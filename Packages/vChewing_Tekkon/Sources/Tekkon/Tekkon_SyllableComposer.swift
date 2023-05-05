@@ -46,6 +46,9 @@ public extension Tekkon {
       consonant.value + semivowel.value + vowel.value + intonation.value
     }
 
+    /// 當前注拼槽是否處於拼音模式。
+    public var isPinyinMode: Bool { parser.rawValue >= 100 }
+
     /// 與 value 類似，這個函式就是用來決定輸入法組字區內顯示的注音/拼音內容，
     /// 但可以指定是否輸出教科書格式（拼音的調號在字母上方、注音的輕聲寫在左側）。
     /// - Parameters:
@@ -66,29 +69,23 @@ public extension Tekkon {
     /// - Parameters:
     ///   - isHanyuPinyin: 是否將輸出結果轉成漢語拼音。
     public func getInlineCompositionForDisplay(isHanyuPinyin: Bool = false) -> String {
-      switch parser {
-      case .ofHanyuPinyin, .ofSecondaryPinyin, .ofYalePinyin, .ofHualuoPinyin, .ofUniversalPinyin, .ofWadeGilesPinyin:
-        var toneReturned = ""
-        switch intonation.value {
-        case " ": toneReturned = "1"
-        case "ˊ": toneReturned = "2"
-        case "ˇ": toneReturned = "3"
-        case "ˋ": toneReturned = "4"
-        case "˙": toneReturned = "5"
-        default: break
-        }
-        return romajiBuffer.replacingOccurrences(of: "v", with: "ü") + toneReturned
-      default: return getComposition(isHanyuPinyin: isHanyuPinyin)
+      guard isPinyinMode else { return getComposition(isHanyuPinyin: isHanyuPinyin) }
+      var toneReturned = ""
+      switch intonation.value {
+      case " ": toneReturned = "1"
+      case "ˊ": toneReturned = "2"
+      case "ˇ": toneReturned = "3"
+      case "ˋ": toneReturned = "4"
+      case "˙": toneReturned = "5"
+      default: break
       }
+      return romajiBuffer.replacingOccurrences(of: "v", with: "ü") + toneReturned
     }
 
     /// 注拼槽內容是否為空。
     public var isEmpty: Bool {
-      switch parser {
-      case .ofHanyuPinyin, .ofSecondaryPinyin, .ofYalePinyin, .ofHualuoPinyin, .ofUniversalPinyin, .ofWadeGilesPinyin:
-        return intonation.isEmpty && romajiBuffer.isEmpty
-      default: return intonation.isEmpty && vowel.isEmpty && semivowel.isEmpty && consonant.isEmpty
-      }
+      guard !isPinyinMode else { return intonation.isEmpty && romajiBuffer.isEmpty }
+      return intonation.isEmpty && vowel.isEmpty && semivowel.isEmpty && consonant.isEmpty
     }
 
     /// 注拼槽內容是否可唸。
@@ -197,23 +194,23 @@ public extension Tekkon {
     /// - Parameters:
     ///   - fromString: 傳入的 String 內容。
     public mutating func receiveKey(fromString input: String = "") {
-      switch parser {
-      case .ofHanyuPinyin, .ofSecondaryPinyin, .ofYalePinyin, .ofHualuoPinyin, .ofUniversalPinyin, .ofWadeGilesPinyin:
-        if mapArayuruPinyinIntonation.keys.contains(input) {
-          if let theTone = mapArayuruPinyinIntonation[input] {
-            intonation = Phonabet(theTone)
-          }
-        } else {
-          // 為了防止 romajiBuffer 越敲越長帶來算力負擔，這裡讓它在要溢出時自動丟掉最早輸入的音頭。
-          let maxCount: Int = (parser == .ofWadeGilesPinyin) ? 7 : 6
-          if romajiBuffer.count > maxCount - 1 {
-            romajiBuffer = String(romajiBuffer.dropFirst())
-          }
-          let romajiBufferBackup = romajiBuffer + input
-          receiveSequence(romajiBufferBackup, isRomaji: true)
-          romajiBuffer = romajiBufferBackup
+      guard isPinyinMode else {
+        receiveKey(fromPhonabet: translate(key: input))
+        return
+      }
+      if mapArayuruPinyinIntonation.keys.contains(input) {
+        if let theTone = mapArayuruPinyinIntonation[input] {
+          intonation = Phonabet(theTone)
         }
-      default: receiveKey(fromPhonabet: translate(key: input))
+      } else {
+        // 為了防止 romajiBuffer 越敲越長帶來算力負擔，這裡讓它在要溢出時自動丟掉最早輸入的音頭。
+        let maxCount: Int = (parser == .ofWadeGilesPinyin) ? 7 : 6
+        if romajiBuffer.count > maxCount - 1 {
+          romajiBuffer = String(romajiBuffer.dropFirst())
+        }
+        let romajiBufferBackup = romajiBuffer + input
+        receiveSequence(romajiBufferBackup, isRomaji: true)
+        romajiBuffer = romajiBufferBackup
       }
     }
 
@@ -325,9 +322,7 @@ public extension Tekkon {
     ///
     /// 基本上就是按順序從游標前方開始往後刪。
     public mutating func doBackSpace() {
-      if [.ofHanyuPinyin, .ofSecondaryPinyin, .ofYalePinyin, .ofHualuoPinyin, .ofUniversalPinyin, .ofWadeGilesPinyin].contains(parser),
-         !romajiBuffer.isEmpty
-      {
+      if isPinyinMode, !romajiBuffer.isEmpty {
         if !intonation.isEmpty {
           intonation.clear()
         } else {
@@ -361,7 +356,29 @@ public extension Tekkon {
       parser = arrange
     }
 
-    // MARK: - Parser Processings
+    /// 拿取用來進行索引檢索用的注音字串。
+    ///
+    /// 如果輸入法的辭典索引是漢語拼音的話，你可能用不上這個函式。
+    /// - Remark: 該字串結果不能為空，否則組字引擎會炸。
+    /// - Parameter pronouncable: 是否可以唸出。
+    /// - Returns: 可用的查詢用注音字串，或者 nil。
+    public func phonabetKeyForQuery(pronouncable: Bool) -> String? {
+      let readingKey = getComposition()
+      var validKeyGeneratable = false
+      switch isPinyinMode {
+      case false:
+        switch pronouncable {
+        case false:
+          validKeyGeneratable = !readingKey.isEmpty
+        case true:
+          validKeyGeneratable = isPronouncable
+        }
+      case true: validKeyGeneratable = isPronouncable
+      }
+      return validKeyGeneratable ? readingKey : nil
+    }
+
+    // MARK: - Parser Processing
 
     // 注拼槽對內處理用函式都在這一小節。
 
@@ -371,6 +388,7 @@ public extension Tekkon {
     /// - Parameters:
     ///   - key: 傳入的 String 訊號。
     public mutating func translate(key: String = "") -> String {
+      guard !isPinyinMode else { return "" }
       switch parser {
       case .ofDachen:
         return Tekkon.mapQwertyDachen[key] ?? ""
@@ -392,10 +410,9 @@ public extension Tekkon {
         return Tekkon.mapFakeSeigyou[key] ?? ""
       case .ofStarlight:
         return handleStarlight(key: key)
-      case .ofHanyuPinyin, .ofSecondaryPinyin, .ofYalePinyin, .ofHualuoPinyin, .ofUniversalPinyin, .ofWadeGilesPinyin:
-        break // 漢語拼音單獨用另外的函式處理
+      default:
+        return ""
       }
-      return ""
     }
 
     /// 所有動態注音鍵盤佈局都會用到的共用糾錯處理步驟。

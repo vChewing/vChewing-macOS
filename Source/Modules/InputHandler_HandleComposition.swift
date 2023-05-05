@@ -94,7 +94,7 @@ extension InputHandler {
         return handleEnter(input: input, readingOnly: true)
       }
       // 拿取用來進行索引檢索用的注音。這裡先不急著處理「僅有注音符號輸入」的情況。
-      guard let readingKey = composer.keyForQuery(pronouncable: true) else { break ifComposeReading }
+      guard let readingKey = composer.phonabetKeyForQuery(pronouncable: true) else { break ifComposeReading }
       // 向語言模型詢問是否有對應的記錄。
       if !currentLM.hasUnigramsFor(keyArray: [readingKey]) {
         delegate.callError("B49C0979：語彙庫內無「\(readingKey)」的匹配記錄。")
@@ -167,7 +167,7 @@ extension InputHandler {
     /// 但這裡不處理陰平聲調。
     if keyConsumedByReading {
       // 此處將 strict 設為 false，以應對「僅有注音符號輸入」的情況。
-      if composer.keyForQuery(pronouncable: false) == nil {
+      if composer.phonabetKeyForQuery(pronouncable: false) == nil {
         // 將被空格鍵覆蓋掉的既有聲調塞入組字器。
         if !composer.isPinyinMode, input.isSpace,
            compositor.insertKey(existedIntonation.value)
@@ -377,35 +377,5 @@ extension InputHandler {
       isCodePointInputMode = true
       return true
     }
-  }
-}
-
-// MARK: - Private Extensions for Tekkon Composer
-
-// 此處的功能擴充大概只會在威注音輸入法當中用到。
-
-extension Tekkon.Composer {
-  /// 闡明當前注拼槽是否處於拼音模式。
-  var isPinyinMode: Bool { parser.rawValue >= 100 }
-
-  /// 拿取用來進行索引檢索用的注音。
-  /// 如果輸入法的辭典索引是漢語拼音的話，要注意改這裡、使其拿到的內容是漢語拼音。
-  /// - Remark: 該字串不能為空，否則組字引擎會炸。
-  /// - Parameter pronouncable: 是否可以唸出。
-  /// - Returns: 可用的查詢用注音字串，或者 nil。
-  func keyForQuery(pronouncable: Bool) -> String? {
-    let readingKey = getComposition()
-    var validKeyGeneratable = false
-    switch isPinyinMode {
-    case false:
-      switch pronouncable {
-      case false:
-        validKeyGeneratable = !readingKey.isEmpty
-      case true:
-        validKeyGeneratable = isPronouncable
-      }
-    case true: validKeyGeneratable = isPronouncable
-    }
-    return validKeyGeneratable ? readingKey : nil
   }
 }
