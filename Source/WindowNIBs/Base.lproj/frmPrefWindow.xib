@@ -1051,7 +1051,7 @@
                                         </column>
                                     </cells>
                                     <connections>
-                                        <binding destination="32" name="selectedTag" keyPath="values.SecifyIntonationKeyBehavior" id="k3O-tW-1Zy"/>
+                                        <binding destination="32" name="selectedTag" keyPath="values.SpecifyIntonationKeyBehavior" id="k3O-tW-1Zy"/>
                                     </connections>
                                 </matrix>
                             </subviews>
