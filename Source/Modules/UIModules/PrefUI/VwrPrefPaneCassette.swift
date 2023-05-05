@@ -121,7 +121,6 @@ struct VwrPrefPaneCassette: View {
               "Cassette mode is similar to the CIN support of the Yahoo Kimo IME, allowing users to use their own CIN tables to implement their stroked-based input schema (e.g. Wubi, Cangjie, Boshiamy, etc.) as a plan-B in vChewing IME. However, since vChewing won't compromise its phonabet input mode experience for this cassette mode, users might not feel comfortable enough comparing to their experiences with RIME (recommended) or OpenVanilla (deprecated)."
             )
           )
-
           .preferenceDescription(maxWidth: CtlPrefUIShared.maxDescriptionWidth)
         }
 
@@ -141,7 +140,6 @@ struct VwrPrefPaneCassette: View {
               "All strokes in the composition buffer will be shown as ASCII keyboard characters unless this option is enabled. Stroke is definable in the “%keyname” section of the CIN file."
             )
           )
-
           .preferenceDescription(maxWidth: CtlPrefUIShared.maxDescriptionWidth)
           Picker(
             "",
@@ -159,7 +157,6 @@ struct VwrPrefPaneCassette: View {
               "This conversion only affects the cassette module, converting typed contents to either Simplified Chinese or Traditional Chinese in accordance with this setting and your current input mode."
             )
           )
-
           .preferenceDescription(maxWidth: CtlPrefUIShared.maxDescriptionWidth)
         }
       }

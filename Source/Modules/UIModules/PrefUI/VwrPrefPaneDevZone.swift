@@ -46,7 +46,6 @@ struct VwrPrefPaneDevZone: View {
           Text(
             "Some clients with web-based front UI may have issues rendering segmented thick underlines drawn by their implemented “setMarkedText()”. This option stops the input method from delivering segmented thick underlines to “client().setMarkedText()”. Note that segmented thick underlines are only used in marking mode, unless the client itself misimplements the IMKTextInput method “setMarkedText()”. This option only affects the inline composition buffer.".localized
           )
-
           .preferenceDescription(maxWidth: CtlPrefUIShared.maxDescriptionWidth)
         }
       }
