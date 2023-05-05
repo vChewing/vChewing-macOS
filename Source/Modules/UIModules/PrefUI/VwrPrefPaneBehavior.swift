@@ -22,6 +22,9 @@ struct VwrPrefPaneBehavior: View {
   @Backport.AppStorage(wrappedValue: true, UserDef.kEscToCleanInputBuffer.rawValue)
   private var escToCleanInputBuffer: Bool
 
+  @Backport.AppStorage(wrappedValue: true, UserDef.kAcceptLeadingIntonations.rawValue)
+  private var acceptLeadingIntonations: Bool
+
   @Backport.AppStorage(wrappedValue: 0, UserDef.kSpecifyIntonationKeyBehavior.rawValue)
   private var specifyIntonationKeyBehavior: Int
 
@@ -172,6 +175,12 @@ struct VwrPrefPaneBehavior: View {
           .labelsHidden()
           .pickerStyle(RadioGroupPickerStyle())
           Text(LocalizedStringKey("Specify the behavior of intonation key when syllable composer is empty."))
+            .preferenceDescription(maxWidth: CtlPrefUIShared.maxDescriptionWidth)
+          Toggle(
+            LocalizedStringKey("Accept leading intonations in rare cases"),
+            isOn: $acceptLeadingIntonations
+          ).controlSize(.small)
+          Text(LocalizedStringKey("This feature accommodates certain typing mistakes that the intonation mark might be typed at first (which is sequentially wrong from a common sense that intonation marks are supposed to be used for confirming combinations). It won't work if the current parser is of (any) pinyin. Also, this feature won't work when an intonation override is possible (and enabled)."))
             .preferenceDescription(maxWidth: CtlPrefUIShared.maxDescriptionWidth)
         }
         SSPreferences.Settings.Section(title: "Shift:", bottomDivider: true) {
