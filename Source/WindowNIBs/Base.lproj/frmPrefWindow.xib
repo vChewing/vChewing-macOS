@@ -883,17 +883,17 @@
         </view>
         <customObject id="-3" userLabel="Application" customClass="NSObject"/>
         <view id="XWo-36-xGi" userLabel="vwrBehavior">
-            <rect key="frame" x="0.0" y="0.0" width="577" height="553"/>
+            <rect key="frame" x="0.0" y="0.0" width="577" height="573"/>
             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
             <subviews>
                 <stackView distribution="fill" orientation="vertical" alignment="leading" spacing="12" horizontalStackHuggingPriority="249.99998474121094" verticalStackHuggingPriority="249.99998474121094" translatesAutoresizingMaskIntoConstraints="NO" id="j9R-fB-ttM">
-                    <rect key="frame" x="20" y="38" width="530" height="495"/>
+                    <rect key="frame" x="20" y="37" width="530" height="516"/>
                     <subviews>
                         <stackView distribution="fill" orientation="vertical" alignment="leading" spacing="5" horizontalStackHuggingPriority="249.99998474121094" verticalStackHuggingPriority="249.99998474121094" translatesAutoresizingMaskIntoConstraints="NO" id="pwZ-0Z-1ID">
-                            <rect key="frame" x="0.0" y="410" width="530" height="85"/>
+                            <rect key="frame" x="0.0" y="410" width="530" height="106"/>
                             <subviews>
                                 <button translatesAutoresizingMaskIntoConstraints="NO" id="109">
-                                    <rect key="frame" x="-1" y="68.5" width="285" height="17"/>
+                                    <rect key="frame" x="-1" y="89.5" width="285" height="17"/>
                                     <constraints>
                                         <constraint firstAttribute="height" constant="16" id="PYH-8e-mUx"/>
                                     </constraints>
@@ -906,7 +906,7 @@
                                     </connections>
                                 </button>
                                 <button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="bE0-Lq-Pj7">
-                                    <rect key="frame" x="-1" y="47.5" width="266" height="17"/>
+                                    <rect key="frame" x="-1" y="68.5" width="266" height="17"/>
                                     <constraints>
                                         <constraint firstAttribute="height" constant="16" id="6uT-D5-KVx"/>
                                     </constraints>
@@ -919,7 +919,7 @@
                                     </connections>
                                 </button>
                                 <button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="6MM-WC-Mpd">
-                                    <rect key="frame" x="-1" y="26.5" width="381" height="17"/>
+                                    <rect key="frame" x="-1" y="47.5" width="381" height="17"/>
                                     <constraints>
                                         <constraint firstAttribute="height" constant="16" id="hhN-al-6OI"/>
                                     </constraints>
@@ -929,6 +929,19 @@
                                     </buttonCell>
                                     <connections>
                                         <binding destination="32" name="value" keyPath="values.AlsoConfirmAssociatedCandidatesByEnter" id="P1C-j9-N88"/>
+                                    </connections>
+                                </button>
+                                <button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="a6O-JL-C4g">
+                                    <rect key="frame" x="-1" y="26.5" width="247" height="17"/>
+                                    <constraints>
+                                        <constraint firstAttribute="height" constant="16" id="WkD-Wx-erN"/>
+                                    </constraints>
+                                    <buttonCell key="cell" type="check" title="Accept leading intonations in rare cases" bezelStyle="regularSquare" imagePosition="left" controlSize="small" inset="2" id="lblAcceptLeadingIntonations">
+                                        <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
+                                        <font key="font" metaFont="cellTitle"/>
+                                    </buttonCell>
+                                    <connections>
+                                        <binding destination="32" name="value" keyPath="values.AcceptLeadingIntonations" id="l0S-gB-ckP"/>
                                     </connections>
                                 </button>
                                 <button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="7QM-7z-tpq">
@@ -957,8 +970,10 @@
                                 <integer value="1000"/>
                                 <integer value="1000"/>
                                 <integer value="1000"/>
+                                <integer value="1000"/>
                             </visibilityPriorities>
                             <customSpacing>
+                                <real value="3.4028234663852886e+38"/>
                                 <real value="3.4028234663852886e+38"/>
                                 <real value="3.4028234663852886e+38"/>
                                 <real value="3.4028234663852886e+38"/>
@@ -1241,7 +1256,7 @@
                 <constraint firstItem="j9R-fB-ttM" firstAttribute="leading" secondItem="XWo-36-xGi" secondAttribute="leading" constant="20" symbolic="YES" id="4lO-GJ-Cpr"/>
                 <constraint firstItem="j9R-fB-ttM" firstAttribute="top" secondItem="XWo-36-xGi" secondAttribute="top" constant="20" symbolic="YES" id="CuZ-dn-mQZ"/>
             </constraints>
-            <point key="canvasLocation" x="-1351.5" y="597.5"/>
+            <point key="canvasLocation" x="-1351.5" y="607.5"/>
         </view>
         <userDefaultsController representsSharedInstance="YES" id="32"/>
         <view id="Rnp-LM-RIF" userLabel="vwrDictionary">
@@ -1592,7 +1607,7 @@
                             <rect key="frame" x="0.0" y="71" width="538" height="370"/>
                             <clipView key="contentView" drawsBackground="NO" id="x8s-wo-bxi">
                                 <rect key="frame" x="0.0" y="0.0" width="538" height="370"/>
-                                <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                                <autoresizingMask key="autoresizingMask"/>
                                 <subviews>
                                     <textView wantsLayer="YES" importsGraphics="NO" richText="NO" verticallyResizable="YES" allowsUndo="YES" smartInsertDelete="YES" id="kSG-dz-P2N">
                                         <rect key="frame" x="0.0" y="0.0" width="538" height="370"/>
