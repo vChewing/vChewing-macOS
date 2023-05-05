@@ -273,6 +273,9 @@ public class PrefMgr: PrefMgrProtocol {
   @AppProperty(key: UserDef.kEscToCleanInputBuffer.rawValue, defaultValue: true)
   public var escToCleanInputBuffer: Bool
 
+  @AppProperty(key: UserDef.kAcceptLeadingIntonations.rawValue, defaultValue: true)
+  public var acceptLeadingIntonations: Bool
+
   @AppProperty(key: UserDef.kSpecifyIntonationKeyBehavior.rawValue, defaultValue: 0)
   public var specifyIntonationKeyBehavior: Int
 
