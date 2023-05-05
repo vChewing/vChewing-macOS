@@ -102,7 +102,6 @@ struct VwrPrefPaneKeyboard: View {
               comment: ""
             )
           )
-
           .preferenceDescription(maxWidth: CtlPrefUIShared.maxDescriptionWidth)
         }
         SSPreferences.Settings.Section(title: "Alphanumerical Layout:".localized) {
@@ -126,7 +125,6 @@ struct VwrPrefPaneKeyboard: View {
               comment: ""
             )
           )
-
           .preferenceDescription(maxWidth: CtlPrefUIShared.maxDescriptionWidth)
         }
         SSPreferences.Settings.Section(title: "Keyboard Shortcuts:".localized) {

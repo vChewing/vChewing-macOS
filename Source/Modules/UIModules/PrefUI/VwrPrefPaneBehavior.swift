@@ -89,7 +89,6 @@ struct VwrPrefPaneBehavior: View {
               "If unchecked, the ESC key will try cleaning the unfinished readings / strokes first, and will commit the current composition buffer if there's no unfinished readings / strkes."
             )
           )
-
           .preferenceDescription(maxWidth: CtlPrefUIShared.maxDescriptionWidth)
         }
         SSPreferences.Settings.Section(title: "Enter:".localized, bottomDivider: true) {
@@ -102,7 +101,6 @@ struct VwrPrefPaneBehavior: View {
               "Otherwise, only the candidate keys are allowed to confirm associates."
             )
           )
-
           .preferenceDescription(maxWidth: CtlPrefUIShared.maxDescriptionWidth)
         }
         SSPreferences.Settings.Section(title: "Shift+BackSpace:".localized, bottomDivider: true) {
@@ -117,7 +115,6 @@ struct VwrPrefPaneBehavior: View {
           .labelsHidden()
           .pickerStyle(RadioGroupPickerStyle())
           Text(LocalizedStringKey("Disassembling process does not work with non-phonetic reading keys."))
-
             .preferenceDescription(maxWidth: CtlPrefUIShared.maxDescriptionWidth)
         }
         SSPreferences.Settings.Section(title: "(Shift+)Tab:", bottomDivider: true) {
@@ -132,7 +129,6 @@ struct VwrPrefPaneBehavior: View {
           .horizontalRadioGroupLayout()
           .pickerStyle(RadioGroupPickerStyle())
           Text(LocalizedStringKey("Choose the behavior of (Shift+)Tab key in the candidate window."))
-
             .preferenceDescription(maxWidth: CtlPrefUIShared.maxDescriptionWidth)
         }
         SSPreferences.Settings.Section(title: "(Shift+)Space:".localized, bottomDivider: true) {
@@ -146,7 +142,6 @@ struct VwrPrefPaneBehavior: View {
           .labelsHidden()
           .pickerStyle(RadioGroupPickerStyle())
           Text(LocalizedStringKey("Choose the behavior of (Shift+)Space key with candidates."))
-
             .preferenceDescription(maxWidth: CtlPrefUIShared.maxDescriptionWidth)
         }
         SSPreferences.Settings.Section(title: "Shift+Letter:".localized, bottomDivider: true) {
@@ -163,7 +158,6 @@ struct VwrPrefPaneBehavior: View {
           .labelsHidden()
           .pickerStyle(RadioGroupPickerStyle())
           Text(LocalizedStringKey("Choose the behavior of Shift+Letter key with letter inputs."))
-
             .preferenceDescription(maxWidth: CtlPrefUIShared.maxDescriptionWidth)
         }
         SSPreferences.Settings.Section(title: "Intonation Key:".localized, bottomDivider: true) {
@@ -178,7 +172,6 @@ struct VwrPrefPaneBehavior: View {
           .labelsHidden()
           .pickerStyle(RadioGroupPickerStyle())
           Text(LocalizedStringKey("Specify the behavior of intonation key when syllable composer is empty."))
-
             .preferenceDescription(maxWidth: CtlPrefUIShared.maxDescriptionWidth)
         }
         SSPreferences.Settings.Section(title: "Shift:", bottomDivider: true) {
