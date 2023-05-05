@@ -41,7 +41,7 @@ public enum UserDef: String, CaseIterable {
   case kHalfWidthPunctuationEnabled = "HalfWidthPunctuationEnable"
   case kMoveCursorAfterSelectingCandidate = "MoveCursorAfterSelectingCandidate"
   case kEscToCleanInputBuffer = "EscToCleanInputBuffer"
-  case kSpecifyIntonationKeyBehavior = "SecifyIntonationKeyBehavior"
+  case kSpecifyIntonationKeyBehavior = "SpecifyIntonationKeyBehavior"
   case kSpecifyShiftBackSpaceKeyBehavior = "SpecifyShiftBackSpaceKeyBehavior"
   case kSpecifyShiftTabKeyBehavior = "SpecifyShiftTabKeyBehavior"
   case kSpecifyShiftSpaceKeyBehavior = "SpecifyShiftSpaceKeyBehavior"
