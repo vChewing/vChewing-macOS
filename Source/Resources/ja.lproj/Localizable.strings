@@ -192,6 +192,7 @@
 "⚠︎ This feature is useful ONLY WHEN the font you are using doesn't support dynamic vertical punctuations. However, typed vertical punctuations will always shown as vertical punctuations EVEN IF your editor has changed the typing direction to horizontal." = "⚠︎ 該当の組版用フォントには縦書き（引用符・括弧）変換機能が備えていない限り、この機能を使う甲斐がある。一旦使うと、入力した全ての引用符・括弧は永遠的に縦書きの様式になる。例え入力を受けているアプリ（例えばワープロソフとなど）の書写方向は横書きと変えたとしても、これらの入力済みの引用符・括弧は全て縦書きの見た目であり、削除してから入力し直す必要になる。";
 "⚠︎ This may hinder the walking algorithm from giving appropriate results." = "⚠︎ ウォーキング算法に差し支えてしまい、正しくない結果が出る恐れがある。";
 "⚠︎ This will reboot the vChewing IME." = "⚠︎ これで威注音入力アプリを再起動。";
+"Accept leading intonations in rare cases" = "まれな場合には、音調記号の優先入力を許容する";
 "All strokes in the composition buffer will be shown as ASCII keyboard characters unless this option is enabled. Stroke is definable in the “%keyname” section of the CIN file." = "これをチェックしないと、全ての筆画は ASCII キーネームで入力緩衝列で表示してしまうことになる。CIN ファイルの「%keyname」というところで筆画の定義はできる。";
 "Allow backspace-editing miscomposed readings" = "効かぬ音読みを BackSpace で再編集";
 "Allow boosting / excluding a candidate of single kanji when marking" = "マーキングモードで即排除/即最優先にできる候補の文字数の最低限は１字とする";
@@ -330,6 +331,7 @@
 "The lookup results are supplied by the CIN cassette module." = "逆引参照の結果は CIN カセットモジュールから提供。";
 "The user override model only possesses memories temporarily. Each memory record gradually becomes ineffective within approximately less than 6 days. You can erase all memory records through the input method menu." = "臨時記憶モジュールは文字の通り「臨時的」の記憶をします。記録は六日間どんどん忘れてしまいます。入力アプリのメニューから全ての記録を消すことはできます。";
 "This conversion only affects the cassette module, converting typed contents to either Simplified Chinese or Traditional Chinese in accordance with this setting and your current input mode." = "この転換はカセットモードだけに使える転換であり、転換結果はこの設定と入力モード次第である。";
+"This feature accommodates certain typing mistakes that the intonation mark might be typed at first (which is sequentially wrong from a common sense that intonation marks are supposed to be used for confirming combinations). It won't work if the current parser is of (any) pinyin. Also, this feature won't work when an intonation override is possible (and enabled)." = "音調記号は常に「漢字の音読組合を確認するキー」として最後で入力することだと常識ですが、間違くてそれを最初に入力してしまった場合もございます。このボカ避け機能は（ほんの一部の）このような間違いを対策できますが、注音入力だけに使えます。更に、（音調の上書き機能がオンを前提として）音調の上書きができる場合には、このボカ避け機能は作動しません。";
 "This feature requires macOS 10.15 and above." = "この機能の稼働には macOS 10.15 以降のシステムが必要である。";
 "This feature requires macOS 12 and above." = "この機能の稼働には macOS 12 以降のシステムが必要である。";
 "This only works with Tadokoro candidate window." = "これは田所候補陳列ウィンドウだけに効ける機能である。";
