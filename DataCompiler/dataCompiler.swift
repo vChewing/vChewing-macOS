@@ -117,15 +117,8 @@ func cnvPhonabetToASCII(_ incoming: String) -> String {
 
 private let urlCurrentFolder = URL(fileURLWithPath: FileManager.default.currentDirectoryPath)
 
-private let urlCHSforCustom: String = "./components/chs/phrases-custom-chs.txt"
-private let urlCHSforTABE: String = "./components/chs/phrases-tabe-chs.txt"
-private let urlCHSforMOE: String = "./components/chs/phrases-moe-chs.txt"
-private let urlCHSforVCHEW: String = "./components/chs/phrases-vchewing-chs.txt"
-
-private let urlCHTforCustom: String = "./components/cht/phrases-custom-cht.txt"
-private let urlCHTforTABE: String = "./components/cht/phrases-tabe-cht.txt"
-private let urlCHTforMOE: String = "./components/cht/phrases-moe-cht.txt"
-private let urlCHTforVCHEW: String = "./components/cht/phrases-vchewing-cht.txt"
+private let urlCHSRoot: String = "./components/chs/"
+private let urlCHTRoot: String = "./components/cht/"
 
 private let urlKanjiCore: String = "./components/common/char-kanji-core.txt"
 private let urlMiscBPMF: String = "./components/common/char-misc-bpmf.txt"
@@ -161,28 +154,22 @@ private var exceptedChars: Set<String> = .init()
 
 func rawDictForPhrases(isCHS: Bool) -> [Unigram] {
   var arrUnigramRAW: [Unigram] = []
-  var strRAWOrig: [String] = []
-  let urlCustom: String = isCHS ? urlCHSforCustom : urlCHTforCustom
-  let urlTABE: String = isCHS ? urlCHSforTABE : urlCHTforTABE
-  let urlMOE: String = isCHS ? urlCHSforMOE : urlCHTforMOE
-  let urlVCHEW: String = isCHS ? urlCHSforVCHEW : urlCHTforVCHEW
+  var strRAWOrigDict: [String: String] = [:]
+  let urlFolderRoot: String = isCHS ? urlCHSRoot : urlCHTRoot
   let i18n: String = isCHS ? "簡體中文" : "繁體中文"
   // 讀取內容
   do {
-    let str1 = try String(contentsOfFile: urlCustom, encoding: .utf8)
-    let str2 = try String(contentsOfFile: urlTABE, encoding: .utf8)
-    let str3 = try String(contentsOfFile: urlMOE, encoding: .utf8)
-    let str4 = try String(contentsOfFile: urlVCHEW, encoding: .utf8)
-    strRAWOrig.append(str1)
-    strRAWOrig.append(str2)
-    strRAWOrig.append(str3)
-    strRAWOrig.append(str4)
+    try FileManager.default.contentsOfDirectory(atPath: urlFolderRoot).forEach { thePath in
+      guard thePath.contains("phrases-") else { return }
+      let str = try String(contentsOfFile: urlFolderRoot + thePath, encoding: .utf8)
+      strRAWOrigDict[thePath] = str
+    }
   } catch {
     NSLog(" - Exception happened when reading raw phrases data.")
     return []
   }
-  for i in 0 ..< strRAWOrig.count {
-    var strRAW = strRAWOrig[i]
+  for key in strRAWOrigDict.keys {
+    guard var strRAW = strRAWOrigDict[key] else { continue }
     // 預處理格式
     strRAW = strRAW.replacingOccurrences(of: " #MACOS", with: "") // 去掉 macOS 標記
     // CJKWhiteSpace (\x{3000}) to ASCII Space
@@ -193,16 +180,14 @@ func rawDictForPhrases(isCHS: Bool) -> [Unigram] {
     strRAW.regReplace(pattern: #"(^ | $)"#, replaceWith: "") // 去除行尾行首空格
     strRAW.regReplace(pattern: #"(\f+|\r+|\n+)+"#, replaceWith: "\n") // CR & Form Feed to LF, 且去除重複行
     strRAW.regReplace(pattern: #"^(#.*|.*#WIN32.*)$"#, replaceWith: "") // 以#開頭的行都淨空+去掉所有 WIN32 特有的行
-    strRAWOrig[i] = strRAW
+    strRAWOrigDict[key] = strRAW
 
     let currentCategory: Unigram.UnigramCategory = {
-      switch i {
-      case 0: return .custom
-      case 1: return .tabe
-      case 2: return .moe
-      case 3: return .macv
-      default: return .custom
-      }
+      if key.contains("-custom-") { return .custom }
+      if key.contains("-tabe-") { return .tabe }
+      if key.contains("-moe-") { return .moe }
+      if key.contains("-vchewing-") { return .macv }
+      return .custom
     }()
     var lineData = ""
     for lineNeta in strRAW.split(separator: "\n") {
