@@ -111,9 +111,12 @@ public extension IMEState {
     return result
   }
 
-  static func ofInputting(displayTextSegments: [String], cursor: Int) -> IMEState {
+  static func ofInputting(displayTextSegments: [String], cursor: Int, highlightAt highlightAtSegment: Int? = nil) -> IMEState {
     var result = IMEState(displayTextSegments: displayTextSegments, cursor: cursor)
     result.type = .ofInputting
+    if let readingAtSegment = highlightAtSegment {
+      result.data.highlightAtSegment = readingAtSegment
+    }
     return result
   }
 
