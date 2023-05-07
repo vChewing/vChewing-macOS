@@ -91,6 +91,7 @@ public struct IMEStateData: IMEStateDataProtocol {
     }
   }
 
+  public var highlightAtSegment: Int?
   public var reading: String = ""
   public var markedReadings = [String]()
   public var candidates = [(keyArray: [String], value: String)]()
