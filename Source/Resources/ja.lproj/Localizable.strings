@@ -1,4 +1,6 @@
 "vChewing" = "威注音入力アプリ";
+"It will attempt to combine with the incoming phonabet input." = "この音調は次の注音入力と組み合わす。";
+"Intonation mark. ENTER to commit.\nSPACE to insert into composition buffer." = "音調記号。ENTER で送り出す。\nSPACE で入力緩衝列に挿入。";
 "CHS / CHT Input Mode Switch" = "簡体・繁体中国語入力の切り替え";
 "Switch to %@ Input Mode" = "%@入力モードに切り替え";
 "Target Input Mode Activation Required" = "関連の入力ソースの追加が必要";

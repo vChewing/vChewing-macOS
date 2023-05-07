@@ -68,7 +68,21 @@ extension InputHandler {
     )
   }
 
-  /// 生成「正在輸入」狀態。
+  /// 生成「在有單獨的前置聲調符號輸入時」的工具提示。
+  var tooltipForStandaloneIntonationMark: String {
+    guard !isComposerUsingPinyin else { return "" }
+    guard composer.hasIntonation(withNothingElse: true) else { return "" }
+    guard composer.intonation.value != " " else { return "" }
+    let result = NSMutableString()
+    result.append("Intonation mark. ENTER to commit.\nSPACE to insert into composition buffer.".localized)
+    if prefs.acceptLeadingIntonations {
+      result.append("\n")
+      result.append("It will attempt to combine with the incoming phonabet input.".localized)
+    }
+    return result.description
+  }
+
+  /// 將組字器內的游標位置資料轉換成可以正確顯示的游標位置資料。
   /// - Parameter rawCursor: 原始游標。
   /// - Returns: 用以顯示的游標。
   func convertCursorForDisplay(_ rawCursor: Int) -> Int {

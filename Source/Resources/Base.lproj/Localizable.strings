@@ -1,4 +1,6 @@
 "vChewing" = "vChewing";
+"It will attempt to combine with the incoming phonabet input." = "It will attempt to combine with the incoming phonabet input.";
+"Intonation mark. ENTER to commit.\nSPACE to insert into composition buffer." = "Intonation mark. ENTER to commit.\nSPACE to insert into composition buffer.";
 "CHS / CHT Input Mode Switch" = "CHS / CHT Input Mode Switch";
 "Switch to %@ Input Mode" = "Switch to %@ Input Mode";
 "Target Input Mode Activation Required" = "Target Input Mode Activation Required";
