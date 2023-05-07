@@ -20,6 +20,7 @@ extension InputHandler {
   /// 生成「正在輸入」狀態。相關的內容會被拿給狀態機械用來處理在電腦螢幕上顯示的內容。
   public func generateStateOfInputting(sansReading: Bool = false) -> IMEStateProtocol {
     if isConsideredEmptyForNow { return IMEState.ofAbortion() }
+    var segHighlightedAt: Int?
     let cpInput = isCodePointInputMode && !sansReading
     /// 「更新內文組字區 (Update the composing buffer)」是指要求客體軟體將組字緩衝區的內容
     /// 換成由此處重新生成的原始資料在 IMEStateData 當中生成的 NSAttributeString。
@@ -39,6 +40,8 @@ extension InputHandler {
           if charCounter == cursor {
             newDisplayTextSegments.append(temporaryNode)
             temporaryNode = ""
+            // 處理在組字區中間或者最後方插入游標的情形。
+            segHighlightedAt = newDisplayTextSegments.count
             newDisplayTextSegments.append(reading)
           }
           temporaryNode += String(char)
@@ -47,7 +50,11 @@ extension InputHandler {
         newDisplayTextSegments.append(temporaryNode)
         temporaryNode = ""
       }
-      if newDisplayTextSegments == displayTextSegments { newDisplayTextSegments.append(reading) }
+      if newDisplayTextSegments == displayTextSegments {
+        // 處理在組字區最前方插入游標的情形。
+        segHighlightedAt = newDisplayTextSegments.count
+        newDisplayTextSegments.append(reading)
+      }
       displayTextSegments = newDisplayTextSegments
       cursor += reading.count
     }
@@ -55,7 +62,10 @@ extension InputHandler {
       displayTextSegments[i] = displayTextSegments[i].trimmingCharacters(in: .newlines)
     }
     /// 這裡生成準備要拿來回呼的「正在輸入」狀態。
-    return IMEState.ofInputting(displayTextSegments: displayTextSegments, cursor: cursor)
+    return IMEState.ofInputting(
+      displayTextSegments: displayTextSegments,
+      cursor: cursor, highlightAt: segHighlightedAt
+    )
   }
 
   /// 生成「正在輸入」狀態。

@@ -44,6 +44,7 @@ public protocol IMEStateDataProtocol {
   var textToCommit: String { get set }
   var markedReadings: [String] { get set }
   var displayTextSegments: [String] { get set }
+  var highlightAtSegment: Int? { get set }
   var isFilterable: Bool { get }
   var isMarkedLengthValid: Bool { get }
   var candidates: [(keyArray: [String], value: String)] { get set }
