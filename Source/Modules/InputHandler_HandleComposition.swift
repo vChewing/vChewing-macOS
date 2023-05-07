@@ -184,7 +184,11 @@ extension InputHandler {
         return nil
       }
       // 以回呼組字狀態的方式來執行 setInlineDisplayWithCursor()。
-      delegate.switchState(generateStateOfInputting())
+      var resultState = generateStateOfInputting()
+      resultState.tooltip = tooltipForStandaloneIntonationMark
+      resultState.tooltipDuration = 0
+      resultState.data.tooltipColorState = .prompt
+      delegate.switchState(resultState)
       return true
     }
     return nil

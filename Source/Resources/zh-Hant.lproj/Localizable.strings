@@ -1,4 +1,6 @@
 "vChewing" = "威注音輸入法";
+"It will attempt to combine with the incoming phonabet input." = "該聲調亦會嘗試與接下來輸入的注音相組合。";
+"Intonation mark. ENTER to commit.\nSPACE to insert into composition buffer." = "聲調符號。敲 Enter 以遞交。\n敲空格鍵以插入組字區。";
 "CHS / CHT Input Mode Switch" = "簡體/繁體中文輸入模式切換";
 "Switch to %@ Input Mode" = "切換至%@輸入模式";
 "Target Input Mode Activation Required" = "得啟用對應的「輸入方式」";
