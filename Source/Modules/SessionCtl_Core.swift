@@ -335,6 +335,7 @@ public extension SessionCtl {
   /// 專門用來就地切換繁簡模式的函式。
   @objc func switchInputMode(_: Any? = nil) {
     guard let client: IMKTextInput = client() else { return }
+    defer { isASCIIMode = false }
     let nowMode = IMEApp.currentInputMode
     guard nowMode != .imeModeNULL else { return }
     modeCheck: for neta in TISInputSource.allRegisteredInstancesOfThisInputMethod {
