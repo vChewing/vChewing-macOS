@@ -57,7 +57,7 @@ SOFTWARE.
 			<key>org.atelierInmu.inputmethod.vChewing.IMECHS</key>
 			<dict>
 				<key>TISDoubleSpaceSubstitution</key>
-				<string>。</string>
+				<string>  </string>
 				<key>TISIntendedLanguage</key>
 				<string>zh-Hans</string>
 				<key>tsInputModeAlternateMenuIconFileKey</key>
@@ -85,7 +85,7 @@ SOFTWARE.
 			<key>org.atelierInmu.inputmethod.vChewing.IMECHT</key>
 			<dict>
 				<key>TISDoubleSpaceSubstitution</key>
-				<string>。</string>
+				<string>  </string>
 				<key>TISIntendedLanguage</key>
 				<string>zh-Hant</string>
 				<key>tsInputModeAlternateMenuIconFileKey</key>
@@ -121,6 +121,8 @@ SOFTWARE.
 	<string>org_atelierInmu_inputmethod_vChewing_Connection</string>
 	<key>InputMethodServerControllerClass</key>
 	<string>SessionCtl</string>
+	<key>InputMethodServerDataSourceClass</key>
+	<string>SessionCtl</string>
 	<key>InputMethodServerDelegateClass</key>
 	<string>SessionCtl</string>
 	<key>InputMethodServerPreferencesWindowControllerClass</key>
@@ -147,18 +149,20 @@ SOFTWARE.
 	<string>Yes</string>
 	<key>TICapsLockLanguageSwitchCapable</key>
 	<true/>
+	<key>TISCapsLockIsSwitch</key>
+	<true/>
+	<key>TISCapsLockResetOnModeSwitch</key>
+	<true/>
+	<key>TISIconIsTemplate</key>
+	<false/>
 	<key>TISInputSourceID</key>
 	<string>org.atelierInmu.inputmethod.vChewing</string>
 	<key>TISIntendedLanguage</key>
 	<string>zh-Hans</string>
 	<key>TISParticipatesInTouchBar</key>
+	<true/>
+	<key>TISUnifiedUIForInputMethodEnabling</key>
 	<false/>
-	<key>UpdateInfoEndpoint</key>
-	<string>https://gitee.com/vchewing/vChewing-macOS/raw/main/Update-Info.plist</string>
-	<key>UpdateInfoSite</key>
-	<string>https://gitee.com/vChewing/vChewing-macOS/releases</string>
-	<key>UpdateInfoSiteGitHub</key>
-	<string>https://github.com/vChewing/vChewing-macOS/releases</string>
 	<key>tsInputMethodCharacterRepertoireKey</key>
 	<array>
 		<string>Hans</string>
@@ -168,5 +172,17 @@ SOFTWARE.
 	</array>
 	<key>tsInputMethodIconFileKey</key>
 	<string>MenuIcon-TCVIM.png</string>
+	<key>UpdateInfoEndpoint</key>
+	<string>https://gitee.com/vchewing/vChewing-macOS/raw/main/Update-Info.plist</string>
+	<key>UpdateInfoEndpointLegacy</key>
+	<string>https://gitee.com/vChewing/vChewing-OSX-Legacy/raw/main/Update-Info.plist</string>
+	<key>UpdateInfoSite</key>
+	<string>https://gitee.com/vChewing/vChewing-macOS/releases</string>
+	<key>UpdateInfoSiteGitHub</key>
+	<string>https://github.com/vChewing/vChewing-macOS/releases</string>
+	<key>UpdateInfoSiteLegacy</key>
+	<string>https://gitee.com/vChewing/vChewing-OSX-Legacy/releases</string>
+	<key>UpdateInfoSiteLegacyGitHub</key>
+	<string>https://github.com/vChewing/vChewing-OSX-Legacy/releases</string>
 </dict>
 </plist>
