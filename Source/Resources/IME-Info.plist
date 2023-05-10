@@ -58,6 +58,8 @@ SOFTWARE.
 			<dict>
 				<key>TISDoubleSpaceSubstitution</key>
 				<string>  </string>
+				<key>TISIconIsTemplate</key>
+				<true/>
 				<key>TISIntendedLanguage</key>
 				<string>zh-Hans</string>
 				<key>tsInputModeAlternateMenuIconFileKey</key>
@@ -86,6 +88,8 @@ SOFTWARE.
 			<dict>
 				<key>TISDoubleSpaceSubstitution</key>
 				<string>  </string>
+				<key>TISIconIsTemplate</key>
+				<true/>
 				<key>TISIntendedLanguage</key>
 				<string>zh-Hant</string>
 				<key>tsInputModeAlternateMenuIconFileKey</key>
@@ -154,7 +158,7 @@ SOFTWARE.
 	<key>TISCapsLockResetOnModeSwitch</key>
 	<true/>
 	<key>TISIconIsTemplate</key>
-	<false/>
+	<true/>
 	<key>TISInputSourceID</key>
 	<string>org.atelierInmu.inputmethod.vChewing</string>
 	<key>TISIntendedLanguage</key>
