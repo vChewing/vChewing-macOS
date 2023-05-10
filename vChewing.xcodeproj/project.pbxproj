@@ -40,6 +40,10 @@
 		5B660A8628F64A8800E5E4F6 /* SymbolMenuDefaultData.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B660A8528F64A8800E5E4F6 /* SymbolMenuDefaultData.swift */; };
 		5B69938C293B811F0057CB8E /* VwrPrefPanePhrases.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B69938B293B811F0057CB8E /* VwrPrefPanePhrases.swift */; };
 		5B6C141228A9D4B30098ADF8 /* SessionCtl_HandleEvent.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B6C141128A9D4B30098ADF8 /* SessionCtl_HandleEvent.swift */; };
+		5B70F4E92A0BE900005EA8C4 /* MenuIcon-TCVIM.png in Resources */ = {isa = PBXBuildFile; fileRef = 5B70F4E52A0BE900005EA8C4 /* MenuIcon-TCVIM.png */; };
+		5B70F4EA2A0BE900005EA8C4 /* MenuIcon-SCVIM.png in Resources */ = {isa = PBXBuildFile; fileRef = 5B70F4E62A0BE900005EA8C4 /* MenuIcon-SCVIM.png */; };
+		5B70F4EB2A0BE900005EA8C4 /* MenuIcon-SCVIM@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 5B70F4E72A0BE900005EA8C4 /* MenuIcon-SCVIM@2x.png */; };
+		5B70F4EC2A0BE900005EA8C4 /* MenuIcon-TCVIM@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 5B70F4E82A0BE900005EA8C4 /* MenuIcon-TCVIM@2x.png */; };
 		5B765F09293A253C00122315 /* PhraseEditorUI in Frameworks */ = {isa = PBXBuildFile; productRef = 5B765F08293A253C00122315 /* PhraseEditorUI */; };
 		5B782EC4280C243C007276DE /* InputHandler_HandleCandidate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B782EC3280C243C007276DE /* InputHandler_HandleCandidate.swift */; };
 		5B78EE0D28A562B4009456C1 /* VwrPrefPaneDevZone.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B78EE0C28A562B4009456C1 /* VwrPrefPaneDevZone.swift */; };
@@ -66,8 +70,6 @@
 		5BBBB75F27AED54C0023B93A /* Beep.m4a in Resources */ = {isa = PBXBuildFile; fileRef = 5BBBB75D27AED54C0023B93A /* Beep.m4a */; };
 		5BBBB76027AED54C0023B93A /* Fart.m4a in Resources */ = {isa = PBXBuildFile; fileRef = 5BBBB75E27AED54C0023B93A /* Fart.m4a */; };
 		5BBBB76D27AED5DB0023B93A /* frmAboutWindow.xib in Resources */ = {isa = PBXBuildFile; fileRef = 5BBBB76927AED5DB0023B93A /* frmAboutWindow.xib */; };
-		5BBBB77527AED70B0023B93A /* MenuIcon-SCVIM.tiff in Resources */ = {isa = PBXBuildFile; fileRef = 5BBBB77127AED70B0023B93A /* MenuIcon-SCVIM.tiff */; };
-		5BBBB77627AED70B0023B93A /* MenuIcon-TCVIM.tiff in Resources */ = {isa = PBXBuildFile; fileRef = 5BBBB77227AED70B0023B93A /* MenuIcon-TCVIM.tiff */; };
 		5BBC2D9E28F51C0400C986F6 /* LICENSE.txt in Resources */ = {isa = PBXBuildFile; fileRef = 5B18BA7227C7BD8B0056EB19 /* LICENSE.txt */; };
 		5BBC2D9F28F51C0400C986F6 /* LICENSE-CHT.txt in Resources */ = {isa = PBXBuildFile; fileRef = 5B18BA7427C7BD8C0056EB19 /* LICENSE-CHT.txt */; };
 		5BBC2DA028F51C0400C986F6 /* LICENSE-JPN.txt in Resources */ = {isa = PBXBuildFile; fileRef = 5B18BA7327C7BD8C0056EB19 /* LICENSE-JPN.txt */; };
@@ -238,6 +240,10 @@
 		5B660A8528F64A8800E5E4F6 /* SymbolMenuDefaultData.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SymbolMenuDefaultData.swift; sourceTree = "<group>"; };
 		5B69938B293B811F0057CB8E /* VwrPrefPanePhrases.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VwrPrefPanePhrases.swift; sourceTree = "<group>"; };
 		5B6C141128A9D4B30098ADF8 /* SessionCtl_HandleEvent.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SessionCtl_HandleEvent.swift; sourceTree = "<group>"; };
+		5B70F4E52A0BE900005EA8C4 /* MenuIcon-TCVIM.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "MenuIcon-TCVIM.png"; sourceTree = "<group>"; };
+		5B70F4E62A0BE900005EA8C4 /* MenuIcon-SCVIM.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "MenuIcon-SCVIM.png"; sourceTree = "<group>"; };
+		5B70F4E72A0BE900005EA8C4 /* MenuIcon-SCVIM@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "MenuIcon-SCVIM@2x.png"; sourceTree = "<group>"; };
+		5B70F4E82A0BE900005EA8C4 /* MenuIcon-TCVIM@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "MenuIcon-TCVIM@2x.png"; sourceTree = "<group>"; };
 		5B765F07293A250000122315 /* vChewing_PhraseEditorUI */ = {isa = PBXFileReference; lastKnownFileType = wrapper; name = vChewing_PhraseEditorUI; path = Packages/vChewing_PhraseEditorUI; sourceTree = "<group>"; };
 		5B782EC3280C243C007276DE /* InputHandler_HandleCandidate.swift */ = {isa = PBXFileReference; explicitFileType = sourcecode.swift; fileEncoding = 4; indentWidth = 2; lineEnding = 0; path = InputHandler_HandleCandidate.swift; sourceTree = "<group>"; tabWidth = 2; usesTabs = 0; };
 		5B78EE0C28A562B4009456C1 /* VwrPrefPaneDevZone.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VwrPrefPaneDevZone.swift; sourceTree = "<group>"; };
@@ -263,8 +269,6 @@
 		5BBBB75D27AED54C0023B93A /* Beep.m4a */ = {isa = PBXFileReference; lastKnownFileType = file; path = Beep.m4a; sourceTree = "<group>"; };
 		5BBBB75E27AED54C0023B93A /* Fart.m4a */ = {isa = PBXFileReference; lastKnownFileType = file; path = Fart.m4a; sourceTree = "<group>"; };
 		5BBBB76A27AED5DB0023B93A /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = Base; path = Base.lproj/frmAboutWindow.xib; sourceTree = "<group>"; };
-		5BBBB77127AED70B0023B93A /* MenuIcon-SCVIM.tiff */ = {isa = PBXFileReference; lastKnownFileType = image.tiff; path = "MenuIcon-SCVIM.tiff"; sourceTree = "<group>"; };
-		5BBBB77227AED70B0023B93A /* MenuIcon-TCVIM.tiff */ = {isa = PBXFileReference; lastKnownFileType = image.tiff; path = "MenuIcon-TCVIM.tiff"; sourceTree = "<group>"; };
 		5BBBB77727AEDB290023B93A /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/MainMenu.strings; sourceTree = "<group>"; };
 		5BBC2DA228F5212100C986F6 /* RelocationDetector.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RelocationDetector.swift; sourceTree = "<group>"; };
 		5BBC2DA428F521C200C986F6 /* AppDelegate_Extension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate_Extension.swift; sourceTree = "<group>"; };
@@ -561,8 +565,10 @@
 		5BBBB76E27AED70B0023B93A /* MenuIcons */ = {
 			isa = PBXGroup;
 			children = (
-				5BBBB77127AED70B0023B93A /* MenuIcon-SCVIM.tiff */,
-				5BBBB77227AED70B0023B93A /* MenuIcon-TCVIM.tiff */,
+				5B70F4E62A0BE900005EA8C4 /* MenuIcon-SCVIM.png */,
+				5B70F4E72A0BE900005EA8C4 /* MenuIcon-SCVIM@2x.png */,
+				5B70F4E52A0BE900005EA8C4 /* MenuIcon-TCVIM.png */,
+				5B70F4E82A0BE900005EA8C4 /* MenuIcon-TCVIM@2x.png */,
 			);
 			name = MenuIcons;
 			path = Source/Resources/MenuIcons;
@@ -932,12 +938,15 @@
 			files = (
 				5B84579E2871AD2200C93B01 /* convdict.plist in Resources */,
 				D4E33D8A27A838CF006DB1CF /* Localizable.strings in Resources */,
+				5B70F4EC2A0BE900005EA8C4 /* MenuIcon-TCVIM@2x.png in Resources */,
 				5BF9DA2828840E6200DBD48E /* template-exclusions.txt in Resources */,
 				5B7DA80328BF6BC600D7B2AD /* fixinstall.sh in Resources */,
 				5B0EF55D28CDBF7100F8F7CE /* frmClientListMgr.xib in Resources */,
+				5B70F4E92A0BE900005EA8C4 /* MenuIcon-TCVIM.png in Resources */,
 				5B0E22B028FC17CB00EB7ACA /* Preferences.prefPane in Resources */,
 				5BBBB76027AED54C0023B93A /* Fart.m4a in Resources */,
 				6A2E40F6253A69DA00D1AE1D /* Images.xcassets in Resources */,
+				5B70F4EA2A0BE900005EA8C4 /* MenuIcon-SCVIM.png in Resources */,
 				D4E33D8F27A838F0006DB1CF /* InfoPlist.strings in Resources */,
 				5BEDB723283B4C250078EB25 /* data-cht.plist in Resources */,
 				5BEDB721283B4C250078EB25 /* data-cns.plist in Resources */,
@@ -949,7 +958,6 @@
 				5B09307628B6FC3B0021F8C5 /* shortcuts.html in Resources */,
 				5BBBB76D27AED5DB0023B93A /* frmAboutWindow.xib in Resources */,
 				5BF9DA2B28840E6200DBD48E /* template-userphrases.txt in Resources */,
-				5BBBB77527AED70B0023B93A /* MenuIcon-SCVIM.tiff in Resources */,
 				5BEDB722283B4C250078EB25 /* data-zhuyinwen.plist in Resources */,
 				5BF9DA2728840E6200DBD48E /* template-usersymbolphrases.txt in Resources */,
 				5B1C98B929436CEE0019B807 /* data-bpmf-reverse-lookup.plist in Resources */,
@@ -957,7 +965,6 @@
 				5BEDB724283B4C250078EB25 /* data-symbols.plist in Resources */,
 				5B7BC4B027AFFBE800F66C24 /* frmPrefWindow.xib in Resources */,
 				5BF9DA2A28840E6200DBD48E /* template-replacements.txt in Resources */,
-				5BBBB77627AED70B0023B93A /* MenuIcon-TCVIM.tiff in Resources */,
 				6A187E2616004C5900466B2E /* MainMenu.xib in Resources */,
 				5BBBB75F27AED54C0023B93A /* Beep.m4a in Resources */,
 				5BC2652227E04B7E00700291 /* uninstall.sh in Resources */,
@@ -969,6 +976,7 @@
 				5B253E822945AF6700680C67 /* data-bpmf-reverse-lookup-CNS4.plist in Resources */,
 				5B253E832945AF6700680C67 /* data-bpmf-reverse-lookup-CNS5.plist in Resources */,
 				5B253E812945AF6700680C67 /* data-bpmf-reverse-lookup-CNS6.plist in Resources */,
+				5B70F4EB2A0BE900005EA8C4 /* MenuIcon-SCVIM@2x.png in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
