@@ -31,6 +31,7 @@ extension InputHandler {
   private func handlePhonabetComposition(input: InputSignalProtocol) -> Bool? {
     guard let delegate = delegate else { return nil }
     let existedIntonation = composer.intonation
+    var overrideHappened = false
 
     // 哪怕不啟用支援對「先輸入聲調、後輸入注音」的情況的支援，對 keyConsumedByReading 的處理得保留。
     // 不然的話，「敲 Space 叫出選字窗」的功能會失效。
@@ -65,6 +66,7 @@ extension InputHandler {
           walk() // 這裡必須 Walk 一次、來更新目前被 walk 的內容。
           composer = theComposer
           // 這裡不需要回呼 generateStateOfInputting()，因為當前輸入的聲調鍵一定是合規的、會在之後回呼 generateStateOfInputting()。
+          overrideHappened = true
         } else {
           delegate.callError("4B0DD2D4：語彙庫內無「\(temporaryReadingKey)」的匹配記錄，放棄覆寫游標身後的內容。")
           return true
@@ -140,6 +142,11 @@ extension InputHandler {
       // 再以回呼組字狀態的方式來執行 setInlineDisplayWithCursor()。
       var inputting = generateStateOfInputting()
       inputting.textToCommit = textToCommit
+      if overrideHappened {
+        inputting.tooltip = "Previous intonation has been overridden.".localized
+        inputting.tooltipDuration = 2
+        inputting.data.tooltipColorState = .normal
+      }
       delegate.switchState(inputting)
 
       /// 逐字選字模式的處理。

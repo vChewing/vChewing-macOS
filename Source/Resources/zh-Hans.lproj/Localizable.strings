@@ -1,4 +1,5 @@
 "vChewing" = "威注音输入法";
+"Previous intonation has been overridden." = "已覆写游标身后的汉字的音调。";
 "It will attempt to combine with the incoming phonabet input." = "该声调亦会尝试与接下来输入的注音相组合。";
 "Intonation mark. ENTER to commit.\nSPACE to insert into composition buffer." = "声调符号。敲 Enter 以递交。\n敲空格键以插入组字区。";
 "CHS / CHT Input Mode Switch" = "简体/繁体中文输入模式切换";
