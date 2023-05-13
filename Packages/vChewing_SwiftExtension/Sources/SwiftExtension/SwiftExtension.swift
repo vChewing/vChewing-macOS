@@ -274,3 +274,35 @@ public extension String {
     return result?.isEmpty ?? true ? nil : result
   }
 }
+
+// MARK: - Overlap Checker (for two sets)
+
+public extension Set where Element: Hashable {
+  func isOverlapped(with target: Set<Element>) -> Bool {
+    guard !target.isEmpty, !isEmpty else { return false }
+    var container: (Set<Element>, Set<Element>)
+    if target.count <= count {
+      container = (target, self)
+    } else {
+      container = (self, target)
+    }
+    for neta in container.0 {
+      guard !container.1.contains(neta) else { return true }
+    }
+    return false
+  }
+
+  func isOverlapped(with target: [Element]) -> Bool {
+    isOverlapped(with: Set(target))
+  }
+}
+
+public extension Array where Element: Hashable {
+  func isOverlapped(with target: [Element]) -> Bool {
+    Set(self).isOverlapped(with: Set(target))
+  }
+
+  func isOverlapped(with target: Set<Element>) -> Bool {
+    Set(self).isOverlapped(with: target)
+  }
+}
