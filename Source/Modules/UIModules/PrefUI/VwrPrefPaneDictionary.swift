@@ -86,7 +86,7 @@ struct VwrPrefPaneDictionary: View {
                       if LMMgr.checkIfSpecifiedUserDataFolderValid(newPath) {
                         userDataFolderSpecified = newPath
                         BookmarkManager.shared.saveBookmark(for: url)
-                        (NSApp.delegate as? AppDelegate)?.updateDirectoryMonitorPath()
+                        AppDelegate.shared.updateDirectoryMonitorPath()
                       } else {
                         IMEApp.buzz()
                         if !bolPreviousFolderValidity {
