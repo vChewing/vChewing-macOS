@@ -292,7 +292,7 @@ public extension SessionCtl {
 
       DispatchQueue.main.async {
         UpdateSputnik.shared.checkForUpdate(forced: false, url: kUpdateInfoSourceURL)
-        (NSApp.delegate as? AppDelegate)?.checkMemoryUsage()
+        AppDelegate.shared.checkMemoryUsage()
       }
 
       state = IMEState.ofEmpty()
