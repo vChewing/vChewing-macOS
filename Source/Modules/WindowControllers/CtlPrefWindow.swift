@@ -354,7 +354,7 @@ class CtlPrefWindow: NSWindowController, NSWindowDelegate {
         if LMMgr.checkIfSpecifiedUserDataFolderValid(newPath) {
           PrefMgr.shared.userDataFolderSpecified = newPath
           BookmarkManager.shared.saveBookmark(for: url)
-          (NSApp.delegate as? AppDelegate)?.updateDirectoryMonitorPath()
+          AppDelegate.shared.updateDirectoryMonitorPath()
         } else {
           IMEApp.buzz()
           if !bolPreviousFolderValidity {
