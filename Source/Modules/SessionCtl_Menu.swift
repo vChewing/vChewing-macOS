@@ -363,7 +363,7 @@ public extension SessionCtl {
   }
 
   @objc func selfUninstall(_: Any? = nil) {
-    (NSApp.delegate as? AppDelegate)?.selfUninstall()
+    AppDelegate.shared.selfUninstall()
   }
 
   @objc func selfTerminate(_: Any? = nil) {
