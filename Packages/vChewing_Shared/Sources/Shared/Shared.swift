@@ -178,6 +178,7 @@ public enum KeyboardParser: Int, CaseIterable {
   case ofETen26 = 3
   case ofHsu = 2
   case ofStarlight = 9
+  case ofAlvinLiu = 10
   case ofHanyuPinyin = 100
   case ofSecondaryPinyin = 101
   case ofYalePinyin = 102
@@ -198,6 +199,7 @@ public enum KeyboardParser: Int, CaseIterable {
       case .ofETen26: return "Eten 26"
       case .ofHsu: return "Hsu"
       case .ofStarlight: return "Starlight"
+      case .ofAlvinLiu: return "Alvin Liu (Imitative)"
       case .ofHanyuPinyin: return "Hanyu Pinyin with Numeral Intonation"
       case .ofSecondaryPinyin: return "Secondary Pinyin with Numeral Intonation"
       case .ofYalePinyin: return "Yale Pinyin with Numeral Intonation"
@@ -231,6 +233,8 @@ public enum KeyboardParser: Int, CaseIterable {
       return "Seigyou"
     case .ofStarlight:
       return "Starlight"
+    case .ofAlvinLiu:
+      return "AlvinLiu"
     case .ofHanyuPinyin:
       return "HanyuPinyin"
     case .ofSecondaryPinyin:
