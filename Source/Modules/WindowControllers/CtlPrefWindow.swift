@@ -194,7 +194,7 @@ class CtlPrefWindow: NSWindowController, NSWindowDelegate {
     parserButton.menu?.removeAllItems()
     let basicParserID = PrefMgr.shared.keyboardParser
     KeyboardParser.allCases.forEach { item in
-      if [7, 10].contains(item.rawValue) {
+      if [7, 100].contains(item.rawValue) {
         parserButton.menu?.addItem(NSMenuItem.separator())
       }
       let menuItem = NSMenuItem()
