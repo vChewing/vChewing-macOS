@@ -52,7 +52,7 @@ struct VwrPrefPaneKeyboard: View {
               Text("↻ㄅ" + " " + NSLocalizedString("Eten Trad.", comment: ""))
             }
             Button {
-              keyboardParser = 10
+              keyboardParser = 100
               basicKeyboardLayout = "com.apple.keylayout.ABC"
             } label: {
               Text("↻Ａ")
@@ -66,7 +66,7 @@ struct VwrPrefPaneKeyboard: View {
               selection: $keyboardParser
             ) {
               ForEach(KeyboardParser.allCases, id: \.self) { item in
-                if [7, 10].contains(item.rawValue) { Divider() }
+                if [7, 100].contains(item.rawValue) { Divider() }
                 Text(item.localizedMenuName).tag(item.rawValue)
               }.id(UUID())
             }

@@ -39,11 +39,7 @@ public extension PrefMgr {
       }
     }
     // 注拼槽注音排列選項糾錯。
-    var isKeyboardParserOptionValid = false
-    KeyboardParser.allCases.forEach {
-      if $0.rawValue == keyboardParser { isKeyboardParserOptionValid = true }
-    }
-    if !isKeyboardParserOptionValid {
+    if KeyboardParser(rawValue: keyboardParser) == nil {
       keyboardParser = 0
     }
     // 基礎鍵盤排列選項糾錯。
