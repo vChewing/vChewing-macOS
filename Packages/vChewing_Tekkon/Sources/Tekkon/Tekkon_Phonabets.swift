@@ -32,6 +32,7 @@ public extension Tekkon {
     case ofSeigyou = 7
     case ofFakeSeigyou = 8
     case ofStarlight = 9
+    case ofAlvinLiu = 10
     case ofHanyuPinyin = 100
     case ofSecondaryPinyin = 101
     case ofYalePinyin = 102
@@ -61,6 +62,8 @@ public extension Tekkon {
         return "Seigyou"
       case .ofStarlight:
         return "Starlight"
+      case .ofAlvinLiu:
+        return "AlvinLiu"
       case .ofHanyuPinyin:
         return "HanyuPinyin"
       case .ofSecondaryPinyin:
@@ -88,9 +91,8 @@ public extension Tekkon {
     public var type: PhoneType = .null
     private var valueStorage = ""
     public var value: String { valueStorage }
-    public var isEmpty: Bool {
-      value.isEmpty
-    }
+    public var isEmpty: Bool { value.isEmpty }
+    public var isValid: Bool { type != .null }
 
     /// 初期化，會根據傳入的 input 字串參數來自動判定自身的 PhoneType 類型屬性值。
     public init(_ input: String = "") {
