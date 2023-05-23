@@ -1,4 +1,5 @@
 "vChewing" = "威注音輸入法";
+"Alvin Liu (Imitative)" = "劉又銘擬音注音排列";
 "Previous intonation has been overridden." = "已覆寫游標身後的漢字的音調。";
 "It will attempt to combine with the incoming phonabet input." = "該聲調亦會嘗試與接下來輸入的注音相組合。";
 "Intonation mark. ENTER to commit.\nSPACE to insert into composition buffer." = "聲調符號。敲 Enter 以遞交。\n敲空格鍵以插入組字區。";

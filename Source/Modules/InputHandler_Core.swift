@@ -460,6 +460,7 @@ public class InputHandler: InputHandlerProtocol {
     case .ofFakeSeigyou: composer.ensureParser(arrange: .ofFakeSeigyou)
     case .ofSeigyou: composer.ensureParser(arrange: .ofSeigyou)
     case .ofStarlight: composer.ensureParser(arrange: .ofStarlight)
+    case .ofAlvinLiu: composer.ensureParser(arrange: .ofAlvinLiu)
     case .ofHanyuPinyin: composer.ensureParser(arrange: .ofHanyuPinyin)
     case .ofSecondaryPinyin: composer.ensureParser(arrange: .ofSecondaryPinyin)
     case .ofYalePinyin: composer.ensureParser(arrange: .ofYalePinyin)
