@@ -13,20 +13,28 @@ import XCTest
 final class TekkonTestsKeyboardArrangments: XCTestCase {
   func testQwertyDachenKeys() throws {
     // Testing Dachen Traditional Mapping (QWERTY)
-    var composer = Tekkon.Composer(arrange: .ofDachen)
-    XCTAssertEqual(composer.convertSequenceToRawComposition("18 "), "ㄅㄚ ")
-    XCTAssertEqual(composer.convertSequenceToRawComposition("m,4"), "ㄩㄝˋ")
-    XCTAssertEqual(composer.convertSequenceToRawComposition("5j/ "), "ㄓㄨㄥ ")
-    XCTAssertEqual(composer.convertSequenceToRawComposition("fu."), "ㄑㄧㄡ")
-    XCTAssertEqual(composer.convertSequenceToRawComposition("g0 "), "ㄕㄢ ")
-    XCTAssertEqual(composer.convertSequenceToRawComposition("xup6"), "ㄌㄧㄣˊ")
-    XCTAssertEqual(composer.convertSequenceToRawComposition("xu;6"), "ㄌㄧㄤˊ")
-    XCTAssertEqual(composer.convertSequenceToRawComposition("z/"), "ㄈㄥ")
-    XCTAssertEqual(composer.convertSequenceToRawComposition("tjo "), "ㄔㄨㄟ ")
-    XCTAssertEqual(composer.convertSequenceToRawComposition("284"), "ㄉㄚˋ")
-    XCTAssertEqual(composer.convertSequenceToRawComposition("2u4"), "ㄉㄧˋ")
-    XCTAssertEqual(composer.convertSequenceToRawComposition("hl3"), "ㄘㄠˇ")
-    XCTAssertEqual(composer.convertSequenceToRawComposition("5 "), "ㄓ ")
-    XCTAssertEqual(composer.convertSequenceToRawComposition("193"), "ㄅㄞˇ")
+    var c = Tekkon.Composer(arrange: .ofDachen)
+    XCTAssertEqual(c.cS2RC("18 "), "ㄅㄚ ")
+    XCTAssertEqual(c.cS2RC("m,4"), "ㄩㄝˋ")
+    XCTAssertEqual(c.cS2RC("5j/ "), "ㄓㄨㄥ ")
+    XCTAssertEqual(c.cS2RC("fu."), "ㄑㄧㄡ")
+    XCTAssertEqual(c.cS2RC("g0 "), "ㄕㄢ ")
+    XCTAssertEqual(c.cS2RC("xup6"), "ㄌㄧㄣˊ")
+    XCTAssertEqual(c.cS2RC("xu;6"), "ㄌㄧㄤˊ")
+    XCTAssertEqual(c.cS2RC("z/"), "ㄈㄥ")
+    XCTAssertEqual(c.cS2RC("tjo "), "ㄔㄨㄟ ")
+    XCTAssertEqual(c.cS2RC("284"), "ㄉㄚˋ")
+    XCTAssertEqual(c.cS2RC("2u4"), "ㄉㄧˋ")
+    XCTAssertEqual(c.cS2RC("hl3"), "ㄘㄠˇ")
+    XCTAssertEqual(c.cS2RC("5 "), "ㄓ ")
+    XCTAssertEqual(c.cS2RC("193"), "ㄅㄞˇ")
+  }
+}
+
+internal extension Tekkon.Composer {
+  // Exactly "convertSequenceToRawComposition()" but with shorter symbol name.
+  mutating func cS2RC(_ givenSequence: String = "") -> String {
+    receiveSequence(givenSequence)
+    return value
   }
 }
