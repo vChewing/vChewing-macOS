@@ -178,12 +178,12 @@ public enum KeyboardParser: Int, CaseIterable {
   case ofETen26 = 3
   case ofHsu = 2
   case ofStarlight = 9
-  case ofHanyuPinyin = 10
-  case ofSecondaryPinyin = 11
-  case ofYalePinyin = 12
-  case ofHualuoPinyin = 13
-  case ofUniversalPinyin = 14
-  case ofWadeGilesPinyin = 15
+  case ofHanyuPinyin = 100
+  case ofSecondaryPinyin = 101
+  case ofYalePinyin = 102
+  case ofHualuoPinyin = 103
+  case ofUniversalPinyin = 104
+  case ofWadeGilesPinyin = 105
 
   public var localizedMenuName: String {
     let rawString: String = {
