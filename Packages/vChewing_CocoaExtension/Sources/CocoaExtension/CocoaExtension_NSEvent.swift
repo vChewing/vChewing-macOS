@@ -311,7 +311,7 @@ public enum EmacsKey {
 // MARK: - Apple ABC Keyboard Mapping
 
 public extension NSEvent {
-  func layoutTranslated(to layout: LatinKeyboardMarkings = .qwerty) -> NSEvent {
+  func layoutTranslated(to layout: LatinKeyboardMappings = .qwerty) -> NSEvent {
     let mapTable = layout.mapTable
     if type == .flagsChanged { return self }
     guard modifierFlags == .shift || modifierFlags.isEmpty else { return self }

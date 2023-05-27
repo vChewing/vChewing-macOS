@@ -8,7 +8,7 @@
 
 import Foundation
 
-public enum LatinKeyboardMarkings: String {
+public enum LatinKeyboardMappings: String {
   case qwerty = "com.apple.keylayout.ABC"
   case qwertyUS = "com.apple.keylayout.US"
   case azerty = "com.apple.keylayout.ABC-AZERTY"
