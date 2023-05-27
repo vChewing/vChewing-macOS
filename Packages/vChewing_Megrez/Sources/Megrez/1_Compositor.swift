@@ -3,8 +3,6 @@
 // ====================
 // This code is released under the MIT license (SPDX-License-Identifier: MIT)
 
-import Foundation
-
 public extension Megrez {
   /// 一個組字器用來在給定一系列的索引鍵的情況下（藉由一系列的觀測行為）返回一套資料值。
   ///
@@ -186,7 +184,7 @@ public extension Megrez {
     /// 生成用以交給 GraphViz 診斷的資料檔案內容，純文字。
     public var dumpDOT: String {
       // C# StringBuilder 與 Swift NSMutableString 能提供爆發性的效能。
-      let strOutput: NSMutableString = .init(string: "digraph {\ngraph [ rankdir=LR ];\nBOS;\n")
+      var strOutput = "digraph {\ngraph [ rankdir=LR ];\nBOS;\n"
       spans.enumerated().forEach { p, span in
         (0 ... span.maxLength).forEach { ni in
           guard let np = span[ni] else { return }
