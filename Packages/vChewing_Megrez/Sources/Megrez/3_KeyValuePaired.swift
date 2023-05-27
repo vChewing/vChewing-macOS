@@ -3,54 +3,64 @@
 // ====================
 // This code is released under the MIT license (SPDX-License-Identifier: MIT)
 
-import Foundation
-
 public extension Megrez {
   /// 鍵值配對，乃索引鍵陣列與讀音的配對單元。
-  struct KeyValuePaired: Equatable, Hashable, Comparable, CustomStringConvertible {
+  class KeyValuePaired: Unigram, Comparable {
     /// 索引鍵陣列。一般情況下用來放置讀音等可以用來作為索引的內容。
-    public var keyArray: [String]
-    /// 資料值。
-    public var value: String
+    public var keyArray: [String] = []
     /// 將當前鍵值列印成一個字串。
-    public var description: String { "(" + keyArray.description + "," + value + ")" }
+    override public var description: String { "(\(keyArray.description),\(value),\(score))" }
     /// 判斷當前鍵值配對是否合規。如果鍵與值有任一為空，則結果為 false。
     public var isValid: Bool { !keyArray.joined().isEmpty && !value.isEmpty }
     /// 將當前鍵值列印成一個字串，但如果該鍵值配對為空的話則僅列印「()」。
-    public var toNGramKey: String { !isValid ? "()" : "(" + joinedKey() + "," + value + ")" }
+    public var toNGramKey: String { !isValid ? "()" : "(\(joinedKey()),\(value))" }
     /// 通用陣列表達形式。
-    public var tupletExpression: (keyArray: [String], value: String) { (keyArray, value) }
+    public var keyValueTuplet: (keyArray: [String], value: String) { (keyArray, value) }
+    /// 通用陣列表達形式。
+    public var triplet: (keyArray: [String], value: String, score: Double) { (keyArray, value, score) }
 
     /// 初期化一組鍵值配對。
     /// - Parameters:
     ///   - keyArray: 索引鍵陣列。一般情況下用來放置讀音等可以用來作為索引的內容。
     ///   - value: 資料值。
-    public init(keyArray: [String], value: String = "N/A") {
+    ///   - score: 權重（雙精度小數）。
+    public init(keyArray: [String], value: String = "N/A", score: Double = 0) {
+      super.init(value: value.isEmpty ? "N/A" : value, score: score)
       self.keyArray = keyArray.isEmpty ? ["N/A"] : keyArray
-      self.value = value.isEmpty ? "N/A" : value
     }
 
     /// 初期化一組鍵值配對。
-    /// - Parameter tupletExpression: 傳入的通用陣列表達形式。
+    /// - Parameter tripletExpression: 傳入的通用陣列表達形式。
+    public init(_ tripletExpression: (keyArray: [String], value: String, score: Double)) {
+      let theValue = tripletExpression.value.isEmpty ? "N/A" : tripletExpression.value
+      super.init(value: theValue, score: tripletExpression.score)
+      keyArray = tripletExpression.keyArray.isEmpty ? ["N/A"] : tripletExpression.keyArray
+    }
+
+    /// 初期化一組鍵值配對。
+    /// - Parameter tuplet: 傳入的通用陣列表達形式。
     public init(_ tupletExpression: (keyArray: [String], value: String)) {
+      let theValue = tupletExpression.value.isEmpty ? "N/A" : tupletExpression.value
+      super.init(value: theValue, score: 0)
       keyArray = tupletExpression.keyArray.isEmpty ? ["N/A"] : tupletExpression.keyArray
-      value = tupletExpression.value.isEmpty ? "N/A" : tupletExpression.value
     }
 
     /// 初期化一組鍵值配對。
     /// - Parameters:
     ///   - key: 索引鍵。一般情況下用來放置讀音等可以用來作為索引的內容。
     ///   - value: 資料值。
-    public init(key: String = "N/A", value: String = "N/A") {
-      keyArray = key.isEmpty ? ["N/A"] : key.components(separatedBy: Megrez.Compositor.theSeparator)
-      self.value = value.isEmpty ? "N/A" : value
+    ///   - score: 權重（雙精度小數）。
+    public init(key: String = "N/A", value: String = "N/A", score: Double = 0) {
+      super.init(value: value.isEmpty ? "N/A" : value, score: score)
+      keyArray = key.isEmpty ? ["N/A"] : key.sliced(by: Megrez.Compositor.theSeparator)
     }
 
     /// 做為預設雜湊函式。
     /// - Parameter hasher: 目前物件的雜湊碼。
-    public func hash(into hasher: inout Hasher) {
+    override public func hash(into hasher: inout Hasher) {
       hasher.combine(keyArray)
       hasher.combine(value)
+      hasher.combine(score)
     }
 
     public func joinedKey(by separator: String = Megrez.Compositor.theSeparator) -> String {
@@ -58,7 +68,7 @@ public extension Megrez {
     }
 
     public static func == (lhs: KeyValuePaired, rhs: KeyValuePaired) -> Bool {
-      lhs.keyArray == rhs.keyArray && lhs.value == rhs.value
+      lhs.score == rhs.score && lhs.keyArray == rhs.keyArray && lhs.value == rhs.value
     }
 
     public static func < (lhs: KeyValuePaired, rhs: KeyValuePaired) -> Bool {
@@ -193,9 +203,9 @@ public extension Megrez.Compositor {
       arrOverlappedNodes = fetchOverlappingNodes(at: i)
       arrOverlappedNodes.forEach { anchor in
         if anchor.node == overridden.node { return }
-        if !overridden.node.joinedKey(by: "\t").contains(anchor.node.joinedKey(by: "\t"))
-          || !overridden.node.value.contains(anchor.node.value)
-        {
+        let anchorNodeKeyJoined = anchor.node.joinedKey(by: "\t")
+        let overriddenNodeKeyJoined = overridden.node.joinedKey(by: "\t")
+        if !overriddenNodeKeyJoined.has(string: anchorNodeKeyJoined) || !overridden.node.value.has(string: anchor.node.value) {
           anchor.node.reset()
           return
         }
