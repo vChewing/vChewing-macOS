@@ -6,8 +6,6 @@
 // marks, or product names of Contributor, except as required to fulfill notice
 // requirements defined in MIT License.
 
-import Foundation
-
 /// The namespace for this package.
 public enum Tekkon {
   // MARK: - Static Constants
