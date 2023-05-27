@@ -3,8 +3,6 @@
 // ====================
 // This code is released under the MIT license (SPDX-License-Identifier: MIT)
 
-import Foundation
-
 public extension Megrez {
   /// 字詞節點。
   ///
@@ -173,6 +171,39 @@ public extension Megrez {
       }
       return false
     }
+
+    // MARK: - Vertex Extensions.
+
+    // 注意：這一段的任何參數都不參與 Hash。
+
+    /// 組字器「文字輸入方向上的」最後方的虛擬節點。
+    internal static let trailingNode = Megrez.Node(keyArray: ["$TRAILING"])
+    /// 組字器「文字輸入方向上的」最前方的虛擬節點，也是根頂點。
+    internal static let leadingNode = Megrez.Node(keyArray: ["$LEADING"])
+
+    /// 前述頂點。
+    internal var prev: Node?
+    /// 自身屬下的頂點陣列。
+    internal var edges = [Node]()
+    /// 該變數用於最短路徑的計算。
+    ///
+    /// 我們實際上是在計算具有最大權重的路徑，因此距離的初始值是負無窮的。
+    /// 如果我們要計算最短的權重/距離，我們會將其初期值設為正無窮。
+    internal var distance = -(Double.infinity)
+    /// 在進行進行位相幾何排序時會用到的狀態標記。
+    internal var topologicallySorted = false
+
+    /// 摧毀一個字詞節點本身的 Vertex 特性資料。
+    /// 讓一個 Vertex 順藤摸瓜地將自己的所有的連帶的 Vertex 都摧毀，再摧毀自己。
+    /// 此過程必須在一套 Vertex 全部使用完畢之後執行一次，可防止記憶體洩漏。
+    internal func destroyVertex() {
+      while prev?.prev != nil { prev?.destroyVertex() }
+      prev = nil
+      edges.forEach { $0.destroyVertex() }
+      edges.removeAll()
+      distance = -(Double.infinity)
+      topologicallySorted = false
+    }
   }
 }
 
@@ -256,14 +287,9 @@ public extension Array where Element == Megrez.Node {
   /// 提供一組逐字的字音配對陣列（不使用 Megrez 的 KeyValuePaired 類型），但字音不匹配的節點除外。
   var smashedPairs: [(key: String, value: String)] {
     var arrData = [(key: String, value: String)]()
-    let separator = Megrez.Compositor.theSeparator
     forEach { node in
-      if node.isReadingMismatched {
-        var newKey = node.joinedKey()
-        if !separator.isEmpty, newKey != separator, newKey.contains(separator) {
-          newKey = newKey.replacingOccurrences(of: separator, with: "\t")
-        }
-        arrData.append((key: newKey, value: node.value))
+      if node.isReadingMismatched, !node.keyArray.joined().isEmpty {
+        arrData.append((key: node.keyArray.joined(separator: "\t"), value: node.value))
         return
       }
       let arrValueChars = node.value.map(\.description)
