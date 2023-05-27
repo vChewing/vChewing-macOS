@@ -6,8 +6,6 @@
 // marks, or product names of Contributor, except as required to fulfill notice
 // requirements defined in MIT License.
 
-import Foundation
-
 public extension Tekkon {
   // MARK: - Dynamic Constants and Basic Enums
 
@@ -115,7 +113,7 @@ public extension Tekkon {
     ///   - strOf: 要取代的內容。
     ///   - strWith: 要取代成的內容。
     public mutating func selfReplace(_ strOf: String, _ strWith: String = "") {
-      valueStorage = valueStorage.replacingOccurrences(of: strOf, with: strWith)
+      if valueStorage == strOf { valueStorage = strWith }
       ensureType()
     }
 

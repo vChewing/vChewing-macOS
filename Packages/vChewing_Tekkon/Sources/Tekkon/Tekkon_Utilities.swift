@@ -6,8 +6,6 @@
 // marks, or product names of Contributor, except as required to fulfill notice
 // requirements defined in MIT License.
 
-import Foundation
-
 public extension Tekkon {
   // MARK: - Phonabet to Hanyu-Pinyin Conversion Processing
 
@@ -17,7 +15,7 @@ public extension Tekkon {
   static func cnvPhonaToHanyuPinyin(targetJoined: String) -> String {
     var targetConverted = targetJoined
     for pair in arrPhonaToHanyuPinyin {
-      targetConverted = targetConverted.replacingOccurrences(of: pair[0], with: pair[1])
+      targetConverted = targetConverted.swapping(pair[0], with: pair[1])
     }
     return targetConverted
   }
@@ -28,7 +26,7 @@ public extension Tekkon {
   static func cnvHanyuPinyinToTextbookStyle(targetJoined: String) -> String {
     var targetConverted = targetJoined
     for pair in arrHanyuPinyinTextbookStyleConversionTable {
-      targetConverted = targetConverted.replacingOccurrences(of: pair[0], with: pair[1])
+      targetConverted = targetConverted.swapping(pair[0], with: pair[1])
     }
     return targetConverted
   }
@@ -54,7 +52,7 @@ public extension Tekkon {
     target: String
   ) -> String {
     var newNeta = target
-    if !"ˊˇˋ˙".contains(String(target.reversed()[0])), !target.contains("_") { newNeta += "1" }
+    if !"ˊˇˋ˙".has(string: String(target.reversed()[0])), !target.has(string: "_") { newNeta += "1" }
     return newNeta
   }
 
@@ -69,11 +67,11 @@ public extension Tekkon {
     var result = targetJoined
     for key in Tekkon.mapHanyuPinyin.keys.sorted(by: { $0.count > $1.count }) {
       guard let value = Tekkon.mapHanyuPinyin[key] else { continue }
-      result = result.replacingOccurrences(of: key, with: value)
+      result = result.swapping(key, with: value)
     }
     for key in Tekkon.mapArayuruPinyinIntonation.keys.sorted(by: { $0.count > $1.count }) {
       guard let value = Tekkon.mapArayuruPinyinIntonation[key] else { continue }
-      result = result.replacingOccurrences(of: key, with: (key == "1") ? newToneOne : value)
+      result = result.swapping(key, with: (key == "1") ? newToneOne : value)
     }
     return result
   }
@@ -82,8 +80,82 @@ public extension Tekkon {
 /// 檢測字串是否包含半形英數內容
 private extension String {
   var isNotPureAlphanumerical: Bool {
-    let regex = ".*[^A-Za-z0-9].*"
-    let testString = NSPredicate(format: "SELF MATCHES %@", regex)
-    return testString.evaluate(with: self)
+    let x = unicodeScalars.map(\.value).filter {
+      if $0 >= 48, $0 <= 57 { return false }
+      if $0 >= 65, $0 <= 90 { return false }
+      if $0 >= 97, $0 <= 122 { return false }
+      return true
+    }
+    return !x.isEmpty
+  }
+}
+
+// This package is trying to deprecate its dependency of Foundation, hence the following contents.
+
+extension StringProtocol {
+  func has(string target: any StringProtocol) -> Bool {
+    let selfArray = Array(unicodeScalars)
+    let targetArray = Array(target.description.unicodeScalars)
+    guard !target.isEmpty else { return isEmpty }
+    guard count >= target.count else { return false }
+    for index in 0 ..< selfArray.count {
+      let range = index ..< (Swift.min(index + targetArray.count, selfArray.count))
+      let ripped = Array(selfArray[range])
+      if ripped == targetArray { return true }
+    }
+    return false
+  }
+
+  func sliced(by separator: any StringProtocol = "") -> [String] {
+    let selfArray = Array(unicodeScalars)
+    let arrSeparator = Array(separator.description.unicodeScalars)
+    var result: [String] = []
+    var buffer: [Unicode.Scalar] = []
+    var sleepCount = 0
+    for index in 0 ..< selfArray.count {
+      let currentChar = selfArray[index]
+      let range = index ..< (Swift.min(index + arrSeparator.count, selfArray.count))
+      let ripped = Array(selfArray[range])
+      if ripped.isEmpty { continue }
+      if ripped == arrSeparator {
+        sleepCount = range.count
+        result.append(buffer.map { String($0) }.joined())
+        buffer.removeAll()
+      }
+      if sleepCount < 1 {
+        buffer.append(currentChar)
+      }
+      sleepCount -= 1
+    }
+    result.append(buffer.map { String($0) }.joined())
+    buffer.removeAll()
+    return result
+  }
+
+  func swapping(_ target: String, with newString: String) -> String {
+    let selfArray = Array(unicodeScalars)
+    let arrTarget = Array(target.description.unicodeScalars)
+    var result = ""
+    var buffer: [Unicode.Scalar] = []
+    var sleepCount = 0
+    for index in 0 ..< selfArray.count {
+      let currentChar = selfArray[index]
+      let range = index ..< (Swift.min(index + arrTarget.count, selfArray.count))
+      let ripped = Array(selfArray[range])
+      if ripped.isEmpty { continue }
+      if ripped == arrTarget {
+        sleepCount = ripped.count
+        result.append(buffer.map { String($0) }.joined())
+        result.append(newString)
+        buffer.removeAll()
+      }
+      if sleepCount < 1 {
+        buffer.append(currentChar)
+      }
+      sleepCount -= 1
+    }
+    result.append(buffer.map { String($0) }.joined())
+    buffer.removeAll()
+    return result
   }
 }
