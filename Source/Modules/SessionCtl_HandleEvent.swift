@@ -124,7 +124,7 @@ public extension SessionCtl {
 
     // 在啟用注音排列而非拼音輸入的情況下，強制將當前鍵盤佈局翻譯為美規鍵盤（或指定的其它鍵盤佈局）。
     if !inputHandler.isComposerUsingPinyin || IMKHelper.isDynamicBasicKeyboardLayoutEnabled {
-      var defaultLayout = LatinKeyboardMarkings(rawValue: PrefMgr.shared.basicKeyboardLayout) ?? .qwerty
+      var defaultLayout = LatinKeyboardMappings(rawValue: PrefMgr.shared.basicKeyboardLayout) ?? .qwerty
       if let parser = KeyboardParser(rawValue: PrefMgr.shared.keyboardParser) {
         switch parser {
         case .ofStandard, .ofIBM, .ofSeigyou, .ofFakeSeigyou, .ofDachen26: defaultLayout = .qwerty
