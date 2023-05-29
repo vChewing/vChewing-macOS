@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="21507" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES">
     <dependencies>
+        <deployment identifier="macosx"/>
         <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="21507"/>
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
     </dependencies>
@@ -150,7 +151,7 @@
                             <rect key="frame" x="0.0" y="180" width="360" height="100"/>
                             <subviews>
                                 <button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="j8R-Hj-3dj">
-                                    <rect key="frame" x="-1" y="84" width="340" height="17"/>
+                                    <rect key="frame" x="-1" y="84" width="340" height="16"/>
                                     <constraints>
                                         <constraint firstAttribute="height" constant="16" id="Fvm-ZT-RYa"/>
                                     </constraints>
@@ -163,7 +164,7 @@
                                     </connections>
                                 </button>
                                 <button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="vwf-Kq-s8M" userLabel="chkShowHanyuPinyinInCompositionBuffer">
-                                    <rect key="frame" x="-1" y="63" width="361" height="17"/>
+                                    <rect key="frame" x="-1" y="63" width="361" height="16"/>
                                     <constraints>
                                         <constraint firstAttribute="height" constant="16" id="ObK-Ia-oU9"/>
                                     </constraints>
@@ -177,7 +178,7 @@
                                     </connections>
                                 </button>
                                 <button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="HaB-rc-AcW">
-                                    <rect key="frame" x="-1" y="42" width="295" height="17"/>
+                                    <rect key="frame" x="-1" y="42" width="295" height="16"/>
                                     <constraints>
                                         <constraint firstAttribute="height" constant="16" id="IVa-xv-upc"/>
                                     </constraints>
@@ -190,7 +191,7 @@
                                     </connections>
                                 </button>
                                 <button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="QpM-Qg-kNf">
-                                    <rect key="frame" x="-1" y="21" width="336" height="17"/>
+                                    <rect key="frame" x="-1" y="21" width="336" height="16"/>
                                     <constraints>
                                         <constraint firstAttribute="height" constant="16" id="tTR-DT-5v2"/>
                                     </constraints>
@@ -203,7 +204,7 @@
                                     </connections>
                                 </button>
                                 <button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="mzw-F2-aAQ">
-                                    <rect key="frame" x="-1" y="0.0" width="295" height="17"/>
+                                    <rect key="frame" x="-1" y="0.0" width="295" height="16"/>
                                     <constraints>
                                         <constraint firstAttribute="height" constant="16" id="rEk-qV-gUu"/>
                                     </constraints>
@@ -252,7 +253,7 @@
                             <rect key="frame" x="0.0" y="48" width="392" height="100"/>
                             <subviews>
                                 <button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="5IL-zZ-CL9" userLabel="chkTrad2KangXi">
-                                    <rect key="frame" x="-1" y="84" width="368" height="17"/>
+                                    <rect key="frame" x="-1" y="84" width="368" height="16"/>
                                     <constraints>
                                         <constraint firstAttribute="height" constant="16" id="y8x-bx-E5d"/>
                                     </constraints>
@@ -266,7 +267,7 @@
                                     </connections>
                                 </button>
                                 <button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="h4r-Sp-LBI" userLabel="chkTrad2JISShinjitai">
-                                    <rect key="frame" x="-1" y="63" width="393" height="17"/>
+                                    <rect key="frame" x="-1" y="63" width="393" height="16"/>
                                     <constraints>
                                         <constraint firstAttribute="height" constant="16" id="NuX-g1-YYs"/>
                                     </constraints>
@@ -280,7 +281,7 @@
                                     </connections>
                                 </button>
                                 <button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="gZ0-OK-r7a" userLabel="InlineDumpPinyinInLieuOfZhuyin">
-                                    <rect key="frame" x="-1" y="42" width="387" height="17"/>
+                                    <rect key="frame" x="-1" y="42" width="387" height="16"/>
                                     <constraints>
                                         <constraint firstAttribute="height" constant="16" id="jnZ-bf-biU"/>
                                     </constraints>
@@ -294,7 +295,7 @@
                                     </connections>
                                 </button>
                                 <button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="xe6-Pu-3Fa">
-                                    <rect key="frame" x="-1" y="21" width="275" height="17"/>
+                                    <rect key="frame" x="-1" y="21" width="275" height="16"/>
                                     <constraints>
                                         <constraint firstAttribute="height" constant="16" id="TuX-GI-UfE"/>
                                     </constraints>
@@ -307,7 +308,7 @@
                                     </connections>
                                 </button>
                                 <button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="1Y9-M9-BGT">
-                                    <rect key="frame" x="-1" y="0.0" width="308" height="17"/>
+                                    <rect key="frame" x="-1" y="0.0" width="308" height="16"/>
                                     <constraints>
                                         <constraint firstAttribute="height" constant="16" id="dfr-Gk-fcb"/>
                                     </constraints>
@@ -345,7 +346,7 @@
                             <rect key="frame" x="0.0" y="0.0" width="530" height="37"/>
                             <subviews>
                                 <button translatesAutoresizingMaskIntoConstraints="NO" id="ChK-Du-6h1">
-                                    <rect key="frame" x="-1" y="21" width="204" height="17"/>
+                                    <rect key="frame" x="-1" y="21" width="204" height="16"/>
                                     <constraints>
                                         <constraint firstAttribute="height" constant="16" id="cyf-Lp-kyH"/>
                                     </constraints>
@@ -361,7 +362,7 @@
                                     <rect key="frame" x="0.0" y="0.0" width="473" height="16"/>
                                     <subviews>
                                         <button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="0Fh-O5-BKD">
-                                            <rect key="frame" x="-1" y="0.0" width="94" height="17"/>
+                                            <rect key="frame" x="-1" y="0.0" width="94" height="16"/>
                                             <constraints>
                                                 <constraint firstAttribute="height" constant="16" id="ldq-X5-xnu"/>
                                             </constraints>
@@ -374,7 +375,7 @@
                                             </connections>
                                         </button>
                                         <button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="pYB-E5-4Nv">
-                                            <rect key="frame" x="100" y="0.0" width="373" height="17"/>
+                                            <rect key="frame" x="100" y="0.0" width="373" height="16"/>
                                             <constraints>
                                                 <constraint firstAttribute="height" constant="16" id="9jO-5c-Glj"/>
                                             </constraints>
@@ -584,7 +585,7 @@
                                             </connections>
                                         </matrix>
                                         <button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="dZH-I5-wms">
-                                            <rect key="frame" x="408" y="3" width="108" height="17"/>
+                                            <rect key="frame" x="408" y="3" width="108" height="16"/>
                                             <constraints>
                                                 <constraint firstAttribute="width" relation="greaterThanOrEqual" constant="70" id="K3Q-Vl-7yU"/>
                                                 <constraint firstAttribute="height" constant="16" id="xMM-G8-A2M"/>
@@ -743,7 +744,7 @@
                                     </connections>
                                 </matrix>
                                 <button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="7z2-DD-c58">
-                                    <rect key="frame" x="-1" y="0.0" width="318" height="16"/>
+                                    <rect key="frame" x="-1" y="0.0" width="318" height="15"/>
                                     <constraints>
                                         <constraint firstAttribute="height" constant="15" id="Ivs-uZ-4Eh"/>
                                     </constraints>
@@ -777,7 +778,7 @@
                             <rect key="frame" x="0.0" y="0.0" width="368" height="79"/>
                             <subviews>
                                 <button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="3qX-dG-cKO">
-                                    <rect key="frame" x="-1" y="63" width="354" height="17"/>
+                                    <rect key="frame" x="-1" y="63" width="354" height="16"/>
                                     <constraints>
                                         <constraint firstAttribute="width" relation="greaterThanOrEqual" constant="70" id="VA4-8t-BXG"/>
                                         <constraint firstAttribute="height" constant="16" id="fAh-uj-Mwh"/>
@@ -791,7 +792,7 @@
                                     </connections>
                                 </button>
                                 <button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="nCb-NT-HJK">
-                                    <rect key="frame" x="-1" y="42" width="351" height="17"/>
+                                    <rect key="frame" x="-1" y="42" width="351" height="16"/>
                                     <constraints>
                                         <constraint firstAttribute="height" constant="16" id="9wH-Rl-7QF"/>
                                     </constraints>
@@ -804,7 +805,7 @@
                                     </connections>
                                 </button>
                                 <button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="B3F-E1F-360">
-                                    <rect key="frame" x="-1" y="21" width="305" height="17"/>
+                                    <rect key="frame" x="-1" y="21" width="305" height="16"/>
                                     <constraints>
                                         <constraint firstAttribute="height" constant="16" id="Ms0-e3-kEx"/>
                                     </constraints>
@@ -817,7 +818,7 @@
                                     </connections>
                                 </button>
                                 <button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="EPi-az-Ri2">
-                                    <rect key="frame" x="-1" y="0.0" width="369" height="17"/>
+                                    <rect key="frame" x="-1" y="0.0" width="369" height="16"/>
                                     <constraints>
                                         <constraint firstAttribute="height" constant="16" id="dhm-Zn-JrH"/>
                                         <constraint firstAttribute="width" relation="greaterThanOrEqual" constant="70" id="dxM-0y-3eP"/>
@@ -892,7 +893,7 @@
                             <rect key="frame" x="0.0" y="410" width="530" height="106"/>
                             <subviews>
                                 <button translatesAutoresizingMaskIntoConstraints="NO" id="109">
-                                    <rect key="frame" x="-1" y="90" width="285" height="17"/>
+                                    <rect key="frame" x="-1" y="90" width="285" height="16"/>
                                     <constraints>
                                         <constraint firstAttribute="height" constant="16" id="PYH-8e-mUx"/>
                                     </constraints>
@@ -905,7 +906,7 @@
                                     </connections>
                                 </button>
                                 <button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="bE0-Lq-Pj7">
-                                    <rect key="frame" x="-1" y="69" width="266" height="17"/>
+                                    <rect key="frame" x="-1" y="69" width="266" height="16"/>
                                     <constraints>
                                         <constraint firstAttribute="height" constant="16" id="6uT-D5-KVx"/>
                                     </constraints>
@@ -918,7 +919,7 @@
                                     </connections>
                                 </button>
                                 <button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="6MM-WC-Mpd">
-                                    <rect key="frame" x="-1" y="48" width="381" height="17"/>
+                                    <rect key="frame" x="-1" y="48" width="381" height="16"/>
                                     <constraints>
                                         <constraint firstAttribute="height" constant="16" id="hhN-al-6OI"/>
                                     </constraints>
@@ -931,7 +932,7 @@
                                     </connections>
                                 </button>
                                 <button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="a6O-JL-C4g">
-                                    <rect key="frame" x="-1" y="27" width="247" height="17"/>
+                                    <rect key="frame" x="-1" y="27" width="247" height="16"/>
                                     <constraints>
                                         <constraint firstAttribute="height" constant="16" id="WkD-Wx-erN"/>
                                     </constraints>
@@ -944,7 +945,7 @@
                                     </connections>
                                 </button>
                                 <button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="7QM-7z-tpq">
-                                    <rect key="frame" x="-1" y="6" width="233" height="17"/>
+                                    <rect key="frame" x="-1" y="6" width="233" height="16"/>
                                     <constraints>
                                         <constraint firstAttribute="height" constant="16" id="fuj-Jy-rz7"/>
                                     </constraints>
@@ -1606,7 +1607,7 @@
                             <rect key="frame" x="0.0" y="71" width="538" height="370"/>
                             <clipView key="contentView" drawsBackground="NO" id="x8s-wo-bxi">
                                 <rect key="frame" x="0.0" y="0.0" width="538" height="370"/>
-                                <autoresizingMask key="autoresizingMask"/>
+                                <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                 <subviews>
                                     <textView wantsLayer="YES" importsGraphics="NO" richText="NO" verticallyResizable="YES" allowsUndo="YES" smartInsertDelete="YES" id="kSG-dz-P2N">
                                         <rect key="frame" x="0.0" y="0.0" width="538" height="370"/>
@@ -1824,7 +1825,7 @@ DQ
                             <rect key="frame" x="0.0" y="142" width="537" height="166"/>
                             <subviews>
                                 <button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="y75-fJ-x9L">
-                                    <rect key="frame" x="-1" y="150" width="311" height="17"/>
+                                    <rect key="frame" x="-1" y="150" width="311" height="16"/>
                                     <constraints>
                                         <constraint firstAttribute="width" relation="greaterThanOrEqual" constant="70" id="UE0-Je-AxG"/>
                                         <constraint firstAttribute="height" constant="16" id="dkb-Cc-S5f"/>
@@ -1851,7 +1852,7 @@ DQ
                                     </textFieldCell>
                                 </textField>
                                 <button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="T4J-vm-GL6">
-                                    <rect key="frame" x="-1" y="54" width="343" height="17"/>
+                                    <rect key="frame" x="-1" y="54" width="343" height="16"/>
                                     <constraints>
                                         <constraint firstAttribute="height" constant="16" id="J7U-FN-fhA"/>
                                         <constraint firstAttribute="width" relation="greaterThanOrEqual" constant="70" id="g7o-3C-NrU"/>
@@ -1865,7 +1866,7 @@ DQ
                                     </connections>
                                 </button>
                                 <button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="3eW-vq-tFr">
-                                    <rect key="frame" x="-1" y="33" width="281" height="17"/>
+                                    <rect key="frame" x="-1" y="33" width="281" height="16"/>
                                     <constraints>
                                         <constraint firstAttribute="width" relation="greaterThanOrEqual" constant="70" id="f8O-YI-8sP"/>
                                         <constraint firstAttribute="height" constant="16" id="x7P-k1-dsX"/>
@@ -1991,17 +1992,17 @@ DQ
             <point key="canvasLocation" x="-80" y="60"/>
         </view>
         <view id="U4q-xw-mc0" userLabel="vwrKeyboard">
-            <rect key="frame" x="0.0" y="0.0" width="577" height="284"/>
+            <rect key="frame" x="0.0" y="0.0" width="577" height="307"/>
             <autoresizingMask key="autoresizingMask"/>
             <subviews>
                 <stackView distribution="fill" orientation="vertical" alignment="leading" spacing="10" horizontalStackHuggingPriority="249.99998474121094" verticalStackHuggingPriority="249.99998474121094" translatesAutoresizingMaskIntoConstraints="NO" id="0gn-BJ-qid">
-                    <rect key="frame" x="20" y="34" width="530" height="230"/>
+                    <rect key="frame" x="20" y="29" width="530" height="258"/>
                     <subviews>
                         <stackView distribution="fill" orientation="vertical" alignment="leading" spacing="5" horizontalStackHuggingPriority="249.99998474121094" verticalStackHuggingPriority="249.99998474121094" translatesAutoresizingMaskIntoConstraints="NO" id="v7J-Jh-97Y">
-                            <rect key="frame" x="0.0" y="133" width="530" height="97"/>
+                            <rect key="frame" x="0.0" y="133" width="530" height="125"/>
                             <subviews>
                                 <textField verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="onD-QP-KPf">
-                                    <rect key="frame" x="-2" y="82" width="345" height="15"/>
+                                    <rect key="frame" x="-2" y="110" width="345" height="15"/>
                                     <textFieldCell key="cell" controlSize="small" lineBreakMode="clipping" title="Choose your preferred keyboard layout and phonetic parser." id="RQ6-MS-m4C">
                                         <font key="font" metaFont="cellTitle"/>
                                         <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
@@ -2009,7 +2010,7 @@ DQ
                                     </textFieldCell>
                                 </textField>
                                 <stackView distribution="fill" orientation="vertical" alignment="leading" spacing="0.0" horizontalStackHuggingPriority="249.99998474121094" verticalStackHuggingPriority="249.99998474121094" translatesAutoresizingMaskIntoConstraints="NO" id="mCz-hd-Tsr">
-                                    <rect key="frame" x="0.0" y="33" width="430" height="44"/>
+                                    <rect key="frame" x="0.0" y="61" width="430" height="44"/>
                                     <subviews>
                                         <stackView distribution="fill" orientation="horizontal" alignment="centerY" horizontalStackHuggingPriority="249.99998474121094" verticalStackHuggingPriority="249.99998474121094" translatesAutoresizingMaskIntoConstraints="NO" id="h8t-5m-DFX">
                                             <rect key="frame" x="0.0" y="22" width="430" height="22"/>
@@ -2124,13 +2125,13 @@ DQ
                                     </customSpacing>
                                 </stackView>
                                 <textField wantsLayer="YES" verticalHuggingPriority="750" horizontalCompressionResistancePriority="250" setsMaxLayoutWidthAtFirstLayout="YES" translatesAutoresizingMaskIntoConstraints="NO" id="hab-1o-1kS">
-                                    <rect key="frame" x="-2" y="0.0" width="534" height="28"/>
+                                    <rect key="frame" x="-2" y="0.0" width="534" height="56"/>
                                     <constraints>
                                         <constraint firstAttribute="width" constant="530" id="hAl-ML-Rbc"/>
                                     </constraints>
-                                    <textFieldCell key="cell" controlSize="small" selectable="YES" id="wQ9-px-b07">
+                                    <textFieldCell key="cell" controlSize="small" id="wQ9-px-b07">
                                         <font key="font" metaFont="smallSystem"/>
-                                        <string key="title">Basic keyboard layout option will only affect the appearance of the on-screen-keyboard if the current Mandarin parser is not (any) pinyin.</string>
+                                        <string key="title">Choose the macOS-level basic keyboard layout. Non-QWERTY alphanumerical keyboard layouts are for Pinyin parser only. This option will only affect the appearance of the on-screen-keyboard if the current Mandarin parser is neither (any) pinyin nor dynamically reparsable with different western keyboard layouts (like Eten 26, Hsu, etc.).</string>
                                         <color key="textColor" name="secondaryLabelColor" catalog="System" colorSpace="catalog"/>
                                         <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
                                     </textFieldCell>
@@ -2168,7 +2169,7 @@ DQ
                                             <rect key="frame" x="0.0" y="0.0" width="186" height="100"/>
                                             <subviews>
                                                 <button verticalHuggingPriority="750" verticalCompressionResistancePriority="751" translatesAutoresizingMaskIntoConstraints="NO" id="8fz-X4-HVS" userLabel="UsingHotKeySCPC">
-                                                    <rect key="frame" x="-1" y="84" width="147" height="17"/>
+                                                    <rect key="frame" x="-1" y="84" width="147" height="16"/>
                                                     <constraints>
                                                         <constraint firstAttribute="height" constant="16" id="iAE-th-G1o"/>
                                                     </constraints>
@@ -2181,7 +2182,7 @@ DQ
                                                     </connections>
                                                 </button>
                                                 <button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="ajS-Ja-Vxr" userLabel="UsingHotKeyKangXi">
-                                                    <rect key="frame" x="-1" y="63" width="140" height="17"/>
+                                                    <rect key="frame" x="-1" y="63" width="140" height="16"/>
                                                     <constraints>
                                                         <constraint firstAttribute="height" constant="16" id="NnI-DU-gqr"/>
                                                     </constraints>
@@ -2194,7 +2195,7 @@ DQ
                                                     </connections>
                                                 </button>
                                                 <button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="ZWc-3p-TII" userLabel="UsingHotKeyAssociates">
-                                                    <rect key="frame" x="-1" y="42" width="187" height="17"/>
+                                                    <rect key="frame" x="-1" y="42" width="187" height="16"/>
                                                     <constraints>
                                                         <constraint firstAttribute="height" constant="16" id="NaX-QA-VsM"/>
                                                     </constraints>
@@ -2207,7 +2208,7 @@ DQ
                                                     </connections>
                                                 </button>
                                                 <button horizontalHuggingPriority="249" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="vbm-7v-Dtb" userLabel="UsingHotKeyJIS">
-                                                    <rect key="frame" x="-1" y="21" width="187" height="17"/>
+                                                    <rect key="frame" x="-1" y="21" width="187" height="16"/>
                                                     <constraints>
                                                         <constraint firstAttribute="height" constant="16" id="SNf-2h-hGK"/>
                                                     </constraints>
@@ -2220,7 +2221,7 @@ DQ
                                                     </connections>
                                                 </button>
                                                 <button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="MVw-Gx-ueg" userLabel="UsingHotKeyCNS">
-                                                    <rect key="frame" x="-1" y="0.0" width="116" height="17"/>
+                                                    <rect key="frame" x="-1" y="0.0" width="116" height="16"/>
                                                     <constraints>
                                                         <constraint firstAttribute="height" constant="16" id="sWQ-Qk-gaB"/>
                                                     </constraints>
@@ -2252,7 +2253,7 @@ DQ
                                             <rect key="frame" x="206" y="0.0" width="190" height="100"/>
                                             <subviews>
                                                 <button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="aBy-qb-ZL5" userLabel="UsingHotKeyHalfWidthASCII">
-                                                    <rect key="frame" x="-1" y="84" width="189" height="17"/>
+                                                    <rect key="frame" x="-1" y="84" width="189" height="16"/>
                                                     <constraints>
                                                         <constraint firstAttribute="height" constant="16" id="9gu-Gq-Bpc"/>
                                                     </constraints>
@@ -2265,7 +2266,7 @@ DQ
                                                     </connections>
                                                 </button>
                                                 <button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="JvA-GK-VEW" userLabel="CurrencyNumerals">
-                                                    <rect key="frame" x="-1" y="63" width="167" height="17"/>
+                                                    <rect key="frame" x="-1" y="63" width="167" height="16"/>
                                                     <constraints>
                                                         <constraint firstAttribute="height" constant="16" id="6EL-3G-s7z"/>
                                                     </constraints>
@@ -2278,7 +2279,7 @@ DQ
                                                     </connections>
                                                 </button>
                                                 <button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="zZA-X1-GCy" userLabel="UsingHotKeyCassette">
-                                                    <rect key="frame" x="-1" y="42" width="131" height="17"/>
+                                                    <rect key="frame" x="-1" y="42" width="131" height="16"/>
                                                     <constraints>
                                                         <constraint firstAttribute="height" constant="16" id="D36-2Y-mX5"/>
                                                     </constraints>
@@ -2291,7 +2292,7 @@ DQ
                                                     </connections>
                                                 </button>
                                                 <button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="g3L-S4-NBx" userLabel="UsingHotKeyCassette">
-                                                    <rect key="frame" x="-1" y="21" width="184" height="17"/>
+                                                    <rect key="frame" x="-1" y="21" width="184" height="16"/>
                                                     <constraints>
                                                         <constraint firstAttribute="height" constant="16" id="MlY-Pc-flb"/>
                                                     </constraints>
@@ -2304,7 +2305,7 @@ DQ
                                                     </connections>
                                                 </button>
                                                 <button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="SAU-IA-cdf" userLabel="UsingHotKeyCassette">
-                                                    <rect key="frame" x="-1" y="0.0" width="191" height="17"/>
+                                                    <rect key="frame" x="-1" y="0.0" width="191" height="16"/>
                                                     <constraints>
                                                         <constraint firstAttribute="height" constant="16" id="aIj-Ga-hmJ"/>
                                                     </constraints>
@@ -2370,7 +2371,7 @@ DQ
                 <constraint firstItem="0gn-BJ-qid" firstAttribute="leading" secondItem="U4q-xw-mc0" secondAttribute="leading" constant="20" symbolic="YES" id="MYd-6b-0XR"/>
                 <constraint firstItem="0gn-BJ-qid" firstAttribute="top" secondItem="U4q-xw-mc0" secondAttribute="top" constant="20" symbolic="YES" id="qgB-J1-68N"/>
             </constraints>
-            <point key="canvasLocation" x="-716" y="447"/>
+            <point key="canvasLocation" x="-716.5" y="458.5"/>
         </view>
         <view id="MaQ-Xm-8TB" userLabel="vwrDevZone">
             <rect key="frame" x="0.0" y="0.0" width="577" height="280"/>
@@ -2400,7 +2401,7 @@ Features listed here may not work as expected.</string>
                             </constraints>
                         </box>
                         <button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="yJg-tV-hH6">
-                            <rect key="frame" x="-1" y="166" width="429" height="17"/>
+                            <rect key="frame" x="-1" y="166" width="429" height="16"/>
                             <constraints>
                                 <constraint firstAttribute="height" constant="16" id="TB3-Kn-UbK"/>
                                 <constraint firstAttribute="width" relation="greaterThanOrEqual" constant="70" id="u5i-mf-Rix"/>
@@ -2426,7 +2427,7 @@ Features listed here may not work as expected.</string>
                             </textFieldCell>
                         </textField>
                         <button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="MQ1-z8-Yf1">
-                            <rect key="frame" x="-1" y="64" width="410" height="17"/>
+                            <rect key="frame" x="-1" y="64" width="410" height="16"/>
                             <constraints>
                                 <constraint firstAttribute="height" constant="16" id="Bru-dS-VCh"/>
                                 <constraint firstAttribute="width" relation="greaterThanOrEqual" constant="70" id="JgS-KT-dqF"/>
