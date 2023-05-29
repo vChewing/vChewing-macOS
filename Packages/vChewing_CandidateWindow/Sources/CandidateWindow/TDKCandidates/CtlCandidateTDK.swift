@@ -45,6 +45,20 @@ public class CtlCandidateTDK: CtlCandidate, NSWindowDelegate {
     VwrCandidateTDKCocoa(controller: self, thePool: Self.thePool)
   }
 
+  private var theViewLegacy: NSView {
+    let textField = NSTextField()
+    textField.isSelectable = false
+    textField.isEditable = false
+    textField.isBordered = false
+    textField.backgroundColor = .clear
+    textField.allowsEditingTextAttributes = false
+    textField.preferredMaxLayoutWidth = textField.frame.width
+    textField.attributedStringValue = Self.thePool.attributedDescription
+    textField.sizeToFit()
+    textField.backgroundColor = .clear
+    return textField
+  }
+
   // MARK: - Constructors
 
   public required init(_ layout: NSUserInterfaceLayoutOrientation = .horizontal) {
@@ -96,6 +110,10 @@ public class CtlCandidateTDK: CtlCandidate, NSWindowDelegate {
       window.backgroundColor = .clear
       viewCheck: if #available(macOS 10.15, *) {
         if useCocoa {
+          // if !NSApplication.isAppleSilicon {
+          //   updateNSWindowLegacy(window)
+          //   return
+          // }
           Self.currentView = theViewCocoa
           break viewCheck
         }
@@ -106,6 +124,25 @@ public class CtlCandidateTDK: CtlCandidate, NSWindowDelegate {
       window.contentView = Self.currentView
       window.setContentSize(Self.currentView.fittingSize)
     }
+  }
+
+  func updateNSWindowLegacy(_ window: NSWindow) {
+    window.isOpaque = true
+    window.backgroundColor = NSColor.controlBackgroundColor
+    let viewToDraw = theViewLegacy
+    let coreSize = viewToDraw.fittingSize
+    let padding: Double = 5
+    let outerSize: NSSize = .init(
+      width: coreSize.width + 2 * padding,
+      height: coreSize.height + 2 * padding
+    )
+    let innerOrigin: NSPoint = .init(x: padding, y: padding)
+    let outerRect: NSRect = .init(origin: .zero, size: outerSize)
+    viewToDraw.setFrameOrigin(innerOrigin)
+    Self.currentView = NSView(frame: outerRect)
+    Self.currentView.addSubview(viewToDraw)
+    window.contentView = Self.currentView
+    window.setContentSize(outerSize)
   }
 
   override public func scrollWheel(with event: NSEvent) {
