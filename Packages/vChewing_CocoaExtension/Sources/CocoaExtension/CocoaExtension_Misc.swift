@@ -218,3 +218,23 @@ public extension Date {
     return (Int(formatter.string(from: Date())) ?? 1970)
   }
 }
+
+// MARK: - Apple Silicon Detector
+
+// Ref: https://developer.apple.com/forums/thread/678914
+
+public extension NSApplication {
+  static var isAppleSilicon: Bool {
+    var systeminfo = utsname()
+    uname(&systeminfo)
+    let machine = withUnsafeBytes(of: &systeminfo.machine) { bufPtr -> String in
+      let data = Data(bufPtr)
+      if let lastIndex = data.lastIndex(where: { $0 != 0 }) {
+        return String(data: data[0 ... lastIndex], encoding: .isoLatin1) ?? "x86_64"
+      } else {
+        return String(data: data, encoding: .isoLatin1) ?? "x86_64"
+      }
+    }
+    return machine == "arm64"
+  }
+}
