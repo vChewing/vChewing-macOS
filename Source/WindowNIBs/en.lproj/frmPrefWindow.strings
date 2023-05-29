@@ -124,7 +124,7 @@
 "W24-T4-cg0.title" = "Enable CNS11643 Support (2023-05-19)";
 "wFR-zX-M8H.title" = "Show Hanyu-Pinyin in the inline composition buffer";
 "wN3-k3-b2a.title" = "Choose your desired user data folder path. Will be omitted if invalid.";
-"wQ9-px-b07.title" = "Basic keyboard layout option will only affect the appearance of the on-screen-keyboard if the current Mandarin parser is not (any) pinyin.";
+"wQ9-px-b07.title" = "Choose the macOS-level basic keyboard layout. Non-QWERTY alphanumerical keyboard layouts are for Pinyin parser only. This option will only affect the appearance of the on-screen-keyboard if the current Mandarin parser is neither (any) pinyin nor dynamically reparsable with different western keyboard layouts (like Eten 26, Hsu, etc.).";
 "Wvt-HE-LOv.title" = "Keyboard Layout";
 "WX6-BW-JPM.title" = "This editor only: Auto-reload modifications happened outside of this editor";
 "xC5-yV-1W1.title" = "Choose your preferred layout of the candidate window.";
