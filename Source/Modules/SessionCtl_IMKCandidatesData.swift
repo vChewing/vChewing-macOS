@@ -70,19 +70,22 @@ public extension SessionCtl {
   /// - Parameter currentSelection: 已經高亮選中的候選字詞內容。
   override func candidateSelectionChanged(_ currentSelection: NSAttributedString!) {
     guard let candidateString = currentSelection?.string, !candidateString.isEmpty else { return }
+    // Handle candidatePairHighlightChanged().
+    var indexDeducted = 0
+    fixIndexForIMKCandidates(&indexDeducted, source: candidateString)
+    if state.type == .ofCandidates {
+      candidatePairHighlightChanged(at: indexDeducted)
+    }
+    let realCandidateString = state.candidates[indexDeducted].value
     // Handle IMK Annotation... We just use this to tell Apple that this never works in IMKCandidates.
     DispatchQueue.main.async { [self] in
       let annotation = reverseLookup(for: candidateString).joined(separator: "\n")
       guard !annotation.isEmpty else { return }
       vCLog("Current Annotation: \(annotation)")
       guard let imkCandidates = candidateUI as? CtlCandidateIMK else { return }
+      annotationSelected(.init(string: annotation), forCandidate: .init(string: realCandidateString))
       imkCandidates.showAnnotation(.init(string: annotation))
     }
-    // Handle candidatePairHighlightChanged().
-    guard state.type == .ofCandidates else { return }
-    var indexDeducted = 0
-    fixIndexForIMKCandidates(&indexDeducted, source: candidateString)
-    candidatePairHighlightChanged(at: indexDeducted)
   }
 
   /// IMK 選字窗限定函式，只要選字窗確認了某個候選字詞的選擇、就會呼叫這個函式。
