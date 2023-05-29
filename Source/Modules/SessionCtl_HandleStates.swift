@@ -104,7 +104,6 @@ public extension SessionCtl {
   /// 如果當前狀態含有「組字結果內容」、或者有選字窗內容、或者存在正在輸入的字根/讀音，則在組字區內顯示游標。
   func setInlineDisplayWithCursor() {
     var attrStr: NSAttributedString = attributedStringSecured.value
-    var theRange: NSRange = attributedStringSecured.range
     // 包括早期版本的騰訊 QQNT 在內，有些客體的 client.setMarkedText() 無法正常處理 .thick 下劃線。
     mitigation: if clientMitigationLevel == 1, state.type == .ofMarking {
       if !PrefMgr.shared.disableSegmentedThickUnderlineInMarkingModeForManagedClients { break mitigation }
@@ -116,19 +115,16 @@ public extension SessionCtl {
           ?? [.underlineStyle: NSUnderlineStyle.thick.rawValue], range: rangeNeo
       )
       attrStr = neo
-      theRange = NSRange.zero
     }
     /// 所謂選區「selectionRange」，就是「可見游標位置」的位置，只不過長度
     /// 是 0 且取代範圍（replacementRange）為「NSNotFound」罷了。
     /// 也就是說，內文組字區該在哪裡出現，得由客體軟體來作主。
-    doSetMarkedText(attrStr, selectionRange: theRange)
+    doSetMarkedText(attrStr)
   }
 
   /// 在處理某些「沒有組字區內容顯示」且「不需要攔截某些按鍵處理」的狀態時使用的函式，會清空螢幕上顯示的組字區。
   func clearInlineDisplay() {
-    doSetMarkedText(
-      NSAttributedString(), selectionRange: NSRange.zero
-    )
+    doSetMarkedText(NSAttributedString())
   }
 
   /// 遞交組字區內容。
@@ -140,13 +136,13 @@ public extension SessionCtl {
       DispatchQueue.main.async {
         guard let client = self.client() else { return }
         client.insertText(
-          buffer, replacementRange: NSRange.notFound
+          buffer, replacementRange: self.replacementRange()
         )
       }
     } else {
       guard let client = client() else { return }
       client.insertText(
-        buffer, replacementRange: NSRange.notFound
+        buffer, replacementRange: replacementRange()
       )
     }
   }
@@ -154,22 +150,21 @@ public extension SessionCtl {
   /// 把 setMarkedText 包裝一下，按需啟用 GCD。
   /// - Parameters:
   ///   - string: 要設定顯示的內容，必須得是 NSAttributedString（否則不顯示下劃線）且手動定義過下劃線。
-  ///   - selectionRange: 高亮選區範圍。該範圍只會在下劃線為 .thick 的時候在某些客體軟體當中生效。
-  ///   - replacementRange: 要替換掉的既有文本的範圍。
   ///   警告：replacementRange 不要亂填，否則會在 Microsoft Office 等軟體內出現故障。
   ///   該功能是給某些想設計「重新組字」功能的輸入法設計的，但一字多音的漢語在注音/拼音輸入這方面不適用這個輸入法特性。
-  func doSetMarkedText(
-    _ string: NSAttributedString, selectionRange: NSRange,
-    replacementRange: NSRange = .notFound
-  ) {
+  func doSetMarkedText(_ string: NSAttributedString) {
     if isServingIMEItself || !isActivated {
       DispatchQueue.main.async {
         guard let client = self.client() else { return }
-        client.setMarkedText(string, selectionRange: selectionRange, replacementRange: replacementRange)
+        client.setMarkedText(
+          string, selectionRange: self.selectionRange(), replacementRange: self.replacementRange()
+        )
       }
     } else {
       guard let client = client() else { return }
-      client.setMarkedText(string, selectionRange: selectionRange, replacementRange: replacementRange)
+      client.setMarkedText(
+        string, selectionRange: selectionRange(), replacementRange: replacementRange()
+      )
     }
   }
 }
