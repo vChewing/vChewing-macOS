@@ -10,13 +10,14 @@ import Foundation
 import Shared
 
 /// 候選字窗會用到的資料池單位，即用即拋。
-public struct CandidatePool {
-  public let blankCell: CandidateCellData
-  public let shitCell: CandidateCellData // 只用來測量單漢字候選字 cell 的最大可能寬度。
-  public let maxLinesPerPage: Int
-  public let layout: LayoutOrientation
-  public let selectionKeys: String
-  public let candidateDataAll: [CandidateCellData]
+public class CandidatePool {
+  // 只用來測量單漢字候選字 cell 的最大可能寬度。
+  public static let shitCell = CandidateCellData(key: " ", displayedText: "💩", isSelected: false)
+  public static let blankCell = CandidateCellData(key: " ", displayedText: "　", isSelected: false)
+  public private(set) var maxLinesPerPage: Int
+  public private(set) var layout: LayoutOrientation
+  public private(set) var selectionKeys: String
+  public private(set) var candidateDataAll: [CandidateCellData]
   public var candidateLines: [[CandidateCellData]] = []
   public var tooltip: String = ""
   public var reverseLookupResult: [String] = []
@@ -30,7 +31,7 @@ public struct CandidatePool {
 
   /// 用來在初期化一個候選字詞資料池的時候研判「橫版多行選字窗每行最大應該塞多少個候選字詞」。
   /// 注意：該參數不用來計算視窗寬度，所以無須算上候選字詞間距。
-  public var maxRowWidth: Double { ceil(Double(maxLineCapacity) * blankCell.cellLength()) }
+  public var maxRowWidth: Double { ceil(Double(maxLineCapacity) * Self.blankCell.cellLength()) }
 
   /// 當前高亮的候選字詞的順序標籤（同時顯示資料池內已有的全部的候選字詞的數量）
   public var currentPositionLabelText: String {
@@ -80,17 +81,34 @@ public struct CandidatePool {
     candidates: [(keyArray: [String], value: String)], lines: Int = 3, selectionKeys: String = "123456789",
     layout: LayoutOrientation = .vertical, locale: String = ""
   ) {
+    maxLinesPerPage = 1
+    self.layout = .horizontal
+    self.selectionKeys = "123456789"
+    candidateDataAll = []
+    // 以上只是為了糊弄 compiler。接下來才是正式的初期化。
+    construct(candidates: candidates, lines: lines, selectionKeys: selectionKeys, layout: layout, locale: locale)
+  }
+
+  /// 初期化（或者自我重新初期化）一個候選字窗專用資料池。
+  /// - Parameters:
+  ///   - candidates: 要塞入的候選字詞陣列。
+  ///   - selectionKeys: 選字鍵。
+  ///   - direction: 橫向排列還是縱向排列（預設情況下是縱向）。
+  ///   - locale: 區域編碼。例：「zh-Hans」或「zh-Hant」。
+  private func construct(
+    candidates: [(keyArray: [String], value: String)], lines: Int = 3, selectionKeys: String = "123456789",
+    layout: LayoutOrientation = .vertical, locale: String = ""
+  ) {
     self.layout = layout
     maxLinesPerPage = max(1, lines)
-    blankCell = CandidateCellData(key: " ", displayedText: "　", isSelected: false)
-    shitCell = CandidateCellData(key: " ", displayedText: "💩", isSelected: false)
-    blankCell.locale = locale
+    Self.blankCell.locale = locale
     self.selectionKeys = selectionKeys.isEmpty ? "123456789" : selectionKeys
     var allCandidates = candidates.map {
       CandidateCellData(key: " ", displayedText: $0.value, spanLength: $0.keyArray.count)
     }
-    if allCandidates.isEmpty { allCandidates.append(blankCell) }
+    if allCandidates.isEmpty { allCandidates.append(Self.blankCell) }
     candidateDataAll = allCandidates
+    candidateLines.removeAll()
     var currentColumn: [CandidateCellData] = []
     for (i, candidate) in candidateDataAll.enumerated() {
       candidate.index = i
@@ -127,7 +145,7 @@ public extension CandidatePool {
   /// 往指定的方向翻頁。
   /// - Parameter isBackward: 是否逆向翻頁。
   /// - Returns: 操作是否順利。
-  @discardableResult mutating func flipPage(isBackward: Bool) -> Bool {
+  @discardableResult func flipPage(isBackward: Bool) -> Bool {
     backupLineRangeForCurrentPage()
     defer { flipLineRangeToNeighborPage(isBackward: isBackward) }
     return consecutivelyFlipLines(isBackward: isBackward, count: maxLinesPerPage)
@@ -147,7 +165,7 @@ public extension CandidatePool {
   ///   - isBackward: 是否逆向翻行。
   ///   - count: 翻幾行。
   /// - Returns: 操作是否順利。
-  @discardableResult mutating func consecutivelyFlipLines(isBackward: Bool, count: Int) -> Bool {
+  @discardableResult func consecutivelyFlipLines(isBackward: Bool, count: Int) -> Bool {
     switch isBackward {
     case false where currentLineNumber == candidateLines.count - 1:
       return highlightNeighborCandidate(isBackward: false)
@@ -165,7 +183,7 @@ public extension CandidatePool {
   /// 嘗試高亮前方或者後方的鄰近候選字詞。
   /// - Parameter isBackward: 是否是後方的鄰近候選字詞。
   /// - Returns: 是否成功。
-  @discardableResult mutating func highlightNeighborCandidate(isBackward: Bool) -> Bool {
+  @discardableResult func highlightNeighborCandidate(isBackward: Bool) -> Bool {
     switch isBackward {
     case false where highlightedIndex >= candidateDataAll.count - 1:
       highlight(at: 0)
@@ -181,7 +199,7 @@ public extension CandidatePool {
 
   /// 高亮指定的候選字。
   /// - Parameter indexSpecified: 給定的候選字詞索引編號，得是資料池內的總索引編號。
-  mutating func highlight(at indexSpecified: Int) {
+  func highlight(at indexSpecified: Int) {
     var indexSpecified = indexSpecified
     let isBackward: Bool = indexSpecified > highlightedIndex
     highlightedIndex = indexSpecified
@@ -222,7 +240,7 @@ public extension CandidatePool {
   }
 
   func cellWidth(_ cell: CandidateCellData) -> (min: CGFloat?, max: CGFloat?) {
-    let minAccepted = ceil(shitCell.cellLength(isMatrix: false))
+    let minAccepted = ceil(Self.shitCell.cellLength(isMatrix: false))
     let defaultMin: CGFloat = cell.cellLength(isMatrix: maxLinesPerPage != 1)
     var min: CGFloat = defaultMin
     if layout != .vertical, maxLinesPerPage == 1 {
@@ -267,14 +285,14 @@ private extension CandidatePool {
     max(0, candidateLines.count - maxLinesPerPage) ..< candidateLines.count
   }
 
-  mutating func selectNewNeighborLine(isBackward: Bool) {
+  func selectNewNeighborLine(isBackward: Bool) {
     switch layout {
     case .horizontal: selectNewNeighborRow(direction: isBackward ? .up : .down)
     case .vertical: selectNewNeighborColumn(direction: isBackward ? .left : .right)
     }
   }
 
-  mutating func fixLineRange(isBackward: Bool = false) {
+  func fixLineRange(isBackward: Bool = false) {
     if !lineRangeForCurrentPage.contains(currentLineNumber) {
       switch isBackward {
       case false:
@@ -289,11 +307,11 @@ private extension CandidatePool {
     }
   }
 
-  mutating func backupLineRangeForCurrentPage() {
+  func backupLineRangeForCurrentPage() {
     previouslyRecordedLineRangeForPreviousPage = lineRangeForCurrentPage
   }
 
-  mutating func flipLineRangeToNeighborPage(isBackward: Bool = false) {
+  func flipLineRangeToNeighborPage(isBackward: Bool = false) {
     guard let prevRange = previouslyRecordedLineRangeForPreviousPage else { return }
     var lowerBound = prevRange.lowerBound
     var upperBound = prevRange.upperBound
@@ -323,7 +341,7 @@ private extension CandidatePool {
     // 應該不會有漏檢的情形了。
   }
 
-  mutating func selectNewNeighborRow(direction: VerticalDirection) {
+  func selectNewNeighborRow(direction: VerticalDirection) {
     let currentSubIndex = candidateDataAll[highlightedIndex].subIndex
     var result = currentSubIndex
     branch: switch direction {
@@ -369,7 +387,7 @@ private extension CandidatePool {
     }
   }
 
-  mutating func selectNewNeighborColumn(direction: HorizontalDirection) {
+  func selectNewNeighborColumn(direction: HorizontalDirection) {
     let currentSubIndex = candidateDataAll[highlightedIndex].subIndex
     switch direction {
     case .left:

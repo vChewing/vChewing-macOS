@@ -39,7 +39,7 @@ public extension CandidateCellData {
               Text(verbatim: displayedText)
                 .font(.init(CTFontCreateUIFontForLanguage(.system, fontSizeCandidate, locale as CFString)!))
                 .foregroundColor(Color(white: 1)).lineLimit(1)
-            }.padding(3).foregroundColor(Color(white: 0.9))
+            }.padding(.vertical, 3).padding(.horizontal, 5)
           }.frame(alignment: .leading)
         } else {
           VStack(spacing: 0) {
@@ -49,7 +49,7 @@ public extension CandidateCellData {
               Text(verbatim: displayedText)
                 .font(.init(CTFontCreateUIFontForLanguage(.system, fontSizeCandidate, locale as CFString)!))
                 .foregroundColor(Color.primary).lineLimit(1)
-            }.padding(3).foregroundColor(Color(white: 0.9))
+            }.padding(.vertical, 3).padding(.horizontal, 5)
           }.frame(alignment: .leading)
         }
       }.fixedSize(horizontal: false, vertical: true)
@@ -71,7 +71,7 @@ public extension CandidateCellData {
             Text(verbatim: displayedText)
               .font(.init(CTFontCreateUIFontForLanguage(.system, fontSizeCandidate, locale as CFString)!))
               .foregroundColor(.init(nsColor: fontColorCandidate)).lineLimit(1)
-          }.padding(3)
+          }.padding(.vertical, 3).padding(.horizontal, 5)
         }.frame(alignment: .leading)
       }.fixedSize(horizontal: false, vertical: true)
     }
