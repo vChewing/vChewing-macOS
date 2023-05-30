@@ -25,7 +25,7 @@ extension CandidatePool {
   private var attributedDescriptionHorizontal: NSAttributedString {
     let paragraphStyle = sharedParagraphStyle
     let attrCandidate: [NSAttributedString.Key: AnyObject] = [
-      .font: blankCell.phraseFont(size: blankCell.size),
+      .font: Self.blankCell.phraseFont(size: Self.blankCell.size),
       .paragraphStyle: paragraphStyle,
     ]
     let result = NSMutableAttributedString(string: "", attributes: attrCandidate)
@@ -64,7 +64,7 @@ extension CandidatePool {
   private var attributedDescriptionVertical: NSAttributedString {
     let paragraphStyle = sharedParagraphStyle
     let attrCandidate: [NSAttributedString.Key: AnyObject] = [
-      .font: blankCell.phraseFont(size: blankCell.size),
+      .font: Self.blankCell.phraseFont(size: Self.blankCell.size),
       .paragraphStyle: paragraphStyle,
     ]
     let result = NSMutableAttributedString(string: "", attributes: attrCandidate)
@@ -129,7 +129,7 @@ extension CandidatePool {
     let positionCounterColorText = NSColor.controlTextColor
     let positionCounterTextSize = max(ceil(CandidateCellData.unifiedSize * 0.7), 11)
     let attrPositionCounter: [NSAttributedString.Key: AnyObject] = [
-      .font: blankCell.phraseFontEmphasized(size: positionCounterTextSize),
+      .font: Self.blankCell.phraseFontEmphasized(size: positionCounterTextSize),
       .backgroundColor: positionCounterColorBG,
       .foregroundColor: positionCounterColorText,
     ]
@@ -142,7 +142,7 @@ extension CandidatePool {
   private var attributedDescriptionTooltip: NSAttributedString {
     let positionCounterTextSize = max(ceil(CandidateCellData.unifiedSize * 0.7), 11)
     let attrTooltip: [NSAttributedString.Key: AnyObject] = [
-      .font: blankCell.phraseFontEmphasized(size: positionCounterTextSize),
+      .font: Self.blankCell.phraseFontEmphasized(size: positionCounterTextSize),
     ]
     let tooltipText = NSAttributedString(
       string: " \(tooltip) ", attributes: attrTooltip
@@ -153,10 +153,10 @@ extension CandidatePool {
   private var attributedDescriptionReverseLookp: NSAttributedString {
     let reverseLookupTextSize = max(ceil(CandidateCellData.unifiedSize * 0.6), 9)
     let attrReverseLookup: [NSAttributedString.Key: AnyObject] = [
-      .font: blankCell.phraseFont(size: reverseLookupTextSize),
+      .font: Self.blankCell.phraseFont(size: reverseLookupTextSize),
     ]
     let attrReverseLookupSpacer: [NSAttributedString.Key: AnyObject] = [
-      .font: blankCell.phraseFont(size: reverseLookupTextSize),
+      .font: Self.blankCell.phraseFont(size: reverseLookupTextSize),
     ]
     let result = NSMutableAttributedString(string: "", attributes: attrReverseLookupSpacer)
     for neta in reverseLookupResult {
