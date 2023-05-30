@@ -39,6 +39,23 @@ public class CandidateCellData: Hashable {
       : .init(red: 142 / 255, green: 142 / 255, blue: 147 / 255, alpha: 1)
   }
 
+  public var hardCopy: CandidateCellData {
+    let result = CandidateCellData(key: selectionKey, displayedText: displayedText, spanLength: spanLength, isSelected: isHighlighted)
+    result.visualDimension = visualDimension
+    result.locale = locale
+    result.whichLine = whichLine
+    result.index = index
+    result.subIndex = subIndex
+    return result
+  }
+
+  public var cleanCopy: CandidateCellData {
+    let result = hardCopy
+    result.isHighlighted = false
+    result.selectionKey = " "
+    return result
+  }
+
   public init(
     key: String, displayedText: String,
     spanLength spanningLength: Int? = nil, isSelected: Bool = false

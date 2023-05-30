@@ -66,9 +66,10 @@ public extension VwrCandidateTDKCocoa {
     }
     if thePool.maxLinesPerPage - thePool.lineRangeForCurrentPage.count > 0 {
       thePool.lineRangeForFinalPageBlanked.enumerated().forEach { _ in
-        var theLine = [thePool.blankCell]
-        for _ in 1 ..< thePool.maxLineCapacity {
-          theLine.append(thePool.blankCell)
+        var theLine = [CandidateCellData]()
+        let copied = CandidatePool.blankCell.cleanCopy
+        for _ in 0 ..< thePool.maxLineCapacity {
+          theLine.append(copied)
         }
         let vwrCurrentLine = generateLineContainer(&theLine)
         candidateContainer.addView(vwrCurrentLine, in: isVerticalListing ? .top : .leading)
@@ -88,7 +89,7 @@ public extension VwrCandidateTDKCocoa {
           let line = Array(lines[viewLineID])
           columnWidth = line.map(\.visualDimension.width).max() ?? lineDimension.width
         } else {
-          columnWidth = thePool.blankCell.visualDimension.width
+          columnWidth = CandidatePool.blankCell.visualDimension.width
         }
         accumulatedWidth += columnWidth
         Self.makeSimpleConstraint(item: vwrCurrentLine, attribute: .width, relation: .equal, value: columnWidth)
@@ -167,7 +168,7 @@ private extension VwrCandidateTDKCocoa {
   }
 
   private func drawCellCocoa(_ theCell: CandidateCellData? = nil) -> NSView {
-    let theCell = theCell ?? thePool.blankCell
+    let theCell = theCell ?? CandidatePool.blankCell.cleanCopy
     let cellLabel = VwrCandidateCell(cell: theCell)
     cellLabel.target = self
     Self.makeSimpleConstraint(item: cellLabel, attribute: .width, relation: .equal, value: cellLabel.fittingSize.width)
@@ -362,6 +363,7 @@ private extension VwrCandidateTDKCocoa {
       }
 
       theMenu = newMenu
+      CtlCandidateTDK.currentMenu = newMenu
     }
 
     @objc func menuActionOfBoosting(_: Any? = nil) {

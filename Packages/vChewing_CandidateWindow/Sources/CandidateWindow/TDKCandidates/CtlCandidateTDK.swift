@@ -31,6 +31,8 @@ public class CtlCandidateTDK: CtlCandidate, NSWindowDelegate {
   public var useMouseScrolling: Bool = true
   private static var thePool: CandidatePool = .init(candidates: [])
   private static var currentView: NSView = .init()
+  public static var currentWindow: NSWindow?
+  public static var currentMenu: NSMenu?
 
   @available(macOS 10.15, *)
   private var theView: some View {

@@ -72,9 +72,10 @@ private extension VwrCandidateTDK {
           .id(rowIndex)
         }
         if thePool.maxLinesPerPage - thePool.lineRangeForCurrentPage.count > 0 {
+          let copied = CandidatePool.blankCell.cleanCopy
           ForEach(thePool.lineRangeForFinalPageBlanked, id: \.self) { _ in
             HStack(spacing: 0) {
-              attributedStringFor(cell: thePool.blankCell)
+              attributedStringFor(cell: copied)
                 .frame(alignment: .topLeading)
                 .contentShape(Rectangle())
               Spacer()
@@ -102,8 +103,9 @@ private extension VwrCandidateTDK {
             }
             .opacity(columnIndex == thePool.currentLineNumber ? 1 : 0.85)
             if thePool.candidateLines[columnIndex].count < thePool.maxLineCapacity {
+              let copied = CandidatePool.blankCell.cleanCopy
               ForEach(0 ..< thePool.dummyCellsRequiredForCurrentLine, id: \.self) { _ in
-                drawCandidate(thePool.blankCell)
+                drawCandidate(copied)
               }
             }
           }
@@ -112,17 +114,15 @@ private extension VwrCandidateTDK {
             alignment: .topLeading
           )
           .id(columnIndex)
-          if thePool.maxLinesPerPage > 1, thePool.maxLinesPerPage <= loopIndex + 1 {
-            Spacer(minLength: 0)
-          }
         }
         if thePool.maxLinesPerPage - thePool.lineRangeForCurrentPage.count > 0 {
           ForEach(Array(thePool.lineRangeForFinalPageBlanked.enumerated()), id: \.offset) { loopIndex, _ in
             VStack(alignment: .leading, spacing: 0) {
+              let copied = CandidatePool.blankCell.cleanCopy
               ForEach(0 ..< thePool.maxLineCapacity, id: \.self) { _ in
-                attributedStringFor(cell: thePool.blankCell).fixedSize()
+                attributedStringFor(cell: copied).fixedSize()
                   .frame(
-                    width: ceil(thePool.blankCell.cellLength(isMatrix: true)),
+                    width: ceil(CandidatePool.blankCell.cellLength(isMatrix: true)),
                     alignment: .topLeading
                   )
                   .contentShape(Rectangle())
@@ -132,11 +132,6 @@ private extension VwrCandidateTDK {
               maxWidth: .infinity,
               alignment: .topLeading
             )
-            if thePool.maxLinesPerPage > 1,
-               loopIndex >= thePool.maxLinesPerPage - thePool.lineRangeForCurrentPage.count - 1
-            {
-              Spacer(minLength: 0)
-            }
           }
         }
       }
@@ -195,7 +190,7 @@ extension VwrCandidateTDK {
     let spacings: CGFloat = horizontalCellSpacing * Double(thePool.maxLineCapacity - 1)
     let maxWindowWith: CGFloat
       = ceil(
-        Double(thePool.maxLineCapacity) * (thePool.blankCell.cellLength())
+        Double(thePool.maxLineCapacity) * (CandidatePool.blankCell.cellLength())
           + spacings
       )
     return thePool.layout == .horizontal && thePool.maxLinesPerPage > 1 ? maxWindowWith : nil
@@ -245,7 +240,7 @@ extension VwrCandidateTDK {
     HStack {
       if !tooltip.isEmpty {
         ZStack(alignment: .center) {
-          Circle().fill(thePool.blankCell.themeColor.opacity(0.8))
+          Circle().fill(CandidatePool.blankCell.themeColor.opacity(0.8))
           Text(tooltip.first?.description ?? "").padding(2).font(.system(size: CandidateCellData.unifiedSize))
         }.frame(width: ceil(CandidateCellData.unifiedSize * 1.7), height: ceil(CandidateCellData.unifiedSize * 1.7))
       }
@@ -371,7 +366,7 @@ struct VwrCandidateTDK_Previews: PreviewProvider {
   ]
   @State static var reverseLookupResult = ["mmmmm", "dddd"]
   @State static var tooltip = "📼"
-  @State static var oldOS: Bool = true
+  @State static var oldOS: Bool = false
 
   static var testCandidatesConverted: [(keyArray: [String], value: String)] {
     testCandidates.map { candidate in
@@ -381,7 +376,7 @@ struct VwrCandidateTDK_Previews: PreviewProvider {
   }
 
   static var thePoolX: CandidatePool {
-    var result = CandidatePool(
+    let result = CandidatePool(
       candidates: testCandidatesConverted, lines: 4,
       selectionKeys: "123456", layout: .horizontal
     )
@@ -392,7 +387,7 @@ struct VwrCandidateTDK_Previews: PreviewProvider {
   }
 
   static var thePoolXS: CandidatePool {
-    var result = CandidatePool(
+    let result = CandidatePool(
       candidates: testCandidatesConverted, lines: 1,
       selectionKeys: "123456", layout: .horizontal
     )
@@ -403,7 +398,7 @@ struct VwrCandidateTDK_Previews: PreviewProvider {
   }
 
   static var thePoolY: CandidatePool {
-    var result = CandidatePool(
+    let result = CandidatePool(
       candidates: testCandidatesConverted, lines: 4,
       selectionKeys: "123456", layout: .vertical
     )
@@ -411,11 +406,12 @@ struct VwrCandidateTDK_Previews: PreviewProvider {
     result.tooltip = Self.tooltip
     result.flipPage(isBackward: false)
     result.highlight(at: 2)
+    result.highlight(at: 21)
     return result
   }
 
   static var thePoolYS: CandidatePool {
-    var result = CandidatePool(
+    let result = CandidatePool(
       candidates: testCandidatesConverted, lines: 1,
       selectionKeys: "123456", layout: .vertical
     )
