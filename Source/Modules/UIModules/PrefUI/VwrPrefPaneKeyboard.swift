@@ -111,9 +111,8 @@ struct VwrPrefPaneKeyboard: View {
               selection: $alphanumericalKeyboardLayout
             ) {
               ForEach(0 ... (IMKHelper.allowedAlphanumericalTISInputSources.count - 1), id: \.self) { id in
-                if let theEntry = IMKHelper.allowedAlphanumericalTISInputSources[id] {
-                  Text(theEntry.vChewingLocalizedName).tag(theEntry.identifier)
-                }
+                let theEntry = IMKHelper.allowedAlphanumericalTISInputSources[id]
+                Text(theEntry.vChewingLocalizedName).tag(theEntry.identifier)
               }.id(UUID())
             }
             .labelsHidden().frame(width: 290)
