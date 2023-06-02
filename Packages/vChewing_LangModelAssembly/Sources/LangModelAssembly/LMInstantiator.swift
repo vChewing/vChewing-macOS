@@ -51,24 +51,24 @@ public extension vChewingLM {
     /// 一個 LMCoreEX 就可以滿足威注音幾乎所有語言模組副本的需求，當然也有這兩個例外：
     /// LMReplacements 與 LMAssociates 分別擔當語彙置換表資料與使用者聯想詞的資料承載工作。
     /// 但是，LMCoreEX 對 2010-2013 年等舊 mac 機種而言，讀取速度異常緩慢。
-    /// 於是 LMCoreNS 就出場了，專門用來讀取原廠的 plist 格式的辭典。
+    /// 於是 LMCoreNS 就出場了，專門用來讀取原廠的 JSON 格式的辭典。
 
     // 聲明原廠語言模組：
     // Reverse 的話，第一欄是注音，第二欄是對應的漢字，第三欄是可能的權重。
     // 不 Reverse 的話，第一欄是漢字，第二欄是對應的注音，第三欄是可能的權重。
-    var lmCore = LMCoreNS(
+    var lmCore = LMCoreJSON(
       reverse: false, consolidate: false, defaultScore: -9.9, forceDefaultScore: false
     )
-    var lmMisc = LMCoreNS(
+    var lmMisc = LMCoreJSON(
       reverse: true, consolidate: false, defaultScore: -1.0, forceDefaultScore: false
     )
 
     // 簡體中文模式與繁體中文模式共用全字庫擴展模組，故靜態處理。
     // 不然，每個模式都會讀入一份全字庫，會多佔用 100MB 記憶體。
-    static var lmCNS = vChewingLM.LMCoreNS(
+    static var lmCNS = vChewingLM.LMCoreJSON(
       reverse: true, consolidate: false, defaultScore: -11.0, forceDefaultScore: false
     )
-    static var lmSymbols = vChewingLM.LMCoreNS(
+    static var lmSymbols = vChewingLM.LMCoreJSON(
       reverse: true, consolidate: false, defaultScore: -13.0, forceDefaultScore: false
     )
 
@@ -92,7 +92,7 @@ public extension vChewingLM {
 
     // MARK: - 工具函式
 
-    public func resetFactoryPlistModels() {
+    public func resetFactoryJSONModels() {
       lmCore.clear()
       lmMisc.clear()
       Self.lmCNS.clear()
@@ -100,43 +100,43 @@ public extension vChewingLM {
     }
 
     public var isCoreLMLoaded: Bool { lmCore.isLoaded }
-    public func loadLanguageModel(plist: (dict: [String: [Data]]?, path: String)) {
-      guard let plistDict = plist.dict else {
-        vCLog("lmCore: File access failure: \(plist.path)")
+    public func loadLanguageModel(json: (dict: [String: [String]]?, path: String)) {
+      guard let jsonDict = json.dict else {
+        vCLog("lmCore: File access failure: \(json.path)")
         return
       }
-      lmCore.load((dict: plistDict, path: plist.path))
-      vCLog("lmCore: \(lmCore.count) entries of data loaded from: \(plist.path)")
+      lmCore.load((dict: jsonDict, path: json.path))
+      vCLog("lmCore: \(lmCore.count) entries of data loaded from: \(json.path)")
     }
 
     public var isCNSDataLoaded: Bool { Self.lmCNS.isLoaded }
-    public func loadCNSData(plist: (dict: [String: [Data]]?, path: String)) {
-      guard let plistDict = plist.dict else {
-        vCLog("lmCNS: File access failure: \(plist.path)")
+    public func loadCNSData(json: (dict: [String: [String]]?, path: String)) {
+      guard let jsonDict = json.dict else {
+        vCLog("lmCNS: File access failure: \(json.path)")
         return
       }
-      Self.lmCNS.load((dict: plistDict, path: plist.path))
-      vCLog("lmCNS: \(Self.lmCNS.count) entries of data loaded from: \(plist.path)")
+      Self.lmCNS.load((dict: jsonDict, path: json.path))
+      vCLog("lmCNS: \(Self.lmCNS.count) entries of data loaded from: \(json.path)")
     }
 
     public var isMiscDataLoaded: Bool { lmMisc.isLoaded }
-    public func loadMiscData(plist: (dict: [String: [Data]]?, path: String)) {
-      guard let plistDict = plist.dict else {
-        vCLog("lmCore: File access failure: \(plist.path)")
+    public func loadMiscData(json: (dict: [String: [String]]?, path: String)) {
+      guard let jsonDict = json.dict else {
+        vCLog("lmCore: File access failure: \(json.path)")
         return
       }
-      lmMisc.load((dict: plistDict, path: plist.path))
-      vCLog("lmMisc: \(lmMisc.count) entries of data loaded from: \(plist.path)")
+      lmMisc.load((dict: jsonDict, path: json.path))
+      vCLog("lmMisc: \(lmMisc.count) entries of data loaded from: \(json.path)")
     }
 
     public var isSymbolDataLoaded: Bool { Self.lmSymbols.isLoaded }
-    public func loadSymbolData(plist: (dict: [String: [Data]]?, path: String)) {
-      guard let plistDict = plist.dict else {
-        vCLog("lmCore: File access failure: \(plist.path)")
+    public func loadSymbolData(json: (dict: [String: [String]]?, path: String)) {
+      guard let jsonDict = json.dict else {
+        vCLog("lmCore: File access failure: \(json.path)")
         return
       }
-      Self.lmSymbols.load((dict: plistDict, path: plist.path))
-      vCLog("lmSymbols: \(Self.lmSymbols.count) entries of data loaded from: \(plist.path)")
+      Self.lmSymbols.load((dict: jsonDict, path: json.path))
+      vCLog("lmSymbols: \(Self.lmSymbols.count) entries of data loaded from: \(json.path)")
     }
 
     // 上述幾個函式不要加 Async，因為這些內容都被 LMMgr 負責用別的方法 Async 了、用 GCD 的多任務並行共結來完成。

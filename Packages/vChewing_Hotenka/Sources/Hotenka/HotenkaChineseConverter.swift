@@ -41,7 +41,7 @@ public enum DictType {
 }
 
 public class HotenkaChineseConverter {
-  public private(set) var dict: [String: [String: String]]
+  private(set) var dict: [String: [String: String]]
   private var dictFiles: [String: [String]]
 
   public init(plistDir: String) {
@@ -53,6 +53,20 @@ public class HotenkaChineseConverter {
       dict = rawPlist
     } catch {
       NSLog("// Exception happened when reading dict plist at: \(plistDir).")
+      dict = .init()
+    }
+  }
+
+  public init(jsonDir: String) {
+    dictFiles = .init()
+    do {
+      let rawData = try Data(contentsOf: URL(fileURLWithPath: jsonDir))
+      guard let rawJSON: [String: [String: String]] = try JSONSerialization.jsonObject(with: rawData) as? [String: [String: String]] else {
+        throw NSError()
+      }
+      dict = rawJSON
+    } catch {
+      NSLog("// Exception happened when reading dict json at: \(jsonDir).")
       dict = .init()
     }
   }
