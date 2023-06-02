@@ -95,7 +95,7 @@ struct Unigram: CustomStringConvertible {
   }
 }
 
-// MARK: - 注音加密，減少 plist 體積
+// MARK: - 注音加密，減少 JSON 體積
 
 func cnvPhonabetToASCII(_ incoming: String) -> String {
   let dicPhonabet2ASCII = [
@@ -129,21 +129,22 @@ private let urlSymbols: String = "./components/common/data-symbols.txt"
 private let urlZhuyinwen: String = "./components/common/data-zhuyinwen.txt"
 private let urlCNS: String = "./components/common/char-kanji-cns.txt"
 
-private let urlPlistSymbols: String = "./data-symbols.plist"
-private let urlPlistZhuyinwen: String = "./data-zhuyinwen.plist"
-private let urlPlistCNS: String = "./data-cns.plist"
-
 private let urlOutputCHS: String = "./data-chs.txt"
-private let urlPlistCHS: String = "./data-chs.plist"
 private let urlOutputCHT: String = "./data-cht.txt"
-private let urlPlistCHT: String = "./data-cht.plist"
-private let urlPlistBPMFReverseLookup: String = "./data-bpmf-reverse-lookup.plist"
-private let urlPlistBPMFReverseLookupCNS1: String = "./data-bpmf-reverse-lookup-CNS1.plist"
-private let urlPlistBPMFReverseLookupCNS2: String = "./data-bpmf-reverse-lookup-CNS2.plist"
-private let urlPlistBPMFReverseLookupCNS3: String = "./data-bpmf-reverse-lookup-CNS3.plist"
-private let urlPlistBPMFReverseLookupCNS4: String = "./data-bpmf-reverse-lookup-CNS4.plist"
-private let urlPlistBPMFReverseLookupCNS5: String = "./data-bpmf-reverse-lookup-CNS5.plist"
-private let urlPlistBPMFReverseLookupCNS6: String = "./data-bpmf-reverse-lookup-CNS6.plist"
+
+private let urlJSONSymbols: String = "./data-symbols.json"
+private let urlJSONZhuyinwen: String = "./data-zhuyinwen.json"
+private let urlJSONCNS: String = "./data-cns.json"
+
+private let urlJSONCHS: String = "./data-chs.json"
+private let urlJSONCHT: String = "./data-cht.json"
+private let urlJSONBPMFReverseLookup: String = "./data-bpmf-reverse-lookup.json"
+private let urlJSONBPMFReverseLookupCNS1: String = "./data-bpmf-reverse-lookup-CNS1.json"
+private let urlJSONBPMFReverseLookupCNS2: String = "./data-bpmf-reverse-lookup-CNS2.json"
+private let urlJSONBPMFReverseLookupCNS3: String = "./data-bpmf-reverse-lookup-CNS3.json"
+private let urlJSONBPMFReverseLookupCNS4: String = "./data-bpmf-reverse-lookup-CNS4.json"
+private let urlJSONBPMFReverseLookupCNS5: String = "./data-bpmf-reverse-lookup-CNS5.json"
+private let urlJSONBPMFReverseLookupCNS6: String = "./data-bpmf-reverse-lookup-CNS6.json"
 
 private var isReverseLookupDictionaryProcessed: Bool = false
 
@@ -263,7 +264,7 @@ func rawDictForKanjis(isCHS: Bool) -> [Unigram] {
   let arrData = Array(
     NSOrderedSet(array: strRAW.components(separatedBy: "\n")).array as! [String])
   var varLineData = ""
-  var mapReverseLookup: [String: [Data]] = [:]
+  var mapReverseLookupJSON: [String: [String]] = [:]
   var mapReverseLookupUnencrypted: [String: [String]] = [:]
   for lineData in arrData {
     // 簡體中文的話，提取 1,2,4；繁體中文的話，提取 1,3,4。
@@ -304,8 +305,8 @@ func rawDictForKanjis(isCHS: Bool) -> [Unigram] {
     }
     if phrase != "" { // 廢掉空數據；之後無須再這樣處理。
       if !isReverseLookupDictionaryProcessed {
-        mapReverseLookup[phrase, default: []].append(cnvPhonabetToASCII(phone).data(using: .utf8)!)
         mapReverseLookupUnencrypted[phrase, default: []].append(phone)
+        mapReverseLookupJSON[phrase, default: []].append(cnvPhonabetToASCII(phone))
       }
       arrUnigramRAW += [
         Unigram(
@@ -318,8 +319,8 @@ func rawDictForKanjis(isCHS: Bool) -> [Unigram] {
   if !isReverseLookupDictionaryProcessed {
     do {
       isReverseLookupDictionaryProcessed = true
-      try PropertyListSerialization.data(fromPropertyList: mapReverseLookup, format: .binary, options: 0).write(
-        to: URL(fileURLWithPath: urlPlistBPMFReverseLookup))
+      try JSONSerialization.data(withJSONObject: mapReverseLookupJSON, options: .sortedKeys).write(
+        to: URL(fileURLWithPath: urlJSONBPMFReverseLookup))
       mapReverseLookupForCheck = mapReverseLookupUnencrypted
     } catch {
       NSLog(" - Core Reverse Lookup Data Generation Failed.")
@@ -457,11 +458,11 @@ func weightAndSort(_ arrStructUncalculated: [Unigram], isCHS: Bool) -> [Unigram]
 func fileOutput(isCHS: Bool) {
   let i18n: String = isCHS ? "簡體中文" : "繁體中文"
   var strPunctuation = ""
-  var rangeMap: [String: [Data]] = [:]
+  var rangeMapJSON: [String: [String]] = [:]
   let pathOutput = urlCurrentFolder.appendingPathComponent(
     isCHS ? urlOutputCHS : urlOutputCHT)
-  let plistURL = urlCurrentFolder.appendingPathComponent(
-    isCHS ? urlPlistCHS : urlPlistCHT)
+  let jsonURL = urlCurrentFolder.appendingPathComponent(
+    isCHS ? urlJSONCHS : urlJSONCHT)
   var strPrintLine = ""
   // 讀取標點內容
   do {
@@ -489,7 +490,7 @@ func fileOutput(isCHS: Bool) {
       let theKey = String(neta[0])
       let theValue = String(neta[1])
       if !neta[0].isEmpty, !neta[1].isEmpty, line.first != "#" {
-        rangeMap[cnvPhonabetToASCII(theKey), default: []].append(theValue.data(using: .utf8)!)
+        rangeMapJSON[cnvPhonabetToASCII(theKey), default: []].append(theValue)
       }
     }
   }
@@ -519,7 +520,7 @@ func fileOutput(isCHS: Bool) {
     let theKey = unigram.key
     let theValue = (String(unigram.score) + " " + unigram.value)
     if !theKey.contains("_punctuation_list") {
-      rangeMap[cnvPhonabetToASCII(theKey), default: []].append(theValue.data(using: .utf8)!)
+      rangeMapJSON[cnvPhonabetToASCII(theKey), default: []].append(theValue)
     }
     strPrintLine += unigram.key + " " + unigram.value
     strPrintLine += " " + String(unigram.score)
@@ -531,8 +532,7 @@ func fileOutput(isCHS: Bool) {
   NSLog(" - \(i18n): 要寫入檔案的 txt 內容編譯完畢。")
   do {
     try strPrintLine.write(to: pathOutput, atomically: true, encoding: .utf8)
-    let plistData = try PropertyListSerialization.data(fromPropertyList: rangeMap, format: .binary, options: 0)
-    try plistData.write(to: plistURL)
+    try JSONSerialization.data(withJSONObject: rangeMapJSON, options: .sortedKeys).write(to: jsonURL)
   } catch {
     NSLog(" - \(i18n): Error on writing strings to file: \(error)")
   }
@@ -550,15 +550,15 @@ func commonFileOutput() {
   var strSymbols = ""
   var strZhuyinwen = ""
   var strCNS = ""
-  var mapSymbols: [String: [Data]] = [:]
-  var mapZhuyinwen: [String: [Data]] = [:]
-  var mapCNS: [String: [Data]] = [:]
-  var mapReverseLookupCNS1: [String: [Data]] = [:]
-  var mapReverseLookupCNS2: [String: [Data]] = [:]
-  var mapReverseLookupCNS3: [String: [Data]] = [:]
-  var mapReverseLookupCNS4: [String: [Data]] = [:]
-  var mapReverseLookupCNS5: [String: [Data]] = [:]
-  var mapReverseLookupCNS6: [String: [Data]] = [:]
+  var mapSymbols: [String: [String]] = [:]
+  var mapZhuyinwen: [String: [String]] = [:]
+  var mapCNS: [String: [String]] = [:]
+  var mapReverseLookupCNS1: [String: [String]] = [:]
+  var mapReverseLookupCNS2: [String: [String]] = [:]
+  var mapReverseLookupCNS3: [String: [String]] = [:]
+  var mapReverseLookupCNS4: [String: [String]] = [:]
+  var mapReverseLookupCNS5: [String: [String]] = [:]
+  var mapReverseLookupCNS6: [String: [String]] = [:]
   // 讀取標點內容
   do {
     strSymbols = try String(contentsOfFile: urlSymbols, encoding: .utf8).replacingOccurrences(of: "\t", with: " ")
@@ -567,7 +567,7 @@ func commonFileOutput() {
   } catch {
     NSLog(" - \(i18n): Exception happened when reading raw punctuation data.")
   }
-  NSLog(" - \(i18n): 成功取得標點符號與西文字母原始資料（plist）。")
+  NSLog(" - \(i18n): 成功取得標點符號與西文字母原始資料（JSON）。")
   // 統合辭典內容
   strSymbols.ranges(splitBy: "\n").forEach {
     let neta = strSymbols[$0].split(separator: " ")
@@ -576,7 +576,7 @@ func commonFileOutput() {
       let theKey = String(neta[1])
       let theValue = String(neta[0])
       if !neta[0].isEmpty, !neta[1].isEmpty, line.first != "#" {
-        mapSymbols[cnvPhonabetToASCII(theKey), default: []].append(theValue.data(using: .utf8)!)
+        mapSymbols[cnvPhonabetToASCII(theKey), default: []].append(theValue)
       }
     }
   }
@@ -587,7 +587,7 @@ func commonFileOutput() {
       let theKey = String(neta[1])
       let theValue = String(neta[0])
       if !neta[0].isEmpty, !neta[1].isEmpty, line.first != "#" {
-        mapZhuyinwen[cnvPhonabetToASCII(theKey), default: []].append(theValue.data(using: .utf8)!)
+        mapZhuyinwen[cnvPhonabetToASCII(theKey), default: []].append(theValue)
       }
     }
   }
@@ -598,31 +598,31 @@ func commonFileOutput() {
       let theKey = String(neta[1])
       let theValue = String(neta[0])
       if !neta[0].isEmpty, !neta[1].isEmpty, line.first != "#" {
-        mapCNS[cnvPhonabetToASCII(theKey), default: []].append(theValue.data(using: .utf8)!)
-        plist: if !theKey.contains("_"), !theKey.contains("-") {
+        mapCNS[cnvPhonabetToASCII(theKey), default: []].append(theValue)
+        json: if !theKey.contains("_"), !theKey.contains("-") {
           if mapReverseLookupCNS1.keys.count <= 16500 {
-            mapReverseLookupCNS1[theValue, default: []].append(cnvPhonabetToASCII(theKey).data(using: .utf8)!)
-            break plist
+            mapReverseLookupCNS1[theValue, default: []].append(cnvPhonabetToASCII(theKey))
+            break json
           }
           if mapReverseLookupCNS2.keys.count <= 16500 {
-            mapReverseLookupCNS2[theValue, default: []].append(cnvPhonabetToASCII(theKey).data(using: .utf8)!)
-            break plist
+            mapReverseLookupCNS2[theValue, default: []].append(cnvPhonabetToASCII(theKey))
+            break json
           }
           if mapReverseLookupCNS3.keys.count <= 16500 {
-            mapReverseLookupCNS3[theValue, default: []].append(cnvPhonabetToASCII(theKey).data(using: .utf8)!)
-            break plist
+            mapReverseLookupCNS3[theValue, default: []].append(cnvPhonabetToASCII(theKey))
+            break json
           }
           if mapReverseLookupCNS4.keys.count <= 16500 {
-            mapReverseLookupCNS4[theValue, default: []].append(cnvPhonabetToASCII(theKey).data(using: .utf8)!)
-            break plist
+            mapReverseLookupCNS4[theValue, default: []].append(cnvPhonabetToASCII(theKey))
+            break json
           }
           if mapReverseLookupCNS5.keys.count <= 16500 {
-            mapReverseLookupCNS5[theValue, default: []].append(cnvPhonabetToASCII(theKey).data(using: .utf8)!)
-            break plist
+            mapReverseLookupCNS5[theValue, default: []].append(cnvPhonabetToASCII(theKey))
+            break json
           }
           if mapReverseLookupCNS6.keys.count <= 16500 {
-            mapReverseLookupCNS6[theValue, default: []].append(cnvPhonabetToASCII(theKey).data(using: .utf8)!)
-            break plist
+            mapReverseLookupCNS6[theValue, default: []].append(cnvPhonabetToASCII(theKey))
+            break json
           }
         }
       }
@@ -630,24 +630,24 @@ func commonFileOutput() {
   }
   NSLog(" - \(i18n): 要寫入檔案的內容編譯完畢。")
   do {
-    try PropertyListSerialization.data(fromPropertyList: mapSymbols, format: .binary, options: 0).write(
-      to: URL(fileURLWithPath: urlPlistSymbols))
-    try PropertyListSerialization.data(fromPropertyList: mapZhuyinwen, format: .binary, options: 0).write(
-      to: URL(fileURLWithPath: urlPlistZhuyinwen))
-    try PropertyListSerialization.data(fromPropertyList: mapCNS, format: .binary, options: 0).write(
-      to: URL(fileURLWithPath: urlPlistCNS))
-    try PropertyListSerialization.data(fromPropertyList: mapReverseLookupCNS1, format: .binary, options: 0).write(
-      to: URL(fileURLWithPath: urlPlistBPMFReverseLookupCNS1))
-    try PropertyListSerialization.data(fromPropertyList: mapReverseLookupCNS2, format: .binary, options: 0).write(
-      to: URL(fileURLWithPath: urlPlistBPMFReverseLookupCNS2))
-    try PropertyListSerialization.data(fromPropertyList: mapReverseLookupCNS3, format: .binary, options: 0).write(
-      to: URL(fileURLWithPath: urlPlistBPMFReverseLookupCNS3))
-    try PropertyListSerialization.data(fromPropertyList: mapReverseLookupCNS4, format: .binary, options: 0).write(
-      to: URL(fileURLWithPath: urlPlistBPMFReverseLookupCNS4))
-    try PropertyListSerialization.data(fromPropertyList: mapReverseLookupCNS5, format: .binary, options: 0).write(
-      to: URL(fileURLWithPath: urlPlistBPMFReverseLookupCNS5))
-    try PropertyListSerialization.data(fromPropertyList: mapReverseLookupCNS6, format: .binary, options: 0).write(
-      to: URL(fileURLWithPath: urlPlistBPMFReverseLookupCNS6))
+    try JSONSerialization.data(withJSONObject: mapSymbols, options: .sortedKeys).write(
+      to: URL(fileURLWithPath: urlJSONSymbols))
+    try JSONSerialization.data(withJSONObject: mapZhuyinwen, options: .sortedKeys).write(
+      to: URL(fileURLWithPath: urlJSONZhuyinwen))
+    try JSONSerialization.data(withJSONObject: mapCNS, options: .sortedKeys).write(
+      to: URL(fileURLWithPath: urlJSONCNS))
+    try JSONSerialization.data(withJSONObject: mapReverseLookupCNS1, options: .sortedKeys).write(
+      to: URL(fileURLWithPath: urlJSONBPMFReverseLookupCNS1))
+    try JSONSerialization.data(withJSONObject: mapReverseLookupCNS2, options: .sortedKeys).write(
+      to: URL(fileURLWithPath: urlJSONBPMFReverseLookupCNS2))
+    try JSONSerialization.data(withJSONObject: mapReverseLookupCNS3, options: .sortedKeys).write(
+      to: URL(fileURLWithPath: urlJSONBPMFReverseLookupCNS3))
+    try JSONSerialization.data(withJSONObject: mapReverseLookupCNS4, options: .sortedKeys).write(
+      to: URL(fileURLWithPath: urlJSONBPMFReverseLookupCNS4))
+    try JSONSerialization.data(withJSONObject: mapReverseLookupCNS5, options: .sortedKeys).write(
+      to: URL(fileURLWithPath: urlJSONBPMFReverseLookupCNS5))
+    try JSONSerialization.data(withJSONObject: mapReverseLookupCNS6, options: .sortedKeys).write(
+      to: URL(fileURLWithPath: urlJSONBPMFReverseLookupCNS6))
   } catch {
     NSLog(" - \(i18n): Error on writing strings to file: \(error)")
   }
