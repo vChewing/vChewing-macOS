@@ -11,13 +11,13 @@ import Megrez
 import Shared
 
 public extension vChewingLM {
-  /// 與之前的 LMCore 不同，LMCoreNS 直接讀取 plist。
+  /// 與之前的 LMCore 不同，LMCoreNS 直接讀取 json。
   /// 這樣一來可以節省在舊 mac 機種內的資料讀入速度。
-  /// 目前僅針對輸入法原廠語彙資料檔案使用 plist 格式。
-  @frozen struct LMCoreNS {
+  /// 目前僅針對輸入法原廠語彙資料檔案使用 json 格式。
+  @frozen struct LMCoreJSON {
     public private(set) var filePath: String?
     /// 資料庫辭典。索引內容為經過加密的注音字串，資料內容則為 UTF8 資料陣列。
-    var dataMap: [String: [Data]] = [:]
+    var dataMap: [String: [String]] = [:]
     /// 【已作廢】資料庫字串陣列。在 LMCoreNS 內沒有作用。
     var strData: String = ""
     /// 【已作廢】聲明原始檔案內第一、二縱列的內容是否彼此顛倒。
@@ -58,7 +58,7 @@ public extension vChewingLM {
     /// 讀入資料辭典。
     /// - parameters:
     ///   - dictData: 辭典資料及對應的 URL 位置。
-    public mutating func load(_ dictData: (dict: [String: [Data]], path: String)) {
+    public mutating func load(_ dictData: (dict: [String: [String]], path: String)) {
       if isLoaded { return }
       filePath = dictData.path
       dataMap = dictData.dict
@@ -74,12 +74,16 @@ public extension vChewingLM {
 
       do {
         let rawData = try Data(contentsOf: URL(fileURLWithPath: path))
-        let rawPlist: [String: [Data]] =
-          try PropertyListSerialization.propertyList(from: rawData, format: nil) as? [String: [Data]] ?? .init()
-        dataMap = rawPlist
+        if let rawJSON = try? JSONSerialization.jsonObject(with: rawData) as? [String: [String]] {
+          dataMap = rawJSON
+        } else {
+          filePath = oldPath
+          vCLog("↑ Exception happened when reading JSON file at: \(path).")
+          return false
+        }
       } catch {
         filePath = oldPath
-        vCLog("↑ Exception happened when reading plist file at: \(path).")
+        vCLog("↑ Exception happened when reading JSON file at: \(path).")
         return false
       }
 
@@ -97,10 +101,9 @@ public extension vChewingLM {
     // MARK: - Advanced features
 
     public func saveData() {
-      guard let filePath = filePath, let plistURL = URL(string: filePath) else { return }
+      guard let filePath = filePath, let jsonURL = URL(string: filePath) else { return }
       do {
-        let plistData = try PropertyListSerialization.data(fromPropertyList: dataMap, format: .binary, options: 0)
-        try plistData.write(to: plistURL)
+        try JSONSerialization.data(withJSONObject: dataMap, options: .sortedKeys).write(to: jsonURL)
       } catch {
         vCLog("Failed to save current database to: \(filePath)")
       }
@@ -112,10 +115,9 @@ public extension vChewingLM {
     public func dump() {
       var strDump = ""
       for entry in dataMap {
-        let netaSets: [Data] = entry.value
+        let netaSets: [String] = entry.value
         let theKey = entry.key
-        for netaSet in netaSets {
-          let strNetaSet = String(decoding: netaSet, as: UTF8.self)
+        for strNetaSet in netaSets {
           let neta = Array(strNetaSet.trimmingCharacters(in: .newlines).components(separatedBy: " ").reversed())
           let theValue = neta[0]
           var theScore = defaultScore
@@ -131,9 +133,8 @@ public extension vChewingLM {
     public func getHaninSymbolMenuUnigrams() -> [Megrez.Unigram] {
       let key = "_punctuation_list"
       var grams: [Megrez.Unigram] = []
-      guard let arrRangeRecords: [Data] = dataMap[cnvPhonabetToASCII(key)] else { return grams }
-      for netaSet in arrRangeRecords {
-        let strNetaSet = String(decoding: netaSet, as: UTF8.self)
+      guard let arrRangeRecords: [String] = dataMap[cnvPhonabetToASCII(key)] else { return grams }
+      for strNetaSet in arrRangeRecords {
         let neta = Array(strNetaSet.trimmingCharacters(in: .newlines).split(separator: " ").reversed())
         let theValue: String = .init(neta[0])
         var theScore = defaultScore
@@ -155,9 +156,8 @@ public extension vChewingLM {
       if key == "_punctuation_list" { return [] }
       var grams: [Megrez.Unigram] = []
       var gramsHW: [Megrez.Unigram] = []
-      guard let arrRangeRecords: [Data] = dataMap[cnvPhonabetToASCII(key)] else { return grams }
-      for netaSet in arrRangeRecords {
-        let strNetaSet = String(decoding: netaSet, as: UTF8.self)
+      guard let arrRangeRecords: [String] = dataMap[cnvPhonabetToASCII(key)] else { return grams }
+      for strNetaSet in arrRangeRecords {
         let neta = Array(strNetaSet.trimmingCharacters(in: .newlines).split(separator: " ").reversed())
         let theValue: String = .init(neta[0])
         var theScore = defaultScore
@@ -187,7 +187,7 @@ public extension vChewingLM {
 
     /// 內部函式，用以將注音讀音索引鍵進行加密。
     ///
-    /// 使用這種加密字串作為索引鍵，可以增加對 plist 資料庫的存取速度。
+    /// 使用這種加密字串作為索引鍵，可以增加對 json 資料庫的存取速度。
     ///
     /// 如果傳入的字串當中包含 ASCII 下畫線符號的話，則表明該字串並非注音讀音字串，會被忽略處理。
     /// - parameters:

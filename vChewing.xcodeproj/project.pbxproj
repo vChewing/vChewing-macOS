@@ -15,17 +15,17 @@
 		5B0E22B228FC318C00EB7ACA /* Preferences.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B0E22B128FC318C00EB7ACA /* Preferences.swift */; };
 		5B0EF55D28CDBF7100F8F7CE /* frmClientListMgr.xib in Resources */ = {isa = PBXBuildFile; fileRef = 5B0EF55C28CDBF7100F8F7CE /* frmClientListMgr.xib */; };
 		5B0EF55F28CDBF8E00F8F7CE /* CtlClientListMgr.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B0EF55E28CDBF8E00F8F7CE /* CtlClientListMgr.swift */; };
-		5B1C98B929436CEE0019B807 /* data-bpmf-reverse-lookup.plist in Resources */ = {isa = PBXBuildFile; fileRef = 5B1C98B729436CED0019B807 /* data-bpmf-reverse-lookup.plist */; };
-		5B1C98BB29436CF60019B807 /* data-bpmf-reverse-lookup.plist in Resources */ = {isa = PBXBuildFile; fileRef = 5B1C98B729436CED0019B807 /* data-bpmf-reverse-lookup.plist */; };
+		5B1C98B929436CEE0019B807 /* data-bpmf-reverse-lookup.json in Resources */ = {isa = PBXBuildFile; fileRef = 5B1C98B729436CED0019B807 /* data-bpmf-reverse-lookup.json */; };
+		5B1C98BB29436CF60019B807 /* data-bpmf-reverse-lookup.json in Resources */ = {isa = PBXBuildFile; fileRef = 5B1C98B729436CED0019B807 /* data-bpmf-reverse-lookup.json */; };
 		5B21176C287539BB000443A9 /* SessionCtl_HandleStates.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B21176B287539BB000443A9 /* SessionCtl_HandleStates.swift */; };
 		5B21176E28753B35000443A9 /* SessionCtl_HandleDisplay.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B21176D28753B35000443A9 /* SessionCtl_HandleDisplay.swift */; };
 		5B21177028753B9D000443A9 /* SessionCtl_Delegates.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B21176F28753B9D000443A9 /* SessionCtl_Delegates.swift */; };
-		5B253E7E2945AF6700680C67 /* data-bpmf-reverse-lookup-CNS1.plist in Resources */ = {isa = PBXBuildFile; fileRef = 5B253E782945AF6700680C67 /* data-bpmf-reverse-lookup-CNS1.plist */; };
-		5B253E7F2945AF6700680C67 /* data-bpmf-reverse-lookup-CNS3.plist in Resources */ = {isa = PBXBuildFile; fileRef = 5B253E792945AF6700680C67 /* data-bpmf-reverse-lookup-CNS3.plist */; };
-		5B253E802945AF6700680C67 /* data-bpmf-reverse-lookup-CNS2.plist in Resources */ = {isa = PBXBuildFile; fileRef = 5B253E7A2945AF6700680C67 /* data-bpmf-reverse-lookup-CNS2.plist */; };
-		5B253E812945AF6700680C67 /* data-bpmf-reverse-lookup-CNS6.plist in Resources */ = {isa = PBXBuildFile; fileRef = 5B253E7B2945AF6700680C67 /* data-bpmf-reverse-lookup-CNS6.plist */; };
-		5B253E822945AF6700680C67 /* data-bpmf-reverse-lookup-CNS4.plist in Resources */ = {isa = PBXBuildFile; fileRef = 5B253E7C2945AF6700680C67 /* data-bpmf-reverse-lookup-CNS4.plist */; };
-		5B253E832945AF6700680C67 /* data-bpmf-reverse-lookup-CNS5.plist in Resources */ = {isa = PBXBuildFile; fileRef = 5B253E7D2945AF6700680C67 /* data-bpmf-reverse-lookup-CNS5.plist */; };
+		5B253E7E2945AF6700680C67 /* data-bpmf-reverse-lookup-CNS1.json in Resources */ = {isa = PBXBuildFile; fileRef = 5B253E782945AF6700680C67 /* data-bpmf-reverse-lookup-CNS1.json */; };
+		5B253E7F2945AF6700680C67 /* data-bpmf-reverse-lookup-CNS3.json in Resources */ = {isa = PBXBuildFile; fileRef = 5B253E792945AF6700680C67 /* data-bpmf-reverse-lookup-CNS3.json */; };
+		5B253E802945AF6700680C67 /* data-bpmf-reverse-lookup-CNS2.json in Resources */ = {isa = PBXBuildFile; fileRef = 5B253E7A2945AF6700680C67 /* data-bpmf-reverse-lookup-CNS2.json */; };
+		5B253E812945AF6700680C67 /* data-bpmf-reverse-lookup-CNS6.json in Resources */ = {isa = PBXBuildFile; fileRef = 5B253E7B2945AF6700680C67 /* data-bpmf-reverse-lookup-CNS6.json */; };
+		5B253E822945AF6700680C67 /* data-bpmf-reverse-lookup-CNS4.json in Resources */ = {isa = PBXBuildFile; fileRef = 5B253E7C2945AF6700680C67 /* data-bpmf-reverse-lookup-CNS4.json */; };
+		5B253E832945AF6700680C67 /* data-bpmf-reverse-lookup-CNS5.json in Resources */ = {isa = PBXBuildFile; fileRef = 5B253E7D2945AF6700680C67 /* data-bpmf-reverse-lookup-CNS5.json */; };
 		5B2E009428FD1E8100E78D6E /* VwrPrefPaneCassette.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B2E009328FD1E8100E78D6E /* VwrPrefPaneCassette.swift */; };
 		5B30BF282944867800BD87A9 /* CtlRevLookupWindow.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B30BF272944867800BD87A9 /* CtlRevLookupWindow.swift */; };
 		5B3133BF280B229700A4A505 /* InputHandler_HandleStates.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B3133BE280B229700A4A505 /* InputHandler_HandleStates.swift */; };
@@ -50,7 +50,7 @@
 		5B7BC4B027AFFBE800F66C24 /* frmPrefWindow.xib in Resources */ = {isa = PBXBuildFile; fileRef = 5B7BC4AE27AFFBE800F66C24 /* frmPrefWindow.xib */; };
 		5B7DA80328BF6BC600D7B2AD /* fixinstall.sh in Resources */ = {isa = PBXBuildFile; fileRef = 5B7DA80228BF6BBA00D7B2AD /* fixinstall.sh */; };
 		5B7F225D2808501000DDD3CB /* InputHandler_HandleInput.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B7F225C2808501000DDD3CB /* InputHandler_HandleInput.swift */; };
-		5B84579E2871AD2200C93B01 /* convdict.plist in Resources */ = {isa = PBXBuildFile; fileRef = 5B84579C2871AD2200C93B01 /* convdict.plist */; };
+		5B84579E2871AD2200C93B01 /* convdict.json in Resources */ = {isa = PBXBuildFile; fileRef = 5B84579C2871AD2200C93B01 /* convdict.json */; };
 		5B8457A12871ADBE00C93B01 /* ChineseConverterBridge.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B8457A02871ADBE00C93B01 /* ChineseConverterBridge.swift */; };
 		5B963C9D28D5BFB800DCEE88 /* CocoaExtension in Frameworks */ = {isa = PBXBuildFile; productRef = 5B963C9C28D5BFB800DCEE88 /* CocoaExtension */; };
 		5B963CA328D5C23600DCEE88 /* SwiftExtension in Frameworks */ = {isa = PBXBuildFile; productRef = 5B963CA228D5C23600DCEE88 /* SwiftExtension */; };
@@ -77,11 +77,11 @@
 		5BBC2DA328F5212100C986F6 /* RelocationDetector.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5BBC2DA228F5212100C986F6 /* RelocationDetector.swift */; };
 		5BBC2DA528F521C200C986F6 /* AppDelegate_Extension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5BBC2DA428F521C200C986F6 /* AppDelegate_Extension.swift */; };
 		5BC2652227E04B7E00700291 /* uninstall.sh in Resources */ = {isa = PBXBuildFile; fileRef = 5BC2652127E04B7B00700291 /* uninstall.sh */; };
-		5BC4479D2865686500EDC323 /* data-chs.plist in Resources */ = {isa = PBXBuildFile; fileRef = 5BEDB71C283B4AEA0078EB25 /* data-chs.plist */; };
-		5BC4479E2865686500EDC323 /* data-cht.plist in Resources */ = {isa = PBXBuildFile; fileRef = 5BEDB720283B4AEA0078EB25 /* data-cht.plist */; };
-		5BC4479F2865686500EDC323 /* data-cns.plist in Resources */ = {isa = PBXBuildFile; fileRef = 5BEDB71D283B4AEA0078EB25 /* data-cns.plist */; };
-		5BC447A02865686500EDC323 /* data-symbols.plist in Resources */ = {isa = PBXBuildFile; fileRef = 5BEDB71E283B4AEA0078EB25 /* data-symbols.plist */; };
-		5BC447A12865686500EDC323 /* data-zhuyinwen.plist in Resources */ = {isa = PBXBuildFile; fileRef = 5BEDB71F283B4AEA0078EB25 /* data-zhuyinwen.plist */; };
+		5BC4479D2865686500EDC323 /* data-chs.json in Resources */ = {isa = PBXBuildFile; fileRef = 5BEDB71C283B4AEA0078EB25 /* data-chs.json */; };
+		5BC4479E2865686500EDC323 /* data-cht.json in Resources */ = {isa = PBXBuildFile; fileRef = 5BEDB720283B4AEA0078EB25 /* data-cht.json */; };
+		5BC4479F2865686500EDC323 /* data-cns.json in Resources */ = {isa = PBXBuildFile; fileRef = 5BEDB71D283B4AEA0078EB25 /* data-cns.json */; };
+		5BC447A02865686500EDC323 /* data-symbols.json in Resources */ = {isa = PBXBuildFile; fileRef = 5BEDB71E283B4AEA0078EB25 /* data-symbols.json */; };
+		5BC447A12865686500EDC323 /* data-zhuyinwen.json in Resources */ = {isa = PBXBuildFile; fileRef = 5BEDB71F283B4AEA0078EB25 /* data-zhuyinwen.json */; };
 		5BC447A628656A1900EDC323 /* Placeholder.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5BC447A228656A1900EDC323 /* Placeholder.swift */; };
 		5BC5E01E28DDE4770094E427 /* NotifierUI in Frameworks */ = {isa = PBXBuildFile; productRef = 5BC5E01D28DDE4770094E427 /* NotifierUI */; };
 		5BC5E02128DDEFE00094E427 /* TooltipUI in Frameworks */ = {isa = PBXBuildFile; productRef = 5BC5E02028DDEFE00094E427 /* TooltipUI */; };
@@ -98,11 +98,11 @@
 		5BDB7A4728D4824A001AC277 /* Tekkon in Frameworks */ = {isa = PBXBuildFile; productRef = 5BDB7A4628D4824A001AC277 /* Tekkon */; };
 		5BE1F8A928F86AB5006C7FF5 /* InputHandler_HandleEvent.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5BE1F8A828F86AB5006C7FF5 /* InputHandler_HandleEvent.swift */; };
 		5BE377A0288FED8D0037365B /* InputHandler_HandleComposition.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5BE3779F288FED8D0037365B /* InputHandler_HandleComposition.swift */; };
-		5BEDB721283B4C250078EB25 /* data-cns.plist in Resources */ = {isa = PBXBuildFile; fileRef = 5BEDB71D283B4AEA0078EB25 /* data-cns.plist */; };
-		5BEDB722283B4C250078EB25 /* data-zhuyinwen.plist in Resources */ = {isa = PBXBuildFile; fileRef = 5BEDB71F283B4AEA0078EB25 /* data-zhuyinwen.plist */; };
-		5BEDB723283B4C250078EB25 /* data-cht.plist in Resources */ = {isa = PBXBuildFile; fileRef = 5BEDB720283B4AEA0078EB25 /* data-cht.plist */; };
-		5BEDB724283B4C250078EB25 /* data-symbols.plist in Resources */ = {isa = PBXBuildFile; fileRef = 5BEDB71E283B4AEA0078EB25 /* data-symbols.plist */; };
-		5BEDB725283B4C250078EB25 /* data-chs.plist in Resources */ = {isa = PBXBuildFile; fileRef = 5BEDB71C283B4AEA0078EB25 /* data-chs.plist */; };
+		5BEDB721283B4C250078EB25 /* data-cns.json in Resources */ = {isa = PBXBuildFile; fileRef = 5BEDB71D283B4AEA0078EB25 /* data-cns.json */; };
+		5BEDB722283B4C250078EB25 /* data-zhuyinwen.json in Resources */ = {isa = PBXBuildFile; fileRef = 5BEDB71F283B4AEA0078EB25 /* data-zhuyinwen.json */; };
+		5BEDB723283B4C250078EB25 /* data-cht.json in Resources */ = {isa = PBXBuildFile; fileRef = 5BEDB720283B4AEA0078EB25 /* data-cht.json */; };
+		5BEDB724283B4C250078EB25 /* data-symbols.json in Resources */ = {isa = PBXBuildFile; fileRef = 5BEDB71E283B4AEA0078EB25 /* data-symbols.json */; };
+		5BEDB725283B4C250078EB25 /* data-chs.json in Resources */ = {isa = PBXBuildFile; fileRef = 5BEDB71C283B4AEA0078EB25 /* data-chs.json */; };
 		5BF018F9299923BD00248CDD /* VwrPrefPaneBehavior.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5BF018F8299923BD00248CDD /* VwrPrefPaneBehavior.swift */; };
 		5BF018FB299923C000248CDD /* VwrPrefPaneOutput.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5BF018FA299923C000248CDD /* VwrPrefPaneOutput.swift */; };
 		5BF018FD299923C200248CDD /* VwrPrefPaneCandidates.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5BF018FC299923C100248CDD /* VwrPrefPaneCandidates.swift */; };
@@ -211,17 +211,17 @@
 		5B18BA7227C7BD8B0056EB19 /* LICENSE.txt */ = {isa = PBXFileReference; lastKnownFileType = text; path = LICENSE.txt; sourceTree = "<group>"; };
 		5B18BA7327C7BD8C0056EB19 /* LICENSE-JPN.txt */ = {isa = PBXFileReference; lastKnownFileType = text; path = "LICENSE-JPN.txt"; sourceTree = "<group>"; };
 		5B18BA7427C7BD8C0056EB19 /* LICENSE-CHT.txt */ = {isa = PBXFileReference; lastKnownFileType = text; path = "LICENSE-CHT.txt"; sourceTree = "<group>"; };
-		5B1C98B729436CED0019B807 /* data-bpmf-reverse-lookup.plist */ = {isa = PBXFileReference; lastKnownFileType = file.bplist; name = "data-bpmf-reverse-lookup.plist"; path = "Data/data-bpmf-reverse-lookup.plist"; sourceTree = "<group>"; };
+		5B1C98B729436CED0019B807 /* data-bpmf-reverse-lookup.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; name = "data-bpmf-reverse-lookup.json"; path = "Data/data-bpmf-reverse-lookup.json"; sourceTree = "<group>"; };
 		5B20430B28BEFC0C00BFC6FD /* vChewing.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = vChewing.entitlements; sourceTree = "<group>"; };
 		5B21176B287539BB000443A9 /* SessionCtl_HandleStates.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SessionCtl_HandleStates.swift; sourceTree = "<group>"; };
 		5B21176D28753B35000443A9 /* SessionCtl_HandleDisplay.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SessionCtl_HandleDisplay.swift; sourceTree = "<group>"; };
 		5B21176F28753B9D000443A9 /* SessionCtl_Delegates.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SessionCtl_Delegates.swift; sourceTree = "<group>"; };
-		5B253E782945AF6700680C67 /* data-bpmf-reverse-lookup-CNS1.plist */ = {isa = PBXFileReference; lastKnownFileType = file.bplist; name = "data-bpmf-reverse-lookup-CNS1.plist"; path = "Data/data-bpmf-reverse-lookup-CNS1.plist"; sourceTree = "<group>"; };
-		5B253E792945AF6700680C67 /* data-bpmf-reverse-lookup-CNS3.plist */ = {isa = PBXFileReference; lastKnownFileType = file.bplist; name = "data-bpmf-reverse-lookup-CNS3.plist"; path = "Data/data-bpmf-reverse-lookup-CNS3.plist"; sourceTree = "<group>"; };
-		5B253E7A2945AF6700680C67 /* data-bpmf-reverse-lookup-CNS2.plist */ = {isa = PBXFileReference; lastKnownFileType = file.bplist; name = "data-bpmf-reverse-lookup-CNS2.plist"; path = "Data/data-bpmf-reverse-lookup-CNS2.plist"; sourceTree = "<group>"; };
-		5B253E7B2945AF6700680C67 /* data-bpmf-reverse-lookup-CNS6.plist */ = {isa = PBXFileReference; lastKnownFileType = file.bplist; name = "data-bpmf-reverse-lookup-CNS6.plist"; path = "Data/data-bpmf-reverse-lookup-CNS6.plist"; sourceTree = "<group>"; };
-		5B253E7C2945AF6700680C67 /* data-bpmf-reverse-lookup-CNS4.plist */ = {isa = PBXFileReference; lastKnownFileType = file.bplist; name = "data-bpmf-reverse-lookup-CNS4.plist"; path = "Data/data-bpmf-reverse-lookup-CNS4.plist"; sourceTree = "<group>"; };
-		5B253E7D2945AF6700680C67 /* data-bpmf-reverse-lookup-CNS5.plist */ = {isa = PBXFileReference; lastKnownFileType = file.bplist; name = "data-bpmf-reverse-lookup-CNS5.plist"; path = "Data/data-bpmf-reverse-lookup-CNS5.plist"; sourceTree = "<group>"; };
+		5B253E782945AF6700680C67 /* data-bpmf-reverse-lookup-CNS1.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; name = "data-bpmf-reverse-lookup-CNS1.json"; path = "Data/data-bpmf-reverse-lookup-CNS1.json"; sourceTree = "<group>"; };
+		5B253E792945AF6700680C67 /* data-bpmf-reverse-lookup-CNS3.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; name = "data-bpmf-reverse-lookup-CNS3.json"; path = "Data/data-bpmf-reverse-lookup-CNS3.json"; sourceTree = "<group>"; };
+		5B253E7A2945AF6700680C67 /* data-bpmf-reverse-lookup-CNS2.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; name = "data-bpmf-reverse-lookup-CNS2.json"; path = "Data/data-bpmf-reverse-lookup-CNS2.json"; sourceTree = "<group>"; };
+		5B253E7B2945AF6700680C67 /* data-bpmf-reverse-lookup-CNS6.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; name = "data-bpmf-reverse-lookup-CNS6.json"; path = "Data/data-bpmf-reverse-lookup-CNS6.json"; sourceTree = "<group>"; };
+		5B253E7C2945AF6700680C67 /* data-bpmf-reverse-lookup-CNS4.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; name = "data-bpmf-reverse-lookup-CNS4.json"; path = "Data/data-bpmf-reverse-lookup-CNS4.json"; sourceTree = "<group>"; };
+		5B253E7D2945AF6700680C67 /* data-bpmf-reverse-lookup-CNS5.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; name = "data-bpmf-reverse-lookup-CNS5.json"; path = "Data/data-bpmf-reverse-lookup-CNS5.json"; sourceTree = "<group>"; };
 		5B2DB17127AF8771006D874E /* Makefile */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.make; name = Makefile; path = Data/Makefile; sourceTree = "<group>"; };
 		5B2E009328FD1E8100E78D6E /* VwrPrefPaneCassette.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = VwrPrefPaneCassette.swift; sourceTree = "<group>"; };
 		5B2F2BB3286216A500B8557B /* vChewingTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = vChewingTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -251,7 +251,7 @@
 		5B7BC4B227AFFC0B00F66C24 /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/frmPrefWindow.strings; sourceTree = "<group>"; };
 		5B7DA80228BF6BBA00D7B2AD /* fixinstall.sh */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.script.sh; lineEnding = 0; path = fixinstall.sh; sourceTree = "<group>"; };
 		5B7F225C2808501000DDD3CB /* InputHandler_HandleInput.swift */ = {isa = PBXFileReference; explicitFileType = sourcecode.swift; fileEncoding = 4; indentWidth = 2; lineEnding = 0; path = InputHandler_HandleInput.swift; sourceTree = "<group>"; tabWidth = 2; usesTabs = 0; };
-		5B84579C2871AD2200C93B01 /* convdict.plist */ = {isa = PBXFileReference; lastKnownFileType = file.bplist; path = convdict.plist; sourceTree = "<group>"; };
+		5B84579C2871AD2200C93B01 /* convdict.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = convdict.json; sourceTree = "<group>"; };
 		5B8457A02871ADBE00C93B01 /* ChineseConverterBridge.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChineseConverterBridge.swift; sourceTree = "<group>"; };
 		5B963C9B28D5BE4100DCEE88 /* vChewing_CocoaExtension */ = {isa = PBXFileReference; lastKnownFileType = wrapper; name = vChewing_CocoaExtension; path = Packages/vChewing_CocoaExtension; sourceTree = "<group>"; };
 		5B963C9E28D5C14600DCEE88 /* vChewing_Shared */ = {isa = PBXFileReference; lastKnownFileType = wrapper; name = vChewing_Shared; path = Packages/vChewing_Shared; sourceTree = "<group>"; };
@@ -301,11 +301,11 @@
 		5BE1F8A828F86AB5006C7FF5 /* InputHandler_HandleEvent.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InputHandler_HandleEvent.swift; sourceTree = "<group>"; };
 		5BE3779F288FED8D0037365B /* InputHandler_HandleComposition.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InputHandler_HandleComposition.swift; sourceTree = "<group>"; };
 		5BE8A8C4281EE65300197741 /* CONTRIBUTING.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = CONTRIBUTING.md; sourceTree = "<group>"; };
-		5BEDB71C283B4AEA0078EB25 /* data-chs.plist */ = {isa = PBXFileReference; lastKnownFileType = file.bplist; name = "data-chs.plist"; path = "Data/data-chs.plist"; sourceTree = "<group>"; };
-		5BEDB71D283B4AEA0078EB25 /* data-cns.plist */ = {isa = PBXFileReference; lastKnownFileType = file.bplist; name = "data-cns.plist"; path = "Data/data-cns.plist"; sourceTree = "<group>"; };
-		5BEDB71E283B4AEA0078EB25 /* data-symbols.plist */ = {isa = PBXFileReference; lastKnownFileType = file.bplist; name = "data-symbols.plist"; path = "Data/data-symbols.plist"; sourceTree = "<group>"; };
-		5BEDB71F283B4AEA0078EB25 /* data-zhuyinwen.plist */ = {isa = PBXFileReference; lastKnownFileType = file.bplist; name = "data-zhuyinwen.plist"; path = "Data/data-zhuyinwen.plist"; sourceTree = "<group>"; };
-		5BEDB720283B4AEA0078EB25 /* data-cht.plist */ = {isa = PBXFileReference; lastKnownFileType = file.bplist; name = "data-cht.plist"; path = "Data/data-cht.plist"; sourceTree = "<group>"; };
+		5BEDB71C283B4AEA0078EB25 /* data-chs.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; name = "data-chs.json"; path = "Data/data-chs.json"; sourceTree = "<group>"; };
+		5BEDB71D283B4AEA0078EB25 /* data-cns.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; name = "data-cns.json"; path = "Data/data-cns.json"; sourceTree = "<group>"; };
+		5BEDB71E283B4AEA0078EB25 /* data-symbols.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; name = "data-symbols.json"; path = "Data/data-symbols.json"; sourceTree = "<group>"; };
+		5BEDB71F283B4AEA0078EB25 /* data-zhuyinwen.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; name = "data-zhuyinwen.json"; path = "Data/data-zhuyinwen.json"; sourceTree = "<group>"; };
+		5BEDB720283B4AEA0078EB25 /* data-cht.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; name = "data-cht.json"; path = "Data/data-cht.json"; sourceTree = "<group>"; };
 		5BF018F8299923BD00248CDD /* VwrPrefPaneBehavior.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VwrPrefPaneBehavior.swift; sourceTree = "<group>"; };
 		5BF018FA299923C000248CDD /* VwrPrefPaneOutput.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VwrPrefPaneOutput.swift; sourceTree = "<group>"; };
 		5BF018FC299923C100248CDD /* VwrPrefPaneCandidates.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VwrPrefPaneCandidates.swift; sourceTree = "<group>"; };
@@ -456,7 +456,7 @@
 		5B62A33027AE78E500A19448 /* Resources */ = {
 			isa = PBXGroup;
 			children = (
-				5B84579C2871AD2200C93B01 /* convdict.plist */,
+				5B84579C2871AD2200C93B01 /* convdict.json */,
 				5B09307828B6FC3B0021F8C5 /* shortcuts.html */,
 				5BF9DA2428840E6200DBD48E /* template-associatedPhrases-chs.txt */,
 				5BF9DA2C2884247800DBD48E /* template-associatedPhrases-cht.txt */,
@@ -518,18 +518,18 @@
 		5B62A35027AE7F6600A19448 /* Data */ = {
 			isa = PBXGroup;
 			children = (
-				5B253E782945AF6700680C67 /* data-bpmf-reverse-lookup-CNS1.plist */,
-				5B253E7A2945AF6700680C67 /* data-bpmf-reverse-lookup-CNS2.plist */,
-				5B253E792945AF6700680C67 /* data-bpmf-reverse-lookup-CNS3.plist */,
-				5B253E7C2945AF6700680C67 /* data-bpmf-reverse-lookup-CNS4.plist */,
-				5B253E7D2945AF6700680C67 /* data-bpmf-reverse-lookup-CNS5.plist */,
-				5B253E7B2945AF6700680C67 /* data-bpmf-reverse-lookup-CNS6.plist */,
-				5B1C98B729436CED0019B807 /* data-bpmf-reverse-lookup.plist */,
-				5BEDB71C283B4AEA0078EB25 /* data-chs.plist */,
-				5BEDB720283B4AEA0078EB25 /* data-cht.plist */,
-				5BEDB71D283B4AEA0078EB25 /* data-cns.plist */,
-				5BEDB71E283B4AEA0078EB25 /* data-symbols.plist */,
-				5BEDB71F283B4AEA0078EB25 /* data-zhuyinwen.plist */,
+				5B253E782945AF6700680C67 /* data-bpmf-reverse-lookup-CNS1.json */,
+				5B253E7A2945AF6700680C67 /* data-bpmf-reverse-lookup-CNS2.json */,
+				5B253E792945AF6700680C67 /* data-bpmf-reverse-lookup-CNS3.json */,
+				5B253E7C2945AF6700680C67 /* data-bpmf-reverse-lookup-CNS4.json */,
+				5B253E7D2945AF6700680C67 /* data-bpmf-reverse-lookup-CNS5.json */,
+				5B253E7B2945AF6700680C67 /* data-bpmf-reverse-lookup-CNS6.json */,
+				5B1C98B729436CED0019B807 /* data-bpmf-reverse-lookup.json */,
+				5BEDB71C283B4AEA0078EB25 /* data-chs.json */,
+				5BEDB720283B4AEA0078EB25 /* data-cht.json */,
+				5BEDB71D283B4AEA0078EB25 /* data-cns.json */,
+				5BEDB71E283B4AEA0078EB25 /* data-symbols.json */,
+				5BEDB71F283B4AEA0078EB25 /* data-zhuyinwen.json */,
 				5B2DB17127AF8771006D874E /* Makefile */,
 			);
 			name = Data;
@@ -923,12 +923,12 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				5BC4479D2865686500EDC323 /* data-chs.plist in Resources */,
-				5BC4479E2865686500EDC323 /* data-cht.plist in Resources */,
-				5B1C98BB29436CF60019B807 /* data-bpmf-reverse-lookup.plist in Resources */,
-				5BC4479F2865686500EDC323 /* data-cns.plist in Resources */,
-				5BC447A02865686500EDC323 /* data-symbols.plist in Resources */,
-				5BC447A12865686500EDC323 /* data-zhuyinwen.plist in Resources */,
+				5BC4479D2865686500EDC323 /* data-chs.json in Resources */,
+				5BC4479E2865686500EDC323 /* data-cht.json in Resources */,
+				5B1C98BB29436CF60019B807 /* data-bpmf-reverse-lookup.json in Resources */,
+				5BC4479F2865686500EDC323 /* data-cns.json in Resources */,
+				5BC447A02865686500EDC323 /* data-symbols.json in Resources */,
+				5BC447A12865686500EDC323 /* data-zhuyinwen.json in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -936,7 +936,7 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				5B84579E2871AD2200C93B01 /* convdict.plist in Resources */,
+				5B84579E2871AD2200C93B01 /* convdict.json in Resources */,
 				D4E33D8A27A838CF006DB1CF /* Localizable.strings in Resources */,
 				5B70F4EC2A0BE900005EA8C4 /* MenuIcon-TCVIM@2x.png in Resources */,
 				5BF9DA2828840E6200DBD48E /* template-exclusions.txt in Resources */,
@@ -948,21 +948,21 @@
 				6A2E40F6253A69DA00D1AE1D /* Images.xcassets in Resources */,
 				5B70F4EA2A0BE900005EA8C4 /* MenuIcon-SCVIM.png in Resources */,
 				D4E33D8F27A838F0006DB1CF /* InfoPlist.strings in Resources */,
-				5BEDB723283B4C250078EB25 /* data-cht.plist in Resources */,
-				5BEDB721283B4C250078EB25 /* data-cns.plist in Resources */,
+				5BEDB723283B4C250078EB25 /* data-cht.json in Resources */,
+				5BEDB721283B4C250078EB25 /* data-cns.json in Resources */,
 				5BBC2D9F28F51C0400C986F6 /* LICENSE-CHT.txt in Resources */,
 				5BF9DA2D288427E000DBD48E /* template-associatedPhrases-cht.txt in Resources */,
 				5BBC2D9E28F51C0400C986F6 /* LICENSE.txt in Resources */,
-				5BEDB725283B4C250078EB25 /* data-chs.plist in Resources */,
+				5BEDB725283B4C250078EB25 /* data-chs.json in Resources */,
 				5BF9DA2928840E6200DBD48E /* template-associatedPhrases-chs.txt in Resources */,
 				5B09307628B6FC3B0021F8C5 /* shortcuts.html in Resources */,
 				5BBBB76D27AED5DB0023B93A /* frmAboutWindow.xib in Resources */,
 				5BF9DA2B28840E6200DBD48E /* template-userphrases.txt in Resources */,
-				5BEDB722283B4C250078EB25 /* data-zhuyinwen.plist in Resources */,
+				5BEDB722283B4C250078EB25 /* data-zhuyinwen.json in Resources */,
 				5BF9DA2728840E6200DBD48E /* template-usersymbolphrases.txt in Resources */,
-				5B1C98B929436CEE0019B807 /* data-bpmf-reverse-lookup.plist in Resources */,
+				5B1C98B929436CEE0019B807 /* data-bpmf-reverse-lookup.json in Resources */,
 				5BBC2DA128F51C0400C986F6 /* LICENSE-CHS.txt in Resources */,
-				5BEDB724283B4C250078EB25 /* data-symbols.plist in Resources */,
+				5BEDB724283B4C250078EB25 /* data-symbols.json in Resources */,
 				5B7BC4B027AFFBE800F66C24 /* frmPrefWindow.xib in Resources */,
 				5BF9DA2A28840E6200DBD48E /* template-replacements.txt in Resources */,
 				6A187E2616004C5900466B2E /* MainMenu.xib in Resources */,
@@ -970,12 +970,12 @@
 				5BC2652227E04B7E00700291 /* uninstall.sh in Resources */,
 				5BAD0CD527D701F6003D127F /* vChewingKeyLayout.bundle in Resources */,
 				5BBC2DA028F51C0400C986F6 /* LICENSE-JPN.txt in Resources */,
-				5B253E7E2945AF6700680C67 /* data-bpmf-reverse-lookup-CNS1.plist in Resources */,
-				5B253E802945AF6700680C67 /* data-bpmf-reverse-lookup-CNS2.plist in Resources */,
-				5B253E7F2945AF6700680C67 /* data-bpmf-reverse-lookup-CNS3.plist in Resources */,
-				5B253E822945AF6700680C67 /* data-bpmf-reverse-lookup-CNS4.plist in Resources */,
-				5B253E832945AF6700680C67 /* data-bpmf-reverse-lookup-CNS5.plist in Resources */,
-				5B253E812945AF6700680C67 /* data-bpmf-reverse-lookup-CNS6.plist in Resources */,
+				5B253E7E2945AF6700680C67 /* data-bpmf-reverse-lookup-CNS1.json in Resources */,
+				5B253E802945AF6700680C67 /* data-bpmf-reverse-lookup-CNS2.json in Resources */,
+				5B253E7F2945AF6700680C67 /* data-bpmf-reverse-lookup-CNS3.json in Resources */,
+				5B253E822945AF6700680C67 /* data-bpmf-reverse-lookup-CNS4.json in Resources */,
+				5B253E832945AF6700680C67 /* data-bpmf-reverse-lookup-CNS5.json in Resources */,
+				5B253E812945AF6700680C67 /* data-bpmf-reverse-lookup-CNS6.json in Resources */,
 				5B70F4EB2A0BE900005EA8C4 /* MenuIcon-SCVIM@2x.png in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -1045,18 +1045,18 @@
 			outputFileListPaths = (
 			);
 			outputPaths = (
-				"$(SRCROOT)/Source/Data/data-chs.plist",
-				"$(SRCROOT)/Source/Data/data-cht.plist",
-				"$(SRCROOT)/Source/Data/data-cns.plist",
-				"$(SRCROOT)/Source/Data/data-zhuyinwen.plist",
-				"$(SRCROOT)/Source/Data/data-symbols.plist",
-				"$(SRCROOT)/Source/Data/data-bpmf-reverse-lookup.plist",
-				"$(SRCROOT)/Source/Data/data-bpmf-reverse-lookup-CNS1.plist",
-				"$(SRCROOT)/Source/Data/data-bpmf-reverse-lookup-CNS2.plist",
-				"$(SRCROOT)/Source/Data/data-bpmf-reverse-lookup-CNS3.plist",
-				"$(SRCROOT)/Source/Data/data-bpmf-reverse-lookup-CNS4.plist",
-				"$(SRCROOT)/Source/Data/data-bpmf-reverse-lookup-CNS5.plist",
-				"$(SRCROOT)/Source/Data/data-bpmf-reverse-lookup-CNS6.plist",
+				"$(SRCROOT)/Source/Data/data-chs.json",
+				"$(SRCROOT)/Source/Data/data-cht.json",
+				"$(SRCROOT)/Source/Data/data-cns.json",
+				"$(SRCROOT)/Source/Data/data-zhuyinwen.json",
+				"$(SRCROOT)/Source/Data/data-symbols.json",
+				"$(SRCROOT)/Source/Data/data-bpmf-reverse-lookup.json",
+				"$(SRCROOT)/Source/Data/data-bpmf-reverse-lookup-CNS1.json",
+				"$(SRCROOT)/Source/Data/data-bpmf-reverse-lookup-CNS2.json",
+				"$(SRCROOT)/Source/Data/data-bpmf-reverse-lookup-CNS3.json",
+				"$(SRCROOT)/Source/Data/data-bpmf-reverse-lookup-CNS4.json",
+				"$(SRCROOT)/Source/Data/data-bpmf-reverse-lookup-CNS5.json",
+				"$(SRCROOT)/Source/Data/data-bpmf-reverse-lookup-CNS6.json",
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;

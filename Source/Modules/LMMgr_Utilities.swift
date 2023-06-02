@@ -24,10 +24,10 @@ public extension LMMgr {
 
   // 該函式目前僅供步天歌繁簡轉換引擎使用，並不會檢查目標檔案格式的實際可用性。
 
-  static func getBundleDataPath(_ filenameSansExt: String, factory: Bool = false) -> String {
+  static func getBundleDataPath(_ filenameSansExt: String, factory: Bool = false, ext: String) -> String {
     let factory = PrefMgr.shared.useExternalFactoryDict ? factory : true
-    let factoryPath = Bundle.main.path(forResource: filenameSansExt, ofType: "plist")!
-    let containerPath = Self.appSupportURL.appendingPathComponent("vChewingFactoryData/\(filenameSansExt).plist").path
+    let factoryPath = Bundle.main.path(forResource: filenameSansExt, ofType: ext)!
+    let containerPath = Self.appSupportURL.appendingPathComponent("vChewingFactoryData/\(filenameSansExt).\(ext)").path
       .expandingTildeInPath
     var isFailed = false
     if !factory {
@@ -42,14 +42,14 @@ public extension LMMgr {
   // MARK: - 獲取原廠核心語彙檔案資料本身（優先獲取 Containers 下的資料檔案），可能會出 nil。
 
   static func getDictionaryData(_ filenameSansExt: String, factory: Bool = false) -> (
-    dict: [String: [Data]]?, path: String
+    dict: [String: [String]]?, path: String
   ) {
     let factory = PrefMgr.shared.useExternalFactoryDict ? factory : true
-    let factoryResultURL = Bundle.main.url(forResource: filenameSansExt, withExtension: "plist")
-    let containerResultURL = Self.appSupportURL.appendingPathComponent("vChewingFactoryData/\(filenameSansExt).plist")
-    var lastReadPath = factoryResultURL?.path ?? "Factory file missing: \(filenameSansExt).plist"
+    let factoryResultURL = Bundle.main.url(forResource: filenameSansExt, withExtension: "json")
+    let containerResultURL = Self.appSupportURL.appendingPathComponent("vChewingFactoryData/\(filenameSansExt).json")
+    var lastReadPath = factoryResultURL?.path ?? "Factory file missing: \(filenameSansExt).json"
 
-    func getPlistData(url: URL?) -> [String: [Data]]? {
+    func getJSONData(url: URL?) -> [String: [String]]? {
       var isFailed = false
       var isFolder = ObjCBool(false)
       guard let url = url else {
@@ -60,12 +60,12 @@ public extension LMMgr {
       if !FileManager.default.fileExists(atPath: url.path, isDirectory: &isFolder) { isFailed = true }
       if !isFailed, !FileManager.default.isReadableFile(atPath: url.path) { isFailed = true }
       if isFailed {
-        vCLog("↑ Exception happened when reading plist file at: \(url.path).")
+        vCLog("↑ Exception happened when reading json file at: \(url.path).")
         return nil
       }
       do {
         let rawData = try Data(contentsOf: url)
-        return try PropertyListSerialization.propertyList(from: rawData, format: nil) as? [String: [Data]] ?? nil
+        return try? JSONSerialization.jsonObject(with: rawData) as? [String: [String]]
       } catch {
         return nil
       }
@@ -73,10 +73,10 @@ public extension LMMgr {
 
     let result =
       factory
-        ? getPlistData(url: factoryResultURL)
-        : getPlistData(url: containerResultURL) ?? getPlistData(url: factoryResultURL)
+        ? getJSONData(url: factoryResultURL)
+        : getJSONData(url: containerResultURL) ?? getJSONData(url: factoryResultURL)
     if result == nil {
-      vCLog("↑ Exception happened when reading plist file at: \(lastReadPath).")
+      vCLog("↑ Exception happened when reading json file at: \(lastReadPath).")
     }
     return (dict: result, path: lastReadPath)
   }
@@ -108,7 +108,7 @@ public extension LMMgr {
   /// - Parameter mode: 簡繁體輸入模式。
   /// - Returns: 資料路徑（URL）。
   static func userSCPCSequencesURL(_ mode: Shared.InputMode) -> URL {
-    let fileName = (mode == .imeModeCHT) ? "data-plain-bpmf-cht.plist" : "data-plain-bpmf-chs.plist"
+    let fileName = (mode == .imeModeCHT) ? "data-plain-bpmf-cht.json" : "data-plain-bpmf-chs.json"
     return URL(fileURLWithPath: dataFolderPath(isDefaultFolder: false)).appendingPathComponent(fileName)
   }
 

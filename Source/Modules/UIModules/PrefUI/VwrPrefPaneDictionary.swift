@@ -133,7 +133,7 @@ struct VwrPrefPaneDictionary: View {
             Toggle(
               LocalizedStringKey("Read external factory dictionary plists if possible"),
               isOn: $useExternalFactoryDict.onChange {
-                LMMgr.reloadFactoryDictionaryPlists()
+                LMMgr.reloadFactoryDictionaryFiles()
               }
             )
             Text(
