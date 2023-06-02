@@ -1,4 +1,4 @@
-.PHONY: lint format
+.PHONY: format
 
 format:
 	@swiftformat --swiftversion 5.5 --indent 2 ./

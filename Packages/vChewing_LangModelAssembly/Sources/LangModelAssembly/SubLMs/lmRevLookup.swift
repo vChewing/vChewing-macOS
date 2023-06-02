@@ -11,12 +11,12 @@ import Shared
 
 public extension vChewingLM {
   @frozen struct LMRevLookup {
-    public private(set) var dataMap: [String: [Data]] = [:]
+    public private(set) var dataMap: [String: [String]] = [:]
     public private(set) var filePath: String = ""
 
-    public init(data dictData: (dict: [String: [Data]]?, path: String)) {
+    public init(data dictData: (dict: [String: [String]]?, path: String)) {
       guard let theDict = dictData.dict else {
-        vCLog("↑ Exception happened when reading plist file at: \(dictData.path).")
+        vCLog("↑ Exception happened when reading JSON file at: \(dictData.path).")
         return
       }
       filePath = dictData.path
@@ -27,11 +27,14 @@ public extension vChewingLM {
       if path.isEmpty { return }
       do {
         let rawData = try Data(contentsOf: URL(fileURLWithPath: path))
-        let rawPlist: [String: [Data]] =
-          try PropertyListSerialization.propertyList(from: rawData, format: nil) as? [String: [Data]] ?? .init()
-        dataMap = rawPlist
+        if let rawJSON = try? JSONSerialization.jsonObject(with: rawData) as? [String: [String]] {
+          dataMap = rawJSON
+        } else {
+          vCLog("↑ Exception happened when reading JSON file at: \(path).")
+          return
+        }
       } catch {
-        vCLog("↑ Exception happened when reading plist file at: \(path).")
+        vCLog("↑ Exception happened when reading JSON file at: \(path).")
         return
       }
       filePath = path
@@ -40,7 +43,7 @@ public extension vChewingLM {
     public func query(with kanji: String) -> [String]? {
       guard let resultData = dataMap[kanji] else { return nil }
       let resultArray = resultData.compactMap {
-        let result = restorePhonabetFromASCII(String(decoding: $0, as: UTF8.self))
+        let result = restorePhonabetFromASCII($0)
         return result.isEmpty ? nil : result
       }
       return resultArray.isEmpty ? nil : resultArray
