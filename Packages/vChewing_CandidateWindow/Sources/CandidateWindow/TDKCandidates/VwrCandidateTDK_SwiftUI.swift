@@ -96,7 +96,7 @@ private extension VwrCandidateTDK {
   var mainViewVertical: some View {
     ScrollView(.horizontal, showsIndicators: false) {
       HStack(alignment: .top, spacing: 4) {
-        ForEach(Array(thePool.lineRangeForCurrentPage.enumerated()), id: \.offset) { loopIndex, columnIndex in
+        ForEach(Array(thePool.lineRangeForCurrentPage.enumerated()), id: \.offset) { _, columnIndex in
           VStack(alignment: .leading, spacing: 0) {
             ForEach(Array(thePool.candidateLines[columnIndex]), id: \.self) { currentCandidate in
               drawCandidate(currentCandidate)
@@ -116,7 +116,7 @@ private extension VwrCandidateTDK {
           .id(columnIndex)
         }
         if thePool.maxLinesPerPage - thePool.lineRangeForCurrentPage.count > 0 {
-          ForEach(Array(thePool.lineRangeForFinalPageBlanked.enumerated()), id: \.offset) { loopIndex, _ in
+          ForEach(Array(thePool.lineRangeForFinalPageBlanked.enumerated()), id: \.offset) { _, _ in
             VStack(alignment: .leading, spacing: 0) {
               let copied = CandidatePool.blankCell.cleanCopy
               ForEach(0 ..< thePool.maxLineCapacity, id: \.self) { _ in
