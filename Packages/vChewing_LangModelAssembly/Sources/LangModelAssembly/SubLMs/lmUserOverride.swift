@@ -77,7 +77,7 @@ public extension vChewingLM {
 // MARK: - Private Structures
 
 extension vChewingLM.LMUserOverride {
-  enum OverrideUnit: CodingKey { case count, timestamp }
+  enum OverrideUnit: CodingKey { case count, timestamp, forceHighScoreOverride }
   enum ObservationUnit: CodingKey { case count, overrides }
   enum KeyObservationPairUnit: CodingKey { case key, observation }
 
@@ -91,13 +91,15 @@ extension vChewingLM.LMUserOverride {
 
     func encode(to encoder: Encoder) throws {
       var container = encoder.container(keyedBy: OverrideUnit.self)
-      try container.encode(timestamp, forKey: .timestamp)
       try container.encode(count, forKey: .count)
+      try container.encode(timestamp, forKey: .timestamp)
+      try container.encode(forceHighScoreOverride, forKey: .forceHighScoreOverride)
     }
 
     func hash(into hasher: inout Hasher) {
       hasher.combine(count)
       hasher.combine(timestamp)
+      hasher.combine(forceHighScoreOverride)
     }
   }
 
