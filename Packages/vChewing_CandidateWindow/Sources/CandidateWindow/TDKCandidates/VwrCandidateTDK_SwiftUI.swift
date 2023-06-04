@@ -31,7 +31,7 @@ public struct VwrCandidateTDK: View {
         case .horizontal:
           ZStack {
             candidateListBackground
-            HStack {
+            HStack(spacing: 0) {
               mainViewHorizontal
               if thePool.maxLinesPerPage == 1 {
                 rightPanes
@@ -244,7 +244,7 @@ extension VwrCandidateTDK {
           Text(tooltip.first?.description ?? "").padding(2).font(.system(size: CandidateCellData.unifiedSize))
         }.frame(width: ceil(CandidateCellData.unifiedSize * 1.7), height: ceil(CandidateCellData.unifiedSize * 1.7))
       }
-      VStack(alignment: .center, spacing: 1) {
+      HStack(alignment: .center, spacing: 0) {
         positionLabelView
         if controller?.delegate?.showReverseLookupResult ?? true {
           if !firstReverseLookupResult.isEmpty {
@@ -258,7 +258,7 @@ extension VwrCandidateTDK {
                     isBold: false
                   )
                 )
-                .opacity(0.8).padding([.horizontal], 4)
+                .opacity(0.8).padding([.leading], 9)
             }.fixedSize()
           }
         }
