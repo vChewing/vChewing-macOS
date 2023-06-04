@@ -142,6 +142,14 @@ public extension CandidatePool {
     case vertical
   }
 
+  func update() {
+    if #available(macOS 10.15, *) {
+      DispatchQueue.main.async {
+        self.objectWillChange.send()
+      }
+    }
+  }
+
   /// 往指定的方向翻頁。
   /// - Parameter isBackward: 是否逆向翻頁。
   /// - Returns: 操作是否順利。
@@ -418,3 +426,8 @@ private extension CandidatePool {
     }
   }
 }
+
+// MARK: - Turn CandidatePool into an ObservableObject.
+
+@available(macOS 10.15, *)
+extension CandidatePool: ObservableObject {}
