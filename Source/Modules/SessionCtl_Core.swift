@@ -275,7 +275,9 @@ public extension SessionCtl {
     }
     DispatchQueue.main.async {
       // 清理掉上一個會話的選字窗及其選單。
-      self.candidateUI = nil
+      if self.candidateUI is CtlCandidateTDK {
+        self.candidateUI = nil
+      }
       CtlCandidateTDK.currentMenu?.cancelTracking()
       CtlCandidateTDK.currentMenu = nil
       CtlCandidateTDK.currentWindow?.orderOut(nil)
