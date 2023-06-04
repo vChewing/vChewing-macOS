@@ -23,10 +23,8 @@ extension InputHandler {
   ///   - input: 輸入訊號。
   /// - Returns: 告知 IMK「該按鍵是否已經被輸入法攔截處理」。
   func handleInput(event input: InputSignalProtocol) -> Bool {
-    // 如果按鍵訊號內的 inputTest 是空的話，則忽略該按鍵輸入，因為很可能是功能修飾鍵。
-    // 不處理任何包含不可列印字元的訊號。
     // delegate 必須存在，否則不處理。
-    guard !input.text.isEmpty, input.charCode.isPrintable, let delegate = delegate else { return false }
+    guard let delegate = delegate else { return false }
 
     let inputText: String = input.text
     var state: IMEStateProtocol { delegate.state } // 常數轉變數。
@@ -82,6 +80,12 @@ extension InputHandler {
     // MARK: 處理候選字詞 (Handle Candidates)
 
     if [.ofCandidates, .ofSymbolTable].contains(state.type) { return handleCandidate(input: input) }
+
+    // MARK: 攔截部分無效按鍵。
+
+    // 如果按鍵訊號內的 inputTest 是空的話，則忽略該按鍵輸入，因為很可能是功能修飾鍵。
+    // 不處理任何包含不可列印字元的訊號。
+    guard !input.text.isEmpty, input.charCode.isPrintable else { return false }
 
     // MARK: 處理聯想詞 (Handle Associated Phrases)
 
