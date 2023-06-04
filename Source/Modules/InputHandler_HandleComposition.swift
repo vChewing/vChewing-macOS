@@ -17,6 +17,8 @@ extension InputHandler {
   ///   - input: 輸入訊號。
   /// - Returns: 告知 IMK「該按鍵是否已經被輸入法攔截處理」。
   func handleComposition(input: InputSignalProtocol) -> Bool? {
+    // 不處理任何包含不可列印字元的訊號。
+    guard !input.text.isEmpty, input.charCode.isPrintable else { return nil }
     if isCodePointInputMode { return handleCodePointComposition(input: input) }
     if prefs.cassetteEnabled { return handleCassetteComposition(input: input) }
     return handlePhonabetComposition(input: input)
