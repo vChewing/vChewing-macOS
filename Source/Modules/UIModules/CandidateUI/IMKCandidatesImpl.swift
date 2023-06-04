@@ -157,7 +157,7 @@ public class CtlCandidateIMK: IMKCandidates, CtlCandidateProtocol {
 
 /// 該參數只用來獲取 "com.apple.keylayout.ABC" 對應的 TISInputSource，
 /// 所以少寫了很多在這裡用不到的東西。
-/// 想參考完整版的話，請洽該專案內的 IME.swift。
+/// 想參考完整版的話，請洽該專案內的 IMKHelper 元件。
 var currentTISInputSource: TISInputSource? {
   var result: TISInputSource?
   let list = TISCreateInputSourceList(nil, true).takeRetainedValue() as! [TISInputSource]
