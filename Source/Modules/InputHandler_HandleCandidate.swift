@@ -25,6 +25,31 @@ extension InputHandler {
     let state = delegate.state
     guard !state.candidates.isEmpty else { return false }
 
+    // MARK: 選字窗內使用熱鍵升權、降權、刪詞。
+
+    manipulator: if (delegate as? CtlCandidateDelegate)?.isCandidateContextMenuEnabled ?? false {
+      // 目前沒有任何手段可以藉由 IMKCandidates 獲取正確的「當前候選字詞位置」在這裡正確使用，故不對 IMK 選字窗開放。
+      if prefs.useIMKCandidateWindow { break manipulator }
+      let candidates = state.candidates
+      let highlightedIndex = ctlCandidate.highlightedIndex
+      if !(0 ..< candidates.count).contains(ctlCandidate.highlightedIndex) { break manipulator }
+      if candidates[highlightedIndex].keyArray.count < 2 || candidates[highlightedIndex].value.count < 2 {
+        break manipulator
+      }
+      switch input.modifierFlags {
+      case [.option, .command] where input.keyCode == 27: // 減號鍵
+        ctlCandidate.delegate?.candidatePairRightClicked(at: highlightedIndex, action: .toNerf)
+        return true
+      case [.option, .command] where input.keyCode == 24: // 英數鍵盤的等號加號鍵；JIS 鍵盤的 ^ 號鍵。
+        ctlCandidate.delegate?.candidatePairRightClicked(at: highlightedIndex, action: .toBoost)
+        return true
+      case _ where input.isOptionHold && input.isCommandHold && input.isDelete:
+        ctlCandidate.delegate?.candidatePairRightClicked(at: highlightedIndex, action: .toFilter)
+        return true
+      default: break
+      }
+    }
+
     // MARK: 取消選字 (Cancel Candidate)
 
     let cancelCandidateKey =
