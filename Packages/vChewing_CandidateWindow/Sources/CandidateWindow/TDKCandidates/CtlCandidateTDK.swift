@@ -117,6 +117,7 @@ public class CtlCandidateTDK: CtlCandidate, NSWindowDelegate {
           Self.currentView = theViewCocoa
           break viewCheck
         }
+        Self.thePool.update()
         Self.currentView = NSHostingView(rootView: theView)
       } else {
         Self.currentView = theViewCocoa

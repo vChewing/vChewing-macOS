@@ -17,7 +17,7 @@ import SwiftUIBackports
 public struct VwrCandidateTDK: View {
   public weak var controller: CtlCandidateTDK?
   @Environment(\.colorScheme) var colorScheme
-  @State public var thePool: CandidatePool
+  @Backport.StateObject public var thePool: CandidatePool
   @State public var forceCatalinaCompatibility: Bool = false
   var tooltip: String { thePool.tooltip }
   var reverseLookupResult: [String] { thePool.reverseLookupResult }
