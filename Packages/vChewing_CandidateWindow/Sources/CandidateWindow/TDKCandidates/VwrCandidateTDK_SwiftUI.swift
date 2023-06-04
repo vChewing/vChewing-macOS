@@ -297,7 +297,7 @@ extension VwrCandidateTDK {
       if !tooltip.isEmpty {
         Text(tooltip).lineLimit(1)
       }
-      if controller?.delegate?.showReverseLookupResult ?? true, !tooltip.isEmpty {
+      if controller?.delegate?.showReverseLookupResult ?? true, !reverseLookupResult.joined().isEmpty {
         reverseLookupPane.padding(0)
       }
       Spacer(minLength: 0)
