@@ -79,7 +79,7 @@ public class CtlCandidateIMK: IMKCandidates, CtlCandidateProtocol {
     }
   }
 
-  public func updateDisplay() {}
+  public func updateDisplay() { update() }
 
   public required init(_ layout: NSUserInterfaceLayoutOrientation = .horizontal) {
     super.init(server: theServer, panelType: kIMKScrollingGridCandidatePanel)
