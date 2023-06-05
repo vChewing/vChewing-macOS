@@ -122,7 +122,7 @@ SOFTWARE.
 		</array>
 	</dict>
 	<key>InputMethodConnectionName</key>
-	<string>org_atelierInmu_inputmethod_vChewing_Connection</string>
+	<string>$(PRODUCT_BUNDLE_IDENTIFIER)_Connection</string>
 	<key>InputMethodServerControllerClass</key>
 	<string>SessionCtl</string>
 	<key>InputMethodServerDataSourceClass</key>
