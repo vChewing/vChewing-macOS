@@ -57,7 +57,7 @@ public struct VwrCandidateTDK: View {
 @available(macOS 10.15, *)
 private extension VwrCandidateTDK {
   var mainViewHorizontal: some View {
-    ScrollView(.vertical, showsIndicators: false) {
+    Group {
       VStack(alignment: .leading, spacing: 1.6) {
         ForEach(thePool.lineRangeForCurrentPage, id: \.self) { rowIndex in
           ZStack(alignment: .leading) {
@@ -94,7 +94,7 @@ private extension VwrCandidateTDK {
   }
 
   var mainViewVertical: some View {
-    ScrollView(.horizontal, showsIndicators: false) {
+    Group {
       HStack(alignment: .top, spacing: 4) {
         ForEach(Array(thePool.lineRangeForCurrentPage.enumerated()), id: \.offset) { _, columnIndex in
           VStack(alignment: .leading, spacing: 0) {
