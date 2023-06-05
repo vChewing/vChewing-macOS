@@ -108,18 +108,13 @@ public class CtlCandidateTDK: CtlCandidate, NSWindowDelegate {
     DispatchQueue.main.async { [self] in
       window.isOpaque = false
       window.backgroundColor = .clear
-      viewCheck: if #available(macOS 10.15, *) {
-        if useCocoa {
-          // if !NSApplication.isAppleSilicon {
-          //   updateNSWindowLegacy(window)
-          //   return
-          // }
-          Self.currentView = theViewCocoa
+      viewCheck: do {
+        viewCheckCatalina: if #available(macOS 10.15, *) {
+          if useCocoa { break viewCheckCatalina }
+          Self.thePool.update()
+          Self.currentView = NSHostingView(rootView: theView)
           break viewCheck
         }
-        Self.thePool.update()
-        Self.currentView = NSHostingView(rootView: theView)
-      } else {
         Self.currentView = theViewCocoa
       }
       window.contentView = Self.currentView
