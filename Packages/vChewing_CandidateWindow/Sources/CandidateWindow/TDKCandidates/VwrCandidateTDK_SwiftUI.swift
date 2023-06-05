@@ -248,18 +248,16 @@ extension VwrCandidateTDK {
         positionLabelView
         if controller?.delegate?.showReverseLookupResult ?? true {
           if !firstReverseLookupResult.isEmpty {
-            ZStack(alignment: .center) {
-              Text(firstReverseLookupResult)
-                .font(.system(size: max(ceil(CandidateCellData.unifiedSize * 0.6), 9)))
-                .frame(
-                  width: getTextWidth(
-                    text: firstReverseLookupResult,
-                    fontSize: max(ceil(CandidateCellData.unifiedSize * 0.6), 9),
-                    isBold: false
-                  )
+            Text(firstReverseLookupResult)
+              .font(.system(size: max(ceil(CandidateCellData.unifiedSize * 0.6), 9)))
+              .frame(
+                width: getTextWidth(
+                  text: firstReverseLookupResult,
+                  fontSize: max(ceil(CandidateCellData.unifiedSize * 0.6), 9),
+                  isBold: false
                 )
-                .opacity(0.8).padding([.leading], 9)
-            }.fixedSize()
+              )
+              .opacity(0.8).padding([.leading], 9)
           }
         }
       }
@@ -271,20 +269,10 @@ extension VwrCandidateTDK {
 
   var reverseLookupPane: some View {
     HStack(alignment: .center, spacing: 2) {
-      if thePool.maxLinesPerPage == 1 {
-        if !firstReverseLookupResult.isEmpty {
-          ZStack(alignment: .center) {
-            Text("\(firstReverseLookupResult.trimmingCharacters(in: .newlines))")
-              .lineLimit(1).padding([.horizontal], 2)
-          }.fixedSize()
-        }
-      } else {
-        ForEach(reverseLookupResult, id: \.self) { currentResult in
-          ZStack(alignment: .center) {
-            Text("\(currentResult.trimmingCharacters(in: .newlines))")
-              .lineLimit(1).padding([.horizontal], 2)
-          }.fixedSize()
-        }
+      let text = (thePool.maxLinesPerPage == 1) ? firstReverseLookupResult : reverseLookupResult.joined(separator: "  ")
+      if !reverseLookupResult.joined().trimmingCharacters(in: .newlines).isEmpty {
+        Text(verbatim: "\(text.trimmingCharacters(in: .newlines))")
+          .lineLimit(1).padding([.horizontal], 2).fixedSize()
       }
     }
     .font(.system(size: max(ceil(CandidateCellData.unifiedSize * 0.6), 9)))
