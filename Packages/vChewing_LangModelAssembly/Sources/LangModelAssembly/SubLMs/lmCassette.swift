@@ -61,6 +61,7 @@ public extension vChewingLM {
     /// - `%endkey` 是會觸發組字事件的按鍵。
     /// - `%wildcardkey` 決定磁帶的萬能鍵名稱，只有第一個字元會生效。
     /// - `%keyname begin` 至 `%keyname end` 之間是字根翻譯表，先讀取為 Swift 辭典以備用。
+    /// - `%quick begin` 至 `%quick end` 之間則是簡碼資料，對應的 value 得拆成單個漢字。
     /// - `%chardef begin` 至 `%chardef end` 之間則是詞庫資料。
     /// - `%octagram begin` 至 `%octagram end` 之間則是詞語頻次資料。
     /// 第三欄資料為對應字根、可有可無。第一欄與第二欄分別為「字詞」與「統計頻次」。
@@ -78,11 +79,19 @@ public extension vChewingLM {
           let lineReader = try LineReader(file: fileHandle)
           var theMaxKeyLength = 1
           var loadingKeys = false
+          var loadingQuickSets = false
           var loadingCharDefinitions = false
           var loadingOctagramData = false
           for strLine in lineReader {
             if !loadingKeys, strLine.contains("%keyname"), strLine.contains("begin") { loadingKeys = true }
             if loadingKeys, strLine.contains("%keyname"), strLine.contains("end") { loadingKeys = false }
+            if !loadingQuickSets, strLine.contains("%quick"), strLine.contains("begin") {
+              loadingQuickSets = true
+            }
+            if loadingQuickSets, strLine.contains("%quick"), strLine.contains("end") {
+              loadingQuickSets = false
+              if charDefMap.keys.contains(wildcardKey) { wildcardKey = "" }
+            }
             if !loadingCharDefinitions, strLine.contains("%chardef"), strLine.contains("begin") {
               loadingCharDefinitions = true
             }
@@ -103,6 +112,16 @@ public extension vChewingLM {
             let strSecondCell = cells[1].trimmingCharacters(in: .newlines)
             if loadingKeys, !cells[0].contains("%keyname") {
               keyNameMap[strFirstCell] = cells[1].trimmingCharacters(in: .newlines)
+            } else if loadingQuickSets, !strLine.contains("%quick") {
+              theMaxKeyLength = max(theMaxKeyLength, cells[0].count)
+              let arrSecondCell = strSecondCell.map(\.description)
+              charDefMap[strFirstCell, default: []].append(contentsOf: arrSecondCell)
+              reverseLookupMap[strSecondCell, default: []].append(contentsOf: arrSecondCell)
+              var keyComps = strFirstCell.map(\.description)
+              while !keyComps.isEmpty {
+                keyComps.removeLast()
+                charDefWildcardMap[keyComps.joined() + wildcard, default: []].append(contentsOf: arrSecondCell)
+              }
             } else if loadingCharDefinitions, !strLine.contains("%chardef") {
               theMaxKeyLength = max(theMaxKeyLength, cells[0].count)
               charDefMap[strFirstCell, default: []].append(strSecondCell)
@@ -121,7 +140,7 @@ public extension vChewingLM {
               }
               norm += Self.fscale ** (Double(cells[0].count) / 3.0 - 1.0) * Double(countValue)
             }
-            guard !loadingKeys, !loadingCharDefinitions, !loadingOctagramData else { continue }
+            guard !loadingKeys, !loadingQuickSets, !loadingCharDefinitions, !loadingOctagramData else { continue }
             if nameENG.isEmpty, strLine.contains("%ename ") {
               for neta in cells[1].components(separatedBy: ";") {
                 let subNetaGroup = neta.components(separatedBy: ":")
