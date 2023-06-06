@@ -225,11 +225,11 @@ public extension SessionCtl {
       // CtlPrefUIShared.shared.controller.window?.setPosition(vertical: .top, horizontal: .right, padding: 20)
       default: CtlPrefUI.show()
       }
-      NSApp.activate(ignoringOtherApps: true)
+      NSApp.popup()
       return
     }
     CtlPrefWindow.show()
-    NSApp.activate(ignoringOtherApps: true)
+    NSApp.popup()
   }
 
   @objc func showCheatSheet(_: Any? = nil) {
@@ -241,7 +241,7 @@ public extension SessionCtl {
 
   @objc func showClientListMgr(_: Any? = nil) {
     CtlClientListMgr.show()
-    NSApp.activate(ignoringOtherApps: true)
+    NSApp.popup()
   }
 
   @objc func toggleCassetteMode(_: Any? = nil) {
@@ -253,7 +253,7 @@ public extension SessionCtl {
         let informativeText = "Please reconfigure the cassette path to a valid one before enabling this mode."
         alert.informativeText = informativeText.localized
         let result = alert.runModal()
-        NSApp.activate(ignoringOtherApps: true)
+        NSApp.popup()
         if result == NSApplication.ModalResponse.alertFirstButtonReturn {
           LMMgr.resetCassettePath()
           PrefMgr.shared.cassetteEnabled = false
@@ -367,7 +367,7 @@ public extension SessionCtl {
   }
 
   @objc func selfTerminate(_: Any? = nil) {
-    NSApp.activate(ignoringOtherApps: true)
+    NSApp.popup()
     NSApp.terminate(nil)
   }
 
@@ -428,6 +428,6 @@ public extension SessionCtl {
 
   @objc func showAbout(_: Any? = nil) {
     CtlAboutWindow.show()
-    NSApp.activate(ignoringOtherApps: true)
+    NSApp.popup()
   }
 }

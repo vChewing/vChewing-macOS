@@ -5,7 +5,7 @@
 // Ref: https://qiita.com/fuziki/items/b31055a69330a3ce55a5
 // Modified by The vChewing Project in order to use it with AppKit.
 
-import Cocoa
+import AppKit
 import CocoaExtension
 import SwiftUI
 

@@ -130,7 +130,7 @@ public extension AppDelegate {
     }
     alert.addButton(withTitle: NSLocalizedString("Not Now", comment: ""))
     let result = alert.runModal()
-    NSApp.activate(ignoringOtherApps: true)
+    NSApp.popup()
     if result == NSApplication.ModalResponse.alertFirstButtonReturn {
       NSWorkspace.shared.openFile(
         LMMgr.dataFolderPath(isDefaultFolder: true), withApplication: "Finder"
@@ -167,6 +167,6 @@ public extension AppDelegate {
   // New About Window
   @IBAction func about(_: Any) {
     CtlAboutWindow.show()
-    NSApp.activate(ignoringOtherApps: true)
+    NSApp.popup()
   }
 }

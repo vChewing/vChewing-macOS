@@ -6,8 +6,8 @@
 // marks, or product names of Contributor, except as required to fulfill notice
 // requirements defined in MIT License.
 
+import AppKit
 import AVFoundation
-import Cocoa
 
 public extension NSSound {
   static func buzz(fart: Bool = false) {

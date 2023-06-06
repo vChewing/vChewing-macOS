@@ -6,7 +6,7 @@
 // marks, or product names of Contributor, except as required to fulfill notice
 // requirements defined in MIT License.
 
-import Cocoa
+import AppKit
 import InputMethodKit
 
 // 所有 IMEState 均遵守該協定：

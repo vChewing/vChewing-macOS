@@ -2,7 +2,7 @@
 // Written by Alexis Bridoux - https://github.com/ABridoux
 // Ref: https://gist.github.com/ABridoux/b935c21c7ead92033d39b357fae6366b
 
-import Cocoa
+import AppKit
 import SwiftUI
 
 // MARK: Model
