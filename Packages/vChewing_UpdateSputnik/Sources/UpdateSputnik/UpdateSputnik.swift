@@ -6,7 +6,7 @@
 // marks, or product names of Contributor, except as required to fulfill notice
 // requirements defined in MIT License.
 
-import Cocoa
+import AppKit
 
 public class UpdateSputnik {
   public static let shared: UpdateSputnik = .init()
@@ -113,7 +113,7 @@ public class UpdateSputnik {
       alert.informativeText = NSLocalizedString("You are already using the latest version.", comment: "")
       alert.addButton(withTitle: NSLocalizedString("OK", comment: ""))
       alert.runModal()
-      NSApp.activate(ignoringOtherApps: true)
+      NSApp.popup()
       return
     }
 
@@ -144,7 +144,7 @@ public class UpdateSputnik {
     }
 
     let result = alert.runModal()
-    NSApp.activate(ignoringOtherApps: true)
+    NSApp.popup()
     switch result {
     case .alertFirstButtonReturn:
       DispatchQueue.main.async {
@@ -172,6 +172,24 @@ public class UpdateSputnik {
     alert.informativeText = content
     alert.addButton(withTitle: NSLocalizedString("OK", comment: ""))
     alert.runModal()
-    NSApp.activate(ignoringOtherApps: true)
+    NSApp.popup()
+  }
+}
+
+// MARK: - NSApp Activation Helper
+
+// This is to deal with changes brought by macOS 14.
+
+private extension NSApplication {
+  func popup() {
+    #if compiler(>=5.9) && canImport(AppKit, _version: "14.0")
+      if #available(macOS 14.0, *) {
+        NSApp.activate()
+      } else {
+        NSApp.activate(ignoringOtherApps: true)
+      }
+    #else
+      NSApp.activate(ignoringOtherApps: true)
+    #endif
   }
 }

@@ -6,7 +6,7 @@
 // marks, or product names of Contributor, except as required to fulfill notice
 // requirements defined in MIT License.
 
-import Cocoa
+import AppKit
 import CocoaExtension
 
 public class Notifier: NSWindowController {

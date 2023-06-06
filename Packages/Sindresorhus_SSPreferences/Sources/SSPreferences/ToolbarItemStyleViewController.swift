@@ -2,7 +2,7 @@
 // ====================
 // This code is released under the MIT license (SPDX-License-Identifier: MIT)
 
-import Cocoa
+import AppKit
 
 final class ToolbarItemStyleViewController: NSObject, SettingsStyleController {
   let toolbar: NSToolbar

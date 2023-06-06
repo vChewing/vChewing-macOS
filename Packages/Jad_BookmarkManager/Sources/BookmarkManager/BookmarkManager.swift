@@ -1,7 +1,7 @@
 //  Ref: https://stackoverflow.com/a/61695824
 //  License: https://creativecommons.org/licenses/by-sa/4.0/
 
-import Cocoa
+import AppKit
 
 public class BookmarkManager {
   public static let shared = BookmarkManager()

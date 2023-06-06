@@ -302,7 +302,7 @@ public extension LMMgr {
         alert.informativeText = content
         alert.addButton(withTitle: NSLocalizedString("OK", comment: ""))
         alert.runModal()
-        NSApp.activate(ignoringOtherApps: true)
+        NSApp.popup()
       }
       return false
     }
