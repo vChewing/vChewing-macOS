@@ -6,7 +6,7 @@
 // marks, or product names of Contributor, except as required to fulfill notice
 // requirements defined in MIT License.
 
-import Cocoa
+import AppKit
 
 class CtlClientListMgr: NSWindowController, NSTableViewDelegate, NSTableViewDataSource {
   @IBOutlet var tblClients: NSTableView!
@@ -24,7 +24,7 @@ class CtlClientListMgr: NSWindowController, NSTableViewDelegate, NSTableViewData
     sharedWindow.level = .statusBar
     sharedWindow.titlebarAppearsTransparent = true
     shared.showWindow(shared)
-    NSApp.activate(ignoringOtherApps: true)
+    NSApp.popup()
   }
 
   override func windowDidLoad() {

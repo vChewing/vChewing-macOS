@@ -8,7 +8,7 @@
 // marks, or product names of Contributor, except as required to fulfill notice
 // requirements defined in MIT License.
 
-import Cocoa
+import AppKit
 import IMKUtils
 import InputMethodKit
 import SwiftExtension
@@ -111,7 +111,7 @@ class AppDelegate: NSWindowController, NSApplicationDelegate {
 
     window.center()
     window.orderFront(self)
-    NSApp.activate(ignoringOtherApps: true)
+    NSApp.popup()
   }
 
   @IBAction func agreeAndInstallAction(_: AnyObject) {
@@ -177,5 +177,23 @@ class AppDelegate: NSWindowController, NSApplicationDelegate {
       return ""
     }
     return output
+  }
+}
+
+// MARK: - NSApp Activation Helper
+
+// This is to deal with changes brought by macOS 14.
+
+private extension NSApplication {
+  func popup() {
+    #if compiler(>=5.9) && canImport(AppKit, _version: "14.0")
+      if #available(macOS 14.0, *) {
+        NSApp.activate()
+      } else {
+        NSApp.activate(ignoringOtherApps: true)
+      }
+    #else
+      NSApp.activate(ignoringOtherApps: true)
+    #endif
   }
 }

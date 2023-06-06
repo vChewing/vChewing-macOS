@@ -358,7 +358,7 @@ public extension SessionCtl {
         break modeCheck
       }
       let result = sharedAlertForInputModeToggling.runModal()
-      NSApp.activate(ignoringOtherApps: true)
+      NSApp.popup()
       if result == NSApplication.ModalResponse.alertFirstButtonReturn {
         neta.activate()
       }

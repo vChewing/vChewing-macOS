@@ -2,7 +2,7 @@
 // ====================
 // This code is released under the MIT license (SPDX-License-Identifier: MIT)
 
-import Cocoa
+import AppKit
 
 final class SettingsTabViewController: NSViewController, SettingsStyleControllerDelegate {
   private var activeTab: Int?
