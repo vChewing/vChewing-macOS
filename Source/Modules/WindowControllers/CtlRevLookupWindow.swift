@@ -6,7 +6,7 @@
 // marks, or product names of Contributor, except as required to fulfill notice
 // requirements defined in MIT License.
 
-import Cocoa
+import AppKit
 import LangModelAssembly
 
 class CtlRevLookupWindow: NSWindowController, NSWindowDelegate {
@@ -22,7 +22,7 @@ class CtlRevLookupWindow: NSWindowController, NSWindowDelegate {
     window.level = .statusBar
     window.titlebarAppearsTransparent = true
     shared.showWindow(shared)
-    NSApp.activate(ignoringOtherApps: true)
+    NSApp.popup()
   }
 }
 

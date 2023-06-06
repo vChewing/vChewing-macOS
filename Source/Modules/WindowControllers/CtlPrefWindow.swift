@@ -73,7 +73,7 @@ class CtlPrefWindow: NSWindowController, NSWindowDelegate {
     sharedWindow.level = .statusBar
     shared.showWindow(shared)
     if resetPhraseEditor { shared.initPhraseEditor() }
-    NSApp.activate(ignoringOtherApps: true)
+    NSApp.popup()
   }
 
   private var currentLanguageSelectItem: NSMenuItem?

@@ -99,8 +99,8 @@ private extension EnvironmentValues {
 @available(macOS 10.15, *)
 @propertyWrapper
 internal struct StringlyTypedEnvironment<Value> {
-  final class Store<Value>: ObservableObject {
-    var value: Value?
+  final class Store<StoredValue>: ObservableObject {
+    var value: StoredValue?
   }
 
   @Environment(\.self) private var env

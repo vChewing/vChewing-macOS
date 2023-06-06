@@ -2,8 +2,8 @@
 // ====================
 // This code is released under the MIT license (SPDX-License-Identifier: MIT)
 
+import AppKit
 import Carbon
-import Cocoa
 
 private extension Date {
   static func - (lhs: Date, rhs: Date) -> TimeInterval {

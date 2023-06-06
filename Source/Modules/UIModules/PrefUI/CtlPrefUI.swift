@@ -67,7 +67,7 @@ class CtlPrefUI: NSWindowController, NSWindowDelegate {
     sharedWindow.orderFrontRegardless() // 逼著視窗往最前方顯示
     sharedWindow.level = .statusBar
     shared.showWindow(shared)
-    NSApp.activate(ignoringOtherApps: true)
+    NSApp.popup()
   }
 
   private var currentLanguageSelectItem: NSMenuItem?

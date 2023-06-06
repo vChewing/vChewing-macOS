@@ -2,7 +2,7 @@
 // ====================
 // This code is released under the MIT license (SPDX-License-Identifier: MIT)
 
-import Cocoa
+import AppKit
 
 extension NSWindow.FrameAutosaveName {
   static let settings: NSWindow.FrameAutosaveName = "com.sindresorhus.Preferences.FrameAutosaveName"
@@ -100,7 +100,15 @@ public final class SettingsWindowController: NSWindowController {
 
     showWindow(self)
     restoreWindowPosition()
-    NSApp.activate(ignoringOtherApps: true)
+    #if compiler(>=5.9) && canImport(AppKit, _version: "14.0")
+      if #available(macOS 14.0, *) {
+        NSApp.activate()
+      } else {
+        NSApp.activate(ignoringOtherApps: true)
+      }
+    #else
+      NSApp.activate(ignoringOtherApps: true)
+    #endif
   }
 
   private func restoreWindowPosition() {
