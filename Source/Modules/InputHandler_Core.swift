@@ -542,9 +542,9 @@ public class InputHandler: InputHandlerProtocol {
     return result > 0
   }
 
-  /// 生成標點符號索引鍵。
+  /// 生成標點符號索引鍵頭。
   /// - Parameter input: 輸入的按鍵訊號。
-  /// - Returns: 生成的標點符號索引鍵。
+  /// - Returns: 生成的標點符號索引鍵頭。
   func generatePunctuationNamePrefix(withKeyCondition input: InputSignalProtocol) -> String {
     if prefs.halfWidthPunctuationEnabled { return "_half_punctuation_" }
     // 注意：這一行為 SHIFT+ALT+主鍵盤數字鍵專用，強制無視不同地區的鍵盤在這個按鍵組合下的符號輸入差異。
@@ -557,6 +557,27 @@ public class InputHandler: InputHandlerProtocol {
     case (false, true): result.append("_alt_punctuation_")
     case (false, false): result.append("_punctuation_")
     }
+    return result
+  }
+
+  /// 生成用以在詞庫內檢索標點符號按鍵資料的檢索字串陣列。
+  /// - Parameter input: 輸入的按鍵訊號。
+  /// - Returns: 生成的標點符號索引字串。
+  func punctuationQueryStrings(input: InputSignalProtocol) -> [String] {
+    /// 如果仍無匹配結果的話，先看一下：
+    /// - 是否是針對當前注音排列/拼音輸入種類專門提供的標點符號。
+    /// - 是否是需要摁修飾鍵才可以輸入的那種標點符號。
+    var result: [String] = []
+    let inputText = input.text
+    let punctuationNamePrefix: String = generatePunctuationNamePrefix(withKeyCondition: input)
+    let parser = currentKeyboardParser
+    let arrCustomPunctuations: [String] = [punctuationNamePrefix, parser, inputText]
+    let customPunctuation: String = arrCustomPunctuations.joined()
+    result.append(customPunctuation)
+    /// 如果仍無匹配結果的話，看看這個輸入是否是不需要修飾鍵的那種標點鍵輸入。
+    let arrPunctuations: [String] = [punctuationNamePrefix, inputText]
+    let punctuation: String = arrPunctuations.joined()
+    result.append(punctuation)
     return result
   }
 }

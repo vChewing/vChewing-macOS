@@ -18,7 +18,7 @@ extension InputHandler {
   /// - Parameter event: 由 IMK 選字窗接收的裝置操作輸入事件。
   /// - Returns: 回「`true`」以將該按鍵已攔截處理的訊息傳遞給 IMK；回「`false`」則放行、不作處理。
   public func handleEvent(_ event: NSEvent) -> Bool {
-    imkCandidatesEventPreHandler(event: event) ?? handleInput(event: event)
+    imkCandidatesEventPreHandler(event: event) ?? triageInput(event: event)
   }
 
   /// 專門處理與 IMK 選字窗有關的判斷語句。
@@ -71,7 +71,7 @@ extension InputHandler {
     let eventArray = [event]
     guard let imkC = delegate.candidateController() as? CtlCandidateIMK else { return false }
     if event.isEsc || event.isBackSpace || event.isDelete || (event.isShiftHold && !event.isSpace) {
-      return handleInput(event: event)
+      return triageInput(event: event)
     } else if event.isSymbolMenuPhysicalKey {
       // 符號鍵的行為是固定的，不受偏好設定影響。
       switch imkC.currentLayout {
@@ -118,7 +118,7 @@ extension InputHandler {
         if let newEvent = newEvent {
           if prefs.useSCPCTypingMode, delegate.state.type == .ofAssociates {
             // 註：input.isShiftHold 已經在 delegate.handle() 內處理，因為在那邊處理才有效。
-            return event.isShiftHold ? true : handleInput(event: event)
+            return event.isShiftHold ? true : triageInput(event: event)
           } else {
             if #available(macOS 10.14, *) {
               PrefMgr.shared.failureFlagForIMKCandidates = true
@@ -149,7 +149,7 @@ extension InputHandler {
       }
 
       if prefs.useSCPCTypingMode, !event.isReservedKey {
-        return handleInput(event: event)
+        return triageInput(event: event)
       }
 
       if delegate.state.type == .ofAssociates,
@@ -157,7 +157,7 @@ extension InputHandler {
          !event.isCursorClockLeft, !event.isCursorClockRight, !event.isSpace,
          !event.isEnter || !prefs.alsoConfirmAssociatedCandidatesByEnter
       {
-        return handleInput(event: event)
+        return triageInput(event: event)
       }
       imkC.interpretKeyEvents(eventArray)
       return true
