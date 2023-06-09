@@ -129,7 +129,7 @@ public extension NSEvent {
   var isShiftHold: Bool { modifierFlags.contains([.shift]) }
   var isCommandHold: Bool { modifierFlags.contains([.command]) }
   var isControlHold: Bool { modifierFlags.contains([.control]) }
-  var isControlHotKey: Bool { modifierFlags.contains([.control]) && text.first?.isLetter ?? false }
+  var beganWithLetter: Bool { text.first?.isLetter ?? false }
   var isOptionHold: Bool { modifierFlags.contains([.option]) }
   var isOptionHotKey: Bool { modifierFlags.contains([.option]) && text.first?.isLetter ?? false }
   var isCapsLockOn: Bool { modifierFlags.contains([.capsLock]) }

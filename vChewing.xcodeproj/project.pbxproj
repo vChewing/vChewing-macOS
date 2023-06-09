@@ -49,7 +49,7 @@
 		5B78EE0D28A562B4009456C1 /* VwrPrefPaneDevZone.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B78EE0C28A562B4009456C1 /* VwrPrefPaneDevZone.swift */; };
 		5B7BC4B027AFFBE800F66C24 /* frmPrefWindow.xib in Resources */ = {isa = PBXBuildFile; fileRef = 5B7BC4AE27AFFBE800F66C24 /* frmPrefWindow.xib */; };
 		5B7DA80328BF6BC600D7B2AD /* fixinstall.sh in Resources */ = {isa = PBXBuildFile; fileRef = 5B7DA80228BF6BBA00D7B2AD /* fixinstall.sh */; };
-		5B7F225D2808501000DDD3CB /* InputHandler_HandleInput.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B7F225C2808501000DDD3CB /* InputHandler_HandleInput.swift */; };
+		5B7F225D2808501000DDD3CB /* InputHandler_TriageInput.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B7F225C2808501000DDD3CB /* InputHandler_TriageInput.swift */; };
 		5B84579E2871AD2200C93B01 /* convdict.json in Resources */ = {isa = PBXBuildFile; fileRef = 5B84579C2871AD2200C93B01 /* convdict.json */; };
 		5B8457A12871ADBE00C93B01 /* ChineseConverterBridge.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B8457A02871ADBE00C93B01 /* ChineseConverterBridge.swift */; };
 		5B963C9D28D5BFB800DCEE88 /* CocoaExtension in Frameworks */ = {isa = PBXBuildFile; productRef = 5B963C9C28D5BFB800DCEE88 /* CocoaExtension */; };
@@ -250,7 +250,7 @@
 		5B7BC4AF27AFFBE800F66C24 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = Base; path = Base.lproj/frmPrefWindow.xib; sourceTree = "<group>"; };
 		5B7BC4B227AFFC0B00F66C24 /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/frmPrefWindow.strings; sourceTree = "<group>"; };
 		5B7DA80228BF6BBA00D7B2AD /* fixinstall.sh */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.script.sh; lineEnding = 0; path = fixinstall.sh; sourceTree = "<group>"; };
-		5B7F225C2808501000DDD3CB /* InputHandler_HandleInput.swift */ = {isa = PBXFileReference; explicitFileType = sourcecode.swift; fileEncoding = 4; indentWidth = 2; lineEnding = 0; path = InputHandler_HandleInput.swift; sourceTree = "<group>"; tabWidth = 2; usesTabs = 0; };
+		5B7F225C2808501000DDD3CB /* InputHandler_TriageInput.swift */ = {isa = PBXFileReference; explicitFileType = sourcecode.swift; fileEncoding = 4; indentWidth = 2; lineEnding = 0; path = InputHandler_TriageInput.swift; sourceTree = "<group>"; tabWidth = 2; usesTabs = 0; };
 		5B84579C2871AD2200C93B01 /* convdict.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = convdict.json; sourceTree = "<group>"; };
 		5B8457A02871ADBE00C93B01 /* ChineseConverterBridge.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChineseConverterBridge.swift; sourceTree = "<group>"; };
 		5B963C9B28D5BE4100DCEE88 /* vChewing_CocoaExtension */ = {isa = PBXFileReference; lastKnownFileType = wrapper; name = vChewing_CocoaExtension; path = Packages/vChewing_CocoaExtension; sourceTree = "<group>"; };
@@ -694,8 +694,8 @@
 				5B782EC3280C243C007276DE /* InputHandler_HandleCandidate.swift */,
 				5BE3779F288FED8D0037365B /* InputHandler_HandleComposition.swift */,
 				5BE1F8A828F86AB5006C7FF5 /* InputHandler_HandleEvent.swift */,
-				5B7F225C2808501000DDD3CB /* InputHandler_HandleInput.swift */,
 				5B3133BE280B229700A4A505 /* InputHandler_HandleStates.swift */,
+				5B7F225C2808501000DDD3CB /* InputHandler_TriageInput.swift */,
 				5BAEFACF28012565001F42C9 /* LMMgr_Core.swift */,
 				5B33844E29B8B4C200FCB497 /* LMMgr_PhraseEditorDelegate.swift */,
 				5B33844C29B8980100FCB497 /* LMMgr_UserPhraseStructure.swift */,
@@ -1106,7 +1106,7 @@
 				5BF018FD299923C200248CDD /* VwrPrefPaneCandidates.swift in Sources */,
 				5B963CA828D5DB1400DCEE88 /* PrefMgr_Core.swift in Sources */,
 				D427F76C278CA2B0004A2160 /* AppDelegate.swift in Sources */,
-				5B7F225D2808501000DDD3CB /* InputHandler_HandleInput.swift in Sources */,
+				5B7F225D2808501000DDD3CB /* InputHandler_TriageInput.swift in Sources */,
 				5B660A8628F64A8800E5E4F6 /* SymbolMenuDefaultData.swift in Sources */,
 				5BF56F9828C39A2700DD6839 /* IMEState.swift in Sources */,
 				5B62A33D27AE7CC100A19448 /* CtlAboutWindow.swift in Sources */,
