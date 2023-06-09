@@ -76,6 +76,11 @@ extension InputHandler {
           if input.isShiftHold, !input.isControlHold, !input.isOptionHold {
             return revolveCandidate(reverseOrder: input.isCommandHold)
           }
+          if isCodePointInputMode {
+            delegate.callError("FDD88EDB")
+            delegate.switchState(IMEState.ofAbortion())
+            return true
+          }
           if compositor.cursor < compositor.length, compositor.insertKey(" ") {
             walk()
             // 一邊吃一邊屙（僅對位列黑名單的 App 用這招限制組字區長度）。
