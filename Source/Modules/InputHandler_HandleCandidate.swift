@@ -16,8 +16,7 @@ import Shared
 
 extension InputHandler {
   /// 當且僅當選字窗出現時，對於經過初次篩選處理的輸入訊號的處理均藉由此函式來進行。
-  /// - Parameters:
-  ///   - input: 輸入訊號。
+  /// - Parameter input: 輸入訊號。
   /// - Returns: 告知 IMK「該按鍵是否已經被輸入法攔截處理」。
   func handleCandidate(input: InputSignalProtocol) -> Bool {
     guard let delegate = delegate else { return false }
@@ -69,7 +68,7 @@ extension InputHandler {
       } else {
         delegate.switchState(generateStateOfInputting())
         if input.isCursorBackward || input.isCursorForward, input.isShiftHold {
-          return handleInput(event: input)
+          return triageInput(event: input)
         }
       }
       if state.type == .ofSymbolTable, let nodePrevious = state.node.previous, !nodePrevious.members.isEmpty {
@@ -212,7 +211,7 @@ extension InputHandler {
         guard let candidateIndex = ctlCandidate.candidateIndexAtKeyLabelIndex(0) else { return true }
         delegate.candidateSelectionConfirmedByInputHandler(at: candidateIndex)
         delegate.switchState(IMEState.ofAbortion())
-        return handleInput(event: input)
+        return triageInput(event: input)
       }
     }
 

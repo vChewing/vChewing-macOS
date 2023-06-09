@@ -33,7 +33,7 @@ public protocol InputSignalProtocol {
   var isShiftHold: Bool { get }
   var isCommandHold: Bool { get }
   var isControlHold: Bool { get }
-  var isControlHotKey: Bool { get }
+  var beganWithLetter: Bool { get }
   var isOptionHold: Bool { get }
   var isOptionHotKey: Bool { get }
   var isCapsLockOn: Bool { get }

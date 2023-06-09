@@ -864,7 +864,7 @@ extension InputHandler {
     return true
   }
 
-  // MARK: - 處理區位輸入狀態的啟動過程
+  // MARK: - 處理區位輸入狀態的啟動過程（CodePoint Input Toggle）
 
   @discardableResult func handleCodePointInputToggle() -> Bool {
     guard let delegate = delegate, delegate.state.type != .ofDeactivated else { return false }
@@ -883,7 +883,7 @@ extension InputHandler {
     return true
   }
 
-  // MARK: - 處理漢音鍵盤符號輸入狀態的啟動過程
+  // MARK: - 處理漢音鍵盤符號輸入狀態的啟動過程（Hanin Pallete）
 
   @discardableResult func handleHaninKeyboardSymbolModeToggle() -> Bool {
     guard let delegate = delegate, delegate.state.type != .ofDeactivated else { return false }
@@ -931,7 +931,7 @@ extension InputHandler {
     return true
   }
 
-  // MARK: - 處理符號選單
+  // MARK: - 處理符號選單（Symbol Menu Input）
 
   /// 處理符號選單。
   /// - Parameters:
@@ -975,5 +975,118 @@ extension InputHandler {
       delegate.switchState(IMEState.ofSymbolTable(node: CandidateNode.root))
       return true
     }
+  }
+
+  // MARK: - 處理 Caps Lock 與英數輸入模式（Caps Lock and Alphanumerical mode）
+
+  /// 處理 CapsLock 與英數輸入模式。
+  /// - Remark: 若 Caps Lock 被啟用的話，則暫停對注音輸入的處理。
+  /// 這裡的處理仍舊有用，不然 Caps Lock 英文模式無法直接鍵入小寫字母。
+  /// - Parameter input: 輸入訊號。
+  /// - Returns: 告知 IMK「該按鍵是否已經被輸入法攔截處理」。
+  func handleCapsLockAndAlphanumericalMode(input: InputSignalProtocol) -> Bool? {
+    guard let delegate = delegate else { return nil }
+    guard input.isCapsLockOn || delegate.isASCIIMode else { return nil }
+
+    // 低於 macOS 12 的系統無法偵測 CapsLock 的啟用狀態，
+    // 所以這裡一律強制重置狀態為 .ofEmpty()。
+    delegate.switchState(IMEState.ofEmpty())
+
+    // 字母鍵摁 Shift 的話，無須額外處理，因為直接就會敲出大寫字母。
+    if (input.isUpperCaseASCIILetterKey && delegate.isASCIIMode)
+      || (input.isCapsLockOn && input.isShiftHold)
+    {
+      return false
+    }
+
+    /// 如果是 ASCII 當中的不可列印的字元的話，
+    /// 不使用「insertText:replacementRange:」。
+    /// 某些應用無法正常處理非 ASCII 字符的輸入。
+    if input.isASCII, !input.charCode.isPrintableASCII { return false }
+
+    // 將整個組字區的內容遞交給客體應用。
+    delegate.switchState(IMEState.ofCommitting(textToCommit: input.text.lowercased()))
+
+    return true
+  }
+
+  // MARK: - 呼叫選字窗（Intentionally Call Candidate Window）
+
+  /// 手動呼叫選字窗。
+  /// - Parameter input: 輸入訊號。
+  /// - Returns: 告知 IMK「該按鍵是否已經被輸入法攔截處理」。
+  func callCandidateState(input: InputSignalProtocol) -> Bool {
+    guard let delegate = delegate else { return false }
+    var state: IMEStateProtocol { delegate.state }
+    // 用上下左右鍵呼叫選字窗。
+    // 僅憑藉 state.hasComposition 的話，並不能真實把握組字器的狀況。
+    // 另外，這裡不要用「!input.isFunctionKeyHold」，
+    // 否則會導致對上下左右鍵與翻頁鍵的判斷失效。
+    let notEmpty = state.hasComposition && !compositor.isEmpty && isComposerOrCalligrapherEmpty
+    let bannedModifiers: NSEvent.ModifierFlags = [.option, .shift, .command, .control]
+    let noBannedModifiers = bannedModifiers.intersection(input.modifierFlags).isEmpty
+    var triggered = input.isCursorClockLeft || input.isCursorClockRight
+    triggered = triggered || (input.isSpace && prefs.chooseCandidateUsingSpace)
+    triggered = triggered || input.isPageDown || input.isPageUp
+    triggered = triggered || (input.isTab && prefs.specifyShiftTabKeyBehavior)
+    guard notEmpty, noBannedModifiers, triggered else { return false }
+    // 開始決定是否切換至選字狀態。
+    let candidateState: IMEStateProtocol = generateStateOfCandidates()
+    _ = candidateState.candidates.isEmpty ? delegate.callError("3572F238") : delegate.switchState(candidateState)
+    return true
+  }
+
+  // MARK: - 處理全形/半形阿拉伯數字輸入（FW/HW Arabic Numerals）
+
+  /// 處理全形/半形阿拉伯數字輸入。
+  /// - Parameter input: 輸入訊號。
+  /// - Returns: 告知 IMK「該按鍵是否已經被輸入法攔截處理」。
+  func handleArabicNumeralInputs(input: InputSignalProtocol) -> Bool {
+    guard let delegate = delegate else { return false }
+    guard delegate.state.type == .ofEmpty, input.isMainAreaNumKey else { return false }
+    guard input.isOptionHold, !input.isCommandHold, !input.isControlHold else { return false }
+    guard let strRAW = input.mainAreaNumKeyChar else { return false }
+    let newString: String = {
+      if input.isShiftHold {
+        return strRAW.applyingTransformFW2HW(reverse: !prefs.halfWidthPunctuationEnabled)
+      }
+      return strRAW.applyingTransformFW2HW(reverse: false)
+    }()
+    delegate.switchState(IMEState.ofCommitting(textToCommit: newString))
+    return true
+  }
+
+  // MARK: - 處理「摁住 SHIFT 敲字母鍵」的輸入行為（Shift + Letter keys）
+
+  /// 處理「摁住 SHIFT 敲字母鍵」的輸入行為。
+  /// - Parameter input: 輸入訊號。
+  /// - Returns: 告知 IMK「該按鍵是否已經被輸入法攔截處理」。
+  func handleLettersWithShiftHold(input: InputSignalProtocol) -> Bool {
+    guard let delegate = delegate else { return false }
+    let inputText = input.text
+    if input.isUpperCaseASCIILetterKey, !input.isCommandHold, !input.isControlHold {
+      if input.isShiftHold { // 這裡先不要判斷 isOptionHold。
+        switch prefs.upperCaseLetterKeyBehavior {
+        case 1, 3:
+          if prefs.upperCaseLetterKeyBehavior == 3, !isConsideredEmptyForNow { break }
+          let commitText = generateStateOfInputting(sansReading: true).displayedText
+          delegate.switchState(IMEState.ofCommitting(textToCommit: commitText + inputText.lowercased()))
+          return true
+        case 2, 4:
+          if prefs.upperCaseLetterKeyBehavior == 4, !isConsideredEmptyForNow { break }
+          let commitText = generateStateOfInputting(sansReading: true).displayedText
+          delegate.switchState(IMEState.ofCommitting(textToCommit: commitText + inputText.uppercased()))
+          return true
+        default: // 包括 case 0。
+          break
+        }
+        // 直接塞給組字區。
+        let letter = "_letter_\(inputText)"
+        if handlePunctuation(letter) {
+          return true
+        }
+      }
+    }
+    return false
   }
 }
