@@ -23,10 +23,7 @@ public extension NSEvent {
     isARepeat: Bool? = nil,
     keyCode: UInt16? = nil
   ) -> NSEvent? {
-    let oldChars: String = {
-      if self.type == .flagsChanged { return "" }
-      return self.characters ?? ""
-    }()
+    let oldChars: String = text
     return NSEvent.keyEvent(
       with: type ?? self.type,
       location: location ?? locationInWindow,
@@ -78,7 +75,10 @@ public extension NSEvent {
 
 public extension NSEvent {
   var isTypingVertical: Bool { charactersIgnoringModifiers == "Vertical" }
-  var text: String { characters ?? "" }
+  /// NSEvent.characters 的類型安全版。
+  /// - Remark: 注意：必須針對 event.type == .flagsChanged 提前返回結果，
+  /// 否則，每次處理這種判斷時都會因為讀取 event.characters? 而觸發 NSInternalInconsistencyException。
+  var text: String { isFlagChanged ? "" : characters ?? "" }
   var inputTextIgnoringModifiers: String? {
     guard charactersIgnoringModifiers != nil else { return nil }
     return charactersIgnoringModifiers ?? characters ?? ""
@@ -313,7 +313,7 @@ public enum EmacsKey {
 public extension NSEvent {
   func layoutTranslated(to layout: LatinKeyboardMappings = .qwerty) -> NSEvent {
     let mapTable = layout.mapTable
-    if type == .flagsChanged { return self }
+    if isFlagChanged { return self }
     guard modifierFlags == .shift || modifierFlags.isEmpty else { return self }
     if !mapTable.keys.contains(keyCode) { return self }
     guard let dataTuplet = mapTable[keyCode] else { return self }
