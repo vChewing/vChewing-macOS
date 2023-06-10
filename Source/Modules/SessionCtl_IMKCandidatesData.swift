@@ -169,4 +169,21 @@ public extension SessionCtl {
       }
     }
   }
+
+  /// 特殊處理：deactivateServer() 可能會遲於另一個客體會話的 activateServer() 執行。
+  /// 雖然所有在這個函式內影響到的變數都改為動態變數了（不會出現跨副本波及的情況），
+  /// 但 IMKCandidates 是有內部共用副本的、會被波及。所以在這裡糾偏一下。
+  internal func keepIMKCandidatesShownUp() {
+    guard PrefMgr.shared.useIMKCandidateWindow else { return }
+    guard let imkC = candidateUI as? CtlCandidateIMK else { return }
+    var i: Double = 0
+    while i < 1 {
+      DispatchQueue.main.asyncAfter(deadline: .now() + i) { [self] in
+        if state.isCandidateContainer, !imkC.visible {
+          imkC.visible = true
+        }
+      }
+      i += 0.3
+    }
+  }
 }

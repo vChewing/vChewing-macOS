@@ -167,15 +167,6 @@ public class SessionCtl: IMKInputController {
         /// 將輸入法偏好設定同步至語言模組內。
         syncBaseLMPrefs()
       }
-      // 特殊處理：deactivateServer() 可能會遲於另一個客體會話的 activateServer() 執行。
-      // 雖然所有在這個函式內影響到的變數都改為動態變數了（不會出現跨副本波及的情況），
-      // 但 IMKCandidates 是有內部共用副本的、會被波及。所以在這裡糾偏一下。
-      if PrefMgr.shared.useIMKCandidateWindow {
-        guard let imkC = candidateUI as? CtlCandidateIMK else { return }
-        if state.isCandidateContainer, !imkC.visible {
-          handle(state: state, replace: false)
-        }
-      }
     }
   }
 
