@@ -113,7 +113,7 @@
 "s7u-Fm-dVg.title" = "Revolving Pages";
 "shc-Nu-UsM.title" = "Show notifications when toggling Caps Lock";
 "SzF-FL-sVO.title" = "Show translated strokes in composition buffer";
-"tglDevZoneIMKCandidate.title" = "Use IMK Candidate Window instead of Tadokoro (will reboot the IME)";
+"tglDevZoneIMKCandidate.title" = "Use IMK Candidate Window instead of Tadokoro";
 "tglTrimUnfinishedReadingsOnCommit.title" = "Trim unfinished readings / strokes on commit";
 "TKl-TY-lvN.title" = "General Settings";
 "TXr-FF-ehw.title" = "Traditional Chinese";

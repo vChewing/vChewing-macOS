@@ -260,8 +260,8 @@ class CtlPrefWindow: NSWindowController, NSWindowDelegate {
   }
 
   @IBAction func updateIMKCandidateEnableStatusAction(_: Any) {
-    NSLog("vChewing App self-terminated due to enabling / disabling IMK candidate window.")
-    NSApp.terminate(nil)
+    // NSLog("vChewing App self-terminated due to enabling / disabling IMK candidate window.")
+    // NSApp.terminate(nil)
   }
 
   @IBAction func clickedWhetherIMEShouldNotFartToggleAction(_: Any) {
