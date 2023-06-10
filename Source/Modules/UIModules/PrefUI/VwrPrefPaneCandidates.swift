@@ -166,15 +166,8 @@ struct VwrPrefPaneCandidates: View {
         SSPreferences.Settings.Section(title: "Experimental:".localized) {
           Toggle(
             LocalizedStringKey("Use IMK Candidate Window instead of Tadokoro"),
-            isOn: $useIMKCandidateWindow.onChange {
-              NSLog("vChewing App self-terminated due to enabling / disabling IMK candidate window.")
-              NSApp.terminate(nil)
-            }
+            isOn: $useIMKCandidateWindow
           )
-          Text(
-            LocalizedStringKey("⚠︎ This will reboot the vChewing IME.")
-          )
-          .preferenceDescription(maxWidth: CtlPrefUIShared.maxDescriptionWidth)
           Text(
             "IMK candidate window relies on certain Apple private APIs which are force-exposed by using bridging headers. Its usability, at this moment, is only guaranteed from macOS 10.14 Mojave to macOS 13 Ventura. Further tests are required in the future in order to tell whether it is usable in newer macOS releases.".localized
           )
