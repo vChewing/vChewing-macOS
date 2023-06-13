@@ -22,7 +22,7 @@ extension InputHandler {
     guard let delegate = delegate else { return false }
     guard var ctlCandidate = delegate.candidateController() else { return false }
     let state = delegate.state
-    guard !state.candidates.isEmpty else { return false }
+    guard state.isCandidateContainer, !state.candidates.isEmpty else { return false }
 
     // MARK: 選字窗內使用熱鍵升權、降權、刪詞。
 
@@ -211,8 +211,9 @@ extension InputHandler {
     // MARK: - Flipping pages by using modified bracket keys (when they are not occupied).
 
     // Shift+Command+[] 被 Chrome 系瀏覽器佔用，所以改用 Ctrl。
-    revolveCandidateWithBrackets: if input.modifierFlags == [.control, .command] {
-      if !state.isCandidateContainer { break revolveCandidateWithBrackets }
+    let ctrlCMD: Bool = input.modifierFlags == [.control, .command]
+    let ctrlShiftCMD: Bool = input.modifierFlags == [.control, .command, .shift]
+    if ctrlShiftCMD || ctrlCMD {
       // 此處 JIS 鍵盤判定無法用於螢幕鍵盤。所以，螢幕鍵盤的場合，系統會依照 US 鍵盤的判定方案。
       let isJIS: Bool = KBGetLayoutType(Int16(LMGetKbdType())) == kKeyboardJIS
       switch (input.keyCode, isJIS) {
