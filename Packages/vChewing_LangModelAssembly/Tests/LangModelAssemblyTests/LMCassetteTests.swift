@@ -39,4 +39,26 @@ final class LMCassetteTests: XCTestCase {
     XCTAssertEqual(lmCassette.endKeys.count, 0)
     XCTAssertEqual(lmCassette.selectionKeys.count, 10)
   }
+
+  func testCassetteLoadArray30() throws {
+    let pathCINFile = testDataPath + "array30.cin"
+    var lmCassette = vChewingLM.LMCassette()
+    NSLog("LMCassette: Start loading CIN.")
+    lmCassette.open(pathCINFile)
+    NSLog("LMCassette: Finished loading CIN. Entries: \(lmCassette.count)")
+    XCTAssertFalse(lmCassette.quickDefMap.isEmpty)
+    print(lmCassette.quickSetsFor(key: ",.") ?? "")
+    XCTAssertEqual(lmCassette.keyNameMap.count, 41)
+    XCTAssertEqual(lmCassette.charDefMap.count, 29537)
+    XCTAssertEqual(lmCassette.charDefWildcardMap.count, 11973)
+    XCTAssertEqual(lmCassette.octagramMap.count, 0)
+    XCTAssertEqual(lmCassette.octagramDividedMap.count, 0)
+    XCTAssertEqual(lmCassette.nameShort, "AR30")
+    XCTAssertEqual(lmCassette.nameENG, "array30")
+    XCTAssertEqual(lmCassette.nameCJK, "行列30")
+    XCTAssertEqual(lmCassette.nameIntl, "Array 30:en;行列30:zh-Hans;行列30:zh-Hant")
+    XCTAssertEqual(lmCassette.maxKeyLength, 5)
+    XCTAssertEqual(lmCassette.endKeys.count, 10)
+    XCTAssertEqual(lmCassette.selectionKeys.count, 10)
+  }
 }

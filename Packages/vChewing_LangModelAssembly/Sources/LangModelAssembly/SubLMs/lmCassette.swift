@@ -20,12 +20,14 @@ public extension vChewingLM {
     public private(set) var nameENG: String = ""
     public private(set) var nameCJK: String = ""
     public private(set) var nameIntl: String = ""
+    public private(set) var nullCandidate: String = ""
     /// 一個漢字可能最多要用到多少碼。
     public private(set) var maxKeyLength: Int = 1
-    public private(set) var selectionKeys: [String] = []
+    public private(set) var selectionKeys: String = ""
     public private(set) var endKeys: [String] = []
     public private(set) var wildcardKey: String = ""
     public private(set) var keyNameMap: [String: String] = [:]
+    public private(set) var quickDefMap: [String: String] = [:]
     public private(set) var charDefMap: [String: [String]] = [:]
     public private(set) var charDefWildcardMap: [String: [String]] = [:]
     public private(set) var reverseLookupMap: [String: [String]] = [:]
@@ -40,7 +42,7 @@ public extension vChewingLM {
 
     /// 萬用花牌字符，哪怕花牌鍵仍不可用。
     public var wildcard: String { wildcardKey.isEmpty ? "†" : wildcardKey }
-    /// 資料陣列內承載的資料筆數。
+    /// 資料陣列內承載的核心 charDef 資料筆數。
     public var count: Int { charDefMap.count }
     /// 是否已有資料載入。
     public var isLoaded: Bool { !charDefMap.isEmpty }
@@ -60,6 +62,7 @@ public extension vChewingLM {
     /// - `%selkey`  不處理，因為威注音輸入法有自己的選字鍵體系。
     /// - `%endkey` 是會觸發組字事件的按鍵。
     /// - `%wildcardkey` 決定磁帶的萬能鍵名稱，只有第一個字元會生效。
+    /// - `%nullcandidate` 用來指明 `%quick` 字段給出的候選字當中有哪一種是無效的。
     /// - `%keyname begin` 至 `%keyname end` 之間是字根翻譯表，先讀取為 Swift 辭典以備用。
     /// - `%quick begin` 至 `%quick end` 之間則是簡碼資料，對應的 value 得拆成單個漢字。
     /// - `%chardef begin` 至 `%chardef end` 之間則是詞庫資料。
@@ -90,7 +93,7 @@ public extension vChewingLM {
             }
             if loadingQuickSets, strLine.contains("%quick"), strLine.contains("end") {
               loadingQuickSets = false
-              if charDefMap.keys.contains(wildcardKey) { wildcardKey = "" }
+              if quickDefMap.keys.contains(wildcardKey) { wildcardKey = "" }
             }
             if !loadingCharDefinitions, strLine.contains("%chardef"), strLine.contains("begin") {
               loadingCharDefinitions = true
@@ -114,14 +117,7 @@ public extension vChewingLM {
               keyNameMap[strFirstCell] = cells[1].trimmingCharacters(in: .newlines)
             } else if loadingQuickSets, !strLine.contains("%quick") {
               theMaxKeyLength = max(theMaxKeyLength, cells[0].count)
-              let arrSecondCell = strSecondCell.map(\.description)
-              charDefMap[strFirstCell, default: []].append(contentsOf: arrSecondCell)
-              reverseLookupMap[strSecondCell, default: []].append(contentsOf: arrSecondCell)
-              var keyComps = strFirstCell.map(\.description)
-              while !keyComps.isEmpty {
-                keyComps.removeLast()
-                charDefWildcardMap[keyComps.joined() + wildcard, default: []].append(contentsOf: arrSecondCell)
-              }
+              quickDefMap[strFirstCell, default: .init()].append(strSecondCell)
             } else if loadingCharDefinitions, !strLine.contains("%chardef") {
               theMaxKeyLength = max(theMaxKeyLength, cells[0].count)
               charDefMap[strFirstCell, default: []].append(strSecondCell)
@@ -156,8 +152,9 @@ public extension vChewingLM {
             }
             if nameCJK.isEmpty, strLine.contains("%cname ") { nameCJK = strSecondCell }
             if nameShort.isEmpty, strLine.contains("%sname ") { nameShort = strSecondCell }
+            if nullCandidate.isEmpty, strLine.contains("%nullcandidate ") { nullCandidate = strSecondCell }
             if selectionKeys.isEmpty, strLine.contains("%selkey ") {
-              selectionKeys = cells[1].map(\.description).deduplicated
+              selectionKeys = cells[1].description
             }
             if endKeys.isEmpty, strLine.contains("%endkey ") {
               endKeys = cells[1].map(\.description).deduplicated
@@ -182,7 +179,9 @@ public extension vChewingLM {
 
     public mutating func clear() {
       filePath = nil
+      nullCandidate.removeAll()
       keyNameMap.removeAll()
+      quickDefMap.removeAll()
       charDefMap.removeAll()
       charDefWildcardMap.removeAll()
       nameShort.removeAll()
@@ -197,6 +196,11 @@ public extension vChewingLM {
       nameIntl.removeAll()
       maxKeyLength = 1
       norm = 0
+    }
+
+    public func quickSetsFor(key: String) -> String? {
+      guard let result = quickDefMap[key] as String? else { return nil }
+      return result.isEmpty ? nil : result
     }
 
     /// 根據給定的字根索引鍵，來獲取資料庫辭典內的對應結果。
