@@ -15,6 +15,20 @@ public extension vChewingLM.LMInstantiator {
   var cassetteWildcardKey: String { Self.lmCassette.wildcardKey }
   /// 當前磁帶規定的最大碼長。
   var maxCassetteKeyLength: Int { Self.lmCassette.maxKeyLength }
+  /// 磁帶模式專用函式：指定 `%quick` 快速候選結果當中要過濾掉的無效候選字符號。
+  var nullCandidateInCassette: String { Self.lmCassette.nullCandidate }
+  /// 選字鍵，在威注音輸入法當中僅優先用於快速模式。
+  var cassetteSelectionKey: String? {
+    let result = Self.lmCassette.selectionKeys
+    return result.isEmpty ? nil : result
+  }
+
+  /// 磁帶模式專用函式：調取 `%quick` 快速候選結果。
+  /// - Parameter key: 按鍵字元。
+  /// - Returns: 結果。
+  func cassetteQuickSetsFor(key: String) -> String? {
+    Self.lmCassette.quickSetsFor(key: key)
+  }
 
   /// 將當前的按鍵轉換成磁帶內定義了的字根。
   /// - Parameter char: 按鍵字元。
