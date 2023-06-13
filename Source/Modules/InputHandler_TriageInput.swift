@@ -158,7 +158,9 @@ extension InputHandler {
 
       // Ctrl+Command+[] 輪替候選字。
       // Shift+Command+[] 被 Chrome 系瀏覽器佔用，所以改用 Ctrl。
-      revolveCandidateWithBrackets: if input.modifierFlags == [.control, .command] {
+      let ctrlCMD: Bool = input.modifierFlags == [.control, .command]
+      let ctrlShiftCMD: Bool = input.modifierFlags == [.control, .command, .shift]
+      revolveCandidateWithBrackets: if ctrlShiftCMD || ctrlCMD {
         if state.type != .ofInputting { break revolveCandidateWithBrackets }
         // 此處 JIS 鍵盤判定無法用於螢幕鍵盤。所以，螢幕鍵盤的場合，系統會依照 US 鍵盤的判定方案。
         let isJIS: Bool = KBGetLayoutType(Int16(LMGetKbdType())) == kKeyboardJIS
