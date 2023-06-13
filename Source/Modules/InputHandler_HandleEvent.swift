@@ -26,7 +26,7 @@ extension InputHandler {
   /// - Parameter event: 由 IMK 選字窗接收的裝置操作輸入事件。
   /// - Returns: 回「`true`」以將該按鍵已攔截處理的訊息傳遞給 IMK；回「`false`」則放行、不作處理。
   private func imkCandidatesEventPreHandler(event eventToDeal: NSEvent) -> Bool? {
-    guard let delegate = delegate else { return false }
+    guard let delegate = delegate, delegate.state.isCandidateContainer else { return nil }
 
     // IMK 選字窗處理，當且僅當啟用了 IMK 選字窗的時候才會生效。
     // 這樣可以讓 interpretKeyEvents() 函式自行判斷：
@@ -133,8 +133,9 @@ extension InputHandler {
       }
 
       // Shift+Command+[] 被 Chrome 系瀏覽器佔用，所以改用 Ctrl。
-      revolveCandidateWithBrackets: if event.modifierFlags == [.control, .command] {
-        if !delegate.state.isCandidateContainer { break revolveCandidateWithBrackets }
+      let ctrlCMD: Bool = event.modifierFlags == [.control, .command]
+      let ctrlShiftCMD: Bool = event.modifierFlags == [.control, .command, .shift]
+      if ctrlShiftCMD || ctrlCMD {
         // 此處 JIS 鍵盤判定無法用於螢幕鍵盤。所以，螢幕鍵盤的場合，系統會依照 US 鍵盤的判定方案。
         let isJIS: Bool = KBGetLayoutType(Int16(LMGetKbdType())) == kKeyboardJIS
         switch (event.keyCode, isJIS) {
