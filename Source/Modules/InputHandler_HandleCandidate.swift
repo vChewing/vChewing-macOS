@@ -150,25 +150,18 @@ extension InputHandler {
       if !input.isShiftHold { return false }
     }
 
-    var index: Int = NSNotFound
-    let match: String =
+    var index: Int?
+    let matched: String =
       (state.type == .ofAssociates) ? input.inputTextIgnoringModifiers ?? "" : input.text
-
-    let selectionKeys = delegate.selectionKeys
-
-    for j in 0 ..< selectionKeys.count {
-      let label = selectionKeys.map(\.description)[j]
-      if match.compare(label, options: .caseInsensitive, range: nil, locale: .current) == .orderedSame {
-        index = j
-        break
-      }
+    checkSelectionKey: for keyPair in delegate.selectionKeys.enumerated() {
+      guard matched.lowercased() == keyPair.element.lowercased() else { continue }
+      index = Int(keyPair.offset)
+      break checkSelectionKey
     }
 
-    if index != NSNotFound {
-      if let candidateIndex = ctlCandidate.candidateIndexAtKeyLabelIndex(index) {
-        delegate.candidateSelectionConfirmedByInputHandler(at: candidateIndex)
-        return true
-      }
+    if let index = index, let candidateIndex = ctlCandidate.candidateIndexAtKeyLabelIndex(index) {
+      delegate.candidateSelectionConfirmedByInputHandler(at: candidateIndex)
+      return true
     }
 
     if state.type == .ofAssociates { return false }
