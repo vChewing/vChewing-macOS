@@ -84,35 +84,33 @@ public extension SessionCtl {
           ? .vertical
           : .horizontal)
 
+    let isInputtingWithCandidates = state.type == .ofInputting && state.isCandidateContainer
     /// 先取消既有的選字窗的內容顯示。否則可能會重複生成選字窗的 NSWindow()。
     candidateUI?.visible = false
-    /// 然後再重新初期化。
     if #available(macOS 10.13, *) {
-      candidateUI =
-        PrefMgr.shared.useIMKCandidateWindow
-          ? CtlCandidateIMK(candidateLayout) : CtlCandidateTDK(candidateLayout)
-      if let candidateTDK = candidateUI as? CtlCandidateTDK {
-        let singleLine = isVerticalTyping || PrefMgr.shared.candidateWindowShowOnlyOneLine
-        candidateTDK.maxLinesPerPage = singleLine ? 1 : 4
-      }
+      /// 然後再重新初期化。
+      let useIMK = PrefMgr.shared.useIMKCandidateWindow
+      candidateUI = useIMK ? CtlCandidateIMK(candidateLayout) : CtlCandidateTDK(candidateLayout)
     } else {
       candidateUI = CtlCandidateTDK(candidateLayout)
     }
+    var singleLine = isVerticalTyping || PrefMgr.shared.candidateWindowShowOnlyOneLine
+    singleLine = singleLine || isInputtingWithCandidates
+    (candidateUI as? CtlCandidateTDK)?.maxLinesPerPage = singleLine ? 1 : 4
 
     candidateUI?.candidateFont = Self.candidateFont(
       name: PrefMgr.shared.candidateTextFontName, size: PrefMgr.shared.candidateListTextSize
     )
 
-    let singleColumn = isVerticalTyping || PrefMgr.shared.candidateWindowShowOnlyOneLine
-
-    if PrefMgr.shared.cassetteEnabled {
-      candidateUI?.tooltip =
-        singleColumn ? "📼" : "📼 " + NSLocalizedString("CIN Cassette Mode", comment: "")
-    }
-
     if state.type == .ofAssociates {
       candidateUI?.tooltip =
-        singleColumn ? "⇧" : NSLocalizedString("Hold ⇧ to choose associates.", comment: "")
+        singleLine ? "⇧" : NSLocalizedString("Hold ⇧ to choose associates.", comment: "")
+    } else if state.type == .ofInputting, state.isCandidateContainer {
+      candidateUI?.tooltip =
+        singleLine ? "⚡️" : "⚡️ " + NSLocalizedString("Quick Candidates", comment: "")
+    } else if PrefMgr.shared.cassetteEnabled {
+      candidateUI?.tooltip =
+        singleLine ? "📼" : "📼 " + NSLocalizedString("CIN Cassette Mode", comment: "")
     }
 
     candidateUI?.locale = {
