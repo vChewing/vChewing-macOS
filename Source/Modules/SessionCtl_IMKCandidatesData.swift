@@ -49,18 +49,23 @@ public extension SessionCtl {
       }
     }
 
-    if state.type == .ofAssociates {
+    switch state.type {
+    case .ofDeactivated, .ofEmpty, .ofAbortion, .ofCommitting, .ofMarking: break
+    case .ofAssociates:
       handleIMKCandidatesPrepared(state.candidates, prefix: "⇧")
-    } else if state.type == .ofSymbolTable {
-      // 分類符號選單不會出現同符異音項、不需要康熙 / JIS 轉換，所以使用簡化過的處理方式。
-      arrResult = state.candidates.map(\.value)
-    } else if state.type == .ofCandidates {
+    case .ofInputting where state.isCandidateContainer:
+      handleIMKCandidatesPrepared(state.candidates, prefix: "🗲")
+    case .ofCandidates:
       guard !state.candidates.isEmpty else { return .init() }
       if state.candidates[0].keyArray.joined(separator: "-").contains("_punctuation") {
         arrResult = state.candidates.map(\.value) // 標點符號選單處理。
       } else {
         handleIMKCandidatesPrepared(state.candidates)
       }
+    case .ofSymbolTable:
+      // 分類符號選單不會出現同符異音項、不需要康熙 / JIS 轉換，所以使用簡化過的處理方式。
+      arrResult = state.candidates.map(\.value)
+    default: break
     }
 
     return arrResult
@@ -113,17 +118,21 @@ public extension SessionCtl {
       }
     }
 
-    if state.type == .ofAssociates {
+    switch state.type {
+    case .ofAssociates:
       fixIndexForIMKCandidates(&indexDeducted, prefix: "⇧", source: candidateString)
-    } else if state.type == .ofSymbolTable {
+    case .ofInputting where state.isCandidateContainer:
+      fixIndexForIMKCandidates(&indexDeducted, prefix: "🗲", source: candidateString)
+    case .ofSymbolTable:
       fixSymbolIndexForIMKCandidates()
-    } else if state.type == .ofCandidates {
+    case .ofCandidates:
       guard !state.candidates.isEmpty else { return }
       if state.candidates[0].keyArray.description.contains("_punctuation") {
         fixSymbolIndexForIMKCandidates() // 標點符號選單處理。
       } else {
         fixIndexForIMKCandidates(&indexDeducted, source: candidateString)
       }
+    default: break
     }
     candidatePairSelectionConfirmed(at: indexDeducted)
   }
