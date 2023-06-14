@@ -84,6 +84,12 @@ extension SessionCtl: CtlCandidateDelegate {
     let blankResult: [String] = []
     // 這一段專門處理「反查」。
     if !PrefMgr.shared.showReverseLookupInCandidateUI { return blankResult }
+    if state.type == .ofInputting, state.isCandidateContainer,
+       inputHandler?.currentLM.nullCandidateInCassette == value
+    {
+      return blankResult
+    }
+    if !PrefMgr.shared.showReverseLookupInCandidateUI { return blankResult }
     if isVerticalTyping { return blankResult } // 縱排輸入的場合，選字窗沒有足夠的空間顯示反查結果。
     if value.isEmpty { return blankResult } // 空字串沒有需要反查的東西。
     if value.contains("_") { return blankResult }
@@ -92,7 +98,17 @@ extension SessionCtl: CtlCandidateDelegate {
   }
 
   public var selectionKeys: String {
-    PrefMgr.shared.useIMKCandidateWindow ? "123456789" : PrefMgr.shared.candidateKeys
+    // `%quick` 模式僅支援 1234567890 選字鍵。
+    if state.type == .ofInputting, state.isCandidateContainer {
+      guard let cinCandidateKey = LMMgr.currentLM.cassetteSelectionKey,
+            CandidateKey.validate(keys: cinCandidateKey) == nil
+      else {
+        return "1234567890"
+      }
+      return cinCandidateKey
+    }
+    if PrefMgr.shared.useIMKCandidateWindow { return "123456789" }
+    return PrefMgr.shared.candidateKeys
   }
 
   public func candidatePairs(conv: Bool = false) -> [(keyArray: [String], value: String)] {
@@ -114,6 +130,7 @@ extension SessionCtl: CtlCandidateDelegate {
 
   public func candidatePairSelectionConfirmed(at index: Int) {
     guard let inputHandler = inputHandler else { return }
+    guard state.isCandidateContainer else { return }
     switch state.type {
     case .ofSymbolTable where (0 ..< state.node.members.count).contains(index):
       let node = state.node.members[index]
@@ -124,12 +141,10 @@ extension SessionCtl: CtlCandidateDelegate {
       }
     case .ofCandidates where (0 ..< state.candidates.count).contains(index):
       let selectedValue = state.candidates[index]
-      if state.type == .ofCandidates {
-        inputHandler.consolidateNode(
-          candidate: selectedValue, respectCursorPushing: true,
-          preConsolidate: PrefMgr.shared.consolidateContextOnCandidateSelection
-        )
-      }
+      inputHandler.consolidateNode(
+        candidate: selectedValue, respectCursorPushing: true,
+        preConsolidate: PrefMgr.shared.consolidateContextOnCandidateSelection
+      )
       var result: IMEStateProtocol = inputHandler.generateStateOfInputting()
       defer { switchState(result) } // 這是最終輸出結果。
       if PrefMgr.shared.useSCPCTypingMode {
@@ -157,6 +172,14 @@ extension SessionCtl: CtlCandidateDelegate {
         withPair: .init(keyArray: selectedValue.keyArray, value: valueKept)
       )
       if !associates.candidates.isEmpty { result = associates }
+    case .ofInputting where (0 ..< state.candidates.count).contains(index):
+      let chosenStr = state.candidates[index].value
+      guard !chosenStr.isEmpty, chosenStr != inputHandler.currentLM.nullCandidateInCassette else {
+        callError("907F9F64")
+        return
+      }
+      let strToCommitFirst = inputHandler.generateStateOfInputting(sansReading: true).displayedText
+      switchState(IMEState.ofCommitting(textToCommit: strToCommitFirst + chosenStr))
     default: return
     }
   }
