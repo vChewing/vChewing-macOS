@@ -99,7 +99,7 @@ extension InputHandler {
               : ctlCandidate.highlightNextCandidate())
         _ = updated ? {}() : delegate.callError("9B691919")
         return true
-      case .kSpace:
+      case .kSpace where state.type != .ofInputting:
         let updated: Bool =
           prefs.specifyShiftSpaceKeyBehavior
             ? (input.isShiftHold
@@ -168,7 +168,8 @@ extension InputHandler {
 
     // MARK: 逐字選字模式的處理 (SCPC Mode Processing)
 
-    if prefs.useSCPCTypingMode {
+    // 這裡得排除掉 .ofInputting 模式，否則會在有 `%quick` 結果的情況下無法正常鍵入一個完整的漢字讀音/字根。
+    if prefs.useSCPCTypingMode, state.type != .ofInputting {
       /// 檢查：
       /// - 是否是針對當前注音排列/拼音輸入種類專門提供的標點符號。
       /// - 是否是需要摁修飾鍵才可以輸入的那種標點符號。
@@ -243,6 +244,8 @@ extension InputHandler {
       default: break
       }
     }
+
+    if state.type == .ofInputting { return false } // `%quick`
 
     delegate.callError("172A0F81")
     return true
