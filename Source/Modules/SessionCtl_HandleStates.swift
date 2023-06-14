@@ -75,6 +75,7 @@ public extension SessionCtl {
       setInlineDisplayWithCursor()
       // 會在工具提示為空的時候自動消除顯示。
       showTooltip(newState.tooltip, duration: newState.tooltipDuration)
+      if newState.isCandidateContainer { showCandidates() }
     case .ofMarking:
       candidateUI?.visible = false
       setInlineDisplayWithCursor()
