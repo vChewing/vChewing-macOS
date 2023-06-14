@@ -212,14 +212,16 @@ extension InputHandler {
   /// - Returns: 告知 IMK「該按鍵是否已經被輸入法攔截處理」。
   private func handleCassetteComposition(input: InputSignalProtocol) -> Bool? {
     guard let delegate = delegate else { return nil }
+    let state = delegate.state
     var wildcardKey: String { currentLM.cassetteWildcardKey } // 花牌鍵。
     let inputText = input.text
     let isWildcardKeyInput: Bool = (inputText == wildcardKey && !wildcardKey.isEmpty)
+    let calligrapherBackup = calligrapher
 
     let skipStrokeHandling =
       input.isReservedKey || input.isNumericPadKey || input.isNonLaptopFunctionKey
         || input.isControlHold || input.isOptionHold || input.isCommandHold // || input.isShiftHold
-    let confirmCombination = input.isSpace || input.isEnter
+    var confirmCombination = input.isSpace
 
     var isLongestPossibleKeyFormed: Bool {
       guard !isWildcardKeyInput, prefs.autoCompositeWithLongestPossibleCassetteKey else { return false }
@@ -251,9 +253,20 @@ extension InputHandler {
       }
 
       if !isStrokesFull {
-        delegate.switchState(generateStateOfInputting())
+        var result = generateStateOfInputting()
+        // 針對 IMK 選字窗停用 `%quick` 特性，因為按鍵邏輯實在難以實作。
+        if !prefs.useIMKCandidateWindow, !calligrapher.isEmpty,
+           let fetched = currentLM.cassetteQuickSetsFor(key: calligrapher)
+        {
+          result.candidates = fetched.map { (keyArray: [""], value: $0.description) }
+        }
+        delegate.switchState(result)
         return true
       }
+    }
+
+    if !(state.type == .ofInputting && state.isCandidateContainer) {
+      confirmCombination = confirmCombination || input.isEnter
     }
 
     var combineStrokes =
@@ -273,8 +286,14 @@ extension InputHandler {
       }
       // 向語言模型詢問是否有對應的記錄。
       if !currentLM.hasUnigramsFor(keyArray: [calligrapher]) {
-        delegate.callError("B49C0979_Cassette：語彙庫內無「\(calligrapher)」的匹配記錄。")
+        // 此時立即處理 `%quick` 選字行為。
+        let quickCandidates: Bool = state.type == .ofInputting && state.isCandidateContainer
+        if quickCandidates, handleCandidate(input: input) {
+          if !calligrapher.isEmpty { calligrapher = calligrapherBackup }
+          return true
+        }
 
+        delegate.callError("B49C0979_Cassette：語彙庫內無「\(calligrapher)」的匹配記錄。")
         calligrapher.removeAll()
         // 根據「組字器是否為空」來判定回呼哪一種狀態。
         switch compositor.isEmpty {
