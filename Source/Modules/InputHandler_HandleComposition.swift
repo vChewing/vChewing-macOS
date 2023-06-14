@@ -212,6 +212,7 @@ extension InputHandler {
   /// - Returns: 告知 IMK「該按鍵是否已經被輸入法攔截處理」。
   private func handleCassetteComposition(input: InputSignalProtocol) -> Bool? {
     guard let delegate = delegate else { return nil }
+    let state = delegate.state
     var wildcardKey: String { currentLM.cassetteWildcardKey } // 花牌鍵。
     let inputText = input.text
     let isWildcardKeyInput: Bool = (inputText == wildcardKey && !wildcardKey.isEmpty)
@@ -219,7 +220,7 @@ extension InputHandler {
     let skipStrokeHandling =
       input.isReservedKey || input.isNumericPadKey || input.isNonLaptopFunctionKey
         || input.isControlHold || input.isOptionHold || input.isCommandHold // || input.isShiftHold
-    let confirmCombination = input.isSpace || input.isEnter
+    var confirmCombination = input.isSpace
 
     var isLongestPossibleKeyFormed: Bool {
       guard !isWildcardKeyInput, prefs.autoCompositeWithLongestPossibleCassetteKey else { return false }
@@ -251,9 +252,20 @@ extension InputHandler {
       }
 
       if !isStrokesFull {
-        delegate.switchState(generateStateOfInputting())
+        var result = generateStateOfInputting()
+        // 針對 IMK 選字窗停用 `%quick` 特性，因為按鍵邏輯實在難以實作。
+        if !prefs.useIMKCandidateWindow, !calligrapher.isEmpty,
+           let fetched = currentLM.cassetteQuickSetsFor(key: calligrapher)
+        {
+          result.candidates = fetched.map { (keyArray: [""], value: $0.description) }
+        }
+        delegate.switchState(result)
         return true
       }
+    }
+
+    if !(state.type == .ofInputting && state.isCandidateContainer) {
+      confirmCombination = confirmCombination || input.isEnter
     }
 
     var combineStrokes =

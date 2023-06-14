@@ -146,6 +146,10 @@ extension InputHandler {
         return handleHaninKeyboardSymbolModeToggle()
       }
 
+      // 處理 `%quick` 選字行為。
+      let quickCandidates: Bool = state.type == .ofInputting && state.isCandidateContainer
+      guard !(quickCandidates && handleCandidate(input: input)) else { return true }
+
       // 注音按鍵輸入與漢音鍵盤符號輸入處理。
       if isHaninKeyboardSymbolMode, [[], .shift].contains(input.modifierFlags) {
         return handleHaninKeyboardSymbolModeInput(input: input)
