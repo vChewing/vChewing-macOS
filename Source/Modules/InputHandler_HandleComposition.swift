@@ -30,6 +30,8 @@ extension InputHandler {
   /// - Returns: 告知 IMK「該按鍵是否已經被輸入法攔截處理」。
   private func handlePhonabetComposition(input: InputSignalProtocol) -> Bool? {
     guard let delegate = delegate else { return nil }
+    var inputText = (input.inputTextIgnoringModifiers ?? input.text)
+    inputText = inputText.lowercased().applyingTransformFW2HW(reverse: false)
     let existedIntonation = composer.intonation
     var overrideHappened = false
 
@@ -56,7 +58,7 @@ extension InputHandler {
         prevReading.0.map(\.description).forEach { theComposer.receiveKey(fromPhonabet: $0) }
         // 發現要覆寫的聲調與覆寫對象的聲調雷同的情況的話，直接跳過處理。
         let oldIntonation: Tekkon.Phonabet = theComposer.intonation
-        theComposer.receiveKey(fromString: input.text)
+        theComposer.receiveKey(fromString: inputText)
         if theComposer.intonation == oldIntonation, prefs.specifyIntonationKeyBehavior == 1 { break proc }
         theComposer.intonation.clear()
         // 檢查新的漢字字音是否在庫。
@@ -74,7 +76,7 @@ extension InputHandler {
       }
 
       // 鐵恨引擎並不具備對 Enter (CR / LF) 鍵的具體判斷能力，所以在這裡單獨處理。
-      composer.receiveKey(fromString: confirmCombination ? " " : input.text)
+      composer.receiveKey(fromString: confirmCombination ? " " : inputText)
       keyConsumedByReading = true
 
       // 沒有調號的話，只需要 setInlineDisplayWithCursor() 且終止處理（return true）即可。
@@ -211,11 +213,12 @@ extension InputHandler {
   private func handleCassetteComposition(input: InputSignalProtocol) -> Bool? {
     guard let delegate = delegate else { return nil }
     var wildcardKey: String { currentLM.cassetteWildcardKey } // 花牌鍵。
-    let isWildcardKeyInput: Bool = (input.text == wildcardKey && !wildcardKey.isEmpty)
+    let inputText = input.text
+    let isWildcardKeyInput: Bool = (inputText == wildcardKey && !wildcardKey.isEmpty)
 
     let skipStrokeHandling =
       input.isReservedKey || input.isNumericPadKey || input.isNonLaptopFunctionKey
-        || input.isControlHold || input.isOptionHold || input.isShiftHold || input.isCommandHold
+        || input.isControlHold || input.isOptionHold || input.isCommandHold // || input.isShiftHold
     let confirmCombination = input.isSpace || input.isEnter
 
     var isLongestPossibleKeyFormed: Bool {
@@ -227,7 +230,7 @@ extension InputHandler {
       calligrapher.count >= currentLM.maxCassetteKeyLength || isLongestPossibleKeyFormed
     }
 
-    prehandling: if !skipStrokeHandling && currentLM.isThisCassetteKeyAllowed(key: input.text) {
+    prehandling: if !skipStrokeHandling && currentLM.isThisCassetteKeyAllowed(key: inputText) {
       if calligrapher.isEmpty, isWildcardKeyInput {
         delegate.callError("3606B9C0")
         var newEmptyState = compositor.isEmpty ? IMEState.ofEmpty() : generateStateOfInputting()
@@ -241,7 +244,7 @@ extension InputHandler {
         delegate.callError("2268DD51: calligrapher is full, clearing calligrapher.")
         calligrapher.removeAll()
       } else {
-        calligrapher.append(input.text)
+        calligrapher.append(inputText)
       }
       if isWildcardKeyInput {
         break prehandling
