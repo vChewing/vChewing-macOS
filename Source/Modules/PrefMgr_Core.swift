@@ -185,7 +185,7 @@ public class PrefMgr: PrefMgrProtocol {
   @AppProperty(key: UserDef.kUseIMKCandidateWindow.rawValue, defaultValue: false)
   public var useIMKCandidateWindow: Bool
 
-  @AppProperty(key: UserDef.kEnableSwiftUIForTDKCandidates.rawValue, defaultValue: true)
+  @AppProperty(key: UserDef.kEnableSwiftUIForTDKCandidates.rawValue, defaultValue: false)
   public var enableSwiftUIForTDKCandidates: Bool
 
   @AppProperty(key: UserDef.kEnableMouseScrollingForTDKCandidatesCocoa.rawValue, defaultValue: false)
