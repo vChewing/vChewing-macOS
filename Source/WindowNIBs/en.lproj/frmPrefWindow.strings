@@ -78,7 +78,7 @@
 "jQC-12-UuK.ibShadowedObjectValues[2]" = "Item 3";
 "lblAcceptLeadingIntonations.title" = "Accept leading intonations in rare cases";
 "lblAlwaysShowTooltipTextsHorizontally.title" = "Always show tooltip texts horizontally";
-"lblDevZoneIMKCandidate.title" = "IMK candidate window relies on certain Apple private APIs which are force-exposed by using bridging headers. Its usability, at this moment, is only guaranteed from macOS 10.14 Mojave to macOS 13 Ventura. Further tests are required in the future in order to tell whether it is usable in newer macOS releases.";
+"lblDevZoneIMKCandidate.title" = "IMK candidate window (IMKCandidates) relies on certain Apple private APIs force-exposed through bridging headers. For now, its usability is only guaranteed from macOS 10.14 Mojave to macOS 14 Sonoma. Further tests are required in later macOS to prove compatibility facts. Also, the `%quick` section in CIN cassettes is not supported when using IMKCandidates.";
 "lblDevZoneTitleDescription.title" = "Warning: This page is for testing future features. \nFeatures listed here may not work as expected.";
 "lblIntonationKeyBehavior.title" = "Specify what intonation key does when syllable composer is empty.";
 "lblShiftBkspKeyBehavior.title" = "Choose the attempted behavior of Shift+BackSpace key.";

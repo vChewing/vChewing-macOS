@@ -78,7 +78,7 @@
 "jQC-12-UuK.ibShadowedObjectValues[2]" = "Item 3";
 "lblAcceptLeadingIntonations.title" = "まれな場合には、音調記号の優先入力を許容する";
 "lblAlwaysShowTooltipTextsHorizontally.title" = "ヒントを常に横書きにする";
-"lblDevZoneIMKCandidate.title" = "IMK 候補陳列ウィンドウは、Apple の未公開のAPIを「bridging-header」という強引的な手段で引き出して利用した機能である。現時点で macOS 10.14 Mojave から macOS 13 Ventura まで利用可能であるが、その後の新しい macOS との互換性の話はまだ早い。";
+"lblDevZoneIMKCandidate.title" = "IMK 候補陳列ウィンドウ（IMKCandidates）は、Apple の未公開のAPIを「bridging-header」という強引的な手段で引き出して利用した機能である。現時点で macOS 10.14 Mojave から macOS 14 Sonoma まで利用可能であるが、その後の新しい macOS との互換性の話はまだ早い。なお、CINカセットに記された「%quick」は IMKCandidates で利用不可である。";
 "lblDevZoneTitleDescription.title" = "警告：これからの新機能テストのために作ったページですから、\nここで陳列されている諸機能は予想通り動けるだと思わないでください。";
 "lblIntonationKeyBehavior.title" = "音調組立緩衝列が空かされた時の音調キーの行為をご指定ください。";
 "lblShiftBkspKeyBehavior.title" = "Shift+BackSpace キーの優先行為をご指定ください。";
