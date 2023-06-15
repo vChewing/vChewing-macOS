@@ -103,8 +103,19 @@ public class SessionCtl: IMKInputController {
     }
   }
 
-  private var isASCIIModeForThisClient = false // 給每個副本用的。
-  private static var isASCIIModeForAllClients = false // 給所有副本共用的。
+  /// 給所有副本共用的 isASCIIMode 追蹤用餐數。
+  private static var isASCIIModeForAllClients = false
+  /// 一個共用辭典，專門用來給每個副本用的 isASCIIMode 追蹤用餐數。
+  private static var isASCIIModeForEachClient: [String: Bool] = [:]
+  /// 給每個副本用的 isASCIIMode 追蹤用餐數。
+  private var isASCIIModeForThisClient: Bool {
+    get {
+      Self.isASCIIModeForEachClient[clientBundleIdentifier] ?? false
+    }
+    set {
+      Self.isASCIIModeForEachClient[clientBundleIdentifier] = newValue
+    }
+  }
 
   /// 輸入調度模組的副本。
   var inputHandler: InputHandlerProtocol?
