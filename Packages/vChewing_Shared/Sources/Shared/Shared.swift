@@ -275,7 +275,7 @@ public enum CandidateKey {
         return "- "
           + NSLocalizedString(
             "Minimum 6 candidate keys allowed.", comment: ""
-          ) + "\n" + "- " + NSLocalizedString("Maximum 9 candidate keys allowed.", comment: "")
+          ) + "\n" + "- " + NSLocalizedString("Maximum 10 candidate keys allowed.", comment: "")
       case .noError:
         return ""
       }
@@ -303,7 +303,7 @@ public enum CandidateKey {
         }
       }
     }
-    if !(6 ... 9).contains(candidateKeys.count) {
+    if !(6 ... 10).contains(candidateKeys.count) {
       result = CandidateKey.ValidationError.countMismatch
     }
     return result == ValidationError.noError ? nil : result.description

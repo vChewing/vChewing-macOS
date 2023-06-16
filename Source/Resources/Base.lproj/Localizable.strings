@@ -121,7 +121,7 @@
 "Candidate keys can only contain printable ASCII characters like alphanumericals." = "Candidate keys can only contain printable ASCII characters like alphanumericals.";
 "Candidate keys cannot contain space." = "Candidate keys cannot contain space.";
 "Minimum 6 candidate keys allowed." = "Minimum 6 candidate keys allowed.";
-"Maximum 9 candidate keys allowed." = "Maximum 9 candidate keys allowed.";
+"Maximum 10 candidate keys allowed." = "Maximum 10 candidate keys allowed.";
 "⚠︎ Phrase replacement mode enabled, interfering user phrase entry." = "⚠︎ Phrase replacement mode enabled, interfering user phrase entry.";
 "⚠︎ Unhandlable: Chars and Readings in buffer doesn't match." = "⚠︎ Unhandlable: Chars and Readings in buffer doesn't match.";
 "Per-Char Select Mode" = "Per-Char Select Mode";
