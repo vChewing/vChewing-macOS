@@ -121,7 +121,7 @@
 "Candidate keys can only contain printable ASCII characters like alphanumericals." = "選字鍵只能是英數等 ASCII 可列印字符。";
 "Candidate keys cannot contain space." = "選字鍵不得包含空格。";
 "Minimum 6 candidate keys allowed." = "請至少指定 6 個選字鍵。";
-"Maximum 9 candidate keys allowed." = "選字鍵最多只能指定 9 個。";
+"Maximum 10 candidate keys allowed." = "選字鍵最多只能指定 9 個。";
 "⚠︎ Phrase replacement mode enabled, interfering user phrase entry." = "⚠︎ 語彙置換功能已啟用，會波及語彙自訂。";
 "⚠︎ Unhandlable: Chars and Readings in buffer doesn't match." = "⚠︎ 無法處理：組字區字數與讀音數不對應。";
 "Per-Char Select Mode" = "模擬逐字選字輸入";
