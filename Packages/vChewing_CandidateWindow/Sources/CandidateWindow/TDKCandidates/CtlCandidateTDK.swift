@@ -106,20 +106,25 @@ public class CtlCandidateTDK: CtlCandidate, NSWindowDelegate {
     }
     delegate?.candidatePairHighlightChanged(at: highlightedIndex)
     DispatchQueue.main.async { [self] in
-      window.isOpaque = false
-      window.backgroundColor = .clear
-      viewCheck: do {
-        viewCheckCatalina: if #available(macOS 10.15, *) {
-          if useCocoa { break viewCheckCatalina }
-          Self.thePool.update()
-          Self.currentView = NSHostingView(rootView: theView)
-          break viewCheck
-        }
-        Self.currentView = theViewCocoa
-      }
-      window.contentView = Self.currentView
-      window.setContentSize(Self.currentView.fittingSize)
+      updateNSWindowModern(window)
     }
+  }
+
+  func updateNSWindowModern(_ window: NSWindow) {
+    window.isOpaque = false
+    window.backgroundColor = .clear
+    viewCheck: do {
+      viewCheckCatalina: if #available(macOS 10.15, *) {
+        if useCocoa { break viewCheckCatalina }
+        Self.thePool.update()
+        Self.currentView = NSHostingView(rootView: theView)
+        break viewCheck
+      }
+      Self.currentView = theViewCocoa
+    }
+    window.contentView = Self.currentView
+    window.setContentSize(Self.currentView.fittingSize)
+    delegate?.resetCandidateWindowOrigin()
   }
 
   func updateNSWindowLegacy(_ window: NSWindow) {
@@ -139,6 +144,7 @@ public class CtlCandidateTDK: CtlCandidate, NSWindowDelegate {
     Self.currentView.addSubview(viewToDraw)
     window.contentView = Self.currentView
     window.setContentSize(outerSize)
+    delegate?.resetCandidateWindowOrigin()
   }
 
   override public func scrollWheel(with event: NSEvent) {
