@@ -674,6 +674,7 @@
                                             </comboBoxCell>
                                             <connections>
                                                 <action selector="changeSelectionKeyAction:" target="-2" id="REj-7y-bbQ"/>
+                                                <binding destination="32" name="value" keyPath="values.CandidateKeys" id="5Fv-A4-QY5"/>
                                                 <binding destination="32" name="enabled" keyPath="values.UseIMKCandidateWindow" id="BDQ-gl-txA">
                                                     <dictionary key="options">
                                                         <string key="NSValueTransformerName">NSNegateBoolean</string>
@@ -1862,7 +1863,7 @@ DQ
                                         <constraint firstAttribute="width" relation="greaterThanOrEqual" constant="70" id="g7o-3C-NrU"/>
                                     </constraints>
                                     <connections>
-                                        <binding destination="32" name="value" keyPath="values.AutoCombineLongestPossibleCassetteKey" id="VUF-y7-K67"/>
+                                        <binding destination="32" name="value" keyPath="values.AutoCompositeWithLongestPossibleCassetteKey" id="OSk-i5-Mdr"/>
                                     </connections>
                                 </button>
                                 <button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="3eW-vq-tFr">
