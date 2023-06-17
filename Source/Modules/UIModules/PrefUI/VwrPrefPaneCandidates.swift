@@ -221,16 +221,17 @@ private struct VwrPrefPaneCandidates_SelectionKeys: View {
       items: CandidateKey.suggestions,
       text: $candidateKeys.onChange {
         let value = candidateKeys
-        let keys: String = value.trimmingCharacters(in: .whitespacesAndNewlines).deduplicated
+        let keys = value.trimmingCharacters(in: .whitespacesAndNewlines).lowercased().deduplicated
         // Start Error Handling.
         if let errorResult = CandidateKey.validate(keys: keys) {
           if let window = CtlPrefUIShared.sharedWindow, !keys.isEmpty {
             IMEApp.buzz()
             let alert = NSAlert(error: NSLocalizedString("Invalid Selection Keys.", comment: ""))
             alert.informativeText = errorResult
-            alert.beginSheetModal(for: window)
+            alert.beginSheetModal(for: window) { _ in
+              candidateKeys = PrefMgr.kDefaultCandidateKeys
+            }
           }
-          candidateKeys = PrefMgr.kDefaultCandidateKeys
         }
       }
     ).frame(width: 180).disabled(useIMKCandidateWindow)

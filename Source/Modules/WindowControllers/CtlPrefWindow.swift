@@ -296,19 +296,13 @@ class CtlPrefWindow: NSWindowController, NSWindowDelegate {
     IMEApp.buzz()
   }
 
-  @IBAction func changeSelectionKeyAction(_ sender: Any) {
-    guard
-      let keys = (sender as AnyObject).stringValue?.trimmingCharacters(
-        in: .whitespacesAndNewlines
-      )
-      .deduplicated
-    else {
-      selectionKeyComboBox.stringValue = PrefMgr.shared.candidateKeys
-      return
-    }
+  @IBAction func changeSelectionKeyAction(_: Any) {
+    let keys = selectionKeyComboBox.stringValue.trimmingCharacters(
+      in: .whitespacesAndNewlines
+    ).lowercased().deduplicated
+    // Start Error Handling.
     guard let errorResult = CandidateKey.validate(keys: keys) else {
       PrefMgr.shared.candidateKeys = keys
-      selectionKeyComboBox.stringValue = PrefMgr.shared.candidateKeys
       return
     }
     if let window = window {
