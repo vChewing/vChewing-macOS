@@ -296,10 +296,9 @@ public class PrefMgr: PrefMgrProtocol {
   @AppProperty(key: UserDef.kCandidateKeys.rawValue, defaultValue: kDefaultCandidateKeys)
   public var candidateKeys: String {
     didSet {
-      if candidateKeys != candidateKeys.deduplicated {
-        candidateKeys = candidateKeys.deduplicated
-      }
-      if !(6 ... 9).contains(candidateKeys.count) {
+      let optimized = candidateKeys.lowercased().deduplicated
+      if candidateKeys != optimized { candidateKeys = optimized }
+      if CandidateKey.validate(keys: candidateKeys) != nil {
         candidateKeys = Self.kDefaultCandidateKeys
       }
     }
