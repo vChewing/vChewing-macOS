@@ -144,6 +144,10 @@ public extension SessionCtl {
     candidateUI?.delegate = self // 會自動觸發田所選字窗的資料重載。
     candidateUI?.visible = true
 
+    resetCandidateWindowOrigin()
+  }
+
+  func resetCandidateWindowOrigin() {
     if isVerticalTyping {
       candidateUI?.set(
         windowTopLeftPoint: NSPoint(
