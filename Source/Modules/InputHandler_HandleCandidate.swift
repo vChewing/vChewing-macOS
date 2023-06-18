@@ -151,8 +151,8 @@ extension InputHandler {
     }
 
     var index: Int?
-    let matched: String =
-      (state.type == .ofAssociates) ? input.inputTextIgnoringModifiers ?? "" : input.text
+    var matched: String = [.ofAssociates, .ofInputting].contains(state.type)
+      ? input.inputTextIgnoringModifiers ?? "" : input.text
     checkSelectionKey: for keyPair in delegate.selectionKeys.enumerated() {
       guard matched.lowercased() == keyPair.element.lowercased() else { continue }
       index = Int(keyPair.offset)
