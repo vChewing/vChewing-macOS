@@ -106,8 +106,10 @@ public extension SessionCtl {
       candidateUI?.tooltip =
         singleLine ? "⇧" : NSLocalizedString("Hold ⇧ to choose associates.", comment: "")
     } else if state.type == .ofInputting, state.isCandidateContainer {
+      let useShift = !PrefMgr.shared.autoCompositeWithLongestPossibleCassetteKey
+      let theEmoji = useShift ? "⬆️" : "⚡️"
       candidateUI?.tooltip =
-        singleLine ? "⚡️" : "⚡️ " + NSLocalizedString("Quick Candidates", comment: "")
+        singleLine ? theEmoji : "\(theEmoji) " + NSLocalizedString("Quick Candidates", comment: "")
     } else if PrefMgr.shared.cassetteEnabled {
       candidateUI?.tooltip =
         singleLine ? "📼" : "📼 " + NSLocalizedString("CIN Cassette Mode", comment: "")
