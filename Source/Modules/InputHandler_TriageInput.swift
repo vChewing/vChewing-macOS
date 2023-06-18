@@ -138,12 +138,21 @@ extension InputHandler {
         return true
       }
 
+      // -----
+
       // 判斷是否響應傳統的漢音鍵盤符號模式熱鍵。
       haninSymbolInput: if prefs.classicHaninKeyboardSymbolModeShortcutEnabled {
         guard let x = input.inputTextIgnoringModifiers,
               "¥\\".contains(x), input.modifierFlags.isEmpty
         else { break haninSymbolInput }
         return handleHaninKeyboardSymbolModeToggle()
+      }
+
+      let hasQuickCandidates: Bool = state.type == .ofInputting && state.isCandidateContainer
+
+      if input.modifierFlags == .shift {
+        // 處理 `%quick` 選字行為（有摁住 Shift）。
+        guard !(hasQuickCandidates && handleCandidate(input: input)) else { return true }
       }
 
       // 注音按鍵輸入與漢音鍵盤符號輸入處理。
@@ -153,9 +162,12 @@ extension InputHandler {
         return compositionHandled
       }
 
-      // 處理 `%quick` 選字行為。
-      let quickCandidates: Bool = state.type == .ofInputting && state.isCandidateContainer
-      guard !(quickCandidates && handleCandidate(input: input)) else { return true }
+      if input.modifierFlags != .shift {
+        // 處理 `%quick` 選字行為（沒有摁住 Shift）。
+        guard !(hasQuickCandidates && handleCandidate(input: input)) else { return true }
+      }
+
+      // -----
 
       // 手動呼叫選字窗。
       if callCandidateState(input: input) { return true }
