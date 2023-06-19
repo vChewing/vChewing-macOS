@@ -152,21 +152,14 @@ extension InputHandler {
 
       let hasQuickCandidates: Bool = state.type == .ofInputting && state.isCandidateContainer
 
-      if input.modifierFlags == .shift {
-        // 處理 `%quick` 選字行為（有摁住 Shift）。
-        guard !(hasQuickCandidates && handleCandidate(input: input)) else { return true }
-      }
+      // 處理 `%quick` 選字行為（有摁住 Shift）。
+      guard !(hasQuickCandidates && handleCandidate(input: input)) else { return true }
 
       // 注音按鍵輸入與漢音鍵盤符號輸入處理。
       if isHaninKeyboardSymbolMode, [[], .shift].contains(input.modifierFlags) {
         return handleHaninKeyboardSymbolModeInput(input: input)
       } else if let compositionHandled = handleComposition(input: input) {
         return compositionHandled
-      }
-
-      if input.modifierFlags != .shift {
-        // 處理 `%quick` 選字行為（沒有摁住 Shift）。
-        guard !(hasQuickCandidates && handleCandidate(input: input)) else { return true }
       }
 
       // -----
