@@ -196,7 +196,10 @@ public extension IMEState {
   func attributedString(for session: IMKInputController) -> NSAttributedString {
     switch type {
     case .ofMarking: return data.attributedStringMarking(for: session)
-    case .ofAssociates, .ofSymbolTable: return data.attributedStringPlaceholder(for: session)
+    case .ofAssociates: return data.attributedStringPlaceholder(for: session)
+    case .ofSymbolTable:
+      guard !displayedText.isEmpty else { return data.attributedStringPlaceholder(for: session) }
+      return data.attributedStringNormal(for: session)
     default: return data.attributedStringNormal(for: session)
     }
   }
