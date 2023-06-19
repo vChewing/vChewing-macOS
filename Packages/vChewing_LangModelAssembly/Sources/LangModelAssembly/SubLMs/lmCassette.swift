@@ -30,6 +30,7 @@ public extension vChewingLM {
     public private(set) var quickDefMap: [String: String] = [:]
     public private(set) var charDefMap: [String: [String]] = [:]
     public private(set) var charDefWildcardMap: [String: [String]] = [:]
+    public private(set) var symbolDefMap: [String: [String]] = [:]
     public private(set) var reverseLookupMap: [String: [String]] = [:]
     /// 字根輸入法專用八股文：[字詞:頻次]。
     public private(set) var octagramMap: [String: Int] = [:]
@@ -66,6 +67,7 @@ public extension vChewingLM {
     /// - `%keyname begin` 至 `%keyname end` 之間是字根翻譯表，先讀取為 Swift 辭典以備用。
     /// - `%quick begin` 至 `%quick end` 之間則是簡碼資料，對應的 value 得拆成單個漢字。
     /// - `%chardef begin` 至 `%chardef end` 之間則是詞庫資料。
+    /// - `%symboldef begin` 至 `%symboldef end` 之間則是符號選單的專用資料。
     /// - `%octagram begin` 至 `%octagram end` 之間則是詞語頻次資料。
     /// 第三欄資料為對應字根、可有可無。第一欄與第二欄分別為「字詞」與「統計頻次」。
     /// - Parameter path: 檔案路徑。
@@ -84,10 +86,12 @@ public extension vChewingLM {
           var loadingKeys = false
           var loadingQuickSets = false
           var loadingCharDefinitions = false
+          var loadingSymbolDefinitions = false
           var loadingOctagramData = false
           for strLine in lineReader {
             if !loadingKeys, strLine.contains("%keyname"), strLine.contains("begin") { loadingKeys = true }
             if loadingKeys, strLine.contains("%keyname"), strLine.contains("end") { loadingKeys = false }
+            // %quick
             if !loadingQuickSets, strLine.contains("%quick"), strLine.contains("begin") {
               loadingQuickSets = true
             }
@@ -95,6 +99,7 @@ public extension vChewingLM {
               loadingQuickSets = false
               if quickDefMap.keys.contains(wildcardKey) { wildcardKey = "" }
             }
+            // %chardef
             if !loadingCharDefinitions, strLine.contains("%chardef"), strLine.contains("begin") {
               loadingCharDefinitions = true
             }
@@ -102,12 +107,22 @@ public extension vChewingLM {
               loadingCharDefinitions = false
               if charDefMap.keys.contains(wildcardKey) { wildcardKey = "" }
             }
+            // %symboldef
+            if !loadingSymbolDefinitions, strLine.contains("%symboldef"), strLine.contains("begin") {
+              loadingSymbolDefinitions = true
+            }
+            if loadingSymbolDefinitions, strLine.contains("%symboldef"), strLine.contains("end") {
+              loadingSymbolDefinitions = false
+              if symbolDefMap.keys.contains(wildcardKey) { wildcardKey = "" }
+            }
+            // %octagram
             if !loadingOctagramData, strLine.contains("%octagram"), strLine.contains("begin") {
               loadingOctagramData = true
             }
             if loadingOctagramData, strLine.contains("%octagram"), strLine.contains("end") {
               loadingOctagramData = false
             }
+            // Start data parsing.
             let cells: [String.SubSequence] =
               strLine.contains("\t") ? strLine.split(separator: "\t") : strLine.split(separator: " ")
             guard cells.count >= 2 else { continue }
@@ -118,7 +133,9 @@ public extension vChewingLM {
             } else if loadingQuickSets, !strLine.contains("%quick") {
               theMaxKeyLength = max(theMaxKeyLength, cells[0].count)
               quickDefMap[strFirstCell, default: .init()].append(strSecondCell)
-            } else if loadingCharDefinitions, !strLine.contains("%chardef") {
+            } else if loadingCharDefinitions, !loadingSymbolDefinitions,
+                      !strLine.contains("%chardef"), !strLine.contains("%symboldef")
+            {
               theMaxKeyLength = max(theMaxKeyLength, cells[0].count)
               charDefMap[strFirstCell, default: []].append(strSecondCell)
               reverseLookupMap[strSecondCell, default: []].append(strFirstCell)
@@ -127,6 +144,10 @@ public extension vChewingLM {
                 keyComps.removeLast()
                 charDefWildcardMap[keyComps.joined() + wildcard, default: []].append(strSecondCell)
               }
+            } else if loadingSymbolDefinitions, !strLine.contains("%chardef"), !strLine.contains("%symboldef") {
+              theMaxKeyLength = max(theMaxKeyLength, cells[0].count)
+              symbolDefMap[strFirstCell, default: []].append(strSecondCell)
+              reverseLookupMap[strSecondCell, default: []].append(strFirstCell)
             } else if loadingOctagramData, !strLine.contains("%octagram") {
               guard let countValue = Int(cells[1]) else { continue }
               switch cells.count {
