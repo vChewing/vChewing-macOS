@@ -1089,4 +1089,22 @@ extension InputHandler {
     }
     return false
   }
+
+  // MARK: - 處理磁帶模式的符號選單輸入
+
+  func handleCassetteSymbolTable(input: InputSignalProtocol) -> Bool {
+    guard let delegate = delegate else { return false }
+    guard prefs.cassetteEnabled else { return false }
+    let inputText = input.text
+    guard !inputText.isEmpty else { return false }
+    let queryString = calligrapher + inputText
+    let maybeResult = currentLM.cassetteSymbolDataFor(key: queryString)
+    guard let result = maybeResult else { return false }
+    let root = CandidateNode(name: queryString, symbols: result)
+    // 得在這裡先 commit buffer，不然會導致「在摁 ESC 離開符號選單時會重複輸入上一次的組字區的內容」的不當行為。
+    let textToCommit = generateStateOfInputting(sansReading: true).displayedText
+    delegate.switchState(IMEState.ofCommitting(textToCommit: textToCommit))
+    delegate.switchState(IMEState.ofSymbolTable(node: root))
+    return true
+  }
 }
