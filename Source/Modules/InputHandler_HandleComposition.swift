@@ -216,7 +216,6 @@ extension InputHandler {
     var wildcardKey: String { currentLM.cassetteWildcardKey } // 花牌鍵。
     let inputText = input.text
     let isWildcardKeyInput: Bool = (inputText == wildcardKey && !wildcardKey.isEmpty)
-    let calligrapherBackup = calligrapher
 
     let skipStrokeHandling =
       input.isReservedKey || input.isNumericPadKey || input.isNonLaptopFunctionKey
@@ -286,13 +285,6 @@ extension InputHandler {
       }
       // 向語言模型詢問是否有對應的記錄。
       if !currentLM.hasUnigramsFor(keyArray: [calligrapher]) {
-        // 此時立即處理 `%quick` 選字行為。
-        let quickCandidates: Bool = state.type == .ofInputting && state.isCandidateContainer
-        if quickCandidates, handleCandidate(input: input) {
-          if !calligrapher.isEmpty { calligrapher = calligrapherBackup }
-          return true
-        }
-
         delegate.callError("B49C0979_Cassette：語彙庫內無「\(calligrapher)」的匹配記錄。")
         calligrapher.removeAll()
         // 根據「組字器是否為空」來判定回呼哪一種狀態。
