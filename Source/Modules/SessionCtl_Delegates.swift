@@ -125,7 +125,26 @@ extension SessionCtl: CtlCandidateDelegate {
   }
 
   public func candidatePairHighlightChanged(at theIndex: Int) {
-    inputHandler?.previewCompositionBufferForCandidate(at: theIndex)
+    guard let inputHandler = inputHandler else { return }
+    guard state.isCandidateContainer else { return }
+    switch state.type {
+    case .ofCandidates where (0 ..< state.candidates.count).contains(theIndex):
+      inputHandler.previewCompositionBufferForCandidate(at: theIndex)
+    case .ofSymbolTable where (0 ..< state.node.members.count).contains(theIndex):
+      let node = state.node.members[theIndex]
+      if node.members.isEmpty {
+        state.data.displayedText = node.name
+        state.data.cursor = node.name.count
+      } else {
+        state.data.displayedText.removeAll()
+        state.data.cursor = 0
+      }
+      setInlineDisplayWithCursor()
+      if clientMitigationLevel >= 2, state.hasComposition {
+        updatePopupDisplayWithCursor()
+      }
+    default: break
+    }
   }
 
   public func candidatePairSelectionConfirmed(at index: Int) {
