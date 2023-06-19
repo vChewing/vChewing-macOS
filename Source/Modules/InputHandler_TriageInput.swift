@@ -148,6 +148,8 @@ extension InputHandler {
         return handleHaninKeyboardSymbolModeToggle()
       }
 
+      if handleCassetteSymbolTable(input: input) { return true }
+
       let hasQuickCandidates: Bool = state.type == .ofInputting && state.isCandidateContainer
 
       if input.modifierFlags == .shift {
