@@ -36,6 +36,7 @@ public extension vChewingLM {
     public private(set) var octagramMap: [String: Int] = [:]
     /// 音韻輸入法專用八股文：[字詞:(頻次, 讀音)]。
     public private(set) var octagramDividedMap: [String: (Int, String)] = [:]
+    public private(set) var areCandidateKeysShiftPressed: Bool = false
 
     /// 計算頻率時要用到的東西
     private static let fscale = 2.7
@@ -88,6 +89,7 @@ public extension vChewingLM {
           var loadingCharDefinitions = false
           var loadingSymbolDefinitions = false
           var loadingOctagramData = false
+          var keysUsedInCharDef: Set<String> = .init()
           for strLine in lineReader {
             if !loadingKeys, strLine.contains("%keyname"), strLine.contains("begin") { loadingKeys = true }
             if loadingKeys, strLine.contains("%keyname"), strLine.contains("end") { loadingKeys = false }
@@ -138,6 +140,11 @@ public extension vChewingLM {
             {
               theMaxKeyLength = max(theMaxKeyLength, cells[0].count)
               charDefMap[strFirstCell, default: []].append(strSecondCell)
+              if strFirstCell.count > 1 {
+                strFirstCell.map(\.description).forEach { keyChar in
+                  keysUsedInCharDef.insert(keyChar.description)
+                }
+              }
               reverseLookupMap[strSecondCell, default: []].append(strFirstCell)
               var keyComps = strFirstCell.map(\.description)
               while !keyComps.isEmpty {
@@ -175,7 +182,7 @@ public extension vChewingLM {
             if nameShort.isEmpty, strLine.contains("%sname ") { nameShort = strSecondCell }
             if nullCandidate.isEmpty, strLine.contains("%nullcandidate ") { nullCandidate = strSecondCell }
             if selectionKeys.isEmpty, strLine.contains("%selkey ") {
-              selectionKeys = cells[1].description
+              selectionKeys = cells[1].map(\.description).deduplicated.joined()
             }
             if endKeys.isEmpty, strLine.contains("%endkey ") {
               endKeys = cells[1].map(\.description).deduplicated
@@ -183,6 +190,11 @@ public extension vChewingLM {
             if wildcardKey.isEmpty, strLine.contains("%wildcardkey ") {
               wildcardKey = cells[1].first?.description ?? ""
             }
+          }
+          // Post process.
+          if CandidateKey.validate(keys: selectionKeys) != nil { selectionKeys = "1234567890" }
+          if !keysUsedInCharDef.intersection(selectionKeys.map(\.description)).isEmpty {
+            areCandidateKeysShiftPressed = true
           }
           maxKeyLength = theMaxKeyLength
           keyNameMap[wildcardKey] = keyNameMap[wildcardKey] ?? "？"
