@@ -49,6 +49,12 @@ extension InputHandler {
       }
     }
 
+    // MARK: 簡碼候選時對 BackSpace 的特殊處理
+
+    if input.isBackSpace, prefs.cassetteEnabled, state.type == .ofInputting {
+      return handleBackSpace(input: input)
+    }
+
     // MARK: 取消選字 (Cancel Candidate)
 
     let cancelCandidateKey =
