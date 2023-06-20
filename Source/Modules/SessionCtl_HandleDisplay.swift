@@ -106,7 +106,7 @@ public extension SessionCtl {
       candidateUI?.tooltip =
         singleLine ? "⇧" : NSLocalizedString("Hold ⇧ to choose associates.", comment: "")
     } else if state.type == .ofInputting, state.isCandidateContainer {
-      let useShift = !PrefMgr.shared.autoCompositeWithLongestPossibleCassetteKey
+      let useShift = LMMgr.currentLM.areCassetteCandidateKeysShiftPressed
       let theEmoji = useShift ? "⬆️" : "⚡️"
       candidateUI?.tooltip =
         singleLine ? theEmoji : "\(theEmoji) " + NSLocalizedString("Quick Candidates", comment: "")
