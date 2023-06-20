@@ -503,7 +503,15 @@ extension InputHandler {
     }
 
     switch isConsideredEmptyForNow {
-    case false: delegate.switchState(generateStateOfInputting())
+    case false:
+      var result = generateStateOfInputting()
+      // 針對 IMK 選字窗停用 `%quick` 特性，因為按鍵邏輯實在難以實作。
+      if prefs.cassetteEnabled, !prefs.useIMKCandidateWindow,
+         let fetched = currentLM.cassetteQuickSetsFor(key: calligrapher)
+      {
+        result.candidates = fetched.map { (keyArray: [""], value: $0.description) }
+      }
+      delegate.switchState(result)
     case true: delegate.switchState(IMEState.ofAbortion())
     }
     return true
