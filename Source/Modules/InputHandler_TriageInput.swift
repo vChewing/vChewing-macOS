@@ -138,8 +138,6 @@ extension InputHandler {
         return true
       }
 
-      // -----
-
       // 判斷是否響應傳統的漢音鍵盤符號模式熱鍵。
       haninSymbolInput: if prefs.classicHaninKeyboardSymbolModeShortcutEnabled {
         guard let x = input.inputTextIgnoringModifiers,
@@ -148,23 +146,12 @@ extension InputHandler {
         return handleHaninKeyboardSymbolModeToggle()
       }
 
-      // 處理 `%symboldef` 選字行為。
-      if handleCassetteSymbolTable(input: input) { return true }
-
-      // 處理 `%quick` 選字行為。
-      var handleQuickCandidate = true
-      if currentLM.areCassetteCandidateKeysShiftPressed { handleQuickCandidate = input.isShiftHold }
-      let hasQuickCandidates: Bool = state.type == .ofInputting && state.isCandidateContainer
-      guard !(hasQuickCandidates && handleQuickCandidate && handleCandidate(input: input)) else { return true }
-
       // 注音按鍵輸入與漢音鍵盤符號輸入處理。
       if isHaninKeyboardSymbolMode, [[], .shift].contains(input.modifierFlags) {
         return handleHaninKeyboardSymbolModeInput(input: input)
       } else if let compositionHandled = handleComposition(input: input) {
         return compositionHandled
       }
-
-      // -----
 
       // 手動呼叫選字窗。
       if callCandidateState(input: input) { return true }
