@@ -148,12 +148,14 @@ extension InputHandler {
         return handleHaninKeyboardSymbolModeToggle()
       }
 
+      // 處理 `%symboldef` 選字行為。
       if handleCassetteSymbolTable(input: input) { return true }
 
+      // 處理 `%quick` 選字行為。
+      var handleQuickCandidate = true
+      if currentLM.areCassetteCandidateKeysShiftPressed { handleQuickCandidate = input.isShiftHold }
       let hasQuickCandidates: Bool = state.type == .ofInputting && state.isCandidateContainer
-
-      // 處理 `%quick` 選字行為（有摁住 Shift）。
-      guard !(hasQuickCandidates && handleCandidate(input: input)) else { return true }
+      guard !(hasQuickCandidates && handleQuickCandidate && handleCandidate(input: input)) else { return true }
 
       // 注音按鍵輸入與漢音鍵盤符號輸入處理。
       if isHaninKeyboardSymbolMode, [[], .shift].contains(input.modifierFlags) {
