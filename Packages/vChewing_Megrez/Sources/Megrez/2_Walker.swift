@@ -19,10 +19,10 @@ public extension Megrez.Compositor {
   /// - Returns: 爬軌結果＋該過程是否順利執行。
   @discardableResult mutating func walk() -> [Megrez.Node] {
     defer { Self.reinitVertexNetwork() }
+    walkedNodes.removeAll()
     sortAndRelax()
     guard !spans.isEmpty else { return [] }
     var iterated: Megrez.Node? = Megrez.Node.leadingNode
-    walkedNodes.removeAll()
     while let itPrev = iterated?.prev {
       // 此處必須得是 Copy，讓組字器外部對此的操作影響不到組字器內部的節點。
       walkedNodes.insert(itPrev.copy, at: 0)
