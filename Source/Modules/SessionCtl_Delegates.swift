@@ -98,8 +98,9 @@ extension SessionCtl: CtlCandidateDelegate {
   }
 
   public var selectionKeys: String {
-    // `%quick` 模式僅支援 1234567890 選字鍵。
-    if state.type == .ofInputting, state.isCandidateContainer {
+    // 磁帶模式的 `%quick` 有單獨的選字鍵判定，會在資料不合規時使用 1234567890 選字鍵。
+    cassetteQuick: if state.type == .ofInputting, state.isCandidateContainer {
+      guard PrefMgr.shared.cassetteEnabled else { break cassetteQuick }
       guard let cinCandidateKey = LMMgr.currentLM.cassetteSelectionKey,
             CandidateKey.validate(keys: cinCandidateKey) == nil
       else {
