@@ -41,7 +41,7 @@ final class LMCassetteTests: XCTestCase {
   }
 
   func testCassetteLoadArray30() throws {
-    let pathCINFile = testDataPath + "array30.cin"
+    let pathCINFile = testDataPath + "array30.cin2"
     var lmCassette = vChewingLM.LMCassette()
     NSLog("LMCassette: Start loading CIN.")
     lmCassette.open(pathCINFile)
@@ -49,8 +49,8 @@ final class LMCassetteTests: XCTestCase {
     XCTAssertFalse(lmCassette.quickDefMap.isEmpty)
     print(lmCassette.quickSetsFor(key: ",.") ?? "")
     XCTAssertEqual(lmCassette.keyNameMap.count, 41)
-    XCTAssertEqual(lmCassette.charDefMap.count, 29537)
-    XCTAssertEqual(lmCassette.charDefWildcardMap.count, 11973)
+    XCTAssertEqual(lmCassette.charDefMap.count, 29491)
+    XCTAssertEqual(lmCassette.charDefWildcardMap.count, 11946)
     XCTAssertEqual(lmCassette.octagramMap.count, 0)
     XCTAssertEqual(lmCassette.octagramDividedMap.count, 0)
     XCTAssertEqual(lmCassette.nameShort, "AR30")

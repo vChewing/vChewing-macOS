@@ -17,6 +17,8 @@ public extension vChewingLM.LMInstantiator {
   var maxCassetteKeyLength: Int { Self.lmCassette.maxKeyLength }
   /// 磁帶模式專用：指定 `%quick` 快速候選結果當中要過濾掉的無效候選字符號。
   var nullCandidateInCassette: String { Self.lmCassette.nullCandidate }
+  /// 磁帶模式專用：選字鍵是否需要敲 Shift 才會生效。
+  var areCassetteCandidateKeysShiftPressed: Bool { Self.lmCassette.areCandidateKeysShiftPressed }
   /// 磁帶模式專用：選字鍵，在威注音輸入法當中僅優先用於快速模式。
   var cassetteSelectionKey: String? {
     let result = Self.lmCassette.selectionKeys
