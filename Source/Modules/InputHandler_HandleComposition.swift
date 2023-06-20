@@ -8,6 +8,7 @@
 
 /// 該檔案用來處理 InputHandler.HandleInput() 當中的與組字有關的行為。
 
+import AppKit
 import Shared
 import Tekkon
 
@@ -16,10 +17,31 @@ extension InputHandler {
   /// - Parameter input: 輸入訊號。
   /// - Returns: 告知 IMK「該按鍵是否已經被輸入法攔截處理」。
   func handleComposition(input: InputSignalProtocol) -> Bool? {
+    guard let delegate = delegate else { return nil }
     // 不處理任何包含不可列印字元的訊號。
     guard !input.text.isEmpty, input.charCode.isPrintable else { return nil }
     if isCodePointInputMode { return handleCodePointComposition(input: input) }
-    if prefs.cassetteEnabled { return handleCassetteComposition(input: input) }
+    if prefs.cassetteEnabled {
+      // 準備處理 `%quick` 選字行為。
+      var handleQuickCandidate = true
+      if currentLM.areCassetteCandidateKeysShiftPressed { handleQuickCandidate = input.isShiftHold }
+      let hasQuickCandidates: Bool = delegate.state.type == .ofInputting && delegate.state.isCandidateContainer
+
+      // 處理 `%symboldef` 選字行為。
+      if handleCassetteSymbolTable(input: input) {
+        return true
+      } else if hasQuickCandidates, input.text != currentLM.cassetteWildcardKey,
+                let itim = input.inputTextIgnoringModifiers,
+                let newEv = (input as? NSEvent)?.reinitiate(characters: itim)
+      {
+        // 處理 `%quick` 選字行為（當且僅當與 `%symboldef` 衝突的情況下）。
+        guard !(handleQuickCandidate && handleCandidate(input: newEv)) else { return true }
+      } else {
+        // 處理 `%quick` 選字行為。
+        guard !(hasQuickCandidates && handleQuickCandidate && handleCandidate(input: input)) else { return true }
+      }
+      return handleCassetteComposition(input: input)
+    }
     return handlePhonabetComposition(input: input)
   }
 
