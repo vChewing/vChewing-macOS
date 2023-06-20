@@ -140,9 +140,7 @@ extension SessionCtl: CtlCandidateDelegate {
         state.data.cursor = 0
       }
       setInlineDisplayWithCursor()
-      if clientMitigationLevel >= 2, state.hasComposition {
-        updatePopupDisplayWithCursor()
-      }
+      updatePopupDisplayWithCursor()
     default: break
     }
   }

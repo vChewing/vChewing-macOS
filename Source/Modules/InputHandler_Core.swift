@@ -433,9 +433,7 @@ public class InputHandler: InputHandlerProtocol {
     theState.data.marker = inputting.marker
     delegate.state = theState // 直接就地取代，不經過 switchState 處理，免得選字窗被重新載入。
     delegate.setInlineDisplayWithCursor()
-    if delegate.clientMitigationLevel >= 2, theState.hasComposition {
-      delegate.updatePopupDisplayWithCursor()
-    }
+    delegate.updatePopupDisplayWithCursor()
   }
 
   // MARK: - Extracted methods and functions (Tekkon).
