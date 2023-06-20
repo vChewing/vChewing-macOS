@@ -151,8 +151,12 @@ extension InputHandler {
     }
 
     var index: Int?
-    let matched: String = [.ofAssociates].contains(state.type)
-      ? input.inputTextIgnoringModifiers ?? "" : input.text
+    var shaltShiftHold = [.ofAssociates].contains(state.type)
+    if [.ofInputting].contains(state.type) {
+      let cassetteShift = currentLM.areCassetteCandidateKeysShiftPressed
+      shaltShiftHold = shaltShiftHold || cassetteShift
+    }
+    let matched: String = shaltShiftHold ? input.inputTextIgnoringModifiers ?? "" : input.text
     checkSelectionKey: for keyPair in delegate.selectionKeys.enumerated() {
       guard matched.lowercased() == keyPair.element.lowercased() else { continue }
       index = Int(keyPair.offset)
