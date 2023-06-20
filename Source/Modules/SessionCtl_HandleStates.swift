@@ -117,9 +117,6 @@ public extension SessionCtl {
       )
       attrStr = neo
     }
-    /// 所謂選區「selectionRange」，就是「可見游標位置」的位置，只不過長度
-    /// 是 0 且取代範圍（replacementRange）為「NSNotFound」罷了。
-    /// 也就是說，內文組字區該在哪裡出現，得由客體軟體來作主。
     doSetMarkedText(attrStr)
   }
 
@@ -149,6 +146,7 @@ public extension SessionCtl {
   }
 
   /// 把 setMarkedText 包裝一下，按需啟用 GCD。
+  /// - Remark: 內文組字區該在哪裡出現，得由客體軟體來作主。
   /// - Parameters:
   ///   - string: 要設定顯示的內容，必須得是 NSAttributedString（否則不顯示下劃線）且手動定義過下劃線。
   ///   警告：replacementRange 不要亂填，否則會在 Microsoft Office 等軟體內出現故障。
