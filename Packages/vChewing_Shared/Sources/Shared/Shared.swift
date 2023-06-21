@@ -74,6 +74,7 @@ public enum UserDef: String, CaseIterable {
   case kPhraseEditorAutoReloadExternalModifications = "PhraseEditorAutoReloadExternalModifications"
   case kClassicHaninKeyboardSymbolModeShortcutEnabled = "ClassicHaninKeyboardSymbolModeShortcutEnabled"
 
+  case kUseSpaceToCommitHighlightedSCPCCandidate = "UseSpaceToCommitHighlightedSCPCCandidate"
   case kUseIMKCandidateWindow = "UseIMKCandidateWindow"
   case kEnableSwiftUIForTDKCandidates = "EnableSwiftUIForTDKCandidates"
   case kEnableMouseScrollingForTDKCandidatesCocoa = "EnableMouseScrollingForTDKCandidatesCocoa"
