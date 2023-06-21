@@ -51,6 +51,7 @@
 "chkKeepReadingUponCompositionError.title" = "効かぬ音読みを BackSpace で再編集";
 "chkOnlyLoadFactoryLangModelsIfNeeded.title" = "必要性を判断してから内蔵辞書を読み込む";
 "chkUseFixecCandidateOrderOnSelection.title" = "候補文字を固定順番で陳列する";
+"clN-4A-iec.title" = "全候補入力の場合、ハイライト候補を Space キーで確認";
 "Cp2-hn-bOq.title" = "カセットモードによる漢字出力の簡繁転換を行わずにする";
 "DbW-eq-ZdB.title" = "星光";
 "dIN-TZ-67g.title" = "Shift+Space で次のページ、Space で次の候補文字を";
