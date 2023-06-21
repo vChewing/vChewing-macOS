@@ -51,6 +51,7 @@
 "chkKeepReadingUponCompositionError.title" = "Allow backspace-editing miscomposed readings";
 "chkOnlyLoadFactoryLangModelsIfNeeded.title" = "Only load factory language models if needed";
 "chkUseFixecCandidateOrderOnSelection.title" = "Always use fixed listing order in candidate window";
+"clN-4A-iec.title" = "Use Space to confirm highlighted candidate in Per-Char Select Mode";
 "Cp2-hn-bOq.title" = "Disable forced conversion for cassette outputs";
 "DbW-eq-ZdB.title" = "Starlight";
 "dIN-TZ-67g.title" = "Space to +revolve candidates, Shift+Space to +revolve pages";
