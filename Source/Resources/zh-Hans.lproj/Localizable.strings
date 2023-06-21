@@ -354,6 +354,7 @@
 "Use ESC key to clear the entire input buffer" = "敲 ESC 键以清空整个组字缓冲区";
 "Use IMK Candidate Window instead of Tadokoro" = "启用与 macOS 内建输入法相同的 IMK 选字窗";
 "Use only one row / column in candidate window." = "仅以单行/单列来陈列候选字。";
+"Use Space to confirm highlighted candidate in Per-Char Select Mode" = "在逐字选字模式当中使用空格键确认当前高亮候选字";
 "Vertical" = "纵向布局";
 "Warning: This page is for testing future features. \nFeatures listed here may not work as expected." = "警告：该页面仅作未来功能测试所用。\n在此列出的功能并非处于完全可用之状态。";
 "Wade-Giles Pinyin with Numeral Intonation" = "韦氏拼音+数字标调";
