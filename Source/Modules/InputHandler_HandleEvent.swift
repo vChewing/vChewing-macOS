@@ -8,6 +8,7 @@
 
 /// 該檔案乃輸入調度模組當中用來預處理 NSEvent 的模組。
 
+import CocoaExtension
 import InputMethodKit
 import Shared
 
@@ -99,6 +100,18 @@ extension InputHandler {
       }
       return true
     } else if event.isSpace {
+      if prefs.useSpaceToCommitHighlightedSCPCCandidate, prefs.useSCPCTypingMode,
+         let eventTranslated = event.reinitiate(keyCode: KeyCode.kCarriageReturn.rawValue)
+      {
+        if #available(macOS 10.14, *) {
+          PrefMgr.shared.failureFlagForIMKCandidates = true
+          imkC.handleKeyboardEvent(eventTranslated)
+          PrefMgr.shared.failureFlagForIMKCandidates = false
+        } else {
+          imkC.interpretKeyEvents([eventTranslated])
+        }
+        return true
+      }
       switch prefs.specifyShiftSpaceKeyBehavior {
       case true: _ = event.isShiftHold ? imkC.highlightNextCandidate() : imkC.showNextPage()
       case false: _ = event.isShiftHold ? imkC.showNextPage() : imkC.highlightNextCandidate()
