@@ -58,6 +58,16 @@ public class SessionCtl: IMKInputController {
   /// 用來標記當前副本是否已處於活動狀態。
   public var isActivated = false
 
+  /// 用来記錄當前副本是否處於開機階段（activateServer 執行後 0.1 秒以內都算）。
+  public private(set) var isBootingUp: Bool = true {
+    didSet {
+      guard isBootingUp else { return }
+      DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
+        self.isBootingUp = false
+      }
+    }
+  }
+
   /// 當前副本的客體是否是輸入法本體？
   public var isServingIMEItself: Bool = false
 
@@ -274,6 +284,7 @@ public extension SessionCtl {
   /// - Parameter sender: 呼叫了該函式的客體。
   override func activateServer(_ sender: Any!) {
     super.activateServer(sender)
+    isBootingUp = true
     DispatchQueue.main.async { [self] in
       if let senderBundleID: String = (sender as? IMKTextInput)?.bundleIdentifier() {
         vCLog("activateServer(\(senderBundleID))")
