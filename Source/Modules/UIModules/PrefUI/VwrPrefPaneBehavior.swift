@@ -37,6 +37,9 @@ struct VwrPrefPaneBehavior: View {
   @Backport.AppStorage(wrappedValue: false, UserDef.kSpecifyShiftSpaceKeyBehavior.rawValue)
   private var specifyShiftSpaceKeyBehavior: Bool
 
+  @Backport.AppStorage(wrappedValue: true, UserDef.kUseSpaceToCommitHighlightedSCPCCandidate.rawValue)
+  private var useSpaceToCommitHighlightedSCPCCandidate: Bool
+
   @Backport.AppStorage(wrappedValue: true, UserDef.kAlsoConfirmAssociatedCandidatesByEnter.rawValue)
   private var alsoConfirmAssociatedCandidatesByEnter: Bool
 
@@ -146,6 +149,10 @@ struct VwrPrefPaneBehavior: View {
           .pickerStyle(RadioGroupPickerStyle())
           Text(LocalizedStringKey("Choose the behavior of (Shift+)Space key with candidates."))
             .preferenceDescription(maxWidth: CtlPrefUIShared.maxDescriptionWidth)
+          Toggle(
+            LocalizedStringKey("Use Space to confirm highlighted candidate in Per-Char Select Mode"),
+            isOn: $useSpaceToCommitHighlightedSCPCCandidate
+          ).controlSize(.small)
         }
         SSPreferences.Settings.Section(title: "Shift+Letter:".localized, bottomDivider: true) {
           Picker(

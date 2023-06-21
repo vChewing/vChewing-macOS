@@ -354,6 +354,7 @@
 "Use ESC key to clear the entire input buffer" = "Use ESC key to clear the entire input buffer";
 "Use IMK Candidate Window instead of Tadokoro" = "Use IMK Candidate Window instead of Tadokoro";
 "Use only one row / column in candidate window." = "Use only one row / column in candidate window.";
+"Use Space to confirm highlighted candidate in Per-Char Select Mode" = "Use Space to confirm highlighted candidate in Per-Char Select Mode";
 "Vertical" = "Vertical";
 "Warning: This page is for testing future features. \nFeatures listed here may not work as expected." = "Warning: This page is for testing future features. \nFeatures listed here may not work as expected.";
 "Wade-Giles Pinyin with Numeral Intonation" = "Wade-Giles Pinyin with Numeral Intonation";
