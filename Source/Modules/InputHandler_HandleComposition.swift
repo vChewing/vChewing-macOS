@@ -256,12 +256,8 @@ extension InputHandler {
     prehandling: if !skipStrokeHandling && currentLM.isThisCassetteKeyAllowed(key: inputText) {
       if calligrapher.isEmpty, isWildcardKeyInput {
         delegate.callError("3606B9C0")
-        var newEmptyState = compositor.isEmpty ? IMEState.ofEmpty() : generateStateOfInputting()
-        newEmptyState.tooltip = NSLocalizedString("Wildcard key cannot be the initial key.", comment: "")
-        newEmptyState.data.tooltipColorState = .redAlert
-        newEmptyState.tooltipDuration = 1.0
-        delegate.switchState(newEmptyState)
-        return true
+        delegate.callNotification(NSLocalizedString("Wildcard key cannot be the initial key.", comment: ""))
+        return nil
       }
       if isStrokesFull {
         delegate.callError("2268DD51: calligrapher is full, clearing calligrapher.")
