@@ -64,6 +64,7 @@ public protocol InputHandlerDelegate {
   var clientBundleIdentifier: String { get }
   var clientMitigationLevel: Int { get }
   func callError(_ logMessage: String)
+  func callNotification(_ message: String)
   func updateVerticalTypingStatus()
   func switchState(_ newState: IMEStateProtocol)
   func candidateController() -> CtlCandidateProtocol?
