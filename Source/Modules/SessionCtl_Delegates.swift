@@ -6,6 +6,7 @@
 // marks, or product names of Contributor, except as required to fulfill notice
 // requirements defined in MIT License.
 
+import NotifierUI
 import Shared
 
 // MARK: - InputHandler Delegate
@@ -24,6 +25,10 @@ extension SessionCtl: InputHandlerDelegate {
 
   public func candidateSelectionConfirmedByInputHandler(at index: Int) {
     candidatePairSelectionConfirmed(at: index)
+  }
+
+  public func callNotification(_ message: String) {
+    Notifier.notify(message: message)
   }
 
   public func callError(_ logMessage: String) {
