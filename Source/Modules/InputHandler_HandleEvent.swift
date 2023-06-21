@@ -27,6 +27,7 @@ extension InputHandler {
   /// - Parameter event: 由 IMK 選字窗接收的裝置操作輸入事件。
   /// - Returns: 回「`true`」以將該按鍵已攔截處理的訊息傳遞給 IMK；回「`false`」則放行、不作處理。
   private func imkCandidatesEventPreHandler(event eventToDeal: NSEvent) -> Bool? {
+    guard prefs.useIMKCandidateWindow else { return nil }
     guard let delegate = delegate, delegate.state.isCandidateContainer else { return nil }
 
     // IMK 選字窗處理，當且僅當啟用了 IMK 選字窗的時候才會生效。
