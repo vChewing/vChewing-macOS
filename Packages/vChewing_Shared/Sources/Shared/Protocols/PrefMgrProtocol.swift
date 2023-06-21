@@ -45,6 +45,7 @@ public protocol PrefMgrProtocol {
   var alwaysShowTooltipTextsHorizontally: Bool { get set }
   var clientsIMKTextInputIncapable: [String: Bool] { get set }
   var onlyLoadFactoryLangModelsIfNeeded: Bool { get set }
+  var useSpaceToCommitHighlightedSCPCCandidate: Bool { get set }
   var useIMKCandidateWindow: Bool { get set }
   var enableSwiftUIForTDKCandidates: Bool { get set }
   var enableMouseScrollingForTDKCandidatesCocoa: Bool { get set }

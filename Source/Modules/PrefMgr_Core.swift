@@ -182,6 +182,9 @@ public class PrefMgr: PrefMgrProtocol {
 
   // MARK: - Settings (Tier 2)
 
+  @AppProperty(key: UserDef.kUseSpaceToCommitHighlightedSCPCCandidate.rawValue, defaultValue: true)
+  public var useSpaceToCommitHighlightedSCPCCandidate: Bool
+
   @AppProperty(key: UserDef.kUseIMKCandidateWindow.rawValue, defaultValue: false)
   public var useIMKCandidateWindow: Bool
 
