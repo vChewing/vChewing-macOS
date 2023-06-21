@@ -106,6 +106,10 @@ extension InputHandler {
         _ = updated ? {}() : delegate.callError("9B691919")
         return true
       case .kSpace where state.type != .ofInputting:
+        guard !(prefs.useSpaceToCommitHighlightedSCPCCandidate && prefs.useSCPCTypingMode) else {
+          delegate.candidateSelectionConfirmedByInputHandler(at: ctlCandidate.highlightedIndex)
+          return true
+        }
         let updated: Bool =
           prefs.specifyShiftSpaceKeyBehavior
             ? (input.isShiftHold
