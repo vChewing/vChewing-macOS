@@ -62,10 +62,12 @@ extension InputHandler {
       displayTextSegments[i] = displayTextSegments[i].trimmingCharacters(in: .newlines)
     }
     /// 這裡生成準備要拿來回呼的「正在輸入」狀態。
-    return IMEState.ofInputting(
+    var result = IMEState.ofInputting(
       displayTextSegments: displayTextSegments,
       cursor: cursor, highlightAt: segHighlightedAt
     )
+    result.marker = compositor.cursor
+    return result
   }
 
   /// 生成「在有單獨的前置聲調符號輸入時」的工具提示。
