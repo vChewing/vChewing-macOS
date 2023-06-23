@@ -153,7 +153,7 @@ extension InputHandler {
     var index: Int?
     var shaltShiftHold = [.ofAssociates].contains(state.type)
     if [.ofInputting].contains(state.type) {
-      let cassetteShift = currentLM.areCassetteCandidateKeysShiftPressed
+      let cassetteShift = currentLM.areCassetteCandidateKeysShiftHeld
       shaltShiftHold = shaltShiftHold || cassetteShift
     }
     let matched: String = shaltShiftHold ? input.inputTextIgnoringModifiers ?? "" : input.text

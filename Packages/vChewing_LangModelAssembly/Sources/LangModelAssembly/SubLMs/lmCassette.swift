@@ -36,7 +36,7 @@ public extension vChewingLM {
     public private(set) var octagramMap: [String: Int] = [:]
     /// 音韻輸入法專用八股文：[字詞:(頻次, 讀音)]。
     public private(set) var octagramDividedMap: [String: (Int, String)] = [:]
-    public private(set) var areCandidateKeysShiftPressed: Bool = false
+    public private(set) var areCandidateKeysShiftHeld: Bool = false
 
     /// 計算頻率時要用到的東西
     private static let fscale = 2.7
@@ -194,7 +194,7 @@ public extension vChewingLM {
           // Post process.
           if CandidateKey.validate(keys: selectionKeys) != nil { selectionKeys = "1234567890" }
           if !keysUsedInCharDef.intersection(selectionKeys.map(\.description)).isEmpty {
-            areCandidateKeysShiftPressed = true
+            areCandidateKeysShiftHeld = true
           }
           maxKeyLength = theMaxKeyLength
           keyNameMap[wildcardKey] = keyNameMap[wildcardKey] ?? "？"
