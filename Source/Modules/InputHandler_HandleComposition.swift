@@ -24,7 +24,7 @@ extension InputHandler {
     if prefs.cassetteEnabled {
       // 準備處理 `%quick` 選字行為。
       var handleQuickCandidate = true
-      if currentLM.areCassetteCandidateKeysShiftPressed { handleQuickCandidate = input.isShiftHold }
+      if currentLM.areCassetteCandidateKeysShiftHeld { handleQuickCandidate = input.isShiftHold }
       let hasQuickCandidates: Bool = delegate.state.type == .ofInputting && delegate.state.isCandidateContainer
 
       // 處理 `%symboldef` 選字行為。
