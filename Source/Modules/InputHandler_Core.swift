@@ -71,8 +71,8 @@ public protocol InputHandlerDelegate {
   func candidateSelectionConfirmedByInputHandler(at index: Int)
   func setInlineDisplayWithCursor()
   func updatePopupDisplayWithCursor()
-  func performUserPhraseOperation(addToFilter: Bool)
-    -> Bool
+  func performUserPhraseOperation(addToFilter: Bool) -> Bool
+  func deductCandidateIndex(from candidateString: String) -> Int
 }
 
 // MARK: - 核心 (Kernel).
