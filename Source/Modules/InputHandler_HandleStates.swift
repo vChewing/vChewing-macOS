@@ -507,8 +507,13 @@ extension InputHandler {
     switch isConsideredEmptyForNow {
     case false:
       var result = generateStateOfInputting()
-      if prefs.cassetteEnabled, let fetched = currentLM.cassetteQuickSetsFor(key: calligrapher) {
-        result.candidates = fetched.map { (keyArray: [""], value: $0.description) }
+      if prefs.cassetteEnabled, var fetched = currentLM.cassetteQuickSetsFor(key: calligrapher) {
+        if prefs.useIMKCandidateWindow {
+          fetched = fetched.deduplicated.filter { $0.description != currentLM.nullCandidateInCassette }
+        }
+        result.candidates = fetched.enumerated().map {
+          (keyArray: [$0.offset.description], value: $0.element.description)
+        }
       }
       delegate.switchState(result)
     case true: delegate.switchState(IMEState.ofAbortion())
