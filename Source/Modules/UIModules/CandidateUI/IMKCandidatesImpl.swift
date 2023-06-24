@@ -148,7 +148,11 @@ public class CtlCandidateIMK: IMKCandidates, CtlCandidateProtocol {
   public func candidateIndexAtKeyLabelIndex(_: Int) -> Int? { 0 }
 
   public var highlightedIndex: Int {
-    get { selectedCandidate() }
+    get {
+      let returned = selectedCandidate()
+      guard let strCurrentCandidate = selectedCandidateString() else { return returned }
+      return delegate?.deductCandidateIndex(from: strCurrentCandidate.string) ?? returned
+    }
     set { selectCandidate(withIdentifier: newValue) }
   }
 }

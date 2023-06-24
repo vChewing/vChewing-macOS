@@ -14,6 +14,7 @@ public protocol CtlCandidateDelegate {
   func candidatePairHighlightChanged(at index: Int)
   func candidatePairRightClicked(at index: Int, action: CandidateContextMenuAction)
   func candidates(_ sender: Any!) -> [Any]!
+  func deductCandidateIndex(from candidateString: String) -> Int
   func resetCandidateWindowOrigin()
   @discardableResult func reverseLookup(for value: String) -> [String]
   var selectionKeys: String { get }
