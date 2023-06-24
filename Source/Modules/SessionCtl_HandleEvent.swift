@@ -150,7 +150,7 @@ public extension SessionCtl {
     Self.areWeNerfing = eventToDeal.modifierFlags == [.shift, .command]
 
     /// 直接交給 commonEventHandler 來處理。
-    let result = inputHandler.handleEvent(eventToDeal)
+    let result = inputHandler.triageInput(event: eventToDeal)
     if !result {
       // 除非是 .ofMarking 狀態，否則讓某些不用去抓的按鍵起到「取消工具提示」的作用。
       if [.ofEmpty].contains(state.type) { tooltipInstance.hide() }
