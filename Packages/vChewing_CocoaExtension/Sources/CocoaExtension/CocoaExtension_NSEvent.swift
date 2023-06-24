@@ -250,6 +250,15 @@ public enum KeyCode: UInt16 {
   case kRightArrow = 124
   case kDownArrow = 125
   case kUpArrow = 126
+
+  public func toEvent() -> NSEvent? {
+    NSEvent.keyEvent(
+      with: .keyDown, location: .zero, modifierFlags: [],
+      timestamp: TimeInterval(), windowNumber: 0, context: nil,
+      characters: "", charactersIgnoringModifiers: "",
+      isARepeat: false, keyCode: rawValue
+    )
+  }
 }
 
 enum KeyCodeBlackListed: UInt16 {
