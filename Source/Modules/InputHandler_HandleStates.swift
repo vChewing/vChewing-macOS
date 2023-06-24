@@ -512,7 +512,7 @@ extension InputHandler {
           fetched = fetched.deduplicated.filter { $0.description != currentLM.nullCandidateInCassette }
         }
         result.candidates = fetched.enumerated().map {
-          (keyArray: [$0.offset.description], value: $0.element.description)
+          (keyArray: [($0.offset + 1).description], value: $0.element.description)
         }
       }
       delegate.switchState(result)
