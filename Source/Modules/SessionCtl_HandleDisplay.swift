@@ -97,6 +97,9 @@ public extension SessionCtl {
     var singleLine = isVerticalTyping || PrefMgr.shared.candidateWindowShowOnlyOneLine
     singleLine = singleLine || isInputtingWithCandidates
     (candidateUI as? CtlCandidateTDK)?.maxLinesPerPage = singleLine ? 1 : 4
+    if isInputtingWithCandidates, candidateLayout == .horizontal {
+      (candidateUI as? CtlCandidateIMK)?.setPanelType(kIMKSingleRowSteppingCandidatePanel)
+    }
 
     candidateUI?.candidateFont = Self.candidateFont(
       name: PrefMgr.shared.candidateTextFontName, size: PrefMgr.shared.candidateListTextSize

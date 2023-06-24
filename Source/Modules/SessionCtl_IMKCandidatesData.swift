@@ -54,7 +54,7 @@ public extension SessionCtl {
     case .ofAssociates:
       handleIMKCandidatesPrepared(state.candidates, prefix: "⇧")
     case .ofInputting where state.isCandidateContainer:
-      handleIMKCandidatesPrepared(state.candidates, prefix: "🗲")
+      handleIMKCandidatesPrepared(state.candidates)
     case .ofCandidates:
       guard !state.candidates.isEmpty else { return .init() }
       if state.candidates[0].keyArray.joined(separator: "-").contains("_punctuation") {
@@ -126,7 +126,7 @@ public extension SessionCtl {
     case .ofAssociates:
       fixIndexForIMKCandidates(&indexDeducted, prefix: "⇧", source: candidateString)
     case .ofInputting where state.isCandidateContainer:
-      fixIndexForIMKCandidates(&indexDeducted, prefix: "🗲", source: candidateString)
+      fixIndexForIMKCandidates(&indexDeducted, source: candidateString)
     case .ofSymbolTable:
       fixSymbolIndexForIMKCandidates()
     case .ofCandidates:
