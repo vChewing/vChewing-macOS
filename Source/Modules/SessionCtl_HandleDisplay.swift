@@ -169,6 +169,7 @@ public extension SessionCtl {
 
   /// FB10978412: Since macOS 11 Big Sur, CTFontCreateUIFontForLanguage cannot
   /// distinguish zh-Hans and zh-Hant with correct adoptation of proper PingFang SC/TC variants.
+  /// Update: This has been fixed in macOS 13.
   ///
   /// Instructions for Apple Developer relations to reveal this bug:
   ///
