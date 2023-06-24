@@ -103,6 +103,7 @@ extension SessionCtl: CtlCandidateDelegate {
   }
 
   public var selectionKeys: String {
+    guard !PrefMgr.shared.useIMKCandidateWindow else { return "123456789" }
     // 磁帶模式的 `%quick` 有單獨的選字鍵判定，會在資料不合規時使用 1234567890 選字鍵。
     cassetteQuick: if state.type == .ofInputting, state.isCandidateContainer {
       guard PrefMgr.shared.cassetteEnabled else { break cassetteQuick }
@@ -113,7 +114,6 @@ extension SessionCtl: CtlCandidateDelegate {
       }
       return cinCandidateKey
     }
-    if PrefMgr.shared.useIMKCandidateWindow { return "123456789" }
     return PrefMgr.shared.candidateKeys
   }
 
