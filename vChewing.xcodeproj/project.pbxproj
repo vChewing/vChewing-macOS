@@ -96,7 +96,6 @@
 		5BDB7A4128D4824A001AC277 /* Megrez in Frameworks */ = {isa = PBXBuildFile; productRef = 5BDB7A4028D4824A001AC277 /* Megrez */; };
 		5BDB7A4528D4824A001AC277 /* ShiftKeyUpChecker in Frameworks */ = {isa = PBXBuildFile; productRef = 5BDB7A4428D4824A001AC277 /* ShiftKeyUpChecker */; };
 		5BDB7A4728D4824A001AC277 /* Tekkon in Frameworks */ = {isa = PBXBuildFile; productRef = 5BDB7A4628D4824A001AC277 /* Tekkon */; };
-		5BE1F8A928F86AB5006C7FF5 /* InputHandler_HandleEvent.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5BE1F8A828F86AB5006C7FF5 /* InputHandler_HandleEvent.swift */; };
 		5BE377A0288FED8D0037365B /* InputHandler_HandleComposition.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5BE3779F288FED8D0037365B /* InputHandler_HandleComposition.swift */; };
 		5BEDB721283B4C250078EB25 /* data-cns.json in Resources */ = {isa = PBXBuildFile; fileRef = 5BEDB71D283B4AEA0078EB25 /* data-cns.json */; };
 		5BEDB722283B4C250078EB25 /* data-zhuyinwen.json in Resources */ = {isa = PBXBuildFile; fileRef = 5BEDB71F283B4AEA0078EB25 /* data-zhuyinwen.json */; };
@@ -298,7 +297,6 @@
 		5BDCBB4827B4F6C600D0CC59 /* zh-Hant */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "zh-Hant"; path = "zh-Hant.lproj/Localizable.strings"; sourceTree = "<group>"; };
 		5BDCBB4927B4F6C700D0CC59 /* zh-Hant */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "zh-Hant"; path = "zh-Hant.lproj/InfoPlist.strings"; sourceTree = "<group>"; };
 		5BDCBB4A27B4F6C700D0CC59 /* zh-Hant */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "zh-Hant"; path = "zh-Hant.lproj/Localizable.strings"; sourceTree = "<group>"; };
-		5BE1F8A828F86AB5006C7FF5 /* InputHandler_HandleEvent.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InputHandler_HandleEvent.swift; sourceTree = "<group>"; };
 		5BE3779F288FED8D0037365B /* InputHandler_HandleComposition.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InputHandler_HandleComposition.swift; sourceTree = "<group>"; };
 		5BE8A8C4281EE65300197741 /* CONTRIBUTING.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = CONTRIBUTING.md; sourceTree = "<group>"; };
 		5BEDB71C283B4AEA0078EB25 /* data-chs.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; name = "data-chs.json"; path = "Data/data-chs.json"; sourceTree = "<group>"; };
@@ -693,7 +691,6 @@
 				5BD0113C2818543900609769 /* InputHandler_Core.swift */,
 				5B782EC3280C243C007276DE /* InputHandler_HandleCandidate.swift */,
 				5BE3779F288FED8D0037365B /* InputHandler_HandleComposition.swift */,
-				5BE1F8A828F86AB5006C7FF5 /* InputHandler_HandleEvent.swift */,
 				5B3133BE280B229700A4A505 /* InputHandler_HandleStates.swift */,
 				5B7F225C2808501000DDD3CB /* InputHandler_TriageInput.swift */,
 				5BAEFACF28012565001F42C9 /* LMMgr_Core.swift */,
@@ -1128,7 +1125,6 @@
 				5BB1D7F42999027200EA8D2C /* PrefUITabs.swift in Sources */,
 				5B33844F29B8B4C200FCB497 /* LMMgr_PhraseEditorDelegate.swift in Sources */,
 				5B21176C287539BB000443A9 /* SessionCtl_HandleStates.swift in Sources */,
-				5BE1F8A928F86AB5006C7FF5 /* InputHandler_HandleEvent.swift in Sources */,
 				5B69938C293B811F0057CB8E /* VwrPrefPanePhrases.swift in Sources */,
 				5BAEFAD028012565001F42C9 /* LMMgr_Core.swift in Sources */,
 				5BCC631629407BBB00A2D84F /* CtlPrefWindow_PhraseEditor.swift in Sources */,

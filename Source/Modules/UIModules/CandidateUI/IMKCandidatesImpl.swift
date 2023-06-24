@@ -45,9 +45,7 @@ public class CtlCandidateIMK: IMKCandidates, CtlCandidateProtocol {
   public var candidateFont = NSFont.systemFont(ofSize: 16) {
     didSet {
       if #available(macOS 10.14, *) {
-        PrefMgr.shared.failureFlagForIMKCandidates = true
-        setFontSize(candidateFont.pointSize)
-        PrefMgr.shared.failureFlagForIMKCandidates = false
+        protectedCall { self.setFontSize(self.candidateFont.pointSize) }
       }
       var attributes = attributes()
       // FB11300759: Set "NSAttributedString.Key.font" doesn't work.
@@ -97,6 +95,14 @@ public class CtlCandidateIMK: IMKCandidates, CtlCandidateProtocol {
     fatalError("init(coder:) has not been implemented")
   }
 
+  private func protectedCall(_ task: @escaping () -> Void) {
+    guard #available(macOS 10.14, *) else { return }
+    let key = UserDef.kFailureFlagForIMKCandidates.rawValue
+    UserDefaults.standard.set(true, forKey: key)
+    task()
+    UserDefaults.standard.set(false, forKey: key)
+  }
+
   public func reloadData() {
     // guard let delegate = delegate else { return }  // 下文無效，所以這句沒用。
     // 既然下述函式無效，那中間這段沒用的也都砍了。
@@ -105,18 +111,15 @@ public class CtlCandidateIMK: IMKCandidates, CtlCandidateProtocol {
     update()
   }
 
-  /// 幹話：這裡很多函式內容亂寫也都無所謂了，因為都被 IMKCandidates 代管執行。
-  /// 對於所有 IMK 選字窗的選字判斷動作，不是在 inputHandler 中，而是在 `SessionCtl_HandleEvent` 中。
-
   // 該函式會影響 IMK 選字窗。
   @discardableResult public func showNextPage() -> Bool {
-    do { currentLayout == .vertical ? moveRight(self) : moveDown(self) }
+    scrollPageDown(self)
     return true
   }
 
   // 該函式會影響 IMK 選字窗。
   @discardableResult public func showPreviousPage() -> Bool {
-    do { currentLayout == .vertical ? moveLeft(self) : moveUp(self) }
+    scrollPageUp(self)
     return true
   }
 
@@ -155,6 +158,24 @@ public class CtlCandidateIMK: IMKCandidates, CtlCandidateProtocol {
     }
     set { selectCandidate(withIdentifier: newValue) }
   }
+
+  @discardableResult public func process(event theEvent: NSEvent) -> Bool {
+    guard #available(macOS 10.14, *) else {
+      interpretKeyEvents([theEvent])
+      return true
+    }
+    var result = true
+    protectedCall { result = self.handleKeyboardEvent(theEvent) }
+    return result
+  }
+
+  override public func update() {
+    super.update()
+    guard #available(macOS 10.14, *) else { return }
+    // Spotlight 視窗自 macOS 10.14 開始會擋住 IMK 選字窗，所以需要特殊處理。
+    let level = UInt64(CGShieldingWindowLevel() + 2)
+    protectedCall { self.setWindowLevel(level) }
+  }
 }
 
 // MARK: - Generate TISInputSource Object
@@ -180,6 +201,14 @@ var currentTISInputSource: TISInputSource? {
 // MARK: - Translating NumPad KeyCodes to Default IMK Candidate Selection KeyCodes.
 
 public extension CtlCandidateIMK {
+  static func giveSelectionKeySansModifiers(from event: NSEvent) -> NSEvent? {
+    let mapDefaultIMKSelectionKey: [UInt16: String] = [
+      18: "1", 19: "2", 20: "3", 21: "4", 23: "5", 22: "6", 26: "7", 28: "8", 25: "9",
+    ]
+    guard let newChar = mapDefaultIMKSelectionKey[event.keyCode] else { return nil }
+    return event.reinitiate(modifierFlags: [], characters: newChar)
+  }
+
   static func replaceNumPadKeyCodes(target event: NSEvent) -> NSEvent? {
     let mapNumPadKeyCodeTranslation: [UInt16: UInt16] = [
       83: 18, 84: 19, 85: 20, 86: 21, 87: 23, 88: 22, 89: 26, 91: 28, 92: 25,

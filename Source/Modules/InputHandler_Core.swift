@@ -29,7 +29,7 @@ public protocol InputHandlerProtocol {
   func clear()
   func clearComposerAndCalligrapher()
   func ensureKeyboardParser()
-  func handleEvent(_ event: NSEvent) -> Bool
+  func triageInput(event input: InputSignalProtocol) -> Bool
   func generateStateOfCandidates() -> IMEStateProtocol
   func generateStateOfInputting(sansReading: Bool) -> IMEStateProtocol
   func generateStateOfAssociates(withPair pair: Megrez.KeyValuePaired) -> IMEStateProtocol
