@@ -214,8 +214,8 @@ public extension IMEState {
 
   var isCandidateContainer: Bool {
     switch type {
-    case .ofCandidates, .ofAssociates, .ofSymbolTable: return true
-    case .ofInputting: return !candidates.isEmpty
+    case .ofSymbolTable: return !node.members.isEmpty
+    case .ofCandidates, .ofAssociates, .ofInputting: return !candidates.isEmpty
     default: return false
     }
   }
