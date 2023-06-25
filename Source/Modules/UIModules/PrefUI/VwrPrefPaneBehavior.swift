@@ -40,7 +40,7 @@ struct VwrPrefPaneBehavior: View {
   @Backport.AppStorage(wrappedValue: true, UserDef.kUseSpaceToCommitHighlightedSCPCCandidate.rawValue)
   private var useSpaceToCommitHighlightedSCPCCandidate: Bool
 
-  @Backport.AppStorage(wrappedValue: true, UserDef.kAlsoConfirmAssociatedCandidatesByEnter.rawValue)
+  @Backport.AppStorage(wrappedValue: false, UserDef.kAlsoConfirmAssociatedCandidatesByEnter.rawValue)
   private var alsoConfirmAssociatedCandidatesByEnter: Bool
 
   @Backport.AppStorage(wrappedValue: true, UserDef.kTogglingAlphanumericalModeWithLShift.rawValue)
