@@ -36,22 +36,23 @@ default: exit(0)
 }
 
 guard let mainNibName = Bundle.main.infoDictionary?["NSMainNibFile"] as? String else {
-  NSLog("Fatal error: NSMainNibFile key not defined in Info.plist.")
+  NSLog("vChewingDebug: Fatal error: NSMainNibFile key not defined in Info.plist.")
   exit(-1)
 }
 
 let loaded = Bundle.main.loadNibNamed(mainNibName, owner: NSApp, topLevelObjects: nil)
 if !loaded {
-  NSLog("Fatal error: Cannot load \(mainNibName).")
+  NSLog("vChewingDebug: Fatal error: Cannot load \(mainNibName).")
   exit(-1)
 }
 
+let kConnectionName = Bundle.main.infoDictionary?["InputMethodConnectionName"] as? String ?? "org.atelierInmu.inputmethod.vChewing_Connection"
+
 guard let bundleID = Bundle.main.bundleIdentifier,
-      let kConnectionName = Bundle.main.infoDictionary?["InputMethodConnectionName"] as? String,
       let server = IMKServer(name: kConnectionName, bundleIdentifier: bundleID)
 else {
   NSLog(
-    "Fatal error: Cannot initialize input method server with connection name retrieved from the plist, nor there's no connection name in the plist."
+    "vChewingDebug: Fatal error: Cannot initialize input method server with connection name retrieved from the plist, nor there's no connection name in the plist."
   )
   exit(-1)
 }
@@ -60,7 +61,7 @@ guard let mainBundleInfoDict = Bundle.main.infoDictionary,
       let strUpdateInfoSource = mainBundleInfoDict["UpdateInfoEndpoint"] as? String,
       let urlUpdateInfoSource = URL(string: strUpdateInfoSource)
 else {
-  NSLog("Fatal error: Info.plist wrecked. It needs to have correct 'UpdateInfoEndpoint' value.")
+  NSLog("vChewingDebug: Fatal error: Info.plist wrecked. It needs to have correct 'UpdateInfoEndpoint' value.")
   exit(-1)
 }
 
