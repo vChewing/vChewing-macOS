@@ -114,7 +114,7 @@ public class PrefMgr: PrefMgrProtocol {
   @AppProperty(key: UserDef.kAutoCorrectReadingCombination.rawValue, defaultValue: true)
   public var autoCorrectReadingCombination: Bool
 
-  @AppProperty(key: UserDef.kAlsoConfirmAssociatedCandidatesByEnter.rawValue, defaultValue: true)
+  @AppProperty(key: UserDef.kAlsoConfirmAssociatedCandidatesByEnter.rawValue, defaultValue: false)
   public var alsoConfirmAssociatedCandidatesByEnter: Bool
 
   @AppProperty(key: UserDef.kKeepReadingUponCompositionError.rawValue, defaultValue: false)

@@ -6,6 +6,7 @@
 // marks, or product names of Contributor, except as required to fulfill notice
 // requirements defined in MIT License.
 
+import AppKit
 import Foundation
 import Shared
 import Tekkon
@@ -99,7 +100,8 @@ public extension SessionCtl {
     let candidateString: String = candidateString?.string ?? ""
     if state.type == .ofAssociates {
       // 聯想詞的 Shift+選字鍵的處理已經在其它位置實作完成。
-      if !PrefMgr.shared.alsoConfirmAssociatedCandidatesByEnter {
+      let isShiftHold = NSEvent.modifierFlags.contains(.shift)
+      if !(isShiftHold || PrefMgr.shared.alsoConfirmAssociatedCandidatesByEnter) {
         switchState(IMEState.ofAbortion())
         return
       }

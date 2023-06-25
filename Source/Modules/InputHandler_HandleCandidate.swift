@@ -102,7 +102,7 @@ extension InputHandler {
     if let keyCodeType = KeyCode(rawValue: input.keyCode) {
       switch keyCodeType {
       case .kLineFeed, .kCarriageReturn:
-        if state.type == .ofAssociates, !prefs.alsoConfirmAssociatedCandidatesByEnter {
+        if state.type == .ofAssociates, !(input.isShiftHold || prefs.alsoConfirmAssociatedCandidatesByEnter) {
           delegate.switchState(IMEState.ofAbortion())
           return true
         }
