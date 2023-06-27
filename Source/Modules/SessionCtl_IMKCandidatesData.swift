@@ -14,6 +14,10 @@ import Tekkon
 // MARK: - IMKCandidates 功能擴充
 
 public extension SessionCtl {
+  private var initialCharForQuickCandidates: String {
+    PrefMgr.shared.useHorizontalCandidateList ? "" : "🗲"
+  }
+
   /// 生成 IMK 選字窗專用的候選字串陣列。
   /// - Parameter sender: 呼叫了該函式的客體（無須使用）。
   /// - Returns: IMK 選字窗專用的候選字串陣列。
@@ -55,7 +59,7 @@ public extension SessionCtl {
     case .ofAssociates:
       handleIMKCandidatesPrepared(state.candidates, prefix: "⇧")
     case .ofInputting where state.isCandidateContainer:
-      handleIMKCandidatesPrepared(state.candidates)
+      handleIMKCandidatesPrepared(state.candidates, prefix: initialCharForQuickCandidates)
     case .ofCandidates:
       guard !state.candidates.isEmpty else { return .init() }
       if state.candidates[0].keyArray.joined(separator: "-").contains("_punctuation") {
@@ -128,7 +132,7 @@ public extension SessionCtl {
     case .ofAssociates:
       fixIndexForIMKCandidates(&indexDeducted, prefix: "⇧", source: candidateString)
     case .ofInputting where state.isCandidateContainer:
-      fixIndexForIMKCandidates(&indexDeducted, source: candidateString)
+      fixIndexForIMKCandidates(&indexDeducted, prefix: initialCharForQuickCandidates, source: candidateString)
     case .ofSymbolTable:
       fixSymbolIndexForIMKCandidates()
     case .ofCandidates:
