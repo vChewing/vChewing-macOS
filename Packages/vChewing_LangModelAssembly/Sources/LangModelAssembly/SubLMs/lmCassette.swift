@@ -37,6 +37,7 @@ public extension vChewingLM {
     /// 音韻輸入法專用八股文：[字詞:(頻次, 讀音)]。
     public private(set) var octagramDividedMap: [String: (Int, String)] = [:]
     public private(set) var areCandidateKeysShiftHeld: Bool = false
+    public private(set) var supplyQuickResults: Bool = false
 
     /// 計算頻率時要用到的東西
     private static let fscale = 2.7
@@ -91,38 +92,49 @@ public extension vChewingLM {
           var loadingOctagramData = false
           var keysUsedInCharDef: Set<String> = .init()
           for strLine in lineReader {
-            if !loadingKeys, strLine.contains("%keyname"), strLine.contains("begin") { loadingKeys = true }
-            if loadingKeys, strLine.contains("%keyname"), strLine.contains("end") { loadingKeys = false }
-            // %quick
-            if !loadingQuickSets, strLine.contains("%quick"), strLine.contains("begin") {
-              loadingQuickSets = true
+            if strLine.starts(with: "%keyname") {
+              if !loadingKeys, strLine.contains("begin") { loadingKeys = true }
+              if loadingKeys, strLine.contains("end") { loadingKeys = false }
             }
-            if loadingQuickSets, strLine.contains("%quick"), strLine.contains("end") {
-              loadingQuickSets = false
-              if quickDefMap.keys.contains(wildcardKey) { wildcardKey = "" }
+            // %quick
+            if strLine.starts(with: "%quick") {
+              if strLine == "%quick", !supplyQuickResults { supplyQuickResults = true }
+              if !loadingQuickSets, strLine.contains("begin") {
+                loadingQuickSets = true
+              }
+              if loadingQuickSets, strLine.contains("end") {
+                loadingQuickSets = false
+                if quickDefMap.keys.contains(wildcardKey) { wildcardKey = "" }
+              }
             }
             // %chardef
-            if !loadingCharDefinitions, strLine.contains("%chardef"), strLine.contains("begin") {
-              loadingCharDefinitions = true
-            }
-            if loadingCharDefinitions, strLine.contains("%chardef"), strLine.contains("end") {
-              loadingCharDefinitions = false
-              if charDefMap.keys.contains(wildcardKey) { wildcardKey = "" }
+            if strLine.starts(with: "%chardef") {
+              if !loadingCharDefinitions, strLine.contains("begin") {
+                loadingCharDefinitions = true
+              }
+              if loadingCharDefinitions, strLine.contains("end") {
+                loadingCharDefinitions = false
+                if charDefMap.keys.contains(wildcardKey) { wildcardKey = "" }
+              }
             }
             // %symboldef
-            if !loadingSymbolDefinitions, strLine.contains("%symboldef"), strLine.contains("begin") {
-              loadingSymbolDefinitions = true
-            }
-            if loadingSymbolDefinitions, strLine.contains("%symboldef"), strLine.contains("end") {
-              loadingSymbolDefinitions = false
-              if symbolDefMap.keys.contains(wildcardKey) { wildcardKey = "" }
+            if strLine.starts(with: "%symboldef") {
+              if !loadingSymbolDefinitions, strLine.contains("begin") {
+                loadingSymbolDefinitions = true
+              }
+              if loadingSymbolDefinitions, strLine.contains("end") {
+                loadingSymbolDefinitions = false
+                if symbolDefMap.keys.contains(wildcardKey) { wildcardKey = "" }
+              }
             }
             // %octagram
-            if !loadingOctagramData, strLine.contains("%octagram"), strLine.contains("begin") {
-              loadingOctagramData = true
-            }
-            if loadingOctagramData, strLine.contains("%octagram"), strLine.contains("end") {
-              loadingOctagramData = false
+            if strLine.starts(with: "%octagram") {
+              if !loadingOctagramData, strLine.contains("begin") {
+                loadingOctagramData = true
+              }
+              if loadingOctagramData, strLine.contains("end") {
+                loadingOctagramData = false
+              }
             }
             // Start data parsing.
             let cells: [String.SubSequence] =
@@ -130,13 +142,13 @@ public extension vChewingLM {
             guard cells.count >= 2 else { continue }
             let strFirstCell = cells[0].trimmingCharacters(in: .newlines)
             let strSecondCell = cells[1].trimmingCharacters(in: .newlines)
-            if loadingKeys, !cells[0].contains("%keyname") {
+            if loadingKeys, !cells[0].starts(with: "%keyname") {
               keyNameMap[strFirstCell] = cells[1].trimmingCharacters(in: .newlines)
-            } else if loadingQuickSets, !strLine.contains("%quick") {
+            } else if loadingQuickSets, !strLine.starts(with: "%quick") {
               theMaxKeyLength = max(theMaxKeyLength, cells[0].count)
               quickDefMap[strFirstCell, default: .init()].append(strSecondCell)
             } else if loadingCharDefinitions, !loadingSymbolDefinitions,
-                      !strLine.contains("%chardef"), !strLine.contains("%symboldef")
+                      !strLine.starts(with: "%chardef"), !strLine.starts(with: "%symboldef")
             {
               theMaxKeyLength = max(theMaxKeyLength, cells[0].count)
               charDefMap[strFirstCell, default: []].append(strSecondCell)
@@ -151,11 +163,11 @@ public extension vChewingLM {
                 keyComps.removeLast()
                 charDefWildcardMap[keyComps.joined() + wildcard, default: []].append(strSecondCell)
               }
-            } else if loadingSymbolDefinitions, !strLine.contains("%chardef"), !strLine.contains("%symboldef") {
+            } else if loadingSymbolDefinitions, !strLine.starts(with: "%chardef"), !strLine.starts(with: "%symboldef") {
               theMaxKeyLength = max(theMaxKeyLength, cells[0].count)
               symbolDefMap[strFirstCell, default: []].append(strSecondCell)
               reverseLookupMap[strSecondCell, default: []].append(strFirstCell)
-            } else if loadingOctagramData, !strLine.contains("%octagram") {
+            } else if loadingOctagramData, !strLine.starts(with: "%octagram") {
               guard let countValue = Int(cells[1]) else { continue }
               switch cells.count {
               case 2: octagramMap[strFirstCell] = countValue
@@ -165,7 +177,7 @@ public extension vChewingLM {
               norm += Self.fscale ** (Double(cells[0].count) / 3.0 - 1.0) * Double(countValue)
             }
             guard !loadingKeys, !loadingQuickSets, !loadingCharDefinitions, !loadingOctagramData else { continue }
-            if nameENG.isEmpty, strLine.contains("%ename ") {
+            if nameENG.isEmpty, strLine.starts(with: "%ename ") {
               for neta in cells[1].components(separatedBy: ";") {
                 let subNetaGroup = neta.components(separatedBy: ":")
                 if subNetaGroup.count == 2, subNetaGroup[1].contains("en") {
@@ -175,19 +187,19 @@ public extension vChewingLM {
               }
               if nameENG.isEmpty { nameENG = strSecondCell }
             }
-            if nameIntl.isEmpty, strLine.contains("%intlname ") {
+            if nameIntl.isEmpty, strLine.starts(with: "%intlname ") {
               nameIntl = strSecondCell.replacingOccurrences(of: "_", with: " ")
             }
-            if nameCJK.isEmpty, strLine.contains("%cname ") { nameCJK = strSecondCell }
-            if nameShort.isEmpty, strLine.contains("%sname ") { nameShort = strSecondCell }
-            if nullCandidate.isEmpty, strLine.contains("%nullcandidate ") { nullCandidate = strSecondCell }
-            if selectionKeys.isEmpty, strLine.contains("%selkey ") {
+            if nameCJK.isEmpty, strLine.starts(with: "%cname ") { nameCJK = strSecondCell }
+            if nameShort.isEmpty, strLine.starts(with: "%sname ") { nameShort = strSecondCell }
+            if nullCandidate.isEmpty, strLine.starts(with: "%nullcandidate ") { nullCandidate = strSecondCell }
+            if selectionKeys.isEmpty, strLine.starts(with: "%selkey ") {
               selectionKeys = cells[1].map(\.description).deduplicated.joined()
             }
-            if endKeys.isEmpty, strLine.contains("%endkey ") {
+            if endKeys.isEmpty, strLine.starts(with: "%endkey ") {
               endKeys = cells[1].map(\.description).deduplicated
             }
-            if wildcardKey.isEmpty, strLine.contains("%wildcardkey ") {
+            if wildcardKey.isEmpty, strLine.starts(with: "%wildcardkey ") {
               wildcardKey = cells[1].first?.description ?? ""
             }
           }
@@ -232,8 +244,22 @@ public extension vChewingLM {
     }
 
     public func quickSetsFor(key: String) -> String? {
-      guard let result = quickDefMap[key] as String? else { return nil }
-      return result.isEmpty ? nil : result
+      guard !key.isEmpty else { return nil }
+      var result = [String]()
+      if let specifiedResult = quickDefMap[key], !specifiedResult.isEmpty {
+        result.append(contentsOf: specifiedResult.map(\.description))
+      }
+      if supplyQuickResults, quickDefMap.isEmpty {
+        let fetched = charDefMap.compactMap {
+          $0.key.starts(with: key) ? $0 : nil
+        }.stableSort {
+          $0.key.count < $1.key.count
+        }.flatMap(\.value).filter {
+          $0.count == 1
+        }
+        result.append(contentsOf: fetched.deduplicated.prefix(selectionKeys.count * 6))
+      }
+      return result.isEmpty ? nil : result.joined(separator: "\t")
     }
 
     /// 根據給定的字根索引鍵，來獲取資料庫辭典內的對應結果。

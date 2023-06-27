@@ -279,7 +279,7 @@ extension InputHandler {
 
       if !isStrokesFull {
         var result = generateStateOfInputting()
-        if !calligrapher.isEmpty, var fetched = currentLM.cassetteQuickSetsFor(key: calligrapher) {
+        if !calligrapher.isEmpty, var fetched = currentLM.cassetteQuickSetsFor(key: calligrapher)?.split(separator: "\t") {
           if prefs.useIMKCandidateWindow {
             fetched = fetched.deduplicated.filter { $0.description != currentLM.nullCandidateInCassette }
           }
