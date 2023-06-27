@@ -169,7 +169,7 @@ struct VwrPrefPaneCandidates: View {
             isOn: $useIMKCandidateWindow
           )
           Text(
-            "IMK candidate window (IMKCandidates) relies on certain Apple private APIs force-exposed through bridging headers. For now, its usability is only guaranteed from macOS 10.14 Mojave to macOS 14 Sonoma. Further tests are required in later macOS to prove compatibility facts. Also, the `%quick` section in CIN cassettes is not supported when using IMKCandidates.".localized
+            "IMK candidate window (IMKCandidates) relies on certain Apple private APIs force-exposed through bridging headers. For now, its usability is only guaranteed from macOS 10.13 High Sierra to macOS 14 Sonoma. Further tests are required in later macOS to prove compatibility facts.".localized
           )
           .preferenceDescription(maxWidth: CtlPrefUIShared.maxDescriptionWidth)
           Toggle(
