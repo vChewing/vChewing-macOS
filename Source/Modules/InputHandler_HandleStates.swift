@@ -507,7 +507,7 @@ extension InputHandler {
     switch isConsideredEmptyForNow {
     case false:
       var result = generateStateOfInputting()
-      if prefs.cassetteEnabled, var fetched = currentLM.cassetteQuickSetsFor(key: calligrapher) {
+      if prefs.cassetteEnabled, var fetched = currentLM.cassetteQuickSetsFor(key: calligrapher)?.split(separator: "\t") {
         if prefs.useIMKCandidateWindow {
           fetched = fetched.deduplicated.filter { $0.description != currentLM.nullCandidateInCassette }
         }
