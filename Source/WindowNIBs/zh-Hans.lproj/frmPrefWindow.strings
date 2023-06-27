@@ -79,7 +79,7 @@
 "jQC-12-UuK.ibShadowedObjectValues[2]" = "Item 3";
 "lblAcceptLeadingIntonations.title" = "在个别情况下，允许声调前置键入";
 "lblAlwaysShowTooltipTextsHorizontally.title" = "始终使用横排来显示工具提示视窗";
-"lblDevZoneIMKCandidate.title" = "IMK 选字窗依赖于 Apple 的私有 API，而且是借由桥接档案头强制曝露的方法使用的。目前，该功能仅在 macOS 10.14 Mojave 至 macOS 14 Sonoma 系统内有测试过可用性。至于在未来的 macOS 发行版当中是否可用，则需要另行测试、才能下结论。此外，CIN 磁带的「%quick」章节不受 IMK 选字窗所支援。";
+"lblDevZoneIMKCandidate.title" = "IMK 选字窗依赖于 Apple 的私有 API，而且是借由桥接档案头强制曝露的方法使用的。目前，该功能仅在 macOS 10.13 High Sierra 至 macOS 14 Sonoma 系统内有测试过可用性。至于在未来的 macOS 发行版当中是否可用，则需要另行测试、才能下结论。";
 "lblDevZoneTitleDescription.title" = "警告：该页面仅作未来功能测试所用。\n在此列出的功能并非处于完全可用之状态。";
 "lblIntonationKeyBehavior.title" = "指定声调键（在注拼槽为「空」状态时）的行为。";
 "lblShiftBkspKeyBehavior.title" = "指定 Shift+BackSpace 组合键率先尝试的行为。";
