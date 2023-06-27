@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="22113.1" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES">
+<document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="22113.3" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES">
     <dependencies>
         <deployment identifier="macosx"/>
-        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="22113.1"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="22113.3"/>
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
     </dependencies>
     <objects>
@@ -49,7 +49,7 @@
         <window title="vChewing Preferences" allowsToolTipsWhenApplicationIsInactive="NO" autorecalculatesKeyViewLoop="NO" restorable="NO" animationBehavior="default" titlebarAppearsTransparent="YES" id="1" userLabel="frmPrefWindow">
             <windowStyleMask key="styleMask" titled="YES" closable="YES" miniaturizable="YES"/>
             <rect key="contentRect" x="401" y="295" width="577" height="406"/>
-            <rect key="screenRect" x="0.0" y="0.0" width="1440" height="875"/>
+            <rect key="screenRect" x="0.0" y="0.0" width="1680" height="1025"/>
             <view key="contentView" id="2">
                 <rect key="frame" x="0.0" y="0.0" width="577" height="406"/>
                 <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
@@ -2394,10 +2394,10 @@ DQ
             <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
             <subviews>
                 <stackView distribution="fill" orientation="vertical" alignment="leading" horizontalStackHuggingPriority="249.99998474121094" verticalStackHuggingPriority="249.99998474121094" translatesAutoresizingMaskIntoConstraints="NO" id="gjM-uG-XkW">
-                    <rect key="frame" x="20" y="33" width="537" height="227"/>
+                    <rect key="frame" x="20" y="47" width="537" height="213"/>
                     <subviews>
                         <textField wantsLayer="YES" verticalHuggingPriority="750" setsMaxLayoutWidthAtFirstLayout="YES" translatesAutoresizingMaskIntoConstraints="NO" id="hBd-sS-cWq">
-                            <rect key="frame" x="-2" y="199" width="541" height="28"/>
+                            <rect key="frame" x="-2" y="185" width="541" height="28"/>
                             <constraints>
                                 <constraint firstAttribute="width" constant="537" id="Kvp-PL-Pes"/>
                             </constraints>
@@ -2410,14 +2410,14 @@ Features listed here may not work as expected.</string>
                             </textFieldCell>
                         </textField>
                         <box verticalHuggingPriority="750" boxType="separator" translatesAutoresizingMaskIntoConstraints="NO" id="ul4-N6-Ybi">
-                            <rect key="frame" x="0.0" y="188" width="537" height="5"/>
+                            <rect key="frame" x="0.0" y="174" width="537" height="5"/>
                             <constraints>
                                 <constraint firstAttribute="width" constant="537" id="2lI-El-JtD"/>
                                 <constraint firstAttribute="width" relation="greaterThanOrEqual" constant="400" id="kJZ-E8-eDL"/>
                             </constraints>
                         </box>
                         <button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="yJg-tV-hH6">
-                            <rect key="frame" x="-1" y="165.5" width="429" height="17"/>
+                            <rect key="frame" x="-1" y="151.5" width="429" height="17"/>
                             <buttonCell key="cell" type="check" title="Disable segmented thick underline in marking mode for managed clients" bezelStyle="regularSquare" imagePosition="left" controlSize="small" inset="2" id="N6e-bR-mVa">
                                 <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
                                 <font key="font" metaFont="cellTitle"/>
@@ -2431,7 +2431,7 @@ Features listed here may not work as expected.</string>
                             </connections>
                         </button>
                         <textField wantsLayer="YES" verticalHuggingPriority="750" setsMaxLayoutWidthAtFirstLayout="YES" translatesAutoresizingMaskIntoConstraints="NO" id="uK3-cc-UcW">
-                            <rect key="frame" x="-2" y="88" width="541" height="70"/>
+                            <rect key="frame" x="-2" y="74" width="541" height="70"/>
                             <constraints>
                                 <constraint firstAttribute="width" constant="537" id="qOi-aV-LQX"/>
                             </constraints>
@@ -2443,7 +2443,7 @@ Features listed here may not work as expected.</string>
                             </textFieldCell>
                         </textField>
                         <button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="MQ1-z8-Yf1">
-                            <rect key="frame" x="-1" y="63.5" width="410" height="17"/>
+                            <rect key="frame" x="-1" y="49.5" width="410" height="17"/>
                             <buttonCell key="cell" type="check" title="Use IMK Candidate Window instead of Tadokoro (will reboot the IME)" bezelStyle="regularSquare" imagePosition="left" controlSize="small" inset="2" id="tglDevZoneIMKCandidate">
                                 <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
                                 <font key="font" metaFont="cellTitle"/>
@@ -2458,13 +2458,13 @@ Features listed here may not work as expected.</string>
                             </connections>
                         </button>
                         <textField wantsLayer="YES" verticalHuggingPriority="750" setsMaxLayoutWidthAtFirstLayout="YES" translatesAutoresizingMaskIntoConstraints="NO" id="5ae-kj-Llx">
-                            <rect key="frame" x="-2" y="0.0" width="541" height="56"/>
+                            <rect key="frame" x="-2" y="0.0" width="541" height="42"/>
                             <constraints>
                                 <constraint firstAttribute="width" constant="537" id="zTP-1s-eev"/>
                             </constraints>
                             <textFieldCell key="cell" controlSize="small" sendsActionOnEndEditing="YES" alignment="left" id="lblDevZoneIMKCandidate">
                                 <font key="font" metaFont="smallSystem"/>
-                                <string key="title">IMK candidate window (IMKCandidates) relies on certain Apple private APIs force-exposed through bridging headers. For now, its usability is only guaranteed from macOS 10.14 Mojave to macOS 14 Sonoma. Further tests are required in later macOS to prove compatibility facts. Also, the `%quick` section in CIN cassettes is not supported when using IMKCandidates.</string>
+                                <string key="title">IMK candidate window (IMKCandidates) relies on certain Apple private APIs force-exposed through bridging headers. For now, its usability is only guaranteed from macOS 10.13 High Sierra to macOS 14 Sonoma. Further tests are required in later macOS to prove compatibility facts.</string>
                                 <color key="textColor" name="secondaryLabelColor" catalog="System" colorSpace="catalog"/>
                                 <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
                             </textFieldCell>
