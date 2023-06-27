@@ -108,7 +108,7 @@ public extension LMMgr {
   /// - Parameter mode: 簡繁體輸入模式。
   /// - Returns: 資料路徑（URL）。
   static func userSCPCSequencesURL(_ mode: Shared.InputMode) -> URL {
-    let fileName = (mode == .imeModeCHT) ? "data-plain-bpmf-cht.json" : "data-plain-bpmf-chs.json"
+    let fileName = (mode == .imeModeCHT) ? "data-plain-bpmf-cht.plist" : "data-plain-bpmf-chs.plist"
     return URL(fileURLWithPath: dataFolderPath(isDefaultFolder: false)).appendingPathComponent(fileName)
   }
 
