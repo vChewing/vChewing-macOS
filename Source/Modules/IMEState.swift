@@ -196,12 +196,14 @@ public extension IMEState {
   func attributedString(for session: IMKInputController) -> NSAttributedString {
     switch type {
     case .ofMarking: return data.attributedStringMarking(for: session)
+    case .ofCandidates where cursor != marker: return data.attributedStringMarking(for: session)
+    case .ofCandidates where cursor == marker: break
     case .ofAssociates: return data.attributedStringPlaceholder(for: session)
-    case .ofSymbolTable:
-      guard !displayedText.isEmpty else { return data.attributedStringPlaceholder(for: session) }
-      return data.attributedStringNormal(for: session)
-    default: return data.attributedStringNormal(for: session)
+    case .ofSymbolTable where displayedText.isEmpty: return data.attributedStringPlaceholder(for: session)
+    case .ofSymbolTable where !displayedText.isEmpty: break
+    default: break
     }
+    return data.attributedStringNormal(for: session)
   }
 
   /// 該參數僅用作輔助判斷。在 InputHandler 內使用的話，必須再檢查 !compositor.isEmpty。
