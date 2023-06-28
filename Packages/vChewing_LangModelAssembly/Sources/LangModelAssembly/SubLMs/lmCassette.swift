@@ -202,6 +202,9 @@ public extension vChewingLM {
             if wildcardKey.isEmpty, strLine.starts(with: "%wildcardkey ") {
               wildcardKey = cells[1].first?.description ?? ""
             }
+            if strLine == "%flag_disp_partial_match", !supplyQuickResults {
+              supplyQuickResults = true
+            }
           }
           // Post process.
           if CandidateKey.validate(keys: selectionKeys) != nil { selectionKeys = "1234567890" }
