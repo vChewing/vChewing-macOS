@@ -428,10 +428,18 @@ public class InputHandler: InputHandlerProtocol {
       preConsolidate: PrefMgr.shared.consolidateContextOnCandidateSelection,
       skipObservation: true
     )
-    let inputting = generateStateOfInputting(sansReading: true)
-    theState.data.displayTextSegments = inputting.data.displayTextSegments
-    theState.data.cursor = inputting.cursor
-    theState.data.marker = inputting.marker
+    theState.data.displayTextSegments = compositor.walkedNodes.values
+    theState.data.cursor = convertCursorForDisplay(compositor.cursor)
+    let markerBackup = compositor.marker
+    if compositor.cursor == compositor.length {
+      compositor.jumpCursorBySpan(to: .rear, isMarker: true)
+    } else if compositor.cursor == 0 {
+      compositor.jumpCursorBySpan(to: .front, isMarker: true)
+    } else {
+      compositor.jumpCursorBySpan(to: prefs.useRearCursorMode ? .front : .rear, isMarker: true)
+    }
+    theState.data.marker = compositor.marker
+    compositor.marker = markerBackup
     delegate.state = theState // 直接就地取代，不經過 switchState 處理，免得選字窗被重新載入。
     delegate.setInlineDisplayWithCursor()
     delegate.updatePopupDisplayWithCursor()
