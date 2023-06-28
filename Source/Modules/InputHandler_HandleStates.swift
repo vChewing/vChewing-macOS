@@ -124,11 +124,18 @@ extension InputHandler {
   /// 拿著給定的候選字詞陣列資料內容，切換至選字狀態。
   /// - Returns: 回呼一個新的選詞狀態，來就給定的候選字詞陣列資料內容顯示選字窗。
   public func generateStateOfCandidates() -> IMEStateProtocol {
-    IMEState.ofCandidates(
+    var result = IMEState.ofCandidates(
       candidates: generateArrayOfCandidates(fixOrder: prefs.useFixecCandidateOrderOnSelection),
       displayTextSegments: compositor.walkedNodes.values,
       cursor: delegate?.state.cursor ?? generateStateOfInputting().cursor
     )
+    if !prefs.useRearCursorMode {
+      let markerBackup = compositor.marker
+      compositor.jumpCursorBySpan(to: .rear, isMarker: true)
+      result.marker = compositor.marker
+      compositor.marker = markerBackup
+    }
+    return result
   }
 
   // MARK: - 用以接收聯想詞陣列且生成狀態
