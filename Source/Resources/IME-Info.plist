@@ -60,6 +60,11 @@ SOFTWARE.
 				<string>  </string>
 				<key>TISIconIsTemplate</key>
 				<true/>
+				<key>TISIconLabels</key>
+				<dict>
+					<key>Primary</key>
+					<string>简注</string>
+				</dict>
 				<key>TISIntendedLanguage</key>
 				<string>zh-Hans</string>
 				<key>tsInputModeAlternateMenuIconFileKey</key>
@@ -73,8 +78,6 @@ SOFTWARE.
 				<true/>
 				<key>tsInputModeIsVisibleKey</key>
 				<true/>
-				<key>tsInputModeKeyEquivalentModifiersKey</key>
-				<integer>4608</integer>
 				<key>tsInputModeMenuIconFileKey</key>
 				<string>MenuIcon-SCVIM.png</string>
 				<key>tsInputModePaletteIconFileKey</key>
@@ -90,6 +93,11 @@ SOFTWARE.
 				<string>  </string>
 				<key>TISIconIsTemplate</key>
 				<true/>
+				<key>TISIconLabels</key>
+				<dict>
+					<key>Primary</key>
+					<string>繁注</string>
+				</dict>
 				<key>TISIntendedLanguage</key>
 				<string>zh-Hant</string>
 				<key>tsInputModeAlternateMenuIconFileKey</key>
@@ -103,8 +111,6 @@ SOFTWARE.
 				<true/>
 				<key>tsInputModeIsVisibleKey</key>
 				<true/>
-				<key>tsInputModeKeyEquivalentModifiersKey</key>
-				<integer>4608</integer>
 				<key>tsInputModeMenuIconFileKey</key>
 				<string>MenuIcon-TCVIM.png</string>
 				<key>tsInputModePaletteIconFileKey</key>
