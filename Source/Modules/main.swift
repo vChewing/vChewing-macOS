@@ -74,6 +74,19 @@ _ = NSApplicationMain(CommandLine.argc, CommandLine.unsafeArgv)
 // MARK: - Top-level Enums relating to Input Mode and Language Supports.
 
 public enum IMEApp {
+  // MARK: - 獲取輸入法的版本以及建置編號
+
+  public static var appVersionLabel: String {
+    guard
+      let intBuild = Bundle.main.infoDictionary?[kCFBundleVersionKey as String] as? String,
+      let strVer = Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String
+    else {
+      return "114.514.1919810"
+    }
+
+    return "\(strVer) Build \(intBuild)"
+  }
+
   // MARK: - 輸入法的當前的簡繁體中文模式
 
   public static var currentInputMode: Shared.InputMode {
