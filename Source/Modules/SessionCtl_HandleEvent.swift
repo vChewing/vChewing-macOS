@@ -31,15 +31,46 @@ public extension SessionCtl {
       return false
     }
 
+    // 用 Shift 開關半形英數模式，僅對 macOS 10.15 及之後的 macOS 有效。
+    // 警告：這裡的 event 必須是原始 event 且不能被 var，否則會影響 Shift 中英模式判定。
+    if Self.theShiftKeyDetector.check(event) {
+      toggleAlphanumericalMode()
+      // Shift 處理完畢之後也有必要立刻返回處理結果。
+      return true
+    }
+
+    var result = false
+    if [.keyDown, .flagsChanged].contains(event.type) {
+      result = handleKeyDown(event: event)
+      if result, event.type == .keyDown {
+        previouslyHandledEvents.append(event)
+      }
+    } else if event.type == .keyUp {
+      result = handleKeyUp(event: event)
+    }
+
+    return result
+  }
+
+  private func handleKeyUp(event: NSEvent) -> Bool {
+    guard ![.ofEmpty, .ofAbortion].contains(state.type) else { return false }
+    let codes = previouslyHandledEvents.map(\.keyCode)
+    if codes.contains(event.keyCode) {
+      previouslyHandledEvents = previouslyHandledEvents.filter { prevEvent in
+        prevEvent.keyCode != event.keyCode
+      }.deduplicated
+      return true
+    }
+    return false
+  }
+
+  private func handleKeyDown(event: NSEvent) -> Bool {
     // MARK: 前置處理
 
-    // 雖然在 recognizedEvents 當中有過定義，但這裡還是再多施加一道保險。
-    if event.type != .keyDown, event.type != .flagsChanged { return false }
-
     // 如果是 deactivated 狀態的話，強制糾正其為 empty()。
-    if let client = client(), state.type == .ofDeactivated {
+    if state.type == .ofDeactivated {
       state = IMEState.ofEmpty()
-      return handle(event, client: client)
+      return handleKeyDown(event: event)
     }
 
     // Caps Lock 通知與切換處理，要求至少 macOS 12 Monterey。
@@ -59,25 +90,10 @@ public extension SessionCtl {
       }
     }
 
-    // 切換英數模式開關。
-    func toggleAlphanumericalMode() {
-      let status = "NotificationSwitchRevolver".localized
-      Notifier.notify(
-        message: isASCIIMode.toggled()
-          ? "Alphanumerical Input Mode".localized + "\n" + status
-          : "Chinese Input Mode".localized + "\n" + status
-      )
-    }
-
-    // 用 Shift 開關半形英數模式，僅對 macOS 10.15 及之後的 macOS 有效。
-    // 用 JIS 鍵盤的英數切換鍵來切換中英文模式，對 macOS 10.09 開始的系統均有效。
-    // 警告：這裡的 event 必須是原始 event 且不能被 var，否則會影響 Shift 中英模式判定。
-    // 另：Shift 按鍵判斷需要同時偵測 keyUp。
-    if (event.type == .keyDown && event.isJISAlphanumericalKey) || Self.theShiftKeyDetector.check(event) {
+    // 用 JIS 鍵盤的英數切換鍵來切換中英文模式。
+    if event.type == .keyDown, event.isJISAlphanumericalKey {
       toggleAlphanumericalMode()
-      // Adobe Photoshop 相容：對 JIS 英數切換鍵傳入事件一律立刻返回 true。
-      // Shift 處理完畢之後也有必要立刻返回處理結果。
-      return true
+      return true // Adobe Photoshop 相容：對 JIS 英數切換鍵傳入事件一律立刻返回 true。
     }
 
     // MARK: 針對客體的具體處理
@@ -163,5 +179,15 @@ public extension SessionCtl {
     }
 
     return result
+  }
+
+  /// 切換英數模式開關。
+  private func toggleAlphanumericalMode() {
+    let status = "NotificationSwitchRevolver".localized
+    Notifier.notify(
+      message: isASCIIMode.toggled()
+        ? NSLocalizedString("Alphanumerical Input Mode", comment: "") + "\n" + status
+        : NSLocalizedString("Chinese Input Mode", comment: "") + "\n" + status
+    )
   }
 }
