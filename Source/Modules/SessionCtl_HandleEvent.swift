@@ -67,6 +67,9 @@ public extension SessionCtl {
   private func handleKeyDown(event: NSEvent) -> Bool {
     // MARK: 前置處理
 
+    // 先放過一些以 .command 觸發的熱鍵（包括剪貼簿熱鍵）。
+    if state.type == .ofEmpty, event.isSingleCommandBasedLetterHotKey { return false }
+
     // 如果是 deactivated 狀態的話，強制糾正其為 empty()。
     if state.type == .ofDeactivated {
       state = IMEState.ofEmpty()
