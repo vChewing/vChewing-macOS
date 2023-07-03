@@ -29,10 +29,10 @@ public class SessionCtl: IMKInputController {
   /// 標記狀態來聲明目前新增的詞彙是否需要賦以非常低的權重。
   public static var areWeNerfing = false
 
-  // IMK 選字窗專用記憶體位址
+  /// IMK 選字窗專用記憶體位址
   private var candidateIMK: CtlCandidateProtocol?
 
-  // 田所選字窗專用記憶體位址
+  /// 田所選字窗專用記憶體位址
   private var candidateTDK: CtlCandidateProtocol?
 
   /// 目前在用的的選字窗副本。
