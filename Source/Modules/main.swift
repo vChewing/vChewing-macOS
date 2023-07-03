@@ -76,16 +76,31 @@ _ = NSApplicationMain(CommandLine.argc, CommandLine.unsafeArgv)
 public enum IMEApp {
   // MARK: - 獲取輸入法的版本以及建置編號
 
-  public static var appVersionLabel: String {
+  public static let appVersionLabel: String = {
+    let maybeStrDate: String? = {
+      guard let executableURL = Bundle.main.executableURL,
+            let infoDate = (try? executableURL.resourceValues(forKeys: [.creationDateKey]))?.creationDate
+      else {
+        return nil
+      }
+
+      let dateFormatter = DateFormatter()
+      dateFormatter.dateFormat = "yyyyMMdd.HHmm"
+      dateFormatter.timeZone = .init(secondsFromGMT: +28800) ?? .current
+      let strDate = dateFormatter.string(from: infoDate)
+      return strDate
+    }()
+
     guard
       let intBuild = Bundle.main.infoDictionary?[kCFBundleVersionKey as String] as? String,
-      let strVer = Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String
+      let strVer = Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String,
+      let strDate = maybeStrDate
     else {
-      return "114.514.1919810"
+      return "1.14.514 - 19190810"
     }
 
-    return "\(strVer) Build \(intBuild)"
-  }
+    return "\(strVer) Build \(intBuild) - \(strDate)"
+  }()
 
   // MARK: - 輸入法的當前的簡繁體中文模式
 
