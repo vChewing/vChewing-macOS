@@ -29,17 +29,9 @@ class CtlAboutWindow: NSWindowController {
   override func windowDidLoad() {
     super.windowDidLoad()
     window?.setPosition(vertical: .top, horizontal: .left, padding: 20)
-
     window?.standardWindowButton(.closeButton)?.isHidden = true
     window?.standardWindowButton(.miniaturizeButton)?.isHidden = true
     window?.standardWindowButton(.zoomButton)?.isHidden = true
-    guard
-      let installingVersion = Bundle.main.infoDictionary?[kCFBundleVersionKey as String]
-      as? String,
-      let versionString = Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String
-    else {
-      return
-    }
     if let copyrightLabel = Bundle.main.localizedInfoDictionary?["NSHumanReadableCopyright"]
       as? String
     {
@@ -50,7 +42,7 @@ class CtlAboutWindow: NSWindowController {
     {
       appEULAContent.string = eulaContent + "\n" + eulaContentUpstream
     }
-    appVersionLabel.stringValue = "\(versionString) Build \(installingVersion)"
+    appVersionLabel.stringValue = IMEApp.appVersionLabel
   }
 
   @IBAction func btnBugReport(_: NSButton) {
