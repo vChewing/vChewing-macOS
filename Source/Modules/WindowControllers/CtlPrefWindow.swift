@@ -107,7 +107,7 @@ class CtlPrefWindow: NSWindowController, NSWindowDelegate {
       window?.toolbarStyle = .preference
     }
     window?.toolbar = toolbar
-    window?.title = preferencesTitleName
+    window?.title = "\(preferencesTitleName) (\(IMEApp.appVersionLabel))"
     window?.titlebarAppearsTransparent = false
     use(view: vwrGeneral, animate: false)
 
