@@ -181,6 +181,12 @@ public extension NSEvent {
     (65 ... 90).contains(charCode) && modifierFlags == .shift
   }
 
+  // 以 .command 觸發的熱鍵（包括剪貼簿熱鍵）。
+  var isSingleCommandBasedLetterHotKey: Bool {
+    ((65 ... 90).contains(charCode) && modifierFlags == [.shift, .command])
+      || ((97 ... 122).contains(charCode) && modifierFlags == .command)
+  }
+
   // 這裡必須用 KeyCode，這樣才不會受隨 macOS 版本更動的 Apple 動態注音鍵盤排列內容的影響。
   // 只是必須得與 ![input isShiftHold] 搭配使用才可以（也就是僅判定 Shift 沒被摁下的情形）。
   var isSymbolMenuPhysicalKey: Bool {

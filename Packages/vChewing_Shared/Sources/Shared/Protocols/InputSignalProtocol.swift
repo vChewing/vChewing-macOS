@@ -58,5 +58,6 @@ public protocol InputSignalProtocol {
   var isCursorClockRight: Bool { get }
   var isCursorClockLeft: Bool { get }
   var isUpperCaseASCIILetterKey: Bool { get }
+  var isSingleCommandBasedLetterHotKey: Bool { get }
   var isSymbolMenuPhysicalKey: Bool { get }
 }
