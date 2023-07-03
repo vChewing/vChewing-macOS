@@ -29,6 +29,9 @@ public class SessionCtl: IMKInputController {
   /// 標記狀態來聲明目前新增的詞彙是否需要賦以非常低的權重。
   public static var areWeNerfing = false
 
+  /// 上一個被處理過的鍵盤事件。
+  public var previouslyHandledEvents: [NSEvent] = .init()
+
   /// IMK 選字窗專用記憶體位址
   private var candidateIMK: CtlCandidateProtocol?
 
@@ -432,7 +435,7 @@ public extension SessionCtl {
   /// - Returns: 返回一個 uint，其中承載了與系統 NSEvent 操作事件有關的掩碼集合（詳見 NSEvent.h）。
   override func recognizedEvents(_ sender: Any!) -> Int {
     _ = sender // 防止格式整理工具毀掉與此對應的參數。
-    let events: NSEvent.EventTypeMask = [.keyDown, .flagsChanged]
+    let events: NSEvent.EventTypeMask = [.keyDown, .flagsChanged, .keyUp]
     return Int(events.rawValue)
   }
 
