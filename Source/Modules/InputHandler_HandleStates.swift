@@ -823,7 +823,7 @@ extension InputHandler {
       return true
     }
 
-    let candidates = generateArrayOfCandidates(fixOrder: true)
+    let candidates = generateArrayOfCandidates(fixOrder: prefs.useFixecCandidateOrderOnSelection)
     guard !candidates.isEmpty else {
       delegate.callError("3378A6DF")
       return true
