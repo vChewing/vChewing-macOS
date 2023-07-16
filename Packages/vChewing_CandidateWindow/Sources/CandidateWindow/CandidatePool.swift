@@ -23,11 +23,32 @@ public class CandidatePool {
   public var reverseLookupResult: [String] = []
   public private(set) var highlightedIndex: Int = 0
   public private(set) var currentLineNumber = 0
+  public var metrics: UIMetrics = .allZeroed
 
   private var recordedLineRangeForCurrentPage: Range<Int>?
   private var previouslyRecordedLineRangeForPreviousPage: Range<Int>?
 
+  public struct UIMetrics {
+    static var allZeroed: UIMetrics {
+      .init(fittingSize: .zero, highlightedLine: .zero, highlightedCandidate: .zero, peripherals: .zero)
+    }
+
+    let fittingSize: CGSize
+    let highlightedLine: CGRect
+    let highlightedCandidate: CGRect
+    let peripherals: CGRect
+  }
+
   // MARK: - 動態變數
+
+  public let padding: CGFloat = 2
+  public let originDelta: CGFloat = 5
+  public let cellTextHeight = CandidatePool.shitCell.textDimension.height
+  public let cellRadius: CGFloat = 4
+  public var windowRadius: CGFloat { originDelta + cellRadius }
+
+  /// 當前資料池是否存在多列/多行候選字詞呈現。
+  public var isMatrix: Bool { maxLinesPerPage > 1 }
 
   /// 用來在初期化一個候選字詞資料池的時候研判「橫版多行選字窗每行最大應該塞多少個候選字詞」。
   /// 注意：該參數不用來計算視窗寬度，所以無須算上候選字詞間距。
@@ -130,6 +151,7 @@ public class CandidatePool {
     candidateLines.append(currentColumn)
     recordedLineRangeForCurrentPage = fallbackedLineRangeForCurrentPage
     highlight(at: 0)
+    updateMetrics()
   }
 }
 
@@ -254,7 +276,7 @@ public extension CandidatePool {
     if layout != .vertical, maxLinesPerPage == 1 {
       min = max(minAccepted, cell.cellLength(isMatrix: false))
     } else if layout == .vertical, maxLinesPerPage == 1 {
-      min = max(Double(CandidateCellData.unifiedSize * 6), 90)
+      min = max(Double(CandidateCellData.unifiedSize * 6), ceil(cell.size * 5.6))
     }
     return (min, nil)
   }
