@@ -70,8 +70,6 @@ public class CtlCandidateTDK: CtlCandidate, NSWindowDelegate {
     panel.level = NSWindow.Level(Int(max(CGShieldingWindowLevel(), kCGPopUpMenuWindowLevel)) + 2)
     panel.hasShadow = true
     panel.backgroundColor = NSColor.clear
-    panel.isMovable = true
-    panel.isMovableByWindowBackground = true
     contentRect.origin = NSPoint.zero
 
     super.init(layout)
