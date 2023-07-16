@@ -180,7 +180,7 @@ extension VwrCandidateTDK {
     case .horizontal where isCurrentLineInMatrix:
       return colorScheme == .dark ? Color.primary.opacity(0.05) : .white
     case .vertical where isCurrentLineInMatrix:
-      return absoluteBackgroundColor.opacity(0.13)
+      return absoluteBackgroundColor.opacity(0.9)
     default:
       return Color.clear
     }
@@ -308,9 +308,9 @@ extension VwrCandidateTDK {
 
   var absoluteBackgroundColor: Color {
     if colorScheme == .dark {
-      return Color(white: 0)
+      return Color.black
     } else {
-      return Color(white: 1)
+      return Color.white
     }
   }
 
@@ -457,13 +457,13 @@ struct VwrCandidateTDK_Previews: PreviewProvider {
     }
     VStack {
       HStack(alignment: .top) {
-        Text("田所選字窗 Cocoa 模式").bold().font(Font.system(.title))
+        Text("田所選字窗 CG 模式").bold().font(Font.system(.title))
         VStack {
-          VwrCandidateTDKCocoaForSwiftUI(controller: nil, thePool: thePoolX).fixedSize()
-          VwrCandidateTDKCocoaForSwiftUI(controller: nil, thePool: thePoolXS).fixedSize()
+          VwrCandidateTDKAppKitForSwiftUI(controller: nil, thePool: thePoolX).fixedSize()
+          VwrCandidateTDKAppKitForSwiftUI(controller: nil, thePool: thePoolXS).fixedSize()
           HStack {
-            VwrCandidateTDKCocoaForSwiftUI(controller: nil, thePool: thePoolY).fixedSize()
-            VwrCandidateTDKCocoaForSwiftUI(controller: nil, thePool: thePoolYS).fixedSize()
+            VwrCandidateTDKAppKitForSwiftUI(controller: nil, thePool: thePoolY).fixedSize()
+            VwrCandidateTDKAppKitForSwiftUI(controller: nil, thePool: thePoolYS).fixedSize()
           }
         }
       }
@@ -480,5 +480,32 @@ struct VwrCandidateTDK_Previews: PreviewProvider {
         }
       }
     }
+    #if USING_STACK_VIEW_IN_TDK_COCOA
+      VStack {
+        HStack(alignment: .top) {
+          Text("田所選字窗 Cocoa 模式").bold().font(Font.system(.title))
+          VStack {
+            VwrCandidateTDKCocoaForSwiftUI(controller: nil, thePool: thePoolX).fixedSize()
+            VwrCandidateTDKCocoaForSwiftUI(controller: nil, thePool: thePoolXS).fixedSize()
+            HStack {
+              VwrCandidateTDKCocoaForSwiftUI(controller: nil, thePool: thePoolY).fixedSize()
+              VwrCandidateTDKCocoaForSwiftUI(controller: nil, thePool: thePoolYS).fixedSize()
+            }
+          }
+        }
+        Divider()
+        HStack(alignment: .top) {
+          Text("田所選字窗 SwiftUI 模式").bold().font(Font.system(.title))
+          VStack {
+            VwrCandidateTDK(controller: nil, thePool: thePoolX, forceCatalinaCompatibility: oldOS).fixedSize()
+            VwrCandidateTDK(controller: nil, thePool: thePoolXS, forceCatalinaCompatibility: oldOS).fixedSize()
+            HStack {
+              VwrCandidateTDK(controller: nil, thePool: thePoolY, forceCatalinaCompatibility: oldOS).fixedSize()
+              VwrCandidateTDK(controller: nil, thePool: thePoolYS, forceCatalinaCompatibility: oldOS).fixedSize()
+            }
+          }
+        }
+      }
+    #endif
   }
 }
