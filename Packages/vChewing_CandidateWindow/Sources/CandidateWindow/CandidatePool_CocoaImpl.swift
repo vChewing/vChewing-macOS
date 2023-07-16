@@ -8,7 +8,141 @@
 
 import AppKit
 
-// MARK: - Using One Single NSAttributedString.
+// MARK: - UI Metrics.
+
+extension CandidatePool {
+  public func updateMetrics() {
+    // 開工
+    let initialOrigin: NSPoint = .init(x: originDelta, y: originDelta)
+    var totalAccuSize: NSSize = .zero
+    // Origin is at the top-left corner.
+    var currentOrigin: NSPoint = initialOrigin
+    var highlightedCellRect: CGRect = .zero
+    var highlightedLineRect: CGRect = .zero
+    var currentPageLines = candidateLines[lineRangeForCurrentPage]
+    var blankLines = maxLinesPerPage - currentPageLines.count
+    var fillBlankCells = true
+    switch (layout, isMatrix) {
+    case (.horizontal, false):
+      blankLines = 0
+      fillBlankCells = false
+    case (.vertical, false): blankLines = 0
+    case (_, true): break
+    }
+    while blankLines > 0 {
+      currentPageLines.append(.init(repeating: Self.shitCell, count: maxLineCapacity))
+      blankLines -= 1
+    }
+    Self.shitCell.updateMetrics(pool: self, origin: currentOrigin)
+    Self.shitCell.isHighlighted = false
+    let minimumCellDimension = Self.shitCell.visualDimension
+    currentPageLines.forEach { currentLine in
+      let currentLineOrigin = currentOrigin
+      var accumulatedLineSize: NSSize = .zero
+      var currentLineRect: CGRect { .init(origin: currentLineOrigin, size: accumulatedLineSize) }
+      let lineHasHighlightedCell = currentLine.hasHighlightedCell
+      currentLine.forEach { currentCell in
+        currentCell.updateMetrics(pool: self, origin: currentOrigin)
+        var cellDimension = currentCell.visualDimension
+        if layout == .vertical || currentCell.displayedText.count <= 2 {
+          cellDimension.width = max(minimumCellDimension.width, cellDimension.width)
+        }
+        cellDimension.height = max(minimumCellDimension.height, cellDimension.height)
+        switch self.layout {
+        case .horizontal:
+          accumulatedLineSize.width += cellDimension.width
+          accumulatedLineSize.height = max(accumulatedLineSize.height, cellDimension.height)
+        case .vertical:
+          accumulatedLineSize.height += cellDimension.height
+          accumulatedLineSize.width = max(accumulatedLineSize.width, cellDimension.width)
+        }
+        if lineHasHighlightedCell {
+          switch self.layout {
+          case .horizontal where currentCell.isHighlighted: highlightedCellRect.size.width = cellDimension.width
+          case .vertical: highlightedCellRect.size.width = max(highlightedCellRect.size.width, cellDimension.width)
+          default: break
+          }
+          if currentCell.isHighlighted {
+            highlightedCellRect.origin = currentOrigin
+            highlightedCellRect.size.height = cellDimension.height
+          }
+        }
+        switch self.layout {
+        case .horizontal: currentOrigin.x += cellDimension.width
+        case .vertical: currentOrigin.y += cellDimension.height
+        }
+      }
+      if lineHasHighlightedCell {
+        highlightedLineRect.origin = currentLineRect.origin
+        switch self.layout {
+        case .horizontal:
+          highlightedLineRect.size.height = currentLineRect.size.height
+        case .vertical:
+          highlightedLineRect.size.width = currentLineRect.size.width
+        }
+      }
+      switch self.layout {
+      case .horizontal:
+        highlightedLineRect.size.width = max(currentLineRect.size.width, highlightedLineRect.width)
+      case .vertical:
+        highlightedLineRect.size.height = max(currentLineRect.size.height, highlightedLineRect.height)
+        currentLine.forEach { theCell in
+          theCell.visualDimension.width = accumulatedLineSize.width
+        }
+      }
+      // 終末處理
+      switch self.layout {
+      case .horizontal:
+        currentOrigin.x = originDelta
+        currentOrigin.y += accumulatedLineSize.height
+        totalAccuSize.width = max(totalAccuSize.width, accumulatedLineSize.width)
+        totalAccuSize.height += accumulatedLineSize.height
+      case .vertical:
+        currentOrigin.y = originDelta
+        currentOrigin.x += accumulatedLineSize.width
+        totalAccuSize.height = max(totalAccuSize.height, accumulatedLineSize.height)
+        totalAccuSize.width += accumulatedLineSize.width
+      }
+    }
+    if fillBlankCells {
+      switch layout {
+      case .horizontal:
+        totalAccuSize.width = max(totalAccuSize.width, CGFloat(maxLineCapacity) * minimumCellDimension.width)
+        highlightedLineRect.size.width = totalAccuSize.width
+      case .vertical:
+        totalAccuSize.height = CGFloat(maxLineCapacity) * minimumCellDimension.height
+      }
+    }
+    // 繪製附加內容
+    let strPeripherals = attributedDescriptionBottomPanes
+    var dimensionPeripherals = strPeripherals.boundingDimension
+    dimensionPeripherals.width = ceil(dimensionPeripherals.width)
+    dimensionPeripherals.height = ceil(dimensionPeripherals.height)
+    if finalContainerOrientation == .horizontal {
+      totalAccuSize.width += 5
+      dimensionPeripherals.width += 5
+      let delta = max(CandidateCellData.unifiedTextHeight + padding * 2 - dimensionPeripherals.height, 0)
+      currentOrigin = .init(x: totalAccuSize.width + originDelta, y: ceil(delta / 2) + originDelta)
+      totalAccuSize.width += dimensionPeripherals.width
+    } else {
+      totalAccuSize.height += 2
+      currentOrigin = .init(x: padding + originDelta, y: totalAccuSize.height + originDelta)
+      totalAccuSize.height += dimensionPeripherals.height
+      totalAccuSize.width = max(totalAccuSize.width, dimensionPeripherals.width)
+    }
+    let rectPeripherals = CGRect(origin: currentOrigin, size: dimensionPeripherals)
+    totalAccuSize.width += originDelta * 2
+    totalAccuSize.height += originDelta * 2
+    metrics = .init(fittingSize: totalAccuSize, highlightedLine: highlightedLineRect, highlightedCandidate: highlightedCellRect, peripherals: rectPeripherals)
+  }
+
+  private var finalContainerOrientation: NSUserInterfaceLayoutOrientation {
+    if maxLinesPerPage == 1, layout == .horizontal { return .horizontal }
+    return .vertical
+  }
+}
+
+// MARK: - Using One Single NSAttributedString. (Some of them are for debug purposes.)
 
 extension CandidatePool {
   // MARK: Candidate List with Peripherals.
@@ -143,6 +277,7 @@ extension CandidatePool {
     let positionCounterTextSize = max(ceil(CandidateCellData.unifiedSize * 0.7), 11)
     let attrTooltip: [NSAttributedString.Key: AnyObject] = [
       .font: Self.blankCell.phraseFontEmphasized(size: positionCounterTextSize),
+      .foregroundColor: NSColor.textColor,
     ]
     let tooltipText = NSAttributedString(
       string: " \(tooltip) ", attributes: attrTooltip
@@ -154,6 +289,7 @@ extension CandidatePool {
     let reverseLookupTextSize = max(ceil(CandidateCellData.unifiedSize * 0.6), 9)
     let attrReverseLookup: [NSAttributedString.Key: AnyObject] = [
       .font: Self.blankCell.phraseFont(size: reverseLookupTextSize),
+      .foregroundColor: NSColor.textColor,
     ]
     let attrReverseLookupSpacer: [NSAttributedString.Key: AnyObject] = [
       .font: Self.blankCell.phraseFont(size: reverseLookupTextSize),

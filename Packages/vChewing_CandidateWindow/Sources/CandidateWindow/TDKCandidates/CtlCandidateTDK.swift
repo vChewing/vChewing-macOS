@@ -41,8 +41,15 @@ public class CtlCandidateTDK: CtlCandidate, NSWindowDelegate {
     ).edgesIgnoringSafeArea(.top)
   }
 
-  private var theViewCocoa: NSStackView {
-    VwrCandidateTDKCocoa(controller: self, thePool: Self.thePool)
+  #if USING_STACK_VIEW_IN_TDK_COCOA
+    /// 該視圖模式因算法陳舊而不再維護。
+    private var theViewCocoa: NSStackView {
+      VwrCandidateTDKCocoa(controller: self, thePool: Self.thePool)
+    }
+  #endif
+
+  private var theViewAppKit: NSView {
+    VwrCandidateTDKAppKit(controller: self, thePool: Self.thePool)
   }
 
   private var theViewLegacy: NSView {
@@ -120,7 +127,7 @@ public class CtlCandidateTDK: CtlCandidate, NSWindowDelegate {
         Self.currentView = NSHostingView(rootView: theView)
         break viewCheck
       }
-      Self.currentView = theViewCocoa
+      Self.currentView = theViewAppKit
     }
     window.contentView = Self.currentView
     window.setContentSize(Self.currentView.fittingSize)
