@@ -77,29 +77,41 @@ public enum IMEApp {
   // MARK: - 獲取輸入法的版本以及建置編號
 
   public static let appVersionLabel: String = {
-    let maybeStrDate: String? = {
+    let maybeDateModified: Date? = {
       guard let executableURL = Bundle.main.executableURL,
-            let infoDate = (try? executableURL.resourceValues(forKeys: [.creationDateKey]))?.creationDate
+            let infoDate = (try? executableURL.resourceValues(forKeys: [.contentModificationDateKey]))?.contentModificationDate
       else {
         return nil
       }
+      return infoDate
+    }()
 
+    func dateStringTag(date givenDate: Date) -> String {
       let dateFormatter = DateFormatter()
       dateFormatter.dateFormat = "yyyyMMdd.HHmm"
       dateFormatter.timeZone = .init(secondsFromGMT: +28800) ?? .current
-      let strDate = dateFormatter.string(from: infoDate)
+      let strDate = dateFormatter.string(from: givenDate)
       return strDate
-    }()
+    }
 
     guard
       let intBuild = Bundle.main.infoDictionary?[kCFBundleVersionKey as String] as? String,
-      let strVer = Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String,
-      let strDate = maybeStrDate
+      let strVer = Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String
     else {
       return "1.14.514 - 19190810"
     }
 
-    return "\(strVer) Build \(intBuild) - \(strDate)"
+    var theResults = ["\(strVer) Build \(intBuild)"]
+
+    if let theDate = Bundle.main.getCodeSignedDate() {
+      theResults.append(dateStringTag(date: theDate))
+    } else if let theDate = maybeDateModified {
+      theResults.append("\(dateStringTag(date: theDate)) Unsigned")
+    } else {
+      theResults.append("Unsigned")
+    }
+
+    return theResults.joined(separator: " - ")
   }()
 
   // MARK: - 輸入法的當前的簡繁體中文模式
