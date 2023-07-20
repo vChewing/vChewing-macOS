@@ -123,21 +123,12 @@ public extension TISInputSource {
   static func rawTISInputSources(onlyASCII: Bool = false) -> [String: TISInputSource] {
     // 為了指定檢索條件，先構築 CFDictionary 辭典。
     // 第二項代指辭典容量。
-    let conditions = CFDictionaryCreateMutable(nil, 2, nil, nil)
-    if onlyASCII {
-      // 第一條件：僅接收靜態鍵盤佈局結果。
-      CFDictionaryAddValue(
-        conditions, unsafeBitCast(kTISPropertyInputSourceType, to: UnsafeRawPointer.self),
-        unsafeBitCast(kTISTypeKeyboardLayout, to: UnsafeRawPointer.self)
-      )
-      // 第二條件：只能輸入 ASCII 內容。
-      CFDictionaryAddValue(
-        conditions, unsafeBitCast(kTISPropertyInputSourceIsASCIICapable, to: UnsafeRawPointer.self),
-        unsafeBitCast(kCFBooleanTrue, to: UnsafeRawPointer.self)
-      )
-    }
+    let dicConditions: [CFString: Any] = !onlyASCII ? [:] : [
+      kTISPropertyInputSourceType: kTISTypeKeyboardLayout as CFString,
+      kTISPropertyInputSourceIsASCIICapable: kCFBooleanTrue as CFBoolean,
+    ]
     // 返回鍵盤配列清單。
-    var result = TISCreateInputSourceList(conditions, true).takeRetainedValue() as? [TISInputSource] ?? .init()
+    var result = TISCreateInputSourceList(dicConditions as CFDictionary, true).takeRetainedValue() as? [TISInputSource] ?? .init()
     if onlyASCII {
       result = result.filter { $0.scriptCode == 0 }
     }
