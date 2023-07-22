@@ -42,6 +42,17 @@ public struct HText: NSViewRepresentable {
 }
 
 public class NSAttributedTextView: NSView {
+  private static let sharedTextField: NSTextField = {
+    let result = NSTextField()
+    result.isSelectable = false
+    result.isEditable = false
+    result.isBordered = false
+    result.backgroundColor = .clear
+    result.allowsEditingTextAttributes = false
+    result.preferredMaxLayoutWidth = result.frame.width
+    return result
+  }()
+
   public enum writingDirection: String {
     case horizontal
     case vertical
@@ -108,11 +119,11 @@ public class NSAttributedTextView: NSView {
       default: return attributedStringValue(areaCalculation: true)
       }
     }()
-    var textWH = attrString.boundingDimension
+    Self.sharedTextField.attributedStringValue = attrString
+    Self.sharedTextField.sizeToFit()
+    var textWH = Self.sharedTextField.fittingSize
     if direction != .horizontal {
-      textWH.height *= 1.03
-      textWH.height = max(textWH.height, NSFont.systemFontSize * 1.1)
-      textWH.height = ceil(textWH.height)
+      textWH.height = max(ceil(1.03 * textWH.height), ceil(NSFont.systemFontSize * 1.1))
       textWH = .init(width: textWH.height, height: textWH.width)
     }
     return .init(origin: .zero, size: textWH)
