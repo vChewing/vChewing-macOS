@@ -79,7 +79,17 @@ public class Notifier: NSWindowController {
     let attrStringAlt = NSMutableAttributedString(string: additionalString, attributes: attrAlt)
     attrString.insert(attrStringAlt, at: attrString.length)
 
-    let textWH = attrString.boundingDimension
+    let lblMessage = NSTextField()
+    lblMessage.attributedStringValue = attrString
+    lblMessage.drawsBackground = false
+    lblMessage.font = .boldSystemFont(ofSize: NSFont.systemFontSize(for: .regular))
+    lblMessage.isBezeled = false
+    lblMessage.isEditable = false
+    lblMessage.isSelectable = false
+    lblMessage.textColor = .controlTextColor
+    lblMessage.sizeToFit()
+
+    let textWH = lblMessage.frame
     let windowWidth = Double(4) * kLargeFontSize + textWH.width
     let contentRect = NSRect(x: 0, y: 0, width: windowWidth, height: 60.0)
     var windowRect = contentRect
@@ -109,22 +119,13 @@ public class Notifier: NSWindowController {
     theWindow.standardWindowButton(NSWindow.ButtonType.zoomButton)?.isHidden = true
     theWindow.isReleasedWhenClosed = true
     theWindow.isMovable = false
-
-    let lblMessage = NSTextField()
-    lblMessage.attributedStringValue = attrString
-    lblMessage.drawsBackground = false
-    lblMessage.font = .boldSystemFont(ofSize: NSFont.systemFontSize(for: .regular))
-    lblMessage.frame = contentRect
-    lblMessage.isBezeled = false
-    lblMessage.isEditable = false
-    lblMessage.isSelectable = false
-    lblMessage.textColor = .controlTextColor
     theWindow.contentView?.addSubview(lblMessage)
 
     let x = lblMessage.frame.origin.x
     let y = ((theWindow.frame.height) - textWH.height) / 1.9
-    let newFrame = NSRect(x: x, y: y, width: theWindow.frame.width, height: textWH.height)
-    lblMessage.frame = newFrame
+    let newOrigin = CGPoint(x: x, y: y)
+    lblMessage.frame.origin = newOrigin
+    lblMessage.frame.size.width += Double(4) * kLargeFontSize
 
     super.init(window: theWindow)
     display()
