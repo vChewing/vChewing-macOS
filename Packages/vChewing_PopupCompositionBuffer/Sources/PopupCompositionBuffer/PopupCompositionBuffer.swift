@@ -133,6 +133,7 @@ public class PopupCompositionBuffer: NSWindowController {
     attrString.insert(attrCursor, at: state.u16Cursor)
 
     attrString.insert(attrPCBHeader, at: 0)
+    attrString.insert(attrPCBHeader, at: attrString.length)
 
     textShown = attrString
     messageTextField.maximumNumberOfLines = 1
@@ -169,19 +170,16 @@ public class PopupCompositionBuffer: NSWindowController {
   }
 
   private func adjustSize() {
-    let attrString = messageTextField.attributedStringValue
-    var rect = NSRect(origin: .zero, size: attrString.boundingDimension)
-    rect.size.height *= 1.2
-    rect.size.height = max(22, rect.size.height)
-    rect.size.width = max(rect.size.width, 20 * Double(attrString.string.count)) + 2
+    messageTextField.sizeToFit()
+    var rect = messageTextField.frame
     if isTypingDirectionVertical {
-      rect = .init(x: rect.minX, y: rect.minY, width: rect.height, height: rect.width)
+      rect = .init(x: rect.minX, y: rect.minY, width: rect.height * 1.5, height: rect.width)
     }
     var bigRect = rect
     bigRect.size.width += NSFont.systemFontSize
     bigRect.size.height += NSFont.systemFontSize
-    rect.origin.x += ceil(NSFont.systemFontSize / 2)
-    rect.origin.y += ceil(NSFont.systemFontSize / 2)
+    rect.origin.x = ceil(NSFont.systemFontSize / 2)
+    rect.origin.y = ceil(NSFont.systemFontSize / 2)
     if isTypingDirectionVertical {
       messageTextField.boundsRotation = 90
     } else {
