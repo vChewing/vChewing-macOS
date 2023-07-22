@@ -49,22 +49,21 @@ public extension NSSize {
 // Ref: https://developer.apple.com/library/archive/documentation/Cocoa/Conceptual/TextLayout/Tasks/StringHeight.html
 
 public extension NSAttributedString {
+  private static let tmpTextStorage = NSTextStorage()
+  private static let tmpLayoutManager = NSLayoutManager()
+  private static let tmpTextContainer = NSTextContainer()
+
   @objc var boundingDimension: NSSize {
-    let rectA = boundingRect(
-      with: NSSize(width: Double.infinity, height: Double.infinity),
-      options: [.usesLineFragmentOrigin, .usesFontLeading]
-    )
-    let textStorage = NSTextStorage(attributedString: self)
-    let textContainer = NSTextContainer()
-    let layoutManager = NSLayoutManager()
-    layoutManager.addTextContainer(textContainer)
-    textStorage.addLayoutManager(layoutManager)
-    textContainer.lineFragmentPadding = 0.0
-    layoutManager.glyphRange(for: textContainer)
-    let rectB = layoutManager.usedRect(for: textContainer)
-    let width = ceil(max(rectA.width, rectB.width))
-    let height = ceil(max(rectA.height, rectB.height))
-    return .init(width: width, height: height)
+    Self.tmpTextStorage.setAttributedString(self)
+    if Self.tmpLayoutManager.textContainers.isEmpty || Self.tmpLayoutManager.textContainers.first !== Self.tmpTextContainer {
+      Self.tmpLayoutManager.addTextContainer(Self.tmpTextContainer)
+    }
+    if Self.tmpTextStorage.layoutManagers.isEmpty || Self.tmpTextStorage.layoutManagers.first !== Self.tmpLayoutManager {
+      Self.tmpTextStorage.addLayoutManager(Self.tmpLayoutManager)
+    }
+    Self.tmpTextContainer.lineFragmentPadding = 0
+    Self.tmpLayoutManager.glyphRange(for: Self.tmpTextContainer)
+    return Self.tmpLayoutManager.usedRect(for: Self.tmpTextContainer).size
   }
 }
 
