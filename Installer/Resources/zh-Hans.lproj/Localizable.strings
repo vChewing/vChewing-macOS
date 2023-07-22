@@ -13,7 +13,7 @@
 "Fatal Error" = "安装错误";
 "Abort" = "放弃安装";
 "Cannot register input source %@ at %@." = "无法从档案位置 %2$@ 安装输入法 \"%1$@\"。";
-"Cannot find input source %@ after registration." = "在注册完输入法 \"%@\" 仍然无法找到输入法。";
+"Cannot find input source %@ after registration." = "在注册完输入法 \"%@\" 之后仍然无法找到该输入法。";
 "Warning" = "安装不完整";
 "Input method may not be fully enabled. Please enable it through System Preferences > Keyboard > Input Sources." = "输入法已经安装好，但可能没有完全启用。请从「系统偏好设定」 > 「键盘」 > 「输入方式」分页加入输入法。";
 "Continue" = "继续";
