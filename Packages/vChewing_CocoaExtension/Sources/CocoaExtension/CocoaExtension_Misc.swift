@@ -52,7 +52,7 @@ public extension NSAttributedString {
   @objc var boundingDimension: NSSize {
     let rectA = boundingRect(
       with: NSSize(width: Double.infinity, height: Double.infinity),
-      options: [.usesLineFragmentOrigin]
+      options: [.usesLineFragmentOrigin, .usesFontLeading]
     )
     let textStorage = NSTextStorage(attributedString: self)
     let textContainer = NSTextContainer()
