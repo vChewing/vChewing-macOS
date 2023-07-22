@@ -146,13 +146,10 @@ extension AppDelegate {
         let message = String(
           format: NSLocalizedString(
             "Cannot find input source %@ after registration.", comment: ""
-          ),
+          ) + "(#D41J0U8U)",
           imeIdentifier
         )
-        runAlertPanel(
-          title: NSLocalizedString("Fatal Error", comment: ""), message: message,
-          buttonTitle: NSLocalizedString("Abort", comment: "")
-        )
+        NSLog(message)
       }
     }
 
