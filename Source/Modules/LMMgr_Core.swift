@@ -382,6 +382,24 @@ public class LMMgr {
     }
   }
 
+  public static func relocateWreckedUOMData() {
+    func dateStringTag(date givenDate: Date) -> String {
+      let dateFormatter = DateFormatter()
+      dateFormatter.dateFormat = "yyyyMMdd-HHmm"
+      dateFormatter.timeZone = .current
+      let strDate = dateFormatter.string(from: givenDate)
+      return strDate
+    }
+
+    let urls: [URL] = [userOverrideModelDataURL(.imeModeCHS), userOverrideModelDataURL(.imeModeCHT)]
+    let folderURL = URL(fileURLWithPath: dataFolderPath(isDefaultFolder: true)).deletingLastPathComponent()
+    urls.forEach { oldURL in
+      let newFileName = "[UOM-CRASH][\(dateStringTag(date: .init()))]\(oldURL.lastPathComponent)"
+      let newURL = folderURL.appendingPathComponent(newFileName)
+      try? FileManager.default.moveItem(at: oldURL, to: newURL)
+    }
+  }
+
   public static func clearUserOverrideModelData(_ mode: Shared.InputMode = .imeModeNULL) {
     switch mode {
     case .imeModeCHS:
