@@ -1,4 +1,8 @@
 "vChewing" = "威注音入力アプリ";
+"Please drag the desired target from Finder to this place." = "ご指定したいものは直接に Finder からこの辺にお引
+// MARK: - Porting NSPathControl to SwiftUI.
+きずりを。";
+"[Technical Reason] macOS releases earlier than 10.13 have an issue: If calling NSOpenPanel directly from an input method, both the input method and its current client app hang in a dead-loop. Furthermore, it makes other apps hang in the same way when you switch into another app. If you don't want to hard-reboot your computer, your last resort is to use SSH to connect to your current computer from another computer and kill the input method process by Terminal commands. That's why vChewing cannot offer access to NSOpenPanel for macOS 10.12 and earlier." = "【技術上の原因説明】macOS 10.12 とそれ以前の macOS には、入力アプリが自ら NSOpenPanel を呼ぶと、入力アプリ自身も、全ての触れ合った客体アプリも、全部固まってしまう状態になります。こうなると、強引的にパソコン再起動や・或いは SSH で他のパソコンからこの入力アプリの強制停止が必要です。従って、弊アプリは macOS 10.12 とその以前の macOS には NSOpenPanel のアクセスの提供はできません。";
 "Quick Candidates" = "早速候補";
 "Alvin Liu (Imitative)" = "劉又銘擬音注音配列";
 "Previous intonation has been overridden." = "後ろ側の漢字の音調を書き直しました。";
