@@ -23,14 +23,12 @@ class CtlPrefWindow: NSWindowController, NSWindowDelegate {
   @IBOutlet var selectionKeyComboBox: NSComboBox!
   @IBOutlet var chkTrad2KangXi: NSButton!
   @IBOutlet var chkTrad2JISShinjitai: NSButton!
-  @IBOutlet var lblCurrentlySpecifiedUserDataFolder: NSTextFieldCell!
   @IBOutlet var tglControlDevZoneIMKCandidate: NSButton!
   @IBOutlet var cmbCandidateFontSize: NSPopUpButton!
   @IBOutlet var chkFartSuppressor: NSButton!
 
   @IBOutlet var chkRevLookupInCandidateWindow: NSButton!
   @IBOutlet var btnBrowseFolderForUserPhrases: NSButton!
-  @IBOutlet var txtUserPhrasesFolderPath: NSTextField!
   @IBOutlet var lblUserPhraseFolderChangeDescription: NSTextField!
 
   @IBOutlet var cmbPEInputModeMenu: NSPopUpButton!
@@ -45,6 +43,9 @@ class CtlPrefWindow: NSWindowController, NSWindowDelegate {
   @IBOutlet var txtPEField1: NSTextField!
   @IBOutlet var txtPEField2: NSTextField!
   @IBOutlet var txtPEField3: NSTextField!
+  @IBOutlet var pctUserDictionaryFolder: NSPathControl!
+  @IBOutlet var pctCassetteFilePath: NSPathControl!
+
   var isLoading = false {
     didSet { setPEUIControlAvailability() }
   }
@@ -85,6 +86,14 @@ class CtlPrefWindow: NSWindowController, NSWindowDelegate {
     chkFartSuppressor.isHidden = !Date.isTodayTheDate(from: 0401)
     chkFartSuppressor.isEnabled = !chkFartSuppressor.isHidden
 
+    pctCassetteFilePath.delegate = self
+    pctCassetteFilePath.url = URL(fileURLWithPath: LMMgr.cassettePath())
+    pctCassetteFilePath.toolTip = "Please drag the desired target from Finder to this place.".localized
+
+    pctUserDictionaryFolder.delegate = self
+    pctUserDictionaryFolder.url = URL(fileURLWithPath: LMMgr.dataFolderPath(isDefaultFolder: false))
+    pctUserDictionaryFolder.toolTip = "Please drag the desired target from Finder to this place.".localized
+
     cmbCandidateFontSize.isEnabled = true
 
     if #unavailable(macOS 10.14) {
@@ -110,9 +119,6 @@ class CtlPrefWindow: NSWindowController, NSWindowDelegate {
     window?.title = "\(preferencesTitleName) (\(IMEApp.appVersionLabel))"
     window?.titlebarAppearsTransparent = false
     use(view: vwrGeneral, animate: false)
-
-    lblCurrentlySpecifiedUserDataFolder.placeholderString = LMMgr.dataFolderPath(
-      isDefaultFolder: true)
 
     // Credit: Hiraku Wang (for the implementation of the UI language select support in Cocoa PrefWindow.
     // Note: The SwiftUI PrefWindow has the same feature implemented by Shiki Suen.
@@ -205,6 +211,12 @@ class CtlPrefWindow: NSWindowController, NSWindowDelegate {
       parserButton.menu?.addItem(menuItem)
     }
     parserButton.select(chosenParserItem ?? defaultParserItem)
+  }
+
+  func warnAboutComDlg32Inavailability() {
+    let title = "Please drag the desired target from Finder to this place.".localized
+    let message = "[Technical Reason] macOS releases earlier than 10.13 have an issue: If calling NSOpenPanel directly from an input method, both the input method and its current client app hang in a dead-loop. Furthermore, it makes other apps hang in the same way when you switch into another app. If you don't want to hard-reboot your computer, your last resort is to use SSH to connect to your current computer from another computer and kill the input method process by Terminal commands. That's why vChewing cannot offer access to NSOpenPanel for macOS 10.12 and earlier.".localized
+    window?.callAlert(title: title, text: message)
   }
 
   // 這裡有必要加上這段處理，用來確保藉由偏好設定介面動過的 CNS 開關能夠立刻生效。
@@ -321,10 +333,19 @@ class CtlPrefWindow: NSWindowController, NSWindowDelegate {
 
   @IBAction func resetSpecifiedUserDataFolder(_: Any) {
     LMMgr.resetSpecifiedUserDataFolder()
+    pctUserDictionaryFolder.url = URL(fileURLWithPath: LMMgr.dataFolderPath(isDefaultFolder: true))
   }
 
   @IBAction func chooseUserDataFolderToSpecify(_: Any) {
+    if NSEvent.modifierFlags == .option, let url = pctUserDictionaryFolder.url {
+      NSWorkspace.shared.activateFileViewerSelecting([url])
+      return
+    }
     guard let window = window else { return }
+    guard #available(macOS 10.13, *) else {
+      warnAboutComDlg32Inavailability()
+      return
+    }
     let dlgOpenPath = NSOpenPanel()
     dlgOpenPath.title = NSLocalizedString(
       "Choose your desired user data folder.", comment: ""
@@ -349,16 +370,19 @@ class CtlPrefWindow: NSWindowController, NSWindowDelegate {
           PrefMgr.shared.userDataFolderSpecified = newPath
           BookmarkManager.shared.saveBookmark(for: url)
           AppDelegate.shared.updateDirectoryMonitorPath()
+          self.pctUserDictionaryFolder.url = url
         } else {
           IMEApp.buzz()
           if !bolPreviousFolderValidity {
             LMMgr.resetSpecifiedUserDataFolder()
+            self.pctUserDictionaryFolder.url = URL(fileURLWithPath: LMMgr.dataFolderPath(isDefaultFolder: true))
           }
           return
         }
       } else {
         if !bolPreviousFolderValidity {
           LMMgr.resetSpecifiedUserDataFolder()
+          self.pctUserDictionaryFolder.url = URL(fileURLWithPath: LMMgr.dataFolderPath(isDefaultFolder: true))
         }
         return
       }
@@ -388,7 +412,15 @@ class CtlPrefWindow: NSWindowController, NSWindowDelegate {
   }
 
   @IBAction func chooseCassettePath(_: Any) {
+    if NSEvent.modifierFlags == .option, let url = pctCassetteFilePath.url {
+      NSWorkspace.shared.activateFileViewerSelecting([url])
+      return
+    }
     guard let window = window else { return }
+    guard #available(macOS 10.13, *) else {
+      warnAboutComDlg32Inavailability()
+      return
+    }
     let dlgOpenFile = NSOpenPanel()
     dlgOpenFile.title = NSLocalizedString(
       "Choose your desired cassette file path.", comment: ""
@@ -411,6 +443,7 @@ class CtlPrefWindow: NSWindowController, NSWindowDelegate {
           PrefMgr.shared.cassettePath = url.path
           LMMgr.loadCassetteData()
           BookmarkManager.shared.saveBookmark(for: url)
+          self.pctCassetteFilePath.url = url
         } else {
           IMEApp.buzz()
           if !bolPreviousPathValidity {
@@ -488,5 +521,52 @@ extension CtlPrefWindow: NSToolbarDelegate {
     item.tag = tab.cocoaTag
     item.action = #selector(updateTab(_:))
     return item
+  }
+}
+
+// MARK: - Path Control Delegate Methods
+
+extension CtlPrefWindow: NSPathControlDelegate {
+  func pathControl(_ pathControl: NSPathControl, acceptDrop info: NSDraggingInfo) -> Bool {
+    let urls = info.draggingPasteboard.readObjects(forClasses: [NSURL.self])
+    guard let url = urls?.first as? URL else { return false }
+    switch pathControl {
+    case pctCassetteFilePath:
+      let bolPreviousPathValidity = LMMgr.checkCassettePathValidity(
+        PrefMgr.shared.cassettePath.expandingTildeInPath)
+      if LMMgr.checkCassettePathValidity(url.path) {
+        PrefMgr.shared.cassettePath = url.path
+        LMMgr.loadCassetteData()
+        BookmarkManager.shared.saveBookmark(for: url)
+        pathControl.url = url
+        return true
+      }
+      // On Error:
+      IMEApp.buzz()
+      if !bolPreviousPathValidity {
+        LMMgr.resetCassettePath()
+      }
+      return false
+    case pctUserDictionaryFolder:
+      let bolPreviousFolderValidity = LMMgr.checkIfSpecifiedUserDataFolderValid(
+        PrefMgr.shared.userDataFolderSpecified.expandingTildeInPath)
+      var newPath = url.path
+      newPath.ensureTrailingSlash()
+      if LMMgr.checkIfSpecifiedUserDataFolderValid(newPath) {
+        PrefMgr.shared.userDataFolderSpecified = newPath
+        BookmarkManager.shared.saveBookmark(for: url)
+        AppDelegate.shared.updateDirectoryMonitorPath()
+        pathControl.url = url
+        return true
+      }
+      // On Error:
+      IMEApp.buzz()
+      if !bolPreviousFolderValidity {
+        LMMgr.resetSpecifiedUserDataFolder()
+        pathControl.url = URL(fileURLWithPath: LMMgr.dataFolderPath(isDefaultFolder: true))
+      }
+      return false
+    default: return false
+    }
   }
 }

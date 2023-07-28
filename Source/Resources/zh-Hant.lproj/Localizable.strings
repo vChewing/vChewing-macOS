@@ -1,4 +1,6 @@
 "vChewing" = "威注音輸入法";
+"Please drag the desired target from Finder to this place." = "請將您想要的目標直接拽到此處。";
+"[Technical Reason] macOS releases earlier than 10.13 have an issue: If calling NSOpenPanel directly from an input method, both the input method and its current client app hang in a dead-loop. Furthermore, it makes other apps hang in the same way when you switch into another app. If you don't want to hard-reboot your computer, your last resort is to use SSH to connect to your current computer from another computer and kill the input method process by Terminal commands. That's why vChewing cannot offer access to NSOpenPanel for macOS 10.12 and earlier." = "【技術原因】macOS 10.13 之前的版本的系統會在輸入法自身呼叫 NSOpenPanel 的時候令自身與客體應用陷入無限停止響應的狀態。更甚者，此時任何嘗試切換到的其他客體應用也會陷入同樣的狀態。除了強制斷電重新開機以外，就只能藉由遠端 SSH 連到目前的電腦上、以終端命令強行終止輸入法執行緒。因此，威注音輸入法不能對 macOS 10.12 及之前的系統開放對 NSOpenPanel 的存取。";
 "Quick Candidates" = "快速候選";
 "Alvin Liu (Imitative)" = "劉又銘擬音注音排列";
 "Previous intonation has been overridden." = "已覆寫游標身後的漢字的音調。";
