@@ -49,6 +49,12 @@ struct VwrPrefPaneCassette: View {
             TextField(fdrCassetteDataDefault, text: $cassettePath).disabled(true)
               .help(cassettePath)
             Button {
+              if NSEvent.modifierFlags == .option, !cassettePath.isEmpty {
+                NSWorkspace.shared.activateFileViewerSelecting(
+                  [URL(fileURLWithPath: cassettePath)]
+                )
+                return
+              }
               Self.dlgOpenFile.title = NSLocalizedString(
                 "Choose your desired cassette file path.", comment: ""
               )
