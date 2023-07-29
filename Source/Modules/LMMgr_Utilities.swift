@@ -252,12 +252,12 @@ public extension LMMgr {
   // MARK: - 重設使用者語彙檔案目錄
 
   static func resetSpecifiedUserDataFolder() {
-    UserDefaults.standard.removeObject(forKey: UserDef.kUserDataFolderSpecified.rawValue)
+    UserDefaults.standard.set(dataFolderPath(isDefaultFolder: true), forKey: UserDef.kUserDataFolderSpecified.rawValue)
     Self.initUserLangModels()
   }
 
   static func resetCassettePath() {
-    UserDefaults.standard.removeObject(forKey: UserDef.kCassettePath.rawValue)
+    UserDefaults.standard.set("", forKey: UserDef.kCassettePath.rawValue)
     Self.loadCassetteData()
   }
 
