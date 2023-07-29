@@ -96,13 +96,13 @@ struct VwrPrefPaneDictionary: View {
                       } else {
                         IMEApp.buzz()
                         if !bolPreviousFolderValidity {
-                          LMMgr.resetSpecifiedUserDataFolder()
+                          userDataFolderSpecified = LMMgr.dataFolderPath(isDefaultFolder: true)
                         }
                         return
                       }
                     } else {
                       if !bolPreviousFolderValidity {
-                        LMMgr.resetSpecifiedUserDataFolder()
+                        userDataFolderSpecified = LMMgr.dataFolderPath(isDefaultFolder: true)
                       }
                       return
                     }
@@ -112,8 +112,7 @@ struct VwrPrefPaneDictionary: View {
                 Text("...")
               }
               Button {
-                userDataFolderSpecified = ""
-                LMMgr.resetSpecifiedUserDataFolder()
+                userDataFolderSpecified = LMMgr.dataFolderPath(isDefaultFolder: true)
               } label: {
                 Text("↻")
               }

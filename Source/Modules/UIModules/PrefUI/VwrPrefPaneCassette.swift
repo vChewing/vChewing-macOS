@@ -80,13 +80,13 @@ struct VwrPrefPaneCassette: View {
                     } else {
                       IMEApp.buzz()
                       if !bolPreviousPathValidity {
-                        LMMgr.resetCassettePath()
+                        cassettePath = ""
                       }
                       return
                     }
                   } else {
                     if !bolPreviousPathValidity {
-                      LMMgr.resetCassettePath()
+                      cassettePath = ""
                     }
                     return
                   }
@@ -96,7 +96,7 @@ struct VwrPrefPaneCassette: View {
               Text("...")
             }
             Button {
-              LMMgr.resetCassettePath()
+              cassettePath = ""
             } label: {
               Text("×")
             }
