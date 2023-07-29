@@ -63,6 +63,12 @@ struct VwrPrefPaneDictionary: View {
               TextField(fdrUserDataDefault, text: $userDataFolderSpecified).disabled(true)
                 .help(userDataFolderSpecified)
               Button {
+                if NSEvent.modifierFlags == .option, !userDataFolderSpecified.isEmpty {
+                  NSWorkspace.shared.activateFileViewerSelecting(
+                    [URL(fileURLWithPath: userDataFolderSpecified)]
+                  )
+                  return
+                }
                 Self.dlgOpenPath.title = NSLocalizedString(
                   "Choose your desired user data folder.", comment: ""
                 )
