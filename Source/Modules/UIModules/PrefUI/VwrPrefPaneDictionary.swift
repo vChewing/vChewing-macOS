@@ -60,8 +60,32 @@ struct VwrPrefPaneDictionary: View {
           Group {
             Text(LocalizedStringKey("Choose your desired user data folder path. Will be omitted if invalid."))
             HStack {
-              TextField(fdrUserDataDefault, text: $userDataFolderSpecified).disabled(true)
-                .help(userDataFolderSpecified)
+              PathControl(pathDroppable: $userDataFolderSpecified) { pathControl in
+                pathControl.allowedTypes = ["public.folder", "public.directory"]
+                pathControl.heightAnchor.constraint(equalToConstant: 20).isActive = true
+                pathControl.widthAnchor.constraint(equalToConstant: CtlPrefUIShared.maxDescriptionWidth).isActive = true
+              } acceptDrop: { pathControl, info in
+                let urls = info.draggingPasteboard.readObjects(forClasses: [NSURL.self])
+                guard let url = urls?.first as? URL else { return false }
+                let bolPreviousFolderValidity = LMMgr.checkIfSpecifiedUserDataFolderValid(
+                  PrefMgr.shared.userDataFolderSpecified.expandingTildeInPath)
+                var newPath = url.path
+                newPath.ensureTrailingSlash()
+                if LMMgr.checkIfSpecifiedUserDataFolderValid(newPath) {
+                  userDataFolderSpecified = newPath
+                  pathControl.url = url
+                  BookmarkManager.shared.saveBookmark(for: url)
+                  AppDelegate.shared.updateDirectoryMonitorPath()
+                  return true
+                }
+                // On Error:
+                IMEApp.buzz()
+                if !bolPreviousFolderValidity {
+                  userDataFolderSpecified = fdrUserDataDefault
+                  pathControl.url = URL(fileURLWithPath: fdrUserDataDefault)
+                }
+                return false
+              }
               Button {
                 if NSEvent.modifierFlags == .option, !userDataFolderSpecified.isEmpty {
                   NSWorkspace.shared.activateFileViewerSelecting(
@@ -96,13 +120,13 @@ struct VwrPrefPaneDictionary: View {
                       } else {
                         IMEApp.buzz()
                         if !bolPreviousFolderValidity {
-                          userDataFolderSpecified = LMMgr.dataFolderPath(isDefaultFolder: true)
+                          userDataFolderSpecified = fdrUserDataDefault
                         }
                         return
                       }
                     } else {
                       if !bolPreviousFolderValidity {
-                        userDataFolderSpecified = LMMgr.dataFolderPath(isDefaultFolder: true)
+                        userDataFolderSpecified = fdrUserDataDefault
                       }
                       return
                     }
@@ -112,7 +136,7 @@ struct VwrPrefPaneDictionary: View {
                 Text("...")
               }
               Button {
-                userDataFolderSpecified = LMMgr.dataFolderPath(isDefaultFolder: true)
+                userDataFolderSpecified = fdrUserDataDefault
               } label: {
                 Text("↻")
               }
