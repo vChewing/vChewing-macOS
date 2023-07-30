@@ -195,3 +195,70 @@ public struct AttributedLabel: NSViewRepresentable {
     nsView.attributedStringValue = text
   }
 }
+
+// MARK: - Porting NSPathControl to SwiftUI.
+
+@available(macOS 10.15, *)
+public struct PathControl: NSViewRepresentable {
+  private let pathCtl = NSPathControl()
+  @Binding private var path: String
+  private var configuration: (NSPathControl) -> Void = { _ in }
+  private var acceptDrop: (NSPathControl, NSDraggingInfo) -> Bool = { _, _ in false }
+
+  public init(
+    path: Binding<String>,
+    configuration: @escaping (NSPathControl) -> Void = { _ in }
+  ) {
+    _path = path
+    self.configuration = configuration
+  }
+
+  public init(
+    pathDroppable: Binding<String>,
+    configuration: @escaping (NSPathControl) -> Void = { _ in },
+    acceptDrop: @escaping (NSPathControl, NSDraggingInfo) -> Bool
+  ) {
+    _path = pathDroppable
+    self.configuration = configuration
+    self.acceptDrop = acceptDrop
+  }
+
+  public func makeNSView(context: Context) -> NSPathControl {
+    pathCtl.allowsExpansionToolTips = true
+    pathCtl.translatesAutoresizingMaskIntoConstraints = false
+    pathCtl.font = NSFont.systemFont(ofSize: NSFont.smallSystemFontSize)
+    pathCtl.controlSize = .small
+    pathCtl.backgroundColor = .controlBackgroundColor
+    pathCtl.target = context.coordinator
+    pathCtl.doubleAction = #selector(Coordinator.action)
+    return pathCtl
+  }
+
+  public func updateNSView(_ pathCtl: NSPathControl, context _: Context) {
+    pathCtl.url = !path.isEmpty ? URL(fileURLWithPath: path) : nil
+    configuration(pathCtl)
+  }
+
+  public func makeCoordinator() -> Coordinator {
+    Coordinator(target: pathCtl, acceptDrop: acceptDrop)
+  }
+
+  public class Coordinator: NSObject, NSPathControlDelegate {
+    private var acceptDrop: (NSPathControl, NSDraggingInfo) -> Bool
+
+    public init(target: NSPathControl, acceptDrop: @escaping (NSPathControl, NSDraggingInfo) -> Bool) {
+      self.acceptDrop = acceptDrop
+      super.init()
+      target.delegate = self
+    }
+
+    @objc public func action(sender: NSPathControl) {
+      guard let url = sender.url else { return }
+      NSWorkspace.shared.activateFileViewerSelecting([url])
+    }
+
+    public func pathControl(_ pathControl: NSPathControl, acceptDrop info: NSDraggingInfo) -> Bool {
+      acceptDrop(pathControl, info)
+    }
+  }
+}
