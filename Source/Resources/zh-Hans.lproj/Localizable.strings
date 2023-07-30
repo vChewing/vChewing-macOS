@@ -121,7 +121,7 @@
 "\"%@\" already exists:\n ENTER to boost, SHIFT+COMMAND+ENTER to nerf, \n BackSpace or Delete key to exclude." = "「%@」已存在：\n　敲 Enter 以升权、敲 Shift+Command+Enter 以降权；\n　敲 BackSpace 或 Delete 以排除。";
 "Edit Phrase Replacement Table…" = "编辑语汇置换表…";
 "Use Phrase Replacement" = "使用语汇置换";
-"Candidate keys can only contain printable ASCII characters like alphanumericals." = "选字键只能是英数等 ASCII 可列印字符。";
+"Candidate keys can only contain printable ASCII characters like alphanumericals." = "选字键只能是英数等 ASCII 可列印字元。";
 "Candidate keys cannot contain space." = "选字键不得包含空格。";
 "Minimum 6 candidate keys allowed." = "请至少指定 6 个选字键。";
 "Maximum 10 candidate keys allowed." = "选字键最多只能指定 9 个。";
@@ -195,7 +195,7 @@
 // SwiftUI Preferences
 "(Shift+)Space:" = "(Shift+)空格键:";
 "⚠︎ This feature in IMK Candidate Window defects. Please consult\nApple Developer Relations with Radar ID: #FB11300759."  = "⚠︎ 该功能因 IMK 选字窗自身缺陷而无法实作。\n请携 Radar 编号 #FB11300759 找 Apple Developer Relations 投诉。";
-"⚠︎ This feature is useful ONLY WHEN the font you are using doesn't support dynamic vertical punctuations. However, typed vertical punctuations will always shown as vertical punctuations EVEN IF your editor has changed the typing direction to horizontal." = "⚠︎ 该功能当且仅当目前的排版字型不支援纵排标点动态显示转义的情况下才有用。一旦使用了，所有敲出去的标点都会被永久转换为静态纵排标点：哪怕当前编辑器的排版模式已经改成横排，这些已经输入的标点也都还是纵排标点字符。";
+"⚠︎ This feature is useful ONLY WHEN the font you are using doesn't support dynamic vertical punctuations. However, typed vertical punctuations will always shown as vertical punctuations EVEN IF your editor has changed the typing direction to horizontal." = "⚠︎ 该功能当且仅当目前的排版字型不支援纵排标点动态显示转义的情况下才有用。一旦使用了，所有敲出去的标点都会被永久转换为静态纵排标点：哪怕当前编辑器的排版模式已经改成横排，这些已经输入的标点也都还是纵排标点字元。";
 "⚠︎ This may hinder the walking algorithm from giving appropriate results." = "⚠︎ 这可能会妨碍爬轨函式，使其无法给出正确的结果。";
 "⚠︎ This will reboot the vChewing IME." = "⚠︎ 这将重启威注音输入法。";
 "Accept leading intonations in rare cases" = "在个别情况下，允许声调前置键入";
