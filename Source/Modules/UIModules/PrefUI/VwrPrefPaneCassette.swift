@@ -34,8 +34,6 @@ struct VwrPrefPaneCassette: View {
 
   // MARK: - Main View
 
-  private var fdrCassetteDataDefault: String { "" }
-
   private static let dlgOpenFile = NSOpenPanel()
 
   var body: some View {
@@ -46,8 +44,30 @@ struct VwrPrefPaneCassette: View {
         SSPreferences.Settings.Section(bottomDivider: true) {
           Text(LocalizedStringKey("Choose your desired cassette file path. Will be omitted if invalid."))
           HStack {
-            TextField(fdrCassetteDataDefault, text: $cassettePath).disabled(true)
-              .help(cassettePath)
+            PathControl(pathDroppable: $cassettePath) { pathControl in
+              pathControl.allowedTypes = ["cin2", "cin", "vcin"]
+              pathControl.heightAnchor.constraint(equalToConstant: 20).isActive = true
+              pathControl.widthAnchor.constraint(equalToConstant: CtlPrefUIShared.maxDescriptionWidth).isActive = true
+              pathControl.placeholderString = "Please drag the desired target from Finder to this place.".localized
+            } acceptDrop: { pathControl, info in
+              let urls = info.draggingPasteboard.readObjects(forClasses: [NSURL.self])
+              guard let url = urls?.first as? URL else { return false }
+              let bolPreviousPathValidity = LMMgr.checkCassettePathValidity(
+                PrefMgr.shared.cassettePath.expandingTildeInPath)
+              if LMMgr.checkCassettePathValidity(url.path) {
+                cassettePath = url.path
+                pathControl.url = url
+                LMMgr.loadCassetteData()
+                BookmarkManager.shared.saveBookmark(for: url)
+                return true
+              }
+              // On Error:
+              IMEApp.buzz()
+              if !bolPreviousPathValidity {
+                cassettePath = ""
+              }
+              return false
+            }
             Button {
               if NSEvent.modifierFlags == .option, !cassettePath.isEmpty {
                 NSWorkspace.shared.activateFileViewerSelecting(
