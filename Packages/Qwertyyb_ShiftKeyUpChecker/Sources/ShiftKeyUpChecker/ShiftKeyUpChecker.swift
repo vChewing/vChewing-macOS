@@ -52,9 +52,6 @@ public struct ShiftKeyUpChecker {
   }
 
   private mutating func checkModifierKeyDown(event: NSEvent) -> Bool {
-    let isLeftShift = event.modifierFlags.rawValue & UInt(NX_DEVICELSHIFTKEYMASK) != 0
-    let isRightShift = event.modifierFlags.rawValue & UInt(NX_DEVICERSHIFTKEYMASK) != 0
-    print("isLeftShift: \(isLeftShift), isRightShift: \(isRightShift)")
     let isKeyDown =
       event.type == .flagsChanged
         && checkModifier.contains(event.modifierFlags.intersection(.deviceIndependentFlagsMask))
