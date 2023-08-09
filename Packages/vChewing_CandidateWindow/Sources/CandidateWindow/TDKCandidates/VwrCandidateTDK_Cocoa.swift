@@ -191,7 +191,7 @@
       wrappedCell.setHuggingPriority(.fittingSizeCompression, for: .vertical)
       Self.makeSimpleConstraint(item: wrappedCell, attribute: .height, relation: .equal, value: cellHeight)
       switch thePool.layout {
-      case .horizontal where thePool.maxLinesPerPage > 1:
+      case .horizontal where thePool.isMatrix:
         Self.makeSimpleConstraint(item: wrappedCell, attribute: .width, relation: .equal, value: cellWidth)
       default:
         Self.makeSimpleConstraint(item: wrappedCell, attribute: .width, relation: .greaterThanOrEqual, value: cellWidth)
@@ -216,7 +216,7 @@
 
     private func generateLineContainer(_ theLine: inout [CandidateCellData]) -> NSStackView {
       let isVerticalListing: Bool = thePool.layout == .vertical
-      let isMatrix = thePool.maxLinesPerPage > 1
+      let isMatrix = thePool.isMatrix
       let vwrCurrentLine = NSStackView()
       vwrCurrentLine.spacing = 0
       vwrCurrentLine.orientation = isVerticalListing ? .vertical : .horizontal
