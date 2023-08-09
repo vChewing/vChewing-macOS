@@ -41,7 +41,7 @@ public struct VwrCandidateTDK: View {
         default:
           mainViewVertical.background(candidateListBackground)
         }
-        if thePool.maxLinesPerPage > 1 || thePool.layout == .vertical {
+        if thePool.isMatrix || thePool.layout == .vertical {
           statusBarContent
         }
       }
@@ -193,7 +193,7 @@ extension VwrCandidateTDK {
         Double(thePool.maxLineCapacity) * (CandidatePool.blankCell.cellLength())
           + spacings
       )
-    return thePool.layout == .horizontal && thePool.maxLinesPerPage > 1 ? maxWindowWith : nil
+    return thePool.layout == .horizontal && thePool.isMatrix ? maxWindowWith : nil
   }
 
   var firstReverseLookupResult: String {

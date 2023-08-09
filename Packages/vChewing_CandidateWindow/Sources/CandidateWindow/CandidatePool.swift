@@ -14,16 +14,17 @@ public class CandidatePool {
   // 只用來測量單漢字候選字 cell 的最大可能寬度。
   public static let shitCell = CandidateCellData(key: " ", displayedText: "💩", isSelected: false)
   public static let blankCell = CandidateCellData(key: " ", displayedText: "　", isSelected: false)
-  public private(set) var maxLinesPerPage: Int
+  public private(set) var _maxLinesPerPage: Int
   public private(set) var layout: LayoutOrientation
   public private(set) var selectionKeys: String
   public private(set) var candidateDataAll: [CandidateCellData]
-  public var candidateLines: [[CandidateCellData]] = []
-  public var tooltip: String = ""
-  public var reverseLookupResult: [String] = []
+  public private(set) var candidateLines: [[CandidateCellData]] = []
   public private(set) var highlightedIndex: Int = 0
   public private(set) var currentLineNumber = 0
+  public private(set) var isExpanded: Bool = false
   public var metrics: UIMetrics = .allZeroed
+  public var tooltip: String = ""
+  public var reverseLookupResult: [String] = []
 
   private var recordedLineRangeForCurrentPage: Range<Int>?
   private var previouslyRecordedLineRangeForPreviousPage: Range<Int>?
@@ -47,8 +48,14 @@ public class CandidatePool {
   public let cellRadius: CGFloat = 4
   public var windowRadius: CGFloat { originDelta + cellRadius }
 
-  /// 當前資料池是否存在多列/多行候選字詞呈現。
+  /// 當前資料池每頁顯示的最大行/列數。
+  public var maxLinesPerPage: Int { isExpanded ? _maxLinesPerPage : 1 }
+
+  /// 當前資料池是否正在以多列/多行的形式呈現候選字詞。
   public var isMatrix: Bool { maxLinesPerPage > 1 }
+
+  /// 當前資料池是否能夠以多列/多行的形式呈現候選字詞。
+  public var isExpandable: Bool { _maxLinesPerPage > 1 }
 
   /// 用來在初期化一個候選字詞資料池的時候研判「橫版多行選字窗每行最大應該塞多少個候選字詞」。
   /// 注意：該參數不用來計算視窗寬度，所以無須算上候選字詞間距。
@@ -99,15 +106,16 @@ public class CandidatePool {
   ///   - direction: 橫向排列還是縱向排列（預設情況下是縱向）。
   ///   - locale: 區域編碼。例：「zh-Hans」或「zh-Hant」。
   public init(
-    candidates: [(keyArray: [String], value: String)], lines: Int = 3, selectionKeys: String = "123456789",
+    candidates: [(keyArray: [String], value: String)], lines: Int = 3, isExpanded expanded: Bool = true, selectionKeys: String = "123456789",
     layout: LayoutOrientation = .vertical, locale: String = ""
   ) {
-    maxLinesPerPage = 1
+    _maxLinesPerPage = max(1, lines)
+    isExpanded = expanded
     self.layout = .horizontal
     self.selectionKeys = "123456789"
     candidateDataAll = []
     // 以上只是為了糊弄 compiler。接下來才是正式的初期化。
-    construct(candidates: candidates, lines: lines, selectionKeys: selectionKeys, layout: layout, locale: locale)
+    construct(candidates: candidates, selectionKeys: selectionKeys, layout: layout, locale: locale)
   }
 
   /// 初期化（或者自我重新初期化）一個候選字窗專用資料池。
@@ -117,11 +125,10 @@ public class CandidatePool {
   ///   - direction: 橫向排列還是縱向排列（預設情況下是縱向）。
   ///   - locale: 區域編碼。例：「zh-Hans」或「zh-Hant」。
   private func construct(
-    candidates: [(keyArray: [String], value: String)], lines: Int = 3, selectionKeys: String = "123456789",
+    candidates: [(keyArray: [String], value: String)], selectionKeys: String = "123456789",
     layout: LayoutOrientation = .vertical, locale: String = ""
   ) {
     self.layout = layout
-    maxLinesPerPage = max(1, lines)
     Self.blankCell.locale = locale
     self.selectionKeys = selectionKeys.isEmpty ? "123456789" : selectionKeys
     var allCandidates = candidates.map {
@@ -172,13 +179,47 @@ public extension CandidatePool {
     }
   }
 
+  func expandIfNeeded(isBackward: Bool) {
+    guard !candidateLines.isEmpty, !isExpanded, isExpandable else { return }
+    let candidatesShown: [CandidateCellData] = candidateLines[lineRangeForCurrentPage].flatMap { $0 }
+    guard !candidatesShown.filter(\.isHighlighted).isEmpty else { return }
+    isExpanded = true
+    if candidateLines.count <= _maxLinesPerPage {
+      recordedLineRangeForCurrentPage = max(0, currentLineNumber - _maxLinesPerPage + 1) ..< currentLineNumber + 1
+    } else {
+      switch isBackward {
+      case true:
+        if lineRangeForFirstPage.contains(currentLineNumber) {
+          recordedLineRangeForCurrentPage = lineRangeForFirstPage
+        } else {
+          recordedLineRangeForCurrentPage = max(0, currentLineNumber - _maxLinesPerPage + 1) ..< currentLineNumber + 1
+        }
+      case false:
+        if lineRangeForFinalPage.contains(currentLineNumber) {
+          recordedLineRangeForCurrentPage = lineRangeForFinalPage
+        } else {
+          recordedLineRangeForCurrentPage = currentLineNumber ..< min(candidateLines.count, currentLineNumber + _maxLinesPerPage)
+        }
+      }
+    }
+    updateMetrics()
+  }
+
   /// 往指定的方向翻頁。
   /// - Parameter isBackward: 是否逆向翻頁。
   /// - Returns: 操作是否順利。
   @discardableResult func flipPage(isBackward: Bool) -> Bool {
+    if !isExpanded, isExpandable {
+      expandIfNeeded(isBackward: isBackward)
+      return true
+    }
     backupLineRangeForCurrentPage()
     defer { flipLineRangeToNeighborPage(isBackward: isBackward) }
-    return consecutivelyFlipLines(isBackward: isBackward, count: maxLinesPerPage)
+    var theCount = maxLinesPerPage
+    let rareConditionA: Bool = isBackward && currentLineNumber == 0
+    let rareConditionB: Bool = !isBackward && currentLineNumber == candidateLines.count - 1
+    if rareConditionA || rareConditionB { theCount = 1 }
+    return consecutivelyFlipLines(isBackward: isBackward, count: theCount)
   }
 
   /// 嘗試用給定的行內編號推算該候選字在資料池內的總編號。
@@ -196,6 +237,7 @@ public extension CandidatePool {
   ///   - count: 翻幾行。
   /// - Returns: 操作是否順利。
   @discardableResult func consecutivelyFlipLines(isBackward: Bool, count: Int) -> Bool {
+    expandIfNeeded(isBackward: isBackward)
     switch isBackward {
     case false where currentLineNumber == candidateLines.count - 1:
       return highlightNeighborCandidate(isBackward: false)
