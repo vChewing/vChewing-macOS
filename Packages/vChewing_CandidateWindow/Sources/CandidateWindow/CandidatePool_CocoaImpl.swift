@@ -170,7 +170,7 @@ extension CandidatePool {
       arrLine.enumerated().forEach { cellID, currentCell in
         let cellString = NSMutableAttributedString(
           attributedString: currentCell.attributedString(
-            noSpacePadding: false, withHighlight: true, isMatrix: maxLinesPerPage > 1
+            noSpacePadding: false, withHighlight: true, isMatrix: isMatrix
           )
         )
         if lineID != currentLineNumber {
@@ -184,7 +184,7 @@ extension CandidatePool {
           result.append(spacer)
         }
       }
-      if lineID < lineRangeForCurrentPage.upperBound - 1 || maxLinesPerPage > 1 {
+      if lineID < lineRangeForCurrentPage.upperBound - 1 || isMatrix {
         result.append(lineFeed)
       } else {
         result.append(spacer)
@@ -211,7 +211,7 @@ extension CandidatePool {
         let currentCell = lineData[inlineIndex]
         let cellString = NSMutableAttributedString(
           attributedString: currentCell.attributedString(
-            noSpacePadding: false, withHighlight: true, isMatrix: maxLinesPerPage > 1
+            noSpacePadding: false, withHighlight: true, isMatrix: isMatrix
           )
         )
         if lineID != currentLineNumber {
@@ -221,7 +221,7 @@ extension CandidatePool {
           )
         }
         result.append(cellString)
-        if maxLinesPerPage > 1, currentCell.displayedText.count > 1 {
+        if isMatrix, currentCell.displayedText.count > 1 {
           if currentCell.isHighlighted {
             spacer.addAttribute(
               .backgroundColor,

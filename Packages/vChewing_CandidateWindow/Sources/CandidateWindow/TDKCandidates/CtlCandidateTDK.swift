@@ -96,7 +96,7 @@ public class CtlCandidateTDK: CtlCandidate, NSWindowDelegate {
     CandidateCellData.unifiedSize = candidateFont.pointSize
     guard let delegate = delegate else { return }
     Self.thePool = .init(
-      candidates: delegate.candidatePairs(conv: true), lines: maxLinesPerPage,
+      candidates: delegate.candidatePairs(conv: true), lines: maxLinesPerPage, isExpanded: false,
       selectionKeys: delegate.selectionKeys, layout: currentLayout.layoutTDK, locale: locale
     )
     Self.thePool.tooltip = tooltip
