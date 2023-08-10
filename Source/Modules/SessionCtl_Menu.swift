@@ -22,7 +22,7 @@ private extension Bool {
 // 因為選單部分的內容又臭又長，所以就單獨拉到一個檔案內管理了。
 
 extension SessionCtl {
-  var optionKeyPressed: Bool { NSEvent.modifierFlags.contains(.option) }
+  var optionKeyPressed: Bool { NSEvent.keyModifierFlags.contains(.option) }
 
   override public func menu() -> NSMenu! {
     let menu = NSMenu(title: "Input Method Menu")
@@ -217,7 +217,7 @@ extension SessionCtl {
 public extension SessionCtl {
   @objc override func showPreferences(_: Any? = nil) {
     osCheck: if #available(macOS 10.15, *) {
-      switch NSEvent.modifierFlags {
+      switch NSEvent.keyModifierFlags {
       case .option: break osCheck
       // case .shift:
       // CtlPrefUIShared.shared.controller.show(preferencePane: PrefUITabs.tabGeneral.ssPaneIdentifier)

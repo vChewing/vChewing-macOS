@@ -59,7 +59,7 @@ public struct ShiftKeyUpChecker {
     if isKeyDown {
       // modifier keydown event
       lastTime = Date()
-      if event.modifierFlags == .shift { shiftIsBeingPressed = true }
+      if event.modifierFlags.intersection(.deviceIndependentFlagsMask) == .shift { shiftIsBeingPressed = true }
     } else {
       lastTime = Date(timeInterval: -3600 * 4, since: Date())
       shiftIsBeingPressed = false

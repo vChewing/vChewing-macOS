@@ -192,7 +192,7 @@ extension CtlPrefWindow: NSTextViewDelegate, NSTextFieldDelegate {
 
   @IBAction func openExternallyPEButtonClicked(_: NSButton) {
     DispatchQueue.main.async { [self] in
-      let app: String = NSEvent.modifierFlags.contains(.option) ? "TextEdit" : "Finder"
+      let app: String = NSEvent.keyModifierFlags.contains(.option) ? "TextEdit" : "Finder"
       LMMgr.shared.openPhraseFile(mode: selInputMode, type: selUserDataType, app: app)
     }
   }

@@ -69,7 +69,7 @@ struct VwrPrefPaneCassette: View {
               return false
             }
             Button {
-              if NSEvent.modifierFlags == .option, !cassettePath.isEmpty {
+              if NSEvent.keyModifierFlags == .option, !cassettePath.isEmpty {
                 NSWorkspace.shared.activateFileViewerSelecting(
                   [URL(fileURLWithPath: cassettePath)]
                 )
