@@ -114,6 +114,7 @@ public class InputHandler: InputHandlerProtocol {
     clearComposerAndCalligrapher()
     compositor.clear()
     isCodePointInputMode = false
+    isHaninKeyboardSymbolMode = false
   }
 
   /// 警告：該參數僅代指組音區/組筆區域與組字區在目前狀態下被視為「空」。
