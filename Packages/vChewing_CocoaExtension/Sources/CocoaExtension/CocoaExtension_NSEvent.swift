@@ -94,6 +94,10 @@ public extension NSEvent {
     return result <= UInt16.max ? UInt16(result) : UInt16.max
   }
 
+  var keyModifierFlags: ModifierFlags { modifierFlags.intersection(.deviceIndependentFlagsMask) }
+
+  static var keyModifierFlags: ModifierFlags { Self.modifierFlags.intersection(.deviceIndependentFlagsMask) }
+
   var isFlagChanged: Bool { type == .flagsChanged }
 
   var isEmacsKey: Bool {
