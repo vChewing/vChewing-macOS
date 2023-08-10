@@ -884,7 +884,7 @@ extension InputHandler {
     return true
   }
 
-  // MARK: - 處理區位輸入狀態的啟動過程（CodePoint Input Toggle）
+  // MARK: - 處理內碼區位輸入狀態的啟動過程（CodePoint Input Toggle）
 
   @discardableResult func handleCodePointInputToggle() -> Bool {
     guard let delegate = delegate, delegate.state.type != .ofDeactivated else { return false }
