@@ -7,6 +7,7 @@
 // requirements defined in MIT License.
 
 import BookmarkManager
+import CocoaExtension
 import Shared
 import SSPreferences
 import SwiftExtension
@@ -87,7 +88,7 @@ struct VwrPrefPaneDictionary: View {
                 return false
               }
               Button {
-                if NSEvent.modifierFlags == .option, !userDataFolderSpecified.isEmpty {
+                if NSEvent.keyModifierFlags == .option, !userDataFolderSpecified.isEmpty {
                   NSWorkspace.shared.activateFileViewerSelecting(
                     [URL(fileURLWithPath: userDataFolderSpecified)]
                   )

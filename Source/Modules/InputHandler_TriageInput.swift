@@ -47,7 +47,7 @@ public extension InputHandler {
       case .kCarriageReturn, .kLineFeed: return handleEnter(input: input)
       case .kSymbolMenuPhysicalKeyJIS, .kSymbolMenuPhysicalKeyIntl:
         let isJIS = keyCodeType == .kSymbolMenuPhysicalKeyJIS
-        switch input.modifierFlags {
+        switch input.keyModifierFlags {
         case []:
           return handlePunctuationList(alternative: false, isJIS: isJIS)
         case [.option, .shift]:
@@ -141,13 +141,13 @@ public extension InputHandler {
       // 判斷是否響應傳統的漢音鍵盤符號模式熱鍵。
       haninSymbolInput: if prefs.classicHaninKeyboardSymbolModeShortcutEnabled {
         guard let x = input.inputTextIgnoringModifiers,
-              "¥\\".contains(x), input.modifierFlags.isEmpty
+              "¥\\".contains(x), input.keyModifierFlags.isEmpty
         else { break haninSymbolInput }
         return handleHaninKeyboardSymbolModeToggle()
       }
 
       // 注音按鍵輸入與漢音鍵盤符號輸入處理。
-      if isHaninKeyboardSymbolMode, [[], .shift].contains(input.modifierFlags) {
+      if isHaninKeyboardSymbolMode, [[], .shift].contains(input.keyModifierFlags) {
         return handleHaninKeyboardSymbolModeInput(input: input)
       } else if let compositionHandled = handleComposition(input: input) {
         return compositionHandled
@@ -158,8 +158,8 @@ public extension InputHandler {
 
       // Ctrl+Command+[] 輪替候選字。
       // Shift+Command+[] 被 Chrome 系瀏覽器佔用，所以改用 Ctrl。
-      let ctrlCMD: Bool = input.modifierFlags == [.control, .command]
-      let ctrlShiftCMD: Bool = input.modifierFlags == [.control, .command, .shift]
+      let ctrlCMD: Bool = input.keyModifierFlags == [.control, .command]
+      let ctrlShiftCMD: Bool = input.keyModifierFlags == [.control, .command, .shift]
       revolveCandidateWithBrackets: if ctrlShiftCMD || ctrlCMD {
         if state.type != .ofInputting { break revolveCandidateWithBrackets }
         // 此處 JIS 鍵盤判定無法用於螢幕鍵盤。所以，螢幕鍵盤的場合，系統會依照 US 鍵盤的判定方案。

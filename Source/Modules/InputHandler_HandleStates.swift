@@ -339,7 +339,7 @@ extension InputHandler {
 
     var displayedText = state.displayedText
 
-    if input.modifierFlags == [.option, .shift] {
+    if input.keyModifierFlags == [.option, .shift] {
       displayedText = displayedText.map(\.description).joined(separator: " ")
     } else if readingOnly {
       displayedText = commissionByCtrlCommandEnter()
@@ -446,7 +446,7 @@ extension InputHandler {
           delegate.switchState(updatedState)
         }
         strCodePointBuffer = strCodePointBuffer.dropLast(1).description
-        if input.modifierFlags == .option {
+        if input.keyModifierFlags == .option {
           strCodePointBuffer.removeAll()
           refreshState()
           isCodePointInputMode = true
@@ -488,7 +488,7 @@ extension InputHandler {
     let steps = getStepsToNearbyNodeBorder(direction: .rear)
     var actualSteps = 1
 
-    switch input.modifierFlags {
+    switch input.keyModifierFlags {
     case .shift:
       delegate.switchState(IMEState.ofAbortion())
       return true
@@ -507,7 +507,7 @@ extension InputHandler {
       }
       walk()
     } else {
-      _ = input.modifierFlags == .option
+      _ = input.keyModifierFlags == .option
         ? clearComposerAndCalligrapher()
         : letComposerAndCalligrapherDoBackSpace()
     }
@@ -549,7 +549,7 @@ extension InputHandler {
 
     // macOS 認為 PC Delete 鍵訊號是必然有 .function 這個修飾鍵在起作用的。
     // 總之處理起來非常機車就是了。
-    switch input.modifierFlags {
+    switch input.keyModifierFlags {
     case _ where input.isShiftHold && !input.isOptionHold && !input.isControlHold:
       delegate.switchState(IMEState.ofAbortion())
       return true
@@ -1044,7 +1044,7 @@ extension InputHandler {
     // 否則會導致對上下左右鍵與翻頁鍵的判斷失效。
     let notEmpty = state.hasComposition && !compositor.isEmpty && isComposerOrCalligrapherEmpty
     let bannedModifiers: NSEvent.ModifierFlags = [.option, .shift, .command, .control]
-    let noBannedModifiers = bannedModifiers.intersection(input.modifierFlags).isEmpty
+    let noBannedModifiers = bannedModifiers.intersection(input.keyModifierFlags).isEmpty
     var triggered = input.isCursorClockLeft || input.isCursorClockRight
     triggered = triggered || (input.isSpace && prefs.chooseCandidateUsingSpace)
     triggered = triggered || input.isPageDown || input.isPageUp

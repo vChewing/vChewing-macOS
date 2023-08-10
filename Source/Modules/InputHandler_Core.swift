@@ -559,7 +559,7 @@ public class InputHandler: InputHandlerProtocol {
     if prefs.halfWidthPunctuationEnabled { return "_half_punctuation_" }
     // 注意：這一行為 SHIFT+ALT+主鍵盤數字鍵專用，強制無視不同地區的鍵盤在這個按鍵組合下的符號輸入差異。
     // 但如果去掉「input.isMainAreaNumKey」這個限定條件的話，可能會影響其他依賴 Shift 鍵輸入的符號。
-    if input.isMainAreaNumKey, input.modifierFlags == [.option, .shift] { return "_shift_alt_punctuation_" }
+    if input.isMainAreaNumKey, input.keyModifierFlags == [.option, .shift] { return "_shift_alt_punctuation_" }
     var result = ""
     switch (input.isControlHold, input.isOptionHold) {
     case (true, true): result.append("_alt_ctrl_punctuation_")
