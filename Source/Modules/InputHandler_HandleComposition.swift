@@ -375,9 +375,9 @@ extension InputHandler {
     return nil
   }
 
-  // MARK: 區位輸入處理 (Handle Code Point Input)
+  // MARK: 內碼區位輸入處理 (Handle Code Point Input)
 
-  /// 用來處理 InputHandler.HandleInput() 當中的與區位輸入有關的組字行為。
+  /// 用來處理 InputHandler.HandleInput() 當中的與內碼區位輸入有關的組字行為。
   /// - Parameter input: 輸入訊號。
   /// - Returns: 告知 IMK「該按鍵是否已經被輸入法攔截處理」。
   private func handleCodePointComposition(input: InputSignalProtocol) -> Bool? {
