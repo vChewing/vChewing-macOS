@@ -80,7 +80,7 @@ public extension SessionCtl {
     if #available(macOS 12, *) {
       if event.type == .flagsChanged, event.keyCode == KeyCode.kCapsLock.rawValue {
         DispatchQueue.main.async {
-          let isCapsLockTurnedOn = event.modifierFlags.intersection(.deviceIndependentFlagsMask).contains(.capsLock)
+          let isCapsLockTurnedOn = Self.isCapsLocked
           let status = NSLocalizedString("NotificationSwitchRevolver", comment: "")
           guard PrefMgr.shared.showNotificationsWhenTogglingCapsLock else { return }
           Notifier.notify(
@@ -102,7 +102,7 @@ public extension SessionCtl {
     // MARK: 針對客體的具體處理
 
     // 不再讓威注音處理由 Shift 切換到的英文模式的按鍵輸入。
-    if isASCIIMode, !isCapsLocked { return false }
+    if isASCIIMode, !Self.isCapsLocked { return false }
 
     /// 這裡仍舊需要判斷 flags。之前使輸入法狀態卡住無法敲漢字的問題已在 InputHandler 內修復。
     /// 這裡不判斷 flags 的話，用方向鍵前後定位光標之後，再次試圖觸發組字區時、反而會在首次按鍵時失敗。
@@ -166,7 +166,7 @@ public extension SessionCtl {
     }
 
     // 準備修飾鍵，用來判定要新增的詞彙是否需要賦以非常低的權重。
-    Self.areWeNerfing = eventToDeal.modifierFlags == [.shift, .command]
+    Self.areWeNerfing = eventToDeal.keyModifierFlags == [.shift, .command]
 
     /// 直接交給 commonEventHandler 來處理。
     let result = inputHandler.triageInput(event: eventToDeal)

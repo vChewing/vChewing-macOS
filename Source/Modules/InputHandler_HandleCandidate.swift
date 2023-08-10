@@ -41,7 +41,7 @@ extension InputHandler {
       if candidates[highlightedIndex].keyArray.count < 2 || candidates[highlightedIndex].value.count < 2 {
         break manipulator
       }
-      switch input.modifierFlags {
+      switch input.keyModifierFlags {
       case [.option, .command] where input.keyCode == 27: // 減號鍵
         ctlCandidate.delegate?.candidatePairRightClicked(at: highlightedIndex, action: .toNerf)
         return true
@@ -274,8 +274,8 @@ extension InputHandler {
     // MARK: - Flipping pages by using modified bracket keys (when they are not occupied).
 
     // Shift+Command+[] 被 Chrome 系瀏覽器佔用，所以改用 Ctrl。
-    let ctrlCMD: Bool = input.modifierFlags == [.control, .command]
-    let ctrlShiftCMD: Bool = input.modifierFlags == [.control, .command, .shift]
+    let ctrlCMD: Bool = input.keyModifierFlags == [.control, .command]
+    let ctrlShiftCMD: Bool = input.keyModifierFlags == [.control, .command, .shift]
     if ctrlShiftCMD || ctrlCMD {
       // 此處 JIS 鍵盤判定無法用於螢幕鍵盤。所以，螢幕鍵盤的場合，系統會依照 US 鍵盤的判定方案。
       let isJIS: Bool = KBGetLayoutType(Int16(LMGetKbdType())) == kKeyboardJIS
@@ -293,7 +293,7 @@ extension InputHandler {
     // MARK: - Flipping pages by using symbol menu keys (when they are not occupied).
 
     if input.isSymbolMenuPhysicalKey {
-      switch input.modifierFlags {
+      switch input.keyModifierFlags {
       case .shift, [],
            .option where state.type != .ofSymbolTable:
         var updated = true

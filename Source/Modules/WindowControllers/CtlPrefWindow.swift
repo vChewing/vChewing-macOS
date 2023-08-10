@@ -337,7 +337,7 @@ class CtlPrefWindow: NSWindowController, NSWindowDelegate {
   }
 
   @IBAction func chooseUserDataFolderToSpecify(_: Any) {
-    if NSEvent.modifierFlags == .option, let url = pctUserDictionaryFolder.url {
+    if NSEvent.keyModifierFlags == .option, let url = pctUserDictionaryFolder.url {
       NSWorkspace.shared.activateFileViewerSelecting([url])
       return
     }
@@ -412,7 +412,7 @@ class CtlPrefWindow: NSWindowController, NSWindowDelegate {
   }
 
   @IBAction func chooseCassettePath(_: Any) {
-    if NSEvent.modifierFlags == .option, let url = pctCassetteFilePath.url {
+    if NSEvent.keyModifierFlags == .option, let url = pctCassetteFilePath.url {
       NSWorkspace.shared.activateFileViewerSelecting([url])
       return
     }
