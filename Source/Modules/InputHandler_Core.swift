@@ -119,7 +119,7 @@ public class InputHandler: InputHandlerProtocol {
 
   /// 警告：該參數僅代指組音區/組筆區域與組字區在目前狀態下被視為「空」。
   var isConsideredEmptyForNow: Bool {
-    compositor.isEmpty && isComposerOrCalligrapherEmpty && strCodePointBuffer.isEmpty
+    compositor.isEmpty && isComposerOrCalligrapherEmpty && !isCodePointInputMode && !isHaninKeyboardSymbolMode
   }
 
   // MARK: - Hanin Keyboard Symbol Mode.
