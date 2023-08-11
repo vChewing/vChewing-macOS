@@ -391,7 +391,7 @@ extension InputHandler {
     case 0 ..< 4:
       if strCodePointBuffer.count < 3 {
         strCodePointBuffer.append(input.text)
-        var updatedState = generateStateOfInputting()
+        var updatedState = generateStateOfInputting(guarded: true)
         updatedState.tooltipDuration = 0
         updatedState.tooltip = tooltipCodePointInputMode
         delegate.switchState(updatedState)
@@ -418,7 +418,8 @@ extension InputHandler {
       }
       // 某些舊版 macOS 會在這裡生成的字元後面插入垃圾字元。這裡只保留起始字元。
       if char.count > 1 { char = char.map(\.description)[0] }
-      var updatedState = IMEState.ofCommitting(textToCommit: char)
+      delegate.switchState(IMEState.ofCommitting(textToCommit: char))
+      var updatedState = generateStateOfInputting(guarded: true)
       updatedState.tooltipDuration = 0
       updatedState.tooltip = tooltipCodePointInputMode
       delegate.switchState(updatedState)
