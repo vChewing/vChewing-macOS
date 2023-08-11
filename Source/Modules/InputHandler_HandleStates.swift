@@ -18,8 +18,12 @@ extension InputHandler {
   // MARK: - 構築狀態（State Building）
 
   /// 生成「正在輸入」狀態。相關的內容會被拿給狀態機械用來處理在電腦螢幕上顯示的內容。
-  public func generateStateOfInputting(sansReading: Bool = false) -> IMEStateProtocol {
-    if isConsideredEmptyForNow { return IMEState.ofAbortion() }
+  /// - Parameters:
+  ///   - sansReading: 不顯示組音區/組筆區。
+  ///   - guarded: 是否在該狀態的顯示文字為空的時候顯示替補空格，否則 InputMethodKit 無法正常攔截方向鍵事件。
+  /// - Returns: 生成的「正在輸入」狀態。
+  public func generateStateOfInputting(sansReading: Bool = false, guarded: Bool = false) -> IMEStateProtocol {
+    if isConsideredEmptyForNow, !guarded { return IMEState.ofAbortion() }
     var segHighlightedAt: Int?
     let cpInput = isCodePointInputMode && !sansReading
     /// 「更新內文組字區 (Update the composing buffer)」是指要求客體軟體將組字緩衝區的內容
@@ -68,6 +72,12 @@ extension InputHandler {
       cursor: cursor, highlightAt: segHighlightedAt
     )
     result.marker = cursorSansReading
+    /// 特殊情形，否則方向鍵事件無法正常攔截。
+    if guarded, result.displayTextSegments.joined().isEmpty {
+      result.data.displayTextSegments = [" "]
+      result.cursor = 0
+      result.marker = 0
+    }
     return result
   }
 
@@ -440,7 +450,7 @@ extension InputHandler {
     if isCodePointInputMode {
       if !strCodePointBuffer.isEmpty {
         func refreshState() {
-          var updatedState = generateStateOfInputting()
+          var updatedState = generateStateOfInputting(guarded: true)
           updatedState.tooltipDuration = 0
           updatedState.tooltip = tooltipCodePointInputMode
           delegate.switchState(updatedState)
@@ -895,7 +905,7 @@ extension InputHandler {
     }
     var updatedState = generateStateOfInputting(sansReading: true)
     delegate.switchState(IMEState.ofCommitting(textToCommit: updatedState.displayedText))
-    updatedState = IMEState.ofEmpty()
+    updatedState = generateStateOfInputting(guarded: true)
     updatedState.tooltipDuration = 0
     updatedState.tooltip = tooltipCodePointInputMode
     delegate.switchState(updatedState)
@@ -915,7 +925,7 @@ extension InputHandler {
     }
     var updatedState = generateStateOfInputting(sansReading: true)
     delegate.switchState(IMEState.ofCommitting(textToCommit: updatedState.displayedText))
-    updatedState = IMEState.ofEmpty()
+    updatedState = generateStateOfInputting(guarded: true)
     updatedState.tooltipDuration = 0
     updatedState.tooltip = Self.tooltipHaninKeyboardSymbolMode
     delegate.switchState(updatedState)

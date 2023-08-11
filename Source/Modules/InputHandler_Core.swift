@@ -31,7 +31,7 @@ public protocol InputHandlerProtocol {
   func ensureKeyboardParser()
   func triageInput(event input: InputSignalProtocol) -> Bool
   func generateStateOfCandidates() -> IMEStateProtocol
-  func generateStateOfInputting(sansReading: Bool) -> IMEStateProtocol
+  func generateStateOfInputting(sansReading: Bool, guarded: Bool) -> IMEStateProtocol
   func generateStateOfAssociates(withPair pair: Megrez.KeyValuePaired) -> IMEStateProtocol
   func consolidateNode(
     candidate: (keyArray: [String], value: String), respectCursorPushing: Bool, preConsolidate: Bool, skipObservation: Bool
@@ -41,8 +41,8 @@ public protocol InputHandlerProtocol {
 }
 
 extension InputHandlerProtocol {
-  func generateStateOfInputting(sansReading: Bool = false) -> IMEStateProtocol {
-    generateStateOfInputting(sansReading: sansReading)
+  func generateStateOfInputting(sansReading: Bool = false, guarded: Bool = false) -> IMEStateProtocol {
+    generateStateOfInputting(sansReading: sansReading, guarded: guarded)
   }
 
   func consolidateNode(candidate: (keyArray: [String], value: String), respectCursorPushing: Bool, preConsolidate: Bool) {
