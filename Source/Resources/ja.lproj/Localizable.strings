@@ -1,7 +1,8 @@
 "vChewing" = "威注音入力アプリ";
-"Please drag the desired target from Finder to this place." = "ご指定したいものは直接に Finder からこの辺にお引
-// MARK: - Porting NSPathControl to SwiftUI.
-きずりを。";
+"Where's IMK Candidate Window?" = "IMK 文字候補ウィンドウはどこに？";
+"The End of Support for IMK Candidate Window" = "IMK 文字候補ウィンドウのサポート中止のお知らせ";
+"1) Only macOS has IMKCandidates. Since it relies on a ObjC Bridging Header to expose necessary internal APIs to work, it hinders vChewing from completely modularized for multi-platform support.\n\n2) IMKCandidates is buggy. It is not likely to be completely fixed by Apple, and its devs are not allowed to talk about it to non-Apple individuals. That's why we have had enough with IMKCandidates. It is likely the reason why Apple had never used IMKCandidates in their official InputMethodKit sample projects (as of August 2023)." = "1) IMKCandidates は macOS だけで利用可能のシステム構成部品であり、ObjC Bridging Header にて特殊の内部 API を使う必要があるため、本アプリの「他のシステムへの移植計画」に妨げています。\n\n2) IMKCandidates には数多くのバグがあり、そして Apple 社に修復される可能性はほぼゼロだと見込めます。さらに、Apple 社の IMKCandidates 開発参与者たちはそれについての一切内容を Apple 社以外の人と話すのは、会社の規則によって禁則事項です。従って、IMKCandidates をこのまま使い続くのは、本当にうんざりです。況してや、これからも、Apple 社が IMKCandidates に何か内部変化を導入して、新たなる互換性支障が生ずる恐れがあると見込めます。Apple の公式の InputMethodKit サンプルプロジェクトに、IMKCandidates が使われていなかった理由はこれこそだと推測できます（2023年8月までの話）。";
+"Please drag the desired target from Finder to this place." = "ご指定したいものは直接に Finder からこの辺にお引きずりを。";
 "[Technical Reason] macOS releases earlier than 10.13 have an issue: If calling NSOpenPanel directly from an input method, both the input method and its current client app hang in a dead-loop. Furthermore, it makes other apps hang in the same way when you switch into another app. If you don't want to hard-reboot your computer, your last resort is to use SSH to connect to your current computer from another computer and kill the input method process by Terminal commands. That's why vChewing cannot offer access to NSOpenPanel for macOS 10.12 and earlier." = "【技術上の原因説明】macOS 10.12 とそれ以前の macOS には、入力アプリが自ら NSOpenPanel を呼ぶと、入力アプリ自身も、全ての触れ合った客体アプリも、全部固まってしまう状態になります。こうなると、強引的にパソコン再起動や・或いは SSH で他のパソコンからこの入力アプリの強制停止が必要です。従って、弊アプリは macOS 10.12 とその以前の macOS には NSOpenPanel のアクセスの提供はできません。";
 "Quick Candidates" = "早速候補";
 "Alvin Liu (Imitative)" = "劉又銘擬音注音配列";
