@@ -6,6 +6,7 @@
 // marks, or product names of Contributor, except as required to fulfill notice
 // requirements defined in MIT License.
 
+import AppKit
 import LangModelAssembly
 import Megrez
 import Shared
@@ -72,7 +73,6 @@ public protocol InputHandlerDelegate {
   func setInlineDisplayWithCursor()
   func updatePopupDisplayWithCursor()
   func performUserPhraseOperation(addToFilter: Bool) -> Bool
-  func deductCandidateIndex(from candidateString: String) -> Int
 }
 
 // MARK: - 核心 (Kernel).

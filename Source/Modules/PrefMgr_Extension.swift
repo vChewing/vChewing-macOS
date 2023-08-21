@@ -6,6 +6,7 @@
 // marks, or product names of Contributor, except as required to fulfill notice
 // requirements defined in MIT License.
 
+import InputMethodKit
 import Shared
 
 // MARK: Auto parameter fix procedures, executed everytime on SessionCtl.activateServer().

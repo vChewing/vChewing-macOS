@@ -9,6 +9,7 @@
 import CandidateWindow
 import CocoaExtension
 import IMKUtils
+import InputMethodKit
 import NotifierUI
 import PopupCompositionBuffer
 import Shared
@@ -32,25 +33,8 @@ public class SessionCtl: IMKInputController {
   /// 上一個被處理過的鍵盤事件。
   public var previouslyHandledEvents: [NSEvent] = .init()
 
-  /// IMK 選字窗專用記憶體位址
-  private var candidateIMK: CtlCandidateProtocol?
-
-  /// 田所選字窗專用記憶體位址
-  private var candidateTDK: CtlCandidateProtocol?
-
   /// 目前在用的的選字窗副本。
-  public var candidateUI: CtlCandidateProtocol? {
-    get {
-      PrefMgr.shared.useIMKCandidateWindow ? candidateIMK : candidateTDK
-    }
-    set {
-      if PrefMgr.shared.useIMKCandidateWindow {
-        candidateIMK = newValue
-      } else {
-        candidateTDK = newValue
-      }
-    }
-  }
+  public var candidateUI: CtlCandidateProtocol?
 
   /// 工具提示視窗的副本。
   public var tooltipInstance = TooltipUI()

@@ -10,6 +10,7 @@
 
 import CandidateWindow
 import CocoaExtension
+import InputMethodKit
 import Shared
 
 // MARK: - § 對選字狀態進行調度 (Handle Candidate State).
@@ -24,17 +25,10 @@ extension InputHandler {
     let state = delegate.state
     guard state.isCandidateContainer else { return false } // 會自動判斷「isEmpty」。
     guard ctlCandidate.visible else { return false }
-    var input = input
-
-    var imkC: CtlCandidateIMK? {
-      prefs.useIMKCandidateWindow ? (ctlCandidate as? CtlCandidateIMK) : nil
-    }
 
     // MARK: 選字窗內使用熱鍵升權、降權、刪詞。
 
     manipulator: if (delegate as? CtlCandidateDelegate)?.isCandidateContextMenuEnabled ?? false {
-      // 目前沒有任何手段可以藉由 IMKCandidates 獲取正確的「當前候選字詞位置」在這裡正確使用，故不對 IMK 選字窗開放。
-      if prefs.useIMKCandidateWindow { break manipulator }
       let candidates = state.candidates
       let highlightedIndex = ctlCandidate.highlightedIndex
       if !(0 ..< candidates.count).contains(ctlCandidate.highlightedIndex) { break manipulator }
@@ -92,11 +86,7 @@ extension InputHandler {
     // MARK: 批次集中處理某些常用功能鍵
 
     func confirmHighlightedCandidate() {
-      if let imkC = imkC, let enterEvent = KeyCode.kCarriageReturn.toEvent() {
-        imkC.process(event: enterEvent)
-      } else {
-        delegate.candidateSelectionConfirmedByInputHandler(at: ctlCandidate.highlightedIndex)
-      }
+      delegate.candidateSelectionConfirmedByInputHandler(at: ctlCandidate.highlightedIndex)
     }
 
     if let keyCodeType = KeyCode(rawValue: input.keyCode) {
@@ -154,19 +144,11 @@ extension InputHandler {
         }
         return true
       case .kHome:
-        if let imkC = imkC, let nsEvent = input as? NSEvent {
-          imkC.process(event: nsEvent)
-          return true
-        }
         _ =
           (ctlCandidate.highlightedIndex == 0)
             ? delegate.callError("9B6EDE8D") : (ctlCandidate.highlightedIndex = 0)
         return true
       case .kEnd:
-        if let imkC = imkC, let nsEvent = input as? NSEvent {
-          imkC.process(event: nsEvent)
-          return true
-        }
         let maxIndex = state.candidates.count - 1
         _ =
           (ctlCandidate.highlightedIndex == maxIndex)
@@ -176,28 +158,9 @@ extension InputHandler {
       }
     }
 
-    // MARK: 針對 IMKCandidates，將數字小鍵盤的事件置換掉
-
-    input = {
-      guard imkC != nil else { return input }
-      guard let eventToDeal = input as? NSEvent else { return input }
-      return CtlCandidateIMK.replaceNumPadKeyCodes(target: eventToDeal) ?? eventToDeal
-    }()
-
     // MARK: 聯想詞處理 (Associated Phrases) 以及標準選字處理
 
-    if state.type == .ofAssociates {
-      if !input.isShiftHold {
-        return false
-      }
-      // 將 input 訊號翻譯成去掉 Shift 的 NSEvent，然後再投餵給 IMKCandidates。
-      if let imkC = imkC, let inputEvent = input as? NSEvent,
-         let inputEventShifted = CtlCandidateIMK.giveSelectionKeySansModifiers(from: inputEvent)
-      {
-        imkC.process(event: inputEventShifted)
-        return true
-      }
-    }
+    if state.type == .ofAssociates, !input.isShiftHold { return false }
 
     var index: Int?
     var shaltShiftHold = [.ofAssociates].contains(state.type)
@@ -213,18 +176,9 @@ extension InputHandler {
     }
 
     // 標準選字處理
-    if let index = index {
-      if let imkC = imkC, let oldEvent = input as? NSEvent {
-        if input.isShiftHold, let newEvent = CtlCandidateIMK.giveSelectionKeySansModifiers(from: oldEvent) {
-          imkC.process(event: newEvent)
-        } else {
-          imkC.process(event: oldEvent)
-        }
-        return true
-      } else if let candidateIndex = ctlCandidate.candidateIndexAtKeyLabelIndex(index) {
-        delegate.candidateSelectionConfirmedByInputHandler(at: candidateIndex)
-        return true
-      }
+    if let index = index, let candidateIndex = ctlCandidate.candidateIndexAtKeyLabelIndex(index) {
+      delegate.candidateSelectionConfirmedByInputHandler(at: candidateIndex)
+      return true
     }
 
     if state.type == .ofAssociates { return false }
