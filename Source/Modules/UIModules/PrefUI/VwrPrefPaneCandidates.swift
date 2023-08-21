@@ -40,9 +40,6 @@ struct VwrPrefPaneCandidates: View {
   @Backport.AppStorage(wrappedValue: true, UserDef.kConsolidateContextOnCandidateSelection.rawValue)
   private var consolidateContextOnCandidateSelection: Bool
 
-  @Backport.AppStorage(wrappedValue: false, UserDef.kUseIMKCandidateWindow.rawValue)
-  private var useIMKCandidateWindow: Bool
-
   @Backport.AppStorage(wrappedValue: false, UserDef.kEnableSwiftUIForTDKCandidates.rawValue)
   private var enableSwiftUIForTDKCandidates: Bool
 
@@ -76,7 +73,6 @@ struct VwrPrefPaneCandidates: View {
             isOn: $candidateWindowShowOnlyOneLine
           )
           .controlSize(.small)
-          .disabled(useIMKCandidateWindow)
           Text(
             "This only works with Tadokoro candidate window.".localized
               + CtlPrefUIShared.sentenceSeparator
@@ -137,7 +133,6 @@ struct VwrPrefPaneCandidates: View {
             LocalizedStringKey("Show available reverse-lookup results in candidate window"),
             isOn: $showReverseLookupInCandidateUI
           )
-          .disabled(useIMKCandidateWindow)
           Text(
             "This only works with Tadokoro candidate window.".localized
               + CtlPrefUIShared.sentenceSeparator
@@ -165,25 +160,14 @@ struct VwrPrefPaneCandidates: View {
         }
         SSPreferences.Settings.Section(title: "Experimental:".localized) {
           Toggle(
-            LocalizedStringKey("Use IMK Candidate Window instead of Tadokoro"),
-            isOn: $useIMKCandidateWindow
-          )
-          Text(
-            "IMK candidate window (IMKCandidates) relies on certain Apple private APIs force-exposed through bridging headers. For now, its usability is only guaranteed from macOS 10.13 High Sierra to macOS 14 Sonoma. Further tests are required in later macOS to prove compatibility facts.".localized
-          )
-          .preferenceDescription(maxWidth: CtlPrefUIShared.maxDescriptionWidth)
-          Toggle(
             LocalizedStringKey("Enable mouse wheel support for Tadokoro Candidate Window"),
             isOn: $enableMouseScrollingForTDKCandidatesCocoa
           )
-          .disabled(
-            useIMKCandidateWindow || enableSwiftUIForTDKCandidates
-          )
+          .disabled(enableSwiftUIForTDKCandidates)
           Toggle(
             LocalizedStringKey("Enable experimental Swift UI typesetting method"),
             isOn: $enableSwiftUIForTDKCandidates
           )
-          .disabled(useIMKCandidateWindow)
           Text(
             "By checking this, Tadokoro Candidate Window will use SwiftUI. SwiftUI was being used in vChewing 3.3.8 and before. However, SwiftUI has unacceptable responsiveness & latency & efficiency problems in rendering the candidate panel UI. That's why a refactored version has been introduced since vChewing 3.3.9 using Cocoa, providing an optimized user experience with blasing-fast operation responsiveness, plus experimental mouse-wheel support.".localized
           )
@@ -211,9 +195,6 @@ private struct VwrPrefPaneCandidates_SelectionKeys: View {
   @Backport.AppStorage(wrappedValue: PrefMgr.kDefaultCandidateKeys, UserDef.kCandidateKeys.rawValue)
   private var candidateKeys: String
 
-  @Backport.AppStorage(wrappedValue: false, UserDef.kUseIMKCandidateWindow.rawValue)
-  private var useIMKCandidateWindow: Bool
-
   // MARK: - Main View
 
   var body: some View {
@@ -234,23 +215,13 @@ private struct VwrPrefPaneCandidates_SelectionKeys: View {
           }
         }
       }
-    ).frame(width: 180).disabled(useIMKCandidateWindow)
-    if useIMKCandidateWindow {
-      Text(
-        LocalizedStringKey(
-          "⚠︎ This feature in IMK Candidate Window defects. Please consult\nApple Developer Relations with Radar ID: #FB11300759."
-        )
-      )
+    ).frame(width: 180)
+    Text(
+      "Choose or hit Enter to confim your prefered keys for selecting candidates.".localized
+        + "\n"
+        + "This will also affect the row / column capacity of the candidate window.".localized
+    )
 
-      .preferenceDescription(maxWidth: CtlPrefUIShared.maxDescriptionWidth)
-    } else {
-      Text(
-        "Choose or hit Enter to confim your prefered keys for selecting candidates.".localized
-          + "\n"
-          + "This will also affect the row / column capacity of the candidate window.".localized
-      )
-
-      .preferenceDescription(maxWidth: CtlPrefUIShared.maxDescriptionWidth)
-    }
+    .preferenceDescription(maxWidth: CtlPrefUIShared.maxDescriptionWidth)
   }
 }

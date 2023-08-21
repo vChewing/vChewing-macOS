@@ -11,7 +11,6 @@ import Foundation
 public protocol PrefMgrProtocol {
   var isDebugModeEnabled: Bool { get set }
   var failureFlagForUOMObservation: Bool { get set }
-  var failureFlagForIMKCandidates: Bool { get set }
   var deltaOfCalendarYears: Int { get set }
   var mostRecentInputMode: String { get set }
   var useExternalFactoryDict: Bool { get set }
@@ -46,7 +45,6 @@ public protocol PrefMgrProtocol {
   var clientsIMKTextInputIncapable: [String: Bool] { get set }
   var onlyLoadFactoryLangModelsIfNeeded: Bool { get set }
   var useSpaceToCommitHighlightedSCPCCandidate: Bool { get set }
-  var useIMKCandidateWindow: Bool { get set }
   var enableSwiftUIForTDKCandidates: Bool { get set }
   var enableMouseScrollingForTDKCandidatesCocoa: Bool { get set }
   var disableSegmentedThickUnderlineInMarkingModeForManagedClients: Bool { get set }

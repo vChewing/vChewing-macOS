@@ -8,6 +8,7 @@
 
 /// 該檔案乃輸入調度模組的用以承載「根據按鍵行為來調控模式」的各種成員函式的部分。
 
+import AppKit
 import Megrez
 import Shared
 import Tekkon
@@ -525,10 +526,7 @@ extension InputHandler {
     switch isConsideredEmptyForNow {
     case false:
       var result = generateStateOfInputting()
-      if prefs.cassetteEnabled, var fetched = currentLM.cassetteQuickSetsFor(key: calligrapher)?.split(separator: "\t") {
-        if prefs.useIMKCandidateWindow {
-          fetched = fetched.deduplicated.filter { $0.description != currentLM.nullCandidateInCassette }
-        }
+      if prefs.cassetteEnabled, let fetched = currentLM.cassetteQuickSetsFor(key: calligrapher)?.split(separator: "\t") {
         result.candidates = fetched.enumerated().map {
           (keyArray: [($0.offset + 1).description], value: $0.element.description)
         }

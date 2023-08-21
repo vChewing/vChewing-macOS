@@ -6,6 +6,7 @@
 // marks, or product names of Contributor, except as required to fulfill notice
 // requirements defined in MIT License.
 
+import AppKit
 import CandidateWindow
 import NSAttributedTextView
 import Shared
@@ -74,7 +75,6 @@ public extension SessionCtl {
 
   func showCandidates() {
     guard client() != nil else { return }
-    defer { keepIMKCandidatesShownUp() }
     updateVerticalTypingStatus()
     isVerticalCandidateWindow = (isVerticalTyping || !PrefMgr.shared.useHorizontalCandidateList)
 
@@ -87,19 +87,10 @@ public extension SessionCtl {
     let isInputtingWithCandidates = state.type == .ofInputting && state.isCandidateContainer
     /// 先取消既有的選字窗的內容顯示。否則可能會重複生成選字窗的 NSWindow()。
     candidateUI?.visible = false
-    if #available(macOS 10.13, *) {
-      /// 然後再重新初期化。
-      let useIMK = PrefMgr.shared.useIMKCandidateWindow
-      candidateUI = useIMK ? CtlCandidateIMK(candidateLayout) : CtlCandidateTDK(candidateLayout)
-    } else {
-      candidateUI = CtlCandidateTDK(candidateLayout)
-    }
+    candidateUI = CtlCandidateTDK(candidateLayout)
     var singleLine = isVerticalTyping || PrefMgr.shared.candidateWindowShowOnlyOneLine
     singleLine = singleLine || isInputtingWithCandidates
     (candidateUI as? CtlCandidateTDK)?.maxLinesPerPage = singleLine ? 1 : 4
-    if isInputtingWithCandidates, candidateLayout == .horizontal {
-      (candidateUI as? CtlCandidateIMK)?.setPanelType(kIMKSingleRowSteppingCandidatePanel)
-    }
 
     candidateUI?.candidateFont = Self.candidateFont(
       name: PrefMgr.shared.candidateTextFontName, size: PrefMgr.shared.candidateListTextSize
@@ -167,10 +158,7 @@ public extension SessionCtl {
   ///
   /// Instructions for Apple Developer relations to reveal this bug:
   ///
-  /// 0) Disable IMK Candidate window in the vChewing preferences (disabled by default).
-  ///    **REASON**: IMKCandidates has bug that it does not respect font attributes attached to the
-  ///    results generated from `candidiates() -> [Any]!` function. IMKCandidates is plagued with
-  ///    bugs which are not dealt in the recent decade, regardless Radar complaints from input method developers.
+  /// 0) Please go to Step 1. Reason: IMK Candidate Window support has been removed in this repo.
   /// 1) Make sure the usage of ".languageIdentifier" is disabled in the Dev Zone of the vChewing SSPreferences.
   /// 2) Run "make update" in the project folder to download the latest git-submodule of dictionary file.
   /// 3) Compile the target "vChewingInstaller", run it. It will install the input method into
