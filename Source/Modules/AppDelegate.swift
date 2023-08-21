@@ -70,12 +70,7 @@ public extension AppDelegate {
     // 如果有開啟 Debug 模式的話，就將既有的半衰記憶資料檔案更名＋打上當時的時間戳。
     // 如果沒有開啟 Debug 模式的話，則將半衰記憶資料直接清空。
     if PrefMgr.shared.failureFlagForUOMObservation {
-      if PrefMgr.shared.isDebugModeEnabled {
-        LMMgr.relocateWreckedUOMData()
-      } else {
-        LMMgr.clearUserOverrideModelData(.imeModeCHS)
-        LMMgr.clearUserOverrideModelData(.imeModeCHT)
-      }
+      LMMgr.relocateWreckedUOMData()
       PrefMgr.shared.failureFlagForUOMObservation = false
       let userNotification = NSUserNotification()
       userNotification.title = NSLocalizedString("vChewing", comment: "")
