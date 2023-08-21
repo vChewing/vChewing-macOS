@@ -6,6 +6,7 @@
 // marks, or product names of Contributor, except as required to fulfill notice
 // requirements defined in MIT License.
 
+import AppKit
 import NotifierUI
 import Shared
 
@@ -103,7 +104,6 @@ extension SessionCtl: CtlCandidateDelegate {
   }
 
   public var selectionKeys: String {
-    guard !PrefMgr.shared.useIMKCandidateWindow else { return "123456789" }
     // 磁帶模式的 `%quick` 有單獨的選字鍵判定，會在資料不合規時使用 1234567890 選字鍵。
     cassetteQuick: if state.type == .ofInputting, state.isCandidateContainer {
       guard PrefMgr.shared.cassetteEnabled else { break cassetteQuick }

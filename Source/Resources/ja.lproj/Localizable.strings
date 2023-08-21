@@ -12,7 +12,6 @@
 "Switch to %@ Input Mode" = "%@入力モードに切り替え";
 "Target Input Mode Activation Required" = "関連の入力ソースの追加が必要";
 "You are proceeding to System Preferences to enable the Input Source which corresponds to the input mode you are going to switch to." = "ご希望の入力モードのご利用の前に、それに対応するの入力ソースの追加が必要である。これからはシステム環境設定の該当ページへ案内します。";
-"IMK Candidate Window has been automatically disabled due to its recent crash with force-exposed necessary internal APIs. As an experimental feature, we advise against using IMK Candidate Window in productive environments." = "IMK 文字候補ウィンドウの利用できるようのために、システム内部の必要のある API の強引的アクセスが必要ですが、前回のその利用で威注音入力アプリが崩れました。故に今は IMK 文字候補ウィンドウを OFF にしました。IMK 文字候補ウィンドウはあくまで実験的な機能として提供していたため、業務用にはお勧めできません。";
 "Do you want to enable the popup composition buffer for this client?" = "この客体アプリに「吹き出し入力緩衝列ウィンドウ」を起用しますか？";
 "Some client apps may have different compatibility issues in IMKTextInput implementation." = "それぞれの客体アプリには、それぞれの IMKTextInput 不具合はあるかもしれません。";
 "Yes" = "うむ";
@@ -162,7 +161,6 @@
 "There is a bug in macOS 10.9, preventing an input method from accessing its own file panels. Doing so will result in eternal hang-crash of not only the input method but all client apps it tries attached to, requiring SSH connection to this computer to terminate the input method process by executing “killall vChewing”. Due to possible concerns of the same possible issue in macOS 10.10 and 10.11, we completely disabled this feature." = "システムの支障の話ですが、macOS 10.9 (恐らく 10.10 - 10.12 も) には下記のバグはございます：入力アプリは自分のファイル操作パネルをアクセススロと、その入力アプリだけでなく、あれから入力アプリの触り合おうとした全ての客体アプリも「無限のカタマリ」その無反応な状態になってしまいます。その場合、SSH でこのパソコンで「killall vChewing」そのターミナルコマンドを実行すれば、及ぼされた客体アプリの反応は戻ります。そのため、開発側は上記のシステムバージョンに応じて、自身のファイルパネルアクセスを全て禁止としました。";
 "defaults write org.atelierInmu.inputmethod.vChewing UserDataFolderSpecified -string \"~/FolderPathEndedWithTrailingSlash/\"" = "defaults write org.atelierInmu.inputmethod.vChewing UserDataFolderSpecified -string \"~/FolderPathEndedWithTrailingSlash/\"";
 "defaults write org.atelierInmu.inputmethod.vChewing CassettePath -string \"~/FilePathEndedWithoutTrailingSlash\"" = "defaults write org.atelierInmu.inputmethod.vChewing CassettePath -string \"~/FilePathEndedWithoutTrailingSlash\"";
-"⚠︎ This feature in IMK Candidate Window defects. Please consult Apple Developer Relations\nand tell them the related Radar ID: #FB11300759." = "⚠︎ この機能は IMK 候補陳列ウィンドウにサポートされておりません。\nApple Developer Relations に按鍵番号 #FB11300759 を教えながらクレームしてください。";
 "Also toggle alphanumerical mode with Left-Shift" = "左側の Shift キーでも英数入力モードの切り替え";
 "Candidate Layout:" = "入力候補陳列の仕様";
 "Completely disable using Shift key to toggle alphanumerical mode" = "Shift キーの英数入力モードの切り替え機能を徹底的に禁ず";
@@ -197,7 +195,6 @@
 
 // SwiftUI Preferences
 "(Shift+)Space:" = "(Shift+)Space:";
-"⚠︎ This feature in IMK Candidate Window defects. Please consult\nApple Developer Relations with Radar ID: #FB11300759."  = "⚠︎ この機能は IMK 候補陳列ウィンドウにサポートされておりません。\nApple Developer Relations に案件番号 #FB11300759 を持ってクレームを。";
 "⚠︎ This feature is useful ONLY WHEN the font you are using doesn't support dynamic vertical punctuations. However, typed vertical punctuations will always shown as vertical punctuations EVEN IF your editor has changed the typing direction to horizontal." = "⚠︎ 該当の組版用フォントには縦書き（引用符・括弧）変換機能が備えていない限り、この機能を使う甲斐がある。一旦使うと、入力した全ての引用符・括弧は永遠的に縦書きの様式になる。例え入力を受けているアプリ（例えばワープロソフとなど）の書写方向は横書きと変えたとしても、これらの入力済みの引用符・括弧は全て縦書きの見た目であり、削除してから入力し直す必要になる。";
 "⚠︎ This may hinder the walking algorithm from giving appropriate results." = "⚠︎ ウォーキング算法に差し支えてしまい、正しくない結果が出る恐れがある。";
 "⚠︎ This will reboot the vChewing IME." = "⚠︎ これで威注音入力アプリを再起動。";
@@ -291,7 +288,6 @@
 "IBM" = "IBM 配列";
 "If disabled, this will insert space instead." = "未チェックの場合、スペースを挿入。";
 "If unchecked, the ESC key will try cleaning the unfinished readings / strokes first, and will commit the current composition buffer if there's no unfinished readings / strkes." = "未チェックの場合、ESC キーはまず未完成の音読/筆画を消す。\n未完成の音読/筆画がない場合、全緩衝列をそのまま送り出す。";
-"IMK candidate window (IMKCandidates) relies on certain Apple private APIs force-exposed through bridging headers. For now, its usability is only guaranteed from macOS 10.13 High Sierra to macOS 14 Sonoma. Further tests are required in later macOS to prove compatibility facts." = "IMK 候補陳列ウィンドウ（IMKCandidates）は、Apple の未公開のAPIを「bridging-header」という強引的な手段で引き出して利用した機能である。現時点で macOS 10.13 High Sierra から macOS 14 Sonoma まで利用可能であるが、その後の新しい macOS との互換性の話はまだ早い。";
 "in front of the phrase (like macOS built-in Zhuyin IME)" = "単語の前で // macOS 内蔵注音入力のやり方";
 "Intonation Key:" = "音調キー:";
 "It only needs to parse consecutive NSEvents passed by macOS built-in InputMethodKit framework, hence no necessity of asking end-users for extra privileges of monitoring global keyboard inputs. You are free to investigate our codebase or reverse-engineer this input method to see whether the above statement is trustable." = "この機能の利用する NSEvent は、macOS 内蔵の入力アプリ共用モジュール「InputMethodKit」から提供した NSEvent のみであり、その NSEvent 文脈関係で「Shift キーは１回押したかどうか」と判断することはできる。この事実に疑いを持つ者は、本アプリのソースコードを審査するか、あるいは本アプリを逆向工程（分解工学, いわゆる「Reverse-Engineering」）するがよい。";
@@ -357,7 +353,6 @@
 "UI Language:" = "表示用言語:";
 "Universal Pinyin with Numeral Intonation" = "汎用弁音 (ローマ字+数字音調)";
 "Use ESC key to clear the entire input buffer" = "ESC キーで入力緩衝列を消す";
-"Use IMK Candidate Window instead of Tadokoro" = "IMK 候補陳列ウィンドウを起用";
 "Use only one row / column in candidate window." = "ただ１つ行・列で文字候補を陳列。";
 "Use Space to confirm highlighted candidate in Per-Char Select Mode" = "全候補入力の場合、ハイライト候補を Space キーで確認";
 "Vertical" = "縦型陳列";

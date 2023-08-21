@@ -8,6 +8,7 @@
 // marks, or product names of Contributor, except as required to fulfill notice
 // requirements defined in MIT License.
 
+import AppKit
 import FolderMonitor
 import Shared
 import Uninstaller
@@ -50,21 +51,6 @@ public extension AppDelegate {
   func applicationDidFinishLaunching(_: Notification) {
     NSUserNotificationCenter.default.delegate = self
     PrefMgr.shared.fixOddPreferences()
-
-    if PrefMgr.shared.failureFlagForIMKCandidates {
-      DispatchQueue.main.async {
-        PrefMgr.shared.failureFlagForIMKCandidates = false
-        PrefMgr.shared.useIMKCandidateWindow = false
-        let userNotification = NSUserNotification()
-        userNotification.title = NSLocalizedString("vChewing", comment: "")
-        userNotification.informativeText = NSLocalizedString(
-          "IMK Candidate Window has been automatically disabled due to its recent crash with force-exposed necessary internal APIs. As an experimental feature, we advise against using IMK Candidate Window in productive environments.",
-          comment: ""
-        )
-        userNotification.soundName = NSUserNotificationDefaultSoundName
-        NSUserNotificationCenter.default.deliver(userNotification)
-      }
-    }
 
     // 一旦發現與使用者半衰模組的觀察行為有關的崩潰標記被開啟：
     // 如果有開啟 Debug 模式的話，就將既有的半衰記憶資料檔案更名＋打上當時的時間戳。

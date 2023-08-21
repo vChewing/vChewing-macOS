@@ -10,7 +10,6 @@
 "Switch to %@ Input Mode" = "切換至%@輸入模式";
 "Target Input Mode Activation Required" = "得啟用對應的「輸入方式」";
 "You are proceeding to System Preferences to enable the Input Source which corresponds to the input mode you are going to switch to." = "若要使用您想切換到的輸入模式，您必須得先在系統偏好設定內啟用對應的「輸入方式」。接下來將會彈出對應的系統偏好設定畫面。";
-"IMK Candidate Window has been automatically disabled due to its recent crash with force-exposed necessary internal APIs. As an experimental feature, we advise against using IMK Candidate Window in productive environments." = "IMK 選字窗在最近一次存取被強制曝露的必需 API 時令輸入法崩潰，所以被自動停用。請勿在生產力場合使用該實驗型功能。";
 "Do you want to enable the popup composition buffer for this client?" = "您要对该客体启用浮动组字窗吗？";
 "Some client apps may have different compatibility issues in IMKTextInput implementation." = "有些客体应用可能会有不同的 IMKTextInput 实作相容问题。";
 "Yes" = "是";
@@ -160,7 +159,6 @@
 "There is a bug in macOS 10.9, preventing an input method from accessing its own file panels. Doing so will result in eternal hang-crash of not only the input method but all client apps it tries attached to, requiring SSH connection to this computer to terminate the input method process by executing “killall vChewing”. Due to possible concerns of the same possible issue in macOS 10.10 and 10.11, we completely disabled this feature." = "已知 macOS 10.9 有此故障：當一個輸入法嘗試存取自身的檔案操作視窗的時候，不只輸入法，而且連其接下來所嘗試掛接的所有的客體應用，都會陷入無限僵死狀態，只能用 SSH 連到這台電腦上執行「killall vChewing」才可以解除僵死。因為我們懷疑 macOS 10.10 至 10.12 也在受影響的範圍內，所以威注音對這些版本的系統禁用了自身的檔案操作視窗存取。";
 "defaults write org.atelierInmu.inputmethod.vChewing UserDataFolderSpecified -string \"~/FolderPathEndedWithTrailingSlash/\"" = "defaults write org.atelierInmu.inputmethod.vChewing UserDataFolderSpecified -string \"~/帶尾部斜槓的資料夾路徑/\"";
 "defaults write org.atelierInmu.inputmethod.vChewing CassettePath -string \"~/FilePathEndedWithoutTrailingSlash\"" = "defaults write org.atelierInmu.inputmethod.vChewing CassettePath -string \"~/不帶尾部斜槓的檔案路徑\"";
-"⚠︎ This feature in IMK Candidate Window defects. Please consult Apple Developer Relations\nand tell them the related Radar ID: #FB11300759." = "⚠︎ 該功能因 IMK 選字窗自身缺陷而無法實作。\n請攜 Radar 編號 #FB11300759 找 Apple Developer Relations 投訴。";
 "Also toggle alphanumerical mode with Left-Shift" = "也允許使用左側的 Shift 鍵盤切換英數輸入模式";
 "Completely disable using Shift key to toggle alphanumerical mode" = "徹底禁止使用 Shift 鍵切換英數模式";
 "Please use mouse wheel to scroll this page. The CheatSheet is available in the IME menu." = "請利用滑鼠滾輪檢視該頁面。也請洽輸入法選單內的熱鍵指南。";
@@ -194,7 +192,6 @@
 
 // SwiftUI Preferences
 "(Shift+)Space:" = "(Shift+)空格鍵:";
-"⚠︎ This feature in IMK Candidate Window defects. Please consult\nApple Developer Relations with Radar ID: #FB11300759."  = "⚠︎ 該功能因 IMK 選字窗自身缺陷而無法實作。\n請攜 Radar 編號 #FB11300759 找 Apple Developer Relations 投訴。";
 "⚠︎ This feature is useful ONLY WHEN the font you are using doesn't support dynamic vertical punctuations. However, typed vertical punctuations will always shown as vertical punctuations EVEN IF your editor has changed the typing direction to horizontal." = "⚠︎ 該功能當且僅當目前的排版字型不支援縱排標點動態顯示轉義的情況下才有用。一旦使用了，所有敲出去的標點都會被永久轉換為靜態縱排標點：哪怕當前編輯器的排版模式已經改成橫排，這些已經輸入的標點也都還是縱排標點字元。";
 "⚠︎ This may hinder the walking algorithm from giving appropriate results." = "⚠︎ 這可能會妨礙爬軌函式，使其無法給出正確的結果。";
 "⚠︎ This will reboot the vChewing IME." = "⚠︎ 這將重啟威注音輸入法。";
@@ -288,7 +285,6 @@
 "IBM" = "IBM 排列";
 "If disabled, this will insert space instead." = "取消勾選的話，該按鍵會插入空格。";
 "If unchecked, the ESC key will try cleaning the unfinished readings / strokes first, and will commit the current composition buffer if there's no unfinished readings / strkes." = "若取消勾選，則 ESC 鍵會先嘗試清除未組成的讀音/字根；\n如果沒有未組成的讀音/字根的話，則會遞交當前組字區的內容。";
-"IMK candidate window (IMKCandidates) relies on certain Apple private APIs force-exposed through bridging headers. For now, its usability is only guaranteed from macOS 10.13 High Sierra to macOS 14 Sonoma. Further tests are required in later macOS to prove compatibility facts." = "IMK 選字窗依賴於 Apple 的私有 API，而且是藉由橋接檔案頭強制曝露的方法使用的。目前，該功能僅在 macOS 10.13 High Sierra 至 macOS 14 Sonoma 系統內有測試過可用性。至於在未來的 macOS 發行版當中是否可用，則需要另行測試、才能下結論。";
 "in front of the phrase (like macOS built-in Zhuyin IME)" = "將游標置於詞語前方 // macOS 內建注音風格";
 "Intonation Key:" = "聲調鍵:";
 "It only needs to parse consecutive NSEvents passed by macOS built-in InputMethodKit framework, hence no necessity of asking end-users for extra privileges of monitoring global keyboard inputs. You are free to investigate our codebase or reverse-engineer this input method to see whether the above statement is trustable." = "該功能只需要對藉由 macOS 內建的輸入法框架傳來的 NSEvent 做上下文分析，自然沒有「向使用者尋求系統全局鍵盤事件監聽權限」之必要。您可自行審視敝輸入法的原始程式碼倉庫、或對敝輸入法逆向工程，以自行證實此處所言之真假。";
@@ -354,7 +350,6 @@
 "UI Language:" = "介面語言:";
 "Universal Pinyin with Numeral Intonation" = "通用拼音+數字標調";
 "Use ESC key to clear the entire input buffer" = "敲 ESC 鍵以清空整個組字緩衝區";
-"Use IMK Candidate Window instead of Tadokoro" = "啟用與 macOS 內建輸入法相同的 IMK 選字窗";
 "Use only one row / column in candidate window." = "僅以單行/單列來陳列候選字。";
 "Use Space to confirm highlighted candidate in Per-Char Select Mode" = "在逐字選字模式當中使用空格鍵確認當前高亮候選字";
 "Vertical" = "縱向佈局";
