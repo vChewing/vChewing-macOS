@@ -172,6 +172,13 @@ struct VwrPrefPaneCandidates: View {
             "By checking this, Tadokoro Candidate Window will use SwiftUI. SwiftUI was being used in vChewing 3.3.8 and before. However, SwiftUI has unacceptable responsiveness & latency & efficiency problems in rendering the candidate panel UI. That's why a refactored version has been introduced since vChewing 3.3.9 using Cocoa, providing an optimized user experience with blasing-fast operation responsiveness, plus experimental mouse-wheel support.".localized
           )
           .preferenceDescription(maxWidth: CtlPrefUIShared.maxDescriptionWidth)
+          Button("Where's IMK Candidate Window?") {
+            if let window = CtlPrefUIShared.sharedWindow {
+              let title = "The End of Support for IMK Candidate Window"
+              let explanation = "1) Only macOS has IMKCandidates. Since it relies on a ObjC Bridging Header to expose necessary internal APIs to work, it hinders vChewing from completely modularized for multi-platform support.\n\n2) IMKCandidates is buggy. It is not likely to be completely fixed by Apple, and its devs are not allowed to talk about it to non-Apple individuals. That's why we have had enough with IMKCandidates. It is likely the reason why Apple had never used IMKCandidates in their official InputMethodKit sample projects (as of August 2023)."
+              window.callAlert(title: title.localized, text: explanation.localized)
+            }
+          }
         }
       }
     }
