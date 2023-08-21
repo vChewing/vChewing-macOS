@@ -28,7 +28,6 @@
                 <outlet property="pctUserDictionaryFolder" destination="p4U-xB-kEs" id="LUK-dT-wFt"/>
                 <outlet property="selectionKeyComboBox" destination="uHU-aL-du7" id="cEx-Ui-Phc"/>
                 <outlet property="tfdPETextEditor" destination="kSG-dz-P2N" id="aiA-EA-Isg"/>
-                <outlet property="tglControlDevZoneIMKCandidate" destination="MQ1-z8-Yf1" id="qRk-OO-iUU"/>
                 <outlet property="txtPECommentField" destination="cRd-HU-x7y" id="eJf-IX-goL"/>
                 <outlet property="txtPEField1" destination="eGd-pc-aEI" id="QQp-wQ-8sj"/>
                 <outlet property="txtPEField2" destination="4hL-rO-jca" id="g2Z-iV-KoH"/>
@@ -598,11 +597,6 @@
                                             </buttonCell>
                                             <connections>
                                                 <binding destination="32" name="value" keyPath="values.CandidateWindowShowOnlyOneLine" id="2gd-yB-Hvb"/>
-                                                <binding destination="32" name="enabled" keyPath="values.UseIMKCandidateWindow" id="8EY-Ul-AJO">
-                                                    <dictionary key="options">
-                                                        <string key="NSValueTransformerName">NSNegateBoolean</string>
-                                                    </dictionary>
-                                                </binding>
                                             </connections>
                                         </button>
                                     </subviews>
@@ -677,11 +671,6 @@
                                             <connections>
                                                 <action selector="changeSelectionKeyAction:" target="-2" id="REj-7y-bbQ"/>
                                                 <binding destination="32" name="value" keyPath="values.CandidateKeys" id="5Fv-A4-QY5"/>
-                                                <binding destination="32" name="enabled" keyPath="values.UseIMKCandidateWindow" id="BDQ-gl-txA">
-                                                    <dictionary key="options">
-                                                        <string key="NSValueTransformerName">NSNegateBoolean</string>
-                                                    </dictionary>
-                                                </binding>
                                             </connections>
                                         </comboBox>
                                     </subviews>
@@ -832,11 +821,6 @@
                                     </buttonCell>
                                     <connections>
                                         <binding destination="32" name="value" keyPath="values.EnableMouseScrollingForTDKCandidatesCocoa" id="Oyc-s5-cFP"/>
-                                        <binding destination="32" name="enabled" keyPath="values.UseIMKCandidateWindow" id="12U-Cd-k9q">
-                                            <dictionary key="options">
-                                                <string key="NSValueTransformerName">NSNegateBoolean</string>
-                                            </dictionary>
-                                        </binding>
                                     </connections>
                                 </button>
                             </subviews>
@@ -2405,10 +2389,10 @@ DQ
             <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
             <subviews>
                 <stackView distribution="fill" orientation="vertical" alignment="leading" horizontalStackHuggingPriority="249.99998474121094" verticalStackHuggingPriority="249.99998474121094" translatesAutoresizingMaskIntoConstraints="NO" id="gjM-uG-XkW">
-                    <rect key="frame" x="20" y="47" width="537" height="213"/>
+                    <rect key="frame" x="20" y="121" width="537" height="139"/>
                     <subviews>
                         <textField wantsLayer="YES" verticalHuggingPriority="750" setsMaxLayoutWidthAtFirstLayout="YES" translatesAutoresizingMaskIntoConstraints="NO" id="hBd-sS-cWq">
-                            <rect key="frame" x="-2" y="185" width="541" height="28"/>
+                            <rect key="frame" x="-2" y="111" width="541" height="28"/>
                             <constraints>
                                 <constraint firstAttribute="width" constant="537" id="Kvp-PL-Pes"/>
                             </constraints>
@@ -2421,14 +2405,14 @@ Features listed here may not work as expected.</string>
                             </textFieldCell>
                         </textField>
                         <box verticalHuggingPriority="750" boxType="separator" translatesAutoresizingMaskIntoConstraints="NO" id="ul4-N6-Ybi">
-                            <rect key="frame" x="0.0" y="174" width="537" height="5"/>
+                            <rect key="frame" x="0.0" y="100" width="537" height="5"/>
                             <constraints>
                                 <constraint firstAttribute="width" constant="537" id="2lI-El-JtD"/>
                                 <constraint firstAttribute="width" relation="greaterThanOrEqual" constant="400" id="kJZ-E8-eDL"/>
                             </constraints>
                         </box>
                         <button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="yJg-tV-hH6">
-                            <rect key="frame" x="-1" y="151.5" width="429" height="17"/>
+                            <rect key="frame" x="-1" y="77.5" width="429" height="17"/>
                             <constraints>
                                 <constraint firstAttribute="height" constant="16" id="TB3-Kn-UbK"/>
                                 <constraint firstAttribute="width" relation="greaterThanOrEqual" constant="70" id="u5i-mf-Rix"/>
@@ -2442,7 +2426,7 @@ Features listed here may not work as expected.</string>
                             </connections>
                         </button>
                         <textField wantsLayer="YES" verticalHuggingPriority="750" setsMaxLayoutWidthAtFirstLayout="YES" translatesAutoresizingMaskIntoConstraints="NO" id="uK3-cc-UcW">
-                            <rect key="frame" x="-2" y="74" width="541" height="70"/>
+                            <rect key="frame" x="-2" y="0.0" width="541" height="70"/>
                             <constraints>
                                 <constraint firstAttribute="width" constant="537" id="qOi-aV-LQX"/>
                             </constraints>
@@ -2453,45 +2437,14 @@ Features listed here may not work as expected.</string>
                                 <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
                             </textFieldCell>
                         </textField>
-                        <button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="MQ1-z8-Yf1">
-                            <rect key="frame" x="-1" y="49.5" width="410" height="17"/>
-                            <constraints>
-                                <constraint firstAttribute="height" constant="16" id="Bru-dS-VCh"/>
-                                <constraint firstAttribute="width" relation="greaterThanOrEqual" constant="70" id="JgS-KT-dqF"/>
-                            </constraints>
-                            <buttonCell key="cell" type="check" title="Use IMK Candidate Window instead of Tadokoro (will reboot the IME)" bezelStyle="regularSquare" imagePosition="left" controlSize="small" inset="2" id="tglDevZoneIMKCandidate">
-                                <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
-                                <font key="font" metaFont="cellTitle"/>
-                            </buttonCell>
-                            <connections>
-                                <action selector="updateIMKCandidateEnableStatusAction:" target="-2" id="v5H-CN-LPS"/>
-                                <binding destination="32" name="value" keyPath="values.UseIMKCandidateWindow" id="6Hj-pH-Wec"/>
-                            </connections>
-                        </button>
-                        <textField wantsLayer="YES" verticalHuggingPriority="750" setsMaxLayoutWidthAtFirstLayout="YES" translatesAutoresizingMaskIntoConstraints="NO" id="5ae-kj-Llx">
-                            <rect key="frame" x="-2" y="0.0" width="541" height="42"/>
-                            <constraints>
-                                <constraint firstAttribute="width" constant="537" id="zTP-1s-eev"/>
-                            </constraints>
-                            <textFieldCell key="cell" controlSize="small" sendsActionOnEndEditing="YES" alignment="left" id="lblDevZoneIMKCandidate">
-                                <font key="font" metaFont="smallSystem"/>
-                                <string key="title">IMK candidate window (IMKCandidates) relies on certain Apple private APIs force-exposed through bridging headers. For now, its usability is only guaranteed from macOS 10.13 High Sierra to macOS 14 Sonoma. Further tests are required in later macOS to prove compatibility facts.</string>
-                                <color key="textColor" name="secondaryLabelColor" catalog="System" colorSpace="catalog"/>
-                                <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
-                            </textFieldCell>
-                        </textField>
                     </subviews>
                     <visibilityPriorities>
                         <integer value="1000"/>
                         <integer value="1000"/>
                         <integer value="1000"/>
                         <integer value="1000"/>
-                        <integer value="1000"/>
-                        <integer value="1000"/>
                     </visibilityPriorities>
                     <customSpacing>
-                        <real value="3.4028234663852886e+38"/>
-                        <real value="3.4028234663852886e+38"/>
                         <real value="3.4028234663852886e+38"/>
                         <real value="3.4028234663852886e+38"/>
                         <real value="3.4028234663852886e+38"/>

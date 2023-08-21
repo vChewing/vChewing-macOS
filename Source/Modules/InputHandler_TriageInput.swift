@@ -11,6 +11,7 @@
 
 import CocoaExtension
 import IMKUtils
+import InputMethodKit
 import LangModelAssembly
 import Shared
 
