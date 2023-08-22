@@ -7,6 +7,7 @@
 // requirements defined in MIT License.
 
 import AppKit
+import MainAssembly
 
 class CtlClientListMgr: NSWindowController, NSTableViewDelegate, NSTableViewDataSource {
   @IBOutlet var tblClients: NSTableView!

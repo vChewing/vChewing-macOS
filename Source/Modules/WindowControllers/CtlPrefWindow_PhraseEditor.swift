@@ -9,6 +9,7 @@
 import AppKit
 import Foundation
 import LangModelAssembly
+import MainAssembly
 import PhraseEditorUI
 import Shared
 

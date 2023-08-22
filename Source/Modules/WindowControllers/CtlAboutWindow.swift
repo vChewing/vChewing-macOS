@@ -7,6 +7,7 @@
 // requirements defined in MIT License.
 
 import AppKit
+import MainAssembly
 
 class CtlAboutWindow: NSWindowController {
   @IBOutlet var appVersionLabel: NSTextField!

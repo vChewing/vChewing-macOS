@@ -11,6 +11,7 @@
 import AppKit
 import BookmarkManager
 import IMKUtils
+import MainAssembly
 import Shared
 
 private let kWindowTitleHeight: Double = 78
