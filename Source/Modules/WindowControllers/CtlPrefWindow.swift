@@ -61,6 +61,8 @@ class CtlPrefWindow: NSWindowController, NSWindowDelegate {
 
   public static var shared: CtlPrefWindow?
 
+  @objc var observation: NSKeyValueObservation?
+
   static func show() {
     let resetPhraseEditor: Bool = shared?.window == nil || !(shared?.window?.isVisible ?? false) || shared == nil
     if shared == nil { shared = CtlPrefWindow(windowNibName: "frmPrefWindow") }
@@ -82,6 +84,10 @@ class CtlPrefWindow: NSWindowController, NSWindowDelegate {
   override func windowDidLoad() {
     super.windowDidLoad()
     window?.setPosition(vertical: .top, horizontal: .right, padding: 20)
+
+    observation = Broadcaster.shared.observe(\.eventForReloadingPhraseEditor, options: [.new]) { _, _ in
+      self.updatePhraseEditor()
+    }
 
     chkFartSuppressor.isHidden = !Date.isTodayTheDate(from: 0401)
     chkFartSuppressor.isEnabled = !chkFartSuppressor.isHidden
