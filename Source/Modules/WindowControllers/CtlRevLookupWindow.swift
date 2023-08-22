@@ -11,6 +11,7 @@ import LangModelAssembly
 
 class CtlRevLookupWindow: NSWindowController, NSWindowDelegate {
   static var shared: CtlRevLookupWindow?
+  @objc var observation: NSKeyValueObservation?
 
   static func show() {
     if shared == nil { Self.shared = .init(window: FrmRevLookupWindow()) }
@@ -20,9 +21,15 @@ class CtlRevLookupWindow: NSWindowController, NSWindowDelegate {
     window.setPosition(vertical: .bottom, horizontal: .right, padding: 20)
     window.orderFrontRegardless() // 逼著視窗往最前方顯示
     window.level = .statusBar
-    window.titlebarAppearsTransparent = true
     shared.showWindow(shared)
     NSApp.popup()
+  }
+  
+  override func windowDidLoad() {
+    super.windowDidLoad()
+    observation = Broadcaster.shared.observe(\.eventForReloadingRevLookupData, options: [.new]) { _, _ in
+      FrmRevLookupWindow.reloadData()
+    }
   }
 }
 

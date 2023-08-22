@@ -280,7 +280,7 @@ public extension LMMgr {
     // by the current application itself, requiring additional manual loading process here.
     if #available(macOS 10.15, *) { FileObserveProject.shared.touch() }
     if PrefMgr.shared.phraseEditorAutoReloadExternalModifications {
-      CtlPrefWindow.shared?.updatePhraseEditor()
+      Broadcaster.shared.eventForReloadingPhraseEditor = .init()
     }
     loadUserPhrasesData(type: .thePhrases)
   }
