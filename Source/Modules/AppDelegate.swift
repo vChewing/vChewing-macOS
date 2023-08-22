@@ -47,7 +47,7 @@ extension AppDelegate {
       DispatchQueue.main.asyncAfter(deadline: DispatchTime.now() + 0.1) {
         if #available(macOS 10.15, *) { FileObserveProject.shared.touch() }
         if PrefMgr.shared.phraseEditorAutoReloadExternalModifications {
-          CtlPrefWindow.shared?.updatePhraseEditor()
+          Broadcaster.shared.eventForReloadingPhraseEditor = .init()
         }
       }
     }
