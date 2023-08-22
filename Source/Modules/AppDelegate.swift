@@ -20,6 +20,19 @@ public class AppDelegate: NSObject, NSApplicationDelegate, NSUserNotificationCen
   private var folderMonitor = FolderMonitor(
     url: URL(fileURLWithPath: LMMgr.dataFolderPath(isDefaultFolder: false))
   )
+
+  public static var updateInfoSourceURL: URL? {
+    guard let urlText = Bundle.main.infoDictionary?["UpdateInfoEndpoint"] as? String else {
+      NSLog("vChewingDebug: Fatal error: Info.plist wrecked. It needs to have correct 'UpdateInfoEndpoint' value.")
+      return nil
+    }
+    return .init(string: urlText)
+  }
+
+  public func checkUpdate(forced: Bool) {
+    guard let url = Self.updateInfoSourceURL else { return }
+    UpdateSputnik.shared.checkForUpdate(forced: forced, url: url)
+  }
 }
 
 // MARK: - Private Functions
@@ -80,7 +93,7 @@ public extension AppDelegate {
 
     // 只要使用者沒有勾選檢查更新、沒有主動做出要檢查更新的操作，就不要檢查更新。
     if PrefMgr.shared.checkUpdateAutomatically {
-      UpdateSputnik.shared.checkForUpdate(forced: false, url: kUpdateInfoSourceURL)
+      checkUpdate(forced: false)
     }
   }
 

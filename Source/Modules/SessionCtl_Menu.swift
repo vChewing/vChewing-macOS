@@ -373,7 +373,7 @@ public extension SessionCtl {
   }
 
   @objc func checkForUpdate(_: Any? = nil) {
-    UpdateSputnik.shared.checkForUpdate(forced: true, url: kUpdateInfoSourceURL)
+    AppDelegate.shared.checkUpdate(forced: true)
   }
 
   @objc func openUserDataFolder(_: Any? = nil) {
