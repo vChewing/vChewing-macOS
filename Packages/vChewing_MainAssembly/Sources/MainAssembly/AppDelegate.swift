@@ -161,10 +161,4 @@ public extension AppDelegate {
     }
     return currentMemorySize
   }
-
-  // New About Window
-  @IBAction func about(_: Any) {
-    CtlAboutWindow.show()
-    NSApp.popup()
-  }
 }

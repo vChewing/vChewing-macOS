@@ -7,10 +7,9 @@
 // requirements defined in MIT License.
 
 import AppKit
-import LangModelAssembly
+import MainAssembly
 import NotifierUI
 import SSPreferences
-import UpdateSputnik
 
 private extension Bool {
   var state: NSControl.StateValue {

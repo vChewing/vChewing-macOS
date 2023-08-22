@@ -185,7 +185,7 @@ public class LMMgr {
   }
 
   public static func reloadFactoryDictionaryFiles() {
-    FrmRevLookupWindow.reloadData()
+    Broadcaster.shared.eventForReloadingRevLookupData = .init()
     LMMgr.lmCHS.resetFactoryJSONModels()
     LMMgr.lmCHT.resetFactoryJSONModels()
     if PrefMgr.shared.onlyLoadFactoryLangModelsIfNeeded {

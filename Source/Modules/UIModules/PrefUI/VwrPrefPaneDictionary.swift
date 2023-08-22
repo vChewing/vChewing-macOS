@@ -8,6 +8,7 @@
 
 import BookmarkManager
 import CocoaExtension
+import MainAssembly
 import Shared
 import SSPreferences
 import SwiftExtension

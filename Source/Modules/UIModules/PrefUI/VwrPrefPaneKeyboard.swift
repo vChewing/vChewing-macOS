@@ -7,6 +7,7 @@
 // requirements defined in MIT License.
 
 import IMKUtils
+import MainAssembly
 import Shared
 import SSPreferences
 import SwiftExtension
