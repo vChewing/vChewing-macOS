@@ -318,7 +318,7 @@ public extension SessionCtl {
       }
 
       DispatchQueue.main.async {
-        UpdateSputnik.shared.checkForUpdate(forced: false, url: kUpdateInfoSourceURL)
+        AppDelegate.shared.checkUpdate(forced: false)
         AppDelegate.shared.checkMemoryUsage()
       }
 
