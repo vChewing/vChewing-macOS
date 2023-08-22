@@ -8,6 +8,8 @@
 
 import AppKit
 import LangModelAssembly
+import MainAssembly
+import Shared
 
 class CtlRevLookupWindow: NSWindowController, NSWindowDelegate {
   static var shared: CtlRevLookupWindow?
@@ -24,7 +26,7 @@ class CtlRevLookupWindow: NSWindowController, NSWindowDelegate {
     shared.showWindow(shared)
     NSApp.popup()
   }
-  
+
   override func windowDidLoad() {
     super.windowDidLoad()
     observation = Broadcaster.shared.observe(\.eventForReloadingRevLookupData, options: [.new]) { _, _ in

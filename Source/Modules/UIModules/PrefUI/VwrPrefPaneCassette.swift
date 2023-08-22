@@ -7,6 +7,7 @@
 // requirements defined in MIT License.
 
 import BookmarkManager
+import MainAssembly
 import Shared
 import SSPreferences
 import SwiftExtension

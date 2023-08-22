@@ -8,6 +8,7 @@
 
 import BookmarkManager
 import IMKUtils
+import MainAssembly
 import Shared
 import SwiftUI
 
