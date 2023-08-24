@@ -119,6 +119,19 @@ public extension Bool {
   }
 }
 
+// MARK: - User Defaults Storage
+
+public extension UserDefaults {
+  // 內部標記，看輸入法是否處於測試模式。
+  static var pendingUnitTests = false
+
+  static var unitTests = UserDefaults(suiteName: "UnitTests")
+
+  static var current: UserDefaults {
+    pendingUnitTests ? .unitTests ?? .standard : .standard
+  }
+}
+
 // MARK: - Property Wrapper
 
 // Ref: https://www.avanderlee.com/swift/property-wrappers/
@@ -127,7 +140,7 @@ public extension Bool {
 public struct AppProperty<Value> {
   public let key: String
   public let defaultValue: Value
-  public var container: UserDefaults = .standard
+  public var container: UserDefaults { .current }
   public init(key: String, defaultValue: Value) {
     self.key = key
     self.defaultValue = defaultValue
