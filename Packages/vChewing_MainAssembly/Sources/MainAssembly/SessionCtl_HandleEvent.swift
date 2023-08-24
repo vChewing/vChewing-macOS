@@ -114,7 +114,7 @@ public extension SessionCtl {
     guard let inputHandler = inputHandler, client() != nil else { return false }
 
     /// 除非核心辭典有載入，否則一律蜂鳴。
-    if !LMMgr.currentLM.isCoreLMLoaded {
+    if !inputHandler.currentLM.isCoreLMLoaded {
       if (event as InputSignalProtocol).isReservedKey { return false }
       var newState: IMEStateProtocol = IMEState.ofEmpty()
       newState.tooltip = NSLocalizedString("Factory dictionary not loaded yet.", comment: "")
