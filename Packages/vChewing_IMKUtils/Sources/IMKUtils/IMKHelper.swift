@@ -49,14 +49,6 @@ public enum IMKHelper {
     "org.unknown.keylayout.vChewingMiTAC",
   ]
 
-  public static var currentBasicKeyboardLayout: String {
-    UserDefaults.standard.string(forKey: "BasicKeyboardLayout") ?? ""
-  }
-
-  public static var isDynamicBasicKeyboardLayoutEnabled: Bool {
-    Self.arrDynamicBasicKeyLayouts.contains(currentBasicKeyboardLayout) || !currentBasicKeyboardLayout.isEmpty
-  }
-
   public static var allowedAlphanumericalTISInputSources: [TISInputSource] {
     arrWhitelistedKeyLayoutsASCII.compactMap { TISInputSource.generate(from: $0) }
   }
