@@ -11,14 +11,14 @@ import Megrez
 import Shared
 
 public extension vChewingLM {
-  /// 與之前的 LMCore 不同，LMCoreNS 直接讀取 json。
+  /// 與之前的 LMCore 不同，LMCoreJSON 直接讀取 json。
   /// 這樣一來可以節省在舊 mac 機種內的資料讀入速度。
   /// 目前僅針對輸入法原廠語彙資料檔案使用 json 格式。
   @frozen struct LMCoreJSON {
     public private(set) var filePath: String?
     /// 資料庫辭典。索引內容為經過加密的注音字串，資料內容則為 UTF8 資料陣列。
     var dataMap: [String: [String]] = [:]
-    /// 【已作廢】資料庫字串陣列。在 LMCoreNS 內沒有作用。
+    /// 【已作廢】資料庫字串陣列。在 LMCoreJSON 內沒有作用。
     var strData: String = ""
     /// 【已作廢】聲明原始檔案內第一、二縱列的內容是否彼此顛倒。
     var shouldReverse = false
@@ -34,7 +34,7 @@ public extension vChewingLM {
 
     /// 初期化該語言模型。
     ///
-    /// 某些參數在 LMCoreNS 內已作廢，但仍保留、以方便那些想用該專案源碼做實驗的人群。
+    /// 某些參數在 LMCoreJSON 內已作廢，但仍保留、以方便那些想用該專案源碼做實驗的人群。
     ///
     /// - parameters:
     ///   - reverse: 已作廢：聲明原始檔案內第一、二縱列的內容是否彼此顛倒。
