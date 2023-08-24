@@ -230,22 +230,22 @@ public extension LMMgr {
     {
       return userDictPathDefault
     }
-    if UserDefaults.standard.object(forKey: UserDef.kUserDataFolderSpecified.rawValue) != nil {
+    if UserDefaults.current.object(forKey: UserDef.kUserDataFolderSpecified.rawValue) != nil {
       BookmarkManager.shared.loadBookmarks()
       if Self.checkIfSpecifiedUserDataFolderValid(userDictPathSpecified) {
         return userDictPathSpecified
       }
-      UserDefaults.standard.removeObject(forKey: UserDef.kUserDataFolderSpecified.rawValue)
+      UserDefaults.current.removeObject(forKey: UserDef.kUserDataFolderSpecified.rawValue)
     }
     return userDictPathDefault
   }
 
   static func cassettePath() -> String {
     let rawCassettePath = PrefMgr.shared.cassettePath
-    if UserDefaults.standard.object(forKey: UserDef.kCassettePath.rawValue) != nil {
+    if UserDefaults.current.object(forKey: UserDef.kCassettePath.rawValue) != nil {
       BookmarkManager.shared.loadBookmarks()
       if Self.checkCassettePathValidity(rawCassettePath) { return rawCassettePath }
-      UserDefaults.standard.removeObject(forKey: UserDef.kCassettePath.rawValue)
+      UserDefaults.current.removeObject(forKey: UserDef.kCassettePath.rawValue)
     }
     return ""
   }
@@ -253,12 +253,12 @@ public extension LMMgr {
   // MARK: - 重設使用者語彙檔案目錄
 
   static func resetSpecifiedUserDataFolder() {
-    UserDefaults.standard.set(dataFolderPath(isDefaultFolder: true), forKey: UserDef.kUserDataFolderSpecified.rawValue)
+    UserDefaults.current.set(dataFolderPath(isDefaultFolder: true), forKey: UserDef.kUserDataFolderSpecified.rawValue)
     Self.initUserLangModels()
   }
 
   static func resetCassettePath() {
-    UserDefaults.standard.set("", forKey: UserDef.kCassettePath.rawValue)
+    UserDefaults.current.set("", forKey: UserDef.kCassettePath.rawValue)
     Self.loadCassetteData()
   }
 

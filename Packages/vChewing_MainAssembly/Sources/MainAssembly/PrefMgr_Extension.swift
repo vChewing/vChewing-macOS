@@ -25,15 +25,15 @@ public extension PrefMgr {
       showNotificationsWhenTogglingCapsLock = false
     }
     if appleLanguages.isEmpty {
-      UserDefaults.standard.removeObject(forKey: UserDef.kAppleLanguages.rawValue)
+      UserDefaults.current.removeObject(forKey: UserDef.kAppleLanguages.rawValue)
     }
     // 自動糾正選字鍵 (利用其 didSet 特性)
     candidateKeys = candidateKeys
     // 客體黑名單資料類型升級。
-    if let clients = UserDefaults.standard.object(
+    if let clients = UserDefaults.current.object(
       forKey: UserDef.kClientsIMKTextInputIncapable.rawValue
     ) as? [String] {
-      UserDefaults.standard.removeObject(forKey: UserDef.kClientsIMKTextInputIncapable.rawValue)
+      UserDefaults.current.removeObject(forKey: UserDef.kClientsIMKTextInputIncapable.rawValue)
       clients.forEach { neta in
         guard !clientsIMKTextInputIncapable.keys.contains(neta) else { return }
         clientsIMKTextInputIncapable[neta] = true
