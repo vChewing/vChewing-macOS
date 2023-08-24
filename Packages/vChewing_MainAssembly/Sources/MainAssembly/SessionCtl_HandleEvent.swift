@@ -58,7 +58,7 @@ public extension SessionCtl {
     if codes.contains(event.keyCode) {
       previouslyHandledEvents = previouslyHandledEvents.filter { prevEvent in
         prevEvent.keyCode != event.keyCode
-      }.deduplicated
+      }
       return true
     }
     return false
