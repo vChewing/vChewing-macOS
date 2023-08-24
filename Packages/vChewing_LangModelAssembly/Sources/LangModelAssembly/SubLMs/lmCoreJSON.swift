@@ -124,7 +124,7 @@ public extension vChewingLM {
           if neta.count >= 2, !shouldForceDefaultScore {
             theScore = .init(String(neta[1])) ?? defaultScore
           }
-          strDump += "\(cnvPhonabetToASCII(theKey)) \(theValue) \(theScore)\n"
+          strDump += "\(Self.cnvPhonabetToASCII(theKey)) \(theValue) \(theScore)\n"
         }
       }
       vCLog(strDump)
@@ -133,7 +133,7 @@ public extension vChewingLM {
     public func getHaninSymbolMenuUnigrams() -> [Megrez.Unigram] {
       let key = "_punctuation_list"
       var grams: [Megrez.Unigram] = []
-      guard let arrRangeRecords: [String] = dataMap[cnvPhonabetToASCII(key)] else { return grams }
+      guard let arrRangeRecords: [String] = dataMap[Self.cnvPhonabetToASCII(key)] else { return grams }
       for strNetaSet in arrRangeRecords {
         let neta = Array(strNetaSet.trimmingCharacters(in: .newlines).split(separator: " ").reversed())
         let theValue: String = .init(neta[0])
@@ -156,7 +156,7 @@ public extension vChewingLM {
       if key == "_punctuation_list" { return [] }
       var grams: [Megrez.Unigram] = []
       var gramsHW: [Megrez.Unigram] = []
-      guard let arrRangeRecords: [String] = dataMap[cnvPhonabetToASCII(key)] else { return grams }
+      guard let arrRangeRecords: [String] = dataMap[Self.cnvPhonabetToASCII(key)] else { return grams }
       for strNetaSet in arrRangeRecords {
         let neta = Array(strNetaSet.trimmingCharacters(in: .newlines).split(separator: " ").reversed())
         let theValue: String = .init(neta[0])
@@ -182,7 +182,7 @@ public extension vChewingLM {
     /// - parameters:
     ///   - key: 讀音索引鍵。
     public func hasUnigramsFor(key: String) -> Bool {
-      dataMap[cnvPhonabetToASCII(key)] != nil
+      dataMap[Self.cnvPhonabetToASCII(key)] != nil
     }
 
     /// 內部函式，用以將注音讀音索引鍵進行加密。
@@ -192,7 +192,7 @@ public extension vChewingLM {
     /// 如果傳入的字串當中包含 ASCII 下畫線符號的話，則表明該字串並非注音讀音字串，會被忽略處理。
     /// - parameters:
     ///   - incoming: 傳入的未加密注音讀音字串。
-    func cnvPhonabetToASCII(_ incoming: String) -> String {
+    public static func cnvPhonabetToASCII(_ incoming: String) -> String {
       var strOutput = incoming
       if !strOutput.contains("_") {
         for entry in Self.dicPhonabet2ASCII {
@@ -207,7 +207,7 @@ public extension vChewingLM {
     /// 如果傳入的字串當中包含 ASCII 下畫線符號的話，則表明該字串並非注音讀音字串，會被忽略處理。
     /// - parameters:
     ///   - incoming: 傳入的已加密注音讀音字串。
-    func restorePhonabetFromASCII(_ incoming: String) -> String {
+    public static func restorePhonabetFromASCII(_ incoming: String) -> String {
       var strOutput = incoming
       if !strOutput.contains("_") {
         for entry in Self.dicPhonabet4ASCII {
