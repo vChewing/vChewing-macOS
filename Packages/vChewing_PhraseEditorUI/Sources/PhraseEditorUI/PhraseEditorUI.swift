@@ -16,7 +16,7 @@ import SwiftUI
 import SwiftUIBackports
 
 private let loc: String =
-  (UserDefaults.standard.array(forKey: UserDef.kAppleLanguages.rawValue) as? [String] ?? ["auto"])[0]
+  (UserDefaults.current.array(forKey: UserDef.kAppleLanguages.rawValue) as? [String] ?? ["auto"])[0]
 
 @available(macOS 10.15, *)
 extension VwrPhraseEditorUI {
@@ -31,7 +31,7 @@ public struct VwrPhraseEditorUI: View {
   )
   @Binding public var txtContent: String
   @ObservedObject public var fileChangeIndicator = FileObserveProject.shared
-  @State private var selAutoReloadExternalModifications: Bool = UserDefaults.standard.bool(
+  @State private var selAutoReloadExternalModifications: Bool = UserDefaults.current.bool(
     forKey: UserDef.kPhraseEditorAutoReloadExternalModifications.rawValue)
   @State var lblAddPhraseTag1 = PETerms.AddPhrases.locPhrase.localized.0
   @State var lblAddPhraseTag2 = PETerms.AddPhrases.locReadingOrStroke.localized.0

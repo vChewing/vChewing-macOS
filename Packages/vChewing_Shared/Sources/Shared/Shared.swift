@@ -98,7 +98,7 @@ public enum UserDef: String, CaseIterable {
 
   public static func resetAll() {
     UserDef.allCases.forEach {
-      UserDefaults.standard.removeObject(forKey: $0.rawValue)
+      UserDefaults.current.removeObject(forKey: $0.rawValue)
     }
   }
 
@@ -106,7 +106,7 @@ public enum UserDef: String, CaseIterable {
     let data = snapshot.data
     guard !data.isEmpty else { return }
     UserDef.allCases.forEach {
-      UserDefaults.standard.set(data[$0.rawValue], forKey: $0.rawValue)
+      UserDefaults.current.set(data[$0.rawValue], forKey: $0.rawValue)
     }
   }
 
@@ -114,7 +114,7 @@ public enum UserDef: String, CaseIterable {
     public var data: [String: Any] = [:]
     public init() {
       UserDef.allCases.forEach {
-        data[$0.rawValue] = UserDefaults.standard.object(forKey: $0.rawValue)
+        data[$0.rawValue] = UserDefaults.current.object(forKey: $0.rawValue)
       }
     }
   }
@@ -310,7 +310,7 @@ public enum CandidateKey {
 }
 
 public func vCLog(_ strPrint: StringLiteralType) {
-  if UserDefaults.standard.bool(forKey: "_DebugMode") {
+  if UserDefaults.current.bool(forKey: "_DebugMode") {
     NSLog("vChewingDebug: %@", strPrint)
   }
 }

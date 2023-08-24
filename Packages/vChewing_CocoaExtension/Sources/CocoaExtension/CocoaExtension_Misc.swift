@@ -133,7 +133,7 @@ public extension NSApplication {
       let appearanceDescription = NSApp.effectiveAppearance.debugDescription
         .lowercased()
       return appearanceDescription.contains("dark")
-    } else if let appleInterfaceStyle = UserDefaults.standard.string(forKey: "AppleInterfaceStyle") {
+    } else if let appleInterfaceStyle = UserDefaults.current.string(forKey: "AppleInterfaceStyle") {
       return appleInterfaceStyle.lowercased().contains("dark")
     }
     return false
