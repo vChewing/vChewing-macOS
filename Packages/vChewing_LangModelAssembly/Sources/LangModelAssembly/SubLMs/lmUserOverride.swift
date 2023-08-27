@@ -363,20 +363,24 @@ extension vChewingLM.LMUserOverride {
       }
     }
 
-    if arrNodes.count >= 2,
-       !kvPrevious.joinedKey().contains("_"),
-       kvPrevious.joinedKey().split(separator: "-").count == kvPrevious.value.count
-    {
-      kvPrevious = arrNodes[1].currentPair
-      readingStack = kvPrevious.joinedKey() + readingStack
+    func checkKeyValueValidityInThisContext(_ target: Megrez.KeyValuePaired) -> Bool {
+      !target.joinedKey().contains("_") && target.joinedKey().split(separator: "-").count == target.value.count
     }
 
-    if arrNodes.count >= 3,
-       !kvAnterior.joinedKey().contains("_"),
-       kvAnterior.joinedKey().split(separator: "-").count == kvAnterior.value.count
-    {
-      kvAnterior = arrNodes[2].currentPair
-      readingStack = kvAnterior.joinedKey() + readingStack
+    if arrNodes.count >= 2 {
+      let maybeKvPrevious = arrNodes[1].currentPair
+      if checkKeyValueValidityInThisContext(maybeKvPrevious) {
+        kvPrevious = maybeKvPrevious
+        readingStack = kvPrevious.joinedKey() + readingStack
+      }
+    }
+
+    if arrNodes.count >= 3 {
+      let maybeKvAnterior = arrNodes[2].currentPair
+      if checkKeyValueValidityInThisContext(maybeKvAnterior) {
+        kvAnterior = maybeKvAnterior
+        readingStack = kvAnterior.joinedKey() + readingStack
+      }
     }
 
     return result
