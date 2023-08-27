@@ -1,5 +1,4 @@
 //// (c) 2021 and onwards The vChewing Project (MIT-NTL License).
-// StringView Ranges extension by (c) 2022 and onwards Isaac Xen (MIT License).
 // ====================
 // This code is released under the MIT license (SPDX-License-Identifier: MIT)
 // ... with NTL restriction stating that:
@@ -49,8 +48,8 @@ final class LMCassetteTests: XCTestCase {
     XCTAssertFalse(lmCassette.quickDefMap.isEmpty)
     print(lmCassette.quickSetsFor(key: ",.") ?? "")
     XCTAssertEqual(lmCassette.keyNameMap.count, 41)
-    XCTAssertEqual(lmCassette.charDefMap.count, 29537)
-    XCTAssertEqual(lmCassette.charDefWildcardMap.count, 11973)
+    XCTAssertEqual(lmCassette.charDefMap.count, 29491)
+    XCTAssertEqual(lmCassette.charDefWildcardMap.count, 11946)
     XCTAssertEqual(lmCassette.octagramMap.count, 0)
     XCTAssertEqual(lmCassette.octagramDividedMap.count, 0)
     XCTAssertEqual(lmCassette.nameShort, "AR30")
