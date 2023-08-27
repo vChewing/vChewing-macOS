@@ -129,8 +129,17 @@ public extension SessionCtl {
   /// 遞交組字區內容。
   /// 注意：必須在 IMK 的 commitComposition 函式當中也間接或者直接執行這個處理。
   private func commit(text: String) {
-    let text = text.trimmingCharacters(in: .newlines)
-    let buffer = ChineseConverter.kanjiConversionIfRequired(text)
+    let phE = PrefMgr.shared.phraseReplacementEnabled && text.count > 1
+    var text = text.trimmingCharacters(in: .newlines)
+    var replaced = false
+    if phE, let queried = inputHandler?.currentLM.queryReplacementValue(key: text) {
+      replaced = true
+      text = queried
+    }
+    var buffer = ChineseConverter.kanjiConversionIfRequired(text)
+    if phE, !replaced, let queried = inputHandler?.currentLM.queryReplacementValue(key: buffer) {
+      buffer = ChineseConverter.kanjiConversionIfRequired(queried)
+    }
     if isServingIMEItself {
       DispatchQueue.main.async {
         guard let client = self.client() else { return }

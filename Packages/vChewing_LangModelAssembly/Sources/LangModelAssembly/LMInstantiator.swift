@@ -233,6 +233,11 @@ public extension vChewingLM {
       lmAssociates.valuesFor(pair: pair)
     }
 
+    public func queryReplacementValue(key: String) -> String? {
+      let result = lmReplacements.valuesFor(key: key)
+      return result.isEmpty ? nil : result
+    }
+
     /// 插入臨時資料。
     /// - Parameters:
     ///   - key: 索引鍵陣列。
