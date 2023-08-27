@@ -239,7 +239,7 @@ public extension vChewingLM.LMUserOverride {
 // MARK: - Private Methods
 
 extension vChewingLM.LMUserOverride {
-  private func doObservation(
+  func doObservation(
     key: String, candidate: String, timestamp: Double, forceHighScoreOverride: Bool,
     saveCallback: @escaping () -> Void
   ) {
@@ -254,7 +254,7 @@ extension vChewingLM.LMUserOverride {
       mutLRUList.insert(koPair, at: 0)
 
       if mutLRUList.count > mutCapacity {
-        mutLRUMap.removeValue(forKey: mutLRUList[mutLRUList.endIndex].key)
+        mutLRUMap.removeValue(forKey: mutLRUList[mutLRUList.endIndex - 1].key)
         mutLRUList.removeLast()
       }
       vCLog("UOM: Observation finished with new observation: \(key)")
@@ -273,7 +273,7 @@ extension vChewingLM.LMUserOverride {
     }
   }
 
-  private func getSuggestion(key: String, timestamp: Double, headReading: String) -> Suggestion {
+  func getSuggestion(key: String, timestamp: Double, headReading: String) -> Suggestion {
     guard !key.isEmpty, let kvPair = mutLRUMap[key] else { return .init() }
     let observation: Observation = kvPair.observation
     var candidates: [(String, Megrez.Unigram)] = .init()
@@ -298,7 +298,7 @@ extension vChewingLM.LMUserOverride {
     return .init(candidates: candidates, forceHighScoreOverride: forceHighScoreOverride)
   }
 
-  private func getScore(
+  func getScore(
     eventCount: Int,
     totalCount: Int,
     eventTimestamp: Double,
@@ -311,7 +311,7 @@ extension vChewingLM.LMUserOverride {
     return prob * decay
   }
 
-  private static func isPunctuation(_ node: Megrez.Node) -> Bool {
+  static func isPunctuation(_ node: Megrez.Node) -> Bool {
     for key in node.keyArray {
       guard let firstChar = key.first else { continue }
       return String(firstChar) == "_"
@@ -319,7 +319,7 @@ extension vChewingLM.LMUserOverride {
     return false
   }
 
-  private static func formObservationKey(
+  static func formObservationKey(
     walkedNodes: [Megrez.Node], headIndex cursorIndex: Int, readingOnly: Bool = false
   ) -> String {
     // let whiteList = "你他妳她祢衪它牠再在"
