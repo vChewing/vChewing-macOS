@@ -96,19 +96,6 @@ public extension SessionCtl {
       name: PrefMgr.shared.candidateTextFontName, size: PrefMgr.shared.candidateListTextSize
     )
 
-    if state.type == .ofAssociates {
-      candidateUI?.tooltip =
-        singleLine ? "⇧" : NSLocalizedString("Hold ⇧ to choose associates.", comment: "")
-    } else if state.type == .ofInputting, state.isCandidateContainer {
-      let useShift = LMMgr.currentLM.areCassetteCandidateKeysShiftHeld
-      let theEmoji = useShift ? "⬆️" : "⚡️"
-      candidateUI?.tooltip =
-        singleLine ? theEmoji : "\(theEmoji) " + NSLocalizedString("Quick Candidates", comment: "")
-    } else if PrefMgr.shared.cassetteEnabled {
-      candidateUI?.tooltip =
-        singleLine ? "📼" : "📼 " + NSLocalizedString("CIN Cassette Mode", comment: "")
-    }
-
     candidateUI?.locale = {
       switch inputMode {
       case .imeModeCHS: return "zh-Hans"
