@@ -92,6 +92,19 @@ extension SessionCtl: CtlCandidateDelegate {
 
   public var showReverseLookupResult: Bool { PrefMgr.shared.showReverseLookupInCandidateUI }
 
+  public func candidateToolTip(shortened: Bool) -> String {
+    if state.type == .ofAssociates {
+      return shortened ? "⇧" : NSLocalizedString("Hold ⇧ to choose associates.", comment: "")
+    } else if state.type == .ofInputting, state.isCandidateContainer {
+      let useShift = LMMgr.currentLM.areCassetteCandidateKeysShiftHeld
+      let theEmoji = useShift ? "⬆️" : "⚡️"
+      return shortened ? theEmoji : "\(theEmoji) " + NSLocalizedString("Quick Candidates", comment: "")
+    } else if PrefMgr.shared.cassetteEnabled {
+      return shortened ? "📼" : "📼 " + NSLocalizedString("CIN Cassette Mode", comment: "")
+    }
+    return ""
+  }
+
   @discardableResult public func reverseLookup(for value: String) -> [String] {
     let blankResult: [String] = []
     // 這一段專門處理「反查」。
