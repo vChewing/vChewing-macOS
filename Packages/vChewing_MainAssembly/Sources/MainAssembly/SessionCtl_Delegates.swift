@@ -79,6 +79,12 @@ extension SessionCtl: InputHandlerDelegate {
 
 extension SessionCtl: CtlCandidateDelegate {
   public var isCandidateState: Bool { state.isCandidateContainer }
+
+  public var shouldAutoExpandCandidates: Bool {
+    guard state.type == .ofSymbolTable else { return state.type == .ofAssociates }
+    return state.node.previous != nil
+  }
+
   public var isCandidateContextMenuEnabled: Bool {
     state.type == .ofCandidates && !clientBundleIdentifier.contains("com.apple.Spotlight")
       && !clientBundleIdentifier.contains("com.raycast.macos")
