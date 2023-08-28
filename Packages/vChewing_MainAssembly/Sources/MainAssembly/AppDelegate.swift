@@ -61,7 +61,7 @@ public extension AppDelegate {
     true
   }
 
-  func applicationDidFinishLaunching(_: Notification) {
+  func applicationWillFinishLaunching(_: Notification) {
     NSUserNotificationCenter.default.delegate = self
     PrefMgr.shared.fixOddPreferences()
 
@@ -82,14 +82,12 @@ public extension AppDelegate {
     }
 
     if !PrefMgr.shared.onlyLoadFactoryLangModelsIfNeeded { LMMgr.loadDataModelsOnAppDelegate() }
-    DispatchQueue.main.async {
-      LMMgr.loadCassetteData()
-      LMMgr.initUserLangModels()
-      self.folderMonitor.folderDidChange = { [weak self] in
-        self?.reloadOnFolderChangeHappens()
-      }
-      if LMMgr.userDataFolderExists { self.folderMonitor.startMonitoring() }
+    LMMgr.loadCassetteData()
+    LMMgr.initUserLangModels()
+    folderMonitor.folderDidChange = { [weak self] in
+      self?.reloadOnFolderChangeHappens()
     }
+    if LMMgr.userDataFolderExists { folderMonitor.startMonitoring() }
 
     // 只要使用者沒有勾選檢查更新、沒有主動做出要檢查更新的操作，就不要檢查更新。
     if PrefMgr.shared.checkUpdateAutomatically {
