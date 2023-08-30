@@ -82,6 +82,9 @@ import SwiftExtension
     }
   }
 
+  @AppProperty(key: UserDef.kAlwaysExpandCandidateWindow.rawValue, defaultValue: false)
+  public dynamic var alwaysExpandCandidateWindow: Bool
+
   @AppProperty(key: UserDef.kCandidateWindowShowOnlyOneLine.rawValue, defaultValue: false)
   public dynamic var candidateWindowShowOnlyOneLine: Bool
 
