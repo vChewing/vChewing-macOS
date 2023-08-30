@@ -199,6 +199,7 @@
 "⚠︎ This may hinder the walking algorithm from giving appropriate results." = "⚠︎ This may hinder the walking algorithm from giving appropriate results.";
 "⚠︎ This will reboot the vChewing IME." = "⚠︎ This will reboot the vChewing IME.";
 "Accept leading intonations in rare cases" = "Accept leading intonations in rare cases";
+"Adjust candidate window location according to current node length" = "Adjust candidate window location according to current node length";
 "All strokes in the composition buffer will be shown as ASCII keyboard characters unless this option is enabled. Stroke is definable in the “%keyname” section of the CIN file." = "All strokes in the composition buffer will be shown as ASCII keyboard characters unless this option is enabled. Stroke is definable in the “%keyname” section of the CIN file.";
 "Allow backspace-editing miscomposed readings" = "Allow backspace-editing miscomposed readings";
 "Allow boosting / excluding a candidate of single kanji when marking" = "Allow boosting / excluding a candidate of single kanji when marking";
