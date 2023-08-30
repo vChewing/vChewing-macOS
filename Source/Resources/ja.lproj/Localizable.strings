@@ -210,6 +210,7 @@
 "Always directly commit lowercased letters" = "いつでもローマ字（小文字）を直接出力";
 "Always directly commit uppercased letters" = "いつでもローマ字（大文字）を直接出力";
 "Always drop the previous reading" = "カーソルの後部の音読みを常に削除する";
+"Always expand candidate window panel" = "文字候補ウィンドウを折り畳みせずに";
 "Always show tooltip texts horizontally" = "ヒントを常に横書きにする";
 "Always type intonations to the inline composition buffer" = "常に入力緩衝列に音調を入力する";
 "Always use fixed listing order in candidate window" = "候補文字を固定順番で陳列する";
@@ -355,7 +356,7 @@
 "UI Language:" = "表示用言語:";
 "Universal Pinyin with Numeral Intonation" = "汎用弁音 (ローマ字+数字音調)";
 "Use ESC key to clear the entire input buffer" = "ESC キーで入力緩衝列を消す";
-"Use only one row / column in candidate window." = "ただ１つ行・列で文字候補を陳列。";
+"Use only one row / column in candidate window" = "ただ１つ行・列で文字候補を陳列";
 "Use Space to confirm highlighted candidate in Per-Char Select Mode" = "全候補入力の場合、ハイライト候補を Space キーで確認";
 "Vertical" = "縦型陳列";
 "Warning: This page is for testing future features. \nFeatures listed here may not work as expected." = "警告：これからの新機能テストのために作ったページですから、\nここで陳列されている諸機能は予想通り動けるだと思わないでください。";

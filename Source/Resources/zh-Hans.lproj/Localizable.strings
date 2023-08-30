@@ -209,6 +209,7 @@
 "Always directly commit lowercased letters" = "始终直接递交小写字母";
 "Always directly commit uppercased letters" = "始终直接递交大写字母";
 "Always drop the previous reading" = "始终剔除游标正后方的字音";
+"Always expand candidate window panel" = "始终自动展开多行选字窗";
 "Always show tooltip texts horizontally" = "始终使用横排来显示工具提示视窗";
 "Always type intonations to the inline composition buffer" = "始终在内文组字区内键入声调符号";
 "Always use fixed listing order in candidate window" = "以固定顺序来陈列选字窗内的候选字";
@@ -354,7 +355,7 @@
 "UI Language:" = "介面语言:";
 "Universal Pinyin with Numeral Intonation" = "通用拼音+数字标调";
 "Use ESC key to clear the entire input buffer" = "敲 ESC 键以清空整个组字缓冲区";
-"Use only one row / column in candidate window." = "仅以单行/单列来陈列候选字。";
+"Use only one row / column in candidate window" = "仅以单行/单列来陈列候选字";
 "Use Space to confirm highlighted candidate in Per-Char Select Mode" = "在逐字选字模式当中使用空格键确认当前高亮候选字";
 "Vertical" = "纵向布局";
 "Warning: This page is for testing future features. \nFeatures listed here may not work as expected." = "警告：该页面仅作未来功能测试所用。\n在此列出的功能并非处于完全可用之状态。";

@@ -26,6 +26,9 @@ struct VwrPrefPaneCandidates: View {
   @Backport.AppStorage(wrappedValue: false, UserDef.kCandidateWindowShowOnlyOneLine.rawValue)
   private var candidateWindowShowOnlyOneLine: Bool
 
+  @Backport.AppStorage(wrappedValue: false, UserDef.kAlwaysExpandCandidateWindow.rawValue)
+  private var alwaysExpandCandidateWindow: Bool
+
   @Backport.AppStorage(wrappedValue: true, UserDef.kShowReverseLookupInCandidateUI.rawValue)
   private var showReverseLookupInCandidateUI: Bool
 
@@ -71,15 +74,29 @@ struct VwrPrefPaneCandidates: View {
           .pickerStyle(RadioGroupPickerStyle())
           Text(LocalizedStringKey("Choose your preferred layout of the candidate window."))
             .preferenceDescription(maxWidth: CtlPrefUIShared.maxDescriptionWidth)
-          Toggle(
-            LocalizedStringKey("Use only one row / column in candidate window."),
-            isOn: $candidateWindowShowOnlyOneLine
-          )
-          .controlSize(.small)
+          let candidateLayoutSubOptions = Group {
+            Toggle(
+              LocalizedStringKey("Use only one row / column in candidate window"),
+              isOn: $candidateWindowShowOnlyOneLine
+            )
+            .controlSize(.small)
+            Toggle(
+              LocalizedStringKey("Always expand candidate window panel"),
+              isOn: $alwaysExpandCandidateWindow
+            )
+            .controlSize(.small).disabled(candidateWindowShowOnlyOneLine)
+          }
+          if CtlPrefUIShared.isCJKInterface {
+            HStack {
+              candidateLayoutSubOptions
+            }
+          } else {
+            VStack(alignment: .leading) {
+              candidateLayoutSubOptions
+            }
+          }
           Text(
-            "This only works with Tadokoro candidate window.".localized
-              + CtlPrefUIShared.sentenceSeparator
-              + "Tadokoro candidate window shows 4 rows / columns by default, providing similar experiences from Microsoft New Phonetic IME and macOS bult-in Chinese IME (since macOS 10.9). However, for some users who have presbyopia, they prefer giant candidate font sizes, resulting a concern that multiple rows / columns of candidates can make the candidate window looks too big, hence this option. Note that this option will be dismissed if the typing context is vertical, forcing the candidates to be shown in only one row / column. Only one reverse-lookup result can be made available in single row / column mode due to reduced candidate window size.".localized
+            "Tadokoro candidate window shows 4 rows / columns by default, providing similar experiences from Microsoft New Phonetic IME and macOS bult-in Chinese IME (since macOS 10.9). However, for some users who have presbyopia, they prefer giant candidate font sizes, resulting a concern that multiple rows / columns of candidates can make the candidate window looks too big, hence this option. Note that this option will be dismissed if the typing context is vertical, forcing the candidates to be shown in only one row / column. Only one reverse-lookup result can be made available in single row / column mode due to reduced candidate window size.".localized
           )
           .preferenceDescription(maxWidth: CtlPrefUIShared.maxDescriptionWidth)
         }
