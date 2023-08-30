@@ -35,6 +35,9 @@ struct VwrPrefPaneCandidates: View {
   @Backport.AppStorage(wrappedValue: true, UserDef.kMoveCursorAfterSelectingCandidate.rawValue)
   private var moveCursorAfterSelectingCandidate: Bool
 
+  @Backport.AppStorage(wrappedValue: true, UserDef.kUseDynamicCandidateWindowOrigin.rawValue)
+  private var useDynamicCandidateWindowOrigin: Bool
+
   @Backport.AppStorage(wrappedValue: false, UserDef.kUseFixedCandidateOrderOnSelection.rawValue)
   private var useFixedCandidateOrderOnSelection: Bool
 
@@ -122,12 +125,15 @@ struct VwrPrefPaneCandidates: View {
           .labelsHidden()
           .pickerStyle(RadioGroupPickerStyle())
           Text(LocalizedStringKey("Choose the cursor position where you want to list possible candidates."))
-
             .preferenceDescription(maxWidth: CtlPrefUIShared.maxDescriptionWidth)
           Toggle(
             LocalizedStringKey("Push the cursor in front of the phrase after selection"),
             isOn: $moveCursorAfterSelectingCandidate
           ).controlSize(.small)
+          Toggle(
+            LocalizedStringKey("Adjust candidate window location according to current node length"),
+            isOn: $useDynamicCandidateWindowOrigin
+          ).controlSize(.small).disabled(useRearCursorMode)
         }
         SSPreferences.Settings.Section(title: "Misc Settings:".localized, bottomDivider: true) {
           Toggle(
