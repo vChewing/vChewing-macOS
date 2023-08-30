@@ -29,6 +29,7 @@ public enum UserDef: String, CaseIterable {
   case kAppleLanguages = "AppleLanguages"
   case kShouldAutoReloadUserDataFiles = "ShouldAutoReloadUserDataFiles"
   case kUseRearCursorMode = "UseRearCursorMode"
+  case kUseDynamicCandidateWindowOrigin = "UseDynamicCandidateWindowOrigin"
   case kUseHorizontalCandidateList = "UseHorizontalCandidateList"
   case kChooseCandidateUsingSpace = "ChooseCandidateUsingSpace"
   case kCassetteEnabled = "CassetteEnabled"

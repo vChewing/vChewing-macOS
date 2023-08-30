@@ -94,6 +94,9 @@ public class PrefMgr: PrefMgrProtocol {
   @AppProperty(key: UserDef.kMoveCursorAfterSelectingCandidate.rawValue, defaultValue: true)
   public var moveCursorAfterSelectingCandidate: Bool
 
+  @AppProperty(key: UserDef.kUseDynamicCandidateWindowOrigin.rawValue, defaultValue: true)
+  public var useDynamicCandidateWindowOrigin: Bool
+
   @AppProperty(key: UserDef.kUseHorizontalCandidateList.rawValue, defaultValue: true)
   public var useHorizontalCandidateList: Bool
 
