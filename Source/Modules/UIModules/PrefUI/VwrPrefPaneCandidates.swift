@@ -70,7 +70,6 @@ struct VwrPrefPaneCandidates: View {
           .horizontalRadioGroupLayout()
           .pickerStyle(RadioGroupPickerStyle())
           Text(LocalizedStringKey("Choose your preferred layout of the candidate window."))
-
             .preferenceDescription(maxWidth: CtlPrefUIShared.maxDescriptionWidth)
           Toggle(
             LocalizedStringKey("Use only one row / column in candidate window."),
@@ -111,7 +110,6 @@ struct VwrPrefPaneCandidates: View {
           .labelsHidden()
           .frame(width: 120.0)
           Text(LocalizedStringKey("Choose candidate font size for better visual clarity."))
-
             .preferenceDescription(maxWidth: CtlPrefUIShared.maxDescriptionWidth)
         }
         SSPreferences.Settings.Section(title: "Cursor Selection:".localized, bottomDivider: true) {

@@ -76,7 +76,6 @@ struct VwrPrefPaneKeyboard: View {
             Spacer(minLength: NSFont.systemFontSize)
           }
           Text(NSLocalizedString("Choose the phonetic layout for Mandarin parser.", comment: ""))
-
             .preferenceDescription(maxWidth: CtlPrefUIShared.maxDescriptionWidth)
         }
         SSPreferences.Settings.Section(title: "Basic Keyboard Layout:".localized) {
