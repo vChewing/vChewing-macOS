@@ -81,6 +81,7 @@ extension SessionCtl: CtlCandidateDelegate {
   public var isCandidateState: Bool { state.isCandidateContainer }
 
   public var shouldAutoExpandCandidates: Bool {
+    guard !PrefMgr.shared.alwaysExpandCandidateWindow else { return true }
     guard state.type == .ofSymbolTable else { return state.type == .ofAssociates }
     return state.node.previous != nil
   }
