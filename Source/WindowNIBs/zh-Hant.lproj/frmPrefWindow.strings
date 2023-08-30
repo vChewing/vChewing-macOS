@@ -50,7 +50,7 @@
 "chkHardenVerticalPunctuations.title" = "在縱排書寫時，強制轉換標點為縱排形式（不推薦）";
 "chkKeepReadingUponCompositionError.title" = "允許對無效的讀音使用 BackSpace 編輯";
 "chkOnlyLoadFactoryLangModelsIfNeeded.title" = "按需載入簡繁體模式的原廠辭典資料";
-"chkUseFixecCandidateOrderOnSelection.title" = "以固定順序來陳列選字窗內的候選字";
+"chkUseFixedCandidateOrderOnSelection.title" = "以固定順序來陳列選字窗內的候選字";
 "clN-4A-iec.title" = "在逐字選字模式當中使用空格鍵確認當前高亮候選字";
 "Cp2-hn-bOq.title" = "對磁帶模式禁用繁簡轉換";
 "DbW-eq-ZdB.title" = "星光";

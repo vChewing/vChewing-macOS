@@ -31,7 +31,7 @@ public protocol PrefMgrProtocol {
   var chooseCandidateUsingSpace: Bool { get set }
   var allowBoostingSingleKanjiAsUserPhrase: Bool { get set }
   var fetchSuggestionsFromUserOverrideModel: Bool { get set }
-  var useFixecCandidateOrderOnSelection: Bool { get set }
+  var useFixedCandidateOrderOnSelection: Bool { get set }
   var autoCorrectReadingCombination: Bool { get set }
   var alsoConfirmAssociatedCandidatesByEnter: Bool { get set }
   var keepReadingUponCompositionError: Bool { get set }

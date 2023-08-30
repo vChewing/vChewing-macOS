@@ -52,7 +52,7 @@ public enum UserDef: String, CaseIterable {
   case kShowHanyuPinyinInCompositionBuffer = "ShowHanyuPinyinInCompositionBuffer"
   case kInlineDumpPinyinInLieuOfZhuyin = "InlineDumpPinyinInLieuOfZhuyin"
   case kFetchSuggestionsFromUserOverrideModel = "FetchSuggestionsFromUserOverrideModel"
-  case kUseFixecCandidateOrderOnSelection = "UseFixecCandidateOrderOnSelection"
+  case kUseFixedCandidateOrderOnSelection = "UseFixedCandidateOrderOnSelection"
   case kAutoCorrectReadingCombination = "AutoCorrectReadingCombination"
   case kAlsoConfirmAssociatedCandidatesByEnter = "AlsoConfirmAssociatedCandidatesByEnter"
   case kKeepReadingUponCompositionError = "KeepReadingUponCompositionError"
