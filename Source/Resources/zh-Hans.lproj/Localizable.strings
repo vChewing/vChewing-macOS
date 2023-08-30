@@ -199,6 +199,7 @@
 "⚠︎ This may hinder the walking algorithm from giving appropriate results." = "⚠︎ 这可能会妨碍爬轨函式，使其无法给出正确的结果。";
 "⚠︎ This will reboot the vChewing IME." = "⚠︎ 这将重启威注音输入法。";
 "Accept leading intonations in rare cases" = "在个别情况下，允许声调前置键入";
+"Adjust candidate window location according to current node length" = "根据当前位置的字词长度，自动调整选字窗的位置";
 "All strokes in the composition buffer will be shown as ASCII keyboard characters unless this option is enabled. Stroke is definable in the “%keyname” section of the CIN file." = "不启用该选项的话，在组字区内的字根将会以原始键盘按键名称来显示。所有关于字根的定义，均请洽 CIN 磁带档案内的「%keyname」章节。";
 "Allow backspace-editing miscomposed readings" = "允许对无效的读音使用 BackSpace 编辑";
 "Allow boosting / excluding a candidate of single kanji when marking" = "允许借由标记模式将可以就地升权/排除的候选字词的最短词长设为单个汉字";
