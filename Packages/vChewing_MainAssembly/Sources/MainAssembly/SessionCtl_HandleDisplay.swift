@@ -29,6 +29,9 @@ public extension SessionCtl {
       return lineHeightRect
     }
     var u16Cursor: Int = state.u16MarkedRange.lowerBound
+    if !PrefMgr.shared.useDynamicCandidateWindowOrigin, state.isCandidateContainer {
+      u16Cursor = state.u16Cursor
+    }
     u16Cursor = max(min(state.displayedTextConverted.utf16.count, u16Cursor), 0)
     if zeroCursor { u16Cursor = 0 }
     // iMessage 的話，據此算出來的 lineHeightRect 結果的橫向座標起始點不準確。目前無解。
