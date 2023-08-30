@@ -156,7 +156,6 @@ struct VwrPrefPaneDictionary: View {
                 "Due to security concerns, we don't consider implementing anything related to shell script execution here. An input method doing this without implementing App Sandbox will definitely have system-wide vulnerabilities, considering that its related UserDefaults are easily tamperable to execute malicious shell scripts. vChewing is designed to be invulnerable from this kind of attack. Also, official releases of vChewing are Sandboxed."
               )
             )
-
             .preferenceDescription(maxWidth: CtlPrefUIShared.maxDescriptionWidth)
           }
           Divider()
@@ -172,7 +171,6 @@ struct VwrPrefPaneDictionary: View {
                 "This will use the plist files deployed by the “make install” command from libvChewing-Data if possible."
               )
             )
-
             .preferenceDescription(maxWidth: CtlPrefUIShared.maxDescriptionWidth)
             Toggle(
               LocalizedStringKey("Only load factory language models if needed"),
@@ -199,7 +197,6 @@ struct VwrPrefPaneDictionary: View {
             Text(
               "The user override model only possesses memories temporarily. Each memory record gradually becomes ineffective within approximately less than 6 days. You can erase all memory records through the input method menu.".localized
             )
-
             .preferenceDescription(maxWidth: CtlPrefUIShared.maxDescriptionWidth)
             Toggle(
               LocalizedStringKey("Enable phrase replacement table"),
@@ -224,7 +221,6 @@ struct VwrPrefPaneDictionary: View {
                 "⚠︎ This may hinder the walking algorithm from giving appropriate results."
               )
             )
-
             .preferenceDescription(maxWidth: CtlPrefUIShared.maxDescriptionWidth)
           }
         }
