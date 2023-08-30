@@ -86,6 +86,10 @@ class CtlPrefUIShared {
     }
   }()
 
+  static var isCJKInterface: Bool {
+    PrefMgr.shared.appleLanguages[0].contains("zh-Han") || PrefMgr.shared.appleLanguages[0] == "ja"
+  }
+
   static var containerWidth: Double { contentWidth + 60 }
   static var maxDescriptionWidth: Double { contentWidth * 0.8 }
 }

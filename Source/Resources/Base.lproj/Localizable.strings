@@ -209,6 +209,7 @@
 "Always directly commit lowercased letters" = "Always directly commit lowercased letters";
 "Always directly commit uppercased letters" = "Always directly commit uppercased letters";
 "Always drop the previous reading" = "Always drop the previous reading";
+"Always expand candidate window panel" = "Always expand candidate window panel";
 "Always show tooltip texts horizontally" = "Always show tooltip texts horizontally";
 "Always type intonations to the inline composition buffer" = "Always type intonations to the inline composition buffer";
 "Always use fixed listing order in candidate window" = "Always use fixed listing order in candidate window";
@@ -354,7 +355,7 @@
 "UI Language:" = "UI Language:";
 "Universal Pinyin with Numeral Intonation" = "Universal Pinyin with Numeral Intonation";
 "Use ESC key to clear the entire input buffer" = "Use ESC key to clear the entire input buffer";
-"Use only one row / column in candidate window." = "Use only one row / column in candidate window.";
+"Use only one row / column in candidate window" = "Use only one row / column in candidate window";
 "Use Space to confirm highlighted candidate in Per-Char Select Mode" = "Use Space to confirm highlighted candidate in Per-Char Select Mode";
 "Vertical" = "Vertical";
 "Warning: This page is for testing future features. \nFeatures listed here may not work as expected." = "Warning: This page is for testing future features. \nFeatures listed here may not work as expected.";
