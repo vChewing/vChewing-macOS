@@ -103,7 +103,6 @@ struct VwrPrefPaneGeneral: View {
             Spacer()
           }
           Text(LocalizedStringKey("Change user interface language (will reboot the IME)."))
-
             .preferenceDescription(maxWidth: CtlPrefUIShared.maxDescriptionWidth)
         }
         SSPreferences.Settings.Section(label: { Text(LocalizedStringKey("Typing Settings:")) }) {
@@ -131,7 +130,6 @@ struct VwrPrefPaneGeneral: View {
             }
           )
           Text(LocalizedStringKey("An accommodation for elder computer users."))
-
             .preferenceDescription(maxWidth: CtlPrefUIShared.maxDescriptionWidth)
           if Date.isTodayTheDate(from: 0401) {
             Toggle(
