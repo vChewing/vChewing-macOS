@@ -136,7 +136,7 @@ extension InputHandler {
   /// - Returns: 回呼一個新的選詞狀態，來就給定的候選字詞陣列資料內容顯示選字窗。
   public func generateStateOfCandidates() -> IMEStateProtocol {
     var result = IMEState.ofCandidates(
-      candidates: generateArrayOfCandidates(fixOrder: prefs.useFixecCandidateOrderOnSelection),
+      candidates: generateArrayOfCandidates(fixOrder: prefs.useFixedCandidateOrderOnSelection),
       displayTextSegments: compositor.walkedNodes.values,
       cursor: delegate?.state.cursor ?? generateStateOfInputting().cursor
     )
@@ -831,7 +831,7 @@ extension InputHandler {
       return true
     }
 
-    let candidates = generateArrayOfCandidates(fixOrder: prefs.useFixecCandidateOrderOnSelection)
+    let candidates = generateArrayOfCandidates(fixOrder: prefs.useFixedCandidateOrderOnSelection)
     guard !candidates.isEmpty else {
       delegate.callError("3378A6DF")
       return true

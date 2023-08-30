@@ -50,7 +50,7 @@
 "chkHardenVerticalPunctuations.title" = "縦書きの時に、引用符・括弧などを強制的に縦書き文字と変換する（不推奨）";
 "chkKeepReadingUponCompositionError.title" = "効かぬ音読みを BackSpace で再編集";
 "chkOnlyLoadFactoryLangModelsIfNeeded.title" = "必要性を判断してから内蔵辞書を読み込む";
-"chkUseFixecCandidateOrderOnSelection.title" = "候補文字を固定順番で陳列する";
+"chkUseFixedCandidateOrderOnSelection.title" = "候補文字を固定順番で陳列する";
 "clN-4A-iec.title" = "全候補入力の場合、ハイライト候補を Space キーで確認";
 "Cp2-hn-bOq.title" = "カセットモードによる漢字出力の簡繁転換を行わずにする";
 "DbW-eq-ZdB.title" = "星光";

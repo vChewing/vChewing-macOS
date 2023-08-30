@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="21701" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES">
     <dependencies>
-        <deployment identifier="macosx"/>
         <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="21701"/>
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
     </dependencies>
@@ -150,7 +149,7 @@
                         <stackView distribution="fill" orientation="vertical" alignment="leading" spacing="5" horizontalStackHuggingPriority="249.99998474121094" verticalStackHuggingPriority="249.99998474121094" translatesAutoresizingMaskIntoConstraints="NO" id="ASo-Wd-8Kn">
                             <rect key="frame" x="0.0" y="180" width="360" height="100"/>
                             <subviews>
-                                <button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="j8R-Hj-3dj">
+                                <button translatesAutoresizingMaskIntoConstraints="NO" id="j8R-Hj-3dj">
                                     <rect key="frame" x="-1" y="83.5" width="340" height="17"/>
                                     <constraints>
                                         <constraint firstAttribute="height" constant="16" id="Fvm-ZT-RYa"/>
@@ -163,7 +162,7 @@
                                         <binding destination="32" name="value" keyPath="values.AutoCorrectReadingCombination" id="bix-eJ-jtV"/>
                                     </connections>
                                 </button>
-                                <button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="vwf-Kq-s8M" userLabel="chkShowHanyuPinyinInCompositionBuffer">
+                                <button translatesAutoresizingMaskIntoConstraints="NO" id="vwf-Kq-s8M" userLabel="chkShowHanyuPinyinInCompositionBuffer">
                                     <rect key="frame" x="-1" y="62.5" width="361" height="17"/>
                                     <constraints>
                                         <constraint firstAttribute="height" constant="16" id="ObK-Ia-oU9"/>
@@ -177,7 +176,7 @@
                                         <binding destination="32" name="value" keyPath="values.ShowHanyuPinyinInCompositionBuffer" id="uDq-eC-wan"/>
                                     </connections>
                                 </button>
-                                <button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="HaB-rc-AcW">
+                                <button translatesAutoresizingMaskIntoConstraints="NO" id="HaB-rc-AcW">
                                     <rect key="frame" x="-1" y="41.5" width="295" height="17"/>
                                     <constraints>
                                         <constraint firstAttribute="height" constant="16" id="IVa-xv-upc"/>
@@ -190,7 +189,7 @@
                                         <binding destination="32" name="value" keyPath="values.KeepReadingUponCompositionError" id="ddF-qg-jes"/>
                                     </connections>
                                 </button>
-                                <button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="QpM-Qg-kNf">
+                                <button translatesAutoresizingMaskIntoConstraints="NO" id="QpM-Qg-kNf">
                                     <rect key="frame" x="-1" y="20.5" width="336" height="17"/>
                                     <constraints>
                                         <constraint firstAttribute="height" constant="16" id="tTR-DT-5v2"/>
@@ -203,7 +202,7 @@
                                         <binding destination="32" name="value" keyPath="values.ClassicHaninKeyboardSymbolModeShortcutEnabled" id="H59-BW-iW8"/>
                                     </connections>
                                 </button>
-                                <button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="mzw-F2-aAQ">
+                                <button translatesAutoresizingMaskIntoConstraints="NO" id="mzw-F2-aAQ">
                                     <rect key="frame" x="-1" y="-0.5" width="295" height="17"/>
                                     <constraints>
                                         <constraint firstAttribute="height" constant="16" id="rEk-qV-gUu"/>
@@ -252,7 +251,7 @@
                         <stackView distribution="fill" orientation="vertical" alignment="leading" spacing="5" horizontalStackHuggingPriority="249.99998474121094" verticalStackHuggingPriority="249.99998474121094" translatesAutoresizingMaskIntoConstraints="NO" id="ff1-0m-vK1">
                             <rect key="frame" x="0.0" y="48" width="392" height="100"/>
                             <subviews>
-                                <button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="5IL-zZ-CL9" userLabel="chkTrad2KangXi">
+                                <button translatesAutoresizingMaskIntoConstraints="NO" id="5IL-zZ-CL9" userLabel="chkTrad2KangXi">
                                     <rect key="frame" x="-1" y="83.5" width="368" height="17"/>
                                     <constraints>
                                         <constraint firstAttribute="height" constant="16" id="y8x-bx-E5d"/>
@@ -266,7 +265,7 @@
                                         <binding destination="32" name="value" keyPath="values.ChineseConversionEnabled" id="X0A-OC-T6e"/>
                                     </connections>
                                 </button>
-                                <button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="h4r-Sp-LBI" userLabel="chkTrad2JISShinjitai">
+                                <button translatesAutoresizingMaskIntoConstraints="NO" id="h4r-Sp-LBI" userLabel="chkTrad2JISShinjitai">
                                     <rect key="frame" x="-1" y="62.5" width="393" height="17"/>
                                     <constraints>
                                         <constraint firstAttribute="height" constant="16" id="NuX-g1-YYs"/>
@@ -280,7 +279,7 @@
                                         <binding destination="32" name="value" keyPath="values.ShiftJISShinjitaiOutputEnabled" id="zu9-pD-86B"/>
                                     </connections>
                                 </button>
-                                <button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="gZ0-OK-r7a" userLabel="InlineDumpPinyinInLieuOfZhuyin">
+                                <button translatesAutoresizingMaskIntoConstraints="NO" id="gZ0-OK-r7a" userLabel="InlineDumpPinyinInLieuOfZhuyin">
                                     <rect key="frame" x="-1" y="41.5" width="387" height="17"/>
                                     <constraints>
                                         <constraint firstAttribute="height" constant="16" id="jnZ-bf-biU"/>
@@ -294,7 +293,7 @@
                                         <binding destination="32" name="value" keyPath="values.InlineDumpPinyinInLieuOfZhuyin" id="MtZ-L5-uvv"/>
                                     </connections>
                                 </button>
-                                <button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="xe6-Pu-3Fa">
+                                <button translatesAutoresizingMaskIntoConstraints="NO" id="xe6-Pu-3Fa">
                                     <rect key="frame" x="-1" y="20.5" width="275" height="17"/>
                                     <constraints>
                                         <constraint firstAttribute="height" constant="16" id="TuX-GI-UfE"/>
@@ -307,7 +306,7 @@
                                         <binding destination="32" name="value" keyPath="values.TrimUnfinishedReadingsOnCommit" id="v0T-cw-dzA"/>
                                     </connections>
                                 </button>
-                                <button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="1Y9-M9-BGT">
+                                <button translatesAutoresizingMaskIntoConstraints="NO" id="1Y9-M9-BGT">
                                     <rect key="frame" x="-1" y="-0.5" width="308" height="17"/>
                                     <constraints>
                                         <constraint firstAttribute="height" constant="16" id="dfr-Gk-fcb"/>
@@ -361,7 +360,7 @@
                                 <stackView distribution="fill" orientation="horizontal" alignment="top" horizontalStackHuggingPriority="249.99998474121094" verticalStackHuggingPriority="249.99998474121094" translatesAutoresizingMaskIntoConstraints="NO" id="AWc-gC-q7J">
                                     <rect key="frame" x="0.0" y="0.0" width="473" height="16"/>
                                     <subviews>
-                                        <button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="0Fh-O5-BKD">
+                                        <button translatesAutoresizingMaskIntoConstraints="NO" id="0Fh-O5-BKD">
                                             <rect key="frame" x="-1" y="-0.5" width="94" height="17"/>
                                             <constraints>
                                                 <constraint firstAttribute="height" constant="16" id="ldq-X5-xnu"/>
@@ -374,7 +373,7 @@
                                                 <binding destination="32" name="value" keyPath="values._DebugMode" id="sEa-DE-7Dw"/>
                                             </connections>
                                         </button>
-                                        <button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="pYB-E5-4Nv">
+                                        <button translatesAutoresizingMaskIntoConstraints="NO" id="pYB-E5-4Nv">
                                             <rect key="frame" x="100" y="-0.5" width="373" height="17"/>
                                             <constraints>
                                                 <constraint firstAttribute="height" constant="16" id="9jO-5c-Glj"/>
@@ -585,7 +584,7 @@
                                                 <binding destination="32" name="selectedTag" keyPath="values.UseHorizontalCandidateList" id="105"/>
                                             </connections>
                                         </matrix>
-                                        <button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="dZH-I5-wms">
+                                        <button translatesAutoresizingMaskIntoConstraints="NO" id="dZH-I5-wms">
                                             <rect key="frame" x="408" y="2.5" width="108" height="17"/>
                                             <constraints>
                                                 <constraint firstAttribute="width" relation="greaterThanOrEqual" constant="70" id="K3Q-Vl-7yU"/>
@@ -735,7 +734,7 @@
                                         <binding destination="32" name="selectedTag" keyPath="values.UseRearCursorMode" id="8rm-vc-0Db"/>
                                     </connections>
                                 </matrix>
-                                <button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="7z2-DD-c58">
+                                <button translatesAutoresizingMaskIntoConstraints="NO" id="7z2-DD-c58">
                                     <rect key="frame" x="-1" y="-0.5" width="318" height="16"/>
                                     <constraints>
                                         <constraint firstAttribute="height" constant="15" id="Ivs-uZ-4Eh"/>
@@ -769,7 +768,7 @@
                         <stackView distribution="fill" orientation="vertical" alignment="leading" spacing="5" horizontalStackHuggingPriority="249.99998474121094" verticalStackHuggingPriority="249.99998474121094" translatesAutoresizingMaskIntoConstraints="NO" id="7It-Pu-aCc">
                             <rect key="frame" x="0.0" y="0.0" width="368" height="79"/>
                             <subviews>
-                                <button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="3qX-dG-cKO">
+                                <button translatesAutoresizingMaskIntoConstraints="NO" id="3qX-dG-cKO">
                                     <rect key="frame" x="-1" y="62.5" width="354" height="17"/>
                                     <constraints>
                                         <constraint firstAttribute="width" relation="greaterThanOrEqual" constant="70" id="VA4-8t-BXG"/>
@@ -783,7 +782,7 @@
                                         <binding destination="32" name="value" keyPath="values.ShowReverseLookupInCandidateUI" id="0pt-zN-u5z"/>
                                     </connections>
                                 </button>
-                                <button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="nCb-NT-HJK">
+                                <button translatesAutoresizingMaskIntoConstraints="NO" id="nCb-NT-HJK">
                                     <rect key="frame" x="-1" y="41.5" width="351" height="17"/>
                                     <constraints>
                                         <constraint firstAttribute="height" constant="16" id="9wH-Rl-7QF"/>
@@ -796,12 +795,12 @@
                                         <binding destination="32" name="value" keyPath="values.ConsolidateContextOnCandidateSelection" id="UdG-3g-Xdo"/>
                                     </connections>
                                 </button>
-                                <button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="B3F-E1F-360">
+                                <button translatesAutoresizingMaskIntoConstraints="NO" id="B3F-E1F-360">
                                     <rect key="frame" x="-1" y="20.5" width="305" height="17"/>
                                     <constraints>
                                         <constraint firstAttribute="height" constant="16" id="Ms0-e3-kEx"/>
                                     </constraints>
-                                    <buttonCell key="cell" type="check" title="Always use fixed listing order in candidate window" bezelStyle="regularSquare" imagePosition="left" controlSize="small" state="on" inset="2" id="chkUseFixecCandidateOrderOnSelection" userLabel="chkUseFixecCandidateOrderOnSelection">
+                                    <buttonCell key="cell" type="check" title="Always use fixed listing order in candidate window" bezelStyle="regularSquare" imagePosition="left" controlSize="small" state="on" inset="2" id="chkUseFixedCandidateOrderOnSelection" userLabel="chkUseFixedCandidateOrderOnSelection">
                                         <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
                                         <font key="font" metaFont="cellTitle"/>
                                     </buttonCell>
@@ -809,7 +808,7 @@
                                         <binding destination="32" name="value" keyPath="values.UseFixecCandidateOrderOnSelection" id="1E3-367-430"/>
                                     </connections>
                                 </button>
-                                <button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="EPi-az-Ri2">
+                                <button translatesAutoresizingMaskIntoConstraints="NO" id="EPi-az-Ri2">
                                     <rect key="frame" x="-1" y="-0.5" width="369" height="17"/>
                                     <constraints>
                                         <constraint firstAttribute="height" constant="16" id="dhm-Zn-JrH"/>
@@ -893,7 +892,7 @@
                                         <binding destination="32" name="value" keyPath="values.ChooseCandidateUsingSpace" id="NU1-DG-vUz"/>
                                     </connections>
                                 </button>
-                                <button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="bE0-Lq-Pj7">
+                                <button translatesAutoresizingMaskIntoConstraints="NO" id="bE0-Lq-Pj7">
                                     <rect key="frame" x="-1" y="89.5" width="266" height="17"/>
                                     <constraints>
                                         <constraint firstAttribute="height" constant="16" id="6uT-D5-KVx"/>
@@ -906,7 +905,7 @@
                                         <binding destination="32" name="value" keyPath="values.EscToCleanInputBuffer" id="aLf-PK-mAS"/>
                                     </connections>
                                 </button>
-                                <button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="6MM-WC-Mpd">
+                                <button translatesAutoresizingMaskIntoConstraints="NO" id="6MM-WC-Mpd">
                                     <rect key="frame" x="-1" y="68.5" width="381" height="17"/>
                                     <constraints>
                                         <constraint firstAttribute="height" constant="16" id="hhN-al-6OI"/>
@@ -919,7 +918,7 @@
                                         <binding destination="32" name="value" keyPath="values.AlsoConfirmAssociatedCandidatesByEnter" id="P1C-j9-N88"/>
                                     </connections>
                                 </button>
-                                <button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="6MK-0e-NrQ">
+                                <button translatesAutoresizingMaskIntoConstraints="NO" id="6MK-0e-NrQ">
                                     <rect key="frame" x="-1" y="47.5" width="344" height="17"/>
                                     <constraints>
                                         <constraint firstAttribute="height" constant="16" id="0mM-np-pTV"/>
@@ -932,7 +931,7 @@
                                         <binding destination="32" name="value" keyPath="values.UseSpaceToCommitHighlightedSCPCCandidate" id="NNu-k7-eSF"/>
                                     </connections>
                                 </button>
-                                <button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="a6O-JL-C4g">
+                                <button translatesAutoresizingMaskIntoConstraints="NO" id="a6O-JL-C4g">
                                     <rect key="frame" x="-1" y="26.5" width="247" height="17"/>
                                     <constraints>
                                         <constraint firstAttribute="height" constant="16" id="WkD-Wx-erN"/>
@@ -945,7 +944,7 @@
                                         <binding destination="32" name="value" keyPath="values.AcceptLeadingIntonations" id="l0S-gB-ckP"/>
                                     </connections>
                                 </button>
-                                <button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="7QM-7z-tpq">
+                                <button translatesAutoresizingMaskIntoConstraints="NO" id="7QM-7z-tpq">
                                     <rect key="frame" x="-1" y="5.5" width="233" height="17"/>
                                     <constraints>
                                         <constraint firstAttribute="height" constant="16" id="fuj-Jy-rz7"/>
@@ -1301,7 +1300,7 @@
                                         <binding destination="32" name="value" keyPath="values.UserDataFolderSpecified" id="Rnt-US-qT9"/>
                                     </connections>
                                 </pathControl>
-                                <button wantsLayer="YES" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="MPN-np-SbT" userLabel="btnOpenFolderToSpecifyForUserData">
+                                <button wantsLayer="YES" translatesAutoresizingMaskIntoConstraints="NO" id="MPN-np-SbT" userLabel="btnOpenFolderToSpecifyForUserData">
                                     <rect key="frame" x="470" y="-1" width="30" height="24"/>
                                     <constraints>
                                         <constraint firstAttribute="height" constant="22" id="P2C-a5-37j"/>
@@ -1315,7 +1314,7 @@
                                         </connections>
                                     </buttonCell>
                                 </button>
-                                <button wantsLayer="YES" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="jXe-xz-9Sd" userLabel="btnOpenFolderToSpecifyForUserData">
+                                <button wantsLayer="YES" translatesAutoresizingMaskIntoConstraints="NO" id="jXe-xz-9Sd" userLabel="btnOpenFolderToSpecifyForUserData">
                                     <rect key="frame" x="500" y="-1" width="30" height="24"/>
                                     <constraints>
                                         <constraint firstAttribute="width" constant="30" id="WTD-kc-v77"/>
@@ -1344,7 +1343,7 @@
                         <stackView distribution="fill" orientation="vertical" alignment="leading" spacing="5" horizontalStackHuggingPriority="249.99998474121094" verticalStackHuggingPriority="249.99998474121094" translatesAutoresizingMaskIntoConstraints="NO" id="i2J-0A-opq">
                             <rect key="frame" x="0.0" y="0.0" width="450" height="163"/>
                             <subviews>
-                                <button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="p7V-IN-OTr">
+                                <button translatesAutoresizingMaskIntoConstraints="NO" id="p7V-IN-OTr">
                                     <rect key="frame" x="-1" y="146.5" width="336" height="17"/>
                                     <constraints>
                                         <constraint firstAttribute="height" constant="16" id="YjP-lh-WEb"/>
@@ -1357,7 +1356,7 @@
                                         <binding destination="32" name="value" keyPath="values.ShouldAutoReloadUserDataFiles" id="XTI-ol-DVN"/>
                                     </connections>
                                 </button>
-                                <button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="MJ6-U4-qyl">
+                                <button translatesAutoresizingMaskIntoConstraints="NO" id="MJ6-U4-qyl">
                                     <rect key="frame" x="-1" y="125.5" width="297" height="17"/>
                                     <constraints>
                                         <constraint firstAttribute="height" constant="16" id="cb2-74-D5t"/>
@@ -1371,7 +1370,7 @@
                                         <binding destination="32" name="value" keyPath="values.UseExternalFactoryDict" id="1Gp-Ax-mRK"/>
                                     </connections>
                                 </button>
-                                <button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="ZQK-w3-FRb">
+                                <button translatesAutoresizingMaskIntoConstraints="NO" id="ZQK-w3-FRb">
                                     <rect key="frame" x="-1" y="104.5" width="274" height="17"/>
                                     <constraints>
                                         <constraint firstAttribute="height" constant="16" id="anX-Rc-sxQ"/>
@@ -1385,7 +1384,7 @@
                                         <binding destination="32" name="value" keyPath="values.OnlyLoadFactoryLangModelsIfNeeded" id="TJ2-Fj-pca"/>
                                     </connections>
                                 </button>
-                                <button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="Yaj-QY-7xV" userLabel="chkCNSSupport">
+                                <button translatesAutoresizingMaskIntoConstraints="NO" id="Yaj-QY-7xV" userLabel="chkCNSSupport">
                                     <rect key="frame" x="-1" y="83.5" width="252" height="17"/>
                                     <constraints>
                                         <constraint firstAttribute="height" constant="16" id="u5w-vZ-JMF"/>
@@ -1399,7 +1398,7 @@
                                         <binding destination="32" name="value" keyPath="values.CNS11643Enabled" id="Pbx-Gt-upm"/>
                                     </connections>
                                 </button>
-                                <button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="O4B-Z2-XYi">
+                                <button translatesAutoresizingMaskIntoConstraints="NO" id="O4B-Z2-XYi">
                                     <rect key="frame" x="-1" y="62.5" width="345" height="17"/>
                                     <constraints>
                                         <constraint firstAttribute="height" constant="16" id="o4B-Az-uzt"/>
@@ -1413,7 +1412,7 @@
                                         <binding destination="32" name="value" keyPath="values.SymbolInputEnabled" id="XWG-G3-DRu"/>
                                     </connections>
                                 </button>
-                                <button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="D46-A7D-E0E">
+                                <button translatesAutoresizingMaskIntoConstraints="NO" id="D46-A7D-E0E">
                                     <rect key="frame" x="-1" y="41.5" width="374" height="17"/>
                                     <constraints>
                                         <constraint firstAttribute="height" constant="16" id="obW-Ey-vPB"/>
@@ -1426,7 +1425,7 @@
                                         <binding destination="32" name="value" keyPath="values.FetchSuggestionsFromUserOverrideModel" id="F53-CE5-A2E"/>
                                     </connections>
                                 </button>
-                                <button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="4Ks-sR-UME">
+                                <button translatesAutoresizingMaskIntoConstraints="NO" id="4Ks-sR-UME">
                                     <rect key="frame" x="-1" y="20.5" width="207" height="17"/>
                                     <constraints>
                                         <constraint firstAttribute="height" constant="16" id="KC2-43-MJM"/>
@@ -1440,7 +1439,7 @@
                                         <binding destination="32" name="value" keyPath="values.PhraseReplacementEnabled" id="0gz-hu-Lgl"/>
                                     </connections>
                                 </button>
-                                <button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="Hyc-Nw-dET">
+                                <button translatesAutoresizingMaskIntoConstraints="NO" id="Hyc-Nw-dET">
                                     <rect key="frame" x="-1" y="-0.5" width="451" height="17"/>
                                     <constraints>
                                         <constraint firstAttribute="height" constant="16" id="RXU-aZ-x5S"/>
@@ -1613,7 +1612,7 @@
                             <rect key="frame" x="0.0" y="71" width="538" height="370"/>
                             <clipView key="contentView" drawsBackground="NO" id="x8s-wo-bxi">
                                 <rect key="frame" x="0.0" y="0.0" width="538" height="370"/>
-                                <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                                <autoresizingMask key="autoresizingMask"/>
                                 <subviews>
                                     <textView wantsLayer="YES" importsGraphics="NO" richText="NO" verticallyResizable="YES" allowsUndo="YES" smartInsertDelete="YES" id="kSG-dz-P2N">
                                         <rect key="frame" x="0.0" y="0.0" width="538" height="370"/>
@@ -1717,7 +1716,7 @@ DQ
                                 <real value="3.4028234663852886e+38"/>
                             </customSpacing>
                         </stackView>
-                        <button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="ITb-81-S6N" userLabel="PhraseEditorAutoReloadExternalModifications">
+                        <button translatesAutoresizingMaskIntoConstraints="NO" id="ITb-81-S6N" userLabel="PhraseEditorAutoReloadExternalModifications">
                             <rect key="frame" x="-1" y="-1" width="413" height="16"/>
                             <buttonCell key="cell" type="check" title="This editor only: Auto-reload modifications happened outside of this editor" bezelStyle="regularSquare" imagePosition="left" controlSize="small" state="on" inset="2" id="WX6-BW-JPM">
                                 <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
@@ -1790,7 +1789,7 @@ DQ
                                         <binding destination="32" name="value" keyPath="values.CassettePath" id="Kgu-v8-vSU"/>
                                     </connections>
                                 </pathControl>
-                                <button wantsLayer="YES" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="8LP-EF-YwT" userLabel="btnOpenFolderToSpecifyForUserData">
+                                <button wantsLayer="YES" translatesAutoresizingMaskIntoConstraints="NO" id="8LP-EF-YwT" userLabel="btnOpenFolderToSpecifyForUserData">
                                     <rect key="frame" x="470" y="-1" width="30" height="24"/>
                                     <constraints>
                                         <constraint firstAttribute="width" constant="30" id="X5O-PM-Eph"/>
@@ -1804,7 +1803,7 @@ DQ
                                         <action selector="chooseCassettePath:" target="-2" id="Q7N-Im-hZd"/>
                                     </connections>
                                 </button>
-                                <button wantsLayer="YES" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="8fG-OI-45A" userLabel="btnOpenFolderToSpecifyForUserData">
+                                <button wantsLayer="YES" translatesAutoresizingMaskIntoConstraints="NO" id="8fG-OI-45A" userLabel="btnOpenFolderToSpecifyForUserData">
                                     <rect key="frame" x="500" y="-1" width="30" height="24"/>
                                     <constraints>
                                         <constraint firstAttribute="width" constant="30" id="H26-EO-Gxs"/>
@@ -1833,7 +1832,7 @@ DQ
                         <stackView distribution="fill" orientation="vertical" alignment="leading" spacing="5" horizontalStackHuggingPriority="249.99998474121094" verticalStackHuggingPriority="249.99998474121094" translatesAutoresizingMaskIntoConstraints="NO" id="6T7-2y-9JA">
                             <rect key="frame" x="0.0" y="142" width="537" height="166"/>
                             <subviews>
-                                <button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="y75-fJ-x9L">
+                                <button translatesAutoresizingMaskIntoConstraints="NO" id="y75-fJ-x9L">
                                     <rect key="frame" x="-1" y="149.5" width="311" height="17"/>
                                     <constraints>
                                         <constraint firstAttribute="width" relation="greaterThanOrEqual" constant="70" id="UE0-Je-AxG"/>
@@ -1860,7 +1859,7 @@ DQ
                                         <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
                                     </textFieldCell>
                                 </textField>
-                                <button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="T4J-vm-GL6">
+                                <button translatesAutoresizingMaskIntoConstraints="NO" id="T4J-vm-GL6">
                                     <rect key="frame" x="-1" y="53.5" width="343" height="17"/>
                                     <constraints>
                                         <constraint firstAttribute="height" constant="16" id="J7U-FN-fhA"/>
@@ -1874,7 +1873,7 @@ DQ
                                         <binding destination="32" name="value" keyPath="values.AutoCompositeWithLongestPossibleCassetteKey" id="OSk-i5-Mdr"/>
                                     </connections>
                                 </button>
-                                <button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="3eW-vq-tFr">
+                                <button translatesAutoresizingMaskIntoConstraints="NO" id="3eW-vq-tFr">
                                     <rect key="frame" x="-1" y="32.5" width="281" height="17"/>
                                     <constraints>
                                         <constraint firstAttribute="width" relation="greaterThanOrEqual" constant="70" id="f8O-YI-8sP"/>
@@ -2178,7 +2177,7 @@ DQ
                                         <stackView distribution="fill" orientation="vertical" alignment="leading" spacing="5" horizontalStackHuggingPriority="249.99998474121094" verticalStackHuggingPriority="249.99998474121094" translatesAutoresizingMaskIntoConstraints="NO" id="j6Y-Nb-nco">
                                             <rect key="frame" x="0.0" y="0.0" width="186" height="100"/>
                                             <subviews>
-                                                <button verticalHuggingPriority="750" verticalCompressionResistancePriority="751" translatesAutoresizingMaskIntoConstraints="NO" id="8fz-X4-HVS" userLabel="UsingHotKeySCPC">
+                                                <button verticalCompressionResistancePriority="751" translatesAutoresizingMaskIntoConstraints="NO" id="8fz-X4-HVS" userLabel="UsingHotKeySCPC">
                                                     <rect key="frame" x="-1" y="83.5" width="147" height="17"/>
                                                     <constraints>
                                                         <constraint firstAttribute="height" constant="16" id="iAE-th-G1o"/>
@@ -2191,7 +2190,7 @@ DQ
                                                         <binding destination="32" name="value" keyPath="values.UsingHotKeySCPC" id="fGT-OM-Lsm"/>
                                                     </connections>
                                                 </button>
-                                                <button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="ajS-Ja-Vxr" userLabel="UsingHotKeyKangXi">
+                                                <button translatesAutoresizingMaskIntoConstraints="NO" id="ajS-Ja-Vxr" userLabel="UsingHotKeyKangXi">
                                                     <rect key="frame" x="-1" y="62.5" width="140" height="17"/>
                                                     <constraints>
                                                         <constraint firstAttribute="height" constant="16" id="NnI-DU-gqr"/>
@@ -2204,7 +2203,7 @@ DQ
                                                         <binding destination="32" name="value" keyPath="values.UsingHotKeyKangXi" id="qXu-X7-Jbp"/>
                                                     </connections>
                                                 </button>
-                                                <button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="ZWc-3p-TII" userLabel="UsingHotKeyAssociates">
+                                                <button translatesAutoresizingMaskIntoConstraints="NO" id="ZWc-3p-TII" userLabel="UsingHotKeyAssociates">
                                                     <rect key="frame" x="-1" y="41.5" width="187" height="17"/>
                                                     <constraints>
                                                         <constraint firstAttribute="height" constant="16" id="NaX-QA-VsM"/>
@@ -2230,7 +2229,7 @@ DQ
                                                         <binding destination="32" name="value" keyPath="values.UsingHotKeyJIS" id="ys3-4B-YOe"/>
                                                     </connections>
                                                 </button>
-                                                <button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="MVw-Gx-ueg" userLabel="UsingHotKeyCNS">
+                                                <button translatesAutoresizingMaskIntoConstraints="NO" id="MVw-Gx-ueg" userLabel="UsingHotKeyCNS">
                                                     <rect key="frame" x="-1" y="-0.5" width="116" height="17"/>
                                                     <constraints>
                                                         <constraint firstAttribute="height" constant="16" id="sWQ-Qk-gaB"/>
@@ -2262,7 +2261,7 @@ DQ
                                         <stackView distribution="fill" orientation="vertical" alignment="leading" spacing="5" horizontalStackHuggingPriority="249.99998474121094" verticalStackHuggingPriority="249.99998474121094" translatesAutoresizingMaskIntoConstraints="NO" id="xUN-xX-K7e">
                                             <rect key="frame" x="206" y="0.0" width="190" height="100"/>
                                             <subviews>
-                                                <button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="aBy-qb-ZL5" userLabel="UsingHotKeyHalfWidthASCII">
+                                                <button translatesAutoresizingMaskIntoConstraints="NO" id="aBy-qb-ZL5" userLabel="UsingHotKeyHalfWidthASCII">
                                                     <rect key="frame" x="-1" y="83.5" width="189" height="17"/>
                                                     <constraints>
                                                         <constraint firstAttribute="height" constant="16" id="9gu-Gq-Bpc"/>
@@ -2275,7 +2274,7 @@ DQ
                                                         <binding destination="32" name="value" keyPath="values.UsingHotKeyHalfWidthASCII" id="Sb7-46-oZ3"/>
                                                     </connections>
                                                 </button>
-                                                <button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="JvA-GK-VEW" userLabel="CurrencyNumerals">
+                                                <button translatesAutoresizingMaskIntoConstraints="NO" id="JvA-GK-VEW" userLabel="CurrencyNumerals">
                                                     <rect key="frame" x="-1" y="62.5" width="167" height="17"/>
                                                     <constraints>
                                                         <constraint firstAttribute="height" constant="16" id="6EL-3G-s7z"/>
@@ -2288,7 +2287,7 @@ DQ
                                                         <binding destination="32" name="value" keyPath="values.UsingHotKeyCurrencyNumerals" id="FuM-xj-9qa"/>
                                                     </connections>
                                                 </button>
-                                                <button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="zZA-X1-GCy" userLabel="UsingHotKeyCassette">
+                                                <button translatesAutoresizingMaskIntoConstraints="NO" id="zZA-X1-GCy" userLabel="UsingHotKeyCassette">
                                                     <rect key="frame" x="-1" y="41.5" width="131" height="17"/>
                                                     <constraints>
                                                         <constraint firstAttribute="height" constant="16" id="D36-2Y-mX5"/>
@@ -2301,7 +2300,7 @@ DQ
                                                         <binding destination="32" name="value" keyPath="values.UsingHotKeyCassette" id="mDe-q0-XYa"/>
                                                     </connections>
                                                 </button>
-                                                <button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="g3L-S4-NBx" userLabel="UsingHotKeyCassette">
+                                                <button translatesAutoresizingMaskIntoConstraints="NO" id="g3L-S4-NBx" userLabel="UsingHotKeyCassette">
                                                     <rect key="frame" x="-1" y="20.5" width="184" height="17"/>
                                                     <constraints>
                                                         <constraint firstAttribute="height" constant="16" id="MlY-Pc-flb"/>
@@ -2314,7 +2313,7 @@ DQ
                                                         <binding destination="32" name="value" keyPath="values.UsingHotKeyRevLookup" id="y9C-ob-Mw2"/>
                                                     </connections>
                                                 </button>
-                                                <button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="SAU-IA-cdf" userLabel="UsingHotKeyCassette">
+                                                <button translatesAutoresizingMaskIntoConstraints="NO" id="SAU-IA-cdf" userLabel="UsingHotKeyCassette">
                                                     <rect key="frame" x="-1" y="-0.5" width="191" height="17"/>
                                                     <constraints>
                                                         <constraint firstAttribute="height" constant="16" id="aIj-Ga-hmJ"/>
@@ -2411,7 +2410,7 @@ Features listed here may not work as expected.</string>
                                 <constraint firstAttribute="width" relation="greaterThanOrEqual" constant="400" id="kJZ-E8-eDL"/>
                             </constraints>
                         </box>
-                        <button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="yJg-tV-hH6">
+                        <button translatesAutoresizingMaskIntoConstraints="NO" id="yJg-tV-hH6">
                             <rect key="frame" x="-1" y="77.5" width="429" height="17"/>
                             <constraints>
                                 <constraint firstAttribute="height" constant="16" id="TB3-Kn-UbK"/>

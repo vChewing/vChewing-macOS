@@ -50,7 +50,7 @@
 "chkHardenVerticalPunctuations.title" = "在纵排书写时，强制转换标点为纵排形式（不推荐）";
 "chkKeepReadingUponCompositionError.title" = "允许对无效的读音使用 BackSpace 编辑";
 "chkOnlyLoadFactoryLangModelsIfNeeded.title" = "按需载入简繁体模式的原厂辞典资料";
-"chkUseFixecCandidateOrderOnSelection.title" = "以固定顺序来陈列选字窗内的候选字";
+"chkUseFixedCandidateOrderOnSelection.title" = "以固定顺序来陈列选字窗内的候选字";
 "clN-4A-iec.title" = "在逐字选字模式当中使用空格键确认当前高亮候选字";
 "Cp2-hn-bOq.title" = "对磁带模式禁用繁简转换";
 "DbW-eq-ZdB.title" = "星光";

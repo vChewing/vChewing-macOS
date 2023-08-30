@@ -35,8 +35,8 @@ struct VwrPrefPaneCandidates: View {
   @Backport.AppStorage(wrappedValue: true, UserDef.kMoveCursorAfterSelectingCandidate.rawValue)
   private var moveCursorAfterSelectingCandidate: Bool
 
-  @Backport.AppStorage(wrappedValue: false, UserDef.kUseFixecCandidateOrderOnSelection.rawValue)
-  private var useFixecCandidateOrderOnSelection: Bool
+  @Backport.AppStorage(wrappedValue: false, UserDef.kUseFixedCandidateOrderOnSelection.rawValue)
+  private var useFixedCandidateOrderOnSelection: Bool
 
   @Backport.AppStorage(wrappedValue: true, UserDef.kConsolidateContextOnCandidateSelection.rawValue)
   private var consolidateContextOnCandidateSelection: Bool
@@ -142,7 +142,7 @@ struct VwrPrefPaneCandidates: View {
           .preferenceDescription(maxWidth: CtlPrefUIShared.maxDescriptionWidth)
           Toggle(
             LocalizedStringKey("Always use fixed listing order in candidate window"),
-            isOn: $useFixecCandidateOrderOnSelection
+            isOn: $useFixedCandidateOrderOnSelection
           )
           Text(
             LocalizedStringKey(

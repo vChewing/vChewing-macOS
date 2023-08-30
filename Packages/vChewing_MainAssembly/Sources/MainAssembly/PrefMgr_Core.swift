@@ -106,8 +106,8 @@ public class PrefMgr: PrefMgrProtocol {
   @AppProperty(key: UserDef.kFetchSuggestionsFromUserOverrideModel.rawValue, defaultValue: true)
   public var fetchSuggestionsFromUserOverrideModel: Bool
 
-  @AppProperty(key: UserDef.kUseFixecCandidateOrderOnSelection.rawValue, defaultValue: false)
-  public var useFixecCandidateOrderOnSelection: Bool
+  @AppProperty(key: UserDef.kUseFixedCandidateOrderOnSelection.rawValue, defaultValue: false)
+  public var useFixedCandidateOrderOnSelection: Bool
 
   @AppProperty(key: UserDef.kAutoCorrectReadingCombination.rawValue, defaultValue: true)
   public var autoCorrectReadingCombination: Bool
