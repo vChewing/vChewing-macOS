@@ -23,6 +23,7 @@ public protocol PrefMgrProtocol {
   var alphanumericalKeyboardLayout: String { get set }
   var showNotificationsWhenTogglingCapsLock: Bool { get set }
   var candidateListTextSize: Double { get set }
+  var alwaysExpandCandidateWindow: Bool { get set }
   var candidateWindowShowOnlyOneLine: Bool { get set }
   var shouldAutoReloadUserDataFiles: Bool { get set }
   var useRearCursorMode: Bool { get set }
