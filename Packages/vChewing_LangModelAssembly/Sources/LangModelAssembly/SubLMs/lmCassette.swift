@@ -38,6 +38,7 @@ public extension vChewingLM {
     public private(set) var octagramDividedMap: [String: (Int, String)] = [:]
     public private(set) var areCandidateKeysShiftHeld: Bool = false
     public private(set) var supplyQuickResults: Bool = false
+    public private(set) var supplyPartiallyMatchedResults: Bool = false
 
     /// 計算頻率時要用到的東西
     private static let fscale = 2.7
@@ -96,9 +97,14 @@ public extension vChewingLM {
               if !loadingKeys, strLine.contains("begin") { loadingKeys = true }
               if loadingKeys, strLine.contains("end") { loadingKeys = false }
             }
+            // %flag_disp_partial_match
+            if strLine == "%flag_disp_partial_match" {
+              supplyPartiallyMatchedResults = true
+              supplyQuickResults = true
+            }
             // %quick
             if strLine.starts(with: "%quick") {
-              if strLine == "%quick", !supplyQuickResults { supplyQuickResults = true }
+              supplyQuickResults = true
               if !loadingQuickSets, strLine.contains("begin") {
                 loadingQuickSets = true
               }
@@ -202,9 +208,6 @@ public extension vChewingLM {
             if wildcardKey.isEmpty, strLine.starts(with: "%wildcardkey ") {
               wildcardKey = cells[1].first?.description ?? ""
             }
-            if strLine == "%flag_disp_partial_match", !supplyQuickResults {
-              supplyQuickResults = true
-            }
           }
           // Post process.
           if CandidateKey.validate(keys: selectionKeys) != nil { selectionKeys = "1234567890" }
@@ -252,15 +255,20 @@ public extension vChewingLM {
       if let specifiedResult = quickDefMap[key], !specifiedResult.isEmpty {
         result.append(contentsOf: specifiedResult.map(\.description))
       }
-      if supplyQuickResults, quickDefMap.isEmpty {
-        let fetched = charDefMap.compactMap {
-          $0.key.starts(with: key) ? $0 : nil
-        }.stableSort {
-          $0.key.count < $1.key.count
-        }.flatMap(\.value).filter {
-          $0.count == 1
+      if supplyQuickResults, result.isEmpty {
+        if supplyPartiallyMatchedResults {
+          let fetched = charDefMap.compactMap {
+            $0.key.starts(with: key) ? $0 : nil
+          }.stableSort {
+            $0.key.count < $1.key.count
+          }.flatMap(\.value).filter {
+            $0.count == 1
+          }
+          result.append(contentsOf: fetched.deduplicated.prefix(selectionKeys.count * 6))
+        } else {
+          let fetched = (charDefMap[key] ?? [String]()).filter { $0.count == 1 }
+          result.append(contentsOf: fetched.deduplicated.prefix(selectionKeys.count * 6))
         }
-        result.append(contentsOf: fetched.deduplicated.prefix(selectionKeys.count * 6))
       }
       return result.isEmpty ? nil : result.joined(separator: "\t")
     }
