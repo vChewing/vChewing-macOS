@@ -415,9 +415,6 @@ class CtlPrefWindow: NSWindowController, NSWindowDelegate {
       return
     }
     let dlgOpenFile = NSOpenPanel()
-    dlgOpenFile.title = NSLocalizedString(
-      "Choose your desired cassette file path.", comment: ""
-    )
     dlgOpenFile.showsResizeIndicator = true
     dlgOpenFile.showsHiddenFiles = true
     dlgOpenFile.canChooseFiles = true

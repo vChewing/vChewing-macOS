@@ -161,7 +161,7 @@ struct VwrPrefPaneDictionary: View {
           Divider()
           Group {
             Toggle(
-              LocalizedStringKey("Read external factory dictionary plists if possible"),
+              LocalizedStringKey("Read external factory dictionary files if possible"),
               isOn: $useExternalFactoryDict.onChange {
                 LMMgr.reloadFactoryDictionaryFiles()
               }

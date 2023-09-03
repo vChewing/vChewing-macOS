@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="21701" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES">
     <dependencies>
-        <deployment identifier="macosx"/>
         <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="21701"/>
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
     </dependencies>
@@ -1398,11 +1397,11 @@
                                     </connections>
                                 </button>
                                 <button translatesAutoresizingMaskIntoConstraints="NO" id="MJ6-U4-qyl">
-                                    <rect key="frame" x="-1" y="125.5" width="297" height="17"/>
+                                    <rect key="frame" x="-1" y="125.5" width="290" height="17"/>
                                     <constraints>
                                         <constraint firstAttribute="height" constant="16" id="cb2-74-D5t"/>
                                     </constraints>
-                                    <buttonCell key="cell" type="check" title="Read external factory dictionary plists if possible" bezelStyle="regularSquare" imagePosition="left" controlSize="small" state="on" inset="2" id="fEA-Bp-Ayn" userLabel="chkUseExternalFactoryDict">
+                                    <buttonCell key="cell" type="check" title="Read external factory dictionary files if possible" bezelStyle="regularSquare" imagePosition="left" controlSize="small" state="on" inset="2" id="fEA-Bp-Ayn" userLabel="chkUseExternalFactoryDict">
                                         <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
                                         <font key="font" metaFont="cellTitle"/>
                                     </buttonCell>
@@ -1653,7 +1652,7 @@
                             <rect key="frame" x="0.0" y="71" width="538" height="370"/>
                             <clipView key="contentView" drawsBackground="NO" id="x8s-wo-bxi">
                                 <rect key="frame" x="0.0" y="0.0" width="538" height="370"/>
-                                <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                                <autoresizingMask key="autoresizingMask"/>
                                 <subviews>
                                     <textView wantsLayer="YES" importsGraphics="NO" richText="NO" verticallyResizable="YES" allowsUndo="YES" smartInsertDelete="YES" id="kSG-dz-P2N">
                                         <rect key="frame" x="0.0" y="0.0" width="538" height="370"/>

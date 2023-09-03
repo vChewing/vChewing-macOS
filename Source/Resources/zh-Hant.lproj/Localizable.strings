@@ -162,7 +162,6 @@
 "There is a bug in macOS 10.9, preventing an input method from accessing its own file panels. Doing so will result in eternal hang-crash of not only the input method but all client apps it tries attached to, requiring SSH connection to this computer to terminate the input method process by executing “killall vChewing”. Due to possible concerns of the same possible issue in macOS 10.10 and 10.11, we completely disabled this feature." = "已知 macOS 10.9 有此故障：當一個輸入法嘗試存取自身的檔案操作視窗的時候，不只輸入法，而且連其接下來所嘗試掛接的所有的客體應用，都會陷入無限僵死狀態，只能用 SSH 連到這台電腦上執行「killall vChewing」才可以解除僵死。因為我們懷疑 macOS 10.10 至 10.12 也在受影響的範圍內，所以威注音對這些版本的系統禁用了自身的檔案操作視窗存取。";
 "defaults write org.atelierInmu.inputmethod.vChewing UserDataFolderSpecified -string \"~/FolderPathEndedWithTrailingSlash/\"" = "defaults write org.atelierInmu.inputmethod.vChewing UserDataFolderSpecified -string \"~/帶尾部斜槓的資料夾路徑/\"";
 "defaults write org.atelierInmu.inputmethod.vChewing CassettePath -string \"~/FilePathEndedWithoutTrailingSlash\"" = "defaults write org.atelierInmu.inputmethod.vChewing CassettePath -string \"~/不帶尾部斜槓的檔案路徑\"";
-"Also toggle alphanumerical mode with Left-Shift" = "也允許使用左側的 Shift 鍵盤切換英數輸入模式";
 "Completely disable using Shift key to toggle alphanumerical mode" = "徹底禁止使用 Shift 鍵切換英數模式";
 "Please use mouse wheel to scroll this page. The CheatSheet is available in the IME menu." = "請利用滑鼠滾輪檢視該頁面。也請洽輸入法選單內的熱鍵指南。";
 "Typing Style:" = "輸入風格:";
@@ -195,9 +194,6 @@
 
 // SwiftUI Preferences
 "(Shift+)Space:" = "(Shift+)空格鍵:";
-"⚠︎ This feature is useful ONLY WHEN the font you are using doesn't support dynamic vertical punctuations. However, typed vertical punctuations will always shown as vertical punctuations EVEN IF your editor has changed the typing direction to horizontal." = "⚠︎ 該功能當且僅當目前的排版字型不支援縱排標點動態顯示轉義的情況下才有用。一旦使用了，所有敲出去的標點都會被永久轉換為靜態縱排標點：哪怕當前編輯器的排版模式已經改成橫排，這些已經輸入的標點也都還是縱排標點字元。";
-"⚠︎ This may hinder the walking algorithm from giving appropriate results." = "⚠︎ 這可能會妨礙爬軌函式，使其無法給出正確的結果。";
-"⚠︎ This will reboot the vChewing IME." = "⚠︎ 這將重啟威注音輸入法。";
 "Accept leading intonations in rare cases" = "在個別情況下，允許聲調前置鍵入";
 "Adjust candidate window location according to current node length" = "根據當前位置的字詞長度，自動調整選字窗的位置";
 "All strokes in the composition buffer will be shown as ASCII keyboard characters unless this option is enabled. Stroke is definable in the “%keyname” section of the CIN file." = "不啟用該選項的話，在組字區內的字根將會以原始鍵盤按鍵名稱來顯示。所有關於字根的定義，均請洽 CIN 磁帶檔案內的「%keyname」章節。";
@@ -242,7 +238,6 @@
 "Choose the macOS-level basic keyboard layout. Non-QWERTY alphanumerical keyboard layouts are for Pinyin parser only. This option will only affect the appearance of the on-screen-keyboard if the current Mandarin parser is neither (any) pinyin nor dynamically reparsable with different western keyboard layouts (like Eten 26, Hsu, etc.)." = "請選擇 macOS 基礎鍵盤佈局。QWERTY 以外的英數佈局是為了拼音排列的使用者而準備的。如果當前的普通話/國音分析器並未設為拼音、或者並未設定成任何受西文鍵盤佈局影響的注音排列（比如倚天 26 鍵排列、許氏排列，等）的話，則鍵盤佈局選項僅會影響到螢幕鍵盤。";
 "Choose the phonetic layout for Mandarin parser." = "請指定普通話/國音分析器所使用的注音排列。";
 "Choose your desired cassette file path. Will be omitted if invalid." = "請在此指定您想指定的 CIN 磁帶檔案。無效值會被忽略。";
-"Choose your desired cassette file path." = "請在此指定您想指定的 CIN 磁帶檔案。";
 "Choose your desired user data folder path. Will be omitted if invalid." = "請在此指定您想指定的使用者語彙檔案目錄。無效值會被忽略。";
 "Choose your preferred layout of the candidate window." = "選擇您所偏好的候選字窗佈局。";
 "Clear the entire inline composition buffer like Shift+Delete" = "像 Shift+Delete 那樣清空當前組字區內容";
@@ -289,10 +284,9 @@
 "Hualuo Pinyin with Numeral Intonation" = "華羅拼音+數字標調";
 "IBM" = "IBM 排列";
 "If disabled, this will insert space instead." = "取消勾選的話，該按鍵會插入空格。";
-"If unchecked, the ESC key will try cleaning the unfinished readings / strokes first, and will commit the current composition buffer if there's no unfinished readings / strkes." = "若取消勾選，則 ESC 鍵會先嘗試清除未組成的讀音/字根；\n如果沒有未組成的讀音/字根的話，則會遞交當前組字區的內容。";
+"If unchecked, the ESC key will try cleaning the unfinished readings / strokes first, and will commit the current composition buffer if there's no unfinished readings / strokes." = "若取消勾選，則 ESC 鍵會先嘗試清除未組成的讀音/字根；\n如果沒有未組成的讀音/字根的話，則會遞交當前組字區的內容。";
 "in front of the phrase (like macOS built-in Zhuyin IME)" = "將游標置於詞語前方 // macOS 內建注音風格";
 "Intonation Key:" = "聲調鍵:";
-"It only needs to parse consecutive NSEvents passed by macOS built-in InputMethodKit framework, hence no necessity of asking end-users for extra privileges of monitoring global keyboard inputs. You are free to investigate our codebase or reverse-engineer this input method to see whether the above statement is trustable." = "該功能只需要對藉由 macOS 內建的輸入法框架傳來的 NSEvent 做上下文分析，自然沒有「向使用者尋求系統全局鍵盤事件監聽權限」之必要。您可自行審視敝輸入法的原始程式碼倉庫、或對敝輸入法逆向工程，以自行證實此處所言之真假。";
 "Japanese" = "和語";
 "Key names in tooltip will be shown as symbols when the tooltip is vertical. However, this option will be ignored since tooltip will always be horizontal if the UI language is English." = "縱排輸入的情況下，工具提示內的按鍵名稱會以符號顯示。";
 "Keyboard Shortcuts:" = "鍵盤熱鍵:";
@@ -314,7 +308,7 @@
 "Please use mouse wheel to scroll each page if needed. The CheatSheet is available in the IME menu." = "請利用滑鼠滾輪檢視頁面。也請洽輸入法選單內的熱鍵指南。";
 "Push the cursor in front of the phrase after selection" = "在選字後將游標置於該字詞的前方";
 "Quick Setup:" = "直接設定:";
-"Read external factory dictionary plists if possible" = "盡量使用外置原廠辭典 plist 檔案";
+"Read external factory dictionary files if possible" = "盡量使用外置原廠辭典 plist 檔案";
 "Secondary Pinyin with Numeral Intonation" = "國音二式+數字標調";
 "Seigyou" = "精業排列";
 "Selection Keys:" = "選字鍵:";
@@ -339,6 +333,7 @@
 "The user override model only possesses memories temporarily. Each memory record gradually becomes ineffective within approximately less than 6 days. You can erase all memory records through the input method menu." = "半衰記憶模組僅持有臨時記憶之功能。每一筆記錄都會在六天之內逐漸變得徹底失效。您可以藉由輸入法選單清除全部的記憶記錄。";
 "This conversion only affects the cassette module, converting typed contents to either Simplified Chinese or Traditional Chinese in accordance with this setting and your current input mode." = "該轉換僅對磁帶模式有影響，會將鍵入的內容根據該選項與當前的簡繁體模式來轉換。";
 "This feature accommodates certain typing mistakes that the intonation mark might be typed at first (which is sequentially wrong from a common sense that intonation marks are supposed to be used for confirming combinations). It won't work if the current parser is of (any) pinyin. Also, this feature won't work when an intonation override is possible (and enabled)." = "聲調鍵是專門用來確認注音組合輸入的，從常理上來講只能在最後鍵入。然而，總是有人會失手將聲調鍵前置鍵入。該防呆功能專門應對這種情形，但無法用於拼音輸入模式，且其優先權比「以聲調鍵覆寫游標身後的漢字的聲調」更低（除非後者被停用）。";
+"This feature only needs to parse consecutive NSEvents passed by macOS built-in InputMethodKit framework, hence no necessity of asking end-users for extra privileges of monitoring global keyboard inputs. You are free to investigate our codebase or reverse-engineer this input method to see whether the above statement is trustable." = "該功能只需要對藉由 macOS 內建的輸入法框架傳來的 NSEvent 做上下文分析，自然沒有「向使用者尋求系統全局鍵盤事件監聽權限」之必要。您可自行審視敝輸入法的原始程式碼倉庫、或對敝輸入法逆向工程，以自行證實此處所言之真假。";
 "This feature requires macOS 10.15 and above." = "該功能要求系統版本至少 macOS 10.15。";
 "This feature requires macOS 12 and above." = "該功能要求系統版本至少 macOS 12。";
 "This only works with Tadokoro candidate window." = "該選項僅對田所選字窗起作用。";
@@ -346,8 +341,8 @@
 "This will batch-replace specified candidates." = "這將會對指定的候選字詞進行整詞取代。";
 "This will stop user override model from affecting how candidates get sorted." = "這將阻止半衰記憶模組影響候選字詞的陳列順序。";
 "This will use the plist files deployed by the “make install” command from libvChewing-Data if possible." = "這將會優先使用由 libvChewing-Data 的 make install 部署的原廠辭典檔案。";
-"Toggle alphanumerical mode with Left-Shift" = "允許使用左側的 Shift 鍵盤切換英數輸入模式";
-"Toggle alphanumerical mode with Right-Shift" = "允許使用右側的 Shift 鍵盤切換英數輸入模式";
+"Toggle alphanumerical mode with Left-Shift" = "允許使用左側的 Shift 鍵切換英數輸入模式";
+"Toggle alphanumerical mode with Right-Shift" = "允許使用右側的 Shift 鍵切換英數輸入模式";
 "Traditional Chinese" = "繁體中文";
 "Trim unfinished readings / strokes on commit" = "在遞交時清理未完成拼寫的讀音或字根";
 "Type them into inline composition buffer" = "直接鍵入內文組字區";
@@ -358,6 +353,9 @@
 "Use only one row / column in candidate window" = "僅以單行/單列來陳列候選字";
 "Use Space to confirm highlighted candidate in Per-Char Select Mode" = "在逐字選字模式當中使用空格鍵確認當前高亮候選字";
 "Vertical" = "縱向佈局";
-"Warning: This page is for testing future features. \nFeatures listed here may not work as expected." = "警告：該頁面僅作未來功能測試所用。\n在此列出的功能並非處於完全可用之狀態。";
 "Wade-Giles Pinyin with Numeral Intonation" = "韋氏拼音+數字標調";
+"Warning: This page is for testing future features. \nFeatures listed here may not work as expected." = "警告：該頁面僅作未來功能測試所用。\n在此列出的功能並非處於完全可用之狀態。";
 "Yale Pinyin with Numeral Intonation" = "耶魯拼音+數字標調";
+"⚠︎ This feature is useful ONLY WHEN the font you are using doesn't support dynamic vertical punctuations. However, typed vertical punctuations will always shown as vertical punctuations EVEN IF your editor has changed the typing direction to horizontal." = "⚠︎ 該功能當且僅當目前的排版字型不支援縱排標點動態顯示轉義的情況下才有用。一旦使用了，所有敲出去的標點都會被永久轉換為靜態縱排標點：哪怕當前編輯器的排版模式已經改成橫排，這些已經輸入的標點也都還是縱排標點字元。";
+"⚠︎ This may hinder the walking algorithm from giving appropriate results." = "⚠︎ 這可能會妨礙爬軌函式，使其無法給出正確的結果。";
+"⚠︎ This will reboot the vChewing IME." = "⚠︎ 這將重啟威注音輸入法。";

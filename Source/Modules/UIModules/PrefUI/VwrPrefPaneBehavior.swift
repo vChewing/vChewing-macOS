@@ -93,7 +93,7 @@ struct VwrPrefPaneBehavior: View {
           )
           Text(
             LocalizedStringKey(
-              "If unchecked, the ESC key will try cleaning the unfinished readings / strokes first, and will commit the current composition buffer if there's no unfinished readings / strkes."
+              "If unchecked, the ESC key will try cleaning the unfinished readings / strokes first, and will commit the current composition buffer if there's no unfinished readings / strokes."
             )
           )
           .preferenceDescription(maxWidth: CtlPrefUIShared.maxDescriptionWidth)
@@ -212,7 +212,7 @@ struct VwrPrefPaneBehavior: View {
           )
           Text(
             "This feature requires macOS 10.15 and above.".localized + CtlPrefUIShared.sentenceSeparator
-              + "It only needs to parse consecutive NSEvents passed by macOS built-in InputMethodKit framework, hence no necessity of asking end-users for extra privileges of monitoring global keyboard inputs. You are free to investigate our codebase or reverse-engineer this input method to see whether the above statement is trustable.".localized
+              + "This feature only needs to parse consecutive NSEvents passed by macOS built-in InputMethodKit framework, hence no necessity of asking end-users for extra privileges of monitoring global keyboard inputs. You are free to investigate our codebase or reverse-engineer this input method to see whether the above statement is trustable.".localized
           )
           .preferenceDescription(maxWidth: CtlPrefUIShared.maxDescriptionWidth)
         }
