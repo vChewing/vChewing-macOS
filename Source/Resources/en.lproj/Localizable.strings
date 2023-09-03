@@ -162,7 +162,6 @@
 "There is a bug in macOS 10.9, preventing an input method from accessing its own file panels. Doing so will result in eternal hang-crash of not only the input method but all client apps it tries attached to, requiring SSH connection to this computer to terminate the input method process by executing “killall vChewing”. Due to possible concerns of the same possible issue in macOS 10.10 and 10.11, we completely disabled this feature." = "There is a bug in macOS 10.9, preventing an input method from accessing its own file panels. Doing so will result in eternal hang-crash of not only the input method but all client apps it tries attached to, requiring SSH connection to this computer to terminate the input method process by executing “killall vChewing”. Due to possible concerns of the same possible issue in macOS 10.10 and 10.11, we completely disabled this feature.";
 "defaults write org.atelierInmu.inputmethod.vChewing UserDataFolderSpecified -string \"~/FolderPathEndedWithTrailingSlash/\"" = "defaults write org.atelierInmu.inputmethod.vChewing UserDataFolderSpecified -string \"~/FolderPathEndedWithTrailingSlash/\"";
 "defaults write org.atelierInmu.inputmethod.vChewing CassettePath -string \"~/FilePathEndedWithoutTrailingSlash\"" = "defaults write org.atelierInmu.inputmethod.vChewing CassettePath -string \"~/FilePathEndedWithoutTrailingSlash\"";
-"Also toggle alphanumerical mode with Left-Shift" = "Also toggle alphanumerical mode with Left-Shift";
 "Completely disable using Shift key to toggle alphanumerical mode" = "Completely disable using Shift key to toggle alphanumerical mode";
 "Please use mouse wheel to scroll this page. The CheatSheet is available in the IME menu." = "Please use mouse wheel to scroll this page. The CheatSheet is available in the IME menu.";
 "Typing Style:" = "Typing Style:";
@@ -195,9 +194,6 @@
 
 // SwiftUI Preferences
 "(Shift+)Space:" = "(Shift+)Space:";
-"⚠︎ This feature is useful ONLY WHEN the font you are using doesn't support dynamic vertical punctuations. However, typed vertical punctuations will always shown as vertical punctuations EVEN IF your editor has changed the typing direction to horizontal." = "⚠︎ This feature is useful ONLY WHEN the font you are using doesn't support dynamic vertical punctuations. However, typed vertical punctuations will always shown as vertical punctuations EVEN IF your editor has changed the typing direction to horizontal.";
-"⚠︎ This may hinder the walking algorithm from giving appropriate results." = "⚠︎ This may hinder the walking algorithm from giving appropriate results.";
-"⚠︎ This will reboot the vChewing IME." = "⚠︎ This will reboot the vChewing IME.";
 "Accept leading intonations in rare cases" = "Accept leading intonations in rare cases";
 "Adjust candidate window location according to current node length" = "Adjust candidate window location according to current node length";
 "All strokes in the composition buffer will be shown as ASCII keyboard characters unless this option is enabled. Stroke is definable in the “%keyname” section of the CIN file." = "All strokes in the composition buffer will be shown as ASCII keyboard characters unless this option is enabled. Stroke is definable in the “%keyname” section of the CIN file.";
@@ -242,7 +238,6 @@
 "Choose the macOS-level basic keyboard layout. Non-QWERTY alphanumerical keyboard layouts are for Pinyin parser only. This option will only affect the appearance of the on-screen-keyboard if the current Mandarin parser is neither (any) pinyin nor dynamically reparsable with different western keyboard layouts (like Eten 26, Hsu, etc.)." = "Choose the macOS-level basic keyboard layout. Non-QWERTY alphanumerical keyboard layouts are for Pinyin parser only. This option will only affect the appearance of the on-screen-keyboard if the current Mandarin parser is neither (any) pinyin nor dynamically reparsable with different western keyboard layouts (like Eten 26, Hsu, etc.).";
 "Choose the phonetic layout for Mandarin parser." = "Choose the phonetic layout for Mandarin parser.";
 "Choose your desired cassette file path. Will be omitted if invalid." = "Choose your desired cassette file path. Will be omitted if invalid.";
-"Choose your desired cassette file path." = "Choose your desired cassette file path.";
 "Choose your desired user data folder path. Will be omitted if invalid." = "Choose your desired user data folder path. Will be omitted if invalid.";
 "Choose your preferred layout of the candidate window." = "Choose your preferred layout of the candidate window.";
 "Clear the entire inline composition buffer like Shift+Delete" = "Clear the entire inline composition buffer like Shift+Delete";
@@ -289,10 +284,9 @@
 "Hualuo Pinyin with Numeral Intonation" = "Hualuo Pinyin with Numeral Intonation";
 "IBM" = "IBM";
 "If disabled, this will insert space instead." = "If disabled, this will insert space instead.";
-"If unchecked, the ESC key will try cleaning the unfinished readings / strokes first, and will commit the current composition buffer if there's no unfinished readings / strkes." = "If unchecked, the ESC key will try cleaning the unfinished readings / strokes first, and will commit the current composition buffer if there's no unfinished readings / strkes.";
+"If unchecked, the ESC key will try cleaning the unfinished readings / strokes first, and will commit the current composition buffer if there's no unfinished readings / strokes." = "If unchecked, the ESC key will try cleaning the unfinished readings / strokes first, and will commit the current composition buffer if there's no unfinished readings / strokes.";
 "in front of the phrase (like macOS built-in Zhuyin IME)" = "in front of the phrase (like macOS built-in Zhuyin IME)";
 "Intonation Key:" = "Intonation Key:";
-"It only needs to parse consecutive NSEvents passed by macOS built-in InputMethodKit framework, hence no necessity of asking end-users for extra privileges of monitoring global keyboard inputs. You are free to investigate our codebase or reverse-engineer this input method to see whether the above statement is trustable." = "It only needs to parse consecutive NSEvents passed by macOS built-in InputMethodKit framework, hence no necessity of asking end-users for extra privileges of monitoring global keyboard inputs. You are free to investigate our codebase or reverse-engineer this input method to see whether the above statement is trustable.";
 "Japanese" = "Japanese";
 "Key names in tooltip will be shown as symbols when the tooltip is vertical. However, this option will be ignored since tooltip will always be horizontal if the UI language is English." = "Key names in tooltip will be shown as symbols when the tooltip is vertical. However, this option will be ignored since tooltip will always be horizontal if the UI language is English.";
 "Keyboard Shortcuts:" = "Keyboard Shortcuts:";
@@ -314,7 +308,7 @@
 "Please use mouse wheel to scroll each page if needed. The CheatSheet is available in the IME menu." = "Please use mouse wheel to scroll each page if needed. The CheatSheet is available in the IME menu.";
 "Push the cursor in front of the phrase after selection" = "Push the cursor in front of the phrase after selection";
 "Quick Setup:" = "Quick Setup:";
-"Read external factory dictionary plists if possible" = "Read external factory dictionary plists if possible";
+"Read external factory dictionary files if possible" = "Read external factory dictionary files if possible";
 "Secondary Pinyin with Numeral Intonation" = "Secondary Pinyin with Numeral Intonation";
 "Seigyou" = "Seigyou (JinYei)";
 "Selection Keys:" = "Selection Keys:";
@@ -339,6 +333,7 @@
 "The user override model only possesses memories temporarily. Each memory record gradually becomes ineffective within approximately less than 6 days. You can erase all memory records through the input method menu." = "The user override model only possesses memories temporarily. Each memory record gradually becomes ineffective within approximately less than 6 days. You can erase all memory records through the input method menu.";
 "This conversion only affects the cassette module, converting typed contents to either Simplified Chinese or Traditional Chinese in accordance with this setting and your current input mode." = "This conversion only affects the cassette module, converting typed contents to either Simplified Chinese or Traditional Chinese in accordance with this setting and your current input mode.";
 "This feature accommodates certain typing mistakes that the intonation mark might be typed at first (which is sequentially wrong from a common sense that intonation marks are supposed to be used for confirming combinations). It won't work if the current parser is of (any) pinyin. Also, this feature won't work when an intonation override is possible (and enabled)." = "This feature accommodates certain typing mistakes that the intonation mark might be typed at first (which is sequentially wrong from a common sense that intonation marks are supposed to be used for confirming combinations). It won't work if the current parser is of (any) pinyin. Also, this feature won't work when an intonation override is possible (and enabled).";
+"This feature only needs to parse consecutive NSEvents passed by macOS built-in InputMethodKit framework, hence no necessity of asking end-users for extra privileges of monitoring global keyboard inputs. You are free to investigate our codebase or reverse-engineer this input method to see whether the above statement is trustable." = "This feature only needs to parse consecutive NSEvents passed by macOS built-in InputMethodKit framework, hence no necessity of asking end-users for extra privileges of monitoring global keyboard inputs. You are free to investigate our codebase or reverse-engineer this input method to see whether the above statement is trustable.";
 "This feature requires macOS 10.15 and above." = "This feature requires macOS 10.15 and above.";
 "This feature requires macOS 12 and above." = "This feature requires macOS 12 and above.";
 "This only works with Tadokoro candidate window." = "This only works with Tadokoro candidate window.";
@@ -358,6 +353,9 @@
 "Use only one row / column in candidate window" = "Use only one row / column in candidate window";
 "Use Space to confirm highlighted candidate in Per-Char Select Mode" = "Use Space to confirm highlighted candidate in Per-Char Select Mode";
 "Vertical" = "Vertical";
-"Warning: This page is for testing future features. \nFeatures listed here may not work as expected." = "Warning: This page is for testing future features. \nFeatures listed here may not work as expected.";
 "Wade-Giles Pinyin with Numeral Intonation" = "Wade-Giles Pinyin with Numeral Intonation";
+"Warning: This page is for testing future features. \nFeatures listed here may not work as expected." = "Warning: This page is for testing future features. \nFeatures listed here may not work as expected.";
 "Yale Pinyin with Numeral Intonation" = "Yale Pinyin with Numeral Intonation";
+"⚠︎ This feature is useful ONLY WHEN the font you are using doesn't support dynamic vertical punctuations. However, typed vertical punctuations will always shown as vertical punctuations EVEN IF your editor has changed the typing direction to horizontal." = "⚠︎ This feature is useful ONLY WHEN the font you are using doesn't support dynamic vertical punctuations. However, typed vertical punctuations will always shown as vertical punctuations EVEN IF your editor has changed the typing direction to horizontal.";
+"⚠︎ This may hinder the walking algorithm from giving appropriate results." = "⚠︎ This may hinder the walking algorithm from giving appropriate results.";
+"⚠︎ This will reboot the vChewing IME." = "⚠︎ This will reboot the vChewing IME.";

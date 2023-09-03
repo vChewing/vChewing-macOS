@@ -162,7 +162,6 @@
 "There is a bug in macOS 10.9, preventing an input method from accessing its own file panels. Doing so will result in eternal hang-crash of not only the input method but all client apps it tries attached to, requiring SSH connection to this computer to terminate the input method process by executing “killall vChewing”. Due to possible concerns of the same possible issue in macOS 10.10 and 10.11, we completely disabled this feature." = "システムの支障の話ですが、macOS 10.9 (恐らく 10.10 - 10.12 も) には下記のバグはございます：入力アプリは自分のファイル操作パネルをアクセススロと、その入力アプリだけでなく、あれから入力アプリの触り合おうとした全ての客体アプリも「無限のカタマリ」その無反応な状態になってしまいます。その場合、SSH でこのパソコンで「killall vChewing」そのターミナルコマンドを実行すれば、及ぼされた客体アプリの反応は戻ります。そのため、開発側は上記のシステムバージョンに応じて、自身のファイルパネルアクセスを全て禁止としました。";
 "defaults write org.atelierInmu.inputmethod.vChewing UserDataFolderSpecified -string \"~/FolderPathEndedWithTrailingSlash/\"" = "defaults write org.atelierInmu.inputmethod.vChewing UserDataFolderSpecified -string \"~/FolderPathEndedWithTrailingSlash/\"";
 "defaults write org.atelierInmu.inputmethod.vChewing CassettePath -string \"~/FilePathEndedWithoutTrailingSlash\"" = "defaults write org.atelierInmu.inputmethod.vChewing CassettePath -string \"~/FilePathEndedWithoutTrailingSlash\"";
-"Also toggle alphanumerical mode with Left-Shift" = "左側の Shift キーでも英数入力モードの切り替え";
 "Candidate Layout:" = "入力候補陳列の仕様";
 "Completely disable using Shift key to toggle alphanumerical mode" = "Shift キーの英数入力モードの切り替え機能を徹底的に禁ず";
 "Please use mouse wheel to scroll this page. The CheatSheet is available in the IME menu." = "マウスホイールでこのページをご覧ください。キーに関する取扱説明のアクセスはメニューに。";
@@ -196,9 +195,6 @@
 
 // SwiftUI Preferences
 "(Shift+)Space:" = "(Shift+)Space:";
-"⚠︎ This feature is useful ONLY WHEN the font you are using doesn't support dynamic vertical punctuations. However, typed vertical punctuations will always shown as vertical punctuations EVEN IF your editor has changed the typing direction to horizontal." = "⚠︎ 該当の組版用フォントには縦書き（引用符・括弧）変換機能が備えていない限り、この機能を使う甲斐がある。一旦使うと、入力した全ての引用符・括弧は永遠的に縦書きの様式になる。例え入力を受けているアプリ（例えばワープロソフとなど）の書写方向は横書きと変えたとしても、これらの入力済みの引用符・括弧は全て縦書きの見た目であり、削除してから入力し直す必要になる。";
-"⚠︎ This may hinder the walking algorithm from giving appropriate results." = "⚠︎ ウォーキング算法に差し支えてしまい、正しくない結果が出る恐れがある。";
-"⚠︎ This will reboot the vChewing IME." = "⚠︎ これで威注音入力アプリを再起動。";
 "Accept leading intonations in rare cases" = "まれな場合には、音調記号の優先入力を許容する";
 "Adjust candidate window location according to current node length" = "カーソル所在位置の単語の長さによって候補陳列ウィンドウの位置を調整";
 "All strokes in the composition buffer will be shown as ASCII keyboard characters unless this option is enabled. Stroke is definable in the “%keyname” section of the CIN file." = "これをチェックしないと、全ての筆画は ASCII キーネームで入力緩衝列で表示してしまうことになる。CIN ファイルの「%keyname」というところで筆画の定義はできる。";
@@ -243,7 +239,6 @@
 "Choose the macOS-level basic keyboard layout. Non-QWERTY alphanumerical keyboard layouts are for Pinyin parser only. This option will only affect the appearance of the on-screen-keyboard if the current Mandarin parser is neither (any) pinyin nor dynamically reparsable with different western keyboard layouts (like Eten 26, Hsu, etc.)." = "macOS 基礎キーボード配置をご指定ください。QWERTY 以外の英数キーボードは弁音以外の配列に不適用。弁音配列或いは「英数キーボードー配置と関わる注音配列（例えば許氏など）」を起用していない限り、キーボード配置の設定はキーボードビューアの有りようだけに影響を及ぼす。";
 "Choose the phonetic layout for Mandarin parser." = "共通語分析器の注音配列をご指定ください。";
 "Choose your desired cassette file path. Will be omitted if invalid." = "欲しがる CIN カセットファイルをご指定ください。無効なる設定は省かれる。";
-"Choose your desired cassette file path." = "欲しがる CIN カセットファイルをご指定ください。";
 "Choose your desired user data folder path. Will be omitted if invalid." = "欲しがるユーザー辞書保存先をご指定ください。無効なる保存先設定は省かれる。";
 "Choose your preferred layout of the candidate window." = "入力候補陳列の仕様をご指定ください。";
 "Clear the entire inline composition buffer like Shift+Delete" = "Shift+Delete のように入力緩衝列を消す";
@@ -290,10 +285,9 @@
 "Hualuo Pinyin with Numeral Intonation" = "中華ローマ弁音 (ローマ字+数字音調)";
 "IBM" = "IBM 配列";
 "If disabled, this will insert space instead." = "未チェックの場合、スペースを挿入。";
-"If unchecked, the ESC key will try cleaning the unfinished readings / strokes first, and will commit the current composition buffer if there's no unfinished readings / strkes." = "未チェックの場合、ESC キーはまず未完成の音読/筆画を消す。\n未完成の音読/筆画がない場合、全緩衝列をそのまま送り出す。";
+"If unchecked, the ESC key will try cleaning the unfinished readings / strokes first, and will commit the current composition buffer if there's no unfinished readings / strokes." = "未チェックの場合、ESC キーはまず未完成の音読/筆画を消す。\n未完成の音読/筆画がない場合、全緩衝列をそのまま送り出す。";
 "in front of the phrase (like macOS built-in Zhuyin IME)" = "単語の前で // macOS 内蔵注音入力のやり方";
 "Intonation Key:" = "音調キー:";
-"It only needs to parse consecutive NSEvents passed by macOS built-in InputMethodKit framework, hence no necessity of asking end-users for extra privileges of monitoring global keyboard inputs. You are free to investigate our codebase or reverse-engineer this input method to see whether the above statement is trustable." = "この機能の利用する NSEvent は、macOS 内蔵の入力アプリ共用モジュール「InputMethodKit」から提供した NSEvent のみであり、その NSEvent 文脈関係で「Shift キーは１回押したかどうか」と判断することはできる。この事実に疑いを持つ者は、本アプリのソースコードを審査するか、あるいは本アプリを逆向工程（分解工学, いわゆる「Reverse-Engineering」）するがよい。";
 "Japanese" = "和語";
 "Key names in tooltip will be shown as symbols when the tooltip is vertical. However, this option will be ignored since tooltip will always be horizontal if the UI language is English." = "縦書き入力の場合、ヒントにはキーの名前は常に符号で表示する。";
 "Keyboard Shortcuts:" = "ショートカット:";
@@ -315,7 +309,7 @@
 "Please use mouse wheel to scroll each page if needed. The CheatSheet is available in the IME menu." = "マウスホイールでページをご覧ください。キーに関する取扱説明のアクセスはメニューに。";
 "Push the cursor in front of the phrase after selection" = "候補選択の直後、すぐカーソルを単語の向こうに推し進める";
 "Quick Setup:" = "直接設定:";
-"Read external factory dictionary plists if possible" = "なるべく（内蔵辞書より）外部の公式辞書ファイルを利用";
+"Read external factory dictionary files if possible" = "なるべく（内蔵辞書より）外部の公式辞書ファイルを利用";
 "Secondary Pinyin with Numeral Intonation" = "国音二式 (ローマ字+数字音調)";
 "Seigyou" = "精業配列";
 "Selection Keys:" = "言選り用キー:";
@@ -340,6 +334,7 @@
 "The user override model only possesses memories temporarily. Each memory record gradually becomes ineffective within approximately less than 6 days. You can erase all memory records through the input method menu." = "臨時記憶モジュールは文字の通り「臨時的」の記憶をします。記録は六日間どんどん忘れてしまいます。入力アプリのメニューから全ての記録を消すことはできます。";
 "This conversion only affects the cassette module, converting typed contents to either Simplified Chinese or Traditional Chinese in accordance with this setting and your current input mode." = "この転換はカセットモードだけに使える転換であり、転換結果はこの設定と入力モード次第である。";
 "This feature accommodates certain typing mistakes that the intonation mark might be typed at first (which is sequentially wrong from a common sense that intonation marks are supposed to be used for confirming combinations). It won't work if the current parser is of (any) pinyin. Also, this feature won't work when an intonation override is possible (and enabled)." = "音調記号は常に「漢字の音読組合を確認するキー」として最後で入力することだと常識ですが、間違くてそれを最初に入力してしまった場合もございます。このボカ避け機能は（ほんの一部の）このような間違いを対策できますが、注音入力だけに使えます。更に、（音調の上書き機能がオンを前提として）音調の上書きができる場合には、このボカ避け機能は作動しません。";
+"This feature only needs to parse consecutive NSEvents passed by macOS built-in InputMethodKit framework, hence no necessity of asking end-users for extra privileges of monitoring global keyboard inputs. You are free to investigate our codebase or reverse-engineer this input method to see whether the above statement is trustable." = "この機能の利用する NSEvent は、macOS 内蔵の入力アプリ共用モジュール「InputMethodKit」から提供した NSEvent のみであり、その NSEvent 文脈関係で「Shift キーは１回押したかどうか」と判断することはできる。この事実に疑いを持つ者は、本アプリのソースコードを審査するか、あるいは本アプリを逆向工程（分解工学, いわゆる「Reverse-Engineering」）するがよい。";
 "This feature requires macOS 10.15 and above." = "この機能の稼働には macOS 10.15 以降のシステムが必要である。";
 "This feature requires macOS 12 and above." = "この機能の稼働には macOS 12 以降のシステムが必要である。";
 "This only works with Tadokoro candidate window." = "これは田所候補陳列ウィンドウだけに効ける機能である。";
@@ -359,6 +354,9 @@
 "Use only one row / column in candidate window" = "ただ１つ行・列で文字候補を陳列";
 "Use Space to confirm highlighted candidate in Per-Char Select Mode" = "全候補入力の場合、ハイライト候補を Space キーで確認";
 "Vertical" = "縦型陳列";
-"Warning: This page is for testing future features. \nFeatures listed here may not work as expected." = "警告：これからの新機能テストのために作ったページですから、\nここで陳列されている諸機能は予想通り動けるだと思わないでください。";
 "Wade-Giles Pinyin with Numeral Intonation" = "ウェード式弁音 (ローマ字+数字音調)";
+"Warning: This page is for testing future features. \nFeatures listed here may not work as expected." = "警告：これからの新機能テストのために作ったページですから、\nここで陳列されている諸機能は予想通り動けるだと思わないでください。";
 "Yale Pinyin with Numeral Intonation" = "イェール弁音 (ローマ字+数字音調)";
+"⚠︎ This feature is useful ONLY WHEN the font you are using doesn't support dynamic vertical punctuations. However, typed vertical punctuations will always shown as vertical punctuations EVEN IF your editor has changed the typing direction to horizontal." = "⚠︎ 該当の組版用フォントには縦書き（引用符・括弧）変換機能が備えていない限り、この機能を使う甲斐がある。一旦使うと、入力した全ての引用符・括弧は永遠的に縦書きの様式になる。例え入力を受けているアプリ（例えばワープロソフとなど）の書写方向は横書きと変えたとしても、これらの入力済みの引用符・括弧は全て縦書きの見た目であり、削除してから入力し直す必要になる。";
+"⚠︎ This may hinder the walking algorithm from giving appropriate results." = "⚠︎ ウォーキング算法に差し支えてしまい、正しくない結果が出る恐れがある。";
+"⚠︎ This will reboot the vChewing IME." = "⚠︎ これで威注音入力アプリを再起動。";

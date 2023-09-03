@@ -76,9 +76,6 @@ struct VwrPrefPaneCassette: View {
                 )
                 return
               }
-              Self.dlgOpenFile.title = NSLocalizedString(
-                "Choose your desired cassette file path.", comment: ""
-              )
               Self.dlgOpenFile.showsResizeIndicator = true
               Self.dlgOpenFile.showsHiddenFiles = true
               Self.dlgOpenFile.canChooseFiles = true
