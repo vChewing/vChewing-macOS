@@ -46,34 +46,30 @@ public extension vChewingLM {
     /// - Parameter path: 給定檔案路徑。
     /// - Returns: 結果正常或修復順利則為真，其餘為假。
     @discardableResult public static func fixEOF(path: String) -> Bool {
-      let urlPath = URL(fileURLWithPath: path)
-      if FileManager.default.fileExists(atPath: path) {
-        var strIncoming = ""
-        do {
-          strIncoming += try String(contentsOf: urlPath, encoding: .utf8)
-          /// 注意：Swift 版 LMConsolidator 並未在此安排對 EOF 的去重複工序。
-          /// 但這個函式執行完之後往往就會 consolidate() 整理格式，所以不會有差。
-          if !strIncoming.hasSuffix("\n") {
-            vCLog("EOF Fix Necessity Confirmed, Start Fixing.")
-            if let writeFile = FileHandle(forUpdatingAtPath: path),
-               let endl = "\n".data(using: .utf8)
-            {
-              writeFile.seekToEndOfFile()
-              writeFile.write(endl)
-              writeFile.closeFile()
-            } else {
-              return false
-            }
-          }
-        } catch {
-          vCLog("EOF Fix Failed w/ File: \(path)")
-          vCLog("EOF Fix Failed w/ Error: \(error).")
-          return false
-        }
-        vCLog("EOF Successfully Ensured (with possible autofixes performed).")
-        return true
+      var fileSize: UInt64?
+      do {
+        let dict = try FileManager.default.attributesOfItem(atPath: path)
+        if let value = dict[FileAttributeKey.size] as? UInt64 { fileSize = value }
+      } catch {
+        vCLog("EOF Fix Failed: File Missing at \(path).")
+        return false
       }
-      vCLog("EOF Fix Failed: File Missing at \(path).")
+      guard let fileSize = fileSize else { return false }
+      guard let writeFile = FileHandle(forUpdatingAtPath: path) else {
+        vCLog("EOF Fix Failed: File Not Writable at \(path).")
+        return false
+      }
+      defer { writeFile.closeFile() }
+      /// 注意：Swift 版 LMConsolidator 並未在此安排對 EOF 的去重複工序。
+      /// 但這個函式執行完之後往往就會 consolidate() 整理格式，所以不會有差。
+      writeFile.seek(toFileOffset: fileSize - 1)
+      if writeFile.readDataToEndOfFile().first != 0x0A {
+        vCLog("EOF Missing Confirmed, Start Fixing.")
+        var newData = Data()
+        newData.append(0x0A)
+        writeFile.write(newData)
+        vCLog("EOF Successfully Assured.")
+      }
       return false
     }
 
