@@ -16,10 +16,6 @@ public extension PrefMgr {
     // macOS 10.15 開始才能使用 SwiftUI 構建的田所選字窗。
     if #unavailable(macOS 10.15) {
       enableSwiftUIForTDKCandidates = false
-      togglingAlphanumericalModeWithRShift = false
-      togglingAlphanumericalModeWithLShift = false
-      showReverseLookupInCandidateUI = false
-      shareAlphanumericalModeStatusAcrossClients = false
     }
     if #unavailable(macOS 12) {
       showNotificationsWhenTogglingCapsLock = false
