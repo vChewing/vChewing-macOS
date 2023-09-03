@@ -64,6 +64,7 @@ public class PopupCompositionBuffer: NSWindowController {
     let attrString: NSMutableAttributedString = .init(string: state.displayedTextConverted)
     let attrPCBHeader: NSMutableAttributedString = .init(string: "　")
     let verticalAttributes: [NSAttributedString.Key: Any] = [
+      .kern: 0,
       .verticalGlyphForm: true,
       .paragraphStyle: {
         let newStyle = NSMutableParagraphStyle()
@@ -88,6 +89,7 @@ public class PopupCompositionBuffer: NSWindowController {
 
     let markerAttributes: [NSAttributedString.Key: Any] = {
       var result: [NSAttributedString.Key: Any] = [
+        .kern: 0,
         .backgroundColor: NSApplication.isDarkMode ? NSColor.systemRed : NSColor.systemYellow,
         .markedClauseSegment: 0,
       ]
@@ -134,6 +136,10 @@ public class PopupCompositionBuffer: NSWindowController {
 
     attrString.insert(attrPCBHeader, at: 0)
     attrString.insert(attrPCBHeader, at: attrString.length)
+
+    attrString.setAttributes(
+      [.kern: 0], range: NSRange(location: 0, length: attrString.length)
+    )
 
     textShown = attrString
     messageTextField.maximumNumberOfLines = 1

@@ -158,7 +158,8 @@ extension CandidatePool {
 
   private var attributedDescriptionHorizontal: NSAttributedString {
     let paragraphStyle = sharedParagraphStyle
-    let attrCandidate: [NSAttributedString.Key: AnyObject] = [
+    let attrCandidate: [NSAttributedString.Key: Any] = [
+      .kern: 0,
       .font: Self.blankCell.phraseFont(size: Self.blankCell.size),
       .paragraphStyle: paragraphStyle,
     ]
@@ -197,7 +198,8 @@ extension CandidatePool {
 
   private var attributedDescriptionVertical: NSAttributedString {
     let paragraphStyle = sharedParagraphStyle
-    let attrCandidate: [NSAttributedString.Key: AnyObject] = [
+    let attrCandidate: [NSAttributedString.Key: Any] = [
+      .kern: 0,
       .font: Self.blankCell.phraseFont(size: Self.blankCell.size),
       .paragraphStyle: paragraphStyle,
     ]
@@ -262,7 +264,8 @@ extension CandidatePool {
       : NSColor(white: 0.9, alpha: 0.7)
     let positionCounterColorText = NSColor.controlTextColor
     let positionCounterTextSize = max(ceil(CandidateCellData.unifiedSize * 0.7), 11)
-    let attrPositionCounter: [NSAttributedString.Key: AnyObject] = [
+    let attrPositionCounter: [NSAttributedString.Key: Any] = [
+      .kern: 0,
       .font: Self.blankCell.phraseFontEmphasized(size: positionCounterTextSize),
       .backgroundColor: positionCounterColorBG,
       .foregroundColor: positionCounterColorText,
@@ -275,7 +278,8 @@ extension CandidatePool {
 
   private var attributedDescriptionTooltip: NSAttributedString {
     let positionCounterTextSize = max(ceil(CandidateCellData.unifiedSize * 0.7), 11)
-    let attrTooltip: [NSAttributedString.Key: AnyObject] = [
+    let attrTooltip: [NSAttributedString.Key: Any] = [
+      .kern: 0,
       .font: Self.blankCell.phraseFontEmphasized(size: positionCounterTextSize),
       .foregroundColor: NSColor.textColor,
     ]
@@ -287,11 +291,13 @@ extension CandidatePool {
 
   private var attributedDescriptionReverseLookp: NSAttributedString {
     let reverseLookupTextSize = max(ceil(CandidateCellData.unifiedSize * 0.6), 9)
-    let attrReverseLookup: [NSAttributedString.Key: AnyObject] = [
+    let attrReverseLookup: [NSAttributedString.Key: Any] = [
+      .kern: 0,
       .font: Self.blankCell.phraseFont(size: reverseLookupTextSize),
       .foregroundColor: NSColor.textColor,
     ]
-    let attrReverseLookupSpacer: [NSAttributedString.Key: AnyObject] = [
+    let attrReverseLookupSpacer: [NSAttributedString.Key: Any] = [
+      .kern: 0,
       .font: Self.blankCell.phraseFont(size: reverseLookupTextSize),
     ]
     let result = NSMutableAttributedString(string: "", attributes: attrReverseLookupSpacer)
