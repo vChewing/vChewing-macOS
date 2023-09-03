@@ -156,9 +156,7 @@ struct VwrPrefPaneCandidates: View {
             isOn: $showReverseLookupInCandidateUI
           )
           Text(
-            "This only works with Tadokoro candidate window.".localized
-              + CtlPrefUIShared.sentenceSeparator
-              + "The lookup results are supplied by the CIN cassette module.".localized
+            "The lookup results are supplied by the CIN cassette module.".localized
           )
           .preferenceDescription(maxWidth: CtlPrefUIShared.maxDescriptionWidth)
           Toggle(
