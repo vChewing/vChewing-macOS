@@ -64,13 +64,15 @@ public class Notifier: NSWindowController {
     let paraStyle = NSMutableParagraphStyle()
     paraStyle.setParagraphStyle(NSParagraphStyle.default)
     paraStyle.alignment = .center
-    let attrTitle: [NSAttributedString.Key: AnyObject] = [
+    let attrTitle: [NSAttributedString.Key: Any] = [
+      .kern: 0,
       .foregroundColor: NSColor.controlTextColor,
       .font: NSFont.boldSystemFont(ofSize: kLargeFontSize),
       .paragraphStyle: paraStyle,
     ]
     let attrString = NSMutableAttributedString(string: messageArray[0], attributes: attrTitle)
-    let attrAlt: [NSAttributedString.Key: AnyObject] = [
+    let attrAlt: [NSAttributedString.Key: Any] = [
+      .kern: 0,
       .foregroundColor: NSColor.secondaryLabelColor,
       .font: NSFont.systemFont(ofSize: kSmallFontSize),
       .paragraphStyle: paraStyle,

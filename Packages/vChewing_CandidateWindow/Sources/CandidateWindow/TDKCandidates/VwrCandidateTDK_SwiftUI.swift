@@ -211,7 +211,8 @@ extension VwrCandidateTDK {
   /// - Returns: 測量出來的字串渲染寬度，經過向上取整之處理。
   func getTextWidth(text: String, fontSize: CGFloat, isBold: Bool) -> CGFloat? {
     guard !text.isEmpty else { return nil }
-    let attributes: [NSAttributedString.Key: AnyObject] = [
+    let attributes: [NSAttributedString.Key: Any] = [
+      .kern: 0,
       .font: NSFont.systemFont(ofSize: fontSize, weight: isBold ? .bold : .regular),
       .paragraphStyle: CandidateCellData.sharedParagraphStyle,
     ]
