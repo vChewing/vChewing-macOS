@@ -52,25 +52,31 @@ public extension LMMgr {
     public func write(toFilter: Bool) -> Bool {
       guard LMMgr.chkUserLMFilesExist(inputMode) else { return false }
 
+      /// 施工筆記：
+      /// 有些使用者的語彙檔案已經過於龐大了（超過一千行），
+      /// 每次寫入時都全文整理格式的話，會引發嚴重的效能問題。
+      /// 所以這裡不再強制要求整理格式。
       let theType: vChewingLM.ReplacableUserDataType = toFilter ? .theFilter : .thePhrases
       let theURL = LMMgr.userDictDataURL(mode: inputMode, type: theType)
-
-      if let writeFile = FileHandle(forUpdatingAtPath: theURL.path),
-         let data = "\n\(description)\n".data(using: .utf8)
-      {
-        writeFile.seekToEndOfFile()
-        writeFile.write(data)
-        writeFile.closeFile()
-      } else {
+      var fileSize: UInt64?
+      do {
+        let dict = try FileManager.default.attributesOfItem(atPath: theURL.path)
+        if let value = dict[FileAttributeKey.size] as? UInt64 { fileSize = value }
+      } catch {
         return false
       }
-
-      // We enforce the format consolidation here, since the pragma header
-      // will let the UserPhraseLM bypasses the consolidating process on load.
-      if !vChewingLM.LMConsolidator.consolidate(path: theURL.path, pragma: false) {
-        return false
+      guard let fileSize = fileSize else { return false }
+      guard var dataToInsert = "\(description)\n".data(using: .utf8) else { return false }
+      guard let writeFile = FileHandle(forUpdatingAtPath: theURL.path) else { return false }
+      defer { writeFile.closeFile() }
+      if fileSize > 0 {
+        writeFile.seek(toFileOffset: fileSize - 1)
+        if writeFile.readDataToEndOfFile().first != 0x0A {
+          dataToInsert.insert(0x0A, at: 0)
+        }
       }
-
+      writeFile.seekToEndOfFile()
+      writeFile.write(dataToInsert)
       return true
     }
   }
