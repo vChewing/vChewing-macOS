@@ -99,6 +99,7 @@ public class NSAttributedTextView: NSView {
   public var backgroundColor: NSColor = .controlBackgroundColor
 
   public var attributes: [NSAttributedString.Key: Any] = [
+    .kern: 0,
     .verticalGlyphForm: true,
     .font: NSFont.systemFont(ofSize: NSFont.systemFontSize),
     .foregroundColor: NSColor.textColor,
