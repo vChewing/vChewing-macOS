@@ -38,14 +38,15 @@ public class FolderMonitor {
     )
     // Define the block to call when a file change is detected.
     folderMonitorSource?.setEventHandler { [weak self] in
-      self?.folderDidChange?()
+      guard let self = self else { return }
+      folderDidChange?()
     }
     // Define a cancel handler to ensure the directory is closed when the source is cancelled.
     folderMonitorSource?.setCancelHandler { [weak self] in
-      guard let strongSelf = self else { return }
-      close(strongSelf.monitoredFolderFileDescriptor)
-      strongSelf.monitoredFolderFileDescriptor = -1
-      strongSelf.folderMonitorSource = nil
+      guard let self = self else { return }
+      close(monitoredFolderFileDescriptor)
+      monitoredFolderFileDescriptor = -1
+      folderMonitorSource = nil
     }
     // Start monitoring the directory via the source.
     folderMonitorSource?.resume()

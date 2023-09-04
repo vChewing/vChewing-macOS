@@ -114,7 +114,8 @@ public class CtlCandidateTDK: CtlCandidate, NSWindowDelegate {
       Self.thePool.tooltip = delegate?.candidateToolTip(shortened: !Self.thePool.isMatrix) ?? ""
     }
     delegate?.candidatePairHighlightChanged(at: highlightedIndex)
-    DispatchQueue.main.async { [self] in
+    DispatchQueue.main.async { [weak self] in
+      guard let self = self else { return }
       updateNSWindowModern(window)
     }
   }
