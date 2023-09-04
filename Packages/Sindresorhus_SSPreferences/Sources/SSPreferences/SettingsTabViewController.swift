@@ -146,7 +146,8 @@ final class SettingsTabViewController: NSViewController, SettingsStyleController
       from: fromViewController,
       to: toViewController,
       options: options
-    ) { [self] in
+    ) { [weak self] in
+      guard let self = self else { return }
       activeChildViewConstraints = toViewController.view.constrainToSuperviewBounds()
     }
   }
