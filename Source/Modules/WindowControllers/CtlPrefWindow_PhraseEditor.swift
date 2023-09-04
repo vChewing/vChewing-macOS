@@ -38,7 +38,8 @@ extension CtlPrefWindow: NSTextViewDelegate, NSTextFieldDelegate {
     clearAllFields()
     isLoading = true
     tfdPETextEditor.string = NSLocalizedString("Loading…", comment: "")
-    DispatchQueue.main.async { [self] in
+    DispatchQueue.main.async { [weak self] in
+      guard let self = self else { return }
       tfdPETextEditor.string = LMMgr.retrieveData(mode: selInputMode, type: selUserDataType)
       tfdPETextEditor.toolTip = PETerms.TooltipTexts.sampleDictionaryContent(for: selUserDataType)
       isLoading = false
@@ -173,7 +174,8 @@ extension CtlPrefWindow: NSTextViewDelegate, NSTextFieldDelegate {
   @IBAction func reloadPEButtonClicked(_: NSButton) { updatePhraseEditor() }
 
   @IBAction func consolidatePEButtonClicked(_: NSButton) {
-    DispatchQueue.main.async { [self] in
+    DispatchQueue.main.async { [weak self] in
+      guard let self = self else { return }
       isLoading = true
       vChewingLM.LMConsolidator.consolidate(text: &tfdPETextEditor.string, pragma: false)
       if selUserDataType == .thePhrases {
@@ -193,20 +195,22 @@ extension CtlPrefWindow: NSTextViewDelegate, NSTextFieldDelegate {
   }
 
   @IBAction func openExternallyPEButtonClicked(_: NSButton) {
-    DispatchQueue.main.async { [self] in
+    DispatchQueue.main.async { [weak self] in
+      guard let self = self else { return }
       let app: String = NSEvent.keyModifierFlags.contains(.option) ? "TextEdit" : "Finder"
       LMMgr.shared.openPhraseFile(mode: selInputMode, type: selUserDataType, app: app)
     }
   }
 
   @IBAction func addPEButtonClicked(_: NSButton) {
-    DispatchQueue.main.async { [self] in
+    DispatchQueue.main.async { [weak self] in
+      guard let self = self else { return }
       txtPEField1.stringValue.removeAll { "　 \t\n\r".contains($0) }
       if selUserDataType != .theAssociates {
         txtPEField2.stringValue.regReplace(pattern: #"( +|　+| +|\t+)+"#, replaceWith: "-")
       }
       txtPEField2.stringValue.removeAll {
-        selUserDataType == .theAssociates ? "\n\r".contains($0) : "　 \t\n\r".contains($0)
+        self.selUserDataType == .theAssociates ? "\n\r".contains($0) : "　 \t\n\r".contains($0)
       }
       txtPEField3.stringValue.removeAll { !"0123456789.-".contains($0) }
       txtPECommentField.stringValue.removeAll { "\n\r".contains($0) }
