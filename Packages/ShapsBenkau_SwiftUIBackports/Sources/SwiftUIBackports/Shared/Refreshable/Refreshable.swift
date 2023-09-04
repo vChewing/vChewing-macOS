@@ -54,8 +54,9 @@ extension Backport where Wrapped: View {
       super.init()
       self.handler = { [weak self] in
         Task { [weak self] in
+          guard let self = self else { return }
           await handler()
-          self?.endRefreshing()
+          endRefreshing()
         }
       }
 
