@@ -20,6 +20,12 @@ public class TooltipUI: NSWindowController {
     }
   }
 
+  private static var currentWindow: NSWindow? {
+    willSet {
+      currentWindow?.orderOut(nil)
+    }
+  }
+
   public var direction: NSAttributedTooltipTextView.writingDirection = .horizontal {
     didSet {
       if #unavailable(macOS 10.13) { direction = .horizontal }
@@ -47,6 +53,7 @@ public class TooltipUI: NSWindowController {
     messageText.textColor = NSColor.textColor
     messageText.needsDisplay = true
     panel.contentView?.addSubview(messageText)
+    Self.currentWindow = panel
     super.init(window: panel)
   }
 
