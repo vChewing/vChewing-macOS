@@ -223,12 +223,6 @@ public extension IMEStateData {
   mutating func updateTooltipForMarking() {
     var tooltipForMarking: String {
       let pair = userPhraseKVPair
-      if PrefMgr.shared.phraseReplacementEnabled {
-        tooltipColorState = .warning
-        return NSLocalizedString(
-          "⚠︎ Phrase replacement mode enabled, interfering user phrase entry.", comment: ""
-        )
-      }
       if markedRange.isEmpty {
         return ""
       }
@@ -278,5 +272,11 @@ public extension IMEStateData {
       )
     }
     tooltip = tooltipForMarking
+    if PrefMgr.shared.phraseReplacementEnabled {
+      tooltipColorState = .warning
+      tooltip += "\n" + NSLocalizedString(
+        "⚠︎ Phrase replacement mode enabled, interfering user phrase entry.", comment: ""
+      )
+    }
   }
 }
