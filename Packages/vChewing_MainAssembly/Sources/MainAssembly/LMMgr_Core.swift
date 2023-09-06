@@ -131,28 +131,15 @@ public class LMMgr {
     let group = DispatchGroup()
     group.enter()
     globalQueue.async {
-      switch mode {
-      case .imeModeCHS:
-        if !Self.lmCHS.isCNSDataLoaded {
-          Self.lmCHS.loadCNSData(json: Self.getDictionaryData("data-cns"))
-        }
-        if !Self.lmCHS.isMiscDataLoaded {
-          Self.lmCHS.loadMiscData(json: Self.getDictionaryData("data-zhuyinwen"))
-        }
-        if !Self.lmCHS.isSymbolDataLoaded {
-          Self.lmCHS.loadSymbolData(json: Self.getDictionaryData("data-symbols"))
-        }
-      case .imeModeCHT:
-        if !Self.lmCHT.isCNSDataLoaded {
-          Self.lmCHT.loadCNSData(json: Self.getDictionaryData("data-cns"))
-        }
-        if !Self.lmCHT.isMiscDataLoaded {
-          Self.lmCHT.loadMiscData(json: Self.getDictionaryData("data-zhuyinwen"))
-        }
-        if !Self.lmCHT.isSymbolDataLoaded {
-          Self.lmCHT.loadSymbolData(json: Self.getDictionaryData("data-symbols"))
-        }
-      default: break
+      let lm = Self.getLM(mode: mode)
+      if !lm.isCNSDataLoaded {
+        lm.loadCNSData(json: Self.getDictionaryData("data-cns"))
+      }
+      if !lm.isMiscDataLoaded {
+        lm.loadMiscData(json: Self.getDictionaryData("data-zhuyinwen"))
+      }
+      if !lm.isSymbolDataLoaded {
+        lm.loadSymbolData(json: Self.getDictionaryData("data-symbols"))
       }
       group.leave()
     }
@@ -289,17 +276,9 @@ public class LMMgr {
     keyArray: [String],
     factoryDictionaryOnly: Bool = false
   ) -> Bool {
-    switch mode {
-    case .imeModeCHS:
-      return lmCHS.hasKeyValuePairFor(
-        keyArray: keyArray, value: userPhrase, factoryDictionaryOnly: factoryDictionaryOnly
-      )
-    case .imeModeCHT:
-      return lmCHT.hasKeyValuePairFor(
-        keyArray: keyArray, value: userPhrase, factoryDictionaryOnly: factoryDictionaryOnly
-      )
-    case .imeModeNULL: return false
-    }
+    Self.getLM(mode: mode).hasKeyValuePairFor(
+      keyArray: keyArray, value: userPhrase, factoryDictionaryOnly: factoryDictionaryOnly
+    )
   }
 
   public static func countPhrasePairs(
@@ -307,17 +286,9 @@ public class LMMgr {
     mode: Shared.InputMode,
     factoryDictionaryOnly: Bool = false
   ) -> Int {
-    switch mode {
-    case .imeModeCHS:
-      return lmCHS.countKeyValuePairs(
-        keyArray: keyArray, factoryDictionaryOnly: factoryDictionaryOnly
-      )
-    case .imeModeCHT:
-      return lmCHT.countKeyValuePairs(
-        keyArray: keyArray, factoryDictionaryOnly: factoryDictionaryOnly
-      )
-    case .imeModeNULL: return 0
-    }
+    Self.getLM(mode: mode).countKeyValuePairs(
+      keyArray: keyArray, factoryDictionaryOnly: factoryDictionaryOnly
+    )
   }
 
   public static func setPhraseReplacementEnabled(_ state: Bool) {
@@ -370,25 +341,11 @@ public class LMMgr {
   }
 
   public static func bleachSpecifiedSuggestions(targets: [String], mode: Shared.InputMode) {
-    switch mode {
-    case .imeModeCHS:
-      Self.uomCHT.bleachSpecifiedSuggestions(targets: targets, saveCallback: { Self.uomCHT.saveData() })
-    case .imeModeCHT:
-      Self.uomCHS.bleachSpecifiedSuggestions(targets: targets, saveCallback: { Self.uomCHS.saveData() })
-    case .imeModeNULL:
-      break
-    }
+    Self.getUOM(mode: mode).bleachSpecifiedSuggestions(targets: targets, saveCallback: { Self.getUOM(mode: mode).saveData() })
   }
 
   public static func removeUnigramsFromUserOverrideModel(_ mode: Shared.InputMode) {
-    switch mode {
-    case .imeModeCHS:
-      Self.uomCHT.bleachUnigrams(saveCallback: { Self.uomCHT.saveData() })
-    case .imeModeCHT:
-      Self.uomCHS.bleachUnigrams(saveCallback: { Self.uomCHS.saveData() })
-    case .imeModeNULL:
-      break
-    }
+    Self.getUOM(mode: mode).bleachUnigrams(saveCallback: { Self.getUOM(mode: mode).saveData() })
   }
 
   public static func relocateWreckedUOMData() {
@@ -410,13 +367,6 @@ public class LMMgr {
   }
 
   public static func clearUserOverrideModelData(_ mode: Shared.InputMode = .imeModeNULL) {
-    switch mode {
-    case .imeModeCHS:
-      Self.uomCHS.clearData(withURL: userOverrideModelDataURL(.imeModeCHS))
-    case .imeModeCHT:
-      Self.uomCHT.clearData(withURL: userOverrideModelDataURL(.imeModeCHT))
-    case .imeModeNULL:
-      break
-    }
+    Self.getUOM(mode: mode).clearData(withURL: userOverrideModelDataURL(mode))
   }
 }
