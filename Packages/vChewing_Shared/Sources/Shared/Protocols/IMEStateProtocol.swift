@@ -24,6 +24,7 @@ public protocol IMEStateProtocol {
   var convertedToInputting: IMEStateProtocol { get }
   var isFilterable: Bool { get }
   var isMarkedLengthValid: Bool { get }
+  var markedTargetIsCurrentlyFiltered: Bool { get }
   var node: CandidateNode { get set }
   var displayTextSegments: [String] { get }
   var tooltipBackupForInputting: String { get set }
@@ -47,6 +48,7 @@ public protocol IMEStateDataProtocol {
   var highlightAtSegment: Int? { get set }
   var isFilterable: Bool { get }
   var isMarkedLengthValid: Bool { get }
+  var markedTargetIsCurrentlyFiltered: Bool { get }
   var candidates: [(keyArray: [String], value: String)] { get set }
   var displayedText: String { get set }
   var displayedTextConverted: String { get }

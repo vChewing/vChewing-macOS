@@ -153,6 +153,7 @@ public extension IMEState {
 
 public extension IMEState {
   var isFilterable: Bool { data.isFilterable }
+  var markedTargetIsCurrentlyFiltered: Bool { data.markedTargetIsCurrentlyFiltered }
   var isMarkedLengthValid: Bool { data.isMarkedLengthValid }
   var displayedText: String { data.displayedText }
   var displayedTextConverted: String { data.displayedTextConverted }
