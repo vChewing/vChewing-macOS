@@ -281,6 +281,14 @@ public class LMMgr {
     )
   }
 
+  public static func checkIfPhrasePairIsFiltered(
+    userPhrase: String,
+    mode: Shared.InputMode,
+    keyArray: [String]
+  ) -> Bool {
+    Self.getLM(mode: mode).isPairFiltered(pair: .init(keyArray: keyArray, value: userPhrase))
+  }
+
   public static func countPhrasePairs(
     keyArray: [String],
     mode: Shared.InputMode,
