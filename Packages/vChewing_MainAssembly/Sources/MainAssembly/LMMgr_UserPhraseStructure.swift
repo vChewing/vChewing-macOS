@@ -62,8 +62,7 @@ public extension LMMgr {
     }
 
     public var isAlreadyFiltered: Bool {
-      let results = LMMgr.getLM(mode: inputMode).queryFilteredValue(key: joinedKey) ?? []
-      return results.contains(value)
+      LMMgr.getLM(mode: inputMode).isPairFiltered(pair: .init(keyArray: keyArray, value: value))
     }
 
     public func write(toFilter: Bool) -> Bool {
