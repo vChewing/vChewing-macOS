@@ -22,7 +22,15 @@ public class LMMgr {
     dataURL: LMMgr.userOverrideModelDataURL(.imeModeCHT))
 
   public static var currentLM: vChewingLM.LMInstantiator {
-    switch IMEApp.currentInputMode {
+    Self.getLM(mode: IMEApp.currentInputMode)
+  }
+
+  public static var currentUOM: vChewingLM.LMUserOverride {
+    Self.getUOM(mode: IMEApp.currentInputMode)
+  }
+
+  public static func getLM(mode: Shared.InputMode) -> vChewingLM.LMInstantiator {
+    switch mode {
     case .imeModeCHS:
       return Self.lmCHS
     case .imeModeCHT:
@@ -32,8 +40,8 @@ public class LMMgr {
     }
   }
 
-  public static var currentUOM: vChewingLM.LMUserOverride {
-    switch IMEApp.currentInputMode {
+  public static func getUOM(mode: Shared.InputMode) -> vChewingLM.LMUserOverride {
+    switch mode {
     case .imeModeCHS:
       return Self.uomCHS
     case .imeModeCHT:

@@ -24,10 +24,22 @@ public extension LMMgr {
       LMMgr.checkIfPhrasePairExists(userPhrase: value, mode: inputMode, keyArray: keyArray)
     }
 
+    public var joinedKey: String {
+      keyArray.joined(separator: "-")
+    }
+
+    public var isValid: Bool {
+      !keyArray.isEmpty && keyArray.filter(\.isEmpty).isEmpty && !value.isEmpty
+    }
+
     public var description: String {
+      descriptionCells.joined(separator: " ")
+    }
+
+    public var descriptionCells: [String] {
       var result = [String]()
       result.append(value)
-      result.append(keyArray.joined(separator: "-"))
+      result.append(joinedKey)
       if let weight = weight {
         result.append(weight.description)
       }
@@ -37,7 +49,7 @@ public extension LMMgr {
       if isConverted {
         result.append("#𝙃𝙪𝙢𝙖𝙣𝘾𝙝𝙚𝙘𝙠𝙍𝙚𝙦𝙪𝙞𝙧𝙚𝙙")
       }
-      return result.joined(separator: " ")
+      return result
     }
 
     public var crossConverted: UserPhrase {
@@ -49,8 +61,13 @@ public extension LMMgr {
       return result
     }
 
+    public var isAlreadyFiltered: Bool {
+      let results = LMMgr.getLM(mode: inputMode).queryFilteredValue(key: joinedKey) ?? []
+      return results.contains(value)
+    }
+
     public func write(toFilter: Bool) -> Bool {
-      guard LMMgr.chkUserLMFilesExist(inputMode) else { return false }
+      guard isValid, LMMgr.chkUserLMFilesExist(inputMode) else { return false }
 
       /// 施工筆記：
       /// 有些使用者的語彙檔案已經過於龐大了（超過一千行），
