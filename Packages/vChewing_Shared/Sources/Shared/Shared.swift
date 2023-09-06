@@ -13,6 +13,7 @@ import SwiftExtension
 
 public enum TooltipColorState {
   case normal
+  case information
   case redAlert
   case warning
   case denialOverflow
