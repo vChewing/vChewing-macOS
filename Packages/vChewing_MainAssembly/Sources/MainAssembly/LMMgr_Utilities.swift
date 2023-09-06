@@ -282,7 +282,7 @@ public extension LMMgr {
     if PrefMgr.shared.phraseEditorAutoReloadExternalModifications {
       Broadcaster.shared.eventForReloadingPhraseEditor = .init()
     }
-    loadUserPhrasesData(type: .thePhrases)
+    loadUserPhrasesData(type: areWeFiltering ? .theFilter : .thePhrases)
   }
 
   // MARK: - 藉由語彙編輯器開啟使用者檔案
