@@ -238,9 +238,8 @@ public extension vChewingLM {
       return result.isEmpty ? nil : result
     }
 
-    public func queryFilteredValue(key: String) -> [String]? {
-      let result = lmFiltered.unigramsFor(key: key).map(\.value)
-      return result.isEmpty ? nil : result
+    public func isPairFiltered(pair: Megrez.KeyValuePaired) -> Bool {
+      lmFiltered.unigramsFor(key: pair.joinedKey()).map(\.value).contains(pair.value)
     }
 
     /// 插入臨時資料。
