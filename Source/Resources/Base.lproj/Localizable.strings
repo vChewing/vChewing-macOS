@@ -119,6 +119,7 @@
 "\"%@\" length must ≥ 2 for a user phrase." = "\"%@\" length must ≥ 2 for a user phrase.";
 "\"%@\" length should ≤ %d for a user phrase." = "\"%@\" length should ≤ %d for a user phrase.";
 "\"%@\" selected. ENTER to add user phrase." = "\"%@\" selected. ENTER to add user phrase.";
+"\"%@\" selected. ENTER to unfilter this phrase." = "\"%@\" selected. ENTER to unfilter this phrase.";
 "\"%@\" already exists:\n ENTER to boost, SHIFT+COMMAND+ENTER to nerf." = "\"%@\" already exists:\n ENTER to boost, SHIFT+COMMAND+ENTER to nerf.";
 "\"%@\" already exists:\n ENTER to boost, SHIFT+COMMAND+ENTER to nerf, \n BackSpace or Delete key to exclude." = "\"%@\" already exists:\n ENTER to boost, SHIFT+COMMAND+ENTER to nerf, \n BackSpace or Delete key to exclude.";
 "Edit Phrase Replacement Table…" = "Edit Phrase Replacement Table…";
