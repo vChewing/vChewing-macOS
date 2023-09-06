@@ -238,6 +238,11 @@ public extension vChewingLM {
       return result.isEmpty ? nil : result
     }
 
+    public func queryFilteredValue(key: String) -> [String]? {
+      let result = lmFiltered.unigramsFor(key: key).map(\.value)
+      return result.isEmpty ? nil : result
+    }
+
     /// 插入臨時資料。
     /// - Parameters:
     ///   - key: 索引鍵陣列。
