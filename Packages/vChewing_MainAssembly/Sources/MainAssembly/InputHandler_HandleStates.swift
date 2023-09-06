@@ -202,9 +202,14 @@ extension InputHandler {
         delegate.callError("9AAFAC00")
         return true
       }
+      let areWeUnfiltering = state.markedTargetIsCurrentlyFiltered
       if !delegate.performUserPhraseOperation(addToFilter: false) {
         delegate.callError("5B69CC8D")
         return true
+      }
+      if areWeUnfiltering {
+        tooltipMessage = "- Succeeded in unfiltering a phrase."
+        tooltipColorState = .succeeded
       }
       var newState = generateStateOfInputting()
       newState.tooltip = NSLocalizedString(tooltipMessage, comment: "")
