@@ -220,15 +220,22 @@ public class LMMgr {
       return
     }
     switch type {
-    case .thePhrases, .theFilter:
+    case .thePhrases:
       Self.lmCHT.loadUserPhrasesData(
         path: userDictDataURL(mode: .imeModeCHT, type: .thePhrases).path,
-        filterPath: userDictDataURL(mode: .imeModeCHT, type: .theFilter).path
+        filterPath: nil
       )
       Self.lmCHS.loadUserPhrasesData(
         path: userDictDataURL(mode: .imeModeCHS, type: .thePhrases).path,
-        filterPath: userDictDataURL(mode: .imeModeCHS, type: .theFilter).path
+        filterPath: nil
       )
+    case .theFilter:
+      DispatchQueue.main.async {
+        Self.reloadUserFilterDirectly(mode: IMEApp.currentInputMode)
+      }
+      DispatchQueue.main.async {
+        Self.reloadUserFilterDirectly(mode: IMEApp.currentInputMode.reversed)
+      }
     case .theReplacements:
       if PrefMgr.shared.phraseReplacementEnabled { Self.loadUserPhraseReplacement() }
     case .theAssociates:
@@ -268,6 +275,10 @@ public class LMMgr {
     Self.lmCHS.loadUserSCPCSequencesData(
       path: Self.userSCPCSequencesURL(.imeModeCHS).path
     )
+  }
+
+  public static func reloadUserFilterDirectly(mode: Shared.InputMode) {
+    Self.getLM(mode: mode).reloadUserFilterDirectly(path: userDictDataURL(mode: mode, type: .theFilter).path)
   }
 
   public static func checkIfPhrasePairExists(

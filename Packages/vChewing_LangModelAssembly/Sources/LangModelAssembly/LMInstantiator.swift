@@ -141,7 +141,7 @@ public extension vChewingLM {
 
     // 上述幾個函式不要加 Async，因為這些內容都被 LMMgr 負責用別的方法 Async 了、用 GCD 的多任務並行共結來完成。
 
-    public func loadUserPhrasesData(path: String, filterPath: String) {
+    public func loadUserPhrasesData(path: String, filterPath: String?) {
       DispatchQueue.main.async {
         if FileManager.default.isReadableFile(atPath: path) {
           self.lmUserPhrases.clear()
@@ -151,6 +151,7 @@ public extension vChewingLM {
           vCLog("lmUserPhrases: File access failure: \(path)")
         }
       }
+      guard let filterPath = filterPath else { return }
       DispatchQueue.main.async {
         if FileManager.default.isReadableFile(atPath: filterPath) {
           self.lmFiltered.clear()
@@ -159,6 +160,17 @@ public extension vChewingLM {
         } else {
           vCLog("lmFiltered: File access failure: \(path)")
         }
+      }
+    }
+
+    /// 這個函式不用 GCD。
+    public func reloadUserFilterDirectly(path: String) {
+      if FileManager.default.isReadableFile(atPath: path) {
+        lmFiltered.clear()
+        lmFiltered.open(path)
+        vCLog("lmFiltered: \(lmFiltered.count) entries of data loaded from: \(path)")
+      } else {
+        vCLog("lmFiltered: File access failure: \(path)")
       }
     }
 

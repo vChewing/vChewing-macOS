@@ -185,6 +185,7 @@ public extension LMMgr {
         fileHandle.seek(toFileOffset: currentWorkingOffset)
         fileHandle.write(blankData)
       }
+      LMMgr.reloadUserFilterDirectly(mode: inputMode)
       return true
     }
   }
