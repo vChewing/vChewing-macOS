@@ -85,6 +85,13 @@ public struct IMEStateData: IMEStateDataProtocol {
     )
   }
 
+  public var markedTargetIsCurrentlyFiltered: Bool {
+    let pair = userPhraseKVPair
+    return LMMgr.checkIfPhrasePairIsFiltered(
+      userPhrase: pair.value, mode: IMEApp.currentInputMode, keyArray: pair.keyArray
+    )
+  }
+
   public var displayTextSegments = [String]() {
     didSet {
       displayedText = displayTextSegments.joined()
@@ -264,6 +271,16 @@ public extension IMEStateData {
           )
         }
       }
+
+      if markedTargetIsCurrentlyFiltered {
+        tooltipColorState = .information
+        return String(
+          format: NSLocalizedString("\"%@\" selected. ENTER to unfilter this phrase.", comment: "") + "\n◆  "
+            + readingDisplay,
+          text
+        )
+      }
+
       tooltipColorState = .normal
       return String(
         format: NSLocalizedString("\"%@\" selected. ENTER to add user phrase.", comment: "") + "\n◆  "

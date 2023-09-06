@@ -119,6 +119,7 @@
 "\"%@\" length must ≥ 2 for a user phrase." = "「%@」字数不足以自订语汇。";
 "\"%@\" length should ≤ %d for a user phrase." = "「%@」字数超过 %d、无法自订。";
 "\"%@\" selected. ENTER to add user phrase." = "「%@」敲 Enter 添入自订语汇。";
+"\"%@\" selected. ENTER to unfilter this phrase." = "「%@」敲 Enter 将该语汇移出滤除清单。";
 "\"%@\" already exists:\n ENTER to boost, SHIFT+COMMAND+ENTER to nerf." = "「%@」已存在：\n　敲 Enter 以升权、敲 Shift+Command+Enter 以降权。";
 "\"%@\" already exists:\n ENTER to boost, SHIFT+COMMAND+ENTER to nerf, \n BackSpace or Delete key to exclude." = "「%@」已存在：\n　敲 Enter 以升权、敲 Shift+Command+Enter 以降权；\n　敲 BackSpace 或 Delete 以排除。";
 "Edit Phrase Replacement Table…" = "编辑语汇置换表…";
