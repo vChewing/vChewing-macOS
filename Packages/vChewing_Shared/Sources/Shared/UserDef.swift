@@ -438,7 +438,8 @@ public extension UserDef {
         userDef: self, shortTitle: "Auto-composite when the longest possible key is formed"
       )
     case .kShareAlphanumericalModeStatusAcrossClients: return .init(
-        userDef: self, shortTitle: "Share alphanumerical mode status across all clients"
+        userDef: self, shortTitle: "Share alphanumerical mode status across all clients",
+        description: "This only works when being toggled by Shift key and JIS Eisu key."
       )
     case .kPhraseEditorAutoReloadExternalModifications: return .init(
         userDef: self, shortTitle: "This editor only: Auto-reload modifications happened outside of this editor"

@@ -204,15 +204,17 @@ struct VwrPrefPaneBehavior: View {
               SessionCtl.theShiftKeyDetector.toggleWithRShift = togglingAlphanumericalModeWithRShift
             }
           )
-          Toggle(
-            LocalizedStringKey("Share alphanumerical mode status across all clients"),
-            isOn: $shareAlphanumericalModeStatusAcrossClients
-          ).disabled(
-            !togglingAlphanumericalModeWithRShift && !togglingAlphanumericalModeWithLShift
-          )
           Text(
             "This feature requires macOS 10.15 and above.".localized + CtlPrefUIShared.sentenceSeparator
               + "This feature only needs to parse consecutive NSEvents passed by macOS built-in InputMethodKit framework, hence no necessity of asking end-users for extra privileges of monitoring global keyboard inputs. You are free to investigate our codebase or reverse-engineer this input method to see whether the above statement is trustable.".localized
+          )
+          .preferenceDescription(maxWidth: CtlPrefUIShared.maxDescriptionWidth)
+          Toggle(
+            LocalizedStringKey("Share alphanumerical mode status across all clients"),
+            isOn: $shareAlphanumericalModeStatusAcrossClients
+          ).controlSize(.small)
+          Text(
+            "This only works when being toggled by Shift key and JIS Eisu key.".localized
           )
           .preferenceDescription(maxWidth: CtlPrefUIShared.maxDescriptionWidth)
         }
