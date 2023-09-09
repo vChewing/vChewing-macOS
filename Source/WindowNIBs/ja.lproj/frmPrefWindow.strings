@@ -78,6 +78,7 @@
 "jQC-12-UuK.ibShadowedObjectValues[0]" = "Item 1";
 "jQC-12-UuK.ibShadowedObjectValues[1]" = "Item 2";
 "jQC-12-UuK.ibShadowedObjectValues[2]" = "Item 3";
+"K8U-Oq-lFc.title" = "全ての客体アプリに英数入力モードの状態を共有";
 "lblAcceptLeadingIntonations.title" = "まれな場合には、音調記号の優先入力を許容する";
 "lblAlwaysShowTooltipTextsHorizontally.title" = "ヒントを常に横書きにする";
 "lblDevZoneTitleDescription.title" = "警告：これからの新機能テストのために作ったページですから、\nここで陳列されている諸機能は予想通り動けるだと思わないでください。";

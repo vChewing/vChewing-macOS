@@ -78,6 +78,7 @@
 "jQC-12-UuK.ibShadowedObjectValues[0]" = "Item 1";
 "jQC-12-UuK.ibShadowedObjectValues[1]" = "Item 2";
 "jQC-12-UuK.ibShadowedObjectValues[2]" = "Item 3";
+"K8U-Oq-lFc.title" = "对所有客体应用共用中英文输入切换状态";
 "lblAcceptLeadingIntonations.title" = "在个别情况下，允许声调前置键入";
 "lblAlwaysShowTooltipTextsHorizontally.title" = "始终使用横排来显示工具提示视窗";
 "lblDevZoneTitleDescription.title" = "警告：该页面仅作未来功能测试所用。\n在此列出的功能并非处于完全可用之状态。";
