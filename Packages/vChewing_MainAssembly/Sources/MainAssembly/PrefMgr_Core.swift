@@ -12,7 +12,7 @@ import SwiftExtension
 
 // MARK: -
 
-@objcMembers public class PrefMgr: PrefMgrProtocol {
+@objcMembers public class PrefMgr: NSObject, PrefMgrProtocol {
   public static let shared = PrefMgr()
   public static let kDefaultCandidateKeys = "123456"
   public static let kDefaultBasicKeyboardLayout = "com.apple.keylayout.ZhuyinBopomofo"
