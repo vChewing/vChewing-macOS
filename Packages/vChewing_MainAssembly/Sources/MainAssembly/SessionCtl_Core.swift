@@ -115,7 +115,11 @@ public class SessionCtl: IMKInputController {
   }
 
   /// 輸入調度模組的副本。
-  var inputHandler: InputHandlerProtocol?
+  public internal(set) var inputHandler: InputHandlerProtocol?
+
+  /// 最近一個被 set 的 marked text。
+  public internal(set) var recentMarkedText: (text: NSAttributedString?, selectionRange: NSRange?) = (nil, nil)
+
   /// 用以記錄當前輸入法狀態的變數。
   public var state: IMEStateProtocol = IMEState.ofEmpty() {
     didSet {
