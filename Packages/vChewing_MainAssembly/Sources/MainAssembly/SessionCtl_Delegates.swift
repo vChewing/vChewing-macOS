@@ -115,7 +115,6 @@ extension SessionCtl: CtlCandidateDelegate {
     {
       return blankResult
     }
-    if !PrefMgr.shared.showReverseLookupInCandidateUI { return blankResult }
     if isVerticalTyping { return blankResult } // 縱排輸入的場合，選字窗沒有足夠的空間顯示反查結果。
     if value.isEmpty { return blankResult } // 空字串沒有需要反查的東西。
     if value.contains("_") { return blankResult }
