@@ -162,17 +162,22 @@ public extension SessionCtl {
   ///   警告：replacementRange 不要亂填，否則會在 Microsoft Office 等軟體內出現故障。
   ///   該功能是給某些想設計「重新組字」功能的輸入法設計的，但一字多音的漢語在注音/拼音輸入這方面不適用這個輸入法特性。
   func doSetMarkedText(_ string: NSAttributedString) {
+    // 威注音用不到 replacementRange，所以不用檢查 replacementRange 的異動情況。
+    let range = attributedStringSecured.range
+    guard !(string.isEqual(to: recentMarkedText.text) && recentMarkedText.selectionRange == range) else { return }
+    recentMarkedText.text = string
+    recentMarkedText.selectionRange = range
     if isServingIMEItself || !isActivated {
       DispatchQueue.main.async {
         guard let client = self.client() else { return }
         client.setMarkedText(
-          string, selectionRange: self.selectionRange(), replacementRange: self.replacementRange()
+          string, selectionRange: range, replacementRange: self.replacementRange()
         )
       }
     } else {
       guard let client = client() else { return }
       client.setMarkedText(
-        string, selectionRange: selectionRange(), replacementRange: replacementRange()
+        string, selectionRange: range, replacementRange: replacementRange()
       )
     }
   }
