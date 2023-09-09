@@ -339,6 +339,7 @@
 "This feature only needs to parse consecutive NSEvents passed by macOS built-in InputMethodKit framework, hence no necessity of asking end-users for extra privileges of monitoring global keyboard inputs. You are free to investigate our codebase or reverse-engineer this input method to see whether the above statement is trustable." = "この機能の利用する NSEvent は、macOS 内蔵の入力アプリ共用モジュール「InputMethodKit」から提供した NSEvent のみであり、その NSEvent 文脈関係で「Shift キーは１回押したかどうか」と判断することはできる。この事実に疑いを持つ者は、本アプリのソースコードを審査するか、あるいは本アプリを逆向工程（分解工学, いわゆる「Reverse-Engineering」）するがよい。";
 "This feature requires macOS 10.15 and above." = "この機能の稼働には macOS 10.15 以降のシステムが必要である。";
 "This feature requires macOS 12 and above." = "この機能の稼働には macOS 12 以降のシステムが必要である。";
+"This only works when being toggled by Shift key and JIS Eisu key." = "Shift キーとJIS 英数キーだけでの英数入力モード状態切替の話。";
 "This only works with Tadokoro candidate window." = "これは田所候補陳列ウィンドウだけに効ける機能である。";
 "This will also affect the row / column capacity of the candidate window." = "言選り用キーの数は、候補陳列の行・列の容量制限にも影響。";
 "This will batch-replace specified candidates." = "指定された候補そのものを置き換える";
