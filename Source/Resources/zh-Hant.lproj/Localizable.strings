@@ -314,7 +314,7 @@
 "Secondary Pinyin with Numeral Intonation" = "國音二式+數字標調";
 "Seigyou" = "精業排列";
 "Selection Keys:" = "選字鍵:";
-"Share alphanumerical mode status across all clients" = "對所有客體應用共用 Shift 中英文輸入切換狀態";
+"Share alphanumerical mode status across all clients" = "對所有客體應用共用中英文輸入切換狀態";
 "Shift+BackSpace:" = "Shift+退格鍵:";
 "Shift+Letter:" = "Shift+字母鍵:";
 "Show available reverse-lookup results in candidate window" = "在選字窗內顯示可用的字根反查結果";
@@ -338,6 +338,7 @@
 "This feature only needs to parse consecutive NSEvents passed by macOS built-in InputMethodKit framework, hence no necessity of asking end-users for extra privileges of monitoring global keyboard inputs. You are free to investigate our codebase or reverse-engineer this input method to see whether the above statement is trustable." = "該功能只需要對藉由 macOS 內建的輸入法框架傳來的 NSEvent 做上下文分析，自然沒有「向使用者尋求系統全局鍵盤事件監聽權限」之必要。您可自行審視敝輸入法的原始程式碼倉庫、或對敝輸入法逆向工程，以自行證實此處所言之真假。";
 "This feature requires macOS 10.15 and above." = "該功能要求系統版本至少 macOS 10.15。";
 "This feature requires macOS 12 and above." = "該功能要求系統版本至少 macOS 12。";
+"This only works when being toggled by Shift key and JIS Eisu key." = "僅用於以 Shift 鍵或 JIS 英數鍵切換中英文輸入模式的場合。";
 "This only works with Tadokoro candidate window." = "該選項僅對田所選字窗起作用。";
 "This will also affect the row / column capacity of the candidate window." = "該選項也會影響到選字窗每行/每列最多顯示的候選字數量。";
 "This will batch-replace specified candidates." = "這將會對指定的候選字詞進行整詞取代。";
