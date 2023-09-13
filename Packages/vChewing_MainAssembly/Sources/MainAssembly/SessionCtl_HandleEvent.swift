@@ -101,9 +101,6 @@ public extension SessionCtl {
 
     // MARK: 針對客體的具體處理
 
-    // 不再讓威注音處理由 Shift 切換到的英文模式的按鍵輸入。
-    if isASCIIMode, !Self.isCapsLocked { return false }
-
     /// 這裡仍舊需要判斷 flags。之前使輸入法狀態卡住無法敲漢字的問題已在 InputHandler 內修復。
     /// 這裡不判斷 flags 的話，用方向鍵前後定位光標之後，再次試圖觸發組字區時、反而會在首次按鍵時失敗。
     /// 同時注意：必須針對 event.type == .flagsChanged 提前返回結果，

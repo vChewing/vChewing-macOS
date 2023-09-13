@@ -1032,6 +1032,9 @@ extension InputHandler {
       return false
     }
 
+    // 不再讓威注音處理由 Shift 切換到的英文模式的按鍵輸入。
+    if delegate.isASCIIMode, !input.isCapsLockOn { return false }
+
     /// 如果是 ASCII 當中的不可列印的字元的話，
     /// 不使用「insertText:replacementRange:」。
     /// 某些應用無法正常處理非 ASCII 字符的輸入。
