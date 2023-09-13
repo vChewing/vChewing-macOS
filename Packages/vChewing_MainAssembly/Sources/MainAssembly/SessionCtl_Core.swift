@@ -322,10 +322,6 @@ public extension SessionCtl {
       Self.theShiftKeyDetector.toggleWithLShift = PrefMgr.shared.togglingAlphanumericalModeWithLShift
       Self.theShiftKeyDetector.toggleWithRShift = PrefMgr.shared.togglingAlphanumericalModeWithRShift
 
-      if #available(macOS 10.15, *) {
-        if isASCIIMode, !Self.theShiftKeyDetector.enabled { isASCIIMode = false }
-      }
-
       DispatchQueue.main.async {
         AppDelegate.shared.checkUpdate(forced: false)
         AppDelegate.shared.checkMemoryUsage()
