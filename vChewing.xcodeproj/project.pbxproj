@@ -15,7 +15,6 @@
 		5B0EF55D28CDBF7100F8F7CE /* frmClientListMgr.xib in Resources */ = {isa = PBXBuildFile; fileRef = 5B0EF55C28CDBF7100F8F7CE /* frmClientListMgr.xib */; };
 		5B0EF55F28CDBF8E00F8F7CE /* CtlClientListMgr.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B0EF55E28CDBF8E00F8F7CE /* CtlClientListMgr.swift */; };
 		5B1C98B929436CEE0019B807 /* data-bpmf-reverse-lookup.json in Resources */ = {isa = PBXBuildFile; fileRef = 5B1C98B729436CED0019B807 /* data-bpmf-reverse-lookup.json */; };
-		5B1C98BB29436CF60019B807 /* data-bpmf-reverse-lookup.json in Resources */ = {isa = PBXBuildFile; fileRef = 5B1C98B729436CED0019B807 /* data-bpmf-reverse-lookup.json */; };
 		5B253E7E2945AF6700680C67 /* data-bpmf-reverse-lookup-CNS1.json in Resources */ = {isa = PBXBuildFile; fileRef = 5B253E782945AF6700680C67 /* data-bpmf-reverse-lookup-CNS1.json */; };
 		5B253E7F2945AF6700680C67 /* data-bpmf-reverse-lookup-CNS3.json in Resources */ = {isa = PBXBuildFile; fileRef = 5B253E792945AF6700680C67 /* data-bpmf-reverse-lookup-CNS3.json */; };
 		5B253E802945AF6700680C67 /* data-bpmf-reverse-lookup-CNS2.json in Resources */ = {isa = PBXBuildFile; fileRef = 5B253E7A2945AF6700680C67 /* data-bpmf-reverse-lookup-CNS2.json */; };
@@ -63,12 +62,6 @@
 		5BBC2DA328F5212100C986F6 /* RelocationDetector.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5BBC2DA228F5212100C986F6 /* RelocationDetector.swift */; };
 		5BBC2DA528F521C200C986F6 /* AppDelegate_Extension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5BBC2DA428F521C200C986F6 /* AppDelegate_Extension.swift */; };
 		5BC2652227E04B7E00700291 /* uninstall.sh in Resources */ = {isa = PBXBuildFile; fileRef = 5BC2652127E04B7B00700291 /* uninstall.sh */; };
-		5BC4479D2865686500EDC323 /* data-chs.json in Resources */ = {isa = PBXBuildFile; fileRef = 5BEDB71C283B4AEA0078EB25 /* data-chs.json */; };
-		5BC4479E2865686500EDC323 /* data-cht.json in Resources */ = {isa = PBXBuildFile; fileRef = 5BEDB720283B4AEA0078EB25 /* data-cht.json */; };
-		5BC4479F2865686500EDC323 /* data-cns.json in Resources */ = {isa = PBXBuildFile; fileRef = 5BEDB71D283B4AEA0078EB25 /* data-cns.json */; };
-		5BC447A02865686500EDC323 /* data-symbols.json in Resources */ = {isa = PBXBuildFile; fileRef = 5BEDB71E283B4AEA0078EB25 /* data-symbols.json */; };
-		5BC447A12865686500EDC323 /* data-zhuyinwen.json in Resources */ = {isa = PBXBuildFile; fileRef = 5BEDB71F283B4AEA0078EB25 /* data-zhuyinwen.json */; };
-		5BC447A628656A1900EDC323 /* Placeholder.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5BC447A228656A1900EDC323 /* Placeholder.swift */; };
 		5BC5E01E28DDE4770094E427 /* NotifierUI in Frameworks */ = {isa = PBXBuildFile; productRef = 5BC5E01D28DDE4770094E427 /* NotifierUI */; };
 		5BC5E02128DDEFE00094E427 /* TooltipUI in Frameworks */ = {isa = PBXBuildFile; productRef = 5BC5E02028DDEFE00094E427 /* TooltipUI */; };
 		5BC5E02428DE07860094E427 /* PopupCompositionBuffer in Frameworks */ = {isa = PBXBuildFile; productRef = 5BC5E02328DE07860094E427 /* PopupCompositionBuffer */; };
@@ -122,13 +115,6 @@
 			proxyType = 1;
 			remoteGlobalIDString = 5B0E229E28FC11B900EB7ACA;
 			remoteInfo = Preferences;
-		};
-		5B2F2BB7286216A500B8557B /* PBXContainerItemProxy */ = {
-			isa = PBXContainerItemProxy;
-			containerPortal = 6A0D4E9415FC0CFA00ABF4B3 /* Project object */;
-			proxyType = 1;
-			remoteGlobalIDString = 6A0D4EA115FC0D2D00ABF4B3;
-			remoteInfo = vChewing;
 		};
 		6ACA420015FC1DCC00935EF6 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
@@ -198,7 +184,6 @@
 		5B253E7D2945AF6700680C67 /* data-bpmf-reverse-lookup-CNS5.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; name = "data-bpmf-reverse-lookup-CNS5.json"; path = "Data/data-bpmf-reverse-lookup-CNS5.json"; sourceTree = "<group>"; };
 		5B2DB17127AF8771006D874E /* Makefile */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.make; name = Makefile; path = Data/Makefile; sourceTree = "<group>"; };
 		5B2E009328FD1E8100E78D6E /* VwrPrefPaneCassette.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = VwrPrefPaneCassette.swift; sourceTree = "<group>"; };
-		5B2F2BB3286216A500B8557B /* vChewingTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = vChewingTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		5B30BF272944867800BD87A9 /* CtlRevLookupWindow.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CtlRevLookupWindow.swift; sourceTree = "<group>"; };
 		5B30F11227BA568800484E24 /* vChewingKeyLayout.bundle */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.plug-in"; path = vChewingKeyLayout.bundle; sourceTree = "<group>"; };
 		5B312684287800DE001AA720 /* FAQ.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = FAQ.md; sourceTree = "<group>"; };
@@ -301,13 +286,6 @@
 
 /* Begin PBXFrameworksBuildPhase section */
 		5B0E229C28FC11B900EB7ACA /* Frameworks */ = {
-			isa = PBXFrameworksBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
-		5B2F2BB0286216A500B8557B /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
@@ -604,7 +582,6 @@
 			children = (
 				6A0D4EA215FC0D2D00ABF4B3 /* vChewing.app */,
 				6ACA41CB15FC1D7500935EF6 /* vChewingInstaller.app */,
-				5B2F2BB3286216A500B8557B /* vChewingTests.xctest */,
 				5B0E229F28FC11B900EB7ACA /* Preferences.prefPane */,
 			);
 			name = Products;
@@ -695,24 +672,6 @@
 			productReference = 5B0E229F28FC11B900EB7ACA /* Preferences.prefPane */;
 			productType = "com.apple.product-type.bundle";
 		};
-		5B2F2BB2286216A500B8557B /* vChewingTests */ = {
-			isa = PBXNativeTarget;
-			buildConfigurationList = 5B2F2BBB286216A500B8557B /* Build configuration list for PBXNativeTarget "vChewingTests" */;
-			buildPhases = (
-				5B2F2BAF286216A500B8557B /* Sources */,
-				5B2F2BB0286216A500B8557B /* Frameworks */,
-				5B2F2BB1286216A500B8557B /* Resources */,
-			);
-			buildRules = (
-			);
-			dependencies = (
-				5B2F2BB8286216A500B8557B /* PBXTargetDependency */,
-			);
-			name = vChewingTests;
-			productName = vChewingTests;
-			productReference = 5B2F2BB3286216A500B8557B /* vChewingTests.xctest */;
-			productType = "com.apple.product-type.bundle.unit-test";
-		};
 		6A0D4EA115FC0D2D00ABF4B3 /* vChewing */ = {
 			isa = PBXNativeTarget;
 			buildConfigurationList = 6A0D4EC015FC0D2E00ABF4B3 /* Build configuration list for PBXNativeTarget "vChewing" */;
@@ -797,10 +756,6 @@
 						CreatedOnToolsVersion = 14.0;
 						LastSwiftMigration = 1400;
 					};
-					5B2F2BB2286216A500B8557B = {
-						CreatedOnToolsVersion = 13.4.1;
-						TestTargetID = 6A0D4EA115FC0D2D00ABF4B3;
-					};
 					6A0D4EA115FC0D2D00ABF4B3 = {
 						LastSwiftMigration = 1400;
 						ProvisioningStyle = Automatic;
@@ -831,7 +786,6 @@
 			targets = (
 				6A0D4EA115FC0D2D00ABF4B3 /* vChewing */,
 				6ACA41CA15FC1D7500935EF6 /* vChewingInstaller */,
-				5B2F2BB2286216A500B8557B /* vChewingTests */,
 				5B0E229E28FC11B900EB7ACA /* Preferences */,
 			);
 		};
@@ -844,19 +798,6 @@
 			files = (
 				5B0E22A928FC11B900EB7ACA /* Preferences.xib in Resources */,
 				5B0E22A628FC11B900EB7ACA /* Preferences.tiff in Resources */,
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
-		5B2F2BB1286216A500B8557B /* Resources */ = {
-			isa = PBXResourcesBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-				5BC4479D2865686500EDC323 /* data-chs.json in Resources */,
-				5BC4479E2865686500EDC323 /* data-cht.json in Resources */,
-				5B1C98BB29436CF60019B807 /* data-bpmf-reverse-lookup.json in Resources */,
-				5BC4479F2865686500EDC323 /* data-cns.json in Resources */,
-				5BC447A02865686500EDC323 /* data-symbols.json in Resources */,
-				5BC447A12865686500EDC323 /* data-zhuyinwen.json in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1019,14 +960,6 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
-		5B2F2BAF286216A500B8557B /* Sources */ = {
-			isa = PBXSourcesBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-				5BC447A628656A1900EDC323 /* Placeholder.swift in Sources */,
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
 		6A0D4E9E15FC0D2D00ABF4B3 /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
@@ -1071,11 +1004,6 @@
 			isa = PBXTargetDependency;
 			target = 5B0E229E28FC11B900EB7ACA /* Preferences */;
 			targetProxy = 5B0E22AE28FC16AA00EB7ACA /* PBXContainerItemProxy */;
-		};
-		5B2F2BB8286216A500B8557B /* PBXTargetDependency */ = {
-			isa = PBXTargetDependency;
-			target = 6A0D4EA115FC0D2D00ABF4B3 /* vChewing */;
-			targetProxy = 5B2F2BB7286216A500B8557B /* PBXContainerItemProxy */;
 		};
 		6ACA420115FC1DCC00935EF6 /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
@@ -1214,7 +1142,6 @@
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
 				CURRENT_PROJECT_VERSION = 3504;
-				DEBUG_INFORMATION_FORMAT = dwarf;
 				GCC_C_LANGUAGE_STANDARD = gnu11;
 				GCC_DYNAMIC_NO_PIC = NO;
 				GCC_OPTIMIZATION_LEVEL = 0;
@@ -1269,7 +1196,6 @@
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
 				CURRENT_PROJECT_VERSION = 3504;
-				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
 				ENABLE_NS_ASSERTIONS = NO;
 				GCC_C_LANGUAGE_STANDARD = gnu11;
 				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
@@ -1301,92 +1227,6 @@
 			};
 			name = Release;
 		};
-		5B2F2BB9286216A500B8557B /* Debug */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				ALWAYS_SEARCH_USER_PATHS = NO;
-				BUNDLE_LOADER = "$(TEST_HOST)";
-				CLANG_ANALYZER_NONNULL = YES;
-				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
-				CLANG_CXX_LANGUAGE_STANDARD = "gnu++17";
-				CLANG_ENABLE_OBJC_ARC = YES;
-				CLANG_ENABLE_OBJC_WEAK = YES;
-				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
-				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
-				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
-				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
-				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 3504;
-				GCC_C_LANGUAGE_STANDARD = gnu11;
-				GCC_DYNAMIC_NO_PIC = NO;
-				GCC_PREPROCESSOR_DEFINITIONS = (
-					"DEBUG=1",
-					"$(inherited)",
-				);
-				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
-				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
-				GENERATE_INFOPLIST_FILE = YES;
-				LD_RUNPATH_SEARCH_PATHS = (
-					"$(inherited)",
-					"$(LD_RUNPATH_SEARCH_PATHS_SHALLOW_BUNDLE_$(SHALLOW_BUNDLE))",
-					/usr/lib/swift,
-				);
-				MACOSX_DEPLOYMENT_TARGET = 10.13.4;
-				MARKETING_VERSION = 3.5.4;
-				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
-				MTL_FAST_MATH = YES;
-				PRODUCT_BUNDLE_IDENTIFIER = org.atelierInmu.vChewingTests;
-				PRODUCT_NAME = "$(TARGET_NAME)";
-				SDKROOT = macosx;
-				SWIFT_ACTIVE_COMPILATION_CONDITIONS = DEBUG;
-				SWIFT_EMIT_LOC_STRINGS = NO;
-				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
-				SWIFT_VERSION = 5.0;
-				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/vChewing.app/Contents/MacOS/vChewing";
-			};
-			name = Debug;
-		};
-		5B2F2BBA286216A500B8557B /* Release */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				ALWAYS_SEARCH_USER_PATHS = NO;
-				BUNDLE_LOADER = "$(TEST_HOST)";
-				CLANG_ANALYZER_NONNULL = YES;
-				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
-				CLANG_CXX_LANGUAGE_STANDARD = "gnu++17";
-				CLANG_ENABLE_OBJC_ARC = YES;
-				CLANG_ENABLE_OBJC_WEAK = YES;
-				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
-				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
-				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
-				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
-				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 3504;
-				ENABLE_NS_ASSERTIONS = NO;
-				GCC_C_LANGUAGE_STANDARD = gnu11;
-				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
-				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
-				GENERATE_INFOPLIST_FILE = YES;
-				LD_RUNPATH_SEARCH_PATHS = (
-					"$(inherited)",
-					"$(LD_RUNPATH_SEARCH_PATHS_SHALLOW_BUNDLE_$(SHALLOW_BUNDLE))",
-					/usr/lib/swift,
-				);
-				MACOSX_DEPLOYMENT_TARGET = 10.13.4;
-				MARKETING_VERSION = 3.5.4;
-				MTL_ENABLE_DEBUG_INFO = NO;
-				MTL_FAST_MATH = YES;
-				PRODUCT_BUNDLE_IDENTIFIER = org.atelierInmu.vChewingTests;
-				PRODUCT_NAME = "$(TARGET_NAME)";
-				SDKROOT = macosx;
-				SWIFT_COMPILATION_MODE = wholemodule;
-				SWIFT_EMIT_LOC_STRINGS = NO;
-				SWIFT_OPTIMIZATION_LEVEL = "-O";
-				SWIFT_VERSION = 5.0;
-				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/vChewing.app/Contents/MacOS/vChewing";
-			};
-			name = Release;
-		};
 		6A0D4E9915FC0CFA00ABF4B3 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
@@ -1411,6 +1251,7 @@
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
 				COPY_PHASE_STRIP = NO;
 				DEAD_CODE_STRIPPING = YES;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
 				ENABLE_TESTABILITY = YES;
 				GCC_NO_COMMON_BLOCKS = YES;
@@ -1455,6 +1296,7 @@
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
 				COPY_PHASE_STRIP = NO;
 				DEAD_CODE_STRIPPING = YES;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
 				GCC_NO_COMMON_BLOCKS = YES;
 				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
@@ -1689,15 +1531,6 @@
 			buildConfigurations = (
 				5B0E22AB28FC11B900EB7ACA /* Debug */,
 				5B0E22AC28FC11B900EB7ACA /* Release */,
-			);
-			defaultConfigurationIsVisible = 0;
-			defaultConfigurationName = Release;
-		};
-		5B2F2BBB286216A500B8557B /* Build configuration list for PBXNativeTarget "vChewingTests" */ = {
-			isa = XCConfigurationList;
-			buildConfigurations = (
-				5B2F2BB9286216A500B8557B /* Debug */,
-				5B2F2BBA286216A500B8557B /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
