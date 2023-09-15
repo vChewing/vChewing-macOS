@@ -88,7 +88,6 @@ public extension SessionCtl {
               ? "Caps Lock " + "Alphanumerical Input Mode".localized + "\n" + status
               : "Chinese Input Mode".localized + "\n" + status
           )
-          self.isASCIIMode = isCapsLockTurnedOn
         }
       }
     }
