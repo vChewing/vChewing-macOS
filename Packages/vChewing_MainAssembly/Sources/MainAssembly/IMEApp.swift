@@ -7,6 +7,7 @@
 // requirements defined in MIT License.
 
 import AppKit
+import Carbon
 import Shared
 
 // MARK: - Top-level Enums relating to Input Mode and Language Supports.
@@ -56,6 +57,11 @@ public enum IMEApp {
 
   public static var currentInputMode: Shared.InputMode {
     .init(rawValue: PrefMgr.shared.mostRecentInputMode) ?? .imeModeNULL
+  }
+
+  /// 當前鍵盤是否是 JIS 佈局
+  public static var isKeyboardJIS: Bool {
+    KBGetLayoutType(Int16(LMGetKbdType())) == kKeyboardJIS
   }
 
   /// Fart or Beep?
