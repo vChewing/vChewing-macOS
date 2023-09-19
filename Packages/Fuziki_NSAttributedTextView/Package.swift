@@ -22,5 +22,9 @@ let package = Package(
         .product(name: "CocoaExtension", package: "vChewing_CocoaExtension"),
       ]
     ),
+    .testTarget(
+      name: "NSAttributedTextViewTests",
+      dependencies: ["NSAttributedTextView"]
+    ),
   ]
 )

@@ -72,6 +72,18 @@ public class NSAttributedTextView: NSView {
     }
   }
 
+  public init() {
+    super.init(frame: .zero)
+    #if compiler(>=5.9) && canImport(AppKit, _version: "14.0")
+      clipsToBounds = true // 得手動聲明該特性，否則該 View 的尺寸會失控。
+    #endif
+  }
+
+  @available(*, unavailable)
+  required init?(coder _: NSCoder) {
+    fatalError("init(coder:) has not been implemented")
+  }
+
   public func attributedStringValue(areaCalculation: Bool = false) -> NSAttributedString {
     var newAttributes = attributes
     let isVertical: Bool = !(direction == .horizontal)
@@ -131,8 +143,7 @@ public class NSAttributedTextView: NSView {
   }
 
   override public func draw(_ rect: CGRect) {
-    let context = NSGraphicsContext.current?.cgContext
-    guard let context = context else { return }
+    guard let currentNSGraphicsContext = NSGraphicsContext.current else { return }
     let setter = CTFramesetterCreateWithAttributedString(attributedStringValue())
     let path = CGPath(rect: rect, transform: nil)
     let theCTFrameProgression: CTFrameProgression = {
@@ -152,7 +163,16 @@ public class NSAttributedTextView: NSView {
     let bgPath: NSBezierPath = .init(roundedRect: rect, xRadius: 0, yRadius: 0)
     bgPath.fill()
     currentRect = rect
-    CTFrameDraw(newFrame, context)
+    if #unavailable(macOS 10.10) {
+      // 由於 NSGraphicsContext.current?.cgContext 僅對 macOS 10.10 Yosemite 開始的系統開放，
+      // 所以這裡必須直接從記憶體位置拿取原始資料來處理。
+      let contextPtr: Unmanaged<CGContext>? = Unmanaged.fromOpaque(currentNSGraphicsContext.graphicsPort)
+      let theContext: CGContext? = contextPtr?.takeUnretainedValue()
+      guard let theContext = theContext else { return }
+      CTFrameDraw(newFrame, theContext)
+    } else {
+      CTFrameDraw(newFrame, currentNSGraphicsContext.cgContext)
+    }
   }
 }
 
