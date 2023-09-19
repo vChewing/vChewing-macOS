@@ -72,6 +72,16 @@ public class NSAttributedTextView: NSView {
     }
   }
 
+  public init() {
+    super.init(frame: .zero)
+    clipsToBounds = true // 得手動聲明該特性，否則該 View 的尺寸會失控。
+  }
+
+  @available(*, unavailable)
+  required init?(coder _: NSCoder) {
+    fatalError("init(coder:) has not been implemented")
+  }
+
   public func attributedStringValue(areaCalculation: Bool = false) -> NSAttributedString {
     var newAttributes = attributes
     let isVertical: Bool = !(direction == .horizontal)
