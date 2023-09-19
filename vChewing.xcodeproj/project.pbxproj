@@ -11,7 +11,6 @@
 		5B0E22A628FC11B900EB7ACA /* Preferences.tiff in Resources */ = {isa = PBXBuildFile; fileRef = 5B0E22A528FC11B900EB7ACA /* Preferences.tiff */; };
 		5B0E22A928FC11B900EB7ACA /* Preferences.xib in Resources */ = {isa = PBXBuildFile; fileRef = 5B0E22A728FC11B900EB7ACA /* Preferences.xib */; };
 		5B0E22B028FC17CB00EB7ACA /* Preferences.prefPane in Resources */ = {isa = PBXBuildFile; fileRef = 5B0E229F28FC11B900EB7ACA /* Preferences.prefPane */; };
-		5B0E22B228FC318C00EB7ACA /* Preferences.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B0E22B128FC318C00EB7ACA /* Preferences.swift */; };
 		5B0EF55D28CDBF7100F8F7CE /* frmClientListMgr.xib in Resources */ = {isa = PBXBuildFile; fileRef = 5B0EF55C28CDBF7100F8F7CE /* frmClientListMgr.xib */; };
 		5B0EF55F28CDBF8E00F8F7CE /* CtlClientListMgr.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B0EF55E28CDBF8E00F8F7CE /* CtlClientListMgr.swift */; };
 		5B1C98B929436CEE0019B807 /* data-bpmf-reverse-lookup.json in Resources */ = {isa = PBXBuildFile; fileRef = 5B1C98B729436CED0019B807 /* data-bpmf-reverse-lookup.json */; };
@@ -34,6 +33,8 @@
 		5B70F4EA2A0BE900005EA8C4 /* MenuIcon-SCVIM.png in Resources */ = {isa = PBXBuildFile; fileRef = 5B70F4E62A0BE900005EA8C4 /* MenuIcon-SCVIM.png */; };
 		5B70F4EB2A0BE900005EA8C4 /* MenuIcon-SCVIM@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 5B70F4E72A0BE900005EA8C4 /* MenuIcon-SCVIM@2x.png */; };
 		5B70F4EC2A0BE900005EA8C4 /* MenuIcon-TCVIM@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 5B70F4E82A0BE900005EA8C4 /* MenuIcon-TCVIM@2x.png */; };
+		5B72D55C2AB98B8300FB88CE /* Preferences.h in Headers */ = {isa = PBXBuildFile; fileRef = 5B72D55A2AB98B8300FB88CE /* Preferences.h */; };
+		5B72D55D2AB98B8300FB88CE /* Preferences.m in Sources */ = {isa = PBXBuildFile; fileRef = 5B72D55B2AB98B8300FB88CE /* Preferences.m */; };
 		5B765F09293A253C00122315 /* PhraseEditorUI in Frameworks */ = {isa = PBXBuildFile; productRef = 5B765F08293A253C00122315 /* PhraseEditorUI */; };
 		5B78EE0D28A562B4009456C1 /* VwrPrefPaneDevZone.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B78EE0C28A562B4009456C1 /* VwrPrefPaneDevZone.swift */; };
 		5B7BC4B027AFFBE800F66C24 /* frmPrefWindow.xib in Resources */ = {isa = PBXBuildFile; fileRef = 5B7BC4AE27AFFBE800F66C24 /* frmPrefWindow.xib */; };
@@ -165,7 +166,6 @@
 		5B0E22A528FC11B900EB7ACA /* Preferences.tiff */ = {isa = PBXFileReference; lastKnownFileType = image.tiff; path = Preferences.tiff; sourceTree = "<group>"; };
 		5B0E22A828FC11B900EB7ACA /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = Base; path = Base.lproj/Preferences.xib; sourceTree = "<group>"; };
 		5B0E22AA28FC11B900EB7ACA /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
-		5B0E22B128FC318C00EB7ACA /* Preferences.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Preferences.swift; sourceTree = "<group>"; };
 		5B0EF55C28CDBF7100F8F7CE /* frmClientListMgr.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = frmClientListMgr.xib; sourceTree = "<group>"; };
 		5B0EF55E28CDBF8E00F8F7CE /* CtlClientListMgr.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CtlClientListMgr.swift; sourceTree = "<group>"; };
 		5B18BA6F27C7BD8B0056EB19 /* LICENSE-CHS.txt */ = {isa = PBXFileReference; lastKnownFileType = text; path = "LICENSE-CHS.txt"; sourceTree = "<group>"; };
@@ -198,6 +198,8 @@
 		5B70F4E62A0BE900005EA8C4 /* MenuIcon-SCVIM.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "MenuIcon-SCVIM.png"; sourceTree = "<group>"; };
 		5B70F4E72A0BE900005EA8C4 /* MenuIcon-SCVIM@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "MenuIcon-SCVIM@2x.png"; sourceTree = "<group>"; };
 		5B70F4E82A0BE900005EA8C4 /* MenuIcon-TCVIM@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "MenuIcon-TCVIM@2x.png"; sourceTree = "<group>"; };
+		5B72D55A2AB98B8300FB88CE /* Preferences.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = Preferences.h; sourceTree = "<group>"; };
+		5B72D55B2AB98B8300FB88CE /* Preferences.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = Preferences.m; sourceTree = "<group>"; };
 		5B765F07293A250000122315 /* vChewing_PhraseEditorUI */ = {isa = PBXFileReference; lastKnownFileType = wrapper; name = vChewing_PhraseEditorUI; path = Packages/vChewing_PhraseEditorUI; sourceTree = "<group>"; };
 		5B78EE0C28A562B4009456C1 /* VwrPrefPaneDevZone.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VwrPrefPaneDevZone.swift; sourceTree = "<group>"; };
 		5B7BC4AF27AFFBE800F66C24 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = Base; path = Base.lproj/frmPrefWindow.xib; sourceTree = "<group>"; };
@@ -347,7 +349,8 @@
 		5B0E22A028FC11B900EB7ACA /* Preferences */ = {
 			isa = PBXGroup;
 			children = (
-				5B0E22B128FC318C00EB7ACA /* Preferences.swift */,
+				5B72D55A2AB98B8300FB88CE /* Preferences.h */,
+				5B72D55B2AB98B8300FB88CE /* Preferences.m */,
 				5B0E22A528FC11B900EB7ACA /* Preferences.tiff */,
 				5B0E22A728FC11B900EB7ACA /* Preferences.xib */,
 				5B0E22AA28FC11B900EB7ACA /* Info.plist */,
@@ -648,6 +651,7 @@
 			isa = PBXHeadersBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				5B72D55C2AB98B8300FB88CE /* Preferences.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -754,7 +758,7 @@
 				TargetAttributes = {
 					5B0E229E28FC11B900EB7ACA = {
 						CreatedOnToolsVersion = 14.0;
-						LastSwiftMigration = 1400;
+						LastSwiftMigration = 1500;
 					};
 					6A0D4EA115FC0D2D00ABF4B3 = {
 						LastSwiftMigration = 1400;
@@ -956,7 +960,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				5B0E22B228FC318C00EB7ACA /* Preferences.swift in Sources */,
+				5B72D55D2AB98B8300FB88CE /* Preferences.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1157,13 +1161,6 @@
 				INFOPLIST_KEY_NSMainNibFile = Preferences;
 				INFOPLIST_KEY_NSPrincipalClass = Preferences;
 				INSTALL_PATH = "$(HOME)/Library/PreferencePanes";
-				LD_RUNPATH_SEARCH_PATHS = (
-					"$(inherited)",
-					"$(LD_RUNPATH_SEARCH_PATHS_SHALLOW_BUNDLE_$(SHALLOW_BUNDLE))",
-					"@loader_path/../Frameworks",
-					"@loader_path/../../../../Frameworks",
-					/usr/lib/swift,
-				);
 				MACOSX_DEPLOYMENT_TARGET = 10.13.4;
 				MARKETING_VERSION = 3.5.5;
 				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
@@ -1206,13 +1203,6 @@
 				INFOPLIST_KEY_NSMainNibFile = Preferences;
 				INFOPLIST_KEY_NSPrincipalClass = Preferences;
 				INSTALL_PATH = "$(HOME)/Library/PreferencePanes";
-				LD_RUNPATH_SEARCH_PATHS = (
-					"$(inherited)",
-					"$(LD_RUNPATH_SEARCH_PATHS_SHALLOW_BUNDLE_$(SHALLOW_BUNDLE))",
-					"@loader_path/../Frameworks",
-					"@loader_path/../../../../Frameworks",
-					/usr/lib/swift,
-				);
 				MACOSX_DEPLOYMENT_TARGET = 10.13.4;
 				MARKETING_VERSION = 3.5.5;
 				MTL_ENABLE_DEBUG_INFO = NO;
