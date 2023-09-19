@@ -753,8 +753,9 @@
 		6A0D4E9415FC0CFA00ABF4B3 /* Project object */ = {
 			isa = PBXProject;
 			attributes = {
+				BuildIndependentTargetsInParallel = YES;
 				LastSwiftUpdateCheck = 1340;
-				LastUpgradeCheck = 1400;
+				LastUpgradeCheck = 1500;
 				TargetAttributes = {
 					5B0E229E28FC11B900EB7ACA = {
 						CreatedOnToolsVersion = 14.0;
@@ -913,6 +914,10 @@
 				"$(SRCROOT)/Source/Data/components/common/data-zhuyinwen.txt",
 				"$(SRCROOT)/Source/Data/components/common/phone-header.txt",
 				"$(SRCROOT)/DataCompiler/dataCompiler.swift",
+				"$(SRCROOT)/Source/Data/components/chs/phrases-custom-genshin-chs.txt",
+				"$(SRCROOT)/Source/Data/components/cht/phrases-custom-genshin-cht.txt",
+				"$(SRCROOT)/Source/Data/components/chs/phrases-custom-seikyuutetsudou-chs.txt",
+				"$(SRCROOT)/Source/Data/components/cht/phrases-custom-seikyuutetsudou-cht.txt",
 			);
 			name = "Run Script (Build Dictionary Data)";
 			outputFileListPaths = (
@@ -933,7 +938,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "# Type a script or drag a script file from your workspace to insert its path.\ncd ${SRCROOT}\nswiftc ${SRCROOT}/DataCompiler/dataCompiler.swift -o ${SRCROOT}/DataCompiler/cook_mac.exe\nmv ${SRCROOT}/DataCompiler/cook_mac.exe ${SRCROOT}/Source/Data/bin/cook_mac.exe\ncd ${SRCROOT}/Source/Data/\n./bin/cook_mac.exe\n";
+			shellScript = "# Type a script or drag a script file from your workspace to insert its path.\ncd ${SRCROOT}/Source/Data/\nswift ${SRCROOT}/DataCompiler/dataCompiler.swift\n";
 		};
 		6A225A2023679F5F00F685C6 /* ShellScript */ = {
 			isa = PBXShellScriptBuildPhase;
@@ -1234,6 +1239,7 @@
 				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
 				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
 				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
 				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
 				CLANG_WARN_STRICT_PROTOTYPES = YES;
 				CLANG_WARN_SUSPICIOUS_MOVE = YES;
@@ -1244,6 +1250,7 @@
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
 				ENABLE_TESTABILITY = YES;
+				ENABLE_USER_SCRIPT_SANDBOXING = YES;
 				GCC_NO_COMMON_BLOCKS = YES;
 				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
 				GCC_WARN_ABOUT_RETURN_TYPE = YES;
@@ -1279,6 +1286,7 @@
 				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
 				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
 				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
 				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
 				CLANG_WARN_STRICT_PROTOTYPES = YES;
 				CLANG_WARN_SUSPICIOUS_MOVE = YES;
@@ -1288,6 +1296,7 @@
 				DEAD_CODE_STRIPPING = YES;
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_USER_SCRIPT_SANDBOXING = YES;
 				GCC_NO_COMMON_BLOCKS = YES;
 				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
 				GCC_WARN_ABOUT_RETURN_TYPE = YES;
@@ -1302,6 +1311,7 @@
 					"$(OTHER_CFLAGS)",
 					"-fcxx-modules",
 				);
+				SWIFT_COMPILATION_MODE = wholemodule;
 			};
 			name = Release;
 		};
