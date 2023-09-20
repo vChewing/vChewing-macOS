@@ -311,6 +311,7 @@
 "Quick Setup:" = "Quick Setup:";
 "Read external factory dictionary files if possible" = "Read external factory dictionary files if possible";
 "Secondary Pinyin with Numeral Intonation" = "Secondary Pinyin with Numeral Intonation";
+"Security-harden the composition buffer for all clients" = "Security-harden the composition buffer for all clients";
 "Seigyou" = "Seigyou (JinYei)";
 "Selection Keys:" = "Selection Keys:";
 "Share alphanumerical mode status across all clients" = "Share alphanumerical mode status across all clients";
@@ -337,6 +338,7 @@
 "This feature only needs to parse consecutive NSEvents passed by macOS built-in InputMethodKit framework, hence no necessity of asking end-users for extra privileges of monitoring global keyboard inputs. You are free to investigate our codebase or reverse-engineer this input method to see whether the above statement is trustable." = "This feature only needs to parse consecutive NSEvents passed by macOS built-in InputMethodKit framework, hence no necessity of asking end-users for extra privileges of monitoring global keyboard inputs. You are free to investigate our codebase or reverse-engineer this input method to see whether the above statement is trustable.";
 "This feature requires macOS 10.15 and above." = "This feature requires macOS 10.15 and above.";
 "This feature requires macOS 12 and above." = "This feature requires macOS 12 and above.";
+"This hinders all client apps from unwelcomely accessing your uncommitted contents in the composition buffer. A popup composition buffer will be shown instead." = "This hinders all client apps from unwelcomely accessing your uncommitted contents in the composition buffer. A popup composition buffer will be shown instead.";
 "This only works when being toggled by Shift key and JIS Eisu key." = "This only works when being toggled by Shift key and JIS Eisu key.";
 "This only works with Tadokoro candidate window." = "This only works with Tadokoro candidate window.";
 "This will also affect the row / column capacity of the candidate window." = "This will also affect the row / column capacity of the candidate window.";
