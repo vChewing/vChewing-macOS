@@ -46,6 +46,7 @@ class CtlPrefWindow: NSWindowController, NSWindowDelegate {
   @IBOutlet var txtPEField3: NSTextField!
   @IBOutlet var pctUserDictionaryFolder: NSPathControl!
   @IBOutlet var pctCassetteFilePath: NSPathControl!
+  @IBOutlet var stkShiftKeyASCIITogglesPane: NSStackView!
 
   var isLoading = false {
     didSet { setPEUIControlAvailability() }
@@ -88,6 +89,10 @@ class CtlPrefWindow: NSWindowController, NSWindowDelegate {
 
     observation = Broadcaster.shared.observe(\.eventForReloadingPhraseEditor, options: [.new]) { _, _ in
       self.updatePhraseEditor()
+    }
+
+    if #unavailable(macOS 10.15) {
+      stkShiftKeyASCIITogglesPane.isHidden = true
     }
 
     chkFartSuppressor.isHidden = !Date.isTodayTheDate(from: 0401)

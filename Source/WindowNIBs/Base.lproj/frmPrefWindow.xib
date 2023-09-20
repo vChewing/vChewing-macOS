@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="21701" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES">
+<document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="22154" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES">
     <dependencies>
         <deployment identifier="macosx"/>
-        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="21701"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="22154"/>
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
     </dependencies>
     <objects>
@@ -27,6 +27,7 @@
                 <outlet property="pctCassetteFilePath" destination="ZSE-Xw-MTl" id="Qdi-C4-NPw"/>
                 <outlet property="pctUserDictionaryFolder" destination="p4U-xB-kEs" id="LUK-dT-wFt"/>
                 <outlet property="selectionKeyComboBox" destination="uHU-aL-du7" id="cEx-Ui-Phc"/>
+                <outlet property="stkShiftKeyASCIITogglesPane" destination="UFf-Pi-9Jt" id="w3y-br-ppk"/>
                 <outlet property="tfdPETextEditor" destination="kSG-dz-P2N" id="aiA-EA-Isg"/>
                 <outlet property="txtPECommentField" destination="cRd-HU-x7y" id="eJf-IX-goL"/>
                 <outlet property="txtPEField1" destination="eGd-pc-aEI" id="QQp-wQ-8sj"/>
@@ -66,7 +67,7 @@
                         <stackView distribution="fill" orientation="vertical" alignment="leading" spacing="3" horizontalStackHuggingPriority="249.99998474121094" verticalStackHuggingPriority="249.99998474121094" translatesAutoresizingMaskIntoConstraints="NO" id="dj4-9G-dKq">
                             <rect key="frame" x="0.0" y="312" width="302" height="40"/>
                             <subviews>
-                                <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" verticalCompressionResistancePriority="751" translatesAutoresizingMaskIntoConstraints="NO" id="5Rz-c8-hp9">
+                                <textField focusRingType="none" horizontalHuggingPriority="251" verticalHuggingPriority="750" verticalCompressionResistancePriority="751" translatesAutoresizingMaskIntoConstraints="NO" id="5Rz-c8-hp9">
                                     <rect key="frame" x="-2" y="25" width="306" height="15"/>
                                     <textFieldCell key="cell" controlSize="small" lineBreakMode="clipping" title="Change user interface language (will reboot the IME)." id="ZEv-Q2-mYL">
                                         <font key="font" metaFont="cellTitle"/>
@@ -77,7 +78,7 @@
                                 <stackView distribution="fill" orientation="horizontal" alignment="centerY" horizontalStackHuggingPriority="249.99998474121094" verticalStackHuggingPriority="249.99998474121094" translatesAutoresizingMaskIntoConstraints="NO" id="6NA-4k-NEM">
                                     <rect key="frame" x="0.0" y="0.0" width="302" height="22"/>
                                     <subviews>
-                                        <textField verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="L5M-VG-W1X">
+                                        <textField focusRingType="none" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="L5M-VG-W1X">
                                             <rect key="frame" x="-2" y="4" width="118" height="15"/>
                                             <textFieldCell key="cell" controlSize="small" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" alignment="left" title="UI language setting:" id="9DS-Rc-TXq">
                                                 <font key="font" metaFont="cellTitle"/>
@@ -87,9 +88,6 @@
                                         </textField>
                                         <popUpButton wantsLayer="YES" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="oS6-u5-7dP">
                                             <rect key="frame" x="118" y="-1" width="188" height="22"/>
-                                            <constraints>
-                                                <constraint firstAttribute="width" relation="greaterThanOrEqual" constant="180" id="SwA-NX-Jun"/>
-                                            </constraints>
                                             <popUpButtonCell key="cell" type="push" title="Auto-Select" bezelStyle="rounded" alignment="left" controlSize="small" lineBreakMode="truncatingTail" state="on" borderStyle="borderAndBezel" imageScaling="proportionallyDown" inset="2" selectedItem="GlJ-Ns-9eE" id="bft-Wv-kiJ">
                                                 <behavior key="behavior" lightByBackground="YES" lightByGray="YES"/>
                                                 <font key="font" metaFont="smallSystem"/>
@@ -103,6 +101,9 @@
                                                     </items>
                                                 </menu>
                                             </popUpButtonCell>
+                                            <constraints>
+                                                <constraint firstAttribute="width" relation="greaterThanOrEqual" constant="180" id="SwA-NX-Jun"/>
+                                            </constraints>
                                             <connections>
                                                 <action selector="updateUiLanguageAction:" target="-2" id="8XG-O0-Otf"/>
                                             </connections>
@@ -136,7 +137,7 @@
                                 <constraint firstAttribute="width" relation="greaterThanOrEqual" constant="530" id="Ylc-XO-ZMh"/>
                             </constraints>
                         </box>
-                        <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="Vp3-lc-XD5">
+                        <textField focusRingType="none" horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="Vp3-lc-XD5">
                             <rect key="frame" x="-2" y="285" width="105" height="16"/>
                             <constraints>
                                 <constraint firstAttribute="height" constant="16" id="3d9-qL-M1k"/>
@@ -152,26 +153,26 @@
                             <subviews>
                                 <button translatesAutoresizingMaskIntoConstraints="NO" id="j8R-Hj-3dj">
                                     <rect key="frame" x="-1" y="83.5" width="340" height="17"/>
-                                    <constraints>
-                                        <constraint firstAttribute="height" constant="16" id="Fvm-ZT-RYa"/>
-                                    </constraints>
                                     <buttonCell key="cell" type="check" title="Automatically correct reading combinations when typing" bezelStyle="regularSquare" imagePosition="left" controlSize="small" inset="2" id="chkAutoCorrectReadingCombination">
                                         <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
                                         <font key="font" metaFont="cellTitle"/>
                                     </buttonCell>
+                                    <constraints>
+                                        <constraint firstAttribute="height" constant="16" id="Fvm-ZT-RYa"/>
+                                    </constraints>
                                     <connections>
                                         <binding destination="32" name="value" keyPath="values.AutoCorrectReadingCombination" id="bix-eJ-jtV"/>
                                     </connections>
                                 </button>
                                 <button translatesAutoresizingMaskIntoConstraints="NO" id="vwf-Kq-s8M" userLabel="chkShowHanyuPinyinInCompositionBuffer">
                                     <rect key="frame" x="-1" y="62.5" width="361" height="17"/>
-                                    <constraints>
-                                        <constraint firstAttribute="height" constant="16" id="ObK-Ia-oU9"/>
-                                    </constraints>
                                     <buttonCell key="cell" type="check" title="Show Hanyu-Pinyin in the inline composition buffer &amp; tooltip" bezelStyle="regularSquare" imagePosition="left" controlSize="small" inset="2" id="wFR-zX-M8H">
                                         <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
                                         <font key="font" metaFont="cellTitle"/>
                                     </buttonCell>
+                                    <constraints>
+                                        <constraint firstAttribute="height" constant="16" id="ObK-Ia-oU9"/>
+                                    </constraints>
                                     <connections>
                                         <action selector="toggleTrad2KangXiAction:" target="-2" id="Bko-rV-Ygf"/>
                                         <binding destination="32" name="value" keyPath="values.ShowHanyuPinyinInCompositionBuffer" id="uDq-eC-wan"/>
@@ -179,39 +180,39 @@
                                 </button>
                                 <button translatesAutoresizingMaskIntoConstraints="NO" id="HaB-rc-AcW">
                                     <rect key="frame" x="-1" y="41.5" width="295" height="17"/>
-                                    <constraints>
-                                        <constraint firstAttribute="height" constant="16" id="IVa-xv-upc"/>
-                                    </constraints>
                                     <buttonCell key="cell" type="check" title="Allow backspace-editing miscomposed readings" bezelStyle="regularSquare" imagePosition="left" controlSize="small" inset="2" id="chkKeepReadingUponCompositionError">
                                         <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
                                         <font key="font" metaFont="cellTitle"/>
                                     </buttonCell>
+                                    <constraints>
+                                        <constraint firstAttribute="height" constant="16" id="IVa-xv-upc"/>
+                                    </constraints>
                                     <connections>
                                         <binding destination="32" name="value" keyPath="values.KeepReadingUponCompositionError" id="ddF-qg-jes"/>
                                     </connections>
                                 </button>
                                 <button translatesAutoresizingMaskIntoConstraints="NO" id="QpM-Qg-kNf">
                                     <rect key="frame" x="-1" y="20.5" width="336" height="17"/>
-                                    <constraints>
-                                        <constraint firstAttribute="height" constant="16" id="tTR-DT-5v2"/>
-                                    </constraints>
                                     <buttonCell key="cell" type="check" title="Also use “\” or “¥” key for Hanin Keyboard Symbol Input" bezelStyle="regularSquare" imagePosition="left" controlSize="small" inset="2" id="MKJ-Q6-dLd">
                                         <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
                                         <font key="font" metaFont="cellTitle"/>
                                     </buttonCell>
+                                    <constraints>
+                                        <constraint firstAttribute="height" constant="16" id="tTR-DT-5v2"/>
+                                    </constraints>
                                     <connections>
                                         <binding destination="32" name="value" keyPath="values.ClassicHaninKeyboardSymbolModeShortcutEnabled" id="H59-BW-iW8"/>
                                     </connections>
                                 </button>
                                 <button translatesAutoresizingMaskIntoConstraints="NO" id="mzw-F2-aAQ">
                                     <rect key="frame" x="-1" y="-0.5" width="295" height="17"/>
-                                    <constraints>
-                                        <constraint firstAttribute="height" constant="16" id="rEk-qV-gUu"/>
-                                    </constraints>
                                     <buttonCell key="cell" type="check" title="Emulating select-candidate-per-character mode" bezelStyle="regularSquare" imagePosition="left" controlSize="small" inset="2" id="ArK-Vk-OoT">
                                         <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
                                         <font key="font" metaFont="cellTitle"/>
                                     </buttonCell>
+                                    <constraints>
+                                        <constraint firstAttribute="height" constant="16" id="rEk-qV-gUu"/>
+                                    </constraints>
                                     <connections>
                                         <binding destination="32" name="value" keyPath="values.UseSCPCTypingMode" id="PbD-wq-OsN"/>
                                     </connections>
@@ -238,7 +239,7 @@
                                 <constraint firstAttribute="width" relation="greaterThanOrEqual" constant="530" id="LDD-dR-33O"/>
                             </constraints>
                         </box>
-                        <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="da1-7e-els">
+                        <textField focusRingType="none" horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="da1-7e-els">
                             <rect key="frame" x="-2" y="153" width="101" height="16"/>
                             <constraints>
                                 <constraint firstAttribute="height" constant="16" id="GBB-5k-Dex"/>
@@ -254,13 +255,13 @@
                             <subviews>
                                 <button translatesAutoresizingMaskIntoConstraints="NO" id="5IL-zZ-CL9" userLabel="chkTrad2KangXi">
                                     <rect key="frame" x="-1" y="83.5" width="368" height="17"/>
-                                    <constraints>
-                                        <constraint firstAttribute="height" constant="16" id="y8x-bx-E5d"/>
-                                    </constraints>
                                     <buttonCell key="cell" type="check" title="Auto-convert traditional Chinese glyphs to KangXi characters" bezelStyle="regularSquare" imagePosition="left" controlSize="small" inset="2" id="BSK-bH-Gct">
                                         <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
                                         <font key="font" metaFont="cellTitle"/>
                                     </buttonCell>
+                                    <constraints>
+                                        <constraint firstAttribute="height" constant="16" id="y8x-bx-E5d"/>
+                                    </constraints>
                                     <connections>
                                         <action selector="toggleTrad2KangXiAction:" target="-2" id="4i1-el-vkn"/>
                                         <binding destination="32" name="value" keyPath="values.ChineseConversionEnabled" id="X0A-OC-T6e"/>
@@ -268,13 +269,13 @@
                                 </button>
                                 <button translatesAutoresizingMaskIntoConstraints="NO" id="h4r-Sp-LBI" userLabel="chkTrad2JISShinjitai">
                                     <rect key="frame" x="-1" y="62.5" width="393" height="17"/>
-                                    <constraints>
-                                        <constraint firstAttribute="height" constant="16" id="NuX-g1-YYs"/>
-                                    </constraints>
                                     <buttonCell key="cell" type="check" title="Auto-convert traditional Chinese glyphs to JIS Shinjitai characters" bezelStyle="regularSquare" imagePosition="left" controlSize="small" inset="2" id="eia-1F-Do0">
                                         <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
                                         <font key="font" metaFont="cellTitle"/>
                                     </buttonCell>
+                                    <constraints>
+                                        <constraint firstAttribute="height" constant="16" id="NuX-g1-YYs"/>
+                                    </constraints>
                                     <connections>
                                         <action selector="toggleTrad2JISShinjitaiAction:" target="-2" id="bhJ-ed-BCo"/>
                                         <binding destination="32" name="value" keyPath="values.ShiftJISShinjitaiOutputEnabled" id="zu9-pD-86B"/>
@@ -282,13 +283,13 @@
                                 </button>
                                 <button translatesAutoresizingMaskIntoConstraints="NO" id="gZ0-OK-r7a" userLabel="InlineDumpPinyinInLieuOfZhuyin">
                                     <rect key="frame" x="-1" y="41.5" width="387" height="17"/>
-                                    <constraints>
-                                        <constraint firstAttribute="height" constant="16" id="jnZ-bf-biU"/>
-                                    </constraints>
                                     <buttonCell key="cell" type="check" title="Commit Hanyu-Pinyin instead on Ctrl(+Option)+Command+Enter" bezelStyle="regularSquare" imagePosition="left" controlSize="small" inset="2" id="iWy-Nw-QKB">
                                         <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
                                         <font key="font" metaFont="cellTitle"/>
                                     </buttonCell>
+                                    <constraints>
+                                        <constraint firstAttribute="height" constant="16" id="jnZ-bf-biU"/>
+                                    </constraints>
                                     <connections>
                                         <action selector="toggleTrad2KangXiAction:" target="-2" id="ACW-LL-i6G"/>
                                         <binding destination="32" name="value" keyPath="values.InlineDumpPinyinInLieuOfZhuyin" id="MtZ-L5-uvv"/>
@@ -296,26 +297,26 @@
                                 </button>
                                 <button translatesAutoresizingMaskIntoConstraints="NO" id="xe6-Pu-3Fa">
                                     <rect key="frame" x="-1" y="20.5" width="275" height="17"/>
-                                    <constraints>
-                                        <constraint firstAttribute="height" constant="16" id="TuX-GI-UfE"/>
-                                    </constraints>
                                     <buttonCell key="cell" type="check" title="Trim unfinished readings / strokes on commit" bezelStyle="regularSquare" imagePosition="left" controlSize="small" inset="2" id="tglTrimUnfinishedReadingsOnCommit">
                                         <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
                                         <font key="font" metaFont="cellTitle"/>
                                     </buttonCell>
+                                    <constraints>
+                                        <constraint firstAttribute="height" constant="16" id="TuX-GI-UfE"/>
+                                    </constraints>
                                     <connections>
                                         <binding destination="32" name="value" keyPath="values.TrimUnfinishedReadingsOnCommit" id="v0T-cw-dzA"/>
                                     </connections>
                                 </button>
                                 <button translatesAutoresizingMaskIntoConstraints="NO" id="1Y9-M9-BGT">
                                     <rect key="frame" x="-1" y="-0.5" width="308" height="17"/>
-                                    <constraints>
-                                        <constraint firstAttribute="height" constant="16" id="dfr-Gk-fcb"/>
-                                    </constraints>
                                     <buttonCell key="cell" type="check" title="Harden vertical punctuations during vertical typing" bezelStyle="regularSquare" imagePosition="left" controlSize="small" state="on" inset="2" id="chkHardenVerticalPunctuations" userLabel="chkHardenVerticalPunctuations">
                                         <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
                                         <font key="font" metaFont="cellTitle"/>
                                     </buttonCell>
+                                    <constraints>
+                                        <constraint firstAttribute="height" constant="16" id="dfr-Gk-fcb"/>
+                                    </constraints>
                                     <connections>
                                         <binding destination="32" name="value" keyPath="values.HardenVerticalPunctuations" id="hpz-Lo-J6H"/>
                                     </connections>
@@ -347,13 +348,13 @@
                             <subviews>
                                 <button translatesAutoresizingMaskIntoConstraints="NO" id="ChK-Du-6h1">
                                     <rect key="frame" x="-1" y="20.5" width="204" height="17"/>
-                                    <constraints>
-                                        <constraint firstAttribute="height" constant="16" id="cyf-Lp-kyH"/>
-                                    </constraints>
                                     <buttonCell key="cell" type="check" title="Check for updates automatically" bezelStyle="regularSquare" imagePosition="left" alignment="left" controlSize="small" inset="2" id="8tT-hw-Hhr">
                                         <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
                                         <font key="font" metaFont="cellTitle"/>
                                     </buttonCell>
+                                    <constraints>
+                                        <constraint firstAttribute="height" constant="16" id="cyf-Lp-kyH"/>
+                                    </constraints>
                                     <connections>
                                         <binding destination="32" name="value" keyPath="values.CheckUpdateAutomatically" id="uaH-89-Mqc"/>
                                     </connections>
@@ -363,26 +364,26 @@
                                     <subviews>
                                         <button translatesAutoresizingMaskIntoConstraints="NO" id="0Fh-O5-BKD">
                                             <rect key="frame" x="-1" y="-0.5" width="94" height="17"/>
-                                            <constraints>
-                                                <constraint firstAttribute="height" constant="16" id="ldq-X5-xnu"/>
-                                            </constraints>
                                             <buttonCell key="cell" type="check" title="Debug Mode" bezelStyle="regularSquare" imagePosition="left" alignment="left" controlSize="small" state="on" inset="2" id="VdT-fw-7pQ">
                                                 <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
                                                 <font key="font" metaFont="cellTitle"/>
                                             </buttonCell>
+                                            <constraints>
+                                                <constraint firstAttribute="height" constant="16" id="ldq-X5-xnu"/>
+                                            </constraints>
                                             <connections>
                                                 <binding destination="32" name="value" keyPath="values._DebugMode" id="sEa-DE-7Dw"/>
                                             </connections>
                                         </button>
                                         <button translatesAutoresizingMaskIntoConstraints="NO" id="pYB-E5-4Nv">
                                             <rect key="frame" x="100" y="-0.5" width="373" height="17"/>
-                                            <constraints>
-                                                <constraint firstAttribute="height" constant="16" id="9jO-5c-Glj"/>
-                                            </constraints>
                                             <buttonCell key="cell" type="check" title="Stop farting (when typed phonetic combination is invalid, etc.)" bezelStyle="regularSquare" imagePosition="left" controlSize="small" inset="2" id="62u-jY-BRh">
                                                 <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
                                                 <font key="font" metaFont="cellTitle"/>
                                             </buttonCell>
+                                            <constraints>
+                                                <constraint firstAttribute="height" constant="16" id="9jO-5c-Glj"/>
+                                            </constraints>
                                             <connections>
                                                 <action selector="clickedWhetherIMEShouldNotFartToggleAction:" target="-2" id="9h1-f6-SGF"/>
                                                 <binding destination="32" name="value" keyPath="values.ShouldNotFartInLieuOfBeep" id="EOH-Pc-8Hk"/>
@@ -453,7 +454,7 @@
                         <stackView distribution="fill" orientation="vertical" alignment="leading" spacing="5" horizontalStackHuggingPriority="249.99998474121094" verticalStackHuggingPriority="249.99998474121094" translatesAutoresizingMaskIntoConstraints="NO" id="zUw-eX-tDv">
                             <rect key="frame" x="0.0" y="330" width="375" height="42"/>
                             <subviews>
-                                <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" verticalCompressionResistancePriority="751" translatesAutoresizingMaskIntoConstraints="NO" id="Ldp-U1-36g">
+                                <textField focusRingType="none" horizontalHuggingPriority="251" verticalHuggingPriority="750" verticalCompressionResistancePriority="751" translatesAutoresizingMaskIntoConstraints="NO" id="Ldp-U1-36g">
                                     <rect key="frame" x="-2" y="27" width="379" height="15"/>
                                     <textFieldCell key="cell" controlSize="small" lineBreakMode="clipping" title="Change UI font size of candidate window for a better visual clarity." id="iRg-wx-Nx2">
                                         <font key="font" metaFont="cellTitle"/>
@@ -464,7 +465,7 @@
                                 <stackView distribution="fill" orientation="horizontal" alignment="centerY" horizontalStackHuggingPriority="249.99998474121094" verticalStackHuggingPriority="249.99998474121094" translatesAutoresizingMaskIntoConstraints="NO" id="eqk-m1-Lcr">
                                     <rect key="frame" x="0.0" y="0.0" width="207" height="22"/>
                                     <subviews>
-                                        <textField verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="28">
+                                        <textField focusRingType="none" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="28">
                                             <rect key="frame" x="-2" y="4" width="133" height="15"/>
                                             <textFieldCell key="cell" controlSize="small" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" alignment="left" title="Candidate UI font size:" id="29">
                                                 <font key="font" metaFont="cellTitle"/>
@@ -474,9 +475,6 @@
                                         </textField>
                                         <popUpButton wantsLayer="YES" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="90">
                                             <rect key="frame" x="133" y="-1" width="78" height="22"/>
-                                            <constraints>
-                                                <constraint firstAttribute="width" relation="greaterThanOrEqual" constant="70" id="4ek-fN-G9U"/>
-                                            </constraints>
                                             <popUpButtonCell key="cell" type="push" title="18" bezelStyle="rounded" alignment="left" controlSize="small" lineBreakMode="truncatingTail" state="on" borderStyle="borderAndBezel" tag="18" imageScaling="proportionallyDown" inset="2" selectedItem="96" id="91">
                                                 <behavior key="behavior" lightByBackground="YES" lightByGray="YES"/>
                                                 <font key="font" metaFont="smallSystem"/>
@@ -496,6 +494,9 @@
                                                     </items>
                                                 </menu>
                                             </popUpButtonCell>
+                                            <constraints>
+                                                <constraint firstAttribute="width" relation="greaterThanOrEqual" constant="70" id="4ek-fN-G9U"/>
+                                            </constraints>
                                             <connections>
                                                 <binding destination="32" name="selectedTag" keyPath="values.CandidateListTextSize" id="107"/>
                                             </connections>
@@ -532,7 +533,7 @@
                         <stackView distribution="fill" orientation="vertical" alignment="leading" spacing="5" horizontalStackHuggingPriority="249.99998474121094" verticalStackHuggingPriority="249.99998474121094" translatesAutoresizingMaskIntoConstraints="NO" id="9L9-ua-Bhv">
                             <rect key="frame" x="0.0" y="255" width="516" height="62"/>
                             <subviews>
-                                <textField horizontalHuggingPriority="251" verticalHuggingPriority="749" translatesAutoresizingMaskIntoConstraints="NO" id="Yl4-Ar-L6r">
+                                <textField focusRingType="none" horizontalHuggingPriority="251" verticalHuggingPriority="749" translatesAutoresizingMaskIntoConstraints="NO" id="Yl4-Ar-L6r">
                                     <rect key="frame" x="-2" y="47" width="314" height="15"/>
                                     <constraints>
                                         <constraint firstAttribute="height" constant="15" id="Bgf-Qu-fAR"/>
@@ -546,7 +547,7 @@
                                 <stackView distribution="fill" orientation="horizontal" alignment="centerY" spacing="10" horizontalStackHuggingPriority="249.99998474121094" verticalStackHuggingPriority="249.99998474121094" translatesAutoresizingMaskIntoConstraints="NO" id="kf7-8I-Wwc">
                                     <rect key="frame" x="0.0" y="20" width="516" height="22"/>
                                     <subviews>
-                                        <textField verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="23">
+                                        <textField focusRingType="none" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="23">
                                             <rect key="frame" x="-2" y="4" width="131" height="15"/>
                                             <textFieldCell key="cell" controlSize="small" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" alignment="left" title="Candidate List Layout:" id="24">
                                                 <font key="font" metaFont="cellTitle"/>
@@ -587,14 +588,14 @@
                                         </matrix>
                                         <button translatesAutoresizingMaskIntoConstraints="NO" id="dZH-I5-wms">
                                             <rect key="frame" x="408" y="2.5" width="108" height="17"/>
-                                            <constraints>
-                                                <constraint firstAttribute="width" relation="greaterThanOrEqual" constant="70" id="K3Q-Vl-7yU"/>
-                                                <constraint firstAttribute="height" constant="16" id="xMM-G8-A2M"/>
-                                            </constraints>
                                             <buttonCell key="cell" type="check" title="One-line layout" bezelStyle="regularSquare" imagePosition="left" controlSize="small" inset="2" id="OVR-eb-laC">
                                                 <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
                                                 <font key="font" metaFont="cellTitle"/>
                                             </buttonCell>
+                                            <constraints>
+                                                <constraint firstAttribute="width" relation="greaterThanOrEqual" constant="70" id="K3Q-Vl-7yU"/>
+                                                <constraint firstAttribute="height" constant="16" id="xMM-G8-A2M"/>
+                                            </constraints>
                                             <connections>
                                                 <binding destination="32" name="value" keyPath="values.CandidateWindowShowOnlyOneLine" id="2gd-yB-Hvb"/>
                                             </connections>
@@ -616,13 +617,13 @@
                                 </stackView>
                                 <button translatesAutoresizingMaskIntoConstraints="NO" id="W88-GQ-XyV">
                                     <rect key="frame" x="-1" y="-0.5" width="245" height="16"/>
-                                    <constraints>
-                                        <constraint firstAttribute="height" constant="15" id="8fO-Qe-mU1"/>
-                                    </constraints>
                                     <buttonCell key="cell" type="check" title="Always expand candidate window panel" bezelStyle="regularSquare" imagePosition="left" controlSize="small" state="on" inset="2" id="0yk-Xi-GaC">
                                         <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
                                         <font key="font" metaFont="cellTitle"/>
                                     </buttonCell>
+                                    <constraints>
+                                        <constraint firstAttribute="height" constant="15" id="8fO-Qe-mU1"/>
+                                    </constraints>
                                     <connections>
                                         <binding destination="32" name="value" keyPath="values.AlwaysExpandCandidateWindow" id="jAF-b2-lda"/>
                                         <binding destination="32" name="enabled" keyPath="values.CandidateWindowShowOnlyOneLine" id="29h-eB-878">
@@ -653,7 +654,7 @@
                         <stackView distribution="fill" orientation="vertical" alignment="leading" spacing="5" horizontalStackHuggingPriority="249.99998474121094" verticalStackHuggingPriority="249.99998474121094" translatesAutoresizingMaskIntoConstraints="NO" id="Y6y-r1-U6p">
                             <rect key="frame" x="0.0" y="200" width="313" height="42"/>
                             <subviews>
-                                <textField autoresizesSubviews="NO" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="IpX-f7-rTL">
+                                <textField autoresizesSubviews="NO" focusRingType="none" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="IpX-f7-rTL">
                                     <rect key="frame" x="-2" y="27" width="317" height="15"/>
                                     <textFieldCell key="cell" controlSize="small" lineBreakMode="clipping" title="Choose which keys you prefer for selecting candidates." id="2pS-nv-te4">
                                         <font key="font" metaFont="cellTitle"/>
@@ -664,7 +665,7 @@
                                 <stackView distribution="fill" orientation="horizontal" alignment="centerY" horizontalStackHuggingPriority="249.99998474121094" verticalStackHuggingPriority="249.99998474121094" translatesAutoresizingMaskIntoConstraints="NO" id="edH-cW-wQI">
                                     <rect key="frame" x="0.0" y="0.0" width="289" height="22"/>
                                     <subviews>
-                                        <textField verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="ETa-09-qWI">
+                                        <textField focusRingType="none" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="ETa-09-qWI">
                                             <rect key="frame" x="-2" y="4" width="91" height="15"/>
                                             <textFieldCell key="cell" lineBreakMode="clipping" alignment="left" title="Selection Keys:" id="FnD-oH-El5">
                                                 <font key="font" metaFont="cellTitle"/>
@@ -672,7 +673,7 @@
                                                 <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
                                             </textFieldCell>
                                         </textField>
-                                        <comboBox verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="uHU-aL-du7">
+                                        <comboBox focusRingType="none" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="uHU-aL-du7">
                                             <rect key="frame" x="94" y="-2" width="197" height="25"/>
                                             <constraints>
                                                 <constraint firstAttribute="width" constant="194" id="RHZ-qM-gNj"/>
@@ -722,7 +723,7 @@
                         <stackView distribution="fill" orientation="vertical" alignment="leading" spacing="6" horizontalStackHuggingPriority="249.99998474121094" verticalStackHuggingPriority="249.99998474121094" translatesAutoresizingMaskIntoConstraints="NO" id="o0j-33-VXh">
                             <rect key="frame" x="0.0" y="92" width="409" height="95"/>
                             <subviews>
-                                <textField verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="13">
+                                <textField focusRingType="none" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="13">
                                     <rect key="frame" x="-2" y="80" width="403" height="15"/>
                                     <textFieldCell key="cell" controlSize="small" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" alignment="left" title="Choose the cursor position where you want to list possible candidates." id="14">
                                         <font key="font" metaFont="cellTitle"/>
@@ -757,26 +758,26 @@
                                 </matrix>
                                 <button translatesAutoresizingMaskIntoConstraints="NO" id="7z2-DD-c58">
                                     <rect key="frame" x="-1" y="20.5" width="318" height="16"/>
-                                    <constraints>
-                                        <constraint firstAttribute="height" constant="15" id="Ivs-uZ-4Eh"/>
-                                    </constraints>
                                     <buttonCell key="cell" type="check" title="Push the cursor in front of the phrase after selection" bezelStyle="regularSquare" imagePosition="left" controlSize="small" state="on" inset="2" id="RUG-ls-KyA">
                                         <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
                                         <font key="font" metaFont="cellTitle"/>
                                     </buttonCell>
+                                    <constraints>
+                                        <constraint firstAttribute="height" constant="15" id="Ivs-uZ-4Eh"/>
+                                    </constraints>
                                     <connections>
                                         <binding destination="32" name="value" keyPath="values.MoveCursorAfterSelectingCandidate" id="BbO-T6-zh3"/>
                                     </connections>
                                 </button>
                                 <button translatesAutoresizingMaskIntoConstraints="NO" id="gdG-uX-PK4">
                                     <rect key="frame" x="-1" y="-0.5" width="410" height="16"/>
-                                    <constraints>
-                                        <constraint firstAttribute="height" constant="15" id="DMz-hx-2IO"/>
-                                    </constraints>
                                     <buttonCell key="cell" type="check" title="Adjust candidate window location according to current phrase length" bezelStyle="regularSquare" imagePosition="left" controlSize="small" state="on" inset="2" id="WcE-vn-c6K">
                                         <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
                                         <font key="font" metaFont="cellTitle"/>
                                     </buttonCell>
+                                    <constraints>
+                                        <constraint firstAttribute="height" constant="15" id="DMz-hx-2IO"/>
+                                    </constraints>
                                     <connections>
                                         <binding destination="32" name="value" keyPath="values.UseDynamicCandidateWindowOrigin" id="Off-fm-DRR"/>
                                         <binding destination="32" name="enabled" keyPath="values.UseRearCursorMode" id="gKJ-4v-P9Z">
@@ -811,54 +812,54 @@
                             <subviews>
                                 <button translatesAutoresizingMaskIntoConstraints="NO" id="3qX-dG-cKO">
                                     <rect key="frame" x="-1" y="62.5" width="354" height="17"/>
-                                    <constraints>
-                                        <constraint firstAttribute="width" relation="greaterThanOrEqual" constant="70" id="VA4-8t-BXG"/>
-                                        <constraint firstAttribute="height" constant="16" id="fAh-uj-Mwh"/>
-                                    </constraints>
                                     <buttonCell key="cell" type="check" title="Show available reverse-lookup results in candidate window" bezelStyle="regularSquare" imagePosition="left" controlSize="small" inset="2" id="hcP-5k-mMw">
                                         <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
                                         <font key="font" metaFont="cellTitle"/>
                                     </buttonCell>
+                                    <constraints>
+                                        <constraint firstAttribute="width" relation="greaterThanOrEqual" constant="70" id="VA4-8t-BXG"/>
+                                        <constraint firstAttribute="height" constant="16" id="fAh-uj-Mwh"/>
+                                    </constraints>
                                     <connections>
                                         <binding destination="32" name="value" keyPath="values.ShowReverseLookupInCandidateUI" id="0pt-zN-u5z"/>
                                     </connections>
                                 </button>
                                 <button translatesAutoresizingMaskIntoConstraints="NO" id="nCb-NT-HJK">
                                     <rect key="frame" x="-1" y="41.5" width="351" height="17"/>
-                                    <constraints>
-                                        <constraint firstAttribute="height" constant="16" id="9wH-Rl-7QF"/>
-                                    </constraints>
                                     <buttonCell key="cell" type="check" title="Consolidate the context on confirming candidate selection" bezelStyle="regularSquare" imagePosition="left" controlSize="small" state="on" inset="2" id="chkConsolidateContextOnCandidateSelection" userLabel="chkConsolidateContextOnCandidateSelection">
                                         <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
                                         <font key="font" metaFont="cellTitle"/>
                                     </buttonCell>
+                                    <constraints>
+                                        <constraint firstAttribute="height" constant="16" id="9wH-Rl-7QF"/>
+                                    </constraints>
                                     <connections>
                                         <binding destination="32" name="value" keyPath="values.ConsolidateContextOnCandidateSelection" id="UdG-3g-Xdo"/>
                                     </connections>
                                 </button>
                                 <button translatesAutoresizingMaskIntoConstraints="NO" id="B3F-E1F-360">
                                     <rect key="frame" x="-1" y="20.5" width="305" height="17"/>
-                                    <constraints>
-                                        <constraint firstAttribute="height" constant="16" id="Ms0-e3-kEx"/>
-                                    </constraints>
                                     <buttonCell key="cell" type="check" title="Always use fixed listing order in candidate window" bezelStyle="regularSquare" imagePosition="left" controlSize="small" state="on" inset="2" id="chkUseFixedCandidateOrderOnSelection" userLabel="chkUseFixedCandidateOrderOnSelection">
                                         <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
                                         <font key="font" metaFont="cellTitle"/>
                                     </buttonCell>
+                                    <constraints>
+                                        <constraint firstAttribute="height" constant="16" id="Ms0-e3-kEx"/>
+                                    </constraints>
                                     <connections>
                                         <binding destination="32" name="value" keyPath="values.UseFixecCandidateOrderOnSelection" id="1E3-367-430"/>
                                     </connections>
                                 </button>
                                 <button translatesAutoresizingMaskIntoConstraints="NO" id="EPi-az-Ri2">
                                     <rect key="frame" x="-1" y="-0.5" width="369" height="17"/>
-                                    <constraints>
-                                        <constraint firstAttribute="height" constant="16" id="dhm-Zn-JrH"/>
-                                        <constraint firstAttribute="width" relation="greaterThanOrEqual" constant="70" id="dxM-0y-3eP"/>
-                                    </constraints>
                                     <buttonCell key="cell" type="check" title="Enable mouse wheel support for Tadokoro Candidate Window" bezelStyle="regularSquare" imagePosition="left" controlSize="small" inset="2" id="lDd-rN-BSM">
                                         <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
                                         <font key="font" metaFont="cellTitle"/>
                                     </buttonCell>
+                                    <constraints>
+                                        <constraint firstAttribute="height" constant="16" id="dhm-Zn-JrH"/>
+                                        <constraint firstAttribute="width" relation="greaterThanOrEqual" constant="70" id="dxM-0y-3eP"/>
+                                    </constraints>
                                     <connections>
                                         <binding destination="32" name="value" keyPath="values.EnableMouseScrollingForTDKCandidatesCocoa" id="Oyc-s5-cFP"/>
                                     </connections>
@@ -922,91 +923,91 @@
                             <subviews>
                                 <button translatesAutoresizingMaskIntoConstraints="NO" id="109">
                                     <rect key="frame" x="-1" y="124.5" width="285" height="17"/>
-                                    <constraints>
-                                        <constraint firstAttribute="height" constant="16" id="PYH-8e-mUx"/>
-                                    </constraints>
                                     <buttonCell key="cell" type="check" title="Enable Space key for calling candidate window" bezelStyle="regularSquare" imagePosition="left" alignment="left" controlSize="small" state="on" inset="2" id="110">
                                         <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
                                         <font key="font" metaFont="cellTitle"/>
                                     </buttonCell>
+                                    <constraints>
+                                        <constraint firstAttribute="height" constant="16" id="PYH-8e-mUx"/>
+                                    </constraints>
                                     <connections>
                                         <binding destination="32" name="value" keyPath="values.ChooseCandidateUsingSpace" id="NU1-DG-vUz"/>
                                     </connections>
                                 </button>
                                 <button translatesAutoresizingMaskIntoConstraints="NO" id="bE0-Lq-Pj7">
                                     <rect key="frame" x="-1" y="104.5" width="266" height="17"/>
-                                    <constraints>
-                                        <constraint firstAttribute="height" constant="16" id="6uT-D5-KVx"/>
-                                    </constraints>
                                     <buttonCell key="cell" type="check" title="Use ESC key to clear the entire input buffer" bezelStyle="regularSquare" imagePosition="left" controlSize="small" state="on" inset="2" id="f2j-xD-4xK">
                                         <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
                                         <font key="font" metaFont="cellTitle"/>
                                     </buttonCell>
+                                    <constraints>
+                                        <constraint firstAttribute="height" constant="16" id="6uT-D5-KVx"/>
+                                    </constraints>
                                     <connections>
                                         <binding destination="32" name="value" keyPath="values.EscToCleanInputBuffer" id="aLf-PK-mAS"/>
                                     </connections>
                                 </button>
                                 <button translatesAutoresizingMaskIntoConstraints="NO" id="6MM-WC-Mpd">
                                     <rect key="frame" x="-1" y="84.5" width="381" height="17"/>
-                                    <constraints>
-                                        <constraint firstAttribute="height" constant="16" id="hhN-al-6OI"/>
-                                    </constraints>
                                     <buttonCell key="cell" type="check" title="Allow using Enter key to confirm associated candidate selection" bezelStyle="regularSquare" imagePosition="left" controlSize="small" inset="2" id="chkAlsoConfirmAssociatedCandidatesByEnter">
                                         <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
                                         <font key="font" metaFont="cellTitle"/>
                                     </buttonCell>
+                                    <constraints>
+                                        <constraint firstAttribute="height" constant="16" id="hhN-al-6OI"/>
+                                    </constraints>
                                     <connections>
                                         <binding destination="32" name="value" keyPath="values.AlsoConfirmAssociatedCandidatesByEnter" id="P1C-j9-N88"/>
                                     </connections>
                                 </button>
                                 <button translatesAutoresizingMaskIntoConstraints="NO" id="6MK-0e-NrQ">
                                     <rect key="frame" x="-1" y="64.5" width="344" height="17"/>
-                                    <constraints>
-                                        <constraint firstAttribute="height" constant="16" id="0mM-np-pTV"/>
-                                    </constraints>
                                     <buttonCell key="cell" type="check" title="Use Space to confirm candidate in Per-Char Select Mode" bezelStyle="regularSquare" imagePosition="left" controlSize="small" inset="2" id="clN-4A-iec">
                                         <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
                                         <font key="font" metaFont="cellTitle"/>
                                     </buttonCell>
+                                    <constraints>
+                                        <constraint firstAttribute="height" constant="16" id="0mM-np-pTV"/>
+                                    </constraints>
                                     <connections>
                                         <binding destination="32" name="value" keyPath="values.UseSpaceToCommitHighlightedSCPCCandidate" id="NNu-k7-eSF"/>
                                     </connections>
                                 </button>
                                 <button translatesAutoresizingMaskIntoConstraints="NO" id="a6O-JL-C4g">
                                     <rect key="frame" x="-1" y="44.5" width="247" height="17"/>
-                                    <constraints>
-                                        <constraint firstAttribute="height" constant="16" id="WkD-Wx-erN"/>
-                                    </constraints>
                                     <buttonCell key="cell" type="check" title="Accept leading intonations in rare cases" bezelStyle="regularSquare" imagePosition="left" controlSize="small" inset="2" id="lblAcceptLeadingIntonations">
                                         <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
                                         <font key="font" metaFont="cellTitle"/>
                                     </buttonCell>
+                                    <constraints>
+                                        <constraint firstAttribute="height" constant="16" id="WkD-Wx-erN"/>
+                                    </constraints>
                                     <connections>
                                         <binding destination="32" name="value" keyPath="values.AcceptLeadingIntonations" id="l0S-gB-ckP"/>
                                     </connections>
                                 </button>
                                 <button translatesAutoresizingMaskIntoConstraints="NO" id="7QM-7z-tpq">
                                     <rect key="frame" x="-1" y="24.5" width="233" height="17"/>
-                                    <constraints>
-                                        <constraint firstAttribute="height" constant="16" id="fuj-Jy-rz7"/>
-                                    </constraints>
                                     <buttonCell key="cell" type="check" title="Always show tooltip texts horizontally" bezelStyle="regularSquare" imagePosition="left" controlSize="small" inset="2" id="lblAlwaysShowTooltipTextsHorizontally">
                                         <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
                                         <font key="font" metaFont="cellTitle"/>
                                     </buttonCell>
+                                    <constraints>
+                                        <constraint firstAttribute="height" constant="16" id="fuj-Jy-rz7"/>
+                                    </constraints>
                                     <connections>
                                         <binding destination="32" name="value" keyPath="values.AlwaysShowTooltipTextsHorizontally" id="szi-4g-EIC"/>
                                     </connections>
                                 </button>
                                 <button translatesAutoresizingMaskIntoConstraints="NO" id="mug-xq-Lmy">
                                     <rect key="frame" x="-1" y="4.5" width="314" height="17"/>
-                                    <constraints>
-                                        <constraint firstAttribute="height" constant="16" id="SHw-vN-0jF"/>
-                                    </constraints>
                                     <buttonCell key="cell" type="check" title="Share alphanumerical mode status across all clients" bezelStyle="regularSquare" imagePosition="left" controlSize="small" inset="2" id="K8U-Oq-lFc">
                                         <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
                                         <font key="font" metaFont="cellTitle"/>
                                     </buttonCell>
+                                    <constraints>
+                                        <constraint firstAttribute="height" constant="16" id="SHw-vN-0jF"/>
+                                    </constraints>
                                     <connections>
                                         <binding destination="32" name="value" keyPath="values.ShareAlphanumericalModeStatusAcrossClients" id="fG7-I0-pqu"/>
                                     </connections>
@@ -1042,7 +1043,7 @@
                         <stackView distribution="fill" orientation="vertical" alignment="leading" horizontalStackHuggingPriority="249.99998474121094" verticalStackHuggingPriority="249.99998474121094" translatesAutoresizingMaskIntoConstraints="NO" id="fO5-4y-X0y">
                             <rect key="frame" x="0.0" y="344" width="365" height="38"/>
                             <subviews>
-                                <textField verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="TMn-LX-3Ub">
+                                <textField focusRingType="none" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="TMn-LX-3Ub">
                                     <rect key="frame" x="-2" y="23" width="369" height="15"/>
                                     <textFieldCell key="cell" controlSize="small" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" alignment="left" title="Choose the behavior of (Shift+)Tab key in the candidate window." id="ueU-Rz-a1C">
                                         <font key="font" metaFont="cellTitle"/>
@@ -1090,7 +1091,7 @@
                         <stackView distribution="fill" orientation="vertical" alignment="leading" horizontalStackHuggingPriority="249.99998474121094" verticalStackHuggingPriority="249.99998474121094" translatesAutoresizingMaskIntoConstraints="NO" id="EOx-os-rU9">
                             <rect key="frame" x="0.0" y="262" width="381" height="74"/>
                             <subviews>
-                                <textField verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="sjl-L6-qdY">
+                                <textField focusRingType="none" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="sjl-L6-qdY">
                                     <rect key="frame" x="-2" y="59" width="385" height="15"/>
                                     <textFieldCell key="cell" controlSize="small" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" alignment="left" title="Specify what intonation key does when syllable composer is empty." id="lblIntonationKeyBehavior">
                                         <font key="font" metaFont="cellTitle"/>
@@ -1140,7 +1141,7 @@
                         <stackView distribution="fill" orientation="vertical" alignment="leading" spacing="7" horizontalStackHuggingPriority="249.99998474121094" verticalStackHuggingPriority="249.99998474121094" translatesAutoresizingMaskIntoConstraints="NO" id="L1h-Ce-g4Z">
                             <rect key="frame" x="0.0" y="145" width="449" height="109"/>
                             <subviews>
-                                <textField verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="6q5-OP-iEb">
+                                <textField focusRingType="none" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="6q5-OP-iEb">
                                     <rect key="frame" x="-2" y="94" width="332" height="15"/>
                                     <textFieldCell key="cell" controlSize="small" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" alignment="left" title="Choose the behavior of Shift+Letter key with letter inputs." id="lblUpperCaseLetterKeyBehavior">
                                         <font key="font" metaFont="cellTitle"/>
@@ -1198,7 +1199,7 @@
                         <stackView distribution="fill" orientation="vertical" alignment="leading" horizontalStackHuggingPriority="249.99998474121094" verticalStackHuggingPriority="249.99998474121094" translatesAutoresizingMaskIntoConstraints="NO" id="NOW-jd-XBh">
                             <rect key="frame" x="0.0" y="81" width="358" height="56"/>
                             <subviews>
-                                <textField verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="J0f-Aw-dxC">
+                                <textField focusRingType="none" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="J0f-Aw-dxC">
                                     <rect key="frame" x="-2" y="41" width="336" height="15"/>
                                     <textFieldCell key="cell" controlSize="small" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" alignment="left" title="Choose the behavior of (Shift+)Space key with candidates." id="Pg5-G9-pY5">
                                         <font key="font" metaFont="cellTitle"/>
@@ -1244,7 +1245,7 @@
                         <stackView distribution="fill" orientation="vertical" alignment="leading" spacing="7" horizontalStackHuggingPriority="249.99998474121094" verticalStackHuggingPriority="249.99998474121094" translatesAutoresizingMaskIntoConstraints="NO" id="s47-wG-vKA">
                             <rect key="frame" x="0.0" y="0.0" width="348" height="73"/>
                             <subviews>
-                                <textField verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="iCL-n8-VTP">
+                                <textField focusRingType="none" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="iCL-n8-VTP">
                                     <rect key="frame" x="-2" y="58" width="323" height="15"/>
                                     <textFieldCell key="cell" controlSize="small" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" alignment="left" title="Choose the attempted behavior of Shift+BackSpace key." id="lblShiftBkspKeyBehavior">
                                         <font key="font" metaFont="cellTitle"/>
@@ -1325,7 +1326,7 @@
                 <stackView distribution="fill" orientation="vertical" alignment="leading" horizontalStackHuggingPriority="249.99998474121094" verticalStackHuggingPriority="249.99998474121094" translatesAutoresizingMaskIntoConstraints="NO" id="6xK-1z-A14">
                     <rect key="frame" x="20" y="31" width="530" height="216"/>
                     <subviews>
-                        <textField autoresizesSubviews="NO" horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="FUV-qx-xkC">
+                        <textField autoresizesSubviews="NO" focusRingType="none" horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="FUV-qx-xkC">
                             <rect key="frame" x="-2" y="201" width="388" height="15"/>
                             <textFieldCell key="cell" controlSize="small" lineBreakMode="clipping" title="Choose your desired user data folder path. Will be omitted if invalid." id="wN3-k3-b2a">
                                 <font key="font" metaFont="cellTitle"/>
@@ -1358,10 +1359,6 @@
                                 </pathControl>
                                 <button wantsLayer="YES" translatesAutoresizingMaskIntoConstraints="NO" id="MPN-np-SbT" userLabel="btnOpenFolderToSpecifyForUserData">
                                     <rect key="frame" x="470" y="-1" width="30" height="24"/>
-                                    <constraints>
-                                        <constraint firstAttribute="height" constant="22" id="P2C-a5-37j"/>
-                                        <constraint firstAttribute="width" constant="30" id="g4h-2n-Ly7"/>
-                                    </constraints>
                                     <buttonCell key="cell" type="smallSquare" title="…" bezelStyle="smallSquare" alignment="center" lineBreakMode="truncatingTail" state="on" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="5YP-ws-KLH">
                                         <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
                                         <font key="font" metaFont="system"/>
@@ -1369,17 +1366,21 @@
                                             <action selector="chooseUserDataFolderToSpecify:" target="-2" id="DYG-k1-z3R"/>
                                         </connections>
                                     </buttonCell>
+                                    <constraints>
+                                        <constraint firstAttribute="height" constant="22" id="P2C-a5-37j"/>
+                                        <constraint firstAttribute="width" constant="30" id="g4h-2n-Ly7"/>
+                                    </constraints>
                                 </button>
                                 <button wantsLayer="YES" translatesAutoresizingMaskIntoConstraints="NO" id="jXe-xz-9Sd" userLabel="btnOpenFolderToSpecifyForUserData">
                                     <rect key="frame" x="500" y="-1" width="30" height="24"/>
-                                    <constraints>
-                                        <constraint firstAttribute="width" constant="30" id="WTD-kc-v77"/>
-                                        <constraint firstAttribute="height" constant="22" id="m4f-W3-T1Q"/>
-                                    </constraints>
                                     <buttonCell key="cell" type="smallSquare" title="↻" bezelStyle="smallSquare" alignment="center" lineBreakMode="truncatingTail" state="on" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="4Jw-5h-CdV">
                                         <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
                                         <font key="font" metaFont="system"/>
                                     </buttonCell>
+                                    <constraints>
+                                        <constraint firstAttribute="width" constant="30" id="WTD-kc-v77"/>
+                                        <constraint firstAttribute="height" constant="22" id="m4f-W3-T1Q"/>
+                                    </constraints>
                                     <connections>
                                         <action selector="resetSpecifiedUserDataFolder:" target="-2" id="pqR-AG-4cm"/>
                                     </connections>
@@ -1401,26 +1402,26 @@
                             <subviews>
                                 <button translatesAutoresizingMaskIntoConstraints="NO" id="p7V-IN-OTr">
                                     <rect key="frame" x="-1" y="146.5" width="336" height="17"/>
-                                    <constraints>
-                                        <constraint firstAttribute="height" constant="16" id="YjP-lh-WEb"/>
-                                    </constraints>
                                     <buttonCell key="cell" type="check" title="Automatically reload user data files if changes detected" bezelStyle="regularSquare" imagePosition="left" controlSize="small" state="on" inset="2" id="f8i-69-zxm">
                                         <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
                                         <font key="font" metaFont="cellTitle"/>
                                     </buttonCell>
+                                    <constraints>
+                                        <constraint firstAttribute="height" constant="16" id="YjP-lh-WEb"/>
+                                    </constraints>
                                     <connections>
                                         <binding destination="32" name="value" keyPath="values.ShouldAutoReloadUserDataFiles" id="XTI-ol-DVN"/>
                                     </connections>
                                 </button>
                                 <button translatesAutoresizingMaskIntoConstraints="NO" id="MJ6-U4-qyl">
                                     <rect key="frame" x="-1" y="125.5" width="290" height="17"/>
-                                    <constraints>
-                                        <constraint firstAttribute="height" constant="16" id="cb2-74-D5t"/>
-                                    </constraints>
                                     <buttonCell key="cell" type="check" title="Read external factory dictionary files if possible" bezelStyle="regularSquare" imagePosition="left" controlSize="small" state="on" inset="2" id="fEA-Bp-Ayn" userLabel="chkUseExternalFactoryDict">
                                         <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
                                         <font key="font" metaFont="cellTitle"/>
                                     </buttonCell>
+                                    <constraints>
+                                        <constraint firstAttribute="height" constant="16" id="cb2-74-D5t"/>
+                                    </constraints>
                                     <connections>
                                         <action selector="toggledExternalFactoryPlistDataOnOff:" target="-2" id="TYX-1b-x0P"/>
                                         <binding destination="32" name="value" keyPath="values.UseExternalFactoryDict" id="1Gp-Ax-mRK"/>
@@ -1428,13 +1429,13 @@
                                 </button>
                                 <button translatesAutoresizingMaskIntoConstraints="NO" id="ZQK-w3-FRb">
                                     <rect key="frame" x="-1" y="104.5" width="274" height="17"/>
-                                    <constraints>
-                                        <constraint firstAttribute="height" constant="16" id="anX-Rc-sxQ"/>
-                                    </constraints>
                                     <buttonCell key="cell" type="check" title="Only load factory language models if needed" bezelStyle="regularSquare" imagePosition="left" controlSize="small" state="on" inset="2" id="chkOnlyLoadFactoryLangModelsIfNeeded" userLabel="chkOnlyLoadFactoryLangModelsIfNeeded">
                                         <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
                                         <font key="font" metaFont="cellTitle"/>
                                     </buttonCell>
+                                    <constraints>
+                                        <constraint firstAttribute="height" constant="16" id="anX-Rc-sxQ"/>
+                                    </constraints>
                                     <connections>
                                         <action selector="toggleSymbolInputEnabled:" target="-2" id="AeU-Ii-tOF"/>
                                         <binding destination="32" name="value" keyPath="values.OnlyLoadFactoryLangModelsIfNeeded" id="TJ2-Fj-pca"/>
@@ -1442,13 +1443,13 @@
                                 </button>
                                 <button translatesAutoresizingMaskIntoConstraints="NO" id="Yaj-QY-7xV" userLabel="chkCNSSupport">
                                     <rect key="frame" x="-1" y="83.5" width="252" height="17"/>
-                                    <constraints>
-                                        <constraint firstAttribute="height" constant="16" id="u5w-vZ-JMF"/>
-                                    </constraints>
                                     <buttonCell key="cell" type="check" title="Enable CNS11643 Support (2023-05-19)" bezelStyle="regularSquare" imagePosition="left" controlSize="small" inset="2" id="W24-T4-cg0">
                                         <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
                                         <font key="font" metaFont="cellTitle"/>
                                     </buttonCell>
+                                    <constraints>
+                                        <constraint firstAttribute="height" constant="16" id="u5w-vZ-JMF"/>
+                                    </constraints>
                                     <connections>
                                         <action selector="toggleCNSSupport:" target="-2" id="mcY-ma-N0c"/>
                                         <binding destination="32" name="value" keyPath="values.CNS11643Enabled" id="Pbx-Gt-upm"/>
@@ -1456,13 +1457,13 @@
                                 </button>
                                 <button translatesAutoresizingMaskIntoConstraints="NO" id="O4B-Z2-XYi">
                                     <rect key="frame" x="-1" y="62.5" width="345" height="17"/>
-                                    <constraints>
-                                        <constraint firstAttribute="height" constant="16" id="o4B-Az-uzt"/>
-                                    </constraints>
                                     <buttonCell key="cell" type="check" title="Enable symbol input support (incl. certain emoji symbols)" bezelStyle="regularSquare" imagePosition="left" controlSize="small" state="on" inset="2" id="hSv-LJ-Cq3" userLabel="chkSymbolEnabled">
                                         <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
                                         <font key="font" metaFont="cellTitle"/>
                                     </buttonCell>
+                                    <constraints>
+                                        <constraint firstAttribute="height" constant="16" id="o4B-Az-uzt"/>
+                                    </constraints>
                                     <connections>
                                         <action selector="toggleSymbolInputEnabled:" target="-2" id="Gzj-dF-gvj"/>
                                         <binding destination="32" name="value" keyPath="values.SymbolInputEnabled" id="XWG-G3-DRu"/>
@@ -1470,40 +1471,40 @@
                                 </button>
                                 <button translatesAutoresizingMaskIntoConstraints="NO" id="D46-A7D-E0E">
                                     <rect key="frame" x="-1" y="41.5" width="374" height="17"/>
-                                    <constraints>
-                                        <constraint firstAttribute="height" constant="16" id="obW-Ey-vPB"/>
-                                    </constraints>
                                     <buttonCell key="cell" type="check" title="Applying typing suggestions from half-life user override model" bezelStyle="regularSquare" imagePosition="left" controlSize="small" state="on" inset="2" id="chkFetchSuggestionsFromUserOverrideModel" userLabel="chkFetchSuggestionsFromUserOverrideModel">
                                         <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
                                         <font key="font" metaFont="cellTitle"/>
                                     </buttonCell>
+                                    <constraints>
+                                        <constraint firstAttribute="height" constant="16" id="obW-Ey-vPB"/>
+                                    </constraints>
                                     <connections>
                                         <binding destination="32" name="value" keyPath="values.FetchSuggestionsFromUserOverrideModel" id="F53-CE5-A2E"/>
                                     </connections>
                                 </button>
                                 <button translatesAutoresizingMaskIntoConstraints="NO" id="4Ks-sR-UME">
                                     <rect key="frame" x="-1" y="20.5" width="207" height="17"/>
-                                    <constraints>
-                                        <constraint firstAttribute="height" constant="16" id="KC2-43-MJM"/>
-                                        <constraint firstAttribute="width" relation="greaterThanOrEqual" constant="70" id="mbh-8u-8ef"/>
-                                    </constraints>
                                     <buttonCell key="cell" type="check" title="Enable phrase replacement table" bezelStyle="regularSquare" imagePosition="left" controlSize="small" inset="2" id="iyh-1K-76v">
                                         <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
                                         <font key="font" metaFont="cellTitle"/>
                                     </buttonCell>
+                                    <constraints>
+                                        <constraint firstAttribute="height" constant="16" id="KC2-43-MJM"/>
+                                        <constraint firstAttribute="width" relation="greaterThanOrEqual" constant="70" id="mbh-8u-8ef"/>
+                                    </constraints>
                                     <connections>
                                         <binding destination="32" name="value" keyPath="values.PhraseReplacementEnabled" id="0gz-hu-Lgl"/>
                                     </connections>
                                 </button>
                                 <button translatesAutoresizingMaskIntoConstraints="NO" id="Hyc-Nw-dET">
                                     <rect key="frame" x="-1" y="-0.5" width="451" height="17"/>
-                                    <constraints>
-                                        <constraint firstAttribute="height" constant="16" id="RXU-aZ-x5S"/>
-                                    </constraints>
                                     <buttonCell key="cell" type="check" title="Allow boosting / excluding a candidate of single kanji through marking mode" bezelStyle="regularSquare" imagePosition="left" controlSize="small" state="on" inset="2" id="chkAllowBoostingSingleKanjiAsUserPhrase" userLabel="chkAllowBoostingSingleKanjiAsUserPhrase">
                                         <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
                                         <font key="font" metaFont="cellTitle"/>
                                     </buttonCell>
+                                    <constraints>
+                                        <constraint firstAttribute="height" constant="16" id="RXU-aZ-x5S"/>
+                                    </constraints>
                                     <connections>
                                         <binding destination="32" name="value" keyPath="values.AllowBoostingSingleKanjiAsUserPhrase" id="jiw-1V-C7x"/>
                                     </connections>
@@ -1694,7 +1695,7 @@
                                 <autoresizingMask key="autoresizingMask"/>
                             </scroller>
                         </scrollView>
-                        <textField wantsLayer="YES" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="cRd-HU-x7y" userLabel="CommentField">
+                        <textField wantsLayer="YES" focusRingType="none" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="cRd-HU-x7y" userLabel="CommentField">
                             <rect key="frame" x="0.0" y="45" width="538" height="21"/>
                             <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" selectable="YES" editable="YES" sendsActionOnEndEditing="YES" borderStyle="bezel" placeholderString="Comment" drawsBackground="YES" usesSingleLineMode="YES" id="8ao-bw-PSo">
                                 <font key="font" usesAppearanceFont="YES"/>
@@ -1705,7 +1706,7 @@
                         <stackView distribution="fill" orientation="horizontal" alignment="bottom" horizontalStackHuggingPriority="249.99998474121094" verticalStackHuggingPriority="249.99998474121094" translatesAutoresizingMaskIntoConstraints="NO" id="hOe-xG-Qde">
                             <rect key="frame" x="0.0" y="19" width="538" height="21"/>
                             <subviews>
-                                <textField wantsLayer="YES" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="eGd-pc-aEI" userLabel="Field1">
+                                <textField wantsLayer="YES" focusRingType="none" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="eGd-pc-aEI" userLabel="Field1">
                                     <rect key="frame" x="0.0" y="0.0" width="139" height="21"/>
                                     <constraints>
                                         <constraint firstAttribute="width" constant="139" id="HcX-BZ-tBS"/>
@@ -1716,7 +1717,7 @@
                                         <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
                                     </textFieldCell>
                                 </textField>
-                                <textField wantsLayer="YES" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="4hL-rO-jca" userLabel="Field2">
+                                <textField wantsLayer="YES" focusRingType="none" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="4hL-rO-jca" userLabel="Field2">
                                     <rect key="frame" x="147" y="0.0" width="222" height="21"/>
                                     <constraints>
                                         <constraint firstAttribute="width" constant="222" id="40e-8a-KXa"/>
@@ -1727,7 +1728,7 @@
                                         <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
                                     </textFieldCell>
                                 </textField>
-                                <textField wantsLayer="YES" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="MtM-ya-r2H" userLabel="Field3">
+                                <textField wantsLayer="YES" focusRingType="none" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="MtM-ya-r2H" userLabel="Field3">
                                     <rect key="frame" x="377" y="0.0" width="108" height="21"/>
                                     <constraints>
                                         <constraint firstAttribute="width" relation="greaterThanOrEqual" constant="107" id="bDV-wY-WKh"/>
@@ -1740,9 +1741,6 @@
                                 </textField>
                                 <button wantsLayer="YES" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="gTs-SB-5lC" userLabel="Add">
                                     <rect key="frame" x="486" y="-7" width="59" height="32"/>
-                                    <constraints>
-                                        <constraint firstAttribute="width" relation="greaterThanOrEqual" constant="45" id="aqH-qL-Kzr"/>
-                                    </constraints>
                                     <buttonCell key="cell" type="push" title="Add" bezelStyle="rounded" alignment="center" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="ddf-uN-Ek9">
                                         <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
                                         <font key="font" metaFont="system"/>
@@ -1751,6 +1749,9 @@ DQ
 </string>
                                         <modifierMask key="keyEquivalentModifierMask" command="YES"/>
                                     </buttonCell>
+                                    <constraints>
+                                        <constraint firstAttribute="width" relation="greaterThanOrEqual" constant="45" id="aqH-qL-Kzr"/>
+                                    </constraints>
                                     <connections>
                                         <action selector="addPEButtonClicked:" target="-2" id="hhk-Nx-ifF"/>
                                     </connections>
@@ -1813,7 +1814,7 @@ DQ
                 <stackView distribution="fill" orientation="vertical" alignment="leading" horizontalStackHuggingPriority="249.99998474121094" verticalStackHuggingPriority="249.99998474121094" translatesAutoresizingMaskIntoConstraints="NO" id="sgB-kZ-rJg">
                     <rect key="frame" x="20" y="34" width="537" height="361"/>
                     <subviews>
-                        <textField autoresizesSubviews="NO" horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="vgR-3O-aTP">
+                        <textField autoresizesSubviews="NO" focusRingType="none" horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="vgR-3O-aTP">
                             <rect key="frame" x="-2" y="346" width="368" height="15"/>
                             <textFieldCell key="cell" controlSize="small" lineBreakMode="clipping" title="Choose your desired cassette file path. Will be omitted if invalid." id="Iai-0X-nxi">
                                 <font key="font" metaFont="cellTitle"/>
@@ -1847,28 +1848,28 @@ DQ
                                 </pathControl>
                                 <button wantsLayer="YES" translatesAutoresizingMaskIntoConstraints="NO" id="8LP-EF-YwT" userLabel="btnOpenFolderToSpecifyForUserData">
                                     <rect key="frame" x="470" y="-1" width="30" height="24"/>
-                                    <constraints>
-                                        <constraint firstAttribute="width" constant="30" id="X5O-PM-Eph"/>
-                                        <constraint firstAttribute="height" constant="22" id="YrO-NB-UNc"/>
-                                    </constraints>
                                     <buttonCell key="cell" type="smallSquare" title="…" bezelStyle="smallSquare" alignment="center" lineBreakMode="truncatingTail" state="on" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="V4e-Bu-wom">
                                         <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
                                         <font key="font" metaFont="system"/>
                                     </buttonCell>
+                                    <constraints>
+                                        <constraint firstAttribute="width" constant="30" id="X5O-PM-Eph"/>
+                                        <constraint firstAttribute="height" constant="22" id="YrO-NB-UNc"/>
+                                    </constraints>
                                     <connections>
                                         <action selector="chooseCassettePath:" target="-2" id="Q7N-Im-hZd"/>
                                     </connections>
                                 </button>
                                 <button wantsLayer="YES" translatesAutoresizingMaskIntoConstraints="NO" id="8fG-OI-45A" userLabel="btnOpenFolderToSpecifyForUserData">
                                     <rect key="frame" x="500" y="-1" width="30" height="24"/>
-                                    <constraints>
-                                        <constraint firstAttribute="width" constant="30" id="H26-EO-Gxs"/>
-                                        <constraint firstAttribute="height" constant="22" id="bQs-q7-Ual"/>
-                                    </constraints>
                                     <buttonCell key="cell" type="smallSquare" title="×" bezelStyle="smallSquare" alignment="center" lineBreakMode="truncatingTail" state="on" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="62c-wp-9mF">
                                         <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
                                         <font key="font" metaFont="system"/>
                                     </buttonCell>
+                                    <constraints>
+                                        <constraint firstAttribute="width" constant="30" id="H26-EO-Gxs"/>
+                                        <constraint firstAttribute="height" constant="22" id="bQs-q7-Ual"/>
+                                    </constraints>
                                     <connections>
                                         <action selector="resetSpecifiedCassettePath:" target="-2" id="lFN-a2-ADt"/>
                                     </connections>
@@ -1890,20 +1891,20 @@ DQ
                             <subviews>
                                 <button translatesAutoresizingMaskIntoConstraints="NO" id="y75-fJ-x9L">
                                     <rect key="frame" x="-1" y="149.5" width="311" height="17"/>
-                                    <constraints>
-                                        <constraint firstAttribute="width" relation="greaterThanOrEqual" constant="70" id="UE0-Je-AxG"/>
-                                        <constraint firstAttribute="height" constant="16" id="dkb-Cc-S5f"/>
-                                    </constraints>
                                     <buttonCell key="cell" type="check" title="Enable cassette mode, suppressing phonabet input" bezelStyle="regularSquare" imagePosition="left" controlSize="small" state="on" inset="2" id="Grn-MZ-wTg">
                                         <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
                                         <font key="font" metaFont="cellTitle"/>
                                     </buttonCell>
+                                    <constraints>
+                                        <constraint firstAttribute="width" relation="greaterThanOrEqual" constant="70" id="UE0-Je-AxG"/>
+                                        <constraint firstAttribute="height" constant="16" id="dkb-Cc-S5f"/>
+                                    </constraints>
                                     <connections>
                                         <action selector="onToggleCassetteMode:" target="-2" id="0OS-EB-07O"/>
                                         <binding destination="32" name="value" keyPath="values.CassetteEnabled" id="zBA-Is-Ejs"/>
                                     </connections>
                                 </button>
-                                <textField wantsLayer="YES" verticalHuggingPriority="750" setsMaxLayoutWidthAtFirstLayout="YES" translatesAutoresizingMaskIntoConstraints="NO" id="XN3-ki-c3E" userLabel="lblCassetteModeDescription">
+                                <textField wantsLayer="YES" focusRingType="none" verticalHuggingPriority="750" setsMaxLayoutWidthAtFirstLayout="YES" translatesAutoresizingMaskIntoConstraints="NO" id="XN3-ki-c3E" userLabel="lblCassetteModeDescription">
                                     <rect key="frame" x="-2" y="75" width="541" height="70"/>
                                     <constraints>
                                         <constraint firstAttribute="width" constant="537" id="6MO-OV-Ykr"/>
@@ -1917,33 +1918,33 @@ DQ
                                 </textField>
                                 <button translatesAutoresizingMaskIntoConstraints="NO" id="T4J-vm-GL6">
                                     <rect key="frame" x="-1" y="53.5" width="343" height="17"/>
-                                    <constraints>
-                                        <constraint firstAttribute="height" constant="16" id="J7U-FN-fhA"/>
-                                        <constraint firstAttribute="width" relation="greaterThanOrEqual" constant="70" id="g7o-3C-NrU"/>
-                                    </constraints>
                                     <buttonCell key="cell" type="check" title="Auto-composite when the longest possible key is formed" bezelStyle="regularSquare" imagePosition="left" controlSize="small" state="on" inset="2" id="neb-Pz-n1h">
                                         <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
                                         <font key="font" metaFont="cellTitle"/>
                                     </buttonCell>
+                                    <constraints>
+                                        <constraint firstAttribute="height" constant="16" id="J7U-FN-fhA"/>
+                                        <constraint firstAttribute="width" relation="greaterThanOrEqual" constant="70" id="g7o-3C-NrU"/>
+                                    </constraints>
                                     <connections>
                                         <binding destination="32" name="value" keyPath="values.AutoCompositeWithLongestPossibleCassetteKey" id="OSk-i5-Mdr"/>
                                     </connections>
                                 </button>
                                 <button translatesAutoresizingMaskIntoConstraints="NO" id="3eW-vq-tFr">
                                     <rect key="frame" x="-1" y="32.5" width="281" height="17"/>
-                                    <constraints>
-                                        <constraint firstAttribute="width" relation="greaterThanOrEqual" constant="70" id="f8O-YI-8sP"/>
-                                        <constraint firstAttribute="height" constant="16" id="x7P-k1-dsX"/>
-                                    </constraints>
                                     <buttonCell key="cell" type="check" title="Show translated strokes in composition buffer" bezelStyle="regularSquare" imagePosition="left" controlSize="small" state="on" inset="2" id="SzF-FL-sVO">
                                         <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
                                         <font key="font" metaFont="cellTitle"/>
                                     </buttonCell>
+                                    <constraints>
+                                        <constraint firstAttribute="width" relation="greaterThanOrEqual" constant="70" id="f8O-YI-8sP"/>
+                                        <constraint firstAttribute="height" constant="16" id="x7P-k1-dsX"/>
+                                    </constraints>
                                     <connections>
                                         <binding destination="32" name="value" keyPath="values.ShowTranslatedStrokesInCompositionBuffer" id="wZl-Ll-NQE"/>
                                     </connections>
                                 </button>
-                                <textField wantsLayer="YES" verticalHuggingPriority="750" setsMaxLayoutWidthAtFirstLayout="YES" translatesAutoresizingMaskIntoConstraints="NO" id="E3c-R8-OEL" userLabel="lblCassetteStrokeTranslation">
+                                <textField wantsLayer="YES" focusRingType="none" verticalHuggingPriority="750" setsMaxLayoutWidthAtFirstLayout="YES" translatesAutoresizingMaskIntoConstraints="NO" id="E3c-R8-OEL" userLabel="lblCassetteStrokeTranslation">
                                     <rect key="frame" x="-2" y="0.0" width="541" height="28"/>
                                     <constraints>
                                         <constraint firstAttribute="width" constant="537" id="MuV-7s-8wL"/>
@@ -1971,7 +1972,7 @@ DQ
                                 <real value="3.4028234663852886e+38"/>
                             </customSpacing>
                         </stackView>
-                        <textField verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="yaq-5S-KLW">
+                        <textField focusRingType="none" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="yaq-5S-KLW">
                             <rect key="frame" x="-2" y="119" width="504" height="15"/>
                             <constraints>
                                 <constraint firstAttribute="width" relation="greaterThanOrEqual" constant="500" id="oHO-0L-j8S"/>
@@ -2018,7 +2019,7 @@ DQ
                                 <binding destination="32" name="selectedTag" keyPath="values.ForceCassetteChineseConversion" id="ZU7-OV-xvR"/>
                             </connections>
                         </matrix>
-                        <textField wantsLayer="YES" verticalHuggingPriority="750" setsMaxLayoutWidthAtFirstLayout="YES" translatesAutoresizingMaskIntoConstraints="NO" id="v8K-1M-luy" userLabel="lblCassetteChineseConversionDescription">
+                        <textField wantsLayer="YES" focusRingType="none" verticalHuggingPriority="750" setsMaxLayoutWidthAtFirstLayout="YES" translatesAutoresizingMaskIntoConstraints="NO" id="v8K-1M-luy" userLabel="lblCassetteChineseConversionDescription">
                             <rect key="frame" x="-2" y="0.0" width="541" height="28"/>
                             <constraints>
                                 <constraint firstAttribute="width" constant="537" id="M6k-9g-blj"/>
@@ -2066,7 +2067,7 @@ DQ
                         <stackView distribution="fill" orientation="vertical" alignment="leading" spacing="5" horizontalStackHuggingPriority="249.99998474121094" verticalStackHuggingPriority="249.99998474121094" translatesAutoresizingMaskIntoConstraints="NO" id="v7J-Jh-97Y">
                             <rect key="frame" x="0.0" y="133" width="530" height="125"/>
                             <subviews>
-                                <textField verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="onD-QP-KPf">
+                                <textField focusRingType="none" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="onD-QP-KPf">
                                     <rect key="frame" x="-2" y="110" width="345" height="15"/>
                                     <textFieldCell key="cell" controlSize="small" lineBreakMode="clipping" title="Choose your preferred keyboard layout and phonetic parser." id="RQ6-MS-m4C">
                                         <font key="font" metaFont="cellTitle"/>
@@ -2080,7 +2081,7 @@ DQ
                                         <stackView distribution="fill" orientation="horizontal" alignment="centerY" horizontalStackHuggingPriority="249.99998474121094" verticalStackHuggingPriority="249.99998474121094" translatesAutoresizingMaskIntoConstraints="NO" id="h8t-5m-DFX">
                                             <rect key="frame" x="0.0" y="22" width="430" height="22"/>
                                             <subviews>
-                                                <textField horizontalHuggingPriority="1" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="11">
+                                                <textField focusRingType="none" horizontalHuggingPriority="1" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="11">
                                                     <rect key="frame" x="-2" y="4" width="126" height="15"/>
                                                     <constraints>
                                                         <constraint firstAttribute="width" relation="greaterThanOrEqual" constant="76" id="2hq-Hr-fjU"/>
@@ -2093,10 +2094,6 @@ DQ
                                                 </textField>
                                                 <popUpButton wantsLayer="YES" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="3">
                                                     <rect key="frame" x="126" y="-4" width="308" height="28"/>
-                                                    <constraints>
-                                                        <constraint firstAttribute="width" relation="greaterThanOrEqual" constant="300" id="ABT-zF-fLk"/>
-                                                        <constraint firstAttribute="height" constant="22" id="hlU-Bq-ZfZ"/>
-                                                    </constraints>
                                                     <popUpButtonCell key="cell" type="push" title="Standard" bezelStyle="rounded" alignment="left" controlSize="small" lineBreakMode="truncatingTail" state="on" borderStyle="borderAndBezel" imageScaling="proportionallyDown" inset="2" selectedItem="6" id="4">
                                                         <behavior key="behavior" lightByBackground="YES" lightByGray="YES"/>
                                                         <font key="font" metaFont="cellTitle"/>
@@ -2126,6 +2123,10 @@ DQ
                                                             <binding destination="32" name="selectedTag" keyPath="values.KeyboardParser" id="8MX-rF-6Lp"/>
                                                         </connections>
                                                     </popUpButtonCell>
+                                                    <constraints>
+                                                        <constraint firstAttribute="width" relation="greaterThanOrEqual" constant="300" id="ABT-zF-fLk"/>
+                                                        <constraint firstAttribute="height" constant="22" id="hlU-Bq-ZfZ"/>
+                                                    </constraints>
                                                 </popUpButton>
                                             </subviews>
                                             <visibilityPriorities>
@@ -2140,7 +2141,7 @@ DQ
                                         <stackView distribution="fill" orientation="horizontal" alignment="centerY" horizontalStackHuggingPriority="249.99998474121094" verticalStackHuggingPriority="249.99998474121094" translatesAutoresizingMaskIntoConstraints="NO" id="CvR-zl-5Xk">
                                             <rect key="frame" x="0.0" y="0.0" width="430" height="22"/>
                                             <subviews>
-                                                <textField horizontalHuggingPriority="1" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="125">
+                                                <textField focusRingType="none" horizontalHuggingPriority="1" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="125">
                                                     <rect key="frame" x="-2" y="4" width="126" height="15"/>
                                                     <constraints>
                                                         <constraint firstAttribute="width" relation="greaterThanOrEqual" constant="76" id="sfr-Qb-PHn"/>
@@ -2153,15 +2154,15 @@ DQ
                                                 </textField>
                                                 <popUpButton verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="124">
                                                     <rect key="frame" x="126" y="-4" width="308" height="28"/>
-                                                    <constraints>
-                                                        <constraint firstAttribute="width" relation="greaterThanOrEqual" constant="300" id="bNw-H3-WH5"/>
-                                                        <constraint firstAttribute="height" constant="22" id="wOe-2O-VNa"/>
-                                                    </constraints>
                                                     <popUpButtonCell key="cell" type="push" bezelStyle="rounded" alignment="left" controlSize="small" lineBreakMode="truncatingTail" borderStyle="borderAndBezel" imageScaling="proportionallyDown" inset="2" id="127">
                                                         <behavior key="behavior" lightByBackground="YES" lightByGray="YES"/>
                                                         <font key="font" metaFont="cellTitle"/>
                                                         <menu key="menu" title="OtherViews" id="128"/>
                                                     </popUpButtonCell>
+                                                    <constraints>
+                                                        <constraint firstAttribute="width" relation="greaterThanOrEqual" constant="300" id="bNw-H3-WH5"/>
+                                                        <constraint firstAttribute="height" constant="22" id="wOe-2O-VNa"/>
+                                                    </constraints>
                                                     <connections>
                                                         <action selector="updateBasicKeyboardLayoutAction:" target="-2" id="136"/>
                                                     </connections>
@@ -2189,7 +2190,7 @@ DQ
                                         <real value="3.4028234663852886e+38"/>
                                     </customSpacing>
                                 </stackView>
-                                <textField wantsLayer="YES" verticalHuggingPriority="750" horizontalCompressionResistancePriority="250" setsMaxLayoutWidthAtFirstLayout="YES" translatesAutoresizingMaskIntoConstraints="NO" id="hab-1o-1kS">
+                                <textField wantsLayer="YES" focusRingType="none" verticalHuggingPriority="750" horizontalCompressionResistancePriority="250" setsMaxLayoutWidthAtFirstLayout="YES" translatesAutoresizingMaskIntoConstraints="NO" id="hab-1o-1kS">
                                     <rect key="frame" x="-2" y="0.0" width="534" height="56"/>
                                     <constraints>
                                         <constraint firstAttribute="width" constant="530" id="hAl-ML-Rbc"/>
@@ -2219,7 +2220,7 @@ DQ
                         <stackView distribution="fill" orientation="vertical" alignment="leading" horizontalStackHuggingPriority="249.99998474121094" verticalStackHuggingPriority="249.99998474121094" translatesAutoresizingMaskIntoConstraints="NO" id="gwA-XL-zVB">
                             <rect key="frame" x="0.0" y="0.0" width="396" height="123"/>
                             <subviews>
-                                <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="Md1-t7-hU4">
+                                <textField focusRingType="none" horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="Md1-t7-hU4">
                                     <rect key="frame" x="-2" y="108" width="125" height="15"/>
                                     <textFieldCell key="cell" lineBreakMode="clipping" title="Keyboard Shortcuts" id="xibKeyboardShortcuts">
                                         <font key="font" metaFont="systemBold" size="12"/>
@@ -2235,65 +2236,65 @@ DQ
                                             <subviews>
                                                 <button verticalCompressionResistancePriority="751" translatesAutoresizingMaskIntoConstraints="NO" id="8fz-X4-HVS" userLabel="UsingHotKeySCPC">
                                                     <rect key="frame" x="-1" y="83.5" width="147" height="17"/>
-                                                    <constraints>
-                                                        <constraint firstAttribute="height" constant="16" id="iAE-th-G1o"/>
-                                                    </constraints>
                                                     <buttonCell key="cell" type="check" title="Per-Char Select Mode" bezelStyle="regularSquare" imagePosition="left" controlSize="small" inset="2" id="xibUsingHotKeySCPC">
                                                         <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
                                                         <font key="font" metaFont="cellTitle"/>
                                                     </buttonCell>
+                                                    <constraints>
+                                                        <constraint firstAttribute="height" constant="16" id="iAE-th-G1o"/>
+                                                    </constraints>
                                                     <connections>
                                                         <binding destination="32" name="value" keyPath="values.UsingHotKeySCPC" id="fGT-OM-Lsm"/>
                                                     </connections>
                                                 </button>
                                                 <button translatesAutoresizingMaskIntoConstraints="NO" id="ajS-Ja-Vxr" userLabel="UsingHotKeyKangXi">
                                                     <rect key="frame" x="-1" y="62.5" width="140" height="17"/>
-                                                    <constraints>
-                                                        <constraint firstAttribute="height" constant="16" id="NnI-DU-gqr"/>
-                                                    </constraints>
                                                     <buttonCell key="cell" type="check" title="Force KangXi Writing" bezelStyle="regularSquare" imagePosition="left" controlSize="small" inset="2" id="xibUsingHotKeyKangXi">
                                                         <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
                                                         <font key="font" metaFont="cellTitle"/>
                                                     </buttonCell>
+                                                    <constraints>
+                                                        <constraint firstAttribute="height" constant="16" id="NnI-DU-gqr"/>
+                                                    </constraints>
                                                     <connections>
                                                         <binding destination="32" name="value" keyPath="values.UsingHotKeyKangXi" id="qXu-X7-Jbp"/>
                                                     </connections>
                                                 </button>
                                                 <button translatesAutoresizingMaskIntoConstraints="NO" id="ZWc-3p-TII" userLabel="UsingHotKeyAssociates">
                                                     <rect key="frame" x="-1" y="41.5" width="187" height="17"/>
-                                                    <constraints>
-                                                        <constraint firstAttribute="height" constant="16" id="NaX-QA-VsM"/>
-                                                    </constraints>
                                                     <buttonCell key="cell" type="check" title="Per-Char Associated Phrases" bezelStyle="regularSquare" imagePosition="left" controlSize="small" inset="2" id="xibUsingHotKeyAssociates">
                                                         <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
                                                         <font key="font" metaFont="cellTitle"/>
                                                     </buttonCell>
+                                                    <constraints>
+                                                        <constraint firstAttribute="height" constant="16" id="NaX-QA-VsM"/>
+                                                    </constraints>
                                                     <connections>
                                                         <binding destination="32" name="value" keyPath="values.UsingHotKeyAssociates" id="rtd-1k-lXs"/>
                                                     </connections>
                                                 </button>
                                                 <button horizontalHuggingPriority="249" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="vbm-7v-Dtb" userLabel="UsingHotKeyJIS">
                                                     <rect key="frame" x="-1" y="20.5" width="187" height="17"/>
-                                                    <constraints>
-                                                        <constraint firstAttribute="height" constant="16" id="SNf-2h-hGK"/>
-                                                    </constraints>
                                                     <buttonCell key="cell" type="check" title="JIS Shinjitai Output" bezelStyle="regularSquare" imagePosition="left" controlSize="small" inset="2" id="xibUsingHotKeyJIS">
                                                         <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
                                                         <font key="font" metaFont="cellTitle"/>
                                                     </buttonCell>
+                                                    <constraints>
+                                                        <constraint firstAttribute="height" constant="16" id="SNf-2h-hGK"/>
+                                                    </constraints>
                                                     <connections>
                                                         <binding destination="32" name="value" keyPath="values.UsingHotKeyJIS" id="ys3-4B-YOe"/>
                                                     </connections>
                                                 </button>
                                                 <button translatesAutoresizingMaskIntoConstraints="NO" id="MVw-Gx-ueg" userLabel="UsingHotKeyCNS">
                                                     <rect key="frame" x="-1" y="-0.5" width="116" height="17"/>
-                                                    <constraints>
-                                                        <constraint firstAttribute="height" constant="16" id="sWQ-Qk-gaB"/>
-                                                    </constraints>
                                                     <buttonCell key="cell" type="check" title="CNS11643 Mode" bezelStyle="regularSquare" imagePosition="left" controlSize="small" inset="2" id="xibUsingHotKeyCNS">
                                                         <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
                                                         <font key="font" metaFont="cellTitle"/>
                                                     </buttonCell>
+                                                    <constraints>
+                                                        <constraint firstAttribute="height" constant="16" id="sWQ-Qk-gaB"/>
+                                                    </constraints>
                                                     <connections>
                                                         <binding destination="32" name="value" keyPath="values.UsingHotKeyCNS" id="wR2-4R-4Fm"/>
                                                     </connections>
@@ -2319,65 +2320,65 @@ DQ
                                             <subviews>
                                                 <button translatesAutoresizingMaskIntoConstraints="NO" id="aBy-qb-ZL5" userLabel="UsingHotKeyHalfWidthASCII">
                                                     <rect key="frame" x="-1" y="83.5" width="189" height="17"/>
-                                                    <constraints>
-                                                        <constraint firstAttribute="height" constant="16" id="9gu-Gq-Bpc"/>
-                                                    </constraints>
                                                     <buttonCell key="cell" type="check" title="Half-Width Punctuation Mode" bezelStyle="regularSquare" imagePosition="left" controlSize="small" inset="2" id="xibUsingHotKeyHalfWidthASCII">
                                                         <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
                                                         <font key="font" metaFont="cellTitle"/>
                                                     </buttonCell>
+                                                    <constraints>
+                                                        <constraint firstAttribute="height" constant="16" id="9gu-Gq-Bpc"/>
+                                                    </constraints>
                                                     <connections>
                                                         <binding destination="32" name="value" keyPath="values.UsingHotKeyHalfWidthASCII" id="Sb7-46-oZ3"/>
                                                     </connections>
                                                 </button>
                                                 <button translatesAutoresizingMaskIntoConstraints="NO" id="JvA-GK-VEW" userLabel="CurrencyNumerals">
                                                     <rect key="frame" x="-1" y="62.5" width="167" height="17"/>
-                                                    <constraints>
-                                                        <constraint firstAttribute="height" constant="16" id="6EL-3G-s7z"/>
-                                                    </constraints>
                                                     <buttonCell key="cell" type="check" title="Currency Numeral Output" bezelStyle="regularSquare" imagePosition="left" controlSize="small" inset="2" id="xibUsingCurrencyNumerals">
                                                         <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
                                                         <font key="font" metaFont="cellTitle"/>
                                                     </buttonCell>
+                                                    <constraints>
+                                                        <constraint firstAttribute="height" constant="16" id="6EL-3G-s7z"/>
+                                                    </constraints>
                                                     <connections>
                                                         <binding destination="32" name="value" keyPath="values.UsingHotKeyCurrencyNumerals" id="FuM-xj-9qa"/>
                                                     </connections>
                                                 </button>
                                                 <button translatesAutoresizingMaskIntoConstraints="NO" id="zZA-X1-GCy" userLabel="UsingHotKeyCassette">
                                                     <rect key="frame" x="-1" y="41.5" width="131" height="17"/>
-                                                    <constraints>
-                                                        <constraint firstAttribute="height" constant="16" id="D36-2Y-mX5"/>
-                                                    </constraints>
                                                     <buttonCell key="cell" type="check" title="CIN Cassette Mode" bezelStyle="regularSquare" imagePosition="left" controlSize="small" inset="2" id="xibUsingHotKeyCassette">
                                                         <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
                                                         <font key="font" metaFont="cellTitle"/>
                                                     </buttonCell>
+                                                    <constraints>
+                                                        <constraint firstAttribute="height" constant="16" id="D36-2Y-mX5"/>
+                                                    </constraints>
                                                     <connections>
                                                         <binding destination="32" name="value" keyPath="values.UsingHotKeyCassette" id="mDe-q0-XYa"/>
                                                     </connections>
                                                 </button>
                                                 <button translatesAutoresizingMaskIntoConstraints="NO" id="g3L-S4-NBx" userLabel="UsingHotKeyCassette">
                                                     <rect key="frame" x="-1" y="20.5" width="184" height="17"/>
-                                                    <constraints>
-                                                        <constraint firstAttribute="height" constant="16" id="MlY-Pc-flb"/>
-                                                    </constraints>
                                                     <buttonCell key="cell" type="check" title="Reverse Lookup (Phonabets)" bezelStyle="regularSquare" imagePosition="left" controlSize="small" inset="2" id="xibUsingHotKeyRevLookup">
                                                         <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
                                                         <font key="font" metaFont="cellTitle"/>
                                                     </buttonCell>
+                                                    <constraints>
+                                                        <constraint firstAttribute="height" constant="16" id="MlY-Pc-flb"/>
+                                                    </constraints>
                                                     <connections>
                                                         <binding destination="32" name="value" keyPath="values.UsingHotKeyRevLookup" id="y9C-ob-Mw2"/>
                                                     </connections>
                                                 </button>
                                                 <button translatesAutoresizingMaskIntoConstraints="NO" id="SAU-IA-cdf" userLabel="UsingHotKeyCassette">
                                                     <rect key="frame" x="-1" y="-0.5" width="191" height="17"/>
-                                                    <constraints>
-                                                        <constraint firstAttribute="height" constant="16" id="aIj-Ga-hmJ"/>
-                                                    </constraints>
                                                     <buttonCell key="cell" type="check" title="CHS / CHT Input Mode Switch" bezelStyle="regularSquare" imagePosition="left" controlSize="small" inset="2" id="xibUsingHotKeyInputMode">
                                                         <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
                                                         <font key="font" metaFont="cellTitle"/>
                                                     </buttonCell>
+                                                    <constraints>
+                                                        <constraint firstAttribute="height" constant="16" id="aIj-Ga-hmJ"/>
+                                                    </constraints>
                                                     <connections>
                                                         <binding destination="32" name="value" keyPath="values.UsingHotKeyInputMode" id="C0X-mL-WNo"/>
                                                     </connections>
@@ -2440,14 +2441,14 @@ DQ
             <point key="canvasLocation" x="-716" y="453"/>
         </view>
         <view id="MaQ-Xm-8TB" userLabel="vwrDevZone">
-            <rect key="frame" x="0.0" y="0.0" width="577" height="280"/>
+            <rect key="frame" x="0.0" y="0.0" width="577" height="296"/>
             <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
             <subviews>
                 <stackView distribution="fill" orientation="vertical" alignment="leading" horizontalStackHuggingPriority="249.99998474121094" verticalStackHuggingPriority="249.99998474121094" translatesAutoresizingMaskIntoConstraints="NO" id="gjM-uG-XkW">
-                    <rect key="frame" x="20" y="121" width="537" height="139"/>
+                    <rect key="frame" x="20" y="31" width="537" height="245"/>
                     <subviews>
-                        <textField wantsLayer="YES" verticalHuggingPriority="750" setsMaxLayoutWidthAtFirstLayout="YES" translatesAutoresizingMaskIntoConstraints="NO" id="hBd-sS-cWq">
-                            <rect key="frame" x="-2" y="111" width="541" height="28"/>
+                        <textField wantsLayer="YES" focusRingType="none" verticalHuggingPriority="750" setsMaxLayoutWidthAtFirstLayout="YES" translatesAutoresizingMaskIntoConstraints="NO" id="hBd-sS-cWq">
+                            <rect key="frame" x="-2" y="217" width="541" height="28"/>
                             <constraints>
                                 <constraint firstAttribute="width" constant="537" id="Kvp-PL-Pes"/>
                             </constraints>
@@ -2460,28 +2461,28 @@ Features listed here may not work as expected.</string>
                             </textFieldCell>
                         </textField>
                         <box verticalHuggingPriority="750" boxType="separator" translatesAutoresizingMaskIntoConstraints="NO" id="ul4-N6-Ybi">
-                            <rect key="frame" x="0.0" y="100" width="537" height="5"/>
+                            <rect key="frame" x="0.0" y="206" width="537" height="5"/>
                             <constraints>
                                 <constraint firstAttribute="width" constant="537" id="2lI-El-JtD"/>
                                 <constraint firstAttribute="width" relation="greaterThanOrEqual" constant="400" id="kJZ-E8-eDL"/>
                             </constraints>
                         </box>
                         <button translatesAutoresizingMaskIntoConstraints="NO" id="yJg-tV-hH6">
-                            <rect key="frame" x="-1" y="77.5" width="429" height="17"/>
-                            <constraints>
-                                <constraint firstAttribute="height" constant="16" id="TB3-Kn-UbK"/>
-                                <constraint firstAttribute="width" relation="greaterThanOrEqual" constant="70" id="u5i-mf-Rix"/>
-                            </constraints>
+                            <rect key="frame" x="-1" y="183.5" width="429" height="17"/>
                             <buttonCell key="cell" type="check" title="Disable segmented thick underline in marking mode for managed clients" bezelStyle="regularSquare" imagePosition="left" controlSize="small" inset="2" id="N6e-bR-mVa">
                                 <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
                                 <font key="font" metaFont="cellTitle"/>
                             </buttonCell>
+                            <constraints>
+                                <constraint firstAttribute="height" constant="16" id="TB3-Kn-UbK"/>
+                                <constraint firstAttribute="width" relation="greaterThanOrEqual" constant="70" id="u5i-mf-Rix"/>
+                            </constraints>
                             <connections>
                                 <binding destination="32" name="value" keyPath="values.DisableSegmentedThickUnderlineInMarkingModeForManagedClients" id="pPC-Ao-nPv"/>
                             </connections>
                         </button>
-                        <textField wantsLayer="YES" verticalHuggingPriority="750" setsMaxLayoutWidthAtFirstLayout="YES" translatesAutoresizingMaskIntoConstraints="NO" id="uK3-cc-UcW">
-                            <rect key="frame" x="-2" y="0.0" width="541" height="70"/>
+                        <textField wantsLayer="YES" focusRingType="none" verticalHuggingPriority="750" setsMaxLayoutWidthAtFirstLayout="YES" translatesAutoresizingMaskIntoConstraints="NO" id="uK3-cc-UcW">
+                            <rect key="frame" x="-2" y="106" width="541" height="70"/>
                             <constraints>
                                 <constraint firstAttribute="width" constant="537" id="qOi-aV-LQX"/>
                             </constraints>
@@ -2492,14 +2493,71 @@ Features listed here may not work as expected.</string>
                                 <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
                             </textFieldCell>
                         </textField>
+                        <stackView distribution="fill" orientation="vertical" alignment="leading" spacing="5" horizontalStackHuggingPriority="249.99998474121094" verticalStackHuggingPriority="249.99998474121094" detachesHiddenViews="YES" translatesAutoresizingMaskIntoConstraints="NO" id="UFf-Pi-9Jt" userLabel="stkShiftKeyASCIITogglesPane">
+                            <rect key="frame" x="0.0" y="0.0" width="537" height="98"/>
+                            <subviews>
+                                <button translatesAutoresizingMaskIntoConstraints="NO" id="47z-Kc-MdV">
+                                    <rect key="frame" x="-1" y="81.5" width="268" height="17"/>
+                                    <buttonCell key="cell" type="check" title="Toggle alphanumerical mode with Left-Shift" bezelStyle="regularSquare" imagePosition="left" controlSize="small" inset="2" id="CVy-8U-3qQ">
+                                        <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
+                                        <font key="font" metaFont="cellTitle"/>
+                                    </buttonCell>
+                                    <constraints>
+                                        <constraint firstAttribute="width" relation="greaterThanOrEqual" constant="70" id="JyP-8L-nph"/>
+                                        <constraint firstAttribute="height" constant="16" id="uE2-0S-Bgm"/>
+                                    </constraints>
+                                    <connections>
+                                        <binding destination="32" name="value" keyPath="values.TogglingAlphanumericalModeWithLShift" id="L1D-gV-tCC"/>
+                                    </connections>
+                                </button>
+                                <button translatesAutoresizingMaskIntoConstraints="NO" id="taP-hv-eg2">
+                                    <rect key="frame" x="-1" y="60.5" width="276" height="17"/>
+                                    <buttonCell key="cell" type="check" title="Toggle alphanumerical mode with Right-Shift" bezelStyle="regularSquare" imagePosition="left" controlSize="small" inset="2" id="nxP-CV-ZAu">
+                                        <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
+                                        <font key="font" metaFont="cellTitle"/>
+                                    </buttonCell>
+                                    <constraints>
+                                        <constraint firstAttribute="width" relation="greaterThanOrEqual" constant="70" id="mzA-do-IWc"/>
+                                        <constraint firstAttribute="height" constant="16" id="uiX-bl-Lww"/>
+                                    </constraints>
+                                    <connections>
+                                        <binding destination="32" name="value" keyPath="values.TogglingAlphanumericalModeWithRShift" id="4qK-TY-SFb"/>
+                                    </connections>
+                                </button>
+                                <textField wantsLayer="YES" focusRingType="none" verticalHuggingPriority="750" setsMaxLayoutWidthAtFirstLayout="YES" translatesAutoresizingMaskIntoConstraints="NO" id="Dec-3q-bsx">
+                                    <rect key="frame" x="-2" y="0.0" width="541" height="56"/>
+                                    <constraints>
+                                        <constraint firstAttribute="width" constant="537" id="wkg-gt-KuK"/>
+                                    </constraints>
+                                    <textFieldCell key="cell" controlSize="small" sendsActionOnEndEditing="YES" alignment="left" id="Rl7-3a-RDn">
+                                        <font key="font" metaFont="smallSystem"/>
+                                        <mutableString key="title">This feature only needs to parse consecutive NSEvents passed by macOS built-in InputMethodKit framework, hence no necessity of asking end-users for extra privileges of monitoring global keyboard inputs. You are free to investigate our codebase or reverse-engineer this input method to see whether the above statement is trustable.</mutableString>
+                                        <color key="textColor" name="secondaryLabelColor" catalog="System" colorSpace="catalog"/>
+                                        <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
+                                    </textFieldCell>
+                                </textField>
+                            </subviews>
+                            <visibilityPriorities>
+                                <integer value="1000"/>
+                                <integer value="1000"/>
+                                <integer value="1000"/>
+                            </visibilityPriorities>
+                            <customSpacing>
+                                <real value="3.4028234663852886e+38"/>
+                                <real value="3.4028234663852886e+38"/>
+                                <real value="3.4028234663852886e+38"/>
+                            </customSpacing>
+                        </stackView>
                     </subviews>
                     <visibilityPriorities>
                         <integer value="1000"/>
                         <integer value="1000"/>
                         <integer value="1000"/>
                         <integer value="1000"/>
+                        <integer value="1000"/>
                     </visibilityPriorities>
                     <customSpacing>
+                        <real value="3.4028234663852886e+38"/>
                         <real value="3.4028234663852886e+38"/>
                         <real value="3.4028234663852886e+38"/>
                         <real value="3.4028234663852886e+38"/>
@@ -2512,7 +2570,7 @@ Features listed here may not work as expected.</string>
                 <constraint firstItem="gjM-uG-XkW" firstAttribute="top" secondItem="MaQ-Xm-8TB" secondAttribute="top" constant="20" symbolic="YES" id="fvK-di-3g3"/>
             </constraints>
             <accessibility identifier="vwrDevZone"/>
-            <point key="canvasLocation" x="-85" y="487"/>
+            <point key="canvasLocation" x="-85.5" y="495"/>
         </view>
     </objects>
 </document>
