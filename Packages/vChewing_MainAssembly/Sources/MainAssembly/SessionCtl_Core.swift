@@ -37,7 +37,7 @@ public class SessionCtl: IMKInputController {
   public var candidateUI: CtlCandidateProtocol?
 
   /// 工具提示視窗的副本。
-  public var tooltipInstance = TooltipUI()
+  public var tooltipInstance: any TooltipUIProtocol = SessionCtl.makeTooltipUI()
 
   /// 浮動組字窗的副本。
   public var popupCompositionBuffer = PopupCompositionBuffer()
@@ -267,6 +267,11 @@ public extension SessionCtl {
     // 威注音不再在這裡對 IMKTextInput 客體黑名單當中的應用做資安措施。
     // 有相關需求者，請在切換掉輸入法或者切換至新的客體應用之前敲一下 Shift+Delete。
     switchState(IMEState.ofCommitting(textToCommit: textToCommit))
+  }
+
+  static func makeTooltipUI() -> TooltipUIProtocol {
+    if #unavailable(macOS 10.14) { return TooltipUI_EarlyCocoa() }
+    return TooltipUI_LateCocoa()
   }
 }
 
