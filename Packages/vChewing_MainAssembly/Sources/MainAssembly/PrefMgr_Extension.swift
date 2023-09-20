@@ -13,10 +13,6 @@ import Shared
 
 public extension PrefMgr {
   func fixOddPreferences() {
-    // macOS 10.15 開始才能使用 SwiftUI 構建的田所選字窗。
-    if #unavailable(macOS 10.15) {
-      enableSwiftUIForTDKCandidates = false
-    }
     if #unavailable(macOS 12) {
       showNotificationsWhenTogglingCapsLock = false
     }
