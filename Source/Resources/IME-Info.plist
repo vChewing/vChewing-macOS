@@ -56,8 +56,6 @@ SOFTWARE.
 		<dict>
 			<key>org.atelierInmu.inputmethod.vChewing.IMECHS</key>
 			<dict>
-				<key>TISDoubleSpaceSubstitution</key>
-				<string>  </string>
 				<key>TISIconIsTemplate</key>
 				<true/>
 				<key>TISIconLabels</key>
@@ -89,8 +87,6 @@ SOFTWARE.
 			</dict>
 			<key>org.atelierInmu.inputmethod.vChewing.IMECHT</key>
 			<dict>
-				<key>TISDoubleSpaceSubstitution</key>
-				<string>  </string>
 				<key>TISIconIsTemplate</key>
 				<true/>
 				<key>TISIconLabels</key>
