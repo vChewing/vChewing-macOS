@@ -84,6 +84,7 @@ public class PopupCompositionBuffer: NSWindowController {
         return newStyle
       }(),
     ]
+    let horizontalAttributes: [NSAttributedString.Key: Any] = [.kern: 0]
 
     if isTypingDirectionVertical {
       attrPCBHeader.setAttributes(
@@ -91,6 +92,13 @@ public class PopupCompositionBuffer: NSWindowController {
       )
       attrString.setAttributes(
         verticalAttributes, range: NSRange(location: 0, length: attrString.length)
+      )
+    } else {
+      attrPCBHeader.setAttributes(
+        horizontalAttributes, range: NSRange(location: 0, length: attrPCBHeader.length)
+      )
+      attrString.setAttributes(
+        horizontalAttributes, range: NSRange(location: 0, length: attrString.length)
       )
     }
 
@@ -143,10 +151,6 @@ public class PopupCompositionBuffer: NSWindowController {
 
     attrString.insert(attrPCBHeader, at: 0)
     attrString.insert(attrPCBHeader, at: attrString.length)
-
-    attrString.setAttributes(
-      [.kern: 0], range: NSRange(location: 0, length: attrString.length)
-    )
 
     textShown = attrString
     messageTextField.maximumNumberOfLines = 1
