@@ -9,8 +9,6 @@
 import AppKit
 import CocoaExtension
 import Shared
-import SwiftExtension
-import SwiftUI
 
 private extension NSUserInterfaceLayoutOrientation {
   var layoutTDK: CandidatePool.LayoutOrientation {
@@ -37,20 +35,6 @@ public class CtlCandidateTDK: CtlCandidate, NSWindowDelegate {
       currentWindow?.orderOut(nil)
     }
   }
-
-  @available(macOS 10.15, *)
-  private var theView: some View {
-    VwrCandidateTDK(
-      controller: self, thePool: Self.thePool
-    ).edgesIgnoringSafeArea(.top)
-  }
-
-  #if USING_STACK_VIEW_IN_TDK_COCOA
-    /// 該視圖模式因算法陳舊而不再維護。
-    private var theViewCocoa: NSStackView {
-      VwrCandidateTDKCocoa(controller: self, thePool: Self.thePool)
-    }
-  #endif
 
   private var theViewAppKit: NSView {
     VwrCandidateTDKAppKit(controller: self, thePool: Self.thePool)
@@ -121,44 +105,16 @@ public class CtlCandidateTDK: CtlCandidate, NSWindowDelegate {
     delegate?.candidatePairHighlightChanged(at: highlightedIndex)
     DispatchQueue.main.async { [weak self] in
       guard let self = self else { return }
-      updateNSWindowModern(window)
+      self.updateNSWindowModern(window)
     }
   }
 
   func updateNSWindowModern(_ window: NSWindow) {
+    Self.currentView = theViewAppKit
     window.isOpaque = false
     window.backgroundColor = .clear
-    viewCheck: do {
-      viewCheckCatalina: if #available(macOS 10.15, *) {
-        if useCocoa { break viewCheckCatalina }
-        Self.thePool.update()
-        Self.currentView = NSHostingView(rootView: theView)
-        break viewCheck
-      }
-      Self.currentView = theViewAppKit
-    }
     window.contentView = Self.currentView
     window.setContentSize(Self.currentView.fittingSize)
-    delegate?.resetCandidateWindowOrigin()
-  }
-
-  func updateNSWindowLegacy(_ window: NSWindow) {
-    window.isOpaque = true
-    window.backgroundColor = NSColor.controlBackgroundColor
-    let viewToDraw = theViewLegacy
-    let coreSize = viewToDraw.fittingSize
-    let padding: Double = 5
-    let outerSize: NSSize = .init(
-      width: coreSize.width + 2 * padding,
-      height: coreSize.height + 2 * padding
-    )
-    let innerOrigin: NSPoint = .init(x: padding, y: padding)
-    let outerRect: NSRect = .init(origin: .zero, size: outerSize)
-    viewToDraw.setFrameOrigin(innerOrigin)
-    Self.currentView = NSView(frame: outerRect)
-    Self.currentView.addSubview(viewToDraw)
-    window.contentView = Self.currentView
-    window.setContentSize(outerSize)
     delegate?.resetCandidateWindowOrigin()
   }
 
