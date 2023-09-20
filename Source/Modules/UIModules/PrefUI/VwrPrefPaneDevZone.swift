@@ -22,6 +22,12 @@ struct VwrPrefPaneDevZone: View {
   )
   private var disableSegmentedThickUnderlineInMarkingModeForManagedClients: Bool
 
+  @Backport.AppStorage(
+    wrappedValue: false,
+    UserDef.kSecurityHardenedCompositionBuffer.rawValue
+  )
+  private var securityHardenedCompositionBuffer: Bool
+
   // MARK: - Main View
 
   var body: some View {
@@ -39,6 +45,14 @@ struct VwrPrefPaneDevZone: View {
 
               .preferenceDescription(maxWidth: CtlPrefUIShared.maxDescriptionWidth)
           }
+          Toggle(
+            UserDef.kSecurityHardenedCompositionBuffer.metaData?.shortTitle?.localized ?? "",
+            isOn: $securityHardenedCompositionBuffer
+          )
+          Text(
+            UserDef.kSecurityHardenedCompositionBuffer.metaData?.description?.localized ?? ""
+          )
+          .preferenceDescription(maxWidth: CtlPrefUIShared.maxDescriptionWidth)
           Toggle(
             "Disable segmented thick underline in marking mode for managed clients".localized,
             isOn: $disableSegmentedThickUnderlineInMarkingModeForManagedClients
