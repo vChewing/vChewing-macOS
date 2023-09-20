@@ -93,7 +93,6 @@ public enum UserDef: String, CaseIterable {
   case kClassicHaninKeyboardSymbolModeShortcutEnabled = "ClassicHaninKeyboardSymbolModeShortcutEnabled"
 
   case kUseSpaceToCommitHighlightedSCPCCandidate = "UseSpaceToCommitHighlightedSCPCCandidate"
-  case kEnableSwiftUIForTDKCandidates = "EnableSwiftUIForTDKCandidates"
   case kEnableMouseScrollingForTDKCandidatesCocoa = "EnableMouseScrollingForTDKCandidatesCocoa"
   case kDisableSegmentedThickUnderlineInMarkingModeForManagedClients
     = "DisableSegmentedThickUnderlineInMarkingModeForManagedClients"
@@ -207,7 +206,6 @@ public extension UserDef {
     case .kPhraseEditorAutoReloadExternalModifications: return .bool
     case .kClassicHaninKeyboardSymbolModeShortcutEnabled: return .bool
     case .kUseSpaceToCommitHighlightedSCPCCandidate: return .bool
-    case .kEnableSwiftUIForTDKCandidates: return .bool
     case .kEnableMouseScrollingForTDKCandidatesCocoa: return .bool
     case .kDisableSegmentedThickUnderlineInMarkingModeForManagedClients: return .bool
     case .kCandidateTextFontName: return .string
@@ -449,11 +447,6 @@ public extension UserDef {
       )
     case .kUseSpaceToCommitHighlightedSCPCCandidate: return .init(
         userDef: self, shortTitle: "Use Space to confirm highlighted candidate in Per-Char Select Mode"
-      )
-    case .kEnableSwiftUIForTDKCandidates: return .init(
-        userDef: self, shortTitle: "Enable experimental Swift UI typesetting method",
-        description: "By checking this, Tadokoro Candidate Window will use SwiftUI. SwiftUI was being used in vChewing 3.3.8 and before. However, SwiftUI has unacceptable responsiveness & latency & efficiency problems in rendering the candidate panel UI. That's why a refactored version has been introduced since vChewing 3.3.9 using Cocoa, providing an optimized user experience with blasing-fast operation responsiveness, plus experimental mouse-wheel support.",
-        minimumOS: 10.15
       )
     case .kEnableMouseScrollingForTDKCandidatesCocoa: return .init(
         userDef: self, shortTitle: "Enable mouse wheel support for Tadokoro Candidate Window"
