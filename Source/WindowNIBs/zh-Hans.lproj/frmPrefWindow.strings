@@ -54,6 +54,7 @@
 "chkUseFixedCandidateOrderOnSelection.title" = "以固定顺序来陈列选字窗内的候选字";
 "clN-4A-iec.title" = "在逐字选字模式当中使用空格键确认当前高亮候选字";
 "Cp2-hn-bOq.title" = "对磁带模式禁用繁简转换";
+"CVy-8U-3qQ.title" = "允许使用左侧的 Shift 键切换英数输入模式";
 "DbW-eq-ZdB.title" = "星光";
 "dIN-TZ-67g.title" = "Shift+Space 换下一页，Space 换选下一个候选字。";
 "E1l-m8-xgb.title" = "进阶设定";
@@ -89,6 +90,7 @@
 "MKJ-Q6-dLd.title" = "亦使用「\\」或「¥」键启用汉音键盘符号模式";
 "N6e-bR-mVa.title" = "针对被管理的客体，在标记模式下禁用分段式粗型下划线";
 "neb-Pz-n1h.title" = "在已经敲出最长可能码的时候自动组字";
+"nxP-CV-ZAu.title" = "允许使用右侧的 Shift 键切换英数输入模式";
 "o3r-NZ-gsU.title" = "仅在简体模式转换至简体";
 "OVR-eb-laC.title" = "单行/列布局";
 "Parser11.title" = "国音二式+数字标调";
@@ -108,6 +110,7 @@
 "rdoUpperCaseLetterKeyBehavior2.title" = "始终直接递交大写字母";
 "rdoUpperCaseLetterKeyBehavior3.title" = "直接递交小写字母，除非组字区不为空";
 "rdoUpperCaseLetterKeyBehavior4.title" = "直接递交大写字母，除非组字区不为空";
+"Rl7-3a-RDn.title" = "该功能只需要对借由 macOS 内建的输入法框架传来的 NSEvent 做上下文分析，自然没有「向使用者寻求系统全局键盘事件监听权限」之必要。您可自行审视敝输入法的原始程式码仓库、或对敝输入法逆向工程，以自行证实此处所言之真假。";
 "RQ6-MS-m4C.title" = "选择您所偏好的系统键盘布局与注音分析器排列。";
 "RUG-ls-KyA.title" = "在选字后将光标置于该字词的前方";
 "rVQ-Hx-cGi.title" = "和语";

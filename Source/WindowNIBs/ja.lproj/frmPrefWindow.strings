@@ -54,6 +54,7 @@
 "chkUseFixedCandidateOrderOnSelection.title" = "候補文字を固定順番で陳列する";
 "clN-4A-iec.title" = "全候補入力の場合、ハイライト候補を Space キーで確認";
 "Cp2-hn-bOq.title" = "カセットモードによる漢字出力の簡繁転換を行わずにする";
+"CVy-8U-3qQ.title" = "允许使用左侧的 Shift 键切换英数输入模式";
 "DbW-eq-ZdB.title" = "星光";
 "dIN-TZ-67g.title" = "Shift+Space で次のページ、Space で次の候補文字を";
 "E1l-m8-xgb.title" = "詳細設定";
@@ -89,6 +90,7 @@
 "MKJ-Q6-dLd.title" = "「\\」・「¥」キーでも漢音キーボード符号入力";
 "N6e-bR-mVa.title" = "管理されている客体アプリには、マーキングモードの多段式太下線の描きを禁ず";
 "neb-Pz-n1h.title" = "最長可能キーができた場合、文字を組み立つ";
+"nxP-CV-ZAu.title" = "右側の Shift キーで英数入力モードの切り替え";
 "o3r-NZ-gsU.title" = "簡体モードだけの場合、カセットモードの漢字出力転換を";
 "OVR-eb-laC.title" = "一行・列組版";
 "Parser11.title" = "国音二式 (ローマ字+数字音調)";
@@ -108,6 +110,7 @@
 "rdoUpperCaseLetterKeyBehavior2.title" = "いつでもローマ字（大文字）を直接出力";
 "rdoUpperCaseLetterKeyBehavior3.title" = "入力緩衝列がからっぽの時、ローマ字（小文字）を直接出力";
 "rdoUpperCaseLetterKeyBehavior4.title" = "入力緩衝列がからっぽの時、ローマ字（大文字）を直接出力";
+"Rl7-3a-RDn.title" = "この機能の利用する NSEvent は、macOS 内蔵の入力アプリ共用モジュール「InputMethodKit」から提供した NSEvent のみであり、その NSEvent 文脈関係で「Shift キーは１回押したかどうか」と判断することはできる。この事実に疑いを持つ者は、本アプリのソースコードを審査するか、あるいは本アプリを逆向工程（分解工学, いわゆる「Reverse-Engineering」）するがよい。";
 "RQ6-MS-m4C.title" = "お好きなるキーボードとそれに相応しい注音配列をお選びください。";
 "RUG-ls-KyA.title" = "候補選択の直後、すぐカーソルを単語の向こうに推す";
 "rVQ-Hx-cGi.title" = "和語";

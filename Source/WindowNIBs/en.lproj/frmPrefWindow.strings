@@ -54,6 +54,7 @@
 "chkUseFixedCandidateOrderOnSelection.title" = "Always use fixed listing order in candidate window";
 "clN-4A-iec.title" = "Use Space to confirm highlighted candidate in Per-Char Select Mode";
 "Cp2-hn-bOq.title" = "Disable forced conversion for cassette outputs";
+"CVy-8U-3qQ.title" = "Toggle alphanumerical mode with Left-Shift";
 "DbW-eq-ZdB.title" = "Starlight";
 "dIN-TZ-67g.title" = "Space to +revolve candidates, Shift+Space to +revolve pages";
 "E1l-m8-xgb.title" = "Advanced Settings";
@@ -108,6 +109,7 @@
 "rdoUpperCaseLetterKeyBehavior2.title" = "Always directly commit uppercased letters";
 "rdoUpperCaseLetterKeyBehavior3.title" = "Directly commit lowercased letters only if the compositor is empty";
 "rdoUpperCaseLetterKeyBehavior4.title" = "Directly commit uppercased letters only if the compositor is empty";
+"Rl7-3a-RDn.title" = "This feature only needs to parse consecutive NSEvents passed by macOS built-in InputMethodKit framework, hence no necessity of asking end-users for extra privileges of monitoring global keyboard inputs. You are free to investigate our codebase or reverse-engineer this input method to see whether the above statement is trustable.";
 "RQ6-MS-m4C.title" = "Choose your preferred keyboard layout and phonetic parser.";
 "RUG-ls-KyA.title" = "Push the cursor in front of the phrase after selection";
 "rVQ-Hx-cGi.title" = "Japanese";
@@ -117,6 +119,7 @@
 "SzF-FL-sVO.title" = "Show translated strokes in composition buffer";
 "tglTrimUnfinishedReadingsOnCommit.title" = "Trim unfinished readings / strokes on commit";
 "TKl-TY-lvN.title" = "General Settings";
+"Toggle alphanumerical mode with Right-Shift" = "Toggle alphanumerical mode with Right-Shift";
 "TXr-FF-ehw.title" = "Traditional Chinese";
 "ueU-Rz-a1C.title" = "Choose the behavior of (Shift+)Tab key in the candidate window.";
 "VAP-TU-eck.title" = "Some clients with web-based front UI may have issues rendering segmented thick underlines drawn by their implemented “setMarkedText()”. This option stops the input method from delivering segmented thick underlines to “client().setMarkedText()”. Note that segmented thick underlines are only used in marking mode, unless the client itself misimplements the IMKTextInput method “setMarkedText()”. This option only affects the inline composition buffer.";
