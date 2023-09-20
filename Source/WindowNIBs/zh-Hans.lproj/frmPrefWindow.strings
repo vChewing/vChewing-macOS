@@ -21,6 +21,7 @@
 "29.title" = "字型大小设定:";
 "2iG-Ic-gbl.label" = "辞典";
 "2pS-nv-te4.title" = "选择您所偏好的用来选字的按键组合。";
+"3N6-LT-HPv.title" = "针对所有客体软体启用强化型组字区安全防护";
 "5.title" = "OtherViews";
 "6.title" = "微软/大千/王安/国乔/零壹/仲鼎";
 "62u-jY-BRh.title" = "廉耻模式 // 取消勾选的话，敲错字时会有异音";
@@ -80,6 +81,7 @@
 "jQC-12-UuK.ibShadowedObjectValues[1]" = "Item 2";
 "jQC-12-UuK.ibShadowedObjectValues[2]" = "Item 3";
 "K8U-Oq-lFc.title" = "对所有客体应用共用中英文输入切换状态";
+"kcM-O6-mLN.title" = "这会阻止任何客体擅自存取尚未递交的组字区内容。此举也会全局启用浮动组字窗。";
 "lblAcceptLeadingIntonations.title" = "在个别情况下，允许声调前置键入";
 "lblAlwaysShowTooltipTextsHorizontally.title" = "始终使用横排来显示工具提示视窗";
 "lblDevZoneTitleDescription.title" = "警告：该页面仅作未来功能测试所用。\n在此列出的功能并非处于完全可用之状态。";
