@@ -11,7 +11,7 @@ import CocoaExtension
 import NSAttributedTextView
 import Shared
 
-public class TooltipUI: NSWindowController {
+public class TooltipUI_LateCocoa: NSWindowController, TooltipUIProtocol {
   private var messageText: NSAttributedTooltipTextView
   private var tooltip: String = "" {
     didSet {
@@ -63,11 +63,11 @@ public class TooltipUI: NSWindowController {
   }
 
   public func show(
-    tooltip: String = "", at point: NSPoint,
+    tooltip: String, at point: NSPoint,
     bottomOutOfScreenAdjustmentHeight heightDelta: Double,
-    direction: NSAttributedTooltipTextView.writingDirection = .horizontal, duration: Double = 0
+    direction: NSUserInterfaceLayoutOrientation = .horizontal, duration: Double
   ) {
-    self.direction = direction
+    self.direction = direction == .horizontal ? .horizontal : .vertical
     self.tooltip = tooltip
     window?.setIsVisible(false)
     window?.orderFront(nil)
