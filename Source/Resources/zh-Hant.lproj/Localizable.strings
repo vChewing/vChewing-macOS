@@ -311,6 +311,7 @@
 "Quick Setup:" = "直接設定:";
 "Read external factory dictionary files if possible" = "盡量使用外置原廠辭典 plist 檔案";
 "Secondary Pinyin with Numeral Intonation" = "國音二式+數字標調";
+"Security-harden the composition buffer for all clients" = "針對所有客體軟體啟用強化型組字區安全防護";
 "Seigyou" = "精業排列";
 "Selection Keys:" = "選字鍵:";
 "Share alphanumerical mode status across all clients" = "對所有客體應用共用中英文輸入切換狀態";
@@ -337,6 +338,7 @@
 "This feature only needs to parse consecutive NSEvents passed by macOS built-in InputMethodKit framework, hence no necessity of asking end-users for extra privileges of monitoring global keyboard inputs. You are free to investigate our codebase or reverse-engineer this input method to see whether the above statement is trustable." = "該功能只需要對藉由 macOS 內建的輸入法框架傳來的 NSEvent 做上下文分析，自然沒有「向使用者尋求系統全局鍵盤事件監聽權限」之必要。您可自行審視敝輸入法的原始程式碼倉庫、或對敝輸入法逆向工程，以自行證實此處所言之真假。";
 "This feature requires macOS 10.15 and above." = "該功能要求系統版本至少 macOS 10.15。";
 "This feature requires macOS 12 and above." = "該功能要求系統版本至少 macOS 12。";
+"This hinders all client apps from unwelcomely accessing your uncommitted contents in the composition buffer. A popup composition buffer will be shown instead." = "這會阻止任何客體擅自存取尚未遞交的組字區內容。此舉也會全局啟用浮動組字窗。";
 "This only works when being toggled by Shift key and JIS Eisu key." = "僅用於以 Shift 鍵或 JIS 英數鍵切換中英文輸入模式的場合。";
 "This only works with Tadokoro candidate window." = "該選項僅對田所選字窗起作用。";
 "This will also affect the row / column capacity of the candidate window." = "該選項也會影響到選字窗每行/每列最多顯示的候選字數量。";
