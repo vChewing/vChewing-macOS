@@ -21,6 +21,7 @@
 "29.title" = "Candidate UI font size:";
 "2iG-Ic-gbl.label" = "Dictionary";
 "2pS-nv-te4.title" = "Choose which keys you prefer for selecting candidates.";
+"3N6-LT-HPv.title" = "Security-harden the composition buffer for all clients";
 "5.title" = "OtherViews";
 "6.title" = "Microsoft, Dachen, Wang, etc.";
 "62u-jY-BRh.title" = "Stop farting (when typed phonetic combination is invalid, etc.)";
@@ -80,6 +81,7 @@
 "jQC-12-UuK.ibShadowedObjectValues[1]" = "Item 2";
 "jQC-12-UuK.ibShadowedObjectValues[2]" = "Item 3";
 "K8U-Oq-lFc.title" = "Share alphanumerical mode status across all clients";
+"kcM-O6-mLN.title" = "This hinders all client apps from unwelcomely accessing your uncommitted contents in the composition buffer. A popup composition buffer will be shown instead.";
 "lblAcceptLeadingIntonations.title" = "Accept leading intonations in rare cases";
 "lblAlwaysShowTooltipTextsHorizontally.title" = "Always show tooltip texts horizontally";
 "lblDevZoneTitleDescription.title" = "Warning: This page is for testing future features. \nFeatures listed here may not work as expected.";

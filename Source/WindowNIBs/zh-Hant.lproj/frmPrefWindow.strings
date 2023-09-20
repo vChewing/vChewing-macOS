@@ -21,6 +21,7 @@
 "29.title" = "字型大小設定:";
 "2iG-Ic-gbl.label" = "辭典";
 "2pS-nv-te4.title" = "選擇您所偏好的用來選字的按鍵組合。";
+"3N6-LT-HPv.title" = "針對所有客體軟體啟用強化型組字區安全防護";
 "5.title" = "OtherViews";
 "6.title" = "微軟/大千/王安/國喬/零壹/仲鼎";
 "62u-jY-BRh.title" = "廉恥模式 // 取消勾選的話，敲錯字時會有異音";
@@ -80,6 +81,7 @@
 "jQC-12-UuK.ibShadowedObjectValues[1]" = "Item 2";
 "jQC-12-UuK.ibShadowedObjectValues[2]" = "Item 3";
 "K8U-Oq-lFc.title" = "對所有客體應用共用中英文輸入切換狀態";
+"kcM-O6-mLN.title" = "這會阻止任何客體擅自存取尚未遞交的組字區內容。此舉也會全局啟用浮動組字窗。";
 "lblAcceptLeadingIntonations.title" = "在個別情況下，允許聲調前置鍵入";
 "lblAlwaysShowTooltipTextsHorizontally.title" = "始終使用橫排來顯示工具提示視窗";
 "lblDevZoneTitleDescription.title" = "警告：該頁面僅作未來功能測試所用。\n在此列出的功能並非處於完全可用之狀態。";
