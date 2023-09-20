@@ -59,14 +59,14 @@ public extension SessionCtl {
         x: lineHeightRect.origin.x + lineHeightRect.size.width + 5, y: lineHeightRect.origin.y
       )
     }
-    let tooltipContentDirection: NSAttributedTextView.writingDirection = {
+    let tooltipContentDirection: NSUserInterfaceLayoutOrientation = {
       if PrefMgr.shared.alwaysShowTooltipTextsHorizontally { return .horizontal }
       return isVerticalTyping ? .vertical : .horizontal
     }()
     // 強制重新初期化，因為 NSAttributedTextView 有顯示滯後性。
     do {
       tooltipInstance.hide()
-      tooltipInstance = .init()
+      tooltipInstance = Self.makeTooltipUI()
       tooltipInstance.setColor(state: state.data.tooltipColorState)
     }
     // 再設定其文字顯示內容並顯示。
