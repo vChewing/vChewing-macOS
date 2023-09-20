@@ -47,9 +47,6 @@ struct VwrPrefPaneCandidates: View {
   @Backport.AppStorage(wrappedValue: true, UserDef.kConsolidateContextOnCandidateSelection.rawValue)
   private var consolidateContextOnCandidateSelection: Bool
 
-  @Backport.AppStorage(wrappedValue: false, UserDef.kEnableSwiftUIForTDKCandidates.rawValue)
-  private var enableSwiftUIForTDKCandidates: Bool
-
   @Backport.AppStorage(wrappedValue: false, UserDef.kEnableMouseScrollingForTDKCandidatesCocoa.rawValue)
   private var enableMouseScrollingForTDKCandidatesCocoa: Bool
 
@@ -183,15 +180,6 @@ struct VwrPrefPaneCandidates: View {
             LocalizedStringKey("Enable mouse wheel support for Tadokoro Candidate Window"),
             isOn: $enableMouseScrollingForTDKCandidatesCocoa
           )
-          .disabled(enableSwiftUIForTDKCandidates)
-          Toggle(
-            LocalizedStringKey("Enable experimental Swift UI typesetting method"),
-            isOn: $enableSwiftUIForTDKCandidates
-          )
-          Text(
-            "By checking this, Tadokoro Candidate Window will use SwiftUI. SwiftUI was being used in vChewing 3.3.8 and before. However, SwiftUI has unacceptable responsiveness & latency & efficiency problems in rendering the candidate panel UI. That's why a refactored version has been introduced since vChewing 3.3.9 using Cocoa, providing an optimized user experience with blasing-fast operation responsiveness, plus experimental mouse-wheel support.".localized
-          )
-          .preferenceDescription(maxWidth: CtlPrefUIShared.maxDescriptionWidth)
           Button("Where's IMK Candidate Window?") {
             if let window = CtlPrefUIShared.sharedWindow {
               let title = "The End of Support for IMK Candidate Window"
