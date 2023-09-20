@@ -128,7 +128,7 @@ public extension TISInputSource {
       kTISPropertyInputSourceIsASCIICapable: kCFBooleanTrue as CFBoolean,
     ]
     // 返回鍵盤配列清單。
-    var result = TISCreateInputSourceList(dicConditions as CFDictionary, true).takeRetainedValue() as? [TISInputSource] ?? .init()
+    var result = TISCreateInputSourceList(dicConditions as CFDictionary, true)?.takeRetainedValue() as? [TISInputSource] ?? .init()
     if onlyASCII {
       result = result.filter { $0.scriptCode == 0 }
     }
