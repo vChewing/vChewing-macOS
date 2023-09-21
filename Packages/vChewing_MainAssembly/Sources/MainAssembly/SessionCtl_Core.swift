@@ -15,7 +15,6 @@ import PopupCompositionBuffer
 import Shared
 import ShiftKeyUpChecker
 import TooltipUI
-import UpdateSputnik
 
 /// 輸入法控制模組，乃在輸入法端用以控制輸入行為的基礎型別。
 ///
@@ -289,6 +288,12 @@ public extension SessionCtl {
         vCLog("activateServer(\(senderBundleID))")
         self.isServingIMEItself = Bundle.main.bundleIdentifier == senderBundleID
         self.clientBundleIdentifier = senderBundleID
+        // 只要使用者沒有勾選檢查更新、沒有主動做出要檢查更新的操作，就不要檢查更新。
+        if PrefMgr.shared.checkUpdateAutomatically {
+          AppDelegate.shared.checkUpdate(forced: false) {
+            senderBundleID == "com.apple.SecurityAgent"
+          }
+        }
       }
     }
     DispatchQueue.main.async {
@@ -338,7 +343,6 @@ public extension SessionCtl {
       }
 
       DispatchQueue.main.async {
-        AppDelegate.shared.checkUpdate(forced: false)
         AppDelegate.shared.checkMemoryUsage()
       }
 
