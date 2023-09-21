@@ -223,16 +223,16 @@ public class SessionCtl: IMKInputController {
   private func construct(client theClient: (IMKTextInput & NSObjectProtocol)? = nil) {
     DispatchQueue.main.async { [weak self] in
       guard let self = self else { return }
-      inputHandler = InputHandler(
+      self.inputHandler = InputHandler(
         lm: LMMgr.currentLM, uom: LMMgr.currentUOM, pref: PrefMgr.shared
       )
-      inputHandler?.delegate = self
-      syncBaseLMPrefs()
+      self.inputHandler?.delegate = self
+      self.syncBaseLMPrefs()
       // 下述兩行很有必要，否則輸入法會在手動重啟之後無法立刻生效。
-      let maybeClient = theClient ?? client()
-      activateServer(maybeClient)
+      let maybeClient = theClient ?? self.client()
+      self.activateServer(maybeClient)
       // GCD 會觸發 didSet，所以不用擔心。
-      inputMode = .init(rawValue: PrefMgr.shared.mostRecentInputMode) ?? .imeModeNULL
+      self.inputMode = .init(rawValue: PrefMgr.shared.mostRecentInputMode) ?? .imeModeNULL
     }
   }
 }
@@ -246,7 +246,7 @@ public extension SessionCtl {
 
     DispatchQueue.main.async { [weak self] in
       guard let self = self else { return }
-      if isASCIIMode, IMKHelper.isDynamicBasicKeyboardLayoutEnabled {
+      if self.isASCIIMode, IMKHelper.isDynamicBasicKeyboardLayoutEnabled {
         client.overrideKeyboard(withKeyboardNamed: PrefMgr.shared.alphanumericalKeyboardLayout)
         return
       }
@@ -287,8 +287,8 @@ public extension SessionCtl {
       guard let self = self else { return }
       if let senderBundleID: String = (sender as? IMKTextInput)?.bundleIdentifier() {
         vCLog("activateServer(\(senderBundleID))")
-        isServingIMEItself = Bundle.main.bundleIdentifier == senderBundleID
-        clientBundleIdentifier = senderBundleID
+        self.isServingIMEItself = Bundle.main.bundleIdentifier == senderBundleID
+        self.clientBundleIdentifier = senderBundleID
       }
     }
     DispatchQueue.main.async {
@@ -299,8 +299,8 @@ public extension SessionCtl {
     }
     DispatchQueue.main.async { [weak self] in
       guard let self = self else { return }
-      if inputMode != IMEApp.currentInputMode {
-        inputMode = IMEApp.currentInputMode
+      if self.inputMode != IMEApp.currentInputMode {
+        self.inputMode = IMEApp.currentInputMode
       }
     }
     DispatchQueue.main.async {
@@ -315,25 +315,25 @@ public extension SessionCtl {
     }
     DispatchQueue.main.async { [weak self] in
       guard let self = self else { return }
-      if isActivated { return }
+      if self.isActivated { return }
 
       // 這裡不需要 setValue()，因為 IMK 會在自動呼叫 activateServer() 之後自動執行 setValue()。
-      inputHandler = InputHandler(
+      self.inputHandler = InputHandler(
         lm: LMMgr.currentLM, uom: LMMgr.currentUOM, pref: PrefMgr.shared
       )
-      inputHandler?.delegate = self
-      syncBaseLMPrefs()
+      self.inputHandler?.delegate = self
+      self.syncBaseLMPrefs()
 
       Self.theShiftKeyDetector.toggleWithLShift = PrefMgr.shared.togglingAlphanumericalModeWithLShift
       Self.theShiftKeyDetector.toggleWithRShift = PrefMgr.shared.togglingAlphanumericalModeWithRShift
 
-      if isASCIIMode, !IMEApp.isKeyboardJIS {
+      if self.isASCIIMode, !IMEApp.isKeyboardJIS {
         if #available(macOS 10.15, *) {
           if !Self.theShiftKeyDetector.enabled {
-            isASCIIMode = false
+            self.isASCIIMode = false
           }
         } else {
-          isASCIIMode = false
+          self.isASCIIMode = false
         }
       }
 
@@ -342,9 +342,9 @@ public extension SessionCtl {
         AppDelegate.shared.checkMemoryUsage()
       }
 
-      state = IMEState.ofEmpty()
-      isActivated = true // 登記啟用狀態。
-      setKeyLayout()
+      self.state = IMEState.ofEmpty()
+      self.isActivated = true // 登記啟用狀態。
+      self.setKeyLayout()
     }
   }
 
@@ -353,13 +353,13 @@ public extension SessionCtl {
   override func deactivateServer(_ sender: Any!) {
     DispatchQueue.main.async { [weak self] in
       guard let self = self else { return }
-      isActivated = false
-      resetInputHandler() // 這條會自動搞定 Empty 狀態。
-      switchState(IMEState.ofDeactivated())
-      inputHandler = nil
+      self.isActivated = false
+      self.resetInputHandler() // 這條會自動搞定 Empty 狀態。
+      self.switchState(IMEState.ofDeactivated())
+      self.inputHandler = nil
       // IMK 選字窗可以不用 nil，不然反而會出問題。反正 IMK 選字窗記憶體開銷可以不計。
-      if candidateUI is CtlCandidateTDK {
-        candidateUI = nil
+      if self.candidateUI is CtlCandidateTDK {
+        self.candidateUI = nil
       }
     }
     super.deactivateServer(sender)
@@ -376,7 +376,7 @@ public extension SessionCtl {
     DispatchQueue.main.async { [weak self] in
       guard let self = self else { return }
       let newMode: Shared.InputMode = .init(rawValue: value as? String ?? PrefMgr.shared.mostRecentInputMode) ?? .imeModeNULL
-      if inputMode != newMode { inputMode = newMode }
+      if self.inputMode != newMode { self.inputMode = newMode }
     }
     super.setValue(value, forTag: tag, client: sender)
   }
