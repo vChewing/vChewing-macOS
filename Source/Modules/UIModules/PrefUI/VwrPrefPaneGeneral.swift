@@ -71,8 +71,8 @@ struct VwrPrefPaneGeneral: View {
 
   var body: some View {
     ScrollView {
-      SSPreferences.Settings.Container(contentWidth: CtlPrefUIShared.contentWidth) {
-        SSPreferences.Settings.Section {
+      Form {
+        VStack(alignment: .leading) {
           Text(
             "\u{2022} "
               + NSLocalizedString(
@@ -84,28 +84,21 @@ struct VwrPrefPaneGeneral: View {
                 comment: ""
               )
           )
-          .preferenceDescription(maxWidth: CtlPrefUIShared.maxDescriptionWidth).padding(.bottom, NSFont.systemFontSize)
-        }
-        SSPreferences.Settings.Section(title: "UI Language:".localized) {
-          HStack {
-            Picker(
-              LocalizedStringKey("Follow OS settings"),
-              selection: $appleLanguageTag
-            ) {
-              Text(LocalizedStringKey("Follow OS settings")).tag("auto")
-              Text(LocalizedStringKey("Simplified Chinese")).tag("zh-Hans")
-              Text(LocalizedStringKey("Traditional Chinese")).tag("zh-Hant")
-              Text(LocalizedStringKey("Japanese")).tag("ja")
-              Text(LocalizedStringKey("English")).tag("en")
-            }
-            .labelsHidden()
-            .frame(width: 180.0)
-            Spacer()
+          .settingsDescription()
+          Picker("UI Language:", selection: $appleLanguageTag) {
+            Text(LocalizedStringKey("Follow OS settings")).tag("auto")
+            Text(LocalizedStringKey("Simplified Chinese")).tag("zh-Hans")
+            Text(LocalizedStringKey("Traditional Chinese")).tag("zh-Hant")
+            Text(LocalizedStringKey("Japanese")).tag("ja")
+            Text(LocalizedStringKey("English")).tag("en")
           }
           Text(LocalizedStringKey("Change user interface language (will reboot the IME)."))
-            .preferenceDescription(maxWidth: CtlPrefUIShared.maxDescriptionWidth)
+            .settingsDescription()
         }
-        SSPreferences.Settings.Section(label: { Text(LocalizedStringKey("Typing Settings:")) }) {
+
+        // MARK: (header: Text("Typing Settings:"))
+
+        Section {
           Toggle(
             LocalizedStringKey("Automatically correct reading combinations when typing"),
             isOn: $autoCorrectReadingCombination
@@ -122,15 +115,17 @@ struct VwrPrefPaneGeneral: View {
             LocalizedStringKey("Also use “\\” or “¥” key for Hanin Keyboard Symbol Input"),
             isOn: $classicHaninKeyboardSymbolModeShortcutEnabled
           )
-          Toggle(
-            LocalizedStringKey("Emulating select-candidate-per-character mode"),
-            isOn: $useSCPCTypingMode.onChange {
-              guard useSCPCTypingMode else { return }
-              LMMgr.loadUserSCPCSequencesData()
-            }
-          )
-          Text(LocalizedStringKey("An accommodation for elder computer users."))
-            .preferenceDescription(maxWidth: CtlPrefUIShared.maxDescriptionWidth)
+          VStack(alignment: .leading) {
+            Toggle(
+              LocalizedStringKey("Emulating select-candidate-per-character mode"),
+              isOn: $useSCPCTypingMode.onChange {
+                guard useSCPCTypingMode else { return }
+                LMMgr.loadUserSCPCSequencesData()
+              }
+            )
+            Text(LocalizedStringKey("An accommodation for elder computer users."))
+              .settingsDescription()
+          }
           if Date.isTodayTheDate(from: 0401) {
             Toggle(
               LocalizedStringKey("Stop farting (when typed phonetic combination is invalid, etc.)"),
@@ -168,19 +163,20 @@ struct VwrPrefPaneGeneral: View {
             )
           }
         }
-        SSPreferences.Settings.Section(label: { Text(LocalizedStringKey("Misc Settings:")).controlSize(.small) }) {
+
+        // MARK: (header: Text("Misc Settings:"))
+
+        Section {
           Toggle(
             LocalizedStringKey("Check for updates automatically"),
             isOn: $checkUpdateAutomatically
           )
-          .controlSize(.small)
           Toggle(
             LocalizedStringKey("Debug Mode"),
             isOn: $isDebugModeEnabled
           )
-          .controlSize(.small)
         }
-      }
+      }.formStyled().frame(width: CtlPrefUIShared.formWidth)
     }
     .frame(maxHeight: CtlPrefUIShared.contentMaxHeight)
   }

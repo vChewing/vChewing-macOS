@@ -73,178 +73,186 @@ struct VwrPrefPaneBehavior: View {
 
   var body: some View {
     ScrollView {
-      SSPreferences.Settings.Container(contentWidth: CtlPrefUIShared.contentWidth) {
-        SSPreferences.Settings.Section(title: "Space:".localized, bottomDivider: true) {
-          Toggle(
-            LocalizedStringKey("Enable Space key for calling candidate window"),
-            isOn: $chooseCandidateUsingSpace
-          )
-          Text(
-            LocalizedStringKey(
-              "If disabled, this will insert space instead."
+      Form {
+        Section {
+          VStack(alignment: .leading) {
+            Toggle(
+              LocalizedStringKey("Enable Space key for calling candidate window"),
+              isOn: $chooseCandidateUsingSpace
             )
-          )
-          .preferenceDescription(maxWidth: CtlPrefUIShared.maxDescriptionWidth)
-        }
-        SSPreferences.Settings.Section(title: "ESC:".localized, bottomDivider: true) {
-          Toggle(
-            LocalizedStringKey("Use ESC key to clear the entire input buffer"),
-            isOn: $escToCleanInputBuffer
-          )
-          Text(
-            LocalizedStringKey(
-              "If unchecked, the ESC key will try cleaning the unfinished readings / strokes first, and will commit the current composition buffer if there's no unfinished readings / strokes."
+            Text(
+              LocalizedStringKey(
+                "If disabled, this will insert space instead."
+              )
             )
-          )
-          .preferenceDescription(maxWidth: CtlPrefUIShared.maxDescriptionWidth)
-        }
-        SSPreferences.Settings.Section(title: "Enter:".localized, bottomDivider: true) {
-          Toggle(
-            LocalizedStringKey("Allow using Enter key to confirm associated candidate selection"),
-            isOn: $alsoConfirmAssociatedCandidatesByEnter
-          )
-          Text(
-            LocalizedStringKey(
-              "Otherwise, only the candidate keys are allowed to confirm associates."
+            .settingsDescription()
+          }
+
+          VStack(alignment: .leading) {
+            Toggle(
+              LocalizedStringKey("Use ESC key to clear the entire input buffer"),
+              isOn: $escToCleanInputBuffer
             )
-          )
-          .preferenceDescription(maxWidth: CtlPrefUIShared.maxDescriptionWidth)
-        }
-        SSPreferences.Settings.Section(title: "Shift+BackSpace:".localized, bottomDivider: true) {
-          Picker(
-            "",
-            selection: $specifyShiftBackSpaceKeyBehavior
-          ) {
-            Text(LocalizedStringKey("Disassemble the previous reading, dropping its intonation")).tag(0)
-            Text(LocalizedStringKey("Clear the entire inline composition buffer like Shift+Delete")).tag(1)
-            Text(LocalizedStringKey("Always drop the previous reading")).tag(2)
+            Text(
+              LocalizedStringKey(
+                "If unchecked, the ESC key will try cleaning the unfinished readings / strokes first, and will commit the current composition buffer if there's no unfinished readings / strokes."
+              )
+            )
+            .settingsDescription()
           }
-          .labelsHidden()
-          .pickerStyle(RadioGroupPickerStyle())
-          Text(LocalizedStringKey("Disassembling process does not work with non-phonetic reading keys."))
-            .preferenceDescription(maxWidth: CtlPrefUIShared.maxDescriptionWidth)
-        }
-        SSPreferences.Settings.Section(title: "(Shift+)Tab:", bottomDivider: true) {
-          Picker(
-            "",
-            selection: $specifyShiftTabKeyBehavior
-          ) {
-            Text(LocalizedStringKey("for revolving candidates")).tag(false)
-            Text(LocalizedStringKey("for revolving pages")).tag(true)
+          VStack(alignment: .leading) {
+            Toggle(
+              LocalizedStringKey("Allow using Enter key to confirm associated candidate selection"),
+              isOn: $alsoConfirmAssociatedCandidatesByEnter
+            )
+            Text(
+              LocalizedStringKey(
+                "Otherwise, only the candidate keys are allowed to confirm associates."
+              )
+            )
+            .settingsDescription()
           }
-          .labelsHidden()
-          .horizontalRadioGroupLayout()
-          .pickerStyle(RadioGroupPickerStyle())
-          Text(LocalizedStringKey("Choose the behavior of (Shift+)Tab key in the candidate window."))
-            .preferenceDescription(maxWidth: CtlPrefUIShared.maxDescriptionWidth)
-        }
-        SSPreferences.Settings.Section(title: "(Shift+)Space:".localized, bottomDivider: true) {
-          Picker(
-            "",
-            selection: $specifyShiftSpaceKeyBehavior
-          ) {
-            Text(LocalizedStringKey("Space to +revolve candidates, Shift+Space to +revolve pages")).tag(false)
-            Text(LocalizedStringKey("Space to +revolve pages, Shift+Space to +revolve candidates")).tag(true)
-          }
-          .labelsHidden()
-          .pickerStyle(RadioGroupPickerStyle())
-          Text(LocalizedStringKey("Choose the behavior of (Shift+)Space key with candidates."))
-            .preferenceDescription(maxWidth: CtlPrefUIShared.maxDescriptionWidth)
-          Toggle(
-            LocalizedStringKey("Use Space to confirm highlighted candidate in Per-Char Select Mode"),
-            isOn: $useSpaceToCommitHighlightedSCPCCandidate
-          ).controlSize(.small)
-        }
-        SSPreferences.Settings.Section(title: "Shift+Letter:".localized, bottomDivider: true) {
-          Picker(
-            "",
-            selection: $upperCaseLetterKeyBehavior
-          ) {
-            Text(LocalizedStringKey("Type them into inline composition buffer")).tag(0)
-            Text(LocalizedStringKey("Always directly commit lowercased letters")).tag(1)
-            Text(LocalizedStringKey("Always directly commit uppercased letters")).tag(2)
-            Text(LocalizedStringKey("Directly commit lowercased letters only if the compositor is empty")).tag(3)
-            Text(LocalizedStringKey("Directly commit uppercased letters only if the compositor is empty")).tag(4)
-          }
-          .labelsHidden()
-          .pickerStyle(RadioGroupPickerStyle())
-          Text(LocalizedStringKey("Choose the behavior of Shift+Letter key with letter inputs."))
-            .preferenceDescription(maxWidth: CtlPrefUIShared.maxDescriptionWidth)
-        }
-        SSPreferences.Settings.Section(title: "Intonation Key:".localized, bottomDivider: true) {
-          Picker(
-            "",
-            selection: $specifyIntonationKeyBehavior
-          ) {
-            Text(LocalizedStringKey("Override the previous reading's intonation with candidate-reset")).tag(0)
-            Text(LocalizedStringKey("Only override the intonation of the previous reading if different")).tag(1)
-            Text(LocalizedStringKey("Always type intonations to the inline composition buffer")).tag(2)
-          }
-          .labelsHidden()
-          .pickerStyle(RadioGroupPickerStyle())
-          Text(LocalizedStringKey("Specify the behavior of intonation key when syllable composer is empty."))
-            .preferenceDescription(maxWidth: CtlPrefUIShared.maxDescriptionWidth)
-          Toggle(
-            LocalizedStringKey("Accept leading intonations in rare cases"),
-            isOn: $acceptLeadingIntonations
-          ).controlSize(.small)
-          Text(LocalizedStringKey("This feature accommodates certain typing mistakes that the intonation mark might be typed at first (which is sequentially wrong from a common sense that intonation marks are supposed to be used for confirming combinations). It won't work if the current parser is of (any) pinyin. Also, this feature won't work when an intonation override is possible (and enabled)."))
-            .preferenceDescription(maxWidth: CtlPrefUIShared.maxDescriptionWidth)
-        }
-        SSPreferences.Settings.Section(title: "Shift:", bottomDivider: true) {
-          Toggle(
-            LocalizedStringKey("Toggle alphanumerical mode with Left-Shift"),
-            isOn: $togglingAlphanumericalModeWithLShift.onChange {
-              SessionCtl.theShiftKeyDetector.toggleWithLShift = togglingAlphanumericalModeWithLShift
+          VStack(alignment: .leading) {
+            Picker(
+              "Shift+BackSpace:",
+              selection: $specifyShiftBackSpaceKeyBehavior
+            ) {
+              Text(LocalizedStringKey("Disassemble the previous reading, dropping its intonation")).tag(0)
+              Text(LocalizedStringKey("Clear the entire inline composition buffer like Shift+Delete")).tag(1)
+              Text(LocalizedStringKey("Always drop the previous reading")).tag(2)
             }
-          )
-          Toggle(
-            LocalizedStringKey("Toggle alphanumerical mode with Right-Shift"),
-            isOn: $togglingAlphanumericalModeWithRShift.onChange {
-              SessionCtl.theShiftKeyDetector.toggleWithRShift = togglingAlphanumericalModeWithRShift
+            Text(LocalizedStringKey("Disassembling process does not work with non-phonetic reading keys."))
+              .settingsDescription()
+          }
+          VStack(alignment: .leading) {
+            Picker(
+              "(Shift+)Tab:",
+              selection: $specifyShiftTabKeyBehavior
+            ) {
+              Text(LocalizedStringKey("for revolving candidates")).tag(false)
+              Text(LocalizedStringKey("for revolving pages")).tag(true)
             }
-          )
-          Text(
-            "This feature requires macOS 10.15 and above.".localized + CtlPrefUIShared.sentenceSeparator
-              + "This feature only needs to parse consecutive NSEvents passed by macOS built-in InputMethodKit framework, hence no necessity of asking end-users for extra privileges of monitoring global keyboard inputs. You are free to investigate our codebase or reverse-engineer this input method to see whether the above statement is trustable.".localized
-          )
-          .preferenceDescription(maxWidth: CtlPrefUIShared.maxDescriptionWidth)
-          Toggle(
-            LocalizedStringKey("Share alphanumerical mode status across all clients"),
-            isOn: $shareAlphanumericalModeStatusAcrossClients
-          ).controlSize(.small)
-          Text(
-            "This only works when being toggled by Shift key and JIS Eisu key.".localized
-          )
-          .preferenceDescription(maxWidth: CtlPrefUIShared.maxDescriptionWidth)
+            .pickerStyle(RadioGroupPickerStyle())
+            Text(LocalizedStringKey("Choose the behavior of (Shift+)Tab key in the candidate window."))
+              .settingsDescription()
+          }
+          VStack(alignment: .leading) {
+            Picker(
+              "(Shift+)Space:",
+              selection: $specifyShiftSpaceKeyBehavior
+            ) {
+              Text(LocalizedStringKey("Space to +revolve candidates, Shift+Space to +revolve pages")).tag(false)
+              Text(LocalizedStringKey("Space to +revolve pages, Shift+Space to +revolve candidates")).tag(true)
+            }
+            Spacer()
+            Text(LocalizedStringKey("Choose the behavior of (Shift+)Space key with candidates."))
+              .settingsDescription()
+            Toggle(
+              LocalizedStringKey("Use Space to confirm highlighted candidate in Per-Char Select Mode"),
+              isOn: $useSpaceToCommitHighlightedSCPCCandidate
+            )
+          }
         }
-        SSPreferences.Settings.Section(title: "Caps Lock:", bottomDivider: true) {
-          Toggle(
-            LocalizedStringKey("Show notifications when toggling Caps Lock"),
-            isOn: $showNotificationsWhenTogglingCapsLock.onChange {
-              if !macOSMontereyOrLaterDetected, showNotificationsWhenTogglingCapsLock {
-                showNotificationsWhenTogglingCapsLock.toggle()
+        Section {
+          VStack(alignment: .leading) {
+            Picker(
+              "Shift+Letter:",
+              selection: $upperCaseLetterKeyBehavior
+            ) {
+              Text(LocalizedStringKey("Type them into inline composition buffer")).tag(0)
+              Text(LocalizedStringKey("Always directly commit lowercased letters")).tag(1)
+              Text(LocalizedStringKey("Always directly commit uppercased letters")).tag(2)
+              Text(LocalizedStringKey("Directly commit lowercased letters only if the compositor is empty")).tag(3)
+              Text(LocalizedStringKey("Directly commit uppercased letters only if the compositor is empty")).tag(4)
+            }
+            Text(LocalizedStringKey("Choose the behavior of Shift+Letter key with letter inputs."))
+              .settingsDescription()
+          }
+        }
+        Section {
+          VStack(alignment: .leading) {
+            Picker(
+              "Intonation Key:",
+              selection: $specifyIntonationKeyBehavior
+            ) {
+              Text(LocalizedStringKey("Override the previous reading's intonation with candidate-reset")).tag(0)
+              Text(LocalizedStringKey("Only override the intonation of the previous reading if different")).tag(1)
+              Text(LocalizedStringKey("Always type intonations to the inline composition buffer")).tag(2)
+            }
+            Text(LocalizedStringKey("Specify the behavior of intonation key when syllable composer is empty."))
+              .settingsDescription()
+          }
+          VStack(alignment: .leading) {
+            Toggle(
+              LocalizedStringKey("Accept leading intonations in rare cases"),
+              isOn: $acceptLeadingIntonations
+            )
+            Spacer()
+            Text(LocalizedStringKey("This feature accommodates certain typing mistakes that the intonation mark might be typed at first (which is sequentially wrong from a common sense that intonation marks are supposed to be used for confirming combinations). It won't work if the current parser is of (any) pinyin. Also, this feature won't work when an intonation override is possible (and enabled)."))
+              .settingsDescription()
+          }
+        }
+        Section {
+          VStack(alignment: .leading) {
+            Toggle(
+              LocalizedStringKey("Share alphanumerical mode status across all clients"),
+              isOn: $shareAlphanumericalModeStatusAcrossClients
+            )
+            Text(
+              "This only works when being toggled by Shift key and JIS Eisu key.".localized
+            )
+            .settingsDescription()
+          }
+          VStack(alignment: .leading) {
+            Toggle(
+              LocalizedStringKey("Toggle alphanumerical mode with Left-Shift"),
+              isOn: $togglingAlphanumericalModeWithLShift.onChange {
+                SessionCtl.theShiftKeyDetector.toggleWithLShift = togglingAlphanumericalModeWithLShift
               }
-            }
-          ).disabled(!macOSMontereyOrLaterDetected)
-          Text(
-            "This feature requires macOS 12 and above.".localized
-          )
-          .preferenceDescription(maxWidth: CtlPrefUIShared.maxDescriptionWidth)
-        }
-        SSPreferences.Settings.Section(title: "Misc Settings:".localized) {
-          Toggle(
-            LocalizedStringKey("Always show tooltip texts horizontally"),
-            isOn: $alwaysShowTooltipTextsHorizontally
-          ).disabled(Bundle.main.preferredLocalizations[0] == "en")
-          Text(
-            LocalizedStringKey(
-              "Key names in tooltip will be shown as symbols when the tooltip is vertical. However, this option will be ignored since tooltip will always be horizontal if the UI language is English."
             )
-          )
-          .preferenceDescription(maxWidth: CtlPrefUIShared.maxDescriptionWidth)
+            Toggle(
+              LocalizedStringKey("Toggle alphanumerical mode with Right-Shift"),
+              isOn: $togglingAlphanumericalModeWithRShift.onChange {
+                SessionCtl.theShiftKeyDetector.toggleWithRShift = togglingAlphanumericalModeWithRShift
+              }
+            )
+            Spacer()
+            Text(
+              "This feature requires macOS 10.15 and above.".localized + CtlPrefUIShared.sentenceSeparator
+                + "This feature only needs to parse consecutive NSEvents passed by macOS built-in InputMethodKit framework, hence no necessity of asking end-users for extra privileges of monitoring global keyboard inputs. You are free to investigate our codebase or reverse-engineer this input method to see whether the above statement is trustable.".localized
+            )
+            .settingsDescription()
+          }
         }
-      }
+        Section {
+          VStack(alignment: .leading) {
+            Toggle(
+              LocalizedStringKey("Show notifications when toggling Caps Lock"),
+              isOn: $showNotificationsWhenTogglingCapsLock.onChange {
+                if !macOSMontereyOrLaterDetected, showNotificationsWhenTogglingCapsLock {
+                  showNotificationsWhenTogglingCapsLock.toggle()
+                }
+              }
+            ).disabled(!macOSMontereyOrLaterDetected)
+            Text(
+              "This feature requires macOS 12 and above.".localized
+            )
+            .settingsDescription()
+          }
+          VStack(alignment: .leading) {
+            Toggle(
+              LocalizedStringKey("Always show tooltip texts horizontally"),
+              isOn: $alwaysShowTooltipTextsHorizontally
+            ).disabled(Bundle.main.preferredLocalizations[0] == "en")
+            Text(
+              LocalizedStringKey(
+                "Key names in tooltip will be shown as symbols when the tooltip is vertical. However, this option will be ignored since tooltip will always be horizontal if the UI language is English."
+              )
+            )
+            .settingsDescription()
+          }
+        }
+      }.formStyled().frame(width: CtlPrefUIShared.formWidth)
     }
     .frame(maxHeight: CtlPrefUIShared.contentMaxHeight)
   }

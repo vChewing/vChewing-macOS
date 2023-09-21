@@ -35,48 +35,46 @@ struct VwrPrefPaneOutput: View {
 
   var body: some View {
     ScrollView {
-      SSPreferences.Settings.Container(contentWidth: CtlPrefUIShared.contentWidth) {
-        SSPreferences.Settings.Section(title: "Output Settings:".localized, bottomDivider: true) {
+      Form {
+        Section {
+          Toggle(
+            LocalizedStringKey("Auto-convert traditional Chinese glyphs to KangXi characters"),
+            isOn: $chineseConversionEnabled.onChange {
+              if chineseConversionEnabled, shiftJISShinjitaiOutputEnabled {
+                shiftJISShinjitaiOutputEnabled = false
+              }
+            }
+          )
+          Toggle(
+            LocalizedStringKey("Auto-convert traditional Chinese glyphs to JIS Shinjitai characters"),
+            isOn: $shiftJISShinjitaiOutputEnabled.onChange {
+              if chineseConversionEnabled, shiftJISShinjitaiOutputEnabled {
+                chineseConversionEnabled = false
+              }
+            }
+          )
+          Toggle(
+            LocalizedStringKey("Commit Hanyu-Pinyin instead on Ctrl(+Option)+Command+Enter"),
+            isOn: $inlineDumpPinyinInLieuOfZhuyin
+          )
+          Toggle(
+            LocalizedStringKey("Trim unfinished readings / strokes on commit"),
+            isOn: $trimUnfinishedReadingsOnCommit
+          )
+        }
+        Section(header: Text("Experimental:")) {
           VStack(alignment: .leading) {
             Toggle(
-              LocalizedStringKey("Auto-convert traditional Chinese glyphs to KangXi characters"),
-              isOn: $chineseConversionEnabled.onChange {
-                if chineseConversionEnabled, shiftJISShinjitaiOutputEnabled {
-                  shiftJISShinjitaiOutputEnabled = false
-                }
-              }
+              LocalizedStringKey("Harden vertical punctuations during vertical typing (not recommended)"),
+              isOn: $hardenVerticalPunctuations
             )
-            Toggle(
-              LocalizedStringKey("Auto-convert traditional Chinese glyphs to JIS Shinjitai characters"),
-              isOn: $shiftJISShinjitaiOutputEnabled.onChange {
-                if chineseConversionEnabled, shiftJISShinjitaiOutputEnabled {
-                  chineseConversionEnabled = false
-                }
-              }
-            )
-            Toggle(
-              LocalizedStringKey("Commit Hanyu-Pinyin instead on Ctrl(+Option)+Command+Enter"),
-              isOn: $inlineDumpPinyinInLieuOfZhuyin
-            )
-            Toggle(
-              LocalizedStringKey("Trim unfinished readings / strokes on commit"),
-              isOn: $trimUnfinishedReadingsOnCommit
-            )
-          }
-        }
-        SSPreferences.Settings.Section(title: "Experimental:".localized) {
-          Toggle(
-            LocalizedStringKey("Harden vertical punctuations during vertical typing (not recommended)"),
-            isOn: $hardenVerticalPunctuations
-          )
-          Text(
-            LocalizedStringKey(
+            Text(
               "⚠︎ This feature is useful ONLY WHEN the font you are using doesn't support dynamic vertical punctuations. However, typed vertical punctuations will always shown as vertical punctuations EVEN IF your editor has changed the typing direction to horizontal."
             )
-          )
-          .preferenceDescription(maxWidth: CtlPrefUIShared.maxDescriptionWidth)
+            .settingsDescription()
+          }
         }
-      }
+      }.formStyled().frame(width: CtlPrefUIShared.formWidth)
     }
     .frame(maxHeight: CtlPrefUIShared.contentMaxHeight)
   }
