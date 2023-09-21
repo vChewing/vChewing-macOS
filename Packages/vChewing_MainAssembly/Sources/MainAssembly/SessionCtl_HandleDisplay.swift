@@ -63,7 +63,7 @@ public extension SessionCtl {
       if PrefMgr.shared.alwaysShowTooltipTextsHorizontally { return .horizontal }
       return isVerticalTyping ? .vertical : .horizontal
     }()
-    // 強制重新初期化，因為 NSAttributedTextView 有顯示滯後性。
+    // 強制重新初期化，因為有顯示滯後性。
     do {
       tooltipInstance.hide()
       tooltipInstance = Self.makeTooltipUI()
