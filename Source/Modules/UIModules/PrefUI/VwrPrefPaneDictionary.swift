@@ -55,111 +55,115 @@ struct VwrPrefPaneDictionary: View {
 
   var body: some View {
     ScrollView {
-      SSPreferences.Settings.Container(contentWidth: CtlPrefUIShared.contentWidth) {
+      Form {
         // MARK: - User Data Folder Path Management
 
-        SSPreferences.Settings.Section(bottomDivider: true) {
+        Section {
           Group {
-            Text(LocalizedStringKey("Choose your desired user data folder path. Will be omitted if invalid."))
-            HStack {
-              PathControl(pathDroppable: $userDataFolderSpecified) { pathControl in
-                pathControl.allowedTypes = ["public.folder", "public.directory"]
-                pathControl.heightAnchor.constraint(equalToConstant: 20).isActive = true
-                pathControl.widthAnchor.constraint(equalToConstant: CtlPrefUIShared.maxDescriptionWidth).isActive = true
-              } acceptDrop: { pathControl, info in
-                let urls = info.draggingPasteboard.readObjects(forClasses: [NSURL.self])
-                guard let url = urls?.first as? URL else { return false }
-                let bolPreviousFolderValidity = LMMgr.checkIfSpecifiedUserDataFolderValid(
-                  PrefMgr.shared.userDataFolderSpecified.expandingTildeInPath)
-                var newPath = url.path
-                newPath.ensureTrailingSlash()
-                if LMMgr.checkIfSpecifiedUserDataFolderValid(newPath) {
-                  userDataFolderSpecified = newPath
-                  pathControl.url = url
-                  BookmarkManager.shared.saveBookmark(for: url)
-                  AppDelegate.shared.updateDirectoryMonitorPath()
-                  return true
+            VStack(alignment: .leading) {
+              Text(LocalizedStringKey("Choose your desired user data folder path. Will be omitted if invalid."))
+              HStack(spacing: 3) {
+                PathControl(pathDroppable: $userDataFolderSpecified) { pathControl in
+                  pathControl.allowedTypes = ["public.folder", "public.directory"]
+                  pathControl.placeholderString = "Please drag the desired target from Finder to this place.".localized
+                } acceptDrop: { pathControl, info in
+                  let urls = info.draggingPasteboard.readObjects(forClasses: [NSURL.self])
+                  guard let url = urls?.first as? URL else { return false }
+                  let bolPreviousFolderValidity = LMMgr.checkIfSpecifiedUserDataFolderValid(
+                    PrefMgr.shared.userDataFolderSpecified.expandingTildeInPath)
+                  var newPath = url.path
+                  newPath.ensureTrailingSlash()
+                  if LMMgr.checkIfSpecifiedUserDataFolderValid(newPath) {
+                    userDataFolderSpecified = newPath
+                    pathControl.url = url
+                    BookmarkManager.shared.saveBookmark(for: url)
+                    AppDelegate.shared.updateDirectoryMonitorPath()
+                    return true
+                  }
+                  // On Error:
+                  IMEApp.buzz()
+                  if !bolPreviousFolderValidity {
+                    userDataFolderSpecified = fdrUserDataDefault
+                    pathControl.url = URL(fileURLWithPath: fdrUserDataDefault)
+                  }
+                  return false
                 }
-                // On Error:
-                IMEApp.buzz()
-                if !bolPreviousFolderValidity {
-                  userDataFolderSpecified = fdrUserDataDefault
-                  pathControl.url = URL(fileURLWithPath: fdrUserDataDefault)
-                }
-                return false
-              }
-              Button {
-                if NSEvent.keyModifierFlags == .option, !userDataFolderSpecified.isEmpty {
-                  NSWorkspace.shared.activateFileViewerSelecting(
-                    [URL(fileURLWithPath: userDataFolderSpecified)]
+                Button {
+                  if NSEvent.keyModifierFlags == .option, !userDataFolderSpecified.isEmpty {
+                    NSWorkspace.shared.activateFileViewerSelecting(
+                      [URL(fileURLWithPath: userDataFolderSpecified)]
+                    )
+                    return
+                  }
+                  Self.dlgOpenPath.title = NSLocalizedString(
+                    "Choose your desired user data folder.", comment: ""
                   )
-                  return
-                }
-                Self.dlgOpenPath.title = NSLocalizedString(
-                  "Choose your desired user data folder.", comment: ""
-                )
-                Self.dlgOpenPath.showsResizeIndicator = true
-                Self.dlgOpenPath.showsHiddenFiles = true
-                Self.dlgOpenPath.canChooseFiles = false
-                Self.dlgOpenPath.allowsMultipleSelection = false
-                Self.dlgOpenPath.canChooseDirectories = true
+                  Self.dlgOpenPath.showsResizeIndicator = true
+                  Self.dlgOpenPath.showsHiddenFiles = true
+                  Self.dlgOpenPath.canChooseFiles = false
+                  Self.dlgOpenPath.allowsMultipleSelection = false
+                  Self.dlgOpenPath.canChooseDirectories = true
 
-                let bolPreviousFolderValidity = LMMgr.checkIfSpecifiedUserDataFolderValid(
-                  userDataFolderSpecified.expandingTildeInPath)
+                  let bolPreviousFolderValidity = LMMgr.checkIfSpecifiedUserDataFolderValid(
+                    userDataFolderSpecified.expandingTildeInPath)
 
-                if let window = CtlPrefUIShared.sharedWindow {
-                  Self.dlgOpenPath.beginSheetModal(for: window) { result in
-                    if result == NSApplication.ModalResponse.OK {
-                      guard let url = Self.dlgOpenPath.url else { return }
-                      // CommonDialog 讀入的路徑沒有結尾斜槓，這會導致檔案目錄合規性判定失準。
-                      // 所以要手動補回來。
-                      var newPath = url.path
-                      newPath.ensureTrailingSlash()
-                      if LMMgr.checkIfSpecifiedUserDataFolderValid(newPath) {
-                        userDataFolderSpecified = newPath
-                        BookmarkManager.shared.saveBookmark(for: url)
-                        AppDelegate.shared.updateDirectoryMonitorPath()
+                  if let window = CtlPrefUIShared.sharedWindow {
+                    Self.dlgOpenPath.beginSheetModal(for: window) { result in
+                      if result == NSApplication.ModalResponse.OK {
+                        guard let url = Self.dlgOpenPath.url else { return }
+                        // CommonDialog 讀入的路徑沒有結尾斜槓，這會導致檔案目錄合規性判定失準。
+                        // 所以要手動補回來。
+                        var newPath = url.path
+                        newPath.ensureTrailingSlash()
+                        if LMMgr.checkIfSpecifiedUserDataFolderValid(newPath) {
+                          userDataFolderSpecified = newPath
+                          BookmarkManager.shared.saveBookmark(for: url)
+                          AppDelegate.shared.updateDirectoryMonitorPath()
+                        } else {
+                          IMEApp.buzz()
+                          if !bolPreviousFolderValidity {
+                            userDataFolderSpecified = fdrUserDataDefault
+                          }
+                          return
+                        }
                       } else {
-                        IMEApp.buzz()
                         if !bolPreviousFolderValidity {
                           userDataFolderSpecified = fdrUserDataDefault
                         }
                         return
                       }
-                    } else {
-                      if !bolPreviousFolderValidity {
-                        userDataFolderSpecified = fdrUserDataDefault
-                      }
-                      return
                     }
                   }
-                }
-              } label: {
-                Text("...")
+                } label: {
+                  Text("...")
+                }.frame(minWidth: 25)
+                Button {
+                  userDataFolderSpecified = fdrUserDataDefault
+                } label: {
+                  Text("↻")
+                }.frame(minWidth: 25)
               }
-              Button {
-                userDataFolderSpecified = fdrUserDataDefault
-              } label: {
-                Text("↻")
-              }
-            }
-            Toggle(
-              LocalizedStringKey("Automatically reload user data files if changes detected"),
-              isOn: $shouldAutoReloadUserDataFiles.onChange {
-                if shouldAutoReloadUserDataFiles {
-                  LMMgr.initUserLangModels()
-                }
-              }
-            ).controlSize(.small)
-            Text(
-              LocalizedStringKey(
-                "Due to security concerns, we don't consider implementing anything related to shell script execution here. An input method doing this without implementing App Sandbox will definitely have system-wide vulnerabilities, considering that its related UserDefaults are easily tamperable to execute malicious shell scripts. vChewing is designed to be invulnerable from this kind of attack. Also, official releases of vChewing are Sandboxed."
+              Spacer()
+              Text(
+                LocalizedStringKey(
+                  "Due to security concerns, we don't consider implementing anything related to shell script execution here. An input method doing this without implementing App Sandbox will definitely have system-wide vulnerabilities, considering that its related UserDefaults are easily tamperable to execute malicious shell scripts. vChewing is designed to be invulnerable from this kind of attack. Also, official releases of vChewing are Sandboxed."
+                )
               )
-            )
-            .preferenceDescription(maxWidth: CtlPrefUIShared.maxDescriptionWidth)
+              .settingsDescription()
+              Toggle(
+                LocalizedStringKey("Automatically reload user data files if changes detected"),
+                isOn: $shouldAutoReloadUserDataFiles.onChange {
+                  if shouldAutoReloadUserDataFiles {
+                    LMMgr.initUserLangModels()
+                  }
+                }
+              )
+            }
           }
-          Divider()
-          Group {
+        }
+
+        Section {
+          VStack(alignment: .leading) {
             Toggle(
               LocalizedStringKey("Read external factory dictionary files if possible"),
               isOn: $useExternalFactoryDict.onChange {
@@ -171,25 +175,27 @@ struct VwrPrefPaneDictionary: View {
                 "This will use the plist files deployed by the “make install” command from libvChewing-Data if possible."
               )
             )
-            .preferenceDescription(maxWidth: CtlPrefUIShared.maxDescriptionWidth)
-            Toggle(
-              LocalizedStringKey("Only load factory language models if needed"),
-              isOn: $onlyLoadFactoryLangModelsIfNeeded.onChange {
-                if !onlyLoadFactoryLangModelsIfNeeded { LMMgr.loadDataModelsOnAppDelegate() }
-              }
-            )
-            Toggle(
-              LocalizedStringKey("Enable CNS11643 Support (2023-05-19)"),
-              isOn: $cns11643Enabled.onChange {
-                LMMgr.setCNSEnabled(cns11643Enabled)
-              }
-            )
-            Toggle(
-              LocalizedStringKey("Enable symbol input support (incl. certain emoji symbols)"),
-              isOn: $symbolInputEnabled.onChange {
-                LMMgr.setSymbolEnabled(symbolInputEnabled)
-              }
-            )
+            .settingsDescription()
+          }
+          Toggle(
+            LocalizedStringKey("Only load factory language models if needed"),
+            isOn: $onlyLoadFactoryLangModelsIfNeeded.onChange {
+              if !onlyLoadFactoryLangModelsIfNeeded { LMMgr.loadDataModelsOnAppDelegate() }
+            }
+          )
+          Toggle(
+            LocalizedStringKey("Enable CNS11643 Support (2023-05-19)"),
+            isOn: $cns11643Enabled.onChange {
+              LMMgr.setCNSEnabled(cns11643Enabled)
+            }
+          )
+          Toggle(
+            LocalizedStringKey("Enable symbol input support (incl. certain emoji symbols)"),
+            isOn: $symbolInputEnabled.onChange {
+              LMMgr.setSymbolEnabled(symbolInputEnabled)
+            }
+          )
+          VStack(alignment: .leading) {
             Toggle(
               LocalizedStringKey("Applying typing suggestions from half-life user override model"),
               isOn: $fetchSuggestionsFromUserOverrideModel
@@ -197,7 +203,9 @@ struct VwrPrefPaneDictionary: View {
             Text(
               "The user override model only possesses memories temporarily. Each memory record gradually becomes ineffective within approximately less than 6 days. You can erase all memory records through the input method menu.".localized
             )
-            .preferenceDescription(maxWidth: CtlPrefUIShared.maxDescriptionWidth)
+            .settingsDescription()
+          }
+          VStack(alignment: .leading) {
             Toggle(
               LocalizedStringKey("Enable phrase replacement table"),
               isOn: $phraseReplacementEnabled.onChange {
@@ -208,10 +216,11 @@ struct VwrPrefPaneDictionary: View {
               }
             )
             Text("This will batch-replace specified candidates.".localized)
-              .preferenceDescription(maxWidth: CtlPrefUIShared.maxDescriptionWidth)
+              .settingsDescription()
           }
-          Divider()
-          Group {
+        }
+        Section {
+          VStack(alignment: .leading) {
             Toggle(
               LocalizedStringKey("Allow boosting / excluding a candidate of single kanji when marking"),
               isOn: $allowBoostingSingleKanjiAsUserPhrase
@@ -221,10 +230,10 @@ struct VwrPrefPaneDictionary: View {
                 "⚠︎ This may hinder the walking algorithm from giving appropriate results."
               )
             )
-            .preferenceDescription(maxWidth: CtlPrefUIShared.maxDescriptionWidth)
+            .settingsDescription()
           }
         }
-      }
+      }.formStyled().frame(width: CtlPrefUIShared.formWidth)
     }
     .frame(maxHeight: CtlPrefUIShared.contentMaxHeight)
   }
