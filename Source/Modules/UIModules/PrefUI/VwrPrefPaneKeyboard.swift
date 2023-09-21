@@ -37,9 +37,11 @@ struct VwrPrefPaneKeyboard: View {
 
   var body: some View {
     ScrollView {
-      SSPreferences.Settings.Container(contentWidth: CtlPrefUIShared.contentWidth) {
-        SSPreferences.Settings.Section(title: "Quick Setup:".localized) {
+      Form {
+        Section {
           HStack(alignment: .top) {
+            Text("Quick Setup:")
+            Spacer()
             Button {
               keyboardParser = 0
               basicKeyboardLayout = "com.apple.keylayout.ZhuyinBopomofo"
@@ -58,12 +60,10 @@ struct VwrPrefPaneKeyboard: View {
             } label: {
               Text("↻Ａ")
             }
-          }.controlSize(.small)
-        }
-        SSPreferences.Settings.Section(title: "Phonetic Parser:".localized) {
-          HStack {
+          }
+          VStack(alignment: .leading) {
             Picker(
-              "",
+              "Phonetic Parser:",
               selection: $keyboardParser
             ) {
               ForEach(KeyboardParser.allCases, id: \.self) { item in
@@ -71,65 +71,62 @@ struct VwrPrefPaneKeyboard: View {
                 Text(item.localizedMenuName).tag(item.rawValue)
               }.id(UUID())
             }
-            .fixedSize()
-            .labelsHidden()
-            Spacer(minLength: NSFont.systemFontSize)
+            Spacer()
+            Text(NSLocalizedString("Choose the phonetic layout for Mandarin parser.", comment: ""))
+              .settingsDescription()
           }
-          Text(NSLocalizedString("Choose the phonetic layout for Mandarin parser.", comment: ""))
-            .preferenceDescription(maxWidth: CtlPrefUIShared.maxDescriptionWidth)
-        }
-        SSPreferences.Settings.Section(title: "Basic Keyboard Layout:".localized) {
-          HStack {
-            Picker(
-              "",
-              selection: $basicKeyboardLayout
-            ) {
-              ForEach(0 ... (IMKHelper.allowedBasicLayoutsAsTISInputSources.count - 1), id: \.self) { id in
-                let theEntry = IMKHelper.allowedBasicLayoutsAsTISInputSources[id]
-                if let theEntry = theEntry {
+
+          VStack(alignment: .leading) {
+            HStack {
+              Picker(
+                "Basic Keyboard Layout:",
+                selection: $basicKeyboardLayout
+              ) {
+                ForEach(0 ... (IMKHelper.allowedBasicLayoutsAsTISInputSources.count - 1), id: \.self) { id in
+                  let theEntry = IMKHelper.allowedBasicLayoutsAsTISInputSources[id]
+                  if let theEntry = theEntry {
+                    Text(theEntry.vChewingLocalizedName).tag(theEntry.identifier)
+                  } else {
+                    Divider()
+                  }
+                }.id(UUID())
+              }
+            }
+            Spacer()
+            Text(
+              NSLocalizedString(
+                "Choose the macOS-level basic keyboard layout. Non-QWERTY alphanumerical keyboard layouts are for Pinyin parser only. This option will only affect the appearance of the on-screen-keyboard if the current Mandarin parser is neither (any) pinyin nor dynamically reparsable with different western keyboard layouts (like Eten 26, Hsu, etc.).",
+                comment: ""
+              )
+            )
+            .settingsDescription()
+          }
+          VStack(alignment: .leading) {
+            HStack {
+              Picker(
+                "Alphanumerical Layout:",
+                selection: $alphanumericalKeyboardLayout
+              ) {
+                ForEach(0 ... (IMKHelper.allowedAlphanumericalTISInputSources.count - 1), id: \.self) { id in
+                  let theEntry = IMKHelper.allowedAlphanumericalTISInputSources[id]
                   Text(theEntry.vChewingLocalizedName).tag(theEntry.identifier)
-                } else {
-                  Divider()
-                }
-              }.id(UUID())
+                }.id(UUID())
+              }
             }
-            .labelsHidden().frame(width: 290)
-            Spacer(minLength: NSFont.systemFontSize)
-          }
-          Text(
-            NSLocalizedString(
-              "Choose the macOS-level basic keyboard layout. Non-QWERTY alphanumerical keyboard layouts are for Pinyin parser only. This option will only affect the appearance of the on-screen-keyboard if the current Mandarin parser is neither (any) pinyin nor dynamically reparsable with different western keyboard layouts (like Eten 26, Hsu, etc.).",
-              comment: ""
+            Spacer()
+            Text(
+              NSLocalizedString(
+                "Choose the macOS-level alphanumerical keyboard layout. This setting is for Shift-toggled alphanumerical mode only.",
+                comment: ""
+              )
             )
-          )
-          .preferenceDescription(maxWidth: CtlPrefUIShared.maxDescriptionWidth)
-        }
-        SSPreferences.Settings.Section(title: "Alphanumerical Layout:".localized) {
-          HStack {
-            Picker(
-              "",
-              selection: $alphanumericalKeyboardLayout
-            ) {
-              ForEach(0 ... (IMKHelper.allowedAlphanumericalTISInputSources.count - 1), id: \.self) { id in
-                let theEntry = IMKHelper.allowedAlphanumericalTISInputSources[id]
-                Text(theEntry.vChewingLocalizedName).tag(theEntry.identifier)
-              }.id(UUID())
-            }
-            .labelsHidden().frame(width: 290)
-            Spacer(minLength: NSFont.systemFontSize)
+            .settingsDescription()
           }
-          Text(
-            NSLocalizedString(
-              "Choose the macOS-level alphanumerical keyboard layout. This setting is for Shift-toggled alphanumerical mode only.",
-              comment: ""
-            )
-          )
-          .preferenceDescription(maxWidth: CtlPrefUIShared.maxDescriptionWidth)
         }
-        SSPreferences.Settings.Section(title: "Keyboard Shortcuts:".localized) {
+        Section(header: Text("Keyboard Shortcuts:")) {
           VwrPrefPaneKeyboard_KeyboardShortcuts()
         }
-      }
+      }.formStyled().frame(width: CtlPrefUIShared.formWidth)
     }
     .frame(maxHeight: CtlPrefUIShared.contentMaxHeight)
   }
@@ -195,6 +192,7 @@ private struct VwrPrefPaneKeyboard_KeyboardShortcuts: View {
           isOn: $usingHotKeyRevLookup
         )
       }
+      Divider()
       VStack(alignment: .leading) {
         Toggle(
           LocalizedStringKey("JIS Shinjitai Output"),
@@ -225,72 +223,5 @@ private struct VwrPrefPaneKeyboard_KeyboardShortcuts: View {
 struct VwrPrefPaneKeyboard_Previews: PreviewProvider {
   static var previews: some View {
     VwrPrefPaneKeyboard()
-  }
-}
-
-// MARK: - NSComboBox
-
-// Ref: https://stackoverflow.com/a/71058587/4162914
-// License: https://creativecommons.org/licenses/by-sa/4.0/
-
-@available(macOS 10.15, *)
-public struct ComboBox: NSViewRepresentable {
-  // The items that will show up in the pop-up menu:
-  public var items: [String] = []
-
-  // The property on our parent view that gets synced to the current
-  // stringValue of the NSComboBox, whether the user typed it in or
-  // selected it from the list:
-  @Binding public var text: String
-
-  public func makeCoordinator() -> Coordinator {
-    Coordinator(self)
-  }
-
-  public func makeNSView(context: Context) -> NSComboBox {
-    let comboBox = NSComboBox()
-    comboBox.usesDataSource = false
-    comboBox.completes = false
-    comboBox.delegate = context.coordinator
-    comboBox.intercellSpacing = NSSize(width: 0.0, height: 10.0)
-    return comboBox
-  }
-
-  public func updateNSView(_ nsView: NSComboBox, context: Context) {
-    nsView.removeAllItems()
-    nsView.addItems(withObjectValues: items)
-
-    // ComboBox doesn't automatically select the item matching its text;
-    // we must do that manually. But we need the delegate to ignore that
-    // selection-change or we'll get a "state modified during view update;
-    // will cause undefined behavior" warning.
-    context.coordinator.ignoreSelectionChanges = true
-    nsView.stringValue = text
-    nsView.selectItem(withObjectValue: text)
-    context.coordinator.ignoreSelectionChanges = false
-  }
-
-  public class Coordinator: NSObject, NSComboBoxDelegate {
-    public var parent: ComboBox
-    public var ignoreSelectionChanges = false
-
-    public init(_ parent: ComboBox) {
-      self.parent = parent
-    }
-
-    public func comboBoxSelectionDidChange(_ notification: Notification) {
-      if !ignoreSelectionChanges,
-         let box: NSComboBox = notification.object as? NSComboBox,
-         let newStringValue: String = box.objectValueOfSelectedItem as? String
-      {
-        parent.text = newStringValue
-      }
-    }
-
-    public func controlTextDidEndEditing(_ obj: Notification) {
-      if let textField = obj.object as? NSTextField {
-        parent.text = textField.stringValue
-      }
-    }
   }
 }
