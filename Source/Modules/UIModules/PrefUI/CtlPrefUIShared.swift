@@ -86,10 +86,41 @@ class CtlPrefUIShared {
     }
   }()
 
+  static let formWidth: Double = {
+    switch PrefMgr.shared.appleLanguages[0] {
+    case "ja":
+      return 520
+    default:
+      if PrefMgr.shared.appleLanguages[0].contains("zh-Han") {
+        return 500
+      } else {
+        return 580
+      }
+    }
+  }()
+
   static var isCJKInterface: Bool {
     PrefMgr.shared.appleLanguages[0].contains("zh-Han") || PrefMgr.shared.appleLanguages[0] == "ja"
   }
 
   static var containerWidth: Double { contentWidth + 60 }
   static var maxDescriptionWidth: Double { contentWidth * 0.8 }
+}
+
+@available(macOS 10.15, *)
+public extension View {
+  func settingsDescription(maxWidth: CGFloat? = .infinity) -> some View {
+    controlSize(.small)
+      .frame(maxWidth: maxWidth, alignment: .leading)
+      // TODO: Use `.foregroundStyle` when targeting macOS 12.
+      .foregroundColor(.secondary)
+  }
+}
+
+@available(macOS 10.15, *)
+public extension View {
+  func formStyled() -> some View {
+    if #available(macOS 13, *) { return self.formStyle(.grouped) }
+    return self.padding()
+  }
 }

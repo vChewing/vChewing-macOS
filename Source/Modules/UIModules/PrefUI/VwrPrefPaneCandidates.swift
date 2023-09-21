@@ -54,141 +54,144 @@ struct VwrPrefPaneCandidates: View {
 
   var body: some View {
     ScrollView {
-      SSPreferences.Settings.Container(contentWidth: CtlPrefUIShared.contentWidth) {
-        SSPreferences.Settings.Section(title: "Selection Keys:".localized, bottomDivider: true) {
-          VwrPrefPaneCandidates_SelectionKeys()
-        }
-        SSPreferences.Settings.Section(title: "Candidate Layout:".localized, bottomDivider: true) {
-          Picker(
-            "",
-            selection: $useHorizontalCandidateList
-          ) {
-            Text(LocalizedStringKey("Vertical")).tag(false)
-            Text(LocalizedStringKey("Horizontal")).tag(true)
+      Form {
+        Section {
+          VStack(alignment: .leading) {
+            Picker(
+              "Cursor Selection:",
+              selection: $useRearCursorMode
+            ) {
+              Text(LocalizedStringKey("in front of the phrase (like macOS built-in Zhuyin IME)")).tag(false)
+              Text(LocalizedStringKey("at the rear of the phrase (like Microsoft New Phonetic)")).tag(true)
+            }
+            Text(LocalizedStringKey("Choose the cursor position where you want to list possible candidates."))
+              .settingsDescription()
           }
-          .labelsHidden()
-          .horizontalRadioGroupLayout()
-          .pickerStyle(RadioGroupPickerStyle())
-          Text(LocalizedStringKey("Choose your preferred layout of the candidate window."))
-            .preferenceDescription(maxWidth: CtlPrefUIShared.maxDescriptionWidth)
-          let candidateLayoutSubOptions = Group {
+          Toggle(
+            LocalizedStringKey("Push the cursor in front of the phrase after selection"),
+            isOn: $moveCursorAfterSelectingCandidate
+          )
+          if !useRearCursorMode {
+            Toggle(
+              LocalizedStringKey("Adjust candidate window location according to current node length"),
+              isOn: $useDynamicCandidateWindowOrigin
+            ).disabled(useRearCursorMode)
+          }
+        }
+        Section {
+          VStack(alignment: .leading) { VwrPrefPaneCandidates_SelectionKeys() }
+          VStack(alignment: .leading) {
+            Picker(
+              "Candidate Layout:",
+              selection: $useHorizontalCandidateList
+            ) {
+              Text(LocalizedStringKey("Vertical")).tag(false)
+              Text(LocalizedStringKey("Horizontal")).tag(true)
+            }
+            .pickerStyle(RadioGroupPickerStyle())
+            Text(LocalizedStringKey("Choose your preferred layout of the candidate window."))
+              .settingsDescription()
+          }
+          VStack(alignment: .leading) {
+            Picker(
+              "Candidate Size:",
+              selection: $candidateListTextSize.onChange {
+                guard !(12 ... 196).contains(candidateListTextSize) else { return }
+                candidateListTextSize = max(12, min(candidateListTextSize, 196))
+              }
+            ) {
+              Group {
+                Text("12").tag(12.0)
+                Text("14").tag(14.0)
+                Text("16").tag(16.0)
+                Text("17").tag(17.0)
+                Text("18").tag(18.0)
+                Text("20").tag(20.0)
+                Text("22").tag(22.0)
+                Text("24").tag(24.0)
+              }
+              Group {
+                Text("32").tag(32.0)
+                Text("64").tag(64.0)
+                Text("96").tag(96.0)
+              }
+            }
+            Text(LocalizedStringKey("Choose candidate font size for better visual clarity."))
+              .settingsDescription()
+          }
+          VStack(alignment: .leading) {
             Toggle(
               LocalizedStringKey("Use only one row / column in candidate window"),
               isOn: $candidateWindowShowOnlyOneLine
             )
-            .controlSize(.small)
+            Text(
+              "Tadokoro candidate window shows 4 rows / columns by default, providing similar experiences from Microsoft New Phonetic IME and macOS bult-in Chinese IME (since macOS 10.9). However, for some users who have presbyopia, they prefer giant candidate font sizes, resulting a concern that multiple rows / columns of candidates can make the candidate window looks too big, hence this option. Note that this option will be dismissed if the typing context is vertical, forcing the candidates to be shown in only one row / column. Only one reverse-lookup result can be made available in single row / column mode due to reduced candidate window size.".localized
+            )
+            .settingsDescription()
+          }
+          if !candidateWindowShowOnlyOneLine {
             Toggle(
               LocalizedStringKey("Always expand candidate window panel"),
               isOn: $alwaysExpandCandidateWindow
             )
-            .controlSize(.small).disabled(candidateWindowShowOnlyOneLine)
+            .disabled(candidateWindowShowOnlyOneLine)
           }
-          if CtlPrefUIShared.isCJKInterface {
-            HStack {
-              candidateLayoutSubOptions
-            }
-          } else {
-            VStack(alignment: .leading) {
-              candidateLayoutSubOptions
-            }
-          }
-          Text(
-            "Tadokoro candidate window shows 4 rows / columns by default, providing similar experiences from Microsoft New Phonetic IME and macOS bult-in Chinese IME (since macOS 10.9). However, for some users who have presbyopia, they prefer giant candidate font sizes, resulting a concern that multiple rows / columns of candidates can make the candidate window looks too big, hence this option. Note that this option will be dismissed if the typing context is vertical, forcing the candidates to be shown in only one row / column. Only one reverse-lookup result can be made available in single row / column mode due to reduced candidate window size.".localized
-          )
-          .preferenceDescription(maxWidth: CtlPrefUIShared.maxDescriptionWidth)
         }
-        SSPreferences.Settings.Section(title: "Candidate Size:".localized, bottomDivider: true) {
-          Picker(
-            "",
-            selection: $candidateListTextSize.onChange {
-              guard !(12 ... 196).contains(candidateListTextSize) else { return }
-              candidateListTextSize = max(12, min(candidateListTextSize, 196))
-            }
-          ) {
-            Group {
-              Text("12").tag(12.0)
-              Text("14").tag(14.0)
-              Text("16").tag(16.0)
-              Text("17").tag(17.0)
-              Text("18").tag(18.0)
-              Text("20").tag(20.0)
-              Text("22").tag(22.0)
-              Text("24").tag(24.0)
-            }
-            Group {
-              Text("32").tag(32.0)
-              Text("64").tag(64.0)
-              Text("96").tag(96.0)
-            }
-          }
-          .labelsHidden()
-          .frame(width: 120.0)
-          Text(LocalizedStringKey("Choose candidate font size for better visual clarity."))
-            .preferenceDescription(maxWidth: CtlPrefUIShared.maxDescriptionWidth)
-        }
-        SSPreferences.Settings.Section(title: "Cursor Selection:".localized, bottomDivider: true) {
-          Picker(
-            "",
-            selection: $useRearCursorMode
-          ) {
-            Text(LocalizedStringKey("in front of the phrase (like macOS built-in Zhuyin IME)")).tag(false)
-            Text(LocalizedStringKey("at the rear of the phrase (like Microsoft New Phonetic)")).tag(true)
-          }
-          .labelsHidden()
-          .pickerStyle(RadioGroupPickerStyle())
-          Text(LocalizedStringKey("Choose the cursor position where you want to list possible candidates."))
-            .preferenceDescription(maxWidth: CtlPrefUIShared.maxDescriptionWidth)
-          Toggle(
-            LocalizedStringKey("Push the cursor in front of the phrase after selection"),
-            isOn: $moveCursorAfterSelectingCandidate
-          ).controlSize(.small)
-          Toggle(
-            LocalizedStringKey("Adjust candidate window location according to current node length"),
-            isOn: $useDynamicCandidateWindowOrigin
-          ).controlSize(.small).disabled(useRearCursorMode)
-        }
-        SSPreferences.Settings.Section(title: "Misc Settings:".localized, bottomDivider: true) {
-          Toggle(
-            LocalizedStringKey("Show available reverse-lookup results in candidate window"),
-            isOn: $showReverseLookupInCandidateUI
-          )
-          Text(
-            "The lookup results are supplied by the CIN cassette module.".localized
-          )
-          .preferenceDescription(maxWidth: CtlPrefUIShared.maxDescriptionWidth)
-          Toggle(
-            LocalizedStringKey("Always use fixed listing order in candidate window"),
-            isOn: $useFixedCandidateOrderOnSelection
-          )
-          Text(
-            LocalizedStringKey(
-              "This will stop user override model from affecting how candidates get sorted."
+
+        // MARK: (header: Text("Misc Settings:"))
+
+        Section {
+          VStack(alignment: .leading) {
+            Toggle(
+              LocalizedStringKey("Show available reverse-lookup results in candidate window"),
+              isOn: $showReverseLookupInCandidateUI
             )
-          )
-          .preferenceDescription(maxWidth: CtlPrefUIShared.maxDescriptionWidth)
-          Toggle(
-            LocalizedStringKey("Consolidate the context on confirming candidate selection"),
-            isOn: $consolidateContextOnCandidateSelection
-          )
-          Text(
-            "For example: When typing “章太炎” and you want to override the “太” with “泰”, and the raw operation index range [1,2) which bounds are cutting the current node “章太炎” in range [0,3). If having lack of the pre-consolidation process, this word will become something like “張泰言” after the candidate selection. Only if we enable this consolidation, this word will become “章泰炎” which is the expected result that the context is kept as-is.".localized
-          )
-          .preferenceDescription(maxWidth: CtlPrefUIShared.maxDescriptionWidth)
+            Text(
+              "The lookup results are supplied by the CIN cassette module.".localized
+            )
+            .settingsDescription()
+          }
+          VStack(alignment: .leading) {
+            Toggle(
+              LocalizedStringKey("Always use fixed listing order in candidate window"),
+              isOn: $useFixedCandidateOrderOnSelection
+            )
+            Text(
+              LocalizedStringKey(
+                "This will stop user override model from affecting how candidates get sorted."
+              )
+            )
+            .settingsDescription()
+          }
+          VStack(alignment: .leading) {
+            Toggle(
+              LocalizedStringKey("Consolidate the context on confirming candidate selection"),
+              isOn: $consolidateContextOnCandidateSelection
+            )
+            Text(
+              "For example: When typing “章太炎” and you want to override the “太” with “泰”, and the raw operation index range [1,2) which bounds are cutting the current node “章太炎” in range [0,3). If having lack of the pre-consolidation process, this word will become something like “張泰言” after the candidate selection. Only if we enable this consolidation, this word will become “章泰炎” which is the expected result that the context is kept as-is.".localized
+            )
+            .settingsDescription()
+          }
         }
-        SSPreferences.Settings.Section(title: "Experimental:".localized) {
+
+        // MARK: (header: Text("Experimental:"))
+
+        let imkEOSNoticeButton = Button("Where's IMK Candidate Window?") {
+          if let window = CtlPrefUIShared.sharedWindow {
+            let title = "The End of Support for IMK Candidate Window"
+            let explanation = "1) Only macOS has IMKCandidates. Since it relies on a dedicated ObjC Bridging Header to expose necessary internal APIs to work, it hinders vChewing from completely modularized for multi-platform support.\n\n2) IMKCandidates is buggy. It is not likely to be completely fixed by Apple, and its devs are not allowed to talk about it to non-Apple individuals. That's why we have had enough with IMKCandidates. It is likely the reason why Apple had never used IMKCandidates in their official InputMethodKit sample projects (as of August 2023)."
+            window.callAlert(title: title.localized, text: explanation.localized)
+          }
+        }
+
+        Section(footer: imkEOSNoticeButton) {
           Toggle(
             LocalizedStringKey("Enable mouse wheel support for Tadokoro Candidate Window"),
             isOn: $enableMouseScrollingForTDKCandidatesCocoa
           )
-          Button("Where's IMK Candidate Window?") {
-            if let window = CtlPrefUIShared.sharedWindow {
-              let title = "The End of Support for IMK Candidate Window"
-              let explanation = "1) Only macOS has IMKCandidates. Since it relies on a ObjC Bridging Header to expose necessary internal APIs to work, it hinders vChewing from completely modularized for multi-platform support.\n\n2) IMKCandidates is buggy. It is not likely to be completely fixed by Apple, and its devs are not allowed to talk about it to non-Apple individuals. That's why we have had enough with IMKCandidates. It is likely the reason why Apple had never used IMKCandidates in their official InputMethodKit sample projects (as of August 2023)."
-              window.callAlert(title: title.localized, text: explanation.localized)
-            }
-          }
         }
-      }
+      }.formStyled().frame(width: CtlPrefUIShared.formWidth)
     }
     .frame(maxHeight: CtlPrefUIShared.contentMaxHeight)
   }
@@ -213,30 +216,100 @@ private struct VwrPrefPaneCandidates_SelectionKeys: View {
   // MARK: - Main View
 
   var body: some View {
-    ComboBox(
-      items: CandidateKey.suggestions,
-      text: $candidateKeys.onChange {
-        let value = candidateKeys
-        let keys = value.trimmingCharacters(in: .whitespacesAndNewlines).lowercased().deduplicated
-        // Start Error Handling.
-        if let errorResult = CandidateKey.validate(keys: keys) {
-          if let window = CtlPrefUIShared.sharedWindow, !keys.isEmpty {
-            IMEApp.buzz()
-            let alert = NSAlert(error: NSLocalizedString("Invalid Selection Keys.", comment: ""))
-            alert.informativeText = errorResult
-            alert.beginSheetModal(for: window) { _ in
-              candidateKeys = PrefMgr.kDefaultCandidateKeys
+    HStack {
+      Text("Selection Keys:")
+      Spacer()
+      ComboBox(
+        items: CandidateKey.suggestions,
+        text: $candidateKeys.onChange {
+          let value = candidateKeys
+          let keys = value.trimmingCharacters(in: .whitespacesAndNewlines).lowercased().deduplicated
+          // Start Error Handling.
+          if let errorResult = CandidateKey.validate(keys: keys) {
+            if let window = CtlPrefUIShared.sharedWindow, !keys.isEmpty {
+              IMEApp.buzz()
+              let alert = NSAlert(error: NSLocalizedString("Invalid Selection Keys.", comment: ""))
+              alert.informativeText = errorResult
+              alert.beginSheetModal(for: window) { _ in
+                candidateKeys = PrefMgr.kDefaultCandidateKeys
+              }
             }
           }
         }
-      }
-    ).frame(width: 180)
+      ).frame(width: 180)
+    }
     Text(
       "Choose or hit Enter to confim your prefered keys for selecting candidates.".localized
         + "\n"
         + "This will also affect the row / column capacity of the candidate window.".localized
     )
+    .settingsDescription()
+  }
+}
 
-    .preferenceDescription(maxWidth: CtlPrefUIShared.maxDescriptionWidth)
+// MARK: - NSComboBox
+
+// Ref: https://stackoverflow.com/a/71058587/4162914
+// License: https://creativecommons.org/licenses/by-sa/4.0/
+
+@available(macOS 10.15, *)
+public struct ComboBox: NSViewRepresentable {
+  // The items that will show up in the pop-up menu:
+  public var items: [String] = []
+
+  // The property on our parent view that gets synced to the current
+  // stringValue of the NSComboBox, whether the user typed it in or
+  // selected it from the list:
+  @Binding public var text: String
+
+  public func makeCoordinator() -> Coordinator {
+    Coordinator(self)
+  }
+
+  public func makeNSView(context: Context) -> NSComboBox {
+    let comboBox = NSComboBox()
+    comboBox.usesDataSource = false
+    comboBox.completes = false
+    comboBox.delegate = context.coordinator
+    comboBox.intercellSpacing = NSSize(width: 0.0, height: 10.0)
+    return comboBox
+  }
+
+  public func updateNSView(_ nsView: NSComboBox, context: Context) {
+    nsView.removeAllItems()
+    nsView.addItems(withObjectValues: items)
+
+    // ComboBox doesn't automatically select the item matching its text;
+    // we must do that manually. But we need the delegate to ignore that
+    // selection-change or we'll get a "state modified during view update;
+    // will cause undefined behavior" warning.
+    context.coordinator.ignoreSelectionChanges = true
+    nsView.stringValue = text
+    nsView.selectItem(withObjectValue: text)
+    context.coordinator.ignoreSelectionChanges = false
+  }
+
+  public class Coordinator: NSObject, NSComboBoxDelegate {
+    public var parent: ComboBox
+    public var ignoreSelectionChanges = false
+
+    public init(_ parent: ComboBox) {
+      self.parent = parent
+    }
+
+    public func comboBoxSelectionDidChange(_ notification: Notification) {
+      if !ignoreSelectionChanges,
+         let box: NSComboBox = notification.object as? NSComboBox,
+         let newStringValue: String = box.objectValueOfSelectedItem as? String
+      {
+        parent.text = newStringValue
+      }
+    }
+
+    public func controlTextDidEndEditing(_ obj: Notification) {
+      if let textField = obj.object as? NSTextField {
+        parent.text = textField.stringValue
+      }
+    }
   }
 }

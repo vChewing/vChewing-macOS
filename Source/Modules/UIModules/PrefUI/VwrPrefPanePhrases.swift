@@ -18,11 +18,16 @@ struct VwrPrefPanePhrases: View {
   var body: some View {
     ScrollView {
       VStack {
-        VwrPhraseEditorUI(delegate: LMMgr.shared, window: CtlPrefUIShared.sharedWindow)
-          .frame(width: CtlPrefUIShared.contentWidth + 28, height: 445)
-        Spacer()
+        GroupBox {
+          VwrPhraseEditorUI(delegate: LMMgr.shared, window: CtlPrefUIShared.sharedWindow)
+            .padding(4)
+            .frame(maxWidth: .infinity)
+            .frame(height: 440)
+        }
       }
+      .padding(4)
       .padding()
+      .frame(width: CtlPrefUIShared.formWidth)
     }
     .frame(maxHeight: CtlPrefUIShared.contentMaxHeight)
   }
