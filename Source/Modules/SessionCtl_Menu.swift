@@ -26,6 +26,7 @@ extension SessionCtl {
 
   override public func menu() -> NSMenu! {
     let menu = NSMenu(title: "Input Method Menu")
+    var silentMode: Bool { clientBundleIdentifier == "com.apple.SecurityAgent" }
 
     let switchInputModeItem = menu.addItem(
       withTitle: String(
@@ -115,39 +116,41 @@ extension SessionCtl {
 
     menu.addItem(NSMenuItem.separator()) // ---------------------
 
-    menu.addItem(
-      withTitle: "Open User Dictionary Folder".localized,
-      action: #selector(openUserDataFolder(_:)), keyEquivalent: ""
-    )
-    menu.addItem(
-      withTitle: "Edit vChewing User Phrases…".localized,
-      action: #selector(openUserPhrases(_:)), keyEquivalent: ""
-    )
-    menu.addItem(
-      withTitle: "Edit Excluded Phrases…".localized,
-      action: #selector(openExcludedPhrases(_:)), keyEquivalent: ""
-    )
+    if !silentMode {
+      menu.addItem(
+        withTitle: "Open User Dictionary Folder".localized,
+        action: #selector(openUserDataFolder(_:)), keyEquivalent: ""
+      )
+      menu.addItem(
+        withTitle: "Edit vChewing User Phrases…".localized,
+        action: #selector(openUserPhrases(_:)), keyEquivalent: ""
+      )
+      menu.addItem(
+        withTitle: "Edit Excluded Phrases…".localized,
+        action: #selector(openExcludedPhrases(_:)), keyEquivalent: ""
+      )
 
-    if optionKeyPressed || PrefMgr.shared.associatedPhrasesEnabled {
-      menu.addItem(
-        withTitle: "Edit Associated Phrases…".localized,
-        action: #selector(openAssociatedPhrases(_:)), keyEquivalent: ""
-      )
-    }
+      if optionKeyPressed || PrefMgr.shared.associatedPhrasesEnabled {
+        menu.addItem(
+          withTitle: "Edit Associated Phrases…".localized,
+          action: #selector(openAssociatedPhrases(_:)), keyEquivalent: ""
+        )
+      }
 
-    if optionKeyPressed {
-      menu.addItem(
-        withTitle: "Edit Phrase Replacement Table…".localized,
-        action: #selector(openPhraseReplacement(_:)), keyEquivalent: ""
-      )
-      menu.addItem(
-        withTitle: "Edit User Symbol & Emoji Data…".localized,
-        action: #selector(openUserSymbols(_:)), keyEquivalent: ""
-      )
-      menu.addItem(
-        withTitle: "Open App Support Folder".localized.withEllipsis,
-        action: #selector(openAppSupportFolderFromContainer(_:)), keyEquivalent: ""
-      )
+      if optionKeyPressed {
+        menu.addItem(
+          withTitle: "Edit Phrase Replacement Table…".localized,
+          action: #selector(openPhraseReplacement(_:)), keyEquivalent: ""
+        )
+        menu.addItem(
+          withTitle: "Edit User Symbol & Emoji Data…".localized,
+          action: #selector(openUserSymbols(_:)), keyEquivalent: ""
+        )
+        menu.addItem(
+          withTitle: "Open App Support Folder".localized.withEllipsis,
+          action: #selector(openAppSupportFolderFromContainer(_:)), keyEquivalent: ""
+        )
+      }
     }
 
     if optionKeyPressed || !PrefMgr.shared.shouldAutoReloadUserDataFiles {
@@ -173,39 +176,40 @@ extension SessionCtl {
       action: #selector(clearUOM(_:)), keyEquivalent: ""
     )
 
-    menu.addItem(NSMenuItem.separator()) // ---------------------
-
-    menu.addItem(
-      withTitle: "vChewing Preferences…".localized,
-      action: #selector(showPreferences(_:)), keyEquivalent: ""
-    )
-    menu.addItem(
-      withTitle: "Client Manager".localized.withEllipsis,
-      action: #selector(showClientListMgr(_:)), keyEquivalent: ""
-    )
-    if !optionKeyPressed {
+    if !silentMode {
+      menu.addItem(NSMenuItem.separator()) // ---------------------
       menu.addItem(
-        withTitle: "Check for Updates…".localized,
-        action: #selector(checkForUpdate(_:)), keyEquivalent: ""
+        withTitle: "vChewing Preferences…".localized,
+        action: #selector(showPreferences(_:)), keyEquivalent: ""
       )
-    }
-    menu.addItem(
-      withTitle: "Reboot vChewing…".localized,
-      action: #selector(selfTerminate(_:)), keyEquivalent: ""
-    )
-    menu.addItem(
-      withTitle: "About vChewing…".localized,
-      action: #selector(showAbout(_:)), keyEquivalent: ""
-    )
-    menu.addItem(
-      withTitle: "CheatSheet".localized.withEllipsis,
-      action: #selector(showCheatSheet(_:)), keyEquivalent: ""
-    )
-    if optionKeyPressed {
       menu.addItem(
-        withTitle: "Uninstall vChewing…".localized,
-        action: #selector(selfUninstall(_:)), keyEquivalent: ""
+        withTitle: "Client Manager".localized.withEllipsis,
+        action: #selector(showClientListMgr(_:)), keyEquivalent: ""
       )
+      if !optionKeyPressed {
+        menu.addItem(
+          withTitle: "Check for Updates…".localized,
+          action: #selector(checkForUpdate(_:)), keyEquivalent: ""
+        )
+      }
+      menu.addItem(
+        withTitle: "Reboot vChewing…".localized,
+        action: #selector(selfTerminate(_:)), keyEquivalent: ""
+      )
+      menu.addItem(
+        withTitle: "About vChewing…".localized,
+        action: #selector(showAbout(_:)), keyEquivalent: ""
+      )
+      menu.addItem(
+        withTitle: "CheatSheet".localized.withEllipsis,
+        action: #selector(showCheatSheet(_:)), keyEquivalent: ""
+      )
+      if optionKeyPressed {
+        menu.addItem(
+          withTitle: "Uninstall vChewing…".localized,
+          action: #selector(selfUninstall(_:)), keyEquivalent: ""
+        )
+      }
     }
 
     return menu
