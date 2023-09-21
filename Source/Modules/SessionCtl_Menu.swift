@@ -372,7 +372,9 @@ public extension SessionCtl {
   }
 
   @objc func checkForUpdate(_: Any? = nil) {
-    AppDelegate.shared.checkUpdate(forced: true)
+    AppDelegate.shared.checkUpdate(forced: true) { [weak self] in
+      self?.clientBundleIdentifier == "com.apple.SecurityAgent"
+    }
   }
 
   @objc func openUserDataFolder(_: Any? = nil) {

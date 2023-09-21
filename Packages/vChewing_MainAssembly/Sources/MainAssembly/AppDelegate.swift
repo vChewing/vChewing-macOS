@@ -17,6 +17,7 @@ import UpdateSputnik
 @objc(AppDelegate)
 public class AppDelegate: NSObject, NSApplicationDelegate, NSUserNotificationCenterDelegate {
   public static let shared = AppDelegate()
+
   private var folderMonitor = FolderMonitor(
     url: URL(fileURLWithPath: LMMgr.dataFolderPath(isDefaultFolder: false))
   )
@@ -29,9 +30,9 @@ public class AppDelegate: NSObject, NSApplicationDelegate, NSUserNotificationCen
     return .init(string: urlText)
   }
 
-  public func checkUpdate(forced: Bool) {
+  public func checkUpdate(forced: Bool, shouldBypass: @escaping () -> Bool) {
     guard let url = Self.updateInfoSourceURL else { return }
-    UpdateSputnik.shared.checkForUpdate(forced: forced, url: url)
+    UpdateSputnik.shared.checkForUpdate(forced: forced, url: url) { shouldBypass() }
   }
 }
 
@@ -89,11 +90,6 @@ public extension AppDelegate {
       self.reloadOnFolderChangeHappens()
     }
     if LMMgr.userDataFolderExists { folderMonitor.startMonitoring() }
-
-    // 只要使用者沒有勾選檢查更新、沒有主動做出要檢查更新的操作，就不要檢查更新。
-    if PrefMgr.shared.checkUpdateAutomatically {
-      checkUpdate(forced: false)
-    }
   }
 
   func updateDirectoryMonitorPath() {
