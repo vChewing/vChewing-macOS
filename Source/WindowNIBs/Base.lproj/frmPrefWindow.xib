@@ -15,6 +15,7 @@
                 <outlet property="btnPEOpenExternally" destination="xXK-s1-vSe" id="vKF-Im-fLU"/>
                 <outlet property="btnPEReload" destination="PCy-3G-HoZ" id="Ssb-15-kUj"/>
                 <outlet property="btnPESave" destination="Ss7-cl-3E0" id="yK4-7N-pf2"/>
+                <outlet property="chkCapsLockNotification" destination="EPk-3B-NHc" id="Ccu-uG-th1"/>
                 <outlet property="chkFartSuppressor" destination="pYB-E5-4Nv" id="zcC-ZZ-mG4"/>
                 <outlet property="chkRevLookupInCandidateWindow" destination="3qX-dG-cKO" id="8kw-bP-xE7"/>
                 <outlet property="chkTrad2JISShinjitai" destination="h4r-Sp-LBI" id="pk8-xi-IJi"/>
@@ -58,14 +59,14 @@
             <point key="canvasLocation" x="-2004" y="90"/>
         </window>
         <view id="BUt-lg-GPp" userLabel="vwrGeneral">
-            <rect key="frame" x="0.0" y="0.0" width="577" height="406"/>
+            <rect key="frame" x="0.0" y="0.0" width="577" height="424"/>
             <autoresizingMask key="autoresizingMask"/>
             <subviews>
                 <stackView distribution="fill" orientation="vertical" alignment="leading" spacing="5" horizontalStackHuggingPriority="249.99998474121094" verticalStackHuggingPriority="249.99998474121094" translatesAutoresizingMaskIntoConstraints="NO" id="jxD-fv-UYx">
-                    <rect key="frame" x="20" y="34" width="530" height="352"/>
+                    <rect key="frame" x="20" y="31" width="530" height="373"/>
                     <subviews>
                         <stackView distribution="fill" orientation="vertical" alignment="leading" spacing="3" horizontalStackHuggingPriority="249.99998474121094" verticalStackHuggingPriority="249.99998474121094" translatesAutoresizingMaskIntoConstraints="NO" id="dj4-9G-dKq">
-                            <rect key="frame" x="0.0" y="312" width="302" height="40"/>
+                            <rect key="frame" x="0.0" y="333" width="302" height="40"/>
                             <subviews>
                                 <textField focusRingType="none" horizontalHuggingPriority="251" verticalHuggingPriority="750" verticalCompressionResistancePriority="751" translatesAutoresizingMaskIntoConstraints="NO" id="5Rz-c8-hp9">
                                     <rect key="frame" x="-2" y="25" width="306" height="15"/>
@@ -132,13 +133,13 @@
                             </customSpacing>
                         </stackView>
                         <box verticalHuggingPriority="750" boxType="separator" translatesAutoresizingMaskIntoConstraints="NO" id="50g-ym-cMe">
-                            <rect key="frame" x="0.0" y="304" width="530" height="5"/>
+                            <rect key="frame" x="0.0" y="325" width="530" height="5"/>
                             <constraints>
                                 <constraint firstAttribute="width" relation="greaterThanOrEqual" constant="530" id="Ylc-XO-ZMh"/>
                             </constraints>
                         </box>
                         <textField focusRingType="none" horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="Vp3-lc-XD5">
-                            <rect key="frame" x="-2" y="285" width="105" height="16"/>
+                            <rect key="frame" x="-2" y="306" width="105" height="16"/>
                             <constraints>
                                 <constraint firstAttribute="height" constant="16" id="3d9-qL-M1k"/>
                             </constraints>
@@ -149,10 +150,10 @@
                             </textFieldCell>
                         </textField>
                         <stackView distribution="fill" orientation="vertical" alignment="leading" spacing="5" horizontalStackHuggingPriority="249.99998474121094" verticalStackHuggingPriority="249.99998474121094" translatesAutoresizingMaskIntoConstraints="NO" id="ASo-Wd-8Kn">
-                            <rect key="frame" x="0.0" y="180" width="360" height="100"/>
+                            <rect key="frame" x="0.0" y="180" width="360" height="121"/>
                             <subviews>
                                 <button translatesAutoresizingMaskIntoConstraints="NO" id="j8R-Hj-3dj">
-                                    <rect key="frame" x="-1" y="83.5" width="340" height="17"/>
+                                    <rect key="frame" x="-1" y="104.5" width="340" height="17"/>
                                     <buttonCell key="cell" type="check" title="Automatically correct reading combinations when typing" bezelStyle="regularSquare" imagePosition="left" controlSize="small" inset="2" id="chkAutoCorrectReadingCombination">
                                         <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
                                         <font key="font" metaFont="cellTitle"/>
@@ -165,7 +166,7 @@
                                     </connections>
                                 </button>
                                 <button translatesAutoresizingMaskIntoConstraints="NO" id="vwf-Kq-s8M" userLabel="chkShowHanyuPinyinInCompositionBuffer">
-                                    <rect key="frame" x="-1" y="62.5" width="361" height="17"/>
+                                    <rect key="frame" x="-1" y="83.5" width="361" height="17"/>
                                     <buttonCell key="cell" type="check" title="Show Hanyu-Pinyin in the inline composition buffer &amp; tooltip" bezelStyle="regularSquare" imagePosition="left" controlSize="small" inset="2" id="wFR-zX-M8H">
                                         <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
                                         <font key="font" metaFont="cellTitle"/>
@@ -179,7 +180,7 @@
                                     </connections>
                                 </button>
                                 <button translatesAutoresizingMaskIntoConstraints="NO" id="HaB-rc-AcW">
-                                    <rect key="frame" x="-1" y="41.5" width="295" height="17"/>
+                                    <rect key="frame" x="-1" y="62.5" width="295" height="17"/>
                                     <buttonCell key="cell" type="check" title="Allow backspace-editing miscomposed readings" bezelStyle="regularSquare" imagePosition="left" controlSize="small" inset="2" id="chkKeepReadingUponCompositionError">
                                         <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
                                         <font key="font" metaFont="cellTitle"/>
@@ -192,7 +193,7 @@
                                     </connections>
                                 </button>
                                 <button translatesAutoresizingMaskIntoConstraints="NO" id="QpM-Qg-kNf">
-                                    <rect key="frame" x="-1" y="20.5" width="336" height="17"/>
+                                    <rect key="frame" x="-1" y="41.5" width="336" height="17"/>
                                     <buttonCell key="cell" type="check" title="Also use “\” or “¥” key for Hanin Keyboard Symbol Input" bezelStyle="regularSquare" imagePosition="left" controlSize="small" inset="2" id="MKJ-Q6-dLd">
                                         <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
                                         <font key="font" metaFont="cellTitle"/>
@@ -205,7 +206,7 @@
                                     </connections>
                                 </button>
                                 <button translatesAutoresizingMaskIntoConstraints="NO" id="mzw-F2-aAQ">
-                                    <rect key="frame" x="-1" y="-0.5" width="295" height="17"/>
+                                    <rect key="frame" x="-1" y="20.5" width="295" height="17"/>
                                     <buttonCell key="cell" type="check" title="Emulating select-candidate-per-character mode" bezelStyle="regularSquare" imagePosition="left" controlSize="small" inset="2" id="ArK-Vk-OoT">
                                         <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
                                         <font key="font" metaFont="cellTitle"/>
@@ -217,6 +218,19 @@
                                         <binding destination="32" name="value" keyPath="values.UseSCPCTypingMode" id="PbD-wq-OsN"/>
                                     </connections>
                                 </button>
+                                <button translatesAutoresizingMaskIntoConstraints="NO" id="EPk-3B-NHc">
+                                    <rect key="frame" x="-1" y="-0.5" width="271" height="17"/>
+                                    <buttonCell key="cell" type="check" title="Show notifications when toggling Caps Lock" bezelStyle="regularSquare" imagePosition="left" controlSize="small" inset="2" id="shc-Nu-UsM">
+                                        <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
+                                        <font key="font" metaFont="cellTitle"/>
+                                    </buttonCell>
+                                    <constraints>
+                                        <constraint firstAttribute="height" constant="16" id="Rl8-Au-Vn1"/>
+                                    </constraints>
+                                    <connections>
+                                        <binding destination="32" name="value" keyPath="values.ShowNotificationsWhenTogglingCapsLock" id="LuD-ZC-LHv"/>
+                                    </connections>
+                                </button>
                             </subviews>
                             <visibilityPriorities>
                                 <integer value="1000"/>
@@ -224,8 +238,10 @@
                                 <integer value="1000"/>
                                 <integer value="1000"/>
                                 <integer value="1000"/>
+                                <integer value="1000"/>
                             </visibilityPriorities>
                             <customSpacing>
+                                <real value="3.4028234663852886e+38"/>
                                 <real value="3.4028234663852886e+38"/>
                                 <real value="3.4028234663852886e+38"/>
                                 <real value="3.4028234663852886e+38"/>
@@ -442,7 +458,7 @@
                 <constraint firstItem="jxD-fv-UYx" firstAttribute="top" secondItem="BUt-lg-GPp" secondAttribute="top" constant="20" symbolic="YES" id="P60-u0-EHB"/>
             </constraints>
             <accessibility identifier="vwrGeneral"/>
-            <point key="canvasLocation" x="-1350" y="59"/>
+            <point key="canvasLocation" x="-1350.5" y="68"/>
         </view>
         <view id="3x9-Ir-gx7" userLabel="vwrCandidates">
             <rect key="frame" x="0.0" y="0.0" width="577" height="424"/>
