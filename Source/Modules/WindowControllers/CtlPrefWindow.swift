@@ -27,6 +27,7 @@ class CtlPrefWindow: NSWindowController, NSWindowDelegate {
   @IBOutlet var chkTrad2JISShinjitai: NSButton!
   @IBOutlet var cmbCandidateFontSize: NSPopUpButton!
   @IBOutlet var chkFartSuppressor: NSButton!
+  @IBOutlet var chkCapsLockNotification: NSButton!
 
   @IBOutlet var chkRevLookupInCandidateWindow: NSButton!
   @IBOutlet var btnBrowseFolderForUserPhrases: NSButton!
@@ -93,6 +94,11 @@ class CtlPrefWindow: NSWindowController, NSWindowDelegate {
 
     if #unavailable(macOS 10.15) {
       stkShiftKeyASCIITogglesPane.isHidden = true
+    }
+
+    if #unavailable(macOS 12) {
+      chkCapsLockNotification.isEnabled = false
+      chkCapsLockNotification.toolTip = "This feature requires macOS 12 and above.".localized
     }
 
     chkFartSuppressor.isHidden = !Date.isTodayTheDate(from: 0401)
