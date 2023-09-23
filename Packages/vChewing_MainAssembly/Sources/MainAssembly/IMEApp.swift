@@ -16,6 +16,21 @@ public enum IMEApp {
   // MARK: - 獲取輸入法的版本以及建置編號
 
   public static let appVersionLabel: String = {
+    [appMainVersionLabel.joined(separator: " Build "), appSignedDateLabel].joined(separator: " - ")
+  }()
+
+  public static let appMainVersionLabel: [String] = {
+    guard
+      let intBuild = Bundle.main.infoDictionary?[kCFBundleVersionKey as String] as? String,
+      let strVer = Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String
+    else {
+      return ["1.14.514", "19190810"]
+    }
+
+    return [strVer, intBuild]
+  }()
+
+  public static let appSignedDateLabel: String = {
     let maybeDateModified: Date? = {
       guard let executableURL = Bundle.main.executableURL,
             let infoDate = (try? executableURL.resourceValues(forKeys: [.contentModificationDateKey]))?.contentModificationDate
@@ -25,32 +40,13 @@ public enum IMEApp {
       return infoDate
     }()
 
-    func dateStringTag(date givenDate: Date) -> String {
-      let dateFormatter = DateFormatter()
-      dateFormatter.dateFormat = "yyyyMMdd.HHmm"
-      dateFormatter.timeZone = .init(secondsFromGMT: +28800) ?? .current
-      let strDate = dateFormatter.string(from: givenDate)
-      return strDate
-    }
-
-    guard
-      let intBuild = Bundle.main.infoDictionary?[kCFBundleVersionKey as String] as? String,
-      let strVer = Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String
-    else {
-      return "1.14.514 - 19190810"
-    }
-
-    var theResults = ["\(strVer) Build \(intBuild)"]
-
     if let theDate = Bundle.main.getCodeSignedDate() {
-      theResults.append(dateStringTag(date: theDate))
+      return theDate.stringTag
     } else if let theDate = maybeDateModified {
-      theResults.append("\(dateStringTag(date: theDate)) Unsigned")
+      return "\(theDate.stringTag) Unsigned"
     } else {
-      theResults.append("Unsigned")
+      return "Unsigned"
     }
-
-    return theResults.joined(separator: " - ")
   }()
 
   // MARK: - 輸入法的當前的簡繁體中文模式
@@ -73,5 +69,15 @@ public enum IMEApp {
     } else {
       NSSound.beep()
     }
+  }
+}
+
+public extension Date {
+  var stringTag: String {
+    let dateFormatter = DateFormatter()
+    dateFormatter.dateFormat = "yyyyMMdd.HHmm"
+    dateFormatter.timeZone = .init(secondsFromGMT: +28800) ?? .current
+    let strDate = dateFormatter.string(from: self)
+    return strDate
   }
 }

@@ -24,6 +24,7 @@
 		5B30BF282944867800BD87A9 /* CtlRevLookupWindow.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B30BF272944867800BD87A9 /* CtlRevLookupWindow.swift */; };
 		5B40113928D7050D00A9D4CB /* Shared in Frameworks */ = {isa = PBXBuildFile; productRef = 5B40113828D7050D00A9D4CB /* Shared */; };
 		5B40113C28D71C0100A9D4CB /* Uninstaller in Frameworks */ = {isa = PBXBuildFile; productRef = 5B40113B28D71C0100A9D4CB /* Uninstaller */; };
+		5B4C59AE2ABCB18700098626 /* VwrSettingsUI.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B4C59AD2ABCB18700098626 /* VwrSettingsUI.swift */; };
 		5B5A603028E81CC50001AE8D /* SwiftUIBackports in Frameworks */ = {isa = PBXBuildFile; productRef = 5B5A602F28E81CC50001AE8D /* SwiftUIBackports */; };
 		5B62A33D27AE7CC100A19448 /* CtlAboutWindow.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B62A33C27AE7CC100A19448 /* CtlAboutWindow.swift */; };
 		5B65FB342A9518DA007EEFB0 /* MainAssembly in Frameworks */ = {isa = PBXBuildFile; productRef = 5B65FB332A9518DA007EEFB0 /* MainAssembly */; };
@@ -187,6 +188,7 @@
 		5B30F11227BA568800484E24 /* vChewingKeyLayout.bundle */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.plug-in"; path = vChewingKeyLayout.bundle; sourceTree = "<group>"; };
 		5B312684287800DE001AA720 /* FAQ.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = FAQ.md; sourceTree = "<group>"; };
 		5B40113A28D71B8700A9D4CB /* vChewing_Uninstaller */ = {isa = PBXFileReference; lastKnownFileType = wrapper; name = vChewing_Uninstaller; path = Packages/vChewing_Uninstaller; sourceTree = "<group>"; };
+		5B4C59AD2ABCB18700098626 /* VwrSettingsUI.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VwrSettingsUI.swift; sourceTree = "<group>"; };
 		5B5A602E28E81CB00001AE8D /* ShapsBenkau_SwiftUIBackports */ = {isa = PBXFileReference; lastKnownFileType = wrapper; name = ShapsBenkau_SwiftUIBackports; path = Packages/ShapsBenkau_SwiftUIBackports; sourceTree = "<group>"; };
 		5B62A33C27AE7CC100A19448 /* CtlAboutWindow.swift */ = {isa = PBXFileReference; explicitFileType = sourcecode.swift; fileEncoding = 4; indentWidth = 2; lineEnding = 0; path = CtlAboutWindow.swift; sourceTree = "<group>"; tabWidth = 2; usesTabs = 0; };
 		5B65B919284D0185007C558B /* README.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = README.md; sourceTree = "<group>"; };
@@ -475,6 +477,7 @@
 				5B2E009328FD1E8100E78D6E /* VwrPrefPaneCassette.swift */,
 				5BA9FD0B27FEDB6B002DE248 /* VwrPrefPaneKeyboard.swift */,
 				5B78EE0C28A562B4009456C1 /* VwrPrefPaneDevZone.swift */,
+				5B4C59AD2ABCB18700098626 /* VwrSettingsUI.swift */,
 			);
 			path = PrefUI;
 			sourceTree = "<group>";
@@ -984,6 +987,7 @@
 				5BA9FD1127FEDB6B002DE248 /* CtlPrefUIShared.swift in Sources */,
 				5BA9FD1327FEDB6B002DE248 /* VwrPrefPaneDictionary.swift in Sources */,
 				5BF7548929B2F04F00FA50DA /* CtlPrefUI.swift in Sources */,
+				5B4C59AE2ABCB18700098626 /* VwrSettingsUI.swift in Sources */,
 				5BF018F9299923BD00248CDD /* VwrPrefPaneBehavior.swift in Sources */,
 				5BB802DA27FABA8300CF1C19 /* SessionCtl_Menu.swift in Sources */,
 				5B2E009428FD1E8100E78D6E /* VwrPrefPaneCassette.swift in Sources */,

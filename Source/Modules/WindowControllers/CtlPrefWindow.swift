@@ -124,7 +124,7 @@ class CtlPrefWindow: NSWindowController, NSWindowDelegate {
     toolbar.delegate = self
     toolbar.selectedItemIdentifier = PrefUITabs.tabGeneral.toolbarIdentifier
     toolbar.showsBaselineSeparator = true
-    if #available(macOS 11.0, *) {
+    if #available(macOS 13, *) {
       window?.toolbarStyle = .preference
     }
     window?.toolbar = toolbar
