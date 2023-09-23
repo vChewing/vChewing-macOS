@@ -18,35 +18,6 @@ private let kWindowTitleHeight: Double = 78
 
 @available(macOS 10.15, *)
 class CtlPrefUI: NSWindowController, NSWindowDelegate {
-  static var vwrGeneral: NSView = generateView(tab: .tabGeneral)
-  static var vwrCandidates: NSView = generateView(tab: .tabCandidates)
-  static var vwrBehavior: NSView = generateView(tab: .tabBehavior)
-  static var vwrOutput: NSView = generateView(tab: .tabOutput)
-  static var vwrDictionary: NSView = generateView(tab: .tabDictionary)
-  static var vwrPhrases: NSView = generateView(tab: .tabPhrases)
-  static var vwrCassette: NSView = generateView(tab: .tabCassette)
-  static var vwrKeyboard: NSView = generateView(tab: .tabKeyboard)
-  static var vwrDevZone: NSView = generateView(tab: .tabDevZone)
-
-  static func generateView(tab: PrefUITabs) -> NSView {
-    var body: some View {
-      Group {
-        switch tab {
-        case .tabGeneral: VwrPrefPaneGeneral()
-        case .tabCandidates: VwrPrefPaneCandidates()
-        case .tabBehavior: VwrPrefPaneBehavior()
-        case .tabOutput: VwrPrefPaneOutput()
-        case .tabDictionary: VwrPrefPaneDictionary()
-        case .tabPhrases: VwrPrefPanePhrases()
-        case .tabCassette: VwrPrefPaneCassette()
-        case .tabKeyboard: VwrPrefPaneKeyboard()
-        case .tabDevZone: VwrPrefPaneDevZone()
-        }
-      }.fixedSize()
-    }
-    return NSHostingView(rootView: body.edgesIgnoringSafeArea(.top))
-  }
-
   public static var shared: CtlPrefUI?
 
   static func show() {
@@ -76,48 +47,36 @@ class CtlPrefUI: NSWindowController, NSWindowDelegate {
   override func windowDidLoad() {
     super.windowDidLoad()
     window?.setPosition(vertical: .top, horizontal: .right, padding: 20)
-
-    var preferencesTitleName = NSLocalizedString("vChewing Preferences…", comment: "")
-    preferencesTitleName.removeLast()
-
+    if #available(macOS 13, *) {
+      window?.contentView = NSHostingView(
+        rootView: VwrSettingsUI()
+          .fixedSize(horizontal: true, vertical: false)
+          .ignoresSafeArea()
+      )
+    }
     let toolbar = NSToolbar(identifier: "preference toolbar")
     toolbar.allowsUserCustomization = false
     toolbar.autosavesConfiguration = false
     toolbar.sizeMode = .default
     toolbar.delegate = self
-    toolbar.selectedItemIdentifier = PrefUITabs.tabGeneral.toolbarIdentifier
+    toolbar.selectedItemIdentifier = nil
     toolbar.showsBaselineSeparator = true
-    if #available(macOS 11.0, *) {
-      window?.toolbarStyle = .preference
+    if #available(macOS 11, *) {
+      window?.toolbarStyle = .unifiedCompact
     }
     window?.toolbar = toolbar
-    window?.title = "\(preferencesTitleName) (\(IMEApp.appVersionLabel))"
-    window?.titlebarAppearsTransparent = false
-    use(view: Self.vwrGeneral, animate: false)
+    var preferencesTitleName = NSLocalizedString("vChewing Preferences…", comment: "")
+    preferencesTitleName.removeLast()
+    window?.title = preferencesTitleName
   }
 }
 
-// MARK: - NSToolbarDelegate Methods
+// MARK: - NSToolbarDelegate.
 
 @available(macOS 10.15, *)
 extension CtlPrefUI: NSToolbarDelegate {
-  func use(view newView: NSView, animate: Bool = true) {
-    // 強制重置語彙編輯器畫面。
-    if window?.contentView == Self.vwrPhrases || newView == Self.vwrPhrases {
-      Self.vwrPhrases = Self.generateView(tab: .tabPhrases)
-    }
-    guard let window = window, let existingContentView = window.contentView else { return }
-    let temporaryViewOld = NSView(frame: existingContentView.frame)
-    window.contentView = temporaryViewOld
-    var newWindowRect = NSRect(origin: window.frame.origin, size: newView.fittingSize)
-    newWindowRect.size.height += kWindowTitleHeight
-    newWindowRect.origin.y = window.frame.maxY - newWindowRect.height
-    window.setFrame(newWindowRect, display: true, animate: animate)
-    window.contentView = newView
-  }
-
   var toolbarIdentifiers: [NSToolbarItem.Identifier] {
-    PrefUITabs.allCases.map(\.toolbarIdentifier)
+    [.init("Collapse or Expand Sidebar")]
   }
 
   func toolbarDefaultItemIdentifiers(_: NSToolbar) -> [NSToolbarItem.Identifier] {
@@ -129,36 +88,21 @@ extension CtlPrefUI: NSToolbarDelegate {
   }
 
   func toolbarSelectableItemIdentifiers(_: NSToolbar) -> [NSToolbarItem.Identifier] {
-    toolbarIdentifiers
-  }
-
-  @objc func updateTab(_ target: NSToolbarItem) {
-    guard let tab = PrefUITabs.fromInt(target.tag) else { return }
-    switch tab {
-    case .tabGeneral: use(view: Self.vwrGeneral)
-    case .tabCandidates: use(view: Self.vwrCandidates)
-    case .tabBehavior: use(view: Self.vwrBehavior)
-    case .tabOutput: use(view: Self.vwrOutput)
-    case .tabDictionary: use(view: Self.vwrDictionary)
-    case .tabPhrases: use(view: Self.vwrPhrases)
-    case .tabCassette: use(view: Self.vwrCassette)
-    case .tabKeyboard: use(view: Self.vwrKeyboard)
-    case .tabDevZone: use(view: Self.vwrDevZone)
-    }
-    window?.toolbar?.selectedItemIdentifier = tab.toolbarIdentifier
+    []
   }
 
   func toolbar(
     _: NSToolbar, itemForItemIdentifier itemIdentifier: NSToolbarItem.Identifier,
     willBeInsertedIntoToolbar _: Bool
   ) -> NSToolbarItem? {
-    guard let tab = PrefUITabs(rawValue: itemIdentifier.rawValue) else { return nil }
     let item = NSToolbarItem(itemIdentifier: itemIdentifier)
-    item.target = self
-    item.image = tab.icon
-    item.label = tab.i18nTitle
-    item.tag = tab.cocoaTag
-    item.action = #selector(updateTab(_:))
+    if #available(macOS 11.0, *) {
+      item.isNavigational = true
+    }
+    item.target = window?.firstResponder
+    item.image = NSImage(named: "NSTouchBarSidebarTemplate") ?? .init()
+    item.tag = 0
+    item.action = #selector(NSSplitViewController.toggleSidebar(_:))
     return item
   }
 }
