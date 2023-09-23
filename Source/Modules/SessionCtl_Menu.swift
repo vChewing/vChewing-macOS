@@ -9,7 +9,6 @@
 import AppKit
 import MainAssembly
 import NotifierUI
-import SSPreferences
 
 private extension Bool {
   var state: NSControl.StateValue {
@@ -220,13 +219,9 @@ extension SessionCtl {
 
 public extension SessionCtl {
   @objc override func showPreferences(_: Any? = nil) {
-    osCheck: if #available(macOS 10.15, *) {
+    osCheck: if #available(macOS 13, *) {
       switch NSEvent.keyModifierFlags {
       case .option: break osCheck
-      // case .shift:
-      // CtlPrefUIShared.shared.controller.show(preferencePane: PrefUITabs.tabGeneral.ssPaneIdentifier)
-      // CtlPrefUIShared.shared.controller.window?.level = .statusBar
-      // CtlPrefUIShared.shared.controller.window?.setPosition(vertical: .top, horizontal: .right, padding: 20)
       default: CtlPrefUI.show()
       }
       NSApp.popup()

@@ -7,7 +7,6 @@
 // requirements defined in MIT License.
 
 import Shared
-import SSPreferences
 import SwiftExtension
 import SwiftUI
 import SwiftUIBackports
@@ -74,7 +73,7 @@ struct VwrPrefPaneOutput: View {
             .settingsDescription()
           }
         }
-      }.formStyled().frame(width: CtlPrefUIShared.formWidth)
+      }.formStyled().frame(minWidth: CtlPrefUIShared.formWidth, maxWidth: ceil(CtlPrefUIShared.formWidth * 1.2))
     }
     .frame(maxHeight: CtlPrefUIShared.contentMaxHeight)
   }
