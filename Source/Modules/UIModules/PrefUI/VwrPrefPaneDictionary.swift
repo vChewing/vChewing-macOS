@@ -10,7 +10,6 @@ import BookmarkManager
 import CocoaExtension
 import MainAssembly
 import Shared
-import SSPreferences
 import SwiftExtension
 import SwiftUI
 import SwiftUIBackports
@@ -107,7 +106,7 @@ struct VwrPrefPaneDictionary: View {
                   let bolPreviousFolderValidity = LMMgr.checkIfSpecifiedUserDataFolderValid(
                     userDataFolderSpecified.expandingTildeInPath)
 
-                  if let window = CtlPrefUIShared.sharedWindow {
+                  if let window = CtlPrefUI.shared?.window {
                     Self.dlgOpenPath.beginSheetModal(for: window) { result in
                       if result == NSApplication.ModalResponse.OK {
                         guard let url = Self.dlgOpenPath.url else { return }
@@ -233,7 +232,7 @@ struct VwrPrefPaneDictionary: View {
             .settingsDescription()
           }
         }
-      }.formStyled().frame(width: CtlPrefUIShared.formWidth)
+      }.formStyled().frame(minWidth: CtlPrefUIShared.formWidth, maxWidth: ceil(CtlPrefUIShared.formWidth * 1.2))
     }
     .frame(maxHeight: CtlPrefUIShared.contentMaxHeight)
   }

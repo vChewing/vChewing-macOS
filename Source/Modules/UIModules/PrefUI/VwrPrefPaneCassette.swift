@@ -9,7 +9,6 @@
 import BookmarkManager
 import MainAssembly
 import Shared
-import SSPreferences
 import SwiftExtension
 import SwiftUI
 import SwiftUIBackports
@@ -86,7 +85,7 @@ struct VwrPrefPaneCassette: View {
                 let bolPreviousPathValidity = LMMgr.checkCassettePathValidity(
                   cassettePath.expandingTildeInPath)
 
-                if let window = CtlPrefUIShared.sharedWindow {
+                if let window = CtlPrefUI.shared?.window {
                   Self.dlgOpenFile.beginSheetModal(for: window) { result in
                     if result == NSApplication.ModalResponse.OK {
                       guard let url = Self.dlgOpenFile.url else { return }
@@ -129,7 +128,7 @@ struct VwrPrefPaneCassette: View {
               LocalizedStringKey("Enable cassette mode, suppressing phonabet input"),
               isOn: $cassetteEnabled.onChange {
                 if cassetteEnabled, !LMMgr.checkCassettePathValidity(cassettePath) {
-                  if let window = CtlPrefUIShared.sharedWindow {
+                  if let window = CtlPrefUI.shared?.window {
                     IMEApp.buzz()
                     let alert = NSAlert(error: NSLocalizedString("Path invalid or file access error.", comment: ""))
                     alert.informativeText = NSLocalizedString(
@@ -186,7 +185,7 @@ struct VwrPrefPaneCassette: View {
             .settingsDescription()
           }
         }
-      }.formStyled().frame(width: CtlPrefUIShared.formWidth)
+      }.formStyled().frame(minWidth: CtlPrefUIShared.formWidth, maxWidth: ceil(CtlPrefUIShared.formWidth * 1.2))
     }
     .frame(maxHeight: CtlPrefUIShared.contentMaxHeight)
   }

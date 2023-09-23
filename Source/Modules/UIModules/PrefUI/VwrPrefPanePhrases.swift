@@ -9,7 +9,6 @@
 import MainAssembly
 import PhraseEditorUI
 import Shared
-import SSPreferences
 import SwiftExtension
 import SwiftUI
 
@@ -19,7 +18,7 @@ struct VwrPrefPanePhrases: View {
     ScrollView {
       VStack {
         GroupBox {
-          VwrPhraseEditorUI(delegate: LMMgr.shared, window: CtlPrefUIShared.sharedWindow)
+          VwrPhraseEditorUI(delegate: LMMgr.shared, window: CtlPrefUI.shared?.window)
             .padding(4)
             .frame(maxWidth: .infinity)
             .frame(height: 440)
@@ -27,7 +26,7 @@ struct VwrPrefPanePhrases: View {
       }
       .padding(4)
       .padding()
-      .frame(width: CtlPrefUIShared.formWidth)
+      .frame(minWidth: CtlPrefUIShared.formWidth, maxWidth: ceil(CtlPrefUIShared.formWidth * 1.2))
     }
     .frame(maxHeight: CtlPrefUIShared.contentMaxHeight)
   }

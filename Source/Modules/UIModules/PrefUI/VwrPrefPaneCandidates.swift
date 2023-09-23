@@ -8,7 +8,6 @@
 
 import MainAssembly
 import Shared
-import SSPreferences
 import SwiftExtension
 import SwiftUI
 import SwiftUIBackports
@@ -178,7 +177,7 @@ struct VwrPrefPaneCandidates: View {
         // MARK: (header: Text("Experimental:"))
 
         let imkEOSNoticeButton = Button("Where's IMK Candidate Window?") {
-          if let window = CtlPrefUIShared.sharedWindow {
+          if let window = CtlPrefUI.shared?.window {
             let title = "The End of Support for IMK Candidate Window"
             let explanation = "1) Only macOS has IMKCandidates. Since it relies on a dedicated ObjC Bridging Header to expose necessary internal APIs to work, it hinders vChewing from completely modularized for multi-platform support.\n\n2) IMKCandidates is buggy. It is not likely to be completely fixed by Apple, and its devs are not allowed to talk about it to non-Apple individuals. That's why we have had enough with IMKCandidates. It is likely the reason why Apple had never used IMKCandidates in their official InputMethodKit sample projects (as of August 2023)."
             window.callAlert(title: title.localized, text: explanation.localized)
@@ -191,7 +190,7 @@ struct VwrPrefPaneCandidates: View {
             isOn: $enableMouseScrollingForTDKCandidatesCocoa
           )
         }
-      }.formStyled().frame(width: CtlPrefUIShared.formWidth)
+      }.formStyled().frame(minWidth: CtlPrefUIShared.formWidth, maxWidth: ceil(CtlPrefUIShared.formWidth * 1.2))
     }
     .frame(maxHeight: CtlPrefUIShared.contentMaxHeight)
   }
@@ -226,7 +225,7 @@ private struct VwrPrefPaneCandidates_SelectionKeys: View {
           let keys = value.trimmingCharacters(in: .whitespacesAndNewlines).lowercased().deduplicated
           // Start Error Handling.
           if let errorResult = CandidateKey.validate(keys: keys) {
-            if let window = CtlPrefUIShared.sharedWindow, !keys.isEmpty {
+            if let window = CtlPrefUI.shared?.window, !keys.isEmpty {
               IMEApp.buzz()
               let alert = NSAlert(error: NSLocalizedString("Invalid Selection Keys.", comment: ""))
               alert.informativeText = errorResult

@@ -8,7 +8,6 @@
 
 import MainAssembly
 import Shared
-import SSPreferences
 import SwiftExtension
 import SwiftUI
 import SwiftUIBackports
@@ -144,7 +143,7 @@ struct VwrPrefPaneGeneral: View {
                   }
                 }
                 alert.addButton(withTitle: NSLocalizedString("Leave it checked", comment: ""))
-                if let window = CtlPrefUIShared.sharedWindow, !shouldNotFartInLieuOfBeep {
+                if let window = CtlPrefUI.shared?.window, !shouldNotFartInLieuOfBeep {
                   shouldNotFartInLieuOfBeep = true
                   alert.beginSheetModal(for: window) { result in
                     switch result {
@@ -176,7 +175,7 @@ struct VwrPrefPaneGeneral: View {
             isOn: $isDebugModeEnabled
           )
         }
-      }.formStyled().frame(width: CtlPrefUIShared.formWidth)
+      }.formStyled().frame(minWidth: CtlPrefUIShared.formWidth, maxWidth: ceil(CtlPrefUIShared.formWidth * 1.2))
     }
     .frame(maxHeight: CtlPrefUIShared.contentMaxHeight)
   }
