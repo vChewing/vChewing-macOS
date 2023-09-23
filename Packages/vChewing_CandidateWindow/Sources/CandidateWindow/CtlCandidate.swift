@@ -65,7 +65,7 @@ open class CtlCandidate: NSWindowController, CtlCandidateProtocol {
       NSObject.cancelPreviousPerformRequests(withTarget: self)
       DispatchQueue.main.async { [weak self] in
         guard let self = self else { return }
-        _ = visible ? window?.orderFront(self) : window?.orderOut(self)
+        _ = self.visible ? self.window?.orderFront(self) : self.window?.orderOut(self)
       }
     }
   }

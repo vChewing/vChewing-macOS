@@ -158,7 +158,7 @@ class FrmRevLookupWindow: NSWindow {
     resultView.string = "\n" + "Loading…".localized
     DispatchQueue.main.async { [weak self] in
       guard let self = self else { return }
-      updateResult(with: self.inputField.stringValue)
+      self.updateResult(with: self.inputField.stringValue)
     }
   }
 

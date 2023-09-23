@@ -40,9 +40,9 @@ extension CtlPrefWindow: NSTextViewDelegate, NSTextFieldDelegate {
     tfdPETextEditor.string = NSLocalizedString("Loading…", comment: "")
     DispatchQueue.main.async { [weak self] in
       guard let self = self else { return }
-      tfdPETextEditor.string = LMMgr.retrieveData(mode: selInputMode, type: selUserDataType)
-      tfdPETextEditor.toolTip = PETerms.TooltipTexts.sampleDictionaryContent(for: selUserDataType)
-      isLoading = false
+      self.tfdPETextEditor.string = LMMgr.retrieveData(mode: self.selInputMode, type: self.selUserDataType)
+      self.tfdPETextEditor.toolTip = PETerms.TooltipTexts.sampleDictionaryContent(for: self.selUserDataType)
+      self.isLoading = false
     }
   }
 
@@ -176,12 +176,12 @@ extension CtlPrefWindow: NSTextViewDelegate, NSTextFieldDelegate {
   @IBAction func consolidatePEButtonClicked(_: NSButton) {
     DispatchQueue.main.async { [weak self] in
       guard let self = self else { return }
-      isLoading = true
-      vChewingLM.LMConsolidator.consolidate(text: &tfdPETextEditor.string, pragma: false)
-      if selUserDataType == .thePhrases {
-        LMMgr.shared.tagOverrides(in: &tfdPETextEditor.string, mode: selInputMode)
+      self.isLoading = true
+      vChewingLM.LMConsolidator.consolidate(text: &self.tfdPETextEditor.string, pragma: false)
+      if self.selUserDataType == .thePhrases {
+        LMMgr.shared.tagOverrides(in: &self.tfdPETextEditor.string, mode: self.selInputMode)
       }
-      isLoading = false
+      self.isLoading = false
     }
   }
 
@@ -198,38 +198,38 @@ extension CtlPrefWindow: NSTextViewDelegate, NSTextFieldDelegate {
     DispatchQueue.main.async { [weak self] in
       guard let self = self else { return }
       let app: String = NSEvent.keyModifierFlags.contains(.option) ? "TextEdit" : "Finder"
-      LMMgr.shared.openPhraseFile(mode: selInputMode, type: selUserDataType, app: app)
+      LMMgr.shared.openPhraseFile(mode: self.selInputMode, type: self.selUserDataType, app: app)
     }
   }
 
   @IBAction func addPEButtonClicked(_: NSButton) {
     DispatchQueue.main.async { [weak self] in
       guard let self = self else { return }
-      txtPEField1.stringValue.removeAll { "　 \t\n\r".contains($0) }
-      if selUserDataType != .theAssociates {
-        txtPEField2.stringValue.regReplace(pattern: #"( +|　+| +|\t+)+"#, replaceWith: "-")
+      self.txtPEField1.stringValue.removeAll { "　 \t\n\r".contains($0) }
+      if self.selUserDataType != .theAssociates {
+        self.txtPEField2.stringValue.regReplace(pattern: #"( +|　+| +|\t+)+"#, replaceWith: "-")
       }
-      txtPEField2.stringValue.removeAll {
+      self.txtPEField2.stringValue.removeAll {
         self.selUserDataType == .theAssociates ? "\n\r".contains($0) : "　 \t\n\r".contains($0)
       }
-      txtPEField3.stringValue.removeAll { !"0123456789.-".contains($0) }
-      txtPECommentField.stringValue.removeAll { "\n\r".contains($0) }
-      guard !txtPEField1.stringValue.isEmpty, !txtPEField2.stringValue.isEmpty else { return }
-      var arrResult: [String] = [txtPEField1.stringValue, txtPEField2.stringValue]
-      if let weightVal = Double(txtPEField3.stringValue), weightVal < 0 {
+      self.txtPEField3.stringValue.removeAll { !"0123456789.-".contains($0) }
+      self.txtPECommentField.stringValue.removeAll { "\n\r".contains($0) }
+      guard !self.txtPEField1.stringValue.isEmpty, !self.txtPEField2.stringValue.isEmpty else { return }
+      var arrResult: [String] = [self.txtPEField1.stringValue, self.txtPEField2.stringValue]
+      if let weightVal = Double(self.txtPEField3.stringValue), weightVal < 0 {
         arrResult.append(weightVal.description)
       }
-      if !txtPECommentField.stringValue.isEmpty { arrResult.append("#" + txtPECommentField.stringValue) }
+      if !self.txtPECommentField.stringValue.isEmpty { arrResult.append("#" + self.txtPECommentField.stringValue) }
       if LMMgr.shared.checkIfPhrasePairExists(
-        userPhrase: txtPEField1.stringValue, mode: selInputMode, key: txtPEField2.stringValue
+        userPhrase: self.txtPEField1.stringValue, mode: self.selInputMode, key: self.txtPEField2.stringValue
       ) {
         arrResult.append(" #𝙾𝚟𝚎𝚛𝚛𝚒𝚍𝚎")
       }
-      if let lastChar = tfdPETextEditor.string.last, !"\n".contains(lastChar) {
+      if let lastChar = self.tfdPETextEditor.string.last, !"\n".contains(lastChar) {
         arrResult.insert("\n", at: 0)
       }
-      tfdPETextEditor.string.append(arrResult.joined(separator: " ") + "\n")
-      clearAllFields()
+      self.tfdPETextEditor.string.append(arrResult.joined(separator: " ") + "\n")
+      self.clearAllFields()
     }
   }
 }
