@@ -86,7 +86,7 @@ public extension AppDelegate {
     LMMgr.initUserLangModels()
     folderMonitor.folderDidChange = { [weak self] in
       guard let self = self else { return }
-      reloadOnFolderChangeHappens()
+      self.reloadOnFolderChangeHappens()
     }
     if LMMgr.userDataFolderExists { folderMonitor.startMonitoring() }
 
@@ -103,7 +103,7 @@ public extension AppDelegate {
     )
     folderMonitor.folderDidChange = { [weak self] in
       guard let self = self else { return }
-      reloadOnFolderChangeHappens()
+      self.reloadOnFolderChangeHappens()
     }
     if LMMgr.userDataFolderExists { // 沒有資料夾的話，FolderMonitor 會崩潰。
       folderMonitor.startMonitoring()
