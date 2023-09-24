@@ -9,19 +9,18 @@
 import Shared
 import SwiftExtension
 import SwiftUI
-import SwiftUIBackports
 
 @available(macOS 13, *)
 struct VwrPrefPaneDevZone: View {
   // MARK: - AppStorage Variables
 
-  @Backport.AppStorage(
+  @AppStorage(
     wrappedValue: false,
     UserDef.kDisableSegmentedThickUnderlineInMarkingModeForManagedClients.rawValue
   )
   private var disableSegmentedThickUnderlineInMarkingModeForManagedClients: Bool
 
-  @Backport.AppStorage(
+  @AppStorage(
     wrappedValue: false,
     UserDef.kSecurityHardenedCompositionBuffer.rawValue
   )

@@ -11,25 +11,24 @@ import MainAssembly
 import Shared
 import SwiftExtension
 import SwiftUI
-import SwiftUIBackports
 
 @available(macOS 13, *)
 struct VwrPrefPaneCassette: View {
   // MARK: - AppStorage Variables
 
-  @Backport.AppStorage(wrappedValue: "", UserDef.kCassettePath.rawValue)
+  @AppStorage(wrappedValue: "", UserDef.kCassettePath.rawValue)
   private var cassettePath: String
 
-  @Backport.AppStorage(wrappedValue: false, UserDef.kCassetteEnabled.rawValue)
+  @AppStorage(wrappedValue: false, UserDef.kCassetteEnabled.rawValue)
   private var cassetteEnabled: Bool
 
-  @Backport.AppStorage(wrappedValue: 0, UserDef.kForceCassetteChineseConversion.rawValue)
+  @AppStorage(wrappedValue: 0, UserDef.kForceCassetteChineseConversion.rawValue)
   private var forceCassetteChineseConversion: Int
 
-  @Backport.AppStorage(wrappedValue: true, UserDef.kShowTranslatedStrokesInCompositionBuffer.rawValue)
+  @AppStorage(wrappedValue: true, UserDef.kShowTranslatedStrokesInCompositionBuffer.rawValue)
   private var showTranslatedStrokesInCompositionBuffer: Bool
 
-  @Backport.AppStorage(wrappedValue: true, UserDef.kAutoCompositeWithLongestPossibleCassetteKey.rawValue)
+  @AppStorage(wrappedValue: true, UserDef.kAutoCompositeWithLongestPossibleCassetteKey.rawValue)
   private var autoCompositeWithLongestPossibleCassetteKey: Bool
 
   // MARK: - Main View
