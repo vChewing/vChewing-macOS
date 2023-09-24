@@ -13,18 +13,17 @@ import LangModelAssembly
 import Shared
 import SwiftExtension
 import SwiftUI
-import SwiftUIBackports
 
 private let loc: String =
   (UserDefaults.current.array(forKey: UserDef.kAppleLanguages.rawValue) as? [String] ?? ["auto"])[0]
 
-@available(macOS 10.15, *)
+@available(macOS 13, *)
 extension VwrPhraseEditorUI {
-  @Backport.AppStorage("PhraseEditorAutoReloadExternalModifications")
+  @AppStorage("PhraseEditorAutoReloadExternalModifications")
   private static var autoReloadExternalModifications: Bool = true
 }
 
-@available(macOS 10.15, *)
+@available(macOS 13, *)
 public struct VwrPhraseEditorUI: View {
   static var txtContentStorage: String = NSLocalizedString(
     "Please select Simplified / Traditional Chinese mode above.", comment: ""
@@ -235,16 +234,10 @@ public struct VwrPhraseEditorUI: View {
         Button("Consolidate") {
           consolidate()
         }.disabled(selInputMode == .imeModeNULL || isLoading)
-        if #available(macOS 11.0, *) {
-          Button("Save") {
-            DispatchQueue.main.async { saveAndReload() }
-          }.keyboardShortcut("s", modifiers: [.command])
-            .disabled(delegate == nil)
-        } else {
-          Button("Save") {
-            DispatchQueue.main.async { saveAndReload() }
-          }
-        }
+        Button("Save") {
+          DispatchQueue.main.async { saveAndReload() }
+        }.keyboardShortcut("s", modifiers: [.command])
+          .disabled(delegate == nil)
         Button("...") {
           DispatchQueue.main.async {
             saveAndReload()
@@ -256,7 +249,7 @@ public struct VwrPhraseEditorUI: View {
       TextEditorEX(text: $txtContent)
         .disabled(selInputMode == .imeModeNULL || isLoading)
         .frame(minWidth: 320, minHeight: 240)
-        .backport.onChange(of: fileChangeIndicator.id) { _ in
+        .onChange(of: fileChangeIndicator.id) { _ in
           if Self.autoReloadExternalModifications { update() }
         }
 
@@ -291,18 +284,13 @@ public struct VwrPhraseEditorUI: View {
         }
       }.disabled(selInputMode == Shared.InputMode.imeModeNULL || isLoading)
       HStack {
-        if #available(macOS 12, *) {
-          Toggle(
-            LocalizedStringKey("This editor only: Auto-reload modifications happened outside of this editor"),
-            isOn: $selAutoReloadExternalModifications.onChange {
-              Self.autoReloadExternalModifications = selAutoReloadExternalModifications
-            }
-          )
-          .controlSize(.small)
-        } else {
-          Text("Some features are unavailable for macOS 10.15 and macOS 11 due to API limitations.")
-            .font(.system(size: 11.0)).foregroundColor(.secondary)
-        }
+        Toggle(
+          LocalizedStringKey("This editor only: Auto-reload modifications happened outside of this editor"),
+          isOn: $selAutoReloadExternalModifications.onChange {
+            Self.autoReloadExternalModifications = selAutoReloadExternalModifications
+          }
+        )
+        .controlSize(.small)
         Spacer()
       }
     }.onDisappear {
@@ -319,7 +307,7 @@ public struct VwrPhraseEditorUI: View {
   }
 }
 
-@available(macOS 10.15, *)
+@available(macOS 13, *)
 struct ContentView_Previews: PreviewProvider {
   static var previews: some View {
     VwrPhraseEditorUI()

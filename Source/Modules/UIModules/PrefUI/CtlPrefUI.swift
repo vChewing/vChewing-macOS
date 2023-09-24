@@ -16,7 +16,7 @@ private let kWindowTitleHeight: Double = 78
 
 // InputMethodServerPreferencesWindowControllerClass 非必需。
 
-@available(macOS 10.15, *)
+@available(macOS 13, *)
 class CtlPrefUI: NSWindowController, NSWindowDelegate {
   public static var shared: CtlPrefUI?
 
@@ -47,13 +47,11 @@ class CtlPrefUI: NSWindowController, NSWindowDelegate {
   override func windowDidLoad() {
     super.windowDidLoad()
     window?.setPosition(vertical: .top, horizontal: .right, padding: 20)
-    if #available(macOS 13, *) {
-      window?.contentView = NSHostingView(
-        rootView: VwrSettingsUI()
-          .fixedSize(horizontal: true, vertical: false)
-          .ignoresSafeArea()
-      )
-    }
+    window?.contentView = NSHostingView(
+      rootView: VwrSettingsUI()
+        .fixedSize(horizontal: true, vertical: false)
+        .ignoresSafeArea()
+    )
     let toolbar = NSToolbar(identifier: "preference toolbar")
     toolbar.allowsUserCustomization = false
     toolbar.autosavesConfiguration = false
@@ -61,9 +59,7 @@ class CtlPrefUI: NSWindowController, NSWindowDelegate {
     toolbar.delegate = self
     toolbar.selectedItemIdentifier = nil
     toolbar.showsBaselineSeparator = true
-    if #available(macOS 11, *) {
-      window?.toolbarStyle = .unifiedCompact
-    }
+    window?.toolbarStyle = .unifiedCompact
     window?.toolbar = toolbar
     var preferencesTitleName = NSLocalizedString("vChewing Preferences…", comment: "")
     preferencesTitleName.removeLast()
@@ -73,7 +69,7 @@ class CtlPrefUI: NSWindowController, NSWindowDelegate {
 
 // MARK: - NSToolbarDelegate.
 
-@available(macOS 10.15, *)
+@available(macOS 13, *)
 extension CtlPrefUI: NSToolbarDelegate {
   var toolbarIdentifiers: [NSToolbarItem.Identifier] {
     [.init("Collapse or Expand Sidebar")]
@@ -96,13 +92,48 @@ extension CtlPrefUI: NSToolbarDelegate {
     willBeInsertedIntoToolbar _: Bool
   ) -> NSToolbarItem? {
     let item = NSToolbarItem(itemIdentifier: itemIdentifier)
-    if #available(macOS 11.0, *) {
-      item.isNavigational = true
-    }
+    item.isNavigational = true
     item.target = window?.firstResponder
     item.image = NSImage(named: "NSTouchBarSidebarTemplate") ?? .init()
     item.tag = 0
     item.action = #selector(NSSplitViewController.toggleSidebar(_:))
     return item
+  }
+}
+
+// MARK: - Shared Static Variables and Constants
+
+@available(macOS 13, *)
+extension CtlPrefUI {
+  static let sentenceSeparator: String = {
+    switch PrefMgr.shared.appleLanguages[0] {
+    case "ja":
+      return ""
+    default:
+      if PrefMgr.shared.appleLanguages[0].contains("zh-Han") {
+        return ""
+      } else {
+        return " "
+      }
+    }
+  }()
+
+  static let contentMaxHeight: Double = 490
+
+  static let formWidth: Double = {
+    switch PrefMgr.shared.appleLanguages[0] {
+    case "ja":
+      return 520
+    default:
+      if PrefMgr.shared.appleLanguages[0].contains("zh-Han") {
+        return 500
+      } else {
+        return 580
+      }
+    }
+  }()
+
+  static var isCJKInterface: Bool {
+    PrefMgr.shared.appleLanguages[0].contains("zh-Han") || PrefMgr.shared.appleLanguages[0] == "ja"
   }
 }
