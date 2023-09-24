@@ -10,43 +10,42 @@ import MainAssembly
 import Shared
 import SwiftExtension
 import SwiftUI
-import SwiftUIBackports
 
 @available(macOS 13, *)
 struct VwrPrefPaneCandidates: View {
   // MARK: - AppStorage Variables
 
-  @Backport.AppStorage(wrappedValue: 16, UserDef.kCandidateListTextSize.rawValue)
+  @AppStorage(wrappedValue: 16, UserDef.kCandidateListTextSize.rawValue)
   private var candidateListTextSize: Double
 
-  @Backport.AppStorage(wrappedValue: true, UserDef.kUseHorizontalCandidateList.rawValue)
+  @AppStorage(wrappedValue: true, UserDef.kUseHorizontalCandidateList.rawValue)
   private var useHorizontalCandidateList: Bool
 
-  @Backport.AppStorage(wrappedValue: false, UserDef.kCandidateWindowShowOnlyOneLine.rawValue)
+  @AppStorage(wrappedValue: false, UserDef.kCandidateWindowShowOnlyOneLine.rawValue)
   private var candidateWindowShowOnlyOneLine: Bool
 
-  @Backport.AppStorage(wrappedValue: false, UserDef.kAlwaysExpandCandidateWindow.rawValue)
+  @AppStorage(wrappedValue: false, UserDef.kAlwaysExpandCandidateWindow.rawValue)
   private var alwaysExpandCandidateWindow: Bool
 
-  @Backport.AppStorage(wrappedValue: true, UserDef.kShowReverseLookupInCandidateUI.rawValue)
+  @AppStorage(wrappedValue: true, UserDef.kShowReverseLookupInCandidateUI.rawValue)
   private var showReverseLookupInCandidateUI: Bool
 
-  @Backport.AppStorage(wrappedValue: false, UserDef.kUseRearCursorMode.rawValue)
+  @AppStorage(wrappedValue: false, UserDef.kUseRearCursorMode.rawValue)
   private var useRearCursorMode: Bool
 
-  @Backport.AppStorage(wrappedValue: true, UserDef.kMoveCursorAfterSelectingCandidate.rawValue)
+  @AppStorage(wrappedValue: true, UserDef.kMoveCursorAfterSelectingCandidate.rawValue)
   private var moveCursorAfterSelectingCandidate: Bool
 
-  @Backport.AppStorage(wrappedValue: true, UserDef.kUseDynamicCandidateWindowOrigin.rawValue)
+  @AppStorage(wrappedValue: true, UserDef.kUseDynamicCandidateWindowOrigin.rawValue)
   private var useDynamicCandidateWindowOrigin: Bool
 
-  @Backport.AppStorage(wrappedValue: false, UserDef.kUseFixedCandidateOrderOnSelection.rawValue)
+  @AppStorage(wrappedValue: false, UserDef.kUseFixedCandidateOrderOnSelection.rawValue)
   private var useFixedCandidateOrderOnSelection: Bool
 
-  @Backport.AppStorage(wrappedValue: true, UserDef.kConsolidateContextOnCandidateSelection.rawValue)
+  @AppStorage(wrappedValue: true, UserDef.kConsolidateContextOnCandidateSelection.rawValue)
   private var consolidateContextOnCandidateSelection: Bool
 
-  @Backport.AppStorage(wrappedValue: false, UserDef.kEnableMouseScrollingForTDKCandidatesCocoa.rawValue)
+  @AppStorage(wrappedValue: false, UserDef.kEnableMouseScrollingForTDKCandidatesCocoa.rawValue)
   private var enableMouseScrollingForTDKCandidatesCocoa: Bool
 
   // MARK: - Main View
@@ -209,7 +208,7 @@ struct VwrPrefPaneCandidates_Previews: PreviewProvider {
 private struct VwrPrefPaneCandidates_SelectionKeys: View {
   // MARK: - AppStorage Variables
 
-  @Backport.AppStorage(wrappedValue: PrefMgr.kDefaultCandidateKeys, UserDef.kCandidateKeys.rawValue)
+  @AppStorage(wrappedValue: PrefMgr.kDefaultCandidateKeys, UserDef.kCandidateKeys.rawValue)
   private var candidateKeys: String
 
   // MARK: - Main View

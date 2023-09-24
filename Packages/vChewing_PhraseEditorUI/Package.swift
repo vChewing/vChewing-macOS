@@ -15,14 +15,12 @@ let package = Package(
   dependencies: [
     .package(path: "../vChewing_LangModelAssembly"),
     .package(path: "../vChewing_Shared"),
-    .package(path: "../ShapsBenkau_SwiftUIBackports"),
   ],
   targets: [
     .target(
       name: "PhraseEditorUI",
       dependencies: [
         .product(name: "LangModelAssembly", package: "vChewing_LangModelAssembly"),
-        .product(name: "SwiftUIBackports", package: "ShapsBenkau_SwiftUIBackports"),
         .product(name: "Shared", package: "vChewing_Shared"),
       ]
     ),
