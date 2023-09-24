@@ -10,7 +10,7 @@ import MainAssembly
 import SwiftExtension
 import SwiftUI
 
-@available(macOS 10.15, *)
+@available(macOS 13, *)
 extension PrefUITabs {
   @ViewBuilder
   var suiView: some View {
@@ -25,46 +25,6 @@ extension PrefUITabs {
     case .tabKeyboard: VwrPrefPaneKeyboard()
     case .tabDevZone: VwrPrefPaneDevZone()
     }
-  }
-}
-
-@available(macOS 10.15, *)
-class CtlPrefUIShared {
-  static var sharedWindow: NSWindow? {
-    CtlPrefUI.shared?.window
-  }
-
-  static let shared = CtlPrefUIShared()
-  static let sentenceSeparator: String = {
-    switch PrefMgr.shared.appleLanguages[0] {
-    case "ja":
-      return ""
-    default:
-      if PrefMgr.shared.appleLanguages[0].contains("zh-Han") {
-        return ""
-      } else {
-        return " "
-      }
-    }
-  }()
-
-  static let contentMaxHeight: Double = 490
-
-  static let formWidth: Double = {
-    switch PrefMgr.shared.appleLanguages[0] {
-    case "ja":
-      return 520
-    default:
-      if PrefMgr.shared.appleLanguages[0].contains("zh-Han") {
-        return 500
-      } else {
-        return 580
-      }
-    }
-  }()
-
-  static var isCJKInterface: Bool {
-    PrefMgr.shared.appleLanguages[0].contains("zh-Han") || PrefMgr.shared.appleLanguages[0] == "ja"
   }
 }
 

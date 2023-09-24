@@ -11,7 +11,7 @@ import SwiftExtension
 import SwiftUI
 import SwiftUIBackports
 
-@available(macOS 10.15, *)
+@available(macOS 13, *)
 struct VwrPrefPaneDevZone: View {
   // MARK: - AppStorage Variables
 
@@ -56,13 +56,13 @@ struct VwrPrefPaneDevZone: View {
             .settingsDescription()
           }
         }
-      }.formStyled().frame(minWidth: CtlPrefUIShared.formWidth, maxWidth: ceil(CtlPrefUIShared.formWidth * 1.2))
+      }.formStyled().frame(minWidth: CtlPrefUI.formWidth, maxWidth: ceil(CtlPrefUI.formWidth * 1.2))
     }
-    .frame(maxHeight: CtlPrefUIShared.contentMaxHeight)
+    .frame(maxHeight: CtlPrefUI.contentMaxHeight)
   }
 }
 
-@available(macOS 11.0, *)
+@available(macOS 13, *)
 struct VwrPrefPaneDevZone_Previews: PreviewProvider {
   static var previews: some View {
     VwrPrefPaneDevZone()
