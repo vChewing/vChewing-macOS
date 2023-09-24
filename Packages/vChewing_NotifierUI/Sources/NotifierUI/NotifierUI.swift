@@ -71,9 +71,15 @@ public class Notifier: NSWindowController {
       .paragraphStyle: paraStyle,
     ]
     let attrString = NSMutableAttributedString(string: messageArray[0], attributes: attrTitle)
+    let foregroundColor: NSColor = {
+      if #available(macOS 10.10, *) {
+        return NSColor.secondaryLabelColor
+      }
+      return NSColor.controlTextColor
+    }()
     let attrAlt: [NSAttributedString.Key: Any] = [
       .kern: 0,
-      .foregroundColor: NSColor.secondaryLabelColor,
+      .foregroundColor: foregroundColor,
       .font: NSFont.systemFont(ofSize: kSmallFontSize),
       .paragraphStyle: paraStyle,
     ]
@@ -99,9 +105,15 @@ public class Notifier: NSWindowController {
     windowRect.origin.y = screenRect.maxY - windowRect.height - 10
     let styleMask: NSWindow.StyleMask = [.borderless]
 
-    let transparentVisualEffect = NSVisualEffectView()
-    transparentVisualEffect.blendingMode = .behindWindow
-    transparentVisualEffect.state = .active
+    let transparentVisualEffect: NSView = {
+      if #available(macOS 10.10, *) {
+        let transparentVisualEffect = NSVisualEffectView()
+        transparentVisualEffect.blendingMode = .behindWindow
+        transparentVisualEffect.state = .active
+        return transparentVisualEffect
+      }
+      return .init()
+    }()
 
     let theWindow = NSWindow(
       contentRect: windowRect, styleMask: styleMask, backing: .buffered, defer: false
@@ -112,8 +124,10 @@ public class Notifier: NSWindowController {
     theWindow.hasShadow = true
     theWindow.backgroundColor = .textBackgroundColor
     theWindow.title = ""
-    theWindow.titlebarAppearsTransparent = true
-    theWindow.titleVisibility = .hidden
+    if #available(macOS 10.10, *) {
+      theWindow.titlebarAppearsTransparent = true
+      theWindow.titleVisibility = .hidden
+    }
     theWindow.showsToolbarButton = false
     theWindow.standardWindowButton(NSWindow.ButtonType.zoomButton)?.isHidden = true
     theWindow.standardWindowButton(NSWindow.ButtonType.miniaturizeButton)?.isHidden = true
