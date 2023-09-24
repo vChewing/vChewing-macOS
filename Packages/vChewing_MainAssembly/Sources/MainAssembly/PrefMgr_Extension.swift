@@ -8,6 +8,20 @@
 
 import InputMethodKit
 import Shared
+import SwiftUI
+
+// MARK: ObservableProject.
+
+@available(macOS 10.15, *)
+extension PrefMgr: ObservableObject {}
+
+extension PrefMgr {
+  func sendObjWillChange() {
+    if #available(macOS 10.15, *) {
+      objectWillChange.send()
+    }
+  }
+}
 
 // MARK: Auto parameter fix procedures, executed everytime on SessionCtl.activateServer().
 
