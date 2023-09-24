@@ -10,7 +10,6 @@ import MainAssembly
 import Shared
 import SwiftExtension
 import SwiftUI
-import SwiftUIBackports
 
 @available(macOS 13, *)
 struct VwrPrefPaneGeneral: View {
@@ -39,31 +38,28 @@ struct VwrPrefPaneGeneral: View {
 
   // MARK: - AppStorage Variables
 
-  @Backport.AppStorage(wrappedValue: [], UserDef.kAppleLanguages.rawValue)
-  private var appleLanguages: [String]
-
-  @Backport.AppStorage(wrappedValue: true, UserDef.kAutoCorrectReadingCombination.rawValue)
+  @AppStorage(wrappedValue: true, UserDef.kAutoCorrectReadingCombination.rawValue)
   private var autoCorrectReadingCombination: Bool
 
-  @Backport.AppStorage(wrappedValue: false, UserDef.kKeepReadingUponCompositionError.rawValue)
+  @AppStorage(wrappedValue: false, UserDef.kKeepReadingUponCompositionError.rawValue)
   private var keepReadingUponCompositionError: Bool
 
-  @Backport.AppStorage(wrappedValue: false, UserDef.kShowHanyuPinyinInCompositionBuffer.rawValue)
+  @AppStorage(wrappedValue: false, UserDef.kShowHanyuPinyinInCompositionBuffer.rawValue)
   private var showHanyuPinyinInCompositionBuffer: Bool
 
-  @Backport.AppStorage(wrappedValue: false, UserDef.kClassicHaninKeyboardSymbolModeShortcutEnabled.rawValue)
+  @AppStorage(wrappedValue: false, UserDef.kClassicHaninKeyboardSymbolModeShortcutEnabled.rawValue)
   private var classicHaninKeyboardSymbolModeShortcutEnabled: Bool
 
-  @Backport.AppStorage(wrappedValue: false, UserDef.kUseSCPCTypingMode.rawValue)
+  @AppStorage(wrappedValue: false, UserDef.kUseSCPCTypingMode.rawValue)
   private var useSCPCTypingMode: Bool
 
-  @Backport.AppStorage(wrappedValue: true, UserDef.kShouldNotFartInLieuOfBeep.rawValue)
+  @AppStorage(wrappedValue: true, UserDef.kShouldNotFartInLieuOfBeep.rawValue)
   private var shouldNotFartInLieuOfBeep: Bool
 
-  @Backport.AppStorage(wrappedValue: false, UserDef.kCheckUpdateAutomatically.rawValue)
+  @AppStorage(wrappedValue: false, UserDef.kCheckUpdateAutomatically.rawValue)
   private var checkUpdateAutomatically: Bool
 
-  @Backport.AppStorage(wrappedValue: false, UserDef.kIsDebugModeEnabled.rawValue)
+  @AppStorage(wrappedValue: false, UserDef.kIsDebugModeEnabled.rawValue)
   private var isDebugModeEnabled: Bool
 
   // MARK: - Main View

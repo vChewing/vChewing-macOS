@@ -11,22 +11,21 @@ import MainAssembly
 import Shared
 import SwiftExtension
 import SwiftUI
-import SwiftUIBackports
 
 @available(macOS 13, *)
 struct VwrPrefPaneKeyboard: View {
   // MARK: - AppStorage Variables
 
-  @Backport.AppStorage(wrappedValue: 0, UserDef.kKeyboardParser.rawValue)
+  @AppStorage(wrappedValue: 0, UserDef.kKeyboardParser.rawValue)
   private var keyboardParser: Int
 
-  @Backport.AppStorage(
+  @AppStorage(
     wrappedValue: PrefMgr.kDefaultBasicKeyboardLayout,
     UserDef.kBasicKeyboardLayout.rawValue
   )
   private var basicKeyboardLayout: String
 
-  @Backport.AppStorage(
+  @AppStorage(
     wrappedValue: PrefMgr.kDefaultAlphanumericalKeyboardLayout,
     UserDef.kAlphanumericalKeyboardLayout.rawValue
   )
@@ -135,34 +134,34 @@ struct VwrPrefPaneKeyboard: View {
 private struct VwrPrefPaneKeyboard_KeyboardShortcuts: View {
   // MARK: - AppStorage Variables
 
-  @Backport.AppStorage(wrappedValue: true, UserDef.kUsingHotKeySCPC.rawValue)
+  @AppStorage(wrappedValue: true, UserDef.kUsingHotKeySCPC.rawValue)
   private var usingHotKeySCPC: Bool
 
-  @Backport.AppStorage(wrappedValue: true, UserDef.kUsingHotKeyAssociates.rawValue)
+  @AppStorage(wrappedValue: true, UserDef.kUsingHotKeyAssociates.rawValue)
   private var usingHotKeyAssociates: Bool
 
-  @Backport.AppStorage(wrappedValue: true, UserDef.kUsingHotKeyCNS.rawValue)
+  @AppStorage(wrappedValue: true, UserDef.kUsingHotKeyCNS.rawValue)
   private var usingHotKeyCNS: Bool
 
-  @Backport.AppStorage(wrappedValue: true, UserDef.kUsingHotKeyKangXi.rawValue)
+  @AppStorage(wrappedValue: true, UserDef.kUsingHotKeyKangXi.rawValue)
   private var usingHotKeyKangXi: Bool
 
-  @Backport.AppStorage(wrappedValue: true, UserDef.kUsingHotKeyJIS.rawValue)
+  @AppStorage(wrappedValue: true, UserDef.kUsingHotKeyJIS.rawValue)
   private var usingHotKeyJIS: Bool
 
-  @Backport.AppStorage(wrappedValue: true, UserDef.kUsingHotKeyHalfWidthASCII.rawValue)
+  @AppStorage(wrappedValue: true, UserDef.kUsingHotKeyHalfWidthASCII.rawValue)
   private var usingHotKeyHalfWidthASCII: Bool
 
-  @Backport.AppStorage(wrappedValue: true, UserDef.kUsingHotKeyCurrencyNumerals.rawValue)
+  @AppStorage(wrappedValue: true, UserDef.kUsingHotKeyCurrencyNumerals.rawValue)
   private var usingHotKeyCurrencyNumerals: Bool
 
-  @Backport.AppStorage(wrappedValue: true, UserDef.kUsingHotKeyCassette.rawValue)
+  @AppStorage(wrappedValue: true, UserDef.kUsingHotKeyCassette.rawValue)
   private var usingHotKeyCassette: Bool
 
-  @Backport.AppStorage(wrappedValue: true, UserDef.kUsingHotKeyRevLookup.rawValue)
+  @AppStorage(wrappedValue: true, UserDef.kUsingHotKeyRevLookup.rawValue)
   private var usingHotKeyRevLookup: Bool
 
-  @Backport.AppStorage(wrappedValue: true, UserDef.kUsingHotKeyInputMode.rawValue)
+  @AppStorage(wrappedValue: true, UserDef.kUsingHotKeyInputMode.rawValue)
   private var usingHotKeyInputMode: Bool
 
   // MARK: - Main View

@@ -12,37 +12,36 @@ import MainAssembly
 import Shared
 import SwiftExtension
 import SwiftUI
-import SwiftUIBackports
 
 @available(macOS 13, *)
 struct VwrPrefPaneDictionary: View {
   // MARK: - AppStorage Variables
 
-  @Backport.AppStorage(wrappedValue: "", UserDef.kUserDataFolderSpecified.rawValue)
+  @AppStorage(wrappedValue: "", UserDef.kUserDataFolderSpecified.rawValue)
   private var userDataFolderSpecified: String
 
-  @Backport.AppStorage(wrappedValue: true, UserDef.kShouldAutoReloadUserDataFiles.rawValue)
+  @AppStorage(wrappedValue: true, UserDef.kShouldAutoReloadUserDataFiles.rawValue)
   private var shouldAutoReloadUserDataFiles: Bool
 
-  @Backport.AppStorage(wrappedValue: false, UserDef.kUseExternalFactoryDict.rawValue)
+  @AppStorage(wrappedValue: false, UserDef.kUseExternalFactoryDict.rawValue)
   private var useExternalFactoryDict: Bool
 
-  @Backport.AppStorage(wrappedValue: true, UserDef.kOnlyLoadFactoryLangModelsIfNeeded.rawValue)
+  @AppStorage(wrappedValue: true, UserDef.kOnlyLoadFactoryLangModelsIfNeeded.rawValue)
   private var onlyLoadFactoryLangModelsIfNeeded: Bool
 
-  @Backport.AppStorage(wrappedValue: false, UserDef.kCNS11643Enabled.rawValue)
+  @AppStorage(wrappedValue: false, UserDef.kCNS11643Enabled.rawValue)
   private var cns11643Enabled: Bool
 
-  @Backport.AppStorage(wrappedValue: true, UserDef.kSymbolInputEnabled.rawValue)
+  @AppStorage(wrappedValue: true, UserDef.kSymbolInputEnabled.rawValue)
   private var symbolInputEnabled: Bool
 
-  @Backport.AppStorage(wrappedValue: true, UserDef.kFetchSuggestionsFromUserOverrideModel.rawValue)
+  @AppStorage(wrappedValue: true, UserDef.kFetchSuggestionsFromUserOverrideModel.rawValue)
   private var fetchSuggestionsFromUserOverrideModel: Bool
 
-  @Backport.AppStorage(wrappedValue: false, UserDef.kPhraseReplacementEnabled.rawValue)
+  @AppStorage(wrappedValue: false, UserDef.kPhraseReplacementEnabled.rawValue)
   private var phraseReplacementEnabled: Bool
 
-  @Backport.AppStorage(wrappedValue: false, UserDef.kAllowBoostingSingleKanjiAsUserPhrase.rawValue)
+  @AppStorage(wrappedValue: false, UserDef.kAllowBoostingSingleKanjiAsUserPhrase.rawValue)
   private var allowBoostingSingleKanjiAsUserPhrase: Bool
 
   // MARK: - Main View

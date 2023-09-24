@@ -9,25 +9,24 @@
 import Shared
 import SwiftExtension
 import SwiftUI
-import SwiftUIBackports
 
 @available(macOS 13, *)
 struct VwrPrefPaneOutput: View {
   // MARK: - AppStorage Variables
 
-  @Backport.AppStorage(wrappedValue: false, UserDef.kChineseConversionEnabled.rawValue)
+  @AppStorage(wrappedValue: false, UserDef.kChineseConversionEnabled.rawValue)
   private var chineseConversionEnabled: Bool
 
-  @Backport.AppStorage(wrappedValue: false, UserDef.kShiftJISShinjitaiOutputEnabled.rawValue)
+  @AppStorage(wrappedValue: false, UserDef.kShiftJISShinjitaiOutputEnabled.rawValue)
   private var shiftJISShinjitaiOutputEnabled: Bool
 
-  @Backport.AppStorage(wrappedValue: false, UserDef.kInlineDumpPinyinInLieuOfZhuyin.rawValue)
+  @AppStorage(wrappedValue: false, UserDef.kInlineDumpPinyinInLieuOfZhuyin.rawValue)
   private var inlineDumpPinyinInLieuOfZhuyin: Bool
 
-  @Backport.AppStorage(wrappedValue: true, UserDef.kTrimUnfinishedReadingsOnCommit.rawValue)
+  @AppStorage(wrappedValue: true, UserDef.kTrimUnfinishedReadingsOnCommit.rawValue)
   private var trimUnfinishedReadingsOnCommit: Bool
 
-  @Backport.AppStorage(wrappedValue: false, UserDef.kHardenVerticalPunctuations.rawValue)
+  @AppStorage(wrappedValue: false, UserDef.kHardenVerticalPunctuations.rawValue)
   private var hardenVerticalPunctuations: Bool
 
   // MARK: - Main View

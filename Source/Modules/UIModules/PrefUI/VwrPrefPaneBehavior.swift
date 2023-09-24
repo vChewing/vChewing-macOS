@@ -10,63 +10,57 @@ import MainAssembly
 import Shared
 import SwiftExtension
 import SwiftUI
-import SwiftUIBackports
 
 @available(macOS 13, *)
 struct VwrPrefPaneBehavior: View {
   // MARK: - AppStorage Variables
 
-  @Backport.AppStorage(wrappedValue: true, UserDef.kChooseCandidateUsingSpace.rawValue)
+  @AppStorage(wrappedValue: true, UserDef.kChooseCandidateUsingSpace.rawValue)
   private var chooseCandidateUsingSpace: Bool
 
-  @Backport.AppStorage(wrappedValue: true, UserDef.kEscToCleanInputBuffer.rawValue)
+  @AppStorage(wrappedValue: true, UserDef.kEscToCleanInputBuffer.rawValue)
   private var escToCleanInputBuffer: Bool
 
-  @Backport.AppStorage(wrappedValue: true, UserDef.kAcceptLeadingIntonations.rawValue)
+  @AppStorage(wrappedValue: true, UserDef.kAcceptLeadingIntonations.rawValue)
   private var acceptLeadingIntonations: Bool
 
-  @Backport.AppStorage(wrappedValue: 0, UserDef.kSpecifyIntonationKeyBehavior.rawValue)
+  @AppStorage(wrappedValue: 0, UserDef.kSpecifyIntonationKeyBehavior.rawValue)
   private var specifyIntonationKeyBehavior: Int
 
-  @Backport.AppStorage(wrappedValue: 0, UserDef.kSpecifyShiftBackSpaceKeyBehavior.rawValue)
+  @AppStorage(wrappedValue: 0, UserDef.kSpecifyShiftBackSpaceKeyBehavior.rawValue)
   private var specifyShiftBackSpaceKeyBehavior: Int
 
-  @Backport.AppStorage(wrappedValue: false, UserDef.kSpecifyShiftTabKeyBehavior.rawValue)
+  @AppStorage(wrappedValue: false, UserDef.kSpecifyShiftTabKeyBehavior.rawValue)
   private var specifyShiftTabKeyBehavior: Bool
 
-  @Backport.AppStorage(wrappedValue: false, UserDef.kSpecifyShiftSpaceKeyBehavior.rawValue)
+  @AppStorage(wrappedValue: false, UserDef.kSpecifyShiftSpaceKeyBehavior.rawValue)
   private var specifyShiftSpaceKeyBehavior: Bool
 
-  @Backport.AppStorage(wrappedValue: true, UserDef.kUseSpaceToCommitHighlightedSCPCCandidate.rawValue)
+  @AppStorage(wrappedValue: true, UserDef.kUseSpaceToCommitHighlightedSCPCCandidate.rawValue)
   private var useSpaceToCommitHighlightedSCPCCandidate: Bool
 
-  @Backport.AppStorage(wrappedValue: false, UserDef.kAlsoConfirmAssociatedCandidatesByEnter.rawValue)
+  @AppStorage(wrappedValue: false, UserDef.kAlsoConfirmAssociatedCandidatesByEnter.rawValue)
   private var alsoConfirmAssociatedCandidatesByEnter: Bool
 
-  @Backport.AppStorage(wrappedValue: true, UserDef.kTogglingAlphanumericalModeWithLShift.rawValue)
+  @AppStorage(wrappedValue: true, UserDef.kTogglingAlphanumericalModeWithLShift.rawValue)
   private var togglingAlphanumericalModeWithLShift: Bool
 
-  @Backport.AppStorage(wrappedValue: true, UserDef.kTogglingAlphanumericalModeWithRShift.rawValue)
+  @AppStorage(wrappedValue: true, UserDef.kTogglingAlphanumericalModeWithRShift.rawValue)
   private var togglingAlphanumericalModeWithRShift: Bool
 
-  @Backport.AppStorage(wrappedValue: 0, UserDef.kUpperCaseLetterKeyBehavior.rawValue)
+  @AppStorage(wrappedValue: 0, UserDef.kUpperCaseLetterKeyBehavior.rawValue)
   private var upperCaseLetterKeyBehavior: Int
 
-  @Backport.AppStorage(wrappedValue: false, UserDef.kAlwaysShowTooltipTextsHorizontally.rawValue)
+  @AppStorage(wrappedValue: false, UserDef.kAlwaysShowTooltipTextsHorizontally.rawValue)
   private var alwaysShowTooltipTextsHorizontally: Bool
 
-  @Backport.AppStorage(wrappedValue: true, UserDef.kShowNotificationsWhenTogglingCapsLock.rawValue)
+  @AppStorage(wrappedValue: true, UserDef.kShowNotificationsWhenTogglingCapsLock.rawValue)
   private var showNotificationsWhenTogglingCapsLock: Bool
 
-  @Backport.AppStorage(wrappedValue: false, UserDef.kShareAlphanumericalModeStatusAcrossClients.rawValue)
+  @AppStorage(wrappedValue: false, UserDef.kShareAlphanumericalModeStatusAcrossClients.rawValue)
   private var shareAlphanumericalModeStatusAcrossClients: Bool
 
-  var macOSMontereyOrLaterDetected: Bool {
-    if #available(macOS 12, *) {
-      return true
-    }
-    return false
-  }
+  var macOSMontereyOrLaterDetected: Bool { true } // Always met.
 
   // MARK: - Main View
 
