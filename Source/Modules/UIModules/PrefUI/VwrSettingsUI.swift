@@ -47,6 +47,6 @@ public struct VwrSettingsUI: View {
       .frame(minWidth: 128, idealWidth: 128, maxWidth: 128)
       PrefUITabs.tabGeneral.suiView
     }
-    .frame(width: CtlPrefUIShared.formWidth + 140, height: CtlPrefUIShared.contentMaxHeight)
+    .frame(width: CtlPrefUI.formWidth + 140, height: CtlPrefUI.contentMaxHeight)
   }
 }

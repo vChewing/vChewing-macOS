@@ -13,7 +13,7 @@ import SwiftExtension
 import SwiftUI
 import SwiftUIBackports
 
-@available(macOS 10.15, *)
+@available(macOS 13, *)
 struct VwrPrefPaneKeyboard: View {
   // MARK: - AppStorage Variables
 
@@ -125,13 +125,13 @@ struct VwrPrefPaneKeyboard: View {
         Section(header: Text("Keyboard Shortcuts:")) {
           VwrPrefPaneKeyboard_KeyboardShortcuts()
         }
-      }.formStyled().frame(minWidth: CtlPrefUIShared.formWidth, maxWidth: ceil(CtlPrefUIShared.formWidth * 1.2))
+      }.formStyled().frame(minWidth: CtlPrefUI.formWidth, maxWidth: ceil(CtlPrefUI.formWidth * 1.2))
     }
-    .frame(maxHeight: CtlPrefUIShared.contentMaxHeight)
+    .frame(maxHeight: CtlPrefUI.contentMaxHeight)
   }
 }
 
-@available(macOS 10.15, *)
+@available(macOS 13, *)
 private struct VwrPrefPaneKeyboard_KeyboardShortcuts: View {
   // MARK: - AppStorage Variables
 
@@ -218,7 +218,7 @@ private struct VwrPrefPaneKeyboard_KeyboardShortcuts: View {
   }
 }
 
-@available(macOS 11.0, *)
+@available(macOS 13, *)
 struct VwrPrefPaneKeyboard_Previews: PreviewProvider {
   static var previews: some View {
     VwrPrefPaneKeyboard()

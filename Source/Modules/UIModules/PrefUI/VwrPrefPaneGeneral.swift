@@ -12,7 +12,7 @@ import SwiftExtension
 import SwiftUI
 import SwiftUIBackports
 
-@available(macOS 10.15, *)
+@available(macOS 13, *)
 struct VwrPrefPaneGeneral: View {
   @Binding var appleLanguageTag: String
 
@@ -137,10 +137,8 @@ struct VwrPrefPaneGeneral: View {
                 let alert = NSAlert(error: NSLocalizedString("Warning", comment: ""))
                 alert.informativeText = content
                 alert.addButton(withTitle: NSLocalizedString("Uncheck", comment: ""))
-                if #available(macOS 11, *) {
-                  alert.buttons.forEach { button in
-                    button.hasDestructiveAction = true
-                  }
+                alert.buttons.forEach { button in
+                  button.hasDestructiveAction = true
                 }
                 alert.addButton(withTitle: NSLocalizedString("Leave it checked", comment: ""))
                 if let window = CtlPrefUI.shared?.window, !shouldNotFartInLieuOfBeep {
@@ -175,13 +173,13 @@ struct VwrPrefPaneGeneral: View {
             isOn: $isDebugModeEnabled
           )
         }
-      }.formStyled().frame(minWidth: CtlPrefUIShared.formWidth, maxWidth: ceil(CtlPrefUIShared.formWidth * 1.2))
+      }.formStyled().frame(minWidth: CtlPrefUI.formWidth, maxWidth: ceil(CtlPrefUI.formWidth * 1.2))
     }
-    .frame(maxHeight: CtlPrefUIShared.contentMaxHeight)
+    .frame(maxHeight: CtlPrefUI.contentMaxHeight)
   }
 }
 
-@available(macOS 11.0, *)
+@available(macOS 13, *)
 struct VwrPrefPaneGeneral_Previews: PreviewProvider {
   static var previews: some View {
     VwrPrefPaneGeneral()
