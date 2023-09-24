@@ -10,8 +10,20 @@ import AppKit
 
 public class UpdateSputnik {
   public static let shared: UpdateSputnik = .init()
-  public let kUpdateInfoPageURLKey: String = "UpdateInfoSite"
-  public let kUpdateInfoPageURLGitHubKey: String = "UpdateInfoSiteGitHub"
+  public let kUpdateInfoPageURLKey: String = {
+    if #available(macOS 13, *) {
+      return "UpdateInfoSite"
+    }
+    return "UpdateInfoSiteLegacy"
+  }()
+
+  public let kUpdateInfoPageURLGitHubKey: String = {
+    if #available(macOS 13, *) {
+      return "UpdateInfoSiteGitHub"
+    }
+    return "UpdateInfoSiteLegacyGitHub"
+  }()
+
   public let kUpdateCheckDateKeyPrevious: String = "PreviousUpdateCheckDate"
   public let kUpdateCheckDateKeyNext: String = "NextUpdateCheckDate"
   public let kUpdateCheckInterval: TimeInterval = 114_514
