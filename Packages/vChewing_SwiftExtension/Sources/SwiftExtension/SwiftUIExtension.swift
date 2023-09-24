@@ -159,12 +159,12 @@ public struct TextEditorEX: NSViewRepresentable {
 
 // MARK: - Property Wrapper (Bindable Extension)
 
-public extension AppProperty {
+extension AppProperty: DynamicProperty {
   @available(macOS 10.15, *)
-  var projectedValue: Binding<Value> {
+  public var projectedValue: Binding<Value> {
     .init(
       get: {
-        container.object(forKey: key) as? Value ?? defaultValue
+        wrappedValue
       },
       set: {
         container.set($0, forKey: key)
