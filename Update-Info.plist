@@ -6,6 +6,8 @@
 	<string>3.5.5</string>
 	<key>CFBundleVersion</key>
 	<string>3505</string>
+	<key>IsMainStreamDistro</key>
+	<true/>
 	<key>UpdateInfoEndpoint</key>
 	<string>https://gitee.com/vchewing/vChewing-macOS/raw/main/Update-Info.plist</string>
 	<key>UpdateInfoEndpointLegacy</key>

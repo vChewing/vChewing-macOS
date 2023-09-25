@@ -9,6 +9,7 @@
 import AppKit
 
 public class UpdateSputnik {
+  public static let isMainStreamRelease = true
   public static let shared: UpdateSputnik = .init()
   public let kUpdateInfoPageURLKey: String = {
     if #available(macOS 13, *) {
@@ -125,8 +126,11 @@ public class UpdateSputnik {
           let intCurrentVersion = Int(dicMainBundle[kCFBundleVersionKey as String] as? String ?? ""),
           let strCurrentVersionShortened = dicMainBundle["CFBundleShortVersionString"] as? String
     else { return } // Shouldn't happen.
-    if intRemoteVersion <= intCurrentVersion {
+    let isRemoteMainStreamDistro: Bool = dicMainBundle["IsMainStreamDistro"] as? Bool ?? true
+    let crossDistroNotification = Self.isMainStreamRelease != isRemoteMainStreamDistro
+    versionCheck: if intRemoteVersion <= intCurrentVersion {
       guard isCurrentCheckForced else { return }
+      if intRemoteVersion == intCurrentVersion, crossDistroNotification { break versionCheck }
       let alert = NSAlert()
       alert.messageText = NSLocalizedString("Update Check Completed", comment: "")
       alert.informativeText = NSLocalizedString("You are already using the latest version.", comment: "")
@@ -136,7 +140,7 @@ public class UpdateSputnik {
       return
     }
 
-    let content = String(
+    var content = String(
       format: NSLocalizedString(
         "You're currently using vChewing %@ (%@), a new version %@ (%@) is now available. Do you want to visit vChewing's website to download the version?",
         comment: ""
@@ -146,6 +150,15 @@ public class UpdateSputnik {
       strRemoteVersionShortened,
       intRemoteVersion.description
     )
+    if crossDistroNotification {
+      content.append("\n\n")
+      content.append(
+        NSLocalizedString(
+          "This update will upgrade vChewing from Aqua Special Edition to Mainstream Release (recommended for your current OS version).",
+          comment: ""
+        )
+      )
+    }
     let alert = NSAlert()
     alert.informativeText = content
     alert.messageText = NSLocalizedString("New Version Available", comment: "")
