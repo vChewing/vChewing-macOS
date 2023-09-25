@@ -231,6 +231,9 @@ public struct PathControl: NSViewRepresentable {
     pathCtl.backgroundColor = .controlBackgroundColor
     pathCtl.target = context.coordinator
     pathCtl.doubleAction = #selector(Coordinator.action)
+    pathCtl.setContentHuggingPriority(.defaultHigh, for: .vertical)
+    pathCtl.setContentCompressionResistancePriority(.defaultLow, for: .horizontal)
+    pathCtl.heightAnchor.constraint(equalToConstant: NSFont.smallSystemFontSize * 2).isActive = true
     return pathCtl
   }
 
