@@ -519,6 +519,7 @@ extension CtlPrefWindow: NSToolbarDelegate {
     item.target = self
     item.image = tab.icon
     item.label = tab.i18nTitle
+    item.toolTip = tab.i18nTitle
     item.tag = tab.cocoaTag
     item.action = #selector(updateTab(_:))
     return item
