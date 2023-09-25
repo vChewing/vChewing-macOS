@@ -147,8 +147,8 @@ public class CandidateCellData: Hashable {
     noSpacePadding: Bool = true, withHighlight: Bool = false, isMatrix: Bool = false
   ) -> NSAttributedString {
     let attrSpace: [NSAttributedString.Key: Any] = [
-      .font: phraseFont(size: size),
       .kern: 0,
+      .font: phraseFont(size: size),
       .paragraphStyle: Self.sharedParagraphStyle,
     ]
     let result: NSMutableAttributedString = {
@@ -185,6 +185,7 @@ public class CandidateCellData: Hashable {
 
   public func attributedStringPhrase(isMatrix: Bool = false) -> NSAttributedString {
     var attrCandidate: [NSAttributedString.Key: Any] = [
+      .kern: 0,
       .font: phraseFont(size: size),
       .paragraphStyle: Self.sharedParagraphStyle,
       .foregroundColor: fontColorCandidate,
