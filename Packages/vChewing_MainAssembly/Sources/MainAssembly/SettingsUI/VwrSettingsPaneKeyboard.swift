@@ -7,13 +7,12 @@
 // requirements defined in MIT License.
 
 import IMKUtils
-import MainAssembly
 import Shared
 import SwiftExtension
 import SwiftUI
 
 @available(macOS 13, *)
-struct VwrPrefPaneKeyboard: View {
+public struct VwrSettingsPaneKeyboard: View {
   // MARK: - AppStorage Variables
 
   @AppStorage(wrappedValue: 0, UserDef.kKeyboardParser.rawValue)
@@ -33,7 +32,7 @@ struct VwrPrefPaneKeyboard: View {
 
   // MARK: - Main View
 
-  var body: some View {
+  public var body: some View {
     ScrollView {
       Form {
         Section {
@@ -122,16 +121,16 @@ struct VwrPrefPaneKeyboard: View {
           }
         }
         Section(header: Text("Keyboard Shortcuts:")) {
-          VwrPrefPaneKeyboard_KeyboardShortcuts()
+          VwrSettingsPaneKeyboard_KeyboardShortcuts()
         }
-      }.formStyled().frame(minWidth: CtlPrefUI.formWidth, maxWidth: ceil(CtlPrefUI.formWidth * 1.2))
+      }.formStyled().frame(minWidth: CtlSettingsUI.formWidth, maxWidth: ceil(CtlSettingsUI.formWidth * 1.2))
     }
-    .frame(maxHeight: CtlPrefUI.contentMaxHeight)
+    .frame(maxHeight: CtlSettingsUI.contentMaxHeight)
   }
 }
 
 @available(macOS 13, *)
-private struct VwrPrefPaneKeyboard_KeyboardShortcuts: View {
+private struct VwrSettingsPaneKeyboard_KeyboardShortcuts: View {
   // MARK: - AppStorage Variables
 
   @AppStorage(wrappedValue: true, UserDef.kUsingHotKeySCPC.rawValue)
@@ -218,8 +217,8 @@ private struct VwrPrefPaneKeyboard_KeyboardShortcuts: View {
 }
 
 @available(macOS 13, *)
-struct VwrPrefPaneKeyboard_Previews: PreviewProvider {
+struct VwrSettingsPaneKeyboard_Previews: PreviewProvider {
   static var previews: some View {
-    VwrPrefPaneKeyboard()
+    VwrSettingsPaneKeyboard()
   }
 }

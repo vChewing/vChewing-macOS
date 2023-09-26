@@ -7,13 +7,12 @@
 // requirements defined in MIT License.
 
 import BookmarkManager
-import MainAssembly
 import Shared
 import SwiftExtension
 import SwiftUI
 
 @available(macOS 13, *)
-struct VwrPrefPaneCassette: View {
+public struct VwrSettingsPaneCassette: View {
   // MARK: - AppStorage Variables
 
   @AppStorage(wrappedValue: "", UserDef.kCassettePath.rawValue)
@@ -35,7 +34,7 @@ struct VwrPrefPaneCassette: View {
 
   private static let dlgOpenFile = NSOpenPanel()
 
-  var body: some View {
+  public var body: some View {
     ScrollView {
       Form {
         // MARK: - Cassette Data Path Management
@@ -84,7 +83,7 @@ struct VwrPrefPaneCassette: View {
                 let bolPreviousPathValidity = LMMgr.checkCassettePathValidity(
                   cassettePath.expandingTildeInPath)
 
-                if let window = CtlPrefUI.shared?.window {
+                if let window = CtlSettingsUI.shared?.window {
                   Self.dlgOpenFile.beginSheetModal(for: window) { result in
                     if result == NSApplication.ModalResponse.OK {
                       guard let url = Self.dlgOpenFile.url else { return }
@@ -127,7 +126,7 @@ struct VwrPrefPaneCassette: View {
               LocalizedStringKey("Enable cassette mode, suppressing phonabet input"),
               isOn: $cassetteEnabled.onChange {
                 if cassetteEnabled, !LMMgr.checkCassettePathValidity(cassettePath) {
-                  if let window = CtlPrefUI.shared?.window {
+                  if let window = CtlSettingsUI.shared?.window {
                     IMEApp.buzz()
                     let alert = NSAlert(error: NSLocalizedString("Path invalid or file access error.", comment: ""))
                     alert.informativeText = NSLocalizedString(
@@ -184,15 +183,15 @@ struct VwrPrefPaneCassette: View {
             .settingsDescription()
           }
         }
-      }.formStyled().frame(minWidth: CtlPrefUI.formWidth, maxWidth: ceil(CtlPrefUI.formWidth * 1.2))
+      }.formStyled().frame(minWidth: CtlSettingsUI.formWidth, maxWidth: ceil(CtlSettingsUI.formWidth * 1.2))
     }
-    .frame(maxHeight: CtlPrefUI.contentMaxHeight)
+    .frame(maxHeight: CtlSettingsUI.contentMaxHeight)
   }
 }
 
 @available(macOS 13, *)
-struct VwrPrefPaneCassette_Previews: PreviewProvider {
+struct VwrSettingsPaneCassette_Previews: PreviewProvider {
   static var previews: some View {
-    VwrPrefPaneDictionary()
+    VwrSettingsPaneDictionary()
   }
 }

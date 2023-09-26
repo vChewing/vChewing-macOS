@@ -8,13 +8,12 @@
 
 import BookmarkManager
 import CocoaExtension
-import MainAssembly
 import Shared
 import SwiftExtension
 import SwiftUI
 
 @available(macOS 13, *)
-struct VwrPrefPaneDictionary: View {
+public struct VwrSettingsPaneDictionary: View {
   // MARK: - AppStorage Variables
 
   @AppStorage(wrappedValue: "", UserDef.kUserDataFolderSpecified.rawValue)
@@ -51,7 +50,7 @@ struct VwrPrefPaneDictionary: View {
   private static let dlgOpenPath = NSOpenPanel()
   private static let dlgOpenFile = NSOpenPanel()
 
-  var body: some View {
+  public var body: some View {
     ScrollView {
       Form {
         // MARK: - User Data Folder Path Management
@@ -105,7 +104,7 @@ struct VwrPrefPaneDictionary: View {
                   let bolPreviousFolderValidity = LMMgr.checkIfSpecifiedUserDataFolderValid(
                     userDataFolderSpecified.expandingTildeInPath)
 
-                  if let window = CtlPrefUI.shared?.window {
+                  if let window = CtlSettingsUI.shared?.window {
                     Self.dlgOpenPath.beginSheetModal(for: window) { result in
                       if result == NSApplication.ModalResponse.OK {
                         guard let url = Self.dlgOpenPath.url else { return }
@@ -231,15 +230,15 @@ struct VwrPrefPaneDictionary: View {
             .settingsDescription()
           }
         }
-      }.formStyled().frame(minWidth: CtlPrefUI.formWidth, maxWidth: ceil(CtlPrefUI.formWidth * 1.2))
+      }.formStyled().frame(minWidth: CtlSettingsUI.formWidth, maxWidth: ceil(CtlSettingsUI.formWidth * 1.2))
     }
-    .frame(maxHeight: CtlPrefUI.contentMaxHeight)
+    .frame(maxHeight: CtlSettingsUI.contentMaxHeight)
   }
 }
 
 @available(macOS 13, *)
-struct VwrPrefPaneDictionary_Previews: PreviewProvider {
+struct VwrSettingsPaneDictionary_Previews: PreviewProvider {
   static var previews: some View {
-    VwrPrefPaneDictionary()
+    VwrSettingsPaneDictionary()
   }
 }

@@ -6,19 +6,18 @@
 // marks, or product names of Contributor, except as required to fulfill notice
 // requirements defined in MIT License.
 
-import MainAssembly
 import PhraseEditorUI
 import Shared
 import SwiftExtension
 import SwiftUI
 
 @available(macOS 13, *)
-struct VwrPrefPanePhrases: View {
-  var body: some View {
+public struct VwrSettingsPanePhrases: View {
+  public var body: some View {
     ScrollView {
       VStack {
         GroupBox {
-          VwrPhraseEditorUI(delegate: LMMgr.shared, window: CtlPrefUI.shared?.window)
+          VwrPhraseEditorUI(delegate: LMMgr.shared, window: CtlSettingsUI.shared?.window)
             .padding(4)
             .frame(maxWidth: .infinity)
             .frame(height: 440)
@@ -26,15 +25,15 @@ struct VwrPrefPanePhrases: View {
       }
       .padding(4)
       .padding()
-      .frame(minWidth: CtlPrefUI.formWidth, maxWidth: ceil(CtlPrefUI.formWidth * 1.2))
+      .frame(minWidth: CtlSettingsUI.formWidth, maxWidth: ceil(CtlSettingsUI.formWidth * 1.2))
     }
-    .frame(maxHeight: CtlPrefUI.contentMaxHeight)
+    .frame(maxHeight: CtlSettingsUI.contentMaxHeight)
   }
 }
 
 @available(macOS 13, *)
-struct VwrPrefPanePhrases_Previews: PreviewProvider {
+struct VwrSettingsPanePhrases_Previews: PreviewProvider {
   static var previews: some View {
-    VwrPrefPanePhrases()
+    VwrSettingsPanePhrases()
   }
 }

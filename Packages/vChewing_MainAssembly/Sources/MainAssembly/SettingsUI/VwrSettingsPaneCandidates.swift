@@ -6,13 +6,12 @@
 // marks, or product names of Contributor, except as required to fulfill notice
 // requirements defined in MIT License.
 
-import MainAssembly
 import Shared
 import SwiftExtension
 import SwiftUI
 
 @available(macOS 13, *)
-struct VwrPrefPaneCandidates: View {
+public struct VwrSettingsPaneCandidates: View {
   // MARK: - AppStorage Variables
 
   @AppStorage(wrappedValue: 16, UserDef.kCandidateListTextSize.rawValue)
@@ -50,7 +49,7 @@ struct VwrPrefPaneCandidates: View {
 
   // MARK: - Main View
 
-  var body: some View {
+  public var body: some View {
     ScrollView {
       Form {
         Section {
@@ -77,7 +76,7 @@ struct VwrPrefPaneCandidates: View {
           }
         }
         Section {
-          VStack(alignment: .leading) { VwrPrefPaneCandidates_SelectionKeys() }
+          VStack(alignment: .leading) { VwrSettingsPaneCandidates_SelectionKeys() }
           VStack(alignment: .leading) {
             Picker(
               "Candidate Layout:",
@@ -176,7 +175,7 @@ struct VwrPrefPaneCandidates: View {
         // MARK: (header: Text("Experimental:"))
 
         let imkEOSNoticeButton = Button("Where's IMK Candidate Window?") {
-          if let window = CtlPrefUI.shared?.window {
+          if let window = CtlSettingsUI.shared?.window {
             let title = "The End of Support for IMK Candidate Window"
             let explanation = "1) Only macOS has IMKCandidates. Since it relies on a dedicated ObjC Bridging Header to expose necessary internal APIs to work, it hinders vChewing from completely modularized for multi-platform support.\n\n2) IMKCandidates is buggy. It is not likely to be completely fixed by Apple, and its devs are not allowed to talk about it to non-Apple individuals. That's why we have had enough with IMKCandidates. It is likely the reason why Apple had never used IMKCandidates in their official InputMethodKit sample projects (as of August 2023)."
             window.callAlert(title: title.localized, text: explanation.localized)
@@ -189,23 +188,23 @@ struct VwrPrefPaneCandidates: View {
             isOn: $enableMouseScrollingForTDKCandidatesCocoa
           )
         }
-      }.formStyled().frame(minWidth: CtlPrefUI.formWidth, maxWidth: ceil(CtlPrefUI.formWidth * 1.2))
+      }.formStyled().frame(minWidth: CtlSettingsUI.formWidth, maxWidth: ceil(CtlSettingsUI.formWidth * 1.2))
     }
-    .frame(maxHeight: CtlPrefUI.contentMaxHeight)
+    .frame(maxHeight: CtlSettingsUI.contentMaxHeight)
   }
 }
 
 @available(macOS 13, *)
-struct VwrPrefPaneCandidates_Previews: PreviewProvider {
+struct VwrSettingsPaneCandidates_Previews: PreviewProvider {
   static var previews: some View {
-    VwrPrefPaneCandidates()
+    VwrSettingsPaneCandidates()
   }
 }
 
 // MARK: - Selection Key Preferences (View)
 
 @available(macOS 13, *)
-private struct VwrPrefPaneCandidates_SelectionKeys: View {
+private struct VwrSettingsPaneCandidates_SelectionKeys: View {
   // MARK: - AppStorage Variables
 
   @AppStorage(wrappedValue: PrefMgr.kDefaultCandidateKeys, UserDef.kCandidateKeys.rawValue)
@@ -224,7 +223,7 @@ private struct VwrPrefPaneCandidates_SelectionKeys: View {
           let keys = value.trimmingCharacters(in: .whitespacesAndNewlines).lowercased().deduplicated
           // Start Error Handling.
           if let errorResult = CandidateKey.validate(keys: keys) {
-            if let window = CtlPrefUI.shared?.window, !keys.isEmpty {
+            if let window = CtlSettingsUI.shared?.window, !keys.isEmpty {
               IMEApp.buzz()
               let alert = NSAlert(error: NSLocalizedString("Invalid Selection Keys.", comment: ""))
               alert.informativeText = errorResult
