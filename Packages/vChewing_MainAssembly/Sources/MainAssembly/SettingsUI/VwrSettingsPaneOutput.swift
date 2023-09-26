@@ -11,7 +11,7 @@ import SwiftExtension
 import SwiftUI
 
 @available(macOS 13, *)
-struct VwrPrefPaneOutput: View {
+public struct VwrSettingsPaneOutput: View {
   // MARK: - AppStorage Variables
 
   @AppStorage(wrappedValue: false, UserDef.kChineseConversionEnabled.rawValue)
@@ -31,7 +31,7 @@ struct VwrPrefPaneOutput: View {
 
   // MARK: - Main View
 
-  var body: some View {
+  public var body: some View {
     ScrollView {
       Form {
         Section {
@@ -72,15 +72,15 @@ struct VwrPrefPaneOutput: View {
             .settingsDescription()
           }
         }
-      }.formStyled().frame(minWidth: CtlPrefUI.formWidth, maxWidth: ceil(CtlPrefUI.formWidth * 1.2))
+      }.formStyled().frame(minWidth: CtlSettingsUI.formWidth, maxWidth: ceil(CtlSettingsUI.formWidth * 1.2))
     }
-    .frame(maxHeight: CtlPrefUI.contentMaxHeight)
+    .frame(maxHeight: CtlSettingsUI.contentMaxHeight)
   }
 }
 
 @available(macOS 13, *)
-struct VwrPrefPaneOutput_Previews: PreviewProvider {
+struct VwrSettingsPaneOutput_Previews: PreviewProvider {
   static var previews: some View {
-    VwrPrefPaneOutput()
+    VwrSettingsPaneOutput()
   }
 }

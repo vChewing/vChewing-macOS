@@ -20,14 +20,11 @@
 		5B253E812945AF6700680C67 /* data-bpmf-reverse-lookup-CNS6.json in Resources */ = {isa = PBXBuildFile; fileRef = 5B253E7B2945AF6700680C67 /* data-bpmf-reverse-lookup-CNS6.json */; };
 		5B253E822945AF6700680C67 /* data-bpmf-reverse-lookup-CNS4.json in Resources */ = {isa = PBXBuildFile; fileRef = 5B253E7C2945AF6700680C67 /* data-bpmf-reverse-lookup-CNS4.json */; };
 		5B253E832945AF6700680C67 /* data-bpmf-reverse-lookup-CNS5.json in Resources */ = {isa = PBXBuildFile; fileRef = 5B253E7D2945AF6700680C67 /* data-bpmf-reverse-lookup-CNS5.json */; };
-		5B2E009428FD1E8100E78D6E /* VwrPrefPaneCassette.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B2E009328FD1E8100E78D6E /* VwrPrefPaneCassette.swift */; };
 		5B30BF282944867800BD87A9 /* CtlRevLookupWindow.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B30BF272944867800BD87A9 /* CtlRevLookupWindow.swift */; };
 		5B40113928D7050D00A9D4CB /* Shared in Frameworks */ = {isa = PBXBuildFile; productRef = 5B40113828D7050D00A9D4CB /* Shared */; };
 		5B40113C28D71C0100A9D4CB /* Uninstaller in Frameworks */ = {isa = PBXBuildFile; productRef = 5B40113B28D71C0100A9D4CB /* Uninstaller */; };
-		5B4C59AE2ABCB18700098626 /* VwrSettingsUI.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B4C59AD2ABCB18700098626 /* VwrSettingsUI.swift */; };
 		5B62A33D27AE7CC100A19448 /* CtlAboutWindow.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B62A33C27AE7CC100A19448 /* CtlAboutWindow.swift */; };
 		5B65FB342A9518DA007EEFB0 /* MainAssembly in Frameworks */ = {isa = PBXBuildFile; productRef = 5B65FB332A9518DA007EEFB0 /* MainAssembly */; };
-		5B69938C293B811F0057CB8E /* VwrPrefPanePhrases.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B69938B293B811F0057CB8E /* VwrPrefPanePhrases.swift */; };
 		5B70F4E92A0BE900005EA8C4 /* MenuIcon-TCVIM.png in Resources */ = {isa = PBXBuildFile; fileRef = 5B70F4E52A0BE900005EA8C4 /* MenuIcon-TCVIM.png */; };
 		5B70F4EA2A0BE900005EA8C4 /* MenuIcon-SCVIM.png in Resources */ = {isa = PBXBuildFile; fileRef = 5B70F4E62A0BE900005EA8C4 /* MenuIcon-SCVIM.png */; };
 		5B70F4EB2A0BE900005EA8C4 /* MenuIcon-SCVIM@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 5B70F4E72A0BE900005EA8C4 /* MenuIcon-SCVIM@2x.png */; };
@@ -35,7 +32,6 @@
 		5B72D55C2AB98B8300FB88CE /* Preferences.h in Headers */ = {isa = PBXBuildFile; fileRef = 5B72D55A2AB98B8300FB88CE /* Preferences.h */; };
 		5B72D55D2AB98B8300FB88CE /* Preferences.m in Sources */ = {isa = PBXBuildFile; fileRef = 5B72D55B2AB98B8300FB88CE /* Preferences.m */; };
 		5B765F09293A253C00122315 /* PhraseEditorUI in Frameworks */ = {isa = PBXBuildFile; productRef = 5B765F08293A253C00122315 /* PhraseEditorUI */; };
-		5B78EE0D28A562B4009456C1 /* VwrPrefPaneDevZone.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B78EE0C28A562B4009456C1 /* VwrPrefPaneDevZone.swift */; };
 		5B7BC4B027AFFBE800F66C24 /* frmPrefWindow.xib in Resources */ = {isa = PBXBuildFile; fileRef = 5B7BC4AE27AFFBE800F66C24 /* frmPrefWindow.xib */; };
 		5B7DA80328BF6BC600D7B2AD /* fixinstall.sh in Resources */ = {isa = PBXBuildFile; fileRef = 5B7DA80228BF6BBA00D7B2AD /* fixinstall.sh */; };
 		5B84579E2871AD2200C93B01 /* convdict.json in Resources */ = {isa = PBXBuildFile; fileRef = 5B84579C2871AD2200C93B01 /* convdict.json */; };
@@ -45,12 +41,7 @@
 		5B9A62D9295BEA3400F79F3C /* SwiftExtension in Frameworks */ = {isa = PBXBuildFile; productRef = 5B9A62D8295BEA3400F79F3C /* SwiftExtension */; };
 		5B9A62DB295BEA4500F79F3C /* CocoaExtension in Frameworks */ = {isa = PBXBuildFile; productRef = 5B9A62DA295BEA4500F79F3C /* CocoaExtension */; };
 		5BA8C30328DF0360004C5CC4 /* CandidateWindow in Frameworks */ = {isa = PBXBuildFile; productRef = 5BA8C30228DF0360004C5CC4 /* CandidateWindow */; };
-		5BA9FD0F27FEDB6B002DE248 /* VwrPrefPaneGeneral.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5BA9FD0A27FEDB6B002DE248 /* VwrPrefPaneGeneral.swift */; };
-		5BA9FD1027FEDB6B002DE248 /* VwrPrefPaneKeyboard.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5BA9FD0B27FEDB6B002DE248 /* VwrPrefPaneKeyboard.swift */; };
-		5BA9FD1127FEDB6B002DE248 /* CtlPrefUIShared.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5BA9FD0C27FEDB6B002DE248 /* CtlPrefUIShared.swift */; };
-		5BA9FD1327FEDB6B002DE248 /* VwrPrefPaneDictionary.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5BA9FD0E27FEDB6B002DE248 /* VwrPrefPaneDictionary.swift */; };
 		5BAD0CD527D701F6003D127F /* vChewingKeyLayout.bundle in Resources */ = {isa = PBXBuildFile; fileRef = 5B30F11227BA568800484E24 /* vChewingKeyLayout.bundle */; };
-		5BB1D7F42999027200EA8D2C /* PrefUITabs.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5BB1D7F32999027200EA8D2C /* PrefUITabs.swift */; };
 		5BB802DA27FABA8300CF1C19 /* SessionCtl_Menu.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5BB802D927FABA8300CF1C19 /* SessionCtl_Menu.swift */; };
 		5BBBB75F27AED54C0023B93A /* Beep.m4a in Resources */ = {isa = PBXBuildFile; fileRef = 5BBBB75D27AED54C0023B93A /* Beep.m4a */; };
 		5BBBB76027AED54C0023B93A /* Fart.m4a in Resources */ = {isa = PBXBuildFile; fileRef = 5BBBB75E27AED54C0023B93A /* Fart.m4a */; };
@@ -78,10 +69,6 @@
 		5BEDB723283B4C250078EB25 /* data-cht.json in Resources */ = {isa = PBXBuildFile; fileRef = 5BEDB720283B4AEA0078EB25 /* data-cht.json */; };
 		5BEDB724283B4C250078EB25 /* data-symbols.json in Resources */ = {isa = PBXBuildFile; fileRef = 5BEDB71E283B4AEA0078EB25 /* data-symbols.json */; };
 		5BEDB725283B4C250078EB25 /* data-chs.json in Resources */ = {isa = PBXBuildFile; fileRef = 5BEDB71C283B4AEA0078EB25 /* data-chs.json */; };
-		5BF018F9299923BD00248CDD /* VwrPrefPaneBehavior.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5BF018F8299923BD00248CDD /* VwrPrefPaneBehavior.swift */; };
-		5BF018FB299923C000248CDD /* VwrPrefPaneOutput.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5BF018FA299923C000248CDD /* VwrPrefPaneOutput.swift */; };
-		5BF018FD299923C200248CDD /* VwrPrefPaneCandidates.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5BF018FC299923C100248CDD /* VwrPrefPaneCandidates.swift */; };
-		5BF7548929B2F04F00FA50DA /* CtlPrefUI.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5BF7548829B2F04F00FA50DA /* CtlPrefUI.swift */; };
 		5BF9DA2728840E6200DBD48E /* template-usersymbolphrases.txt in Resources */ = {isa = PBXBuildFile; fileRef = 5BF9DA2228840E6200DBD48E /* template-usersymbolphrases.txt */; };
 		5BF9DA2828840E6200DBD48E /* template-exclusions.txt in Resources */ = {isa = PBXBuildFile; fileRef = 5BF9DA2328840E6200DBD48E /* template-exclusions.txt */; };
 		5BF9DA2928840E6200DBD48E /* template-associatedPhrases-chs.txt in Resources */ = {isa = PBXBuildFile; fileRef = 5BF9DA2428840E6200DBD48E /* template-associatedPhrases-chs.txt */; };
@@ -182,16 +169,13 @@
 		5B253E7C2945AF6700680C67 /* data-bpmf-reverse-lookup-CNS4.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; name = "data-bpmf-reverse-lookup-CNS4.json"; path = "Data/data-bpmf-reverse-lookup-CNS4.json"; sourceTree = "<group>"; };
 		5B253E7D2945AF6700680C67 /* data-bpmf-reverse-lookup-CNS5.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; name = "data-bpmf-reverse-lookup-CNS5.json"; path = "Data/data-bpmf-reverse-lookup-CNS5.json"; sourceTree = "<group>"; };
 		5B2DB17127AF8771006D874E /* Makefile */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.make; name = Makefile; path = Data/Makefile; sourceTree = "<group>"; };
-		5B2E009328FD1E8100E78D6E /* VwrPrefPaneCassette.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = VwrPrefPaneCassette.swift; sourceTree = "<group>"; };
 		5B30BF272944867800BD87A9 /* CtlRevLookupWindow.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CtlRevLookupWindow.swift; sourceTree = "<group>"; };
 		5B30F11227BA568800484E24 /* vChewingKeyLayout.bundle */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.plug-in"; path = vChewingKeyLayout.bundle; sourceTree = "<group>"; };
 		5B312684287800DE001AA720 /* FAQ.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = FAQ.md; sourceTree = "<group>"; };
 		5B40113A28D71B8700A9D4CB /* vChewing_Uninstaller */ = {isa = PBXFileReference; lastKnownFileType = wrapper; name = vChewing_Uninstaller; path = Packages/vChewing_Uninstaller; sourceTree = "<group>"; };
-		5B4C59AD2ABCB18700098626 /* VwrSettingsUI.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VwrSettingsUI.swift; sourceTree = "<group>"; };
 		5B62A33C27AE7CC100A19448 /* CtlAboutWindow.swift */ = {isa = PBXFileReference; explicitFileType = sourcecode.swift; fileEncoding = 4; indentWidth = 2; lineEnding = 0; path = CtlAboutWindow.swift; sourceTree = "<group>"; tabWidth = 2; usesTabs = 0; };
 		5B65B919284D0185007C558B /* README.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = README.md; sourceTree = "<group>"; };
 		5B65FB322A9518C9007EEFB0 /* vChewing_MainAssembly */ = {isa = PBXFileReference; lastKnownFileType = wrapper; name = vChewing_MainAssembly; path = Packages/vChewing_MainAssembly; sourceTree = "<group>"; };
-		5B69938B293B811F0057CB8E /* VwrPrefPanePhrases.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VwrPrefPanePhrases.swift; sourceTree = "<group>"; };
 		5B70F4E52A0BE900005EA8C4 /* MenuIcon-TCVIM.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "MenuIcon-TCVIM.png"; sourceTree = "<group>"; };
 		5B70F4E62A0BE900005EA8C4 /* MenuIcon-SCVIM.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "MenuIcon-SCVIM.png"; sourceTree = "<group>"; };
 		5B70F4E72A0BE900005EA8C4 /* MenuIcon-SCVIM@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "MenuIcon-SCVIM@2x.png"; sourceTree = "<group>"; };
@@ -199,7 +183,6 @@
 		5B72D55A2AB98B8300FB88CE /* Preferences.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = Preferences.h; sourceTree = "<group>"; };
 		5B72D55B2AB98B8300FB88CE /* Preferences.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = Preferences.m; sourceTree = "<group>"; };
 		5B765F07293A250000122315 /* vChewing_PhraseEditorUI */ = {isa = PBXFileReference; lastKnownFileType = wrapper; name = vChewing_PhraseEditorUI; path = Packages/vChewing_PhraseEditorUI; sourceTree = "<group>"; };
-		5B78EE0C28A562B4009456C1 /* VwrPrefPaneDevZone.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VwrPrefPaneDevZone.swift; sourceTree = "<group>"; };
 		5B7BC4AF27AFFBE800F66C24 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = Base; path = Base.lproj/frmPrefWindow.xib; sourceTree = "<group>"; };
 		5B7BC4B227AFFC0B00F66C24 /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/frmPrefWindow.strings; sourceTree = "<group>"; };
 		5B7DA80228BF6BBA00D7B2AD /* fixinstall.sh */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.script.sh; lineEnding = 0; path = fixinstall.sh; sourceTree = "<group>"; };
@@ -209,11 +192,6 @@
 		5B963CA128D5C22D00DCEE88 /* vChewing_SwiftExtension */ = {isa = PBXFileReference; lastKnownFileType = wrapper; name = vChewing_SwiftExtension; path = Packages/vChewing_SwiftExtension; sourceTree = "<group>"; };
 		5B98114628D6198000CBC605 /* vChewing_PinyinPhonaConverter */ = {isa = PBXFileReference; lastKnownFileType = wrapper; name = vChewing_PinyinPhonaConverter; path = Packages/vChewing_PinyinPhonaConverter; sourceTree = "<group>"; };
 		5BA8C30128DEFE4F004C5CC4 /* vChewing_CandidateWindow */ = {isa = PBXFileReference; lastKnownFileType = wrapper; name = vChewing_CandidateWindow; path = Packages/vChewing_CandidateWindow; sourceTree = "<group>"; };
-		5BA9FD0A27FEDB6B002DE248 /* VwrPrefPaneGeneral.swift */ = {isa = PBXFileReference; explicitFileType = sourcecode.swift; fileEncoding = 4; indentWidth = 2; lineEnding = 0; path = VwrPrefPaneGeneral.swift; sourceTree = "<group>"; tabWidth = 2; usesTabs = 0; };
-		5BA9FD0B27FEDB6B002DE248 /* VwrPrefPaneKeyboard.swift */ = {isa = PBXFileReference; explicitFileType = sourcecode.swift; fileEncoding = 4; indentWidth = 2; lineEnding = 0; path = VwrPrefPaneKeyboard.swift; sourceTree = "<group>"; tabWidth = 2; usesTabs = 0; };
-		5BA9FD0C27FEDB6B002DE248 /* CtlPrefUIShared.swift */ = {isa = PBXFileReference; explicitFileType = sourcecode.swift; fileEncoding = 4; indentWidth = 2; lineEnding = 0; path = CtlPrefUIShared.swift; sourceTree = "<group>"; tabWidth = 2; usesTabs = 0; };
-		5BA9FD0E27FEDB6B002DE248 /* VwrPrefPaneDictionary.swift */ = {isa = PBXFileReference; explicitFileType = sourcecode.swift; fileEncoding = 4; indentWidth = 2; lineEnding = 0; path = VwrPrefPaneDictionary.swift; sourceTree = "<group>"; tabWidth = 2; usesTabs = 0; };
-		5BB1D7F32999027200EA8D2C /* PrefUITabs.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PrefUITabs.swift; sourceTree = "<group>"; };
 		5BB802D927FABA8300CF1C19 /* SessionCtl_Menu.swift */ = {isa = PBXFileReference; explicitFileType = sourcecode.swift; fileEncoding = 4; indentWidth = 2; lineEnding = 0; path = SessionCtl_Menu.swift; sourceTree = "<group>"; tabWidth = 2; usesTabs = 0; };
 		5BBBB75D27AED54C0023B93A /* Beep.m4a */ = {isa = PBXFileReference; lastKnownFileType = file; path = Beep.m4a; sourceTree = "<group>"; };
 		5BBBB75E27AED54C0023B93A /* Fart.m4a */ = {isa = PBXFileReference; lastKnownFileType = file; path = Fart.m4a; sourceTree = "<group>"; };
@@ -251,12 +229,8 @@
 		5BEDB71E283B4AEA0078EB25 /* data-symbols.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; name = "data-symbols.json"; path = "Data/data-symbols.json"; sourceTree = "<group>"; };
 		5BEDB71F283B4AEA0078EB25 /* data-zhuyinwen.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; name = "data-zhuyinwen.json"; path = "Data/data-zhuyinwen.json"; sourceTree = "<group>"; };
 		5BEDB720283B4AEA0078EB25 /* data-cht.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; name = "data-cht.json"; path = "Data/data-cht.json"; sourceTree = "<group>"; };
-		5BF018F8299923BD00248CDD /* VwrPrefPaneBehavior.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VwrPrefPaneBehavior.swift; sourceTree = "<group>"; };
-		5BF018FA299923C000248CDD /* VwrPrefPaneOutput.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VwrPrefPaneOutput.swift; sourceTree = "<group>"; };
-		5BF018FC299923C100248CDD /* VwrPrefPaneCandidates.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VwrPrefPaneCandidates.swift; sourceTree = "<group>"; };
 		5BF255CD28B2694E003ECB60 /* vChewing-Bridging-Header.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "vChewing-Bridging-Header.h"; sourceTree = "<group>"; };
 		5BF4A44628E5820C002AF9C5 /* vChewingInstaller.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = vChewingInstaller.entitlements; sourceTree = "<group>"; };
-		5BF7548829B2F04F00FA50DA /* CtlPrefUI.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CtlPrefUI.swift; sourceTree = "<group>"; };
 		5BF9DA2228840E6200DBD48E /* template-usersymbolphrases.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; lineEnding = 0; path = "template-usersymbolphrases.txt"; sourceTree = "<group>"; usesTabs = 0; };
 		5BF9DA2328840E6200DBD48E /* template-exclusions.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; lineEnding = 0; path = "template-exclusions.txt"; sourceTree = "<group>"; usesTabs = 0; };
 		5BF9DA2428840E6200DBD48E /* template-associatedPhrases-chs.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; lineEnding = 0; name = "template-associatedPhrases-chs.txt"; path = "../Data/components/chs/template-associatedPhrases-chs.txt"; sourceTree = "<group>"; usesTabs = 0; };
@@ -408,15 +382,6 @@
 			path = Resources;
 			sourceTree = "<group>";
 		};
-		5B62A33927AE7C6700A19448 /* UIModules */ = {
-			isa = PBXGroup;
-			children = (
-				5BA9FD0927FED9F3002DE248 /* PrefUI */,
-				5BB1D7F32999027200EA8D2C /* PrefUITabs.swift */,
-			);
-			path = UIModules;
-			sourceTree = "<group>";
-		};
 		5B62A33A27AE7C7500A19448 /* WindowControllers */ = {
 			isa = PBXGroup;
 			children = (
@@ -458,25 +423,6 @@
 				5B2DB17127AF8771006D874E /* Makefile */,
 			);
 			name = Data;
-			sourceTree = "<group>";
-		};
-		5BA9FD0927FED9F3002DE248 /* PrefUI */ = {
-			isa = PBXGroup;
-			children = (
-				5BA9FD0C27FEDB6B002DE248 /* CtlPrefUIShared.swift */,
-				5BF7548829B2F04F00FA50DA /* CtlPrefUI.swift */,
-				5BA9FD0A27FEDB6B002DE248 /* VwrPrefPaneGeneral.swift */,
-				5BF018FC299923C100248CDD /* VwrPrefPaneCandidates.swift */,
-				5BF018F8299923BD00248CDD /* VwrPrefPaneBehavior.swift */,
-				5BF018FA299923C000248CDD /* VwrPrefPaneOutput.swift */,
-				5BA9FD0E27FEDB6B002DE248 /* VwrPrefPaneDictionary.swift */,
-				5B69938B293B811F0057CB8E /* VwrPrefPanePhrases.swift */,
-				5B2E009328FD1E8100E78D6E /* VwrPrefPaneCassette.swift */,
-				5BA9FD0B27FEDB6B002DE248 /* VwrPrefPaneKeyboard.swift */,
-				5B78EE0C28A562B4009456C1 /* VwrPrefPaneDevZone.swift */,
-				5B4C59AD2ABCB18700098626 /* VwrSettingsUI.swift */,
-			);
-			path = PrefUI;
 			sourceTree = "<group>";
 		};
 		5BBBB75C27AED54C0023B93A /* SoundFiles */ = {
@@ -608,7 +554,6 @@
 		6A0D4F1215FC0EB100ABF4B3 /* Modules */ = {
 			isa = PBXGroup;
 			children = (
-				5B62A33927AE7C6700A19448 /* UIModules */,
 				5B62A33A27AE7C7500A19448 /* WindowControllers */,
 				D427F76B278CA1BA004A2160 /* AppDelegateImpl.swift */,
 				D47B92BF27972AC800458394 /* main.swift */,
@@ -966,27 +911,14 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				5BF018FD299923C200248CDD /* VwrPrefPaneCandidates.swift in Sources */,
 				D427F76C278CA2B0004A2160 /* AppDelegateImpl.swift in Sources */,
 				5B62A33D27AE7CC100A19448 /* CtlAboutWindow.swift in Sources */,
 				D47B92C027972AD100458394 /* main.swift in Sources */,
 				5B0EF55F28CDBF8E00F8F7CE /* CtlClientListMgr.swift in Sources */,
-				5BA9FD1027FEDB6B002DE248 /* VwrPrefPaneKeyboard.swift in Sources */,
-				5B78EE0D28A562B4009456C1 /* VwrPrefPaneDevZone.swift in Sources */,
 				D47F7DCE278BFB57002F9DD7 /* CtlPrefWindow.swift in Sources */,
 				5B30BF282944867800BD87A9 /* CtlRevLookupWindow.swift in Sources */,
-				5BB1D7F42999027200EA8D2C /* PrefUITabs.swift in Sources */,
-				5B69938C293B811F0057CB8E /* VwrPrefPanePhrases.swift in Sources */,
 				5BCC631629407BBB00A2D84F /* CtlPrefWindow_PhraseEditor.swift in Sources */,
-				5BA9FD0F27FEDB6B002DE248 /* VwrPrefPaneGeneral.swift in Sources */,
-				5BA9FD1127FEDB6B002DE248 /* CtlPrefUIShared.swift in Sources */,
-				5BA9FD1327FEDB6B002DE248 /* VwrPrefPaneDictionary.swift in Sources */,
-				5BF7548929B2F04F00FA50DA /* CtlPrefUI.swift in Sources */,
-				5B4C59AE2ABCB18700098626 /* VwrSettingsUI.swift in Sources */,
-				5BF018F9299923BD00248CDD /* VwrPrefPaneBehavior.swift in Sources */,
 				5BB802DA27FABA8300CF1C19 /* SessionCtl_Menu.swift in Sources */,
-				5B2E009428FD1E8100E78D6E /* VwrPrefPaneCassette.swift in Sources */,
-				5BF018FB299923C000248CDD /* VwrPrefPaneOutput.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

@@ -6,7 +6,6 @@
 // marks, or product names of Contributor, except as required to fulfill notice
 // requirements defined in MIT License.
 
-import MainAssembly
 import SwiftUI
 
 @available(macOS 13, *)
@@ -47,6 +46,13 @@ public struct VwrSettingsUI: View {
       .frame(minWidth: 128, idealWidth: 128, maxWidth: 128)
       PrefUITabs.tabGeneral.suiView
     }
-    .frame(width: CtlPrefUI.formWidth + 140, height: CtlPrefUI.contentMaxHeight)
+    .frame(width: CtlSettingsUI.formWidth + 140, height: CtlSettingsUI.contentMaxHeight)
+  }
+}
+
+@available(macOS 13, *)
+struct VwrSettingsUI_Previews: PreviewProvider {
+  static var previews: some View {
+    VwrSettingsUI()
   }
 }

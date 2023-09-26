@@ -8,7 +8,6 @@
 
 import BookmarkManager
 import IMKUtils
-import MainAssembly
 import Shared
 import SwiftUI
 
@@ -17,17 +16,17 @@ private let kWindowTitleHeight: Double = 78
 // InputMethodServerPreferencesWindowControllerClass 非必需。
 
 @available(macOS 13, *)
-class CtlPrefUI: NSWindowController, NSWindowDelegate {
-  public static var shared: CtlPrefUI?
+public class CtlSettingsUI: NSWindowController, NSWindowDelegate {
+  public static var shared: CtlSettingsUI?
 
-  static func show() {
+  public static func show() {
     if shared == nil {
       let newWindow = NSWindow(
         contentRect: CGRect(x: 401, y: 295, width: 577, height: 568),
         styleMask: [.titled, .closable, .miniaturizable],
         backing: .buffered, defer: true
       )
-      let newInstance = CtlPrefUI(window: newWindow)
+      let newInstance = CtlSettingsUI(window: newWindow)
       shared = newInstance
     }
     guard let shared = shared, let sharedWindow = shared.window else { return }
@@ -44,7 +43,7 @@ class CtlPrefUI: NSWindowController, NSWindowDelegate {
 
   private var currentLanguageSelectItem: NSMenuItem?
 
-  override func windowDidLoad() {
+  override public func windowDidLoad() {
     super.windowDidLoad()
     window?.setPosition(vertical: .top, horizontal: .right, padding: 20)
     window?.contentView = NSHostingView(
@@ -70,24 +69,24 @@ class CtlPrefUI: NSWindowController, NSWindowDelegate {
 // MARK: - NSToolbarDelegate.
 
 @available(macOS 13, *)
-extension CtlPrefUI: NSToolbarDelegate {
-  var toolbarIdentifiers: [NSToolbarItem.Identifier] {
+extension CtlSettingsUI: NSToolbarDelegate {
+  public var toolbarIdentifiers: [NSToolbarItem.Identifier] {
     [.init("Collapse or Expand Sidebar")]
   }
 
-  func toolbarDefaultItemIdentifiers(_: NSToolbar) -> [NSToolbarItem.Identifier] {
+  public func toolbarDefaultItemIdentifiers(_: NSToolbar) -> [NSToolbarItem.Identifier] {
     toolbarIdentifiers
   }
 
-  func toolbarAllowedItemIdentifiers(_: NSToolbar) -> [NSToolbarItem.Identifier] {
+  public func toolbarAllowedItemIdentifiers(_: NSToolbar) -> [NSToolbarItem.Identifier] {
     toolbarIdentifiers
   }
 
-  func toolbarSelectableItemIdentifiers(_: NSToolbar) -> [NSToolbarItem.Identifier] {
+  public func toolbarSelectableItemIdentifiers(_: NSToolbar) -> [NSToolbarItem.Identifier] {
     []
   }
 
-  func toolbar(
+  public func toolbar(
     _: NSToolbar, itemForItemIdentifier itemIdentifier: NSToolbarItem.Identifier,
     willBeInsertedIntoToolbar _: Bool
   ) -> NSToolbarItem? {
@@ -104,7 +103,7 @@ extension CtlPrefUI: NSToolbarDelegate {
 // MARK: - Shared Static Variables and Constants
 
 @available(macOS 13, *)
-extension CtlPrefUI {
+public extension CtlSettingsUI {
   static let sentenceSeparator: String = {
     switch PrefMgr.shared.appleLanguages[0] {
     case "ja":
@@ -135,5 +134,23 @@ extension CtlPrefUI {
 
   static var isCJKInterface: Bool {
     PrefMgr.shared.appleLanguages[0].contains("zh-Han") || PrefMgr.shared.appleLanguages[0] == "ja"
+  }
+}
+
+@available(macOS 10.15, *)
+public extension View {
+  func settingsDescription(maxWidth: CGFloat? = .infinity) -> some View {
+    controlSize(.small)
+      .frame(maxWidth: maxWidth, alignment: .leading)
+      // TODO: Use `.foregroundStyle` when targeting macOS 12.
+      .foregroundColor(.secondary)
+  }
+}
+
+@available(macOS 10.15, *)
+public extension View {
+  func formStyled() -> some View {
+    if #available(macOS 13, *) { return self.formStyle(.grouped) }
+    return padding()
   }
 }

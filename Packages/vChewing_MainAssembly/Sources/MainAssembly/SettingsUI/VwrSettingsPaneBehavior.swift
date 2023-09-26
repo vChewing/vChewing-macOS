@@ -6,13 +6,12 @@
 // marks, or product names of Contributor, except as required to fulfill notice
 // requirements defined in MIT License.
 
-import MainAssembly
 import Shared
 import SwiftExtension
 import SwiftUI
 
 @available(macOS 13, *)
-struct VwrPrefPaneBehavior: View {
+public struct VwrSettingsPaneBehavior: View {
   // MARK: - AppStorage Variables
 
   @AppStorage(wrappedValue: true, UserDef.kChooseCandidateUsingSpace.rawValue)
@@ -64,7 +63,7 @@ struct VwrPrefPaneBehavior: View {
 
   // MARK: - Main View
 
-  var body: some View {
+  public var body: some View {
     ScrollView {
       Form {
         Section {
@@ -211,7 +210,7 @@ struct VwrPrefPaneBehavior: View {
             )
             Spacer()
             Text(
-              "This feature requires macOS 10.15 and above.".localized + CtlPrefUI.sentenceSeparator
+              "This feature requires macOS 10.15 and above.".localized + CtlSettingsUI.sentenceSeparator
                 + "This feature only needs to parse consecutive NSEvents passed by macOS built-in InputMethodKit framework, hence no necessity of asking end-users for extra privileges of monitoring global keyboard inputs. You are free to investigate our codebase or reverse-engineer this input method to see whether the above statement is trustable.".localized
             )
             .settingsDescription()
@@ -245,15 +244,15 @@ struct VwrPrefPaneBehavior: View {
             .settingsDescription()
           }
         }
-      }.formStyled().frame(minWidth: CtlPrefUI.formWidth, maxWidth: ceil(CtlPrefUI.formWidth * 1.2))
+      }.formStyled().frame(minWidth: CtlSettingsUI.formWidth, maxWidth: ceil(CtlSettingsUI.formWidth * 1.2))
     }
-    .frame(maxHeight: CtlPrefUI.contentMaxHeight)
+    .frame(maxHeight: CtlSettingsUI.contentMaxHeight)
   }
 }
 
 @available(macOS 13, *)
-struct VwrPrefPaneBehavior_Previews: PreviewProvider {
+struct VwrSettingsPaneBehavior_Previews: PreviewProvider {
   static var previews: some View {
-    VwrPrefPaneBehavior()
+    VwrSettingsPaneBehavior()
   }
 }
