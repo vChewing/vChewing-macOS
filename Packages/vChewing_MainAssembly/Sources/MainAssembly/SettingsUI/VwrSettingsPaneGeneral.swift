@@ -6,16 +6,15 @@
 // marks, or product names of Contributor, except as required to fulfill notice
 // requirements defined in MIT License.
 
-import MainAssembly
 import Shared
 import SwiftExtension
 import SwiftUI
 
 @available(macOS 13, *)
-struct VwrPrefPaneGeneral: View {
+public struct VwrSettingsPaneGeneral: View {
   @Binding var appleLanguageTag: String
 
-  init() {
+  public init() {
     _appleLanguageTag = .init(
       get: {
         let loadedValue = (UserDefaults.standard.array(forKey: UserDef.kAppleLanguages.rawValue) as? [String] ?? ["auto"]).joined()
@@ -64,7 +63,7 @@ struct VwrPrefPaneGeneral: View {
 
   // MARK: - Main View
 
-  var body: some View {
+  public var body: some View {
     ScrollView {
       Form {
         VStack(alignment: .leading) {
@@ -137,7 +136,7 @@ struct VwrPrefPaneGeneral: View {
                   button.hasDestructiveAction = true
                 }
                 alert.addButton(withTitle: NSLocalizedString("Leave it checked", comment: ""))
-                if let window = CtlPrefUI.shared?.window, !shouldNotFartInLieuOfBeep {
+                if let window = CtlSettingsUI.shared?.window, !shouldNotFartInLieuOfBeep {
                   shouldNotFartInLieuOfBeep = true
                   alert.beginSheetModal(for: window) { result in
                     switch result {
@@ -169,15 +168,15 @@ struct VwrPrefPaneGeneral: View {
             isOn: $isDebugModeEnabled
           )
         }
-      }.formStyled().frame(minWidth: CtlPrefUI.formWidth, maxWidth: ceil(CtlPrefUI.formWidth * 1.2))
+      }.formStyled().frame(minWidth: CtlSettingsUI.formWidth, maxWidth: ceil(CtlSettingsUI.formWidth * 1.2))
     }
-    .frame(maxHeight: CtlPrefUI.contentMaxHeight)
+    .frame(maxHeight: CtlSettingsUI.contentMaxHeight)
   }
 }
 
 @available(macOS 13, *)
-struct VwrPrefPaneGeneral_Previews: PreviewProvider {
+struct VwrSettingsPaneGeneral_Previews: PreviewProvider {
   static var previews: some View {
-    VwrPrefPaneGeneral()
+    VwrSettingsPaneGeneral()
   }
 }

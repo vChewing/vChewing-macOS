@@ -7,11 +7,11 @@
 // requirements defined in MIT License.
 
 import AppKit
-import MainAssembly
 import Shared
+import SwiftUI
 
-enum PrefUITabs: String, CaseIterable, Identifiable, Hashable {
-  var id: ObjectIdentifier { .init(rawValue as NSString) }
+public enum PrefUITabs: String, CaseIterable, Identifiable, Hashable {
+  public var id: ObjectIdentifier { .init(rawValue as NSString) }
   case tabGeneral = "General"
   case tabCandidates = "Candidates"
   case tabBehavior = "Behavior"
@@ -23,7 +23,7 @@ enum PrefUITabs: String, CaseIterable, Identifiable, Hashable {
   case tabDevZone = "DevZone"
 }
 
-extension PrefUITabs {
+public extension PrefUITabs {
   private static let i18nTable: [String: (Hans: String, Hant: String, Ja: String)] = [
     "General": (Hans: "一般设定", Hant: "一般設定", Ja: "一般設定"),
     "Candidates": (Hans: "选字设定", Hant: "選字設定", Ja: "候補設定"),
@@ -62,6 +62,22 @@ extension PrefUITabs {
     case 80: return .tabKeyboard
     case 90: return .tabDevZone
     default: return nil
+    }
+  }
+
+  @available(macOS 13, *)
+  @ViewBuilder
+  var suiView: some View {
+    switch self {
+    case .tabGeneral: VwrSettingsPaneGeneral()
+    case .tabCandidates: VwrSettingsPaneCandidates()
+    case .tabBehavior: VwrSettingsPaneBehavior()
+    case .tabOutput: VwrSettingsPaneOutput()
+    case .tabDictionary: VwrSettingsPaneDictionary()
+    case .tabPhrases: VwrSettingsPanePhrases()
+    case .tabCassette: VwrSettingsPaneCassette()
+    case .tabKeyboard: VwrSettingsPaneKeyboard()
+    case .tabDevZone: VwrSettingsPaneDevZone()
     }
   }
 

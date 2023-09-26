@@ -222,7 +222,7 @@ public extension SessionCtl {
     osCheck: if #available(macOS 13, *) {
       switch NSEvent.keyModifierFlags {
       case .option: break osCheck
-      default: CtlPrefUI.show()
+      default: CtlSettingsUI.show()
       }
       NSApp.popup()
       return
