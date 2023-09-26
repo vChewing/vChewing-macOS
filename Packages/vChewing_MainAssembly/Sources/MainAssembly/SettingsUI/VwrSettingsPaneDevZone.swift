@@ -11,7 +11,7 @@ import SwiftExtension
 import SwiftUI
 
 @available(macOS 13, *)
-struct VwrPrefPaneDevZone: View {
+public struct VwrSettingsPaneDevZone: View {
   // MARK: - AppStorage Variables
 
   @AppStorage(
@@ -28,7 +28,7 @@ struct VwrPrefPaneDevZone: View {
 
   // MARK: - Main View
 
-  var body: some View {
+  public var body: some View {
     ScrollView {
       Form {
         Section(header: Text(
@@ -55,15 +55,15 @@ struct VwrPrefPaneDevZone: View {
             .settingsDescription()
           }
         }
-      }.formStyled().frame(minWidth: CtlPrefUI.formWidth, maxWidth: ceil(CtlPrefUI.formWidth * 1.2))
+      }.formStyled().frame(minWidth: CtlSettingsUI.formWidth, maxWidth: ceil(CtlSettingsUI.formWidth * 1.2))
     }
-    .frame(maxHeight: CtlPrefUI.contentMaxHeight)
+    .frame(maxHeight: CtlSettingsUI.contentMaxHeight)
   }
 }
 
 @available(macOS 13, *)
-struct VwrPrefPaneDevZone_Previews: PreviewProvider {
+struct VwrSettingsPaneDevZone_Previews: PreviewProvider {
   static var previews: some View {
-    VwrPrefPaneDevZone()
+    VwrSettingsPaneDevZone()
   }
 }
