@@ -1,5 +1,5 @@
 "vChewing Input Method" = "威注音输入法";
-"Upgrade" = "接受并升级";
+"i18n:installer.DO_APP_UPGRADE" = "接受并升级";
 "Cancel" = "取消";
 "Cannot activate the input method." = "无法启用输入法。";
 "Cannot copy the file to the destination." = "无法将输入法拷贝至目的地。";
@@ -17,3 +17,14 @@
 "Warning" = "安装不完整";
 "Input method may not be fully enabled. Please enable it through System Preferences > Keyboard > Input Sources." = "输入法已经安装好，但可能没有完全启用。请从「系统偏好设定」 > 「键盘」 > 「输入方式」分页加入输入法。";
 "Continue" = "继续";
+"i18n:installer.DISCLAIMER_TEXT" = "免责声明：威注音专案对小麦注音官方专案内赠的小麦注音原版词库内容不负任何责任。威注音输入法专用的威注音官方词库不包含任何「会在法理上妨碍威注音在全球传播」的「与地缘政治及政治意识形态有关的」内容。威注音专案与 OpenVanilla 专案之间无合作关系、无隶属关系。";
+"i18n:installer.INSTALLER_APP_TITLE" = "威注音安装程式";
+"i18n:installer.INSTALLER_APP_TITLE_FULL" = "威注音输入法安装程式";
+"i18n:installer.ACCEPT_INSTALLATION" = "我接受";
+"i18n:installer.CANCEL_INSTALLATION" = "取消安装";
+"i18n:installer.LICENSE_TITLE" = "麻理去商标授权合约 (MIT-NTL License):";
+"i18n:installer.APP_NAME" = "vChewing for macOS";
+"i18n:installer.APP_DERIVED_FROM" = "该专案曾由 OpenVanilla 小麦注音专案 (MIT-License) 衍生而来。";
+"i18n:installer.DEV_CREW" = "威注音 macOS 程式研发：Shiki Suen, Isaac Xen, Hiraku Wang, 等。\n威注音词库维护：Shiki Suen。\n爬轨算法：Lukhnos Liu (Gramambular 2, MIT-License)。";
+"i18n:installer.EULA_PROMPT_NOTICE" = "若要安装该软件，请接受上述条款。";
+"i18n:installer.STOPPING_THE_OLD_VERSION" = "等待旧版完全停用，大约需要一分钟…";

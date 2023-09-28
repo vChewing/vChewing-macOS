@@ -1,5 +1,3 @@
-// (c) 2011 and onwards The OpenVanilla Project (MIT License).
-// All possible vChewing-specific modifications are of:
 // (c) 2021 and onwards The vChewing Project (MIT-NTL License).
 // ====================
 // This code is released under the MIT license (SPDX-License-Identifier: MIT)
@@ -9,22 +7,12 @@
 // requirements defined in MIT License.
 
 import AppKit
+import IMKUtils
 import InputMethodKit
 
-extension AppDelegate {
+public extension MainView {
   func removeThenInstallInputMethod() {
-    // if !FileManager.default.fileExists(atPath: kTargetPartialPath) {
-    //   installInputMethod(
-    //     previousExists: false, previousVersionNotFullyDeactivatedWarning: false
-    //   )
-    //   return
-    // }
-
-    guard let window = window else { return }
-
-    let shouldWaitForTranslocationRemoval =
-      Reloc.isAppBundleTranslocated(atPath: kTargetPartialPath)
-        && window.responds(to: #selector(NSWindow.beginSheet(_:completionHandler:)))
+    let shouldWaitForTranslocationRemoval = Reloc.isAppBundleTranslocated(atPath: kTargetPartialPath)
 
     // 將既存輸入法扔到垃圾桶內
     do {
@@ -58,28 +46,7 @@ extension AppDelegate {
     killTask2.waitUntilExit()
 
     if shouldWaitForTranslocationRemoval {
-      progressIndicator.startAnimation(self)
-      window.beginSheet(progressSheet) { returnCode in
-        DispatchQueue.main.async {
-          if returnCode == .continue {
-            self.installInputMethod(
-              previousExists: true,
-              previousVersionNotFullyDeactivatedWarning: false
-            )
-          } else {
-            self.installInputMethod(
-              previousExists: true,
-              previousVersionNotFullyDeactivatedWarning: true
-            )
-          }
-        }
-      }
-
-      translocationRemovalStartTime = Date()
-      Timer.scheduledTimer(
-        timeInterval: kTranslocationRemovalTickInterval, target: self,
-        selector: #selector(timerTick(_:)), userInfo: nil, repeats: true
-      )
+      pendingSheetPresenting = true
     } else {
       installInputMethod(
         previousExists: false, previousVersionNotFullyDeactivatedWarning: false
@@ -105,20 +72,16 @@ extension AppDelegate {
     cpTask.waitUntilExit()
 
     if cpTask.terminationStatus != 0 {
-      runAlertPanel(
-        title: NSLocalizedString("Install Failed", comment: ""),
-        message: NSLocalizedString("Cannot copy the file to the destination.", comment: ""),
-        buttonTitle: NSLocalizedString("Cancel", comment: "")
-      )
-      endAppWithDelay()
+      isShowingAlertForFailedInstallation = true
+      NSApp.terminateWithDelay()
     }
 
-    _ = try? shell("/usr/bin/xattr -drs com.apple.quarantine \(kTargetPartialPath)")
+    _ = try? NSApp.shell("/usr/bin/xattr -drs com.apple.quarantine \(kTargetPartialPath)")
 
     guard let theBundle = Bundle(url: imeURLInstalled),
           let imeIdentifier = theBundle.bundleIdentifier
     else {
-      endAppWithDelay()
+      NSApp.terminateWithDelay()
       return
     }
 
@@ -128,18 +91,8 @@ extension AppDelegate {
       NSLog("Registering input source \(imeIdentifier) at \(imeBundleURL.absoluteString).")
       let status = (TISRegisterInputSource(imeBundleURL as CFURL) == noErr)
       if !status {
-        let message = String(
-          format: NSLocalizedString(
-            "Cannot find input source %@ after registration.", comment: ""
-          ),
-          imeIdentifier
-        )
-        runAlertPanel(
-          title: NSLocalizedString("Fatal Error", comment: ""), message: message,
-          buttonTitle: NSLocalizedString("Abort", comment: "")
-        )
-        endAppWithDelay()
-        return
+        isShowingAlertForMissingPostInstall = true
+        NSApp.terminateWithDelay()
       }
 
       if allRegisteredInstancesOfThisInputMethod.isEmpty {
@@ -172,35 +125,14 @@ extension AppDelegate {
     }
 
     // Alert Panel
-    let ntfPostInstall = NSAlert()
     if warning {
-      ntfPostInstall.messageText = NSLocalizedString("Attention", comment: "")
-      ntfPostInstall.informativeText = NSLocalizedString(
-        "vChewing is upgraded, but please log out or reboot for the new version to be fully functional.",
-        comment: ""
-      )
-      ntfPostInstall.addButton(withTitle: NSLocalizedString("OK", comment: ""))
+      currentAlertContent = .postInstallAttention
+    } else if !mainInputSourceEnabled {
+      currentAlertContent = .postInstallWarning
     } else {
-      if !mainInputSourceEnabled {
-        ntfPostInstall.messageText = NSLocalizedString("Warning", comment: "")
-        ntfPostInstall.informativeText = NSLocalizedString(
-          "Input method may not be fully enabled. Please enable it through System Preferences > Keyboard > Input Sources.",
-          comment: ""
-        )
-        ntfPostInstall.addButton(withTitle: NSLocalizedString("Continue", comment: ""))
-      } else {
-        ntfPostInstall.messageText = NSLocalizedString(
-          "Installation Successful", comment: ""
-        )
-        ntfPostInstall.informativeText = NSLocalizedString(
-          "vChewing is ready to use. \n\nPlease relogin if this is the first time you install it in this user account.",
-          comment: ""
-        )
-        ntfPostInstall.addButton(withTitle: NSLocalizedString("OK", comment: ""))
-      }
+      currentAlertContent = .postInstallOK
     }
-    ntfPostInstall.beginSheetModal(for: window!) { _ in
-      self.endAppWithDelay()
-    }
+    isShowingPostInstallNotification = true
+    NSApp.terminateWithDelay()
   }
 }
