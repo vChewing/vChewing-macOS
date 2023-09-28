@@ -38,8 +38,6 @@
 		5B963C9D28D5BFB800DCEE88 /* CocoaExtension in Frameworks */ = {isa = PBXBuildFile; productRef = 5B963C9C28D5BFB800DCEE88 /* CocoaExtension */; };
 		5B963CA328D5C23600DCEE88 /* SwiftExtension in Frameworks */ = {isa = PBXBuildFile; productRef = 5B963CA228D5C23600DCEE88 /* SwiftExtension */; };
 		5B98114828D6198700CBC605 /* PinyinPhonaConverter in Frameworks */ = {isa = PBXBuildFile; productRef = 5B98114728D6198700CBC605 /* PinyinPhonaConverter */; };
-		5B9A62D9295BEA3400F79F3C /* SwiftExtension in Frameworks */ = {isa = PBXBuildFile; productRef = 5B9A62D8295BEA3400F79F3C /* SwiftExtension */; };
-		5B9A62DB295BEA4500F79F3C /* CocoaExtension in Frameworks */ = {isa = PBXBuildFile; productRef = 5B9A62DA295BEA4500F79F3C /* CocoaExtension */; };
 		5BA8C30328DF0360004C5CC4 /* CandidateWindow in Frameworks */ = {isa = PBXBuildFile; productRef = 5BA8C30228DF0360004C5CC4 /* CandidateWindow */; };
 		5BAD0CD527D701F6003D127F /* vChewingKeyLayout.bundle in Resources */ = {isa = PBXBuildFile; fileRef = 5B30F11227BA568800484E24 /* vChewingKeyLayout.bundle */; };
 		5BB802DA27FABA8300CF1C19 /* SessionCtl_Menu.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5BB802D927FABA8300CF1C19 /* SessionCtl_Menu.swift */; };
@@ -51,7 +49,6 @@
 		5BBC2DA028F51C0400C986F6 /* LICENSE-JPN.txt in Resources */ = {isa = PBXBuildFile; fileRef = 5B18BA7327C7BD8C0056EB19 /* LICENSE-JPN.txt */; };
 		5BBC2DA128F51C0400C986F6 /* LICENSE-CHS.txt in Resources */ = {isa = PBXBuildFile; fileRef = 5B18BA6F27C7BD8B0056EB19 /* LICENSE-CHS.txt */; };
 		5BBC2DA328F5212100C986F6 /* RelocationDetector.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5BBC2DA228F5212100C986F6 /* RelocationDetector.swift */; };
-		5BBC2DA528F521C200C986F6 /* AppDelegate_Extension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5BBC2DA428F521C200C986F6 /* AppDelegate_Extension.swift */; };
 		5BC2652227E04B7E00700291 /* uninstall.sh in Resources */ = {isa = PBXBuildFile; fileRef = 5BC2652127E04B7B00700291 /* uninstall.sh */; };
 		5BC5E01E28DDE4770094E427 /* NotifierUI in Frameworks */ = {isa = PBXBuildFile; productRef = 5BC5E01D28DDE4770094E427 /* NotifierUI */; };
 		5BC5E02128DDEFE00094E427 /* TooltipUI in Frameworks */ = {isa = PBXBuildFile; productRef = 5BC5E02028DDEFE00094E427 /* TooltipUI */; };
@@ -64,6 +61,10 @@
 		5BDB7A4128D4824A001AC277 /* Megrez in Frameworks */ = {isa = PBXBuildFile; productRef = 5BDB7A4028D4824A001AC277 /* Megrez */; };
 		5BDB7A4528D4824A001AC277 /* ShiftKeyUpChecker in Frameworks */ = {isa = PBXBuildFile; productRef = 5BDB7A4428D4824A001AC277 /* ShiftKeyUpChecker */; };
 		5BDB7A4728D4824A001AC277 /* Tekkon in Frameworks */ = {isa = PBXBuildFile; productRef = 5BDB7A4628D4824A001AC277 /* Tekkon */; };
+		5BE63A2D2AC5B8A6009AFC0C /* InstallerShared.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5BE63A2C2AC5B882009AFC0C /* InstallerShared.swift */; };
+		5BE63A2E2AC5B8A8009AFC0C /* MainView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5BE63A2B2AC5B7D3009AFC0C /* MainView.swift */; };
+		5BE63A2F2AC5B8A9009AFC0C /* vChewingInstallerApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5BE63A2A2AC5B7C3009AFC0C /* vChewingInstallerApp.swift */; };
+		5BE63A332AC5F4F8009AFC0C /* MainViewImpl.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5BE63A322AC5F4F8009AFC0C /* MainViewImpl.swift */; };
 		5BEDB721283B4C250078EB25 /* data-cns.json in Resources */ = {isa = PBXBuildFile; fileRef = 5BEDB71D283B4AEA0078EB25 /* data-cns.json */; };
 		5BEDB722283B4C250078EB25 /* data-zhuyinwen.json in Resources */ = {isa = PBXBuildFile; fileRef = 5BEDB71F283B4AEA0078EB25 /* data-zhuyinwen.json */; };
 		5BEDB723283B4C250078EB25 /* data-cht.json in Resources */ = {isa = PBXBuildFile; fileRef = 5BEDB720283B4AEA0078EB25 /* data-cht.json */; };
@@ -85,14 +86,12 @@
 		6A2E40F9253A6AA000D1AE1D /* Images.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 6A2E40F5253A69DA00D1AE1D /* Images.xcassets */; };
 		6ACA41FA15FC1D9000935EF6 /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = 6ACA41EA15FC1D9000935EF6 /* InfoPlist.strings */; };
 		6ACA41FC15FC1D9000935EF6 /* Localizable.strings in Resources */ = {isa = PBXBuildFile; fileRef = 6ACA41EE15FC1D9000935EF6 /* Localizable.strings */; };
-		6ACA41FD15FC1D9000935EF6 /* MainMenu.xib in Resources */ = {isa = PBXBuildFile; fileRef = 6ACA41F015FC1D9000935EF6 /* MainMenu.xib */; };
 		6ACA420215FC1E5200935EF6 /* vChewing.app in Resources */ = {isa = PBXBuildFile; fileRef = 6A0D4EA215FC0D2D00ABF4B3 /* vChewing.app */; };
 		D427F76C278CA2B0004A2160 /* AppDelegateImpl.swift in Sources */ = {isa = PBXBuildFile; fileRef = D427F76B278CA1BA004A2160 /* AppDelegateImpl.swift */; };
 		D47B92C027972AD100458394 /* main.swift in Sources */ = {isa = PBXBuildFile; fileRef = D47B92BF27972AC800458394 /* main.swift */; };
 		D47F7DCE278BFB57002F9DD7 /* CtlPrefWindow.swift in Sources */ = {isa = PBXBuildFile; fileRef = D47F7DCD278BFB57002F9DD7 /* CtlPrefWindow.swift */; };
 		D4E33D8A27A838CF006DB1CF /* Localizable.strings in Resources */ = {isa = PBXBuildFile; fileRef = D4E33D8827A838CF006DB1CF /* Localizable.strings */; };
 		D4E33D8F27A838F0006DB1CF /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = D4E33D8D27A838F0006DB1CF /* InfoPlist.strings */; };
-		D4F0BBE1279AF8B30071253C /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = D4F0BBE0279AF8B30071253C /* AppDelegate.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -128,14 +127,12 @@
 /* Begin PBXFileReference section */
 		5B04305327B529D800CB65BC /* zh-Hans */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "zh-Hans"; path = "zh-Hans.lproj/InfoPlist.strings"; sourceTree = "<group>"; };
 		5B04305427B529D800CB65BC /* zh-Hans */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "zh-Hans"; path = "zh-Hans.lproj/Localizable.strings"; sourceTree = "<group>"; };
-		5B04305527B529D800CB65BC /* zh-Hans */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "zh-Hans"; path = "zh-Hans.lproj/MainMenu.strings"; sourceTree = "<group>"; };
 		5B04305627B529D800CB65BC /* zh-Hans */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "zh-Hans"; path = "zh-Hans.lproj/InfoPlist.strings"; sourceTree = "<group>"; };
 		5B04305727B529D800CB65BC /* zh-Hans */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "zh-Hans"; path = "zh-Hans.lproj/Localizable.strings"; sourceTree = "<group>"; };
 		5B04305827B529D800CB65BC /* zh-Hans */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "zh-Hans"; path = "zh-Hans.lproj/frmAboutWindow.strings"; sourceTree = "<group>"; };
 		5B04305927B529D800CB65BC /* zh-Hans */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "zh-Hans"; path = ja.lproj/frmPrefWindow.strings; sourceTree = "<group>"; };
 		5B04305E27B5312E00CB65BC /* ja */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = ja; path = ja.lproj/InfoPlist.strings; sourceTree = "<group>"; };
 		5B04305F27B5312E00CB65BC /* ja */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = ja; path = ja.lproj/Localizable.strings; sourceTree = "<group>"; };
-		5B04306027B5312E00CB65BC /* ja */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = ja; path = ja.lproj/MainMenu.strings; sourceTree = "<group>"; };
 		5B04306127B5312E00CB65BC /* ja */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = ja; path = ja.lproj/InfoPlist.strings; sourceTree = "<group>"; };
 		5B04306227B5312E00CB65BC /* ja */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = ja; path = ja.lproj/Localizable.strings; sourceTree = "<group>"; };
 		5B04306327B5312E00CB65BC /* ja */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = ja; path = ja.lproj/frmAboutWindow.strings; sourceTree = "<group>"; };
@@ -196,9 +193,7 @@
 		5BBBB75D27AED54C0023B93A /* Beep.m4a */ = {isa = PBXFileReference; lastKnownFileType = file; path = Beep.m4a; sourceTree = "<group>"; };
 		5BBBB75E27AED54C0023B93A /* Fart.m4a */ = {isa = PBXFileReference; lastKnownFileType = file; path = Fart.m4a; sourceTree = "<group>"; };
 		5BBBB76A27AED5DB0023B93A /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = Base; path = Base.lproj/frmAboutWindow.xib; sourceTree = "<group>"; };
-		5BBBB77727AEDB290023B93A /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/MainMenu.strings; sourceTree = "<group>"; };
 		5BBC2DA228F5212100C986F6 /* RelocationDetector.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RelocationDetector.swift; sourceTree = "<group>"; };
-		5BBC2DA428F521C200C986F6 /* AppDelegate_Extension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate_Extension.swift; sourceTree = "<group>"; };
 		5BBD627827B6C4D900271480 /* Update-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = "Update-Info.plist"; sourceTree = "<group>"; };
 		5BC0AAC927F58472002D33E9 /* pkgPreInstall.sh */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.script.sh; path = pkgPreInstall.sh; sourceTree = "<group>"; };
 		5BC0AACA27F58472002D33E9 /* pkgPostInstall.sh */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.script.sh; path = pkgPostInstall.sh; sourceTree = "<group>"; };
@@ -216,13 +211,16 @@
 		5BDB7A3428D47587001AC277 /* Qwertyyb_ShiftKeyUpChecker */ = {isa = PBXFileReference; lastKnownFileType = wrapper; name = Qwertyyb_ShiftKeyUpChecker; path = Packages/Qwertyyb_ShiftKeyUpChecker; sourceTree = "<group>"; };
 		5BDB7A3528D47587001AC277 /* RMJay_LineReader */ = {isa = PBXFileReference; lastKnownFileType = wrapper; name = RMJay_LineReader; path = Packages/RMJay_LineReader; sourceTree = "<group>"; };
 		5BDB7A3628D47587001AC277 /* vChewing_Tekkon */ = {isa = PBXFileReference; lastKnownFileType = wrapper; name = vChewing_Tekkon; path = Packages/vChewing_Tekkon; sourceTree = "<group>"; };
-		5BDCBB4227B4F6C600D0CC59 /* zh-Hant */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "zh-Hant"; path = "zh-Hant.lproj/MainMenu.strings"; sourceTree = "<group>"; };
 		5BDCBB4327B4F6C600D0CC59 /* zh-Hant */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "zh-Hant"; path = "zh-Hant.lproj/frmAboutWindow.strings"; sourceTree = "<group>"; };
 		5BDCBB4527B4F6C600D0CC59 /* zh-Hant */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "zh-Hant"; path = "zh-Hant.lproj/frmPrefWindow.strings"; sourceTree = "<group>"; };
 		5BDCBB4727B4F6C600D0CC59 /* zh-Hant */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "zh-Hant"; path = "zh-Hant.lproj/InfoPlist.strings"; sourceTree = "<group>"; };
 		5BDCBB4827B4F6C600D0CC59 /* zh-Hant */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "zh-Hant"; path = "zh-Hant.lproj/Localizable.strings"; sourceTree = "<group>"; };
 		5BDCBB4927B4F6C700D0CC59 /* zh-Hant */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "zh-Hant"; path = "zh-Hant.lproj/InfoPlist.strings"; sourceTree = "<group>"; };
 		5BDCBB4A27B4F6C700D0CC59 /* zh-Hant */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "zh-Hant"; path = "zh-Hant.lproj/Localizable.strings"; sourceTree = "<group>"; };
+		5BE63A2A2AC5B7C3009AFC0C /* vChewingInstallerApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = vChewingInstallerApp.swift; sourceTree = "<group>"; };
+		5BE63A2B2AC5B7D3009AFC0C /* MainView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MainView.swift; sourceTree = "<group>"; };
+		5BE63A2C2AC5B882009AFC0C /* InstallerShared.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InstallerShared.swift; sourceTree = "<group>"; };
+		5BE63A322AC5F4F8009AFC0C /* MainViewImpl.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MainViewImpl.swift; sourceTree = "<group>"; };
 		5BE8A8C4281EE65300197741 /* CONTRIBUTING.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = CONTRIBUTING.md; sourceTree = "<group>"; };
 		5BEDB71C283B4AEA0078EB25 /* data-chs.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; name = "data-chs.json"; path = "Data/data-chs.json"; sourceTree = "<group>"; };
 		5BEDB71D283B4AEA0078EB25 /* data-cns.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; name = "data-cns.json"; path = "Data/data-cns.json"; sourceTree = "<group>"; };
@@ -243,7 +241,6 @@
 		5BFC63CD28D4AC98004A77B7 /* vChewing_LangModelAssembly */ = {isa = PBXFileReference; lastKnownFileType = wrapper; name = vChewing_LangModelAssembly; path = Packages/vChewing_LangModelAssembly; sourceTree = "<group>"; };
 		6A0D4EA215FC0D2D00ABF4B3 /* vChewing.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = vChewing.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		6A0D4EF515FC0DA600ABF4B3 /* IME-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = "IME-Info.plist"; sourceTree = "<group>"; };
-		6A15B32421A51F2300B92CD3 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = Base; path = Base.lproj/MainMenu.xib; sourceTree = "<group>"; };
 		6A15B32521A51F2300B92CD3 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = Base; path = Base.lproj/MainMenu.xib; sourceTree = "<group>"; };
 		6A2E40F5253A69DA00D1AE1D /* Images.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Images.xcassets; sourceTree = "<group>"; };
 		6ACA41CB15FC1D7500935EF6 /* vChewingInstaller.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = vChewingInstaller.app; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -255,7 +252,6 @@
 		D47F7DCD278BFB57002F9DD7 /* CtlPrefWindow.swift */ = {isa = PBXFileReference; explicitFileType = sourcecode.swift; fileEncoding = 4; indentWidth = 2; lineEnding = 0; path = CtlPrefWindow.swift; sourceTree = "<group>"; tabWidth = 2; usesTabs = 0; };
 		D4E33D8927A838CF006DB1CF /* Base */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = Base; path = Base.lproj/Localizable.strings; sourceTree = "<group>"; };
 		D4E33D8E27A838F0006DB1CF /* Base */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = Base; path = Base.lproj/InfoPlist.strings; sourceTree = "<group>"; };
-		D4F0BBE0279AF8B30071253C /* AppDelegate.swift */ = {isa = PBXFileReference; explicitFileType = sourcecode.swift; fileEncoding = 4; indentWidth = 2; lineEnding = 0; path = AppDelegate.swift; sourceTree = "<group>"; tabWidth = 2; usesTabs = 0; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -299,8 +295,6 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				5B9A62D9295BEA3400F79F3C /* SwiftExtension in Frameworks */,
-				5B9A62DB295BEA4500F79F3C /* CocoaExtension in Frameworks */,
 				5BFC63D128D4B9F7004A77B7 /* IMKUtils in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -352,13 +346,6 @@
 				5BC447A228656A1900EDC323 /* Placeholder.swift */,
 			);
 			path = vChewingTests;
-			sourceTree = "<group>";
-		};
-		5B44B97C28D2F283004508BF /* PKGRoot */ = {
-			isa = PBXGroup;
-			children = (
-			);
-			path = PKGRoot;
 			sourceTree = "<group>";
 		};
 		5B62A33027AE78E500A19448 /* Resources */ = {
@@ -451,7 +438,6 @@
 			children = (
 				6ACA41EA15FC1D9000935EF6 /* InfoPlist.strings */,
 				6ACA41EE15FC1D9000935EF6 /* Localizable.strings */,
-				6ACA41F015FC1D9000935EF6 /* MainMenu.xib */,
 			);
 			path = Resources;
 			sourceTree = "<group>";
@@ -565,11 +551,12 @@
 		6ACA41E715FC1D9000935EF6 /* Installer */ = {
 			isa = PBXGroup;
 			children = (
-				5B44B97C28D2F283004508BF /* PKGRoot */,
 				5BBBB77827AEDB330023B93A /* Resources */,
-				D4F0BBE0279AF8B30071253C /* AppDelegate.swift */,
-				5BBC2DA428F521C200C986F6 /* AppDelegate_Extension.swift */,
+				5BE63A2C2AC5B882009AFC0C /* InstallerShared.swift */,
+				5BE63A2B2AC5B7D3009AFC0C /* MainView.swift */,
+				5BE63A322AC5F4F8009AFC0C /* MainViewImpl.swift */,
 				5BBC2DA228F5212100C986F6 /* RelocationDetector.swift */,
+				5BE63A2A2AC5B7C3009AFC0C /* vChewingInstallerApp.swift */,
 				6ACA41F215FC1D9000935EF6 /* Installer-Info.plist */,
 				5BC0AACA27F58472002D33E9 /* pkgPostInstall.sh */,
 				5BC0AAC927F58472002D33E9 /* pkgPreInstall.sh */,
@@ -678,8 +665,6 @@
 			name = vChewingInstaller;
 			packageProductDependencies = (
 				5BFC63D028D4B9F7004A77B7 /* IMKUtils */,
-				5B9A62D8295BEA3400F79F3C /* SwiftExtension */,
-				5B9A62DA295BEA4500F79F3C /* CocoaExtension */,
 			);
 			productName = vChewingInstaller;
 			productReference = 6ACA41CB15FC1D7500935EF6 /* vChewingInstaller.app */;
@@ -800,7 +785,6 @@
 				6A2E40F9253A6AA000D1AE1D /* Images.xcassets in Resources */,
 				6ACA41FA15FC1D9000935EF6 /* InfoPlist.strings in Resources */,
 				6ACA41FC15FC1D9000935EF6 /* Localizable.strings in Resources */,
-				6ACA41FD15FC1D9000935EF6 /* MainMenu.xib in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -926,9 +910,11 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				D4F0BBE1279AF8B30071253C /* AppDelegate.swift in Sources */,
-				5BBC2DA528F521C200C986F6 /* AppDelegate_Extension.swift in Sources */,
+				5BE63A2D2AC5B8A6009AFC0C /* InstallerShared.swift in Sources */,
+				5BE63A2E2AC5B8A8009AFC0C /* MainView.swift in Sources */,
 				5BBC2DA328F5212100C986F6 /* RelocationDetector.swift in Sources */,
+				5BE63A2F2AC5B8A9009AFC0C /* vChewingInstallerApp.swift in Sources */,
+				5BE63A332AC5F4F8009AFC0C /* MainViewImpl.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1019,18 +1005,6 @@
 				5B04305F27B5312E00CB65BC /* ja */,
 			);
 			name = Localizable.strings;
-			sourceTree = "<group>";
-		};
-		6ACA41F015FC1D9000935EF6 /* MainMenu.xib */ = {
-			isa = PBXVariantGroup;
-			children = (
-				6A15B32421A51F2300B92CD3 /* Base */,
-				5BBBB77727AEDB290023B93A /* en */,
-				5BDCBB4227B4F6C600D0CC59 /* zh-Hant */,
-				5B04305527B529D800CB65BC /* zh-Hans */,
-				5B04306027B5312E00CB65BC /* ja */,
-			);
-			name = MainMenu.xib;
 			sourceTree = "<group>";
 		};
 		D4E33D8827A838CF006DB1CF /* Localizable.strings */ = {
@@ -1514,14 +1488,6 @@
 		5B98114728D6198700CBC605 /* PinyinPhonaConverter */ = {
 			isa = XCSwiftPackageProductDependency;
 			productName = PinyinPhonaConverter;
-		};
-		5B9A62D8295BEA3400F79F3C /* SwiftExtension */ = {
-			isa = XCSwiftPackageProductDependency;
-			productName = SwiftExtension;
-		};
-		5B9A62DA295BEA4500F79F3C /* CocoaExtension */ = {
-			isa = XCSwiftPackageProductDependency;
-			productName = CocoaExtension;
 		};
 		5BA8C30228DF0360004C5CC4 /* CandidateWindow */ = {
 			isa = XCSwiftPackageProductDependency;
