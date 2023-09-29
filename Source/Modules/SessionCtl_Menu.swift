@@ -434,7 +434,7 @@ public extension SessionCtl {
   }
 
   @objc func showAbout(_: Any? = nil) {
-    CtlAboutWindow.show()
+    CtlAboutUI.show()
     NSApp.popup()
   }
 }
