@@ -41,8 +41,6 @@ public class CtlSettingsUI: NSWindowController, NSWindowDelegate {
     NSApp.popup()
   }
 
-  private var currentLanguageSelectItem: NSMenuItem?
-
   override public func windowDidLoad() {
     super.windowDidLoad()
     window?.setPosition(vertical: .top, horizontal: .right, padding: 20)
