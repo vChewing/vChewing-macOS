@@ -13,9 +13,10 @@ import FolderMonitor
 import Shared
 import Uninstaller
 import UpdateSputnik
+import UserNotifications
 
 @objc(AppDelegate)
-public class AppDelegate: NSObject, NSApplicationDelegate, NSUserNotificationCenterDelegate {
+public class AppDelegate: NSObject, NSApplicationDelegate, UNUserNotificationCenterDelegate {
   public static let shared = AppDelegate()
 
   private var folderMonitor = FolderMonitor(
@@ -58,12 +59,11 @@ extension AppDelegate {
 // MARK: - Public Functions
 
 public extension AppDelegate {
-  func userNotificationCenter(_: NSUserNotificationCenter, shouldPresent _: NSUserNotification) -> Bool {
-    true
-  }
-
   func applicationWillFinishLaunching(_: Notification) {
-    NSUserNotificationCenter.default.delegate = self
+    UNUserNotificationCenter.current().delegate = self
+
+    UNUserNotificationCenter.current().requestAuthorization(options: [.alert, .sound, .badge], completionHandler: { _, _ in })
+
     PrefMgr.shared.fixOddPreferences()
 
     // 一旦發現與使用者半衰模組的觀察行為有關的崩潰標記被開啟：
@@ -72,14 +72,17 @@ public extension AppDelegate {
     if PrefMgr.shared.failureFlagForUOMObservation {
       LMMgr.relocateWreckedUOMData()
       PrefMgr.shared.failureFlagForUOMObservation = false
-      let userNotification = NSUserNotification()
-      userNotification.title = NSLocalizedString("vChewing", comment: "")
-      userNotification.informativeText = NSLocalizedString(
+      let msgPackage = UNMutableNotificationContent()
+      msgPackage.title = NSLocalizedString("vChewing", comment: "")
+      msgPackage.body = NSLocalizedString(
         "vChewing crashed while handling previously loaded UOM observation data. These data files are cleaned now to ensure the usability.",
         comment: ""
       )
-      userNotification.soundName = NSUserNotificationDefaultSoundName
-      NSUserNotificationCenter.default.deliver(userNotification)
+      msgPackage.sound = .defaultCritical
+      UNUserNotificationCenter.current().add(
+        .init(identifier: "vChewing.notification.uomCrash", content: msgPackage, trigger: nil),
+        withCompletionHandler: nil
+      )
     }
 
     if !PrefMgr.shared.onlyLoadFactoryLangModelsIfNeeded { LMMgr.loadDataModelsOnAppDelegate() }
@@ -125,14 +128,15 @@ public extension AppDelegate {
     alert.addButton(withTitle: NSLocalizedString("Not Now", comment: ""))
     let result = alert.runModal()
     NSApp.popup()
-    if result == NSApplication.ModalResponse.alertFirstButtonReturn {
-      NSWorkspace.shared.openFile(
-        LMMgr.dataFolderPath(isDefaultFolder: true), withApplication: "Finder"
-      )
-      Uninstaller.uninstall(
-        isSudo: false, selfKill: true, defaultDataFolderPath: LMMgr.dataFolderPath(isDefaultFolder: true)
-      )
-    }
+    guard result == NSApplication.ModalResponse.alertFirstButtonReturn else { return }
+    let url = URL(fileURLWithPath: LMMgr.dataFolderPath(isDefaultFolder: true))
+    guard let finderURL = NSWorkspace.shared.urlForApplication(withBundleIdentifier: "com.apple.finder") else { return }
+    let configuration = NSWorkspace.OpenConfiguration()
+    configuration.promptsUserIfNeeded = true
+    NSWorkspace.shared.open([url], withApplicationAt: finderURL, configuration: configuration)
+    Uninstaller.uninstall(
+      isSudo: false, selfKill: true, defaultDataFolderPath: LMMgr.dataFolderPath(isDefaultFolder: true)
+    )
   }
 
   /// 檢查該程式本身的記憶體佔用量。
@@ -143,13 +147,19 @@ public extension AppDelegate {
     switch currentMemorySize {
     case 768...:
       vCLog("WARNING: EXCESSIVE MEMORY FOOTPRINT (\(currentMemorySize)MB).")
-      let userNotification = NSUserNotification()
-      userNotification.title = NSLocalizedString("vChewing", comment: "")
-      userNotification.informativeText = NSLocalizedString(
+      let msgPackage = UNMutableNotificationContent()
+      msgPackage.title = NSLocalizedString("vChewing", comment: "")
+      msgPackage.body = NSLocalizedString(
         "vChewing is rebooted due to a memory-excessive-usage problem. If convenient, please inform the developer that you are having this issue, stating whether you are using an Intel Mac or Apple Silicon Mac. An NSLog is generated with the current memory footprint size.",
         comment: ""
       )
-      NSUserNotificationCenter.default.deliver(userNotification)
+      UNUserNotificationCenter.current().add(
+        .init(
+          identifier: "vChewing.notification.memoryExcessiveUsage",
+          content: msgPackage, trigger: nil
+        ),
+        withCompletionHandler: nil
+      )
       DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
         NSApp.terminate(self)
       }

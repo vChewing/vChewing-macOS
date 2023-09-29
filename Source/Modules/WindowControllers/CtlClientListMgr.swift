@@ -8,6 +8,7 @@
 
 import AppKit
 import MainAssembly
+import UniformTypeIdentifiers
 
 class CtlClientListMgr: NSWindowController, NSTableViewDelegate, NSTableViewDataSource {
   @IBOutlet var tblClients: NSTableView!
@@ -33,7 +34,7 @@ class CtlClientListMgr: NSWindowController, NSTableViewDelegate, NSTableViewData
     window?.setPosition(vertical: .center, horizontal: .right, padding: 20)
     localize()
     tblClients.delegate = self
-    tblClients.registerForDraggedTypes([.init(rawValue: kUTTypeFileURL as String)])
+    tblClients.registerForDraggedTypes([.fileURL])
     tblClients.allowsMultipleSelection = true
     tblClients.dataSource = self
     tblClients.action = #selector(onItemClicked(_:))
@@ -125,7 +126,7 @@ extension CtlClientListMgr {
         )
         dlgOpenPath.showsResizeIndicator = true
         dlgOpenPath.allowsMultipleSelection = true
-        dlgOpenPath.allowedFileTypes = ["app"]
+        dlgOpenPath.allowedContentTypes = [UTType.applicationBundle]
         dlgOpenPath.allowsOtherFileTypes = false
         dlgOpenPath.showsHiddenFiles = true
         dlgOpenPath.canChooseFiles = true
@@ -240,7 +241,7 @@ extension CtlClientListMgr {
     neta info: NSDraggingInfo, onError: @escaping () -> Void?, handler: (([URL]) -> Void)? = nil
   ) {
     let board = info.draggingPasteboard
-    let type = NSPasteboard.PasteboardType(rawValue: kUTTypeApplicationBundle as String)
+    let type = UTType.applicationBundle
     let options: [NSPasteboard.ReadingOptionKey: Any] = [
       .urlReadingFileURLsOnly: true,
       .urlReadingContentsConformToTypes: [type],

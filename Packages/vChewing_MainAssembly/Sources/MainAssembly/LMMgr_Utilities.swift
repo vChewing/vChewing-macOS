@@ -311,50 +311,29 @@ public extension LMMgr {
   }
 
   static func openUserDictFile(type: vChewingLM.ReplacableUserDataType, dual: Bool = false, alt: Bool) {
-    let app: String = alt ? "" : "Finder"
-    openPhraseFile(fromURL: userDictDataURL(mode: IMEApp.currentInputMode, type: type), app: app)
+    let appIdentifier: String = alt ? "" : "Finder"
+    openPhraseFile(fromURL: userDictDataURL(mode: IMEApp.currentInputMode, type: type), appIdentifier: appIdentifier)
     guard dual else { return }
-    openPhraseFile(fromURL: userDictDataURL(mode: IMEApp.currentInputMode.reversed, type: type), app: app)
+    openPhraseFile(fromURL: userDictDataURL(mode: IMEApp.currentInputMode.reversed, type: type), appIdentifier: appIdentifier)
   }
 
   /// 用指定應用開啟指定檔案。
   /// - Remark: 如果你的 App 有 Sandbox 處理過的話，請勿給 app 傳入 "vim" 參數，因為 Sandbox 會阻止之。
   /// - Parameters:
   ///   - url: 檔案 URL。
-  ///   - app: 指定 App 應用的 binary 檔案名稱。
-  static func openPhraseFile(fromURL url: URL, app: String = "") {
+  ///   - appIdentifier: 指定 App 應用的 bundle identifier 名稱。
+  static func openPhraseFile(fromURL url: URL, appIdentifier: String = "") {
     if !Self.checkIfUserFilesExistBeforeOpening() { return }
     DispatchQueue.main.async {
-      switch app {
-      case "vim":
-        let process = Process()
-        let pipe = Pipe()
-        process.executableURL = URL(fileURLWithPath: "/bin/sh/")
-        process.arguments = ["-c", "open '/usr/bin/vim'", "'\(url.path)'"]
-        process.standardOutput = pipe
-        process.standardError = pipe
-        process.terminationHandler = { process in
-          vCLog("\ndidFinish: \(!process.isRunning)")
-        }
-        let fileHandle = pipe.fileHandleForReading
-        do {
-          try process.run()
-        } catch {
-          NSWorkspace.shared.openFile(url.path, withApplication: "TextEdit")
-        }
-        do {
-          if let theData = try fileHandle.readToEnd(),
-             let outStr = String(data: theData, encoding: .utf8)
-          {
-            vCLog(outStr)
-          }
-        } catch {}
+      switch appIdentifier {
       case "Finder":
         NSWorkspace.shared.activateFileViewerSelecting([url])
       default:
-        if !NSWorkspace.shared.openFile(url.path, withApplication: app) {
-          NSWorkspace.shared.openFile(url.path, withApplication: "TextEdit")
-        }
+        guard let textEditURL = NSWorkspace.shared.urlForApplication(withBundleIdentifier: "com.apple.TextEdit") else { return }
+        let toolURL = NSWorkspace.shared.urlForApplication(withBundleIdentifier: appIdentifier) ?? textEditURL
+        let configuration = NSWorkspace.OpenConfiguration()
+        configuration.promptsUserIfNeeded = true
+        NSWorkspace.shared.open([url], withApplicationAt: toolURL, configuration: configuration)
       }
     }
   }
