@@ -233,9 +233,10 @@ public extension SessionCtl {
 
   @objc func showCheatSheet(_: Any? = nil) {
     guard let url = Bundle.main.url(forResource: "shortcuts", withExtension: "html") else { return }
-    DispatchQueue.main.async {
-      NSWorkspace.shared.openFile(url.path, withApplication: "Safari")
-    }
+    guard let safariURL = NSWorkspace.shared.urlForApplication(withBundleIdentifier: "com.apple.Safari") else { return }
+    let configuration = NSWorkspace.OpenConfiguration()
+    configuration.promptsUserIfNeeded = true
+    NSWorkspace.shared.open([url], withApplicationAt: safariURL, configuration: configuration)
   }
 
   @objc func showClientListMgr(_: Any? = nil) {
@@ -380,13 +381,18 @@ public extension SessionCtl {
     if !LMMgr.userDataFolderExists {
       return
     }
-    NSWorkspace.shared.openFile(
-      LMMgr.dataFolderPath(isDefaultFolder: false), withApplication: "Finder"
-    )
+    let url = URL(fileURLWithPath: LMMgr.dataFolderPath(isDefaultFolder: false))
+    guard let finderURL = NSWorkspace.shared.urlForApplication(withBundleIdentifier: "com.apple.finder") else { return }
+    let configuration = NSWorkspace.OpenConfiguration()
+    configuration.promptsUserIfNeeded = true
+    NSWorkspace.shared.open([url], withApplicationAt: finderURL, configuration: configuration)
   }
 
   @objc func openAppSupportFolderFromContainer(_: Any? = nil) {
-    NSWorkspace.shared.openFile(LMMgr.appSupportURL.path, withApplication: "Finder")
+    guard let finderURL = NSWorkspace.shared.urlForApplication(withBundleIdentifier: "com.apple.finder") else { return }
+    let configuration = NSWorkspace.OpenConfiguration()
+    configuration.promptsUserIfNeeded = true
+    NSWorkspace.shared.open([LMMgr.appSupportURL], withApplicationAt: finderURL, configuration: configuration)
   }
 
   @objc func openUserPhrases(_: Any? = nil) {

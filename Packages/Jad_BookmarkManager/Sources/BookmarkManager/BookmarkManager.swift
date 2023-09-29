@@ -34,10 +34,8 @@ public class BookmarkManager {
     if fileExists(url) {
       do {
         let fileData = try Data(contentsOf: url)
-        if let fileBookmarks = try NSKeyedUnarchiver.unarchiveTopLevelObjectWithData(fileData) as! [URL: Data]? {
-          for bookmark in fileBookmarks {
-            restoreBookmark(key: bookmark.key, value: bookmark.value)
-          }
+        try (NSKeyedUnarchiver.unarchivedObject(ofClass: NSDictionary.self, from: fileData) as? [URL: Data])?.forEach { bookmark in
+          restoreBookmark(key: bookmark.key, value: bookmark.value)
         }
       } catch {
         NSLog("Couldn't load bookmarks")
@@ -82,12 +80,7 @@ public class BookmarkManager {
   }
 
   private func getBookmarkURL() -> URL? {
-    let urls = FileManager.default.urls(for: .applicationSupportDirectory, in: .userDomainMask)
-    if let appSupportURL = urls.last {
-      let url = appSupportURL.appendingPathComponent("Bookmarks.dict")
-      return url
-    }
-    return nil
+    FileManager.default.urls(for: .applicationSupportDirectory, in: .userDomainMask).last?.appendingPathComponent("Bookmarks.dict")
   }
 
   private func fileExists(_ url: URL) -> Bool {

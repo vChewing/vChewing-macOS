@@ -198,7 +198,7 @@ extension CtlPrefWindow: NSTextViewDelegate, NSTextFieldDelegate {
     DispatchQueue.main.async { [weak self] in
       guard let self = self else { return }
       let app: String = NSEvent.keyModifierFlags.contains(.option) ? "TextEdit" : "Finder"
-      LMMgr.shared.openPhraseFile(mode: self.selInputMode, type: self.selUserDataType, app: app)
+      LMMgr.shared.openPhraseFile(mode: self.selInputMode, type: self.selUserDataType, appIdentifier: app)
     }
   }
 

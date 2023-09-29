@@ -17,7 +17,7 @@ open class CtlCandidate: NSWindowController, CtlCandidateProtocol {
   open var reverseLookupResult: [String] = []
 
   open func highlightedColor() -> NSColor {
-    var result = NSColor.alternateSelectedControlColor
+    var result = NSColor.controlAccentColor
     var colorBlendAmount: Double = NSApplication.isDarkMode ? 0.3 : 0.0
     if #available(macOS 10.14, *), !NSApplication.isDarkMode, locale == "zh-Hant" {
       colorBlendAmount = 0.15
