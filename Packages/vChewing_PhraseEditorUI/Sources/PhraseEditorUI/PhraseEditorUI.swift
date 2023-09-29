@@ -246,12 +246,14 @@ public struct VwrPhraseEditorUI: View {
         }
       }
 
-      TextEditorEX(text: $txtContent)
-        .disabled(selInputMode == .imeModeNULL || isLoading)
-        .frame(minWidth: 320, minHeight: 240)
-        .onChange(of: fileChangeIndicator.id) { _ in
-          if Self.autoReloadExternalModifications { update() }
-        }
+      GroupBox {
+        TextEditorEX(text: $txtContent)
+          .disabled(selInputMode == .imeModeNULL || isLoading)
+          .frame(minWidth: 320, minHeight: 240)
+          .onChange(of: fileChangeIndicator.id) { _ in
+            if Self.autoReloadExternalModifications { update() }
+          }
+      }
 
       VStack(spacing: 4) {
         if selUserDataType != .theAssociates {

@@ -148,7 +148,10 @@ public struct TextEditorEX: NSViewRepresentable {
 
       scrollview.borderType = .noBorder
       scrollview.hasVerticalScroller = true
+      scrollview.hasHorizontalScroller = true
       scrollview.documentView = textView
+      scrollview.scrollerStyle = .legacy
+      scrollview.autohidesScrollers = true
 
       return scrollview
     }
