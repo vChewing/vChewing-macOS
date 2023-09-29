@@ -17,6 +17,6 @@ public protocol PhraseEditorDelegate {
     -> String
   func checkIfPhrasePairExists(userPhrase: String, mode: Shared.InputMode, key unigramKey: String) -> Bool
   func consolidate(text strProcessed: inout String, pragma shouldCheckPragma: Bool)
-  func openPhraseFile(mode: Shared.InputMode, type: vChewingLM.ReplacableUserDataType, app: String)
+  func openPhraseFile(mode: Shared.InputMode, type: vChewingLM.ReplacableUserDataType, appIdentifier: String)
   func tagOverrides(in strProcessed: inout String, mode: Shared.InputMode)
 }

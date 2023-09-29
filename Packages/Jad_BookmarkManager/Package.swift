@@ -4,7 +4,7 @@ import PackageDescription
 let package = Package(
   name: "BookmarkManager",
   platforms: [
-    .macOS(.v10_11),
+    .macOS(.v11),
   ],
   products: [
     .library(

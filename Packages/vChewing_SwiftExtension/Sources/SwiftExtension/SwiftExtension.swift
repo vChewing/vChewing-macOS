@@ -223,19 +223,6 @@ public extension BinaryInteger {
   }
 }
 
-// MARK: - File Handle API Compatibility for macOS 10.15.3 and Earlier.
-
-@available(macOS, deprecated: 10.15.4)
-extension FileHandle {
-  public func read(upToCount count: Int) throws -> Data? {
-    readData(ofLength: count)
-  }
-
-  public func readToEnd() throws -> Data? {
-    readDataToEndOfFile()
-  }
-}
-
 // MARK: - Index Revolver (only for Array)
 
 // Further discussion: https://forums.swift.org/t/62847
