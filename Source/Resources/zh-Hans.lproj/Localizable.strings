@@ -1,3 +1,13 @@
+"i18n:aboutWindow.ABOUT_APP_TITLE_FULL" = "关于 macOS 版「威注音输入法」";
+"i18n:aboutWindow.DISCLAIMER_TEXT" = "免责声明：威注音专案对小麦注音官方专案内赠的小麦注音原版词库内容不负任何责任。威注音输入法专用的威注音官方词库不包含任何「会在法理上妨碍威注音在全球传播」的「与地缘政治及政治意识形态有关的」内容。威注音专案与 OpenVanilla 专案之间无合作关系、无隶属关系。";
+"i18n:aboutWindow.OK_BUTTON" = "确定";
+"i18n:aboutWindow.WEBSITE_BUTTON" = "网站";
+"i18n:aboutWindow.BUGREPORT_BUTTON" = "故障提报";
+"i18n:aboutWindow.LICENSE_TITLE" = "麻理去商标授权合约 (MIT-NTL License):";
+"i18n:aboutWindow.APP_NAME" = "vChewing for macOS";
+"i18n:aboutWindow.APP_DERIVED_FROM" = "该专案曾由 OpenVanilla 小麦注音专案 (MIT-License) 衍生而来。";
+"i18n:aboutWindow.DEV_CREW" = "威注音 macOS 程式研发：Shiki Suen, Isaac Xen, Hiraku Wang, 等。\n威注音词库维护：Shiki Suen。\n爬轨算法：Lukhnos Liu (Gramambular 2, MIT-License)。";
+
 "vChewing" = "威注音输入法";
 "This update will upgrade vChewing from Aqua Special Edition to Mainstream Release (recommended for your current OS version)." = "该更新会将您当前的输入法由 Aqua 特别版置换为针对当前系统设计的主流发行版。";
 "Where's IMK Candidate Window?" = "IMK 选字窗去哪里了？";

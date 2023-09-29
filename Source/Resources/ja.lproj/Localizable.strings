@@ -1,3 +1,13 @@
+"i18n:aboutWindow.ABOUT_APP_TITLE_FULL" = "macOS 版威注音入力アプリについて";
+"i18n:aboutWindow.DISCLAIMER_TEXT" = "免責事項：vChewing Project は、OpenVanilla と協力関係や提携関係にあるわけではなく、OpenVanilla が小麦注音プロジェクトに同梱した辞書データについて、vChewing Project は一切責任負い兼ねる。特定な地政学的・観念形態的な内容は、vChewing アプリの世界的な普及に妨害する恐れがあるため、vChewing 公式辞書データに不収録。";
+"i18n:aboutWindow.OK_BUTTON" = "うむ";
+"i18n:aboutWindow.WEBSITE_BUTTON" = "公式HP";
+"i18n:aboutWindow.BUGREPORT_BUTTON" = "問題を報告";
+"i18n:aboutWindow.LICENSE_TITLE" = "ＭＩＴ商標不許可ライセンス (MIT-NTL License):";
+"i18n:aboutWindow.APP_NAME" = "vChewing for macOS";
+"i18n:aboutWindow.APP_DERIVED_FROM" = "曾て OpenVanilla 小麦注音プロジェクト (MIT-License) から派生。";
+"i18n:aboutWindow.DEV_CREW" = "macOS 版威注音の開発：Shiki Suen, Isaac Xen, Hiraku Wang, など。\n威注音語彙データの維持：Shiki Suen。\nウォーキング算法：Lukhnos Liu (Gramambular 2, MIT-License)。";
+
 "vChewing" = "威注音入力アプリ";
 "This update will upgrade vChewing from Aqua Special Edition to Mainstream Release (recommended for your current OS version)." = "これで今のこのアプリを Aqua 特別版から主流発行版と置き換えます。主流発行版は今の時代の macOS のために最適化したものであり、おすすめです。";
 "Where's IMK Candidate Window?" = "IMK 文字候補ウィンドウはどこに？";

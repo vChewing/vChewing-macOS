@@ -14,7 +14,7 @@ import MainAssembly
 extension AppDelegate {
   // New About Window
   @IBAction func about(_: Any) {
-    CtlAboutWindow.show()
+    CtlAboutUI.show()
     NSApp.popup()
   }
 }
