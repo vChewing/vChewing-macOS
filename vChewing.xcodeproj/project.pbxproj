@@ -59,6 +59,8 @@
 		5BDB7A4128D4824A001AC277 /* Megrez in Frameworks */ = {isa = PBXBuildFile; productRef = 5BDB7A4028D4824A001AC277 /* Megrez */; };
 		5BDB7A4528D4824A001AC277 /* ShiftKeyUpChecker in Frameworks */ = {isa = PBXBuildFile; productRef = 5BDB7A4428D4824A001AC277 /* ShiftKeyUpChecker */; };
 		5BDB7A4728D4824A001AC277 /* Tekkon in Frameworks */ = {isa = PBXBuildFile; productRef = 5BDB7A4628D4824A001AC277 /* Tekkon */; };
+		5BE5D9952ACAEFDE009A732C /* sequenceDataFromEtenDOS-cht.json in Resources */ = {isa = PBXBuildFile; fileRef = 5BE5D9932ACAEFDE009A732C /* sequenceDataFromEtenDOS-cht.json */; };
+		5BE5D9962ACAEFDE009A732C /* sequenceDataFromEtenDOS-chs.json in Resources */ = {isa = PBXBuildFile; fileRef = 5BE5D9942ACAEFDE009A732C /* sequenceDataFromEtenDOS-chs.json */; };
 		5BE63A2D2AC5B8A6009AFC0C /* InstallerShared.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5BE63A2C2AC5B882009AFC0C /* InstallerShared.swift */; };
 		5BE63A2E2AC5B8A8009AFC0C /* MainView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5BE63A2B2AC5B7D3009AFC0C /* MainView.swift */; };
 		5BE63A2F2AC5B8A9009AFC0C /* vChewingInstallerApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5BE63A2A2AC5B7C3009AFC0C /* vChewingInstallerApp.swift */; };
@@ -209,6 +211,8 @@
 		5BDCBB4827B4F6C600D0CC59 /* zh-Hant */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "zh-Hant"; path = "zh-Hant.lproj/Localizable.strings"; sourceTree = "<group>"; };
 		5BDCBB4927B4F6C700D0CC59 /* zh-Hant */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "zh-Hant"; path = "zh-Hant.lproj/InfoPlist.strings"; sourceTree = "<group>"; };
 		5BDCBB4A27B4F6C700D0CC59 /* zh-Hant */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "zh-Hant"; path = "zh-Hant.lproj/Localizable.strings"; sourceTree = "<group>"; };
+		5BE5D9932ACAEFDE009A732C /* sequenceDataFromEtenDOS-cht.json */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.json; path = "sequenceDataFromEtenDOS-cht.json"; sourceTree = "<group>"; };
+		5BE5D9942ACAEFDE009A732C /* sequenceDataFromEtenDOS-chs.json */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.json; path = "sequenceDataFromEtenDOS-chs.json"; sourceTree = "<group>"; };
 		5BE63A2A2AC5B7C3009AFC0C /* vChewingInstallerApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = vChewingInstallerApp.swift; sourceTree = "<group>"; };
 		5BE63A2B2AC5B7D3009AFC0C /* MainView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MainView.swift; sourceTree = "<group>"; };
 		5BE63A2C2AC5B882009AFC0C /* InstallerShared.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InstallerShared.swift; sourceTree = "<group>"; };
@@ -345,6 +349,8 @@
 			children = (
 				5B84579C2871AD2200C93B01 /* convdict.json */,
 				5B09307828B6FC3B0021F8C5 /* shortcuts.html */,
+				5BE5D9942ACAEFDE009A732C /* sequenceDataFromEtenDOS-chs.json */,
+				5BE5D9932ACAEFDE009A732C /* sequenceDataFromEtenDOS-cht.json */,
 				5BF9DA2428840E6200DBD48E /* template-associatedPhrases-chs.txt */,
 				5BF9DA2C2884247800DBD48E /* template-associatedPhrases-cht.txt */,
 				5BF9DA2328840E6200DBD48E /* template-exclusions.txt */,
@@ -738,6 +744,7 @@
 				5BEDB723283B4C250078EB25 /* data-cht.json in Resources */,
 				5BEDB721283B4C250078EB25 /* data-cns.json in Resources */,
 				5BBC2D9F28F51C0400C986F6 /* LICENSE-CHT.txt in Resources */,
+				5BE5D9952ACAEFDE009A732C /* sequenceDataFromEtenDOS-cht.json in Resources */,
 				5BF9DA2D288427E000DBD48E /* template-associatedPhrases-cht.txt in Resources */,
 				5BBC2D9E28F51C0400C986F6 /* LICENSE.txt in Resources */,
 				5BEDB725283B4C250078EB25 /* data-chs.json in Resources */,
@@ -748,6 +755,7 @@
 				5BF9DA2728840E6200DBD48E /* template-usersymbolphrases.txt in Resources */,
 				5B1C98B929436CEE0019B807 /* data-bpmf-reverse-lookup.json in Resources */,
 				5BBC2DA128F51C0400C986F6 /* LICENSE-CHS.txt in Resources */,
+				5BE5D9962ACAEFDE009A732C /* sequenceDataFromEtenDOS-chs.json in Resources */,
 				5BEDB724283B4C250078EB25 /* data-symbols.json in Resources */,
 				5B7BC4B027AFFBE800F66C24 /* frmPrefWindow.xib in Resources */,
 				5BF9DA2A28840E6200DBD48E /* template-replacements.txt in Resources */,

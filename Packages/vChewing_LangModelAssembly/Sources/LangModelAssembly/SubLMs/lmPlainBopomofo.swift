@@ -29,13 +29,17 @@ public extension vChewingLM {
 
       do {
         let rawData = try Data(contentsOf: URL(fileURLWithPath: path))
-        let rawPlist: [String: String] =
-          try PropertyListSerialization.propertyList(from: rawData, format: nil) as? [String: String] ?? .init()
-        dataMap = rawPlist
+        if let rawJSON = try? JSONSerialization.jsonObject(with: rawData) as? [String: String] {
+          dataMap = rawJSON
+        } else {
+          filePath = oldPath
+          vCLog("↑ Exception happened when reading JSON file at: \(path).")
+          return false
+        }
       } catch {
         filePath = oldPath
         vCLog("\(error)")
-        vCLog("↑ Exception happened when reading data at: \(path).")
+        vCLog("↑ Exception happened when reading JSON file at: \(path).")
         return false
       }
 
