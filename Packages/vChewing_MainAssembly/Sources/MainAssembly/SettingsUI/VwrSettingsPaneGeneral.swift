@@ -114,7 +114,7 @@ public struct VwrSettingsPaneGeneral: View {
               LocalizedStringKey("Emulating select-candidate-per-character mode"),
               isOn: $useSCPCTypingMode.onChange {
                 guard useSCPCTypingMode else { return }
-                LMMgr.loadUserSCPCSequencesData()
+                LMMgr.loadSCPCSequencesData()
               }
             )
             Text(LocalizedStringKey("An accommodation for elder computer users."))

@@ -312,7 +312,8 @@ import SwiftExtension
   public dynamic var useSCPCTypingMode: Bool {
     willSet {
       if newValue {
-        LMMgr.loadUserSCPCSequencesData()
+        LMMgr.loadSCPCSequencesData()
+        LMMgr.setSCPCEnabled(true)
       }
     }
   }

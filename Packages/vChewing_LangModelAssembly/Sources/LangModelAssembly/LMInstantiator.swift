@@ -210,7 +210,7 @@ public extension vChewingLM {
       }
     }
 
-    public func loadUserSCPCSequencesData(path: String) {
+    public func loadSCPCSequencesData(path: String) {
       DispatchQueue.main.async {
         if FileManager.default.isReadableFile(atPath: path) {
           self.lmPlainBopomofo.clear()
