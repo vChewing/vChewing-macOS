@@ -299,7 +299,7 @@ public class PrefMgrObservable: NSObject, PrefMgrProtocol, ObservableObject {
   public var useSCPCTypingMode: Bool {
     willSet {
       if newValue {
-        LMMgr.loadUserSCPCSequencesData()
+        LMMgr.loadSCPCSequencesData()
       }
     }
   }

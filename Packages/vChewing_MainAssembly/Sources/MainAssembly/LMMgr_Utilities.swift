@@ -105,12 +105,12 @@ public extension LMMgr {
     return URL(fileURLWithPath: dataFolderPath(isDefaultFolder: false)).appendingPathComponent(fileName)
   }
 
-  /// 使用者逐字選字模式候選字詞順序資料路徑。
+  /// 逐字選字模式候選字詞順序資料路徑。該資料出自倚天中文 DOS 系統。
   /// - Parameter mode: 簡繁體輸入模式。
   /// - Returns: 資料路徑（URL）。
-  static func userSCPCSequencesURL(_ mode: Shared.InputMode) -> URL {
-    let fileName = (mode == .imeModeCHT) ? "data-plain-bpmf-cht.plist" : "data-plain-bpmf-chs.plist"
-    return URL(fileURLWithPath: dataFolderPath(isDefaultFolder: false)).appendingPathComponent(fileName)
+  static func etenSCPCSequencesURL(_ mode: Shared.InputMode) -> URL {
+    let fileName = (mode == .imeModeCHT) ? "sequenceDataFromEtenDOS-cht" : "sequenceDataFromEtenDOS-chs"
+    return URL(fileURLWithPath: getBundleDataPath(fileName, factory: true, ext: "json"))
   }
 
   /// 使用者波浪符號選單資料路徑。
@@ -380,7 +380,6 @@ public extension LMMgr {
         break caseCheck
       }
     }
-    failed = failed || !ensureFileExists(userSCPCSequencesURL(mode))
     return !failed
   }
 
