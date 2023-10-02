@@ -211,7 +211,7 @@ public class LMMgr {
 
       if PrefMgr.shared.associatedPhrasesEnabled { Self.loadUserAssociatesData() }
       if PrefMgr.shared.phraseReplacementEnabled { Self.loadUserPhraseReplacement() }
-      if PrefMgr.shared.useSCPCTypingMode { Self.loadUserSCPCSequencesData() }
+      if PrefMgr.shared.useSCPCTypingMode { Self.loadSCPCSequencesData() }
 
       Self.uomCHT.loadData(fromURL: userOverrideModelDataURL(.imeModeCHT))
       Self.uomCHS.loadData(fromURL: userOverrideModelDataURL(.imeModeCHS))
@@ -268,12 +268,12 @@ public class LMMgr {
     )
   }
 
-  public static func loadUserSCPCSequencesData() {
-    Self.lmCHT.loadUserSCPCSequencesData(
-      path: Self.userSCPCSequencesURL(.imeModeCHT).path
+  public static func loadSCPCSequencesData() {
+    Self.lmCHT.loadSCPCSequencesData(
+      path: Self.etenSCPCSequencesURL(.imeModeCHT).path
     )
-    Self.lmCHS.loadUserSCPCSequencesData(
-      path: Self.userSCPCSequencesURL(.imeModeCHS).path
+    Self.lmCHS.loadSCPCSequencesData(
+      path: Self.etenSCPCSequencesURL(.imeModeCHS).path
     )
   }
 
