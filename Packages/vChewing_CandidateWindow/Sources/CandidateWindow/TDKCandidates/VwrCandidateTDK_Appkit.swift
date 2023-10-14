@@ -56,8 +56,9 @@ public extension VwrCandidateTDKAppKit {
   override var fittingSize: NSSize { thePool.metrics.fittingSize }
 
   static var candidateListBackground: NSColor {
-    let delta = NSApplication.isDarkMode ? 0.05 : 0.99
-    return .init(white: delta, alpha: 1)
+    let brightBackground = NSColor(red: 0.99, green: 0.99, blue: 0.99, alpha: 1.00)
+    let darkBackground = NSColor(red: 0.13, green: 0.13, blue: 0.14, alpha: 1.00)
+    return NSApplication.isDarkMode ? darkBackground : brightBackground
   }
 
   override func draw(_: NSRect) {
