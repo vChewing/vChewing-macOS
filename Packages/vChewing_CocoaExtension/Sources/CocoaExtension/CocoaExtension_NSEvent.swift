@@ -130,15 +130,15 @@ public extension NSEvent {
   var isJISKanaSwappingKey: Bool { KeyCode(rawValue: keyCode) == KeyCode.kJISKanaSwappingKey }
   var isNumericPadKey: Bool { arrNumpadKeyCodes.contains(keyCode) }
   var isMainAreaNumKey: Bool { mapMainAreaNumKey.keys.contains(keyCode) }
-  var isShiftHold: Bool { modifierFlags.contains(.shift) }
-  var isCommandHold: Bool { modifierFlags.contains(.command) }
-  var isControlHold: Bool { modifierFlags.contains(.control) }
+  var isShiftHold: Bool { keyModifierFlags.contains(.shift) }
+  var isCommandHold: Bool { keyModifierFlags.contains(.command) }
+  var isControlHold: Bool { keyModifierFlags.contains(.control) }
   var beganWithLetter: Bool { text.first?.isLetter ?? false }
-  var isOptionHold: Bool { modifierFlags.contains(.option) }
-  var isOptionHotKey: Bool { modifierFlags.contains(.option) && text.first?.isLetter ?? false }
-  var isCapsLockOn: Bool { modifierFlags.contains(.capsLock) }
-  var isFunctionKeyHold: Bool { modifierFlags.contains(.function) }
-  var isNonLaptopFunctionKey: Bool { modifierFlags.contains(.numericPad) && !isNumericPadKey }
+  var isOptionHold: Bool { keyModifierFlags.contains(.option) }
+  var isOptionHotKey: Bool { keyModifierFlags.contains(.option) && text.first?.isLetter ?? false }
+  var isCapsLockOn: Bool { keyModifierFlags.contains(.capsLock) }
+  var isFunctionKeyHold: Bool { keyModifierFlags.contains(.function) }
+  var isNonLaptopFunctionKey: Bool { keyModifierFlags.contains(.numericPad) && !isNumericPadKey }
   var isEnter: Bool { [KeyCode.kCarriageReturn, KeyCode.kLineFeed].contains(KeyCode(rawValue: keyCode)) }
   var isTab: Bool { KeyCode(rawValue: keyCode) == KeyCode.kTab }
   var isUp: Bool { KeyCode(rawValue: keyCode) == KeyCode.kUpArrow }
