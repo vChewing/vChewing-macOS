@@ -178,12 +178,14 @@
 "Completely disable using Shift key to toggle alphanumerical mode" = "彻底禁止使用 Shift 键切换英数模式";
 "Please use mouse wheel to scroll this page. The CheatSheet is available in the IME menu." = "请利用滑鼠滚轮检视该页面。也请洽输入法选单内的热键指南。";
 "Typing Style:" = "输入风格:";
+"%@-Stroke" = "%@画";
 
 // The followings are the category names used in the Symbol menu.
 "catCommonSymbols" = "常用";
 "catHoriBrackets" = "横括";
 "catVertBrackets" = "纵括";
 "catAlphabets" = "字母";
+"catRadicals" = "部首";
 "catSpecialNumbers" = "数字";
 "catMathSymbols" = "数学";
 "catCurrencyUnits" = "货币";
