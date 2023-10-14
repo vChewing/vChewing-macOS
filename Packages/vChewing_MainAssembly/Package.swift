@@ -14,6 +14,7 @@ let package = Package(
   ],
   dependencies: [
     .package(path: "../DanielGalasko_FolderMonitor"),
+    .package(path: "../HangarRash_SwiftyCapsLockToggler"),
     .package(path: "../Jad_BookmarkManager"),
     .package(path: "../Qwertyyb_ShiftKeyUpChecker"),
     .package(path: "../vChewing_CandidateWindow"),
@@ -50,6 +51,7 @@ let package = Package(
         .product(name: "Shared", package: "vChewing_Shared"),
         .product(name: "ShiftKeyUpChecker", package: "Qwertyyb_ShiftKeyUpChecker"),
         .product(name: "SwiftExtension", package: "vChewing_SwiftExtension"),
+        .product(name: "SwiftyCapsLockToggler", package: "HangarRash_SwiftyCapsLockToggler"),
         .product(name: "Tekkon", package: "vChewing_Tekkon"),
         .product(name: "TooltipUI", package: "vChewing_TooltipUI"),
         .product(name: "Uninstaller", package: "vChewing_Uninstaller"),
