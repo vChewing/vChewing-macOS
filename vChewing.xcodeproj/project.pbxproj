@@ -185,6 +185,7 @@
 		5B963CA128D5C22D00DCEE88 /* vChewing_SwiftExtension */ = {isa = PBXFileReference; lastKnownFileType = wrapper; name = vChewing_SwiftExtension; path = Packages/vChewing_SwiftExtension; sourceTree = "<group>"; };
 		5B98114628D6198000CBC605 /* vChewing_PinyinPhonaConverter */ = {isa = PBXFileReference; lastKnownFileType = wrapper; name = vChewing_PinyinPhonaConverter; path = Packages/vChewing_PinyinPhonaConverter; sourceTree = "<group>"; };
 		5BA8C30128DEFE4F004C5CC4 /* vChewing_CandidateWindow */ = {isa = PBXFileReference; lastKnownFileType = wrapper; name = vChewing_CandidateWindow; path = Packages/vChewing_CandidateWindow; sourceTree = "<group>"; };
+		5BAD67E12ADAB62D005A4842 /* HangarRash_SwiftyCapsLockToggler */ = {isa = PBXFileReference; lastKnownFileType = wrapper; name = HangarRash_SwiftyCapsLockToggler; path = Packages/HangarRash_SwiftyCapsLockToggler; sourceTree = "<group>"; };
 		5BB802D927FABA8300CF1C19 /* SessionCtl_Menu.swift */ = {isa = PBXFileReference; explicitFileType = sourcecode.swift; fileEncoding = 4; indentWidth = 2; lineEnding = 0; path = SessionCtl_Menu.swift; sourceTree = "<group>"; tabWidth = 2; usesTabs = 0; };
 		5BBBB75D27AED54C0023B93A /* Beep.m4a */ = {isa = PBXFileReference; lastKnownFileType = file; path = Beep.m4a; sourceTree = "<group>"; };
 		5BBBB75E27AED54C0023B93A /* Fart.m4a */ = {isa = PBXFileReference; lastKnownFileType = file; path = Fart.m4a; sourceTree = "<group>"; };
@@ -443,6 +444,7 @@
 			children = (
 				5BDB7A3128D47587001AC277 /* DanielGalasko_FolderMonitor */,
 				5BFC63C428D487AE004A77B7 /* Fuziki_NSAttributedTextView */,
+				5BAD67E12ADAB62D005A4842 /* HangarRash_SwiftyCapsLockToggler */,
 				5BDB7A3028D47587001AC277 /* Jad_BookmarkManager */,
 				5BDB7A3428D47587001AC277 /* Qwertyyb_ShiftKeyUpChecker */,
 				5BDB7A3528D47587001AC277 /* RMJay_LineReader */,
