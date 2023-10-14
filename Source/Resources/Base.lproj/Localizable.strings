@@ -178,12 +178,14 @@
 "Completely disable using Shift key to toggle alphanumerical mode" = "Completely disable using Shift key to toggle alphanumerical mode";
 "Please use mouse wheel to scroll this page. The CheatSheet is available in the IME menu." = "Please use mouse wheel to scroll this page. The CheatSheet is available in the IME menu.";
 "Typing Style:" = "Typing Style:";
+"%@-Stroke" = "%@-Stroke";
 
 // The followings are the category names used in the Symbol menu.
 "catCommonSymbols" = "CommonSymbols";
 "catHoriBrackets" = "HorizontalBrackets";
 "catVertBrackets" = "VerticalBrackets";
 "catAlphabets" = "Alphabets";
+"catRadicals" = "Radicals";
 "catSpecialNumbers" = "SpecialNumbers";
 "catMathSymbols" = "MathSymbols";
 "catCurrencyUnits" = "CurrencyUnits";

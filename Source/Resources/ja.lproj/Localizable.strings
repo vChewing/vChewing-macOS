@@ -179,12 +179,14 @@
 "Completely disable using Shift key to toggle alphanumerical mode" = "Shift キーの英数入力モードの切り替え機能を徹底的に禁ず";
 "Please use mouse wheel to scroll this page. The CheatSheet is available in the IME menu." = "マウスホイールでこのページをご覧ください。キーに関する取扱説明のアクセスはメニューに。";
 "Typing Style:" = "入力習慣:";
+"%@-Stroke" = "%@画";
 
 // The followings are the category names used in the Symbol menu.
 "catCommonSymbols" = "常用";
 "catHoriBrackets" = "横括";
 "catVertBrackets" = "縦括";
 "catAlphabets" = "字母";
+"catRadicals" = "部首";
 "catSpecialNumbers" = "数字";
 "catMathSymbols" = "数学";
 "catCurrencyUnits" = "貨幣";
