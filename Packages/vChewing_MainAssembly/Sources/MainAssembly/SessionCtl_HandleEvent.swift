@@ -80,10 +80,13 @@ public extension SessionCtl {
     // Caps Lock 通知與切換處理，要求至少 macOS 12 Monterey。
     if #available(macOS 12, *) {
       if event.type == .flagsChanged, event.keyCode == KeyCode.kCapsLock.rawValue {
-        DispatchQueue.main.async {
+        DispatchQueue.main.async { [weak self] in
           let isCapsLockTurnedOn = Self.isCapsLocked
-          let status = NSLocalizedString("NotificationSwitchRevolver", comment: "")
+          if !isCapsLockTurnedOn, self?.isASCIIMode ?? false {
+            self?.isASCIIMode.toggle()
+          }
           guard PrefMgr.shared.showNotificationsWhenTogglingCapsLock else { return }
+          let status = NSLocalizedString("NotificationSwitchRevolver", comment: "")
           Notifier.notify(
             message: isCapsLockTurnedOn
               ? "Caps Lock " + "Alphanumerical Input Mode".localized + "\n" + status
