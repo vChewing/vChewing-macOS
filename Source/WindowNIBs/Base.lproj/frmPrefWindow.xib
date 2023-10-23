@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="22154" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES">
+<document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="22155" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES">
     <dependencies>
         <deployment identifier="macosx"/>
-        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="22154"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="22155"/>
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
     </dependencies>
     <objects>
@@ -928,14 +928,14 @@
         </view>
         <customObject id="-3" userLabel="Application" customClass="NSObject"/>
         <view id="XWo-36-xGi" userLabel="vwrBehavior">
-            <rect key="frame" x="0.0" y="0.0" width="577" height="589"/>
+            <rect key="frame" x="0.0" y="0.0" width="577" height="695"/>
             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
             <subviews>
                 <stackView distribution="fill" orientation="vertical" alignment="leading" horizontalStackHuggingPriority="249.99998474121094" verticalStackHuggingPriority="249.99998474121094" translatesAutoresizingMaskIntoConstraints="NO" id="j9R-fB-ttM">
-                    <rect key="frame" x="20" y="38" width="530" height="531"/>
+                    <rect key="frame" x="20" y="32" width="537" height="643"/>
                     <subviews>
                         <stackView distribution="fill" orientation="vertical" alignment="leading" spacing="4" horizontalStackHuggingPriority="249.99998474121094" verticalStackHuggingPriority="249.99998474121094" translatesAutoresizingMaskIntoConstraints="NO" id="pwZ-0Z-1ID">
-                            <rect key="frame" x="0.0" y="390" width="530" height="141"/>
+                            <rect key="frame" x="0.0" y="502" width="530" height="141"/>
                             <subviews>
                                 <button translatesAutoresizingMaskIntoConstraints="NO" id="109">
                                     <rect key="frame" x="-1" y="124.5" width="285" height="17"/>
@@ -1057,7 +1057,7 @@
                             </customSpacing>
                         </stackView>
                         <stackView distribution="fill" orientation="vertical" alignment="leading" horizontalStackHuggingPriority="249.99998474121094" verticalStackHuggingPriority="249.99998474121094" translatesAutoresizingMaskIntoConstraints="NO" id="fO5-4y-X0y">
-                            <rect key="frame" x="0.0" y="344" width="365" height="38"/>
+                            <rect key="frame" x="0.0" y="456" width="365" height="38"/>
                             <subviews>
                                 <textField focusRingType="none" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="TMn-LX-3Ub">
                                     <rect key="frame" x="-2" y="23" width="369" height="15"/>
@@ -1105,7 +1105,7 @@
                             </customSpacing>
                         </stackView>
                         <stackView distribution="fill" orientation="vertical" alignment="leading" horizontalStackHuggingPriority="249.99998474121094" verticalStackHuggingPriority="249.99998474121094" translatesAutoresizingMaskIntoConstraints="NO" id="EOx-os-rU9">
-                            <rect key="frame" x="0.0" y="262" width="381" height="74"/>
+                            <rect key="frame" x="0.0" y="374" width="381" height="74"/>
                             <subviews>
                                 <textField focusRingType="none" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="sjl-L6-qdY">
                                     <rect key="frame" x="-2" y="59" width="385" height="15"/>
@@ -1155,7 +1155,7 @@
                             </customSpacing>
                         </stackView>
                         <stackView distribution="fill" orientation="vertical" alignment="leading" spacing="7" horizontalStackHuggingPriority="249.99998474121094" verticalStackHuggingPriority="249.99998474121094" translatesAutoresizingMaskIntoConstraints="NO" id="L1h-Ce-g4Z">
-                            <rect key="frame" x="0.0" y="145" width="449" height="109"/>
+                            <rect key="frame" x="0.0" y="257" width="449" height="109"/>
                             <subviews>
                                 <textField focusRingType="none" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="6q5-OP-iEb">
                                     <rect key="frame" x="-2" y="94" width="332" height="15"/>
@@ -1213,7 +1213,7 @@
                             </customSpacing>
                         </stackView>
                         <stackView distribution="fill" orientation="vertical" alignment="leading" horizontalStackHuggingPriority="249.99998474121094" verticalStackHuggingPriority="249.99998474121094" translatesAutoresizingMaskIntoConstraints="NO" id="NOW-jd-XBh">
-                            <rect key="frame" x="0.0" y="81" width="358" height="56"/>
+                            <rect key="frame" x="0.0" y="193" width="358" height="56"/>
                             <subviews>
                                 <textField focusRingType="none" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="J0f-Aw-dxC">
                                     <rect key="frame" x="-2" y="41" width="336" height="15"/>
@@ -1259,7 +1259,7 @@
                             </customSpacing>
                         </stackView>
                         <stackView distribution="fill" orientation="vertical" alignment="leading" spacing="7" horizontalStackHuggingPriority="249.99998474121094" verticalStackHuggingPriority="249.99998474121094" translatesAutoresizingMaskIntoConstraints="NO" id="s47-wG-vKA">
-                            <rect key="frame" x="0.0" y="0.0" width="348" height="73"/>
+                            <rect key="frame" x="0.0" y="112" width="348" height="73"/>
                             <subviews>
                                 <textField focusRingType="none" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="iCL-n8-VTP">
                                     <rect key="frame" x="-2" y="58" width="323" height="15"/>
@@ -1308,8 +1308,72 @@
                                 <real value="3.4028234663852886e+38"/>
                             </customSpacing>
                         </stackView>
+                        <stackView distribution="fill" orientation="vertical" alignment="leading" spacing="5" horizontalStackHuggingPriority="249.99998474121094" verticalStackHuggingPriority="249.99998474121094" detachesHiddenViews="YES" translatesAutoresizingMaskIntoConstraints="NO" id="UFf-Pi-9Jt" userLabel="stkShiftKeyASCIITogglesPane">
+                            <rect key="frame" x="0.0" y="0.0" width="537" height="104"/>
+                            <subviews>
+                                <box verticalHuggingPriority="750" boxType="separator" translatesAutoresizingMaskIntoConstraints="NO" id="2zC-9V-ryy">
+                                    <rect key="frame" x="0.0" y="101" width="530" height="5"/>
+                                    <constraints>
+                                        <constraint firstAttribute="width" relation="greaterThanOrEqual" constant="530" id="ppo-kg-vfE"/>
+                                    </constraints>
+                                </box>
+                                <button translatesAutoresizingMaskIntoConstraints="NO" id="47z-Kc-MdV">
+                                    <rect key="frame" x="-1" y="81.5" width="268" height="17"/>
+                                    <buttonCell key="cell" type="check" title="Toggle alphanumerical mode with Left-Shift" bezelStyle="regularSquare" imagePosition="left" controlSize="small" inset="2" id="CVy-8U-3qQ">
+                                        <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
+                                        <font key="font" metaFont="cellTitle"/>
+                                    </buttonCell>
+                                    <constraints>
+                                        <constraint firstAttribute="width" relation="greaterThanOrEqual" constant="70" id="JyP-8L-nph"/>
+                                        <constraint firstAttribute="height" constant="16" id="uE2-0S-Bgm"/>
+                                    </constraints>
+                                    <connections>
+                                        <binding destination="32" name="value" keyPath="values.TogglingAlphanumericalModeWithLShift" id="L1D-gV-tCC"/>
+                                    </connections>
+                                </button>
+                                <button translatesAutoresizingMaskIntoConstraints="NO" id="taP-hv-eg2">
+                                    <rect key="frame" x="-1" y="60.5" width="276" height="17"/>
+                                    <buttonCell key="cell" type="check" title="Toggle alphanumerical mode with Right-Shift" bezelStyle="regularSquare" imagePosition="left" controlSize="small" inset="2" id="nxP-CV-ZAu">
+                                        <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
+                                        <font key="font" metaFont="cellTitle"/>
+                                    </buttonCell>
+                                    <constraints>
+                                        <constraint firstAttribute="width" relation="greaterThanOrEqual" constant="70" id="mzA-do-IWc"/>
+                                        <constraint firstAttribute="height" constant="16" id="uiX-bl-Lww"/>
+                                    </constraints>
+                                    <connections>
+                                        <binding destination="32" name="value" keyPath="values.TogglingAlphanumericalModeWithRShift" id="4qK-TY-SFb"/>
+                                    </connections>
+                                </button>
+                                <textField wantsLayer="YES" focusRingType="none" verticalHuggingPriority="750" setsMaxLayoutWidthAtFirstLayout="YES" translatesAutoresizingMaskIntoConstraints="NO" id="Dec-3q-bsx">
+                                    <rect key="frame" x="-2" y="0.0" width="541" height="56"/>
+                                    <constraints>
+                                        <constraint firstAttribute="width" constant="537" id="wkg-gt-KuK"/>
+                                    </constraints>
+                                    <textFieldCell key="cell" controlSize="small" sendsActionOnEndEditing="YES" alignment="left" id="Rl7-3a-RDn">
+                                        <font key="font" metaFont="smallSystem"/>
+                                        <string key="title">This feature only needs to parse consecutive NSEvents passed by macOS built-in InputMethodKit framework, hence no necessity of asking end-users for extra privileges of monitoring global keyboard inputs. You are free to investigate our codebase or reverse-engineer this input method to see whether the above statement is trustable.</string>
+                                        <color key="textColor" name="secondaryLabelColor" catalog="System" colorSpace="catalog"/>
+                                        <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
+                                    </textFieldCell>
+                                </textField>
+                            </subviews>
+                            <visibilityPriorities>
+                                <integer value="1000"/>
+                                <integer value="1000"/>
+                                <integer value="1000"/>
+                                <integer value="1000"/>
+                            </visibilityPriorities>
+                            <customSpacing>
+                                <real value="3.4028234663852886e+38"/>
+                                <real value="3.4028234663852886e+38"/>
+                                <real value="3.4028234663852886e+38"/>
+                                <real value="3.4028234663852886e+38"/>
+                            </customSpacing>
+                        </stackView>
                     </subviews>
                     <visibilityPriorities>
+                        <integer value="1000"/>
                         <integer value="1000"/>
                         <integer value="1000"/>
                         <integer value="1000"/>
@@ -1324,6 +1388,7 @@
                         <real value="3.4028234663852886e+38"/>
                         <real value="3.4028234663852886e+38"/>
                         <real value="3.4028234663852886e+38"/>
+                        <real value="3.4028234663852886e+38"/>
                     </customSpacing>
                 </stackView>
             </subviews>
@@ -1332,7 +1397,7 @@
                 <constraint firstItem="j9R-fB-ttM" firstAttribute="top" secondItem="XWo-36-xGi" secondAttribute="top" constant="20" symbolic="YES" id="CuZ-dn-mQZ"/>
             </constraints>
             <accessibility identifier="vwrBehavior"/>
-            <point key="canvasLocation" x="-1351.5" y="615.5"/>
+            <point key="canvasLocation" x="-1351.5" y="668.5"/>
         </view>
         <userDefaultsController representsSharedInstance="YES" id="32"/>
         <view id="Rnp-LM-RIF" userLabel="vwrDictionary">
@@ -1685,7 +1750,7 @@
                             <rect key="frame" x="0.0" y="71" width="538" height="370"/>
                             <clipView key="contentView" drawsBackground="NO" id="x8s-wo-bxi">
                                 <rect key="frame" x="0.0" y="0.0" width="538" height="370"/>
-                                <autoresizingMask key="autoresizingMask"/>
+                                <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                 <subviews>
                                     <textView wantsLayer="YES" importsGraphics="NO" richText="NO" verticallyResizable="YES" allowsUndo="YES" smartInsertDelete="YES" id="kSG-dz-P2N">
                                         <rect key="frame" x="0.0" y="0.0" width="538" height="370"/>
@@ -2454,17 +2519,17 @@ DQ
                 <constraint firstItem="0gn-BJ-qid" firstAttribute="top" secondItem="U4q-xw-mc0" secondAttribute="top" constant="20" symbolic="YES" id="qgB-J1-68N"/>
             </constraints>
             <accessibility identifier="vwrKeyboard"/>
-            <point key="canvasLocation" x="-716" y="453"/>
+            <point key="canvasLocation" x="-716" y="475"/>
         </view>
         <view id="MaQ-Xm-8TB" userLabel="vwrDevZone">
             <rect key="frame" x="0.0" y="0.0" width="577" height="364"/>
             <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
             <subviews>
                 <stackView distribution="fill" orientation="vertical" alignment="leading" horizontalStackHuggingPriority="249.99998474121094" verticalStackHuggingPriority="249.99998474121094" translatesAutoresizingMaskIntoConstraints="NO" id="gjM-uG-XkW">
-                    <rect key="frame" x="20" y="39" width="537" height="305"/>
+                    <rect key="frame" x="20" y="43" width="537" height="301"/>
                     <subviews>
                         <textField wantsLayer="YES" focusRingType="none" verticalHuggingPriority="750" setsMaxLayoutWidthAtFirstLayout="YES" translatesAutoresizingMaskIntoConstraints="NO" id="hBd-sS-cWq">
-                            <rect key="frame" x="-2" y="277" width="541" height="28"/>
+                            <rect key="frame" x="-2" y="273" width="541" height="28"/>
                             <constraints>
                                 <constraint firstAttribute="width" constant="537" id="Kvp-PL-Pes"/>
                             </constraints>
@@ -2477,14 +2542,14 @@ Features listed here may not work as expected.</string>
                             </textFieldCell>
                         </textField>
                         <box verticalHuggingPriority="750" boxType="separator" translatesAutoresizingMaskIntoConstraints="NO" id="ul4-N6-Ybi">
-                            <rect key="frame" x="0.0" y="266" width="537" height="5"/>
+                            <rect key="frame" x="0.0" y="262" width="537" height="5"/>
                             <constraints>
                                 <constraint firstAttribute="width" constant="537" id="2lI-El-JtD"/>
                                 <constraint firstAttribute="width" relation="greaterThanOrEqual" constant="400" id="kJZ-E8-eDL"/>
                             </constraints>
                         </box>
                         <button translatesAutoresizingMaskIntoConstraints="NO" id="mCf-kK-FJc">
-                            <rect key="frame" x="-1" y="243.5" width="321" height="17"/>
+                            <rect key="frame" x="-1" y="239.5" width="321" height="17"/>
                             <buttonCell key="cell" type="check" title="Security-harden the composition buffer for all clients" bezelStyle="regularSquare" imagePosition="left" controlSize="small" inset="2" id="3N6-LT-HPv">
                                 <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
                                 <font key="font" metaFont="cellTitle"/>
@@ -2498,7 +2563,7 @@ Features listed here may not work as expected.</string>
                             </connections>
                         </button>
                         <textField wantsLayer="YES" focusRingType="none" verticalHuggingPriority="750" setsMaxLayoutWidthAtFirstLayout="YES" translatesAutoresizingMaskIntoConstraints="NO" id="uTe-PD-0NE">
-                            <rect key="frame" x="-2" y="208" width="541" height="28"/>
+                            <rect key="frame" x="-2" y="204" width="541" height="28"/>
                             <constraints>
                                 <constraint firstAttribute="width" constant="537" id="RXL-dq-gV0"/>
                             </constraints>
@@ -2510,7 +2575,7 @@ Features listed here may not work as expected.</string>
                             </textFieldCell>
                         </textField>
                         <button translatesAutoresizingMaskIntoConstraints="NO" id="yJg-tV-hH6">
-                            <rect key="frame" x="-1" y="183.5" width="429" height="17"/>
+                            <rect key="frame" x="-1" y="179.5" width="429" height="17"/>
                             <buttonCell key="cell" type="check" title="Disable segmented thick underline in marking mode for managed clients" bezelStyle="regularSquare" imagePosition="left" controlSize="small" inset="2" id="N6e-bR-mVa">
                                 <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
                                 <font key="font" metaFont="cellTitle"/>
@@ -2524,7 +2589,7 @@ Features listed here may not work as expected.</string>
                             </connections>
                         </button>
                         <textField wantsLayer="YES" focusRingType="none" verticalHuggingPriority="750" setsMaxLayoutWidthAtFirstLayout="YES" translatesAutoresizingMaskIntoConstraints="NO" id="uK3-cc-UcW">
-                            <rect key="frame" x="-2" y="106" width="541" height="70"/>
+                            <rect key="frame" x="-2" y="102" width="541" height="70"/>
                             <constraints>
                                 <constraint firstAttribute="width" constant="537" id="qOi-aV-LQX"/>
                             </constraints>
@@ -2535,61 +2600,32 @@ Features listed here may not work as expected.</string>
                                 <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
                             </textFieldCell>
                         </textField>
-                        <stackView distribution="fill" orientation="vertical" alignment="leading" spacing="5" horizontalStackHuggingPriority="249.99998474121094" verticalStackHuggingPriority="249.99998474121094" detachesHiddenViews="YES" translatesAutoresizingMaskIntoConstraints="NO" id="UFf-Pi-9Jt" userLabel="stkShiftKeyASCIITogglesPane">
-                            <rect key="frame" x="0.0" y="0.0" width="537" height="98"/>
-                            <subviews>
-                                <button translatesAutoresizingMaskIntoConstraints="NO" id="47z-Kc-MdV">
-                                    <rect key="frame" x="-1" y="81.5" width="268" height="17"/>
-                                    <buttonCell key="cell" type="check" title="Toggle alphanumerical mode with Left-Shift" bezelStyle="regularSquare" imagePosition="left" controlSize="small" inset="2" id="CVy-8U-3qQ">
-                                        <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
-                                        <font key="font" metaFont="cellTitle"/>
-                                    </buttonCell>
-                                    <constraints>
-                                        <constraint firstAttribute="width" relation="greaterThanOrEqual" constant="70" id="JyP-8L-nph"/>
-                                        <constraint firstAttribute="height" constant="16" id="uE2-0S-Bgm"/>
-                                    </constraints>
-                                    <connections>
-                                        <binding destination="32" name="value" keyPath="values.TogglingAlphanumericalModeWithLShift" id="L1D-gV-tCC"/>
-                                    </connections>
-                                </button>
-                                <button translatesAutoresizingMaskIntoConstraints="NO" id="taP-hv-eg2">
-                                    <rect key="frame" x="-1" y="60.5" width="276" height="17"/>
-                                    <buttonCell key="cell" type="check" title="Toggle alphanumerical mode with Right-Shift" bezelStyle="regularSquare" imagePosition="left" controlSize="small" inset="2" id="nxP-CV-ZAu">
-                                        <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
-                                        <font key="font" metaFont="cellTitle"/>
-                                    </buttonCell>
-                                    <constraints>
-                                        <constraint firstAttribute="width" relation="greaterThanOrEqual" constant="70" id="mzA-do-IWc"/>
-                                        <constraint firstAttribute="height" constant="16" id="uiX-bl-Lww"/>
-                                    </constraints>
-                                    <connections>
-                                        <binding destination="32" name="value" keyPath="values.TogglingAlphanumericalModeWithRShift" id="4qK-TY-SFb"/>
-                                    </connections>
-                                </button>
-                                <textField wantsLayer="YES" focusRingType="none" verticalHuggingPriority="750" setsMaxLayoutWidthAtFirstLayout="YES" translatesAutoresizingMaskIntoConstraints="NO" id="Dec-3q-bsx">
-                                    <rect key="frame" x="-2" y="0.0" width="541" height="56"/>
-                                    <constraints>
-                                        <constraint firstAttribute="width" constant="537" id="wkg-gt-KuK"/>
-                                    </constraints>
-                                    <textFieldCell key="cell" controlSize="small" sendsActionOnEndEditing="YES" alignment="left" id="Rl7-3a-RDn">
-                                        <font key="font" metaFont="smallSystem"/>
-                                        <string key="title">This feature only needs to parse consecutive NSEvents passed by macOS built-in InputMethodKit framework, hence no necessity of asking end-users for extra privileges of monitoring global keyboard inputs. You are free to investigate our codebase or reverse-engineer this input method to see whether the above statement is trustable.</string>
-                                        <color key="textColor" name="secondaryLabelColor" catalog="System" colorSpace="catalog"/>
-                                        <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
-                                    </textFieldCell>
-                                </textField>
-                            </subviews>
-                            <visibilityPriorities>
-                                <integer value="1000"/>
-                                <integer value="1000"/>
-                                <integer value="1000"/>
-                            </visibilityPriorities>
-                            <customSpacing>
-                                <real value="3.4028234663852886e+38"/>
-                                <real value="3.4028234663852886e+38"/>
-                                <real value="3.4028234663852886e+38"/>
-                            </customSpacing>
-                        </stackView>
+                        <button translatesAutoresizingMaskIntoConstraints="NO" id="PAX-gG-dDq">
+                            <rect key="frame" x="-1" y="77.5" width="395" height="17"/>
+                            <buttonCell key="cell" type="check" title="Actively check those processes abusing the SecureEventInput API" bezelStyle="regularSquare" imagePosition="left" controlSize="small" inset="2" id="chkCheckAbusersOfSecureEventInputAPI">
+                                <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
+                                <font key="font" metaFont="cellTitle"/>
+                            </buttonCell>
+                            <constraints>
+                                <constraint firstAttribute="width" relation="greaterThanOrEqual" constant="70" id="CPH-Ec-61k"/>
+                                <constraint firstAttribute="height" constant="16" id="Sl3-ON-r6A"/>
+                            </constraints>
+                            <connections>
+                                <binding destination="32" name="value" keyPath="values.CheckAbusersOfSecureEventInputAPI" id="j92-od-32w"/>
+                            </connections>
+                        </button>
+                        <textField wantsLayer="YES" focusRingType="none" verticalHuggingPriority="750" setsMaxLayoutWidthAtFirstLayout="YES" translatesAutoresizingMaskIntoConstraints="NO" id="7xr-bA-Gg5">
+                            <rect key="frame" x="-2" y="0.0" width="541" height="70"/>
+                            <constraints>
+                                <constraint firstAttribute="width" constant="537" id="uIU-Qp-xCh"/>
+                            </constraints>
+                            <textFieldCell key="cell" controlSize="small" sendsActionOnEndEditing="YES" alignment="left" id="lblCheckAbusersOfSecureEventInputAPI">
+                                <font key="font" metaFont="smallSystem"/>
+                                <string key="title">Such abuse of SecureEventInput API in the background can hinder all 3rd-party input methods from being able to switch to. It is fine to use SecureEventInput for sensitive input fields. However, an app calling EnableSecureEventInput() is responsible to call DisableSecureEventInput() immediately right after the input field loses focus. This situation may also happen if an app is hanging in the background (or working as a helper application in the background) with its SecureEventInput left enabled.</string>
+                                <color key="textColor" name="secondaryLabelColor" catalog="System" colorSpace="catalog"/>
+                                <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
+                            </textFieldCell>
+                        </textField>
                     </subviews>
                     <visibilityPriorities>
                         <integer value="1000"/>
@@ -2599,8 +2635,10 @@ Features listed here may not work as expected.</string>
                         <integer value="1000"/>
                         <integer value="1000"/>
                         <integer value="1000"/>
+                        <integer value="1000"/>
                     </visibilityPriorities>
                     <customSpacing>
+                        <real value="3.4028234663852886e+38"/>
                         <real value="3.4028234663852886e+38"/>
                         <real value="3.4028234663852886e+38"/>
                         <real value="3.4028234663852886e+38"/>
