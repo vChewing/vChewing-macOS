@@ -47,6 +47,7 @@
 "chkAllowBoostingSingleKanjiAsUserPhrase.title" = "Allow boosting / excluding a candidate of single kanji when marking";
 "chkAlsoConfirmAssociatedCandidatesByEnter.title" = "Allow using Enter key to confirm associated candidate selection";
 "chkAutoCorrectReadingCombination.title" = "Automatically correct reading combinations when typing";
+"chkCheckAbusersOfSecureEventInputAPI.title" = "Actively check those processes abusing the SecureEventInput API";
 "chkConsolidateContextOnCandidateSelection.title" = "Consolidate the context on confirming candidate selection";
 "chkFetchSuggestionsFromUserOverrideModel.title" = "Applying typing suggestions from half-life user override model";
 "chkHardenVerticalPunctuations.title" = "Harden vertical punctuations during vertical typing";
@@ -84,6 +85,7 @@
 "kcM-O6-mLN.title" = "This hinders all client apps from unwelcomely accessing your uncommitted contents in the composition buffer. A popup composition buffer will be shown instead.";
 "lblAcceptLeadingIntonations.title" = "Accept leading intonations in rare cases";
 "lblAlwaysShowTooltipTextsHorizontally.title" = "Always show tooltip texts horizontally";
+"lblCheckAbusersOfSecureEventInputAPI.title" = "Such abuse of SecureEventInput API in the background can hinder all 3rd-party input methods from being able to switch to. It is fine to use SecureEventInput for sensitive input fields. However, an app calling EnableSecureEventInput() is responsible to call DisableSecureEventInput() immediately right after the input field loses focus. This situation may also happen if an app is hanging in the background (or working as a helper application in the background) with its SecureEventInput left enabled.";
 "lblDevZoneTitleDescription.title" = "Warning: This page is for testing future features. \nFeatures listed here may not work as expected.";
 "lblIntonationKeyBehavior.title" = "Specify what intonation key does when syllable composer is empty.";
 "lblShiftBkspKeyBehavior.title" = "Choose the attempted behavior of Shift+BackSpace key.";

@@ -62,6 +62,8 @@ class CtlPrefWindow: NSWindowController, NSWindowDelegate {
   @IBOutlet var vwrKeyboard: NSView!
   @IBOutlet var vwrDevZone: NSView!
 
+  var previousView: NSView?
+
   public static var shared: CtlPrefWindow?
 
   @objc var observation: NSKeyValueObservation?
@@ -124,7 +126,7 @@ class CtlPrefWindow: NSWindowController, NSWindowDelegate {
     toolbar.delegate = self
     toolbar.selectedItemIdentifier = PrefUITabs.tabGeneral.toolbarIdentifier
     toolbar.showsBaselineSeparator = true
-    if #available(macOS 13, *) {
+    if #available(macOS 11.0, *) {
       window?.toolbarStyle = .preference
     }
     window?.toolbar = toolbar
@@ -467,13 +469,28 @@ class CtlPrefWindow: NSWindowController, NSWindowDelegate {
 extension CtlPrefWindow: NSToolbarDelegate {
   func use(view newView: NSView, animate: Bool = true) {
     guard let window = window, let existingContentView = window.contentView else { return }
+    guard previousView != newView else { return }
+    previousView = newView
     let temporaryViewOld = NSView(frame: existingContentView.frame)
     window.contentView = temporaryViewOld
     var newWindowRect = NSRect(origin: window.frame.origin, size: newView.bounds.size)
+    let shouldScroll: Bool = newWindowRect.size.height > 577
+    if shouldScroll { newWindowRect.size.height = 577 }
     newWindowRect.size.height += kWindowTitleHeight
     newWindowRect.origin.y = window.frame.maxY - newWindowRect.height
     window.setFrame(newWindowRect, display: true, animate: animate)
-    window.contentView = newView
+    if shouldScroll {
+      let scrollview = NSScrollView(frame: NSRect(x: 0, y: 0, width: 577, height: 577))
+      scrollview.borderType = .noBorder
+      scrollview.hasVerticalScroller = true
+      scrollview.hasHorizontalScroller = false
+      scrollview.verticalScroller?.scrollerStyle = .legacy
+      scrollview.autoresizingMask = [.width, .height]
+      scrollview.documentView = newView
+      window.contentView = scrollview
+    } else {
+      window.contentView = newView
+    }
   }
 
   var toolbarIdentifiers: [NSToolbarItem.Identifier] {
