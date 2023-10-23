@@ -300,6 +300,8 @@
 "Horizontal" = "横型陳列";
 "Hsu" = "許氏国音自然配列";
 "Hualuo Pinyin with Numeral Intonation" = "中華ローマ弁音 (ローマ字+数字音調)";
+"i18n:userdef.kCheckAbusersOfSecureEventInputAPI.description" = "このような不正利用は「システム内蔵入力以外の全ての入力アプリがメニューで灰色状態で選べなくて使えない」の元凶である。センシティブな資料の記入どころでSecureEventInputをEnableSecureEventInput()で使うのは当然であるが、「入力中」状態が終わった後必ずDisableSecureEventInput()で状態解消すべきだと義務である。いくつかヘルパーアプリも、あるいはSecureEventInputを呼び起こしてからすぐ固まったアプリも、この状態になりやすい。特に、他のアプリの画面へ切り替えたとしても、固まったアプリのSecureEventInput状態は自動的に解消できぬ。";
+"i18n:UserDef.kCheckAbusersOfSecureEventInputAPI.shortTitle" = "SecureEventInput API を不正利用しているバクグラウンド・プロセスを自動検知";
 "IBM" = "IBM 配列";
 "If disabled, this will insert space instead." = "未チェックの場合、スペースを挿入。";
 "If unchecked, the ESC key will try cleaning the unfinished readings / strokes first, and will commit the current composition buffer if there's no unfinished readings / strokes." = "未チェックの場合、ESC キーはまず未完成の音読/筆画を消す。\n未完成の音読/筆画がない場合、全緩衝列をそのまま送り出す。";

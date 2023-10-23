@@ -38,6 +38,9 @@ import SwiftExtension
   @AppProperty(key: UserDef.kSecurityHardenedCompositionBuffer.rawValue, defaultValue: false)
   public dynamic var securityHardenedCompositionBuffer: Bool
 
+  @AppProperty(key: UserDef.kCheckAbusersOfSecureEventInputAPI.rawValue, defaultValue: true)
+  public dynamic var checkAbusersOfSecureEventInputAPI: Bool
+
   @AppProperty(key: UserDef.kDeltaOfCalendarYears.rawValue, defaultValue: -2000)
   public dynamic var deltaOfCalendarYears: Int
 

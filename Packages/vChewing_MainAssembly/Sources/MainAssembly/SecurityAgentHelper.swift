@@ -41,6 +41,7 @@ public class SecurityAgentHelper {
   }
 
   @objc public func checkAndHandle(_: Timer) {
+    guard PrefMgr.shared.checkAbusersOfSecureEventInputAPI else { return }
     var results = SecureEventInputSputnik.getRunningSecureInputApps(abusersOnly: true)
     vCLog("SecurityAgentHelper scanned SecureEventInput abusers. \(results.count) targets found.")
     guard !results.isEmpty else { return }
