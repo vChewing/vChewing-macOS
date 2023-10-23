@@ -32,6 +32,7 @@ public enum UserDef: String, CaseIterable {
   case kIsDebugModeEnabled = "_DebugMode"
   case kFailureFlagForUOMObservation = "_FailureFlag_UOMObservation"
   case kSecurityHardenedCompositionBuffer = "SecurityHardenedCompositionBuffer"
+  case kCheckAbusersOfSecureEventInputAPI = "CheckAbusersOfSecureEventInputAPI"
   case kDeltaOfCalendarYears = "DeltaOfCalendarYears"
   case kMostRecentInputMode = "MostRecentInputMode"
   case kCassettePath = "CassettePath"
@@ -147,6 +148,7 @@ public extension UserDef {
     case .kIsDebugModeEnabled: return .bool
     case .kFailureFlagForUOMObservation: return .bool
     case .kSecurityHardenedCompositionBuffer: return .bool
+    case .kCheckAbusersOfSecureEventInputAPI: return .bool
     case .kDeltaOfCalendarYears: return .integer
     case .kMostRecentInputMode: return .string
     case .kCassettePath: return .string
@@ -236,6 +238,10 @@ public extension UserDef {
     case .kSecurityHardenedCompositionBuffer: return .init(
         userDef: self, shortTitle: "Security-harden the composition buffer for all clients",
         description: "This hinders all client apps from unwelcomely accessing your uncommitted contents in the composition buffer. A popup composition buffer will be shown instead."
+      )
+    case .kCheckAbusersOfSecureEventInputAPI: return .init(
+        userDef: self, shortTitle: "i18n:UserDef.kCheckAbusersOfSecureEventInputAPI.shortTitle",
+        description: "i18n:userdef.kCheckAbusersOfSecureEventInputAPI.description"
       )
     case .kDeltaOfCalendarYears: return nil
     case .kMostRecentInputMode: return nil
