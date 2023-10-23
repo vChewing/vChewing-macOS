@@ -47,6 +47,7 @@
 "chkAllowBoostingSingleKanjiAsUserPhrase.title" = "允許藉由標記模式將可以就地升權/排除的候選字詞的最短詞長設為單個漢字";
 "chkAlsoConfirmAssociatedCandidatesByEnter.title" = "允許使用 Enter 確認當前選中的聯想詞";
 "chkAutoCorrectReadingCombination.title" = "敲字時自動糾正讀音組合";
+"chkCheckAbusersOfSecureEventInputAPI.title" = "主動偵測正在濫用 SecureEventInput API 的後檯執行緒";
 "chkConsolidateContextOnCandidateSelection.title" = "在使用選字窗選字時，自動鞏固上下文";
 "chkFetchSuggestionsFromUserOverrideModel.title" = "在敲字時自動套用來自半衰記憶模組的建議";
 "chkHardenVerticalPunctuations.title" = "在縱排書寫時，強制轉換標點為縱排形式（不推薦）";
@@ -84,6 +85,7 @@
 "kcM-O6-mLN.title" = "這會阻止任何客體擅自存取尚未遞交的組字區內容。此舉也會全局啟用浮動組字窗。";
 "lblAcceptLeadingIntonations.title" = "在個別情況下，允許聲調前置鍵入";
 "lblAlwaysShowTooltipTextsHorizontally.title" = "始終使用橫排來顯示工具提示視窗";
+"lblCheckAbusersOfSecureEventInputAPI.title" = "這種濫用會導致系統內的所有第三方輸入法全都無法正常使用（在輸入法選單內會變成灰色）。針對需要填寫敏感資料的場合，使用 SecureEventInput 無可厚非。但是，用 EnableSecureEventInput() 開啟該模式之後，就有義務在輸入窗格失焦的那一刻呼叫 DisableSecureEventInput() 來結束這種狀態。這種狀態還常見於後檯輔助 App 當中、或者某個 App 在叫出該模式之後失去回應（這樣的話，哪怕被切換到後檯，SecureEventInput 也不會自動解除）。";
 "lblDevZoneTitleDescription.title" = "警告：該頁面僅作未來功能測試所用。\n在此列出的功能並非處於完全可用之狀態。";
 "lblIntonationKeyBehavior.title" = "指定聲調鍵（在注拼槽為「空」狀態時）的行為。";
 "lblShiftBkspKeyBehavior.title" = "指定 Shift+BackSpace 組合鍵率先嘗試的行為。";
