@@ -8,9 +8,6 @@
 
 /* Begin PBXBuildFile section */
 		5B09307628B6FC3B0021F8C5 /* shortcuts.html in Resources */ = {isa = PBXBuildFile; fileRef = 5B09307828B6FC3B0021F8C5 /* shortcuts.html */; };
-		5B0E22A628FC11B900EB7ACA /* Preferences.tiff in Resources */ = {isa = PBXBuildFile; fileRef = 5B0E22A528FC11B900EB7ACA /* Preferences.tiff */; };
-		5B0E22A928FC11B900EB7ACA /* Preferences.xib in Resources */ = {isa = PBXBuildFile; fileRef = 5B0E22A728FC11B900EB7ACA /* Preferences.xib */; };
-		5B0E22B028FC17CB00EB7ACA /* Preferences.prefPane in Resources */ = {isa = PBXBuildFile; fileRef = 5B0E229F28FC11B900EB7ACA /* Preferences.prefPane */; };
 		5B0EF55D28CDBF7100F8F7CE /* frmClientListMgr.xib in Resources */ = {isa = PBXBuildFile; fileRef = 5B0EF55C28CDBF7100F8F7CE /* frmClientListMgr.xib */; };
 		5B0EF55F28CDBF8E00F8F7CE /* CtlClientListMgr.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B0EF55E28CDBF8E00F8F7CE /* CtlClientListMgr.swift */; };
 		5B1C98B929436CEE0019B807 /* data-bpmf-reverse-lookup.json in Resources */ = {isa = PBXBuildFile; fileRef = 5B1C98B729436CED0019B807 /* data-bpmf-reverse-lookup.json */; };
@@ -28,8 +25,6 @@
 		5B70F4EA2A0BE900005EA8C4 /* MenuIcon-SCVIM.png in Resources */ = {isa = PBXBuildFile; fileRef = 5B70F4E62A0BE900005EA8C4 /* MenuIcon-SCVIM.png */; };
 		5B70F4EB2A0BE900005EA8C4 /* MenuIcon-SCVIM@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 5B70F4E72A0BE900005EA8C4 /* MenuIcon-SCVIM@2x.png */; };
 		5B70F4EC2A0BE900005EA8C4 /* MenuIcon-TCVIM@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 5B70F4E82A0BE900005EA8C4 /* MenuIcon-TCVIM@2x.png */; };
-		5B72D55C2AB98B8300FB88CE /* Preferences.h in Headers */ = {isa = PBXBuildFile; fileRef = 5B72D55A2AB98B8300FB88CE /* Preferences.h */; };
-		5B72D55D2AB98B8300FB88CE /* Preferences.m in Sources */ = {isa = PBXBuildFile; fileRef = 5B72D55B2AB98B8300FB88CE /* Preferences.m */; };
 		5B765F09293A253C00122315 /* PhraseEditorUI in Frameworks */ = {isa = PBXBuildFile; productRef = 5B765F08293A253C00122315 /* PhraseEditorUI */; };
 		5B7BC4B027AFFBE800F66C24 /* frmPrefWindow.xib in Resources */ = {isa = PBXBuildFile; fileRef = 5B7BC4AE27AFFBE800F66C24 /* frmPrefWindow.xib */; };
 		5B7DA80328BF6BC600D7B2AD /* fixinstall.sh in Resources */ = {isa = PBXBuildFile; fileRef = 5B7DA80228BF6BBA00D7B2AD /* fixinstall.sh */; };
@@ -95,13 +90,6 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
-		5B0E22AE28FC16AA00EB7ACA /* PBXContainerItemProxy */ = {
-			isa = PBXContainerItemProxy;
-			containerPortal = 6A0D4E9415FC0CFA00ABF4B3 /* Project object */;
-			proxyType = 1;
-			remoteGlobalIDString = 5B0E229E28FC11B900EB7ACA;
-			remoteInfo = Preferences;
-		};
 		6ACA420015FC1DCC00935EF6 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = 6A0D4E9415FC0CFA00ABF4B3 /* Project object */;
@@ -142,10 +130,6 @@
 		5B09307A28B6FC400021F8C5 /* en */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.html; lineEnding = 0; name = en; path = en.lproj/shortcuts.html; sourceTree = "<group>"; };
 		5B09307B28B6FC410021F8C5 /* ja */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.html; lineEnding = 0; name = ja; path = ja.lproj/shortcuts.html; sourceTree = "<group>"; };
 		5B0C5EDF27C7D9870078037C /* dataCompiler.swift */ = {isa = PBXFileReference; explicitFileType = sourcecode.swift; fileEncoding = 4; indentWidth = 2; lineEnding = 0; path = dataCompiler.swift; sourceTree = "<group>"; tabWidth = 2; usesTabs = 0; };
-		5B0E229F28FC11B900EB7ACA /* Preferences.prefPane */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = Preferences.prefPane; sourceTree = BUILT_PRODUCTS_DIR; };
-		5B0E22A528FC11B900EB7ACA /* Preferences.tiff */ = {isa = PBXFileReference; lastKnownFileType = image.tiff; path = Preferences.tiff; sourceTree = "<group>"; };
-		5B0E22A828FC11B900EB7ACA /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = Base; path = Base.lproj/Preferences.xib; sourceTree = "<group>"; };
-		5B0E22AA28FC11B900EB7ACA /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		5B0EF55C28CDBF7100F8F7CE /* frmClientListMgr.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = frmClientListMgr.xib; sourceTree = "<group>"; };
 		5B0EF55E28CDBF8E00F8F7CE /* CtlClientListMgr.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CtlClientListMgr.swift; sourceTree = "<group>"; };
 		5B18BA6F27C7BD8B0056EB19 /* LICENSE-CHS.txt */ = {isa = PBXFileReference; lastKnownFileType = text; path = "LICENSE-CHS.txt"; sourceTree = "<group>"; };
@@ -173,8 +157,6 @@
 		5B70F4E62A0BE900005EA8C4 /* MenuIcon-SCVIM.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "MenuIcon-SCVIM.png"; sourceTree = "<group>"; };
 		5B70F4E72A0BE900005EA8C4 /* MenuIcon-SCVIM@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "MenuIcon-SCVIM@2x.png"; sourceTree = "<group>"; };
 		5B70F4E82A0BE900005EA8C4 /* MenuIcon-TCVIM@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "MenuIcon-TCVIM@2x.png"; sourceTree = "<group>"; };
-		5B72D55A2AB98B8300FB88CE /* Preferences.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = Preferences.h; sourceTree = "<group>"; };
-		5B72D55B2AB98B8300FB88CE /* Preferences.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = Preferences.m; sourceTree = "<group>"; };
 		5B765F07293A250000122315 /* vChewing_PhraseEditorUI */ = {isa = PBXFileReference; lastKnownFileType = wrapper; name = vChewing_PhraseEditorUI; path = Packages/vChewing_PhraseEditorUI; sourceTree = "<group>"; };
 		5B7BC4AF27AFFBE800F66C24 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = Base; path = Base.lproj/frmPrefWindow.xib; sourceTree = "<group>"; };
 		5B7BC4B227AFFC0B00F66C24 /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/frmPrefWindow.strings; sourceTree = "<group>"; };
@@ -252,13 +234,6 @@
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
-		5B0E229C28FC11B900EB7ACA /* Frameworks */ = {
-			isa = PBXFrameworksBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
 		6A0D4E9F15FC0D2D00ABF4B3 /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
@@ -305,18 +280,6 @@
 				5B0C5EDF27C7D9870078037C /* dataCompiler.swift */,
 			);
 			path = DataCompiler;
-			sourceTree = "<group>";
-		};
-		5B0E22A028FC11B900EB7ACA /* Preferences */ = {
-			isa = PBXGroup;
-			children = (
-				5B72D55A2AB98B8300FB88CE /* Preferences.h */,
-				5B72D55B2AB98B8300FB88CE /* Preferences.m */,
-				5B0E22A528FC11B900EB7ACA /* Preferences.tiff */,
-				5B0E22A728FC11B900EB7ACA /* Preferences.xib */,
-				5B0E22AA28FC11B900EB7ACA /* Info.plist */,
-			);
-			path = Preferences;
 			sourceTree = "<group>";
 		};
 		5B18BA7527C7BF6D0056EB19 /* MiscRootFiles */ = {
@@ -497,7 +460,6 @@
 				6ACA41E715FC1D9000935EF6 /* Installer */,
 				6A0D4EC215FC0D3C00ABF4B3 /* Source */,
 				5B2F2BB4286216A500B8557B /* vChewingTests */,
-				5B0E22A028FC11B900EB7ACA /* Preferences */,
 				6A0D4EA315FC0D2D00ABF4B3 /* Products */,
 				D47D73C127A7200500255A50 /* Frameworks */,
 				5BDC5CB127C28E8B00E1CCE2 /* KeyboardExtension */,
@@ -510,7 +472,6 @@
 			children = (
 				6A0D4EA215FC0D2D00ABF4B3 /* vChewing.app */,
 				6ACA41CB15FC1D7500935EF6 /* vChewingInstaller.app */,
-				5B0E229F28FC11B900EB7ACA /* Preferences.prefPane */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -571,36 +532,7 @@
 		};
 /* End PBXGroup section */
 
-/* Begin PBXHeadersBuildPhase section */
-		5B0E229A28FC11B900EB7ACA /* Headers */ = {
-			isa = PBXHeadersBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-				5B72D55C2AB98B8300FB88CE /* Preferences.h in Headers */,
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
-/* End PBXHeadersBuildPhase section */
-
 /* Begin PBXNativeTarget section */
-		5B0E229E28FC11B900EB7ACA /* Preferences */ = {
-			isa = PBXNativeTarget;
-			buildConfigurationList = 5B0E22AD28FC11B900EB7ACA /* Build configuration list for PBXNativeTarget "Preferences" */;
-			buildPhases = (
-				5B0E229A28FC11B900EB7ACA /* Headers */,
-				5B0E229B28FC11B900EB7ACA /* Sources */,
-				5B0E229C28FC11B900EB7ACA /* Frameworks */,
-				5B0E229D28FC11B900EB7ACA /* Resources */,
-			);
-			buildRules = (
-			);
-			dependencies = (
-			);
-			name = Preferences;
-			productName = Preferences;
-			productReference = 5B0E229F28FC11B900EB7ACA /* Preferences.prefPane */;
-			productType = "com.apple.product-type.bundle";
-		};
 		6A0D4EA115FC0D2D00ABF4B3 /* vChewing */ = {
 			isa = PBXNativeTarget;
 			buildConfigurationList = 6A0D4EC015FC0D2E00ABF4B3 /* Build configuration list for PBXNativeTarget "vChewing" */;
@@ -615,7 +547,6 @@
 			buildRules = (
 			);
 			dependencies = (
-				5B0E22AF28FC16AA00EB7ACA /* PBXTargetDependency */,
 			);
 			name = vChewing;
 			packageProductDependencies = (
@@ -678,10 +609,6 @@
 				LastSwiftUpdateCheck = 1340;
 				LastUpgradeCheck = 1500;
 				TargetAttributes = {
-					5B0E229E28FC11B900EB7ACA = {
-						CreatedOnToolsVersion = 14.0;
-						LastSwiftMigration = 1500;
-					};
 					6A0D4EA115FC0D2D00ABF4B3 = {
 						LastSwiftMigration = 1400;
 						ProvisioningStyle = Automatic;
@@ -712,21 +639,11 @@
 			targets = (
 				6A0D4EA115FC0D2D00ABF4B3 /* vChewing */,
 				6ACA41CA15FC1D7500935EF6 /* vChewingInstaller */,
-				5B0E229E28FC11B900EB7ACA /* Preferences */,
 			);
 		};
 /* End PBXProject section */
 
 /* Begin PBXResourcesBuildPhase section */
-		5B0E229D28FC11B900EB7ACA /* Resources */ = {
-			isa = PBXResourcesBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-				5B0E22A928FC11B900EB7ACA /* Preferences.xib in Resources */,
-				5B0E22A628FC11B900EB7ACA /* Preferences.tiff in Resources */,
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
 		6A0D4EA015FC0D2D00ABF4B3 /* Resources */ = {
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
@@ -738,7 +655,6 @@
 				5B7DA80328BF6BC600D7B2AD /* fixinstall.sh in Resources */,
 				5B0EF55D28CDBF7100F8F7CE /* frmClientListMgr.xib in Resources */,
 				5B70F4E92A0BE900005EA8C4 /* MenuIcon-TCVIM.png in Resources */,
-				5B0E22B028FC17CB00EB7ACA /* Preferences.prefPane in Resources */,
 				5BBBB76027AED54C0023B93A /* Fart.m4a in Resources */,
 				6A2E40F6253A69DA00D1AE1D /* Images.xcassets in Resources */,
 				5B70F4EA2A0BE900005EA8C4 /* MenuIcon-SCVIM.png in Resources */,
@@ -882,14 +798,6 @@
 /* End PBXShellScriptBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
-		5B0E229B28FC11B900EB7ACA /* Sources */ = {
-			isa = PBXSourcesBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-				5B72D55D2AB98B8300FB88CE /* Preferences.m in Sources */,
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
 		6A0D4E9E15FC0D2D00ABF4B3 /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
@@ -919,11 +827,6 @@
 /* End PBXSourcesBuildPhase section */
 
 /* Begin PBXTargetDependency section */
-		5B0E22AF28FC16AA00EB7ACA /* PBXTargetDependency */ = {
-			isa = PBXTargetDependency;
-			target = 5B0E229E28FC11B900EB7ACA /* Preferences */;
-			targetProxy = 5B0E22AE28FC16AA00EB7ACA /* PBXContainerItemProxy */;
-		};
 		6ACA420115FC1DCC00935EF6 /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
 			target = 6A0D4EA115FC0D2D00ABF4B3 /* vChewing */;
@@ -941,14 +844,6 @@
 				5B09307B28B6FC410021F8C5 /* ja */,
 			);
 			name = shortcuts.html;
-			sourceTree = "<group>";
-		};
-		5B0E22A728FC11B900EB7ACA /* Preferences.xib */ = {
-			isa = PBXVariantGroup;
-			children = (
-				5B0E22A828FC11B900EB7ACA /* Base */,
-			);
-			name = Preferences.xib;
 			sourceTree = "<group>";
 		};
 		5B7BC4AE27AFFBE800F66C24 /* frmPrefWindow.xib */ = {
@@ -1020,94 +915,6 @@
 /* End PBXVariantGroup section */
 
 /* Begin XCBuildConfiguration section */
-		5B0E22AB28FC11B900EB7ACA /* Debug */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				CLANG_ANALYZER_NONNULL = YES;
-				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
-				CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";
-				CLANG_ENABLE_MODULES = YES;
-				CLANG_ENABLE_OBJC_ARC = YES;
-				CLANG_ENABLE_OBJC_WEAK = YES;
-				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
-				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
-				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
-				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
-				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
-				CODE_SIGN_STYLE = Automatic;
-				COMBINE_HIDPI_IMAGES = YES;
-				CURRENT_PROJECT_VERSION = 3600;
-				GCC_C_LANGUAGE_STANDARD = gnu11;
-				GCC_DYNAMIC_NO_PIC = NO;
-				GCC_OPTIMIZATION_LEVEL = 0;
-				GCC_PREPROCESSOR_DEFINITIONS = (
-					"DEBUG=1",
-					"$(inherited)",
-				);
-				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
-				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
-				GENERATE_INFOPLIST_FILE = YES;
-				INFOPLIST_FILE = Preferences/Info.plist;
-				INFOPLIST_KEY_NSHumanReadableCopyright = "";
-				INFOPLIST_KEY_NSMainNibFile = Preferences;
-				INFOPLIST_KEY_NSPrincipalClass = Preferences;
-				INSTALL_PATH = "$(HOME)/Library/PreferencePanes";
-				MACOSX_DEPLOYMENT_TARGET = 12.0;
-				MARKETING_VERSION = 3.6.0;
-				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
-				MTL_FAST_MATH = YES;
-				PRODUCT_BUNDLE_IDENTIFIER = org.atelierInmu.vChewing.Preferences;
-				PRODUCT_NAME = "$(TARGET_NAME)";
-				SDKROOT = macosx;
-				SKIP_INSTALL = YES;
-				SWIFT_EMIT_LOC_STRINGS = YES;
-				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
-				SWIFT_VERSION = 5.0;
-				WRAPPER_EXTENSION = prefPane;
-			};
-			name = Debug;
-		};
-		5B0E22AC28FC11B900EB7ACA /* Release */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				CLANG_ANALYZER_NONNULL = YES;
-				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
-				CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";
-				CLANG_ENABLE_MODULES = YES;
-				CLANG_ENABLE_OBJC_ARC = YES;
-				CLANG_ENABLE_OBJC_WEAK = YES;
-				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
-				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
-				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
-				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
-				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
-				CODE_SIGN_STYLE = Automatic;
-				COMBINE_HIDPI_IMAGES = YES;
-				CURRENT_PROJECT_VERSION = 3600;
-				ENABLE_NS_ASSERTIONS = NO;
-				GCC_C_LANGUAGE_STANDARD = gnu11;
-				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
-				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
-				GENERATE_INFOPLIST_FILE = YES;
-				INFOPLIST_FILE = Preferences/Info.plist;
-				INFOPLIST_KEY_NSHumanReadableCopyright = "";
-				INFOPLIST_KEY_NSMainNibFile = Preferences;
-				INFOPLIST_KEY_NSPrincipalClass = Preferences;
-				INSTALL_PATH = "$(HOME)/Library/PreferencePanes";
-				MACOSX_DEPLOYMENT_TARGET = 12.0;
-				MARKETING_VERSION = 3.6.0;
-				MTL_ENABLE_DEBUG_INFO = NO;
-				MTL_FAST_MATH = YES;
-				PRODUCT_BUNDLE_IDENTIFIER = org.atelierInmu.vChewing.Preferences;
-				PRODUCT_NAME = "$(TARGET_NAME)";
-				SDKROOT = macosx;
-				SKIP_INSTALL = YES;
-				SWIFT_EMIT_LOC_STRINGS = YES;
-				SWIFT_VERSION = 5.0;
-				WRAPPER_EXTENSION = prefPane;
-			};
-			name = Release;
-		};
 		6A0D4E9915FC0CFA00ABF4B3 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
@@ -1408,15 +1215,6 @@
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
-		5B0E22AD28FC11B900EB7ACA /* Build configuration list for PBXNativeTarget "Preferences" */ = {
-			isa = XCConfigurationList;
-			buildConfigurations = (
-				5B0E22AB28FC11B900EB7ACA /* Debug */,
-				5B0E22AC28FC11B900EB7ACA /* Release */,
-			);
-			defaultConfigurationIsVisible = 0;
-			defaultConfigurationName = Release;
-		};
 		6A0D4E9715FC0CFA00ABF4B3 /* Build configuration list for PBXProject "vChewing" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
