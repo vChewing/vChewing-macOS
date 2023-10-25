@@ -211,7 +211,7 @@ public struct VwrSettingsPaneBehavior: View {
             Spacer()
             Text(
               "This feature requires macOS 10.15 and above.".localized + CtlSettingsUI.sentenceSeparator
-                + "This feature only needs to parse consecutive NSEvents passed by macOS built-in InputMethodKit framework, hence no necessity of asking end-users for extra privileges of monitoring global keyboard inputs. You are free to investigate our codebase or reverse-engineer this input method to see whether the above statement is trustable.".localized
+                + "i18n:settings.shiftKeyASCIITogle.description".localized
             )
             .settingsDescription()
           }

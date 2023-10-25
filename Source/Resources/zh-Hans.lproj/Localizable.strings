@@ -243,9 +243,9 @@
 "Candidate Size:" = "候选字窗字号:";
 "Cassette mode is similar to the CIN support of the Yahoo Kimo IME, allowing users to use their own CIN tables to implement their stroked-based input schema (e.g. Wubi, Cangjie, Boshiamy, etc.) as a plan-B in vChewing IME. However, since vChewing won't compromise its phonabet input mode experience for this cassette mode, users might not feel comfortable enough comparing to their experiences with RIME (recommended) or OpenVanilla (deprecated)." = "磁带模式类似于雅虎奇摩输入法的 CIN 支援模式，允许使用者借由 CIN 表格档案扩充自己想要的笔画输入法（比如五笔、仓颉、呒虾米，等）。然而，因为威注音不打算为了这个功能而牺牲注音输入的体验，所以这个磁带模式的体验对于已经习惯 RIME 或者 OpenVanilla 的人群而言可能会稍微麻烦一些。";
 "Cassette" = "磁带设定";
-"Chinese Conversion:" = "繁简转换:";
 "Change user interface language (will reboot the IME)." = "变更输入法介面语言，会自动重启输入法。";
 "Check for updates automatically" = "自动检查软体更新";
+"Chinese Conversion:" = "繁简转换:";
 "Choose candidate font size for better visual clarity." = "变更候选字窗的字型大小。";
 "Choose or hit Enter to confim your prefered keys for selecting candidates." = "请选择您所偏好的用来选字的按键组合。自订组合需敲 Enter 键生效。";
 "Choose the behavior of (Shift+)Space key with candidates." = "指定 (Shift+)空格键 对候选字词而言的轮替操作对象。";
@@ -300,6 +300,7 @@
 "Horizontal" = "横向布局";
 "Hsu" = "许氏国音自然排列";
 "Hualuo Pinyin with Numeral Intonation" = "华罗拼音+数字标调";
+"i18n:settings.shiftKeyASCIITogle.description" = "该功能只需要对借由 macOS 内建的输入法框架传来的 NSEvent 做上下文分析，自然没有「向使用者寻求系统全局键盘事件监听权限」之必要。您可自行审视敝输入法的原始程式码仓库、或对敝输入法逆向工程，以自行证实此处所言之真假。另注：这个 Shift 键切换开关在 CapsLock 灯亮时无效。";
 "i18n:userdef.kCheckAbusersOfSecureEventInputAPI.description" = "这种滥用会导致系统内的所有第三方输入法全都无法正常使用（在输入法选单内会变成灰色）。针对需要填写敏感数据的场合，使用 SecureEventInput 无可厚非。但是，用 EnableSecureEventInput() 开启该模式之后，就有义务在输入窗格失焦的那一刻呼叫 DisableSecureEventInput() 来结束这种状态。这种状态还常见于后台辅助 App 当中、或者某个 App 在叫出该模式之后失去响应（这样的话，哪怕被切换到后台，SecureEventInput 也不会自动解除）。";
 "i18n:UserDef.kCheckAbusersOfSecureEventInputAPI.shortTitle" = "主动检测正在滥用 SecureEventInput API 的后台进程";
 "IBM" = "IBM 排列";
@@ -354,7 +355,6 @@
 "The user override model only possesses memories temporarily. Each memory record gradually becomes ineffective within approximately less than 6 days. You can erase all memory records through the input method menu." = "半衰记忆模组仅持有临时记忆之功能。每一笔记录都会在六天之内逐渐变得彻底失效。您可以借由输入法选单清除全部的记忆记录。";
 "This conversion only affects the cassette module, converting typed contents to either Simplified Chinese or Traditional Chinese in accordance with this setting and your current input mode." = "该转换仅对磁带模式有影响，会将键入的内容根据该选项与当前的简繁体模式来转换。";
 "This feature accommodates certain typing mistakes that the intonation mark might be typed at first (which is sequentially wrong from a common sense that intonation marks are supposed to be used for confirming combinations). It won't work if the current parser is of (any) pinyin. Also, this feature won't work when an intonation override is possible (and enabled)." = "声调键是专门用来确认注音组合输入的，从常理上来讲只能在最后键入。然而，总是有人会失手将声调键前置键入。该防呆功能专门应对这种情形，但无法用于拼音输入模式，且其优先权比「以声调键覆写游标身后的汉字的声调」更低（除非后者被停用）。";
-"This feature only needs to parse consecutive NSEvents passed by macOS built-in InputMethodKit framework, hence no necessity of asking end-users for extra privileges of monitoring global keyboard inputs. You are free to investigate our codebase or reverse-engineer this input method to see whether the above statement is trustable." = "该功能只需要对借由 macOS 内建的输入法框架传来的 NSEvent 做上下文分析，自然没有「向使用者寻求系统全局键盘事件监听权限」之必要。您可自行审视敝输入法的原始程式码仓库、或对敝输入法逆向工程，以自行证实此处所言之真假。";
 "This feature requires macOS 10.15 and above." = "该功能要求系统版本至少 macOS 10.15。";
 "This feature requires macOS 12 and above." = "该功能要求系统版本至少 macOS 12。";
 "This hinders all client apps from unwelcomely accessing your uncommitted contents in the composition buffer. A popup composition buffer will be shown instead." = "这会阻止任何客体擅自存取尚未递交的组字区内容。此举也会全局启用浮动组字窗。";

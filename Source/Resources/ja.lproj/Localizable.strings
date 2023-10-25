@@ -244,8 +244,8 @@
 "Candidate Size:" = "候補文字の字号:";
 "Cassette mode is similar to the CIN support of the Yahoo Kimo IME, allowing users to use their own CIN tables to implement their stroked-based input schema (e.g. Wubi, Cangjie, Boshiamy, etc.) as a plan-B in vChewing IME. However, since vChewing won't compromise its phonabet input mode experience for this cassette mode, users might not feel comfortable enough comparing to their experiences with RIME (recommended) or OpenVanilla (deprecated)." = "カセットモードは、CIN ファイルを用いて、（五筆や倉頡や嘸蝦米などのような）筆画入力を機能拡張できるモードである。ですが、単なる予備機能として提供したもののため、使いやすいかどうか、RIME や OpenVanilla などに比べられないかもしれん。";
 "Cassette" = "カセ設定";
-"Chinese Conversion:" = "繁体字・簡体字変換:";"Change user interface language (will reboot the IME)." = "アプリ表示用言語をご指定下さい、そして入力アプリは自動的に再起動。";
 "Check for updates automatically" = "アプリの更新通知を受く";
+"Chinese Conversion:" = "繁体字・簡体字変換:";"Change user interface language (will reboot the IME)." = "アプリ表示用言語をご指定下さい、そして入力アプリは自動的に再起動。";
 "Choose candidate font size for better visual clarity." = "入力候補陳列の候補文字の字号をご指定ください。";
 "Choose or hit Enter to confim your prefered keys for selecting candidates." = "お好きなる言選り用キー陣列をご指定ください。新しい組み合わせは Enter で効かす。";
 "Choose the behavior of (Shift+)Space key with candidates." = "入力候補についての (Shift+)Space キーの輪番切替対象をご指定ください。";
@@ -300,6 +300,7 @@
 "Horizontal" = "横型陳列";
 "Hsu" = "許氏国音自然配列";
 "Hualuo Pinyin with Numeral Intonation" = "中華ローマ弁音 (ローマ字+数字音調)";
+"i18n:settings.shiftKeyASCIITogle.description" = "この機能の利用する NSEvent は、macOS 内蔵の入力アプリ共用モジュール「InputMethodKit」から提供した NSEvent のみであり、その NSEvent 文脈関係で「Shift キーは１回押したかどうか」と判断することはできる。この事実に疑いを持つ者は、本アプリのソースコードを審査するか、あるいは本アプリを逆向工程（分解工学, いわゆる「Reverse-Engineering」）するがよい。なお、Shiftキーによるこの切り替えは、CapsLockがONの時には効かぬ。";
 "i18n:userdef.kCheckAbusersOfSecureEventInputAPI.description" = "このような不正利用は「システム内蔵入力以外の全ての入力アプリがメニューで灰色状態で選べなくて使えない」の元凶である。センシティブな資料の記入どころでSecureEventInputをEnableSecureEventInput()で使うのは当然であるが、「入力中」状態が終わった後必ずDisableSecureEventInput()で状態解消すべきだと義務である。いくつかヘルパーアプリも、あるいはSecureEventInputを呼び起こしてからすぐ固まったアプリも、この状態になりやすい。特に、他のアプリの画面へ切り替えたとしても、固まったアプリのSecureEventInput状態は自動的に解消できぬ。";
 "i18n:UserDef.kCheckAbusersOfSecureEventInputAPI.shortTitle" = "SecureEventInput API を不正利用しているバクグラウンド・プロセスを自動検知";
 "IBM" = "IBM 配列";
@@ -354,7 +355,6 @@
 "The user override model only possesses memories temporarily. Each memory record gradually becomes ineffective within approximately less than 6 days. You can erase all memory records through the input method menu." = "臨時記憶モジュールは文字の通り「臨時的」の記憶をします。記録は六日間どんどん忘れてしまいます。入力アプリのメニューから全ての記録を消すことはできます。";
 "This conversion only affects the cassette module, converting typed contents to either Simplified Chinese or Traditional Chinese in accordance with this setting and your current input mode." = "この転換はカセットモードだけに使える転換であり、転換結果はこの設定と入力モード次第である。";
 "This feature accommodates certain typing mistakes that the intonation mark might be typed at first (which is sequentially wrong from a common sense that intonation marks are supposed to be used for confirming combinations). It won't work if the current parser is of (any) pinyin. Also, this feature won't work when an intonation override is possible (and enabled)." = "音調記号は常に「漢字の音読組合を確認するキー」として最後で入力することだと常識ですが、間違くてそれを最初に入力してしまった場合もございます。このボカ避け機能は（ほんの一部の）このような間違いを対策できますが、注音入力だけに使えます。更に、（音調の上書き機能がオンを前提として）音調の上書きができる場合には、このボカ避け機能は作動しません。";
-"This feature only needs to parse consecutive NSEvents passed by macOS built-in InputMethodKit framework, hence no necessity of asking end-users for extra privileges of monitoring global keyboard inputs. You are free to investigate our codebase or reverse-engineer this input method to see whether the above statement is trustable." = "この機能の利用する NSEvent は、macOS 内蔵の入力アプリ共用モジュール「InputMethodKit」から提供した NSEvent のみであり、その NSEvent 文脈関係で「Shift キーは１回押したかどうか」と判断することはできる。この事実に疑いを持つ者は、本アプリのソースコードを審査するか、あるいは本アプリを逆向工程（分解工学, いわゆる「Reverse-Engineering」）するがよい。";
 "This feature requires macOS 10.15 and above." = "この機能の稼働には macOS 10.15 以降のシステムが必要である。";
 "This feature requires macOS 12 and above." = "この機能の稼働には macOS 12 以降のシステムが必要である。";
 "This hinders all client apps from unwelcomely accessing your uncommitted contents in the composition buffer. A popup composition buffer will be shown instead." = "これで、どの客体アプリも、入力緩衝列の送り出さなかった内容を（勝手に）読み用いることは不可能になる。すなわち「吹き出し入力緩衝列ウィンドウ」の「常に出番」である。";
