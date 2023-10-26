@@ -82,7 +82,7 @@ public extension SessionCtl {
       if event.type == .flagsChanged, event.keyCode == KeyCode.kCapsLock.rawValue {
         DispatchQueue.main.async { [weak self] in
           let isCapsLockTurnedOn = Self.isCapsLocked
-          if !isCapsLockTurnedOn, self?.isASCIIMode ?? false {
+          if PrefMgr.shared.shiftEisuToggleOffTogetherWithCapsLock, !isCapsLockTurnedOn, self?.isASCIIMode ?? false {
             self?.isASCIIMode.toggle()
           }
           guard PrefMgr.shared.showNotificationsWhenTogglingCapsLock else { return }
@@ -194,7 +194,7 @@ public extension SessionCtl {
         ? NSLocalizedString("Alphanumerical Input Mode", comment: "") + "\n" + status
         : NSLocalizedString("Chinese Input Mode", comment: "") + "\n" + status
     )
-    if oldValue, !newValue, Self.isCapsLocked {
+    if PrefMgr.shared.shiftEisuToggleOffTogetherWithCapsLock, oldValue, !newValue, Self.isCapsLocked {
       CapsLockToggler.turnOff()
     }
   }
