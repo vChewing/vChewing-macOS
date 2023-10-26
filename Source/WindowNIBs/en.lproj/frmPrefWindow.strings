@@ -47,12 +47,14 @@
 "chkAllowBoostingSingleKanjiAsUserPhrase.title" = "Allow boosting / excluding a candidate of single kanji when marking";
 "chkAlsoConfirmAssociatedCandidatesByEnter.title" = "Allow using Enter key to confirm associated candidate selection";
 "chkAutoCorrectReadingCombination.title" = "Automatically correct reading combinations when typing";
+"chkBypassNonAppleCapsLockHandling.title" = "Bypass the vChewing built-in Caps Lock handling";
 "chkCheckAbusersOfSecureEventInputAPI.title" = "Actively check those processes abusing the SecureEventInput API";
 "chkConsolidateContextOnCandidateSelection.title" = "Consolidate the context on confirming candidate selection";
 "chkFetchSuggestionsFromUserOverrideModel.title" = "Applying typing suggestions from half-life user override model";
 "chkHardenVerticalPunctuations.title" = "Harden vertical punctuations during vertical typing";
 "chkKeepReadingUponCompositionError.title" = "Allow backspace-editing miscomposed readings";
 "chkOnlyLoadFactoryLangModelsIfNeeded.title" = "Only load factory language models if needed";
+"chkShiftEisuToggleOffTogetherWithCapsLock.title" = "Sync the off state between Caps Lock and Shift / Eisu Alphanumerical Toggle";
 "chkUseFixedCandidateOrderOnSelection.title" = "Always use fixed listing order in candidate window";
 "clN-4A-iec.title" = "Use Space to confirm highlighted candidate in Per-Char Select Mode";
 "Cp2-hn-bOq.title" = "Disable forced conversion for cassette outputs";
@@ -85,10 +87,12 @@
 "kcM-O6-mLN.title" = "This hinders all client apps from unwelcomely accessing your uncommitted contents in the composition buffer. A popup composition buffer will be shown instead.";
 "lblAcceptLeadingIntonations.title" = "Accept leading intonations in rare cases";
 "lblAlwaysShowTooltipTextsHorizontally.title" = "Always show tooltip texts horizontally";
+"lblBypassNonAppleCapsLockHandling.title" = "This won't affect the same feature offered by macOS since 10.14 Mojave and later.";
 "lblCheckAbusersOfSecureEventInputAPI.title" = "Such abuse of SecureEventInput API in the background can hinder all 3rd-party input methods from being able to switch to. It is fine to use SecureEventInput for sensitive input fields. However, an app calling EnableSecureEventInput() is responsible to call DisableSecureEventInput() immediately right after the input field loses focus. This situation may also happen if an app is hanging in the background (or working as a helper application in the background) with its SecureEventInput left enabled.";
 "lblDevZoneTitleDescription.title" = "Warning: This page is for testing future features. \nFeatures listed here may not work as expected.";
 "lblIntonationKeyBehavior.title" = "Specify what intonation key does when syllable composer is empty.";
 "lblShiftBkspKeyBehavior.title" = "Choose the attempted behavior of Shift+BackSpace key.";
+"lblShiftEisuToggleOffTogetherWithCapsLock.title" = "This does: 1) On macOS 12 and later, if the Caps Lock gets turned off, then the internal switch for Shift-key / JIS-Eisu-key Alphanumerical Mode Toggle will also be switched off. 2) If you have turned off the same switch by JIS-Eisu key, then the Caps Lock gets turned off together. Note: vChewing has no way to recognize single hits of Shift key when Caps Lock is on.";
 "lblUpperCaseLetterKeyBehavior.title" = "Choose the behavior of Shift+Letter key with letter inputs.";
 "lDd-rN-BSM.title" = "Enable mouse wheel support for Tadokoro Candidate Window";
 "MKJ-Q6-dLd.title" = "Also use “\\” or “¥” key for Hanin Keyboard Symbol Input";
