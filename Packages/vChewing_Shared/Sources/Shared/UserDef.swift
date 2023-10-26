@@ -77,6 +77,8 @@ public enum UserDef: String, CaseIterable {
   case kAutoCorrectReadingCombination = "AutoCorrectReadingCombination"
   case kAlsoConfirmAssociatedCandidatesByEnter = "AlsoConfirmAssociatedCandidatesByEnter"
   case kKeepReadingUponCompositionError = "KeepReadingUponCompositionError"
+  case kBypassNonAppleCapsLockHandling = "BypassNonAppleCapsLockHandling"
+  case kShiftEisuToggleOffTogetherWithCapsLock = "ShiftEisuToggleOffTogetherWithCapsLock"
   case kTogglingAlphanumericalModeWithLShift = "TogglingAlphanumericalModeWithLShift"
   case kTogglingAlphanumericalModeWithRShift = "TogglingAlphanumericalModeWithRShift"
   case kUpperCaseLetterKeyBehavior = "UpperCaseLetterKeyBehavior"
@@ -193,6 +195,8 @@ public extension UserDef {
     case .kAutoCorrectReadingCombination: return .bool
     case .kAlsoConfirmAssociatedCandidatesByEnter: return .bool
     case .kKeepReadingUponCompositionError: return .bool
+    case .kBypassNonAppleCapsLockHandling: return .bool
+    case .kShiftEisuToggleOffTogetherWithCapsLock: return .bool
     case .kTogglingAlphanumericalModeWithLShift: return .bool
     case .kTogglingAlphanumericalModeWithRShift: return .bool
     case .kUpperCaseLetterKeyBehavior: return .integer
@@ -399,6 +403,16 @@ public extension UserDef {
         description: "Otherwise, only the candidate keys are allowed to confirm associates."
       )
     case .kKeepReadingUponCompositionError: return .init(userDef: self, shortTitle: "Allow backspace-editing miscomposed readings")
+    case .kBypassNonAppleCapsLockHandling: return .init(
+        userDef: self, shortTitle: "i18n:UserDef.kBypassNonAppleCapsLockHandling.shortTitle",
+        description: "i18n:UserDef.kBypassNonAppleCapsLockHandling.description",
+        minimumOS: 10.15
+      )
+    case .kShiftEisuToggleOffTogetherWithCapsLock: return .init(
+        userDef: self, shortTitle: "i18n:UserDef.kShiftEisuToggleOffTogetherWithCapsLock.shortTitle",
+        description: "i18n:UserDef.kShiftEisuToggleOffTogetherWithCapsLock.description",
+        minimumOS: 10.15
+      )
     case .kTogglingAlphanumericalModeWithLShift: return .init(
         userDef: self, shortTitle: "Toggle alphanumerical mode with Left-Shift", minimumOS: 10.15
       )
