@@ -59,6 +59,12 @@ public struct VwrSettingsPaneBehavior: View {
   @AppStorage(wrappedValue: false, UserDef.kShareAlphanumericalModeStatusAcrossClients.rawValue)
   private var shareAlphanumericalModeStatusAcrossClients: Bool
 
+  @AppStorage(wrappedValue: true, UserDef.kShiftEisuToggleOffTogetherWithCapsLock.rawValue)
+  public dynamic var shiftEisuToggleOffTogetherWithCapsLock: Bool
+
+  @AppStorage(wrappedValue: false, UserDef.kBypassNonAppleCapsLockHandling.rawValue)
+  public dynamic var bypassNonAppleCapsLockHandling: Bool
+
   var macOSMontereyOrLaterDetected: Bool { true } // Always met.
 
   // MARK: - Main View
@@ -187,6 +193,14 @@ public struct VwrSettingsPaneBehavior: View {
         Section {
           VStack(alignment: .leading) {
             Toggle(
+              LocalizedStringKey("i18n:UserDef.kBypassNonAppleCapsLockHandling.shortTitle"),
+              isOn: $bypassNonAppleCapsLockHandling
+            )
+            Text("i18n:UserDef.kBypassNonAppleCapsLockHandling.description")
+              .settingsDescription()
+          }
+          VStack(alignment: .leading) {
+            Toggle(
               LocalizedStringKey("Share alphanumerical mode status across all clients"),
               isOn: $shareAlphanumericalModeStatusAcrossClients
             )
@@ -214,6 +228,15 @@ public struct VwrSettingsPaneBehavior: View {
                 + "i18n:settings.shiftKeyASCIITogle.description".localized
             )
             .settingsDescription()
+          }
+          VStack(alignment: .leading) {
+            Toggle(
+              LocalizedStringKey("i18n:UserDef.kShiftEisuToggleOffTogetherWithCapsLock.shortTitle"),
+              isOn: $shiftEisuToggleOffTogetherWithCapsLock
+            )
+            Spacer()
+            Text("i18n:UserDef.kShiftEisuToggleOffTogetherWithCapsLock.description")
+              .settingsDescription()
           }
         }
         Section {
