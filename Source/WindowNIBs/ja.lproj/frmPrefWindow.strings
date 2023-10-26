@@ -47,12 +47,14 @@
 "chkAllowBoostingSingleKanjiAsUserPhrase.title" = "マーキングモードで即排除/即最優先にできる候補の文字数の最低限は１字とする";
 "chkAlsoConfirmAssociatedCandidatesByEnter.title" = "Enter キーを連想語彙候補の確認のために使う";
 "chkAutoCorrectReadingCombination.title" = "入力中で打ち間違った発音組み合わせを自動的に訂正する";
+"chkBypassNonAppleCapsLockHandling.title" = "威注音入力アプリの内蔵CapsLock処理を不使用";
 "chkCheckAbusersOfSecureEventInputAPI.title" = "SecureEventInput API を不正利用しているバクグラウンド・プロセスを自動検知";
 "chkConsolidateContextOnCandidateSelection.title" = "候補陳列ウィンドウで候補を選ぶ時に文脈を強固する";
 "chkFetchSuggestionsFromUserOverrideModel.title" = "入力中で臨時記憶モジュールからお薦めの候補を自動的に選ぶ";
 "chkHardenVerticalPunctuations.title" = "縦書きの時に、引用符・括弧などを強制的に縦書き文字と変換する（不推奨）";
 "chkKeepReadingUponCompositionError.title" = "効かぬ音読みを BackSpace で再編集";
 "chkOnlyLoadFactoryLangModelsIfNeeded.title" = "必要性を判断してから内蔵辞書を読み込む";
+"chkShiftEisuToggleOffTogetherWithCapsLock.title" = "「Shiftキー・JIS英数キー」による英数モードのオフ状態をCapsLockのオフ状態と同期する";
 "chkUseFixedCandidateOrderOnSelection.title" = "候補文字を固定順番で陳列する";
 "clN-4A-iec.title" = "全候補入力の場合、ハイライト候補を Space キーで確認";
 "Cp2-hn-bOq.title" = "カセットモードによる漢字出力の簡繁転換を行わずにする";
@@ -85,10 +87,12 @@
 "kcM-O6-mLN.title" = "これで、どの客体アプリも、入力緩衝列の送り出さなかった内容を（勝手に）読み用いることは不可能になる。すなわち「吹き出し入力緩衝列ウィンドウ」の「常に出番」である。";
 "lblAcceptLeadingIntonations.title" = "まれな場合には、音調記号の優先入力を許容する";
 "lblAlwaysShowTooltipTextsHorizontally.title" = "ヒントを常に横書きにする";
+"lblBypassNonAppleCapsLockHandling.title" = "macOS 10.14 からのシステム内蔵機能としての同じ機能に影響しません。";
 "lblCheckAbusersOfSecureEventInputAPI.title" = "このような不正利用は「システム内蔵入力以外の全ての入力アプリがメニューで灰色状態で選べなくて使えない」の元凶である。センシティブな資料の記入どころでSecureEventInputをEnableSecureEventInput()で使うのは当然であるが、「入力中」状態が終わった後必ずDisableSecureEventInput()で状態解消すべきだと義務である。いくつかヘルパーアプリも、あるいはSecureEventInputを呼び起こしてからすぐ固まったアプリも、この状態になりやすい。特に、他のアプリの画面へ切り替えたとしても、固まったアプリのSecureEventInput状態は自動的に解消できぬ。";
 "lblDevZoneTitleDescription.title" = "警告：これからの新機能テストのために作ったページですから、\nここで陳列されている諸機能は予想通り動けるだと思わないでください。";
 "lblIntonationKeyBehavior.title" = "音調組立緩衝列が空かされた時の音調キーの行為をご指定ください。";
 "lblShiftBkspKeyBehavior.title" = "Shift+BackSpace キーの優先行為をご指定ください。";
+"lblShiftEisuToggleOffTogetherWithCapsLock.title" = "このチェックを入れると：イ）[macOS 12 以降] CapsLockがオフした時に、「Shiftキー・JIS英数キー」の共有していた内部のスイッチもオフにする；ロ）「JIS英数キー」でそのキーに応ずる英数モードがオフした時に、CapsLockもオフにする。尚、CapsLockがオンの時に、「Shiftキーだけを打った」行為は検知できません。";
 "lblUpperCaseLetterKeyBehavior.title" = "Shift+文字キーの行為をご指定ください。";
 "lDd-rN-BSM.title" = "田所候補陳列ウィンドウのマウススクロール機能を起用";
 "MKJ-Q6-dLd.title" = "「\\」・「¥」キーでも漢音キーボード符号入力";

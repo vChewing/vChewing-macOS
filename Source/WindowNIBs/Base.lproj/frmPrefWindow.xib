@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="22155" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES">
+<document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="22503" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES">
     <dependencies>
         <deployment identifier="macosx"/>
-        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="22155"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="22503"/>
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
     </dependencies>
     <objects>
@@ -68,7 +68,7 @@
                         <stackView distribution="fill" orientation="vertical" alignment="leading" spacing="3" horizontalStackHuggingPriority="249.99998474121094" verticalStackHuggingPriority="249.99998474121094" translatesAutoresizingMaskIntoConstraints="NO" id="dj4-9G-dKq">
                             <rect key="frame" x="0.0" y="333" width="302" height="40"/>
                             <subviews>
-                                <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" verticalCompressionResistancePriority="751" translatesAutoresizingMaskIntoConstraints="NO" id="5Rz-c8-hp9">
+                                <textField focusRingType="none" horizontalHuggingPriority="251" verticalHuggingPriority="750" verticalCompressionResistancePriority="751" translatesAutoresizingMaskIntoConstraints="NO" id="5Rz-c8-hp9">
                                     <rect key="frame" x="-2" y="25" width="306" height="15"/>
                                     <textFieldCell key="cell" controlSize="small" lineBreakMode="clipping" title="Change user interface language (will reboot the IME)." id="ZEv-Q2-mYL">
                                         <font key="font" metaFont="cellTitle"/>
@@ -79,7 +79,7 @@
                                 <stackView distribution="fill" orientation="horizontal" alignment="centerY" horizontalStackHuggingPriority="249.99998474121094" verticalStackHuggingPriority="249.99998474121094" translatesAutoresizingMaskIntoConstraints="NO" id="6NA-4k-NEM">
                                     <rect key="frame" x="0.0" y="0.0" width="302" height="22"/>
                                     <subviews>
-                                        <textField verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="L5M-VG-W1X">
+                                        <textField focusRingType="none" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="L5M-VG-W1X">
                                             <rect key="frame" x="-2" y="4" width="118" height="15"/>
                                             <textFieldCell key="cell" controlSize="small" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" alignment="left" title="UI language setting:" id="9DS-Rc-TXq">
                                                 <font key="font" metaFont="cellTitle"/>
@@ -138,7 +138,7 @@
                                 <constraint firstAttribute="width" relation="greaterThanOrEqual" constant="530" id="Ylc-XO-ZMh"/>
                             </constraints>
                         </box>
-                        <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="Vp3-lc-XD5">
+                        <textField focusRingType="none" horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="Vp3-lc-XD5">
                             <rect key="frame" x="-2" y="306" width="105" height="16"/>
                             <constraints>
                                 <constraint firstAttribute="height" constant="16" id="3d9-qL-M1k"/>
@@ -255,7 +255,7 @@
                                 <constraint firstAttribute="width" relation="greaterThanOrEqual" constant="530" id="LDD-dR-33O"/>
                             </constraints>
                         </box>
-                        <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="da1-7e-els">
+                        <textField focusRingType="none" horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="da1-7e-els">
                             <rect key="frame" x="-2" y="153" width="101" height="16"/>
                             <constraints>
                                 <constraint firstAttribute="height" constant="16" id="GBB-5k-Dex"/>
@@ -470,7 +470,7 @@
                         <stackView distribution="fill" orientation="vertical" alignment="leading" spacing="5" horizontalStackHuggingPriority="249.99998474121094" verticalStackHuggingPriority="249.99998474121094" translatesAutoresizingMaskIntoConstraints="NO" id="zUw-eX-tDv">
                             <rect key="frame" x="0.0" y="330" width="375" height="42"/>
                             <subviews>
-                                <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" verticalCompressionResistancePriority="751" translatesAutoresizingMaskIntoConstraints="NO" id="Ldp-U1-36g">
+                                <textField focusRingType="none" horizontalHuggingPriority="251" verticalHuggingPriority="750" verticalCompressionResistancePriority="751" translatesAutoresizingMaskIntoConstraints="NO" id="Ldp-U1-36g">
                                     <rect key="frame" x="-2" y="27" width="379" height="15"/>
                                     <textFieldCell key="cell" controlSize="small" lineBreakMode="clipping" title="Change UI font size of candidate window for a better visual clarity." id="iRg-wx-Nx2">
                                         <font key="font" metaFont="cellTitle"/>
@@ -481,7 +481,7 @@
                                 <stackView distribution="fill" orientation="horizontal" alignment="centerY" horizontalStackHuggingPriority="249.99998474121094" verticalStackHuggingPriority="249.99998474121094" translatesAutoresizingMaskIntoConstraints="NO" id="eqk-m1-Lcr">
                                     <rect key="frame" x="0.0" y="0.0" width="207" height="22"/>
                                     <subviews>
-                                        <textField verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="28">
+                                        <textField focusRingType="none" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="28">
                                             <rect key="frame" x="-2" y="4" width="133" height="15"/>
                                             <textFieldCell key="cell" controlSize="small" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" alignment="left" title="Candidate UI font size:" id="29">
                                                 <font key="font" metaFont="cellTitle"/>
@@ -549,7 +549,7 @@
                         <stackView distribution="fill" orientation="vertical" alignment="leading" spacing="5" horizontalStackHuggingPriority="249.99998474121094" verticalStackHuggingPriority="249.99998474121094" translatesAutoresizingMaskIntoConstraints="NO" id="9L9-ua-Bhv">
                             <rect key="frame" x="0.0" y="255" width="516" height="62"/>
                             <subviews>
-                                <textField horizontalHuggingPriority="251" verticalHuggingPriority="749" translatesAutoresizingMaskIntoConstraints="NO" id="Yl4-Ar-L6r">
+                                <textField focusRingType="none" horizontalHuggingPriority="251" verticalHuggingPriority="749" translatesAutoresizingMaskIntoConstraints="NO" id="Yl4-Ar-L6r">
                                     <rect key="frame" x="-2" y="47" width="314" height="15"/>
                                     <constraints>
                                         <constraint firstAttribute="height" constant="15" id="Bgf-Qu-fAR"/>
@@ -563,7 +563,7 @@
                                 <stackView distribution="fill" orientation="horizontal" alignment="centerY" spacing="10" horizontalStackHuggingPriority="249.99998474121094" verticalStackHuggingPriority="249.99998474121094" translatesAutoresizingMaskIntoConstraints="NO" id="kf7-8I-Wwc">
                                     <rect key="frame" x="0.0" y="20" width="516" height="22"/>
                                     <subviews>
-                                        <textField verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="23">
+                                        <textField focusRingType="none" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="23">
                                             <rect key="frame" x="-2" y="4" width="131" height="15"/>
                                             <textFieldCell key="cell" controlSize="small" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" alignment="left" title="Candidate List Layout:" id="24">
                                                 <font key="font" metaFont="cellTitle"/>
@@ -670,7 +670,7 @@
                         <stackView distribution="fill" orientation="vertical" alignment="leading" spacing="5" horizontalStackHuggingPriority="249.99998474121094" verticalStackHuggingPriority="249.99998474121094" translatesAutoresizingMaskIntoConstraints="NO" id="Y6y-r1-U6p">
                             <rect key="frame" x="0.0" y="200" width="313" height="42"/>
                             <subviews>
-                                <textField autoresizesSubviews="NO" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="IpX-f7-rTL">
+                                <textField autoresizesSubviews="NO" focusRingType="none" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="IpX-f7-rTL">
                                     <rect key="frame" x="-2" y="27" width="317" height="15"/>
                                     <textFieldCell key="cell" controlSize="small" lineBreakMode="clipping" title="Choose which keys you prefer for selecting candidates." id="2pS-nv-te4">
                                         <font key="font" metaFont="cellTitle"/>
@@ -681,7 +681,7 @@
                                 <stackView distribution="fill" orientation="horizontal" alignment="centerY" horizontalStackHuggingPriority="249.99998474121094" verticalStackHuggingPriority="249.99998474121094" translatesAutoresizingMaskIntoConstraints="NO" id="edH-cW-wQI">
                                     <rect key="frame" x="0.0" y="0.0" width="289" height="22"/>
                                     <subviews>
-                                        <textField verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="ETa-09-qWI">
+                                        <textField focusRingType="none" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="ETa-09-qWI">
                                             <rect key="frame" x="-2" y="4" width="91" height="15"/>
                                             <textFieldCell key="cell" lineBreakMode="clipping" alignment="left" title="Selection Keys:" id="FnD-oH-El5">
                                                 <font key="font" metaFont="cellTitle"/>
@@ -689,7 +689,7 @@
                                                 <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
                                             </textFieldCell>
                                         </textField>
-                                        <comboBox verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="uHU-aL-du7">
+                                        <comboBox focusRingType="none" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="uHU-aL-du7">
                                             <rect key="frame" x="94" y="-2" width="197" height="25"/>
                                             <constraints>
                                                 <constraint firstAttribute="width" constant="194" id="RHZ-qM-gNj"/>
@@ -739,7 +739,7 @@
                         <stackView distribution="fill" orientation="vertical" alignment="leading" spacing="6" horizontalStackHuggingPriority="249.99998474121094" verticalStackHuggingPriority="249.99998474121094" translatesAutoresizingMaskIntoConstraints="NO" id="o0j-33-VXh">
                             <rect key="frame" x="0.0" y="92" width="409" height="95"/>
                             <subviews>
-                                <textField verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="13">
+                                <textField focusRingType="none" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="13">
                                     <rect key="frame" x="-2" y="80" width="403" height="15"/>
                                     <textFieldCell key="cell" controlSize="small" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" alignment="left" title="Choose the cursor position where you want to list possible candidates." id="14">
                                         <font key="font" metaFont="cellTitle"/>
@@ -928,14 +928,14 @@
         </view>
         <customObject id="-3" userLabel="Application" customClass="NSObject"/>
         <view id="XWo-36-xGi" userLabel="vwrBehavior">
-            <rect key="frame" x="0.0" y="0.0" width="577" height="720"/>
+            <rect key="frame" x="0.0" y="0.0" width="577" height="835"/>
             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
             <subviews>
                 <stackView distribution="fill" orientation="vertical" alignment="leading" horizontalStackHuggingPriority="249.99998474121094" verticalStackHuggingPriority="249.99998474121094" translatesAutoresizingMaskIntoConstraints="NO" id="j9R-fB-ttM">
-                    <rect key="frame" x="20" y="35" width="537" height="665"/>
+                    <rect key="frame" x="20" y="19" width="537" height="796"/>
                     <subviews>
                         <stackView distribution="fill" orientation="vertical" alignment="leading" spacing="4" horizontalStackHuggingPriority="249.99998474121094" verticalStackHuggingPriority="249.99998474121094" translatesAutoresizingMaskIntoConstraints="NO" id="pwZ-0Z-1ID">
-                            <rect key="frame" x="0.0" y="544" width="530" height="121"/>
+                            <rect key="frame" x="0.0" y="675" width="530" height="121"/>
                             <subviews>
                                 <button translatesAutoresizingMaskIntoConstraints="NO" id="109">
                                     <rect key="frame" x="-1" y="104.5" width="285" height="17"/>
@@ -1042,9 +1042,9 @@
                             </customSpacing>
                         </stackView>
                         <stackView distribution="fill" orientation="vertical" alignment="leading" horizontalStackHuggingPriority="249.99998474121094" verticalStackHuggingPriority="249.99998474121094" translatesAutoresizingMaskIntoConstraints="NO" id="fO5-4y-X0y">
-                            <rect key="frame" x="0.0" y="498" width="365" height="38"/>
+                            <rect key="frame" x="0.0" y="629" width="365" height="38"/>
                             <subviews>
-                                <textField verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="TMn-LX-3Ub">
+                                <textField focusRingType="none" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="TMn-LX-3Ub">
                                     <rect key="frame" x="-2" y="23" width="369" height="15"/>
                                     <textFieldCell key="cell" controlSize="small" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" alignment="left" title="Choose the behavior of (Shift+)Tab key in the candidate window." id="ueU-Rz-a1C">
                                         <font key="font" metaFont="cellTitle"/>
@@ -1090,9 +1090,9 @@
                             </customSpacing>
                         </stackView>
                         <stackView distribution="fill" orientation="vertical" alignment="leading" horizontalStackHuggingPriority="249.99998474121094" verticalStackHuggingPriority="249.99998474121094" translatesAutoresizingMaskIntoConstraints="NO" id="EOx-os-rU9">
-                            <rect key="frame" x="0.0" y="416" width="381" height="74"/>
+                            <rect key="frame" x="0.0" y="547" width="381" height="74"/>
                             <subviews>
-                                <textField verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="sjl-L6-qdY">
+                                <textField focusRingType="none" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="sjl-L6-qdY">
                                     <rect key="frame" x="-2" y="59" width="385" height="15"/>
                                     <textFieldCell key="cell" controlSize="small" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" alignment="left" title="Specify what intonation key does when syllable composer is empty." id="lblIntonationKeyBehavior">
                                         <font key="font" metaFont="cellTitle"/>
@@ -1140,9 +1140,9 @@
                             </customSpacing>
                         </stackView>
                         <stackView distribution="fill" orientation="vertical" alignment="leading" spacing="7" horizontalStackHuggingPriority="249.99998474121094" verticalStackHuggingPriority="249.99998474121094" translatesAutoresizingMaskIntoConstraints="NO" id="L1h-Ce-g4Z">
-                            <rect key="frame" x="0.0" y="299" width="449" height="109"/>
+                            <rect key="frame" x="0.0" y="430" width="449" height="109"/>
                             <subviews>
-                                <textField verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="6q5-OP-iEb">
+                                <textField focusRingType="none" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="6q5-OP-iEb">
                                     <rect key="frame" x="-2" y="94" width="332" height="15"/>
                                     <textFieldCell key="cell" controlSize="small" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" alignment="left" title="Choose the behavior of Shift+Letter key with letter inputs." id="lblUpperCaseLetterKeyBehavior">
                                         <font key="font" metaFont="cellTitle"/>
@@ -1198,9 +1198,9 @@
                             </customSpacing>
                         </stackView>
                         <stackView distribution="fill" orientation="vertical" alignment="leading" horizontalStackHuggingPriority="249.99998474121094" verticalStackHuggingPriority="249.99998474121094" translatesAutoresizingMaskIntoConstraints="NO" id="NOW-jd-XBh">
-                            <rect key="frame" x="0.0" y="235" width="358" height="56"/>
+                            <rect key="frame" x="0.0" y="366" width="358" height="56"/>
                             <subviews>
-                                <textField verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="J0f-Aw-dxC">
+                                <textField focusRingType="none" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="J0f-Aw-dxC">
                                     <rect key="frame" x="-2" y="41" width="336" height="15"/>
                                     <textFieldCell key="cell" controlSize="small" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" alignment="left" title="Choose the behavior of (Shift+)Space key with candidates." id="Pg5-G9-pY5">
                                         <font key="font" metaFont="cellTitle"/>
@@ -1244,9 +1244,9 @@
                             </customSpacing>
                         </stackView>
                         <stackView distribution="fill" orientation="vertical" alignment="leading" spacing="7" horizontalStackHuggingPriority="249.99998474121094" verticalStackHuggingPriority="249.99998474121094" translatesAutoresizingMaskIntoConstraints="NO" id="s47-wG-vKA">
-                            <rect key="frame" x="0.0" y="154" width="348" height="73"/>
+                            <rect key="frame" x="0.0" y="285" width="348" height="73"/>
                             <subviews>
-                                <textField verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="iCL-n8-VTP">
+                                <textField focusRingType="none" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="iCL-n8-VTP">
                                     <rect key="frame" x="-2" y="58" width="323" height="15"/>
                                     <textFieldCell key="cell" controlSize="small" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" alignment="left" title="Choose the attempted behavior of Shift+BackSpace key." id="lblShiftBkspKeyBehavior">
                                         <font key="font" metaFont="cellTitle"/>
@@ -1293,17 +1293,79 @@
                                 <real value="3.4028234663852886e+38"/>
                             </customSpacing>
                         </stackView>
-                        <stackView distribution="fill" orientation="vertical" alignment="leading" spacing="5" horizontalStackHuggingPriority="249.99998474121094" verticalStackHuggingPriority="249.99998474121094" detachesHiddenViews="YES" translatesAutoresizingMaskIntoConstraints="NO" id="UFf-Pi-9Jt" userLabel="stkShiftKeyASCIITogglesPane">
-                            <rect key="frame" x="0.0" y="0.0" width="537" height="146"/>
+                        <stackView distribution="fill" orientation="vertical" alignment="leading" spacing="5" horizontalStackHuggingPriority="249.99998474121094" verticalStackHuggingPriority="249.99998474121094" translatesAutoresizingMaskIntoConstraints="NO" id="TiS-ka-72K">
+                            <rect key="frame" x="0.0" y="173" width="537" height="104"/>
+                            <subviews>
+                                <box verticalHuggingPriority="750" boxType="separator" translatesAutoresizingMaskIntoConstraints="NO" id="oCA-nr-Sc7">
+                                    <rect key="frame" x="0.0" y="101" width="530" height="5"/>
+                                    <constraints>
+                                        <constraint firstAttribute="width" relation="greaterThanOrEqual" constant="530" id="YNl-To-qPB"/>
+                                    </constraints>
+                                </box>
+                                <button translatesAutoresizingMaskIntoConstraints="NO" id="mug-xq-Lmy">
+                                    <rect key="frame" x="-1" y="81.5" width="314" height="17"/>
+                                    <buttonCell key="cell" type="check" title="Share alphanumerical mode status across all clients" bezelStyle="regularSquare" imagePosition="left" controlSize="small" inset="2" id="K8U-Oq-lFc">
+                                        <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
+                                        <font key="font" metaFont="cellTitle"/>
+                                    </buttonCell>
+                                    <constraints>
+                                        <constraint firstAttribute="height" constant="16" id="SHw-vN-0jF"/>
+                                    </constraints>
+                                    <connections>
+                                        <binding destination="32" name="value" keyPath="values.ShareAlphanumericalModeStatusAcrossClients" id="fG7-I0-pqu"/>
+                                    </connections>
+                                </button>
+                                <button translatesAutoresizingMaskIntoConstraints="NO" id="P2l-TU-TcG">
+                                    <rect key="frame" x="-1" y="60.5" width="456" height="17"/>
+                                    <buttonCell key="cell" type="check" title="Sync the off state between Caps Lock and Shift / Eisu Alphanumerical Toggle" bezelStyle="regularSquare" imagePosition="left" controlSize="small" inset="2" id="chkShiftEisuToggleOffTogetherWithCapsLock">
+                                        <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
+                                        <font key="font" metaFont="cellTitle"/>
+                                    </buttonCell>
+                                    <constraints>
+                                        <constraint firstAttribute="height" constant="16" id="Pqi-IA-QKj"/>
+                                        <constraint firstAttribute="width" relation="greaterThanOrEqual" constant="70" id="u2R-CU-TzQ"/>
+                                    </constraints>
+                                    <connections>
+                                        <binding destination="32" name="value" keyPath="values.ShiftEisuToggleOffTogetherWithCapsLock" id="brB-ug-zJf"/>
+                                    </connections>
+                                </button>
+                                <textField wantsLayer="YES" focusRingType="none" verticalHuggingPriority="750" setsMaxLayoutWidthAtFirstLayout="YES" translatesAutoresizingMaskIntoConstraints="NO" id="oIo-cW-mrw">
+                                    <rect key="frame" x="-2" y="0.0" width="541" height="56"/>
+                                    <constraints>
+                                        <constraint firstAttribute="width" constant="537" id="9Sb-CJ-a0l"/>
+                                    </constraints>
+                                    <textFieldCell key="cell" controlSize="small" sendsActionOnEndEditing="YES" alignment="left" id="lblShiftEisuToggleOffTogetherWithCapsLock">
+                                        <font key="font" metaFont="smallSystem"/>
+                                        <string key="title">This does: 1) On macOS 12 and later, if the Caps Lock gets turned off, then the internal switch for Shift-key / JIS-Eisu-key Alphanumerical Mode Toggle will also be switched off. 2) If you have turned off the same switch by JIS-Eisu key, then the Caps Lock gets turned off together. Note: vChewing has no way to recognize single hits of Shift key when Caps Lock is on.</string>
+                                        <color key="textColor" name="secondaryLabelColor" catalog="System" colorSpace="catalog"/>
+                                        <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
+                                    </textFieldCell>
+                                </textField>
+                            </subviews>
+                            <visibilityPriorities>
+                                <integer value="1000"/>
+                                <integer value="1000"/>
+                                <integer value="1000"/>
+                                <integer value="1000"/>
+                            </visibilityPriorities>
+                            <customSpacing>
+                                <real value="3.4028234663852886e+38"/>
+                                <real value="3.4028234663852886e+38"/>
+                                <real value="3.4028234663852886e+38"/>
+                                <real value="3.4028234663852886e+38"/>
+                            </customSpacing>
+                        </stackView>
+                        <stackView distribution="fill" orientation="vertical" alignment="leading" spacing="5" horizontalStackHuggingPriority="249.99998474121094" verticalStackHuggingPriority="249.99998474121094" translatesAutoresizingMaskIntoConstraints="NO" id="UFf-Pi-9Jt" userLabel="stkShiftKeyASCIITogglesPane">
+                            <rect key="frame" x="0.0" y="0.0" width="537" height="165"/>
                             <subviews>
                                 <box verticalHuggingPriority="750" boxType="separator" translatesAutoresizingMaskIntoConstraints="NO" id="2zC-9V-ryy">
-                                    <rect key="frame" x="0.0" y="143" width="530" height="5"/>
+                                    <rect key="frame" x="0.0" y="162" width="530" height="5"/>
                                     <constraints>
                                         <constraint firstAttribute="width" relation="greaterThanOrEqual" constant="530" id="ppo-kg-vfE"/>
                                     </constraints>
                                 </box>
-                                <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="8jJ-wr-Hhm">
-                                    <rect key="frame" x="-2" y="124" width="413" height="16"/>
+                                <textField focusRingType="none" horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="8jJ-wr-Hhm">
+                                    <rect key="frame" x="-2" y="143" width="413" height="16"/>
                                     <constraints>
                                         <constraint firstAttribute="height" constant="16" id="JwL-81-H33"/>
                                     </constraints>
@@ -1314,7 +1376,7 @@
                                     </textFieldCell>
                                 </textField>
                                 <button translatesAutoresizingMaskIntoConstraints="NO" id="47z-Kc-MdV">
-                                    <rect key="frame" x="-1" y="102.5" width="268" height="17"/>
+                                    <rect key="frame" x="-1" y="121.5" width="268" height="17"/>
                                     <buttonCell key="cell" type="check" title="Toggle alphanumerical mode with Left-Shift" bezelStyle="regularSquare" imagePosition="left" controlSize="small" inset="2" id="CVy-8U-3qQ">
                                         <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
                                         <font key="font" metaFont="cellTitle"/>
@@ -1328,7 +1390,7 @@
                                     </connections>
                                 </button>
                                 <button translatesAutoresizingMaskIntoConstraints="NO" id="taP-hv-eg2">
-                                    <rect key="frame" x="-1" y="81.5" width="276" height="17"/>
+                                    <rect key="frame" x="-1" y="100.5" width="276" height="17"/>
                                     <buttonCell key="cell" type="check" title="Toggle alphanumerical mode with Right-Shift" bezelStyle="regularSquare" imagePosition="left" controlSize="small" inset="2" id="nxP-CV-ZAu">
                                         <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
                                         <font key="font" metaFont="cellTitle"/>
@@ -1341,8 +1403,8 @@
                                         <binding destination="32" name="value" keyPath="values.TogglingAlphanumericalModeWithRShift" id="4qK-TY-SFb"/>
                                     </connections>
                                 </button>
-                                <textField wantsLayer="YES" verticalHuggingPriority="750" setsMaxLayoutWidthAtFirstLayout="YES" translatesAutoresizingMaskIntoConstraints="NO" id="Dec-3q-bsx">
-                                    <rect key="frame" x="-2" y="21" width="541" height="56"/>
+                                <textField wantsLayer="YES" focusRingType="none" verticalHuggingPriority="750" setsMaxLayoutWidthAtFirstLayout="YES" translatesAutoresizingMaskIntoConstraints="NO" id="Dec-3q-bsx">
+                                    <rect key="frame" x="-2" y="40" width="541" height="56"/>
                                     <constraints>
                                         <constraint firstAttribute="width" constant="537" id="wkg-gt-KuK"/>
                                     </constraints>
@@ -1353,19 +1415,31 @@
                                         <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
                                     </textFieldCell>
                                 </textField>
-                                <button translatesAutoresizingMaskIntoConstraints="NO" id="mug-xq-Lmy">
-                                    <rect key="frame" x="-1" y="-0.5" width="314" height="17"/>
-                                    <buttonCell key="cell" type="check" title="Share alphanumerical mode status across all clients" bezelStyle="regularSquare" imagePosition="left" controlSize="small" inset="2" id="K8U-Oq-lFc">
+                                <button translatesAutoresizingMaskIntoConstraints="NO" id="Ku4-rR-MdM">
+                                    <rect key="frame" x="-1" y="18.5" width="301" height="17"/>
+                                    <buttonCell key="cell" type="check" title="Bypass the vChewing built-in Caps Lock handling" bezelStyle="regularSquare" imagePosition="left" controlSize="small" inset="2" id="chkBypassNonAppleCapsLockHandling">
                                         <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
                                         <font key="font" metaFont="cellTitle"/>
                                     </buttonCell>
                                     <constraints>
-                                        <constraint firstAttribute="height" constant="16" id="SHw-vN-0jF"/>
+                                        <constraint firstAttribute="height" constant="16" id="mcc-F4-zF2"/>
+                                        <constraint firstAttribute="width" relation="greaterThanOrEqual" constant="70" id="scf-fg-8nh"/>
                                     </constraints>
                                     <connections>
-                                        <binding destination="32" name="value" keyPath="values.ShareAlphanumericalModeStatusAcrossClients" id="fG7-I0-pqu"/>
+                                        <binding destination="32" name="value" keyPath="values.BypassNonAppleCapsLockHandling" id="vym-AR-tlm"/>
                                     </connections>
                                 </button>
+                                <textField wantsLayer="YES" focusRingType="none" verticalHuggingPriority="750" setsMaxLayoutWidthAtFirstLayout="YES" translatesAutoresizingMaskIntoConstraints="NO" id="7le-2d-a1D">
+                                    <rect key="frame" x="-2" y="0.0" width="541" height="14"/>
+                                    <constraints>
+                                        <constraint firstAttribute="width" constant="537" id="Zi4-sa-ncL"/>
+                                    </constraints>
+                                    <textFieldCell key="cell" controlSize="small" sendsActionOnEndEditing="YES" alignment="left" title="This won't affect the same feature offered by macOS since 10.14 Mojave and later." id="lblBypassNonAppleCapsLockHandling">
+                                        <font key="font" metaFont="smallSystem"/>
+                                        <color key="textColor" name="secondaryLabelColor" catalog="System" colorSpace="catalog"/>
+                                        <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
+                                    </textFieldCell>
+                                </textField>
                             </subviews>
                             <visibilityPriorities>
                                 <integer value="1000"/>
@@ -1374,8 +1448,10 @@
                                 <integer value="1000"/>
                                 <integer value="1000"/>
                                 <integer value="1000"/>
+                                <integer value="1000"/>
                             </visibilityPriorities>
                             <customSpacing>
+                                <real value="3.4028234663852886e+38"/>
                                 <real value="3.4028234663852886e+38"/>
                                 <real value="3.4028234663852886e+38"/>
                                 <real value="3.4028234663852886e+38"/>
@@ -1393,8 +1469,10 @@
                         <integer value="1000"/>
                         <integer value="1000"/>
                         <integer value="1000"/>
+                        <integer value="1000"/>
                     </visibilityPriorities>
                     <customSpacing>
+                        <real value="3.4028234663852886e+38"/>
                         <real value="3.4028234663852886e+38"/>
                         <real value="3.4028234663852886e+38"/>
                         <real value="3.4028234663852886e+38"/>
@@ -1410,7 +1488,7 @@
                 <constraint firstItem="j9R-fB-ttM" firstAttribute="top" secondItem="XWo-36-xGi" secondAttribute="top" constant="20" symbolic="YES" id="CuZ-dn-mQZ"/>
             </constraints>
             <accessibility identifier="vwrBehavior"/>
-            <point key="canvasLocation" x="-1351.5" y="681"/>
+            <point key="canvasLocation" x="-1351.5" y="738.5"/>
         </view>
         <userDefaultsController representsSharedInstance="YES" id="32"/>
         <view id="Rnp-LM-RIF" userLabel="vwrDictionary">
@@ -1420,7 +1498,7 @@
                 <stackView distribution="fill" orientation="vertical" alignment="leading" horizontalStackHuggingPriority="249.99998474121094" verticalStackHuggingPriority="249.99998474121094" translatesAutoresizingMaskIntoConstraints="NO" id="6xK-1z-A14">
                     <rect key="frame" x="20" y="31" width="530" height="216"/>
                     <subviews>
-                        <textField autoresizesSubviews="NO" horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="FUV-qx-xkC">
+                        <textField autoresizesSubviews="NO" focusRingType="none" horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="FUV-qx-xkC">
                             <rect key="frame" x="-2" y="201" width="388" height="15"/>
                             <textFieldCell key="cell" controlSize="small" lineBreakMode="clipping" title="Choose your desired user data folder path. Will be omitted if invalid." id="wN3-k3-b2a">
                                 <font key="font" metaFont="cellTitle"/>
@@ -1789,7 +1867,7 @@
                                 <autoresizingMask key="autoresizingMask"/>
                             </scroller>
                         </scrollView>
-                        <textField wantsLayer="YES" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="cRd-HU-x7y" userLabel="CommentField">
+                        <textField wantsLayer="YES" focusRingType="none" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="cRd-HU-x7y" userLabel="CommentField">
                             <rect key="frame" x="0.0" y="45" width="538" height="21"/>
                             <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" selectable="YES" editable="YES" sendsActionOnEndEditing="YES" borderStyle="bezel" placeholderString="Comment" drawsBackground="YES" usesSingleLineMode="YES" id="8ao-bw-PSo">
                                 <font key="font" usesAppearanceFont="YES"/>
@@ -1800,7 +1878,7 @@
                         <stackView distribution="fill" orientation="horizontal" alignment="bottom" horizontalStackHuggingPriority="249.99998474121094" verticalStackHuggingPriority="249.99998474121094" translatesAutoresizingMaskIntoConstraints="NO" id="hOe-xG-Qde">
                             <rect key="frame" x="0.0" y="19" width="538" height="21"/>
                             <subviews>
-                                <textField wantsLayer="YES" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="eGd-pc-aEI" userLabel="Field1">
+                                <textField wantsLayer="YES" focusRingType="none" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="eGd-pc-aEI" userLabel="Field1">
                                     <rect key="frame" x="0.0" y="0.0" width="139" height="21"/>
                                     <constraints>
                                         <constraint firstAttribute="width" constant="139" id="HcX-BZ-tBS"/>
@@ -1811,7 +1889,7 @@
                                         <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
                                     </textFieldCell>
                                 </textField>
-                                <textField wantsLayer="YES" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="4hL-rO-jca" userLabel="Field2">
+                                <textField wantsLayer="YES" focusRingType="none" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="4hL-rO-jca" userLabel="Field2">
                                     <rect key="frame" x="147" y="0.0" width="222" height="21"/>
                                     <constraints>
                                         <constraint firstAttribute="width" constant="222" id="40e-8a-KXa"/>
@@ -1822,7 +1900,7 @@
                                         <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
                                     </textFieldCell>
                                 </textField>
-                                <textField wantsLayer="YES" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="MtM-ya-r2H" userLabel="Field3">
+                                <textField wantsLayer="YES" focusRingType="none" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="MtM-ya-r2H" userLabel="Field3">
                                     <rect key="frame" x="377" y="0.0" width="108" height="21"/>
                                     <constraints>
                                         <constraint firstAttribute="width" relation="greaterThanOrEqual" constant="107" id="bDV-wY-WKh"/>
@@ -1908,7 +1986,7 @@ DQ
                 <stackView distribution="fill" orientation="vertical" alignment="leading" horizontalStackHuggingPriority="249.99998474121094" verticalStackHuggingPriority="249.99998474121094" translatesAutoresizingMaskIntoConstraints="NO" id="sgB-kZ-rJg">
                     <rect key="frame" x="20" y="34" width="537" height="361"/>
                     <subviews>
-                        <textField autoresizesSubviews="NO" horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="vgR-3O-aTP">
+                        <textField autoresizesSubviews="NO" focusRingType="none" horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="vgR-3O-aTP">
                             <rect key="frame" x="-2" y="346" width="368" height="15"/>
                             <textFieldCell key="cell" controlSize="small" lineBreakMode="clipping" title="Choose your desired cassette file path. Will be omitted if invalid." id="Iai-0X-nxi">
                                 <font key="font" metaFont="cellTitle"/>
@@ -1998,7 +2076,7 @@ DQ
                                         <binding destination="32" name="value" keyPath="values.CassetteEnabled" id="zBA-Is-Ejs"/>
                                     </connections>
                                 </button>
-                                <textField wantsLayer="YES" verticalHuggingPriority="750" setsMaxLayoutWidthAtFirstLayout="YES" translatesAutoresizingMaskIntoConstraints="NO" id="XN3-ki-c3E" userLabel="lblCassetteModeDescription">
+                                <textField wantsLayer="YES" focusRingType="none" verticalHuggingPriority="750" setsMaxLayoutWidthAtFirstLayout="YES" translatesAutoresizingMaskIntoConstraints="NO" id="XN3-ki-c3E" userLabel="lblCassetteModeDescription">
                                     <rect key="frame" x="-2" y="75" width="541" height="70"/>
                                     <constraints>
                                         <constraint firstAttribute="width" constant="537" id="6MO-OV-Ykr"/>
@@ -2038,7 +2116,7 @@ DQ
                                         <binding destination="32" name="value" keyPath="values.ShowTranslatedStrokesInCompositionBuffer" id="wZl-Ll-NQE"/>
                                     </connections>
                                 </button>
-                                <textField wantsLayer="YES" verticalHuggingPriority="750" setsMaxLayoutWidthAtFirstLayout="YES" translatesAutoresizingMaskIntoConstraints="NO" id="E3c-R8-OEL" userLabel="lblCassetteStrokeTranslation">
+                                <textField wantsLayer="YES" focusRingType="none" verticalHuggingPriority="750" setsMaxLayoutWidthAtFirstLayout="YES" translatesAutoresizingMaskIntoConstraints="NO" id="E3c-R8-OEL" userLabel="lblCassetteStrokeTranslation">
                                     <rect key="frame" x="-2" y="0.0" width="541" height="28"/>
                                     <constraints>
                                         <constraint firstAttribute="width" constant="537" id="MuV-7s-8wL"/>
@@ -2066,7 +2144,7 @@ DQ
                                 <real value="3.4028234663852886e+38"/>
                             </customSpacing>
                         </stackView>
-                        <textField verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="yaq-5S-KLW">
+                        <textField focusRingType="none" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="yaq-5S-KLW">
                             <rect key="frame" x="-2" y="119" width="504" height="15"/>
                             <constraints>
                                 <constraint firstAttribute="width" relation="greaterThanOrEqual" constant="500" id="oHO-0L-j8S"/>
@@ -2113,7 +2191,7 @@ DQ
                                 <binding destination="32" name="selectedTag" keyPath="values.ForceCassetteChineseConversion" id="ZU7-OV-xvR"/>
                             </connections>
                         </matrix>
-                        <textField wantsLayer="YES" verticalHuggingPriority="750" setsMaxLayoutWidthAtFirstLayout="YES" translatesAutoresizingMaskIntoConstraints="NO" id="v8K-1M-luy" userLabel="lblCassetteChineseConversionDescription">
+                        <textField wantsLayer="YES" focusRingType="none" verticalHuggingPriority="750" setsMaxLayoutWidthAtFirstLayout="YES" translatesAutoresizingMaskIntoConstraints="NO" id="v8K-1M-luy" userLabel="lblCassetteChineseConversionDescription">
                             <rect key="frame" x="-2" y="0.0" width="541" height="28"/>
                             <constraints>
                                 <constraint firstAttribute="width" constant="537" id="M6k-9g-blj"/>
@@ -2161,7 +2239,7 @@ DQ
                         <stackView distribution="fill" orientation="vertical" alignment="leading" spacing="5" horizontalStackHuggingPriority="249.99998474121094" verticalStackHuggingPriority="249.99998474121094" translatesAutoresizingMaskIntoConstraints="NO" id="v7J-Jh-97Y">
                             <rect key="frame" x="0.0" y="133" width="530" height="125"/>
                             <subviews>
-                                <textField verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="onD-QP-KPf">
+                                <textField focusRingType="none" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="onD-QP-KPf">
                                     <rect key="frame" x="-2" y="110" width="345" height="15"/>
                                     <textFieldCell key="cell" controlSize="small" lineBreakMode="clipping" title="Choose your preferred keyboard layout and phonetic parser." id="RQ6-MS-m4C">
                                         <font key="font" metaFont="cellTitle"/>
@@ -2175,7 +2253,7 @@ DQ
                                         <stackView distribution="fill" orientation="horizontal" alignment="centerY" horizontalStackHuggingPriority="249.99998474121094" verticalStackHuggingPriority="249.99998474121094" translatesAutoresizingMaskIntoConstraints="NO" id="h8t-5m-DFX">
                                             <rect key="frame" x="0.0" y="22" width="430" height="22"/>
                                             <subviews>
-                                                <textField horizontalHuggingPriority="1" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="11">
+                                                <textField focusRingType="none" horizontalHuggingPriority="1" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="11">
                                                     <rect key="frame" x="-2" y="4" width="126" height="15"/>
                                                     <constraints>
                                                         <constraint firstAttribute="width" relation="greaterThanOrEqual" constant="76" id="2hq-Hr-fjU"/>
@@ -2235,7 +2313,7 @@ DQ
                                         <stackView distribution="fill" orientation="horizontal" alignment="centerY" horizontalStackHuggingPriority="249.99998474121094" verticalStackHuggingPriority="249.99998474121094" translatesAutoresizingMaskIntoConstraints="NO" id="CvR-zl-5Xk">
                                             <rect key="frame" x="0.0" y="0.0" width="430" height="22"/>
                                             <subviews>
-                                                <textField horizontalHuggingPriority="1" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="125">
+                                                <textField focusRingType="none" horizontalHuggingPriority="1" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="125">
                                                     <rect key="frame" x="-2" y="4" width="126" height="15"/>
                                                     <constraints>
                                                         <constraint firstAttribute="width" relation="greaterThanOrEqual" constant="76" id="sfr-Qb-PHn"/>
@@ -2284,7 +2362,7 @@ DQ
                                         <real value="3.4028234663852886e+38"/>
                                     </customSpacing>
                                 </stackView>
-                                <textField wantsLayer="YES" verticalHuggingPriority="750" horizontalCompressionResistancePriority="250" setsMaxLayoutWidthAtFirstLayout="YES" translatesAutoresizingMaskIntoConstraints="NO" id="hab-1o-1kS">
+                                <textField wantsLayer="YES" focusRingType="none" verticalHuggingPriority="750" horizontalCompressionResistancePriority="250" setsMaxLayoutWidthAtFirstLayout="YES" translatesAutoresizingMaskIntoConstraints="NO" id="hab-1o-1kS">
                                     <rect key="frame" x="-2" y="0.0" width="534" height="56"/>
                                     <constraints>
                                         <constraint firstAttribute="width" constant="530" id="hAl-ML-Rbc"/>
@@ -2314,7 +2392,7 @@ DQ
                         <stackView distribution="fill" orientation="vertical" alignment="leading" horizontalStackHuggingPriority="249.99998474121094" verticalStackHuggingPriority="249.99998474121094" translatesAutoresizingMaskIntoConstraints="NO" id="gwA-XL-zVB">
                             <rect key="frame" x="0.0" y="0.0" width="396" height="123"/>
                             <subviews>
-                                <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="Md1-t7-hU4">
+                                <textField focusRingType="none" horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="Md1-t7-hU4">
                                     <rect key="frame" x="-2" y="108" width="125" height="15"/>
                                     <textFieldCell key="cell" lineBreakMode="clipping" title="Keyboard Shortcuts" id="xibKeyboardShortcuts">
                                         <font key="font" metaFont="systemBold" size="12"/>
@@ -2541,7 +2619,7 @@ DQ
                 <stackView distribution="fill" orientation="vertical" alignment="leading" horizontalStackHuggingPriority="249.99998474121094" verticalStackHuggingPriority="249.99998474121094" translatesAutoresizingMaskIntoConstraints="NO" id="gjM-uG-XkW">
                     <rect key="frame" x="20" y="43" width="537" height="301"/>
                     <subviews>
-                        <textField wantsLayer="YES" verticalHuggingPriority="750" setsMaxLayoutWidthAtFirstLayout="YES" translatesAutoresizingMaskIntoConstraints="NO" id="hBd-sS-cWq">
+                        <textField wantsLayer="YES" focusRingType="none" verticalHuggingPriority="750" setsMaxLayoutWidthAtFirstLayout="YES" translatesAutoresizingMaskIntoConstraints="NO" id="hBd-sS-cWq">
                             <rect key="frame" x="-2" y="273" width="541" height="28"/>
                             <constraints>
                                 <constraint firstAttribute="width" constant="537" id="Kvp-PL-Pes"/>
@@ -2575,7 +2653,7 @@ Features listed here may not work as expected.</string>
                                 <binding destination="32" name="value" keyPath="values.SecurityHardenedCompositionBuffer" id="jPI-Es-ipo"/>
                             </connections>
                         </button>
-                        <textField wantsLayer="YES" verticalHuggingPriority="750" setsMaxLayoutWidthAtFirstLayout="YES" translatesAutoresizingMaskIntoConstraints="NO" id="uTe-PD-0NE">
+                        <textField wantsLayer="YES" focusRingType="none" verticalHuggingPriority="750" setsMaxLayoutWidthAtFirstLayout="YES" translatesAutoresizingMaskIntoConstraints="NO" id="uTe-PD-0NE">
                             <rect key="frame" x="-2" y="204" width="541" height="28"/>
                             <constraints>
                                 <constraint firstAttribute="width" constant="537" id="RXL-dq-gV0"/>
@@ -2601,7 +2679,7 @@ Features listed here may not work as expected.</string>
                                 <binding destination="32" name="value" keyPath="values.DisableSegmentedThickUnderlineInMarkingModeForManagedClients" id="pPC-Ao-nPv"/>
                             </connections>
                         </button>
-                        <textField wantsLayer="YES" verticalHuggingPriority="750" setsMaxLayoutWidthAtFirstLayout="YES" translatesAutoresizingMaskIntoConstraints="NO" id="uK3-cc-UcW">
+                        <textField wantsLayer="YES" focusRingType="none" verticalHuggingPriority="750" setsMaxLayoutWidthAtFirstLayout="YES" translatesAutoresizingMaskIntoConstraints="NO" id="uK3-cc-UcW">
                             <rect key="frame" x="-2" y="102" width="541" height="70"/>
                             <constraints>
                                 <constraint firstAttribute="width" constant="537" id="qOi-aV-LQX"/>
@@ -2627,7 +2705,7 @@ Features listed here may not work as expected.</string>
                                 <binding destination="32" name="value" keyPath="values.CheckAbusersOfSecureEventInputAPI" id="j92-od-32w"/>
                             </connections>
                         </button>
-                        <textField wantsLayer="YES" verticalHuggingPriority="750" setsMaxLayoutWidthAtFirstLayout="YES" translatesAutoresizingMaskIntoConstraints="NO" id="7xr-bA-Gg5">
+                        <textField wantsLayer="YES" focusRingType="none" verticalHuggingPriority="750" setsMaxLayoutWidthAtFirstLayout="YES" translatesAutoresizingMaskIntoConstraints="NO" id="7xr-bA-Gg5">
                             <rect key="frame" x="-2" y="0.0" width="541" height="70"/>
                             <constraints>
                                 <constraint firstAttribute="width" constant="537" id="uIU-Qp-xCh"/>
@@ -2669,5 +2747,24 @@ Features listed here may not work as expected.</string>
             <accessibility identifier="vwrDevZone"/>
             <point key="canvasLocation" x="-85.5" y="529"/>
         </view>
+        <stackView distribution="fill" orientation="vertical" alignment="leading" spacing="4" horizontalStackHuggingPriority="249.99998474121094" verticalStackHuggingPriority="249.99998474121094" id="pcw-0g-uWR">
+            <rect key="frame" x="0.0" y="120" width="530" height="1"/>
+            <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+            <subviews>
+                <box verticalHuggingPriority="750" boxType="separator" translatesAutoresizingMaskIntoConstraints="NO" id="OWF-GZ-q7h">
+                    <rect key="frame" x="0.0" y="-2" width="530" height="5"/>
+                    <constraints>
+                        <constraint firstAttribute="width" relation="greaterThanOrEqual" constant="530" id="abr-dE-eqh"/>
+                    </constraints>
+                </box>
+            </subviews>
+            <visibilityPriorities>
+                <integer value="1000"/>
+            </visibilityPriorities>
+            <customSpacing>
+                <real value="3.4028234663852886e+38"/>
+            </customSpacing>
+            <point key="canvasLocation" x="-1902" y="1286"/>
+        </stackView>
     </objects>
 </document>
