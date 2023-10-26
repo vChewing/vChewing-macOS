@@ -101,8 +101,8 @@ public class Notifier: NSWindowController {
     let windowWidth = Double(4) * kLargeFontSize + textWH.width
     let contentRect = NSRect(x: 0, y: 0, width: windowWidth, height: 60.0)
     var windowRect = contentRect
-    windowRect.origin.x = screenRect.maxX - windowRect.width - 10
-    windowRect.origin.y = screenRect.maxY - windowRect.height - 10
+    windowRect.origin.x = screenRect.maxX - windowRect.width - 20
+    windowRect.origin.y = screenRect.maxY - ceil(2.5 * windowRect.height) - 10
     let styleMask: NSWindow.StyleMask = [.borderless]
 
     let transparentVisualEffect: NSView = {
