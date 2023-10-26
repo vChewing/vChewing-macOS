@@ -1019,7 +1019,8 @@ extension InputHandler {
   /// - Returns: 告知 IMK「該按鍵是否已經被輸入法攔截處理」。
   func handleCapsLockAndAlphanumericalMode(input: InputSignalProtocol) -> Bool? {
     guard let delegate = delegate else { return nil }
-    guard input.isCapsLockOn || delegate.isASCIIMode else { return nil }
+    let handleCapsLock = !PrefMgr.shared.bypassNonAppleCapsLockHandling && input.isCapsLockOn
+    guard handleCapsLock || delegate.isASCIIMode else { return nil }
 
     // 低於 macOS 12 的系統無法偵測 CapsLock 的啟用狀態，
     // 所以這裡一律強制重置狀態為 .ofEmpty()。
@@ -1027,13 +1028,13 @@ extension InputHandler {
 
     // 字母鍵摁 Shift 的話，無須額外處理，因為直接就會敲出大寫字母。
     if (input.isUpperCaseASCIILetterKey && delegate.isASCIIMode)
-      || (input.isCapsLockOn && input.isShiftHold)
+      || (handleCapsLock && input.isShiftHold)
     {
       return false
     }
 
     // 不再讓威注音處理由 Shift 切換到的英文模式的按鍵輸入。
-    if delegate.isASCIIMode, !input.isCapsLockOn { return false }
+    if delegate.isASCIIMode, !handleCapsLock { return false }
 
     /// 如果是 ASCII 當中的不可列印的字元的話，
     /// 不使用「insertText:replacementRange:」。
