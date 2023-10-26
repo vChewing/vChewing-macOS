@@ -47,12 +47,14 @@
 "chkAllowBoostingSingleKanjiAsUserPhrase.title" = "允許藉由標記模式將可以就地升權/排除的候選字詞的最短詞長設為單個漢字";
 "chkAlsoConfirmAssociatedCandidatesByEnter.title" = "允許使用 Enter 確認當前選中的聯想詞";
 "chkAutoCorrectReadingCombination.title" = "敲字時自動糾正讀音組合";
+"chkBypassNonAppleCapsLockHandling.title" = "不使用威注音輸入法內建的 Caps Lock 處理";
 "chkCheckAbusersOfSecureEventInputAPI.title" = "主動偵測正在濫用 SecureEventInput API 的後檯執行緒";
 "chkConsolidateContextOnCandidateSelection.title" = "在使用選字窗選字時，自動鞏固上下文";
 "chkFetchSuggestionsFromUserOverrideModel.title" = "在敲字時自動套用來自半衰記憶模組的建議";
 "chkHardenVerticalPunctuations.title" = "在縱排書寫時，強制轉換標點為縱排形式（不推薦）";
 "chkKeepReadingUponCompositionError.title" = "允許對無效的讀音使用 BackSpace 編輯";
 "chkOnlyLoadFactoryLangModelsIfNeeded.title" = "按需載入簡繁體模式的原廠辭典資料";
+"chkShiftEisuToggleOffTogetherWithCapsLock.title" = "使「Shift 鍵 / JIS 英数鍵」英數模式的關閉狀態與 Caps Lock 的關閉狀態保持彼此同步";
 "chkUseFixedCandidateOrderOnSelection.title" = "以固定順序來陳列選字窗內的候選字";
 "clN-4A-iec.title" = "在逐字選字模式當中使用空格鍵確認當前高亮候選字";
 "Cp2-hn-bOq.title" = "對磁帶模式禁用繁簡轉換";
@@ -85,10 +87,12 @@
 "kcM-O6-mLN.title" = "這會阻止任何客體擅自存取尚未遞交的組字區內容。此舉也會全局啟用浮動組字窗。";
 "lblAcceptLeadingIntonations.title" = "在個別情況下，允許聲調前置鍵入";
 "lblAlwaysShowTooltipTextsHorizontally.title" = "始終使用橫排來顯示工具提示視窗";
+"lblBypassNonAppleCapsLockHandling.title" = "這不會影響到對 macOS 10.14 開始的系統內建的同名功能。";
 "lblCheckAbusersOfSecureEventInputAPI.title" = "這種濫用會導致系統內的所有第三方輸入法全都無法正常使用（在輸入法選單內會變成灰色）。針對需要填寫敏感資料的場合，使用 SecureEventInput 無可厚非。但是，用 EnableSecureEventInput() 開啟該模式之後，就有義務在輸入窗格失焦的那一刻呼叫 DisableSecureEventInput() 來結束這種狀態。這種狀態還常見於後檯輔助 App 當中、或者某個 App 在叫出該模式之後失去回應（這樣的話，哪怕被切換到後檯，SecureEventInput 也不會自動解除）。";
 "lblDevZoneTitleDescription.title" = "警告：該頁面僅作未來功能測試所用。\n在此列出的功能並非處於完全可用之狀態。";
 "lblIntonationKeyBehavior.title" = "指定聲調鍵（在注拼槽為「空」狀態時）的行為。";
 "lblShiftBkspKeyBehavior.title" = "指定 Shift+BackSpace 組合鍵率先嘗試的行為。";
+"lblShiftEisuToggleOffTogetherWithCapsLock.title" = "勾選該選項後：1) [至少 macOS 12 起] Caps Lock 在關掉的時候，會連帶關掉由 Shift 鍵 / JIS 英數鍵負責控制的英數模式；2) 在藉由 JIS 英數鍵關掉其控制的英數模式的時候，也會關掉 Caps Lock。註：威注音無法在 Caps Lock 亮燈的時候感知 Shift 鍵的單獨敲擊事件。";
 "lblUpperCaseLetterKeyBehavior.title" = "指定 Shift+字母鍵 的行為。";
 "lDd-rN-BSM.title" = "啟用田所選字窗的滑鼠滾動支援";
 "MKJ-Q6-dLd.title" = "亦使用「\\」或「¥」鍵啟用漢音鍵盤符號模式";
