@@ -50,14 +50,13 @@ P.S.: 威注音輸入法的 Shift 按鍵監測功能僅藉由對 NSEvent 訊號�
 
 編譯出的成品對應系統需求：
 
-- 至少 macOS 10.13 High Sierra，因為這是 Xcode 14 的限制。
-  - 保留該系統支援的原因：17-inch 2011 MacBook Pro 支援的最後一版 macOS 就是 High Sierra。
+- 至少 macOS 12 Monterey。
+  - 如需要在更舊版的系統下運行的話，請前往[威注音輸入法主頁](https://vchewing.github.io/README.html)下載 Aqua 紀念版威注音輸入法，可支援自 macOS 10.9 開始至 macOS 12 Monterey 為止的系統版本。
 
-- **推薦最低系統版本**：macOS 10.14.6 Mojave。
+- **推薦最低系統版本**：macOS 13 Ventura。
 
   - 同時建議**系統記憶體應至少 4GB**。威注音輸入法佔用記憶體約 115MB 左右（簡繁雙模式）、75MB左右（單模式），供參考。
     - 請務必使用 SSD 硬碟，否則可能會影響每次開機之後輸入法首次載入的速度。從 10.10 Yosemite 開始，macOS 就已經是針對機械硬碟負優化的作業系統了。
-    - 注：有條件換電腦的話，請更換至少能運行 macOS 12 Monterey 的電腦。威注音 3.0 版開始會要求至少 macOS 12。
 
 - 關於全字庫支援，因下述事實而在理論上很難做到最完美：
 
