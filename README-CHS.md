@@ -38,7 +38,7 @@ P.S.: 威注音输入法的 Shift 按键监测功能仅借由对 NSEvent 讯号�
 
 ## 系统需求
 
-编译用系统需求：
+建置用系统需求：
 
 - 至少 macOS 12 Monterey & Xcode 13.4.1。
     - 原因：Swift 封包管理支援与 Swift 5.5 所需，且仓库内包含了需要 Xcode 13.4.1 才能正常编译的内容（App 型安装程式）。
@@ -50,14 +50,13 @@ P.S.: 威注音输入法的 Shift 按键监测功能仅借由对 NSEvent 讯号�
 
 编译出的成品对应系统需求：
 
-- 至少 macOS 10.13 High Sierra，因为这是 Xcode 14 的限制。
-  - 保留该系统支援的原因：17-inch 2011 MacBook Pro 支援的最后一版 macOS 就是 High Sierra。
+- 至少 macOS 12 Monterey。
+  - 如需要在更旧版的系统下运行的话，请前往[威注音输入法主页](https://vchewing.github.io/README.html)下载 Aqua 纪念版威注音输入法，可支援自 macOS 10.9 开始至 macOS 12 Monterey 为止的系统版本。
 
-- **推荐最低系统版本**：macOS 10.14.6 Mojave。
+- **推荐最低系统版本**：macOS 13 Ventura。
 
   - 同时建议**系统记忆体应至少 4GB**。威注音输入法占用记忆体约 115MB 左右（简繁双模式）、75MB左右（单模式），供参考。
     - 请务必使用 SSD 硬碟，否则可能会影响每次开机之后输入法首次载入的速度。从 10.10 Yosemite 开始，macOS 就已经是针对机械硬碟负优化的作业系统了。
-    - 注：有条件换电脑的话，请更换至少能运行 macOS 12 Monterey 的电脑。威注音 3.0 版开始会要求至少 macOS 12。
 
 - 关于全字库支持，因下述事实而在理论上很难做到最完美：
 
