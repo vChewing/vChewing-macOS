@@ -129,6 +129,7 @@ public extension SessionCtl {
   /// 遞交組字區內容。
   /// 注意：必須在 IMK 的 commitComposition 函式當中也間接或者直接執行這個處理。
   private func commit(text: String) {
+    guard !text.isEmpty else { return }
     let phE = PrefMgr.shared.phraseReplacementEnabled && text.count > 1
     var text = text.trimmingCharacters(in: .newlines)
     var replaced = false
@@ -140,18 +141,21 @@ public extension SessionCtl {
     if phE, !replaced, let queried = inputHandler?.currentLM.queryReplacementValue(key: buffer) {
       buffer = ChineseConverter.kanjiConversionIfRequired(queried)
     }
-    if isServingIMEItself {
-      DispatchQueue.main.async {
-        guard let client = self.client() else { return }
-        client.insertText(
-          buffer, replacementRange: self.replacementRange()
-        )
-      }
-    } else {
+
+    func doCommit() {
       guard let client = client() else { return }
+      handlePreCommit()
       client.insertText(
         buffer, replacementRange: replacementRange()
       )
+    }
+
+    if isServingIMEItself {
+      DispatchQueue.main.async {
+        doCommit()
+      }
+    } else {
+      doCommit()
     }
   }
 
@@ -161,13 +165,13 @@ public extension SessionCtl {
   ///   - string: 要設定顯示的內容，必須得是 NSAttributedString（否則不顯示下劃線）且手動定義過下劃線。
   ///   警告：replacementRange 不要亂填，否則會在 Microsoft Office 等軟體內出現故障。
   ///   該功能是給某些想設計「重新組字」功能的輸入法設計的，但一字多音的漢語在注音/拼音輸入這方面不適用這個輸入法特性。
-  func doSetMarkedText(_ string: NSAttributedString) {
+  func doSetMarkedText(_ string: NSAttributedString, allowAsync: Bool = true) {
     // 威注音用不到 replacementRange，所以不用檢查 replacementRange 的異動情況。
     let range = attributedStringSecured.range
     guard !(string.isEqual(to: recentMarkedText.text) && recentMarkedText.selectionRange == range) else { return }
     recentMarkedText.text = string
     recentMarkedText.selectionRange = range
-    if isServingIMEItself || !isActivated {
+    if allowAsync, isServingIMEItself || !isActivated {
       DispatchQueue.main.async {
         guard let client = self.client() else { return }
         client.setMarkedText(
@@ -179,6 +183,18 @@ public extension SessionCtl {
       client.setMarkedText(
         string, selectionRange: range, replacementRange: replacementRange()
       )
+    }
+  }
+
+  func handlePreCommit() {
+    let whoShouldBypassHandling: [String] = ["com.barebones.bbedit", "com.barebones.textwrangler"]
+    if !whoShouldBypassHandling.contains(clientBundleIdentifier) {
+      let blankStr = NSMutableAttributedString(string: "")
+      blankStr.setAttributes(
+        mark(forStyle: kTSMHiliteConvertedText, at: .zero) as? [NSAttributedString.Key: Any] ?? [:],
+        range: .zero
+      )
+      doSetMarkedText(blankStr, allowAsync: false)
     }
   }
 }
