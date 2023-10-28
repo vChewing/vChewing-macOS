@@ -94,15 +94,19 @@ public extension NSEvent {
     return result <= UInt16.max ? UInt16(result) : UInt16.max
   }
 
-  var keyModifierFlags: ModifierFlags { modifierFlags.intersection(.deviceIndependentFlagsMask) }
+  var keyModifierFlags: ModifierFlags {
+    modifierFlags.intersection(.deviceIndependentFlagsMask).subtracting(.capsLock)
+  }
 
-  static var keyModifierFlags: ModifierFlags { Self.modifierFlags.intersection(.deviceIndependentFlagsMask) }
+  static var keyModifierFlags: ModifierFlags {
+    Self.modifierFlags.intersection(.deviceIndependentFlagsMask).subtracting(.capsLock)
+  }
 
   var isFlagChanged: Bool { type == .flagsChanged }
 
   var isEmacsKey: Bool {
     // 這裡不能只用 isControlHold，因為這裡對修飾鍵的要求有排他性。
-    [6, 2, 1, 5, 4, 22].contains(charCode) && modifierFlags == .control
+    [6, 2, 1, 5, 4, 22].contains(charCode) && keyModifierFlags == .control
   }
 
   // 摁 Alt+Shift+主鍵盤區域數字鍵 的話，根據不同的 macOS 鍵盤佈局種類，會出現不同的符號結果。
@@ -136,7 +140,7 @@ public extension NSEvent {
   var beganWithLetter: Bool { text.first?.isLetter ?? false }
   var isOptionHold: Bool { keyModifierFlags.contains(.option) }
   var isOptionHotKey: Bool { keyModifierFlags.contains(.option) && text.first?.isLetter ?? false }
-  var isCapsLockOn: Bool { keyModifierFlags.contains(.capsLock) }
+  var isCapsLockOn: Bool { modifierFlags.intersection(.deviceIndependentFlagsMask).contains(.capsLock) }
   var isFunctionKeyHold: Bool { keyModifierFlags.contains(.function) }
   var isNonLaptopFunctionKey: Bool { keyModifierFlags.contains(.numericPad) && !isNumericPadKey }
   var isEnter: Bool { [KeyCode.kCarriageReturn, KeyCode.kLineFeed].contains(KeyCode(rawValue: keyCode)) }
@@ -182,13 +186,13 @@ public extension NSEvent {
 
   // 這裡必須加上「flags == .shift」，否則會出現某些情況下輸入法「誤判當前鍵入的非 Shift 字符為大寫」的問題
   var isUpperCaseASCIILetterKey: Bool {
-    (65 ... 90).contains(charCode) && modifierFlags == .shift
+    (65 ... 90).contains(charCode) && keyModifierFlags == .shift
   }
 
   // 以 .command 觸發的熱鍵（包括剪貼簿熱鍵）。
   var isSingleCommandBasedLetterHotKey: Bool {
-    ((65 ... 90).contains(charCode) && modifierFlags == [.shift, .command])
-      || ((97 ... 122).contains(charCode) && modifierFlags == .command)
+    ((65 ... 90).contains(charCode) && keyModifierFlags == [.shift, .command])
+      || ((97 ... 122).contains(charCode) && keyModifierFlags == .command)
   }
 
   // 這裡必須用 KeyCode，這樣才不會受隨 macOS 版本更動的 Apple 動態注音鍵盤排列內容的影響。
@@ -333,7 +337,7 @@ public extension NSEvent {
   func layoutTranslated(to layout: LatinKeyboardMappings = .qwerty) -> NSEvent {
     let mapTable = layout.mapTable
     if isFlagChanged { return self }
-    guard modifierFlags == .shift || modifierFlags.isEmpty else { return self }
+    guard keyModifierFlags == .shift || keyModifierFlags.isEmpty else { return self }
     if !mapTable.keys.contains(keyCode) { return self }
     guard let dataTuplet = mapTable[keyCode] else { return self }
     let result: NSEvent? = reinitiate(
