@@ -70,7 +70,7 @@ extension InputHandler {
     // 這裡 inputValidityCheck() 是讓注拼槽檢查 charCode 這個 UniChar 是否是合法的注音輸入。
     // 如果是的話，就將這次傳入的這個按鍵訊號塞入注拼槽內且標記為「keyConsumedByReading」。
     // 函式 composer.receiveKey() 可以既接收 String 又接收 UniChar。
-    if (!skipPhoneticHandling && composer.inputValidityCheck(key: input.charCode)) || confirmCombination {
+    if (!skipPhoneticHandling && composer.inputValidityCheck(charStr: inputText)) || confirmCombination {
       // 引入 macOS 內建注音輸入法的行為，允許用除了陰平以外的聲調鍵覆寫前一個漢字的讀音。
       // 但如果要覆寫的內容會導致游標身後的字音沒有對應的辭典記錄的話，那就只蜂鳴警告一下。
       proc: if [0, 1].contains(prefs.specifyIntonationKeyBehavior), composer.isEmpty, !input.isSpace {
@@ -109,7 +109,8 @@ extension InputHandler {
       }
     }
 
-    var composeReading = composer.hasIntonation() && composer.inputValidityCheck(key: input.charCode) // 這裡不需要做排他性判斷。
+    // 這裡不需要做排他性判斷。
+    var composeReading = composer.hasIntonation() && composer.inputValidityCheck(charStr: inputText)
     // 如果當前的按鍵是 Enter 或 Space 的話，這時就可以取出 composer 內的注音來做檢查了。
     // 來看看詞庫內到底有沒有對應的讀音索引。這裡用了類似「|=」的判斷處理方式。
     composeReading = composeReading || (!composer.isEmpty && confirmCombination)
