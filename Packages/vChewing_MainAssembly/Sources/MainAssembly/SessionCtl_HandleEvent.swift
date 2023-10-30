@@ -195,7 +195,7 @@ public extension SessionCtl {
         ? NSLocalizedString("Alphanumerical Input Mode", comment: "") + "\n" + status
         : NSLocalizedString("Chinese Input Mode", comment: "") + "\n" + status
     )
-    if PrefMgr.shared.shiftEisuToggleOffTogetherWithCapsLock, oldValue, !newValue, Self.isCapsLocked {
+    if PrefMgr.shared.shiftEisuToggleOffTogetherWithCapsLock, oldValue, !newValue, CapsLockToggler.isOn {
       CapsLockToggler.turnOff()
     }
   }
