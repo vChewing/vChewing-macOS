@@ -79,9 +79,6 @@ public class SessionCtl: IMKInputController {
 
   // MARK: -
 
-  /// 當前 Caps Lock 按鍵是否被摁下。
-  public static var isCapsLocked: Bool { NSEvent.keyModifierFlags.contains(.capsLock) }
-
   /// 當前這個 SessionCtl 副本是否處於英數輸入模式。
   public var isASCIIMode: Bool {
     get {
