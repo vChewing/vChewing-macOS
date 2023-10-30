@@ -7,13 +7,7 @@ import CapsLockToggler
 
 public enum CapsLockToggler {
   public static func toggle() {
-    let thePort: mach_port_t = {
-      if #available(macOS 12.0, *) {
-        return kIOMainPortDefault
-      }
-      return kIOMasterPortDefault
-    }()
-    let ioService: io_service_t = IOServiceGetMatchingService(thePort, IOServiceMatching(kIOHIDSystemClass))
+    let ioService: io_service_t = IOServiceGetMatchingService(0, IOServiceMatching(kIOHIDSystemClass))
     var ioConnect: io_connect_t = 0
     IOServiceOpen(ioService, mach_task_self_, UInt32(kIOHIDParamConnectType), &ioConnect)
     var state = false
@@ -23,14 +17,17 @@ public enum CapsLockToggler {
     IOServiceClose(ioConnect)
   }
 
+  public static var isOn: Bool {
+    let ioService: io_service_t = IOServiceGetMatchingService(0, IOServiceMatching(kIOHIDSystemClass))
+    var ioConnect: io_connect_t = 0
+    IOServiceOpen(ioService, mach_task_self_, UInt32(kIOHIDParamConnectType), &ioConnect)
+    var state = false
+    IOHIDGetModifierLockState(ioConnect, Int32(kIOHIDCapsLockState), &state)
+    return state
+  }
+
   public static func turnOff() {
-    let thePort: mach_port_t = {
-      if #available(macOS 12.0, *) {
-        return kIOMainPortDefault
-      }
-      return kIOMasterPortDefault
-    }()
-    let ioService: io_service_t = IOServiceGetMatchingService(thePort, IOServiceMatching(kIOHIDSystemClass))
+    let ioService: io_service_t = IOServiceGetMatchingService(0, IOServiceMatching(kIOHIDSystemClass))
     var ioConnect: io_connect_t = 0
     IOServiceOpen(ioService, mach_task_self_, UInt32(kIOHIDParamConnectType), &ioConnect)
     IOHIDSetModifierLockState(ioConnect, Int32(kIOHIDCapsLockState), false)
