@@ -144,7 +144,6 @@ public extension SessionCtl {
 
     func doCommit() {
       guard let client = client() else { return }
-      handlePreCommit()
       client.insertText(
         buffer, replacementRange: replacementRange()
       )
@@ -183,18 +182,6 @@ public extension SessionCtl {
       client.setMarkedText(
         string, selectionRange: range, replacementRange: replacementRange()
       )
-    }
-  }
-
-  func handlePreCommit() {
-    let whoShouldBypassHandling: [String] = ["com.barebones.bbedit", "com.barebones.textwrangler"]
-    if !whoShouldBypassHandling.contains(clientBundleIdentifier) {
-      let blankStr = NSMutableAttributedString(string: "")
-      blankStr.setAttributes(
-        mark(forStyle: kTSMHiliteConvertedText, at: .zero) as? [NSAttributedString.Key: Any] ?? [:],
-        range: .zero
-      )
-      doSetMarkedText(blankStr, allowAsync: false)
     }
   }
 }
