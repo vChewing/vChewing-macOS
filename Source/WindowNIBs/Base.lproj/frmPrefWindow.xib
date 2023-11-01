@@ -1492,14 +1492,14 @@
         </view>
         <userDefaultsController representsSharedInstance="YES" id="32"/>
         <view id="Rnp-LM-RIF" userLabel="vwrDictionary">
-            <rect key="frame" x="0.0" y="0.0" width="577" height="267"/>
+            <rect key="frame" x="0.0" y="0.0" width="577" height="288"/>
             <autoresizingMask key="autoresizingMask"/>
             <subviews>
                 <stackView distribution="fill" orientation="vertical" alignment="leading" horizontalStackHuggingPriority="249.99998474121094" verticalStackHuggingPriority="249.99998474121094" translatesAutoresizingMaskIntoConstraints="NO" id="6xK-1z-A14">
-                    <rect key="frame" x="20" y="31" width="530" height="216"/>
+                    <rect key="frame" x="20" y="28" width="530" height="240"/>
                     <subviews>
                         <textField autoresizesSubviews="NO" focusRingType="none" horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="FUV-qx-xkC">
-                            <rect key="frame" x="-2" y="201" width="388" height="15"/>
+                            <rect key="frame" x="-2" y="225" width="388" height="15"/>
                             <textFieldCell key="cell" controlSize="small" lineBreakMode="clipping" title="Choose your desired user data folder path. Will be omitted if invalid." id="wN3-k3-b2a">
                                 <font key="font" metaFont="cellTitle"/>
                                 <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
@@ -1507,7 +1507,7 @@
                             </textFieldCell>
                         </textField>
                         <stackView distribution="fill" orientation="horizontal" alignment="bottom" spacing="0.0" horizontalStackHuggingPriority="249.99998474121094" verticalStackHuggingPriority="249.99998474121094" translatesAutoresizingMaskIntoConstraints="NO" id="uUS-Ni-jFP">
-                            <rect key="frame" x="0.0" y="171" width="530" height="22"/>
+                            <rect key="frame" x="0.0" y="195" width="530" height="22"/>
                             <subviews>
                                 <pathControl verticalHuggingPriority="750" allowsExpansionToolTips="YES" translatesAutoresizingMaskIntoConstraints="NO" id="p4U-xB-kEs">
                                     <rect key="frame" x="0.0" y="0.0" width="470" height="20"/>
@@ -1569,6 +1569,16 @@
                                 <real value="3.4028234663852886e+38"/>
                             </customSpacing>
                         </stackView>
+                        <button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="qFh-Qn-v9j">
+                            <rect key="frame" x="-6" y="164" width="249" height="27"/>
+                            <buttonCell key="cell" type="push" title="Import Yahoo! KeyKey User Dictionary File" bezelStyle="rounded" alignment="center" controlSize="small" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="btnImportFromKimoTxt">
+                                <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
+                                <font key="font" metaFont="smallSystem"/>
+                            </buttonCell>
+                            <connections>
+                                <action selector="importYahooKeyKeyUserDictionaryData:" target="-2" id="4Jr-va-ti9"/>
+                            </connections>
+                        </button>
                         <stackView distribution="fill" orientation="vertical" alignment="leading" spacing="5" horizontalStackHuggingPriority="249.99998474121094" verticalStackHuggingPriority="249.99998474121094" translatesAutoresizingMaskIntoConstraints="NO" id="i2J-0A-opq">
                             <rect key="frame" x="0.0" y="0.0" width="450" height="163"/>
                             <subviews>
@@ -1708,8 +1718,10 @@
                         <integer value="1000"/>
                         <integer value="1000"/>
                         <integer value="1000"/>
+                        <integer value="1000"/>
                     </visibilityPriorities>
                     <customSpacing>
+                        <real value="3.4028234663852886e+38"/>
                         <real value="3.4028234663852886e+38"/>
                         <real value="3.4028234663852886e+38"/>
                         <real value="3.4028234663852886e+38"/>
@@ -1721,7 +1733,7 @@
                 <constraint firstItem="6xK-1z-A14" firstAttribute="leading" secondItem="Rnp-LM-RIF" secondAttribute="leading" constant="20" symbolic="YES" id="zFW-2a-uC3"/>
             </constraints>
             <accessibility identifier="vwrDictionary"/>
-            <point key="canvasLocation" x="-717.5" y="800.5"/>
+            <point key="canvasLocation" x="-717.5" y="811"/>
         </view>
         <view wantsLayer="YES" id="nMV-YT-ex7" userLabel="vwrPhrases">
             <rect key="frame" x="0.0" y="0.0" width="577" height="508"/>
