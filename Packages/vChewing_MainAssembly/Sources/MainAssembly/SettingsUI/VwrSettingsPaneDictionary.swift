@@ -11,6 +11,7 @@ import CocoaExtension
 import Shared
 import SwiftExtension
 import SwiftUI
+import UniformTypeIdentifiers
 
 @available(macOS 13, *)
 public struct VwrSettingsPaneDictionary: View {
@@ -44,6 +45,8 @@ public struct VwrSettingsPaneDictionary: View {
   private var allowBoostingSingleKanjiAsUserPhrase: Bool
 
   // MARK: - Main View
+
+  @State var keykeyImportButtonDisabled = false
 
   private var fdrUserDataDefault: String { LMMgr.dataFolderPath(isDefaultFolder: true) }
 
@@ -228,6 +231,36 @@ public struct VwrSettingsPaneDictionary: View {
               )
             )
             .settingsDescription()
+          }
+        } footer: {
+          HStack {
+            Spacer()
+            Button {
+              Self.dlgOpenFile.title = NSLocalizedString(
+                "i18n:settings.importFromKimoTxt.buttonText", comment: ""
+              ) + ":"
+              Self.dlgOpenFile.showsResizeIndicator = true
+              Self.dlgOpenFile.showsHiddenFiles = true
+              Self.dlgOpenFile.canChooseFiles = true
+              Self.dlgOpenFile.allowsMultipleSelection = false
+              Self.dlgOpenFile.canChooseDirectories = false
+              Self.dlgOpenFile.allowedContentTypes = [.init(filenameExtension: "txt")].compactMap { $0 }
+
+              if let window = CtlSettingsUI.shared?.window {
+                Self.dlgOpenFile.beginSheetModal(for: window) { result in
+                  if result == NSApplication.ModalResponse.OK {
+                    keykeyImportButtonDisabled = true
+                    defer { keykeyImportButtonDisabled = false }
+                    guard let url = Self.dlgOpenFile.url else { return }
+                    guard var rawString = try? String(contentsOf: url) else { return }
+                    let count = LMMgr.importYahooKeyKeyUserDictionary(text: &rawString)
+                    window.callAlert(title: String(format: "i18n:settings.importFromKimoTxt.finishedCount:%@".localized, count.description))
+                  }
+                }
+              }
+            } label: {
+              Text(verbatim: "i18n:settings.importFromKimoTxt.buttonText".localized + " (TXT)…")
+            }.disabled(keykeyImportButtonDisabled)
           }
         }
       }.formStyled().frame(minWidth: CtlSettingsUI.formWidth, maxWidth: ceil(CtlSettingsUI.formWidth * 1.2))
