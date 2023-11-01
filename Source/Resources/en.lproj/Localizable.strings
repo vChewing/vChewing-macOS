@@ -1,3 +1,5 @@
+"i18n:settings.importFromKimoTxt.buttonText" = "Import Yahoo! KeyKey User Dictionary File";
+"i18n:settings.importFromKimoTxt.finishedCount:%@" = "Imported %@ new records.";
 "i18n:aboutWindow.ABOUT_APP_TITLE_FULL" = "About vChewing for macOS";
 "i18n:aboutWindow.DISCLAIMER_TEXT" = "DISCLAIMER: The vChewing project, having no relationship of cooperation or affiliation with the OpenVanilla project, is not responsible for the phrase database shipped in the original McBopomofo project. Certain geopolitical and ideological contents, which are potentially harmful to the global spread of this software, are not included in vChewing official phrase database.";
 "i18n:aboutWindow.OK_BUTTON" = "I Accept";
