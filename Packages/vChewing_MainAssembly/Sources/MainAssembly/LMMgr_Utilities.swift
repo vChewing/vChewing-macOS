@@ -311,7 +311,7 @@ public extension LMMgr {
   }
 
   static func openUserDictFile(type: vChewingLM.ReplacableUserDataType, dual: Bool = false, alt: Bool) {
-    let appIdentifier: String = alt ? "" : "Finder"
+    let appIdentifier: String = alt ? "com.apple.TextEdit" : "com.apple.finder"
     openPhraseFile(fromURL: userDictDataURL(mode: IMEApp.currentInputMode, type: type), appIdentifier: appIdentifier)
     guard dual else { return }
     openPhraseFile(fromURL: userDictDataURL(mode: IMEApp.currentInputMode.reversed, type: type), appIdentifier: appIdentifier)
@@ -326,7 +326,7 @@ public extension LMMgr {
     if !Self.checkIfUserFilesExistBeforeOpening() { return }
     DispatchQueue.main.async {
       switch appIdentifier {
-      case "Finder":
+      case "Finder", "com.apple.finder":
         NSWorkspace.shared.activateFileViewerSelecting([url])
       default:
         guard let textEditURL = NSWorkspace.shared.urlForApplication(withBundleIdentifier: "com.apple.TextEdit") else { return }
