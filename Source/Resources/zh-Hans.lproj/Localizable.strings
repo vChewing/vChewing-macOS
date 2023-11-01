@@ -1,3 +1,5 @@
+"i18n:settings.importFromKimoTxt.buttonText" = "汇入奇摩输入法自订词资料库";
+"i18n:settings.importFromKimoTxt.finishedCount:%@" = "汇入了 %@ 笔新记录。";
 "i18n:aboutWindow.ABOUT_APP_TITLE_FULL" = "关于 macOS 版「威注音输入法」";
 "i18n:aboutWindow.DISCLAIMER_TEXT" = "免责声明：威注音专案对小麦注音官方专案内赠的小麦注音原版词库内容不负任何责任。威注音输入法专用的威注音官方词库不包含任何「会在法理上妨碍威注音在全球传播」的「与地缘政治及政治意识形态有关的」内容。威注音专案与 OpenVanilla 专案之间无合作关系、无隶属关系。";
 "i18n:aboutWindow.OK_BUTTON" = "确定";
