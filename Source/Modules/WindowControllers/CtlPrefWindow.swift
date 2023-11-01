@@ -462,6 +462,30 @@ class CtlPrefWindow: NSWindowController, NSWindowDelegate {
       }
     }
   }
+
+  @IBAction func importYahooKeyKeyUserDictionaryData(_: NSButton) {
+    let dlgOpenFile = NSOpenPanel()
+    dlgOpenFile.title = NSLocalizedString(
+      "i18n:settings.importFromKimoTxt.buttonText", comment: ""
+    ) + ":"
+    dlgOpenFile.showsResizeIndicator = true
+    dlgOpenFile.showsHiddenFiles = true
+    dlgOpenFile.canChooseFiles = true
+    dlgOpenFile.allowsMultipleSelection = false
+    dlgOpenFile.canChooseDirectories = false
+    dlgOpenFile.allowedContentTypes = [.init(filenameExtension: "txt")].compactMap { $0 }
+
+    if let window = window {
+      dlgOpenFile.beginSheetModal(for: window) { result in
+        if result == NSApplication.ModalResponse.OK {
+          guard let url = dlgOpenFile.url else { return }
+          guard var rawString = try? String(contentsOf: url) else { return }
+          let count = LMMgr.importYahooKeyKeyUserDictionary(text: &rawString)
+          window.callAlert(title: String(format: "i18n:settings.importFromKimoTxt.finishedCount:%@".localized, count.description))
+        }
+      }
+    }
+  }
 }
 
 // MARK: - NSToolbarDelegate Methods
