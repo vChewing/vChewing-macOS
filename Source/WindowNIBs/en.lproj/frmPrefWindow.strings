@@ -42,6 +42,7 @@
 "ArK-Vk-OoT.title" = "Emulating select-candidate-per-character mode";
 "BDG-qU-aj6.title" = "All strokes in the composition buffer will be shown as ASCII keyboard characters unless this option is enabled. Stroke is definable in the “%keyname” section of the CIN file.";
 "BSK-bH-Gct.title" = "Auto-convert traditional Chinese glyphs to KangXi characters";
+"btnImportFromKimoTxt.title" = "Import Yahoo! KeyKey User Dictionary File";
 "cBw-gz-TXe.title" = "Only enforce conversion in Traditional Chinese mode";
 "cf2-se-PDO.title" = "Dictionary and Language Models";
 "chkAllowBoostingSingleKanjiAsUserPhrase.title" = "Allow boosting / excluding a candidate of single kanji when marking";

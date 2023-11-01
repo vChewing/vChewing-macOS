@@ -42,6 +42,7 @@
 "ArK-Vk-OoT.title" = "模擬 90 年代前期注音逐字選字輸入風格";
 "BDG-qU-aj6.title" = "不啟用該選項的話，在組字區內的字根將會以原始鍵盤按鍵名稱來顯示。所有關於字根的定義，均請洽 CIN 磁帶檔案內的「%keyname」章節。";
 "BSK-bH-Gct.title" = "自動將繁體中文字轉換為康熙正體字";
+"btnImportFromKimoTxt.title" = "匯入奇摩輸入法自訂詞資料庫";
 "cBw-gz-TXe.title" = "僅在繁體模式轉換至繁體";
 "cf2-se-PDO.title" = "辭典＆語言模型";
 "chkAllowBoostingSingleKanjiAsUserPhrase.title" = "允許藉由標記模式將可以就地升權/排除的候選字詞的最短詞長設為單個漢字";
