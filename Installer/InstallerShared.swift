@@ -101,31 +101,31 @@ public enum AlertType: String, Identifiable {
 
   var title: LocalizedStringKey {
     switch self {
-    case .nothing: ""
-    case .installationFailed: "Install Failed"
-    case .missingAfterRegistration: "Fatal Error"
-    case .postInstallAttention: "Attention"
-    case .postInstallWarning: "Warning"
-    case .postInstallOK: "Installation Successful"
+    case .nothing: return ""
+    case .installationFailed: return "Install Failed"
+    case .missingAfterRegistration: return "Fatal Error"
+    case .postInstallAttention: return "Attention"
+    case .postInstallWarning: return "Warning"
+    case .postInstallOK: return "Installation Successful"
     }
   }
 
   var message: String {
     switch self {
-    case .nothing: ""
+    case .nothing: return ""
     case .installationFailed:
-      "Cannot copy the file to the destination.".i18n
+      return "Cannot copy the file to the destination.".i18n
     case .missingAfterRegistration:
-      String(
+      return String(
         format: "Cannot find input source %@ after registration.".i18n,
         kTISInputSourceID
       )
     case .postInstallAttention:
-      "vChewing is upgraded, but please log out or reboot for the new version to be fully functional.".i18n
+      return "vChewing is upgraded, but please log out or reboot for the new version to be fully functional.".i18n
     case .postInstallWarning:
-      "Input method may not be fully enabled. Please enable it through System Preferences > Keyboard > Input Sources.".i18n
+      return "Input method may not be fully enabled. Please enable it through System Preferences > Keyboard > Input Sources.".i18n
     case .postInstallOK:
-      "vChewing is ready to use. \n\nPlease relogin if this is the first time you install it in this user account.".i18n
+      return "vChewing is ready to use. \n\nPlease relogin if this is the first time you install it in this user account.".i18n
     }
   }
 }
