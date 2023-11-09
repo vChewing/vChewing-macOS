@@ -11,8 +11,6 @@ import SwiftUI
 
 @available(macOS 12, *)
 public struct VwrAboutUI: View {
-  @Environment(\.dismiss) private var dismiss
-
   public static let copyrightLabel = Bundle.main.localizedInfoDictionary?["NSHumanReadableCopyright"] as? String ?? "BAD_COPYRIGHT_LABEL"
   public static let eulaContent = Bundle.main.localizedInfoDictionary?["CFEULAContent"] as? String ?? "BAD_EULA_CONTENT"
   public static let eulaContentUpstream = Bundle.main.infoDictionary?["CFUpstreamEULAContent"] as? String ?? "BAD_EULA_UPSTREAM"
@@ -52,7 +50,7 @@ public struct VwrAboutUI: View {
             .frame(maxWidth: .infinity)
           VStack(spacing: 4) {
             Button {
-              dismiss()
+              CtlAboutUI.shared?.window?.close()
             } label: {
               Text("i18n:aboutWindow.OK_BUTTON").frame(width: 114)
             }
