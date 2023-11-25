@@ -179,7 +179,7 @@ public class SessionCtl: IMKInputController {
       PrefMgr.shared.mostRecentInputMode = newValue.rawValue
     }
     didSet {
-      if PrefMgr.shared.onlyLoadFactoryLangModelsIfNeeded { LMMgr.loadDataModel(inputMode) }
+      /// SQLite 資料庫是在 AppDelegate 階段就載入的，所以這裡不需要再 Lazy-Load。
       if oldValue != inputMode, inputMode != .imeModeNULL {
         /// 先重置輸入調度模組，不然會因為之後的命令而導致該命令無法正常執行。
         resetInputHandler()
@@ -406,11 +406,9 @@ public extension SessionCtl {
     }
     let status = "NotificationSwitchRevolver".localized
     DispatchQueue.main.async {
-      if LMMgr.lmCHT.isCoreLMLoaded, LMMgr.lmCHS.isCoreLMLoaded {
-        Notifier.notify(
-          message: nowMode.reversed.localizedDescription + "\n" + status
-        )
-      }
+      Notifier.notify(
+        message: nowMode.reversed.localizedDescription + "\n" + status
+      )
     }
     client.selectMode(nowMode.reversed.rawValue)
   }

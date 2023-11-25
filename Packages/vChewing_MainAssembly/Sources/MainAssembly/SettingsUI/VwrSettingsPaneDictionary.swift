@@ -26,9 +26,6 @@ public struct VwrSettingsPaneDictionary: View {
   @AppStorage(wrappedValue: false, UserDef.kUseExternalFactoryDict.rawValue)
   private var useExternalFactoryDict: Bool
 
-  @AppStorage(wrappedValue: true, UserDef.kOnlyLoadFactoryLangModelsIfNeeded.rawValue)
-  private var onlyLoadFactoryLangModelsIfNeeded: Bool
-
   @AppStorage(wrappedValue: false, UserDef.kCNS11643Enabled.rawValue)
   private var cns11643Enabled: Bool
 
@@ -167,7 +164,7 @@ public struct VwrSettingsPaneDictionary: View {
             Toggle(
               LocalizedStringKey("Read external factory dictionary files if possible"),
               isOn: $useExternalFactoryDict.onChange {
-                LMMgr.reloadFactoryDictionaryFiles()
+                LMMgr.connectCoreDB()
               }
             )
             Text(
@@ -177,12 +174,6 @@ public struct VwrSettingsPaneDictionary: View {
             )
             .settingsDescription()
           }
-          Toggle(
-            LocalizedStringKey("Only load factory language models if needed"),
-            isOn: $onlyLoadFactoryLangModelsIfNeeded.onChange {
-              if !onlyLoadFactoryLangModelsIfNeeded { LMMgr.loadDataModelsOnAppDelegate() }
-            }
-          )
           Toggle(
             LocalizedStringKey("Enable CNS11643 Support (2023-05-19)"),
             isOn: $cns11643Enabled.onChange {

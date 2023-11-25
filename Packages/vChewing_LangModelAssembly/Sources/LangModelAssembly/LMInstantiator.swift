@@ -9,6 +9,7 @@
 import Foundation
 import Megrez
 import Shared
+import SQLite3
 
 public extension vChewingLM {
   /// 語言模組副本化模組（LMInstantiator，下稱「LMI」）自身為符合天權星組字引擎內
@@ -29,6 +30,15 @@ public extension vChewingLM {
   /// LMI 會根據需要分別載入原廠語言模組和其他個別的子語言模組。LMI 本身不會記錄這些
   /// 語言模組的相關資料的存放位置，僅藉由參數來讀取相關訊息。
   class LMInstantiator: LangModelProtocol {
+    // SQLite 連線所在的記憶體位置。
+    static var ptrSQL: OpaquePointer?
+
+    // SQLite 連線是否已經建立。
+    public private(set) static var isSQLDBConnected: Bool = false
+
+    // SQLite Statement 專用的記憶體位置。
+    static var ptrStatement: OpaquePointer?
+
     // 在函式內部用以記錄狀態的開關。
     public var isCassetteEnabled = false
     public var isPhraseReplacementEnabled = false
@@ -43,6 +53,27 @@ public extension vChewingLM {
       self.isCHS = isCHS
     }
 
+    @discardableResult public static func connectSQLDB(dbPath: String, dropPreviousConnection: Bool = true) -> Bool {
+      if dropPreviousConnection { disconnectSQLDB() }
+      vCLog("Establishing SQLite connection to: \(dbPath)")
+      guard sqlite3_open(dbPath, &Self.ptrSQL) == SQLITE_OK else { return false }
+      guard "PRAGMA journal_mode = MEMORY;".runAsSQLExec(dbPointer: &ptrSQL) else { return false }
+      isSQLDBConnected = true
+      return true
+    }
+
+    public static func disconnectSQLDB() {
+      if Self.ptrStatement != nil {
+        sqlite3_finalize(Self.ptrStatement)
+        Self.ptrStatement = nil
+      }
+      if Self.ptrSQL != nil {
+        sqlite3_close_v2(Self.ptrSQL)
+        Self.ptrSQL = nil
+      }
+      isSQLDBConnected = false
+    }
+
     /// 介紹一下幾個通用的語言模組型別：
     /// ----------------------
     /// LMCoreEX 是全功能通用型的模組，每一筆辭典記錄以 key 為注音、以 [Unigram] 陣列作為記錄內容。
@@ -52,25 +83,6 @@ public extension vChewingLM {
     /// LMReplacements 與 LMAssociates 分別擔當語彙置換表資料與使用者聯想詞的資料承載工作。
     /// 但是，LMCoreEX 對 2010-2013 年等舊 mac 機種而言，讀取速度異常緩慢。
     /// 於是 LMCoreJSON 就出場了，專門用來讀取原廠的 JSON 格式的辭典。
-
-    // 聲明原廠語言模組：
-    // Reverse 的話，第一欄是注音，第二欄是對應的漢字，第三欄是可能的權重。
-    // 不 Reverse 的話，第一欄是漢字，第二欄是對應的注音，第三欄是可能的權重。
-    var lmCore = LMCoreJSON(
-      reverse: false, consolidate: false, defaultScore: -9.9, forceDefaultScore: false
-    )
-    var lmMisc = LMCoreJSON(
-      reverse: true, consolidate: false, defaultScore: -1.0, forceDefaultScore: false
-    )
-
-    // 簡體中文模式與繁體中文模式共用全字庫擴展模組，故靜態處理。
-    // 不然，每個模式都會讀入一份全字庫，會多佔用 100MB 記憶體。
-    static var lmCNS = vChewingLM.LMCoreJSON(
-      reverse: true, consolidate: false, defaultScore: -11.0, forceDefaultScore: false
-    )
-    static var lmSymbols = vChewingLM.LMCoreJSON(
-      reverse: true, consolidate: false, defaultScore: -13.0, forceDefaultScore: false
-    )
 
     // 磁帶資料模組。「currentCassette」對外唯讀，僅用來讀取磁帶本身的中繼資料（Metadata）。
     static var lmCassette = LMCassette()
@@ -92,54 +104,7 @@ public extension vChewingLM {
 
     // MARK: - 工具函式
 
-    public func resetFactoryJSONModels() {
-      lmCore.clear()
-      lmMisc.clear()
-      Self.lmCNS.clear()
-      Self.lmSymbols.clear()
-    }
-
-    public var isCoreLMLoaded: Bool { lmCore.isLoaded }
-    public func loadLanguageModel(json: (dict: [String: [String]]?, path: String)) {
-      guard let jsonDict = json.dict else {
-        vCLog("lmCore: File access failure: \(json.path)")
-        return
-      }
-      lmCore.load((dict: jsonDict, path: json.path))
-      vCLog("lmCore: \(lmCore.count) entries of data loaded from: \(json.path)")
-    }
-
-    public var isCNSDataLoaded: Bool { Self.lmCNS.isLoaded }
-    public func loadCNSData(json: (dict: [String: [String]]?, path: String)) {
-      guard let jsonDict = json.dict else {
-        vCLog("lmCNS: File access failure: \(json.path)")
-        return
-      }
-      Self.lmCNS.load((dict: jsonDict, path: json.path))
-      vCLog("lmCNS: \(Self.lmCNS.count) entries of data loaded from: \(json.path)")
-    }
-
-    public var isMiscDataLoaded: Bool { lmMisc.isLoaded }
-    public func loadMiscData(json: (dict: [String: [String]]?, path: String)) {
-      guard let jsonDict = json.dict else {
-        vCLog("lmCore: File access failure: \(json.path)")
-        return
-      }
-      lmMisc.load((dict: jsonDict, path: json.path))
-      vCLog("lmMisc: \(lmMisc.count) entries of data loaded from: \(json.path)")
-    }
-
-    public var isSymbolDataLoaded: Bool { Self.lmSymbols.isLoaded }
-    public func loadSymbolData(json: (dict: [String: [String]]?, path: String)) {
-      guard let jsonDict = json.dict else {
-        vCLog("lmCore: File access failure: \(json.path)")
-        return
-      }
-      Self.lmSymbols.load((dict: jsonDict, path: json.path))
-      vCLog("lmSymbols: \(Self.lmSymbols.count) entries of data loaded from: \(json.path)")
-    }
-
-    // 上述幾個函式不要加 Async，因為這些內容都被 LMMgr 負責用別的方法 Async 了、用 GCD 的多任務並行共結來完成。
+    public func resetFactoryJSONModels() {}
 
     public func loadUserPhrasesData(path: String, filterPath: String?) {
       DispatchQueue.main.async {
@@ -210,7 +175,12 @@ public extension vChewingLM {
       }
     }
 
-    public func loadSCPCSequencesData(path: String) {
+    public func loadSCPCSequencesData() {
+      let fileName = !isCHS ? "sequenceDataFromEtenDOS-cht" : "sequenceDataFromEtenDOS-chs"
+      guard let path = Bundle.module.path(forResource: fileName, ofType: "json") else {
+        vCLog("lmPlainBopomofo: File name access failure: \(fileName)")
+        return
+      }
       DispatchQueue.main.async {
         if FileManager.default.isReadableFile(atPath: path) {
           self.lmPlainBopomofo.clear()
@@ -322,7 +292,7 @@ public extension vChewingLM {
     /// - Returns: 是否在庫。
     public func hasKeyValuePairFor(keyArray: [String], value: String, factoryDictionaryOnly: Bool = false) -> Bool {
       factoryDictionaryOnly
-        ? lmCore.unigramsFor(key: keyArray.joined(separator: "-")).map(\.value).contains(value)
+        ? factoryCoreUnigramsFor(key: keyArray.joined(separator: "-")).map(\.value).contains(value)
         : unigramsFor(keyArray: keyArray).map(\.value).contains(value)
     }
 
@@ -333,7 +303,7 @@ public extension vChewingLM {
     /// - Returns: 是否在庫。
     public func countKeyValuePairs(keyArray: [String], factoryDictionaryOnly: Bool = false) -> Int {
       factoryDictionaryOnly
-        ? lmCore.unigramsFor(key: keyArray.joined(separator: "-")).count
+        ? factoryCoreUnigramsFor(key: keyArray.joined(separator: "-")).count
         : unigramsFor(keyArray: keyArray).count
     }
 
@@ -363,15 +333,17 @@ public extension vChewingLM {
 
       if !isCassetteEnabled || isCassetteEnabled && keyChain.map(\.description)[0] == "_" {
         // LMMisc 與 LMCore 的 score 在 (-10.0, 0.0) 這個區間內。
-        rawAllUnigrams += lmMisc.unigramsFor(key: keyChain)
-        rawAllUnigrams += lmCore.unigramsFor(key: keyChain)
-        if isCNSEnabled { rawAllUnigrams += Self.lmCNS.unigramsFor(key: keyChain) }
+        rawAllUnigrams += factoryUnigramsFor(key: keyChain, column: .theDataCHEW)
+        rawAllUnigrams += factoryCoreUnigramsFor(key: keyChain)
+        if isCNSEnabled {
+          rawAllUnigrams += factoryUnigramsFor(key: keyChain, column: .theDataCNS)
+        }
       }
 
       if isSymbolEnabled {
         rawAllUnigrams += lmUserSymbols.unigramsFor(key: keyChain)
         if !isCassetteEnabled {
-          rawAllUnigrams += Self.lmSymbols.unigramsFor(key: keyChain)
+          rawAllUnigrams += factoryUnigramsFor(key: keyChain, column: .theDataSYMB)
         }
       }
 
@@ -379,7 +351,7 @@ public extension vChewingLM {
       rawAllUnigrams.append(contentsOf: queryDateTimeUnigrams(with: keyChain))
 
       if keyChain == "_punctuation_list" {
-        rawAllUnigrams.append(contentsOf: lmCore.getHaninSymbolMenuUnigrams())
+        rawAllUnigrams.append(contentsOf: getHaninSymbolMenuUnigrams())
       }
 
       // 提前處理語彙置換

@@ -25,9 +25,10 @@ public extension LMMgr {
 
   // 該函式目前僅供步天歌繁簡轉換引擎使用，並不會檢查目標檔案格式的實際可用性。
 
-  static func getBundleDataPath(_ filenameSansExt: String, factory: Bool = false, ext: String) -> String {
+  static func getBundleDataPath(_ filenameSansExt: String, factory: Bool = false, ext: String) -> String? {
+    let factoryPath = Bundle.main.path(forResource: filenameSansExt, ofType: ext) ?? Bundle.module.path(forResource: filenameSansExt, ofType: ext)
+    guard let factoryPath = factoryPath else { return nil }
     let factory = PrefMgr.shared.useExternalFactoryDict ? factory : true
-    let factoryPath = Bundle.main.path(forResource: filenameSansExt, ofType: ext)!
     let containerPath = Self.appSupportURL.appendingPathComponent("vChewingFactoryData/\(filenameSansExt).\(ext)").path
       .expandingTildeInPath
     var isFailed = false
@@ -40,46 +41,15 @@ public extension LMMgr {
     return result
   }
 
-  // MARK: - 獲取原廠核心語彙檔案資料本身（優先獲取 Containers 下的資料檔案），可能會出 nil。
+  // MARK: - 獲取原廠核心語彙檔案（SQLite）的路徑（優先獲取 Containers 下的資料檔案）。
 
-  static func getDictionaryData(_ filenameSansExt: String, factory: Bool = false) -> (
-    dict: [String: [String]]?, path: String
-  ) {
-    let factory = PrefMgr.shared.useExternalFactoryDict ? factory : true
-    let factoryResultURL = Bundle.main.url(forResource: filenameSansExt, withExtension: "json")
-    let containerResultURL = Self.appSupportURL.appendingPathComponent("vChewingFactoryData/\(filenameSansExt).json")
-    var lastReadPath = factoryResultURL?.path ?? "Factory file missing: \(filenameSansExt).json"
-
-    func getJSONData(url: URL?) -> [String: [String]]? {
-      var isFailed = false
-      var isFolder = ObjCBool(false)
-      guard let url = url else {
-        vCLog("URL Invalid.")
-        return nil
-      }
-      defer { lastReadPath = url.path }
-      if !FileManager.default.fileExists(atPath: url.path, isDirectory: &isFolder) { isFailed = true }
-      if !isFailed, !FileManager.default.isReadableFile(atPath: url.path) { isFailed = true }
-      if isFailed {
-        vCLog("↑ Exception happened when reading json file at: \(url.path).")
-        return nil
-      }
-      do {
-        let rawData = try Data(contentsOf: url)
-        return try? JSONSerialization.jsonObject(with: rawData) as? [String: [String]]
-      } catch {
-        return nil
-      }
+  static func getCoreDictionaryDBPath(factory: Bool = false) -> String? {
+    guard let factoryResultURL = Bundle.main.url(forResource: "vChewingFactoryDatabase", withExtension: "sqlite") else {
+      return nil
     }
-
-    let result =
-      factory
-        ? getJSONData(url: factoryResultURL)
-        : getJSONData(url: containerResultURL) ?? getJSONData(url: factoryResultURL)
-    if result == nil {
-      vCLog("↑ Exception happened when reading json file at: \(lastReadPath).")
-    }
-    return (dict: result, path: lastReadPath)
+    guard !factory, !PrefMgr.shared.useExternalFactoryDict else { return factoryResultURL.path }
+    let containerResultURL = Self.appSupportURL.appendingPathComponent("vChewingFactoryData/vChewingFactoryDatabase.sqlite")
+    return FileManager.default.fileExists(atPath: containerResultURL.path, isDirectory: nil) ? containerResultURL.path : factoryResultURL.path
   }
 
   // MARK: - 使用者語彙檔案的具體檔案名稱路徑定義
@@ -103,14 +73,6 @@ public extension LMMgr {
     }()
     fileName.append((mode == .imeModeCHT) ? "-cht.txt" : "-chs.txt")
     return URL(fileURLWithPath: dataFolderPath(isDefaultFolder: false)).appendingPathComponent(fileName)
-  }
-
-  /// 逐字選字模式候選字詞順序資料路徑。該資料出自倚天中文 DOS 系統。
-  /// - Parameter mode: 簡繁體輸入模式。
-  /// - Returns: 資料路徑（URL）。
-  static func etenSCPCSequencesURL(_ mode: Shared.InputMode) -> URL {
-    let fileName = (mode == .imeModeCHT) ? "sequenceDataFromEtenDOS-cht" : "sequenceDataFromEtenDOS-chs"
-    return URL(fileURLWithPath: getBundleDataPath(fileName, factory: true, ext: "json"))
   }
 
   /// 使用者波浪符號選單資料路徑。

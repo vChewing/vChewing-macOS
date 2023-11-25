@@ -24,6 +24,7 @@
  */
 
 import Foundation
+import SQLite3
 
 #if os(Linux)
   import Glibc
@@ -31,18 +32,58 @@ import Foundation
   import Darwin
 #endif
 
-public enum DictType {
-  case zhHantTW
-  case zhHantHK
-  case zhHansSG
-  case zhHansJP
-  case zhHantKX
-  case zhHansCN
+public enum DictType: Int, CaseIterable {
+  case zhHantTW = 0
+  case zhHantHK = 1
+  case zhHansSG = 2
+  case zhHansJP = 3
+  case zhHantKX = 4
+  case zhHansCN = 5
+
+  public static func match(rawKeyString: String) -> DictType? {
+    DictType.allCases.filter { $0.rawKeyString == rawKeyString }.first
+  }
+
+  public var rawKeyString: String {
+    switch self {
+    case .zhHantTW:
+      return "zh2TW"
+    case .zhHantHK:
+      return "zh2HK"
+    case .zhHansSG:
+      return "zh2SG"
+    case .zhHansJP:
+      return "zh2JP"
+    case .zhHantKX:
+      return "zh2KX"
+    case .zhHansCN:
+      return "zh2CN"
+    }
+  }
 }
 
 public class HotenkaChineseConverter {
   private(set) var dict: [String: [String: String]]
   private var dictFiles: [String: [String]]
+  var ptrSQL: OpaquePointer?
+  var ptrStatement: OpaquePointer?
+
+  deinit {
+    sqlite3_finalize(ptrStatement)
+    sqlite3_close_v2(ptrSQL)
+    ptrSQL = nil
+    ptrStatement = nil
+  }
+
+  public init(sqliteDir dbPath: String) {
+    dict = .init()
+    dictFiles = .init()
+    guard sqlite3_open(dbPath, &ptrSQL) == SQLITE_OK else {
+      NSLog("// Exception happened when connecting to SQLite database at: \(dbPath).")
+      ptrSQL = nil
+      return
+    }
+  }
 
   public init(plistDir: String) {
     dictFiles = .init()
@@ -137,26 +178,23 @@ public class HotenkaChineseConverter {
 
   // MARK: - Public Methods
 
-  public func convert(_ target: String, to dictType: DictType) -> String {
-    var dictTypeKey: String
-
-    switch dictType {
-    case .zhHantTW:
-      dictTypeKey = "zh2TW"
-    case .zhHantHK:
-      dictTypeKey = "zh2HK"
-    case .zhHansSG:
-      dictTypeKey = "zh2SG"
-    case .zhHansJP:
-      dictTypeKey = "zh2JP"
-    case .zhHantKX:
-      dictTypeKey = "zh2KX"
-    case .zhHansCN:
-      dictTypeKey = "zh2CN"
+  public func query(dict dictType: DictType, key searchKey: String) -> String? {
+    guard ptrSQL != nil else { return dict[dictType.rawKeyString]?[searchKey] }
+    let sqlQuery = "SELECT * FROM DATA_HOTENKA WHERE dict=\(dictType.rawValue) AND theKey='\(searchKey)';"
+    sqlite3_prepare_v2(ptrSQL, sqlQuery, -1, &ptrStatement, nil)
+    // 此處只需要用到第一筆結果。
+    while sqlite3_step(ptrStatement) == SQLITE_ROW {
+      guard let rawValue = sqlite3_column_text(ptrStatement, 2) else { continue }
+      return String(cString: rawValue)
     }
+    return nil
+  }
 
+  public func convert(_ target: String, to dictType: DictType) -> String {
     var result = ""
-    guard let useDict = dict[dictTypeKey] else { return target }
+    if ptrSQL == nil {
+      guard dict[dictType.rawKeyString] != nil else { return target }
+    }
 
     var i = 0
     while i < (target.count) {
@@ -167,7 +205,7 @@ public class HotenkaChineseConverter {
       innerloop: while j > 0 {
         let start = target.index(target.startIndex, offsetBy: i)
         let end = target.index(target.startIndex, offsetBy: i + j)
-        guard let useDictSubStr = useDict[String(target[start ..< end])] else {
+        guard let useDictSubStr = query(dict: dictType, key: String(target[start ..< end])) else {
           j -= 1
           continue
         }

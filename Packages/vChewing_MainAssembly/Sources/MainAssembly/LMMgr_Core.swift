@@ -62,132 +62,18 @@ public class LMMgr {
     Self.loadUserPhrasesData()
   }
 
-  public static func loadCoreLanguageModelFile(
-    filenameSansExtension: String, langModel lm: vChewingLM.LMInstantiator
-  ) {
-    lm.loadLanguageModel(json: Self.getDictionaryData(filenameSansExtension))
-  }
+  public static var isCoreDBConnected: Bool { vChewingLM.LMInstantiator.isSQLDBConnected }
 
-  public static func loadDataModelsOnAppDelegate() {
-    let globalQueue = DispatchQueue(label: "vChewingLM", qos: .unspecified, attributes: .concurrent)
-    var showFinishNotification = false
-    let group = DispatchGroup()
-    group.enter()
-    globalQueue.async {
-      if !Self.lmCHT.isCNSDataLoaded {
-        Self.lmCHT.loadCNSData(json: Self.getDictionaryData("data-cns"))
-      }
-      if !Self.lmCHT.isMiscDataLoaded {
-        Self.lmCHT.loadMiscData(json: Self.getDictionaryData("data-zhuyinwen"))
-      }
-      if !Self.lmCHT.isSymbolDataLoaded {
-        Self.lmCHT.loadSymbolData(json: Self.getDictionaryData("data-symbols"))
-      }
-      if !Self.lmCHS.isCNSDataLoaded {
-        Self.lmCHS.loadCNSData(json: Self.getDictionaryData("data-cns"))
-      }
-      if !Self.lmCHS.isMiscDataLoaded {
-        Self.lmCHS.loadMiscData(json: Self.getDictionaryData("data-zhuyinwen"))
-      }
-      if !Self.lmCHS.isSymbolDataLoaded {
-        Self.lmCHS.loadSymbolData(json: Self.getDictionaryData("data-symbols"))
-      }
-      group.leave()
+  public static func connectCoreDB(dbPath: String? = nil) {
+    guard let path: String = dbPath ?? Self.getCoreDictionaryDBPath() else {
+      assertionFailure("vChewing factory SQLite data not found.")
+      return
     }
-    if !Self.lmCHT.isCoreLMLoaded {
-      showFinishNotification = true
-      Notifier.notify(
-        message: NSLocalizedString("Loading CHT Core Dict...", comment: "")
-      )
-      group.enter()
-      globalQueue.async {
-        loadCoreLanguageModelFile(filenameSansExtension: "data-cht", langModel: Self.lmCHT)
-        group.leave()
-      }
-    }
-    if !Self.lmCHS.isCoreLMLoaded {
-      showFinishNotification = true
-      Notifier.notify(
-        message: NSLocalizedString("Loading CHS Core Dict...", comment: "")
-      )
-      group.enter()
-      globalQueue.async {
-        loadCoreLanguageModelFile(filenameSansExtension: "data-chs", langModel: Self.lmCHS)
-        group.leave()
-      }
-    }
-    group.notify(queue: DispatchQueue.main) {
-      if showFinishNotification {
-        Notifier.notify(
-          message: NSLocalizedString("Core Dict loading complete.", comment: "")
-        )
-      }
-    }
-  }
-
-  public static func loadDataModel(_ mode: Shared.InputMode) {
-    let globalQueue = DispatchQueue(label: "vChewingLM_Lazy", qos: .unspecified, attributes: .concurrent)
-    var showFinishNotification = false
-    let group = DispatchGroup()
-    group.enter()
-    globalQueue.async {
-      let lm = Self.getLM(mode: mode)
-      if !lm.isCNSDataLoaded {
-        lm.loadCNSData(json: Self.getDictionaryData("data-cns"))
-      }
-      if !lm.isMiscDataLoaded {
-        lm.loadMiscData(json: Self.getDictionaryData("data-zhuyinwen"))
-      }
-      if !lm.isSymbolDataLoaded {
-        lm.loadSymbolData(json: Self.getDictionaryData("data-symbols"))
-      }
-      group.leave()
-    }
-    switch mode {
-    case .imeModeCHS:
-      if !Self.lmCHS.isCoreLMLoaded {
-        showFinishNotification = true
-        Notifier.notify(
-          message: NSLocalizedString("Loading CHS Core Dict...", comment: "")
-        )
-        group.enter()
-        globalQueue.async {
-          loadCoreLanguageModelFile(filenameSansExtension: "data-chs", langModel: Self.lmCHS)
-          group.leave()
-        }
-      }
-    case .imeModeCHT:
-      if !Self.lmCHT.isCoreLMLoaded {
-        showFinishNotification = true
-        Notifier.notify(
-          message: NSLocalizedString("Loading CHT Core Dict...", comment: "")
-        )
-        group.enter()
-        globalQueue.async {
-          loadCoreLanguageModelFile(filenameSansExtension: "data-cht", langModel: Self.lmCHT)
-          group.leave()
-        }
-      }
-    default: break
-    }
-    group.notify(queue: DispatchQueue.main) {
-      if showFinishNotification {
-        Notifier.notify(
-          message: NSLocalizedString("Core Dict loading complete.", comment: "")
-        )
-      }
-    }
-  }
-
-  public static func reloadFactoryDictionaryFiles() {
-    Broadcaster.shared.eventForReloadingRevLookupData = .init()
-    LMMgr.lmCHS.resetFactoryJSONModels()
-    LMMgr.lmCHT.resetFactoryJSONModels()
-    if PrefMgr.shared.onlyLoadFactoryLangModelsIfNeeded {
-      LMMgr.loadDataModel(IMEApp.currentInputMode)
-    } else {
-      LMMgr.loadDataModelsOnAppDelegate()
-    }
+    let result = vChewingLM.LMInstantiator.connectSQLDB(dbPath: path)
+    assert(result, "vChewing factory SQLite connection failed.")
+    Notifier.notify(
+      message: NSLocalizedString("Core Dict loading complete.", comment: "")
+    )
   }
 
   /// 載入磁帶資料。
@@ -269,12 +155,8 @@ public class LMMgr {
   }
 
   public static func loadSCPCSequencesData() {
-    Self.lmCHT.loadSCPCSequencesData(
-      path: Self.etenSCPCSequencesURL(.imeModeCHT).path
-    )
-    Self.lmCHS.loadSCPCSequencesData(
-      path: Self.etenSCPCSequencesURL(.imeModeCHS).path
-    )
+    Self.lmCHT.loadSCPCSequencesData()
+    Self.lmCHS.loadSCPCSequencesData()
   }
 
   public static func reloadUserFilterDirectly(mode: Shared.InputMode) {
