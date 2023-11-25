@@ -34,8 +34,11 @@ func vCTestLog(_ str: String) {
 /// 該單元測試使用獨立的語彙資料，因此會在選字時的候選字
 /// 順序等方面與威注音輸入法實際使用時的體驗有差異。
 class MainAssemblyTests: XCTestCase {
-  let testUOM = vChewingLM.LMUserOverride(dataURL: .init(fileURLWithPath: "/dev/null"))
-  var testLM = vChewingLM.LMInstantiator.construct { $0.loadTestData() }
+  let testUOM = LangModelAssembly.vChewingLM.LMUserOverride(dataURL: .init(fileURLWithPath: "/dev/null"))
+  var testLM = LangModelAssembly.vChewingLM.LMInstantiator.construct { _ in
+    vChewingLM.LMInstantiator.connectToTestSQLDB()
+  }
+
   static let testServer = IMKServer(name: "org.atelierInmu.vChewing.MainAssembly.UnitTests_Connection", bundleIdentifier: "org.atelierInmu.vChewing.MainAssembly.UnitTests")
 
   static var _testHandler: InputHandler?
@@ -100,5 +103,15 @@ class MainAssemblyTests: XCTestCase {
     UserDef.resetAll()
     testClient.clear()
     testSession.deactivateServer(testClient)
+  }
+}
+
+extension vChewingLM.LMInstantiator {
+  static func construct(
+    isCHS: Bool = false, completionHandler: @escaping (_ this: vChewingLM.LMInstantiator) -> Void
+  ) -> vChewingLM.LMInstantiator {
+    let this = vChewingLM.LMInstantiator(isCHS: isCHS)
+    completionHandler(this)
+    return this
   }
 }

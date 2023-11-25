@@ -56,6 +56,9 @@ let package = Package(
         .product(name: "TooltipUI", package: "vChewing_TooltipUI"),
         .product(name: "Uninstaller", package: "vChewing_Uninstaller"),
         .product(name: "UpdateSputnik", package: "vChewing_UpdateSputnik"),
+      ],
+      resources: [
+        .process("Resources/convdict.sqlite"),
       ]
     ),
     .testTarget(

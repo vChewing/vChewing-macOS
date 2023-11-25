@@ -9,6 +9,7 @@
 // requirements defined in MIT License.
 
 import Foundation
+import SQLite3
 
 // MARK: - 前導工作
 
@@ -24,6 +25,19 @@ fileprivate extension String {
         in: self, options: [], range: range, withTemplate: replaceWith
       )
     } catch { return }
+  }
+}
+
+// MARK: - String as SQL Command
+
+fileprivate extension String {
+  @discardableResult func runAsSQLExec(dbPointer ptrDB: inout OpaquePointer?) -> Bool {
+    ptrDB != nil && sqlite3_exec(ptrDB, self, nil, nil, nil) == SQLITE_OK
+  }
+
+  @discardableResult func runAsSQLPreparedStep(dbPointer ptrDB: inout OpaquePointer?, stmtPtr ptrStmt: inout OpaquePointer?) -> Bool {
+    guard ptrDB != nil else { return false }
+    return sqlite3_prepare_v2(ptrDB, self, -1, &ptrStmt, nil) == SQLITE_OK && sqlite3_step(ptrStmt) == SQLITE_DONE
   }
 }
 
@@ -117,39 +131,111 @@ func cnvPhonabetToASCII(_ incoming: String) -> String {
 
 private let urlCurrentFolder = URL(fileURLWithPath: FileManager.default.currentDirectoryPath)
 
-private let urlCHSRoot: String = "./components/chs/"
-private let urlCHTRoot: String = "./components/cht/"
+private let urlCHSRoot: String = "\(urlCurrentFolder.path)/components/chs/"
+private let urlCHTRoot: String = "\(urlCurrentFolder.path)/components/cht/"
 
-private let urlKanjiCore: String = "./components/common/char-kanji-core.txt"
-private let urlMiscBPMF: String = "./components/common/char-misc-bpmf.txt"
-private let urlMiscNonKanji: String = "./components/common/char-misc-nonkanji.txt"
+private let urlKanjiCore: String = "\(urlCurrentFolder.path)/components/common/char-kanji-core.txt"
+private let urlMiscBPMF: String = "\(urlCurrentFolder.path)/components/common/char-misc-bpmf.txt"
+private let urlMiscNonKanji: String = "\(urlCurrentFolder.path)/components/common/char-misc-nonkanji.txt"
 
-private let urlPunctuation: String = "./components/common/data-punctuations.txt"
-private let urlSymbols: String = "./components/common/data-symbols.txt"
-private let urlZhuyinwen: String = "./components/common/data-zhuyinwen.txt"
-private let urlCNS: String = "./components/common/char-kanji-cns.txt"
+private let urlPunctuation: String = "\(urlCurrentFolder.path)/components/common/data-punctuations.txt"
+private let urlSymbols: String = "\(urlCurrentFolder.path)/components/common/data-symbols.txt"
+private let urlZhuyinwen: String = "\(urlCurrentFolder.path)/components/common/data-zhuyinwen.txt"
+private let urlCNS: String = "\(urlCurrentFolder.path)/components/common/char-kanji-cns.txt"
 
-private let urlOutputCHS: String = "./data-chs.txt"
-private let urlOutputCHT: String = "./data-cht.txt"
+private let urlOutputCHS: String = "\(urlCurrentFolder.path)/data-chs.txt"
+private let urlOutputCHT: String = "\(urlCurrentFolder.path)/data-cht.txt"
 
-private let urlJSONSymbols: String = "./data-symbols.json"
-private let urlJSONZhuyinwen: String = "./data-zhuyinwen.json"
-private let urlJSONCNS: String = "./data-cns.json"
+private let urlJSONSymbols: String = "\(urlCurrentFolder.path)/data-symbols.json"
+private let urlJSONZhuyinwen: String = "\(urlCurrentFolder.path)/data-zhuyinwen.json"
+private let urlJSONCNS: String = "\(urlCurrentFolder.path)/data-cns.json"
 
-private let urlJSONCHS: String = "./data-chs.json"
-private let urlJSONCHT: String = "./data-cht.json"
-private let urlJSONBPMFReverseLookup: String = "./data-bpmf-reverse-lookup.json"
-private let urlJSONBPMFReverseLookupCNS1: String = "./data-bpmf-reverse-lookup-CNS1.json"
-private let urlJSONBPMFReverseLookupCNS2: String = "./data-bpmf-reverse-lookup-CNS2.json"
-private let urlJSONBPMFReverseLookupCNS3: String = "./data-bpmf-reverse-lookup-CNS3.json"
-private let urlJSONBPMFReverseLookupCNS4: String = "./data-bpmf-reverse-lookup-CNS4.json"
-private let urlJSONBPMFReverseLookupCNS5: String = "./data-bpmf-reverse-lookup-CNS5.json"
-private let urlJSONBPMFReverseLookupCNS6: String = "./data-bpmf-reverse-lookup-CNS6.json"
+private let urlJSONCHS: String = "\(urlCurrentFolder.path)/data-chs.json"
+private let urlJSONCHT: String = "\(urlCurrentFolder.path)/data-cht.json"
+private let urlJSONBPMFReverseLookup: String = "\(urlCurrentFolder.path)/data-bpmf-reverse-lookup.json"
+private let urlJSONBPMFReverseLookupCNS1: String = "\(urlCurrentFolder.path)/data-bpmf-reverse-lookup-CNS1.json"
+private let urlJSONBPMFReverseLookupCNS2: String = "\(urlCurrentFolder.path)/data-bpmf-reverse-lookup-CNS2.json"
+private let urlJSONBPMFReverseLookupCNS3: String = "\(urlCurrentFolder.path)/data-bpmf-reverse-lookup-CNS3.json"
+private let urlJSONBPMFReverseLookupCNS4: String = "\(urlCurrentFolder.path)/data-bpmf-reverse-lookup-CNS4.json"
+private let urlJSONBPMFReverseLookupCNS5: String = "\(urlCurrentFolder.path)/data-bpmf-reverse-lookup-CNS5.json"
+private let urlJSONBPMFReverseLookupCNS6: String = "\(urlCurrentFolder.path)/data-bpmf-reverse-lookup-CNS6.json"
 
 private var isReverseLookupDictionaryProcessed: Bool = false
 
+private let urlSQLite: String = "\(urlCurrentFolder.path)/Build/Release/vChewingFactoryDatabase.sqlite"
+
 private var mapReverseLookupForCheck: [String: [String]] = [:]
 private var exceptedChars: Set<String> = .init()
+
+private var ptrSQL: OpaquePointer?
+private var sharedJSONEncoder: JSONEncoder = .init()
+
+var rangeMapJSONCHS: [String: [String]] = [:]
+var rangeMapJSONCHT: [String: [String]] = [:]
+var rangeMapSymbols: [String: [String]] = [:]
+var rangeMapZhuyinwen: [String: [String]] = [:]
+var rangeMapCNS: [String: [String]] = [:]
+var rangeMapReverseLookup: [String: [String]] = [:]
+/// Also use mapReverseLookupForCheck.
+
+// MARK: - 準備資料庫
+
+func prepareDatabase() -> Bool {
+  let sqlMakeTableMACV = """
+  DROP TABLE IF EXISTS DATA_REV;
+  DROP TABLE IF EXISTS DATA_MAIN;
+  CREATE TABLE IF NOT EXISTS DATA_MAIN (
+    theKey TEXT NOT NULL,
+    theDataCHS TEXT,
+    theDataCHT TEXT,
+    theDataCNS TEXT,
+    theDataMISC TEXT,
+    theDataSYMB TEXT,
+    theDataCHEW TEXT,
+    PRIMARY KEY (theKey)
+  ) WITHOUT ROWID;
+  CREATE TABLE IF NOT EXISTS DATA_REV (
+    theChar TEXT NOT NULL,
+    theReadings TEXT NOT NULL,
+    PRIMARY KEY (theChar)
+  ) WITHOUT ROWID;
+  """
+  guard sqlite3_open(urlSQLite, &ptrSQL) == SQLITE_OK else { return false }
+  guard sqlite3_exec(ptrSQL, "PRAGMA synchronous = OFF;", nil, nil, nil) == SQLITE_OK else { return false }
+  guard sqlite3_exec(ptrSQL, "PRAGMA journal_mode = MEMORY;", nil, nil, nil) == SQLITE_OK else { return false }
+  guard sqlMakeTableMACV.runAsSQLExec(dbPointer: &ptrSQL) else { return false }
+  guard "begin;".runAsSQLExec(dbPointer: &ptrSQL) else { return false }
+
+  return true
+}
+
+@discardableResult func writeMainMapToSQL(_ theMap: [String: [String]], column columnName: String, ptrStmt: inout OpaquePointer?) -> Bool {
+  for (encryptedKey, arrValues) in theMap {
+    // SQL 語言需要對西文 ASCII 半形單引號做回退處理、變成「''」。
+    let safeKey = encryptedKey.replacingOccurrences(of: "'", with: "''")
+    let valueText = arrValues.joined(separator: "\t").replacingOccurrences(of: "'", with: "''")
+    let sqlStmt = "INSERT INTO DATA_MAIN (theKey, \(columnName)) VALUES ('\(safeKey)', '\(valueText)') ON CONFLICT(theKey) DO UPDATE SET \(columnName)='\(valueText)';"
+    guard sqlStmt.runAsSQLPreparedStep(dbPointer: &ptrSQL, stmtPtr: &ptrStmt) else {
+      print("Failed: " + sqlStmt)
+      return false
+    }
+  }
+  return true
+}
+
+@discardableResult func writeRevLookupMapToSQL(_ theMap: [String: [String]], ptrStmt: inout OpaquePointer?) -> Bool {
+  for (encryptedKey, arrValues) in theMap {
+    // SQL 語言需要對西文 ASCII 半形單引號做回退處理、變成「''」。
+    let safeKey = encryptedKey.replacingOccurrences(of: "'", with: "''")
+    let valueText = arrValues.joined(separator: "\t").replacingOccurrences(of: "'", with: "''")
+    let sqlStmt = "INSERT INTO DATA_REV (theChar, theReadings) VALUES ('\(safeKey)', '\(valueText)') ON CONFLICT(theChar) DO UPDATE SET theReadings='\(valueText)';"
+    guard sqlStmt.runAsSQLPreparedStep(dbPointer: &ptrSQL, stmtPtr: &ptrStmt) else {
+      print("Failed: " + sqlStmt)
+      return false
+    }
+  }
+  return true
+}
 
 // MARK: - 載入詞組檔案且輸出陣列
 
@@ -459,10 +545,8 @@ func fileOutput(isCHS: Bool) {
   let i18n: String = isCHS ? "簡體中文" : "繁體中文"
   var strPunctuation = ""
   var rangeMapJSON: [String: [String]] = [:]
-  let pathOutput = urlCurrentFolder.appendingPathComponent(
-    isCHS ? urlOutputCHS : urlOutputCHT)
-  let jsonURL = urlCurrentFolder.appendingPathComponent(
-    isCHS ? urlJSONCHS : urlJSONCHT)
+  let pathOutput = URL(fileURLWithPath: isCHS ? urlOutputCHS : urlOutputCHT)
+  let jsonURL = URL(fileURLWithPath: isCHS ? urlJSONCHS : urlJSONCHT)
   var strPrintLine = ""
   // 讀取標點內容
   do {
@@ -533,10 +617,15 @@ func fileOutput(isCHS: Bool) {
   do {
     try strPrintLine.write(to: pathOutput, atomically: true, encoding: .utf8)
     try JSONSerialization.data(withJSONObject: rangeMapJSON, options: .sortedKeys).write(to: jsonURL)
+    if isCHS {
+      rangeMapJSONCHS = rangeMapJSON
+    } else {
+      rangeMapJSONCHT = rangeMapJSON
+    }
   } catch {
     NSLog(" - \(i18n): Error on writing strings to file: \(error)")
   }
-  NSLog(" - \(i18n): 寫入完成。")
+  NSLog(" - \(i18n): JSON & TXT 寫入完成。")
   if !arrFoundedDuplications.isEmpty {
     NSLog(" - \(i18n): 尋得下述重複項目，請務必手動排查：")
     print("-------------------")
@@ -576,7 +665,9 @@ func commonFileOutput() {
       let theKey = String(neta[1])
       let theValue = String(neta[0])
       if !neta[0].isEmpty, !neta[1].isEmpty, line.first != "#" {
-        mapSymbols[cnvPhonabetToASCII(theKey), default: []].append(theValue)
+        let encryptedKey = cnvPhonabetToASCII(theKey)
+        mapSymbols[encryptedKey, default: []].append(theValue)
+        rangeMapSymbols[encryptedKey, default: []].append(theValue)
       }
     }
   }
@@ -587,7 +678,9 @@ func commonFileOutput() {
       let theKey = String(neta[1])
       let theValue = String(neta[0])
       if !neta[0].isEmpty, !neta[1].isEmpty, line.first != "#" {
-        mapZhuyinwen[cnvPhonabetToASCII(theKey), default: []].append(theValue)
+        let encryptedKey = cnvPhonabetToASCII(theKey)
+        mapZhuyinwen[encryptedKey, default: []].append(theValue)
+        rangeMapZhuyinwen[encryptedKey, default: []].append(theValue)
       }
     }
   }
@@ -598,30 +691,33 @@ func commonFileOutput() {
       let theKey = String(neta[1])
       let theValue = String(neta[0])
       if !neta[0].isEmpty, !neta[1].isEmpty, line.first != "#" {
-        mapCNS[cnvPhonabetToASCII(theKey), default: []].append(theValue)
+        let encryptedKey = cnvPhonabetToASCII(theKey)
+        mapCNS[encryptedKey, default: []].append(theValue)
+        rangeMapCNS[encryptedKey, default: []].append(theValue)
         json: if !theKey.contains("_"), !theKey.contains("-") {
+          rangeMapReverseLookup[theValue, default: []].append(encryptedKey)
           if mapReverseLookupCNS1.keys.count <= 16500 {
-            mapReverseLookupCNS1[theValue, default: []].append(cnvPhonabetToASCII(theKey))
+            mapReverseLookupCNS1[theValue, default: []].append(encryptedKey)
             break json
           }
           if mapReverseLookupCNS2.keys.count <= 16500 {
-            mapReverseLookupCNS2[theValue, default: []].append(cnvPhonabetToASCII(theKey))
+            mapReverseLookupCNS2[theValue, default: []].append(encryptedKey)
             break json
           }
           if mapReverseLookupCNS3.keys.count <= 16500 {
-            mapReverseLookupCNS3[theValue, default: []].append(cnvPhonabetToASCII(theKey))
+            mapReverseLookupCNS3[theValue, default: []].append(encryptedKey)
             break json
           }
           if mapReverseLookupCNS4.keys.count <= 16500 {
-            mapReverseLookupCNS4[theValue, default: []].append(cnvPhonabetToASCII(theKey))
+            mapReverseLookupCNS4[theValue, default: []].append(encryptedKey)
             break json
           }
           if mapReverseLookupCNS5.keys.count <= 16500 {
-            mapReverseLookupCNS5[theValue, default: []].append(cnvPhonabetToASCII(theKey))
+            mapReverseLookupCNS5[theValue, default: []].append(encryptedKey)
             break json
           }
           if mapReverseLookupCNS6.keys.count <= 16500 {
-            mapReverseLookupCNS6[theValue, default: []].append(cnvPhonabetToASCII(theKey))
+            mapReverseLookupCNS6[theValue, default: []].append(encryptedKey)
             break json
           }
         }
@@ -653,38 +749,6 @@ func commonFileOutput() {
   }
   NSLog(" - \(i18n): 寫入完成。")
 }
-
-// MARK: - 主執行緒
-
-func main() {
-  let globalQueue = DispatchQueue.global(qos: .default)
-  let group = DispatchGroup()
-  group.enter()
-  globalQueue.async {
-    NSLog("// 準備編譯符號表情ㄅ文語料檔案。")
-    commonFileOutput()
-    group.leave()
-  }
-  group.enter()
-  globalQueue.async {
-    NSLog("// 準備編譯繁體中文核心語料檔案。")
-    fileOutput(isCHS: false)
-    group.leave()
-  }
-  group.enter()
-  globalQueue.async {
-    NSLog("// 準備編譯簡體中文核心語料檔案。")
-    fileOutput(isCHS: true)
-    group.leave()
-  }
-  // 一直等待完成
-  _ = group.wait(timeout: .distantFuture)
-  group.notify(queue: DispatchQueue.main) {
-    NSLog("// 全部辭典檔案建置完畢。")
-  }
-}
-
-main()
 
 // MARK: - 辭庫健康狀況檢查專用函式
 
@@ -979,3 +1043,62 @@ func healthCheck(_ data: [Unigram]) -> String {
   result += "\n"
   return result
 }
+
+// MARK: - 主執行緒
+
+func main() {
+  guard prepareDatabase() else {
+    NSLog("// SQLite 資料庫初期化失敗。")
+    exit(-1)
+  }
+  let globalQueue = DispatchQueue.global(qos: .default)
+  let group = DispatchGroup()
+  group.enter()
+  globalQueue.async {
+    NSLog("// 準備編譯符號表情ㄅ文語料檔案。")
+    commonFileOutput()
+    group.leave()
+  }
+  group.enter()
+  globalQueue.async {
+    NSLog("// 準備編譯繁體中文核心語料檔案。")
+    fileOutput(isCHS: false)
+    group.leave()
+  }
+  group.enter()
+  globalQueue.async {
+    NSLog("// 準備編譯簡體中文核心語料檔案。")
+    fileOutput(isCHS: true)
+    group.leave()
+  }
+  // 一直等待完成
+  _ = group.wait(timeout: .distantFuture)
+  NSLog("// 全部 TXT & JSON 辭典檔案建置完畢。")
+  NSLog("// 開始整合反查資料。")
+  mapReverseLookupForCheck.forEach { key, values in
+    values.reversed().forEach { valueLiteral in
+      let value = cnvPhonabetToASCII(valueLiteral)
+      if !rangeMapReverseLookup[key, default: []].contains(value) {
+        rangeMapReverseLookup[key, default: []].insert(value, at: 0)
+      }
+    }
+  }
+  NSLog("// 反查資料整合完畢。")
+  NSLog("// 準備建置 SQL 資料庫。")
+  var ptrStmt: OpaquePointer?
+  writeMainMapToSQL(rangeMapJSONCHS, column: "theDataCHS", ptrStmt: &ptrStmt)
+  writeMainMapToSQL(rangeMapJSONCHT, column: "theDataCHT", ptrStmt: &ptrStmt)
+  writeMainMapToSQL(rangeMapSymbols, column: "theDataSYMB", ptrStmt: &ptrStmt)
+  writeMainMapToSQL(rangeMapZhuyinwen, column: "theDataCHEW", ptrStmt: &ptrStmt)
+  writeMainMapToSQL(rangeMapCNS, column: "theDataCNS", ptrStmt: &ptrStmt)
+  writeRevLookupMapToSQL(rangeMapReverseLookup, ptrStmt: &ptrStmt)
+  sqlite3_finalize(ptrStmt)
+  let committed = "commit;".runAsSQLExec(dbPointer: &ptrSQL)
+  assert(committed)
+  let compressed = "VACUUM;".runAsSQLExec(dbPointer: &ptrSQL)
+  assert(compressed)
+  sqlite3_close_v2(ptrSQL)
+  NSLog("// 全部 SQLite 辭典檔案建置完畢。")
+}
+
+main()

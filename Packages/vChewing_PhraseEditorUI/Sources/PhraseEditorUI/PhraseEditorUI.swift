@@ -316,10 +316,6 @@ struct ContentView_Previews: PreviewProvider {
   }
 }
 
-public extension vChewingLM.ReplacableUserDataType {
-  var localizedDescription: String { NSLocalizedString(rawValue, comment: "") }
-}
-
 public enum PETerms {
   public enum AddPhrases: String {
     case locPhrase = "Phrase"
