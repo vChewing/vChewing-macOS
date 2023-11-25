@@ -49,7 +49,6 @@ public protocol PrefMgrProtocol {
   var trimUnfinishedReadingsOnCommit: Bool { get set }
   var alwaysShowTooltipTextsHorizontally: Bool { get set }
   var clientsIMKTextInputIncapable: [String: Bool] { get set }
-  var onlyLoadFactoryLangModelsIfNeeded: Bool { get set }
   var useSpaceToCommitHighlightedSCPCCandidate: Bool { get set }
   var enableMouseScrollingForTDKCandidatesCocoa: Bool { get set }
   var disableSegmentedThickUnderlineInMarkingModeForManagedClients: Bool { get set }

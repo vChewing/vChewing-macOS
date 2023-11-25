@@ -87,7 +87,6 @@ public enum UserDef: String, CaseIterable {
   case kTrimUnfinishedReadingsOnCommit = "TrimUnfinishedReadingsOnCommit"
   case kAlwaysShowTooltipTextsHorizontally = "AlwaysShowTooltipTextsHorizontally"
   case kClientsIMKTextInputIncapable = "ClientsIMKTextInputIncapable"
-  case kOnlyLoadFactoryLangModelsIfNeeded = "OnlyLoadFactoryLangModelsIfNeeded"
   case kShowTranslatedStrokesInCompositionBuffer = "ShowTranslatedStrokesInCompositionBuffer"
   case kForceCassetteChineseConversion = "ForceCassetteChineseConversion"
   case kShowReverseLookupInCandidateUI = "ShowReverseLookupInCandidateUI"
@@ -205,7 +204,6 @@ public extension UserDef {
     case .kTrimUnfinishedReadingsOnCommit: return .bool
     case .kAlwaysShowTooltipTextsHorizontally: return .bool
     case .kClientsIMKTextInputIncapable: return .dictionary
-    case .kOnlyLoadFactoryLangModelsIfNeeded: return .bool
     case .kShowTranslatedStrokesInCompositionBuffer: return .bool
     case .kForceCassetteChineseConversion: return .integer
     case .kShowReverseLookupInCandidateUI: return .bool
@@ -441,7 +439,6 @@ public extension UserDef {
     case .kTrimUnfinishedReadingsOnCommit: return .init(userDef: self, shortTitle: "Trim unfinished readings / strokes on commit")
     case .kAlwaysShowTooltipTextsHorizontally: return .init(userDef: self, shortTitle: "Always show tooltip texts horizontally")
     case .kClientsIMKTextInputIncapable: return nil
-    case .kOnlyLoadFactoryLangModelsIfNeeded: return .init(userDef: self, shortTitle: "Only load factory language models if needed")
     case .kShowTranslatedStrokesInCompositionBuffer: return .init(userDef: self, shortTitle: "Show translated strokes in composition buffer")
     case .kForceCassetteChineseConversion: return .init(
         userDef: self,

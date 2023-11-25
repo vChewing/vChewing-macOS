@@ -10,13 +10,7 @@
 		5B09307628B6FC3B0021F8C5 /* shortcuts.html in Resources */ = {isa = PBXBuildFile; fileRef = 5B09307828B6FC3B0021F8C5 /* shortcuts.html */; };
 		5B0EF55D28CDBF7100F8F7CE /* frmClientListMgr.xib in Resources */ = {isa = PBXBuildFile; fileRef = 5B0EF55C28CDBF7100F8F7CE /* frmClientListMgr.xib */; };
 		5B0EF55F28CDBF8E00F8F7CE /* CtlClientListMgr.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B0EF55E28CDBF8E00F8F7CE /* CtlClientListMgr.swift */; };
-		5B1C98B929436CEE0019B807 /* data-bpmf-reverse-lookup.json in Resources */ = {isa = PBXBuildFile; fileRef = 5B1C98B729436CED0019B807 /* data-bpmf-reverse-lookup.json */; };
-		5B253E7E2945AF6700680C67 /* data-bpmf-reverse-lookup-CNS1.json in Resources */ = {isa = PBXBuildFile; fileRef = 5B253E782945AF6700680C67 /* data-bpmf-reverse-lookup-CNS1.json */; };
-		5B253E7F2945AF6700680C67 /* data-bpmf-reverse-lookup-CNS3.json in Resources */ = {isa = PBXBuildFile; fileRef = 5B253E792945AF6700680C67 /* data-bpmf-reverse-lookup-CNS3.json */; };
-		5B253E802945AF6700680C67 /* data-bpmf-reverse-lookup-CNS2.json in Resources */ = {isa = PBXBuildFile; fileRef = 5B253E7A2945AF6700680C67 /* data-bpmf-reverse-lookup-CNS2.json */; };
-		5B253E812945AF6700680C67 /* data-bpmf-reverse-lookup-CNS6.json in Resources */ = {isa = PBXBuildFile; fileRef = 5B253E7B2945AF6700680C67 /* data-bpmf-reverse-lookup-CNS6.json */; };
-		5B253E822945AF6700680C67 /* data-bpmf-reverse-lookup-CNS4.json in Resources */ = {isa = PBXBuildFile; fileRef = 5B253E7C2945AF6700680C67 /* data-bpmf-reverse-lookup-CNS4.json */; };
-		5B253E832945AF6700680C67 /* data-bpmf-reverse-lookup-CNS5.json in Resources */ = {isa = PBXBuildFile; fileRef = 5B253E7D2945AF6700680C67 /* data-bpmf-reverse-lookup-CNS5.json */; };
+		5B2CA1E62B130869002634EE /* vChewingFactoryDatabase.sqlite in Resources */ = {isa = PBXBuildFile; fileRef = 5B2CA1E52B130869002634EE /* vChewingFactoryDatabase.sqlite */; };
 		5B30BF282944867800BD87A9 /* CtlRevLookupWindow.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B30BF272944867800BD87A9 /* CtlRevLookupWindow.swift */; };
 		5B40113928D7050D00A9D4CB /* Shared in Frameworks */ = {isa = PBXBuildFile; productRef = 5B40113828D7050D00A9D4CB /* Shared */; };
 		5B40113C28D71C0100A9D4CB /* Uninstaller in Frameworks */ = {isa = PBXBuildFile; productRef = 5B40113B28D71C0100A9D4CB /* Uninstaller */; };
@@ -28,7 +22,6 @@
 		5B765F09293A253C00122315 /* PhraseEditorUI in Frameworks */ = {isa = PBXBuildFile; productRef = 5B765F08293A253C00122315 /* PhraseEditorUI */; };
 		5B7BC4B027AFFBE800F66C24 /* frmPrefWindow.xib in Resources */ = {isa = PBXBuildFile; fileRef = 5B7BC4AE27AFFBE800F66C24 /* frmPrefWindow.xib */; };
 		5B7DA80328BF6BC600D7B2AD /* fixinstall.sh in Resources */ = {isa = PBXBuildFile; fileRef = 5B7DA80228BF6BBA00D7B2AD /* fixinstall.sh */; };
-		5B84579E2871AD2200C93B01 /* convdict.json in Resources */ = {isa = PBXBuildFile; fileRef = 5B84579C2871AD2200C93B01 /* convdict.json */; };
 		5B963C9D28D5BFB800DCEE88 /* CocoaExtension in Frameworks */ = {isa = PBXBuildFile; productRef = 5B963C9C28D5BFB800DCEE88 /* CocoaExtension */; };
 		5B963CA328D5C23600DCEE88 /* SwiftExtension in Frameworks */ = {isa = PBXBuildFile; productRef = 5B963CA228D5C23600DCEE88 /* SwiftExtension */; };
 		5B98114828D6198700CBC605 /* PinyinPhonaConverter in Frameworks */ = {isa = PBXBuildFile; productRef = 5B98114728D6198700CBC605 /* PinyinPhonaConverter */; };
@@ -54,17 +47,10 @@
 		5BDB7A4128D4824A001AC277 /* Megrez in Frameworks */ = {isa = PBXBuildFile; productRef = 5BDB7A4028D4824A001AC277 /* Megrez */; };
 		5BDB7A4528D4824A001AC277 /* ShiftKeyUpChecker in Frameworks */ = {isa = PBXBuildFile; productRef = 5BDB7A4428D4824A001AC277 /* ShiftKeyUpChecker */; };
 		5BDB7A4728D4824A001AC277 /* Tekkon in Frameworks */ = {isa = PBXBuildFile; productRef = 5BDB7A4628D4824A001AC277 /* Tekkon */; };
-		5BE5D9952ACAEFDE009A732C /* sequenceDataFromEtenDOS-cht.json in Resources */ = {isa = PBXBuildFile; fileRef = 5BE5D9932ACAEFDE009A732C /* sequenceDataFromEtenDOS-cht.json */; };
-		5BE5D9962ACAEFDE009A732C /* sequenceDataFromEtenDOS-chs.json in Resources */ = {isa = PBXBuildFile; fileRef = 5BE5D9942ACAEFDE009A732C /* sequenceDataFromEtenDOS-chs.json */; };
 		5BE63A2D2AC5B8A6009AFC0C /* InstallerShared.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5BE63A2C2AC5B882009AFC0C /* InstallerShared.swift */; };
 		5BE63A2E2AC5B8A8009AFC0C /* MainView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5BE63A2B2AC5B7D3009AFC0C /* MainView.swift */; };
 		5BE63A2F2AC5B8A9009AFC0C /* vChewingInstallerApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5BE63A2A2AC5B7C3009AFC0C /* vChewingInstallerApp.swift */; };
 		5BE63A332AC5F4F8009AFC0C /* MainViewImpl.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5BE63A322AC5F4F8009AFC0C /* MainViewImpl.swift */; };
-		5BEDB721283B4C250078EB25 /* data-cns.json in Resources */ = {isa = PBXBuildFile; fileRef = 5BEDB71D283B4AEA0078EB25 /* data-cns.json */; };
-		5BEDB722283B4C250078EB25 /* data-zhuyinwen.json in Resources */ = {isa = PBXBuildFile; fileRef = 5BEDB71F283B4AEA0078EB25 /* data-zhuyinwen.json */; };
-		5BEDB723283B4C250078EB25 /* data-cht.json in Resources */ = {isa = PBXBuildFile; fileRef = 5BEDB720283B4AEA0078EB25 /* data-cht.json */; };
-		5BEDB724283B4C250078EB25 /* data-symbols.json in Resources */ = {isa = PBXBuildFile; fileRef = 5BEDB71E283B4AEA0078EB25 /* data-symbols.json */; };
-		5BEDB725283B4C250078EB25 /* data-chs.json in Resources */ = {isa = PBXBuildFile; fileRef = 5BEDB71C283B4AEA0078EB25 /* data-chs.json */; };
 		5BF9DA2728840E6200DBD48E /* template-usersymbolphrases.txt in Resources */ = {isa = PBXBuildFile; fileRef = 5BF9DA2228840E6200DBD48E /* template-usersymbolphrases.txt */; };
 		5BF9DA2828840E6200DBD48E /* template-exclusions.txt in Resources */ = {isa = PBXBuildFile; fileRef = 5BF9DA2328840E6200DBD48E /* template-exclusions.txt */; };
 		5BF9DA2928840E6200DBD48E /* template-associatedPhrases-chs.txt in Resources */ = {isa = PBXBuildFile; fileRef = 5BF9DA2428840E6200DBD48E /* template-associatedPhrases-chs.txt */; };
@@ -138,14 +124,8 @@
 		5B18BA7227C7BD8B0056EB19 /* LICENSE.txt */ = {isa = PBXFileReference; lastKnownFileType = text; path = LICENSE.txt; sourceTree = "<group>"; };
 		5B18BA7327C7BD8C0056EB19 /* LICENSE-JPN.txt */ = {isa = PBXFileReference; lastKnownFileType = text; path = "LICENSE-JPN.txt"; sourceTree = "<group>"; };
 		5B18BA7427C7BD8C0056EB19 /* LICENSE-CHT.txt */ = {isa = PBXFileReference; lastKnownFileType = text; path = "LICENSE-CHT.txt"; sourceTree = "<group>"; };
-		5B1C98B729436CED0019B807 /* data-bpmf-reverse-lookup.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; name = "data-bpmf-reverse-lookup.json"; path = "Data/data-bpmf-reverse-lookup.json"; sourceTree = "<group>"; };
 		5B20430B28BEFC0C00BFC6FD /* vChewing.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = vChewing.entitlements; sourceTree = "<group>"; };
-		5B253E782945AF6700680C67 /* data-bpmf-reverse-lookup-CNS1.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; name = "data-bpmf-reverse-lookup-CNS1.json"; path = "Data/data-bpmf-reverse-lookup-CNS1.json"; sourceTree = "<group>"; };
-		5B253E792945AF6700680C67 /* data-bpmf-reverse-lookup-CNS3.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; name = "data-bpmf-reverse-lookup-CNS3.json"; path = "Data/data-bpmf-reverse-lookup-CNS3.json"; sourceTree = "<group>"; };
-		5B253E7A2945AF6700680C67 /* data-bpmf-reverse-lookup-CNS2.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; name = "data-bpmf-reverse-lookup-CNS2.json"; path = "Data/data-bpmf-reverse-lookup-CNS2.json"; sourceTree = "<group>"; };
-		5B253E7B2945AF6700680C67 /* data-bpmf-reverse-lookup-CNS6.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; name = "data-bpmf-reverse-lookup-CNS6.json"; path = "Data/data-bpmf-reverse-lookup-CNS6.json"; sourceTree = "<group>"; };
-		5B253E7C2945AF6700680C67 /* data-bpmf-reverse-lookup-CNS4.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; name = "data-bpmf-reverse-lookup-CNS4.json"; path = "Data/data-bpmf-reverse-lookup-CNS4.json"; sourceTree = "<group>"; };
-		5B253E7D2945AF6700680C67 /* data-bpmf-reverse-lookup-CNS5.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; name = "data-bpmf-reverse-lookup-CNS5.json"; path = "Data/data-bpmf-reverse-lookup-CNS5.json"; sourceTree = "<group>"; };
+		5B2CA1E52B130869002634EE /* vChewingFactoryDatabase.sqlite */ = {isa = PBXFileReference; lastKnownFileType = file; name = vChewingFactoryDatabase.sqlite; path = Data/Build/Release/vChewingFactoryDatabase.sqlite; sourceTree = "<group>"; };
 		5B2DB17127AF8771006D874E /* Makefile */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.make; name = Makefile; path = Data/Makefile; sourceTree = "<group>"; };
 		5B30BF272944867800BD87A9 /* CtlRevLookupWindow.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CtlRevLookupWindow.swift; sourceTree = "<group>"; };
 		5B30F11227BA568800484E24 /* vChewingKeyLayout.bundle */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.plug-in"; path = vChewingKeyLayout.bundle; sourceTree = "<group>"; };
@@ -161,7 +141,6 @@
 		5B7BC4AF27AFFBE800F66C24 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = Base; path = Base.lproj/frmPrefWindow.xib; sourceTree = "<group>"; };
 		5B7BC4B227AFFC0B00F66C24 /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/frmPrefWindow.strings; sourceTree = "<group>"; };
 		5B7DA80228BF6BBA00D7B2AD /* fixinstall.sh */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.script.sh; lineEnding = 0; path = fixinstall.sh; sourceTree = "<group>"; };
-		5B84579C2871AD2200C93B01 /* convdict.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = convdict.json; sourceTree = "<group>"; };
 		5B963C9B28D5BE4100DCEE88 /* vChewing_CocoaExtension */ = {isa = PBXFileReference; lastKnownFileType = wrapper; name = vChewing_CocoaExtension; path = Packages/vChewing_CocoaExtension; sourceTree = "<group>"; };
 		5B963C9E28D5C14600DCEE88 /* vChewing_Shared */ = {isa = PBXFileReference; lastKnownFileType = wrapper; name = vChewing_Shared; path = Packages/vChewing_Shared; sourceTree = "<group>"; };
 		5B963CA128D5C22D00DCEE88 /* vChewing_SwiftExtension */ = {isa = PBXFileReference; lastKnownFileType = wrapper; name = vChewing_SwiftExtension; path = Packages/vChewing_SwiftExtension; sourceTree = "<group>"; };
@@ -194,18 +173,11 @@
 		5BDCBB4827B4F6C600D0CC59 /* zh-Hant */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "zh-Hant"; path = "zh-Hant.lproj/Localizable.strings"; sourceTree = "<group>"; };
 		5BDCBB4927B4F6C700D0CC59 /* zh-Hant */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "zh-Hant"; path = "zh-Hant.lproj/InfoPlist.strings"; sourceTree = "<group>"; };
 		5BDCBB4A27B4F6C700D0CC59 /* zh-Hant */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "zh-Hant"; path = "zh-Hant.lproj/Localizable.strings"; sourceTree = "<group>"; };
-		5BE5D9932ACAEFDE009A732C /* sequenceDataFromEtenDOS-cht.json */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.json; path = "sequenceDataFromEtenDOS-cht.json"; sourceTree = "<group>"; };
-		5BE5D9942ACAEFDE009A732C /* sequenceDataFromEtenDOS-chs.json */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.json; path = "sequenceDataFromEtenDOS-chs.json"; sourceTree = "<group>"; };
 		5BE63A2A2AC5B7C3009AFC0C /* vChewingInstallerApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = vChewingInstallerApp.swift; sourceTree = "<group>"; };
 		5BE63A2B2AC5B7D3009AFC0C /* MainView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MainView.swift; sourceTree = "<group>"; };
 		5BE63A2C2AC5B882009AFC0C /* InstallerShared.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InstallerShared.swift; sourceTree = "<group>"; };
 		5BE63A322AC5F4F8009AFC0C /* MainViewImpl.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MainViewImpl.swift; sourceTree = "<group>"; };
 		5BE8A8C4281EE65300197741 /* CONTRIBUTING.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = CONTRIBUTING.md; sourceTree = "<group>"; };
-		5BEDB71C283B4AEA0078EB25 /* data-chs.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; name = "data-chs.json"; path = "Data/data-chs.json"; sourceTree = "<group>"; };
-		5BEDB71D283B4AEA0078EB25 /* data-cns.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; name = "data-cns.json"; path = "Data/data-cns.json"; sourceTree = "<group>"; };
-		5BEDB71E283B4AEA0078EB25 /* data-symbols.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; name = "data-symbols.json"; path = "Data/data-symbols.json"; sourceTree = "<group>"; };
-		5BEDB71F283B4AEA0078EB25 /* data-zhuyinwen.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; name = "data-zhuyinwen.json"; path = "Data/data-zhuyinwen.json"; sourceTree = "<group>"; };
-		5BEDB720283B4AEA0078EB25 /* data-cht.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; name = "data-cht.json"; path = "Data/data-cht.json"; sourceTree = "<group>"; };
 		5BF255CD28B2694E003ECB60 /* vChewing-Bridging-Header.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "vChewing-Bridging-Header.h"; sourceTree = "<group>"; };
 		5BF4A44628E5820C002AF9C5 /* vChewingInstaller.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = vChewingInstaller.entitlements; sourceTree = "<group>"; };
 		5BF9DA2228840E6200DBD48E /* template-usersymbolphrases.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; lineEnding = 0; path = "template-usersymbolphrases.txt"; sourceTree = "<group>"; usesTabs = 0; };
@@ -311,10 +283,7 @@
 		5B62A33027AE78E500A19448 /* Resources */ = {
 			isa = PBXGroup;
 			children = (
-				5B84579C2871AD2200C93B01 /* convdict.json */,
 				5B09307828B6FC3B0021F8C5 /* shortcuts.html */,
-				5BE5D9942ACAEFDE009A732C /* sequenceDataFromEtenDOS-chs.json */,
-				5BE5D9932ACAEFDE009A732C /* sequenceDataFromEtenDOS-cht.json */,
 				5BF9DA2428840E6200DBD48E /* template-associatedPhrases-chs.txt */,
 				5BF9DA2C2884247800DBD48E /* template-associatedPhrases-cht.txt */,
 				5BF9DA2328840E6200DBD48E /* template-exclusions.txt */,
@@ -355,18 +324,7 @@
 		5B62A35027AE7F6600A19448 /* Data */ = {
 			isa = PBXGroup;
 			children = (
-				5B253E782945AF6700680C67 /* data-bpmf-reverse-lookup-CNS1.json */,
-				5B253E7A2945AF6700680C67 /* data-bpmf-reverse-lookup-CNS2.json */,
-				5B253E792945AF6700680C67 /* data-bpmf-reverse-lookup-CNS3.json */,
-				5B253E7C2945AF6700680C67 /* data-bpmf-reverse-lookup-CNS4.json */,
-				5B253E7D2945AF6700680C67 /* data-bpmf-reverse-lookup-CNS5.json */,
-				5B253E7B2945AF6700680C67 /* data-bpmf-reverse-lookup-CNS6.json */,
-				5B1C98B729436CED0019B807 /* data-bpmf-reverse-lookup.json */,
-				5BEDB71C283B4AEA0078EB25 /* data-chs.json */,
-				5BEDB720283B4AEA0078EB25 /* data-cht.json */,
-				5BEDB71D283B4AEA0078EB25 /* data-cns.json */,
-				5BEDB71E283B4AEA0078EB25 /* data-symbols.json */,
-				5BEDB71F283B4AEA0078EB25 /* data-zhuyinwen.json */,
+				5B2CA1E52B130869002634EE /* vChewingFactoryDatabase.sqlite */,
 				5B2DB17127AF8771006D874E /* Makefile */,
 			);
 			name = Data;
@@ -648,7 +606,6 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				5B84579E2871AD2200C93B01 /* convdict.json in Resources */,
 				D4E33D8A27A838CF006DB1CF /* Localizable.strings in Resources */,
 				5B70F4EC2A0BE900005EA8C4 /* MenuIcon-TCVIM@2x.png in Resources */,
 				5BF9DA2828840E6200DBD48E /* template-exclusions.txt in Resources */,
@@ -659,22 +616,15 @@
 				6A2E40F6253A69DA00D1AE1D /* Images.xcassets in Resources */,
 				5B70F4EA2A0BE900005EA8C4 /* MenuIcon-SCVIM.png in Resources */,
 				D4E33D8F27A838F0006DB1CF /* InfoPlist.strings in Resources */,
-				5BEDB723283B4C250078EB25 /* data-cht.json in Resources */,
-				5BEDB721283B4C250078EB25 /* data-cns.json in Resources */,
 				5BBC2D9F28F51C0400C986F6 /* LICENSE-CHT.txt in Resources */,
-				5BE5D9952ACAEFDE009A732C /* sequenceDataFromEtenDOS-cht.json in Resources */,
 				5BF9DA2D288427E000DBD48E /* template-associatedPhrases-cht.txt in Resources */,
 				5BBC2D9E28F51C0400C986F6 /* LICENSE.txt in Resources */,
-				5BEDB725283B4C250078EB25 /* data-chs.json in Resources */,
+				5B2CA1E62B130869002634EE /* vChewingFactoryDatabase.sqlite in Resources */,
 				5BF9DA2928840E6200DBD48E /* template-associatedPhrases-chs.txt in Resources */,
 				5B09307628B6FC3B0021F8C5 /* shortcuts.html in Resources */,
 				5BF9DA2B28840E6200DBD48E /* template-userphrases.txt in Resources */,
-				5BEDB722283B4C250078EB25 /* data-zhuyinwen.json in Resources */,
 				5BF9DA2728840E6200DBD48E /* template-usersymbolphrases.txt in Resources */,
-				5B1C98B929436CEE0019B807 /* data-bpmf-reverse-lookup.json in Resources */,
 				5BBC2DA128F51C0400C986F6 /* LICENSE-CHS.txt in Resources */,
-				5BE5D9962ACAEFDE009A732C /* sequenceDataFromEtenDOS-chs.json in Resources */,
-				5BEDB724283B4C250078EB25 /* data-symbols.json in Resources */,
 				5B7BC4B027AFFBE800F66C24 /* frmPrefWindow.xib in Resources */,
 				5BF9DA2A28840E6200DBD48E /* template-replacements.txt in Resources */,
 				6A187E2616004C5900466B2E /* MainMenu.xib in Resources */,
@@ -682,12 +632,6 @@
 				5BC2652227E04B7E00700291 /* uninstall.sh in Resources */,
 				5BAD0CD527D701F6003D127F /* vChewingKeyLayout.bundle in Resources */,
 				5BBC2DA028F51C0400C986F6 /* LICENSE-JPN.txt in Resources */,
-				5B253E7E2945AF6700680C67 /* data-bpmf-reverse-lookup-CNS1.json in Resources */,
-				5B253E802945AF6700680C67 /* data-bpmf-reverse-lookup-CNS2.json in Resources */,
-				5B253E7F2945AF6700680C67 /* data-bpmf-reverse-lookup-CNS3.json in Resources */,
-				5B253E822945AF6700680C67 /* data-bpmf-reverse-lookup-CNS4.json in Resources */,
-				5B253E832945AF6700680C67 /* data-bpmf-reverse-lookup-CNS5.json in Resources */,
-				5B253E812945AF6700680C67 /* data-bpmf-reverse-lookup-CNS6.json in Resources */,
 				5B70F4EB2A0BE900005EA8C4 /* MenuIcon-SCVIM@2x.png in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -772,6 +716,11 @@
 				"$(SRCROOT)/Source/Data/data-bpmf-reverse-lookup-CNS4.json",
 				"$(SRCROOT)/Source/Data/data-bpmf-reverse-lookup-CNS5.json",
 				"$(SRCROOT)/Source/Data/data-bpmf-reverse-lookup-CNS6.json",
+				"$(SRCROOT)/Source/Data/Build/Release/vChewingFactoryDatabase.sqlite",
+				"$(SRCROOT)/Source/Data/Build/Release/vChewingFactoryDatabase.sqlite-journal",
+				"$(SRCROOT)/Source/Data/Build/Release/",
+				"$(SRCROOT)/Source/Data/data-chs.txt",
+				"$(SRCROOT)/Source/Data/data-cht.txt",
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;

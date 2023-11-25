@@ -26,28 +26,9 @@ class CtlRevLookupWindow: NSWindowController, NSWindowDelegate {
     shared.showWindow(shared)
     NSApp.popup()
   }
-
-  override func windowDidLoad() {
-    super.windowDidLoad()
-    observation = Broadcaster.shared.observe(\.eventForReloadingRevLookupData, options: [.new]) { _, _ in
-      FrmRevLookupWindow.reloadData()
-    }
-  }
 }
 
 class FrmRevLookupWindow: NSWindow {
-  typealias LMRevLookup = vChewingLM.LMRevLookup
-
-  static var lmRevLookupCore = LMRevLookup(data: LMMgr.getDictionaryData("data-bpmf-reverse-lookup"))
-
-  // 全字庫資料接近十萬筆索引，只放到單個 Dictionary 內的話、每次查詢時都會把輸入法搞崩潰。只能分卷處理。
-  static var lmRevLookupCNS1 = LMRevLookup(data: LMMgr.getDictionaryData("data-bpmf-reverse-lookup-CNS1"))
-  static var lmRevLookupCNS2 = LMRevLookup(data: LMMgr.getDictionaryData("data-bpmf-reverse-lookup-CNS2"))
-  static var lmRevLookupCNS3 = LMRevLookup(data: LMMgr.getDictionaryData("data-bpmf-reverse-lookup-CNS3"))
-  static var lmRevLookupCNS4 = LMRevLookup(data: LMMgr.getDictionaryData("data-bpmf-reverse-lookup-CNS4"))
-  static var lmRevLookupCNS5 = LMRevLookup(data: LMMgr.getDictionaryData("data-bpmf-reverse-lookup-CNS5"))
-  static var lmRevLookupCNS6 = LMRevLookup(data: LMMgr.getDictionaryData("data-bpmf-reverse-lookup-CNS6"))
-
   public lazy var inputField = NSTextField()
   public lazy var resultView = NSTextView()
   private lazy var clipView = NSClipView()
@@ -56,13 +37,7 @@ class FrmRevLookupWindow: NSWindow {
   private lazy var view = NSView()
 
   static func reloadData() {
-    DispatchQueue.main.async { lmRevLookupCore = .init(data: LMMgr.getDictionaryData("data-bpmf-reverse-lookup")) }
-    DispatchQueue.main.async { lmRevLookupCNS1 = .init(data: LMMgr.getDictionaryData("data-bpmf-reverse-lookup-CNS1")) }
-    DispatchQueue.main.async { lmRevLookupCNS2 = .init(data: LMMgr.getDictionaryData("data-bpmf-reverse-lookup-CNS2")) }
-    DispatchQueue.main.async { lmRevLookupCNS3 = .init(data: LMMgr.getDictionaryData("data-bpmf-reverse-lookup-CNS3")) }
-    DispatchQueue.main.async { lmRevLookupCNS4 = .init(data: LMMgr.getDictionaryData("data-bpmf-reverse-lookup-CNS4")) }
-    DispatchQueue.main.async { lmRevLookupCNS5 = .init(data: LMMgr.getDictionaryData("data-bpmf-reverse-lookup-CNS5")) }
-    DispatchQueue.main.async { lmRevLookupCNS6 = .init(data: LMMgr.getDictionaryData("data-bpmf-reverse-lookup-CNS6")) }
+    LMMgr.connectCoreDB()
   }
 
   init() {
@@ -176,17 +151,7 @@ class FrmRevLookupWindow: NSWindow {
         strBuilder.append("Maximum 15 results returnable.".localized + "\n")
         break theLoop
       }
-      var arrResult = Self.lmRevLookupCore.query(with: char) ?? []
-      // 一般情況下，威注音語彙庫的倉庫內的全字庫資料檔案有做過排序，所以每個分卷的索引都是不重複的。
-      arrResult +=
-        Self.lmRevLookupCNS1.query(with: char)
-        ?? Self.lmRevLookupCNS2.query(with: char)
-        ?? Self.lmRevLookupCNS3.query(with: char)
-        ?? Self.lmRevLookupCNS4.query(with: char)
-        ?? Self.lmRevLookupCNS5.query(with: char)
-        ?? Self.lmRevLookupCNS6.query(with: char)
-        ?? []
-      arrResult = arrResult.deduplicated
+      let arrResult = vChewingLM.LMInstantiator.getFactoryReverseLookupData(with: char)?.deduplicated ?? []
       if !arrResult.isEmpty {
         strBuilder.append(char + "\t")
         strBuilder.append(arrResult.joined(separator: ", "))

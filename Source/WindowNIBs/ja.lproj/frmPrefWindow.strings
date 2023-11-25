@@ -54,7 +54,6 @@
 "chkFetchSuggestionsFromUserOverrideModel.title" = "入力中で臨時記憶モジュールからお薦めの候補を自動的に選ぶ";
 "chkHardenVerticalPunctuations.title" = "縦書きの時に、引用符・括弧などを強制的に縦書き文字と変換する（不推奨）";
 "chkKeepReadingUponCompositionError.title" = "効かぬ音読みを BackSpace で再編集";
-"chkOnlyLoadFactoryLangModelsIfNeeded.title" = "必要性を判断してから内蔵辞書を読み込む";
 "chkShiftEisuToggleOffTogetherWithCapsLock.title" = "「Shiftキー・JIS英数キー」による英数モードのオフ状態をCapsLockのオフ状態と同期する";
 "chkUseFixedCandidateOrderOnSelection.title" = "候補文字を固定順番で陳列する";
 "clN-4A-iec.title" = "全候補入力の場合、ハイライト候補を Space キーで確認";

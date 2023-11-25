@@ -9,7 +9,9 @@
 import Hotenka
 
 public enum ChineseConverter {
-  public static let shared = HotenkaChineseConverter(jsonDir: LMMgr.getBundleDataPath("convdict", ext: "json"))
+  public static let shared = HotenkaChineseConverter(
+    sqliteDir: LMMgr.getBundleDataPath("convdict", ext: "sqlite") ?? ":memory:"
+  )
 
   private static var punctuationConversionTable: [(String, String)] = [
     ("【", "︻"), ("】", "︼"), ("〖", "︗"), ("〗", "︘"), ("〔", "︹"), ("〕", "︺"), ("《", "︽"), ("》", "︾"),
