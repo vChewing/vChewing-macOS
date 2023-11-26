@@ -208,16 +208,7 @@ private extension VwrCandidateTDKAppKit {
 
 private extension VwrCandidateTDKAppKit {
   private func lineBackground(isCurrentLine: Bool, isMatrix: Bool) -> NSColor {
-    if !isCurrentLine { return .clear }
-    let absBg: NSColor = NSApplication.isDarkMode ? .black : .white
-    switch thePool.layout {
-    case .horizontal where isMatrix:
-      return NSApplication.isDarkMode ? .controlTextColor.withAlphaComponent(0.05) : .white
-    case .vertical where isMatrix:
-      return absBg.withAlphaComponent(0.9)
-    default:
-      return .clear
-    }
+    (isCurrentLine && isMatrix) ? (NSApplication.isDarkMode ? .controlTextColor.withAlphaComponent(0.05) : .white) : .clear
   }
 
   private var finalContainerOrientation: NSUserInterfaceLayoutOrientation {
