@@ -185,7 +185,7 @@ public extension CandidatePool {
     guard !candidatesShown.filter(\.isHighlighted).isEmpty else { return }
     isExpanded = true
     if candidateLines.count <= _maxLinesPerPage {
-      recordedLineRangeForCurrentPage = max(0, currentLineNumber - _maxLinesPerPage + 1) ..< currentLineNumber + 1
+      recordedLineRangeForCurrentPage = lineRangeForFirstPage
     } else {
       switch isBackward {
       case true:
