@@ -498,23 +498,10 @@ extension CtlPrefWindow: NSToolbarDelegate {
     let temporaryViewOld = NSView(frame: existingContentView.frame)
     window.contentView = temporaryViewOld
     var newWindowRect = NSRect(origin: window.frame.origin, size: newView.bounds.size)
-    let shouldScroll: Bool = newWindowRect.size.height > 577
-    if shouldScroll { newWindowRect.size.height = 577 }
     newWindowRect.size.height += kWindowTitleHeight
     newWindowRect.origin.y = window.frame.maxY - newWindowRect.height
     window.setFrame(newWindowRect, display: true, animate: animate)
-    if shouldScroll {
-      let scrollview = NSScrollView(frame: NSRect(x: 0, y: 0, width: 577, height: 577))
-      scrollview.borderType = .noBorder
-      scrollview.hasVerticalScroller = true
-      scrollview.hasHorizontalScroller = false
-      scrollview.verticalScroller?.scrollerStyle = .legacy
-      scrollview.autoresizingMask = [.width, .height]
-      scrollview.documentView = newView
-      window.contentView = scrollview
-    } else {
-      window.contentView = newView
-    }
+    window.contentView = newView
   }
 
   var toolbarIdentifiers: [NSToolbarItem.Identifier] {

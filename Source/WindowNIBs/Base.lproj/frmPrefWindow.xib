@@ -928,567 +928,609 @@
         </view>
         <customObject id="-3" userLabel="Application" customClass="NSObject"/>
         <view id="XWo-36-xGi" userLabel="vwrBehavior">
-            <rect key="frame" x="0.0" y="0.0" width="577" height="835"/>
+            <rect key="frame" x="0.0" y="0.0" width="577" height="526"/>
             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
             <subviews>
-                <stackView distribution="fill" orientation="vertical" alignment="leading" horizontalStackHuggingPriority="249.99998474121094" verticalStackHuggingPriority="249.99998474121094" translatesAutoresizingMaskIntoConstraints="NO" id="j9R-fB-ttM">
-                    <rect key="frame" x="20" y="19" width="537" height="796"/>
-                    <subviews>
-                        <stackView distribution="fill" orientation="vertical" alignment="leading" spacing="4" horizontalStackHuggingPriority="249.99998474121094" verticalStackHuggingPriority="249.99998474121094" translatesAutoresizingMaskIntoConstraints="NO" id="pwZ-0Z-1ID">
-                            <rect key="frame" x="0.0" y="675" width="530" height="121"/>
-                            <subviews>
-                                <button translatesAutoresizingMaskIntoConstraints="NO" id="109">
-                                    <rect key="frame" x="-1" y="104.5" width="285" height="17"/>
-                                    <buttonCell key="cell" type="check" title="Enable Space key for calling candidate window" bezelStyle="regularSquare" imagePosition="left" alignment="left" controlSize="small" state="on" inset="2" id="110">
-                                        <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
-                                        <font key="font" metaFont="cellTitle"/>
-                                    </buttonCell>
-                                    <constraints>
-                                        <constraint firstAttribute="height" constant="16" id="PYH-8e-mUx"/>
-                                    </constraints>
-                                    <connections>
-                                        <binding destination="32" name="value" keyPath="values.ChooseCandidateUsingSpace" id="NU1-DG-vUz"/>
-                                    </connections>
-                                </button>
-                                <button translatesAutoresizingMaskIntoConstraints="NO" id="bE0-Lq-Pj7">
-                                    <rect key="frame" x="-1" y="84.5" width="266" height="17"/>
-                                    <buttonCell key="cell" type="check" title="Use ESC key to clear the entire input buffer" bezelStyle="regularSquare" imagePosition="left" controlSize="small" state="on" inset="2" id="f2j-xD-4xK">
-                                        <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
-                                        <font key="font" metaFont="cellTitle"/>
-                                    </buttonCell>
-                                    <constraints>
-                                        <constraint firstAttribute="height" constant="16" id="6uT-D5-KVx"/>
-                                    </constraints>
-                                    <connections>
-                                        <binding destination="32" name="value" keyPath="values.EscToCleanInputBuffer" id="aLf-PK-mAS"/>
-                                    </connections>
-                                </button>
-                                <button translatesAutoresizingMaskIntoConstraints="NO" id="6MM-WC-Mpd">
-                                    <rect key="frame" x="-1" y="64.5" width="381" height="17"/>
-                                    <buttonCell key="cell" type="check" title="Allow using Enter key to confirm associated candidate selection" bezelStyle="regularSquare" imagePosition="left" controlSize="small" inset="2" id="chkAlsoConfirmAssociatedCandidatesByEnter">
-                                        <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
-                                        <font key="font" metaFont="cellTitle"/>
-                                    </buttonCell>
-                                    <constraints>
-                                        <constraint firstAttribute="height" constant="16" id="hhN-al-6OI"/>
-                                    </constraints>
-                                    <connections>
-                                        <binding destination="32" name="value" keyPath="values.AlsoConfirmAssociatedCandidatesByEnter" id="P1C-j9-N88"/>
-                                    </connections>
-                                </button>
-                                <button translatesAutoresizingMaskIntoConstraints="NO" id="6MK-0e-NrQ">
-                                    <rect key="frame" x="-1" y="44.5" width="344" height="17"/>
-                                    <buttonCell key="cell" type="check" title="Use Space to confirm candidate in Per-Char Select Mode" bezelStyle="regularSquare" imagePosition="left" controlSize="small" inset="2" id="clN-4A-iec">
-                                        <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
-                                        <font key="font" metaFont="cellTitle"/>
-                                    </buttonCell>
-                                    <constraints>
-                                        <constraint firstAttribute="height" constant="16" id="0mM-np-pTV"/>
-                                    </constraints>
-                                    <connections>
-                                        <binding destination="32" name="value" keyPath="values.UseSpaceToCommitHighlightedSCPCCandidate" id="NNu-k7-eSF"/>
-                                    </connections>
-                                </button>
-                                <button translatesAutoresizingMaskIntoConstraints="NO" id="a6O-JL-C4g">
-                                    <rect key="frame" x="-1" y="24.5" width="247" height="17"/>
-                                    <buttonCell key="cell" type="check" title="Accept leading intonations in rare cases" bezelStyle="regularSquare" imagePosition="left" controlSize="small" inset="2" id="lblAcceptLeadingIntonations">
-                                        <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
-                                        <font key="font" metaFont="cellTitle"/>
-                                    </buttonCell>
-                                    <constraints>
-                                        <constraint firstAttribute="height" constant="16" id="WkD-Wx-erN"/>
-                                    </constraints>
-                                    <connections>
-                                        <binding destination="32" name="value" keyPath="values.AcceptLeadingIntonations" id="l0S-gB-ckP"/>
-                                    </connections>
-                                </button>
-                                <button translatesAutoresizingMaskIntoConstraints="NO" id="7QM-7z-tpq">
-                                    <rect key="frame" x="-1" y="4.5" width="233" height="17"/>
-                                    <buttonCell key="cell" type="check" title="Always show tooltip texts horizontally" bezelStyle="regularSquare" imagePosition="left" controlSize="small" inset="2" id="lblAlwaysShowTooltipTextsHorizontally">
-                                        <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
-                                        <font key="font" metaFont="cellTitle"/>
-                                    </buttonCell>
-                                    <constraints>
-                                        <constraint firstAttribute="height" constant="16" id="fuj-Jy-rz7"/>
-                                    </constraints>
-                                    <connections>
-                                        <binding destination="32" name="value" keyPath="values.AlwaysShowTooltipTextsHorizontally" id="szi-4g-EIC"/>
-                                    </connections>
-                                </button>
-                                <box verticalHuggingPriority="750" boxType="separator" translatesAutoresizingMaskIntoConstraints="NO" id="Agg-8d-6bO">
-                                    <rect key="frame" x="0.0" y="-2" width="530" height="5"/>
-                                    <constraints>
-                                        <constraint firstAttribute="width" relation="greaterThanOrEqual" constant="530" id="e6d-B8-ghT"/>
-                                    </constraints>
-                                </box>
-                            </subviews>
-                            <visibilityPriorities>
-                                <integer value="1000"/>
-                                <integer value="1000"/>
-                                <integer value="1000"/>
-                                <integer value="1000"/>
-                                <integer value="1000"/>
-                                <integer value="1000"/>
-                                <integer value="1000"/>
-                            </visibilityPriorities>
-                            <customSpacing>
-                                <real value="3.4028234663852886e+38"/>
-                                <real value="3.4028234663852886e+38"/>
-                                <real value="3.4028234663852886e+38"/>
-                                <real value="3.4028234663852886e+38"/>
-                                <real value="3.4028234663852886e+38"/>
-                                <real value="3.4028234663852886e+38"/>
-                                <real value="3.4028234663852886e+38"/>
-                            </customSpacing>
-                        </stackView>
-                        <stackView distribution="fill" orientation="vertical" alignment="leading" horizontalStackHuggingPriority="249.99998474121094" verticalStackHuggingPriority="249.99998474121094" translatesAutoresizingMaskIntoConstraints="NO" id="fO5-4y-X0y">
-                            <rect key="frame" x="0.0" y="629" width="365" height="38"/>
-                            <subviews>
-                                <textField focusRingType="none" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="TMn-LX-3Ub">
-                                    <rect key="frame" x="-2" y="23" width="369" height="15"/>
-                                    <textFieldCell key="cell" controlSize="small" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" alignment="left" title="Choose the behavior of (Shift+)Tab key in the candidate window." id="ueU-Rz-a1C">
-                                        <font key="font" metaFont="cellTitle"/>
-                                        <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
-                                        <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
-                                    </textFieldCell>
-                                </textField>
-                                <matrix wantsLayer="YES" verticalHuggingPriority="750" allowsEmptySelection="NO" translatesAutoresizingMaskIntoConstraints="NO" id="n7q-ew-DYu">
-                                    <rect key="frame" x="0.0" y="0.0" width="290" height="15"/>
-                                    <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
-                                    <size key="cellSize" width="143" height="15"/>
-                                    <size key="intercellSpacing" width="4" height="2"/>
-                                    <buttonCell key="prototype" type="radio" title="Radio" imagePosition="left" alignment="left" controlSize="small" inset="2" id="6Hs-cH-sbg">
-                                        <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
-                                        <font key="font" metaFont="cellTitle"/>
-                                    </buttonCell>
-                                    <cells>
-                                        <column>
-                                            <buttonCell type="radio" title="Revolving Candidates" imagePosition="left" alignment="left" controlSize="small" state="on" inset="2" id="FVC-br-H57">
-                                                <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
-                                                <font key="font" metaFont="cellTitle"/>
-                                            </buttonCell>
-                                        </column>
-                                        <column>
-                                            <buttonCell type="radio" title="Revolving Pages" imagePosition="left" alignment="left" controlSize="small" tag="1" inset="2" id="s7u-Fm-dVg">
-                                                <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
-                                                <font key="font" metaFont="cellTitle"/>
-                                            </buttonCell>
-                                        </column>
-                                    </cells>
-                                    <connections>
-                                        <binding destination="32" name="selectedTag" keyPath="values.SpecifyShiftTabKeyBehavior" id="R1A-Ji-8i2"/>
-                                    </connections>
-                                </matrix>
-                            </subviews>
-                            <visibilityPriorities>
-                                <integer value="1000"/>
-                                <integer value="1000"/>
-                            </visibilityPriorities>
-                            <customSpacing>
-                                <real value="3.4028234663852886e+38"/>
-                                <real value="3.4028234663852886e+38"/>
-                            </customSpacing>
-                        </stackView>
-                        <stackView distribution="fill" orientation="vertical" alignment="leading" horizontalStackHuggingPriority="249.99998474121094" verticalStackHuggingPriority="249.99998474121094" translatesAutoresizingMaskIntoConstraints="NO" id="EOx-os-rU9">
-                            <rect key="frame" x="0.0" y="547" width="381" height="74"/>
-                            <subviews>
-                                <textField focusRingType="none" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="sjl-L6-qdY">
-                                    <rect key="frame" x="-2" y="59" width="385" height="15"/>
-                                    <textFieldCell key="cell" controlSize="small" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" alignment="left" title="Specify what intonation key does when syllable composer is empty." id="lblIntonationKeyBehavior">
-                                        <font key="font" metaFont="cellTitle"/>
-                                        <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
-                                        <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
-                                    </textFieldCell>
-                                </textField>
-                                <matrix wantsLayer="YES" verticalHuggingPriority="750" allowsEmptySelection="NO" translatesAutoresizingMaskIntoConstraints="NO" id="15D-3C-qwe">
-                                    <rect key="frame" x="0.0" y="0.0" width="380" height="51"/>
-                                    <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
-                                    <size key="cellSize" width="380" height="15"/>
-                                    <size key="intercellSpacing" width="4" height="3"/>
-                                    <buttonCell key="prototype" type="radio" title="Radio" imagePosition="left" alignment="left" controlSize="small" inset="2" id="kct-wG-rSl">
-                                        <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
-                                        <font key="font" metaFont="cellTitle"/>
-                                    </buttonCell>
-                                    <cells>
-                                        <column>
-                                            <buttonCell type="radio" title="Override the previous reading's intonation with candidate-reset" imagePosition="left" alignment="left" controlSize="small" state="on" inset="2" id="rdoIntonationKeyBehavior0">
-                                                <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
-                                                <font key="font" metaFont="cellTitle"/>
-                                            </buttonCell>
-                                            <buttonCell type="radio" title="Only override the intonation of the previous reading if different" imagePosition="left" alignment="left" controlSize="small" tag="1" inset="2" id="rdoIntonationKeyBehavior1">
-                                                <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
-                                                <font key="font" metaFont="cellTitle"/>
-                                            </buttonCell>
-                                            <buttonCell type="radio" title="Always type intonations to the inline composition buffer" imagePosition="left" alignment="left" controlSize="small" tag="2" inset="2" id="rdoIntonationKeyBehavior2">
-                                                <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
-                                                <font key="font" metaFont="cellTitle"/>
-                                            </buttonCell>
-                                        </column>
-                                    </cells>
-                                    <connections>
-                                        <binding destination="32" name="selectedTag" keyPath="values.SpecifyIntonationKeyBehavior" id="k3O-tW-1Zy"/>
-                                    </connections>
-                                </matrix>
-                            </subviews>
-                            <visibilityPriorities>
-                                <integer value="1000"/>
-                                <integer value="1000"/>
-                            </visibilityPriorities>
-                            <customSpacing>
-                                <real value="3.4028234663852886e+38"/>
-                                <real value="3.4028234663852886e+38"/>
-                            </customSpacing>
-                        </stackView>
-                        <stackView distribution="fill" orientation="vertical" alignment="leading" spacing="7" horizontalStackHuggingPriority="249.99998474121094" verticalStackHuggingPriority="249.99998474121094" translatesAutoresizingMaskIntoConstraints="NO" id="L1h-Ce-g4Z">
-                            <rect key="frame" x="0.0" y="430" width="449" height="109"/>
-                            <subviews>
-                                <textField focusRingType="none" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="6q5-OP-iEb">
-                                    <rect key="frame" x="-2" y="94" width="332" height="15"/>
-                                    <textFieldCell key="cell" controlSize="small" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" alignment="left" title="Choose the behavior of Shift+Letter key with letter inputs." id="lblUpperCaseLetterKeyBehavior">
-                                        <font key="font" metaFont="cellTitle"/>
-                                        <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
-                                        <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
-                                    </textFieldCell>
-                                </textField>
-                                <matrix wantsLayer="YES" verticalHuggingPriority="750" allowsEmptySelection="NO" translatesAutoresizingMaskIntoConstraints="NO" id="veW-XM-HGs">
-                                    <rect key="frame" x="0.0" y="0.0" width="449" height="87"/>
-                                    <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
-                                    <size key="cellSize" width="449" height="15"/>
-                                    <size key="intercellSpacing" width="4" height="3"/>
-                                    <buttonCell key="prototype" type="radio" title="Radio" imagePosition="left" alignment="left" controlSize="small" inset="2" id="Fxk-tK-cP7">
-                                        <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
-                                        <font key="font" metaFont="cellTitle"/>
-                                    </buttonCell>
-                                    <cells>
-                                        <column>
-                                            <buttonCell type="radio" title="Type them into inline composition buffer" imagePosition="left" alignment="left" controlSize="small" state="on" inset="2" id="rdoUpperCaseLetterKeyBehavior0">
-                                                <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
-                                                <font key="font" metaFont="cellTitle"/>
-                                            </buttonCell>
-                                            <buttonCell type="radio" title="Always directly commit lowercased letters" imagePosition="left" alignment="left" controlSize="small" tag="1" inset="2" id="rdoUpperCaseLetterKeyBehavior1">
-                                                <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
-                                                <font key="font" metaFont="cellTitle"/>
-                                            </buttonCell>
-                                            <buttonCell type="radio" title="Always directly commit uppercased letters" imagePosition="left" alignment="left" controlSize="small" tag="2" inset="2" id="rdoUpperCaseLetterKeyBehavior2">
-                                                <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
-                                                <font key="font" metaFont="cellTitle"/>
-                                            </buttonCell>
-                                            <buttonCell type="radio" title="Directly commit lowercased letters only if the compositor is empty" imagePosition="left" alignment="left" controlSize="small" tag="3" inset="2" id="rdoUpperCaseLetterKeyBehavior3">
-                                                <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
-                                                <font key="font" metaFont="cellTitle"/>
-                                            </buttonCell>
-                                            <buttonCell type="radio" title="Directly commit uppercased letters only if the compositor is empty" imagePosition="left" alignment="left" controlSize="small" tag="4" inset="2" id="rdoUpperCaseLetterKeyBehavior4">
-                                                <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
-                                                <font key="font" metaFont="cellTitle"/>
-                                            </buttonCell>
-                                        </column>
-                                    </cells>
-                                    <connections>
-                                        <binding destination="32" name="selectedTag" keyPath="values.UpperCaseLetterKeyBehavior" id="fCQ-Ru-Fuq"/>
-                                    </connections>
-                                </matrix>
-                            </subviews>
-                            <visibilityPriorities>
-                                <integer value="1000"/>
-                                <integer value="1000"/>
-                            </visibilityPriorities>
-                            <customSpacing>
-                                <real value="3.4028234663852886e+38"/>
-                                <real value="3.4028234663852886e+38"/>
-                            </customSpacing>
-                        </stackView>
-                        <stackView distribution="fill" orientation="vertical" alignment="leading" horizontalStackHuggingPriority="249.99998474121094" verticalStackHuggingPriority="249.99998474121094" translatesAutoresizingMaskIntoConstraints="NO" id="NOW-jd-XBh">
-                            <rect key="frame" x="0.0" y="366" width="358" height="56"/>
-                            <subviews>
-                                <textField focusRingType="none" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="J0f-Aw-dxC">
-                                    <rect key="frame" x="-2" y="41" width="336" height="15"/>
-                                    <textFieldCell key="cell" controlSize="small" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" alignment="left" title="Choose the behavior of (Shift+)Space key with candidates." id="Pg5-G9-pY5">
-                                        <font key="font" metaFont="cellTitle"/>
-                                        <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
-                                        <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
-                                    </textFieldCell>
-                                </textField>
-                                <matrix wantsLayer="YES" verticalHuggingPriority="750" allowsEmptySelection="NO" translatesAutoresizingMaskIntoConstraints="NO" id="YkJ-lr-EP6">
-                                    <rect key="frame" x="0.0" y="0.0" width="358" height="33"/>
-                                    <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
-                                    <size key="cellSize" width="358" height="15"/>
-                                    <size key="intercellSpacing" width="4" height="3"/>
-                                    <buttonCell key="prototype" type="radio" title="Radio" imagePosition="left" alignment="left" controlSize="small" inset="2" id="8V2-DR-rwL">
-                                        <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
-                                        <font key="font" metaFont="cellTitle"/>
-                                    </buttonCell>
-                                    <cells>
-                                        <column>
-                                            <buttonCell type="radio" title="Space to +revolve candidates, Shift+Space t+revolve pages" imagePosition="left" alignment="left" controlSize="small" state="on" inset="2" id="dIN-TZ-67g">
-                                                <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
-                                                <font key="font" metaFont="cellTitle"/>
-                                            </buttonCell>
-                                            <buttonCell type="radio" title="Space to +revolve pages, Shift+Space t+revolve candidates" imagePosition="left" alignment="left" controlSize="small" tag="1" inset="2" id="XqL-rf-X6d">
-                                                <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
-                                                <font key="font" metaFont="cellTitle"/>
-                                            </buttonCell>
-                                        </column>
-                                    </cells>
-                                    <connections>
-                                        <binding destination="32" name="selectedTag" keyPath="values.SpecifyShiftSpaceKeyBehavior" id="Ajq-3d-Lh1"/>
-                                    </connections>
-                                </matrix>
-                            </subviews>
-                            <visibilityPriorities>
-                                <integer value="1000"/>
-                                <integer value="1000"/>
-                            </visibilityPriorities>
-                            <customSpacing>
-                                <real value="3.4028234663852886e+38"/>
-                                <real value="3.4028234663852886e+38"/>
-                            </customSpacing>
-                        </stackView>
-                        <stackView distribution="fill" orientation="vertical" alignment="leading" spacing="7" horizontalStackHuggingPriority="249.99998474121094" verticalStackHuggingPriority="249.99998474121094" translatesAutoresizingMaskIntoConstraints="NO" id="s47-wG-vKA">
-                            <rect key="frame" x="0.0" y="285" width="348" height="73"/>
-                            <subviews>
-                                <textField focusRingType="none" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="iCL-n8-VTP">
-                                    <rect key="frame" x="-2" y="58" width="323" height="15"/>
-                                    <textFieldCell key="cell" controlSize="small" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" alignment="left" title="Choose the attempted behavior of Shift+BackSpace key." id="lblShiftBkspKeyBehavior">
-                                        <font key="font" metaFont="cellTitle"/>
-                                        <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
-                                        <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
-                                    </textFieldCell>
-                                </textField>
-                                <matrix wantsLayer="YES" verticalHuggingPriority="750" allowsEmptySelection="NO" translatesAutoresizingMaskIntoConstraints="NO" id="pKb-qa-Tku">
-                                    <rect key="frame" x="0.0" y="0.0" width="348" height="51"/>
-                                    <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
-                                    <size key="cellSize" width="348" height="15"/>
-                                    <size key="intercellSpacing" width="4" height="3"/>
-                                    <buttonCell key="prototype" type="radio" title="Radio" imagePosition="left" alignment="left" controlSize="small" inset="2" id="Bqo-H8-c8p">
-                                        <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
-                                        <font key="font" metaFont="cellTitle"/>
-                                    </buttonCell>
-                                    <cells>
-                                        <column>
-                                            <buttonCell type="radio" title="Disassemble the previous reading, dropping its intonation" imagePosition="left" alignment="left" controlSize="small" state="on" inset="2" id="rdoShiftBkspKeyBehavior0">
-                                                <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
-                                                <font key="font" metaFont="cellTitle"/>
-                                            </buttonCell>
-                                            <buttonCell type="radio" title="Clear the entire inline composition buffer like Shift+Delete" imagePosition="left" alignment="left" controlSize="small" tag="1" inset="2" id="rdoShiftBkspKeyBehavior1">
-                                                <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
-                                                <font key="font" metaFont="cellTitle"/>
-                                            </buttonCell>
-                                            <buttonCell type="radio" title="Always drop the previous reading" imagePosition="left" alignment="left" controlSize="small" tag="2" inset="2" id="rdoShiftBkspKeyBehavior2">
-                                                <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
-                                                <font key="font" metaFont="cellTitle"/>
-                                            </buttonCell>
-                                        </column>
-                                    </cells>
-                                    <connections>
-                                        <binding destination="32" name="selectedTag" keyPath="values.SpecifyShiftBackSpaceKeyBehavior" id="6Bn-Sh-hiE"/>
-                                    </connections>
-                                </matrix>
-                            </subviews>
-                            <visibilityPriorities>
-                                <integer value="1000"/>
-                                <integer value="1000"/>
-                            </visibilityPriorities>
-                            <customSpacing>
-                                <real value="3.4028234663852886e+38"/>
-                                <real value="3.4028234663852886e+38"/>
-                            </customSpacing>
-                        </stackView>
-                        <stackView distribution="fill" orientation="vertical" alignment="leading" spacing="5" horizontalStackHuggingPriority="249.99998474121094" verticalStackHuggingPriority="249.99998474121094" translatesAutoresizingMaskIntoConstraints="NO" id="TiS-ka-72K">
-                            <rect key="frame" x="0.0" y="173" width="537" height="104"/>
-                            <subviews>
-                                <box verticalHuggingPriority="750" boxType="separator" translatesAutoresizingMaskIntoConstraints="NO" id="oCA-nr-Sc7">
-                                    <rect key="frame" x="0.0" y="101" width="530" height="5"/>
-                                    <constraints>
-                                        <constraint firstAttribute="width" relation="greaterThanOrEqual" constant="530" id="YNl-To-qPB"/>
-                                    </constraints>
-                                </box>
-                                <button translatesAutoresizingMaskIntoConstraints="NO" id="mug-xq-Lmy">
-                                    <rect key="frame" x="-1" y="81.5" width="314" height="17"/>
-                                    <buttonCell key="cell" type="check" title="Share alphanumerical mode status across all clients" bezelStyle="regularSquare" imagePosition="left" controlSize="small" inset="2" id="K8U-Oq-lFc">
-                                        <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
-                                        <font key="font" metaFont="cellTitle"/>
-                                    </buttonCell>
-                                    <constraints>
-                                        <constraint firstAttribute="height" constant="16" id="SHw-vN-0jF"/>
-                                    </constraints>
-                                    <connections>
-                                        <binding destination="32" name="value" keyPath="values.ShareAlphanumericalModeStatusAcrossClients" id="fG7-I0-pqu"/>
-                                    </connections>
-                                </button>
-                                <button translatesAutoresizingMaskIntoConstraints="NO" id="P2l-TU-TcG">
-                                    <rect key="frame" x="-1" y="60.5" width="456" height="17"/>
-                                    <buttonCell key="cell" type="check" title="Sync the off state between Caps Lock and Shift / Eisu Alphanumerical Toggle" bezelStyle="regularSquare" imagePosition="left" controlSize="small" inset="2" id="chkShiftEisuToggleOffTogetherWithCapsLock">
-                                        <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
-                                        <font key="font" metaFont="cellTitle"/>
-                                    </buttonCell>
-                                    <constraints>
-                                        <constraint firstAttribute="height" constant="16" id="Pqi-IA-QKj"/>
-                                        <constraint firstAttribute="width" relation="greaterThanOrEqual" constant="70" id="u2R-CU-TzQ"/>
-                                    </constraints>
-                                    <connections>
-                                        <binding destination="32" name="value" keyPath="values.ShiftEisuToggleOffTogetherWithCapsLock" id="brB-ug-zJf"/>
-                                    </connections>
-                                </button>
-                                <textField wantsLayer="YES" focusRingType="none" verticalHuggingPriority="750" setsMaxLayoutWidthAtFirstLayout="YES" translatesAutoresizingMaskIntoConstraints="NO" id="oIo-cW-mrw">
-                                    <rect key="frame" x="-2" y="0.0" width="541" height="56"/>
-                                    <constraints>
-                                        <constraint firstAttribute="width" constant="537" id="9Sb-CJ-a0l"/>
-                                    </constraints>
-                                    <textFieldCell key="cell" controlSize="small" sendsActionOnEndEditing="YES" alignment="left" id="lblShiftEisuToggleOffTogetherWithCapsLock">
-                                        <font key="font" metaFont="smallSystem"/>
-                                        <string key="title">This does: 1) On macOS 12 and later, if the Caps Lock gets turned off, then the internal switch for Shift-key / JIS-Eisu-key Alphanumerical Mode Toggle will also be switched off. 2) If you have turned off the same switch by JIS-Eisu key, then the Caps Lock gets turned off together. Note: vChewing has no way to recognize single hits of Shift key when Caps Lock is on.</string>
-                                        <color key="textColor" name="secondaryLabelColor" catalog="System" colorSpace="catalog"/>
-                                        <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
-                                    </textFieldCell>
-                                </textField>
-                            </subviews>
-                            <visibilityPriorities>
-                                <integer value="1000"/>
-                                <integer value="1000"/>
-                                <integer value="1000"/>
-                                <integer value="1000"/>
-                            </visibilityPriorities>
-                            <customSpacing>
-                                <real value="3.4028234663852886e+38"/>
-                                <real value="3.4028234663852886e+38"/>
-                                <real value="3.4028234663852886e+38"/>
-                                <real value="3.4028234663852886e+38"/>
-                            </customSpacing>
-                        </stackView>
-                        <stackView distribution="fill" orientation="vertical" alignment="leading" spacing="5" horizontalStackHuggingPriority="249.99998474121094" verticalStackHuggingPriority="249.99998474121094" translatesAutoresizingMaskIntoConstraints="NO" id="UFf-Pi-9Jt" userLabel="stkShiftKeyASCIITogglesPane">
-                            <rect key="frame" x="0.0" y="0.0" width="537" height="165"/>
-                            <subviews>
-                                <box verticalHuggingPriority="750" boxType="separator" translatesAutoresizingMaskIntoConstraints="NO" id="2zC-9V-ryy">
-                                    <rect key="frame" x="0.0" y="162" width="530" height="5"/>
-                                    <constraints>
-                                        <constraint firstAttribute="width" relation="greaterThanOrEqual" constant="530" id="ppo-kg-vfE"/>
-                                    </constraints>
-                                </box>
-                                <textField focusRingType="none" horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="8jJ-wr-Hhm">
-                                    <rect key="frame" x="-2" y="143" width="413" height="16"/>
-                                    <constraints>
-                                        <constraint firstAttribute="height" constant="16" id="JwL-81-H33"/>
-                                    </constraints>
-                                    <textFieldCell key="cell" controlSize="small" lineBreakMode="clipping" title="Shift-key Alphanumerical Mode Toggle (not work if CapsLock is ON)" id="ZEv-Q2-mYN">
-                                        <font key="font" metaFont="systemBold" size="12"/>
-                                        <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
-                                        <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
-                                    </textFieldCell>
-                                </textField>
-                                <button translatesAutoresizingMaskIntoConstraints="NO" id="47z-Kc-MdV">
-                                    <rect key="frame" x="-1" y="121.5" width="268" height="17"/>
-                                    <buttonCell key="cell" type="check" title="Toggle alphanumerical mode with Left-Shift" bezelStyle="regularSquare" imagePosition="left" controlSize="small" inset="2" id="CVy-8U-3qQ">
-                                        <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
-                                        <font key="font" metaFont="cellTitle"/>
-                                    </buttonCell>
-                                    <constraints>
-                                        <constraint firstAttribute="width" relation="greaterThanOrEqual" constant="70" id="JyP-8L-nph"/>
-                                        <constraint firstAttribute="height" constant="16" id="uE2-0S-Bgm"/>
-                                    </constraints>
-                                    <connections>
-                                        <binding destination="32" name="value" keyPath="values.TogglingAlphanumericalModeWithLShift" id="L1D-gV-tCC"/>
-                                    </connections>
-                                </button>
-                                <button translatesAutoresizingMaskIntoConstraints="NO" id="taP-hv-eg2">
-                                    <rect key="frame" x="-1" y="100.5" width="276" height="17"/>
-                                    <buttonCell key="cell" type="check" title="Toggle alphanumerical mode with Right-Shift" bezelStyle="regularSquare" imagePosition="left" controlSize="small" inset="2" id="nxP-CV-ZAu">
-                                        <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
-                                        <font key="font" metaFont="cellTitle"/>
-                                    </buttonCell>
-                                    <constraints>
-                                        <constraint firstAttribute="width" relation="greaterThanOrEqual" constant="70" id="mzA-do-IWc"/>
-                                        <constraint firstAttribute="height" constant="16" id="uiX-bl-Lww"/>
-                                    </constraints>
-                                    <connections>
-                                        <binding destination="32" name="value" keyPath="values.TogglingAlphanumericalModeWithRShift" id="4qK-TY-SFb"/>
-                                    </connections>
-                                </button>
-                                <textField wantsLayer="YES" focusRingType="none" verticalHuggingPriority="750" setsMaxLayoutWidthAtFirstLayout="YES" translatesAutoresizingMaskIntoConstraints="NO" id="Dec-3q-bsx">
-                                    <rect key="frame" x="-2" y="40" width="541" height="56"/>
-                                    <constraints>
-                                        <constraint firstAttribute="width" constant="537" id="wkg-gt-KuK"/>
-                                    </constraints>
-                                    <textFieldCell key="cell" controlSize="small" sendsActionOnEndEditing="YES" alignment="left" id="Rl7-3a-RDn">
-                                        <font key="font" metaFont="smallSystem"/>
-                                        <string key="title">This feature only needs to parse consecutive NSEvents passed by macOS built-in InputMethodKit framework, hence no necessity of asking end-users for extra privileges of monitoring global keyboard inputs. You are free to investigate our codebase or reverse-engineer this input method to see whether the above statement is trustable.</string>
-                                        <color key="textColor" name="secondaryLabelColor" catalog="System" colorSpace="catalog"/>
-                                        <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
-                                    </textFieldCell>
-                                </textField>
-                                <button translatesAutoresizingMaskIntoConstraints="NO" id="Ku4-rR-MdM">
-                                    <rect key="frame" x="-1" y="18.5" width="301" height="17"/>
-                                    <buttonCell key="cell" type="check" title="Bypass the vChewing built-in Caps Lock handling" bezelStyle="regularSquare" imagePosition="left" controlSize="small" inset="2" id="chkBypassNonAppleCapsLockHandling">
-                                        <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
-                                        <font key="font" metaFont="cellTitle"/>
-                                    </buttonCell>
-                                    <constraints>
-                                        <constraint firstAttribute="height" constant="16" id="mcc-F4-zF2"/>
-                                        <constraint firstAttribute="width" relation="greaterThanOrEqual" constant="70" id="scf-fg-8nh"/>
-                                    </constraints>
-                                    <connections>
-                                        <binding destination="32" name="value" keyPath="values.BypassNonAppleCapsLockHandling" id="vym-AR-tlm"/>
-                                    </connections>
-                                </button>
-                                <textField wantsLayer="YES" focusRingType="none" verticalHuggingPriority="750" setsMaxLayoutWidthAtFirstLayout="YES" translatesAutoresizingMaskIntoConstraints="NO" id="7le-2d-a1D">
-                                    <rect key="frame" x="-2" y="0.0" width="541" height="14"/>
-                                    <constraints>
-                                        <constraint firstAttribute="width" constant="537" id="Zi4-sa-ncL"/>
-                                    </constraints>
-                                    <textFieldCell key="cell" controlSize="small" sendsActionOnEndEditing="YES" alignment="left" title="This won't affect the same feature offered by macOS since 10.14 Mojave and later." id="lblBypassNonAppleCapsLockHandling">
-                                        <font key="font" metaFont="smallSystem"/>
-                                        <color key="textColor" name="secondaryLabelColor" catalog="System" colorSpace="catalog"/>
-                                        <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
-                                    </textFieldCell>
-                                </textField>
-                            </subviews>
-                            <visibilityPriorities>
-                                <integer value="1000"/>
-                                <integer value="1000"/>
-                                <integer value="1000"/>
-                                <integer value="1000"/>
-                                <integer value="1000"/>
-                                <integer value="1000"/>
-                                <integer value="1000"/>
-                            </visibilityPriorities>
-                            <customSpacing>
-                                <real value="3.4028234663852886e+38"/>
-                                <real value="3.4028234663852886e+38"/>
-                                <real value="3.4028234663852886e+38"/>
-                                <real value="3.4028234663852886e+38"/>
-                                <real value="3.4028234663852886e+38"/>
-                                <real value="3.4028234663852886e+38"/>
-                                <real value="3.4028234663852886e+38"/>
-                            </customSpacing>
-                        </stackView>
-                    </subviews>
-                    <visibilityPriorities>
-                        <integer value="1000"/>
-                        <integer value="1000"/>
-                        <integer value="1000"/>
-                        <integer value="1000"/>
-                        <integer value="1000"/>
-                        <integer value="1000"/>
-                        <integer value="1000"/>
-                        <integer value="1000"/>
-                    </visibilityPriorities>
-                    <customSpacing>
-                        <real value="3.4028234663852886e+38"/>
-                        <real value="3.4028234663852886e+38"/>
-                        <real value="3.4028234663852886e+38"/>
-                        <real value="3.4028234663852886e+38"/>
-                        <real value="3.4028234663852886e+38"/>
-                        <real value="3.4028234663852886e+38"/>
-                        <real value="3.4028234663852886e+38"/>
-                        <real value="3.4028234663852886e+38"/>
-                    </customSpacing>
-                </stackView>
+                <tabView translatesAutoresizingMaskIntoConstraints="NO" id="3dr-gK-PDv">
+                    <rect key="frame" x="13" y="15" width="551" height="508"/>
+                    <font key="font" metaFont="system"/>
+                    <tabViewItems>
+                        <tabViewItem label="A" identifier="" id="aWN-to-wD5">
+                            <view key="view" id="Tdf-hU-qXZ">
+                                <rect key="frame" x="10" y="33" width="531" height="462"/>
+                                <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                                <subviews>
+                                    <stackView distribution="fill" orientation="vertical" alignment="leading" spacing="9" horizontalStackHuggingPriority="249.99998474121094" verticalStackHuggingPriority="249.99998474121094" translatesAutoresizingMaskIntoConstraints="NO" id="a1o-Sq-maq">
+                                        <rect key="frame" x="17" y="48" width="500" height="411"/>
+                                        <subviews>
+                                            <stackView distribution="fill" orientation="vertical" alignment="leading" spacing="4" horizontalStackHuggingPriority="249.99998474121094" verticalStackHuggingPriority="249.99998474121094" translatesAutoresizingMaskIntoConstraints="NO" id="pwZ-0Z-1ID">
+                                                <rect key="frame" x="0.0" y="295" width="500" height="116"/>
+                                                <subviews>
+                                                    <button translatesAutoresizingMaskIntoConstraints="NO" id="109">
+                                                        <rect key="frame" x="-1" y="99.5" width="285" height="17"/>
+                                                        <buttonCell key="cell" type="check" title="Enable Space key for calling candidate window" bezelStyle="regularSquare" imagePosition="left" alignment="left" controlSize="small" state="on" inset="2" id="110">
+                                                            <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
+                                                            <font key="font" metaFont="cellTitle"/>
+                                                        </buttonCell>
+                                                        <constraints>
+                                                            <constraint firstAttribute="height" constant="16" id="PYH-8e-mUx"/>
+                                                        </constraints>
+                                                        <connections>
+                                                            <binding destination="32" name="value" keyPath="values.ChooseCandidateUsingSpace" id="NU1-DG-vUz"/>
+                                                        </connections>
+                                                    </button>
+                                                    <button translatesAutoresizingMaskIntoConstraints="NO" id="bE0-Lq-Pj7">
+                                                        <rect key="frame" x="-1" y="79.5" width="266" height="17"/>
+                                                        <buttonCell key="cell" type="check" title="Use ESC key to clear the entire input buffer" bezelStyle="regularSquare" imagePosition="left" controlSize="small" state="on" inset="2" id="f2j-xD-4xK">
+                                                            <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
+                                                            <font key="font" metaFont="cellTitle"/>
+                                                        </buttonCell>
+                                                        <constraints>
+                                                            <constraint firstAttribute="height" constant="16" id="6uT-D5-KVx"/>
+                                                        </constraints>
+                                                        <connections>
+                                                            <binding destination="32" name="value" keyPath="values.EscToCleanInputBuffer" id="aLf-PK-mAS"/>
+                                                        </connections>
+                                                    </button>
+                                                    <button translatesAutoresizingMaskIntoConstraints="NO" id="6MM-WC-Mpd">
+                                                        <rect key="frame" x="-1" y="59.5" width="381" height="17"/>
+                                                        <buttonCell key="cell" type="check" title="Allow using Enter key to confirm associated candidate selection" bezelStyle="regularSquare" imagePosition="left" controlSize="small" inset="2" id="chkAlsoConfirmAssociatedCandidatesByEnter">
+                                                            <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
+                                                            <font key="font" metaFont="cellTitle"/>
+                                                        </buttonCell>
+                                                        <constraints>
+                                                            <constraint firstAttribute="height" constant="16" id="hhN-al-6OI"/>
+                                                        </constraints>
+                                                        <connections>
+                                                            <binding destination="32" name="value" keyPath="values.AlsoConfirmAssociatedCandidatesByEnter" id="P1C-j9-N88"/>
+                                                        </connections>
+                                                    </button>
+                                                    <button translatesAutoresizingMaskIntoConstraints="NO" id="6MK-0e-NrQ">
+                                                        <rect key="frame" x="-1" y="39.5" width="344" height="17"/>
+                                                        <buttonCell key="cell" type="check" title="Use Space to confirm candidate in Per-Char Select Mode" bezelStyle="regularSquare" imagePosition="left" controlSize="small" inset="2" id="clN-4A-iec">
+                                                            <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
+                                                            <font key="font" metaFont="cellTitle"/>
+                                                        </buttonCell>
+                                                        <constraints>
+                                                            <constraint firstAttribute="height" constant="16" id="0mM-np-pTV"/>
+                                                        </constraints>
+                                                        <connections>
+                                                            <binding destination="32" name="value" keyPath="values.UseSpaceToCommitHighlightedSCPCCandidate" id="NNu-k7-eSF"/>
+                                                        </connections>
+                                                    </button>
+                                                    <button translatesAutoresizingMaskIntoConstraints="NO" id="a6O-JL-C4g">
+                                                        <rect key="frame" x="-1" y="19.5" width="247" height="17"/>
+                                                        <buttonCell key="cell" type="check" title="Accept leading intonations in rare cases" bezelStyle="regularSquare" imagePosition="left" controlSize="small" inset="2" id="lblAcceptLeadingIntonations">
+                                                            <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
+                                                            <font key="font" metaFont="cellTitle"/>
+                                                        </buttonCell>
+                                                        <constraints>
+                                                            <constraint firstAttribute="height" constant="16" id="WkD-Wx-erN"/>
+                                                        </constraints>
+                                                        <connections>
+                                                            <binding destination="32" name="value" keyPath="values.AcceptLeadingIntonations" id="l0S-gB-ckP"/>
+                                                        </connections>
+                                                    </button>
+                                                    <button translatesAutoresizingMaskIntoConstraints="NO" id="7QM-7z-tpq">
+                                                        <rect key="frame" x="-1" y="-0.5" width="233" height="17"/>
+                                                        <buttonCell key="cell" type="check" title="Always show tooltip texts horizontally" bezelStyle="regularSquare" imagePosition="left" controlSize="small" inset="2" id="lblAlwaysShowTooltipTextsHorizontally">
+                                                            <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
+                                                            <font key="font" metaFont="cellTitle"/>
+                                                        </buttonCell>
+                                                        <constraints>
+                                                            <constraint firstAttribute="height" constant="16" id="fuj-Jy-rz7"/>
+                                                        </constraints>
+                                                        <connections>
+                                                            <binding destination="32" name="value" keyPath="values.AlwaysShowTooltipTextsHorizontally" id="szi-4g-EIC"/>
+                                                        </connections>
+                                                    </button>
+                                                </subviews>
+                                                <constraints>
+                                                    <constraint firstAttribute="width" constant="500" id="6CO-wp-p8q"/>
+                                                </constraints>
+                                                <visibilityPriorities>
+                                                    <integer value="1000"/>
+                                                    <integer value="1000"/>
+                                                    <integer value="1000"/>
+                                                    <integer value="1000"/>
+                                                    <integer value="1000"/>
+                                                    <integer value="1000"/>
+                                                </visibilityPriorities>
+                                                <customSpacing>
+                                                    <real value="3.4028234663852886e+38"/>
+                                                    <real value="3.4028234663852886e+38"/>
+                                                    <real value="3.4028234663852886e+38"/>
+                                                    <real value="3.4028234663852886e+38"/>
+                                                    <real value="3.4028234663852886e+38"/>
+                                                    <real value="3.4028234663852886e+38"/>
+                                                </customSpacing>
+                                            </stackView>
+                                            <box verticalHuggingPriority="750" boxType="separator" translatesAutoresizingMaskIntoConstraints="NO" id="6qi-Y2-zpC">
+                                                <rect key="frame" x="0.0" y="283" width="500" height="5"/>
+                                                <constraints>
+                                                    <constraint firstAttribute="width" relation="greaterThanOrEqual" constant="500" id="GWa-YK-K1v"/>
+                                                </constraints>
+                                            </box>
+                                            <stackView distribution="fill" orientation="vertical" alignment="leading" spacing="5" horizontalStackHuggingPriority="249.99998474121094" verticalStackHuggingPriority="249.99998474121094" translatesAutoresizingMaskIntoConstraints="NO" id="TiS-ka-72K">
+                                                <rect key="frame" x="0.0" y="178" width="500" height="98"/>
+                                                <subviews>
+                                                    <button translatesAutoresizingMaskIntoConstraints="NO" id="mug-xq-Lmy">
+                                                        <rect key="frame" x="-1" y="81.5" width="314" height="17"/>
+                                                        <buttonCell key="cell" type="check" title="Share alphanumerical mode status across all clients" bezelStyle="regularSquare" imagePosition="left" controlSize="small" inset="2" id="K8U-Oq-lFc">
+                                                            <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
+                                                            <font key="font" metaFont="cellTitle"/>
+                                                        </buttonCell>
+                                                        <constraints>
+                                                            <constraint firstAttribute="height" constant="16" id="SHw-vN-0jF"/>
+                                                        </constraints>
+                                                        <connections>
+                                                            <binding destination="32" name="value" keyPath="values.ShareAlphanumericalModeStatusAcrossClients" id="fG7-I0-pqu"/>
+                                                        </connections>
+                                                    </button>
+                                                    <button translatesAutoresizingMaskIntoConstraints="NO" id="P2l-TU-TcG">
+                                                        <rect key="frame" x="-1" y="60.5" width="456" height="17"/>
+                                                        <buttonCell key="cell" type="check" title="Sync the off state between Caps Lock and Shift / Eisu Alphanumerical Toggle" bezelStyle="regularSquare" imagePosition="left" controlSize="small" inset="2" id="chkShiftEisuToggleOffTogetherWithCapsLock">
+                                                            <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
+                                                            <font key="font" metaFont="cellTitle"/>
+                                                        </buttonCell>
+                                                        <constraints>
+                                                            <constraint firstAttribute="height" constant="16" id="Pqi-IA-QKj"/>
+                                                            <constraint firstAttribute="width" relation="greaterThanOrEqual" constant="70" id="u2R-CU-TzQ"/>
+                                                        </constraints>
+                                                        <connections>
+                                                            <binding destination="32" name="value" keyPath="values.ShiftEisuToggleOffTogetherWithCapsLock" id="brB-ug-zJf"/>
+                                                        </connections>
+                                                    </button>
+                                                    <textField wantsLayer="YES" focusRingType="none" verticalHuggingPriority="750" setsMaxLayoutWidthAtFirstLayout="YES" translatesAutoresizingMaskIntoConstraints="NO" id="oIo-cW-mrw">
+                                                        <rect key="frame" x="-2" y="0.0" width="504" height="56"/>
+                                                        <constraints>
+                                                            <constraint firstAttribute="width" constant="500" id="9Sb-CJ-a0l"/>
+                                                        </constraints>
+                                                        <textFieldCell key="cell" controlSize="small" sendsActionOnEndEditing="YES" alignment="left" id="lblShiftEisuToggleOffTogetherWithCapsLock">
+                                                            <font key="font" metaFont="smallSystem"/>
+                                                            <string key="title">This does: 1) On macOS 12 and later, if the Caps Lock gets turned off, then the internal switch for Shift-key / JIS-Eisu-key Alphanumerical Mode Toggle will also be switched off. 2) If you have turned off the same switch by JIS-Eisu key, then the Caps Lock gets turned off together. Note: vChewing has no way to recognize single hits of Shift key when Caps Lock is on.</string>
+                                                            <color key="textColor" name="secondaryLabelColor" catalog="System" colorSpace="catalog"/>
+                                                            <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
+                                                        </textFieldCell>
+                                                    </textField>
+                                                </subviews>
+                                                <constraints>
+                                                    <constraint firstAttribute="width" constant="500" id="fhc-Sp-glm"/>
+                                                </constraints>
+                                                <visibilityPriorities>
+                                                    <integer value="1000"/>
+                                                    <integer value="1000"/>
+                                                    <integer value="1000"/>
+                                                </visibilityPriorities>
+                                                <customSpacing>
+                                                    <real value="3.4028234663852886e+38"/>
+                                                    <real value="3.4028234663852886e+38"/>
+                                                    <real value="3.4028234663852886e+38"/>
+                                                </customSpacing>
+                                            </stackView>
+                                            <box verticalHuggingPriority="750" boxType="separator" translatesAutoresizingMaskIntoConstraints="NO" id="hbf-W6-jPz">
+                                                <rect key="frame" x="0.0" y="166" width="500" height="5"/>
+                                                <constraints>
+                                                    <constraint firstAttribute="width" relation="greaterThanOrEqual" constant="500" id="b3g-9g-4jw"/>
+                                                </constraints>
+                                            </box>
+                                            <stackView distribution="fill" orientation="vertical" alignment="leading" spacing="5" horizontalStackHuggingPriority="249.99998474121094" verticalStackHuggingPriority="249.99998474121094" translatesAutoresizingMaskIntoConstraints="NO" id="UFf-Pi-9Jt" userLabel="stkShiftKeyASCIITogglesPane">
+                                                <rect key="frame" x="0.0" y="0.0" width="500" height="159"/>
+                                                <subviews>
+                                                    <textField focusRingType="none" horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="8jJ-wr-Hhm">
+                                                        <rect key="frame" x="-2" y="143" width="413" height="16"/>
+                                                        <constraints>
+                                                            <constraint firstAttribute="height" constant="16" id="JwL-81-H33"/>
+                                                        </constraints>
+                                                        <textFieldCell key="cell" controlSize="small" lineBreakMode="clipping" title="Shift-key Alphanumerical Mode Toggle (not work if CapsLock is ON)" id="ZEv-Q2-mYN">
+                                                            <font key="font" metaFont="systemBold" size="12"/>
+                                                            <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
+                                                            <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
+                                                        </textFieldCell>
+                                                    </textField>
+                                                    <button translatesAutoresizingMaskIntoConstraints="NO" id="47z-Kc-MdV">
+                                                        <rect key="frame" x="-1" y="121.5" width="268" height="17"/>
+                                                        <buttonCell key="cell" type="check" title="Toggle alphanumerical mode with Left-Shift" bezelStyle="regularSquare" imagePosition="left" controlSize="small" inset="2" id="CVy-8U-3qQ">
+                                                            <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
+                                                            <font key="font" metaFont="cellTitle"/>
+                                                        </buttonCell>
+                                                        <constraints>
+                                                            <constraint firstAttribute="width" relation="greaterThanOrEqual" constant="70" id="JyP-8L-nph"/>
+                                                            <constraint firstAttribute="height" constant="16" id="uE2-0S-Bgm"/>
+                                                        </constraints>
+                                                        <connections>
+                                                            <binding destination="32" name="value" keyPath="values.TogglingAlphanumericalModeWithLShift" id="L1D-gV-tCC"/>
+                                                        </connections>
+                                                    </button>
+                                                    <button translatesAutoresizingMaskIntoConstraints="NO" id="taP-hv-eg2">
+                                                        <rect key="frame" x="-1" y="100.5" width="276" height="17"/>
+                                                        <buttonCell key="cell" type="check" title="Toggle alphanumerical mode with Right-Shift" bezelStyle="regularSquare" imagePosition="left" controlSize="small" inset="2" id="nxP-CV-ZAu">
+                                                            <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
+                                                            <font key="font" metaFont="cellTitle"/>
+                                                        </buttonCell>
+                                                        <constraints>
+                                                            <constraint firstAttribute="width" relation="greaterThanOrEqual" constant="70" id="mzA-do-IWc"/>
+                                                            <constraint firstAttribute="height" constant="16" id="uiX-bl-Lww"/>
+                                                        </constraints>
+                                                        <connections>
+                                                            <binding destination="32" name="value" keyPath="values.TogglingAlphanumericalModeWithRShift" id="4qK-TY-SFb"/>
+                                                        </connections>
+                                                    </button>
+                                                    <textField wantsLayer="YES" focusRingType="none" verticalHuggingPriority="750" setsMaxLayoutWidthAtFirstLayout="YES" translatesAutoresizingMaskIntoConstraints="NO" id="Dec-3q-bsx">
+                                                        <rect key="frame" x="-2" y="40" width="504" height="56"/>
+                                                        <constraints>
+                                                            <constraint firstAttribute="width" constant="500" id="wkg-gt-KuK"/>
+                                                        </constraints>
+                                                        <textFieldCell key="cell" controlSize="small" sendsActionOnEndEditing="YES" alignment="left" id="Rl7-3a-RDn">
+                                                            <font key="font" metaFont="smallSystem"/>
+                                                            <string key="title">This feature only needs to parse consecutive NSEvents passed by macOS built-in InputMethodKit framework, hence no necessity of asking end-users for extra privileges of monitoring global keyboard inputs. You are free to investigate our codebase or reverse-engineer this input method to see whether the above statement is trustable.</string>
+                                                            <color key="textColor" name="secondaryLabelColor" catalog="System" colorSpace="catalog"/>
+                                                            <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
+                                                        </textFieldCell>
+                                                    </textField>
+                                                    <button translatesAutoresizingMaskIntoConstraints="NO" id="Ku4-rR-MdM">
+                                                        <rect key="frame" x="-1" y="18.5" width="301" height="17"/>
+                                                        <buttonCell key="cell" type="check" title="Bypass the vChewing built-in Caps Lock handling" bezelStyle="regularSquare" imagePosition="left" controlSize="small" inset="2" id="chkBypassNonAppleCapsLockHandling">
+                                                            <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
+                                                            <font key="font" metaFont="cellTitle"/>
+                                                        </buttonCell>
+                                                        <constraints>
+                                                            <constraint firstAttribute="height" constant="16" id="mcc-F4-zF2"/>
+                                                            <constraint firstAttribute="width" relation="greaterThanOrEqual" constant="70" id="scf-fg-8nh"/>
+                                                        </constraints>
+                                                        <connections>
+                                                            <binding destination="32" name="value" keyPath="values.BypassNonAppleCapsLockHandling" id="vym-AR-tlm"/>
+                                                        </connections>
+                                                    </button>
+                                                    <textField wantsLayer="YES" focusRingType="none" verticalHuggingPriority="750" setsMaxLayoutWidthAtFirstLayout="YES" translatesAutoresizingMaskIntoConstraints="NO" id="7le-2d-a1D">
+                                                        <rect key="frame" x="-2" y="0.0" width="435" height="14"/>
+                                                        <constraints>
+                                                            <constraint firstAttribute="width" constant="537" id="Zi4-sa-ncL"/>
+                                                        </constraints>
+                                                        <textFieldCell key="cell" controlSize="small" sendsActionOnEndEditing="YES" alignment="left" title="This won't affect the same feature offered by macOS since 10.14 Mojave and later." id="lblBypassNonAppleCapsLockHandling">
+                                                            <font key="font" metaFont="smallSystem"/>
+                                                            <color key="textColor" name="secondaryLabelColor" catalog="System" colorSpace="catalog"/>
+                                                            <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
+                                                        </textFieldCell>
+                                                    </textField>
+                                                </subviews>
+                                                <constraints>
+                                                    <constraint firstAttribute="width" constant="500" id="znF-Rv-kbc"/>
+                                                </constraints>
+                                                <visibilityPriorities>
+                                                    <integer value="1000"/>
+                                                    <integer value="1000"/>
+                                                    <integer value="1000"/>
+                                                    <integer value="1000"/>
+                                                    <integer value="1000"/>
+                                                    <integer value="1000"/>
+                                                </visibilityPriorities>
+                                                <customSpacing>
+                                                    <real value="3.4028234663852886e+38"/>
+                                                    <real value="3.4028234663852886e+38"/>
+                                                    <real value="3.4028234663852886e+38"/>
+                                                    <real value="3.4028234663852886e+38"/>
+                                                    <real value="3.4028234663852886e+38"/>
+                                                    <real value="3.4028234663852886e+38"/>
+                                                </customSpacing>
+                                            </stackView>
+                                        </subviews>
+                                        <visibilityPriorities>
+                                            <integer value="1000"/>
+                                            <integer value="1000"/>
+                                            <integer value="1000"/>
+                                            <integer value="1000"/>
+                                            <integer value="1000"/>
+                                        </visibilityPriorities>
+                                        <customSpacing>
+                                            <real value="3.4028234663852886e+38"/>
+                                            <real value="3.4028234663852886e+38"/>
+                                            <real value="3.4028234663852886e+38"/>
+                                            <real value="3.4028234663852886e+38"/>
+                                            <real value="3.4028234663852886e+38"/>
+                                        </customSpacing>
+                                    </stackView>
+                                </subviews>
+                                <constraints>
+                                    <constraint firstItem="a1o-Sq-maq" firstAttribute="top" secondItem="Tdf-hU-qXZ" secondAttribute="top" constant="3" id="4Wl-9P-Ke4"/>
+                                    <constraint firstItem="a1o-Sq-maq" firstAttribute="leading" secondItem="Tdf-hU-qXZ" secondAttribute="leading" constant="17" id="dlW-Wc-okM"/>
+                                </constraints>
+                            </view>
+                        </tabViewItem>
+                        <tabViewItem label="B" identifier="" id="ZkQ-yN-6Op">
+                            <view key="view" ambiguous="YES" id="zBQ-e0-37m">
+                                <rect key="frame" x="10" y="33" width="531" height="462"/>
+                                <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                                <subviews>
+                                    <stackView distribution="fill" orientation="vertical" alignment="leading" horizontalStackHuggingPriority="249.99998474121094" verticalStackHuggingPriority="249.99998474121094" ambiguous="YES" translatesAutoresizingMaskIntoConstraints="NO" id="j9R-fB-ttM">
+                                        <rect key="frame" x="17" y="77" width="449" height="382"/>
+                                        <subviews>
+                                            <stackView distribution="fill" orientation="vertical" alignment="leading" horizontalStackHuggingPriority="249.99998474121094" verticalStackHuggingPriority="249.99998474121094" translatesAutoresizingMaskIntoConstraints="NO" id="fO5-4y-X0y">
+                                                <rect key="frame" x="0.0" y="344" width="365" height="38"/>
+                                                <subviews>
+                                                    <textField focusRingType="none" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="TMn-LX-3Ub">
+                                                        <rect key="frame" x="-2" y="23" width="369" height="15"/>
+                                                        <textFieldCell key="cell" controlSize="small" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" alignment="left" title="Choose the behavior of (Shift+)Tab key in the candidate window." id="ueU-Rz-a1C">
+                                                            <font key="font" metaFont="cellTitle"/>
+                                                            <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
+                                                            <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
+                                                        </textFieldCell>
+                                                    </textField>
+                                                    <matrix wantsLayer="YES" verticalHuggingPriority="750" allowsEmptySelection="NO" translatesAutoresizingMaskIntoConstraints="NO" id="n7q-ew-DYu">
+                                                        <rect key="frame" x="0.0" y="0.0" width="290" height="15"/>
+                                                        <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
+                                                        <size key="cellSize" width="143" height="15"/>
+                                                        <size key="intercellSpacing" width="4" height="2"/>
+                                                        <buttonCell key="prototype" type="radio" title="Radio" imagePosition="left" alignment="left" controlSize="small" inset="2" id="6Hs-cH-sbg">
+                                                            <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
+                                                            <font key="font" metaFont="cellTitle"/>
+                                                        </buttonCell>
+                                                        <cells>
+                                                            <column>
+                                                                <buttonCell type="radio" title="Revolving Candidates" imagePosition="left" alignment="left" controlSize="small" state="on" inset="2" id="FVC-br-H57">
+                                                                    <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
+                                                                    <font key="font" metaFont="cellTitle"/>
+                                                                </buttonCell>
+                                                            </column>
+                                                            <column>
+                                                                <buttonCell type="radio" title="Revolving Pages" imagePosition="left" alignment="left" controlSize="small" tag="1" inset="2" id="s7u-Fm-dVg">
+                                                                    <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
+                                                                    <font key="font" metaFont="cellTitle"/>
+                                                                </buttonCell>
+                                                            </column>
+                                                        </cells>
+                                                        <connections>
+                                                            <binding destination="32" name="selectedTag" keyPath="values.SpecifyShiftTabKeyBehavior" id="R1A-Ji-8i2"/>
+                                                        </connections>
+                                                    </matrix>
+                                                </subviews>
+                                                <visibilityPriorities>
+                                                    <integer value="1000"/>
+                                                    <integer value="1000"/>
+                                                </visibilityPriorities>
+                                                <customSpacing>
+                                                    <real value="3.4028234663852886e+38"/>
+                                                    <real value="3.4028234663852886e+38"/>
+                                                </customSpacing>
+                                            </stackView>
+                                            <stackView distribution="fill" orientation="vertical" alignment="leading" horizontalStackHuggingPriority="249.99998474121094" verticalStackHuggingPriority="249.99998474121094" translatesAutoresizingMaskIntoConstraints="NO" id="EOx-os-rU9">
+                                                <rect key="frame" x="0.0" y="262" width="381" height="74"/>
+                                                <subviews>
+                                                    <textField focusRingType="none" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="sjl-L6-qdY">
+                                                        <rect key="frame" x="-2" y="59" width="385" height="15"/>
+                                                        <textFieldCell key="cell" controlSize="small" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" alignment="left" title="Specify what intonation key does when syllable composer is empty." id="lblIntonationKeyBehavior">
+                                                            <font key="font" metaFont="cellTitle"/>
+                                                            <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
+                                                            <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
+                                                        </textFieldCell>
+                                                    </textField>
+                                                    <matrix wantsLayer="YES" verticalHuggingPriority="750" allowsEmptySelection="NO" translatesAutoresizingMaskIntoConstraints="NO" id="15D-3C-qwe">
+                                                        <rect key="frame" x="0.0" y="0.0" width="380" height="51"/>
+                                                        <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
+                                                        <size key="cellSize" width="380" height="15"/>
+                                                        <size key="intercellSpacing" width="4" height="3"/>
+                                                        <buttonCell key="prototype" type="radio" title="Radio" imagePosition="left" alignment="left" controlSize="small" inset="2" id="kct-wG-rSl">
+                                                            <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
+                                                            <font key="font" metaFont="cellTitle"/>
+                                                        </buttonCell>
+                                                        <cells>
+                                                            <column>
+                                                                <buttonCell type="radio" title="Override the previous reading's intonation with candidate-reset" imagePosition="left" alignment="left" controlSize="small" state="on" inset="2" id="rdoIntonationKeyBehavior0">
+                                                                    <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
+                                                                    <font key="font" metaFont="cellTitle"/>
+                                                                </buttonCell>
+                                                                <buttonCell type="radio" title="Only override the intonation of the previous reading if different" imagePosition="left" alignment="left" controlSize="small" tag="1" inset="2" id="rdoIntonationKeyBehavior1">
+                                                                    <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
+                                                                    <font key="font" metaFont="cellTitle"/>
+                                                                </buttonCell>
+                                                                <buttonCell type="radio" title="Always type intonations to the inline composition buffer" imagePosition="left" alignment="left" controlSize="small" tag="2" inset="2" id="rdoIntonationKeyBehavior2">
+                                                                    <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
+                                                                    <font key="font" metaFont="cellTitle"/>
+                                                                </buttonCell>
+                                                            </column>
+                                                        </cells>
+                                                        <connections>
+                                                            <binding destination="32" name="selectedTag" keyPath="values.SpecifyIntonationKeyBehavior" id="k3O-tW-1Zy"/>
+                                                        </connections>
+                                                    </matrix>
+                                                </subviews>
+                                                <visibilityPriorities>
+                                                    <integer value="1000"/>
+                                                    <integer value="1000"/>
+                                                </visibilityPriorities>
+                                                <customSpacing>
+                                                    <real value="3.4028234663852886e+38"/>
+                                                    <real value="3.4028234663852886e+38"/>
+                                                </customSpacing>
+                                            </stackView>
+                                            <stackView distribution="fill" orientation="vertical" alignment="leading" spacing="7" horizontalStackHuggingPriority="249.99998474121094" verticalStackHuggingPriority="249.99998474121094" translatesAutoresizingMaskIntoConstraints="NO" id="L1h-Ce-g4Z">
+                                                <rect key="frame" x="0.0" y="145" width="449" height="109"/>
+                                                <subviews>
+                                                    <textField focusRingType="none" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="6q5-OP-iEb">
+                                                        <rect key="frame" x="-2" y="94" width="332" height="15"/>
+                                                        <textFieldCell key="cell" controlSize="small" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" alignment="left" title="Choose the behavior of Shift+Letter key with letter inputs." id="lblUpperCaseLetterKeyBehavior">
+                                                            <font key="font" metaFont="cellTitle"/>
+                                                            <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
+                                                            <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
+                                                        </textFieldCell>
+                                                    </textField>
+                                                    <matrix wantsLayer="YES" verticalHuggingPriority="750" allowsEmptySelection="NO" translatesAutoresizingMaskIntoConstraints="NO" id="veW-XM-HGs">
+                                                        <rect key="frame" x="0.0" y="0.0" width="449" height="87"/>
+                                                        <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
+                                                        <size key="cellSize" width="449" height="15"/>
+                                                        <size key="intercellSpacing" width="4" height="3"/>
+                                                        <buttonCell key="prototype" type="radio" title="Radio" imagePosition="left" alignment="left" controlSize="small" inset="2" id="Fxk-tK-cP7">
+                                                            <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
+                                                            <font key="font" metaFont="cellTitle"/>
+                                                        </buttonCell>
+                                                        <cells>
+                                                            <column>
+                                                                <buttonCell type="radio" title="Type them into inline composition buffer" imagePosition="left" alignment="left" controlSize="small" state="on" inset="2" id="rdoUpperCaseLetterKeyBehavior0">
+                                                                    <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
+                                                                    <font key="font" metaFont="cellTitle"/>
+                                                                </buttonCell>
+                                                                <buttonCell type="radio" title="Always directly commit lowercased letters" imagePosition="left" alignment="left" controlSize="small" tag="1" inset="2" id="rdoUpperCaseLetterKeyBehavior1">
+                                                                    <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
+                                                                    <font key="font" metaFont="cellTitle"/>
+                                                                </buttonCell>
+                                                                <buttonCell type="radio" title="Always directly commit uppercased letters" imagePosition="left" alignment="left" controlSize="small" tag="2" inset="2" id="rdoUpperCaseLetterKeyBehavior2">
+                                                                    <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
+                                                                    <font key="font" metaFont="cellTitle"/>
+                                                                </buttonCell>
+                                                                <buttonCell type="radio" title="Directly commit lowercased letters only if the compositor is empty" imagePosition="left" alignment="left" controlSize="small" tag="3" inset="2" id="rdoUpperCaseLetterKeyBehavior3">
+                                                                    <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
+                                                                    <font key="font" metaFont="cellTitle"/>
+                                                                </buttonCell>
+                                                                <buttonCell type="radio" title="Directly commit uppercased letters only if the compositor is empty" imagePosition="left" alignment="left" controlSize="small" tag="4" inset="2" id="rdoUpperCaseLetterKeyBehavior4">
+                                                                    <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
+                                                                    <font key="font" metaFont="cellTitle"/>
+                                                                </buttonCell>
+                                                            </column>
+                                                        </cells>
+                                                        <connections>
+                                                            <binding destination="32" name="selectedTag" keyPath="values.UpperCaseLetterKeyBehavior" id="fCQ-Ru-Fuq"/>
+                                                        </connections>
+                                                    </matrix>
+                                                </subviews>
+                                                <visibilityPriorities>
+                                                    <integer value="1000"/>
+                                                    <integer value="1000"/>
+                                                </visibilityPriorities>
+                                                <customSpacing>
+                                                    <real value="3.4028234663852886e+38"/>
+                                                    <real value="3.4028234663852886e+38"/>
+                                                </customSpacing>
+                                            </stackView>
+                                            <stackView distribution="fill" orientation="vertical" alignment="leading" horizontalStackHuggingPriority="249.99998474121094" verticalStackHuggingPriority="249.99998474121094" translatesAutoresizingMaskIntoConstraints="NO" id="NOW-jd-XBh">
+                                                <rect key="frame" x="0.0" y="81" width="358" height="56"/>
+                                                <subviews>
+                                                    <textField focusRingType="none" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="J0f-Aw-dxC">
+                                                        <rect key="frame" x="-2" y="41" width="336" height="15"/>
+                                                        <textFieldCell key="cell" controlSize="small" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" alignment="left" title="Choose the behavior of (Shift+)Space key with candidates." id="Pg5-G9-pY5">
+                                                            <font key="font" metaFont="cellTitle"/>
+                                                            <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
+                                                            <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
+                                                        </textFieldCell>
+                                                    </textField>
+                                                    <matrix wantsLayer="YES" verticalHuggingPriority="750" allowsEmptySelection="NO" translatesAutoresizingMaskIntoConstraints="NO" id="YkJ-lr-EP6">
+                                                        <rect key="frame" x="0.0" y="0.0" width="358" height="33"/>
+                                                        <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
+                                                        <size key="cellSize" width="358" height="15"/>
+                                                        <size key="intercellSpacing" width="4" height="3"/>
+                                                        <buttonCell key="prototype" type="radio" title="Radio" imagePosition="left" alignment="left" controlSize="small" inset="2" id="8V2-DR-rwL">
+                                                            <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
+                                                            <font key="font" metaFont="cellTitle"/>
+                                                        </buttonCell>
+                                                        <cells>
+                                                            <column>
+                                                                <buttonCell type="radio" title="Space to +revolve candidates, Shift+Space t+revolve pages" imagePosition="left" alignment="left" controlSize="small" state="on" inset="2" id="dIN-TZ-67g">
+                                                                    <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
+                                                                    <font key="font" metaFont="cellTitle"/>
+                                                                </buttonCell>
+                                                                <buttonCell type="radio" title="Space to +revolve pages, Shift+Space t+revolve candidates" imagePosition="left" alignment="left" controlSize="small" tag="1" inset="2" id="XqL-rf-X6d">
+                                                                    <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
+                                                                    <font key="font" metaFont="cellTitle"/>
+                                                                </buttonCell>
+                                                            </column>
+                                                        </cells>
+                                                        <connections>
+                                                            <binding destination="32" name="selectedTag" keyPath="values.SpecifyShiftSpaceKeyBehavior" id="Ajq-3d-Lh1"/>
+                                                        </connections>
+                                                    </matrix>
+                                                </subviews>
+                                                <visibilityPriorities>
+                                                    <integer value="1000"/>
+                                                    <integer value="1000"/>
+                                                </visibilityPriorities>
+                                                <customSpacing>
+                                                    <real value="3.4028234663852886e+38"/>
+                                                    <real value="3.4028234663852886e+38"/>
+                                                </customSpacing>
+                                            </stackView>
+                                            <stackView distribution="fill" orientation="vertical" alignment="leading" spacing="7" horizontalStackHuggingPriority="249.99998474121094" verticalStackHuggingPriority="249.99998474121094" translatesAutoresizingMaskIntoConstraints="NO" id="s47-wG-vKA">
+                                                <rect key="frame" x="0.0" y="0.0" width="348" height="73"/>
+                                                <subviews>
+                                                    <textField focusRingType="none" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="iCL-n8-VTP">
+                                                        <rect key="frame" x="-2" y="58" width="323" height="15"/>
+                                                        <textFieldCell key="cell" controlSize="small" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" alignment="left" title="Choose the attempted behavior of Shift+BackSpace key." id="lblShiftBkspKeyBehavior">
+                                                            <font key="font" metaFont="cellTitle"/>
+                                                            <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
+                                                            <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
+                                                        </textFieldCell>
+                                                    </textField>
+                                                    <matrix wantsLayer="YES" verticalHuggingPriority="750" allowsEmptySelection="NO" translatesAutoresizingMaskIntoConstraints="NO" id="pKb-qa-Tku">
+                                                        <rect key="frame" x="0.0" y="0.0" width="348" height="51"/>
+                                                        <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
+                                                        <size key="cellSize" width="348" height="15"/>
+                                                        <size key="intercellSpacing" width="4" height="3"/>
+                                                        <buttonCell key="prototype" type="radio" title="Radio" imagePosition="left" alignment="left" controlSize="small" inset="2" id="Bqo-H8-c8p">
+                                                            <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
+                                                            <font key="font" metaFont="cellTitle"/>
+                                                        </buttonCell>
+                                                        <cells>
+                                                            <column>
+                                                                <buttonCell type="radio" title="Disassemble the previous reading, dropping its intonation" imagePosition="left" alignment="left" controlSize="small" state="on" inset="2" id="rdoShiftBkspKeyBehavior0">
+                                                                    <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
+                                                                    <font key="font" metaFont="cellTitle"/>
+                                                                </buttonCell>
+                                                                <buttonCell type="radio" title="Clear the entire inline composition buffer like Shift+Delete" imagePosition="left" alignment="left" controlSize="small" tag="1" inset="2" id="rdoShiftBkspKeyBehavior1">
+                                                                    <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
+                                                                    <font key="font" metaFont="cellTitle"/>
+                                                                </buttonCell>
+                                                                <buttonCell type="radio" title="Always drop the previous reading" imagePosition="left" alignment="left" controlSize="small" tag="2" inset="2" id="rdoShiftBkspKeyBehavior2">
+                                                                    <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
+                                                                    <font key="font" metaFont="cellTitle"/>
+                                                                </buttonCell>
+                                                            </column>
+                                                        </cells>
+                                                        <connections>
+                                                            <binding destination="32" name="selectedTag" keyPath="values.SpecifyShiftBackSpaceKeyBehavior" id="6Bn-Sh-hiE"/>
+                                                        </connections>
+                                                    </matrix>
+                                                </subviews>
+                                                <visibilityPriorities>
+                                                    <integer value="1000"/>
+                                                    <integer value="1000"/>
+                                                </visibilityPriorities>
+                                                <customSpacing>
+                                                    <real value="3.4028234663852886e+38"/>
+                                                    <real value="3.4028234663852886e+38"/>
+                                                </customSpacing>
+                                            </stackView>
+                                        </subviews>
+                                        <visibilityPriorities>
+                                            <integer value="1000"/>
+                                            <integer value="1000"/>
+                                            <integer value="1000"/>
+                                            <integer value="1000"/>
+                                            <integer value="1000"/>
+                                        </visibilityPriorities>
+                                        <customSpacing>
+                                            <real value="3.4028234663852886e+38"/>
+                                            <real value="3.4028234663852886e+38"/>
+                                            <real value="3.4028234663852886e+38"/>
+                                            <real value="3.4028234663852886e+38"/>
+                                            <real value="3.4028234663852886e+38"/>
+                                        </customSpacing>
+                                    </stackView>
+                                </subviews>
+                                <constraints>
+                                    <constraint firstItem="j9R-fB-ttM" firstAttribute="leading" secondItem="zBQ-e0-37m" secondAttribute="leading" constant="17" id="Q4O-zS-YN9"/>
+                                    <constraint firstItem="j9R-fB-ttM" firstAttribute="top" secondItem="zBQ-e0-37m" secondAttribute="top" constant="3" id="r1l-XB-FHz"/>
+                                </constraints>
+                            </view>
+                        </tabViewItem>
+                    </tabViewItems>
+                </tabView>
             </subviews>
             <constraints>
-                <constraint firstItem="j9R-fB-ttM" firstAttribute="leading" secondItem="XWo-36-xGi" secondAttribute="leading" constant="20" symbolic="YES" id="4lO-GJ-Cpr"/>
-                <constraint firstItem="j9R-fB-ttM" firstAttribute="top" secondItem="XWo-36-xGi" secondAttribute="top" constant="20" symbolic="YES" id="CuZ-dn-mQZ"/>
+                <constraint firstAttribute="trailing" secondItem="3dr-gK-PDv" secondAttribute="trailing" constant="20" symbolic="YES" id="KNC-41-aT7"/>
+                <constraint firstItem="3dr-gK-PDv" firstAttribute="top" secondItem="XWo-36-xGi" secondAttribute="top" constant="9" id="PkB-f1-9PN"/>
+                <constraint firstAttribute="bottom" secondItem="3dr-gK-PDv" secondAttribute="bottom" constant="25" id="VYs-lj-dYd"/>
+                <constraint firstItem="3dr-gK-PDv" firstAttribute="leading" secondItem="XWo-36-xGi" secondAttribute="leading" constant="20" symbolic="YES" id="kcB-Q0-i7E"/>
             </constraints>
             <accessibility identifier="vwrBehavior"/>
-            <point key="canvasLocation" x="-1351.5" y="738.5"/>
+            <point key="canvasLocation" x="-1622.5" y="695"/>
         </view>
         <userDefaultsController representsSharedInstance="YES" id="32"/>
         <view id="Rnp-LM-RIF" userLabel="vwrDictionary">
@@ -1837,7 +1879,7 @@
                             <rect key="frame" x="0.0" y="71" width="538" height="370"/>
                             <clipView key="contentView" drawsBackground="NO" id="x8s-wo-bxi">
                                 <rect key="frame" x="0.0" y="0.0" width="538" height="370"/>
-                                <autoresizingMask key="autoresizingMask"/>
+                                <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                 <subviews>
                                     <textView wantsLayer="YES" importsGraphics="NO" richText="NO" verticallyResizable="YES" allowsUndo="YES" smartInsertDelete="YES" id="kSG-dz-P2N">
                                         <rect key="frame" x="0.0" y="0.0" width="538" height="370"/>
@@ -2743,24 +2785,5 @@ Features listed here may not work as expected.</string>
             <accessibility identifier="vwrDevZone"/>
             <point key="canvasLocation" x="-85.5" y="529"/>
         </view>
-        <stackView distribution="fill" orientation="vertical" alignment="leading" spacing="4" horizontalStackHuggingPriority="249.99998474121094" verticalStackHuggingPriority="249.99998474121094" id="pcw-0g-uWR">
-            <rect key="frame" x="0.0" y="120" width="530" height="1"/>
-            <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
-            <subviews>
-                <box verticalHuggingPriority="750" boxType="separator" translatesAutoresizingMaskIntoConstraints="NO" id="OWF-GZ-q7h">
-                    <rect key="frame" x="0.0" y="-2" width="530" height="5"/>
-                    <constraints>
-                        <constraint firstAttribute="width" relation="greaterThanOrEqual" constant="530" id="abr-dE-eqh"/>
-                    </constraints>
-                </box>
-            </subviews>
-            <visibilityPriorities>
-                <integer value="1000"/>
-            </visibilityPriorities>
-            <customSpacing>
-                <real value="3.4028234663852886e+38"/>
-            </customSpacing>
-            <point key="canvasLocation" x="-1902" y="1286"/>
-        </stackView>
     </objects>
 </document>
