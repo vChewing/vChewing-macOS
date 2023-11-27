@@ -54,6 +54,7 @@
 "chkFetchSuggestionsFromUserOverrideModel.title" = "在敲字时自动套用来自半衰记忆模组的建议";
 "chkHardenVerticalPunctuations.title" = "在纵排书写时，强制转换标点为纵排形式（不推荐）";
 "chkKeepReadingUponCompositionError.title" = "允许对无效的读音使用 BackSpace 编辑";
+"chkRespectClientAccentColor.title" = "遵循客体应用或系统全局的强调色偏好设定";
 "chkShiftEisuToggleOffTogetherWithCapsLock.title" = "使「Shift 键 / JIS 英数键」英数模式的关闭状态与 Caps Lock 的关闭状态保持彼此同步";
 "chkUseFixedCandidateOrderOnSelection.title" = "以固定顺序来陈列选字窗内的候选字";
 "clN-4A-iec.title" = "在逐字选字模式当中使用空格键确认当前高亮候选字";

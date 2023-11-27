@@ -54,6 +54,7 @@
 "chkFetchSuggestionsFromUserOverrideModel.title" = "Applying typing suggestions from half-life user override model";
 "chkHardenVerticalPunctuations.title" = "Harden vertical punctuations during vertical typing";
 "chkKeepReadingUponCompositionError.title" = "Allow backspace-editing miscomposed readings";
+"chkRespectClientAccentColor.title" = "Respect accent colors of the client app and the system";
 "chkShiftEisuToggleOffTogetherWithCapsLock.title" = "Sync the off state between Caps Lock and Shift / Eisu Alphanumerical Toggle";
 "chkUseFixedCandidateOrderOnSelection.title" = "Always use fixed listing order in candidate window";
 "clN-4A-iec.title" = "Use Space to confirm highlighted candidate in Per-Char Select Mode";
