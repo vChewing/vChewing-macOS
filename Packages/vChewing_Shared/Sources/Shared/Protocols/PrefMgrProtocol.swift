@@ -11,6 +11,7 @@ import Foundation
 public protocol PrefMgrProtocol {
   var isDebugModeEnabled: Bool { get set }
   var failureFlagForUOMObservation: Bool { get set }
+  var respectClientAccentColor: Bool { get set }
   var securityHardenedCompositionBuffer: Bool { get set }
   var checkAbusersOfSecureEventInputAPI: Bool { get set }
   var deltaOfCalendarYears: Int { get set }
