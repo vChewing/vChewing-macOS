@@ -27,6 +27,11 @@ extension SessionCtl {
     let menu = NSMenu(title: "Input Method Menu")
     var silentMode: Bool { clientBundleIdentifier == "com.apple.SecurityAgent" }
 
+    if PrefMgr.shared.isDebugModeEnabled, let currentMemorySizeInBytes = NSApplication.memoryFootprint {
+      let currentMemorySize: Double = (Double(currentMemorySizeInBytes) / 1024 / 1024).rounded(toPlaces: 1)
+      menu.addItem(withTitle: "Total RAM Usage: \(currentMemorySize)MB", action: nil, keyEquivalent: "")
+    }
+
     let switchInputModeItem = menu.addItem(
       withTitle: String(
         format: "Switch to %@ Input Mode".localized,
