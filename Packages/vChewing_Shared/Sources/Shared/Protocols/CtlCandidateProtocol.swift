@@ -22,6 +22,7 @@ public protocol CtlCandidateDelegate {
   var shouldAutoExpandCandidates: Bool { get }
   var isCandidateContextMenuEnabled: Bool { get }
   var showReverseLookupResult: Bool { get }
+  var clientAccentColor: NSColor? { get }
 }
 
 public protocol CtlCandidateProtocol {
