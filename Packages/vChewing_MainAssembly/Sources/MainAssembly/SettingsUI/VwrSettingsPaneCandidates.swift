@@ -23,6 +23,9 @@ public struct VwrSettingsPaneCandidates: View {
   @AppStorage(wrappedValue: false, UserDef.kCandidateWindowShowOnlyOneLine.rawValue)
   private var candidateWindowShowOnlyOneLine: Bool
 
+  @AppStorage(wrappedValue: true, UserDef.kRespectClientAccentColor.rawValue)
+  private var respectClientAccentColor: Bool
+
   @AppStorage(wrappedValue: false, UserDef.kAlwaysExpandCandidateWindow.rawValue)
   private var alwaysExpandCandidateWindow: Bool
 
@@ -132,6 +135,16 @@ public struct VwrSettingsPaneCandidates: View {
               isOn: $alwaysExpandCandidateWindow
             )
             .disabled(candidateWindowShowOnlyOneLine)
+          }
+          VStack(alignment: .leading) {
+            Toggle(
+              LocalizedStringKey(UserDef.kRespectClientAccentColor.metaData?.shortTitle ?? "[i18n]respectClientAccentColor"),
+              isOn: $respectClientAccentColor
+            )
+            Text(
+              UserDef.kRespectClientAccentColor.metaData?.description?.localized ?? "[i18n]respectClientAccentColor.description"
+            )
+            .settingsDescription()
           }
         }
 
