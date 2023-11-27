@@ -31,6 +31,7 @@ public enum UserDef: String, CaseIterable {
 
   case kIsDebugModeEnabled = "_DebugMode"
   case kFailureFlagForUOMObservation = "_FailureFlag_UOMObservation"
+  case kRespectClientAccentColor = "RespectClientAccentColor"
   case kSecurityHardenedCompositionBuffer = "SecurityHardenedCompositionBuffer"
   case kCheckAbusersOfSecureEventInputAPI = "CheckAbusersOfSecureEventInputAPI"
   case kDeltaOfCalendarYears = "DeltaOfCalendarYears"
@@ -148,6 +149,7 @@ public extension UserDef {
     switch self {
     case .kIsDebugModeEnabled: return .bool
     case .kFailureFlagForUOMObservation: return .bool
+    case .kRespectClientAccentColor: return .bool
     case .kSecurityHardenedCompositionBuffer: return .bool
     case .kCheckAbusersOfSecureEventInputAPI: return .bool
     case .kDeltaOfCalendarYears: return .integer
@@ -237,6 +239,10 @@ public extension UserDef {
     switch self {
     case .kIsDebugModeEnabled: return .init(userDef: self, shortTitle: "Debug Mode")
     case .kFailureFlagForUOMObservation: return nil
+    case .kRespectClientAccentColor: return .init(
+        userDef: self, shortTitle: "i18n:userdef.kRespectClientAccentColor.shortTitle",
+        description: "i18n:userdef.kRespectClientAccentColor.description"
+      )
     case .kSecurityHardenedCompositionBuffer: return .init(
         userDef: self, shortTitle: "Security-harden the composition buffer for all clients",
         description: "This hinders all client apps from unwelcomely accessing your uncommitted contents in the composition buffer. A popup composition buffer will be shown instead."
