@@ -75,7 +75,9 @@ public extension VwrCandidateTDKAppKit {
     let allCells = thePool.candidateLines[thePool.lineRangeForCurrentPage].flatMap { $0 }
     allCells.forEach { currentCell in
       if currentCell.isHighlighted, !cellHighlightedDrawn {
-        currentCell.themeColorCocoa.setFill()
+        let alphaRatio = NSApplication.isDarkMode ? 0.75 : 1
+        let themeColor = controller?.delegate?.clientAccentColor?.withAlphaComponent(alphaRatio)
+        (themeColor ?? currentCell.themeColorCocoa).setFill()
         NSBezierPath(roundedRect: sizesCalculated.highlightedCandidate, xRadius: cellRadius, yRadius: cellRadius).fill()
         cellHighlightedDrawn = true
       }
