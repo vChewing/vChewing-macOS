@@ -72,10 +72,12 @@ public struct MainView: View {
         HStack(alignment: .top) {
           Text("i18n:installer.DISCLAIMER_TEXT")
             .font(.custom("Tahoma", size: 11))
+            .opacity(0.5)
             .frame(maxWidth: .infinity)
           VStack(spacing: 4) {
             Button { installationButtonClicked() } label: {
-              Text(isUpgrading ? "i18n:installer.DO_APP_UPGRADE" : "i18n:installer.ACCEPT_INSTALLATION").frame(width: 114)
+              Text(isUpgrading ? "i18n:installer.DO_APP_UPGRADE" : "i18n:installer.ACCEPT_INSTALLATION")
+                .bold().frame(width: 114)
             }
             .keyboardShortcut(.defaultAction)
             .disabled(!isCancelButtonEnabled)
@@ -136,10 +138,13 @@ public struct MainView: View {
         }
     }
     // OTHER
-    .padding([.horizontal, .bottom], 12)
+    .padding(12)
     .frame(width: 533, alignment: .topLeading)
     .navigationTitle(mainWindowTitle)
     .fixedSize()
+    .foregroundStyle(Color(nsColor: NSColor.textColor))
+    .background(Color(nsColor: NSColor.windowBackgroundColor))
+    .clipShape(RoundedRectangle(cornerRadius: 16))
     .frame(minWidth: 533, idealWidth: 533, maxWidth: 533,
            minHeight: 386, idealHeight: 386, maxHeight: 386,
            alignment: .top)
