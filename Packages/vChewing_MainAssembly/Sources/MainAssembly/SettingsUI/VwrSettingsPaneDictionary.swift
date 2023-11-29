@@ -175,7 +175,7 @@ public struct VwrSettingsPaneDictionary: View {
             .settingsDescription()
           }
           Toggle(
-            LocalizedStringKey("Enable CNS11643 Support (2023-05-19)"),
+            LocalizedStringKey("Enable CNS11643 Support (2023-11-06)"),
             isOn: $cns11643Enabled.onChange {
               LMMgr.setCNSEnabled(cns11643Enabled)
             }
