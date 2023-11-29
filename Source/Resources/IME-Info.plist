@@ -61,7 +61,7 @@ SOFTWARE.
 				<key>TISIconLabels</key>
 				<dict>
 					<key>Primary</key>
-					<string>简注</string>
+					<string>简ㄋ</string>
 				</dict>
 				<key>TISIntendedLanguage</key>
 				<string>zh-Hans</string>
@@ -92,7 +92,7 @@ SOFTWARE.
 				<key>TISIconLabels</key>
 				<dict>
 					<key>Primary</key>
-					<string>繁注</string>
+					<string>繁ㄋ</string>
 				</dict>
 				<key>TISIntendedLanguage</key>
 				<string>zh-Hant</string>
