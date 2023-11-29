@@ -47,6 +47,7 @@ public struct VwrAboutUI: View {
         HStack(alignment: .top) {
           Text("i18n:aboutWindow.DISCLAIMER_TEXT")
             .font(.custom("Tahoma", size: 11))
+            .opacity(0.5)
             .frame(maxWidth: .infinity)
           VStack(spacing: 4) {
             Button {
