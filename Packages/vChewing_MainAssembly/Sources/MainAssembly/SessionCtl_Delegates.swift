@@ -87,9 +87,8 @@ extension SessionCtl: CtlCandidateDelegate {
     nullResponse = nullResponse || PrefMgr.shared.chineseConversionEnabled
     guard !nullResponse else { return nil }
     let fallbackValue = NSColor.accentColor
-    if #unavailable(macOS 10.14) {
-      return fallbackValue
-    }
+    guard !NSApp.isAccentColorCustomized else { return fallbackValue }
+    if #unavailable(macOS 10.14) { return fallbackValue }
     // 此處因為沒有對 client() 的強引用，所以不會耽誤很多時間。
     let urls = NSRunningApplication.runningApplications(
       withBundleIdentifier: client()?.bundleIdentifier() ?? ""
