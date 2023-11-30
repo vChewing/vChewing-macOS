@@ -36,9 +36,6 @@ public extension vChewingLM {
     // SQLite 連線是否已經建立。
     public private(set) static var isSQLDBConnected: Bool = false
 
-    // SQLite Statement 專用的記憶體位置。
-    static var ptrStatement: OpaquePointer?
-
     // 在函式內部用以記錄狀態的開關。
     public var isCassetteEnabled = false
     public var isPhraseReplacementEnabled = false
@@ -63,10 +60,6 @@ public extension vChewingLM {
     }
 
     public static func disconnectSQLDB() {
-      if Self.ptrStatement != nil {
-        sqlite3_finalize(Self.ptrStatement)
-        Self.ptrStatement = nil
-      }
       if Self.ptrSQL != nil {
         sqlite3_close_v2(Self.ptrSQL)
         Self.ptrSQL = nil
