@@ -66,13 +66,10 @@ public class HotenkaChineseConverter {
   private(set) var dict: [String: [String: String]]
   private var dictFiles: [String: [String]]
   var ptrSQL: OpaquePointer?
-  var ptrStatement: OpaquePointer?
 
   deinit {
-    sqlite3_finalize(ptrStatement)
     sqlite3_close_v2(ptrSQL)
     ptrSQL = nil
-    ptrStatement = nil
   }
 
   public init(sqliteDir dbPath: String) {
@@ -180,8 +177,13 @@ public class HotenkaChineseConverter {
 
   public func query(dict dictType: DictType, key searchKey: String) -> String? {
     guard ptrSQL != nil else { return dict[dictType.rawKeyString]?[searchKey] }
+    var ptrStatement: OpaquePointer?
     let sqlQuery = "SELECT * FROM DATA_HOTENKA WHERE dict=\(dictType.rawValue) AND theKey='\(searchKey)';"
     sqlite3_prepare_v2(ptrSQL, sqlQuery, -1, &ptrStatement, nil)
+    defer {
+      sqlite3_finalize(ptrStatement)
+      ptrStatement = nil
+    }
     // 此處只需要用到第一筆結果。
     while sqlite3_step(ptrStatement) == SQLITE_ROW {
       guard let rawValue = sqlite3_column_text(ptrStatement, 2) else { continue }
