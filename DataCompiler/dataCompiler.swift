@@ -28,6 +28,26 @@ fileprivate extension String {
   }
 }
 
+// MARK: - Safe APIs for using SQLite Statements.
+
+func performStatement(_ handler: (inout OpaquePointer?) -> Bool) -> Bool {
+  var ptrStmt: OpaquePointer?
+  defer {
+    sqlite3_finalize(ptrStmt)
+    ptrStmt = nil
+  }
+  return handler(&ptrStmt)
+}
+
+func performStatementSansResult(_ handler: (inout OpaquePointer?) -> Void) {
+  var ptrStmt: OpaquePointer?
+  defer {
+    sqlite3_finalize(ptrStmt)
+    ptrStmt = nil
+  }
+  handler(&ptrStmt)
+}
+
 // MARK: - String as SQL Command
 
 fileprivate extension String {
@@ -35,9 +55,11 @@ fileprivate extension String {
     ptrDB != nil && sqlite3_exec(ptrDB, self, nil, nil, nil) == SQLITE_OK
   }
 
-  @discardableResult func runAsSQLPreparedStep(dbPointer ptrDB: inout OpaquePointer?, stmtPtr ptrStmt: inout OpaquePointer?) -> Bool {
+  @discardableResult func runAsSQLPreparedStep(dbPointer ptrDB: inout OpaquePointer?) -> Bool {
     guard ptrDB != nil else { return false }
-    return sqlite3_prepare_v2(ptrDB, self, -1, &ptrStmt, nil) == SQLITE_OK && sqlite3_step(ptrStmt) == SQLITE_DONE
+    return performStatement { ptrStmt in
+      sqlite3_prepare_v2(ptrDB, self, -1, &ptrStmt, nil) == SQLITE_OK && sqlite3_step(ptrStmt) == SQLITE_DONE
+    }
   }
 }
 
@@ -209,13 +231,13 @@ func prepareDatabase() -> Bool {
   return true
 }
 
-@discardableResult func writeMainMapToSQL(_ theMap: [String: [String]], column columnName: String, ptrStmt: inout OpaquePointer?) -> Bool {
+@discardableResult func writeMainMapToSQL(_ theMap: [String: [String]], column columnName: String) -> Bool {
   for (encryptedKey, arrValues) in theMap {
     // SQL 語言需要對西文 ASCII 半形單引號做回退處理、變成「''」。
     let safeKey = encryptedKey.replacingOccurrences(of: "'", with: "''")
     let valueText = arrValues.joined(separator: "\t").replacingOccurrences(of: "'", with: "''")
     let sqlStmt = "INSERT INTO DATA_MAIN (theKey, \(columnName)) VALUES ('\(safeKey)', '\(valueText)') ON CONFLICT(theKey) DO UPDATE SET \(columnName)='\(valueText)';"
-    guard sqlStmt.runAsSQLPreparedStep(dbPointer: &ptrSQL, stmtPtr: &ptrStmt) else {
+    guard sqlStmt.runAsSQLPreparedStep(dbPointer: &ptrSQL) else {
       print("Failed: " + sqlStmt)
       return false
     }
@@ -223,13 +245,13 @@ func prepareDatabase() -> Bool {
   return true
 }
 
-@discardableResult func writeRevLookupMapToSQL(_ theMap: [String: [String]], ptrStmt: inout OpaquePointer?) -> Bool {
+@discardableResult func writeRevLookupMapToSQL(_ theMap: [String: [String]]) -> Bool {
   for (encryptedKey, arrValues) in theMap {
     // SQL 語言需要對西文 ASCII 半形單引號做回退處理、變成「''」。
     let safeKey = encryptedKey.replacingOccurrences(of: "'", with: "''")
     let valueText = arrValues.joined(separator: "\t").replacingOccurrences(of: "'", with: "''")
     let sqlStmt = "INSERT INTO DATA_REV (theChar, theReadings) VALUES ('\(safeKey)', '\(valueText)') ON CONFLICT(theChar) DO UPDATE SET theReadings='\(valueText)';"
-    guard sqlStmt.runAsSQLPreparedStep(dbPointer: &ptrSQL, stmtPtr: &ptrStmt) else {
+    guard sqlStmt.runAsSQLPreparedStep(dbPointer: &ptrSQL) else {
       print("Failed: " + sqlStmt)
       return false
     }
@@ -1085,14 +1107,12 @@ func main() {
   }
   NSLog("// 反查資料整合完畢。")
   NSLog("// 準備建置 SQL 資料庫。")
-  var ptrStmt: OpaquePointer?
-  writeMainMapToSQL(rangeMapJSONCHS, column: "theDataCHS", ptrStmt: &ptrStmt)
-  writeMainMapToSQL(rangeMapJSONCHT, column: "theDataCHT", ptrStmt: &ptrStmt)
-  writeMainMapToSQL(rangeMapSymbols, column: "theDataSYMB", ptrStmt: &ptrStmt)
-  writeMainMapToSQL(rangeMapZhuyinwen, column: "theDataCHEW", ptrStmt: &ptrStmt)
-  writeMainMapToSQL(rangeMapCNS, column: "theDataCNS", ptrStmt: &ptrStmt)
-  writeRevLookupMapToSQL(rangeMapReverseLookup, ptrStmt: &ptrStmt)
-  sqlite3_finalize(ptrStmt)
+  writeMainMapToSQL(rangeMapJSONCHS, column: "theDataCHS")
+  writeMainMapToSQL(rangeMapJSONCHT, column: "theDataCHT")
+  writeMainMapToSQL(rangeMapSymbols, column: "theDataSYMB")
+  writeMainMapToSQL(rangeMapZhuyinwen, column: "theDataCHEW")
+  writeMainMapToSQL(rangeMapCNS, column: "theDataCNS")
+  writeRevLookupMapToSQL(rangeMapReverseLookup)
   let committed = "commit;".runAsSQLExec(dbPointer: &ptrSQL)
   assert(committed)
   let compressed = "VACUUM;".runAsSQLExec(dbPointer: &ptrSQL)
