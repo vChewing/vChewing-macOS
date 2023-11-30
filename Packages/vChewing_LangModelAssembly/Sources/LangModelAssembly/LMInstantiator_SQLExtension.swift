@@ -57,23 +57,25 @@ enum CoreColumn: Int32 {
 extension vChewingLM.LMInstantiator {
   fileprivate static func querySQL(strStmt sqlQuery: String, coreColumn column: CoreColumn, handler: (String) -> Void) {
     guard Self.ptrSQL != nil else { return }
-    defer { sqlite3_finalize(Self.ptrStatement) }
-    sqlite3_prepare_v2(Self.ptrSQL, sqlQuery, -1, &Self.ptrStatement, nil)
-    while sqlite3_step(Self.ptrStatement) == SQLITE_ROW {
-      guard let rawValue = sqlite3_column_text(Self.ptrStatement, column.id) else { continue }
-      handler(String(cString: rawValue))
+    performStatementSansResult { ptrStatement in
+      sqlite3_prepare_v2(Self.ptrSQL, sqlQuery, -1, &ptrStatement, nil)
+      while sqlite3_step(ptrStatement) == SQLITE_ROW {
+        guard let rawValue = sqlite3_column_text(ptrStatement, column.id) else { continue }
+        handler(String(cString: rawValue))
+      }
     }
   }
 
   fileprivate static func hasSQLResult(strStmt sqlQuery: String, coreColumn column: CoreColumn) -> Bool {
     guard Self.ptrSQL != nil else { return false }
-    defer { sqlite3_finalize(Self.ptrStatement) }
-    sqlite3_prepare_v2(Self.ptrSQL, sqlQuery, -1, &Self.ptrStatement, nil)
-    while sqlite3_step(Self.ptrStatement) == SQLITE_ROW {
-      guard sqlite3_column_text(Self.ptrStatement, column.id) != nil else { continue }
-      return true
+    return performStatement { ptrStatement in
+      sqlite3_prepare_v2(Self.ptrSQL, sqlQuery, -1, &ptrStatement, nil)
+      while sqlite3_step(ptrStatement) == SQLITE_ROW {
+        guard sqlite3_column_text(ptrStatement, column.id) != nil else { continue }
+        return true
+      }
+      return false
     }
-    return false
   }
 
   /// 获取字根反查资料。
@@ -81,15 +83,16 @@ extension vChewingLM.LMInstantiator {
     var results: [String] = []
     let sqlQuery = "SELECT * FROM DATA_REV WHERE theChar='\(kanji)';"
     guard Self.ptrSQL != nil else { return nil }
-    defer { sqlite3_finalize(Self.ptrStatement) }
-    sqlite3_prepare_v2(Self.ptrSQL, sqlQuery, -1, &Self.ptrStatement, nil)
-    while sqlite3_step(Self.ptrStatement) == SQLITE_ROW {
-      guard let rawValue = sqlite3_column_text(Self.ptrStatement, 1) else { continue }
-      results.append(
-        contentsOf: String(cString: rawValue).split(separator: "\t").map { reading in
-          Self.restorePhonabetFromASCII(reading.description)
-        }
-      )
+    performStatementSansResult { ptrStatement in
+      sqlite3_prepare_v2(Self.ptrSQL, sqlQuery, -1, &ptrStatement, nil)
+      while sqlite3_step(ptrStatement) == SQLITE_ROW {
+        guard let rawValue = sqlite3_column_text(ptrStatement, 1) else { continue }
+        results.append(
+          contentsOf: String(cString: rawValue).split(separator: "\t").map { reading in
+            Self.restorePhonabetFromASCII(reading.description)
+          }
+        )
+      }
     }
     return results.isEmpty ? nil : results
   }

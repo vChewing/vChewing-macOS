@@ -34,9 +34,11 @@ extension String {
     ptrDB != nil && sqlite3_exec(ptrDB, self, nil, nil, nil) == SQLITE_OK
   }
 
-  @discardableResult func runAsSQLPreparedStep(dbPointer ptrDB: inout OpaquePointer?, stmtPtr ptrStmt: inout OpaquePointer?) -> Bool {
+  @discardableResult func runAsSQLPreparedStep(dbPointer ptrDB: inout OpaquePointer?) -> Bool {
     guard ptrDB != nil else { return false }
-    return sqlite3_prepare_v2(ptrDB, self, -1, &ptrStmt, nil) == SQLITE_OK && sqlite3_step(ptrStmt) == SQLITE_DONE
+    return performStatement { ptrStmt in
+      sqlite3_prepare_v2(ptrDB, self, -1, &ptrStmt, nil) == SQLITE_OK && sqlite3_step(ptrStmt) == SQLITE_DONE
+    }
   }
 }
 
@@ -59,4 +61,24 @@ extension Array where Element == String {
     }
     return true
   }
+}
+
+// MARK: - Safe APIs for using SQLite Statements.
+
+func performStatement(_ handler: (inout OpaquePointer?) -> Bool) -> Bool {
+  var ptrStmt: OpaquePointer?
+  defer {
+    sqlite3_finalize(ptrStmt)
+    ptrStmt = nil
+  }
+  return handler(&ptrStmt)
+}
+
+func performStatementSansResult(_ handler: (inout OpaquePointer?) -> Void) {
+  var ptrStmt: OpaquePointer?
+  defer {
+    sqlite3_finalize(ptrStmt)
+    ptrStmt = nil
+  }
+  handler(&ptrStmt)
 }
