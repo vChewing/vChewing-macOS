@@ -319,3 +319,11 @@ public extension NSRunningApplication {
     return .init(hue: h, saturation: s, brightness: 128, alpha: 1)
   }
 }
+
+// MARK: - Check whether system's accent color is fixed with non-default value.
+
+public extension NSApplication {
+  var isAccentColorCustomized: Bool {
+    UserDefaults.standard.object(forKey: "AppleAccentColor") != nil
+  }
+}
