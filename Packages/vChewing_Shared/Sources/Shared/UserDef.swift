@@ -444,7 +444,7 @@ public extension UserDef {
       )
     case .kTrimUnfinishedReadingsOnCommit: return .init(userDef: self, shortTitle: "Trim unfinished readings / strokes on commit")
     case .kAlwaysShowTooltipTextsHorizontally: return .init(userDef: self, shortTitle: "Always show tooltip texts horizontally")
-    case .kClientsIMKTextInputIncapable: return nil
+    case .kClientsIMKTextInputIncapable: return .init(userDef: self)
     case .kShowTranslatedStrokesInCompositionBuffer: return .init(userDef: self, shortTitle: "Show translated strokes in composition buffer")
     case .kForceCassetteChineseConversion: return .init(
         userDef: self,
