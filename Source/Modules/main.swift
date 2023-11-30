@@ -16,18 +16,19 @@ switch max(CommandLine.arguments.count - 1, 0) {
 case 0: break
 case 1, 2:
   switch CommandLine.arguments[1] {
+  case "--dump-prefs":
+    if let strDumpedPrefs = PrefMgr.shared.dumpShellScriptBackup() {
+      print(strDumpedPrefs)
+    }
+    exit(0)
   case "install":
-    if CommandLine.arguments[1] == "install" {
-      let exitCode = IMKHelper.registerInputMethod()
-      exit(exitCode)
-    }
+    let exitCode = IMKHelper.registerInputMethod()
+    exit(exitCode)
   case "uninstall":
-    if CommandLine.arguments[1] == "uninstall" {
-      let exitCode = Uninstaller.uninstall(
-        isSudo: NSApplication.isSudoMode, defaultDataFolderPath: LMMgr.dataFolderPath(isDefaultFolder: true)
-      )
-      exit(exitCode)
-    }
+    let exitCode = Uninstaller.uninstall(
+      isSudo: NSApplication.isSudoMode, defaultDataFolderPath: LMMgr.dataFolderPath(isDefaultFolder: true)
+    )
+    exit(exitCode)
   default: break
   }
   exit(0)
