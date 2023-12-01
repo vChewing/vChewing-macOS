@@ -14,14 +14,17 @@ public class BookmarkManager {
       return
     }
 
-    if #available(macOS 10.13, *) {
-      do {
-        let data = try NSKeyedArchiver.archivedData(withRootObject: bookmarkDic, requiringSecureCoding: false)
-        try data.write(to: bookmarkURL)
-        NSLog("Did save data to url")
-      } catch {
-        NSLog("Couldn't save bookmarks")
+    do {
+      var data: Data?
+      if #unavailable(macOS 10.13) {
+        data = NSKeyedArchiver.archivedData(withRootObject: bookmarkDic)
+      } else {
+        data = try NSKeyedArchiver.archivedData(withRootObject: bookmarkDic, requiringSecureCoding: false)
       }
+      try data?.write(to: bookmarkURL)
+      NSLog("Did save data to url")
+    } catch {
+      NSLog("Couldn't save bookmarks")
     }
   }
 
@@ -34,8 +37,24 @@ public class BookmarkManager {
     if fileExists(url) {
       do {
         let fileData = try Data(contentsOf: url)
-        try (NSKeyedUnarchiver.unarchivedObject(ofClass: NSDictionary.self, from: fileData) as? [URL: Data])?.forEach { bookmark in
-          restoreBookmark(key: bookmark.key, value: bookmark.value)
+        if #available(macOS 11.0, *) {
+          if let fileBookmarks = try NSKeyedUnarchiver.unarchivedDictionary(ofKeyClass: NSURL.self, objectClass: NSData.self, from: fileData) as [URL: Data]? {
+            for bookmark in fileBookmarks {
+              restoreBookmark(key: bookmark.key, value: bookmark.value)
+            }
+          }
+        } else if #available(macOS 10.11, *) {
+          if let fileBookmarks = try NSKeyedUnarchiver.unarchiveTopLevelObjectWithData(fileData) as! [URL: Data]? {
+            for bookmark in fileBookmarks {
+              restoreBookmark(key: bookmark.key, value: bookmark.value)
+            }
+          }
+        } else {
+          if let fileBookmarks = NSKeyedUnarchiver.unarchiveObject(with: fileData) as! [URL: Data]? {
+            for bookmark in fileBookmarks {
+              restoreBookmark(key: bookmark.key, value: bookmark.value)
+            }
+          }
         }
       } catch {
         NSLog("Couldn't load bookmarks")
