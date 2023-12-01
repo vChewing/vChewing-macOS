@@ -274,7 +274,7 @@ public extension vChewingLM {
     /// - Returns: 是否在庫。
     public func hasUnigramsFor(keyArray: [String]) -> Bool {
       let keyChain = keyArray.joined(separator: "-")
-      return keyChain == " " || (!unigramsFor(keyArray: keyArray).isEmpty && !keyChain.isEmpty)
+      return keyChain == " " || (hasFactoryCoreUnigramsFor(keyArray: keyArray) && !keyChain.isEmpty)
     }
 
     /// 根據給定的索引鍵和資料值，確認是否有該具體的資料值在庫。
