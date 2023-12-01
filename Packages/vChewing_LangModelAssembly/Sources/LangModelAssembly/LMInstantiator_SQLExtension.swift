@@ -66,13 +66,16 @@ extension vChewingLM.LMInstantiator {
     }
   }
 
-  fileprivate static func hasSQLResult(strStmt sqlQuery: String, coreColumn column: CoreColumn) -> Bool {
+  fileprivate static func hasSQLResult(strStmt sqlQuery: String) -> Bool {
     guard Self.ptrSQL != nil else { return false }
+    var sqlQuery = sqlQuery
+    if sqlQuery.last == ";" { sqlQuery = sqlQuery.dropLast(1).description } // 防呆設計。
+    guard !sqlQuery.isEmpty else { return false }
     return performStatement { ptrStatement in
-      sqlite3_prepare_v2(Self.ptrSQL, sqlQuery, -1, &ptrStatement, nil)
+      let wrappedQuery = "SELECT EXISTS(\(sqlQuery));"
+      sqlite3_prepare_v2(Self.ptrSQL, wrappedQuery, -1, &ptrStatement, nil)
       while sqlite3_step(ptrStatement) == SQLITE_ROW {
-        guard sqlite3_column_text(ptrStatement, column.id) != nil else { continue }
-        return true
+        return sqlite3_column_int(ptrStatement, 0) == 1
       }
       return false
     }
@@ -165,12 +168,13 @@ extension vChewingLM.LMInstantiator {
   /// 根據給定的讀音索引鍵，來獲取原廠資料庫辭典內的對應資料陣列的 UTF8 資料、就地分析、生成單元圖陣列。
   /// - parameters:
   ///   - key: 讀音索引鍵。
-  func hasFactoryCoreUnigramsFor(key: String) -> Bool {
+  func hasFactoryCoreUnigramsFor(keyArray: [String]) -> Bool {
     let column: CoreColumn = isCHS ? .theDataCHS : .theDataCHT
     // 此處需要把 ASCII 單引號換成連續兩個單引號，否則會有 SQLite 語句查詢故障。
-    let encryptedKey = Self.cnvPhonabetToASCII(key.replacingOccurrences(of: "'", with: "''"))
-    let sqlQuery = "SELECT * FROM DATA_MAIN WHERE theKey='\(encryptedKey)';"
-    return Self.hasSQLResult(strStmt: sqlQuery, coreColumn: column)
+    let encryptedKey = Self.cnvPhonabetToASCII(keyArray.joined(separator: "-").replacingOccurrences(of: "'", with: "''"))
+    // 此處為特例，無須以分號結尾。回頭整句塞到「SELECT EXISTS();」當中執行。
+    let sqlQuery = "SELECT * FROM DATA_MAIN WHERE theKey='\(encryptedKey)' AND \(column.name) IS NOT NULL"
+    return Self.hasSQLResult(strStmt: sqlQuery)
   }
 }
 
