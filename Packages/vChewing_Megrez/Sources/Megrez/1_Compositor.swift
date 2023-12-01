@@ -294,7 +294,7 @@ extension Megrez.Compositor {
         guard position + theLength <= keys.count, position >= 0 else { return }
         let joinedKeyArray = keys[position ..< (position + theLength)].map(\.description)
 
-        if let theNode = spans[position][theLength] {
+        if (0 ..< spans.count).contains(position), let theNode = spans[position][theLength] {
           if !updateExisting { return }
           let unigrams = langModel.unigramsFor(keyArray: joinedKeyArray)
           // 自動銷毀無效的節點。
