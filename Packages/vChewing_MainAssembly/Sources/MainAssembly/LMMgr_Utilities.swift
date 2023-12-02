@@ -47,7 +47,7 @@ public extension LMMgr {
     guard let factoryResultURL = Bundle.main.url(forResource: "vChewingFactoryDatabase", withExtension: "sqlite") else {
       return nil
     }
-    guard !factory, !PrefMgr.shared.useExternalFactoryDict else { return factoryResultURL.path }
+    guard !factory, PrefMgr.shared.useExternalFactoryDict else { return factoryResultURL.path }
     let containerResultURL = Self.appSupportURL.appendingPathComponent("vChewingFactoryData/vChewingFactoryDatabase.sqlite")
     return FileManager.default.fileExists(atPath: containerResultURL.path, isDirectory: nil) ? containerResultURL.path : factoryResultURL.path
   }
