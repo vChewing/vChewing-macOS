@@ -704,18 +704,6 @@
 			outputFileListPaths = (
 			);
 			outputPaths = (
-				"$(SRCROOT)/Source/Data/data-chs.json",
-				"$(SRCROOT)/Source/Data/data-cht.json",
-				"$(SRCROOT)/Source/Data/data-cns.json",
-				"$(SRCROOT)/Source/Data/data-zhuyinwen.json",
-				"$(SRCROOT)/Source/Data/data-symbols.json",
-				"$(SRCROOT)/Source/Data/data-bpmf-reverse-lookup.json",
-				"$(SRCROOT)/Source/Data/data-bpmf-reverse-lookup-CNS1.json",
-				"$(SRCROOT)/Source/Data/data-bpmf-reverse-lookup-CNS2.json",
-				"$(SRCROOT)/Source/Data/data-bpmf-reverse-lookup-CNS3.json",
-				"$(SRCROOT)/Source/Data/data-bpmf-reverse-lookup-CNS4.json",
-				"$(SRCROOT)/Source/Data/data-bpmf-reverse-lookup-CNS5.json",
-				"$(SRCROOT)/Source/Data/data-bpmf-reverse-lookup-CNS6.json",
 				"$(SRCROOT)/Source/Data/Build/Release/vChewingFactoryDatabase.sqlite",
 				"$(SRCROOT)/Source/Data/Build/Release/vChewingFactoryDatabase.sqlite-journal",
 				"$(SRCROOT)/Source/Data/Build/Release/",
