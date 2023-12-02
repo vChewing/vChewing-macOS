@@ -190,7 +190,6 @@ private var mapReverseLookupForCheck: [String: [String]] = [:]
 private var exceptedChars: Set<String> = .init()
 
 private var ptrSQL: OpaquePointer?
-private var sharedJSONEncoder: JSONEncoder = .init()
 
 var rangeMapJSONCHS: [String: [String]] = [:]
 var rangeMapJSONCHT: [String: [String]] = [:]
@@ -427,8 +426,10 @@ func rawDictForKanjis(isCHS: Bool) -> [Unigram] {
   if !isReverseLookupDictionaryProcessed {
     do {
       isReverseLookupDictionaryProcessed = true
-      try JSONSerialization.data(withJSONObject: mapReverseLookupJSON, options: .sortedKeys).write(
-        to: URL(fileURLWithPath: urlJSONBPMFReverseLookup))
+      if compileJSON {
+        try JSONSerialization.data(withJSONObject: mapReverseLookupJSON, options: .sortedKeys).write(
+          to: URL(fileURLWithPath: urlJSONBPMFReverseLookup))
+      }
       mapReverseLookupForCheck = mapReverseLookupUnencrypted
     } catch {
       NSLog(" - Core Reverse Lookup Data Generation Failed.")
@@ -638,7 +639,9 @@ func fileOutput(isCHS: Bool) {
   NSLog(" - \(i18n): 要寫入檔案的 txt 內容編譯完畢。")
   do {
     try strPrintLine.write(to: pathOutput, atomically: true, encoding: .utf8)
-    try JSONSerialization.data(withJSONObject: rangeMapJSON, options: .sortedKeys).write(to: jsonURL)
+    if compileJSON {
+      try JSONSerialization.data(withJSONObject: rangeMapJSON, options: .sortedKeys).write(to: jsonURL)
+    }
     if isCHS {
       rangeMapJSONCHS = rangeMapJSON
     } else {
@@ -748,24 +751,26 @@ func commonFileOutput() {
   }
   NSLog(" - \(i18n): 要寫入檔案的內容編譯完畢。")
   do {
-    try JSONSerialization.data(withJSONObject: mapSymbols, options: .sortedKeys).write(
-      to: URL(fileURLWithPath: urlJSONSymbols))
-    try JSONSerialization.data(withJSONObject: mapZhuyinwen, options: .sortedKeys).write(
-      to: URL(fileURLWithPath: urlJSONZhuyinwen))
-    try JSONSerialization.data(withJSONObject: mapCNS, options: .sortedKeys).write(
-      to: URL(fileURLWithPath: urlJSONCNS))
-    try JSONSerialization.data(withJSONObject: mapReverseLookupCNS1, options: .sortedKeys).write(
-      to: URL(fileURLWithPath: urlJSONBPMFReverseLookupCNS1))
-    try JSONSerialization.data(withJSONObject: mapReverseLookupCNS2, options: .sortedKeys).write(
-      to: URL(fileURLWithPath: urlJSONBPMFReverseLookupCNS2))
-    try JSONSerialization.data(withJSONObject: mapReverseLookupCNS3, options: .sortedKeys).write(
-      to: URL(fileURLWithPath: urlJSONBPMFReverseLookupCNS3))
-    try JSONSerialization.data(withJSONObject: mapReverseLookupCNS4, options: .sortedKeys).write(
-      to: URL(fileURLWithPath: urlJSONBPMFReverseLookupCNS4))
-    try JSONSerialization.data(withJSONObject: mapReverseLookupCNS5, options: .sortedKeys).write(
-      to: URL(fileURLWithPath: urlJSONBPMFReverseLookupCNS5))
-    try JSONSerialization.data(withJSONObject: mapReverseLookupCNS6, options: .sortedKeys).write(
-      to: URL(fileURLWithPath: urlJSONBPMFReverseLookupCNS6))
+    if compileJSON {
+      try JSONSerialization.data(withJSONObject: mapSymbols, options: .sortedKeys).write(
+        to: URL(fileURLWithPath: urlJSONSymbols))
+      try JSONSerialization.data(withJSONObject: mapZhuyinwen, options: .sortedKeys).write(
+        to: URL(fileURLWithPath: urlJSONZhuyinwen))
+      try JSONSerialization.data(withJSONObject: mapCNS, options: .sortedKeys).write(
+        to: URL(fileURLWithPath: urlJSONCNS))
+      try JSONSerialization.data(withJSONObject: mapReverseLookupCNS1, options: .sortedKeys).write(
+        to: URL(fileURLWithPath: urlJSONBPMFReverseLookupCNS1))
+      try JSONSerialization.data(withJSONObject: mapReverseLookupCNS2, options: .sortedKeys).write(
+        to: URL(fileURLWithPath: urlJSONBPMFReverseLookupCNS2))
+      try JSONSerialization.data(withJSONObject: mapReverseLookupCNS3, options: .sortedKeys).write(
+        to: URL(fileURLWithPath: urlJSONBPMFReverseLookupCNS3))
+      try JSONSerialization.data(withJSONObject: mapReverseLookupCNS4, options: .sortedKeys).write(
+        to: URL(fileURLWithPath: urlJSONBPMFReverseLookupCNS4))
+      try JSONSerialization.data(withJSONObject: mapReverseLookupCNS5, options: .sortedKeys).write(
+        to: URL(fileURLWithPath: urlJSONBPMFReverseLookupCNS5))
+      try JSONSerialization.data(withJSONObject: mapReverseLookupCNS6, options: .sortedKeys).write(
+        to: URL(fileURLWithPath: urlJSONBPMFReverseLookupCNS6))
+    }
   } catch {
     NSLog(" - \(i18n): Error on writing strings to file: \(error)")
   }
@@ -1068,10 +1073,27 @@ func healthCheck(_ data: [Unigram]) -> String {
 
 // MARK: - 主執行緒
 
+var compileJSON = false
+var compileSQLite = true
+
 func main() {
-  guard prepareDatabase() else {
-    NSLog("// SQLite 資料庫初期化失敗。")
-    exit(-1)
+  let arguments = CommandLine.arguments.compactMap { $0.lowercased() }
+  let conditionMet = arguments.contains(where: { $0 == "--json" || $0 == "json" })
+  if conditionMet {
+    NSLog("// 接下來準備建置 JSON 格式的原廠辭典，同時生成用來偵錯的 TXT 副產物。")
+    compileJSON = true
+    compileSQLite = false
+  } else {
+    NSLog("// 接下來準備建置 SQLite 格式的原廠辭典，同時生成用來偵錯的 TXT 副產物。")
+    compileJSON = false
+    compileSQLite = true
+  }
+
+  if compileSQLite {
+    guard prepareDatabase() else {
+      NSLog("// SQLite 資料庫初期化失敗。")
+      exit(-1)
+    }
   }
   let globalQueue = DispatchQueue.global(qos: .default)
   let group = DispatchGroup()
@@ -1095,30 +1117,35 @@ func main() {
   }
   // 一直等待完成
   _ = group.wait(timeout: .distantFuture)
-  NSLog("// 全部 TXT & JSON 辭典檔案建置完畢。")
-  NSLog("// 開始整合反查資料。")
-  mapReverseLookupForCheck.forEach { key, values in
-    values.reversed().forEach { valueLiteral in
-      let value = cnvPhonabetToASCII(valueLiteral)
-      if !rangeMapReverseLookup[key, default: []].contains(value) {
-        rangeMapReverseLookup[key, default: []].insert(value, at: 0)
+  NSLog("// 全部 TXT 辭典檔案建置完畢。")
+  if compileJSON {
+    NSLog("// 全部 JSON 辭典檔案建置完畢。")
+  }
+  if compileSQLite {
+    NSLog("// 開始整合反查資料。")
+    mapReverseLookupForCheck.forEach { key, values in
+      values.reversed().forEach { valueLiteral in
+        let value = cnvPhonabetToASCII(valueLiteral)
+        if !rangeMapReverseLookup[key, default: []].contains(value) {
+          rangeMapReverseLookup[key, default: []].insert(value, at: 0)
+        }
       }
     }
+    NSLog("// 反查資料整合完畢。")
+    NSLog("// 準備建置 SQL 資料庫。")
+    writeMainMapToSQL(rangeMapJSONCHS, column: "theDataCHS")
+    writeMainMapToSQL(rangeMapJSONCHT, column: "theDataCHT")
+    writeMainMapToSQL(rangeMapSymbols, column: "theDataSYMB")
+    writeMainMapToSQL(rangeMapZhuyinwen, column: "theDataCHEW")
+    writeMainMapToSQL(rangeMapCNS, column: "theDataCNS")
+    writeRevLookupMapToSQL(rangeMapReverseLookup)
+    let committed = "commit;".runAsSQLExec(dbPointer: &ptrSQL)
+    assert(committed)
+    let compressed = "VACUUM;".runAsSQLExec(dbPointer: &ptrSQL)
+    assert(compressed)
+    sqlite3_close_v2(ptrSQL)
+    NSLog("// 全部 SQLite 辭典檔案建置完畢。")
   }
-  NSLog("// 反查資料整合完畢。")
-  NSLog("// 準備建置 SQL 資料庫。")
-  writeMainMapToSQL(rangeMapJSONCHS, column: "theDataCHS")
-  writeMainMapToSQL(rangeMapJSONCHT, column: "theDataCHT")
-  writeMainMapToSQL(rangeMapSymbols, column: "theDataSYMB")
-  writeMainMapToSQL(rangeMapZhuyinwen, column: "theDataCHEW")
-  writeMainMapToSQL(rangeMapCNS, column: "theDataCNS")
-  writeRevLookupMapToSQL(rangeMapReverseLookup)
-  let committed = "commit;".runAsSQLExec(dbPointer: &ptrSQL)
-  assert(committed)
-  let compressed = "VACUUM;".runAsSQLExec(dbPointer: &ptrSQL)
-  assert(compressed)
-  sqlite3_close_v2(ptrSQL)
-  NSLog("// 全部 SQLite 辭典檔案建置完畢。")
 }
 
 main()
