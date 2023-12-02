@@ -337,7 +337,7 @@
 "Please use mouse wheel to scroll each page if needed. The CheatSheet is available in the IME menu." = "請利用滑鼠滾輪檢視頁面。也請洽輸入法選單內的熱鍵指南。";
 "Push the cursor in front of the phrase after selection" = "在選字後將游標置於該字詞的前方";
 "Quick Setup:" = "直接設定:";
-"Read external factory dictionary files if possible" = "盡量使用外置原廠辭典 plist 檔案";
+"Read external factory dictionary files if possible" = "盡量使用外置原廠辭典檔案";
 "Secondary Pinyin with Numeral Intonation" = "國音二式+數字標調";
 "Security-harden the composition buffer for all clients" = "針對所有客體軟體啟用強化型組字區安全防護";
 "Seigyou" = "精業排列";
@@ -371,7 +371,7 @@
 "This will also affect the row / column capacity of the candidate window." = "該選項也會影響到選字窗每行/每列最多顯示的候選字數量。";
 "This will batch-replace specified candidates." = "這將會對指定的候選字詞進行整詞取代。";
 "This will stop user override model from affecting how candidates get sorted." = "這將阻止半衰記憶模組影響候選字詞的陳列順序。";
-"This will use the plist files deployed by the “make install” command from libvChewing-Data if possible." = "這將會優先使用由 libvChewing-Data 的 make install 部署的原廠辭典檔案。";
+"This will use the SQLite database deployed by the “make install” command from libvChewing-Data if possible." = "這將會優先使用由 libvChewing-Data 的 make install 部署的原廠辭典檔案。";
 "Toggle alphanumerical mode with Left-Shift" = "允許使用左側的 Shift 鍵切換英數輸入模式";
 "Toggle alphanumerical mode with Right-Shift" = "允許使用右側的 Shift 鍵切換英數輸入模式";
 "Traditional Chinese" = "繁體中文";
