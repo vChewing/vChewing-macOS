@@ -169,7 +169,7 @@ public struct VwrSettingsPaneDictionary: View {
             )
             Text(
               LocalizedStringKey(
-                "This will use the plist files deployed by the “make install” command from libvChewing-Data if possible."
+                "This will use the SQLite database deployed by the “make install” command from libvChewing-Data if possible."
               )
             )
             .settingsDescription()

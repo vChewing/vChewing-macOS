@@ -371,7 +371,7 @@
 "This will also affect the row / column capacity of the candidate window." = "言選り用キーの数は、候補陳列の行・列の容量制限にも影響。";
 "This will batch-replace specified candidates." = "指定された候補そのものを置き換える";
 "This will stop user override model from affecting how candidates get sorted." = "これで臨時記憶モジュールは候補陳列の順番に影響を与えなくなる。";
-"This will use the plist files deployed by the “make install” command from libvChewing-Data if possible." = "これで libvChewing-Data の make install にて設置した公式辞書ファイルを優先的に用いる。";
+"This will use the SQLite database deployed by the “make install” command from libvChewing-Data if possible." = "これで libvChewing-Data の make install にて設置した公式辞書ファイルを優先的に用いる。";
 "Toggle alphanumerical mode with Left-Shift" = "左側の Shift キーで英数入力モードの切り替え";
 "Toggle alphanumerical mode with Right-Shift" = "右側の Shift キーで英数入力モードの切り替え";
 "Traditional Chinese" = "繁体中国語";
