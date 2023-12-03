@@ -166,6 +166,7 @@ extension vChewingLM.LMInstantiator {
   }
 
   /// 根據給定的讀音索引鍵，來獲取原廠資料庫辭典內的對應資料陣列的 UTF8 資料、就地分析、生成單元圖陣列。
+  /// - remark: 該函式暫時用不到，但先不用刪除。沒準今後會有用場。
   /// - parameters:
   ///   - key: 讀音索引鍵。
   func hasFactoryCoreUnigramsFor(keyArray: [String]) -> Bool {
