@@ -28,38 +28,11 @@ fileprivate extension String {
   }
 }
 
-// MARK: - Safe APIs for using SQLite Statements.
-
-func performStatement(_ handler: (inout OpaquePointer?) -> Bool) -> Bool {
-  var ptrStmt: OpaquePointer?
-  defer {
-    sqlite3_finalize(ptrStmt)
-    ptrStmt = nil
-  }
-  return handler(&ptrStmt)
-}
-
-func performStatementSansResult(_ handler: (inout OpaquePointer?) -> Void) {
-  var ptrStmt: OpaquePointer?
-  defer {
-    sqlite3_finalize(ptrStmt)
-    ptrStmt = nil
-  }
-  handler(&ptrStmt)
-}
-
 // MARK: - String as SQL Command
 
 fileprivate extension String {
   @discardableResult func runAsSQLExec(dbPointer ptrDB: inout OpaquePointer?) -> Bool {
     ptrDB != nil && sqlite3_exec(ptrDB, self, nil, nil, nil) == SQLITE_OK
-  }
-
-  @discardableResult func runAsSQLPreparedStep(dbPointer ptrDB: inout OpaquePointer?) -> Bool {
-    guard ptrDB != nil else { return false }
-    return performStatement { ptrStmt in
-      sqlite3_prepare_v2(ptrDB, self, -1, &ptrStmt, nil) == SQLITE_OK && sqlite3_step(ptrStmt) == SQLITE_DONE
-    }
   }
 }
 
@@ -236,7 +209,7 @@ func prepareDatabase() -> Bool {
     let safeKey = encryptedKey.replacingOccurrences(of: "'", with: "''")
     let valueText = arrValues.joined(separator: "\t").replacingOccurrences(of: "'", with: "''")
     let sqlStmt = "INSERT INTO DATA_MAIN (theKey, \(columnName)) VALUES ('\(safeKey)', '\(valueText)') ON CONFLICT(theKey) DO UPDATE SET \(columnName)='\(valueText)';"
-    guard sqlStmt.runAsSQLPreparedStep(dbPointer: &ptrSQL) else {
+    guard sqlStmt.runAsSQLExec(dbPointer: &ptrSQL) else {
       print("Failed: " + sqlStmt)
       return false
     }
@@ -250,7 +223,7 @@ func prepareDatabase() -> Bool {
     let safeKey = encryptedKey.replacingOccurrences(of: "'", with: "''")
     let valueText = arrValues.joined(separator: "\t").replacingOccurrences(of: "'", with: "''")
     let sqlStmt = "INSERT INTO DATA_REV (theChar, theReadings) VALUES ('\(safeKey)', '\(valueText)') ON CONFLICT(theChar) DO UPDATE SET theReadings='\(valueText)';"
-    guard sqlStmt.runAsSQLPreparedStep(dbPointer: &ptrSQL) else {
+    guard sqlStmt.runAsSQLExec(dbPointer: &ptrSQL) else {
       print("Failed: " + sqlStmt)
       return false
     }
@@ -1078,8 +1051,8 @@ var compileSQLite = true
 
 func main() {
   let arguments = CommandLine.arguments.compactMap { $0.lowercased() }
-  let conditionMet = arguments.contains(where: { $0 == "--json" || $0 == "json" })
-  if conditionMet {
+  let jsonConditionMet = arguments.contains(where: { $0 == "--json" || $0 == "json" })
+  if jsonConditionMet {
     NSLog("// 接下來準備建置 JSON 格式的原廠辭典，同時生成用來偵錯的 TXT 副產物。")
     compileJSON = true
     compileSQLite = false
@@ -1089,11 +1062,9 @@ func main() {
     compileSQLite = true
   }
 
-  if compileSQLite {
-    guard prepareDatabase() else {
-      NSLog("// SQLite 資料庫初期化失敗。")
-      exit(-1)
-    }
+  if !prepareDatabase(), compileSQLite {
+    NSLog("// SQLite 資料庫初期化失敗。")
+    exit(-1)
   }
   let globalQueue = DispatchQueue.global(qos: .default)
   let group = DispatchGroup()
@@ -1116,7 +1087,7 @@ func main() {
     group.leave()
   }
   // 一直等待完成
-  _ = group.wait(timeout: .distantFuture)
+  group.wait()
   NSLog("// 全部 TXT 辭典檔案建置完畢。")
   if compileJSON {
     NSLog("// 全部 JSON 辭典檔案建置完畢。")
