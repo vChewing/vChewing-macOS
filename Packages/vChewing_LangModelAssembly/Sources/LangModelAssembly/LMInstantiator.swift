@@ -274,7 +274,10 @@ public extension vChewingLM {
     /// - Returns: 是否在庫。
     public func hasUnigramsFor(keyArray: [String]) -> Bool {
       let keyChain = keyArray.joined(separator: "-")
-      return keyChain == " " || (hasFactoryCoreUnigramsFor(keyArray: keyArray) && !keyChain.isEmpty)
+      // 因為涉及到對濾除清單的檢查，所以這裡必須走一遍 .unigramsFor()。
+      // 從 SQL 查詢的角度來看，這樣恐怕不是很經濟，因為 SQLite 要專門準備一次查詢結果。
+      // 但以 2010 年的電腦效能作為基準參考來看的話，這方面的效能壓力可以忽略不計。
+      return keyChain == " " || (!unigramsFor(keyArray: keyArray).isEmpty && !keyChain.isEmpty)
     }
 
     /// 根據給定的索引鍵和資料值，確認是否有該具體的資料值在庫。
