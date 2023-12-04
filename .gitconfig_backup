@@ -25,7 +25,7 @@
         url = https://gitcode.net/vChewing/vChewing-macOS.git/
         fetch = +refs/heads/*:refs/remotes/gitcode/*
 [remote "gitlab"]
-        url = https://jihulab.com/vChewing/vChewing-macOS.git/
+        url = https://gitlab.com/vChewing/vChewing-macOS.git/
         fetch = +refs/heads/*:refs/remotes/gitlab/*
 [remote "github"]
         url = https://github.com/vChewing/vChewing-macOS/
@@ -35,5 +35,5 @@
         fetch = +refs/heads/*:refs/remotes/all/*
         pushurl = https://gitee.com/vchewing/vChewing-macOS.git/
         pushurl = https://gitcode.net/vChewing/vChewing-macOS.git/
-        pushurl = https://jihulab.com/vChewing/vChewing-macOS.git/
+        pushurl = https://gitlab.com/vChewing/vChewing-macOS.git/
         pushurl = https://github.com/vChewing/vChewing-macOS/
