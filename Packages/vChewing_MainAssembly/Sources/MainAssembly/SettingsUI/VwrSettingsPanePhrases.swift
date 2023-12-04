@@ -25,9 +25,11 @@ public struct VwrSettingsPanePhrases: View {
       }
       .padding(4)
       .padding()
-      .frame(minWidth: CtlSettingsUI.formWidth, maxWidth: ceil(CtlSettingsUI.formWidth * 1.2))
     }
-    .frame(maxHeight: CtlSettingsUI.contentMaxHeight)
+    .frame(
+      minWidth: CtlSettingsUI.formWidth,
+      maxHeight: CtlSettingsUI.contentMaxHeight
+    )
   }
 }
 
