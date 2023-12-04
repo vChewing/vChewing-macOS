@@ -267,9 +267,12 @@ public struct VwrSettingsPaneBehavior: View {
             .settingsDescription()
           }
         }
-      }.formStyled().frame(minWidth: CtlSettingsUI.formWidth, maxWidth: ceil(CtlSettingsUI.formWidth * 1.2))
+      }.formStyled()
     }
-    .frame(maxHeight: CtlSettingsUI.contentMaxHeight)
+    .frame(
+      minWidth: CtlSettingsUI.formWidth,
+      maxHeight: CtlSettingsUI.contentMaxHeight
+    )
   }
 }
 

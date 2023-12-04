@@ -123,9 +123,12 @@ public struct VwrSettingsPaneKeyboard: View {
         Section(header: Text("Keyboard Shortcuts:")) {
           VwrSettingsPaneKeyboard_KeyboardShortcuts()
         }
-      }.formStyled().frame(minWidth: CtlSettingsUI.formWidth, maxWidth: ceil(CtlSettingsUI.formWidth * 1.2))
+      }.formStyled()
     }
-    .frame(maxHeight: CtlSettingsUI.contentMaxHeight)
+    .frame(
+      minWidth: CtlSettingsUI.formWidth,
+      maxHeight: CtlSettingsUI.contentMaxHeight
+    )
   }
 }
 
