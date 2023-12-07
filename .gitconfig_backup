@@ -18,9 +18,9 @@
 [branch "upd/dev"]
         remote = origin
         merge = refs/heads/upd/dev
-[branch "bleed/1.5.x"]
-        remote = origin
-        merge = refs/heads/bleed/1.5.x
+[remote "gitlink"]
+        url = https://gitlink.org.cn/vChewing/vChewing-macOS.git
+        fetch = +refs/heads/*:refs/remotes/gitlink/*
 [remote "gitcode"]
         url = https://gitcode.net/vChewing/vChewing-macOS.git/
         fetch = +refs/heads/*:refs/remotes/gitcode/*
@@ -34,6 +34,7 @@
         url = https://gitee.com/vChewing/vChewing-macOS.git/
         fetch = +refs/heads/*:refs/remotes/all/*
         pushurl = https://gitee.com/vchewing/vChewing-macOS.git/
+        pushurl = https://gitlink.org.cn/vChewing/vChewing-macOS.git/
         pushurl = https://gitcode.net/vChewing/vChewing-macOS.git/
         pushurl = https://gitlab.com/vChewing/vChewing-macOS.git/
         pushurl = https://github.com/vChewing/vChewing-macOS/
