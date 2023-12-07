@@ -19,6 +19,8 @@ public extension vChewingLM.LMInstantiator {
   var nullCandidateInCassette: String { Self.lmCassette.nullCandidate }
   /// 磁帶模式專用：選字鍵是否需要敲 Shift 才會生效。
   var areCassetteCandidateKeysShiftHeld: Bool { Self.lmCassette.areCandidateKeysShiftHeld }
+  /// 磁帶模式專用：需要直接递交的按键。
+  var keysToDirectlyCommit: String { Self.lmCassette.keysToDirectlyCommit }
   /// 磁帶模式專用：選字鍵，在威注音輸入法當中僅優先用於快速模式。
   var cassetteSelectionKey: String? {
     let result = Self.lmCassette.selectionKeys
