@@ -26,6 +26,7 @@ public extension vChewingLM {
     public private(set) var selectionKeys: String = ""
     public private(set) var endKeys: [String] = []
     public private(set) var wildcardKey: String = ""
+    public private(set) var keysToDirectlyCommit: String = ""
     public private(set) var keyNameMap: [String: String] = [:]
     public private(set) var quickDefMap: [String: String] = [:]
     public private(set) var charDefMap: [String: [String]] = [:]
@@ -207,6 +208,9 @@ public extension vChewingLM {
             }
             if wildcardKey.isEmpty, strLine.starts(with: "%wildcardkey ") {
               wildcardKey = cells[1].first?.description ?? ""
+            }
+            if keysToDirectlyCommit.isEmpty, strLine.starts(with: "%keys_to_directly_commit ") {
+              keysToDirectlyCommit = strSecondCell
             }
           }
           // Post process.
