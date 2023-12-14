@@ -343,14 +343,26 @@ public extension vChewingLM {
         }
       }
 
-      // 新增與日期、時間、星期有關的單元圖資料
+      // 分析且處理可能存在的 InputToken。
+      rawAllUnigrams = rawAllUnigrams.map { unigram in
+        let convertedValues = unigram.value.parseAsInputToken(isCHS: isCHS)
+        guard !convertedValues.isEmpty else { return [unigram] }
+        var result = [Megrez.Unigram]()
+        convertedValues.enumerated().forEach { absDelta, value in
+          let newScore: Double = -80 - Double(absDelta) * 0.01
+          result.append(.init(value: value, score: newScore))
+        }
+        return result
+      }.flatMap { $0 }
+
+      // 新增與日期、時間、星期有關的單元圖資料。
       rawAllUnigrams.append(contentsOf: queryDateTimeUnigrams(with: keyChain))
 
       if keyChain == "_punctuation_list" {
         rawAllUnigrams.append(contentsOf: getHaninSymbolMenuUnigrams())
       }
 
-      // 提前處理語彙置換
+      // 提前處理語彙置換。
       if isPhraseReplacementEnabled {
         for i in 0 ..< rawAllUnigrams.count {
           let newValue = lmReplacements.valuesFor(key: rawAllUnigrams[i].value)
