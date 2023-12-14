@@ -10,6 +10,7 @@
 
 import AppKit
 import IOKit
+import Quartz
 
 public enum SecureEventInputSputnik {
   public static func getIORegListResults() -> String? {
@@ -40,6 +41,7 @@ public enum SecureEventInputSputnik {
   /// Note that you cannot terminate a process if your app is Sandboxed.
   /// - Returns: Matched results as a dictionary in `[Int32: NSRunningApplication]` format. The keys are PIDs.
   /// - Remark: The`"com.apple.SecurityAgent"` won't be included in the result since it is a system process.
+  /// Also, "com.apple.loginwindow" should be excluded as long as the system screen saver engine is running.
   public static func getRunningSecureInputApps(abusersOnly: Bool = false) -> [Int32: NSRunningApplication] {
     var result = [Int32: NSRunningApplication]()
     guard let rawData = getIORegListResults() else { return result }
@@ -48,11 +50,28 @@ public enum SecureEventInputSputnik {
       guard let filteredNumStr = Int32(currentLine.filter("0123456789".contains)) else { return }
       guard let matchedApp = NSRunningApplication(processIdentifier: filteredNumStr) else { return }
       guard matchedApp.bundleIdentifier != "com.apple.SecurityAgent" else { return }
+      guard !(matchedApp.isLoginWindowWithLockedScreenOrScreenSaver) else { return }
       if abusersOnly {
         guard !matchedApp.isActive else { return }
       }
       result[filteredNumStr] = matchedApp
     }
     return result
+  }
+}
+
+extension NSRunningApplication {
+  public var isLoginWindowWithLockedScreenOrScreenSaver: Bool {
+    guard bundleIdentifier == "com.apple.loginwindow" else { return false }
+    return Self.isScreenSaverEngineRunning || Self.isDesktopLocked
+  }
+
+  private static var isScreenSaverEngineRunning: Bool {
+    !NSRunningApplication.runningApplications(withBundleIdentifier: "com.apple.ScreenSaver.Engine").isEmpty
+  }
+
+  private static var isDesktopLocked: Bool {
+    guard let x = CGSessionCopyCurrentDictionary() as? [String: Any] else { return false }
+    return x.keys.contains("CGSSessionScreenIsLocked")
   }
 }
