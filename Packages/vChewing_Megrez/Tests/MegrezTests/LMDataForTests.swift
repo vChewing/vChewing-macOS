@@ -19,8 +19,7 @@ class SimpleLM: LangModelProtocol {
       let col0 = String(linestream[0])
       let col1 = String(linestream[1])
       let col2 = Double(linestream[2]) ?? 0.0
-      let u = Megrez.Unigram(value: swapKeyValue ? col0 : col1, score: 0)
-      u.score = col2
+      let u = Megrez.Unigram(value: swapKeyValue ? col0 : col1, score: col2)
       mutDatabase[swapKeyValue ? col1 : col0, default: []].append(u)
     }
   }
