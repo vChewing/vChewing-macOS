@@ -33,6 +33,16 @@ public extension StringLiteralType {
 // Extend the RangeReplaceableCollection to allow it clean duplicated characters.
 // Ref: https://stackoverflow.com/questions/25738817/
 public extension RangeReplaceableCollection where Element: Hashable {
+  /// 使用 NSOrderedSet 處理 class 陣列的「去重複化」。
+  var classDeduplicated: Self {
+    NSOrderedSet(array: Array(self)).compactMap { $0 as? Element.Type } as? Self ?? self
+    // 下述方法有 Bug 會在處理 KeyValuePaired 的時候崩掉，暫時停用。
+    // var set = Set<Element>()
+    // return filter { set.insert($0).inserted }
+  }
+
+  /// 去重複化。
+  /// - Remark: 該方法不適合用來處理 class，除非該 class 遵循 Identifiable 協定。
   var deduplicated: Self {
     var set = Set<Element>()
     return filter { set.insert($0).inserted }
