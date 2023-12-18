@@ -5,11 +5,15 @@
 
 public extension Megrez {
   /// 鍵值配對，乃索引鍵陣列與讀音的配對單元。
-  class KeyValuePaired: Unigram, Comparable {
+  struct KeyValuePaired: Equatable, CustomStringConvertible, Hashable, Comparable {
     /// 索引鍵陣列。一般情況下用來放置讀音等可以用來作為索引的內容。
-    public var keyArray: [String] = []
+    public let keyArray: [String]
+    /// 資料值，通常是詞語或單個字。
+    public let value: String
+    /// 權重。
+    public let score: Double
     /// 將當前鍵值列印成一個字串。
-    override public var description: String { "(\(keyArray.description),\(value),\(score))" }
+    public var description: String { "(\(keyArray.description),\(value),\(score))" }
     /// 判斷當前鍵值配對是否合規。如果鍵與值有任一為空，則結果為 false。
     public var isValid: Bool { !keyArray.joined().isEmpty && !value.isEmpty }
     /// 將當前鍵值列印成一個字串，但如果該鍵值配對為空的話則僅列印「()」。
@@ -24,25 +28,28 @@ public extension Megrez {
     ///   - keyArray: 索引鍵陣列。一般情況下用來放置讀音等可以用來作為索引的內容。
     ///   - value: 資料值。
     ///   - score: 權重（雙精度小數）。
-    public init(keyArray: [String], value: String = "N/A", score: Double = 0) {
-      super.init(value: value.isEmpty ? "N/A" : value, score: score)
+    public init(keyArray: [String] = [], value: String = "N/A", score: Double = 0) {
       self.keyArray = keyArray.isEmpty ? ["N/A"] : keyArray
+      self.value = value.isEmpty ? "N/A" : value
+      self.score = score
     }
 
     /// 初期化一組鍵值配對。
     /// - Parameter tripletExpression: 傳入的通用陣列表達形式。
     public init(_ tripletExpression: (keyArray: [String], value: String, score: Double)) {
-      let theValue = tripletExpression.value.isEmpty ? "N/A" : tripletExpression.value
-      super.init(value: theValue, score: tripletExpression.score)
       keyArray = tripletExpression.keyArray.isEmpty ? ["N/A"] : tripletExpression.keyArray
+      let theValue = tripletExpression.value.isEmpty ? "N/A" : tripletExpression.value
+      value = theValue
+      score = tripletExpression.score
     }
 
     /// 初期化一組鍵值配對。
     /// - Parameter tuplet: 傳入的通用陣列表達形式。
     public init(_ tupletExpression: (keyArray: [String], value: String)) {
-      let theValue = tupletExpression.value.isEmpty ? "N/A" : tupletExpression.value
-      super.init(value: theValue, score: 0)
       keyArray = tupletExpression.keyArray.isEmpty ? ["N/A"] : tupletExpression.keyArray
+      let theValue = tupletExpression.value.isEmpty ? "N/A" : tupletExpression.value
+      value = theValue
+      score = 0
     }
 
     /// 初期化一組鍵值配對。
@@ -51,16 +58,21 @@ public extension Megrez {
     ///   - value: 資料值。
     ///   - score: 權重（雙精度小數）。
     public init(key: String = "N/A", value: String = "N/A", score: Double = 0) {
-      super.init(value: value.isEmpty ? "N/A" : value, score: score)
       keyArray = key.isEmpty ? ["N/A"] : key.sliced(by: Megrez.Compositor.theSeparator)
+      self.value = value.isEmpty ? "N/A" : value
+      self.score = score
     }
 
     /// 做為預設雜湊函式。
     /// - Parameter hasher: 目前物件的雜湊碼。
-    override public func hash(into hasher: inout Hasher) {
+    public func hash(into hasher: inout Hasher) {
       hasher.combine(keyArray)
       hasher.combine(value)
       hasher.combine(score)
+    }
+
+    public var hardCopy: KeyValuePaired {
+      .init(keyArray: keyArray, value: value, score: score)
     }
 
     public func joinedKey(by separator: String = Megrez.Compositor.theSeparator) -> String {

@@ -5,7 +5,7 @@
 
 public extension Megrez {
   /// 單元圖。
-  class Unigram: Equatable, CustomStringConvertible, Hashable {
+  struct Unigram: Equatable, CustomStringConvertible, Hashable {
     /// 資料值，通常是詞語或單個字。
     public var value: String
     /// 權重。
