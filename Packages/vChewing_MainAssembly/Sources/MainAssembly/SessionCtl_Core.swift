@@ -26,6 +26,8 @@ import TooltipUI
 /// 輸入會話創建一個控制器型別。因此，對於每個輸入會話，都有一個對應的 IMKInputController。
 @objc(SessionCtl) // 必須加上 ObjC，因為 IMK 是用 ObjC 寫的。
 public class SessionCtl: IMKInputController {
+  public weak static var current: SessionCtl?
+
   /// 標記狀態來聲明目前新增的詞彙是否需要賦以非常低的權重。
   public static var areWeNerfing = false
 
@@ -219,6 +221,9 @@ public class SessionCtl: IMKInputController {
   private func construct(client theClient: (IMKTextInput & NSObjectProtocol)? = nil) {
     DispatchQueue.main.async { [weak self] in
       guard let self = self else { return }
+      // 關掉所有之前的副本的視窗。
+      Self.current?.hidePalettes()
+      Self.current = self
       self.inputHandler = InputHandler(
         lm: LMMgr.currentLM, uom: LMMgr.currentUOM, pref: PrefMgr.shared
       )
@@ -479,8 +484,12 @@ public extension SessionCtl {
 
   /// 該函式僅用來取消任何輸入法浮動視窗的顯示。
   override func hidePalettes() {
-    candidateUI?.visible = false
-    popupCompositionBuffer.hide()
-    tooltipInstance.hide()
+    Broadcaster.shared.eventForClosingAllPanels = .init()
+    // 因為上述變數受選字窗、浮動組字窗、工具提示視窗所實時觀測，
+    // 所以他們會在看到該變數有變化時自行關閉。
+    // 自然不需要下述三行。
+    // candidateUI?.visible = false
+    // popupCompositionBuffer.hide()
+    // tooltipInstance.hide()
   }
 }
