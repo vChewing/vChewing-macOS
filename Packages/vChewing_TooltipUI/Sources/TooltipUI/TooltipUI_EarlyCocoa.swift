@@ -10,6 +10,7 @@ import AppKit
 import Shared
 
 public class TooltipUI_EarlyCocoa: NSWindowController, TooltipUIProtocol {
+  @objc var observation: NSKeyValueObservation?
   private var messageText: NSTextField
   private var tooltip: String = "" {
     didSet {
@@ -100,6 +101,10 @@ public class TooltipUI_EarlyCocoa: NSWindowController, TooltipUIProtocol {
     panel.contentView?.addSubview(messageText)
     Self.currentWindow = panel
     super.init(window: panel)
+
+    observation = Broadcaster.shared.observe(\.eventForClosingAllPanels, options: [.new]) { _, _ in
+      self.hide()
+    }
   }
 
   @available(*, unavailable)
