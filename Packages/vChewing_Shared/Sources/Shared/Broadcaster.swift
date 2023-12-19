@@ -13,4 +13,5 @@ import AppKit
 @objcMembers public class Broadcaster: NSObject {
   public static var shared = Broadcaster()
   public dynamic var eventForReloadingPhraseEditor = UUID()
+  public dynamic var eventForClosingAllPanels = UUID()
 }
