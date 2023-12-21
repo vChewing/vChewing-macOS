@@ -106,7 +106,7 @@ public extension InputHandler {
 
     // MARK: - 按狀態分診（Triage by States）
 
-    switch state.type {
+    triageByState: switch state.type {
     case .ofDeactivated, .ofAbortion, .ofCommitting: return false
     case .ofAssociates, .ofCandidates, .ofSymbolTable:
       let result = handleCandidate(input: input)
@@ -173,6 +173,12 @@ public extension InputHandler {
 
       // 根據 keyCode 進行分診處理。
       if let keyCodeTriaged = triageByKeyCode() { return keyCodeTriaged }
+
+      // 磁帶模式：如果有定義 keysToDirectlyCommit 的話，對符合條件的輸入訊號不再作處理。
+      var cinDirectlyCommit = prefs.cassetteEnabled && !currentLM.keysToDirectlyCommit.isEmpty
+      cinDirectlyCommit = cinDirectlyCommit && [.ofInputting, .ofEmpty].contains(state.type)
+      cinDirectlyCommit = cinDirectlyCommit && currentLM.keysToDirectlyCommit.contains(input.text)
+      guard !cinDirectlyCommit else { break triageByState }
 
       // 全形/半形阿拉伯數字輸入。
       if handleArabicNumeralInputs(input: input) { return true }
