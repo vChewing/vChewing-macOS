@@ -93,7 +93,7 @@ public class CandidateCellData: Hashable {
     if #available(macOS 10.15, *) {
       return NSFont.monospacedSystemFont(ofSize: fontSizeKey, weight: .regular)
     }
-    return NSFont(name: "Menlo", size: size) ?? phraseFont(size: size)
+    return NSFont(name: "Courier New", size: size) ?? phraseFont(size: size)
   }
 
   func phraseFont(size: CGFloat? = nil) -> NSFont {
