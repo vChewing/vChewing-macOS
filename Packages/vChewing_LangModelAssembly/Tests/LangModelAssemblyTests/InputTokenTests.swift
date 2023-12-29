@@ -55,4 +55,19 @@ final class InputTokenTests: XCTestCase {
     print("測試一千年以後干支：" + "MACRO@YEAR_GANZHI_YEARDELTA:1000".parseAsInputToken(isCHS: false).description)
     print("測試一千年以後生肖：" + "MACRO@YEAR_ZODIAC_YEARDELTA:1000".parseAsInputToken(isCHS: false).description)
   }
+
+  func testGeneratedResultsFromLMInstantiator() throws {
+    let instance = vChewingLM.LMInstantiator(isCHS: true)
+    XCTAssertTrue(vChewingLM.LMInstantiator.connectToTestSQLDB())
+    instance.isCNSEnabled = false
+    instance.isSymbolEnabled = false
+    instance.insertTemporaryData(
+      keyArray: ["ㄐㄧㄣ", "ㄊㄧㄢ", "ㄖˋ", "ㄑㄧˊ"],
+      unigram: .init(value: "MACRO@DATE_YEARDELTA:-1945", score: -97.5),
+      isFiltering: false
+    )
+    let x = instance.unigramsFor(keyArray: ["ㄐㄧㄣ", "ㄊㄧㄢ", "ㄖˋ", "ㄑㄧˊ"]).description
+    print(x)
+    vChewingLM.LMInstantiator.disconnectSQLDB()
+  }
 }
