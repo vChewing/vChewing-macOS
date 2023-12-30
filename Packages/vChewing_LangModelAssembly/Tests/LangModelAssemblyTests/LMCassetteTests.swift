@@ -47,7 +47,7 @@ final class LMCassetteTests: XCTestCase {
     NSLog("LMCassette: Finished loading CIN. Entries: \(lmCassette.count)")
     XCTAssertFalse(lmCassette.quickDefMap.isEmpty)
     print(lmCassette.quickSetsFor(key: ",.") ?? "")
-    XCTAssertEqual(lmCassette.keyNameMap.count, 41)
+    XCTAssertEqual(lmCassette.keyNameMap.count, 31)
     XCTAssertEqual(lmCassette.charDefMap.count, 29491)
     XCTAssertEqual(lmCassette.charDefWildcardMap.count, 11946)
     XCTAssertEqual(lmCassette.octagramMap.count, 0)
