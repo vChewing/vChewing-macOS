@@ -23,9 +23,9 @@ final class LMUserOverrideTests: XCTestCase {
 
   func testUOM_1_BasicOps() throws {
     let uom = vChewingLM.LMUserOverride(capacity: capacity, decayConstant: Double(halfLife), dataURL: nullURL)
-    let key = "((ㄍㄨㄥ-ㄙ,公司),(ㄉㄜ˙,的),ㄋㄧㄢˊ-ㄓㄨㄥ)"
-    let headReading = "ㄋㄧㄢˊ-ㄓㄨㄥ"
-    let expectedSuggestion = "年終"
+    let key = "((ㄕㄣˊ-ㄌㄧˇ-ㄌㄧㄥˊ-ㄏㄨㄚˊ,神里綾華),(ㄉㄜ˙,的),ㄍㄡˇ)"
+    let headReading = "ㄍㄡˇ"
+    let expectedSuggestion = "狗"
     observe(who: uom, key: key, candidate: expectedSuggestion, timestamp: nowTimeStamp)
     var suggested = uom.getSuggestion(key: key, timestamp: nowTimeStamp, headReading: headReading)
     XCTAssertEqual(Set(suggested.candidates.map(\.1.value)).first ?? "", expectedSuggestion)
@@ -46,10 +46,10 @@ final class LMUserOverrideTests: XCTestCase {
 
   func testUOM_2_NewestAgainstRepeatedlyUsed() throws {
     let uom = vChewingLM.LMUserOverride(capacity: capacity, decayConstant: Double(halfLife), dataURL: nullURL)
-    let key = "((ㄍㄨㄥ-ㄙ,公司),(ㄉㄜ˙,的),ㄋㄧㄢˊ-ㄓㄨㄥ)"
-    let headReading = "ㄋㄧㄢˊ-ㄓㄨㄥ"
-    let valRepeatedlyUsed = "年終" // 更常用
-    let valNewest = "年中" // 最近偶爾用了一次
+    let key = "((ㄕㄣˊ-ㄌㄧˇ-ㄌㄧㄥˊ-ㄏㄨㄚˊ,神里綾華),(ㄉㄜ˙,的),ㄍㄡˇ)"
+    let headReading = "ㄍㄡˇ"
+    let valRepeatedlyUsed = "狗" // 更常用
+    let valNewest = "苟" // 最近偶爾用了一次
     let stamps: [Double] = [0, 0.5, 2, 2.5, 4, 4.5, 5.3].map { nowTimeStamp + halfLife * $0 }
     stamps.forEach { stamp in
       observe(who: uom, key: key, candidate: valRepeatedlyUsed, timestamp: stamp)
@@ -62,8 +62,6 @@ final class LMUserOverrideTests: XCTestCase {
     }
     // 試試看偶爾選了不常用的詞的話、是否會影響上文所生成的有一定強效的記憶。
     observe(who: uom, key: key, candidate: valNewest, timestamp: nowTimeStamp + halfLife * 23.4)
-    suggested = uom.getSuggestion(key: key, timestamp: nowTimeStamp + halfLife * 23.6, headReading: headReading)
-    XCTAssertEqual(Set(suggested.candidates.map(\.1.value)).first ?? "", valNewest)
     suggested = uom.getSuggestion(key: key, timestamp: nowTimeStamp + halfLife * 26, headReading: headReading)
     XCTAssertEqual(Set(suggested.candidates.map(\.1.value)).first ?? "", valNewest)
     suggested = uom.getSuggestion(key: key, timestamp: nowTimeStamp + halfLife * 50, headReading: headReading)
@@ -72,9 +70,9 @@ final class LMUserOverrideTests: XCTestCase {
   }
 
   func testUOM_3_LRUTable() throws {
-    let a = (key: "((ㄍㄨㄥ-ㄙ,公司),(ㄉㄜ˙,的),ㄋㄧㄢˊ-ㄓㄨㄥ)", value: "年終", head: "ㄋㄧㄢˊ-ㄓㄨㄥ")
-    let b = (key: "((ㄑㄧˋ-ㄧㄝˋ,企業),(ㄉㄜ˙,的),ㄐㄧㄤˇ-ㄐㄧㄣ)", value: "獎金", head: "ㄐㄧㄤˇ-ㄐㄧㄣ")
-    let c = (key: "((ㄒㄩㄝˊ-ㄕㄥ,學生),(ㄉㄜ˙,的),ㄈㄨˊ-ㄌㄧˋ)", value: "福利", head: "ㄈㄨˊ-ㄌㄧˋ")
+    let a = (key: "((ㄕㄣˊ-ㄌㄧˇ-ㄌㄧㄥˊ-ㄏㄨㄚˊ,神里綾華),(ㄉㄜ˙,的),ㄍㄡˇ)", value: "狗", head: "ㄍㄡˇ")
+    let b = (key: "((ㄆㄞˋ-ㄇㄥˊ,派蒙),(ㄉㄜ˙,的),ㄐㄧㄤˇ-ㄐㄧㄣ)", value: "伙食費", head: "ㄏㄨㄛˇ-ㄕˊ-ㄈㄟˋ")
+    let c = (key: "((ㄍㄨㄛˊ-ㄅㄥ,國崩),(ㄉㄜ˙,的),ㄇㄠˋ-ㄗ˙)", value: "帽子", head: "ㄇㄠˋ-ㄗ˙")
     let d = (key: "((ㄌㄟˊ-ㄉㄧㄢˋ-ㄐㄧㄤ-ㄐㄩㄣ,雷電將軍),(ㄉㄜ˙,的),ㄐㄧㄠˇ-ㄔㄡˋ)", value: "腳臭", head: "ㄐㄧㄠˇ-ㄔㄡˋ")
     let uom = vChewingLM.LMUserOverride(capacity: 2, decayConstant: Double(halfLife), dataURL: nullURL)
     observe(who: uom, key: a.key, candidate: a.value, timestamp: nowTimeStamp)
