@@ -2,6 +2,14 @@
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
 <plist version="1.0">
 <dict>
+	<key>TISCapsLockResetOnModeSwitch</key>
+	<true/>
+	<key>TISCapsLockIsSwitch</key>
+	<true/>
+	<key>TICapsLockLanguageSwitchCapable</key>
+	<true/>
+	<key>TISParticipatesInTouchBar</key>
+	<false/>
 	<key>CFBundleDevelopmentRegion</key>
 	<string>English</string>
 	<key>CFBundleExecutable</key>
@@ -56,6 +64,8 @@ SOFTWARE.
 		<dict>
 			<key>org.atelierInmu.inputmethod.vChewing.IMECHS</key>
 			<dict>
+				<key>TISInputSourceID</key>
+				<string>org.atelierInmu.inputmethod.vChewing.IMECHS</string>
 				<key>TISIconIsTemplate</key>
 				<true/>
 				<key>TISIconLabels</key>
@@ -65,11 +75,11 @@ SOFTWARE.
 				</dict>
 				<key>TISIntendedLanguage</key>
 				<string>zh-Hans</string>
-				<key>tsInputModeAlternateMenuIconFileKey</key>
-				<string>MenuIcon-SCVIM.png</string>
 				<key>tsInputModeCharacterRepertoireKey</key>
 				<array>
 					<string>Hans</string>
+					<string>Hani</string>
+					<string>Hanb</string>
 					<string>Han</string>
 				</array>
 				<key>tsInputModeDefaultStateKey</key>
@@ -87,6 +97,8 @@ SOFTWARE.
 			</dict>
 			<key>org.atelierInmu.inputmethod.vChewing.IMECHT</key>
 			<dict>
+				<key>TISInputSourceID</key>
+				<string>org.atelierInmu.inputmethod.vChewing.IMECHT</string>
 				<key>TISIconIsTemplate</key>
 				<true/>
 				<key>TISIconLabels</key>
@@ -96,11 +108,11 @@ SOFTWARE.
 				</dict>
 				<key>TISIntendedLanguage</key>
 				<string>zh-Hant</string>
-				<key>tsInputModeAlternateMenuIconFileKey</key>
-				<string>MenuIcon-TCVIM.png</string>
 				<key>tsInputModeCharacterRepertoireKey</key>
 				<array>
 					<string>Hant</string>
+					<string>Hani</string>
+					<string>Hanb</string>
 					<string>Han</string>
 				</array>
 				<key>tsInputModeDefaultStateKey</key>
@@ -153,31 +165,8 @@ SOFTWARE.
 	<string>No</string>
 	<key>NSWindowDarkChocolate</key>
 	<string>Yes</string>
-	<key>TICapsLockLanguageSwitchCapable</key>
-	<true/>
-	<key>TISCapsLockIsSwitch</key>
-	<true/>
-	<key>TISCapsLockResetOnModeSwitch</key>
-	<true/>
-	<key>TISIconIsTemplate</key>
-	<true/>
-	<key>TISInputSourceID</key>
-	<string>org.atelierInmu.inputmethod.vChewing</string>
-	<key>TISIntendedLanguage</key>
-	<string>zh-Hans</string>
-	<key>TISParticipatesInTouchBar</key>
-	<true/>
 	<key>TISUnifiedUIForInputMethodEnabling</key>
 	<false/>
-	<key>tsInputMethodCharacterRepertoireKey</key>
-	<array>
-		<string>Hans</string>
-		<string>Hant</string>
-		<string>Hani</string>
-		<string>Hanb</string>
-	</array>
-	<key>tsInputMethodIconFileKey</key>
-	<string>MenuIcon-TCVIM.png</string>
 	<key>UpdateInfoEndpoint</key>
 	<string>https://gitee.com/vchewing/vChewing-macOS/raw/main/Update-Info.plist</string>
 	<key>UpdateInfoEndpointLegacy</key>
