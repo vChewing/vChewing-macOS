@@ -30,7 +30,13 @@ public class CtlCandidateTDK: CtlCandidate, NSWindowDelegate {
   public var useMouseScrolling: Bool = true
   private static var thePool: CandidatePool = .init(candidates: [])
   private static var currentView: NSView = .init()
-  public static var currentMenu: NSMenu?
+
+  public static var currentMenu: NSMenu? {
+    willSet {
+      currentMenu?.cancelTracking()
+    }
+  }
+
   public static var currentWindow: NSWindow? {
     willSet {
       currentWindow?.orderOut(nil)
