@@ -46,16 +46,6 @@ public class SessionCtl: IMKInputController {
   /// 用來標記當前副本是否已處於活動狀態。
   public var isActivated = false
 
-  /// 用来記錄當前副本是否處於開機階段（activateServer 執行後 0.1 秒以內都算）。
-  public private(set) var isBootingUp: Bool = true {
-    didSet {
-      guard isBootingUp else { return }
-      DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
-        self.isBootingUp = false
-      }
-    }
-  }
-
   /// 當前副本的客體是否是輸入法本體？
   public var isServingIMEItself: Bool = false
 
@@ -219,22 +209,12 @@ public class SessionCtl: IMKInputController {
 
   /// 所有建構子都會執行的共用部分，在 super.init() 之後執行。
   private func construct(client theClient: (IMKTextInput & NSObjectProtocol)? = nil) {
-    DispatchQueue.main.async { [weak self] in
-      guard let self = self else { return }
-      // 關掉所有之前的副本的視窗。
-      Self.current?.hidePalettes()
-      Self.current = self
-      self.inputHandler = InputHandler(
-        lm: LMMgr.currentLM, uom: LMMgr.currentUOM, pref: PrefMgr.shared
-      )
-      self.inputHandler?.delegate = self
-      self.syncBaseLMPrefs()
-      // 下述兩行很有必要，否則輸入法會在手動重啟之後無法立刻生效。
-      let maybeClient = theClient ?? self.client()
-      self.activateServer(maybeClient)
-      // GCD 會觸發 didSet，所以不用擔心。
-      self.inputMode = .init(rawValue: PrefMgr.shared.mostRecentInputMode) ?? .imeModeNULL
+    activate(server: theClient ?? client())
+    // defer 會觸發 didSet，所以不用擔心。
+    defer {
+      inputMode = .init(rawValue: PrefMgr.shared.mostRecentInputMode) ?? .imeModeNULL
     }
+    vCLog("constuct() executed.")
   }
 }
 
@@ -243,10 +223,9 @@ public class SessionCtl: IMKInputController {
 public extension SessionCtl {
   /// 強制重設當前鍵盤佈局、使其與偏好設定同步。
   func setKeyLayout() {
-    guard let client = client(), !isServingIMEItself else { return }
-
     DispatchQueue.main.async { [weak self] in
       guard let self = self else { return }
+      guard let client = self.client(), !self.isServingIMEItself else { return }
       if self.isASCIIMode, IMKHelper.isDynamicBasicKeyboardLayoutEnabled {
         client.overrideKeyboard(withKeyboardNamed: PrefMgr.shared.alphanumericalKeyboardLayout)
         return
@@ -282,76 +261,72 @@ public extension SessionCtl {
   /// 啟用輸入法時，會觸發該函式。
   /// - Parameter sender: 呼叫了該函式的客體。
   override func activateServer(_ sender: Any!) {
+    activate(server: sender as? IMKTextInput ?? client())
+  }
+
+  /// 啟用輸入法時，會觸發該函式。
+  /// - Parameter sender: 呼叫了該函式的客體。
+  func activate(server sender: IMKTextInput) {
+    // 關掉所有之前的副本的視窗。
+    Self.current?.hidePalettes()
+    Self.current = self
     super.activateServer(sender)
-    isBootingUp = true
-    DispatchQueue.main.async { [weak self] in
-      guard let self = self else { return }
-      if let senderBundleID: String = (sender as? IMKTextInput)?.bundleIdentifier() {
-        vCLog("activateServer(\(senderBundleID))")
-        self.isServingIMEItself = Bundle.main.bundleIdentifier == senderBundleID
-        self.clientBundleIdentifier = senderBundleID
-        // 只要使用者沒有勾選檢查更新、沒有主動做出要檢查更新的操作，就不要檢查更新。
-        if PrefMgr.shared.checkUpdateAutomatically {
-          AppDelegate.shared.checkUpdate(forced: false) {
-            senderBundleID == "com.apple.SecurityAgent"
-          }
+    if let senderBundleID: String = sender.bundleIdentifier() {
+      vCLog("activateServer(\(senderBundleID))")
+      isServingIMEItself = Bundle.main.bundleIdentifier == senderBundleID
+      clientBundleIdentifier = senderBundleID
+      // 只要使用者沒有勾選檢查更新、沒有主動做出要檢查更新的操作，就不要檢查更新。
+      if PrefMgr.shared.checkUpdateAutomatically {
+        AppDelegate.shared.checkUpdate(forced: false) {
+          senderBundleID == "com.apple.SecurityAgent"
         }
       }
     }
-    DispatchQueue.main.async {
-      // 自動啟用肛塞（廉恥模式），除非這一天是愚人節。
-      if !Date.isTodayTheDate(from: 0401), !PrefMgr.shared.shouldNotFartInLieuOfBeep {
-        PrefMgr.shared.shouldNotFartInLieuOfBeep = true
-      }
+    // 自動啟用肛塞（廉恥模式），除非這一天是愚人節。
+    if !Date.isTodayTheDate(from: 0401), !PrefMgr.shared.shouldNotFartInLieuOfBeep {
+      PrefMgr.shared.shouldNotFartInLieuOfBeep = true
     }
-    DispatchQueue.main.async { [weak self] in
-      guard let self = self else { return }
-      if self.inputMode != IMEApp.currentInputMode {
-        self.inputMode = IMEApp.currentInputMode
-      }
+    if inputMode != IMEApp.currentInputMode {
+      inputMode = IMEApp.currentInputMode
     }
-    DispatchQueue.main.async {
-      // 清理掉上一個會話的選字窗及其選單。
-      if self.candidateUI is CtlCandidateTDK {
-        self.candidateUI = nil
-      }
-      CtlCandidateTDK.currentMenu?.cancelTracking()
-      CtlCandidateTDK.currentMenu = nil
-      CtlCandidateTDK.currentWindow?.orderOut(nil)
-      CtlCandidateTDK.currentWindow = nil
+    // 清理掉上一個會話的選字窗及其選單。
+    if candidateUI is CtlCandidateTDK {
+      candidateUI = nil
     }
-    DispatchQueue.main.async { [weak self] in
-      guard let self = self else { return }
-      if self.isActivated { return }
+    CtlCandidateTDK.currentMenu = nil
+    CtlCandidateTDK.currentWindow = nil
 
-      // 這裡不需要 setValue()，因為 IMK 會在自動呼叫 activateServer() 之後自動執行 setValue()。
-      self.inputHandler = InputHandler(
-        lm: LMMgr.currentLM, uom: LMMgr.currentUOM, pref: PrefMgr.shared
-      )
-      self.inputHandler?.delegate = self
-      self.syncBaseLMPrefs()
+    // MARK: 正式過程
 
-      Self.theShiftKeyDetector.toggleWithLShift = PrefMgr.shared.togglingAlphanumericalModeWithLShift
-      Self.theShiftKeyDetector.toggleWithRShift = PrefMgr.shared.togglingAlphanumericalModeWithRShift
+    if isActivated { return }
 
-      if self.isASCIIMode, !IMEApp.isKeyboardJIS {
-        if #available(macOS 10.15, *) {
-          if !Self.theShiftKeyDetector.enabled {
-            self.isASCIIMode = false
-          }
-        } else {
+    // 這裡不需要 setValue()，因為 IMK 會在自動呼叫 activateServer() 之後自動執行 setValue()。
+    inputHandler = InputHandler(
+      lm: LMMgr.currentLM, uom: LMMgr.currentUOM, pref: PrefMgr.shared
+    )
+    inputHandler?.delegate = self
+    syncBaseLMPrefs()
+
+    Self.theShiftKeyDetector.toggleWithLShift = PrefMgr.shared.togglingAlphanumericalModeWithLShift
+    Self.theShiftKeyDetector.toggleWithRShift = PrefMgr.shared.togglingAlphanumericalModeWithRShift
+
+    if isASCIIMode, !IMEApp.isKeyboardJIS {
+      if #available(macOS 10.15, *) {
+        if !Self.theShiftKeyDetector.enabled {
           self.isASCIIMode = false
         }
+      } else {
+        isASCIIMode = false
       }
-
-      DispatchQueue.main.async {
-        AppDelegate.shared.checkMemoryUsage()
-      }
-
-      self.state = IMEState.ofEmpty()
-      self.isActivated = true // 登記啟用狀態。
-      self.setKeyLayout()
     }
+
+    DispatchQueue.main.async {
+      AppDelegate.shared.checkMemoryUsage()
+    }
+
+    state = IMEState.ofEmpty()
+    isActivated = true // 登記啟用狀態。
+    setKeyLayout()
   }
 
   /// 停用輸入法時，會觸發該函式。
