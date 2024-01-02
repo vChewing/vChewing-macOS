@@ -40,7 +40,21 @@ public extension SessionCtl {
   ///   - replace: 是否取代現有狀態。
   func handle(state newState: IMEStateProtocol, replace: Bool) {
     var previous = state
-    if replace { state = newState }
+    if replace {
+      var newState = newState
+      /// IMK 有如下限制：
+      /// 1. 內文組字區要想顯示游標的話，所有下劃線的粗細必須相等。
+      /// 2. 如果所有線段粗細相等的話，給 client().setMarkedText() 塞入的 selectionRange 的長度必須得是 0。
+      /// 不然的話，游標會頑固地出現在內文組字區的正前方（文字輸入順序上的前方）。
+      /// 3. 從 macOS 14 開始，粗細相等的相鄰下劃線會顯示成一整個線段。該行為改變恐怕是 macOS 故意所為。
+      ///
+      /// 於是乎，此處特地針對 .ofInputtingState 專門將內文組字區的 marker 設定到 cursor 的位置。
+      /// 這是一招隔山打牛的方法，讓此時的 selectionRange 的長度必定是 0。
+      if newState.type == .ofInputting, clientMitigationLevel < 2 {
+        newState.data.marker = newState.data.cursor
+      }
+      state = newState
+    }
     switch newState.type {
     case .ofDeactivated:
       // 這裡移除一些處理，轉而交給 commitComposition() 代為執行。
@@ -166,7 +180,7 @@ public extension SessionCtl {
   ///   該功能是給某些想設計「重新組字」功能的輸入法設計的，但一字多音的漢語在注音/拼音輸入這方面不適用這個輸入法特性。
   func doSetMarkedText(_ string: NSAttributedString, allowAsync: Bool = true) {
     // 威注音用不到 replacementRange，所以不用檢查 replacementRange 的異動情況。
-    let range = attributedStringSecured.range
+    let range = selectionRange()
     guard !(string.isEqual(to: recentMarkedText.text) && recentMarkedText.selectionRange == range) else { return }
     recentMarkedText.text = string
     recentMarkedText.selectionRange = range
