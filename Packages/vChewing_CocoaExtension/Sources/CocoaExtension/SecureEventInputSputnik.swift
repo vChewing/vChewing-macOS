@@ -9,10 +9,16 @@
 /// A Swift script to check whether a non-system process is abusing the SecureEventInput.
 
 import AppKit
+import Combine
 import IOKit
-import Quartz
 
-public enum SecureEventInputSputnik {
+public class SecureEventInputSputnik {
+  public let shared = SecureEventInputSputnik()
+
+  public init() {
+    oobe()
+  }
+
   public static func getIORegListResults() -> String? {
     var resultDictionaryCF: Unmanaged<CFMutableDictionary>?
     /// Regarding the parameter in IORegistryGetRootEntry:
@@ -60,8 +66,8 @@ public enum SecureEventInputSputnik {
   }
 }
 
-extension NSRunningApplication {
-  public var isLoginWindowWithLockedScreenOrScreenSaver: Bool {
+public extension NSRunningApplication {
+  var isLoginWindowWithLockedScreenOrScreenSaver: Bool {
     guard bundleIdentifier == "com.apple.loginwindow" else { return false }
     return Self.isScreenSaverEngineRunning || Self.isDesktopLocked
   }
@@ -70,8 +76,36 @@ extension NSRunningApplication {
     !NSRunningApplication.runningApplications(withBundleIdentifier: "com.apple.ScreenSaver.Engine").isEmpty
   }
 
-  private static var isDesktopLocked: Bool {
-    guard let x = CGSessionCopyCurrentDictionary() as? [String: Any] else { return false }
-    return x.keys.contains("CGSSessionScreenIsLocked")
+  fileprivate(set) static var isDesktopLocked: Bool = false
+}
+
+extension SecureEventInputSputnik {
+  private static var combinePoolCocoa = [any NSObjectProtocol]()
+
+  @available(macOS 10.15, *)
+  private static var combinePool = Set<AnyCancellable>()
+
+  func oobe() {
+    if #available(macOS 10.15, *) {
+      DistributedNotificationCenter.default()
+        .publisher(for: .init(rawValue: "com.apple.screenIsLocked"))
+        .sink { _ in NSRunningApplication.isDesktopLocked = true }
+        .store(in: &Self.combinePool)
+      DistributedNotificationCenter.default()
+        .publisher(for: .init(rawValue: "com.apple.screenIsUnlocked"))
+        .sink { _ in NSRunningApplication.isDesktopLocked = false }
+        .store(in: &Self.combinePool)
+    } else {
+      let lockObserver = DistributedNotificationCenter.default()
+        .addObserver(forName: .init("com.apple.screenIsLocked"), object: nil, queue: .main) { _ in
+          NSRunningApplication.isDesktopLocked = true
+        }
+      let unlockObserver = DistributedNotificationCenter.default()
+        .addObserver(forName: .init("com.apple.screenIsUnlocked"), object: nil, queue: .main) { _ in
+          NSRunningApplication.isDesktopLocked = false
+        }
+      Self.combinePoolCocoa.append(lockObserver)
+      Self.combinePoolCocoa.append(unlockObserver)
+    }
   }
 }
