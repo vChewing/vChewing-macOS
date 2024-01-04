@@ -229,7 +229,7 @@ extension SessionCtl: CtlCandidateDelegate {
       defer { switchState(result) } // 這是最終輸出結果。
       switchState(IMEState.ofCommitting(textToCommit: selectedValue.value))
       guard PrefMgr.shared.associatedPhrasesEnabled else { return }
-      // 此時是聯想詞選字模式，所以「selectedValue.value」必須只保留最後一個字。
+      // 此時是關聯詞語選字模式，所以「selectedValue.value」必須只保留最後一個字。
       // 不然的話，一旦你選中了由多個字組成的聯想候選詞，則連續聯想會被打斷。
       guard let valueKept = selectedValue.value.last?.description else { return }
       let associates = inputHandler.generateStateOfAssociates(

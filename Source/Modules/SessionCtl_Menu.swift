@@ -49,7 +49,7 @@ extension SessionCtl {
     useSCPCTypingModeItem.state = PrefMgr.shared.useSCPCTypingMode.state
 
     let userAssociatedPhrasesItem = menu.addItem(
-      withTitle: "Per-Char Associated Phrases".localized,
+      withTitle: "Associated Phrases".localized,
       action: #selector(toggleAssociatedPhrasesEnabled(_:)),
       keyEquivalent: PrefMgr.shared.usingHotKeyAssociates ? "O" : ""
     )
@@ -350,7 +350,7 @@ public extension SessionCtl {
   @objc func toggleAssociatedPhrasesEnabled(_: Any? = nil) {
     resetInputHandler(forceComposerCleanup: true)
     Notifier.notify(
-      message: "Per-Char Associated Phrases".localized + "\n"
+      message: "Associated Phrases".localized + "\n"
         + (PrefMgr.shared.associatedPhrasesEnabled.toggled()
           ? "NotificationSwitchON".localized
           : "NotificationSwitchOFF".localized)

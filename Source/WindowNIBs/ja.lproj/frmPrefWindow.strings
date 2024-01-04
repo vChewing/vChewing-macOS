@@ -146,7 +146,7 @@
 "xibKeyboardShortcuts.title" = "ショートカット";
 "xibOutputSettings.title" = "出力設定";
 "xibUsingCurrencyNumerals.title" = "数字大字変換";
-"xibUsingHotKeyAssociates.title" = "全候補入力で連想語彙";
+"xibUsingHotKeyAssociates.title" = "関連語彙モード";
 "xibUsingHotKeyCassette.title" = "CIN カセットモード";
 "xibUsingHotKeyCNS.title" = "全字庫モード";
 "xibUsingHotKeyHalfWidthASCII.title" = "半角句読モード";

@@ -149,23 +149,24 @@ extension InputHandler {
     return result
   }
 
-  // MARK: - 用以接收聯想詞陣列且生成狀態
+  // MARK: - 用以接收關聯詞語陣列且生成狀態
 
-  /// 拿著給定的聯想詞陣列資料內容，切換至聯想詞狀態。
+  /// 拿著給定的關聯詞語陣列資料內容，切換至關聯詞語狀態。
   ///
   /// 這次重寫時，針對「generateStateOfAssociates」這個（用以生成帶有
-  /// 聯想詞候選清單的結果的狀態回呼的）函式進行了小幅度的重構處理，使其始終
+  /// 關聯詞語候選清單的結果的狀態回呼的）函式進行了小幅度的重構處理，使其始終
   /// 可以從 Core 部分的「generateArrayOfAssociates」函式獲取到一個內容類型
-  /// 為「String」的標準 Swift 陣列。這樣一來，該聯想詞狀態回呼函式將始終能
+  /// 為「String」的標準 Swift 陣列。這樣一來，該關聯詞語狀態回呼函式將始終能
   /// 夠傳回正確的結果形態、永遠也無法傳回 nil。於是，所有在用到該函式時以
   /// 回傳結果類型判斷作為合法性判斷依據的函式，全都將依據改為檢查傳回的陣列
   /// 是否為空：如果陣列為空的話，直接回呼一個空狀態。
+  ///
+  /// 該函式僅用於 SessionCtl，因為 InputHandler 內部可以直接存取 generateArrayOfAssociates().
   /// - Parameters:
-  ///   - key: 給定的索引鍵（也就是給定的聯想詞的開頭字）。
-  /// - Returns: 回呼一個新的聯想詞狀態，來就給定的聯想詞陣列資料內容顯示選字窗。
+  ///   - key: 給定的索引鍵（也就是給定的關聯詞語的開頭字）。
+  /// - Returns: 回呼一個新的關聯詞語狀態，來就給定的關聯詞語陣列資料內容顯示選字窗。
   public func generateStateOfAssociates(withPair pair: Megrez.KeyValuePaired) -> IMEStateProtocol {
-    IMEState.ofAssociates(
-      candidates: generateArrayOfAssociates(withPair: pair))
+    IMEState.ofAssociates(candidates: generateArrayOfAssociates(withPair: pair))
   }
 
   // MARK: - 用以處理就地新增自訂語彙時的行為
@@ -342,9 +343,16 @@ extension InputHandler {
   // MARK: - Enter 鍵的處理，包括對其他修飾鍵的應對。
 
   /// Enter 鍵的處理。
-  /// - Parameter input: 輸入按鍵訊號。
+  /// - Parameters:
+  ///   - input: 輸入按鍵訊號。
+  ///   - readingOnly: 是否僅遞交讀音。
+  ///   - associatesData: 給定的關聯詞語資料陣列。
+  ///   該部分僅對 .ofInputting() 狀態有效、且不能是漢音符號模式與內碼輸入模式。
   /// - Returns: 將按鍵行為「是否有處理掉」藉由 SessionCtl 回報給 IMK。
-  @discardableResult func handleEnter(input: InputSignalProtocol, readingOnly: Bool = false) -> Bool {
+  @discardableResult func handleEnter(
+    input: InputSignalProtocol, readingOnly: Bool = false,
+    associatesData: @escaping () -> ([(keyArray: [String], value: String)]) = { [] }
+  ) -> Bool {
     guard let delegate = delegate else { return false }
     let state = delegate.state
 
@@ -360,13 +368,21 @@ extension InputHandler {
     } else if readingOnly {
       displayedText = commissionByCtrlCommandEnter()
     } else if input.isCommandHold, input.isControlHold {
-      displayedText =
-        input.isOptionHold
-          ? commissionByCtrlOptionCommandEnter(isShiftPressed: input.isShiftHold)
-          : commissionByCtrlCommandEnter(isShiftPressed: input.isShiftHold)
+      displayedText = input.isOptionHold
+        ? commissionByCtrlOptionCommandEnter(isShiftPressed: input.isShiftHold)
+        : commissionByCtrlCommandEnter(isShiftPressed: input.isShiftHold)
     }
 
     delegate.switchState(IMEState.ofCommitting(textToCommit: displayedText))
+
+    associatedPhrases: if !prefs.useSCPCTypingMode, prefs.associatedPhrasesEnabled {
+      guard input.keyModifierFlags == .shift else { break associatedPhrases }
+      guard isComposerOrCalligrapherEmpty else { break associatedPhrases }
+      let associatedCandidates = associatesData()
+      guard !associatedCandidates.isEmpty else { break associatedPhrases }
+      delegate.switchState(IMEState.ofAssociates(candidates: associatedCandidates))
+    }
+
     return true
   }
 

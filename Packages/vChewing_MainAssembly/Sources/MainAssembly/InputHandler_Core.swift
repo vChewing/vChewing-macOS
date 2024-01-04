@@ -198,16 +198,42 @@ public class InputHandler: InputHandlerProtocol {
     }
   }
 
-  /// 用以組建聯想詞陣列的函式。
-  /// - Parameter key: 給定的聯想詞的開頭字。
-  /// - Returns: 抓取到的聯想詞陣列。
+  /// 用以組建關聯詞語陣列的函式，生成的內容不包含重複的結果。
+  /// - Parameter pairs: 給定的詞音配對陣列。
+  /// - Returns: 抓取到的關聯詞語陣列。
   /// 不會是 nil，但那些負責接收結果的函式會對空白陣列結果做出正確的處理。
-  func generateArrayOfAssociates(withPair pair: Megrez.KeyValuePaired) -> [(keyArray: [String], value: String)] {
+  func generateArrayOfAssociates(withPairs pairs: [Megrez.KeyValuePaired]) -> [(keyArray: [String], value: String)] {
     var arrResult: [(keyArray: [String], value: String)] = []
-    if currentLM.hasAssociatedPhrasesFor(pair: pair) {
-      arrResult = currentLM.associatedPhrasesFor(pair: pair).map { ([""], $0) }
+    pairs.forEach { pair in
+      if currentLM.hasAssociatedPhrasesFor(pair: pair) {
+        let arrFetched: [String] = currentLM.associatedPhrasesFor(pair: pair)
+        arrFetched.forEach { thingToAdd in
+          // keyArray 對關聯詞語候選字詞而言（現階段）毫無意義。這裡只判斷 value。
+          if !arrResult.map(\.value).contains(thingToAdd) {
+            arrResult.append((keyArray: [""], value: thingToAdd))
+          }
+        }
+      }
     }
     return arrResult
+  }
+
+  /// 用以組建關聯詞語陣列的函式，生成的內容不包含重複的結果。
+  /// - Parameter pair: 給定的詞音配對。
+  /// - Returns: 抓取到的關聯詞語陣列。
+  /// 不會是 nil，但那些負責接收結果的函式會對空白陣列結果做出正確的處理。
+  func generateArrayOfAssociates(withPair pair: Megrez.KeyValuePaired) -> [(keyArray: [String], value: String)] {
+    var pairs = [Megrez.KeyValuePaired]()
+    var keyArray = pair.keyArray
+    var value = pair.value
+    while !keyArray.isEmpty {
+      // 關聯詞語處理用不到組字引擎，故不需要 score。
+      if keyArray.count == value.count { pairs.append(.init(keyArray: keyArray, value: value)) }
+      pairs.append(.init(key: "", value: value)) // 保底。
+      keyArray = Array(keyArray.dropFirst())
+      value = value.dropFirst().description
+    }
+    return generateArrayOfAssociates(withPairs: pairs)
   }
 
   /// 用來計算離當前游標最近的一個節點邊界的距離的函式。

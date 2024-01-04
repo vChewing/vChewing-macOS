@@ -53,7 +53,7 @@
 "thePhrases" = "自訂語彙";
 "theFilter" = "濾除清單";
 "theReplacements" = "語彙置換";
-"theAssociates" = "聯想字詞";
+"theAssociates" = "關聯詞語";
 "theSymbols" = "繪文字符號";
 "Please select…" = "請選擇…";
 "Loading…" = "正在載入…";
@@ -148,12 +148,12 @@
 "⚠︎ Phrase replacement mode enabled, interfering user phrase entry." = "⚠︎ 語彙置換功能已啟用，會波及語彙自訂。";
 "⚠︎ Unhandlable: Chars and Readings in buffer doesn't match." = "⚠︎ 無法處理：組字區字數與讀音數不對應。";
 "Per-Char Select Mode" = "模擬逐字選字輸入";
-"Inline comments are not supported in associated phrases." = "聯想詞不支援行內註解。";
+"Inline comments are not supported in associated phrases." = "關聯詞語不支援行內註解。";
 "CNS11643 Mode" = "全字庫模式";
 "JIS Shinjitai Output" = "JIS 新字體模式";
-"Per-Char Associated Phrases" = "逐字選字聯想模式";
+"Associated Phrases" = "關聯詞語模式";
 "Open User Dictionary Folder" = "開啟使用者辭典資料夾";
-"Edit Associated Phrases…" = "編輯聯想詞…";
+"Edit Associated Phrases…" = "編輯關聯詞語…";
 "Reboot vChewing…" = "重新啟動輸入法…";
 "auto" = "與系統設定一致";
 "en" = "英文";
@@ -171,7 +171,7 @@
 "Optimize Memorized Phrases" = "精簡臨時記憶語彙資料";
 "Clear Memorized Phrases" = "清除臨時記憶語彙資料";
 "Currency Numeral Output" = "大寫漢字數字輸出";
-"Hold ⇧ to choose associates." = "摁住⇧以選取聯想詞。";
+"Hold ⇧ to choose associates." = "摁住⇧以選取關聯詞語。";
 "Dachen Trad." = "大千傳統";
 "Eten Trad." = "倚天傳統";
 "User phrase folder path is not customizable in macOS 10.9 - 10.12." = "在 macOS 10.9 - 10.12 系統下無法自訂使用者辭典目錄。";
@@ -219,7 +219,7 @@
 "All strokes in the composition buffer will be shown as ASCII keyboard characters unless this option is enabled. Stroke is definable in the “%keyname” section of the CIN file." = "不啟用該選項的話，在組字區內的字根將會以原始鍵盤按鍵名稱來顯示。所有關於字根的定義，均請洽 CIN 磁帶檔案內的「%keyname」章節。";
 "Allow backspace-editing miscomposed readings" = "允許對無效的讀音使用 BackSpace 編輯";
 "Allow boosting / excluding a candidate of single kanji when marking" = "允許藉由標記模式將可以就地升權/排除的候選字詞的最短詞長設為單個漢字";
-"Allow using Enter key to confirm associated candidate selection" = "允許使用 Enter 確認當前選中的聯想詞";
+"Allow using Enter key to confirm associated candidate selection" = "允許使用 Enter 確認當前選中的關聯詞語";
 "Alphanumerical Layout:" = "英數鍵盤佈局:";
 "Also use “\\” or “¥” key for Hanin Keyboard Symbol Input" = "亦使用「\\」或「¥」鍵啟用漢音鍵盤符號模式";
 "Always directly commit lowercased letters" = "始終直接遞交小寫字母";
@@ -327,7 +327,7 @@
 "Only enforce conversion in Traditional Chinese mode" = "僅在繁體模式轉換至繁體";
 "Only load factory language models if needed" = "按需載入簡繁體模式的原廠辭典資料";
 "Only override the intonation of the previous reading if different" = "僅在鍵入的聲調與游標正後方的字音不同時，嘗試覆寫";
-"Otherwise, only the candidate keys are allowed to confirm associates." = "不勾選這一項的話，就只能用選字鍵來選取聯想詞。";
+"Otherwise, only the candidate keys are allowed to confirm associates." = "不勾選這一項的話，就只能用選字鍵來選取關聯詞語。";
 "Output Settings:" = "輸出設定:";
 "Override the previous reading's intonation with candidate-reset" = "嘗試對游標正後方的字音覆寫聲調，且重設其選字狀態";
 "Path invalid or file access error." = "檔案存取失敗，或者路徑不合規。";

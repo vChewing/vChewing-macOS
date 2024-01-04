@@ -41,7 +41,7 @@ public enum StateType: String {
   /// 該狀態在處理完畢之後會被立刻切換至 .ofEmpty()。如果直接呼叫處理該狀態的話，
   /// 在呼叫處理之前的組字區的內容會消失，除非你事先呼叫處理過 .ofEmpty()。
   case ofCommitting = "Committing"
-  /// **聯想詞狀態 .ofAssociates**: 逐字選字模式內的聯想詞輸入狀態。
+  /// **關聯詞語狀態 .ofAssociates**: 逐字選字模式內的關聯詞語輸入狀態。
   case ofAssociates = "Associates"
   /// **輸入狀態 .ofInputting**: 使用者輸入了內容。此時會出現組字區（Compositor）。
   case ofInputting = "Inputting"
