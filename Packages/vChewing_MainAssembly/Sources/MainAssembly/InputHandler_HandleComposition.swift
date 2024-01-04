@@ -186,8 +186,12 @@ extension InputHandler {
           delegate.switchState(IMEState.ofCommitting(textToCommit: text))
 
           if prefs.associatedPhrasesEnabled {
-            let associatedPhrases = generateStateOfAssociates(withPair: .init(keyArray: reading, value: text))
-            delegate.switchState(associatedPhrases.candidates.isEmpty ? IMEState.ofEmpty() : associatedPhrases)
+            let associatedCandidates = generateArrayOfAssociates(withPairs: [.init(keyArray: reading, value: text)])
+            delegate.switchState(
+              associatedCandidates.isEmpty
+                ? IMEState.ofEmpty()
+                : IMEState.ofAssociates(candidates: associatedCandidates)
+            )
           }
         default: break
         }
@@ -348,20 +352,24 @@ extension InputHandler {
       inputting.textToCommit = textToCommit
       delegate.switchState(inputting)
 
-      /// 逐字選字模式的處理，與注音輸入的部分完全雷同。
+      /// 逐字選字模式的處理。
       if prefs.useSCPCTypingMode {
         let candidateState: IMEStateProtocol = generateStateOfCandidates()
         switch candidateState.candidates.count {
         case 2...: delegate.switchState(candidateState)
         case 1:
           let firstCandidate = candidateState.candidates.first! // 一定會有，所以強制拆包也無妨。
-          let reading: String = firstCandidate.0.joined(separator: compositor.separator)
+          let reading: [String] = firstCandidate.keyArray
           let text: String = firstCandidate.value
           delegate.switchState(IMEState.ofCommitting(textToCommit: text))
 
           if prefs.associatedPhrasesEnabled {
-            let associatedPhrases = generateStateOfAssociates(withPair: .init(keyArray: [reading], value: text))
-            delegate.switchState(associatedPhrases.candidates.isEmpty ? IMEState.ofEmpty() : associatedPhrases)
+            let associatedCandidates = generateArrayOfAssociates(withPairs: [.init(keyArray: reading, value: text)])
+            delegate.switchState(
+              associatedCandidates.isEmpty
+                ? IMEState.ofEmpty()
+                : IMEState.ofAssociates(candidates: associatedCandidates)
+            )
           }
         default: break
         }

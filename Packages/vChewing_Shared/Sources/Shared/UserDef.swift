@@ -492,7 +492,7 @@ public extension UserDef {
         description: "This will batch-replace specified candidates."
       )
     case .kUsingHotKeySCPC: return .init(userDef: self, shortTitle: "Per-Char Select Mode")
-    case .kUsingHotKeyAssociates: return .init(userDef: self, shortTitle: "Per-Char Associated Phrases")
+    case .kUsingHotKeyAssociates: return .init(userDef: self, shortTitle: "Associated Phrases")
     case .kUsingHotKeyCNS: return .init(userDef: self, shortTitle: "CNS11643 Mode")
     case .kUsingHotKeyKangXi: return .init(userDef: self, shortTitle: "Force KangXi Writing")
     case .kUsingHotKeyJIS: return .init(userDef: self, shortTitle: "Reverse Lookup (Phonabets)")

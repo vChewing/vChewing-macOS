@@ -46,7 +46,7 @@
 "cBw-gz-TXe.title" = "僅在繁體模式轉換至繁體";
 "cf2-se-PDO.title" = "辭典＆語言模型";
 "chkAllowBoostingSingleKanjiAsUserPhrase.title" = "允許藉由標記模式將可以就地升權/排除的候選字詞的最短詞長設為單個漢字";
-"chkAlsoConfirmAssociatedCandidatesByEnter.title" = "允許使用 Enter 確認當前選中的聯想詞";
+"chkAlsoConfirmAssociatedCandidatesByEnter.title" = "允許使用 Enter 確認當前選中的關聯詞語";
 "chkAutoCorrectReadingCombination.title" = "敲字時自動糾正讀音組合";
 "chkBypassNonAppleCapsLockHandling.title" = "不使用威注音輸入法內建的 Caps Lock 處理";
 "chkCheckAbusersOfSecureEventInputAPI.title" = "主動偵測正在濫用 SecureEventInput API 的後檯執行緒";
@@ -146,7 +146,7 @@
 "xibKeyboardShortcuts.title" = "鍵盤熱鍵";
 "xibOutputSettings.title" = "輸出設定";
 "xibUsingCurrencyNumerals.title" = "大寫漢字數字輸出";
-"xibUsingHotKeyAssociates.title" = "逐字選字聯想模式";
+"xibUsingHotKeyAssociates.title" = "關聯詞語模式";
 "xibUsingHotKeyCassette.title" = "CIN 磁帶模式";
 "xibUsingHotKeyCNS.title" = "全字庫模式";
 "xibUsingHotKeyHalfWidthASCII.title" = "半形標點模式";

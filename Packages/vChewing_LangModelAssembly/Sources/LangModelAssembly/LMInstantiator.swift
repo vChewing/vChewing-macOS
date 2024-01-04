@@ -73,7 +73,7 @@ public extension vChewingLM {
     /// 比較適合那種每筆記錄都有不同的權重數值的語言模組，雖然也可以強制施加權重數值就是了。
     /// LMCoreEX 的辭典陣列不承載 Unigram 本體、而是承載索引範圍，這樣可以節約記憶體。
     /// 一個 LMCoreEX 就可以滿足威注音幾乎所有語言模組副本的需求，當然也有這兩個例外：
-    /// LMReplacements 與 LMAssociates 分別擔當語彙置換表資料與使用者聯想詞的資料承載工作。
+    /// LMReplacements 與 LMAssociates 分別擔當語彙置換表資料與使用者關聯詞語的資料承載工作。
     /// 但是，LMCoreEX 對 2010-2013 年等舊 mac 機種而言，讀取速度異常緩慢。
     /// 於是 LMCoreJSON 就出場了，專門用來讀取原廠的 JSON 格式的辭典。
 

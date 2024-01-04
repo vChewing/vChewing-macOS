@@ -13,6 +13,7 @@ import CocoaExtension
 import IMKUtils
 import InputMethodKit
 import LangModelAssembly
+import Megrez
 import Shared
 
 // MARK: - § 根據狀態調度按鍵輸入 (Handle Input with States) * Triage
@@ -45,7 +46,15 @@ public extension InputHandler {
       case .kEnd: return handleEnd()
       case .kBackSpace: return handleBackSpace(input: input)
       case .kWindowsDelete: return handleDelete(input: input)
-      case .kCarriageReturn, .kLineFeed: return handleEnter(input: input)
+      case .kCarriageReturn, .kLineFeed:
+        let frontNode = compositor.walkedNodes.last
+        return handleEnter(input: input) {
+          guard !self.isHaninKeyboardSymbolMode, !self.isCodePointInputMode else { return [] }
+          guard let frontNode = frontNode else { return [] }
+          let pair = Megrez.KeyValuePaired(keyArray: frontNode.keyArray, value: frontNode.value)
+          let associates = self.generateArrayOfAssociates(withPair: pair)
+          return associates
+        }
       case .kSymbolMenuPhysicalKeyJIS, .kSymbolMenuPhysicalKeyIntl:
         let isJIS = keyCodeType == .kSymbolMenuPhysicalKeyJIS
         switch input.keyModifierFlags {

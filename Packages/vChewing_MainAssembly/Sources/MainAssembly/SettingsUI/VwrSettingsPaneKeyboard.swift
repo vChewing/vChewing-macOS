@@ -176,7 +176,7 @@ private struct VwrSettingsPaneKeyboard_KeyboardShortcuts: View {
           isOn: $usingHotKeySCPC
         )
         Toggle(
-          LocalizedStringKey("Per-Char Associated Phrases"),
+          LocalizedStringKey("Associated Phrases"),
           isOn: $usingHotKeyAssociates
         )
         Toggle(
