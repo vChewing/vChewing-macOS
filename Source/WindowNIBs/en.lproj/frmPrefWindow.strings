@@ -146,7 +146,7 @@
 "xibKeyboardShortcuts.title" = "Keyboard Shortcuts";
 "xibOutputSettings.title" = "Output Settings";
 "xibUsingCurrencyNumerals.title" = "Currency Numeral Output";
-"xibUsingHotKeyAssociates.title" = "Per-Char Associated Phrases";
+"xibUsingHotKeyAssociates.title" = "Associated Phrases";
 "xibUsingHotKeyCassette.title" = "CIN Cassette Mode";
 "xibUsingHotKeyCNS.title" = "CNS11643 Mode";
 "xibUsingHotKeyHalfWidthASCII.title" = "Half-Width Punctuation Mode";

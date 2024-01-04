@@ -9,7 +9,7 @@
 以下是子模組：
 
 - lmCassette：專門用來處理 CIN 磁帶檔案的模組，命名為「遠野」引擎。
-- LMAssociates：聯想詞模組。
+- LMAssociates：關聯詞語模組。
 - LMCoreEX：可以直接讀取 TXT 格式的帶有權重資料的語彙檔案的模組。
 - LMCoreJSON：專門用來讀取原廠 JSON 檔案的模組。
 - lmPlainBopomofo：專門用來讀取使用者自訂ㄅ半候選字順序覆蓋定義檔案（plist）的模組。

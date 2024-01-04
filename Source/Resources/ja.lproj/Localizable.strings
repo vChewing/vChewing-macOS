@@ -53,7 +53,7 @@
 "thePhrases" = "ユーザー辞書";
 "theFilter" = "排除リスト";
 "theReplacements" = "言葉置換";
-"theAssociates" = "連想語彙";
+"theAssociates" = "関連語彙";
 "theSymbols" = "絵文字＆符号";
 "Please select…" = "お選びを…";
 "Loading…" = "読み込む中…";
@@ -151,7 +151,7 @@
 "Inline comments are not supported in associated phrases." = "インラインメモは連想語彙辞書で使えません。";
 "CNS11643 Mode" = "全字庫モード";
 "JIS Shinjitai Output" = "JIS 新字体モード";
-"Per-Char Associated Phrases" = "全候補入力で連想語彙";
+"Associated Phrases" = "関連語彙モード";
 "Open User Dictionary Folder" = "ユーザー辞書フォルダを開く";
 "Edit Associated Phrases…" = "連想語彙を編集…";
 "Reboot vChewing…" = "入力アプリ再起動…";
