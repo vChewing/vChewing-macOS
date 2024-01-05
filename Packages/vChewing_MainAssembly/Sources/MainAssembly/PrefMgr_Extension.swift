@@ -67,6 +67,9 @@ public extension PrefMgr {
     if ![0, 1, 2, 3, 4].contains(upperCaseLetterKeyBehavior) {
       upperCaseLetterKeyBehavior = 0
     }
+    if ![0, 1, 2].contains(readingNarrationCoverage) {
+      readingNarrationCoverage = 0
+    }
   }
 }
 

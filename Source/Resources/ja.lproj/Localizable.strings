@@ -307,6 +307,11 @@
 "i18n:UserDef.kBypassNonAppleCapsLockHandling.shortTitle" = "威注音入力アプリの内蔵CapsLock処理を不使用";
 "i18n:userdef.kCheckAbusersOfSecureEventInputAPI.description" = "このような不正利用は「システム内蔵入力以外の全ての入力アプリがメニューで灰色状態で選べなくて使えない」の元凶である。センシティブな資料の記入どころでSecureEventInputをEnableSecureEventInput()で使うのは当然であるが、「入力中」状態が終わった後必ずDisableSecureEventInput()で状態解消すべきだと義務である。いくつかヘルパーアプリも、あるいはSecureEventInputを呼び起こしてからすぐ固まったアプリも、この状態になりやすい。特に、他のアプリの画面へ切り替えたとしても、固まったアプリのSecureEventInput状態は自動的に解消できぬ。";
 "i18n:UserDef.kCheckAbusersOfSecureEventInputAPI.shortTitle" = "SecureEventInput API を不正利用しているバクグラウンド・プロセスを自動検知";
+"i18n:UserDef.kReadingNarrationCoverage.description" = "音読組立緩衝列の内容の変化を朗読。該功能對磁帶模式無效。";
+"i18n:UserDef.kReadingNarrationCoverage.option.confirmed" = "音調キーで確認するときに";
+"i18n:UserDef.kReadingNarrationCoverage.option.nothing" = "朗読せずに";
+"i18n:UserDef.kReadingNarrationCoverage.option.realtime" = "いずれの変化が起きたときに";
+"i18n:UserDef.kReadingNarrationCoverage.shortTitle" = "音読組立の朗読";
 "i18n:userdef.kRespectClientAccentColor.description" = "これで田所候補陳列ウィンドウの「選択中の候補の背景色」を「今が文字入力を受けている客体アプリのアクセントカラー」と一致することになる。もしその客体アプリ自体のアクセントカラーが未指定であり、あるいはシステムのアクセントカラーがデフォルト値ではないのなら、システム設定でのアクセントカラーに準ず。１つ例外状況：JIS / 康熙字体変換モードがONの場合、このチェックは効かぬ。";
 "i18n:userdef.kRespectClientAccentColor.shortTitle" = "客体アプリ・システムのアクセントカラーに準ず";
 "i18n:UserDef.kShiftEisuToggleOffTogetherWithCapsLock.description" = "このチェックを入れると：イ）[macOS 12 以降] CapsLockがオフした時に、「Shiftキー・JIS英数キー」の共有していた内部のスイッチもオフにする；ロ）「JIS英数キー」でそのキーに応ずる英数モードがオフした時に、CapsLockもオフにする。尚、CapsLockがオンの時に、「Shiftキーだけを打った」行為は検知できません。";
