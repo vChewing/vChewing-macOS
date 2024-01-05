@@ -67,6 +67,14 @@ extension InputHandler {
         || input.isControlHold || input.isOptionHold || input.isShiftHold || input.isCommandHold
     let confirmCombination = input.isSpace || input.isEnter
 
+    func narrateTheComposer(with maybeKey: String? = nil, when condition: Bool, allowDuplicates: Bool = true) {
+      guard condition else { return }
+      let maybeKey = maybeKey ?? composer.phonabetKeyForQuery(pronouncable: prefs.acceptLeadingIntonations)
+      guard var keyToNarrate = maybeKey else { return }
+      if composer.intonation == Tekkon.Phonabet(" ") { keyToNarrate.append("ˉ") }
+      SpeechSputnik.shared.narrate(keyToNarrate, allowDuplicates: allowDuplicates)
+    }
+
     // 這裡 inputValidityCheck() 是讓注拼槽檢查 charCode 這個 UniChar 是否是合法的注音輸入。
     // 如果是的話，就將這次傳入的這個按鍵訊號塞入注拼槽內且標記為「keyConsumedByReading」。
     // 函式 composer.receiveKey() 可以既接收 String 又接收 UniChar。
@@ -100,6 +108,7 @@ extension InputHandler {
       // 鐵恨引擎並不具備對 Enter (CR / LF) 鍵的具體判斷能力，所以在這裡單獨處理。
       composer.receiveKey(fromString: confirmCombination ? " " : inputText)
       keyConsumedByReading = true
+      narrateTheComposer(when: !overrideHappened && prefs.readingNarrationCoverage >= 2, allowDuplicates: false)
 
       // 沒有調號的話，只需要 setInlineDisplayWithCursor() 且終止處理（return true）即可。
       // 有調號的話，則不需要這樣，而是轉而繼續在此之後的處理。
@@ -150,6 +159,8 @@ extension InputHandler {
       } else if !compositor.insertKey(readingKey) {
         delegate.callError("3CF278C9: 得檢查對應的語言模組的 hasUnigramsFor() 是否有誤判之情形。")
         return true
+      } else {
+        narrateTheComposer(with: readingKey, when: prefs.readingNarrationCoverage == 1)
       }
 
       // 讓組字器反爬軌格。

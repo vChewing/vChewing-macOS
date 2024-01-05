@@ -68,6 +68,8 @@ public extension AppDelegate {
 
     SecurityAgentHelper.shared.timer?.fire()
 
+    SpeechSputnik.shared.refreshStatus() // 根據現狀條件決定是否初期化語音引擎。
+
     // 一旦發現與使用者半衰模組的觀察行為有關的崩潰標記被開啟：
     // 如果有開啟 Debug 模式的話，就將既有的半衰記憶資料檔案更名＋打上當時的時間戳。
     // 如果沒有開啟 Debug 模式的話，則將半衰記憶資料直接清空。
