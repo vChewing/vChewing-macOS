@@ -76,6 +76,7 @@ public enum UserDef: String, CaseIterable {
   case kFetchSuggestionsFromUserOverrideModel = "FetchSuggestionsFromUserOverrideModel"
   case kUseFixedCandidateOrderOnSelection = "UseFixedCandidateOrderOnSelection"
   case kAutoCorrectReadingCombination = "AutoCorrectReadingCombination"
+  case kReadingNarrationCoverage = "ReadingNarrationCoverage"
   case kAlsoConfirmAssociatedCandidatesByEnter = "AlsoConfirmAssociatedCandidatesByEnter"
   case kKeepReadingUponCompositionError = "KeepReadingUponCompositionError"
   case kBypassNonAppleCapsLockHandling = "BypassNonAppleCapsLockHandling"
@@ -194,6 +195,7 @@ public extension UserDef {
     case .kFetchSuggestionsFromUserOverrideModel: return .bool
     case .kUseFixedCandidateOrderOnSelection: return .bool
     case .kAutoCorrectReadingCombination: return .bool
+    case .kReadingNarrationCoverage: return .integer
     case .kAlsoConfirmAssociatedCandidatesByEnter: return .bool
     case .kKeepReadingUponCompositionError: return .bool
     case .kBypassNonAppleCapsLockHandling: return .bool
@@ -402,6 +404,15 @@ public extension UserDef {
         description: "This will stop user override model from affecting how candidates get sorted."
       )
     case .kAutoCorrectReadingCombination: return .init(userDef: self, shortTitle: "Automatically correct reading combinations when typing")
+    case .kReadingNarrationCoverage: return .init(
+        userDef: self, shortTitle: "i18n:UserDef.kReadingNarrationCoverage.shortTitle",
+        description: "i18n:UserDef.kReadingNarrationCoverage.description",
+        options: [
+          0: "i18n:UserDef.kReadingNarrationCoverage.option.nothing",
+          1: "i18n:UserDef.kReadingNarrationCoverage.option.confirmed",
+          2: "i18n:UserDef.kReadingNarrationCoverage.option.realtime",
+        ]
+      )
     case .kAlsoConfirmAssociatedCandidatesByEnter: return .init(
         userDef: self, shortTitle: "Allow using Enter key to confirm associated candidate selection",
         description: "Otherwise, only the candidate keys are allowed to confirm associates."

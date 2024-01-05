@@ -127,6 +127,9 @@ import SwiftExtension
   @AppProperty(key: UserDef.kAutoCorrectReadingCombination.rawValue, defaultValue: true)
   public dynamic var autoCorrectReadingCombination: Bool
 
+  @AppProperty(key: UserDef.kReadingNarrationCoverage.rawValue, defaultValue: 0)
+  public dynamic var readingNarrationCoverage: Int
+
   @AppProperty(key: UserDef.kAlsoConfirmAssociatedCandidatesByEnter.rawValue, defaultValue: false)
   public dynamic var alsoConfirmAssociatedCandidatesByEnter: Bool
 
