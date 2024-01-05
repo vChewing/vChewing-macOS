@@ -92,6 +92,8 @@
 "lblCheckAbusersOfSecureEventInputAPI.title" = "Such abuse of SecureEventInput API in the background can hinder all 3rd-party input methods from being able to switch to. It is fine to use SecureEventInput for sensitive input fields. However, an app calling EnableSecureEventInput() is responsible to call DisableSecureEventInput() immediately right after the input field loses focus. This situation may also happen if an app is hanging in the background (or working as a helper application in the background) with its SecureEventInput left enabled.";
 "lblDevZoneTitleDescription.title" = "Warning: This page is for testing future features. \nFeatures listed here may not work as expected.";
 "lblIntonationKeyBehavior.title" = "Specify what intonation key does when syllable composer is empty.";
+"lblReadingNarrationCoverageDescription.title" = "This reads your typed phonabets aloud. Only works with non-cassette Mode.";
+"lblReadingNarrationCoverageShortTitle.title" = "Reading composer contents to narrate:";
 "lblShiftBkspKeyBehavior.title" = "Choose the attempted behavior of Shift+BackSpace key.";
 "lblShiftEisuToggleOffTogetherWithCapsLock.title" = "This does: 1) On macOS 12 and later, if the Caps Lock gets turned off, then the internal switch for Shift-key / JIS-Eisu-key Alphanumerical Mode Toggle will also be switched off. 2) If you have turned off the same switch by JIS-Eisu key, then the Caps Lock gets turned off together. Note: vChewing has no way to recognize single hits of Shift key when Caps Lock is on.";
 "lblUpperCaseLetterKeyBehavior.title" = "Choose the behavior of Shift+Letter key with letter inputs.";
@@ -100,6 +102,9 @@
 "N6e-bR-mVa.title" = "Disable segmented thick underline in marking mode for managed clients";
 "neb-Pz-n1h.title" = "Auto-composite when the longest possible key is formed";
 "o3r-NZ-gsU.title" = "Only enforce conversion in Simplified Chinese mode";
+"optReadingNarrationCoverageConfirmed.title" = "Only when combined by intonation";
+"optReadingNarrationCoverageNothing.title" = "Do not narrate";
+"optReadingNarrationCoverageRealtime.title" = "All changes in reading composer";
 "OVR-eb-laC.title" = "One-line layout";
 "Parser11.title" = "Secondary Pinyin with Numeral Intonation";
 "Parser12.title" = "Yale Pinyin with Numeral Intonation";
