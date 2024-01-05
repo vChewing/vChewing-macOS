@@ -40,6 +40,9 @@ public struct VwrSettingsPaneGeneral: View {
   @AppStorage(wrappedValue: true, UserDef.kAutoCorrectReadingCombination.rawValue)
   private var autoCorrectReadingCombination: Bool
 
+  @AppStorage(wrappedValue: 0, UserDef.kReadingNarrationCoverage.rawValue)
+  private var readingNarrationCoverage: Int
+
   @AppStorage(wrappedValue: false, UserDef.kKeepReadingUponCompositionError.rawValue)
   private var keepReadingUponCompositionError: Bool
 
@@ -93,6 +96,22 @@ public struct VwrSettingsPaneGeneral: View {
         // MARK: (header: Text("Typing Settings:"))
 
         Section {
+          VStack(alignment: .leading) {
+            let meta = UserDef.kReadingNarrationCoverage.metaData
+            let mainKey = "i18n:UserDef.kReadingNarrationCoverage"
+            Picker(
+              LocalizedStringKey(meta?.shortTitle ?? mainKey + ".shortTitle"),
+              selection: $readingNarrationCoverage.onChange {
+                SpeechSputnik.shared.refreshStatus()
+              }
+            ) {
+              Text(LocalizedStringKey(meta?.options?[0] ?? mainKey + ".option.nothing")).tag(0)
+              Text(LocalizedStringKey(meta?.options?[1] ?? mainKey + ".option.confirmed")).tag(1)
+              Text(LocalizedStringKey(meta?.options?[2] ?? mainKey + ".option.realtime")).tag(2)
+            }
+            Text(LocalizedStringKey(meta?.description ?? mainKey + ".description"))
+              .settingsDescription()
+          }
           Toggle(
             LocalizedStringKey("Automatically correct reading combinations when typing"),
             isOn: $autoCorrectReadingCombination
