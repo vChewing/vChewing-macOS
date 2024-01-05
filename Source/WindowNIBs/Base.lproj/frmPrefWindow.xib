@@ -1,7 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="22155" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES">
+<document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="22505" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES">
     <dependencies>
-        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="22155"/>
+        <deployment identifier="macosx"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="22505"/>
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
     </dependencies>
     <objects>
@@ -49,7 +50,7 @@
         <window title="vChewing Preferences" allowsToolTipsWhenApplicationIsInactive="NO" autorecalculatesKeyViewLoop="NO" restorable="NO" animationBehavior="default" titlebarAppearsTransparent="YES" id="1" userLabel="frmPrefWindow">
             <windowStyleMask key="styleMask" titled="YES" closable="YES" miniaturizable="YES"/>
             <rect key="contentRect" x="401" y="295" width="577" height="406"/>
-            <rect key="screenRect" x="0.0" y="0.0" width="1920" height="1055"/>
+            <rect key="screenRect" x="0.0" y="0.0" width="2048" height="1127"/>
             <view key="contentView" id="2">
                 <rect key="frame" x="0.0" y="0.0" width="577" height="406"/>
                 <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
@@ -58,25 +59,17 @@
             <point key="canvasLocation" x="-2004" y="90"/>
         </window>
         <view id="BUt-lg-GPp" userLabel="vwrGeneral">
-            <rect key="frame" x="0.0" y="0.0" width="577" height="424"/>
+            <rect key="frame" x="0.0" y="0.0" width="577" height="470"/>
             <autoresizingMask key="autoresizingMask"/>
             <subviews>
                 <stackView distribution="fill" orientation="vertical" alignment="leading" spacing="5" horizontalStackHuggingPriority="249.99998474121094" verticalStackHuggingPriority="249.99998474121094" translatesAutoresizingMaskIntoConstraints="NO" id="jxD-fv-UYx">
-                    <rect key="frame" x="20" y="31" width="530" height="373"/>
+                    <rect key="frame" x="20" y="30" width="537" height="420"/>
                     <subviews>
                         <stackView distribution="fill" orientation="vertical" alignment="leading" spacing="3" horizontalStackHuggingPriority="249.99998474121094" verticalStackHuggingPriority="249.99998474121094" translatesAutoresizingMaskIntoConstraints="NO" id="dj4-9G-dKq">
-                            <rect key="frame" x="0.0" y="333" width="302" height="40"/>
+                            <rect key="frame" x="0.0" y="381" width="302" height="39"/>
                             <subviews>
-                                <textField focusRingType="none" horizontalHuggingPriority="251" verticalHuggingPriority="750" verticalCompressionResistancePriority="751" translatesAutoresizingMaskIntoConstraints="NO" id="5Rz-c8-hp9">
-                                    <rect key="frame" x="-2" y="25" width="306" height="15"/>
-                                    <textFieldCell key="cell" controlSize="small" lineBreakMode="clipping" title="Change user interface language (will reboot the IME)." id="ZEv-Q2-mYL">
-                                        <font key="font" metaFont="cellTitle"/>
-                                        <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
-                                        <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
-                                    </textFieldCell>
-                                </textField>
                                 <stackView distribution="fill" orientation="horizontal" alignment="centerY" horizontalStackHuggingPriority="249.99998474121094" verticalStackHuggingPriority="249.99998474121094" translatesAutoresizingMaskIntoConstraints="NO" id="6NA-4k-NEM">
-                                    <rect key="frame" x="0.0" y="0.0" width="302" height="22"/>
+                                    <rect key="frame" x="0.0" y="17" width="302" height="22"/>
                                     <subviews>
                                         <textField focusRingType="none" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="L5M-VG-W1X">
                                             <rect key="frame" x="-2" y="4" width="118" height="15"/>
@@ -121,6 +114,14 @@
                                         <real value="3.4028234663852886e+38"/>
                                     </customSpacing>
                                 </stackView>
+                                <textField focusRingType="none" horizontalHuggingPriority="251" verticalHuggingPriority="750" verticalCompressionResistancePriority="751" translatesAutoresizingMaskIntoConstraints="NO" id="5Rz-c8-hp9">
+                                    <rect key="frame" x="-2" y="0.0" width="284" height="14"/>
+                                    <textFieldCell key="cell" controlSize="small" lineBreakMode="clipping" title="Change user interface language (will reboot the IME)." id="ZEv-Q2-mYL">
+                                        <font key="font" metaFont="smallSystem"/>
+                                        <color key="textColor" name="secondaryLabelColor" catalog="System" colorSpace="catalog"/>
+                                        <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
+                                    </textFieldCell>
+                                </textField>
                             </subviews>
                             <visibilityPriorities>
                                 <integer value="1000"/>
@@ -132,9 +133,83 @@
                             </customSpacing>
                         </stackView>
                         <box verticalHuggingPriority="750" boxType="separator" translatesAutoresizingMaskIntoConstraints="NO" id="50g-ym-cMe">
-                            <rect key="frame" x="0.0" y="325" width="530" height="5"/>
+                            <rect key="frame" x="0.0" y="373" width="530" height="5"/>
                             <constraints>
                                 <constraint firstAttribute="width" relation="greaterThanOrEqual" constant="530" id="Ylc-XO-ZMh"/>
+                            </constraints>
+                        </box>
+                        <stackView distribution="fill" orientation="vertical" alignment="leading" spacing="1" horizontalStackHuggingPriority="249.99998474121094" verticalStackHuggingPriority="249.99998474121094" detachesHiddenViews="YES" translatesAutoresizingMaskIntoConstraints="NO" id="wDs-Vy-dgw">
+                            <rect key="frame" x="0.0" y="333" width="537" height="37"/>
+                            <subviews>
+                                <stackView distribution="fill" orientation="horizontal" alignment="centerY" horizontalStackHuggingPriority="249.99998474121094" verticalStackHuggingPriority="249.99998474121094" translatesAutoresizingMaskIntoConstraints="NO" id="xGf-x1-oCc">
+                                    <rect key="frame" x="0.0" y="15" width="435" height="22"/>
+                                    <subviews>
+                                        <textField focusRingType="none" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="djS-EA-D08">
+                                            <rect key="frame" x="-2" y="4" width="225" height="15"/>
+                                            <textFieldCell key="cell" controlSize="small" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" alignment="left" title="Reading composer contents to narrate:" id="lblReadingNarrationCoverageShortTitle">
+                                                <font key="font" metaFont="cellTitle"/>
+                                                <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
+                                                <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
+                                            </textFieldCell>
+                                        </textField>
+                                        <popUpButton wantsLayer="YES" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="RKn-R9-NBX">
+                                            <rect key="frame" x="225" y="-1" width="214" height="22"/>
+                                            <popUpButtonCell key="cell" type="push" title="Do not narrate" bezelStyle="rounded" alignment="left" controlSize="small" lineBreakMode="truncatingTail" state="on" borderStyle="borderAndBezel" imageScaling="proportionallyDown" inset="2" selectedItem="optReadingNarrationCoverageNothing" id="7DT-2z-XK5">
+                                                <behavior key="behavior" lightByBackground="YES" lightByGray="YES"/>
+                                                <font key="font" metaFont="smallSystem"/>
+                                                <menu key="menu" id="Pwt-Hp-HoN">
+                                                    <items>
+                                                        <menuItem title="Do not narrate" state="on" id="optReadingNarrationCoverageNothing"/>
+                                                        <menuItem title="Only when combined by intonation" tag="1" id="optReadingNarrationCoverageConfirmed"/>
+                                                        <menuItem title="All changes in reading composer" tag="2" id="optReadingNarrationCoverageRealtime"/>
+                                                    </items>
+                                                </menu>
+                                            </popUpButtonCell>
+                                            <constraints>
+                                                <constraint firstAttribute="width" relation="greaterThanOrEqual" constant="180" id="ICQ-nM-Iu3"/>
+                                            </constraints>
+                                            <connections>
+                                                <binding destination="32" name="selectedTag" keyPath="values.ReadingNarrationCoverage" id="ZPc-QW-gBl"/>
+                                            </connections>
+                                        </popUpButton>
+                                    </subviews>
+                                    <constraints>
+                                        <constraint firstAttribute="height" constant="22" id="iRD-u2-XEQ"/>
+                                    </constraints>
+                                    <visibilityPriorities>
+                                        <integer value="1000"/>
+                                        <integer value="1000"/>
+                                    </visibilityPriorities>
+                                    <customSpacing>
+                                        <real value="3.4028234663852886e+38"/>
+                                        <real value="3.4028234663852886e+38"/>
+                                    </customSpacing>
+                                </stackView>
+                                <textField wantsLayer="YES" focusRingType="none" verticalHuggingPriority="750" setsMaxLayoutWidthAtFirstLayout="YES" translatesAutoresizingMaskIntoConstraints="NO" id="ia8-hs-HgR">
+                                    <rect key="frame" x="-2" y="0.0" width="541" height="14"/>
+                                    <constraints>
+                                        <constraint firstAttribute="width" constant="537" id="jkQ-40-sYJ"/>
+                                    </constraints>
+                                    <textFieldCell key="cell" controlSize="small" sendsActionOnEndEditing="YES" alignment="left" title="This reads your typed phonabets aloud. Only works with non-cassette Mode." id="lblReadingNarrationCoverageDescription">
+                                        <font key="font" metaFont="smallSystem"/>
+                                        <color key="textColor" name="secondaryLabelColor" catalog="System" colorSpace="catalog"/>
+                                        <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
+                                    </textFieldCell>
+                                </textField>
+                            </subviews>
+                            <visibilityPriorities>
+                                <integer value="1000"/>
+                                <integer value="1000"/>
+                            </visibilityPriorities>
+                            <customSpacing>
+                                <real value="3.4028234663852886e+38"/>
+                                <real value="3.4028234663852886e+38"/>
+                            </customSpacing>
+                        </stackView>
+                        <box verticalHuggingPriority="750" boxType="separator" translatesAutoresizingMaskIntoConstraints="NO" id="6sb-Ml-Bho">
+                            <rect key="frame" x="0.0" y="325" width="530" height="5"/>
+                            <constraints>
+                                <constraint firstAttribute="width" relation="greaterThanOrEqual" constant="530" id="KqM-pa-FEN"/>
                             </constraints>
                         </box>
                         <textField focusRingType="none" horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="Vp3-lc-XD5">
@@ -438,8 +513,12 @@
                         <integer value="1000"/>
                         <integer value="1000"/>
                         <integer value="1000"/>
+                        <integer value="1000"/>
+                        <integer value="1000"/>
                     </visibilityPriorities>
                     <customSpacing>
+                        <real value="3.4028234663852886e+38"/>
+                        <real value="3.4028234663852886e+38"/>
                         <real value="3.4028234663852886e+38"/>
                         <real value="3.4028234663852886e+38"/>
                         <real value="3.4028234663852886e+38"/>
@@ -457,7 +536,7 @@
                 <constraint firstItem="jxD-fv-UYx" firstAttribute="top" secondItem="BUt-lg-GPp" secondAttribute="top" constant="20" symbolic="YES" id="P60-u0-EHB"/>
             </constraints>
             <accessibility identifier="vwrGeneral"/>
-            <point key="canvasLocation" x="-1350.5" y="68"/>
+            <point key="canvasLocation" x="-1350.5" y="91"/>
         </view>
         <view id="3x9-Ir-gx7" userLabel="vwrCandidates">
             <rect key="frame" x="0.0" y="0.0" width="577" height="437"/>
@@ -1894,7 +1973,7 @@
                             <rect key="frame" x="0.0" y="71" width="538" height="370"/>
                             <clipView key="contentView" drawsBackground="NO" id="x8s-wo-bxi">
                                 <rect key="frame" x="0.0" y="0.0" width="538" height="370"/>
-                                <autoresizingMask key="autoresizingMask"/>
+                                <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                 <subviews>
                                     <textView wantsLayer="YES" importsGraphics="NO" richText="NO" verticallyResizable="YES" allowsUndo="YES" smartInsertDelete="YES" id="kSG-dz-P2N">
                                         <rect key="frame" x="0.0" y="0.0" width="538" height="370"/>

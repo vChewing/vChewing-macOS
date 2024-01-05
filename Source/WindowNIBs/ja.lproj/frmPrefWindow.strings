@@ -92,6 +92,8 @@
 "lblCheckAbusersOfSecureEventInputAPI.title" = "このような不正利用は「システム内蔵入力以外の全ての入力アプリがメニューで灰色状態で選べなくて使えない」の元凶である。センシティブな資料の記入どころでSecureEventInputをEnableSecureEventInput()で使うのは当然であるが、「入力中」状態が終わった後必ずDisableSecureEventInput()で状態解消すべきだと義務である。いくつかヘルパーアプリも、あるいはSecureEventInputを呼び起こしてからすぐ固まったアプリも、この状態になりやすい。特に、他のアプリの画面へ切り替えたとしても、固まったアプリのSecureEventInput状態は自動的に解消できぬ。";
 "lblDevZoneTitleDescription.title" = "警告：これからの新機能テストのために作ったページですから、\nここで陳列されている諸機能は予想通り動けるだと思わないでください。";
 "lblIntonationKeyBehavior.title" = "音調組立緩衝列が空かされた時の音調キーの行為をご指定ください。";
+"lblReadingNarrationCoverageDescription.title" = "音読組立緩衝列の内容の変化を朗読。該功能對磁帶模式無效。";
+"lblReadingNarrationCoverageShortTitle.title" = "音読組立の朗読:";
 "lblShiftBkspKeyBehavior.title" = "Shift+BackSpace キーの優先行為をご指定ください。";
 "lblShiftEisuToggleOffTogetherWithCapsLock.title" = "このチェックを入れると：イ）[macOS 12 以降] CapsLockがオフした時に、「Shiftキー・JIS英数キー」の共有していた内部のスイッチもオフにする；ロ）「JIS英数キー」でそのキーに応ずる英数モードがオフした時に、CapsLockもオフにする。尚、CapsLockがオンの時に、「Shiftキーだけを打った」行為は検知できません。";
 "lblUpperCaseLetterKeyBehavior.title" = "Shift+文字キーの行為をご指定ください。";
@@ -101,6 +103,9 @@
 "neb-Pz-n1h.title" = "最長可能キーができた場合、文字を組み立つ";
 "nxP-CV-ZAu.title" = "右側の Shift キーで英数入力モードの切り替え";
 "o3r-NZ-gsU.title" = "簡体モードだけの場合、カセットモードの漢字出力転換を";
+"optReadingNarrationCoverageConfirmed.title" = "音調キーで確認するときに";
+"optReadingNarrationCoverageNothing.title" = "朗読せずに";
+"optReadingNarrationCoverageRealtime.title" = "いずれの変化が起きたときに";
 "OVR-eb-laC.title" = "一行・列組版";
 "Parser11.title" = "国音二式 (ローマ字+数字音調)";
 "Parser12.title" = "イェール弁音 (ローマ字+数字音調)";
