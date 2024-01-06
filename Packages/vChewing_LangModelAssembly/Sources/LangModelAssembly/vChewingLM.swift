@@ -51,10 +51,11 @@ extension Array where Element == String {
       assert(looseEnds)
     }
 
-    var ptrStmt: OpaquePointer?
-    defer { sqlite3_finalize(ptrStmt) }
     for strStmt in self {
-      guard sqlite3_prepare_v2(ptrDB, strStmt, -1, &ptrStmt, nil) == SQLITE_OK, sqlite3_step(ptrStmt) == SQLITE_DONE else {
+      let thisResult = performStatement { ptrStmt in
+        sqlite3_prepare_v2(ptrDB, strStmt, -1, &ptrStmt, nil) == SQLITE_OK && sqlite3_step(ptrStmt) == SQLITE_DONE
+      }
+      guard thisResult else {
         vCLog("SQL Query Error. Statement: \(strStmt)")
         return false
       }
