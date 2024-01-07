@@ -196,7 +196,7 @@ func prepareDatabase() -> Bool {
   """
   guard sqlite3_open(urlSQLite, &ptrSQL) == SQLITE_OK else { return false }
   guard sqlite3_exec(ptrSQL, "PRAGMA synchronous = OFF;", nil, nil, nil) == SQLITE_OK else { return false }
-  guard sqlite3_exec(ptrSQL, "PRAGMA journal_mode = MEMORY;", nil, nil, nil) == SQLITE_OK else { return false }
+  guard sqlite3_exec(ptrSQL, "PRAGMA journal_mode = OFF;", nil, nil, nil) == SQLITE_OK else { return false }
   guard sqlMakeTableMACV.runAsSQLExec(dbPointer: &ptrSQL) else { return false }
   guard "begin;".runAsSQLExec(dbPointer: &ptrSQL) else { return false }
 
@@ -1061,8 +1061,8 @@ func main() {
     compileJSON = false
     compileSQLite = true
   }
-
-  if !prepareDatabase(), compileSQLite {
+  let prepared = prepareDatabase()
+  if compileSQLite, !prepared {
     NSLog("// SQLite 資料庫初期化失敗。")
     exit(-1)
   }
@@ -1092,7 +1092,7 @@ func main() {
   if compileJSON {
     NSLog("// 全部 JSON 辭典檔案建置完畢。")
   }
-  if compileSQLite {
+  if compileSQLite, prepared {
     NSLog("// 開始整合反查資料。")
     mapReverseLookupForCheck.forEach { key, values in
       values.reversed().forEach { valueLiteral in
