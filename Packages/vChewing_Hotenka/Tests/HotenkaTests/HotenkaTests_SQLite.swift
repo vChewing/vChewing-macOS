@@ -51,6 +51,10 @@ extension HotenkaTests {
       sqlite3_exec(ptrSQL, "PRAGMA synchronous = OFF;", nil, nil, nil) == SQLITE_OK,
       "HOTENKA: SQLite synchronous OFF failed."
     )
+    XCTAssertTrue(
+      sqlite3_exec(ptrSQL, "PRAGMA journal_mode = OFF;", nil, nil, nil) == SQLITE_OK,
+      "HOTENKA: SQLite journal_mode OFF failed."
+    )
 
     let sqlMakeTableHotenka = """
     DROP TABLE IF EXISTS DATA_HOTENKA;
