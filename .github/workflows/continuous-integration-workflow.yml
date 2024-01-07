@@ -7,14 +7,14 @@ on:
 
 jobs:
   build:
-    name: Build (latest)
-    runs-on: macOS-latest
+    name: Build
+    runs-on: macOS-13
     env:
         GIT_SSL_NO_VERIFY: true
     steps:
       - uses: maxim-lobanov/setup-xcode@v1
         with:
-          xcode-version: '^15.0'
+          xcode-version: '^15.1'
       - uses: actions/checkout@v1
       - name: Clean
         run: make clean
