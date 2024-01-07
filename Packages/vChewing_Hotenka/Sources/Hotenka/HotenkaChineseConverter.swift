@@ -80,6 +80,7 @@ public class HotenkaChineseConverter {
       ptrSQL = nil
       return
     }
+    sqlite3_exec(ptrSQL, "PRAGMA journal_mode = OFF;", nil, nil, nil)
   }
 
   public init(plistDir: String) {
