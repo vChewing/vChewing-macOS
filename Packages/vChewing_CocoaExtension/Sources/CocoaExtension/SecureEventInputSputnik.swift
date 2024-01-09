@@ -72,9 +72,7 @@ public extension NSRunningApplication {
     return Self.isScreenSaverEngineRunning || Self.isDesktopLocked
   }
 
-  private static var isScreenSaverEngineRunning: Bool {
-    !NSRunningApplication.runningApplications(withBundleIdentifier: "com.apple.ScreenSaver.Engine").isEmpty
-  }
+  fileprivate(set) static var isScreenSaverEngineRunning: Bool = false
 
   fileprivate(set) static var isDesktopLocked: Bool = false
 }
@@ -95,6 +93,14 @@ extension SecureEventInputSputnik {
         .publisher(for: .init(rawValue: "com.apple.screenIsUnlocked"))
         .sink { _ in NSRunningApplication.isDesktopLocked = false }
         .store(in: &Self.combinePool)
+      DistributedNotificationCenter.default()
+        .publisher(for: .init(rawValue: "com.apple.screensaver.didstart"))
+        .sink { _ in NSRunningApplication.isScreenSaverEngineRunning = true }
+        .store(in: &Self.combinePool)
+      DistributedNotificationCenter.default()
+        .publisher(for: .init(rawValue: "com.apple.screensaver.didstop"))
+        .sink { _ in NSRunningApplication.isScreenSaverEngineRunning = false }
+        .store(in: &Self.combinePool)
     } else {
       let lockObserver = DistributedNotificationCenter.default()
         .addObserver(forName: .init("com.apple.screenIsLocked"), object: nil, queue: .main) { _ in
@@ -104,8 +110,18 @@ extension SecureEventInputSputnik {
         .addObserver(forName: .init("com.apple.screenIsUnlocked"), object: nil, queue: .main) { _ in
           NSRunningApplication.isDesktopLocked = false
         }
+      let screenSaverDidStart = DistributedNotificationCenter.default()
+        .addObserver(forName: .init("com.apple.screensaver.didstart"), object: nil, queue: .main) { _ in
+          NSRunningApplication.isScreenSaverEngineRunning = true
+        }
+      let screenSaverDidStop = DistributedNotificationCenter.default()
+        .addObserver(forName: .init("com.apple.screensaver.didstop"), object: nil, queue: .main) { _ in
+          NSRunningApplication.isScreenSaverEngineRunning = false
+        }
       Self.combinePoolCocoa.append(lockObserver)
       Self.combinePoolCocoa.append(unlockObserver)
+      Self.combinePoolCocoa.append(screenSaverDidStart)
+      Self.combinePoolCocoa.append(screenSaverDidStop)
     }
   }
 }
