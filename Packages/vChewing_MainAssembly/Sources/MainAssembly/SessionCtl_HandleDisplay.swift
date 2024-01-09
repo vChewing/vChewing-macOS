@@ -99,17 +99,7 @@ public extension SessionCtl {
       name: PrefMgr.shared.candidateTextFontName, size: PrefMgr.shared.candidateListTextSize
     )
 
-    candidateUI?.locale = {
-      switch inputMode {
-      case .imeModeCHS: return "zh-Hans"
-      case .imeModeCHT:
-        if !PrefMgr.shared.shiftJISShinjitaiOutputEnabled, !PrefMgr.shared.chineseConversionEnabled {
-          return "zh-Hant"
-        }
-        return "ja"
-      default: return ""
-      }
-    }()
+    candidateUI?.locale = localeForFontFallbacks
 
     if let ctlCandidateCurrent = candidateUI as? CtlCandidateTDK {
       ctlCandidateCurrent.useMouseScrolling = PrefMgr.shared.enableMouseScrollingForTDKCandidatesCocoa
@@ -136,6 +126,18 @@ public extension SessionCtl {
         bottomOutOfScreenAdjustmentHeight: lineHeightRect().size.height + 4.0,
         useGCD: true
       )
+    }
+  }
+
+  var localeForFontFallbacks: String {
+    switch inputMode {
+    case .imeModeCHS: return "zh-Hans"
+    case .imeModeCHT:
+      if !PrefMgr.shared.shiftJISShinjitaiOutputEnabled, !PrefMgr.shared.chineseConversionEnabled {
+        return "zh-Hant"
+      }
+      return "ja"
+    default: return ""
     }
   }
 

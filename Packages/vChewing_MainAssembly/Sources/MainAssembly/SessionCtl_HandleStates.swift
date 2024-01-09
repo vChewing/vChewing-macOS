@@ -109,6 +109,7 @@ public extension SessionCtl {
     if state.hasComposition, clientMitigationLevel >= 2 {
       updateVerticalTypingStatus()
       popupCompositionBuffer.isTypingDirectionVertical = isVerticalTyping
+      popupCompositionBuffer.sync(accent: clientAccentColor, locale: localeForFontFallbacks)
       popupCompositionBuffer.show(
         state: state, at: lineHeightRect(zeroCursor: true).origin
       )
