@@ -32,6 +32,32 @@ public class PopupCompositionBuffer: NSWindowController {
     }
   }
 
+  public func sync(accent: NSColor?, locale: String) {
+    self.locale = locale
+    self.accent = accent ?? themeColorCocoa
+    window?.backgroundColor = adjustedThemeColor
+    messageTextField.backgroundColor = .clear
+    messageTextField.textColor = textColor
+  }
+
+  private var accent: NSColor = .accentColor
+
+  private var locale: String = ""
+
+  var themeColorCocoa: NSColor {
+    switch locale {
+    case "zh-Hans": return .init(red: 255 / 255, green: 64 / 255, blue: 53 / 255, alpha: 0.85)
+    case "zh-Hant": return .init(red: 5 / 255, green: 127 / 255, blue: 255 / 255, alpha: 0.85)
+    case "ja": return .init(red: 167 / 255, green: 137 / 255, blue: 99 / 255, alpha: 0.85)
+    default: return .init(red: 5 / 255, green: 127 / 255, blue: 255 / 255, alpha: 0.85)
+    }
+  }
+
+  private func bufferFont(size: CGFloat = 18) -> NSFont {
+    let defaultResult: CTFont? = CTFontCreateUIFontForLanguage(.system, size, locale as CFString)
+    return defaultResult ?? NSFont.systemFont(ofSize: size)
+  }
+
   public init() {
     let contentRect = NSRect(x: 128.0, y: 128.0, width: 300.0, height: 20.0)
     let styleMask: NSWindow.StyleMask = [.borderless, .nonactivatingPanel]
@@ -41,16 +67,16 @@ public class PopupCompositionBuffer: NSWindowController {
     panel.level = NSWindow.Level(Int(max(CGShieldingWindowLevel(), kCGPopUpMenuWindowLevel)) + 1)
     panel.hasShadow = true
     panel.backgroundColor = NSColor.controlBackgroundColor
-    panel.styleMask = .fullSizeContentView
+    panel.styleMask = .utilityWindow
     panel.isMovable = false
     messageTextField = NSTextField()
     messageTextField.isEditable = false
     messageTextField.isSelectable = false
     messageTextField.isBezeled = false
-    messageTextField.textColor = NSColor.textColor
+    messageTextField.textColor = NSColor.selectedMenuItemTextColor
     messageTextField.drawsBackground = true
     messageTextField.backgroundColor = NSColor.clear
-    messageTextField.font = .systemFont(ofSize: 18)
+    messageTextField.font = .systemFont(ofSize: 18) // 不是最終值。
     panel.contentView?.addSubview(messageTextField)
     panel.contentView?.wantsLayer = true
     Self.currentWindow = panel
@@ -72,6 +98,7 @@ public class PopupCompositionBuffer: NSWindowController {
     let attrPCBHeader: NSMutableAttributedString = .init(string: "　")
     let verticalAttributes: [NSAttributedString.Key: Any] = [
       .kern: 0,
+      .font: bufferFont(),
       .verticalGlyphForm: true,
       .paragraphStyle: {
         let newStyle = NSMutableParagraphStyle()
@@ -84,7 +111,10 @@ public class PopupCompositionBuffer: NSWindowController {
         return newStyle
       }(),
     ]
-    let horizontalAttributes: [NSAttributedString.Key: Any] = [.kern: 0]
+    let horizontalAttributes: [NSAttributedString.Key: Any] = [
+      .font: bufferFont(),
+      .kern: 0,
+    ]
 
     if isTypingDirectionVertical {
       attrPCBHeader.setAttributes(
@@ -102,10 +132,12 @@ public class PopupCompositionBuffer: NSWindowController {
       )
     }
 
-    let markerAttributes: [NSAttributedString.Key: Any] = {
+    var markerAttributes: [NSAttributedString.Key: Any] {
       var result: [NSAttributedString.Key: Any] = [
         .kern: 0,
-        .backgroundColor: NSApplication.isDarkMode ? NSColor.systemRed : NSColor.systemYellow,
+        .font: bufferFont(),
+        .backgroundColor: markerColor,
+        .foregroundColor: markerTextColor,
         .markedClauseSegment: 0,
       ]
       if isTypingDirectionVertical {
@@ -113,7 +145,7 @@ public class PopupCompositionBuffer: NSWindowController {
         result[.verticalGlyphForm] = true
       }
       return result
-    }()
+    }
 
     // 在這個視窗內的下畫線繪製方法就得單獨設計了。
     attrString.setAttributes(
@@ -124,10 +156,11 @@ public class PopupCompositionBuffer: NSWindowController {
       )
     )
 
-    let cursorAttributes: [NSAttributedString.Key: Any] = {
+    var cursorAttributes: [NSAttributedString.Key: Any] {
       var result: [NSAttributedString.Key: Any] = [
         .kern: -18,
-        .foregroundColor: NSColor.textColor,
+        .font: bufferFont(),
+        .foregroundColor: textColor,
       ]
       if isTypingDirectionVertical {
         result[.paragraphStyle] = verticalAttributes[.paragraphStyle]
@@ -141,7 +174,7 @@ public class PopupCompositionBuffer: NSWindowController {
         result[.baselineOffset] = 0
       }
       return result
-    }()
+    }
 
     let attrCursor: NSAttributedString =
       isTypingDirectionVertical
@@ -153,7 +186,6 @@ public class PopupCompositionBuffer: NSWindowController {
     attrString.insert(attrPCBHeader, at: attrString.length)
 
     textShown = attrString
-    messageTextField.maximumNumberOfLines = 1
     if let editor = messageTextField.currentEditor() {
       editor.selectedRange = NSRange(state.u16MarkedRange)
     }
@@ -204,5 +236,21 @@ public class PopupCompositionBuffer: NSWindowController {
     }
     messageTextField.frame = rect
     window?.setFrame(bigRect, display: true)
+  }
+
+  private var markerColor: NSColor {
+    .selectedMenuItemTextColor.withAlphaComponent(0.9)
+  }
+
+  private var markerTextColor: NSColor {
+    adjustedThemeColor
+  }
+
+  private var textColor: NSColor {
+    .selectedMenuItemTextColor
+  }
+
+  private var adjustedThemeColor: NSColor {
+    accent.blended(withFraction: NSApplication.isDarkMode ? 0.75 : 0.25, of: .black) ?? accent
   }
 }
