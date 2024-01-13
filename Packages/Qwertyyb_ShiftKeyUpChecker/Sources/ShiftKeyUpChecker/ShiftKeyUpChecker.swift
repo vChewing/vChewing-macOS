@@ -37,7 +37,7 @@ public struct ShiftKeyUpChecker {
 
   /// 實現邏輯基本上是相同的，只是威注音這邊的行文風格習慣可能與業火五筆有不同。
 
-  private let delayInterval = 0.3
+  private let delayInterval = 0.2
   private var previousKeyCode: UInt16?
   private var lastTime: Date = .init()
 
