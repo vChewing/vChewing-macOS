@@ -30,12 +30,9 @@ extension InputHandler {
       // 處理 `%symboldef` 選字行為。
       if handleCassetteSymbolTable(input: input) {
         return true
-      } else if hasQuickCandidates, input.text != currentLM.cassetteWildcardKey,
-                let itim = input.inputTextIgnoringModifiers,
-                let newEv = (input as? NSEvent)?.reinitiate(characters: itim)
-      {
+      } else if hasQuickCandidates, input.text != currentLM.cassetteWildcardKey {
         // 處理 `%quick` 選字行為（當且僅當與 `%symboldef` 衝突的情況下）。
-        guard !(handleQuickCandidate && handleCandidate(input: newEv)) else { return true }
+        guard !(handleQuickCandidate && handleCandidate(input: input, ignoringModifiers: true)) else { return true }
       } else {
         // 處理 `%quick` 選字行為。
         guard !(hasQuickCandidates && handleQuickCandidate && handleCandidate(input: input)) else { return true }
