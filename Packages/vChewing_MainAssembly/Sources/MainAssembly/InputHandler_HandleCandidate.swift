@@ -18,14 +18,17 @@ import Shared
 
 extension InputHandler {
   /// 當且僅當選字窗出現時，對於經過初次篩選處理的輸入訊號的處理均藉由此函式來進行。
-  /// - Parameter input: 輸入訊號。
+  /// - Parameters:
+  ///   - input: 輸入訊號。
+  ///   - ignoringModifiers: 是否需要忽視修飾鍵。
   /// - Returns: 告知 IMK「該按鍵是否已經被輸入法攔截處理」。
-  func handleCandidate(input: InputSignalProtocol) -> Bool {
+  func handleCandidate(input: InputSignalProtocol, ignoringModifiers: Bool = false) -> Bool {
     guard let delegate = delegate else { return false }
     guard var ctlCandidate = delegate.candidateController() else { return false }
     let state = delegate.state
     guard state.isCandidateContainer else { return false } // 會自動判斷「isEmpty」。
     guard ctlCandidate.visible else { return false }
+    let inputText = ignoringModifiers ? (input.inputTextIgnoringModifiers ?? input.text) : input.text
 
     // MARK: 選字窗內使用熱鍵升權、降權、刪詞。
 
@@ -184,7 +187,7 @@ extension InputHandler {
       let cassetteShift = currentLM.areCassetteCandidateKeysShiftHeld
       shaltShiftHold = shaltShiftHold || cassetteShift
     }
-    let matched: String = shaltShiftHold ? input.inputTextIgnoringModifiers ?? "" : input.text
+    let matched: String = shaltShiftHold ? input.inputTextIgnoringModifiers ?? "" : inputText
     checkSelectionKey: for keyPair in delegate.selectionKeys.enumerated() {
       guard matched.lowercased() == keyPair.element.lowercased() else { continue }
       index = Int(keyPair.offset)
@@ -210,27 +213,27 @@ extension InputHandler {
       let punctuationNamePrefix: String = generatePunctuationNamePrefix(withKeyCondition: input)
       let parser = currentKeyboardParser
       let arrCustomPunctuations: [String] = [
-        punctuationNamePrefix, parser, input.text,
+        punctuationNamePrefix, parser, inputText,
       ]
       let customPunctuation: String = arrCustomPunctuations.joined()
 
       /// 看看這個輸入是否是不需要修飾鍵的那種標點鍵輸入。
 
       let arrPunctuations: [String] = [
-        punctuationNamePrefix, input.text,
+        punctuationNamePrefix, inputText,
       ]
       let punctuation: String = arrPunctuations.joined()
 
       let isInputValid: Bool =
         prefs.cassetteEnabled
-          ? currentLM.isThisCassetteKeyAllowed(key: input.text) : composer.inputValidityCheck(key: input.charCode)
+          ? currentLM.isThisCassetteKeyAllowed(key: inputText) : composer.inputValidityCheck(key: input.charCode)
 
       var shouldAutoSelectCandidate: Bool =
         isInputValid || currentLM.hasUnigramsFor(keyArray: [customPunctuation])
           || currentLM.hasUnigramsFor(keyArray: [punctuation])
 
       if !shouldAutoSelectCandidate, input.isUpperCaseASCIILetterKey {
-        let letter = "_letter_\(input.text)"
+        let letter = "_letter_\(inputText)"
         if currentLM.hasUnigramsFor(keyArray: [letter]) { shouldAutoSelectCandidate = true }
       }
 
