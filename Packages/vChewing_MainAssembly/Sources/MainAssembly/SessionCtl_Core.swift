@@ -32,7 +32,7 @@ public class SessionCtl: IMKInputController {
   public static var areWeNerfing = false
 
   /// 上一個被處理過的鍵盤事件。
-  public var previouslyHandledEvents: [NSEvent] = .init()
+  public var previouslyHandledEvents = [KBEvent]()
 
   /// 目前在用的的選字窗副本。
   public var candidateUI: CtlCandidateProtocol?

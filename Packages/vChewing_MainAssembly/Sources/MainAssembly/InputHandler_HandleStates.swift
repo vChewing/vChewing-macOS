@@ -1076,7 +1076,7 @@ extension InputHandler {
     // 另外，這裡不要用「!input.isFunctionKeyHold」，
     // 否則會導致對上下左右鍵與翻頁鍵的判斷失效。
     let notEmpty = state.hasComposition && !compositor.isEmpty && isComposerOrCalligrapherEmpty
-    let bannedModifiers: NSEvent.ModifierFlags = [.option, .shift, .command, .control]
+    let bannedModifiers: KBEvent.ModifierFlags = [.option, .shift, .command, .control]
     let noBannedModifiers = bannedModifiers.intersection(input.keyModifierFlags).isEmpty
     var triggered = input.isCursorClockLeft || input.isCursorClockRight
     triggered = triggered || (input.isSpace && prefs.chooseCandidateUsingSpace)

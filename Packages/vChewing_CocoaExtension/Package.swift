@@ -13,14 +13,12 @@ let package = Package(
     ),
   ],
   dependencies: [
-    .package(path: "../vChewing_IMKUtils"),
     .package(path: "../vChewing_SwiftExtension"),
   ],
   targets: [
     .target(
       name: "CocoaExtension",
       dependencies: [
-        .product(name: "IMKUtils", package: "vChewing_IMKUtils"),
         .product(name: "SwiftExtension", package: "vChewing_SwiftExtension"),
       ]
     ),

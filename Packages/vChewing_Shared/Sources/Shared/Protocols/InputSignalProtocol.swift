@@ -9,13 +9,10 @@
 import AppKit
 import CocoaExtension
 
-extension NSEvent: InputSignalProtocol {}
-
 // MARK: - InputSignalProtocol
 
 public protocol InputSignalProtocol {
-  var modifierFlags: NSEvent.ModifierFlags { get }
-  var keyModifierFlags: NSEvent.ModifierFlags { get }
+  var keyModifierFlags: KBEvent.ModifierFlags { get }
   var isTypingVertical: Bool { get }
   var text: String { get }
   var inputTextIgnoringModifiers: String? { get }
@@ -61,4 +58,10 @@ public protocol InputSignalProtocol {
   var isUpperCaseASCIILetterKey: Bool { get }
   var isSingleCommandBasedLetterHotKey: Bool { get }
   var isSymbolMenuPhysicalKey: Bool { get }
+}
+
+public extension InputSignalProtocol {
+  var commonKeyModifierFlags: KBEvent.ModifierFlags {
+    keyModifierFlags.subtracting([.function, .numericPad, .help])
+  }
 }
