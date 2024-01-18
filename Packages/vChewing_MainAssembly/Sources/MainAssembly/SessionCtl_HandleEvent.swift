@@ -40,20 +40,19 @@ public extension SessionCtl {
       return true
     }
 
-    var result = false
-    if [.keyDown, .flagsChanged].contains(event.type) {
-      result = handleKeyDown(event: event)
-      if result, event.type == .keyDown {
-        previouslyHandledEvents.append(event)
-      }
-    } else if event.type == .keyUp {
-      result = handleKeyUp(event: event)
-    }
+    guard let newEvent = event.copyAsKBEvent else { return false }
 
-    return result
+    switch newEvent.type {
+    case .flagsChanged: return handleKeyDown(event: newEvent)
+    case .keyDown:
+      let result = handleKeyDown(event: newEvent)
+      if result { previouslyHandledEvents.append(newEvent) }
+      return result
+    case .keyUp: return handleKeyUp(event: newEvent)
+    }
   }
 
-  private func handleKeyUp(event: NSEvent) -> Bool {
+  private func handleKeyUp(event: KBEvent) -> Bool {
     guard ![.ofEmpty, .ofAbortion].contains(state.type) else { return false }
     let codes = previouslyHandledEvents.map(\.keyCode)
     if codes.contains(event.keyCode) {
@@ -65,7 +64,7 @@ public extension SessionCtl {
     return false
   }
 
-  private func handleKeyDown(event: NSEvent) -> Bool {
+  private func handleKeyDown(event: KBEvent) -> Bool {
     // MARK: 前置處理
 
     // 先放過一些以 .command 觸發的熱鍵（包括剪貼簿熱鍵）。
@@ -131,7 +130,7 @@ public extension SessionCtl {
     // 如果是方向鍵輸入的話，就想辦法帶上標記資訊、來說明當前是縱排還是橫排。
     if event.isUp || event.isDown || event.isLeft || event.isRight {
       updateVerticalTypingStatus() // 檢查當前環境是否是縱排輸入。
-      eventToDeal = event.reinitiate(charactersIgnoringModifiers: isVerticalTyping ? "Vertical" : "Horizontal") ?? event
+      eventToDeal = event.reinitiate(charactersIgnoringModifiers: isVerticalTyping ? "Vertical" : "Horizontal")
     }
 
     // 使 NSEvent 自翻譯，這樣可以讓 Emacs NSEvent 變成標準 NSEvent。
@@ -158,12 +157,12 @@ public extension SessionCtl {
     if eventToDeal.isNumericPadKey,
        let eventCharConverted = eventToDeal.characters?.applyingTransformFW2HW(reverse: false)
     {
-      eventToDeal = eventToDeal.reinitiate(characters: eventCharConverted) ?? eventToDeal
+      eventToDeal = eventToDeal.reinitiate(characters: eventCharConverted)
     } else if [.ofEmpty, .ofInputting].contains(state.type), eventToDeal.isMainAreaNumKey,
               !eventToDeal.isCommandHold, !eventToDeal.isControlHold, eventToDeal.isOptionHold
     {
       // Alt(+Shift)+主鍵盤區數字鍵 預先處理
-      eventToDeal = eventToDeal.reinitiate(characters: eventToDeal.mainAreaNumKeyChar) ?? eventToDeal
+      eventToDeal = eventToDeal.reinitiate(characters: eventToDeal.mainAreaNumKeyChar)
     }
 
     // 準備修飾鍵，用來判定要新增的詞彙是否需要賦以非常低的權重。
