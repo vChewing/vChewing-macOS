@@ -31,6 +31,9 @@ public extension vChewingLM {
   /// 語言模組的相關資料的存放位置，僅藉由參數來讀取相關訊息。
   class LMInstantiator: LangModelProtocol {
     public struct Config {
+      /// 如果設定為 nil 的話，則不產生任何詞頻資料。
+      /// true = 全形，false = 半形。
+      public var numPadFWHWStatus: Bool?
       public var isCassetteEnabled = false
       public var isPhraseReplacementEnabled = false
       public var isCNSEnabled = false
@@ -338,6 +341,8 @@ public extension vChewingLM {
       rawAllUnigrams += lmUserPhrases.unigramsFor(key: keyChain).reversed()
 
       if !config.isCassetteEnabled || config.isCassetteEnabled && keyChain.map(\.description)[0] == "_" {
+        // 先給出 NumPad 的結果。
+        rawAllUnigrams += supplyNumPadUnigrams(key: keyChain)
         // LMMisc 與 LMCore 的 score 在 (-10.0, 0.0) 這個區間內。
         rawAllUnigrams += factoryUnigramsFor(key: keyChain, column: .theDataCHEW)
         rawAllUnigrams += factoryCoreUnigramsFor(key: keyChain)
