@@ -24,14 +24,18 @@ final class LMInstantiatorSQLTests: XCTestCase {
   func testSQL() throws {
     let instance = vChewingLM.LMInstantiator(isCHS: true)
     XCTAssertTrue(vChewingLM.LMInstantiator.connectToTestSQLDB())
-    instance.isCNSEnabled = false
-    instance.isSymbolEnabled = false
+    instance.setOptions { config in
+      config.isCNSEnabled = false
+      config.isSymbolEnabled = false
+    }
     XCTAssertEqual(instance.unigramsFor(keyArray: strBloatingKey).description, "[(吹牛逼,-7.375), (吹牛屄,-7.399)]")
     XCTAssertEqual(instance.unigramsFor(keyArray: strHaninSymbolMenuKey)[1].description, "(，,-9.9)")
     XCTAssertEqual(instance.unigramsFor(keyArray: strRefutationKey).description, "[(㨃,-9.544)]")
     XCTAssertEqual(instance.unigramsFor(keyArray: strBoobsKey).description, "[(ㄋㄟㄋㄟ,-1.0)]")
-    instance.isCNSEnabled = true
-    instance.isSymbolEnabled = true
+    instance.setOptions { config in
+      config.isCNSEnabled = true
+      config.isSymbolEnabled = true
+    }
     XCTAssertEqual(instance.unigramsFor(keyArray: strBloatingKey).last?.description, "(🌳🆕🐝,-13.0)")
     XCTAssertEqual(instance.unigramsFor(keyArray: strHaninSymbolMenuKey)[1].description, "(，,-9.9)")
     XCTAssertEqual(instance.unigramsFor(keyArray: strRefutationKey).count, 10)

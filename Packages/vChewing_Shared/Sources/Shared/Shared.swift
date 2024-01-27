@@ -226,6 +226,10 @@ public enum Shared {
       }
     }
 
+    public static var validCases: [InputMode] {
+      [.imeModeCHS, .imeModeCHT]
+    }
+
     public var localizedDescription: String { NSLocalizedString(description, comment: "") }
     public var description: String {
       switch self {

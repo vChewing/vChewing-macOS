@@ -19,14 +19,14 @@ extension vChewingLM.LMInstantiator {
 
     func processDateWithDayDelta(_ delta: Int) {
       tokens = ["MACRO@DATE_DAYDELTA:\(delta)"]
-      if deltaOfCalendarYears != 0 { tokens.append("MACRO@DATE_DAYDELTA:\(delta)_YEARDELTA:\(deltaOfCalendarYears)") }
+      if config.deltaOfCalendarYears != 0 { tokens.append("MACRO@DATE_DAYDELTA:\(delta)_YEARDELTA:\(config.deltaOfCalendarYears)") }
       tokens.append("MACRO@DATE_DAYDELTA:\(delta)_SHORTENED")
       tokens.append("MACRO@DATE_DAYDELTA:\(delta)_LUNA")
     }
 
     func processYearWithYearDelta(_ delta: Int) {
       tokens = ["MACRO@YEAR_YEARDELTA:\(delta)"]
-      if deltaOfCalendarYears != 0 { tokens.append("MACRO@YEAR_YEARDELTA:\(delta + deltaOfCalendarYears)") }
+      if config.deltaOfCalendarYears != 0 { tokens.append("MACRO@YEAR_YEARDELTA:\(delta + config.deltaOfCalendarYears)") }
       tokens.append("MACRO@YEAR_GANZHI_YEARDELTA:\(delta)")
       tokens.append("MACRO@YEAR_ZODIAC_YEARDELTA:\(delta)")
     }
