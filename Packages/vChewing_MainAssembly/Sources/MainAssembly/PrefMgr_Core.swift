@@ -230,21 +230,21 @@ import SwiftExtension
   @AppProperty(key: UserDef.kCNS11643Enabled.rawValue, defaultValue: false)
   public dynamic var cns11643Enabled: Bool {
     didSet {
-      LMMgr.setCNSEnabled(cns11643Enabled) // 很重要
+      LMMgr.syncLMPrefs()
     }
   }
 
   @AppProperty(key: UserDef.kSymbolInputEnabled.rawValue, defaultValue: true)
   public dynamic var symbolInputEnabled: Bool {
     didSet {
-      LMMgr.setSymbolEnabled(symbolInputEnabled) // 很重要
+      LMMgr.syncLMPrefs()
     }
   }
 
   @AppProperty(key: UserDef.kCassetteEnabled.rawValue, defaultValue: false)
   public dynamic var cassetteEnabled: Bool {
     didSet {
-      LMMgr.setCassetteEnabled(cassetteEnabled) // 很重要
+      LMMgr.syncLMPrefs()
     }
   }
 
@@ -325,7 +325,7 @@ import SwiftExtension
     willSet {
       if newValue {
         LMMgr.loadSCPCSequencesData()
-        LMMgr.setSCPCEnabled(true)
+        LMMgr.syncLMPrefs()
       }
     }
   }
@@ -333,7 +333,7 @@ import SwiftExtension
   @AppProperty(key: UserDef.kPhraseReplacementEnabled.rawValue, defaultValue: false)
   public dynamic var phraseReplacementEnabled: Bool {
     willSet {
-      LMMgr.setPhraseReplacementEnabled(newValue)
+      LMMgr.syncLMPrefs()
       if newValue {
         LMMgr.loadUserPhraseReplacement()
       }

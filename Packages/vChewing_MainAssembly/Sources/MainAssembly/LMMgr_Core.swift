@@ -12,50 +12,42 @@ import NotifierUI
 import Shared
 import SwiftExtension
 
+// MARK: - Input Mode Extension for Language Models
+
+public extension Shared.InputMode {
+  private static let lmCHS = vChewingLM.LMInstantiator(isCHS: true)
+  private static let lmCHT = vChewingLM.LMInstantiator(isCHS: false)
+  private static let uomCHS = vChewingLM.LMUserOverride(dataURL: LMMgr.userOverrideModelDataURL(.imeModeCHS))
+  private static let uomCHT = vChewingLM.LMUserOverride(dataURL: LMMgr.userOverrideModelDataURL(.imeModeCHT))
+
+  var langModel: vChewingLM.LMInstantiator {
+    switch self {
+    case .imeModeCHS: return Self.lmCHS
+    case .imeModeCHT: return Self.lmCHT
+    case .imeModeNULL: return .init()
+    }
+  }
+
+  var uom: vChewingLM.LMUserOverride {
+    switch self {
+    case .imeModeCHS: return Self.uomCHS
+    case .imeModeCHT: return Self.uomCHT
+    case .imeModeNULL: return .init(dataURL: LMMgr.userOverrideModelDataURL(IMEApp.currentInputMode))
+    }
+  }
+}
+
+// MARK: - Language Model Manager.
+
 public class LMMgr {
   public static var shared = LMMgr()
-  public private(set) static var lmCHS = vChewingLM.LMInstantiator(isCHS: true)
-  public private(set) static var lmCHT = vChewingLM.LMInstantiator(isCHS: false)
-  public private(set) static var uomCHS = vChewingLM.LMUserOverride(
-    dataURL: LMMgr.userOverrideModelDataURL(.imeModeCHS))
-  public private(set) static var uomCHT = vChewingLM.LMUserOverride(
-    dataURL: LMMgr.userOverrideModelDataURL(.imeModeCHT))
-
-  public static var currentLM: vChewingLM.LMInstantiator {
-    Self.getLM(mode: IMEApp.currentInputMode)
-  }
-
-  public static var currentUOM: vChewingLM.LMUserOverride {
-    Self.getUOM(mode: IMEApp.currentInputMode)
-  }
-
-  public static func getLM(mode: Shared.InputMode) -> vChewingLM.LMInstantiator {
-    switch mode {
-    case .imeModeCHS:
-      return Self.lmCHS
-    case .imeModeCHT:
-      return Self.lmCHT
-    case .imeModeNULL:
-      return .init()
-    }
-  }
-
-  public static func getUOM(mode: Shared.InputMode) -> vChewingLM.LMUserOverride {
-    switch mode {
-    case .imeModeCHS:
-      return Self.uomCHS
-    case .imeModeCHT:
-      return Self.uomCHT
-    case .imeModeNULL:
-      return .init(dataURL: Self.userOverrideModelDataURL(IMEApp.currentInputMode))
-    }
-  }
 
   // MARK: - Functions reacting directly with language models.
 
   public static func initUserLangModels() {
-    Self.chkUserLMFilesExist(.imeModeCHT)
-    Self.chkUserLMFilesExist(.imeModeCHS)
+    Shared.InputMode.validCases.forEach { mode in
+      Self.chkUserLMFilesExist(mode)
+    }
     // LMMgr 的 loadUserPhrases 等函式在自動讀取 dataFolderPath 時，
     // 如果發現自訂目錄不可用，則會自動抹去自訂目錄設定、改採預設目錄。
     // 所以這裡不需要特別處理。
@@ -84,83 +76,69 @@ public class LMMgr {
 
   public static func loadUserPhrasesData(type: vChewingLM.ReplacableUserDataType? = nil) {
     guard let type = type else {
-      Self.lmCHT.loadUserPhrasesData(
-        path: userDictDataURL(mode: .imeModeCHT, type: .thePhrases).path,
-        filterPath: userDictDataURL(mode: .imeModeCHT, type: .theFilter).path
-      )
-      Self.lmCHS.loadUserPhrasesData(
-        path: userDictDataURL(mode: .imeModeCHS, type: .thePhrases).path,
-        filterPath: userDictDataURL(mode: .imeModeCHS, type: .theFilter).path
-      )
-      Self.lmCHT.loadUserSymbolData(path: userDictDataURL(mode: .imeModeCHT, type: .theSymbols).path)
-      Self.lmCHS.loadUserSymbolData(path: userDictDataURL(mode: .imeModeCHS, type: .theSymbols).path)
+      Shared.InputMode.validCases.forEach { mode in
+        mode.langModel.loadUserPhrasesData(
+          path: userDictDataURL(mode: mode, type: .thePhrases).path,
+          filterPath: userDictDataURL(mode: mode, type: .theFilter).path
+        )
+        mode.langModel.loadUserSymbolData(path: userDictDataURL(mode: mode, type: .theSymbols).path)
+        mode.uom.loadData(fromURL: userOverrideModelDataURL(mode))
+      }
 
       if PrefMgr.shared.associatedPhrasesEnabled { Self.loadUserAssociatesData() }
       if PrefMgr.shared.phraseReplacementEnabled { Self.loadUserPhraseReplacement() }
       if PrefMgr.shared.useSCPCTypingMode { Self.loadSCPCSequencesData() }
 
-      Self.uomCHT.loadData(fromURL: userOverrideModelDataURL(.imeModeCHT))
-      Self.uomCHS.loadData(fromURL: userOverrideModelDataURL(.imeModeCHS))
-
       CandidateNode.load(url: Self.userSymbolMenuDataURL())
       return
     }
-    switch type {
-    case .thePhrases:
-      Self.lmCHT.loadUserPhrasesData(
-        path: userDictDataURL(mode: .imeModeCHT, type: .thePhrases).path,
-        filterPath: nil
-      )
-      Self.lmCHS.loadUserPhrasesData(
-        path: userDictDataURL(mode: .imeModeCHS, type: .thePhrases).path,
-        filterPath: nil
-      )
-    case .theFilter:
-      DispatchQueue.main.async {
-        Self.reloadUserFilterDirectly(mode: IMEApp.currentInputMode)
+    Shared.InputMode.validCases.forEach { mode in
+      switch type {
+      case .thePhrases:
+        mode.langModel.loadUserPhrasesData(
+          path: userDictDataURL(mode: mode, type: .thePhrases).path,
+          filterPath: nil
+        )
+      case .theFilter:
+        DispatchQueue.main.async {
+          Self.reloadUserFilterDirectly(mode: mode)
+        }
+      case .theReplacements:
+        if PrefMgr.shared.phraseReplacementEnabled { Self.loadUserPhraseReplacement() }
+      case .theAssociates:
+        if PrefMgr.shared.associatedPhrasesEnabled { Self.loadUserAssociatesData() }
+      case .theSymbols:
+        mode.langModel.loadUserSymbolData(
+          path: Self.userDictDataURL(mode: mode, type: .theSymbols).path
+        )
       }
-      DispatchQueue.main.async {
-        Self.reloadUserFilterDirectly(mode: IMEApp.currentInputMode.reversed)
-      }
-    case .theReplacements:
-      if PrefMgr.shared.phraseReplacementEnabled { Self.loadUserPhraseReplacement() }
-    case .theAssociates:
-      if PrefMgr.shared.associatedPhrasesEnabled { Self.loadUserAssociatesData() }
-    case .theSymbols:
-      Self.lmCHT.loadUserSymbolData(
-        path: Self.userDictDataURL(mode: .imeModeCHT, type: .theSymbols).path
-      )
-      Self.lmCHS.loadUserSymbolData(
-        path: Self.userDictDataURL(mode: .imeModeCHS, type: .theSymbols).path
-      )
     }
   }
 
   public static func loadUserAssociatesData() {
-    Self.lmCHT.loadUserAssociatesData(
-      path: Self.userDictDataURL(mode: .imeModeCHT, type: .theAssociates).path
-    )
-    Self.lmCHS.loadUserAssociatesData(
-      path: Self.userDictDataURL(mode: .imeModeCHS, type: .theAssociates).path
-    )
+    Shared.InputMode.validCases.forEach { mode in
+      mode.langModel.loadUserAssociatesData(
+        path: Self.userDictDataURL(mode: mode, type: .theAssociates).path
+      )
+    }
   }
 
   public static func loadUserPhraseReplacement() {
-    Self.lmCHT.loadReplacementsData(
-      path: Self.userDictDataURL(mode: .imeModeCHT, type: .theReplacements).path
-    )
-    Self.lmCHS.loadReplacementsData(
-      path: Self.userDictDataURL(mode: .imeModeCHS, type: .theReplacements).path
-    )
+    Shared.InputMode.validCases.forEach { mode in
+      mode.langModel.loadReplacementsData(
+        path: Self.userDictDataURL(mode: mode, type: .theReplacements).path
+      )
+    }
   }
 
   public static func loadSCPCSequencesData() {
-    Self.lmCHT.loadSCPCSequencesData()
-    Self.lmCHS.loadSCPCSequencesData()
+    Shared.InputMode.validCases.forEach { mode in
+      mode.langModel.loadSCPCSequencesData()
+    }
   }
 
   public static func reloadUserFilterDirectly(mode: Shared.InputMode) {
-    Self.getLM(mode: mode).reloadUserFilterDirectly(path: userDictDataURL(mode: mode, type: .theFilter).path)
+    mode.langModel.reloadUserFilterDirectly(path: userDictDataURL(mode: mode, type: .theFilter).path)
   }
 
   public static func checkIfPhrasePairExists(
@@ -169,7 +147,7 @@ public class LMMgr {
     keyArray: [String],
     factoryDictionaryOnly: Bool = false
   ) -> Bool {
-    Self.getLM(mode: mode).hasKeyValuePairFor(
+    mode.langModel.hasKeyValuePairFor(
       keyArray: keyArray, value: userPhrase, factoryDictionaryOnly: factoryDictionaryOnly
     )
   }
@@ -179,7 +157,7 @@ public class LMMgr {
     mode: Shared.InputMode,
     keyArray: [String]
   ) -> Bool {
-    Self.getLM(mode: mode).isPairFiltered(pair: .init(keyArray: keyArray, value: userPhrase))
+    mode.langModel.isPairFiltered(pair: .init(keyArray: keyArray, value: userPhrase))
   }
 
   public static func countPhrasePairs(
@@ -187,39 +165,22 @@ public class LMMgr {
     mode: Shared.InputMode,
     factoryDictionaryOnly: Bool = false
   ) -> Int {
-    Self.getLM(mode: mode).countKeyValuePairs(
+    mode.langModel.countKeyValuePairs(
       keyArray: keyArray, factoryDictionaryOnly: factoryDictionaryOnly
     )
   }
 
-  public static func setPhraseReplacementEnabled(_ state: Bool) {
-    Self.lmCHT.isPhraseReplacementEnabled = state
-    Self.lmCHS.isPhraseReplacementEnabled = state
-  }
-
-  public static func setCNSEnabled(_ state: Bool) {
-    Self.lmCHT.isCNSEnabled = state
-    Self.lmCHS.isCNSEnabled = state
-  }
-
-  public static func setSymbolEnabled(_ state: Bool) {
-    Self.lmCHT.isSymbolEnabled = state
-    Self.lmCHS.isSymbolEnabled = state
-  }
-
-  public static func setSCPCEnabled(_ state: Bool) {
-    Self.lmCHT.isSCPCEnabled = state
-    Self.lmCHS.isSCPCEnabled = state
-  }
-
-  public static func setCassetteEnabled(_ state: Bool) {
-    Self.lmCHT.isCassetteEnabled = state
-    Self.lmCHS.isCassetteEnabled = state
-  }
-
-  public static func setDeltaOfCalendarYears(_ delta: Int) {
-    Self.lmCHT.deltaOfCalendarYears = delta
-    Self.lmCHS.deltaOfCalendarYears = delta
+  public static func syncLMPrefs() {
+    Shared.InputMode.validCases.forEach { mode in
+      mode.langModel.setOptions { config in
+        config.isPhraseReplacementEnabled = PrefMgr.shared.phraseReplacementEnabled
+        config.isCNSEnabled = PrefMgr.shared.cns11643Enabled
+        config.isSymbolEnabled = PrefMgr.shared.symbolInputEnabled
+        config.isSCPCEnabled = PrefMgr.shared.useSCPCTypingMode
+        config.isCassetteEnabled = PrefMgr.shared.cassetteEnabled
+        config.deltaOfCalendarYears = PrefMgr.shared.deltaOfCalendarYears
+      }
+    }
   }
 
   // MARK: UOM
@@ -227,26 +188,23 @@ public class LMMgr {
   public static func saveUserOverrideModelData() {
     let globalQueue = DispatchQueue(label: "vChewingLM_UOM", qos: .unspecified, attributes: .concurrent)
     let group = DispatchGroup()
-    group.enter()
-    globalQueue.async {
-      Self.uomCHT.saveData(toURL: userOverrideModelDataURL(.imeModeCHT))
-      group.leave()
-    }
-    group.enter()
-    globalQueue.async {
-      Self.uomCHS.saveData(toURL: userOverrideModelDataURL(.imeModeCHS))
-      group.leave()
+    Shared.InputMode.validCases.forEach { mode in
+      group.enter()
+      globalQueue.async {
+        mode.uom.saveData(toURL: userOverrideModelDataURL(mode))
+        group.leave()
+      }
     }
     _ = group.wait(timeout: .distantFuture)
     group.notify(queue: DispatchQueue.main) {}
   }
 
   public static func bleachSpecifiedSuggestions(targets: [String], mode: Shared.InputMode) {
-    Self.getUOM(mode: mode).bleachSpecifiedSuggestions(targets: targets, saveCallback: { Self.getUOM(mode: mode).saveData() })
+    mode.uom.bleachSpecifiedSuggestions(targets: targets, saveCallback: { mode.uom.saveData() })
   }
 
   public static func removeUnigramsFromUserOverrideModel(_ mode: Shared.InputMode) {
-    Self.getUOM(mode: mode).bleachUnigrams(saveCallback: { Self.getUOM(mode: mode).saveData() })
+    mode.uom.bleachUnigrams(saveCallback: { mode.uom.saveData() })
   }
 
   public static func relocateWreckedUOMData() {
@@ -268,6 +226,6 @@ public class LMMgr {
   }
 
   public static func clearUserOverrideModelData(_ mode: Shared.InputMode = .imeModeNULL) {
-    Self.getUOM(mode: mode).clearData(withURL: userOverrideModelDataURL(mode))
+    mode.uom.clearData(withURL: userOverrideModelDataURL(mode))
   }
 }

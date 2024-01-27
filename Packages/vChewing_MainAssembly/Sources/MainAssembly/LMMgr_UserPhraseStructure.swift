@@ -62,7 +62,7 @@ public extension LMMgr {
     }
 
     public var isAlreadyFiltered: Bool {
-      LMMgr.getLM(mode: inputMode).isPairFiltered(pair: .init(keyArray: keyArray, value: value))
+      inputMode.langModel.isPairFiltered(pair: .init(keyArray: keyArray, value: value))
     }
 
     public func write(toFilter: Bool) -> Bool {

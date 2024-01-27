@@ -30,24 +30,34 @@ public extension vChewingLM {
   /// LMI 會根據需要分別載入原廠語言模組和其他個別的子語言模組。LMI 本身不會記錄這些
   /// 語言模組的相關資料的存放位置，僅藉由參數來讀取相關訊息。
   class LMInstantiator: LangModelProtocol {
+    public struct Config {
+      public var isCassetteEnabled = false
+      public var isPhraseReplacementEnabled = false
+      public var isCNSEnabled = false
+      public var isSymbolEnabled = false
+      public var isSCPCEnabled = false
+      public var deltaOfCalendarYears: Int = -2000
+    }
+
     // SQLite 連線所在的記憶體位置。
     static var ptrSQL: OpaquePointer?
 
     // SQLite 連線是否已經建立。
     public private(set) static var isSQLDBConnected: Bool = false
 
+    // 簡體中文模型？
+    public let isCHS: Bool
+
     // 在函式內部用以記錄狀態的開關。
-    public var isCassetteEnabled = false
-    public var isPhraseReplacementEnabled = false
-    public var isCNSEnabled = false
-    public var isSymbolEnabled = false
-    public var isSCPCEnabled = false
-    public var isCHS = false
-    public var deltaOfCalendarYears: Int = -2000
+    public var config = Config()
 
     // 這句需要留著，不然無法被 package 外界存取。
     public init(isCHS: Bool = false) {
       self.isCHS = isCHS
+    }
+
+    public func setOptions(handler: (inout Config) -> Void) {
+      handler(&config)
     }
 
     @discardableResult public static func connectSQLDB(dbPath: String, dropPreviousConnection: Bool = true) -> Bool {
@@ -315,10 +325,10 @@ public extension vChewingLM {
       /// 準備不同的語言模組容器，開始逐漸往容器陣列內塞入資料。
       var rawAllUnigrams: [Megrez.Unigram] = []
 
-      if isCassetteEnabled { rawAllUnigrams += Self.lmCassette.unigramsFor(key: keyChain) }
+      if config.isCassetteEnabled { rawAllUnigrams += Self.lmCassette.unigramsFor(key: keyChain) }
 
       // 如果有檢測到使用者自訂逐字選字語料庫內的相關資料的話，在這裡先插入。
-      if isSCPCEnabled {
+      if config.isSCPCEnabled {
         rawAllUnigrams += lmPlainBopomofo.valuesFor(key: keyChain).map { Megrez.Unigram(value: $0, score: 0) }
       }
 
@@ -327,18 +337,18 @@ public extension vChewingLM {
       // 將兩句差分也是為了讓 rawUserUnigrams 的類型不受可能的影響。
       rawAllUnigrams += lmUserPhrases.unigramsFor(key: keyChain).reversed()
 
-      if !isCassetteEnabled || isCassetteEnabled && keyChain.map(\.description)[0] == "_" {
+      if !config.isCassetteEnabled || config.isCassetteEnabled && keyChain.map(\.description)[0] == "_" {
         // LMMisc 與 LMCore 的 score 在 (-10.0, 0.0) 這個區間內。
         rawAllUnigrams += factoryUnigramsFor(key: keyChain, column: .theDataCHEW)
         rawAllUnigrams += factoryCoreUnigramsFor(key: keyChain)
-        if isCNSEnabled {
+        if config.isCNSEnabled {
           rawAllUnigrams += factoryUnigramsFor(key: keyChain, column: .theDataCNS)
         }
       }
 
-      if isSymbolEnabled {
+      if config.isSymbolEnabled {
         rawAllUnigrams += lmUserSymbols.unigramsFor(key: keyChain)
-        if !isCassetteEnabled {
+        if !config.isCassetteEnabled {
           rawAllUnigrams += factoryUnigramsFor(key: keyChain, column: .theDataSYMB)
         }
       }
@@ -363,7 +373,7 @@ public extension vChewingLM {
       }
 
       // 提前處理語彙置換。
-      if isPhraseReplacementEnabled {
+      if config.isPhraseReplacementEnabled {
         for i in 0 ..< rawAllUnigrams.count {
           let newValue = lmReplacements.valuesFor(key: rawAllUnigrams[i].value)
           guard !newValue.isEmpty else { continue }

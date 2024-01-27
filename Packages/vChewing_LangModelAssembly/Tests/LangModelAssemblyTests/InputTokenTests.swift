@@ -59,8 +59,10 @@ final class InputTokenTests: XCTestCase {
   func testGeneratedResultsFromLMInstantiator() throws {
     let instance = vChewingLM.LMInstantiator(isCHS: true)
     XCTAssertTrue(vChewingLM.LMInstantiator.connectToTestSQLDB())
-    instance.isCNSEnabled = false
-    instance.isSymbolEnabled = false
+    instance.setOptions { config in
+      config.isCNSEnabled = false
+      config.isSymbolEnabled = false
+    }
     instance.insertTemporaryData(
       keyArray: ["ㄐㄧㄣ", "ㄊㄧㄢ", "ㄖˋ", "ㄑㄧˊ"],
       unigram: .init(value: "MACRO@DATE_YEARDELTA:-1945", score: -97.5),

@@ -63,7 +63,7 @@ extension SessionCtl: InputHandlerDelegate {
 
     // 因為上述操作不會立即生效（除非遞交組字區），所以暫時塞入臨時資料記錄。
     // 該臨時資料記錄會在接下來的語言模組資料重載過程中被自動清除。
-    LMMgr.currentLM.insertTemporaryData(
+    inputMode.langModel.insertTemporaryData(
       keyArray: userPhrase.keyArray,
       unigram: .init(value: userPhrase.value, score: userPhrase.weight ?? 0),
       isFiltering: addToFilter
@@ -119,7 +119,7 @@ extension SessionCtl: CtlCandidateDelegate {
     if state.type == .ofAssociates {
       return shortened ? "⇧" : NSLocalizedString("Hold ⇧ to choose associates.", comment: "")
     } else if state.type == .ofInputting, state.isCandidateContainer {
-      let useShift = LMMgr.currentLM.areCassetteCandidateKeysShiftHeld
+      let useShift = inputMode.langModel.areCassetteCandidateKeysShiftHeld
       let theEmoji = useShift ? "⬆️" : "⚡️"
       return shortened ? theEmoji : "\(theEmoji) " + NSLocalizedString("Quick Candidates", comment: "")
     } else if PrefMgr.shared.cassetteEnabled {
@@ -141,14 +141,14 @@ extension SessionCtl: CtlCandidateDelegate {
     if value.isEmpty { return blankResult } // 空字串沒有需要反查的東西。
     if value.contains("_") { return blankResult }
     // 因為威注音輸入法的反查結果僅由磁帶模組負責，所以相關運算挪至 LMInstantiator 內處理。
-    return LMMgr.currentLM.cassetteReverseLookup(for: value)
+    return inputMode.langModel.cassetteReverseLookup(for: value)
   }
 
   public var selectionKeys: String {
     // 磁帶模式的 `%quick` 有單獨的選字鍵判定，會在資料不合規時使用 1234567890 選字鍵。
     cassetteQuick: if state.type == .ofInputting, state.isCandidateContainer {
       guard PrefMgr.shared.cassetteEnabled else { break cassetteQuick }
-      guard let cinCandidateKey = LMMgr.currentLM.cassetteSelectionKey,
+      guard let cinCandidateKey = inputMode.langModel.cassetteSelectionKey,
             CandidateKey.validate(keys: cinCandidateKey) == nil
       else {
         return "1234567890"
@@ -267,7 +267,7 @@ extension SessionCtl: CtlCandidateDelegate {
 
     // 因為上述操作不會立即生效（除非遞交組字區），所以暫時塞入臨時資料記錄。
     // 該臨時資料記錄會在接下來的語言模組資料重載過程中被自動清除。
-    LMMgr.currentLM.insertTemporaryData(
+    inputMode.langModel.insertTemporaryData(
       keyArray: userPhrase.keyArray,
       unigram: .init(value: userPhrase.value, score: userPhrase.weight ?? 0),
       isFiltering: action == .toFilter
