@@ -177,13 +177,13 @@ public struct VwrSettingsPaneDictionary: View {
           Toggle(
             LocalizedStringKey("Enable CNS11643 Support (2023-11-06)"),
             isOn: $cns11643Enabled.onChange {
-              LMMgr.setCNSEnabled(cns11643Enabled)
+              LMMgr.syncLMPrefs()
             }
           )
           Toggle(
             LocalizedStringKey("Enable symbol input support (incl. certain emoji symbols)"),
             isOn: $symbolInputEnabled.onChange {
-              LMMgr.setSymbolEnabled(symbolInputEnabled)
+              LMMgr.syncLMPrefs()
             }
           )
           VStack(alignment: .leading) {
@@ -200,7 +200,7 @@ public struct VwrSettingsPaneDictionary: View {
             Toggle(
               LocalizedStringKey("Enable phrase replacement table"),
               isOn: $phraseReplacementEnabled.onChange {
-                LMMgr.setPhraseReplacementEnabled(phraseReplacementEnabled)
+                LMMgr.syncLMPrefs()
                 if phraseReplacementEnabled {
                   LMMgr.loadUserPhraseReplacement()
                 }

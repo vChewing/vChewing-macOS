@@ -233,11 +233,11 @@ class CtlPrefWindow: NSWindowController, NSWindowDelegate {
   // 這裡有必要加上這段處理，用來確保藉由偏好設定介面動過的 CNS 開關能夠立刻生效。
   // 所有涉及到語言模型開關的內容均需要這樣處理。
   @IBAction func toggleCNSSupport(_: Any) {
-    LMMgr.setCNSEnabled(PrefMgr.shared.cns11643Enabled)
+    LMMgr.syncLMPrefs()
   }
 
   @IBAction func toggleSymbolInputEnabled(_: Any) {
-    LMMgr.setSymbolEnabled(PrefMgr.shared.symbolInputEnabled)
+    LMMgr.syncLMPrefs()
   }
 
   @IBAction func toggleTrad2KangXiAction(_: Any) {

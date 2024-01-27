@@ -177,8 +177,8 @@ public class SessionCtl: IMKInputController {
         resetInputHandler()
         // ----------------------------
         /// 重設所有語言模組。這裡不需要做按需重設，因為對運算量沒有影響。
-        inputHandler?.currentLM = LMMgr.currentLM // 會自動更新組字引擎內的模組。
-        inputHandler?.currentUOM = LMMgr.currentUOM
+        inputHandler?.currentLM = inputMode.langModel // 會自動更新組字引擎內的模組。
+        inputHandler?.currentUOM = inputMode.uom
         /// 清空注拼槽＋同步最新的注拼槽排列設定。
         inputHandler?.ensureKeyboardParser()
         /// 將輸入法偏好設定同步至語言模組內。
@@ -215,7 +215,7 @@ public class SessionCtl: IMKInputController {
       Self.current?.hidePalettes()
       Self.current = self
       self.inputHandler = InputHandler(
-        lm: LMMgr.currentLM, uom: LMMgr.currentUOM, pref: PrefMgr.shared
+        lm: self.inputMode.langModel, uom: self.inputMode.uom, pref: PrefMgr.shared
       )
       self.inputHandler?.delegate = self
       self.syncBaseLMPrefs()
@@ -314,7 +314,7 @@ public extension SessionCtl {
 
       // 這裡不需要 setValue()，因為 IMK 會在自動呼叫 activateServer() 之後自動執行 setValue()。
       self.inputHandler = InputHandler(
-        lm: LMMgr.currentLM, uom: LMMgr.currentUOM, pref: PrefMgr.shared
+        lm: self.inputMode.langModel, uom: self.inputMode.uom, pref: PrefMgr.shared
       )
       self.inputHandler?.delegate = self
       self.syncBaseLMPrefs()
@@ -408,12 +408,7 @@ public extension SessionCtl {
 
   /// 將輸入法偏好設定同步至語言模組內。
   func syncBaseLMPrefs() {
-    LMMgr.currentLM.isPhraseReplacementEnabled = PrefMgr.shared.phraseReplacementEnabled
-    LMMgr.currentLM.isCNSEnabled = PrefMgr.shared.cns11643Enabled
-    LMMgr.currentLM.isSymbolEnabled = PrefMgr.shared.symbolInputEnabled
-    LMMgr.currentLM.isSCPCEnabled = PrefMgr.shared.useSCPCTypingMode
-    LMMgr.currentLM.isCassetteEnabled = PrefMgr.shared.cassetteEnabled
-    LMMgr.currentLM.deltaOfCalendarYears = PrefMgr.shared.deltaOfCalendarYears
+    LMMgr.syncLMPrefs()
   }
 }
 

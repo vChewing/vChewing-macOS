@@ -140,7 +140,7 @@ public struct VwrSettingsPaneCassette: View {
                 } else {
                   LMMgr.loadCassetteData()
                 }
-                LMMgr.setCassetteEnabled(cassetteEnabled)
+                LMMgr.syncLMPrefs()
               }
             )
           }
