@@ -147,82 +147,45 @@ public struct VwrSettingsPaneDictionary: View {
                 )
               )
               .settingsDescription()
-              Toggle(
-                LocalizedStringKey("Automatically reload user data files if changes detected"),
-                isOn: $shouldAutoReloadUserDataFiles.onChange {
+              UserDef.kShouldAutoReloadUserDataFiles.bind(
+                $shouldAutoReloadUserDataFiles.onChange {
                   if shouldAutoReloadUserDataFiles {
                     LMMgr.initUserLangModels()
                   }
                 }
-              )
+              ).render()
             }
           }
         }
 
         Section {
-          VStack(alignment: .leading) {
-            Toggle(
-              LocalizedStringKey("Read external factory dictionary files if possible"),
-              isOn: $useExternalFactoryDict.onChange {
-                LMMgr.connectCoreDB()
-              }
-            )
-            Text(
-              LocalizedStringKey(
-                "This will use the SQLite database deployed by the “make install” command from libvChewing-Data if possible."
-              )
-            )
-            .settingsDescription()
-          }
-          Toggle(
-            LocalizedStringKey("Enable CNS11643 Support (2023-11-06)"),
-            isOn: $cns11643Enabled.onChange {
+          UserDef.kUseExternalFactoryDict.bind(
+            $useExternalFactoryDict.onChange {
+              LMMgr.connectCoreDB()
+            }
+          ).render()
+          UserDef.kCNS11643Enabled.bind(
+            $cns11643Enabled.onChange {
               LMMgr.syncLMPrefs()
             }
-          )
-          Toggle(
-            LocalizedStringKey("Enable symbol input support (incl. certain emoji symbols)"),
-            isOn: $symbolInputEnabled.onChange {
+          ).render()
+          UserDef.kSymbolInputEnabled.bind(
+            $symbolInputEnabled.onChange {
               LMMgr.syncLMPrefs()
             }
-          )
-          VStack(alignment: .leading) {
-            Toggle(
-              LocalizedStringKey("Applying typing suggestions from half-life user override model"),
-              isOn: $fetchSuggestionsFromUserOverrideModel
-            )
-            Text(
-              "The user override model only possesses memories temporarily. Each memory record gradually becomes ineffective within approximately less than 6 days. You can erase all memory records through the input method menu.".localized
-            )
-            .settingsDescription()
-          }
-          VStack(alignment: .leading) {
-            Toggle(
-              LocalizedStringKey("Enable phrase replacement table"),
-              isOn: $phraseReplacementEnabled.onChange {
-                LMMgr.syncLMPrefs()
-                if phraseReplacementEnabled {
-                  LMMgr.loadUserPhraseReplacement()
-                }
+          ).render()
+          UserDef.kFetchSuggestionsFromUserOverrideModel.bind($fetchSuggestionsFromUserOverrideModel).render()
+          UserDef.kPhraseReplacementEnabled.bind(
+            $phraseReplacementEnabled.onChange {
+              LMMgr.syncLMPrefs()
+              if phraseReplacementEnabled {
+                LMMgr.loadUserPhraseReplacement()
               }
-            )
-            Text("This will batch-replace specified candidates.".localized)
-              .settingsDescription()
-          }
+            }
+          ).render()
         }
         Section {
-          VStack(alignment: .leading) {
-            Toggle(
-              LocalizedStringKey("Allow boosting / excluding a candidate of single kanji when marking"),
-              isOn: $allowBoostingSingleKanjiAsUserPhrase
-            )
-            Text(
-              LocalizedStringKey(
-                "⚠︎ This may hinder the walking algorithm from giving appropriate results."
-              )
-            )
-            .settingsDescription()
-          }
+          UserDef.kAllowBoostingSingleKanjiAsUserPhrase.bind($allowBoostingSingleKanjiAsUserPhrase).render()
         } footer: {
           HStack {
             Spacer()

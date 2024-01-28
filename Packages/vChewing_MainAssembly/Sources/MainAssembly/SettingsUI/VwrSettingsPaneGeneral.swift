@@ -82,110 +82,43 @@ public struct VwrSettingsPaneGeneral: View {
               )
           )
           .settingsDescription()
-          Picker("UI Language:", selection: $appleLanguageTag) {
-            Text(LocalizedStringKey("Follow OS settings")).tag("auto")
-            Text(LocalizedStringKey("Simplified Chinese")).tag("zh-Hans")
-            Text(LocalizedStringKey("Traditional Chinese")).tag("zh-Hant")
-            Text(LocalizedStringKey("Japanese")).tag("ja")
-            Text(LocalizedStringKey("English")).tag("en")
-          }
-          Text(LocalizedStringKey("Change user interface language (will reboot the IME)."))
-            .settingsDescription()
+          UserDef.kAppleLanguages.bind($appleLanguageTag).render()
         }
 
         // MARK: (header: Text("Typing Settings:"))
 
         Section {
-          VStack(alignment: .leading) {
-            let meta = UserDef.kReadingNarrationCoverage.metaData
-            let mainKey = "i18n:UserDef.kReadingNarrationCoverage"
-            Picker(
-              LocalizedStringKey(meta?.shortTitle ?? mainKey + ".shortTitle"),
-              selection: $readingNarrationCoverage.onChange {
-                SpeechSputnik.shared.refreshStatus()
-              }
-            ) {
-              Text(LocalizedStringKey(meta?.options?[0] ?? mainKey + ".option.nothing")).tag(0)
-              Text(LocalizedStringKey(meta?.options?[1] ?? mainKey + ".option.confirmed")).tag(1)
-              Text(LocalizedStringKey(meta?.options?[2] ?? mainKey + ".option.realtime")).tag(2)
+          UserDef.kReadingNarrationCoverage.bind(
+            $readingNarrationCoverage.onChange {
+              SpeechSputnik.shared.refreshStatus()
             }
-            Text(LocalizedStringKey(meta?.description ?? mainKey + ".description"))
-              .settingsDescription()
-          }
-          Toggle(
-            LocalizedStringKey("Automatically correct reading combinations when typing"),
-            isOn: $autoCorrectReadingCombination
-          )
-          Toggle(
-            LocalizedStringKey("Show Hanyu-Pinyin in the inline composition buffer"),
-            isOn: $showHanyuPinyinInCompositionBuffer
-          )
-          Toggle(
-            LocalizedStringKey("Allow backspace-editing miscomposed readings"),
-            isOn: $keepReadingUponCompositionError
-          )
-          Toggle(
-            LocalizedStringKey("Also use “\\” or “¥” key for Hanin Keyboard Symbol Input"),
-            isOn: $classicHaninKeyboardSymbolModeShortcutEnabled
-          )
-          VStack(alignment: .leading) {
-            Toggle(
-              LocalizedStringKey("Emulating select-candidate-per-character mode"),
-              isOn: $useSCPCTypingMode.onChange {
-                guard useSCPCTypingMode else { return }
-                LMMgr.loadSCPCSequencesData()
-              }
-            )
-            Text(LocalizedStringKey("An accommodation for elder computer users."))
-              .settingsDescription()
-          }
+          ).render()
+          UserDef.kAutoCorrectReadingCombination.bind($autoCorrectReadingCombination).render()
+          UserDef.kShowHanyuPinyinInCompositionBuffer.bind($showHanyuPinyinInCompositionBuffer).render()
+          UserDef.kKeepReadingUponCompositionError.bind($keepReadingUponCompositionError).render()
+          UserDef.kClassicHaninKeyboardSymbolModeShortcutEnabled
+            .bind($classicHaninKeyboardSymbolModeShortcutEnabled).render()
+          UserDef.kUseSCPCTypingMode.bind(
+            $useSCPCTypingMode.onChange {
+              guard useSCPCTypingMode else { return }
+              LMMgr.loadSCPCSequencesData()
+            }
+          ).render()
           if Date.isTodayTheDate(from: 0401) {
-            Toggle(
-              LocalizedStringKey("Stop farting (when typed phonetic combination is invalid, etc.)"),
-              isOn: $shouldNotFartInLieuOfBeep.onChange {
-                let content = String(
-                  format: NSLocalizedString(
-                    "You are about to uncheck this fart suppressor. You are responsible for all consequences lead by letting people nearby hear the fart sound come from your computer. We strongly advise against unchecking this in any public circumstance that prohibits NSFW netas.",
-                    comment: ""
-                  ))
-                let alert = NSAlert(error: NSLocalizedString("Warning", comment: ""))
-                alert.informativeText = content
-                alert.addButton(withTitle: NSLocalizedString("Uncheck", comment: ""))
-                alert.buttons.forEach { button in
-                  button.hasDestructiveAction = true
-                }
-                alert.addButton(withTitle: NSLocalizedString("Leave it checked", comment: ""))
-                if let window = CtlSettingsUI.shared?.window, !shouldNotFartInLieuOfBeep {
-                  shouldNotFartInLieuOfBeep = true
-                  alert.beginSheetModal(for: window) { result in
-                    switch result {
-                    case .alertFirstButtonReturn:
-                      shouldNotFartInLieuOfBeep = false
-                    case .alertSecondButtonReturn:
-                      shouldNotFartInLieuOfBeep = true
-                    default: break
-                    }
-                    IMEApp.buzz()
-                  }
-                  return
-                }
-                IMEApp.buzz()
-              }
-            )
+            UserDef.kShouldNotFartInLieuOfBeep.bind(
+              $shouldNotFartInLieuOfBeep.onChange { onFartControlChange() }
+            ).render()
           }
         }
 
         // MARK: (header: Text("Misc Settings:"))
 
         Section {
-          Toggle(
-            LocalizedStringKey("Check for updates automatically"),
-            isOn: $checkUpdateAutomatically
-          )
-          Toggle(
-            LocalizedStringKey("Debug Mode"),
-            isOn: $isDebugModeEnabled
-          )
+          HStack {
+            UserDef.kCheckUpdateAutomatically.bind($checkUpdateAutomatically).render()
+            Divider()
+            UserDef.kIsDebugModeEnabled.bind($isDebugModeEnabled).render()
+          }
         }
       }.formStyled()
     }
@@ -193,6 +126,36 @@ public struct VwrSettingsPaneGeneral: View {
       minWidth: CtlSettingsUI.formWidth,
       maxHeight: CtlSettingsUI.contentMaxHeight
     )
+  }
+
+  private func onFartControlChange() {
+    let content = String(
+      format: NSLocalizedString(
+        "You are about to uncheck this fart suppressor. You are responsible for all consequences lead by letting people nearby hear the fart sound come from your computer. We strongly advise against unchecking this in any public circumstance that prohibits NSFW netas.",
+        comment: ""
+      ))
+    let alert = NSAlert(error: NSLocalizedString("Warning", comment: ""))
+    alert.informativeText = content
+    alert.addButton(withTitle: NSLocalizedString("Uncheck", comment: ""))
+    alert.buttons.forEach { button in
+      button.hasDestructiveAction = true
+    }
+    alert.addButton(withTitle: NSLocalizedString("Leave it checked", comment: ""))
+    if let window = CtlSettingsUI.shared?.window, !shouldNotFartInLieuOfBeep {
+      shouldNotFartInLieuOfBeep = true
+      alert.beginSheetModal(for: window) { result in
+        switch result {
+        case .alertFirstButtonReturn:
+          shouldNotFartInLieuOfBeep = false
+        case .alertSecondButtonReturn:
+          shouldNotFartInLieuOfBeep = true
+        default: break
+        }
+        IMEApp.buzz()
+      }
+      return
+    }
+    IMEApp.buzz()
   }
 }
 

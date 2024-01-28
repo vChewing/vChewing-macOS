@@ -40,36 +40,11 @@ public struct VwrSettingsPaneDevZone: View {
         Section(header: Text(
           "Warning: This page is for testing future features. \nFeatures listed here may not work as expected."
         ), footer: Text("Some previous options are moved to other tabs.".localized).settingsDescription()) {
-          VStack(alignment: .leading) {
-            Toggle(
-              UserDef.kSecurityHardenedCompositionBuffer.metaData?.shortTitle?.localized ?? "",
-              isOn: $securityHardenedCompositionBuffer
-            )
-            Text(
-              UserDef.kSecurityHardenedCompositionBuffer.metaData?.description?.localized ?? ""
-            )
-            .settingsDescription()
-          }
-          VStack(alignment: .leading) {
-            Toggle(
-              "Disable segmented thick underline in marking mode for managed clients".localized,
-              isOn: $disableSegmentedThickUnderlineInMarkingModeForManagedClients
-            )
-            Text(
-              "Some clients with web-based front UI may have issues rendering segmented thick underlines drawn by their implemented “setMarkedText()”. This option stops the input method from delivering segmented thick underlines to “client().setMarkedText()”. Note that segmented thick underlines are only used in marking mode, unless the client itself misimplements the IMKTextInput method “setMarkedText()”. This option only affects the inline composition buffer.".localized
-            )
-            .settingsDescription()
-          }
-          VStack(alignment: .leading) {
-            Toggle(
-              (UserDef.kCheckAbusersOfSecureEventInputAPI.metaData?.shortTitle ?? "i18n:UserDef.kCheckAbusersOfSecureEventInputAPI.shortTitle").localized,
-              isOn: $checkAbusersOfSecureEventInputAPI
-            )
-            Text(
-              (UserDef.kCheckAbusersOfSecureEventInputAPI.metaData?.description ?? "i18n:UserDef.kCheckAbusersOfSecureEventInputAPI.description").localized
-            )
-            .settingsDescription()
-          }
+          UserDef.kSecurityHardenedCompositionBuffer.bind($securityHardenedCompositionBuffer).render()
+          UserDef.kDisableSegmentedThickUnderlineInMarkingModeForManagedClients
+            .bind($disableSegmentedThickUnderlineInMarkingModeForManagedClients)
+            .render()
+          UserDef.kCheckAbusersOfSecureEventInputAPI.bind($checkAbusersOfSecureEventInputAPI).render()
         }
       }.formStyled()
     }
