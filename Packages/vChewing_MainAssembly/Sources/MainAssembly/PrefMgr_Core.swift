@@ -143,6 +143,9 @@ import SwiftExtension
   @AppProperty(key: UserDef.kUpperCaseLetterKeyBehavior.rawValue, defaultValue: 0)
   public dynamic var upperCaseLetterKeyBehavior: Int
 
+  @AppProperty(key: UserDef.kNumPadCharInputBehavior.rawValue, defaultValue: 0)
+  public var numPadCharInputBehavior: Int
+
   @AppProperty(key: UserDef.kShiftEisuToggleOffTogetherWithCapsLock.rawValue, defaultValue: true)
   public dynamic var shiftEisuToggleOffTogetherWithCapsLock: Bool
 
