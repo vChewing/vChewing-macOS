@@ -22,7 +22,6 @@ public extension InputHandler {
   func triageInput(event input: InputSignalProtocol) -> Bool {
     guard let delegate = delegate else { return false }
     var state: IMEStateProtocol { delegate.state }
-    let inputText = input.text
 
     // MARK: - 按鍵碼分診（Triage by KeyCode）
 
@@ -142,11 +141,7 @@ public extension InputHandler {
       }
 
       // 處理九宮格數字鍵盤區域。
-      if input.isNumericPadKey {
-        delegate.switchState(IMEState.ofEmpty())
-        delegate.switchState(IMEState.ofCommitting(textToCommit: inputText.lowercased()))
-        return true
-      }
+      if handleNumPadKeyInput(input: input) { return true }
 
       // 判斷是否響應傳統的漢音鍵盤符號模式熱鍵。
       haninSymbolInput: if prefs.classicHaninKeyboardSymbolModeShortcutEnabled {

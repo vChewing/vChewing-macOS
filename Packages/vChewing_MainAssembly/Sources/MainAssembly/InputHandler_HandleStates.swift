@@ -1043,11 +1043,9 @@ extension InputHandler {
     delegate.switchState(IMEState.ofEmpty())
 
     // 字母鍵摁 Shift 的話，無須額外處理，因為直接就會敲出大寫字母。
-    if (input.isUpperCaseASCIILetterKey && delegate.isASCIIMode)
-      || (handleCapsLock && input.isShiftHold)
-    {
-      return false
-    }
+    var shiftCapsLockHandling = input.isUpperCaseASCIILetterKey && delegate.isASCIIMode
+    shiftCapsLockHandling = shiftCapsLockHandling || handleCapsLock && input.isShiftHold
+    guard !shiftCapsLockHandling else { return false }
 
     // 不再讓威注音處理由 Shift 切換到的英文模式的按鍵輸入。
     if delegate.isASCIIMode, !handleCapsLock { return false }
@@ -1141,6 +1139,31 @@ extension InputHandler {
       }
     }
     return false
+  }
+
+  // MARK: - 處理數字小鍵盤的文字輸入行為（NumPad）
+
+  /// 處理數字小鍵盤的文字輸入行為。
+  /// - Parameter input: 輸入訊號。
+  /// - Returns: 告知 IMK「該按鍵是否已經被輸入法攔截處理」。
+  func handleNumPadKeyInput(input: InputSignalProtocol) -> Bool {
+    guard let delegate = delegate, input.isNumericPadKey else { return false }
+    let inputText = input.text
+    guard inputText.count == 1, input.isASCII else { return false }
+    guard KeyCode(rawValue: input.keyCode) == nil else { return false } // 排除功能鍵。
+    let behaviorValue = prefs.numPadCharInputBehavior
+    let fullWidthResult = behaviorValue % 2 != 0 // 能被二整除的都是半形。
+    triagePrefs: switch (behaviorValue, isConsideredEmptyForNow) {
+    case (2, _), (3, _), (4, false), (5, false):
+      currentLM.config.numPadFWHWStatus = fullWidthResult
+      if handlePunctuation("_NumPad_\(inputText)") { return true }
+    default: break triagePrefs // 包括 case 0 & 1。
+    }
+    currentLM.config.numPadFWHWStatus = nil
+    delegate.switchState(IMEState.ofEmpty())
+    let charToCommit = inputText.applyingTransformFW2HW(reverse: fullWidthResult)
+    delegate.switchState(IMEState.ofCommitting(textToCommit: charToCommit))
+    return true
   }
 
   // MARK: - 處理磁帶模式的符號選單輸入
