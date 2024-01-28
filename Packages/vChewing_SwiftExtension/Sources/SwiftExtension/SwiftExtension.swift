@@ -316,3 +316,29 @@ public extension Array where Element: Hashable {
     Set(self).isOverlapped(with: target)
   }
 }
+
+// MARK: - Version Comparer.
+
+public extension String {
+  /// ref: https://sarunw.com/posts/how-to-compare-two-app-version-strings-in-swift/
+  func versionCompare(_ otherVersion: String) -> ComparisonResult {
+    let versionDelimiter = "."
+
+    var versionComponents = components(separatedBy: versionDelimiter) // <1>
+    var otherVersionComponents = otherVersion.components(separatedBy: versionDelimiter)
+
+    let zeroDiff = versionComponents.count - otherVersionComponents.count // <2>
+
+    // <3> Compare normally if the formats are the same.
+    guard zeroDiff != 0 else { return compare(otherVersion, options: .numeric) }
+
+    let zeros = Array(repeating: "0", count: abs(zeroDiff)) // <4>
+    if zeroDiff > 0 {
+      otherVersionComponents.append(contentsOf: zeros) // <5>
+    } else {
+      versionComponents.append(contentsOf: zeros)
+    }
+    return versionComponents.joined(separator: versionDelimiter)
+      .compare(otherVersionComponents.joined(separator: versionDelimiter), options: .numeric) // <6>
+  }
+}
