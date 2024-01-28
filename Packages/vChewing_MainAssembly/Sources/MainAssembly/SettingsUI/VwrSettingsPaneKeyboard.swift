@@ -58,67 +58,9 @@ public struct VwrSettingsPaneKeyboard: View {
               Text("↻Ａ")
             }
           }
-          VStack(alignment: .leading) {
-            Picker(
-              "Phonetic Parser:",
-              selection: $keyboardParser
-            ) {
-              ForEach(KeyboardParser.allCases, id: \.self) { item in
-                if [7, 100].contains(item.rawValue) { Divider() }
-                Text(item.localizedMenuName).tag(item.rawValue)
-              }.id(UUID())
-            }
-            Spacer()
-            Text(NSLocalizedString("Choose the phonetic layout for Mandarin parser.", comment: ""))
-              .settingsDescription()
-          }
-
-          VStack(alignment: .leading) {
-            HStack {
-              Picker(
-                "Basic Keyboard Layout:",
-                selection: $basicKeyboardLayout
-              ) {
-                ForEach(0 ... (IMKHelper.allowedBasicLayoutsAsTISInputSources.count - 1), id: \.self) { id in
-                  let theEntry = IMKHelper.allowedBasicLayoutsAsTISInputSources[id]
-                  if let theEntry = theEntry {
-                    Text(theEntry.vChewingLocalizedName).tag(theEntry.identifier)
-                  } else {
-                    Divider()
-                  }
-                }.id(UUID())
-              }
-            }
-            Spacer()
-            Text(
-              NSLocalizedString(
-                "Choose the macOS-level basic keyboard layout. Non-QWERTY alphanumerical keyboard layouts are for Pinyin parser only. This option will only affect the appearance of the on-screen-keyboard if the current Mandarin parser is neither (any) pinyin nor dynamically reparsable with different western keyboard layouts (like Eten 26, Hsu, etc.).",
-                comment: ""
-              )
-            )
-            .settingsDescription()
-          }
-          VStack(alignment: .leading) {
-            HStack {
-              Picker(
-                "Alphanumerical Layout:",
-                selection: $alphanumericalKeyboardLayout
-              ) {
-                ForEach(0 ... (IMKHelper.allowedAlphanumericalTISInputSources.count - 1), id: \.self) { id in
-                  let theEntry = IMKHelper.allowedAlphanumericalTISInputSources[id]
-                  Text(theEntry.vChewingLocalizedName).tag(theEntry.identifier)
-                }.id(UUID())
-              }
-            }
-            Spacer()
-            Text(
-              NSLocalizedString(
-                "Choose the macOS-level alphanumerical keyboard layout. This setting is for Shift-toggled alphanumerical mode only.",
-                comment: ""
-              )
-            )
-            .settingsDescription()
-          }
+          UserDef.kKeyboardParser.bind($keyboardParser).render()
+          UserDef.kBasicKeyboardLayout.bind($basicKeyboardLayout).render()
+          UserDef.kAlphanumericalKeyboardLayout.bind($alphanumericalKeyboardLayout).render()
         }
         Section(header: Text("Keyboard Shortcuts:")) {
           VwrSettingsPaneKeyboard_KeyboardShortcuts()
@@ -171,49 +113,19 @@ private struct VwrSettingsPaneKeyboard_KeyboardShortcuts: View {
   var body: some View {
     HStack(alignment: .top, spacing: NSFont.systemFontSize) {
       VStack(alignment: .leading) {
-        Toggle(
-          LocalizedStringKey("Per-Char Select Mode"),
-          isOn: $usingHotKeySCPC
-        )
-        Toggle(
-          LocalizedStringKey("Associated Phrases"),
-          isOn: $usingHotKeyAssociates
-        )
-        Toggle(
-          LocalizedStringKey("CNS11643 Mode"),
-          isOn: $usingHotKeyCNS
-        )
-        Toggle(
-          LocalizedStringKey("Force KangXi Writing"),
-          isOn: $usingHotKeyKangXi
-        )
-        Toggle(
-          LocalizedStringKey("Reverse Lookup (Phonabets)"),
-          isOn: $usingHotKeyRevLookup
-        )
+        UserDef.kUsingHotKeySCPC.bind($usingHotKeySCPC).render()
+        UserDef.kUsingHotKeyAssociates.bind($usingHotKeyAssociates).render()
+        UserDef.kUsingHotKeyCNS.bind($usingHotKeyCNS).render()
+        UserDef.kUsingHotKeyKangXi.bind($usingHotKeyKangXi).render()
+        UserDef.kUsingHotKeyRevLookup.bind($usingHotKeyRevLookup).render()
       }
       Divider()
       VStack(alignment: .leading) {
-        Toggle(
-          LocalizedStringKey("JIS Shinjitai Output"),
-          isOn: $usingHotKeyJIS
-        )
-        Toggle(
-          LocalizedStringKey("Half-Width Punctuation Mode"),
-          isOn: $usingHotKeyHalfWidthASCII
-        )
-        Toggle(
-          LocalizedStringKey("Currency Numeral Output"),
-          isOn: $usingHotKeyCurrencyNumerals
-        )
-        Toggle(
-          LocalizedStringKey("CIN Cassette Mode"),
-          isOn: $usingHotKeyCassette
-        )
-        Toggle(
-          LocalizedStringKey("CHS / CHT Input Mode Switch"),
-          isOn: $usingHotKeyInputMode
-        )
+        UserDef.kUsingHotKeyJIS.bind($usingHotKeyJIS).render()
+        UserDef.kUsingHotKeyHalfWidthASCII.bind($usingHotKeyHalfWidthASCII).render()
+        UserDef.kUsingHotKeyCurrencyNumerals.bind($usingHotKeyCurrencyNumerals).render()
+        UserDef.kUsingHotKeyCassette.bind($usingHotKeyCassette).render()
+        UserDef.kUsingHotKeyInputMode.bind($usingHotKeyInputMode).render()
       }
     }
   }

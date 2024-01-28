@@ -35,42 +35,25 @@ public struct VwrSettingsPaneOutput: View {
     ScrollView {
       Form {
         Section {
-          Toggle(
-            LocalizedStringKey("Auto-convert traditional Chinese glyphs to KangXi characters"),
-            isOn: $chineseConversionEnabled.onChange {
+          UserDef.kChineseConversionEnabled.bind(
+            $chineseConversionEnabled.onChange {
               if chineseConversionEnabled, shiftJISShinjitaiOutputEnabled {
                 shiftJISShinjitaiOutputEnabled = false
               }
             }
-          )
-          Toggle(
-            LocalizedStringKey("Auto-convert traditional Chinese glyphs to JIS Shinjitai characters"),
-            isOn: $shiftJISShinjitaiOutputEnabled.onChange {
+          ).render()
+          UserDef.kShiftJISShinjitaiOutputEnabled.bind(
+            $shiftJISShinjitaiOutputEnabled.onChange {
               if chineseConversionEnabled, shiftJISShinjitaiOutputEnabled {
                 chineseConversionEnabled = false
               }
             }
-          )
-          Toggle(
-            LocalizedStringKey("Commit Hanyu-Pinyin instead on Ctrl(+Option)+Command+Enter"),
-            isOn: $inlineDumpPinyinInLieuOfZhuyin
-          )
-          Toggle(
-            LocalizedStringKey("Trim unfinished readings / strokes on commit"),
-            isOn: $trimUnfinishedReadingsOnCommit
-          )
+          ).render()
+          UserDef.kInlineDumpPinyinInLieuOfZhuyin.bind($inlineDumpPinyinInLieuOfZhuyin).render()
+          UserDef.kTrimUnfinishedReadingsOnCommit.bind($trimUnfinishedReadingsOnCommit).render()
         }
         Section(header: Text("Experimental:")) {
-          VStack(alignment: .leading) {
-            Toggle(
-              LocalizedStringKey("Harden vertical punctuations during vertical typing (not recommended)"),
-              isOn: $hardenVerticalPunctuations
-            )
-            Text(
-              "⚠︎ This feature is useful ONLY WHEN the font you are using doesn't support dynamic vertical punctuations. However, typed vertical punctuations will always shown as vertical punctuations EVEN IF your editor has changed the typing direction to horizontal."
-            )
-            .settingsDescription()
-          }
+          UserDef.kHardenVerticalPunctuations.bind($hardenVerticalPunctuations).render()
         }
       }.formStyled()
     }
