@@ -149,39 +149,9 @@ public struct VwrSettingsPaneCassette: View {
         // MARK: - Something Else
 
         Section {
-          Toggle(
-            LocalizedStringKey("Auto-composite when the longest possible key is formed"),
-            isOn: $autoCompositeWithLongestPossibleCassetteKey
-          )
-          VStack(alignment: .leading) {
-            Toggle(
-              LocalizedStringKey("Show translated strokes in composition buffer"),
-              isOn: $showTranslatedStrokesInCompositionBuffer
-            )
-            Text(
-              LocalizedStringKey(
-                "All strokes in the composition buffer will be shown as ASCII keyboard characters unless this option is enabled. Stroke is definable in the “%keyname” section of the CIN file."
-              )
-            )
-            .settingsDescription()
-          }
-          VStack(alignment: .leading) {
-            Picker(
-              "Chinese Conversion:",
-              selection: $forceCassetteChineseConversion
-            ) {
-              Text(LocalizedStringKey("Disable forced conversion for cassette outputs")).tag(0)
-              Text(LocalizedStringKey("Enforce conversion in both input modes")).tag(1)
-              Text(LocalizedStringKey("Only enforce conversion in Simplified Chinese mode")).tag(2)
-              Text(LocalizedStringKey("Only enforce conversion in Traditional Chinese mode")).tag(3)
-            }
-            Text(
-              LocalizedStringKey(
-                "This conversion only affects the cassette module, converting typed contents to either Simplified Chinese or Traditional Chinese in accordance with this setting and your current input mode."
-              )
-            )
-            .settingsDescription()
-          }
+          UserDef.kAutoCompositeWithLongestPossibleCassetteKey.bind($autoCompositeWithLongestPossibleCassetteKey).render()
+          UserDef.kShowTranslatedStrokesInCompositionBuffer.bind($showTranslatedStrokesInCompositionBuffer).render()
+          UserDef.kForceCassetteChineseConversion.bind($forceCassetteChineseConversion).render()
         }
       }.formStyled()
     }
