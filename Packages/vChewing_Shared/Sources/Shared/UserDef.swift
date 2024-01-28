@@ -10,19 +10,22 @@ import Foundation
 
 // MARK: - UserDef
 
-public enum UserDef: String, CaseIterable {
+public enum UserDef: String, CaseIterable, Identifiable {
   public enum DataType: CaseIterable {
     case string, bool, integer, double, array, dictionary, other
   }
+
+  public var id: String { rawValue }
 
   public struct MetaData {
     public var userDef: UserDef
     public var shortTitle: String?
     public var control: AnyObject?
     public var prompt: String?
+    public var inlinePrompt: String?
     public var popupPrompt: String?
     public var description: String?
-    public var minimumOS: Double?
+    public var minimumOS: Double = 10.9
     public var options: [Int: String]?
     public var toolTip: String?
   }
@@ -268,7 +271,7 @@ public extension UserDef {
       )
     case .kUseExternalFactoryDict: return .init(
         userDef: self, shortTitle: "Read external factory dictionary files if possible",
-        prompt: "Read external factory dictionary files if possible"
+        description: "This will use the SQLite database deployed by the “make install” command from libvChewing-Data if possible."
       )
     case .kKeyboardParser: return .init(
         userDef: self, shortTitle: "Phonetic Parser:",
@@ -286,10 +289,29 @@ public extension UserDef {
         userDef: self, shortTitle: "Show notifications when toggling Caps Lock", minimumOS: 12
       )
     case .kCandidateListTextSize: return .init(
-        userDef: self, shortTitle: "Candidate Size:", description: "Choose candidate font size for better visual clarity."
+        userDef: self,
+        shortTitle: "Candidate Size:",
+        description: "Choose candidate font size for better visual clarity.",
+        options: [
+          12: "12",
+          14: "14",
+          16: "16",
+          17: "17",
+          18: "18",
+          20: "20",
+          22: "22",
+          24: "24",
+          32: "32",
+          64: "64",
+          96: "96",
+        ]
       )
     case .kAlwaysExpandCandidateWindow: return .init(userDef: self, shortTitle: "Always expand candidate window panel")
-    case .kCandidateWindowShowOnlyOneLine: return .init(userDef: self, shortTitle: "Use only one row / column in candidate window")
+    case .kCandidateWindowShowOnlyOneLine: return .init(
+        userDef: self,
+        shortTitle: "Use only one row / column in candidate window",
+        description: "Tadokoro candidate window shows 4 rows / columns by default, providing similar experiences from Microsoft New Phonetic IME and macOS bult-in Chinese IME (since macOS 10.9). However, for some users who have presbyopia, they prefer giant candidate font sizes, resulting a concern that multiple rows / columns of candidates can make the candidate window looks too big, hence this option. Note that this option will be dismissed if the typing context is vertical, forcing the candidates to be shown in only one row / column. Only one reverse-lookup result can be made available in single row / column mode due to reduced candidate window size."
+      )
     case .kAppleLanguages: return .init(
         userDef: self, shortTitle: "UI Language:",
         description: "Change user interface language (will reboot the IME)."
@@ -454,12 +476,20 @@ public extension UserDef {
         description: "⚠︎ This feature is useful ONLY WHEN the font you are using doesn't support dynamic vertical punctuations. However, typed vertical punctuations will always shown as vertical punctuations EVEN IF your editor has changed the typing direction to horizontal."
       )
     case .kTrimUnfinishedReadingsOnCommit: return .init(userDef: self, shortTitle: "Trim unfinished readings / strokes on commit")
-    case .kAlwaysShowTooltipTextsHorizontally: return .init(userDef: self, shortTitle: "Always show tooltip texts horizontally")
+    case .kAlwaysShowTooltipTextsHorizontally: return .init(
+        userDef: self,
+        shortTitle: "Always show tooltip texts horizontally",
+        description: "Key names in tooltip will be shown as symbols when the tooltip is vertical. However, this option will be ignored since tooltip will always be horizontal if the UI language is English."
+      )
     case .kClientsIMKTextInputIncapable: return .init(userDef: self)
-    case .kShowTranslatedStrokesInCompositionBuffer: return .init(userDef: self, shortTitle: "Show translated strokes in composition buffer")
+    case .kShowTranslatedStrokesInCompositionBuffer: return .init(
+        userDef: self,
+        shortTitle: "Show translated strokes in composition buffer",
+        description: "All strokes in the composition buffer will be shown as ASCII keyboard characters unless this option is enabled. Stroke is definable in the “%keyname” section of the CIN file."
+      )
     case .kForceCassetteChineseConversion: return .init(
         userDef: self,
-        shortTitle: "Chinese conversion for cassette module",
+        shortTitle: "Chinese Conversion:",
         description: "This conversion only affects the cassette module, converting typed contents to either Simplified Chinese or Traditional Chinese in accordance with this setting and your current input mode.",
         options: [
           0: "Disable forced conversion for cassette outputs",
@@ -496,7 +526,11 @@ public extension UserDef {
         description: "Some clients with web-based front UI may have issues rendering segmented thick underlines drawn by their implemented “setMarkedText()”. This option stops the input method from delivering segmented thick underlines to “client().setMarkedText()”. Note that segmented thick underlines are only used in marking mode, unless the client itself misimplements the IMKTextInput method “setMarkedText()”. This option only affects the inline composition buffer."
       )
     case .kCandidateTextFontName: return nil
-    case .kCandidateKeys: return .init(userDef: self, shortTitle: "Selection Keys:", prompt: "Choose or hit Enter to confim your prefered keys for selecting candidates.", description: "This will also affect the row / column capacity of the candidate window.")
+    case .kCandidateKeys: return .init(
+        userDef: self, shortTitle: "Selection Keys:",
+        inlinePrompt: "Choose or hit Enter to confim your prefered keys for selecting candidates.",
+        description: "This will also affect the row / column capacity of the candidate window."
+      )
     case .kAssociatedPhrasesEnabled: return nil
     case .kPhraseReplacementEnabled: return .init(
         userDef: self, shortTitle: "Enable phrase replacement table",
