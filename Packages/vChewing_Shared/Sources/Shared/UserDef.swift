@@ -87,6 +87,7 @@ public enum UserDef: String, CaseIterable, Identifiable {
   case kTogglingAlphanumericalModeWithLShift = "TogglingAlphanumericalModeWithLShift"
   case kTogglingAlphanumericalModeWithRShift = "TogglingAlphanumericalModeWithRShift"
   case kUpperCaseLetterKeyBehavior = "UpperCaseLetterKeyBehavior"
+  case kNumPadCharInputBehavior = "NumPadCharInputBehavior"
   case kConsolidateContextOnCandidateSelection = "ConsolidateContextOnCandidateSelection"
   case kHardenVerticalPunctuations = "HardenVerticalPunctuations"
   case kTrimUnfinishedReadingsOnCommit = "TrimUnfinishedReadingsOnCommit"
@@ -206,6 +207,7 @@ public extension UserDef {
     case .kTogglingAlphanumericalModeWithLShift: return .bool
     case .kTogglingAlphanumericalModeWithRShift: return .bool
     case .kUpperCaseLetterKeyBehavior: return .integer
+    case .kNumPadCharInputBehavior: return .integer
     case .kConsolidateContextOnCandidateSelection: return .bool
     case .kHardenVerticalPunctuations: return .bool
     case .kTrimUnfinishedReadingsOnCommit: return .bool
@@ -465,6 +467,18 @@ public extension UserDef {
           2: "Always directly commit uppercased letters",
           3: "Directly commit lowercased letters only if the compositor is empty",
           4: "Directly commit uppercased letters only if the compositor is empty",
+        ]
+      )
+    case .kNumPadCharInputBehavior: return .init(
+        userDef: self, shortTitle: "i18n:UserDef.kNumPadCharInputBehavior.shortTitle",
+        description: "i18n:UserDef.kNumPadCharInputBehavior.description",
+        options: [
+          0: "i18n:UserDef.kNumPadCharInputBehavior.option.0",
+          1: "i18n:UserDef.kNumPadCharInputBehavior.option.1",
+          2: "i18n:UserDef.kNumPadCharInputBehavior.option.2",
+          3: "i18n:UserDef.kNumPadCharInputBehavior.option.3",
+          4: "i18n:UserDef.kNumPadCharInputBehavior.option.4",
+          5: "i18n:UserDef.kNumPadCharInputBehavior.option.5",
         ]
       )
     case .kConsolidateContextOnCandidateSelection: return .init(
