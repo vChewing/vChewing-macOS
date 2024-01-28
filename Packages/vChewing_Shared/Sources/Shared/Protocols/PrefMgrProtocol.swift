@@ -42,6 +42,7 @@ public protocol PrefMgrProtocol {
   var alsoConfirmAssociatedCandidatesByEnter: Bool { get set }
   var keepReadingUponCompositionError: Bool { get set }
   var upperCaseLetterKeyBehavior: Int { get set }
+  var numPadCharInputBehavior: Int { get set }
   var shiftEisuToggleOffTogetherWithCapsLock: Bool { get set }
   var bypassNonAppleCapsLockHandling: Bool { get set }
   var togglingAlphanumericalModeWithLShift: Bool { get set }
