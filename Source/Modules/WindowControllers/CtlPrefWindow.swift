@@ -100,8 +100,10 @@ class CtlPrefWindow: NSWindowController, NSWindowDelegate {
 
     if #unavailable(macOS 12) {
       chkCapsLockNotification.isEnabled = false
-      chkCapsLockNotification.toolTip = "This feature requires macOS 12 and above.".localized
     }
+    chkCapsLockNotification.toolTip = String(
+      format: "This feature requires macOS %@ and above.".localized, arguments: ["12.0"]
+    )
 
     chkFartSuppressor.isHidden = !Date.isTodayTheDate(from: 0401)
     chkFartSuppressor.isEnabled = !chkFartSuppressor.isHidden

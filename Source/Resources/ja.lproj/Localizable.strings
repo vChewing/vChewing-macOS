@@ -368,8 +368,7 @@
 "The user override model only possesses memories temporarily. Each memory record gradually becomes ineffective within approximately less than 6 days. You can erase all memory records through the input method menu." = "臨時記憶モジュールは文字の通り「臨時的」の記憶をします。記録は六日間どんどん忘れてしまいます。入力アプリのメニューから全ての記録を消すことはできます。";
 "This conversion only affects the cassette module, converting typed contents to either Simplified Chinese or Traditional Chinese in accordance with this setting and your current input mode." = "この転換はカセットモードだけに使える転換であり、転換結果はこの設定と入力モード次第である。";
 "This feature accommodates certain typing mistakes that the intonation mark might be typed at first (which is sequentially wrong from a common sense that intonation marks are supposed to be used for confirming combinations). It won't work if the current parser is of (any) pinyin. Also, this feature won't work when an intonation override is possible (and enabled)." = "音調記号は常に「漢字の音読組合を確認するキー」として最後で入力することだと常識ですが、間違くてそれを最初に入力してしまった場合もございます。このボカ避け機能は（ほんの一部の）このような間違いを対策できますが、注音入力だけに使えます。更に、（音調の上書き機能がオンを前提として）音調の上書きができる場合には、このボカ避け機能は作動しません。";
-"This feature requires macOS 10.15 and above." = "この機能の稼働には macOS 10.15 以降のシステムが必要である。";
-"This feature requires macOS 12 and above." = "この機能の稼働には macOS 12 以降のシステムが必要である。";
+"This feature requires macOS %@ and above." = "この機能の稼働には macOS %@ 以降のシステムが必要である。";
 "This hinders all client apps from unwelcomely accessing your uncommitted contents in the composition buffer. A popup composition buffer will be shown instead." = "これで、どの客体アプリも、入力緩衝列の送り出さなかった内容を（勝手に）読み用いることは不可能になる。すなわち「吹き出し入力緩衝列ウィンドウ」の「常に出番」である。";
 "This only works when being toggled by Shift key and JIS Eisu key." = "Shift キーとJIS 英数キーだけでの英数入力モード状態切替の話。";
 "This only works with Tadokoro candidate window." = "これは田所候補陳列ウィンドウだけに効ける機能である。";
