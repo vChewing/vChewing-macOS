@@ -368,8 +368,7 @@
 "The user override model only possesses memories temporarily. Each memory record gradually becomes ineffective within approximately less than 6 days. You can erase all memory records through the input method menu." = "半衰记忆模组仅持有临时记忆之功能。每一笔记录都会在六天之内逐渐变得彻底失效。您可以借由输入法选单清除全部的记忆记录。";
 "This conversion only affects the cassette module, converting typed contents to either Simplified Chinese or Traditional Chinese in accordance with this setting and your current input mode." = "该转换仅对磁带模式有影响，会将键入的内容根据该选项与当前的简繁体模式来转换。";
 "This feature accommodates certain typing mistakes that the intonation mark might be typed at first (which is sequentially wrong from a common sense that intonation marks are supposed to be used for confirming combinations). It won't work if the current parser is of (any) pinyin. Also, this feature won't work when an intonation override is possible (and enabled)." = "声调键是专门用来确认注音组合输入的，从常理上来讲只能在最后键入。然而，总是有人会失手将声调键前置键入。该防呆功能专门应对这种情形，但无法用于拼音输入模式，且其优先权比「以声调键覆写游标身后的汉字的声调」更低（除非后者被停用）。";
-"This feature requires macOS 10.15 and above." = "该功能要求系统版本至少 macOS 10.15。";
-"This feature requires macOS 12 and above." = "该功能要求系统版本至少 macOS 12。";
+"This feature requires macOS %@ and above." = "该功能要求系统版本至少 macOS %@。";
 "This hinders all client apps from unwelcomely accessing your uncommitted contents in the composition buffer. A popup composition buffer will be shown instead." = "这会阻止任何客体擅自存取尚未递交的组字区内容。此举也会全局启用浮动组字窗。";
 "This only works when being toggled by Shift key and JIS Eisu key." = "仅用于以 Shift 键或 JIS 英数键切换中英文输入模式的场合。";
 "This only works with Tadokoro candidate window." = "该选项仅对田所选字窗起作用。";
