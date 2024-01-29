@@ -166,7 +166,7 @@ public extension SessionCtl {
     }
 
     // 準備修飾鍵，用來判定要新增的詞彙是否需要賦以非常低的權重。
-    Self.areWeNerfing = eventToDeal.keyModifierFlags == [.shift, .command]
+    Self.areWeNerfing = eventToDeal.commonKeyModifierFlags == [.shift, .command]
 
     /// 直接交給 commonEventHandler 來處理。
     let result = inputHandler.triageInput(event: eventToDeal)
