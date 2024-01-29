@@ -10,7 +10,7 @@
 "i18n:aboutWindow.APP_DERIVED_FROM" = "曾て OpenVanilla 小麦注音プロジェクト (MIT-License) から派生。";
 "i18n:aboutWindow.DEV_CREW" = "macOS 版威注音の開発：Shiki Suen, Isaac Xen, Hiraku Wang, など。\n威注音語彙データの維持：Shiki Suen。\nウォーキング算法：Lukhnos Liu (Gramambular 2, MIT-License)。";
 "i18n:securityAgentHelper.warningMessage.title" = "SecureEventInput の不正利用が検出";
-"i18n:securityAgentHelper.warningMessage.header" = "威注音入力アプリ（略称「威注音」）は「他のバックグラウンド・プロセスがSecureEventInputを正しく利用していない」と検出しました。このような不正利用は「システム内蔵入力以外の全ての入力アプリがメニューで灰色状態で選べなくて使えない」の元凶です。\n\nセンシティブな資料の記入どころでSecureEventInputをEnableSecureEventInput()で使うのは当然ですが、「入力中」状態が終わった後必ずDisableSecureEventInput()で状態解消すべきだと義務です。いくつかヘルパーアプリも、あるいはSecureEventInputを呼び起こしてからすぐ固まったアプリも、この状態になりやすいです。特に、他のアプリの画面へ切り替えたとしても、固まったアプリのSecureEventInput状態は自動的に解消できません。\n\n検出した該当プロセスは：";
+"i18n:securityAgentHelper.warningMessage.header" = "威注音入力アプリ（略称「威注音」）は「他のバックグラウンド・プロセスがSecureEventInputを正しく利用していない」と検出しました。このような不正利用は「システム内蔵入力以外の全ての入力アプリがメニューで灰色状態で選べなくて使えない」の元凶です。\n\nセンシティブな資料の記入どころでSecureEventInputをEnableSecureEventInput()で使うのは当然ですが、「入力中」状態が終わった後必ずDisableSecureEventInput()で状態解消すべきだと義務です。いくつかヘルパーアプリも、あるいはSecureEventInputを呼び起こしてからすぐ固まったアプリも、この状態になりやすいです。特に、他のアプリの画面へ切り替えたとしても、固まったアプリのSecureEventInput状態は自動的に解消できません。\n\n検出した該当プロセスは:";
 "i18n:securityAgentHelper.warningMessage.footer" = "このメッセージが出た時に、威注音がすでに「DisableSecureEventInput()」を実行してみました。これで入力ソースメニューで威注音は利用できる状態になったかもしれませんが、下記のステップはおすすめです：\n\nイ）今のこのメッセージの画面のスクリーンショットを撮って置いてください。後ほど使えます。\n\nロ）もし、今でも入力ソースメニューで威注音は利用できぬ状態でしたら、上記のプロセスを（強制）中止してください。そうすれば、それぞれのSecureEventInput状態は解消できて、入力ソースメニューで威注音はすぐ利用できることになります。\n\nハ）もし、該当プロセスは Mac App Store のアプリからのものでしたら、該当アプリを Apple 社にご通報ください。状況と必要性次第、該当アプリは Mac App Store からしばらく取り下がて、支障解決まで Mac App Store 提供中止になるかもしれません。\n\nニ）該当プロセスは Mac App Store からダウンロードしたものか否か、それぞれの開発元にこの支障をご通報ください。今のこのメッセージの画面のスクリーンショットを該当開発元に送れば、必要なる情報は該当開発元に全部お知らせすることができます。";
 
 "vChewing" = "威注音入力アプリ";
@@ -41,7 +41,7 @@
 "Uncheck" = "チェックの外す";
 "Leave it checked" = "チェックをそのままに";
 "Warning" = "警告";
-"You may follow:" = "このように：";
+"You may follow:" = "このように:";
 "Initial" = "頭文字";
 "Phrase" = "語彙";
 "Reading/Stroke" = "音読/筆画";
@@ -175,7 +175,7 @@
 "Dachen Trad." = "大千伝統";
 "Eten Trad." = "倚天伝統";
 "User phrase folder path is not customizable in macOS 10.9 - 10.12." = "macOS 10.9 - 10.12 でのユーザー辞書フォルダの変更は不可能。";
-"Please use “defaults write” terminal command to modify this String value:" = "ターミナルコマンド「defaults write」で下記の String 値のご設定を：";
+"Please use “defaults write” terminal command to modify this String value:" = "ターミナルコマンド「defaults write」で下記の String 値のご設定を:";
 "Please manually enter the identifier(s)." = "ご自分で唯一識別子（Bundle Identifier）のご入力を。";
 "There is a bug in macOS 10.9, preventing an input method from accessing its own file panels. Doing so will result in eternal hang-crash of not only the input method but all client apps it tries attached to, requiring SSH connection to this computer to terminate the input method process by executing “killall vChewing”. Due to possible concerns of the same possible issue in macOS 10.10 and 10.11, we completely disabled this feature." = "システムの支障の話ですが、macOS 10.9 (恐らく 10.10 - 10.12 も) には下記のバグはございます：入力アプリは自分のファイル操作パネルをアクセススロと、その入力アプリだけでなく、あれから入力アプリの触り合おうとした全ての客体アプリも「無限のカタマリ」その無反応な状態になってしまいます。その場合、SSH でこのパソコンで「killall vChewing」そのターミナルコマンドを実行すれば、及ぼされた客体アプリの反応は戻ります。そのため、開発側は上記のシステムバージョンに応じて、自身のファイルパネルアクセスを全て禁止としました。";
 "defaults write org.atelierInmu.inputmethod.vChewing UserDataFolderSpecified -string \"~/FolderPathEndedWithTrailingSlash/\"" = "defaults write org.atelierInmu.inputmethod.vChewing UserDataFolderSpecified -string \"~/FolderPathEndedWithTrailingSlash/\"";
