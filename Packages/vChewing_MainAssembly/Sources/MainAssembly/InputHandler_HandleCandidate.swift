@@ -150,16 +150,54 @@ extension InputHandler {
         _ = ctlCandidate.showPreviousPage() ? {}() : delegate.callError("9569955D")
         return true
       case .kUpArrow, .kDownArrow, .kLeftArrow, .kRightArrow:
-        handleArrowKey: switch (keyCodeType, ctlCandidate.currentLayout) {
-        case (.kLeftArrow, .horizontal), (.kUpArrow, .vertical): // Previous Candidate
-          _ = ctlCandidate.highlightPreviousCandidate()
-        case (.kRightArrow, .horizontal), (.kDownArrow, .vertical): // Next Candidate
-          _ = ctlCandidate.highlightNextCandidate()
-        case (.kUpArrow, .horizontal), (.kLeftArrow, .vertical): // Previous Line
-          _ = ctlCandidate.showPreviousLine()
-        case (.kDownArrow, .horizontal), (.kRightArrow, .vertical): // Next Line
-          _ = ctlCandidate.showNextLine()
-        default: break handleArrowKey
+        switch input.commonKeyModifierFlags {
+        case [.option, .shift] where input.isCursorForward:
+          if compositor.cursor < compositor.length {
+            compositor.cursor += 1
+            if isCursorCuttingChar() { compositor.jumpCursorBySpan(to: .front) }
+            delegate.switchState(generateStateOfCandidates())
+          } else {
+            delegate.callError("D3006C85")
+          }
+          return true
+        case [.option, .shift] where input.isCursorBackward:
+          if compositor.cursor > 0 {
+            compositor.cursor -= 1
+            if isCursorCuttingChar() { compositor.jumpCursorBySpan(to: .rear) }
+            delegate.switchState(generateStateOfCandidates())
+          } else {
+            delegate.callError("DE9DAF0D")
+          }
+          return true
+        case .option where input.isCursorForward:
+          if compositor.cursor < compositor.length {
+            compositor.jumpCursorBySpan(to: .front)
+            delegate.switchState(generateStateOfCandidates())
+          } else {
+            delegate.callError("5D9F4819")
+          }
+          return true
+        case .option where input.isCursorBackward:
+          if compositor.cursor > 0 {
+            compositor.jumpCursorBySpan(to: .rear)
+            delegate.switchState(generateStateOfCandidates())
+          } else {
+            delegate.callError("34B6322D")
+          }
+          return true
+        default:
+          handleArrowKey: switch (keyCodeType, ctlCandidate.currentLayout) {
+          case (.kLeftArrow, .horizontal), (.kUpArrow, .vertical): // Previous Candidate
+            _ = ctlCandidate.highlightPreviousCandidate()
+          case (.kRightArrow, .horizontal), (.kDownArrow, .vertical): // Next Candidate
+            _ = ctlCandidate.highlightNextCandidate()
+          case (.kUpArrow, .horizontal), (.kLeftArrow, .vertical): // Previous Line
+            _ = ctlCandidate.showPreviousLine()
+          case (.kDownArrow, .horizontal), (.kRightArrow, .vertical): // Next Line
+            _ = ctlCandidate.showNextLine()
+          default: break handleArrowKey
+          }
+          return true
         }
       case .kHome:
         _ =
