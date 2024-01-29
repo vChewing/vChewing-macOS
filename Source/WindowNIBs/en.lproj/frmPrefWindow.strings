@@ -101,6 +101,13 @@
 "MKJ-Q6-dLd.title" = "Also use “\\” or “¥” key for Hanin Keyboard Symbol Input";
 "N6e-bR-mVa.title" = "Disable segmented thick underline in marking mode for managed clients";
 "neb-Pz-n1h.title" = "Auto-composite when the longest possible key is formed";
+"NumPadCharInputBehavior-description.title" = "Choose the behavior of numeric pad inputs.";
+"NumPadCharInputBehavior-option-0.title" = "Always directly commit half-width chars";
+"NumPadCharInputBehavior-option-1.title" = "Always directly commit full-width chars";
+"NumPadCharInputBehavior-option-2.title" = "Insert into composition buffer (half-width)";
+"NumPadCharInputBehavior-option-3.title" = "Insert into composition buffer (full-width)";
+"NumPadCharInputBehavior-option-4.title" = "Directly commit half-width chars only if the compositor is empty";
+"NumPadCharInputBehavior-option-5.title" = "Directly commit full-width chars only if the compositor is empty";
 "o3r-NZ-gsU.title" = "Only enforce conversion in Simplified Chinese mode";
 "optReadingNarrationCoverageConfirmed.title" = "Only when combined by intonation";
 "optReadingNarrationCoverageNothing.title" = "Do not narrate";

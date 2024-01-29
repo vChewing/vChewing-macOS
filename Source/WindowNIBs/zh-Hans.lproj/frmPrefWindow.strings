@@ -101,6 +101,13 @@
 "MKJ-Q6-dLd.title" = "亦使用「\\」或「¥」键启用汉音键盘符号模式";
 "N6e-bR-mVa.title" = "针对被管理的客体，在标记模式下禁用分段式粗型下划线";
 "neb-Pz-n1h.title" = "在已经敲出最长可能码的时候自动组字";
+"NumPadCharInputBehavior-description.title" = "指定数字小键盘的输入行为。";
+"NumPadCharInputBehavior-option-0.title" = "始终以半形文字直接递交";
+"NumPadCharInputBehavior-option-1.title" = "始终以全形文字直接递交";
+"NumPadCharInputBehavior-option-2.title" = "以半形文字插入组字区";
+"NumPadCharInputBehavior-option-3.title" = "以全形文字插入组字区";
+"NumPadCharInputBehavior-option-4.title" = "直接递交半形文字，除非组字区不为空";
+"NumPadCharInputBehavior-option-5.title" = "直接递交全形文字，除非组字区不为空";
 "nxP-CV-ZAu.title" = "允许使用右侧的 Shift 键切换英数输入模式";
 "o3r-NZ-gsU.title" = "仅在简体模式转换至简体";
 "optReadingNarrationCoverageConfirmed.title" = "仅在用声调键确认时";
