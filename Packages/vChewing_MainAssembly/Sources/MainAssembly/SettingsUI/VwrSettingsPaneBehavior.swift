@@ -50,6 +50,9 @@ public struct VwrSettingsPaneBehavior: View {
   @AppStorage(wrappedValue: 0, UserDef.kUpperCaseLetterKeyBehavior.rawValue)
   private var upperCaseLetterKeyBehavior: Int
 
+  @AppStorage(wrappedValue: 0, UserDef.kNumPadCharInputBehavior.rawValue)
+  private var numPadCharInputBehavior: Int
+
   @AppStorage(wrappedValue: false, UserDef.kAlwaysShowTooltipTextsHorizontally.rawValue)
   private var alwaysShowTooltipTextsHorizontally: Bool
 
@@ -85,6 +88,7 @@ public struct VwrSettingsPaneBehavior: View {
 
         Section {
           UserDef.kUpperCaseLetterKeyBehavior.bind($upperCaseLetterKeyBehavior).render()
+          UserDef.kNumPadCharInputBehavior.bind($numPadCharInputBehavior).render()
         }
 
         Section {
