@@ -39,7 +39,7 @@ extension InputHandler {
       if candidates[highlightedIndex].keyArray.count < 2 || candidates[highlightedIndex].value.count < 2 {
         break manipulator
       }
-      switch input.keyModifierFlags {
+      switch input.commonKeyModifierFlags {
       case [.option, .command] where input.keyCode == 27: // 減號鍵
         ctlCandidate.delegate?.candidatePairRightClicked(at: highlightedIndex, action: .toNerf)
         return true
@@ -61,11 +61,11 @@ extension InputHandler {
 
     // MARK: 取消選字 (Cancel Candidate)
 
-    let cancelCandidateKey =
+    let dismissingCandidateWindow =
       input.isBackSpace || input.isEsc || input.isDelete
-        || ((input.isCursorBackward || input.isCursorForward) && input.isShiftHold)
+        || ((input.isCursorBackward || input.isCursorForward) && input.commonKeyModifierFlags == .shift)
 
-    if cancelCandidateKey {
+    if dismissingCandidateWindow {
       if state.type == .ofAssociates
         || prefs.useSCPCTypingMode
         || compositor.isEmpty
@@ -77,7 +77,7 @@ extension InputHandler {
         delegate.switchState(IMEState.ofAbortion())
       } else {
         delegate.switchState(generateStateOfInputting())
-        if input.isCursorBackward || input.isCursorForward, input.isShiftHold {
+        if input.isCursorBackward || input.isCursorForward, input.commonKeyModifierFlags == .shift {
           return triageInput(event: input)
         }
       }
@@ -107,7 +107,7 @@ extension InputHandler {
         // 關聯詞語。
         associatedPhrases: if handleAssociates {
           guard handleAssociates else { break associatedPhrases }
-          guard input.keyModifierFlags == .shift else { break associatedPhrases }
+          guard input.commonKeyModifierFlags == .shift else { break associatedPhrases }
           let pair = Megrez.KeyValuePaired(
             keyArray: highlightedCandidate.keyArray, value: highlightedCandidate.value
           )
@@ -161,7 +161,6 @@ extension InputHandler {
           _ = ctlCandidate.showNextLine()
         default: break handleArrowKey
         }
-        return true
       case .kHome:
         _ =
           (ctlCandidate.highlightedIndex == 0)
@@ -247,8 +246,8 @@ extension InputHandler {
     // MARK: - Flipping pages by using modified bracket keys (when they are not occupied).
 
     // Shift+Command+[] 被 Chrome 系瀏覽器佔用，所以改用 Ctrl。
-    let ctrlCMD: Bool = input.keyModifierFlags == [.control, .command]
-    let ctrlShiftCMD: Bool = input.keyModifierFlags == [.control, .command, .shift]
+    let ctrlCMD: Bool = input.commonKeyModifierFlags == [.control, .command]
+    let ctrlShiftCMD: Bool = input.commonKeyModifierFlags == [.control, .command, .shift]
     if ctrlShiftCMD || ctrlCMD {
       // 此處 JIS 鍵盤判定無法用於螢幕鍵盤。所以，螢幕鍵盤的場合，系統會依照 US 鍵盤的判定方案。
       switch (input.keyCode, IMEApp.isKeyboardJIS) {
@@ -265,7 +264,7 @@ extension InputHandler {
     // MARK: - Flipping pages by using symbol menu keys (when they are not occupied).
 
     if input.isSymbolMenuPhysicalKey {
-      switch input.keyModifierFlags {
+      switch input.commonKeyModifierFlags {
       case .shift, [],
            .option where state.type != .ofSymbolTable:
         var updated = true

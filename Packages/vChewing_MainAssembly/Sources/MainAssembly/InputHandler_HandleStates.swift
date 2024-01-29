@@ -363,7 +363,7 @@ extension InputHandler {
 
     var displayedText = state.displayedText
 
-    if input.keyModifierFlags == [.option, .shift] {
+    if input.commonKeyModifierFlags == [.option, .shift] {
       displayedText = displayedText.map(\.description).joined(separator: " ")
     } else if readingOnly {
       displayedText = commissionByCtrlCommandEnter()
@@ -376,7 +376,7 @@ extension InputHandler {
     delegate.switchState(IMEState.ofCommitting(textToCommit: displayedText))
 
     associatedPhrases: if !prefs.useSCPCTypingMode, prefs.associatedPhrasesEnabled {
-      guard input.keyModifierFlags == .shift else { break associatedPhrases }
+      guard input.commonKeyModifierFlags == .shift else { break associatedPhrases }
       guard isComposerOrCalligrapherEmpty else { break associatedPhrases }
       let associatedCandidates = associatesData()
       guard !associatedCandidates.isEmpty else { break associatedPhrases }
@@ -478,7 +478,7 @@ extension InputHandler {
           delegate.switchState(updatedState)
         }
         strCodePointBuffer = strCodePointBuffer.dropLast(1).description
-        if input.keyModifierFlags == .option {
+        if input.commonKeyModifierFlags == .option {
           strCodePointBuffer.removeAll()
           refreshState()
           isCodePointInputMode = true
@@ -493,34 +493,36 @@ extension InputHandler {
     }
 
     // 引入 macOS 內建注音輸入法的行為，允許用 Shift+BackSpace 解構前一個漢字的讀音。
-    shiftBksp: switch prefs.specifyShiftBackSpaceKeyBehavior {
-    case 0:
-      if prefs.cassetteEnabled {
-        guard input.isShiftHold, calligrapher.isEmpty else { break shiftBksp }
-        guard let prevReading = previousParsableCalligraph else { break shiftBksp }
-        compositor.dropKey(direction: .rear)
-        walk() // 這裡必須 Walk 一次、來更新目前被 walk 的內容。
-        calligrapher = prevReading
-      } else {
-        guard input.isShiftHold, isComposerOrCalligrapherEmpty else { break shiftBksp }
-        guard let prevReading = previousParsableReading else { break shiftBksp }
-        // prevReading 的內容分別是：「完整讀音」「去掉聲調的讀音」「是否有聲調」。
-        compositor.dropKey(direction: .rear)
-        walk() // 這裡必須 Walk 一次、來更新目前被 walk 的內容。
-        prevReading.1.map(\.description).forEach { composer.receiveKey(fromPhonabet: $0) }
+    shiftBksp: if input.commonKeyModifierFlags == .shift {
+      switch prefs.specifyShiftBackSpaceKeyBehavior {
+      case 0:
+        if prefs.cassetteEnabled {
+          guard input.isShiftHold, calligrapher.isEmpty else { break shiftBksp }
+          guard let prevReading = previousParsableCalligraph else { break shiftBksp }
+          compositor.dropKey(direction: .rear)
+          walk() // 這裡必須 Walk 一次、來更新目前被 walk 的內容。
+          calligrapher = prevReading
+        } else {
+          guard input.isShiftHold, isComposerOrCalligrapherEmpty else { break shiftBksp }
+          guard let prevReading = previousParsableReading else { break shiftBksp }
+          // prevReading 的內容分別是：「完整讀音」「去掉聲調的讀音」「是否有聲調」。
+          compositor.dropKey(direction: .rear)
+          walk() // 這裡必須 Walk 一次、來更新目前被 walk 的內容。
+          prevReading.1.map(\.description).forEach { composer.receiveKey(fromPhonabet: $0) }
+        }
+        delegate.switchState(generateStateOfInputting())
+        return true
+      case 1:
+        delegate.switchState(IMEState.ofAbortion())
+        return true
+      default: break
       }
-      delegate.switchState(generateStateOfInputting())
-      return true
-    case 1:
-      delegate.switchState(IMEState.ofAbortion())
-      return true
-    default: break
     }
 
     let steps = getStepsToNearbyNodeBorder(direction: .rear)
     var actualSteps = 1
 
-    switch input.keyModifierFlags {
+    switch input.commonKeyModifierFlags {
     case .shift:
       delegate.switchState(IMEState.ofAbortion())
       return true
@@ -539,7 +541,7 @@ extension InputHandler {
       }
       walk()
     } else {
-      _ = input.keyModifierFlags == .option
+      _ = input.commonKeyModifierFlags == .option
         ? clearComposerAndCalligrapher()
         : letComposerAndCalligrapherDoBackSpace()
     }
@@ -578,11 +580,11 @@ extension InputHandler {
 
     // macOS 認為 PC Delete 鍵訊號是必然有 .function 這個修飾鍵在起作用的。
     // 總之處理起來非常機車就是了。
-    switch input.keyModifierFlags {
-    case _ where input.isShiftHold && !input.isOptionHold && !input.isControlHold:
+    switch input.commonKeyModifierFlags {
+    case .shift:
       delegate.switchState(IMEState.ofAbortion())
       return true
-    case _ where !input.isShiftHold && input.isOptionHold && !input.isControlHold:
+    case .option:
       actualSteps = steps
     default: break
     }
