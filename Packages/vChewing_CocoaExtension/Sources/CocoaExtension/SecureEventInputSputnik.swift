@@ -66,15 +66,27 @@ public class SecureEventInputSputnik {
   }
 }
 
+public extension NSWorkspace {
+  struct ActivationFlags: OptionSet {
+    public let rawValue: Int
+    public init(rawValue: Int) {
+      self.rawValue = rawValue
+    }
+
+    public static let hibernating = ActivationFlags(rawValue: 1 << 0)
+    public static let desktopLocked = ActivationFlags(rawValue: 1 << 1)
+    public static let sesssionSwitchedOut = ActivationFlags(rawValue: 1 << 2)
+    public static let screenSaverRunning = ActivationFlags(rawValue: 1 << 3)
+  }
+
+  static var activationFlags: ActivationFlags = []
+}
+
 public extension NSRunningApplication {
   var isLoginWindowWithLockedScreenOrScreenSaver: Bool {
     guard bundleIdentifier == "com.apple.loginwindow" else { return false }
-    return Self.isScreenSaverEngineRunning || Self.isDesktopLocked
+    return !NSWorkspace.activationFlags.isEmpty
   }
-
-  fileprivate(set) static var isScreenSaverEngineRunning: Bool = false
-
-  fileprivate(set) static var isDesktopLocked: Bool = false
 }
 
 extension SecureEventInputSputnik {
@@ -87,41 +99,85 @@ extension SecureEventInputSputnik {
     if #available(macOS 10.15, *) {
       DistributedNotificationCenter.default()
         .publisher(for: .init(rawValue: "com.apple.screenIsLocked"))
-        .sink { _ in NSRunningApplication.isDesktopLocked = true }
+        .sink { _ in NSWorkspace.activationFlags.insert(.desktopLocked) }
         .store(in: &Self.combinePool)
       DistributedNotificationCenter.default()
         .publisher(for: .init(rawValue: "com.apple.screenIsUnlocked"))
-        .sink { _ in NSRunningApplication.isDesktopLocked = false }
+        .sink { _ in NSWorkspace.activationFlags.remove(.desktopLocked) }
         .store(in: &Self.combinePool)
       DistributedNotificationCenter.default()
         .publisher(for: .init(rawValue: "com.apple.screensaver.didstart"))
-        .sink { _ in NSRunningApplication.isScreenSaverEngineRunning = true }
+        .sink { _ in NSWorkspace.activationFlags.insert(.screenSaverRunning) }
         .store(in: &Self.combinePool)
       DistributedNotificationCenter.default()
         .publisher(for: .init(rawValue: "com.apple.screensaver.didstop"))
-        .sink { _ in NSRunningApplication.isScreenSaverEngineRunning = false }
+        .sink { _ in NSWorkspace.activationFlags.remove(.screenSaverRunning) }
+        .store(in: &Self.combinePool)
+      NSWorkspace.shared.notificationCenter
+        .publisher(for: NSWorkspace.willSleepNotification)
+        .sink { _ in NSWorkspace.activationFlags.insert(.hibernating) }
+        .store(in: &Self.combinePool)
+      NSWorkspace.shared.notificationCenter
+        .publisher(for: NSWorkspace.didWakeNotification)
+        .sink { _ in NSWorkspace.activationFlags.remove(.hibernating) }
+        .store(in: &Self.combinePool)
+      NSWorkspace.shared.notificationCenter
+        .publisher(for: NSWorkspace.sessionDidResignActiveNotification)
+        .sink { _ in NSWorkspace.activationFlags.insert(.sesssionSwitchedOut) }
+        .store(in: &Self.combinePool)
+      NSWorkspace.shared.notificationCenter
+        .publisher(for: NSWorkspace.sessionDidBecomeActiveNotification)
+        .sink { _ in NSWorkspace.activationFlags.remove(.sesssionSwitchedOut) }
         .store(in: &Self.combinePool)
     } else {
-      let lockObserver = DistributedNotificationCenter.default()
-        .addObserver(forName: .init("com.apple.screenIsLocked"), object: nil, queue: .main) { _ in
-          NSRunningApplication.isDesktopLocked = true
-        }
-      let unlockObserver = DistributedNotificationCenter.default()
-        .addObserver(forName: .init("com.apple.screenIsUnlocked"), object: nil, queue: .main) { _ in
-          NSRunningApplication.isDesktopLocked = false
-        }
-      let screenSaverDidStart = DistributedNotificationCenter.default()
-        .addObserver(forName: .init("com.apple.screensaver.didstart"), object: nil, queue: .main) { _ in
-          NSRunningApplication.isScreenSaverEngineRunning = true
-        }
-      let screenSaverDidStop = DistributedNotificationCenter.default()
-        .addObserver(forName: .init("com.apple.screensaver.didstop"), object: nil, queue: .main) { _ in
-          NSRunningApplication.isScreenSaverEngineRunning = false
-        }
-      Self.combinePoolCocoa.append(lockObserver)
-      Self.combinePoolCocoa.append(unlockObserver)
-      Self.combinePoolCocoa.append(screenSaverDidStart)
-      Self.combinePoolCocoa.append(screenSaverDidStop)
+      Self.combinePoolCocoa.append(
+        DistributedNotificationCenter.default()
+          .addObserver(forName: .init("com.apple.screenIsLocked"), object: nil, queue: .main) { _ in
+            NSWorkspace.activationFlags.insert(.desktopLocked)
+          }
+      )
+      Self.combinePoolCocoa.append(
+        DistributedNotificationCenter.default()
+          .addObserver(forName: .init("com.apple.screenIsUnlocked"), object: nil, queue: .main) { _ in
+            NSWorkspace.activationFlags.remove(.desktopLocked)
+          }
+      )
+      Self.combinePoolCocoa.append(
+        DistributedNotificationCenter.default()
+          .addObserver(forName: .init("com.apple.screensaver.didstart"), object: nil, queue: .main) { _ in
+            NSWorkspace.activationFlags.insert(.screenSaverRunning)
+          }
+      )
+      Self.combinePoolCocoa.append(
+        DistributedNotificationCenter.default()
+          .addObserver(forName: .init("com.apple.screensaver.didstop"), object: nil, queue: .main) { _ in
+            NSWorkspace.activationFlags.remove(.screenSaverRunning)
+          }
+      )
+      Self.combinePoolCocoa.append(
+        NSWorkspace.shared.notificationCenter
+          .addObserver(forName: NSWorkspace.willSleepNotification, object: nil, queue: .main) { _ in
+            NSWorkspace.activationFlags.insert(.hibernating)
+          }
+      )
+      Self.combinePoolCocoa.append(
+        NSWorkspace.shared.notificationCenter
+          .addObserver(forName: NSWorkspace.didWakeNotification, object: nil, queue: .main) { _ in
+            NSWorkspace.activationFlags.remove(.hibernating)
+          }
+      )
+      Self.combinePoolCocoa.append(
+        NSWorkspace.shared.notificationCenter
+          .addObserver(forName: NSWorkspace.sessionDidResignActiveNotification, object: nil, queue: .main) { _ in
+            NSWorkspace.activationFlags.insert(.sesssionSwitchedOut)
+          }
+      )
+      Self.combinePoolCocoa.append(
+        NSWorkspace.shared.notificationCenter
+          .addObserver(forName: NSWorkspace.sessionDidBecomeActiveNotification, object: nil, queue: .main) { _ in
+            NSWorkspace.activationFlags.remove(.sesssionSwitchedOut)
+          }
+      )
     }
   }
 }
