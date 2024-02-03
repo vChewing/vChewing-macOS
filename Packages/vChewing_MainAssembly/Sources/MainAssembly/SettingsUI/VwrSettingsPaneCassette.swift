@@ -124,7 +124,7 @@ public struct VwrSettingsPaneCassette: View {
             .settingsDescription()
             Toggle(
               LocalizedStringKey("Enable cassette mode, suppressing phonabet input"),
-              isOn: $cassetteEnabled.onChange {
+              isOn: $cassetteEnabled.didChange {
                 if cassetteEnabled, !LMMgr.checkCassettePathValidity(cassettePath) {
                   if let window = CtlSettingsUI.shared?.window {
                     IMEApp.buzz()

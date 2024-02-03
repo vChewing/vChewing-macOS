@@ -195,7 +195,7 @@ public struct VwrPhraseEditorUI: View {
   public var body: some View {
     VStack(spacing: 4) {
       HStack {
-        Picker("", selection: $selInputMode.onChange { dropDownMenuDidChange() }) {
+        Picker("", selection: $selInputMode.didChange { dropDownMenuDidChange() }) {
           switch currentIMEInputMode {
           case .imeModeCHS:
             Text(Shared.InputMode.imeModeCHS.localizedDescription).tag(Shared.InputMode.imeModeCHS)
@@ -215,7 +215,7 @@ public struct VwrPhraseEditorUI: View {
           }
         }
         .labelsHidden()
-        Picker("", selection: $selUserDataType.onChange { dropDownMenuDidChange() }) {
+        Picker("", selection: $selUserDataType.didChange { dropDownMenuDidChange() }) {
           Text(vChewingLM.ReplacableUserDataType.thePhrases.localizedDescription).tag(
             vChewingLM.ReplacableUserDataType.thePhrases)
           Text(vChewingLM.ReplacableUserDataType.theFilter.localizedDescription).tag(
@@ -251,7 +251,9 @@ public struct VwrPhraseEditorUI: View {
           .disabled(selInputMode == .imeModeNULL || isLoading)
           .frame(minWidth: 320, minHeight: 240)
           .onChange(of: fileChangeIndicator.id) { _ in
-            if Self.autoReloadExternalModifications { update() }
+            Task {
+              if Self.autoReloadExternalModifications { update() }
+            }
           }
       }
 
@@ -267,7 +269,7 @@ public struct VwrPhraseEditorUI: View {
           if selUserDataType == .thePhrases {
             TextField(
               lblAddPhraseTag3,
-              text: $txtAddPhraseField3.onChange {
+              text: $txtAddPhraseField3.didChange {
                 guard let weightVal = Double(txtAddPhraseField3) else { return }
                 if weightVal > 0 { txtAddPhraseField3 = "" }
               }
@@ -288,7 +290,7 @@ public struct VwrPhraseEditorUI: View {
       HStack {
         Toggle(
           LocalizedStringKey("This editor only: Auto-reload modifications happened outside of this editor"),
-          isOn: $selAutoReloadExternalModifications.onChange {
+          isOn: $selAutoReloadExternalModifications.didChange {
             Self.autoReloadExternalModifications = selAutoReloadExternalModifications
           }
         )
