@@ -8,13 +8,13 @@
 
 import SwiftUI
 
-// MARK: - Add "onChange" support.
+// MARK: - Add "didChange" support to bindings.
 
 // Ref: https://mjeld.com/swiftui-macos-10-15-toggle-onchange/
 
 @available(macOS 10.15, *)
 public extension Binding {
-  func onChange(_ action: @escaping () -> Void) -> Binding {
+  func didChange(_ action: @escaping () -> Void) -> Binding {
     Binding(
       get: {
         wrappedValue

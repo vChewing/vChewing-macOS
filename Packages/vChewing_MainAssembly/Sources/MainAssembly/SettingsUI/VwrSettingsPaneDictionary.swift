@@ -148,7 +148,7 @@ public struct VwrSettingsPaneDictionary: View {
               )
               .settingsDescription()
               UserDef.kShouldAutoReloadUserDataFiles.bind(
-                $shouldAutoReloadUserDataFiles.onChange {
+                $shouldAutoReloadUserDataFiles.didChange {
                   if shouldAutoReloadUserDataFiles {
                     LMMgr.initUserLangModels()
                   }
@@ -160,23 +160,23 @@ public struct VwrSettingsPaneDictionary: View {
 
         Section {
           UserDef.kUseExternalFactoryDict.bind(
-            $useExternalFactoryDict.onChange {
+            $useExternalFactoryDict.didChange {
               LMMgr.connectCoreDB()
             }
           ).render()
           UserDef.kCNS11643Enabled.bind(
-            $cns11643Enabled.onChange {
+            $cns11643Enabled.didChange {
               LMMgr.syncLMPrefs()
             }
           ).render()
           UserDef.kSymbolInputEnabled.bind(
-            $symbolInputEnabled.onChange {
+            $symbolInputEnabled.didChange {
               LMMgr.syncLMPrefs()
             }
           ).render()
           UserDef.kFetchSuggestionsFromUserOverrideModel.bind($fetchSuggestionsFromUserOverrideModel).render()
           UserDef.kPhraseReplacementEnabled.bind(
-            $phraseReplacementEnabled.onChange {
+            $phraseReplacementEnabled.didChange {
               LMMgr.syncLMPrefs()
               if phraseReplacementEnabled {
                 LMMgr.loadUserPhraseReplacement()
