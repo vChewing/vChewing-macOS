@@ -68,7 +68,7 @@ public struct VwrSettingsPaneCandidates: View {
           UserDef.kUseHorizontalCandidateList.bind($useHorizontalCandidateList).render()
             .pickerStyle(RadioGroupPickerStyle())
           UserDef.kCandidateListTextSize.bind(
-            $candidateListTextSize.onChange {
+            $candidateListTextSize.didChange {
               guard !(12 ... 196).contains(candidateListTextSize) else { return }
               candidateListTextSize = max(12, min(candidateListTextSize, 196))
             }
@@ -132,7 +132,7 @@ private struct VwrSettingsPaneCandidates_SelectionKeys: View {
 
   var body: some View {
     UserDef.kCandidateKeys.bind(
-      $candidateKeys.onChange {
+      $candidateKeys.didChange {
         let value = candidateKeys
         let keys = value.trimmingCharacters(in: .whitespacesAndNewlines).lowercased().deduplicated
         // Start Error Handling.

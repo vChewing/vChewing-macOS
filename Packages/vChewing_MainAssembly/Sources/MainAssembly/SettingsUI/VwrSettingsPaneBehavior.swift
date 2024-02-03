@@ -101,12 +101,12 @@ public struct VwrSettingsPaneBehavior: View {
           UserDef.kShareAlphanumericalModeStatusAcrossClients.bind($shareAlphanumericalModeStatusAcrossClients).render()
           VStack(alignment: .leading) {
             UserDef.kTogglingAlphanumericalModeWithLShift.bind(
-              $togglingAlphanumericalModeWithLShift.onChange {
+              $togglingAlphanumericalModeWithLShift.didChange {
                 SessionCtl.theShiftKeyDetector.toggleWithLShift = togglingAlphanumericalModeWithLShift
               }
             ).render()
             UserDef.kTogglingAlphanumericalModeWithRShift.bind(
-              $togglingAlphanumericalModeWithRShift.onChange {
+              $togglingAlphanumericalModeWithRShift.didChange {
                 SessionCtl.theShiftKeyDetector.toggleWithRShift = togglingAlphanumericalModeWithRShift
               }
             ).render()

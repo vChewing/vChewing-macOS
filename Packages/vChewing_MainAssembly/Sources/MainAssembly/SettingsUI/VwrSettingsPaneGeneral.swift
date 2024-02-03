@@ -89,7 +89,7 @@ public struct VwrSettingsPaneGeneral: View {
 
         Section {
           UserDef.kReadingNarrationCoverage.bind(
-            $readingNarrationCoverage.onChange {
+            $readingNarrationCoverage.didChange {
               SpeechSputnik.shared.refreshStatus()
             }
           ).render()
@@ -99,14 +99,14 @@ public struct VwrSettingsPaneGeneral: View {
           UserDef.kClassicHaninKeyboardSymbolModeShortcutEnabled
             .bind($classicHaninKeyboardSymbolModeShortcutEnabled).render()
           UserDef.kUseSCPCTypingMode.bind(
-            $useSCPCTypingMode.onChange {
+            $useSCPCTypingMode.didChange {
               guard useSCPCTypingMode else { return }
               LMMgr.loadSCPCSequencesData()
             }
           ).render()
           if Date.isTodayTheDate(from: 0401) {
             UserDef.kShouldNotFartInLieuOfBeep.bind(
-              $shouldNotFartInLieuOfBeep.onChange { onFartControlChange() }
+              $shouldNotFartInLieuOfBeep.didChange { onFartControlChange() }
             ).render()
           }
         }

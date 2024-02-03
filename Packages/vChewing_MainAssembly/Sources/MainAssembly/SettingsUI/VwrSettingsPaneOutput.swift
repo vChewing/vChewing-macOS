@@ -36,14 +36,14 @@ public struct VwrSettingsPaneOutput: View {
       Form {
         Section {
           UserDef.kChineseConversionEnabled.bind(
-            $chineseConversionEnabled.onChange {
+            $chineseConversionEnabled.didChange {
               if chineseConversionEnabled, shiftJISShinjitaiOutputEnabled {
                 shiftJISShinjitaiOutputEnabled = false
               }
             }
           ).render()
           UserDef.kShiftJISShinjitaiOutputEnabled.bind(
-            $shiftJISShinjitaiOutputEnabled.onChange {
+            $shiftJISShinjitaiOutputEnabled.didChange {
               if chineseConversionEnabled, shiftJISShinjitaiOutputEnabled {
                 chineseConversionEnabled = false
               }
