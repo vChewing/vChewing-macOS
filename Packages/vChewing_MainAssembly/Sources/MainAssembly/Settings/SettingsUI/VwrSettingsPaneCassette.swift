@@ -115,35 +115,27 @@ public struct VwrSettingsPaneCassette: View {
                 Text("×")
               }
             }
-            Spacer()
-            Text(
-              LocalizedStringKey(
-                "Cassette mode is similar to the CIN support of the Yahoo Kimo IME, allowing users to use their own CIN tables to implement their stroked-based input schema (e.g. Wubi, Cangjie, Boshiamy, etc.) as a plan-B in vChewing IME. However, since vChewing won't compromise its phonabet input mode experience for this cassette mode, users might not feel comfortable enough comparing to their experiences with RIME (recommended) or OpenVanilla (deprecated)."
-              )
-            )
-            .settingsDescription()
-            Toggle(
-              LocalizedStringKey("Enable cassette mode, suppressing phonabet input"),
-              isOn: $cassetteEnabled.didChange {
-                if cassetteEnabled, !LMMgr.checkCassettePathValidity(cassettePath) {
-                  if let window = CtlSettingsUI.shared?.window {
-                    IMEApp.buzz()
-                    let alert = NSAlert(error: NSLocalizedString("Path invalid or file access error.", comment: ""))
-                    alert.informativeText = NSLocalizedString(
-                      "Please reconfigure the cassette path to a valid one before enabling this mode.", comment: ""
-                    )
-                    alert.beginSheetModal(for: window) { _ in
-                    }
-                  }
-                  LMMgr.resetCassettePath()
-                  cassetteEnabled = false
-                } else {
-                  LMMgr.loadCassetteData()
-                }
-                LMMgr.syncLMPrefs()
-              }
-            )
           }
+          UserDef.kCassetteEnabled.bind(
+            $cassetteEnabled.didChange {
+              if cassetteEnabled, !LMMgr.checkCassettePathValidity(cassettePath) {
+                if let window = CtlSettingsUI.shared?.window {
+                  IMEApp.buzz()
+                  let alert = NSAlert(error: NSLocalizedString("Path invalid or file access error.", comment: ""))
+                  alert.informativeText = NSLocalizedString(
+                    "Please reconfigure the cassette path to a valid one before enabling this mode.", comment: ""
+                  )
+                  alert.beginSheetModal(for: window) { _ in
+                  }
+                }
+                LMMgr.resetCassettePath()
+                cassetteEnabled = false
+              } else {
+                LMMgr.loadCassetteData()
+              }
+              LMMgr.syncLMPrefs()
+            }
+          ).render()
         }
 
         // MARK: - Something Else
