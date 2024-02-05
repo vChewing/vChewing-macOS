@@ -20,7 +20,6 @@ public enum UserDef: String, CaseIterable, Identifiable {
   public struct MetaData {
     public var userDef: UserDef
     public var shortTitle: String?
-    public var control: AnyObject?
     public var prompt: String?
     public var inlinePrompt: String?
     public var popupPrompt: String?

@@ -49,11 +49,18 @@ public extension NSWindowController {
 
 public extension NSWindow {
   @discardableResult func callAlert(title: String, text: String? = nil) -> NSApplication.ModalResponse {
+    (self as NSWindow?).callAlert(title: title, text: text)
+  }
+}
+
+public extension NSWindow? {
+  @discardableResult func callAlert(title: String, text: String? = nil) -> NSApplication.ModalResponse {
     let alert = NSAlert()
     alert.messageText = title
     if let text = text { alert.informativeText = text }
     alert.addButton(withTitle: NSLocalizedString("OK", comment: ""))
     var result: NSApplication.ModalResponse = .alertFirstButtonReturn
+    guard let self = self else { return alert.runModal() }
     alert.beginSheetModal(for: self) { theResponce in
       result = theResponce
     }
