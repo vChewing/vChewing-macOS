@@ -127,6 +127,10 @@ public extension Bool {
     toggle()
     return self
   }
+
+  static func from(integer: Int) -> Bool {
+    integer > 0 ? true : false
+  }
 }
 
 // MARK: - User Defaults Storage
@@ -340,5 +344,38 @@ public extension String {
     }
     return versionComponents.joined(separator: versionDelimiter)
       .compare(otherVersionComponents.joined(separator: versionDelimiter), options: .numeric) // <6>
+  }
+}
+
+// MARK: - Array Builder.
+
+@resultBuilder
+public enum ArrayBuilder<OutputModel> {
+  public static func buildEither(first component: [OutputModel]) -> [OutputModel] {
+    component
+  }
+
+  public static func buildEither(second component: [OutputModel]) -> [OutputModel] {
+    component
+  }
+
+  public static func buildOptional(_ component: [OutputModel]?) -> [OutputModel] {
+    component ?? []
+  }
+
+  public static func buildExpression(_ expression: OutputModel) -> [OutputModel] {
+    [expression]
+  }
+
+  public static func buildExpression(_: ()) -> [OutputModel] {
+    []
+  }
+
+  public static func buildBlock(_ components: [OutputModel]...) -> [OutputModel] {
+    components.flatMap { $0 }
+  }
+
+  public static func buildArray(_ components: [[OutputModel]]) -> [OutputModel] {
+    Array(components.joined())
   }
 }
