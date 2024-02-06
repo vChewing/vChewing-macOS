@@ -330,7 +330,7 @@ public enum PETerms {
 
     public var localized: (String, String) {
       if self == .locAdd {
-        return loc.contains("zh") ? ("添入", "") : loc.contains("ja") ? ("記入", "") : ("Add", "")
+        return loc.prefix(2) == "zh" ? ("添入", "") : loc.prefix(2) == "ja" ? ("記入", "") : ("Add", "")
       }
       let rawArray = NSLocalizedString(self.rawValue, comment: "").components(separatedBy: " ")
       if rawArray.isEmpty { return ("N/A", "N/A") }
