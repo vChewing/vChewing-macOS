@@ -232,7 +232,7 @@ public extension SessionCtl {
       NSApp.popup()
       return
     }
-    CtlPrefWindow.show()
+    CtlSettingsCocoa.show()
     NSApp.popup()
   }
 
