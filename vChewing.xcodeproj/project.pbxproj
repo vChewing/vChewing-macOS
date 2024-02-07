@@ -8,8 +8,6 @@
 
 /* Begin PBXBuildFile section */
 		5B09307628B6FC3B0021F8C5 /* shortcuts.html in Resources */ = {isa = PBXBuildFile; fileRef = 5B09307828B6FC3B0021F8C5 /* shortcuts.html */; };
-		5B0EF55D28CDBF7100F8F7CE /* frmClientListMgr.xib in Resources */ = {isa = PBXBuildFile; fileRef = 5B0EF55C28CDBF7100F8F7CE /* frmClientListMgr.xib */; };
-		5B0EF55F28CDBF8E00F8F7CE /* CtlClientListMgr.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B0EF55E28CDBF8E00F8F7CE /* CtlClientListMgr.swift */; };
 		5B2CA1E62B130869002634EE /* vChewingFactoryDatabase.sqlite in Resources */ = {isa = PBXBuildFile; fileRef = 5B2CA1E52B130869002634EE /* vChewingFactoryDatabase.sqlite */; };
 		5B30BF282944867800BD87A9 /* CtlRevLookupWindow.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B30BF272944867800BD87A9 /* CtlRevLookupWindow.swift */; };
 		5B40113928D7050D00A9D4CB /* Shared in Frameworks */ = {isa = PBXBuildFile; productRef = 5B40113828D7050D00A9D4CB /* Shared */; };
@@ -111,8 +109,6 @@
 		5B09307A28B6FC400021F8C5 /* en */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.html; lineEnding = 0; name = en; path = en.lproj/shortcuts.html; sourceTree = "<group>"; };
 		5B09307B28B6FC410021F8C5 /* ja */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.html; lineEnding = 0; name = ja; path = ja.lproj/shortcuts.html; sourceTree = "<group>"; };
 		5B0C5EDF27C7D9870078037C /* dataCompiler.swift */ = {isa = PBXFileReference; explicitFileType = sourcecode.swift; fileEncoding = 4; indentWidth = 2; lineEnding = 0; path = dataCompiler.swift; sourceTree = "<group>"; tabWidth = 2; usesTabs = 0; };
-		5B0EF55C28CDBF7100F8F7CE /* frmClientListMgr.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = frmClientListMgr.xib; sourceTree = "<group>"; };
-		5B0EF55E28CDBF8E00F8F7CE /* CtlClientListMgr.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CtlClientListMgr.swift; sourceTree = "<group>"; };
 		5B18BA6F27C7BD8B0056EB19 /* LICENSE-CHS.txt */ = {isa = PBXFileReference; lastKnownFileType = text; path = "LICENSE-CHS.txt"; sourceTree = "<group>"; };
 		5B18BA7027C7BD8B0056EB19 /* Makefile */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.make; path = Makefile; sourceTree = "<group>"; };
 		5B18BA7127C7BD8B0056EB19 /* README-CHS.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = "README-CHS.md"; sourceTree = "<group>"; };
@@ -293,7 +289,6 @@
 		5B62A33A27AE7C7500A19448 /* WindowControllers */ = {
 			isa = PBXGroup;
 			children = (
-				5B0EF55E28CDBF8E00F8F7CE /* CtlClientListMgr.swift */,
 				5B30BF272944867800BD87A9 /* CtlRevLookupWindow.swift */,
 			);
 			path = WindowControllers;
@@ -302,7 +297,6 @@
 		5B62A33B27AE7C7F00A19448 /* WindowNIBs */ = {
 			isa = PBXGroup;
 			children = (
-				5B0EF55C28CDBF7100F8F7CE /* frmClientListMgr.xib */,
 				6A187E2816004C5900466B2E /* MainMenu.xib */,
 			);
 			path = WindowNIBs;
@@ -597,7 +591,6 @@
 				5B70F4EC2A0BE900005EA8C4 /* MenuIcon-TCVIM@2x.png in Resources */,
 				5BF9DA2828840E6200DBD48E /* template-exclusions.txt in Resources */,
 				5B7DA80328BF6BC600D7B2AD /* fixinstall.sh in Resources */,
-				5B0EF55D28CDBF7100F8F7CE /* frmClientListMgr.xib in Resources */,
 				5B70F4E92A0BE900005EA8C4 /* MenuIcon-TCVIM.png in Resources */,
 				5BBBB76027AED54C0023B93A /* Fart.m4a in Resources */,
 				6A2E40F6253A69DA00D1AE1D /* Images.xcassets in Resources */,
@@ -727,7 +720,6 @@
 			files = (
 				D427F76C278CA2B0004A2160 /* AppDelegateImpl.swift in Sources */,
 				D47B92C027972AD100458394 /* main.swift in Sources */,
-				5B0EF55F28CDBF8E00F8F7CE /* CtlClientListMgr.swift in Sources */,
 				5B30BF282944867800BD87A9 /* CtlRevLookupWindow.swift in Sources */,
 				5BB802DA27FABA8300CF1C19 /* SessionCtl_Menu.swift in Sources */,
 			);
