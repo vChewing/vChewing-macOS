@@ -186,8 +186,8 @@ public struct VwrPhraseEditorUI: View {
   }
 
   private func callExternalAppToOpenPhraseFile() {
-    let app: String = NSEvent.keyModifierFlags.contains(.option) ? "com.apple.TextEdit" : "com.apple.finder"
-    delegate?.openPhraseFile(mode: selInputMode, type: selUserDataType, appIdentifier: app)
+    let app: FileOpenMethod = NSEvent.keyModifierFlags.contains(.option) ? .textEdit : .finder
+    delegate?.openPhraseFile(mode: selInputMode, type: selUserDataType, using: app)
   }
 
   // MARK: - Main View.
