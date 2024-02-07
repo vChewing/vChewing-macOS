@@ -134,10 +134,7 @@ public extension AppDelegate {
     NSApp.popup()
     guard result == NSApplication.ModalResponse.alertFirstButtonReturn else { return }
     let url = URL(fileURLWithPath: LMMgr.dataFolderPath(isDefaultFolder: true))
-    guard let finderURL = NSWorkspace.shared.urlForApplication(withBundleIdentifier: "com.apple.finder") else { return }
-    let configuration = NSWorkspace.OpenConfiguration()
-    configuration.promptsUserIfNeeded = true
-    NSWorkspace.shared.open([url], withApplicationAt: finderURL, configuration: configuration)
+    FileOpenMethod.finder.open(url: url)
     Uninstaller.uninstall(
       isSudo: false, selfKill: true, defaultDataFolderPath: LMMgr.dataFolderPath(isDefaultFolder: true)
     )

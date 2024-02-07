@@ -6,6 +6,7 @@
 // marks, or product names of Contributor, except as required to fulfill notice
 // requirements defined in MIT License.
 
+import AppKit
 import Foundation
 import SwiftExtension
 
@@ -255,5 +256,46 @@ public class FileObserveProject: ObservableObject, Equatable {
 
   public func touch() {
     id = UUID().uuidString
+  }
+}
+
+// MARK: - File Open Method
+
+public enum FileOpenMethod: String {
+  case finder = "Finder"
+  case textEdit = "TextEdit"
+  case safari = "Safari"
+
+  public var appName: String {
+    switch self {
+    case .finder: return "Finder"
+    case .textEdit: return "TextEdit"
+    case .safari: return "Safari"
+    }
+  }
+
+  public var bundleIdentifier: String {
+    switch self {
+    case .finder: return "com.apple.finder"
+    case .textEdit: return "com.apple.TextEdit"
+    case .safari: return "com.apple.Safari"
+    }
+  }
+
+  public func open(url: URL) {
+    switch self {
+    case .finder: NSWorkspace.shared.activateFileViewerSelecting([url])
+    default:
+      if #unavailable(macOS 10.15) {
+        NSWorkspace.shared.openFile(url.path, withApplication: appName)
+        return
+      } else {
+        let textEditURL = NSWorkspace.shared.urlForApplication(withBundleIdentifier: bundleIdentifier)
+        guard let textEditURL = textEditURL else { return }
+        let configuration = NSWorkspace.OpenConfiguration()
+        configuration.promptsUserIfNeeded = true
+        NSWorkspace.shared.open([url], withApplicationAt: textEditURL, configuration: configuration)
+      }
+    }
   }
 }
