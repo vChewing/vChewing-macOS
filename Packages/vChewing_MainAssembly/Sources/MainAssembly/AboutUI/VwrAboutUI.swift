@@ -9,12 +9,15 @@
 import AppKit
 import SwiftUI
 
-@available(macOS 12, *)
-public struct VwrAboutUI: View {
-  public static let copyrightLabel = Bundle.main.localizedInfoDictionary?["NSHumanReadableCopyright"] as? String ?? "BAD_COPYRIGHT_LABEL"
-  public static let eulaContent = Bundle.main.localizedInfoDictionary?["CFEULAContent"] as? String ?? "BAD_EULA_CONTENT"
-  public static let eulaContentUpstream = Bundle.main.infoDictionary?["CFUpstreamEULAContent"] as? String ?? "BAD_EULA_UPSTREAM"
+public struct VwrAboutUI {
+  public static var copyrightLabel: String { VwrAboutCocoa.copyrightLabel }
+  public static var eulaContent: String { VwrAboutCocoa.eulaContent }
+  public static var eulaContentUpstream: String { VwrAboutCocoa.eulaContentUpstream }
+  let foobar = "FOO_BAR"
+}
 
+@available(macOS 12, *)
+extension VwrAboutUI: View {
   public var body: some View {
     GroupBox {
       VStack(alignment: .leading, spacing: 6) {
@@ -29,6 +32,7 @@ public struct VwrAboutUI: View {
                 Text("v\(IMEApp.appMainVersionLabel.joined(separator: " Build ")) - \(IMEApp.appSignedDateLabel)").lineLimit(1)
               }.fixedSize()
               Text("i18n:aboutWindow.APP_DERIVED_FROM").font(.custom("Tahoma", size: 11))
+              Text(Self.copyrightLabel).font(.custom("Tahoma", size: 11))
               Text("i18n:aboutWindow.DEV_CREW").font(.custom("Tahoma", size: 11)).padding([.vertical], 2)
             }
           }
