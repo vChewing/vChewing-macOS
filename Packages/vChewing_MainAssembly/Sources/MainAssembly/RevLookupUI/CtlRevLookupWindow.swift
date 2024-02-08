@@ -8,7 +8,6 @@
 
 import AppKit
 import LangModelAssembly
-import MainAssembly
 import Shared
 
 class CtlRevLookupWindow: NSWindowController, NSWindowDelegate {
