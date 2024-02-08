@@ -23,7 +23,6 @@
 		5B98114828D6198700CBC605 /* PinyinPhonaConverter in Frameworks */ = {isa = PBXBuildFile; productRef = 5B98114728D6198700CBC605 /* PinyinPhonaConverter */; };
 		5BA8C30328DF0360004C5CC4 /* CandidateWindow in Frameworks */ = {isa = PBXBuildFile; productRef = 5BA8C30228DF0360004C5CC4 /* CandidateWindow */; };
 		5BAD0CD527D701F6003D127F /* vChewingKeyLayout.bundle in Resources */ = {isa = PBXBuildFile; fileRef = 5B30F11227BA568800484E24 /* vChewingKeyLayout.bundle */; };
-		5BB802DA27FABA8300CF1C19 /* SessionCtl_Menu.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5BB802D927FABA8300CF1C19 /* SessionCtl_Menu.swift */; };
 		5BBBB75F27AED54C0023B93A /* Beep.m4a in Resources */ = {isa = PBXBuildFile; fileRef = 5BBBB75D27AED54C0023B93A /* Beep.m4a */; };
 		5BBBB76027AED54C0023B93A /* Fart.m4a in Resources */ = {isa = PBXBuildFile; fileRef = 5BBBB75E27AED54C0023B93A /* Fart.m4a */; };
 		5BBC2D9E28F51C0400C986F6 /* LICENSE.txt in Resources */ = {isa = PBXBuildFile; fileRef = 5B18BA7227C7BD8B0056EB19 /* LICENSE.txt */; };
@@ -134,7 +133,6 @@
 		5B98114628D6198000CBC605 /* vChewing_PinyinPhonaConverter */ = {isa = PBXFileReference; lastKnownFileType = wrapper; name = vChewing_PinyinPhonaConverter; path = Packages/vChewing_PinyinPhonaConverter; sourceTree = "<group>"; };
 		5BA8C30128DEFE4F004C5CC4 /* vChewing_CandidateWindow */ = {isa = PBXFileReference; lastKnownFileType = wrapper; name = vChewing_CandidateWindow; path = Packages/vChewing_CandidateWindow; sourceTree = "<group>"; };
 		5BAD67E12ADAB62D005A4842 /* HangarRash_SwiftyCapsLockToggler */ = {isa = PBXFileReference; lastKnownFileType = wrapper; name = HangarRash_SwiftyCapsLockToggler; path = Packages/HangarRash_SwiftyCapsLockToggler; sourceTree = "<group>"; };
-		5BB802D927FABA8300CF1C19 /* SessionCtl_Menu.swift */ = {isa = PBXFileReference; explicitFileType = sourcecode.swift; fileEncoding = 4; indentWidth = 2; lineEnding = 0; path = SessionCtl_Menu.swift; sourceTree = "<group>"; tabWidth = 2; usesTabs = 0; };
 		5BBBB75D27AED54C0023B93A /* Beep.m4a */ = {isa = PBXFileReference; lastKnownFileType = file; path = Beep.m4a; sourceTree = "<group>"; };
 		5BBBB75E27AED54C0023B93A /* Fart.m4a */ = {isa = PBXFileReference; lastKnownFileType = file; path = Fart.m4a; sourceTree = "<group>"; };
 		5BBC2DA228F5212100C986F6 /* RelocationDetector.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RelocationDetector.swift; sourceTree = "<group>"; };
@@ -430,7 +428,6 @@
 			children = (
 				D427F76B278CA1BA004A2160 /* AppDelegateImpl.swift */,
 				D47B92BF27972AC800458394 /* main.swift */,
-				5BB802D927FABA8300CF1C19 /* SessionCtl_Menu.swift */,
 			);
 			path = Modules;
 			sourceTree = "<group>";
@@ -709,7 +706,6 @@
 			files = (
 				D427F76C278CA2B0004A2160 /* AppDelegateImpl.swift in Sources */,
 				D47B92C027972AD100458394 /* main.swift in Sources */,
-				5BB802DA27FABA8300CF1C19 /* SessionCtl_Menu.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
