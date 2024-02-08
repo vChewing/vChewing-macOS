@@ -144,6 +144,7 @@ public struct TextEditorEX: NSViewRepresentable {
       textView.isVerticallyResizable = true
       textView.frame = CGRect(x: 0, y: 0, width: contentSize.width, height: contentSize.height)
       textView.autoresizingMask = [.width]
+      textView.isRichText = false
       textView.delegate = self
 
       scrollview.borderType = .noBorder
