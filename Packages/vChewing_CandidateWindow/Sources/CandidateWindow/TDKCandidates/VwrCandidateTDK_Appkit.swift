@@ -7,6 +7,7 @@
 // requirements defined in MIT License.
 
 import AppKit
+import CocoaExtension
 import Shared
 
 /// 田所選字窗的 AppKit 简单版本，繪製效率不受 SwiftUI 的限制。
@@ -151,30 +152,17 @@ public extension VwrCandidateTDKAppKit {
 private extension VwrCandidateTDKAppKit {
   private func prepareMenu() {
     let newMenu = NSMenu()
-    let boostMenuItem = NSMenuItem(
-      title: "↑ \(clickedCell.displayedText)",
-      action: #selector(menuActionOfBoosting(_:)),
-      keyEquivalent: ""
-    )
-    boostMenuItem.target = self
-    newMenu.addItem(boostMenuItem)
-
-    let nerfMenuItem = NSMenuItem(
-      title: "↓ \(clickedCell.displayedText)",
-      action: #selector(menuActionOfNerfing(_:)),
-      keyEquivalent: ""
-    )
-    nerfMenuItem.target = self
-    newMenu.addItem(nerfMenuItem)
-
-    if thePool.isFilterable(target: clickedCell.index) {
-      let filterMenuItem = NSMenuItem(
-        title: "✖︎ \(clickedCell.displayedText)",
-        action: #selector(menuActionOfFiltering(_:)),
-        keyEquivalent: ""
-      )
-      filterMenuItem.target = self
-      newMenu.addItem(filterMenuItem)
+    newMenu.appendItems(self) {
+      NSMenu.Item(
+        verbatim: "↑ \(clickedCell.displayedText)"
+      )?.act(#selector(menuActionOfBoosting(_:)))
+      NSMenu.Item(
+        verbatim: "↓ \(clickedCell.displayedText)"
+      )?.act(#selector(menuActionOfNerfing(_:)))
+      NSMenu.Item(
+        verbatim: "✖︎ \(clickedCell.displayedText)"
+      )?.act(#selector(menuActionOfFiltering(_:)))
+        .nulled(!thePool.isFilterable(target: clickedCell.index))
     }
 
     theMenu = newMenu
