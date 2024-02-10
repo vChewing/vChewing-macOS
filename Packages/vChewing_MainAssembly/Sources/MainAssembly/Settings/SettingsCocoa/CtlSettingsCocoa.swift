@@ -104,7 +104,12 @@ extension CtlSettingsCocoa: NSToolbarDelegate {
   }
 
   var toolbarIdentifiers: [NSToolbarItem.Identifier] {
-    PrefUITabs.allCases.map(\.toolbarIdentifier)
+    var coreResults = PrefUITabs.allCases.map(\.toolbarIdentifier)
+    guard #unavailable(macOS 11) else { return coreResults }
+    // 下文是给 macOS 10.x 系统用的，让工具列的图示全部居中。
+    coreResults.insert(.flexibleSpace, at: coreResults.startIndex)
+    coreResults.append(.flexibleSpace)
+    return coreResults
   }
 
   public func toolbarDefaultItemIdentifiers(_: NSToolbar) -> [NSToolbarItem.Identifier] {
