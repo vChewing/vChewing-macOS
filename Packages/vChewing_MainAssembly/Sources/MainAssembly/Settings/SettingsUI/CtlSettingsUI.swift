@@ -49,7 +49,7 @@ public class CtlSettingsUI: NSWindowController, NSWindowDelegate {
         .fixedSize(horizontal: true, vertical: false)
         .ignoresSafeArea()
     )
-    let toolbar = NSToolbar(identifier: "preference toolbar")
+    let toolbar = NSToolbar(identifier: "vChewing.Settings.SwiftUI.Toolbar")
     toolbar.allowsUserCustomization = false
     toolbar.autosavesConfiguration = false
     toolbar.sizeMode = .default
