@@ -25,6 +25,7 @@ extension InputHandler {
   /// - Returns: 生成的「正在輸入」狀態。
   public func generateStateOfInputting(sansReading: Bool = false, guarded: Bool = false) -> IMEStateProtocol {
     if isConsideredEmptyForNow, !guarded { return IMEState.ofAbortion() }
+    restoreBackupCursor() // 只要叫了 Inputting 狀態，就盡可能還原游標備份。
     var segHighlightedAt: Int?
     let cpInput = isCodePointInputMode && !sansReading
     /// 「更新內文組字區 (Update the composing buffer)」是指要求客體軟體將組字緩衝區的內容
@@ -134,11 +135,15 @@ extension InputHandler {
 
   /// 拿著給定的候選字詞陣列資料內容，切換至選字狀態。
   /// - Returns: 回呼一個新的選詞狀態，來就給定的候選字詞陣列資料內容顯示選字窗。
-  public func generateStateOfCandidates() -> IMEStateProtocol {
+  public func generateStateOfCandidates(dodge: Bool = true) -> IMEStateProtocol {
+    guard let delegate = delegate else { return IMEState.ofAbortion() }
+    if dodge, delegate.state.type == .ofInputting {
+      dodgeInvalidEdgeCursorForCandidateState()
+    }
     var result = IMEState.ofCandidates(
       candidates: generateArrayOfCandidates(fixOrder: prefs.useFixedCandidateOrderOnSelection),
       displayTextSegments: compositor.walkedNodes.values,
-      cursor: delegate?.state.cursor ?? generateStateOfInputting().cursor
+      cursor: compositor.cursor
     )
     if !prefs.useRearCursorMode {
       let markerBackup = compositor.marker
@@ -1001,7 +1006,7 @@ extension InputHandler {
           inputting.textToCommit = textToCommit
           delegate.switchState(inputting)
           // 開始決定是否切換至選字狀態。
-          let newState = generateStateOfCandidates()
+          let newState = generateStateOfCandidates(dodge: false)
           _ = newState.candidates.isEmpty ? delegate.callError("B5127D8A") : delegate.switchState(newState)
         } else { // 不要在注音沒敲完整的情況下叫出統合符號選單。
           delegate.callError("17446655")

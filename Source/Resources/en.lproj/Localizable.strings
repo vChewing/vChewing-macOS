@@ -1,4 +1,3 @@
-
 "! Succeeded in filtering a candidate." = "! Succeeded in filtering a candidate.";
 "! Succeeded in filtering a user phrase." = "! Succeeded in filtering a user phrase.";
 "%@-Stroke" = "%@-Stroke";
@@ -191,6 +190,7 @@
 "i18n:UserDef.kBypassNonAppleCapsLockHandling.shortTitle" = "Bypass the vChewing built-in Caps Lock handling";
 "i18n:userdef.kCheckAbusersOfSecureEventInputAPI.description" = "Such abuse of SecureEventInput API in the background can hinder all 3rd-party input methods from being able to switch to. It is fine to use SecureEventInput for sensitive input fields. However, an app calling EnableSecureEventInput() is responsible to call DisableSecureEventInput() immediately right after the input field loses focus. This situation may also happen if an app is hanging in the background (or working as a helper application in the background) with its SecureEventInput left enabled.";
 "i18n:UserDef.kCheckAbusersOfSecureEventInputAPI.shortTitle" = "Actively check those processes abusing the SecureEventInput API";
+"i18n:UserDef.kDodgeInvalidEdgeCandidateCursorPosition.shortTitle" = "Dodge Invalid Edge Candidate Cursor Position";
 "i18n:UserDef.kNumPadCharInputBehavior.description" = "Choose the behavior of numeric pad inputs.";
 "i18n:UserDef.kNumPadCharInputBehavior.option.0" = "Always directly commit half-width chars";
 "i18n:UserDef.kNumPadCharInputBehavior.option.1" = "Always directly commit full-width chars";
