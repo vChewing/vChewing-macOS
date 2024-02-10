@@ -126,7 +126,8 @@ public class UpdateSputnik {
           let intCurrentVersion = Int(dicMainBundle[kCFBundleVersionKey as String] as? String ?? ""),
           let strCurrentVersionShortened = dicMainBundle["CFBundleShortVersionString"] as? String
     else { return } // Shouldn't happen.
-    let isRemoteMainStreamDistro: Bool = dicMainBundle["IsMainStreamDistro"] as? Bool ?? true
+    /// 註：此處 isRemoteMainStreamDistro 在 Aqua 紀念版內應該設為 false；主流版則為 true。
+    let isRemoteMainStreamDistro: Bool = plist["IsMainStreamDistro"] as? Bool ?? true
     let crossDistroNotification = Self.isMainStreamRelease != isRemoteMainStreamDistro
     versionCheck: if intRemoteVersion <= intCurrentVersion {
       guard isCurrentCheckForced else { return }
