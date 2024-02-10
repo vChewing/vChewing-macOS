@@ -27,7 +27,7 @@ public enum IMKHelper {
       "com.apple.keylayout.Dvorak-Right",
     ]
     if #unavailable(macOS 10.13) {
-      result.append("com.apple.keylayout.US")
+      result.insert("com.apple.keylayout.US", at: result.startIndex)
       result.append("com.apple.keylayout.German")
       result.append("com.apple.keylayout.French")
     }
@@ -49,31 +49,29 @@ public enum IMKHelper {
     "org.unknown.keylayout.vChewingMiTAC",
   ]
 
-  public static var allowedAlphanumericalTISInputSources: [TISInputSource] {
-    arrWhitelistedKeyLayoutsASCII.compactMap { TISInputSource.generate(from: $0) }
+  public static var allowedAlphanumericalTISInputSources: [TISInputSource.KeyboardLayout] {
+    let allTISKeyboardLayouts = TISInputSource.getAllTISInputKeyboardLayoutMap()
+    return arrWhitelistedKeyLayoutsASCII.compactMap { allTISKeyboardLayouts[$0] }
   }
 
-  public static var allowedBasicLayoutsAsTISInputSources: [TISInputSource?] {
-    // 為了保證清單順序，先弄兩個容器。
-    var containerA: [TISInputSource?] = []
-    var containerB: [TISInputSource?] = []
-    var containerC: [TISInputSource?] = []
+  public static var allowedBasicLayoutsAsTISInputSources: [TISInputSource.KeyboardLayout?] {
+    let allTISKeyboardLayouts = TISInputSource.getAllTISInputKeyboardLayoutMap()
+    // 為了保證清單順序，先弄幾個容器。
+    var containerA: [TISInputSource.KeyboardLayout?] = []
+    var containerB: [TISInputSource.KeyboardLayout?] = []
+    var containerC: [TISInputSource.KeyboardLayout] = []
 
-    let rawDictionary = TISInputSource.rawTISInputSources(onlyASCII: false)
-
-    Self.arrWhitelistedKeyLayoutsASCII.forEach {
-      if let neta = rawDictionary[$0], !arrDynamicBasicKeyLayouts.contains(neta.identifier) {
-        containerC.append(neta)
-      }
+    let filterSet = Array(Set(arrWhitelistedKeyLayoutsASCII).subtracting(Set(arrDynamicBasicKeyLayouts)))
+    let matchedGroupBasic = (arrWhitelistedKeyLayoutsASCII + arrDynamicBasicKeyLayouts).compactMap {
+      allTISKeyboardLayouts[$0]
     }
-
-    Self.arrDynamicBasicKeyLayouts.forEach {
-      if let neta = rawDictionary[$0] {
-        if neta.identifier.contains("com.apple") {
-          containerA.append(neta)
-        } else {
-          containerB.append(neta)
-        }
+    matchedGroupBasic.forEach { neta in
+      if filterSet.contains(neta.id) {
+        containerC.append(neta)
+      } else if neta.id.hasPrefix("com.apple") {
+        containerA.append(neta)
+      } else {
+        containerB.append(neta)
       }
     }
 
