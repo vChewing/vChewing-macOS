@@ -31,7 +31,7 @@ public protocol InputHandlerProtocol {
   func clearComposerAndCalligrapher()
   func ensureKeyboardParser()
   func triageInput(event input: InputSignalProtocol) -> Bool
-  func generateStateOfCandidates() -> IMEStateProtocol
+  func generateStateOfCandidates(dodge: Bool) -> IMEStateProtocol
   func generateStateOfInputting(sansReading: Bool, guarded: Bool) -> IMEStateProtocol
   func generateStateOfAssociates(withPair pair: Megrez.KeyValuePaired) -> IMEStateProtocol
   func consolidateNode(
@@ -44,6 +44,10 @@ public protocol InputHandlerProtocol {
 extension InputHandlerProtocol {
   func generateStateOfInputting(sansReading: Bool = false, guarded: Bool = false) -> IMEStateProtocol {
     generateStateOfInputting(sansReading: sansReading, guarded: guarded)
+  }
+
+  func generateStateOfCandidates() -> IMEStateProtocol {
+    generateStateOfCandidates(dodge: true)
   }
 
   func consolidateNode(candidate: (keyArray: [String], value: String), respectCursorPushing: Bool, preConsolidate: Bool) {
@@ -83,6 +87,9 @@ public class InputHandler: InputHandlerProtocol {
   public var delegate: InputHandlerDelegate?
   public var prefs: PrefMgrProtocol
 
+  /// 用來記錄「叫出選字窗前」的游標位置的變數。
+  var backupCursor: Int?
+
   /// 半衰模組的衰減指數
   let kEpsilon: Double = 0.000_001
 
@@ -115,6 +122,7 @@ public class InputHandler: InputHandlerProtocol {
     compositor.clear()
     isCodePointInputMode = false
     isHaninKeyboardSymbolMode = false
+    backupCursor = nil
   }
 
   /// 警告：該參數僅代指組音區/組筆區域與組字區在目前狀態下被視為「空」。
@@ -154,6 +162,43 @@ public class InputHandler: InputHandlerProtocol {
   // MARK: - Functions dealing with Megrez.
 
   public var isCompositorEmpty: Bool { compositor.isEmpty }
+
+  func isInvalidEdgeCursorSituation(givenCursor: Int? = nil) -> Bool {
+    let cursorToCheck = givenCursor ?? compositor.cursor
+    // prefs.useRearCursorMode 為 0 (false) 時（macOS 注音選字），最後方的游標位置不合邏輯。
+    // prefs.useRearCursorMode 為 1 (true) 時（微軟新注音選字），最前方的游標位置不合邏輯。
+    switch prefs.useRearCursorMode {
+    case false where cursorToCheck == 0: return true
+    case true where cursorToCheck == compositor.length: return true
+    default: return false
+    }
+  }
+
+  public func removeBackupCursor() {
+    backupCursor = nil
+  }
+
+  public func dodgeInvalidEdgeCursorForCandidateState() {
+    guard !prefs.useSCPCTypingMode else { return }
+    guard prefs.dodgeInvalidEdgeCandidateCursorPosition else { return }
+    guard isInvalidEdgeCursorSituation() else { return }
+    backupCursor = compositor.cursor
+    switch prefs.useRearCursorMode {
+    case false where compositor.cursor < compositor.length:
+      compositor.cursor += 1
+      if isCursorCuttingChar() { compositor.jumpCursorBySpan(to: .front) }
+    case true where compositor.cursor > 0:
+      compositor.cursor -= 1
+      if isCursorCuttingChar() { compositor.jumpCursorBySpan(to: .rear) }
+    default: break
+    }
+  }
+
+  public func restoreBackupCursor() {
+    guard let theBackupCursor = backupCursor else { return }
+    compositor.cursor = Swift.max(Swift.min(theBackupCursor, compositor.length), 0)
+    backupCursor = nil
+  }
 
   /// 獲取當前標記得範圍。這個函式只能是函式、而非只讀變數。
   /// - Returns: 當前標記範圍。

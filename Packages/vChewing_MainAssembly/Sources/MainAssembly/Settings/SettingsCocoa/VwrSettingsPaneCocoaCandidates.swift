@@ -51,6 +51,7 @@ public extension SettingsPanesCocoa {
               UserDef.kUseRearCursorMode.render(fixWidth: contentWidth)
               UserDef.kMoveCursorAfterSelectingCandidate.render(fixWidth: contentWidth)
               UserDef.kUseDynamicCandidateWindowOrigin.render(fixWidth: contentWidth)
+              UserDef.kDodgeInvalidEdgeCandidateCursorPosition.render(fixWidth: contentWidth)
             }?.boxed()
             NSStackView.buildSection(width: contentWidth) {
               UserDef.kShowReverseLookupInCandidateUI.render(fixWidth: contentWidth)

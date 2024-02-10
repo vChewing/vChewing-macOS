@@ -1,4 +1,3 @@
-
 "! Succeeded in filtering a candidate." = "! 指定された文字候補は排除リストに登録しました。";
 "! Succeeded in filtering a user phrase." = "! この語彙は排除リストに登録完了。";
 "%@-Stroke" = "%@画";
@@ -191,6 +190,7 @@
 "i18n:UserDef.kBypassNonAppleCapsLockHandling.shortTitle" = "威注音入力アプリの内蔵CapsLock処理を不使用";
 "i18n:userdef.kCheckAbusersOfSecureEventInputAPI.description" = "このような不正利用は「システム内蔵入力以外の全ての入力アプリがメニューで灰色状態で選べなくて使えない」の元凶である。センシティブな資料の記入どころでSecureEventInputをEnableSecureEventInput()で使うのは当然であるが、「入力中」状態が終わった後必ずDisableSecureEventInput()で状態解消すべきだと義務である。いくつかヘルパーアプリも、あるいはSecureEventInputを呼び起こしてからすぐ固まったアプリも、この状態になりやすい。特に、他のアプリの画面へ切り替えたとしても、固まったアプリのSecureEventInput状態は自動的に解消できぬ。";
 "i18n:UserDef.kCheckAbusersOfSecureEventInputAPI.shortTitle" = "SecureEventInput API を不正利用しているバクグラウンド・プロセスを自動検知";
+"i18n:UserDef.kDodgeInvalidEdgeCandidateCursorPosition.shortTitle" = "端末での不合理的な候補選択用カーソル位置を是正";
 "i18n:UserDef.kNumPadCharInputBehavior.description" = "テンキー文字の入力行為をご指定ください。";
 "i18n:UserDef.kNumPadCharInputBehavior.option.0" = "いつでも半角で直接出力";
 "i18n:UserDef.kNumPadCharInputBehavior.option.1" = "いつでも全角で直接出力";

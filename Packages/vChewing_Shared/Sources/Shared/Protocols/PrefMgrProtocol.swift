@@ -31,6 +31,7 @@ public protocol PrefMgrProtocol {
   var shouldAutoReloadUserDataFiles: Bool { get set }
   var useRearCursorMode: Bool { get set }
   var moveCursorAfterSelectingCandidate: Bool { get set }
+  var dodgeInvalidEdgeCandidateCursorPosition: Bool { get set }
   var useDynamicCandidateWindowOrigin: Bool { get set }
   var useHorizontalCandidateList: Bool { get set }
   var chooseCandidateUsingSpace: Bool { get set }
