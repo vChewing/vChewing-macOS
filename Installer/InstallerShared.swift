@@ -50,7 +50,7 @@ var allRegisteredInstancesOfThisInputMethod: [TISInputSource] {
   else {
     return []
   }
-  return tsInputModeListKey.keys.compactMap { TISInputSource.generate(from: $0) }
+  return TISInputSource.match(modeIDs: tsInputModeListKey.keys.map(\.description))
 }
 
 // MARK: - NSApp Activation Helper

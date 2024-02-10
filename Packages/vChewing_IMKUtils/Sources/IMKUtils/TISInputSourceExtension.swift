@@ -12,8 +12,13 @@ import InputMethodKit
 // MARK: - TISInputSource Extension by The vChewing Project (MIT-NTL License).
 
 public extension TISInputSource {
+  struct KeyboardLayout: Identifiable {
+    public var id: String
+    public var titleLocalized: String
+  }
+
   static var allRegisteredInstancesOfThisInputMethod: [TISInputSource] {
-    TISInputSource.modes.compactMap { TISInputSource.generate(from: $0) }
+    TISInputSource.match(modeIDs: TISInputSource.modes)
   }
 
   static var modes: [String] {
@@ -22,7 +27,7 @@ public extension TISInputSource {
     else {
       return []
     }
-    return tsInputModeListKey.keys.map { $0 }
+    return tsInputModeListKey.keys.map(\.description)
   }
 
   @discardableResult static func registerInputMethod() -> Bool {
@@ -80,10 +85,6 @@ public extension TISInputSource {
       == kCFBooleanTrue
   }
 
-  static func generate(from identifier: String) -> TISInputSource? {
-    TISInputSource.rawTISInputSources(onlyASCII: false)[identifier]
-  }
-
   var inputModeID: String {
     unsafeBitCast(TISGetInputSourceProperty(self, kTISPropertyInputModeID), to: NSString.self) as String? ?? ""
   }
@@ -120,9 +121,34 @@ public extension TISInputSource {
     return unsafeBitCast(r, to: NSString.self).integerValue as Int? ?? 0
   }
 
-  static func rawTISInputSources(onlyASCII: Bool = false) -> [String: TISInputSource] {
+  // Refactored by Shiki Suen.
+  static func match(identifiers: [String] = [], modeIDs: [String] = [], onlyASCII: Bool = false) -> [TISInputSource] {
+    let dicConditions: [CFString: Any] = !onlyASCII ? [:] : [
+      kTISPropertyInputSourceType: kTISTypeKeyboardLayout as CFString,
+      kTISPropertyInputSourceIsASCIICapable: kCFBooleanTrue as CFBoolean,
+    ]
+    let cfDict = !onlyASCII ? nil : dicConditions as CFDictionary
+    var resultStack: [TISInputSource] = []
+    let unionedIDs = NSOrderedSet(array: modeIDs + identifiers).compactMap { $0 as? String }
+    let retrieved = (TISCreateInputSourceList(cfDict, true)?.takeRetainedValue() as? [TISInputSource]) ?? []
+    retrieved.forEach { tis in
+      unionedIDs.forEach { id in
+        guard tis.identifier == id || tis.inputModeID == id else { return }
+        if onlyASCII {
+          guard tis.scriptCode == 0 else { return }
+        }
+        resultStack.append(tis)
+      }
+    }
+    // 為了保持指定排序，才在最後做這種處理。效能略有打折，但至少比起直接迭代容量破百的 retrieved 要好多了。
+    return unionedIDs.compactMap { currentIdentifier in
+      retrieved.first { $0.identifier == currentIdentifier || $0.inputModeID == currentIdentifier }
+    }
+  }
+
+  /// 備註：這是 Mzp 的原版函式，留在這裡當範本參考。上述的 .match() 函式都衍生自此。
+  static func rawTISInputSources(onlyASCII: Bool = false) -> [TISInputSource] {
     // 為了指定檢索條件，先構築 CFDictionary 辭典。
-    // 第二項代指辭典容量。
     let dicConditions: [CFString: Any] = !onlyASCII ? [:] : [
       kTISPropertyInputSourceType: kTISTypeKeyboardLayout as CFString,
       kTISPropertyInputSourceIsASCIICapable: kCFBooleanTrue as CFBoolean,
@@ -132,10 +158,21 @@ public extension TISInputSource {
     if onlyASCII {
       result = result.filter { $0.scriptCode == 0 }
     }
-    var resultDictionary: [String: TISInputSource] = [:]
+    return result
+  }
+
+  /// Derived from rawTISInputSources().
+  static func getAllTISInputKeyboardLayoutMap() -> [String: TISInputSource.KeyboardLayout] {
+    // 為了指定檢索條件，先構築 CFDictionary 辭典。
+    let dicConditions: [CFString: Any] = [kTISPropertyInputSourceType: kTISTypeKeyboardLayout as CFString]
+    // 返回鍵盤配列清單。
+    let result = TISCreateInputSourceList(dicConditions as CFDictionary, true)?.takeRetainedValue() as? [TISInputSource] ?? .init()
+    var resultDictionary: [String: TISInputSource.KeyboardLayout] = [:]
     result.forEach {
-      resultDictionary[$0.inputModeID] = $0
-      resultDictionary[$0.identifier] = $0
+      let newNeta1 = TISInputSource.KeyboardLayout(id: $0.inputModeID, titleLocalized: $0.vChewingLocalizedName)
+      let newNeta2 = TISInputSource.KeyboardLayout(id: $0.identifier, titleLocalized: $0.vChewingLocalizedName)
+      resultDictionary[$0.inputModeID] = newNeta1
+      resultDictionary[$0.identifier] = newNeta2
     }
     return resultDictionary
   }

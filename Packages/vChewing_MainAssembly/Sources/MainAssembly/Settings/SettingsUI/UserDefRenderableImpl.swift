@@ -41,7 +41,7 @@ public extension UserDefRenderable<String> {
             Picker(LocalizedStringKey(metaData.shortTitle ?? ""), selection: binding) {
               ForEach(0 ... (IMKHelper.allowedAlphanumericalTISInputSources.count - 1), id: \.self) { id in
                 let theEntry = IMKHelper.allowedAlphanumericalTISInputSources[id]
-                Text(theEntry.vChewingLocalizedName).tag(theEntry.identifier)
+                Text(theEntry.titleLocalized).tag(theEntry.id)
               }.id(UUID())
             }
           case (.string, .kBasicKeyboardLayout):
@@ -49,7 +49,7 @@ public extension UserDefRenderable<String> {
               ForEach(0 ... (IMKHelper.allowedBasicLayoutsAsTISInputSources.count - 1), id: \.self) { id in
                 let theEntry = IMKHelper.allowedBasicLayoutsAsTISInputSources[id]
                 if let theEntry = theEntry {
-                  Text(theEntry.vChewingLocalizedName).tag(theEntry.identifier)
+                  Text(theEntry.titleLocalized).tag(theEntry.id)
                 } else {
                   Divider()
                 }
