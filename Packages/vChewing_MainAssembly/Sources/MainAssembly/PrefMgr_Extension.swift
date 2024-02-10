@@ -51,10 +51,11 @@ public extension PrefMgr {
       keyboardParser = 0
     }
     // 基礎鍵盤排列選項糾錯。
-    if TISInputSource.generate(from: basicKeyboardLayout) == nil {
+    let matchedResults = TISInputSource.match(identifiers: [basicKeyboardLayout, alphanumericalKeyboardLayout])
+    if !matchedResults.contains(where: { $0.identifier == basicKeyboardLayout }) {
       basicKeyboardLayout = Self.kDefaultBasicKeyboardLayout
     }
-    if TISInputSource.generate(from: alphanumericalKeyboardLayout) == nil {
+    if !matchedResults.contains(where: { $0.identifier == alphanumericalKeyboardLayout }) {
       alphanumericalKeyboardLayout = Self.kDefaultAlphanumericalKeyboardLayout
     }
     // 其它多元選項參數自動糾錯。
