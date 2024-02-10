@@ -63,6 +63,7 @@ public enum UserDef: String, CaseIterable, Identifiable {
   case kCurrencyNumeralsEnabled = "CurrencyNumeralsEnabled"
   case kHalfWidthPunctuationEnabled = "HalfWidthPunctuationEnable"
   case kMoveCursorAfterSelectingCandidate = "MoveCursorAfterSelectingCandidate"
+  case kDodgeInvalidEdgeCandidateCursorPosition = "DodgeInvalidEdgeCandidateCursorPosition"
   case kEscToCleanInputBuffer = "EscToCleanInputBuffer"
   case kAcceptLeadingIntonations = "AcceptLeadingIntonations"
   case kSpecifyIntonationKeyBehavior = "SpecifyIntonationKeyBehavior"
@@ -183,6 +184,7 @@ public extension UserDef {
     case .kCurrencyNumeralsEnabled: return .bool
     case .kHalfWidthPunctuationEnabled: return .bool
     case .kMoveCursorAfterSelectingCandidate: return .bool
+    case .kDodgeInvalidEdgeCandidateCursorPosition: return .bool
     case .kEscToCleanInputBuffer: return .bool
     case .kAcceptLeadingIntonations: return .bool
     case .kSpecifyIntonationKeyBehavior: return .integer
@@ -356,6 +358,9 @@ public extension UserDef {
     case .kHalfWidthPunctuationEnabled: return .init(userDef: self, shortTitle: "Enable half-width punctuations")
     case .kMoveCursorAfterSelectingCandidate: return .init(
         userDef: self, shortTitle: "Push the cursor in front of the phrase after selection"
+      )
+    case .kDodgeInvalidEdgeCandidateCursorPosition: return .init(
+        userDef: self, shortTitle: "i18n:UserDef.kDodgeInvalidEdgeCandidateCursorPosition.shortTitle"
       )
     case .kEscToCleanInputBuffer: return .init(
         userDef: self, shortTitle: "Use ESC key to clear the entire input buffer",

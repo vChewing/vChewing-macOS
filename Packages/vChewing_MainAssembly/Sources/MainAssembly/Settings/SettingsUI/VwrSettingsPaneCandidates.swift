@@ -41,6 +41,9 @@ public struct VwrSettingsPaneCandidates: View {
   @AppStorage(wrappedValue: true, UserDef.kUseDynamicCandidateWindowOrigin.rawValue)
   private var useDynamicCandidateWindowOrigin: Bool
 
+  @AppStorage(wrappedValue: true, UserDef.kDodgeInvalidEdgeCandidateCursorPosition.rawValue)
+  private var dodgeInvalidEdgeCandidateCursorPosition: Bool
+
   @AppStorage(wrappedValue: false, UserDef.kUseFixedCandidateOrderOnSelection.rawValue)
   private var useFixedCandidateOrderOnSelection: Bool
 
@@ -62,6 +65,7 @@ public struct VwrSettingsPaneCandidates: View {
             UserDef.kUseDynamicCandidateWindowOrigin.bind($useDynamicCandidateWindowOrigin).render()
               .disabled(useRearCursorMode)
           }
+          UserDef.kDodgeInvalidEdgeCandidateCursorPosition.bind($dodgeInvalidEdgeCandidateCursorPosition).render()
         }
         Section {
           VwrSettingsPaneCandidates_SelectionKeys()
