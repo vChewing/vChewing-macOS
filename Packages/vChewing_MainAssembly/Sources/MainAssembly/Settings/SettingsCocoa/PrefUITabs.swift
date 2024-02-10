@@ -97,6 +97,7 @@ public extension PrefUITabs {
   }
 
   var icon: NSImage {
+    let note = "\(rawValue) Preferences" + " \(i18nTitle)"
     if #available(macOS 11.0, *) {
       let name: String = {
         switch self {
@@ -120,10 +121,17 @@ public extension PrefUITabs {
           return "pc"
         }
       }()
-      let note = "\(self.rawValue) Preferences"
       return NSImage(systemSymbolName: name, accessibilityDescription: note) ?? NSImage()
     }
     let legacyName = "PrefToolbar-\(rawValue)"
-    return NSImage(named: legacyName) ?? NSImage()
+    let matchedImage = NSImage(named: legacyName) ?? NSImage()
+    let newImage = NSImage(size: matchedImage.size)
+    newImage.lockFocus()
+    let imageRect = NSRect(origin: .zero, size: matchedImage.size)
+    matchedImage.draw(in: imageRect, from: imageRect, operation: .sourceOver, fraction: 0.85)
+    newImage.unlockFocus()
+    newImage.isTemplate = true
+    newImage.accessibilityDescription = note
+    return newImage
   }
 }
