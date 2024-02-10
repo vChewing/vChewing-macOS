@@ -27,14 +27,18 @@ public extension NSEvent? {
 public extension NSEvent {
   var copyAsKBEvent: KBEvent? {
     guard let typeKB = type.toKB else { return nil }
+    // NSEvent 只是個外表皮，裡面有好幾個影子 class。
+    // 不是所有的影子 class 都有「characters」和「isARepeated」。
+    // 貿然存取的話，會觸發 NSInternalInconsistencyException。
+    // 已知 FlagsChanged 類型的事件是如此，那就對這個類型做例外處理。
     return .init(
       with: typeKB,
       modifierFlags: modifierFlags.toKB,
       timestamp: timestamp,
       windowNumber: windowNumber,
-      characters: characters,
-      charactersIgnoringModifiers: charactersIgnoringModifiers,
-      isARepeat: isARepeat,
+      characters: typeKB != .flagsChanged ? characters : nil,
+      charactersIgnoringModifiers: typeKB != .flagsChanged ? charactersIgnoringModifiers : nil,
+      isARepeat: typeKB != .flagsChanged ? isARepeat : nil,
       keyCode: keyCode
     )
   }
