@@ -69,7 +69,12 @@ public struct VwrSettingsPaneCandidates: View {
               .disabled(useRearCursorMode)
           }
           UserDef.kDodgeInvalidEdgeCandidateCursorPosition.bind($dodgeInvalidEdgeCandidateCursorPosition).render()
-          UserDef.kUseJKtoMoveCompositorCursorInCandidateState.bind($useJKtoMoveCompositorCursorInCandidateState).render()
+          UserDef.kUseJKtoMoveCompositorCursorInCandidateState.bind(
+            $useJKtoMoveCompositorCursorInCandidateState.didChange {
+              // 利用該變數的 didSet 屬性自糾。
+              PrefMgr.shared.candidateKeys = PrefMgr.shared.candidateKeys
+            }
+          ).render()
         }
         Section {
           VwrSettingsPaneCandidates_SelectionKeys()
@@ -144,7 +149,7 @@ private struct VwrSettingsPaneCandidates_SelectionKeys: View {
         let value = candidateKeys
         let keys = value.trimmingCharacters(in: .whitespacesAndNewlines).lowercased().deduplicated
         // Start Error Handling.
-        if let errorResult = CandidateKey.validate(keys: keys) {
+        if let errorResult = PrefMgr.shared.validate(candidateKeys: keys) {
           if let window = CtlSettingsUI.shared?.window, !keys.isEmpty {
             IMEApp.buzz()
             let alert = NSAlert(error: NSLocalizedString("Invalid Selection Keys.", comment: ""))

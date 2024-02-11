@@ -144,7 +144,7 @@ public enum KeyboardParser: Int, CaseIterable {
 public enum CandidateKey {
   public static var defaultKeys: String { suggestions[0] }
   public static let suggestions: [String] = [
-    "123456", "123456789", "234567890", "QWERTYUIO", "QWERTASDF", "ASDFGHJKL", "ASDFZXCVB",
+    "123456", "123456789", "234567890", "QWERTYUIO", "QWERTASDF", "ASDFGH", "ASDFZXCVB",
   ]
 
   /// 僅列舉那些需要專門檢查才能發現的那種無法自動排除的錯誤。
@@ -160,7 +160,11 @@ public enum CandidateKey {
           + NSLocalizedString(
             "Candidate keys can only contain printable ASCII characters like alphanumericals.",
             comment: ""
-          ) + "\n" + "- " + NSLocalizedString("Candidate keys cannot contain space.", comment: "")
+          ) + "\n" + "- " + NSLocalizedString(
+            "i18n:CandidateKey.ValidationError.AssignedForOtherPurposes", comment: ""
+          ) + "\n" + "- " + NSLocalizedString(
+            "Candidate keys cannot contain space.", comment: ""
+          )
       case .countMismatch:
         return "- "
           + NSLocalizedString(
@@ -177,12 +181,18 @@ public enum CandidateKey {
   /// ```
   /// .trimmingCharacters(in: .whitespacesAndNewlines).deduplicated
   /// ```
-  /// - Parameter candidateKeys: 傳入的參數值
+  /// - Parameters:
+  ///   - candidateKeys: 傳入的參數值
+  ///   - excluding: 指定哪些按鍵無法用作選字鍵
   /// - Returns: 返回 nil 的話，證明沒有錯誤；否則會返回錯誤描述訊息。
-  public static func validate(keys candidateKeys: String) -> String? {
+  public static func validate(
+    keys candidateKeys: String, excluding forbiddenChars: String = ""
+  ) -> String? {
+    let candidateKeys = candidateKeys.lowercased()
+    let forbiddenChars = forbiddenChars.lowercased()
     var result = ValidationError.noError
     charValidityCheck: for neta in candidateKeys {
-      if String(neta) == " " {
+      if String(neta) == " " || forbiddenChars.contains(neta) {
         result = CandidateKey.ValidationError.invalidCharacters
         break charValidityCheck
       }

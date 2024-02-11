@@ -149,7 +149,7 @@ extension SessionCtl: CtlCandidateDelegate {
     cassetteQuick: if state.type == .ofInputting, state.isCandidateContainer {
       guard PrefMgr.shared.cassetteEnabled else { break cassetteQuick }
       guard let cinCandidateKey = inputMode.langModel.cassetteSelectionKey,
-            CandidateKey.validate(keys: cinCandidateKey) == nil
+            PrefMgr.shared.validate(candidateKeys: cinCandidateKey) == nil
       else {
         return "1234567890"
       }
