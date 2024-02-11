@@ -52,6 +52,7 @@ public enum UserDef: String, CaseIterable, Identifiable {
   case kAppleLanguages = "AppleLanguages"
   case kShouldAutoReloadUserDataFiles = "ShouldAutoReloadUserDataFiles"
   case kUseRearCursorMode = "UseRearCursorMode"
+  case kUseJKtoMoveCompositorCursorInCandidateState = "UseJKtoMoveCompositorCursorInCandidateState"
   case kUseDynamicCandidateWindowOrigin = "UseDynamicCandidateWindowOrigin"
   case kUseHorizontalCandidateList = "UseHorizontalCandidateList"
   case kChooseCandidateUsingSpace = "ChooseCandidateUsingSpace"
@@ -173,6 +174,7 @@ public extension UserDef {
     case .kAppleLanguages: return .array
     case .kShouldAutoReloadUserDataFiles: return .bool
     case .kUseRearCursorMode: return .bool
+    case .kUseJKtoMoveCompositorCursorInCandidateState: return .bool
     case .kUseDynamicCandidateWindowOrigin: return .bool
     case .kUseHorizontalCandidateList: return .bool
     case .kChooseCandidateUsingSpace: return .bool
@@ -327,6 +329,11 @@ public extension UserDef {
           0: "in front of the phrase (like macOS built-in Zhuyin IME)",
           1: "at the rear of the phrase (like Microsoft New Phonetic)",
         ]
+      )
+    case .kUseJKtoMoveCompositorCursorInCandidateState: return .init(
+        userDef: self,
+        shortTitle: "i18n:UserDef.kUseJKtoMoveCompositorCursorInCandidateState.shortTitle",
+        description: "i18n:UserDef.kUseJKtoMoveCompositorCursorInCandidateState.description"
       )
     case .kUseDynamicCandidateWindowOrigin: return .init(
         userDef: self, shortTitle: "Adjust candidate window location according to current node length"

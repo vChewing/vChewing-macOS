@@ -29,6 +29,7 @@ extension InputHandler {
     guard state.isCandidateContainer else { return false } // 會自動判斷「isEmpty」。
     guard ctlCandidate.visible else { return false }
     let inputText = ignoringModifiers ? (input.inputTextIgnoringModifiers ?? input.text) : input.text
+    let allowMovingCompositorCursor = state.type == .ofCandidates && !prefs.useSCPCTypingMode
 
     // MARK: 選字窗內使用熱鍵升權、降權、刪詞。
 
@@ -151,7 +152,7 @@ extension InputHandler {
         return true
       case .kUpArrow, .kDownArrow, .kLeftArrow, .kRightArrow:
         switch input.commonKeyModifierFlags {
-        case [.option, .shift] where input.isCursorForward:
+        case [.option, .shift] where allowMovingCompositorCursor && input.isCursorForward:
           if compositor.cursor < compositor.length {
             compositor.cursor += 1
             if isCursorCuttingChar() { compositor.jumpCursorBySpan(to: .front) }
@@ -160,7 +161,7 @@ extension InputHandler {
             delegate.callError("D3006C85")
           }
           return true
-        case [.option, .shift] where input.isCursorBackward:
+        case [.option, .shift] where allowMovingCompositorCursor && input.isCursorBackward:
           if compositor.cursor > 0 {
             compositor.cursor -= 1
             if isCursorCuttingChar() { compositor.jumpCursorBySpan(to: .rear) }
@@ -214,21 +215,54 @@ extension InputHandler {
       }
     }
 
+    // MARK: J / K 鍵組字區的游標移動行為處理
+
+    let allowMovingCompositorCursorByJK = allowMovingCompositorCursor && prefs.useJKtoMoveCompositorCursorInCandidateState
+
+    checkMovingCompositorCursorByJK: if allowMovingCompositorCursorByJK {
+      guard input.keyModifierFlags.isEmpty else { break checkMovingCompositorCursorByJK }
+      // keycode: 38 = J, 40 = K.
+      switch input.keyCode {
+      case 38:
+        if compositor.cursor > 0 {
+          compositor.cursor -= 1
+          if isCursorCuttingChar() { compositor.jumpCursorBySpan(to: .rear) }
+          delegate.switchState(generateStateOfCandidates())
+        } else {
+          delegate.callError("6F389AE9")
+        }
+        return true
+      case 40:
+        if compositor.cursor < compositor.length {
+          compositor.cursor += 1
+          if isCursorCuttingChar() { compositor.jumpCursorBySpan(to: .front) }
+          delegate.switchState(generateStateOfCandidates())
+        } else {
+          delegate.callError("EDBD27F2")
+        }
+        return true
+      default: break checkMovingCompositorCursorByJK
+      }
+    }
+
     // MARK: 關聯詞語處理 (Associated Phrases) 以及標準選字處理
 
     if state.type == .ofAssociates, !input.isShiftHold { return false }
 
     var index: Int?
     var shaltShiftHold = [.ofAssociates].contains(state.type)
-    if [.ofInputting].contains(state.type) {
+    if state.type == .ofInputting {
       let cassetteShift = currentLM.areCassetteCandidateKeysShiftHeld
       shaltShiftHold = shaltShiftHold || cassetteShift
     }
-    let matched: String = shaltShiftHold ? input.inputTextIgnoringModifiers ?? "" : inputText
-    checkSelectionKey: for keyPair in delegate.selectionKeys.enumerated() {
-      guard matched.lowercased() == keyPair.element.lowercased() else { continue }
-      index = Int(keyPair.offset)
-      break checkSelectionKey
+    let matched: String = (shaltShiftHold ? input.inputTextIgnoringModifiers ?? "" : inputText).lowercased()
+    // 如果允許 J / K 鍵前後移動組字區游標的話，則不再將 J / K 鍵盤視為選字鍵。
+    if !(prefs.useJKtoMoveCompositorCursorInCandidateState && "jk".contains(matched)) {
+      checkSelectionKey: for keyPair in delegate.selectionKeys.enumerated() {
+        guard matched == keyPair.element.lowercased() else { continue }
+        index = Int(keyPair.offset)
+        break checkSelectionKey
+      }
     }
 
     // 標準選字處理

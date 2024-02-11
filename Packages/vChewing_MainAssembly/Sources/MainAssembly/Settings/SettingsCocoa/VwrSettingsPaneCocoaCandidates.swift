@@ -28,13 +28,6 @@ public extension SettingsPanesCocoa {
         NSTabView.build {
           NSTabView.TabPage(title: "Ａ") {
             NSStackView.buildSection(width: contentWidth) {
-              UserDef.kCandidateKeys.render { renderable in
-                renderable.currentControl?.target = self
-                renderable.currentControl?.action = #selector(self.candidateKeysDidSet(_:))
-                renderable.currentControl?.alignment = .right
-              }
-            }?.boxed()
-            NSStackView.buildSection(width: contentWidth) {
               UserDef.kUseHorizontalCandidateList.render(fixWidth: contentWidth)
               UserDef.kCandidateListTextSize.render { renderable in
                 renderable.currentControl?.target = self
@@ -48,11 +41,22 @@ public extension SettingsPanesCocoa {
           }
           NSTabView.TabPage(title: "Ｂ") {
             NSStackView.buildSection(width: contentWidth) {
+              UserDef.kCandidateKeys.render { renderable in
+                renderable.currentControl?.target = self
+                renderable.currentControl?.action = #selector(self.candidateKeysDidSet(_:))
+                renderable.currentControl?.alignment = .right
+              }
+            }?.boxed()
+            NSStackView.buildSection(width: contentWidth) {
               UserDef.kUseRearCursorMode.render(fixWidth: contentWidth)
               UserDef.kMoveCursorAfterSelectingCandidate.render(fixWidth: contentWidth)
               UserDef.kUseDynamicCandidateWindowOrigin.render(fixWidth: contentWidth)
               UserDef.kDodgeInvalidEdgeCandidateCursorPosition.render(fixWidth: contentWidth)
+              UserDef.kUseJKtoMoveCompositorCursorInCandidateState.render(fixWidth: contentWidth)
             }?.boxed()
+            NSView()
+          }
+          NSTabView.TabPage(title: "Ｃ") {
             NSStackView.buildSection(width: contentWidth) {
               UserDef.kShowReverseLookupInCandidateUI.render(fixWidth: contentWidth)
               UserDef.kUseFixedCandidateOrderOnSelection.render(fixWidth: contentWidth)
