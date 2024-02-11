@@ -17,37 +17,29 @@ extension InputHandler {
   /// - Parameter input: 輸入訊號。
   /// - Returns: 告知 IMK「該按鍵是否已經被輸入法攔截處理」。
   func handleComposition(input: InputSignalProtocol) -> Bool? {
-    guard let delegate = delegate else { return nil }
     // 不處理任何包含不可列印字元的訊號。
-    guard !input.text.isEmpty, input.charCode.isPrintable else { return nil }
-    if isCodePointInputMode { return handleCodePointComposition(input: input) }
-    if prefs.cassetteEnabled {
-      // 準備處理 `%quick` 選字行為。
-      var handleQuickCandidate = true
-      if currentLM.areCassetteCandidateKeysShiftHeld { handleQuickCandidate = input.isShiftHold }
-      let hasQuickCandidates: Bool = delegate.state.type == .ofInputting && delegate.state.isCandidateContainer
-
-      // 處理 `%symboldef` 選字行為。
-      if handleCassetteSymbolTable(input: input) {
-        return true
-      } else if hasQuickCandidates, input.text != currentLM.cassetteWildcardKey {
-        // 處理 `%quick` 選字行為（當且僅當與 `%symboldef` 衝突的情況下）。
-        guard !(handleQuickCandidate && handleCandidate(input: input, ignoringModifiers: true)) else { return true }
-      } else {
-        // 處理 `%quick` 選字行為。
-        guard !(hasQuickCandidates && handleQuickCandidate && handleCandidate(input: input)) else { return true }
-      }
+    let hardRequirementMet = !input.text.isEmpty && input.charCode.isPrintable
+    switch currentTypingMethod {
+    case .codePoint where hardRequirementMet:
+      return handleCodePointComposition(input: input)
+    case .haninKeyboardSymbol where [[], .shift].contains(input.keyModifierFlags):
+      return handleHaninKeyboardSymbolModeInput(input: input)
+    case .vChewingFactory where hardRequirementMet && prefs.cassetteEnabled:
       return handleCassetteComposition(input: input)
+    case .vChewingFactory where hardRequirementMet && !prefs.cassetteEnabled:
+      return handlePhonabetComposition(input: input)
+    default: return nil
     }
-    return handlePhonabetComposition(input: input)
   }
+}
 
-  // MARK: 注音按鍵輸入處理 (Handle BPMF Keys)
+// MARK: - 注音按鍵輸入處理 (Handle BPMF Keys)
 
+private extension InputHandler {
   /// 用來處理 InputHandler.HandleInput() 當中的與注音输入有關的組字行為。
   /// - Parameter input: 輸入訊號。
   /// - Returns: 告知 IMK「該按鍵是否已經被輸入法攔截處理」。
-  private func handlePhonabetComposition(input: InputSignalProtocol) -> Bool? {
+  func handlePhonabetComposition(input: InputSignalProtocol) -> Bool? {
     guard let delegate = delegate else { return nil }
     var inputText = (input.inputTextIgnoringModifiers ?? input.text)
     inputText = inputText.lowercased().applyingTransformFW2HW(reverse: false)
@@ -241,13 +233,31 @@ extension InputHandler {
 
 // MARK: - 磁帶模式的組字支援。
 
-extension InputHandler {
-  /// 用來處理 InputHandler.HandleInput() 當中的與磁帶模組有關的組字行為。
+private extension InputHandler {
+  /// 用來處理 InputHandler.HandleInput() 當中的與磁帶模組有關的組字行為。（前置處理）
   /// - Parameter input: 輸入訊號。
   /// - Returns: 告知 IMK「該按鍵是否已經被輸入法攔截處理」。
-  private func handleCassetteComposition(input: InputSignalProtocol) -> Bool? {
+  func handleCassetteComposition(input: InputSignalProtocol) -> Bool? {
     guard let delegate = delegate else { return nil }
     let state = delegate.state
+
+    // 準備處理 `%quick` 選字行為。
+    var handleQuickCandidate = true
+    if currentLM.areCassetteCandidateKeysShiftHeld { handleQuickCandidate = input.isShiftHold }
+    let hasQuickCandidates: Bool = state.type == .ofInputting && state.isCandidateContainer
+
+    // 處理 `%symboldef` 選字行為。
+    if handleCassetteSymbolTable(input: input) {
+      return true
+    } else if hasQuickCandidates, input.text != currentLM.cassetteWildcardKey {
+      // 處理 `%quick` 選字行為（當且僅當與 `%symboldef` 衝突的情況下）。
+      guard !(handleQuickCandidate && handleCandidate(input: input, ignoringModifiers: true)) else { return true }
+    } else {
+      // 處理 `%quick` 選字行為。
+      guard !(hasQuickCandidates && handleQuickCandidate && handleCandidate(input: input)) else { return true }
+    }
+
+    // 正式處理。
     var wildcardKey: String { currentLM.cassetteWildcardKey } // 花牌鍵。
     let inputText = input.text
     let isWildcardKeyInput: Bool = (inputText == wildcardKey && !wildcardKey.isEmpty)
@@ -266,7 +276,7 @@ extension InputHandler {
       calligrapher.count >= currentLM.maxCassetteKeyLength || isLongestPossibleKeyFormed
     }
 
-    prehandling: if !skipStrokeHandling && currentLM.isThisCassetteKeyAllowed(key: inputText) {
+  prehandling: if !skipStrokeHandling && currentLM.isThisCassetteKeyAllowed(key: inputText) {
       if calligrapher.isEmpty, isWildcardKeyInput {
         delegate.callError("3606B9C0")
         if input.beganWithLetter {
@@ -385,16 +395,17 @@ extension InputHandler {
       // 將「這個按鍵訊號已經被輸入法攔截處理了」的結果藉由 SessionCtl 回報給 IMK。
       return true
     }
-
     return nil
   }
+}
 
-  // MARK: 內碼區位輸入處理 (Handle Code Point Input)
+// MARK: - 內碼區位輸入處理 (Handle Code Point Input)
 
+private extension InputHandler {
   /// 用來處理 InputHandler.HandleInput() 當中的與內碼區位輸入有關的組字行為。
   /// - Parameter input: 輸入訊號。
   /// - Returns: 告知 IMK「該按鍵是否已經被輸入法攔截處理」。
-  private func handleCodePointComposition(input: InputSignalProtocol) -> Bool? {
+  func handleCodePointComposition(input: InputSignalProtocol) -> Bool? {
     guard !input.isReservedKey else { return nil }
     guard let delegate = delegate, input.text.count == 1 else { return nil }
     guard !input.text.compactMap(\.hexDigitValue).isEmpty else {
@@ -407,7 +418,7 @@ extension InputHandler {
         strCodePointBuffer.append(input.text)
         var updatedState = generateStateOfInputting(guarded: true)
         updatedState.tooltipDuration = 0
-        updatedState.tooltip = tooltipCodePointInputMode
+        updatedState.tooltip = TypingMethod.codePoint.getTooltip(vertical: delegate.isVerticalTyping)
         delegate.switchState(updatedState)
         return true
       }
@@ -427,7 +438,7 @@ extension InputHandler {
         updatedState.tooltipDuration = 0
         updatedState.tooltip = "Invalid Code Point.".localized
         delegate.switchState(updatedState)
-        isCodePointInputMode = true
+        currentTypingMethod = .codePoint
         return true
       }
       // 某些舊版 macOS 會在這裡生成的字元後面插入垃圾字元。這裡只保留起始字元。
@@ -435,14 +446,46 @@ extension InputHandler {
       delegate.switchState(IMEState.ofCommitting(textToCommit: char))
       var updatedState = generateStateOfInputting(guarded: true)
       updatedState.tooltipDuration = 0
-      updatedState.tooltip = tooltipCodePointInputMode
+      updatedState.tooltip = TypingMethod.codePoint.getTooltip(vertical: delegate.isVerticalTyping)
       delegate.switchState(updatedState)
-      isCodePointInputMode = true
+      currentTypingMethod = .codePoint
       return true
     default:
       delegate.switchState(generateStateOfInputting())
-      isCodePointInputMode = true
+      currentTypingMethod = .codePoint
       return true
     }
+  }
+}
+
+// MARK: - 處理漢音鍵盤符號輸入狀態（Handle Hanin Keyboard Symbol Inputs）
+
+private extension InputHandler {
+  /// 處理漢音鍵盤符號輸入。
+  /// - Parameters:
+  ///   - input: 輸入按鍵訊號。
+  /// - Returns: 將按鍵行為「是否有處理掉」藉由 SessionCtl 回報給 IMK。
+  func handleHaninKeyboardSymbolModeInput(input: InputSignalProtocol) -> Bool {
+    guard let delegate = delegate, delegate.state.type != .ofDeactivated else { return false }
+    let charText = input.text.lowercased().applyingTransformFW2HW(reverse: false)
+    guard CandidateNode.mapHaninKeyboardSymbols.keys.contains(charText) else {
+      return revolveTypingMethod(to: .vChewingFactory)
+    }
+    guard
+      charText.count == 1, let symbols = CandidateNode.queryHaninKeyboardSymbols(char: charText)
+    else {
+      delegate.callError("C1A760C7")
+      return true
+    }
+    // 得在這裡先 commit buffer，不然會導致「在摁 ESC 離開符號選單時會重複輸入上一次的組字區的內容」的不當行為。
+    let textToCommit = generateStateOfInputting(sansReading: true).displayedText
+    delegate.switchState(IMEState.ofCommitting(textToCommit: textToCommit))
+    if symbols.members.count == 1 {
+      delegate.switchState(IMEState.ofCommitting(textToCommit: symbols.members.map(\.name).joined()))
+    } else {
+      delegate.switchState(IMEState.ofSymbolTable(node: symbols))
+    }
+    currentTypingMethod = .vChewingFactory // 用完就關掉，但保持選字窗開啟，所以這裡不用呼叫 toggle 函式。
+    return true
   }
 }

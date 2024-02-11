@@ -27,17 +27,18 @@ extension InputHandler {
     if isConsideredEmptyForNow, !guarded { return IMEState.ofAbortion() }
     restoreBackupCursor() // 只要叫了 Inputting 狀態，就盡可能還原游標備份。
     var segHighlightedAt: Int?
-    let cpInput = isCodePointInputMode && !sansReading
+    let handleAsCodePointInput = currentTypingMethod == .codePoint && !sansReading
     /// 「更新內文組字區 (Update the composing buffer)」是指要求客體軟體將組字緩衝區的內容
     /// 換成由此處重新生成的原始資料在 IMEStateData 當中生成的 NSAttributeString。
-    var displayTextSegments: [String] = cpInput
+    var displayTextSegments: [String] = handleAsCodePointInput
       ? [strCodePointBuffer]
       : compositor.walkedNodes.values
-    var cursor = cpInput
+    var cursor = handleAsCodePointInput
       ? displayTextSegments.joined().count
       : convertCursorForDisplay(compositor.cursor)
     let cursorSansReading = cursor
-    let reading: String = (sansReading || isCodePointInputMode) ? "" : readingForDisplay // 先提出來，減輕運算負擔。
+    // 先提出來讀音資料，減輕運算負擔。
+    let reading: String = (sansReading || currentTypingMethod == .codePoint) ? "" : readingForDisplay
     if !reading.isEmpty {
       var newDisplayTextSegments = [String]()
       var temporaryNode = ""
@@ -361,8 +362,9 @@ extension InputHandler {
     guard let delegate = delegate else { return false }
     let state = delegate.state
 
-    if isHaninKeyboardSymbolMode { return handleHaninKeyboardSymbolModeToggle() }
-    if isCodePointInputMode { return handleCodePointInputToggle() }
+    guard currentTypingMethod == .vChewingFactory else {
+      return revolveTypingMethod(to: .vChewingFactory)
+    }
 
     guard state.type == .ofInputting else { return false }
 
@@ -470,31 +472,28 @@ extension InputHandler {
     guard let delegate = delegate else { return false }
     let state = delegate.state
     guard state.type == .ofInputting else {
-      isCodePointInputMode = false
+      currentTypingMethod = .vChewingFactory
       return false
     }
 
-    if isCodePointInputMode {
+    if currentTypingMethod == .codePoint {
       if !strCodePointBuffer.isEmpty {
         func refreshState() {
           var updatedState = generateStateOfInputting(guarded: true)
           updatedState.tooltipDuration = 0
-          updatedState.tooltip = tooltipCodePointInputMode
+          updatedState.tooltip = delegate.state.tooltip
           delegate.switchState(updatedState)
         }
         strCodePointBuffer = strCodePointBuffer.dropLast(1).description
         if input.commonKeyModifierFlags == .option {
-          strCodePointBuffer.removeAll()
-          refreshState()
-          isCodePointInputMode = true
-          return true
+          return revolveTypingMethod(to: .codePoint)
         }
         if !strCodePointBuffer.isEmpty {
           refreshState()
           return true
         }
       }
-      return handleCodePointInputToggle()
+      return revolveTypingMethod(to: .vChewingFactory)
     }
 
     // 引入 macOS 內建注音輸入法的行為，允許用 Shift+BackSpace 解構前一個漢字的讀音。
@@ -575,8 +574,9 @@ extension InputHandler {
     guard let delegate = delegate else { return false }
     let state = delegate.state
 
-    if isHaninKeyboardSymbolMode { return handleHaninKeyboardSymbolModeToggle() }
-    if isCodePointInputMode { return handleCodePointInputToggle() }
+    guard currentTypingMethod == .vChewingFactory else {
+      return revolveTypingMethod(to: .vChewingFactory)
+    }
 
     guard state.type == .ofInputting else { return false }
 
@@ -684,8 +684,9 @@ extension InputHandler {
     guard let delegate = delegate else { return false }
     let state = delegate.state
 
-    if isHaninKeyboardSymbolMode { return handleHaninKeyboardSymbolModeToggle() }
-    if isCodePointInputMode { return handleCodePointInputToggle() }
+    guard currentTypingMethod == .vChewingFactory else {
+      return revolveTypingMethod(to: .vChewingFactory)
+    }
 
     guard state.type == .ofInputting else { return false }
 
@@ -917,73 +918,6 @@ extension InputHandler {
     vCLog(newState.tooltip)
     newState.tooltipDuration = 0
     delegate.switchState(newState)
-    return true
-  }
-
-  // MARK: - 處理內碼區位輸入狀態的啟動過程（CodePoint Input Toggle）
-
-  @discardableResult func handleCodePointInputToggle() -> Bool {
-    guard let delegate = delegate, delegate.state.type != .ofDeactivated else { return false }
-    if isCodePointInputMode {
-      isCodePointInputMode = false
-      delegate.switchState(IMEState.ofAbortion())
-      return true
-    }
-    var updatedState = generateStateOfInputting(sansReading: true)
-    delegate.switchState(IMEState.ofCommitting(textToCommit: updatedState.displayedText))
-    updatedState = generateStateOfInputting(guarded: true)
-    updatedState.tooltipDuration = 0
-    updatedState.tooltip = tooltipCodePointInputMode
-    delegate.switchState(updatedState)
-    isCodePointInputMode = true
-    return true
-  }
-
-  // MARK: - 處理漢音鍵盤符號輸入狀態的啟動過程（Hanin Pallete）
-
-  @discardableResult func handleHaninKeyboardSymbolModeToggle() -> Bool {
-    guard let delegate = delegate, delegate.state.type != .ofDeactivated else { return false }
-    if isCodePointInputMode { isCodePointInputMode = false }
-    if isHaninKeyboardSymbolMode {
-      isHaninKeyboardSymbolMode = false
-      delegate.switchState(IMEState.ofAbortion())
-      return true
-    }
-    var updatedState = generateStateOfInputting(sansReading: true)
-    delegate.switchState(IMEState.ofCommitting(textToCommit: updatedState.displayedText))
-    updatedState = generateStateOfInputting(guarded: true)
-    updatedState.tooltipDuration = 0
-    updatedState.tooltip = Self.tooltipHaninKeyboardSymbolMode
-    delegate.switchState(updatedState)
-    isHaninKeyboardSymbolMode = true
-    return true
-  }
-
-  /// 處理漢音鍵盤符號輸入。
-  /// - Parameters:
-  ///   - input: 輸入按鍵訊號。
-  /// - Returns: 將按鍵行為「是否有處理掉」藉由 SessionCtl 回報給 IMK。
-  func handleHaninKeyboardSymbolModeInput(input: InputSignalProtocol) -> Bool {
-    guard let delegate = delegate, delegate.state.type != .ofDeactivated else { return false }
-    let charText = input.text.lowercased().applyingTransformFW2HW(reverse: false)
-    guard CandidateNode.mapHaninKeyboardSymbols.keys.contains(charText) else {
-      return handleHaninKeyboardSymbolModeToggle()
-    }
-    guard
-      charText.count == 1, let symbols = CandidateNode.queryHaninKeyboardSymbols(char: charText)
-    else {
-      delegate.callError("C1A760C7")
-      return true
-    }
-    // 得在這裡先 commit buffer，不然會導致「在摁 ESC 離開符號選單時會重複輸入上一次的組字區的內容」的不當行為。
-    let textToCommit = generateStateOfInputting(sansReading: true).displayedText
-    delegate.switchState(IMEState.ofCommitting(textToCommit: textToCommit))
-    if symbols.members.count == 1 {
-      delegate.switchState(IMEState.ofCommitting(textToCommit: symbols.members.map(\.name).joined()))
-    } else {
-      delegate.switchState(IMEState.ofSymbolTable(node: symbols))
-    }
-    isHaninKeyboardSymbolMode = false // 用完就關掉，但保持選字窗開啟，所以這裡不用呼叫 toggle 函式。
     return true
   }
 

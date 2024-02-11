@@ -311,7 +311,8 @@ extension InputHandler {
         if !updated { delegate.callError("66F3477B") }
         return true
       case .option where state.type == .ofSymbolTable:
-        return handleHaninKeyboardSymbolModeToggle()
+        // 繞過內碼輸入模式，直接進入漢音鍵盤符號模式。
+        return revolveTypingMethod(to: .haninKeyboardSymbol)
       default: break
       }
     }
