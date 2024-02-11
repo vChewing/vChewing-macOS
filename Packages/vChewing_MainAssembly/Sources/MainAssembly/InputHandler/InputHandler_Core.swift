@@ -22,7 +22,6 @@ public protocol InputHandlerProtocol {
   var currentLM: vChewingLM.LMInstantiator { get set }
   var currentUOM: vChewingLM.LMUserOverride { get set }
   var delegate: InputHandlerDelegate? { get set }
-  var composer: Tekkon.Composer { get set }
   var keySeparator: String { get }
   static var keySeparator: String { get }
   var isCompositorEmpty: Bool { get }
@@ -89,13 +88,17 @@ public class InputHandler: InputHandlerProtocol {
 
   /// 用來記錄「叫出選字窗前」的游標位置的變數。
   var backupCursor: Int?
+  /// 當前的打字模式。
+  var currentTypingMethod: TypingMethod = .vChewingFactory
 
   /// 半衰模組的衰減指數
   let kEpsilon: Double = 0.000_001
 
-  public var calligrapher = "" // 磁帶專用組筆區
-  public var composer: Tekkon.Composer = .init() // 注拼槽
-  public var compositor: Megrez.Compositor // 組字器
+  var strCodePointBuffer = "" // 內碼輸入專用組碼區
+  var calligrapher = "" // 磁帶專用組筆區
+  var composer: Tekkon.Composer = .init() // 注拼槽
+  var compositor: Megrez.Compositor // 組字器
+
   public var currentUOM: vChewingLM.LMUserOverride
   public var currentLM: vChewingLM.LMInstantiator {
     didSet {
@@ -120,43 +123,13 @@ public class InputHandler: InputHandlerProtocol {
   public func clear() {
     clearComposerAndCalligrapher()
     compositor.clear()
-    isCodePointInputMode = false
-    isHaninKeyboardSymbolMode = false
+    currentTypingMethod = .vChewingFactory
     backupCursor = nil
   }
 
   /// 警告：該參數僅代指組音區/組筆區域與組字區在目前狀態下被視為「空」。
   var isConsideredEmptyForNow: Bool {
-    compositor.isEmpty && isComposerOrCalligrapherEmpty && !isCodePointInputMode && !isHaninKeyboardSymbolMode
-  }
-
-  // MARK: - Hanin Keyboard Symbol Mode.
-
-  var isHaninKeyboardSymbolMode = false
-
-  static let tooltipHaninKeyboardSymbolMode: String = "\("Hanin Keyboard Symbol Input.".localized)"
-
-  // MARK: - Codepoint Input Buffer.
-
-  var isCodePointInputMode = false {
-    willSet {
-      strCodePointBuffer.removeAll()
-    }
-  }
-
-  var strCodePointBuffer = ""
-
-  var tooltipCodePointInputMode: String {
-    let commonTerm = NSMutableString()
-    commonTerm.insert("Code Point Input.".localized, at: 0)
-    if !(delegate?.isVerticalTyping ?? false) {
-      switch IMEApp.currentInputMode {
-      case .imeModeCHS: commonTerm.insert("[GB] ", at: 0)
-      case .imeModeCHT: commonTerm.insert("[Big5] ", at: 0)
-      default: break
-      }
-    }
-    return commonTerm.description
+    compositor.isEmpty && isComposerOrCalligrapherEmpty && currentTypingMethod == .vChewingFactory
   }
 
   // MARK: - Functions dealing with Megrez.

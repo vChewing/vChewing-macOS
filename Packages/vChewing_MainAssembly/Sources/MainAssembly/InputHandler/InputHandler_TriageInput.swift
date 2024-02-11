@@ -48,7 +48,7 @@ public extension InputHandler {
       case .kCarriageReturn, .kLineFeed:
         let frontNode = compositor.walkedNodes.last
         return handleEnter(input: input) {
-          guard !self.isHaninKeyboardSymbolMode, !self.isCodePointInputMode else { return [] }
+          guard self.currentTypingMethod == .vChewingFactory else { return [] }
           guard let frontNode = frontNode else { return [] }
           let pair = Megrez.KeyValuePaired(keyArray: frontNode.keyArray, value: frontNode.value)
           let associates = self.generateArrayOfAssociates(withPair: pair)
@@ -62,13 +62,7 @@ public extension InputHandler {
         case [.option, .shift]:
           return handlePunctuationList(alternative: true, isJIS: isJIS)
         case .option:
-          switch (isCodePointInputMode, isHaninKeyboardSymbolMode) {
-          case (false, false): return handleCodePointInputToggle()
-          case (true, false), (false, true):
-            return handleHaninKeyboardSymbolModeToggle()
-          default: break
-          }
-          return true
+          return revolveTypingMethod()
         default: break
         }
       case .kSpace:
@@ -85,7 +79,7 @@ public extension InputHandler {
           if input.isShiftHold, !input.isControlHold, !input.isOptionHold {
             return revolveCandidate(reverseOrder: input.isCommandHold)
           }
-          if isCodePointInputMode {
+          if currentTypingMethod == .codePoint {
             delegate.callError("FDD88EDB")
             delegate.switchState(IMEState.ofAbortion())
             return true
@@ -148,13 +142,11 @@ public extension InputHandler {
         guard let x = input.inputTextIgnoringModifiers,
               "¥\\".contains(x), input.keyModifierFlags.isEmpty
         else { break haninSymbolInput }
-        return handleHaninKeyboardSymbolModeToggle()
+        return revolveTypingMethod(to: .haninKeyboardSymbol)
       }
 
-      // 注音按鍵輸入與漢音鍵盤符號輸入處理。
-      if isHaninKeyboardSymbolMode, [[], .shift].contains(input.keyModifierFlags) {
-        return handleHaninKeyboardSymbolModeInput(input: input)
-      } else if let compositionHandled = handleComposition(input: input) {
+      // 注音/磁帶按鍵輸入與漢音鍵盤符號輸入處理。
+      if let compositionHandled = handleComposition(input: input) {
         return compositionHandled
       }
 
