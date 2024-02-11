@@ -103,6 +103,9 @@ import SwiftExtension
   @AppProperty(key: UserDef.kUseRearCursorMode.rawValue, defaultValue: false)
   public dynamic var useRearCursorMode: Bool
 
+  @AppProperty(key: UserDef.kUseJKtoMoveCompositorCursorInCandidateState.rawValue, defaultValue: false)
+  public var useJKtoMoveCompositorCursorInCandidateState: Bool
+
   @AppProperty(key: UserDef.kMoveCursorAfterSelectingCandidate.rawValue, defaultValue: true)
   public dynamic var moveCursorAfterSelectingCandidate: Bool
 
