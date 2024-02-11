@@ -52,7 +52,11 @@ public extension SettingsPanesCocoa {
               UserDef.kMoveCursorAfterSelectingCandidate.render(fixWidth: contentWidth)
               UserDef.kUseDynamicCandidateWindowOrigin.render(fixWidth: contentWidth)
               UserDef.kDodgeInvalidEdgeCandidateCursorPosition.render(fixWidth: contentWidth)
-              UserDef.kUseJKtoMoveCompositorCursorInCandidateState.render(fixWidth: contentWidth)
+              UserDef.kUseJKtoMoveCompositorCursorInCandidateState
+                .render(fixWidth: contentWidth) { renderable in
+                  renderable.currentControl?.target = self
+                  renderable.currentControl?.action = #selector(self.useJKToMoveBufferCursorDidSet(_:))
+                }
             }?.boxed()
             NSView()
           }
@@ -84,12 +88,17 @@ public extension SettingsPanesCocoa {
       window.callAlert(title: title.localized, text: explanation.localized)
     }
 
+    @IBAction func useJKToMoveBufferCursorDidSet(_: NSControl) {
+      // 利用該變數的 didSet 屬性自糾。
+      PrefMgr.shared.candidateKeys = PrefMgr.shared.candidateKeys
+    }
+
     @IBAction func candidateKeysDidSet(_ sender: NSComboBox) {
       let keys = sender.stringValue.trimmingCharacters(
         in: .whitespacesAndNewlines
       ).lowercased().deduplicated
       // Start Error Handling.
-      guard let errorResult = CandidateKey.validate(keys: keys) else {
+      guard let errorResult = PrefMgr.shared.validate(candidateKeys: keys) else {
         PrefMgr.shared.candidateKeys = keys
         return
       }

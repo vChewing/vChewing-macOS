@@ -193,6 +193,8 @@ public extension vChewingLM.LMCassette {
           }
         }
         // Post process.
+        // 備註：因為 Package 層級嵌套的現狀，此處不太方便檢查是否需要篩掉 J / K 鍵。
+        // 因此只能在其他地方做篩檢。
         if CandidateKey.validate(keys: selectionKeys) != nil { selectionKeys = "1234567890" }
         if !keysUsedInCharDef.intersection(selectionKeys.map(\.description)).isEmpty {
           areCandidateKeysShiftHeld = true
