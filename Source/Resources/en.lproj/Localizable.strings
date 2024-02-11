@@ -223,6 +223,8 @@
 "i18n:userdef.kRespectClientAccentColor.shortTitle" = "Respect accent colors of the client app and the system";
 "i18n:UserDef.kShiftEisuToggleOffTogetherWithCapsLock.description" = "This does: 1) On macOS 12 and later, if the Caps Lock gets turned off, then the internal switch for Shift-key / JIS-Eisu-key Alphanumerical Mode Toggle will also be switched off. 2) If you have turned off the same switch by JIS-Eisu key, then the Caps Lock gets turned off together. Note: vChewing has no way to recognize single hits of Shift key when Caps Lock is on.";
 "i18n:UserDef.kShiftEisuToggleOffTogetherWithCapsLock.shortTitle" = "Sync the off state between Caps Lock and Shift / Eisu Alphanumerical Toggle";
+"i18n:UserDef.kUseJKtoMoveCompositorCursorInCandidateState.description" = "⚠︎ This will automatically prevent J and K from being used as candidate keys. Also, this won't work with ‘%quick’ candidates in cassette mode.";
+"i18n:UserDef.kUseJKtoMoveCompositorCursorInCandidateState.shortTitle" = "Use J / K to Move Buffer Cursor While Choosing Candidates";
 "IBM" = "IBM";
 "If disabled, this will insert space instead." = "If disabled, this will insert space instead.";
 "If not filling the weight, it will be 0.0, the maximum one. An ideal weight situates in [-9.5, 0], making itself can be captured by the walking algorithm. The exception is -114.514, the disciplinary weight. The walking algorithm will ignore it unless it is the unique result." = "If not filling the weight, it will be 0.0, the maximum one. An ideal weight situates in [-9.5, 0], making itself can be captured by the walking algorithm. The exception is -114.514, the disciplinary weight. The walking algorithm will ignore it unless it is the unique result.";

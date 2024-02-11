@@ -35,6 +35,9 @@ public struct VwrSettingsPaneCandidates: View {
   @AppStorage(wrappedValue: false, UserDef.kUseRearCursorMode.rawValue)
   private var useRearCursorMode: Bool
 
+  @AppStorage(wrappedValue: false, UserDef.kUseJKtoMoveCompositorCursorInCandidateState.rawValue)
+  private var useJKtoMoveCompositorCursorInCandidateState: Bool
+
   @AppStorage(wrappedValue: true, UserDef.kMoveCursorAfterSelectingCandidate.rawValue)
   private var moveCursorAfterSelectingCandidate: Bool
 
@@ -66,6 +69,7 @@ public struct VwrSettingsPaneCandidates: View {
               .disabled(useRearCursorMode)
           }
           UserDef.kDodgeInvalidEdgeCandidateCursorPosition.bind($dodgeInvalidEdgeCandidateCursorPosition).render()
+          UserDef.kUseJKtoMoveCompositorCursorInCandidateState.bind($useJKtoMoveCompositorCursorInCandidateState).render()
         }
         Section {
           VwrSettingsPaneCandidates_SelectionKeys()
