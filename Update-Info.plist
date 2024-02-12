@@ -5,7 +5,7 @@
 	<key>CFBundleShortVersionString</key>
 	<string>3.8.0</string>
 	<key>CFBundleVersion</key>
-	<string>3800</string>
+	<string>3801</string>
 	<key>IsMainStreamDistro</key>
 	<true/>
 	<key>UpdateInfoEndpoint</key>
