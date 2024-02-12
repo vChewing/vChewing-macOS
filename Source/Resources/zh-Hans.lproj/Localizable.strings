@@ -153,7 +153,7 @@
 "Emulating select-candidate-per-character mode" = "模拟 90 年代前期注音逐字选字输入风格";
 "en" = "英文";
 "Enable cassette mode, suppressing phonabet input" = "启用磁带模式，会停用注音输入";
-"Enable CNS11643 Support (2024-01-15)" = "启用 CNS11643 全字库支援 (2024-01-15)";
+"i18n:UserDef.kCNS11643Enabled.shortTitle" = "启用 CNS11643 全字库支援 (2024-01-23)";
 "Enable experimental Swift UI typesetting method" = "使用 Swift UI 介面排版方法";
 "Enable mouse wheel support for Tadokoro Candidate Window" = "启用田所选字窗的滑鼠滚动支援";
 "Enable phrase replacement table" = "启用语汇置换表";
