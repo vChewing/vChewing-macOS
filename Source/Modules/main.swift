@@ -12,10 +12,12 @@ import InputMethodKit
 import MainAssembly
 import Uninstaller
 
-switch max(CommandLine.arguments.count - 1, 0) {
+let cmdParameters = CommandLine.arguments.dropFirst(1)
+
+switch cmdParameters.count {
 case 0: break
-case 1, 2:
-  switch CommandLine.arguments[1] {
+case 1:
+  switch cmdParameters.first?.lowercased() {
   case "--dump-prefs":
     if let strDumpedPrefs = PrefMgr.shared.dumpShellScriptBackup() {
       print(strDumpedPrefs)
@@ -26,12 +28,36 @@ case 1, 2:
     exit(exitCode)
   case "uninstall":
     let exitCode = Uninstaller.uninstall(
-      isSudo: NSApplication.isSudoMode, defaultDataFolderPath: LMMgr.dataFolderPath(isDefaultFolder: true)
+      defaultDataFolderPath: LMMgr.dataFolderPath(isDefaultFolder: true),
+      removeAll: false
     )
     exit(exitCode)
   default: break
   }
   exit(0)
+case 2:
+  switch cmdParameters.first?.lowercased() {
+  case "uninstall" where cmdParameters.last?.lowercased() == "--all":
+    let exitCode = Uninstaller.uninstall(
+      defaultDataFolderPath: LMMgr.dataFolderPath(isDefaultFolder: true),
+      removeAll: true
+    )
+    exit(exitCode)
+  case "--import-kimo":
+    guard let path = cmdParameters.last else {
+      exit(1)
+    }
+    let url = URL(fileURLWithPath: path)
+    guard var rawString = try? String(contentsOf: url) else {
+      print("[Kimo Import] Given file path is either invalid or not accessible. Read access is needed for this operation.")
+      exit(1)
+    }
+    let count = LMMgr.importYahooKeyKeyUserDictionary(text: &rawString)
+    let msg = String(format: "i18n:settings.importFromKimoTxt.finishedCount:%@".localized, count.description)
+    print("[Kimo Import] \(msg)")
+    exit(0)
+  default: break
+  }
 default: exit(0)
 }
 

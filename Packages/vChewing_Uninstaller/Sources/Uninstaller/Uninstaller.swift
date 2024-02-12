@@ -13,8 +13,11 @@ public enum Uninstaller {
   // MARK: - Uninstall the input method.
 
   @discardableResult public static func uninstall(
-    isSudo: Bool = false, selfKill: Bool = true, defaultDataFolderPath: String
+    selfKill: Bool = true,
+    defaultDataFolderPath: String,
+    removeAll: Bool = false
   ) -> Int32 {
+    let isSudo = NSApplication.isSudoMode
     let realHomeDir = URL(
       fileURLWithFileSystemRepresentation: getpwuid(getuid()).pointee.pw_dir, isDirectory: true, relativeTo: nil
     )
@@ -53,9 +56,7 @@ public enum Uninstaller {
       let objFullPath = pathLibrary + pathUnitKeyboardLayouts + objPath
       if !FileManager.trashTargetIfExists(objFullPath) { return -1 }
     }
-    if CommandLine.arguments.count > 2, CommandLine.arguments[2] == "--all",
-       CommandLine.arguments[1] == "uninstall"
-    {
+    if removeAll {
       // 再處理是否需要移除放在預設使用者資料夾內的檔案的情況。
       // 如果使用者有在輸入法偏好設定內將該目錄改到別的地方（而不是用 symbol link）的話，則不處理。
       // 目前暫時無法應對 symbol link 的情況。
