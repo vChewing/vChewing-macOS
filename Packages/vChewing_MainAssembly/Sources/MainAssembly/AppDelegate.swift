@@ -136,7 +136,7 @@ public extension AppDelegate {
     let url = URL(fileURLWithPath: LMMgr.dataFolderPath(isDefaultFolder: true))
     FileOpenMethod.finder.open(url: url)
     Uninstaller.uninstall(
-      isSudo: false, selfKill: true, defaultDataFolderPath: LMMgr.dataFolderPath(isDefaultFolder: true)
+      selfKill: true, defaultDataFolderPath: LMMgr.dataFolderPath(isDefaultFolder: true)
     )
   }
 
