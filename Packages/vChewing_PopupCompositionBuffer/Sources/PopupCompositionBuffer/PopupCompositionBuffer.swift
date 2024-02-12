@@ -157,10 +157,15 @@ public class PopupCompositionBuffer: NSWindowController {
     )
 
     var cursorAttributes: [NSAttributedString.Key: Any] {
+      let shadow = NSShadow()
+      shadow.shadowBlurRadius = 4
+      shadow.shadowOffset.height = 1
+      shadow.shadowColor = .black
       var result: [NSAttributedString.Key: Any] = [
         .kern: -18,
         .font: bufferFont(),
         .foregroundColor: textColor,
+        .shadow: shadow,
       ]
       if isTypingDirectionVertical {
         result[.paragraphStyle] = verticalAttributes[.paragraphStyle]
