@@ -19,4 +19,4 @@ OS_Version=$(sw_vers -productVersion)
 ##### fi
 
 # Finally, register the input method:
-/Users/"${login_user}"/Library/Input\ Methods/"${TARGET}".app/Contents/MacOS/"${TARGET}" install --all || true
+/Users/"${login_user}"/Library/Input\ Methods/"${TARGET}".app/Contents/MacOS/"${TARGET}" install || true
