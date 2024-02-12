@@ -234,8 +234,8 @@ extension SettingsPanesCocoa.Phrases: NSTextViewDelegate, NSTextFieldDelegate {
     // 嚴重警告：NSMenu.items 在 macOS 10.13 為止的系統下是唯讀的！！
     // 往這個 property 裡面直接寫東西會導致整個視窗叫不出來！！！
     cmbPEDataTypeMenu.menu?.appendItems {
-      for neta in vChewingLM.ReplacableUserDataType.allCases {
-        NSMenu.Item(verbatim: neta.localizedDescription)?.tag(cmbPEDataTypeMenu.menu?.items.count)
+      for (tag, neta) in vChewingLM.ReplacableUserDataType.allCases.enumerated() {
+        NSMenu.Item(verbatim: neta.localizedDescription)?.tag(tag)
       }
     }
     cmbPEDataTypeMenu.select(cmbPEDataTypeMenu.menu?.items.first)
