@@ -92,7 +92,7 @@ extension CtlSettingsCocoa: NSToolbarDelegate {
   func use(view newView: NSView, animate: Bool = true) {
     guard let window = window, let existingContentView = window.contentView else { return }
     guard previousView != newView else { return }
-    newView.layoutSubtreeIfNeeded()
+    newView.layoutSubtreeIfNeeded() // 第一遍，保證 macOS 10.9 系統下的顯示正確。
     previousView = newView
     let temporaryViewOld = NSView(frame: existingContentView.frame)
     window.contentView = temporaryViewOld
@@ -101,6 +101,7 @@ extension CtlSettingsCocoa: NSToolbarDelegate {
     newWindowRect.origin.y = window.frame.maxY - newWindowRect.height
     window.setFrame(newWindowRect, display: true, animate: animate)
     window.contentView = newView
+    newView.layoutSubtreeIfNeeded() // 第二遍，保證最近幾年的這幾版系統下的顯示正確。
   }
 
   var toolbarIdentifiers: [NSToolbarItem.Identifier] {
