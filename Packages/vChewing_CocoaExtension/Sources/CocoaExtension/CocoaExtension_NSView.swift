@@ -439,3 +439,58 @@ public extension NSMenuItem {
     return self
   }
 }
+
+// MARK: - NSFileDragRetrieverButton
+
+@objcMembers public class NSFileDragRetrieverButton: NSButton {
+  public var postDragHandler: ((URL) -> Void) = { url in
+    NSSound.beep()
+    print(url.description)
+  }
+
+  var allowedTypes: [String] = ["txt"]
+
+  public init() {
+    super.init(frame: .zero)
+    bezelStyle = .rounded
+    title = "DRAG FILE TO HERE"
+    registerForDraggedTypes([.init(rawValue: kUTTypeFileURL as String)])
+    target = self
+  }
+
+  required init?(coder: NSCoder) {
+    super.init(coder: coder)
+  }
+
+  override public func draggingEntered(_ sender: NSDraggingInfo) -> NSDragOperation {
+    checkExtension(sender) ? .copy : NSDragOperation()
+  }
+
+  fileprivate func checkExtension(_ drag: NSDraggingInfo) -> Bool {
+    guard let pasteboard = drag.draggingPasteboard.propertyList(
+      forType: NSPasteboard.PasteboardType(rawValue: "NSFilenamesPboardType")
+    ) as? [String], let path = pasteboard.first else {
+      return false
+    }
+
+    let suffix = URL(fileURLWithPath: path).pathExtension
+    for ext in allowedTypes {
+      if ext.lowercased() == suffix {
+        return true
+      }
+    }
+    return false
+  }
+
+  override public func performDragOperation(_ sender: NSDraggingInfo) -> Bool {
+    guard let pasteboard = sender.draggingPasteboard.propertyList(
+      forType: NSPasteboard.PasteboardType(rawValue: "NSFilenamesPboardType")
+    ) as? [String], let path = pasteboard.first else {
+      print("failure")
+      return false
+    }
+
+    postDragHandler(URL(fileURLWithPath: path))
+    return true
+  }
+}

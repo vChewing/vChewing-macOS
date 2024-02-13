@@ -153,7 +153,6 @@
 "Emulating select-candidate-per-character mode" = "漢字１つづつ全候補選択入力モード";
 "en" = "英語";
 "Enable cassette mode, suppressing phonabet input" = "カセットモードを起用（注音入力はこのモードで使えぬ）";
-"i18n:UserDef.kCNS11643Enabled.shortTitle" = "全字庫モード // 入力可能な漢字数を倍増す (2024-01-23)";
 "Enable experimental Swift UI typesetting method" = "Swift UI 組版方法を起用する";
 "Enable mouse wheel support for Tadokoro Candidate Window" = "田所候補陳列ウィンドウのマウススクロール機能を起用";
 "Enable phrase replacement table" = "言葉置換表を起用";
@@ -196,6 +195,7 @@
 "i18n:aboutWindow.OK_BUTTON" = "うむ";
 "i18n:aboutWindow.WEBSITE_BUTTON" = "公式HP";
 "i18n:CandidateKey.ValidationError.AssignedForOtherPurposes" = "他の用途に指定したキーは言選りには使えません。";
+"i18n:kimoImportButton.DragFileToHere" = "ここにドラッグして";
 "i18n:securityAgentHelper.warningMessage.footer" = "このメッセージが出た時に、威注音がすでに「DisableSecureEventInput()」を実行してみました。これで入力ソースメニューで威注音は利用できる状態になったかもしれませんが、下記のステップはおすすめです：\n\nイ）今のこのメッセージの画面のスクリーンショットを撮って置いてください。後ほど使えます。\n\nロ）もし、今でも入力ソースメニューで威注音は利用できぬ状態でしたら、上記のプロセスを（強制）中止してください。そうすれば、それぞれのSecureEventInput状態は解消できて、入力ソースメニューで威注音はすぐ利用できることになります。\n\nハ）もし、該当プロセスは Mac App Store のアプリからのものでしたら、該当アプリを Apple 社にご通報ください。状況と必要性次第、該当アプリは Mac App Store からしばらく取り下がて、支障解決まで Mac App Store 提供中止になるかもしれません。\n\nニ）該当プロセスは Mac App Store からダウンロードしたものか否か、それぞれの開発元にこの支障をご通報ください。今のこのメッセージの画面のスクリーンショットを該当開発元に送れば、必要なる情報は該当開発元に全部お知らせすることができます。";
 "i18n:securityAgentHelper.warningMessage.header" = "威注音入力アプリ（略称「威注音」）は「他のバックグラウンド・プロセスがSecureEventInputを正しく利用していない」と検出しました。このような不正利用は「システム内蔵入力以外の全ての入力アプリがメニューで灰色状態で選べなくて使えない」の元凶です。\n\nセンシティブな資料の記入どころでSecureEventInputをEnableSecureEventInput()で使うのは当然ですが、「入力中」状態が終わった後必ずDisableSecureEventInput()で状態解消すべきだと義務です。いくつかヘルパーアプリも、あるいはSecureEventInputを呼び起こしてからすぐ固まったアプリも、この状態になりやすいです。特に、他のアプリの画面へ切り替えたとしても、固まったアプリのSecureEventInput状態は自動的に解消できません。\n\n検出した該当プロセスは:";
 "i18n:securityAgentHelper.warningMessage.title" = "SecureEventInput の不正利用が検出";
@@ -206,6 +206,7 @@
 "i18n:UserDef.kBypassNonAppleCapsLockHandling.shortTitle" = "威注音入力アプリの内蔵CapsLock処理を不使用";
 "i18n:userdef.kCheckAbusersOfSecureEventInputAPI.description" = "このような不正利用は「システム内蔵入力以外の全ての入力アプリがメニューで灰色状態で選べなくて使えない」の元凶である。センシティブな資料の記入どころでSecureEventInputをEnableSecureEventInput()で使うのは当然であるが、「入力中」状態が終わった後必ずDisableSecureEventInput()で状態解消すべきだと義務である。いくつかヘルパーアプリも、あるいはSecureEventInputを呼び起こしてからすぐ固まったアプリも、この状態になりやすい。特に、他のアプリの画面へ切り替えたとしても、固まったアプリのSecureEventInput状態は自動的に解消できぬ。";
 "i18n:UserDef.kCheckAbusersOfSecureEventInputAPI.shortTitle" = "SecureEventInput API を不正利用しているバクグラウンド・プロセスを自動検知";
+"i18n:UserDef.kCNS11643Enabled.shortTitle" = "全字庫モード // 入力可能な漢字数を倍増す (2024-01-23)";
 "i18n:UserDef.kDodgeInvalidEdgeCandidateCursorPosition.shortTitle" = "端末での不合理的な候補選択用カーソル位置を是正";
 "i18n:UserDef.kNumPadCharInputBehavior.description" = "テンキー文字の入力行為をご指定ください。";
 "i18n:UserDef.kNumPadCharInputBehavior.option.0" = "いつでも半角で直接出力";
@@ -281,7 +282,7 @@
 "Phrase" = "語彙";
 "Please check the permission at \"%@\"." = "「%@」に書き出す権限は不足らしい。";
 "Please drag the apps into the Client Manager window from Finder." = "Finder からアプリをこのウィンドウに直接にドラッグしてください。";
-"Please drag the desired target from Finder to this place." = "ご指定したいものは直接に Finder からこの辺にお引きずりを。";
+"Please drag the desired target from Finder to this place." = "ご指定したいものは直接に Finder からこの辺にドラッグを。";
 "Please enter the client app bundle identifier(s) you want to register." = "登録したい客体アプリの唯一識別子（Bundle Identifier）をご入力ください。";
 "Please manage the list of those clients here which are: 1) IMKTextInput-incompatible; 2) suspected from abusing the contents of the inline composition buffer. A client listed here, if checked, will use popup composition buffer with maximum 20 reading counts holdable." = "下記の客体アプリはここでご登録を：１）IMKTextInput 議定規約に反するもの；２）文脈内入力緩衝列の内容の不正利用容疑のあるもの。「登録済みのアプリ」にチェックを入れると、「吹き出し入力緩衝列ウィンドウ」と「緩衝列容量制限」を起用し、容量制限は最大限音読み２０箇とする。";
 "Please manually enter the identifier(s)." = "ご自分で唯一識別子（Bundle Identifier）のご入力を。";
