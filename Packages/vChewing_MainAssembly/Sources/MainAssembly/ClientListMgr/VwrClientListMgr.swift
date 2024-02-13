@@ -196,7 +196,7 @@ extension VwrClientListMgr {
   }
 
   @IBAction func btnAddClientClicked(_: Any) {
-    guard let window = NSApp.keyWindow else { return }
+    guard let window = CtlClientListMgr.shared?.window else { return }
     let alert = NSAlert()
     alert.messageText = NSLocalizedString(
       "Please enter the client app bundle identifier(s) you want to register.", comment: ""
@@ -277,11 +277,11 @@ extension VwrClientListMgr {
               )
               let text = url.path + "\n\n" + NSLocalizedString("Please try again.", comment: "")
               guard let bundle = Bundle(url: url) else {
-                NSApp.keyWindow?.callAlert(title: title, text: text)
+                CtlClientListMgr.shared?.window.callAlert(title: title, text: text)
                 return
               }
               guard let identifier = bundle.bundleIdentifier else {
-                NSApp.keyWindow?.callAlert(title: title, text: text)
+                CtlClientListMgr.shared?.window.callAlert(title: title, text: text)
                 return
               }
               let isIdentifierAlreadyRegistered = Self.clientsList.contains(identifier)

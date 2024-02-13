@@ -118,7 +118,7 @@ public extension SettingsPanesCocoa {
         }
       }
       alert.addButton(withTitle: NSLocalizedString("Leave it checked", comment: ""))
-      let window = NSApp.keyWindow
+      let window = CtlSettingsCocoa.shared?.window
       if !PrefMgr.shared.shouldNotFartInLieuOfBeep {
         PrefMgr.shared.shouldNotFartInLieuOfBeep = true
         alert.beginSheetModal(at: window) { result in
