@@ -139,7 +139,7 @@ extension SettingsPanesCocoa.Cassette: NSPathControlDelegate {
     let bolPreviousPathValidity = LMMgr.checkCassettePathValidity(
       PrefMgr.shared.cassettePath.expandingTildeInPath)
 
-    let window = NSApp.keyWindow
+    let window = CtlSettingsCocoa.shared?.window
     dlgOpenFile.beginSheetModal(at: window) { result in
       if result == NSApplication.ModalResponse.OK {
         guard let url = dlgOpenFile.url else { return }

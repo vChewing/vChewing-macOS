@@ -138,7 +138,7 @@ public extension SettingsPanesCocoa {
         dlgOpenFile.allowedContentTypes = [.init(filenameExtension: "txt")].compactMap { $0 }
       }
 
-      let window = NSApp.keyWindow
+      let window = CtlSettingsCocoa.shared?.window
       dlgOpenFile.beginSheetModal(at: window) { result in
         if result == NSApplication.ModalResponse.OK {
           guard let url = dlgOpenFile.url else { return }
@@ -209,7 +209,7 @@ extension SettingsPanesCocoa.Dictionary: NSPathControlDelegate {
 
     let bolPreviousFolderValidity = LMMgr.checkIfSpecifiedUserDataFolderValid(
       PrefMgr.shared.userDataFolderSpecified.expandingTildeInPath)
-    let window = NSApp.keyWindow
+    let window = CtlSettingsCocoa.shared?.window
     dlgOpenPath.beginSheetModal(at: window) { result in
       if result == NSApplication.ModalResponse.OK {
         guard let url = dlgOpenPath.url else { return }
