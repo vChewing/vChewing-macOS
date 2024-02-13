@@ -8,25 +8,27 @@
 
 import Foundation
 
-public enum LatinKeyboardMappings: String {
+public enum LatinKeyboardMappings: String, CaseIterable {
   case qwerty = "com.apple.keylayout.ABC"
-  case qwertyUS = "com.apple.keylayout.US"
+  case qwertyBritish = "com.apple.keylayout.British"
+  case qwertyUS = "com.apple.keylayout.US" // 10.9 - 10.12
   case azerty = "com.apple.keylayout.ABC-AZERTY"
-  case azertyFrench = "com.apple.keylayout.French"
   case qwertz = "com.apple.keylayout.ABC-QWERTZ"
-  case qwertyGerman = "com.apple.keylayout.German"
+  case azertyFrench = "com.apple.keylayout.French" // 10.9 - 10.12
+  case qwertzGerman = "com.apple.keylayout.German" // 10.9 - 10.12
   case colemak = "com.apple.keylayout.Colemak"
   case dvorak = "com.apple.keylayout.Dvorak"
+  case dvorakQwertyCMD = "com.apple.keylayout.DVORAK-QWERTYCMD"
   case dvorakLeft = "com.apple.keylayout.Dvorak-Left"
   case dvorakRight = "com.apple.keylayout.Dvorak-Right"
 
   public var mapTable: [UInt16: (String, String)] {
     switch self {
-    case .qwerty, .qwertyUS: return Self.dictQwerty
+    case .qwerty, .qwertyUS, .qwertyBritish: return Self.dictQwerty
     case .azerty, .azertyFrench: return Self.dictAzerty
-    case .qwertz, .qwertyGerman: return Self.dictQwertz
+    case .qwertz, .qwertzGerman: return Self.dictQwertz
     case .colemak: return Self.dictColemak
-    case .dvorak: return Self.dictDvorak
+    case .dvorak, .dvorakQwertyCMD: return Self.dictDvorak
     case .dvorakLeft: return Self.dictDvorakLeft
     case .dvorakRight: return Self.dictDvorakRight
     }
