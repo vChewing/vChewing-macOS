@@ -131,7 +131,9 @@ public extension UserDefRenderableCocoa {
       control
     }
     if let fixedWidth = fixedWidth {
-      textLabel?.preferredMaxLayoutWidth = fixedWidth - controlWidth
+      let specifiedWidth = fixedWidth - controlWidth - NSFont.systemFontSize
+      textLabel?.preferredMaxLayoutWidth = specifiedWidth
+      textLabel?.makeSimpleConstraint(.width, relation: .lessThanOrEqual, value: specifiedWidth)
     }
     textLabel?.sizeToFit()
     return result
