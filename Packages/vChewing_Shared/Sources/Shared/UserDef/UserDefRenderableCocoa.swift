@@ -108,6 +108,11 @@ public extension UserDefRenderableCocoa {
       textField.font = NSFont.systemFont(ofSize: NSFont.smallSystemFontSize)
     }
     textField.preferredMaxLayoutWidth = fixedWidth ?? 0
+    if let fixedWidth = fixedWidth {
+      textField.makeSimpleConstraint(.width, relation: .lessThanOrEqual, value: fixedWidth)
+      textField.sizeToFit()
+      textField.makeSimpleConstraint(.height, relation: .lessThanOrEqual, value: textField.fittingSize.height)
+    }
     return textField
   }
 
@@ -130,10 +135,12 @@ public extension UserDefRenderableCocoa {
       }
       control
     }
-    if let fixedWidth = fixedWidth {
+    if let fixedWidth = fixedWidth, let textLabel = textLabel {
       let specifiedWidth = fixedWidth - controlWidth - NSFont.systemFontSize
-      textLabel?.preferredMaxLayoutWidth = specifiedWidth
-      textLabel?.makeSimpleConstraint(.width, relation: .lessThanOrEqual, value: specifiedWidth)
+      textLabel.preferredMaxLayoutWidth = specifiedWidth
+      textLabel.makeSimpleConstraint(.width, relation: .lessThanOrEqual, value: specifiedWidth)
+      textLabel.sizeToFit()
+      textLabel.makeSimpleConstraint(.height, relation: .lessThanOrEqual, value: textLabel.fittingSize.height)
     }
     textLabel?.sizeToFit()
     return result

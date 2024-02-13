@@ -34,7 +34,7 @@ public extension SettingsPanesCocoa {
           strNotice += "\n\u{2022} "
           strNotice += "Note: The “Delete ⌫” key on Mac keyboard is named as “BackSpace ⌫” here in order to distinguish the real “Delete ⌦” key from full-sized desktop keyboards. If you want to use the real “Delete ⌦” key on a Mac keyboard with no numpad equipped, you have to press “Fn+⌫” instead.".localized
           strNotice.makeNSLabel(descriptive: true, fixWidth: contentWidth)
-          UserDef.kAppleLanguages.render { renderable in
+          UserDef.kAppleLanguages.render(fixWidth: contentWidth) { renderable in
             renderable.currentControl = self.btnLangSelector
           }
         }?.boxed()

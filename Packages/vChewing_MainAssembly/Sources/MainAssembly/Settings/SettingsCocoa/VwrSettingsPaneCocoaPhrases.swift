@@ -81,9 +81,10 @@ public extension SettingsPanesCocoa {
               txtPEField3.makeSimpleConstraint(.width, relation: .greaterThanOrEqual, value: 90)
               btnPEAdd
             }
-            UserDef.kPhraseEditorAutoReloadExternalModifications.render { renderable in
-              renderable.tinySize = true
-            }
+            UserDef.kPhraseEditorAutoReloadExternalModifications
+              .render(fixWidth: contentWidth) { renderable in
+                renderable.tinySize = true
+              }
           }
         }?.boxed()
         NSView().makeSimpleConstraint(.height, relation: .equal, value: NSFont.systemFontSize)

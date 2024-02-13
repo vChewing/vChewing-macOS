@@ -24,11 +24,11 @@ public extension SettingsPanesCocoa {
     var body: NSView? {
       NSStackView.build(.vertical, insets: .new(all: 14)) {
         NSStackView.buildSection(width: contentWidth) {
-          UserDef.kChineseConversionEnabled.render { renderable in
+          UserDef.kChineseConversionEnabled.render(fixWidth: contentWidth) { renderable in
             renderable.currentControl?.target = self
             renderable.currentControl?.action = #selector(self.sanityCheckKangXi(_:))
           }
-          UserDef.kShiftJISShinjitaiOutputEnabled.render { renderable in
+          UserDef.kShiftJISShinjitaiOutputEnabled.render(fixWidth: contentWidth) { renderable in
             renderable.currentControl?.target = self
             renderable.currentControl?.action = #selector(self.sanityCheckJIS(_:))
           }
