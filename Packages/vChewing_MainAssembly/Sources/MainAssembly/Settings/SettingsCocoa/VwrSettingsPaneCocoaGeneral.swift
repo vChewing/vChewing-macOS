@@ -39,7 +39,10 @@ public extension SettingsPanesCocoa {
           }
         }?.boxed()
         NSStackView.buildSection(width: contentWidth) {
-          UserDef.kReadingNarrationCoverage.render(fixWidth: contentWidth)
+          UserDef.kReadingNarrationCoverage.render(fixWidth: contentWidth) { renderable in
+            renderable.currentControl?.target = self
+            renderable.currentControl?.action = #selector(self.updateNarratorSettingsAction(_:))
+          }
           UserDef.kAutoCorrectReadingCombination.render(fixWidth: contentWidth)
           UserDef.kShowHanyuPinyinInCompositionBuffer.render(fixWidth: contentWidth)
           UserDef.kKeepReadingUponCompositionError.render(fixWidth: contentWidth)
