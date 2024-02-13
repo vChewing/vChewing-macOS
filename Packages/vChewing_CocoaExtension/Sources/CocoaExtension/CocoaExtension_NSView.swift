@@ -62,14 +62,59 @@ public extension NSEdgeInsets {
 public extension NSView {
   @discardableResult func makeSimpleConstraint(
     _ attribute: NSLayoutConstraint.Attribute,
-    relation: NSLayoutConstraint.Relation,
+    relation givenRelation: NSLayoutConstraint.Relation,
     value: CGFloat?
   ) -> NSView {
-    guard let value = value else { return self }
     translatesAutoresizingMaskIntoConstraints = false
+    guard let givenValue = value, givenValue >= 0 else { return self }
+    var handled = false
+    constraints.forEach { constraint in
+      guard constraint.firstAttribute == attribute else { return }
+      switch (constraint.relation, givenRelation) {
+      case (.lessThanOrEqual, .lessThanOrEqual):
+        constraint.constant = Swift.min(givenValue, constraint.constant)
+        handled = true
+      case (.lessThanOrEqual, .equal):
+        constraint.constant = Swift.max(givenValue, constraint.constant)
+        handled = true
+      case (.lessThanOrEqual, .greaterThanOrEqual):
+        switch givenValue {
+        case constraint.constant, ..<constraint.constant: // Smaller & Equal
+          handled = false
+        default: // Bigger
+          removeConstraint(constraint)
+          handled = false
+        }
+      case (.equal, .lessThanOrEqual):
+        constraint.constant = Swift.min(givenValue, constraint.constant)
+        handled = true
+      case (.equal, .equal):
+        constraint.constant = Swift.min(givenValue, constraint.constant) // 往往都是外圍容器最後賦值，所以取最小值。
+        handled = true
+      case (.equal, .greaterThanOrEqual):
+        constraint.constant = Swift.max(givenValue, constraint.constant)
+        handled = true
+      case (.greaterThanOrEqual, .lessThanOrEqual):
+        switch givenValue {
+        case ..<constraint.constant: // Smaller
+          removeConstraint(constraint)
+          handled = false
+        default: // Bigger & Equal
+          handled = false
+        }
+      case (.greaterThanOrEqual, .equal):
+        constraint.constant = Swift.max(givenValue, constraint.constant)
+        handled = true
+      case (.greaterThanOrEqual, .greaterThanOrEqual):
+        constraint.constant = Swift.max(givenValue, constraint.constant)
+        handled = true
+      default: break
+      }
+    }
+    guard !handled else { return self }
     let widthConstraint = NSLayoutConstraint(
-      item: self, attribute: attribute, relatedBy: relation, toItem: nil,
-      attribute: NSLayoutConstraint.Attribute.notAnAttribute, multiplier: 1, constant: value
+      item: self, attribute: attribute, relatedBy: givenRelation, toItem: nil,
+      attribute: NSLayoutConstraint.Attribute.notAnAttribute, multiplier: 1, constant: givenValue
     )
     addConstraint(widthConstraint)
     return self
