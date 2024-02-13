@@ -27,12 +27,12 @@ public extension SettingsPanesCocoa {
     var body: NSView? {
       NSStackView.build(.vertical, insets: .new(all: 14)) {
         NSStackView.buildSection(width: contentWidth) {
-          UserDef.kUserDataFolderSpecified.render { renderable in
+          UserDef.kUserDataFolderSpecified.render(fixWidth: contentWidth) { renderable in
             renderable.currentControl = self.pctUserDictionaryFolder
             renderable.mainViewOverride = self.pathControlMainView
           }
           NSStackView.build(.vertical) {
-            UserDef.kShouldAutoReloadUserDataFiles.render { renderable in
+            UserDef.kShouldAutoReloadUserDataFiles.render(fixWidth: contentWidth) { renderable in
               renderable.currentControl?.target = self
               renderable.currentControl?.action = #selector(self.lmmgrInitUserLMsWhenShould(_:))
             }
@@ -40,20 +40,20 @@ public extension SettingsPanesCocoa {
           }
         }?.boxed()
         NSStackView.buildSection(width: contentWidth) {
-          UserDef.kUseExternalFactoryDict.render { renderable in
+          UserDef.kUseExternalFactoryDict.render(fixWidth: contentWidth) { renderable in
             renderable.currentControl?.target = self
             renderable.currentControl?.action = #selector(self.lmmgrConnectCoreDB(_:))
           }
           UserDef.kFetchSuggestionsFromUserOverrideModel.render(fixWidth: contentWidth)
-          UserDef.kCNS11643Enabled.render { renderable in
+          UserDef.kCNS11643Enabled.render(fixWidth: contentWidth) { renderable in
             renderable.currentControl?.target = self
             renderable.currentControl?.action = #selector(self.lmmgrSyncLMPrefs(_:))
           }
-          UserDef.kSymbolInputEnabled.render { renderable in
+          UserDef.kSymbolInputEnabled.render(fixWidth: contentWidth) { renderable in
             renderable.currentControl?.target = self
             renderable.currentControl?.action = #selector(self.lmmgrSyncLMPrefs(_:))
           }
-          UserDef.kPhraseReplacementEnabled.render { renderable in
+          UserDef.kPhraseReplacementEnabled.render(fixWidth: contentWidth) { renderable in
             renderable.currentControl?.target = self
             renderable.currentControl?.action = #selector(self.lmmgrSyncLMPrefsWithReplacementTable(_:))
           }
