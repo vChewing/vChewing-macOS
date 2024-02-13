@@ -55,7 +55,7 @@ public extension SettingsPanesCocoa {
               }
               UserDef.kAlwaysShowTooltipTextsHorizontally.render(fixWidth: contentWidth)
               if Date.isTodayTheDate(from: 0401) {
-                UserDef.kShouldNotFartInLieuOfBeep.render { renderable in
+                UserDef.kShouldNotFartInLieuOfBeep.render(fixWidth: contentWidth) { renderable in
                   renderable.currentControl?.target = self
                   renderable.currentControl?.action = #selector(self.onFartControlChange(_:))
                 }
@@ -69,14 +69,16 @@ public extension SettingsPanesCocoa {
               UserDef.kShareAlphanumericalModeStatusAcrossClients.render(fixWidth: contentWidth)
               if #available(macOS 10.15, *) {
                 NSStackView.build(.vertical) {
-                  UserDef.kTogglingAlphanumericalModeWithLShift.render { renderable in
-                    renderable.currentControl?.target = self
-                    renderable.currentControl?.action = #selector(self.syncShiftKeyUpChecker(_:))
-                  }
-                  UserDef.kTogglingAlphanumericalModeWithRShift.render { renderable in
-                    renderable.currentControl?.target = self
-                    renderable.currentControl?.action = #selector(self.syncShiftKeyUpChecker(_:))
-                  }
+                  UserDef.kTogglingAlphanumericalModeWithLShift
+                    .render(fixWidth: contentWidth) { renderable in
+                      renderable.currentControl?.target = self
+                      renderable.currentControl?.action = #selector(self.syncShiftKeyUpChecker(_:))
+                    }
+                  UserDef.kTogglingAlphanumericalModeWithRShift
+                    .render(fixWidth: contentWidth) { renderable in
+                      renderable.currentControl?.target = self
+                      renderable.currentControl?.action = #selector(self.syncShiftKeyUpChecker(_:))
+                    }
                   var strOSReq = " "
                   strOSReq += String(
                     format: "This feature requires macOS %@ and above.".localized, arguments: ["10.15"]

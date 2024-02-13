@@ -27,11 +27,11 @@ public extension SettingsPanesCocoa {
     var body: NSView? {
       NSStackView.build(.vertical, insets: .new(all: 14)) {
         NSStackView.buildSection(width: contentWidth) {
-          UserDef.kCassettePath.render { renderable in
+          UserDef.kCassettePath.render(fixWidth: contentWidth) { renderable in
             renderable.currentControl = self.pctCassetteFilePath
             renderable.mainViewOverride = self.pathControlMainView
           }
-          UserDef.kCassetteEnabled.render { renderable in
+          UserDef.kCassetteEnabled.render(fixWidth: contentWidth) { renderable in
             renderable.currentControl?.target = self
             renderable.currentControl?.action = #selector(self.cassetteEnabledToggled(_:))
           }
