@@ -13,9 +13,11 @@ import Shared
 
 public extension SettingsPanesCocoa {
   class Keyboard: NSViewController {
-    let windowWidth: CGFloat = 577
-    let contentWidth: CGFloat = 512
-    var contentHalfWidth: CGFloat { contentWidth / 2 - 4 }
+    var windowWidth: CGFloat { SettingsPanesCocoa.windowWidth }
+    var contentWidth: CGFloat { SettingsPanesCocoa.contentWidth }
+    var innerContentWidth: CGFloat { SettingsPanesCocoa.innerContentWidth }
+    var tabContainerWidth: CGFloat { SettingsPanesCocoa.tabContainerWidth }
+    var contentHalfWidth: CGFloat { SettingsPanesCocoa.contentHalfWidth }
 
     override public func loadView() {
       view = body ?? .init()

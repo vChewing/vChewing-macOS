@@ -12,9 +12,11 @@ import Shared
 
 public extension SettingsPanesCocoa {
   class Behavior: NSViewController {
-    let windowWidth: CGFloat = 577
-    let contentWidth: CGFloat = 512 - 37
-    let tabContainerWidth: CGFloat = 512 + 20
+    var windowWidth: CGFloat { SettingsPanesCocoa.windowWidth }
+    var contentWidth: CGFloat { SettingsPanesCocoa.contentWidth }
+    var innerContentWidth: CGFloat { SettingsPanesCocoa.innerContentWidth }
+    var tabContainerWidth: CGFloat { SettingsPanesCocoa.tabContainerWidth }
+    var contentHalfWidth: CGFloat { SettingsPanesCocoa.contentHalfWidth }
 
     override public func loadView() {
       view = body ?? .init()
@@ -27,35 +29,35 @@ public extension SettingsPanesCocoa {
         NSView().makeSimpleConstraint(.height, relation: .equal, value: 4)
         NSTabView.build {
           NSTabView.TabPage(title: "Ａ") {
-            NSStackView.buildSection(width: contentWidth) {
-              UserDef.kSpecifyShiftBackSpaceKeyBehavior.render(fixWidth: contentWidth)
-              UserDef.kSpecifyShiftTabKeyBehavior.render(fixWidth: contentWidth)
-              UserDef.kSpecifyShiftSpaceKeyBehavior.render(fixWidth: contentWidth)
+            NSStackView.buildSection(width: innerContentWidth) {
+              UserDef.kSpecifyShiftBackSpaceKeyBehavior.render(fixWidth: innerContentWidth)
+              UserDef.kSpecifyShiftTabKeyBehavior.render(fixWidth: innerContentWidth)
+              UserDef.kSpecifyShiftSpaceKeyBehavior.render(fixWidth: innerContentWidth)
             }?.boxed()
-            NSStackView.buildSection(width: contentWidth) {
-              UserDef.kUpperCaseLetterKeyBehavior.render(fixWidth: contentWidth)
-              UserDef.kNumPadCharInputBehavior.render(fixWidth: contentWidth)
+            NSStackView.buildSection(width: innerContentWidth) {
+              UserDef.kUpperCaseLetterKeyBehavior.render(fixWidth: innerContentWidth)
+              UserDef.kNumPadCharInputBehavior.render(fixWidth: innerContentWidth)
             }?.boxed()
-            NSStackView.buildSection(width: contentWidth) {
-              UserDef.kSpecifyIntonationKeyBehavior.render(fixWidth: contentWidth)
-              UserDef.kAcceptLeadingIntonations.render(fixWidth: contentWidth)
+            NSStackView.buildSection(width: innerContentWidth) {
+              UserDef.kSpecifyIntonationKeyBehavior.render(fixWidth: innerContentWidth)
+              UserDef.kAcceptLeadingIntonations.render(fixWidth: innerContentWidth)
             }?.boxed()
             NSView()
           }
           NSTabView.TabPage(title: "Ｂ") {
-            NSStackView.buildSection(width: contentWidth) {
-              UserDef.kChooseCandidateUsingSpace.render(fixWidth: contentWidth)
-              UserDef.kEscToCleanInputBuffer.render(fixWidth: contentWidth)
-              UserDef.kAlsoConfirmAssociatedCandidatesByEnter.render(fixWidth: contentWidth)
-              UserDef.kUseSpaceToCommitHighlightedSCPCCandidate.render(fixWidth: contentWidth)
+            NSStackView.buildSection(width: innerContentWidth) {
+              UserDef.kChooseCandidateUsingSpace.render(fixWidth: innerContentWidth)
+              UserDef.kEscToCleanInputBuffer.render(fixWidth: innerContentWidth)
+              UserDef.kAlsoConfirmAssociatedCandidatesByEnter.render(fixWidth: innerContentWidth)
+              UserDef.kUseSpaceToCommitHighlightedSCPCCandidate.render(fixWidth: innerContentWidth)
             }?.boxed()
-            NSStackView.buildSection(width: contentWidth) {
+            NSStackView.buildSection(width: innerContentWidth) {
               if #available(macOS 12, *) {
-                UserDef.kShowNotificationsWhenTogglingCapsLock.render(fixWidth: contentWidth)
+                UserDef.kShowNotificationsWhenTogglingCapsLock.render(fixWidth: innerContentWidth)
               }
-              UserDef.kAlwaysShowTooltipTextsHorizontally.render(fixWidth: contentWidth)
+              UserDef.kAlwaysShowTooltipTextsHorizontally.render(fixWidth: innerContentWidth)
               if Date.isTodayTheDate(from: 0401) {
-                UserDef.kShouldNotFartInLieuOfBeep.render(fixWidth: contentWidth) { renderable in
+                UserDef.kShouldNotFartInLieuOfBeep.render(fixWidth: innerContentWidth) { renderable in
                   renderable.currentControl?.target = self
                   renderable.currentControl?.action = #selector(self.onFartControlChange(_:))
                 }
@@ -64,18 +66,18 @@ public extension SettingsPanesCocoa {
             NSView()
           }
           NSTabView.TabPage(title: "Ｃ") {
-            NSStackView.buildSection(width: contentWidth) {
-              UserDef.kBypassNonAppleCapsLockHandling.render(fixWidth: contentWidth)
-              UserDef.kShareAlphanumericalModeStatusAcrossClients.render(fixWidth: contentWidth)
+            NSStackView.buildSection(width: innerContentWidth) {
+              UserDef.kBypassNonAppleCapsLockHandling.render(fixWidth: innerContentWidth)
+              UserDef.kShareAlphanumericalModeStatusAcrossClients.render(fixWidth: innerContentWidth)
               if #available(macOS 10.15, *) {
                 NSStackView.build(.vertical) {
                   UserDef.kTogglingAlphanumericalModeWithLShift
-                    .render(fixWidth: contentWidth) { renderable in
+                    .render(fixWidth: innerContentWidth) { renderable in
                       renderable.currentControl?.target = self
                       renderable.currentControl?.action = #selector(self.syncShiftKeyUpChecker(_:))
                     }
                   UserDef.kTogglingAlphanumericalModeWithRShift
-                    .render(fixWidth: contentWidth) { renderable in
+                    .render(fixWidth: innerContentWidth) { renderable in
                       renderable.currentControl?.target = self
                       renderable.currentControl?.action = #selector(self.syncShiftKeyUpChecker(_:))
                     }
@@ -85,10 +87,10 @@ public extension SettingsPanesCocoa {
                   )
                   strOSReq += "\n"
                   strOSReq += "i18n:settings.shiftKeyASCIITogle.description".localized
-                  strOSReq.makeNSLabel(descriptive: true, fixWidth: contentWidth)
+                  strOSReq.makeNSLabel(descriptive: true, fixWidth: innerContentWidth)
                 }
               }
-              UserDef.kShiftEisuToggleOffTogetherWithCapsLock.render(fixWidth: contentWidth)
+              UserDef.kShiftEisuToggleOffTogetherWithCapsLock.render(fixWidth: innerContentWidth)
             }?.boxed()
             NSView()
           }
