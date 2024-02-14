@@ -65,7 +65,7 @@ public extension SettingsPanesCocoa {
       NSStackView.build(.vertical, insets: .new(all: 14)) {
         NSStackView.buildSection(width: contentWidth) {
           NSStackView.build(.vertical) {
-            NSStackView.build(.horizontal) {
+            NSStackView.build(.horizontal, spacing: 4) {
               cmbPEInputModeMenu
               cmbPEDataTypeMenu
               NSView()
