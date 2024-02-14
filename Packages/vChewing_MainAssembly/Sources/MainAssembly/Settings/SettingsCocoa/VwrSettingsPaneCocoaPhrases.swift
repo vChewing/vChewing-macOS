@@ -245,11 +245,12 @@ extension SettingsPanesCocoa.Phrases: NSTextViewDelegate, NSTextFieldDelegate {
     cmbPEDataTypeMenu.select(cmbPEDataTypeMenu.menu?.items.first)
 
     // Buttons.
-    btnPEReload.title = NSLocalizedString("Reload", comment: "")
+    btnPEReload.title = "↻"
+    btnPEReload.toolTip = NSLocalizedString("Reload", comment: "")
     btnPEConsolidate.title = NSLocalizedString("Consolidate", comment: "")
     btnPESave.title = NSLocalizedString("Save", comment: "")
     btnPEAdd.title = PETerminology.AddPhrases.locAdd.localized.0
-    btnPEOpenExternally.title = NSLocalizedString("...", comment: "")
+    btnPEOpenExternally.title = "…"
 
     // DataFormatter.
     txtPEField3.formatter = formatter
