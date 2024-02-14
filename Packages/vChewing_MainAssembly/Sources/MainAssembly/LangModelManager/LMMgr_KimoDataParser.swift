@@ -8,6 +8,7 @@
 
 import Foundation
 import LineReader
+import Shared
 
 public extension LMMgr {
   /// 匯入自奇摩輸入法使用者自訂詞資料庫匯出的 TXT 檔案。
@@ -63,7 +64,11 @@ public extension LMMgr {
     fileHandlerCHT.seekToEndOfFile()
     fileHandlerCHT.write(outputDataCHT)
 
-    return allPhrasesCHT.count
+    let result = allPhrasesCHT.count
+    if result > 0 {
+      Broadcaster.shared.eventForReloadingPhraseEditor = .init()
+    }
+    return result
   }
 }
 

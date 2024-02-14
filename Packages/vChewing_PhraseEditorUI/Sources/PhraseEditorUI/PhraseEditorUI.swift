@@ -18,18 +18,14 @@ private let loc: String =
   (UserDefaults.current.array(forKey: UserDef.kAppleLanguages.rawValue) as? [String] ?? ["auto"])[0]
 
 @available(macOS 13, *)
-extension VwrPhraseEditorUI {
-  @AppStorage("PhraseEditorAutoReloadExternalModifications")
-  private static var autoReloadExternalModifications: Bool = true
-}
-
-@available(macOS 13, *)
 public struct VwrPhraseEditorUI: View {
   static var txtContentStorage: String = NSLocalizedString(
     "Please select Simplified / Traditional Chinese mode above.", comment: ""
   )
   @Binding public var txtContent: String
-  @ObservedObject public var fileChangeIndicator = FileObserveProject.shared
+  @ObservedObject public var fileChangeIndicator = PEReloadEventObserver.shared
+  @AppStorage("PhraseEditorAutoReloadExternalModifications")
+  private var autoReloadExternalModifications: Bool = true
   @State private var selAutoReloadExternalModifications: Bool = UserDefaults.current.bool(
     forKey: UserDef.kPhraseEditorAutoReloadExternalModifications.rawValue)
   @State var lblAddPhraseTag1 = PETerms.AddPhrases.locPhrase.localized.0
@@ -252,7 +248,7 @@ public struct VwrPhraseEditorUI: View {
           .frame(minWidth: 320, minHeight: 240)
           .onChange(of: fileChangeIndicator.id) { _ in
             Task {
-              if Self.autoReloadExternalModifications { update() }
+              if autoReloadExternalModifications { update() }
             }
           }
       }
@@ -291,7 +287,7 @@ public struct VwrPhraseEditorUI: View {
         Toggle(
           LocalizedStringKey("This editor only: Auto-reload modifications happened outside of this editor"),
           isOn: $selAutoReloadExternalModifications.didChange {
-            Self.autoReloadExternalModifications = selAutoReloadExternalModifications
+            autoReloadExternalModifications = selAutoReloadExternalModifications
           }
         )
         .controlSize(.small)
