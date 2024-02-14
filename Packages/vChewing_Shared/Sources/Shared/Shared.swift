@@ -255,14 +255,21 @@ public enum Shared {
   }
 }
 
-// MARK: - Observable Object
+// MARK: - PEReloadEventObserver
 
 @available(macOS 10.15, *)
-public class FileObserveProject: ObservableObject, Equatable {
-  public static let shared = FileObserveProject()
+public class PEReloadEventObserver: ObservableObject, Equatable {
+  public static let shared = PEReloadEventObserver()
+  private var observation: NSKeyValueObservation?
   @Published public var id = UUID().uuidString
 
-  public static func == (lhs: FileObserveProject, rhs: FileObserveProject) -> Bool { lhs.id == rhs.id }
+  public init() {
+    observation = Broadcaster.shared.observe(\.eventForReloadingPhraseEditor, options: [.new]) { _, _ in
+      self.touch()
+    }
+  }
+
+  public static func == (lhs: PEReloadEventObserver, rhs: PEReloadEventObserver) -> Bool { lhs.id == rhs.id }
 
   public func touch() {
     id = UUID().uuidString

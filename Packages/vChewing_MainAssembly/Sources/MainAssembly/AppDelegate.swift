@@ -47,7 +47,6 @@ extension AppDelegate {
       // 先執行 initUserLangModels() 可以在目標辭典檔案不存在的情況下先行生成空白範本檔案。
       if PrefMgr.shared.shouldAutoReloadUserDataFiles || forced { LMMgr.initUserLangModels() }
       DispatchQueue.main.asyncAfter(deadline: DispatchTime.now() + 0.1) {
-        if #available(macOS 10.15, *) { FileObserveProject.shared.touch() }
         if PrefMgr.shared.phraseEditorAutoReloadExternalModifications {
           Broadcaster.shared.eventForReloadingPhraseEditor = .init()
         }
