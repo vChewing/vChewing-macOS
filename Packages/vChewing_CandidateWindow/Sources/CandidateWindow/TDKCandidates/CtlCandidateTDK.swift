@@ -108,16 +108,30 @@ public class CtlCandidateTDK: CtlCandidate, NSWindowDelegate {
 
   override open func updateDisplay() {
     guard let window = window else { return }
-    if let currentCandidateText = Self.thePool.currentSelectedCandidateText {
-      reverseLookupResult = delegate?.reverseLookup(for: currentCandidateText) ?? []
-      Self.thePool.reverseLookupResult = reverseLookupResult
-      Self.thePool.tooltip = delegate?.candidateToolTip(shortened: !Self.thePool.isMatrix) ?? ""
-    }
-    delegate?.candidatePairHighlightChanged(at: highlightedIndex)
     DispatchQueue.main.async { [weak self] in
       guard let self = self else { return }
       self.updateNSWindowModern(window)
     }
+    if let currentCandidate = Self.thePool.currentCandidate {
+      let displayedText = currentCandidate.displayedText
+      var lookupResult: [String?] = delegate?.reverseLookup(for: displayedText) ?? []
+      if displayedText.count == 1, delegate?.showCodePointForCurrentCandidate ?? false {
+        if lookupResult.isEmpty {
+          lookupResult.append(currentCandidate.charDescriptions(shortened: !Self.thePool.isMatrix).first)
+        } else {
+          lookupResult.insert(currentCandidate.charDescriptions(shortened: true).first, at: lookupResult.startIndex)
+        }
+        reverseLookupResult = lookupResult.compactMap { $0 }
+      } else {
+        // 如果不提供 UNICODE 碼位資料顯示的話，則在非多行多列模式下僅顯示一筆反查資料。
+        if !Self.thePool.isMatrix {
+          reverseLookupResult = [lookupResult.compactMap { $0 }.first].compactMap { $0 }
+        }
+      }
+      Self.thePool.reverseLookupResult = reverseLookupResult
+    }
+    Self.thePool.tooltip = delegate?.candidateToolTip(shortened: !Self.thePool.isMatrix) ?? ""
+    delegate?.candidatePairHighlightChanged(at: highlightedIndex)
   }
 
   func updateNSWindowModern(_ window: NSWindow) {

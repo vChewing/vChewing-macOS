@@ -80,6 +80,7 @@ extension SessionCtl: InputHandlerDelegate {
 
 extension SessionCtl: CtlCandidateDelegate {
   public var isCandidateState: Bool { state.isCandidateContainer }
+  public var showCodePointForCurrentCandidate: Bool { PrefMgr.shared.showCodePointInCandidateUI }
 
   public var clientAccentColor: NSColor? {
     var nullResponse = !PrefMgr.shared.respectClientAccentColor
