@@ -301,10 +301,12 @@ extension CandidatePool {
       .font: Self.blankCell.phraseFont(size: reverseLookupTextSize),
     ]
     let result = NSMutableAttributedString(string: "", attributes: attrReverseLookupSpacer)
+    var addedCounter = 0
     for neta in reverseLookupResult {
       result.append(NSAttributedString(string: " ", attributes: attrReverseLookupSpacer))
       result.append(NSAttributedString(string: " \(neta) ", attributes: attrReverseLookup))
-      if maxLinesPerPage == 1 { break }
+      addedCounter += 1
+      if maxLinesPerPage == 1, addedCounter == 2 { break }
     }
     return result
   }

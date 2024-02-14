@@ -200,14 +200,14 @@ public class CandidateCellData: Hashable {
     return attrStrCandidate
   }
 
-  public var charDescriptions: [String] {
+  public func charDescriptions(shortened: Bool = false) -> [String] {
     var result = displayedText
     if displayedText.contains("("), displayedText.count > 2 {
       result = displayedText.replacingOccurrences(of: "(", with: "").replacingOccurrences(of: ")", with: "")
     }
     return result.flatMap(\.unicodeScalars).compactMap {
       let theName: String = $0.properties.name ?? ""
-      return String(format: "U+%02X %@", $0.value, theName)
+      return shortened ? String(format: "U+%02X", $0.value) : String(format: "U+%02X %@", $0.value, theName)
     }
   }
 
