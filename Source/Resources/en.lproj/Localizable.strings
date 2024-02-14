@@ -215,7 +215,7 @@
 "i18n:UserDef.kNumPadCharInputBehavior.option.3" = "Insert into composition buffer (full-width)";
 "i18n:UserDef.kNumPadCharInputBehavior.option.4" = "Directly commit half-width chars only if the compositor is empty";
 "i18n:UserDef.kNumPadCharInputBehavior.option.5" = "Directly commit full-width chars only if the compositor is empty";
-"i18n:UserDef.kNumPadCharInputBehavior.shortTitle" = "Printable Chars in Numeric Pad:";
+"i18n:UserDef.kNumPadCharInputBehavior.shortTitle" = "Numeric Pad:";
 "i18n:UserDef.kReadingNarrationCoverage.description" = "This reads your typed phonabets aloud. Only works with non-cassette Mode.";
 "i18n:UserDef.kReadingNarrationCoverage.option.confirmed" = "Only when combined by intonation";
 "i18n:UserDef.kReadingNarrationCoverage.option.nothing" = "Do not narrate";

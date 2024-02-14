@@ -215,7 +215,7 @@
 "i18n:UserDef.kNumPadCharInputBehavior.option.3" = "以全形文字插入組字區";
 "i18n:UserDef.kNumPadCharInputBehavior.option.4" = "直接遞交半形文字，除非組字區不為空";
 "i18n:UserDef.kNumPadCharInputBehavior.option.5" = "直接遞交全形文字，除非組字區不為空";
-"i18n:UserDef.kNumPadCharInputBehavior.shortTitle" = "數字小鍵盤的可輸入字元:";
+"i18n:UserDef.kNumPadCharInputBehavior.shortTitle" = "數字小鍵盤:";
 "i18n:UserDef.kReadingNarrationCoverage.description" = "這會將您的組音區的內容唸出來。該功能對磁帶模式無效。";
 "i18n:UserDef.kReadingNarrationCoverage.option.confirmed" = "僅在用聲調鍵確認時";
 "i18n:UserDef.kReadingNarrationCoverage.option.nothing" = "不唸讀";

@@ -215,7 +215,7 @@
 "i18n:UserDef.kNumPadCharInputBehavior.option.3" = "入力緩衝列に全角文字を挿入";
 "i18n:UserDef.kNumPadCharInputBehavior.option.4" = "入力緩衝列がからっぽの時、半角で直接出力";
 "i18n:UserDef.kNumPadCharInputBehavior.option.5" = "入力緩衝列がからっぽの時、全角で直接出力";
-"i18n:UserDef.kNumPadCharInputBehavior.shortTitle" = "テンキーで入力可能の文字:";
+"i18n:UserDef.kNumPadCharInputBehavior.shortTitle" = "テンキー:";
 "i18n:UserDef.kReadingNarrationCoverage.description" = "音読組立緩衝列の内容の変化を朗読。該功能對磁帶模式無效。";
 "i18n:UserDef.kReadingNarrationCoverage.option.confirmed" = "音調キーで確認するときに";
 "i18n:UserDef.kReadingNarrationCoverage.option.nothing" = "朗読せずに";
