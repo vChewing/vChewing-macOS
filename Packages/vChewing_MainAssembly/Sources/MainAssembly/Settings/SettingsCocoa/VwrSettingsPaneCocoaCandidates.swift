@@ -12,9 +12,11 @@ import Shared
 
 public extension SettingsPanesCocoa {
   class Candidates: NSViewController {
-    let windowWidth: CGFloat = 577
-    let contentWidth: CGFloat = 512 - 37
-    let tabContainerWidth: CGFloat = 512 + 20
+    var windowWidth: CGFloat { SettingsPanesCocoa.windowWidth }
+    var contentWidth: CGFloat { SettingsPanesCocoa.contentWidth }
+    var innerContentWidth: CGFloat { SettingsPanesCocoa.innerContentWidth }
+    var tabContainerWidth: CGFloat { SettingsPanesCocoa.tabContainerWidth }
+    var contentHalfWidth: CGFloat { SettingsPanesCocoa.contentHalfWidth }
 
     override public func loadView() {
       view = body ?? .init()
@@ -27,33 +29,33 @@ public extension SettingsPanesCocoa {
         NSView().makeSimpleConstraint(.height, relation: .equal, value: 4)
         NSTabView.build {
           NSTabView.TabPage(title: "Ａ") {
-            NSStackView.buildSection(width: contentWidth) {
-              UserDef.kUseHorizontalCandidateList.render(fixWidth: contentWidth)
-              UserDef.kCandidateListTextSize.render(fixWidth: contentWidth) { renderable in
+            NSStackView.buildSection(width: innerContentWidth) {
+              UserDef.kUseHorizontalCandidateList.render(fixWidth: innerContentWidth)
+              UserDef.kCandidateListTextSize.render(fixWidth: innerContentWidth) { renderable in
                 renderable.currentControl?.target = self
                 renderable.currentControl?.action = #selector(self.candidateFontSizeDidSet(_:))
               }
-              UserDef.kCandidateWindowShowOnlyOneLine.render(fixWidth: contentWidth)
-              UserDef.kAlwaysExpandCandidateWindow.render(fixWidth: contentWidth)
-              UserDef.kRespectClientAccentColor.render(fixWidth: contentWidth)
+              UserDef.kCandidateWindowShowOnlyOneLine.render(fixWidth: innerContentWidth)
+              UserDef.kAlwaysExpandCandidateWindow.render(fixWidth: innerContentWidth)
+              UserDef.kRespectClientAccentColor.render(fixWidth: innerContentWidth)
             }?.boxed()
             NSView()
           }
           NSTabView.TabPage(title: "Ｂ") {
-            NSStackView.buildSection(width: contentWidth) {
-              UserDef.kCandidateKeys.render(fixWidth: contentWidth) { renderable in
+            NSStackView.buildSection(width: innerContentWidth) {
+              UserDef.kCandidateKeys.render(fixWidth: innerContentWidth) { renderable in
                 renderable.currentControl?.target = self
                 renderable.currentControl?.action = #selector(self.candidateKeysDidSet(_:))
                 renderable.currentControl?.alignment = .right
               }
             }?.boxed()
-            NSStackView.buildSection(width: contentWidth) {
-              UserDef.kUseRearCursorMode.render(fixWidth: contentWidth)
-              UserDef.kMoveCursorAfterSelectingCandidate.render(fixWidth: contentWidth)
-              UserDef.kUseDynamicCandidateWindowOrigin.render(fixWidth: contentWidth)
-              UserDef.kDodgeInvalidEdgeCandidateCursorPosition.render(fixWidth: contentWidth)
+            NSStackView.buildSection(width: innerContentWidth) {
+              UserDef.kUseRearCursorMode.render(fixWidth: innerContentWidth)
+              UserDef.kMoveCursorAfterSelectingCandidate.render(fixWidth: innerContentWidth)
+              UserDef.kUseDynamicCandidateWindowOrigin.render(fixWidth: innerContentWidth)
+              UserDef.kDodgeInvalidEdgeCandidateCursorPosition.render(fixWidth: innerContentWidth)
               UserDef.kUseJKtoMoveCompositorCursorInCandidateState
-                .render(fixWidth: contentWidth) { renderable in
+                .render(fixWidth: innerContentWidth) { renderable in
                   renderable.currentControl?.target = self
                   renderable.currentControl?.action = #selector(self.useJKToMoveBufferCursorDidSet(_:))
                 }
@@ -61,15 +63,15 @@ public extension SettingsPanesCocoa {
             NSView()
           }
           NSTabView.TabPage(title: "Ｃ") {
-            NSStackView.buildSection(width: contentWidth) {
-              UserDef.kShowReverseLookupInCandidateUI.render(fixWidth: contentWidth)
-              UserDef.kUseFixedCandidateOrderOnSelection.render(fixWidth: contentWidth)
-              UserDef.kConsolidateContextOnCandidateSelection.render(fixWidth: contentWidth)
+            NSStackView.buildSection(width: innerContentWidth) {
+              UserDef.kShowReverseLookupInCandidateUI.render(fixWidth: innerContentWidth)
+              UserDef.kUseFixedCandidateOrderOnSelection.render(fixWidth: innerContentWidth)
+              UserDef.kConsolidateContextOnCandidateSelection.render(fixWidth: innerContentWidth)
             }?.boxed()
-            NSStackView.buildSection(width: contentWidth) {
-              UserDef.kEnableMouseScrollingForTDKCandidatesCocoa.render(fixWidth: contentWidth)
+            NSStackView.buildSection(width: innerContentWidth) {
+              UserDef.kEnableMouseScrollingForTDKCandidatesCocoa.render(fixWidth: innerContentWidth)
               NSStackView.build(.horizontal) {
-                "Where's IMK Candidate Window?".makeNSLabel(fixWidth: contentWidth)
+                "Where's IMK Candidate Window?".makeNSLabel(fixWidth: innerContentWidth)
                 NSView()
                 NSButton(verbatim: "...", target: self, action: #selector(whereIsIMKCandidatesWindow(_:)))
               }

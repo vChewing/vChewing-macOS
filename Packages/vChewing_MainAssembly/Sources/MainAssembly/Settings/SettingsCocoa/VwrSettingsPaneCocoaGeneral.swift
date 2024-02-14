@@ -12,9 +12,11 @@ import Shared
 
 public extension SettingsPanesCocoa {
   class General: NSViewController {
-    let windowWidth: CGFloat = 577
-    let contentWidth: CGFloat = 512
-    var contentHalfWidth: CGFloat { contentWidth / 2 - 4 }
+    var windowWidth: CGFloat { SettingsPanesCocoa.windowWidth }
+    var contentWidth: CGFloat { SettingsPanesCocoa.contentWidth }
+    var innerContentWidth: CGFloat { SettingsPanesCocoa.innerContentWidth }
+    var tabContainerWidth: CGFloat { SettingsPanesCocoa.tabContainerWidth }
+    var contentHalfWidth: CGFloat { SettingsPanesCocoa.contentHalfWidth }
     var currentLanguageSelectItem: NSMenuItem?
     let btnLangSelector = NSPopUpButton()
     let languages = ["auto", "en", "zh-Hans", "zh-Hant", "ja"]
