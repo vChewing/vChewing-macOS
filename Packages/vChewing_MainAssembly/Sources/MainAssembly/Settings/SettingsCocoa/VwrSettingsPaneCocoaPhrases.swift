@@ -13,8 +13,11 @@ import Shared
 
 public extension SettingsPanesCocoa {
   class Phrases: NSViewController {
-    let windowWidth: CGFloat = 577
-    let contentWidth: CGFloat = 512
+    var windowWidth: CGFloat { SettingsPanesCocoa.windowWidth }
+    var contentWidth: CGFloat { SettingsPanesCocoa.contentWidth }
+    var innerContentWidth: CGFloat { SettingsPanesCocoa.innerContentWidth }
+    var tabContainerWidth: CGFloat { SettingsPanesCocoa.tabContainerWidth }
+    var contentHalfWidth: CGFloat { SettingsPanesCocoa.contentHalfWidth }
     let cmbPEInputModeMenu = NSPopUpButton()
     let cmbPEDataTypeMenu = NSPopUpButton()
     let btnPEReload = NSButton()

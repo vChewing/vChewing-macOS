@@ -14,8 +14,11 @@ import Shared
 
 public extension SettingsPanesCocoa {
   class Dictionary: NSViewController {
-    let windowWidth: CGFloat = 577
-    let contentWidth: CGFloat = 512
+    var windowWidth: CGFloat { SettingsPanesCocoa.windowWidth }
+    var contentWidth: CGFloat { SettingsPanesCocoa.contentWidth }
+    var innerContentWidth: CGFloat { SettingsPanesCocoa.innerContentWidth }
+    var tabContainerWidth: CGFloat { SettingsPanesCocoa.tabContainerWidth }
+    var contentHalfWidth: CGFloat { SettingsPanesCocoa.contentHalfWidth }
     let pctUserDictionaryFolder: NSPathControl = .init()
     let dragRetrieverKimo: NSFileDragRetrieverButton = .init()
 
@@ -108,7 +111,7 @@ public extension SettingsPanesCocoa {
       pathCtl.setContentHuggingPriority(.defaultHigh, for: .vertical)
       pathCtl.setContentCompressionResistancePriority(.defaultHigh, for: .horizontal)
       pathCtl.makeSimpleConstraint(.height, relation: .equal, value: NSFont.smallSystemFontSize * 2)
-      pathCtl.makeSimpleConstraint(.width, relation: .greaterThanOrEqual, value: 432)
+      pathCtl.makeSimpleConstraint(.width, relation: .greaterThanOrEqual, value: windowWidth - 145)
       pathCtl.url = URL(fileURLWithPath: LMMgr.dataFolderPath(isDefaultFolder: false))
       pathCtl.toolTip = "Please drag the desired target from Finder to this place.".localized
     }

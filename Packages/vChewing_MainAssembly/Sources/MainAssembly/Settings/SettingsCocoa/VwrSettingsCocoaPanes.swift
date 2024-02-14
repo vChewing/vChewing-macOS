@@ -20,6 +20,12 @@ public class SettingsPanesCocoa {
   public let ctlPageCassette = SettingsPanesCocoa.Cassette()
   public let ctlPageKeyboard = SettingsPanesCocoa.Keyboard()
   public let ctlPageDevZone = SettingsPanesCocoa.DevZone()
+
+  public static let windowWidth: CGFloat = 614
+  public static var contentWidth: CGFloat { windowWidth - 65 }
+  public static var innerContentWidth: CGFloat { contentWidth - 37 }
+  public static var tabContainerWidth: CGFloat { contentWidth + 20 }
+  public static var contentHalfWidth: CGFloat { contentWidth / 2 - 4 }
 }
 
 public extension SettingsPanesCocoa {
