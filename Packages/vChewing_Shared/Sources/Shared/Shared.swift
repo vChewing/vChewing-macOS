@@ -284,10 +284,44 @@ public enum FileOpenMethod: String {
   case safari = "Safari"
 
   public var appName: String {
-    switch self {
-    case .finder: return "Finder"
-    case .textEdit: return "TextEdit"
-    case .safari: return "Safari"
+    let englishFallback: String = {
+      switch self {
+      case .finder: return "Finder"
+      case .textEdit: return "TextEdit"
+      case .safari: return "Safari"
+      }
+    }()
+    let tag = Locale.preferredLanguages.first?.lowercased().replacingOccurrences(of: "_", with: "-")
+    guard let tag = tag else { return englishFallback }
+    switch tag.prefix(2) {
+    case "ja":
+      switch self {
+      case .finder: return "Finder"
+      case .textEdit: return "テキストエディット"
+      case .safari: return "Safari"
+      }
+    case "zh" where tag.hasSuffix("-cn") || tag.hasSuffix("-hans"):
+      if #available(macOS 10.13.2, *) {
+        switch self {
+        case .finder: return "访达"
+        case .textEdit: return "文本编辑"
+        case .safari: return "Safari浏览器"
+        }
+      } else {
+        switch self {
+        case .finder: return "Finder"
+        case .textEdit: return "文本编辑"
+        case .safari: return "Safari"
+        }
+      }
+    case "zh-hant" where tag.hasSuffix("-tw") || tag.hasSuffix("-hk") || tag.hasSuffix("-hant"):
+      switch self {
+      case .finder: return "Finder"
+      case .textEdit: return "文字編輯"
+      case .safari: return "Safari"
+      }
+    default:
+      return englishFallback
     }
   }
 
