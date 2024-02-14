@@ -11,6 +11,24 @@ BUILD_SETTINGS += ARCHS="$(ARCHS)"
 BUILD_SETTINGS += ONLY_ACTIVE_ARCH=NO
 endif
 
+spmDebug:
+	swift build -c debug --package-path ./Packages/vChewing_MainAssembly/
+
+spmRelease:
+	swift build -c release --package-path ./Packages/vChewing_MainAssembly/
+
+spmLintFormat:
+	make lint --file=./Packages/Makefile || true
+	make format --file=./Packages/Makefile || true
+
+spmClean:
+	@for currentDir in $$(ls ./Packages/); do \
+		if [ -d $$a ]; then \
+			echo "processing folder $$currentDir"; \
+			swift package clean --package-path ./Packages/$$currentDir || true; \
+		fi; \
+	done;
+
 release: 
 	xcodebuild -project vChewing.xcodeproj -scheme vChewingInstaller -configuration Release $(BUILD_SETTINGS) build
 
@@ -42,6 +60,7 @@ install-release: permission-check
 .PHONY: clean
 
 clean:
+	make clean --file=./Packages/Makefile || true
 	xcodebuild -scheme vChewingInstaller -configuration Debug $(BUILD_SETTINGS)  clean
 	xcodebuild -scheme vChewingInstaller -configuration Release $(BUILD_SETTINGS) clean
 	make clean --file=./Source/Data/Makefile || true
