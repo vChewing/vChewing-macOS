@@ -1,4 +1,4 @@
-name: Build-with-macOS-latest
+name: debug-macOS-MainAssembly
 on:
   push:
     branches: [ "main" ]
@@ -17,6 +17,6 @@ jobs:
           xcode-version: '^15.1'
       - uses: actions/checkout@v1
       - name: Clean
-        run: make clean
+        run: make spmClean
       - name: Build
-        run: git pull --all && git submodule sync; make update; make
+        run: make spmDebug
