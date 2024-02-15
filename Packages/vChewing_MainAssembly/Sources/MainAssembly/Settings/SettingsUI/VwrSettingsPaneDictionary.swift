@@ -41,6 +41,9 @@ public struct VwrSettingsPaneDictionary: View {
   @AppStorage(wrappedValue: false, UserDef.kAllowBoostingSingleKanjiAsUserPhrase.rawValue)
   private var allowBoostingSingleKanjiAsUserPhrase: Bool
 
+  @AppStorage(wrappedValue: false, UserDef.kFilterNonCNSReadingsForCHTInput.rawValue)
+  private var filterNonCNSReadingsForCHTInput: Bool
+
   // MARK: - Main View
 
   @State var keykeyImportButtonDisabled = false
@@ -161,6 +164,11 @@ public struct VwrSettingsPaneDictionary: View {
         Section {
           UserDef.kUseExternalFactoryDict.bind(
             $useExternalFactoryDict.didChange {
+              LMMgr.connectCoreDB()
+            }
+          ).render()
+          UserDef.kFilterNonCNSReadingsForCHTInput.bind(
+            $filterNonCNSReadingsForCHTInput.didChange {
               LMMgr.connectCoreDB()
             }
           ).render()

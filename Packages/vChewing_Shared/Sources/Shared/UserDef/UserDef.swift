@@ -102,6 +102,7 @@ public enum UserDef: String, CaseIterable, Identifiable {
   case kShareAlphanumericalModeStatusAcrossClients = "ShareAlphanumericalModeStatusAcrossClients"
   case kPhraseEditorAutoReloadExternalModifications = "PhraseEditorAutoReloadExternalModifications"
   case kClassicHaninKeyboardSymbolModeShortcutEnabled = "ClassicHaninKeyboardSymbolModeShortcutEnabled"
+  case kFilterNonCNSReadingsForCHTInput = "FilterNonCNSReadingsForCHTInput"
 
   case kUseSpaceToCommitHighlightedSCPCCandidate = "UseSpaceToCommitHighlightedSCPCCandidate"
   case kEnableMouseScrollingForTDKCandidatesCocoa = "EnableMouseScrollingForTDKCandidatesCocoa"
@@ -225,6 +226,7 @@ public extension UserDef {
     case .kShareAlphanumericalModeStatusAcrossClients: return .bool
     case .kPhraseEditorAutoReloadExternalModifications: return .bool
     case .kClassicHaninKeyboardSymbolModeShortcutEnabled: return .bool
+    case .kFilterNonCNSReadingsForCHTInput: return .bool
     case .kUseSpaceToCommitHighlightedSCPCCandidate: return .bool
     case .kEnableMouseScrollingForTDKCandidatesCocoa: return .bool
     case .kDisableSegmentedThickUnderlineInMarkingModeForManagedClients: return .bool
@@ -544,6 +546,9 @@ public extension UserDef {
       )
     case .kClassicHaninKeyboardSymbolModeShortcutEnabled: return .init(
         userDef: self, shortTitle: "Also use “\\” or “¥” key for Hanin Keyboard Symbol Input"
+      )
+    case .kFilterNonCNSReadingsForCHTInput: return .init(
+        userDef: self, shortTitle: "i18n:UserDef.kFilterNonCNSReadingsForCHTInput.shortTitle"
       )
     case .kUseSpaceToCommitHighlightedSCPCCandidate: return .init(
         userDef: self, shortTitle: "Use Space to confirm highlighted candidate in Per-Char Select Mode"

@@ -201,9 +201,9 @@
 "i18n:securityAgentHelper.warningMessage.footer" = "このメッセージが出た時に、威注音がすでに「DisableSecureEventInput()」を実行してみました。これで入力ソースメニューで威注音は利用できる状態になったかもしれませんが、下記のステップはおすすめです：\n\nイ）今のこのメッセージの画面のスクリーンショットを撮って置いてください。後ほど使えます。\n\nロ）もし、今でも入力ソースメニューで威注音は利用できぬ状態でしたら、上記のプロセスを（強制）中止してください。そうすれば、それぞれのSecureEventInput状態は解消できて、入力ソースメニューで威注音はすぐ利用できることになります。\n\nハ）もし、該当プロセスは Mac App Store のアプリからのものでしたら、該当アプリを Apple 社にご通報ください。状況と必要性次第、該当アプリは Mac App Store からしばらく取り下がて、支障解決まで Mac App Store 提供中止になるかもしれません。\n\nニ）該当プロセスは Mac App Store からダウンロードしたものか否か、それぞれの開発元にこの支障をご通報ください。今のこのメッセージの画面のスクリーンショットを該当開発元に送れば、必要なる情報は該当開発元に全部お知らせすることができます。";
 "i18n:securityAgentHelper.warningMessage.header" = "威注音入力アプリ（略称「威注音」）は「他のバックグラウンド・プロセスがSecureEventInputを正しく利用していない」と検出しました。このような不正利用は「システム内蔵入力以外の全ての入力アプリがメニューで灰色状態で選べなくて使えない」の元凶です。\n\nセンシティブな資料の記入どころでSecureEventInputをEnableSecureEventInput()で使うのは当然ですが、「入力中」状態が終わった後必ずDisableSecureEventInput()で状態解消すべきだと義務です。いくつかヘルパーアプリも、あるいはSecureEventInputを呼び起こしてからすぐ固まったアプリも、この状態になりやすいです。特に、他のアプリの画面へ切り替えたとしても、固まったアプリのSecureEventInput状態は自動的に解消できません。\n\n検出した該当プロセスは:";
 "i18n:securityAgentHelper.warningMessage.title" = "SecureEventInput の不正利用が検出";
-"i18n:settings.importFromKimoTxt.label" = "Yahoo! KeyKey ユーザー辞書ファイルを読込";
 "i18n:settings.importFromKimoTxt.DirectlyImport" = "直接読込";
 "i18n:settings.importFromKimoTxt.finishedCount:%@" = "新しい記録は %@ つ読み込みました。";
+"i18n:settings.importFromKimoTxt.label" = "Yahoo! KeyKey ユーザー辞書ファイルを読込";
 "i18n:settings.shiftKeyASCIITogle.description" = "この機能の利用する NSEvent は、macOS 内蔵の入力アプリ共用モジュール「InputMethodKit」から提供した NSEvent のみであり、その NSEvent 文脈関係で「Shift キーは１回押したかどうか」と判断することはできる。この事実に疑いを持つ者は、本アプリのソースコードを審査するか、あるいは本アプリを逆向工程（分解工学, いわゆる「Reverse-Engineering」）するがよい。なお、Shiftキーによるこの切り替えは、CapsLockがONの時には効かぬ。";
 "i18n:UserDef.kBypassNonAppleCapsLockHandling.description" = "macOS 10.14 からのシステム内蔵機能としての同じ機能に影響しません。";
 "i18n:UserDef.kBypassNonAppleCapsLockHandling.shortTitle" = "威注音入力アプリの内蔵CapsLock処理を不使用";
@@ -211,6 +211,7 @@
 "i18n:UserDef.kCheckAbusersOfSecureEventInputAPI.shortTitle" = "SecureEventInput API を不正利用しているバクグラウンド・プロセスを自動検知";
 "i18n:UserDef.kCNS11643Enabled.shortTitle" = "全字庫モード // 入力可能な漢字数を倍増す (2024-01-23)";
 "i18n:UserDef.kDodgeInvalidEdgeCandidateCursorPosition.shortTitle" = "端末での不合理的な候補選択用カーソル位置を是正";
+"i18n:UserDef.kFilterNonCNSReadingsForCHTInput.shortTitle" = "全字庫以外の音読みを内蔵辞書繁体中国語検索結果から除く";
 "i18n:UserDef.kNumPadCharInputBehavior.description" = "テンキー文字の入力行為をご指定ください。";
 "i18n:UserDef.kNumPadCharInputBehavior.option.0" = "いつでも半角で直接出力";
 "i18n:UserDef.kNumPadCharInputBehavior.option.1" = "いつでも全角で直接出力";
