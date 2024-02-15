@@ -63,7 +63,7 @@
 "Candidate keys cannot contain space." = "選字鍵不得包含空格。";
 "Candidate Layout:" = "候選字窗佈局:";
 "Candidate Size:" = "候選字窗字號:";
-"Cassette mode is similar to the CIN support of the Yahoo Kimo IME, allowing users to use their own CIN tables to implement their stroked-based input schema (e.g. Wubi, Cangjie, Boshiamy, etc.) as a plan-B in vChewing IME. However, since vChewing won't compromise its phonabet input mode experience for this cassette mode, users might not feel comfortable enough comparing to their experiences with RIME (recommended) or OpenVanilla (deprecated)." = "磁帶模式類似於雅虎奇摩輸入法的 CIN 支援模式，允許使用者藉由 CIN 表格檔案擴充自己想要的筆畫輸入法（比如五筆、倉頡、嘸蝦米，等）。然而，因為威注音不打算為了這個功能而犧牲注音輸入的體驗，所以這個磁帶模式的體驗對於已經習慣 RIME 或者 OpenVanilla 的人群而言可能會稍微麻煩一些。";
+"Cassette mode is similar to the CIN support of the Yahoo! KeyKey IME, allowing users to use their own CIN tables to implement their stroked-based input schema (e.g. Wubi, Cangjie, Boshiamy, etc.) as a plan-B in vChewing IME. However, since vChewing won't compromise its phonabet input mode experience for this cassette mode, users might not feel comfortable enough comparing to their experiences with RIME (recommended) or OpenVanilla (deprecated)." = "磁帶模式類似於雅虎奇摩輸入法的 CIN 支援模式，允許使用者藉由 CIN 表格檔案擴充自己想要的筆畫輸入法（比如五筆、倉頡、嘸蝦米，等）。然而，因為威注音不打算為了這個功能而犧牲注音輸入的體驗，所以這個磁帶模式的體驗對於已經習慣 RIME 或者 OpenVanilla 的人群而言可能會稍微麻煩一些。";
 "Cassette" = "磁帶設定";
 "catAlphabets" = "字母";
 "catBracketedASCII" = "括英";
@@ -195,11 +195,14 @@
 "i18n:aboutWindow.OK_BUTTON" = "確定";
 "i18n:aboutWindow.WEBSITE_BUTTON" = "網站";
 "i18n:CandidateKey.ValidationError.AssignedForOtherPurposes" = "無法將已挪作他用的按鍵設為選字鍵。";
+"i18n:KimoDataImportError.connectionFailure.errMsg" = "「直接匯入」功能失敗：無法成功建立 NSConnection 跨執行緒通訊。\n\n- 在執行該步驟之前，請確保奇摩輸入法有在運行。威注音輸入法已經在此刻發起了一次對奇摩輸入法的運行呼叫請求，於是您可以立刻再次重試。\n\n- 如果您當前運行的威注音輸入法的程式包是您自己建置的話，請檢查專案內的 Sandbox 權能組態設定檔案（Entitlements）、看看是否發生了與此有關的內容變更。\n\n- 如果這台 Mac 並未使用 Intel CPU 的話，請先安裝 Rosetta 2，否則奇摩輸入法將無法運作。\n\n- 如果以上狀況都被排除了的話，那麼 __objc_empty_cache 這個 API 可能在當前版本的作業系統內被移除了。這個 API 對奇摩輸入法而言至關重要。請檢查您當前的作業系統內建的「系統監視程式 Console.app」，確認一下是否有與奇摩輸入法有關的程式崩潰報告。";
+"i18n:KimoDataImportError.fileHandlerFailure.errMsg" = "沒能將新的資料成功寫入到使用者自訂語彙辭典當中。";
 "i18n:kimoImportButton.DragFileToHere" = "請將檔案拽到這邊";
 "i18n:securityAgentHelper.warningMessage.footer" = "當這則訊息呈現出來的時候，威注音已經嘗試呼叫 `DisableSecureEventInput()` 來試圖解除這個狀態。以下是威注音建議您採取的行動：\n\n0. 將這則訊息視窗留一份螢幕擷圖、以備接下來的需要。\n\n1. 如果輸入法選單內的威注音仍舊處於無法選取的狀態（下文簡稱「灰色不可用狀態」），則請考慮結束上述執行緒、以迫使其釋放各自的 SecureEventInput 狀態。這將立刻解除威注音的灰色不可用狀態。\n\n2. 如果該執行緒所屬的 App 來自於 Mac App Store 的話，請向 Apple 檢舉其對 SecureEventInput 的濫用。Apple 會在必要的情況下對這類 App 採取措施，比如：臨時下架，直至軟體研發方解決相關故障。\n\n3. 無論該執行緒是否來自於 Mac App Store，也都請您向相關的研發方/提供方提報該故障。您可以將這則訊息的螢幕擷圖給他們看，因為裡面已經包含了用以偵測該故障的必要資訊。";
 "i18n:securityAgentHelper.warningMessage.header" = "威注音有偵測到下述後檯執行緒有在濫用 SecureEventInput。這種濫用會導致系統內的所有第三方輸入法全都無法正常使用（在輸入法選單內會變成灰色）。\n\n針對需要填寫敏感資料的場合，使用 SecureEventInput 無可厚非。但是，用 EnableSecureEventInput() 開啟該模式之後，就有義務在輸入窗格失焦的那一刻呼叫 DisableSecureEventInput() 來結束這種狀態。這種狀態還常見於後檯輔助 App 當中、或者某個 App 在叫出該模式之後失去回應（這樣的話，哪怕被切換到後檯，SecureEventInput 也不會自動解除）。\n\n被偵測到的執行緒如下:";
 "i18n:securityAgentHelper.warningMessage.title" = "偵測到對 SecureEventInput 的濫用行為";
-"i18n:settings.importFromKimoTxt.buttonText" = "匯入奇摩輸入法自訂詞資料庫";
+"i18n:settings.importFromKimoTxt.label" = "匯入奇摩輸入法自訂詞資料庫";
+"i18n:settings.importFromKimoTxt.DirectlyImport" = "直接匯入";
 "i18n:settings.importFromKimoTxt.finishedCount:%@" = "匯入了 %@ 筆新記錄。";
 "i18n:settings.shiftKeyASCIITogle.description" = "該功能只需要對藉由 macOS 內建的輸入法框架傳來的 NSEvent 做上下文分析，自然沒有「向使用者尋求系統全局鍵盤事件監聽權限」之必要。您可自行審視敝輸入法的原始程式碼倉庫、或對敝輸入法逆向工程，以自行證實此處所言之真假。另註：這個 Shift 鍵切換開關在 CapsLock 燈亮時無效。";
 "i18n:UserDef.kBypassNonAppleCapsLockHandling.description" = "這不會影響到自 macOS 10.14 開始的系統內建的同名功能。";

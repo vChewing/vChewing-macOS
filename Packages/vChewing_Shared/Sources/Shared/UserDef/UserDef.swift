@@ -351,7 +351,7 @@ public extension UserDef {
       )
     case .kCassetteEnabled: return .init(
         userDef: self, shortTitle: "Enable cassette mode, suppressing phonabet input",
-        description: "Cassette mode is similar to the CIN support of the Yahoo Kimo IME, allowing users to use their own CIN tables to implement their stroked-based input schema (e.g. Wubi, Cangjie, Boshiamy, etc.) as a plan-B in vChewing IME. However, since vChewing won't compromise its phonabet input mode experience for this cassette mode, users might not feel comfortable enough comparing to their experiences with RIME (recommended) or OpenVanilla (deprecated)."
+        description: "Cassette mode is similar to the CIN support of the Yahoo! KeyKey IME, allowing users to use their own CIN tables to implement their stroked-based input schema (e.g. Wubi, Cangjie, Boshiamy, etc.) as a plan-B in vChewing IME. However, since vChewing won't compromise its phonabet input mode experience for this cassette mode, users might not feel comfortable enough comparing to their experiences with RIME (recommended) or OpenVanilla (deprecated)."
       )
     case .kCNS11643Enabled: return .init(userDef: self, shortTitle: "i18n:UserDef.kCNS11643Enabled.shortTitle")
     case .kSymbolInputEnabled: return .init(
