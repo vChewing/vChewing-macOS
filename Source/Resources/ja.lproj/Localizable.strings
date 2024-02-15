@@ -225,6 +225,7 @@
 "i18n:userdef.kRespectClientAccentColor.shortTitle" = "客体アプリ・システムのアクセントカラーに準ず";
 "i18n:UserDef.kShiftEisuToggleOffTogetherWithCapsLock.description" = "このチェックを入れると：イ）[macOS 12 以降] CapsLockがオフした時に、「Shiftキー・JIS英数キー」の共有していた内部のスイッチもオフにする；ロ）「JIS英数キー」でそのキーに応ずる英数モードがオフした時に、CapsLockもオフにする。尚、CapsLockがオンの時に、「Shiftキーだけを打った」行為は検知できません。";
 "i18n:UserDef.kShiftEisuToggleOffTogetherWithCapsLock.shortTitle" = "「Shiftキー・JIS英数キー」による英数モードのオフ状態をCapsLockのオフ状態と同期する";
+"i18n:UserDef.kShowCodePointInCandidateUI.shortTitle" = "候補陳列ウィンドウで Unicode のコードポイント情報を示す";
 "i18n:UserDef.kUseJKtoMoveCompositorCursorInCandidateState.description" = "⚠︎ これで「J / K」キーは言選り用キー陣列から自動的に外されます。尚、この機能はカセットモードの「%quick」による早速候補入力状態では利用できません。";
 "i18n:UserDef.kUseJKtoMoveCompositorCursorInCandidateState.shortTitle" = "候補陳列が見えるとき、「J / K」キーで入力緩衝列のカーソルを移す";
 "IBM" = "IBM 配列";
