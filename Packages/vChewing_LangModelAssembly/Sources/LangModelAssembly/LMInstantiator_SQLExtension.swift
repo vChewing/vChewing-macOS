@@ -165,6 +165,24 @@ extension vChewingLM.LMInstantiator {
     return grams
   }
 
+  /// 根據給定的讀音索引鍵，來獲取原廠 CNS 資料庫辭典內的對應資料陣列的 UTF8 資料。
+  /// 該函式僅用來快速篩查 CNS 檢索結果
+  /// - parameters:
+  ///   - key: 讀音索引鍵。
+  ///   - column: 資料欄位。
+  private func factoryCNSFilterThreadFor(key: String) -> String? {
+    let column = CoreColumn.theDataCNS
+    if key == "_punctuation_list" { return nil }
+    var results: [String] = []
+    // 此處需要把 ASCII 單引號換成連續兩個單引號，否則會有 SQLite 語句查詢故障。
+    let encryptedKey = Self.cnvPhonabetToASCII(key.replacingOccurrences(of: "'", with: "''"))
+    let sqlQuery = "SELECT * FROM DATA_MAIN WHERE theKey='\(encryptedKey)';"
+    Self.querySQL(strStmt: sqlQuery, coreColumn: column) { currentResult in
+      results.append(currentResult)
+    }
+    return results.joined(separator: "\t")
+  }
+
   /// 根據給定的讀音索引鍵，來獲取原廠資料庫辭典內的對應資料陣列的 UTF8 資料、就地分析、生成單元圖陣列。
   /// - remark: 該函式暫時用不到，但先不用刪除。沒準今後會有用場。
   /// - parameters:
@@ -176,6 +194,19 @@ extension vChewingLM.LMInstantiator {
     // 此處為特例，無須以分號結尾。回頭整句塞到「SELECT EXISTS();」當中執行。
     let sqlQuery = "SELECT * FROM DATA_MAIN WHERE theKey='\(encryptedKey)' AND \(column.name) IS NOT NULL"
     return Self.hasSQLResult(strStmt: sqlQuery)
+  }
+
+  /// 檢查該當 Unigram 結果是否完全符合台澎金馬 CNS11643 的規定讀音。
+  /// 該函式不適合拿給簡體中文模式使用。
+  func checkCNSConformation(for unigram: Megrez.Unigram, keyArray: [String]) -> Bool {
+    guard unigram.value.count == keyArray.count else { return true }
+    let chars = unigram.value.map(\.description)
+    for (i, key) in keyArray.enumerated() {
+      guard !key.hasPrefix("_") else { continue }
+      guard let matchedCNSResult = factoryCNSFilterThreadFor(key: key) else { continue }
+      guard matchedCNSResult.contains(chars[i]) else { return false }
+    }
+    return true
   }
 }
 

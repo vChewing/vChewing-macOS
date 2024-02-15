@@ -44,4 +44,21 @@ final class LMInstantiatorSQLTests: XCTestCase {
     XCTAssertEqual(vChewingLM.LMInstantiator.getFactoryReverseLookupData(with: "和"), expectedReverseLookupResults)
     vChewingLM.LMInstantiator.disconnectSQLDB()
   }
+
+  func testCNSMask() throws {
+    let instance = vChewingLM.LMInstantiator(isCHS: false)
+    XCTAssertTrue(vChewingLM.LMInstantiator.connectToTestSQLDB())
+    instance.setOptions { config in
+      config.isCNSEnabled = false
+      config.isSymbolEnabled = false
+      config.filterNonCNSReadings = false
+    }
+    XCTAssertEqual(instance.unigramsFor(keyArray: ["ㄨㄟ"]).description, "[(危,-6.0)]")
+    XCTAssertEqual(instance.unigramsFor(keyArray: ["ㄨㄟˊ"]).description, "[(危,-6.0)]")
+    instance.setOptions { config in
+      config.filterNonCNSReadings = true
+    }
+    XCTAssertEqual(instance.unigramsFor(keyArray: ["ㄨㄟ"]).description, "[]")
+    XCTAssertEqual(instance.unigramsFor(keyArray: ["ㄨㄟˊ"]).description, "[(危,-6.0)]")
+  }
 }
