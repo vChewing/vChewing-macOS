@@ -64,6 +64,7 @@ public protocol PrefMgrProtocol {
   var showTranslatedStrokesInCompositionBuffer: Bool { get set }
   var forceCassetteChineseConversion: Int { get set }
   var showReverseLookupInCandidateUI: Bool { get set }
+  var showCodePointInCandidateUI: Bool { get set }
   var autoCompositeWithLongestPossibleCassetteKey: Bool { get set }
   var shareAlphanumericalModeStatusAcrossClients: Bool { get set }
   var phraseEditorAutoReloadExternalModifications: Bool { get set }
