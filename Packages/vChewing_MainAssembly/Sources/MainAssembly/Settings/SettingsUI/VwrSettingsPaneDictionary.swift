@@ -186,12 +186,10 @@ public struct VwrSettingsPaneDictionary: View {
         }
         Section {
           UserDef.kAllowBoostingSingleKanjiAsUserPhrase.bind($allowBoostingSingleKanjiAsUserPhrase).render()
-        } footer: {
-          HStack {
-            Spacer()
-            Button {
+          LabeledContent("i18n:settings.importFromKimoTxt.label") {
+            Button("…") {
               Self.dlgOpenFile.title = NSLocalizedString(
-                "i18n:settings.importFromKimoTxt.buttonText", comment: ""
+                "i18n:settings.importFromKimoTxt.label", comment: ""
               ) + ":"
               Self.dlgOpenFile.showsResizeIndicator = true
               Self.dlgOpenFile.showsHiddenFiles = true
@@ -207,15 +205,27 @@ public struct VwrSettingsPaneDictionary: View {
                     defer { keykeyImportButtonDisabled = false }
                     guard let url = Self.dlgOpenFile.url else { return }
                     guard var rawString = try? String(contentsOf: url) else { return }
-                    let count = LMMgr.importYahooKeyKeyUserDictionary(text: &rawString)
+                    let maybeCount = try? LMMgr.importYahooKeyKeyUserDictionary(text: &rawString)
+                    let count: Int = maybeCount ?? 0
                     window.callAlert(title: String(format: "i18n:settings.importFromKimoTxt.finishedCount:%@".localized, count.description))
                   }
                 }
               }
-            } label: {
-              Text(verbatim: "i18n:settings.importFromKimoTxt.buttonText".localized + " (TXT)…")
-            }.disabled(keykeyImportButtonDisabled)
-          }
+            }
+            Button("i18n:settings.importFromKimoTxt.DirectlyImport") {
+              do {
+                let count = try LMMgr.importYahooKeyKeyUserDictionaryByXPC()
+                CtlSettingsUI.shared?.window.callAlert(
+                  title: String(format: "i18n:settings.importFromKimoTxt.finishedCount:%@".localized, count.description)
+                )
+              } catch {
+                let error = NSAlert(error: error)
+                error.beginSheetModal(at: CtlSettingsUI.shared?.window) { _ in
+                  // DO NOTHING.
+                }
+              }
+            }
+          }.disabled(keykeyImportButtonDisabled)
         }
       }.formStyled()
     }
