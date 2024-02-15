@@ -52,7 +52,8 @@ case 2:
       print("[Kimo Import] Given file path is either invalid or not accessible. Read access is needed for this operation.")
       exit(1)
     }
-    let count = LMMgr.importYahooKeyKeyUserDictionary(text: &rawString)
+    let maybeCount = try? LMMgr.importYahooKeyKeyUserDictionary(text: &rawString)
+    let count: Int = maybeCount ?? 0
     let msg = String(format: "i18n:settings.importFromKimoTxt.finishedCount:%@".localized, count.description)
     print("[Kimo Import] \(msg)")
     exit(0)

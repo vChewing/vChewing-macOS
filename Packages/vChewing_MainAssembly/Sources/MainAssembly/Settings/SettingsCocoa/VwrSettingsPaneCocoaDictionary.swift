@@ -66,9 +66,16 @@ public extension SettingsPanesCocoa {
         NSStackView.buildSection(width: contentWidth) {
           UserDef.kAllowBoostingSingleKanjiAsUserPhrase.render(fixWidth: contentWidth)
           NSStackView.build(.horizontal) {
-            "i18n:settings.importFromKimoTxt.buttonText".makeNSLabel(fixWidth: contentWidth)
+            "i18n:settings.importFromKimoTxt.label".makeNSLabel(fixWidth: contentWidth)
             NSView()
-            importKimoDragButton()
+            NSStackView.build(.horizontal, spacing: 4) {
+              importKimoDragButton()
+              NSButton(
+                "i18n:settings.importFromKimoTxt.DirectlyImport",
+                target: self,
+                action: #selector(importYahooKeyKeyUserDictionaryDataXPC(_:))
+              )
+            }
           }
         }?.boxed()
         NSView().makeSimpleConstraint(.height, relation: .equal, value: NSFont.systemFontSize)
@@ -78,7 +85,8 @@ public extension SettingsPanesCocoa {
     func importKimoDragButton() -> NSFileDragRetrieverButton {
       dragRetrieverKimo.postDragHandler = { url in
         guard var rawString = try? String(contentsOf: url) else { return }
-        let count = LMMgr.importYahooKeyKeyUserDictionary(text: &rawString)
+        let maybeCount = try? LMMgr.importYahooKeyKeyUserDictionary(text: &rawString)
+        let count: Int = maybeCount ?? 0
         CtlSettingsCocoa.shared?.window.callAlert(
           title: String(format: "i18n:settings.importFromKimoTxt.finishedCount:%@".localized, count.description)
         )
@@ -137,6 +145,20 @@ public extension SettingsPanesCocoa {
       }
     }
 
+    @IBAction func importYahooKeyKeyUserDictionaryDataXPC(_: NSButton) {
+      do {
+        let count = try LMMgr.importYahooKeyKeyUserDictionaryByXPC()
+        CtlSettingsCocoa.shared?.window.callAlert(
+          title: String(format: "i18n:settings.importFromKimoTxt.finishedCount:%@".localized, count.description)
+        )
+      } catch {
+        let error = NSAlert(error: error)
+        error.beginSheetModal(at: CtlSettingsCocoa.shared?.window) { _ in
+          // DO NOTHING.
+        }
+      }
+    }
+
     @IBAction func importYahooKeyKeyUserDictionaryData(_: NSButton) {
       guard #available(macOS 10.13, *) else {
         SettingsPanesCocoa.warnAboutComDlg32Inavailability()
@@ -144,7 +166,7 @@ public extension SettingsPanesCocoa {
       }
       let dlgOpenFile = NSOpenPanel()
       dlgOpenFile.title = NSLocalizedString(
-        "i18n:settings.importFromKimoTxt.buttonText", comment: ""
+        "i18n:settings.importFromKimoTxt.label", comment: ""
       ) + ":"
       dlgOpenFile.showsResizeIndicator = true
       dlgOpenFile.showsHiddenFiles = true
@@ -162,7 +184,8 @@ public extension SettingsPanesCocoa {
         if result == NSApplication.ModalResponse.OK {
           guard let url = dlgOpenFile.url else { return }
           guard var rawString = try? String(contentsOf: url) else { return }
-          let count = LMMgr.importYahooKeyKeyUserDictionary(text: &rawString)
+          let maybeCount = try? LMMgr.importYahooKeyKeyUserDictionary(text: &rawString)
+          let count: Int = maybeCount ?? 0
           window.callAlert(title: String(format: "i18n:settings.importFromKimoTxt.finishedCount:%@".localized, count.description))
         }
       }

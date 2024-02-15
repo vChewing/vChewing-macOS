@@ -3,7 +3,7 @@
 	archiveVersion = 1;
 	classes = {
 	};
-	objectVersion = 54;
+	objectVersion = 60;
 	objects = {
 
 /* Begin PBXBuildFile section */
@@ -34,6 +34,7 @@
 		5BC5E01E28DDE4770094E427 /* NotifierUI in Frameworks */ = {isa = PBXBuildFile; productRef = 5BC5E01D28DDE4770094E427 /* NotifierUI */; };
 		5BC5E02128DDEFE00094E427 /* TooltipUI in Frameworks */ = {isa = PBXBuildFile; productRef = 5BC5E02028DDEFE00094E427 /* TooltipUI */; };
 		5BC5E02428DE07860094E427 /* PopupCompositionBuffer in Frameworks */ = {isa = PBXBuildFile; productRef = 5BC5E02328DE07860094E427 /* PopupCompositionBuffer */; };
+		5BC8EB7E2B7E1CC1004F5101 /* KimoDataReader in Frameworks */ = {isa = PBXBuildFile; productRef = 5BC8EB7D2B7E1CC1004F5101 /* KimoDataReader */; };
 		5BDB7A3928D4824A001AC277 /* BookmarkManager in Frameworks */ = {isa = PBXBuildFile; productRef = 5BDB7A3828D4824A001AC277 /* BookmarkManager */; };
 		5BDB7A3B28D4824A001AC277 /* FolderMonitor in Frameworks */ = {isa = PBXBuildFile; productRef = 5BDB7A3A28D4824A001AC277 /* FolderMonitor */; };
 		5BDB7A3D28D4824A001AC277 /* Hotenka in Frameworks */ = {isa = PBXBuildFile; productRef = 5BDB7A3C28D4824A001AC277 /* Hotenka */; };
@@ -129,6 +130,7 @@
 		5B963CA128D5C22D00DCEE88 /* vChewing_SwiftExtension */ = {isa = PBXFileReference; lastKnownFileType = wrapper; name = vChewing_SwiftExtension; path = Packages/vChewing_SwiftExtension; sourceTree = "<group>"; };
 		5B98114628D6198000CBC605 /* vChewing_PinyinPhonaConverter */ = {isa = PBXFileReference; lastKnownFileType = wrapper; name = vChewing_PinyinPhonaConverter; path = Packages/vChewing_PinyinPhonaConverter; sourceTree = "<group>"; };
 		5BA8C30128DEFE4F004C5CC4 /* vChewing_CandidateWindow */ = {isa = PBXFileReference; lastKnownFileType = wrapper; name = vChewing_CandidateWindow; path = Packages/vChewing_CandidateWindow; sourceTree = "<group>"; };
+		5BAD29D12B7E1A1B0013D695 /* vChewing_KimoDataReader */ = {isa = PBXFileReference; lastKnownFileType = wrapper; name = vChewing_KimoDataReader; path = Packages/vChewing_KimoDataReader; sourceTree = "<group>"; };
 		5BAD67E12ADAB62D005A4842 /* HangarRash_SwiftyCapsLockToggler */ = {isa = PBXFileReference; lastKnownFileType = wrapper; name = HangarRash_SwiftyCapsLockToggler; path = Packages/HangarRash_SwiftyCapsLockToggler; sourceTree = "<group>"; };
 		5BBBB75D27AED54C0023B93A /* Beep.m4a */ = {isa = PBXFileReference; lastKnownFileType = file; path = Beep.m4a; sourceTree = "<group>"; };
 		5BBBB75E27AED54C0023B93A /* Fart.m4a */ = {isa = PBXFileReference; lastKnownFileType = file; path = Fart.m4a; sourceTree = "<group>"; };
@@ -193,6 +195,7 @@
 			files = (
 				5BC5E02428DE07860094E427 /* PopupCompositionBuffer in Frameworks */,
 				5B65FB342A9518DA007EEFB0 /* MainAssembly in Frameworks */,
+				5BC8EB7E2B7E1CC1004F5101 /* KimoDataReader in Frameworks */,
 				5BDB7A4528D4824A001AC277 /* ShiftKeyUpChecker in Frameworks */,
 				5BFC63CC28D49BBC004A77B7 /* UpdateSputnik in Frameworks */,
 				5BDB7A4128D4824A001AC277 /* Megrez in Frameworks */,
@@ -341,6 +344,7 @@
 				5B963C9B28D5BE4100DCEE88 /* vChewing_CocoaExtension */,
 				5BDB7A3228D47587001AC277 /* vChewing_Hotenka */,
 				5BFC63C728D49511004A77B7 /* vChewing_IMKUtils */,
+				5BAD29D12B7E1A1B0013D695 /* vChewing_KimoDataReader */,
 				5BFC63CD28D4AC98004A77B7 /* vChewing_LangModelAssembly */,
 				5B65FB322A9518C9007EEFB0 /* vChewing_MainAssembly */,
 				5BDB7A3328D47587001AC277 /* vChewing_Megrez */,
@@ -496,6 +500,7 @@
 				5BA8C30228DF0360004C5CC4 /* CandidateWindow */,
 				5B765F08293A253C00122315 /* PhraseEditorUI */,
 				5B65FB332A9518DA007EEFB0 /* MainAssembly */,
+				5BC8EB7D2B7E1CC1004F5101 /* KimoDataReader */,
 			);
 			productName = vChewing;
 			productReference = 6A0D4EA215FC0D2D00ABF4B3 /* vChewing.app */;
@@ -556,6 +561,7 @@
 			);
 			mainGroup = 6A0D4E9215FC0CFA00ABF4B3;
 			packageReferences = (
+				5BC8EB7C2B7E1CC1004F5101 /* XCLocalSwiftPackageReference "Packages/vChewing_KimoDataReader" */,
 			);
 			productRefGroup = 6A0D4EA315FC0D2D00ABF4B3 /* Products */;
 			projectDirPath = "";
@@ -1129,6 +1135,13 @@
 		};
 /* End XCConfigurationList section */
 
+/* Begin XCLocalSwiftPackageReference section */
+		5BC8EB7C2B7E1CC1004F5101 /* XCLocalSwiftPackageReference "Packages/vChewing_KimoDataReader" */ = {
+			isa = XCLocalSwiftPackageReference;
+			relativePath = Packages/vChewing_KimoDataReader;
+		};
+/* End XCLocalSwiftPackageReference section */
+
 /* Begin XCSwiftPackageProductDependency section */
 		5B40113828D7050D00A9D4CB /* Shared */ = {
 			isa = XCSwiftPackageProductDependency;
@@ -1173,6 +1186,10 @@
 		5BC5E02328DE07860094E427 /* PopupCompositionBuffer */ = {
 			isa = XCSwiftPackageProductDependency;
 			productName = PopupCompositionBuffer;
+		};
+		5BC8EB7D2B7E1CC1004F5101 /* KimoDataReader */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = KimoDataReader;
 		};
 		5BDB7A3828D4824A001AC277 /* BookmarkManager */ = {
 			isa = XCSwiftPackageProductDependency;
