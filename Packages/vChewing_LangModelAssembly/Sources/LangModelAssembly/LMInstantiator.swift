@@ -39,6 +39,7 @@ public extension vChewingLM {
       public var isCNSEnabled = false
       public var isSymbolEnabled = false
       public var isSCPCEnabled = false
+      public var filterNonCNSReadings = false
       public var deltaOfCalendarYears: Int = -2000
     }
 
@@ -345,7 +346,17 @@ public extension vChewingLM {
         rawAllUnigrams += supplyNumPadUnigrams(key: keyChain)
         // LMMisc 與 LMCore 的 score 在 (-10.0, 0.0) 這個區間內。
         rawAllUnigrams += factoryUnigramsFor(key: keyChain, column: .theDataCHEW)
-        rawAllUnigrams += factoryCoreUnigramsFor(key: keyChain)
+        // 原廠核心辭典內容。
+        var coreUnigramsResult: [Megrez.Unigram] = factoryCoreUnigramsFor(key: keyChain)
+        // 如果是繁體中文、且有開啟 CNS11643 全字庫讀音過濾開關的話，對原廠核心辭典內容追加過濾處理：
+        if config.filterNonCNSReadings, !isCHS {
+          coreUnigramsResult.removeAll { thisUnigram in
+            !checkCNSConformation(for: thisUnigram, keyArray: keyArray)
+          }
+        }
+        // 正式追加原廠核心辭典檢索結果。
+        rawAllUnigrams += coreUnigramsResult
+
         if config.isCNSEnabled {
           rawAllUnigrams += factoryUnigramsFor(key: keyChain, column: .theDataCNS)
         }
