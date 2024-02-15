@@ -44,27 +44,41 @@ public extension SettingsPanesCocoa {
             "Due to security concerns, we don't consider implementing anything related to shell script execution here. An input method doing this without implementing App Sandbox will definitely have system-wide vulnerabilities, considering that its related UserDefaults are easily tamperable to execute malicious shell scripts. vChewing is designed to be invulnerable from this kind of attack. Also, official releases of vChewing are Sandboxed.".makeNSLabel(descriptive: true, fixWidth: contentWidth)
           }
         }?.boxed()
+        NSTabView.build {
+          NSTabView.TabPage(title: "Ａ") {
+            NSStackView.buildSection(width: innerContentWidth) {
+              UserDef.kFetchSuggestionsFromUserOverrideModel.render(fixWidth: innerContentWidth)
+              UserDef.kFilterNonCNSReadingsForCHTInput.render(fixWidth: innerContentWidth) { renderable in
+                renderable.currentControl?.target = self
+                renderable.currentControl?.action = #selector(self.lmmgrSyncLMPrefs(_:))
+              }
+              UserDef.kCNS11643Enabled.render(fixWidth: innerContentWidth) { renderable in
+                renderable.currentControl?.target = self
+                renderable.currentControl?.action = #selector(self.lmmgrSyncLMPrefs(_:))
+              }
+              UserDef.kSymbolInputEnabled.render(fixWidth: innerContentWidth) { renderable in
+                renderable.currentControl?.target = self
+                renderable.currentControl?.action = #selector(self.lmmgrSyncLMPrefs(_:))
+              }
+            }?.boxed()
+            NSView()
+          }
+          NSTabView.TabPage(title: "Ｂ") {
+            NSStackView.buildSection(width: innerContentWidth) {
+              UserDef.kUseExternalFactoryDict.render(fixWidth: innerContentWidth) { renderable in
+                renderable.currentControl?.target = self
+                renderable.currentControl?.action = #selector(self.lmmgrConnectCoreDB(_:))
+              }
+              UserDef.kPhraseReplacementEnabled.render(fixWidth: innerContentWidth) { renderable in
+                renderable.currentControl?.target = self
+                renderable.currentControl?.action = #selector(self.lmmgrSyncLMPrefsWithReplacementTable(_:))
+              }
+              UserDef.kAllowBoostingSingleKanjiAsUserPhrase.render(fixWidth: innerContentWidth)
+            }?.boxed()
+            NSView()
+          }
+        }?.makeSimpleConstraint(.width, relation: .equal, value: tabContainerWidth)
         NSStackView.buildSection(width: contentWidth) {
-          UserDef.kUseExternalFactoryDict.render(fixWidth: contentWidth) { renderable in
-            renderable.currentControl?.target = self
-            renderable.currentControl?.action = #selector(self.lmmgrConnectCoreDB(_:))
-          }
-          UserDef.kFetchSuggestionsFromUserOverrideModel.render(fixWidth: contentWidth)
-          UserDef.kCNS11643Enabled.render(fixWidth: contentWidth) { renderable in
-            renderable.currentControl?.target = self
-            renderable.currentControl?.action = #selector(self.lmmgrSyncLMPrefs(_:))
-          }
-          UserDef.kSymbolInputEnabled.render(fixWidth: contentWidth) { renderable in
-            renderable.currentControl?.target = self
-            renderable.currentControl?.action = #selector(self.lmmgrSyncLMPrefs(_:))
-          }
-          UserDef.kPhraseReplacementEnabled.render(fixWidth: contentWidth) { renderable in
-            renderable.currentControl?.target = self
-            renderable.currentControl?.action = #selector(self.lmmgrSyncLMPrefsWithReplacementTable(_:))
-          }
-        }?.boxed()
-        NSStackView.buildSection(width: contentWidth) {
-          UserDef.kAllowBoostingSingleKanjiAsUserPhrase.render(fixWidth: contentWidth)
           NSStackView.build(.horizontal) {
             "i18n:settings.importFromKimoTxt.label".makeNSLabel(fixWidth: contentWidth)
             NSView()

@@ -69,6 +69,7 @@ public protocol PrefMgrProtocol {
   var shareAlphanumericalModeStatusAcrossClients: Bool { get set }
   var phraseEditorAutoReloadExternalModifications: Bool { get set }
   var classicHaninKeyboardSymbolModeShortcutEnabled: Bool { get set }
+  var filterNonCNSReadingsForCHTInput: Bool { get set }
   var cns11643Enabled: Bool { get set }
   var cassetteEnabled: Bool { get set }
   var symbolInputEnabled: Bool { get set }

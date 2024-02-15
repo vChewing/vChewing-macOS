@@ -178,6 +178,7 @@ public class LMMgr {
         config.isSymbolEnabled = PrefMgr.shared.symbolInputEnabled
         config.isSCPCEnabled = PrefMgr.shared.useSCPCTypingMode
         config.isCassetteEnabled = PrefMgr.shared.cassetteEnabled
+        config.filterNonCNSReadings = PrefMgr.shared.filterNonCNSReadingsForCHTInput
         config.deltaOfCalendarYears = PrefMgr.shared.deltaOfCalendarYears
       }
     }
