@@ -97,6 +97,7 @@ public enum UserDef: String, CaseIterable, Identifiable {
   case kShowTranslatedStrokesInCompositionBuffer = "ShowTranslatedStrokesInCompositionBuffer"
   case kForceCassetteChineseConversion = "ForceCassetteChineseConversion"
   case kShowReverseLookupInCandidateUI = "ShowReverseLookupInCandidateUI"
+  case kShowCodePointInCandidateUI = "ShowCodePointInCandidateUI"
   case kAutoCompositeWithLongestPossibleCassetteKey = "AutoCompositeWithLongestPossibleCassetteKey"
   case kShareAlphanumericalModeStatusAcrossClients = "ShareAlphanumericalModeStatusAcrossClients"
   case kPhraseEditorAutoReloadExternalModifications = "PhraseEditorAutoReloadExternalModifications"
@@ -219,6 +220,7 @@ public extension UserDef {
     case .kShowTranslatedStrokesInCompositionBuffer: return .bool
     case .kForceCassetteChineseConversion: return .integer
     case .kShowReverseLookupInCandidateUI: return .bool
+    case .kShowCodePointInCandidateUI: return .bool
     case .kAutoCompositeWithLongestPossibleCassetteKey: return .bool
     case .kShareAlphanumericalModeStatusAcrossClients: return .bool
     case .kPhraseEditorAutoReloadExternalModifications: return .bool
@@ -526,6 +528,9 @@ public extension UserDef {
     case .kShowReverseLookupInCandidateUI: return .init(
         userDef: self, shortTitle: "Show available reverse-lookup results in candidate window",
         description: "The lookup results are supplied by the CIN cassette module."
+      )
+    case .kShowCodePointInCandidateUI: return .init(
+        userDef: self, shortTitle: "i18n:UserDef.kShowCodePointInCandidateUI.shortTitle"
       )
     case .kAutoCompositeWithLongestPossibleCassetteKey: return .init(
         userDef: self, shortTitle: "Auto-composite when the longest possible key is formed"

@@ -225,6 +225,7 @@
 "i18n:userdef.kRespectClientAccentColor.shortTitle" = "遵循客体应用或系统全局的强调色偏好设定";
 "i18n:UserDef.kShiftEisuToggleOffTogetherWithCapsLock.description" = "勾选该选项后：1) [至少 macOS 12 起] Caps Lock 在关掉的时候，会连带关掉由 Shift 键 / JIS 英数键负责控制的英数模式；2) 在借由 JIS 英数键关掉其控制的英数模式的时候，也会关掉 Caps Lock。注：威注音无法在 Caps Lock 亮灯的时候感知 Shift 键的单独敲击事件。";
 "i18n:UserDef.kShiftEisuToggleOffTogetherWithCapsLock.shortTitle" = "使「Shift 键 / JIS 英数键」英数模式的关闭状态与 Caps Lock 的关闭状态保持彼此同步";
+"i18n:UserDef.kShowCodePointInCandidateUI.shortTitle" = "在选字窗内显示当前候选字的统一码码位";
 "i18n:UserDef.kUseJKtoMoveCompositorCursorInCandidateState.description" = "⚠︎ 这将自动禁止 J / K 键用作选字键。另外，该功能在磁带模式的“%quick”快速选字状态下无效。";
 "i18n:UserDef.kUseJKtoMoveCompositorCursorInCandidateState.shortTitle" = "在选字窗显示时允许以 J / K 键移动组字区游标";
 "IBM" = "IBM 排列";

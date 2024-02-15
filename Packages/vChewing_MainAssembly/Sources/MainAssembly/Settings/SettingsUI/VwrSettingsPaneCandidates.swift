@@ -32,6 +32,9 @@ public struct VwrSettingsPaneCandidates: View {
   @AppStorage(wrappedValue: true, UserDef.kShowReverseLookupInCandidateUI.rawValue)
   private var showReverseLookupInCandidateUI: Bool
 
+  @AppStorage(wrappedValue: true, UserDef.kShowCodePointInCandidateUI.rawValue)
+  private var showCodePointInCandidateUI: Bool
+
   @AppStorage(wrappedValue: false, UserDef.kUseRearCursorMode.rawValue)
   private var useRearCursorMode: Bool
 
@@ -97,6 +100,7 @@ public struct VwrSettingsPaneCandidates: View {
         // MARK: (header: Text("Misc Settings:"))
 
         Section {
+          UserDef.kShowCodePointInCandidateUI.bind($showCodePointInCandidateUI).render()
           UserDef.kShowReverseLookupInCandidateUI.bind($showReverseLookupInCandidateUI).render()
           UserDef.kUseFixedCandidateOrderOnSelection.bind($useFixedCandidateOrderOnSelection).render()
           UserDef.kConsolidateContextOnCandidateSelection.bind($consolidateContextOnCandidateSelection).render()
