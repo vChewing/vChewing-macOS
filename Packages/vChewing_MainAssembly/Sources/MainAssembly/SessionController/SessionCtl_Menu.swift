@@ -45,6 +45,11 @@ extension SessionCtl {
         .act(#selector(toggleAssociatedPhrasesEnabled(_:)))
         .state(PrefMgr.shared.associatedPhrasesEnabled)
         .hotkey(PrefMgr.shared.usingHotKeyAssociates ? "O" : "", mask: [.command, .control])
+      NSMenu.Item("Edit Associated Phrases…")?
+        .act(#selector(openAssociatedPhrases(_:)))
+        .alternated()
+        .hotkey(PrefMgr.shared.usingHotKeyAssociates ? "O" : "", mask: [.command, .option, .control])
+        .nulled(silentMode)
       NSMenu.Item("CIN Cassette Mode")?
         .act(#selector(toggleCassetteMode(_:)))
         .state(PrefMgr.shared.cassetteEnabled)
@@ -74,47 +79,73 @@ extension SessionCtl {
       NSMenu.Item("Use Phrase Replacement")?
         .act(#selector(togglePhraseReplacement(_:)))
         .state(PrefMgr.shared.phraseReplacementEnabled)
-        .nulled(!optionKeyPressed && !PrefMgr.shared.phraseReplacementEnabled)
+      NSMenu.Item("Edit Phrase Replacement Table…")?
+        .act(#selector(openPhraseReplacement(_:)))
+        .alternated().nulled(silentMode)
       NSMenu.Item("Symbol & Emoji Input")?
         .act(#selector(toggleSymbolEnabled(_:)))
         .state(PrefMgr.shared.symbolInputEnabled)
-        .nulled(!optionKeyPressed)
+      NSMenu.Item("Edit User Symbol & Emoji Data…")?
+        .act(#selector(openUserSymbols(_:)))
+        .alternated().nulled(silentMode)
 
       NSMenu.Item.separator() // ---------------------
-      NSMenu.Item("Open User Dictionary Folder")?.act(#selector(openUserDataFolder(_:))).nulled(silentMode)
-      NSMenu.Item("Edit vChewing User Phrases…")?.act(#selector(openUserPhrases(_:))).nulled(silentMode)
-      NSMenu.Item("Edit Excluded Phrases…")?.act(#selector(openExcludedPhrases(_:))).nulled(silentMode)
-      NSMenu.Item("Edit Associated Phrases…")?.act(#selector(openAssociatedPhrases(_:))).nulled(
-        !(!silentMode && (optionKeyPressed || PrefMgr.shared.associatedPhrasesEnabled))
-      )
-      NSMenu.Item("Edit Phrase Replacement Table…")?.act(#selector(openPhraseReplacement(_:))).nulled(silentMode || !optionKeyPressed)
-      NSMenu.Item("Edit User Symbol & Emoji Data…")?.act(#selector(openUserSymbols(_:))).nulled(silentMode || !optionKeyPressed)
-      NSMenu.Item("Open App Support Folder")?.act(#selector(openAppSupportFolderFromContainer(_:))).nulled(silentMode || !optionKeyPressed)
-
-      NSMenu.Item("Reload User Phrases")?.act(#selector(reloadUserPhrasesData(_:))).nulled(PrefMgr.shared.shouldAutoReloadUserDataFiles && !optionKeyPressed)
+      NSMenu.Item("Open User Dictionary Folder")?
+        .act(#selector(openUserDataFolder(_:)))
+        .nulled(silentMode)
+      NSMenu.Item("Open App Support Folder")?
+        .act(#selector(openAppSupportFolderFromContainer(_:)))
+        .alternated().nulled(silentMode)
+      NSMenu.Item("Edit vChewing User Phrases…")?
+        .act(#selector(openUserPhrases(_:)))
+        .nulled(silentMode)
+      NSMenu.Item("Reload User Phrases")?
+        .act(#selector(reloadUserPhrasesData(_:)))
+      NSMenu.Item("Edit Excluded Phrases…")?
+        .act(#selector(openExcludedPhrases(_:)))
+        .alternated().nulled(silentMode)
       NSMenu.Item(verbatim: "Reverse Lookup (Phonabets)".localized.withEllipsis)?
-        .act(#selector(callReverseLookupWindow(_:))).hotkey(PrefMgr.shared.usingHotKeyRevLookup ? "/" : "", mask: [.command, .control])
-
-      NSMenu.Item("Optimize Memorized Phrases")?.act(#selector(removeUnigramsFromUOM(_:)))
-      NSMenu.Item("Clear Memorized Phrases")?.act(#selector(clearUOM(_:)))
+        .act(#selector(callReverseLookupWindow(_:)))
+        .hotkey(PrefMgr.shared.usingHotKeyRevLookup ? "/" : "", mask: [.command, .control])
+      NSMenu.Item("Optimize Memorized Phrases")?
+        .act(#selector(removeUnigramsFromUOM(_:)))
+      NSMenu.Item("Clear Memorized Phrases")?
+        .act(#selector(clearUOM(_:)))
+        .alternated()
 
       NSMenu.Item.separator() // ---------------------
       if #unavailable(macOS 13) {
-        NSMenu.Item("vChewing Preferences…")?.act(#selector(showPreferences(_:))).nulled(silentMode)
+        NSMenu.Item("vChewing Preferences…")?
+          .act(#selector(showPreferences(_:)))
+          .nulled(silentMode)
       } else {
-        NSMenu.Item(
-          verbatim: "vChewing Preferences…".localized + " (SwiftUI)"
-        )?.act(#selector(showSettingsSwiftUI(_:))).nulled(silentMode)
-        NSMenu.Item(
-          verbatim: "vChewing Preferences…".localized + " (AppKit)"
-        )?.act(#selector(showSettingsAppKit(_:))).nulled(silentMode)
+        NSMenu.Item(verbatim: "vChewing Preferences…".localized + " (SwiftUI)")?
+          .act(#selector(showSettingsSwiftUI(_:)))
+          .nulled(silentMode)
+        NSMenu.Item(verbatim: "vChewing Preferences…".localized + " (AppKit)")?
+          .act(#selector(showSettingsAppKit(_:)))
+          .alternated().nulled(silentMode)
       }
-      NSMenu.Item(verbatim: "Client Manager".localized.withEllipsis)?.act(#selector(showClientListMgr(_:))).nulled(silentMode)
-      NSMenu.Item("Check for Updates…")?.act(#selector(checkForUpdate(_:))).nulled(silentMode)
-      NSMenu.Item("Reboot vChewing…")?.act(#selector(selfTerminate(_:)))
-      NSMenu.Item("About vChewing…")?.act(#selector(showAbout(_:))).nulled(silentMode)
-      NSMenu.Item("CheatSheet")?.act(#selector(showCheatSheet(_:))).nulled(silentMode)
-      NSMenu.Item("Uninstall vChewing…")?.act(#selector(selfUninstall(_:))).nulled(silentMode || !optionKeyPressed)
+      NSMenu.Item("vChewing Preferences…")?
+        .act(#selector(showPreferences(_:)))
+        .nulled(silentMode)
+      NSMenu.Item(verbatim: "Client Manager".localized.withEllipsis)?
+        .act(#selector(showClientListMgr(_:)))
+        .nulled(silentMode)
+      NSMenu.Item("Check for Updates…")?
+        .act(#selector(checkForUpdate(_:)))
+        .nulled(silentMode)
+      NSMenu.Item("Reboot vChewing…")?
+        .act(#selector(selfTerminate(_:)))
+      NSMenu.Item("CheatSheet")?
+        .act(#selector(showCheatSheet(_:)))
+        .nulled(silentMode)
+      NSMenu.Item("About vChewing…")?
+        .act(#selector(showAbout(_:)))
+        .alternated()
+      NSMenu.Item("Uninstall vChewing…")?
+        .act(#selector(selfUninstall(_:)))
+        .nulled(silentMode || !optionKeyPressed)
     }
   }
 }
