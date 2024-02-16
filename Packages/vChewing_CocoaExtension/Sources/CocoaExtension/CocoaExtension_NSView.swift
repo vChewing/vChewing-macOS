@@ -413,6 +413,12 @@ public extension NSMenuItem {
     return self
   }
 
+  @discardableResult func alternated(sure sured: Bool = true) -> NSMenuItem {
+    isAlternate = sured
+    keyEquivalentModifierMask = .option
+    return self
+  }
+
   @discardableResult func state(_ givenState: Bool) -> NSMenuItem {
     state = givenState ? .on : .off
     return self
