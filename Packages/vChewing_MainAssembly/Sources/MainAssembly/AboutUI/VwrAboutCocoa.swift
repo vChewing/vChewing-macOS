@@ -87,7 +87,7 @@ public class VwrAboutCocoa: NSViewController {
           )
           NSView()
         }
-        NSStackView.build(.vertical, width: 114) {
+        NSStackView.build(.vertical, spacing: 4, width: 114) {
           addKeyEquivalent(
             NSButton(
               "i18n:aboutWindow.OK_BUTTON",

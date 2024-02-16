@@ -44,7 +44,7 @@ public class VwrClientListMgr: NSViewController {
             .makeSimpleConstraint(.width, relation: .greaterThanOrEqual, value: descriptionWidth)
           NSView()
         }
-        NSStackView.build(.vertical) {
+        NSStackView.build(.vertical, spacing: 6) {
           btnAddClient
             .makeSimpleConstraint(.width, relation: .equal, value: buttonWidth)
           btnRemoveClient
