@@ -12,6 +12,8 @@
 - 程式碼倉庫：https://gitee.com/vchewing/vChewing-macOS
 
 # vChewing 威注音輸入法
+[![FOSSA Status](https://app.fossa.com/api/projects/git%2Bgithub.com%2FvChewing%2FvChewing-macOS.svg?type=shield)](https://app.fossa.com/projects/git%2Bgithub.com%2FvChewing%2FvChewing-macOS?ref=badge_shield)
+
 
 威注音輸入法最開始是基於小麥注音二次開發的，是**原生簡體中文、原生繁體中文注音輸入法**：
 
@@ -127,3 +129,7 @@ P.S.: 威注音輸入法的 Shift 按鍵監測功能僅藉由對 NSEvent 訊號�
 敝專案採用了《[貢獻者品行準則承約書 v2.1](./code-of-conduct.md)》。考慮到上游鏈接給出的中文版翻譯與英文原文嚴重不符合的情況（會出現因執法與被執法雙方的認知偏差導致的矛盾，非常容易變成敵我矛盾），敝專案使用了自行翻譯的版本、且新增了一些能促進雙方共識的註解。
 
 $ EOF.
+
+
+## License
+[![FOSSA Status](https://app.fossa.com/api/projects/git%2Bgithub.com%2FvChewing%2FvChewing-macOS.svg?type=large)](https://app.fossa.com/projects/git%2Bgithub.com%2FvChewing%2FvChewing-macOS?ref=badge_large)
