@@ -126,9 +126,10 @@ public class CtlCandidateTDK: CtlCandidate, NSWindowDelegate {
         }
         reverseLookupResult = lookupResult.compactMap { $0 }
       } else {
+        reverseLookupResult = lookupResult.compactMap { $0 }
         // 如果不提供 UNICODE 碼位資料顯示的話，則在非多行多列模式下僅顯示一筆反查資料。
         if !Self.thePool.isMatrix {
-          reverseLookupResult = [lookupResult.compactMap { $0 }.first].compactMap { $0 }
+          reverseLookupResult = [reverseLookupResult.first].compactMap { $0 }
         }
       }
     }
