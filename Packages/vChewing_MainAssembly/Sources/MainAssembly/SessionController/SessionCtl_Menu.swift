@@ -126,9 +126,6 @@ extension SessionCtl {
           .act(#selector(showSettingsAppKit(_:)))
           .alternated().nulled(silentMode)
       }
-      NSMenu.Item("vChewing Preferences…")?
-        .act(#selector(showPreferences(_:)))
-        .nulled(silentMode)
       NSMenu.Item(verbatim: "Client Manager".localized.withEllipsis)?
         .act(#selector(showClientListMgr(_:)))
         .nulled(silentMode)
@@ -142,7 +139,7 @@ extension SessionCtl {
         .nulled(silentMode)
       NSMenu.Item("About vChewing…")?
         .act(#selector(showAbout(_:)))
-        .alternated()
+        .nulled(silentMode)
       NSMenu.Item("Uninstall vChewing…")?
         .act(#selector(selfUninstall(_:)))
         .nulled(silentMode || !optionKeyPressed)
