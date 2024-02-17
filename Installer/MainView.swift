@@ -10,6 +10,8 @@ import AppKit
 import SwiftUI
 
 public struct MainView: View {
+  static let strCopyrightLabel = Bundle.main.localizedInfoDictionary?["NSHumanReadableCopyright"] as? String ?? "BAD_COPYRIGHT_LABEL"
+
   @State var pendingSheetPresenting = false
   @State var isShowingAlertForFailedInstallation = false
   @State var isShowingAlertForMissingPostInstall = false
@@ -53,6 +55,7 @@ public struct MainView: View {
                 Text("v\(versionString) Build \(installingVersion)").lineLimit(1)
               }.fixedSize()
               Text("i18n:installer.APP_DERIVED_FROM").font(.custom("Tahoma", size: 11))
+              Text(Self.strCopyrightLabel).font(.custom("Tahoma", size: 11))
               Text("i18n:installer.DEV_CREW").font(.custom("Tahoma", size: 11)).padding([.vertical], 2)
             }
           }
