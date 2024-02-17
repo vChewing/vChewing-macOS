@@ -112,6 +112,9 @@ public class CtlCandidateTDK: CtlCandidate, NSWindowDelegate {
       guard let self = self else { return }
       self.updateNSWindowModern(window)
     }
+    // 先擦除之前的反查结果。
+    reverseLookupResult = []
+    // 再更新新的反查结果。
     if let currentCandidate = Self.thePool.currentCandidate {
       let displayedText = currentCandidate.displayedText
       var lookupResult: [String?] = delegate?.reverseLookup(for: displayedText) ?? []
@@ -128,8 +131,8 @@ public class CtlCandidateTDK: CtlCandidate, NSWindowDelegate {
           reverseLookupResult = [lookupResult.compactMap { $0 }.first].compactMap { $0 }
         }
       }
-      Self.thePool.reverseLookupResult = reverseLookupResult
     }
+    Self.thePool.reverseLookupResult = reverseLookupResult
     Self.thePool.tooltip = delegate?.candidateToolTip(shortened: !Self.thePool.isMatrix) ?? ""
     delegate?.candidatePairHighlightChanged(at: highlightedIndex)
   }
