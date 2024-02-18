@@ -30,12 +30,8 @@ public extension InputHandler {
       case .codePoint:
         let commonTerm = NSMutableString()
         commonTerm.insert("Code Point Input.".localized, at: 0)
-        if !vertical {
-          switch IMEApp.currentInputMode {
-          case .imeModeCHS: commonTerm.insert("[GB] ", at: 0)
-          case .imeModeCHT: commonTerm.insert("[Big5] ", at: 0)
-          default: break
-          }
+        if !vertical, let initials = IMEApp.currentInputMode.nonUTFEncodingInitials {
+          commonTerm.insert("[\(initials)] ", at: 0)
         }
         return commonTerm.description
       case .haninKeyboardSymbol:
