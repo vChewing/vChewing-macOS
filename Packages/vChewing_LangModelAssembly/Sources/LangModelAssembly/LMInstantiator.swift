@@ -11,7 +11,7 @@ import Megrez
 import Shared
 import SQLite3
 
-public extension vChewingLM {
+public extension LMAssembly {
   /// 語言模組副本化模組（LMInstantiator，下稱「LMI」）自身為符合天權星組字引擎內
   /// 的 LangModelProtocol 協定的模組、統籌且整理來自其它子模組的資料（包括使
   /// 用者語彙、繪文字模組、語彙濾除表、原廠語言模組等）。
@@ -56,8 +56,12 @@ public extension vChewingLM {
     public var config = Config()
 
     // 這句需要留著，不然無法被 package 外界存取。
-    public init(isCHS: Bool = false) {
+    public init(
+      isCHS: Bool = false,
+      uomDataURL: URL? = nil
+    ) {
       self.isCHS = isCHS
+      lmUserOverride = .init(dataURL: uomDataURL)
     }
 
     public func setOptions(handler: (inout Config) -> Void) {
@@ -108,6 +112,9 @@ public extension vChewingLM {
     var lmReplacements = LMReplacements()
     var lmAssociates = LMAssociates()
     var lmPlainBopomofo = LMPlainBopomofo()
+
+    // 半衰记忆模组
+    var lmUserOverride: LMUserOverride
 
     // MARK: - 工具函式
 

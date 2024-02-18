@@ -57,8 +57,8 @@ final class InputTokenTests: XCTestCase {
   }
 
   func testGeneratedResultsFromLMInstantiator() throws {
-    let instance = vChewingLM.LMInstantiator(isCHS: true)
-    XCTAssertTrue(vChewingLM.LMInstantiator.connectToTestSQLDB())
+    let instance = LMAssembly.LMInstantiator(isCHS: true)
+    XCTAssertTrue(LMAssembly.LMInstantiator.connectToTestSQLDB())
     instance.setOptions { config in
       config.isCNSEnabled = false
       config.isSymbolEnabled = false
@@ -70,6 +70,6 @@ final class InputTokenTests: XCTestCase {
     )
     let x = instance.unigramsFor(keyArray: ["ㄐㄧㄣ", "ㄊㄧㄢ", "ㄖˋ", "ㄑㄧˊ"]).description
     print(x)
-    vChewingLM.LMInstantiator.disconnectSQLDB()
+    LMAssembly.LMInstantiator.disconnectSQLDB()
   }
 }

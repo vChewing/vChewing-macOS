@@ -61,7 +61,7 @@ public extension LMMgr {
   ///   - mode: 繁簡模式。
   ///   - type: 辭典資料類型
   /// - Returns: 資料路徑（URL）。
-  static func userDictDataURL(mode: Shared.InputMode, type: vChewingLM.ReplacableUserDataType) -> URL {
+  static func userDictDataURL(mode: Shared.InputMode, type: LMAssembly.ReplacableUserDataType) -> URL {
     var fileName: String = {
       switch type {
       case .thePhrases: return "userdata"
@@ -271,7 +271,7 @@ public extension LMMgr {
     return true
   }
 
-  static func openUserDictFile(type: vChewingLM.ReplacableUserDataType, dual: Bool = false, alt: Bool) {
+  static func openUserDictFile(type: LMAssembly.ReplacableUserDataType, dual: Bool = false, alt: Bool) {
     let app: FileOpenMethod = alt ? .textEdit : .finder
     openPhraseFile(fromURL: userDictDataURL(mode: IMEApp.currentInputMode, type: type), using: app)
     guard dual else { return }
@@ -324,7 +324,7 @@ public extension LMMgr {
     /// 前者的話，需要該檔案存在的人自己會建立。
     /// 後者的話，你在敲字時自己就會建立。
     var failed = false
-    caseCheck: for type in vChewingLM.ReplacableUserDataType.allCases {
+    caseCheck: for type in LMAssembly.ReplacableUserDataType.allCases {
       let templateName = Self.templateName(for: type, mode: mode)
       if !ensureFileExists(userDictDataURL(mode: mode, type: type), deployTemplate: templateName) {
         failed = true
@@ -334,7 +334,7 @@ public extension LMMgr {
     return !failed
   }
 
-  internal static func templateName(for type: vChewingLM.ReplacableUserDataType, mode: Shared.InputMode) -> String {
+  internal static func templateName(for type: LMAssembly.ReplacableUserDataType, mode: Shared.InputMode) -> String {
     switch type {
     case .thePhrases: return kTemplateNameUserPhrases
     case .theFilter: return kTemplateNameUserFilterList

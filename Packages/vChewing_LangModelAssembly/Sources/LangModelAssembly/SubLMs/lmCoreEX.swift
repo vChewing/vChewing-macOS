@@ -10,12 +10,12 @@ import Megrez
 import PinyinPhonaConverter
 import Shared
 
-public extension vChewingLM {
+extension LMAssembly {
   /// 與之前的 LMCore 不同，LMCoreEX 不在辭典內記錄實體，而是記錄 range 範圍。
   /// 需要資料的時候，直接拿 range 去 strData 取資料。
   /// 資料記錄原理與上游 C++ 的 ParselessLM 差不多，但用的是 Swift 原生手段。
   /// 主要時間消耗仍在 For 迴圈，但這個算法可以顯著減少記憶體佔用。
-  @frozen struct LMCoreEX {
+  struct LMCoreEX {
     public private(set) var filePath: String?
     /// 資料庫辭典。索引內容為注音字串，資料內容則為字串首尾範圍、方便自 strData 取資料。
     var rangeMap: [String: [Range<String.Index>]] = [:]

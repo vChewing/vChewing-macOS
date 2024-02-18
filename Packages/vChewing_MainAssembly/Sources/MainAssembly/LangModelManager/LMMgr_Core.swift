@@ -15,24 +15,18 @@ import SwiftExtension
 // MARK: - Input Mode Extension for Language Models
 
 public extension Shared.InputMode {
-  private static let lmCHS = vChewingLM.LMInstantiator(isCHS: true)
-  private static let lmCHT = vChewingLM.LMInstantiator(isCHS: false)
-  private static let uomCHS = vChewingLM.LMUserOverride(dataURL: LMMgr.userOverrideModelDataURL(.imeModeCHS))
-  private static let uomCHT = vChewingLM.LMUserOverride(dataURL: LMMgr.userOverrideModelDataURL(.imeModeCHT))
+  private static let lmCHS = LMAssembly.LMInstantiator(
+    isCHS: true, uomDataURL: LMMgr.userOverrideModelDataURL(.imeModeCHS)
+  )
+  private static let lmCHT = LMAssembly.LMInstantiator(
+    isCHS: false, uomDataURL: LMMgr.userOverrideModelDataURL(.imeModeCHT)
+  )
 
-  var langModel: vChewingLM.LMInstantiator {
+  var langModel: LMAssembly.LMInstantiator {
     switch self {
     case .imeModeCHS: return Self.lmCHS
     case .imeModeCHT: return Self.lmCHT
     case .imeModeNULL: return .init()
-    }
-  }
-
-  var uom: vChewingLM.LMUserOverride {
-    switch self {
-    case .imeModeCHS: return Self.uomCHS
-    case .imeModeCHT: return Self.uomCHT
-    case .imeModeNULL: return .init(dataURL: LMMgr.userOverrideModelDataURL(IMEApp.currentInputMode))
     }
   }
 }
@@ -54,14 +48,14 @@ public class LMMgr {
     Self.loadUserPhrasesData()
   }
 
-  public static var isCoreDBConnected: Bool { vChewingLM.LMInstantiator.isSQLDBConnected }
+  public static var isCoreDBConnected: Bool { LMAssembly.LMInstantiator.isSQLDBConnected }
 
   public static func connectCoreDB(dbPath: String? = nil) {
     guard let path: String = dbPath ?? Self.getCoreDictionaryDBPath() else {
       assertionFailure("vChewing factory SQLite data not found.")
       return
     }
-    let result = vChewingLM.LMInstantiator.connectSQLDB(dbPath: path)
+    let result = LMAssembly.LMInstantiator.connectSQLDB(dbPath: path)
     assert(result, "vChewing factory SQLite connection failed.")
     Notifier.notify(
       message: NSLocalizedString("Core Dict loading complete.", comment: "")
@@ -71,10 +65,10 @@ public class LMMgr {
   /// 載入磁帶資料。
   /// - Remark: cassettePath() 會在輸入法停用磁帶時直接返回
   public static func loadCassetteData() {
-    vChewingLM.LMInstantiator.loadCassetteData(path: cassettePath())
+    LMAssembly.LMInstantiator.loadCassetteData(path: cassettePath())
   }
 
-  public static func loadUserPhrasesData(type: vChewingLM.ReplacableUserDataType? = nil) {
+  public static func loadUserPhrasesData(type: LMAssembly.ReplacableUserDataType? = nil) {
     guard let type = type else {
       Shared.InputMode.validCases.forEach { mode in
         mode.langModel.loadUserPhrasesData(
@@ -82,7 +76,7 @@ public class LMMgr {
           filterPath: userDictDataURL(mode: mode, type: .theFilter).path
         )
         mode.langModel.loadUserSymbolData(path: userDictDataURL(mode: mode, type: .theSymbols).path)
-        mode.uom.loadData(fromURL: userOverrideModelDataURL(mode))
+        mode.langModel.loadUOMData()
       }
 
       if PrefMgr.shared.associatedPhrasesEnabled { Self.loadUserAssociatesData() }
@@ -187,12 +181,12 @@ public class LMMgr {
   // MARK: UOM
 
   public static func saveUserOverrideModelData() {
-    let globalQueue = DispatchQueue(label: "vChewingLM_UOM", qos: .unspecified, attributes: .concurrent)
+    let globalQueue = DispatchQueue(label: "LMAssembly_UOM", qos: .unspecified, attributes: .concurrent)
     let group = DispatchGroup()
     Shared.InputMode.validCases.forEach { mode in
       group.enter()
       globalQueue.async {
-        mode.uom.saveData(toURL: userOverrideModelDataURL(mode))
+        mode.langModel.saveUOMData()
         group.leave()
       }
     }
@@ -201,11 +195,11 @@ public class LMMgr {
   }
 
   public static func bleachSpecifiedSuggestions(targets: [String], mode: Shared.InputMode) {
-    mode.uom.bleachSpecifiedSuggestions(targets: targets, saveCallback: { mode.uom.saveData() })
+    mode.langModel.bleachSpecifiedUOMSuggestions(targets: targets)
   }
 
   public static func removeUnigramsFromUserOverrideModel(_ mode: Shared.InputMode) {
-    mode.uom.bleachUnigrams(saveCallback: { mode.uom.saveData() })
+    mode.langModel.bleachUOMUnigrams()
   }
 
   public static func relocateWreckedUOMData() {
@@ -227,6 +221,6 @@ public class LMMgr {
   }
 
   public static func clearUserOverrideModelData(_ mode: Shared.InputMode = .imeModeNULL) {
-    mode.uom.clearData(withURL: userOverrideModelDataURL(mode))
+    mode.langModel.clearUOMData()
   }
 }

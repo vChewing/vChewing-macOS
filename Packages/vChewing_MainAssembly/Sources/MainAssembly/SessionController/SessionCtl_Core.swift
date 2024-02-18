@@ -178,7 +178,6 @@ public class SessionCtl: IMKInputController {
         // ----------------------------
         /// 重設所有語言模組。這裡不需要做按需重設，因為對運算量沒有影響。
         inputHandler?.currentLM = inputMode.langModel // 會自動更新組字引擎內的模組。
-        inputHandler?.currentUOM = inputMode.uom
         /// 清空注拼槽＋同步最新的注拼槽排列設定。
         inputHandler?.ensureKeyboardParser()
         /// 將輸入法偏好設定同步至語言模組內。
@@ -214,9 +213,7 @@ public class SessionCtl: IMKInputController {
       // 關掉所有之前的副本的視窗。
       Self.current?.hidePalettes()
       Self.current = self
-      self.inputHandler = InputHandler(
-        lm: self.inputMode.langModel, uom: self.inputMode.uom, pref: PrefMgr.shared
-      )
+      self.inputHandler = InputHandler(lm: self.inputMode.langModel, pref: PrefMgr.shared)
       self.inputHandler?.delegate = self
       self.syncBaseLMPrefs()
       // 下述兩行很有必要，否則輸入法會在手動重啟之後無法立刻生效。
@@ -313,9 +310,7 @@ public extension SessionCtl {
       if self.isActivated { return }
 
       // 這裡不需要 setValue()，因為 IMK 會在自動呼叫 activateServer() 之後自動執行 setValue()。
-      self.inputHandler = InputHandler(
-        lm: self.inputMode.langModel, uom: self.inputMode.uom, pref: PrefMgr.shared
-      )
+      self.inputHandler = InputHandler(lm: self.inputMode.langModel, pref: PrefMgr.shared)
       self.inputHandler?.delegate = self
       self.syncBaseLMPrefs()
 

@@ -37,7 +37,7 @@ public struct VwrPhraseEditorUI: View {
   @State var txtAddPhraseField3 = ""
   @State var txtAddPhraseField4 = ""
   @State public var selInputMode: Shared.InputMode = .imeModeNULL
-  @State public var selUserDataType: vChewingLM.ReplacableUserDataType = .thePhrases
+  @State public var selUserDataType: LMAssembly.ReplacableUserDataType = .thePhrases
   @State private var isLoading = false
   @State private var textEditorTooltip = PETerms.TooltipTexts.sampleDictionaryContent(for: .thePhrases)
   public weak var window: NSWindow?
@@ -212,16 +212,16 @@ public struct VwrPhraseEditorUI: View {
         }
         .labelsHidden()
         Picker("", selection: $selUserDataType.didChange { dropDownMenuDidChange() }) {
-          Text(vChewingLM.ReplacableUserDataType.thePhrases.localizedDescription).tag(
-            vChewingLM.ReplacableUserDataType.thePhrases)
-          Text(vChewingLM.ReplacableUserDataType.theFilter.localizedDescription).tag(
-            vChewingLM.ReplacableUserDataType.theFilter)
-          Text(vChewingLM.ReplacableUserDataType.theReplacements.localizedDescription).tag(
-            vChewingLM.ReplacableUserDataType.theReplacements)
-          Text(vChewingLM.ReplacableUserDataType.theAssociates.localizedDescription).tag(
-            vChewingLM.ReplacableUserDataType.theAssociates)
-          Text(vChewingLM.ReplacableUserDataType.theSymbols.localizedDescription).tag(
-            vChewingLM.ReplacableUserDataType.theSymbols)
+          Text(LMAssembly.ReplacableUserDataType.thePhrases.localizedDescription).tag(
+            LMAssembly.ReplacableUserDataType.thePhrases)
+          Text(LMAssembly.ReplacableUserDataType.theFilter.localizedDescription).tag(
+            LMAssembly.ReplacableUserDataType.theFilter)
+          Text(LMAssembly.ReplacableUserDataType.theReplacements.localizedDescription).tag(
+            LMAssembly.ReplacableUserDataType.theReplacements)
+          Text(LMAssembly.ReplacableUserDataType.theAssociates.localizedDescription).tag(
+            LMAssembly.ReplacableUserDataType.theAssociates)
+          Text(LMAssembly.ReplacableUserDataType.theSymbols.localizedDescription).tag(
+            LMAssembly.ReplacableUserDataType.theSymbols)
         }
         .labelsHidden()
         Button("Reload") {
@@ -340,7 +340,7 @@ public enum PETerms {
     case weightInputBox =
       "If not filling the weight, it will be 0.0, the maximum one. An ideal weight situates in [-9.5, 0], making itself can be captured by the walking algorithm. The exception is -114.514, the disciplinary weight. The walking algorithm will ignore it unless it is the unique result."
 
-    public static func sampleDictionaryContent(for type: vChewingLM.ReplacableUserDataType) -> String {
+    public static func sampleDictionaryContent(for type: LMAssembly.ReplacableUserDataType) -> String {
       var result = ""
       switch type {
       case .thePhrases:

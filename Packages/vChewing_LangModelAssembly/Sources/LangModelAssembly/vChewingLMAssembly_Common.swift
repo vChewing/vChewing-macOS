@@ -10,7 +10,7 @@ import Foundation
 import Shared
 import SQLite3
 
-public enum vChewingLM {
+public enum LMAssembly {
   enum FileErrors: Error {
     case fileHandleError(String)
   }

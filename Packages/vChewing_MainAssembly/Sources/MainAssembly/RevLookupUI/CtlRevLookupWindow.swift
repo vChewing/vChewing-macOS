@@ -150,7 +150,7 @@ class FrmRevLookupWindow: NSWindow {
         strBuilder.append("Maximum 15 results returnable.".localized + "\n")
         break theLoop
       }
-      let arrResult = vChewingLM.LMInstantiator.getFactoryReverseLookupData(with: char)?.deduplicated ?? []
+      let arrResult = LMAssembly.LMInstantiator.getFactoryReverseLookupData(with: char)?.deduplicated ?? []
       if !arrResult.isEmpty {
         strBuilder.append(char + "\t")
         strBuilder.append(arrResult.joined(separator: ", "))

@@ -12,9 +12,9 @@ import LineReader
 import Megrez
 import Shared
 
-public extension vChewingLM {
+extension LMAssembly {
   /// 磁帶模組，用來方便使用者自行擴充字根輸入法。
-  @frozen struct LMCassette {
+  struct LMCassette {
     public private(set) var filePath: String?
     public private(set) var nameShort: String = ""
     public private(set) var nameENG: String = ""
@@ -45,7 +45,7 @@ public extension vChewingLM {
   }
 }
 
-public extension vChewingLM.LMCassette {
+extension LMAssembly.LMCassette {
   /// 計算頻率時要用到的東西 - fscale
   private static let fscale = 2.7
   /// 萬用花牌字符，哪怕花牌鍵仍不可用。
@@ -86,7 +86,7 @@ public extension vChewingLM.LMCassette {
     if FileManager.default.fileExists(atPath: path) {
       do {
         guard let fileHandle = FileHandle(forReadingAtPath: path) else {
-          throw vChewingLM.FileErrors.fileHandleError("")
+          throw LMAssembly.FileErrors.fileHandleError("")
         }
         let lineReader = try LineReader(file: fileHandle)
         var theMaxKeyLength = 1

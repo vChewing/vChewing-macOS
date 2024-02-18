@@ -34,16 +34,15 @@ func vCTestLog(_ str: String) {
 /// 該單元測試使用獨立的語彙資料，因此會在選字時的候選字
 /// 順序等方面與威注音輸入法實際使用時的體驗有差異。
 class MainAssemblyTests: XCTestCase {
-  let testUOM = LangModelAssembly.vChewingLM.LMUserOverride(dataURL: .init(fileURLWithPath: "/dev/null"))
-  var testLM = LangModelAssembly.vChewingLM.LMInstantiator.construct { _ in
-    vChewingLM.LMInstantiator.connectToTestSQLDB()
+  var testLM = LMAssembly.LMInstantiator.construct { _ in
+    LMAssembly.LMInstantiator.connectToTestSQLDB()
   }
 
   static let testServer = IMKServer(name: "org.atelierInmu.vChewing.MainAssembly.UnitTests_Connection", bundleIdentifier: "org.atelierInmu.vChewing.MainAssembly.UnitTests")
 
   static var _testHandler: InputHandler?
   var testHandler: InputHandler {
-    let result = Self._testHandler ?? InputHandler(lm: testLM, uom: testUOM, pref: PrefMgr.shared)
+    let result = Self._testHandler ?? InputHandler(lm: testLM, pref: PrefMgr.shared)
     if Self._testHandler == nil { Self._testHandler = result }
     return result
   }
@@ -65,7 +64,7 @@ class MainAssemblyTests: XCTestCase {
   let dataTab = NSEvent.KeyEventData(chars: NSEvent.SpecialKey.tab.unicodeScalar.description, keyCode: KeyCode.kTab.rawValue)
 
   func clearTestUOM() {
-    testUOM.clearData(withURL: URL(fileURLWithPath: "/dev/null"))
+    testLM.clearUOMData()
   }
 
   func typeSentenceOrCandidates(_ sequence: String) {
@@ -106,11 +105,11 @@ class MainAssemblyTests: XCTestCase {
   }
 }
 
-extension vChewingLM.LMInstantiator {
+extension LMAssembly.LMInstantiator {
   static func construct(
-    isCHS: Bool = false, completionHandler: @escaping (_ this: vChewingLM.LMInstantiator) -> Void
-  ) -> vChewingLM.LMInstantiator {
-    let this = vChewingLM.LMInstantiator(isCHS: isCHS)
+    isCHS: Bool = false, completionHandler: @escaping (_ this: LMAssembly.LMInstantiator) -> Void
+  ) -> LMAssembly.LMInstantiator {
+    let this = LMAssembly.LMInstantiator(isCHS: isCHS)
     completionHandler(this)
     return this
   }

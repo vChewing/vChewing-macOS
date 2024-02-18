@@ -38,7 +38,7 @@ private let sampleData: String = #"""
 
 final class LMCoreEXTests: XCTestCase {
   func testLMCoreEXAsFactoryCoreDict() throws {
-    var lmTest = vChewingLM.LMCoreEX(
+    var lmTest = LMAssembly.LMCoreEX(
       reverse: false, consolidate: false, defaultScore: 0, forceDefaultScore: false
     )
     lmTest.replaceData(textData: sampleData)
