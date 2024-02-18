@@ -194,7 +194,7 @@ func prepareDatabase() -> Bool {
     PRIMARY KEY (theChar)
   ) WITHOUT ROWID;
   """
-  guard sqlite3_open(urlSQLite, &ptrSQL) == SQLITE_OK else { return false }
+  guard sqlite3_open(":memory:", &ptrSQL) == SQLITE_OK else { return false }
   guard sqlite3_exec(ptrSQL, "PRAGMA synchronous = OFF;", nil, nil, nil) == SQLITE_OK else { return false }
   guard sqlite3_exec(ptrSQL, "PRAGMA journal_mode = OFF;", nil, nil, nil) == SQLITE_OK else { return false }
   guard sqlMakeTableMACV.runAsSQLExec(dbPointer: &ptrSQL) else { return false }
@@ -229,6 +229,20 @@ func prepareDatabase() -> Bool {
     }
   }
   return true
+}
+
+// MARK: - Dump SQLite3 Memory Database to File.
+
+@discardableResult func dumpSQLDB() -> Bool {
+  var ptrSQLTarget: OpaquePointer?
+  defer { sqlite3_close_v2(ptrSQLTarget) }
+  guard sqlite3_open(urlSQLite, &ptrSQLTarget) == SQLITE_OK else { return false }
+  let ptrBackupObj = sqlite3_backup_init(ptrSQLTarget, "main", ptrSQL, "main")
+  if ptrBackupObj != nil {
+    sqlite3_backup_step(ptrBackupObj, -1)
+    sqlite3_backup_finish(ptrBackupObj)
+  }
+  return sqlite3_errcode(ptrSQLTarget) == SQLITE_OK
 }
 
 // MARK: - 載入詞組檔案且輸出陣列
@@ -1114,8 +1128,12 @@ func main() {
     assert(committed)
     let compressed = "VACUUM;".runAsSQLExec(dbPointer: &ptrSQL)
     assert(compressed)
+    if !dumpSQLDB() {
+      NSLog("// SQLite 辭典傾印失敗。")
+    } else {
+      NSLog("// 全部 SQLite 辭典檔案建置完畢。")
+    }
     sqlite3_close_v2(ptrSQL)
-    NSLog("// 全部 SQLite 辭典檔案建置完畢。")
   }
 }
 
