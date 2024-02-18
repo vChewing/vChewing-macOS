@@ -13,7 +13,7 @@ import XCTest
 
 final class LMInstantiatorNumericPadTests: XCTestCase {
   func testSQL() throws {
-    let instance = vChewingLM.LMInstantiator(isCHS: true)
+    let instance = LMAssembly.LMInstantiator(isCHS: true)
     instance.setOptions { config in
       config.numPadFWHWStatus = nil
     }

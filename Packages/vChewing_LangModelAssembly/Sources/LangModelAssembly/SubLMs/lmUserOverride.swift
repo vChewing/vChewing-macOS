@@ -11,72 +11,40 @@ import Foundation
 import Megrez
 import Shared
 
-public extension vChewingLM {
-  class LMUserOverride {
-    // MARK: - Main
+// MARK: - Public Types.
 
+public extension LMAssembly {
+  struct OverrideSuggestion {
+    public var candidates = [(String, Megrez.Unigram)]()
+    public var forceHighScoreOverride = false
+    public var isEmpty: Bool { candidates.isEmpty }
+  }
+}
+
+// MARK: - LMUserOverride Class Definition.
+
+extension LMAssembly {
+  class LMUserOverride {
     var mutCapacity: Int
     var mutDecayExponent: Double
     var mutLRUList: [KeyObservationPair] = []
     var mutLRUMap: [String: KeyObservationPair] = [:]
     let kDecayThreshold: Double = 1.0 / 1_048_576.0 // 衰減二十次之後差不多就失效了。
-    var fileSaveLocationURL: URL
+    var fileSaveLocationURL: URL?
 
     public static let kObservedOverrideHalfLife: Double = 3600.0 * 6 // 6 小時半衰一次，能持續不到六天的記憶。
 
-    public init(capacity: Int = 500, decayConstant: Double = LMUserOverride.kObservedOverrideHalfLife, dataURL: URL) {
+    public init(capacity: Int = 500, decayConstant: Double = LMUserOverride.kObservedOverrideHalfLife, dataURL: URL? = nil) {
       mutCapacity = max(capacity, 1) // Ensures that this integer value is always > 0.
       mutDecayExponent = log(0.5) / decayConstant
       fileSaveLocationURL = dataURL
-    }
-
-    public func performObservation(
-      walkedBefore: [Megrez.Node], walkedAfter: [Megrez.Node],
-      cursor: Int, timestamp: Double, saveCallback: @escaping () -> Void
-    ) {
-      // 參數合規性檢查。
-      guard !walkedAfter.isEmpty, !walkedBefore.isEmpty else { return }
-      guard walkedBefore.totalKeyCount == walkedAfter.totalKeyCount else { return }
-      // 先判斷用哪種覆寫方法。
-      var actualCursor = 0
-      guard let currentNode = walkedAfter.findNode(at: cursor, target: &actualCursor) else { return }
-      // 當前節點超過三個字的話，就不記憶了。在這種情形下，使用者可以考慮新增自訂語彙。
-      guard currentNode.spanLength <= 3 else { return }
-      // 前一個節點得從前一次爬軌結果當中來找。
-      guard actualCursor > 0 else { return } // 該情況應該不會出現。
-      let currentNodeIndex = actualCursor
-      actualCursor -= 1
-      var prevNodeIndex = 0
-      guard let prevNode = walkedBefore.findNode(at: actualCursor, target: &prevNodeIndex) else { return }
-
-      let forceHighScoreOverride: Bool = currentNode.spanLength > prevNode.spanLength
-      let breakingUp = currentNode.spanLength == 1 && prevNode.spanLength > 1
-
-      let targetNodeIndex = breakingUp ? currentNodeIndex : prevNodeIndex
-      let key: String = vChewingLM.LMUserOverride.formObservationKey(
-        walkedNodes: walkedAfter, headIndex: targetNodeIndex
-      )
-      guard !key.isEmpty else { return }
-      doObservation(
-        key: key, candidate: currentNode.currentUnigram.value, timestamp: timestamp,
-        forceHighScoreOverride: forceHighScoreOverride, saveCallback: { saveCallback() }
-      )
-    }
-
-    public func fetchSuggestion(
-      currentWalk: [Megrez.Node], cursor: Int, timestamp: Double
-    ) -> Suggestion {
-      var headIndex = 0
-      guard let nodeIter = currentWalk.findNode(at: cursor, target: &headIndex) else { return .init() }
-      let key = vChewingLM.LMUserOverride.formObservationKey(walkedNodes: currentWalk, headIndex: headIndex)
-      return getSuggestion(key: key, timestamp: timestamp, headReading: nodeIter.joinedKey())
     }
   }
 }
 
 // MARK: - Private Structures
 
-extension vChewingLM.LMUserOverride {
+extension LMAssembly.LMUserOverride {
   enum OverrideUnit: CodingKey { case count, timestamp, forceHighScoreOverride }
   enum ObservationUnit: CodingKey { case count, overrides }
   enum KeyObservationPairUnit: CodingKey { case key, observation }
@@ -153,10 +121,52 @@ extension vChewingLM.LMUserOverride {
   }
 }
 
-// MARK: - Hash and Dehash the entire UOM data, etc.
+// MARK: - Internal Methods in LMAssembly.
 
-public extension vChewingLM.LMUserOverride {
-  func bleachSpecifiedSuggestions(targets: [String], saveCallback: @escaping () -> Void) {
+extension LMAssembly.LMUserOverride {
+  func performObservation(
+    walkedBefore: [Megrez.Node], walkedAfter: [Megrez.Node],
+    cursor: Int, timestamp: Double, saveCallback: (() -> Void)? = nil
+  ) {
+    // 參數合規性檢查。
+    guard !walkedAfter.isEmpty, !walkedBefore.isEmpty else { return }
+    guard walkedBefore.totalKeyCount == walkedAfter.totalKeyCount else { return }
+    // 先判斷用哪種覆寫方法。
+    var actualCursor = 0
+    guard let currentNode = walkedAfter.findNode(at: cursor, target: &actualCursor) else { return }
+    // 當前節點超過三個字的話，就不記憶了。在這種情形下，使用者可以考慮新增自訂語彙。
+    guard currentNode.spanLength <= 3 else { return }
+    // 前一個節點得從前一次爬軌結果當中來找。
+    guard actualCursor > 0 else { return } // 該情況應該不會出現。
+    let currentNodeIndex = actualCursor
+    actualCursor -= 1
+    var prevNodeIndex = 0
+    guard let prevNode = walkedBefore.findNode(at: actualCursor, target: &prevNodeIndex) else { return }
+
+    let forceHighScoreOverride: Bool = currentNode.spanLength > prevNode.spanLength
+    let breakingUp = currentNode.spanLength == 1 && prevNode.spanLength > 1
+
+    let targetNodeIndex = breakingUp ? currentNodeIndex : prevNodeIndex
+    let key: String = LMAssembly.LMUserOverride.formObservationKey(
+      walkedNodes: walkedAfter, headIndex: targetNodeIndex
+    )
+    guard !key.isEmpty else { return }
+    doObservation(
+      key: key, candidate: currentNode.currentUnigram.value, timestamp: timestamp,
+      forceHighScoreOverride: forceHighScoreOverride, saveCallback: saveCallback
+    )
+  }
+
+  func fetchSuggestion(
+    currentWalk: [Megrez.Node], cursor: Int, timestamp: Double
+  ) -> LMAssembly.OverrideSuggestion {
+    var headIndex = 0
+    guard let nodeIter = currentWalk.findNode(at: cursor, target: &headIndex) else { return .init() }
+    let key = LMAssembly.LMUserOverride.formObservationKey(walkedNodes: currentWalk, headIndex: headIndex)
+    return getSuggestion(key: key, timestamp: timestamp, headReading: nodeIter.joinedKey())
+  }
+
+  func bleachSpecifiedSuggestions(targets: [String], saveCallback: (() -> Void)? = nil) {
     if targets.isEmpty { return }
     for neta in mutLRUMap {
       for target in targets {
@@ -166,44 +176,50 @@ public extension vChewingLM.LMUserOverride {
       }
     }
     resetMRUList()
-    saveCallback()
+    saveCallback?() ?? saveData()
   }
 
   /// 自 LRU 辭典內移除所有的單元圖。
-  func bleachUnigrams(saveCallback: @escaping () -> Void) {
+  func bleachUnigrams(saveCallback: (() -> Void)? = nil) {
     for key in mutLRUMap.keys {
       if !key.contains("(),()") { continue }
       mutLRUMap.removeValue(forKey: key)
     }
     resetMRUList()
-    saveCallback()
+    saveCallback?() ?? saveData()
   }
 
-  internal func resetMRUList() {
+  func resetMRUList() {
     mutLRUList.removeAll()
     for neta in mutLRUMap.reversed() {
       mutLRUList.append(neta.value)
     }
   }
 
-  func clearData(withURL fileURL: URL) {
+  func clearData(withURL fileURL: URL? = nil) {
     mutLRUMap = .init()
     mutLRUList = .init()
     do {
       let nullData = "{}"
+      guard let fileURL = fileURL ?? fileSaveLocationURL else {
+        throw "given fileURL is invalid or nil."
+      }
       try nullData.write(to: fileURL, atomically: false, encoding: .utf8)
     } catch {
-      vCLog("UOM Error: Unable to clear data. Details: \(error)")
+      vCLog("UOM Error: Unable to clear the data in the UOM file. Details: \(error)")
       return
     }
   }
 
   func saveData(toURL fileURL: URL? = nil) {
+    guard let fileURL: URL = fileURL ?? fileSaveLocationURL else {
+      vCLog("UOM saveData() failed. At least the file Save URL is not set for the current UOM.")
+      return
+    }
     // 此處不要使用 JSONSerialization，不然執行緒會炸掉。
     let encoder = JSONEncoder()
     do {
       guard let jsonData = try? encoder.encode(mutLRUMap) else { return }
-      let fileURL: URL = fileURL ?? fileSaveLocationURL
       try jsonData.write(to: fileURL, options: .atomic)
     } catch {
       vCLog("UOM Error: Unable to save data, abort saving. Details: \(error)")
@@ -211,7 +227,11 @@ public extension vChewingLM.LMUserOverride {
     }
   }
 
-  func loadData(fromURL fileURL: URL) {
+  func loadData(fromURL fileURL: URL? = nil) {
+    guard let fileURL: URL = fileURL ?? fileSaveLocationURL else {
+      vCLog("UOM loadData() failed. At least the file Load URL is not set for the current UOM.")
+      return
+    }
     // 此處不要使用 JSONSerialization，不然執行緒會炸掉。
     let decoder = JSONDecoder()
     do {
@@ -228,20 +248,14 @@ public extension vChewingLM.LMUserOverride {
       return
     }
   }
-
-  struct Suggestion {
-    public var candidates = [(String, Megrez.Unigram)]()
-    public var forceHighScoreOverride = false
-    public var isEmpty: Bool { candidates.isEmpty }
-  }
 }
 
-// MARK: - Private Methods
+// MARK: - Other Non-Public Internal Methods
 
-extension vChewingLM.LMUserOverride {
+extension LMAssembly.LMUserOverride {
   func doObservation(
     key: String, candidate: String, timestamp: Double, forceHighScoreOverride: Bool,
-    saveCallback: @escaping () -> Void
+    saveCallback: (() -> Void)?
   ) {
     guard mutLRUMap[key] != nil else {
       var observation: Observation = .init()
@@ -258,7 +272,7 @@ extension vChewingLM.LMUserOverride {
         mutLRUList.removeLast()
       }
       vCLog("UOM: Observation finished with new observation: \(key)")
-      saveCallback()
+      saveCallback?() ?? saveData()
       return
     }
     // 這裡還是不要做 decayCallback 判定「是否不急著更新觀察」了，不然會在嘗試覆寫掉錯誤的記憶時失敗。
@@ -269,11 +283,11 @@ extension vChewingLM.LMUserOverride {
       mutLRUList.insert(theNeta, at: 0)
       mutLRUMap[key] = theNeta
       vCLog("UOM: Observation finished with existing observation: \(key)")
-      saveCallback()
+      saveCallback?() ?? saveData()
     }
   }
 
-  func getSuggestion(key: String, timestamp: Double, headReading: String) -> Suggestion {
+  func getSuggestion(key: String, timestamp: Double, headReading: String) -> LMAssembly.OverrideSuggestion {
     guard !key.isEmpty, let kvPair = mutLRUMap[key] else { return .init() }
     let observation: Observation = kvPair.observation
     var candidates: [(String, Megrez.Unigram)] = .init()

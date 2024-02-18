@@ -140,7 +140,7 @@ extension SettingsPanesCocoa.Phrases: NSTextViewDelegate, NSTextFieldDelegate {
     }
   }
 
-  var selUserDataType: vChewingLM.ReplacableUserDataType {
+  var selUserDataType: LMAssembly.ReplacableUserDataType {
     switch cmbPEDataTypeMenu.selectedTag() {
     case 0: return .thePhrases
     case 1: return .theFilter
@@ -238,7 +238,7 @@ extension SettingsPanesCocoa.Phrases: NSTextViewDelegate, NSTextFieldDelegate {
     // 嚴重警告：NSMenu.items 在 macOS 10.13 為止的系統下是唯讀的！！
     // 往這個 property 裡面直接寫東西會導致整個視窗叫不出來！！！
     cmbPEDataTypeMenu.menu?.appendItems {
-      for (tag, neta) in vChewingLM.ReplacableUserDataType.allCases.enumerated() {
+      for (tag, neta) in LMAssembly.ReplacableUserDataType.allCases.enumerated() {
         NSMenu.Item(verbatim: neta.localizedDescription)?.tag(tag)
       }
     }
@@ -332,7 +332,7 @@ extension SettingsPanesCocoa.Phrases: NSTextViewDelegate, NSTextFieldDelegate {
     DispatchQueue.main.async { [weak self] in
       guard let self = self else { return }
       self.isLoading = true
-      vChewingLM.LMConsolidator.consolidate(text: &self.tfdPETextEditor.string, pragma: false)
+      LMAssembly.LMConsolidator.consolidate(text: &self.tfdPETextEditor.string, pragma: false)
       if self.selUserDataType == .thePhrases {
         LMMgr.shared.tagOverrides(in: &self.tfdPETextEditor.string, mode: self.selInputMode)
       }
@@ -416,7 +416,7 @@ private enum PETerminology {
     case weightInputBox =
       "If not filling the weight, it will be 0.0, the maximum one. An ideal weight situates in [-9.5, 0], making itself can be captured by the walking algorithm. The exception is -114.514, the disciplinary weight. The walking algorithm will ignore it unless it is the unique result."
 
-    public static func sampleDictionaryContent(for type: vChewingLM.ReplacableUserDataType) -> String {
+    public static func sampleDictionaryContent(for type: LMAssembly.ReplacableUserDataType) -> String {
       var result = ""
       switch type {
       case .thePhrases:
