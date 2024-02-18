@@ -10,7 +10,7 @@ import Foundation
 import Megrez
 import Shared
 
-public extension vChewingLM.LMInstantiator {
+public extension LMAssembly.LMInstantiator {
   /// 磁帶模式專用：當前磁帶所規定的花牌鍵。
   var cassetteWildcardKey: String { Self.lmCassette.wildcardKey }
   /// 磁帶模式專用：當前磁帶規定的最大碼長。

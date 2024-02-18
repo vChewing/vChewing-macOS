@@ -11,29 +11,31 @@ import Foundation
 /// 工作原理：先用 InputToken.parse 分析原始字串，給出準確的 Token。
 /// 然後再讓這個 Token 用 .translated() 自我表述出轉換結果。
 
-public enum InputToken {
-  case timeZone(shortened: Bool)
-  case timeNow(shortened: Bool)
-  case date(dayDelta: Int = 0, yearDelta: Int = 0, shortened: Bool = true, luna: Bool = false)
-  case week(dayDelta: Int = 0, shortened: Bool = true)
-  case year(yearDelta: Int = 0)
-  case yearGanzhi(yearDelta: Int = 0)
-  case yearZodiac(yearDelta: Int = 0)
+extension LMAssembly {
+  enum InputToken {
+    case timeZone(shortened: Bool)
+    case timeNow(shortened: Bool)
+    case date(dayDelta: Int = 0, yearDelta: Int = 0, shortened: Bool = true, luna: Bool = false)
+    case week(dayDelta: Int = 0, shortened: Bool = true)
+    case year(yearDelta: Int = 0)
+    case yearGanzhi(yearDelta: Int = 0)
+    case yearZodiac(yearDelta: Int = 0)
+  }
 }
 
 // MARK: - 正式對外投入使用的 API。
 
 public extension String {
   func parseAsInputToken(isCHS: Bool) -> [String] {
-    InputToken.parse(from: self).map { $0.translated(isCHS: isCHS) }.flatMap { $0 }.deduplicated
+    LMAssembly.InputToken.parse(from: self).map { $0.translated(isCHS: isCHS) }.flatMap { $0 }.deduplicated
   }
 }
 
 // MARK: - Parser parsing raw token value to construct token.
 
-public extension InputToken {
-  static func parse(from rawToken: String) -> [InputToken] {
-    var result: [InputToken] = []
+extension LMAssembly.InputToken {
+  static func parse(from rawToken: String) -> [LMAssembly.InputToken] {
+    var result: [LMAssembly.InputToken] = []
     guard rawToken.prefix(6) == "MACRO@" else { return result }
     var mapParams: [String: Int] = [:]
     let tokenComponents = rawToken.dropFirst(6).split(separator: "_").map { param in
@@ -69,7 +71,7 @@ public extension InputToken {
 
 // MARK: - Parser parsing token itself.
 
-public extension InputToken {
+extension LMAssembly.InputToken {
   func translated(isCHS: Bool) -> [String] {
     let locale = Locale(identifier: isCHS ? "zh-Hans" : "zh-Hant-TW")
     let formatter = DateFormatter()

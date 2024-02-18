@@ -17,12 +17,12 @@ private let halfLife: Double = 5400
 private let nullURL = URL(fileURLWithPath: "/dev/null")
 
 final class LMUserOverrideTests: XCTestCase {
-  private func observe(who uom: vChewingLM.LMUserOverride, key: String, candidate: String, timestamp stamp: Double) {
+  private func observe(who uom: LMAssembly.LMUserOverride, key: String, candidate: String, timestamp stamp: Double) {
     uom.doObservation(key: key, candidate: candidate, timestamp: stamp, forceHighScoreOverride: false, saveCallback: {})
   }
 
   func testUOM_1_BasicOps() throws {
-    let uom = vChewingLM.LMUserOverride(capacity: capacity, decayConstant: Double(halfLife), dataURL: nullURL)
+    let uom = LMAssembly.LMUserOverride(capacity: capacity, decayConstant: Double(halfLife), dataURL: nullURL)
     let key = "((ㄕㄣˊ-ㄌㄧˇ-ㄌㄧㄥˊ-ㄏㄨㄚˊ,神里綾華),(ㄉㄜ˙,的),ㄍㄡˇ)"
     let headReading = "ㄍㄡˇ"
     let expectedSuggestion = "狗"
@@ -45,7 +45,7 @@ final class LMUserOverrideTests: XCTestCase {
   }
 
   func testUOM_2_NewestAgainstRepeatedlyUsed() throws {
-    let uom = vChewingLM.LMUserOverride(capacity: capacity, decayConstant: Double(halfLife), dataURL: nullURL)
+    let uom = LMAssembly.LMUserOverride(capacity: capacity, decayConstant: Double(halfLife), dataURL: nullURL)
     let key = "((ㄕㄣˊ-ㄌㄧˇ-ㄌㄧㄥˊ-ㄏㄨㄚˊ,神里綾華),(ㄉㄜ˙,的),ㄍㄡˇ)"
     let headReading = "ㄍㄡˇ"
     let valRepeatedlyUsed = "狗" // 更常用
@@ -74,7 +74,7 @@ final class LMUserOverrideTests: XCTestCase {
     let b = (key: "((ㄆㄞˋ-ㄇㄥˊ,派蒙),(ㄉㄜ˙,的),ㄐㄧㄤˇ-ㄐㄧㄣ)", value: "伙食費", head: "ㄏㄨㄛˇ-ㄕˊ-ㄈㄟˋ")
     let c = (key: "((ㄍㄨㄛˊ-ㄅㄥ,國崩),(ㄉㄜ˙,的),ㄇㄠˋ-ㄗ˙)", value: "帽子", head: "ㄇㄠˋ-ㄗ˙")
     let d = (key: "((ㄌㄟˊ-ㄉㄧㄢˋ-ㄐㄧㄤ-ㄐㄩㄣ,雷電將軍),(ㄉㄜ˙,的),ㄐㄧㄠˇ-ㄔㄡˋ)", value: "腳臭", head: "ㄐㄧㄠˇ-ㄔㄡˋ")
-    let uom = vChewingLM.LMUserOverride(capacity: 2, decayConstant: Double(halfLife), dataURL: nullURL)
+    let uom = LMAssembly.LMUserOverride(capacity: 2, decayConstant: Double(halfLife), dataURL: nullURL)
     observe(who: uom, key: a.key, candidate: a.value, timestamp: nowTimeStamp)
     observe(who: uom, key: b.key, candidate: b.value, timestamp: nowTimeStamp + halfLife * 1)
     observe(who: uom, key: c.key, candidate: c.value, timestamp: nowTimeStamp + halfLife * 2)

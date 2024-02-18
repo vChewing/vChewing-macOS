@@ -22,8 +22,8 @@ private let expectedReverseLookupResults: [String] = [
 
 final class LMInstantiatorSQLTests: XCTestCase {
   func testSQL() throws {
-    let instance = vChewingLM.LMInstantiator(isCHS: true)
-    XCTAssertTrue(vChewingLM.LMInstantiator.connectToTestSQLDB())
+    let instance = LMAssembly.LMInstantiator(isCHS: true)
+    XCTAssertTrue(LMAssembly.LMInstantiator.connectToTestSQLDB())
     instance.setOptions { config in
       config.isCNSEnabled = false
       config.isSymbolEnabled = false
@@ -41,13 +41,13 @@ final class LMInstantiatorSQLTests: XCTestCase {
     XCTAssertEqual(instance.unigramsFor(keyArray: strRefutationKey).count, 10)
     XCTAssertEqual(instance.unigramsFor(keyArray: strBoobsKey).last?.description, "(☉☉,-13.0)")
     // 再測試反查。
-    XCTAssertEqual(vChewingLM.LMInstantiator.getFactoryReverseLookupData(with: "和"), expectedReverseLookupResults)
-    vChewingLM.LMInstantiator.disconnectSQLDB()
+    XCTAssertEqual(LMAssembly.LMInstantiator.getFactoryReverseLookupData(with: "和"), expectedReverseLookupResults)
+    LMAssembly.LMInstantiator.disconnectSQLDB()
   }
 
   func testCNSMask() throws {
-    let instance = vChewingLM.LMInstantiator(isCHS: false)
-    XCTAssertTrue(vChewingLM.LMInstantiator.connectToTestSQLDB())
+    let instance = LMAssembly.LMInstantiator(isCHS: false)
+    XCTAssertTrue(LMAssembly.LMInstantiator.connectToTestSQLDB())
     instance.setOptions { config in
       config.isCNSEnabled = false
       config.isSymbolEnabled = false

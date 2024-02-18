@@ -9,7 +9,7 @@
 import Foundation
 import Shared
 
-public extension vChewingLM {
+public extension LMAssembly {
   @frozen struct LMPlainBopomofo {
     public private(set) var filePath: String?
     var dataMap: [String: String] = [:]
@@ -29,13 +29,8 @@ public extension vChewingLM {
 
       do {
         let rawData = try Data(contentsOf: URL(fileURLWithPath: path))
-        if let rawJSON = try? JSONSerialization.jsonObject(with: rawData) as? [String: String] {
-          dataMap = rawJSON
-        } else {
-          filePath = oldPath
-          vCLog("↑ Exception happened when reading JSON file at: \(path).")
-          return false
-        }
+        let rawJSON = try JSONDecoder().decode([String: String].self, from: rawData)
+        dataMap = rawJSON
       } catch {
         filePath = oldPath
         vCLog("\(error)")

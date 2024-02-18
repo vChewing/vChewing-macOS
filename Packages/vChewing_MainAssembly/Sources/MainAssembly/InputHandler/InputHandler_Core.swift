@@ -19,8 +19,7 @@ import Tekkon
 // MARK: - InputHandler 自身協定 (Protocol).
 
 public protocol InputHandlerProtocol {
-  var currentLM: vChewingLM.LMInstantiator { get set }
-  var currentUOM: vChewingLM.LMUserOverride { get set }
+  var currentLM: LMAssembly.LMInstantiator { get set }
   var delegate: InputHandlerDelegate? { get set }
   var keySeparator: String { get }
   static var keySeparator: String { get }
@@ -99,8 +98,7 @@ public class InputHandler: InputHandlerProtocol {
   var composer: Tekkon.Composer = .init() // 注拼槽
   var compositor: Megrez.Compositor // 組字器
 
-  public var currentUOM: vChewingLM.LMUserOverride
-  public var currentLM: vChewingLM.LMInstantiator {
+  public var currentLM: LMAssembly.LMInstantiator {
     didSet {
       compositor.langModel = .init(withLM: currentLM)
       clear()
@@ -108,10 +106,9 @@ public class InputHandler: InputHandlerProtocol {
   }
 
   /// 初期化。
-  public init(lm: vChewingLM.LMInstantiator, uom: vChewingLM.LMUserOverride, pref: PrefMgrProtocol) {
+  public init(lm: LMAssembly.LMInstantiator, pref: PrefMgrProtocol) {
     prefs = pref
     currentLM = lm
-    currentUOM = uom
     /// 同步組字器單個詞的幅位長度上限。
     Megrez.Compositor.maxSpanLength = prefs.maxCandidateLength
     /// 組字器初期化。因為是首次初期化變數，所以這裡不能用 ensureCompositor() 代勞。
@@ -369,8 +366,8 @@ public class InputHandler: InputHandlerProtocol {
     let currentNode = currentWalk.findNode(at: actualNodeCursorPosition, target: &accumulatedCursor)
     guard let currentNode = currentNode else { return }
 
-    uom: if currentNode.currentUnigram.score > -12, prefs.fetchSuggestionsFromUserOverrideModel {
-      if skipObservation { break uom }
+    uomProcessing: if currentNode.currentUnigram.score > -12, prefs.fetchSuggestionsFromUserOverrideModel {
+      if skipObservation { break uomProcessing }
       vCLog("UOM: Start Observation.")
       // 這個過程可能會因為使用者半衰記憶模組內部資料錯亂、而導致輸入法在選字時崩潰。
       // 於是在這裡引入災後狀況察覺專用變數，且先開啟該開關。順利執行完觀察後會關閉。
@@ -378,9 +375,9 @@ public class InputHandler: InputHandlerProtocol {
       prefs.failureFlagForUOMObservation = true
       // 令半衰記憶模組觀測給定的三元圖。
       // 這個過程會讓半衰引擎根據當前上下文生成三元圖索引鍵。
-      currentUOM.performObservation(
+      currentLM.performUOMObservation(
         walkedBefore: previousWalk, walkedAfter: currentWalk, cursor: actualNodeCursorPosition,
-        timestamp: Date().timeIntervalSince1970, saveCallback: { self.currentUOM.saveData() }
+        timestamp: Date().timeIntervalSince1970
       )
       // 如果沒有出現崩框的話，那就將這個開關復位。
       prefs.failureFlagForUOMObservation = false
@@ -432,7 +429,7 @@ public class InputHandler: InputHandlerProtocol {
     /// 如果這個開關沒打開的話，直接放棄執行這個函式。
     if !prefs.fetchSuggestionsFromUserOverrideModel { return arrResult }
     /// 獲取來自半衰記憶模組的建議結果
-    let suggestion = currentUOM.fetchSuggestion(
+    let suggestion = currentLM.fetchUOMSuggestion(
       currentWalk: compositor.walkedNodes, cursor: actualNodeCursorPosition, timestamp: Date().timeIntervalSince1970
     )
     arrResult.append(contentsOf: suggestion.candidates)

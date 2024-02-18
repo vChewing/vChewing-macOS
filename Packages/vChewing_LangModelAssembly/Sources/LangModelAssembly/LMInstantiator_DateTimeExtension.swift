@@ -11,7 +11,7 @@ import Megrez
 
 // MARK: - 日期時間便捷輸入功能
 
-extension vChewingLM.LMInstantiator {
+extension LMAssembly.LMInstantiator {
   func queryDateTimeUnigrams(with key: String = "") -> [Megrez.Unigram] {
     guard let tokenTrigger = TokenTrigger(rawValue: key) else { return [] }
     var results = [Megrez.Unigram]()
