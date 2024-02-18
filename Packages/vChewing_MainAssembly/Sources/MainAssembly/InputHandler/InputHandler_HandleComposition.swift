@@ -422,16 +422,9 @@ private extension InputHandler {
         delegate.switchState(updatedState)
         return true
       }
-      let encoding: CFStringEncodings? = {
-        switch IMEApp.currentInputMode {
-        case .imeModeCHS: return .GB_18030_2000
-        case .imeModeCHT: return .big5_HKSCS_1999
-        default: return nil
-        }
-      }()
       guard
         var char = "\(strCodePointBuffer)\(input.text)"
-        .parsedAsHexLiteral(encoding: encoding)?.first?.description
+        .parsedAsHexLiteral(encoding: IMEApp.currentInputMode.nonUTFEncoding)?.first?.description
       else {
         delegate.callError("D220B880：輸入的字碼沒有對應的字元。")
         var updatedState = IMEState.ofAbortion()

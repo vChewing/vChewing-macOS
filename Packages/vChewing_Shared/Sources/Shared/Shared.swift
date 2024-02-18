@@ -252,6 +252,22 @@ public enum Shared {
         return "Please select…"
       }
     }
+
+    public var nonUTFEncoding: CFStringEncodings? {
+      switch self {
+      case .imeModeCHS: return .GB_18030_2000
+      case .imeModeCHT: return .big5_HKSCS_1999
+      default: return nil
+      }
+    }
+
+    public var nonUTFEncodingInitials: String? {
+      switch self {
+      case .imeModeCHS: return "GB"
+      case .imeModeCHT: return "Big5"
+      default: return nil
+      }
+    }
   }
 }
 
