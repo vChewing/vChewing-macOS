@@ -26,10 +26,6 @@ let package = Package(
         .product(name: "Megrez", package: "vChewing_Megrez"),
         .product(name: "Shared", package: "vChewing_Shared"),
         .product(name: "PinyinPhonaConverter", package: "vChewing_PinyinPhonaConverter"),
-      ],
-      resources: [
-        .process("Resources/sequenceDataFromEtenDOS-chs.json"),
-        .process("Resources/sequenceDataFromEtenDOS-cht.json"),
       ]
     ),
     .testTarget(

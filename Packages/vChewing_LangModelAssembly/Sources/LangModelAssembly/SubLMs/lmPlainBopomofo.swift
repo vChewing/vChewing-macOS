@@ -9,60 +9,35 @@
 import Foundation
 import Shared
 
-public extension LMAssembly {
-  @frozen struct LMPlainBopomofo {
-    public private(set) var filePath: String?
-    var dataMap: [String: String] = [:]
+extension LMAssembly {
+  struct LMPlainBopomofo {
+    @usableFromInline typealias DataMap = [String: [String: String]]
+    let dataMap: DataMap
 
     public var count: Int { dataMap.count }
 
     public init() {
-      dataMap = [:]
+      do {
+        let rawData = jsnEtenDosSequence.data(using: .utf8) ?? .init([])
+        let rawJSON = try JSONDecoder().decode([String: [String: String]].self, from: rawData)
+        dataMap = rawJSON
+      } catch {
+        vCLog("\(error)")
+        vCLog("↑ Exception happened when parsing raw JSON sequence data from vChewing LMAssembly.")
+        dataMap = [:]
+      }
     }
 
     public var isLoaded: Bool { !dataMap.isEmpty }
 
-    @discardableResult public mutating func open(_ path: String) -> Bool {
-      if isLoaded { return false }
-      let oldPath = filePath
-      filePath = nil
-
-      do {
-        let rawData = try Data(contentsOf: URL(fileURLWithPath: path))
-        let rawJSON = try JSONDecoder().decode([String: String].self, from: rawData)
-        dataMap = rawJSON
-      } catch {
-        filePath = oldPath
-        vCLog("\(error)")
-        vCLog("↑ Exception happened when reading JSON file at: \(path).")
-        return false
-      }
-
-      filePath = path
-      return true
-    }
-
-    public mutating func clear() {
-      filePath = nil
-      dataMap.removeAll()
-    }
-
-    public func saveData() {
-      guard let filePath = filePath, let plistURL = URL(string: filePath) else { return }
-      do {
-        let plistData = try PropertyListSerialization.data(fromPropertyList: dataMap, format: .binary, options: 0)
-        try plistData.write(to: plistURL)
-      } catch {
-        vCLog("Failed to save current database to: \(filePath)")
-      }
-    }
-
-    public func valuesFor(key: String) -> [String] {
+    public func valuesFor(key: String, isCHS: Bool) -> [String] {
       var pairs: [String] = []
-      if let arrRangeRecords: String = dataMap[key]?.trimmingCharacters(in: .newlines) {
+      let subKey = isCHS ? "S" : "T"
+      if let arrRangeRecords: String = dataMap[key]?[subKey] {
         pairs.append(contentsOf: arrRangeRecords.map(\.description))
       }
-      return pairs.deduplicated
+      // 這裡不做去重複處理，因為倚天中文系統注音排序適應者們已經形成了肌肉記憶。
+      return pairs
     }
 
     public func hasValuesFor(key: String) -> Bool { dataMap.keys.contains(key) }
