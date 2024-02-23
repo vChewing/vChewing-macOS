@@ -98,12 +98,7 @@ public struct VwrSettingsPaneGeneral: View {
           UserDef.kKeepReadingUponCompositionError.bind($keepReadingUponCompositionError).render()
           UserDef.kClassicHaninKeyboardSymbolModeShortcutEnabled
             .bind($classicHaninKeyboardSymbolModeShortcutEnabled).render()
-          UserDef.kUseSCPCTypingMode.bind(
-            $useSCPCTypingMode.didChange {
-              guard useSCPCTypingMode else { return }
-              LMMgr.loadSCPCSequencesData()
-            }
-          ).render()
+          UserDef.kUseSCPCTypingMode.bind($useSCPCTypingMode).render()
           if Date.isTodayTheDate(from: 0401) {
             UserDef.kShouldNotFartInLieuOfBeep.bind(
               $shouldNotFartInLieuOfBeep.didChange { onFartControlChange() }
