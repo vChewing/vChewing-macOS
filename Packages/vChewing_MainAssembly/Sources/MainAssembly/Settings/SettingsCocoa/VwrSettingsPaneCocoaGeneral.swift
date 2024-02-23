@@ -83,11 +83,6 @@ public extension SettingsPanesCocoa {
       SpeechSputnik.shared.refreshStatus()
     }
 
-    @IBAction func updateSCPCSettingsAction(_: NSControl) {
-      guard PrefMgr.shared.useSCPCTypingMode else { return }
-      LMMgr.loadSCPCSequencesData()
-    }
-
     @IBAction func updateUiLanguageAction(_ sender: NSPopUpButton) {
       let language = languages[sender.indexOfSelectedItem]
       guard let bundleID = Bundle.main.bundleIdentifier, bundleID.contains("vChewing") else {

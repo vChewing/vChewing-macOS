@@ -64,8 +64,9 @@ public extension LMAssembly {
       lmUserOverride = .init(dataURL: uomDataURL)
     }
 
-    public func setOptions(handler: (inout Config) -> Void) {
+    @discardableResult public func setOptions(handler: (inout Config) -> Void) -> LMInstantiator {
       handler(&config)
+      return self
     }
 
     @discardableResult public static func connectSQLDB(dbPath: String, dropPreviousConnection: Bool = true) -> Bool {
@@ -97,6 +98,7 @@ public extension LMAssembly {
 
     // 磁帶資料模組。「currentCassette」對外唯讀，僅用來讀取磁帶本身的中繼資料（Metadata）。
     static var lmCassette = LMCassette()
+    static var lmPlainBopomofo = LMPlainBopomofo()
 
     // 聲明使用者語言模組。
     // 使用者語言模組使用多執行緒的話，可能會導致一些問題。有時間再仔細排查看看。
@@ -111,7 +113,6 @@ public extension LMAssembly {
     )
     var lmReplacements = LMReplacements()
     var lmAssociates = LMAssociates()
-    var lmPlainBopomofo = LMPlainBopomofo()
 
     // 半衰记忆模组
     var lmUserOverride: LMUserOverride
@@ -185,23 +186,6 @@ public extension LMAssembly {
           vCLog("lmReplacements: \(self.lmReplacements.count) entries of data loaded from: \(path)")
         } else {
           vCLog("lmReplacements: File access failure: \(path)")
-        }
-      }
-    }
-
-    public func loadSCPCSequencesData() {
-      let fileName = !isCHS ? "sequenceDataFromEtenDOS-cht" : "sequenceDataFromEtenDOS-chs"
-      guard let path = Bundle.module.path(forResource: fileName, ofType: "json") else {
-        vCLog("lmPlainBopomofo: File name access failure: \(fileName)")
-        return
-      }
-      DispatchQueue.main.async {
-        if FileManager.default.isReadableFile(atPath: path) {
-          self.lmPlainBopomofo.clear()
-          self.lmPlainBopomofo.open(path)
-          vCLog("lmPlainBopomofo: \(self.lmPlainBopomofo.count) entries of data loaded from: \(path)")
-        } else {
-          vCLog("lmPlainBopomofo: File access failure: \(path)")
         }
       }
     }
@@ -340,7 +324,9 @@ public extension LMAssembly {
 
       // 如果有檢測到使用者自訂逐字選字語料庫內的相關資料的話，在這裡先插入。
       if config.isSCPCEnabled {
-        rawAllUnigrams += lmPlainBopomofo.valuesFor(key: keyChain).map { Megrez.Unigram(value: $0, score: 0) }
+        rawAllUnigrams += Self.lmPlainBopomofo.valuesFor(key: keyChain, isCHS: isCHS).map {
+          Megrez.Unigram(value: $0, score: 0)
+        }
       }
 
       // 用 reversed 指令讓使用者語彙檔案內的詞條優先順序隨著行數增加而逐漸增高。
