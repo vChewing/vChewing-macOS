@@ -17,6 +17,7 @@ let package = Package(
     .package(path: "../HangarRash_SwiftyCapsLockToggler"),
     .package(path: "../Jad_BookmarkManager"),
     .package(path: "../Qwertyyb_ShiftKeyUpChecker"),
+    .package(path: "../vChewing_BrailleSputnik"),
     .package(path: "../vChewing_CandidateWindow"),
     .package(path: "../vChewing_CocoaExtension"),
     .package(path: "../vChewing_Hotenka"),
@@ -38,6 +39,7 @@ let package = Package(
     .target(
       name: "MainAssembly",
       dependencies: [
+        .product(name: "BrailleSputnik", package: "vChewing_BrailleSputnik"),
         .product(name: "BookmarkManager", package: "Jad_BookmarkManager"),
         .product(name: "CandidateWindow", package: "vChewing_CandidateWindow"),
         .product(name: "CocoaExtension", package: "vChewing_CocoaExtension"),
