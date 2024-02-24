@@ -119,6 +119,7 @@
 		5B40113A28D71B8700A9D4CB /* vChewing_Uninstaller */ = {isa = PBXFileReference; lastKnownFileType = wrapper; name = vChewing_Uninstaller; path = Packages/vChewing_Uninstaller; sourceTree = "<group>"; };
 		5B65B919284D0185007C558B /* README.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = README.md; sourceTree = "<group>"; };
 		5B65FB322A9518C9007EEFB0 /* vChewing_MainAssembly */ = {isa = PBXFileReference; lastKnownFileType = wrapper; name = vChewing_MainAssembly; path = Packages/vChewing_MainAssembly; sourceTree = "<group>"; };
+		5B6CA6272B8A1C9200A85050 /* vChewing_BrailleSputnik */ = {isa = PBXFileReference; lastKnownFileType = wrapper; name = vChewing_BrailleSputnik; path = Packages/vChewing_BrailleSputnik; sourceTree = "<group>"; };
 		5B70F4E52A0BE900005EA8C4 /* MenuIcon-TCVIM.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "MenuIcon-TCVIM.png"; sourceTree = "<group>"; };
 		5B70F4E62A0BE900005EA8C4 /* MenuIcon-SCVIM.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "MenuIcon-SCVIM.png"; sourceTree = "<group>"; };
 		5B70F4E72A0BE900005EA8C4 /* MenuIcon-SCVIM@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "MenuIcon-SCVIM@2x.png"; sourceTree = "<group>"; };
@@ -340,6 +341,7 @@
 				5BDB7A3028D47587001AC277 /* Jad_BookmarkManager */,
 				5BDB7A3428D47587001AC277 /* Qwertyyb_ShiftKeyUpChecker */,
 				5BDB7A3528D47587001AC277 /* RMJay_LineReader */,
+				5B6CA6272B8A1C9200A85050 /* vChewing_BrailleSputnik */,
 				5BA8C30128DEFE4F004C5CC4 /* vChewing_CandidateWindow */,
 				5B963C9B28D5BE4100DCEE88 /* vChewing_CocoaExtension */,
 				5BDB7A3228D47587001AC277 /* vChewing_Hotenka */,
