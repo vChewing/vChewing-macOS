@@ -71,6 +71,7 @@ public enum UserDef: String, CaseIterable, Identifiable {
   case kSpecifyShiftBackSpaceKeyBehavior = "SpecifyShiftBackSpaceKeyBehavior"
   case kSpecifyShiftTabKeyBehavior = "SpecifyShiftTabKeyBehavior"
   case kSpecifyShiftSpaceKeyBehavior = "SpecifyShiftSpaceKeyBehavior"
+  case kSpecifyCmdOptCtrlEnterBehavior = "SpecifyCmdOptCtrlEnterBehavior"
   case kAllowBoostingSingleKanjiAsUserPhrase = "AllowBoostingSingleKanjiAsUserPhrase"
   case kUseSCPCTypingMode = "UseSCPCTypingMode"
   case kMaxCandidateLength = "MaxCandidateLength"
@@ -195,6 +196,7 @@ public extension UserDef {
     case .kSpecifyShiftBackSpaceKeyBehavior: return .integer
     case .kSpecifyShiftTabKeyBehavior: return .bool
     case .kSpecifyShiftSpaceKeyBehavior: return .bool
+    case .kSpecifyCmdOptCtrlEnterBehavior: return .integer
     case .kAllowBoostingSingleKanjiAsUserPhrase: return .bool
     case .kUseSCPCTypingMode: return .bool
     case .kMaxCandidateLength: return .integer
@@ -415,6 +417,16 @@ public extension UserDef {
           1: "Space to +revolve pages, Shift+Space to +revolve candidates",
         ]
       )
+    case .kSpecifyCmdOptCtrlEnterBehavior: return .init(
+        userDef: self, shortTitle: "i18n:UserDef.kSpecifyCmdOptCtrlEnterBehavior.shortTitle",
+        description: "i18n:UserDef.kSpecifyCmdOptCtrlEnterBehavior.description",
+        options: [
+          0: "i18n:UserDef.kSpecifyCmdOptCtrlEnterBehavior.option.0",
+          1: "i18n:UserDef.kSpecifyCmdOptCtrlEnterBehavior.option.1",
+          2: "i18n:UserDef.kSpecifyCmdOptCtrlEnterBehavior.option.2",
+          3: "i18n:UserDef.kSpecifyCmdOptCtrlEnterBehavior.option.3",
+        ]
+      )
     case .kAllowBoostingSingleKanjiAsUserPhrase: return .init(
         userDef: self, shortTitle: "Allow boosting / excluding a candidate of single kanji when marking",
         description: "⚠︎ This may hinder the walking algorithm from giving appropriate results."
@@ -432,7 +444,8 @@ public extension UserDef {
         userDef: self, shortTitle: "Show Hanyu-Pinyin in the inline composition buffer"
       )
     case .kInlineDumpPinyinInLieuOfZhuyin: return .init(
-        userDef: self, shortTitle: "Commit Hanyu-Pinyin instead on Ctrl(+Option)+Command+Enter"
+        userDef: self, shortTitle: "Commit Hanyu-Pinyin instead on Ctrl(+Option)+Command+Enter",
+        description: "i18n:UserDef.kInlineDumpPinyinInLieuOfZhuyin.description"
       )
     case .kFetchSuggestionsFromUserOverrideModel: return .init(
         userDef: self, shortTitle: "Applying typing suggestions from half-life user override model",

@@ -80,6 +80,9 @@ public extension PrefMgr {
     if ![0, 1, 2].contains(readingNarrationCoverage) {
       readingNarrationCoverage = 0
     }
+    if ![0, 1, 2, 3].contains(specifyCmdOptCtrlEnterBehavior) {
+      specifyCmdOptCtrlEnterBehavior = 0
+    }
   }
 }
 

@@ -212,6 +212,7 @@
 "i18n:UserDef.kCNS11643Enabled.shortTitle" = "啟用 CNS11643 全字庫支援 (2024-01-23)";
 "i18n:UserDef.kDodgeInvalidEdgeCandidateCursorPosition.shortTitle" = "糾正不合理的端點選字游標位置";
 "i18n:UserDef.kFilterNonCNSReadingsForCHTInput.shortTitle" = "僅繁體中文: 原廠辭典僅返回符合全字庫讀音的結果";
+"i18n:UserDef.kInlineDumpPinyinInLieuOfZhuyin.description" = "藉由 Command+Option+Ctrl+Enter 輸出的內容受對應的行為設定所影響。";
 "i18n:UserDef.kNumPadCharInputBehavior.description" = "指定數字小鍵盤的輸入行為。";
 "i18n:UserDef.kNumPadCharInputBehavior.option.0" = "始終以半形文字直接遞交";
 "i18n:UserDef.kNumPadCharInputBehavior.option.1" = "始終以全形文字直接遞交";
@@ -230,6 +231,12 @@
 "i18n:UserDef.kShiftEisuToggleOffTogetherWithCapsLock.description" = "勾選該選項後：1) [至少 macOS 12 起] Caps Lock 在關掉的時候，會連帶關掉由 Shift 鍵 / JIS 英數鍵負責控制的英數模式；2) 在藉由 JIS 英數鍵關掉其控制的英數模式的時候，也會關掉 Caps Lock。註：威注音無法在 Caps Lock 亮燈的時候感知 Shift 鍵的單獨敲擊事件。";
 "i18n:UserDef.kShiftEisuToggleOffTogetherWithCapsLock.shortTitle" = "使「Shift 鍵 / JIS 英数鍵」英數模式的關閉狀態與 Caps Lock 的關閉狀態保持彼此同步";
 "i18n:UserDef.kShowCodePointInCandidateUI.shortTitle" = "在選字窗內顯示當前候選字的統一碼碼位";
+"i18n:UserDef.kSpecifyCmdOptCtrlEnterBehavior.description" = "在磁帶模式下，該熱鍵組合將不再遞交點字陣列（屆時會改為遞交括弧註解標記）。如另有對點字/盲文功能的更專業的需求的話，請考慮使用專門的點字/盲文工具軟體。";
+"i18n:UserDef.kSpecifyCmdOptCtrlEnterBehavior.option.0" = "遞交括弧註解標記";
+"i18n:UserDef.kSpecifyCmdOptCtrlEnterBehavior.option.1" = "遞交 HTML Ruby 註解標記";
+"i18n:UserDef.kSpecifyCmdOptCtrlEnterBehavior.option.2" = "遞交國語點字 (1947)";
+"i18n:UserDef.kSpecifyCmdOptCtrlEnterBehavior.option.3" = "遞交國通盲文 (GF0019-2018)";
+"i18n:UserDef.kSpecifyCmdOptCtrlEnterBehavior.shortTitle" = "Command+Option+Ctrl+Enter:";
 "i18n:UserDef.kUseJKtoMoveCompositorCursorInCandidateState.description" = "⚠︎ 這將自動禁止 J / K 鍵用作選字鍵。另外，該功能在磁帶模式的「%quick」快速選字狀態下無效。";
 "i18n:UserDef.kUseJKtoMoveCompositorCursorInCandidateState.shortTitle" = "在選字窗顯示時允許以 J / K 鍵移動組字區游標";
 "IBM" = "IBM 排列";

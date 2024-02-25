@@ -83,6 +83,7 @@ public protocol PrefMgrProtocol {
   var specifyShiftBackSpaceKeyBehavior: Int { get set }
   var specifyShiftTabKeyBehavior: Bool { get set }
   var specifyShiftSpaceKeyBehavior: Bool { get set }
+  var specifyCmdOptCtrlEnterBehavior: Int { get set }
   var candidateTextFontName: String { get set }
   var candidateKeys: String { get set }
   var useSCPCTypingMode: Bool { get set }

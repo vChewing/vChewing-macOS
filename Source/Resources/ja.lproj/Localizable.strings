@@ -212,6 +212,7 @@
 "i18n:UserDef.kCNS11643Enabled.shortTitle" = "全字庫モード // 入力可能な漢字数を倍増す (2024-01-23)";
 "i18n:UserDef.kDodgeInvalidEdgeCandidateCursorPosition.shortTitle" = "端末での不合理的な候補選択用カーソル位置を是正";
 "i18n:UserDef.kFilterNonCNSReadingsForCHTInput.shortTitle" = "全字庫以外の音読みを内蔵辞書繁体中国語検索結果から除く";
+"i18n:UserDef.kInlineDumpPinyinInLieuOfZhuyin.description" = "Command+Option+Ctrl+Enter で送り出したものは、それに関する作動設定次第です。";
 "i18n:UserDef.kNumPadCharInputBehavior.description" = "テンキー文字の入力行為をご指定ください。";
 "i18n:UserDef.kNumPadCharInputBehavior.option.0" = "いつでも半角で直接出力";
 "i18n:UserDef.kNumPadCharInputBehavior.option.1" = "いつでも全角で直接出力";
@@ -230,6 +231,12 @@
 "i18n:UserDef.kShiftEisuToggleOffTogetherWithCapsLock.description" = "このチェックを入れると：イ）[macOS 12 以降] CapsLockがオフした時に、「Shiftキー・JIS英数キー」の共有していた内部のスイッチもオフにする；ロ）「JIS英数キー」でそのキーに応ずる英数モードがオフした時に、CapsLockもオフにする。尚、CapsLockがオンの時に、「Shiftキーだけを打った」行為は検知できません。";
 "i18n:UserDef.kShiftEisuToggleOffTogetherWithCapsLock.shortTitle" = "「Shiftキー・JIS英数キー」による英数モードのオフ状態をCapsLockのオフ状態と同期する";
 "i18n:UserDef.kShowCodePointInCandidateUI.shortTitle" = "候補陳列ウィンドウで Unicode のコードポイント情報を示す";
+"i18n:UserDef.kSpecifyCmdOptCtrlEnterBehavior.description" = "カセットモードがONにした場合、このショートカットで点字を送り出すのはできなくて、代わりに「発音表記（丸括弧仕様）」を送り出します。尚、他の点字機能のご希望の場合、他の特別の点字ツールソフトのご使用はお薦めです。";
+"i18n:UserDef.kSpecifyCmdOptCtrlEnterBehavior.option.0" = "発音表記（丸括弧仕様）を送出";
+"i18n:UserDef.kSpecifyCmdOptCtrlEnterBehavior.option.1" = "発音表記（HTML ルビ仕様）を送出";
+"i18n:UserDef.kSpecifyCmdOptCtrlEnterBehavior.option.2" = "中国語点字 (1947) を送出";
+"i18n:UserDef.kSpecifyCmdOptCtrlEnterBehavior.option.3" = "中国語点字 (GF0019-2018) を送出";
+"i18n:UserDef.kSpecifyCmdOptCtrlEnterBehavior.shortTitle" = "Command+Option+Ctrl+Enter:";
 "i18n:UserDef.kUseJKtoMoveCompositorCursorInCandidateState.description" = "⚠︎ これで「J / K」キーは言選り用キー陣列から自動的に外されます。尚、この機能はカセットモードの「%quick」による早速候補入力状態では利用できません。";
 "i18n:UserDef.kUseJKtoMoveCompositorCursorInCandidateState.shortTitle" = "候補陳列が見えるとき、「J / K」キーで入力緩衝列のカーソルを移す";
 "IBM" = "IBM 配列";
@@ -399,7 +406,7 @@
 "Wildcard key cannot be the initial key." = "骨牌キーは最初のキーとしてはならぬ。";
 "Yale Pinyin with Numeral Intonation" = "イェール弁音 (ローマ字+数字音調)";
 "Yes" = "うむ";
-"You are about to uncheck this fart suppressor. You are responsible for all consequences lead by letting people nearby hear the fart sound come from your computer. We strongly advise against unchecking this in any public circumstance that prohibits NSFW netas." = "マナーモードのチェックの外すことになります。周りの人は貴殿のパソコンから屁音を聞いてしまい、それについての結果は全部貴殿の自己責任でございます。公的なる場所でこのチェックを外すのはお勧めできません。";
+"You are about to uncheck this fart suppressor. You are responsible for all consequences lead by letting people nearby hear the fart sound come from your computer. We strongly advise against unchecking this in any public circumstance that prohibits NSFW netas." = "マナーモードのチェックの外すことになります。周りの人は貴殿のパソコンから屁音を聞いてしまい、それについての結果は全部貴殿の自己責任でございます。公的なる場所でこのチェックを外すのはお薦めできません。";
 "You are already using the latest version of vChewing." = "今の威注音はすでに最新版だと報告します。";
 "You are already using the latest version." = "現在稼働中のは最新バージョンである。";
 "You are proceeding to System Preferences to enable the Input Source which corresponds to the input mode you are going to switch to." = "ご希望の入力モードのご利用の前に、それに対応するの入力ソースの追加が必要である。これからはシステム環境設定の該当ページへ案内します。";
