@@ -212,6 +212,7 @@
 "i18n:UserDef.kCNS11643Enabled.shortTitle" = "Enable CNS11643 Support (2024-01-23)";
 "i18n:UserDef.kDodgeInvalidEdgeCandidateCursorPosition.shortTitle" = "Dodge Invalid Edge Candidate Cursor Position";
 "i18n:UserDef.kFilterNonCNSReadingsForCHTInput.shortTitle" = "Filter Non-CNS11643 factory readings (CHT input only)";
+"i18n:UserDef.kInlineDumpPinyinInLieuOfZhuyin.description" = "Contents committed by Command+Option+Ctrl+Enter may vary depending on related behavior settings.";
 "i18n:UserDef.kNumPadCharInputBehavior.description" = "Choose the behavior of numeric pad inputs.";
 "i18n:UserDef.kNumPadCharInputBehavior.option.0" = "Always directly commit half-width chars";
 "i18n:UserDef.kNumPadCharInputBehavior.option.1" = "Always directly commit full-width chars";
@@ -230,6 +231,12 @@
 "i18n:UserDef.kShiftEisuToggleOffTogetherWithCapsLock.description" = "This does: 1) On macOS 12 and later, if the Caps Lock gets turned off, then the internal switch for Shift-key / JIS-Eisu-key Alphanumerical Mode Toggle will also be switched off. 2) If you have turned off the same switch by JIS-Eisu key, then the Caps Lock gets turned off together. Note: vChewing has no way to recognize single hits of Shift key when Caps Lock is on.";
 "i18n:UserDef.kShiftEisuToggleOffTogetherWithCapsLock.shortTitle" = "Sync the off state between Caps Lock and Shift / Eisu Alphanumerical Toggle";
 "i18n:UserDef.kShowCodePointInCandidateUI.shortTitle" = "Show Unicode codepoint metadata in candidate window";
+"i18n:UserDef.kSpecifyCmdOptCtrlEnterBehavior.description" = "This hotkey commits bracketed annotation instead of braille sequence if cassette mode is enabled. Also, please consider using those dedicated braille utility softwares if you have more professional necessities.";
+"i18n:UserDef.kSpecifyCmdOptCtrlEnterBehavior.option.0" = "Commit Bracketed Annotation";
+"i18n:UserDef.kSpecifyCmdOptCtrlEnterBehavior.option.1" = "Commit HTML Ruby Annotation";
+"i18n:UserDef.kSpecifyCmdOptCtrlEnterBehavior.option.2" = "Commit Mandarin Braille (1947)";
+"i18n:UserDef.kSpecifyCmdOptCtrlEnterBehavior.option.3" = "Commit Mandarin Braille (GF0019-2018)";
+"i18n:UserDef.kSpecifyCmdOptCtrlEnterBehavior.shortTitle" = "Command+Option+Ctrl+Enter:";
 "i18n:UserDef.kUseJKtoMoveCompositorCursorInCandidateState.description" = "⚠︎ This will automatically prevent J and K from being used as candidate keys. Also, this won't work with ‘%quick’ candidates in cassette mode.";
 "i18n:UserDef.kUseJKtoMoveCompositorCursorInCandidateState.shortTitle" = "Use J / K to Move Buffer Cursor While Choosing Candidates";
 "IBM" = "IBM";

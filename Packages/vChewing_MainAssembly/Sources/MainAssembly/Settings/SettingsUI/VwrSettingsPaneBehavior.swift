@@ -35,6 +35,9 @@ public struct VwrSettingsPaneBehavior: View {
   @AppStorage(wrappedValue: false, UserDef.kSpecifyShiftSpaceKeyBehavior.rawValue)
   private var specifyShiftSpaceKeyBehavior: Bool
 
+  @AppStorage(wrappedValue: 0, UserDef.kSpecifyCmdOptCtrlEnterBehavior.rawValue)
+  private var specifyCmdOptCtrlEnterBehavior: Int
+
   @AppStorage(wrappedValue: true, UserDef.kUseSpaceToCommitHighlightedSCPCCandidate.rawValue)
   private var useSpaceToCommitHighlightedSCPCCandidate: Bool
 
@@ -80,6 +83,7 @@ public struct VwrSettingsPaneBehavior: View {
           UserDef.kSpecifyShiftBackSpaceKeyBehavior.bind($specifyShiftBackSpaceKeyBehavior).render()
           UserDef.kSpecifyShiftTabKeyBehavior.bind($specifyShiftTabKeyBehavior).render()
             .pickerStyle(RadioGroupPickerStyle())
+          UserDef.kSpecifyCmdOptCtrlEnterBehavior.bind($specifyCmdOptCtrlEnterBehavior).render()
           VStack(alignment: .leading) {
             UserDef.kSpecifyShiftSpaceKeyBehavior.bind($specifyShiftSpaceKeyBehavior).render()
             UserDef.kUseSpaceToCommitHighlightedSCPCCandidate.bind($useSpaceToCommitHighlightedSCPCCandidate).render()

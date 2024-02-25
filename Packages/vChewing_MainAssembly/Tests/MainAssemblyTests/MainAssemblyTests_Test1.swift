@@ -151,4 +151,35 @@ extension MainAssemblyTests {
     XCTAssertEqual(resultText6, "濟公的年中獎金")
     vCTestLog("- 已成功證實「年終」的記憶不會對除了給定上下文以外的情形生效。")
   }
+
+  /// 測試 inputHandler.commissionByCtrlOptionCommandEnter()。
+  func test105_InputHandler_MiscCommissionTest() throws {
+    PrefMgr.shared.useSCPCTypingMode = false
+    clearTestUOM()
+    vCTestLog("正在測試 inputHandler.commissionByCtrlOptionCommandEnter()。")
+    testSession.resetInputHandler(forceComposerCleanup: true)
+    typeSentenceOrCandidates("el dk ru4ej/ n 2k7")
+    guard let handler = testSession.inputHandler as? InputHandler else {
+      XCTAssertThrowsError("testSession.handler is nil.")
+      return
+    }
+    PrefMgr.shared.specifyCmdOptCtrlEnterBehavior = 0
+    var result = handler.commissionByCtrlOptionCommandEnter(isShiftPressed: true)
+    XCTAssertEqual(result, "ㄍㄠ ㄎㄜ ㄐㄧˋ ㄍㄨㄥ ㄙ ˙ㄉㄜ")
+    result = handler.commissionByCtrlOptionCommandEnter() // isShiftPressed 的參數預設是 false。
+    XCTAssertEqual(result, "高(ㄍㄠ)科(ㄎㄜ)技(ㄐㄧˋ)公(ㄍㄨㄥ)司(ㄙ)的(˙ㄉㄜ)")
+    PrefMgr.shared.specifyCmdOptCtrlEnterBehavior = 1
+    result = handler.commissionByCtrlOptionCommandEnter()
+    let expectedRubyResult = """
+    <ruby>高<rp>(</rp><rt>ㄍㄠ</rt><rp>)</rp></ruby><ruby>科<rp>(</rp><rt>ㄎㄜ</rt><rp>)</rp></ruby><ruby>技<rp>(</rp><rt>ㄐㄧˋ</rt><rp>)</rp></ruby><ruby>公<rp>(</rp><rt>ㄍㄨㄥ</rt><rp>)</rp></ruby><ruby>司<rp>(</rp><rt>ㄙ</rt><rp>)</rp></ruby><ruby>的<rp>(</rp><rt>˙ㄉㄜ</rt><rp>)</rp></ruby>
+    """
+    XCTAssertEqual(result, expectedRubyResult)
+    PrefMgr.shared.specifyCmdOptCtrlEnterBehavior = 2
+    result = handler.commissionByCtrlOptionCommandEnter()
+    XCTAssertEqual(result, "⠅⠩⠄⠇⠮⠄⠅⠡⠐⠅⠯⠄⠑⠄⠙⠮⠁")
+    PrefMgr.shared.specifyCmdOptCtrlEnterBehavior = 3
+    result = handler.commissionByCtrlOptionCommandEnter()
+    XCTAssertEqual(result, "⠛⠖⠁⠅⠢⠁⠛⠊⠆⠛⠲⠁⠎⠁⠙⠢")
+    vCTestLog("成功完成測試 inputHandler.commissionByCtrlOptionCommandEnter()。")
+  }
 }
