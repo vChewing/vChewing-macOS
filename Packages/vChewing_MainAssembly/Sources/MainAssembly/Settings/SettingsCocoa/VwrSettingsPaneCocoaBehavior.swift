@@ -33,7 +33,11 @@ public extension SettingsPanesCocoa {
               UserDef.kSpecifyShiftBackSpaceKeyBehavior.render(fixWidth: innerContentWidth)
               UserDef.kSpecifyShiftTabKeyBehavior.render(fixWidth: innerContentWidth)
               UserDef.kSpecifyShiftSpaceKeyBehavior.render(fixWidth: innerContentWidth)
+              UserDef.kSpecifyCmdOptCtrlEnterBehavior.render(fixWidth: innerContentWidth)
             }?.boxed()
+            NSView()
+          }
+          NSTabView.TabPage(title: "Ｂ") {
             NSStackView.buildSection(width: innerContentWidth) {
               UserDef.kUpperCaseLetterKeyBehavior.render(fixWidth: innerContentWidth)
               UserDef.kNumPadCharInputBehavior.render(fixWidth: innerContentWidth)
@@ -44,7 +48,7 @@ public extension SettingsPanesCocoa {
             }?.boxed()
             NSView()
           }
-          NSTabView.TabPage(title: "Ｂ") {
+          NSTabView.TabPage(title: "Ｃ") {
             NSStackView.buildSection(width: innerContentWidth) {
               UserDef.kChooseCandidateUsingSpace.render(fixWidth: innerContentWidth)
               UserDef.kEscToCleanInputBuffer.render(fixWidth: innerContentWidth)
@@ -65,7 +69,7 @@ public extension SettingsPanesCocoa {
             }?.boxed()
             NSView()
           }
-          NSTabView.TabPage(title: "Ｃ") {
+          NSTabView.TabPage(title: "Ｄ") {
             NSStackView.buildSection(width: innerContentWidth) {
               UserDef.kBypassNonAppleCapsLockHandling.render(fixWidth: innerContentWidth)
               UserDef.kShareAlphanumericalModeStatusAcrossClients.render(fixWidth: innerContentWidth)

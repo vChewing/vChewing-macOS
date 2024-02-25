@@ -319,6 +319,9 @@ import SwiftExtension
   @AppProperty(key: UserDef.kSpecifyShiftSpaceKeyBehavior.rawValue, defaultValue: false)
   public dynamic var specifyShiftSpaceKeyBehavior: Bool
 
+  @AppProperty(key: UserDef.kSpecifyCmdOptCtrlEnterBehavior.rawValue, defaultValue: 0)
+  public dynamic var specifyCmdOptCtrlEnterBehavior: Int
+
   // MARK: - Optional settings
 
   @AppProperty(key: UserDef.kCandidateTextFontName.rawValue, defaultValue: "")
