@@ -274,12 +274,13 @@ public enum Shared {
 // MARK: - PEReloadEventObserver
 
 @available(macOS 10.15, *)
-public class PEReloadEventObserver: ObservableObject, Equatable {
+public class PEReloadEventObserver: NSObject, ObservableObject {
   public static let shared = PEReloadEventObserver()
   private var observation: NSKeyValueObservation?
   @Published public var id = UUID().uuidString
 
-  public init() {
+  override public init() {
+    super.init()
     observation = Broadcaster.shared.observe(\.eventForReloadingPhraseEditor, options: [.new]) { _, _ in
       self.touch()
     }
