@@ -128,15 +128,14 @@ public extension NSApplication {
   // MARK: - System Dark Mode Status Detector.
 
   static var isDarkMode: Bool {
-    if #unavailable(macOS 10.14) { return false }
-    if #available(macOS 10.15, *) {
-      let appearanceDescription = NSApp.effectiveAppearance.debugDescription
-        .lowercased()
-      return appearanceDescription.contains("dark")
-    } else if let appleInterfaceStyle = UserDefaults.current.string(forKey: "AppleInterfaceStyle") {
-      return appleInterfaceStyle.lowercased().contains("dark")
+    // "NSApp" can be nil during SPM unit tests.
+    // Therefore, the method dedicated for macOS 10.15 and later is not considered stable anymore.
+    // Fortunately, the method for macOS 10.14 works well on later macOS releases.
+    if #available(macOS 10.14, *), let strAIS = UserDefaults.current.string(forKey: "AppleInterfaceStyle") {
+      return strAIS.lowercased().contains("dark")
+    } else {
+      return false
     }
-    return false
   }
 
   // MARK: - Tell whether this IME is running with Root privileges.
