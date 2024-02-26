@@ -8,6 +8,7 @@
 
 import AppKit
 import AVFoundation
+import Shared
 
 public class SpeechSputnik {
   public static var shared: SpeechSputnik = .init()

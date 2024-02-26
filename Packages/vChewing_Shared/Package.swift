@@ -26,5 +26,9 @@ let package = Package(
         .product(name: "SwiftExtension", package: "vChewing_SwiftExtension"),
       ]
     ),
+    .testTarget(
+      name: "SharedTests",
+      dependencies: ["Shared"]
+    ),
   ]
 )

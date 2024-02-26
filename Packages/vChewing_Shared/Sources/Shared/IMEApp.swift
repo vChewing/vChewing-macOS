@@ -8,7 +8,6 @@
 
 import AppKit
 import Carbon
-import Shared
 
 // MARK: - Top-level Enums relating to Input Mode and Language Supports.
 
@@ -52,7 +51,7 @@ public enum IMEApp {
   // MARK: - 輸入法的當前的簡繁體中文模式
 
   public static var currentInputMode: Shared.InputMode {
-    .init(rawValue: PrefMgr.shared.mostRecentInputMode) ?? .imeModeNULL
+    .init(rawValue: PrefMgr().mostRecentInputMode) ?? .imeModeNULL
   }
 
   /// 當前鍵盤是否是 JIS 佈局
@@ -62,9 +61,10 @@ public enum IMEApp {
 
   /// Fart or Beep?
   public static func buzz() {
-    if PrefMgr.shared.isDebugModeEnabled {
-      NSSound.buzz(fart: !PrefMgr.shared.shouldNotFartInLieuOfBeep)
-    } else if !PrefMgr.shared.shouldNotFartInLieuOfBeep {
+    let prefs = PrefMgr()
+    if prefs.isDebugModeEnabled {
+      NSSound.buzz(fart: !prefs.shouldNotFartInLieuOfBeep)
+    } else if !prefs.shouldNotFartInLieuOfBeep {
       NSSound.buzz(fart: true)
     } else {
       NSSound.beep()
