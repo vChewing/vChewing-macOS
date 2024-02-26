@@ -7,22 +7,7 @@
 // requirements defined in MIT License.
 
 import InputMethodKit
-import Shared
 import SwiftExtension
-import SwiftUI
-
-// MARK: ObservableProject.
-
-@available(macOS 10.15, *)
-extension PrefMgr: ObservableObject {}
-
-extension PrefMgr {
-  func sendObjWillChange() {
-    if #available(macOS 10.15, *) {
-      objectWillChange.send()
-    }
-  }
-}
 
 // MARK: Guarded Method for Validating Candidate Keys.
 
@@ -90,7 +75,7 @@ public extension PrefMgr {
 
 public extension PrefMgr {
   @discardableResult func dumpShellScriptBackup() -> String? {
-    let mirror = Mirror(reflecting: PrefMgr.shared)
+    let mirror = Mirror(reflecting: self)
     guard let bundleIdentifier = Bundle.main.bundleIdentifier else { return nil }
     let strDoubleDashLine = String(String(repeating: "=", count: 70))
     let consoleOutput = NSMutableString(string: "#!/bin/sh\n\n")

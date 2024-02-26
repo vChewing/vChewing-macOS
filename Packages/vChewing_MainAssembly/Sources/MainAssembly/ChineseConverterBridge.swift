@@ -7,6 +7,7 @@
 // requirements defined in MIT License.
 
 import Hotenka
+import Shared
 
 public enum ChineseConverter {
   public static let shared = HotenkaChineseConverter(
