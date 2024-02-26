@@ -7,6 +7,7 @@
 // requirements defined in MIT License.
 
 import Foundation
+import Shared
 import SwiftExtension
 
 // MARK: - Typing Method

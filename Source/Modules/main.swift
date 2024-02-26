@@ -10,6 +10,7 @@ import AppKit
 import IMKUtils
 import InputMethodKit
 import MainAssembly
+import Shared
 import Uninstaller
 
 let cmdParameters = CommandLine.arguments.dropFirst(1)
