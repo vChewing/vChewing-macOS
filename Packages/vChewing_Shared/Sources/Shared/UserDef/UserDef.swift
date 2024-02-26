@@ -33,6 +33,7 @@ public enum UserDef: String, CaseIterable, Identifiable {
 
   case kIsDebugModeEnabled = "_DebugMode"
   case kFailureFlagForUOMObservation = "_FailureFlag_UOMObservation"
+  case kCandidateServiceMenuContents = "CandidateServiceMenuContents"
   case kRespectClientAccentColor = "RespectClientAccentColor"
   case kSecurityHardenedCompositionBuffer = "SecurityHardenedCompositionBuffer"
   case kCheckAbusersOfSecureEventInputAPI = "CheckAbusersOfSecureEventInputAPI"
@@ -158,6 +159,7 @@ public extension UserDef {
     switch self {
     case .kIsDebugModeEnabled: return .bool
     case .kFailureFlagForUOMObservation: return .bool
+    case .kCandidateServiceMenuContents: return .dictionary
     case .kRespectClientAccentColor: return .bool
     case .kSecurityHardenedCompositionBuffer: return .bool
     case .kCheckAbusersOfSecureEventInputAPI: return .bool
@@ -254,6 +256,7 @@ public extension UserDef {
   var metaData: MetaData? {
     switch self {
     case .kIsDebugModeEnabled: return .init(userDef: self, shortTitle: "Debug Mode")
+    case .kCandidateServiceMenuContents: return nil
     case .kFailureFlagForUOMObservation: return nil
     case .kRespectClientAccentColor: return .init(
         userDef: self, shortTitle: "i18n:userdef.kRespectClientAccentColor.shortTitle",

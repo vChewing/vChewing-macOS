@@ -25,6 +25,29 @@ import SwiftExtension
     "com.valvesoftware.steam": true, "jp.naver.line.mac": true,
   ]
 
+  public static let kDefaultCandidateServiceMenuItem: [String] = [
+    #"Unicode Metadata: %s"# + "\t" + #"@SEL:copyUnicodeMetadata:"#,
+    #"macOS Dict: %s"# + "\t" + #"@URL:dict://%s"#,
+    #"Bing: %s"# + "\t" + #"@WEB:https://www.bing.com/search?q=%s"#,
+    #"DuckDuckGo: %s"# + "\t" + #"@WEB:https://duckduckgo.com/?t=h_&q=%s"#,
+    #"Ecosia: %s"# + "\t" + #"@WEB:https://www.ecosia.org/search?method=index&q=%s"#,
+    #"Google: %s"# + "\t" + #"@WEB:https://www.google.com/search?q=%s"#,
+    #"MoeDict: %s"# + "\t" + #"@WEB:https://www.moedict.tw/%s"#,
+    #"Wikitonary: %s"# + "\t" + #"@WEB:https://zh.wiktionary.org/wiki/Special:Search?search=%s"#,
+    #"Unihan: %s"# + "\t" + #"@WEB:https://www.unicode.org/cgi-bin/GetUnihanData.pl?codepoint=%s"#,
+    #"Zi-Hi: %s"# + "\t" + #"@WEB:https://zi-hi.com/sp/uni/%s"#,
+    #"HTML Ruby Zhuyin: %s"# + "\t" + #"@SEL:copyRubyHTMLZhuyinTextbookStyle:"#,
+    #"HTML Ruby Pinyin: %s"# + "\t" + #"@SEL:copyRubyHTMLHanyuPinyinTextbookStyle:"#,
+    #"Zhuyin Annotation: %s"# + "\t" + #"@SEL:copyInlineZhuyinAnnotationTextbookStyle:"#,
+    #"Pinyin Annotation: %s"# + "\t" + #"@SEL:copyInlineHanyuPinyinAnnotationTextbookStyle:"#,
+    #"Braille 1947: %s"# + "\t" + #"@SEL:copyBraille1947:"#,
+    #"Braille 2018: %s"# + "\t" + #"@SEL:copyBraille2018:"#,
+    #"Baidu: %s"# + "\t" + #"@WEB:https://www.baidu.com/s?wd=%s"#,
+    #"BiliBili: %s"# + "\t" + #"@WEB:https://search.bilibili.com/all?keyword=%s"#,
+    #"Genshin BiliWiki: %s"# + "\t" + #"@WEB:https://wiki.biligame.com/ys/%s"#,
+    #"HSR BiliWiki: %s"# + "\t" + #"@WEB:https://wiki.biligame.com/sr/%s"#,
+  ]
+
   public var didAskForSyncingLMPrefs: (() -> Void)?
   public var didAskForRefreshingSpeechSputnik: (() -> Void)?
   public var didAskForSyncingShiftKeyDetectorPrefs: (() -> Void)?
@@ -36,6 +59,9 @@ import SwiftExtension
 
   @AppProperty(key: UserDef.kFailureFlagForUOMObservation.rawValue, defaultValue: false)
   public dynamic var failureFlagForUOMObservation: Bool
+
+  @AppProperty(key: UserDef.kCandidateServiceMenuContents.rawValue, defaultValue: kDefaultCandidateServiceMenuItem)
+  public dynamic var candidateServiceMenuContents: [String]
 
   @AppProperty(key: UserDef.kRespectClientAccentColor.rawValue, defaultValue: true)
   public dynamic var respectClientAccentColor: Bool
