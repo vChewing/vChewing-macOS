@@ -71,6 +71,18 @@ public extension NSAttributedString {
 
 public extension NSString {
   var localized: String { NSLocalizedString(description, comment: "") }
+
+  @objc func getCharDescriptions(_: Any? = nil) -> [String] {
+    (self as String).charDescriptions
+  }
+
+  @objc func getCodePoints(_: Any? = nil) -> [String] {
+    (self as String).codePoints
+  }
+
+  @objc func getDescriptionAsCodePoints(_: Any? = nil) -> [String] {
+    (self as String).describedAsCodePoints
+  }
 }
 
 // MARK: - NSRange Extension
