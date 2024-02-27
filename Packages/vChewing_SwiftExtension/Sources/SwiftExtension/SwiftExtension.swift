@@ -200,7 +200,7 @@ public extension String {
   }
 }
 
-// MARK: - String CharName Extension
+// MARK: - String CharName and CodePoint Extension
 
 public extension String {
   var charDescriptions: [String] {
@@ -208,6 +208,25 @@ public extension String {
       let theName: String = $0.properties.name ?? ""
       return String(format: "U+%02X %@", $0.value, theName)
     }
+  }
+
+  var codePoints: [String] {
+    map(\.codePoint)
+  }
+
+  var describedAsCodePoints: [String] {
+    map {
+      "\($0) (\($0.codePoint))"
+    }
+  }
+}
+
+// MARK: - Character Codepoint
+
+public extension Character {
+  var codePoint: String {
+    guard let value = unicodeScalars.first?.value else { return "U+NULL" }
+    return String(format: "U+%02X", value)
   }
 }
 
