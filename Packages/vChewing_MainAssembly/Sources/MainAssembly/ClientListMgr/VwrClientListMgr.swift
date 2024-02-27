@@ -15,6 +15,7 @@ public class VwrClientListMgr: NSViewController {
   let windowWidth: CGFloat = 770
   let contentWidth: CGFloat = 750
   let buttonWidth: CGFloat = 150
+  let tableHeight: CGFloat = 230
 
   lazy var tblClients: NSTableView = .init()
   lazy var btnAddClient = NSButton("Add Client", target: self, action: #selector(btnAddClientClicked(_:)))
@@ -35,7 +36,7 @@ public class VwrClientListMgr: NSViewController {
   var body: NSView? {
     NSStackView.build(.vertical, insets: .new(all: 14)) {
       makeScrollableTable()
-        .makeSimpleConstraint(.height, relation: .equal, value: 232)
+        .makeSimpleConstraint(.height, relation: .equal, value: tableHeight)
       NSStackView.build(.horizontal) {
         let descriptionWidth = contentWidth - buttonWidth - 20
         NSStackView.build(.vertical) {
@@ -59,6 +60,8 @@ public class VwrClientListMgr: NSViewController {
     scrollContainer.scrollerStyle = .legacy
     scrollContainer.autohidesScrollers = true
     scrollContainer.documentView = tblClients
+    scrollContainer.hasVerticalScroller = true
+    scrollContainer.hasHorizontalScroller = true
     if #available(macOS 11.0, *) {
       tblClients.style = .inset
     }
@@ -72,7 +75,7 @@ public class VwrClientListMgr: NSViewController {
     tblClients.autosaveTableColumns = false
     tblClients.backgroundColor = NSColor.controlBackgroundColor
     tblClients.columnAutoresizingStyle = .lastColumnOnlyAutoresizingStyle
-    tblClients.frame = CGRect(x: 0, y: 0, width: 728, height: 230)
+    tblClients.frame = CGRect(x: 0, y: 0, width: 728, height: tableHeight)
     tblClients.gridColor = NSColor.clear
     tblClients.intercellSpacing = CGSize(width: 17, height: 0)
     tblClients.rowHeight = 24
