@@ -54,6 +54,7 @@ public enum UserDef: String, CaseIterable, Identifiable {
   case kShouldAutoReloadUserDataFiles = "ShouldAutoReloadUserDataFiles"
   case kUseRearCursorMode = "UseRearCursorMode"
   case kUseJKtoMoveCompositorCursorInCandidateState = "UseJKtoMoveCompositorCursorInCandidateState"
+  case kUseShiftQuestionToCallServiceMenu = "UseShiftQuestionToCallServiceMenu"
   case kUseDynamicCandidateWindowOrigin = "UseDynamicCandidateWindowOrigin"
   case kUseHorizontalCandidateList = "UseHorizontalCandidateList"
   case kChooseCandidateUsingSpace = "ChooseCandidateUsingSpace"
@@ -180,6 +181,7 @@ public extension UserDef {
     case .kShouldAutoReloadUserDataFiles: return .bool
     case .kUseRearCursorMode: return .bool
     case .kUseJKtoMoveCompositorCursorInCandidateState: return .bool
+    case .kUseShiftQuestionToCallServiceMenu: return .bool
     case .kUseDynamicCandidateWindowOrigin: return .bool
     case .kUseHorizontalCandidateList: return .bool
     case .kChooseCandidateUsingSpace: return .bool
@@ -343,6 +345,10 @@ public extension UserDef {
         userDef: self,
         shortTitle: "i18n:UserDef.kUseJKtoMoveCompositorCursorInCandidateState.shortTitle",
         description: "i18n:UserDef.kUseJKtoMoveCompositorCursorInCandidateState.description"
+      )
+    case .kUseShiftQuestionToCallServiceMenu: return .init(
+        userDef: self,
+        shortTitle: "i18n:UserDef.kUseShiftQuestionToCallServiceMenu.shortTitle"
       )
     case .kUseDynamicCandidateWindowOrigin: return .init(
         userDef: self, shortTitle: "Adjust candidate window location according to current node length"

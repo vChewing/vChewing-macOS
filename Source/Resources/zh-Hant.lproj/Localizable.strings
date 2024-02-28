@@ -250,6 +250,7 @@
 "i18n:UserDef.kSpecifyCmdOptCtrlEnterBehavior.shortTitle" = "Command+Option+Ctrl+Enter:";
 "i18n:UserDef.kUseJKtoMoveCompositorCursorInCandidateState.description" = "⚠︎ 這將自動禁止 J / K 鍵用作選字鍵。另外，該功能在磁帶模式的「%quick」快速選字狀態下無效。";
 "i18n:UserDef.kUseJKtoMoveCompositorCursorInCandidateState.shortTitle" = "在選字窗顯示時允許以 J / K 鍵移動組字區游標";
+"i18n:UserDef.kUseShiftQuestionToCallServiceMenu.shortTitle" = "允許在選字窗內也使用「Shift+?」叫出服務選單";
 "IBM" = "IBM 排列";
 "If disabled, this will insert space instead." = "取消勾選的話，該按鍵會插入空格。";
 "If not filling the weight, it will be 0.0, the maximum one. An ideal weight situates in [-9.5, 0], making itself can be captured by the walking algorithm. The exception is -114.514, the disciplinary weight. The walking algorithm will ignore it unless it is the unique result." = "不填寫權重的話，預設權重為最高值「0」。理想的權重範圍在 [-9.5, 0] 這個閉區間內，可以被爬軌算法自動抓到。例外就是懲戒權重「-114.514」，屬於極端降權。這種情況下，除非是唯一結果，否則會被爬軌算法忽略掉。";

@@ -134,6 +134,9 @@ import SwiftExtension
   @AppProperty(key: UserDef.kUseJKtoMoveCompositorCursorInCandidateState.rawValue, defaultValue: false)
   public var useJKtoMoveCompositorCursorInCandidateState: Bool
 
+  @AppProperty(key: UserDef.kUseShiftQuestionToCallServiceMenu.rawValue, defaultValue: true)
+  public var useShiftQuestionToCallServiceMenu: Bool
+
   @AppProperty(key: UserDef.kMoveCursorAfterSelectingCandidate.rawValue, defaultValue: true)
   public dynamic var moveCursorAfterSelectingCandidate: Bool
 
