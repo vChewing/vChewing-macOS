@@ -12,6 +12,28 @@ import Shared
 import Tekkon
 
 public extension CandidateTextService {
+  // MARK: - Final Sanity Check Implementation.
+
+  static func enableFinalSanityCheck() {
+    finalSanityCheck = finalSanityCheckImplemented
+  }
+
+  private static func finalSanityCheckImplemented(_ target: CandidateTextService) -> Bool {
+    switch target.value {
+    case .url: return true
+    case let .selector(strSelector):
+      guard target.candidateText != "%s" else { return true } // 防止誤傷到編輯器。
+      switch strSelector {
+      case "copyUnicodeMetadata:": return true
+      case _ where strSelector.hasPrefix("copyRuby"),
+           _ where strSelector.hasPrefix("copyBraille"),
+           _ where strSelector.hasPrefix("copyInline"):
+        return !target.reading.joined().isEmpty // 以便應對 [""] 的情況。
+      default: return true
+      }
+    }
+  }
+
   // MARK: - Selector Methods, CandidatePairServicable, and the Coordinator.
 
   var responseFromSelector: String? {

@@ -26,6 +26,8 @@ public struct CandidateTextService: Codable {
   public let value: ServiceValue
   public let candidateText: String
 
+  public static var finalSanityCheck: ((CandidateTextService) -> Bool)?
+
   public init?(key: String, definedValue: String, param: String = #"%s"#, reading: [String] = []) {
     guard !key.isEmpty, !definedValue.isEmpty, definedValue.first != "#" else { return nil }
     candidateText = param
@@ -62,6 +64,8 @@ public struct CandidateTextService: Codable {
     }
     guard let finalServiceValue = finalServiceValue else { return nil }
     value = finalServiceValue
+    let finalSanityCheckResult = Self.finalSanityCheck?(self) ?? true
+    if !finalSanityCheckResult { return nil }
   }
 }
 

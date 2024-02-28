@@ -24,6 +24,21 @@ class CandidateServiceCoordinatorTests: XCTestCase {
     #"Braille 2018: %s"# + "\t" + #"@SEL:copyBraille2018:"#,
   ]
 
+  func testSelector_FinalSanityCheck() throws {
+    var stacked = Self.testDataMap.parseIntoCandidateTextServiceStack(
+      candidate: "胡桃", reading: [] // 故意使用空 Reading
+    )
+    let count1 = stacked.count
+    print("Current Count before Sanity Check ON: \(stacked.count)")
+    CandidateTextService.enableFinalSanityCheck()
+    stacked = Self.testDataMap.parseIntoCandidateTextServiceStack(
+      candidate: "胡桃", reading: [] // 故意使用空 Reading
+    )
+    let count2 = stacked.count
+    print("Current Count after Sanity Check ON: \(stacked.count)")
+    XCTAssertGreaterThan(count1, count2)
+  }
+
   func testSelector_UnicodeMetadata() throws {
     let stacked = Self.testDataMap.parseIntoCandidateTextServiceStack(
       candidate: "胡桃", reading: ["ㄏㄨˊ", "ㄊㄠˊ"]
