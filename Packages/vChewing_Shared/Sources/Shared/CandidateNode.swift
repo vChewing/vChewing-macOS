@@ -8,7 +8,7 @@
 
 import Foundation
 
-public class CandidateNode {
+open class CandidateNode {
   public var name: String
   public var members: [CandidateNode]
   public var previous: CandidateNode?
