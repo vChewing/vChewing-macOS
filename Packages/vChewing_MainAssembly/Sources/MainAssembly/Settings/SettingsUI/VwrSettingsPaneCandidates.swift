@@ -41,6 +41,9 @@ public struct VwrSettingsPaneCandidates: View {
   @AppStorage(wrappedValue: false, UserDef.kUseJKtoMoveCompositorCursorInCandidateState.rawValue)
   private var useJKtoMoveCompositorCursorInCandidateState: Bool
 
+  @AppStorage(wrappedValue: true, UserDef.kUseShiftQuestionToCallServiceMenu.rawValue)
+  public var useShiftQuestionToCallServiceMenu: Bool
+
   @AppStorage(wrappedValue: true, UserDef.kMoveCursorAfterSelectingCandidate.rawValue)
   private var moveCursorAfterSelectingCandidate: Bool
 
@@ -72,6 +75,12 @@ public struct VwrSettingsPaneCandidates: View {
               .disabled(useRearCursorMode)
           }
           UserDef.kDodgeInvalidEdgeCandidateCursorPosition.bind($dodgeInvalidEdgeCandidateCursorPosition).render()
+          UserDef.kUseShiftQuestionToCallServiceMenu.bind(
+            $useShiftQuestionToCallServiceMenu.didChange {
+              // 利用該變數的 didSet 屬性自糾。
+              PrefMgr.shared.candidateKeys = PrefMgr.shared.candidateKeys
+            }
+          ).render()
           UserDef.kUseJKtoMoveCompositorCursorInCandidateState.bind(
             $useJKtoMoveCompositorCursorInCandidateState.didChange {
               // 利用該變數的 didSet 屬性自糾。
