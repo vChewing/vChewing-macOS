@@ -26,6 +26,7 @@
 "About vChewing…" = "About vChewing…";
 "Accept leading intonations in rare cases" = "Accept leading intonations in rare cases";
 "Add Client" = "Add Client";
+"Add Service" = "Add Service";
 "Adjust candidate window location according to current node length" = "Adjust candidate window location according to current node length";
 "All strokes in the composition buffer will be shown as ASCII keyboard characters unless this option is enabled. Stroke is definable in the “%keyname” section of the CIN file." = "All strokes in the composition buffer will be shown as ASCII keyboard characters unless this option is enabled. Stroke is definable in the “%keyname” section of the CIN file.";
 "Allow backspace-editing miscomposed readings" = "Allow backspace-editing miscomposed readings";
@@ -125,6 +126,7 @@
 "Completely disable using Shift key to toggle alphanumerical mode" = "Completely disable using Shift key to toggle alphanumerical mode";
 "Consolidate the context on confirming candidate selection" = "Consolidate the context on confirming candidate selection";
 "Consolidate" = "Consolidate";
+"Copy All to Clipboard" = "Copy All to Clipboard";
 "Core Dict loading complete." = "Core Dict loading complete.";
 "Currency Numeral Output" = "Currency Numeral Output";
 "Cursor Selection:" = "Cursor Selection:";
@@ -183,6 +185,7 @@
 "Harden vertical punctuations during vertical typing (not recommended)" = "Harden vertical punctuations during vertical typing (not recommended)";
 "Hold ⇧ to choose associates." = "Hold ⇧ to choose associates.";
 "Horizontal" = "Horizontal";
+"How to Fill" = "How to Fill";
 "Hsu" = "Hsu";
 "Hualuo Pinyin with Numeral Intonation" = "Hualuo Pinyin with Numeral Intonation";
 "i18n:aboutWindow.ABOUT_APP_TITLE_FULL" = "About vChewing for macOS";
@@ -195,6 +198,14 @@
 "i18n:aboutWindow.OK_BUTTON" = "I Accept";
 "i18n:aboutWindow.WEBSITE_BUTTON" = "Website";
 "i18n:CandidateKey.ValidationError.AssignedForOtherPurposes" = "Candidates cannot have those keys who are assigned for other purposes.";
+"i18n:candidateServiceMenu.selectorResponse.failed" = "Failed\nEither ObjC Selector mismatch or no result available.";
+"i18n:candidateServiceMenu.selectorResponse.succeeded" = "Succeeded\nResults are available in Clipboard.";
+"i18n:CandidateServiceMenuEditor.description" = "Candidate Service Menu can be called in Candidate Window by using “(Shift+)SymbolMenuKey”. The currently highlighted candidate will be used as the parameter for calling the Service Menu. Depending on what listed in the current window (Service Menu Editor), some services are for opening a designated web browser page to query the parameter, and some are for local-generating some computed results to your clipboard.\n\nP.S.: If no service is registered in the current window, then the above hotkey will behave as alternative page-flipping shortcuts.";
+"i18n:CandidateServiceMenuEditor.formatGuide" = "Here are the formatting rules of the Service Metadata:\n\n1. One definition per line. Use “Tab” as delimiter to divide the two cells. The parameter “%s” written in the Menu Item Title will be replaced using the real parameter data when you are using the service. If the parameter consists of only one character, then its codepoint will be attached to the end of the Menu Item Title.\n\n2. The Defined Value begins with “@SEL:” or “@WEB:” or “@URL:”. Here are their differences:\n\n- “@SEL:” means that the remaining string should be the name of the specified Objective-C Selector. It must be ended with an ASCII colon. This method is to call some internal features in vChewing to retrieve locally-generated query results.\n\n- “@WEB:” and “@URL:” are exactly the same, indicating that the remaining string should be an URL for the web page to query the parameter. The parameter “%s” written in the URL will be replaced using the real parameter data when you are using the service.";
+"i18n:CandidateServiceMenuEditor.howToGetGuide" = "You may hover your mouse pointer onto the editing area to see the pop-up data-filling instructions.";
+"i18n:CandidateServiceMenuEditor.prompt" = "Please input the service metadata you want to register.";
+"i18n:CandidateServiceMenuEditor.table.field.MenuTitle" = "Menu Item Title";
+"i18n:CandidateServiceMenuEditor.table.field.Value" = "Defined Value";
 "i18n:KimoDataImportError.connectionFailure.errMsg" = "Directly Import is not available due to an NSConnection failure.\n\n- Please enable Yahoo! KeyKey Input Method and run it prior to performing the current action. vChewing now have just triggered Yahoo! KeyKey Input Method to run, so you can retry the import immediately.\n\n- If this copy of vChewing is compiled by yourself, please double-check the Sandbox Entitlements you have modified.\n\n- If this mac is not an Intel Mac, then Rosetta 2 is required to run Yahoo! KeyKey Input Method.\n\n- If all of the above reasons are not met in this case, then the __objc_empty_cache API might be unavailable in the current system. This API is crucial in order to let Yahoo! KeyKey Input Method run. Please double check the Console.app in your system to see whether there are any crash reports related to Yahoo! KeyKey Input Method.";
 "i18n:KimoDataImportError.fileHandlerFailure.errMsg" = "Failed in writing new user phrases data.";
 "i18n:kimoImportButton.DragFileToHere" = "DRAG FILE TO HERE";
@@ -319,12 +330,14 @@
 "Reload" = "Reload";
 "Remove Selected" = "Remove Selected";
 "Replace to" = "Replace to";
+"Reset Default" = "Reset Default";
 "Reverse Lookup (Phonabets)" = "Reverse Lookup (Phonabets)";
 "Save" = "Save";
 "Secondary Pinyin with Numeral Intonation" = "Secondary Pinyin with Numeral Intonation";
 "Security-harden the composition buffer for all clients" = "Security-harden the composition buffer for all clients";
 "Seigyou" = "Seigyou (JinYei)";
 "Selection Keys:" = "Selection Keys:";
+"Service Menu Editor" = "Service Menu Editor";
 "Share alphanumerical mode status across all clients" = "Share alphanumerical mode status across all clients";
 "Shift+BackSpace:" = "Shift+BackSpace:";
 "Shift+Letter:" = "Shift+Letter:";

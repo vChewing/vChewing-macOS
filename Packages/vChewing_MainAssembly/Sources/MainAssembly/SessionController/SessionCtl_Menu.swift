@@ -129,6 +129,9 @@ extension SessionCtl {
       NSMenu.Item(verbatim: "Client Manager".localized.withEllipsis)?
         .act(#selector(showClientListMgr(_:)))
         .nulled(silentMode)
+      NSMenu.Item(verbatim: "Service Menu Editor".localized.withEllipsis)?
+        .act(#selector(showServiceMenuEditor(_:)))
+        .alternated().nulled(silentMode)
       NSMenu.Item("Check for Updates…")?
         .act(#selector(checkForUpdate(_:)))
         .nulled(silentMode)
@@ -181,6 +184,11 @@ public extension SessionCtl {
 
   @objc func showClientListMgr(_: Any? = nil) {
     CtlClientListMgr.show()
+    NSApp.popup()
+  }
+
+  @objc func showServiceMenuEditor(_: Any? = nil) {
+    CtlServiceMenuEditor.show()
     NSApp.popup()
   }
 

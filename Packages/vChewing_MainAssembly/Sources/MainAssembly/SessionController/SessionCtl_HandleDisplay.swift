@@ -79,13 +79,12 @@ public extension SessionCtl {
   func showCandidates() {
     guard client() != nil else { return }
     updateVerticalTypingStatus()
-    isVerticalCandidateWindow = (isVerticalTyping || !PrefMgr.shared.useHorizontalCandidateList)
+    let isServiceMenu = state.type == .ofSymbolTable && state.node.containsCandidateServices
+    isVerticalCandidateWindow = isVerticalTyping || !PrefMgr.shared.useHorizontalCandidateList
+    isVerticalCandidateWindow = isVerticalCandidateWindow || isServiceMenu
 
     /// 無論是田所選字窗還是 IMK 選字窗，在這裡都有必要重新初期化。
-    let candidateLayout: NSUserInterfaceLayoutOrientation =
-      ((isVerticalTyping || !PrefMgr.shared.useHorizontalCandidateList)
-          ? .vertical
-          : .horizontal)
+    let candidateLayout: NSUserInterfaceLayoutOrientation = (isVerticalCandidateWindow ? .vertical : .horizontal)
 
     let isInputtingWithCandidates = state.type == .ofInputting && state.isCandidateContainer
     /// 先取消既有的選字窗的內容顯示。否則可能會重複生成選字窗的 NSWindow()。
@@ -93,6 +92,8 @@ public extension SessionCtl {
     candidateUI = CtlCandidateTDK(candidateLayout)
     var singleLine = isVerticalTyping || PrefMgr.shared.candidateWindowShowOnlyOneLine
     singleLine = singleLine || isInputtingWithCandidates
+    singleLine = singleLine || isServiceMenu
+
     (candidateUI as? CtlCandidateTDK)?.maxLinesPerPage = singleLine ? 1 : 4
 
     candidateUI?.candidateFont = Self.candidateFont(
