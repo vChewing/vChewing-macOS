@@ -32,4 +32,17 @@ final class SharedTests: XCTestCase {
     }
     XCTAssertEqual(stacked.rawRepresentation, Self.testDataMap)
   }
+
+  func testCandidateServiceMenuNode() throws {
+    let rootNode = CandidateTextService.getCurrentServiceMenu(
+      fromMap: Self.testDataMap,
+      candidate: "🍰", reading: ["ㄉㄢˋ", "ㄍㄠ"]
+    )
+    guard let rootNode = rootNode else {
+      XCTAssertThrowsError("Root Node Construction Failed.")
+      return
+    }
+    print(rootNode.members.map(\.name))
+    print(rootNode.members.compactMap(\.asServiceMenuNode?.service))
+  }
 }
