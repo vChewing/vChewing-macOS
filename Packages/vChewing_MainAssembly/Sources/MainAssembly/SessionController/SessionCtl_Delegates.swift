@@ -125,6 +125,8 @@ extension SessionCtl: CtlCandidateDelegate {
       return shortened ? theEmoji : "\(theEmoji) " + NSLocalizedString("Quick Candidates", comment: "")
     } else if PrefMgr.shared.cassetteEnabled {
       return shortened ? "📼" : "📼 " + NSLocalizedString("CIN Cassette Mode", comment: "")
+    } else if state.type == .ofSymbolTable, state.node.containsCandidateServices {
+      return shortened ? "🌎" : "🌎 " + NSLocalizedString("Service Menu", comment: "")
     }
     return ""
   }
@@ -201,6 +203,22 @@ extension SessionCtl: CtlCandidateDelegate {
       let node = state.node.members[index]
       if !node.members.isEmpty {
         switchState(IMEState.ofSymbolTable(node: node))
+      } else if let serviceNode = node.asServiceMenuNode {
+        switch serviceNode.service.value {
+        case let .url(theURL):
+          // 雖然 Safari 理論上是啟動速度最快的，但這裡還是尊重一下使用者各自電腦內的偏好設定好了。
+          NSWorkspace.shared.open(theURL)
+        case .selector:
+          if let response = serviceNode.service.responseFromSelector {
+            NSPasteboard.general.declareTypes([.string], owner: nil)
+            NSPasteboard.general.setString(response, forType: .string)
+            Notifier.notify(message: "i18n:candidateServiceMenu.selectorResponse.succeeded".localized)
+          } else {
+            callError("4DFDC487: Candidate Text Service Selector Responsiveness Failure.")
+            Notifier.notify(message: "i18n:candidateServiceMenu.selectorResponse.failed".localized)
+          }
+        }
+        switchState(IMEState.ofAbortion())
       } else {
         switchState(IMEState.ofCommitting(textToCommit: node.name))
       }

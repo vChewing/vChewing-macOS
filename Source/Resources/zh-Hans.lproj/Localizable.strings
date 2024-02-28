@@ -26,6 +26,7 @@
 "About vChewing…" = "关于威注音…";
 "Accept leading intonations in rare cases" = "在个别情况下，允许声调前置键入";
 "Add Client" = "登记新客体";
+"Add Service" = "新增服务";
 "Adjust candidate window location according to current node length" = "根据当前位置的字词长度，自动调整选字窗的位置";
 "All strokes in the composition buffer will be shown as ASCII keyboard characters unless this option is enabled. Stroke is definable in the “%keyname” section of the CIN file." = "不启用该选项的话，在组字区内的字根将会以原始键盘按键名称来显示。所有关于字根的定义，均请洽 CIN 磁带档案内的「%keyname」章节。";
 "Allow backspace-editing miscomposed readings" = "允许对无效的读音使用 BackSpace 编辑";
@@ -125,6 +126,7 @@
 "Completely disable using Shift key to toggle alphanumerical mode" = "彻底禁止使用 Shift 键切换英数模式";
 "Consolidate the context on confirming candidate selection" = "在使用选字窗选字时，自动巩固上下文";
 "Consolidate" = "整理";
+"Copy All to Clipboard" = "全部拷贝到剪贴簿";
 "Core Dict loading complete." = "核心辞典载入完毕";
 "Currency Numeral Output" = "大写汉字数字输出";
 "Cursor Selection:" = "选字游标:";
@@ -183,6 +185,7 @@
 "Harden vertical punctuations during vertical typing (not recommended)" = "在纵排书写时，强制转换标点为纵排形式（不推荐）";
 "Hold ⇧ to choose associates." = "摁住⇧以选取关联词语。";
 "Horizontal" = "横向布局";
+"How to Fill" = "填写指引";
 "Hsu" = "许氏国音自然排列";
 "Hualuo Pinyin with Numeral Intonation" = "华罗拼音+数字标调";
 "i18n:aboutWindow.ABOUT_APP_TITLE_FULL" = "关于 macOS 版「威注音输入法」";
@@ -195,6 +198,14 @@
 "i18n:aboutWindow.OK_BUTTON" = "确定";
 "i18n:aboutWindow.WEBSITE_BUTTON" = "网站";
 "i18n:CandidateKey.ValidationError.AssignedForOtherPurposes" = "无法将已挪作他用的按键设为选字键。";
+"i18n:candidateServiceMenu.selectorResponse.failed" = "请求失败\nSelector 指令匹配失败、或无结果可用。";
+"i18n:candidateServiceMenu.selectorResponse.succeeded" = "成功取得结果\n已将结果写入剪贴簿。";
+"i18n:CandidateServiceMenuEditor.description" = "服务选单可以在选字窗内借由「(Shift+)符号选单键」呼出。在您呼出该选单的那一刻，原先的选字窗内的高亮选中的候选字词将成为该服务选单内各个功能的处理参数。根据当前视窗（服务选单管理器）内所陈列的服务的不同，有些服务是会叫出浏览器前往指定网页检索指定内容，而有些服务则可能会将本地计算的某些结果自动拷贝到您的剪贴簿内。\n\n注：如果当前视窗内没有任何可用的服务选单资料的话，上述热键在选字窗内的对应的行为会是辅助翻页。";
+"i18n:CandidateServiceMenuEditor.formatGuide" = "填写规则大致如下：\n\n1. 每行一笔定义，选单条目名称与定义资料值以 Tab 字元分割。选单名称当中的「%s」会在使用服务时被置换成传入的参数。如果参数只有一个字元的话，则程式会自动在选单名称结尾用括弧追加显示其统一码码位。\n\n2. 定义资料值的开头是「@SEL:」或「@WEB:」或「@URL:」，其中：\n\n- 「@SEL:」对应 Objective-C Selector 名称，可以呼叫威注音输入法内部预先定义的某些资料生成功能。直接在此之后紧接着填写 Selector 名称即可（须以西文半形冒号结尾）。\n\n- 「@WEB:」与「@URL:」等价，用来紧接着填写网址。网址当中的「%s」会在使用服务时被置换成传入的参数。";
+"i18n:CandidateServiceMenuEditor.howToGetGuide" = "可将滑鼠悬停于编辑区内、以检视资料填写指引。";
+"i18n:CandidateServiceMenuEditor.prompt" = "请键入您要登记的服务资料。";
+"i18n:CandidateServiceMenuEditor.table.field.MenuTitle" = "选单条目名称";
+"i18n:CandidateServiceMenuEditor.table.field.Value" = "定义资料值";
 "i18n:KimoDataImportError.connectionFailure.errMsg" = "「直接汇入」功能失败：无法成功建立 NSConnection 跨执行绪通讯。\n\n- 在执行该步骤之前，请确保奇摩输入法有在运行。威注音输入法已经在此刻发起了一次对奇摩输入法的运行呼叫请求，于是您可以立刻再次重试。\n\n- 如果您当前运行的威注音输入法的程式包是您自己建置的话，请检查专案内的 Sandbox 权能组态设定档案（Entitlements）、看看是否发生了与此有关的内容变更。\n\n- 如果这台 Mac 并未使用 Intel CPU 的话，请先安装 Rosetta 2，否则奇摩输入法将无法运作。\n\n- 如果以上状况都被排除了的话，那么 __objc_empty_cache 这个 API 可能在当前版本的作业系统内被移除了。这个 API 对奇摩输入法而言至关重要。请检查您当前的作业系统内建的「系统监视程式 Console.app」，确认一下是否有与奇摩输入法有关的程式崩溃报告。";
 "i18n:KimoDataImportError.fileHandlerFailure.errMsg" = "没能将新的资料成功写入到使用者自订语汇辞典当中。";
 "i18n:kimoImportButton.DragFileToHere" = "请将档案拽到这边";
@@ -319,12 +330,14 @@
 "Reload" = "重新载入";
 "Remove Selected" = "移除所选条目";
 "Replace to" = "置换 为";
+"Reset Default" = "恢复原厂设定";
 "Reverse Lookup (Phonabets)" = "注音反查";
 "Save" = "存档";
 "Secondary Pinyin with Numeral Intonation" = "国音二式+数字标调";
 "Security-harden the composition buffer for all clients" = "针对所有客体软体启用强化型组字区安全防护";
 "Seigyou" = "精业排列";
 "Selection Keys:" = "选字键:";
+"Service Menu Editor" = "服务选单编辑器";
 "Share alphanumerical mode status across all clients" = "对所有客体应用共用中英文输入切换状态";
 "Shift+BackSpace:" = "Shift+退格键:";
 "Shift+Letter:" = "Shift+字母键:";

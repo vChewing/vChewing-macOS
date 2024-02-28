@@ -200,7 +200,8 @@ public extension IMEState {
     case .ofCandidates where cursor != marker: return data.attributedStringMarking(for: session)
     case .ofCandidates where cursor == marker: break
     case .ofAssociates: return data.attributedStringPlaceholder(for: session)
-    case .ofSymbolTable where displayedText.isEmpty: return data.attributedStringPlaceholder(for: session)
+    case .ofSymbolTable where displayedText.isEmpty || node.containsCandidateServices:
+      return data.attributedStringPlaceholder(for: session)
     case .ofSymbolTable where !displayedText.isEmpty: break
     default: break
     }

@@ -94,6 +94,7 @@ extension InputHandler {
       delegate.candidateSelectionConfirmedByInputHandler(at: ctlCandidate.highlightedIndex)
     }
 
+    let highlightedCandidate = state.candidates[ctlCandidate.highlightedIndex] // 關聯詞語功能專用。
     if let keyCodeType = KeyCode(rawValue: input.keyCode) {
       switch keyCodeType {
       case .kLineFeed, .kCarriageReturn:
@@ -101,7 +102,6 @@ extension InputHandler {
           delegate.switchState(IMEState.ofAbortion())
           return true
         }
-        let highlightedCandidate = state.candidates[ctlCandidate.highlightedIndex] // 關聯詞語功能專用。
         var handleAssociates = !prefs.useSCPCTypingMode && prefs.associatedPhrasesEnabled // 關聯詞語功能專用。
         handleAssociates = handleAssociates && compositor.cursor == compositor.length // 關聯詞語功能專用。
         confirmHighlightedCandidate()
@@ -336,9 +336,17 @@ extension InputHandler {
     // MARK: - Flipping pages by using symbol menu keys (when they are not occupied).
 
     if input.isSymbolMenuPhysicalKey {
+      let candidateTextServiceMenuRunning = state.node.containsCandidateServices && state.type == .ofSymbolTable
       switch input.commonKeyModifierFlags {
       case .shift, [],
-           .option where state.type != .ofSymbolTable:
+           .option where !candidateTextServiceMenuRunning:
+        if !candidateTextServiceMenuRunning {
+          let handled = handleServiceMenuInitiation(
+            candidateText: highlightedCandidate.value,
+            reading: highlightedCandidate.keyArray
+          )
+          if handled { return true }
+        }
         var updated = true
         let reverseTrigger = input.isShiftHold || input.isOptionHold
         updated = reverseTrigger ? ctlCandidate.showPreviousLine() : ctlCandidate.showNextLine()

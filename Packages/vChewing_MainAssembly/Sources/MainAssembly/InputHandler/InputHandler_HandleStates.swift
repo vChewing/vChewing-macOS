@@ -898,6 +898,20 @@ extension InputHandler {
     }
   }
 
+  // MARK: - 處理選字窗服務選單 (Service Menu)
+
+  func handleServiceMenuInitiation(candidateText: String, reading: [String]) -> Bool {
+    guard let delegate = delegate, delegate.state.type != .ofDeactivated else { return false }
+    guard !candidateText.isEmpty else { return false }
+    let rootNode = CandidateTextService.getCurrentServiceMenu(candidate: candidateText, reading: reading)
+    guard let rootNode = rootNode else { return false }
+    // 得在這裡先 commit buffer，不然會導致「在摁 ESC 離開符號選單時會重複輸入上一次的組字區的內容」的不當行為。
+    let textToCommit = generateStateOfInputting(sansReading: true).displayedText
+    delegate.switchState(IMEState.ofCommitting(textToCommit: textToCommit))
+    delegate.switchState(IMEState.ofSymbolTable(node: rootNode))
+    return true
+  }
+
   // MARK: - 處理 Caps Lock 與英數輸入模式（Caps Lock and Alphanumerical mode）
 
   /// 處理 CapsLock 與英數輸入模式。

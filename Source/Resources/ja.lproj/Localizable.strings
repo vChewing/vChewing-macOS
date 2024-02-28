@@ -26,6 +26,7 @@
 "About vChewing…" = "威注音について…";
 "Accept leading intonations in rare cases" = "まれな場合には、音調記号の優先入力を許容する";
 "Add Client" = "入れる";
+"Add Service" = "サービスを追加";
 "Adjust candidate window location according to current node length" = "カーソル所在位置の単語の長さによって候補陳列ウィンドウの位置を調整";
 "All strokes in the composition buffer will be shown as ASCII keyboard characters unless this option is enabled. Stroke is definable in the “%keyname” section of the CIN file." = "これをチェックしないと、全ての筆画は ASCII キーネームで入力緩衝列で表示してしまうことになる。CIN ファイルの「%keyname」というところで筆画の定義はできる。";
 "Allow backspace-editing miscomposed readings" = "効かぬ音読みを BackSpace で再編集";
@@ -125,6 +126,7 @@
 "Completely disable using Shift key to toggle alphanumerical mode" = "Shift キーの英数入力モードの切り替え機能を徹底的に禁ず";
 "Consolidate the context on confirming candidate selection" = "候補陳列ウィンドウで候補を選ぶ時に文脈を強固する";
 "Consolidate" = "整理";
+"Copy All to Clipboard" = "全てをクリップボードにコピー";
 "Core Dict loading complete." = "核心辞書読込完了";
 "Currency Numeral Output" = "数字大字変換";
 "Cursor Selection:" = "カーソル候補呼出:";
@@ -183,6 +185,7 @@
 "Harden vertical punctuations during vertical typing (not recommended)" = "縦書きの時に、引用符・括弧などを強制的に縦書き文字と変換する（不推奨）";
 "Hold ⇧ to choose associates." = "⇧を押しながら連想候補を選択。";
 "Horizontal" = "横型陳列";
+"How to Fill" = "記入方法";
 "Hsu" = "許氏国音自然配列";
 "Hualuo Pinyin with Numeral Intonation" = "中華ローマ弁音 (ローマ字+数字音調)";
 "i18n:aboutWindow.ABOUT_APP_TITLE_FULL" = "macOS 版威注音入力アプリについて";
@@ -195,6 +198,14 @@
 "i18n:aboutWindow.OK_BUTTON" = "うむ";
 "i18n:aboutWindow.WEBSITE_BUTTON" = "公式HP";
 "i18n:CandidateKey.ValidationError.AssignedForOtherPurposes" = "他の用途に指定したキーは言選りには使えません。";
+"i18n:candidateServiceMenu.selectorResponse.failed" = "請求失敗\n一致なる Selector あるいは利用できる結果はございません。";
+"i18n:candidateServiceMenu.selectorResponse.succeeded" = "結果獲得完了\n取得した結果はクリップボードに書き込みました。";
+"i18n:CandidateServiceMenuEditor.description"="サービスメニューは候補陳列ウィンドウで「(Shift+)符号メニューキー」で呼び出せるメニューです。ハイライトされている候補はサービスメニューを呼び出すためのパラメータとして使用されます。現在のウィンドウ（サービスメニューエディター）に陳列中のメタデータによって、パラメーターをクエリするために指定済みのウェブページを開くサービスもあれば、クリップボードに（このパソコンでの）計算結果を書き出すサービスもございます。\n\n追記: 現在のウィンドウにサービスが登録されていない場合、上記のショートカットは代わりに「ページをめくるショートカット」として動作します。";
+"i18n:CandidateServiceMenuEditor.formatGuide" = "サービスメタデータのフォーマット規則です。\n\nイ）1 行に 1 定義。2 つのセルを区切るには、区切り文字として「Tab」をご使用ください。メニュー項目タイトルに含むパラメータ「%s」は、サービス利用時に実際のパラメータデータと置き換わります。パラメータが 1 文字の場合は、メニュー項目名の末尾に UTF コードポイントが付きます。\n\nロ）定義値の冒頭部分は「@SEL:」か「@WEB:」か「@URL:」であり、それぞれの意味：\n\n- 「@SEL:」がつく場合：残りの文字列はご指定の Objective-C Selector の名前とします。Selector の名前の最後文字は必ず「ASCII コロン」です。これで弊アプリのいくつかの内部機能を用いて（このパソコンでの）計算結果をを取得することができます。\n\n- 「@WEB:」・「@URL:」がつく場合：残りの文字列は「パラメータをクエリするための」Web ページの URL です。その URL に含むパラメータ「%s」は、サービス利用時に実際のパラメータデータと置き換わります。";
+"i18n:CandidateServiceMenuEditor.howToGetGuide" = "編集エリアにマウスポインターをホバーすると、ポップアップで「データ入力の説明」が表示されます。";
+"i18n:CandidateServiceMenuEditor.prompt" = "登録したいサービスのメタデータを入力してください。";
+"i18n:CandidateServiceMenuEditor.table.field.MenuTitle" = "メニュー項目タイトル";
+"i18n:CandidateServiceMenuEditor.table.field.Value" = "定義値";
 "i18n:KimoDataImportError.connectionFailure.errMsg" = "「直接読み込む」作動失敗：両アプリの NSConnection 通信はできませんでした。\n\n- 「直接読込」を続行する前に、まずは Yahoo! KeyKey そのアプリを実行すること。弊アプリは Yahoo! KeyKey をすでに１度呼び覚ませてみたため、すぐにもう一度「直接読込」するのも可能です。\n\n- 今の実行中の弊アプリはご自分で Xcode で組み立てた場合、Xcode プロジェクトの Sandbox Entitlements の配置の正しさをご確認ください。\n\n- 今のパソコンは Intel Mac ではない場合、必ず Rosetta 2 をご実装ください。Yahoo! KeyKey の実行には Rosetta 2 は必要条件です。\n\n- 上記のすべての状況を排除したら、多分「__objc_empty_cache」という肝心なる API は今のこのシステムでもう利用できないと推測できます。この API がない限り、Yahoo! KeyKey の実行は不可能です。今のこのシステムの「Console.app」で Yahoo! KeyKey の故障報告の有無をご確認ください。";
 "i18n:KimoDataImportError.fileHandlerFailure.errMsg" = "新しい資料はユーザー辞書データファイルに書き込むのはできませんでした。";
 "i18n:kimoImportButton.DragFileToHere" = "ここにドラッグして";
@@ -319,12 +330,14 @@
 "Reload" = "再読込";
 "Remove Selected" = "外す";
 "Replace to" = "単語 →";
+"Reset Default" = "全てをリセット";
 "Reverse Lookup (Phonabets)" = "注音音読逆引参照";
 "Save" = "セーブ";
 "Secondary Pinyin with Numeral Intonation" = "国音二式 (ローマ字+数字音調)";
 "Security-harden the composition buffer for all clients" = "全ての客体アプリに対して、入力緩衝列にセキュリティ強化対策を起用";
 "Seigyou" = "精業配列";
 "Selection Keys:" = "言選り用キー:";
+"Service Menu Editor" = "サービスメニューエディター";
 "Share alphanumerical mode status across all clients" = "全ての客体アプリに英数入力モードの状態を共有";
 "Shift+BackSpace:" = "Shift+BackSpace:";
 "Shift+Letter:" = "Shift+文字キー:";
