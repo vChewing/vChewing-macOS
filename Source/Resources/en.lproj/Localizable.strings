@@ -250,6 +250,7 @@
 "i18n:UserDef.kSpecifyCmdOptCtrlEnterBehavior.shortTitle" = "Command+Option+Ctrl+Enter:";
 "i18n:UserDef.kUseJKtoMoveCompositorCursorInCandidateState.description" = "⚠︎ This will automatically prevent J and K from being used as candidate keys. Also, this won't work with ‘%quick’ candidates in cassette mode.";
 "i18n:UserDef.kUseJKtoMoveCompositorCursorInCandidateState.shortTitle" = "Use J / K to Move Buffer Cursor While Choosing Candidates";
+"i18n:UserDef.kUseShiftQuestionToCallServiceMenu.shortTitle" = "Also use Shift+? to call Service Menu in Candidate Window";
 "IBM" = "IBM";
 "If disabled, this will insert space instead." = "If disabled, this will insert space instead.";
 "If not filling the weight, it will be 0.0, the maximum one. An ideal weight situates in [-9.5, 0], making itself can be captured by the walking algorithm. The exception is -114.514, the disciplinary weight. The walking algorithm will ignore it unless it is the unique result." = "If not filling the weight, it will be 0.0, the maximum one. An ideal weight situates in [-9.5, 0], making itself can be captured by the walking algorithm. The exception is -114.514, the disciplinary weight. The walking algorithm will ignore it unless it is the unique result.";

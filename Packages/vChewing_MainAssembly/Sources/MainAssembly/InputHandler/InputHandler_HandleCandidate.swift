@@ -333,10 +333,24 @@ extension InputHandler {
       }
     }
 
-    // MARK: - Flipping pages by using symbol menu keys (when they are not occupied).
+    // MARK: - Calling Service Menu Key through "Shift+?" (if enabled).
+
+    var candidateTextServiceMenuRunning: Bool {
+      state.node.containsCandidateServices && state.type == .ofSymbolTable
+    }
+
+    serviceMenu: if prefs.useShiftQuestionToCallServiceMenu, input.commonKeyModifierFlags == .shift, input.text == "?" {
+      if candidateTextServiceMenuRunning { break serviceMenu }
+      let handled = handleServiceMenuInitiation(
+        candidateText: highlightedCandidate.value,
+        reading: highlightedCandidate.keyArray
+      )
+      if handled { return true }
+    }
+
+    // MARK: - Flipping pages or Calling Service Menu by the Symbol Menu Key.
 
     if input.isSymbolMenuPhysicalKey {
-      let candidateTextServiceMenuRunning = state.node.containsCandidateServices && state.type == .ofSymbolTable
       switch input.commonKeyModifierFlags {
       case .shift, [],
            .option where !candidateTextServiceMenuRunning:
