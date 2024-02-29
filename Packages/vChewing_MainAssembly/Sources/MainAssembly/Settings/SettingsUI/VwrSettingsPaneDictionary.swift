@@ -11,7 +11,6 @@ import CocoaExtension
 import Shared
 import SwiftExtension
 import SwiftUI
-import UniformTypeIdentifiers
 
 @available(macOS 13, *)
 public struct VwrSettingsPaneDictionary: View {
