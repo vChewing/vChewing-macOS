@@ -30,6 +30,47 @@ extension InputHandler {
     guard ctlCandidate.visible else { return false }
     let inputText = ignoringModifiers ? (input.inputTextIgnoringModifiers ?? input.text) : input.text
     let allowMovingCompositorCursor = state.type == .ofCandidates && !prefs.useSCPCTypingMode
+    let highlightedCandidate = state.candidates[ctlCandidate.highlightedIndex]
+
+    // MARK: 選字窗服務選單（Shift+?）。
+
+    var candidateTextServiceMenuRunning: Bool {
+      state.node.containsCandidateServices && state.type == .ofSymbolTable
+    }
+
+    serviceMenu: if prefs.useShiftQuestionToCallServiceMenu, input.commonKeyModifierFlags == .shift, input.text == "?" {
+      if candidateTextServiceMenuRunning { break serviceMenu }
+      let handled = handleServiceMenuInitiation(
+        candidateText: highlightedCandidate.value,
+        reading: highlightedCandidate.keyArray
+      )
+      if handled { return true }
+    }
+
+    // MARK: 波浪符號鍵（選字窗服務選單 / 輔助翻頁 / 其他功能）。
+
+    if input.isSymbolMenuPhysicalKey {
+      switch input.commonKeyModifierFlags {
+      case .shift, [],
+           .option where !candidateTextServiceMenuRunning:
+        if !candidateTextServiceMenuRunning {
+          let handled = handleServiceMenuInitiation(
+            candidateText: highlightedCandidate.value,
+            reading: highlightedCandidate.keyArray
+          )
+          if handled { return true }
+        }
+        var updated = true
+        let reverseTrigger = input.isShiftHold || input.isOptionHold
+        updated = reverseTrigger ? ctlCandidate.showPreviousLine() : ctlCandidate.showNextLine()
+        if !updated { delegate.callError("66F3477B") }
+        return true
+      case .option where state.type == .ofSymbolTable:
+        // 繞過內碼輸入模式，直接進入漢音鍵盤符號模式。
+        return revolveTypingMethod(to: .haninKeyboardSymbol)
+      default: break
+      }
+    }
 
     // MARK: 選字窗內使用熱鍵升權、降權、刪詞。
 
@@ -94,7 +135,6 @@ extension InputHandler {
       delegate.candidateSelectionConfirmedByInputHandler(at: ctlCandidate.highlightedIndex)
     }
 
-    let highlightedCandidate = state.candidates[ctlCandidate.highlightedIndex] // 關聯詞語功能專用。
     if let keyCodeType = KeyCode(rawValue: input.keyCode) {
       switch keyCodeType {
       case .kLineFeed, .kCarriageReturn:
@@ -315,7 +355,7 @@ extension InputHandler {
       }
     }
 
-    // MARK: - Flipping pages by using modified bracket keys (when they are not occupied).
+    // MARK: Flipping pages by using modified bracket keys (when they are not occupied).
 
     // Shift+Command+[] 被 Chrome 系瀏覽器佔用，所以改用 Ctrl。
     let ctrlCMD: Bool = input.commonKeyModifierFlags == [.control, .command]
@@ -329,46 +369,6 @@ extension InputHandler {
       case (42, true), (30, false):
         _ = ctlCandidate.highlightNextCandidate() ? {}() : delegate.callError("D2ABB507")
         return true
-      default: break
-      }
-    }
-
-    // MARK: - Calling Service Menu Key through "Shift+?" (if enabled).
-
-    var candidateTextServiceMenuRunning: Bool {
-      state.node.containsCandidateServices && state.type == .ofSymbolTable
-    }
-
-    serviceMenu: if prefs.useShiftQuestionToCallServiceMenu, input.commonKeyModifierFlags == .shift, input.text == "?" {
-      if candidateTextServiceMenuRunning { break serviceMenu }
-      let handled = handleServiceMenuInitiation(
-        candidateText: highlightedCandidate.value,
-        reading: highlightedCandidate.keyArray
-      )
-      if handled { return true }
-    }
-
-    // MARK: - Flipping pages or Calling Service Menu by the Symbol Menu Key.
-
-    if input.isSymbolMenuPhysicalKey {
-      switch input.commonKeyModifierFlags {
-      case .shift, [],
-           .option where !candidateTextServiceMenuRunning:
-        if !candidateTextServiceMenuRunning {
-          let handled = handleServiceMenuInitiation(
-            candidateText: highlightedCandidate.value,
-            reading: highlightedCandidate.keyArray
-          )
-          if handled { return true }
-        }
-        var updated = true
-        let reverseTrigger = input.isShiftHold || input.isOptionHold
-        updated = reverseTrigger ? ctlCandidate.showPreviousLine() : ctlCandidate.showNextLine()
-        if !updated { delegate.callError("66F3477B") }
-        return true
-      case .option where state.type == .ofSymbolTable:
-        // 繞過內碼輸入模式，直接進入漢音鍵盤符號模式。
-        return revolveTypingMethod(to: .haninKeyboardSymbol)
       default: break
       }
     }
