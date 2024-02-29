@@ -9,7 +9,6 @@
 import AppKit
 import Foundation
 import Shared
-import UniformTypeIdentifiers
 
 public class VwrClientListMgr: NSViewController {
   let windowWidth: CGFloat = 770
@@ -80,7 +79,7 @@ public class VwrClientListMgr: NSViewController {
     tblClients.intercellSpacing = CGSize(width: 17, height: 0)
     tblClients.rowHeight = 24
     tblClients.setContentHuggingPriority(.defaultHigh, for: .vertical)
-    tblClients.registerForDraggedTypes([.init(rawValue: kUTTypeFileURL as String)])
+    tblClients.registerForDraggedTypes([.kUTTypeFileURL])
     tblClients.dataSource = self
     tblClients.action = #selector(onItemClicked(_:))
     tblClients.target = self
@@ -153,7 +152,7 @@ extension VwrClientListMgr {
     neta info: NSDraggingInfo, onError: @escaping () -> Void?, handler: (([URL]) -> Void)? = nil
   ) {
     let board = info.draggingPasteboard
-    let type = NSPasteboard.PasteboardType(rawValue: kUTTypeApplicationBundle as String)
+    let type = NSPasteboard.PasteboardType.kUTTypeAppBundle
     let options: [NSPasteboard.ReadingOptionKey: Any] = [
       .urlReadingFileURLsOnly: true,
       .urlReadingContentsConformToTypes: [type],

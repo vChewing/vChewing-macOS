@@ -338,3 +338,13 @@ public extension NSApplication {
     UserDefaults.standard.object(forKey: "AppleAccentColor") != nil
   }
 }
+
+// MARK: - Pasteboard Type Extension.
+
+public extension NSPasteboard.PasteboardType {
+  static let kUTTypeFileURL = Self(rawValue: "public.file-url") // import UniformTypeIdentifiers
+  static let kUTTypeData = Self(rawValue: "public.data") // import UniformTypeIdentifiers
+  static let kUTTypeAppBundle = Self(rawValue: "com.apple.application-bundle") // import UniformTypeIdentifiers
+  static let kUTTypeUTF8PlainText = Self(rawValue: "public.utf8-plain-text")
+  static let kNSFilenamesPboardType = Self(rawValue: "NSFilenamesPboardType")
+}
