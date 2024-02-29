@@ -460,12 +460,33 @@ public extension NSMenuItem {
 
   var allowedTypes: [String] = ["txt"]
 
-  public init() {
+  public convenience init(
+    _ givenTitle: String? = nil,
+    target: AnyObject? = nil,
+    action: Selector? = nil,
+    postDrag: ((URL) -> Void)? = nil
+  ) {
+    self.init(
+      verbatim: givenTitle?.localized,
+      target: target,
+      action: action,
+      postDrag: postDrag
+    )
+  }
+
+  public init(
+    verbatim givenTitle: String? = nil,
+    target: AnyObject? = nil,
+    action: Selector? = nil,
+    postDrag: ((URL) -> Void)? = nil
+  ) {
     super.init(frame: .zero)
     bezelStyle = .rounded
-    title = "DRAG FILE TO HERE"
-    registerForDraggedTypes([.init(rawValue: kUTTypeFileURL as String)])
-    target = self
+    title = givenTitle ?? "DRAG FILE TO HERE"
+    registerForDraggedTypes([.kUTTypeFileURL])
+    self.target = target ?? self
+    self.action = action
+    postDragHandler = postDrag ?? postDragHandler
   }
 
   required init?(coder: NSCoder) {
@@ -478,7 +499,7 @@ public extension NSMenuItem {
 
   fileprivate func checkExtension(_ drag: NSDraggingInfo) -> Bool {
     guard let pasteboard = drag.draggingPasteboard.propertyList(
-      forType: NSPasteboard.PasteboardType(rawValue: "NSFilenamesPboardType")
+      forType: NSPasteboard.PasteboardType.kNSFilenamesPboardType
     ) as? [String], let path = pasteboard.first else {
       return false
     }
@@ -494,7 +515,7 @@ public extension NSMenuItem {
 
   override public func performDragOperation(_ sender: NSDraggingInfo) -> Bool {
     guard let pasteboard = sender.draggingPasteboard.propertyList(
-      forType: NSPasteboard.PasteboardType(rawValue: "NSFilenamesPboardType")
+      forType: NSPasteboard.PasteboardType.kNSFilenamesPboardType
     ) as? [String], let path = pasteboard.first else {
       print("failure")
       return false
