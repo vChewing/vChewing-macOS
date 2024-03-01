@@ -125,9 +125,10 @@ extension LMAssembly.LMInstantiator {
   }
 
   /// 根據給定的讀音索引鍵，來獲取原廠標準資料庫辭典內的對應資料陣列的 UTF8 資料、就地分析、生成單元圖陣列。
+  /// - Remark: 該函式會無損地返回原廠辭典的結果，不受使用者控頻與資料過濾條件的影響，不包含全字庫的資料。
   /// - parameters:
   ///   - key: 讀音索引鍵。
-  func factoryCoreUnigramsFor(key: String) -> [Megrez.Unigram] {
+  public func factoryCoreUnigramsFor(key: String) -> [Megrez.Unigram] {
     // 此處需要把 ASCII 單引號換成連續兩個單引號，否則會有 SQLite 語句查詢故障。
     factoryUnigramsFor(key: key, column: isCHS ? .theDataCHS : .theDataCHT)
   }
