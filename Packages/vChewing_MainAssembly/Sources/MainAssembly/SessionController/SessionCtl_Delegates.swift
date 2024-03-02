@@ -46,8 +46,11 @@ extension SessionCtl: InputHandlerDelegate {
     var userPhrase = LMMgr.UserPhrase(
       keyArray: kvPair.keyArray, value: kvPair.value, inputMode: inputMode
     )
-    if Self.areWeNerfing { userPhrase.weight = -114.514 }
-    LMMgr.writeUserPhrasesAtOnce(userPhrase, areWeFiltering: addToFilter) {
+    var action = CandidateContextMenuAction.toBoost
+    if Self.areWeNerfing { action = .toNerf }
+    if addToFilter { action = .toFilter }
+    userPhrase.updateWeight(basedOn: action)
+    LMMgr.writeUserPhrasesAtOnce(userPhrase, areWeFiltering: action == .toFilter) {
       succeeded = false
     }
     if !succeeded { return false }
@@ -275,7 +278,7 @@ extension SessionCtl: CtlCandidateDelegate {
     var userPhrase = LMMgr.UserPhrase(
       keyArray: rawPair.keyArray, value: rawPair.value, inputMode: inputMode
     )
-    if action == .toNerf { userPhrase.weight = -114.514 }
+    userPhrase.updateWeight(basedOn: action)
     LMMgr.writeUserPhrasesAtOnce(userPhrase, areWeFiltering: action == .toFilter) {
       succeeded = false
     }

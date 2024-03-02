@@ -6,8 +6,10 @@
 // marks, or product names of Contributor, except as required to fulfill notice
 // requirements defined in MIT License.
 
+import CandidateWindow
 import Foundation
 import LangModelAssembly
+import Megrez
 import Shared
 
 // MARK: - 使用者語彙類型定義
@@ -30,6 +32,10 @@ public extension LMMgr {
 
     public var isValid: Bool {
       !keyArray.isEmpty && keyArray.filter(\.isEmpty).isEmpty && !value.isEmpty
+    }
+
+    var isSingleCharReadingPair: Bool {
+      value.count == 1 && keyArray.count == 1 && keyArray.first?.first != "_"
     }
 
     public var description: String {
@@ -188,5 +194,47 @@ public extension LMMgr {
       LMMgr.reloadUserFilterDirectly(mode: inputMode)
       return true
     }
+  }
+}
+
+// MARK: - Weight Suggestions.
+
+public extension LMMgr.UserPhrase {
+  mutating func updateWeight(basedOn action: CandidateContextMenuAction) {
+    weight = suggestNextFreq(for: action)
+  }
+
+  func suggestNextFreq(for action: CandidateContextMenuAction, extreme: Bool = false) -> Double? {
+    var extremeFallbackResult: Double? {
+      switch action {
+      case .toBoost: return nil // 不填寫權重的話，預設權重是 0
+      case .toNerf: return -114.514
+      case .toFilter: return nil
+      }
+    }
+    guard !extreme, isSingleCharReadingPair else { return extremeFallbackResult }
+    let factoryUnigrams = inputMode.langModel.factoryCoreUnigramsFor(key: keyArray.joined(separator: "-"))
+    let currentWeight = weight ?? factoryUnigrams.first { $0.value == value }?.score
+    guard let currentWeight = currentWeight else { return extremeFallbackResult }
+    let factoryScores = factoryUnigrams.map(\.score)
+    var neighborValue: Double?
+    switch action {
+    case .toBoost:
+      neighborValue = currentWeight.findNeighborValue(from: factoryScores, greater: true)
+      if let realNeighborValue = neighborValue {
+        neighborValue = realNeighborValue + 0.0001
+      } else {
+        neighborValue = Swift.min(0, currentWeight + 1)
+      }
+    case .toNerf:
+      neighborValue = currentWeight.findNeighborValue(from: factoryScores, greater: false)
+      if let realNeighborValue = neighborValue {
+        neighborValue = realNeighborValue - 0.0001
+      } else {
+        neighborValue = Swift.max(-114.514, currentWeight - 1)
+      }
+    case .toFilter: return nil
+    }
+    return neighborValue ?? extremeFallbackResult
   }
 }
