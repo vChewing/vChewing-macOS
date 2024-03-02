@@ -398,3 +398,24 @@ public enum ArrayBuilder<OutputModel> {
     Array(components.joined())
   }
 }
+
+// MARK: - Extending Comparable to let it able to find its neighbor values in any collection.
+
+public extension Comparable {
+  func findNeighborValue(from givenSeq: any Collection<Self>, greater isGreater: Bool) -> Self? {
+    let givenArray: [Self] = isGreater ? Array(givenSeq.sorted()) : Array(givenSeq.sorted().reversed())
+    let givenMap: [Int: Self] = .init(uniqueKeysWithValues: Array(givenArray.enumerated()))
+    var (startID, endID, returnableID) = (0, givenArray.count - 1, -1)
+    func internalCompare(_ lhs: Self, _ rhs: Self) -> Bool { isGreater ? lhs <= rhs : lhs >= rhs }
+    while let startObj = givenMap[startID], let endObj = givenMap[endID], internalCompare(startObj, endObj) {
+      let midID = (startID + endID) / 2
+      if let midObj = givenMap[midID], internalCompare(midObj, self) {
+        startID = midID + 1
+      } else {
+        returnableID = midID
+        endID = midID - 1
+      }
+    }
+    return givenMap[returnableID]
+  }
+}
