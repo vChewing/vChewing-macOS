@@ -847,6 +847,7 @@
 					"$(OTHER_CFLAGS)",
 					"-fcxx-modules",
 				);
+				STRIP_SWIFT_SYMBOLS = NO;
 			};
 			name = Debug;
 		};
@@ -893,6 +894,7 @@
 					"$(OTHER_CFLAGS)",
 					"-fcxx-modules",
 				);
+				STRIP_SWIFT_SYMBOLS = NO;
 				SWIFT_COMPILATION_MODE = wholemodule;
 			};
 			name = Release;
