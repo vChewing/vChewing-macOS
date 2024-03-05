@@ -7,7 +7,7 @@
 // requirements defined in MIT License.
 
 import AppKit
-import CocoaExtension
+import OSFrameworkImpl
 
 public class Notifier: NSWindowController {
   public static func notify(message: String) {

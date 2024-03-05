@@ -7,10 +7,10 @@
 // requirements defined in MIT License.
 
 import CandidateWindow
-import CocoaExtension
 import IMKUtils
 import InputMethodKit
 import NotifierUI
+import OSFrameworkImpl
 import PopupCompositionBuffer
 import Shared
 import ShiftKeyUpChecker

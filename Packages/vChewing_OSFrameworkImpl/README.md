@@ -1,4 +1,4 @@
-# CocoaExtension
+# OSFrameworkImpl
 
 威注音輸入法針對 Cocoa 的一些功能擴充，使程式維護體驗更佳。
 

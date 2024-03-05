@@ -7,8 +7,8 @@
 // requirements defined in MIT License.
 
 import AppKit
-import CocoaExtension
 import NotifierUI
+import OSFrameworkImpl
 import Shared
 import SwiftExtension
 

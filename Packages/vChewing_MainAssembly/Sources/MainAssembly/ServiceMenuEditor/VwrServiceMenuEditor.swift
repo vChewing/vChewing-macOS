@@ -7,8 +7,8 @@
 // requirements defined in MIT License.
 
 import AppKit
-import CocoaExtension
 import Foundation
+import OSFrameworkImpl
 import Shared
 
 public class VwrServiceMenuEditor: NSViewController {

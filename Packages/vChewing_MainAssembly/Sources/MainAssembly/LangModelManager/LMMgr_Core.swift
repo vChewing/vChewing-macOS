@@ -65,6 +65,11 @@ public class LMMgr {
   /// 載入磁帶資料。
   /// - Remark: cassettePath() 會在輸入法停用磁帶時直接返回
   public static func loadCassetteData() {
+    func validateCassetteCandidateKey(_ target: String) -> Bool {
+      CandidateKey.validate(keys: target) == nil
+    }
+
+    LMAssembly.LMInstantiator.setCassetCandidateKeyValidator(validateCassetteCandidateKey)
     LMAssembly.LMInstantiator.loadCassetteData(path: cassettePath())
   }
 

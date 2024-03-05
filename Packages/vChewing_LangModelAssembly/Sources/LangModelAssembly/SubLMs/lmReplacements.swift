@@ -6,8 +6,6 @@
 // marks, or product names of Contributor, except as required to fulfill notice
 // requirements defined in MIT License.
 
-import Shared
-
 extension LMAssembly {
   struct LMReplacements {
     public private(set) var filePath: String?
@@ -35,8 +33,8 @@ extension LMAssembly {
         replaceData(textData: rawStrData)
       } catch {
         filePath = oldPath
-        vCLog("\(error)")
-        vCLog("↑ Exception happened when reading data at: \(path).")
+        vCLMLog("\(error)")
+        vCLMLog("↑ Exception happened when reading data at: \(path).")
         return false
       }
 
@@ -72,7 +70,7 @@ extension LMAssembly {
       do {
         try strData.write(toFile: filePath, atomically: true, encoding: .utf8)
       } catch {
-        vCLog("Failed to save current database to: \(filePath)")
+        vCLMLog("Failed to save current database to: \(filePath)")
       }
     }
 
@@ -81,7 +79,7 @@ extension LMAssembly {
       for entry in rangeMap {
         strDump += strData[entry.value] + "\n"
       }
-      vCLog(strDump)
+      vCLMLog(strDump)
     }
 
     public func valuesFor(key: String) -> String {

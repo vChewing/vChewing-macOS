@@ -8,8 +8,8 @@
 
 import AppKit
 import BookmarkManager
-import CocoaExtension
 import Foundation
+import OSFrameworkImpl
 import Shared
 
 public extension SettingsPanesCocoa {

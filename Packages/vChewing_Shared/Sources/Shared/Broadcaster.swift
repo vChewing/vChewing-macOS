@@ -8,7 +8,7 @@
 // marks, or product names of Contributor, except as required to fulfill notice
 // requirements defined in MIT License.
 
-import AppKit
+import Foundation
 
 @objcMembers public class Broadcaster: NSObject {
   public static var shared = Broadcaster()

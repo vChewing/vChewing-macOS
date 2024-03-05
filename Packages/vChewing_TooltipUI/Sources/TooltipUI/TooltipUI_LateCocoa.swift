@@ -7,8 +7,8 @@
 // requirements defined in MIT License.
 
 import AppKit
-import CocoaExtension
 import NSAttributedTextView
+import OSFrameworkImpl
 import Shared
 
 public class TooltipUI_LateCocoa: NSWindowController, TooltipUIProtocol {

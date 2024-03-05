@@ -9,11 +9,11 @@
 /// 該檔案乃輸入調度模組當中「用來規定當 IMK 接受按鍵訊號時且首次交給輸入調度模組處理時、
 /// 輸入調度模組要率先處理」的部分。據此判斷是否需要將按鍵處理委派給其它成員函式。
 
-import CocoaExtension
 import IMKUtils
 import InputMethodKit
 import LangModelAssembly
 import Megrez
+import OSFrameworkImpl
 import Shared
 
 // MARK: - § 根據狀態調度按鍵輸入 (Handle Input with States) * Triage
