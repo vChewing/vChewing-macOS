@@ -6,10 +6,10 @@
 // marks, or product names of Contributor, except as required to fulfill notice
 // requirements defined in MIT License.
 
-import CocoaExtension
 import IMKUtils
 import InputMethodKit
 import NotifierUI
+import OSFrameworkImpl
 import Shared
 import SwiftyCapsLockToggler
 

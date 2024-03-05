@@ -7,8 +7,8 @@
 // requirements defined in MIT License.
 
 import BookmarkManager
+import OSFrameworkImpl
 import Shared
-import SwiftExtension
 import SwiftUI
 
 @available(macOS 13, *)

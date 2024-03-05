@@ -10,6 +10,7 @@ import AppKit
 import Combine
 import Foundation
 import LangModelAssembly
+import OSFrameworkImpl
 import Shared
 import SwiftExtension
 import SwiftUI

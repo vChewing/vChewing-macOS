@@ -7,9 +7,9 @@
 // requirements defined in MIT License.
 
 import AppKit
-import CocoaExtension
 import Foundation
 @testable import NSAttributedTextView
+import OSFrameworkImpl
 import Shared
 import XCTest
 

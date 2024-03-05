@@ -9,9 +9,9 @@
 // 這其實是 UserDefRenderable 的另一個版本，但用的是 AppKit 而非 SwiftUI。
 
 import AppKit
-import CocoaExtension
 import Foundation
 import IMKUtils
+import OSFrameworkImpl
 
 public class UserDefRenderableCocoa: NSObject, Identifiable {
   public let def: UserDef

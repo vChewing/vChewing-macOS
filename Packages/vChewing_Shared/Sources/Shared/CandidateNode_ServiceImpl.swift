@@ -6,8 +6,6 @@
 // marks, or product names of Contributor, except as required to fulfill notice
 // requirements defined in MIT License.
 
-import Foundation
-
 public extension CandidateNode {
   convenience init(
     name: String, services: [CandidateTextService], previous: CandidateNode? = nil

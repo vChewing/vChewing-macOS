@@ -13,7 +13,7 @@ let package = Package(
     ),
   ],
   dependencies: [
-    .package(path: "../vChewing_CocoaExtension"),
+    .package(path: "../vChewing_OSFrameworkImpl"),
     .package(path: "../vChewing_IMKUtils"),
     .package(path: "../vChewing_SwiftExtension"),
   ],
@@ -21,7 +21,7 @@ let package = Package(
     .target(
       name: "Shared",
       dependencies: [
-        .product(name: "CocoaExtension", package: "vChewing_CocoaExtension"),
+        .product(name: "OSFrameworkImpl", package: "vChewing_OSFrameworkImpl"),
         .product(name: "IMKUtils", package: "vChewing_IMKUtils"),
         .product(name: "SwiftExtension", package: "vChewing_SwiftExtension"),
       ]

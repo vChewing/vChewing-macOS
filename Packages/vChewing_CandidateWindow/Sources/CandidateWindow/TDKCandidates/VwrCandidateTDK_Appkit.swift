@@ -7,7 +7,7 @@
 // requirements defined in MIT License.
 
 import AppKit
-import CocoaExtension
+import OSFrameworkImpl
 import Shared
 
 /// 田所選字窗的 AppKit 简单版本，繪製效率不受 SwiftUI 的限制。

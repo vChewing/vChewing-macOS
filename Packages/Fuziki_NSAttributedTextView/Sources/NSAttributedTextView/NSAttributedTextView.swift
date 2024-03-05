@@ -6,7 +6,7 @@
 // Modified by The vChewing Project in order to use it with AppKit.
 
 import AppKit
-import CocoaExtension
+import OSFrameworkImpl
 import SwiftUI
 
 @available(macOS 10.15, *)

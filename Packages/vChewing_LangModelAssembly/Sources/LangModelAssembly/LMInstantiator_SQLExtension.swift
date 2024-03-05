@@ -8,7 +8,6 @@
 
 import Foundation
 import Megrez
-import Shared
 import SQLite3
 
 /* ==============
@@ -57,6 +56,23 @@ extension LMAssembly.LMInstantiator {
 }
 
 extension LMAssembly.LMInstantiator {
+  @discardableResult public static func connectSQLDB(dbPath: String, dropPreviousConnection: Bool = true) -> Bool {
+    if dropPreviousConnection { disconnectSQLDB() }
+    vCLMLog("Establishing SQLite connection to: \(dbPath)")
+    guard sqlite3_open(dbPath, &Self.ptrSQL) == SQLITE_OK else { return false }
+    guard "PRAGMA journal_mode = OFF;".runAsSQLExec(dbPointer: &ptrSQL) else { return false }
+    isSQLDBConnected = true
+    return true
+  }
+
+  public static func disconnectSQLDB() {
+    if Self.ptrSQL != nil {
+      sqlite3_close_v2(Self.ptrSQL)
+      Self.ptrSQL = nil
+    }
+    isSQLDBConnected = false
+  }
+
   fileprivate static func querySQL(strStmt sqlQuery: String, coreColumn column: CoreColumn, handler: (String) -> Void) {
     guard Self.ptrSQL != nil else { return }
     performStatementSansResult { ptrStatement in

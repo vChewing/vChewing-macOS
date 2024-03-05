@@ -15,8 +15,7 @@ let package = Package(
   dependencies: [
     .package(path: "../RMJay_LineReader"),
     .package(path: "../vChewing_Megrez"),
-    .package(path: "../vChewing_PinyinPhonaConverter"),
-    .package(path: "../vChewing_Shared"),
+    .package(path: "../vChewing_SwiftExtension"),
   ],
   targets: [
     .target(
@@ -24,8 +23,7 @@ let package = Package(
       dependencies: [
         .product(name: "LineReader", package: "RMJay_LineReader"),
         .product(name: "Megrez", package: "vChewing_Megrez"),
-        .product(name: "Shared", package: "vChewing_Shared"),
-        .product(name: "PinyinPhonaConverter", package: "vChewing_PinyinPhonaConverter"),
+        .product(name: "SwiftExtension", package: "vChewing_SwiftExtension"),
       ]
     ),
     .testTarget(

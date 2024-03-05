@@ -8,7 +8,7 @@
 
 import AppKit
 import Carbon
-import CocoaExtension
+import OSFrameworkImpl
 import Shared
 
 public class SecurityAgentHelper {

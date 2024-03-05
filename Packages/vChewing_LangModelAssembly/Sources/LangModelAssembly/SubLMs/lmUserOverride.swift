@@ -9,7 +9,6 @@
 
 import Foundation
 import Megrez
-import Shared
 
 // MARK: - Public Types.
 
@@ -202,18 +201,18 @@ extension LMAssembly.LMUserOverride {
     do {
       let nullData = "{}"
       guard let fileURL = fileURL ?? fileSaveLocationURL else {
-        throw "given fileURL is invalid or nil."
+        throw UOMError(rawValue: "given fileURL is invalid or nil.")
       }
       try nullData.write(to: fileURL, atomically: false, encoding: .utf8)
     } catch {
-      vCLog("UOM Error: Unable to clear the data in the UOM file. Details: \(error)")
+      vCLMLog("UOM Error: Unable to clear the data in the UOM file. Details: \(error)")
       return
     }
   }
 
   func saveData(toURL fileURL: URL? = nil) {
     guard let fileURL: URL = fileURL ?? fileSaveLocationURL else {
-      vCLog("UOM saveData() failed. At least the file Save URL is not set for the current UOM.")
+      vCLMLog("UOM saveData() failed. At least the file Save URL is not set for the current UOM.")
       return
     }
     // 此處不要使用 JSONSerialization，不然執行緒會炸掉。
@@ -222,14 +221,14 @@ extension LMAssembly.LMUserOverride {
       guard let jsonData = try? encoder.encode(mutLRUMap) else { return }
       try jsonData.write(to: fileURL, options: .atomic)
     } catch {
-      vCLog("UOM Error: Unable to save data, abort saving. Details: \(error)")
+      vCLMLog("UOM Error: Unable to save data, abort saving. Details: \(error)")
       return
     }
   }
 
   func loadData(fromURL fileURL: URL? = nil) {
     guard let fileURL: URL = fileURL ?? fileSaveLocationURL else {
-      vCLog("UOM loadData() failed. At least the file Load URL is not set for the current UOM.")
+      vCLMLog("UOM loadData() failed. At least the file Load URL is not set for the current UOM.")
       return
     }
     // 此處不要使用 JSONSerialization，不然執行緒會炸掉。
@@ -238,13 +237,13 @@ extension LMAssembly.LMUserOverride {
       let data = try Data(contentsOf: fileURL, options: .mappedIfSafe)
       if ["", "{}"].contains(String(data: data, encoding: .utf8)) { return }
       guard let jsonResult = try? decoder.decode([String: KeyObservationPair].self, from: data) else {
-        vCLog("UOM Error: Read file content type invalid, abort loading.")
+        vCLMLog("UOM Error: Read file content type invalid, abort loading.")
         return
       }
       mutLRUMap = jsonResult
       resetMRUList()
     } catch {
-      vCLog("UOM Error: Unable to read file or parse the data, abort loading. Details: \(error)")
+      vCLMLog("UOM Error: Unable to read file or parse the data, abort loading. Details: \(error)")
       return
     }
   }
@@ -271,7 +270,7 @@ extension LMAssembly.LMUserOverride {
         mutLRUMap.removeValue(forKey: mutLRUList[mutLRUList.endIndex - 1].key)
         mutLRUList.removeLast()
       }
-      vCLog("UOM: Observation finished with new observation: \(key)")
+      vCLMLog("UOM: Observation finished with new observation: \(key)")
       saveCallback?() ?? saveData()
       return
     }
@@ -282,7 +281,7 @@ extension LMAssembly.LMUserOverride {
       )
       mutLRUList.insert(theNeta, at: 0)
       mutLRUMap[key] = theNeta
-      vCLog("UOM: Observation finished with existing observation: \(key)")
+      vCLMLog("UOM: Observation finished with existing observation: \(key)")
       saveCallback?() ?? saveData()
     }
   }
@@ -398,5 +397,12 @@ extension LMAssembly.LMUserOverride {
     }
 
     return result
+  }
+}
+
+struct UOMError: LocalizedError {
+  var rawValue: String
+  var errorDescription: String? {
+    NSLocalizedString("rawValue", comment: "")
   }
 }
