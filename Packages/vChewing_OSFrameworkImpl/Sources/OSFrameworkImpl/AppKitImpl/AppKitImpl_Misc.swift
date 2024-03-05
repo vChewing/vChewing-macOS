@@ -210,19 +210,6 @@ public extension NSApplication {
   }
 }
 
-// MARK: - String.applyingTransform
-
-public extension String {
-  func applyingTransformFW2HW(reverse: Bool) -> String {
-    if #available(macOS 10.11, *) {
-      return applyingTransform(.fullwidthToHalfwidth, reverse: reverse) ?? self
-    }
-    let theString = NSMutableString(string: self)
-    CFStringTransform(theString, nil, kCFStringTransformFullwidthHalfwidth, reverse)
-    return theString as String
-  }
-}
-
 // MARK: - Check whether current date is the given date.
 
 public extension Date {

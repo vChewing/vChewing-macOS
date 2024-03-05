@@ -14,7 +14,7 @@ let package = Package(
   ],
   dependencies: [
     .package(path: "../Fuziki_NSAttributedTextView"),
-    .package(path: "../vChewing_CocoaExtension"),
+    .package(path: "../vChewing_OSFrameworkImpl"),
     .package(path: "../vChewing_Shared"),
   ],
   targets: [
@@ -22,7 +22,7 @@ let package = Package(
       name: "TooltipUI",
       dependencies: [
         .product(name: "NSAttributedTextView", package: "Fuziki_NSAttributedTextView"),
-        .product(name: "CocoaExtension", package: "vChewing_CocoaExtension"),
+        .product(name: "OSFrameworkImpl", package: "vChewing_OSFrameworkImpl"),
         .product(name: "Shared", package: "vChewing_Shared"),
       ]
     ),

@@ -7,7 +7,6 @@
 // requirements defined in MIT License.
 
 import Foundation
-import Shared
 
 extension LMAssembly {
   struct LMPlainBopomofo {
@@ -22,8 +21,8 @@ extension LMAssembly {
         let rawJSON = try JSONDecoder().decode([String: [String: String]].self, from: rawData)
         dataMap = rawJSON
       } catch {
-        vCLog("\(error)")
-        vCLog("↑ Exception happened when parsing raw JSON sequence data from vChewing LMAssembly.")
+        vCLMLog("\(error)")
+        vCLMLog("↑ Exception happened when parsing raw JSON sequence data from vChewing LMAssembly.")
         dataMap = [:]
       }
     }

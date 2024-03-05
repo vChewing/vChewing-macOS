@@ -7,7 +7,7 @@
 // requirements defined in MIT License.
 
 import AppKit
-import CocoaExtension
+import OSFrameworkImpl
 
 // MARK: - InputSignalProtocol
 

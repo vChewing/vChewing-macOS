@@ -1,7 +1,6 @@
 // (c) 2019 and onwards Robert Muckle-Jones (Apache 2.0 License).
 
 import Foundation
-import SwiftExtension
 
 public class LineReader {
   let encoding: String.Encoding

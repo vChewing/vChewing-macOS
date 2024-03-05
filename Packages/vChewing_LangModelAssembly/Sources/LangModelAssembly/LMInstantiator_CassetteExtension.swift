@@ -8,7 +8,7 @@
 
 import Foundation
 import Megrez
-import Shared
+import SwiftExtension
 
 public extension LMAssembly.LMInstantiator {
   /// 磁帶模式專用：當前磁帶所規定的花牌鍵。

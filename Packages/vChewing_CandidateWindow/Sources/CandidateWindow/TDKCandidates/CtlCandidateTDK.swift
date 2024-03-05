@@ -7,7 +7,7 @@
 // requirements defined in MIT License.
 
 import AppKit
-import CocoaExtension
+import OSFrameworkImpl
 import Shared
 
 private extension NSUserInterfaceLayoutOrientation {

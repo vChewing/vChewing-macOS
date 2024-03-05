@@ -2,14 +2,14 @@
 import PackageDescription
 
 let package = Package(
-  name: "CocoaExtension",
+  name: "OSFrameworkImpl",
   platforms: [
     .macOS(.v11),
   ],
   products: [
     .library(
-      name: "CocoaExtension",
-      targets: ["CocoaExtension"]
+      name: "OSFrameworkImpl",
+      targets: ["OSFrameworkImpl"]
     ),
   ],
   dependencies: [
@@ -17,7 +17,7 @@ let package = Package(
   ],
   targets: [
     .target(
-      name: "CocoaExtension",
+      name: "OSFrameworkImpl",
       dependencies: [
         .product(name: "SwiftExtension", package: "vChewing_SwiftExtension"),
       ]

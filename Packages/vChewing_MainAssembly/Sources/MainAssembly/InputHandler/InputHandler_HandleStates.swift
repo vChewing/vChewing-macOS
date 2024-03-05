@@ -1041,11 +1041,15 @@ extension InputHandler {
     let fullWidthResult = behaviorValue % 2 != 0 // 能被二整除的都是半形。
     triagePrefs: switch (behaviorValue, isConsideredEmptyForNow) {
     case (2, _), (3, _), (4, false), (5, false):
-      currentLM.config.numPadFWHWStatus = fullWidthResult
+      currentLM.setOptions { config in
+        config.numPadFWHWStatus = fullWidthResult
+      }
       if handlePunctuation("_NumPad_\(inputText)") { return true }
     default: break triagePrefs // 包括 case 0 & 1。
     }
-    currentLM.config.numPadFWHWStatus = nil
+    currentLM.setOptions { config in
+      config.numPadFWHWStatus = nil
+    }
     delegate.switchState(IMEState.ofEmpty())
     let charToCommit = inputText.applyingTransformFW2HW(reverse: fullWidthResult)
     delegate.switchState(IMEState.ofCommitting(textToCommit: charToCommit))

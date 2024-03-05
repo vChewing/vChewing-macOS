@@ -7,7 +7,7 @@
 // requirements defined in MIT License.
 
 import BookmarkManager
-import CocoaExtension
+import OSFrameworkImpl
 import Shared
 import SwiftExtension
 import SwiftUI

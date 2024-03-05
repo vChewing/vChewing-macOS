@@ -13,13 +13,13 @@ let package = Package(
     ),
   ],
   dependencies: [
-    .package(path: "../vChewing_CocoaExtension"),
+    .package(path: "../vChewing_OSFrameworkImpl"),
   ],
   targets: [
     .target(
       name: "NSAttributedTextView",
       dependencies: [
-        .product(name: "CocoaExtension", package: "vChewing_CocoaExtension"),
+        .product(name: "OSFrameworkImpl", package: "vChewing_OSFrameworkImpl"),
       ]
     ),
     .testTarget(
