@@ -20,15 +20,19 @@ public class SecureEventInputSputnik {
   }
 
   public static func getIORegListResults() -> String? {
+    // Don't generate results under any of the following situations:
+    // - Hibernation / LoggedOut / SwitchedOut / ScreenSaver situations.
+    guard NSWorkspace.activationFlags.isEmpty else { return nil }
     var resultDictionaryCF: Unmanaged<CFMutableDictionary>?
+    defer { resultDictionaryCF = nil }
     /// Regarding the parameter in IORegistryGetRootEntry:
     /// Both kIOMasterPortDefault and kIOMainPortDefault are 0.
     /// The latter one is similar to what `git` had done: changing "Master" to "Main".
     let statusSucceeded = IORegistryEntryCreateCFProperties(
       IORegistryGetRootEntry(0), &resultDictionaryCF, kCFAllocatorDefault, IOOptionBits(0)
     )
+    let dict: CFMutableDictionary? = resultDictionaryCF?.takeRetainedValue()
     guard statusSucceeded == KERN_SUCCESS else { return nil }
-    let dict = resultDictionaryCF?.takeRetainedValue()
     guard let dict: [CFString: Any] = dict as? [CFString: Any] else { return nil }
     return (dict.description)
   }
@@ -75,7 +79,7 @@ public extension NSWorkspace {
 
     public static let hibernating = ActivationFlags(rawValue: 1 << 0)
     public static let desktopLocked = ActivationFlags(rawValue: 1 << 1)
-    public static let sesssionSwitchedOut = ActivationFlags(rawValue: 1 << 2)
+    public static let sessionSwitchedOut = ActivationFlags(rawValue: 1 << 2)
     public static let screenSaverRunning = ActivationFlags(rawValue: 1 << 3)
   }
 
@@ -123,11 +127,11 @@ extension SecureEventInputSputnik {
         .store(in: &Self.combinePool)
       NSWorkspace.shared.notificationCenter
         .publisher(for: NSWorkspace.sessionDidResignActiveNotification)
-        .sink { _ in NSWorkspace.activationFlags.insert(.sesssionSwitchedOut) }
+        .sink { _ in NSWorkspace.activationFlags.insert(.sessionSwitchedOut) }
         .store(in: &Self.combinePool)
       NSWorkspace.shared.notificationCenter
         .publisher(for: NSWorkspace.sessionDidBecomeActiveNotification)
-        .sink { _ in NSWorkspace.activationFlags.remove(.sesssionSwitchedOut) }
+        .sink { _ in NSWorkspace.activationFlags.remove(.sessionSwitchedOut) }
         .store(in: &Self.combinePool)
     } else {
       Self.combinePoolCocoa.append(
@@ -169,13 +173,13 @@ extension SecureEventInputSputnik {
       Self.combinePoolCocoa.append(
         NSWorkspace.shared.notificationCenter
           .addObserver(forName: NSWorkspace.sessionDidResignActiveNotification, object: nil, queue: .main) { _ in
-            NSWorkspace.activationFlags.insert(.sesssionSwitchedOut)
+            NSWorkspace.activationFlags.insert(.sessionSwitchedOut)
           }
       )
       Self.combinePoolCocoa.append(
         NSWorkspace.shared.notificationCenter
           .addObserver(forName: NSWorkspace.sessionDidBecomeActiveNotification, object: nil, queue: .main) { _ in
-            NSWorkspace.activationFlags.remove(.sesssionSwitchedOut)
+            NSWorkspace.activationFlags.remove(.sessionSwitchedOut)
           }
       )
     }
