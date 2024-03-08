@@ -17,26 +17,24 @@ open class CtlCandidate: NSWindowController, CtlCandidateProtocol {
   open var reverseLookupResult: [String] = []
 
   open func highlightedColor() -> NSColor {
-    var result = NSColor.controlAccentColor
-    var colorBlendAmount: Double = NSApplication.isDarkMode ? 0.3 : 0.0
-    if #available(macOS 10.14, *), !NSApplication.isDarkMode, locale == "zh-Hant" {
-      colorBlendAmount = 0.15
+    var result = NSColor.clear
+    if #available(macOS 10.14, *) {
+      result = .controlAccentColor
+    } else {
+      result = .alternateSelectedControlTextColor
     }
+    let colorBlendAmount = 0.3
     // 設定當前高亮候選字的背景顏色。
     switch locale {
     case "zh-Hans":
-      result = NSColor.systemRed
+      result = NSColor.red
     case "zh-Hant":
-      result = NSColor.systemBlue
+      result = NSColor.blue
     case "ja":
-      result = NSColor.systemBrown
+      result = NSColor.brown
     default: break
     }
-    var blendingAgainstTarget: NSColor = NSApplication.isDarkMode ? NSColor.black : NSColor.white
-    if #unavailable(macOS 10.14) {
-      colorBlendAmount = 0.3
-      blendingAgainstTarget = NSColor.white
-    }
+    let blendingAgainstTarget: NSColor = NSApplication.isDarkMode ? NSColor.black : NSColor.white
     return result.blended(withFraction: colorBlendAmount, of: blendingAgainstTarget)!
   }
 
