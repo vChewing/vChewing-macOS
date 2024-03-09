@@ -1058,6 +1058,19 @@ func healthCheck(_ data: [Unigram]) -> String {
   return result
 }
 
+// MARK: - 與主執行緒有關的任務 Flags
+
+struct TaskFlags: OptionSet {
+  public let rawValue: Int
+  public init(rawValue: Int) {
+    self.rawValue = rawValue
+  }
+
+  public static let common = TaskFlags(rawValue: 1 << 0)
+  public static let chs = TaskFlags(rawValue: 1 << 1)
+  public static let cht = TaskFlags(rawValue: 1 << 2)
+}
+
 // MARK: - 主執行緒
 
 var compileJSON = false
@@ -1080,61 +1093,71 @@ func main() {
     NSLog("// SQLite 資料庫初期化失敗。")
     exit(-1)
   }
+
+  var taskFlags: TaskFlags = [.common, .chs, .cht] {
+    didSet {
+      guard taskFlags.isEmpty else { return }
+      NSLog("// 全部 TXT 辭典檔案建置完畢。")
+      if compileJSON {
+        NSLog("// 全部 JSON 辭典檔案建置完畢。")
+      }
+      if compileSQLite, prepared {
+        NSLog("// 開始整合反查資料。")
+        mapReverseLookupForCheck.forEach { key, values in
+          values.reversed().forEach { valueLiteral in
+            let value = cnvPhonabetToASCII(valueLiteral)
+            if !rangeMapReverseLookup[key, default: []].contains(value) {
+              rangeMapReverseLookup[key, default: []].insert(value, at: 0)
+            }
+          }
+        }
+        NSLog("// 反查資料整合完畢。")
+        NSLog("// 準備建置 SQL 資料庫。")
+        writeMainMapToSQL(rangeMapJSONCHS, column: "theDataCHS")
+        writeMainMapToSQL(rangeMapJSONCHT, column: "theDataCHT")
+        writeMainMapToSQL(rangeMapSymbols, column: "theDataSYMB")
+        writeMainMapToSQL(rangeMapZhuyinwen, column: "theDataCHEW")
+        writeMainMapToSQL(rangeMapCNS, column: "theDataCNS")
+        writeRevLookupMapToSQL(rangeMapReverseLookup)
+        let committed = "commit;".runAsSQLExec(dbPointer: &ptrSQL)
+        assert(committed)
+        let compressed = "VACUUM;".runAsSQLExec(dbPointer: &ptrSQL)
+        assert(compressed)
+        if !dumpSQLDB() {
+          NSLog("// SQLite 辭典傾印失敗。")
+        } else {
+          NSLog("// 全部 SQLite 辭典檔案建置完畢。")
+        }
+        sqlite3_close_v2(ptrSQL)
+      }
+    }
+  }
+
   let globalQueue = DispatchQueue.global(qos: .default)
   let group = DispatchGroup()
   group.enter()
   globalQueue.async {
     NSLog("// 準備編譯符號表情ㄅ文語料檔案。")
     commonFileOutput()
+    taskFlags.remove(.common)
     group.leave()
   }
   group.enter()
   globalQueue.async {
     NSLog("// 準備編譯繁體中文核心語料檔案。")
     fileOutput(isCHS: false)
+    taskFlags.remove(.cht)
     group.leave()
   }
   group.enter()
   globalQueue.async {
     NSLog("// 準備編譯簡體中文核心語料檔案。")
     fileOutput(isCHS: true)
+    taskFlags.remove(.chs)
     group.leave()
   }
   // 一直等待完成
   group.wait()
-  NSLog("// 全部 TXT 辭典檔案建置完畢。")
-  if compileJSON {
-    NSLog("// 全部 JSON 辭典檔案建置完畢。")
-  }
-  if compileSQLite, prepared {
-    NSLog("// 開始整合反查資料。")
-    mapReverseLookupForCheck.forEach { key, values in
-      values.reversed().forEach { valueLiteral in
-        let value = cnvPhonabetToASCII(valueLiteral)
-        if !rangeMapReverseLookup[key, default: []].contains(value) {
-          rangeMapReverseLookup[key, default: []].insert(value, at: 0)
-        }
-      }
-    }
-    NSLog("// 反查資料整合完畢。")
-    NSLog("// 準備建置 SQL 資料庫。")
-    writeMainMapToSQL(rangeMapJSONCHS, column: "theDataCHS")
-    writeMainMapToSQL(rangeMapJSONCHT, column: "theDataCHT")
-    writeMainMapToSQL(rangeMapSymbols, column: "theDataSYMB")
-    writeMainMapToSQL(rangeMapZhuyinwen, column: "theDataCHEW")
-    writeMainMapToSQL(rangeMapCNS, column: "theDataCNS")
-    writeRevLookupMapToSQL(rangeMapReverseLookup)
-    let committed = "commit;".runAsSQLExec(dbPointer: &ptrSQL)
-    assert(committed)
-    let compressed = "VACUUM;".runAsSQLExec(dbPointer: &ptrSQL)
-    assert(compressed)
-    if !dumpSQLDB() {
-      NSLog("// SQLite 辭典傾印失敗。")
-    } else {
-      NSLog("// 全部 SQLite 辭典檔案建置完畢。")
-    }
-    sqlite3_close_v2(ptrSQL)
-  }
 }
 
 main()
