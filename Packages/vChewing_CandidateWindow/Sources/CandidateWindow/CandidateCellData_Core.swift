@@ -19,6 +19,7 @@ public class CandidateCellData: Hashable {
   public static var unifiedSize: Double = 16
   public static var unifiedCharDimension: Double { ceil(unifiedSize * 1.0125 + 7) }
   public static var unifiedTextHeight: Double { ceil(unifiedSize * 19 / 16) }
+  static var internalPrefs = PrefMgr()
   public var selectionKey: String
   public let displayedText: String
   public private(set) var textDimension: NSSize
@@ -81,7 +82,8 @@ public class CandidateCellData: Hashable {
   }
 
   public func cellLength(isMatrix: Bool = true) -> Double {
-    let minLength = ceil(Self.unifiedCharDimension * 2 + size * 1.25)
+    let factor: CGFloat = (Self.internalPrefs.minCellWidthForHorizontalMatrix == 0) ? 1.5 : 2
+    let minLength = ceil(Self.unifiedCharDimension * factor + size * 1.25)
     if displayedText.count <= 2, isMatrix { return minLength }
     return textDimension.width
   }

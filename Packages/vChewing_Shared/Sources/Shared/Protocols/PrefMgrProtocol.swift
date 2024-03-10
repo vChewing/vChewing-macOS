@@ -37,6 +37,7 @@ public protocol PrefMgrProtocol {
   var dodgeInvalidEdgeCandidateCursorPosition: Bool { get set }
   var useDynamicCandidateWindowOrigin: Bool { get set }
   var useHorizontalCandidateList: Bool { get set }
+  var minCellWidthForHorizontalMatrix: Int { get set }
   var chooseCandidateUsingSpace: Bool { get set }
   var allowBoostingSingleKanjiAsUserPhrase: Bool { get set }
   var fetchSuggestionsFromUserOverrideModel: Bool { get set }
