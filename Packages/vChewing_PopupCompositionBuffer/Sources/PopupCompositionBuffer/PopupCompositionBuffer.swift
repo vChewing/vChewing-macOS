@@ -34,7 +34,11 @@ public class PopupCompositionBuffer: NSWindowController {
 
   public func sync(accent: NSColor?, locale: String) {
     self.locale = locale
-    self.accent = accent ?? themeColorCocoa
+    if let accent = accent {
+      self.accent = (accent.alphaComponent == 1) ? accent.withAlphaComponent(Self.bgOpacity) : accent
+    } else {
+      self.accent = themeColorCocoa
+    }
     window?.backgroundColor = adjustedThemeColor
     messageTextField.backgroundColor = .clear
     messageTextField.textColor = textColor
@@ -44,12 +48,14 @@ public class PopupCompositionBuffer: NSWindowController {
 
   private var locale: String = ""
 
+  private static let bgOpacity: CGFloat = 0.8
+
   var themeColorCocoa: NSColor {
     switch locale {
-    case "zh-Hans": return .init(red: 255 / 255, green: 64 / 255, blue: 53 / 255, alpha: 0.85)
-    case "zh-Hant": return .init(red: 5 / 255, green: 127 / 255, blue: 255 / 255, alpha: 0.85)
-    case "ja": return .init(red: 167 / 255, green: 137 / 255, blue: 99 / 255, alpha: 0.85)
-    default: return .init(red: 5 / 255, green: 127 / 255, blue: 255 / 255, alpha: 0.85)
+    case "zh-Hans": return .init(red: 255 / 255, green: 64 / 255, blue: 53 / 255, alpha: Self.bgOpacity)
+    case "zh-Hant": return .init(red: 5 / 255, green: 127 / 255, blue: 255 / 255, alpha: Self.bgOpacity)
+    case "ja": return .init(red: 167 / 255, green: 137 / 255, blue: 99 / 255, alpha: Self.bgOpacity)
+    default: return .init(red: 5 / 255, green: 127 / 255, blue: 255 / 255, alpha: Self.bgOpacity)
     }
   }
 
@@ -256,6 +262,6 @@ public class PopupCompositionBuffer: NSWindowController {
   }
 
   private var adjustedThemeColor: NSColor {
-    accent.blended(withFraction: NSApplication.isDarkMode ? 0.75 : 0.25, of: .black) ?? accent
+    accent.blended(withFraction: NSApplication.isDarkMode ? 0.5 : 0.25, of: .black) ?? accent
   }
 }
