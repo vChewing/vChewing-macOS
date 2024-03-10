@@ -37,6 +37,7 @@ public extension SettingsPanesCocoa {
               }
               UserDef.kCandidateWindowShowOnlyOneLine.render(fixWidth: innerContentWidth)
               UserDef.kAlwaysExpandCandidateWindow.render(fixWidth: innerContentWidth)
+              UserDef.kMinCellWidthForHorizontalMatrix.render(fixWidth: innerContentWidth)
               UserDef.kRespectClientAccentColor.render(fixWidth: innerContentWidth)
             }?.boxed()
             NSView()

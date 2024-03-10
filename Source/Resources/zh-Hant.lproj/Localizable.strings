@@ -224,6 +224,9 @@
 "i18n:UserDef.kDodgeInvalidEdgeCandidateCursorPosition.shortTitle" = "糾正不合理的端點選字游標位置";
 "i18n:UserDef.kFilterNonCNSReadingsForCHTInput.shortTitle" = "僅繁體中文: 原廠辭典僅返回符合全字庫讀音的結果";
 "i18n:UserDef.kInlineDumpPinyinInLieuOfZhuyin.description" = "藉由 Command+Option+Ctrl+Enter 輸出的內容受對應的行為設定所影響。";
+"i18n:UserDef.kMinCellWidthForHorizontalMatrix.option.0" = "兩個漢字";
+"i18n:UserDef.kMinCellWidthForHorizontalMatrix.option.1" = "兩個繪文字（更寬）";
+"i18n:userdef.kMinCellWidthForHorizontalMatrix.shortTitle" = "橫向多列選字窗最低單元寬度:";
 "i18n:UserDef.kNumPadCharInputBehavior.description" = "指定數字小鍵盤的輸入行為。";
 "i18n:UserDef.kNumPadCharInputBehavior.option.0" = "始終以半形文字直接遞交";
 "i18n:UserDef.kNumPadCharInputBehavior.option.1" = "始終以全形文字直接遞交";

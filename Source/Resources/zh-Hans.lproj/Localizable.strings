@@ -224,6 +224,9 @@
 "i18n:UserDef.kDodgeInvalidEdgeCandidateCursorPosition.shortTitle" = "糾正不合理的端点选字游标位置";
 "i18n:UserDef.kFilterNonCNSReadingsForCHTInput.shortTitle" = "仅繁体中文: 原厂辞典仅返回符合全字库读音的结果";
 "i18n:UserDef.kInlineDumpPinyinInLieuOfZhuyin.description" = "借由 Command+Option+Ctrl+Enter 输出的内容受对应的行为设定所影响。";
+"i18n:UserDef.kMinCellWidthForHorizontalMatrix.option.0" = "两个汉字";
+"i18n:UserDef.kMinCellWidthForHorizontalMatrix.option.1" = "两个绘文字（更宽）";
+"i18n:userdef.kMinCellWidthForHorizontalMatrix.shortTitle" = "横向多列选字窗最低单元宽度:";
 "i18n:UserDef.kNumPadCharInputBehavior.description" = "指定数字小键盘的输入行为。";
 "i18n:UserDef.kNumPadCharInputBehavior.option.0" = "始终以半形文字直接递交";
 "i18n:UserDef.kNumPadCharInputBehavior.option.1" = "始终以全形文字直接递交";

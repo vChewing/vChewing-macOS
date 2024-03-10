@@ -57,6 +57,7 @@ public enum UserDef: String, CaseIterable, Identifiable {
   case kUseShiftQuestionToCallServiceMenu = "UseShiftQuestionToCallServiceMenu"
   case kUseDynamicCandidateWindowOrigin = "UseDynamicCandidateWindowOrigin"
   case kUseHorizontalCandidateList = "UseHorizontalCandidateList"
+  case kMinCellWidthForHorizontalMatrix = "MinCellWidthForHorizontalMatrix"
   case kChooseCandidateUsingSpace = "ChooseCandidateUsingSpace"
   case kCassetteEnabled = "CassetteEnabled"
   case kCNS11643Enabled = "CNS11643Enabled"
@@ -184,6 +185,7 @@ public extension UserDef {
     case .kUseShiftQuestionToCallServiceMenu: return .bool
     case .kUseDynamicCandidateWindowOrigin: return .bool
     case .kUseHorizontalCandidateList: return .bool
+    case .kMinCellWidthForHorizontalMatrix: return .integer
     case .kChooseCandidateUsingSpace: return .bool
     case .kCassetteEnabled: return .bool
     case .kCNS11643Enabled: return .bool
@@ -357,6 +359,13 @@ public extension UserDef {
         userDef: self, shortTitle: "Candidate Layout:",
         description: "Choose your preferred layout of the candidate window.",
         options: [0: "Vertical", 1: "Horizontal"]
+      )
+    case .kMinCellWidthForHorizontalMatrix: return .init(
+        userDef: self, shortTitle: "i18n:userdef.kMinCellWidthForHorizontalMatrix.shortTitle",
+        options: [
+          0: "i18n:UserDef.kMinCellWidthForHorizontalMatrix.option.0",
+          1: "i18n:UserDef.kMinCellWidthForHorizontalMatrix.option.1",
+        ]
       )
     case .kChooseCandidateUsingSpace: return .init(
         userDef: self, shortTitle: "Enable Space key for calling candidate window",

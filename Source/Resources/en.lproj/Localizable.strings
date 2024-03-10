@@ -224,6 +224,9 @@
 "i18n:UserDef.kDodgeInvalidEdgeCandidateCursorPosition.shortTitle" = "Dodge Invalid Edge Candidate Cursor Position";
 "i18n:UserDef.kFilterNonCNSReadingsForCHTInput.shortTitle" = "Filter Non-CNS11643 factory readings (CHT input only)";
 "i18n:UserDef.kInlineDumpPinyinInLieuOfZhuyin.description" = "Contents committed by Command+Option+Ctrl+Enter may vary depending on related behavior settings.";
+"i18n:UserDef.kMinCellWidthForHorizontalMatrix.option.0" = "2 Kanjis";
+"i18n:UserDef.kMinCellWidthForHorizontalMatrix.option.1" = "2 Emojis (Wider)";
+"i18n:userdef.kMinCellWidthForHorizontalMatrix.shortTitle" = "Minimum cell width for horizontal matrix:";
 "i18n:UserDef.kNumPadCharInputBehavior.description" = "Choose the behavior of numeric pad inputs.";
 "i18n:UserDef.kNumPadCharInputBehavior.option.0" = "Always directly commit half-width chars";
 "i18n:UserDef.kNumPadCharInputBehavior.option.1" = "Always directly commit full-width chars";
