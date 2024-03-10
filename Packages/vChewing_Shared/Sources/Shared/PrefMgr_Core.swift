@@ -149,6 +149,9 @@ import SwiftExtension
   @AppProperty(key: UserDef.kUseHorizontalCandidateList.rawValue, defaultValue: true)
   public dynamic var useHorizontalCandidateList: Bool
 
+  @AppProperty(key: UserDef.kMinCellWidthForHorizontalMatrix.rawValue, defaultValue: 0)
+  public dynamic var minCellWidthForHorizontalMatrix: Int
+
   @AppProperty(key: UserDef.kChooseCandidateUsingSpace.rawValue, defaultValue: true)
   public dynamic var chooseCandidateUsingSpace: Bool
 

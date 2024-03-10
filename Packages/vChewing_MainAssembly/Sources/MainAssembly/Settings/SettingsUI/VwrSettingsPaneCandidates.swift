@@ -26,6 +26,9 @@ public struct VwrSettingsPaneCandidates: View {
   @AppStorage(wrappedValue: true, UserDef.kRespectClientAccentColor.rawValue)
   private var respectClientAccentColor: Bool
 
+  @AppStorage(wrappedValue: 0, UserDef.kMinCellWidthForHorizontalMatrix.rawValue)
+  private var minCellWidthForHorizontalMatrix: Int
+
   @AppStorage(wrappedValue: false, UserDef.kAlwaysExpandCandidateWindow.rawValue)
   private var alwaysExpandCandidateWindow: Bool
 
@@ -101,6 +104,8 @@ public struct VwrSettingsPaneCandidates: View {
           UserDef.kCandidateWindowShowOnlyOneLine.bind($candidateWindowShowOnlyOneLine).render()
           if !candidateWindowShowOnlyOneLine {
             UserDef.kAlwaysExpandCandidateWindow.bind($alwaysExpandCandidateWindow).render()
+              .disabled(candidateWindowShowOnlyOneLine)
+            UserDef.kMinCellWidthForHorizontalMatrix.bind($minCellWidthForHorizontalMatrix).render()
               .disabled(candidateWindowShowOnlyOneLine)
           }
           UserDef.kRespectClientAccentColor.bind($respectClientAccentColor).render()
