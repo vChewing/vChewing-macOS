@@ -6,11 +6,13 @@
 // marks, or product names of Contributor, except as required to fulfill notice
 // requirements defined in MIT License.
 
+infix operator <~: AssignmentPrecedence
+
 public extension Tekkon {
   // MARK: - Dynamic Constants and Basic Enums
 
   /// 定義注音符號的種類
-  enum PhoneType: Int {
+  enum PhoneType: Int, Codable, Hashable {
     case null = 0 // 假
     case consonant = 1 // 聲
     case semivowel = 2 // 介
@@ -19,7 +21,7 @@ public extension Tekkon {
   }
 
   /// 定義注音排列的類型
-  enum MandarinParser: Int {
+  enum MandarinParser: Int, Codable, Hashable {
     case ofDachen = 0
     case ofDachen26 = 1
     case ofETen = 2
@@ -85,7 +87,7 @@ public extension Tekkon {
   /// 如果遇到被設為多個字符、或者字符不對的情況的話，value 會被清空、PhoneType 會變成 null。
   /// 賦值時最好直接重新 init 且一直用 let 來初期化 Phonabet。
   /// 其實 value 對外只讀，對內的話另有 valueStorage 代為存儲內容。這樣比較安全一些。
-  @frozen struct Phonabet: Equatable, Hashable, ExpressibleByStringLiteral {
+  @frozen struct Phonabet: Equatable, Codable, Hashable {
     public var type: PhoneType = .null
     private var valueStorage = ""
     public var value: String { valueStorage }
@@ -117,6 +119,15 @@ public extension Tekkon {
       ensureType()
     }
 
+    public mutating func setValue(_ newValue: String) {
+      valueStorage = newValue
+      ensureType()
+    }
+
+    public static func <~ (_ lhs: inout Tekkon.Phonabet, _ newValue: String) {
+      lhs.setValue(newValue)
+    }
+
     /// 用來自動更新自身的屬性值的函式。
     public mutating func ensureType() {
       if Tekkon.allowedConsonants.contains(value) {
@@ -131,31 +142,6 @@ public extension Tekkon {
         type = .null
         valueStorage = ""
       }
-    }
-
-    // MARK: - Misc Definitions
-
-    /// 這些內容用來滿足 "Equatable, Hashable, ExpressibleByStringLiteral" 需求。
-
-    public static func == (lhs: Phonabet, rhs: Phonabet) -> Bool {
-      lhs.value == rhs.value
-    }
-
-    public func hash(into hasher: inout Hasher) {
-      hasher.combine(value)
-      hasher.combine(type)
-    }
-
-    public init(stringLiteral value: String) {
-      self.init(value)
-    }
-
-    public init(unicodeScalarLiteral value: String) {
-      self.init(stringLiteral: value)
-    }
-
-    public init(extendedGraphemeClusterLiteral value: String) {
-      self.init(stringLiteral: value)
     }
   }
 }

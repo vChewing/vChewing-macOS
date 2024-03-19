@@ -212,7 +212,7 @@ public extension IMEStateData {
             subNeta = Tekkon.cnvPhonaToHanyuPinyin(targetJoined: subNeta)
             subNeta = Tekkon.cnvHanyuPinyinToTextbookStyle(targetJoined: subNeta)
           } else {
-            subNeta = Tekkon.cnvPhonaToTextbookReading(target: subNeta)
+            subNeta = Tekkon.cnvPhonaToTextbookStyle(target: subNeta)
           }
         }
         arrOutput.append(subNeta)
