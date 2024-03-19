@@ -58,7 +58,7 @@ private extension InputHandler {
 
     func narrateTheComposer(with maybeKey: String? = nil, when condition: Bool, allowDuplicates: Bool = true) {
       guard condition else { return }
-      let maybeKey = maybeKey ?? composer.phonabetKeyForQuery(pronouncable: prefs.acceptLeadingIntonations)
+      let maybeKey = maybeKey ?? composer.phonabetKeyForQuery(pronounceableOnly: prefs.acceptLeadingIntonations)
       guard var keyToNarrate = maybeKey else { return }
       if composer.intonation == Tekkon.Phonabet(" ") { keyToNarrate.append("ˉ") }
       SpeechSputnik.shared.narrate(keyToNarrate, allowDuplicates: allowDuplicates)
@@ -119,7 +119,7 @@ private extension InputHandler {
         return handleEnter(input: input, readingOnly: true)
       }
       // 拿取用來進行索引檢索用的注音。這裡先不急著處理「僅有注音符號輸入」的情況。
-      let maybeKey = composer.phonabetKeyForQuery(pronouncable: prefs.acceptLeadingIntonations)
+      let maybeKey = composer.phonabetKeyForQuery(pronounceableOnly: prefs.acceptLeadingIntonations)
       guard let readingKey = maybeKey else { break ifComposeReading }
       // 向語言模型詢問是否有對應的記錄。
       if !currentLM.hasUnigramsFor(keyArray: [readingKey]) {
@@ -204,7 +204,7 @@ private extension InputHandler {
     /// 但這裡不處理陰平聲調。
     if keyConsumedByReading {
       // 此處將 strict 設為 false，以應對「僅有注音符號輸入」的情況。
-      if composer.phonabetKeyForQuery(pronouncable: false) == nil {
+      if composer.phonabetKeyForQuery(pronounceableOnly: false) == nil {
         // 將被空格鍵覆蓋掉的既有聲調塞入組字器。
         if !composer.isPinyinMode, input.isSpace,
            compositor.insertKey(existedIntonation.value)
