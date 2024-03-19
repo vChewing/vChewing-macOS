@@ -153,7 +153,7 @@ private extension CandidateTextService.Coordinator {
   func prepareTextBookZhuyinReadings(_ param: CandidateTextService.CandidatePairServicable) {
     let newReadings = param.reading.map { currentReading in
       if currentReading.contains("_") { return "_??" }
-      return Tekkon.cnvPhonaToTextbookReading(target: currentReading)
+      return Tekkon.cnvPhonaToTextbookStyle(target: currentReading)
     }
     param.reading = newReadings
   }

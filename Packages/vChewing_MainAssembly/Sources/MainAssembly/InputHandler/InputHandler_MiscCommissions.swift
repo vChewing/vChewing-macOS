@@ -100,7 +100,7 @@ extension InputHandler {
         key =
           prefs.inlineDumpPinyinInLieuOfZhuyin
             ? Tekkon.restoreToneOneInPhona(target: key) // 恢復陰平標記
-            : Tekkon.cnvPhonaToTextbookReading(target: key) // 恢復陰平標記
+            : Tekkon.cnvPhonaToTextbookStyle(target: key) // 恢復陰平標記
 
         if prefs.inlineDumpPinyinInLieuOfZhuyin {
           key = Tekkon.cnvPhonaToHanyuPinyin(targetJoined: key) // 注音轉拼音

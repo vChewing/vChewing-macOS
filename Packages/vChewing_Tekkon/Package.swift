@@ -4,7 +4,7 @@ import PackageDescription
 let package = Package(
   name: "Tekkon",
   platforms: [
-    .macOS(.v11),
+    .macOS(.v10_11),
   ],
   products: [
     .library(

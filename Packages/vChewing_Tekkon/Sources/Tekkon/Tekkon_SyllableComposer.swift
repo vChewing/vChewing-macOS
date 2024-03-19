@@ -15,21 +15,21 @@ public extension Tekkon {
   ///
   /// 因為是 String Literal，所以初期化時可以藉由 @input 參數指定初期已經傳入的按鍵訊號。
   /// 還可以在初期化時藉由 @arrange 參數來指定注音排列（預設為「.ofDachen」大千佈局）。
-  @frozen struct Composer: Equatable, Hashable, ExpressibleByStringLiteral {
+  @frozen struct Composer: Equatable, Codable, Hashable, ExpressibleByStringLiteral {
     /// 聲母。
-    public var consonant: Phonabet = ""
+    public var consonant: Phonabet = .init()
 
     /// 介母。
-    public var semivowel: Phonabet = ""
+    public var semivowel: Phonabet = .init()
 
     /// 韻母。
-    public var vowel: Phonabet = ""
+    public var vowel: Phonabet = .init()
 
     /// 聲調。
-    public var intonation: Phonabet = ""
+    public var intonation: Phonabet = .init()
 
     /// 拼音組音區。
-    public var romajiBuffer: String = ""
+    public var romajiBuffer: String = .init()
 
     /// 注音排列種類。預設情況下是大千排列（Windows / macOS 預設注音排列）。
     public var parser: MandarinParser = .ofDachen
@@ -64,7 +64,7 @@ public extension Tekkon {
       switch isHanyuPinyin {
       case false: // 注音輸出的場合
         let valReturnZhuyin = value.swapping(" ", with: "")
-        return isTextBookStyle ? cnvPhonaToTextbookReading(target: valReturnZhuyin) : valReturnZhuyin
+        return isTextBookStyle ? cnvPhonaToTextbookStyle(target: valReturnZhuyin) : valReturnZhuyin
       case true: // 拼音輸出的場合
         let valReturnPinyin = Tekkon.cnvPhonaToHanyuPinyin(targetJoined: value)
         return isTextBookStyle ? Tekkon.cnvHanyuPinyinToTextbookStyle(targetJoined: valReturnPinyin) : valReturnPinyin
@@ -95,7 +95,7 @@ public extension Tekkon {
     }
 
     /// 注拼槽內容是否可唸。
-    public var isPronouncable: Bool {
+    public var isPronounceable: Bool {
       !vowel.isEmpty || !semivowel.isEmpty || !consonant.isEmpty
     }
 
@@ -204,10 +204,8 @@ public extension Tekkon {
         receiveKey(fromPhonabet: translate(key: input))
         return
       }
-      if mapArayuruPinyinIntonation.keys.contains(input) {
-        if let theTone = mapArayuruPinyinIntonation[input] {
-          intonation = Phonabet(theTone)
-        }
+      if let theTone = mapArayuruPinyinIntonation[input] {
+        intonation = Phonabet(theTone)
       } else {
         // 為了防止 romajiBuffer 越敲越長帶來算力負擔，這裡讓它在要溢出時自動丟掉最早輸入的音頭。
         let maxCount: Int = (parser == .ofWadeGilesPinyin) ? 7 : 6
@@ -241,36 +239,32 @@ public extension Tekkon {
       if phonabetCombinationCorrectionEnabled {
         switch phonabet {
         case "ㄧ", "ㄩ":
-          if vowel.value == "ㄜ" { vowel = "ㄝ" }
+          if vowel.value == "ㄜ" { vowel <~ "ㄝ" }
         case "ㄜ":
-          if "ㄨ".doesHave(semivowel.value) { semivowel = "ㄩ" }
-          if "ㄧㄩ".doesHave(semivowel.value) { thePhone = "ㄝ" }
+          if "ㄨ".doesHave(semivowel.value) { semivowel <~ "ㄩ" }
+          if "ㄧㄩ".doesHave(semivowel.value) { thePhone <~ "ㄝ" }
         case "ㄝ":
-          if "ㄨ".doesHave(semivowel.value) { semivowel = "ㄩ" }
+          if "ㄨ".doesHave(semivowel.value) { semivowel <~ "ㄩ" }
         case "ㄛ", "ㄥ":
-          if phonabet == "ㄛ", semivowel.value == "ㄩ" { semivowel = "ㄨ" }
+          if phonabet == "ㄛ", semivowel.value == "ㄩ" { semivowel <~ "ㄨ" }
           if "ㄅㄆㄇㄈ".doesHave(consonant.value), semivowel.value == "ㄨ" { semivowel.clear() }
         case "ㄟ":
           if "ㄋㄌ".doesHave(consonant.value), semivowel.value == "ㄨ" { semivowel.clear() }
         case "ㄨ":
           if "ㄅㄆㄇㄈ".doesHave(consonant.value), "ㄛㄥ".doesHave(vowel.value) { vowel.clear() }
           if "ㄋㄌ".doesHave(consonant.value), "ㄟ".doesHave(vowel.value) { vowel.clear() }
-          if "ㄜ".doesHave(vowel.value) { vowel = "ㄝ" }
-          if "ㄝ".doesHave(vowel.value) { thePhone = "ㄩ" }
+          if "ㄜ".doesHave(vowel.value) { vowel <~ "ㄝ" }
+          if "ㄝ".doesHave(vowel.value) { thePhone <~ "ㄩ" }
         case "ㄅ", "ㄆ", "ㄇ", "ㄈ":
           if ["ㄨㄛ", "ㄨㄥ"].contains(semivowel.value + vowel.value) { semivowel.clear() }
         default: break
         }
         if [.vowel, .intonation].contains(thePhone.type), "ㄓㄔㄕㄗㄘㄙ".doesHave(consonant.value) {
-          switch semivowel.value {
-          case "ㄧ": semivowel.clear()
-          case "ㄩ":
-            switch consonant {
-            case _ where "ㄓㄗ".doesHave(consonant.value): consonant = "ㄐ"
-            case _ where "ㄔㄘ".doesHave(consonant.value): consonant = "ㄑ"
-            case _ where "ㄕㄙ".doesHave(consonant.value): consonant = "ㄒ"
-            default: break
-            }
+          switch (semivowel.value, consonant.value) {
+          case ("ㄧ", _): semivowel.clear()
+          case ("ㄩ", "ㄓ"), ("ㄩ", "ㄗ"): consonant <~ "ㄐ"
+          case ("ㄩ", "ㄔ"), ("ㄩ", "ㄘ"): consonant <~ "ㄑ"
+          case ("ㄩ", "ㄕ"), ("ㄩ", "ㄙ"): consonant <~ "ㄒ"
           default: break
           }
         }
@@ -290,11 +284,12 @@ public extension Tekkon {
     /// - Parameters:
     ///   - givenSequence: 傳入的 String 內容，用以處理一整串擊鍵輸入。
     ///   - isRomaji: 如果輸入的字串是諸如漢語拼音這樣的西文字母拼音的話，請啟用此選項。
-    public mutating func receiveSequence(_ givenSequence: String = "", isRomaji: Bool = false) {
+    /// - Returns: 處理之後的結果。
+    @discardableResult public mutating func receiveSequence(_ givenSequence: String = "", isRomaji: Bool = false) -> String {
       clear()
       guard isRomaji else {
         givenSequence.forEach { receiveKey(fromString: $0.description) }
-        return
+        return value
       }
       var dictResult: String?
       switch parser {
@@ -313,13 +308,6 @@ public extension Tekkon {
       default: break
       }
       dictResult?.forEach { receiveKey(fromPhonabet: $0.description) }
-    }
-
-    /// 處理一連串的按鍵輸入、且返回被處理之後的注音（陰平為空格）。
-    /// - Parameters:
-    ///   - givenSequence: 傳入的 String 內容，用以處理一整串擊鍵輸入。
-    public mutating func convertSequenceToRawComposition(_ givenSequence: String = "") -> String {
-      receiveSequence(givenSequence)
       return value
     }
 
@@ -366,22 +354,29 @@ public extension Tekkon {
     ///
     /// 如果輸入法的辭典索引是漢語拼音的話，你可能用不上這個函式。
     /// - Remark: 該字串結果不能為空，否則組字引擎會炸。
-    /// - Parameter pronouncable: 是否可以唸出。
+    /// - Parameter pronounceableOnly: 是否可以唸出。
     /// - Returns: 可用的查詢用注音字串，或者 nil。
-    public func phonabetKeyForQuery(pronouncable: Bool) -> String? {
+    public func phonabetKeyForQuery(pronounceableOnly: Bool) -> String? {
       let readingKey = getComposition()
-      var validKeyGeneratable = false
+      var validKeyAvailable = false
+      let isPinyinMode = isPinyinMode
+      switch (isPinyinMode, pronounceableOnly) {
+      case (false, true): validKeyAvailable = isPronounceable
+      case (false, false): validKeyAvailable = !readingKey.isEmpty
+      case (true, _): validKeyAvailable = isPronounceable
+      }
+
       switch isPinyinMode {
       case false:
-        switch pronouncable {
+        switch pronounceableOnly {
         case false:
-          validKeyGeneratable = !readingKey.isEmpty
+          validKeyAvailable = !readingKey.isEmpty
         case true:
-          validKeyGeneratable = isPronouncable
+          validKeyAvailable = isPronounceable
         }
-      case true: validKeyGeneratable = isPronouncable
+      case true: validKeyAvailable = isPronounceable
       }
-      return validKeyGeneratable ? readingKey : nil
+      return validKeyAvailable ? readingKey : nil
     }
 
     // MARK: - Parser Processing
@@ -429,38 +424,14 @@ public extension Tekkon {
       // 處理特殊情形。
       switch incomingPhonabet.type {
       case .semivowel:
-        switch consonant {
-        case "ㄍ":
-          switch incomingPhonabet {
-          // 這裡不處理「ㄍㄧ」到「ㄑㄧ」的轉換，因為只有倚天26需要處理這個。
-          case "ㄨ": consonant = "ㄍ" // ㄍㄨ
-          case "ㄩ": consonant = "ㄑ" // ㄑㄩ
-          default: break
-          }
-        case "ㄓ":
-          switch incomingPhonabet {
-          case "ㄧ": consonant = "ㄐ" // ㄐㄧ
-          case "ㄨ": consonant = "ㄓ" // ㄓㄨ
-          case "ㄩ": consonant = "ㄐ" // ㄐㄩ
-          default: break
-          }
-        case "ㄔ":
-          switch incomingPhonabet {
-          case "ㄧ": consonant = "ㄑ" // ㄐㄧ
-          case "ㄨ": consonant = "ㄔ" // ㄓㄨ
-          case "ㄩ": consonant = "ㄑ" // ㄐㄩ
-          default: break
-          }
-        case "ㄕ":
-          switch incomingPhonabet {
-          case "ㄧ": consonant = "ㄒ" // ㄒㄧ
-          case "ㄨ": consonant = "ㄕ" // ㄕㄨ
-          case "ㄩ": consonant = "ㄒ" // ㄒㄩ
-          default: break
-          }
+        // 這裡不處理「ㄍㄧ」到「ㄑㄧ」的轉換，因為只有倚天26需要處理這個。
+        switch (consonant.value, incomingPhonabet.value) {
+        case ("ㄓ", "ㄧ"), ("ㄓ", "ㄩ"): consonant <~ "ㄐ"
+        case ("ㄍ", "ㄩ"), ("ㄔ", "ㄧ"), ("ㄔ", "ㄩ"): consonant <~ "ㄑ"
+        case ("ㄕ", "ㄧ"), ("ㄕ", "ㄩ"): consonant <~ "ㄒ"
         default: break
         }
-        if incomingPhonabet == "ㄨ" {
+        if incomingPhonabet.value == "ㄨ" {
           fixValue("ㄐ", "ㄓ")
           fixValue("ㄑ", "ㄔ")
           fixValue("ㄒ", "ㄕ")
@@ -486,12 +457,12 @@ public extension Tekkon {
       let keysToHandleHere = "dfhjklmnpqtw"
 
       switch key {
-      case "d" where isPronouncable: strReturn = "˙"
-      case "f" where isPronouncable: strReturn = "ˊ"
-      case "j" where isPronouncable: strReturn = "ˇ"
-      case "k" where isPronouncable: strReturn = "ˋ"
-      case "e" where consonant == "ㄍ": consonant = "ㄑ"
-      case "p" where !consonant.isEmpty || semivowel == "ㄧ": strReturn = "ㄡ"
+      case "d" where isPronounceable: strReturn = "˙"
+      case "f" where isPronounceable: strReturn = "ˊ"
+      case "j" where isPronounceable: strReturn = "ˇ"
+      case "k" where isPronounceable: strReturn = "ˋ"
+      case "e" where consonant.value == "ㄍ": consonant <~ "ㄑ"
+      case "p" where !consonant.isEmpty || semivowel.value == "ㄧ": strReturn = "ㄡ"
       case "h" where !consonant.isEmpty || !semivowel.isEmpty: strReturn = "ㄦ"
       case "l" where !consonant.isEmpty || !semivowel.isEmpty: strReturn = "ㄥ"
       case "m" where !consonant.isEmpty || !semivowel.isEmpty: strReturn = "ㄢ"
@@ -519,7 +490,7 @@ public extension Tekkon {
       }
 
       // 後置修正
-      if value == "ㄍ˙" { consonant = "ㄑ" }
+      if value == "ㄍ˙" { consonant <~ "ㄑ" }
 
       // 這些按鍵在上文處理過了，就不要再回傳了。
       if keysToHandleHere.doesHave(key) { strReturn = "" }
@@ -539,10 +510,10 @@ public extension Tekkon {
       let keysToHandleHere = "acdefghjklmns"
 
       switch key {
-      case "d" where isPronouncable: strReturn = "ˊ"
-      case "f" where isPronouncable: strReturn = "ˇ"
-      case "s" where isPronouncable: strReturn = "˙"
-      case "j" where isPronouncable: strReturn = "ˋ"
+      case "d" where isPronounceable: strReturn = "ˊ"
+      case "f" where isPronounceable: strReturn = "ˇ"
+      case "s" where isPronounceable: strReturn = "˙"
+      case "j" where isPronounceable: strReturn = "ˋ"
       case "a" where !consonant.isEmpty || !semivowel.isEmpty: strReturn = "ㄟ"
       case "v" where !semivowel.isEmpty: strReturn = "ㄑ"
       case "c" where !semivowel.isEmpty: strReturn = "ㄒ"
@@ -584,7 +555,7 @@ public extension Tekkon {
       }
 
       // 後置修正
-      if value == "ㄔ˙" { consonant = "ㄑ" }
+      if value == "ㄔ˙" { consonant <~ "ㄑ" }
 
       // 這些按鍵在上文處理過了，就不要再回傳了。
       if keysToHandleHere.doesHave(key) { strReturn = "" }
@@ -648,46 +619,43 @@ public extension Tekkon {
       var strReturn = Tekkon.mapDachenCP26StaticKeys[key] ?? ""
 
       switch key {
-      case "e" where isPronouncable: strReturn = "ˊ"
-      case "r" where isPronouncable: strReturn = "ˇ"
-      case "d" where isPronouncable: strReturn = "ˋ"
-      case "y" where isPronouncable: strReturn = "˙"
+      case "e" where isPronounceable: strReturn = "ˊ"
+      case "r" where isPronounceable: strReturn = "ˇ"
+      case "d" where isPronounceable: strReturn = "ˋ"
+      case "y" where isPronounceable: strReturn = "˙"
       case "b" where !consonant.isEmpty || !semivowel.isEmpty: strReturn = "ㄝ"
-      case "i" where vowel.isEmpty || vowel == "ㄞ": strReturn = "ㄛ"
-      case "l" where vowel.isEmpty || vowel == "ㄤ": strReturn = "ㄠ"
+      case "i" where vowel.isEmpty || vowel.value == "ㄞ": strReturn = "ㄛ"
+      case "l" where vowel.isEmpty || vowel.value == "ㄤ": strReturn = "ㄠ"
       case "n" where !consonant.isEmpty || !semivowel.isEmpty:
         if value == "ㄙ" { consonant.clear() }
         strReturn = "ㄥ"
-      case "o" where vowel.isEmpty || vowel == "ㄢ": strReturn = "ㄟ"
-      case "p" where vowel.isEmpty || vowel == "ㄦ": strReturn = "ㄣ"
-      case "q" where consonant.isEmpty || consonant == "ㄅ": strReturn = "ㄆ"
-      case "t" where consonant.isEmpty || consonant == "ㄓ": strReturn = "ㄔ"
-      case "w" where consonant.isEmpty || consonant == "ㄉ": strReturn = "ㄊ"
+      case "o" where vowel.isEmpty || vowel.value == "ㄢ": strReturn = "ㄟ"
+      case "p" where vowel.isEmpty || vowel.value == "ㄦ": strReturn = "ㄣ"
+      case "q" where consonant.isEmpty || consonant.value == "ㄅ": strReturn = "ㄆ"
+      case "t" where consonant.isEmpty || consonant.value == "ㄓ": strReturn = "ㄔ"
+      case "w" where consonant.isEmpty || consonant.value == "ㄉ": strReturn = "ㄊ"
       case "m":
-        if semivowel == "ㄩ", vowel != "ㄡ" {
+        switch (semivowel.value, vowel.value) {
+        case ("ㄩ", _):
           semivowel.clear()
           strReturn = "ㄡ"
-        } else if semivowel != "ㄩ", vowel == "ㄡ" {
+        case (_, "ㄡ"):
           vowel.clear()
           strReturn = "ㄩ"
-        } else if !semivowel.isEmpty {
-          strReturn = "ㄡ"
-        } else {
-          strReturn = "ㄐㄑㄒ".doesHave(consonant.value) ? "ㄩ" : "ㄡ"
+        case ("ㄩ", "ㄡ"), _:
+          strReturn = (!semivowel.isEmpty || !"ㄐㄑㄒ".doesHave(consonant.value)) ? "ㄡ" : "ㄩ"
         }
       case "u":
-        if semivowel == "ㄧ", vowel != "ㄚ" {
-          semivowel.clear()
-          strReturn = "ㄚ"
-        } else if semivowel != "ㄧ", vowel == "ㄚ" {
-          strReturn = "ㄧ"
-        } else if semivowel == "ㄧ", vowel == "ㄚ" {
+        switch (semivowel.value, vowel.value) {
+        case ("ㄧ", "ㄚ"):
           semivowel.clear()
           vowel.clear()
-        } else if !semivowel.isEmpty {
+        case ("ㄧ", _):
+          semivowel.clear()
           strReturn = "ㄚ"
-        } else {
+        case (_, "ㄚ"):
           strReturn = "ㄧ"
+        case (_, _): strReturn = semivowel.isEmpty ? "ㄧ" : "ㄚ"
         }
       default: break
       }
@@ -711,10 +679,10 @@ public extension Tekkon {
       let keysToHandleHere = "dfjlegnhkbmc"
 
       switch key {
-      case "d" where isPronouncable: strReturn = "˙"
-      case "f" where isPronouncable: strReturn = "ˊ"
-      case "j" where isPronouncable: strReturn = "ˇ"
-      case "l" where isPronouncable: strReturn = "ˋ"
+      case "d" where isPronounceable: strReturn = "˙"
+      case "f" where isPronounceable: strReturn = "ˊ"
+      case "j" where isPronounceable: strReturn = "ˇ"
+      case "l" where isPronounceable: strReturn = "ˋ"
       case "e" where "ㄧㄩ".doesHave(semivowel.value): strReturn = "ㄝ"
       case "g" where !consonant.isEmpty || !semivowel.isEmpty: strReturn = "ㄤ"
       case "n" where !consonant.isEmpty || !semivowel.isEmpty: strReturn = "ㄣ"
