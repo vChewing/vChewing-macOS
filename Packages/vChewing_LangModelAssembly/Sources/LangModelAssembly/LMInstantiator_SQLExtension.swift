@@ -163,8 +163,10 @@ extension LMAssembly.LMInstantiator {
     let encryptedKey = Self.cnvPhonabetToASCII(key.replacingOccurrences(of: "'", with: "''"))
     let sqlQuery = "SELECT * FROM DATA_MAIN WHERE theKey='\(encryptedKey)';"
     Self.querySQL(strStmt: sqlQuery, coreColumn: column) { currentResult in
-      let arrRangeRecords = currentResult.split(separator: "\t")
-      for strNetaSet in arrRangeRecords {
+      var i: Double = 0
+      var previousScore: Double?
+      currentResult.split(separator: "\t").forEach { strNetaSet in
+        // 這裡假定原廠資料已經經過對權重的 stable sort 排序。
         let neta = Array(strNetaSet.trimmingCharacters(in: .newlines).split(separator: " ").reversed())
         let theValue: String = .init(neta[0])
         var theScore = column.defaultScore
@@ -174,8 +176,15 @@ extension LMAssembly.LMInstantiator {
         if theScore > 0 {
           theScore *= -1 // 應對可能忘記寫負號的情形
         }
+        if previousScore == theScore {
+          theScore -= i * 0.000_001
+          i += 1
+        } else {
+          previousScore = theScore
+          i = 0
+        }
         grams.append(Megrez.Unigram(value: theValue, score: theScore))
-        if !key.contains("_punctuation") { continue }
+        if !key.contains("_punctuation") { return }
         let halfValue = theValue.applyingTransformFW2HW(reverse: false)
         if halfValue != theValue {
           gramsHW.append(Megrez.Unigram(value: halfValue, score: theScore))
