@@ -98,3 +98,13 @@ extension LMAssembly {
     }
   }
 }
+
+extension LMAssembly.LMReplacements {
+  var dictRepresented: [String: String] {
+    var result = [String: String]()
+    rangeMap.forEach { key, valueRange in
+      result[key] = strData[valueRange].description
+    }
+    return result
+  }
+}
