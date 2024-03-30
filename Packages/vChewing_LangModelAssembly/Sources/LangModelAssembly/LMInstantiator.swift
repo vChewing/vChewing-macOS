@@ -314,11 +314,6 @@ public extension LMAssembly {
         }
       }
 
-      // 用 reversed 指令讓使用者語彙檔案內的詞條優先順序隨著行數增加而逐漸增高。
-      // 這樣一來就可以在就地新增語彙時徹底複寫優先權。
-      // 將兩句差分也是為了讓 rawUserUnigrams 的類型不受可能的影響。
-      rawAllUnigrams += lmUserPhrases.unigramsFor(key: keyChain).reversed()
-
       if !config.isCassetteEnabled || config.isCassetteEnabled && keyChain.map(\.description)[0] == "_" {
         // 先給出 NumPad 的結果。
         rawAllUnigrams += supplyNumPadUnigrams(key: keyChain)
@@ -346,6 +341,21 @@ public extension LMAssembly {
           rawAllUnigrams += factoryUnigramsFor(key: keyChain, column: .theDataSYMB)
         }
       }
+
+      // 用 reversed 指令讓使用者語彙檔案內的詞條優先順序隨著行數增加而逐漸增高。
+      // 這樣一來就可以在就地新增語彙時徹底複寫優先權。
+      // 將兩句差分也是為了讓 rawUserUnigrams 的類型不受可能的影響。
+      var userPhraseUnigrams = Array(lmUserPhrases.unigramsFor(key: keyChain).reversed())
+      if keyArray.count == 1, let topScore = rawAllUnigrams.map(\.score).max() {
+        // 不再讓使用者自己加入的單漢字讀音權重進入爬軌體系。
+        userPhraseUnigrams = userPhraseUnigrams.map { currentUnigram in
+          Megrez.Unigram(
+            value: currentUnigram.value,
+            score: Swift.min(topScore + 0.000_114_514, currentUnigram.score)
+          )
+        }
+      }
+      rawAllUnigrams = userPhraseUnigrams + rawAllUnigrams
 
       // 分析且處理可能存在的 InputToken。
       rawAllUnigrams = rawAllUnigrams.map { unigram in
