@@ -213,24 +213,30 @@ public extension LMMgr.UserPhrase {
       }
     }
     guard !extreme, isSingleCharReadingPair else { return extremeFallbackResult }
-    let factoryUnigrams = inputMode.langModel.factoryCoreUnigramsFor(key: keyArray.joined(separator: "-"))
-    let currentWeight = weight ?? factoryUnigrams.first { $0.value == value }?.score
+    let fetchedUnigrams = inputMode.langModel.unigramsFor(keyArray: keyArray)
+    let currentWeight = weight ?? fetchedUnigrams.first { $0.value == value }?.score
     guard let currentWeight = currentWeight else { return extremeFallbackResult }
-    let factoryScores = factoryUnigrams.map(\.score)
+    let fetchedScores = fetchedUnigrams.map(\.score)
     var neighborValue: Double?
     switch action {
     case .toBoost:
-      neighborValue = currentWeight.findNeighborValue(from: factoryScores, greater: true)
+      neighborValue = currentWeight.findNeighborValue(from: fetchedScores, greater: true)
       if let realNeighborValue = neighborValue {
-        neighborValue = realNeighborValue + 0.0001
+        neighborValue = realNeighborValue + 0.000_001
+      } else if let fetchedMax = fetchedScores.min(), currentWeight <= fetchedMax {
+        neighborValue = Swift.min(0, currentWeight + 0.000_001)
       } else {
+        // 理論上來講，這種情況不該出現。
         neighborValue = Swift.min(0, currentWeight + 1)
       }
     case .toNerf:
-      neighborValue = currentWeight.findNeighborValue(from: factoryScores, greater: false)
+      neighborValue = currentWeight.findNeighborValue(from: fetchedScores, greater: false)
       if let realNeighborValue = neighborValue {
-        neighborValue = realNeighborValue - 0.0001
+        neighborValue = realNeighborValue - 0.000_001
+      } else if let fetchedMax = fetchedScores.max(), currentWeight >= fetchedMax {
+        neighborValue = Swift.max(-114.514, currentWeight - 0.000_001)
       } else {
+        // 理論上來講，這種情況不該出現。
         neighborValue = Swift.max(-114.514, currentWeight - 1)
       }
     case .toFilter: return nil
