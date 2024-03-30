@@ -11,7 +11,7 @@ import Megrez
 extension LMAssembly {
   struct LMAssociates {
     public private(set) var filePath: String?
-    var rangeMap: [String: [(Range<String.Index>, Int)]] = [:]
+    var rangeMap: [String: [(Range<String.Index>, Int)]] = [:] // Range 只可能是一整行，所以必須得有 index。
     var strData: String = ""
 
     public var count: Int { rangeMap.count }
@@ -97,15 +97,9 @@ extension LMAssembly {
 
     public func valuesFor(pair: Megrez.KeyValuePaired) -> [String] {
       var pairs: [String] = []
-      if let arrRangeRecords: [(Range<String.Index>, Int)] = rangeMap[pair.toNGramKey] {
-        for (netaRange, index) in arrRangeRecords {
-          let neta = strData[netaRange].split(separator: " ")
-          let theValue: String = .init(neta[index])
-          pairs.append(theValue)
-        }
-      }
-      if let arrRangeRecords: [(Range<String.Index>, Int)] = rangeMap[pair.value] {
-        for (netaRange, index) in arrRangeRecords {
+      let availableResults = [rangeMap[pair.toNGramKey], rangeMap[pair.value]].compactMap { $0 }
+      availableResults.forEach { arrRangeRecords in
+        arrRangeRecords.forEach { netaRange, index in
           let neta = strData[netaRange].split(separator: " ")
           let theValue: String = .init(neta[index])
           pairs.append(theValue)
@@ -118,5 +112,19 @@ extension LMAssembly {
       if rangeMap[pair.toNGramKey] != nil { return true }
       return rangeMap[pair.value] != nil
     }
+  }
+}
+
+extension LMAssembly.LMAssociates {
+  var dictRepresented: [String: [String]] {
+    var result = [String: [String]]()
+    rangeMap.forEach { key, arrRangeRecords in
+      arrRangeRecords.forEach { netaRange, index in
+        let neta = strData[netaRange].split(separator: " ")
+        let theValue: String = .init(neta[index])
+        result[key, default: []].append(theValue)
+      }
+    }
+    return result
   }
 }

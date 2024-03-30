@@ -184,3 +184,15 @@ extension LMAssembly {
     }
   }
 }
+
+extension LMAssembly.LMCoreEX {
+  var dictRepresented: [String: [String]] {
+    var result = [String: [String]]()
+    rangeMap.forEach { key, arrValueRanges in
+      result[key, default: []] = arrValueRanges.map { currentRange in
+        strData[currentRange].description
+      }
+    }
+    return result
+  }
+}
