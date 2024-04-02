@@ -345,3 +345,26 @@ public extension LMMgr {
     }
   }
 }
+
+// MARK: - 將當前輸入法的所有使用者辭典數據傾印成 JSON
+
+// 威注音輸入法並非可永續的專案。用單個 JSON 檔案遷移資料的話，可方便其他程式開發者們實作相關功能。
+
+public extension LMMgr {
+  @discardableResult static func dumpUserDictDataToJSON(print: Bool = false, all: Bool) -> String? {
+    var summarizedDict = [LMAssembly.UserDictionarySummarized]()
+    Shared.InputMode.allCases.forEach { mode in
+      guard mode != .imeModeNULL else { return }
+      summarizedDict.append(mode.langModel.summarize(all: all))
+    }
+    let encoder = JSONEncoder()
+    encoder.outputFormatting = .prettyPrinted
+    if #available(macOS 10.13, *) {
+      encoder.outputFormatting.insert(.sortedKeys)
+    }
+    guard let data = try? encoder.encode(summarizedDict) else { return nil }
+    guard let outputStr = String(data: data, encoding: .utf8) else { return nil }
+    if print { Swift.print(outputStr) }
+    return outputStr
+  }
+}
