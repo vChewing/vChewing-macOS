@@ -41,6 +41,8 @@ public extension LMAssembly {
       public var deltaOfCalendarYears: Int = -2000
     }
 
+    public static var asyncLoadingUserData: Bool = true
+
     // SQLite 連線所在的記憶體位置。
     static var ptrSQL: OpaquePointer?
 
@@ -107,23 +109,37 @@ public extension LMAssembly {
     public func resetFactoryJSONModels() {}
 
     public func loadUserPhrasesData(path: String, filterPath: String?) {
-      DispatchQueue.main.async {
+      func loadMain() {
         if FileManager.default.isReadableFile(atPath: path) {
-          self.lmUserPhrases.clear()
-          self.lmUserPhrases.open(path)
-          vCLMLog("lmUserPhrases: \(self.lmUserPhrases.count) entries of data loaded from: \(path)")
+          lmUserPhrases.clear()
+          lmUserPhrases.open(path)
+          vCLMLog("lmUserPhrases: \(lmUserPhrases.count) entries of data loaded from: \(path)")
         } else {
           vCLMLog("lmUserPhrases: File access failure: \(path)")
         }
       }
+      if !Self.asyncLoadingUserData {
+        loadMain()
+      } else {
+        DispatchQueue.main.async {
+          loadMain()
+        }
+      }
       guard let filterPath = filterPath else { return }
-      DispatchQueue.main.async {
+      func loadFilter() {
         if FileManager.default.isReadableFile(atPath: filterPath) {
-          self.lmFiltered.clear()
-          self.lmFiltered.open(filterPath)
-          vCLMLog("lmFiltered: \(self.lmFiltered.count) entries of data loaded from: \(path)")
+          lmFiltered.clear()
+          lmFiltered.open(filterPath)
+          vCLMLog("lmFiltered: \(lmFiltered.count) entries of data loaded from: \(path)")
         } else {
           vCLMLog("lmFiltered: File access failure: \(path)")
+        }
+      }
+      if !Self.asyncLoadingUserData {
+        loadFilter()
+      } else {
+        DispatchQueue.main.async {
+          loadFilter()
         }
       }
     }
@@ -140,50 +156,78 @@ public extension LMAssembly {
     }
 
     public func loadUserSymbolData(path: String) {
-      DispatchQueue.main.async {
+      func load() {
         if FileManager.default.isReadableFile(atPath: path) {
-          self.lmUserSymbols.clear()
-          self.lmUserSymbols.open(path)
-          vCLMLog("lmUserSymbol: \(self.lmUserSymbols.count) entries of data loaded from: \(path)")
+          lmUserSymbols.clear()
+          lmUserSymbols.open(path)
+          vCLMLog("lmUserSymbol: \(lmUserSymbols.count) entries of data loaded from: \(path)")
         } else {
           vCLMLog("lmUserSymbol: File access failure: \(path)")
+        }
+      }
+      if !Self.asyncLoadingUserData {
+        load()
+      } else {
+        DispatchQueue.main.async {
+          load()
         }
       }
     }
 
     public func loadUserAssociatesData(path: String) {
-      DispatchQueue.main.async {
+      func load() {
         if FileManager.default.isReadableFile(atPath: path) {
-          self.lmAssociates.clear()
-          self.lmAssociates.open(path)
-          vCLMLog("lmAssociates: \(self.lmAssociates.count) entries of data loaded from: \(path)")
+          lmAssociates.clear()
+          lmAssociates.open(path)
+          vCLMLog("lmAssociates: \(lmAssociates.count) entries of data loaded from: \(path)")
         } else {
           vCLMLog("lmAssociates: File access failure: \(path)")
+        }
+      }
+      if !Self.asyncLoadingUserData {
+        load()
+      } else {
+        DispatchQueue.main.async {
+          load()
         }
       }
     }
 
     public func loadReplacementsData(path: String) {
-      DispatchQueue.main.async {
+      func load() {
         if FileManager.default.isReadableFile(atPath: path) {
-          self.lmReplacements.clear()
-          self.lmReplacements.open(path)
-          vCLMLog("lmReplacements: \(self.lmReplacements.count) entries of data loaded from: \(path)")
+          lmReplacements.clear()
+          lmReplacements.open(path)
+          vCLMLog("lmReplacements: \(lmReplacements.count) entries of data loaded from: \(path)")
         } else {
           vCLMLog("lmReplacements: File access failure: \(path)")
+        }
+      }
+      if !Self.asyncLoadingUserData {
+        load()
+      } else {
+        DispatchQueue.main.async {
+          load()
         }
       }
     }
 
     public var isCassetteDataLoaded: Bool { Self.lmCassette.isLoaded }
     public static func loadCassetteData(path: String) {
-      DispatchQueue.main.async {
+      func load() {
         if FileManager.default.isReadableFile(atPath: path) {
           Self.lmCassette.clear()
           Self.lmCassette.open(path)
           vCLMLog("lmCassette: \(Self.lmCassette.count) entries of data loaded from: \(path)")
         } else {
           vCLMLog("lmCassette: File access failure: \(path)")
+        }
+      }
+      if !Self.asyncLoadingUserData {
+        load()
+      } else {
+        DispatchQueue.main.async {
+          load()
         }
       }
     }
