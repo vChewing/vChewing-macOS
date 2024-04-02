@@ -9,6 +9,7 @@
 import AppKit
 import IMKUtils
 import InputMethodKit
+import LangModelAssembly
 import MainAssembly
 import Shared
 import Uninstaller
@@ -23,6 +24,19 @@ case 1:
     if let strDumpedPrefs = PrefMgr.shared.dumpShellScriptBackup() {
       print(strDumpedPrefs)
     }
+    exit(0)
+  case "--dump-user-dict":
+    LMAssembly.LMInstantiator.asyncLoadingUserData = false
+    LMMgr.initUserLangModels()
+    LMMgr.loadUserPhraseReplacement()
+    LMMgr.dumpUserDictDataToJSON(print: true, all: false)
+    exit(0)
+  case "--dump-user-dict-all":
+    LMAssembly.LMInstantiator.asyncLoadingUserData = false
+    LMMgr.initUserLangModels()
+    LMMgr.loadUserPhraseReplacement()
+    LMMgr.loadUserAssociatesData()
+    LMMgr.dumpUserDictDataToJSON(print: true, all: true)
     exit(0)
   case "install":
     let exitCode = IMKHelper.registerInputMethod()
@@ -60,6 +74,7 @@ case 2:
     exit(0)
   default: break
   }
+  exit(0)
 default: exit(0)
 }
 
