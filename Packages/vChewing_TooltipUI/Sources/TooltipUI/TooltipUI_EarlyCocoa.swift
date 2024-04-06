@@ -86,8 +86,12 @@ public class TooltipUI_EarlyCocoa: NSWindowController, TooltipUIProtocol {
     )
     panel.level = NSWindow.Level(Int(max(CGShieldingWindowLevel(), kCGPopUpMenuWindowLevel)) + 2)
     panel.hasShadow = true
-    panel.backgroundColor = NSColor.controlBackgroundColor
+    panel.backgroundColor = .clear
+    panel.isOpaque = false
     panel.isMovable = false
+    panel.contentView?.wantsLayer = true
+    panel.contentView?.layer?.cornerRadius = 7
+    panel.contentView?.layer?.backgroundColor = NSColor.controlBackgroundColor.cgColor
     messageText = NSTextField()
     messageText.isEditable = false
     messageText.isSelectable = false
@@ -187,7 +191,7 @@ public class TooltipUI_EarlyCocoa: NSWindowController, TooltipUIProtocol {
         red: 0.91, green: 0.95, blue: 0.92, alpha: 1.00
       )
     }
-    window?.backgroundColor = backgroundColor
+    window?.contentView?.layer?.backgroundColor = backgroundColor.cgColor
     messageText.backgroundColor = backgroundColor
     messageText.textColor = textColor
   }
