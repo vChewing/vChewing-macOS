@@ -39,7 +39,10 @@ public class PopupCompositionBuffer: NSWindowController {
     } else {
       self.accent = themeColorCocoa
     }
-    window?.backgroundColor = adjustedThemeColor
+    let themeColor = adjustedThemeColor
+    window?.backgroundColor = .clear
+    window?.contentView?.layer?.backgroundColor = themeColor.cgColor
+    window?.contentView?.layer?.borderColor = NSColor.white.withAlphaComponent(0.1).cgColor
     messageTextField.backgroundColor = .clear
     messageTextField.textColor = textColor
   }
@@ -72,9 +75,8 @@ public class PopupCompositionBuffer: NSWindowController {
     )
     panel.level = NSWindow.Level(Int(max(CGShieldingWindowLevel(), kCGPopUpMenuWindowLevel)) + 1)
     panel.hasShadow = true
-    panel.backgroundColor = NSColor.controlBackgroundColor
-    panel.styleMask = .utilityWindow
-    panel.isMovable = false
+    panel.backgroundColor = .clear
+    panel.isOpaque = false
     messageTextField = NSTextField()
     messageTextField.isEditable = false
     messageTextField.isSelectable = false
@@ -85,6 +87,15 @@ public class PopupCompositionBuffer: NSWindowController {
     messageTextField.font = .systemFont(ofSize: 18) // 不是最終值。
     panel.contentView?.addSubview(messageTextField)
     panel.contentView?.wantsLayer = true
+    panel.contentView?.shadow = .init()
+    panel.contentView?.shadow?.shadowBlurRadius = 6
+    panel.contentView?.shadow?.shadowColor = .black
+    panel.contentView?.shadow?.shadowOffset = .zero
+    if let layer = panel.contentView?.layer {
+      layer.cornerRadius = 9
+      layer.borderWidth = 1
+      layer.masksToBounds = true
+    }
     Self.currentWindow = panel
     super.init(window: panel)
   }
