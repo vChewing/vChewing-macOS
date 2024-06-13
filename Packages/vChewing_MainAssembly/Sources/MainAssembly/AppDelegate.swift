@@ -11,6 +11,7 @@
 import AppKit
 import FolderMonitor
 import Shared
+import SwiftExtension
 import Uninstaller
 import UpdateSputnik
 import UserNotifications
@@ -50,11 +51,11 @@ public class AppDelegate: NSObject, NSApplicationDelegate, UNUserNotificationCen
 extension AppDelegate {
   private func reloadOnFolderChangeHappens(forced: Bool = true) {
     // 拖 100ms 再重載，畢竟有些有特殊需求的使用者可能會想使用巨型自訂語彙檔案。
-    DispatchQueue.main.asyncAfter(deadline: DispatchTime.now() + 0.1) {
+    asyncOnMain(after: 0.1) {
       // forced 用於剛剛切換了辭典檔案目錄的場合。
       // 先執行 initUserLangModels() 可以在目標辭典檔案不存在的情況下先行生成空白範本檔案。
       if PrefMgr.shared.shouldAutoReloadUserDataFiles || forced { LMMgr.initUserLangModels() }
-      DispatchQueue.main.asyncAfter(deadline: DispatchTime.now() + 0.1) {
+      asyncOnMain(after: 0.1) {
         if PrefMgr.shared.phraseEditorAutoReloadExternalModifications {
           Broadcaster.shared.eventForReloadingPhraseEditor = .init()
         }
@@ -176,7 +177,7 @@ extension AppDelegate {
         ),
         withCompletionHandler: nil
       )
-      DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
+      asyncOnMain(after: 0.3) {
         NSApp.terminate(self)
       }
     default: break

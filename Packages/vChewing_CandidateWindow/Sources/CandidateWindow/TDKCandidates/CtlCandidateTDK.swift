@@ -9,6 +9,7 @@
 import AppKit
 import OSFrameworkImpl
 import Shared
+import SwiftExtension
 
 extension NSUserInterfaceLayoutOrientation {
   fileprivate var layoutTDK: CandidatePool.LayoutOrientation {
@@ -62,7 +63,7 @@ public class CtlCandidateTDK: CtlCandidate, NSWindowDelegate {
 
   override open func updateDisplay() {
     guard let window = window else { return }
-    DispatchQueue.main.async { [weak self] in
+    asyncOnMain { [weak self] in
       guard let self = self else { return }
       self.updateNSWindowModern(window)
     }

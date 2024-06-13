@@ -11,6 +11,7 @@ import LangModelAssembly
 import NotifierUI
 import PhraseEditorUI
 import Shared
+import SwiftExtension
 
 // MARK: - Implements Conforming to Phrase Editor Delegate Protocol
 
@@ -75,7 +76,7 @@ extension LMMgr: PhraseEditorDelegate {
     mode: Shared.InputMode, type: LMAssembly.ReplacableUserDataType, data: String
   )
     -> String {
-    DispatchQueue.main.async {
+    asyncOnMain {
       let theURL = Self.userDictDataURL(mode: mode, type: type)
       do {
         try data.write(to: theURL, atomically: true, encoding: .utf8)

@@ -11,6 +11,7 @@ import InputMethodKit
 import NotifierUI
 import OSFrameworkImpl
 import Shared
+import SwiftExtension
 import SwiftyCapsLockToggler
 
 // MARK: - Facade
@@ -84,7 +85,7 @@ extension SessionCtl {
     // Caps Lock 通知與切換處理，要求至少 macOS 12 Monterey。
     if #available(macOS 12, *) {
       if event.type == .flagsChanged, event.keyCode == KeyCode.kCapsLock.rawValue {
-        DispatchQueue.main.async { [weak self] in
+        asyncOnMain { [weak self] in
           let isCapsLockTurnedOn = CapsLockToggler.isOn
           if PrefMgr.shared.shiftEisuToggleOffTogetherWithCapsLock, !isCapsLockTurnedOn,
              self?.isASCIIMode ?? false {

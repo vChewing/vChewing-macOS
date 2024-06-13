@@ -8,6 +8,7 @@
 
 import AppKit
 import OSFrameworkImpl
+import SwiftExtension
 
 // MARK: - Notifier
 
@@ -38,7 +39,7 @@ public class Notifier: NSWindowController {
     // 正式進入處理環節。
     defer {
       // 先讓新通知標記自此開始過 0.3 秒自動變為 false。
-      DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
+      asyncOnMain(after: 0.3) {
         self.isNew = false
       }
     }
@@ -140,7 +141,7 @@ public class Notifier: NSWindowController {
   // MARK: Public
 
   public static func notify(message: String) {
-    DispatchQueue.main.async { Self.message = message }
+    asyncOnMain { Self.message = message }
   }
 
   // MARK: Internal
@@ -186,7 +187,7 @@ extension Notifier {
     window.setFrame(beforeRect, display: true)
     window.orderFront(self)
     window.setFrame(afterRect, display: true, animate: true)
-    DispatchQueue.main.asyncAfter(deadline: .now() + 1.3) {
+    asyncOnMain(after: 1.3) {
       beforeRect = window.frame
       afterRect = window.frame
       afterRect.origin.x += 20
@@ -204,7 +205,7 @@ extension Notifier {
       }
     }
     shiftExistingWindowPositions()
-    DispatchQueue.main.async {
+    asyncOnMain {
       self.performDisplayLifetime()
     }
   }

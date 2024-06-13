@@ -207,7 +207,7 @@ extension SessionCtl {
     resetInputHandler(forceComposerCleanup: true)
     if !PrefMgr.shared.cassetteEnabled,
        !LMMgr.checkCassettePathValidity(PrefMgr.shared.cassettePath) {
-      DispatchQueue.main.async {
+      asyncOnMain {
         IMEApp.buzz()
         let alert = NSAlert(error: "Path invalid or file access error.".localized)
         let informativeText =

@@ -9,6 +9,7 @@
 import InputMethodKit
 import PopupCompositionBuffer
 import Shared
+import SwiftExtension
 
 // MARK: - 狀態調度 (State Handling)
 
@@ -158,19 +159,20 @@ extension SessionCtl {
       buffer = ChineseConverter.kanjiConversionIfRequired(queried)
     }
 
-    func doCommit() {
+    @Sendable
+    func doCommit(_ theBuffer: String) {
       guard let client = client() else { return }
       client.insertText(
-        buffer, replacementRange: replacementRange()
+        theBuffer, replacementRange: replacementRange()
       )
     }
 
     if isServingIMEItself {
-      DispatchQueue.main.async {
-        doCommit()
+      asyncOnMain {
+        doCommit(buffer)
       }
     } else {
-      doCommit()
+      doCommit(buffer)
     }
   }
 
@@ -181,6 +183,8 @@ extension SessionCtl {
   ///   警告：replacementRange 不要亂填，否則會在 Microsoft Office 等軟體內出現故障。
   ///   該功能是給某些想設計「重新組字」功能的輸入法設計的，但一字多音的漢語在注音/拼音輸入這方面不適用這個輸入法特性。
   public func doSetMarkedText(_ string: NSAttributedString, allowAsync: Bool = true) {
+    // 得複製一份，因為 NSAttributedString 不支援 Sendable 特性。
+    let newString = string.copy() as? NSAttributedString ?? .init(string: string.string)
     // 威注音用不到 replacementRange，所以不用檢查 replacementRange 的異動情況。
     let range = selectionRange()
     guard !(string.isEqual(to: recentMarkedText.text) && recentMarkedText.selectionRange == range)
@@ -188,10 +192,12 @@ extension SessionCtl {
     recentMarkedText.text = string
     recentMarkedText.selectionRange = range
     if allowAsync, isServingIMEItself || !isActivated {
-      DispatchQueue.main.async {
+      asyncOnMain {
         guard let client = self.client() else { return }
         client.setMarkedText(
-          string, selectionRange: range, replacementRange: self.replacementRange()
+          newString,
+          selectionRange: range,
+          replacementRange: self.replacementRange()
         )
       }
     } else {

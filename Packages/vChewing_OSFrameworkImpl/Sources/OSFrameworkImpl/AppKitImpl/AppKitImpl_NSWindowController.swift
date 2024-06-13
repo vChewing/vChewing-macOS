@@ -7,6 +7,7 @@
 // requirements defined in MIT License.
 
 import AppKit
+import SwiftExtension
 
 extension NSWindowController {
   public func orderFront() {
@@ -51,7 +52,7 @@ extension NSWindowController {
       window.setFrameTopLeftPoint(adjustedPoint)
     }
 
-    if !useGCD { doSet() } else { DispatchQueue.main.async { doSet() } }
+    if !useGCD { doSet() } else { asyncOnMain { doSet() } }
   }
 }
 

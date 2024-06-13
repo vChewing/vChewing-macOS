@@ -193,3 +193,37 @@ extension String {
       .compare(otherVersionComponents.joined(separator: versionDelimiter), options: .numeric) // <6>
   }
 }
+
+// MARK: - Async Task
+
+public func asyncOnMain(
+  execute work: @escaping @convention(block) () -> ()
+) {
+  if #available(macOS 10.15, *) {
+    Task.detached { @MainActor in
+      work()
+    }
+  } else {
+    DispatchQueue.main.async { work() }
+  }
+}
+
+public func asyncOnMain(
+  after delayInterval: TimeInterval,
+  execute work: @escaping @convention(block) () -> ()
+) {
+  let delayInterval = Swift.max(0, delayInterval)
+  if #available(macOS 10.15, *) {
+    Task.detached { @MainActor in
+      if delayInterval > 0 {
+        let delay = UInt64(delayInterval * 1_000_000_000)
+        try await Task<Never, Never>.sleep(nanoseconds: delay)
+      }
+      work()
+    }
+  } else {
+    DispatchQueue.main.asyncAfter(deadline: DispatchTime.now() + delayInterval) {
+      work()
+    }
+  }
+}
