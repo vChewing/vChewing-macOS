@@ -9,12 +9,11 @@
 // requirements defined in MIT License.
 
 import Foundation
-import SQLite3
 
 // MARK: - 前導工作
 
-fileprivate extension String {
-  mutating func regReplace(pattern: String, replaceWith: String = "") {
+extension String {
+  fileprivate mutating func regReplace(pattern: String, replaceWith: String = "") {
     // Ref: https://stackoverflow.com/a/40993403/4162914 && https://stackoverflow.com/a/71291137/4162914
     do {
       let regex = try NSRegularExpression(
@@ -28,18 +27,10 @@ fileprivate extension String {
   }
 }
 
-// MARK: - String as SQL Command
-
-fileprivate extension String {
-  @discardableResult func runAsSQLExec(dbPointer ptrDB: inout OpaquePointer?) -> Bool {
-    ptrDB != nil && sqlite3_exec(ptrDB, self, nil, nil, nil) == SQLITE_OK
-  }
-}
-
 // MARK: - StringView Ranges Extension (by Isaac Xen)
 
-fileprivate extension String {
-  func ranges(splitBy separator: Element) -> [Range<String.Index>] {
+extension String {
+  fileprivate func ranges(splitBy separator: Element) -> [Range<String.Index>] {
     var startIndex = startIndex
     return split(separator: separator).reduce(into: []) { ranges, substring in
       _ = range(of: substring, range: startIndex ..< endIndex).map { range in
@@ -53,8 +44,8 @@ fileprivate extension String {
 // MARK: - 引入小數點位數控制函式
 
 // Ref: https://stackoverflow.com/a/32581409/4162914
-fileprivate extension Double {
-  func rounded(toPlaces places: Int) -> Double {
+extension Double {
+  fileprivate func rounded(toPlaces places: Int) -> Double {
     let divisor = pow(10.0, Double(places))
     return (self * divisor).rounded() / divisor
   }
@@ -74,17 +65,10 @@ func ** (_ base: Double, _ exp: Double) -> Double {
   pow(base, exp)
 }
 
-// MARK: - 定義檔案結構
+// MARK: - Unigram
 
 struct Unigram: CustomStringConvertible {
-  enum UnigramCategory: String {
-    case macv = "MACV"
-    case tabe = "TABE"
-    case moe = "MOED"
-    case custom = "CUST"
-    case misc = "MISC"
-    var description: String { rawValue }
-  }
+  // MARK: Lifecycle
 
   init(key: String, value: String, score: Double, count: Int, category: Unigram.UnigramCategory) {
     self.key = key
@@ -94,13 +78,32 @@ struct Unigram: CustomStringConvertible {
     self.category = category
   }
 
+  // MARK: Internal
+
+  enum UnigramCategory: String {
+    case macv = "MACV"
+    case tabe = "TABE"
+    case moe = "MOED"
+    case custom = "CUST"
+    case misc = "MISC"
+
+    // MARK: Internal
+
+    var description: String { rawValue }
+  }
+
   var key: String = ""
   var value: String = ""
   var score: Double = -1.0
   var count: Int = 0
   var category: UnigramCategory
+
   var description: String {
     "(\(key), \(value), \(score), \(category)"
+  }
+
+  var isEmpty: Bool {
+    count == 0
   }
 }
 
@@ -108,9 +111,12 @@ struct Unigram: CustomStringConvertible {
 
 func cnvPhonabetToASCII(_ incoming: String) -> String {
   let dicPhonabet2ASCII = [
-    "ㄅ": "b", "ㄆ": "p", "ㄇ": "m", "ㄈ": "f", "ㄉ": "d", "ㄊ": "t", "ㄋ": "n", "ㄌ": "l", "ㄍ": "g", "ㄎ": "k", "ㄏ": "h",
-    "ㄐ": "j", "ㄑ": "q", "ㄒ": "x", "ㄓ": "Z", "ㄔ": "C", "ㄕ": "S", "ㄖ": "r", "ㄗ": "z", "ㄘ": "c", "ㄙ": "s", "ㄧ": "i",
-    "ㄨ": "u", "ㄩ": "v", "ㄚ": "a", "ㄛ": "o", "ㄜ": "e", "ㄝ": "E", "ㄞ": "B", "ㄟ": "P", "ㄠ": "M", "ㄡ": "F", "ㄢ": "D",
+    "ㄅ": "b", "ㄆ": "p", "ㄇ": "m", "ㄈ": "f", "ㄉ": "d", "ㄊ": "t", "ㄋ": "n", "ㄌ": "l", "ㄍ": "g",
+    "ㄎ": "k", "ㄏ": "h",
+    "ㄐ": "j", "ㄑ": "q", "ㄒ": "x", "ㄓ": "Z", "ㄔ": "C", "ㄕ": "S", "ㄖ": "r", "ㄗ": "z", "ㄘ": "c",
+    "ㄙ": "s", "ㄧ": "i",
+    "ㄨ": "u", "ㄩ": "v", "ㄚ": "a", "ㄛ": "o", "ㄜ": "e", "ㄝ": "E", "ㄞ": "B", "ㄟ": "P", "ㄠ": "M",
+    "ㄡ": "F", "ㄢ": "D",
     "ㄣ": "T", "ㄤ": "N", "ㄥ": "L", "ㄦ": "R", "ˊ": "2", "ˇ": "3", "ˋ": "4", "˙": "5",
   ]
   var strOutput = incoming
@@ -131,9 +137,11 @@ private let urlCHTRoot: String = "\(urlCurrentFolder.path)/components/cht/"
 
 private let urlKanjiCore: String = "\(urlCurrentFolder.path)/components/common/char-kanji-core.txt"
 private let urlMiscBPMF: String = "\(urlCurrentFolder.path)/components/common/char-misc-bpmf.txt"
-private let urlMiscNonKanji: String = "\(urlCurrentFolder.path)/components/common/char-misc-nonkanji.txt"
+private let urlMiscNonKanji: String =
+  "\(urlCurrentFolder.path)/components/common/char-misc-nonkanji.txt"
 
-private let urlPunctuation: String = "\(urlCurrentFolder.path)/components/common/data-punctuations.txt"
+private let urlPunctuation: String =
+  "\(urlCurrentFolder.path)/components/common/data-punctuations.txt"
 private let urlSymbols: String = "\(urlCurrentFolder.path)/components/common/data-symbols.txt"
 private let urlZhuyinwen: String = "\(urlCurrentFolder.path)/components/common/data-zhuyinwen.txt"
 private let urlCNS: String = "\(urlCurrentFolder.path)/components/common/char-kanji-cns.txt"
@@ -147,22 +155,30 @@ private let urlJSONCNS: String = "\(urlCurrentFolder.path)/data-cns.json"
 
 private let urlJSONCHS: String = "\(urlCurrentFolder.path)/data-chs.json"
 private let urlJSONCHT: String = "\(urlCurrentFolder.path)/data-cht.json"
-private let urlJSONBPMFReverseLookup: String = "\(urlCurrentFolder.path)/data-bpmf-reverse-lookup.json"
-private let urlJSONBPMFReverseLookupCNS1: String = "\(urlCurrentFolder.path)/data-bpmf-reverse-lookup-CNS1.json"
-private let urlJSONBPMFReverseLookupCNS2: String = "\(urlCurrentFolder.path)/data-bpmf-reverse-lookup-CNS2.json"
-private let urlJSONBPMFReverseLookupCNS3: String = "\(urlCurrentFolder.path)/data-bpmf-reverse-lookup-CNS3.json"
-private let urlJSONBPMFReverseLookupCNS4: String = "\(urlCurrentFolder.path)/data-bpmf-reverse-lookup-CNS4.json"
-private let urlJSONBPMFReverseLookupCNS5: String = "\(urlCurrentFolder.path)/data-bpmf-reverse-lookup-CNS5.json"
-private let urlJSONBPMFReverseLookupCNS6: String = "\(urlCurrentFolder.path)/data-bpmf-reverse-lookup-CNS6.json"
+private let urlJSONBPMFReverseLookup: String =
+  "\(urlCurrentFolder.path)/data-bpmf-reverse-lookup.json"
+private let urlJSONBPMFReverseLookupCNS1: String =
+  "\(urlCurrentFolder.path)/data-bpmf-reverse-lookup-CNS1.json"
+private let urlJSONBPMFReverseLookupCNS2: String =
+  "\(urlCurrentFolder.path)/data-bpmf-reverse-lookup-CNS2.json"
+private let urlJSONBPMFReverseLookupCNS3: String =
+  "\(urlCurrentFolder.path)/data-bpmf-reverse-lookup-CNS3.json"
+private let urlJSONBPMFReverseLookupCNS4: String =
+  "\(urlCurrentFolder.path)/data-bpmf-reverse-lookup-CNS4.json"
+private let urlJSONBPMFReverseLookupCNS5: String =
+  "\(urlCurrentFolder.path)/data-bpmf-reverse-lookup-CNS5.json"
+private let urlJSONBPMFReverseLookupCNS6: String =
+  "\(urlCurrentFolder.path)/data-bpmf-reverse-lookup-CNS6.json"
 
 private var isReverseLookupDictionaryProcessed: Bool = false
 
-private let urlSQLite: String = "\(urlCurrentFolder.path)/Build/Release/vChewingFactoryDatabase.sqlite"
+private let urlSQLite: String =
+  "\(urlCurrentFolder.path)/Build/Release/vChewingFactoryDatabase.sqlite"
+private let urlSQLScript: String =
+  "\(urlCurrentFolder.path)/Build/Release/vChewingFactoryDatabase.sql"
 
 private var mapReverseLookupForCheck: [String: [String]] = [:]
 private var exceptedChars: Set<String> = .init()
-
-private var ptrSQL: OpaquePointer?
 
 var rangeMapJSONCHS: [String: [String]] = [:]
 var rangeMapJSONCHT: [String: [String]] = [:]
@@ -174,11 +190,16 @@ var rangeMapReverseLookup: [String: [String]] = [:]
 
 // MARK: - 準備資料庫
 
-func prepareDatabase() -> Bool {
-  let sqlMakeTableMACV = """
-  DROP TABLE IF EXISTS DATA_REV;
+func dumpSQL(_ insertData: @escaping () -> String) throws {
+  let strBuilder = NSMutableString()
+  let sqlHeader = #"""
+  PRAGMA synchronous=OFF;
+  PRAGMA journal_mode=OFF;
+  PRAGMA foreign_keys=OFF;
+  BEGIN TRANSACTION;
   DROP TABLE IF EXISTS DATA_MAIN;
-  CREATE TABLE IF NOT EXISTS DATA_MAIN (
+  DROP TABLE IF EXISTS DATA_REV;
+  CREATE TABLE DATA_MAIN (
     theKey TEXT NOT NULL,
     theDataCHS TEXT,
     theDataCHT TEXT,
@@ -188,61 +209,49 @@ func prepareDatabase() -> Bool {
     theDataCHEW TEXT,
     PRIMARY KEY (theKey)
   ) WITHOUT ROWID;
-  CREATE TABLE IF NOT EXISTS DATA_REV (
+  CREATE TABLE DATA_REV (
     theChar TEXT NOT NULL,
     theReadings TEXT NOT NULL,
     PRIMARY KEY (theChar)
   ) WITHOUT ROWID;
-  """
-  guard sqlite3_open(":memory:", &ptrSQL) == SQLITE_OK else { return false }
-  guard sqlite3_exec(ptrSQL, "PRAGMA synchronous = OFF;", nil, nil, nil) == SQLITE_OK else { return false }
-  guard sqlite3_exec(ptrSQL, "PRAGMA journal_mode = OFF;", nil, nil, nil) == SQLITE_OK else { return false }
-  guard sqlMakeTableMACV.runAsSQLExec(dbPointer: &ptrSQL) else { return false }
-  guard "begin;".runAsSQLExec(dbPointer: &ptrSQL) else { return false }
-
-  return true
+  """#
+  strBuilder.append(sqlHeader)
+  strBuilder.append("\n")
+  strBuilder.append(insertData())
+  strBuilder.append("\nCOMMIT;\n")
+  try strBuilder.write(toFile: urlSQLScript, atomically: true, encoding: NSUTF8StringEncoding)
 }
 
-@discardableResult func writeMainMapToSQL(_ theMap: [String: [String]], column columnName: String) -> Bool {
+@discardableResult
+func writeMainMapToSQL(
+  _ theMap: [String: [String]],
+  column columnName: String
+)
+  -> String {
+  let script = NSMutableString()
   for (encryptedKey, arrValues) in theMap {
     // SQL 語言需要對西文 ASCII 半形單引號做回退處理、變成「''」。
     let safeKey = encryptedKey.replacingOccurrences(of: "'", with: "''")
     let valueText = arrValues.joined(separator: "\t").replacingOccurrences(of: "'", with: "''")
-    let sqlStmt = "INSERT INTO DATA_MAIN (theKey, \(columnName)) VALUES ('\(safeKey)', '\(valueText)') ON CONFLICT(theKey) DO UPDATE SET \(columnName)='\(valueText)';"
-    guard sqlStmt.runAsSQLExec(dbPointer: &ptrSQL) else {
-      print("Failed: " + sqlStmt)
-      return false
-    }
+    let sqlStmt =
+      "INSERT INTO DATA_MAIN (theKey, \(columnName)) VALUES ('\(safeKey)', '\(valueText)') ON CONFLICT(theKey) DO UPDATE SET \(columnName)='\(valueText)';"
+    script.append("\(sqlStmt)\n")
   }
-  return true
+  return script.description
 }
 
-@discardableResult func writeRevLookupMapToSQL(_ theMap: [String: [String]]) -> Bool {
+@discardableResult
+func writeRevLookupMapToSQL(_ theMap: [String: [String]]) -> String {
+  let script = NSMutableString()
   for (encryptedKey, arrValues) in theMap {
     // SQL 語言需要對西文 ASCII 半形單引號做回退處理、變成「''」。
     let safeKey = encryptedKey.replacingOccurrences(of: "'", with: "''")
     let valueText = arrValues.joined(separator: "\t").replacingOccurrences(of: "'", with: "''")
-    let sqlStmt = "INSERT INTO DATA_REV (theChar, theReadings) VALUES ('\(safeKey)', '\(valueText)') ON CONFLICT(theChar) DO UPDATE SET theReadings='\(valueText)';"
-    guard sqlStmt.runAsSQLExec(dbPointer: &ptrSQL) else {
-      print("Failed: " + sqlStmt)
-      return false
-    }
+    let sqlStmt =
+      "INSERT INTO DATA_REV (theChar, theReadings) VALUES ('\(safeKey)', '\(valueText)') ON CONFLICT(theChar) DO UPDATE SET theReadings='\(valueText)';"
+    script.append("\(sqlStmt)\n")
   }
-  return true
-}
-
-// MARK: - Dump SQLite3 Memory Database to File.
-
-@discardableResult func dumpSQLDB() -> Bool {
-  var ptrSQLTarget: OpaquePointer?
-  defer { sqlite3_close_v2(ptrSQLTarget) }
-  guard sqlite3_open(urlSQLite, &ptrSQLTarget) == SQLITE_OK else { return false }
-  let ptrBackupObj = sqlite3_backup_init(ptrSQLTarget, "main", ptrSQL, "main")
-  if ptrBackupObj != nil {
-    sqlite3_backup_step(ptrBackupObj, -1)
-    sqlite3_backup_finish(ptrBackupObj)
-  }
-  return sqlite3_errcode(ptrSQLTarget) == SQLITE_OK
+  return script.description
 }
 
 // MARK: - 載入詞組檔案且輸出陣列
@@ -273,7 +282,8 @@ func rawDictForPhrases(isCHS: Bool) -> [Unigram] {
     // 統整連續空格為一個 ASCII 空格
     strRAW.regReplace(pattern: #"( +|　+| +|\t+)+"#, replaceWith: " ")
     strRAW.regReplace(pattern: #"(^ | $)"#, replaceWith: "") // 去除行尾行首空格
-    strRAW.regReplace(pattern: #"(\f+|\r+|\n+)+"#, replaceWith: "\n") // CR & Form Feed to LF, 且去除重複行
+    strRAW
+      .regReplace(pattern: #"(\f+|\r+|\n+)+"#, replaceWith: "\n") // CR & Form Feed to LF, 且去除重複行
     strRAW.regReplace(pattern: #"^(#.*|.*#WIN32.*)$"#, replaceWith: "") // 以#開頭的行都淨空+去掉所有 WIN32 特有的行
     strRAWOrigDict[key] = strRAW
 
@@ -356,7 +366,8 @@ func rawDictForKanjis(isCHS: Bool) -> [Unigram] {
   strRAW.regReplace(pattern: #"^(#.*|.*#WIN32.*)$"#, replaceWith: "") // 以#開頭的行都淨空+去掉所有 WIN32 特有的行
   // 正式整理格式，現在就開始去重複：
   let arrData = Array(
-    NSOrderedSet(array: strRAW.components(separatedBy: "\n")).array as! [String])
+    NSOrderedSet(array: strRAW.components(separatedBy: "\n")).array as! [String]
+  )
   var varLineData = ""
   var mapReverseLookupJSON: [String: [String]] = [:]
   var mapReverseLookupUnencrypted: [String: [String]] = [:]
@@ -364,10 +375,12 @@ func rawDictForKanjis(isCHS: Bool) -> [Unigram] {
     // 簡體中文的話，提取 1,2,4；繁體中文的話，提取 1,3,4。
     let varLineDataPre = lineData.components(separatedBy: " ").prefix(isCHS ? 2 : 1)
       .joined(
-        separator: "\t")
+        separator: "\t"
+      )
     let varLineDataPost = lineData.components(separatedBy: " ").suffix(isCHS ? 1 : 2)
       .joined(
-        separator: "\t")
+        separator: "\t"
+      )
     varLineData = varLineDataPre + "\t" + varLineDataPost
     let arrLineData = varLineData.components(separatedBy: " ")
     var varLineDataProcessed = ""
@@ -414,8 +427,10 @@ func rawDictForKanjis(isCHS: Bool) -> [Unigram] {
     do {
       isReverseLookupDictionaryProcessed = true
       if compileJSON {
-        try JSONSerialization.data(withJSONObject: mapReverseLookupJSON, options: .sortedKeys).write(
-          to: URL(fileURLWithPath: urlJSONBPMFReverseLookup))
+        try JSONSerialization.data(withJSONObject: mapReverseLookupJSON, options: .sortedKeys)
+          .write(
+            to: URL(fileURLWithPath: urlJSONBPMFReverseLookup)
+          )
       }
       mapReverseLookupForCheck = mapReverseLookupUnencrypted
     } catch {
@@ -453,7 +468,8 @@ func rawDictForNonKanjis(isCHS: Bool) -> [Unigram] {
   strRAW.regReplace(pattern: #"^(#.*|.*#WIN32.*)$"#, replaceWith: "") // 以#開頭的行都淨空+去掉所有 WIN32 特有的行
   // 正式整理格式，現在就開始去重複：
   let arrData = Array(
-    NSOrderedSet(array: strRAW.components(separatedBy: "\n")).array as! [String])
+    NSOrderedSet(array: strRAW.components(separatedBy: "\n")).array as! [String]
+  )
   var varLineData = ""
   for lineData in arrData {
     varLineData = lineData
@@ -526,11 +542,13 @@ func weightAndSort(_ arrStructUncalculated: [Unigram], isCHS: Bool) -> [Unigram]
       weight = -13
     case 0: // 墊底低頻漢字與詞語
       weight = log10(
-        fscale ** (Double(unigram.value.count) / 3.0 - 1.0) * 0.25 / norm)
+        fscale ** (Double(unigram.value.count) / 3.0 - 1.0) * 0.25 / norm
+      )
     default:
       weight = log10(
         fscale ** (Double(unigram.value.count) / 3.0 - 1.0)
-          * Double(unigram.count) / norm) // Credit: MJHsieh.
+          * Double(unigram.count) / norm
+      ) // Credit: MJHsieh.
     }
     let weightRounded: Double = weight.rounded(toPlaces: 3) // 為了節省生成的檔案體積，僅保留小數點後三位。
     arrStructCalculated += [
@@ -547,7 +565,13 @@ func weightAndSort(_ arrStructUncalculated: [Unigram], isCHS: Bool) -> [Unigram]
     (lhs.key, rhs.count) < (rhs.key, lhs.count)
   })
   NSLog(" - \(i18n): 排序整理完畢，準備編譯要寫入的檔案內容。")
-  arrStructSorted.append(Unigram(key: "__NORM__", value: norm.description, score: 0, count: 0, category: .misc))
+  arrStructSorted.append(Unigram(
+    key: "__NORM__",
+    value: norm.description,
+    score: 0,
+    count: 0,
+    category: .misc
+  ))
   return arrStructSorted
 }
 
@@ -560,15 +584,19 @@ func fileOutput(isCHS: Bool) {
   var strPrintLine = ""
   // 讀取標點內容
   do {
-    strPunctuation = try String(contentsOfFile: urlPunctuation, encoding: .utf8).replacingOccurrences(
-      of: "\t", with: " "
-    )
+    strPunctuation = try String(contentsOfFile: urlPunctuation, encoding: .utf8)
+      .replacingOccurrences(
+        of: "\t",
+        with: " "
+      )
     if let charLast = strPunctuation.last, !"\n".contains(charLast) {
       strPunctuation += "\n"
     }
-    strPrintLine += try String(contentsOfFile: urlPunctuation, encoding: .utf8).replacingOccurrences(
-      of: "\t", with: " "
-    )
+    strPrintLine += try String(contentsOfFile: urlPunctuation, encoding: .utf8)
+      .replacingOccurrences(
+        of: "\t",
+        with: " "
+      )
     if let charLast = strPunctuation.last, !"\n".contains(charLast) {
       strPunctuation += "\n"
     }
@@ -618,7 +646,7 @@ func fileOutput(isCHS: Bool) {
     }
     strPrintLine += unigram.key + " " + unigram.value
     strPrintLine += " " + String(unigram.score)
-    if unigram.count != 0 {
+    if !unigram.isEmpty {
       strPrintLine += " " + String(unigram.count)
     }
     strPrintLine += "\n"
@@ -627,7 +655,8 @@ func fileOutput(isCHS: Bool) {
   do {
     try strPrintLine.write(to: pathOutput, atomically: true, encoding: .utf8)
     if compileJSON {
-      try JSONSerialization.data(withJSONObject: rangeMapJSON, options: .sortedKeys).write(to: jsonURL)
+      try JSONSerialization.data(withJSONObject: rangeMapJSON, options: .sortedKeys)
+        .write(to: jsonURL)
     }
     if isCHS {
       rangeMapJSONCHS = rangeMapJSON
@@ -662,9 +691,18 @@ func commonFileOutput() {
   var mapReverseLookupCNS6: [String: [String]] = [:]
   // 讀取標點內容
   do {
-    strSymbols = try String(contentsOfFile: urlSymbols, encoding: .utf8).replacingOccurrences(of: "\t", with: " ")
-    strZhuyinwen = try String(contentsOfFile: urlZhuyinwen, encoding: .utf8).replacingOccurrences(of: "\t", with: " ")
-    strCNS = try String(contentsOfFile: urlCNS, encoding: .utf8).replacingOccurrences(of: "\t", with: " ")
+    strSymbols = try String(contentsOfFile: urlSymbols, encoding: .utf8).replacingOccurrences(
+      of: "\t",
+      with: " "
+    )
+    strZhuyinwen = try String(contentsOfFile: urlZhuyinwen, encoding: .utf8).replacingOccurrences(
+      of: "\t",
+      with: " "
+    )
+    strCNS = try String(contentsOfFile: urlCNS, encoding: .utf8).replacingOccurrences(
+      of: "\t",
+      with: " "
+    )
   } catch {
     NSLog(" - \(i18n): Exception happened when reading raw punctuation data.")
   }
@@ -740,23 +778,32 @@ func commonFileOutput() {
   do {
     if compileJSON {
       try JSONSerialization.data(withJSONObject: mapSymbols, options: .sortedKeys).write(
-        to: URL(fileURLWithPath: urlJSONSymbols))
+        to: URL(fileURLWithPath: urlJSONSymbols)
+      )
       try JSONSerialization.data(withJSONObject: mapZhuyinwen, options: .sortedKeys).write(
-        to: URL(fileURLWithPath: urlJSONZhuyinwen))
+        to: URL(fileURLWithPath: urlJSONZhuyinwen)
+      )
       try JSONSerialization.data(withJSONObject: mapCNS, options: .sortedKeys).write(
-        to: URL(fileURLWithPath: urlJSONCNS))
+        to: URL(fileURLWithPath: urlJSONCNS)
+      )
       try JSONSerialization.data(withJSONObject: mapReverseLookupCNS1, options: .sortedKeys).write(
-        to: URL(fileURLWithPath: urlJSONBPMFReverseLookupCNS1))
+        to: URL(fileURLWithPath: urlJSONBPMFReverseLookupCNS1)
+      )
       try JSONSerialization.data(withJSONObject: mapReverseLookupCNS2, options: .sortedKeys).write(
-        to: URL(fileURLWithPath: urlJSONBPMFReverseLookupCNS2))
+        to: URL(fileURLWithPath: urlJSONBPMFReverseLookupCNS2)
+      )
       try JSONSerialization.data(withJSONObject: mapReverseLookupCNS3, options: .sortedKeys).write(
-        to: URL(fileURLWithPath: urlJSONBPMFReverseLookupCNS3))
+        to: URL(fileURLWithPath: urlJSONBPMFReverseLookupCNS3)
+      )
       try JSONSerialization.data(withJSONObject: mapReverseLookupCNS4, options: .sortedKeys).write(
-        to: URL(fileURLWithPath: urlJSONBPMFReverseLookupCNS4))
+        to: URL(fileURLWithPath: urlJSONBPMFReverseLookupCNS4)
+      )
       try JSONSerialization.data(withJSONObject: mapReverseLookupCNS5, options: .sortedKeys).write(
-        to: URL(fileURLWithPath: urlJSONBPMFReverseLookupCNS5))
+        to: URL(fileURLWithPath: urlJSONBPMFReverseLookupCNS5)
+      )
       try JSONSerialization.data(withJSONObject: mapReverseLookupCNS6, options: .sortedKeys).write(
-        to: URL(fileURLWithPath: urlJSONBPMFReverseLookupCNS6))
+        to: URL(fileURLWithPath: urlJSONBPMFReverseLookupCNS6)
+      )
     }
   } catch {
     NSLog(" - \(i18n): Error on writing strings to file: \(error)")
@@ -771,15 +818,18 @@ func healthCheck(_ data: [Unigram]) -> String {
   var result = ""
   var unigramMonoChar = [String: Unigram]()
   var valueToScore = [String: Double]()
-  let unigramMonoCharCounter = data.filter { $0.score > -14 && $0.key.split(separator: "-").count == 1 }.count
-  let unigramPolyCharCounter = data.filter { $0.score > -14 && $0.key.split(separator: "-").count > 1 }.count
+  let unigramMonoCharCounter = data
+    .filter { $0.score > -14 && $0.key.split(separator: "-").count == 1 }.count
+  let unigramPolyCharCounter = data
+    .filter { $0.score > -14 && $0.key.split(separator: "-").count > 1 }.count
 
   // 核心字詞庫的內容頻率一般大於 -10，但也得考慮某些包含假名的合成詞。
   for neta in data.filter({ $0.score > -14 }) {
     valueToScore[neta.value] = max(neta.score, valueToScore[neta.value] ?? -14)
     let theKeySliceArr = neta.key.split(separator: "-")
     guard let theKey = theKeySliceArr.first, theKeySliceArr.count == 1 else { continue }
-    if unigramMonoChar.keys.contains(String(theKey)), let theRecord = unigramMonoChar[String(theKey)] {
+    if unigramMonoChar.keys.contains(String(theKey)),
+       let theRecord = unigramMonoChar[String(theKey)] {
       if neta.score > theRecord.score { unigramMonoChar[String(theKey)] = neta }
     } else {
       unigramMonoChar[String(theKey)] = neta
@@ -805,7 +855,8 @@ func healthCheck(_ data: [Unigram]) -> String {
         if neta.value.count == 1 {
           mispronouncedKanji.append("\(neta.category)@\(neta.value)@\(neta.key)")
         } else if neta.value.count == arrNetaKeys.count {
-          mispronouncedKanji.append("\(neta.category)@\(neta.value.map(\.description)[i])@\(arrNetaKeys[i])")
+          mispronouncedKanji
+            .append("\(neta.category)@\(neta.value.map(\.description)[i])@\(arrNetaKeys[i])")
         } else {
           mispronouncedKanji.append("\(neta.category)@OTHER@\(String(x))")
         }
@@ -1058,17 +1109,22 @@ func healthCheck(_ data: [Unigram]) -> String {
   return result
 }
 
-// MARK: - 與主執行緒有關的任務 Flags
+// MARK: - TaskFlags
 
 struct TaskFlags: OptionSet {
-  public let rawValue: Int
+  // MARK: Lifecycle
+
   public init(rawValue: Int) {
     self.rawValue = rawValue
   }
 
+  // MARK: Public
+
   public static let common = TaskFlags(rawValue: 1 << 0)
   public static let chs = TaskFlags(rawValue: 1 << 1)
   public static let cht = TaskFlags(rawValue: 1 << 2)
+
+  public let rawValue: Int
 }
 
 // MARK: - 主執行緒
@@ -1088,11 +1144,6 @@ func main() {
     compileJSON = false
     compileSQLite = true
   }
-  let prepared = prepareDatabase()
-  if compileSQLite, !prepared {
-    NSLog("// SQLite 資料庫初期化失敗。")
-    exit(-1)
-  }
 
   var taskFlags: TaskFlags = [.common, .chs, .cht] {
     didSet {
@@ -1101,7 +1152,7 @@ func main() {
       if compileJSON {
         NSLog("// 全部 JSON 辭典檔案建置完畢。")
       }
-      if compileSQLite, prepared {
+      if compileSQLite {
         NSLog("// 開始整合反查資料。")
         mapReverseLookupForCheck.forEach { key, values in
           values.reversed().forEach { valueLiteral in
@@ -1112,23 +1163,26 @@ func main() {
           }
         }
         NSLog("// 反查資料整合完畢。")
-        NSLog("// 準備建置 SQL 資料庫。")
-        writeMainMapToSQL(rangeMapJSONCHS, column: "theDataCHS")
-        writeMainMapToSQL(rangeMapJSONCHT, column: "theDataCHT")
-        writeMainMapToSQL(rangeMapSymbols, column: "theDataSYMB")
-        writeMainMapToSQL(rangeMapZhuyinwen, column: "theDataCHEW")
-        writeMainMapToSQL(rangeMapCNS, column: "theDataCNS")
-        writeRevLookupMapToSQL(rangeMapReverseLookup)
-        let committed = "commit;".runAsSQLExec(dbPointer: &ptrSQL)
-        assert(committed)
-        let compressed = "VACUUM;".runAsSQLExec(dbPointer: &ptrSQL)
-        assert(compressed)
-        if !dumpSQLDB() {
+        NSLog("// 準備建置 SQL 資料庫指令腳本。")
+        var failed = false
+        do {
+          try dumpSQL {
+            writeMainMapToSQL(rangeMapJSONCHS, column: "theDataCHS")
+              + writeMainMapToSQL(rangeMapJSONCHT, column: "theDataCHT")
+              + writeMainMapToSQL(rangeMapSymbols, column: "theDataSYMB")
+              + writeMainMapToSQL(rangeMapZhuyinwen, column: "theDataCHEW")
+              + writeMainMapToSQL(rangeMapCNS, column: "theDataCNS")
+              + writeRevLookupMapToSQL(rangeMapReverseLookup)
+          }
+        } catch {
+          failed = true
+          NSLog(error.localizedDescription)
+        }
+        if failed {
           NSLog("// SQLite 辭典傾印失敗。")
         } else {
-          NSLog("// 全部 SQLite 辭典檔案建置完畢。")
+          NSLog("// 全部 SQLite 辭典指令腳本檔案建置完畢。")
         }
-        sqlite3_close_v2(ptrSQL)
       }
     }
   }

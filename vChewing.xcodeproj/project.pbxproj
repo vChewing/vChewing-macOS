@@ -759,10 +759,11 @@
 				"$(SRCROOT)/Source/Data/Build/Release/",
 				"$(SRCROOT)/Source/Data/data-chs.txt",
 				"$(SRCROOT)/Source/Data/data-cht.txt",
+				"$(SRCROOT)/Source/Data/Build/Release/vChewingFactoryDatabase.sql",
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "# Type a script or drag a script file from your workspace to insert its path.\ncd ${SRCROOT}/Source/Data/\nswift ${SRCROOT}/DataCompiler/dataCompiler.swift\n";
+			shellScript = "# Type a script or drag a script file from your workspace to insert its path.\ncd ${SRCROOT}/Source/Data/\nswift ${SRCROOT}/DataCompiler/dataCompiler.swift\nsqlite3 ${SRCROOT}/Source/Data//Build/Release/vChewingFactoryDatabase.sqlite < ${SRCROOT}/Source/Data//Build/Release/vChewingFactoryDatabase.sql\n";
 		};
 		6A225A2023679F5F00F685C6 /* ShellScript */ = {
 			isa = PBXShellScriptBuildPhase;
