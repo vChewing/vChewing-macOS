@@ -194,7 +194,13 @@ public struct TextEditorEX: NSViewRepresentable {
 
 // MARK: - AppProperty + DynamicProperty
 
-extension AppProperty: DynamicProperty {
+#if hasFeature(RetroactiveAttribute)
+  extension AppProperty: @retroactive DynamicProperty {}
+#else
+  extension AppProperty: DynamicProperty {}
+#endif
+
+extension AppProperty {
   @available(macOS 10.15, *)
   public var projectedValue: Binding<Value> {
     .init(
