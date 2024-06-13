@@ -10,11 +10,61 @@ import AppKit
 import Shared
 
 open class CtlCandidate: NSWindowController, CtlCandidateProtocol {
+  // MARK: Lifecycle
+
+  public required init(_: NSUserInterfaceLayoutOrientation = .horizontal) {
+    super.init(window: .init())
+    self.visible = false
+  }
+
+  // MARK: - 不需要在這裡仔細實作的內容。
+
+  @available(*, unavailable)
+  public required init?(coder _: NSCoder) {
+    fatalError("init(coder:) has not been implemented")
+  }
+
+  // MARK: Open
+
   open var tooltip: String = ""
   open var currentLayout: NSUserInterfaceLayoutOrientation = .horizontal
   open var locale: String = ""
   open var useLangIdentifier: Bool = false
   open var reverseLookupResult: [String] = []
+
+  open var highlightedIndex: Int = .max
+  open var candidateFont: NSFont = .systemFont(
+    ofSize: min(196, max(12, Double(UserDefaults.current.integer(forKey: "CandidateListTextSize"))))
+  )
+
+  open var delegate: CtlCandidateDelegate? {
+    didSet {
+      guard let delegate = delegate else { return }
+      if delegate.isCandidateState { reloadData() }
+    }
+  }
+
+  open var windowTopLeftPoint: NSPoint {
+    get {
+      guard let frameRect = window?.frame else { return NSPoint.zero }
+      return NSPoint(x: frameRect.minX, y: frameRect.maxY)
+    }
+    set {
+      DispatchQueue.main.async {
+        self.set(windowTopLeftPoint: newValue, bottomOutOfScreenAdjustmentHeight: 0, useGCD: true)
+      }
+    }
+  }
+
+  open var visible = false {
+    didSet {
+      NSObject.cancelPreviousPerformRequests(withTarget: self)
+      DispatchQueue.main.async { [weak self] in
+        guard let self = self else { return }
+        _ = self.visible ? self.window?.orderFront(self) : self.window?.orderOut(self)
+      }
+    }
+  }
 
   open func highlightedColor() -> NSColor {
     var result = NSColor.clear
@@ -38,73 +88,33 @@ open class CtlCandidate: NSWindowController, CtlCandidateProtocol {
     return result.blended(withFraction: colorBlendAmount, of: blendingAgainstTarget)!
   }
 
-  open var delegate: CtlCandidateDelegate? {
-    didSet {
-      guard let delegate = delegate else { return }
-      if delegate.isCandidateState { reloadData() }
-    }
-  }
-
-  open var windowTopLeftPoint: NSPoint {
-    get {
-      guard let frameRect = window?.frame else { return NSPoint.zero }
-      return NSPoint(x: frameRect.minX, y: frameRect.maxY)
-    }
-    set {
-      DispatchQueue.main.async {
-        self.set(windowTopLeftPoint: newValue, bottomOutOfScreenAdjustmentHeight: 0, useGCD: true)
-      }
-    }
-  }
-
-  open var highlightedIndex: Int = .max
-  open var visible = false {
-    didSet {
-      NSObject.cancelPreviousPerformRequests(withTarget: self)
-      DispatchQueue.main.async { [weak self] in
-        guard let self = self else { return }
-        _ = self.visible ? self.window?.orderFront(self) : self.window?.orderOut(self)
-      }
-    }
-  }
-
-  public required init(_: NSUserInterfaceLayoutOrientation = .horizontal) {
-    super.init(window: .init())
-    visible = false
-  }
-
-  // MARK: - 不需要在這裡仔細實作的內容。
-
-  @available(*, unavailable)
-  public required init?(coder _: NSCoder) {
-    fatalError("init(coder:) has not been implemented")
-  }
-
-  open var candidateFont: NSFont = NSFont.systemFont(
-    ofSize: min(196, max(12, Double(UserDefaults.current.integer(forKey: "CandidateListTextSize"))))
-  )
-
-  @discardableResult open func showNextLine() -> Bool {
+  @discardableResult
+  open func showNextLine() -> Bool {
     false
   }
 
-  @discardableResult open func showPreviousLine() -> Bool {
+  @discardableResult
+  open func showPreviousLine() -> Bool {
     false
   }
 
-  @discardableResult open func highlightNextCandidate() -> Bool {
+  @discardableResult
+  open func highlightNextCandidate() -> Bool {
     false
   }
 
-  @discardableResult open func highlightPreviousCandidate() -> Bool {
+  @discardableResult
+  open func highlightPreviousCandidate() -> Bool {
     false
   }
 
-  @discardableResult open func showNextPage() -> Bool {
+  @discardableResult
+  open func showNextPage() -> Bool {
     false
   }
 
-  @discardableResult open func showPreviousPage() -> Bool {
+  @discardableResult
+  open func showPreviousPage() -> Bool {
     false
   }
 

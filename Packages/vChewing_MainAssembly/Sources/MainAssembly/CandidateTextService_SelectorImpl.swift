@@ -11,10 +11,10 @@ import Foundation
 import Shared
 import Tekkon
 
-public extension CandidateTextService {
+extension CandidateTextService {
   // MARK: - Final Sanity Check Implementation.
 
-  static func enableFinalSanityCheck() {
+  public static func enableFinalSanityCheck() {
     finalSanityCheck = finalSanityCheckImplemented
   }
 
@@ -36,7 +36,7 @@ public extension CandidateTextService {
 
   // MARK: - Selector Methods, CandidatePairServicable, and the Coordinator.
 
-  var responseFromSelector: String? {
+  public var responseFromSelector: String? {
     switch value {
     case .url: return nil
     case let .selector(string):
@@ -45,17 +45,26 @@ public extension CandidateTextService {
     }
   }
 
-  @objcMembers class CandidatePairServicable: NSObject {
-    public var value: String
-    public var reading: [String]
+  @objcMembers
+  public class CandidatePairServicable: NSObject {
+    // MARK: Lifecycle
+
     public init(value: String, reading: [String] = []) {
       self.value = value
       self.reading = reading
     }
 
+    // MARK: Public
+
     public typealias SubPair = (key: String, value: String)
 
-    @nonobjc var smashed: [SubPair] {
+    public var value: String
+    public var reading: [String]
+
+    // MARK: Internal
+
+    @nonobjc
+    var smashed: [SubPair] {
       var pairs = [SubPair]()
       if value.count != reading.count {
         pairs.append((reading.joined(separator: " "), value))
@@ -68,8 +77,9 @@ public extension CandidateTextService {
     }
   }
 
-  @objc class Coordinator: NSObject {
-    private var result: String?
+  @objc
+  public class Coordinator: NSObject {
+    // MARK: Public
 
     public func runTask(selectorName: String, candidate param: CandidatePairServicable) -> String? {
       guard !selectorName.isEmpty, !param.value.isEmpty else { return nil }
@@ -79,9 +89,12 @@ public extension CandidateTextService {
       return result
     }
 
+    // MARK: Internal
+
     /// 生成 Unicode 統一碼碼位中繼資料。
     /// - Parameter param: 要處理的詞音配對物件。
-    @objc func copyUnicodeMetadata(_ param: CandidatePairServicable) {
+    @objc
+    func copyUnicodeMetadata(_ param: CandidatePairServicable) {
       var resultArray = [String]()
       param.value.forEach { char in
         resultArray.append("\(char) \(char.description.charDescriptions.first ?? "NULL")")
@@ -91,46 +104,57 @@ public extension CandidateTextService {
 
     /// 生成 HTML Ruby (教科書注音)。
     /// - Parameter param: 要處理的詞音配對物件。
-    @objc func copyRubyHTMLZhuyinTextbookStyle(_ param: CandidatePairServicable) {
+    @objc
+    func copyRubyHTMLZhuyinTextbookStyle(_ param: CandidatePairServicable) {
       prepareTextBookZhuyinReadings(param)
       copyRubyHTMLCommon(param)
     }
 
     /// 生成 HTML Ruby (教科書漢語拼音注音)。
     /// - Parameter param: 要處理的詞音配對物件。
-    @objc func copyRubyHTMLHanyuPinyinTextbookStyle(_ param: CandidatePairServicable) {
+    @objc
+    func copyRubyHTMLHanyuPinyinTextbookStyle(_ param: CandidatePairServicable) {
       prepareTextBookPinyinReadings(param)
       copyRubyHTMLCommon(param)
     }
 
     /// 生成內文讀音標注 (教科書注音)。
     /// - Parameter param: 要處理的詞音配對物件。
-    @objc func copyInlineZhuyinAnnotationTextbookStyle(_ param: CandidatePairServicable) {
+    @objc
+    func copyInlineZhuyinAnnotationTextbookStyle(_ param: CandidatePairServicable) {
       prepareTextBookZhuyinReadings(param)
       copyInlineAnnotationCommon(param)
     }
 
     /// 生成內文讀音標注 (教科書漢語拼音注音)。
     /// - Parameter param: 要處理的詞音配對物件。
-    @objc func copyInlineHanyuPinyinAnnotationTextbookStyle(_ param: CandidatePairServicable) {
+    @objc
+    func copyInlineHanyuPinyinAnnotationTextbookStyle(_ param: CandidatePairServicable) {
       prepareTextBookPinyinReadings(param)
       copyInlineAnnotationCommon(param)
     }
 
-    @objc func copyBraille1947(_ param: CandidatePairServicable) {
+    @objc
+    func copyBraille1947(_ param: CandidatePairServicable) {
       result = BrailleSputnik(standard: .of1947).convertToBraille(smashedPairs: param.smashed)
     }
 
-    @objc func copyBraille2018(_ param: CandidatePairServicable) {
+    @objc
+    func copyBraille2018(_ param: CandidatePairServicable) {
       result = BrailleSputnik(standard: .of2018).convertToBraille(smashedPairs: param.smashed)
     }
 
-    // MARK: Privates
+    // MARK: Private
+
+    private var result: String?
   }
 }
 
-private extension CandidateTextService.Coordinator {
-  func copyInlineAnnotationCommon(_ param: CandidateTextService.CandidatePairServicable) {
+extension CandidateTextService.Coordinator {
+  fileprivate func copyInlineAnnotationCommon(
+    _ param: CandidateTextService
+      .CandidatePairServicable
+  ) {
     var composed = ""
     param.smashed.forEach { subPair in
       let subKey = subPair.key
@@ -140,17 +164,21 @@ private extension CandidateTextService.Coordinator {
     result = composed
   }
 
-  func copyRubyHTMLCommon(_ param: CandidateTextService.CandidatePairServicable) {
+  fileprivate func copyRubyHTMLCommon(_ param: CandidateTextService.CandidatePairServicable) {
     var composed = ""
     param.smashed.forEach { subPair in
       let subKey = subPair.key
       let subValue = subPair.value
-      composed += subKey.contains("_") ? subValue : "<ruby>\(subValue)<rp>(</rp><rt>\(subKey)</rt><rp>)</rp></ruby>"
+      composed += subKey
+        .contains("_") ? subValue : "<ruby>\(subValue)<rp>(</rp><rt>\(subKey)</rt><rp>)</rp></ruby>"
     }
     result = composed
   }
 
-  func prepareTextBookZhuyinReadings(_ param: CandidateTextService.CandidatePairServicable) {
+  fileprivate func prepareTextBookZhuyinReadings(
+    _ param: CandidateTextService
+      .CandidatePairServicable
+  ) {
     let newReadings = param.reading.map { currentReading in
       if currentReading.contains("_") { return "_??" }
       return Tekkon.cnvPhonaToTextbookStyle(target: currentReading)
@@ -158,7 +186,10 @@ private extension CandidateTextService.Coordinator {
     param.reading = newReadings
   }
 
-  func prepareTextBookPinyinReadings(_ param: CandidateTextService.CandidatePairServicable) {
+  fileprivate func prepareTextBookPinyinReadings(
+    _ param: CandidateTextService
+      .CandidatePairServicable
+  ) {
     let newReadings = param.reading.map { currentReading in
       if currentReading.contains("_") { return "_??" }
       return Tekkon.cnvHanyuPinyinToTextbookStyle(

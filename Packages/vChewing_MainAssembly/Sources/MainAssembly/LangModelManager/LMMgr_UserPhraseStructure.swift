@@ -12,10 +12,12 @@ import LangModelAssembly
 import Megrez
 import Shared
 
-// MARK: - 使用者語彙類型定義
+// MARK: - LMMgr.UserPhrase
 
-public extension LMMgr {
-  struct UserPhrase: Hashable {
+extension LMMgr {
+  public struct UserPhrase: Hashable {
+    // MARK: Public
+
     public private(set) var keyArray: [String]
     public private(set) var value: String
     public private(set) var inputMode: Shared.InputMode
@@ -32,10 +34,6 @@ public extension LMMgr {
 
     public var isValid: Bool {
       !keyArray.isEmpty && keyArray.filter(\.isEmpty).isEmpty && !value.isEmpty
-    }
-
-    var isSingleCharReadingPair: Bool {
-      value.count == 1 && keyArray.count == 1 && keyArray.first?.first != "_"
     }
 
     public var description: String {
@@ -101,19 +99,27 @@ public extension LMMgr {
         let dict = try FileManager.default.attributesOfItem(atPath: theURL.path)
         if let value = dict[FileAttributeKey.size] as? UInt64 { fileSize = value }
       } catch {
-        vCLog("UserPhrase.write(toFilter: \(toFilter.description)) Error: Target file size is null.")
+        vCLog(
+          "UserPhrase.write(toFilter: \(toFilter.description)) Error: Target file size is null."
+        )
         return false
       }
       guard let fileSize = fileSize else {
-        vCLog("UserPhrase.write(toFilter: \(toFilter.description)) Error: Target file size is null.")
+        vCLog(
+          "UserPhrase.write(toFilter: \(toFilter.description)) Error: Target file size is null."
+        )
         return false
       }
       guard var dataToInsert = "\(description)\n".data(using: .utf8) else {
-        vCLog("UserPhrase.write(toFilter: \(toFilter.description)) Error: Failed from preparing insertion data.")
+        vCLog(
+          "UserPhrase.write(toFilter: \(toFilter.description)) Error: Failed from preparing insertion data."
+        )
         return false
       }
       guard let writeFile = FileHandle(forUpdatingAtPath: theURL.path) else {
-        vCLog("UserPhrase.write(toFilter: \(toFilter.description)) Error: Failed from initiating file handle.")
+        vCLog(
+          "UserPhrase.write(toFilter: \(toFilter.description)) Error: Failed from initiating file handle."
+        )
         return false
       }
       defer { writeFile.closeFile() }
@@ -133,30 +139,41 @@ public extension LMMgr {
     /// 原理：發現該當條目時，直接全部置換為 NULL（0x0）。這樣可以最小化磁碟寫入次數。
     /// （不然還得將當前位置後面的內容整個重新寫入。）
     /// - Parameter confirm: 再檢查一遍是否符合執行條件。不符合的話，就啥也不做。
-    @discardableResult public func removeFromFilter(confirm: Bool = false, forceConsolidate: Bool = false) -> Bool {
+    @discardableResult
+    public func removeFromFilter(
+      confirm: Bool = false,
+      forceConsolidate: Bool = false
+    )
+      -> Bool {
       let debugOutput = NSMutableString()
       defer {
         if debugOutput.length > 0 { vCLog(debugOutput.description) }
       }
       if confirm {
         guard isValid else {
-          debugOutput.append("removeFromFilter(): This user phrase pair is invalid. \(descriptionCells.prefix(2).joined(separator: " "))")
+          debugOutput
+            .append(
+              "removeFromFilter(): This user phrase pair is invalid. \(descriptionCells.prefix(2).joined(separator: " "))"
+            )
           return false
         }
         guard isAlreadyFiltered else {
-          debugOutput.append("removeFromFilter(): This user phrase pair is not in the filtered list.")
+          debugOutput
+            .append("removeFromFilter(): This user phrase pair is not in the filtered list.")
           return false
         }
       }
       let theURL = LMMgr.userDictDataURL(mode: inputMode, type: .theFilter)
-      if forceConsolidate, !LMAssembly.LMConsolidator.consolidate(path: theURL.path, pragma: false) { return false }
+      if forceConsolidate,
+         !LMAssembly.LMConsolidator.consolidate(path: theURL.path, pragma: false) { return false }
       // Get FileSize.
       var fileSize: UInt64?
       do {
         let dict = try FileManager.default.attributesOfItem(atPath: theURL.path)
         if let value = dict[FileAttributeKey.size] as? UInt64 { fileSize = value }
       } catch {
-        debugOutput.append("removeFromFilter(): Failed from getting the file size of the filter list file.")
+        debugOutput
+          .append("removeFromFilter(): Failed from getting the file size of the filter list file.")
         return false
       }
       guard let fileSize = fileSize else { return false }
@@ -194,17 +211,27 @@ public extension LMMgr {
       LMMgr.reloadUserFilterDirectly(mode: inputMode)
       return true
     }
+
+    // MARK: Internal
+
+    var isSingleCharReadingPair: Bool {
+      value.count == 1 && keyArray.count == 1 && keyArray.first?.first != "_"
+    }
   }
 }
 
 // MARK: - Weight Suggestions.
 
-public extension LMMgr.UserPhrase {
-  mutating func updateWeight(basedOn action: CandidateContextMenuAction) {
+extension LMMgr.UserPhrase {
+  public mutating func updateWeight(basedOn action: CandidateContextMenuAction) {
     weight = suggestNextFreq(for: action)
   }
 
-  func suggestNextFreq(for action: CandidateContextMenuAction, extreme: Bool = false) -> Double? {
+  public func suggestNextFreq(
+    for action: CandidateContextMenuAction,
+    extreme: Bool = false
+  )
+    -> Double? {
     var extremeFallbackResult: Double? {
       switch action {
       case .toBoost: return nil // 不填寫權重的話，預設權重是 0

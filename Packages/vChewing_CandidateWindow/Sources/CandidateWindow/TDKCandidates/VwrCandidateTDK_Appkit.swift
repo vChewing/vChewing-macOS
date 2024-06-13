@@ -10,13 +10,39 @@ import AppKit
 import OSFrameworkImpl
 import Shared
 
+// MARK: - VwrCandidateTDKAppKit
+
 /// 田所選字窗的 AppKit 简单版本，繪製效率不受 SwiftUI 的限制。
 /// 該版本可以使用更少的系統資源來繪製選字窗。
 
 public class VwrCandidateTDKAppKit: NSView {
+  // MARK: Lifecycle
+
+  // MARK: - Constructors.
+
+  public init(controller: CtlCandidateTDK? = nil, thePool pool: CandidatePool) {
+    self.controller = controller
+    self.thePool = pool
+    thePool.updateMetrics()
+    super.init(frame: .init(origin: .zero, size: .init(width: 114_514, height: 114_514)))
+  }
+
+  deinit {
+    theMenu?.cancelTrackingWithoutAnimation()
+  }
+
+  @available(*, unavailable)
+  required init?(coder _: NSCoder) {
+    fatalError("init(coder:) has not been implemented")
+  }
+
+  // MARK: Public
+
   public weak var controller: CtlCandidateTDK?
   public var thePool: CandidatePool
-  private var dimension: NSSize = .zero
+
+  // MARK: Internal
+
   var action: Selector?
   weak var target: AnyObject?
   var theMenu: NSMenu?
@@ -30,39 +56,25 @@ public class VwrCandidateTDKAppKit: NSView {
   var windowRadius: CGFloat { thePool.windowRadius }
   var isMatrix: Bool { thePool.isMatrix }
 
-  // MARK: - Constructors.
+  // MARK: Private
 
-  public init(controller: CtlCandidateTDK? = nil, thePool pool: CandidatePool) {
-    self.controller = controller
-    thePool = pool
-    thePool.updateMetrics()
-    super.init(frame: .init(origin: .zero, size: .init(width: 114_514, height: 114_514)))
-  }
-
-  deinit {
-    theMenu?.cancelTrackingWithoutAnimation()
-  }
-
-  @available(*, unavailable)
-  required init?(coder _: NSCoder) {
-    fatalError("init(coder:) has not been implemented")
-  }
+  private var dimension: NSSize = .zero
 }
 
 // MARK: - Interface Renderer (with shared public variables).
 
-public extension VwrCandidateTDKAppKit {
-  override var isFlipped: Bool { true }
+extension VwrCandidateTDKAppKit {
+  public override var isFlipped: Bool { true }
 
-  override var fittingSize: NSSize { thePool.metrics.fittingSize }
+  public override var fittingSize: NSSize { thePool.metrics.fittingSize }
 
-  static var candidateListBackground: NSColor {
+  public static var candidateListBackground: NSColor {
     let brightBackground = NSColor(red: 0.99, green: 0.99, blue: 0.99, alpha: 1.00)
     let darkBackground = NSColor(red: 0.13, green: 0.13, blue: 0.14, alpha: 1.00)
     return NSApplication.isDarkMode ? darkBackground : brightBackground
   }
 
-  override func draw(_: NSRect) {
+  public override func draw(_: NSRect) {
     let sizesCalculated = thePool.metrics
     // 先塗底色
     let allRect = NSRect(origin: .zero, size: sizesCalculated.fittingSize)
@@ -70,7 +82,11 @@ public extension VwrCandidateTDKAppKit {
     NSBezierPath(roundedRect: allRect, xRadius: windowRadius, yRadius: windowRadius).fill()
     // 繪製高亮行背景與高亮候選字詞背景
     lineBackground(isCurrentLine: true, isMatrix: isMatrix).setFill()
-    NSBezierPath(roundedRect: sizesCalculated.highlightedLine, xRadius: cellRadius, yRadius: cellRadius).fill()
+    NSBezierPath(
+      roundedRect: sizesCalculated.highlightedLine,
+      xRadius: cellRadius,
+      yRadius: cellRadius
+    ).fill()
     var cellHighlightedDrawn = false
     // 開始繪製候選字詞
     let allCells = thePool.candidateLines[thePool.lineRangeForCurrentPage].flatMap { $0 }
@@ -79,10 +95,15 @@ public extension VwrCandidateTDKAppKit {
         let alphaRatio = NSApplication.isDarkMode ? 0.75 : 1
         let themeColor = controller?.delegate?.clientAccentColor?.withAlphaComponent(alphaRatio)
         (themeColor ?? currentCell.themeColorCocoa).setFill()
-        NSBezierPath(roundedRect: sizesCalculated.highlightedCandidate, xRadius: cellRadius, yRadius: cellRadius).fill()
+        NSBezierPath(
+          roundedRect: sizesCalculated.highlightedCandidate,
+          xRadius: cellRadius,
+          yRadius: cellRadius
+        ).fill()
         cellHighlightedDrawn = true
       }
-      currentCell.attributedStringHeader.draw(at:
+      currentCell.attributedStringHeader.draw(
+        at:
         .init(
           x: currentCell.visualOrigin.x + 2 * padding,
           y: currentCell.visualOrigin.y + ceil(currentCell.visualDimension.height * 0.2)
@@ -103,7 +124,7 @@ public extension VwrCandidateTDKAppKit {
 
 // MARK: - Mouse Interaction Handlers.
 
-public extension VwrCandidateTDKAppKit {
+extension VwrCandidateTDKAppKit {
   private func findCell(from mouseEvent: NSEvent) -> Int? {
     var clickPoint = convert(mouseEvent.locationInWindow, to: self)
     clickPoint.y = bounds.height - clickPoint.y // 翻轉座標系
@@ -116,7 +137,7 @@ public extension VwrCandidateTDKAppKit {
     return firstValidCell.index
   }
 
-  override func mouseDown(with event: NSEvent) {
+  public override func mouseDown(with event: NSEvent) {
     guard let cellIndex = findCell(from: event) else { return }
     guard cellIndex != thePool.highlightedIndex else { return }
     thePool.highlight(at: cellIndex)
@@ -124,16 +145,16 @@ public extension VwrCandidateTDKAppKit {
     setNeedsDisplay(bounds)
   }
 
-  override func mouseDragged(with event: NSEvent) {
+  public override func mouseDragged(with event: NSEvent) {
     mouseDown(with: event)
   }
 
-  override func mouseUp(with event: NSEvent) {
+  public override func mouseUp(with event: NSEvent) {
     guard let cellIndex = findCell(from: event) else { return }
     didSelectCandidateAt(cellIndex)
   }
 
-  override func rightMouseUp(with event: NSEvent) {
+  public override func rightMouseUp(with event: NSEvent) {
     guard let cellIndex = findCell(from: event) else { return }
     clickedCell = thePool.candidateDataAll[cellIndex]
     let index = clickedCell.index
@@ -149,7 +170,7 @@ public extension VwrCandidateTDKAppKit {
 
 // MARK: - Context Menu.
 
-private extension VwrCandidateTDKAppKit {
+extension VwrCandidateTDKAppKit {
   private func prepareMenu() {
     let newMenu = NSMenu()
     newMenu.appendItems(self) {
@@ -169,36 +190,40 @@ private extension VwrCandidateTDKAppKit {
     CtlCandidateTDK.currentMenu = newMenu
   }
 
-  @objc func menuActionOfBoosting(_: Any? = nil) {
+  @objc
+  fileprivate func menuActionOfBoosting(_: Any? = nil) {
     didRightClickCandidateAt(clickedCell.index, action: .toBoost)
   }
 
-  @objc func menuActionOfNerfing(_: Any? = nil) {
+  @objc
+  fileprivate func menuActionOfNerfing(_: Any? = nil) {
     didRightClickCandidateAt(clickedCell.index, action: .toNerf)
   }
 
-  @objc func menuActionOfFiltering(_: Any? = nil) {
+  @objc
+  fileprivate func menuActionOfFiltering(_: Any? = nil) {
     didRightClickCandidateAt(clickedCell.index, action: .toFilter)
   }
 }
 
 // MARK: - Delegate Methods
 
-private extension VwrCandidateTDKAppKit {
-  func didSelectCandidateAt(_ pos: Int) {
+extension VwrCandidateTDKAppKit {
+  fileprivate func didSelectCandidateAt(_ pos: Int) {
     controller?.delegate?.candidatePairSelectionConfirmed(at: pos)
   }
 
-  func didRightClickCandidateAt(_ pos: Int, action: CandidateContextMenuAction) {
+  fileprivate func didRightClickCandidateAt(_ pos: Int, action: CandidateContextMenuAction) {
     controller?.delegate?.candidatePairRightClicked(at: pos, action: action)
   }
 }
 
 // MARK: - Extracted Internal Methods for UI Rendering.
 
-private extension VwrCandidateTDKAppKit {
+extension VwrCandidateTDKAppKit {
   private func lineBackground(isCurrentLine: Bool, isMatrix: Bool) -> NSColor {
-    (isCurrentLine && isMatrix) ? (NSApplication.isDarkMode ? .controlTextColor.withAlphaComponent(0.05) : .white) : .clear
+    (isCurrentLine && isMatrix) ?
+      (NSApplication.isDarkMode ? .controlTextColor.withAlphaComponent(0.05) : .white) : .clear
   }
 
   private var finalContainerOrientation: NSUserInterfaceLayoutOrientation {
@@ -210,6 +235,8 @@ private extension VwrCandidateTDKAppKit {
 // MARK: - Debug Module Using Swift UI.
 
 import SwiftUI
+
+// MARK: - VwrCandidateTDKAppKitForSwiftUI
 
 @available(macOS 10.15, *)
 public struct VwrCandidateTDKAppKitForSwiftUI: NSViewRepresentable {

@@ -28,7 +28,8 @@ extension InputHandler {
     let state = delegate.state
     guard state.isCandidateContainer else { return false } // 會自動判斷「isEmpty」。
     guard ctlCandidate.visible else { return false }
-    let inputText = ignoringModifiers ? (input.inputTextIgnoringModifiers ?? input.text) : input.text
+    let inputText = ignoringModifiers ? (input.inputTextIgnoringModifiers ?? input.text) : input
+      .text
     let allowMovingCompositorCursor = state.type == .ofCandidates && !prefs.useSCPCTypingMode
     let highlightedCandidate = state.candidates[ctlCandidate.highlightedIndex]
 
@@ -38,7 +39,8 @@ extension InputHandler {
       state.node.containsCandidateServices && state.type == .ofSymbolTable
     }
 
-    serviceMenu: if prefs.useShiftQuestionToCallServiceMenu, input.commonKeyModifierFlags == .shift, input.text == "?" {
+    serviceMenu: if prefs.useShiftQuestionToCallServiceMenu, input.commonKeyModifierFlags == .shift,
+                    input.text == "?" {
       if candidateTextServiceMenuRunning { break serviceMenu }
       let handled = handleServiceMenuInitiation(
         candidateText: highlightedCandidate.value,
@@ -78,7 +80,8 @@ extension InputHandler {
       let candidates = state.candidates
       let highlightedIndex = ctlCandidate.highlightedIndex
       if !(0 ..< candidates.count).contains(ctlCandidate.highlightedIndex) { break manipulator }
-      if candidates[highlightedIndex].keyArray.count < 2 || candidates[highlightedIndex].value.count < 2 {
+      if candidates[highlightedIndex].keyArray.count < 2 || candidates[highlightedIndex].value
+        .count < 2 {
         break manipulator
       }
       switch input.commonKeyModifierFlags {
@@ -105,13 +108,16 @@ extension InputHandler {
 
     let dismissingCandidateWindow =
       input.isBackSpace || input.isEsc || input.isDelete
-        || ((input.isCursorBackward || input.isCursorForward) && input.commonKeyModifierFlags == .shift)
+        ||
+        (
+          (input.isCursorBackward || input.isCursorForward) && input
+            .commonKeyModifierFlags == .shift
+        )
 
     if dismissingCandidateWindow {
       if state.type == .ofAssociates
         || prefs.useSCPCTypingMode
-        || compositor.isEmpty
-      {
+        || compositor.isEmpty {
         // 如果此時發現當前組字緩衝區為真空的情況的話，
         // 就將當前的組字緩衝區析構處理、強制重設輸入狀態。
         // 否則，一個本不該出現的真空組字緩衝區會使前後方向鍵與 BackSpace 鍵失靈。
@@ -123,7 +129,8 @@ extension InputHandler {
           return triageInput(event: input)
         }
       }
-      if state.type == .ofSymbolTable, let nodePrevious = state.node.previous, !nodePrevious.members.isEmpty {
+      if state.type == .ofSymbolTable, let nodePrevious = state.node.previous,
+         !nodePrevious.members.isEmpty {
         delegate.switchState(IMEState.ofSymbolTable(node: nodePrevious))
       }
       return true
@@ -137,12 +144,14 @@ extension InputHandler {
 
     if let keyCodeType = KeyCode(rawValue: input.keyCode) {
       switch keyCodeType {
-      case .kLineFeed, .kCarriageReturn:
-        if state.type == .ofAssociates, !(input.isShiftHold || prefs.alsoConfirmAssociatedCandidatesByEnter) {
+      case .kCarriageReturn, .kLineFeed:
+        if state.type == .ofAssociates,
+           !(input.isShiftHold || prefs.alsoConfirmAssociatedCandidatesByEnter) {
           delegate.switchState(IMEState.ofAbortion())
           return true
         }
-        var handleAssociates = !prefs.useSCPCTypingMode && prefs.associatedPhrasesEnabled // 關聯詞語功能專用。
+        var handleAssociates = !prefs.useSCPCTypingMode && prefs
+          .associatedPhrasesEnabled // 關聯詞語功能專用。
         handleAssociates = handleAssociates && compositor.cursor == compositor.length // 關聯詞語功能專用。
         confirmHighlightedCandidate()
         // 關聯詞語。
@@ -161,12 +170,16 @@ extension InputHandler {
       case .kTab:
         let updated: Bool =
           prefs.specifyShiftTabKeyBehavior
-            ? (input.isShiftHold
-              ? ctlCandidate.showPreviousLine()
-              : ctlCandidate.showNextLine())
-            : (input.isShiftHold
-              ? ctlCandidate.highlightPreviousCandidate()
-              : ctlCandidate.highlightNextCandidate())
+            ? (
+              input.isShiftHold
+                ? ctlCandidate.showPreviousLine()
+                : ctlCandidate.showNextLine()
+            )
+            : (
+              input.isShiftHold
+                ? ctlCandidate.highlightPreviousCandidate()
+                : ctlCandidate.highlightNextCandidate()
+            )
         _ = updated ? {}() : delegate.callError("9B691919")
         return true
       case .kSpace where state.type != .ofInputting:
@@ -176,12 +189,16 @@ extension InputHandler {
         }
         let updated: Bool =
           prefs.specifyShiftSpaceKeyBehavior
-            ? (input.isShiftHold
-              ? ctlCandidate.highlightNextCandidate()
-              : ctlCandidate.showNextLine())
-            : (input.isShiftHold
-              ? ctlCandidate.showNextLine()
-              : ctlCandidate.highlightNextCandidate())
+            ? (
+              input.isShiftHold
+                ? ctlCandidate.highlightNextCandidate()
+                : ctlCandidate.showNextLine()
+            )
+            : (
+              input.isShiftHold
+                ? ctlCandidate.showNextLine()
+                : ctlCandidate.highlightNextCandidate()
+            )
         _ = updated ? {}() : delegate.callError("A11C781F")
         return true
       case .kPageDown:
@@ -190,7 +207,7 @@ extension InputHandler {
       case .kPageUp:
         _ = ctlCandidate.showPreviousPage() ? {}() : delegate.callError("9569955D")
         return true
-      case .kUpArrow, .kDownArrow, .kLeftArrow, .kRightArrow:
+      case .kDownArrow, .kLeftArrow, .kRightArrow, .kUpArrow:
         switch input.commonKeyModifierFlags {
         case [.option, .shift] where allowMovingCompositorCursor && input.isCursorForward:
           if compositor.cursor < compositor.length {
@@ -230,9 +247,11 @@ extension InputHandler {
           handleArrowKey: switch (keyCodeType, ctlCandidate.currentLayout) {
           case (.kLeftArrow, .horizontal), (.kUpArrow, .vertical): // Previous Candidate
             _ = ctlCandidate.highlightPreviousCandidate()
-          case (.kRightArrow, .horizontal), (.kDownArrow, .vertical): // Next Candidate
+          case (.kDownArrow, .vertical), // Next Candidate
+               (.kRightArrow, .horizontal): // Next Candidate
             _ = ctlCandidate.highlightNextCandidate()
-          case (.kUpArrow, .horizontal), (.kLeftArrow, .vertical): // Previous Line
+          case (.kLeftArrow, .vertical), // Previous Line
+               (.kUpArrow, .horizontal): // Previous Line
             _ = ctlCandidate.showPreviousLine()
           case (.kDownArrow, .horizontal), (.kRightArrow, .vertical): // Next Line
             _ = ctlCandidate.showNextLine()
@@ -257,7 +276,8 @@ extension InputHandler {
 
     // MARK: J / K 鍵組字區的游標移動行為處理
 
-    let allowMovingCompositorCursorByJK = allowMovingCompositorCursor && prefs.useJKtoMoveCompositorCursorInCandidateState
+    let allowMovingCompositorCursorByJK = allowMovingCompositorCursor && prefs
+      .useJKtoMoveCompositorCursorInCandidateState
 
     checkMovingCompositorCursorByJK: if allowMovingCompositorCursorByJK {
       guard input.keyModifierFlags.isEmpty else { break checkMovingCompositorCursorByJK }
@@ -295,7 +315,8 @@ extension InputHandler {
       let cassetteShift = currentLM.areCassetteCandidateKeysShiftHeld
       shaltShiftHold = shaltShiftHold || cassetteShift
     }
-    let matched: String = (shaltShiftHold ? input.inputTextIgnoringModifiers ?? "" : inputText).lowercased()
+    let matched: String = (shaltShiftHold ? input.inputTextIgnoringModifiers ?? "" : inputText)
+      .lowercased()
     // 如果允許 J / K 鍵前後移動組字區游標的話，則不再將 J / K 鍵盤視為選字鍵。
     if !(prefs.useJKtoMoveCompositorCursorInCandidateState && "jk".contains(matched)) {
       checkSelectionKey: for keyPair in delegate.selectionKeys.enumerated() {
@@ -337,7 +358,8 @@ extension InputHandler {
 
       let isInputValid: Bool =
         prefs.cassetteEnabled
-          ? currentLM.isThisCassetteKeyAllowed(key: inputText) : composer.inputValidityCheck(key: input.charCode)
+          ? currentLM.isThisCassetteKeyAllowed(key: inputText) : composer
+          .inputValidityCheck(key: input.charCode)
 
       var shouldAutoSelectCandidate: Bool =
         isInputValid || currentLM.hasUnigramsFor(keyArray: [customPunctuation])
@@ -366,7 +388,7 @@ extension InputHandler {
       case (30, true), (33, false):
         _ = ctlCandidate.highlightPreviousCandidate() ? {}() : delegate.callError("8B144DCD")
         return true
-      case (42, true), (30, false):
+      case (30, false), (42, true):
         _ = ctlCandidate.highlightNextCandidate() ? {}() : delegate.callError("D2ABB507")
         return true
       default: break

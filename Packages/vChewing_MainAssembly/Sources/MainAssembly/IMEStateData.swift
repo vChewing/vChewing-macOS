@@ -11,14 +11,10 @@ import Shared
 import Tekkon
 import TooltipUI
 
-public struct IMEStateData: IMEStateDataProtocol {
-  private static var minCandidateLength: Int {
-    PrefMgr.shared.allowBoostingSingleKanjiAsUserPhrase ? 1 : 2
-  }
+// MARK: - IMEStateData
 
-  static var allowedMarkLengthRange: ClosedRange<Int> {
-    Self.minCandidateLength ... PrefMgr.shared.maxCandidateLength
-  }
+public struct IMEStateData: IMEStateDataProtocol {
+  // MARK: Public
 
   public var displayedText: String = "" {
     didSet {
@@ -32,8 +28,7 @@ public struct IMEStateData: IMEStateDataProtocol {
     /// 先做繁簡轉換
     var result = ChineseConverter.kanjiConversionIfRequired(displayedText)
     if result.utf16.count != displayedText.utf16.count
-      || result.count != displayedText.count
-    {
+      || result.count != displayedText.count {
       result = displayedText
     }
     return result
@@ -122,12 +117,24 @@ public struct IMEStateData: IMEStateDataProtocol {
   public var tooltipDuration: Double = 1.0
   public var tooltipBackupForInputting: String = ""
   public var tooltipColorState: TooltipColorState = .normal
+
+  // MARK: Internal
+
+  static var allowedMarkLengthRange: ClosedRange<Int> {
+    Self.minCandidateLength ... PrefMgr.shared.maxCandidateLength
+  }
+
+  // MARK: Private
+
+  private static var minCandidateLength: Int {
+    PrefMgr.shared.allowBoostingSingleKanjiAsUserPhrase ? 1 : 2
+  }
 }
 
 // MARK: - AttributedString 生成器
 
-public extension IMEStateData {
-  func attributedStringNormal(for session: IMKInputController) -> NSAttributedString {
+extension IMEStateData {
+  public func attributedStringNormal(for session: IMKInputController) -> NSAttributedString {
     /// 考慮到因為滑鼠點擊等其它行為導致的組字區內容遞交情況，
     /// 這裡對組字區內容也加上康熙字轉換或者 JIS 漢字轉換處理。
     let attributedString = NSMutableAttributedString(string: displayedTextConverted)
@@ -146,7 +153,7 @@ public extension IMEStateData {
     return attributedString
   }
 
-  func attributedStringMarking(for session: IMKInputController) -> NSAttributedString {
+  public func attributedStringMarking(for session: IMKInputController) -> NSAttributedString {
     /// 考慮到因為滑鼠點擊等其它行為導致的組字區內容遞交情況，
     /// 這裡對組字區內容也加上康熙字轉換或者 JIS 漢字轉換處理。
     let attributedString = NSMutableAttributedString(string: displayedTextConverted)
@@ -181,7 +188,7 @@ public extension IMEStateData {
     return attributedString
   }
 
-  func attributedStringPlaceholder(for session: IMKInputController) -> NSAttributedString {
+  public func attributedStringPlaceholder(for session: IMKInputController) -> NSAttributedString {
     let attributes: [NSAttributedString.Key: Any]
       = session.mark(forStyle: kTSMHiliteSelectedRawText, at: .zero)
       as? [NSAttributedString.Key: Any]
@@ -192,8 +199,8 @@ public extension IMEStateData {
 
 // MARK: - IMEState 工具函式
 
-public extension IMEStateData {
-  var readingThreadForDisplay: String {
+extension IMEStateData {
+  public var readingThreadForDisplay: String {
     var arrOutput = [String]()
     for neta in markedReadings {
       if neta.isEmpty { continue }
@@ -205,8 +212,7 @@ public extension IMEStateData {
         var subNeta = subNeta
         if !PrefMgr.shared.cassetteEnabled {
           if PrefMgr.shared.showHanyuPinyinInCompositionBuffer,
-             PrefMgr.shared.alwaysShowTooltipTextsHorizontally || !SessionCtl.isVerticalTyping
-          {
+             PrefMgr.shared.alwaysShowTooltipTextsHorizontally || !SessionCtl.isVerticalTyping {
             // 恢復陰平標記->注音轉拼音->轉教科書式標調
             subNeta = Tekkon.restoreToneOneInPhona(target: subNeta)
             subNeta = Tekkon.cnvPhonaToHanyuPinyin(targetJoined: subNeta)
@@ -221,13 +227,13 @@ public extension IMEStateData {
     return arrOutput.joined(separator: "\u{A0}")
   }
 
-  var userPhraseKVPair: (keyArray: [String], value: String) {
+  public var userPhraseKVPair: (keyArray: [String], value: String) {
     let key = markedReadings
     let value = displayedText.map(\.description)[markedRange].joined()
     return (key, value)
   }
 
-  mutating func updateTooltipForMarking() {
+  public mutating func updateTooltipForMarking() {
     var tooltipForMarking: String {
       let pair = userPhraseKVPair
       if markedRange.isEmpty {
@@ -275,7 +281,11 @@ public extension IMEStateData {
       if markedTargetIsCurrentlyFiltered {
         tooltipColorState = .information
         return String(
-          format: NSLocalizedString("\"%@\" selected. ENTER to unfilter this phrase.", comment: "") + "\n◆  "
+          format: NSLocalizedString(
+            "\"%@\" selected. ENTER to unfilter this phrase.",
+            comment: ""
+          ) +
+            "\n◆  "
             + readingDisplay,
           text
         )
@@ -283,7 +293,8 @@ public extension IMEStateData {
 
       tooltipColorState = .normal
       return String(
-        format: NSLocalizedString("\"%@\" selected. ENTER to add user phrase.", comment: "") + "\n◆  "
+        format: NSLocalizedString("\"%@\" selected. ENTER to add user phrase.", comment: "") +
+          "\n◆  "
           + readingDisplay,
         text
       )

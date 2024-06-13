@@ -2,13 +2,10 @@
 
 import Foundation
 
+// MARK: - LineReader
+
 public class LineReader {
-  let encoding: String.Encoding
-  let chunkSize: Int
-  var fileHandle: FileHandle
-  let delimData: Data
-  var buffer: Data
-  var atEof: Bool
+  // MARK: Lifecycle
 
   public init(
     file: FileHandle, encoding: String.Encoding = .utf8,
@@ -18,10 +15,12 @@ public class LineReader {
     self.encoding = encoding
     self.chunkSize = chunkSize
     self.fileHandle = fileHandle
-    delimData = "\n".data(using: encoding)!
-    buffer = Data(capacity: chunkSize)
-    atEof = false
+    self.delimData = "\n".data(using: encoding)!
+    self.buffer = Data(capacity: chunkSize)
+    self.atEof = false
   }
+
+  // MARK: Public
 
   /// Return next line, or nil on EOF.
   public func nextLine() -> String? {
@@ -63,7 +62,18 @@ public class LineReader {
     buffer.count = 0
     atEof = false
   }
+
+  // MARK: Internal
+
+  let encoding: String.Encoding
+  let chunkSize: Int
+  var fileHandle: FileHandle
+  let delimData: Data
+  var buffer: Data
+  var atEof: Bool
 }
+
+// MARK: Sequence
 
 extension LineReader: Sequence {
   public func makeIterator() -> AnyIterator<String> {

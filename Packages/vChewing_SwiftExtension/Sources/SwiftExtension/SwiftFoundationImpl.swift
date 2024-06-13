@@ -10,17 +10,17 @@ import Foundation
 
 // MARK: - String.localized extension
 
-public extension StringLiteralType {
-  var localized: String { NSLocalizedString(description, comment: "") }
+extension StringLiteralType {
+  public var localized: String { NSLocalizedString(description, comment: "") }
 }
 
 // MARK: - Root Extensions (classDeduplicated)
 
 // Extend the RangeReplaceableCollection to allow it clean duplicated characters.
 // Ref: https://stackoverflow.com/questions/25738817/
-public extension RangeReplaceableCollection where Element: Hashable {
+extension RangeReplaceableCollection where Element: Hashable {
   /// 使用 NSOrderedSet 處理 class 陣列的「去重複化」。
-  var classDeduplicated: Self {
+  public var classDeduplicated: Self {
     NSOrderedSet(array: Array(self)).compactMap { $0 as? Element.Type } as? Self ?? self
     // 下述方法有 Bug 會在處理 KeyValuePaired 的時候崩掉，暫時停用。
     // var set = Set<Element>()
@@ -30,13 +30,13 @@ public extension RangeReplaceableCollection where Element: Hashable {
 
 // MARK: - String Tildes Expansion Extension
 
-public extension String {
-  var expandingTildeInPath: String {
+extension String {
+  public var expandingTildeInPath: String {
     (self as NSString).expandingTildeInPath
   }
 }
 
-// MARK: - String Localized Error Extension
+// MARK: - String + LocalizedError
 
 extension String: LocalizedError {
   public var errorDescription: String? {
@@ -47,8 +47,8 @@ extension String: LocalizedError {
 // MARK: - CharCode printability check for UniChar (CoreFoundation)
 
 // Ref: https://forums.swift.org/t/57085/5
-public extension UniChar {
-  var isPrintable: Bool {
+extension UniChar {
+  public var isPrintable: Bool {
     guard Unicode.Scalar(UInt32(self)) != nil else {
       struct NotAWholeScalar: Error {}
       return false
@@ -56,33 +56,32 @@ public extension UniChar {
     return true
   }
 
-  var isPrintableASCII: Bool {
+  public var isPrintableASCII: Bool {
     (32 ... 126).contains(self)
   }
 }
 
 // MARK: - User Defaults Storage
 
-public extension UserDefaults {
+extension UserDefaults {
   // 內部標記，看輸入法是否處於測試模式。
-  static var pendingUnitTests = false
+  public static var pendingUnitTests = false
 
-  static var unitTests = UserDefaults(suiteName: "UnitTests")
+  public static var unitTests = UserDefaults(suiteName: "UnitTests")
 
-  static var current: UserDefaults {
+  public static var current: UserDefaults {
     pendingUnitTests ? .unitTests ?? .standard : .standard
   }
 }
 
-// MARK: - Property Wrapper
+// MARK: - AppProperty
 
 // Ref: https://www.avanderlee.com/swift/property-wrappers/
 
 @propertyWrapper
 public struct AppProperty<Value> {
-  public let key: String
-  public let defaultValue: Value
-  public var container: UserDefaults { .current }
+  // MARK: Lifecycle
+
   public init(key: String, defaultValue: Value) {
     self.key = key
     self.defaultValue = defaultValue
@@ -91,6 +90,12 @@ public struct AppProperty<Value> {
     }
   }
 
+  // MARK: Public
+
+  public let key: String
+  public let defaultValue: Value
+
+  public var container: UserDefaults { .current }
   public var wrappedValue: Value {
     get {
       container.object(forKey: key) as? Value ?? defaultValue
@@ -104,8 +109,8 @@ public struct AppProperty<Value> {
 // MARK: - String RegReplace Extension
 
 // Ref: https://stackoverflow.com/a/40993403/4162914 && https://stackoverflow.com/a/71291137/4162914
-public extension String {
-  mutating func regReplace(pattern: String, replaceWith: String = "") {
+extension String {
+  public mutating func regReplace(pattern: String, replaceWith: String = "") {
     do {
       let regex = try NSRegularExpression(
         pattern: pattern, options: [.caseInsensitive, .anchorsMatchLines]
@@ -120,8 +125,8 @@ public extension String {
 
 // MARK: - Localized String Extension for Integers and Floats
 
-public extension BinaryFloatingPoint {
-  func i18n(loc: String) -> String {
+extension BinaryFloatingPoint {
+  public func i18n(loc: String) -> String {
     let formatter = NumberFormatter()
     formatter.locale = Locale(identifier: loc)
     formatter.numberStyle = .spellOut
@@ -129,8 +134,8 @@ public extension BinaryFloatingPoint {
   }
 }
 
-public extension BinaryInteger {
-  func i18n(loc: String) -> String {
+extension BinaryInteger {
+  public func i18n(loc: String) -> String {
     let formatter = NumberFormatter()
     formatter.locale = Locale(identifier: loc)
     formatter.numberStyle = .spellOut
@@ -143,8 +148,8 @@ public extension BinaryInteger {
 // Original author: Shiki Suen
 // Refactored by: Isaac Xen
 
-public extension String {
-  func parsedAsHexLiteral(encoding: CFStringEncodings? = nil) -> String? {
+extension String {
+  public func parsedAsHexLiteral(encoding: CFStringEncodings? = nil) -> String? {
     guard !isEmpty else { return nil }
     var charBytes = [Int8]()
     var buffer: Int?
@@ -165,9 +170,9 @@ public extension String {
 
 // MARK: - Version Comparer.
 
-public extension String {
+extension String {
   /// ref: https://sarunw.com/posts/how-to-compare-two-app-version-strings-in-swift/
-  func versionCompare(_ otherVersion: String) -> ComparisonResult {
+  public func versionCompare(_ otherVersion: String) -> ComparisonResult {
     let versionDelimiter = "."
 
     var versionComponents = components(separatedBy: versionDelimiter) // <1>

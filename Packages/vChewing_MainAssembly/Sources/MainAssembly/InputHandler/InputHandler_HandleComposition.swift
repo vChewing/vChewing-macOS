@@ -35,11 +35,11 @@ extension InputHandler {
 
 // MARK: - 注音按鍵輸入處理 (Handle BPMF Keys)
 
-private extension InputHandler {
+extension InputHandler {
   /// 用來處理 InputHandler.HandleInput() 當中的與注音输入有關的組字行為。
   /// - Parameter input: 輸入訊號。
   /// - Returns: 告知 IMK「該按鍵是否已經被輸入法攔截處理」。
-  func handlePhonabetComposition(input: InputSignalProtocol) -> Bool? {
+  fileprivate func handlePhonabetComposition(input: InputSignalProtocol) -> Bool? {
     guard let delegate = delegate else { return nil }
     var inputText = (input.inputTextIgnoringModifiers ?? input.text)
     inputText = inputText.lowercased().applyingTransformFW2HW(reverse: false)
@@ -56,9 +56,14 @@ private extension InputHandler {
         || input.isControlHold || input.isOptionHold || input.isShiftHold || input.isCommandHold
     let confirmCombination = input.isSpace || input.isEnter
 
-    func narrateTheComposer(with maybeKey: String? = nil, when condition: Bool, allowDuplicates: Bool = true) {
+    func narrateTheComposer(
+      with maybeKey: String? = nil,
+      when condition: Bool,
+      allowDuplicates: Bool = true
+    ) {
       guard condition else { return }
-      let maybeKey = maybeKey ?? composer.phonabetKeyForQuery(pronounceableOnly: prefs.acceptLeadingIntonations)
+      let maybeKey = maybeKey ?? composer
+        .phonabetKeyForQuery(pronounceableOnly: prefs.acceptLeadingIntonations)
       guard var keyToNarrate = maybeKey else { return }
       if composer.intonation == Tekkon.Phonabet(" ") { keyToNarrate.append("ˉ") }
       SpeechSputnik.shared.narrate(keyToNarrate, allowDuplicates: allowDuplicates)
@@ -67,10 +72,12 @@ private extension InputHandler {
     // 這裡 inputValidityCheck() 是讓注拼槽檢查 charCode 這個 UniChar 是否是合法的注音輸入。
     // 如果是的話，就將這次傳入的這個按鍵訊號塞入注拼槽內且標記為「keyConsumedByReading」。
     // 函式 composer.receiveKey() 可以既接收 String 又接收 UniChar。
-    if (!skipPhoneticHandling && composer.inputValidityCheck(charStr: inputText)) || confirmCombination {
+    if (!skipPhoneticHandling && composer.inputValidityCheck(charStr: inputText)) ||
+      confirmCombination {
       // 引入 macOS 內建注音輸入法的行為，允許用除了陰平以外的聲調鍵覆寫前一個漢字的讀音。
       // 但如果要覆寫的內容會導致游標身後的字音沒有對應的辭典記錄的話，那就只蜂鳴警告一下。
-      proc: if [0, 1].contains(prefs.specifyIntonationKeyBehavior), composer.isEmpty, !input.isSpace {
+      proc: if [0, 1].contains(prefs.specifyIntonationKeyBehavior), composer.isEmpty,
+               !input.isSpace {
         // prevReading 的內容分別是：「完整讀音」「去掉聲調的讀音」「是否有聲調」。
         guard let prevReading = previousParsableReading, isIntonationKey(input) else { break proc }
         var theComposer = composer
@@ -78,7 +85,8 @@ private extension InputHandler {
         // 發現要覆寫的聲調與覆寫對象的聲調雷同的情況的話，直接跳過處理。
         let oldIntonation: Tekkon.Phonabet = theComposer.intonation
         theComposer.receiveKey(fromString: inputText)
-        if theComposer.intonation == oldIntonation, prefs.specifyIntonationKeyBehavior == 1 { break proc }
+        if theComposer.intonation == oldIntonation,
+           prefs.specifyIntonationKeyBehavior == 1 { break proc }
         theComposer.intonation.clear()
         // 檢查新的漢字字音是否在庫。
         let temporaryReadingKey = theComposer.getComposition()
@@ -97,7 +105,10 @@ private extension InputHandler {
       // 鐵恨引擎並不具備對 Enter (CR / LF) 鍵的具體判斷能力，所以在這裡單獨處理。
       composer.receiveKey(fromString: confirmCombination ? " " : inputText)
       keyConsumedByReading = true
-      narrateTheComposer(when: !overrideHappened && prefs.readingNarrationCoverage >= 2, allowDuplicates: false)
+      narrateTheComposer(
+        when: !overrideHappened && prefs.readingNarrationCoverage >= 2,
+        allowDuplicates: false
+      )
 
       // 沒有調號的話，只需要 setInlineDisplayWithCursor() 且終止處理（return true）即可。
       // 有調號的話，則不需要這樣，而是轉而繼續在此之後的處理。
@@ -114,8 +125,7 @@ private extension InputHandler {
     composeReading = composeReading || (!composer.isEmpty && confirmCombination)
     ifComposeReading: if composeReading {
       if input.isControlHold, input.isCommandHold, input.isEnter,
-         !input.isOptionHold, !input.isShiftHold, compositor.isEmpty
-      {
+         !input.isOptionHold, !input.isShiftHold, compositor.isEmpty {
         return handleEnter(input: input, readingOnly: true)
       }
       // 拿取用來進行索引檢索用的注音。這裡先不急著處理「僅有注音符號輸入」的情況。
@@ -186,7 +196,10 @@ private extension InputHandler {
           delegate.switchState(IMEState.ofCommitting(textToCommit: text))
 
           if prefs.associatedPhrasesEnabled {
-            let associatedCandidates = generateArrayOfAssociates(withPairs: [.init(keyArray: reading, value: text)])
+            let associatedCandidates = generateArrayOfAssociates(withPairs: [.init(
+              keyArray: reading,
+              value: text
+            )])
             delegate.switchState(
               associatedCandidates.isEmpty
                 ? IMEState.ofEmpty()
@@ -207,8 +220,7 @@ private extension InputHandler {
       if composer.phonabetKeyForQuery(pronounceableOnly: false) == nil {
         // 將被空格鍵覆蓋掉的既有聲調塞入組字器。
         if !composer.isPinyinMode, input.isSpace,
-           compositor.insertKey(existedIntonation.value)
-        {
+           compositor.insertKey(existedIntonation.value) {
           walk()
           var theInputting = generateStateOfInputting()
           theInputting.textToCommit = commitOverflownComposition
@@ -233,11 +245,11 @@ private extension InputHandler {
 
 // MARK: - 磁帶模式的組字支援。
 
-private extension InputHandler {
+extension InputHandler {
   /// 用來處理 InputHandler.HandleInput() 當中的與磁帶模組有關的組字行為。（前置處理）
   /// - Parameter input: 輸入訊號。
   /// - Returns: 告知 IMK「該按鍵是否已經被輸入法攔截處理」。
-  func handleCassetteComposition(input: InputSignalProtocol) -> Bool? {
+  fileprivate func handleCassetteComposition(input: InputSignalProtocol) -> Bool? {
     guard let delegate = delegate else { return nil }
     let state = delegate.state
 
@@ -251,10 +263,12 @@ private extension InputHandler {
       return true
     } else if hasQuickCandidates, input.text != currentLM.cassetteWildcardKey {
       // 處理 `%quick` 選字行為（當且僅當與 `%symboldef` 衝突的情況下）。
-      guard !(handleQuickCandidate && handleCandidate(input: input, ignoringModifiers: true)) else { return true }
+      guard !(handleQuickCandidate && handleCandidate(input: input, ignoringModifiers: true))
+      else { return true }
     } else {
       // 處理 `%quick` 選字行為。
-      guard !(hasQuickCandidates && handleQuickCandidate && handleCandidate(input: input)) else { return true }
+      guard !(hasQuickCandidates && handleQuickCandidate && handleCandidate(input: input))
+      else { return true }
     }
 
     // 正式處理。
@@ -268,7 +282,8 @@ private extension InputHandler {
     var confirmCombination = input.isSpace
 
     var isLongestPossibleKeyFormed: Bool {
-      guard !isWildcardKeyInput, prefs.autoCompositeWithLongestPossibleCassetteKey else { return false }
+      guard !isWildcardKeyInput,
+            prefs.autoCompositeWithLongestPossibleCassetteKey else { return false }
       return !currentLM.hasCassetteWildcardResultsFor(key: calligrapher) && !calligrapher.isEmpty
     }
 
@@ -276,18 +291,24 @@ private extension InputHandler {
       calligrapher.count >= currentLM.maxCassetteKeyLength || isLongestPossibleKeyFormed
     }
 
-  prehandling: if !skipStrokeHandling && currentLM.isThisCassetteKeyAllowed(key: inputText) {
+    prehandling: if !skipStrokeHandling && currentLM.isThisCassetteKeyAllowed(key: inputText) {
       if calligrapher.isEmpty, isWildcardKeyInput {
         delegate.callError("3606B9C0")
         if input.beganWithLetter {
           var newEmptyState = compositor.isEmpty ? IMEState.ofEmpty() : generateStateOfInputting()
-          newEmptyState.tooltip = NSLocalizedString("Wildcard key cannot be the initial key.", comment: "")
+          newEmptyState.tooltip = NSLocalizedString(
+            "Wildcard key cannot be the initial key.",
+            comment: ""
+          )
           newEmptyState.data.tooltipColorState = .redAlert
           newEmptyState.tooltipDuration = 1.0
           delegate.switchState(newEmptyState)
           return true
         }
-        delegate.callNotification(NSLocalizedString("Wildcard key cannot be the initial key.", comment: ""))
+        delegate.callNotification(NSLocalizedString(
+          "Wildcard key cannot be the initial key.",
+          comment: ""
+        ))
         return nil
       }
       if isStrokesFull {
@@ -302,7 +323,8 @@ private extension InputHandler {
 
       if !isStrokesFull {
         var result = generateStateOfInputting()
-        if !calligrapher.isEmpty, let fetched = currentLM.cassetteQuickSetsFor(key: calligrapher)?.split(separator: "\t") {
+        if !calligrapher.isEmpty,
+           let fetched = currentLM.cassetteQuickSetsFor(key: calligrapher)?.split(separator: "\t") {
           result.candidates = fetched.enumerated().map {
             (keyArray: [($0.offset + 1).description], value: $0.element.description)
           }
@@ -327,8 +349,7 @@ private extension InputHandler {
       // 警告：calligrapher 不能為空，否則組字引擎會炸。
       guard !calligrapher.isEmpty else { break ifCombineStrokes }
       if input.isControlHold, input.isCommandHold, input.isEnter,
-         !input.isOptionHold, !input.isShiftHold, composer.isEmpty
-      {
+         !input.isOptionHold, !input.isShiftHold, composer.isEmpty {
         return handleEnter(input: input, readingOnly: true)
       }
       // 向語言模型詢問是否有對應的記錄。
@@ -382,7 +403,10 @@ private extension InputHandler {
           delegate.switchState(IMEState.ofCommitting(textToCommit: text))
 
           if prefs.associatedPhrasesEnabled {
-            let associatedCandidates = generateArrayOfAssociates(withPairs: [.init(keyArray: reading, value: text)])
+            let associatedCandidates = generateArrayOfAssociates(withPairs: [.init(
+              keyArray: reading,
+              value: text
+            )])
             delegate.switchState(
               associatedCandidates.isEmpty
                 ? IMEState.ofEmpty()
@@ -401,11 +425,11 @@ private extension InputHandler {
 
 // MARK: - 內碼區位輸入處理 (Handle Code Point Input)
 
-private extension InputHandler {
+extension InputHandler {
   /// 用來處理 InputHandler.HandleInput() 當中的與內碼區位輸入有關的組字行為。
   /// - Parameter input: 輸入訊號。
   /// - Returns: 告知 IMK「該按鍵是否已經被輸入法攔截處理」。
-  func handleCodePointComposition(input: InputSignalProtocol) -> Bool? {
+  fileprivate func handleCodePointComposition(input: InputSignalProtocol) -> Bool? {
     guard !input.isReservedKey else { return nil }
     guard let delegate = delegate, input.text.count == 1 else { return nil }
     guard !input.text.compactMap(\.hexDigitValue).isEmpty else {
@@ -418,13 +442,14 @@ private extension InputHandler {
         strCodePointBuffer.append(input.text)
         var updatedState = generateStateOfInputting(guarded: true)
         updatedState.tooltipDuration = 0
-        updatedState.tooltip = TypingMethod.codePoint.getTooltip(vertical: delegate.isVerticalTyping)
+        updatedState.tooltip = TypingMethod.codePoint
+          .getTooltip(vertical: delegate.isVerticalTyping)
         delegate.switchState(updatedState)
         return true
       }
-      guard
-        var char = "\(strCodePointBuffer)\(input.text)"
-        .parsedAsHexLiteral(encoding: IMEApp.currentInputMode.nonUTFEncoding)?.first?.description
+      guard var char = "\(strCodePointBuffer)\(input.text)"
+        .parsedAsHexLiteral(encoding: IMEApp.currentInputMode.nonUTFEncoding)?.first?
+        .description
       else {
         delegate.callError("D220B880：輸入的字碼沒有對應的字元。")
         var updatedState = IMEState.ofAbortion()
@@ -453,19 +478,18 @@ private extension InputHandler {
 
 // MARK: - 處理漢音鍵盤符號輸入狀態（Handle Hanin Keyboard Symbol Inputs）
 
-private extension InputHandler {
+extension InputHandler {
   /// 處理漢音鍵盤符號輸入。
   /// - Parameters:
   ///   - input: 輸入按鍵訊號。
   /// - Returns: 將按鍵行為「是否有處理掉」藉由 SessionCtl 回報給 IMK。
-  func handleHaninKeyboardSymbolModeInput(input: InputSignalProtocol) -> Bool {
+  fileprivate func handleHaninKeyboardSymbolModeInput(input: InputSignalProtocol) -> Bool {
     guard let delegate = delegate, delegate.state.type != .ofDeactivated else { return false }
     let charText = input.text.lowercased().applyingTransformFW2HW(reverse: false)
     guard CandidateNode.mapHaninKeyboardSymbols.keys.contains(charText) else {
       return revolveTypingMethod(to: .vChewingFactory)
     }
-    guard
-      charText.count == 1, let symbols = CandidateNode.queryHaninKeyboardSymbols(char: charText)
+    guard charText.count == 1, let symbols = CandidateNode.queryHaninKeyboardSymbols(char: charText)
     else {
       delegate.callError("C1A760C7")
       return true
@@ -474,7 +498,8 @@ private extension InputHandler {
     let textToCommit = generateStateOfInputting(sansReading: true).displayedText
     delegate.switchState(IMEState.ofCommitting(textToCommit: textToCommit))
     if symbols.members.count == 1 {
-      delegate.switchState(IMEState.ofCommitting(textToCommit: symbols.members.map(\.name).joined()))
+      delegate
+        .switchState(IMEState.ofCommitting(textToCommit: symbols.members.map(\.name).joined()))
     } else {
       delegate.switchState(IMEState.ofSymbolTable(node: symbols))
     }

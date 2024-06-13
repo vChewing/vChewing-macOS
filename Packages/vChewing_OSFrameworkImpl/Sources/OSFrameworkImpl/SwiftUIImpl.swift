@@ -14,8 +14,8 @@ import SwiftUI
 // Ref: https://mjeld.com/swiftui-macos-10-15-toggle-onchange/
 
 @available(macOS 10.15, *)
-public extension Binding {
-  func didChange(_ action: @escaping () -> Void) -> Binding {
+extension Binding {
+  public func didChange(_ action: @escaping () -> ()) -> Binding {
     Binding(
       get: {
         wrappedValue
@@ -28,7 +28,7 @@ public extension Binding {
   }
 }
 
-// MARK: - Add ".tooltip" support.
+// MARK: - Tooltip
 
 // Ref: https://stackoverflow.com/a/63217861
 
@@ -47,24 +47,29 @@ struct Tooltip: NSViewRepresentable {
 }
 
 @available(macOS 10.15, *)
-public extension View {
-  func help(_ tooltip: String) -> some View {
+extension View {
+  public func help(_ tooltip: String) -> some View {
     overlay(Tooltip(tooltip: tooltip))
   }
 }
 
-// MARK: - Windows Aero in Swift UI
+// MARK: - VisualEffectView
 
 // Ref: https://stackoverflow.com/questions/62461957
 
 @available(macOS 10.15, *)
 public struct VisualEffectView: NSViewRepresentable {
-  let material: NSVisualEffectView.Material
-  let blendingMode: NSVisualEffectView.BlendingMode
-  public init(material: NSVisualEffectView.Material, blendingMode: NSVisualEffectView.BlendingMode) {
+  // MARK: Lifecycle
+
+  public init(
+    material: NSVisualEffectView.Material,
+    blendingMode: NSVisualEffectView.BlendingMode
+  ) {
     self.material = material
     self.blendingMode = blendingMode
   }
+
+  // MARK: Public
 
   public func makeNSView(context _: Context) -> NSVisualEffectView {
     let visualEffectView = NSVisualEffectView()
@@ -78,19 +83,93 @@ public struct VisualEffectView: NSViewRepresentable {
     visualEffectView.material = material
     visualEffectView.blendingMode = blendingMode
   }
+
+  // MARK: Internal
+
+  let material: NSVisualEffectView.Material
+  let blendingMode: NSVisualEffectView.BlendingMode
 }
 
-// MARK: - TextEditor for macOS 10.15 Catalina
+// MARK: - TextEditorEX
 
 // Ref: https://stackoverflow.com/a/63761738/4162914
 
 @available(macOS 10.15, *)
 /// A much faster alternative than Apple official TextEditor.
 public struct TextEditorEX: NSViewRepresentable {
-  @Binding var text: String
+  // MARK: Lifecycle
 
   public init(text: Binding<String>) {
     _text = text
+  }
+
+  // MARK: Public
+
+  public class Coordinator: NSObject, NSTextViewDelegate {
+    // MARK: Lifecycle
+
+    public init(text: Binding<String>) {
+      self.text = text
+    }
+
+    // MARK: Public
+
+    public var text: Binding<String>
+
+    public func textView(
+      _ textView: NSTextView,
+      shouldChangeTextIn range: NSRange,
+      replacementString text: String?
+    )
+      -> Bool {
+      defer {
+        self.text.wrappedValue = (textView.string as NSString).replacingCharacters(
+          in: range,
+          with: text!
+        )
+      }
+      return true
+    }
+
+    public func createTextViewStack() -> NSScrollView {
+      let contentSize = scrollview.contentSize
+
+      if let n = textView.textContainer {
+        n.containerSize = CGSize(width: contentSize.width, height: CGFloat.greatestFiniteMagnitude)
+        n.widthTracksTextView = true
+      }
+
+      textView.minSize = CGSize(width: 0, height: 0)
+      textView.maxSize = CGSize(
+        width: CGFloat.greatestFiniteMagnitude,
+        height: CGFloat.greatestFiniteMagnitude
+      )
+      textView.isVerticallyResizable = true
+      textView.frame = CGRect(x: 0, y: 0, width: contentSize.width, height: contentSize.height)
+      textView.autoresizingMask = [.width]
+      textView.isRichText = false
+      textView.delegate = self
+
+      scrollview.borderType = .noBorder
+      scrollview.hasVerticalScroller = true
+      scrollview.hasHorizontalScroller = true
+      scrollview.documentView = textView
+      scrollview.scrollerStyle = .legacy
+      scrollview.autohidesScrollers = true
+
+      return scrollview
+    }
+
+    // MARK: Fileprivate
+
+    fileprivate lazy var textView: NSTextView = {
+      let result = NSTextView(frame: CGRect())
+      result.font = NSFont.systemFont(ofSize: 13, weight: .regular)
+      result.allowsUndo = true
+      return result
+    }()
+
+    fileprivate lazy var scrollview = NSScrollView()
   }
 
   public func makeNSView(context: Context) -> NSScrollView {
@@ -107,60 +186,13 @@ public struct TextEditorEX: NSViewRepresentable {
     Coordinator(text: $text)
   }
 
-  public class Coordinator: NSObject, NSTextViewDelegate {
-    public var text: Binding<String>
+  // MARK: Internal
 
-    public init(text: Binding<String>) {
-      self.text = text
-    }
-
-    public func textView(_ textView: NSTextView, shouldChangeTextIn range: NSRange, replacementString text: String?)
-      -> Bool
-    {
-      defer {
-        self.text.wrappedValue = (textView.string as NSString).replacingCharacters(in: range, with: text!)
-      }
-      return true
-    }
-
-    fileprivate lazy var textView: NSTextView = {
-      let result = NSTextView(frame: CGRect())
-      result.font = NSFont.systemFont(ofSize: 13, weight: .regular)
-      result.allowsUndo = true
-      return result
-    }()
-
-    fileprivate lazy var scrollview = NSScrollView()
-
-    public func createTextViewStack() -> NSScrollView {
-      let contentSize = scrollview.contentSize
-
-      if let n = textView.textContainer {
-        n.containerSize = CGSize(width: contentSize.width, height: CGFloat.greatestFiniteMagnitude)
-        n.widthTracksTextView = true
-      }
-
-      textView.minSize = CGSize(width: 0, height: 0)
-      textView.maxSize = CGSize(width: CGFloat.greatestFiniteMagnitude, height: CGFloat.greatestFiniteMagnitude)
-      textView.isVerticallyResizable = true
-      textView.frame = CGRect(x: 0, y: 0, width: contentSize.width, height: contentSize.height)
-      textView.autoresizingMask = [.width]
-      textView.isRichText = false
-      textView.delegate = self
-
-      scrollview.borderType = .noBorder
-      scrollview.hasVerticalScroller = true
-      scrollview.hasHorizontalScroller = true
-      scrollview.documentView = textView
-      scrollview.scrollerStyle = .legacy
-      scrollview.autohidesScrollers = true
-
-      return scrollview
-    }
-  }
+  @Binding
+  var text: String
 }
 
-// MARK: - Property Wrapper (Bindable Extension)
+// MARK: - AppProperty + DynamicProperty
 
 extension AppProperty: DynamicProperty {
   @available(macOS 10.15, *)
@@ -176,15 +208,17 @@ extension AppProperty: DynamicProperty {
   }
 }
 
-// MARK: - Porting NSTextField (Label) to SwiftUI.
+// MARK: - AttributedLabel
 
 @available(macOS 10.15, *)
 public struct AttributedLabel: NSViewRepresentable {
-  private let text: NSAttributedString
+  // MARK: Lifecycle
 
   public init(attributedString: NSAttributedString) {
-    text = attributedString
+    self.text = attributedString
   }
+
+  // MARK: Public
 
   public func makeNSView(context _: Context) -> NSTextField {
     let textField = NSTextField(labelWithAttributedString: text)
@@ -197,20 +231,21 @@ public struct AttributedLabel: NSViewRepresentable {
   public func updateNSView(_ nsView: NSTextField, context _: Context) {
     nsView.attributedStringValue = text
   }
+
+  // MARK: Private
+
+  private let text: NSAttributedString
 }
 
-// MARK: - Porting NSPathControl to SwiftUI.
+// MARK: - PathControl
 
 @available(macOS 10.15, *)
 public struct PathControl: NSViewRepresentable {
-  private let pathCtl = NSPathControl()
-  @Binding private var path: String
-  private var configuration: (NSPathControl) -> Void = { _ in }
-  private var acceptDrop: (NSPathControl, NSDraggingInfo) -> Bool = { _, _ in false }
+  // MARK: Lifecycle
 
   public init(
     path: Binding<String>,
-    configuration: @escaping (NSPathControl) -> Void = { _ in }
+    configuration: @escaping (NSPathControl) -> () = { _ in }
   ) {
     _path = path
     self.configuration = configuration
@@ -218,12 +253,43 @@ public struct PathControl: NSViewRepresentable {
 
   public init(
     pathDroppable: Binding<String>,
-    configuration: @escaping (NSPathControl) -> Void = { _ in },
+    configuration: @escaping (NSPathControl) -> () = { _ in },
     acceptDrop: @escaping (NSPathControl, NSDraggingInfo) -> Bool
   ) {
     _path = pathDroppable
     self.configuration = configuration
     self.acceptDrop = acceptDrop
+  }
+
+  // MARK: Public
+
+  public class Coordinator: NSObject, NSPathControlDelegate {
+    // MARK: Lifecycle
+
+    public init(
+      target: NSPathControl,
+      acceptDrop: @escaping (NSPathControl, NSDraggingInfo) -> Bool
+    ) {
+      self.acceptDrop = acceptDrop
+      super.init()
+      target.delegate = self
+    }
+
+    // MARK: Public
+
+    @objc
+    public func action(sender: NSPathControl) {
+      guard let url = sender.url else { return }
+      NSWorkspace.shared.activateFileViewerSelecting([url])
+    }
+
+    public func pathControl(_ pathControl: NSPathControl, acceptDrop info: NSDraggingInfo) -> Bool {
+      acceptDrop(pathControl, info)
+    }
+
+    // MARK: Private
+
+    private var acceptDrop: (NSPathControl, NSDraggingInfo) -> Bool
   }
 
   public func makeNSView(context: Context) -> NSPathControl {
@@ -249,22 +315,11 @@ public struct PathControl: NSViewRepresentable {
     Coordinator(target: pathCtl, acceptDrop: acceptDrop)
   }
 
-  public class Coordinator: NSObject, NSPathControlDelegate {
-    private var acceptDrop: (NSPathControl, NSDraggingInfo) -> Bool
+  // MARK: Private
 
-    public init(target: NSPathControl, acceptDrop: @escaping (NSPathControl, NSDraggingInfo) -> Bool) {
-      self.acceptDrop = acceptDrop
-      super.init()
-      target.delegate = self
-    }
-
-    @objc public func action(sender: NSPathControl) {
-      guard let url = sender.url else { return }
-      NSWorkspace.shared.activateFileViewerSelecting([url])
-    }
-
-    public func pathControl(_ pathControl: NSPathControl, acceptDrop info: NSDraggingInfo) -> Bool {
-      acceptDrop(pathControl, info)
-    }
-  }
+  private let pathCtl = NSPathControl()
+  @Binding
+  private var path: String
+  private var configuration: (NSPathControl) -> () = { _ in }
+  private var acceptDrop: (NSPathControl, NSDraggingInfo) -> Bool = { _, _ in false }
 }

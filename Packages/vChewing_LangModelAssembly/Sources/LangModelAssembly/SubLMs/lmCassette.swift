@@ -11,9 +11,13 @@ import Foundation
 import LineReader
 import Megrez
 
+// MARK: - LMAssembly.LMCassette
+
 extension LMAssembly {
   /// 磁帶模組，用來方便使用者自行擴充字根輸入法。
   struct LMCassette {
+    // MARK: Public
+
     public private(set) var filePath: String?
     public private(set) var nameShort: String = ""
     public private(set) var nameENG: String = ""
@@ -40,6 +44,9 @@ extension LMAssembly {
     public private(set) var supplyQuickResults: Bool = false
     public private(set) var supplyPartiallyMatchedResults: Bool = false
     public var candidateKeysValidator: (String) -> Bool = { _ in false }
+
+    // MARK: Private
+
     /// 計算頻率時要用到的東西 - NORM
     private var norm = 0.0
   }
@@ -79,7 +86,8 @@ extension LMAssembly.LMCassette {
   /// 第三欄資料為對應字根、可有可無。第一欄與第二欄分別為「字詞」與「統計頻次」。
   /// - Parameter path: 檔案路徑。
   /// - Returns: 是否載入成功。
-  @discardableResult mutating func open(_ path: String) -> Bool {
+  @discardableResult
+  mutating func open(_ path: String) -> Bool {
     if isLoaded { return false }
     let oldPath = filePath
     filePath = nil
@@ -112,7 +120,8 @@ extension LMAssembly.LMCassette {
 
         for strLine in lineReader {
           let isTabDelimiting = strLine.contains("\t")
-          let cells = isTabDelimiting ? strLine.split(separator: "\t") : strLine.split(separator: " ")
+          let cells = isTabDelimiting ? strLine.split(separator: "\t") : strLine
+            .split(separator: " ")
           guard cells.count >= 1 else { continue }
           let strFirstCell = cells[0].trimmingCharacters(in: .newlines)
           let strSecondCell = cells.count >= 2 ? cells[1].trimmingCharacters(in: .newlines) : nil
@@ -144,14 +153,21 @@ extension LMAssembly.LMCassette {
               }
               guard nameENG.isEmpty else { break processTags }
               nameENG = strSecondCell
-            case "%intlname" where nameIntl.isEmpty: nameIntl = strSecondCell.replacingOccurrences(of: "_", with: " ")
+            case "%intlname"
+              where nameIntl.isEmpty: nameIntl = strSecondCell
+              .replacingOccurrences(of: "_", with: " ")
             case "%cname" where nameCJK.isEmpty: nameCJK = strSecondCell
             case "%sname" where nameShort.isEmpty: nameShort = strSecondCell
             case "%nullcandidate" where nullCandidate.isEmpty: nullCandidate = strSecondCell
-            case "%selkey" where selectionKeys.isEmpty: selectionKeys = strSecondCell.map(\.description).deduplicated.joined()
-            case "%endkey" where endKeys.isEmpty: endKeys = strSecondCell.map(\.description).deduplicated
-            case "%wildcardkey" where wildcardKey.isEmpty: wildcardKey = strSecondCell.first?.description ?? ""
-            case "%keys_to_directly_commit" where keysToDirectlyCommit.isEmpty: keysToDirectlyCommit = strSecondCell
+            case "%selkey"
+              where selectionKeys.isEmpty: selectionKeys = strSecondCell.map(\.description)
+              .deduplicated.joined()
+            case "%endkey"
+              where endKeys.isEmpty: endKeys = strSecondCell.map(\.description).deduplicated
+            case "%wildcardkey"
+              where wildcardKey.isEmpty: wildcardKey = strSecondCell.first?.description ?? ""
+            case "%keys_to_directly_commit"
+              where keysToDirectlyCommit.isEmpty: keysToDirectlyCommit = strSecondCell
             default: break processTags
             }
             continue
@@ -186,7 +202,10 @@ extension LMAssembly.LMCassette {
             guard let countValue = Int(strSecondCell) else { continue }
             switch cells.count {
             case 2: octagramMap[strFirstCell] = countValue
-            case 3: octagramDividedMap[strFirstCell] = (countValue, cells[2].trimmingCharacters(in: .newlines))
+            case 3: octagramDividedMap[strFirstCell] = (
+                countValue,
+                cells[2].trimmingCharacters(in: .newlines)
+              )
             default: break
             }
             norm += Self.fscale ** (Double(cells[0].count) / 3.0 - 1.0) * Double(countValue)
@@ -248,8 +267,7 @@ extension LMAssembly.LMCassette {
     let arrRaw = charDefMap[key]?.deduplicated ?? []
     var arrRawWildcard: [String] = []
     if let arrRawWildcardValues = charDefWildcardMap[key]?.deduplicated,
-       key.contains(wildcard), key.first?.description != wildcard
-    {
+       key.contains(wildcard), key.first?.description != wildcard {
       arrRawWildcard.append(contentsOf: arrRawWildcardValues)
     }
     var arrResults = [Megrez.Unigram]()
@@ -289,7 +307,11 @@ extension LMAssembly.LMCassette {
   ///   - key: 讀音索引鍵。
   func hasUnigramsFor(key: String) -> Bool {
     charDefMap[key] != nil
-      || (charDefWildcardMap[key] != nil && key.contains(wildcard) && key.first?.description != wildcard)
+      ||
+      (
+        charDefWildcardMap[key] != nil && key.contains(wildcard) && key.first?
+          .description != wildcard
+      )
   }
 
   // MARK: - Private Functions.
@@ -303,7 +325,8 @@ extension LMAssembly.LMCassette {
       weight = -13
     case 0: // 墊底低頻漢字與詞語
       weight = log10(
-        Self.fscale ** (Double(phraseLength) / 3.0 - 1.0) * 0.25 / norm)
+        Self.fscale ** (Double(phraseLength) / 3.0 - 1.0) * 0.25 / norm
+      )
     default:
       weight = log10(
         Self.fscale ** (Double(phraseLength) / 3.0 - 1.0)

@@ -22,9 +22,11 @@ public enum LatinKeyboardMappings: String, CaseIterable {
   case dvorakLeft = "com.apple.keylayout.Dvorak-Left"
   case dvorakRight = "com.apple.keylayout.Dvorak-Right"
 
+  // MARK: Public
+
   public var mapTable: [UInt16: (String, String)] {
     switch self {
-    case .qwerty, .qwertyUS, .qwertyBritish: return Self.dictQwerty
+    case .qwerty, .qwertyBritish, .qwertyUS: return Self.dictQwerty
     case .azerty, .azertyFrench: return Self.dictAzerty
     case .qwertz, .qwertzGerman: return Self.dictQwertz
     case .colemak: return Self.dictColemak
@@ -34,6 +36,8 @@ public enum LatinKeyboardMappings: String, CaseIterable {
     }
   }
 
+  // MARK: Private
+
   private static let dictQwerty: [UInt16: (String, String)] = [
     0: ("a", "A"), 1: ("s", "S"), 2: ("d", "D"), 3: ("f", "F"), 4: ("h", "H"), 5: ("g", "G"),
     6: ("z", "Z"), 7: ("x", "X"), 8: ("c", "C"), 9: ("v", "V"), 11: ("b", "B"), 12: ("q", "Q"),
@@ -41,7 +45,8 @@ public enum LatinKeyboardMappings: String, CaseIterable {
     19: ("2", "@"), 20: ("3", "#"), 21: ("4", "$"), 22: ("6", "^"), 23: ("5", "%"), 24: ("=", "+"),
     25: ("9", "("), 26: ("7", "&"), 27: ("-", "_"), 28: ("8", "*"), 29: ("0", ")"), 30: ("]", "}"),
     31: ("o", "O"), 32: ("u", "U"), 33: ("[", "{"), 34: ("i", "I"), 35: ("p", "P"), 37: ("l", "L"),
-    38: ("j", "J"), 39: ("\'", "\""), 40: ("k", "K"), 41: (";", ":"), 42: ("\\", "|"), 43: (",", "<"),
+    38: ("j", "J"), 39: ("\'", "\""), 40: ("k", "K"), 41: (";", ":"), 42: ("\\", "|"),
+    43: (",", "<"),
     44: ("/", "?"), 45: ("n", "N"), 46: ("m", "M"), 47: (".", ">"), 50: ("`", "~"),
   ]
 
@@ -49,7 +54,8 @@ public enum LatinKeyboardMappings: String, CaseIterable {
     0: ("q", "Q"), 1: ("s", "S"), 2: ("d", "D"), 3: ("f", "F"), 4: ("h", "H"), 5: ("g", "G"),
     6: ("w", "W"), 7: ("x", "X"), 8: ("c", "C"), 9: ("v", "V"), 11: ("b", "B"), 12: ("a", "A"),
     13: ("z", "Z"), 14: ("e", "E"), 15: ("r", "R"), 16: ("y", "Y"), 17: ("t", "T"), 18: ("&", "1"),
-    19: ("é", "2"), 20: ("\"", "3"), 21: ("\'", "4"), 22: ("§", "6"), 23: ("(", "5"), 24: ("-", "_"),
+    19: ("é", "2"), 20: ("\"", "3"), 21: ("\'", "4"), 22: ("§", "6"), 23: ("(", "5"),
+    24: ("-", "_"),
     25: ("ç", "9"), 26: ("è", "7"), 27: (")", "°"), 28: ("!", "8"), 29: ("à", "0"), 30: ("$", "*"),
     31: ("o", "O"), 32: ("u", "U"), 33: ("^", "¨"), 34: ("i", "I"), 35: ("p", "P"), 37: ("l", "L"),
     38: ("j", "J"), 39: ("ù", "%"), 40: ("k", "K"), 41: ("m", "M"), 42: ("`", "£"), 43: (";", "."),
@@ -74,7 +80,8 @@ public enum LatinKeyboardMappings: String, CaseIterable {
     19: ("2", "@"), 20: ("3", "#"), 21: ("4", "$"), 22: ("6", "^"), 23: ("5", "%"), 24: ("=", "+"),
     25: ("9", "("), 26: ("7", "&"), 27: ("-", "_"), 28: ("8", "*"), 29: ("0", ")"), 30: ("]", "}"),
     31: ("y", "Y"), 32: ("l", "L"), 33: ("[", "{"), 34: ("u", "U"), 35: (";", ":"), 37: ("i", "I"),
-    38: ("n", "N"), 39: ("\'", "\""), 40: ("e", "E"), 41: ("o", "O"), 42: ("\\", "|"), 43: (",", "<"),
+    38: ("n", "N"), 39: ("\'", "\""), 40: ("e", "E"), 41: ("o", "O"), 42: ("\\", "|"),
+    43: (",", "<"),
     44: ("/", "?"), 45: ("k", "K"), 46: ("m", "M"), 47: (".", ">"), 50: ("`", "~"),
   ]
 

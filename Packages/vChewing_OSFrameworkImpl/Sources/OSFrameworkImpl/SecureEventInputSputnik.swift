@@ -12,12 +12,18 @@ import AppKit
 import Combine
 import IOKit
 
+// MARK: - SecureEventInputSputnik
+
 public class SecureEventInputSputnik {
-  public let shared = SecureEventInputSputnik()
+  // MARK: Lifecycle
 
   public init() {
     oobe()
   }
+
+  // MARK: Public
+
+  public let shared = SecureEventInputSputnik()
 
   public static func getIORegListResults() -> String? {
     // Don't generate results under any of the following situations:
@@ -34,7 +40,7 @@ public class SecureEventInputSputnik {
     let dict: CFMutableDictionary? = resultDictionaryCF?.takeRetainedValue()
     guard statusSucceeded == KERN_SUCCESS else { return nil }
     guard let dict: [CFString: Any] = dict as? [CFString: Any] else { return nil }
-    return (dict.description)
+    return dict.description
   }
 
   /// Find all non-system processes using the SecureEventInput.
@@ -52,7 +58,8 @@ public class SecureEventInputSputnik {
   /// - Returns: Matched results as a dictionary in `[Int32: NSRunningApplication]` format. The keys are PIDs.
   /// - Remark: The`"com.apple.SecurityAgent"` won't be included in the result since it is a system process.
   /// Also, "com.apple.loginwindow" should be excluded as long as the system screen saver engine is running.
-  public static func getRunningSecureInputApps(abusersOnly: Bool = false) -> [Int32: NSRunningApplication] {
+  public static func getRunningSecureInputApps(abusersOnly: Bool = false)
+    -> [Int32: NSRunningApplication] {
     var result = [Int32: NSRunningApplication]()
     guard let rawData = getIORegListResults() else { return result }
     rawData.enumerateLines { currentLine, _ in
@@ -70,24 +77,29 @@ public class SecureEventInputSputnik {
   }
 }
 
-public extension NSWorkspace {
-  struct ActivationFlags: OptionSet {
-    public let rawValue: Int
+extension NSWorkspace {
+  public struct ActivationFlags: OptionSet {
+    // MARK: Lifecycle
+
     public init(rawValue: Int) {
       self.rawValue = rawValue
     }
+
+    // MARK: Public
 
     public static let hibernating = ActivationFlags(rawValue: 1 << 0)
     public static let desktopLocked = ActivationFlags(rawValue: 1 << 1)
     public static let sessionSwitchedOut = ActivationFlags(rawValue: 1 << 2)
     public static let screenSaverRunning = ActivationFlags(rawValue: 1 << 3)
+
+    public let rawValue: Int
   }
 
-  static var activationFlags: ActivationFlags = []
+  public static var activationFlags: ActivationFlags = []
 }
 
-public extension NSRunningApplication {
-  var isLoginWindowWithLockedScreenOrScreenSaver: Bool {
+extension NSRunningApplication {
+  public var isLoginWindowWithLockedScreenOrScreenSaver: Bool {
     guard bundleIdentifier == "com.apple.loginwindow" else { return false }
     return !NSWorkspace.activationFlags.isEmpty
   }
@@ -142,19 +154,31 @@ extension SecureEventInputSputnik {
       )
       Self.combinePoolCocoa.append(
         DistributedNotificationCenter.default()
-          .addObserver(forName: .init("com.apple.screenIsUnlocked"), object: nil, queue: .main) { _ in
+          .addObserver(
+            forName: .init("com.apple.screenIsUnlocked"),
+            object: nil,
+            queue: .main
+          ) { _ in
             NSWorkspace.activationFlags.remove(.desktopLocked)
           }
       )
       Self.combinePoolCocoa.append(
         DistributedNotificationCenter.default()
-          .addObserver(forName: .init("com.apple.screensaver.didstart"), object: nil, queue: .main) { _ in
+          .addObserver(
+            forName: .init("com.apple.screensaver.didstart"),
+            object: nil,
+            queue: .main
+          ) { _ in
             NSWorkspace.activationFlags.insert(.screenSaverRunning)
           }
       )
       Self.combinePoolCocoa.append(
         DistributedNotificationCenter.default()
-          .addObserver(forName: .init("com.apple.screensaver.didstop"), object: nil, queue: .main) { _ in
+          .addObserver(
+            forName: .init("com.apple.screensaver.didstop"),
+            object: nil,
+            queue: .main
+          ) { _ in
             NSWorkspace.activationFlags.remove(.screenSaverRunning)
           }
       )
@@ -172,13 +196,21 @@ extension SecureEventInputSputnik {
       )
       Self.combinePoolCocoa.append(
         NSWorkspace.shared.notificationCenter
-          .addObserver(forName: NSWorkspace.sessionDidResignActiveNotification, object: nil, queue: .main) { _ in
+          .addObserver(
+            forName: NSWorkspace.sessionDidResignActiveNotification,
+            object: nil,
+            queue: .main
+          ) { _ in
             NSWorkspace.activationFlags.insert(.sessionSwitchedOut)
           }
       )
       Self.combinePoolCocoa.append(
         NSWorkspace.shared.notificationCenter
-          .addObserver(forName: NSWorkspace.sessionDidBecomeActiveNotification, object: nil, queue: .main) { _ in
+          .addObserver(
+            forName: NSWorkspace.sessionDidBecomeActiveNotification,
+            object: nil,
+            queue: .main
+          ) { _ in
             NSWorkspace.activationFlags.remove(.sessionSwitchedOut)
           }
       )

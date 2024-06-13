@@ -9,8 +9,8 @@
 import AppKit
 import AVFoundation
 
-public extension NSSound {
-  static func buzz(fart: Bool = false) {
+extension NSSound {
+  public static func buzz(fart: Bool = false) {
     let filePath = Bundle.main.path(forResource: fart ? "Fart" : "Beep", ofType: "m4a")!
     let fileURL = URL(fileURLWithPath: filePath)
     var soundID: SystemSoundID = 0
@@ -18,7 +18,7 @@ public extension NSSound {
     AudioServicesPlaySystemSound(soundID)
   }
 
-  static func buzz(fart: Bool = false, count: Int) {
+  public static func buzz(fart: Bool = false, count: Int) {
     if count <= 1 {
       NSSound.buzz(fart: fart)
       return

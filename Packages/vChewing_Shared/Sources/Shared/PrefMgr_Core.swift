@@ -11,7 +11,8 @@ import SwiftExtension
 
 // MARK: -
 
-@objcMembers public class PrefMgr: NSObject, PrefMgrProtocol {
+@objcMembers
+public class PrefMgr: NSObject, PrefMgrProtocol {
   public static let kDefaultCandidateKeys = "123456"
   public static let kDefaultBasicKeyboardLayout = "com.apple.keylayout.ZhuyinBopomofo"
   public static let kDefaultAlphanumericalKeyboardLayout = {
@@ -48,9 +49,9 @@ import SwiftExtension
     #"HSR BiliWiki: %s"# + "\t" + #"@WEB:https://wiki.biligame.com/sr/%s"#,
   ]
 
-  public var didAskForSyncingLMPrefs: (() -> Void)?
-  public var didAskForRefreshingSpeechSputnik: (() -> Void)?
-  public var didAskForSyncingShiftKeyDetectorPrefs: (() -> Void)?
+  public var didAskForSyncingLMPrefs: (() -> ())?
+  public var didAskForRefreshingSpeechSputnik: (() -> ())?
+  public var didAskForSyncingShiftKeyDetectorPrefs: (() -> ())?
 
   // MARK: - Settings (Tier 1)
 
@@ -60,7 +61,10 @@ import SwiftExtension
   @AppProperty(key: UserDef.kFailureFlagForUOMObservation.rawValue, defaultValue: false)
   public dynamic var failureFlagForUOMObservation: Bool
 
-  @AppProperty(key: UserDef.kCandidateServiceMenuContents.rawValue, defaultValue: kDefaultCandidateServiceMenuItem)
+  @AppProperty(
+    key: UserDef.kCandidateServiceMenuContents.rawValue,
+    defaultValue: kDefaultCandidateServiceMenuItem
+  )
   public dynamic var candidateServiceMenuContents: [String]
 
   @AppProperty(key: UserDef.kRespectClientAccentColor.rawValue, defaultValue: true)
@@ -102,22 +106,13 @@ import SwiftExtension
   public dynamic var basicKeyboardLayout: String
 
   @AppProperty(
-    key: UserDef.kAlphanumericalKeyboardLayout.rawValue, defaultValue: kDefaultAlphanumericalKeyboardLayout
+    key: UserDef.kAlphanumericalKeyboardLayout.rawValue,
+    defaultValue: kDefaultAlphanumericalKeyboardLayout
   )
   public dynamic var alphanumericalKeyboardLayout: String
 
   @AppProperty(key: UserDef.kShowNotificationsWhenTogglingCapsLock.rawValue, defaultValue: true)
   public dynamic var showNotificationsWhenTogglingCapsLock: Bool
-
-  @AppProperty(key: UserDef.kCandidateListTextSize.rawValue, defaultValue: 16)
-  public dynamic var candidateListTextSize: Double {
-    didSet {
-      // 必須確立條件，否則就會是無限迴圈。
-      if !(12 ... 196).contains(candidateListTextSize) {
-        candidateListTextSize = max(12, min(candidateListTextSize, 196))
-      }
-    }
-  }
 
   @AppProperty(key: UserDef.kAlwaysExpandCandidateWindow.rawValue, defaultValue: false)
   public dynamic var alwaysExpandCandidateWindow: Bool
@@ -131,7 +126,10 @@ import SwiftExtension
   @AppProperty(key: UserDef.kUseRearCursorMode.rawValue, defaultValue: false)
   public dynamic var useRearCursorMode: Bool
 
-  @AppProperty(key: UserDef.kUseJKtoMoveCompositorCursorInCandidateState.rawValue, defaultValue: false)
+  @AppProperty(
+    key: UserDef.kUseJKtoMoveCompositorCursorInCandidateState.rawValue,
+    defaultValue: false
+  )
   public var useJKtoMoveCompositorCursorInCandidateState: Bool
 
   @AppProperty(key: UserDef.kUseShiftQuestionToCallServiceMenu.rawValue, defaultValue: true)
@@ -167,11 +165,6 @@ import SwiftExtension
   @AppProperty(key: UserDef.kAutoCorrectReadingCombination.rawValue, defaultValue: true)
   public dynamic var autoCorrectReadingCombination: Bool
 
-  @AppProperty(key: UserDef.kReadingNarrationCoverage.rawValue, defaultValue: 0)
-  public dynamic var readingNarrationCoverage: Int {
-    didSet { didAskForRefreshingSpeechSputnik?() }
-  }
-
   @AppProperty(key: UserDef.kAlsoConfirmAssociatedCandidatesByEnter.rawValue, defaultValue: false)
   public dynamic var alsoConfirmAssociatedCandidatesByEnter: Bool
 
@@ -190,16 +183,6 @@ import SwiftExtension
   @AppProperty(key: UserDef.kBypassNonAppleCapsLockHandling.rawValue, defaultValue: false)
   public dynamic var bypassNonAppleCapsLockHandling: Bool
 
-  @AppProperty(key: UserDef.kTogglingAlphanumericalModeWithLShift.rawValue, defaultValue: true)
-  public dynamic var togglingAlphanumericalModeWithLShift: Bool {
-    didSet { didAskForSyncingShiftKeyDetectorPrefs?() }
-  }
-
-  @AppProperty(key: UserDef.kTogglingAlphanumericalModeWithRShift.rawValue, defaultValue: true)
-  public dynamic var togglingAlphanumericalModeWithRShift: Bool {
-    didSet { didAskForSyncingShiftKeyDetectorPrefs?() }
-  }
-
   @AppProperty(key: UserDef.kConsolidateContextOnCandidateSelection.rawValue, defaultValue: true)
   public dynamic var consolidateContextOnCandidateSelection: Bool
 
@@ -212,7 +195,10 @@ import SwiftExtension
   @AppProperty(key: UserDef.kAlwaysShowTooltipTextsHorizontally.rawValue, defaultValue: false)
   public dynamic var alwaysShowTooltipTextsHorizontally: Bool
 
-  @AppProperty(key: UserDef.kClientsIMKTextInputIncapable.rawValue, defaultValue: kDefaultClientsIMKTextInputIncapable)
+  @AppProperty(
+    key: UserDef.kClientsIMKTextInputIncapable.rawValue,
+    defaultValue: kDefaultClientsIMKTextInputIncapable
+  )
   public dynamic var clientsIMKTextInputIncapable: [String: Bool]
 
   @AppProperty(key: UserDef.kShowTranslatedStrokesInCompositionBuffer.rawValue, defaultValue: true)
@@ -227,16 +213,28 @@ import SwiftExtension
   @AppProperty(key: UserDef.kShowCodePointInCandidateUI.rawValue, defaultValue: true)
   public dynamic var showCodePointInCandidateUI: Bool
 
-  @AppProperty(key: UserDef.kAutoCompositeWithLongestPossibleCassetteKey.rawValue, defaultValue: true)
+  @AppProperty(
+    key: UserDef.kAutoCompositeWithLongestPossibleCassetteKey.rawValue,
+    defaultValue: true
+  )
   public dynamic var autoCompositeWithLongestPossibleCassetteKey: Bool
 
-  @AppProperty(key: UserDef.kShareAlphanumericalModeStatusAcrossClients.rawValue, defaultValue: false)
+  @AppProperty(
+    key: UserDef.kShareAlphanumericalModeStatusAcrossClients.rawValue,
+    defaultValue: false
+  )
   public dynamic var shareAlphanumericalModeStatusAcrossClients: Bool
 
-  @AppProperty(key: UserDef.kPhraseEditorAutoReloadExternalModifications.rawValue, defaultValue: true)
+  @AppProperty(
+    key: UserDef.kPhraseEditorAutoReloadExternalModifications.rawValue,
+    defaultValue: true
+  )
   public dynamic var phraseEditorAutoReloadExternalModifications: Bool
 
-  @AppProperty(key: UserDef.kClassicHaninKeyboardSymbolModeShortcutEnabled.rawValue, defaultValue: false)
+  @AppProperty(
+    key: UserDef.kClassicHaninKeyboardSymbolModeShortcutEnabled.rawValue,
+    defaultValue: false
+  )
   public dynamic var classicHaninKeyboardSymbolModeShortcutEnabled: Bool
 
   // MARK: - Settings (Tier 2)
@@ -244,7 +242,10 @@ import SwiftExtension
   @AppProperty(key: UserDef.kUseSpaceToCommitHighlightedSCPCCandidate.rawValue, defaultValue: true)
   public dynamic var useSpaceToCommitHighlightedSCPCCandidate: Bool
 
-  @AppProperty(key: UserDef.kEnableMouseScrollingForTDKCandidatesCocoa.rawValue, defaultValue: false)
+  @AppProperty(
+    key: UserDef.kEnableMouseScrollingForTDKCandidatesCocoa.rawValue,
+    defaultValue: false
+  )
   public dynamic var enableMouseScrollingForTDKCandidatesCocoa: Bool
 
   @AppProperty(
@@ -269,6 +270,95 @@ import SwiftExtension
 
   @AppProperty(key: UserDef.kFilterNonCNSReadingsForCHTInput.rawValue, defaultValue: false)
   public dynamic var filterNonCNSReadingsForCHTInput: Bool
+
+  @AppProperty(key: UserDef.kCurrencyNumeralsEnabled.rawValue, defaultValue: false)
+  public dynamic var currencyNumeralsEnabled: Bool
+
+  @AppProperty(key: UserDef.kHalfWidthPunctuationEnabled.rawValue, defaultValue: false)
+  public dynamic var halfWidthPunctuationEnabled: Bool
+
+  @AppProperty(key: UserDef.kEscToCleanInputBuffer.rawValue, defaultValue: true)
+  public dynamic var escToCleanInputBuffer: Bool
+
+  @AppProperty(key: UserDef.kAcceptLeadingIntonations.rawValue, defaultValue: true)
+  public dynamic var acceptLeadingIntonations: Bool
+
+  @AppProperty(key: UserDef.kSpecifyIntonationKeyBehavior.rawValue, defaultValue: 0)
+  public dynamic var specifyIntonationKeyBehavior: Int
+
+  @AppProperty(key: UserDef.kSpecifyShiftBackSpaceKeyBehavior.rawValue, defaultValue: 0)
+  public dynamic var specifyShiftBackSpaceKeyBehavior: Int
+
+  @AppProperty(key: UserDef.kSpecifyShiftTabKeyBehavior.rawValue, defaultValue: false)
+  public dynamic var specifyShiftTabKeyBehavior: Bool
+
+  @AppProperty(key: UserDef.kSpecifyShiftSpaceKeyBehavior.rawValue, defaultValue: false)
+  public dynamic var specifyShiftSpaceKeyBehavior: Bool
+
+  @AppProperty(key: UserDef.kSpecifyCmdOptCtrlEnterBehavior.rawValue, defaultValue: 0)
+  public dynamic var specifyCmdOptCtrlEnterBehavior: Int
+
+  // MARK: - Optional settings
+
+  @AppProperty(key: UserDef.kCandidateTextFontName.rawValue, defaultValue: "")
+  public dynamic var candidateTextFontName: String
+
+  // MARK: - Keyboard HotKey Enable / Disable
+
+  @AppProperty(key: UserDef.kUsingHotKeySCPC.rawValue, defaultValue: true)
+  public dynamic var usingHotKeySCPC: Bool
+
+  @AppProperty(key: UserDef.kUsingHotKeyAssociates.rawValue, defaultValue: true)
+  public dynamic var usingHotKeyAssociates: Bool
+
+  @AppProperty(key: UserDef.kUsingHotKeyCNS.rawValue, defaultValue: true)
+  public dynamic var usingHotKeyCNS: Bool
+
+  @AppProperty(key: UserDef.kUsingHotKeyKangXi.rawValue, defaultValue: true)
+  public dynamic var usingHotKeyKangXi: Bool
+
+  @AppProperty(key: UserDef.kUsingHotKeyJIS.rawValue, defaultValue: true)
+  public dynamic var usingHotKeyJIS: Bool
+
+  @AppProperty(key: UserDef.kUsingHotKeyHalfWidthASCII.rawValue, defaultValue: true)
+  public dynamic var usingHotKeyHalfWidthASCII: Bool
+
+  @AppProperty(key: UserDef.kUsingHotKeyCurrencyNumerals.rawValue, defaultValue: true)
+  public dynamic var usingHotKeyCurrencyNumerals: Bool
+
+  @AppProperty(key: UserDef.kUsingHotKeyCassette.rawValue, defaultValue: true)
+  public dynamic var usingHotKeyCassette: Bool
+
+  @AppProperty(key: UserDef.kUsingHotKeyRevLookup.rawValue, defaultValue: true)
+  public dynamic var usingHotKeyRevLookup: Bool
+
+  @AppProperty(key: UserDef.kUsingHotKeyInputMode.rawValue, defaultValue: true)
+  public dynamic var usingHotKeyInputMode: Bool
+
+  @AppProperty(key: UserDef.kCandidateListTextSize.rawValue, defaultValue: 16)
+  public dynamic var candidateListTextSize: Double {
+    didSet {
+      // 必須確立條件，否則就會是無限迴圈。
+      if !(12 ... 196).contains(candidateListTextSize) {
+        candidateListTextSize = max(12, min(candidateListTextSize, 196))
+      }
+    }
+  }
+
+  @AppProperty(key: UserDef.kReadingNarrationCoverage.rawValue, defaultValue: 0)
+  public dynamic var readingNarrationCoverage: Int {
+    didSet { didAskForRefreshingSpeechSputnik?() }
+  }
+
+  @AppProperty(key: UserDef.kTogglingAlphanumericalModeWithLShift.rawValue, defaultValue: true)
+  public dynamic var togglingAlphanumericalModeWithLShift: Bool {
+    didSet { didAskForSyncingShiftKeyDetectorPrefs?() }
+  }
+
+  @AppProperty(key: UserDef.kTogglingAlphanumericalModeWithRShift.rawValue, defaultValue: true)
+  public dynamic var togglingAlphanumericalModeWithRShift: Bool {
+    didSet { didAskForSyncingShiftKeyDetectorPrefs?() }
+  }
 
   @AppProperty(key: UserDef.kCNS11643Enabled.rawValue, defaultValue: false)
   public dynamic var cns11643Enabled: Bool {
@@ -317,38 +407,6 @@ import SwiftExtension
     }
   }
 
-  @AppProperty(key: UserDef.kCurrencyNumeralsEnabled.rawValue, defaultValue: false)
-  public dynamic var currencyNumeralsEnabled: Bool
-
-  @AppProperty(key: UserDef.kHalfWidthPunctuationEnabled.rawValue, defaultValue: false)
-  public dynamic var halfWidthPunctuationEnabled: Bool
-
-  @AppProperty(key: UserDef.kEscToCleanInputBuffer.rawValue, defaultValue: true)
-  public dynamic var escToCleanInputBuffer: Bool
-
-  @AppProperty(key: UserDef.kAcceptLeadingIntonations.rawValue, defaultValue: true)
-  public dynamic var acceptLeadingIntonations: Bool
-
-  @AppProperty(key: UserDef.kSpecifyIntonationKeyBehavior.rawValue, defaultValue: 0)
-  public dynamic var specifyIntonationKeyBehavior: Int
-
-  @AppProperty(key: UserDef.kSpecifyShiftBackSpaceKeyBehavior.rawValue, defaultValue: 0)
-  public dynamic var specifyShiftBackSpaceKeyBehavior: Int
-
-  @AppProperty(key: UserDef.kSpecifyShiftTabKeyBehavior.rawValue, defaultValue: false)
-  public dynamic var specifyShiftTabKeyBehavior: Bool
-
-  @AppProperty(key: UserDef.kSpecifyShiftSpaceKeyBehavior.rawValue, defaultValue: false)
-  public dynamic var specifyShiftSpaceKeyBehavior: Bool
-
-  @AppProperty(key: UserDef.kSpecifyCmdOptCtrlEnterBehavior.rawValue, defaultValue: 0)
-  public dynamic var specifyCmdOptCtrlEnterBehavior: Int
-
-  // MARK: - Optional settings
-
-  @AppProperty(key: UserDef.kCandidateTextFontName.rawValue, defaultValue: "")
-  public dynamic var candidateTextFontName: String
-
   @AppProperty(key: UserDef.kCandidateKeys.rawValue, defaultValue: kDefaultCandidateKeys)
   public dynamic var candidateKeys: String {
     didSet {
@@ -374,36 +432,4 @@ import SwiftExtension
   public dynamic var associatedPhrasesEnabled: Bool {
     didSet { didAskForSyncingLMPrefs?() }
   }
-
-  // MARK: - Keyboard HotKey Enable / Disable
-
-  @AppProperty(key: UserDef.kUsingHotKeySCPC.rawValue, defaultValue: true)
-  public dynamic var usingHotKeySCPC: Bool
-
-  @AppProperty(key: UserDef.kUsingHotKeyAssociates.rawValue, defaultValue: true)
-  public dynamic var usingHotKeyAssociates: Bool
-
-  @AppProperty(key: UserDef.kUsingHotKeyCNS.rawValue, defaultValue: true)
-  public dynamic var usingHotKeyCNS: Bool
-
-  @AppProperty(key: UserDef.kUsingHotKeyKangXi.rawValue, defaultValue: true)
-  public dynamic var usingHotKeyKangXi: Bool
-
-  @AppProperty(key: UserDef.kUsingHotKeyJIS.rawValue, defaultValue: true)
-  public dynamic var usingHotKeyJIS: Bool
-
-  @AppProperty(key: UserDef.kUsingHotKeyHalfWidthASCII.rawValue, defaultValue: true)
-  public dynamic var usingHotKeyHalfWidthASCII: Bool
-
-  @AppProperty(key: UserDef.kUsingHotKeyCurrencyNumerals.rawValue, defaultValue: true)
-  public dynamic var usingHotKeyCurrencyNumerals: Bool
-
-  @AppProperty(key: UserDef.kUsingHotKeyCassette.rawValue, defaultValue: true)
-  public dynamic var usingHotKeyCassette: Bool
-
-  @AppProperty(key: UserDef.kUsingHotKeyRevLookup.rawValue, defaultValue: true)
-  public dynamic var usingHotKeyRevLookup: Bool
-
-  @AppProperty(key: UserDef.kUsingHotKeyInputMode.rawValue, defaultValue: true)
-  public dynamic var usingHotKeyInputMode: Bool
 }

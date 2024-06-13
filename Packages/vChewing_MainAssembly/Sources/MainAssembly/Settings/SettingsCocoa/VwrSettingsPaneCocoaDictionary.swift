@@ -12,15 +12,11 @@ import Foundation
 import OSFrameworkImpl
 import Shared
 
-public extension SettingsPanesCocoa {
-  class Dictionary: NSViewController {
-    var windowWidth: CGFloat { SettingsPanesCocoa.windowWidth }
-    var contentWidth: CGFloat { SettingsPanesCocoa.contentWidth }
-    var innerContentWidth: CGFloat { SettingsPanesCocoa.innerContentWidth }
-    var tabContainerWidth: CGFloat { SettingsPanesCocoa.tabContainerWidth }
-    var contentHalfWidth: CGFloat { SettingsPanesCocoa.contentHalfWidth }
-    let pctUserDictionaryFolder: NSPathControl = .init()
-    let dragRetrieverKimo: NSFileDragRetrieverButton = .init()
+// MARK: - SettingsPanesCocoa.Dictionary
+
+extension SettingsPanesCocoa {
+  public class Dictionary: NSViewController {
+    // MARK: Public
 
     override public func loadView() {
       prepareUserDictionaryFolderPathControl(pctUserDictionaryFolder)
@@ -29,6 +25,16 @@ public extension SettingsPanesCocoa {
       view.makeSimpleConstraint(.width, relation: .equal, value: windowWidth)
     }
 
+    // MARK: Internal
+
+    let pctUserDictionaryFolder: NSPathControl = .init()
+    let dragRetrieverKimo: NSFileDragRetrieverButton = .init()
+
+    var windowWidth: CGFloat { SettingsPanesCocoa.windowWidth }
+    var contentWidth: CGFloat { SettingsPanesCocoa.contentWidth }
+    var innerContentWidth: CGFloat { SettingsPanesCocoa.innerContentWidth }
+    var tabContainerWidth: CGFloat { SettingsPanesCocoa.tabContainerWidth }
+    var contentHalfWidth: CGFloat { SettingsPanesCocoa.contentHalfWidth }
     var body: NSView? {
       NSStackView.build(.vertical, insets: .new(all: 14)) {
         NSStackView.buildSection(width: contentWidth) {
@@ -41,17 +47,19 @@ public extension SettingsPanesCocoa {
               renderable.currentControl?.target = self
               renderable.currentControl?.action = #selector(self.lmmgrInitUserLMsWhenShould(_:))
             }
-            "Due to security concerns, we don't consider implementing anything related to shell script execution here. An input method doing this without implementing App Sandbox will definitely have system-wide vulnerabilities, considering that its related UserDefaults are easily tamperable to execute malicious shell scripts. vChewing is designed to be invulnerable from this kind of attack. Also, official releases of vChewing are Sandboxed.".makeNSLabel(descriptive: true, fixWidth: contentWidth)
+            "Due to security concerns, we don't consider implementing anything related to shell script execution here. An input method doing this without implementing App Sandbox will definitely have system-wide vulnerabilities, considering that its related UserDefaults are easily tamperable to execute malicious shell scripts. vChewing is designed to be invulnerable from this kind of attack. Also, official releases of vChewing are Sandboxed."
+              .makeNSLabel(descriptive: true, fixWidth: contentWidth)
           }
         }?.boxed()
         NSTabView.build {
           NSTabView.TabPage(title: "Ａ") {
             NSStackView.buildSection(width: innerContentWidth) {
               UserDef.kFetchSuggestionsFromUserOverrideModel.render(fixWidth: innerContentWidth)
-              UserDef.kFilterNonCNSReadingsForCHTInput.render(fixWidth: innerContentWidth) { renderable in
-                renderable.currentControl?.target = self
-                renderable.currentControl?.action = #selector(self.lmmgrSyncLMPrefs(_:))
-              }
+              UserDef.kFilterNonCNSReadingsForCHTInput
+                .render(fixWidth: innerContentWidth) { renderable in
+                  renderable.currentControl?.target = self
+                  renderable.currentControl?.action = #selector(self.lmmgrSyncLMPrefs(_:))
+                }
               UserDef.kCNS11643Enabled.render(fixWidth: innerContentWidth) { renderable in
                 renderable.currentControl?.target = self
                 renderable.currentControl?.action = #selector(self.lmmgrSyncLMPrefs(_:))
@@ -71,7 +79,8 @@ public extension SettingsPanesCocoa {
               }
               UserDef.kPhraseReplacementEnabled.render(fixWidth: innerContentWidth) { renderable in
                 renderable.currentControl?.target = self
-                renderable.currentControl?.action = #selector(self.lmmgrSyncLMPrefsWithReplacementTable(_:))
+                renderable.currentControl?
+                  .action = #selector(self.lmmgrSyncLMPrefsWithReplacementTable(_:))
               }
               UserDef.kAllowBoostingSingleKanjiAsUserPhrase.render(fixWidth: innerContentWidth)
             }?.boxed()
@@ -102,7 +111,10 @@ public extension SettingsPanesCocoa {
         let maybeCount = try? LMMgr.importYahooKeyKeyUserDictionary(text: &rawString)
         let count: Int = maybeCount ?? 0
         CtlSettingsCocoa.shared?.window.callAlert(
-          title: String(format: "i18n:settings.importFromKimoTxt.finishedCount:%@".localized, count.description)
+          title: String(
+            format: "i18n:settings.importFromKimoTxt.finishedCount:%@".localized,
+            count.description
+          )
         )
       }
       dragRetrieverKimo.title = "i18n:kimoImportButton.DragFileToHere".localized
@@ -114,7 +126,11 @@ public extension SettingsPanesCocoa {
     func pathControlMainView() -> NSView? {
       NSStackView.build(.horizontal) {
         self.pctUserDictionaryFolder
-        NSButton(verbatim: "...", target: self, action: #selector(chooseUserDataFolderToSpecify(_:)))
+        NSButton(
+          verbatim: "...",
+          target: self,
+          action: #selector(chooseUserDataFolderToSpecify(_:))
+        )
         NSButton(verbatim: "↻", target: self, action: #selector(resetSpecifiedUserDataFolder(_:)))
       }
     }
@@ -138,32 +154,40 @@ public extension SettingsPanesCocoa {
       pathCtl.toolTip = "Please drag the desired target from Finder to this place.".localized
     }
 
-    @IBAction func lmmgrInitUserLMsWhenShould(_: NSControl) {
+    @IBAction
+    func lmmgrInitUserLMsWhenShould(_: NSControl) {
       if PrefMgr.shared.shouldAutoReloadUserDataFiles {
         LMMgr.initUserLangModels()
       }
     }
 
-    @IBAction func lmmgrConnectCoreDB(_: NSControl) {
+    @IBAction
+    func lmmgrConnectCoreDB(_: NSControl) {
       LMMgr.connectCoreDB()
     }
 
-    @IBAction func lmmgrSyncLMPrefs(_: NSControl) {
+    @IBAction
+    func lmmgrSyncLMPrefs(_: NSControl) {
       LMMgr.syncLMPrefs()
     }
 
-    @IBAction func lmmgrSyncLMPrefsWithReplacementTable(_: NSControl) {
+    @IBAction
+    func lmmgrSyncLMPrefsWithReplacementTable(_: NSControl) {
       LMMgr.syncLMPrefs()
       if PrefMgr.shared.phraseReplacementEnabled {
         LMMgr.loadUserPhraseReplacement()
       }
     }
 
-    @IBAction func importYahooKeyKeyUserDictionaryDataXPC(_: NSButton) {
+    @IBAction
+    func importYahooKeyKeyUserDictionaryDataXPC(_: NSButton) {
       do {
         let count = try LMMgr.importYahooKeyKeyUserDictionaryByXPC()
         CtlSettingsCocoa.shared?.window.callAlert(
-          title: String(format: "i18n:settings.importFromKimoTxt.finishedCount:%@".localized, count.description)
+          title: String(
+            format: "i18n:settings.importFromKimoTxt.finishedCount:%@".localized,
+            count.description
+          )
         )
       } catch {
         let error = NSAlert(error: error)
@@ -173,7 +197,8 @@ public extension SettingsPanesCocoa {
       }
     }
 
-    @IBAction func importYahooKeyKeyUserDictionaryData(_: NSButton) {
+    @IBAction
+    func importYahooKeyKeyUserDictionaryData(_: NSButton) {
       guard #available(macOS 10.13, *) else {
         SettingsPanesCocoa.warnAboutComDlg32Inavailability()
         return
@@ -200,14 +225,17 @@ public extension SettingsPanesCocoa {
           guard var rawString = try? String(contentsOf: url) else { return }
           let maybeCount = try? LMMgr.importYahooKeyKeyUserDictionary(text: &rawString)
           let count: Int = maybeCount ?? 0
-          window.callAlert(title: String(format: "i18n:settings.importFromKimoTxt.finishedCount:%@".localized, count.description))
+          window.callAlert(title: String(
+            format: "i18n:settings.importFromKimoTxt.finishedCount:%@".localized,
+            count.description
+          ))
         }
       }
     }
   }
 }
 
-// MARK: - Controls related to data path settings.
+// MARK: - SettingsPanesCocoa.Dictionary + NSPathControlDelegate
 
 extension SettingsPanesCocoa.Dictionary: NSPathControlDelegate {
   public func pathControl(_ pathControl: NSPathControl, acceptDrop info: NSDraggingInfo) -> Bool {
@@ -215,7 +243,8 @@ extension SettingsPanesCocoa.Dictionary: NSPathControlDelegate {
     guard let url = urls?.first as? URL else { return false }
     guard pathControl === pctUserDictionaryFolder else { return false }
     let bolPreviousFolderValidity = LMMgr.checkIfSpecifiedUserDataFolderValid(
-      PrefMgr.shared.userDataFolderSpecified.expandingTildeInPath)
+      PrefMgr.shared.userDataFolderSpecified.expandingTildeInPath
+    )
     var newPath = url.path
     newPath.ensureTrailingSlash()
     if LMMgr.checkIfSpecifiedUserDataFolderValid(newPath) {
@@ -234,17 +263,20 @@ extension SettingsPanesCocoa.Dictionary: NSPathControlDelegate {
     return false
   }
 
-  @IBAction func resetSpecifiedUserDataFolder(_: Any) {
+  @IBAction
+  func resetSpecifiedUserDataFolder(_: Any) {
     LMMgr.resetSpecifiedUserDataFolder()
     pctUserDictionaryFolder.url = URL(fileURLWithPath: LMMgr.dataFolderPath(isDefaultFolder: true))
   }
 
-  @IBAction func pathControlDoubleAction(_ sender: NSPathControl) {
+  @IBAction
+  func pathControlDoubleAction(_ sender: NSPathControl) {
     guard let url = sender.url else { return }
     NSWorkspace.shared.activateFileViewerSelecting([url])
   }
 
-  @IBAction func chooseUserDataFolderToSpecify(_: Any) {
+  @IBAction
+  func chooseUserDataFolderToSpecify(_: Any) {
     if NSEvent.keyModifierFlags == .option, let url = pctUserDictionaryFolder.url {
       NSWorkspace.shared.activateFileViewerSelecting([url])
       return
@@ -264,7 +296,8 @@ extension SettingsPanesCocoa.Dictionary: NSPathControlDelegate {
     dlgOpenPath.allowsMultipleSelection = false
 
     let bolPreviousFolderValidity = LMMgr.checkIfSpecifiedUserDataFolderValid(
-      PrefMgr.shared.userDataFolderSpecified.expandingTildeInPath)
+      PrefMgr.shared.userDataFolderSpecified.expandingTildeInPath
+    )
     let window = CtlSettingsCocoa.shared?.window
     dlgOpenPath.beginSheetModal(at: window) { result in
       if result == NSApplication.ModalResponse.OK {
@@ -282,14 +315,16 @@ extension SettingsPanesCocoa.Dictionary: NSPathControlDelegate {
           IMEApp.buzz()
           if !bolPreviousFolderValidity {
             LMMgr.resetSpecifiedUserDataFolder()
-            self.pctUserDictionaryFolder.url = URL(fileURLWithPath: LMMgr.dataFolderPath(isDefaultFolder: true))
+            self.pctUserDictionaryFolder
+              .url = URL(fileURLWithPath: LMMgr.dataFolderPath(isDefaultFolder: true))
           }
           return
         }
       } else {
         if !bolPreviousFolderValidity {
           LMMgr.resetSpecifiedUserDataFolder()
-          self.pctUserDictionaryFolder.url = URL(fileURLWithPath: LMMgr.dataFolderPath(isDefaultFolder: true))
+          self.pctUserDictionaryFolder
+            .url = URL(fileURLWithPath: LMMgr.dataFolderPath(isDefaultFolder: true))
         }
         return
       }

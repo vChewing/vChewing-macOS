@@ -13,8 +13,8 @@ import SwiftUI
 // MARK: - Contents specifically made for SwiftUI.
 
 @available(macOS 10.15, *)
-public extension CandidateCellData {
-  var themeColor: Color {
+extension CandidateCellData {
+  public var themeColor: Color {
     // 設定當前高亮候選字的背景顏色。
     let result: Color = {
       switch locale {
@@ -27,7 +27,7 @@ public extension CandidateCellData {
     return result.opacity(0.85)
   }
 
-  var attributedStringForSwiftUIBackports: some View {
+  public var attributedStringForSwiftUIBackports: some View {
     var result: some View {
       ZStack(alignment: .leading) {
         if isHighlighted {
@@ -37,7 +37,11 @@ public extension CandidateCellData {
               Text(verbatim: selectionKey).font(.custom("Menlo", size: fontSizeKey))
                 .foregroundColor(Color.white.opacity(0.8)).lineLimit(1)
               Text(verbatim: displayedText)
-                .font(.init(CTFontCreateUIFontForLanguage(.system, fontSizeCandidate, locale as CFString)!))
+                .font(.init(CTFontCreateUIFontForLanguage(
+                  .system,
+                  fontSizeCandidate,
+                  locale as CFString
+                )!))
                 .foregroundColor(Color(white: 1)).lineLimit(1)
             }.padding(.vertical, 3).padding(.horizontal, 5)
           }.frame(alignment: .leading)
@@ -47,7 +51,11 @@ public extension CandidateCellData {
               Text(verbatim: selectionKey).font(.custom("Menlo", size: fontSizeKey))
                 .foregroundColor(Color.secondary).lineLimit(1)
               Text(verbatim: displayedText)
-                .font(.init(CTFontCreateUIFontForLanguage(.system, fontSizeCandidate, locale as CFString)!))
+                .font(.init(CTFontCreateUIFontForLanguage(
+                  .system,
+                  fontSizeCandidate,
+                  locale as CFString
+                )!))
                 .foregroundColor(Color.primary).lineLimit(1)
             }.padding(.vertical, 3).padding(.horizontal, 5)
           }.frame(alignment: .leading)
@@ -58,7 +66,7 @@ public extension CandidateCellData {
   }
 
   @available(macOS 12, *)
-  var attributedStringForSwiftUI: some View {
+  public var attributedStringForSwiftUI: some View {
     var result: some View {
       ZStack(alignment: .leading) {
         if isHighlighted {
@@ -69,7 +77,11 @@ public extension CandidateCellData {
             Text(verbatim: selectionKey).font(.system(size: fontSizeKey).monospaced())
               .foregroundColor(.init(nsColor: fontColorKey)).lineLimit(1)
             Text(verbatim: displayedText)
-              .font(.init(CTFontCreateUIFontForLanguage(.system, fontSizeCandidate, locale as CFString)!))
+              .font(.init(CTFontCreateUIFontForLanguage(
+                .system,
+                fontSizeCandidate,
+                locale as CFString
+              )!))
               .foregroundColor(.init(nsColor: fontColorCandidate)).lineLimit(1)
           }.padding(.vertical, 3).padding(.horizontal, 5)
         }.frame(alignment: .leading)

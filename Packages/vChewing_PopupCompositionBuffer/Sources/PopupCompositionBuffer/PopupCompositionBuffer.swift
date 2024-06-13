@@ -10,62 +10,7 @@ import AppKit
 import Shared
 
 public class PopupCompositionBuffer: NSWindowController {
-  private static var currentWindow: NSWindow? {
-    willSet {
-      currentWindow?.orderOut(nil)
-    }
-  }
-
-  public var isTypingDirectionVertical = false {
-    didSet {
-      if #unavailable(macOS 10.14) {
-        isTypingDirectionVertical = false
-      }
-    }
-  }
-
-  private var messageTextField: NSTextField
-  private var textShown: NSAttributedString = .init(string: "") {
-    didSet {
-      messageTextField.attributedStringValue = textShown
-      adjustSize()
-    }
-  }
-
-  public func sync(accent: NSColor?, locale: String) {
-    self.locale = locale
-    if let accent = accent {
-      self.accent = (accent.alphaComponent == 1) ? accent.withAlphaComponent(Self.bgOpacity) : accent
-    } else {
-      self.accent = themeColorCocoa
-    }
-    let themeColor = adjustedThemeColor
-    window?.backgroundColor = .clear
-    window?.contentView?.layer?.backgroundColor = themeColor.cgColor
-    window?.contentView?.layer?.borderColor = NSColor.white.withAlphaComponent(0.1).cgColor
-    messageTextField.backgroundColor = .clear
-    messageTextField.textColor = textColor
-  }
-
-  private var accent: NSColor = .accentColor
-
-  private var locale: String = ""
-
-  private static let bgOpacity: CGFloat = 0.8
-
-  var themeColorCocoa: NSColor {
-    switch locale {
-    case "zh-Hans": return .init(red: 255 / 255, green: 64 / 255, blue: 53 / 255, alpha: Self.bgOpacity)
-    case "zh-Hant": return .init(red: 5 / 255, green: 127 / 255, blue: 255 / 255, alpha: Self.bgOpacity)
-    case "ja": return .init(red: 167 / 255, green: 137 / 255, blue: 99 / 255, alpha: Self.bgOpacity)
-    default: return .init(red: 5 / 255, green: 127 / 255, blue: 255 / 255, alpha: Self.bgOpacity)
-    }
-  }
-
-  private func bufferFont(size: CGFloat = 18) -> NSFont {
-    let defaultResult: CTFont? = CTFontCreateUIFontForLanguage(.system, size, locale as CFString)
-    return defaultResult ?? NSFont.systemFont(ofSize: size)
-  }
+  // MARK: Lifecycle
 
   public init() {
     let contentRect = NSRect(x: 128.0, y: 128.0, width: 300.0, height: 20.0)
@@ -77,7 +22,7 @@ public class PopupCompositionBuffer: NSWindowController {
     panel.hasShadow = true
     panel.backgroundColor = .clear
     panel.isOpaque = false
-    messageTextField = NSTextField()
+    self.messageTextField = NSTextField()
     messageTextField.isEditable = false
     messageTextField.isSelectable = false
     messageTextField.isBezeled = false
@@ -103,6 +48,32 @@ public class PopupCompositionBuffer: NSWindowController {
   @available(*, unavailable)
   public required init?(coder _: NSCoder) {
     fatalError("init(coder:) has not been implemented")
+  }
+
+  // MARK: Public
+
+  public var isTypingDirectionVertical = false {
+    didSet {
+      if #unavailable(macOS 10.14) {
+        isTypingDirectionVertical = false
+      }
+    }
+  }
+
+  public func sync(accent: NSColor?, locale: String) {
+    self.locale = locale
+    if let accent = accent {
+      self.accent = (accent.alphaComponent == 1) ? accent
+        .withAlphaComponent(Self.bgOpacity) : accent
+    } else {
+      self.accent = themeColorCocoa
+    }
+    let themeColor = adjustedThemeColor
+    window?.backgroundColor = .clear
+    window?.contentView?.layer?.backgroundColor = themeColor.cgColor
+    window?.contentView?.layer?.borderColor = NSColor.white.withAlphaComponent(0.1).cgColor
+    messageTextField.backgroundColor = .clear
+    messageTextField.textColor = textColor
   }
 
   public func show(state: IMEStateProtocol, at point: NSPoint) {
@@ -219,6 +190,62 @@ public class PopupCompositionBuffer: NSWindowController {
     window?.orderOut(nil)
   }
 
+  // MARK: Internal
+
+  var themeColorCocoa: NSColor {
+    switch locale {
+    case "zh-Hans": return .init(red: 255 / 255, green: 64 / 255, blue: 53 / 255,
+                                 alpha: Self.bgOpacity)
+    case "zh-Hant": return .init(red: 5 / 255, green: 127 / 255, blue: 255 / 255,
+                                 alpha: Self.bgOpacity)
+    case "ja": return .init(red: 167 / 255, green: 137 / 255, blue: 99 / 255, alpha: Self.bgOpacity)
+    default: return .init(red: 5 / 255, green: 127 / 255, blue: 255 / 255, alpha: Self.bgOpacity)
+    }
+  }
+
+  // MARK: Private
+
+  private static let bgOpacity: CGFloat = 0.8
+
+  private static var currentWindow: NSWindow? {
+    willSet {
+      currentWindow?.orderOut(nil)
+    }
+  }
+
+  private var messageTextField: NSTextField
+  private var accent: NSColor = .accentColor
+
+  private var locale: String = ""
+
+  private var textShown: NSAttributedString = .init(string: "") {
+    didSet {
+      messageTextField.attributedStringValue = textShown
+      adjustSize()
+    }
+  }
+
+  private var markerColor: NSColor {
+    .selectedMenuItemTextColor.withAlphaComponent(0.9)
+  }
+
+  private var markerTextColor: NSColor {
+    adjustedThemeColor
+  }
+
+  private var textColor: NSColor {
+    .selectedMenuItemTextColor
+  }
+
+  private var adjustedThemeColor: NSColor {
+    accent.blended(withFraction: NSApplication.isDarkMode ? 0.5 : 0.25, of: .black) ?? accent
+  }
+
+  private func bufferFont(size: CGFloat = 18) -> NSFont {
+    let defaultResult: CTFont? = CTFontCreateUIFontForLanguage(.system, size, locale as CFString)
+    return defaultResult ?? NSFont.systemFont(ofSize: size)
+  }
+
   private func set(windowOrigin: NSPoint) {
     guard let window = window else { return }
     let windowSize = window.frame.size
@@ -230,8 +257,14 @@ public class PopupCompositionBuffer: NSWindowController {
       break
     }
 
-    adjustedPoint.y = min(max(adjustedPoint.y, screenFrame.minY + windowSize.height), screenFrame.maxY)
-    adjustedPoint.x = min(max(adjustedPoint.x, screenFrame.minX), screenFrame.maxX - windowSize.width)
+    adjustedPoint.y = min(
+      max(adjustedPoint.y, screenFrame.minY + windowSize.height),
+      screenFrame.maxY
+    )
+    adjustedPoint.x = min(
+      max(adjustedPoint.x, screenFrame.minX),
+      screenFrame.maxX - windowSize.width
+    )
 
     if isTypingDirectionVertical {
       window.setFrameTopLeftPoint(adjustedPoint)
@@ -258,21 +291,5 @@ public class PopupCompositionBuffer: NSWindowController {
     }
     messageTextField.frame = rect
     window?.setFrame(bigRect, display: true)
-  }
-
-  private var markerColor: NSColor {
-    .selectedMenuItemTextColor.withAlphaComponent(0.9)
-  }
-
-  private var markerTextColor: NSColor {
-    adjustedThemeColor
-  }
-
-  private var textColor: NSColor {
-    .selectedMenuItemTextColor
-  }
-
-  private var adjustedThemeColor: NSColor {
-    accent.blended(withFraction: NSApplication.isDarkMode ? 0.5 : 0.25, of: .black) ?? accent
   }
 }

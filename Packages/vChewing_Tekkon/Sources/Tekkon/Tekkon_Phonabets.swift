@@ -8,11 +8,11 @@
 
 infix operator <~: AssignmentPrecedence
 
-public extension Tekkon {
+extension Tekkon {
   // MARK: - Dynamic Constants and Basic Enums
 
   /// 定義注音符號的種類
-  enum PhoneType: Int, Codable, Hashable {
+  public enum PhoneType: Int, Codable, Hashable {
     case null = 0 // 假
     case consonant = 1 // 聲
     case semivowel = 2 // 介
@@ -21,7 +21,7 @@ public extension Tekkon {
   }
 
   /// 定義注音排列的類型
-  enum MandarinParser: Int, Codable, Hashable {
+  public enum MandarinParser: Int, Codable, Hashable {
     case ofDachen = 0
     case ofDachen26 = 1
     case ofETen = 2
@@ -39,6 +39,8 @@ public extension Tekkon {
     case ofHualuoPinyin = 103
     case ofUniversalPinyin = 104
     case ofWadeGilesPinyin = 105
+
+    // MARK: Internal
 
     var name: String {
       switch self {
@@ -87,21 +89,30 @@ public extension Tekkon {
   /// 如果遇到被設為多個字符、或者字符不對的情況的話，value 會被清空、PhoneType 會變成 null。
   /// 賦值時最好直接重新 init 且一直用 let 來初期化 Phonabet。
   /// 其實 value 對外只讀，對內的話另有 valueStorage 代為存儲內容。這樣比較安全一些。
-  @frozen struct Phonabet: Equatable, Codable, Hashable {
-    public var type: PhoneType = .null
-    private var valueStorage = ""
-    public var value: String { valueStorage }
-    public var isEmpty: Bool { value.isEmpty }
-    public var isValid: Bool { type != .null }
+  @frozen
+  public struct Phonabet: Equatable, Codable, Hashable {
+    // MARK: Lifecycle
 
     /// 初期化，會根據傳入的 input 字串參數來自動判定自身的 PhoneType 類型屬性值。
     public init(_ input: String = "") {
       if !input.isEmpty {
         if allowedPhonabets.contains(String(input.reversed()[0])) {
-          valueStorage = String(input.reversed()[0])
+          self.valueStorage = String(input.reversed()[0])
           ensureType()
         }
       }
+    }
+
+    // MARK: Public
+
+    public var type: PhoneType = .null
+
+    public var value: String { valueStorage }
+    public var isEmpty: Bool { value.isEmpty }
+    public var isValid: Bool { type != .null }
+
+    public static func <~ (_ lhs: inout Tekkon.Phonabet, _ newValue: String) {
+      lhs.setValue(newValue)
     }
 
     /// 自我清空內容。
@@ -124,10 +135,6 @@ public extension Tekkon {
       ensureType()
     }
 
-    public static func <~ (_ lhs: inout Tekkon.Phonabet, _ newValue: String) {
-      lhs.setValue(newValue)
-    }
-
     /// 用來自動更新自身的屬性值的函式。
     public mutating func ensureType() {
       if Tekkon.allowedConsonants.contains(value) {
@@ -143,5 +150,9 @@ public extension Tekkon {
         valueStorage = ""
       }
     }
+
+    // MARK: Private
+
+    private var valueStorage = ""
   }
 }

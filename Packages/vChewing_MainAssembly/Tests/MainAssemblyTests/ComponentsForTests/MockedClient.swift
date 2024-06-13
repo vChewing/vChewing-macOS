@@ -10,15 +10,15 @@ import InputMethodKit
 
 class FakeClient: NSObject, IMKTextInput {
   var attributedString: NSMutableAttributedString = .init(string: "")
+  var selectedRangeStored: NSRange = .notFound
+  var markedRangeStored: NSRange = .notFound
+  var markedText: NSAttributedString = .init(string: "")
+
   var cursor = 0 {
     didSet {
       cursor = max(0, min(cursor, attributedString.length))
     }
   }
-
-  var selectedRangeStored: NSRange = .notFound
-  var markedRangeStored: NSRange = .notFound
-  var markedText: NSAttributedString = .init(string: "")
 
   func toString() -> String {
     attributedString.string
@@ -58,7 +58,10 @@ class FakeClient: NSObject, IMKTextInput {
   }
 
   func attributedSubstring(from range: NSRange) -> NSAttributedString! {
-    let usableRange = NSIntersectionRange(range, .init(location: 0, length: attributedString.length))
+    let usableRange = NSIntersectionRange(
+      range,
+      .init(location: 0, length: attributedString.length)
+    )
     return attributedString.attributedSubstring(from: usableRange)
   }
 
@@ -66,11 +69,20 @@ class FakeClient: NSObject, IMKTextInput {
     attributedString.length
   }
 
-  func characterIndex(for _: NSPoint, tracking _: IMKLocationToOffsetMappingMode, inMarkedRange _: UnsafeMutablePointer<ObjCBool>!) -> Int {
+  func characterIndex(
+    for _: NSPoint,
+    tracking _: IMKLocationToOffsetMappingMode,
+    inMarkedRange _: UnsafeMutablePointer<ObjCBool>!
+  )
+    -> Int {
     cursor
   }
 
-  func attributes(forCharacterIndex _: Int, lineHeightRectangle _: UnsafeMutablePointer<NSRect>!) -> [AnyHashable: Any]! {
+  func attributes(
+    forCharacterIndex _: Int,
+    lineHeightRectangle _: UnsafeMutablePointer<NSRect>!
+  )
+    -> [AnyHashable: Any]! {
     [:]
   }
 
@@ -109,7 +121,10 @@ class FakeClient: NSObject, IMKTextInput {
   func string(from range: NSRange, actualRange: NSRangePointer!) -> String! {
     let actualNSRange = actualRange.move()
     var usableRange = NSIntersectionRange(actualNSRange, range)
-    usableRange = NSIntersectionRange(usableRange, .init(location: 0, length: attributedString.length))
+    usableRange = NSIntersectionRange(
+      usableRange,
+      .init(location: 0, length: attributedString.length)
+    )
     return attributedString.attributedSubstring(from: usableRange).string
   }
 

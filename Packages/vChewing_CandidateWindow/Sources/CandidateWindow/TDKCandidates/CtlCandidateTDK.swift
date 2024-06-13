@@ -10,8 +10,8 @@ import AppKit
 import OSFrameworkImpl
 import Shared
 
-private extension NSUserInterfaceLayoutOrientation {
-  var layoutTDK: CandidatePool.LayoutOrientation {
+extension NSUserInterfaceLayoutOrientation {
+  fileprivate var layoutTDK: CandidatePool.LayoutOrientation {
     switch self {
     case .horizontal:
       return .horizontal
@@ -23,43 +23,10 @@ private extension NSUserInterfaceLayoutOrientation {
   }
 }
 
+// MARK: - CtlCandidateTDK
+
 public class CtlCandidateTDK: CtlCandidate, NSWindowDelegate {
-  @objc var observation: NSKeyValueObservation?
-  public var maxLinesPerPage: Int = 0
-  public var useCocoa: Bool = false
-  public var useMouseScrolling: Bool = true
-  private static var thePool: CandidatePool = .init(candidates: [])
-  private static var currentView: NSView = .init()
-
-  public static var currentMenu: NSMenu? {
-    willSet {
-      currentMenu?.cancelTracking()
-    }
-  }
-
-  public static var currentWindow: NSWindow? {
-    willSet {
-      currentWindow?.orderOut(nil)
-    }
-  }
-
-  private var theViewAppKit: NSView {
-    VwrCandidateTDKAppKit(controller: self, thePool: Self.thePool)
-  }
-
-  private var theViewLegacy: NSView {
-    let textField = NSTextField()
-    textField.isSelectable = false
-    textField.isEditable = false
-    textField.isBordered = false
-    textField.backgroundColor = .clear
-    textField.allowsEditingTextAttributes = false
-    textField.preferredMaxLayoutWidth = textField.frame.width
-    textField.attributedStringValue = Self.thePool.attributedDescription
-    textField.sizeToFit()
-    textField.backgroundColor = .clear
-    return textField
-  }
+  // MARK: Lifecycle
 
   // MARK: - Constructors
 
@@ -80,14 +47,80 @@ public class CtlCandidateTDK: CtlCandidate, NSWindowDelegate {
     window?.delegate = self
     currentLayout = layout
 
-    observation = Broadcaster.shared.observe(\.eventForClosingAllPanels, options: [.new]) { _, _ in
-      self.visible = false
-    }
+    self.observation = Broadcaster.shared
+      .observe(\.eventForClosingAllPanels, options: [.new]) { _, _ in
+        self.visible = false
+      }
   }
 
   @available(*, unavailable)
   required init?(coder _: NSCoder) {
     fatalError("init(coder:) has not been implemented")
+  }
+
+  // MARK: Open
+
+  override open func updateDisplay() {
+    guard let window = window else { return }
+    DispatchQueue.main.async { [weak self] in
+      guard let self = self else { return }
+      self.updateNSWindowModern(window)
+    }
+    // 先擦除之前的反查结果。
+    reverseLookupResult = []
+    // 再更新新的反查结果。
+    if let currentCandidate = Self.thePool.currentCandidate {
+      let displayedText = currentCandidate.displayedText
+      var lookupResult: [String?] = delegate?.reverseLookup(for: displayedText) ?? []
+      if displayedText.count == 1, delegate?.showCodePointForCurrentCandidate ?? false {
+        if lookupResult.isEmpty {
+          lookupResult
+            .append(currentCandidate.charDescriptions(shortened: !Self.thePool.isMatrix).first)
+        } else {
+          lookupResult.insert(
+            currentCandidate.charDescriptions(shortened: true).first,
+            at: lookupResult.startIndex
+          )
+        }
+        reverseLookupResult = lookupResult.compactMap { $0 }
+      } else {
+        reverseLookupResult = lookupResult.compactMap { $0 }
+        // 如果不提供 UNICODE 碼位資料顯示的話，則在非多行多列模式下僅顯示一筆反查資料。
+        if !Self.thePool.isMatrix {
+          reverseLookupResult = [reverseLookupResult.first].compactMap { $0 }
+        }
+      }
+    }
+    Self.thePool.reverseLookupResult = reverseLookupResult
+    Self.thePool.tooltip = delegate?.candidateToolTip(shortened: !Self.thePool.isMatrix) ?? ""
+    delegate?.candidatePairHighlightChanged(at: highlightedIndex)
+  }
+
+  // MARK: Public
+
+  public static var currentMenu: NSMenu? {
+    willSet {
+      currentMenu?.cancelTracking()
+    }
+  }
+
+  public static var currentWindow: NSWindow? {
+    willSet {
+      currentWindow?.orderOut(nil)
+    }
+  }
+
+  public var maxLinesPerPage: Int = 0
+  public var useCocoa: Bool = false
+  public var useMouseScrolling: Bool = true
+
+  // Already implemented in CandidatePool.
+  override public var highlightedIndex: Int {
+    get { Self.thePool.highlightedIndex }
+    set {
+      Self.thePool.highlight(at: newValue)
+      updateDisplay()
+    }
   }
 
   // MARK: - Public functions
@@ -106,37 +139,62 @@ public class CtlCandidateTDK: CtlCandidate, NSWindowDelegate {
     updateDisplay()
   }
 
-  override open func updateDisplay() {
-    guard let window = window else { return }
-    DispatchQueue.main.async { [weak self] in
-      guard let self = self else { return }
-      self.updateNSWindowModern(window)
-    }
-    // 先擦除之前的反查结果。
-    reverseLookupResult = []
-    // 再更新新的反查结果。
-    if let currentCandidate = Self.thePool.currentCandidate {
-      let displayedText = currentCandidate.displayedText
-      var lookupResult: [String?] = delegate?.reverseLookup(for: displayedText) ?? []
-      if displayedText.count == 1, delegate?.showCodePointForCurrentCandidate ?? false {
-        if lookupResult.isEmpty {
-          lookupResult.append(currentCandidate.charDescriptions(shortened: !Self.thePool.isMatrix).first)
-        } else {
-          lookupResult.insert(currentCandidate.charDescriptions(shortened: true).first, at: lookupResult.startIndex)
-        }
-        reverseLookupResult = lookupResult.compactMap { $0 }
-      } else {
-        reverseLookupResult = lookupResult.compactMap { $0 }
-        // 如果不提供 UNICODE 碼位資料顯示的話，則在非多行多列模式下僅顯示一筆反查資料。
-        if !Self.thePool.isMatrix {
-          reverseLookupResult = [reverseLookupResult.first].compactMap { $0 }
-        }
-      }
-    }
-    Self.thePool.reverseLookupResult = reverseLookupResult
-    Self.thePool.tooltip = delegate?.candidateToolTip(shortened: !Self.thePool.isMatrix) ?? ""
-    delegate?.candidatePairHighlightChanged(at: highlightedIndex)
+  override public func scrollWheel(with event: NSEvent) {
+    guard useMouseScrolling else { return }
+    handleMouseScroll(deltaX: event.deltaX, deltaY: event.deltaY)
   }
+
+  // Already implemented in CandidatePool.
+  @discardableResult
+  override public func showNextPage() -> Bool {
+    defer { updateDisplay() }
+    return Self.thePool.flipPage(isBackward: false)
+  }
+
+  // Already implemented in CandidatePool.
+  @discardableResult
+  override public func showPreviousPage() -> Bool {
+    defer { updateDisplay() }
+    return Self.thePool.flipPage(isBackward: true)
+  }
+
+  // Already implemented in CandidatePool.
+  @discardableResult
+  override public func showPreviousLine() -> Bool {
+    defer { updateDisplay() }
+    return Self.thePool.consecutivelyFlipLines(isBackward: true, count: 1)
+  }
+
+  // Already implemented in CandidatePool.
+  @discardableResult
+  override public func showNextLine() -> Bool {
+    defer { updateDisplay() }
+    return Self.thePool.consecutivelyFlipLines(isBackward: false, count: 1)
+  }
+
+  // Already implemented in CandidatePool.
+  @discardableResult
+  override public func highlightNextCandidate() -> Bool {
+    defer { updateDisplay() }
+    return Self.thePool.highlightNeighborCandidate(isBackward: false)
+  }
+
+  // Already implemented in CandidatePool.
+  @discardableResult
+  override public func highlightPreviousCandidate() -> Bool {
+    defer { updateDisplay() }
+    return Self.thePool.highlightNeighborCandidate(isBackward: true)
+  }
+
+  // Already implemented in CandidatePool.
+  override public func candidateIndexAtKeyLabelIndex(_ id: Int) -> Int? {
+    Self.thePool.calculateCandidateIndex(subIndex: id)
+  }
+
+  // MARK: Internal
+
+  @objc
+  var observation: NSKeyValueObservation?
 
   func updateNSWindowModern(_ window: NSWindow) {
     Self.currentView = theViewAppKit
@@ -147,14 +205,9 @@ public class CtlCandidateTDK: CtlCandidate, NSWindowDelegate {
     delegate?.resetCandidateWindowOrigin()
   }
 
-  override public func scrollWheel(with event: NSEvent) {
-    guard useMouseScrolling else { return }
-    handleMouseScroll(deltaX: event.deltaX, deltaY: event.deltaY)
-  }
-
   func handleMouseScroll(deltaX: CGFloat, deltaY: CGFloat) {
     switch (deltaX, deltaY, Self.thePool.layout) {
-    case (1..., 0, .horizontal), (0, 1..., .vertical): highlightNextCandidate()
+    case (0, 1..., .vertical), (1..., 0, .horizontal): highlightNextCandidate()
     case (..<0, 0, .horizontal), (0, ..<0, .vertical): highlightPreviousCandidate()
     case (0, 1..., .horizontal), (1..., 0, .vertical): showNextLine()
     case (0, ..<0, .horizontal), (..<0, 0, .vertical): showPreviousLine()
@@ -162,53 +215,26 @@ public class CtlCandidateTDK: CtlCandidate, NSWindowDelegate {
     }
   }
 
-  // Already implemented in CandidatePool.
-  @discardableResult override public func showNextPage() -> Bool {
-    defer { updateDisplay() }
-    return Self.thePool.flipPage(isBackward: false)
+  // MARK: Private
+
+  private static var thePool: CandidatePool = .init(candidates: [])
+  private static var currentView: NSView = .init()
+
+  private var theViewAppKit: NSView {
+    VwrCandidateTDKAppKit(controller: self, thePool: Self.thePool)
   }
 
-  // Already implemented in CandidatePool.
-  @discardableResult override public func showPreviousPage() -> Bool {
-    defer { updateDisplay() }
-    return Self.thePool.flipPage(isBackward: true)
-  }
-
-  // Already implemented in CandidatePool.
-  @discardableResult override public func showPreviousLine() -> Bool {
-    defer { updateDisplay() }
-    return Self.thePool.consecutivelyFlipLines(isBackward: true, count: 1)
-  }
-
-  // Already implemented in CandidatePool.
-  @discardableResult override public func showNextLine() -> Bool {
-    defer { updateDisplay() }
-    return Self.thePool.consecutivelyFlipLines(isBackward: false, count: 1)
-  }
-
-  // Already implemented in CandidatePool.
-  @discardableResult override public func highlightNextCandidate() -> Bool {
-    defer { updateDisplay() }
-    return Self.thePool.highlightNeighborCandidate(isBackward: false)
-  }
-
-  // Already implemented in CandidatePool.
-  @discardableResult override public func highlightPreviousCandidate() -> Bool {
-    defer { updateDisplay() }
-    return Self.thePool.highlightNeighborCandidate(isBackward: true)
-  }
-
-  // Already implemented in CandidatePool.
-  override public func candidateIndexAtKeyLabelIndex(_ id: Int) -> Int? {
-    Self.thePool.calculateCandidateIndex(subIndex: id)
-  }
-
-  // Already implemented in CandidatePool.
-  override public var highlightedIndex: Int {
-    get { Self.thePool.highlightedIndex }
-    set {
-      Self.thePool.highlight(at: newValue)
-      updateDisplay()
-    }
+  private var theViewLegacy: NSView {
+    let textField = NSTextField()
+    textField.isSelectable = false
+    textField.isEditable = false
+    textField.isBordered = false
+    textField.backgroundColor = .clear
+    textField.allowsEditingTextAttributes = false
+    textField.preferredMaxLayoutWidth = textField.frame.width
+    textField.attributedStringValue = Self.thePool.attributedDescription
+    textField.sizeToFit()
+    textField.backgroundColor = .clear
+    return textField
   }
 }

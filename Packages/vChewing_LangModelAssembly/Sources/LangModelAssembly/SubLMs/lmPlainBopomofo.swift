@@ -10,22 +10,25 @@ import Foundation
 
 extension LMAssembly {
   struct LMPlainBopomofo {
-    @usableFromInline typealias DataMap = [String: [String: String]]
-    let dataMap: DataMap
-
-    public var count: Int { dataMap.count }
+    // MARK: Lifecycle
 
     public init() {
       do {
         let rawData = jsnEtenDosSequence.data(using: .utf8) ?? .init([])
         let rawJSON = try JSONDecoder().decode([String: [String: String]].self, from: rawData)
-        dataMap = rawJSON
+        self.dataMap = rawJSON
       } catch {
         vCLMLog("\(error)")
-        vCLMLog("↑ Exception happened when parsing raw JSON sequence data from vChewing LMAssembly.")
-        dataMap = [:]
+        vCLMLog(
+          "↑ Exception happened when parsing raw JSON sequence data from vChewing LMAssembly."
+        )
+        self.dataMap = [:]
       }
     }
+
+    // MARK: Public
+
+    public var count: Int { dataMap.count }
 
     public var isLoaded: Bool { !dataMap.isEmpty }
 
@@ -40,5 +43,11 @@ extension LMAssembly {
     }
 
     public func hasValuesFor(key: String) -> Bool { dataMap.keys.contains(key) }
+
+    // MARK: Internal
+
+    @usableFromInline typealias DataMap = [String: [String: String]]
+
+    let dataMap: DataMap
   }
 }

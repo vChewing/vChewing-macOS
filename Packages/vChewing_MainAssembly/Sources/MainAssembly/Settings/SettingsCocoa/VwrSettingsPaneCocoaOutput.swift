@@ -10,19 +10,23 @@ import AppKit
 import Foundation
 import Shared
 
-public extension SettingsPanesCocoa {
-  class Output: NSViewController {
-    var windowWidth: CGFloat { SettingsPanesCocoa.windowWidth }
-    var contentWidth: CGFloat { SettingsPanesCocoa.contentWidth }
-    var innerContentWidth: CGFloat { SettingsPanesCocoa.innerContentWidth }
-    var tabContainerWidth: CGFloat { SettingsPanesCocoa.tabContainerWidth }
-    var contentHalfWidth: CGFloat { SettingsPanesCocoa.contentHalfWidth }
+extension SettingsPanesCocoa {
+  public class Output: NSViewController {
+    // MARK: Public
 
     override public func loadView() {
       view = body ?? .init()
       (view as? NSStackView)?.alignment = .centerX
       view.makeSimpleConstraint(.width, relation: .equal, value: windowWidth)
     }
+
+    // MARK: Internal
+
+    var windowWidth: CGFloat { SettingsPanesCocoa.windowWidth }
+    var contentWidth: CGFloat { SettingsPanesCocoa.contentWidth }
+    var innerContentWidth: CGFloat { SettingsPanesCocoa.innerContentWidth }
+    var tabContainerWidth: CGFloat { SettingsPanesCocoa.tabContainerWidth }
+    var contentHalfWidth: CGFloat { SettingsPanesCocoa.contentHalfWidth }
 
     var body: NSView? {
       NSStackView.build(.vertical, insets: .new(all: 14)) {
@@ -45,13 +49,15 @@ public extension SettingsPanesCocoa {
       }
     }
 
-    @IBAction func sanityCheckKangXi(_: NSControl) {
+    @IBAction
+    func sanityCheckKangXi(_: NSControl) {
       if PrefMgr.shared.chineseConversionEnabled, PrefMgr.shared.shiftJISShinjitaiOutputEnabled {
         PrefMgr.shared.shiftJISShinjitaiOutputEnabled = false
       }
     }
 
-    @IBAction func sanityCheckJIS(_: NSControl) {
+    @IBAction
+    func sanityCheckJIS(_: NSControl) {
       if PrefMgr.shared.chineseConversionEnabled, PrefMgr.shared.shiftJISShinjitaiOutputEnabled {
         PrefMgr.shared.chineseConversionEnabled = false
       }

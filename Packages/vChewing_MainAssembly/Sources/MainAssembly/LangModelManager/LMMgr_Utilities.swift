@@ -20,21 +20,32 @@ private let kTemplateNameUserSymbolPhrases = "template-usersymbolphrases"
 private let kTemplateNameUserAssociatesCHS = "template-associatedPhrases-chs"
 private let kTemplateNameUserAssociatesCHT = "template-associatedPhrases-cht"
 
-public extension LMMgr {
+extension LMMgr {
   // MARK: - 獲取原廠核心語彙檔案資料所在路徑（優先獲取 Containers 下的資料檔案）。
 
   // 該函式目前僅供步天歌繁簡轉換引擎使用，並不會檢查目標檔案格式的實際可用性。
 
-  static func getBundleDataPath(_ filenameSansExt: String, factory: Bool = false, ext: String) -> String? {
-    let factoryPath = Bundle.main.path(forResource: filenameSansExt, ofType: ext) ?? Bundle.module.path(forResource: filenameSansExt, ofType: ext)
+  public static func getBundleDataPath(
+    _ filenameSansExt: String,
+    factory: Bool = false,
+    ext: String
+  )
+    -> String? {
+    let factoryPath = Bundle.main.path(forResource: filenameSansExt, ofType: ext) ?? Bundle.module
+      .path(
+        forResource: filenameSansExt,
+        ofType: ext
+      )
     guard let factoryPath = factoryPath else { return nil }
     let factory = PrefMgr.shared.useExternalFactoryDict ? factory : true
-    let containerPath = Self.appSupportURL.appendingPathComponent("vChewingFactoryData/\(filenameSansExt).\(ext)").path
+    let containerPath = Self.appSupportURL
+      .appendingPathComponent("vChewingFactoryData/\(filenameSansExt).\(ext)").path
       .expandingTildeInPath
     var isFailed = false
     if !factory {
       var isFolder = ObjCBool(false)
-      if !FileManager.default.fileExists(atPath: containerPath, isDirectory: &isFolder) { isFailed = true }
+      if !FileManager.default
+        .fileExists(atPath: containerPath, isDirectory: &isFolder) { isFailed = true }
       if !isFailed, !FileManager.default.isReadableFile(atPath: containerPath) { isFailed = true }
     }
     let result = (factory || isFailed) ? factoryPath : containerPath
@@ -43,13 +54,19 @@ public extension LMMgr {
 
   // MARK: - 獲取原廠核心語彙檔案（SQLite）的路徑（優先獲取 Containers 下的資料檔案）。
 
-  static func getCoreDictionaryDBPath(factory: Bool = false) -> String? {
-    guard let factoryResultURL = Bundle.main.url(forResource: "vChewingFactoryDatabase", withExtension: "sqlite") else {
+  public static func getCoreDictionaryDBPath(factory: Bool = false) -> String? {
+    guard let factoryResultURL = Bundle.main.url(
+      forResource: "vChewingFactoryDatabase",
+      withExtension: "sqlite"
+    ) else {
       return nil
     }
     guard !factory, PrefMgr.shared.useExternalFactoryDict else { return factoryResultURL.path }
-    let containerResultURL = Self.appSupportURL.appendingPathComponent("vChewingFactoryData/vChewingFactoryDatabase.sqlite")
-    return FileManager.default.fileExists(atPath: containerResultURL.path, isDirectory: nil) ? containerResultURL.path : factoryResultURL.path
+    let containerResultURL = Self.appSupportURL
+      .appendingPathComponent("vChewingFactoryData/vChewingFactoryDatabase.sqlite")
+    return FileManager.default
+      .fileExists(atPath: containerResultURL.path, isDirectory: nil) ? containerResultURL
+      .path : factoryResultURL.path
   }
 
   // MARK: - 使用者語彙檔案的具體檔案名稱路徑定義
@@ -61,7 +78,11 @@ public extension LMMgr {
   ///   - mode: 繁簡模式。
   ///   - type: 辭典資料類型
   /// - Returns: 資料路徑（URL）。
-  static func userDictDataURL(mode: Shared.InputMode, type: LMAssembly.ReplacableUserDataType) -> URL {
+  public static func userDictDataURL(
+    mode: Shared.InputMode,
+    type: LMAssembly.ReplacableUserDataType
+  )
+    -> URL {
     var fileName: String = {
       switch type {
       case .thePhrases: return "userdata"
@@ -72,21 +93,23 @@ public extension LMMgr {
       }
     }()
     fileName.append((mode == .imeModeCHT) ? "-cht.txt" : "-chs.txt")
-    return URL(fileURLWithPath: dataFolderPath(isDefaultFolder: false)).appendingPathComponent(fileName)
+    return URL(fileURLWithPath: dataFolderPath(isDefaultFolder: false))
+      .appendingPathComponent(fileName)
   }
 
   /// 使用者波浪符號選單資料路徑。
   /// - Returns: 資料路徑（URL）。
-  static func userSymbolMenuDataURL() -> URL {
+  public static func userSymbolMenuDataURL() -> URL {
     let fileName = "symbols.dat"
-    return URL(fileURLWithPath: dataFolderPath(isDefaultFolder: false)).appendingPathComponent(fileName)
+    return URL(fileURLWithPath: dataFolderPath(isDefaultFolder: false))
+      .appendingPathComponent(fileName)
   }
 
   /// 使用者半衰記憶模組資料的存取頻次特別高，且資料新陳代謝速度快，所以只適合放在預設的使用者資料目錄下。
   /// 也就是「~/Library/Application Support/vChewing/」目錄下，且不會隨著使用者辭典目錄的改變而改變。
   /// - Parameter mode: 簡繁體輸入模式。
   /// - Returns: 資料路徑（URL）。
-  static func userOverrideModelDataURL(_ mode: Shared.InputMode) -> URL {
+  public static func userOverrideModelDataURL(_ mode: Shared.InputMode) -> URL {
     let fileName: String = {
       switch mode {
       case .imeModeCHS: return "vChewing_override-model-data-chs.dat"
@@ -103,9 +126,12 @@ public extension LMMgr {
   // MARK: - 使用者語彙檔案專用目錄的合規性檢查
 
   // 一次性檢查給定的目錄是否存在寫入合規性（僅用於偏好設定檢查等初步檢查場合，不做任何糾偏行為）
-  static func checkIfSpecifiedUserDataFolderValid(_ folderPath: String?) -> Bool {
+  public static func checkIfSpecifiedUserDataFolderValid(_ folderPath: String?) -> Bool {
     var isFolder = ObjCBool(false)
-    let folderExist = FileManager.default.fileExists(atPath: folderPath ?? "", isDirectory: &isFolder)
+    let folderExist = FileManager.default.fileExists(
+      atPath: folderPath ?? "",
+      isDirectory: &isFolder
+    )
     // The above "&" mutates the "isFolder" value to the real one received by the "folderExist".
 
     // 路徑沒有結尾斜槓的話，會導致目錄合規性判定失準。
@@ -123,7 +149,7 @@ public extension LMMgr {
   }
 
   // 檢查給定的磁帶目錄是否存在讀入合規性、且是否為指定格式。
-  static func checkCassettePathValidity(_ cassettePath: String?) -> Bool {
+  public static func checkCassettePathValidity(_ cassettePath: String?) -> Bool {
     var isFolder = ObjCBool(true)
     let isExist = FileManager.default.fileExists(atPath: cassettePath ?? "", isDirectory: &isFolder)
     // The above "&" mutates the "isFolder" value to the real one received by the "isExist".
@@ -132,7 +158,7 @@ public extension LMMgr {
   }
 
   // 檢查給定的目錄是否存在寫入合規性、且糾偏，不接受任何傳入變數。
-  static var userDataFolderExists: Bool {
+  public static var userDataFolderExists: Bool {
     let folderPath = Self.dataFolderPath(isDefaultFolder: false)
     var isFolder = ObjCBool(false)
     var folderExist = FileManager.default.fileExists(atPath: folderPath, isDirectory: &isFolder)
@@ -143,8 +169,7 @@ public extension LMMgr {
     if folderExist, !isFolder.boolValue {
       do {
         if dataFolderPath(isDefaultFolder: false)
-          == dataFolderPath(isDefaultFolder: true)
-        {
+          == dataFolderPath(isDefaultFolder: true) {
           let formatter = DateFormatter()
           formatter.dateFormat = "YYYYMMDD-HHMM'Hrs'-ss's'"
           let dirAlternative = folderPath + formatter.string(from: Date())
@@ -177,9 +202,12 @@ public extension LMMgr {
 
   // 當且僅當 PrefMgr 當中的參數不合規（比如非實在路徑、或者無權限寫入）時，才會糾偏。
 
-  static let appSupportURL = FileManager.default.urls(for: .applicationSupportDirectory, in: .userDomainMask)[0]
+  public static let appSupportURL = FileManager.default.urls(
+    for: .applicationSupportDirectory,
+    in: .userDomainMask
+  )[0]
 
-  static func dataFolderPath(isDefaultFolder: Bool) -> String {
+  public static func dataFolderPath(isDefaultFolder: Bool) -> String {
     var userDictPathSpecified = PrefMgr.shared.userDataFolderSpecified.expandingTildeInPath
     var userDictPathDefault =
       Self.appSupportURL.appendingPathComponent("vChewing").path.expandingTildeInPath
@@ -188,8 +216,7 @@ public extension LMMgr {
     userDictPathSpecified.ensureTrailingSlash()
 
     if (userDictPathSpecified == userDictPathDefault)
-      || isDefaultFolder
-    {
+      || isDefaultFolder {
       return userDictPathDefault
     }
     if UserDefaults.current.object(forKey: UserDef.kUserDataFolderSpecified.rawValue) != nil {
@@ -202,7 +229,7 @@ public extension LMMgr {
     return userDictPathDefault
   }
 
-  static func cassettePath() -> String {
+  public static func cassettePath() -> String {
     let rawCassettePath = PrefMgr.shared.cassettePath
     if UserDefaults.current.object(forKey: UserDef.kCassettePath.rawValue) != nil {
       BookmarkManager.shared.loadBookmarks()
@@ -214,21 +241,24 @@ public extension LMMgr {
 
   // MARK: - 重設使用者語彙檔案目錄
 
-  static func resetSpecifiedUserDataFolder() {
-    UserDefaults.current.set(dataFolderPath(isDefaultFolder: true), forKey: UserDef.kUserDataFolderSpecified.rawValue)
+  public static func resetSpecifiedUserDataFolder() {
+    UserDefaults.current.set(
+      dataFolderPath(isDefaultFolder: true),
+      forKey: UserDef.kUserDataFolderSpecified.rawValue
+    )
     Self.initUserLangModels()
   }
 
-  static func resetCassettePath() {
+  public static func resetCassettePath() {
     UserDefaults.current.set("", forKey: UserDef.kCassettePath.rawValue)
     Self.loadCassetteData()
   }
 
   // MARK: - 寫入使用者檔案
 
-  static func writeUserPhrasesAtOnce(
+  public static func writeUserPhrasesAtOnce(
     _ userPhrase: UserPhrase, areWeFiltering: Bool,
-    errorHandler: (() -> Void)? = nil
+    errorHandler: (() -> ())? = nil
   ) {
     let resultA = userPhrase.write(toFilter: areWeFiltering)
     let resultB = userPhrase.crossConverted.write(toFilter: areWeFiltering)
@@ -250,8 +280,7 @@ public extension LMMgr {
 
   private static func checkIfUserFilesExistBeforeOpening() -> Bool {
     if !Self.chkUserLMFilesExist(.imeModeCHS)
-      || !Self.chkUserLMFilesExist(.imeModeCHT)
-    {
+      || !Self.chkUserLMFilesExist(.imeModeCHT) {
       let content = String(
         format: NSLocalizedString(
           "Please check the permission at \"%@\".", comment: ""
@@ -271,18 +300,25 @@ public extension LMMgr {
     return true
   }
 
-  static func openUserDictFile(type: LMAssembly.ReplacableUserDataType, dual: Bool = false, alt: Bool) {
+  public static func openUserDictFile(
+    type: LMAssembly.ReplacableUserDataType,
+    dual: Bool = false,
+    alt: Bool
+  ) {
     let app: FileOpenMethod = alt ? .textEdit : .finder
     openPhraseFile(fromURL: userDictDataURL(mode: IMEApp.currentInputMode, type: type), using: app)
     guard dual else { return }
-    openPhraseFile(fromURL: userDictDataURL(mode: IMEApp.currentInputMode.reversed, type: type), using: app)
+    openPhraseFile(
+      fromURL: userDictDataURL(mode: IMEApp.currentInputMode.reversed, type: type),
+      using: app
+    )
   }
 
   /// 用指定應用開啟指定檔案。
   /// - Parameters:
   ///   - url: 檔案 URL。
   ///   - FileOpenMethod: 指定 App 應用。
-  static func openPhraseFile(fromURL url: URL, using app: FileOpenMethod) {
+  public static func openPhraseFile(fromURL url: URL, using app: FileOpenMethod) {
     if !Self.checkIfUserFilesExistBeforeOpening() { return }
     DispatchQueue.main.async {
       app.open(url: url)
@@ -294,7 +330,8 @@ public extension LMMgr {
   private static func ensureFileExists(
     _ fileURL: URL, deployTemplate templateBasename: String = "1145141919810",
     extension ext: String = "txt"
-  ) -> Bool {
+  )
+    -> Bool {
     let filePath = fileURL.path
     if !FileManager.default.fileExists(atPath: filePath) {
       let templateURL = Bundle.main.url(forResource: templateBasename, withExtension: ext)
@@ -316,7 +353,8 @@ public extension LMMgr {
     return true
   }
 
-  @discardableResult static func chkUserLMFilesExist(_ mode: Shared.InputMode) -> Bool {
+  @discardableResult
+  public static func chkUserLMFilesExist(_ mode: Shared.InputMode) -> Bool {
     if !userDataFolderExists {
       return false
     }
@@ -334,7 +372,11 @@ public extension LMMgr {
     return !failed
   }
 
-  internal static func templateName(for type: LMAssembly.ReplacableUserDataType, mode: Shared.InputMode) -> String {
+  internal static func templateName(
+    for type: LMAssembly.ReplacableUserDataType,
+    mode: Shared.InputMode
+  )
+    -> String {
     switch type {
     case .thePhrases: return kTemplateNameUserPhrases
     case .theFilter: return kTemplateNameUserFilterList
@@ -350,8 +392,13 @@ public extension LMMgr {
 
 // 威注音輸入法並非可永續的專案。用單個 JSON 檔案遷移資料的話，可方便其他程式開發者們實作相關功能。
 
-public extension LMMgr {
-  @discardableResult static func dumpUserDictDataToJSON(print: Bool = false, all: Bool) -> String? {
+extension LMMgr {
+  @discardableResult
+  public static func dumpUserDictDataToJSON(
+    print: Bool = false,
+    all: Bool
+  )
+    -> String? {
     var summarizedDict = [LMAssembly.UserDictionarySummarized]()
     Shared.InputMode.allCases.forEach { mode in
       guard mode != .imeModeNULL else { return }

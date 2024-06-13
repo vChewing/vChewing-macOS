@@ -20,6 +20,8 @@ private let expectedReverseLookupResults: [String] = [
   "ㄏㄜˋ", "ㄏㄢˋ", "ㄏㄨˊ", "ㄏㄨㄛ˙", "ㄏㄨㄛˋ",
 ]
 
+// MARK: - LMInstantiatorSQLTests
+
 final class LMInstantiatorSQLTests: XCTestCase {
   func testSQL() throws {
     let instance = LMAssembly.LMInstantiator(isCHS: true)
@@ -28,7 +30,10 @@ final class LMInstantiatorSQLTests: XCTestCase {
       config.isCNSEnabled = false
       config.isSymbolEnabled = false
     }
-    XCTAssertEqual(instance.unigramsFor(keyArray: strBloatingKey).description, "[(吹牛逼,-7.375), (吹牛屄,-7.399)]")
+    XCTAssertEqual(
+      instance.unigramsFor(keyArray: strBloatingKey).description,
+      "[(吹牛逼,-7.375), (吹牛屄,-7.399)]"
+    )
     XCTAssertEqual(instance.unigramsFor(keyArray: strHaninSymbolMenuKey)[1].description, "(，,-9.9)")
     XCTAssertEqual(instance.unigramsFor(keyArray: strRefutationKey).description, "[(㨃,-9.544)]")
     XCTAssertEqual(instance.unigramsFor(keyArray: strBoobsKey).description, "[(ㄋㄟㄋㄟ,-1.0)]")
@@ -41,7 +46,10 @@ final class LMInstantiatorSQLTests: XCTestCase {
     XCTAssertEqual(instance.unigramsFor(keyArray: strRefutationKey).count, 10)
     XCTAssertEqual(instance.unigramsFor(keyArray: strBoobsKey).last?.description, "(☉☉,-13.0)")
     // 再測試反查。
-    XCTAssertEqual(LMAssembly.LMInstantiator.getFactoryReverseLookupData(with: "和"), expectedReverseLookupResults)
+    XCTAssertEqual(
+      LMAssembly.LMInstantiator.getFactoryReverseLookupData(with: "和"),
+      expectedReverseLookupResults
+    )
     LMAssembly.LMInstantiator.disconnectSQLDB()
   }
 

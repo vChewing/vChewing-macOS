@@ -13,7 +13,10 @@ import Foundation
 private typealias LengthSortedDictionary = [Int: [String: String]]
 
 private let mapHanyuPinyinToPhonabets: LengthSortedDictionary = {
-  let parsed = try? JSONDecoder().decode(LengthSortedDictionary.self, from: jsnHanyuPinyinToMPS.data(using: .utf8) ?? Data([]))
+  let parsed = try? JSONDecoder().decode(
+    LengthSortedDictionary.self,
+    from: jsnHanyuPinyinToMPS.data(using: .utf8) ?? Data([])
+  )
   return parsed ?? [:]
 }()
 
@@ -31,8 +34,8 @@ extension String {
 }
 
 /// 檢測字串是否包含半形英數內容
-private extension String {
-  var isNotPureAlphanumerical: Bool {
+extension String {
+  fileprivate var isNotPureAlphanumerical: Bool {
     let regex = ".*[^A-Za-z0-9].*"
     let testString = NSPredicate(format: "SELF MATCHES %@", regex)
     return testString.evaluate(with: self)

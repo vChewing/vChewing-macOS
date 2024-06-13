@@ -10,6 +10,13 @@
 import XCTest
 
 final class SharedTests: XCTestCase {
+  // MARK: - CandidateTextService (Basic Tests)
+
+  static let testDataMap: [String] = [
+    #"Bing: %s"# + "\t" + #"@WEB:https://www.bing.com/search?q=%s"#,
+    #"Ecosia: %s"# + "\t" + #"@WEB:https://www.ecosia.org/search?method=index&q=%s"#,
+  ]
+
   // MARK: - PrefMgr().dumpShellScriptBackup()
 
   func testDumpedPrefs() throws {
@@ -17,13 +24,6 @@ final class SharedTests: XCTestCase {
     let fetched = prefs.dumpShellScriptBackup() ?? ""
     XCTAssertFalse(fetched.isEmpty)
   }
-
-  // MARK: - CandidateTextService (Basic Tests)
-
-  static let testDataMap: [String] = [
-    #"Bing: %s"# + "\t" + #"@WEB:https://www.bing.com/search?q=%s"#,
-    #"Ecosia: %s"# + "\t" + #"@WEB:https://www.ecosia.org/search?method=index&q=%s"#,
-  ]
 
   func testDataRestoration() throws {
     let stacked = Self.testDataMap.parseIntoCandidateTextServiceStack()

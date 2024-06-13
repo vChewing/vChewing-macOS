@@ -10,13 +10,12 @@ import AppKit
 import NotifierUI
 import Shared
 
-// MARK: - InputHandler Delegate
+// MARK: - SessionCtl + InputHandlerDelegate
 
 extension SessionCtl: InputHandlerDelegate {
   public var clientMitigationLevel: Int {
     guard !PrefMgr.shared.securityHardenedCompositionBuffer else { return 2 }
-    guard
-      let result = PrefMgr.shared.clientsIMKTextInputIncapable[clientBundleIdentifier]
+    guard let result = PrefMgr.shared.clientsIMKTextInputIncapable[clientBundleIdentifier]
     else {
       return 0
     }
@@ -73,13 +72,16 @@ extension SessionCtl: InputHandlerDelegate {
     )
     // 開始針對使用者半衰模組的清詞處理
     LMMgr.bleachSpecifiedSuggestions(targets: [valueCurrent], mode: IMEApp.currentInputMode)
-    LMMgr.bleachSpecifiedSuggestions(targets: [valueReversed], mode: IMEApp.currentInputMode.reversed)
+    LMMgr.bleachSpecifiedSuggestions(
+      targets: [valueReversed],
+      mode: IMEApp.currentInputMode.reversed
+    )
     // 清詞完畢
     return true
   }
 }
 
-// MARK: - Candidate Controller Delegate
+// MARK: - SessionCtl + CtlCandidateDelegate
 
 extension SessionCtl: CtlCandidateDelegate {
   public var isCandidateState: Bool { state.isCandidateContainer }
@@ -125,7 +127,8 @@ extension SessionCtl: CtlCandidateDelegate {
     } else if state.type == .ofInputting, state.isCandidateContainer {
       let useShift = inputMode.langModel.areCassetteCandidateKeysShiftHeld
       let theEmoji = useShift ? "⬆️" : "⚡️"
-      return shortened ? theEmoji : "\(theEmoji) " + NSLocalizedString("Quick Candidates", comment: "")
+      return shortened ? theEmoji : "\(theEmoji) " +
+        NSLocalizedString("Quick Candidates", comment: "")
     } else if PrefMgr.shared.cassetteEnabled {
       return shortened ? "📼" : "📼 " + NSLocalizedString("CIN Cassette Mode", comment: "")
     } else if state.type == .ofSymbolTable, state.node.containsCandidateServices {
@@ -134,13 +137,13 @@ extension SessionCtl: CtlCandidateDelegate {
     return ""
   }
 
-  @discardableResult public func reverseLookup(for value: String) -> [String] {
+  @discardableResult
+  public func reverseLookup(for value: String) -> [String] {
     let blankResult: [String] = []
     // 這一段專門處理「反查」。
     if !PrefMgr.shared.showReverseLookupInCandidateUI { return blankResult }
     if state.type == .ofInputting, state.isCandidateContainer,
-       inputHandler?.currentLM.nullCandidateInCassette == value
-    {
+       inputHandler?.currentLM.nullCandidateInCassette == value {
       return blankResult
     }
     if isVerticalTyping { return blankResult } // 縱排輸入的場合，選字窗沒有足夠的空間顯示反查結果。
@@ -166,10 +169,14 @@ extension SessionCtl: CtlCandidateDelegate {
 
   public func candidatePairs(conv: Bool = false) -> [(keyArray: [String], value: String)] {
     if !state.isCandidateContainer || state.candidates.isEmpty { return [] }
-    if !conv || PrefMgr.shared.cns11643Enabled || state.candidates[0].keyArray.joined().contains("_punctuation") {
+    if !conv || PrefMgr.shared.cns11643Enabled || state.candidates[0].keyArray.joined()
+      .contains("_punctuation") {
       return state.candidates
     }
-    let convertedCandidates = state.candidates.map { theCandidatePair -> (keyArray: [String], value: String) in
+    let convertedCandidates = state.candidates.map { theCandidatePair -> (
+      keyArray: [String],
+      value: String
+    ) in
       var theCandidatePair = theCandidatePair
       theCandidatePair.value = ChineseConverter.kanjiConversionIfRequired(theCandidatePair.value)
       return theCandidatePair
@@ -215,7 +222,8 @@ extension SessionCtl: CtlCandidateDelegate {
           if let response = serviceNode.service.responseFromSelector {
             NSPasteboard.general.declareTypes([.string], owner: nil)
             NSPasteboard.general.setString(response, forType: .string)
-            Notifier.notify(message: "i18n:candidateServiceMenu.selectorResponse.succeeded".localized)
+            Notifier
+              .notify(message: "i18n:candidateServiceMenu.selectorResponse.succeeded".localized)
           } else {
             callError("4DFDC487: Candidate Text Service Selector Responsiveness Failure.")
             Notifier.notify(message: "i18n:candidateServiceMenu.selectorResponse.failed".localized)
@@ -297,7 +305,10 @@ extension SessionCtl: CtlCandidateDelegate {
 
     // 開始針對使用者半衰模組的清詞處理
     LMMgr.bleachSpecifiedSuggestions(targets: [valueCurrent], mode: IMEApp.currentInputMode)
-    LMMgr.bleachSpecifiedSuggestions(targets: [valueReversed], mode: IMEApp.currentInputMode.reversed)
+    LMMgr.bleachSpecifiedSuggestions(
+      targets: [valueReversed],
+      mode: IMEApp.currentInputMode.reversed
+    )
     // 更新組字器內的單元圖資料。
     let updateResult = inputHandler.updateUnigramData()
     // 清詞完畢
@@ -310,13 +321,16 @@ extension SessionCtl: CtlCandidateDelegate {
     switch action {
     case .toBoost:
       newState.data.tooltipColorState = .normal
-      tooltipMessage = succeeded ? "+ Succeeded in boosting a candidate." : "⚠︎ Failed from boosting a candidate."
+      tooltipMessage = succeeded ? "+ Succeeded in boosting a candidate." :
+        "⚠︎ Failed from boosting a candidate."
     case .toNerf:
       newState.data.tooltipColorState = .succeeded
-      tooltipMessage = succeeded ? "- Succeeded in nerfing a candidate." : "⚠︎ Failed from nerfing a candidate."
+      tooltipMessage = succeeded ? "- Succeeded in nerfing a candidate." :
+        "⚠︎ Failed from nerfing a candidate."
     case .toFilter:
       newState.data.tooltipColorState = .warning
-      tooltipMessage = succeeded ? "! Succeeded in filtering a candidate." : "⚠︎ Failed from filtering a candidate."
+      tooltipMessage = succeeded ? "! Succeeded in filtering a candidate." :
+        "⚠︎ Failed from filtering a candidate."
     }
     if !succeeded { newState.data.tooltipColorState = .redAlert }
     newState.tooltip = NSLocalizedString(tooltipMessage, comment: "")

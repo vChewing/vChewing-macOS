@@ -12,14 +12,17 @@ import OSFrameworkImpl
 public enum Uninstaller {
   // MARK: - Uninstall the input method.
 
-  @discardableResult public static func uninstall(
+  @discardableResult
+  public static func uninstall(
     selfKill: Bool = true,
     defaultDataFolderPath: String,
     removeAll: Bool = false
-  ) -> Int32 {
+  )
+    -> Int32 {
     let isSudo = NSApplication.isSudoMode
     let realHomeDir = URL(
-      fileURLWithFileSystemRepresentation: getpwuid(getuid()).pointee.pw_dir, isDirectory: true, relativeTo: nil
+      fileURLWithFileSystemRepresentation: getpwuid(getuid()).pointee.pw_dir, isDirectory: true,
+      relativeTo: nil
     )
     // 輸入法自毀處理。這裡不用「Bundle.main.bundleURL」是為了方便使用者以 sudo 身分來移除被錯誤安裝到系統目錄內的輸入法。
     guard let bundleID = Bundle.main.bundleIdentifier else {
@@ -61,9 +64,15 @@ public enum Uninstaller {
       // 如果使用者有在輸入法偏好設定內將該目錄改到別的地方（而不是用 symbol link）的話，則不處理。
       // 目前暫時無法應對 symbol link 的情況。
       FileManager.trashTargetIfExists(defaultDataFolderPath)
-      FileManager.trashTargetIfExists(pathLibrary + "/Preferences/" + bundleID + ".plist") // 之後移除 App 偏好設定
-      FileManager.trashTargetIfExists(pathLibrary + "/Receipts/org.atelierInmu.vChewing.bom") // pkg 垃圾
-      FileManager.trashTargetIfExists(pathLibrary + "/Receipts/org.atelierInmu.vChewing.plist") // pkg 垃圾
+      FileManager
+        .trashTargetIfExists(pathLibrary + "/Preferences/" + bundleID + ".plist") // 之後移除 App 偏好設定
+      FileManager
+        .trashTargetIfExists(pathLibrary + "/Receipts/org.atelierInmu.vChewing.bom") // pkg 垃圾
+      FileManager
+        .trashTargetIfExists(
+          pathLibrary +
+            "/Receipts/org.atelierInmu.vChewing.plist"
+        ) // pkg 垃圾
     }
     if !FileManager.trashTargetIfExists(pathIMELibrary + kTargetBundle) { return -1 } // 最後移除 App 自身
     // 幹掉殘留在記憶體內的執行緒。

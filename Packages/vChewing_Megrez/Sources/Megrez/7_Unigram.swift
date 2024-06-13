@@ -3,17 +3,12 @@
 // ====================
 // This code is released under the MIT license (SPDX-License-Identifier: MIT)
 
-public extension Megrez {
+// MARK: - Megrez.Unigram
+
+extension Megrez {
   /// 單元圖。
-  struct Unigram: Equatable, CustomStringConvertible, Hashable {
-    /// 資料值，通常是詞語或單個字。
-    public var value: String
-    /// 權重。
-    public var score: Double
-    /// 將當前單元圖列印成一個字串。
-    public var description: String {
-      "(" + value.description + "," + String(score) + ")"
-    }
+  public struct Unigram: Equatable, CustomStringConvertible, Hashable {
+    // MARK: Lifecycle
 
     /// 初期化一筆「單元圖」。一筆單元圖由一筆資料值與一筆權重數值組成。
     /// - Parameters:
@@ -24,11 +19,16 @@ public extension Megrez {
       self.score = score
     }
 
-    /// 做為預設雜湊函式。
-    /// - Parameter hasher: 目前物件的雜湊碼。
-    public func hash(into hasher: inout Hasher) {
-      hasher.combine(value)
-      hasher.combine(score)
+    // MARK: Public
+
+    /// 資料值，通常是詞語或單個字。
+    public var value: String
+    /// 權重。
+    public var score: Double
+
+    /// 將當前單元圖列印成一個字串。
+    public var description: String {
+      "(" + value.description + "," + String(score) + ")"
     }
 
     public static func == (lhs: Unigram, rhs: Unigram) -> Bool {
@@ -38,14 +38,21 @@ public extension Megrez {
     public static func < (lhs: Unigram, rhs: Unigram) -> Bool {
       lhs.value < rhs.value || (lhs.value == rhs.value && lhs.score < rhs.score)
     }
+
+    /// 做為預設雜湊函式。
+    /// - Parameter hasher: 目前物件的雜湊碼。
+    public func hash(into hasher: inout Hasher) {
+      hasher.combine(value)
+      hasher.combine(score)
+    }
   }
 }
 
 // MARK: - Array Extensions.
 
-public extension Array where Element == Megrez.Unigram {
+extension Array where Element == Megrez.Unigram {
   /// 給定過濾清單，讓單元圖陣列自我過濾。
-  mutating func consolidate(filter theFilter: Set<String> = .init()) {
+  public mutating func consolidate(filter theFilter: Set<String> = .init()) {
     var inserted: [String: Double] = [:]
     var insertedArray: [Megrez.Unigram] = []
     filter { !theFilter.contains($0.value) }.forEach { neta in

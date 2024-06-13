@@ -10,6 +10,8 @@ import XCTest
 
 @testable import Tekkon
 
+// MARK: - TekkonTestsBasic
+
 final class TekkonTestsBasic: XCTestCase {
   func testInitializingPhonabet() throws {
     let thePhonabetNull = Tekkon.Phonabet("0")
@@ -217,7 +219,7 @@ final class TekkonTestsBasic: XCTestCase {
   }
 }
 
-// MARK: Testing Pinyin Arrangements
+// MARK: - TekkonTestsPinyin
 
 final class TekkonTestsPinyin: XCTestCase {
   func testHanyuPinyinKeyReceivingAndCompositions() throws {

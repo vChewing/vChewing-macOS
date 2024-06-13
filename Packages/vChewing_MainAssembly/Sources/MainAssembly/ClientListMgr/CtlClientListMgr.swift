@@ -10,9 +10,8 @@ import AppKit
 import Foundation
 
 public class CtlClientListMgr: NSWindowController {
-  let viewController = VwrClientListMgr()
+  // MARK: Lifecycle
 
-  public static var shared: CtlClientListMgr?
   public init() {
     super.init(
       window: .init(
@@ -28,6 +27,10 @@ public class CtlClientListMgr: NSWindowController {
   required init?(coder: NSCoder) {
     super.init(coder: coder)
   }
+
+  // MARK: Public
+
+  public static var shared: CtlClientListMgr?
 
   public static func show() {
     if shared == nil {
@@ -59,4 +62,8 @@ public class CtlClientListMgr: NSWindowController {
     }
     window?.setPosition(vertical: .center, horizontal: .right, padding: 20)
   }
+
+  // MARK: Internal
+
+  let viewController = VwrClientListMgr()
 }

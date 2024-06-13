@@ -8,8 +8,8 @@
 
 import AppKit
 
-public extension NSWindowController {
-  func orderFront() {
+extension NSWindowController {
+  public func orderFront() {
     window?.orderFront(self)
   }
 
@@ -20,14 +20,19 @@ public extension NSWindowController {
   /// - Parameters:
   ///   - windowTopLeftPoint: 給定的視窗顯示位置。
   ///   - heightDelta: 為了「防止選字窗抻出螢幕下方」而給定的預留高度。
-  func set(windowTopLeftPoint: NSPoint, bottomOutOfScreenAdjustmentHeight heightDelta: Double, useGCD: Bool) {
+  public func set(
+    windowTopLeftPoint: NSPoint,
+    bottomOutOfScreenAdjustmentHeight heightDelta: Double,
+    useGCD: Bool
+  ) {
     func doSet() {
       guard let window = window, var screenFrame = NSScreen.main?.visibleFrame else { return }
       let windowSize = window.frame.size
 
       var adjustedPoint = windowTopLeftPoint
       var delta = heightDelta
-      for frame in NSScreen.screens.map(\.visibleFrame).filter({ $0.contains(windowTopLeftPoint) }) {
+      for frame in NSScreen.screens.map(\.visibleFrame)
+        .filter({ $0.contains(windowTopLeftPoint) }) {
         screenFrame = frame
         break
       }
@@ -38,7 +43,10 @@ public extension NSWindowController {
         adjustedPoint.y = windowTopLeftPoint.y + windowSize.height + delta
       }
       adjustedPoint.y = min(adjustedPoint.y, screenFrame.maxY - 1.0)
-      adjustedPoint.x = min(max(adjustedPoint.x, screenFrame.minX), screenFrame.maxX - windowSize.width - 1.0)
+      adjustedPoint.x = min(
+        max(adjustedPoint.x, screenFrame.minX),
+        screenFrame.maxX - windowSize.width - 1.0
+      )
 
       window.setFrameTopLeftPoint(adjustedPoint)
     }
@@ -47,14 +55,18 @@ public extension NSWindowController {
   }
 }
 
-public extension NSWindow {
-  @discardableResult func callAlert(title: String, text: String? = nil) -> NSApplication.ModalResponse {
+extension NSWindow {
+  @discardableResult
+  public func callAlert(title: String, text: String? = nil) -> NSApplication
+    .ModalResponse {
     (self as NSWindow?).callAlert(title: title, text: text)
   }
 }
 
-public extension NSWindow? {
-  @discardableResult func callAlert(title: String, text: String? = nil) -> NSApplication.ModalResponse {
+extension NSWindow? {
+  @discardableResult
+  public func callAlert(title: String, text: String? = nil) -> NSApplication
+    .ModalResponse {
     let alert = NSAlert()
     alert.messageText = title
     if let text = text { alert.informativeText = text }

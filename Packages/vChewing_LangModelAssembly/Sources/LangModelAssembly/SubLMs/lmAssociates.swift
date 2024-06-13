@@ -8,32 +8,26 @@
 
 import Megrez
 
+// MARK: - LMAssembly.LMAssociates
+
 extension LMAssembly {
   struct LMAssociates {
+    // MARK: Lifecycle
+
+    public init() {
+      self.rangeMap = [:]
+    }
+
+    // MARK: Public
+
     public private(set) var filePath: String?
-    var rangeMap: [String: [(Range<String.Index>, Int)]] = [:] // Range 只可能是一整行，所以必須得有 index。
-    var strData: String = ""
 
     public var count: Int { rangeMap.count }
 
-    public init() {
-      rangeMap = [:]
-    }
-
     public var isLoaded: Bool { !rangeMap.isEmpty }
 
-    internal static func cnvNGramKeyFromPinyinToPhona(target: String) -> String {
-      guard target.contains("("), target.contains(","), target.contains(")") else {
-        return target
-      }
-      let arrTarget = target.dropLast().dropFirst().split(separator: ",")
-      guard arrTarget.count == 2 else { return target }
-      var arrTarget0 = String(arrTarget[0]).lowercased()
-      arrTarget0.convertToPhonabets()
-      return "(\(arrTarget0),\(arrTarget[1]))"
-    }
-
-    @discardableResult public mutating func open(_ path: String) -> Bool {
+    @discardableResult
+    public mutating func open(_ path: String) -> Bool {
       if isLoaded { return false }
       let oldPath = filePath
       filePath = nil
@@ -111,6 +105,22 @@ extension LMAssembly {
     public func hasValuesFor(pair: Megrez.KeyValuePaired) -> Bool {
       if rangeMap[pair.toNGramKey] != nil { return true }
       return rangeMap[pair.value] != nil
+    }
+
+    // MARK: Internal
+
+    var rangeMap: [String: [(Range<String.Index>, Int)]] = [:] // Range 只可能是一整行，所以必須得有 index。
+    var strData: String = ""
+
+    internal static func cnvNGramKeyFromPinyinToPhona(target: String) -> String {
+      guard target.contains("("), target.contains(","), target.contains(")") else {
+        return target
+      }
+      let arrTarget = target.dropLast().dropFirst().split(separator: ",")
+      guard arrTarget.count == 2 else { return target }
+      var arrTarget0 = String(arrTarget[0]).lowercased()
+      arrTarget0.convertToPhonabets()
+      return "(\(arrTarget0),\(arrTarget[1]))"
     }
   }
 }

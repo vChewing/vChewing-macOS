@@ -10,8 +10,42 @@ import Shared
 import SwiftExtension
 import SwiftUI
 
+// MARK: - VwrSettingsPaneDevZone
+
 @available(macOS 13, *)
 public struct VwrSettingsPaneDevZone: View {
+  // MARK: Public
+
+  // MARK: - Main View
+
+  public var body: some View {
+    ScrollView {
+      Form {
+        Section(
+          header: Text(
+            "Warning: This page is for testing future features. \nFeatures listed here may not work as expected."
+          ),
+          footer: Text("Some previous options are moved to other tabs.".localized)
+            .settingsDescription()
+        ) {
+          UserDef.kSecurityHardenedCompositionBuffer.bind($securityHardenedCompositionBuffer)
+            .render()
+          UserDef.kDisableSegmentedThickUnderlineInMarkingModeForManagedClients
+            .bind($disableSegmentedThickUnderlineInMarkingModeForManagedClients)
+            .render()
+          UserDef.kCheckAbusersOfSecureEventInputAPI.bind($checkAbusersOfSecureEventInputAPI)
+            .render()
+        }
+      }.formStyled()
+    }
+    .frame(
+      minWidth: CtlSettingsUI.formWidth,
+      maxHeight: CtlSettingsUI.contentMaxHeight
+    )
+  }
+
+  // MARK: Private
+
   // MARK: - AppStorage Variables
 
   @AppStorage(
@@ -31,29 +65,9 @@ public struct VwrSettingsPaneDevZone: View {
     UserDef.kCheckAbusersOfSecureEventInputAPI.rawValue
   )
   private var checkAbusersOfSecureEventInputAPI: Bool
-
-  // MARK: - Main View
-
-  public var body: some View {
-    ScrollView {
-      Form {
-        Section(header: Text(
-          "Warning: This page is for testing future features. \nFeatures listed here may not work as expected."
-        ), footer: Text("Some previous options are moved to other tabs.".localized).settingsDescription()) {
-          UserDef.kSecurityHardenedCompositionBuffer.bind($securityHardenedCompositionBuffer).render()
-          UserDef.kDisableSegmentedThickUnderlineInMarkingModeForManagedClients
-            .bind($disableSegmentedThickUnderlineInMarkingModeForManagedClients)
-            .render()
-          UserDef.kCheckAbusersOfSecureEventInputAPI.bind($checkAbusersOfSecureEventInputAPI).render()
-        }
-      }.formStyled()
-    }
-    .frame(
-      minWidth: CtlSettingsUI.formWidth,
-      maxHeight: CtlSettingsUI.contentMaxHeight
-    )
-  }
 }
+
+// MARK: - VwrSettingsPaneDevZone_Previews
 
 @available(macOS 13, *)
 struct VwrSettingsPaneDevZone_Previews: PreviewProvider {

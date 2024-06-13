@@ -4,24 +4,20 @@
 import Foundation
 
 public class FolderMonitor {
-  // MARK: Properties
-
-  /// A file descriptor for the monitored directory.
-  private var monitoredFolderFileDescriptor: CInt = -1
-  /// A dispatch queue used for sending file changes in the directory.
-  private let folderMonitorQueue = DispatchQueue(label: "FolderMonitorQueue", attributes: .concurrent)
-  /// A dispatch source to monitor a file descriptor created from the directory.
-  private var folderMonitorSource: DispatchSourceFileSystemObject?
-  /// URL for the directory being monitored.
-  public let url: URL
-
-  public var folderDidChange: (() -> Void)?
+  // MARK: Lifecycle
 
   // MARK: Initializers
 
   public init(url: URL) {
     self.url = url
   }
+
+  // MARK: Public
+
+  /// URL for the directory being monitored.
+  public let url: URL
+
+  public var folderDidChange: (() -> ())?
 
   // MARK: Monitoring
 
@@ -56,4 +52,18 @@ public class FolderMonitor {
   public func stopMonitoring() {
     folderMonitorSource?.cancel()
   }
+
+  // MARK: Private
+
+  // MARK: Properties
+
+  /// A file descriptor for the monitored directory.
+  private var monitoredFolderFileDescriptor: CInt = -1
+  /// A dispatch queue used for sending file changes in the directory.
+  private let folderMonitorQueue = DispatchQueue(
+    label: "FolderMonitorQueue",
+    attributes: .concurrent
+  )
+  /// A dispatch source to monitor a file descriptor created from the directory.
+  private var folderMonitorSource: DispatchSourceFileSystemObject?
 }
