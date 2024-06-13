@@ -79,7 +79,13 @@ extension UserDefRenderable<Any> {
 
 // MARK: - Identifiable + Identifiable
 
-extension [UserDefRenderable<Any>]: Identifiable {
+#if hasFeature(RetroactiveAttribute)
+  extension [UserDefRenderable<Any>]: @retroactive Identifiable {}
+#else
+  extension [UserDefRenderable<Any>]: Identifiable {}
+#endif
+
+extension [UserDefRenderable<Any>] {
   public var id: String { map(\.id).description }
 }
 
