@@ -10,6 +10,7 @@ import AppKit
 import NSAttributedTextView
 import OSFrameworkImpl
 import Shared
+import SwiftExtension
 
 public class TooltipUI_LateCocoa: NSWindowController, TooltipUIProtocol {
   // MARK: Lifecycle
@@ -69,7 +70,7 @@ public class TooltipUI_LateCocoa: NSWindowController, TooltipUIProtocol {
     set(windowTopLeftPoint: point, bottomOutOfScreenAdjustmentHeight: heightDelta, useGCD: false)
     window?.setIsVisible(true)
     if duration > 0 {
-      DispatchQueue.main.asyncAfter(deadline: .now() + duration) {
+      asyncOnMain(after: duration) {
         self.window?.orderOut(nil)
       }
     }

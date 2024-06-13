@@ -8,6 +8,7 @@
 
 import AppKit
 import Shared
+import SwiftExtension
 
 open class CtlCandidate: NSWindowController, CtlCandidateProtocol {
   // MARK: Lifecycle
@@ -50,7 +51,7 @@ open class CtlCandidate: NSWindowController, CtlCandidateProtocol {
       return NSPoint(x: frameRect.minX, y: frameRect.maxY)
     }
     set {
-      DispatchQueue.main.async {
+      asyncOnMain {
         self.set(windowTopLeftPoint: newValue, bottomOutOfScreenAdjustmentHeight: 0, useGCD: true)
       }
     }
@@ -59,7 +60,7 @@ open class CtlCandidate: NSWindowController, CtlCandidateProtocol {
   open var visible = false {
     didSet {
       NSObject.cancelPreviousPerformRequests(withTarget: self)
-      DispatchQueue.main.async { [weak self] in
+      asyncOnMain { [weak self] in
         guard let self = self else { return }
         _ = self.visible ? self.window?.orderFront(self) : self.window?.orderOut(self)
       }

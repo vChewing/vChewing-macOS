@@ -52,7 +52,7 @@ public class NSAttributedTextView: NSView {
 
   public init() {
     super.init(frame: .zero)
-    #if compiler(>=5.9) && canImport(AppKit, _version: "14.0")
+    #if compiler(>=5.9) && canImport(AppKit, _version: 14.0)
       clipsToBounds = true // 得手動聲明該特性，否則該 View 的尺寸會失控。
     #endif
   }

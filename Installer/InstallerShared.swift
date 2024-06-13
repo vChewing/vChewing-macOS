@@ -8,6 +8,7 @@
 
 import AppKit
 import InputMethodKit
+import SwiftExtension
 import SwiftUI
 
 public let kTargetBin = "vChewing"
@@ -67,7 +68,7 @@ var allRegisteredInstancesOfThisInputMethod: [TISInputSource] {
 
 extension NSApplication {
   public func popup() {
-    #if compiler(>=5.9) && canImport(AppKit, _version: "14.0")
+    #if compiler(>=5.9) && canImport(AppKit, _version: 14.0)
       if #available(macOS 14.0, *) {
         NSApp.activate()
       } else {
@@ -91,7 +92,7 @@ extension NSApplication {
 
 extension NSApplication {
   public func terminateWithDelay() {
-    DispatchQueue.main.asyncAfter(deadline: DispatchTime.now() + 0.1) { [weak self] in
+    asyncOnMain(after: 0.1) { [weak self] in
       if let this = self {
         this.terminate(this)
       }

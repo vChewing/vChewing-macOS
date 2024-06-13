@@ -287,7 +287,7 @@ extension LMMgr {
         ),
         Self.dataFolderPath(isDefaultFolder: false)
       )
-      DispatchQueue.main.async {
+      asyncOnMain {
         let alert = NSAlert()
         alert.messageText = NSLocalizedString("Unable to create the user phrase file.", comment: "")
         alert.informativeText = content
@@ -320,7 +320,7 @@ extension LMMgr {
   ///   - FileOpenMethod: 指定 App 應用。
   public static func openPhraseFile(fromURL url: URL, using app: FileOpenMethod) {
     if !Self.checkIfUserFilesExistBeforeOpening() { return }
-    DispatchQueue.main.async {
+    asyncOnMain {
       app.open(url: url)
     }
   }

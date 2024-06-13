@@ -8,6 +8,7 @@
 
 import Foundation
 import Shared
+import SwiftExtension
 
 // MARK: - CandidatePool
 
@@ -191,7 +192,7 @@ extension CandidatePool {
 
   public func update() {
     if #available(macOS 10.15, *) {
-      DispatchQueue.main.async {
+      asyncOnMain {
         self.objectWillChange.send()
       }
     }

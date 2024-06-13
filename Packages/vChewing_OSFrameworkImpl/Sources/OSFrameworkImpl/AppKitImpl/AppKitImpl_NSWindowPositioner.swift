@@ -3,6 +3,7 @@
 // Ref: https://gist.github.com/ABridoux/b935c21c7ead92033d39b357fae6366b
 
 import AppKit
+import SwiftExtension
 import SwiftUI
 
 // MARK: - NSWindow.Position
@@ -110,12 +111,12 @@ extension NSWindow {
 
     public func makeNSView(context _: Self.Context) -> NSView {
       let view = NSView()
-      DispatchQueue.main.async { callback(view.window) }
+      asyncOnMain { callback(view.window) }
       return view
     }
 
     public func updateNSView(_ nsView: NSView, context _: Context) {
-      DispatchQueue.main.async { callback(nsView.window) }
+      asyncOnMain { callback(nsView.window) }
     }
   }
 
