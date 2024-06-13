@@ -6,7 +6,9 @@
 // marks, or product names of Contributor, except as required to fulfill notice
 // requirements defined in MIT License.
 
-public extension Tekkon {
+// MARK: - Tekkon.Composer
+
+extension Tekkon {
   // MARK: - Syllable Composer
 
   /// 注音並擊處理的對外介面以注拼槽（Syllable Composer）的形式存在。
@@ -15,7 +17,42 @@ public extension Tekkon {
   ///
   /// 因為是 String Literal，所以初期化時可以藉由 @input 參數指定初期已經傳入的按鍵訊號。
   /// 還可以在初期化時藉由 @arrange 參數來指定注音排列（預設為「.ofDachen」大千佈局）。
-  @frozen struct Composer: Equatable, Codable, Hashable, ExpressibleByStringLiteral {
+  @frozen
+  public struct Composer: Equatable, Codable, Hashable, ExpressibleByStringLiteral {
+    // MARK: Lifecycle
+
+    // MARK: 注拼槽對外處理函式
+
+    /// 初期化一個新的注拼槽。可以藉由 @input 參數指定初期已經傳入的按鍵訊號。
+    /// 還可以在初期化時藉由 @arrange 參數來指定注音排列（預設為「.ofDachen」大千佈局）。
+    /// - Parameters:
+    ///   - input: 傳入的 String 內容，用以處理單個字符。
+    ///   - arrange: 要使用的注音排列。
+    ///   - correction: 是否對錯誤的注音讀音組合做出自動糾正處理。
+    public init(
+      _ input: String = "",
+      arrange parser: MandarinParser = .ofDachen,
+      correction: Bool = false
+    ) {
+      self.phonabetCombinationCorrectionEnabled = correction
+      ensureParser(arrange: parser)
+      receiveKey(fromString: input)
+    }
+
+    public init(stringLiteral value: String) {
+      self.init(value)
+    }
+
+    public init(unicodeScalarLiteral value: String) {
+      self.init(stringLiteral: value)
+    }
+
+    public init(extendedGraphemeClusterLiteral value: String) {
+      self.init(stringLiteral: value)
+    }
+
+    // MARK: Public
+
     /// 聲母。
     public var consonant: Phonabet = .init()
 
@@ -47,6 +84,25 @@ public extension Tekkon {
     /// 當前注拼槽是否處於拼音模式。
     public var isPinyinMode: Bool { parser.rawValue >= 100 }
 
+    /// 注拼槽內容是否為空。
+    public var isEmpty: Bool {
+      guard !isPinyinMode else { return intonation.isEmpty && romajiBuffer.isEmpty }
+      return intonation.isEmpty && vowel.isEmpty && semivowel.isEmpty && consonant.isEmpty
+    }
+
+    /// 注拼槽內容是否可唸。
+    public var isPronounceable: Bool {
+      !vowel.isEmpty || !semivowel.isEmpty || !consonant.isEmpty
+    }
+
+    // MARK: - Misc Definitions
+
+    /// 這些內容用來滿足 "Equatable, Hashable, ExpressibleByStringLiteral" 需求。
+
+    public static func == (lhs: Composer, rhs: Composer) -> Bool {
+      lhs.value == rhs.value
+    }
+
     /// 統計有效的聲介韻（調）個數。
     /// - Parameter withIntonation: 是否統計聲調。
     /// - Returns: 統計出的有效 Phonabet 個數。
@@ -60,14 +116,19 @@ public extension Tekkon {
     /// - Parameters:
     ///   - isHanyuPinyin: 是否將輸出結果轉成漢語拼音。
     ///   - isTextBookStyle: 是否將輸出的注音/拼音結果轉成教科書排版格式。
-    public func getComposition(isHanyuPinyin: Bool = false, isTextBookStyle: Bool = false) -> String {
+    public func getComposition(
+      isHanyuPinyin: Bool = false,
+      isTextBookStyle: Bool = false
+    )
+      -> String {
       switch isHanyuPinyin {
       case false: // 注音輸出的場合
         let valReturnZhuyin = value.swapping(" ", with: "")
         return isTextBookStyle ? cnvPhonaToTextbookStyle(target: valReturnZhuyin) : valReturnZhuyin
       case true: // 拼音輸出的場合
         let valReturnPinyin = Tekkon.cnvPhonaToHanyuPinyin(targetJoined: value)
-        return isTextBookStyle ? Tekkon.cnvHanyuPinyinToTextbookStyle(targetJoined: valReturnPinyin) : valReturnPinyin
+        return isTextBookStyle ? Tekkon
+          .cnvHanyuPinyinToTextbookStyle(targetJoined: valReturnPinyin) : valReturnPinyin
       }
     }
 
@@ -86,31 +147,6 @@ public extension Tekkon {
       default: break
       }
       return romajiBuffer.swapping("v", with: "ü") + toneReturned
-    }
-
-    /// 注拼槽內容是否為空。
-    public var isEmpty: Bool {
-      guard !isPinyinMode else { return intonation.isEmpty && romajiBuffer.isEmpty }
-      return intonation.isEmpty && vowel.isEmpty && semivowel.isEmpty && consonant.isEmpty
-    }
-
-    /// 注拼槽內容是否可唸。
-    public var isPronounceable: Bool {
-      !vowel.isEmpty || !semivowel.isEmpty || !consonant.isEmpty
-    }
-
-    // MARK: 注拼槽對外處理函式
-
-    /// 初期化一個新的注拼槽。可以藉由 @input 參數指定初期已經傳入的按鍵訊號。
-    /// 還可以在初期化時藉由 @arrange 參數來指定注音排列（預設為「.ofDachen」大千佈局）。
-    /// - Parameters:
-    ///   - input: 傳入的 String 內容，用以處理單個字符。
-    ///   - arrange: 要使用的注音排列。
-    ///   - correction: 是否對錯誤的注音讀音組合做出自動糾正處理。
-    public init(_ input: String = "", arrange parser: MandarinParser = .ofDachen, correction: Bool = false) {
-      phonabetCombinationCorrectionEnabled = correction
-      ensureParser(arrange: parser)
-      receiveKey(fromString: input)
     }
 
     /// 清除自身的內容，就是將聲介韻調全部清空。
@@ -166,31 +202,9 @@ public extension Tekkon {
         return Tekkon.mapAlvinLiuStaticKeys[input] != nil
       case .ofWadeGilesPinyin:
         return Tekkon.mapWadeGilesPinyinKeys.has(string: input)
-      case .ofHanyuPinyin, .ofSecondaryPinyin, .ofYalePinyin, .ofHualuoPinyin, .ofUniversalPinyin:
+      case .ofHanyuPinyin, .ofHualuoPinyin, .ofSecondaryPinyin, .ofUniversalPinyin, .ofYalePinyin:
         return Tekkon.mapArayuruPinyin.has(string: input)
       }
-    }
-
-    /// 按需更新拼音組音區的內容顯示。
-    mutating func updateRomajiBuffer() {
-      romajiBuffer = Tekkon.cnvPhonaToHanyuPinyin(targetJoined: consonant.value + semivowel.value + vowel.value)
-    }
-
-    /// 自我變換單個注音資料值。
-    /// - Parameters:
-    ///   - strOf: 要取代的內容。
-    ///   - strWith: 要取代成的內容。
-    mutating func fixValue(_ strOf: String, _ strWith: String = "") {
-      guard !strOf.isEmpty, !strWith.isEmpty else { return }
-      let theOld = Phonabet(strOf)
-      switch theOld {
-      case consonant: consonant.clear()
-      case semivowel: semivowel.clear()
-      case vowel: vowel.clear()
-      case intonation: intonation.clear()
-      default: return
-      }
-      receiveKey(fromPhonabet: strWith)
     }
 
     /// 接受傳入的按鍵訊號時的處理，處理對象為 String。
@@ -285,7 +299,12 @@ public extension Tekkon {
     ///   - givenSequence: 傳入的 String 內容，用以處理一整串擊鍵輸入。
     ///   - isRomaji: 如果輸入的字串是諸如漢語拼音這樣的西文字母拼音的話，請啟用此選項。
     /// - Returns: 處理之後的結果。
-    @discardableResult public mutating func receiveSequence(_ givenSequence: String = "", isRomaji: Bool = false) -> String {
+    @discardableResult
+    public mutating func receiveSequence(
+      _ givenSequence: String = "",
+      isRomaji: Bool = false
+    )
+      -> String {
       clear()
       guard isRomaji else {
         givenSequence.forEach { receiveKey(fromString: $0.description) }
@@ -420,7 +439,9 @@ public extension Tekkon {
 
     /// 所有動態注音排列都會用到的共用糾錯處理步驟。
     /// - Parameter incomingPhonabet: 傳入的注音 Phonabet。
-    public mutating func commonFixWhenHandlingDynamicArrangeInputs(target incomingPhonabet: Phonabet) {
+    public mutating func commonFixWhenHandlingDynamicArrangeInputs(
+      target incomingPhonabet: Phonabet
+    ) {
       // 處理特殊情形。
       switch incomingPhonabet.type {
       case .semivowel:
@@ -642,7 +663,7 @@ public extension Tekkon {
         case (_, "ㄡ"):
           vowel.clear()
           strReturn = "ㄩ"
-        case ("ㄩ", "ㄡ"), _:
+        case _, ("ㄩ", "ㄡ"):
           strReturn = (!semivowel.isEmpty || !"ㄐㄑㄒ".doesHave(consonant.value)) ? "ㄡ" : "ㄩ"
         }
       case "u":
@@ -722,14 +743,6 @@ public extension Tekkon {
       return strReturn
     }
 
-    // MARK: - Misc Definitions
-
-    /// 這些內容用來滿足 "Equatable, Hashable, ExpressibleByStringLiteral" 需求。
-
-    public static func == (lhs: Composer, rhs: Composer) -> Bool {
-      lhs.value == rhs.value
-    }
-
     public func hash(into hasher: inout Hasher) {
       hasher.combine(consonant)
       hasher.combine(semivowel)
@@ -737,22 +750,35 @@ public extension Tekkon {
       hasher.combine(intonation)
     }
 
-    public init(stringLiteral value: String) {
-      self.init(value)
+    // MARK: Internal
+
+    /// 按需更新拼音組音區的內容顯示。
+    mutating func updateRomajiBuffer() {
+      romajiBuffer = Tekkon
+        .cnvPhonaToHanyuPinyin(targetJoined: consonant.value + semivowel.value + vowel.value)
     }
 
-    public init(unicodeScalarLiteral value: String) {
-      self.init(stringLiteral: value)
-    }
-
-    public init(extendedGraphemeClusterLiteral value: String) {
-      self.init(stringLiteral: value)
+    /// 自我變換單個注音資料值。
+    /// - Parameters:
+    ///   - strOf: 要取代的內容。
+    ///   - strWith: 要取代成的內容。
+    mutating func fixValue(_ strOf: String, _ strWith: String = "") {
+      guard !strOf.isEmpty, !strWith.isEmpty else { return }
+      let theOld = Phonabet(strOf)
+      switch theOld {
+      case consonant: consonant.clear()
+      case semivowel: semivowel.clear()
+      case vowel: vowel.clear()
+      case intonation: intonation.clear()
+      default: return
+      }
+      receiveKey(fromPhonabet: strWith)
     }
   }
 }
 
-private extension String {
-  func doesHave(_ target: String) -> Bool {
+extension String {
+  fileprivate func doesHave(_ target: String) -> Bool {
     has(string: target)
   }
 }

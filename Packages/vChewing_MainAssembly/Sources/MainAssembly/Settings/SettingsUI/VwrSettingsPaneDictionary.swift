@@ -12,6 +12,8 @@ import Shared
 import SwiftExtension
 import SwiftUI
 
+// MARK: - VwrSettingsPaneDictionary
+
 @available(macOS 13, *)
 public struct VwrSettingsPaneDictionary: View {
   // MARK: - AppStorage Variables
@@ -45,7 +47,8 @@ public struct VwrSettingsPaneDictionary: View {
 
   // MARK: - Main View
 
-  @State var keykeyImportButtonDisabled = false
+  @State
+  var keykeyImportButtonDisabled = false
 
   private var fdrUserDataDefault: String { LMMgr.dataFolderPath(isDefaultFolder: true) }
 
@@ -60,16 +63,23 @@ public struct VwrSettingsPaneDictionary: View {
         Section {
           Group {
             VStack(alignment: .leading) {
-              Text(LocalizedStringKey("Choose your desired user data folder path. Will be omitted if invalid."))
+              Text(
+                LocalizedStringKey(
+                  "Choose your desired user data folder path. Will be omitted if invalid."
+                )
+              )
               HStack(spacing: 3) {
                 PathControl(pathDroppable: $userDataFolderSpecified) { pathControl in
                   pathControl.allowedTypes = ["public.folder", "public.directory"]
-                  pathControl.placeholderString = "Please drag the desired target from Finder to this place.".localized
+                  pathControl
+                    .placeholderString = "Please drag the desired target from Finder to this place."
+                    .localized
                 } acceptDrop: { pathControl, info in
                   let urls = info.draggingPasteboard.readObjects(forClasses: [NSURL.self])
                   guard let url = urls?.first as? URL else { return false }
                   let bolPreviousFolderValidity = LMMgr.checkIfSpecifiedUserDataFolderValid(
-                    PrefMgr.shared.userDataFolderSpecified.expandingTildeInPath)
+                    PrefMgr.shared.userDataFolderSpecified.expandingTildeInPath
+                  )
                   var newPath = url.path
                   newPath.ensureTrailingSlash()
                   if LMMgr.checkIfSpecifiedUserDataFolderValid(newPath) {
@@ -104,7 +114,8 @@ public struct VwrSettingsPaneDictionary: View {
                   Self.dlgOpenPath.canChooseDirectories = true
 
                   let bolPreviousFolderValidity = LMMgr.checkIfSpecifiedUserDataFolderValid(
-                    userDataFolderSpecified.expandingTildeInPath)
+                    userDataFolderSpecified.expandingTildeInPath
+                  )
 
                   if let window = CtlSettingsUI.shared?.window {
                     Self.dlgOpenPath.beginSheetModal(for: window) { result in
@@ -181,7 +192,8 @@ public struct VwrSettingsPaneDictionary: View {
               LMMgr.syncLMPrefs()
             }
           ).render()
-          UserDef.kFetchSuggestionsFromUserOverrideModel.bind($fetchSuggestionsFromUserOverrideModel).render()
+          UserDef.kFetchSuggestionsFromUserOverrideModel
+            .bind($fetchSuggestionsFromUserOverrideModel).render()
           UserDef.kPhraseReplacementEnabled.bind(
             $phraseReplacementEnabled.didChange {
               LMMgr.syncLMPrefs()
@@ -192,7 +204,8 @@ public struct VwrSettingsPaneDictionary: View {
           ).render()
         }
         Section {
-          UserDef.kAllowBoostingSingleKanjiAsUserPhrase.bind($allowBoostingSingleKanjiAsUserPhrase).render()
+          UserDef.kAllowBoostingSingleKanjiAsUserPhrase.bind($allowBoostingSingleKanjiAsUserPhrase)
+            .render()
           LabeledContent("i18n:settings.importFromKimoTxt.label") {
             Button("…") {
               Self.dlgOpenFile.title = NSLocalizedString(
@@ -203,7 +216,8 @@ public struct VwrSettingsPaneDictionary: View {
               Self.dlgOpenFile.canChooseFiles = true
               Self.dlgOpenFile.allowsMultipleSelection = false
               Self.dlgOpenFile.canChooseDirectories = false
-              Self.dlgOpenFile.allowedContentTypes = [.init(filenameExtension: "txt")].compactMap { $0 }
+              Self.dlgOpenFile.allowedContentTypes = [.init(filenameExtension: "txt")]
+                .compactMap { $0 }
 
               if let window = CtlSettingsUI.shared?.window {
                 Self.dlgOpenFile.beginSheetModal(for: window) { result in
@@ -214,7 +228,10 @@ public struct VwrSettingsPaneDictionary: View {
                     guard var rawString = try? String(contentsOf: url) else { return }
                     let maybeCount = try? LMMgr.importYahooKeyKeyUserDictionary(text: &rawString)
                     let count: Int = maybeCount ?? 0
-                    window.callAlert(title: String(format: "i18n:settings.importFromKimoTxt.finishedCount:%@".localized, count.description))
+                    window.callAlert(title: String(
+                      format: "i18n:settings.importFromKimoTxt.finishedCount:%@".localized,
+                      count.description
+                    ))
                   }
                 }
               }
@@ -223,7 +240,10 @@ public struct VwrSettingsPaneDictionary: View {
               do {
                 let count = try LMMgr.importYahooKeyKeyUserDictionaryByXPC()
                 CtlSettingsUI.shared?.window.callAlert(
-                  title: String(format: "i18n:settings.importFromKimoTxt.finishedCount:%@".localized, count.description)
+                  title: String(
+                    format: "i18n:settings.importFromKimoTxt.finishedCount:%@".localized,
+                    count.description
+                  )
                 )
               } catch {
                 let error = NSAlert(error: error)
@@ -242,6 +262,8 @@ public struct VwrSettingsPaneDictionary: View {
     )
   }
 }
+
+// MARK: - VwrSettingsPaneDictionary_Previews
 
 @available(macOS 13, *)
 struct VwrSettingsPaneDictionary_Previews: PreviewProvider {

@@ -13,9 +13,9 @@ import SwiftUI
 
 // MARK: - UserDefRenderable Extension
 
-public extension UserDefRenderable<String> {
+extension UserDefRenderable<String> {
   @ViewBuilder
-  func render() -> some View {
+  public func render() -> some View {
     if let metaData = metaData {
       VStack(alignment: .leading) {
         Group {
@@ -39,14 +39,20 @@ public extension UserDefRenderable<String> {
             }
           case (.string, .kAlphanumericalKeyboardLayout):
             Picker(LocalizedStringKey(metaData.shortTitle ?? ""), selection: binding) {
-              ForEach(0 ... (IMKHelper.allowedAlphanumericalTISInputSources.count - 1), id: \.self) { id in
+              ForEach(
+                0 ... (IMKHelper.allowedAlphanumericalTISInputSources.count - 1),
+                id: \.self
+              ) { id in
                 let theEntry = IMKHelper.allowedAlphanumericalTISInputSources[id]
                 Text(theEntry.titleLocalized).tag(theEntry.id)
               }.id(UUID())
             }
           case (.string, .kBasicKeyboardLayout):
             Picker(LocalizedStringKey(metaData.shortTitle ?? ""), selection: binding) {
-              ForEach(0 ... (IMKHelper.allowedBasicLayoutsAsTISInputSources.count - 1), id: \.self) { id in
+              ForEach(
+                0 ... (IMKHelper.allowedBasicLayoutsAsTISInputSources.count - 1),
+                id: \.self
+              ) { id in
                 let theEntry = IMKHelper.allowedBasicLayoutsAsTISInputSources[id]
                 if let theEntry = theEntry {
                   Text(theEntry.titleLocalized).tag(theEntry.id)
@@ -66,9 +72,9 @@ public extension UserDefRenderable<String> {
   }
 }
 
-public extension UserDefRenderable<Bool> {
+extension UserDefRenderable<Bool> {
   @ViewBuilder
-  func render() -> some View {
+  public func render() -> some View {
     if let metaData = metaData {
       VStack(alignment: .leading) {
         Group {
@@ -99,9 +105,9 @@ public extension UserDefRenderable<Bool> {
   }
 }
 
-public extension UserDefRenderable<Int> {
+extension UserDefRenderable<Int> {
   @ViewBuilder
-  func render() -> some View {
+  public func render() -> some View {
     if let metaData = metaData {
       VStack(alignment: .leading) {
         Group {
@@ -144,9 +150,9 @@ public extension UserDefRenderable<Int> {
   }
 }
 
-public extension UserDefRenderable<Double> {
+extension UserDefRenderable<Double> {
   @ViewBuilder
-  func render() -> some View {
+  public func render() -> some View {
     if let metaData = metaData {
       VStack(alignment: .leading) {
         Group {
@@ -179,20 +185,48 @@ public extension UserDefRenderable<Double> {
   }
 }
 
-// MARK: - NSComboBox
+// MARK: - ComboBox
 
 // Ref: https://stackoverflow.com/a/71058587/4162914
 // License: https://creativecommons.org/licenses/by-sa/4.0/
 
 @available(macOS 10.15, *)
 public struct ComboBox: NSViewRepresentable {
+  public class Coordinator: NSObject, NSComboBoxDelegate {
+    // MARK: Lifecycle
+
+    public init(_ parent: ComboBox) {
+      self.parent = parent
+    }
+
+    // MARK: Public
+
+    public var parent: ComboBox
+    public var ignoreSelectionChanges = false
+
+    public func comboBoxSelectionDidChange(_ notification: Notification) {
+      if !ignoreSelectionChanges,
+         let box: NSComboBox = notification.object as? NSComboBox,
+         let newStringValue: String = box.objectValueOfSelectedItem as? String {
+        parent.text = newStringValue
+      }
+    }
+
+    public func controlTextDidEndEditing(_ obj: Notification) {
+      if let textField = obj.object as? NSTextField {
+        parent.text = textField.stringValue
+      }
+    }
+  }
+
   // The items that will show up in the pop-up menu:
   public var items: [String] = []
 
   // The property on our parent view that gets synced to the current
   // stringValue of the NSComboBox, whether the user typed it in or
   // selected it from the list:
-  @Binding public var text: String
+  @Binding
+  public var text: String
 
   public func makeCoordinator() -> Coordinator {
     Coordinator(self)
@@ -219,29 +253,5 @@ public struct ComboBox: NSViewRepresentable {
     nsView.stringValue = text
     nsView.selectItem(withObjectValue: text)
     context.coordinator.ignoreSelectionChanges = false
-  }
-
-  public class Coordinator: NSObject, NSComboBoxDelegate {
-    public var parent: ComboBox
-    public var ignoreSelectionChanges = false
-
-    public init(_ parent: ComboBox) {
-      self.parent = parent
-    }
-
-    public func comboBoxSelectionDidChange(_ notification: Notification) {
-      if !ignoreSelectionChanges,
-         let box: NSComboBox = notification.object as? NSComboBox,
-         let newStringValue: String = box.objectValueOfSelectedItem as? String
-      {
-        parent.text = newStringValue
-      }
-    }
-
-    public func controlTextDidEndEditing(_ obj: Notification) {
-      if let textField = obj.object as? NSTextField {
-        parent.text = textField.stringValue
-      }
-    }
   }
 }

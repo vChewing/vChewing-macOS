@@ -12,10 +12,14 @@ import Foundation
 
 let strDataPath = "./"
 
-func handleFiles(_ handler: @escaping ((url: URL, fileName: String)) -> Void) {
-  let rawURLs = FileManager.default.enumerator(at: URL(fileURLWithPath: strDataPath), includingPropertiesForKeys: nil)?.compactMap { $0 as? URL }
+func handleFiles(_ handler: @escaping ((url: URL, fileName: String)) -> ()) {
+  let rawURLs = FileManager.default.enumerator(
+    at: URL(fileURLWithPath: strDataPath),
+    includingPropertiesForKeys: nil
+  )?.compactMap { $0 as? URL }
   rawURLs?.forEach { url in
-    guard let fileName = url.pathComponents.last, fileName.lowercased() == "localizable.strings" else { return }
+    guard let fileName = url.pathComponents.last,
+          fileName.lowercased() == "localizable.strings" else { return }
     handler((url, fileName))
   }
 }
@@ -26,7 +30,8 @@ handleFiles { url, fileName in
   do {
     try rawStr.components(separatedBy: .newlines).filter { !$0.isEmpty }.sorted {
       $0.compare($1, locale: locale) == .orderedAscending
-    }.joined(separator: "\n").description.appending("\n").write(to: url, atomically: false, encoding: .utf8)
+    }.joined(separator: "\n").description.appending("\n")
+      .write(to: url, atomically: false, encoding: .utf8)
   } catch {
     print("!! Error writing to \(fileName)")
   }

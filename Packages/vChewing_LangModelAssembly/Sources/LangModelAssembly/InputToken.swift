@@ -8,6 +8,8 @@
 
 import Foundation
 
+// MARK: - LMAssembly.InputToken
+
 /// 工作原理：先用 InputToken.parse 分析原始字串，給出準確的 Token。
 /// 然後再讓這個 Token 用 .translated() 自我表述出轉換結果。
 
@@ -25,9 +27,10 @@ extension LMAssembly {
 
 // MARK: - 正式對外投入使用的 API。
 
-public extension String {
-  func parseAsInputToken(isCHS: Bool) -> [String] {
-    LMAssembly.InputToken.parse(from: self).map { $0.translated(isCHS: isCHS) }.flatMap { $0 }.deduplicated
+extension String {
+  public func parseAsInputToken(isCHS: Bool) -> [String] {
+    LMAssembly.InputToken.parse(from: self).map { $0.translated(isCHS: isCHS) }.flatMap { $0 }
+      .deduplicated
   }
 }
 
@@ -58,7 +61,8 @@ extension LMAssembly.InputToken {
     switch tokenComponents[0] {
     case "TIMEZONE": result.append(.timeZone(shortened: shortened))
     case "TIME": result.append(.timeNow(shortened: shortened))
-    case "DATE": result.append(.date(dayDelta: dayDelta, yearDelta: yearDelta, shortened: shortened, luna: hasLuna))
+    case "DATE": result
+      .append(.date(dayDelta: dayDelta, yearDelta: yearDelta, shortened: shortened, luna: hasLuna))
     case "WEEK": result.append(.week(dayDelta: dayDelta, shortened: shortened))
     case "YEAR": result.append(.year(yearDelta: yearDelta)) // 始終插入公曆年，方便對比參考。
       if hasZodiac { result.append(.yearZodiac(yearDelta: yearDelta)) }
@@ -233,10 +237,10 @@ private let tableMappingArabicDatesToChinese: [String: String] = {
   return result
 }()
 
-private extension String {
+extension String {
   /// 將給定的字串當中的阿拉伯數字轉為漢語小寫，逐字轉換。
   /// - Parameter target: 要進行轉換操作的對象，會直接修改該對象。
-  func convertArabicNumeralsToChinese(onlyDigits: Bool) -> String {
+  fileprivate func convertArabicNumeralsToChinese(onlyDigits: Bool) -> String {
     var target = self
     let sortedKeys = tableMappingArabicDatesToChinese.keys.sorted { $0.count > $1.count }
     for key in sortedKeys {

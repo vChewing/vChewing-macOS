@@ -32,6 +32,8 @@ import SQLite3
   import Darwin
 #endif
 
+// MARK: - DictType
+
 public enum DictType: Int, CaseIterable {
   case zhHantTW = 0
   case zhHantHK = 1
@@ -40,9 +42,7 @@ public enum DictType: Int, CaseIterable {
   case zhHantKX = 4
   case zhHansCN = 5
 
-  public static func match(rawKeyString: String) -> DictType? {
-    DictType.allCases.filter { $0.rawKeyString == rawKeyString }.first
-  }
+  // MARK: Public
 
   public var rawKeyString: String {
     switch self {
@@ -60,12 +60,16 @@ public enum DictType: Int, CaseIterable {
       return "zh2CN"
     }
   }
+
+  public static func match(rawKeyString: String) -> DictType? {
+    DictType.allCases.filter { $0.rawKeyString == rawKeyString }.first
+  }
 }
 
+// MARK: - HotenkaChineseConverter
+
 public class HotenkaChineseConverter {
-  private(set) var dict: [String: [String: String]]
-  private var dictFiles: [String: [String]]
-  var ptrSQL: OpaquePointer?
+  // MARK: Lifecycle
 
   deinit {
     sqlite3_close_v2(ptrSQL)
@@ -73,43 +77,44 @@ public class HotenkaChineseConverter {
   }
 
   public init(sqliteDir dbPath: String) {
-    dict = .init()
-    dictFiles = .init()
+    self.dict = .init()
+    self.dictFiles = .init()
     guard sqlite3_open(dbPath, &ptrSQL) == SQLITE_OK else {
       NSLog("// Exception happened when connecting to SQLite database at: \(dbPath).")
-      ptrSQL = nil
+      self.ptrSQL = nil
       return
     }
     sqlite3_exec(ptrSQL, "PRAGMA journal_mode = OFF;", nil, nil, nil)
   }
 
   public init(plistDir: String) {
-    dictFiles = .init()
+    self.dictFiles = .init()
     do {
       let rawData = try Data(contentsOf: URL(fileURLWithPath: plistDir))
       let rawPlist: [String: [String: String]] =
-        try PropertyListSerialization.propertyList(from: rawData, format: nil) as? [String: [String: String]] ?? .init()
-      dict = rawPlist
+        try PropertyListSerialization
+          .propertyList(from: rawData, format: nil) as? [String: [String: String]] ?? .init()
+      self.dict = rawPlist
     } catch {
       NSLog("// Exception happened when reading dict plist at: \(plistDir).")
-      dict = .init()
+      self.dict = .init()
     }
   }
 
   public init(jsonDir: String) {
-    dictFiles = .init()
+    self.dictFiles = .init()
     do {
       let rawData = try Data(contentsOf: URL(fileURLWithPath: jsonDir))
       let rawJSON = try JSONDecoder().decode([String: [String: String]].self, from: rawData)
-      dict = rawJSON
+      self.dict = rawJSON
     } catch {
       NSLog("// Exception happened when reading dict json at: \(jsonDir).")
-      dict = .init()
+      self.dict = .init()
     }
   }
 
   public init(dictDir: String) {
-    dictFiles = [
+    self.dictFiles = [
       "zh2TW": [String](),
       "zh2HK": [String](),
       "zh2SG": [String](),
@@ -117,7 +122,7 @@ public class HotenkaChineseConverter {
       "zh2KX": [String](),
       "zh2CN": [String](),
     ]
-    dict = [
+    self.dict = [
       "zh2TW": [String: String](),
       "zh2HK": [String: String](),
       "zh2SG": [String: String](),
@@ -152,7 +157,8 @@ public class HotenkaChineseConverter {
           continue
         }
         do {
-          let arrLines = try String(contentsOfFile: filePath, encoding: .utf8).split(separator: "\n")
+          let arrLines = try String(contentsOfFile: filePath, encoding: .utf8)
+            .split(separator: "\n")
           for line in arrLines {
             let arrWords = line.split(separator: "\t")
             if arrWords.count == 2 {
@@ -172,12 +178,15 @@ public class HotenkaChineseConverter {
     sleep(1)
   }
 
+  // MARK: Public
+
   // MARK: - Public Methods
 
   public func query(dict dictType: DictType, key searchKey: String) -> String? {
     guard ptrSQL != nil else { return dict[dictType.rawKeyString]?[searchKey] }
     var ptrStatement: OpaquePointer?
-    let sqlQuery = "SELECT * FROM DATA_HOTENKA WHERE dict=\(dictType.rawValue) AND theKey='\(searchKey)';"
+    let sqlQuery =
+      "SELECT * FROM DATA_HOTENKA WHERE dict=\(dictType.rawValue) AND theKey='\(searchKey)';"
     sqlite3_prepare_v2(ptrSQL, sqlQuery, -1, &ptrStatement, nil)
     defer {
       sqlite3_finalize(ptrStatement)
@@ -226,12 +235,21 @@ public class HotenkaChineseConverter {
 
     return result
   }
+
+  // MARK: Internal
+
+  private(set) var dict: [String: [String: String]]
+  var ptrSQL: OpaquePointer?
+
+  // MARK: Private
+
+  private var dictFiles: [String: [String]]
 }
 
 // MARK: - String extensions
 
-private extension String {
-  func range(of str: String) -> Range<Int> {
+extension String {
+  fileprivate func range(of str: String) -> Range<Int> {
     var start = -1
     withCString { bytes in
       str.withCString { sbytes in
@@ -241,7 +259,7 @@ private extension String {
     return start < 0 ? 0 ..< 0 : start ..< start + str.utf8.count
   }
 
-  func substring(to index: Int) -> String {
+  fileprivate func substring(to index: Int) -> String {
     var out = self
     withCString { bytes in
       let bytes = UnsafeMutablePointer<Int8>(mutating: bytes)
@@ -251,7 +269,7 @@ private extension String {
     return out
   }
 
-  func substring(from index: Int) -> String {
+  fileprivate func substring(from index: Int) -> String {
     var out = self
     withCString { bytes in
       out = String(cString: bytes + index)

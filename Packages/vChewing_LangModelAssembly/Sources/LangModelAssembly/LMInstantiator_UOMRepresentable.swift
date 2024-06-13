@@ -9,13 +9,13 @@
 import Foundation
 import Megrez
 
-public extension LMAssembly.LMInstantiator {
-  func performUOMObservation(
+extension LMAssembly.LMInstantiator {
+  public func performUOMObservation(
     walkedBefore: [Megrez.Node],
     walkedAfter: [Megrez.Node],
     cursor: Int,
     timestamp: Double,
-    saveCallback: (() -> Void)? = nil
+    saveCallback: (() -> ())? = nil
   ) {
     lmUserOverride.performObservation(
       walkedBefore: walkedBefore,
@@ -26,11 +26,12 @@ public extension LMAssembly.LMInstantiator {
     )
   }
 
-  func fetchUOMSuggestion(
+  public func fetchUOMSuggestion(
     currentWalk: [Megrez.Node],
     cursor: Int,
     timestamp: Double
-  ) -> LMAssembly.OverrideSuggestion {
+  )
+    -> LMAssembly.OverrideSuggestion {
     lmUserOverride.fetchSuggestion(
       currentWalk: currentWalk,
       cursor: cursor,
@@ -38,23 +39,23 @@ public extension LMAssembly.LMInstantiator {
     )
   }
 
-  func loadUOMData(fromURL fileURL: URL? = nil) {
+  public func loadUOMData(fromURL fileURL: URL? = nil) {
     lmUserOverride.loadData(fromURL: fileURL)
   }
 
-  func saveUOMData(toURL fileURL: URL? = nil) {
+  public func saveUOMData(toURL fileURL: URL? = nil) {
     lmUserOverride.saveData(toURL: fileURL)
   }
 
-  func clearUOMData(withURL fileURL: URL? = nil) {
+  public func clearUOMData(withURL fileURL: URL? = nil) {
     lmUserOverride.clearData(withURL: fileURL)
   }
 
-  func bleachSpecifiedUOMSuggestions(targets: [String], saveCallback: (() -> Void)? = nil) {
+  public func bleachSpecifiedUOMSuggestions(targets: [String], saveCallback: (() -> ())? = nil) {
     lmUserOverride.bleachSpecifiedSuggestions(targets: targets, saveCallback: saveCallback)
   }
 
-  func bleachUOMUnigrams(saveCallback: (() -> Void)? = nil) {
+  public func bleachUOMUnigrams(saveCallback: (() -> ())? = nil) {
     lmUserOverride.bleachUnigrams(saveCallback: saveCallback)
   }
 }

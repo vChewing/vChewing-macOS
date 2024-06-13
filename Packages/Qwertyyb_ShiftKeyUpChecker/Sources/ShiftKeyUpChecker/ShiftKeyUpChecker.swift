@@ -4,19 +4,25 @@
 
 import AppKit
 
-private extension Date {
-  static func - (lhs: Date, rhs: Date) -> TimeInterval {
+extension Date {
+  fileprivate static func - (lhs: Date, rhs: Date) -> TimeInterval {
     lhs.timeIntervalSinceReferenceDate - rhs.timeIntervalSinceReferenceDate
   }
 }
 
+// MARK: - ShiftKeyUpChecker
+
 public struct ShiftKeyUpChecker {
+  // MARK: Lifecycle
+
   // MARK: - 威注音輸入法專有部分
 
   public init(useLShift: Bool = false, useRShift: Bool = false) {
-    toggleWithLShift = useLShift
-    toggleWithRShift = useRShift
+    self.toggleWithLShift = useLShift
+    self.toggleWithRShift = useRShift
   }
+
+  // MARK: Public
 
   public var toggleWithLShift = false
   public var toggleWithRShift = false
@@ -25,13 +31,19 @@ public struct ShiftKeyUpChecker {
 
   public var enabled: Bool { toggleWithLShift || toggleWithRShift }
 
-  private var checkModifier: NSEvent.ModifierFlags { .shift }
-  private var checkKeyCode: [UInt16] {
-    var result = [UInt16]()
-    if toggleWithLShift { result.append(lShiftKeyCode) }
-    if toggleWithRShift { result.append(rShiftKeyCode) }
-    return result
+  // To confirm that only the shift key is "pressed-and-released".
+  public mutating func check(_ event: NSEvent) -> Bool {
+    var met: Bool = event.type == .flagsChanged
+    met = met && checkKeyCode.contains(event.keyCode)
+    met = met && event.keyCode == previousKeyCode // 檢查 KeyCode 一致性。
+    met = met && event.modifierFlags.intersection(.deviceIndependentFlagsMask).isEmpty
+    met = met && Date() - lastTime <= delayInterval
+    _ = met ? lastTime = Date(timeInterval: .infinity * -1, since: Date()) :
+      registerModifierKeyDown(event: event)
+    return met
   }
+
+  // MARK: Private
 
   // MARK: - 與業火五筆共用的內容
 
@@ -41,23 +53,21 @@ public struct ShiftKeyUpChecker {
   private var previousKeyCode: UInt16?
   private var lastTime: Date = .init()
 
+  private var checkModifier: NSEvent.ModifierFlags { .shift }
+  private var checkKeyCode: [UInt16] {
+    var result = [UInt16]()
+    if toggleWithLShift { result.append(lShiftKeyCode) }
+    if toggleWithRShift { result.append(rShiftKeyCode) }
+    return result
+  }
+
   private mutating func registerModifierKeyDown(event: NSEvent) {
     var isKeyDown: Bool = event.type == .flagsChanged
     // 注意：ModifierFlags 是 OptionSet，在使用 contains 時會在給定參數是「空集合」的時候返回 true（明明你可能想要 false）。
-    isKeyDown = isKeyDown && event.modifierFlags.intersection(.deviceIndependentFlagsMask) == checkModifier
+    isKeyDown = isKeyDown && event.modifierFlags
+      .intersection(.deviceIndependentFlagsMask) == checkModifier
     isKeyDown = isKeyDown && checkKeyCode.contains(event.keyCode)
     lastTime = isKeyDown ? .init() : .init(timeInterval: .infinity * -1, since: Date())
     previousKeyCode = isKeyDown ? event.keyCode : nil
-  }
-
-  // To confirm that only the shift key is "pressed-and-released".
-  public mutating func check(_ event: NSEvent) -> Bool {
-    var met: Bool = event.type == .flagsChanged
-    met = met && checkKeyCode.contains(event.keyCode)
-    met = met && event.keyCode == previousKeyCode // 檢查 KeyCode 一致性。
-    met = met && event.modifierFlags.intersection(.deviceIndependentFlagsMask).isEmpty
-    met = met && Date() - lastTime <= delayInterval
-    _ = met ? lastTime = Date(timeInterval: .infinity * -1, since: Date()) : registerModifierKeyDown(event: event)
-    return met
   }
 }

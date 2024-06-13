@@ -10,6 +10,8 @@ import Shared
 import SwiftExtension
 import SwiftUI
 
+// MARK: - VwrSettingsPaneBehavior
+
 @available(macOS 13, *)
 public struct VwrSettingsPaneBehavior: View {
   // MARK: - AppStorage Variables
@@ -79,14 +81,16 @@ public struct VwrSettingsPaneBehavior: View {
         Section {
           UserDef.kChooseCandidateUsingSpace.bind($chooseCandidateUsingSpace).render()
           UserDef.kEscToCleanInputBuffer.bind($escToCleanInputBuffer).render()
-          UserDef.kAlsoConfirmAssociatedCandidatesByEnter.bind($alsoConfirmAssociatedCandidatesByEnter).render()
+          UserDef.kAlsoConfirmAssociatedCandidatesByEnter
+            .bind($alsoConfirmAssociatedCandidatesByEnter).render()
           UserDef.kSpecifyShiftBackSpaceKeyBehavior.bind($specifyShiftBackSpaceKeyBehavior).render()
           UserDef.kSpecifyShiftTabKeyBehavior.bind($specifyShiftTabKeyBehavior).render()
             .pickerStyle(RadioGroupPickerStyle())
           UserDef.kSpecifyCmdOptCtrlEnterBehavior.bind($specifyCmdOptCtrlEnterBehavior).render()
           VStack(alignment: .leading) {
             UserDef.kSpecifyShiftSpaceKeyBehavior.bind($specifyShiftSpaceKeyBehavior).render()
-            UserDef.kUseSpaceToCommitHighlightedSCPCCandidate.bind($useSpaceToCommitHighlightedSCPCCandidate).render()
+            UserDef.kUseSpaceToCommitHighlightedSCPCCandidate
+              .bind($useSpaceToCommitHighlightedSCPCCandidate).render()
           }
         }
 
@@ -102,31 +106,38 @@ public struct VwrSettingsPaneBehavior: View {
 
         Section {
           UserDef.kBypassNonAppleCapsLockHandling.bind($bypassNonAppleCapsLockHandling).render()
-          UserDef.kShareAlphanumericalModeStatusAcrossClients.bind($shareAlphanumericalModeStatusAcrossClients).render()
+          UserDef.kShareAlphanumericalModeStatusAcrossClients
+            .bind($shareAlphanumericalModeStatusAcrossClients).render()
           VStack(alignment: .leading) {
             UserDef.kTogglingAlphanumericalModeWithLShift.bind(
               $togglingAlphanumericalModeWithLShift.didChange {
-                SessionCtl.theShiftKeyDetector.toggleWithLShift = togglingAlphanumericalModeWithLShift
+                SessionCtl.theShiftKeyDetector
+                  .toggleWithLShift = togglingAlphanumericalModeWithLShift
               }
             ).render()
             UserDef.kTogglingAlphanumericalModeWithRShift.bind(
               $togglingAlphanumericalModeWithRShift.didChange {
-                SessionCtl.theShiftKeyDetector.toggleWithRShift = togglingAlphanumericalModeWithRShift
+                SessionCtl.theShiftKeyDetector
+                  .toggleWithRShift = togglingAlphanumericalModeWithRShift
               }
             ).render()
             Spacer()
             Group {
-              Text(" ") + Text(LocalizedStringKey("This feature requires macOS \("10.15") and above."))
+              Text(" ") +
+                Text(LocalizedStringKey("This feature requires macOS \("10.15") and above."))
                 + Text(CtlSettingsUI.sentenceSeparator)
                 + Text("i18n:settings.shiftKeyASCIITogle.description".localized)
             }.settingsDescription()
           }
-          UserDef.kShiftEisuToggleOffTogetherWithCapsLock.bind($shiftEisuToggleOffTogetherWithCapsLock).render()
+          UserDef.kShiftEisuToggleOffTogetherWithCapsLock
+            .bind($shiftEisuToggleOffTogetherWithCapsLock).render()
         }
 
         Section {
-          UserDef.kShowNotificationsWhenTogglingCapsLock.bind($showNotificationsWhenTogglingCapsLock).render()
-          UserDef.kAlwaysShowTooltipTextsHorizontally.bind($alwaysShowTooltipTextsHorizontally).render()
+          UserDef.kShowNotificationsWhenTogglingCapsLock
+            .bind($showNotificationsWhenTogglingCapsLock).render()
+          UserDef.kAlwaysShowTooltipTextsHorizontally.bind($alwaysShowTooltipTextsHorizontally)
+            .render()
             .disabled(Bundle.main.preferredLocalizations[0] == "en")
         }
       }.formStyled()
@@ -137,6 +148,8 @@ public struct VwrSettingsPaneBehavior: View {
     )
   }
 }
+
+// MARK: - VwrSettingsPaneBehavior_Previews
 
 @available(macOS 13, *)
 struct VwrSettingsPaneBehavior_Previews: PreviewProvider {

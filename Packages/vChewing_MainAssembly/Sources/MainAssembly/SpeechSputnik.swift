@@ -10,11 +10,12 @@ import AppKit
 import AVFoundation
 import Shared
 
+// MARK: - SpeechSputnik
+
 public class SpeechSputnik {
+  // MARK: Public
+
   public static var shared: SpeechSputnik = .init()
-  private static var tags: [String] = ["ting-ting", "zh-CN", "mei-jia", "zh-TW"]
-  private var currentNarrator: NSObject?
-  private var currentVoice: NSObject?
 
   public func refreshStatus() {
     switch PrefMgr.shared.readingNarrationCoverage {
@@ -23,11 +24,14 @@ public class SpeechSputnik {
     }
   }
 
-  private func clear() {
-    currentNarrator = nil
-    currentVoice = nil
-    previouslyNarrated = ""
-  }
+  // MARK: Private
+
+  private static var tags: [String] = ["ting-ting", "zh-CN", "mei-jia", "zh-TW"]
+
+  private var currentNarrator: NSObject?
+  private var currentVoice: NSObject?
+
+  private lazy var previouslyNarrated: String = ""
 
   private var narrator: NSObject? {
     get {
@@ -49,7 +53,11 @@ public class SpeechSputnik {
     }
   }
 
-  private lazy var previouslyNarrated: String = ""
+  private func clear() {
+    currentNarrator = nil
+    currentVoice = nil
+    previouslyNarrated = ""
+  }
 }
 
 // MARK: - Generators.
@@ -73,15 +81,16 @@ extension SpeechSputnik {
     return AVSpeechSynthesisVoice(identifier: "com.apple.voice.compact.zh-CN.Binbin")
       ?? AVSpeechSynthesisVoice(identifier: "com.apple.voice.compact.zh-CN.Tingting")
       ?? .speechVoices().first {
-        $0.identifier.contains("Tingting") || $0.language.contains("zh-CN") || $0.language.contains("zh-TW")
+        $0.identifier.contains("Tingting") || $0.language.contains("zh-CN") || $0.language
+          .contains("zh-TW")
       }
   }
 }
 
 // MARK: - Public API.
 
-public extension SpeechSputnik {
-  func narrate(_ text: String, allowDuplicates: Bool = true) {
+extension SpeechSputnik {
+  public func narrate(_ text: String, allowDuplicates: Bool = true) {
     defer { previouslyNarrated = text }
     guard !(!allowDuplicates && previouslyNarrated == text) else { return }
     if #available(macOS 14, *) {

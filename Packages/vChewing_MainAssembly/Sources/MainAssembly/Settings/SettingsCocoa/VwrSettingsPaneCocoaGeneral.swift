@@ -10,16 +10,9 @@ import AppKit
 import Foundation
 import Shared
 
-public extension SettingsPanesCocoa {
-  class General: NSViewController {
-    var windowWidth: CGFloat { SettingsPanesCocoa.windowWidth }
-    var contentWidth: CGFloat { SettingsPanesCocoa.contentWidth }
-    var innerContentWidth: CGFloat { SettingsPanesCocoa.innerContentWidth }
-    var tabContainerWidth: CGFloat { SettingsPanesCocoa.tabContainerWidth }
-    var contentHalfWidth: CGFloat { SettingsPanesCocoa.contentHalfWidth }
-    var currentLanguageSelectItem: NSMenuItem?
-    let btnLangSelector = NSPopUpButton()
-    let languages = ["auto", "en", "zh-Hans", "zh-Hant", "ja"]
+extension SettingsPanesCocoa {
+  public class General: NSViewController {
+    // MARK: Public
 
     override public func loadView() {
       prepareLangSelectorButton()
@@ -28,13 +21,28 @@ public extension SettingsPanesCocoa {
       view.makeSimpleConstraint(.width, relation: .equal, value: windowWidth)
     }
 
+    // MARK: Internal
+
+    var currentLanguageSelectItem: NSMenuItem?
+    let btnLangSelector = NSPopUpButton()
+    let languages = ["auto", "en", "zh-Hans", "zh-Hant", "ja"]
+
+    var windowWidth: CGFloat { SettingsPanesCocoa.windowWidth }
+    var contentWidth: CGFloat { SettingsPanesCocoa.contentWidth }
+    var innerContentWidth: CGFloat { SettingsPanesCocoa.innerContentWidth }
+    var tabContainerWidth: CGFloat { SettingsPanesCocoa.tabContainerWidth }
+    var contentHalfWidth: CGFloat { SettingsPanesCocoa.contentHalfWidth }
     var body: NSView? {
       NSStackView.build(.vertical, insets: .new(all: 14)) {
         NSStackView.buildSection(width: contentWidth, withDividers: false) {
           var strNotice = "\u{2022} "
-          strNotice += "Please use mouse wheel to scroll each page if needed. The CheatSheet is available in the IME menu.".localized
+          strNotice +=
+            "Please use mouse wheel to scroll each page if needed. The CheatSheet is available in the IME menu."
+            .localized
           strNotice += "\n\u{2022} "
-          strNotice += "Note: The “Delete ⌫” key on Mac keyboard is named as “BackSpace ⌫” here in order to distinguish the real “Delete ⌦” key from full-sized desktop keyboards. If you want to use the real “Delete ⌦” key on a Mac keyboard with no numpad equipped, you have to press “Fn+⌫” instead.".localized
+          strNotice +=
+            "Note: The “Delete ⌫” key on Mac keyboard is named as “BackSpace ⌫” here in order to distinguish the real “Delete ⌦” key from full-sized desktop keyboards. If you want to use the real “Delete ⌦” key on a Mac keyboard with no numpad equipped, you have to press “Fn+⌫” instead."
+            .localized
           strNotice.makeNSLabel(descriptive: true, fixWidth: contentWidth)
           UserDef.kAppleLanguages.render(fixWidth: contentWidth) { renderable in
             renderable.currentControl = self.btnLangSelector
@@ -79,11 +87,13 @@ public extension SettingsPanesCocoa {
       btnLangSelector.font = NSFont.systemFont(ofSize: 12)
     }
 
-    @IBAction func updateNarratorSettingsAction(_: NSControl) {
+    @IBAction
+    func updateNarratorSettingsAction(_: NSControl) {
       SpeechSputnik.shared.refreshStatus()
     }
 
-    @IBAction func updateUiLanguageAction(_ sender: NSPopUpButton) {
+    @IBAction
+    func updateUiLanguageAction(_ sender: NSPopUpButton) {
       let language = languages[sender.indexOfSelectedItem]
       guard let bundleID = Bundle.main.bundleIdentifier, bundleID.contains("vChewing") else {
         print("App Language Changed to \(language).")

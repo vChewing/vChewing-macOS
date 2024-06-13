@@ -8,6 +8,8 @@
 
 import AppKit
 
+// MARK: - CtlCandidateDelegate
+
 public protocol CtlCandidateDelegate {
   func candidatePairs(conv: Bool) -> [(keyArray: [String], value: String)]
   func candidatePairSelectionConfirmed(at index: Int)
@@ -15,7 +17,8 @@ public protocol CtlCandidateDelegate {
   func candidatePairRightClicked(at index: Int, action: CandidateContextMenuAction)
   func candidateToolTip(shortened: Bool) -> String
   func resetCandidateWindowOrigin()
-  @discardableResult func reverseLookup(for value: String) -> [String]
+  @discardableResult
+  func reverseLookup(for value: String) -> [String]
   var selectionKeys: String { get }
   var isVerticalTyping: Bool { get }
   var isCandidateState: Bool { get }
@@ -25,6 +28,8 @@ public protocol CtlCandidateDelegate {
   var showReverseLookupResult: Bool { get }
   var clientAccentColor: NSColor? { get }
 }
+
+// MARK: - CtlCandidateProtocol
 
 public protocol CtlCandidateProtocol {
   var tooltip: String { get set }
@@ -48,8 +53,14 @@ public protocol CtlCandidateProtocol {
   func highlightNextCandidate() -> Bool
   func highlightPreviousCandidate() -> Bool
   func candidateIndexAtKeyLabelIndex(_: Int) -> Int?
-  func set(windowTopLeftPoint: NSPoint, bottomOutOfScreenAdjustmentHeight height: Double, useGCD: Bool)
+  func set(
+    windowTopLeftPoint: NSPoint,
+    bottomOutOfScreenAdjustmentHeight height: Double,
+    useGCD: Bool
+  )
 }
+
+// MARK: - CandidateContextMenuAction
 
 public enum CandidateContextMenuAction {
   case toBoost

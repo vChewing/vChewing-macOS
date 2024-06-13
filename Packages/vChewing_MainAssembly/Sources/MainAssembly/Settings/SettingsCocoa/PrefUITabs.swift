@@ -10,8 +10,9 @@ import AppKit
 import Shared
 import SwiftUI
 
+// MARK: - PrefUITabs
+
 public enum PrefUITabs: String, CaseIterable, Identifiable, Hashable {
-  public var id: ObjectIdentifier { .init(rawValue as NSString) }
   case tabGeneral = "General"
   case tabCandidates = "Candidates"
   case tabBehavior = "Behavior"
@@ -21,9 +22,13 @@ public enum PrefUITabs: String, CaseIterable, Identifiable, Hashable {
   case tabCassette = "Cassette"
   case tabKeyboard = "Keyboard"
   case tabDevZone = "DevZone"
+
+  // MARK: Public
+
+  public var id: ObjectIdentifier { .init(rawValue as NSString) }
 }
 
-public extension PrefUITabs {
+extension PrefUITabs {
   private static let i18nTable: [String: (Hans: String, Hant: String, Ja: String)] = [
     "General": (Hans: "一般设定", Hant: "一般設定", Ja: "一般設定"),
     "Candidates": (Hans: "选字设定", Hant: "選字設定", Ja: "候補設定"),
@@ -36,7 +41,7 @@ public extension PrefUITabs {
     "DevZone": (Hans: "开发道场", Hant: "開發道場", Ja: "開発道場"),
   ]
 
-  var cocoaTag: Int {
+  public var cocoaTag: Int {
     switch self {
     case .tabGeneral: return 10
     case .tabCandidates: return 20
@@ -50,7 +55,7 @@ public extension PrefUITabs {
     }
   }
 
-  static func fromInt(_ int: Int) -> Self? {
+  public static func fromInt(_ int: Int) -> Self? {
     switch int {
     case 10: return .tabGeneral
     case 20: return .tabCandidates
@@ -67,7 +72,7 @@ public extension PrefUITabs {
 
   @available(macOS 13, *)
   @ViewBuilder
-  var suiView: some View {
+  public var suiView: some View {
     switch self {
     case .tabGeneral: VwrSettingsPaneGeneral()
     case .tabCandidates: VwrSettingsPaneCandidates()
@@ -81,9 +86,9 @@ public extension PrefUITabs {
     }
   }
 
-  var toolbarIdentifier: NSToolbarItem.Identifier { .init(rawValue: rawValue) }
+  public var toolbarIdentifier: NSToolbarItem.Identifier { .init(rawValue: rawValue) }
 
-  var i18nTitle: String {
+  public var i18nTitle: String {
     switch PrefMgr.shared.appleLanguages[0] {
     case "ja": return Self.i18nTable[rawValue]?.Ja ?? rawValue
     default:
@@ -96,7 +101,7 @@ public extension PrefUITabs {
     }
   }
 
-  var icon: NSImage {
+  public var icon: NSImage {
     let note = "\(rawValue) Preferences" + " \(i18nTitle)"
     if #available(macOS 11.0, *) {
       let name: String = {

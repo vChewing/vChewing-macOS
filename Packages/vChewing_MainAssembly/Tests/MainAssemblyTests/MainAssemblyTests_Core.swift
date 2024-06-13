@@ -15,13 +15,15 @@ import XCTest
 
 let testClient = FakeClient()
 
-public extension SessionCtl {
-  override func client() -> (IMKTextInput & NSObjectProtocol)! { testClient }
+extension SessionCtl {
+  public override func client() -> (IMKTextInput & NSObjectProtocol)! { testClient }
 }
 
 func vCTestLog(_ str: String) {
   print("[VCLOG] \(str)")
 }
+
+// MARK: - MainAssemblyTests
 
 /// 威注音輸入法的控制模組單元測試。
 /// - Remark: 歡迎來到威注音輸入法的控制模組單元測試。
@@ -34,41 +36,64 @@ func vCTestLog(_ str: String) {
 /// 該單元測試使用獨立的語彙資料，因此會在選字時的候選字
 /// 順序等方面與威注音輸入法實際使用時的體驗有差異。
 class MainAssemblyTests: XCTestCase {
+  static let testServer = IMKServer(
+    name: "org.atelierInmu.vChewing.MainAssembly.UnitTests_Connection",
+    bundleIdentifier: "org.atelierInmu.vChewing.MainAssembly.UnitTests"
+  )
+
+  static var _testHandler: InputHandler?
+  static var _testSession: SessionCtl?
+
   var testLM = LMAssembly.LMInstantiator.construct { _ in
     LMAssembly.LMInstantiator.connectToTestSQLDB()
   }
 
-  static let testServer = IMKServer(name: "org.atelierInmu.vChewing.MainAssembly.UnitTests_Connection", bundleIdentifier: "org.atelierInmu.vChewing.MainAssembly.UnitTests")
+  // MARK: - Utilities
 
-  static var _testHandler: InputHandler?
+  let dataArrowLeft = NSEvent.KeyEventData(
+    chars: NSEvent.SpecialKey.leftArrow.unicodeScalar.description,
+    keyCode: KeyCode.kLeftArrow.rawValue
+  )
+  let dataArrowDown = NSEvent.KeyEventData(
+    chars: NSEvent.SpecialKey.downArrow.unicodeScalar.description,
+    keyCode: KeyCode.kDownArrow.rawValue
+  )
+  let dataEnterReturn = NSEvent.KeyEventData(
+    chars: NSEvent.SpecialKey.carriageReturn.unicodeScalar.description,
+    keyCode: KeyCode.kLineFeed.rawValue
+  )
+  let dataTab = NSEvent.KeyEventData(
+    chars: NSEvent.SpecialKey.tab.unicodeScalar.description,
+    keyCode: KeyCode.kTab.rawValue
+  )
+
   var testHandler: InputHandler {
     let result = Self._testHandler ?? InputHandler(lm: testLM, pref: PrefMgr.shared)
     if Self._testHandler == nil { Self._testHandler = result }
     return result
   }
 
-  static var _testSession: SessionCtl?
   var testSession: SessionCtl {
-    guard let session = Self._testSession ?? SessionCtl(server: Self.testServer, delegate: testHandler, client: testClient) else {
+    guard let session = Self._testSession ?? SessionCtl(
+      server: Self.testServer,
+      delegate: testHandler,
+      client: testClient
+    ) else {
       fatalError("Session failed from booting!")
     }
     if Self._testSession == nil { Self._testSession = session }
     return session
   }
 
-  // MARK: - Utilities
-
-  let dataArrowLeft = NSEvent.KeyEventData(chars: NSEvent.SpecialKey.leftArrow.unicodeScalar.description, keyCode: KeyCode.kLeftArrow.rawValue)
-  let dataArrowDown = NSEvent.KeyEventData(chars: NSEvent.SpecialKey.downArrow.unicodeScalar.description, keyCode: KeyCode.kDownArrow.rawValue)
-  let dataEnterReturn = NSEvent.KeyEventData(chars: NSEvent.SpecialKey.carriageReturn.unicodeScalar.description, keyCode: KeyCode.kLineFeed.rawValue)
-  let dataTab = NSEvent.KeyEventData(chars: NSEvent.SpecialKey.tab.unicodeScalar.description, keyCode: KeyCode.kTab.rawValue)
-
   func clearTestUOM() {
     testLM.clearUOMData()
   }
 
   func typeSentenceOrCandidates(_ sequence: String) {
-    if !([.ofEmpty, .ofInputting].contains(testSession.state.type) || testSession.state.isCandidateContainer) { return }
+    if !(
+      [.ofEmpty, .ofInputting].contains(testSession.state.type) || testSession.state
+        .isCandidateContainer
+    ) { return }
     let typingSequence: [NSEvent] = sequence.compactMap { charRAW in
       var finalArray = [NSEvent]()
       let char = charRAW.description
@@ -107,8 +132,9 @@ class MainAssemblyTests: XCTestCase {
 
 extension LMAssembly.LMInstantiator {
   static func construct(
-    isCHS: Bool = false, completionHandler: @escaping (_ this: LMAssembly.LMInstantiator) -> Void
-  ) -> LMAssembly.LMInstantiator {
+    isCHS: Bool = false, completionHandler: @escaping (_ this: LMAssembly.LMInstantiator) -> ()
+  )
+    -> LMAssembly.LMInstantiator {
     let this = LMAssembly.LMInstantiator(isCHS: isCHS)
     completionHandler(this)
     return this

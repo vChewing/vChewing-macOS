@@ -54,9 +54,7 @@ extension InputHandler {
     case braille1947 = 2
     case braille2018 = 3
 
-    static func match(rawValue: Int) -> Self {
-      CommitableMarkupType(rawValue: rawValue) ?? .textWithBracketedAnnotations
-    }
+    // MARK: Internal
 
     var brailleStandard: BrailleSputnik.BrailleStandard? {
       switch self {
@@ -64,6 +62,10 @@ extension InputHandler {
       case .braille2018: return .of2018
       default: return nil
       }
+    }
+
+    static func match(rawValue: Int) -> Self {
+      CommitableMarkupType(rawValue: rawValue) ?? .textWithBracketedAnnotations
     }
   }
 
@@ -115,7 +117,8 @@ extension InputHandler {
       case .textWithBracketedAnnotations:
         composed += key.contains("_") ? value : "\(value)(\(key))"
       case .textWithHTMLRubyAnnotations:
-        composed += key.contains("_") ? value : "<ruby>\(value)<rp>(</rp><rt>\(key)</rt><rp>)</rp></ruby>"
+        composed += key
+          .contains("_") ? value : "<ruby>\(value)<rp>(</rp><rt>\(key)</rt><rp>)</rp></ruby>"
       case .braille1947: break // 另案處理
       case .braille2018: break // 另案處理
       }

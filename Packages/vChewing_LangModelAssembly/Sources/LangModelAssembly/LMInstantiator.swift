@@ -9,7 +9,7 @@
 import Foundation
 import Megrez
 
-public extension LMAssembly {
+extension LMAssembly {
   /// 語言模組副本化模組（LMInstantiator，下稱「LMI」）自身為符合天權星組字引擎內
   /// 的 LangModelProtocol 協定的模組、統籌且整理來自其它子模組的資料（包括使
   /// 用者語彙、繪文字模組、語彙濾除表、原廠語言模組等）。
@@ -27,7 +27,20 @@ public extension LMAssembly {
   ///
   /// LMI 會根據需要分別載入原廠語言模組和其他個別的子語言模組。LMI 本身不會記錄這些
   /// 語言模組的相關資料的存放位置，僅藉由參數來讀取相關訊息。
-  class LMInstantiator: LangModelProtocol {
+  public class LMInstantiator: LangModelProtocol {
+    // MARK: Lifecycle
+
+    // 這句需要留著，不然無法被 package 外界存取。
+    public init(
+      isCHS: Bool = false,
+      uomDataURL: URL? = nil
+    ) {
+      self.isCHS = isCHS
+      self.lmUserOverride = .init(dataURL: uomDataURL)
+    }
+
+    // MARK: Public
+
     public struct Config {
       /// 如果設定為 nil 的話，則不產生任何詞頻資料。
       /// true = 全形，false = 半形。
@@ -43,9 +56,6 @@ public extension LMAssembly {
 
     public static var asyncLoadingUserData: Bool = true
 
-    // SQLite 連線所在的記憶體位置。
-    static var ptrSQL: OpaquePointer?
-
     // SQLite 連線是否已經建立。
     public internal(set) static var isSQLDBConnected: Bool = false
 
@@ -55,54 +65,36 @@ public extension LMAssembly {
     // 在函式內部用以記錄狀態的開關。
     public private(set) var config = Config()
 
-    // 這句需要留著，不然無法被 package 外界存取。
-    public init(
-      isCHS: Bool = false,
-      uomDataURL: URL? = nil
-    ) {
-      self.isCHS = isCHS
-      lmUserOverride = .init(dataURL: uomDataURL)
-    }
-
-    @discardableResult public func setOptions(handler: (inout Config) -> Void) -> LMInstantiator {
-      handler(&config)
-      return self
-    }
+    public var isCassetteDataLoaded: Bool { Self.lmCassette.isLoaded }
 
     public static func setCassetCandidateKeyValidator(_ validator: @escaping (String) -> Bool) {
       Self.lmCassette.candidateKeysValidator = validator
     }
 
-    /// 介紹一下幾個通用的語言模組型別：
-    /// ----------------------
-    /// LMCoreEX 是全功能通用型的模組，每一筆辭典記錄以 key 為注音、以 [Unigram] 陣列作為記錄內容。
-    /// 比較適合那種每筆記錄都有不同的權重數值的語言模組，雖然也可以強制施加權重數值就是了。
-    /// LMCoreEX 的辭典陣列不承載 Unigram 本體、而是承載索引範圍，這樣可以節約記憶體。
-    /// 一個 LMCoreEX 就可以滿足威注音幾乎所有語言模組副本的需求，當然也有這兩個例外：
-    /// LMReplacements 與 LMAssociates 分別擔當語彙置換表資料與使用者關聯詞語的資料承載工作。
-    /// 但是，LMCoreEX 對 2010-2013 年等舊 mac 機種而言，讀取速度異常緩慢。
-    /// 於是 LMCoreJSON 就出場了，專門用來讀取原廠的 JSON 格式的辭典。
+    public static func loadCassetteData(path: String) {
+      func load() {
+        if FileManager.default.isReadableFile(atPath: path) {
+          Self.lmCassette.clear()
+          Self.lmCassette.open(path)
+          vCLMLog("lmCassette: \(Self.lmCassette.count) entries of data loaded from: \(path)")
+        } else {
+          vCLMLog("lmCassette: File access failure: \(path)")
+        }
+      }
+      if !Self.asyncLoadingUserData {
+        load()
+      } else {
+        DispatchQueue.main.async {
+          load()
+        }
+      }
+    }
 
-    // 磁帶資料模組。「currentCassette」對外唯讀，僅用來讀取磁帶本身的中繼資料（Metadata）。
-    static var lmCassette = LMCassette()
-    static var lmPlainBopomofo = LMPlainBopomofo()
-
-    // 聲明使用者語言模組。
-    // 使用者語言模組使用多執行緒的話，可能會導致一些問題。有時間再仔細排查看看。
-    var lmUserPhrases = LMCoreEX(
-      reverse: true, consolidate: true, defaultScore: 0, forceDefaultScore: false
-    )
-    var lmFiltered = LMCoreEX(
-      reverse: true, consolidate: true, defaultScore: 0, forceDefaultScore: true
-    )
-    var lmUserSymbols = LMCoreEX(
-      reverse: true, consolidate: true, defaultScore: -12.0, forceDefaultScore: true
-    )
-    var lmReplacements = LMReplacements()
-    var lmAssociates = LMAssociates()
-
-    // 半衰记忆模组
-    var lmUserOverride: LMUserOverride
+    @discardableResult
+    public func setOptions(handler: (inout Config) -> ()) -> LMInstantiator {
+      handler(&config)
+      return self
+    }
 
     // MARK: - 工具函式
 
@@ -212,26 +204,6 @@ public extension LMAssembly {
       }
     }
 
-    public var isCassetteDataLoaded: Bool { Self.lmCassette.isLoaded }
-    public static func loadCassetteData(path: String) {
-      func load() {
-        if FileManager.default.isReadableFile(atPath: path) {
-          Self.lmCassette.clear()
-          Self.lmCassette.open(path)
-          vCLMLog("lmCassette: \(Self.lmCassette.count) entries of data loaded from: \(path)")
-        } else {
-          vCLMLog("lmCassette: File access failure: \(path)")
-        }
-      }
-      if !Self.asyncLoadingUserData {
-        load()
-      } else {
-        DispatchQueue.main.async {
-          load()
-        }
-      }
-    }
-
     // MARK: - 核心函式（對外）
 
     public func hasAssociatedPhrasesFor(pair: Megrez.KeyValuePaired) -> Bool {
@@ -256,7 +228,11 @@ public extension LMAssembly {
     ///   - key: 索引鍵陣列。
     ///   - unigram: 要插入的單元圖。
     ///   - isFiltering: 是否有在過濾內容。
-    public func insertTemporaryData(keyArray: [String], unigram: Megrez.Unigram, isFiltering: Bool) {
+    public func insertTemporaryData(
+      keyArray: [String],
+      unigram: Megrez.Unigram,
+      isFiltering: Bool
+    ) {
       let keyChain = keyArray.joined(separator: "-")
       _ =
         isFiltering
@@ -281,7 +257,11 @@ public extension LMAssembly {
     /// - Parameters:
     ///   - rawStrData: 新的資料。
     ///   - targetType: 操作對象。
-    public func replaceData(textData rawStrData: String, for targetType: ReplacableUserDataType, save: Bool = true) {
+    public func replaceData(
+      textData rawStrData: String,
+      for targetType: ReplacableUserDataType,
+      save: Bool = true
+    ) {
       var rawText = rawStrData
       LMConsolidator.consolidate(text: &rawText, pragma: true)
       switch targetType {
@@ -320,7 +300,12 @@ public extension LMAssembly {
     ///   - value: 資料值。
     ///   - factoryDictionaryOnly: 是否僅自原廠辭典確認在庫。
     /// - Returns: 是否在庫。
-    public func hasKeyValuePairFor(keyArray: [String], value: String, factoryDictionaryOnly: Bool = false) -> Bool {
+    public func hasKeyValuePairFor(
+      keyArray: [String],
+      value: String,
+      factoryDictionaryOnly: Bool = false
+    )
+      -> Bool {
       factoryDictionaryOnly
         ? factoryCoreUnigramsFor(key: keyArray.joined(separator: "-")).map(\.value).contains(value)
         : unigramsFor(keyArray: keyArray).map(\.value).contains(value)
@@ -358,7 +343,8 @@ public extension LMAssembly {
         }
       }
 
-      if !config.isCassetteEnabled || config.isCassetteEnabled && keyChain.map(\.description)[0] == "_" {
+      if !config.isCassetteEnabled || config.isCassetteEnabled && keyChain
+        .map(\.description)[0] == "_" {
         // 先給出 NumPad 的結果。
         rawAllUnigrams += supplyNumPadUnigrams(key: keyChain)
         // LMMisc 與 LMCore 的 score 在 (-10.0, 0.0) 這個區間內。
@@ -433,5 +419,41 @@ public extension LMAssembly {
       rawAllUnigrams.consolidate(filter: .init(lmFiltered.unigramsFor(key: keyChain).map(\.value)))
       return rawAllUnigrams
     }
+
+    // MARK: Internal
+
+    // SQLite 連線所在的記憶體位置。
+    static var ptrSQL: OpaquePointer?
+
+    /// 介紹一下幾個通用的語言模組型別：
+    /// ----------------------
+    /// LMCoreEX 是全功能通用型的模組，每一筆辭典記錄以 key 為注音、以 [Unigram] 陣列作為記錄內容。
+    /// 比較適合那種每筆記錄都有不同的權重數值的語言模組，雖然也可以強制施加權重數值就是了。
+    /// LMCoreEX 的辭典陣列不承載 Unigram 本體、而是承載索引範圍，這樣可以節約記憶體。
+    /// 一個 LMCoreEX 就可以滿足威注音幾乎所有語言模組副本的需求，當然也有這兩個例外：
+    /// LMReplacements 與 LMAssociates 分別擔當語彙置換表資料與使用者關聯詞語的資料承載工作。
+    /// 但是，LMCoreEX 對 2010-2013 年等舊 mac 機種而言，讀取速度異常緩慢。
+    /// 於是 LMCoreJSON 就出場了，專門用來讀取原廠的 JSON 格式的辭典。
+
+    // 磁帶資料模組。「currentCassette」對外唯讀，僅用來讀取磁帶本身的中繼資料（Metadata）。
+    static var lmCassette = LMCassette()
+    static var lmPlainBopomofo = LMPlainBopomofo()
+
+    // 聲明使用者語言模組。
+    // 使用者語言模組使用多執行緒的話，可能會導致一些問題。有時間再仔細排查看看。
+    var lmUserPhrases = LMCoreEX(
+      reverse: true, consolidate: true, defaultScore: 0, forceDefaultScore: false
+    )
+    var lmFiltered = LMCoreEX(
+      reverse: true, consolidate: true, defaultScore: 0, forceDefaultScore: true
+    )
+    var lmUserSymbols = LMCoreEX(
+      reverse: true, consolidate: true, defaultScore: -12.0, forceDefaultScore: true
+    )
+    var lmReplacements = LMReplacements()
+    var lmAssociates = LMAssociates()
+
+    // 半衰记忆模组
+    var lmUserOverride: LMUserOverride
   }
 }

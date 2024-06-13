@@ -13,7 +13,7 @@ import Tekkon
 
 // MARK: - IMKCandidates 功能擴充
 
-public extension SessionCtl {
+extension SessionCtl {
   private var initialCharForQuickCandidates: String {
     PrefMgr.shared.useHorizontalCandidateList ? "" : "🗲"
   }
@@ -21,7 +21,7 @@ public extension SessionCtl {
   /// 生成 IMK 選字窗專用的候選字串陣列。
   /// - Parameter sender: 呼叫了該函式的客體（無須使用）。
   /// - Returns: IMK 選字窗專用的候選字串陣列。
-  override func candidates(_ sender: Any!) -> [Any]! {
+  public override func candidates(_ sender: Any!) -> [Any]! {
     _ = sender // 防止格式整理工具毀掉與此對應的參數。
     var arrResult = [String]()
 
@@ -32,22 +32,25 @@ public extension SessionCtl {
       guard let separator = inputHandler?.keySeparator else { return }
       for theCandidate in candidates {
         let theConverted = ChineseConverter.kanjiConversionIfRequired(theCandidate.value)
-        var result = (theCandidate.value == theConverted) ? theCandidate.value : "\(theConverted)\u{1A}(\(theCandidate.value))"
+        var result = (theCandidate.value == theConverted) ? theCandidate
+          .value : "\(theConverted)\u{1A}(\(theCandidate.value))"
         if arrResult.contains(result) {
           let reading: String =
             PrefMgr.shared.cassetteEnabled
               ? theCandidate.keyArray.joined(separator: separator)
-              : (PrefMgr.shared.showHanyuPinyinInCompositionBuffer
-                ? Tekkon.cnvPhonaToHanyuPinyin(
-                  targetJoined: {
-                    var arr = [String]()
-                    theCandidate.keyArray.forEach { key in
-                      arr.append(Tekkon.restoreToneOneInPhona(target: key))
-                    }
-                    return arr.joined(separator: "-")
-                  }()
-                )
-                : theCandidate.keyArray.joined(separator: separator))
+              : (
+                PrefMgr.shared.showHanyuPinyinInCompositionBuffer
+                  ? Tekkon.cnvPhonaToHanyuPinyin(
+                    targetJoined: {
+                      var arr = [String]()
+                      theCandidate.keyArray.forEach { key in
+                        arr.append(Tekkon.restoreToneOneInPhona(target: key))
+                      }
+                      return arr.joined(separator: "-")
+                    }()
+                  )
+                  : theCandidate.keyArray.joined(separator: separator)
+              )
           result = "\(result)\u{17}(\(reading))"
         }
         arrResult.append(prefix + result)
@@ -55,7 +58,7 @@ public extension SessionCtl {
     }
 
     switch state.type {
-    case .ofDeactivated, .ofEmpty, .ofAbortion, .ofCommitting, .ofMarking: break
+    case .ofAbortion, .ofCommitting, .ofDeactivated, .ofEmpty, .ofMarking: break
     case .ofAssociates:
       handleIMKCandidatesPrepared(state.candidates, prefix: "⇧")
     case .ofInputting where state.isCandidateContainer:
@@ -78,7 +81,7 @@ public extension SessionCtl {
 
   /// IMK 選字窗限定函式，只要選字窗內的高亮內容選擇出現變化了、就會呼叫這個函式。
   /// - Parameter currentSelection: 已經高亮選中的候選字詞內容。
-  override func candidateSelectionChanged(_ currentSelection: NSAttributedString!) {
+  public override func candidateSelectionChanged(_ currentSelection: NSAttributedString!) {
     guard state.isCandidateContainer else { return }
     guard let candidateString = currentSelection?.string, !candidateString.isEmpty else { return }
     // Handle candidatePairHighlightChanged().
@@ -91,7 +94,10 @@ public extension SessionCtl {
       guard !annotation.isEmpty else { return }
       vCLog("Current Annotation: \(annotation)")
       guard let imkCandidates = candidateUI as? CtlCandidateIMK else { return }
-      annotationSelected(.init(string: annotation), forCandidate: .init(string: realCandidateString))
+      annotationSelected(
+        .init(string: annotation),
+        forCandidate: .init(string: realCandidateString)
+      )
       imkCandidates.showAnnotation(.init(string: annotation))
     }
   }
@@ -99,7 +105,7 @@ public extension SessionCtl {
   /// IMK 選字窗限定函式，只要選字窗確認了某個候選字詞的選擇、就會呼叫這個函式。
   /// - Remark: 不要被 IMK 的 API 命名方式困惑到。這其實是 Confirm Selection 確認選字。
   /// - Parameter candidateString: 已經確認的候選字詞內容。
-  override func candidateSelected(_ candidateString: NSAttributedString!) {
+  public override func candidateSelected(_ candidateString: NSAttributedString!) {
     guard state.isCandidateContainer else { return }
     let candidateString: String = candidateString?.string ?? ""
     if state.type == .ofAssociates {
@@ -115,7 +121,7 @@ public extension SessionCtl {
     candidatePairSelectionConfirmed(at: indexDeducted)
   }
 
-  func deductCandidateIndex(from candidateString: String) -> Int {
+  public func deductCandidateIndex(from candidateString: String) -> Int {
     var indexDeducted = 0
 
     // 分類符號選單不會出現同符異音項、不需要康熙 / JIS 轉換，所以使用簡化過的處理方式。
@@ -132,7 +138,11 @@ public extension SessionCtl {
     case .ofAssociates:
       fixIndexForIMKCandidates(&indexDeducted, prefix: "⇧", source: candidateString)
     case .ofInputting where state.isCandidateContainer:
-      fixIndexForIMKCandidates(&indexDeducted, prefix: initialCharForQuickCandidates, source: candidateString)
+      fixIndexForIMKCandidates(
+        &indexDeducted,
+        prefix: initialCharForQuickCandidates,
+        source: candidateString
+      )
     case .ofSymbolTable:
       fixSymbolIndexForIMKCandidates()
     case .ofCandidates:
@@ -168,17 +178,19 @@ public extension SessionCtl {
       let reading: String =
         PrefMgr.shared.cassetteEnabled
           ? neta.keyArray.joined(separator: separator)
-          : (PrefMgr.shared.showHanyuPinyinInCompositionBuffer
-            ? Tekkon.cnvPhonaToHanyuPinyin(
-              targetJoined: {
-                var arr = [String]()
-                neta.keyArray.forEach { key in
-                  arr.append(Tekkon.restoreToneOneInPhona(target: key))
-                }
-                return arr.joined(separator: "-")
-              }()
-            )
-            : neta.keyArray.joined(separator: separator))
+          : (
+            PrefMgr.shared.showHanyuPinyinInCompositionBuffer
+              ? Tekkon.cnvPhonaToHanyuPinyin(
+                targetJoined: {
+                  var arr = [String]()
+                  neta.keyArray.forEach { key in
+                    arr.append(Tekkon.restoreToneOneInPhona(target: key))
+                  }
+                  return arr.joined(separator: "-")
+                }()
+              )
+              : neta.keyArray.joined(separator: separator)
+          )
       let netaShownWithPronunciation = "\(netaShown)\u{17}(\(reading))"
       if candidateString == prefix + netaShownWithPronunciation {
         indexDeducted = min(i, maxIndex)

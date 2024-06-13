@@ -14,7 +14,7 @@ import SwiftExtension
 
 // MARK: - Input Mode Extension for Language Models
 
-public extension Shared.InputMode {
+extension Shared.InputMode {
   private static let lmCHS = LMAssembly.LMInstantiator(
     isCHS: true, uomDataURL: LMMgr.userOverrideModelDataURL(.imeModeCHS)
   )
@@ -22,7 +22,7 @@ public extension Shared.InputMode {
     isCHS: false, uomDataURL: LMMgr.userOverrideModelDataURL(.imeModeCHT)
   )
 
-  var langModel: LMAssembly.LMInstantiator {
+  public var langModel: LMAssembly.LMInstantiator {
     switch self {
     case .imeModeCHS: return Self.lmCHS
     case .imeModeCHT: return Self.lmCHT
@@ -31,10 +31,12 @@ public extension Shared.InputMode {
   }
 }
 
-// MARK: - Language Model Manager.
+// MARK: - LMMgr
 
 public class LMMgr {
   public static var shared = LMMgr()
+
+  public static var isCoreDBConnected: Bool { LMAssembly.LMInstantiator.isSQLDBConnected }
 
   // MARK: - Functions reacting directly with language models.
 
@@ -47,8 +49,6 @@ public class LMMgr {
     // 所以這裡不需要特別處理。
     Self.loadUserPhrasesData()
   }
-
-  public static var isCoreDBConnected: Bool { LMAssembly.LMInstantiator.isSQLDBConnected }
 
   public static func connectCoreDB(dbPath: String? = nil) {
     guard let path: String = dbPath ?? Self.getCoreDictionaryDBPath() else {
@@ -130,7 +130,8 @@ public class LMMgr {
   }
 
   public static func reloadUserFilterDirectly(mode: Shared.InputMode) {
-    mode.langModel.reloadUserFilterDirectly(path: userDictDataURL(mode: mode, type: .theFilter).path)
+    mode.langModel
+      .reloadUserFilterDirectly(path: userDictDataURL(mode: mode, type: .theFilter).path)
   }
 
   public static func checkIfPhrasePairExists(
@@ -138,7 +139,8 @@ public class LMMgr {
     mode: Shared.InputMode,
     keyArray: [String],
     factoryDictionaryOnly: Bool = false
-  ) -> Bool {
+  )
+    -> Bool {
     mode.langModel.hasKeyValuePairFor(
       keyArray: keyArray, value: userPhrase, factoryDictionaryOnly: factoryDictionaryOnly
     )
@@ -148,7 +150,8 @@ public class LMMgr {
     userPhrase: String,
     mode: Shared.InputMode,
     keyArray: [String]
-  ) -> Bool {
+  )
+    -> Bool {
     mode.langModel.isPairFiltered(pair: .init(keyArray: keyArray, value: userPhrase))
   }
 
@@ -156,7 +159,8 @@ public class LMMgr {
     keyArray: [String],
     mode: Shared.InputMode,
     factoryDictionaryOnly: Bool = false
-  ) -> Int {
+  )
+    -> Int {
     mode.langModel.countKeyValuePairs(
       keyArray: keyArray, factoryDictionaryOnly: factoryDictionaryOnly
     )
@@ -179,7 +183,11 @@ public class LMMgr {
   // MARK: UOM
 
   public static func saveUserOverrideModelData() {
-    let globalQueue = DispatchQueue(label: "LMAssembly_UOM", qos: .unspecified, attributes: .concurrent)
+    let globalQueue = DispatchQueue(
+      label: "LMAssembly_UOM",
+      qos: .unspecified,
+      attributes: .concurrent
+    )
     let group = DispatchGroup()
     Shared.InputMode.validCases.forEach { mode in
       group.enter()
@@ -210,7 +218,8 @@ public class LMMgr {
     }
 
     let urls: [URL] = [userOverrideModelDataURL(.imeModeCHS), userOverrideModelDataURL(.imeModeCHT)]
-    let folderURL = URL(fileURLWithPath: dataFolderPath(isDefaultFolder: true)).deletingLastPathComponent()
+    let folderURL = URL(fileURLWithPath: dataFolderPath(isDefaultFolder: true))
+      .deletingLastPathComponent()
     urls.forEach { oldURL in
       let newFileName = "[UOM-CRASH][\(dateStringTag(date: .init()))]\(oldURL.lastPathComponent)"
       let newURL = folderURL.appendingPathComponent(newFileName)

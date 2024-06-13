@@ -11,11 +11,14 @@ import XCTest
 
 @testable import LangModelAssembly
 
-private let packageRootPath = URL(fileURLWithPath: #file).pathComponents.prefix(while: { $0 != "Tests" }).joined(
-  separator: "/"
-).dropFirst()
+private let packageRootPath = URL(fileURLWithPath: #file).pathComponents
+  .prefix(while: { $0 != "Tests" }).joined(
+    separator: "/"
+  ).dropFirst()
 
 private let testDataPath: String = packageRootPath + "/Tests/TestCINData/"
+
+// MARK: - LMCassetteTests
 
 final class LMCassetteTests: XCTestCase {
   func testCassetteLoadWubi86() throws {

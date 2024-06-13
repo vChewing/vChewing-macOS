@@ -12,11 +12,7 @@ import OSFrameworkImpl
 import Shared
 
 public class SecurityAgentHelper {
-  public static let shared = SecurityAgentHelper()
-  private static var reportedPIDs: [Int32] = []
-
-  var timer: Timer?
-  let alertInstance = NSAlert()
+  // MARK: Lifecycle
 
   private init() {
     deployTimer()
@@ -26,9 +22,14 @@ public class SecurityAgentHelper {
     removeTimer()
   }
 
+  // MARK: Public
+
+  public static let shared = SecurityAgentHelper()
+
   public func deployTimer() {
     timer = Timer.scheduledTimer(
-      timeInterval: 60, target: self, selector: #selector(checkAndHandle(_:)), userInfo: nil, repeats: true
+      timeInterval: 60, target: self, selector: #selector(checkAndHandle(_:)), userInfo: nil,
+      repeats: true
     )
     timer?.tolerance = 600
     timer?.fire()
@@ -40,7 +41,8 @@ public class SecurityAgentHelper {
     timer = nil
   }
 
-  @objc public func checkAndHandle(_: Timer) {
+  @objc
+  public func checkAndHandle(_: Timer) {
     guard PrefMgr.shared.checkAbusersOfSecureEventInputAPI else { return }
     var results = SecureEventInputSputnik.getRunningSecureInputApps(abusersOnly: true)
     vCLog("SecurityAgentHelper scanned SecureEventInput abusers. \(results.count) targets found.")
@@ -80,4 +82,13 @@ public class SecurityAgentHelper {
     alertInstance.runModal()
     NSApp.popup()
   }
+
+  // MARK: Internal
+
+  var timer: Timer?
+  let alertInstance = NSAlert()
+
+  // MARK: Private
+
+  private static var reportedPIDs: [Int32] = []
 }

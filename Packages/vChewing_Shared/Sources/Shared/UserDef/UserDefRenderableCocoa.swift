@@ -13,16 +13,10 @@ import Foundation
 import IMKUtils
 import OSFrameworkImpl
 
+// MARK: - UserDefRenderableCocoa
+
 public class UserDefRenderableCocoa: NSObject, Identifiable {
-  public let def: UserDef
-  public var id: String { def.rawValue }
-  public var optionsLocalized: [(Int, String)?]
-  private var optionsLocalizedAsIdentifiables: [(String, String)?] = [] // 非 Int 型資料專用（例：鍵盤佈局選擇器）。
-  public var inlineDescriptionLocalized: String?
-  public var hideTitle: Bool = false
-  public var mainViewOverride: (() -> NSView?)?
-  public var currentControl: NSControl?
-  public var tinySize: Bool = false
+  // MARK: Lifecycle
 
   public init(def: UserDef) {
     self.def = def
@@ -31,9 +25,9 @@ public class UserDefRenderableCocoa: NSObject, Identifiable {
       rawOptions.forEach { key, value in
         newOptions[key] = value.localized
       }
-      optionsLocalized = rawOptions.sorted(by: { $0.key < $1.key })
+      self.optionsLocalized = rawOptions.sorted(by: { $0.key < $1.key })
     } else {
-      optionsLocalized = []
+      self.optionsLocalized = []
     }
 
     var objOptions = [(String, String)?]()
@@ -43,7 +37,7 @@ public class UserDefRenderableCocoa: NSObject, Identifiable {
       IMKHelper.allowedAlphanumericalTISInputSources.forEach { currentTIS in
         objOptions.append((currentTIS.id, currentTIS.titleLocalized))
       }
-      optionsLocalizedAsIdentifiables = objOptions
+      self.optionsLocalizedAsIdentifiables = objOptions
     case .kBasicKeyboardLayout:
       IMKHelper.allowedBasicLayoutsAsTISInputSources.forEach { currentTIS in
         guard let currentTIS = currentTIS else {
@@ -52,19 +46,19 @@ public class UserDefRenderableCocoa: NSObject, Identifiable {
         }
         objOptions.append((currentTIS.id, currentTIS.titleLocalized))
       }
-      optionsLocalizedAsIdentifiables = objOptions
+      self.optionsLocalizedAsIdentifiables = objOptions
     case .kKeyboardParser:
       KeyboardParser.allCases.forEach { currentParser in
         if [7, 100].contains(currentParser.rawValue) { intOptions.append(nil) }
         intOptions.append((currentParser.rawValue, currentParser.localizedMenuName))
       }
-      optionsLocalized = intOptions
+      self.optionsLocalized = intOptions
     default: break checkDef
     }
 
     super.init()
     guard let metaData = def.metaData else {
-      inlineDescriptionLocalized = nil
+      self.inlineDescriptionLocalized = nil
       return
     }
     var stringStack = [String]()
@@ -81,17 +75,33 @@ public class UserDefRenderableCocoa: NSObject, Identifiable {
       )
       stringStack.append(strOSReq)
     }
-    currentControl = renderFunctionControl()
+    self.currentControl = renderFunctionControl()
     guard !stringStack.isEmpty else {
-      inlineDescriptionLocalized = nil
+      self.inlineDescriptionLocalized = nil
       return
     }
-    inlineDescriptionLocalized = stringStack.joined(separator: "\n")
+    self.inlineDescriptionLocalized = stringStack.joined(separator: "\n")
   }
+
+  // MARK: Public
+
+  public let def: UserDef
+  public var optionsLocalized: [(Int, String)?]
+  public var inlineDescriptionLocalized: String?
+  public var hideTitle: Bool = false
+  public var mainViewOverride: (() -> NSView?)?
+  public var currentControl: NSControl?
+  public var tinySize: Bool = false
+
+  public var id: String { def.rawValue }
+
+  // MARK: Private
+
+  private var optionsLocalizedAsIdentifiables: [(String, String)?] = [] // 非 Int 型資料專用（例：鍵盤佈局選擇器）。
 }
 
-public extension UserDefRenderableCocoa {
-  func render(fixWidth fixedWith: CGFloat? = nil) -> NSView? {
+extension UserDefRenderableCocoa {
+  public func render(fixWidth fixedWith: CGFloat? = nil) -> NSView? {
     let result: NSStackView? = NSStackView.build(.vertical) {
       renderMainLine(fixedWidth: fixedWith)
       renderDescription(fixedWidth: fixedWith)
@@ -100,7 +110,7 @@ public extension UserDefRenderableCocoa {
     return result
   }
 
-  func renderDescription(fixedWidth: CGFloat? = nil) -> NSTextField? {
+  public func renderDescription(fixedWidth: CGFloat? = nil) -> NSTextField? {
     guard let text = inlineDescriptionLocalized else { return nil }
     let textField = text.makeNSLabel(descriptive: true)
     if #available(macOS 10.10, *), tinySize {
@@ -111,12 +121,16 @@ public extension UserDefRenderableCocoa {
     if let fixedWidth = fixedWidth {
       textField.makeSimpleConstraint(.width, relation: .lessThanOrEqual, value: fixedWidth)
       textField.sizeToFit()
-      textField.makeSimpleConstraint(.height, relation: .lessThanOrEqual, value: textField.fittingSize.height)
+      textField.makeSimpleConstraint(
+        .height,
+        relation: .lessThanOrEqual,
+        value: textField.fittingSize.height
+      )
     }
     return textField
   }
 
-  func renderMainLine(fixedWidth: CGFloat? = nil) -> NSView? {
+  public func renderMainLine(fixedWidth: CGFloat? = nil) -> NSView? {
     if let mainViewOverride = mainViewOverride {
       return mainViewOverride()
     }
@@ -140,7 +154,11 @@ public extension UserDefRenderableCocoa {
       textLabel.preferredMaxLayoutWidth = specifiedWidth
       textLabel.makeSimpleConstraint(.width, relation: .lessThanOrEqual, value: specifiedWidth)
       textLabel.sizeToFit()
-      textLabel.makeSimpleConstraint(.height, relation: .lessThanOrEqual, value: textLabel.fittingSize.height)
+      textLabel.makeSimpleConstraint(
+        .height,
+        relation: .lessThanOrEqual,
+        value: textLabel.fittingSize.height
+      )
     }
     textLabel?.sizeToFit()
     return result
@@ -263,22 +281,34 @@ public extension UserDefRenderableCocoa {
     }
     if #available(macOS 10.10, *), tinySize {
       result?.controlSize = .small
-      return result?.makeSimpleConstraint(.height, relation: .greaterThanOrEqual, value: Swift.max(14, result?.fittingSize.height ?? 14)) as? NSControl
+      return result?.makeSimpleConstraint(
+        .height,
+        relation: .greaterThanOrEqual,
+        value: Swift.max(14, result?.fittingSize.height ?? 14)
+      ) as? NSControl
     }
-    return result?.makeSimpleConstraint(.height, relation: .greaterThanOrEqual, value: Swift.max(16, result?.fittingSize.height ?? 16)) as? NSControl
+    return result?.makeSimpleConstraint(
+      .height,
+      relation: .greaterThanOrEqual,
+      value: Swift.max(16, result?.fittingSize.height ?? 16)
+    ) as? NSControl
   }
 }
 
 // MARK: - External Extensions.
 
-public extension UserDef {
-  func render(fixWidth: CGFloat? = nil, extraOps: ((inout UserDefRenderableCocoa) -> Void)? = nil) -> NSView? {
+extension UserDef {
+  public func render(
+    fixWidth: CGFloat? = nil,
+    extraOps: ((inout UserDefRenderableCocoa) -> ())? = nil
+  )
+    -> NSView? {
     var renderable = toCocoaRenderable()
     extraOps?(&renderable)
     return renderable.render(fixWidth: fixWidth)
   }
 
-  func toCocoaRenderable() -> UserDefRenderableCocoa {
+  public func toCocoaRenderable() -> UserDefRenderableCocoa {
     .init(def: self)
   }
 }

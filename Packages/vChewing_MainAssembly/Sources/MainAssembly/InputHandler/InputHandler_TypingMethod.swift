@@ -10,13 +10,15 @@ import Foundation
 import Shared
 import SwiftExtension
 
-// MARK: - Typing Method
+// MARK: - InputHandler.TypingMethod
 
-public extension InputHandler {
-  enum TypingMethod: Int, CaseIterable {
+extension InputHandler {
+  public enum TypingMethod: Int, CaseIterable {
     case vChewingFactory // 自動指派: 0
     case codePoint // 自動指派: 1
     case haninKeyboardSymbol // 自動指派: 2
+
+    // MARK: Internal
 
     mutating func revolveNext() {
       var theInt = rawValue
@@ -44,8 +46,10 @@ public extension InputHandler {
 
 // MARK: - Handle Rotation Toggles
 
-public extension InputHandler {
-  @discardableResult func revolveTypingMethod(to specifiedMethod: TypingMethod? = nil) -> Bool {
+extension InputHandler {
+  @discardableResult
+  public func revolveTypingMethod(to specifiedMethod: TypingMethod? = nil)
+    -> Bool {
     guard let delegate = delegate else { return false }
     var newMethod = currentTypingMethod
     if let specified = specifiedMethod {

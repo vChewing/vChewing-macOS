@@ -9,29 +9,14 @@
 import AppKit
 import OSFrameworkImpl
 
+// MARK: - Notifier
+
 public class Notifier: NSWindowController {
-  public static func notify(message: String) {
-    DispatchQueue.main.async { Self.message = message }
-  }
+  // MARK: Lifecycle
 
-  static var message: String = "" {
-    didSet {
-      if !Self.message.isEmpty {
-        Self.message = Notifier(message).blankValue
-      }
-    }
-  }
-
-  private var currentMessage: String // 承載該副本在初期化時被傳入的訊息內容。
-  private var isNew = true // 新通知標記。
-
-  // MARK: - Private Declarations
-
-  private static var instanceSet: NSMutableOrderedSet = .init()
-  private let blankValue = ""
-
-  @discardableResult private init(_ message: String) {
-    currentMessage = message
+  @discardableResult
+  private init(_ message: String) {
+    self.currentMessage = message
     let rawMessage = message.replacingOccurrences(of: "\n", with: "")
     let isDuplicated: Bool = {
       if let firstInstanceExisted = Self.instanceSet.firstNotifier {
@@ -152,9 +137,36 @@ public class Notifier: NSWindowController {
     fatalError("init(coder:) has not been implemented")
   }
 
+  // MARK: Public
+
+  public static func notify(message: String) {
+    DispatchQueue.main.async { Self.message = message }
+  }
+
   override public func close() {
     super.close()
   }
+
+  // MARK: Internal
+
+  static var message: String = "" {
+    didSet {
+      if !Self.message.isEmpty {
+        Self.message = Notifier(message).blankValue
+      }
+    }
+  }
+
+  // MARK: Private
+
+  // MARK: - Private Declarations
+
+  private static var instanceSet: NSMutableOrderedSet = .init()
+
+  private var currentMessage: String // 承載該副本在初期化時被傳入的訊息內容。
+  private var isNew = true // 新通知標記。
+
+  private let blankValue = ""
 }
 
 // MARK: - Private Functions
@@ -202,15 +214,15 @@ extension Notifier {
   }
 }
 
-private extension NSMutableOrderedSet {
-  var arrayOfWindows: [NSWindow] { compactMap { ($0 as? Notifier)?.window } }
+extension NSMutableOrderedSet {
+  fileprivate var arrayOfWindows: [NSWindow] { compactMap { ($0 as? Notifier)?.window } }
 
-  var firstNotifier: Notifier? {
+  fileprivate var firstNotifier: Notifier? {
     for neta in self { if let result = neta as? Notifier { return result } }
     return nil
   }
 
-  var lastNotifier: Notifier? {
+  fileprivate var lastNotifier: Notifier? {
     for neta in reversed { if let result = neta as? Notifier { return result } }
     return nil
   }

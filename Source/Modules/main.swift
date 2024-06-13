@@ -64,12 +64,17 @@ case 2:
     }
     let url = URL(fileURLWithPath: path)
     guard var rawString = try? String(contentsOf: url) else {
-      print("[Kimo Import] Given file path is either invalid or not accessible. Read access is needed for this operation.")
+      print(
+        "[Kimo Import] Given file path is either invalid or not accessible. Read access is needed for this operation."
+      )
       exit(1)
     }
     let maybeCount = try? LMMgr.importYahooKeyKeyUserDictionary(text: &rawString)
     let count: Int = maybeCount ?? 0
-    let msg = String(format: "i18n:settings.importFromKimoTxt.finishedCount:%@".localized, count.description)
+    let msg = String(
+      format: "i18n:settings.importFromKimoTxt.finishedCount:%@".localized,
+      count.description
+    )
     print("[Kimo Import] \(msg)")
     exit(0)
   default: break
@@ -89,7 +94,9 @@ if !loaded {
   exit(-1)
 }
 
-let kConnectionName = Bundle.main.infoDictionary?["InputMethodConnectionName"] as? String ?? "org.atelierInmu.inputmethod.vChewing_Connection"
+let kConnectionName = Bundle.main
+  .infoDictionary?["InputMethodConnectionName"] as? String ??
+  "org.atelierInmu.inputmethod.vChewing_Connection"
 
 guard let bundleID = Bundle.main.bundleIdentifier,
       let server = IMKServer(name: kConnectionName, bundleIdentifier: bundleID)

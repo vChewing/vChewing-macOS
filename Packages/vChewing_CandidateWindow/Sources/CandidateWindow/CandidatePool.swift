@@ -9,11 +9,56 @@
 import Foundation
 import Shared
 
+// MARK: - CandidatePool
+
 /// 候選字窗會用到的資料池單位，即用即拋。
 public class CandidatePool {
+  // MARK: Lifecycle
+
+  // MARK: - Constructors
+
+  /// 初期化一個候選字窗專用資料池。
+  /// - Parameters:
+  ///   - candidates: 要塞入的候選字詞陣列。
+  ///   - selectionKeys: 選字鍵。
+  ///   - direction: 橫向排列還是縱向排列（預設情況下是縱向）。
+  ///   - locale: 區域編碼。例：「zh-Hans」或「zh-Hant」。
+  public init(
+    candidates: [(keyArray: [String], value: String)], lines: Int = 3,
+    isExpanded expanded: Bool = true, selectionKeys: String = "123456789",
+    layout: LayoutOrientation = .vertical, locale: String = ""
+  ) {
+    self._maxLinesPerPage = max(1, lines)
+    self.isExpanded = expanded
+    self.layout = .horizontal
+    self.selectionKeys = "123456789"
+    self.candidateDataAll = []
+    // 以上只是為了糊弄 compiler。接下來才是正式的初期化。
+    construct(candidates: candidates, selectionKeys: selectionKeys, layout: layout, locale: locale)
+  }
+
+  // MARK: Public
+
+  public struct UIMetrics {
+    static var allZeroed: UIMetrics {
+      .init(
+        fittingSize: .zero,
+        highlightedLine: .zero,
+        highlightedCandidate: .zero,
+        peripherals: .zero
+      )
+    }
+
+    let fittingSize: CGSize
+    let highlightedLine: CGRect
+    let highlightedCandidate: CGRect
+    let peripherals: CGRect
+  }
+
   // 只用來測量單漢字候選字 cell 的最大可能寬度。
   public static let shitCell = CandidateCellData(key: " ", displayedText: "💩", isSelected: false)
   public static let blankCell = CandidateCellData(key: " ", displayedText: "　", isSelected: false)
+
   public private(set) var _maxLinesPerPage: Int
   public private(set) var layout: LayoutOrientation
   public private(set) var selectionKeys: String
@@ -26,26 +71,13 @@ public class CandidatePool {
   public var tooltip: String = ""
   public var reverseLookupResult: [String] = []
 
-  private var recordedLineRangeForCurrentPage: Range<Int>?
-  private var previouslyRecordedLineRangeForPreviousPage: Range<Int>?
-
-  public struct UIMetrics {
-    static var allZeroed: UIMetrics {
-      .init(fittingSize: .zero, highlightedLine: .zero, highlightedCandidate: .zero, peripherals: .zero)
-    }
-
-    let fittingSize: CGSize
-    let highlightedLine: CGRect
-    let highlightedCandidate: CGRect
-    let peripherals: CGRect
-  }
-
   // MARK: - 動態變數
 
   public let padding: CGFloat = 2
   public let originDelta: CGFloat = 5
   public let cellTextHeight = CandidatePool.shitCell.textDimension.height
   public let cellRadius: CGFloat = 4
+
   public var windowRadius: CGFloat { originDelta + cellRadius }
 
   /// 當前資料池每頁顯示的最大行/列數。
@@ -68,7 +100,8 @@ public class CandidatePool {
 
   /// 當前高亮的候選字詞。
   public var currentCandidate: CandidateCellData? {
-    (0 ..< candidateDataAll.count).contains(highlightedIndex) ? candidateDataAll[highlightedIndex] : nil
+    (0 ..< candidateDataAll.count)
+      .contains(highlightedIndex) ? candidateDataAll[highlightedIndex] : nil
   }
 
   /// 當前高亮的候選字詞的文本。如果相關資料不存在或者不合規的話，則返回空字串。
@@ -97,26 +130,10 @@ public class CandidatePool {
     currentLineNumber ..< min(candidateLines.count, currentLineNumber + maxLinesPerPage)
   }
 
-  // MARK: - Constructors
+  // MARK: Private
 
-  /// 初期化一個候選字窗專用資料池。
-  /// - Parameters:
-  ///   - candidates: 要塞入的候選字詞陣列。
-  ///   - selectionKeys: 選字鍵。
-  ///   - direction: 橫向排列還是縱向排列（預設情況下是縱向）。
-  ///   - locale: 區域編碼。例：「zh-Hans」或「zh-Hant」。
-  public init(
-    candidates: [(keyArray: [String], value: String)], lines: Int = 3, isExpanded expanded: Bool = true, selectionKeys: String = "123456789",
-    layout: LayoutOrientation = .vertical, locale: String = ""
-  ) {
-    _maxLinesPerPage = max(1, lines)
-    isExpanded = expanded
-    self.layout = .horizontal
-    self.selectionKeys = "123456789"
-    candidateDataAll = []
-    // 以上只是為了糊弄 compiler。接下來才是正式的初期化。
-    construct(candidates: candidates, selectionKeys: selectionKeys, layout: layout, locale: locale)
-  }
+  private var recordedLineRangeForCurrentPage: Range<Int>?
+  private var previouslyRecordedLineRangeForPreviousPage: Range<Int>?
 
   /// 初期化（或者自我重新初期化）一個候選字窗專用資料池。
   /// - Parameters:
@@ -144,7 +161,8 @@ public class CandidatePool {
       var isOverflown: Bool = (currentColumn.count == maxLineCapacity) && !currentColumn.isEmpty
       if layout == .horizontal {
         isOverflown = isOverflown
-          || currentColumn.map { $0.cellLength() }.reduce(0, +) > maxRowWidth - candidate.cellLength()
+          || currentColumn.map { $0.cellLength() }.reduce(0, +) > maxRowWidth - candidate
+          .cellLength()
       }
       if isOverflown {
         candidateLines.append(currentColumn)
@@ -164,14 +182,14 @@ public class CandidatePool {
 
 // MARK: - Public Functions (for all OS)
 
-public extension CandidatePool {
+extension CandidatePool {
   /// 選字窗的候選字詞陳列方向。
-  enum LayoutOrientation {
+  public enum LayoutOrientation {
     case horizontal
     case vertical
   }
 
-  func update() {
+  public func update() {
     if #available(macOS 10.15, *) {
       DispatchQueue.main.async {
         self.objectWillChange.send()
@@ -179,9 +197,10 @@ public extension CandidatePool {
     }
   }
 
-  func expandIfNeeded(isBackward: Bool) {
+  public func expandIfNeeded(isBackward: Bool) {
     guard !candidateLines.isEmpty, !isExpanded, isExpandable else { return }
-    let candidatesShown: [CandidateCellData] = candidateLines[lineRangeForCurrentPage].flatMap { $0 }
+    let candidatesShown: [CandidateCellData] = candidateLines[lineRangeForCurrentPage]
+      .flatMap { $0 }
     guard !candidatesShown.filter(\.isHighlighted).isEmpty else { return }
     isExpanded = true
     if candidateLines.count <= _maxLinesPerPage {
@@ -192,13 +211,17 @@ public extension CandidatePool {
         if lineRangeForFirstPage.contains(currentLineNumber) {
           recordedLineRangeForCurrentPage = lineRangeForFirstPage
         } else {
-          recordedLineRangeForCurrentPage = max(0, currentLineNumber - _maxLinesPerPage + 1) ..< currentLineNumber + 1
+          recordedLineRangeForCurrentPage = max(0, currentLineNumber - _maxLinesPerPage + 1) ..<
+            currentLineNumber + 1
         }
       case false:
         if lineRangeForFinalPage.contains(currentLineNumber) {
           recordedLineRangeForCurrentPage = lineRangeForFinalPage
         } else {
-          recordedLineRangeForCurrentPage = currentLineNumber ..< min(candidateLines.count, currentLineNumber + _maxLinesPerPage)
+          recordedLineRangeForCurrentPage = currentLineNumber ..< min(
+            candidateLines.count,
+            currentLineNumber + _maxLinesPerPage
+          )
         }
       }
     }
@@ -208,7 +231,8 @@ public extension CandidatePool {
   /// 往指定的方向翻頁。
   /// - Parameter isBackward: 是否逆向翻頁。
   /// - Returns: 操作是否順利。
-  @discardableResult func flipPage(isBackward: Bool) -> Bool {
+  @discardableResult
+  public func flipPage(isBackward: Bool) -> Bool {
     if !isExpanded, isExpandable {
       expandIfNeeded(isBackward: isBackward)
       return true
@@ -225,7 +249,7 @@ public extension CandidatePool {
   /// 嘗試用給定的行內編號推算該候選字在資料池內的總編號。
   /// - Parameter subIndex: 給定的行內編號。
   /// - Returns: 推算結果（可能會是 nil）。
-  func calculateCandidateIndex(subIndex: Int) -> Int? {
+  public func calculateCandidateIndex(subIndex: Int) -> Int? {
     let arrCurrentLine = candidateLines[currentLineNumber]
     if !(0 ..< arrCurrentLine.count).contains(subIndex) { return nil }
     return arrCurrentLine[subIndex].index
@@ -236,7 +260,8 @@ public extension CandidatePool {
   ///   - isBackward: 是否逆向翻行。
   ///   - count: 翻幾行。
   /// - Returns: 操作是否順利。
-  @discardableResult func consecutivelyFlipLines(isBackward: Bool, count: Int) -> Bool {
+  @discardableResult
+  public func consecutivelyFlipLines(isBackward: Bool, count: Int) -> Bool {
     expandIfNeeded(isBackward: isBackward)
     switch isBackward {
     case false where currentLineNumber == candidateLines.count - 1:
@@ -255,7 +280,8 @@ public extension CandidatePool {
   /// 嘗試高亮前方或者後方的鄰近候選字詞。
   /// - Parameter isBackward: 是否是後方的鄰近候選字詞。
   /// - Returns: 是否成功。
-  @discardableResult func highlightNeighborCandidate(isBackward: Bool) -> Bool {
+  @discardableResult
+  public func highlightNeighborCandidate(isBackward: Bool) -> Bool {
     switch isBackward {
     case false where highlightedIndex >= candidateDataAll.count - 1:
       highlight(at: 0)
@@ -271,7 +297,7 @@ public extension CandidatePool {
 
   /// 高亮指定的候選字。
   /// - Parameter indexSpecified: 給定的候選字詞索引編號，得是資料池內的總索引編號。
-  func highlight(at indexSpecified: Int) {
+  public func highlight(at indexSpecified: Int) {
     var indexSpecified = indexSpecified
     let isBackward: Bool = indexSpecified > highlightedIndex
     highlightedIndex = indexSpecified
@@ -311,7 +337,7 @@ public extension CandidatePool {
     }
   }
 
-  func cellWidth(_ cell: CandidateCellData) -> (min: CGFloat?, max: CGFloat?) {
+  public func cellWidth(_ cell: CandidateCellData) -> (min: CGFloat?, max: CGFloat?) {
     let minAccepted = ceil(Self.shitCell.cellLength(isMatrix: false))
     let defaultMin: CGFloat = cell.cellLength(isMatrix: maxLinesPerPage != 1)
     var min: CGFloat = defaultMin
@@ -323,48 +349,48 @@ public extension CandidatePool {
     return (min, nil)
   }
 
-  func isFilterable(target index: Int) -> Bool {
+  public func isFilterable(target index: Int) -> Bool {
     let spanLength = candidateDataAll[index].spanLength
     guard spanLength == 1 else { return true }
     return cellsOf(spanLength: spanLength).count > 1
   }
 
-  func cellsOf(spanLength: Int) -> [CandidateCellData] {
+  public func cellsOf(spanLength: Int) -> [CandidateCellData] {
     candidateDataAll.filter { $0.spanLength == spanLength }
   }
 }
 
 // MARK: - Privates.
 
-private extension CandidatePool {
-  enum VerticalDirection {
+extension CandidatePool {
+  fileprivate enum VerticalDirection {
     case up
     case down
   }
 
-  enum HorizontalDirection {
+  fileprivate enum HorizontalDirection {
     case left
     case right
   }
 
   /// 第一頁所在的行範圍。
-  var lineRangeForFirstPage: Range<Int> {
+  fileprivate var lineRangeForFirstPage: Range<Int> {
     0 ..< min(maxLinesPerPage, candidateLines.count)
   }
 
   /// 最後一頁所在的行範圍。
-  var lineRangeForFinalPage: Range<Int> {
+  fileprivate var lineRangeForFinalPage: Range<Int> {
     max(0, candidateLines.count - maxLinesPerPage) ..< candidateLines.count
   }
 
-  func selectNewNeighborLine(isBackward: Bool) {
+  fileprivate func selectNewNeighborLine(isBackward: Bool) {
     switch layout {
     case .horizontal: selectNewNeighborRow(direction: isBackward ? .up : .down)
     case .vertical: selectNewNeighborColumn(direction: isBackward ? .left : .right)
     }
   }
 
-  func fixLineRange(isBackward: Bool = false) {
+  fileprivate func fixLineRange(isBackward: Bool = false) {
     if !lineRangeForCurrentPage.contains(currentLineNumber) {
       switch isBackward {
       case false:
@@ -379,11 +405,11 @@ private extension CandidatePool {
     }
   }
 
-  func backupLineRangeForCurrentPage() {
+  fileprivate func backupLineRangeForCurrentPage() {
     previouslyRecordedLineRangeForPreviousPage = lineRangeForCurrentPage
   }
 
-  func flipLineRangeToNeighborPage(isBackward: Bool = false) {
+  fileprivate func flipLineRangeToNeighborPage(isBackward: Bool = false) {
     guard let prevRange = previouslyRecordedLineRangeForPreviousPage else { return }
     var lowerBound = prevRange.lowerBound
     var upperBound = prevRange.upperBound
@@ -396,13 +422,15 @@ private extension CandidatePool {
       if upperBound < candidateLines.count { break branch1 }
       if lowerBound < lineRangeForFinalPage.lowerBound { break branch1 }
       let isOverFlipped = !lineRangeForFinalPage.contains(currentLineNumber)
-      recordedLineRangeForCurrentPage = isOverFlipped ? lineRangeForFirstPage : lineRangeForFinalPage
+      recordedLineRangeForCurrentPage = isOverFlipped ? lineRangeForFirstPage :
+        lineRangeForFinalPage
       return
     case true:
       if lowerBound > 0 { break branch1 }
       if upperBound > lineRangeForFirstPage.upperBound { break branch1 }
       let isOverFlipped = !lineRangeForFirstPage.contains(currentLineNumber)
-      recordedLineRangeForCurrentPage = isOverFlipped ? lineRangeForFinalPage : lineRangeForFirstPage
+      recordedLineRangeForCurrentPage = isOverFlipped ? lineRangeForFinalPage :
+        lineRangeForFirstPage
       return
     }
     let result = lowerBound ..< upperBound
@@ -413,7 +441,7 @@ private extension CandidatePool {
     // 應該不會有漏檢的情形了。
   }
 
-  func selectNewNeighborRow(direction: VerticalDirection) {
+  fileprivate func selectNewNeighborRow(direction: VerticalDirection) {
     let currentSubIndex = candidateDataAll[highlightedIndex].subIndex
     var result = currentSubIndex
     branch: switch direction {
@@ -426,7 +454,8 @@ private extension CandidatePool {
         fixLineRange(isBackward: false)
         break branch
       }
-      if currentLineNumber >= candidateLines.count - 1 { currentLineNumber = candidateLines.count - 1 }
+      if currentLineNumber >= candidateLines
+        .count - 1 { currentLineNumber = candidateLines.count - 1 }
       result = currentSubIndex
       // 考慮到選字窗末行往往都是將選字窗貼左排列的（而非左右平鋪排列），所以這裡對「↑」鍵不採用這段特殊處理。
       // if candidateLines[currentLineNumber].count != candidateLines[currentLineNumber - 1].count {
@@ -449,8 +478,14 @@ private extension CandidatePool {
       result = currentSubIndex
       // 特殊處理。
       if candidateLines[currentLineNumber].count != candidateLines[currentLineNumber + 1].count {
-        let ratio: Double = min(1, Double(currentSubIndex) / Double(candidateLines[currentLineNumber].count))
-        result = max(Int(floor(Double(candidateLines[currentLineNumber + 1].count) * ratio)), result)
+        let ratio: Double = min(
+          1,
+          Double(currentSubIndex) / Double(candidateLines[currentLineNumber].count)
+        )
+        result = max(
+          Int(floor(Double(candidateLines[currentLineNumber + 1].count) * ratio)),
+          result
+        )
       }
       let targetRow = candidateLines[currentLineNumber + 1]
       let newSubIndex = min(result, targetRow.count - 1)
@@ -459,7 +494,7 @@ private extension CandidatePool {
     }
   }
 
-  func selectNewNeighborColumn(direction: HorizontalDirection) {
+  fileprivate func selectNewNeighborColumn(direction: HorizontalDirection) {
     let currentSubIndex = candidateDataAll[highlightedIndex].subIndex
     switch direction {
     case .left:
@@ -470,7 +505,8 @@ private extension CandidatePool {
         highlight(at: firstColumn[newSubIndex].index)
         break
       }
-      if currentLineNumber >= candidateLines.count - 1 { currentLineNumber = candidateLines.count - 1 }
+      if currentLineNumber >= candidateLines
+        .count - 1 { currentLineNumber = candidateLines.count - 1 }
       let targetColumn = candidateLines[currentLineNumber - 1]
       let newSubIndex = min(currentSubIndex, targetColumn.count - 1)
       highlight(at: targetColumn[newSubIndex].index)
@@ -491,7 +527,7 @@ private extension CandidatePool {
   }
 }
 
-// MARK: - Turn CandidatePool into an ObservableObject.
+// MARK: ObservableObject
 
 @available(macOS 10.15, *)
 extension CandidatePool: ObservableObject {}

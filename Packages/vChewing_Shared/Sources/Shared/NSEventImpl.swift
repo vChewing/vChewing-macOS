@@ -11,8 +11,8 @@ import IMKUtils
 
 // MARK: - NSEvent Extension - Reconstructors
 
-public extension NSEvent {
-  func reinitiate(
+extension NSEvent {
+  public func reinitiate(
     with type: NSEvent.EventType? = nil,
     location: NSPoint? = nil,
     modifierFlags: NSEvent.ModifierFlags? = nil,
@@ -22,11 +22,13 @@ public extension NSEvent {
     charactersIgnoringModifiers: String? = nil,
     isARepeat: Bool? = nil,
     keyCode: UInt16? = nil
-  ) -> NSEvent? {
+  )
+    -> NSEvent? {
     let oldChars: String = text
     var characters = characters
     checkSpecialKey: if let matchedKey = KeyCode(rawValue: keyCode ?? self.keyCode) {
-      let scalar = matchedKey.correspondedSpecialKeyScalar(flags: (modifierFlags ?? self.modifierFlags).toKB)
+      let scalar = matchedKey
+        .correspondedSpecialKeyScalar(flags: (modifierFlags ?? self.modifierFlags).toKB)
       guard let scalar = scalar else { break checkSpecialKey }
       characters = .init(scalar)
     }
@@ -48,7 +50,7 @@ public extension NSEvent {
   /// 自 Emacs 熱鍵的 NSEvent 翻譯回標準 NSEvent。失敗的話則會返回原始 NSEvent 自身。
   /// - Parameter isVerticalTyping: 是否按照縱排來操作。
   /// - Returns: 翻譯結果。失敗的話則返回翻譯原文。
-  func convertFromEmacsKeyEvent(isVerticalContext: Bool) -> NSEvent {
+  public func convertFromEmacsKeyEvent(isVerticalContext: Bool) -> NSEvent {
     guard isEmacsKey else { return self }
     let newKeyCode: UInt16 = {
       switch isVerticalContext {
@@ -57,25 +59,30 @@ public extension NSEvent {
       }
     }()
     guard newKeyCode != 0 else { return self }
-    return reinitiate(modifierFlags: [], characters: nil, charactersIgnoringModifiers: nil, keyCode: newKeyCode)
+    return reinitiate(
+      modifierFlags: [],
+      characters: nil,
+      charactersIgnoringModifiers: nil,
+      keyCode: newKeyCode
+    )
       ?? self
   }
 }
 
 // MARK: - NSEvent Extension - InputSignalProtocol
 
-public extension NSEvent {
-  var isTypingVertical: Bool { charactersIgnoringModifiers == "Vertical" }
+extension NSEvent {
+  public var isTypingVertical: Bool { charactersIgnoringModifiers == "Vertical" }
   /// NSEvent.characters 的類型安全版。
   /// - Remark: 注意：必須針對 event.type == .flagsChanged 提前返回結果，
   /// 否則，每次處理這種判斷時都會因為讀取 event.characters? 而觸發 NSInternalInconsistencyException。
-  var text: String { isFlagChanged ? "" : characters ?? "" }
-  var inputTextIgnoringModifiers: String? {
+  public var text: String { isFlagChanged ? "" : characters ?? "" }
+  public var inputTextIgnoringModifiers: String? {
     guard charactersIgnoringModifiers != nil else { return nil }
     return charactersIgnoringModifiers ?? characters ?? ""
   }
 
-  var charCode: UInt16 {
+  public var charCode: UInt16 {
     guard type != .flagsChanged else { return 0 }
     guard characters != nil else { return 0 }
     // 這裡不用「count > 0」，因為該整數變數只要「!isEmpty」那就必定滿足這個條件。
@@ -89,13 +96,13 @@ public extension NSEvent {
     modifierFlags.intersection(.deviceIndependentFlagsMask).subtracting(.capsLock)
   }
 
-  static var keyModifierFlags: ModifierFlags {
+  public static var keyModifierFlags: ModifierFlags {
     Self.modifierFlags.intersection(.deviceIndependentFlagsMask).subtracting(.capsLock)
   }
 
-  var isFlagChanged: Bool { type == .flagsChanged }
+  public var isFlagChanged: Bool { type == .flagsChanged }
 
-  var isEmacsKey: Bool {
+  public var isEmacsKey: Bool {
     // 這裡不能只用 isControlHold，因為這裡對修飾鍵的要求有排他性。
     [6, 2, 1, 5, 4, 22].contains(charCode) && keyModifierFlagsNS == .control
   }
@@ -103,100 +110,118 @@ public extension NSEvent {
   // 摁 Alt+Shift+主鍵盤區域數字鍵 的話，根據不同的 macOS 鍵盤佈局種類，會出現不同的符號結果。
   // 然而呢，KeyCode 卻是一致的。於是這裡直接準備一個換算表來用。
   // 這句用來返回換算結果。
-  var mainAreaNumKeyChar: String? { mapMainAreaNumKey[keyCode] }
+  public var mainAreaNumKeyChar: String? { mapMainAreaNumKey[keyCode] }
 
   // 除了 ANSI charCode 以外，其餘一律過濾掉，免得 InputHandler 被餵屎。
-  var isInvalid: Bool {
+  public var isInvalid: Bool {
     (0x20 ... 0xFF).contains(charCode) ? false : !(isReservedKey && !isKeyCodeBlacklisted)
   }
 
-  var isKeyCodeBlacklisted: Bool {
+  public var isKeyCodeBlacklisted: Bool {
     guard let code = KeyCodeBlackListed(rawValue: keyCode) else { return false }
     return code.rawValue != KeyCode.kNone.rawValue
   }
 
-  var isReservedKey: Bool {
+  public var isReservedKey: Bool {
     guard let code = KeyCode(rawValue: keyCode) else { return false }
     return code.rawValue != KeyCode.kNone.rawValue
   }
 
   /// 單獨用 flags 來判定數字小鍵盤輸入的方法已經失效了，所以必須再增補用 KeyCode 判定的方法。
-  var isJISAlphanumericalKey: Bool { KeyCode(rawValue: keyCode) == KeyCode.kJISAlphanumericalKey }
-  var isJISKanaSwappingKey: Bool { KeyCode(rawValue: keyCode) == KeyCode.kJISKanaSwappingKey }
-  var isNumericPadKey: Bool { arrNumpadKeyCodes.contains(keyCode) }
-  var isMainAreaNumKey: Bool { mapMainAreaNumKey.keys.contains(keyCode) }
-  var isShiftHold: Bool { keyModifierFlagsNS.contains(.shift) }
-  var isCommandHold: Bool { keyModifierFlagsNS.contains(.command) }
-  var isControlHold: Bool { keyModifierFlagsNS.contains(.control) }
-  var beganWithLetter: Bool { text.first?.isLetter ?? false }
-  var isOptionHold: Bool { keyModifierFlagsNS.contains(.option) }
-  var isOptionHotKey: Bool { keyModifierFlagsNS.contains(.option) && text.first?.isLetter ?? false }
-  var isCapsLockOn: Bool { modifierFlags.intersection(.deviceIndependentFlagsMask).contains(.capsLock) }
-  var isFunctionKeyHold: Bool { keyModifierFlagsNS.contains(.function) }
-  var isNonLaptopFunctionKey: Bool { keyModifierFlagsNS.contains(.numericPad) && !isNumericPadKey }
-  var isEnter: Bool { [KeyCode.kCarriageReturn, KeyCode.kLineFeed].contains(KeyCode(rawValue: keyCode)) }
-  var isTab: Bool { KeyCode(rawValue: keyCode) == KeyCode.kTab }
-  var isUp: Bool { KeyCode(rawValue: keyCode) == KeyCode.kUpArrow }
-  var isDown: Bool { KeyCode(rawValue: keyCode) == KeyCode.kDownArrow }
-  var isLeft: Bool { KeyCode(rawValue: keyCode) == KeyCode.kLeftArrow }
-  var isRight: Bool { KeyCode(rawValue: keyCode) == KeyCode.kRightArrow }
-  var isPageUp: Bool { KeyCode(rawValue: keyCode) == KeyCode.kPageUp }
-  var isPageDown: Bool { KeyCode(rawValue: keyCode) == KeyCode.kPageDown }
-  var isSpace: Bool { KeyCode(rawValue: keyCode) == KeyCode.kSpace }
-  var isBackSpace: Bool { KeyCode(rawValue: keyCode) == KeyCode.kBackSpace }
-  var isEsc: Bool { KeyCode(rawValue: keyCode) == KeyCode.kEscape }
-  var isHome: Bool { KeyCode(rawValue: keyCode) == KeyCode.kHome }
-  var isEnd: Bool { KeyCode(rawValue: keyCode) == KeyCode.kEnd }
-  var isDelete: Bool { KeyCode(rawValue: keyCode) == KeyCode.kWindowsDelete }
+  public var isJISAlphanumericalKey: Bool {
+    KeyCode(rawValue: keyCode) == KeyCode.kJISAlphanumericalKey
+  }
 
-  var isCursorBackward: Bool {
+  public var isJISKanaSwappingKey: Bool { KeyCode(rawValue: keyCode) == KeyCode.kJISKanaSwappingKey
+  }
+
+  public var isNumericPadKey: Bool { arrNumpadKeyCodes.contains(keyCode) }
+  public var isMainAreaNumKey: Bool { mapMainAreaNumKey.keys.contains(keyCode) }
+  public var isShiftHold: Bool { keyModifierFlagsNS.contains(.shift) }
+  public var isCommandHold: Bool { keyModifierFlagsNS.contains(.command) }
+  public var isControlHold: Bool { keyModifierFlagsNS.contains(.control) }
+  public var beganWithLetter: Bool { text.first?.isLetter ?? false }
+  public var isOptionHold: Bool { keyModifierFlagsNS.contains(.option) }
+  public var isOptionHotKey: Bool {
+    keyModifierFlagsNS.contains(.option) && text.first?.isLetter ?? false
+  }
+
+  public var isCapsLockOn: Bool {
+    modifierFlags.intersection(.deviceIndependentFlagsMask).contains(.capsLock)
+  }
+
+  public var isFunctionKeyHold: Bool { keyModifierFlagsNS.contains(.function) }
+  public var isNonLaptopFunctionKey: Bool {
+    keyModifierFlagsNS.contains(.numericPad) && !isNumericPadKey
+  }
+
+  public var isEnter: Bool {
+    [KeyCode.kCarriageReturn, KeyCode.kLineFeed].contains(KeyCode(rawValue: keyCode))
+  }
+
+  public var isTab: Bool { KeyCode(rawValue: keyCode) == KeyCode.kTab }
+  public var isUp: Bool { KeyCode(rawValue: keyCode) == KeyCode.kUpArrow }
+  public var isDown: Bool { KeyCode(rawValue: keyCode) == KeyCode.kDownArrow }
+  public var isLeft: Bool { KeyCode(rawValue: keyCode) == KeyCode.kLeftArrow }
+  public var isRight: Bool { KeyCode(rawValue: keyCode) == KeyCode.kRightArrow }
+  public var isPageUp: Bool { KeyCode(rawValue: keyCode) == KeyCode.kPageUp }
+  public var isPageDown: Bool { KeyCode(rawValue: keyCode) == KeyCode.kPageDown }
+  public var isSpace: Bool { KeyCode(rawValue: keyCode) == KeyCode.kSpace }
+  public var isBackSpace: Bool { KeyCode(rawValue: keyCode) == KeyCode.kBackSpace }
+  public var isEsc: Bool { KeyCode(rawValue: keyCode) == KeyCode.kEscape }
+  public var isHome: Bool { KeyCode(rawValue: keyCode) == KeyCode.kHome }
+  public var isEnd: Bool { KeyCode(rawValue: keyCode) == KeyCode.kEnd }
+  public var isDelete: Bool { KeyCode(rawValue: keyCode) == KeyCode.kWindowsDelete }
+
+  public var isCursorBackward: Bool {
     isTypingVertical
       ? KeyCode(rawValue: keyCode) == .kUpArrow
       : KeyCode(rawValue: keyCode) == .kLeftArrow
   }
 
-  var isCursorForward: Bool {
+  public var isCursorForward: Bool {
     isTypingVertical
       ? KeyCode(rawValue: keyCode) == .kDownArrow
       : KeyCode(rawValue: keyCode) == .kRightArrow
   }
 
-  var isCursorClockRight: Bool {
+  public var isCursorClockRight: Bool {
     isTypingVertical
       ? KeyCode(rawValue: keyCode) == .kRightArrow
       : KeyCode(rawValue: keyCode) == .kUpArrow
   }
 
-  var isCursorClockLeft: Bool {
+  public var isCursorClockLeft: Bool {
     isTypingVertical
       ? KeyCode(rawValue: keyCode) == .kLeftArrow
       : KeyCode(rawValue: keyCode) == .kDownArrow
   }
 
-  var isASCII: Bool { charCode < 0x80 }
+  public var isASCII: Bool { charCode < 0x80 }
 
   // 這裡必須加上「flags == .shift」，否則會出現某些情況下輸入法「誤判當前鍵入的非 Shift 字符為大寫」的問題
-  var isUpperCaseASCIILetterKey: Bool {
+  public var isUpperCaseASCIILetterKey: Bool {
     (65 ... 90).contains(charCode) && keyModifierFlagsNS == .shift
   }
 
   // 以 .command 觸發的熱鍵（包括剪貼簿熱鍵）。
-  var isSingleCommandBasedLetterHotKey: Bool {
+  public var isSingleCommandBasedLetterHotKey: Bool {
     ((65 ... 90).contains(charCode) && keyModifierFlagsNS == [.shift, .command])
       || ((97 ... 122).contains(charCode) && keyModifierFlagsNS == .command)
   }
 
   // 這裡必須用 KeyCode，這樣才不會受隨 macOS 版本更動的 Apple 動態注音鍵盤排列內容的影響。
   // 只是必須得與 ![input isShiftHold] 搭配使用才可以（也就是僅判定 Shift 沒被摁下的情形）。
-  var isSymbolMenuPhysicalKey: Bool {
-    [KeyCode.kSymbolMenuPhysicalKeyIntl, KeyCode.kSymbolMenuPhysicalKeyJIS].contains(KeyCode(rawValue: keyCode))
+  public var isSymbolMenuPhysicalKey: Bool {
+    [KeyCode.kSymbolMenuPhysicalKeyIntl, KeyCode.kSymbolMenuPhysicalKeyJIS]
+      .contains(KeyCode(rawValue: keyCode))
   }
 }
 
 // MARK: - Apple ABC Keyboard Mapping
 
-public extension NSEvent {
-  func layoutTranslated(to layout: LatinKeyboardMappings = .qwerty) -> NSEvent {
+extension NSEvent {
+  public func layoutTranslated(to layout: LatinKeyboardMappings = .qwerty) -> NSEvent {
     let mapTable = layout.mapTable
     if isFlagChanged { return self }
     guard keyModifierFlagsNS == .shift || keyModifierFlagsNS.isEmpty else { return self }

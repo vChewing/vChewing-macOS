@@ -11,24 +11,6 @@ import Foundation
 // MARK: - UserDef
 
 public enum UserDef: String, CaseIterable, Identifiable {
-  public enum DataType: CaseIterable {
-    case string, bool, integer, double, array, dictionary, other
-  }
-
-  public var id: String { rawValue }
-
-  public struct MetaData {
-    public var userDef: UserDef
-    public var shortTitle: String?
-    public var prompt: String?
-    public var inlinePrompt: String?
-    public var popupPrompt: String?
-    public var description: String?
-    public var minimumOS: Double = 10.9
-    public var options: [Int: String]?
-    public var toolTip: String?
-  }
-
   // MARK: - Cases.
 
   case kIsDebugModeEnabled = "_DebugMode"
@@ -105,7 +87,8 @@ public enum UserDef: String, CaseIterable, Identifiable {
   case kAutoCompositeWithLongestPossibleCassetteKey = "AutoCompositeWithLongestPossibleCassetteKey"
   case kShareAlphanumericalModeStatusAcrossClients = "ShareAlphanumericalModeStatusAcrossClients"
   case kPhraseEditorAutoReloadExternalModifications = "PhraseEditorAutoReloadExternalModifications"
-  case kClassicHaninKeyboardSymbolModeShortcutEnabled = "ClassicHaninKeyboardSymbolModeShortcutEnabled"
+  case kClassicHaninKeyboardSymbolModeShortcutEnabled =
+    "ClassicHaninKeyboardSymbolModeShortcutEnabled"
   case kFilterNonCNSReadingsForCHTInput = "FilterNonCNSReadingsForCHTInput"
 
   case kUseSpaceToCommitHighlightedSCPCCandidate = "UseSpaceToCommitHighlightedSCPCCandidate"
@@ -130,6 +113,40 @@ public enum UserDef: String, CaseIterable, Identifiable {
   case kUsingHotKeyRevLookup = "UsingHotKeyRevLookup"
   case kUsingHotKeyInputMode = "UsingHotKeyInputMode"
 
+  // MARK: Public
+
+  public enum DataType: CaseIterable {
+    case string, bool, integer, double, array, dictionary, other
+  }
+
+  public struct MetaData {
+    public var userDef: UserDef
+    public var shortTitle: String?
+    public var prompt: String?
+    public var inlinePrompt: String?
+    public var popupPrompt: String?
+    public var description: String?
+    public var minimumOS: Double = 10.9
+    public var options: [Int: String]?
+    public var toolTip: String?
+  }
+
+  public struct Snapshot {
+    // MARK: Lifecycle
+
+    public init() {
+      UserDef.allCases.forEach {
+        data[$0.rawValue] = UserDefaults.current.object(forKey: $0.rawValue)
+      }
+    }
+
+    // MARK: Public
+
+    public var data: [String: Any] = [:]
+  }
+
+  public var id: String { rawValue }
+
   // MARK: - SnapShot-Related Methods.
 
   public static func resetAll() {
@@ -145,19 +162,10 @@ public enum UserDef: String, CaseIterable, Identifiable {
       UserDefaults.current.set(data[$0.rawValue], forKey: $0.rawValue)
     }
   }
-
-  public struct Snapshot {
-    public var data: [String: Any] = [:]
-    public init() {
-      UserDef.allCases.forEach {
-        data[$0.rawValue] = UserDefaults.current.object(forKey: $0.rawValue)
-      }
-    }
-  }
 }
 
-public extension UserDef {
-  var dataType: DataType {
+extension UserDef {
+  public var dataType: DataType {
     switch self {
     case .kIsDebugModeEnabled: return .bool
     case .kFailureFlagForUOMObservation: return .bool
@@ -256,8 +264,8 @@ public extension UserDef {
   }
 }
 
-public extension UserDef {
-  var metaData: MetaData? {
+extension UserDef {
+  public var metaData: MetaData? {
     switch self {
     case .kIsDebugModeEnabled: return .init(userDef: self, shortTitle: "Debug Mode")
     case .kCandidateServiceMenuContents: return nil
@@ -324,7 +332,10 @@ public extension UserDef {
           96: "96",
         ]
       )
-    case .kAlwaysExpandCandidateWindow: return .init(userDef: self, shortTitle: "Always expand candidate window panel")
+    case .kAlwaysExpandCandidateWindow: return .init(
+        userDef: self,
+        shortTitle: "Always expand candidate window panel"
+      )
     case .kCandidateWindowShowOnlyOneLine: return .init(
         userDef: self,
         shortTitle: "Use only one row / column in candidate window",
@@ -334,7 +345,10 @@ public extension UserDef {
         userDef: self, shortTitle: "UI Language:",
         description: "Change user interface language (will reboot the IME)."
       )
-    case .kShouldAutoReloadUserDataFiles: return .init(userDef: self, shortTitle: "Automatically reload user data files if changes detected")
+    case .kShouldAutoReloadUserDataFiles: return .init(
+        userDef: self,
+        shortTitle: "Automatically reload user data files if changes detected"
+      )
     case .kUseRearCursorMode: return .init(
         userDef: self, shortTitle: "Cursor Selection:",
         description: "Choose the cursor position where you want to list possible candidates.",
@@ -353,7 +367,8 @@ public extension UserDef {
         shortTitle: "i18n:UserDef.kUseShiftQuestionToCallServiceMenu.shortTitle"
       )
     case .kUseDynamicCandidateWindowOrigin: return .init(
-        userDef: self, shortTitle: "Adjust candidate window location according to current node length"
+        userDef: self,
+        shortTitle: "Adjust candidate window location according to current node length"
       )
     case .kUseHorizontalCandidateList: return .init(
         userDef: self, shortTitle: "Candidate Layout:",
@@ -375,7 +390,10 @@ public extension UserDef {
         userDef: self, shortTitle: "Enable cassette mode, suppressing phonabet input",
         description: "Cassette mode is similar to the CIN support of the Yahoo! KeyKey IME, allowing users to use their own CIN tables to implement their stroked-based input schema (e.g. Wubi, Cangjie, Boshiamy, etc.) as a plan-B in vChewing IME. However, since vChewing won't compromise its phonabet input mode experience for this cassette mode, users might not feel comfortable enough comparing to their experiences with RIME (recommended) or OpenVanilla (deprecated)."
       )
-    case .kCNS11643Enabled: return .init(userDef: self, shortTitle: "i18n:UserDef.kCNS11643Enabled.shortTitle")
+    case .kCNS11643Enabled: return .init(
+        userDef: self,
+        shortTitle: "i18n:UserDef.kCNS11643Enabled.shortTitle"
+      )
     case .kSymbolInputEnabled: return .init(
         userDef: self, shortTitle: "Enable symbol input support (incl. certain emoji symbols)"
       )
@@ -383,15 +401,23 @@ public extension UserDef {
         userDef: self, shortTitle: "Auto-convert traditional Chinese glyphs to KangXi characters"
       )
     case .kShiftJISShinjitaiOutputEnabled: return .init(
-        userDef: self, shortTitle: "Auto-convert traditional Chinese glyphs to JIS Shinjitai characters"
+        userDef: self,
+        shortTitle: "Auto-convert traditional Chinese glyphs to JIS Shinjitai characters"
       )
-    case .kCurrencyNumeralsEnabled: return .init(userDef: self, shortTitle: "Enable currency numerals output")
-    case .kHalfWidthPunctuationEnabled: return .init(userDef: self, shortTitle: "Enable half-width punctuations")
+    case .kCurrencyNumeralsEnabled: return .init(
+        userDef: self,
+        shortTitle: "Enable currency numerals output"
+      )
+    case .kHalfWidthPunctuationEnabled: return .init(
+        userDef: self,
+        shortTitle: "Enable half-width punctuations"
+      )
     case .kMoveCursorAfterSelectingCandidate: return .init(
         userDef: self, shortTitle: "Push the cursor in front of the phrase after selection"
       )
     case .kDodgeInvalidEdgeCandidateCursorPosition: return .init(
-        userDef: self, shortTitle: "i18n:UserDef.kDodgeInvalidEdgeCandidateCursorPosition.shortTitle"
+        userDef: self,
+        shortTitle: "i18n:UserDef.kDodgeInvalidEdgeCandidateCursorPosition.shortTitle"
       )
     case .kEscToCleanInputBuffer: return .init(
         userDef: self, shortTitle: "Use ESC key to clear the entire input buffer",
@@ -446,7 +472,8 @@ public extension UserDef {
         ]
       )
     case .kAllowBoostingSingleKanjiAsUserPhrase: return .init(
-        userDef: self, shortTitle: "Allow boosting / excluding a candidate of single kanji when marking",
+        userDef: self,
+        shortTitle: "Allow boosting / excluding a candidate of single kanji when marking",
         description: "⚠︎ This may hinder the walking algorithm from giving appropriate results."
       )
     case .kUseSCPCTypingMode: return .init(
@@ -455,7 +482,8 @@ public extension UserDef {
       )
     case .kMaxCandidateLength: return nil
     case .kShouldNotFartInLieuOfBeep: return .init(
-        userDef: self, shortTitle: "Stop farting (when typed phonetic combination is invalid, etc.)",
+        userDef: self,
+        shortTitle: "Stop farting (when typed phonetic combination is invalid, etc.)",
         description: "You are about to uncheck this fart suppressor. You are responsible for all consequences lead by letting people nearby hear the fart sound come from your computer. We strongly advise against unchecking this in any public circumstance that prohibits NSFW netas."
       )
     case .kShowHanyuPinyinInCompositionBuffer: return .init(
@@ -473,7 +501,10 @@ public extension UserDef {
         userDef: self, shortTitle: "Always use fixed listing order in candidate window",
         description: "This will stop user override model from affecting how candidates get sorted."
       )
-    case .kAutoCorrectReadingCombination: return .init(userDef: self, shortTitle: "Automatically correct reading combinations when typing")
+    case .kAutoCorrectReadingCombination: return .init(
+        userDef: self,
+        shortTitle: "Automatically correct reading combinations when typing"
+      )
     case .kReadingNarrationCoverage: return .init(
         userDef: self, shortTitle: "i18n:UserDef.kReadingNarrationCoverage.shortTitle",
         description: "i18n:UserDef.kReadingNarrationCoverage.description",
@@ -484,17 +515,22 @@ public extension UserDef {
         ]
       )
     case .kAlsoConfirmAssociatedCandidatesByEnter: return .init(
-        userDef: self, shortTitle: "Allow using Enter key to confirm associated candidate selection",
+        userDef: self,
+        shortTitle: "Allow using Enter key to confirm associated candidate selection",
         description: "Otherwise, only the candidate keys are allowed to confirm associates."
       )
-    case .kKeepReadingUponCompositionError: return .init(userDef: self, shortTitle: "Allow backspace-editing miscomposed readings")
+    case .kKeepReadingUponCompositionError: return .init(
+        userDef: self,
+        shortTitle: "Allow backspace-editing miscomposed readings"
+      )
     case .kBypassNonAppleCapsLockHandling: return .init(
         userDef: self, shortTitle: "i18n:UserDef.kBypassNonAppleCapsLockHandling.shortTitle",
         description: "i18n:UserDef.kBypassNonAppleCapsLockHandling.description",
         minimumOS: 10.15
       )
     case .kShiftEisuToggleOffTogetherWithCapsLock: return .init(
-        userDef: self, shortTitle: "i18n:UserDef.kShiftEisuToggleOffTogetherWithCapsLock.shortTitle",
+        userDef: self,
+        shortTitle: "i18n:UserDef.kShiftEisuToggleOffTogetherWithCapsLock.shortTitle",
         description: "i18n:UserDef.kShiftEisuToggleOffTogetherWithCapsLock.description",
         minimumOS: 10.15
       )
@@ -532,10 +568,14 @@ public extension UserDef {
         description: "For example: When typing “章太炎” and you want to override the “太” with “泰”, and the raw operation index range [1,2) which bounds are cutting the current node “章太炎” in range [0,3). If having lack of the pre-consolidation process, this word will become something like “張泰言” after the candidate selection. Only if we enable this consolidation, this word will become “章泰炎” which is the expected result that the context is kept as-is."
       )
     case .kHardenVerticalPunctuations: return .init(
-        userDef: self, shortTitle: "Harden vertical punctuations during vertical typing (not recommended)",
+        userDef: self,
+        shortTitle: "Harden vertical punctuations during vertical typing (not recommended)",
         description: "⚠︎ This feature is useful ONLY WHEN the font you are using doesn't support dynamic vertical punctuations. However, typed vertical punctuations will always shown as vertical punctuations EVEN IF your editor has changed the typing direction to horizontal."
       )
-    case .kTrimUnfinishedReadingsOnCommit: return .init(userDef: self, shortTitle: "Trim unfinished readings / strokes on commit")
+    case .kTrimUnfinishedReadingsOnCommit: return .init(
+        userDef: self,
+        shortTitle: "Trim unfinished readings / strokes on commit"
+      )
     case .kAlwaysShowTooltipTextsHorizontally: return .init(
         userDef: self,
         shortTitle: "Always show tooltip texts horizontally",
@@ -573,7 +613,8 @@ public extension UserDef {
         description: "This only works when being toggled by Shift key and JIS Eisu key."
       )
     case .kPhraseEditorAutoReloadExternalModifications: return .init(
-        userDef: self, shortTitle: "This editor only: Auto-reload modifications happened outside of this editor"
+        userDef: self,
+        shortTitle: "This editor only: Auto-reload modifications happened outside of this editor"
       )
     case .kClassicHaninKeyboardSymbolModeShortcutEnabled: return .init(
         userDef: self, shortTitle: "Also use “\\” or “¥” key for Hanin Keyboard Symbol Input"
@@ -582,13 +623,15 @@ public extension UserDef {
         userDef: self, shortTitle: "i18n:UserDef.kFilterNonCNSReadingsForCHTInput.shortTitle"
       )
     case .kUseSpaceToCommitHighlightedSCPCCandidate: return .init(
-        userDef: self, shortTitle: "Use Space to confirm highlighted candidate in Per-Char Select Mode"
+        userDef: self,
+        shortTitle: "Use Space to confirm highlighted candidate in Per-Char Select Mode"
       )
     case .kEnableMouseScrollingForTDKCandidatesCocoa: return .init(
         userDef: self, shortTitle: "Enable mouse wheel support for Tadokoro Candidate Window"
       )
     case .kDisableSegmentedThickUnderlineInMarkingModeForManagedClients: return .init(
-        userDef: self, shortTitle: "Disable segmented thick underline in marking mode for managed clients",
+        userDef: self,
+        shortTitle: "Disable segmented thick underline in marking mode for managed clients",
         description: "Some clients with web-based front UI may have issues rendering segmented thick underlines drawn by their implemented “setMarkedText()”. This option stops the input method from delivering segmented thick underlines to “client().setMarkedText()”. Note that segmented thick underlines are only used in marking mode, unless the client itself misimplements the IMKTextInput method “setMarkedText()”. This option only affects the inline composition buffer."
       )
     case .kCandidateTextFontName: return nil
@@ -607,11 +650,20 @@ public extension UserDef {
     case .kUsingHotKeyCNS: return .init(userDef: self, shortTitle: "CNS11643 Mode")
     case .kUsingHotKeyKangXi: return .init(userDef: self, shortTitle: "Force KangXi Writing")
     case .kUsingHotKeyJIS: return .init(userDef: self, shortTitle: "Reverse Lookup (Phonabets)")
-    case .kUsingHotKeyHalfWidthASCII: return .init(userDef: self, shortTitle: "JIS Shinjitai Output")
-    case .kUsingHotKeyCurrencyNumerals: return .init(userDef: self, shortTitle: "Half-Width Punctuation Mode")
+    case .kUsingHotKeyHalfWidthASCII: return .init(
+        userDef: self,
+        shortTitle: "JIS Shinjitai Output"
+      )
+    case .kUsingHotKeyCurrencyNumerals: return .init(
+        userDef: self,
+        shortTitle: "Half-Width Punctuation Mode"
+      )
     case .kUsingHotKeyCassette: return .init(userDef: self, shortTitle: "Currency Numeral Output")
     case .kUsingHotKeyRevLookup: return .init(userDef: self, shortTitle: "CIN Cassette Mode")
-    case .kUsingHotKeyInputMode: return .init(userDef: self, shortTitle: "CHS / CHT Input Mode Switch")
+    case .kUsingHotKeyInputMode: return .init(
+        userDef: self,
+        shortTitle: "CHS / CHT Input Mode Switch"
+      )
     }
   }
 }

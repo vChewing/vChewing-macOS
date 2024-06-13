@@ -19,23 +19,28 @@ extension LMAssembly.LMInstantiator {
 
     func processDateWithDayDelta(_ delta: Int) {
       tokens = ["MACRO@DATE_DAYDELTA:\(delta)"]
-      if config.deltaOfCalendarYears != 0 { tokens.append("MACRO@DATE_DAYDELTA:\(delta)_YEARDELTA:\(config.deltaOfCalendarYears)") }
+      if config
+        .deltaOfCalendarYears !=
+        0 { tokens.append("MACRO@DATE_DAYDELTA:\(delta)_YEARDELTA:\(config.deltaOfCalendarYears)")
+      }
       tokens.append("MACRO@DATE_DAYDELTA:\(delta)_SHORTENED")
       tokens.append("MACRO@DATE_DAYDELTA:\(delta)_LUNA")
     }
 
     func processYearWithYearDelta(_ delta: Int) {
       tokens = ["MACRO@YEAR_YEARDELTA:\(delta)"]
-      if config.deltaOfCalendarYears != 0 { tokens.append("MACRO@YEAR_YEARDELTA:\(delta + config.deltaOfCalendarYears)") }
+      if config
+        .deltaOfCalendarYears !=
+        0 { tokens.append("MACRO@YEAR_YEARDELTA:\(delta + config.deltaOfCalendarYears)") }
       tokens.append("MACRO@YEAR_GANZHI_YEARDELTA:\(delta)")
       tokens.append("MACRO@YEAR_ZODIAC_YEARDELTA:\(delta)")
     }
 
     switch tokenTrigger {
-    case .jin1tian1ri4qi2, .jin1tian1ri4qi1: processDateWithDayDelta(0) // 今天日期
-    case .zuo2tian1ri4qi2, .zuo2tian1ri4qi1: processDateWithDayDelta(-1) // 昨天日期
-    case .qian2tian1ri4qi2, .qian2tian1ri4qi1: processDateWithDayDelta(-2) // 前天日期
-    case .ming2tian1ri4qi2, .ming2tian1ri4qi1: processDateWithDayDelta(1) // 明天日期
+    case .jin1tian1ri4qi1, .jin1tian1ri4qi2: processDateWithDayDelta(0) // 今天日期
+    case .zuo2tian1ri4qi1, .zuo2tian1ri4qi2: processDateWithDayDelta(-1) // 昨天日期
+    case .qian2tian1ri4qi1, .qian2tian1ri4qi2: processDateWithDayDelta(-2) // 前天日期
+    case .ming2tian1ri4qi1, .ming2tian1ri4qi2: processDateWithDayDelta(1) // 明天日期
     case .hou4tian1ri4qi1, .hou4tian1ri4qi2: processDateWithDayDelta(2) // 後天日期
     case .jin1nian2nian2du4: processYearWithYearDelta(0) // 今年年度
     case .qu4nian2nian2du4: processYearWithYearDelta(-1) // 去年年度
@@ -44,7 +49,10 @@ extension LMAssembly.LMInstantiator {
     case .hou4nian2nian2du4: processYearWithYearDelta(2) // 後年年度
     case .shi2jian1: tokens = ["MACRO@TIME_SHORTENED"] // 時間
     case .xing1qi1, .xing1qi2: tokens = ["MACRO@WEEK_SHORTENED", "MACRO@WEEK"] // 星期
-    case .suo3zai4shi2qu1, .dang1qian2shi2qu1, .mu4qian2shi2qu1: tokens = ["MACRO@TIMEZONE", "MACRO@TIMEZONE_SHORTENED"] // 時區
+    case .dang1qian2shi2qu1, .mu4qian2shi2qu1, .suo3zai4shi2qu1: tokens = [
+        "MACRO@TIMEZONE",
+        "MACRO@TIMEZONE_SHORTENED",
+      ] // 時區
     }
     // 終末處理。
     let values = tokens.map { $0.parseAsInputToken(isCHS: isCHS) }.flatMap { $0 }.deduplicated
@@ -56,6 +64,8 @@ extension LMAssembly.LMInstantiator {
     return results
   }
 }
+
+// MARK: - TokenTrigger
 
 private enum TokenTrigger: String {
   case shi2jian1 = "ㄕˊ-ㄐㄧㄢ"

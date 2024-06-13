@@ -10,24 +10,11 @@ import Shared
 import SwiftExtension
 import SwiftUI
 
+// MARK: - VwrSettingsPaneOutput
+
 @available(macOS 13, *)
 public struct VwrSettingsPaneOutput: View {
-  // MARK: - AppStorage Variables
-
-  @AppStorage(wrappedValue: false, UserDef.kChineseConversionEnabled.rawValue)
-  private var chineseConversionEnabled: Bool
-
-  @AppStorage(wrappedValue: false, UserDef.kShiftJISShinjitaiOutputEnabled.rawValue)
-  private var shiftJISShinjitaiOutputEnabled: Bool
-
-  @AppStorage(wrappedValue: false, UserDef.kInlineDumpPinyinInLieuOfZhuyin.rawValue)
-  private var inlineDumpPinyinInLieuOfZhuyin: Bool
-
-  @AppStorage(wrappedValue: true, UserDef.kTrimUnfinishedReadingsOnCommit.rawValue)
-  private var trimUnfinishedReadingsOnCommit: Bool
-
-  @AppStorage(wrappedValue: false, UserDef.kHardenVerticalPunctuations.rawValue)
-  private var hardenVerticalPunctuations: Bool
+  // MARK: Public
 
   // MARK: - Main View
 
@@ -62,7 +49,28 @@ public struct VwrSettingsPaneOutput: View {
       maxHeight: CtlSettingsUI.contentMaxHeight
     )
   }
+
+  // MARK: Private
+
+  // MARK: - AppStorage Variables
+
+  @AppStorage(wrappedValue: false, UserDef.kChineseConversionEnabled.rawValue)
+  private var chineseConversionEnabled: Bool
+
+  @AppStorage(wrappedValue: false, UserDef.kShiftJISShinjitaiOutputEnabled.rawValue)
+  private var shiftJISShinjitaiOutputEnabled: Bool
+
+  @AppStorage(wrappedValue: false, UserDef.kInlineDumpPinyinInLieuOfZhuyin.rawValue)
+  private var inlineDumpPinyinInLieuOfZhuyin: Bool
+
+  @AppStorage(wrappedValue: true, UserDef.kTrimUnfinishedReadingsOnCommit.rawValue)
+  private var trimUnfinishedReadingsOnCommit: Bool
+
+  @AppStorage(wrappedValue: false, UserDef.kHardenVerticalPunctuations.rawValue)
+  private var hardenVerticalPunctuations: Bool
 }
+
+// MARK: - VwrSettingsPaneOutput_Previews
 
 @available(macOS 13, *)
 struct VwrSettingsPaneOutput_Previews: PreviewProvider {

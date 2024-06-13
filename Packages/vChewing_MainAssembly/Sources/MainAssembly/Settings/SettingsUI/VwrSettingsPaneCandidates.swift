@@ -10,6 +10,8 @@ import Shared
 import SwiftExtension
 import SwiftUI
 
+// MARK: - VwrSettingsPaneCandidates
+
 @available(macOS 13, *)
 public struct VwrSettingsPaneCandidates: View {
   // MARK: - AppStorage Variables
@@ -72,12 +74,14 @@ public struct VwrSettingsPaneCandidates: View {
       Form {
         Section {
           UserDef.kUseRearCursorMode.bind($useRearCursorMode).render()
-          UserDef.kMoveCursorAfterSelectingCandidate.bind($moveCursorAfterSelectingCandidate).render()
+          UserDef.kMoveCursorAfterSelectingCandidate.bind($moveCursorAfterSelectingCandidate)
+            .render()
           if !useRearCursorMode {
             UserDef.kUseDynamicCandidateWindowOrigin.bind($useDynamicCandidateWindowOrigin).render()
               .disabled(useRearCursorMode)
           }
-          UserDef.kDodgeInvalidEdgeCandidateCursorPosition.bind($dodgeInvalidEdgeCandidateCursorPosition).render()
+          UserDef.kDodgeInvalidEdgeCandidateCursorPosition
+            .bind($dodgeInvalidEdgeCandidateCursorPosition).render()
           UserDef.kUseShiftQuestionToCallServiceMenu.bind(
             $useShiftQuestionToCallServiceMenu.didChange {
               // 利用該變數的 didSet 屬性自糾。
@@ -116,8 +120,10 @@ public struct VwrSettingsPaneCandidates: View {
         Section {
           UserDef.kShowCodePointInCandidateUI.bind($showCodePointInCandidateUI).render()
           UserDef.kShowReverseLookupInCandidateUI.bind($showReverseLookupInCandidateUI).render()
-          UserDef.kUseFixedCandidateOrderOnSelection.bind($useFixedCandidateOrderOnSelection).render()
-          UserDef.kConsolidateContextOnCandidateSelection.bind($consolidateContextOnCandidateSelection).render()
+          UserDef.kUseFixedCandidateOrderOnSelection.bind($useFixedCandidateOrderOnSelection)
+            .render()
+          UserDef.kConsolidateContextOnCandidateSelection
+            .bind($consolidateContextOnCandidateSelection).render()
         }
 
         // MARK: (header: Text("Experimental:"))
@@ -125,13 +131,15 @@ public struct VwrSettingsPaneCandidates: View {
         let imkEOSNoticeButton = Button("Where's IMK Candidate Window?") {
           if let window = CtlSettingsUI.shared?.window {
             let title = "The End of Support for IMK Candidate Window"
-            let explanation = "1) Only macOS has IMKCandidates. Since it relies on a dedicated ObjC Bridging Header to expose necessary internal APIs to work, it hinders vChewing from completely modularized for multi-platform support.\n\n2) IMKCandidates is buggy. It is not likely to be completely fixed by Apple, and its devs are not allowed to talk about it to non-Apple individuals. That's why we have had enough with IMKCandidates. It is likely the reason why Apple had never used IMKCandidates in their official InputMethodKit sample projects (as of August 2023)."
+            let explanation =
+              "1) Only macOS has IMKCandidates. Since it relies on a dedicated ObjC Bridging Header to expose necessary internal APIs to work, it hinders vChewing from completely modularized for multi-platform support.\n\n2) IMKCandidates is buggy. It is not likely to be completely fixed by Apple, and its devs are not allowed to talk about it to non-Apple individuals. That's why we have had enough with IMKCandidates. It is likely the reason why Apple had never used IMKCandidates in their official InputMethodKit sample projects (as of August 2023)."
             window.callAlert(title: title.localized, text: explanation.localized)
           }
         }
 
         Section(footer: imkEOSNoticeButton) {
-          UserDef.kEnableMouseScrollingForTDKCandidatesCocoa.bind($enableMouseScrollingForTDKCandidatesCocoa).render()
+          UserDef.kEnableMouseScrollingForTDKCandidatesCocoa
+            .bind($enableMouseScrollingForTDKCandidatesCocoa).render()
         }
       }.formStyled()
     }
@@ -142,6 +150,8 @@ public struct VwrSettingsPaneCandidates: View {
   }
 }
 
+// MARK: - VwrSettingsPaneCandidates_Previews
+
 @available(macOS 13, *)
 struct VwrSettingsPaneCandidates_Previews: PreviewProvider {
   static var previews: some View {
@@ -149,15 +159,12 @@ struct VwrSettingsPaneCandidates_Previews: PreviewProvider {
   }
 }
 
-// MARK: - Selection Key Preferences (View)
+// MARK: - VwrSettingsPaneCandidates_SelectionKeys
 
 @available(macOS 13, *)
 /// 出於與效能有關的隱憂，該部件單獨以一個 View Struct 實現。
 private struct VwrSettingsPaneCandidates_SelectionKeys: View {
-  // MARK: - AppStorage Variables
-
-  @AppStorage(wrappedValue: PrefMgr.kDefaultCandidateKeys, UserDef.kCandidateKeys.rawValue)
-  private var candidateKeys: String
+  // MARK: Internal
 
   // MARK: - Main View
 
@@ -180,4 +187,11 @@ private struct VwrSettingsPaneCandidates_SelectionKeys: View {
       }
     ).render()
   }
+
+  // MARK: Private
+
+  // MARK: - AppStorage Variables
+
+  @AppStorage(wrappedValue: PrefMgr.kDefaultCandidateKeys, UserDef.kCandidateKeys.rawValue)
+  private var candidateKeys: String
 }

@@ -10,9 +10,8 @@ import AppKit
 import Foundation
 
 public class CtlServiceMenuEditor: NSWindowController {
-  let viewController = VwrServiceMenuEditor()
+  // MARK: Lifecycle
 
-  public static var shared: CtlServiceMenuEditor?
   public init() {
     super.init(
       window: .init(
@@ -29,6 +28,10 @@ public class CtlServiceMenuEditor: NSWindowController {
   required init?(coder: NSCoder) {
     super.init(coder: coder)
   }
+
+  // MARK: Public
+
+  public static var shared: CtlServiceMenuEditor?
 
   public static func show() {
     if shared == nil {
@@ -60,4 +63,8 @@ public class CtlServiceMenuEditor: NSWindowController {
     }
     window?.setPosition(vertical: .center, horizontal: .right, padding: 20)
   }
+
+  // MARK: Internal
+
+  let viewController = VwrServiceMenuEditor()
 }

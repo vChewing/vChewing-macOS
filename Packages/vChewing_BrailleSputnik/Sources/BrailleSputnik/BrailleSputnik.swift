@@ -8,11 +8,22 @@
 
 import Tekkon
 
+// MARK: - BrailleSputnik
+
 public class BrailleSputnik {
-  public var standard: BrailleStandard
+  // MARK: Lifecycle
+
   public init(standard: BrailleStandard) {
     self.standard = standard
   }
+
+  // MARK: Public
+
+  public var standard: BrailleStandard
+
+  // MARK: Internal
+
+  static var sharedComposer = Tekkon.Composer("", arrange: .ofDachen, correction: true)
 
   var staticData: BrailleProcessingUnit {
     switch standard {
@@ -21,13 +32,18 @@ public class BrailleSputnik {
     }
   }
 
-  static var sharedComposer = Tekkon.Composer("", arrange: .ofDachen, correction: true)
+  // MARK: Private
+
   private static let staticData1947: BrailleProcessingUnit = BrailleProcessingUnit1947()
   private static let staticData2018: BrailleProcessingUnit = BrailleProcessingUnit2018()
 }
 
-public extension BrailleSputnik {
-  func convertToBraille(smashedPairs: [(key: String, value: String)], extraInsertion: (reading: String, cursor: Int)? = nil) -> String {
+extension BrailleSputnik {
+  public func convertToBraille(
+    smashedPairs: [(key: String, value: String)],
+    extraInsertion: (reading: String, cursor: Int)? = nil
+  )
+    -> String {
     var convertedStack: [String?] = []
     var processedKeysCount = 0
     var extraInsertion = extraInsertion
@@ -72,14 +88,19 @@ public extension BrailleSputnik {
     }
   }
 
-  func convertPunctuationToBraille(_ givenTarget: any StringProtocol) -> String? {
+  public func convertPunctuationToBraille(_ givenTarget: any StringProtocol) -> String? {
     staticData.mapPunctuations[givenTarget.description]
   }
 
-  func convertPhonabetReadingToBraille(_ rawReading: any StringProtocol, value referredValue: String? = nil) -> String? {
+  public func convertPhonabetReadingToBraille(
+    _ rawReading: any StringProtocol,
+    value referredValue: String? = nil
+  )
+    -> String? {
     var resultStack = ""
     // 检查特殊情形。
-    guard !staticData.handleSpecialCases(target: &resultStack, value: referredValue) else { return resultStack }
+    guard !staticData.handleSpecialCases(target: &resultStack, value: referredValue)
+    else { return resultStack }
     Self.sharedComposer.clear()
     rawReading.forEach { char in
       Self.sharedComposer.receiveKey(fromPhonabet: char.description)
@@ -99,7 +120,8 @@ public extension BrailleSputnik {
       resultStack.append(staticData.mapVowels[vowel] ?? "")
     }
     // 聲調處理。
-    if let intonationSpecialCaseMetResult = staticData.mapIntonationSpecialCases[vowel + intonation] {
+    if let intonationSpecialCaseMetResult = staticData
+      .mapIntonationSpecialCases[vowel + intonation] {
       resultStack.append(intonationSpecialCaseMetResult.last?.description ?? "")
     } else {
       resultStack.append(staticData.mapIntonations[intonation] ?? "")

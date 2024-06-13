@@ -9,6 +9,8 @@
 import AppKit
 import InputMethodKit
 
+// MARK: - IMEStateProtocol
+
 // 所有 IMEState 均遵守該協定：
 public protocol IMEStateProtocol {
   var type: StateType { get }
@@ -35,6 +37,8 @@ public protocol IMEStateProtocol {
   var marker: Int { get set }
   func attributedString(for session: IMKInputController) -> NSAttributedString
 }
+
+// MARK: - IMEStateDataProtocol
 
 public protocol IMEStateDataProtocol {
   var cursor: Int { get set }

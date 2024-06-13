@@ -10,12 +10,21 @@ import AppKit
 import Shared
 import SwiftUI
 
+// MARK: - VwrAboutUI
+
 public struct VwrAboutUI {
+  // MARK: Public
+
   public static var copyrightLabel: String { VwrAboutCocoa.copyrightLabel }
   public static var eulaContent: String { VwrAboutCocoa.eulaContent }
   public static var eulaContentUpstream: String { VwrAboutCocoa.eulaContentUpstream }
+
+  // MARK: Internal
+
   let foobar = "FOO_BAR"
 }
+
+// MARK: View
 
 @available(macOS 12, *)
 extension VwrAboutUI: View {
@@ -30,11 +39,15 @@ extension VwrAboutUI: View {
             VStack(alignment: .leading) {
               HStack {
                 Text("i18n:aboutWindow.APP_NAME").fontWeight(.heavy).lineLimit(1)
-                Text("v\(IMEApp.appMainVersionLabel.joined(separator: " Build ")) - \(IMEApp.appSignedDateLabel)").lineLimit(1)
+                Text(
+                  "v\(IMEApp.appMainVersionLabel.joined(separator: " Build ")) - \(IMEApp.appSignedDateLabel)"
+                )
+                .lineLimit(1)
               }.fixedSize()
               Text("i18n:aboutWindow.APP_DERIVED_FROM").font(.custom("Tahoma", size: 11))
               Text(Self.copyrightLabel).font(.custom("Tahoma", size: 11))
-              Text("i18n:aboutWindow.DEV_CREW").font(.custom("Tahoma", size: 11)).padding([.vertical], 2)
+              Text("i18n:aboutWindow.DEV_CREW").font(.custom("Tahoma", size: 11))
+                .padding([.vertical], 2)
             }
           }
           GroupBox(label: Text("i18n:aboutWindow.LICENSE_TITLE")) {
@@ -86,8 +99,14 @@ extension VwrAboutUI: View {
     .padding([.horizontal, .bottom], 12)
     .frame(width: 533, alignment: .topLeading)
     .fixedSize()
-    .frame(minWidth: 533, idealWidth: 533, maxWidth: 533,
-           minHeight: 386, idealHeight: 386, maxHeight: 386,
-           alignment: .top)
+    .frame(
+      minWidth: 533,
+      idealWidth: 533,
+      maxWidth: 533,
+      minHeight: 386,
+      idealHeight: 386,
+      maxHeight: 386,
+      alignment: .top
+    )
   }
 }

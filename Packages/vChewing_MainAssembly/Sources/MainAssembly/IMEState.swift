@@ -10,6 +10,8 @@ import InputMethodKit
 import LangModelAssembly
 import Shared
 
+// MARK: - IMEState
+
 /// 用以呈現輸入法控制器（SessionCtl）的各種狀態。
 ///
 /// 從實際角度來看，輸入法屬於有限態械（Finite State Machine）。其藉由滑鼠/鍵盤
@@ -45,10 +47,12 @@ import Shared
 /// - **選字狀態 .ofCandidates**: 叫出選字窗、允許使用者選字。
 /// - **分類分層符號表狀態 .ofSymbolTable**: 分類分層符號表選單專用的狀態，有自身的特殊處理。
 public struct IMEState: IMEStateProtocol {
-  public var type: StateType = .ofEmpty
-  public var data: IMEStateDataProtocol = IMEStateData() as IMEStateDataProtocol
-  public var node: CandidateNode = .init(name: "")
-  init(_ data: IMEStateDataProtocol = IMEStateData() as IMEStateDataProtocol, type: StateType = .ofEmpty) {
+  // MARK: Lifecycle
+
+  init(
+    _ data: IMEStateDataProtocol = IMEStateData() as IMEStateDataProtocol,
+    type: StateType = .ofEmpty
+  ) {
     self.data = data
     self.type = type
   }
@@ -63,7 +67,10 @@ public struct IMEState: IMEStateProtocol {
       if !SessionCtl.isVerticalTyping { return $0 }
       guard PrefMgr.shared.hardenVerticalPunctuations else { return $0 }
       var neta = $0
-      ChineseConverter.hardenVerticalPunctuations(target: &neta, convert: SessionCtl.isVerticalTyping)
+      ChineseConverter.hardenVerticalPunctuations(
+        target: &neta,
+        convert: SessionCtl.isVerticalTyping
+      )
       return neta
     }
     data.cursor = cursor
@@ -76,7 +83,8 @@ public struct IMEState: IMEStateProtocol {
   ///   - type: 狀態類型。
   ///   - node: 節點。
   init(
-    _ data: IMEStateDataProtocol = IMEStateData() as IMEStateDataProtocol, type: StateType = .ofEmpty,
+    _ data: IMEStateDataProtocol = IMEStateData() as IMEStateDataProtocol,
+    type: StateType = .ofEmpty,
     node: CandidateNode
   ) {
     self.data = data
@@ -84,34 +92,45 @@ public struct IMEState: IMEStateProtocol {
     self.node = node
     self.data.candidates = node.members.map { ([""], $0.name) }
   }
+
+  // MARK: Public
+
+  public var type: StateType = .ofEmpty
+  public var data: IMEStateDataProtocol = IMEStateData() as IMEStateDataProtocol
+  public var node: CandidateNode = .init(name: "")
 }
 
 // MARK: - 針對不同的狀態，規定不同的構造器
 
-public extension IMEState {
-  static func ofDeactivated() -> IMEState { .init(type: .ofDeactivated) }
-  static func ofEmpty() -> IMEState { .init(type: .ofEmpty) }
-  static func ofAbortion() -> IMEState { .init(type: .ofAbortion) }
+extension IMEState {
+  public static func ofDeactivated() -> IMEState { .init(type: .ofDeactivated) }
+  public static func ofEmpty() -> IMEState { .init(type: .ofEmpty) }
+  public static func ofAbortion() -> IMEState { .init(type: .ofAbortion) }
 
   /// 用以手動遞交指定內容的狀態。
   /// - Remark: 直接切換至該狀態的話，會丟失上一個狀態的內容。
   /// 如不想丟失的話，請先切換至 `.ofEmpty()` 再切換至 `.ofCommitting()`。
   /// - Parameter textToCommit: 要遞交的文本。
   /// - Returns: 要切換到的狀態。
-  static func ofCommitting(textToCommit: String) -> IMEState {
+  public static func ofCommitting(textToCommit: String) -> IMEState {
     var result = IMEState(type: .ofCommitting)
     result.textToCommit = textToCommit
     ChineseConverter.ensureCurrencyNumerals(target: &result.data.textToCommit)
     return result
   }
 
-  static func ofAssociates(candidates: [(keyArray: [String], value: String)]) -> IMEState {
+  public static func ofAssociates(candidates: [(keyArray: [String], value: String)]) -> IMEState {
     var result = IMEState(type: .ofAssociates)
     result.candidates = candidates
     return result
   }
 
-  static func ofInputting(displayTextSegments: [String], cursor: Int, highlightAt highlightAtSegment: Int? = nil) -> IMEState {
+  public static func ofInputting(
+    displayTextSegments: [String],
+    cursor: Int,
+    highlightAt highlightAtSegment: Int? = nil
+  )
+    -> IMEState {
     var result = IMEState(displayTextSegments: displayTextSegments, cursor: cursor)
     result.type = .ofInputting
     if let readingAtSegment = highlightAtSegment {
@@ -120,11 +139,10 @@ public extension IMEState {
     return result
   }
 
-  static func ofMarking(
+  public static func ofMarking(
     displayTextSegments: [String], markedReadings: [String], cursor: Int, marker: Int
   )
-    -> IMEState
-  {
+    -> IMEState {
     var result = IMEState(displayTextSegments: displayTextSegments, cursor: cursor)
     result.type = .ofMarking
     result.data.marker = marker
@@ -133,16 +151,19 @@ public extension IMEState {
     return result
   }
 
-  static func ofCandidates(candidates: [(keyArray: [String], value: String)], displayTextSegments: [String], cursor: Int)
-    -> IMEState
-  {
+  public static func ofCandidates(
+    candidates: [(keyArray: [String], value: String)],
+    displayTextSegments: [String],
+    cursor: Int
+  )
+    -> IMEState {
     var result = IMEState(displayTextSegments: displayTextSegments, cursor: cursor)
     result.type = .ofCandidates
     result.data.candidates = candidates
     return result
   }
 
-  static func ofSymbolTable(node: CandidateNode) -> IMEState {
+  public static func ofSymbolTable(node: CandidateNode) -> IMEState {
     var result = IMEState(node: node)
     result.type = .ofSymbolTable
     return result
@@ -151,50 +172,53 @@ public extension IMEState {
 
 // MARK: - 規定一個狀態該怎樣返回自己的資料值
 
-public extension IMEState {
-  var isFilterable: Bool { data.isFilterable }
-  var markedTargetIsCurrentlyFiltered: Bool { data.markedTargetIsCurrentlyFiltered }
-  var isMarkedLengthValid: Bool { data.isMarkedLengthValid }
-  var displayedText: String { data.displayedText }
-  var displayedTextConverted: String { data.displayedTextConverted }
-  var displayTextSegments: [String] { data.displayTextSegments }
-  var markedRange: Range<Int> { data.markedRange }
-  var u16MarkedRange: Range<Int> { data.u16MarkedRange }
-  var u16Cursor: Int { data.u16Cursor }
+extension IMEState {
+  public var isFilterable: Bool { data.isFilterable }
+  public var markedTargetIsCurrentlyFiltered: Bool { data.markedTargetIsCurrentlyFiltered }
+  public var isMarkedLengthValid: Bool { data.isMarkedLengthValid }
+  public var displayedText: String { data.displayedText }
+  public var displayedTextConverted: String { data.displayedTextConverted }
+  public var displayTextSegments: [String] { data.displayTextSegments }
+  public var markedRange: Range<Int> { data.markedRange }
+  public var u16MarkedRange: Range<Int> { data.u16MarkedRange }
+  public var u16Cursor: Int { data.u16Cursor }
 
-  var cursor: Int {
+  public var cursor: Int {
     get { data.cursor }
     set { data.cursor = newValue }
   }
 
-  var marker: Int {
+  public var marker: Int {
     get { data.marker }
     set { data.marker = newValue }
   }
 
-  var convertedToInputting: IMEStateProtocol {
+  public var convertedToInputting: IMEStateProtocol {
     if type == .ofInputting { return self }
-    var result = Self.ofInputting(displayTextSegments: data.displayTextSegments, cursor: data.cursor)
+    var result = Self.ofInputting(
+      displayTextSegments: data.displayTextSegments,
+      cursor: data.cursor
+    )
     result.tooltip = data.tooltipBackupForInputting
     return result
   }
 
-  var candidates: [(keyArray: [String], value: String)] {
+  public var candidates: [(keyArray: [String], value: String)] {
     get { data.candidates }
     set { data.candidates = newValue }
   }
 
-  var textToCommit: String {
+  public var textToCommit: String {
     get { data.textToCommit }
     set { data.textToCommit = newValue }
   }
 
-  var tooltip: String {
+  public var tooltip: String {
     get { data.tooltip }
     set { data.tooltip = newValue }
   }
 
-  func attributedString(for session: IMKInputController) -> NSAttributedString {
+  public func attributedString(for session: IMKInputController) -> NSAttributedString {
     switch type {
     case .ofMarking: return data.attributedStringMarking(for: session)
     case .ofCandidates where cursor != marker: return data.attributedStringMarking(for: session)
@@ -209,27 +233,27 @@ public extension IMEState {
   }
 
   /// 該參數僅用作輔助判斷。在 InputHandler 內使用的話，必須再檢查 !compositor.isEmpty。
-  var hasComposition: Bool {
+  public var hasComposition: Bool {
     switch type {
-    case .ofInputting, .ofMarking, .ofCandidates: return true
+    case .ofCandidates, .ofInputting, .ofMarking: return true
     default: return false
     }
   }
 
-  var isCandidateContainer: Bool {
+  public var isCandidateContainer: Bool {
     switch type {
     case .ofSymbolTable: return !node.members.isEmpty
-    case .ofCandidates, .ofAssociates, .ofInputting: return !candidates.isEmpty
+    case .ofAssociates, .ofCandidates, .ofInputting: return !candidates.isEmpty
     default: return false
     }
   }
 
-  var tooltipBackupForInputting: String {
+  public var tooltipBackupForInputting: String {
     get { data.tooltipBackupForInputting }
     set { data.tooltipBackupForInputting = newValue }
   }
 
-  var tooltipDuration: Double {
+  public var tooltipDuration: Double {
     get { type == .ofMarking ? 0 : data.tooltipDuration }
     set { data.tooltipDuration = newValue }
   }

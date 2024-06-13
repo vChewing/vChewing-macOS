@@ -11,16 +11,24 @@ import SwiftExtension
 
 // MARK: - Get Bundle Signature Timestamp
 
-public extension Bundle {
-  func getCodeSignedDate() -> Date? {
+extension Bundle {
+  public func getCodeSignedDate() -> Date? {
     var code: SecStaticCode?
     var information: CFDictionary?
-    let status4Code = SecStaticCodeCreateWithPath(bundleURL as CFURL, SecCSFlags(rawValue: 0), &code)
+    let status4Code = SecStaticCodeCreateWithPath(
+      bundleURL as CFURL,
+      SecCSFlags(rawValue: 0),
+      &code
+    )
     guard status4Code == 0, let code = code else {
       NSLog("Error from getCodeSignedDate(): Failed from retrieving status4Code.")
       return nil
     }
-    let status = SecCodeCopySigningInformation(code, SecCSFlags(rawValue: kSecCSSigningInformation), &information)
+    let status = SecCodeCopySigningInformation(
+      code,
+      SecCSFlags(rawValue: kSecCSSigningInformation),
+      &information
+    )
     guard status == noErr else {
       NSLog("Error from getCodeSignedDate(): Failed from retrieving code signing intelligence.")
       return nil
@@ -40,25 +48,28 @@ public extension Bundle {
 
 // MARK: - NSSize extension
 
-public extension NSSize {
-  static var infinity: NSSize { .init(width: Double.infinity, height: Double.infinity) }
+extension NSSize {
+  public static var infinity: NSSize { .init(width: Double.infinity, height: Double.infinity) }
 }
 
 // MARK: - NSAttributedString extension
 
 // Ref: https://developer.apple.com/library/archive/documentation/Cocoa/Conceptual/TextLayout/Tasks/StringHeight.html
 
-public extension NSAttributedString {
+extension NSAttributedString {
   private static let tmpTextStorage = NSTextStorage()
   private static let tmpLayoutManager = NSLayoutManager()
   private static let tmpTextContainer = NSTextContainer()
 
-  @objc var boundingDimension: NSSize {
+  @objc
+  public var boundingDimension: NSSize {
     Self.tmpTextStorage.setAttributedString(self)
-    if Self.tmpLayoutManager.textContainers.isEmpty || Self.tmpLayoutManager.textContainers.first !== Self.tmpTextContainer {
+    if Self.tmpLayoutManager.textContainers.isEmpty || Self.tmpLayoutManager.textContainers
+      .first !== Self.tmpTextContainer {
       Self.tmpLayoutManager.addTextContainer(Self.tmpTextContainer)
     }
-    if Self.tmpTextStorage.layoutManagers.isEmpty || Self.tmpTextStorage.layoutManagers.first !== Self.tmpLayoutManager {
+    if Self.tmpTextStorage.layoutManagers.isEmpty || Self.tmpTextStorage.layoutManagers
+      .first !== Self.tmpLayoutManager {
       Self.tmpTextStorage.addLayoutManager(Self.tmpLayoutManager)
     }
     Self.tmpTextContainer.lineFragmentPadding = 0
@@ -69,41 +80,44 @@ public extension NSAttributedString {
 
 // MARK: - NSString extension
 
-public extension NSString {
-  var localized: String { NSLocalizedString(description, comment: "") }
+extension NSString {
+  public var localized: String { NSLocalizedString(description, comment: "") }
 
-  @objc func getCharDescriptions(_: Any? = nil) -> [String] {
+  @objc
+  public func getCharDescriptions(_: Any? = nil) -> [String] {
     (self as String).charDescriptions
   }
 
-  @objc func getCodePoints(_: Any? = nil) -> [String] {
+  @objc
+  public func getCodePoints(_: Any? = nil) -> [String] {
     (self as String).codePoints
   }
 
-  @objc func getDescriptionAsCodePoints(_: Any? = nil) -> [String] {
+  @objc
+  public func getDescriptionAsCodePoints(_: Any? = nil) -> [String] {
     (self as String).describedAsCodePoints
   }
 }
 
 // MARK: - NSRange Extension
 
-public extension NSRange {
-  static var zero = NSRange(location: 0, length: 0)
-  static var notFound = NSRange(location: NSNotFound, length: NSNotFound)
+extension NSRange {
+  public static var zero = NSRange(location: 0, length: 0)
+  public static var notFound = NSRange(location: NSNotFound, length: NSNotFound)
 }
 
 // MARK: - NSRect Extension
 
-public extension NSRect {
-  static var seniorTheBeast: NSRect {
+extension NSRect {
+  public static var seniorTheBeast: NSRect {
     NSRect(x: 0.0, y: 0.0, width: 0.114, height: 0.514)
   }
 }
 
 // MARK: - Shell Extension
 
-public extension NSApplication {
-  static func shell(_ command: String) throws -> String {
+extension NSApplication {
+  public static func shell(_ command: String) throws -> String {
     let task = Process()
     let pipe = Pipe()
 
@@ -136,14 +150,15 @@ public extension NSApplication {
   }
 }
 
-public extension NSApplication {
+extension NSApplication {
   // MARK: - System Dark Mode Status Detector.
 
-  static var isDarkMode: Bool {
+  public static var isDarkMode: Bool {
     // "NSApp" can be nil during SPM unit tests.
     // Therefore, the method dedicated for macOS 10.15 and later is not considered stable anymore.
     // Fortunately, the method for macOS 10.14 works well on later macOS releases.
-    if #available(macOS 10.14, *), let strAIS = UserDefaults.current.string(forKey: "AppleInterfaceStyle") {
+    if #available(macOS 10.14, *),
+       let strAIS = UserDefaults.current.string(forKey: "AppleInterfaceStyle") {
       return strAIS.lowercased().contains("dark")
     } else {
       return false
@@ -152,23 +167,25 @@ public extension NSApplication {
 
   // MARK: - Tell whether this IME is running with Root privileges.
 
-  static var isSudoMode: Bool {
+  public static var isSudoMode: Bool {
     NSUserName() == "root"
   }
 }
 
 // MARK: - Real Home Dir for Sandboxed Apps
 
-public extension FileManager {
-  static let realHomeDir = URL(
-    fileURLWithFileSystemRepresentation: getpwuid(getuid()).pointee.pw_dir, isDirectory: true, relativeTo: nil
+extension FileManager {
+  public static let realHomeDir = URL(
+    fileURLWithFileSystemRepresentation: getpwuid(getuid()).pointee.pw_dir, isDirectory: true,
+    relativeTo: nil
   )
 }
 
 // MARK: - Trash a file if it exists.
 
-public extension FileManager {
-  @discardableResult static func trashTargetIfExists(_ path: String) -> Bool {
+extension FileManager {
+  @discardableResult
+  public static func trashTargetIfExists(_ path: String) -> Bool {
     do {
       if FileManager.default.fileExists(atPath: path) {
         // 塞入垃圾桶
@@ -189,15 +206,17 @@ public extension FileManager {
 // MARK: - Memory Footprint Calculator
 
 // Ref: https://developer.apple.com/forums/thread/105088?answerId=357415022#357415022
-public extension NSApplication {
+extension NSApplication {
   /// The memory footprint of the current application in bytes.
-  static var memoryFootprint: UInt64? {
+  public static var memoryFootprint: UInt64? {
     // The `TASK_VM_INFO_COUNT` and `TASK_VM_INFO_REV1_COUNT` macros are too
     // complex for the Swift C importer, so we have to define them ourselves.
     let tskVMInfoCount = mach_msg_type_number_t(
-      MemoryLayout<task_vm_info_data_t>.size / MemoryLayout<integer_t>.size)
+      MemoryLayout<task_vm_info_data_t>.size / MemoryLayout<integer_t>.size
+    )
     let tskVMInfoRev1Count = mach_msg_type_number_t(
-      MemoryLayout.offset(of: \task_vm_info_data_t.min_address)! / MemoryLayout<integer_t>.size)
+      MemoryLayout.offset(of: \task_vm_info_data_t.min_address)! / MemoryLayout<integer_t>.size
+    )
     var info = task_vm_info_data_t()
     var count = tskVMInfoCount
     let kr = withUnsafeMutablePointer(to: &info) { infoPtr in
@@ -212,11 +231,11 @@ public extension NSApplication {
 
 // MARK: - Check whether current date is the given date.
 
-public extension Date {
+extension Date {
   /// Check whether current date is the given date.
   /// - Parameter dateDigits: `yyyyMMdd`, 8-digit integer. If only `MMdd`, then the year will be the current year.
   /// - Returns: The result. Will return false if the given dateDigits is invalid.
-  static func isTodayTheDate(from dateDigits: Int) -> Bool {
+  public static func isTodayTheDate(from dateDigits: Int) -> Bool {
     let currentYear = Self.currentYear
     var dateDigits = dateDigits
     let strDateDigits = dateDigits.description
@@ -232,16 +251,19 @@ public extension Date {
     var calendar = NSCalendar.current
     calendar.timeZone = TimeZone.current
     let components = calendar.dateComponents([.day, .month, .year], from: Date())
-    if let a = calendar.date(from: components), let b = formatter.date(from: dateDigits.description), a == b {
+    if let a = calendar.date(from: components), let b = formatter.date(
+      from: dateDigits.description
+    ),
+      a == b {
       return true
     }
     return false
   }
 
-  static var currentYear: Int {
+  public static var currentYear: Int {
     let formatter = DateFormatter()
     formatter.dateFormat = "yyyy"
-    return (Int(formatter.string(from: Date())) ?? 1970)
+    return Int(formatter.string(from: Date())) ?? 1970
   }
 }
 
@@ -249,8 +271,8 @@ public extension Date {
 
 // Ref: https://developer.apple.com/forums/thread/678914
 
-public extension NSApplication {
-  static var isAppleSilicon: Bool {
+extension NSApplication {
+  public static var isAppleSilicon: Bool {
     var systeminfo = utsname()
     uname(&systeminfo)
     let machine = withUnsafeBytes(of: &systeminfo.machine) { bufPtr -> String in
@@ -269,8 +291,8 @@ public extension NSApplication {
 
 // This is to deal with changes brought by macOS 14.
 
-public extension NSApplication {
-  func popup() {
+extension NSApplication {
+  public func popup() {
     #if compiler(>=5.9) && canImport(AppKit, _version: "14.0")
       if #available(macOS 14.0, *) {
         NSApp.activate()
@@ -285,27 +307,28 @@ public extension NSApplication {
 
 // MARK: - Reading bundle's accent color.
 
-public extension NSColor {
-  static var accentColor: NSColor {
+extension NSColor {
+  public static var accentColor: NSColor {
     guard #unavailable(macOS 10.14) else { return .controlAccentColor }
     return .alternateSelectedControlColor
   }
 }
 
-public extension Bundle {
-  func getAccentColor() -> NSColor {
+extension Bundle {
+  public func getAccentColor() -> NSColor {
     let defaultResult: NSColor = .accentColor
-    let queryPhrase = localizedInfoDictionary?["NSAccentColorName"] as? String ?? infoDictionary?["NSAccentColorName"] as? String
+    let queryPhrase = localizedInfoDictionary?["NSAccentColorName"] as? String ??
+      infoDictionary?["NSAccentColorName"] as? String
     guard let queryPhrase = queryPhrase, !queryPhrase.isEmpty else { return defaultResult }
     guard #available(macOS 10.13, *) else { return defaultResult }
     return NSColor(named: queryPhrase, bundle: self) ?? defaultResult
   }
 }
 
-public extension NSRunningApplication {
+extension NSRunningApplication {
   private static var temporatyBundlePtr: Bundle?
 
-  static func findAccentColor(with bundleIdentifier: String) -> NSColor {
+  public static func findAccentColor(with bundleIdentifier: String) -> NSColor {
     let matchedRunningApps = Self.runningApplications(withBundleIdentifier: bundleIdentifier)
     guard let matchedAppURL = matchedRunningApps.first?.bundleURL else { return .accentColor }
     Self.temporatyBundlePtr = Bundle(url: matchedAppURL)
@@ -320,18 +343,20 @@ public extension NSRunningApplication {
 
 // MARK: - Check whether system's accent color is fixed with non-default value.
 
-public extension NSApplication {
-  var isAccentColorCustomized: Bool {
+extension NSApplication {
+  public var isAccentColorCustomized: Bool {
     UserDefaults.standard.object(forKey: "AppleAccentColor") != nil
   }
 }
 
 // MARK: - Pasteboard Type Extension.
 
-public extension NSPasteboard.PasteboardType {
-  static let kUTTypeFileURL = Self(rawValue: "public.file-url") // import UniformTypeIdentifiers
-  static let kUTTypeData = Self(rawValue: "public.data") // import UniformTypeIdentifiers
-  static let kUTTypeAppBundle = Self(rawValue: "com.apple.application-bundle") // import UniformTypeIdentifiers
-  static let kUTTypeUTF8PlainText = Self(rawValue: "public.utf8-plain-text")
-  static let kNSFilenamesPboardType = Self(rawValue: "NSFilenamesPboardType")
+extension NSPasteboard.PasteboardType {
+  public static let kUTTypeFileURL =
+    Self(rawValue: "public.file-url") // import UniformTypeIdentifiers
+  public static let kUTTypeData = Self(rawValue: "public.data") // import UniformTypeIdentifiers
+  public static let kUTTypeAppBundle =
+    Self(rawValue: "com.apple.application-bundle") // import UniformTypeIdentifiers
+  public static let kUTTypeUTF8PlainText = Self(rawValue: "public.utf8-plain-text")
+  public static let kNSFilenamesPboardType = Self(rawValue: "NSFilenamesPboardType")
 }

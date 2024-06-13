@@ -10,17 +10,26 @@ import Shared
 import SwiftExtension
 import SwiftUI
 
+// MARK: - VwrSettingsPaneGeneral
+
 @available(macOS 13, *)
 public struct VwrSettingsPaneGeneral: View {
-  @Binding var appleLanguageTag: String
+  // MARK: Lifecycle
 
   public init() {
     _appleLanguageTag = .init(
       get: {
-        let loadedValue = (UserDefaults.standard.array(forKey: UserDef.kAppleLanguages.rawValue) as? [String] ?? ["auto"]).joined()
-        let plistValueNotExist = (UserDefaults.standard.object(forKey: UserDef.kAppleLanguages.rawValue) == nil)
+        let loadedValue = (
+          UserDefaults.standard
+            .array(forKey: UserDef.kAppleLanguages.rawValue) as? [String] ?? ["auto"]
+        ).joined()
+        let plistValueNotExist = (
+          UserDefaults.standard
+            .object(forKey: UserDef.kAppleLanguages.rawValue) == nil
+        )
         let targetToCheck = (plistValueNotExist || loadedValue.isEmpty) ? "auto" : loadedValue
-        return Shared.arrSupportedLocales.contains(targetToCheck) ? (plistValueNotExist ? "auto" : loadedValue) : "auto"
+        return Shared.arrSupportedLocales
+          .contains(targetToCheck) ? (plistValueNotExist ? "auto" : loadedValue) : "auto"
       }, set: { newValue in
         var newValue = newValue
         if newValue.isEmpty || newValue == "auto" {
@@ -35,34 +44,7 @@ public struct VwrSettingsPaneGeneral: View {
     )
   }
 
-  // MARK: - AppStorage Variables
-
-  @AppStorage(wrappedValue: true, UserDef.kAutoCorrectReadingCombination.rawValue)
-  private var autoCorrectReadingCombination: Bool
-
-  @AppStorage(wrappedValue: 0, UserDef.kReadingNarrationCoverage.rawValue)
-  private var readingNarrationCoverage: Int
-
-  @AppStorage(wrappedValue: false, UserDef.kKeepReadingUponCompositionError.rawValue)
-  private var keepReadingUponCompositionError: Bool
-
-  @AppStorage(wrappedValue: false, UserDef.kShowHanyuPinyinInCompositionBuffer.rawValue)
-  private var showHanyuPinyinInCompositionBuffer: Bool
-
-  @AppStorage(wrappedValue: false, UserDef.kClassicHaninKeyboardSymbolModeShortcutEnabled.rawValue)
-  private var classicHaninKeyboardSymbolModeShortcutEnabled: Bool
-
-  @AppStorage(wrappedValue: false, UserDef.kUseSCPCTypingMode.rawValue)
-  private var useSCPCTypingMode: Bool
-
-  @AppStorage(wrappedValue: true, UserDef.kShouldNotFartInLieuOfBeep.rawValue)
-  private var shouldNotFartInLieuOfBeep: Bool
-
-  @AppStorage(wrappedValue: false, UserDef.kCheckUpdateAutomatically.rawValue)
-  private var checkUpdateAutomatically: Bool
-
-  @AppStorage(wrappedValue: false, UserDef.kIsDebugModeEnabled.rawValue)
-  private var isDebugModeEnabled: Bool
+  // MARK: Public
 
   // MARK: - Main View
 
@@ -94,7 +76,8 @@ public struct VwrSettingsPaneGeneral: View {
             }
           ).render()
           UserDef.kAutoCorrectReadingCombination.bind($autoCorrectReadingCombination).render()
-          UserDef.kShowHanyuPinyinInCompositionBuffer.bind($showHanyuPinyinInCompositionBuffer).render()
+          UserDef.kShowHanyuPinyinInCompositionBuffer.bind($showHanyuPinyinInCompositionBuffer)
+            .render()
           UserDef.kKeepReadingUponCompositionError.bind($keepReadingUponCompositionError).render()
           UserDef.kClassicHaninKeyboardSymbolModeShortcutEnabled
             .bind($classicHaninKeyboardSymbolModeShortcutEnabled).render()
@@ -123,12 +106,49 @@ public struct VwrSettingsPaneGeneral: View {
     )
   }
 
+  // MARK: Internal
+
+  @Binding
+  var appleLanguageTag: String
+
+  // MARK: Private
+
+  // MARK: - AppStorage Variables
+
+  @AppStorage(wrappedValue: true, UserDef.kAutoCorrectReadingCombination.rawValue)
+  private var autoCorrectReadingCombination: Bool
+
+  @AppStorage(wrappedValue: 0, UserDef.kReadingNarrationCoverage.rawValue)
+  private var readingNarrationCoverage: Int
+
+  @AppStorage(wrappedValue: false, UserDef.kKeepReadingUponCompositionError.rawValue)
+  private var keepReadingUponCompositionError: Bool
+
+  @AppStorage(wrappedValue: false, UserDef.kShowHanyuPinyinInCompositionBuffer.rawValue)
+  private var showHanyuPinyinInCompositionBuffer: Bool
+
+  @AppStorage(wrappedValue: false, UserDef.kClassicHaninKeyboardSymbolModeShortcutEnabled.rawValue)
+  private var classicHaninKeyboardSymbolModeShortcutEnabled: Bool
+
+  @AppStorage(wrappedValue: false, UserDef.kUseSCPCTypingMode.rawValue)
+  private var useSCPCTypingMode: Bool
+
+  @AppStorage(wrappedValue: true, UserDef.kShouldNotFartInLieuOfBeep.rawValue)
+  private var shouldNotFartInLieuOfBeep: Bool
+
+  @AppStorage(wrappedValue: false, UserDef.kCheckUpdateAutomatically.rawValue)
+  private var checkUpdateAutomatically: Bool
+
+  @AppStorage(wrappedValue: false, UserDef.kIsDebugModeEnabled.rawValue)
+  private var isDebugModeEnabled: Bool
+
   private func onFartControlChange() {
     let content = String(
       format: NSLocalizedString(
         "You are about to uncheck this fart suppressor. You are responsible for all consequences lead by letting people nearby hear the fart sound come from your computer. We strongly advise against unchecking this in any public circumstance that prohibits NSFW netas.",
         comment: ""
-      ))
+      )
+    )
     let alert = NSAlert(error: NSLocalizedString("Warning", comment: ""))
     alert.informativeText = content
     alert.addButton(withTitle: NSLocalizedString("Uncheck", comment: ""))
@@ -153,6 +173,8 @@ public struct VwrSettingsPaneGeneral: View {
     IMEApp.buzz()
   }
 }
+
+// MARK: - VwrSettingsPaneGeneral_Previews
 
 @available(macOS 13, *)
 struct VwrSettingsPaneGeneral_Previews: PreviewProvider {

@@ -58,8 +58,12 @@ extension CandidatePool {
         }
         if lineHasHighlightedCell {
           switch self.layout {
-          case .horizontal where currentCell.isHighlighted: highlightedCellRect.size.width = cellDimension.width
-          case .vertical: highlightedCellRect.size.width = max(highlightedCellRect.size.width, cellDimension.width)
+          case .horizontal
+            where currentCell.isHighlighted: highlightedCellRect.size.width = cellDimension.width
+          case .vertical: highlightedCellRect.size.width = max(
+              highlightedCellRect.size.width,
+              cellDimension.width
+            )
           default: break
           }
           if currentCell.isHighlighted {
@@ -85,7 +89,10 @@ extension CandidatePool {
       case .horizontal:
         highlightedLineRect.size.width = max(currentLineRect.size.width, highlightedLineRect.width)
       case .vertical:
-        highlightedLineRect.size.height = max(currentLineRect.size.height, highlightedLineRect.height)
+        highlightedLineRect.size.height = max(
+          currentLineRect.size.height,
+          highlightedLineRect.height
+        )
         currentLine.forEach { theCell in
           theCell.visualDimension.width = accumulatedLineSize.width
         }
@@ -107,7 +114,10 @@ extension CandidatePool {
     if fillBlankCells {
       switch layout {
       case .horizontal:
-        totalAccuSize.width = max(totalAccuSize.width, CGFloat(maxLineCapacity) * minimumCellDimension.width)
+        totalAccuSize.width = max(
+          totalAccuSize.width,
+          CGFloat(maxLineCapacity) * minimumCellDimension.width
+        )
         highlightedLineRect.size.width = totalAccuSize.width
       case .vertical:
         totalAccuSize.height = CGFloat(maxLineCapacity) * minimumCellDimension.height
@@ -121,7 +131,10 @@ extension CandidatePool {
     if finalContainerOrientation == .horizontal {
       totalAccuSize.width += 5
       dimensionPeripherals.width += 5
-      let delta = max(CandidateCellData.unifiedTextHeight + padding * 2 - dimensionPeripherals.height, 0)
+      let delta = max(
+        CandidateCellData.unifiedTextHeight + padding * 2 - dimensionPeripherals.height,
+        0
+      )
       currentOrigin = .init(x: totalAccuSize.width + originDelta, y: ceil(delta / 2) + originDelta)
       totalAccuSize.width += dimensionPeripherals.width
     } else {
@@ -133,7 +146,12 @@ extension CandidatePool {
     let rectPeripherals = CGRect(origin: currentOrigin, size: dimensionPeripherals)
     totalAccuSize.width += originDelta * 2
     totalAccuSize.height += originDelta * 2
-    metrics = .init(fittingSize: totalAccuSize, highlightedLine: highlightedLineRect, highlightedCandidate: highlightedCellRect, peripherals: rectPeripherals)
+    metrics = .init(
+      fittingSize: totalAccuSize,
+      highlightedLine: highlightedLineRect,
+      highlightedCandidate: highlightedCellRect,
+      peripherals: rectPeripherals
+    )
   }
 
   private var finalContainerOrientation: NSUserInterfaceLayoutOrientation {
@@ -254,7 +272,11 @@ extension CandidatePool {
     result.append(attributedDescriptionPositionCounter)
     if !tooltip.isEmpty { result.append(attributedDescriptionTooltip) }
     if !reverseLookupResult.isEmpty { result.append(attributedDescriptionReverseLookp) }
-    result.addAttribute(.paragraphStyle, value: paragraphStyle, range: .init(location: 0, length: result.string.utf16.count))
+    result.addAttribute(
+      .paragraphStyle,
+      value: paragraphStyle,
+      range: .init(location: 0, length: result.string.utf16.count)
+    )
     return result
   }
 

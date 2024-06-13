@@ -60,8 +60,8 @@ public protocol InputSignalProtocol {
   var isSymbolMenuPhysicalKey: Bool { get }
 }
 
-public extension InputSignalProtocol {
-  var commonKeyModifierFlags: KBEvent.ModifierFlags {
+extension InputSignalProtocol {
+  public var commonKeyModifierFlags: KBEvent.ModifierFlags {
     keyModifierFlags.subtracting([.function, .numericPad, .help])
   }
 }

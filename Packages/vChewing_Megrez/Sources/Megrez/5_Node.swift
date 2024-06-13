@@ -3,7 +3,9 @@
 // ====================
 // This code is released under the MIT license (SPDX-License-Identifier: MIT)
 
-public extension Megrez {
+// MARK: - Megrez.Node
+
+extension Megrez {
   /// 字詞節點。
   ///
   /// 一個節點由這些內容組成：幅位長度、索引鍵、以及一組單元圖。幅位長度就是指這個
@@ -11,7 +13,42 @@ public extension Megrez {
   /// 的詞，組字器會將多個讀音索引鍵合併為一個讀音索引鍵、據此向語言模組請求對應的
   /// 單元圖結果陣列。舉例說，如果一個詞有兩個漢字組成的話，那麼讀音也是有兩個、其
   /// 索引鍵也是由兩個讀音組成的，那麼這個節點的幅位長度就是 2。
-  class Node: Equatable, Hashable {
+  public class Node: Equatable, Hashable {
+    // MARK: Lifecycle
+
+    /// 生成一個字詞節點。
+    ///
+    /// 一個節點由這些內容組成：幅位長度、索引鍵、以及一組單元圖。幅位長度就是指這個
+    /// 節點在組字器內橫跨了多少個字長。組字器負責構築自身的節點。對於由多個漢字組成
+    /// 的詞，組字器會將多個讀音索引鍵合併為一個讀音索引鍵、據此向語言模組請求對應的
+    /// 單元圖結果陣列。舉例說，如果一個詞有兩個漢字組成的話，那麼讀音也是有兩個、其
+    /// 索引鍵也是由兩個讀音組成的，那麼這個節點的幅位長度就是 2。
+    /// - Parameters:
+    ///   - keyArray: 給定索引鍵陣列，不得為空。
+    ///   - spanLength: 給定幅位長度，一般情況下與給定索引鍵陣列內的索引鍵數量一致。
+    ///   - unigrams: 給定單元圖陣列，不得為空。
+    public init(keyArray: [String] = [], spanLength: Int = 0, unigrams: [Megrez.Unigram] = []) {
+      self.keyArray = keyArray
+      self.spanLength = max(spanLength, 0)
+      self.unigrams = unigrams
+      self.currentOverrideType = .withNoOverrides
+    }
+
+    /// 以指定字詞節點生成拷貝。
+    /// - Remark: 因為 Node 不是 Struct，所以會在 Compositor 被拷貝的時候無法被真實複製。
+    /// 這樣一來，Compositor 複製品當中的 Node 的變化會被反應到原先的 Compositor 身上。
+    /// 這在某些情況下會造成意料之外的混亂情況，所以需要引入一個拷貝用的建構子。
+    public init(node: Node) {
+      self.overridingScore = node.overridingScore
+      self.keyArray = node.keyArray
+      self.spanLength = node.spanLength
+      self.unigrams = node.unigrams
+      self.currentOverrideType = node.currentOverrideType
+      self.currentUnigramIndex = node.currentUnigramIndex
+    }
+
+    // MARK: Public
+
     /// 三種不同的針對一個節點的覆寫行為。
     /// - withNoOverrides: 無覆寫行為。
     /// - withTopUnigramScore: 使用指定的單元圖資料值來覆寫該節點，但卻使用
@@ -44,6 +81,7 @@ public extension Megrez {
     public private(set) var unigrams: [Megrez.Unigram]
     /// 該節點目前的覆寫狀態種類。
     public private(set) var currentOverrideType: Node.OverrideType
+
     /// 當前該節點所指向的（單元圖陣列內的）單元圖索引位置。
     public private(set) var currentUnigramIndex: Int = 0 {
       didSet { currentUnigramIndex = max(min(unigrams.count - 1, currentUnigramIndex), 0) }
@@ -51,54 +89,6 @@ public extension Megrez {
 
     /// 該節點當前狀態所展示的鍵值配對。
     public var currentPair: Megrez.KeyValuePaired { .init(keyArray: keyArray, value: value) }
-
-    /// 做為預設雜湊函式。
-    /// - Parameter hasher: 目前物件的雜湊碼。
-    public func hash(into hasher: inout Hasher) {
-      hasher.combine(overridingScore)
-      hasher.combine(keyArray)
-      hasher.combine(spanLength)
-      hasher.combine(unigrams)
-      hasher.combine(currentOverrideType)
-      hasher.combine(currentUnigramIndex)
-    }
-
-    public static func == (lhs: Node, rhs: Node) -> Bool {
-      lhs.overridingScore == rhs.overridingScore && lhs.spanLength == rhs.spanLength
-        && lhs.keyArray == rhs.keyArray && lhs.currentUnigramIndex == rhs.currentUnigramIndex
-        && lhs.unigrams == rhs.unigrams && lhs.currentOverrideType == rhs.currentOverrideType
-    }
-
-    /// 生成一個字詞節點。
-    ///
-    /// 一個節點由這些內容組成：幅位長度、索引鍵、以及一組單元圖。幅位長度就是指這個
-    /// 節點在組字器內橫跨了多少個字長。組字器負責構築自身的節點。對於由多個漢字組成
-    /// 的詞，組字器會將多個讀音索引鍵合併為一個讀音索引鍵、據此向語言模組請求對應的
-    /// 單元圖結果陣列。舉例說，如果一個詞有兩個漢字組成的話，那麼讀音也是有兩個、其
-    /// 索引鍵也是由兩個讀音組成的，那麼這個節點的幅位長度就是 2。
-    /// - Parameters:
-    ///   - keyArray: 給定索引鍵陣列，不得為空。
-    ///   - spanLength: 給定幅位長度，一般情況下與給定索引鍵陣列內的索引鍵數量一致。
-    ///   - unigrams: 給定單元圖陣列，不得為空。
-    public init(keyArray: [String] = [], spanLength: Int = 0, unigrams: [Megrez.Unigram] = []) {
-      self.keyArray = keyArray
-      self.spanLength = max(spanLength, 0)
-      self.unigrams = unigrams
-      currentOverrideType = .withNoOverrides
-    }
-
-    /// 以指定字詞節點生成拷貝。
-    /// - Remark: 因為 Node 不是 Struct，所以會在 Compositor 被拷貝的時候無法被真實複製。
-    /// 這樣一來，Compositor 複製品當中的 Node 的變化會被反應到原先的 Compositor 身上。
-    /// 這在某些情況下會造成意料之外的混亂情況，所以需要引入一個拷貝用的建構子。
-    public init(node: Node) {
-      overridingScore = node.overridingScore
-      keyArray = node.keyArray
-      spanLength = node.spanLength
-      unigrams = node.unigrams
-      currentOverrideType = node.currentOverrideType
-      currentUnigramIndex = node.currentUnigramIndex
-    }
 
     /// 生成自身的拷貝。
     /// - Remark: 因為 Node 不是 Struct，所以會在 Compositor 被拷貝的時候無法被真實複製。
@@ -127,6 +117,23 @@ public extension Megrez {
       case .withTopUnigramScore: return unigrams[0].score
       default: return currentUnigram.score
       }
+    }
+
+    public static func == (lhs: Node, rhs: Node) -> Bool {
+      lhs.overridingScore == rhs.overridingScore && lhs.spanLength == rhs.spanLength
+        && lhs.keyArray == rhs.keyArray && lhs.currentUnigramIndex == rhs.currentUnigramIndex
+        && lhs.unigrams == rhs.unigrams && lhs.currentOverrideType == rhs.currentOverrideType
+    }
+
+    /// 做為預設雜湊函式。
+    /// - Parameter hasher: 目前物件的雜湊碼。
+    public func hash(into hasher: inout Hasher) {
+      hasher.combine(overridingScore)
+      hasher.combine(keyArray)
+      hasher.combine(spanLength)
+      hasher.combine(unigrams)
+      hasher.combine(currentOverrideType)
+      hasher.combine(currentUnigramIndex)
     }
 
     /// 重設該節點的覆寫狀態、及其內部的單元圖索引位置指向。
@@ -172,6 +179,8 @@ public extension Megrez {
       return false
     }
 
+    // MARK: Internal
+
     // MARK: - Vertex Extensions.
 
     // 注意：這一段的任何參數都不參與 Hash。
@@ -209,17 +218,17 @@ public extension Megrez {
 
 // MARK: - Array Extensions.
 
-public extension Array where Element == Megrez.Node {
+extension Array where Element == Megrez.Node {
   /// 從一個節點陣列當中取出目前的選字字串陣列。
-  var values: [String] { map(\.value) }
+  public var values: [String] { map(\.value) }
 
   /// 從一個節點陣列當中取出目前的索引鍵陣列。
-  func joinedKeys(by separator: String = Megrez.Compositor.theSeparator) -> [String] {
+  public func joinedKeys(by separator: String = Megrez.Compositor.theSeparator) -> [String] {
     map { $0.keyArray.lazy.joined(separator: separator) }
   }
 
   /// 從一個節點陣列當中取出目前的索引鍵陣列。
-  var keyArrays: [[String]] { map(\.keyArray) }
+  public var keyArrays: [[String]] { map(\.keyArray) }
 
   /// 返回一連串的節點起點。結果為 (Result A, Result B) 辭典陣列。
   /// Result A 以索引查座標，Result B 以座標查索引。
@@ -241,14 +250,14 @@ public extension Array where Element == Megrez.Node {
   }
 
   /// 返回一個辭典，以座標查索引。允許以游標位置查詢其屬於第幾個幅位座標（從 0 開始算）。
-  var cursorRegionMap: [Int: Int] { nodeBorderPointDictPair.cursorRegionMap }
+  public var cursorRegionMap: [Int: Int] { nodeBorderPointDictPair.cursorRegionMap }
 
   /// 總讀音單元數量。在絕大多數情況下，可視為總幅位長度。
-  var totalKeyCount: Int { map(\.keyArray.count).reduce(0, +) }
+  public var totalKeyCount: Int { map(\.keyArray.count).reduce(0, +) }
 
   /// 根據給定的游標，返回其前後最近的邊界點。
   /// - Parameter cursor: 給定的游標。
-  func contextRange(ofGivenCursor cursor: Int) -> Range<Int> {
+  public func contextRange(ofGivenCursor cursor: Int) -> Range<Int> {
     guard !isEmpty else { return 0 ..< 0 }
     let lastSpanningLength = reversed()[0].keyArray.count
     var nilReturn = (totalKeyCount - lastSpanningLength) ..< totalKeyCount
@@ -257,8 +266,10 @@ public extension Array where Element == Megrez.Node {
     nilReturn = cursor ..< cursor
     // 下文按道理來講不應該會出現 nilReturn。
     guard let rearNodeID = nodeBorderPointDictPair.cursorRegionMap[cursor] else { return nilReturn }
-    guard let rearIndex = nodeBorderPointDictPair.regionCursorMap[rearNodeID] else { return nilReturn }
-    guard let frontIndex = nodeBorderPointDictPair.regionCursorMap[rearNodeID + 1] else { return nilReturn }
+    guard let rearIndex = nodeBorderPointDictPair.regionCursorMap[rearNodeID]
+    else { return nilReturn }
+    guard let frontIndex = nodeBorderPointDictPair.regionCursorMap[rearNodeID + 1]
+    else { return nilReturn }
     return rearIndex ..< frontIndex
   }
 
@@ -267,7 +278,7 @@ public extension Array where Element == Megrez.Node {
   ///   - cursor: 給定游標位置。
   ///   - outCursorPastNode: 找出的節點的前端位置。
   /// - Returns: 查找結果。
-  func findNode(at cursor: Int, target outCursorPastNode: inout Int) -> Megrez.Node? {
+  public func findNode(at cursor: Int, target outCursorPastNode: inout Int) -> Megrez.Node? {
     guard !isEmpty else { return nil }
     let cursor = Swift.max(0, Swift.min(cursor, totalKeyCount - 1)) // 防呆
     let range = contextRange(ofGivenCursor: cursor)
@@ -279,13 +290,13 @@ public extension Array where Element == Megrez.Node {
   /// 在陣列內以給定游標位置找出對應的節點。
   /// - Parameter cursor: 給定游標位置。
   /// - Returns: 查找結果。
-  func findNode(at cursor: Int) -> Megrez.Node? {
+  public func findNode(at cursor: Int) -> Megrez.Node? {
     var useless = 0
     return findNode(at: cursor, target: &useless)
   }
 
   /// 提供一組逐字的字音配對陣列（不使用 Megrez 的 KeyValuePaired 類型），但字音不匹配的節點除外。
-  var smashedPairs: [(key: String, value: String)] {
+  public var smashedPairs: [(key: String, value: String)] {
     var arrData = [(key: String, value: String)]()
     forEach { node in
       if node.isReadingMismatched, !node.keyArray.joined().isEmpty {

@@ -18,42 +18,11 @@ import SwiftUI
 private let loc: String =
   (UserDefaults.current.array(forKey: UserDef.kAppleLanguages.rawValue) as? [String] ?? ["auto"])[0]
 
+// MARK: - VwrPhraseEditorUI
+
 @available(macOS 13, *)
 public struct VwrPhraseEditorUI: View {
-  static var txtContentStorage: String = NSLocalizedString(
-    "Please select Simplified / Traditional Chinese mode above.", comment: ""
-  )
-  @Binding public var txtContent: String
-  @ObservedObject public var fileChangeIndicator = PEReloadEventObserver.shared
-  @AppStorage("PhraseEditorAutoReloadExternalModifications")
-  private var autoReloadExternalModifications: Bool = true
-  @State private var selAutoReloadExternalModifications: Bool = UserDefaults.current.bool(
-    forKey: UserDef.kPhraseEditorAutoReloadExternalModifications.rawValue)
-  @State var lblAddPhraseTag1 = PETerms.AddPhrases.locPhrase.localized.0
-  @State var lblAddPhraseTag2 = PETerms.AddPhrases.locReadingOrStroke.localized.0
-  @State var lblAddPhraseTag3 = PETerms.AddPhrases.locWeight.localized.0
-  @State var lblAddPhraseTag4 = PETerms.AddPhrases.locComment.localized.0
-  @State var txtAddPhraseField1 = ""
-  @State var txtAddPhraseField2 = ""
-  @State var txtAddPhraseField3 = ""
-  @State var txtAddPhraseField4 = ""
-  @State public var selInputMode: Shared.InputMode = .imeModeNULL
-  @State public var selUserDataType: LMAssembly.ReplacableUserDataType = .thePhrases
-  @State private var isLoading = false
-  @State private var textEditorTooltip = PETerms.TooltipTexts.sampleDictionaryContent(for: .thePhrases)
-  public weak var window: NSWindow?
-
-  public var currentIMEInputMode: Shared.InputMode {
-    delegate?.currentInputMode ?? selInputMode
-  }
-
-  public var delegate: PhraseEditorDelegate? {
-    didSet {
-      guard let delegate = delegate else { return }
-      selInputMode = delegate.currentInputMode
-      update()
-    }
-  }
+  // MARK: Lifecycle
 
   // MARK: -
 
@@ -72,119 +41,28 @@ public struct VwrPhraseEditorUI: View {
     }
   }
 
-  public func update() {
-    guard let delegate = delegate else { return }
-    updateLabels()
-    clearAllFields()
-    txtContent = NSLocalizedString("Loading…", comment: "")
-    isLoading = true
-    DispatchQueue.main.async {
-      txtContent = delegate.retrieveData(mode: selInputMode, type: selUserDataType)
-      textEditorTooltip = PETerms.TooltipTexts.sampleDictionaryContent(for: selUserDataType)
-      isLoading = false
-    }
+  // MARK: Public
+
+  @Binding
+  public var txtContent: String
+  @ObservedObject
+  public var fileChangeIndicator = PEReloadEventObserver.shared
+  @State
+  public var selInputMode: Shared.InputMode = .imeModeNULL
+  @State
+  public var selUserDataType: LMAssembly.ReplacableUserDataType = .thePhrases
+  public weak var window: NSWindow?
+
+  public var currentIMEInputMode: Shared.InputMode {
+    delegate?.currentInputMode ?? selInputMode
   }
 
-  private func updateLabels() {
-    clearAllFields()
-    switch selUserDataType {
-    case .thePhrases:
-      lblAddPhraseTag1 = PETerms.AddPhrases.locPhrase.localized.0
-      lblAddPhraseTag2 = PETerms.AddPhrases.locReadingOrStroke.localized.0
-      lblAddPhraseTag3 = PETerms.AddPhrases.locWeight.localized.0
-      lblAddPhraseTag4 = PETerms.AddPhrases.locComment.localized.0
-    case .theFilter:
-      lblAddPhraseTag1 = PETerms.AddPhrases.locPhrase.localized.0
-      lblAddPhraseTag2 = PETerms.AddPhrases.locReadingOrStroke.localized.0
-      lblAddPhraseTag3 = ""
-      lblAddPhraseTag4 = PETerms.AddPhrases.locComment.localized.0
-    case .theReplacements:
-      lblAddPhraseTag1 = PETerms.AddPhrases.locReplaceTo.localized.0
-      lblAddPhraseTag2 = PETerms.AddPhrases.locReplaceTo.localized.1
-      lblAddPhraseTag3 = ""
-      lblAddPhraseTag4 = PETerms.AddPhrases.locComment.localized.0
-    case .theAssociates:
-      lblAddPhraseTag1 = PETerms.AddPhrases.locInitial.localized.0
-      lblAddPhraseTag2 = {
-        let result = PETerms.AddPhrases.locPhrase.localized.0
-        return (result == "Phrase") ? "Phrases" : result
-      }()
-      lblAddPhraseTag3 = ""
-      lblAddPhraseTag4 = ""
-    case .theSymbols:
-      lblAddPhraseTag1 = PETerms.AddPhrases.locPhrase.localized.0
-      lblAddPhraseTag2 = PETerms.AddPhrases.locReadingOrStroke.localized.0
-      lblAddPhraseTag3 = ""
-      lblAddPhraseTag4 = PETerms.AddPhrases.locComment.localized.0
+  public var delegate: PhraseEditorDelegate? {
+    didSet {
+      guard let delegate = delegate else { return }
+      selInputMode = delegate.currentInputMode
+      update()
     }
-  }
-
-  private func insertEntry() {
-    txtAddPhraseField1.removeAll { "　 \t\n\r".contains($0) }
-    if selUserDataType != .theAssociates {
-      txtAddPhraseField2.regReplace(pattern: #"( +|　+| +|\t+)+"#, replaceWith: "-")
-    }
-    txtAddPhraseField2.removeAll {
-      selUserDataType == .theAssociates ? "\n\r".contains($0) : "　 \t\n\r".contains($0)
-    }
-    txtAddPhraseField3.removeAll { !"0123456789.-".contains($0) }
-    txtAddPhraseField4.removeAll { "\n\r".contains($0) }
-    guard !txtAddPhraseField1.isEmpty, !txtAddPhraseField2.isEmpty else { return }
-    var arrResult: [String] = [txtAddPhraseField1, txtAddPhraseField2]
-    if let weightVal = Double(txtAddPhraseField3), weightVal < 0 {
-      arrResult.append(weightVal.description)
-    }
-    if !txtAddPhraseField4.isEmpty { arrResult.append("#" + txtAddPhraseField4) }
-    if let delegate = delegate,
-       delegate.checkIfPhrasePairExists(
-         userPhrase: txtAddPhraseField1, mode: selInputMode, key: txtAddPhraseField2
-       )
-    {
-      arrResult.append(" #𝙾𝚟𝚎𝚛𝚛𝚒𝚍𝚎")
-    }
-    if let lastChar = txtContent.last, !"\n".contains(lastChar) {
-      arrResult.insert("\n", at: 0)
-    }
-    txtContent.append(arrResult.joined(separator: " ") + "\n")
-    clearAllFields()
-  }
-
-  private func clearAllFields() {
-    txtAddPhraseField1 = ""
-    txtAddPhraseField2 = ""
-    txtAddPhraseField3 = ""
-    txtAddPhraseField4 = ""
-  }
-
-  private func dropDownMenuDidChange() {
-    update()
-  }
-
-  private func saveAndReload() {
-    guard let delegate = delegate, selInputMode != .imeModeNULL else { return }
-    let toSave = txtContent
-    txtContent = NSLocalizedString("Loading…", comment: "")
-    isLoading = true
-    let newResult = delegate.saveData(mode: selInputMode, type: selUserDataType, data: toSave)
-    txtContent = newResult
-    isLoading = false
-  }
-
-  private func consolidate() {
-    guard let delegate = delegate, selInputMode != .imeModeNULL else { return }
-    DispatchQueue.main.async {
-      isLoading = true
-      delegate.consolidate(text: &txtContent, pragma: false) // 強制整理
-      if selUserDataType == .thePhrases {
-        delegate.tagOverrides(in: &txtContent, mode: selInputMode)
-      }
-      isLoading = false
-    }
-  }
-
-  private func callExternalAppToOpenPhraseFile() {
-    let app: FileOpenMethod = NSEvent.keyModifierFlags.contains(.option) ? .textEdit : .finder
-    delegate?.openPhraseFile(mode: selInputMode, type: selUserDataType, using: app)
   }
 
   // MARK: - Main View.
@@ -201,28 +79,38 @@ public struct VwrPhraseEditorUI: View {
             Text(Shared.InputMode.imeModeCHT.localizedDescription).tag(Shared.InputMode.imeModeCHT)
             Text(Shared.InputMode.imeModeCHS.localizedDescription).tag(Shared.InputMode.imeModeCHS)
           case .imeModeNULL:
-            Text(Shared.InputMode.imeModeNULL.localizedDescription).tag(Shared.InputMode.imeModeNULL)
+            Text(Shared.InputMode.imeModeNULL.localizedDescription)
+              .tag(Shared.InputMode.imeModeNULL)
             if loc.contains("Hans") {
-              Text(Shared.InputMode.imeModeCHS.localizedDescription).tag(Shared.InputMode.imeModeCHS)
-              Text(Shared.InputMode.imeModeCHT.localizedDescription).tag(Shared.InputMode.imeModeCHT)
+              Text(Shared.InputMode.imeModeCHS.localizedDescription)
+                .tag(Shared.InputMode.imeModeCHS)
+              Text(Shared.InputMode.imeModeCHT.localizedDescription)
+                .tag(Shared.InputMode.imeModeCHT)
             } else {
-              Text(Shared.InputMode.imeModeCHT.localizedDescription).tag(Shared.InputMode.imeModeCHT)
-              Text(Shared.InputMode.imeModeCHS.localizedDescription).tag(Shared.InputMode.imeModeCHS)
+              Text(Shared.InputMode.imeModeCHT.localizedDescription)
+                .tag(Shared.InputMode.imeModeCHT)
+              Text(Shared.InputMode.imeModeCHS.localizedDescription)
+                .tag(Shared.InputMode.imeModeCHS)
             }
           }
         }
         .labelsHidden()
         Picker("", selection: $selUserDataType.didChange { dropDownMenuDidChange() }) {
           Text(LMAssembly.ReplacableUserDataType.thePhrases.localizedDescription).tag(
-            LMAssembly.ReplacableUserDataType.thePhrases)
+            LMAssembly.ReplacableUserDataType.thePhrases
+          )
           Text(LMAssembly.ReplacableUserDataType.theFilter.localizedDescription).tag(
-            LMAssembly.ReplacableUserDataType.theFilter)
+            LMAssembly.ReplacableUserDataType.theFilter
+          )
           Text(LMAssembly.ReplacableUserDataType.theReplacements.localizedDescription).tag(
-            LMAssembly.ReplacableUserDataType.theReplacements)
+            LMAssembly.ReplacableUserDataType.theReplacements
+          )
           Text(LMAssembly.ReplacableUserDataType.theAssociates.localizedDescription).tag(
-            LMAssembly.ReplacableUserDataType.theAssociates)
+            LMAssembly.ReplacableUserDataType.theAssociates
+          )
           Text(LMAssembly.ReplacableUserDataType.theSymbols.localizedDescription).tag(
-            LMAssembly.ReplacableUserDataType.theSymbols)
+            LMAssembly.ReplacableUserDataType.theSymbols
+          )
         }
         .labelsHidden()
         Button("Reload") {
@@ -286,7 +174,9 @@ public struct VwrPhraseEditorUI: View {
       }.disabled(selInputMode == Shared.InputMode.imeModeNULL || isLoading)
       HStack {
         Toggle(
-          LocalizedStringKey("This editor only: Auto-reload modifications happened outside of this editor"),
+          LocalizedStringKey(
+            "This editor only: Auto-reload modifications happened outside of this editor"
+          ),
           isOn: $selAutoReloadExternalModifications.didChange {
             autoReloadExternalModifications = selAutoReloadExternalModifications
           }
@@ -297,7 +187,10 @@ public struct VwrPhraseEditorUI: View {
     }.onDisappear {
       selInputMode = .imeModeNULL
       selUserDataType = .thePhrases
-      txtContent = NSLocalizedString("Please select Simplified / Traditional Chinese mode above.", comment: "")
+      txtContent = NSLocalizedString(
+        "Please select Simplified / Traditional Chinese mode above.",
+        comment: ""
+      )
       isLoading = true
       Self.txtContentStorage = ""
     }.onAppear {
@@ -306,7 +199,160 @@ public struct VwrPhraseEditorUI: View {
       update()
     }
   }
+
+  public func update() {
+    guard let delegate = delegate else { return }
+    updateLabels()
+    clearAllFields()
+    txtContent = NSLocalizedString("Loading…", comment: "")
+    isLoading = true
+    DispatchQueue.main.async {
+      txtContent = delegate.retrieveData(mode: selInputMode, type: selUserDataType)
+      textEditorTooltip = PETerms.TooltipTexts.sampleDictionaryContent(for: selUserDataType)
+      isLoading = false
+    }
+  }
+
+  // MARK: Internal
+
+  static var txtContentStorage: String = NSLocalizedString(
+    "Please select Simplified / Traditional Chinese mode above.", comment: ""
+  )
+
+  @State
+  var lblAddPhraseTag1 = PETerms.AddPhrases.locPhrase.localized.0
+  @State
+  var lblAddPhraseTag2 = PETerms.AddPhrases.locReadingOrStroke.localized.0
+  @State
+  var lblAddPhraseTag3 = PETerms.AddPhrases.locWeight.localized.0
+  @State
+  var lblAddPhraseTag4 = PETerms.AddPhrases.locComment.localized.0
+  @State
+  var txtAddPhraseField1 = ""
+  @State
+  var txtAddPhraseField2 = ""
+  @State
+  var txtAddPhraseField3 = ""
+  @State
+  var txtAddPhraseField4 = ""
+
+  // MARK: Private
+
+  @AppStorage("PhraseEditorAutoReloadExternalModifications")
+  private var autoReloadExternalModifications: Bool = true
+  @State
+  private var selAutoReloadExternalModifications: Bool = UserDefaults.current.bool(
+    forKey: UserDef.kPhraseEditorAutoReloadExternalModifications.rawValue
+  )
+  @State
+  private var isLoading = false
+  @State
+  private var textEditorTooltip = PETerms.TooltipTexts
+    .sampleDictionaryContent(for: .thePhrases)
+
+  private func updateLabels() {
+    clearAllFields()
+    switch selUserDataType {
+    case .thePhrases:
+      lblAddPhraseTag1 = PETerms.AddPhrases.locPhrase.localized.0
+      lblAddPhraseTag2 = PETerms.AddPhrases.locReadingOrStroke.localized.0
+      lblAddPhraseTag3 = PETerms.AddPhrases.locWeight.localized.0
+      lblAddPhraseTag4 = PETerms.AddPhrases.locComment.localized.0
+    case .theFilter:
+      lblAddPhraseTag1 = PETerms.AddPhrases.locPhrase.localized.0
+      lblAddPhraseTag2 = PETerms.AddPhrases.locReadingOrStroke.localized.0
+      lblAddPhraseTag3 = ""
+      lblAddPhraseTag4 = PETerms.AddPhrases.locComment.localized.0
+    case .theReplacements:
+      lblAddPhraseTag1 = PETerms.AddPhrases.locReplaceTo.localized.0
+      lblAddPhraseTag2 = PETerms.AddPhrases.locReplaceTo.localized.1
+      lblAddPhraseTag3 = ""
+      lblAddPhraseTag4 = PETerms.AddPhrases.locComment.localized.0
+    case .theAssociates:
+      lblAddPhraseTag1 = PETerms.AddPhrases.locInitial.localized.0
+      lblAddPhraseTag2 = {
+        let result = PETerms.AddPhrases.locPhrase.localized.0
+        return (result == "Phrase") ? "Phrases" : result
+      }()
+      lblAddPhraseTag3 = ""
+      lblAddPhraseTag4 = ""
+    case .theSymbols:
+      lblAddPhraseTag1 = PETerms.AddPhrases.locPhrase.localized.0
+      lblAddPhraseTag2 = PETerms.AddPhrases.locReadingOrStroke.localized.0
+      lblAddPhraseTag3 = ""
+      lblAddPhraseTag4 = PETerms.AddPhrases.locComment.localized.0
+    }
+  }
+
+  private func insertEntry() {
+    txtAddPhraseField1.removeAll { "　 \t\n\r".contains($0) }
+    if selUserDataType != .theAssociates {
+      txtAddPhraseField2.regReplace(pattern: #"( +|　+| +|\t+)+"#, replaceWith: "-")
+    }
+    txtAddPhraseField2.removeAll {
+      selUserDataType == .theAssociates ? "\n\r".contains($0) : "　 \t\n\r".contains($0)
+    }
+    txtAddPhraseField3.removeAll { !"0123456789.-".contains($0) }
+    txtAddPhraseField4.removeAll { "\n\r".contains($0) }
+    guard !txtAddPhraseField1.isEmpty, !txtAddPhraseField2.isEmpty else { return }
+    var arrResult: [String] = [txtAddPhraseField1, txtAddPhraseField2]
+    if let weightVal = Double(txtAddPhraseField3), weightVal < 0 {
+      arrResult.append(weightVal.description)
+    }
+    if !txtAddPhraseField4.isEmpty { arrResult.append("#" + txtAddPhraseField4) }
+    if let delegate = delegate,
+       delegate.checkIfPhrasePairExists(
+         userPhrase: txtAddPhraseField1, mode: selInputMode, key: txtAddPhraseField2
+       ) {
+      arrResult.append(" #𝙾𝚟𝚎𝚛𝚛𝚒𝚍𝚎")
+    }
+    if let lastChar = txtContent.last, !"\n".contains(lastChar) {
+      arrResult.insert("\n", at: 0)
+    }
+    txtContent.append(arrResult.joined(separator: " ") + "\n")
+    clearAllFields()
+  }
+
+  private func clearAllFields() {
+    txtAddPhraseField1 = ""
+    txtAddPhraseField2 = ""
+    txtAddPhraseField3 = ""
+    txtAddPhraseField4 = ""
+  }
+
+  private func dropDownMenuDidChange() {
+    update()
+  }
+
+  private func saveAndReload() {
+    guard let delegate = delegate, selInputMode != .imeModeNULL else { return }
+    let toSave = txtContent
+    txtContent = NSLocalizedString("Loading…", comment: "")
+    isLoading = true
+    let newResult = delegate.saveData(mode: selInputMode, type: selUserDataType, data: toSave)
+    txtContent = newResult
+    isLoading = false
+  }
+
+  private func consolidate() {
+    guard let delegate = delegate, selInputMode != .imeModeNULL else { return }
+    DispatchQueue.main.async {
+      isLoading = true
+      delegate.consolidate(text: &txtContent, pragma: false) // 強制整理
+      if selUserDataType == .thePhrases {
+        delegate.tagOverrides(in: &txtContent, mode: selInputMode)
+      }
+      isLoading = false
+    }
+  }
+
+  private func callExternalAppToOpenPhraseFile() {
+    let app: FileOpenMethod = NSEvent.keyModifierFlags.contains(.option) ? .textEdit : .finder
+    delegate?.openPhraseFile(mode: selInputMode, type: selUserDataType, using: app)
+  }
 }
+
+// MARK: - ContentView_Previews
 
 @available(macOS 13, *)
 struct ContentView_Previews: PreviewProvider {
@@ -314,6 +360,8 @@ struct ContentView_Previews: PreviewProvider {
     VwrPhraseEditorUI()
   }
 }
+
+// MARK: - PETerms
 
 public enum PETerms {
   public enum AddPhrases: String {
@@ -325,11 +373,13 @@ public enum PETerms {
     case locAdd = "Add"
     case locInitial = "Initial"
 
+    // MARK: Public
+
     public var localized: (String, String) {
       if self == .locAdd {
         return loc.prefix(2) == "zh" ? ("添入", "") : loc.prefix(2) == "ja" ? ("記入", "") : ("Add", "")
       }
-      let rawArray = NSLocalizedString(self.rawValue, comment: "").components(separatedBy: " ")
+      let rawArray = NSLocalizedString(rawValue, comment: "").components(separatedBy: " ")
       if rawArray.isEmpty { return ("N/A", "N/A") }
       let val1: String = rawArray[0]
       let val2: String = (rawArray.count >= 2) ? rawArray[1] : ""
@@ -341,22 +391,30 @@ public enum PETerms {
     case weightInputBox =
       "If not filling the weight, it will be 0.0, the maximum one. An ideal weight situates in [-9.5, 0], making itself can be captured by the walking algorithm. The exception is -114.514, the disciplinary weight. The walking algorithm will ignore it unless it is the unique result."
 
-    public static func sampleDictionaryContent(for type: LMAssembly.ReplacableUserDataType) -> String {
+    // MARK: Public
+
+    public var localized: String { rawValue.localized }
+
+    public static func sampleDictionaryContent(
+      for type: LMAssembly
+        .ReplacableUserDataType
+    )
+      -> String {
       var result = ""
       switch type {
       case .thePhrases:
         result =
-          "Example:\nCandidate Reading-Reading Weight #Comment\nCandidate Reading-Reading #Comment".localized + "\n\n"
+          "Example:\nCandidate Reading-Reading Weight #Comment\nCandidate Reading-Reading #Comment"
+            .localized + "\n\n"
             + weightInputBox.localized
       case .theFilter: result = "Example:\nCandidate Reading-Reading #Comment".localized
       case .theReplacements: result = "Example:\nOldPhrase NewPhrase #Comment".localized
       case .theAssociates:
-        result = "Example:\nInitial RestPhrase\nInitial RestPhrase1 RestPhrase2 RestPhrase3...".localized
+        result = "Example:\nInitial RestPhrase\nInitial RestPhrase1 RestPhrase2 RestPhrase3..."
+          .localized
       case .theSymbols: result = "Example:\nCandidate Reading-Reading #Comment".localized
       }
       return result
     }
-
-    public var localized: String { rawValue.localized }
   }
 }

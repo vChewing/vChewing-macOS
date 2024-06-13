@@ -15,14 +15,19 @@ import SwiftyCapsLockToggler
 
 // MARK: - Facade
 
-public extension SessionCtl {
+extension SessionCtl {
   /// 接受所有鍵鼠事件為 NSEvent，讓輸入法判斷是否要處理、該怎樣處理。
   /// 然後再交給 InputHandler.handleEvent() 分診。
   /// - Parameters:
   ///   - event: 裝置操作輸入事件，可能會是 nil。
   ///   - sender: 呼叫了該函式的客體（無須使用）。
   /// - Returns: 回「`true`」以將該按鍵已攔截處理的訊息傳遞給 IMK；回「`false`」則放行、不作處理。
-  @objc(handleEvent:client:) override func handle(_ event: NSEvent?, client sender: Any?) -> Bool {
+  @objc(handleEvent:client:)
+  public override func handle(
+    _ event: NSEvent?,
+    client sender: Any?
+  )
+    -> Bool {
     _ = sender // 防止格式整理工具毀掉與此對應的參數。
 
     // 就這傳入的 NSEvent 都還有可能是 nil，Apple InputMethodKit 團隊到底在搞三小。
@@ -81,7 +86,8 @@ public extension SessionCtl {
       if event.type == .flagsChanged, event.keyCode == KeyCode.kCapsLock.rawValue {
         DispatchQueue.main.async { [weak self] in
           let isCapsLockTurnedOn = CapsLockToggler.isOn
-          if PrefMgr.shared.shiftEisuToggleOffTogetherWithCapsLock, !isCapsLockTurnedOn, self?.isASCIIMode ?? false {
+          if PrefMgr.shared.shiftEisuToggleOffTogetherWithCapsLock, !isCapsLockTurnedOn,
+             self?.isASCIIMode ?? false {
             self?.isASCIIMode.toggle()
           }
           self?.resetInputHandler()
@@ -131,23 +137,26 @@ public extension SessionCtl {
     // 如果是方向鍵輸入的話，就想辦法帶上標記資訊、來說明當前是縱排還是橫排。
     if event.isUp || event.isDown || event.isLeft || event.isRight {
       updateVerticalTypingStatus() // 檢查當前環境是否是縱排輸入。
-      eventToDeal = event.reinitiate(charactersIgnoringModifiers: isVerticalTyping ? "Vertical" : "Horizontal")
+      eventToDeal = event
+        .reinitiate(charactersIgnoringModifiers: isVerticalTyping ? "Vertical" : "Horizontal")
     }
 
     // 使 NSEvent 自翻譯，這樣可以讓 Emacs NSEvent 變成標準 NSEvent。
     // 注意不要針對 Empty 空狀態使用這個轉換，否則會使得相關組合鍵第交出垃圾字元。
     if eventToDeal.isEmacsKey {
       if state.type == .ofEmpty { return false }
-      let verticalProcessing = (state.isCandidateContainer) ? isVerticalCandidateWindow : isVerticalTyping
+      let verticalProcessing = (state.isCandidateContainer) ? isVerticalCandidateWindow :
+        isVerticalTyping
       eventToDeal = eventToDeal.convertFromEmacsKeyEvent(isVerticalContext: verticalProcessing)
     }
 
     // 在啟用注音排列而非拼音輸入的情況下，強制將當前鍵盤佈局翻譯為美規鍵盤（或指定的其它鍵盤佈局）。
     if !inputHandler.isComposerUsingPinyin || IMKHelper.isDynamicBasicKeyboardLayoutEnabled {
-      var defaultLayout = LatinKeyboardMappings(rawValue: PrefMgr.shared.basicKeyboardLayout) ?? .qwerty
+      var defaultLayout = LatinKeyboardMappings(rawValue: PrefMgr.shared.basicKeyboardLayout) ??
+        .qwerty
       if let parser = KeyboardParser(rawValue: PrefMgr.shared.keyboardParser) {
         switch parser {
-        case .ofStandard, .ofIBM, .ofSeigyou, .ofFakeSeigyou, .ofDachen26: defaultLayout = .qwerty
+        case .ofDachen26, .ofFakeSeigyou, .ofIBM, .ofSeigyou, .ofStandard: defaultLayout = .qwerty
         default: break
         }
       }
@@ -156,12 +165,10 @@ public extension SessionCtl {
 
     // Apple 數字小鍵盤處理
     if eventToDeal.isNumericPadKey,
-       let eventCharConverted = eventToDeal.characters?.applyingTransformFW2HW(reverse: false)
-    {
+       let eventCharConverted = eventToDeal.characters?.applyingTransformFW2HW(reverse: false) {
       eventToDeal = eventToDeal.reinitiate(characters: eventCharConverted)
     } else if [.ofEmpty, .ofInputting].contains(state.type), eventToDeal.isMainAreaNumKey,
-              !eventToDeal.isCommandHold, !eventToDeal.isControlHold, eventToDeal.isOptionHold
-    {
+              !eventToDeal.isCommandHold, !eventToDeal.isControlHold, eventToDeal.isOptionHold {
       // Alt(+Shift)+主鍵盤區數字鍵 預先處理
       eventToDeal = eventToDeal.reinitiate(characters: eventToDeal.mainAreaNumKeyChar)
     }
@@ -195,7 +202,8 @@ public extension SessionCtl {
         ? NSLocalizedString("Alphanumerical Input Mode", comment: "") + "\n" + status
         : NSLocalizedString("Chinese Input Mode", comment: "") + "\n" + status
     )
-    if PrefMgr.shared.shiftEisuToggleOffTogetherWithCapsLock, oldValue, !newValue, CapsLockToggler.isOn {
+    if PrefMgr.shared.shiftEisuToggleOffTogetherWithCapsLock, oldValue, !newValue,
+       CapsLockToggler.isOn {
       CapsLockToggler.turnOff()
     }
   }

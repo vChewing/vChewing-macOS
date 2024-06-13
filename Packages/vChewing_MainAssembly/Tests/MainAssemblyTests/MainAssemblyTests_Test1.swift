@@ -125,10 +125,11 @@ extension MainAssemblyTests {
     vCTestLog("- 該給定上下文情形為「((ㄍㄨㄥ-ㄙ,公司),(ㄉㄜ˙,的),ㄋㄧㄢˊ-ㄓㄨㄥ)」。")
     clearTestUOM()
     let keyTwo = NSEvent.KeyEventData(chars: "2")
-    [dataArrowLeft, dataArrowLeft, dataArrowDown, keyTwo].map(\.asPairedEvents).flatMap { $0 }.forEach { theEvent in
-      let dismissed = !testSession.handle(theEvent, client: testClient)
-      if theEvent.type == .keyDown { XCTAssertFalse(dismissed) }
-    }
+    [dataArrowLeft, dataArrowLeft, dataArrowDown, keyTwo].map(\.asPairedEvents).flatMap { $0 }
+      .forEach { theEvent in
+        let dismissed = !testSession.handle(theEvent, client: testClient)
+        if theEvent.type == .keyDown { XCTAssertFalse(dismissed) }
+      }
     let resultText4 = testSession.state.displayedText
     vCTestLog("- // 組字結果：\(resultText4)")
     XCTAssertEqual(resultText4, "高科技公司的年終獎金")

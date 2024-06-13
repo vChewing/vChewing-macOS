@@ -11,14 +11,11 @@ import BookmarkManager
 import Foundation
 import Shared
 
-public extension SettingsPanesCocoa {
-  class Cassette: NSViewController {
-    var windowWidth: CGFloat { SettingsPanesCocoa.windowWidth }
-    var contentWidth: CGFloat { SettingsPanesCocoa.contentWidth }
-    var innerContentWidth: CGFloat { SettingsPanesCocoa.innerContentWidth }
-    var tabContainerWidth: CGFloat { SettingsPanesCocoa.tabContainerWidth }
-    var contentHalfWidth: CGFloat { SettingsPanesCocoa.contentHalfWidth }
-    let pctCassetteFilePath: NSPathControl = .init()
+// MARK: - SettingsPanesCocoa.Cassette
+
+extension SettingsPanesCocoa {
+  public class Cassette: NSViewController {
+    // MARK: Public
 
     override public func loadView() {
       prepareCassetteFolderPathControl(pctCassetteFilePath)
@@ -27,6 +24,15 @@ public extension SettingsPanesCocoa {
       view.makeSimpleConstraint(.width, relation: .equal, value: windowWidth)
     }
 
+    // MARK: Internal
+
+    let pctCassetteFilePath: NSPathControl = .init()
+
+    var windowWidth: CGFloat { SettingsPanesCocoa.windowWidth }
+    var contentWidth: CGFloat { SettingsPanesCocoa.contentWidth }
+    var innerContentWidth: CGFloat { SettingsPanesCocoa.innerContentWidth }
+    var tabContainerWidth: CGFloat { SettingsPanesCocoa.tabContainerWidth }
+    var contentHalfWidth: CGFloat { SettingsPanesCocoa.contentHalfWidth }
     var body: NSView? {
       NSStackView.build(.vertical, insets: .new(all: 14)) {
         NSStackView.buildSection(width: contentWidth) {
@@ -58,7 +64,8 @@ public extension SettingsPanesCocoa {
 
     func prepareCassetteFolderPathControl(_ pathCtl: NSPathControl) {
       pathCtl.delegate = self
-      (pathCtl.cell as? NSTextFieldCell)?.placeholderString = "Please drag the desired target from Finder to this place.".localized
+      (pathCtl.cell as? NSTextFieldCell)?
+        .placeholderString = "Please drag the desired target from Finder to this place.".localized
       pathCtl.allowsExpansionToolTips = true
       (pathCtl.cell as? NSPathCell)?.allowedTypes = ["cin2", "cin", "vcin"]
       pathCtl.translatesAutoresizingMaskIntoConstraints = false
@@ -78,11 +85,12 @@ public extension SettingsPanesCocoa {
       pathCtl.toolTip = "Please drag the desired target from Finder to this place.".localized
     }
 
-    @IBAction func cassetteEnabledToggled(_: NSControl) {}
+    @IBAction
+    func cassetteEnabledToggled(_: NSControl) {}
   }
 }
 
-// MARK: - Controls related to data path settings.
+// MARK: - SettingsPanesCocoa.Cassette + NSPathControlDelegate
 
 extension SettingsPanesCocoa.Cassette: NSPathControlDelegate {
   public func pathControl(_ pathControl: NSPathControl, acceptDrop info: NSDraggingInfo) -> Bool {
@@ -107,16 +115,19 @@ extension SettingsPanesCocoa.Cassette: NSPathControlDelegate {
     return false
   }
 
-  @IBAction func resetCassettePath(_: Any) {
+  @IBAction
+  func resetCassettePath(_: Any) {
     LMMgr.resetCassettePath()
   }
 
-  @IBAction func pathControlDoubleAction(_ sender: NSPathControl) {
+  @IBAction
+  func pathControlDoubleAction(_ sender: NSPathControl) {
     guard let url = sender.url else { return }
     NSWorkspace.shared.activateFileViewerSelecting([url])
   }
 
-  @IBAction func chooseCassetteFileToSpecify(_: Any) {
+  @IBAction
+  func chooseCassetteFileToSpecify(_: Any) {
     if NSEvent.keyModifierFlags == .option, let url = pctCassetteFilePath.url {
       NSWorkspace.shared.activateFileViewerSelecting([url])
       return
@@ -133,14 +144,16 @@ extension SettingsPanesCocoa.Cassette: NSPathControlDelegate {
     dlgOpenFile.allowsMultipleSelection = false
 
     if #available(macOS 11.0, *) {
-      dlgOpenFile.allowedContentTypes = ["cin2", "vcin", "cin"].compactMap { .init(filenameExtension: $0) }
+      dlgOpenFile.allowedContentTypes = ["cin2", "vcin", "cin"]
+        .compactMap { .init(filenameExtension: $0) }
     } else {
       dlgOpenFile.allowedFileTypes = ["cin2", "vcin", "cin"]
     }
     dlgOpenFile.allowsOtherFileTypes = true
 
     let bolPreviousPathValidity = LMMgr.checkCassettePathValidity(
-      PrefMgr.shared.cassettePath.expandingTildeInPath)
+      PrefMgr.shared.cassettePath.expandingTildeInPath
+    )
 
     let window = CtlSettingsCocoa.shared?.window
     dlgOpenFile.beginSheetModal(at: window) { result in

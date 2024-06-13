@@ -10,9 +10,10 @@ import AppKit
 import IMKUtils
 import InputMethodKit
 
-public extension MainView {
-  func removeThenInstallInputMethod() {
-    let shouldWaitForTranslocationRemoval = Reloc.isAppBundleTranslocated(atPath: kTargetPartialPath)
+extension MainView {
+  public func removeThenInstallInputMethod() {
+    let shouldWaitForTranslocationRemoval = Reloc
+      .isAppBundleTranslocated(atPath: kTargetPartialPath)
 
     // 將既存輸入法扔到垃圾桶內
     do {
@@ -54,11 +55,10 @@ public extension MainView {
     }
   }
 
-  func installInputMethod(
+  public func installInputMethod(
     previousExists _: Bool, previousVersionNotFullyDeactivatedWarning warning: Bool
   ) {
-    guard
-      let targetBundle = Bundle.main.path(forResource: kTargetBin, ofType: kTargetType)
+    guard let targetBundle = Bundle.main.path(forResource: kTargetBin, ofType: kTargetType)
     else {
       return
     }

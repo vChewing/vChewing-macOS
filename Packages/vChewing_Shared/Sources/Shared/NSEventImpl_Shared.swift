@@ -8,7 +8,7 @@
 
 import AppKit
 
-// MARK: - NSEvent - Conforming to InputSignalProtocol
+// MARK: - NSEvent + InputSignalProtocol
 
 extension NSEvent: InputSignalProtocol {
   public var keyModifierFlags: KBEvent.ModifierFlags {
@@ -18,14 +18,14 @@ extension NSEvent: InputSignalProtocol {
 
 // MARK: - NSEvent - Translating to KBEvent
 
-public extension NSEvent? {
-  var copyAsKBEvent: KBEvent? {
+extension NSEvent? {
+  public var copyAsKBEvent: KBEvent? {
     self?.copyAsKBEvent ?? nil
   }
 }
 
-public extension NSEvent {
-  var copyAsKBEvent: KBEvent? {
+extension NSEvent {
+  public var copyAsKBEvent: KBEvent? {
     guard let typeKB = type.toKB else { return nil }
     // NSEvent 只是個外表皮，裡面有好幾個影子 class。
     // 不是所有的影子 class 都有「characters」和「isARepeated」。
@@ -44,8 +44,8 @@ public extension NSEvent {
   }
 }
 
-public extension NSEvent.EventType {
-  var toKB: KBEvent.EventType? {
+extension NSEvent.EventType {
+  public var toKB: KBEvent.EventType? {
     switch self {
     case .flagsChanged: return .flagsChanged
     case .keyDown: return .keyDown
@@ -55,22 +55,22 @@ public extension NSEvent.EventType {
   }
 }
 
-public extension NSEvent.ModifierFlags {
-  var toKB: KBEvent.ModifierFlags {
+extension NSEvent.ModifierFlags {
+  public var toKB: KBEvent.ModifierFlags {
     .init(rawValue: rawValue)
   }
 }
 
 // MARK: - KBEvent - Translating to NSEvent
 
-public extension KBEvent? {
-  var copyAsNSEvent: NSEvent? {
+extension KBEvent? {
+  public var copyAsNSEvent: NSEvent? {
     self?.copyAsNSEvent ?? nil
   }
 }
 
-public extension KBEvent {
-  var copyAsNSEvent: NSEvent? {
+extension KBEvent {
+  public var copyAsNSEvent: NSEvent? {
     NSEvent.keyEvent(
       with: type.toNS,
       location: .zero,
@@ -86,8 +86,8 @@ public extension KBEvent {
   }
 }
 
-public extension KBEvent.EventType {
-  var toNS: NSEvent.EventType {
+extension KBEvent.EventType {
+  public var toNS: NSEvent.EventType {
     switch self {
     case .flagsChanged: return .flagsChanged
     case .keyDown: return .keyDown
@@ -96,8 +96,8 @@ public extension KBEvent.EventType {
   }
 }
 
-public extension KBEvent.ModifierFlags {
-  var toNS: NSEvent.ModifierFlags {
+extension KBEvent.ModifierFlags {
+  public var toNS: NSEvent.ModifierFlags {
     .init(rawValue: rawValue)
   }
 }

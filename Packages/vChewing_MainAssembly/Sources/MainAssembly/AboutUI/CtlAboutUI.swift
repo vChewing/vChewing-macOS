@@ -11,12 +11,10 @@ import Shared
 import SwiftUI
 
 public class CtlAboutUI: NSWindowController, NSWindowDelegate {
-  public static var shared: CtlAboutUI?
-  private var viewController: NSViewController?
-  var useLegacyView: Bool = false
+  // MARK: Lifecycle
 
   public init(forceLegacy: Bool = false) {
-    useLegacyView = forceLegacy
+    self.useLegacyView = forceLegacy
     let newWindow = NSWindow(
       contentRect: CGRect(x: 401, y: 295, width: 577, height: 568),
       styleMask: [.titled, .closable, .miniaturizable],
@@ -24,7 +22,7 @@ public class CtlAboutUI: NSWindowController, NSWindowDelegate {
     )
     super.init(window: newWindow)
     guard #available(macOS 12, *), !useLegacyView else {
-      viewController = VwrAboutCocoa()
+      self.viewController = VwrAboutCocoa()
       viewController?.loadView()
       return
     }
@@ -33,6 +31,10 @@ public class CtlAboutUI: NSWindowController, NSWindowDelegate {
   required init?(coder: NSCoder) {
     super.init(coder: coder)
   }
+
+  // MARK: Public
+
+  public static var shared: CtlAboutUI?
 
   public static func show() {
     let forceLegacy = NSEvent.modifierFlags == .option
@@ -72,8 +74,17 @@ public class CtlAboutUI: NSWindowController, NSWindowDelegate {
     if #available(macOS 10.10, *) {
       window.titlebarAppearsTransparent = true
     }
-    window.title = "i18n:aboutWindow.ABOUT_APP_TITLE_FULL".localized + " (v\(IMEApp.appMainVersionLabel.joined(separator: " Build ")))"
+    window.title = "i18n:aboutWindow.ABOUT_APP_TITLE_FULL"
+      .localized + " (v\(IMEApp.appMainVersionLabel.joined(separator: " Build ")))"
   }
+
+  // MARK: Internal
+
+  var useLegacyView: Bool = false
+
+  // MARK: Private
+
+  private var viewController: NSViewController?
 
   @available(macOS 12, *)
   private func windowDidLoadSwiftUI() {
@@ -87,6 +98,7 @@ public class CtlAboutUI: NSWindowController, NSWindowDelegate {
         .fixedSize(horizontal: true, vertical: false)
         .ignoresSafeArea()
     )
-    window?.title = "i18n:aboutWindow.ABOUT_APP_TITLE_FULL".localized + " (v\(IMEApp.appMainVersionLabel.joined(separator: " Build ")))"
+    window?.title = "i18n:aboutWindow.ABOUT_APP_TITLE_FULL"
+      .localized + " (v\(IMEApp.appMainVersionLabel.joined(separator: " Build ")))"
   }
 }

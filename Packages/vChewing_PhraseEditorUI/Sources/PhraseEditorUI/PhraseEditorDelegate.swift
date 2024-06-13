@@ -13,10 +13,20 @@ import Shared
 public protocol PhraseEditorDelegate {
   var currentInputMode: Shared.InputMode { get }
   func retrieveData(mode: Shared.InputMode, type: LMAssembly.ReplacableUserDataType) -> String
-  @discardableResult func saveData(mode: Shared.InputMode, type: LMAssembly.ReplacableUserDataType, data: String)
+  @discardableResult
+  func saveData(
+    mode: Shared.InputMode,
+    type: LMAssembly.ReplacableUserDataType,
+    data: String
+  )
     -> String
-  func checkIfPhrasePairExists(userPhrase: String, mode: Shared.InputMode, key unigramKey: String) -> Bool
+  func checkIfPhrasePairExists(userPhrase: String, mode: Shared.InputMode, key unigramKey: String)
+    -> Bool
   func consolidate(text strProcessed: inout String, pragma shouldCheckPragma: Bool)
-  func openPhraseFile(mode: Shared.InputMode, type: LMAssembly.ReplacableUserDataType, using: FileOpenMethod)
+  func openPhraseFile(
+    mode: Shared.InputMode,
+    type: LMAssembly.ReplacableUserDataType,
+    using: FileOpenMethod
+  )
   func tagOverrides(in strProcessed: inout String, mode: Shared.InputMode)
 }

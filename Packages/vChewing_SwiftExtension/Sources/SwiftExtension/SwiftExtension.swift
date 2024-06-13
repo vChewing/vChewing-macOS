@@ -24,10 +24,10 @@ public func ^= (lhs: inout Bool, rhs: Bool) {
 
 // Extend the RangeReplaceableCollection to allow it clean duplicated characters.
 // Ref: https://stackoverflow.com/questions/25738817/
-public extension RangeReplaceableCollection where Element: Hashable {
+extension RangeReplaceableCollection where Element: Hashable {
   /// 去重複化。
   /// - Remark: 該方法不適合用來處理 class，除非該 class 遵循 Identifiable 協定。
-  var deduplicated: Self {
+  public var deduplicated: Self {
     var set = Set<Element>()
     return filter { set.insert($0).inserted }
   }
@@ -35,8 +35,8 @@ public extension RangeReplaceableCollection where Element: Hashable {
 
 // MARK: - Ensuring trailing slash of a string
 
-public extension String {
-  mutating func ensureTrailingSlash() {
+extension String {
+  public mutating func ensureTrailingSlash() {
     if !hasSuffix("/") {
       self += "/"
     }
@@ -45,8 +45,8 @@ public extension String {
 
 // MARK: - CharCode printability check
 
-public extension Unicode.Scalar {
-  var isPrintableASCII: Bool {
+extension Unicode.Scalar {
+  public var isPrintableASCII: Bool {
     (32 ... 126).contains(value)
   }
 }
@@ -54,16 +54,15 @@ public extension Unicode.Scalar {
 // MARK: - Stable Sort Extension
 
 // Ref: https://stackoverflow.com/a/50545761/4162914
-public extension Sequence {
+extension Sequence {
   /// Return a stable-sorted collection.
   ///
   /// - Parameter areInIncreasingOrder: Return nil when two element are equal.
   /// - Returns: The sorted collection.
-  func stableSort(
+  public func stableSort(
     by areInIncreasingOrder: (Element, Element) throws -> Bool
   )
-    rethrows -> [Element]
-  {
+    rethrows -> [Element] {
     try enumerated()
       .sorted { a, b -> Bool in
         try areInIncreasingOrder(a.element, b.element)
@@ -75,13 +74,13 @@ public extension Sequence {
 
 // MARK: - Return toggled value.
 
-public extension Bool {
-  mutating func toggled() -> Bool {
+extension Bool {
+  public mutating func toggled() -> Bool {
     toggle()
     return self
   }
 
-  static func from(integer: Int) -> Bool {
+  public static func from(integer: Int) -> Bool {
     integer > 0 ? true : false
   }
 }
@@ -89,15 +88,15 @@ public extension Bool {
 // MARK: - 引入小數點位數控制函式
 
 // Ref: https://stackoverflow.com/a/32581409/4162914
-public extension Double {
-  func rounded(toPlaces places: Int) -> Double {
+extension Double {
+  public func rounded(toPlaces places: Int) -> Double {
     let divisor = 10.0.mathPowered(by: places)
     return (self * divisor).rounded() / divisor
   }
 }
 
-public extension Double {
-  func mathPowered(by operand: Int) -> Double {
+extension Double {
+  public func mathPowered(by operand: Int) -> Double {
     var target = self
     for _ in 0 ..< operand {
       target = target * target
@@ -108,19 +107,19 @@ public extension Double {
 
 // MARK: - String CharName and CodePoint Extension
 
-public extension String {
-  var charDescriptions: [String] {
+extension String {
+  public var charDescriptions: [String] {
     flatMap(\.unicodeScalars).compactMap {
       let theName: String = $0.properties.name ?? ""
       return String(format: "U+%02X %@", $0.value, theName)
     }
   }
 
-  var codePoints: [String] {
+  public var codePoints: [String] {
     map(\.codePoint)
   }
 
-  var describedAsCodePoints: [String] {
+  public var describedAsCodePoints: [String] {
     map {
       "\($0) (\($0.codePoint))"
     }
@@ -129,8 +128,8 @@ public extension String {
 
 // MARK: - Character Codepoint
 
-public extension Character {
-  var codePoint: String {
+extension Character {
+  public var codePoint: String {
     guard let value = unicodeScalars.first?.value else { return "U+NULL" }
     return String(format: "U+%02X", value)
   }
@@ -138,16 +137,16 @@ public extension Character {
 
 // MARK: - String Ellipsis Extension
 
-public extension String {
-  var withEllipsis: String { self + "…" }
+extension String {
+  public var withEllipsis: String { self + "…" }
 }
 
 // MARK: - Index Revolver (only for Array)
 
 // Further discussion: https://forums.swift.org/t/62847
 
-public extension Array {
-  func revolvedIndex(_ id: Int, clockwise: Bool = true, steps: Int = 1) -> Int {
+extension Array {
+  public func revolvedIndex(_ id: Int, clockwise: Bool = true, steps: Int = 1) -> Int {
     if id < 0 || steps < 1 { return id }
     var result = id
     func revolvedIndexByOneStep(_ id: Int, clockwise: Bool = true) -> Int {
@@ -162,8 +161,8 @@ public extension Array {
   }
 }
 
-public extension Int {
-  mutating func revolveAsIndex(with target: [Any], clockwise: Bool = true, steps: Int = 1) {
+extension Int {
+  public mutating func revolveAsIndex(with target: [Any], clockwise: Bool = true, steps: Int = 1) {
     if self < 0 || steps < 1 { return }
     self = target.revolvedIndex(self, clockwise: clockwise, steps: steps)
   }
@@ -171,8 +170,8 @@ public extension Int {
 
 // MARK: - Overlap Checker (for two sets)
 
-public extension Set where Element: Hashable {
-  func isOverlapped(with target: Set<Element>) -> Bool {
+extension Set where Element: Hashable {
+  public func isOverlapped(with target: Set<Element>) -> Bool {
     guard !target.isEmpty, !isEmpty else { return false }
     var container: (Set<Element>, Set<Element>)
     if target.count <= count {
@@ -186,22 +185,22 @@ public extension Set where Element: Hashable {
     return false
   }
 
-  func isOverlapped(with target: [Element]) -> Bool {
+  public func isOverlapped(with target: [Element]) -> Bool {
     isOverlapped(with: Set(target))
   }
 }
 
-public extension Array where Element: Hashable {
-  func isOverlapped(with target: [Element]) -> Bool {
+extension Array where Element: Hashable {
+  public func isOverlapped(with target: [Element]) -> Bool {
     Set(self).isOverlapped(with: Set(target))
   }
 
-  func isOverlapped(with target: Set<Element>) -> Bool {
+  public func isOverlapped(with target: Set<Element>) -> Bool {
     Set(self).isOverlapped(with: target)
   }
 }
 
-// MARK: - Array Builder.
+// MARK: - ArrayBuilder
 
 @resultBuilder
 public enum ArrayBuilder<OutputModel> {
@@ -236,13 +235,21 @@ public enum ArrayBuilder<OutputModel> {
 
 // MARK: - Extending Comparable to let it able to find its neighbor values in any collection.
 
-public extension Comparable {
-  func findNeighborValue(from givenSeq: any Collection<Self>, greater isGreater: Bool) -> Self? {
-    let givenArray: [Self] = isGreater ? Array(givenSeq.sorted()) : Array(givenSeq.sorted().reversed())
+extension Comparable {
+  public func findNeighborValue(
+    from givenSeq: any Collection<Self>,
+    greater isGreater: Bool
+  )
+    -> Self? {
+    let givenArray: [Self] = isGreater ? Array(givenSeq.sorted()) :
+      Array(givenSeq.sorted().reversed())
     let givenMap: [Int: Self] = .init(uniqueKeysWithValues: Array(givenArray.enumerated()))
     var (startID, endID, returnableID) = (0, givenArray.count - 1, -1)
     func internalCompare(_ lhs: Self, _ rhs: Self) -> Bool { isGreater ? lhs <= rhs : lhs >= rhs }
-    while let startObj = givenMap[startID], let endObj = givenMap[endID], internalCompare(startObj, endObj) {
+    while let startObj = givenMap[startID], let endObj = givenMap[endID], internalCompare(
+      startObj,
+      endObj
+    ) {
       let midID = (startID + endID) / 2
       if let midObj = givenMap[midID], internalCompare(midObj, self) {
         startID = midID + 1
@@ -257,9 +264,9 @@ public extension Comparable {
 
 // MARK: - String.applyingTransform
 
-public extension String {
+extension String {
   /// This only works with ASCII chars for now.
-  func applyingTransformFW2HW(reverse: Bool) -> String {
+  public func applyingTransformFW2HW(reverse: Bool) -> String {
     var arr: [Character] = map { $0 }
     for i in 0 ..< arr.count {
       let oldChar = arr[i]
@@ -270,7 +277,8 @@ public extension String {
       } else {
         guard oldCodePoint > 0xFEE0 || oldCodePoint == 0x3000 else { continue }
       }
-      var newCodePoint: Int32 = reverse ? (Int32(oldCodePoint) + 0xFEE0) : (Int32(oldCodePoint) - 0xFEE0)
+      var newCodePoint: Int32 = reverse ? (Int32(oldCodePoint) + 0xFEE0) :
+        (Int32(oldCodePoint) - 0xFEE0)
       checkSpace: switch (oldCodePoint, reverse) {
       case (0x3000, false): newCodePoint = 0x20
       case (0x20, true): newCodePoint = 0x3000

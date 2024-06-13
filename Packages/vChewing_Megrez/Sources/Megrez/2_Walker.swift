@@ -3,7 +3,7 @@
 // ====================
 // This code is released under the MIT license (SPDX-License-Identifier: MIT)
 
-public extension Megrez.Compositor {
+extension Megrez.Compositor {
   /// 爬軌函式，會更新當前組字器的 walkedNodes。
   ///
   /// 找到軌格陣圖內權重最大的路徑。該路徑代表了可被觀測到的最可能的隱藏事件鏈。
@@ -17,7 +17,8 @@ public extension Megrez.Compositor {
   /// 郭家寶（ByVoid）的《[基於統計語言模型的拼音輸入法](https://byvoid.com/zht/blog/slm_based_pinyin_ime/) 》；
   /// 再後來則是 2022 年中時期劉燈的 Gramambular 2 組字引擎。
   /// - Returns: 爬軌結果＋該過程是否順利執行。
-  @discardableResult mutating func walk() -> [Megrez.Node] {
+  @discardableResult
+  public mutating func walk() -> [Megrez.Node] {
     defer { Self.reinitVertexNetwork() }
     walkedNodes.removeAll()
     sortAndRelax()

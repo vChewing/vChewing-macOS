@@ -20,7 +20,7 @@ extension String {
   ///   - task: 要執行的外包任務。
   func parse(
     splitee separator: Element,
-    task: @escaping (_ theRange: Range<String.Index>) -> Void
+    task: @escaping (_ theRange: Range<String.Index>) -> ()
   ) {
     var startIndex = startIndex
     split(separator: separator).forEach { substring in
@@ -36,8 +36,8 @@ extension String {
 
 // This is only for reference and is not used in this assembly.
 
-private extension String {
-  func ranges(splitBy separator: Element) -> [Range<String.Index>] {
+extension String {
+  fileprivate func ranges(splitBy separator: Element) -> [Range<String.Index>] {
     var startIndex = startIndex
     return split(separator: separator).reduce(into: []) { ranges, substring in
       _ = range(of: substring, range: startIndex ..< endIndex).map { range in

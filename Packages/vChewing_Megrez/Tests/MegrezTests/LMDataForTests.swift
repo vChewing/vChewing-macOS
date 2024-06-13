@@ -5,10 +5,11 @@
 
 import Megrez
 
-// MARK: - 用以測試的語言模型（簡單範本型）
+// MARK: - SimpleLM
 
 class SimpleLM: LangModelProtocol {
-  var mutDatabase: [String: [Megrez.Unigram]] = [:]
+  // MARK: Lifecycle
+
   init(input: String, swapKeyValue: Bool = false) {
     let sstream = input.components(separatedBy: "\n")
     sstream.forEach { line in
@@ -23,6 +24,10 @@ class SimpleLM: LangModelProtocol {
       mutDatabase[swapKeyValue ? col1 : col0, default: []].append(u)
     }
   }
+
+  // MARK: Internal
+
+  var mutDatabase: [String: [Megrez.Unigram]] = [:]
 
   func unigramsFor(keyArray: [String]) -> [Megrez.Unigram] {
     if let f = mutDatabase[keyArray.joined()] {
@@ -46,6 +51,8 @@ class SimpleLM: LangModelProtocol {
     mutDatabase[key] = arr
   }
 }
+
+// MARK: - MockLM
 
 class MockLM: LangModelProtocol {
   func unigramsFor(keyArray: [String]) -> [Megrez.Unigram] {
