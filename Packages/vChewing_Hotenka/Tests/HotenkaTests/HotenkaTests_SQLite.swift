@@ -29,9 +29,10 @@ import XCTest
 
 @testable import Hotenka
 
-private let packageRootPath = URL(fileURLWithPath: #file).pathComponents.prefix(while: { $0 != "Tests" }).joined(
-  separator: "/"
-).dropFirst()
+private let packageRootPath = URL(fileURLWithPath: #file).pathComponents
+  .prefix(while: { $0 != "Tests" }).joined(
+    separator: "/"
+  ).dropFirst()
 
 private let testDataPath: String = packageRootPath + "/Tests/TestDictData/"
 
@@ -77,7 +78,8 @@ extension HotenkaTests {
       guard let dictID = DictType.match(rawKeyString: dictName)?.rawValue else { return }
       subDict.forEach { key, value in
         var ptrStatement: OpaquePointer?
-        let sqlInsertion = "INSERT INTO DATA_HOTENKA (dict, theKey, theValue) VALUES (\(dictID), '\(key)', '\(value)')"
+        let sqlInsertion =
+          "INSERT INTO DATA_HOTENKA (dict, theKey, theValue) VALUES (\(dictID), '\(key)', '\(value)')"
         assert(
           sqlite3_prepare_v2(
             ptrSQL, sqlInsertion, -1, &ptrStatement, nil

@@ -10,19 +10,23 @@ import AppKit
 import Foundation
 import Shared
 
-public extension SettingsPanesCocoa {
-  class Behavior: NSViewController {
-    var windowWidth: CGFloat { SettingsPanesCocoa.windowWidth }
-    var contentWidth: CGFloat { SettingsPanesCocoa.contentWidth }
-    var innerContentWidth: CGFloat { SettingsPanesCocoa.innerContentWidth }
-    var tabContainerWidth: CGFloat { SettingsPanesCocoa.tabContainerWidth }
-    var contentHalfWidth: CGFloat { SettingsPanesCocoa.contentHalfWidth }
+extension SettingsPanesCocoa {
+  public class Behavior: NSViewController {
+    // MARK: Public
 
     override public func loadView() {
       view = body ?? .init()
       (view as? NSStackView)?.alignment = .centerX
       view.makeSimpleConstraint(.width, relation: .equal, value: windowWidth)
     }
+
+    // MARK: Internal
+
+    var windowWidth: CGFloat { SettingsPanesCocoa.windowWidth }
+    var contentWidth: CGFloat { SettingsPanesCocoa.contentWidth }
+    var innerContentWidth: CGFloat { SettingsPanesCocoa.innerContentWidth }
+    var tabContainerWidth: CGFloat { SettingsPanesCocoa.tabContainerWidth }
+    var contentHalfWidth: CGFloat { SettingsPanesCocoa.contentHalfWidth }
 
     var body: NSView? {
       NSStackView.build(.vertical) {
@@ -61,10 +65,11 @@ public extension SettingsPanesCocoa {
               }
               UserDef.kAlwaysShowTooltipTextsHorizontally.render(fixWidth: innerContentWidth)
               if Date.isTodayTheDate(from: 0401) {
-                UserDef.kShouldNotFartInLieuOfBeep.render(fixWidth: innerContentWidth) { renderable in
-                  renderable.currentControl?.target = self
-                  renderable.currentControl?.action = #selector(self.onFartControlChange(_:))
-                }
+                UserDef.kShouldNotFartInLieuOfBeep
+                  .render(fixWidth: innerContentWidth) { renderable in
+                    renderable.currentControl?.target = self
+                    renderable.currentControl?.action = #selector(self.onFartControlChange(_:))
+                  }
               }
             }?.boxed()
             NSView()
@@ -72,7 +77,8 @@ public extension SettingsPanesCocoa {
           NSTabView.TabPage(title: "Ｄ") {
             NSStackView.buildSection(width: innerContentWidth) {
               UserDef.kBypassNonAppleCapsLockHandling.render(fixWidth: innerContentWidth)
-              UserDef.kShareAlphanumericalModeStatusAcrossClients.render(fixWidth: innerContentWidth)
+              UserDef.kShareAlphanumericalModeStatusAcrossClients
+                .render(fixWidth: innerContentWidth)
               if #available(macOS 10.15, *) {
                 NSStackView.build(.vertical) {
                   UserDef.kTogglingAlphanumericalModeWithLShift
@@ -87,7 +93,8 @@ public extension SettingsPanesCocoa {
                     }
                   var strOSReq = " "
                   strOSReq += String(
-                    format: "This feature requires macOS %@ and above.".localized, arguments: ["10.15"]
+                    format: "This feature requires macOS %@ and above.".localized,
+                    arguments: ["10.15"]
                   )
                   strOSReq += "\n"
                   strOSReq += "i18n:settings.shiftKeyASCIITogle.description".localized
@@ -103,18 +110,23 @@ public extension SettingsPanesCocoa {
       }
     }
 
-    @IBAction func syncShiftKeyUpChecker(_: NSControl) {
+    @IBAction
+    func syncShiftKeyUpChecker(_: NSControl) {
       print("Syncing ShiftKeyUpChecker configurations.")
-      SessionCtl.theShiftKeyDetector.toggleWithLShift = PrefMgr.shared.togglingAlphanumericalModeWithLShift
-      SessionCtl.theShiftKeyDetector.toggleWithRShift = PrefMgr.shared.togglingAlphanumericalModeWithRShift
+      SessionCtl.theShiftKeyDetector.toggleWithLShift = PrefMgr.shared
+        .togglingAlphanumericalModeWithLShift
+      SessionCtl.theShiftKeyDetector.toggleWithRShift = PrefMgr.shared
+        .togglingAlphanumericalModeWithRShift
     }
 
-    @IBAction func onFartControlChange(_: NSControl) {
+    @IBAction
+    func onFartControlChange(_: NSControl) {
       let content = String(
         format: NSLocalizedString(
           "You are about to uncheck this fart suppressor. You are responsible for all consequences lead by letting people nearby hear the fart sound come from your computer. We strongly advise against unchecking this in any public circumstance that prohibits NSFW netas.",
           comment: ""
-        ))
+        )
+      )
       let alert = NSAlert(error: NSLocalizedString("Warning", comment: ""))
       alert.informativeText = content
       alert.addButton(withTitle: NSLocalizedString("Uncheck", comment: ""))

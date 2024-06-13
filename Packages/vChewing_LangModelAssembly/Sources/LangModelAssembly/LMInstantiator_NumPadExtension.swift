@@ -9,8 +9,8 @@
 import Foundation
 import Megrez
 
-public extension LMAssembly.LMInstantiator {
-  func supplyNumPadUnigrams(key: String) -> [Megrez.Unigram] {
+extension LMAssembly.LMInstantiator {
+  public func supplyNumPadUnigrams(key: String) -> [Megrez.Unigram] {
     guard let status = config.numPadFWHWStatus else { return [] }
     let initials = "_NumPad_"
     guard key.hasPrefix(initials) else { return [] }

@@ -9,6 +9,8 @@ import AppKit
 import OSFrameworkImpl
 import SwiftUI
 
+// MARK: - VText
+
 @available(macOS 10.15, *)
 public struct VText: NSViewRepresentable {
   public var text: String?
@@ -24,6 +26,8 @@ public struct VText: NSViewRepresentable {
     nsView.text = text
   }
 }
+
+// MARK: - HText
 
 @available(macOS 10.15, *)
 public struct HText: NSViewRepresentable {
@@ -41,36 +45,10 @@ public struct HText: NSViewRepresentable {
   }
 }
 
+// MARK: - NSAttributedTextView
+
 public class NSAttributedTextView: NSView {
-  private static let sharedTextField: NSTextField = {
-    let result = NSTextField()
-    result.isSelectable = false
-    result.isEditable = false
-    result.isBordered = false
-    result.backgroundColor = .clear
-    result.allowsEditingTextAttributes = false
-    result.preferredMaxLayoutWidth = result.frame.width
-    return result
-  }()
-
-  public enum writingDirection: String {
-    case horizontal
-    case vertical
-    case verticalReversed
-  }
-
-  public var direction: writingDirection = .horizontal
-  public var fontSize: Double = NSFont.systemFontSize {
-    didSet {
-      attributes[.font] = NSFont.systemFont(ofSize: fontSize)
-    }
-  }
-
-  public var textColor: NSColor = .textColor {
-    didSet {
-      attributes[.foregroundColor] = textColor
-    }
-  }
+  // MARK: Lifecycle
 
   public init() {
     super.init(frame: .zero)
@@ -84,11 +62,50 @@ public class NSAttributedTextView: NSView {
     fatalError("init(coder:) has not been implemented")
   }
 
+  // MARK: Public
+
+  public enum writingDirection: String {
+    case horizontal
+    case vertical
+    case verticalReversed
+  }
+
+  public var direction: writingDirection = .horizontal
+  public var backgroundColor: NSColor = .controlBackgroundColor
+
+  public var attributes: [NSAttributedString.Key: Any] = [
+    .kern: 0,
+    .verticalGlyphForm: true,
+    .font: NSFont.systemFont(ofSize: NSFont.systemFontSize),
+    .foregroundColor: NSColor.textColor,
+    .paragraphStyle: {
+      let paragraphStyle = NSMutableParagraphStyle()
+      paragraphStyle.alignment = .left
+      return paragraphStyle
+    }(),
+  ]
+  public private(set) var currentRect: NSRect?
+
+  public var fontSize: Double = NSFont.systemFontSize {
+    didSet {
+      attributes[.font] = NSFont.systemFont(ofSize: fontSize)
+    }
+  }
+
+  public var textColor: NSColor = .textColor {
+    didSet {
+      attributes[.foregroundColor] = textColor
+    }
+  }
+
+  public var text: String? { didSet { ctFrame = nil } }
+
   public func attributedStringValue(areaCalculation: Bool = false) -> NSAttributedString {
     var newAttributes = attributes
     let isVertical: Bool = !(direction == .horizontal)
     newAttributes[.verticalGlyphForm] = isVertical
-    let newStyle: NSMutableParagraphStyle = newAttributes[.paragraphStyle] as! NSMutableParagraphStyle
+    let newStyle: NSMutableParagraphStyle =
+      newAttributes[.paragraphStyle] as! NSMutableParagraphStyle
     if #available(macOS 10.13, *) {
       newStyle.lineSpacing = isVertical ? (fontSize / -2) : fontSize * 0.1
       newStyle.maximumLineHeight = fontSize * 1.1
@@ -108,24 +125,8 @@ public class NSAttributedTextView: NSView {
     return attributedText
   }
 
-  public var backgroundColor: NSColor = .controlBackgroundColor
-
-  public var attributes: [NSAttributedString.Key: Any] = [
-    .kern: 0,
-    .verticalGlyphForm: true,
-    .font: NSFont.systemFont(ofSize: NSFont.systemFontSize),
-    .foregroundColor: NSColor.textColor,
-    .paragraphStyle: {
-      let paragraphStyle = NSMutableParagraphStyle()
-      paragraphStyle.alignment = .left
-      return paragraphStyle
-    }(),
-  ]
-  public var text: String? { didSet { ctFrame = nil } }
-  private var ctFrame: CTFrame?
-  public private(set) var currentRect: NSRect?
-
-  @discardableResult public func shrinkFrame() -> NSRect {
+  @discardableResult
+  public func shrinkFrame() -> NSRect {
     let attrString: NSAttributedString = {
       switch direction {
       case .horizontal: return attributedStringValue()
@@ -166,7 +167,8 @@ public class NSAttributedTextView: NSView {
     if #unavailable(macOS 10.10) {
       // 由於 NSGraphicsContext.current?.cgContext 僅對 macOS 10.10 Yosemite 開始的系統開放，
       // 所以這裡必須直接從記憶體位置拿取原始資料來處理。
-      let contextPtr: Unmanaged<CGContext>? = Unmanaged.fromOpaque(currentNSGraphicsContext.graphicsPort)
+      let contextPtr: Unmanaged<CGContext>? = Unmanaged
+        .fromOpaque(currentNSGraphicsContext.graphicsPort)
       let theContext: CGContext? = contextPtr?.takeUnretainedValue()
       guard let theContext = theContext else { return }
       CTFrameDraw(newFrame, theContext)
@@ -174,14 +176,32 @@ public class NSAttributedTextView: NSView {
       CTFrameDraw(newFrame, currentNSGraphicsContext.cgContext)
     }
   }
+
+  // MARK: Private
+
+  private static let sharedTextField: NSTextField = {
+    let result = NSTextField()
+    result.isSelectable = false
+    result.isEditable = false
+    result.isBordered = false
+    result.backgroundColor = .clear
+    result.allowsEditingTextAttributes = false
+    result.preferredMaxLayoutWidth = result.frame.width
+    return result
+  }()
+
+  private var ctFrame: CTFrame?
 }
+
+// MARK: - NSAttributedTooltipTextView
 
 public class NSAttributedTooltipTextView: NSAttributedTextView {
   override public func attributedStringValue(areaCalculation: Bool = false) -> NSAttributedString {
     var newAttributes = attributes
     let isVertical: Bool = !(direction == .horizontal)
     newAttributes[.verticalGlyphForm] = isVertical
-    let newStyle: NSMutableParagraphStyle = newAttributes[.paragraphStyle] as! NSMutableParagraphStyle
+    let newStyle: NSMutableParagraphStyle =
+      newAttributes[.paragraphStyle] as! NSMutableParagraphStyle
     if #available(macOS 10.13, *) {
       newStyle.lineSpacing = isVertical ? (fontSize / -2) : fontSize * 0.1
       newStyle.maximumLineHeight = fontSize * 1.1

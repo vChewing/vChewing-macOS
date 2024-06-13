@@ -13,6 +13,8 @@ import OSFrameworkImpl
 import Shared
 import XCTest
 
+// MARK: - MainAssemblyTests
+
 class MainAssemblyTests: XCTestCase {
   func testView() throws {
     let testCtl: testController = .init()
@@ -30,8 +32,11 @@ class MainAssemblyTests: XCTestCase {
   }
 }
 
+// MARK: - testController
+
 class testController: NSWindowController {
-  var attrView: NSAttributedTextView
+  // MARK: Lifecycle
+
   init() {
     let contentRect = NSRect(x: 128.0, y: 128.0, width: 300.0, height: 20.0)
     let styleMask: NSWindow.StyleMask = [.borderless, .nonactivatingPanel]
@@ -46,7 +51,7 @@ class testController: NSWindowController {
     panel.contentView?.wantsLayer = true
     panel.contentView?.layer?.cornerRadius = 7
     panel.contentView?.layer?.backgroundColor = NSColor.controlBackgroundColor.cgColor
-    attrView = NSAttributedTextView()
+    self.attrView = NSAttributedTextView()
     attrView.backgroundColor = NSColor.clear
     attrView.textColor = NSColor.textColor
     attrView.needsDisplay = true
@@ -59,4 +64,8 @@ class testController: NSWindowController {
   required init?(coder _: NSCoder) {
     fatalError("init(coder:) has not been implemented")
   }
+
+  // MARK: Internal
+
+  var attrView: NSAttributedTextView
 }

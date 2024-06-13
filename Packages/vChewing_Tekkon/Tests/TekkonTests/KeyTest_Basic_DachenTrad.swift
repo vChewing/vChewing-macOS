@@ -10,6 +10,8 @@ import XCTest
 
 @testable import Tekkon
 
+// MARK: - TekkonTestsKeyboardArrangments
+
 final class TekkonTestsKeyboardArrangments: XCTestCase {
   static func checkEq(
     _ counter: inout Int,
@@ -47,9 +49,9 @@ final class TekkonTestsKeyboardArrangments: XCTestCase {
   }
 }
 
-internal extension Tekkon.Composer {
+extension Tekkon.Composer {
   // Exactly "convertSequenceToRawComposition()" but with shorter symbol name.
-  mutating func cS2RC(_ givenSequence: String = "") -> String {
+  internal mutating func cS2RC(_ givenSequence: String = "") -> String {
     receiveSequence(givenSequence)
   }
 }

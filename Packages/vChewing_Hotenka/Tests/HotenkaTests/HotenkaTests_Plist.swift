@@ -28,11 +28,14 @@ import XCTest
 
 @testable import Hotenka
 
-private let packageRootPath = URL(fileURLWithPath: #file).pathComponents.prefix(while: { $0 != "Tests" }).joined(
-  separator: "/"
-).dropFirst()
+private let packageRootPath = URL(fileURLWithPath: #file).pathComponents
+  .prefix(while: { $0 != "Tests" }).joined(
+    separator: "/"
+  ).dropFirst()
 
 private let testDataPath: String = packageRootPath + "/Tests/TestDictData/"
+
+// MARK: - HotenkaTests
 
 final class HotenkaTests: XCTestCase {
   func testGeneratingPlist() throws {
@@ -40,8 +43,13 @@ final class HotenkaTests: XCTestCase {
     let testInstance: HotenkaChineseConverter = .init(dictDir: testDataPath)
     NSLog("// Loading complete. Generating plist dict file.")
     do {
-      try PropertyListSerialization.data(fromPropertyList: testInstance.dict, format: .binary, options: 0).write(
-        to: URL(fileURLWithPath: testDataPath + "convdict.plist"))
+      try PropertyListSerialization.data(
+        fromPropertyList: testInstance.dict,
+        format: .binary,
+        options: 0
+      ).write(
+        to: URL(fileURLWithPath: testDataPath + "convdict.plist")
+      )
     } catch {
       NSLog("// Error on writing strings to file: \(error)")
     }

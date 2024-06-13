@@ -13,6 +13,18 @@ import SwiftUI
 
 @available(macOS 10.15, *)
 public struct UserDefRenderable<Value>: Identifiable {
+  // MARK: Lifecycle
+
+  public init(_ userDef: UserDef, binding: Binding<Value>) {
+    self.def = userDef
+    self.binding = binding
+    self.options = (def.metaData?.options ?? [:]).sorted(by: { $0.key < $1.key })
+  }
+
+  // MARK: Public
+
+  public typealias RawFormat = (key: UserDef, value: Binding<Value>)
+
   public let def: UserDef
   public let binding: Binding<Value>
   public let options: [Dictionary<Int, String>.Element]
@@ -20,22 +32,14 @@ public struct UserDefRenderable<Value>: Identifiable {
   public var id: String { def.rawValue }
   public var metaData: UserDef.MetaData? { def.metaData }
 
-  public init(_ userDef: UserDef, binding: Binding<Value>) {
-    def = userDef
-    self.binding = binding
-    options = (def.metaData?.options ?? [:]).sorted(by: { $0.key < $1.key })
+  public var hasInlineDescription: Bool {
+    guard let meta = def.metaData else { return false }
+    return meta.description != nil || meta.inlinePrompt != nil || meta.minimumOS > 10.9
   }
-
-  public typealias RawFormat = (key: UserDef, value: Binding<Value>)
 
   @ViewBuilder
   public func render() -> some View {
     EmptyView()
-  }
-
-  public var hasInlineDescription: Bool {
-    guard let meta = def.metaData else { return false }
-    return meta.description != nil || meta.inlinePrompt != nil || meta.minimumOS > 10.9
   }
 
   @ViewBuilder
@@ -53,20 +57,27 @@ public struct UserDefRenderable<Value>: Identifiable {
       }
       if metaData.minimumOS > 10.9 {
         Group {
-          Text(" ") + Text(LocalizedStringKey("This feature requires macOS \(metaData.minimumOS.description) and above."))
+          Text(" ") +
+            Text(
+              LocalizedStringKey(
+                "This feature requires macOS \(metaData.minimumOS.description) and above."
+              )
+            )
         }.settingsDescription()
       }
     }
   }
 }
 
-public extension UserDefRenderable<Any> {
-  func batch(_ input: [RawFormat]) -> [UserDefRenderable<Value>] {
+extension UserDefRenderable<Any> {
+  public func batch(_ input: [RawFormat]) -> [UserDefRenderable<Value>] {
     input.compactMap { metaPair in
       metaPair.key.bind(binding)
     }
   }
 }
+
+// MARK: - Identifiable + Identifiable
 
 extension [UserDefRenderable<Any>]: Identifiable {
   public var id: String { map(\.id).description }
@@ -74,8 +85,8 @@ extension [UserDefRenderable<Any>]: Identifiable {
 
 // MARK: - UserDef metaData Extension
 
-public extension UserDef {
-  func bind<Value>(_ binding: Binding<Value>) -> UserDefRenderable<Value> {
+extension UserDef {
+  public func bind<Value>(_ binding: Binding<Value>) -> UserDefRenderable<Value> {
     UserDefRenderable(self, binding: binding)
   }
 }
@@ -83,8 +94,8 @@ public extension UserDef {
 // MARK: - Private View Extension
 
 @available(macOS 10.15, *)
-private extension View {
-  func settingsDescription(maxWidth: CGFloat? = .infinity) -> some View {
+extension View {
+  fileprivate func settingsDescription(maxWidth: CGFloat? = .infinity) -> some View {
     controlSize(.small)
       .frame(maxWidth: maxWidth, alignment: .leading)
       // TODO: Use `.foregroundStyle` when targeting macOS 12.

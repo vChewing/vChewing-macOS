@@ -11,8 +11,11 @@ import SwiftExtension
 
 // MARK: - NSAlert
 
-public extension NSAlert {
-  func beginSheetModal(at window: NSWindow?, completionHandler handler: @escaping (NSApplication.ModalResponse) -> Void) {
+extension NSAlert {
+  public func beginSheetModal(
+    at window: NSWindow?,
+    completionHandler handler: @escaping (NSApplication.ModalResponse) -> ()
+  ) {
     if let window = window ?? NSApp.keyWindow {
       beginSheetModal(for: window, completionHandler: handler)
     } else {
@@ -23,8 +26,11 @@ public extension NSAlert {
 
 // MARK: - NSOpenPanel
 
-public extension NSOpenPanel {
-  func beginSheetModal(at window: NSWindow?, completionHandler handler: @escaping (NSApplication.ModalResponse) -> Void) {
+extension NSOpenPanel {
+  public func beginSheetModal(
+    at window: NSWindow?,
+    completionHandler handler: @escaping (NSApplication.ModalResponse) -> ()
+  ) {
     if let window = window ?? NSApp.keyWindow {
       beginSheetModal(for: window, completionHandler: handler)
     } else {
@@ -35,8 +41,8 @@ public extension NSOpenPanel {
 
 // MARK: - NSButton
 
-public extension NSButton {
-  convenience init(verbatim title: String, target: AnyObject?, action: Selector?) {
+extension NSButton {
+  public convenience init(verbatim title: String, target: AnyObject?, action: Selector?) {
     self.init()
     self.title = title
     self.target = target
@@ -44,27 +50,41 @@ public extension NSButton {
     bezelStyle = .rounded
   }
 
-  convenience init(_ title: String, target: AnyObject?, action: Selector?) {
+  public convenience init(_ title: String, target: AnyObject?, action: Selector?) {
     self.init(verbatim: title.localized, target: target, action: action)
   }
 }
 
 // MARK: - Convenient Constructor for NSEdgeInsets.
 
-public extension NSEdgeInsets {
-  static func new(all: CGFloat? = nil, top: CGFloat? = nil, bottom: CGFloat? = nil, left: CGFloat? = nil, right: CGFloat? = nil) -> NSEdgeInsets {
-    NSEdgeInsets(top: top ?? all ?? 0, left: left ?? all ?? 0, bottom: bottom ?? all ?? 0, right: right ?? all ?? 0)
+extension NSEdgeInsets {
+  public static func new(
+    all: CGFloat? = nil,
+    top: CGFloat? = nil,
+    bottom: CGFloat? = nil,
+    left: CGFloat? = nil,
+    right: CGFloat? = nil
+  )
+    -> NSEdgeInsets {
+    NSEdgeInsets(
+      top: top ?? all ?? 0,
+      left: left ?? all ?? 0,
+      bottom: bottom ?? all ?? 0,
+      right: right ?? all ?? 0
+    )
   }
 }
 
 // MARK: - Constrains and Box Container Modifier.
 
-public extension NSView {
-  @discardableResult func makeSimpleConstraint(
+extension NSView {
+  @discardableResult
+  public func makeSimpleConstraint(
     _ attribute: NSLayoutConstraint.Attribute,
     relation givenRelation: NSLayoutConstraint.Relation,
     value: CGFloat?
-  ) -> NSView {
+  )
+    -> NSView {
     translatesAutoresizingMaskIntoConstraints = false
     guard let givenValue = value, givenValue >= 0 else { return self }
     var handled = false
@@ -120,7 +140,7 @@ public extension NSView {
     return self
   }
 
-  func boxed(title: String = "") -> NSBox {
+  public func boxed(title: String = "") -> NSBox {
     let maxDimension = fittingSize
     let result = NSBox()
     result.title = title.localized
@@ -128,7 +148,10 @@ public extension NSView {
       result.titlePosition = .noTitle
     }
     let minWidth = Swift.max(maxDimension.width + 12, result.intrinsicContentSize.width)
-    let minHeight = Swift.max(maxDimension.height + result.titleRect.height + 14, result.intrinsicContentSize.height)
+    let minHeight = Swift.max(
+      maxDimension.height + result.titleRect.height + 14,
+      result.intrinsicContentSize.height
+    )
     result.makeSimpleConstraint(.width, relation: .greaterThanOrEqual, value: minWidth)
     result.makeSimpleConstraint(.height, relation: .greaterThanOrEqual, value: minHeight)
     result.contentView = self
@@ -141,18 +164,19 @@ public extension NSView {
 
 // MARK: - Stacks
 
-public extension NSStackView {
-  var requiresConstraintBasedLayout: Bool {
+extension NSStackView {
+  public var requiresConstraintBasedLayout: Bool {
     true
   }
 
-  static func buildSection(
+  public static func buildSection(
     _ orientation: NSUserInterfaceLayoutOrientation = .vertical,
     spacing: CGFloat? = nil,
     width: CGFloat? = nil,
     withDividers: Bool = true,
     @ArrayBuilder<NSView?> views: () -> [NSView?]
-  ) -> NSStackView? {
+  )
+    -> NSStackView? {
     let viewsRendered = views().compactMap {
       // 下述註解是用來協助偵錯的。
       // $0?.wantsLayer = true
@@ -163,16 +187,22 @@ public extension NSStackView {
     var itemWidth = width
     var splitterDelta: CGFloat = 4
     splitterDelta = withDividers ? splitterDelta : 0
-    if let width = width, orientation == .horizontal, viewsRendered.count > 0 {
+    if let width = width, orientation == .horizontal, !viewsRendered.isEmpty {
       itemWidth = (width - splitterDelta) / CGFloat(viewsRendered.count) - 6
     }
     func giveViews() -> [NSView?] { viewsRendered }
-    let result = build(orientation, divider: withDividers, spacing: spacing, width: itemWidth, views: giveViews)?
+    let result = build(
+      orientation,
+      divider: withDividers,
+      spacing: spacing,
+      width: itemWidth,
+      views: giveViews
+    )?
       .withInsets(.new(all: 4))
     return result
   }
 
-  static func build(
+  public static func build(
     _ orientation: NSUserInterfaceLayoutOrientation,
     divider: Bool = false,
     spacing: CGFloat? = nil,
@@ -180,7 +210,8 @@ public extension NSStackView {
     height: CGFloat? = nil,
     insets: NSEdgeInsets? = nil,
     @ArrayBuilder<NSView?> views: () -> [NSView?]
-  ) -> NSStackView? {
+  )
+    -> NSStackView? {
     let result = views().compactMap {
       $0?
         .makeSimpleConstraint(.width, relation: .equal, value: width)
@@ -190,19 +221,20 @@ public extension NSStackView {
     return result.stack(orientation, divider: divider, spacing: spacing)?.withInsets(insets)
   }
 
-  func withInsets(_ newValue: NSEdgeInsets?) -> NSStackView {
+  public func withInsets(_ newValue: NSEdgeInsets?) -> NSStackView {
     edgeInsets = newValue ?? edgeInsets
     return self
   }
 }
 
-public extension Array where Element == NSView {
-  func stack(
+extension Array where Element == NSView {
+  public func stack(
     _ orientation: NSUserInterfaceLayoutOrientation,
     divider: Bool = false,
     spacing: CGFloat? = nil,
     insets: NSEdgeInsets? = nil
-  ) -> NSStackView? {
+  )
+    -> NSStackView? {
     guard !isEmpty else { return nil }
     let outerStack = NSStackView()
     if #unavailable(macOS 10.11) {
@@ -238,11 +270,27 @@ public extension Array where Element == NSView {
       subView.layoutSubtreeIfNeeded()
       switch orientation {
       case .horizontal:
-        subView.makeSimpleConstraint(.height, relation: .greaterThanOrEqual, value: subView.intrinsicContentSize.height)
-        subView.makeSimpleConstraint(.width, relation: .greaterThanOrEqual, value: subView.intrinsicContentSize.width)
+        subView.makeSimpleConstraint(
+          .height,
+          relation: .greaterThanOrEqual,
+          value: subView.intrinsicContentSize.height
+        )
+        subView.makeSimpleConstraint(
+          .width,
+          relation: .greaterThanOrEqual,
+          value: subView.intrinsicContentSize.width
+        )
       case .vertical:
-        subView.makeSimpleConstraint(.width, relation: .greaterThanOrEqual, value: subView.intrinsicContentSize.width)
-        subView.makeSimpleConstraint(.height, relation: .greaterThanOrEqual, value: subView.intrinsicContentSize.height)
+        subView.makeSimpleConstraint(
+          .width,
+          relation: .greaterThanOrEqual,
+          value: subView.intrinsicContentSize.width
+        )
+        subView.makeSimpleConstraint(
+          .height,
+          relation: .greaterThanOrEqual,
+          value: subView.intrinsicContentSize.height
+        )
       @unknown default: break
       }
       subView.setContentCompressionResistancePriority(.defaultHigh, for: .horizontal)
@@ -264,8 +312,8 @@ public extension Array where Element == NSView {
 
 // MARK: - Make NSAttributedString into Label
 
-public extension NSAttributedString {
-  func makeNSLabel(fixWidth: CGFloat? = nil) -> NSTextField {
+extension NSAttributedString {
+  public func makeNSLabel(fixWidth: CGFloat? = nil) -> NSTextField {
     let textField = NSTextField()
     textField.attributedStringValue = self
     textField.isEditable = false
@@ -280,10 +328,18 @@ public extension NSAttributedString {
 
 // MARK: - Make String into Label
 
-public extension String {
-  func makeNSLabel(descriptive: Bool = false, localized: Bool = true, fixWidth: CGFloat? = nil) -> NSTextField {
+extension String {
+  public func makeNSLabel(
+    descriptive: Bool = false,
+    localized: Bool = true,
+    fixWidth: CGFloat? = nil
+  )
+    -> NSTextField {
     let rawAttributedString = NSMutableAttributedString(string: localized ? self.localized : self)
-    rawAttributedString.addAttributes([.kern: 0], range: .init(location: 0, length: rawAttributedString.length))
+    rawAttributedString.addAttributes(
+      [.kern: 0],
+      range: .init(location: 0, length: rawAttributedString.length)
+    )
     let textField = rawAttributedString.makeNSLabel(fixWidth: fixWidth)
     if descriptive {
       if #available(macOS 10.10, *) {
@@ -299,10 +355,9 @@ public extension String {
 
 // MARK: - NSTabView
 
-public extension NSTabView {
-  struct TabPage {
-    public let title: String
-    public let view: NSView
+extension NSTabView {
+  public struct TabPage {
+    // MARK: Lifecycle
 
     public init?(title: String, view: NSView?) {
       self.title = title
@@ -322,13 +377,19 @@ public extension NSTabView {
       func giveViews() -> [NSView?] { viewsRendered }
       let result = NSStackView.build(.vertical, insets: .new(all: 14, top: 0), views: giveViews)
       guard let result = result else { return nil }
-      view = result
+      self.view = result
     }
+
+    // MARK: Public
+
+    public let title: String
+    public let view: NSView
   }
 
-  static func build(
+  public static func build(
     @ArrayBuilder<TabPage?> pages: () -> [TabPage?]
-  ) -> NSTabView? {
+  )
+    -> NSTabView? {
     let tabPages = pages().compactMap { $0 }
     guard !tabPages.isEmpty else { return nil }
     let finalTabView = NSTabView()
@@ -350,8 +411,13 @@ public extension NSTabView {
 
 // MARK: - NSMenu
 
-public extension NSMenu {
-  @discardableResult func appendItems(_ target: AnyObject? = nil, @ArrayBuilder<NSMenuItem?> items: () -> [NSMenuItem?]) -> NSMenu {
+extension NSMenu {
+  @discardableResult
+  public func appendItems(
+    _ target: AnyObject? = nil,
+    @ArrayBuilder<NSMenuItem?> items: () -> [NSMenuItem?]
+  )
+    -> NSMenu {
     let theItems = items()
     for currentItem in theItems {
       guard let currentItem = currentItem else { continue }
@@ -363,7 +429,8 @@ public extension NSMenu {
     return self
   }
 
-  @discardableResult func propagateTarget(_ obj: AnyObject?) -> NSMenu {
+  @discardableResult
+  public func propagateTarget(_ obj: AnyObject?) -> NSMenu {
     for currentItem in items {
       currentItem.target = obj
       currentItem.submenu?.propagateTarget(obj)
@@ -371,23 +438,31 @@ public extension NSMenu {
     return self
   }
 
-  static func buildSubMenu(verbatim: String?, @ArrayBuilder<NSMenuItem?> items: () -> [NSMenuItem?]) -> NSMenuItem? {
+  public static func buildSubMenu(
+    verbatim: String?,
+    @ArrayBuilder<NSMenuItem?> items: () -> [NSMenuItem?]
+  )
+    -> NSMenuItem? {
     guard let verbatim = verbatim, !verbatim.isEmpty else { return nil }
     let newItem = NSMenu.Item(verbatim: verbatim)
     newItem?.submenu = .init(title: verbatim).appendItems(items: items)
     return newItem
   }
 
-  static func buildSubMenu(_ title: String?, @ArrayBuilder<NSMenuItem?> items: () -> [NSMenuItem?]) -> NSMenuItem? {
+  public static func buildSubMenu(
+    _ title: String?,
+    @ArrayBuilder<NSMenuItem?> items: () -> [NSMenuItem?]
+  )
+    -> NSMenuItem? {
     guard let title = title?.localized, !title.isEmpty else { return nil }
     return buildSubMenu(verbatim: title, items: items)
   }
 
-  typealias Item = NSMenuItem
+  public typealias Item = NSMenuItem
 }
 
-public extension Array where Element == NSMenuItem? {
-  func propagateTarget(_ obj: AnyObject?) {
+extension Array where Element == NSMenuItem? {
+  public func propagateTarget(_ obj: AnyObject?) {
     forEach { currentItem in
       guard let currentItem = currentItem else { return }
       currentItem.target = obj
@@ -396,54 +471,66 @@ public extension Array where Element == NSMenuItem? {
   }
 }
 
-public extension NSMenuItem {
-  convenience init?(verbatim: String?) {
+extension NSMenuItem {
+  public convenience init?(verbatim: String?) {
     guard let verbatim = verbatim, !verbatim.isEmpty else { return nil }
     self.init(title: verbatim, action: nil, keyEquivalent: "")
   }
 
-  convenience init?(_ title: String?) {
+  public convenience init?(_ title: String?) {
     guard let title = title?.localized, !title.isEmpty else { return nil }
     self.init(verbatim: title)
   }
 
-  @discardableResult func hotkey(_ keyEquivalent: String, mask: NSEvent.ModifierFlags? = nil) -> NSMenuItem {
+  @discardableResult
+  public func hotkey(
+    _ keyEquivalent: String,
+    mask: NSEvent.ModifierFlags? = nil
+  )
+    -> NSMenuItem {
     keyEquivalentModifierMask = mask ?? keyEquivalentModifierMask
     self.keyEquivalent = keyEquivalent
     return self
   }
 
-  @discardableResult func alternated(sure sured: Bool = true) -> NSMenuItem {
+  @discardableResult
+  public func alternated(sure sured: Bool = true) -> NSMenuItem {
     isAlternate = sured
     keyEquivalentModifierMask = .option
     return self
   }
 
-  @discardableResult func state(_ givenState: Bool) -> NSMenuItem {
+  @discardableResult
+  public func state(_ givenState: Bool) -> NSMenuItem {
     state = givenState ? .on : .off
     return self
   }
 
-  @discardableResult func act(_ action: Selector) -> NSMenuItem {
+  @discardableResult
+  public func act(_ action: Selector) -> NSMenuItem {
     self.action = action
     return self
   }
 
-  @discardableResult func nulled(_ condition: Bool) -> NSMenuItem? {
+  @discardableResult
+  public func nulled(_ condition: Bool) -> NSMenuItem? {
     condition ? nil : self
   }
 
-  @discardableResult func mask(_ flags: NSEvent.ModifierFlags) -> NSMenuItem {
+  @discardableResult
+  public func mask(_ flags: NSEvent.ModifierFlags) -> NSMenuItem {
     keyEquivalentModifierMask = flags
     return self
   }
 
-  @discardableResult func represent(_ object: Any?) -> NSMenuItem {
+  @discardableResult
+  public func represent(_ object: Any?) -> NSMenuItem {
     representedObject = object
     return self
   }
 
-  @discardableResult func tag(_ givenTag: Int?) -> NSMenuItem {
+  @discardableResult
+  public func tag(_ givenTag: Int?) -> NSMenuItem {
     guard let givenTag = givenTag else { return self }
     tag = givenTag
     return self
@@ -452,19 +539,15 @@ public extension NSMenuItem {
 
 // MARK: - NSFileDragRetrieverButton
 
-@objcMembers public class NSFileDragRetrieverButton: NSButton {
-  public var postDragHandler: ((URL) -> Void) = { url in
-    NSSound.beep()
-    print(url.description)
-  }
-
-  var allowedTypes: [String] = ["txt"]
+@objcMembers
+public class NSFileDragRetrieverButton: NSButton {
+  // MARK: Lifecycle
 
   public convenience init(
     _ givenTitle: String? = nil,
     target: AnyObject? = nil,
     action: Selector? = nil,
-    postDrag: ((URL) -> Void)? = nil
+    postDrag: ((URL) -> ())? = nil
   ) {
     self.init(
       verbatim: givenTitle?.localized,
@@ -478,7 +561,7 @@ public extension NSMenuItem {
     verbatim givenTitle: String? = nil,
     target: AnyObject? = nil,
     action: Selector? = nil,
-    postDrag: ((URL) -> Void)? = nil
+    postDrag: ((URL) -> ())? = nil
   ) {
     super.init(frame: .zero)
     bezelStyle = .rounded
@@ -486,16 +569,41 @@ public extension NSMenuItem {
     registerForDraggedTypes([.kUTTypeFileURL])
     self.target = target ?? self
     self.action = action
-    postDragHandler = postDrag ?? postDragHandler
+    self.postDragHandler = postDrag ?? postDragHandler
   }
 
   required init?(coder: NSCoder) {
     super.init(coder: coder)
   }
 
+  // MARK: Public
+
+  public var postDragHandler: ((URL) -> ()) = { url in
+    NSSound.beep()
+    print(url.description)
+  }
+
   override public func draggingEntered(_ sender: NSDraggingInfo) -> NSDragOperation {
     checkExtension(sender) ? .copy : NSDragOperation()
   }
+
+  override public func performDragOperation(_ sender: NSDraggingInfo) -> Bool {
+    guard let pasteboard = sender.draggingPasteboard.propertyList(
+      forType: NSPasteboard.PasteboardType.kNSFilenamesPboardType
+    ) as? [String], let path = pasteboard.first else {
+      print("failure")
+      return false
+    }
+
+    postDragHandler(URL(fileURLWithPath: path))
+    return true
+  }
+
+  // MARK: Internal
+
+  var allowedTypes: [String] = ["txt"]
+
+  // MARK: Fileprivate
 
   fileprivate func checkExtension(_ drag: NSDraggingInfo) -> Bool {
     guard let pasteboard = drag.draggingPasteboard.propertyList(
@@ -511,17 +619,5 @@ public extension NSMenuItem {
       }
     }
     return false
-  }
-
-  override public func performDragOperation(_ sender: NSDraggingInfo) -> Bool {
-    guard let pasteboard = sender.draggingPasteboard.propertyList(
-      forType: NSPasteboard.PasteboardType.kNSFilenamesPboardType
-    ) as? [String], let path = pasteboard.first else {
-      print("failure")
-      return false
-    }
-
-    postDragHandler(URL(fileURLWithPath: path))
-    return true
   }
 }

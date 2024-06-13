@@ -10,8 +10,10 @@
 
 import Foundation
 
-@objcMembers public class Broadcaster: NSObject {
+@objcMembers
+public class Broadcaster: NSObject {
   public static var shared = Broadcaster()
+
   public dynamic var eventForReloadingPhraseEditor = UUID()
   public dynamic var eventForClosingAllPanels = UUID()
 }

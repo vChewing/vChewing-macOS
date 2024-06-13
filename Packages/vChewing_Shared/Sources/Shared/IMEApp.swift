@@ -9,7 +9,7 @@
 import AppKit
 import Carbon
 
-// MARK: - Top-level Enums relating to Input Mode and Language Supports.
+// MARK: - IMEApp
 
 public enum IMEApp {
   // MARK: - 獲取輸入法的版本以及建置編號
@@ -19,9 +19,8 @@ public enum IMEApp {
   }()
 
   public static let appMainVersionLabel: [String] = {
-    guard
-      let intBuild = Bundle.main.infoDictionary?[kCFBundleVersionKey as String] as? String,
-      let strVer = Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String
+    guard let intBuild = Bundle.main.infoDictionary?[kCFBundleVersionKey as String] as? String,
+          let strVer = Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String
     else {
       return ["1.14.514", "19190810"]
     }
@@ -32,7 +31,10 @@ public enum IMEApp {
   public static let appSignedDateLabel: String = {
     let maybeDateModified: Date? = {
       guard let executableURL = Bundle.main.executableURL,
-            let infoDate = (try? executableURL.resourceValues(forKeys: [.contentModificationDateKey]))?.contentModificationDate
+            let infoDate = (
+              try? executableURL
+                .resourceValues(forKeys: [.contentModificationDateKey])
+            )?.contentModificationDate
       else {
         return nil
       }
@@ -72,8 +74,8 @@ public enum IMEApp {
   }
 }
 
-public extension Date {
-  var stringTag: String {
+extension Date {
+  public var stringTag: String {
     let dateFormatter = DateFormatter()
     dateFormatter.dateFormat = "yyyyMMdd.HHmm"
     dateFormatter.timeZone = .init(secondsFromGMT: +28800) ?? .current

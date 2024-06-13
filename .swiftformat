@@ -33,8 +33,8 @@ redundantRawValues,               \
 redundantType,                    \
 redundantVoidReturnType,          \
 semicolons,                       \
-sortedImports,                    \
-sortedSwitchCases,                \
+sortImports,                    \
+sortSwitchCases,                \
 spaceAroundBraces,                \
 spaceAroundBrackets,              \
 spaceAroundComments,              \
@@ -102,3 +102,8 @@ strongifiedSelf
 --exclude Pods,**/UNTESTED_TODO,vendor,fastlane
 
 # https://github.com/NoemiRozpara/Google-SwiftFormat-Config
+
+# vChewing-specific settings:
+
+ --disable preferForLoop
+ 

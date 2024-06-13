@@ -10,73 +10,7 @@ import AppKit
 import Shared
 
 public class TooltipUI_EarlyCocoa: NSWindowController, TooltipUIProtocol {
-  @objc var observation: NSKeyValueObservation?
-  private var messageText: NSTextField
-  private var tooltip: String = "" {
-    didSet {
-      var text = tooltip
-      if direction == .vertical {
-        text = text.replacingOccurrences(of: "˙", with: "･")
-        text = text.replacingOccurrences(of: "\u{A0}", with: "　")
-        text = text.replacingOccurrences(of: "+", with: "")
-        text = text.replacingOccurrences(of: "Shift", with: "⇧")
-        text = text.replacingOccurrences(of: "Control", with: "⌃")
-        text = text.replacingOccurrences(of: "Enter", with: "⏎")
-        text = text.replacingOccurrences(of: "Command", with: "⌘")
-        text = text.replacingOccurrences(of: "Delete", with: "⌦")
-        text = text.replacingOccurrences(of: "BackSpace", with: "⌫")
-        text = text.replacingOccurrences(of: "Space", with: "␣")
-        text = text.replacingOccurrences(of: "SHIFT", with: "⇧")
-        text = text.replacingOccurrences(of: "CONTROL", with: "⌃")
-        text = text.replacingOccurrences(of: "ENTER", with: "⏎")
-        text = text.replacingOccurrences(of: "COMMAND", with: "⌘")
-        text = text.replacingOccurrences(of: "DELETE", with: "⌦")
-        text = text.replacingOccurrences(of: "BACKSPACE", with: "⌫")
-        text = text.replacingOccurrences(of: "SPACE", with: "␣")
-      }
-
-      let attrString: NSMutableAttributedString = .init(string: text)
-      let verticalAttributes: [NSAttributedString.Key: Any] = [
-        .kern: 0,
-        .verticalGlyphForm: true,
-        .paragraphStyle: {
-          let newStyle = NSMutableParagraphStyle()
-          let fontSize = messageText.font?.pointSize ?? NSFont.systemFontSize
-          newStyle.lineSpacing = 1
-          newStyle.maximumLineHeight = fontSize
-          newStyle.minimumLineHeight = fontSize
-          return newStyle
-        }(),
-      ]
-
-      attrString.setAttributes(
-        [.kern: 0], range: NSRange(location: 0, length: attrString.length)
-      )
-
-      if direction == .vertical {
-        attrString.setAttributes(
-          verticalAttributes, range: NSRange(location: 0, length: attrString.length)
-        )
-      }
-
-      messageText.attributedStringValue = attrString
-      adjustSize()
-    }
-  }
-
-  private static var currentWindow: NSWindow? {
-    willSet {
-      currentWindow?.orderOut(nil)
-    }
-  }
-
-  public var direction: NSUserInterfaceLayoutOrientation = .horizontal {
-    didSet {
-      if #unavailable(macOS 10.14) {
-        direction = .horizontal
-      }
-    }
-  }
+  // MARK: Lifecycle
 
   public init() {
     let contentRect = NSRect(x: 128.0, y: 128.0, width: 300.0, height: 20.0)
@@ -92,7 +26,7 @@ public class TooltipUI_EarlyCocoa: NSWindowController, TooltipUIProtocol {
     panel.contentView?.wantsLayer = true
     panel.contentView?.layer?.cornerRadius = 7
     panel.contentView?.layer?.backgroundColor = NSColor.controlBackgroundColor.cgColor
-    messageText = NSTextField()
+    self.messageText = NSTextField()
     messageText.isEditable = false
     messageText.isSelectable = false
     messageText.isBezeled = false
@@ -106,14 +40,25 @@ public class TooltipUI_EarlyCocoa: NSWindowController, TooltipUIProtocol {
     Self.currentWindow = panel
     super.init(window: panel)
 
-    observation = Broadcaster.shared.observe(\.eventForClosingAllPanels, options: [.new]) { _, _ in
-      self.hide()
-    }
+    self.observation = Broadcaster.shared
+      .observe(\.eventForClosingAllPanels, options: [.new]) { _, _ in
+        self.hide()
+      }
   }
 
   @available(*, unavailable)
   public required init?(coder _: NSCoder) {
     fatalError("init(coder:) has not been implemented")
+  }
+
+  // MARK: Public
+
+  public var direction: NSUserInterfaceLayoutOrientation = .horizontal {
+    didSet {
+      if #unavailable(macOS 10.14) {
+        direction = .horizontal
+      }
+    }
   }
 
   public func show(
@@ -203,6 +148,73 @@ public class TooltipUI_EarlyCocoa: NSWindowController, TooltipUIProtocol {
   public func hide() {
     setColor(state: .normal)
     window?.orderOut(nil)
+  }
+
+  // MARK: Internal
+
+  @objc
+  var observation: NSKeyValueObservation?
+
+  // MARK: Private
+
+  private static var currentWindow: NSWindow? {
+    willSet {
+      currentWindow?.orderOut(nil)
+    }
+  }
+
+  private var messageText: NSTextField
+
+  private var tooltip: String = "" {
+    didSet {
+      var text = tooltip
+      if direction == .vertical {
+        text = text.replacingOccurrences(of: "˙", with: "･")
+        text = text.replacingOccurrences(of: "\u{A0}", with: "　")
+        text = text.replacingOccurrences(of: "+", with: "")
+        text = text.replacingOccurrences(of: "Shift", with: "⇧")
+        text = text.replacingOccurrences(of: "Control", with: "⌃")
+        text = text.replacingOccurrences(of: "Enter", with: "⏎")
+        text = text.replacingOccurrences(of: "Command", with: "⌘")
+        text = text.replacingOccurrences(of: "Delete", with: "⌦")
+        text = text.replacingOccurrences(of: "BackSpace", with: "⌫")
+        text = text.replacingOccurrences(of: "Space", with: "␣")
+        text = text.replacingOccurrences(of: "SHIFT", with: "⇧")
+        text = text.replacingOccurrences(of: "CONTROL", with: "⌃")
+        text = text.replacingOccurrences(of: "ENTER", with: "⏎")
+        text = text.replacingOccurrences(of: "COMMAND", with: "⌘")
+        text = text.replacingOccurrences(of: "DELETE", with: "⌦")
+        text = text.replacingOccurrences(of: "BACKSPACE", with: "⌫")
+        text = text.replacingOccurrences(of: "SPACE", with: "␣")
+      }
+
+      let attrString: NSMutableAttributedString = .init(string: text)
+      let verticalAttributes: [NSAttributedString.Key: Any] = [
+        .kern: 0,
+        .verticalGlyphForm: true,
+        .paragraphStyle: {
+          let newStyle = NSMutableParagraphStyle()
+          let fontSize = messageText.font?.pointSize ?? NSFont.systemFontSize
+          newStyle.lineSpacing = 1
+          newStyle.maximumLineHeight = fontSize
+          newStyle.minimumLineHeight = fontSize
+          return newStyle
+        }(),
+      ]
+
+      attrString.setAttributes(
+        [.kern: 0], range: NSRange(location: 0, length: attrString.length)
+      )
+
+      if direction == .vertical {
+        attrString.setAttributes(
+          verticalAttributes, range: NSRange(location: 0, length: attrString.length)
+        )
+      }
+
+      messageText.attributedStringValue = attrString
+      adjustSize()
+    }
   }
 
   private func adjustSize() {

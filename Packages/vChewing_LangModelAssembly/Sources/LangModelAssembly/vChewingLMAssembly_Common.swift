@@ -9,40 +9,52 @@
 import Foundation
 import SQLite3
 
+// MARK: - LMAssembly
+
 public enum LMAssembly {
-  enum FileErrors: Error {
-    case fileHandleError(String)
-  }
+  // MARK: Public
 
   public enum ReplacableUserDataType: String, CaseIterable, Identifiable {
-    public var id: ObjectIdentifier { .init(rawValue as AnyObject) }
-    public var localizedDescription: String { NSLocalizedString(rawValue, comment: "") }
-
     case thePhrases
     case theFilter
     case theReplacements
     case theAssociates
     case theSymbols
+
+    // MARK: Public
+
+    public var id: ObjectIdentifier { .init(rawValue as AnyObject) }
+    public var localizedDescription: String { NSLocalizedString(rawValue, comment: "") }
+  }
+
+  // MARK: Internal
+
+  enum FileErrors: Error {
+    case fileHandleError(String)
   }
 }
 
 // MARK: - String as SQL Command
 
 extension String {
-  @discardableResult func runAsSQLExec(dbPointer ptrDB: inout OpaquePointer?) -> Bool {
+  @discardableResult
+  func runAsSQLExec(dbPointer ptrDB: inout OpaquePointer?) -> Bool {
     ptrDB != nil && sqlite3_exec(ptrDB, self, nil, nil, nil) == SQLITE_OK
   }
 
-  @discardableResult func runAsSQLPreparedStep(dbPointer ptrDB: inout OpaquePointer?) -> Bool {
+  @discardableResult
+  func runAsSQLPreparedStep(dbPointer ptrDB: inout OpaquePointer?) -> Bool {
     guard ptrDB != nil else { return false }
     return performStatement { ptrStmt in
-      sqlite3_prepare_v2(ptrDB, self, -1, &ptrStmt, nil) == SQLITE_OK && sqlite3_step(ptrStmt) == SQLITE_DONE
+      sqlite3_prepare_v2(ptrDB, self, -1, &ptrStmt, nil) == SQLITE_OK && sqlite3_step(ptrStmt) ==
+        SQLITE_DONE
     }
   }
 }
 
 extension Array where Element == String {
-  @discardableResult func runAsSQLPreparedSteps(dbPointer ptrDB: inout OpaquePointer?) -> Bool {
+  @discardableResult
+  func runAsSQLPreparedSteps(dbPointer ptrDB: inout OpaquePointer?) -> Bool {
     guard ptrDB != nil else { return false }
     guard "begin;".runAsSQLExec(dbPointer: &ptrDB) else { return false }
     defer {
@@ -52,7 +64,10 @@ extension Array where Element == String {
 
     for strStmt in self {
       let thisResult = performStatement { ptrStmt in
-        sqlite3_prepare_v2(ptrDB, strStmt, -1, &ptrStmt, nil) == SQLITE_OK && sqlite3_step(ptrStmt) == SQLITE_DONE
+        sqlite3_prepare_v2(ptrDB, strStmt, -1, &ptrStmt, nil) == SQLITE_OK && sqlite3_step(
+          ptrStmt
+        ) ==
+          SQLITE_DONE
       }
       guard thisResult else {
         vCLMLog("SQL Query Error. Statement: \(strStmt)")
@@ -74,7 +89,7 @@ func performStatement(_ handler: (inout OpaquePointer?) -> Bool) -> Bool {
   return handler(&ptrStmt)
 }
 
-func performStatementSansResult(_ handler: (inout OpaquePointer?) -> Void) {
+func performStatementSansResult(_ handler: (inout OpaquePointer?) -> ()) {
   var ptrStmt: OpaquePointer?
   defer {
     sqlite3_finalize(ptrStmt)

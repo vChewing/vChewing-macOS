@@ -8,29 +8,15 @@
 
 import Megrez
 
+// MARK: - LMAssembly.LMCoreEX
+
 extension LMAssembly {
   /// 與之前的 LMCore 不同，LMCoreEX 不在辭典內記錄實體，而是記錄 range 範圍。
   /// 需要資料的時候，直接拿 range 去 strData 取資料。
   /// 資料記錄原理與上游 C++ 的 ParselessLM 差不多，但用的是 Swift 原生手段。
   /// 主要時間消耗仍在 For 迴圈，但這個算法可以顯著減少記憶體佔用。
   struct LMCoreEX {
-    public private(set) var filePath: String?
-    /// 資料庫辭典。索引內容為注音字串，資料內容則為字串首尾範圍、方便自 strData 取資料。
-    var rangeMap: [String: [Range<String.Index>]] = [:]
-    /// 資料庫追加辭典。
-    var temporaryMap: [String: [Megrez.Unigram]] = [:]
-    /// 資料庫字串陣列。
-    var strData: String = ""
-    /// 聲明原始檔案內第一、二縱列的內容是否彼此顛倒。
-    var shouldReverse = false
-    var allowConsolidation = false
-    /// 當某一筆資料內的權重資料毀損時，要施加的預設權重。
-    var defaultScore: Double = 0
-    /// 啟用該選項的話，會強制施加預設權重、而無視原始權重資料。
-    var shouldForceDefaultScore = false
-
-    /// 資料陣列內承載的資料筆數。
-    public var count: Int { rangeMap.count }
+    // MARK: Lifecycle
 
     /// 初期化該語言模型。
     ///
@@ -43,12 +29,19 @@ extension LMAssembly {
       reverse: Bool = false, consolidate: Bool = false, defaultScore scoreDefault: Double = 0,
       forceDefaultScore: Bool = false
     ) {
-      rangeMap = [:]
-      allowConsolidation = consolidate
-      shouldReverse = reverse
-      defaultScore = scoreDefault
-      shouldForceDefaultScore = forceDefaultScore
+      self.rangeMap = [:]
+      self.allowConsolidation = consolidate
+      self.shouldReverse = reverse
+      self.defaultScore = scoreDefault
+      self.shouldForceDefaultScore = forceDefaultScore
     }
+
+    // MARK: Public
+
+    public private(set) var filePath: String?
+
+    /// 資料陣列內承載的資料筆數。
+    public var count: Int { rangeMap.count }
 
     /// 檢測資料庫辭典內是否已經有載入的資料。
     public var isLoaded: Bool { !rangeMap.isEmpty }
@@ -56,7 +49,8 @@ extension LMAssembly {
     /// 將資料從檔案讀入至資料庫辭典內。
     /// - parameters:
     ///   - path: 給定路徑。
-    @discardableResult public mutating func open(_ path: String) -> Bool {
+    @discardableResult
+    public mutating func open(_ path: String) -> Bool {
       if isLoaded { return false }
 
       let oldPath = filePath
@@ -182,6 +176,22 @@ extension LMAssembly {
     public func hasUnigramsFor(key: String) -> Bool {
       rangeMap[key] != nil
     }
+
+    // MARK: Internal
+
+    /// 資料庫辭典。索引內容為注音字串，資料內容則為字串首尾範圍、方便自 strData 取資料。
+    var rangeMap: [String: [Range<String.Index>]] = [:]
+    /// 資料庫追加辭典。
+    var temporaryMap: [String: [Megrez.Unigram]] = [:]
+    /// 資料庫字串陣列。
+    var strData: String = ""
+    /// 聲明原始檔案內第一、二縱列的內容是否彼此顛倒。
+    var shouldReverse = false
+    var allowConsolidation = false
+    /// 當某一筆資料內的權重資料毀損時，要施加的預設權重。
+    var defaultScore: Double = 0
+    /// 啟用該選項的話，會強制施加預設權重、而無視原始權重資料。
+    var shouldForceDefaultScore = false
   }
 }
 

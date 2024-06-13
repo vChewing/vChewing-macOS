@@ -28,9 +28,10 @@ import XCTest
 
 @testable import Hotenka
 
-private let packageRootPath = URL(fileURLWithPath: #file).pathComponents.prefix(while: { $0 != "Tests" }).joined(
-  separator: "/"
-).dropFirst()
+private let packageRootPath = URL(fileURLWithPath: #file).pathComponents
+  .prefix(while: { $0 != "Tests" }).joined(
+    separator: "/"
+  ).dropFirst()
 
 private let testDataPath: String = packageRootPath + "/Tests/TestDictData/"
 

@@ -11,33 +11,17 @@ import Foundation
 import OSFrameworkImpl
 import Shared
 
+// MARK: - VwrServiceMenuEditor
+
 public class VwrServiceMenuEditor: NSViewController {
-  let windowWidth: CGFloat = 770
-  let contentWidth: CGFloat = 750
-  let tableHeight: CGFloat = 230
-
-  lazy var tblServices: NSTableView = .init()
-  lazy var btnShowInstructions = NSButton("How to Fill", target: self, action: #selector(btnShowInstructionsClicked(_:)))
-  lazy var btnAddService = NSFileDragRetrieverButton(
-    "Add Service",
-    target: self,
-    action: #selector(btnAddServiceClicked(_:)),
-    postDrag: handleDrag
-  )
-  lazy var btnRemoveService = NSButton("Remove Selected", target: self, action: #selector(btnRemoveServiceClicked(_:)))
-  lazy var btnResetService = NSButton("Reset Default", target: self, action: #selector(btnResetServiceClicked(_:)))
-  lazy var btnCopyAllToClipboard = NSButton("Copy All to Clipboard", target: self, action: #selector(btnCopyAllToClipboardClicked(_:)))
-  lazy var tableColumn1Cell = NSTextFieldCell()
-  lazy var tableColumn1 = NSTableColumn()
-  lazy var tableColumn2Cell = NSTextFieldCell()
-  lazy var tableColumn2 = NSTableColumn()
-
-  var windowController: NSWindowController?
+  // MARK: Lifecycle
 
   public convenience init(windowController: NSWindowController? = nil) {
     self.init()
     self.windowController = windowController
   }
+
+  // MARK: Public
 
   override public func loadView() {
     tblServices.reloadData()
@@ -46,6 +30,46 @@ public class VwrServiceMenuEditor: NSViewController {
     view.makeSimpleConstraint(.width, relation: .equal, value: windowWidth)
     btnRemoveService.keyEquivalent = .init(NSEvent.SpecialKey.delete.unicodeScalar)
   }
+
+  // MARK: Internal
+
+  let windowWidth: CGFloat = 770
+  let contentWidth: CGFloat = 750
+  let tableHeight: CGFloat = 230
+
+  lazy var tblServices: NSTableView = .init()
+  lazy var btnShowInstructions = NSButton(
+    "How to Fill",
+    target: self,
+    action: #selector(btnShowInstructionsClicked(_:))
+  )
+  lazy var btnAddService = NSFileDragRetrieverButton(
+    "Add Service",
+    target: self,
+    action: #selector(btnAddServiceClicked(_:)),
+    postDrag: handleDrag
+  )
+  lazy var btnRemoveService = NSButton(
+    "Remove Selected",
+    target: self,
+    action: #selector(btnRemoveServiceClicked(_:))
+  )
+  lazy var btnResetService = NSButton(
+    "Reset Default",
+    target: self,
+    action: #selector(btnResetServiceClicked(_:))
+  )
+  lazy var btnCopyAllToClipboard = NSButton(
+    "Copy All to Clipboard",
+    target: self,
+    action: #selector(btnCopyAllToClipboardClicked(_:))
+  )
+  lazy var tableColumn1Cell = NSTextFieldCell()
+  lazy var tableColumn1 = NSTableColumn()
+  lazy var tableColumn2Cell = NSTextFieldCell()
+  lazy var tableColumn2 = NSTableColumn()
+
+  var windowController: NSWindowController?
 
   var body: NSView? {
     NSStackView.build(.vertical, insets: .new(all: 14)) {
@@ -101,7 +125,8 @@ public class VwrServiceMenuEditor: NSViewController {
     if #available(macOS 11.0, *) { tblServices.style = .inset }
 
     tableColumn1.identifier = NSUserInterfaceItemIdentifier("colTitle")
-    tableColumn1.headerCell.title = "i18n:CandidateServiceMenuEditor.table.field.MenuTitle".localized
+    tableColumn1.headerCell.title = "i18n:CandidateServiceMenuEditor.table.field.MenuTitle"
+      .localized
     tableColumn1.maxWidth = 280
     tableColumn1.minWidth = 200
     tableColumn1.resizingMask = [.autoresizingMask, .userResizingMask]
@@ -137,8 +162,8 @@ public class VwrServiceMenuEditor: NSViewController {
 
 // MARK: - UserDefaults Handlers.
 
-public extension VwrServiceMenuEditor {
-  static var servicesList: [CandidateTextService] {
+extension VwrServiceMenuEditor {
+  public static var servicesList: [CandidateTextService] {
     get {
       PrefMgr.shared.candidateServiceMenuContents.parseIntoCandidateTextServiceStack()
     }
@@ -147,7 +172,7 @@ public extension VwrServiceMenuEditor {
     }
   }
 
-  static func removeService(at index: Int) {
+  public static func removeService(at index: Int) {
     guard index < Self.servicesList.count else { return }
     Self.servicesList.remove(at: index)
   }
@@ -163,12 +188,17 @@ extension VwrServiceMenuEditor {
 
   func reassureButtonAvailability() {
     btnRemoveService.isEnabled = (0 ..< Self.servicesList.count).contains(
-      tblServices.selectedRow)
+      tblServices.selectedRow
+    )
   }
 
   func handleDrag(_ givenURL: URL) {
     guard let string = try? String(contentsOf: givenURL) else { return }
-    Self.servicesList.append(contentsOf: string.components(separatedBy: .newlines).parseIntoCandidateTextServiceStack())
+    Self.servicesList
+      .append(
+        contentsOf: string.components(separatedBy: .newlines)
+          .parseIntoCandidateTextServiceStack()
+      )
     refresh()
   }
 }
@@ -176,18 +206,21 @@ extension VwrServiceMenuEditor {
 // MARK: - IBActions.
 
 extension VwrServiceMenuEditor {
-  @IBAction func btnShowInstructionsClicked(_: Any) {
+  @IBAction
+  func btnShowInstructionsClicked(_: Any) {
     let strTitle = "How to Fill".localized
     let strFillGuide = "i18n:CandidateServiceMenuEditor.formatGuide".localized
     windowController?.window.callAlert(title: strTitle, text: strFillGuide)
   }
 
-  @IBAction func btnResetServiceClicked(_: Any) {
+  @IBAction
+  func btnResetServiceClicked(_: Any) {
     PrefMgr.shared.candidateServiceMenuContents = PrefMgr.kDefaultCandidateServiceMenuItem
     tblServices.reloadData()
   }
 
-  @IBAction func btnCopyAllToClipboardClicked(_: Any) {
+  @IBAction
+  func btnCopyAllToClipboardClicked(_: Any) {
     var resultArrayLines = [String]()
     Self.servicesList.forEach { currentService in
       resultArrayLines.append("\(currentService.key)\t\(currentService.definedValue)")
@@ -197,7 +230,8 @@ extension VwrServiceMenuEditor {
     NSPasteboard.general.setString(result, forType: .string)
   }
 
-  @IBAction func btnRemoveServiceClicked(_: Any) {
+  @IBAction
+  func btnRemoveServiceClicked(_: Any) {
     guard let minIndexSelected = tblServices.selectedRowIndexes.min() else { return }
     if minIndexSelected >= Self.servicesList.count { return }
     if minIndexSelected < 0 { return }
@@ -212,13 +246,17 @@ extension VwrServiceMenuEditor {
       }
     }
     if isLastRow {
-      tblServices.selectRowIndexes(.init(arrayLiteral: minIndexSelected - 1), byExtendingSelection: false)
+      tblServices.selectRowIndexes(
+        .init(arrayLiteral: minIndexSelected - 1),
+        byExtendingSelection: false
+      )
     }
     tblServices.reloadData()
     btnRemoveService.isEnabled = (0 ..< Self.servicesList.count).contains(minIndexSelected)
   }
 
-  @IBAction func btnAddServiceClicked(_: Any) {
+  @IBAction
+  func btnAddServiceClicked(_: Any) {
     guard let window = windowController?.window else { return }
     let alert = NSAlert()
     alert.messageText = NSLocalizedString(
@@ -239,7 +277,12 @@ extension VwrServiceMenuEditor {
     scrollview.horizontalScroller?.scrollerStyle = .legacy
     scrollview.verticalScroller?.scrollerStyle = .legacy
     scrollview.autoresizingMask = [.width, .height]
-    let theTextView = NSTextView(frame: NSRect(x: 0, y: 0, width: contentSize.width, height: contentSize.height))
+    let theTextView = NSTextView(frame: NSRect(
+      x: 0,
+      y: 0,
+      width: contentSize.width,
+      height: contentSize.height
+    ))
     scrollview.documentView = theTextView
     theTextView.minSize = NSSize(width: 0.0, height: contentSize.height)
     theTextView.maxSize = NSSize(width: maxFloat, height: maxFloat)
@@ -259,7 +302,8 @@ extension VwrServiceMenuEditor {
     alert.beginSheetModal(at: window) { result in
       switch result {
       case .alertFirstButtonReturn:
-        let rawLines = theTextView.textContainer?.textView?.string.components(separatedBy: .newlines) ?? []
+        let rawLines = theTextView.textContainer?.textView?.string
+          .components(separatedBy: .newlines) ?? []
         self.tblServices.beginUpdates()
         Self.servicesList.append(contentsOf: rawLines.parseIntoCandidateTextServiceStack())
         self.tblServices.endUpdates()
@@ -269,7 +313,7 @@ extension VwrServiceMenuEditor {
   }
 }
 
-// MARK: - TableView Extensions.
+// MARK: NSTableViewDelegate, NSTableViewDataSource
 
 extension VwrServiceMenuEditor: NSTableViewDelegate, NSTableViewDataSource {
   public func numberOfRows(in _: NSTableView) -> Int {
@@ -283,7 +327,8 @@ extension VwrServiceMenuEditor: NSTableViewDelegate, NSTableViewDataSource {
   public func tableView(_: NSTableView, objectValueFor column: NSTableColumn?, row: Int) -> Any? {
     defer {
       self.btnRemoveService.isEnabled = (0 ..< Self.servicesList.count).contains(
-        self.tblServices.selectedRow)
+        self.tblServices.selectedRow
+      )
     }
     guard row < Self.servicesList.count else { return "" }
     if let column = column {
@@ -301,7 +346,8 @@ extension VwrServiceMenuEditor: NSTableViewDelegate, NSTableViewDataSource {
 
   public func tableView(
     _: NSTableView, pasteboardWriterForRow row: Int
-  ) -> NSPasteboardWriting? {
+  )
+    -> NSPasteboardWriting? {
     let pasteboard = NSPasteboardItem()
     pasteboard.setString(row.description, forType: .string)
     return pasteboard
@@ -312,7 +358,8 @@ extension VwrServiceMenuEditor: NSTableViewDelegate, NSTableViewDataSource {
     validateDrop _: NSDraggingInfo,
     proposedRow _: Int,
     proposedDropOperation _: NSTableView.DropOperation
-  ) -> NSDragOperation {
+  )
+    -> NSDragOperation {
     .move
   }
 
@@ -321,7 +368,8 @@ extension VwrServiceMenuEditor: NSTableViewDelegate, NSTableViewDataSource {
     acceptDrop info: NSDraggingInfo,
     row: Int,
     dropOperation _: NSTableView.DropOperation
-  ) -> Bool {
+  )
+    -> Bool {
     var oldIndexes = [Int]()
     info.enumerateDraggingItems(
       options: [],
@@ -330,7 +378,8 @@ extension VwrServiceMenuEditor: NSTableViewDelegate, NSTableViewDataSource {
       searchOptions: [:]
     ) { dragItem, _, _ in
       guard let pasteboardItem = dragItem.item as? NSPasteboardItem else { return }
-      guard let index = Int(pasteboardItem.string(forType: .string) ?? "NULL"), index >= 0 else { return }
+      guard let index = Int(pasteboardItem.string(forType: .string) ?? "NULL"),
+            index >= 0 else { return }
       oldIndexes.append(index)
     }
 

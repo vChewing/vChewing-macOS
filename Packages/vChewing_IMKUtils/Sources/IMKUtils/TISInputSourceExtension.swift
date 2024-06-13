@@ -11,17 +11,17 @@ import InputMethodKit
 
 // MARK: - TISInputSource Extension by The vChewing Project (MIT-NTL License).
 
-public extension TISInputSource {
-  struct KeyboardLayout: Identifiable {
+extension TISInputSource {
+  public struct KeyboardLayout: Identifiable {
     public var id: String
     public var titleLocalized: String
   }
 
-  static var allRegisteredInstancesOfThisInputMethod: [TISInputSource] {
+  public static var allRegisteredInstancesOfThisInputMethod: [TISInputSource] {
     TISInputSource.match(modeIDs: TISInputSource.modes)
   }
 
-  static var modes: [String] {
+  public static var modes: [String] {
     guard let components = Bundle.main.infoDictionary?["ComponentInputModeDict"] as? [String: Any],
           let tsInputModeListKey = components["tsInputModeListKey"] as? [String: Any]
     else {
@@ -30,7 +30,8 @@ public extension TISInputSource {
     return tsInputModeListKey.keys.map(\.description)
   }
 
-  @discardableResult static func registerInputMethod() -> Bool {
+  @discardableResult
+  public static func registerInputMethod() -> Bool {
     let instances = TISInputSource.allRegisteredInstancesOfThisInputMethod
     if instances.isEmpty {
       // 有實例尚未登記。執行登記手續。
@@ -51,15 +52,18 @@ public extension TISInputSource {
     return succeeded
   }
 
-  @discardableResult static func registerInputSource() -> Bool {
+  @discardableResult
+  public static func registerInputSource() -> Bool {
     TISRegisterInputSource(Bundle.main.bundleURL as CFURL) == noErr
   }
 
-  @discardableResult func activate() -> Bool {
+  @discardableResult
+  public func activate() -> Bool {
     TISEnableInputSource(self) == noErr
   }
 
-  @discardableResult func select() -> Bool {
+  @discardableResult
+  public func select() -> Bool {
     if !isSelectable {
       NSLog("Non-selectable: \(identifier)")
       return false
@@ -71,25 +75,35 @@ public extension TISInputSource {
     return true
   }
 
-  @discardableResult func deactivate() -> Bool {
+  @discardableResult
+  public func deactivate() -> Bool {
     TISDisableInputSource(self) == noErr
   }
 
-  var isActivated: Bool {
-    unsafeBitCast(TISGetInputSourceProperty(self, kTISPropertyInputSourceIsEnabled), to: CFBoolean.self)
+  public var isActivated: Bool {
+    unsafeBitCast(
+      TISGetInputSourceProperty(self, kTISPropertyInputSourceIsEnabled),
+      to: CFBoolean.self
+    )
       == kCFBooleanTrue
   }
 
-  var isSelectable: Bool {
-    unsafeBitCast(TISGetInputSourceProperty(self, kTISPropertyInputSourceIsSelectCapable), to: CFBoolean.self)
+  public var isSelectable: Bool {
+    unsafeBitCast(
+      TISGetInputSourceProperty(self, kTISPropertyInputSourceIsSelectCapable),
+      to: CFBoolean.self
+    )
       == kCFBooleanTrue
   }
 
-  var inputModeID: String {
-    unsafeBitCast(TISGetInputSourceProperty(self, kTISPropertyInputModeID), to: NSString.self) as String? ?? ""
+  public var inputModeID: String {
+    unsafeBitCast(
+      TISGetInputSourceProperty(self, kTISPropertyInputModeID),
+      to: NSString.self
+    ) as String? ?? ""
   }
 
-  var vChewingLocalizedName: String {
+  public var vChewingLocalizedName: String {
     switch identifier {
     case "com.apple.keylayout.ZhuyinBopomofo":
       return NSLocalizedString("Apple Zhuyin Bopomofo (Dachen)", comment: "")
@@ -105,16 +119,22 @@ public extension TISInputSource {
 // Ref: Original source codes are written in Swift 4 from Mzp's InputMethodKit textbook.
 // Note: Slightly modified by vChewing Project: Using Dictionaries when necessary.
 
-public extension TISInputSource {
-  var localizedName: String {
-    unsafeBitCast(TISGetInputSourceProperty(self, kTISPropertyLocalizedName), to: NSString.self) as String? ?? ""
+extension TISInputSource {
+  public var localizedName: String {
+    unsafeBitCast(
+      TISGetInputSourceProperty(self, kTISPropertyLocalizedName),
+      to: NSString.self
+    ) as String? ?? ""
   }
 
-  var identifier: String {
-    unsafeBitCast(TISGetInputSourceProperty(self, kTISPropertyInputSourceID), to: NSString.self) as String? ?? ""
+  public var identifier: String {
+    unsafeBitCast(
+      TISGetInputSourceProperty(self, kTISPropertyInputSourceID),
+      to: NSString.self
+    ) as String? ?? ""
   }
 
-  var scriptCode: Int {
+  public var scriptCode: Int {
     // Shiki's note: There is no "kTISPropertyScriptCode" in TextInputSources.h file.
     // Using Mzp's latest solution in his blog: https://mzp.hatenablog.com/entry/2018/07/16/212026
     let r = TISGetInputSourceProperty(self, "TSMInputSourcePropertyScriptCode" as CFString)
@@ -122,7 +142,12 @@ public extension TISInputSource {
   }
 
   // Refactored by Shiki Suen.
-  static func match(identifiers: [String] = [], modeIDs: [String] = [], onlyASCII: Bool = false) -> [TISInputSource] {
+  public static func match(
+    identifiers: [String] = [],
+    modeIDs: [String] = [],
+    onlyASCII: Bool = false
+  )
+    -> [TISInputSource] {
     let dicConditions: [CFString: Any] = !onlyASCII ? [:] : [
       kTISPropertyInputSourceType: kTISTypeKeyboardLayout as CFString,
       kTISPropertyInputSourceIsASCIICapable: kCFBooleanTrue as CFBoolean,
@@ -130,7 +155,10 @@ public extension TISInputSource {
     let cfDict = !onlyASCII ? nil : dicConditions as CFDictionary
     var resultStack: [TISInputSource] = []
     let unionedIDs = NSOrderedSet(array: modeIDs + identifiers).compactMap { $0 as? String }
-    let retrieved = (TISCreateInputSourceList(cfDict, true)?.takeRetainedValue() as? [TISInputSource]) ?? []
+    let retrieved = (
+      TISCreateInputSourceList(cfDict, true)?
+        .takeRetainedValue() as? [TISInputSource]
+    ) ?? []
     retrieved.forEach { tis in
       unionedIDs.forEach { id in
         guard tis.identifier == id || tis.inputModeID == id else { return }
@@ -147,14 +175,15 @@ public extension TISInputSource {
   }
 
   /// 備註：這是 Mzp 的原版函式，留在這裡當範本參考。上述的 .match() 函式都衍生自此。
-  static func rawTISInputSources(onlyASCII: Bool = false) -> [TISInputSource] {
+  public static func rawTISInputSources(onlyASCII: Bool = false) -> [TISInputSource] {
     // 為了指定檢索條件，先構築 CFDictionary 辭典。
     let dicConditions: [CFString: Any] = !onlyASCII ? [:] : [
       kTISPropertyInputSourceType: kTISTypeKeyboardLayout as CFString,
       kTISPropertyInputSourceIsASCIICapable: kCFBooleanTrue as CFBoolean,
     ]
     // 返回鍵盤配列清單。
-    var result = TISCreateInputSourceList(dicConditions as CFDictionary, true)?.takeRetainedValue() as? [TISInputSource] ?? .init()
+    var result = TISCreateInputSourceList(dicConditions as CFDictionary, true)?
+      .takeRetainedValue() as? [TISInputSource] ?? .init()
     if onlyASCII {
       result = result.filter { $0.scriptCode == 0 }
     }
@@ -162,15 +191,23 @@ public extension TISInputSource {
   }
 
   /// Derived from rawTISInputSources().
-  static func getAllTISInputKeyboardLayoutMap() -> [String: TISInputSource.KeyboardLayout] {
+  public static func getAllTISInputKeyboardLayoutMap() -> [String: TISInputSource.KeyboardLayout] {
     // 為了指定檢索條件，先構築 CFDictionary 辭典。
-    let dicConditions: [CFString: Any] = [kTISPropertyInputSourceType: kTISTypeKeyboardLayout as CFString]
+    let dicConditions: [CFString: Any] =
+      [kTISPropertyInputSourceType: kTISTypeKeyboardLayout as CFString]
     // 返回鍵盤配列清單。
-    let result = TISCreateInputSourceList(dicConditions as CFDictionary, true)?.takeRetainedValue() as? [TISInputSource] ?? .init()
+    let result = TISCreateInputSourceList(dicConditions as CFDictionary, true)?
+      .takeRetainedValue() as? [TISInputSource] ?? .init()
     var resultDictionary: [String: TISInputSource.KeyboardLayout] = [:]
     result.forEach {
-      let newNeta1 = TISInputSource.KeyboardLayout(id: $0.inputModeID, titleLocalized: $0.vChewingLocalizedName)
-      let newNeta2 = TISInputSource.KeyboardLayout(id: $0.identifier, titleLocalized: $0.vChewingLocalizedName)
+      let newNeta1 = TISInputSource.KeyboardLayout(
+        id: $0.inputModeID,
+        titleLocalized: $0.vChewingLocalizedName
+      )
+      let newNeta2 = TISInputSource.KeyboardLayout(
+        id: $0.identifier,
+        titleLocalized: $0.vChewingLocalizedName
+      )
       resultDictionary[$0.inputModeID] = newNeta1
       resultDictionary[$0.identifier] = newNeta2
     }

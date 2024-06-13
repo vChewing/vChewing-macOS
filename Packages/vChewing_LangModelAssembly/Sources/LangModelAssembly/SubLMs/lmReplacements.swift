@@ -6,21 +6,26 @@
 // marks, or product names of Contributor, except as required to fulfill notice
 // requirements defined in MIT License.
 
+// MARK: - LMAssembly.LMReplacements
+
 extension LMAssembly {
   struct LMReplacements {
+    // MARK: Lifecycle
+
+    public init() {
+      self.rangeMap = [:]
+    }
+
+    // MARK: Public
+
     public private(set) var filePath: String?
-    var rangeMap: [String: Range<String.Index>] = [:]
-    var strData: String = ""
 
     public var count: Int { rangeMap.count }
 
-    public init() {
-      rangeMap = [:]
-    }
-
     public var isLoaded: Bool { !rangeMap.isEmpty }
 
-    @discardableResult public mutating func open(_ path: String) -> Bool {
+    @discardableResult
+    public mutating func open(_ path: String) -> Bool {
       if isLoaded { return false }
       let oldPath = filePath
       filePath = nil
@@ -96,6 +101,11 @@ extension LMAssembly {
     public func hasValuesFor(key: String) -> Bool {
       rangeMap[key] != nil
     }
+
+    // MARK: Internal
+
+    var rangeMap: [String: Range<String.Index>] = [:]
+    var strData: String = ""
   }
 }
 

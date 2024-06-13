@@ -3,6 +3,8 @@
 // ====================
 // This code is released under the MIT license (SPDX-License-Identifier: MIT)
 
+// MARK: - LangModelProtocol
+
 /// 語言模組協定。
 public protocol LangModelProtocol {
   /// 給定索引鍵陣列，讓語言模型找給一組單元圖陣列。
@@ -11,15 +13,20 @@ public protocol LangModelProtocol {
   func hasUnigramsFor(keyArray: [String]) -> Bool
 }
 
-public extension Megrez.Compositor {
+// MARK: - Megrez.Compositor.LangModelRanked
+
+extension Megrez.Compositor {
   /// 一個套殼語言模型，用來始終返回經過排序的單元圖。
-  class LangModelRanked: LangModelProtocol {
-    private let langModel: LangModelProtocol
+  public class LangModelRanked: LangModelProtocol {
+    // MARK: Lifecycle
+
     /// 一個套殼語言模型，用來始終返回經過排序的單元圖。
     /// - Parameter withLM: 用來對接的語言模型。
     public init(withLM: LangModelProtocol) {
-      langModel = withLM
+      self.langModel = withLM
     }
+
+    // MARK: Public
 
     /// 給定索引鍵，讓語言模型找給一組經過穩定排序的單元圖陣列。
     /// - Parameter key: 給定的索引鍵字串。
@@ -34,6 +41,10 @@ public extension Megrez.Compositor {
     public func hasUnigramsFor(keyArray: [String]) -> Bool {
       langModel.hasUnigramsFor(keyArray: keyArray)
     }
+
+    // MARK: Private
+
+    private let langModel: LangModelProtocol
   }
 }
 
@@ -41,16 +52,15 @@ public extension Megrez.Compositor {
 
 // Reference: https://stackoverflow.com/a/50545761/4162914
 
-private extension Sequence {
+extension Sequence {
   /// Return a stable-sorted collection.
   ///
   /// - Parameter areInIncreasingOrder: Return nil when two element are equal.
   /// - Returns: The sorted collection.
-  func stableSorted(
+  fileprivate func stableSorted(
     by areInIncreasingOrder: (Element, Element) throws -> Bool
   )
-    rethrows -> [Element]
-  {
+    rethrows -> [Element] {
     try enumerated()
       .sorted { a, b -> Bool in
         try areInIncreasingOrder(a.element, b.element)

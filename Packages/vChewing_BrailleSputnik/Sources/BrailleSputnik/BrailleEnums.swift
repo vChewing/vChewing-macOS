@@ -80,6 +80,8 @@ extension BrailleSputnik {
   }
 }
 
+// MARK: - BrailleProcessingUnit
+
 protocol BrailleProcessingUnit {
   var mapConsonants: [String: String] { get }
   var mapSemivowels: [String: String] { get }
@@ -92,15 +94,10 @@ protocol BrailleProcessingUnit {
   func handleSpecialCases(target: inout String, value: String?) -> Bool
 }
 
-// MARK: - Static Data conforming to 1947 Standard.
+// MARK: - BrailleSputnik.BrailleProcessingUnit1947
 
 extension BrailleSputnik {
   class BrailleProcessingUnit1947: BrailleProcessingUnit {
-    func handleSpecialCases(target _: inout String, value _: String?) -> Bool {
-      // 國語點字標準無最終例外處理步驟。
-      false
-    }
-
     let mapConsonants: [String: String] = [
       "ㄎ": "⠇", "ㄋ": "⠝", "ㄕ": "⠊",
       "ㄌ": "⠉", "ㄆ": "⠏", "ㄇ": "⠍",
@@ -150,23 +147,18 @@ extension BrailleSputnik {
       "（": "⠪", "）": "⠕", "〔": "⠯", "〕": "⠽",
       "｛": "⠦", "｝": "⠴", "［": "⠯", "］": "⠽",
     ]
+
+    func handleSpecialCases(target _: inout String, value _: String?) -> Bool {
+      // 國語點字標準無最終例外處理步驟。
+      false
+    }
   }
 }
 
-// MARK: - Static Data conforming to 2018 Standard (GF0019-2018)
+// MARK: - BrailleSputnik.BrailleProcessingUnit2018
 
 extension BrailleSputnik {
   class BrailleProcessingUnit2018: BrailleProcessingUnit {
-    func handleSpecialCases(target: inout String, value: String?) -> Bool {
-      guard let value = value else { return false }
-      switch value {
-      case "他": target = Braille.d2345.rawValue + Braille.d35.rawValue
-      case "它": target = Braille.d4.rawValue + Braille.d2345.rawValue + Braille.d35.rawValue
-      default: return false
-      }
-      return true
-    }
-
     let mapConsonants: [String: String] = [
       "ㄅ": Braille.d12.rawValue,
       "ㄆ": Braille.d1234.rawValue,
@@ -280,5 +272,15 @@ extension BrailleSputnik {
       "］": Braille.d56.rawValue + Braille.d23.rawValue,
       // "｛": "⠦", "｝": "⠴", // 2018 國通標準並未定義花括弧。
     ]
+
+    func handleSpecialCases(target: inout String, value: String?) -> Bool {
+      guard let value = value else { return false }
+      switch value {
+      case "他": target = Braille.d2345.rawValue + Braille.d35.rawValue
+      case "它": target = Braille.d4.rawValue + Braille.d2345.rawValue + Braille.d35.rawValue
+      default: return false
+      }
+      return true
+    }
   }
 }

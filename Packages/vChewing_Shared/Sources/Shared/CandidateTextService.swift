@@ -8,29 +8,14 @@
 
 import Foundation
 
+// MARK: - CandidateTextService
+
 public struct CandidateTextService: Codable {
-  public enum ServiceValueType: Int {
-    case url = 0
-    case selector = 1
-  }
-
-  public enum ServiceValue: Codable {
-    case url(URL)
-    case selector(String)
-  }
-
-  public let key: String
-  public let reading: [String]
-  public let menuTitle: String
-  public let definedValue: String
-  public let value: ServiceValue
-  public let candidateText: String
-
-  public static var finalSanityCheck: ((CandidateTextService) -> Bool)?
+  // MARK: Lifecycle
 
   public init?(key: String, definedValue: String, param: String = #"%s"#, reading: [String] = []) {
     guard !key.isEmpty, !definedValue.isEmpty, definedValue.first != "#" else { return nil }
-    candidateText = param
+    self.candidateText = param
     self.key = key.replacingOccurrences(of: #"%s"#, with: param)
     self.reading = reading
     let rawKeyHasParam = self.key != key
@@ -41,7 +26,7 @@ public struct CandidateTextService: Codable {
     if param.count == 1, let strUTFCharCode = param.first?.codePoint, rawKeyHasParam {
       newMenuTitle = "\(self.key) (\(strUTFCharCode))"
     }
-    menuTitle = newMenuTitle
+    self.menuTitle = newMenuTitle
 
     // Start parsing rawValue
     var temporaryRawValue = definedValue
@@ -54,20 +39,47 @@ public struct CandidateTextService: Codable {
     switch fetchedTypeHeader.uppercased() {
     case #"@SEL:"#:
       finalServiceValue = .selector(temporaryRawValue)
-    case #"@WEB:"#, #"@URL:"#:
-      let encodedParam = param.addingPercentEncoding(withAllowedCharacters: CharacterSet.urlQueryAllowed)
+    case #"@URL:"#, #"@WEB:"#:
+      let encodedParam = param
+        .addingPercentEncoding(withAllowedCharacters: CharacterSet.urlQueryAllowed)
       guard let encodedParam = encodedParam else { return nil }
-      let newURL = URL(string: temporaryRawValue.replacingOccurrences(of: #"%s"#, with: encodedParam))
+      let newURL = URL(string: temporaryRawValue.replacingOccurrences(
+        of: #"%s"#,
+        with: encodedParam
+      ))
       guard let newURL = newURL else { return nil }
       finalServiceValue = .url(newURL)
     default: return nil
     }
     guard let finalServiceValue = finalServiceValue else { return nil }
-    value = finalServiceValue
+    self.value = finalServiceValue
     let finalSanityCheckResult = Self.finalSanityCheck?(self) ?? true
     if !finalSanityCheckResult { return nil }
   }
+
+  // MARK: Public
+
+  public enum ServiceValueType: Int {
+    case url = 0
+    case selector = 1
+  }
+
+  public enum ServiceValue: Codable {
+    case url(URL)
+    case selector(String)
+  }
+
+  public static var finalSanityCheck: ((CandidateTextService) -> Bool)?
+
+  public let key: String
+  public let reading: [String]
+  public let menuTitle: String
+  public let definedValue: String
+  public let value: ServiceValue
+  public let candidateText: String
 }
+
+// MARK: RawRepresentable
 
 extension CandidateTextService: RawRepresentable {
   public init?(rawValue: String) {
@@ -89,16 +101,17 @@ extension CandidateTextService: RawRepresentable {
 
 // MARK: - Extensions
 
-public extension Array where Element == CandidateTextService {
-  var rawRepresentation: [String] {
+extension Array where Element == CandidateTextService {
+  public var rawRepresentation: [String] {
     map(\.rawValue)
   }
 }
 
-public extension Array where Element == String {
-  func parseIntoCandidateTextServiceStack(
+extension Array where Element == String {
+  public func parseIntoCandidateTextServiceStack(
     candidate: String = #"%s"#, reading: [String] = []
-  ) -> [CandidateTextService] {
+  )
+    -> [CandidateTextService] {
     compactMap { rawValue in
       CandidateTextService(rawValue: rawValue, param: candidate, reading: reading)
     }

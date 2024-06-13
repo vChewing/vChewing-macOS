@@ -11,6 +11,8 @@ import Shared
 import SwiftExtension
 import SwiftUI
 
+// MARK: - VwrSettingsPanePhrases
+
 @available(macOS 13, *)
 public struct VwrSettingsPanePhrases: View {
   public var body: some View {
@@ -32,6 +34,8 @@ public struct VwrSettingsPanePhrases: View {
     )
   }
 }
+
+// MARK: - VwrSettingsPanePhrases_Previews
 
 @available(macOS 13, *)
 struct VwrSettingsPanePhrases_Previews: PreviewProvider {

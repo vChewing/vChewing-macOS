@@ -12,28 +12,7 @@ import OSFrameworkImpl
 import Shared
 
 public class TooltipUI_LateCocoa: NSWindowController, TooltipUIProtocol {
-  @objc var observation: NSKeyValueObservation?
-  private var messageText: NSAttributedTooltipTextView
-  private var tooltip: String = "" {
-    didSet {
-      messageText.text = tooltip.isEmpty ? nil : tooltip
-      adjustSize()
-    }
-  }
-
-  private static var currentWindow: NSWindow? {
-    willSet {
-      currentWindow?.orderOut(nil)
-    }
-  }
-
-  public var direction: NSAttributedTooltipTextView.writingDirection = .horizontal {
-    didSet {
-      if #unavailable(macOS 10.13) { direction = .horizontal }
-      if Bundle.main.preferredLocalizations[0] == "en" { direction = .horizontal }
-      messageText.direction = direction
-    }
-  }
+  // MARK: Lifecycle
 
   public init() {
     let contentRect = NSRect(x: 128.0, y: 128.0, width: 300.0, height: 20.0)
@@ -49,7 +28,7 @@ public class TooltipUI_LateCocoa: NSWindowController, TooltipUIProtocol {
     panel.contentView?.wantsLayer = true
     panel.contentView?.layer?.cornerRadius = 7
     panel.contentView?.layer?.backgroundColor = NSColor.controlBackgroundColor.cgColor
-    messageText = NSAttributedTooltipTextView()
+    self.messageText = NSAttributedTooltipTextView()
     messageText.backgroundColor = NSColor.clear
     messageText.textColor = NSColor.textColor
     messageText.needsDisplay = true
@@ -57,14 +36,25 @@ public class TooltipUI_LateCocoa: NSWindowController, TooltipUIProtocol {
     Self.currentWindow = panel
     super.init(window: panel)
 
-    observation = Broadcaster.shared.observe(\.eventForClosingAllPanels, options: [.new]) { _, _ in
-      self.hide()
-    }
+    self.observation = Broadcaster.shared
+      .observe(\.eventForClosingAllPanels, options: [.new]) { _, _ in
+        self.hide()
+      }
   }
 
   @available(*, unavailable)
   public required init?(coder _: NSCoder) {
     fatalError("init(coder:) has not been implemented")
+  }
+
+  // MARK: Public
+
+  public var direction: NSAttributedTooltipTextView.writingDirection = .horizontal {
+    didSet {
+      if #unavailable(macOS 10.13) { direction = .horizontal }
+      if Bundle.main.preferredLocalizations[0] == "en" { direction = .horizontal }
+      messageText.direction = direction
+    }
   }
 
   public func show(
@@ -152,6 +142,28 @@ public class TooltipUI_LateCocoa: NSWindowController, TooltipUIProtocol {
   public func hide() {
     setColor(state: .normal)
     window?.orderOut(nil)
+  }
+
+  // MARK: Internal
+
+  @objc
+  var observation: NSKeyValueObservation?
+
+  // MARK: Private
+
+  private static var currentWindow: NSWindow? {
+    willSet {
+      currentWindow?.orderOut(nil)
+    }
+  }
+
+  private var messageText: NSAttributedTooltipTextView
+
+  private var tooltip: String = "" {
+    didSet {
+      messageText.text = tooltip.isEmpty ? nil : tooltip
+      adjustSize()
+    }
   }
 
   private func adjustSize() {

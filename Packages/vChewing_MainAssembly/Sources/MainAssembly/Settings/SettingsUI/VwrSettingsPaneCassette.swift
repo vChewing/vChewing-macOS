@@ -11,28 +11,11 @@ import OSFrameworkImpl
 import Shared
 import SwiftUI
 
+// MARK: - VwrSettingsPaneCassette
+
 @available(macOS 13, *)
 public struct VwrSettingsPaneCassette: View {
-  // MARK: - AppStorage Variables
-
-  @AppStorage(wrappedValue: "", UserDef.kCassettePath.rawValue)
-  private var cassettePath: String
-
-  @AppStorage(wrappedValue: false, UserDef.kCassetteEnabled.rawValue)
-  private var cassetteEnabled: Bool
-
-  @AppStorage(wrappedValue: 0, UserDef.kForceCassetteChineseConversion.rawValue)
-  private var forceCassetteChineseConversion: Int
-
-  @AppStorage(wrappedValue: true, UserDef.kShowTranslatedStrokesInCompositionBuffer.rawValue)
-  private var showTranslatedStrokesInCompositionBuffer: Bool
-
-  @AppStorage(wrappedValue: true, UserDef.kAutoCompositeWithLongestPossibleCassetteKey.rawValue)
-  private var autoCompositeWithLongestPossibleCassetteKey: Bool
-
-  // MARK: - Main View
-
-  private static let dlgOpenFile = NSOpenPanel()
+  // MARK: Public
 
   public var body: some View {
     ScrollView {
@@ -41,16 +24,23 @@ public struct VwrSettingsPaneCassette: View {
 
         Section {
           VStack(alignment: .leading) {
-            Text(LocalizedStringKey("Choose your desired cassette file path. Will be omitted if invalid."))
+            Text(
+              LocalizedStringKey(
+                "Choose your desired cassette file path. Will be omitted if invalid."
+              )
+            )
             HStack(spacing: 3) {
               PathControl(pathDroppable: $cassettePath) { pathControl in
                 pathControl.allowedTypes = ["cin2", "cin", "vcin"]
-                pathControl.placeholderString = "Please drag the desired target from Finder to this place.".localized
+                pathControl
+                  .placeholderString = "Please drag the desired target from Finder to this place."
+                  .localized
               } acceptDrop: { pathControl, info in
                 let urls = info.draggingPasteboard.readObjects(forClasses: [NSURL.self])
                 guard let url = urls?.first as? URL else { return false }
                 let bolPreviousPathValidity = LMMgr.checkCassettePathValidity(
-                  PrefMgr.shared.cassettePath.expandingTildeInPath)
+                  PrefMgr.shared.cassettePath.expandingTildeInPath
+                )
                 if LMMgr.checkCassettePathValidity(url.path) {
                   cassettePath = url.path
                   pathControl.url = url
@@ -81,7 +71,8 @@ public struct VwrSettingsPaneCassette: View {
                 Self.dlgOpenFile.allowsOtherFileTypes = true
 
                 let bolPreviousPathValidity = LMMgr.checkCassettePathValidity(
-                  cassettePath.expandingTildeInPath)
+                  cassettePath.expandingTildeInPath
+                )
 
                 if let window = CtlSettingsUI.shared?.window {
                   Self.dlgOpenFile.beginSheetModal(for: window) { result in
@@ -121,9 +112,13 @@ public struct VwrSettingsPaneCassette: View {
               if cassetteEnabled, !LMMgr.checkCassettePathValidity(cassettePath) {
                 if let window = CtlSettingsUI.shared?.window {
                   IMEApp.buzz()
-                  let alert = NSAlert(error: NSLocalizedString("Path invalid or file access error.", comment: ""))
+                  let alert = NSAlert(error: NSLocalizedString(
+                    "Path invalid or file access error.",
+                    comment: ""
+                  ))
                   alert.informativeText = NSLocalizedString(
-                    "Please reconfigure the cassette path to a valid one before enabling this mode.", comment: ""
+                    "Please reconfigure the cassette path to a valid one before enabling this mode.",
+                    comment: ""
                   )
                   alert.beginSheetModal(for: window) { _ in
                   }
@@ -141,8 +136,10 @@ public struct VwrSettingsPaneCassette: View {
         // MARK: - Something Else
 
         Section {
-          UserDef.kAutoCompositeWithLongestPossibleCassetteKey.bind($autoCompositeWithLongestPossibleCassetteKey).render()
-          UserDef.kShowTranslatedStrokesInCompositionBuffer.bind($showTranslatedStrokesInCompositionBuffer).render()
+          UserDef.kAutoCompositeWithLongestPossibleCassetteKey
+            .bind($autoCompositeWithLongestPossibleCassetteKey).render()
+          UserDef.kShowTranslatedStrokesInCompositionBuffer
+            .bind($showTranslatedStrokesInCompositionBuffer).render()
           UserDef.kForceCassetteChineseConversion.bind($forceCassetteChineseConversion).render()
         }
       }.formStyled()
@@ -152,7 +149,32 @@ public struct VwrSettingsPaneCassette: View {
       maxHeight: CtlSettingsUI.contentMaxHeight
     )
   }
+
+  // MARK: Private
+
+  // MARK: - Main View
+
+  private static let dlgOpenFile = NSOpenPanel()
+
+  // MARK: - AppStorage Variables
+
+  @AppStorage(wrappedValue: "", UserDef.kCassettePath.rawValue)
+  private var cassettePath: String
+
+  @AppStorage(wrappedValue: false, UserDef.kCassetteEnabled.rawValue)
+  private var cassetteEnabled: Bool
+
+  @AppStorage(wrappedValue: 0, UserDef.kForceCassetteChineseConversion.rawValue)
+  private var forceCassetteChineseConversion: Int
+
+  @AppStorage(wrappedValue: true, UserDef.kShowTranslatedStrokesInCompositionBuffer.rawValue)
+  private var showTranslatedStrokesInCompositionBuffer: Bool
+
+  @AppStorage(wrappedValue: true, UserDef.kAutoCompositeWithLongestPossibleCassetteKey.rawValue)
+  private var autoCompositeWithLongestPossibleCassetteKey: Bool
 }
+
+// MARK: - VwrSettingsPaneCassette_Previews
 
 @available(macOS 13, *)
 struct VwrSettingsPaneCassette_Previews: PreviewProvider {

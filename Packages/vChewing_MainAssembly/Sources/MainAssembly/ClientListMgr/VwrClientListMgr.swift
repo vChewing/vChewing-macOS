@@ -10,19 +10,10 @@ import AppKit
 import Foundation
 import Shared
 
-public class VwrClientListMgr: NSViewController {
-  let windowWidth: CGFloat = 770
-  let contentWidth: CGFloat = 750
-  let buttonWidth: CGFloat = 150
-  let tableHeight: CGFloat = 230
+// MARK: - VwrClientListMgr
 
-  lazy var tblClients: NSTableView = .init()
-  lazy var btnAddClient = NSButton("Add Client", target: self, action: #selector(btnAddClientClicked(_:)))
-  lazy var btnRemoveClient = NSButton("Remove Selected", target: self, action: #selector(btnRemoveClientClicked(_:)))
-  lazy var tableColumn1Cell = NSButtonCell()
-  lazy var tableColumn1 = NSTableColumn()
-  lazy var tableColumn2Cell = NSTextFieldCell()
-  lazy var tableColumn2 = NSTableColumn()
+public class VwrClientListMgr: NSViewController {
+  // MARK: Public
 
   override public func loadView() {
     tblClients.reloadData()
@@ -32,6 +23,29 @@ public class VwrClientListMgr: NSViewController {
     btnRemoveClient.keyEquivalent = .init(NSEvent.SpecialKey.delete.unicodeScalar)
   }
 
+  // MARK: Internal
+
+  let windowWidth: CGFloat = 770
+  let contentWidth: CGFloat = 750
+  let buttonWidth: CGFloat = 150
+  let tableHeight: CGFloat = 230
+
+  lazy var tblClients: NSTableView = .init()
+  lazy var btnAddClient = NSButton(
+    "Add Client",
+    target: self,
+    action: #selector(btnAddClientClicked(_:))
+  )
+  lazy var btnRemoveClient = NSButton(
+    "Remove Selected",
+    target: self,
+    action: #selector(btnRemoveClientClicked(_:))
+  )
+  lazy var tableColumn1Cell = NSButtonCell()
+  lazy var tableColumn1 = NSTableColumn()
+  lazy var tableColumn2Cell = NSTextFieldCell()
+  lazy var tableColumn2 = NSTableColumn()
+
   var body: NSView? {
     NSStackView.build(.vertical, insets: .new(all: 14)) {
       makeScrollableTable()
@@ -39,7 +53,8 @@ public class VwrClientListMgr: NSViewController {
       NSStackView.build(.horizontal) {
         let descriptionWidth = contentWidth - buttonWidth - 20
         NSStackView.build(.vertical) {
-          let strDescription = "Please manage the list of those clients here which are: 1) IMKTextInput-incompatible; 2) suspected from abusing the contents of the inline composition buffer. A client listed here, if checked, will use popup composition buffer with maximum 20 reading counts holdable."
+          let strDescription =
+            "Please manage the list of those clients here which are: 1) IMKTextInput-incompatible; 2) suspected from abusing the contents of the inline composition buffer. A client listed here, if checked, will use popup composition buffer with maximum 20 reading counts holdable."
           strDescription.makeNSLabel(descriptive: true, fixWidth: descriptionWidth)
             .makeSimpleConstraint(.width, relation: .greaterThanOrEqual, value: descriptionWidth)
           NSView()
@@ -119,9 +134,12 @@ public class VwrClientListMgr: NSViewController {
 
 // MARK: - UserDefaults Handlers.
 
-public extension VwrClientListMgr {
-  static var clientsList: [String] { PrefMgr.shared.clientsIMKTextInputIncapable.keys.sorted() }
-  static func removeClient(at index: Int) {
+extension VwrClientListMgr {
+  public static var clientsList: [String] {
+    PrefMgr.shared.clientsIMKTextInputIncapable.keys.sorted()
+  }
+
+  public static func removeClient(at index: Int) {
     guard index < Self.clientsList.count else { return }
     let key = Self.clientsList[index]
     var dict = PrefMgr.shared.clientsIMKTextInputIncapable
@@ -140,7 +158,8 @@ extension VwrClientListMgr {
     PrefMgr.shared.clientsIMKTextInputIncapable = dict
     tblClients.reloadData()
     btnRemoveClient.isEnabled = (0 ..< Self.clientsList.count).contains(
-      tblClients.selectedRow)
+      tblClients.selectedRow
+    )
   }
 
   /// 檢查傳入的 NSDraggingInfo 當中的 URL 對應的物件是否是 App Bundle。
@@ -149,7 +168,7 @@ extension VwrClientListMgr {
   ///   - onError: 當不滿足判定條件時，執行給定的 lambda expression。
   ///   - handler: 當滿足判定條件時，讓傳入的 lambda expression 處理已經整理出來的 URL 陣列。
   private func validatePasteboardForAppBundles(
-    neta info: NSDraggingInfo, onError: @escaping () -> Void?, handler: (([URL]) -> Void)? = nil
+    neta info: NSDraggingInfo, onError: @escaping () -> ()?, handler: (([URL]) -> ())? = nil
   ) {
     let board = info.draggingPasteboard
     let type = NSPasteboard.PasteboardType.kUTTypeAppBundle
@@ -157,7 +176,8 @@ extension VwrClientListMgr {
       .urlReadingFileURLsOnly: true,
       .urlReadingContentsConformToTypes: [type],
     ]
-    guard let urls = board.readObjects(forClasses: [NSURL.self], options: options) as? [URL], !urls.isEmpty else {
+    guard let urls = board.readObjects(forClasses: [NSURL.self], options: options) as? [URL],
+          !urls.isEmpty else {
       onError()
       return
     }
@@ -170,13 +190,15 @@ extension VwrClientListMgr {
 // MARK: - IBActions.
 
 extension VwrClientListMgr {
-  @IBAction func onItemClicked(_: Any!) {
+  @IBAction
+  func onItemClicked(_: Any!) {
     guard tblClients.clickedColumn == 0 else { return }
     PrefMgr.shared.clientsIMKTextInputIncapable[Self.clientsList[tblClients.clickedRow]]?.toggle()
     tblClients.reloadData()
   }
 
-  @IBAction func btnRemoveClientClicked(_: Any) {
+  @IBAction
+  func btnRemoveClientClicked(_: Any) {
     guard let minIndexSelected = tblClients.selectedRowIndexes.min() else { return }
     if minIndexSelected >= Self.clientsList.count { return }
     if minIndexSelected < 0 { return }
@@ -191,20 +213,25 @@ extension VwrClientListMgr {
       }
     }
     if isLastRow {
-      tblClients.selectRowIndexes(.init(arrayLiteral: minIndexSelected - 1), byExtendingSelection: false)
+      tblClients.selectRowIndexes(
+        .init(arrayLiteral: minIndexSelected - 1),
+        byExtendingSelection: false
+      )
     }
     tblClients.reloadData()
     btnRemoveClient.isEnabled = (0 ..< Self.clientsList.count).contains(minIndexSelected)
   }
 
-  @IBAction func btnAddClientClicked(_: Any) {
+  @IBAction
+  func btnAddClientClicked(_: Any) {
     guard let window = CtlClientListMgr.shared?.window else { return }
     let alert = NSAlert()
     alert.messageText = NSLocalizedString(
       "Please enter the client app bundle identifier(s) you want to register.", comment: ""
     )
     alert.informativeText = NSLocalizedString(
-      "One record per line. Use Option+Enter to break lines.\nBlank lines will be dismissed.", comment: ""
+      "One record per line. Use Option+Enter to break lines.\nBlank lines will be dismissed.",
+      comment: ""
     )
     alert.addButton(withTitle: NSLocalizedString("OK", comment: ""))
     alert.addButton(withTitle: NSLocalizedString("Just Select", comment: "") + "…")
@@ -219,7 +246,12 @@ extension VwrClientListMgr {
     scrollview.horizontalScroller?.scrollerStyle = .legacy
     scrollview.verticalScroller?.scrollerStyle = .legacy
     scrollview.autoresizingMask = [.width, .height]
-    let theTextView = NSTextView(frame: NSRect(x: 0, y: 0, width: contentSize.width, height: contentSize.height))
+    let theTextView = NSTextView(frame: NSRect(
+      x: 0,
+      y: 0,
+      width: contentSize.width,
+      height: contentSize.height
+    ))
     scrollview.documentView = theTextView
     theTextView.minSize = NSSize(width: 0.0, height: contentSize.height)
     theTextView.maxSize = NSSize(width: maxFloat, height: maxFloat)
@@ -246,12 +278,17 @@ extension VwrClientListMgr {
     alert.beginSheetModal(at: window) { result in
       resultCheck: switch result {
       case .alertFirstButtonReturn, .alertSecondButtonReturn:
-        theTextView.textContainer?.textView?.string.components(separatedBy: "\n").filter { !$0.isEmpty }.forEach {
-          self.applyNewValue($0, highMitigation: result == .alertFirstButtonReturn)
-        }
+        theTextView.textContainer?.textView?.string.components(separatedBy: "\n")
+          .filter { !$0.isEmpty }.forEach {
+            self.applyNewValue($0, highMitigation: result == .alertFirstButtonReturn)
+          }
         if result == .alertFirstButtonReturn { break }
         if #unavailable(macOS 10.13) {
-          window.callAlert(title: "Please drag the apps into the Client Manager window from Finder.".localized)
+          window
+            .callAlert(
+              title: "Please drag the apps into the Client Manager window from Finder."
+                .localized
+            )
           break resultCheck
         }
         let dlgOpenPath = NSOpenPanel()
@@ -291,7 +328,9 @@ extension VwrClientListMgr {
               alert2.messageText =
                 "Do you want to enable the popup composition buffer for this client?".localized
               alert2.informativeText = "\(identifier)\n\n"
-                + "Some client apps may have different compatibility issues in IMKTextInput implementation.".localized
+                +
+                "Some client apps may have different compatibility issues in IMKTextInput implementation."
+                .localized
               alert2.addButton(withTitle: "Yes".localized)
               alert2.addButton(withTitle: "No".localized)
               alert2.beginSheetModal(for: window) { result2 in
@@ -311,7 +350,7 @@ extension VwrClientListMgr {
   }
 }
 
-// MARK: - TableView Extensions.
+// MARK: NSTableViewDelegate, NSTableViewDataSource
 
 extension VwrClientListMgr: NSTableViewDelegate, NSTableViewDataSource {
   public func numberOfRows(in _: NSTableView) -> Int {
@@ -325,7 +364,8 @@ extension VwrClientListMgr: NSTableViewDelegate, NSTableViewDataSource {
   public func tableView(_: NSTableView, objectValueFor column: NSTableColumn?, row: Int) -> Any? {
     defer {
       self.btnRemoveClient.isEnabled = (0 ..< Self.clientsList.count).contains(
-        self.tblClients.selectedRow)
+        self.tblClients.selectedRow
+      )
     }
     guard row < Self.clientsList.count else { return "" }
     if let column = column {
@@ -344,7 +384,8 @@ extension VwrClientListMgr: NSTableViewDelegate, NSTableViewDataSource {
   public func tableView(
     _: NSTableView, validateDrop info: NSDraggingInfo, proposedRow _: Int,
     proposedDropOperation _: NSTableView.DropOperation
-  ) -> NSDragOperation {
+  )
+    -> NSDragOperation {
     var result = NSDragOperation.copy
     validatePasteboardForAppBundles(
       neta: info, onError: { result = .init(rawValue: 0) } // 對應 NSDragOperationNone。
@@ -355,7 +396,8 @@ extension VwrClientListMgr: NSTableViewDelegate, NSTableViewDataSource {
   public func tableView(
     _: NSTableView, acceptDrop info: NSDraggingInfo,
     row _: Int, dropOperation _: NSTableView.DropOperation
-  ) -> Bool {
+  )
+    -> Bool {
     var result = true
     validatePasteboardForAppBundles(
       neta: info, onError: { result = false } // 對應 NSDragOperationNone。

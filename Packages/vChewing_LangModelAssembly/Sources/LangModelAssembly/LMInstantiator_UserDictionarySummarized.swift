@@ -8,8 +8,10 @@
 
 import Foundation
 
-public extension LMAssembly {
-  struct UserDictionarySummarized: Codable {
+// MARK: - LMAssembly.UserDictionarySummarized
+
+extension LMAssembly {
+  public struct UserDictionarySummarized: Codable {
     let isCHS: Bool
     let userPhrases: [String: [String]]
     let filter: [String: [String]]
@@ -19,8 +21,8 @@ public extension LMAssembly {
   }
 }
 
-public extension LMAssembly.LMInstantiator {
-  func summarize(all: Bool) -> LMAssembly.UserDictionarySummarized {
+extension LMAssembly.LMInstantiator {
+  public func summarize(all: Bool) -> LMAssembly.UserDictionarySummarized {
     LMAssembly.UserDictionarySummarized(
       isCHS: isCHS,
       userPhrases: lmUserPhrases.dictRepresented,

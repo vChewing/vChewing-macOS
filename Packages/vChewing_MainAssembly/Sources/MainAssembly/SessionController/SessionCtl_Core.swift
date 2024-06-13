@@ -16,6 +16,8 @@ import Shared
 import ShiftKeyUpChecker
 import TooltipUI
 
+// MARK: - SessionCtl
+
 /// 輸入法控制模組，乃在輸入法端用以控制輸入行為的基礎型別。
 ///
 /// IMKInputController 完全實現了相關協定所定義的內容。
@@ -26,10 +28,55 @@ import TooltipUI
 /// 輸入會話創建一個控制器型別。因此，對於每個輸入會話，都有一個對應的 IMKInputController。
 @objc(SessionCtl) // 必須加上 ObjC，因為 IMK 是用 ObjC 寫的。
 public class SessionCtl: IMKInputController {
+  // MARK: Lifecycle
+
+  /// 對用以設定委任物件的控制器型別進行初期化處理。
+  override public init() {
+    super.init()
+    construct(client: client())
+  }
+
+  /// 對用以設定委任物件的控制器型別進行初期化處理。
+  ///
+  /// inputClient 參數是客體應用側存在的用以藉由 IMKServer 伺服器向輸入法傳訊的物件。該物件始終遵守 IMKTextInput 協定。
+  /// - Remark: 所有由委任物件實裝的「被協定要求實裝的方法」都會有一個用來接受客體物件的參數。在 IMKInputController 內部的型別不需要接受這個參數，因為已經有「client()」這個參數存在了。
+  /// - Parameters:
+  ///   - server: IMKServer
+  ///   - delegate: 客體物件
+  ///   - inputClient: 用以接受輸入的客體應用物件
+  override public init!(server: IMKServer!, delegate: Any!, client inputClient: Any!) {
+    super.init(server: server, delegate: delegate, client: inputClient)
+    let theClient = inputClient as? (IMKTextInput & NSObjectProtocol)
+    construct(client: theClient)
+  }
+
+  // MARK: Public
+
   public weak static var current: SessionCtl?
 
   /// 標記狀態來聲明目前新增的詞彙是否需要賦以非常低的權重。
   public static var areWeNerfing = false
+
+  /// Shift 按鍵事件分析器的副本。
+  /// - Remark: 警告：該工具必須為 Struct 且全專案只能有一個唯一初期化副本。否則會在動 Caps Lock 的時候誤以為是在摁 Shift。
+  public static var theShiftKeyDetector = ShiftKeyUpChecker(
+    useLShift: PrefMgr.shared.togglingAlphanumericalModeWithLShift,
+    useRShift: PrefMgr.shared.togglingAlphanumericalModeWithRShift
+  )
+
+  /// 記錄當前輸入環境是縱排輸入還是橫排輸入。
+  public static var isVerticalTyping: Bool = false
+
+  /// 用以記錄最近存取過的十個客體（亂序），相關內容會在客體管理器當中用得到。
+  public static var recentClientBundleIdentifiers = [String: Int]() {
+    didSet {
+      if recentClientBundleIdentifiers.count < 20 { return }
+      if recentClientBundleIdentifiers.isEmpty { return }
+      let x = recentClientBundleIdentifiers.sorted(by: { $0.value < $1.value }).first?.key
+      guard let x = x else { return }
+      recentClientBundleIdentifiers[x] = nil
+    }
+  }
 
   /// 上一個被處理過的鍵盤事件。
   public var previouslyHandledEvents = [KBEvent]()
@@ -49,23 +96,27 @@ public class SessionCtl: IMKInputController {
   /// 當前副本的客體是否是輸入法本體？
   public var isServingIMEItself: Bool = false
 
+  /// 輸入調度模組的副本。
+  public internal(set) var inputHandler: InputHandlerProtocol?
+
+  /// 最近一個被 set 的 marked text。
+  public internal(set) var recentMarkedText: (
+    text: NSAttributedString?,
+    selectionRange: NSRange?
+  ) = (
+    nil,
+    nil
+  )
+
+  /// 當前選字窗是否為縱向。（縱排輸入時，只會啟用縱排選字窗。）
+  public var isVerticalCandidateWindow = false
+
   /// 用以存儲客體的 bundleIdentifier。
   /// 由於每次動態獲取都會耗時，所以這裡直接靜態記載之。
   public var clientBundleIdentifier: String = "" {
     willSet {
       if newValue.isEmpty { return }
       Self.recentClientBundleIdentifiers[newValue] = Int(Date().timeIntervalSince1970)
-    }
-  }
-
-  /// 用以記錄最近存取過的十個客體（亂序），相關內容會在客體管理器當中用得到。
-  public static var recentClientBundleIdentifiers = [String: Int]() {
-    didSet {
-      if recentClientBundleIdentifiers.count < 20 { return }
-      if recentClientBundleIdentifiers.isEmpty { return }
-      let x = recentClientBundleIdentifiers.sorted(by: { $0.value < $1.value }).first?.key
-      guard let x = x else { return }
-      recentClientBundleIdentifiers[x] = nil
     }
   }
 
@@ -88,26 +139,6 @@ public class SessionCtl: IMKInputController {
     }
   }
 
-  /// 給所有副本共用的 isASCIIMode 追蹤用餐數。
-  private static var isASCIIModeForAllClients = false
-  /// 一個共用辭典，專門用來給每個副本用的 isASCIIMode 追蹤用餐數。
-  private static var isASCIIModeForEachClient: [String: Bool] = [:]
-  /// 給每個副本用的 isASCIIMode 追蹤用餐數。
-  private var isASCIIModeForThisClient: Bool {
-    get {
-      Self.isASCIIModeForEachClient[clientBundleIdentifier] ?? false
-    }
-    set {
-      Self.isASCIIModeForEachClient[clientBundleIdentifier] = newValue
-    }
-  }
-
-  /// 輸入調度模組的副本。
-  public internal(set) var inputHandler: InputHandlerProtocol?
-
-  /// 最近一個被 set 的 marked text。
-  public internal(set) var recentMarkedText: (text: NSAttributedString?, selectionRange: NSRange?) = (nil, nil)
-
   /// 用以記錄當前輸入法狀態的變數。
   public var state: IMEStateProtocol = IMEState.ofEmpty() {
     didSet {
@@ -123,45 +154,11 @@ public class SessionCtl: IMKInputController {
     }
   }
 
-  /// Shift 按鍵事件分析器的副本。
-  /// - Remark: 警告：該工具必須為 Struct 且全專案只能有一個唯一初期化副本。否則會在動 Caps Lock 的時候誤以為是在摁 Shift。
-  public static var theShiftKeyDetector = ShiftKeyUpChecker(
-    useLShift: PrefMgr.shared.togglingAlphanumericalModeWithLShift,
-    useRShift: PrefMgr.shared.togglingAlphanumericalModeWithRShift
-  )
-
-  /// 記錄當前輸入環境是縱排輸入還是橫排輸入。
-  public static var isVerticalTyping: Bool = false
   public var isVerticalTyping: Bool = false {
     didSet {
       Self.isVerticalTyping = isVerticalTyping
     }
   }
-
-  private let sharedAlertForInputModeToggling: NSAlert = {
-    let alert = NSAlert()
-    alert.alertStyle = .informational
-    alert.messageText = "Target Input Mode Activation Required".localized
-    alert.informativeText = "You are proceeding to System Preferences to enable the Input Source which corresponds to the input mode you are going to switch to.".localized
-    alert.addButton(withTitle: "OK".localized)
-    return alert
-  }()
-
-  public func updateVerticalTypingStatus() {
-    guard let client = client() else {
-      isVerticalTyping = false
-      return
-    }
-    var textFrame = NSRect.seniorTheBeast
-    let attributes: [AnyHashable: Any]? = client.attributes(
-      forCharacterIndex: 0, lineHeightRectangle: &textFrame
-    )
-    let result = (attributes?["IMKTextOrientation"] as? NSNumber)?.intValue == 0 || false
-    isVerticalTyping = result
-  }
-
-  /// 當前選字窗是否為縱向。（縱排輸入時，只會啟用縱排選字窗。）
-  public var isVerticalCandidateWindow = false
 
   /// InputMode 需要在每次出現內容變更的時候都連帶重設組字器與各項語言模組，
   /// 順帶更新 IME 模組及 UserPrefs 當中對於當前語言模式的記載。
@@ -186,24 +183,46 @@ public class SessionCtl: IMKInputController {
     }
   }
 
-  /// 對用以設定委任物件的控制器型別進行初期化處理。
-  override public init() {
-    super.init()
-    construct(client: client())
+  public func updateVerticalTypingStatus() {
+    guard let client = client() else {
+      isVerticalTyping = false
+      return
+    }
+    var textFrame = NSRect.seniorTheBeast
+    let attributes: [AnyHashable: Any]? = client.attributes(
+      forCharacterIndex: 0, lineHeightRectangle: &textFrame
+    )
+    let result = (attributes?["IMKTextOrientation"] as? NSNumber)?.intValue == 0 || false
+    isVerticalTyping = result
   }
 
-  /// 對用以設定委任物件的控制器型別進行初期化處理。
-  ///
-  /// inputClient 參數是客體應用側存在的用以藉由 IMKServer 伺服器向輸入法傳訊的物件。該物件始終遵守 IMKTextInput 協定。
-  /// - Remark: 所有由委任物件實裝的「被協定要求實裝的方法」都會有一個用來接受客體物件的參數。在 IMKInputController 內部的型別不需要接受這個參數，因為已經有「client()」這個參數存在了。
-  /// - Parameters:
-  ///   - server: IMKServer
-  ///   - delegate: 客體物件
-  ///   - inputClient: 用以接受輸入的客體應用物件
-  override public init!(server: IMKServer!, delegate: Any!, client inputClient: Any!) {
-    super.init(server: server, delegate: delegate, client: inputClient)
-    let theClient = inputClient as? (IMKTextInput & NSObjectProtocol)
-    construct(client: theClient)
+  // MARK: Private
+
+  /// 給所有副本共用的 isASCIIMode 追蹤用餐數。
+  private static var isASCIIModeForAllClients = false
+  /// 一個共用辭典，專門用來給每個副本用的 isASCIIMode 追蹤用餐數。
+  private static var isASCIIModeForEachClient: [String: Bool] = [:]
+
+  private let sharedAlertForInputModeToggling: NSAlert = {
+    let alert = NSAlert()
+    alert.alertStyle = .informational
+    alert.messageText = "Target Input Mode Activation Required".localized
+    alert
+      .informativeText =
+      "You are proceeding to System Preferences to enable the Input Source which corresponds to the input mode you are going to switch to."
+        .localized
+    alert.addButton(withTitle: "OK".localized)
+    return alert
+  }()
+
+  /// 給每個副本用的 isASCIIMode 追蹤用餐數。
+  private var isASCIIModeForThisClient: Bool {
+    get {
+      Self.isASCIIModeForEachClient[clientBundleIdentifier] ?? false
+    }
+    set {
+      Self.isASCIIModeForEachClient[clientBundleIdentifier] = newValue
+    }
   }
 
   /// 所有建構子都會執行的共用部分，在 super.init() 之後執行。
@@ -227,9 +246,9 @@ public class SessionCtl: IMKInputController {
 
 // MARK: - 工具函式
 
-public extension SessionCtl {
+extension SessionCtl {
   /// 強制重設當前鍵盤佈局、使其與偏好設定同步。
-  func setKeyLayout() {
+  public func setKeyLayout() {
     DispatchQueue.main.async { [weak self] in
       guard let self = self else { return }
       guard let client = self.client(), !self.isServingIMEItself else { return }
@@ -242,12 +261,13 @@ public extension SessionCtl {
   }
 
   /// 重設輸入調度模組，會將當前尚未遞交的內容遞交出去。
-  func resetInputHandler(forceComposerCleanup forceCleanup: Bool = false) {
+  public func resetInputHandler(forceComposerCleanup forceCleanup: Bool = false) {
     guard let inputHandler = inputHandler else { return }
     var textToCommit = ""
     // 過濾掉尚未完成拼寫的注音。
     let sansReading: Bool =
-      (state.type == .ofInputting) && (PrefMgr.shared.trimUnfinishedReadingsOnCommit || forceCleanup)
+      (state.type == .ofInputting) &&
+      (PrefMgr.shared.trimUnfinishedReadingsOnCommit || forceCleanup)
     if state.hasComposition {
       textToCommit = inputHandler.generateStateOfInputting(sansReading: sansReading).displayedText
     }
@@ -256,7 +276,7 @@ public extension SessionCtl {
     switchState(IMEState.ofCommitting(textToCommit: textToCommit))
   }
 
-  static func makeTooltipUI() -> TooltipUIProtocol {
+  public static func makeTooltipUI() -> TooltipUIProtocol {
     if #unavailable(macOS 10.14) { return TooltipUI_EarlyCocoa() }
     return TooltipUI_LateCocoa()
   }
@@ -264,10 +284,10 @@ public extension SessionCtl {
 
 // MARK: - IMKStateSetting 協定規定的方法
 
-public extension SessionCtl {
+extension SessionCtl {
   /// 啟用輸入法時，會觸發該函式。
   /// - Parameter sender: 呼叫了該函式的客體。
-  override func activateServer(_ sender: Any!) {
+  public override func activateServer(_ sender: Any!) {
     super.activateServer(sender)
     DispatchQueue.main.async { [weak self] in
       guard let self = self else { return }
@@ -314,8 +334,10 @@ public extension SessionCtl {
       self.inputHandler?.delegate = self
       self.syncBaseLMPrefs()
 
-      Self.theShiftKeyDetector.toggleWithLShift = PrefMgr.shared.togglingAlphanumericalModeWithLShift
-      Self.theShiftKeyDetector.toggleWithRShift = PrefMgr.shared.togglingAlphanumericalModeWithRShift
+      Self.theShiftKeyDetector.toggleWithLShift = PrefMgr.shared
+        .togglingAlphanumericalModeWithLShift
+      Self.theShiftKeyDetector.toggleWithRShift = PrefMgr.shared
+        .togglingAlphanumericalModeWithRShift
 
       if self.isASCIIMode, !IMEApp.isKeyboardJIS {
         if #available(macOS 10.15, *) {
@@ -339,7 +361,7 @@ public extension SessionCtl {
 
   /// 停用輸入法時，會觸發該函式。
   /// - Parameter sender: 呼叫了該函式的客體（無須使用）。
-  override func deactivateServer(_ sender: Any!) {
+  public override func deactivateServer(_ sender: Any!) {
     DispatchQueue.main.async { [weak self] in
       guard let self = self else { return }
       self.isActivated = false
@@ -361,17 +383,20 @@ public extension SessionCtl {
   ///   - value: 輸入法在系統偏好設定當中的副本的 identifier，與 bundle identifier 類似。在輸入法的 info.plist 內定義。
   ///   - tag: 標記（無須使用）。
   ///   - sender: 呼叫了該函式的客體（無須使用）。
-  override func setValue(_ value: Any!, forTag tag: Int, client sender: Any!) {
+  public override func setValue(_ value: Any!, forTag tag: Int, client sender: Any!) {
     DispatchQueue.main.async { [weak self] in
       guard let self = self else { return }
-      let newMode: Shared.InputMode = .init(rawValue: value as? String ?? PrefMgr.shared.mostRecentInputMode) ?? .imeModeNULL
+      let newMode: Shared
+        .InputMode = .init(rawValue: value as? String ?? PrefMgr.shared.mostRecentInputMode) ??
+        .imeModeNULL
       if self.inputMode != newMode { self.inputMode = newMode }
     }
     super.setValue(value, forTag: tag, client: sender)
   }
 
   /// 專門用來就地切換繁簡模式的函式。
-  @objc func switchInputMode(_: Any? = nil) {
+  @objc
+  public func switchInputMode(_: Any? = nil) {
     guard let client: IMKTextInput = client() else { return }
     defer { isASCIIMode = false }
     let nowMode = IMEApp.currentInputMode
@@ -402,7 +427,7 @@ public extension SessionCtl {
   }
 
   /// 將輸入法偏好設定同步至語言模組內。
-  func syncBaseLMPrefs() {
+  public func syncBaseLMPrefs() {
     LMMgr.syncLMPrefs()
   }
 }
@@ -411,7 +436,7 @@ public extension SessionCtl {
 
 // 註：handle(_ event:) 位於 SessionCtl_HandleEvent.swift。
 
-public extension SessionCtl {
+extension SessionCtl {
   /// 該函式的回饋結果決定了輸入法會攔截且捕捉哪些類型的輸入裝置操作事件。
   ///
   /// 一個客體應用會與輸入法共同確認某個輸入裝置操作事件是否可以觸發輸入法內的某個方法。預設情況下，
@@ -421,7 +446,7 @@ public extension SessionCtl {
   /// 「`commitComposition(_ message)`」遞交給客體。
   /// - Parameter sender: 呼叫了該函式的客體（無須使用）。
   /// - Returns: 返回一個 uint，其中承載了與系統 NSEvent 操作事件有關的掩碼集合（詳見 NSEvent.h）。
-  override func recognizedEvents(_ sender: Any!) -> Int {
+  public override func recognizedEvents(_ sender: Any!) -> Int {
     _ = sender // 防止格式整理工具毀掉與此對應的參數。
     let events: NSEvent.EventTypeMask = [.keyDown, .flagsChanged, .keyUp]
     return Int(events.rawValue)
@@ -431,7 +456,7 @@ public extension SessionCtl {
   /// 也就是說 handle(event:) 完全抓不到這個 Event。
   /// 這時需要在 commitComposition 這一關做一些收尾處理。
   /// - Parameter sender: 呼叫了該函式的客體（無須使用）。
-  override func commitComposition(_ sender: Any!) {
+  public override func commitComposition(_ sender: Any!) {
     _ = sender // 防止格式整理工具毀掉與此對應的參數。
     resetInputHandler()
     clearInlineDisplay()
@@ -441,7 +466,7 @@ public extension SessionCtl {
   /// 指定輸入法要遞交出去的內容（雖然 InputMethodKit 可能並不會真的用到這個函式）。
   /// - Parameter sender: 呼叫了該函式的客體（無須使用）。
   /// - Returns: 字串內容，或者 nil。
-  override func composedString(_ sender: Any!) -> Any! {
+  public override func composedString(_ sender: Any!) -> Any! {
     _ = sender // 防止格式整理工具毀掉與此對應的參數。
     guard state.hasComposition else { return "" }
     return state.displayedTextConverted
@@ -449,19 +474,19 @@ public extension SessionCtl {
 
   /// 輸入法要被換掉或關掉的時候，要做的事情。
   /// 不過好像因為 IMK 的 Bug 而並不會被執行。
-  override func inputControllerWillClose() {
+  public override func inputControllerWillClose() {
     // 下述兩行用來防止尚未完成拼寫的注音內容被遞交出去。
     resetInputHandler()
     super.inputControllerWillClose()
   }
 
   /// 指定標記模式下被高亮的部分。
-  override func selectionRange() -> NSRange {
+  public override func selectionRange() -> NSRange {
     attributedStringSecured.range
   }
 
   /// 該函式僅用來取消任何輸入法浮動視窗的顯示。
-  override func hidePalettes() {
+  public override func hidePalettes() {
     Broadcaster.shared.eventForClosingAllPanels = .init()
     // 因為上述變數受選字窗、浮動組字窗、工具提示視窗所實時觀測，
     // 所以他們會在看到該變數有變化時自行關閉。

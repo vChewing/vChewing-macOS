@@ -18,8 +18,8 @@ import Shared
 
 // MARK: - § 根據狀態調度按鍵輸入 (Handle Input with States) * Triage
 
-public extension InputHandler {
-  func triageInput(event input: InputSignalProtocol) -> Bool {
+extension InputHandler {
+  public func triageInput(event input: InputSignalProtocol) -> Bool {
     guard let delegate = delegate else { return false }
     var state: IMEStateProtocol { delegate.state }
 
@@ -29,13 +29,13 @@ public extension InputHandler {
       guard let keyCodeType = KeyCode(rawValue: input.keyCode) else { return nil }
       switch keyCodeType {
       case .kEscape: return handleEsc()
-      case .kTab, .kContextMenu: return revolveCandidate(reverseOrder: input.isShiftHold)
-      case .kUpArrow, .kDownArrow, .kLeftArrow, .kRightArrow:
+      case .kContextMenu, .kTab: return revolveCandidate(reverseOrder: input.isShiftHold)
+      case .kDownArrow, .kLeftArrow, .kRightArrow, .kUpArrow:
         let rotation: Bool = (input.isOptionHold || input.isShiftHold) && state.type == .ofInputting
         handleArrowKey: switch (keyCodeType, delegate.isVerticalTyping) {
         case (.kLeftArrow, false), (.kUpArrow, true): return handleBackward(input: input)
-        case (.kRightArrow, false), (.kDownArrow, true): return handleForward(input: input)
-        case (.kUpArrow, false), (.kLeftArrow, true):
+        case (.kDownArrow, true), (.kRightArrow, false): return handleForward(input: input)
+        case (.kLeftArrow, true), (.kUpArrow, false):
           return rotation ? revolveCandidate(reverseOrder: true) : handleClockKey()
         case (.kDownArrow, false), (.kRightArrow, true):
           return rotation ? revolveCandidate(reverseOrder: false) : handleClockKey()
@@ -54,7 +54,7 @@ public extension InputHandler {
           let associates = self.generateArrayOfAssociates(withPair: pair)
           return associates
         }
-      case .kSymbolMenuPhysicalKeyJIS, .kSymbolMenuPhysicalKeyIntl:
+      case .kSymbolMenuPhysicalKeyIntl, .kSymbolMenuPhysicalKeyJIS:
         let isJIS = keyCodeType == .kSymbolMenuPhysicalKeyJIS
         switch input.commonKeyModifierFlags {
         case []:
@@ -109,7 +109,7 @@ public extension InputHandler {
     // MARK: - 按狀態分診（Triage by States）
 
     triageByState: switch state.type {
-    case .ofDeactivated, .ofAbortion, .ofCommitting: return false
+    case .ofAbortion, .ofCommitting, .ofDeactivated: return false
     case .ofAssociates, .ofCandidates, .ofSymbolTable:
       let result = handleCandidate(input: input)
       guard !result, state.type == .ofAssociates else { return true }
@@ -162,7 +162,7 @@ public extension InputHandler {
         // 此處 JIS 鍵盤判定無法用於螢幕鍵盤。所以，螢幕鍵盤的場合，系統會依照 US 鍵盤的判定方案。
         switch (input.keyCode, IMEApp.isKeyboardJIS) {
         case (30, true), (33, false): return revolveCandidate(reverseOrder: true)
-        case (42, true), (30, false): return revolveCandidate(reverseOrder: false)
+        case (30, false), (42, true): return revolveCandidate(reverseOrder: false)
         default: break
         }
       }
@@ -195,7 +195,10 @@ public extension InputHandler {
     // 砍掉這一段會導致「F1-F12 按鍵干擾組字區」的問題。
     // 暫時只能先恢復這段，且補上偵錯彙報機制，方便今後排查故障。
     if state.hasComposition || !isComposerOrCalligrapherEmpty {
-      delegate.callError("Blocked data: charCode: \(input.charCode), keyCode: \(input.keyCode), text: \(input.text)")
+      delegate
+        .callError(
+          "Blocked data: charCode: \(input.charCode), keyCode: \(input.keyCode), text: \(input.text)"
+        )
       delegate.callError("A9BFF20E")
       return true
     }

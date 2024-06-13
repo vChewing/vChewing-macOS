@@ -12,14 +12,17 @@ import KimoDataReader
 import LineReader
 import Shared
 
-public extension LMMgr {
-  enum KimoDataImportError: Error, LocalizedError {
+extension LMMgr {
+  public enum KimoDataImportError: Error, LocalizedError {
     case connectionFailure
     case fileHandlerFailure
 
+    // MARK: Public
+
     public var errorDescription: String? {
       switch self {
-      case .fileHandlerFailure: return "i18n:KimoDataImportError.fileHandlerFailure.errMsg".localized
+      case .fileHandlerFailure: return "i18n:KimoDataImportError.fileHandlerFailure.errMsg"
+        .localized
       case .connectionFailure: return "i18n:KimoDataImportError.connectionFailure.errMsg".localized
       }
     }
@@ -28,7 +31,8 @@ public extension LMMgr {
   /// 藉由 XPC 通訊的方式匯入自奇摩輸入法使用者自訂詞資料庫檔案。
   /// - Parameter rawString: 原始 TXT 檔案內容。
   /// - Returns: 成功匯入的資料數量。
-  @discardableResult static func importYahooKeyKeyUserDictionaryByXPC() throws -> Int {
+  @discardableResult
+  public static func importYahooKeyKeyUserDictionaryByXPC() throws -> Int {
     let kimoBundleID = "com.yahoo.inputmethod.KeyKey"
     if #unavailable(macOS 11) {
       NSWorkspace.shared.launchApplication(
@@ -37,12 +41,14 @@ public extension LMMgr {
         launchIdentifier: nil
       )
     } else {
-      guard let imeURL = NSWorkspace.shared.urlForApplication(withBundleIdentifier: kimoBundleID) else {
+      guard let imeURL = NSWorkspace.shared.urlForApplication(withBundleIdentifier: kimoBundleID)
+      else {
         throw KimoDataImportError.connectionFailure
       }
       NSWorkspace.shared.openApplication(at: imeURL, configuration: .init())
     }
-    guard KimoCommunicator.shared.establishConnection() else { throw KimoDataImportError.connectionFailure }
+    guard KimoCommunicator.shared.establishConnection()
+    else { throw KimoDataImportError.connectionFailure }
     var allPhrasesCHT = [UserPhrase]()
     var allPhrasesCHS = [UserPhrase]()
     KimoCommunicator.shared.prepareData { key, value in
@@ -61,7 +67,9 @@ public extension LMMgr {
       allPhrasesCHS.append(phraseCHS)
     }
 
-    guard Self.batchImportUserPhrasePairs(allPhrasesCHT: allPhrasesCHT, allPhrasesCHS: allPhrasesCHS) else {
+    guard Self
+      .batchImportUserPhrasePairs(allPhrasesCHT: allPhrasesCHT, allPhrasesCHS: allPhrasesCHS)
+    else {
       throw KimoDataImportError.fileHandlerFailure
     }
 
@@ -75,7 +83,11 @@ public extension LMMgr {
   /// 匯入自奇摩輸入法使用者自訂詞資料庫匯出的 TXT 檔案。
   /// - Parameter rawString: 原始 TXT 檔案內容。
   /// - Returns: 成功匯入的資料數量。
-  @discardableResult static func importYahooKeyKeyUserDictionary(text rawString: inout String) throws -> Int {
+  @discardableResult
+  public static func importYahooKeyKeyUserDictionary(
+    text rawString: inout String
+  ) throws
+    -> Int {
     var allPhrasesCHT = [UserPhrase]()
     var allPhrasesCHS = [UserPhrase]()
     rawString.enumerateLines { currentLine, _ in
@@ -83,7 +95,12 @@ public extension LMMgr {
       guard cells.count >= 3, cells.first != "#", cells.first != "MJSR" else { return }
       let value = cells[0].description
       let keyArray = cells[1].split(separator: ",").map(\.description)
-      let phraseCHT = UserPhrase(keyArray: keyArray, value: value, inputMode: .imeModeCHT, isConverted: false)
+      let phraseCHT = UserPhrase(
+        keyArray: keyArray,
+        value: value,
+        inputMode: .imeModeCHT,
+        isConverted: false
+      )
       guard phraseCHT.isValid, !phraseCHT.isDuplicated else { return }
       guard !(phraseCHT.value.count == 1 && phraseCHT.keyArray.count == 1) else { return }
       allPhrasesCHT.append(phraseCHT)
@@ -94,7 +111,9 @@ public extension LMMgr {
     }
     guard !allPhrasesCHT.isEmpty else { return 0 }
 
-    guard Self.batchImportUserPhrasePairs(allPhrasesCHT: allPhrasesCHT, allPhrasesCHS: allPhrasesCHS) else {
+    guard Self
+      .batchImportUserPhrasePairs(allPhrasesCHT: allPhrasesCHT, allPhrasesCHS: allPhrasesCHS)
+    else {
       throw KimoDataImportError.fileHandlerFailure
     }
 
@@ -105,7 +124,11 @@ public extension LMMgr {
     return result
   }
 
-  private static func batchImportUserPhrasePairs(allPhrasesCHT: [UserPhrase], allPhrasesCHS: [UserPhrase]) -> Bool {
+  private static func batchImportUserPhrasePairs(
+    allPhrasesCHT: [UserPhrase],
+    allPhrasesCHS: [UserPhrase]
+  )
+    -> Bool {
     let outputStrCHS = allPhrasesCHS.map(\.description).joined(separator: "\n")
     let outputStrCHT = allPhrasesCHT.map(\.description).joined(separator: "\n")
     var outputDataCHS = "\(outputStrCHS)\n".data(using: .utf8) ?? .init([])
@@ -115,7 +138,8 @@ public extension LMMgr {
 
     let fileHandlerCHS = try? FileHandle(forUpdating: urlCHS)
     let fileHandlerCHT = try? FileHandle(forUpdating: urlCHT)
-    guard let fileHandlerCHS = fileHandlerCHS, let fileHandlerCHT = fileHandlerCHT else { return false }
+    guard let fileHandlerCHS = fileHandlerCHS,
+          let fileHandlerCHT = fileHandlerCHT else { return false }
     defer {
       fileHandlerCHS.closeFile()
       fileHandlerCHT.closeFile()
@@ -143,5 +167,8 @@ public extension LMMgr {
 }
 
 private func fileSize(for theURL: URL) -> UInt64? {
-  (try? FileManager.default.attributesOfItem(atPath: theURL.path))?[FileAttributeKey.size] as? UInt64
+  (
+    try? FileManager.default
+      .attributesOfItem(atPath: theURL.path)
+  )?[FileAttributeKey.size] as? UInt64
 }

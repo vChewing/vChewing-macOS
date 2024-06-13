@@ -6,13 +6,13 @@
 // marks, or product names of Contributor, except as required to fulfill notice
 // requirements defined in MIT License.
 
-public extension Tekkon {
+extension Tekkon {
   // MARK: - Phonabet to Hanyu-Pinyin Conversion Processing
 
   /// 注音轉拼音，要求陰平必須是空格。
   /// - Parameters:
   ///   - targetJoined: 傳入的 String 對象物件。
-  static func cnvPhonaToHanyuPinyin(targetJoined: String) -> String {
+  public static func cnvPhonaToHanyuPinyin(targetJoined: String) -> String {
     var targetConverted = targetJoined
     for pair in arrPhonaToHanyuPinyin {
       targetConverted = targetConverted.swapping(pair.0, with: pair.1)
@@ -23,7 +23,7 @@ public extension Tekkon {
   /// 漢語拼音數字標調式轉漢語拼音教科書格式，要求陰平必須是數字 1。
   /// - Parameters:
   ///   - target: 傳入的 String 對象物件。
-  static func cnvHanyuPinyinToTextbookStyle(targetJoined: String) -> String {
+  public static func cnvHanyuPinyinToTextbookStyle(targetJoined: String) -> String {
     var targetConverted = targetJoined
     for pair in arrHanyuPinyinTextbookStyleConversionTable {
       targetConverted = targetConverted.swapping(pair.0, with: pair.1)
@@ -35,7 +35,7 @@ public extension Tekkon {
   /// - Parameters:
   ///   - target: 要拿來做轉換處理的讀音。
   /// - Returns: 經過轉換處理的讀音。
-  static func cnvPhonaToTextbookStyle(target: String) -> String {
+  public static func cnvPhonaToTextbookStyle(target: String) -> String {
     var newString = target
     if String(target.reversed()[0]) == "˙" {
       newString = String(target.dropLast())
@@ -48,11 +48,13 @@ public extension Tekkon {
   /// - Parameters:
   ///   - target: 要拿來做轉換處理的讀音。
   /// - Returns: 經過轉換處理的讀音。
-  static func restoreToneOneInPhona(
+  public static func restoreToneOneInPhona(
     target: String
-  ) -> String {
+  )
+    -> String {
     var newNeta = target
-    if !"ˊˇˋ˙".has(string: String(target.reversed()[0])), !target.has(string: "_") { newNeta += "1" }
+    if !"ˊˇˋ˙".has(string: String(target.reversed()[0])),
+       !target.has(string: "_") { newNeta += "1" }
     return newNeta
   }
 
@@ -61,7 +63,11 @@ public extension Tekkon {
   ///   - targetJoined: 要轉換的漢語拼音內容，要求必須帶有 12345 數字標調。
   ///   - newToneOne: 對陰平指定新的標記。預設情況下該標記為空字串。
   /// - Returns: 轉換結果。
-  static func cnvHanyuPinyinToPhona(targetJoined: String, newToneOne: String = "") -> String {
+  public static func cnvHanyuPinyinToPhona(
+    targetJoined: String,
+    newToneOne: String = ""
+  )
+    -> String {
     /// 如果當前內容有任何除了半形英數內容以外的內容的話，就直接放棄轉換。
     if targetJoined.contains("_") || !targetJoined.isNotPureAlphanumerical { return targetJoined }
     var result = targetJoined
@@ -78,8 +84,8 @@ public extension Tekkon {
 }
 
 /// 檢測字串是否包含半形英數內容
-private extension String {
-  var isNotPureAlphanumerical: Bool {
+extension String {
+  fileprivate var isNotPureAlphanumerical: Bool {
     let x = unicodeScalars.map(\.value).filter {
       if $0 >= 48, $0 <= 57 { return false }
       if $0 >= 65, $0 <= 90 { return false }

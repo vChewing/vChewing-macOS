@@ -10,13 +10,18 @@ import AppKit
 import LangModelAssembly
 import Shared
 
+// MARK: - CtlRevLookupWindow
+
 class CtlRevLookupWindow: NSWindowController, NSWindowDelegate {
   static var shared: CtlRevLookupWindow?
-  @objc var observation: NSKeyValueObservation?
+
+  @objc
+  var observation: NSKeyValueObservation?
 
   static func show() {
     if shared == nil { Self.shared = .init(window: FrmRevLookupWindow()) }
-    guard let shared = Self.shared, let window = shared.window as? FrmRevLookupWindow else { return }
+    guard let shared = Self.shared,
+          let window = shared.window as? FrmRevLookupWindow else { return }
     shared.window = window
     window.delegate = shared
     window.setPosition(vertical: .bottom, horizontal: .right, padding: 20)
@@ -27,17 +32,10 @@ class CtlRevLookupWindow: NSWindowController, NSWindowDelegate {
   }
 }
 
-class FrmRevLookupWindow: NSWindow {
-  public lazy var inputField = NSTextField()
-  public lazy var resultView = NSTextView()
-  private lazy var clipView = NSClipView()
-  private lazy var scrollView = NSScrollView()
-  private lazy var button = NSButton()
-  private lazy var view = NSView()
+// MARK: - FrmRevLookupWindow
 
-  static func reloadData() {
-    LMMgr.connectCoreDB()
-  }
+class FrmRevLookupWindow: NSWindow {
+  // MARK: Lifecycle
 
   init() {
     super.init(
@@ -47,6 +45,34 @@ class FrmRevLookupWindow: NSWindow {
     )
     setupUI()
   }
+
+  // MARK: Public
+
+  public lazy var inputField = NSTextField()
+  public lazy var resultView = NSTextView()
+
+  // MARK: Internal
+
+  static func reloadData() {
+    LMMgr.connectCoreDB()
+  }
+
+  @objc
+  func keyboardConfirmed(_: Any?) {
+    if inputField.stringValue.isEmpty { return }
+    resultView.string = "\n" + "Loading…".localized
+    DispatchQueue.main.async { [weak self] in
+      guard let self = self else { return }
+      self.updateResult(with: self.inputField.stringValue)
+    }
+  }
+
+  // MARK: Private
+
+  private lazy var clipView = NSClipView()
+  private lazy var scrollView = NSScrollView()
+  private lazy var button = NSButton()
+  private lazy var view = NSView()
 
   private func setupUI() {
     contentView = view
@@ -73,7 +99,10 @@ class FrmRevLookupWindow: NSWindow {
     button.cell.map { $0 as? NSButtonCell }??.isBordered = true
     button.target = self
     button.action = #selector(keyboardConfirmed(_:))
-    button.keyEquivalent = String(utf16CodeUnits: [unichar(NSEvent.SpecialKey.enter.rawValue)], count: 1) as String
+    button.keyEquivalent = String(
+      utf16CodeUnits: [unichar(NSEvent.SpecialKey.enter.rawValue)],
+      count: 1
+    ) as String
 
     scrollView.autoresizingMask = [.maxXMargin, .minYMargin]
     scrollView.borderType = .noBorder
@@ -127,15 +156,6 @@ class FrmRevLookupWindow: NSWindow {
       "Maximum 15 results returnable.".localized
   }
 
-  @objc func keyboardConfirmed(_: Any?) {
-    if inputField.stringValue.isEmpty { return }
-    resultView.string = "\n" + "Loading…".localized
-    DispatchQueue.main.async { [weak self] in
-      guard let self = self else { return }
-      self.updateResult(with: self.inputField.stringValue)
-    }
-  }
-
   private func updateResult(with input: String) {
     guard !input.isEmpty else { return }
     button.isEnabled = false
@@ -150,7 +170,8 @@ class FrmRevLookupWindow: NSWindow {
         strBuilder.append("Maximum 15 results returnable.".localized + "\n")
         break theLoop
       }
-      let arrResult = LMAssembly.LMInstantiator.getFactoryReverseLookupData(with: char)?.deduplicated ?? []
+      let arrResult = LMAssembly.LMInstantiator.getFactoryReverseLookupData(with: char)?
+        .deduplicated ?? []
       if !arrResult.isEmpty {
         strBuilder.append(char + "\t")
         strBuilder.append(arrResult.joined(separator: ", "))

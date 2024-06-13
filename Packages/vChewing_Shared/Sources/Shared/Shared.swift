@@ -10,7 +10,7 @@ import AppKit
 import Foundation
 import SwiftExtension
 
-// MARK: - Tooltip Color States
+// MARK: - TooltipColorState
 
 public enum TooltipColorState {
   case normal
@@ -23,7 +23,7 @@ public enum TooltipColorState {
   case succeeded
 }
 
-// MARK: - IMEState types.
+// MARK: - StateType
 
 /// 用以讓每個狀態自描述的 enum。
 public enum StateType: String {
@@ -55,7 +55,7 @@ public enum StateType: String {
   case ofSymbolTable = "SymbolTable"
 }
 
-// MARK: - Parser for Syllable composer
+// MARK: - KeyboardParser
 
 public enum KeyboardParser: Int, CaseIterable {
   case ofStandard = 0
@@ -75,6 +75,8 @@ public enum KeyboardParser: Int, CaseIterable {
   case ofHualuoPinyin = 103
   case ofUniversalPinyin = 104
   case ofWadeGilesPinyin = 105
+
+  // MARK: Public
 
   public var localizedMenuName: String {
     let rawString: String = {
@@ -141,17 +143,16 @@ public enum KeyboardParser: Int, CaseIterable {
   }
 }
 
-public enum CandidateKey {
-  public static var defaultKeys: String { suggestions[0] }
-  public static let suggestions: [String] = [
-    "123456", "123456789", "234567890", "QWERTYUIO", "QWERTASDF", "ASDFGH", "ASDFZXCVB",
-  ]
+// MARK: - CandidateKey
 
+public enum CandidateKey {
   /// 僅列舉那些需要專門檢查才能發現的那種無法自動排除的錯誤。
   public enum ValidationError {
     case noError
     case invalidCharacters
     case countMismatch
+
+    // MARK: Public
 
     public var description: String {
       switch self {
@@ -176,6 +177,12 @@ public enum CandidateKey {
     }
   }
 
+  public static let suggestions: [String] = [
+    "123456", "123456789", "234567890", "QWERTYUIO", "QWERTASDF", "ASDFGH", "ASDFZXCVB",
+  ]
+
+  public static var defaultKeys: String { suggestions[0] }
+
   /// 校驗選字鍵參數資料值的合法性。
   /// - Remark: 傳入的參數值得事先做過下述處理：
   /// ```
@@ -187,7 +194,8 @@ public enum CandidateKey {
   /// - Returns: 返回 nil 的話，證明沒有錯誤；否則會返回錯誤描述訊息。
   public static func validate(
     keys candidateKeys: String, excluding forbiddenChars: String = ""
-  ) -> String? {
+  )
+    -> String? {
     let candidateKeys = candidateKeys.lowercased()
     let forbiddenChars = forbiddenChars.lowercased()
     var result = ValidationError.noError
@@ -216,16 +224,22 @@ public func vCLog(_ strPrint: StringLiteralType) {
   }
 }
 
-public enum Shared {
-  // Supported locales.
-  public static let arrSupportedLocales: [String] = ["en", "zh-Hant", "zh-Hans", "ja"]
+// MARK: - Shared
 
+public enum Shared {
   // The type of input modes.
   public enum InputMode: String, CaseIterable, Identifiable {
-    public var id: ObjectIdentifier { .init(rawValue as AnyObject) }
     case imeModeCHS = "org.atelierInmu.inputmethod.vChewing.IMECHS"
     case imeModeCHT = "org.atelierInmu.inputmethod.vChewing.IMECHT"
     case imeModeNULL = ""
+
+    // MARK: Public
+
+    public static var validCases: [InputMode] {
+      [.imeModeCHS, .imeModeCHT]
+    }
+
+    public var id: ObjectIdentifier { .init(rawValue as AnyObject) }
     public var reversed: Shared.InputMode {
       switch self {
       case .imeModeCHS:
@@ -235,10 +249,6 @@ public enum Shared {
       case .imeModeNULL:
         return .imeModeNULL
       }
-    }
-
-    public static var validCases: [InputMode] {
-      [.imeModeCHS, .imeModeCHT]
     }
 
     public var localizedDescription: String { NSLocalizedString(description, comment: "") }
@@ -269,36 +279,55 @@ public enum Shared {
       }
     }
   }
+
+  // Supported locales.
+  public static let arrSupportedLocales: [String] = ["en", "zh-Hant", "zh-Hans", "ja"]
 }
 
 // MARK: - PEReloadEventObserver
 
 @available(macOS 10.15, *)
 public class PEReloadEventObserver: NSObject, ObservableObject {
-  public static let shared = PEReloadEventObserver()
-  private var observation: NSKeyValueObservation?
-  @Published public var id = UUID().uuidString
+  // MARK: Lifecycle
 
   override public init() {
     super.init()
-    observation = Broadcaster.shared.observe(\.eventForReloadingPhraseEditor, options: [.new]) { _, _ in
-      self.touch()
-    }
+    self.observation = Broadcaster.shared
+      .observe(\.eventForReloadingPhraseEditor, options: [.new]) { _, _ in
+        self.touch()
+      }
   }
 
-  public static func == (lhs: PEReloadEventObserver, rhs: PEReloadEventObserver) -> Bool { lhs.id == rhs.id }
+  // MARK: Public
+
+  public static let shared = PEReloadEventObserver()
+
+  @Published
+  public var id = UUID().uuidString
+
+  public static func == (
+    lhs: PEReloadEventObserver,
+    rhs: PEReloadEventObserver
+  )
+    -> Bool { lhs.id == rhs.id }
 
   public func touch() {
     id = UUID().uuidString
   }
+
+  // MARK: Private
+
+  private var observation: NSKeyValueObservation?
 }
 
-// MARK: - File Open Method
+// MARK: - FileOpenMethod
 
 public enum FileOpenMethod: String {
   case finder = "Finder"
   case textEdit = "TextEdit"
   case safari = "Safari"
+
+  // MARK: Public
 
   public var appName: String {
     let englishFallback: String = {
@@ -358,7 +387,8 @@ public enum FileOpenMethod: String {
         NSWorkspace.shared.openFile(url.path, withApplication: appName)
         return
       } else {
-        let textEditURL = NSWorkspace.shared.urlForApplication(withBundleIdentifier: bundleIdentifier)
+        let textEditURL = NSWorkspace.shared
+          .urlForApplication(withBundleIdentifier: bundleIdentifier)
         guard let textEditURL = textEditURL else { return }
         let configuration = NSWorkspace.OpenConfiguration()
         configuration.promptsUserIfNeeded = true

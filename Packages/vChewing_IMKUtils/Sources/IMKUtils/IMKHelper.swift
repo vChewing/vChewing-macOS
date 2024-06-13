@@ -9,9 +9,14 @@
 import Foundation
 import InputMethodKit
 
-// MARK: - IMKHelper by The vChewing Project (MIT License).
+// MARK: - IMKHelper
 
 public enum IMKHelper {
+  public struct CarbonKeyboardLayout {
+    var strName: String = ""
+    var strValue: String = ""
+  }
+
   /// 威注音有專門統計過，實際上會有差異的英數鍵盤佈局只有這幾種。
   /// 精簡成這種清單的話，不但節省 SwiftUI 的繪製壓力，也方便使用者做選擇。
   public static let arrWhitelistedKeyLayoutsASCII: [String] = {
@@ -51,7 +56,10 @@ public enum IMKHelper {
     var containerB: [TISInputSource.KeyboardLayout?] = []
     var containerC: [TISInputSource.KeyboardLayout] = []
 
-    let filterSet = Array(Set(arrWhitelistedKeyLayoutsASCII).subtracting(Set(arrDynamicBasicKeyLayouts)))
+    let filterSet = Array(
+      Set(arrWhitelistedKeyLayoutsASCII)
+        .subtracting(Set(arrDynamicBasicKeyLayouts))
+    )
     let matchedGroupBasic = (arrWhitelistedKeyLayoutsASCII + arrDynamicBasicKeyLayouts).compactMap {
       allTISKeyboardLayouts[$0]
     }
@@ -71,17 +79,13 @@ public enum IMKHelper {
 
     return containerA + containerB + containerC
   }
-
-  public struct CarbonKeyboardLayout {
-    var strName: String = ""
-    var strValue: String = ""
-  }
 }
 
 // MARK: - 與輸入法的具體的安裝過程有關的命令
 
-public extension IMKHelper {
-  @discardableResult static func registerInputMethod() -> Int32 {
+extension IMKHelper {
+  @discardableResult
+  public static func registerInputMethod() -> Int32 {
     TISInputSource.registerInputMethod() ? 0 : -1
   }
 }

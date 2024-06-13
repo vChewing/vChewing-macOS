@@ -8,9 +8,18 @@
 
 import AppKit
 
+// MARK: - UpdateSputnik
+
 public class UpdateSputnik {
+  // MARK: Lifecycle
+
+  public init() {}
+
+  // MARK: Public
+
   public static let isMainStreamRelease = true
   public static let shared: UpdateSputnik = .init()
+
   public let kUpdateInfoPageURLKey: String = {
     if #available(macOS 13, *) {
       return "UpdateInfoSite"
@@ -30,8 +39,6 @@ public class UpdateSputnik {
   public let kUpdateCheckInterval: TimeInterval = 114_514
   public let kCheckUpdateAutomatically = "CheckUpdateAutomatically"
 
-  public init() {}
-
   public func checkForUpdate(forced: Bool = false, url: URL, shouldBypass: @escaping () -> Bool) {
     let shouldBypass = shouldBypass()
     silentMode = shouldBypass
@@ -39,7 +46,8 @@ public class UpdateSputnik {
 
     if !forced {
       if !UserDefaults.standard.bool(forKey: kCheckUpdateAutomatically) { return }
-      if let nextCheckDate = nextUpdateCheckDate, Date().compare(nextCheckDate) == .orderedAscending {
+      if let nextCheckDate = nextUpdateCheckDate,
+         Date().compare(nextCheckDate) == .orderedAscending {
         return
       }
     }
@@ -64,41 +72,17 @@ public class UpdateSputnik {
     currentTask = task
   }
 
-  // MARK: - Private Properties
+  // MARK: Internal
 
-  private var silentMode = false
-  private var isCurrentCheckForced = false
-  var sessionConfiguration = URLSessionConfiguration.background(withIdentifier: Bundle.main.bundleIdentifier!)
-
-  private var busy: Bool { currentTask != nil }
-  private var currentTask: URLSessionDataTask?
-  private var data: Data? {
-    didSet {
-      if let data = data {
-        DispatchQueue.main.async {
-          if !self.silentMode {
-            self.dataDidSet(data: data)
-          }
-          self.currentTask = nil
-        }
-      }
-    }
-  }
-
-  private var nextUpdateCheckDate: Date? {
-    get {
-      UserDefaults.standard.object(forKey: kUpdateCheckDateKeyNext) as? Date
-    }
-    set {
-      UserDefaults.standard.set(newValue, forKey: kUpdateCheckDateKeyNext)
-    }
-  }
+  var sessionConfiguration = URLSessionConfiguration
+    .background(withIdentifier: Bundle.main.bundleIdentifier!)
 
   // MARK: - Private Functions.
 
   internal func dataDidSet(data: Data) {
     var plist: [AnyHashable: Any]?
-    plist = try? PropertyListSerialization.propertyList(from: data, options: [], format: nil) as? [AnyHashable: Any]
+    plist = try? PropertyListSerialization
+      .propertyList(from: data, options: [], format: nil) as? [AnyHashable: Any]
     nextUpdateCheckDate = .init().addingTimeInterval(kUpdateCheckInterval)
     cleanUp()
 
@@ -116,14 +100,18 @@ public class UpdateSputnik {
           let strRemoteVersionShortened = plist["CFBundleShortVersionString"] as? String
     else {
       DispatchQueue.main.async {
-        self.showError(message: NSLocalizedString("Plist downloaded cannot be parsed correctly.", comment: ""))
+        self.showError(message: NSLocalizedString(
+          "Plist downloaded cannot be parsed correctly.",
+          comment: ""
+        ))
         self.currentTask = nil
       }
       return
     }
 
     guard let dicMainBundle = Bundle.main.infoDictionary,
-          let intCurrentVersion = Int(dicMainBundle[kCFBundleVersionKey as String] as? String ?? ""),
+          let intCurrentVersion =
+          Int(dicMainBundle[kCFBundleVersionKey as String] as? String ?? ""),
           let strCurrentVersionShortened = dicMainBundle["CFBundleShortVersionString"] as? String
     else { return } // Shouldn't happen.
     /// 註：此處 isRemoteMainStreamDistro 在 Aqua 紀念版內應該設為 false；主流版則為 true。
@@ -134,7 +122,10 @@ public class UpdateSputnik {
       if intRemoteVersion == intCurrentVersion, crossDistroNotification { break versionCheck }
       let alert = NSAlert()
       alert.messageText = NSLocalizedString("Update Check Completed", comment: "")
-      alert.informativeText = NSLocalizedString("You are already using the latest version.", comment: "")
+      alert.informativeText = NSLocalizedString(
+        "You are already using the latest version.",
+        comment: ""
+      )
       alert.addButton(withTitle: NSLocalizedString("OK", comment: ""))
       alert.runModal()
       NSApp.popup()
@@ -191,6 +182,37 @@ public class UpdateSputnik {
     }
   }
 
+  // MARK: Private
+
+  // MARK: - Private Properties
+
+  private var silentMode = false
+  private var isCurrentCheckForced = false
+  private var currentTask: URLSessionDataTask?
+
+  private var busy: Bool { currentTask != nil }
+  private var data: Data? {
+    didSet {
+      if let data = data {
+        DispatchQueue.main.async {
+          if !self.silentMode {
+            self.dataDidSet(data: data)
+          }
+          self.currentTask = nil
+        }
+      }
+    }
+  }
+
+  private var nextUpdateCheckDate: Date? {
+    get {
+      UserDefaults.standard.object(forKey: kUpdateCheckDateKeyNext) as? Date
+    }
+    set {
+      UserDefaults.standard.set(newValue, forKey: kUpdateCheckDateKeyNext)
+    }
+  }
+
   private func cleanUp() {
     currentTask = nil
     data = nil
@@ -213,8 +235,8 @@ public class UpdateSputnik {
 
 // This is to deal with changes brought by macOS 14.
 
-private extension NSApplication {
-  func popup() {
+extension NSApplication {
+  fileprivate func popup() {
     #if compiler(>=5.9) && canImport(AppKit, _version: "14.0")
       if #available(macOS 14.0, *) {
         NSApp.activate()

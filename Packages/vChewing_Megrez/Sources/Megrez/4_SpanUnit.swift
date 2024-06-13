@@ -3,17 +3,19 @@
 // ====================
 // This code is released under the MIT license (SPDX-License-Identifier: MIT)
 
-public extension Megrez {
+// MARK: - Megrez.SpanUnit
+
+extension Megrez {
   /// 幅位乃指一組共享起點的節點。其實是個辭典：[幅位長度: 節點]。
-  typealias SpanUnit = [Int: Node]
+  public typealias SpanUnit = [Int: Node]
 }
 
-public extension Megrez.SpanUnit {
+extension Megrez.SpanUnit {
   /// 幅位乃指一組共享起點的節點。其實是個辭典：[幅位長度: 節點]。
   /// - Remark: 因為 Node 不是 Struct，所以會在 Compositor 被拷貝的時候無法被真實複製。
   /// 這樣一來，Compositor 複製品當中的 Node 的變化會被反應到原先的 Compositor 身上。
   /// 這在某些情況下會造成意料之外的混亂情況，所以需要引入一個拷貝用的建構子。
-  init(SpanUnit target: Megrez.SpanUnit) {
+  public init(SpanUnit target: Megrez.SpanUnit) {
     self.init()
     target.forEach { theKey, theValue in
       self[theKey] = theValue.copy
@@ -21,13 +23,13 @@ public extension Megrez.SpanUnit {
   }
 
   /// 該幅位的硬拷貝。
-  var hardCopy: Megrez.SpanUnit { .init(SpanUnit: self) }
+  public var hardCopy: Megrez.SpanUnit { .init(SpanUnit: self) }
 
   // MARK: - Dynamic Variables
 
   /// 該幅位單元內的所有節點當中持有最長幅位的節點長度。
   /// 該變數受該幅位的自身操作函式而被動更新。
-  var maxLength: Int { keys.max() ?? 0 }
+  public var maxLength: Int { keys.max() ?? 0 }
 
   /// （該變數為捷徑，代傳 Megrez.Compositor.maxSpanLength。）
   private var maxSpanLength: Int { Megrez.Compositor.maxSpanLength }
@@ -40,7 +42,8 @@ public extension Megrez.SpanUnit {
   /// - Remark: 這個函式用來防呆。一般情況下用不到。
   /// - Parameter node: 要塞入的節點。
   /// - Returns: 該操作是否成功執行。
-  @discardableResult mutating func addNode(node: Megrez.Node) -> Bool {
+  @discardableResult
+  public mutating func addNode(node: Megrez.Node) -> Bool {
     guard allowedLengths.contains(node.spanLength) else { return false }
     self[node.spanLength] = node
     return true
@@ -50,7 +53,8 @@ public extension Megrez.SpanUnit {
   /// - Remark: 這個函式用來防呆。一般情況下用不到。
   /// - Parameter length: 給定的幅位長度。
   /// - Returns: 該操作是否成功執行。
-  @discardableResult mutating func dropNodesOfOrBeyond(length: Int) -> Bool {
+  @discardableResult
+  public mutating func dropNodesOfOrBeyond(length: Int) -> Bool {
     guard allowedLengths.contains(length) else { return false }
     let length = Swift.min(length, maxSpanLength)
     (length ... maxSpanLength).forEach { self[$0] = nil }

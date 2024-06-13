@@ -48,7 +48,8 @@ class CandidateServiceCoordinatorTests: XCTestCase {
     case .url: break
     case .selector:
       let response = theService.responseFromSelector
-      let expectedResponse = "胡 U+80E1 CJK UNIFIED IDEOGRAPH-80E1\n桃 U+6843 CJK UNIFIED IDEOGRAPH-6843"
+      let expectedResponse =
+        "胡 U+80E1 CJK UNIFIED IDEOGRAPH-80E1\n桃 U+6843 CJK UNIFIED IDEOGRAPH-6843"
       XCTAssertEqual(response, expectedResponse)
     }
   }
@@ -62,7 +63,8 @@ class CandidateServiceCoordinatorTests: XCTestCase {
     case .url: break
     case .selector:
       let response = theService.responseFromSelector
-      let expectedResponse = "<ruby>甜<rp>(</rp><rt>ㄊㄧㄢˊ</rt><rp>)</rp></ruby><ruby>的<rp>(</rp><rt>˙ㄉㄜ</rt><rp>)</rp></ruby>"
+      let expectedResponse =
+        "<ruby>甜<rp>(</rp><rt>ㄊㄧㄢˊ</rt><rp>)</rp></ruby><ruby>的<rp>(</rp><rt>˙ㄉㄜ</rt><rp>)</rp></ruby>"
       XCTAssertEqual(response, expectedResponse)
     }
   }
@@ -76,7 +78,8 @@ class CandidateServiceCoordinatorTests: XCTestCase {
     case .url: break
     case .selector:
       let response = theService.responseFromSelector
-      let expectedResponse = "<ruby>鐵<rp>(</rp><rt>tiě</rt><rp>)</rp></ruby><ruby>嘴<rp>(</rp><rt>zuǐ</rt><rp>)</rp></ruby>"
+      let expectedResponse =
+        "<ruby>鐵<rp>(</rp><rt>tiě</rt><rp>)</rp></ruby><ruby>嘴<rp>(</rp><rt>zuǐ</rt><rp>)</rp></ruby>"
       XCTAssertEqual(response, expectedResponse)
     }
   }

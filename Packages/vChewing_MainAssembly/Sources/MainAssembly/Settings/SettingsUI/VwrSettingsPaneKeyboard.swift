@@ -11,24 +11,11 @@ import Shared
 import SwiftExtension
 import SwiftUI
 
+// MARK: - VwrSettingsPaneKeyboard
+
 @available(macOS 13, *)
 public struct VwrSettingsPaneKeyboard: View {
-  // MARK: - AppStorage Variables
-
-  @AppStorage(wrappedValue: 0, UserDef.kKeyboardParser.rawValue)
-  private var keyboardParser: Int
-
-  @AppStorage(
-    wrappedValue: PrefMgr.kDefaultBasicKeyboardLayout,
-    UserDef.kBasicKeyboardLayout.rawValue
-  )
-  private var basicKeyboardLayout: String
-
-  @AppStorage(
-    wrappedValue: PrefMgr.kDefaultAlphanumericalKeyboardLayout,
-    UserDef.kAlphanumericalKeyboardLayout.rawValue
-  )
-  private var alphanumericalKeyboardLayout: String
+  // MARK: Public
 
   // MARK: - Main View
 
@@ -72,10 +59,57 @@ public struct VwrSettingsPaneKeyboard: View {
       maxHeight: CtlSettingsUI.contentMaxHeight
     )
   }
+
+  // MARK: Private
+
+  // MARK: - AppStorage Variables
+
+  @AppStorage(wrappedValue: 0, UserDef.kKeyboardParser.rawValue)
+  private var keyboardParser: Int
+
+  @AppStorage(
+    wrappedValue: PrefMgr.kDefaultBasicKeyboardLayout,
+    UserDef.kBasicKeyboardLayout.rawValue
+  )
+  private var basicKeyboardLayout: String
+
+  @AppStorage(
+    wrappedValue: PrefMgr.kDefaultAlphanumericalKeyboardLayout,
+    UserDef.kAlphanumericalKeyboardLayout.rawValue
+  )
+  private var alphanumericalKeyboardLayout: String
 }
+
+// MARK: - VwrSettingsPaneKeyboard_KeyboardShortcuts
 
 @available(macOS 13, *)
 private struct VwrSettingsPaneKeyboard_KeyboardShortcuts: View {
+  // MARK: Internal
+
+  // MARK: - Main View
+
+  var body: some View {
+    HStack(alignment: .top, spacing: NSFont.systemFontSize) {
+      VStack(alignment: .leading) {
+        UserDef.kUsingHotKeySCPC.bind($usingHotKeySCPC).render()
+        UserDef.kUsingHotKeyAssociates.bind($usingHotKeyAssociates).render()
+        UserDef.kUsingHotKeyCNS.bind($usingHotKeyCNS).render()
+        UserDef.kUsingHotKeyKangXi.bind($usingHotKeyKangXi).render()
+        UserDef.kUsingHotKeyRevLookup.bind($usingHotKeyRevLookup).render()
+      }
+      Divider()
+      VStack(alignment: .leading) {
+        UserDef.kUsingHotKeyJIS.bind($usingHotKeyJIS).render()
+        UserDef.kUsingHotKeyHalfWidthASCII.bind($usingHotKeyHalfWidthASCII).render()
+        UserDef.kUsingHotKeyCurrencyNumerals.bind($usingHotKeyCurrencyNumerals).render()
+        UserDef.kUsingHotKeyCassette.bind($usingHotKeyCassette).render()
+        UserDef.kUsingHotKeyInputMode.bind($usingHotKeyInputMode).render()
+      }
+    }
+  }
+
+  // MARK: Private
+
   // MARK: - AppStorage Variables
 
   @AppStorage(wrappedValue: true, UserDef.kUsingHotKeySCPC.rawValue)
@@ -107,29 +141,9 @@ private struct VwrSettingsPaneKeyboard_KeyboardShortcuts: View {
 
   @AppStorage(wrappedValue: true, UserDef.kUsingHotKeyInputMode.rawValue)
   private var usingHotKeyInputMode: Bool
-
-  // MARK: - Main View
-
-  var body: some View {
-    HStack(alignment: .top, spacing: NSFont.systemFontSize) {
-      VStack(alignment: .leading) {
-        UserDef.kUsingHotKeySCPC.bind($usingHotKeySCPC).render()
-        UserDef.kUsingHotKeyAssociates.bind($usingHotKeyAssociates).render()
-        UserDef.kUsingHotKeyCNS.bind($usingHotKeyCNS).render()
-        UserDef.kUsingHotKeyKangXi.bind($usingHotKeyKangXi).render()
-        UserDef.kUsingHotKeyRevLookup.bind($usingHotKeyRevLookup).render()
-      }
-      Divider()
-      VStack(alignment: .leading) {
-        UserDef.kUsingHotKeyJIS.bind($usingHotKeyJIS).render()
-        UserDef.kUsingHotKeyHalfWidthASCII.bind($usingHotKeyHalfWidthASCII).render()
-        UserDef.kUsingHotKeyCurrencyNumerals.bind($usingHotKeyCurrencyNumerals).render()
-        UserDef.kUsingHotKeyCassette.bind($usingHotKeyCassette).render()
-        UserDef.kUsingHotKeyInputMode.bind($usingHotKeyInputMode).render()
-      }
-    }
-  }
 }
+
+// MARK: - VwrSettingsPaneKeyboard_Previews
 
 @available(macOS 13, *)
 struct VwrSettingsPaneKeyboard_Previews: PreviewProvider {

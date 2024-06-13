@@ -10,34 +10,45 @@
 import Foundation
 import Megrez
 
-// MARK: - Public Types.
+// MARK: - LMAssembly.OverrideSuggestion
 
-public extension LMAssembly {
-  struct OverrideSuggestion {
+extension LMAssembly {
+  public struct OverrideSuggestion {
     public var candidates = [(String, Megrez.Unigram)]()
     public var forceHighScoreOverride = false
+
     public var isEmpty: Bool { candidates.isEmpty }
   }
 }
 
-// MARK: - LMUserOverride Class Definition.
+// MARK: - LMAssembly.LMUserOverride
 
 extension LMAssembly {
   class LMUserOverride {
+    // MARK: Lifecycle
+
+    public init(
+      capacity: Int = 500,
+      decayConstant: Double = LMUserOverride.kObservedOverrideHalfLife,
+      dataURL: URL? = nil
+    ) {
+      self.mutCapacity = max(capacity, 1) // Ensures that this integer value is always > 0.
+      self.mutDecayExponent = log(0.5) / decayConstant
+      self.fileSaveLocationURL = dataURL
+    }
+
+    // MARK: Public
+
+    public static let kObservedOverrideHalfLife: Double = 3600.0 * 6 // 6 小時半衰一次，能持續不到六天的記憶。
+
+    // MARK: Internal
+
     var mutCapacity: Int
     var mutDecayExponent: Double
     var mutLRUList: [KeyObservationPair] = []
     var mutLRUMap: [String: KeyObservationPair] = [:]
     let kDecayThreshold: Double = 1.0 / 1_048_576.0 // 衰減二十次之後差不多就失效了。
     var fileSaveLocationURL: URL?
-
-    public static let kObservedOverrideHalfLife: Double = 3600.0 * 6 // 6 小時半衰一次，能持續不到六天的記憶。
-
-    public init(capacity: Int = 500, decayConstant: Double = LMUserOverride.kObservedOverrideHalfLife, dataURL: URL? = nil) {
-      mutCapacity = max(capacity, 1) // Ensures that this integer value is always > 0.
-      mutDecayExponent = log(0.5) / decayConstant
-      fileSaveLocationURL = dataURL
-    }
   }
 }
 
@@ -52,6 +63,7 @@ extension LMAssembly.LMUserOverride {
     var count: Int = 0
     var timestamp: Double = 0.0
     var forceHighScoreOverride = false
+
     static func == (lhs: Override, rhs: Override) -> Bool {
       lhs.count == rhs.count && lhs.timestamp == rhs.timestamp
     }
@@ -73,6 +85,7 @@ extension LMAssembly.LMUserOverride {
   struct Observation: Hashable, Encodable, Decodable {
     var count: Int = 0
     var overrides: [String: Override] = [:]
+
     static func == (lhs: Observation, rhs: Observation) -> Bool {
       lhs.count == rhs.count && lhs.overrides == rhs.overrides
     }
@@ -88,7 +101,11 @@ extension LMAssembly.LMUserOverride {
       hasher.combine(overrides)
     }
 
-    mutating func update(candidate: String, timestamp: Double, forceHighScoreOverride: Bool = false) {
+    mutating func update(
+      candidate: String,
+      timestamp: Double,
+      forceHighScoreOverride: Bool = false
+    ) {
       count += 1
       if overrides.keys.contains(candidate) {
         overrides[candidate]?.timestamp = timestamp
@@ -103,6 +120,7 @@ extension LMAssembly.LMUserOverride {
   struct KeyObservationPair: Hashable, Encodable, Decodable {
     var key: String
     var observation: Observation
+
     static func == (lhs: KeyObservationPair, rhs: KeyObservationPair) -> Bool {
       lhs.key == rhs.key && lhs.observation == rhs.observation
     }
@@ -125,7 +143,7 @@ extension LMAssembly.LMUserOverride {
 extension LMAssembly.LMUserOverride {
   func performObservation(
     walkedBefore: [Megrez.Node], walkedAfter: [Megrez.Node],
-    cursor: Int, timestamp: Double, saveCallback: (() -> Void)? = nil
+    cursor: Int, timestamp: Double, saveCallback: (() -> ())? = nil
   ) {
     // 參數合規性檢查。
     guard !walkedAfter.isEmpty, !walkedBefore.isEmpty else { return }
@@ -140,7 +158,8 @@ extension LMAssembly.LMUserOverride {
     let currentNodeIndex = actualCursor
     actualCursor -= 1
     var prevNodeIndex = 0
-    guard let prevNode = walkedBefore.findNode(at: actualCursor, target: &prevNodeIndex) else { return }
+    guard let prevNode = walkedBefore.findNode(at: actualCursor, target: &prevNodeIndex)
+    else { return }
 
     let forceHighScoreOverride: Bool = currentNode.spanLength > prevNode.spanLength
     let breakingUp = currentNode.spanLength == 1 && prevNode.spanLength > 1
@@ -158,14 +177,19 @@ extension LMAssembly.LMUserOverride {
 
   func fetchSuggestion(
     currentWalk: [Megrez.Node], cursor: Int, timestamp: Double
-  ) -> LMAssembly.OverrideSuggestion {
+  )
+    -> LMAssembly.OverrideSuggestion {
     var headIndex = 0
-    guard let nodeIter = currentWalk.findNode(at: cursor, target: &headIndex) else { return .init() }
-    let key = LMAssembly.LMUserOverride.formObservationKey(walkedNodes: currentWalk, headIndex: headIndex)
+    guard let nodeIter = currentWalk.findNode(at: cursor, target: &headIndex)
+    else { return .init() }
+    let key = LMAssembly.LMUserOverride.formObservationKey(
+      walkedNodes: currentWalk,
+      headIndex: headIndex
+    )
     return getSuggestion(key: key, timestamp: timestamp, headReading: nodeIter.joinedKey())
   }
 
-  func bleachSpecifiedSuggestions(targets: [String], saveCallback: (() -> Void)? = nil) {
+  func bleachSpecifiedSuggestions(targets: [String], saveCallback: (() -> ())? = nil) {
     if targets.isEmpty { return }
     for neta in mutLRUMap {
       for target in targets {
@@ -179,7 +203,7 @@ extension LMAssembly.LMUserOverride {
   }
 
   /// 自 LRU 辭典內移除所有的單元圖。
-  func bleachUnigrams(saveCallback: (() -> Void)? = nil) {
+  func bleachUnigrams(saveCallback: (() -> ())? = nil) {
     for key in mutLRUMap.keys {
       if !key.contains("(),()") { continue }
       mutLRUMap.removeValue(forKey: key)
@@ -236,7 +260,8 @@ extension LMAssembly.LMUserOverride {
     do {
       let data = try Data(contentsOf: fileURL, options: .mappedIfSafe)
       if ["", "{}"].contains(String(data: data, encoding: .utf8)) { return }
-      guard let jsonResult = try? decoder.decode([String: KeyObservationPair].self, from: data) else {
+      guard let jsonResult = try? decoder.decode([String: KeyObservationPair].self, from: data)
+      else {
         vCLMLog("UOM Error: Read file content type invalid, abort loading.")
         return
       }
@@ -254,11 +279,15 @@ extension LMAssembly.LMUserOverride {
 extension LMAssembly.LMUserOverride {
   func doObservation(
     key: String, candidate: String, timestamp: Double, forceHighScoreOverride: Bool,
-    saveCallback: (() -> Void)?
+    saveCallback: (() -> ())?
   ) {
     guard mutLRUMap[key] != nil else {
       var observation: Observation = .init()
-      observation.update(candidate: candidate, timestamp: timestamp, forceHighScoreOverride: forceHighScoreOverride)
+      observation.update(
+        candidate: candidate,
+        timestamp: timestamp,
+        forceHighScoreOverride: forceHighScoreOverride
+      )
       let koPair = KeyObservationPair(key: key, observation: observation)
       // 先移除 key 再設定 key 的話，就可以影響這個 key 在辭典內的順位。
       // Swift 原生的辭典是沒有數字索引排序的，但資料的插入順序卻有保存著。
@@ -286,7 +315,8 @@ extension LMAssembly.LMUserOverride {
     }
   }
 
-  func getSuggestion(key: String, timestamp: Double, headReading: String) -> LMAssembly.OverrideSuggestion {
+  func getSuggestion(key: String, timestamp: Double, headReading: String) -> LMAssembly
+    .OverrideSuggestion {
     guard !key.isEmpty, let kvPair = mutLRUMap[key] else { return .init() }
     let observation: Observation = kvPair.observation
     var candidates: [(String, Megrez.Unigram)] = .init()
@@ -297,7 +327,8 @@ extension LMAssembly.LMUserOverride {
       let isUnigramKey = key.contains("(),(),")
       var decayExp = mutDecayExponent * (isUnigramKey ? 24 : 1)
       // 對於單漢字 Unigram，讓半衰期繼續除以 12。
-      if isUnigramKey, !key.replacingOccurrences(of: "(),(),", with: "").contains("-") { decayExp *= 12 }
+      if isUnigramKey,
+         !key.replacingOccurrences(of: "(),(),", with: "").contains("-") { decayExp *= 12 }
       let overrideScore = getScore(
         eventCount: theObservation.count, totalCount: observation.count,
         eventTimestamp: theObservation.timestamp, timestamp: timestamp, lambda: decayExp
@@ -317,7 +348,8 @@ extension LMAssembly.LMUserOverride {
     eventTimestamp: Double,
     timestamp: Double,
     lambda: Double
-  ) -> Double {
+  )
+    -> Double {
     let decay = exp((timestamp - eventTimestamp) * lambda)
     if decay < kDecayThreshold { return 0.0 }
     let prob = Double(eventCount) / Double(totalCount)
@@ -334,7 +366,8 @@ extension LMAssembly.LMUserOverride {
 
   static func formObservationKey(
     walkedNodes: [Megrez.Node], headIndex cursorIndex: Int, readingOnly: Bool = false
-  ) -> String {
+  )
+    -> String {
     // let whiteList = "你他妳她祢衪它牠再在"
     var arrNodes: [Megrez.Node] = []
     var intLength = 0
@@ -372,12 +405,13 @@ extension LMAssembly.LMUserOverride {
       {
         return ""
       } else {
-        return (readingOnly ? strCurrent : trigramKey)
+        return readingOnly ? strCurrent : trigramKey
       }
     }
 
     func checkKeyValueValidityInThisContext(_ target: Megrez.KeyValuePaired) -> Bool {
-      !target.joinedKey().contains("_") && target.joinedKey().split(separator: "-").count == target.value.count
+      !target.joinedKey().contains("_") && target.joinedKey().split(separator: "-").count == target
+        .value.count
     }
 
     if arrNodes.count >= 2 {
@@ -400,8 +434,11 @@ extension LMAssembly.LMUserOverride {
   }
 }
 
+// MARK: - UOMError
+
 struct UOMError: LocalizedError {
   var rawValue: String
+
   var errorDescription: String? {
     NSLocalizedString("rawValue", comment: "")
   }

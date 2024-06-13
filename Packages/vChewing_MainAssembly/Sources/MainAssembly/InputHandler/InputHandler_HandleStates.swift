@@ -23,7 +23,11 @@ extension InputHandler {
   ///   - sansReading: 不顯示組音區/組筆區。
   ///   - guarded: 是否在該狀態的顯示文字為空的時候顯示替補空格，否則 InputMethodKit 無法正常攔截方向鍵事件。
   /// - Returns: 生成的「正在輸入」狀態。
-  public func generateStateOfInputting(sansReading: Bool = false, guarded: Bool = false) -> IMEStateProtocol {
+  public func generateStateOfInputting(
+    sansReading: Bool = false,
+    guarded: Bool = false
+  )
+    -> IMEStateProtocol {
     if isConsideredEmptyForNow, !guarded { return IMEState.ofAbortion() }
     restoreBackupCursor() // 只要叫了 Inputting 狀態，就盡可能還原游標備份。
     var segHighlightedAt: Int?
@@ -38,7 +42,8 @@ extension InputHandler {
       : convertCursorForDisplay(compositor.cursor)
     let cursorSansReading = cursor
     // 先提出來讀音資料，減輕運算負擔。
-    let reading: String = (sansReading || currentTypingMethod == .codePoint) ? "" : readingForDisplay
+    let reading: String = (sansReading || currentTypingMethod == .codePoint) ? "" :
+      readingForDisplay
     if !reading.isEmpty {
       var newDisplayTextSegments = [String]()
       var temporaryNode = ""
@@ -90,7 +95,11 @@ extension InputHandler {
     guard composer.hasIntonation(withNothingElse: true) else { return "" }
     guard composer.intonation.value != " " else { return "" }
     let result = NSMutableString()
-    result.append("Intonation mark. ENTER to commit.\nSPACE to insert into composition buffer.".localized)
+    result
+      .append(
+        "Intonation mark. ENTER to commit.\nSPACE to insert into composition buffer."
+          .localized
+      )
     if prefs.acceptLeadingIntonations {
       result.append("\n")
       result.append("It will attempt to combine with the incoming phonabet input.".localized)
@@ -355,10 +364,12 @@ extension InputHandler {
   ///   - associatesData: 給定的關聯詞語資料陣列。
   ///   該部分僅對 .ofInputting() 狀態有效、且不能是漢音符號模式與內碼輸入模式。
   /// - Returns: 將按鍵行為「是否有處理掉」藉由 SessionCtl 回報給 IMK。
-  @discardableResult func handleEnter(
+  @discardableResult
+  func handleEnter(
     input: InputSignalProtocol, readingOnly: Bool = false,
     associatesData: @escaping () -> ([(keyArray: [String], value: String)]) = { [] }
-  ) -> Bool {
+  )
+    -> Bool {
     guard let delegate = delegate else { return false }
     let state = delegate.state
 
@@ -484,7 +495,8 @@ extension InputHandler {
     switch isConsideredEmptyForNow {
     case false:
       var result = generateStateOfInputting()
-      if prefs.cassetteEnabled, let fetched = currentLM.cassetteQuickSetsFor(key: calligrapher)?.split(separator: "\t") {
+      if prefs.cassetteEnabled,
+         let fetched = currentLM.cassetteQuickSetsFor(key: calligrapher)?.split(separator: "\t") {
         result.candidates = fetched.enumerated().map {
           (keyArray: [($0.offset + 1).description], value: $0.element.description)
         }
@@ -776,7 +788,8 @@ extension InputHandler {
   func revolveCandidate(reverseOrder: Bool) -> Bool {
     guard let delegate = delegate else { return false }
     let state = delegate.state
-    if isComposerOrCalligrapherEmpty, compositor.isEmpty || compositor.walkedNodes.isEmpty { return false }
+    if isComposerOrCalligrapherEmpty,
+       compositor.isEmpty || compositor.walkedNodes.isEmpty { return false }
     guard state.type == .ofInputting else {
       guard state.type == .ofEmpty else {
         delegate.callError("6044F081")
@@ -817,7 +830,10 @@ extension InputHandler {
           if candidates[0] == currentPaired { result = reverseOrder ? candidates.count - 1 : 1 }
           break theLoop
         }
-        result.revolveAsIndex(with: candidates, clockwise: !(candidate == currentPaired && reverseOrder))
+        result.revolveAsIndex(
+          with: candidates,
+          clockwise: !(candidate == currentPaired && reverseOrder)
+        )
         if candidate == currentPaired { break }
       }
       return (0 ..< candidates.count).contains(result) ? result : 0
@@ -841,7 +857,10 @@ extension InputHandler {
     let newTooltip = NSMutableString()
     newTooltip.insert("　" + candidates[newIndex].value, at: 0)
     if #available(macOS 10.13, *), isContextVertical(), locID != "en" {
-      newTooltip.insert((newIndex + 1).i18n(loc: locID) + "・" + candidates.count.i18n(loc: locID), at: 0)
+      newTooltip.insert(
+        (newIndex + 1).i18n(loc: locID) + "・" + candidates.count.i18n(loc: locID),
+        at: 0
+      )
     } else {
       newTooltip.insert((newIndex + 1).description + " / " + candidates.count.description, at: 0)
     }
@@ -872,7 +891,8 @@ extension InputHandler {
           delegate.switchState(inputting)
           // 開始決定是否切換至選字狀態。
           let newState = generateStateOfCandidates(dodge: false)
-          _ = newState.candidates.isEmpty ? delegate.callError("B5127D8A") : delegate.switchState(newState)
+          _ = newState.candidates.isEmpty ? delegate.callError("B5127D8A") : delegate
+            .switchState(newState)
         } else { // 不要在注音沒敲完整的情況下叫出統合符號選單。
           delegate.callError("17446655")
         }
@@ -903,7 +923,10 @@ extension InputHandler {
   func handleServiceMenuInitiation(candidateText: String, reading: [String]) -> Bool {
     guard let delegate = delegate, delegate.state.type != .ofDeactivated else { return false }
     guard !candidateText.isEmpty else { return false }
-    let rootNode = CandidateTextService.getCurrentServiceMenu(candidate: candidateText, reading: reading)
+    let rootNode = CandidateTextService.getCurrentServiceMenu(
+      candidate: candidateText,
+      reading: reading
+    )
     guard let rootNode = rootNode else { return false }
     // 得在這裡先 commit buffer，不然會導致「在摁 ESC 離開符號選單時會重複輸入上一次的組字區的內容」的不當行為。
     let textToCommit = generateStateOfInputting(sansReading: true).displayedText
@@ -969,7 +992,8 @@ extension InputHandler {
     guard notEmpty, noBannedModifiers, triggered else { return false }
     // 開始決定是否切換至選字狀態。
     let candidateState: IMEStateProtocol = generateStateOfCandidates()
-    _ = candidateState.candidates.isEmpty ? delegate.callError("3572F238") : delegate.switchState(candidateState)
+    _ = candidateState.candidates.isEmpty ? delegate.callError("3572F238") : delegate
+      .switchState(candidateState)
     return true
   }
 
@@ -1007,12 +1031,14 @@ extension InputHandler {
         case 1, 3:
           if prefs.upperCaseLetterKeyBehavior == 3, !isConsideredEmptyForNow { break }
           let commitText = generateStateOfInputting(sansReading: true).displayedText
-          delegate.switchState(IMEState.ofCommitting(textToCommit: commitText + inputText.lowercased()))
+          delegate
+            .switchState(IMEState.ofCommitting(textToCommit: commitText + inputText.lowercased()))
           return true
         case 2, 4:
           if prefs.upperCaseLetterKeyBehavior == 4, !isConsideredEmptyForNow { break }
           let commitText = generateStateOfInputting(sansReading: true).displayedText
-          delegate.switchState(IMEState.ofCommitting(textToCommit: commitText + inputText.uppercased()))
+          delegate
+            .switchState(IMEState.ofCommitting(textToCommit: commitText + inputText.uppercased()))
           return true
         default: // 包括 case 0。
           break

@@ -36,6 +36,8 @@ private let sampleData: String = #"""
 
 """#
 
+// MARK: - LMCoreEXTests
+
 final class LMCoreEXTests: XCTestCase {
   func testLMCoreEXAsFactoryCoreDict() throws {
     var lmTest = LMAssembly.LMCoreEX(

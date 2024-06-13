@@ -5,7 +5,17 @@
 
 import CapsLockToggler
 
+// MARK: - CapsLockToggler
+
 public enum CapsLockToggler {
+  public static var isOn: Bool {
+    var state = false
+    try? IOKit.handleHIDSystemService { ioConnect in
+      IOHIDGetModifierLockState(ioConnect, Int32(kIOHIDCapsLockState), &state)
+    }
+    return state
+  }
+
   public static func toggle() {
     try? IOKit.handleHIDSystemService { ioConnect in
       var state = false
@@ -15,14 +25,6 @@ public enum CapsLockToggler {
     }
   }
 
-  public static var isOn: Bool {
-    var state = false
-    try? IOKit.handleHIDSystemService { ioConnect in
-      IOHIDGetModifierLockState(ioConnect, Int32(kIOHIDCapsLockState), &state)
-    }
-    return state
-  }
-
   public static func turnOff() {
     try? IOKit.handleHIDSystemService { ioConnect in
       IOHIDSetModifierLockState(ioConnect, Int32(kIOHIDCapsLockState), false)
@@ -30,10 +32,15 @@ public enum CapsLockToggler {
   }
 }
 
+// MARK: - IOKit
+
 // Refactored by Shiki Suen (MIT License)
 public enum IOKit {
-  public static func handleHIDSystemService(_ taskHandler: @escaping (io_connect_t) -> Void) throws {
-    let ioService: io_service_t = IOServiceGetMatchingService(0, IOServiceMatching(kIOHIDSystemClass))
+  public static func handleHIDSystemService(_ taskHandler: @escaping (io_connect_t) -> ()) throws {
+    let ioService: io_service_t = IOServiceGetMatchingService(
+      0,
+      IOServiceMatching(kIOHIDSystemClass)
+    )
     var connect: io_connect_t = 0
     let x = IOServiceOpen(ioService, mach_task_self_, UInt32(kIOHIDParamConnectType), &connect)
     if let errorOne = Mach.KernReturn(rawValue: x), errorOne != .success {
@@ -46,6 +53,8 @@ public enum IOKit {
     }
   }
 }
+
+// MARK: - Mach
 
 // Refactored by Shiki Suen (MIT License)
 public enum Mach {

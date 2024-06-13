@@ -13,6 +13,8 @@ import SwiftUI
 
 private let kWindowTitleHeight: Double = 78
 
+// MARK: - CtlSettingsUI
+
 // InputMethodServerPreferencesWindowControllerClass 非必需。
 
 @available(macOS 13, *)
@@ -64,7 +66,7 @@ public class CtlSettingsUI: NSWindowController, NSWindowDelegate {
   }
 }
 
-// MARK: - NSToolbarDelegate.
+// MARK: NSToolbarDelegate
 
 @available(macOS 13, *)
 extension CtlSettingsUI: NSToolbarDelegate {
@@ -87,7 +89,8 @@ extension CtlSettingsUI: NSToolbarDelegate {
   public func toolbar(
     _: NSToolbar, itemForItemIdentifier itemIdentifier: NSToolbarItem.Identifier,
     willBeInsertedIntoToolbar _: Bool
-  ) -> NSToolbarItem? {
+  )
+    -> NSToolbarItem? {
     let item = NSToolbarItem(itemIdentifier: itemIdentifier)
     item.isNavigational = true
     item.target = window?.firstResponder
@@ -101,8 +104,8 @@ extension CtlSettingsUI: NSToolbarDelegate {
 // MARK: - Shared Static Variables and Constants
 
 @available(macOS 13, *)
-public extension CtlSettingsUI {
-  static let sentenceSeparator: String = {
+extension CtlSettingsUI {
+  public static let sentenceSeparator: String = {
     switch PrefMgr.shared.appleLanguages[0] {
     case "ja":
       return ""
@@ -115,9 +118,9 @@ public extension CtlSettingsUI {
     }
   }()
 
-  static let contentMaxHeight: Double = 490
+  public static let contentMaxHeight: Double = 490
 
-  static let formWidth: Double = {
+  public static let formWidth: Double = {
     switch PrefMgr.shared.appleLanguages[0] {
     case "ja":
       return 520
@@ -130,14 +133,14 @@ public extension CtlSettingsUI {
     }
   }()
 
-  static var isCJKInterface: Bool {
+  public static var isCJKInterface: Bool {
     PrefMgr.shared.appleLanguages[0].contains("zh-Han") || PrefMgr.shared.appleLanguages[0] == "ja"
   }
 }
 
 @available(macOS 10.15, *)
-public extension View {
-  func settingsDescription(maxWidth: CGFloat? = .infinity) -> some View {
+extension View {
+  public func settingsDescription(maxWidth: CGFloat? = .infinity) -> some View {
     controlSize(.small)
       .frame(maxWidth: maxWidth, alignment: .leading)
       // TODO: Use `.foregroundStyle` when targeting macOS 12.
@@ -146,8 +149,8 @@ public extension View {
 }
 
 @available(macOS 10.15, *)
-public extension View {
-  func formStyled() -> some View {
+extension View {
+  public func formStyled() -> some View {
     if #available(macOS 13, *) { return self.formStyle(.grouped) }
     return padding()
   }
