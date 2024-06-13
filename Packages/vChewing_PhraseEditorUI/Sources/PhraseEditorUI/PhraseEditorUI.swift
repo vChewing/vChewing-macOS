@@ -114,17 +114,17 @@ public struct VwrPhraseEditorUI: View {
         }
         .labelsHidden()
         Button("Reload") {
-          DispatchQueue.main.async { update() }
+          asyncOnMain { update() }
         }.disabled(selInputMode == .imeModeNULL || isLoading)
         Button("Consolidate") {
           consolidate()
         }.disabled(selInputMode == .imeModeNULL || isLoading)
         Button("Save") {
-          DispatchQueue.main.async { saveAndReload() }
+          asyncOnMain { saveAndReload() }
         }.keyboardShortcut("s", modifiers: [.command])
           .disabled(delegate == nil)
         Button("...") {
-          DispatchQueue.main.async {
+          asyncOnMain {
             saveAndReload()
             callExternalAppToOpenPhraseFile()
           }
@@ -168,7 +168,7 @@ public struct VwrPhraseEditorUI: View {
             )
           }.disabled(window == nil)
           Button(PETerms.AddPhrases.locAdd.localized.0) {
-            DispatchQueue.main.async { insertEntry() }
+            asyncOnMain { insertEntry() }
           }.disabled(txtAddPhraseField1.isEmpty || txtAddPhraseField2.isEmpty)
         }
       }.disabled(selInputMode == Shared.InputMode.imeModeNULL || isLoading)
@@ -206,7 +206,7 @@ public struct VwrPhraseEditorUI: View {
     clearAllFields()
     txtContent = NSLocalizedString("Loading…", comment: "")
     isLoading = true
-    DispatchQueue.main.async {
+    asyncOnMain {
       txtContent = delegate.retrieveData(mode: selInputMode, type: selUserDataType)
       textEditorTooltip = PETerms.TooltipTexts.sampleDictionaryContent(for: selUserDataType)
       isLoading = false
@@ -336,7 +336,7 @@ public struct VwrPhraseEditorUI: View {
 
   private func consolidate() {
     guard let delegate = delegate, selInputMode != .imeModeNULL else { return }
-    DispatchQueue.main.async {
+    asyncOnMain {
       isLoading = true
       delegate.consolidate(text: &txtContent, pragma: false) // 強制整理
       if selUserDataType == .thePhrases {

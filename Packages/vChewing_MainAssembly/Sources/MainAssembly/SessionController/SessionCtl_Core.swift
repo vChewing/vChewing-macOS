@@ -14,6 +14,7 @@ import OSFrameworkImpl
 import PopupCompositionBuffer
 import Shared
 import ShiftKeyUpChecker
+import SwiftExtension
 import TooltipUI
 
 // MARK: - SessionCtl
@@ -227,7 +228,7 @@ public class SessionCtl: IMKInputController {
 
   /// 所有建構子都會執行的共用部分，在 super.init() 之後執行。
   private func construct(client theClient: (IMKTextInput & NSObjectProtocol)? = nil) {
-    DispatchQueue.main.async { [weak self] in
+    asyncOnMain { [weak self] in
       guard let self = self else { return }
       // 關掉所有之前的副本的視窗。
       Self.current?.hidePalettes()
@@ -249,7 +250,7 @@ public class SessionCtl: IMKInputController {
 extension SessionCtl {
   /// 強制重設當前鍵盤佈局、使其與偏好設定同步。
   public func setKeyLayout() {
-    DispatchQueue.main.async { [weak self] in
+    asyncOnMain { [weak self] in
       guard let self = self else { return }
       guard let client = self.client(), !self.isServingIMEItself else { return }
       if self.isASCIIMode, IMKHelper.isDynamicBasicKeyboardLayoutEnabled {
@@ -289,7 +290,7 @@ extension SessionCtl {
   /// - Parameter sender: 呼叫了該函式的客體。
   public override func activateServer(_ sender: Any!) {
     super.activateServer(sender)
-    DispatchQueue.main.async { [weak self] in
+    asyncOnMain { [weak self] in
       guard let self = self else { return }
       if let senderBundleID: String = (sender as? IMKTextInput)?.bundleIdentifier() {
         vCLog("activateServer(\(senderBundleID))")
@@ -303,19 +304,19 @@ extension SessionCtl {
         }
       }
     }
-    DispatchQueue.main.async {
+    asyncOnMain {
       // 自動啟用肛塞（廉恥模式），除非這一天是愚人節。
       if !Date.isTodayTheDate(from: 0401), !PrefMgr.shared.shouldNotFartInLieuOfBeep {
         PrefMgr.shared.shouldNotFartInLieuOfBeep = true
       }
     }
-    DispatchQueue.main.async { [weak self] in
+    asyncOnMain { [weak self] in
       guard let self = self else { return }
       if self.inputMode != IMEApp.currentInputMode {
         self.inputMode = IMEApp.currentInputMode
       }
     }
-    DispatchQueue.main.async {
+    asyncOnMain {
       // 清理掉上一個會話的選字窗及其選單。
       if self.candidateUI is CtlCandidateTDK {
         self.candidateUI = nil
@@ -325,7 +326,7 @@ extension SessionCtl {
       CtlCandidateTDK.currentWindow?.orderOut(nil)
       CtlCandidateTDK.currentWindow = nil
     }
-    DispatchQueue.main.async { [weak self] in
+    asyncOnMain { [weak self] in
       guard let self = self else { return }
       if self.isActivated { return }
 
@@ -349,7 +350,7 @@ extension SessionCtl {
         }
       }
 
-      DispatchQueue.main.async {
+      asyncOnMain {
         AppDelegate.shared.checkMemoryUsage()
       }
 
@@ -362,7 +363,7 @@ extension SessionCtl {
   /// 停用輸入法時，會觸發該函式。
   /// - Parameter sender: 呼叫了該函式的客體（無須使用）。
   public override func deactivateServer(_ sender: Any!) {
-    DispatchQueue.main.async { [weak self] in
+    asyncOnMain { [weak self] in
       guard let self = self else { return }
       self.isActivated = false
       self.resetInputHandler() // 這條會自動搞定 Empty 狀態。
@@ -384,7 +385,7 @@ extension SessionCtl {
   ///   - tag: 標記（無須使用）。
   ///   - sender: 呼叫了該函式的客體（無須使用）。
   public override func setValue(_ value: Any!, forTag tag: Int, client sender: Any!) {
-    DispatchQueue.main.async { [weak self] in
+    asyncOnMain { [weak self] in
       guard let self = self else { return }
       let newMode: Shared
         .InputMode = .init(rawValue: value as? String ?? PrefMgr.shared.mostRecentInputMode) ??
@@ -418,7 +419,7 @@ extension SessionCtl {
       return
     }
     let status = "NotificationSwitchRevolver".localized
-    DispatchQueue.main.async {
+    asyncOnMain {
       Notifier.notify(
         message: nowMode.reversed.localizedDescription + "\n" + status
       )

@@ -30,6 +30,7 @@
 		5B963CA328D5C23600DCEE88 /* SwiftExtension in Frameworks */ = {isa = PBXBuildFile; productRef = 5B963CA228D5C23600DCEE88 /* SwiftExtension */; };
 		5BA8C30328DF0360004C5CC4 /* CandidateWindow in Frameworks */ = {isa = PBXBuildFile; productRef = 5BA8C30228DF0360004C5CC4 /* CandidateWindow */; };
 		5BAD0CD527D701F6003D127F /* vChewingKeyLayout.bundle in Resources */ = {isa = PBXBuildFile; fileRef = 5B30F11227BA568800484E24 /* vChewingKeyLayout.bundle */; };
+		5BB1727C2C1AF9AF00995FA1 /* SwiftExtension in Frameworks */ = {isa = PBXBuildFile; productRef = 5BB1727B2C1AF9AF00995FA1 /* SwiftExtension */; };
 		5BBBB75F27AED54C0023B93A /* Beep.m4a in Resources */ = {isa = PBXBuildFile; fileRef = 5BBBB75D27AED54C0023B93A /* Beep.m4a */; };
 		5BBBB76027AED54C0023B93A /* Fart.m4a in Resources */ = {isa = PBXBuildFile; fileRef = 5BBBB75E27AED54C0023B93A /* Fart.m4a */; };
 		5BBC2D9E28F51C0400C986F6 /* LICENSE.txt in Resources */ = {isa = PBXBuildFile; fileRef = 5B18BA7227C7BD8B0056EB19 /* LICENSE.txt */; };
@@ -246,6 +247,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				5BB1727C2C1AF9AF00995FA1 /* SwiftExtension in Frameworks */,
 				5BFC63D128D4B9F7004A77B7 /* IMKUtils in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -587,6 +589,7 @@
 			name = vChewingInstaller;
 			packageProductDependencies = (
 				5BFC63D028D4B9F7004A77B7 /* IMKUtils */,
+				5BB1727B2C1AF9AF00995FA1 /* SwiftExtension */,
 			);
 			productName = vChewingInstaller;
 			productReference = 6ACA41CB15FC1D7500935EF6 /* vChewingInstaller.app */;
@@ -1384,6 +1387,10 @@
 		5BA8C30228DF0360004C5CC4 /* CandidateWindow */ = {
 			isa = XCSwiftPackageProductDependency;
 			productName = CandidateWindow;
+		};
+		5BB1727B2C1AF9AF00995FA1 /* SwiftExtension */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = SwiftExtension;
 		};
 		5BC5E01D28DDE4770094E427 /* NotifierUI */ = {
 			isa = XCSwiftPackageProductDependency;

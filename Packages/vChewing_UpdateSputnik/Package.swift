@@ -12,11 +12,15 @@ let package = Package(
       targets: ["UpdateSputnik"]
     ),
   ],
-  dependencies: [],
+  dependencies: [
+    .package(path: "../vChewing_SwiftExtension"),
+  ],
   targets: [
     .target(
       name: "UpdateSputnik",
-      dependencies: []
+      dependencies: [
+        .product(name: "SwiftExtension", package: "vChewing_SwiftExtension"),
+      ]
     ),
   ]
 )

@@ -67,7 +67,12 @@ public struct VwrSettingsPaneCassette: View {
                 Self.dlgOpenFile.canChooseFiles = true
                 Self.dlgOpenFile.canChooseDirectories = false
                 Self.dlgOpenFile.allowsMultipleSelection = false
-                Self.dlgOpenFile.allowedFileTypes = ["cin2", "vcin", "cin"]
+                if #available(macOS 11.0, *) {
+                  Self.dlgOpenFile.allowedContentTypes = ["cin2", "vcin", "cin"]
+                    .compactMap { .init(filenameExtension: $0) }
+                } else {
+                  Self.dlgOpenFile.allowedFileTypes = ["cin2", "vcin", "cin"]
+                }
                 Self.dlgOpenFile.allowsOtherFileTypes = true
 
                 let bolPreviousPathValidity = LMMgr.checkCassettePathValidity(
