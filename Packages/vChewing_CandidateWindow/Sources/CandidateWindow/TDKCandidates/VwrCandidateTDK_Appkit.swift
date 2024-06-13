@@ -130,10 +130,10 @@ extension VwrCandidateTDKAppKit {
     clickPoint.y = bounds.height - clickPoint.y // 翻轉座標系
     guard bounds.contains(clickPoint) else { return nil }
     let flattenedCells = thePool.candidateLines[thePool.lineRangeForCurrentPage].flatMap { $0 }
-    let x = flattenedCells.filter { theCell in
-      NSPointInRect(clickPoint, .init(origin: theCell.visualOrigin, size: theCell.visualDimension))
-    }.first
-    guard let firstValidCell = x else { return nil }
+    let filteredData: [CandidateCellData] = flattenedCells.filter { theCell in
+      NSRect(origin: theCell.visualOrigin, size: theCell.visualDimension).contains(clickPoint)
+    }
+    guard let firstValidCell = filteredData.first else { return nil }
     return firstValidCell.index
   }
 
@@ -222,8 +222,9 @@ extension VwrCandidateTDKAppKit {
 
 extension VwrCandidateTDKAppKit {
   private func lineBackground(isCurrentLine: Bool, isMatrix: Bool) -> NSColor {
-    (isCurrentLine && isMatrix) ?
-      (NSApplication.isDarkMode ? .controlTextColor.withAlphaComponent(0.05) : .white) : .clear
+    guard isCurrentLine, isMatrix else { return .clear }
+    guard NSApplication.isDarkMode else { return .white }
+    return CandidateCellData.plainTextColor.withAlphaComponent(0.05)
   }
 
   private var finalContainerOrientation: NSUserInterfaceLayoutOrientation {

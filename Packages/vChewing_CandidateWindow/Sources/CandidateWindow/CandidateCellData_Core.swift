@@ -48,6 +48,8 @@ public class CandidateCellData: Hashable {
 
   public static var unifiedCharDimension: Double { ceil(unifiedSize * 1.0125 + 7) }
   public static var unifiedTextHeight: Double { ceil(unifiedSize * 19 / 16) }
+  public static var plainTextColor: NSColor { absoluteTextColor.withAlphaComponent(0.85) }
+  public static var absoluteTextColor: NSColor { NSApplication.isDarkMode ? .white : .black }
 
   public var visualDimension: CGSize = .zero
   public var visualOrigin: CGPoint = .zero
@@ -66,8 +68,9 @@ public class CandidateCellData: Hashable {
   public var size: Double { Self.unifiedSize }
   public var fontSizeCandidate: Double { size }
   public var fontSizeKey: Double { max(ceil(fontSizeCandidate * 0.6), 11) }
+
   public var fontColorCandidate: NSColor {
-    isHighlighted ? .selectedMenuItemTextColor : .controlTextColor
+    isHighlighted ? .selectedMenuItemTextColor : Self.plainTextColor
   }
 
   public var fontColorKey: NSColor {

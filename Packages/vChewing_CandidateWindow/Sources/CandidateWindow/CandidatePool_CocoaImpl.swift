@@ -284,7 +284,7 @@ extension CandidatePool {
     let positionCounterColorBG = NSApplication.isDarkMode
       ? NSColor(white: 0.215, alpha: 0.7)
       : NSColor(white: 0.9, alpha: 0.7)
-    let positionCounterColorText = NSColor.controlTextColor
+    let positionCounterColorText = CandidateCellData.plainTextColor
     let positionCounterTextSize = max(ceil(CandidateCellData.unifiedSize * 0.7), 11)
     let attrPositionCounter: [NSAttributedString.Key: Any] = [
       .kern: 0,
@@ -303,7 +303,7 @@ extension CandidatePool {
     let attrTooltip: [NSAttributedString.Key: Any] = [
       .kern: 0,
       .font: Self.blankCell.phraseFontEmphasized(size: positionCounterTextSize),
-      .foregroundColor: NSColor.textColor,
+      .foregroundColor: CandidateCellData.absoluteTextColor,
     ]
     let tooltipText = NSAttributedString(
       string: " \(tooltip) ", attributes: attrTooltip
@@ -316,7 +316,7 @@ extension CandidatePool {
     let attrReverseLookup: [NSAttributedString.Key: Any] = [
       .kern: 0,
       .font: Self.blankCell.phraseFont(size: reverseLookupTextSize),
-      .foregroundColor: NSColor.textColor,
+      .foregroundColor: CandidateCellData.absoluteTextColor,
     ]
     let attrReverseLookupSpacer: [NSAttributedString.Key: Any] = [
       .kern: 0,
