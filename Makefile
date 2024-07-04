@@ -18,8 +18,8 @@ spmRelease:
 	swift build -c release --package-path ./Packages/vChewing_MainAssembly/
 
 spmLintFormat:
-	make lint --file=./Packages/Makefile || true
-	make format --file=./Packages/Makefile || true
+	cd ./Packages/ && make lint --file=./Makefile || true
+	cd ./Packages/ && make format --file=./Makefile || true
 
 spmClean:
 	@for currentDir in $$(ls ./Packages/); do \
