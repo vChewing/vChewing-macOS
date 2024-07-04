@@ -123,13 +123,14 @@ extension SessionCtl {
   public func setInlineDisplayWithCursor() {
     var attrStr: NSAttributedString = attributedStringSecured.value
     // 包括早期版本的騰訊 QQNT 在內，有些客體的 client.setMarkedText() 無法正常處理 .thick 下劃線。
-    mitigation: if clientMitigationLevel == 1, state.type == .ofMarking {
+    mitigation: if clientMitigationLevel == 1 {
+      guard state.type == .ofMarking || state.isCandidateContainer else { break mitigation }
       if !PrefMgr.shared
         .disableSegmentedThickUnderlineInMarkingModeForManagedClients { break mitigation }
       let neo = NSMutableAttributedString(attributedString: attributedStringSecured.value)
       let rangeNeo = NSRange(location: 0, length: neo.string.utf16.count)
       neo.setAttributes(
-        mark(forStyle: kTSMHiliteSelectedConvertedText, at: rangeNeo)
+        mark(forStyle: kTSMHiliteNoHilite, at: rangeNeo)
           as? [NSAttributedString.Key: Any]
           ?? [.underlineStyle: NSUnderlineStyle.thick.rawValue], range: rangeNeo
       )
