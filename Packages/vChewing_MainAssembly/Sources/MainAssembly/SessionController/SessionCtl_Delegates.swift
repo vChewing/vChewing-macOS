@@ -14,12 +14,17 @@ import Shared
 
 extension SessionCtl: InputHandlerDelegate {
   public var clientMitigationLevel: Int {
-    guard !PrefMgr.shared.securityHardenedCompositionBuffer else { return 2 }
-    guard let result = PrefMgr.shared.clientsIMKTextInputIncapable[clientBundleIdentifier]
-    else {
-      return 0
+    var result = PrefMgr.shared.securityHardenedCompositionBuffer ? 2 : 0
+    if isClientElectronBased {
+      let newVal = PrefMgr.shared.alwaysUsePCBWithElectronBasedClients ? 2 : 1
+      result = Swift.max(newVal, result)
     }
-    return result ? 2 : 1
+    let toMitigate = PrefMgr.shared.clientsIMKTextInputIncapable[clientBundleIdentifier]
+    if let toMitigate = toMitigate {
+      let mitigationValue = toMitigate ? 2 : 1
+      result = Swift.max(mitigationValue, result)
+    }
+    return result
   }
 
   public func candidateController() -> CtlCandidateProtocol? { candidateUI }
