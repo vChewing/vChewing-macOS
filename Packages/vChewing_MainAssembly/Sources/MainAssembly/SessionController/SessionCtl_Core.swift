@@ -112,6 +112,9 @@ public class SessionCtl: IMKInputController {
   /// 當前選字窗是否為縱向。（縱排輸入時，只會啟用縱排選字窗。）
   public var isVerticalCandidateWindow = false
 
+  /// 當前客體應用是否採用 Web 技術構築（例：Electron）。
+  public internal(set) var isClientElectronBased = false
+
   /// 用以存儲客體的 bundleIdentifier。
   /// 由於每次動態獲取都會耗時，所以這裡直接靜態記載之。
   public var clientBundleIdentifier: String = "" {
@@ -302,6 +305,9 @@ extension SessionCtl {
             senderBundleID == "com.apple.SecurityAgent"
           }
         }
+        // 檢查當前客體軟體是否採用 Web 技術構築（例：Electron）。
+        self.isClientElectronBased = NSRunningApplication
+          .isElectronBasedApp(identifier: senderBundleID)
       }
     }
     asyncOnMain {
