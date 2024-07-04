@@ -46,6 +46,46 @@ extension Bundle {
   }
 }
 
+// MARK: - Detect whether a bundle is Electron-based.
+
+extension Bundle {
+  public var isElectronBasedApp: Bool {
+    // Check the info.plist.
+    guard let dict = infoDictionary else { return false }
+    if dict.keys.contains(where: { $0.lowercased().contains("electron") }) { return true }
+    let selectedValues: [String] = dict.values.compactMap {
+      ($0 as? CustomStringConvertible)?.description.lowercased()
+    }
+    if selectedValues.contains(where: { $0.contains("electron") }) { return true }
+    // Check the existence of the Electron framework bundle.
+    guard let urlFrameworks = privateFrameworksURL else { return false }
+    guard let paths = try? FileManager.default.contentsOfDirectory(
+      at: urlFrameworks, includingPropertiesForKeys: nil, options: []
+    ) else { return false }
+    for path in paths {
+      let pathLC = path.absoluteString.lowercased()
+      if pathLC.contains("electron") { return true }
+      if pathLC.contains("mswebview") { return true }
+      if pathLC.contains("slimcorewebview") { return true }
+    }
+    return false
+  }
+}
+
+// MARK: - Detect whether a running application is Electron-based.
+
+extension NSRunningApplication {
+  public static func isElectronBasedApp(identifier: String) -> Bool {
+    let ids = NSRunningApplication.runningApplications(withBundleIdentifier: identifier)
+    guard !ids.isEmpty else { return false }
+    for id in ids {
+      guard let bURL = id.bundleURL, let bundle = Bundle(url: bURL) else { continue }
+      if bundle.isElectronBasedApp { return true }
+    }
+    return false
+  }
+}
+
 // MARK: - NSSize extension
 
 extension NSSize {
