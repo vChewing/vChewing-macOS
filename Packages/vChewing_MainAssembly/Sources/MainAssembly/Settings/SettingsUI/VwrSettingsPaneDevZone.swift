@@ -28,12 +28,17 @@ public struct VwrSettingsPaneDevZone: View {
           footer: Text("Some previous options are moved to other tabs.".localized)
             .settingsDescription()
         ) {
-          UserDef.kSecurityHardenedCompositionBuffer.bind($securityHardenedCompositionBuffer)
+          UserDef.kSecurityHardenedCompositionBuffer
+            .bind($securityHardenedCompositionBuffer)
+            .render()
+          UserDef.kAlwaysUsePCBWithElectronBasedClients
+            .bind($alwaysUsePCBWithElectronBasedClients)
             .render()
           UserDef.kDisableSegmentedThickUnderlineInMarkingModeForManagedClients
             .bind($disableSegmentedThickUnderlineInMarkingModeForManagedClients)
             .render()
-          UserDef.kCheckAbusersOfSecureEventInputAPI.bind($checkAbusersOfSecureEventInputAPI)
+          UserDef.kCheckAbusersOfSecureEventInputAPI
+            .bind($checkAbusersOfSecureEventInputAPI)
             .render()
         }
       }.formStyled()
@@ -59,6 +64,12 @@ public struct VwrSettingsPaneDevZone: View {
     UserDef.kSecurityHardenedCompositionBuffer.rawValue
   )
   private var securityHardenedCompositionBuffer: Bool
+
+  @AppStorage(
+    wrappedValue: true,
+    UserDef.kAlwaysUsePCBWithElectronBasedClients.rawValue
+  )
+  private var alwaysUsePCBWithElectronBasedClients: Bool
 
   @AppStorage(
     wrappedValue: true,

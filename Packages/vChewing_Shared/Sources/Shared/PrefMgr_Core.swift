@@ -70,6 +70,9 @@ public class PrefMgr: NSObject, PrefMgrProtocol {
   @AppProperty(key: UserDef.kRespectClientAccentColor.rawValue, defaultValue: true)
   public dynamic var respectClientAccentColor: Bool
 
+  @AppProperty(key: UserDef.kAlwaysUsePCBWithElectronBasedClients.rawValue, defaultValue: true)
+  public dynamic var alwaysUsePCBWithElectronBasedClients: Bool
+
   @AppProperty(key: UserDef.kSecurityHardenedCompositionBuffer.rawValue, defaultValue: false)
   public dynamic var securityHardenedCompositionBuffer: Bool
 

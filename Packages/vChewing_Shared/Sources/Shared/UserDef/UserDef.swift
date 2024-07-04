@@ -17,6 +17,7 @@ public enum UserDef: String, CaseIterable, Identifiable {
   case kFailureFlagForUOMObservation = "_FailureFlag_UOMObservation"
   case kCandidateServiceMenuContents = "CandidateServiceMenuContents"
   case kRespectClientAccentColor = "RespectClientAccentColor"
+  case kAlwaysUsePCBWithElectronBasedClients = "AlwaysUsePCBWithElectronBasedClients"
   case kSecurityHardenedCompositionBuffer = "SecurityHardenedCompositionBuffer"
   case kCheckAbusersOfSecureEventInputAPI = "CheckAbusersOfSecureEventInputAPI"
   case kDeltaOfCalendarYears = "DeltaOfCalendarYears"
@@ -171,6 +172,7 @@ extension UserDef {
     case .kFailureFlagForUOMObservation: return .bool
     case .kCandidateServiceMenuContents: return .dictionary
     case .kRespectClientAccentColor: return .bool
+    case .kAlwaysUsePCBWithElectronBasedClients: return .bool
     case .kSecurityHardenedCompositionBuffer: return .bool
     case .kCheckAbusersOfSecureEventInputAPI: return .bool
     case .kDeltaOfCalendarYears: return .integer
@@ -273,6 +275,10 @@ extension UserDef {
     case .kRespectClientAccentColor: return .init(
         userDef: self, shortTitle: "i18n:userdef.kRespectClientAccentColor.shortTitle",
         description: "i18n:userdef.kRespectClientAccentColor.description"
+      )
+    case .kAlwaysUsePCBWithElectronBasedClients: return .init(
+        userDef: self, shortTitle: "i18n:UserDef.kAlwaysUsePCBWithElectronBasedClients.shortTitle",
+        description: "i18n:userdef.kAlwaysUsePCBWithElectronBasedClients.description"
       )
     case .kSecurityHardenedCompositionBuffer: return .init(
         userDef: self, shortTitle: "Security-harden the composition buffer for all clients",
