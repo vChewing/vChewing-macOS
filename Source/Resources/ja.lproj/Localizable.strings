@@ -216,6 +216,8 @@
 "i18n:settings.importFromKimoTxt.finishedCount:%@" = "新しい記録は %@ つ読み込みました。";
 "i18n:settings.importFromKimoTxt.label" = "Yahoo! KeyKey ユーザー辞書ファイルを読込";
 "i18n:settings.shiftKeyASCIITogle.description" = "この機能の利用する NSEvent は、macOS 内蔵の入力アプリ共用モジュール「InputMethodKit」から提供した NSEvent のみであり、その NSEvent 文脈関係で「Shift キーは１回押したかどうか」と判断することはできる。この事実に疑いを持つ者は、本アプリのソースコードを審査するか、あるいは本アプリを逆向工程（分解工学, いわゆる「Reverse-Engineering」）するがよい。なお、Shiftキーによるこの切り替えは、CapsLockがONの時には効かぬ。";
+"i18n:userdef.kAlwaysUsePCBWithElectronBasedClients.description" = "ほとんどの「Electron で構築したアプリ」は IMKTextInput API の実作についての支障があり、その実作した API の挙動は予測できなくて、バグ退治もとても困難だと考えられています。このようなアプリの開発者たちにもそれぞれの原因でこのような支障を解決する策も動力も極めて少ないと認識されております。故に、このスイッチの最初値はONにしました。";
+"i18n:UserDef.kAlwaysUsePCBWithElectronBasedClients.shortTitle" = "Electron で構築した全ての客体アプリに「吹き出し入力緩衝列ウィンドウ」を強制的に起用";
 "i18n:UserDef.kBypassNonAppleCapsLockHandling.description" = "macOS 10.14 からのシステム内蔵機能としての同じ機能に影響しません。";
 "i18n:UserDef.kBypassNonAppleCapsLockHandling.shortTitle" = "威注音入力アプリの内蔵CapsLock処理を不使用";
 "i18n:userdef.kCheckAbusersOfSecureEventInputAPI.description" = "このような不正利用は「システム内蔵入力以外の全ての入力アプリがメニューで灰色状態で選べなくて使えない」の元凶である。センシティブな資料の記入どころでSecureEventInputをEnableSecureEventInput()で使うのは当然であるが、「入力中」状態が終わった後必ずDisableSecureEventInput()で状態解消すべきだと義務である。いくつかヘルパーアプリも、あるいはSecureEventInputを呼び起こしてからすぐ固まったアプリも、この状態になりやすい。特に、他のアプリの画面へ切り替えたとしても、固まったアプリのSecureEventInput状態は自動的に解消できぬ。";

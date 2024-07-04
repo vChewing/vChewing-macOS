@@ -37,6 +37,7 @@ extension SettingsPanesCocoa {
         }
         NSStackView.buildSection(width: contentWidth) {
           UserDef.kSecurityHardenedCompositionBuffer.render(fixWidth: contentWidth)
+          UserDef.kAlwaysUsePCBWithElectronBasedClients.render(fixWidth: contentWidth)
           UserDef.kDisableSegmentedThickUnderlineInMarkingModeForManagedClients
             .render(fixWidth: contentWidth)
           UserDef.kCheckAbusersOfSecureEventInputAPI.render(fixWidth: contentWidth)

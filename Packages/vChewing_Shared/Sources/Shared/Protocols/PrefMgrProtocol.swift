@@ -13,6 +13,7 @@ public protocol PrefMgrProtocol {
   var failureFlagForUOMObservation: Bool { get set }
   var candidateServiceMenuContents: [String] { get set }
   var respectClientAccentColor: Bool { get set }
+  var alwaysUsePCBWithElectronBasedClients: Bool { get set }
   var securityHardenedCompositionBuffer: Bool { get set }
   var checkAbusersOfSecureEventInputAPI: Bool { get set }
   var deltaOfCalendarYears: Int { get set }
