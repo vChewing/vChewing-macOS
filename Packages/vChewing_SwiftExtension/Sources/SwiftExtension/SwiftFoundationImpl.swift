@@ -206,7 +206,7 @@ public func asyncOnMain(
   execute work: @escaping @convention(block) () -> ()
 ) {
   if #available(macOS 10.15, *) {
-    Task.detached { @MainActor in
+    Task { @MainActor in
       work()
     }
   } else {
@@ -220,7 +220,7 @@ public func asyncOnMain(
 ) {
   let delayInterval = Swift.max(0, delayInterval)
   if #available(macOS 10.15, *) {
-    Task.detached { @MainActor in
+    Task { @MainActor in
       if delayInterval > 0 {
         let delay = UInt64(delayInterval * 1_000_000_000)
         try await Task<Never, Never>.sleep(nanoseconds: delay)
