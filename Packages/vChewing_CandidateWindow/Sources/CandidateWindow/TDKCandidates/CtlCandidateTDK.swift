@@ -111,10 +111,6 @@ public class CtlCandidateTDK: CtlCandidate, NSWindowDelegate {
     }
   }
 
-  public var maxLinesPerPage: Int = 0
-  public var useCocoa: Bool = false
-  public var useMouseScrolling: Bool = true
-
   // Already implemented in CandidatePool.
   override public var highlightedIndex: Int {
     get { Self.thePool.highlightedIndex }
@@ -123,6 +119,10 @@ public class CtlCandidateTDK: CtlCandidate, NSWindowDelegate {
       updateDisplay()
     }
   }
+
+  public var maxLinesPerPage: Int = 0
+  public var useCocoa: Bool = false
+  public var useMouseScrolling: Bool = true
 
   // MARK: - Public functions
 

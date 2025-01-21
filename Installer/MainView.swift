@@ -177,10 +177,11 @@ public struct MainView: View {
   @State
   var isUpgrading: Bool = false
 
-  var translocationRemovalStartTime: Date?
-
   @State
   var timeRemaining = 60
+
+  var translocationRemovalStartTime: Date?
+
   let timer = Timer.publish(every: 1, on: .main, in: .common).autoconnect()
 
   func installationButtonClicked() {

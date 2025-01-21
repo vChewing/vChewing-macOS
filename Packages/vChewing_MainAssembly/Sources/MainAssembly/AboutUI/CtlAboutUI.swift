@@ -36,25 +36,6 @@ public class CtlAboutUI: NSWindowController, NSWindowDelegate {
 
   public static var shared: CtlAboutUI?
 
-  public static func show() {
-    let forceLegacy = NSEvent.modifierFlags == .option
-    if shared == nil {
-      let newInstance = CtlAboutUI(forceLegacy: forceLegacy)
-      shared = newInstance
-    }
-    guard let shared = shared, let sharedWindow = shared.window else { return }
-    shared.useLegacyView = forceLegacy
-    sharedWindow.delegate = shared
-    if !sharedWindow.isVisible {
-      shared.windowDidLoad()
-    }
-    sharedWindow.setPosition(vertical: .top, horizontal: .left, padding: 20)
-    sharedWindow.orderFrontRegardless() // 逼著視窗往最前方顯示
-    sharedWindow.level = .statusBar
-    shared.showWindow(shared)
-    NSApp.popup()
-  }
-
   override public func windowDidLoad() {
     super.windowDidLoad()
     guard let window = window else { return }
@@ -76,6 +57,25 @@ public class CtlAboutUI: NSWindowController, NSWindowDelegate {
     }
     window.title = "i18n:aboutWindow.ABOUT_APP_TITLE_FULL"
       .localized + " (v\(IMEApp.appMainVersionLabel.joined(separator: " Build ")))"
+  }
+
+  public static func show() {
+    let forceLegacy = NSEvent.modifierFlags == .option
+    if shared == nil {
+      let newInstance = CtlAboutUI(forceLegacy: forceLegacy)
+      shared = newInstance
+    }
+    guard let shared = shared, let sharedWindow = shared.window else { return }
+    shared.useLegacyView = forceLegacy
+    sharedWindow.delegate = shared
+    if !sharedWindow.isVisible {
+      shared.windowDidLoad()
+    }
+    sharedWindow.setPosition(vertical: .top, horizontal: .left, padding: 20)
+    sharedWindow.orderFrontRegardless() // 逼著視窗往最前方顯示
+    sharedWindow.level = .statusBar
+    shared.showWindow(shared)
+    NSApp.popup()
   }
 
   // MARK: Internal

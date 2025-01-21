@@ -398,11 +398,7 @@ extension LMAssembly.LMUserOverride {
     var readingStack = ""
     var trigramKey: String { "(\(kvAnterior.toNGramKey),\(kvPrevious.toNGramKey),\(strCurrent))" }
     var result: String {
-      if readingStack.contains("_")
-      // 該限制因使用者來信投訴太多，暫時停用：
-      // 不要把單個漢字的 kvCurrent 當前鍵值領頭的單元圖記入資料庫，不然對敲字體驗破壞太大。
-      // || (!kvPrevious.isValid && kvCurrent.value.count == 1 && !whiteList.contains(kvCurrent.value))
-      {
+      if readingStack.contains("_") {
         return ""
       } else {
         return readingOnly ? strCurrent : trigramKey

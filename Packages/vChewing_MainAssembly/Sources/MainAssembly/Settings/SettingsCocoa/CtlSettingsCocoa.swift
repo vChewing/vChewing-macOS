@@ -38,22 +38,6 @@ public class CtlSettingsCocoa: NSWindowController, NSWindowDelegate {
 
   public static var shared: CtlSettingsCocoa?
 
-  public static func show() {
-    if shared == nil {
-      shared = CtlSettingsCocoa()
-    }
-    guard let shared = shared, let sharedWindow = shared.window else { return }
-    sharedWindow.delegate = shared
-    if !sharedWindow.isVisible {
-      shared.windowDidLoad()
-    }
-    sharedWindow.setPosition(vertical: .top, horizontal: .right, padding: 20)
-    sharedWindow.orderFrontRegardless() // 逼著視窗往最前方顯示
-    sharedWindow.level = .statusBar
-    shared.showWindow(shared)
-    NSApp.popup()
-  }
-
   override public func windowDidLoad() {
     super.windowDidLoad()
     window?.setPosition(vertical: .top, horizontal: .right, padding: 20)
@@ -82,6 +66,22 @@ public class CtlSettingsCocoa: NSWindowController, NSWindowDelegate {
     window?.styleMask = [.titled, .closable, .miniaturizable]
 
     use(view: panes.ctlPageGeneral.view, animate: false)
+  }
+
+  public static func show() {
+    if shared == nil {
+      shared = CtlSettingsCocoa()
+    }
+    guard let shared = shared, let sharedWindow = shared.window else { return }
+    sharedWindow.delegate = shared
+    if !sharedWindow.isVisible {
+      shared.windowDidLoad()
+    }
+    sharedWindow.setPosition(vertical: .top, horizontal: .right, padding: 20)
+    sharedWindow.orderFrontRegardless() // 逼著視窗往最前方顯示
+    sharedWindow.level = .statusBar
+    shared.showWindow(shared)
+    NSApp.popup()
   }
 
   // MARK: Internal
