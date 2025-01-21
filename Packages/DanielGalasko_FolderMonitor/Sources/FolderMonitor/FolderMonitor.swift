@@ -55,8 +55,6 @@ public class FolderMonitor {
 
   // MARK: Private
 
-  // MARK: Properties
-
   /// A file descriptor for the monitored directory.
   private var monitoredFolderFileDescriptor: CInt = -1
   /// A dispatch queue used for sending file changes in the directory.

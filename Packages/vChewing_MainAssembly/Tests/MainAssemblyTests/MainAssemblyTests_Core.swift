@@ -85,28 +85,6 @@ class MainAssemblyTests: XCTestCase {
     return session
   }
 
-  func clearTestUOM() {
-    testLM.clearUOMData()
-  }
-
-  func typeSentenceOrCandidates(_ sequence: String) {
-    if !(
-      [.ofEmpty, .ofInputting].contains(testSession.state.type) || testSession.state
-        .isCandidateContainer
-    ) { return }
-    let typingSequence: [NSEvent] = sequence.compactMap { charRAW in
-      var finalArray = [NSEvent]()
-      let char = charRAW.description
-      let keyEventData = NSEvent.KeyEventData(chars: char)
-      finalArray.append(contentsOf: keyEventData.asPairedEvents)
-      return finalArray
-    }.flatMap { $0 }
-    typingSequence.forEach { theEvent in
-      let dismissed = !testSession.handle(theEvent, client: testClient)
-      if theEvent.type == .keyDown { XCTAssertFalse(dismissed) }
-    }
-  }
-
   // MARK: - Preparing Unit Tests.
 
   override func setUpWithError() throws {
@@ -127,6 +105,28 @@ class MainAssemblyTests: XCTestCase {
     UserDef.resetAll()
     testClient.clear()
     testSession.deactivateServer(testClient)
+  }
+
+  func clearTestUOM() {
+    testLM.clearUOMData()
+  }
+
+  func typeSentenceOrCandidates(_ sequence: String) {
+    if !(
+      [.ofEmpty, .ofInputting].contains(testSession.state.type) || testSession.state
+        .isCandidateContainer
+    ) { return }
+    let typingSequence: [NSEvent] = sequence.compactMap { charRAW in
+      var finalArray = [NSEvent]()
+      let char = charRAW.description
+      let keyEventData = NSEvent.KeyEventData(chars: char)
+      finalArray.append(contentsOf: keyEventData.asPairedEvents)
+      return finalArray
+    }.flatMap { $0 }
+    typingSequence.forEach { theEvent in
+      let dismissed = !testSession.handle(theEvent, client: testClient)
+      if theEvent.type == .keyDown { XCTAssertFalse(dismissed) }
+    }
   }
 }
 

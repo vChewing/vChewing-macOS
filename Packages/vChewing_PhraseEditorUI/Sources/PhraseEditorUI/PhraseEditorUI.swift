@@ -51,6 +51,7 @@ public struct VwrPhraseEditorUI: View {
   public var selInputMode: Shared.InputMode = .imeModeNULL
   @State
   public var selUserDataType: LMAssembly.ReplacableUserDataType = .thePhrases
+
   public weak var window: NSWindow?
 
   public var currentIMEInputMode: Shared.InputMode {

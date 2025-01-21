@@ -21,28 +21,6 @@ private let kWindowTitleHeight: Double = 78
 public class CtlSettingsUI: NSWindowController, NSWindowDelegate {
   public static var shared: CtlSettingsUI?
 
-  public static func show() {
-    if shared == nil {
-      let newWindow = NSWindow(
-        contentRect: CGRect(x: 401, y: 295, width: 577, height: 568),
-        styleMask: [.titled, .closable, .miniaturizable],
-        backing: .buffered, defer: true
-      )
-      let newInstance = CtlSettingsUI(window: newWindow)
-      shared = newInstance
-    }
-    guard let shared = shared, let sharedWindow = shared.window else { return }
-    sharedWindow.delegate = shared
-    if !sharedWindow.isVisible {
-      shared.windowDidLoad()
-    }
-    sharedWindow.setPosition(vertical: .top, horizontal: .right, padding: 20)
-    sharedWindow.orderFrontRegardless() // 逼著視窗往最前方顯示
-    sharedWindow.level = .statusBar
-    shared.showWindow(shared)
-    NSApp.popup()
-  }
-
   override public func windowDidLoad() {
     super.windowDidLoad()
     window?.setPosition(vertical: .top, horizontal: .right, padding: 20)
@@ -63,6 +41,28 @@ public class CtlSettingsUI: NSWindowController, NSWindowDelegate {
     var preferencesTitleName = NSLocalizedString("vChewing Preferences…", comment: "")
     preferencesTitleName.removeLast()
     window?.title = preferencesTitleName
+  }
+
+  public static func show() {
+    if shared == nil {
+      let newWindow = NSWindow(
+        contentRect: CGRect(x: 401, y: 295, width: 577, height: 568),
+        styleMask: [.titled, .closable, .miniaturizable],
+        backing: .buffered, defer: true
+      )
+      let newInstance = CtlSettingsUI(window: newWindow)
+      shared = newInstance
+    }
+    guard let shared = shared, let sharedWindow = shared.window else { return }
+    sharedWindow.delegate = shared
+    if !sharedWindow.isVisible {
+      shared.windowDidLoad()
+    }
+    sharedWindow.setPosition(vertical: .top, horizontal: .right, padding: 20)
+    sharedWindow.orderFrontRegardless() // 逼著視窗往最前方顯示
+    sharedWindow.level = .statusBar
+    shared.showWindow(shared)
+    NSApp.popup()
   }
 }
 
