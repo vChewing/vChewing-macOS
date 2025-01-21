@@ -58,6 +58,7 @@ extension Megrez {
     public let value: String
     /// 權重。
     public let score: Double
+
     /// 通用陣列表達形式。
     public var keyValueTuplet: (keyArray: [String], value: String) { (keyArray, value) }
     /// 通用陣列表達形式。

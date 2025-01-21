@@ -100,6 +100,40 @@ public class NSAttributedTextView: NSView {
 
   public var text: String? { didSet { ctFrame = nil } }
 
+  override public func draw(_ rect: CGRect) {
+    guard let currentNSGraphicsContext = NSGraphicsContext.current else { return }
+    let setter = CTFramesetterCreateWithAttributedString(attributedStringValue())
+    let path = CGPath(rect: rect, transform: nil)
+    let theCTFrameProgression: CTFrameProgression = {
+      switch direction {
+      case .horizontal: return CTFrameProgression.topToBottom
+      case .vertical: return CTFrameProgression.rightToLeft
+      case .verticalReversed: return CTFrameProgression.leftToRight
+      }
+    }()
+    let frameAttrs: CFDictionary =
+      [
+        kCTFrameProgressionAttributeName: theCTFrameProgression.rawValue,
+      ] as CFDictionary
+    let newFrame = CTFramesetterCreateFrame(setter, CFRangeMake(0, 0), path, frameAttrs)
+    ctFrame = newFrame
+    backgroundColor.setFill()
+    let bgPath: NSBezierPath = .init(roundedRect: rect, xRadius: 0, yRadius: 0)
+    bgPath.fill()
+    currentRect = rect
+    if #unavailable(macOS 10.10) {
+      // 由於 NSGraphicsContext.current?.cgContext 僅對 macOS 10.10 Yosemite 開始的系統開放，
+      // 所以這裡必須直接從記憶體位置拿取原始資料來處理。
+      let contextPtr: Unmanaged<CGContext>? = Unmanaged
+        .fromOpaque(currentNSGraphicsContext.graphicsPort)
+      let theContext: CGContext? = contextPtr?.takeUnretainedValue()
+      guard let theContext = theContext else { return }
+      CTFrameDraw(newFrame, theContext)
+    } else {
+      CTFrameDraw(newFrame, currentNSGraphicsContext.cgContext)
+    }
+  }
+
   public func attributedStringValue(areaCalculation: Bool = false) -> NSAttributedString {
     var newAttributes = attributes
     let isVertical: Bool = !(direction == .horizontal)
@@ -141,40 +175,6 @@ public class NSAttributedTextView: NSView {
       textWH = .init(width: textWH.height, height: textWH.width)
     }
     return .init(origin: .zero, size: textWH)
-  }
-
-  override public func draw(_ rect: CGRect) {
-    guard let currentNSGraphicsContext = NSGraphicsContext.current else { return }
-    let setter = CTFramesetterCreateWithAttributedString(attributedStringValue())
-    let path = CGPath(rect: rect, transform: nil)
-    let theCTFrameProgression: CTFrameProgression = {
-      switch direction {
-      case .horizontal: return CTFrameProgression.topToBottom
-      case .vertical: return CTFrameProgression.rightToLeft
-      case .verticalReversed: return CTFrameProgression.leftToRight
-      }
-    }()
-    let frameAttrs: CFDictionary =
-      [
-        kCTFrameProgressionAttributeName: theCTFrameProgression.rawValue,
-      ] as CFDictionary
-    let newFrame = CTFramesetterCreateFrame(setter, CFRangeMake(0, 0), path, frameAttrs)
-    ctFrame = newFrame
-    backgroundColor.setFill()
-    let bgPath: NSBezierPath = .init(roundedRect: rect, xRadius: 0, yRadius: 0)
-    bgPath.fill()
-    currentRect = rect
-    if #unavailable(macOS 10.10) {
-      // 由於 NSGraphicsContext.current?.cgContext 僅對 macOS 10.10 Yosemite 開始的系統開放，
-      // 所以這裡必須直接從記憶體位置拿取原始資料來處理。
-      let contextPtr: Unmanaged<CGContext>? = Unmanaged
-        .fromOpaque(currentNSGraphicsContext.graphicsPort)
-      let theContext: CGContext? = contextPtr?.takeUnretainedValue()
-      guard let theContext = theContext else { return }
-      CTFrameDraw(newFrame, theContext)
-    } else {
-      CTFrameDraw(newFrame, currentNSGraphicsContext.cgContext)
-    }
   }
 
   // MARK: Private

@@ -33,6 +33,18 @@ public class CtlServiceMenuEditor: NSWindowController {
 
   public static var shared: CtlServiceMenuEditor?
 
+  override public func windowDidLoad() {
+    super.windowDidLoad()
+    let view = viewController.view
+    window?.contentView = view
+    if let window = window {
+      var frame = window.frame
+      frame.size = view.fittingSize
+      window.setFrame(frame, display: true)
+    }
+    window?.setPosition(vertical: .center, horizontal: .right, padding: 20)
+  }
+
   public static func show() {
     if shared == nil {
       shared = CtlServiceMenuEditor()
@@ -50,18 +62,6 @@ public class CtlServiceMenuEditor: NSWindowController {
     }
     shared.showWindow(shared)
     NSApp.popup()
-  }
-
-  override public func windowDidLoad() {
-    super.windowDidLoad()
-    let view = viewController.view
-    window?.contentView = view
-    if let window = window {
-      var frame = window.frame
-      frame.size = view.fittingSize
-      window.setFrame(frame, display: true)
-    }
-    window?.setPosition(vertical: .center, horizontal: .right, padding: 20)
   }
 
   // MARK: Internal

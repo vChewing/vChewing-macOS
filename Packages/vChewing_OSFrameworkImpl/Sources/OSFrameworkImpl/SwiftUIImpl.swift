@@ -323,9 +323,10 @@ public struct PathControl: NSViewRepresentable {
 
   // MARK: Private
 
-  private let pathCtl = NSPathControl()
   @Binding
   private var path: String
+
+  private let pathCtl = NSPathControl()
   private var configuration: (NSPathControl) -> () = { _ in }
   private var acceptDrop: (NSPathControl, NSDraggingInfo) -> Bool = { _, _ in false }
 }
