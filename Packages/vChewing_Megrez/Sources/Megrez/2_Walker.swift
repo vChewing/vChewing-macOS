@@ -5,6 +5,17 @@
 
 extension Megrez.Compositor {
   /// 爬軌函式，會更新當前組字器的 walkedNodes。
+  /// - Returns: 爬軌結果＋該過程是否順利執行。
+  @discardableResult
+  public mutating func walk(useDAG: Bool = false) -> [Megrez.Node] {
+    useDAG ? walkUsingDAG() : walkUsingDijkstra()
+  }
+}
+
+// MARK: - Walker (DAG Vertex-Relax Approach).
+
+extension Megrez.Compositor {
+  /// 爬軌函式，會更新當前組字器的 walkedNodes。
   ///
   /// 找到軌格陣圖內權重最大的路徑。該路徑代表了可被觀測到的最可能的隱藏事件鏈。
   /// 這裡使用 Cormen 在 2001 年出版的教材當中提出的「有向無環圖的最短路徑」的
@@ -18,7 +29,7 @@ extension Megrez.Compositor {
   /// 再後來則是 2022 年中時期劉燈的 Gramambular 2 組字引擎。
   /// - Returns: 爬軌結果＋該過程是否順利執行。
   @discardableResult
-  public mutating func walk() -> [Megrez.Node] {
+  public mutating func walkUsingDAG() -> [Megrez.Node] {
     defer { Self.reinitVertexNetwork() }
     walkedNodes.removeAll()
     sortAndRelax()
@@ -126,5 +137,124 @@ extension Megrez.Compositor {
     guard v.distance < u.distance + w else { return }
     v.distance = u.distance + w
     v.prev = u
+  }
+}
+
+// MARK: - Walker (Dijkstra Approach).
+
+extension Megrez.Compositor {
+  /// 爬軌函式，會以 Dijkstra 算法更新當前組字器的 walkedNodes。
+  /// - Returns: 爬軌結果＋該過程是否順利執行。
+  @discardableResult
+  public mutating func walkUsingDijkstra() -> [Megrez.Node] {
+    walkedNodes.removeAll()
+
+    var openSet = HybridPriorityQueue<PrioritizedState>()
+    var visited = Set<SearchState>()
+    var distances: [Int: Double] = [:]
+
+    // 從最開始的節點起算。
+    let leadingNode = Megrez.Node(keyArray: ["$LEADING"])
+    let start = SearchState(node: leadingNode, position: 0, prev: nil, distance: 0)
+    openSet.enqueue(PrioritizedState(state: start, distance: 0))
+    distances[0] = 0
+
+    var finalState: SearchState?
+
+    walkingProcess: while !openSet.isEmpty {
+      guard let current = openSet.dequeue()?.state else { break }
+      guard !visited.contains(current) else { continue }
+      visited.insert(current)
+      guard current.position < keys.count else {
+        finalState = current
+        break walkingProcess
+      }
+
+      // 取得當前的幅位。
+      let currentSpan = spans[current.position]
+
+      // 從當前位置處理每個可能的節點。
+      currentSpan.forEach { length, nextNode in
+        guard let nextNode = currentSpan[length] else { return }
+        let nextPosition = current.position + length
+        // 計算新的距離（用負分，反向利用 Dijkstra 找最短捷徑的特性、以尋求最長路徑（分值最高的路徑））。
+        let newDistance = current.distance - nextNode.score
+        // 如果有找到的話，本次迴圈結束，進入下一次迴圈。
+        guard (distances[nextPosition] ?? .infinity) > newDistance else { return }
+
+        let nextState = SearchState(
+          node: nextNode,
+          position: nextPosition,
+          prev: current,
+          distance: newDistance
+        )
+
+        distances[nextPosition] = newDistance
+        openSet.enqueue(PrioritizedState(
+          state: nextState,
+          distance: newDistance
+        ))
+      }
+    }
+
+    if let finalState = finalState {
+      walkedNodes = reconstructPath(from: finalState).dropFirst().map(\.node)
+    }
+
+    return walkedNodes
+  }
+}
+
+extension Megrez.Compositor {
+  final private class SearchState: Hashable {
+    // MARK: Lifecycle
+
+    init(node: Megrez.Node, position: Int, prev: SearchState?, distance: Double = .infinity) {
+      self.node = node
+      self.position = position
+      self.prev = prev
+      self.distance = distance
+    }
+
+    // MARK: Internal
+
+    let node: Megrez.Node
+    let position: Int
+    let prev: SearchState?
+    var distance: Double
+
+    static func == (lhs: SearchState, rhs: SearchState) -> Bool {
+      lhs.node === rhs.node && lhs.position == rhs.position
+    }
+
+    func hash(into hasher: inout Hasher) {
+      hasher.combine(node)
+      hasher.combine(position)
+    }
+  }
+
+  private struct PrioritizedState: Comparable {
+    let state: SearchState
+    let distance: Double
+
+    static func < (lhs: PrioritizedState, rhs: PrioritizedState) -> Bool {
+      lhs.distance < rhs.distance
+    }
+
+    static func == (lhs: PrioritizedState, rhs: PrioritizedState) -> Bool {
+      lhs.distance == rhs.distance && lhs.state == rhs.state
+    }
+  }
+
+  private func reconstructPath(from state: SearchState) -> [SearchState] {
+    var path: [SearchState] = []
+    var current: SearchState? = state
+
+    while let n = current {
+      path.insert(n, at: 0)
+      current = n.prev
+    }
+
+    return path
   }
 }

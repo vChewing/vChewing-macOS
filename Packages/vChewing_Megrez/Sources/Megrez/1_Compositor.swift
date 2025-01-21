@@ -10,11 +10,6 @@ extension Megrez {
   ///
   /// 用於輸入法的話，給定的索引鍵可以是注音、且返回的資料值都是漢語字詞組合。該組字器
   /// 還可以用來對文章做分節處理：此時的索引鍵為漢字，返回的資料值則是漢語字詞分節組合。
-  ///
-  /// - Remark: 雖然這裡用了隱性 Markov 模型（HMM）的術語，但實際上在爬軌時用到的則是更
-  /// 簡單的貝氏推論：因為底層的語言模組只會提供單元圖資料。一旦將所有可以組字的單元圖
-  /// 作為節點塞到組字器內，就可以用一個簡單的有向無環圖爬軌過程、來利用這些隱性資料值
-  /// 算出最大相似估算結果。
   public struct Compositor {
     // MARK: Lifecycle
 
@@ -193,7 +188,7 @@ extension Megrez {
         if target == 0 { return false }
       }
       guard let currentRegion = walkedNodes.cursorRegionMap[target] else { return false }
-
+      let guardedCurrentRegion = min(walkedNodes.count - 1, currentRegion)
       let aRegionForward = max(currentRegion - 1, 0)
       let currentRegionBorderRear: Int = walkedNodes[0 ..< currentRegion].map(\.spanLength).reduce(
         0,
@@ -205,14 +200,14 @@ extension Megrez {
         case .front:
           target =
             (currentRegion > walkedNodes.count)
-              ? keys.count : walkedNodes[0 ... currentRegion].map(\.spanLength).reduce(0, +)
+              ? keys.count : walkedNodes[0 ... guardedCurrentRegion].map(\.spanLength).reduce(0, +)
         case .rear:
           target = walkedNodes[0 ..< aRegionForward].map(\.spanLength).reduce(0, +)
         }
       default:
         switch direction {
         case .front:
-          target = currentRegionBorderRear + walkedNodes[currentRegion].spanLength
+          target = currentRegionBorderRear + walkedNodes[guardedCurrentRegion].spanLength
         case .rear:
           target = currentRegionBorderRear
         }
