@@ -9,6 +9,14 @@
 
 Megrez Engine is a module made for processing lingual data of an input method. This repository is part of Operation Longinus of The vChewing Project.
 
+## 與 Gramambular 2 的區別
+
+敝專案一開始是 Gramambular 2 (Lukhnos Liu 著，MIT License) 的 Swift 實作，但經歷了大量修改。主要區別如下：
+
+- 原生 Swift 實作，擁有完備的 Swift 5.3 ~ 5.9 支援、也可以用作任何 Swift 6 專案的相依套件（需使用者自行處理對跨執行緒安全性的需求）。
+- API 經過重新設計，以陣列的形式處理輸入的 key。而且，在獲取候選字詞內容的時候，也可以徹底篩除橫跨游標的詞。
+- 爬軌算法（Walking Algorithm）改為 Dijkstra 的算法，且經過效能最佳化處理、擁有比 DAG-Relax 算法更優的效能。
+
 ## 使用說明
 
 ### §1. 初期化
@@ -121,3 +129,5 @@ walk 之後的取值的方法及利用方法可以有很多種。這裡有其中
 - Swiftified and further development by (c) 2022 and onwards The vChewing Project (MIT License).
   - Swift programmer: Shiki Suen
 - Was initially rebranded from (c) Lukhnos Liu's C++ library "Gramambular 2" (MIT License).
+- Walking algorithm (Dijkstra) implemented by (c) 2025 and onwards The vChewing Project (MIT License).
+  - Swift programmer: Shiki Suen

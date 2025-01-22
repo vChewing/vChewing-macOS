@@ -1,130 +1,156 @@
 // Swiftified and further development by (c) 2022 and onwards The vChewing Project (MIT License).
 // Was initially rebranded from (c) Lukhnos Liu's C++ library "Gramambular 2" (MIT License).
+// Walking algorithm (Dijkstra) implemented by (c) 2025 and onwards The vChewing Project (MIT License).
 // ====================
 // This code is released under the MIT license (SPDX-License-Identifier: MIT)
 
 extension Megrez.Compositor {
-  /// 爬軌函式，會更新當前組字器的 walkedNodes。
+  /// 爬軌函式，會以 Dijkstra 算法更新當前組字器的 walkedNodes。
   ///
-  /// 找到軌格陣圖內權重最大的路徑。該路徑代表了可被觀測到的最可能的隱藏事件鏈。
-  /// 這裡使用 Cormen 在 2001 年出版的教材當中提出的「有向無環圖的最短路徑」的
-  /// 算法來計算這種路徑。不過，這裡不是要計算距離最短的路徑，而是計算距離最長
-  /// 的路徑（所以要找最大的權重），因為在對數概率下，較大的數值意味著較大的概率。
-  /// 對於 `G = (V, E)`，該算法的運行次數為 `O(|V|+|E|)`，其中 `G` 是一個有向無環圖。
-  /// 這意味著，即使軌格很大，也可以用很少的算力就可以爬軌。
+  /// 該算法會在圖中尋找具有最高分數的路徑，即最可能的字詞組合。
   ///
-  /// - Remark: 利用該數學方法進行輸入法智能組句的（已知可考的）最開始的案例是
-  /// 郭家寶（ByVoid）的《[基於統計語言模型的拼音輸入法](https://byvoid.com/zht/blog/slm_based_pinyin_ime/) 》；
-  /// 再後來則是 2022 年中時期劉燈的 Gramambular 2 組字引擎。
-  /// - Returns: 爬軌結果＋該過程是否順利執行。
+  /// 該算法所依賴的 HybridPriorityQueue 針對 Sandy Bridge 經過最佳化處理，
+  /// 使得該算法在 Sandy Bridge CPU 的電腦上比 DAG 算法擁有更優的效能。
+  ///
+  /// - Returns: 爬軌結果（已選字詞陣列）。
   @discardableResult
   public mutating func walk() -> [Megrez.Node] {
-    defer { Self.reinitVertexNetwork() }
     walkedNodes.removeAll()
-    sortAndRelax()
     guard !spans.isEmpty else { return [] }
-    var iterated: Megrez.Node? = Megrez.Node.leadingNode
-    while let itPrev = iterated?.prev {
-      // 此處必須得是 Copy，讓組字器外部對此的操作影響不到組字器內部的節點。
-      walkedNodes.insert(itPrev.copy, at: 0)
-      iterated = itPrev
+
+    // 初期化資料結構。
+    var openSet = HybridPriorityQueue<PrioritizedState>(reversed: true)
+    var visited = Set<SearchState>()
+    var bestScore = [Int: Double]() // 追蹤每個位置的最佳分數
+
+    // 初期化起始狀態。
+    let leadingNode = Megrez.Node(keyArray: ["$LEADING"])
+    let start = SearchState(
+      node: leadingNode,
+      position: 0,
+      prev: nil,
+      distance: 0
+    )
+    openSet.enqueue(PrioritizedState(state: start))
+    bestScore[0] = 0
+
+    // 追蹤最佳結果。
+    var bestFinalState: SearchState?
+    var bestFinalScore = Double(Int32.min)
+
+    // 主要 Dijkstra 迴圈。
+    while !openSet.isEmpty {
+      guard let current = openSet.dequeue()?.state else { break }
+
+      // 如果已經造訪過具有更好分數的狀態，則跳過。
+      if visited.contains(current) { continue }
+      visited.insert(current)
+
+      // 檢查是否已到達終點。
+      if current.position >= keys.count {
+        if current.distance > bestFinalScore {
+          bestFinalScore = current.distance
+          bestFinalState = current
+        }
+        continue
+      }
+
+      // 處理下一個可能的節點。
+      for (length, nextNode) in spans[current.position] {
+        let nextPos = current.position + length
+
+        // 計算新的權重分數。
+        let newScore = current.distance + nextNode.score
+
+        // 如果該位置已有更優的權重分數，則跳過。
+        guard (bestScore[nextPos] ?? .init(Int32.min)) < newScore else { continue }
+
+        let nextState = SearchState(
+          node: nextNode,
+          position: nextPos,
+          prev: current,
+          distance: newScore
+        )
+
+        bestScore[nextPos] = newScore
+        openSet.enqueue(PrioritizedState(state: nextState))
+      }
     }
-    iterated?.destroyVertex()
-    iterated = nil
-    walkedNodes.removeFirst()
+
+    // 從最佳終止狀態重建路徑。
+    guard let finalState = bestFinalState else { return [] }
+    var pathNodes: [Megrez.Node] = []
+    var current: SearchState? = finalState
+
+    while let state = current {
+      // 排除起始和結束的虛擬節點。
+      if state.node !== leadingNode {
+        pathNodes.insert(state.node, at: 0)
+      }
+      current = state.prev
+      // 備註：此處不需要手動 ASAN，因為沒有參據循環（Retain Cycle）。
+    }
+    walkedNodes = pathNodes.map(\.copy)
     return walkedNodes
   }
+}
 
-  /// 先進行位相幾何排序、再卸勁。
-  internal func sortAndRelax() {
-    Self.reinitVertexNetwork()
-    guard !spans.isEmpty else { return }
-    Megrez.Node.trailingNode.distance = 0
-    spans.enumerated().forEach { location, theSpan in
-      theSpan.values.forEach { theNode in
-        let nextVertexPosition = location + theNode.spanLength
-        if nextVertexPosition == spans.count {
-          theNode.edges.append(.leadingNode)
-          return
-        }
-        spans[nextVertexPosition].values.forEach { theNode.edges.append($0) }
-      }
+// MARK: - 搜尋狀態相關定義
+
+extension Megrez.Compositor {
+  /// 用於追蹤搜尋過程中的狀態。
+  final private class SearchState: Hashable {
+    // MARK: Lifecycle
+
+    /// 初期化搜尋狀態。
+    /// - Parameters:
+    ///   - node: 當前節點。
+    ///   - position: 在輸入串中的位置。
+    ///   - prev: 前一個狀態。
+    ///   - distance: 到達此狀態的累計分數。
+    init(
+      node: Megrez.Node,
+      position: Int,
+      prev: SearchState?,
+      distance: Double = Double(Int.min)
+    ) {
+      self.node = node
+      self.position = position
+      self.prev = prev
+      self.distance = distance
     }
-    Megrez.Node.trailingNode.edges.append(contentsOf: spans[0].values)
-    Self.topologicalSort().reversed().forEach { neta in
-      neta.edges.indices.forEach { Self.relax(u: neta, v: &neta.edges[$0]) }
+
+    // MARK: Internal
+
+    unowned let node: Megrez.Node // 當前節點
+    let position: Int // 在輸入串中的位置
+    unowned let prev: SearchState? // 前一個狀態
+    var distance: Double // 累計分數
+
+    // MARK: - Hashable 協定實作
+
+    static func == (lhs: SearchState, rhs: SearchState) -> Bool {
+      lhs.node === rhs.node && lhs.position == rhs.position
+    }
+
+    func hash(into hasher: inout Hasher) {
+      hasher.combine(node)
+      hasher.combine(position)
     }
   }
 
-  /// 摧毀所有與共用起始虛擬節點有牽涉的節點自身的 Vertex 特性資料。
-  internal static func reinitVertexNetwork() {
-    Megrez.Node.trailingNode.destroyVertex()
-    Megrez.Node.leadingNode.destroyVertex()
-  }
+  /// 用於優先序列的狀態包裝結構
+  private struct PrioritizedState: Comparable {
+    let state: SearchState
 
-  /// 對持有單個根頂點的有向無環圖進行位相幾何排序（topological
-  /// sort）、且將排序結果以頂點陣列的形式給出。
-  ///
-  /// 這裡使用我們自己的堆棧和狀態定義實現了一個非遞迴版本，
-  /// 這樣我們就不會受到當前線程的堆棧大小的限制。以下是等價的原始算法。
-  /// ```
-  ///  func topologicalSort(node: Node) {
-  ///    node.edges.forEach { nodeNode in
-  ///      if !nodeNode.topologicallySorted {
-  ///        dfs(nodeNode, result)
-  ///        nodeNode.topologicallySorted = true
-  ///      }
-  ///      result.append(nodeNode)
-  ///    }
-  ///  }
-  /// ```
-  /// 至於其遞迴版本，則類似於 Cormen 在 2001 年的著作「Introduction to Algorithms」當中的樣子。
-  /// - Returns: 排序結果（頂點陣列）。
-  private static func topologicalSort() -> [Megrez.Node] {
-    class State {
-      var iterIndex: Int
-      let node: Megrez.Node
-      init(node: Megrez.Node, iterIndex: Int = 0) {
-        self.node = node
-        self.iterIndex = iterIndex
-      }
-    }
-    var result = [Megrez.Node]()
-    var stack = [State]()
-    stack.append(.init(node: .trailingNode))
-    while !stack.isEmpty {
-      let state = stack[stack.count - 1]
-      let theNode = state.node
-      if state.iterIndex < state.node.edges.count {
-        let newNode = state.node.edges[state.iterIndex]
-        state.iterIndex += 1
-        if !newNode.topologicallySorted {
-          stack.append(.init(node: newNode))
-          continue
-        }
-      }
-      theNode.topologicallySorted = true
-      result.append(theNode)
-      stack.removeLast()
-    }
-    return result
-  }
+    // MARK: - Comparable 協定實作
 
-  /// 卸勁函式。
-  ///
-  /// 「卸勁 (relax)」一詞出自 Cormen 在 2001 年的著作「Introduction to Algorithms」的 585 頁。
-  /// - Remark: 自己就是參照頂點 (u)，會在必要時成為 target (v) 的前述頂點。
-  /// - Parameters:
-  ///   - u: 基準頂點。
-  ///   - v: 要影響的頂點。
-  private static func relax(u: Megrez.Node, v: inout Megrez.Node) {
-    // 從 u 到 w 的距離，也就是 v 的權重。
-    let w: Double = v.score
-    // 這裡計算最大權重：
-    // 如果 v 目前的距離值小於「u 的距離值＋w（w 是 u 到 w 的距離，也就是 v 的權重）」，
-    // 我們就更新 v 的距離及其前述頂點。
-    guard v.distance < u.distance + w else { return }
-    v.distance = u.distance + w
-    v.prev = u
+    static func < (lhs: PrioritizedState, rhs: PrioritizedState) -> Bool {
+      lhs.state.distance < rhs.state.distance
+    }
+
+    static func == (lhs: PrioritizedState, rhs: PrioritizedState) -> Bool {
+      lhs.state == rhs.state
+    }
   }
 }

@@ -1,5 +1,6 @@
 // Swiftified and further development by (c) 2022 and onwards The vChewing Project (MIT License).
 // Was initially rebranded from (c) Lukhnos Liu's C++ library "Gramambular 2" (MIT License).
+// Walking algorithm (Dijkstra) implemented by (c) 2025 and onwards The vChewing Project (MIT License).
 // ====================
 // This code is released under the MIT license (SPDX-License-Identifier: MIT)
 
@@ -185,4 +186,118 @@ jiao4 較 -3.24869962
 jiao4yu4 教育 -3.32220565
 yu4 育 -3.30192952
 
+"""#
+
+public let strSampleDataLitch = #"""
+nai3ji1 荔枝 -4.73
+nai3ji1 奶積 -9.399
+nai3 乃 -5.262
+nai3 奶 -5.296
+nai3 迺 -6.824
+nai3 氖 -7.71
+nai3 尕 -7.827
+nai3 艿 -7.827
+nai3 氝 -9.543
+nai3 釢 -9.543
+nai3 嬭 -9.543
+nai3 荔 -9.543
+ji1 雞 -5.244
+ji1 幾 -5.258
+ji1 奇 -5.267
+ji1 機 -5.271
+ji1 擊 -5.319
+ji1 積 -5.367
+ji1 跡 -5.505
+ji1 肌 -5.525
+ji1 基 -5.578
+ji1 譏 -5.617
+ji1 激 -5.795
+ji1 畿 -6.024
+ji1 饑 -6.053
+ji1 飢 -6.056
+ji1 姬 -6.065
+ji1 稽 -6.072
+ji1 其 -6.208
+ji1 期 -6.208
+ji1 几 -6.266
+ji1 唧 -6.331
+ji1 嘰 -6.362
+ji1 箕 -6.377
+ji1 乩 -6.457
+ji1 緝 -6.484
+ji1 畸 -6.514
+ji1 績 -6.662
+ji1 羈 -6.82
+ji1 磯 -6.936
+ji1 嵇 -6.95
+ji1 蹟 -7.017
+ji1 屐 -7.043
+ji1 笄 -7.066
+ji1 癘 -7.108
+ji1 圾 -7.155
+ji1 躋 -7.297
+ji1 居 -7.662
+ji1 齏 -7.662
+ji1 璣 -7.827
+ji1 錤 -8.038
+ji1 觭 -8.038
+ji1 勣 -8.096
+ji1 墼 -8.096
+ji1 犄 -8.163
+ji1 隮 -8.339
+ji1 剞 -8.64
+ji1 銈 -8.64
+ji1 芨 -8.941
+ji1 击 -9.543
+ji1 疠 -9.543
+ji1 虮 -9.543
+ji1 迹 -9.543
+ji1 绩 -9.543
+ji1 缉 -9.543
+ji1 碁 -9.543
+ji1 稘 -9.543
+ji1 跻 -9.543
+ji1 霙 -9.543
+ji1 齍 -9.543
+ji1 欚 -9.543
+ji1 丌 -9.543
+ji1 尐 -9.543
+ji1 讥 -9.543
+ji1 叽 -9.543
+ji1 饥 -9.543
+ji1 机 -9.543
+ji1 玑 -9.543
+ji1 矶 -9.543
+ji1 鸡 -9.543
+ji1 枅 -9.543
+ji1 𬯀 -9.543
+ji1 积 -9.543
+ji1 𫓯 -9.543
+ji1 蛣 -9.543
+ji1 赍 -9.543
+ji1 𫌀 -9.543
+ji1 𫓹 -9.543
+ji1 毄 -9.543
+ji1 樍 -9.543
+ji1 諅 -9.543
+ji1 賫 -9.543
+ji1 齑 -9.543
+ji1 禨 -9.543
+ji1 簊 -9.543
+ji1 羁 -9.543
+ji1 襀 -9.543
+ji1 櫅 -9.543
+ji1 鐖 -9.543
+ji1 癪 -9.543
+ji1 鞿 -9.543
+ji1 齎 -9.543
+ji1 羇 -9.543
+ji1 鑇 -9.543
+ji1 鰿 -9.543
+ji1 虀 -9.543
+ji1 鸄 -9.543
+ji1 枝 -9.543
+ji1 咭 -9.543
+ji1 楫 -9.543
+ji1 膣 -9.543
 """#
