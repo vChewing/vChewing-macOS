@@ -1,5 +1,6 @@
 // Swiftified and further development by (c) 2022 and onwards The vChewing Project (MIT License).
 // Was initially rebranded from (c) Lukhnos Liu's C++ library "Gramambular 2" (MIT License).
+// Walking algorithm (Dijkstra) implemented by (c) 2025 and onwards The vChewing Project (MIT License).
 // ====================
 // This code is released under the MIT license (SPDX-License-Identifier: MIT)
 
@@ -10,11 +11,6 @@ extension Megrez {
   ///
   /// 用於輸入法的話，給定的索引鍵可以是注音、且返回的資料值都是漢語字詞組合。該組字器
   /// 還可以用來對文章做分節處理：此時的索引鍵為漢字，返回的資料值則是漢語字詞分節組合。
-  ///
-  /// - Remark: 雖然這裡用了隱性 Markov 模型（HMM）的術語，但實際上在爬軌時用到的則是更
-  /// 簡單的貝氏推論：因為底層的語言模組只會提供單元圖資料。一旦將所有可以組字的單元圖
-  /// 作為節點塞到組字器內，就可以用一個簡單的有向無環圖爬軌過程、來利用這些隱性資料值
-  /// 算出最大相似估算結果。
   public struct Compositor {
     // MARK: Lifecycle
 
@@ -30,12 +26,7 @@ extension Megrez {
     /// 這樣一來，Compositor 複製品當中的 Node 的變化會被反應到原先的 Compositor 身上。
     /// 這在某些情況下會造成意料之外的混亂情況，所以需要引入一個拷貝用的建構子。
     public init(from target: Compositor) {
-      self.cursor = target.cursor
-      self.marker = target.marker
-      self.separator = target.separator
-      self.walkedNodes = target.walkedNodes.map(\.copy)
-      self.keys = target.keys
-      self.spans = target.spans.map(\.hardCopy)
+      self.config = target.config.hardCopy
       self.langModel = target.langModel
     }
 
@@ -52,34 +43,49 @@ extension Megrez {
     /// 該軌格內可以允許的最大幅位長度。
     public static var maxSpanLength: Int = 10 { didSet { maxSpanLength = max(6, maxSpanLength) } }
 
+    public private(set) var config = CompositorConfig()
+
     /// 最近一次爬軌結果。
-    public var walkedNodes: [Node] = []
+    public var walkedNodes: [Node] {
+      get { config.walkedNodes }
+      set { config.walkedNodes = newValue }
+    }
+
     /// 該組字器已經插入的的索引鍵，以陣列的形式存放。
-    public private(set) var keys = [String]()
+    public private(set) var keys: [String] {
+      get { config.keys }
+      set { config.keys = newValue }
+    }
+
     /// 該組字器的幅位單元陣列。
-    public private(set) var spans = [SpanUnit]()
+    public private(set) var spans: [SpanUnit] {
+      get { config.spans }
+      set { config.spans = newValue }
+    }
 
     /// 該組字器的敲字游標位置。
-    public var cursor: Int = 0 {
-      didSet {
-        cursor = max(0, min(cursor, length))
-        marker = cursor
-      }
+    public var cursor: Int {
+      get { config.cursor }
+      set { config.cursor = newValue }
     }
 
     /// 該組字器的標記器（副游標）位置。
-    public var marker: Int = 0 { didSet { marker = max(0, min(marker, length)) } }
+    public var marker: Int {
+      get { config.marker }
+      set { config.marker = newValue }
+    }
+
     /// 多字讀音鍵當中用以分割漢字讀音的記號，預設為「-」。
-    public var separator = theSeparator {
-      didSet {
-        Self.theSeparator = separator
-      }
+    public var separator: String {
+      get { config.separator }
+      set { config.separator = newValue }
     }
 
     /// 該組字器的長度，組字器內已經插入的單筆索引鍵的數量，也就是內建漢字讀音的數量（唯讀）。
     /// - Remark: 理論上而言，spans.count 也是這個數。
     /// 但是，為了防止萬一，就用了目前的方法來計算。
-    public var length: Int { keys.count }
+    public var length: Int { config.length }
+
     /// 組字器是否為空。
     public var isEmpty: Bool { spans.isEmpty && keys.isEmpty }
 
@@ -193,7 +199,7 @@ extension Megrez {
         if target == 0 { return false }
       }
       guard let currentRegion = walkedNodes.cursorRegionMap[target] else { return false }
-
+      let guardedCurrentRegion = min(walkedNodes.count - 1, currentRegion)
       let aRegionForward = max(currentRegion - 1, 0)
       let currentRegionBorderRear: Int = walkedNodes[0 ..< currentRegion].map(\.spanLength).reduce(
         0,
@@ -205,14 +211,14 @@ extension Megrez {
         case .front:
           target =
             (currentRegion > walkedNodes.count)
-              ? keys.count : walkedNodes[0 ... currentRegion].map(\.spanLength).reduce(0, +)
+              ? keys.count : walkedNodes[0 ... guardedCurrentRegion].map(\.spanLength).reduce(0, +)
         case .rear:
           target = walkedNodes[0 ..< aRegionForward].map(\.spanLength).reduce(0, +)
         }
       default:
         switch direction {
         case .front:
-          target = currentRegionBorderRear + walkedNodes[currentRegion].spanLength
+          target = currentRegionBorderRear + walkedNodes[guardedCurrentRegion].spanLength
         case .rear:
           target = currentRegionBorderRear
         }
@@ -340,5 +346,47 @@ extension Megrez.Compositor {
       }
     }
     return nodesChanged
+  }
+}
+
+// MARK: - Megrez.CompositorConfig
+
+extension Megrez {
+  public struct CompositorConfig: Codable {
+    /// 最近一次爬軌結果。
+    public var walkedNodes: [Node] = []
+    /// 該組字器已經插入的的索引鍵，以陣列的形式存放。
+    public var keys = [String]()
+    /// 該組字器的幅位單元陣列。
+    public var spans = [SpanUnit]()
+
+    /// 該組字器的敲字游標位置。
+    public var cursor: Int = 0 {
+      didSet {
+        cursor = max(0, min(cursor, length))
+        marker = cursor
+      }
+    }
+
+    /// 該組字器的標記器（副游標）位置。
+    public var marker: Int = 0 { didSet { marker = max(0, min(marker, length)) } }
+    /// 多字讀音鍵當中用以分割漢字讀音的記號，預設為「-」。
+    public var separator = Megrez.Compositor.theSeparator {
+      didSet {
+        Megrez.Compositor.theSeparator = separator
+      }
+    }
+
+    /// 該組字器的長度，組字器內已經插入的單筆索引鍵的數量，也就是內建漢字讀音的數量（唯讀）。
+    /// - Remark: 理論上而言，spans.count 也是這個數。
+    /// 但是，為了防止萬一，就用了目前的方法來計算。
+    public var length: Int { keys.count }
+
+    public var hardCopy: Self {
+      var newCopy = self
+      newCopy.walkedNodes = walkedNodes.map(\.copy)
+      newCopy.spans = spans.map(\.hardCopy)
+      return newCopy
+    }
   }
 }
