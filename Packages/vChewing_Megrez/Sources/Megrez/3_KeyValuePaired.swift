@@ -1,5 +1,6 @@
 // Swiftified and further development by (c) 2022 and onwards The vChewing Project (MIT License).
 // Was initially rebranded from (c) Lukhnos Liu's C++ library "Gramambular 2" (MIT License).
+// Walking algorithm (Dijkstra) implemented by (c) 2025 and onwards The vChewing Project (MIT License).
 // ====================
 // This code is released under the MIT license (SPDX-License-Identifier: MIT)
 
@@ -7,7 +8,7 @@
 
 extension Megrez {
   /// 鍵值配對，乃索引鍵陣列與讀音的配對單元。
-  public struct KeyValuePaired: Equatable, CustomStringConvertible, Hashable, Comparable {
+  public struct KeyValuePaired: Equatable, CustomStringConvertible, Hashable, Comparable, Codable {
     // MARK: Lifecycle
 
     /// 初期化一組鍵值配對。

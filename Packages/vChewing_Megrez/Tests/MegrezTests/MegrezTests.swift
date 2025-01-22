@@ -1,5 +1,6 @@
 // Swiftified and further development by (c) 2022 and onwards The vChewing Project (MIT License).
 // Was initially rebranded from (c) Lukhnos Liu's C++ library "Gramambular 2" (MIT License).
+// Walking algorithm (Dijkstra) implemented by (c) 2025 and onwards The vChewing Project (MIT License).
 // ====================
 // This code is released under the MIT license (SPDX-License-Identifier: MIT)
 
@@ -511,6 +512,17 @@ final class MegrezTests: XCTestCase {
     let expectedDumpDOT =
       "digraph {\ngraph [ rankdir=LR ];\nBOS;\nBOS -> 高;\n高;\n高 -> 科;\n高 -> 科技;\nBOS -> 高科技;\n高科技;\n高科技 -> 工;\n高科技 -> 公司;\n科;\n科 -> 際;\n科 -> 濟公;\n科技;\n科技 -> 工;\n科技 -> 公司;\n際;\n際 -> 工;\n際 -> 公司;\n濟公;\n濟公 -> 斯;\n工;\n工 -> 斯;\n公司;\n公司 -> 的;\n斯;\n斯 -> 的;\n的;\n的 -> 年;\n的 -> 年終;\n年;\n年 -> 中;\n年終;\n年終 -> 獎;\n年終 -> 獎金;\n中;\n中 -> 獎;\n中 -> 獎金;\n獎;\n獎 -> 金;\n獎金;\n獎金 -> EOS;\n金;\n金 -> EOS;\nEOS;\n}\n"
     XCTAssertEqual(compositor.dumpDOT, expectedDumpDOT)
+    // Extra tests example: Litch.
+    compositor = Megrez.Compositor(with: SimpleLM(input: strSampleDataLitch))
+    compositor.separator = ""
+    compositor.clear()
+    compositor.insertKey("nai3")
+    compositor.insertKey("ji1")
+    result = compositor.walk()
+    XCTAssertEqual(result.values, ["荔枝"])
+    XCTAssertTrue(compositor.overrideCandidateLiteral("雞", at: 1))
+    result = compositor.walk()
+    XCTAssertEqual(result.values, ["乃", "雞"])
   }
 
   func test16_Compositor_InputTest2() throws {
