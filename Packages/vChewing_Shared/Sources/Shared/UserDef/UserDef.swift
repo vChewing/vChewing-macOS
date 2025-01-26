@@ -61,6 +61,7 @@ public enum UserDef: String, CaseIterable, Identifiable {
   case kAllowBoostingSingleKanjiAsUserPhrase = "AllowBoostingSingleKanjiAsUserPhrase"
   case kUseSCPCTypingMode = "UseSCPCTypingMode"
   case kMaxCandidateLength = "MaxCandidateLength"
+  case kBeepSoundPreference = "BeepSoundPreference"
   case kShouldNotFartInLieuOfBeep = "ShouldNotFartInLieuOfBeep"
   case kShowHanyuPinyinInCompositionBuffer = "ShowHanyuPinyinInCompositionBuffer"
   case kInlineDumpPinyinInLieuOfZhuyin = "InlineDumpPinyinInLieuOfZhuyin"
@@ -216,6 +217,7 @@ extension UserDef {
     case .kAllowBoostingSingleKanjiAsUserPhrase: return .bool
     case .kUseSCPCTypingMode: return .bool
     case .kMaxCandidateLength: return .integer
+    case .kBeepSoundPreference: return .integer
     case .kShouldNotFartInLieuOfBeep: return .bool
     case .kShowHanyuPinyinInCompositionBuffer: return .bool
     case .kInlineDumpPinyinInLieuOfZhuyin: return .bool
@@ -487,6 +489,15 @@ extension UserDef {
         description: "An accommodation for elder computer users."
       )
     case .kMaxCandidateLength: return nil
+    case .kBeepSoundPreference: return .init(
+        userDef: self,
+        shortTitle: "i18n:UserDef.kBeepSoundPreference.shortTitle",
+        options: [
+          0: "i18n:UserDef.kBeepSoundPreference.option.0", // Disable
+          1: "i18n:UserDef.kBeepSoundPreference.option.1", // Follow System
+          2: "i18n:UserDef.kBeepSoundPreference.option.2", // Use vChewing SFX (Default Value)
+        ]
+      )
     case .kShouldNotFartInLieuOfBeep: return .init(
         userDef: self,
         shortTitle: "Stop farting (when typed phonetic combination is invalid, etc.)",

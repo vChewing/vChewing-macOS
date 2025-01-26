@@ -218,6 +218,10 @@
 "i18n:settings.shiftKeyASCIITogle.description" = "This feature only needs to parse consecutive NSEvents passed by macOS built-in InputMethodKit framework, hence no necessity of asking end-users for extra privileges of monitoring global keyboard inputs. You are free to investigate our codebase or reverse-engineer this input method to see whether the above statement is trustable. Also, this Shift-key toggle won't work if CapsLock is ON.";
 "i18n:userdef.kAlwaysUsePCBWithElectronBasedClients.description" = "Electron-based apps are notorious in unpredictable (buggy) IMKTextInput API interactive behaviors. Most of such apps are unlikely to have their individual issues of such solved correctly on-time due to various out-of-control reasons, hence why this toggle is enabled by default.";
 "i18n:UserDef.kAlwaysUsePCBWithElectronBasedClients.shortTitle" = "Always use popup composition buffer for Electron-based client apps";
+"i18n:UserDef.kBeepSoundPreference.option.0" = "Muted";
+"i18n:UserDef.kBeepSoundPreference.option.1" = "Use OS Settings";
+"i18n:UserDef.kBeepSoundPreference.option.2" = "Use vChewing SFX";
+"i18n:UserDef.kBeepSoundPreference.shortTitle" = "Beep Sound";
 "i18n:UserDef.kBypassNonAppleCapsLockHandling.description" = "This won't affect the same feature offered by macOS since 10.14 Mojave and later.";
 "i18n:UserDef.kBypassNonAppleCapsLockHandling.shortTitle" = "Bypass the vChewing built-in Caps Lock handling";
 "i18n:userdef.kCheckAbusersOfSecureEventInputAPI.description" = "Such abuse of SecureEventInput API in the background can hinder all 3rd-party input methods from being able to switch to. It is fine to use SecureEventInput for sensitive input fields. However, an app calling EnableSecureEventInput() is responsible to call DisableSecureEventInput() immediately right after the input field loses focus. This situation may also happen if an app is hanging in the background (or working as a helper application in the background) with its SecureEventInput left enabled.";

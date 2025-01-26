@@ -262,6 +262,9 @@ public class PrefMgr: NSObject, PrefMgrProtocol {
   @AppProperty(key: UserDef.kMaxCandidateLength.rawValue, defaultValue: 10)
   public dynamic var maxCandidateLength: Int
 
+  @AppProperty(key: UserDef.kBeepSoundPreference.rawValue, defaultValue: 2)
+  public dynamic var beepSoundPreference: Int
+
   @AppProperty(key: UserDef.kShouldNotFartInLieuOfBeep.rawValue, defaultValue: true)
   public dynamic var shouldNotFartInLieuOfBeep: Bool
 
