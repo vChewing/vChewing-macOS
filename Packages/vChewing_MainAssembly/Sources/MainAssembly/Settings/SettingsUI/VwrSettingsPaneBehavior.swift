@@ -16,6 +16,9 @@ import SwiftUI
 public struct VwrSettingsPaneBehavior: View {
   // MARK: - AppStorage Variables
 
+  @AppStorage(wrappedValue: 2, UserDef.kBeepSoundPreference.rawValue)
+  private var kBeepSoundPreference: Int
+
   @AppStorage(wrappedValue: true, UserDef.kChooseCandidateUsingSpace.rawValue)
   private var chooseCandidateUsingSpace: Bool
 
@@ -79,6 +82,15 @@ public struct VwrSettingsPaneBehavior: View {
     ScrollView {
       Form {
         Section {
+          UserDef.kShowNotificationsWhenTogglingCapsLock
+            .bind($showNotificationsWhenTogglingCapsLock).render()
+          UserDef.kAlwaysShowTooltipTextsHorizontally.bind($alwaysShowTooltipTextsHorizontally)
+            .render()
+            .disabled(Bundle.main.preferredLocalizations[0] == "en")
+          UserDef.kBeepSoundPreference.bind($kBeepSoundPreference).render()
+        }
+
+        Section {
           UserDef.kChooseCandidateUsingSpace.bind($chooseCandidateUsingSpace).render()
           UserDef.kEscToCleanInputBuffer.bind($escToCleanInputBuffer).render()
           UserDef.kAlsoConfirmAssociatedCandidatesByEnter
@@ -131,14 +143,6 @@ public struct VwrSettingsPaneBehavior: View {
           }
           UserDef.kShiftEisuToggleOffTogetherWithCapsLock
             .bind($shiftEisuToggleOffTogetherWithCapsLock).render()
-        }
-
-        Section {
-          UserDef.kShowNotificationsWhenTogglingCapsLock
-            .bind($showNotificationsWhenTogglingCapsLock).render()
-          UserDef.kAlwaysShowTooltipTextsHorizontally.bind($alwaysShowTooltipTextsHorizontally)
-            .render()
-            .disabled(Bundle.main.preferredLocalizations[0] == "en")
         }
       }.formStyled()
     }
