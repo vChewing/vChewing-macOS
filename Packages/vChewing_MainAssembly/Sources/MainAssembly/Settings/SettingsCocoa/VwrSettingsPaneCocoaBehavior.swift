@@ -59,19 +59,23 @@ extension SettingsPanesCocoa {
               UserDef.kAlsoConfirmAssociatedCandidatesByEnter.render(fixWidth: innerContentWidth)
               UserDef.kUseSpaceToCommitHighlightedSCPCCandidate.render(fixWidth: innerContentWidth)
             }?.boxed()
-            NSStackView.buildSection(width: innerContentWidth) {
-              if #available(macOS 12, *) {
-                UserDef.kShowNotificationsWhenTogglingCapsLock.render(fixWidth: innerContentWidth)
-              }
-              UserDef.kAlwaysShowTooltipTextsHorizontally.render(fixWidth: innerContentWidth)
-              if Date.isTodayTheDate(from: 0401) {
+            if #available(macOS 10.14, *) {
+              NSStackView.buildSection(width: innerContentWidth) {
+                if #available(macOS 12, *) {
+                  UserDef.kShowNotificationsWhenTogglingCapsLock.render(fixWidth: innerContentWidth)
+                }
+                UserDef.kAlwaysShowTooltipTextsHorizontally.render(fixWidth: innerContentWidth)
+              }?.boxed()
+            }
+            if Date.isTodayTheDate(from: 0401) {
+              NSStackView.buildSection(width: innerContentWidth) {
                 UserDef.kShouldNotFartInLieuOfBeep
                   .render(fixWidth: innerContentWidth) { renderable in
                     renderable.currentControl?.target = self
                     renderable.currentControl?.action = #selector(self.onFartControlChange(_:))
                   }
-              }
-            }?.boxed()
+              }?.boxed()
+            }
             NSView()
           }
           NSTabView.TabPage(title: "Ｄ") {
