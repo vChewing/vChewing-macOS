@@ -1,4 +1,5 @@
 !**/[Pp]ackages/build/
+**/.index-build/
 !*.[Cc]ache/
 !.axoCover/settings.json
 $RECYCLE.BIN/
