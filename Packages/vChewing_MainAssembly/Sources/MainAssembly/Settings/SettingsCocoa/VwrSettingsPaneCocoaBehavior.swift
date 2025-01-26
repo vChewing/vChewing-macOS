@@ -39,6 +39,9 @@ extension SettingsPanesCocoa {
               UserDef.kSpecifyShiftSpaceKeyBehavior.render(fixWidth: innerContentWidth)
               UserDef.kSpecifyCmdOptCtrlEnterBehavior.render(fixWidth: innerContentWidth)
             }?.boxed()
+            NSStackView.buildSection(width: innerContentWidth) {
+              UserDef.kBeepSoundPreference.render(fixWidth: contentWidth)
+            }?.boxed()
             NSView()
           }
           NSTabView.TabPage(title: "Ｂ") {

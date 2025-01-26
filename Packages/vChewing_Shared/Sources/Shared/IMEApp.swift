@@ -64,12 +64,10 @@ public enum IMEApp {
   /// Fart or Beep?
   public static func buzz() {
     let prefs = PrefMgr()
-    if prefs.isDebugModeEnabled {
-      NSSound.buzz(fart: !prefs.shouldNotFartInLieuOfBeep)
-    } else if !prefs.shouldNotFartInLieuOfBeep {
-      NSSound.buzz(fart: true)
-    } else {
-      NSSound.beep()
+    switch prefs.beepSoundPreference {
+    case 0: return
+    case 1: NSSound.beep()
+    default: NSSound.buzz(fart: !prefs.shouldNotFartInLieuOfBeep)
     }
   }
 }

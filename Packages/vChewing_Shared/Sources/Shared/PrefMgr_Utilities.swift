@@ -74,6 +74,9 @@ extension PrefMgr {
     if ![0, 1, 2, 3].contains(specifyCmdOptCtrlEnterBehavior) {
       specifyCmdOptCtrlEnterBehavior = 0
     }
+    if ![0, 1, 2].contains(beepSoundPreference) {
+      beepSoundPreference = 2
+    }
   }
 }
 

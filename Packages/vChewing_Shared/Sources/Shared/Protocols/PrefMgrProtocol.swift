@@ -62,6 +62,7 @@ public protocol PrefMgrProtocol {
   var enableMouseScrollingForTDKCandidatesCocoa: Bool { get set }
   var disableSegmentedThickUnderlineInMarkingModeForManagedClients: Bool { get set }
   var maxCandidateLength: Int { get set }
+  var beepSoundPreference: Int { get set }
   var shouldNotFartInLieuOfBeep: Bool { get set }
   var showHanyuPinyinInCompositionBuffer: Bool { get set }
   var inlineDumpPinyinInLieuOfZhuyin: Bool { get set }
