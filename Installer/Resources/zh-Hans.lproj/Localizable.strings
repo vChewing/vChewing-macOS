@@ -11,7 +11,7 @@
 "i18n:installer.APP_DERIVED_FROM" = "该专案曾由 OpenVanilla 小麦注音专案 (MIT-License) 衍生而来。";
 "i18n:installer.APP_NAME" = "vChewing for macOS";
 "i18n:installer.CANCEL_INSTALLATION" = "取消安装";
-"i18n:installer.DEV_CREW" = "威注音 macOS 程式研发：Shiki Suen, Isaac Xen, Hiraku Wang, 等。\n威注音词库维护：Shiki Suen。\n爬轨算法：Lukhnos Liu (Gramambular 2, MIT-License)。";
+"i18n:installer.DEV_CREW" = "威注音 macOS 程式研发：Shiki Suen, Isaac Xen, Hiraku Wang, 等。\n威注音词库维护：Shiki Suen。\nDijkstra 爬轨算法实作：Shiki Suen。";
 "i18n:installer.DISCLAIMER_TEXT" = "免责声明：威注音专案对小麦注音官方专案内赠的小麦注音原版词库内容不负任何责任。威注音输入法专用的威注音官方词库不包含任何「会在法理上妨碍威注音在全球传播」的「与地缘政治及政治意识形态有关的」内容。威注音专案与 OpenVanilla 专案之间无合作关系、无隶属关系。";
 "i18n:installer.DO_APP_UPGRADE" = "接受并升级";
 "i18n:installer.EULA_PROMPT_NOTICE" = "若要安装该软件，请接受上述条款。";
