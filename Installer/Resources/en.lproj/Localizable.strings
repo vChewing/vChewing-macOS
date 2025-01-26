@@ -11,7 +11,7 @@
 "i18n:installer.APP_DERIVED_FROM" = "Was derived from OpenVanilla McBopopmofo Project (MIT-License).";
 "i18n:installer.APP_NAME" = "vChewing for macOS";
 "i18n:installer.CANCEL_INSTALLATION" = "Cancel";
-"i18n:installer.DEV_CREW" = "vChewing macOS Development: Shiki Suen, Isaac Xen, Hiraku Wang, etc.\nvChewing Phrase Database Maintained by Shiki Suen.\nWalking algorithm by Lukhnos Liu (from Gramambular 2, MIT-License).";
+"i18n:installer.DEV_CREW" = "vChewing macOS Development: Shiki Suen, Isaac Xen, Hiraku Wang, etc.\nvChewing Phrase Database Maintained by Shiki Suen.\nWalking algorithm (Dijkstra) implemented by Shiki Suen.";
 "i18n:installer.DISCLAIMER_TEXT" = "DISCLAIMER: The vChewing project, having no relationship of cooperation or affiliation with the OpenVanilla project, is not responsible for the phrase database shipped in the original McBopomofo project. Certain geopolitical and ideological contents, which are potentially harmful to the global spread of this software, are not included in vChewing official phrase database.";
 "i18n:installer.DO_APP_UPGRADE" = "Accept & Upgrade";
 "i18n:installer.EULA_PROMPT_NOTICE" = "By installing the software, you must accept the terms above.";
