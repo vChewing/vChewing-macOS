@@ -130,6 +130,12 @@ public class PrefMgr: NSObject, PrefMgrProtocol {
   public dynamic var useRearCursorMode: Bool
 
   @AppProperty(
+    key: UserDef.kUseHLtoMoveCompositorCursorInCandidateState.rawValue,
+    defaultValue: false
+  )
+  public var useHLtoMoveCompositorCursorInCandidateState: Bool
+
+  @AppProperty(
     key: UserDef.kUseJKtoMoveCompositorCursorInCandidateState.rawValue,
     defaultValue: false
   )

@@ -15,6 +15,7 @@ extension PrefMgr {
   public func validate(candidateKeys: String) -> String? {
     var excluded = ""
     if useJKtoMoveCompositorCursorInCandidateState { excluded.append("jk") }
+    if useHLtoMoveCompositorCursorInCandidateState { excluded.append("hl") }
     if useShiftQuestionToCallServiceMenu { excluded.append("?") }
     excluded.append(IMEApp.isKeyboardJIS ? "_" : "`~")
     return CandidateKey.validate(keys: candidateKeys, excluding: excluded)

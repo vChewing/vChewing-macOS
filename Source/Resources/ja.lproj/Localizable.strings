@@ -256,6 +256,8 @@
 "i18n:UserDef.kSpecifyCmdOptCtrlEnterBehavior.option.2" = "中国語点字 (1947) を送出";
 "i18n:UserDef.kSpecifyCmdOptCtrlEnterBehavior.option.3" = "中国語点字 (GF0019-2018) を送出";
 "i18n:UserDef.kSpecifyCmdOptCtrlEnterBehavior.shortTitle" = "Command+Option+Ctrl+Enter:";
+"i18n:UserDef.kUseHLtoMoveCompositorCursorInCandidateState.description" = "⚠︎ これで「H / L」キーは言選り用キー陣列から自動的に外されます。尚、この機能はカセットモードの「%quick」による早速候補入力状態では利用できません。";
+"i18n:UserDef.kUseHLtoMoveCompositorCursorInCandidateState.shortTitle" = "候補陳列が見えるとき、「H / L」キーで入力緩衝列のカーソルを移す";
 "i18n:UserDef.kUseJKtoMoveCompositorCursorInCandidateState.description" = "⚠︎ これで「J / K」キーは言選り用キー陣列から自動的に外されます。尚、この機能はカセットモードの「%quick」による早速候補入力状態では利用できません。";
 "i18n:UserDef.kUseJKtoMoveCompositorCursorInCandidateState.shortTitle" = "候補陳列が見えるとき、「J / K」キーで入力緩衝列のカーソルを移す";
 "i18n:UserDef.kUseShiftQuestionToCallServiceMenu.shortTitle" = "候補陳列ウィンドウで「Shift+?」でもサービスメニューを呼出";
