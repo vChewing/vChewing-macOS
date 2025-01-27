@@ -71,6 +71,12 @@ extension SettingsPanesCocoa {
                   renderable.currentControl?
                     .action = #selector(self.performCandidateKeysSanityCheck(_:))
                 }
+              UserDef.kUseHLtoMoveCompositorCursorInCandidateState
+                .render(fixWidth: innerContentWidth) { renderable in
+                  renderable.currentControl?.target = self
+                  renderable.currentControl?
+                    .action = #selector(self.performCandidateKeysSanityCheck(_:))
+                }
             }?.boxed()
             NSView()
           }

@@ -32,6 +32,7 @@ public protocol PrefMgrProtocol {
   var candidateWindowShowOnlyOneLine: Bool { get set }
   var shouldAutoReloadUserDataFiles: Bool { get set }
   var useRearCursorMode: Bool { get set }
+  var useHLtoMoveCompositorCursorInCandidateState: Bool { get set }
   var useJKtoMoveCompositorCursorInCandidateState: Bool { get set }
   var useShiftQuestionToCallServiceMenu: Bool { get set }
   var moveCursorAfterSelectingCandidate: Bool { get set }

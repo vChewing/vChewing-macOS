@@ -274,16 +274,18 @@ extension InputHandler {
       }
     }
 
-    // MARK: J / K 鍵組字區的游標移動行為處理
+    // MARK: J / K / H / L 鍵組字區的游標移動行為處理
 
     let allowMovingCompositorCursorByJK = allowMovingCompositorCursor && prefs
       .useJKtoMoveCompositorCursorInCandidateState
+    let allowMovingCompositorCursorByHL = allowMovingCompositorCursor && prefs
+      .useHLtoMoveCompositorCursorInCandidateState
 
-    checkMovingCompositorCursorByJK: if allowMovingCompositorCursorByJK {
-      guard input.keyModifierFlags.isEmpty else { break checkMovingCompositorCursorByJK }
-      // keycode: 38 = J, 40 = K.
+    checkMovingCompositorCursorByJKHL: if allowMovingCompositorCursorByJK || allowMovingCompositorCursorByHL {
+      guard input.keyModifierFlags.isEmpty else { break checkMovingCompositorCursorByJKHL }
+      // keycode: 38 = J, 40 = K, 4 = H, 37 = L.
       switch input.keyCode {
-      case 38:
+      case 38 where allowMovingCompositorCursorByJK, 4 where allowMovingCompositorCursorByHL:
         if compositor.cursor > 0 {
           compositor.cursor -= 1
           if isCursorCuttingChar() { compositor.jumpCursorBySpan(to: .rear) }
@@ -292,7 +294,7 @@ extension InputHandler {
           delegate.callError("6F389AE9")
         }
         return true
-      case 40:
+      case 40 where allowMovingCompositorCursorByJK, 37 where allowMovingCompositorCursorByHL:
         if compositor.cursor < compositor.length {
           compositor.cursor += 1
           if isCursorCuttingChar() { compositor.jumpCursorBySpan(to: .front) }
@@ -301,7 +303,7 @@ extension InputHandler {
           delegate.callError("EDBD27F2")
         }
         return true
-      default: break checkMovingCompositorCursorByJK
+      default: break checkMovingCompositorCursorByJKHL
       }
     }
 
@@ -319,6 +321,14 @@ extension InputHandler {
       .lowercased()
     // 如果允許 J / K 鍵前後移動組字區游標的話，則不再將 J / K 鍵盤視為選字鍵。
     if !(prefs.useJKtoMoveCompositorCursorInCandidateState && "jk".contains(matched)) {
+      checkSelectionKey: for keyPair in delegate.selectionKeys.enumerated() {
+        guard matched == keyPair.element.lowercased() else { continue }
+        index = Int(keyPair.offset)
+        break checkSelectionKey
+      }
+    }
+    // 如果允許 H / L 鍵前後移動組字區游標的話，則不再將 H / L 鍵盤視為選字鍵。
+    if !(prefs.useHLtoMoveCompositorCursorInCandidateState && "hl".contains(matched)) {
       checkSelectionKey: for keyPair in delegate.selectionKeys.enumerated() {
         guard matched == keyPair.element.lowercased() else { continue }
         index = Int(keyPair.offset)
