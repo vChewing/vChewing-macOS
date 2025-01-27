@@ -193,7 +193,7 @@ extension IMEStateData {
       = session.mark(forStyle: kTSMHiliteSelectedRawText, at: .zero)
       as? [NSAttributedString.Key: Any]
       ?? [.underlineStyle: NSUnderlineStyle.single.rawValue]
-    return .init(string: " ", attributes: attributes)
+    return .init(string: "✍", attributes: attributes)
   }
 }
 
