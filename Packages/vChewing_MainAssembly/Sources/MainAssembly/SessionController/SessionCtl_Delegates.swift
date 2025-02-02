@@ -10,9 +10,9 @@ import AppKit
 import NotifierUI
 import Shared
 
-// MARK: - SessionCtl + InputHandlerDelegate
+// MARK: - SessionCtl + SessionProtocol
 
-extension SessionCtl: InputHandlerDelegate {
+extension SessionCtl: SessionProtocol {
   public var clientMitigationLevel: Int {
     var result = PrefMgr.shared.securityHardenedCompositionBuffer ? 2 : 0
     if isClientElectronBased {
@@ -31,10 +31,6 @@ extension SessionCtl: InputHandlerDelegate {
 
   public func candidateSelectionConfirmedByInputHandler(at index: Int) {
     candidatePairSelectionConfirmed(at: index)
-  }
-
-  public func callNotification(_ message: String) {
-    Notifier.notify(message: message)
   }
 
   public func callError(_ logMessage: String) {

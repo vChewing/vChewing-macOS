@@ -50,7 +50,7 @@ extension InputHandler {
   @discardableResult
   public func revolveTypingMethod(to specifiedMethod: TypingMethod? = nil)
     -> Bool {
-    guard let delegate = delegate else { return false }
+    guard let session = session else { return false }
     var newMethod = currentTypingMethod
     if let specified = specifiedMethod {
       newMethod = specified
@@ -64,18 +64,18 @@ extension InputHandler {
     }
     switch newMethod {
     case .vChewingFactory:
-      delegate.switchState(IMEState.ofAbortion())
+      session.switchState(IMEState.ofAbortion())
       return true
     case .codePoint:
       strCodePointBuffer.removeAll()
     case .haninKeyboardSymbol: break
     }
     var updatedState = generateStateOfInputting(sansReading: true)
-    delegate.switchState(IMEState.ofCommitting(textToCommit: updatedState.displayedText))
+    session.switchState(IMEState.ofCommitting(textToCommit: updatedState.displayedText))
     updatedState = generateStateOfInputting(guarded: true)
     updatedState.tooltipDuration = 0
-    updatedState.tooltip = newMethod.getTooltip(vertical: delegate.isVerticalTyping)
-    delegate.switchState(updatedState)
+    updatedState.tooltip = newMethod.getTooltip(vertical: session.isVerticalTyping)
+    session.switchState(updatedState)
     return true
   }
 }
