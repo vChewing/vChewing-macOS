@@ -146,8 +146,8 @@ extension InputHandler {
   /// 拿著給定的候選字詞陣列資料內容，切換至選字狀態。
   /// - Returns: 回呼一個新的選詞狀態，來就給定的候選字詞陣列資料內容顯示選字窗。
   public func generateStateOfCandidates(dodge: Bool = true) -> IMEStateProtocol {
-    guard let delegate = delegate else { return IMEState.ofAbortion() }
-    if dodge, delegate.state.type == .ofInputting {
+    guard let session = session else { return IMEState.ofAbortion() }
+    if dodge, session.state.type == .ofInputting {
       dodgeInvalidEdgeCursorForCandidateState()
     }
     var result = IMEState.ofCandidates(
@@ -191,17 +191,17 @@ extension InputHandler {
   ///   - input: 輸入按鍵訊號。
   /// - Returns: 將按鍵行為「是否有處理掉」藉由 SessionCtl 回報給 IMK。
   func handleMarkingState(input: InputSignalProtocol) -> Bool {
-    guard let delegate = delegate else { return false }
-    let state = delegate.state
+    guard let session = session else { return false }
+    let state = session.state
 
     if input.isEsc {
-      delegate.switchState(generateStateOfInputting())
+      session.switchState(generateStateOfInputting())
       return true
     }
 
     // 阻止用於行內注音輸出的熱鍵。
     if input.isControlHold, input.isCommandHold, input.isEnter {
-      delegate.callError("1198E3E5")
+      errorCallback?("1198E3E5")
       return true
     }
 
@@ -215,12 +215,12 @@ extension InputHandler {
         tooltipColorState = .succeeded
       }
       if !state.isMarkedLengthValid {
-        delegate.callError("9AAFAC00")
+        errorCallback?("9AAFAC00")
         return true
       }
       let areWeUnfiltering = state.markedTargetIsCurrentlyFiltered
-      if !delegate.performUserPhraseOperation(addToFilter: false) {
-        delegate.callError("5B69CC8D")
+      if !session.performUserPhraseOperation(addToFilter: false) {
+        errorCallback?("5B69CC8D")
         return true
       }
       if areWeUnfiltering {
@@ -231,7 +231,7 @@ extension InputHandler {
       newState.tooltip = NSLocalizedString(tooltipMessage, comment: "")
       newState.data.tooltipColorState = tooltipColorState
       newState.tooltipDuration = 1.85
-      delegate.switchState(newState)
+      session.switchState(newState)
       return true
     }
 
@@ -239,18 +239,18 @@ extension InputHandler {
     if input.isBackSpace || input.isDelete {
       let tooltipMessage = "! Succeeded in filtering a user phrase."
       if !state.isFilterable {
-        delegate.callError("1F88B191")
+        errorCallback?("1F88B191")
         return true
       }
-      if !delegate.performUserPhraseOperation(addToFilter: true) {
-        delegate.callError("68D3C6C8")
+      if !session.performUserPhraseOperation(addToFilter: true) {
+        errorCallback?("68D3C6C8")
         return true
       }
       var newState = generateStateOfInputting()
       newState.tooltip = NSLocalizedString(tooltipMessage, comment: "")
       newState.data.tooltipColorState = .warning
       newState.tooltipDuration = 1.85
-      delegate.switchState(newState)
+      session.switchState(newState)
       return true
     }
 
@@ -272,9 +272,9 @@ extension InputHandler {
           marker: convertCursorForDisplay(compositor.marker)
         )
         marking.tooltipBackupForInputting = state.tooltipBackupForInputting
-        delegate.switchState(marking.markedRange.isEmpty ? marking.convertedToInputting : marking)
+        session.switchState(marking.markedRange.isEmpty ? marking.convertedToInputting : marking)
       } else {
-        delegate.callError("1149908D")
+        errorCallback?("1149908D")
       }
       return true
     }
@@ -297,9 +297,9 @@ extension InputHandler {
           marker: convertCursorForDisplay(compositor.marker)
         )
         marking.tooltipBackupForInputting = state.tooltipBackupForInputting
-        delegate.switchState(marking.markedRange.isEmpty ? marking.convertedToInputting : marking)
+        session.switchState(marking.markedRange.isEmpty ? marking.convertedToInputting : marking)
       } else {
-        delegate.callError("9B51408D")
+        errorCallback?("9B51408D")
       }
       return true
     }
@@ -313,7 +313,7 @@ extension InputHandler {
   ///   - customPunctuation: 自訂標點索引鍵頭。
   /// - Returns: 將按鍵行為「是否有處理掉」藉由 SessionCtl 回報給 IMK。
   func handlePunctuation(_ customPunctuation: String) -> Bool {
-    guard let delegate = delegate else { return false }
+    guard let session = session else { return false }
 
     if !currentLM.hasUnigramsFor(keyArray: [customPunctuation]) {
       return false
@@ -321,12 +321,12 @@ extension InputHandler {
 
     guard isComposerOrCalligrapherEmpty else {
       // 注音沒敲完的情況下，無視標點輸入。
-      delegate.callError("A9B69908D")
+      errorCallback?("A9B69908D")
       return true
     }
 
     guard compositor.insertKey(customPunctuation) else {
-      delegate.callError("C0793A6D: 得檢查對應的語言模組的 hasUnigramsFor() 是否有誤判之情形。")
+      errorCallback?("C0793A6D: 得檢查對應的語言模組的 hasUnigramsFor() 是否有誤判之情形。")
       return true
     }
 
@@ -335,22 +335,22 @@ extension InputHandler {
     let textToCommit = commitOverflownComposition
     var inputting = generateStateOfInputting()
     inputting.textToCommit = textToCommit
-    delegate.switchState(inputting)
+    session.switchState(inputting)
 
     // 從這一行之後開始，就是針對逐字選字模式的單獨處理。
     guard prefs.useSCPCTypingMode, isComposerOrCalligrapherEmpty else { return true }
 
     let candidateState = generateStateOfCandidates()
     switch candidateState.candidates.count {
-    case 2...: delegate.switchState(candidateState)
+    case 2...: session.switchState(candidateState)
     case 1:
       clear() // 這句不要砍，因為下文可能會回呼 candidateState。
       if let strToCommit = candidateState.candidates.first?.value, !strToCommit.isEmpty {
-        delegate.switchState(IMEState.ofCommitting(textToCommit: strToCommit))
+        session.switchState(IMEState.ofCommitting(textToCommit: strToCommit))
       } else {
-        delegate.switchState(candidateState)
+        session.switchState(candidateState)
       }
-    default: delegate.callError("8DA4096E")
+    default: errorCallback?("8DA4096E")
     }
     return true
   }
@@ -370,8 +370,8 @@ extension InputHandler {
     associatesData: @escaping () -> ([(keyArray: [String], value: String)]) = { [] }
   )
     -> Bool {
-    guard let delegate = delegate else { return false }
-    let state = delegate.state
+    guard let session = session else { return false }
+    let state = session.state
 
     guard currentTypingMethod == .vChewingFactory else {
       return revolveTypingMethod(to: .vChewingFactory)
@@ -391,14 +391,14 @@ extension InputHandler {
         : commissionByCtrlCommandEnter(isShiftPressed: input.isShiftHold)
     }
 
-    delegate.switchState(IMEState.ofCommitting(textToCommit: displayedText))
+    session.switchState(IMEState.ofCommitting(textToCommit: displayedText))
 
     associatedPhrases: if !prefs.useSCPCTypingMode, prefs.associatedPhrasesEnabled {
       guard input.commonKeyModifierFlags == .shift else { break associatedPhrases }
       guard isComposerOrCalligrapherEmpty else { break associatedPhrases }
       let associatedCandidates = associatesData()
       guard !associatedCandidates.isEmpty else { break associatedPhrases }
-      delegate.switchState(IMEState.ofAssociates(candidates: associatedCandidates))
+      session.switchState(IMEState.ofAssociates(candidates: associatedCandidates))
     }
 
     return true
@@ -411,8 +411,8 @@ extension InputHandler {
   ///   - input: 輸入按鍵訊號。
   /// - Returns: 將按鍵行為「是否有處理掉」藉由 SessionCtl 回報給 IMK。
   func handleBackSpace(input: InputSignalProtocol) -> Bool {
-    guard let delegate = delegate else { return false }
-    let state = delegate.state
+    guard let session = session else { return false }
+    let state = session.state
     guard state.type == .ofInputting else {
       currentTypingMethod = .vChewingFactory
       return false
@@ -423,8 +423,8 @@ extension InputHandler {
         func refreshState() {
           var updatedState = generateStateOfInputting(guarded: true)
           updatedState.tooltipDuration = 0
-          updatedState.tooltip = delegate.state.tooltip
-          delegate.switchState(updatedState)
+          updatedState.tooltip = session.state.tooltip
+          session.switchState(updatedState)
         }
         strCodePointBuffer = strCodePointBuffer.dropLast(1).description
         if input.commonKeyModifierFlags == .option {
@@ -456,10 +456,10 @@ extension InputHandler {
           walk() // 這裡必須 Walk 一次、來更新目前被 walk 的內容。
           prevReading.1.map(\.description).forEach { composer.receiveKey(fromPhonabet: $0) }
         }
-        delegate.switchState(generateStateOfInputting())
+        session.switchState(generateStateOfInputting())
         return true
       case 1:
-        delegate.switchState(IMEState.ofAbortion())
+        session.switchState(IMEState.ofAbortion())
         return true
       default: break
       }
@@ -470,7 +470,7 @@ extension InputHandler {
 
     switch input.commonKeyModifierFlags {
     case .shift:
-      delegate.switchState(IMEState.ofAbortion())
+      session.switchState(IMEState.ofAbortion())
       return true
     case .option:
       actualSteps = steps
@@ -479,7 +479,7 @@ extension InputHandler {
 
     if isComposerOrCalligrapherEmpty {
       if compositor.cursor <= 0 || actualSteps <= 0 {
-        delegate.callError("9D69908D")
+        errorCallback?("9D69908D")
         return true
       }
       for _ in 0 ..< actualSteps {
@@ -501,8 +501,8 @@ extension InputHandler {
           (keyArray: [($0.offset + 1).description], value: $0.element.description)
         }
       }
-      delegate.switchState(result)
-    case true: delegate.switchState(IMEState.ofAbortion())
+      session.switchState(result)
+    case true: session.switchState(IMEState.ofAbortion())
     }
     return true
   }
@@ -514,8 +514,8 @@ extension InputHandler {
   ///   - input: 輸入按鍵訊號。
   /// - Returns: 將按鍵行為「是否有處理掉」藉由 SessionCtl 回報給 IMK。
   func handleDelete(input: InputSignalProtocol) -> Bool {
-    guard let delegate = delegate else { return false }
-    let state = delegate.state
+    guard let session = session else { return false }
+    let state = session.state
 
     guard currentTypingMethod == .vChewingFactory else {
       return revolveTypingMethod(to: .vChewingFactory)
@@ -530,7 +530,7 @@ extension InputHandler {
     // 總之處理起來非常機車就是了。
     switch input.commonKeyModifierFlags {
     case .shift:
-      delegate.switchState(IMEState.ofAbortion())
+      session.switchState(IMEState.ofAbortion())
       return true
     case .option:
       actualSteps = steps
@@ -539,7 +539,7 @@ extension InputHandler {
 
     if isComposerOrCalligrapherEmpty {
       if compositor.cursor >= compositor.length || actualSteps <= 0 {
-        delegate.callError("9B69938D")
+        errorCallback?("9B69938D")
         return true
       }
       for _ in 0 ..< actualSteps {
@@ -553,8 +553,8 @@ extension InputHandler {
     let inputting = generateStateOfInputting()
     // 這裡不用「count > 0」，因為該整數變數只要「!isEmpty」那就必定滿足這個條件。
     switch inputting.displayedText.isEmpty {
-    case false: delegate.switchState(inputting)
-    case true: delegate.switchState(IMEState.ofAbortion())
+    case false: session.switchState(inputting)
+    case true: session.switchState(IMEState.ofAbortion())
     }
     return true
   }
@@ -564,10 +564,10 @@ extension InputHandler {
   /// 處理與當前文字輸入排版前後方向呈 90 度的那兩個方向鍵的按鍵行為。
   /// - Returns: 將按鍵行為「是否有處理掉」藉由 SessionCtl 回報給 IMK。
   func handleClockKey() -> Bool {
-    guard let delegate = delegate else { return false }
-    let state = delegate.state
+    guard let session = session else { return false }
+    let state = session.state
     guard state.type == .ofInputting else { return false }
-    if !isComposerOrCalligrapherEmpty { delegate.callError("9B6F908D") }
+    if !isComposerOrCalligrapherEmpty { errorCallback?("9B6F908D") }
     return true
   }
 
@@ -576,20 +576,20 @@ extension InputHandler {
   /// 處理 Home 鍵的行為。
   /// - Returns: 將按鍵行為「是否有處理掉」藉由 SessionCtl 回報給 IMK。
   func handleHome() -> Bool {
-    guard let delegate = delegate else { return false }
-    let state = delegate.state
+    guard let session = session else { return false }
+    let state = session.state
     guard state.type == .ofInputting else { return false }
 
     if !isComposerOrCalligrapherEmpty {
-      delegate.callError("ABC44080")
+      errorCallback?("ABC44080")
       return true
     }
 
     if compositor.cursor != 0 {
       compositor.cursor = 0
-      delegate.switchState(generateStateOfInputting())
+      session.switchState(generateStateOfInputting())
     } else {
-      delegate.callError("66D97F90")
+      errorCallback?("66D97F90")
     }
 
     return true
@@ -600,20 +600,20 @@ extension InputHandler {
   /// 處理 End 鍵的行為。
   /// - Returns: 將按鍵行為「是否有處理掉」藉由 SessionCtl 回報給 IMK。
   func handleEnd() -> Bool {
-    guard let delegate = delegate else { return false }
-    let state = delegate.state
+    guard let session = session else { return false }
+    let state = session.state
     guard state.type == .ofInputting else { return false }
 
     if !isComposerOrCalligrapherEmpty {
-      delegate.callError("9B69908D")
+      errorCallback?("9B69908D")
       return true
     }
 
     if compositor.cursor != compositor.length {
       compositor.cursor = compositor.length
-      delegate.switchState(generateStateOfInputting())
+      session.switchState(generateStateOfInputting())
     } else {
-      delegate.callError("9B69908E")
+      errorCallback?("9B69908E")
     }
 
     return true
@@ -624,8 +624,8 @@ extension InputHandler {
   /// 處理 Esc 鍵的行為。
   /// - Returns: 將按鍵行為「是否有處理掉」藉由 SessionCtl 回報給 IMK。
   func handleEsc() -> Bool {
-    guard let delegate = delegate else { return false }
-    let state = delegate.state
+    guard let session = session else { return false }
+    let state = session.state
 
     guard currentTypingMethod == .vChewingFactory else {
       return revolveTypingMethod(to: .vChewingFactory)
@@ -636,18 +636,18 @@ extension InputHandler {
     if prefs.escToCleanInputBuffer {
       /// 若啟用了該選項，則清空組字器的內容與注拼槽的內容。
       /// 此乃 macOS 內建注音輸入法預設之行為，但不太受 Windows 使用者群體之待見。
-      delegate.switchState(IMEState.ofAbortion())
+      session.switchState(IMEState.ofAbortion())
     } else {
       if isComposerOrCalligrapherEmpty {
         let commitText = generateStateOfInputting(sansReading: true).displayedText
-        delegate.switchState(IMEState.ofCommitting(textToCommit: commitText))
+        session.switchState(IMEState.ofCommitting(textToCommit: commitText))
         return true
       }
       /// 如果注拼槽或組筆區不是空的話，則清空之。
       clearComposerAndCalligrapher()
       switch compositor.isEmpty {
-      case false: delegate.switchState(generateStateOfInputting())
-      case true: delegate.switchState(IMEState.ofAbortion())
+      case false: session.switchState(generateStateOfInputting())
+      case true: session.switchState(IMEState.ofAbortion())
       }
     }
     return true
@@ -660,12 +660,12 @@ extension InputHandler {
   ///   - input: 輸入按鍵訊號。
   /// - Returns: 將按鍵行為「是否有處理掉」藉由 SessionCtl 回報給 IMK。
   func handleForward(input: InputSignalProtocol) -> Bool {
-    guard let delegate = delegate else { return false }
-    let state = delegate.state
+    guard let session = session else { return false }
+    let state = session.state
     guard state.type == .ofInputting else { return false }
 
     if !isComposerOrCalligrapherEmpty {
-      delegate.callError("B3BA5257")
+      errorCallback?("B3BA5257")
       return true
     }
 
@@ -688,9 +688,9 @@ extension InputHandler {
           marker: convertCursorForDisplay(compositor.marker)
         )
         marking.tooltipBackupForInputting = state.tooltip
-        delegate.switchState(marking)
+        session.switchState(marking)
       } else {
-        delegate.callError("BB7F6DB9")
+        errorCallback?("BB7F6DB9")
       }
     } else if input.isOptionHold, !input.isShiftHold {
       if input.isControlHold {
@@ -698,19 +698,19 @@ extension InputHandler {
       }
       // 游標跳轉動作無論怎樣都會執行，但如果出了執行失敗的結果的話則觸發報錯流程。
       if !compositor.jumpCursorBySpan(to: .front) {
-        delegate.callError("33C3B580")
+        errorCallback?("33C3B580")
         return true
       }
-      delegate.switchState(generateStateOfInputting())
+      session.switchState(generateStateOfInputting())
     } else {
       if compositor.cursor < compositor.length {
         compositor.cursor += 1
         if isCursorCuttingChar() {
           compositor.jumpCursorBySpan(to: .front)
         }
-        delegate.switchState(generateStateOfInputting())
+        session.switchState(generateStateOfInputting())
       } else {
-        delegate.callError("A96AAD58")
+        errorCallback?("A96AAD58")
       }
     }
 
@@ -724,12 +724,12 @@ extension InputHandler {
   ///   - input: 輸入按鍵訊號。
   /// - Returns: 將按鍵行為「是否有處理掉」藉由 SessionCtl 回報給 IMK。
   func handleBackward(input: InputSignalProtocol) -> Bool {
-    guard let delegate = delegate else { return false }
-    let state = delegate.state
+    guard let session = session else { return false }
+    let state = session.state
     guard state.type == .ofInputting else { return false }
 
     if !isComposerOrCalligrapherEmpty {
-      delegate.callError("6ED95318")
+      errorCallback?("6ED95318")
       return true
     }
 
@@ -752,27 +752,27 @@ extension InputHandler {
           marker: convertCursorForDisplay(compositor.marker)
         )
         marking.tooltipBackupForInputting = state.tooltip
-        delegate.switchState(marking)
+        session.switchState(marking)
       } else {
-        delegate.callError("D326DEA3")
+        errorCallback?("D326DEA3")
       }
     } else if input.isOptionHold, !input.isShiftHold {
       if input.isControlHold { return handleHome() }
       // 游標跳轉動作無論怎樣都會執行，但如果出了執行失敗的結果的話則觸發報錯流程。
       if !compositor.jumpCursorBySpan(to: .rear) {
-        delegate.callError("8D50DD9E")
+        errorCallback?("8D50DD9E")
         return true
       }
-      delegate.switchState(generateStateOfInputting())
+      session.switchState(generateStateOfInputting())
     } else {
       if compositor.cursor > 0 {
         compositor.cursor -= 1
         if isCursorCuttingChar() {
           compositor.jumpCursorBySpan(to: .rear)
         }
-        delegate.switchState(generateStateOfInputting())
+        session.switchState(generateStateOfInputting())
       } else {
-        delegate.callError("7045E6F3")
+        errorCallback?("7045E6F3")
       }
     }
 
@@ -786,13 +786,13 @@ extension InputHandler {
   ///   - reverseOrder: 是否有控制輪替方向的修飾鍵輸入。
   /// - Returns: 將按鍵行為「是否有處理掉」藉由 SessionCtl 回報給 IMK。
   func revolveCandidate(reverseOrder: Bool) -> Bool {
-    guard let delegate = delegate else { return false }
-    let state = delegate.state
+    guard let session = session else { return false }
+    let state = session.state
     if isComposerOrCalligrapherEmpty,
        compositor.isEmpty || compositor.walkedNodes.isEmpty { return false }
     guard state.type == .ofInputting else {
       guard state.type == .ofEmpty else {
-        delegate.callError("6044F081")
+        errorCallback?("6044F081")
         return true
       }
       // 不妨礙使用者平時輸入 Tab 的需求。
@@ -800,20 +800,20 @@ extension InputHandler {
     }
 
     guard isComposerOrCalligrapherEmpty else {
-      delegate.callError("A2DAF7BC")
+      errorCallback?("A2DAF7BC")
       return true
     }
 
     let candidates = generateArrayOfCandidates(fixOrder: prefs.useFixedCandidateOrderOnSelection)
     guard !candidates.isEmpty else {
-      delegate.callError("3378A6DF")
+      errorCallback?("3378A6DF")
       return true
     }
 
     guard let region = compositor.walkedNodes.cursorRegionMap[actualNodeCursorPosition],
           compositor.walkedNodes.count > region
     else {
-      delegate.callError("1CE6FFBD")
+      errorCallback?("1CE6FFBD")
       return true
     }
 
@@ -848,8 +848,8 @@ extension InputHandler {
 
     // 該動態函式僅用於此場合。
     func isContextVertical() -> Bool {
-      delegate.updateVerticalTypingStatus()
-      return delegate.isVerticalTyping
+      session.updateVerticalTypingStatus()
+      return session.isVerticalTyping
     }
 
     var newState = generateStateOfInputting()
@@ -867,7 +867,7 @@ extension InputHandler {
     newState.tooltip = newTooltip.description
     vCLog(newState.tooltip)
     newState.tooltipDuration = 0
-    delegate.switchState(newState)
+    session.switchState(newState)
     return true
   }
 
@@ -879,7 +879,7 @@ extension InputHandler {
   ///   - JIS: 是否為 JIS 鍵盤。
   /// - Returns: 將按鍵行為「是否有處理掉」藉由 SessionCtl 回報給 IMK。
   func handlePunctuationList(alternative: Bool, isJIS: Bool = false) -> Bool {
-    guard let delegate = delegate, delegate.state.type != .ofDeactivated else { return false }
+    guard let session = session, session.state.type != .ofDeactivated else { return false }
     if alternative {
       if currentLM.hasUnigramsFor(keyArray: ["_punctuation_list"]) {
         if isComposerOrCalligrapherEmpty, compositor.insertKey("_punctuation_list") {
@@ -888,13 +888,13 @@ extension InputHandler {
           let textToCommit = commitOverflownComposition
           var inputting = generateStateOfInputting()
           inputting.textToCommit = textToCommit
-          delegate.switchState(inputting)
+          session.switchState(inputting)
           // 開始決定是否切換至選字狀態。
           let newState = generateStateOfCandidates(dodge: false)
-          _ = newState.candidates.isEmpty ? delegate.callError("B5127D8A") : delegate
+          _ = newState.candidates.isEmpty ? errorCallback?("B5127D8A") : session
             .switchState(newState)
         } else { // 不要在注音沒敲完整的情況下叫出統合符號選單。
-          delegate.callError("17446655")
+          errorCallback?("17446655")
         }
         return true
       } else {
@@ -905,15 +905,15 @@ extension InputHandler {
           )
         vCLog("8EB3FB1A: " + errorMessage)
         let textToCommit = generateStateOfInputting(sansReading: true).displayedText
-        delegate.switchState(IMEState.ofCommitting(textToCommit: textToCommit))
-        delegate.switchState(IMEState.ofCommitting(textToCommit: isJIS ? "_" : "`"))
+        session.switchState(IMEState.ofCommitting(textToCommit: textToCommit))
+        session.switchState(IMEState.ofCommitting(textToCommit: isJIS ? "_" : "`"))
         return true
       }
     } else {
       // 得在這裡先 commit buffer，不然會導致「在摁 ESC 離開符號選單時會重複輸入上一次的組字區的內容」的不當行為。
       let textToCommit = generateStateOfInputting(sansReading: true).displayedText
-      delegate.switchState(IMEState.ofCommitting(textToCommit: textToCommit))
-      delegate.switchState(IMEState.ofSymbolTable(node: CandidateNode.root))
+      session.switchState(IMEState.ofCommitting(textToCommit: textToCommit))
+      session.switchState(IMEState.ofSymbolTable(node: CandidateNode.root))
       return true
     }
   }
@@ -921,7 +921,7 @@ extension InputHandler {
   // MARK: - 處理選字窗服務選單 (Service Menu)
 
   func handleServiceMenuInitiation(candidateText: String, reading: [String]) -> Bool {
-    guard let delegate = delegate, delegate.state.type != .ofDeactivated else { return false }
+    guard let session = session, session.state.type != .ofDeactivated else { return false }
     guard !candidateText.isEmpty else { return false }
     let rootNode = CandidateTextService.getCurrentServiceMenu(
       candidate: candidateText,
@@ -930,8 +930,8 @@ extension InputHandler {
     guard let rootNode = rootNode else { return false }
     // 得在這裡先 commit buffer，不然會導致「在摁 ESC 離開符號選單時會重複輸入上一次的組字區的內容」的不當行為。
     let textToCommit = generateStateOfInputting(sansReading: true).displayedText
-    delegate.switchState(IMEState.ofCommitting(textToCommit: textToCommit))
-    delegate.switchState(IMEState.ofSymbolTable(node: rootNode))
+    session.switchState(IMEState.ofCommitting(textToCommit: textToCommit))
+    session.switchState(IMEState.ofSymbolTable(node: rootNode))
     return true
   }
 
@@ -943,21 +943,21 @@ extension InputHandler {
   /// - Parameter input: 輸入訊號。
   /// - Returns: 告知 IMK「該按鍵是否已經被輸入法攔截處理」。
   func handleCapsLockAndAlphanumericalMode(input: InputSignalProtocol) -> Bool? {
-    guard let delegate = delegate else { return nil }
+    guard let session = session else { return nil }
     let handleCapsLock = !PrefMgr.shared.bypassNonAppleCapsLockHandling && input.isCapsLockOn
-    guard handleCapsLock || delegate.isASCIIMode else { return nil }
+    guard handleCapsLock || session.isASCIIMode else { return nil }
 
     // 低於 macOS 12 的系統無法偵測 CapsLock 的啟用狀態，
     // 所以這裡一律強制重置狀態為 .ofEmpty()。
-    delegate.switchState(IMEState.ofEmpty())
+    session.switchState(IMEState.ofEmpty())
 
     // 字母鍵摁 Shift 的話，無須額外處理，因為直接就會敲出大寫字母。
-    var shiftCapsLockHandling = input.isUpperCaseASCIILetterKey && delegate.isASCIIMode
+    var shiftCapsLockHandling = input.isUpperCaseASCIILetterKey && session.isASCIIMode
     shiftCapsLockHandling = shiftCapsLockHandling || handleCapsLock && input.isShiftHold
     guard !shiftCapsLockHandling else { return false }
 
     // 不再讓威注音處理由 Shift 切換到的英文模式的按鍵輸入。
-    if delegate.isASCIIMode, !handleCapsLock { return false }
+    if session.isASCIIMode, !handleCapsLock { return false }
 
     /// 如果是 ASCII 當中的不可列印的字元的話，
     /// 不使用「insertText:replacementRange:」。
@@ -965,7 +965,7 @@ extension InputHandler {
     if input.isASCII, !input.charCode.isPrintableASCII { return false }
 
     // 將整個組字區的內容遞交給客體應用。
-    delegate.switchState(IMEState.ofCommitting(textToCommit: input.text.lowercased()))
+    session.switchState(IMEState.ofCommitting(textToCommit: input.text.lowercased()))
 
     return true
   }
@@ -976,8 +976,8 @@ extension InputHandler {
   /// - Parameter input: 輸入訊號。
   /// - Returns: 告知 IMK「該按鍵是否已經被輸入法攔截處理」。
   func callCandidateState(input: InputSignalProtocol) -> Bool {
-    guard let delegate = delegate else { return false }
-    var state: IMEStateProtocol { delegate.state }
+    guard let session = session else { return false }
+    var state: IMEStateProtocol { session.state }
     // 用上下左右鍵呼叫選字窗。
     // 僅憑藉 state.hasComposition 的話，並不能真實把握組字器的狀況。
     // 另外，這裡不要用「!input.isFunctionKeyHold」，
@@ -992,7 +992,7 @@ extension InputHandler {
     guard notEmpty, noBannedModifiers, triggered else { return false }
     // 開始決定是否切換至選字狀態。
     let candidateState: IMEStateProtocol = generateStateOfCandidates()
-    _ = candidateState.candidates.isEmpty ? delegate.callError("3572F238") : delegate
+    _ = candidateState.candidates.isEmpty ? errorCallback?("3572F238") : session
       .switchState(candidateState)
     return true
   }
@@ -1003,8 +1003,8 @@ extension InputHandler {
   /// - Parameter input: 輸入訊號。
   /// - Returns: 告知 IMK「該按鍵是否已經被輸入法攔截處理」。
   func handleArabicNumeralInputs(input: InputSignalProtocol) -> Bool {
-    guard let delegate = delegate else { return false }
-    guard delegate.state.type == .ofEmpty, input.isMainAreaNumKey else { return false }
+    guard let session = session else { return false }
+    guard session.state.type == .ofEmpty, input.isMainAreaNumKey else { return false }
     guard input.isOptionHold, !input.isCommandHold, !input.isControlHold else { return false }
     guard let strRAW = input.mainAreaNumKeyChar else { return false }
     let newString: String = {
@@ -1013,7 +1013,7 @@ extension InputHandler {
       }
       return strRAW.applyingTransformFW2HW(reverse: false)
     }()
-    delegate.switchState(IMEState.ofCommitting(textToCommit: newString))
+    session.switchState(IMEState.ofCommitting(textToCommit: newString))
     return true
   }
 
@@ -1023,7 +1023,7 @@ extension InputHandler {
   /// - Parameter input: 輸入訊號。
   /// - Returns: 告知 IMK「該按鍵是否已經被輸入法攔截處理」。
   func handleLettersWithShiftHold(input: InputSignalProtocol) -> Bool {
-    guard let delegate = delegate else { return false }
+    guard let session = session else { return false }
     let inputText = input.text
     if input.isUpperCaseASCIILetterKey, !input.isCommandHold, !input.isControlHold {
       if input.isShiftHold { // 這裡先不要判斷 isOptionHold。
@@ -1031,13 +1031,13 @@ extension InputHandler {
         case 1, 3:
           if prefs.upperCaseLetterKeyBehavior == 3, !isConsideredEmptyForNow { break }
           let commitText = generateStateOfInputting(sansReading: true).displayedText
-          delegate
+          session
             .switchState(IMEState.ofCommitting(textToCommit: commitText + inputText.lowercased()))
           return true
         case 2, 4:
           if prefs.upperCaseLetterKeyBehavior == 4, !isConsideredEmptyForNow { break }
           let commitText = generateStateOfInputting(sansReading: true).displayedText
-          delegate
+          session
             .switchState(IMEState.ofCommitting(textToCommit: commitText + inputText.uppercased()))
           return true
         default: // 包括 case 0。
@@ -1059,7 +1059,7 @@ extension InputHandler {
   /// - Parameter input: 輸入訊號。
   /// - Returns: 告知 IMK「該按鍵是否已經被輸入法攔截處理」。
   func handleNumPadKeyInput(input: InputSignalProtocol) -> Bool {
-    guard let delegate = delegate, input.isNumericPadKey else { return false }
+    guard let session = session, input.isNumericPadKey else { return false }
     let inputText = input.text
     guard inputText.count == 1, input.isASCII else { return false }
     guard KeyCode(rawValue: input.keyCode) == nil else { return false } // 排除功能鍵。
@@ -1076,16 +1076,16 @@ extension InputHandler {
     currentLM.setOptions { config in
       config.numPadFWHWStatus = nil
     }
-    delegate.switchState(IMEState.ofEmpty())
+    session.switchState(IMEState.ofEmpty())
     let charToCommit = inputText.applyingTransformFW2HW(reverse: fullWidthResult)
-    delegate.switchState(IMEState.ofCommitting(textToCommit: charToCommit))
+    session.switchState(IMEState.ofCommitting(textToCommit: charToCommit))
     return true
   }
 
   // MARK: - 處理磁帶模式的符號選單輸入
 
   func handleCassetteSymbolTable(input: InputSignalProtocol) -> Bool {
-    guard let delegate = delegate else { return false }
+    guard let session = session else { return false }
     guard prefs.cassetteEnabled else { return false }
     let inputText = input.text
     guard !inputText.isEmpty else { return false }
@@ -1095,8 +1095,8 @@ extension InputHandler {
     let root = CandidateNode(name: queryString, symbols: result)
     // 得在這裡先 commit buffer，不然會導致「在摁 ESC 離開符號選單時會重複輸入上一次的組字區的內容」的不當行為。
     let textToCommit = generateStateOfInputting(sansReading: true).displayedText
-    delegate.switchState(IMEState.ofCommitting(textToCommit: textToCommit))
-    delegate.switchState(IMEState.ofSymbolTable(node: root))
+    session.switchState(IMEState.ofCommitting(textToCommit: textToCommit))
+    session.switchState(IMEState.ofSymbolTable(node: root))
     return true
   }
 }

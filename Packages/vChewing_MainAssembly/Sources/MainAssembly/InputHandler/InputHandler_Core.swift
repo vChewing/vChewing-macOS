@@ -7,6 +7,7 @@
 // requirements defined in MIT License.
 
 import AppKit
+import CandidateWindow
 import LangModelAssembly
 import Megrez
 import Shared
@@ -20,7 +21,7 @@ import Tekkon
 
 public protocol InputHandlerProtocol {
   var currentLM: LMAssembly.LMInstantiator { get set }
-  var delegate: InputHandlerDelegate? { get set }
+  var session: (SessionProtocol & CtlCandidateDelegate)? { get set }
   var keySeparator: String { get }
   static var keySeparator: String { get }
   var isCompositorEmpty: Bool { get }
@@ -66,18 +67,16 @@ extension InputHandlerProtocol {
   }
 }
 
-// MARK: - InputHandlerDelegate
+// MARK: - SessionProtocol
 
 /// InputHandler 委任協定
-public protocol InputHandlerDelegate {
+public protocol SessionProtocol {
   var isASCIIMode: Bool { get }
   var isVerticalTyping: Bool { get }
   var selectionKeys: String { get }
   var state: IMEStateProtocol { get set }
   var clientBundleIdentifier: String { get }
   var clientMitigationLevel: Int { get }
-  func callError(_ logMessage: String)
-  func callNotification(_ message: String)
   @discardableResult
   func updateVerticalTypingStatus() -> NSRect
   func switchState(_ newState: IMEStateProtocol)
@@ -95,9 +94,16 @@ public class InputHandler: InputHandlerProtocol {
   // MARK: Lifecycle
 
   /// 初期化。
-  public init(lm: LMAssembly.LMInstantiator, pref: PrefMgrProtocol) {
+  public init(
+    lm: LMAssembly.LMInstantiator,
+    pref: PrefMgrProtocol,
+    errorCallback: ((_ message: String) -> ())? = nil,
+    notificationCallback: ((_ message: String) -> ())? = nil
+  ) {
     self.prefs = pref
     self.currentLM = lm
+    self.errorCallback = errorCallback
+    self.notificationCallback = notificationCallback
     /// 同步組字器單個詞的幅位長度上限。
     Megrez.Compositor.maxSpanLength = prefs.maxCandidateLength
     /// 組字器初期化。因為是首次初期化變數，所以這裡不能用 ensureCompositor() 代勞。
@@ -111,8 +117,10 @@ public class InputHandler: InputHandlerProtocol {
   public static var keySeparator: String { Megrez.Compositor.theSeparator }
 
   /// 委任物件 (SessionCtl)，以便呼叫其中的函式。
-  public var delegate: InputHandlerDelegate?
+  public var session: (SessionProtocol & CtlCandidateDelegate)?
   public var prefs: PrefMgrProtocol
+  public var errorCallback: ((String) -> ())?
+  public var notificationCallback: ((String) -> ())?
 
   public var currentLM: LMAssembly.LMInstantiator {
     didSet {
@@ -218,14 +226,14 @@ public class InputHandler: InputHandlerProtocol {
   }
 
   public func previewCompositionBufferForCandidate(at index: Int) {
-    guard var delegate = delegate, delegate.state.type == .ofCandidates,
-          (0 ..< delegate.state.candidates.count).contains(index)
+    guard var session = session, session.state.type == .ofCandidates,
+          (0 ..< session.state.candidates.count).contains(index)
     else {
       return
     }
     let gridBackup = compositor.hardCopy
     defer { compositor = gridBackup }
-    var theState = delegate.state
+    var theState = session.state
     let highlightedPair = theState.candidates[index]
     consolidateNode(
       candidate: highlightedPair, respectCursorPushing: false,
@@ -244,9 +252,9 @@ public class InputHandler: InputHandlerProtocol {
     }
     theState.data.marker = compositor.marker
     compositor.marker = markerBackup
-    delegate.state = theState // 直接就地取代，不經過 switchState 處理，免得選字窗被重新載入。
-    delegate.setInlineDisplayWithCursor()
-    delegate.updatePopupDisplayWithCursor()
+    session.state = theState // 直接就地取代，不經過 switchState 處理，免得選字窗被重新載入。
+    session.setInlineDisplayWithCursor()
+    session.updatePopupDisplayWithCursor()
   }
 
   /// 給注拼槽指定注音排列或拼音輸入種類之後，將注拼槽內容清空。
@@ -692,8 +700,8 @@ extension InputHandler {
   var commitOverflownComposition: String {
     guard !compositor.walkedNodes.isEmpty,
           compositor.length > compositorWidthLimit,
-          let delegate = delegate,
-          delegate.clientMitigationLevel >= 2
+          let session = session,
+          session.clientMitigationLevel >= 2
     else { return "" }
     // 回頭在這裡插上對 Steam 的 Client Identifier 的要求。
     var textToCommit = ""

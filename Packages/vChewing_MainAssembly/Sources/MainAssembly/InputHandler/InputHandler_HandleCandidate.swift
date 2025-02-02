@@ -23,9 +23,9 @@ extension InputHandler {
   ///   - ignoringModifiers: 是否需要忽視修飾鍵。
   /// - Returns: 告知 IMK「該按鍵是否已經被輸入法攔截處理」。
   func handleCandidate(input: InputSignalProtocol, ignoringModifiers: Bool = false) -> Bool {
-    guard let delegate = delegate else { return false }
-    guard var ctlCandidate = delegate.candidateController() else { return false }
-    let state = delegate.state
+    guard let session = session else { return false }
+    guard var ctlCandidate = session.candidateController() else { return false }
+    let state = session.state
     guard state.isCandidateContainer else { return false } // 會自動判斷「isEmpty」。
     guard ctlCandidate.visible else { return false }
     let inputText = ignoringModifiers ? (input.inputTextIgnoringModifiers ?? input.text) : input
@@ -65,7 +65,7 @@ extension InputHandler {
         var updated = true
         let reverseTrigger = input.isShiftHold || input.isOptionHold
         updated = reverseTrigger ? ctlCandidate.showPreviousLine() : ctlCandidate.showNextLine()
-        if !updated { delegate.callError("66F3477B") }
+        if !updated { errorCallback?("66F3477B") }
         return true
       case .option where state.type == .ofSymbolTable:
         // 繞過內碼輸入模式，直接進入漢音鍵盤符號模式。
@@ -76,7 +76,7 @@ extension InputHandler {
 
     // MARK: 選字窗內使用熱鍵升權、降權、刪詞。
 
-    manipulator: if (delegate as? CtlCandidateDelegate)?.isCandidateContextMenuEnabled ?? false {
+    manipulator: if session.isCandidateContextMenuEnabled {
       let candidates = state.candidates
       let highlightedIndex = ctlCandidate.highlightedIndex
       if !(0 ..< candidates.count).contains(ctlCandidate.highlightedIndex) { break manipulator }
@@ -84,18 +84,15 @@ extension InputHandler {
         .count < 2 {
         break manipulator
       }
-      switch input.commonKeyModifierFlags {
-      case [.option, .command] where input.keyCode == 27: // 減號鍵
-        ctlCandidate.delegate?.candidatePairRightClicked(at: highlightedIndex, action: .toNerf)
-        return true
-      case [.option, .command] where input.keyCode == 24: // 英數鍵盤的等號加號鍵；JIS 鍵盤的 ^ 號鍵。
-        ctlCandidate.delegate?.candidatePairRightClicked(at: highlightedIndex, action: .toBoost)
-        return true
-      case _ where input.isOptionHold && input.isCommandHold && input.isDelete:
-        ctlCandidate.delegate?.candidatePairRightClicked(at: highlightedIndex, action: .toFilter)
-        return true
-      default: break
+      let action: CandidateContextMenuAction? = switch input.commonKeyModifierFlags {
+      case [.option, .command] where input.keyCode == 27: .toNerf // 減號鍵
+      case [.option, .command] where input.keyCode == 24: .toBoost // 英數鍵盤的等號加號鍵；JIS 鍵盤的 ^ 號鍵。
+      case _ where input.isOptionHold && input.isCommandHold && input.isDelete: .toFilter
+      default: nil
       }
+      guard let action else { break manipulator }
+      session.candidatePairRightClicked(at: highlightedIndex, action: action)
+      return true
     }
 
     // MARK: 簡碼候選時對 BackSpace 的特殊處理
@@ -122,16 +119,16 @@ extension InputHandler {
         // 就將當前的組字緩衝區析構處理、強制重設輸入狀態。
         // 否則，一個本不該出現的真空組字緩衝區會使前後方向鍵與 BackSpace 鍵失靈。
         // 所以這裡需要對 compositor.isEmpty 做判定。
-        delegate.switchState(IMEState.ofAbortion())
+        session.switchState(IMEState.ofAbortion())
       } else {
-        delegate.switchState(generateStateOfInputting())
+        session.switchState(generateStateOfInputting())
         if input.isCursorBackward || input.isCursorForward, input.commonKeyModifierFlags == .shift {
           return triageInput(event: input)
         }
       }
       if state.type == .ofSymbolTable, let nodePrevious = state.node.previous,
          !nodePrevious.members.isEmpty {
-        delegate.switchState(IMEState.ofSymbolTable(node: nodePrevious))
+        session.switchState(IMEState.ofSymbolTable(node: nodePrevious))
       }
       return true
     }
@@ -139,7 +136,7 @@ extension InputHandler {
     // MARK: 批次集中處理某些常用功能鍵
 
     func confirmHighlightedCandidate() {
-      delegate.candidateSelectionConfirmedByInputHandler(at: ctlCandidate.highlightedIndex)
+      session.candidateSelectionConfirmedByInputHandler(at: ctlCandidate.highlightedIndex)
     }
 
     if let keyCodeType = KeyCode(rawValue: input.keyCode) {
@@ -147,7 +144,7 @@ extension InputHandler {
       case .kCarriageReturn, .kLineFeed:
         if state.type == .ofAssociates,
            !(input.isShiftHold || prefs.alsoConfirmAssociatedCandidatesByEnter) {
-          delegate.switchState(IMEState.ofAbortion())
+          session.switchState(IMEState.ofAbortion())
           return true
         }
         var handleAssociates = !prefs.useSCPCTypingMode && prefs
@@ -163,8 +160,8 @@ extension InputHandler {
           )
           let associatedCandidates = generateArrayOfAssociates(withPair: pair)
           guard !associatedCandidates.isEmpty else { break associatedPhrases }
-          delegate.switchState(IMEState.ofCommitting(textToCommit: state.displayedText))
-          delegate.switchState(IMEState.ofAssociates(candidates: associatedCandidates))
+          session.switchState(IMEState.ofCommitting(textToCommit: state.displayedText))
+          session.switchState(IMEState.ofAssociates(candidates: associatedCandidates))
         }
         return true
       case .kTab:
@@ -180,7 +177,7 @@ extension InputHandler {
                 ? ctlCandidate.highlightPreviousCandidate()
                 : ctlCandidate.highlightNextCandidate()
             )
-        _ = updated ? {}() : delegate.callError("9B691919")
+        _ = updated ? {}() : errorCallback?("9B691919")
         return true
       case .kSpace where state.type != .ofInputting:
         guard !(prefs.useSpaceToCommitHighlightedSCPCCandidate && prefs.useSCPCTypingMode) else {
@@ -199,13 +196,13 @@ extension InputHandler {
                 ? ctlCandidate.showNextLine()
                 : ctlCandidate.highlightNextCandidate()
             )
-        _ = updated ? {}() : delegate.callError("A11C781F")
+        _ = updated ? {}() : errorCallback?("A11C781F")
         return true
       case .kPageDown:
-        _ = ctlCandidate.showNextPage() ? {}() : delegate.callError("9B691919")
+        _ = ctlCandidate.showNextPage() ? {}() : errorCallback?("9B691919")
         return true
       case .kPageUp:
-        _ = ctlCandidate.showPreviousPage() ? {}() : delegate.callError("9569955D")
+        _ = ctlCandidate.showPreviousPage() ? {}() : errorCallback?("9569955D")
         return true
       case .kDownArrow, .kLeftArrow, .kRightArrow, .kUpArrow:
         switch input.commonKeyModifierFlags {
@@ -213,34 +210,34 @@ extension InputHandler {
           if compositor.cursor < compositor.length {
             compositor.cursor += 1
             if isCursorCuttingChar() { compositor.jumpCursorBySpan(to: .front) }
-            delegate.switchState(generateStateOfCandidates())
+            session.switchState(generateStateOfCandidates())
           } else {
-            delegate.callError("D3006C85")
+            errorCallback?("D3006C85")
           }
           return true
         case [.option, .shift] where allowMovingCompositorCursor && input.isCursorBackward:
           if compositor.cursor > 0 {
             compositor.cursor -= 1
             if isCursorCuttingChar() { compositor.jumpCursorBySpan(to: .rear) }
-            delegate.switchState(generateStateOfCandidates())
+            session.switchState(generateStateOfCandidates())
           } else {
-            delegate.callError("DE9DAF0D")
+            errorCallback?("DE9DAF0D")
           }
           return true
         case .option where input.isCursorForward:
           if compositor.cursor < compositor.length {
             compositor.jumpCursorBySpan(to: .front)
-            delegate.switchState(generateStateOfCandidates())
+            session.switchState(generateStateOfCandidates())
           } else {
-            delegate.callError("5D9F4819")
+            errorCallback?("5D9F4819")
           }
           return true
         case .option where input.isCursorBackward:
           if compositor.cursor > 0 {
             compositor.jumpCursorBySpan(to: .rear)
-            delegate.switchState(generateStateOfCandidates())
+            session.switchState(generateStateOfCandidates())
           } else {
-            delegate.callError("34B6322D")
+            errorCallback?("34B6322D")
           }
           return true
         default:
@@ -262,13 +259,13 @@ extension InputHandler {
       case .kHome:
         _ =
           (ctlCandidate.highlightedIndex == 0)
-            ? delegate.callError("9B6EDE8D") : (ctlCandidate.highlightedIndex = 0)
+            ? errorCallback?("9B6EDE8D") : (ctlCandidate.highlightedIndex = 0)
         return true
       case .kEnd:
         let maxIndex = state.candidates.count - 1
         _ =
           (ctlCandidate.highlightedIndex == maxIndex)
-            ? delegate.callError("9B69AAAD") : (ctlCandidate.highlightedIndex = maxIndex)
+            ? errorCallback?("9B69AAAD") : (ctlCandidate.highlightedIndex = maxIndex)
         return true
       default: break
       }
@@ -289,18 +286,18 @@ extension InputHandler {
         if compositor.cursor > 0 {
           compositor.cursor -= 1
           if isCursorCuttingChar() { compositor.jumpCursorBySpan(to: .rear) }
-          delegate.switchState(generateStateOfCandidates())
+          session.switchState(generateStateOfCandidates())
         } else {
-          delegate.callError("6F389AE9")
+          errorCallback?("6F389AE9")
         }
         return true
       case 40 where allowMovingCompositorCursorByJK, 37 where allowMovingCompositorCursorByHL:
         if compositor.cursor < compositor.length {
           compositor.cursor += 1
           if isCursorCuttingChar() { compositor.jumpCursorBySpan(to: .front) }
-          delegate.switchState(generateStateOfCandidates())
+          session.switchState(generateStateOfCandidates())
         } else {
-          delegate.callError("EDBD27F2")
+          errorCallback?("EDBD27F2")
         }
         return true
       default: break checkMovingCompositorCursorByJKHL
@@ -321,7 +318,7 @@ extension InputHandler {
       .lowercased()
     // 如果允許 J / K 鍵前後移動組字區游標的話，則不再將 J / K 鍵盤視為選字鍵。
     if !(prefs.useJKtoMoveCompositorCursorInCandidateState && "jk".contains(matched)) {
-      checkSelectionKey: for keyPair in delegate.selectionKeys.enumerated() {
+      checkSelectionKey: for keyPair in session.selectionKeys.enumerated() {
         guard matched == keyPair.element.lowercased() else { continue }
         index = Int(keyPair.offset)
         break checkSelectionKey
@@ -329,7 +326,7 @@ extension InputHandler {
     }
     // 如果允許 H / L 鍵前後移動組字區游標的話，則不再將 H / L 鍵盤視為選字鍵。
     if !(prefs.useHLtoMoveCompositorCursorInCandidateState && "hl".contains(matched)) {
-      checkSelectionKey: for keyPair in delegate.selectionKeys.enumerated() {
+      checkSelectionKey: for keyPair in session.selectionKeys.enumerated() {
         guard matched == keyPair.element.lowercased() else { continue }
         index = Int(keyPair.offset)
         break checkSelectionKey
@@ -338,7 +335,7 @@ extension InputHandler {
 
     // 標準選字處理
     if let index = index, let candidateIndex = ctlCandidate.candidateIndexAtKeyLabelIndex(index) {
-      delegate.candidateSelectionConfirmedByInputHandler(at: candidateIndex)
+      session.candidateSelectionConfirmedByInputHandler(at: candidateIndex)
       return true
     }
 
@@ -382,7 +379,7 @@ extension InputHandler {
 
       if shouldAutoSelectCandidate {
         confirmHighlightedCandidate() // 此時的高亮候選字是第一個候選字。
-        delegate.switchState(IMEState.ofAbortion())
+        session.switchState(IMEState.ofAbortion())
         return triageInput(event: input)
       }
     }
@@ -396,10 +393,10 @@ extension InputHandler {
       // 此處 JIS 鍵盤判定無法用於螢幕鍵盤。所以，螢幕鍵盤的場合，系統會依照 US 鍵盤的判定方案。
       switch (input.keyCode, IMEApp.isKeyboardJIS) {
       case (30, true), (33, false):
-        _ = ctlCandidate.highlightPreviousCandidate() ? {}() : delegate.callError("8B144DCD")
+        _ = ctlCandidate.highlightPreviousCandidate() ? {}() : errorCallback?("8B144DCD")
         return true
       case (30, false), (42, true):
-        _ = ctlCandidate.highlightNextCandidate() ? {}() : delegate.callError("D2ABB507")
+        _ = ctlCandidate.highlightNextCandidate() ? {}() : errorCallback?("D2ABB507")
         return true
       default: break
       }
@@ -407,7 +404,7 @@ extension InputHandler {
 
     if state.type == .ofInputting { return false } // `%quick`
 
-    delegate.callError("172A0F81")
+    errorCallback?("172A0F81")
     return true
   }
 }

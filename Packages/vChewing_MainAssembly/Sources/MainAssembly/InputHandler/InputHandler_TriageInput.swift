@@ -20,8 +20,8 @@ import Shared
 
 extension InputHandler {
   public func triageInput(event input: InputSignalProtocol) -> Bool {
-    guard let delegate = delegate else { return false }
-    var state: IMEStateProtocol { delegate.state }
+    guard let session = session else { return false }
+    var state: IMEStateProtocol { session.state }
 
     // MARK: - 按鍵碼分診（Triage by KeyCode）
 
@@ -32,7 +32,7 @@ extension InputHandler {
       case .kContextMenu, .kTab: return revolveCandidate(reverseOrder: input.isShiftHold)
       case .kDownArrow, .kLeftArrow, .kRightArrow, .kUpArrow:
         let rotation: Bool = (input.isOptionHold || input.isShiftHold) && state.type == .ofInputting
-        handleArrowKey: switch (keyCodeType, delegate.isVerticalTyping) {
+        handleArrowKey: switch (keyCodeType, session.isVerticalTyping) {
         case (.kLeftArrow, false), (.kUpArrow, true): return handleBackward(input: input)
         case (.kDownArrow, true), (.kRightArrow, false): return handleForward(input: input)
         case (.kLeftArrow, true), (.kUpArrow, false):
@@ -71,7 +71,7 @@ extension InputHandler {
         switch state.type {
         case .ofEmpty:
           if !input.isOptionHold, !input.isControlHold, !input.isCommandHold {
-            delegate.switchState(IMEState.ofCommitting(textToCommit: input.isShiftHold ? "　" : " "))
+            session.switchState(IMEState.ofCommitting(textToCommit: input.isShiftHold ? "　" : " "))
             return true
           }
         case .ofInputting:
@@ -80,8 +80,8 @@ extension InputHandler {
             return revolveCandidate(reverseOrder: input.isCommandHold)
           }
           if currentTypingMethod == .codePoint {
-            delegate.callError("FDD88EDB")
-            delegate.switchState(IMEState.ofAbortion())
+            errorCallback?("FDD88EDB")
+            session.switchState(IMEState.ofAbortion())
             return true
           }
           if compositor.cursor < compositor.length, compositor.insertKey(" ") {
@@ -90,13 +90,13 @@ extension InputHandler {
             let textToCommit = commitOverflownComposition
             var inputting = generateStateOfInputting()
             inputting.textToCommit = textToCommit
-            delegate.switchState(inputting)
+            session.switchState(inputting)
           } else {
             let displayedText = state.displayedText
             if !displayedText.isEmpty, !isConsideredEmptyForNow {
-              delegate.switchState(IMEState.ofCommitting(textToCommit: displayedText))
+              session.switchState(IMEState.ofCommitting(textToCommit: displayedText))
             }
-            delegate.switchState(IMEState.ofCommitting(textToCommit: " "))
+            session.switchState(IMEState.ofCommitting(textToCommit: " "))
           }
           return true
         default: break
@@ -113,11 +113,11 @@ extension InputHandler {
     case .ofAssociates, .ofCandidates, .ofSymbolTable:
       let result = handleCandidate(input: input)
       guard !result, state.type == .ofAssociates else { return true }
-      delegate.switchState(IMEState.ofEmpty())
+      session.switchState(IMEState.ofEmpty())
       return triageInput(event: input)
     case .ofMarking:
       if handleMarkingState(input: input) { return true }
-      delegate.switchState(state.convertedToInputting)
+      session.switchState(state.convertedToInputting)
       return triageInput(event: input)
     case .ofEmpty, .ofInputting:
       // 提前放行一些用不到的特殊按鍵輸入情形。
@@ -195,11 +195,10 @@ extension InputHandler {
     // 砍掉這一段會導致「F1-F12 按鍵干擾組字區」的問題。
     // 暫時只能先恢復這段，且補上偵錯彙報機制，方便今後排查故障。
     if state.hasComposition || !isComposerOrCalligrapherEmpty {
-      delegate
-        .callError(
-          "Blocked data: charCode: \(input.charCode), keyCode: \(input.keyCode), text: \(input.text)"
-        )
-      delegate.callError("A9BFF20E")
+      vCLog(
+        "Blocked data: charCode: \(input.charCode), keyCode: \(input.keyCode), text: \(input.text)"
+      )
+      errorCallback?("A9BFF20E")
       return true
     }
 
