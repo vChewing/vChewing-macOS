@@ -196,7 +196,7 @@ public class SessionCtl: IMKInputController {
     let attributes: [AnyHashable: Any]? = client.attributes(
       forCharacterIndex: 0, lineHeightRectangle: &textFrame
     )
-    let result = (attributes?["IMKTextOrientation"] as? NSNumber)?.intValue == 0 || false
+    let result = (attributes?[IMKTextOrientationName] as? NSNumber)?.intValue == 0 || false
     isVerticalTyping = result
   }
 
