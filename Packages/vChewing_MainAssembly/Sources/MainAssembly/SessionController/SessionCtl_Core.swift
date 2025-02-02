@@ -238,8 +238,7 @@ public class SessionCtl: IMKInputController {
       // 關掉所有之前的副本的視窗。
       Self.current?.hidePalettes()
       Self.current = self
-      self.inputHandler = InputHandler(lm: self.inputMode.langModel, pref: PrefMgr.shared)
-      self.inputHandler?.delegate = self
+      self.initInputHandler()
       self.syncBaseLMPrefs()
       // 下述兩行很有必要，否則輸入法會在手動重啟之後無法立刻生效。
       let maybeClient = theClient ?? self.client()
@@ -285,6 +284,16 @@ extension SessionCtl {
   public static func makeTooltipUI() -> TooltipUIProtocol {
     if #unavailable(macOS 10.14) { return TooltipUI_EarlyCocoa() }
     return TooltipUI_LateCocoa()
+  }
+
+  public func initInputHandler() {
+    inputHandler = InputHandler(
+      lm: inputMode.langModel,
+      pref: PrefMgr.shared,
+      errorCallback: callError,
+      notificationCallback: Notifier.notify
+    )
+    inputHandler?.session = self
   }
 }
 
@@ -339,8 +348,7 @@ extension SessionCtl {
       if self.isActivated { return }
 
       // 這裡不需要 setValue()，因為 IMK 會在自動呼叫 activateServer() 之後自動執行 setValue()。
-      self.inputHandler = InputHandler(lm: self.inputMode.langModel, pref: PrefMgr.shared)
-      self.inputHandler?.delegate = self
+      self.initInputHandler()
       self.syncBaseLMPrefs()
 
       Self.theShiftKeyDetector.toggleWithLShift = PrefMgr.shared
