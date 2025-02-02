@@ -8,6 +8,7 @@
 
 import AppKit
 import CandidateWindow
+import IMKUtils
 import NSAttributedTextView
 import Shared
 
@@ -23,25 +24,17 @@ extension SessionCtl {
       : (state.attributedString(for: self), NSRange(state.u16MarkedRange))
   }
 
-  public func lineHeightRect(zeroCursor: Bool = false) -> NSRect {
-    var lineHeightRect = NSRect.seniorTheBeast
-    guard let client = client() else {
-      return lineHeightRect
-    }
+  public var u16Cursor: Int {
     var u16Cursor: Int = state.u16MarkedRange.lowerBound
     if !PrefMgr.shared.useDynamicCandidateWindowOrigin, state.isCandidateContainer {
       u16Cursor = state.u16Cursor
     }
-    u16Cursor = max(min(state.displayedTextConverted.utf16.count, u16Cursor), 0)
-    if zeroCursor { u16Cursor = 0 }
-    // iMessage 的話，據此算出來的 lineHeightRect 結果的橫向座標起始點不準確。目前無解。
-    while lineHeightRect.origin.x == 0, lineHeightRect.origin.y == 0, u16Cursor >= 0 {
-      client.attributes(
-        forCharacterIndex: u16Cursor, lineHeightRectangle: &lineHeightRect
-      )
-      u16Cursor -= 1
-    }
-    return lineHeightRect
+    return max(min(state.displayedTextConverted.utf16.count, u16Cursor), 0)
+  }
+
+  public func lineHeightRect(zeroCursor: Bool = false) -> NSRect {
+    guard let client = client() else { return .seniorTheBeast }
+    return client.lineHeightRect(u16Cursor: zeroCursor ? 0 : u16Cursor)
   }
 
   public func showTooltip(_ tooltip: String, duration: Double = 0) {
@@ -50,8 +43,7 @@ extension SessionCtl {
       tooltipInstance.hide()
       return
     }
-    updateVerticalTypingStatus()
-    let lineHeightRect = lineHeightRect()
+    let lineHeightRect = updateVerticalTypingStatus()
     var finalOrigin: NSPoint = lineHeightRect.origin
     let delta: Double = lineHeightRect.size.height + 4.0 // bottomOutOfScreenAdjustmentHeight
     if isVerticalTyping {
@@ -115,25 +107,14 @@ extension SessionCtl {
   }
 
   public func resetCandidateWindowOrigin() {
-    if isVerticalTyping {
-      candidateUI?.set(
-        windowTopLeftPoint: NSPoint(
-          x: lineHeightRect().origin.x + lineHeightRect().size.width + 4.0,
-          y: lineHeightRect().origin.y - 4.0
-        ),
-        bottomOutOfScreenAdjustmentHeight: lineHeightRect().size.height + 4.0,
-        useGCD: true
-      )
-    } else {
-      candidateUI?.set(
-        windowTopLeftPoint: NSPoint(
-          x: lineHeightRect().origin.x,
-          y: lineHeightRect().origin.y - 4.0
-        ),
-        bottomOutOfScreenAdjustmentHeight: lineHeightRect().size.height + 4.0,
-        useGCD: true
-      )
-    }
+    let lhRect = lineHeightRect()
+    var tlPoint = NSPoint(x: lhRect.origin.x, y: lhRect.origin.y - 4.0)
+    tlPoint.x += isVerticalTyping ? (lhRect.size.width + 4.0) : 0
+    candidateUI?.set(
+      windowTopLeftPoint: tlPoint,
+      bottomOutOfScreenAdjustmentHeight: lhRect.size.height + 4.0,
+      useGCD: true
+    )
   }
 
   public var localeForFontFallbacks: String {

@@ -187,10 +187,11 @@ public class SessionCtl: IMKInputController {
     }
   }
 
-  public func updateVerticalTypingStatus() {
+  @discardableResult
+  public func updateVerticalTypingStatus() -> NSRect {
     guard let client = client() else {
       isVerticalTyping = false
-      return
+      return .seniorTheBeast
     }
     var textFrame = NSRect.seniorTheBeast
     let attributes: [AnyHashable: Any]? = client.attributes(
@@ -198,6 +199,7 @@ public class SessionCtl: IMKInputController {
     )
     let result = (attributes?[IMKTextOrientationName] as? NSNumber)?.intValue == 0 || false
     isVerticalTyping = result
+    return textFrame
   }
 
   // MARK: Private
