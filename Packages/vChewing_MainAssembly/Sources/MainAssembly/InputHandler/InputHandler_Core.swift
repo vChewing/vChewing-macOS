@@ -78,7 +78,8 @@ public protocol InputHandlerDelegate {
   var clientMitigationLevel: Int { get }
   func callError(_ logMessage: String)
   func callNotification(_ message: String)
-  func updateVerticalTypingStatus()
+  @discardableResult
+  func updateVerticalTypingStatus() -> NSRect
   func switchState(_ newState: IMEStateProtocol)
   func candidateController() -> CtlCandidateProtocol?
   func candidateSelectionConfirmedByInputHandler(at index: Int)
