@@ -47,7 +47,7 @@ public class SessionCtl: IMKInputController {
 
   public private(set) weak static var currentInputController: SessionCtl?
 
-  public private(set) lazy var core: InputSession = .init(controller: self, client: client())
+  public private(set) lazy var core: InputSession = .init(controller: self, client: client)
 }
 
 // MARK: - IMKStateSetting 協定規定的方法
