@@ -123,13 +123,13 @@ public struct VwrSettingsPaneBehavior: View {
           VStack(alignment: .leading) {
             UserDef.kTogglingAlphanumericalModeWithLShift.bind(
               $togglingAlphanumericalModeWithLShift.didChange {
-                SessionCtl.theShiftKeyDetector
+                InputSession.theShiftKeyDetector
                   .toggleWithLShift = togglingAlphanumericalModeWithLShift
               }
             ).render()
             UserDef.kTogglingAlphanumericalModeWithRShift.bind(
               $togglingAlphanumericalModeWithRShift.didChange {
-                SessionCtl.theShiftKeyDetector
+                InputSession.theShiftKeyDetector
                   .toggleWithRShift = togglingAlphanumericalModeWithRShift
               }
             ).render()

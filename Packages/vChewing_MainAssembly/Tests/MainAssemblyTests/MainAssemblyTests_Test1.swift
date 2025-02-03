@@ -51,13 +51,13 @@ extension MainAssemblyTests {
     testSession.resetInputHandler(forceComposerCleanup: true)
     typeSentenceOrCandidates("el dk ru44ej/ 2n ")
     dataArrowDown.asPairedEvents.forEach { theEvent in
-      let dismissed = !testSession.handle(theEvent, client: testClient)
+      let dismissed = !testSession.handleNSEvent(theEvent, client: testClient)
       if theEvent.type == .keyDown { XCTAssertFalse(dismissed) }
     }
     typeSentenceOrCandidates("12k7su065j/ ru;3rup ")
     XCTAssert(testSession.candidateUI?.visible ?? false)
     dataEnterReturn.asPairedEvents.forEach { theEvent in
-      let dismissed = !testSession.handle(theEvent, client: testClient)
+      let dismissed = !testSession.handleNSEvent(theEvent, client: testClient)
       if theEvent.type == .keyDown { XCTAssertFalse(dismissed) }
     }
     let resultText1 = testClient.toString()
@@ -80,12 +80,12 @@ extension MainAssemblyTests {
     vCTestLog("測試就地輪替候選字：高科技公司的年中獎金 -> 高科技公司的年終獎金")
 
     [dataArrowLeft, dataArrowLeft].map(\.asPairedEvents).flatMap { $0 }.forEach { theEvent in
-      let dismissed = !testSession.handle(theEvent, client: testClient)
+      let dismissed = !testSession.handleNSEvent(theEvent, client: testClient)
       if theEvent.type == .keyDown { XCTAssertFalse(dismissed) }
     }
 
     dataTab.asPairedEvents.forEach { theEvent in
-      let dismissed = !testSession.handle(theEvent, client: testClient)
+      let dismissed = !testSession.handleNSEvent(theEvent, client: testClient)
       if theEvent.type == .keyDown { XCTAssertFalse(dismissed) }
     }
     let resultText2 = testSession.state.displayedText
@@ -111,7 +111,7 @@ extension MainAssemblyTests {
     vCTestLog("測試選字窗選字：高科技公司的年終獎金 -> 高科技公司的年中獎金")
     let keyOne = NSEvent.KeyEventData(chars: "1")
     [dataArrowDown, keyOne].map(\.asPairedEvents).flatMap { $0 }.forEach { theEvent in
-      let dismissed = !testSession.handle(theEvent, client: testClient)
+      let dismissed = !testSession.handleNSEvent(theEvent, client: testClient)
       if theEvent.type == .keyDown { XCTAssertFalse(dismissed) }
     }
     let resultText3 = testSession.state.displayedText
@@ -127,7 +127,7 @@ extension MainAssemblyTests {
     let keyTwo = NSEvent.KeyEventData(chars: "2")
     [dataArrowLeft, dataArrowLeft, dataArrowDown, keyTwo].map(\.asPairedEvents).flatMap { $0 }
       .forEach { theEvent in
-        let dismissed = !testSession.handle(theEvent, client: testClient)
+        let dismissed = !testSession.handleNSEvent(theEvent, client: testClient)
         if theEvent.type == .keyDown { XCTAssertFalse(dismissed) }
       }
     let resultText4 = testSession.state.displayedText

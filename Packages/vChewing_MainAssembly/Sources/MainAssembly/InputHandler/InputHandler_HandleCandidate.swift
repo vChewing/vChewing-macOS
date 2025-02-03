@@ -16,7 +16,7 @@ import Shared
 
 // MARK: - § 對選字狀態進行調度 (Handle Candidate State).
 
-extension InputHandler {
+extension InputHandlerProtocol {
   /// 當且僅當選字窗出現時，對於經過初次篩選處理的輸入訊號的處理均藉由此函式來進行。
   /// - Parameters:
   ///   - input: 輸入訊號。

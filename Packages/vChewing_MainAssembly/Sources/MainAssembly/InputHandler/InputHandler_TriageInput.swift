@@ -18,7 +18,7 @@ import Shared
 
 // MARK: - § 根據狀態調度按鍵輸入 (Handle Input with States) * Triage
 
-extension InputHandler {
+extension InputHandlerProtocol {
   public func triageInput(event input: InputSignalProtocol) -> Bool {
     guard let session = session else { return false }
     var state: IMEStateProtocol { session.state }

@@ -18,117 +18,38 @@ import Tekkon
 /// 該檔案乃輸入調度模組的核心部分，主要承接型別初期化內容、協定內容、以及
 /// 被封裝的「與 Megrez 組字引擎和 Tekkon 注拼引擎對接的」各種工具函式。
 /// 注意：不要把 composer 注拼槽與 compositor 組字器這兩個概念搞混。
+public protocol InputHandlerProtocol: AnyObject {
+  // MARK: - Type Properties
 
-public protocol InputHandlerProtocol {
-  var currentLM: LMAssembly.LMInstantiator { get set }
-  var session: (SessionProtocol & CtlCandidateDelegate)? { get set }
-  var keySeparator: String { get }
   static var keySeparator: String { get }
-  var isCompositorEmpty: Bool { get }
-  var isComposerUsingPinyin: Bool { get }
-  func clear()
-  func clearComposerAndCalligrapher()
-  func ensureKeyboardParser()
-  func triageInput(event input: InputSignalProtocol) -> Bool
-  func generateStateOfCandidates(dodge: Bool) -> IMEStateProtocol
-  func generateStateOfInputting(sansReading: Bool, guarded: Bool) -> IMEStateProtocol
-  func generateStateOfAssociates(withPair pair: Megrez.KeyValuePaired) -> IMEStateProtocol
-  func consolidateNode(
-    candidate: (keyArray: [String], value: String), respectCursorPushing: Bool,
-    preConsolidate: Bool,
-    skipObservation: Bool
-  )
-  func updateUnigramData() -> Bool
-  func previewCompositionBufferForCandidate(at index: Int)
+
+  // MARK: - Properties
+
+  /// 委任物件 (SessionCtl)，以便呼叫其中的函式。
+  var session: (SessionProtocol & CtlCandidateDelegate)? { get set }
+
+  var prefs: PrefMgrProtocol { get set }
+  var errorCallback: ((String) -> ())? { get set }
+  var notificationCallback: ((String) -> ())? { get set }
+
+  var currentLM: LMAssembly.LMInstantiator { get set }
+
+  /// 用來記錄「叫出選字窗前」的游標位置的變數。
+  var backupCursor: Int? { get set }
+
+  /// 當前的打字模式。
+  var currentTypingMethod: TypingMethod { get set }
+
+  /// 半衰模組的衰減指數
+  var kEpsilon: Double { get }
+
+  var strCodePointBuffer: String { get set } // 內碼輸入專用組碼區
+  var calligrapher: String { get set } // 磁帶專用組筆區
+  var composer: Tekkon.Composer { get set } // 注拼槽
+  var compositor: Megrez.Compositor { get set } // 組字器
 }
 
 extension InputHandlerProtocol {
-  func generateStateOfInputting(
-    sansReading: Bool = false,
-    guarded: Bool = false
-  )
-    -> IMEStateProtocol {
-    generateStateOfInputting(sansReading: sansReading, guarded: guarded)
-  }
-
-  func generateStateOfCandidates() -> IMEStateProtocol {
-    generateStateOfCandidates(dodge: true)
-  }
-
-  func consolidateNode(
-    candidate: (keyArray: [String], value: String),
-    respectCursorPushing: Bool,
-    preConsolidate: Bool
-  ) {
-    consolidateNode(
-      candidate: candidate, respectCursorPushing: respectCursorPushing,
-      preConsolidate: preConsolidate, skipObservation: false
-    )
-  }
-}
-
-// MARK: - SessionProtocol
-
-/// InputHandler 委任協定
-public protocol SessionProtocol {
-  var isASCIIMode: Bool { get }
-  var isVerticalTyping: Bool { get }
-  var selectionKeys: String { get }
-  var state: IMEStateProtocol { get set }
-  var clientBundleIdentifier: String { get }
-  var clientMitigationLevel: Int { get }
-  @discardableResult
-  func updateVerticalTypingStatus() -> NSRect
-  func switchState(_ newState: IMEStateProtocol)
-  func candidateController() -> CtlCandidateProtocol?
-  func candidateSelectionConfirmedByInputHandler(at index: Int)
-  func setInlineDisplayWithCursor()
-  func updatePopupDisplayWithCursor()
-  func performUserPhraseOperation(addToFilter: Bool) -> Bool
-}
-
-// MARK: - InputHandler
-
-/// InputHandler 輸入調度模組。
-public class InputHandler: InputHandlerProtocol {
-  // MARK: Lifecycle
-
-  /// 初期化。
-  public init(
-    lm: LMAssembly.LMInstantiator,
-    pref: PrefMgrProtocol,
-    errorCallback: ((_ message: String) -> ())? = nil,
-    notificationCallback: ((_ message: String) -> ())? = nil
-  ) {
-    self.prefs = pref
-    self.currentLM = lm
-    self.errorCallback = errorCallback
-    self.notificationCallback = notificationCallback
-    /// 同步組字器單個詞的幅位長度上限。
-    Megrez.Compositor.maxSpanLength = prefs.maxCandidateLength
-    /// 組字器初期化。因為是首次初期化變數，所以這裡不能用 ensureCompositor() 代勞。
-    self.compositor = Megrez.Compositor(with: currentLM, separator: "-")
-    /// 注拼槽初期化。
-    ensureKeyboardParser()
-  }
-
-  // MARK: Public
-
-  public static var keySeparator: String { Megrez.Compositor.theSeparator }
-
-  /// 委任物件 (SessionCtl)，以便呼叫其中的函式。
-  public var session: (SessionProtocol & CtlCandidateDelegate)?
-  public var prefs: PrefMgrProtocol
-  public var errorCallback: ((String) -> ())?
-  public var notificationCallback: ((String) -> ())?
-
-  public var currentLM: LMAssembly.LMInstantiator {
-    didSet {
-      compositor.langModel = .init(withLM: currentLM)
-      clear()
-    }
-  }
-
   // MARK: - Functions dealing with Megrez.
 
   public var isCompositorEmpty: Bool { compositor.isEmpty }
@@ -226,7 +147,7 @@ public class InputHandler: InputHandlerProtocol {
   }
 
   public func previewCompositionBufferForCandidate(at index: Int) {
-    guard var session = session, session.state.type == .ofCandidates,
+    guard let session = session, session.state.type == .ofCandidates,
           (0 ..< session.state.candidates.count).contains(index)
     else {
       return
@@ -253,8 +174,7 @@ public class InputHandler: InputHandlerProtocol {
     theState.data.marker = compositor.marker
     compositor.marker = markerBackup
     session.state = theState // 直接就地取代，不經過 switchState 處理，免得選字窗被重新載入。
-    session.setInlineDisplayWithCursor()
-    session.updatePopupDisplayWithCursor()
+    session.updateCompositionBufferDisplay()
   }
 
   /// 給注拼槽指定注音排列或拼音輸入種類之後，將注拼槽內容清空。
@@ -295,29 +215,14 @@ public class InputHandler: InputHandlerProtocol {
     return result > 0
   }
 
-  // MARK: Internal
-
-  /// 用來記錄「叫出選字窗前」的游標位置的變數。
-  var backupCursor: Int?
-  /// 當前的打字模式。
-  var currentTypingMethod: TypingMethod = .vChewingFactory
-
-  /// 半衰模組的衰減指數
-  let kEpsilon: Double = 0.000_001
-
-  var strCodePointBuffer = "" // 內碼輸入專用組碼區
-  var calligrapher = "" // 磁帶專用組筆區
-  var composer: Tekkon.Composer = .init() // 注拼槽
-  var compositor: Megrez.Compositor // 組字器
-
   /// 警告：該參數僅代指組音區/組筆區域與組字區在目前狀態下被視為「空」。
-  var isConsideredEmptyForNow: Bool {
+  public var isConsideredEmptyForNow: Bool {
     compositor.isEmpty && isComposerOrCalligrapherEmpty && currentTypingMethod == .vChewingFactory
   }
 
   /// 要拿給 Megrez 使用的特殊游標位址，用於各種與節點判定有關的操作。
   /// - Remark: 自 Megrez 引擎 v2.6.2 開始，該參數不得用於獲取候選字詞清單資料。相關函式僅接收原始 cursor 資料。
-  var actualNodeCursorPosition: Int {
+  public var actualNodeCursorPosition: Int {
     compositor.cursor
       -
       (
@@ -690,7 +595,7 @@ public class InputHandler: InputHandlerProtocol {
 /// - Remark: 該選項僅對不支援 IMKTextInput 協定的應用有用，就不交給 PrefMgr 了。
 private let compositorWidthLimit = 20
 
-extension InputHandler {
+extension InputHandlerProtocol {
   /// 在爬取組字結果之前，先將即將從組字區溢出的內容遞交出去。
   ///
   /// 在理想狀況之下，組字區多長都無所謂。但是，螢幕浮動組字窗的尺寸是有限的。

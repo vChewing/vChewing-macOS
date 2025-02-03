@@ -14,7 +14,7 @@ import Shared
 
 // MARK: - Tooltip Display and Candidate Display Methods
 
-extension SessionCtl {
+extension SessionProtocol {
   // 有些 App 會濫用內文組字區的內容來預測使用者的輸入行為。
   // 對此類 App 有疑慮者，可以將這類 App 登記到客體管理員當中。
   // 這樣，不但強制使用（限制讀音 20 個的）浮動組字窗，而且內文組字區只會顯示一個空格。
