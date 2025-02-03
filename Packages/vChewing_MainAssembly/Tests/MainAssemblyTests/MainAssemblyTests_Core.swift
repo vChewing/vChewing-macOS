@@ -42,7 +42,7 @@ class MainAssemblyTests: XCTestCase {
   )
 
   static var _testHandler: InputHandler?
-  static var _testSession: SessionCtl?
+  static var _testSession: InputSession?
 
   var testLM = LMAssembly.LMInstantiator.construct { _ in
     LMAssembly.LMInstantiator.connectToTestSQLDB()
@@ -73,14 +73,11 @@ class MainAssemblyTests: XCTestCase {
     return result
   }
 
-  var testSession: SessionCtl {
-    guard let session = Self._testSession ?? SessionCtl(
-      server: Self.testServer,
-      delegate: testHandler,
+  var testSession: InputSession {
+    let session = Self._testSession ?? InputSession(
+      controller: nil,
       client: testClient
-    ) else {
-      fatalError("Session failed from booting!")
-    }
+    )
     if Self._testSession == nil { Self._testSession = session }
     return session
   }
@@ -94,8 +91,8 @@ class MainAssemblyTests: XCTestCase {
     testSession.activateServer(testClient)
     testSession.isActivated = true
     testSession.inputHandler = testHandler
-    testHandler.delegate = testSession
-    testSession.syncBaseLMPrefs()
+    testHandler.session = testSession
+    LMMgr.syncLMPrefs()
     testClient.clear()
   }
 
@@ -124,7 +121,7 @@ class MainAssemblyTests: XCTestCase {
       return finalArray
     }.flatMap { $0 }
     typingSequence.forEach { theEvent in
-      let dismissed = !testSession.handle(theEvent, client: testClient)
+      let dismissed = !testSession.handleNSEvent(theEvent, client: testClient)
       if theEvent.type == .keyDown { XCTAssertFalse(dismissed) }
     }
   }

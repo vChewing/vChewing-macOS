@@ -7,12 +7,13 @@
 // requirements defined in MIT License.
 
 import AppKit
+import IMKUtils
 import NotifierUI
 import Shared
 
 // MARK: - SessionCtl + SessionProtocol
 
-extension SessionCtl: SessionProtocol {
+extension SessionProtocol {
   public var clientMitigationLevel: Int {
     var result = PrefMgr.shared.securityHardenedCompositionBuffer ? 2 : 0
     if isClientElectronBased {
@@ -31,11 +32,6 @@ extension SessionCtl: SessionProtocol {
 
   public func candidateSelectionConfirmedByInputHandler(at index: Int) {
     candidatePairSelectionConfirmed(at: index)
-  }
-
-  public func callError(_ logMessage: String) {
-    vCLog(logMessage)
-    IMEApp.buzz()
   }
 
   public func performUserPhraseOperation(addToFilter: Bool) -> Bool {
@@ -84,7 +80,7 @@ extension SessionCtl: SessionProtocol {
 
 // MARK: - SessionCtl + CtlCandidateDelegate
 
-extension SessionCtl: CtlCandidateDelegate {
+extension SessionProtocol {
   public var isCandidateState: Bool { state.isCandidateContainer }
   public var showCodePointForCurrentCandidate: Bool { PrefMgr.shared.showCodePointInCandidateUI }
 
@@ -154,20 +150,6 @@ extension SessionCtl: CtlCandidateDelegate {
     return inputMode.langModel.cassetteReverseLookup(for: value)
   }
 
-  public var selectionKeys: String {
-    // 磁帶模式的 `%quick` 有單獨的選字鍵判定，會在資料不合規時使用 1234567890 選字鍵。
-    cassetteQuick: if state.type == .ofInputting, state.isCandidateContainer {
-      guard PrefMgr.shared.cassetteEnabled else { break cassetteQuick }
-      guard let cinCandidateKey = inputMode.langModel.cassetteSelectionKey,
-            PrefMgr.shared.validate(candidateKeys: cinCandidateKey) == nil
-      else {
-        return "1234567890"
-      }
-      return cinCandidateKey
-    }
-    return PrefMgr.shared.candidateKeys
-  }
-
   public func candidatePairs(conv: Bool = false) -> [(keyArray: [String], value: String)] {
     if !state.isCandidateContainer || state.candidates.isEmpty { return [] }
     if !conv || PrefMgr.shared.cns11643Enabled || state.candidates[0].keyArray.joined()
@@ -200,8 +182,7 @@ extension SessionCtl: CtlCandidateDelegate {
         state.data.displayedText.removeAll()
         state.data.cursor = 0
       }
-      setInlineDisplayWithCursor()
-      updatePopupDisplayWithCursor()
+      updateCompositionBufferDisplay()
     default: break
     }
   }

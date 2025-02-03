@@ -6,6 +6,7 @@
 // marks, or product names of Contributor, except as required to fulfill notice
 // requirements defined in MIT License.
 
+import IMKUtils
 import InputMethodKit
 import LangModelAssembly
 import Shared
@@ -64,12 +65,12 @@ public struct IMEState: IMEStateProtocol {
   fileprivate init(displayTextSegments: [String], cursor: Int) {
     // 注意資料的設定順序，一定得先設定 displayTextSegments。
     data.displayTextSegments = displayTextSegments.map {
-      if !SessionCtl.isVerticalTyping { return $0 }
+      if !InputSession.isVerticalTyping { return $0 }
       guard PrefMgr.shared.hardenVerticalPunctuations else { return $0 }
       var neta = $0
       ChineseConverter.hardenVerticalPunctuations(
         target: &neta,
-        convert: SessionCtl.isVerticalTyping
+        convert: InputSession.isVerticalTyping
       )
       return neta
     }
@@ -218,7 +219,7 @@ extension IMEState {
     set { data.tooltip = newValue }
   }
 
-  public func attributedString(for session: IMKInputController) -> NSAttributedString {
+  public func attributedString(for session: IMKInputControllerProtocol) -> NSAttributedString {
     switch type {
     case .ofMarking: return data.attributedStringMarking(for: session)
     case .ofCandidates where cursor != marker: return data.attributedStringMarking(for: session)

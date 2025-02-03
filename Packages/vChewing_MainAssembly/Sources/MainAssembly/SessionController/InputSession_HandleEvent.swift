@@ -16,15 +16,14 @@ import SwiftyCapsLockToggler
 
 // MARK: - Facade
 
-extension SessionCtl {
+extension SessionProtocol {
   /// 接受所有鍵鼠事件為 NSEvent，讓輸入法判斷是否要處理、該怎樣處理。
   /// 然後再交給 InputHandler.handleEvent() 分診。
   /// - Parameters:
   ///   - event: 裝置操作輸入事件，可能會是 nil。
   ///   - sender: 呼叫了該函式的客體（無須使用）。
   /// - Returns: 回「`true`」以將該按鍵已攔截處理的訊息傳遞給 IMK；回「`false`」則放行、不作處理。
-  @objc(handleEvent:client:)
-  public override func handle(
+  public func handleNSEvent(
     _ event: NSEvent?,
     client sender: Any?
   )

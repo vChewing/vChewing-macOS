@@ -22,7 +22,7 @@ extension PrefMgr {
   }
 }
 
-// MARK: Auto parameter fix procedures, executed everytime on SessionCtl.activateServer().
+// MARK: Auto parameter fix procedures, executed everytime on InputSession.activateServer().
 
 extension PrefMgr {
   public func fixOddPreferences() {

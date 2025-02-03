@@ -10,43 +10,41 @@ import Foundation
 import Shared
 import SwiftExtension
 
-// MARK: - InputHandler.TypingMethod
+// MARK: - TypingMethod
 
-extension InputHandler {
-  public enum TypingMethod: Int, CaseIterable {
-    case vChewingFactory // 自動指派: 0
-    case codePoint // 自動指派: 1
-    case haninKeyboardSymbol // 自動指派: 2
+public enum TypingMethod: Int, CaseIterable {
+  case vChewingFactory // 自動指派: 0
+  case codePoint // 自動指派: 1
+  case haninKeyboardSymbol // 自動指派: 2
 
-    // MARK: Internal
+  // MARK: Internal
 
-    mutating func revolveNext() {
-      var theInt = rawValue
-      theInt.revolveAsIndex(with: Self.allCases)
-      guard let nextMethod = TypingMethod(rawValue: theInt) else { return }
-      self = nextMethod
-    }
+  mutating func revolveNext() {
+    var theInt = rawValue
+    theInt.revolveAsIndex(with: Self.allCases)
+    guard let nextMethod = TypingMethod(rawValue: theInt) else { return }
+    self = nextMethod
+  }
 
-    func getTooltip(vertical: Bool = false) -> String {
-      switch self {
-      case .vChewingFactory: return ""
-      case .codePoint:
-        let commonTerm = NSMutableString()
-        commonTerm.insert("Code Point Input.".localized, at: 0)
-        if !vertical, let initials = IMEApp.currentInputMode.nonUTFEncodingInitials {
-          commonTerm.insert("[\(initials)] ", at: 0)
-        }
-        return commonTerm.description
-      case .haninKeyboardSymbol:
-        return "\("Hanin Keyboard Symbol Input.".localized)"
+  func getTooltip(vertical: Bool = false) -> String {
+    switch self {
+    case .vChewingFactory: return ""
+    case .codePoint:
+      let commonTerm = NSMutableString()
+      commonTerm.insert("Code Point Input.".localized, at: 0)
+      if !vertical, let initials = IMEApp.currentInputMode.nonUTFEncodingInitials {
+        commonTerm.insert("[\(initials)] ", at: 0)
       }
+      return commonTerm.description
+    case .haninKeyboardSymbol:
+      return "\("Hanin Keyboard Symbol Input.".localized)"
     }
   }
 }
 
 // MARK: - Handle Rotation Toggles
 
-extension InputHandler {
+extension InputHandlerProtocol {
   @discardableResult
   public func revolveTypingMethod(to specifiedMethod: TypingMethod? = nil)
     -> Bool {

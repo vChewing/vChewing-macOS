@@ -6,6 +6,7 @@
 // marks, or product names of Contributor, except as required to fulfill notice
 // requirements defined in MIT License.
 
+import IMKUtils
 import InputMethodKit
 import Shared
 import Tekkon
@@ -134,7 +135,7 @@ public struct IMEStateData: IMEStateDataProtocol {
 // MARK: - AttributedString 生成器
 
 extension IMEStateData {
-  public func attributedStringNormal(for session: IMKInputController) -> NSAttributedString {
+  public func attributedStringNormal(for session: IMKInputControllerProtocol) -> NSAttributedString {
     /// 考慮到因為滑鼠點擊等其它行為導致的組字區內容遞交情況，
     /// 這裡對組字區內容也加上康熙字轉換或者 JIS 漢字轉換處理。
     let attributedString = NSMutableAttributedString(string: displayedTextConverted)
@@ -153,7 +154,7 @@ extension IMEStateData {
     return attributedString
   }
 
-  public func attributedStringMarking(for session: IMKInputController) -> NSAttributedString {
+  public func attributedStringMarking(for session: IMKInputControllerProtocol) -> NSAttributedString {
     /// 考慮到因為滑鼠點擊等其它行為導致的組字區內容遞交情況，
     /// 這裡對組字區內容也加上康熙字轉換或者 JIS 漢字轉換處理。
     let attributedString = NSMutableAttributedString(string: displayedTextConverted)
@@ -188,7 +189,7 @@ extension IMEStateData {
     return attributedString
   }
 
-  public func attributedStringPlaceholder(for session: IMKInputController) -> NSAttributedString {
+  public func attributedStringPlaceholder(for session: IMKInputControllerProtocol) -> NSAttributedString {
     let attributes: [NSAttributedString.Key: Any]
       = session.mark(forStyle: kTSMHiliteSelectedRawText, at: .zero)
       as? [NSAttributedString.Key: Any]
@@ -212,7 +213,7 @@ extension IMEStateData {
         var subNeta = subNeta
         if !PrefMgr.shared.cassetteEnabled {
           if PrefMgr.shared.showHanyuPinyinInCompositionBuffer,
-             PrefMgr.shared.alwaysShowTooltipTextsHorizontally || !SessionCtl.isVerticalTyping {
+             PrefMgr.shared.alwaysShowTooltipTextsHorizontally || !InputSession.isVerticalTyping {
             // 恢復陰平標記->注音轉拼音->轉教科書式標調
             subNeta = Tekkon.restoreToneOneInPhona(target: subNeta)
             subNeta = Tekkon.cnvPhonaToHanyuPinyin(targetJoined: subNeta)

@@ -120,9 +120,9 @@ extension SettingsPanesCocoa {
     @IBAction
     func syncShiftKeyUpChecker(_: NSControl) {
       print("Syncing ShiftKeyUpChecker configurations.")
-      SessionCtl.theShiftKeyDetector.toggleWithLShift = PrefMgr.shared
+      InputSession.theShiftKeyDetector.toggleWithLShift = PrefMgr.shared
         .togglingAlphanumericalModeWithLShift
-      SessionCtl.theShiftKeyDetector.toggleWithRShift = PrefMgr.shared
+      InputSession.theShiftKeyDetector.toggleWithRShift = PrefMgr.shared
         .togglingAlphanumericalModeWithRShift
     }
 

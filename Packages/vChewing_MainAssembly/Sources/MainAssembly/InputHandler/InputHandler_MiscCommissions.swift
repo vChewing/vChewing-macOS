@@ -10,9 +10,33 @@ import BrailleSputnik
 import Shared
 import Tekkon
 
+// MARK: - CommitableMarkupType
+
 /// 該檔案專門管理「用指定熱鍵遞交特殊的內容」的這一類函式。
 
-extension InputHandler {
+private enum CommitableMarkupType: Int {
+  case bareKeys = -1
+  case textWithBracketedAnnotations = 0
+  case textWithHTMLRubyAnnotations = 1
+  case braille1947 = 2
+  case braille2018 = 3
+
+  // MARK: Internal
+
+  var brailleStandard: BrailleSputnik.BrailleStandard? {
+    switch self {
+    case .braille1947: return .of1947
+    case .braille2018: return .of2018
+    default: return nil
+    }
+  }
+
+  static func match(rawValue: Int) -> Self {
+    CommitableMarkupType(rawValue: rawValue) ?? .textWithBracketedAnnotations
+  }
+}
+
+extension InputHandlerProtocol {
   // MARK: - (Shift+)Ctrl+Command+Enter 鍵的處理（注音文）
 
   /// Command+Enter 鍵的處理（注音文）。
@@ -46,28 +70,6 @@ extension InputHandler {
   }
 
   // MARK: - (Shift+)Ctrl+Command+Option+Enter 鍵的處理（網頁 Ruby 注音文標記）
-
-  private enum CommitableMarkupType: Int {
-    case bareKeys = -1
-    case textWithBracketedAnnotations = 0
-    case textWithHTMLRubyAnnotations = 1
-    case braille1947 = 2
-    case braille2018 = 3
-
-    // MARK: Internal
-
-    var brailleStandard: BrailleSputnik.BrailleStandard? {
-      switch self {
-      case .braille1947: return .of1947
-      case .braille2018: return .of2018
-      default: return nil
-      }
-    }
-
-    static func match(rawValue: Int) -> Self {
-      CommitableMarkupType(rawValue: rawValue) ?? .textWithBracketedAnnotations
-    }
-  }
 
   /// Command+Option+Enter 鍵的處理（網頁 Ruby 注音文標記）。
   ///

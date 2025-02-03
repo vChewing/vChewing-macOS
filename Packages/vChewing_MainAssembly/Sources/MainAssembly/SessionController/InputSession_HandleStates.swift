@@ -13,7 +13,7 @@ import SwiftExtension
 
 // MARK: - 狀態調度 (State Handling)
 
-extension SessionCtl {
+extension SessionProtocol {
   /// 針對傳入的新狀態進行調度、且將當前會話控制器的狀態切換至新狀態。
   ///
   /// 先將舊狀態單獨記錄起來，再將新舊狀態作為參數，
@@ -24,8 +24,8 @@ extension SessionCtl {
   /// 不必要的互相干涉、打斷彼此的工作。
   /// - Note: 本來不用這麼複雜的，奈何 Swift Protocol 不允許給參數指定預設值。
   /// - Parameter newState: 新狀態。
-  public func switchState(_ newState: IMEStateProtocol) {
-    handle(state: newState, replace: true)
+  public func switchState(_ newState: IMEStateProtocol, client clientObj: ClientObj? = nil) {
+    handle(state: newState, replace: true, client: clientObj)
   }
 
   /// 針對傳入的新狀態進行調度。
@@ -39,7 +39,7 @@ extension SessionCtl {
   /// - Parameters:
   ///   - newState: 新狀態。
   ///   - replace: 是否取代現有狀態。
-  public func handle(state newState: IMEStateProtocol, replace: Bool) {
+  public func handle(state newState: IMEStateProtocol, replace: Bool, client clientObj: ClientObj?) {
     var previous = state
     if replace {
       var newState = newState
@@ -64,7 +64,7 @@ extension SessionCtl {
       // 此處的 hidePalettes() 僅適合由新的 Session 來呼叫，否則可能會干擾到新的 Session。
       inputHandler?.clear()
       if ![.ofAbortion, .ofEmpty].contains(previous.type), !previous.displayedText.isEmpty {
-        clearInlineDisplay()
+        clearInlineDisplay(client: clientObj)
       }
     case .ofAbortion, .ofCommitting, .ofEmpty:
       innerCircle: switch newState.type {
@@ -72,36 +72,43 @@ extension SessionCtl {
         previous = IMEState.ofEmpty()
         if replace { state = previous }
       case .ofCommitting:
-        commit(text: newState.textToCommit)
+        commit(text: newState.textToCommit, client: clientObj)
         if replace { state = IMEState.ofEmpty() }
       default: break innerCircle
       }
       candidateUI?.visible = false
       // 全專案用以判斷「.Abortion」的地方僅此一處。
       if previous.hasComposition, ![.ofAbortion, .ofCommitting].contains(newState.type) {
-        commit(text: previous.displayedText)
+        commit(text: previous.displayedText, client: clientObj)
       }
       // 會在工具提示為空的時候自動消除顯示。
       showTooltip(newState.tooltip, duration: newState.tooltipDuration)
-      clearInlineDisplay()
+      clearInlineDisplay(client: clientObj)
       inputHandler?.clear()
     case .ofInputting:
       candidateUI?.visible = false
-      if !newState.textToCommit.isEmpty { commit(text: newState.textToCommit) }
-      setInlineDisplayWithCursor()
+      if !newState.textToCommit.isEmpty {
+        commit(text: newState.textToCommit, client: clientObj)
+      }
+      setInlineDisplayWithCursor(client: clientObj)
       // 會在工具提示為空的時候自動消除顯示。
       showTooltip(newState.tooltip, duration: newState.tooltipDuration)
       if newState.isCandidateContainer { showCandidates() }
     case .ofMarking:
       candidateUI?.visible = false
-      setInlineDisplayWithCursor()
+      setInlineDisplayWithCursor(client: clientObj)
       showTooltip(newState.tooltip)
     case .ofAssociates, .ofCandidates, .ofSymbolTable:
       tooltipInstance.hide()
-      setInlineDisplayWithCursor()
+      setInlineDisplayWithCursor(client: clientObj)
       showCandidates()
     }
     // 浮動組字窗的顯示判定
+    updatePopupDisplayWithCursor()
+  }
+
+  public func updateCompositionBufferDisplay(client clientObj: ClientObj? = nil) {
+    setInlineDisplayWithCursor(client: clientObj)
     updatePopupDisplayWithCursor()
   }
 
@@ -120,7 +127,7 @@ extension SessionCtl {
   }
 
   /// 如果當前狀態含有「組字結果內容」、或者有選字窗內容、或者存在正在輸入的字根/讀音，則在組字區內顯示游標。
-  public func setInlineDisplayWithCursor() {
+  public func setInlineDisplayWithCursor(client clientObj: ClientObj?) {
     var attrStr: NSAttributedString = attributedStringSecured.value
     // 包括早期版本的騰訊 QQNT 在內，有些客體的 client.setMarkedText() 無法正常處理 .thick 下劃線。
     mitigation: if clientMitigationLevel == 1 {
@@ -136,17 +143,17 @@ extension SessionCtl {
       )
       attrStr = neo
     }
-    doSetMarkedText(attrStr)
+    doSetMarkedText(attrStr, client: clientObj)
   }
 
   /// 在處理某些「沒有組字區內容顯示」且「不需要攔截某些按鍵處理」的狀態時使用的函式，會清空螢幕上顯示的組字區。
-  public func clearInlineDisplay() {
-    doSetMarkedText(NSAttributedString())
+  public func clearInlineDisplay(client clientObj: ClientObj?) {
+    doSetMarkedText(NSAttributedString(), client: clientObj)
   }
 
   /// 遞交組字區內容。
   /// 注意：必須在 IMK 的 commitComposition 函式當中也間接或者直接執行這個處理。
-  private func commit(text: String) {
+  private func commit(text: String, client clientObj: ClientObj?) {
     guard !text.isEmpty else { return }
     let phE = PrefMgr.shared.phraseReplacementEnabled && text.count > 1
     var text = text.trimmingCharacters(in: .newlines)
@@ -162,7 +169,7 @@ extension SessionCtl {
 
     @Sendable
     func doCommit(_ theBuffer: String) {
-      guard let client = client() else { return }
+      guard let client = clientObj ?? client() else { return }
       client.insertText(
         theBuffer, replacementRange: replacementRange()
       )
@@ -183,7 +190,7 @@ extension SessionCtl {
   ///   - string: 要設定顯示的內容，必須得是 NSAttributedString（否則不顯示下劃線）且手動定義過下劃線。
   ///   警告：replacementRange 不要亂填，否則會在 Microsoft Office 等軟體內出現故障。
   ///   該功能是給某些想設計「重新組字」功能的輸入法設計的，但一字多音的漢語在注音/拼音輸入這方面不適用這個輸入法特性。
-  public func doSetMarkedText(_ string: NSAttributedString, allowAsync: Bool = true) {
+  public func doSetMarkedText(_ string: NSAttributedString, allowAsync: Bool = true, client clientObj: ClientObj?) {
     // 得複製一份，因為 NSAttributedString 不支援 Sendable 特性。
     let newString = string.copy() as? NSAttributedString ?? .init(string: string.string)
     // 威注音用不到 replacementRange，所以不用檢查 replacementRange 的異動情況。
@@ -194,7 +201,7 @@ extension SessionCtl {
     recentMarkedText.selectionRange = range
     if allowAsync, isServingIMEItself || !isActivated {
       asyncOnMain {
-        guard let client = self.client() else { return }
+        guard let client = clientObj ?? self.client() else { return }
         client.setMarkedText(
           newString,
           selectionRange: range,
@@ -202,7 +209,7 @@ extension SessionCtl {
         )
       }
     } else {
-      guard let client = client() else { return }
+      guard let client = clientObj ?? client() else { return }
       client.setMarkedText(
         string, selectionRange: range, replacementRange: replacementRange()
       )
