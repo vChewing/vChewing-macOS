@@ -22,10 +22,10 @@ public final class InputSession: SessionProtocol {
 
   public init(
     controller inputController: IMKInputController?,
-    client inputClient: ClientObj?
+    client inputClient: @escaping (() -> ClientObj?)
   ) {
     self.theClient = inputClient
-    construct(client: inputClient)
+    construct(client: theClient())
   }
 
   // MARK: Public
@@ -107,7 +107,7 @@ public final class InputSession: SessionProtocol {
 
   public var isVerticalTyping: Bool = false
 
-  public var theClient: ClientObj?
+  public var theClient: () -> ClientObj?
 
   /// IMKInputController 副本。
   public var inputController: SessionCtl? {
@@ -224,7 +224,7 @@ extension InputSession {
   public func commitComposition(_ sender: Any!) {
     _ = sender // 防止格式整理工具毀掉與此對應的參數。
     resetInputHandler()
-    clearInlineDisplay(client: sender as? ClientObj)
+    clearInlineDisplay()
   }
 
   public func updateComposition() { inputController?.updateComposition() }
@@ -267,7 +267,6 @@ extension InputSession {
   public func client() -> (any IMKTextInput & NSObjectProtocol)! {
     /// API 層面的驚嘆號是無法去掉的（否則 IMK 會出錯），那這裡就必須手動 unwrap 確保沒有把 nullptr 丟出去。
     if let unwrapped = inputController?.client() { return unwrapped }
-    if let theClient { return theClient }
     return nil
   }
 
