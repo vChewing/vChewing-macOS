@@ -12,7 +12,7 @@ import AppKit
 import Shared
 import Tekkon
 
-extension InputHandler {
+extension InputHandlerProtocol {
   /// 用來處理 InputHandler.HandleInput() 當中的與組字有關的行為。
   /// - Parameter input: 輸入訊號。
   /// - Returns: 告知 IMK「該按鍵是否已經被輸入法攔截處理」。
@@ -35,7 +35,7 @@ extension InputHandler {
 
 // MARK: - 注音按鍵輸入處理 (Handle BPMF Keys)
 
-extension InputHandler {
+extension InputHandlerProtocol {
   /// 用來處理 InputHandler.HandleInput() 當中的與注音输入有關的組字行為。
   /// - Parameter input: 輸入訊號。
   /// - Returns: 告知 IMK「該按鍵是否已經被輸入法攔截處理」。
@@ -245,7 +245,7 @@ extension InputHandler {
 
 // MARK: - 磁帶模式的組字支援。
 
-extension InputHandler {
+extension InputHandlerProtocol {
   /// 用來處理 InputHandler.HandleInput() 當中的與磁帶模組有關的組字行為。（前置處理）
   /// - Parameter input: 輸入訊號。
   /// - Returns: 告知 IMK「該按鍵是否已經被輸入法攔截處理」。
@@ -425,7 +425,7 @@ extension InputHandler {
 
 // MARK: - 內碼區位輸入處理 (Handle Code Point Input)
 
-extension InputHandler {
+extension InputHandlerProtocol {
   /// 用來處理 InputHandler.HandleInput() 當中的與內碼區位輸入有關的組字行為。
   /// - Parameter input: 輸入訊號。
   /// - Returns: 告知 IMK「該按鍵是否已經被輸入法攔截處理」。
@@ -478,7 +478,7 @@ extension InputHandler {
 
 // MARK: - 處理漢音鍵盤符號輸入狀態（Handle Hanin Keyboard Symbol Inputs）
 
-extension InputHandler {
+extension InputHandlerProtocol {
   /// 處理漢音鍵盤符號輸入。
   /// - Parameters:
   ///   - input: 輸入按鍵訊號。

@@ -268,7 +268,7 @@ extension VwrClientListMgr {
 
     // 預先填寫近期用過威注音輸入法的客體軟體，最多二十筆。
     theTextView.textContainer?.textView?.string = {
-      let recentClients = SessionCtl.recentClientBundleIdentifiers.keys.compactMap {
+      let recentClients = InputSession.recentClientBundleIdentifiers.keys.compactMap {
         PrefMgr.shared.clientsIMKTextInputIncapable.keys.contains($0) ? nil : $0
       }
       return recentClients.sorted().joined(separator: "\n")

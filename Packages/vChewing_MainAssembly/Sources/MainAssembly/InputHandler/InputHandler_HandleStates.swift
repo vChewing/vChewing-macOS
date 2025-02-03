@@ -15,7 +15,7 @@ import Tekkon
 
 // MARK: - § 根據按鍵行為來調控模式的函式 (Functions Interact With States).
 
-extension InputHandler {
+extension InputHandlerProtocol {
   // MARK: - 構築狀態（State Building）
 
   /// 生成「正在輸入」狀態。相關的內容會被拿給狀態機械用來處理在電腦螢幕上顯示的內容。

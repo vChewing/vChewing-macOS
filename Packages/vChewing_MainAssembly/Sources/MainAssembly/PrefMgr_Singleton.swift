@@ -29,9 +29,9 @@ extension PrefMgr {
       SpeechSputnik.shared.refreshStatus()
     }
     didAskForSyncingShiftKeyDetectorPrefs = {
-      SessionCtl.theShiftKeyDetector.toggleWithLShift = PrefMgr.shared
+      InputSession.theShiftKeyDetector.toggleWithLShift = PrefMgr.shared
         .togglingAlphanumericalModeWithLShift
-      SessionCtl.theShiftKeyDetector.toggleWithRShift = PrefMgr.shared
+      InputSession.theShiftKeyDetector.toggleWithRShift = PrefMgr.shared
         .togglingAlphanumericalModeWithRShift
     }
   }
