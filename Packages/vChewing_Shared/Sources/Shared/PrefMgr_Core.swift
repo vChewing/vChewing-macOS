@@ -23,7 +23,9 @@ public class PrefMgr: NSObject, PrefMgrProtocol {
   }()
 
   public static let kDefaultClientsIMKTextInputIncapable: [String: Bool] = [
-    "com.valvesoftware.steam": true, "jp.naver.line.mac": true,
+    "com.valvesoftware.steam": true,
+    "jp.naver.line.mac": true,
+    "com.openai.chat": true,
   ]
 
   public static let kDefaultCandidateServiceMenuItem: [String] = [
