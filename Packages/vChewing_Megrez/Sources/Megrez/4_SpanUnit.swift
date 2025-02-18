@@ -1,8 +1,6 @@
-// Swiftified and further development by (c) 2022 and onwards The vChewing Project (MIT License).
-// Was initially rebranded from (c) Lukhnos Liu's C++ library "Gramambular 2" (MIT License).
-// Walking algorithm (Dijkstra) implemented by (c) 2025 and onwards The vChewing Project (MIT License).
+// (c) 2022 and onwards The vChewing Project (LGPL v3.0 License or later).
 // ====================
-// This code is released under the MIT license (SPDX-License-Identifier: MIT)
+// This code is released under the SPDX-License-Identifier: `LGPL-3.0-or-later`.
 
 // MARK: - Megrez.SpanUnit
 
@@ -31,36 +29,6 @@ extension Megrez.SpanUnit {
   /// 該幅位單元內的所有節點當中持有最長幅位的節點長度。
   /// 該變數受該幅位的自身操作函式而被動更新。
   public var maxLength: Int { keys.max() ?? 0 }
-
-  /// （該變數為捷徑，代傳 Megrez.Compositor.maxSpanLength。）
-  private var maxSpanLength: Int { Megrez.Compositor.maxSpanLength }
-  /// 該幅位單元內的節點的幅位長度上限。
-  private var allowedLengths: ClosedRange<Int> { 1 ... maxSpanLength }
-
-  // MARK: - Functions
-
-  /// 往該幅位塞入一個節點。
-  /// - Remark: 這個函式用來防呆。一般情況下用不到。
-  /// - Parameter node: 要塞入的節點。
-  /// - Returns: 該操作是否成功執行。
-  @discardableResult
-  public mutating func addNode(node: Megrez.Node) -> Bool {
-    guard allowedLengths.contains(node.spanLength) else { return false }
-    self[node.spanLength] = node
-    return true
-  }
-
-  /// 丟掉任何不小於給定幅位長度的節點。
-  /// - Remark: 這個函式用來防呆。一般情況下用不到。
-  /// - Parameter length: 給定的幅位長度。
-  /// - Returns: 該操作是否成功執行。
-  @discardableResult
-  public mutating func dropNodesOfOrBeyond(length: Int) -> Bool {
-    guard allowedLengths.contains(length) else { return false }
-    let length = Swift.min(length, maxSpanLength)
-    (length ... maxSpanLength).forEach { self[$0] = nil }
-    return true
-  }
 }
 
 // MARK: - Related Compositor Implementations.
@@ -72,16 +40,16 @@ extension Megrez.Compositor {
   public func fetchOverlappingNodes(at givenLocation: Int) -> [(location: Int, node: Megrez.Node)] {
     var results = [(location: Int, node: Megrez.Node)]()
     let givenLocation = max(0, min(givenLocation, keys.count - 1))
-    guard !spans.isEmpty else { return results }
+    guard spans.indices.contains(givenLocation) else { return results }
 
     // 先獲取該位置的所有單字節點。
-    (1 ... max(spans[givenLocation].maxLength, 1)).forEach { theSpanLength in
+    spans[givenLocation].keys.sorted().forEach { theSpanLength in
       guard let node = spans[givenLocation][theSpanLength] else { return }
       Self.insertAnchor(spanIndex: givenLocation, node: node, to: &results)
     }
 
     // 再獲取以當前位置結尾或開頭的節點。
-    let begin: Int = givenLocation - min(givenLocation, Megrez.Compositor.maxSpanLength - 1)
+    let begin: Int = givenLocation - min(givenLocation, maxSpanLength - 1)
     (begin ..< givenLocation).forEach { theLocation in
       let (A, B): (Int, Int) = (givenLocation - theLocation + 1, spans[theLocation].maxLength)
       guard A <= B else { return }

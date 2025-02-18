@@ -1,8 +1,6 @@
-// Swiftified and further development by (c) 2022 and onwards The vChewing Project (MIT License).
-// Was initially rebranded from (c) Lukhnos Liu's C++ library "Gramambular 2" (MIT License).
-// Walking algorithm (Dijkstra) implemented by (c) 2025 and onwards The vChewing Project (MIT License).
+// (c) 2022 and onwards The vChewing Project (LGPL v3.0 License or later).
 // ====================
-// This code is released under the MIT license (SPDX-License-Identifier: MIT)
+// This code is released under the SPDX-License-Identifier: `LGPL-3.0-or-later`.
 
 // MARK: - Megrez.KeyValuePaired
 
@@ -78,7 +76,7 @@ extension Megrez {
     }
 
     public static func == (lhs: KeyValuePaired, rhs: KeyValuePaired) -> Bool {
-      lhs.score == rhs.score && lhs.keyArray == rhs.keyArray && lhs.value == rhs.value
+      lhs.hashValue == rhs.hashValue
     }
 
     public static func < (lhs: KeyValuePaired, rhs: KeyValuePaired) -> Bool {
