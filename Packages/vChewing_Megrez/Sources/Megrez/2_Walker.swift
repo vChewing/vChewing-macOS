@@ -1,8 +1,6 @@
-// Swiftified and further development by (c) 2022 and onwards The vChewing Project (MIT License).
-// Was initially rebranded from (c) Lukhnos Liu's C++ library "Gramambular 2" (MIT License).
-// Walking algorithm (Dijkstra) implemented by (c) 2025 and onwards The vChewing Project (MIT License).
+// (c) 2022 and onwards The vChewing Project (LGPL v3.0 License or later).
 // ====================
-// This code is released under the MIT license (SPDX-License-Identifier: MIT)
+// This code is released under the SPDX-License-Identifier: `LGPL-3.0-or-later`.
 
 extension Megrez.Compositor {
   /// 爬軌函式，會以 Dijkstra 算法更新當前組字器的 walkedNodes。
@@ -14,7 +12,7 @@ extension Megrez.Compositor {
   ///
   /// - Returns: 爬軌結果（已選字詞陣列）。
   @discardableResult
-  public mutating func walk() -> [Megrez.Node] {
+  public func walk() -> [Megrez.Node] {
     walkedNodes.removeAll()
     guard !spans.isEmpty else { return [] }
 

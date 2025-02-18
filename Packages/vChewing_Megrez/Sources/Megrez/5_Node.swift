@@ -1,8 +1,6 @@
-// Swiftified and further development by (c) 2022 and onwards The vChewing Project (MIT License).
-// Was initially rebranded from (c) Lukhnos Liu's C++ library "Gramambular 2" (MIT License).
-// Walking algorithm (Dijkstra) implemented by (c) 2025 and onwards The vChewing Project (MIT License).
+// (c) 2022 and onwards The vChewing Project (LGPL v3.0 License or later).
 // ====================
-// This code is released under the MIT license (SPDX-License-Identifier: MIT)
+// This code is released under the SPDX-License-Identifier: `LGPL-3.0-or-later`.
 
 // MARK: - Megrez.Node
 
@@ -121,9 +119,7 @@ extension Megrez {
     }
 
     public static func == (lhs: Node, rhs: Node) -> Bool {
-      lhs.overridingScore == rhs.overridingScore && lhs.spanLength == rhs.spanLength
-        && lhs.keyArray == rhs.keyArray && lhs.currentUnigramIndex == rhs.currentUnigramIndex
-        && lhs.unigrams == rhs.unigrams && lhs.currentOverrideType == rhs.currentOverrideType
+      lhs.hashValue == rhs.hashValue
     }
 
     /// 做為預設雜湊函式。
@@ -231,10 +227,11 @@ extension Array where Element == Megrez.Node {
     let cursor = Swift.max(0, cursor) // 防呆
     nilReturn = cursor ..< cursor
     // 下文按道理來講不應該會出現 nilReturn。
-    guard let rearNodeID = nodeBorderPointDictPair.cursorRegionMap[cursor] else { return nilReturn }
-    guard let rearIndex = nodeBorderPointDictPair.regionCursorMap[rearNodeID]
+    let mapPair = nodeBorderPointDictPair
+    guard let rearNodeID = mapPair.cursorRegionMap[cursor] else { return nilReturn }
+    guard let rearIndex = mapPair.regionCursorMap[rearNodeID]
     else { return nilReturn }
-    guard let frontIndex = nodeBorderPointDictPair.regionCursorMap[rearNodeID + 1]
+    guard let frontIndex = mapPair.regionCursorMap[rearNodeID + 1]
     else { return nilReturn }
     return rearIndex ..< frontIndex
   }
