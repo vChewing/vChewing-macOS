@@ -1,8 +1,6 @@
-// Swiftified and further development by (c) 2022 and onwards The vChewing Project (MIT License).
-// Was initially rebranded from (c) Lukhnos Liu's C++ library "Gramambular 2" (MIT License).
-// Walking algorithm (Dijkstra) implemented by (c) 2025 and onwards The vChewing Project (MIT License).
+// (c) 2022 and onwards The vChewing Project (LGPL v3.0 License or later).
 // ====================
-// This code is released under the MIT license (SPDX-License-Identifier: MIT)
+// This code is released under the SPDX-License-Identifier: `LGPL-3.0-or-later`.
 
 // This package is trying to deprecate its dependency of Foundation, hence this file.
 
@@ -12,7 +10,7 @@ extension StringProtocol {
     let targetArray = Array(target.description.unicodeScalars)
     guard !target.isEmpty else { return isEmpty }
     guard count >= target.count else { return false }
-    for index in 0 ..< selfArray.count {
+    for index in selfArray.indices {
       let range = index ..< (Swift.min(index + targetArray.count, selfArray.count))
       let ripped = Array(selfArray[range])
       if ripped == targetArray { return true }
@@ -26,7 +24,7 @@ extension StringProtocol {
     var result: [String] = []
     var buffer: [Unicode.Scalar] = []
     var sleepCount = 0
-    for index in 0 ..< selfArray.count {
+    for index in selfArray.indices {
       let currentChar = selfArray[index]
       let range = index ..< (Swift.min(index + arrSeparator.count, selfArray.count))
       let ripped = Array(selfArray[range])
@@ -52,7 +50,7 @@ extension StringProtocol {
     var result = ""
     var buffer: [Unicode.Scalar] = []
     var sleepCount = 0
-    for index in 0 ..< selfArray.count {
+    for index in selfArray.indices {
       let currentChar = selfArray[index]
       let range = index ..< (Swift.min(index + arrTarget.count, selfArray.count))
       let ripped = Array(selfArray[range])

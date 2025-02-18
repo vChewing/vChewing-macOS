@@ -1,8 +1,6 @@
-// Swiftified and further development by (c) 2022 and onwards The vChewing Project (MIT License).
-// Was initially rebranded from (c) Lukhnos Liu's C++ library "Gramambular 2" (MIT License).
-// Walking algorithm (Dijkstra) implemented by (c) 2025 and onwards The vChewing Project (MIT License).
+// (c) 2022 and onwards The vChewing Project (LGPL v3.0 License or later).
 // ====================
-// This code is released under the MIT license (SPDX-License-Identifier: MIT)
+// This code is released under the SPDX-License-Identifier: `LGPL-3.0-or-later`.
 
 // MARK: - Megrez.Compositor
 
@@ -11,13 +9,13 @@ extension Megrez {
   ///
   /// 用於輸入法的話，給定的索引鍵可以是注音、且返回的資料值都是漢語字詞組合。該組字器
   /// 還可以用來對文章做分節處理：此時的索引鍵為漢字，返回的資料值則是漢語字詞分節組合。
-  public struct Compositor {
+  public final class Compositor {
     // MARK: Lifecycle
 
     /// 初期化一個組字器。
     /// - Parameter langModel: 要對接的語言模組。
     public init(with langModel: LangModelProtocol, separator: String = "-") {
-      self.langModel = .init(withLM: langModel)
+      self.langModel = langModel
       self.separator = separator
     }
 
@@ -38,12 +36,15 @@ extension Megrez {
     public enum ResizeBehavior { case expand, shrink }
 
     /// 多字讀音鍵當中用以分割漢字讀音的記號的預設值，是「-」。
-    public static var theSeparator: String = "-"
-
-    /// 該軌格內可以允許的最大幅位長度。
-    public static var maxSpanLength: Int = 10 { didSet { maxSpanLength = max(6, maxSpanLength) } }
+    nonisolated(unsafe) public static var theSeparator: String = "-"
 
     public private(set) var config = CompositorConfig()
+
+    /// 該軌格內可以允許的最大幅位長度。
+    public var maxSpanLength: Int {
+      get { config.maxSpanLength }
+      set { config.maxSpanLength = newValue }
+    }
 
     /// 最近一次爬軌結果。
     public var walkedNodes: [Node] {
@@ -90,7 +91,7 @@ extension Megrez {
     public var isEmpty: Bool { spans.isEmpty && keys.isEmpty }
 
     /// 該組字器所使用的語言模型（被 LangModelRanked 所封裝）。
-    public var langModel: LangModelRanked {
+    public var langModel: LangModelProtocol {
       didSet { clear() }
     }
 
@@ -98,26 +99,26 @@ extension Megrez {
     /// - Remark: 因為 Node 不是 Struct，所以會在 Compositor 被拷貝的時候無法被真實複製。
     /// 這樣一來，Compositor 複製品當中的 Node 的變化會被反應到原先的 Compositor 身上。
     /// 這在某些情況下會造成意料之外的混亂情況，所以需要引入一個拷貝用的建構子。
-    public var hardCopy: Compositor { .init(from: self) }
+    public var copy: Compositor { .init(from: self) }
 
     /// 生成用以交給 GraphViz 診斷的資料檔案內容，純文字。
     public var dumpDOT: String {
-      // C# StringBuilder 與 Swift NSMutableString 能提供爆發性的效能。
       var strOutput = "digraph {\ngraph [ rankdir=LR ];\nBOS;\n"
       spans.enumerated().forEach { p, span in
-        (0 ... span.maxLength).forEach { ni in
+        span.keys.sorted().forEach { ni in
           guard let np = span[ni] else { return }
-          if p == 0 { strOutput.append("BOS -> \(np.value);\n") }
-          strOutput.append("\(np.value);\n")
+          let npValue = np.value
+          if p == 0 { strOutput.append("BOS -> \(npValue);\n") }
+          strOutput.append("\(npValue);\n")
           if (p + ni) < spans.count {
             let destinationSpan = spans[p + ni]
-            (0 ... destinationSpan.maxLength).forEach { q in
-              guard let dn = destinationSpan[q] else { return }
-              strOutput.append(np.value + " -> " + dn.value + ";\n")
+            destinationSpan.keys.sorted().forEach { q in
+              guard let dnValue = destinationSpan[q]?.value else { return }
+              strOutput.append(npValue + " -> " + dnValue + ";\n")
             }
           }
           guard (p + ni) == spans.count else { return }
-          strOutput.append(np.value + " -> EOS;\n")
+          strOutput.append(npValue + " -> EOS;\n")
         }
       }
       strOutput.append("EOS;\n}\n")
@@ -128,23 +129,19 @@ extension Megrez {
     ///
     /// 將已經被插入的索引鍵陣列與幅位單元陣列（包括其內的節點）全部清空。
     /// 最近一次的爬軌結果陣列也會被清空。游標跳轉換算表也會被清空。
-    public mutating func clear() {
-      cursor = 0
-      marker = 0
-      keys.removeAll()
-      spans.removeAll()
-      walkedNodes.removeAll()
+    public func clear() {
+      config.clear()
     }
 
     /// 在游標位置插入給定的索引鍵。
     /// - Parameter key: 要插入的索引鍵。
     /// - Returns: 該操作是否成功執行。
     @discardableResult
-    public mutating func insertKey(_ key: String) -> Bool {
+    public func insertKey(_ key: String) -> Bool {
       guard !key.isEmpty, key != separator,
             langModel.hasUnigramsFor(keyArray: [key]) else { return false }
       keys.insert(key, at: cursor)
-      let gridBackup = spans
+      let gridBackup = spans.map(\.hardCopy)
       resizeGrid(at: cursor, do: .expand)
       let nodesInserted = update()
       // 用來在 langModel.hasUnigramsFor() 結果不準確的時候防呆、恢復被搞壞的 spans。
@@ -163,7 +160,7 @@ extension Megrez {
     /// - Parameter direction: 指定方向（相對於文字輸入方向而言）。
     /// - Returns: 該操作是否成功執行。
     @discardableResult
-    public mutating func dropKey(direction: TypingDirection) -> Bool {
+    public func dropKey(direction: TypingDirection) -> Bool {
       let isBackSpace: Bool = direction == .rear ? true : false
       guard cursor != (isBackSpace ? 0 : keys.count) else { return false }
       keys.remove(at: cursor - (isBackSpace ? 1 : 0))
@@ -186,7 +183,7 @@ extension Megrez {
     /// 將標記游標交給敝引擎來管理。屆時，NSStringUtils 將徹底卸任。
     /// - Returns: 該操作是否順利完成。
     @discardableResult
-    public mutating func jumpCursorBySpan(
+    public func jumpCursorBySpan(
       to direction: TypingDirection,
       isMarker: Bool = false
     )
@@ -229,6 +226,60 @@ extension Megrez {
       }
       return true
     }
+
+    /// 根據當前狀況更新整個組字器的節點文脈。
+    /// - Parameter updateExisting: 是否根據目前的語言模型的資料狀態來對既有節點更新其內部的單元圖陣列資料。
+    /// 該特性可以用於「在選字窗內屏蔽了某個詞之後，立刻生效」這樣的軟體功能需求的實現。
+    /// - Returns: 新增或影響了多少個節點。如果返回「0」則表示可能發生了錯誤。
+    @discardableResult
+    public func update(updateExisting: Bool = false) -> Int {
+      let maxSpanLength = maxSpanLength
+      let rangeOfPositions: Range<Int>
+      if updateExisting {
+        rangeOfPositions = spans.indices
+      } else {
+        let lowerbound = Swift.max(0, cursor - maxSpanLength)
+        let upperbound = Swift.min(cursor + maxSpanLength, keys.count)
+        rangeOfPositions = lowerbound ..< upperbound
+      }
+      var nodesChanged = 0
+      rangeOfPositions.forEach { position in
+        let rangeOfLengths = 1 ... min(maxSpanLength, rangeOfPositions.upperBound - position)
+        rangeOfLengths.forEach { theLength in
+          guard position + theLength <= keys.count, position >= 0 else { return }
+          let keyArraySliced = keys[position ..< (position + theLength)].map(\.description)
+          if (0 ..< spans.count).contains(position), let theNode = spans[position][theLength] {
+            if !updateExisting { return }
+            let unigrams = getSortedUnigrams(keyArray: keyArraySliced)
+            // 自動銷毀無效的節點。
+            if unigrams.isEmpty {
+              if theNode.keyArray.count == 1 { return }
+              spans[position][theNode.spanLength] = nil
+            } else {
+              theNode.syncingUnigrams(from: unigrams)
+            }
+            nodesChanged += 1
+            return
+          }
+          let unigrams = getSortedUnigrams(keyArray: keyArraySliced)
+          guard !unigrams.isEmpty else { return }
+          // 這裡原本用 SpanUnit.addNode 來完成的，但直接當作辭典來互動的話也沒差。
+          spans[position][theLength] = .init(
+            keyArray: keyArraySliced, spanLength: theLength, unigrams: unigrams
+          )
+          nodesChanged += 1
+        }
+      }
+      return nodesChanged
+    }
+
+    // MARK: Private
+
+    private func getSortedUnigrams(keyArray: [String]) -> [Megrez.Unigram] {
+      langModel.unigramsFor(keyArray: keyArray).sorted {
+        $0.score > $1.score
+      }
+    }
   }
 }
 
@@ -239,7 +290,7 @@ extension Megrez.Compositor {
   /// - Parameters:
   ///   - location: 給定的幅位座標。
   ///   - action: 指定是擴張還是縮減一個幅位。
-  private mutating func resizeGrid(at location: Int, do action: ResizeBehavior) {
+  private func resizeGrid(at location: Int, do action: ResizeBehavior) {
     let location = max(min(location, spans.count), 0) // 防呆
     switch action {
     case .expand:
@@ -283,76 +334,24 @@ extension Megrez.Compositor {
   ///            (XXXXXXX? <-被砍爛的節點
   /// ```
   /// - Parameter location: 給定的幅位座標。
-  mutating func dropWreckedNodes(at location: Int) {
+  func dropWreckedNodes(at location: Int) {
     let location = max(min(location, spans.count), 0) // 防呆
     guard !spans.isEmpty else { return }
-    let affectedLength = Megrez.Compositor.maxSpanLength - 1
+    let affectedLength = maxSpanLength - 1
     let begin = max(0, location - affectedLength)
     guard location >= begin else { return }
     (begin ..< location).forEach { delta in
-      ((location - delta + 1) ... Self.maxSpanLength).forEach { theLength in
+      ((location - delta + 1) ... maxSpanLength).forEach { theLength in
         spans[delta][theLength] = nil
       }
     }
-  }
-
-  /// 自索引鍵陣列獲取指定範圍的資料。
-  /// - Parameter range: 指定範圍。
-  /// - Returns: 拿到的資料。
-  private func getJoinedKeyArray(range: Range<Int>) -> [String] {
-    // 下面這句不能用 contains，不然會要求至少 macOS 13 Ventura。
-    guard range.upperBound <= keys.count, range.lowerBound >= 0 else { return [] }
-    return keys[range].map(\.description)
-  }
-
-  /// 根據當前狀況更新整個組字器的節點文脈。
-  /// - Parameter updateExisting: 是否根據目前的語言模型的資料狀態來對既有節點更新其內部的單元圖陣列資料。
-  /// 該特性可以用於「在選字窗內屏蔽了某個詞之後，立刻生效」這樣的軟體功能需求的實現。
-  /// - Returns: 新增或影響了多少個節點。如果返回「0」則表示可能發生了錯誤。
-  @discardableResult
-  public mutating func update(updateExisting: Bool = false) -> Int {
-    let maxSpanLength = Megrez.Compositor.maxSpanLength
-    let rangeOfPositions = max(0, cursor - maxSpanLength) ..< min(
-      cursor + maxSpanLength,
-      keys.count
-    )
-    var nodesChanged = 0
-    rangeOfPositions.forEach { position in
-      let rangeOfLengths = 1 ... min(maxSpanLength, rangeOfPositions.upperBound - position)
-      rangeOfLengths.forEach { theLength in
-        guard position + theLength <= keys.count, position >= 0 else { return }
-        let joinedKeyArray = keys[position ..< (position + theLength)].map(\.description)
-
-        if (0 ..< spans.count).contains(position), let theNode = spans[position][theLength] {
-          if !updateExisting { return }
-          let unigrams = langModel.unigramsFor(keyArray: joinedKeyArray)
-          // 自動銷毀無效的節點。
-          if unigrams.isEmpty {
-            if theNode.keyArray.count == 1 { return }
-            spans[position][theNode.spanLength] = nil
-          } else {
-            theNode.syncingUnigrams(from: unigrams)
-          }
-          nodesChanged += 1
-          return
-        }
-        let unigrams = langModel.unigramsFor(keyArray: joinedKeyArray)
-        guard !unigrams.isEmpty else { return }
-        // 這裡原本用 SpanUnit.addNode 來完成的，但直接當作辭典來互動的話也沒差。
-        spans[position][theLength] = .init(
-          keyArray: joinedKeyArray, spanLength: theLength, unigrams: unigrams
-        )
-        nodesChanged += 1
-      }
-    }
-    return nodesChanged
   }
 }
 
 // MARK: - Megrez.CompositorConfig
 
 extension Megrez {
-  public struct CompositorConfig: Codable {
+  public struct CompositorConfig: Codable, Equatable, Hashable {
     /// 最近一次爬軌結果。
     public var walkedNodes: [Node] = []
     /// 該組字器已經插入的的索引鍵，以陣列的形式存放。
@@ -365,6 +364,13 @@ extension Megrez {
       didSet {
         cursor = max(0, min(cursor, length))
         marker = cursor
+      }
+    }
+
+    /// 該軌格內可以允許的最大幅位長度。
+    public var maxSpanLength: Int = 10 {
+      didSet {
+        _ = (maxSpanLength < 6) ? maxSpanLength = 6 : dropNodesBeyondMaxSpanLength()
       }
     }
 
@@ -382,11 +388,38 @@ extension Megrez {
     /// 但是，為了防止萬一，就用了目前的方法來計算。
     public var length: Int { keys.count }
 
+    /// 該組字器的硬拷貝。
+    /// - Remark: 因為 Node 不是 Struct，所以會在 Compositor 被拷貝的時候無法被真實複製。
+    /// 這樣一來，Compositor 複製品當中的 Node 的變化會被反應到原先的 Compositor 身上。
+    /// 這在某些情況下會造成意料之外的混亂情況，所以需要引入一個拷貝用的建構子。
     public var hardCopy: Self {
       var newCopy = self
       newCopy.walkedNodes = walkedNodes.map(\.copy)
       newCopy.spans = spans.map(\.hardCopy)
       return newCopy
+    }
+
+    /// 重置包括游標在內的各項參數，且清空各種由組字器生成的內部資料。
+    ///
+    /// 將已經被插入的索引鍵陣列與幅位單元陣列（包括其內的節點）全部清空。
+    /// 最近一次的爬軌結果陣列也會被清空。游標跳轉換算表也會被清空。
+    public mutating func clear() {
+      walkedNodes.removeAll()
+      keys.removeAll()
+      spans.removeAll()
+      cursor = 0
+      marker = 0
+    }
+
+    /// 清除所有幅長超過 MaxSpanLength 的節點。
+    public mutating func dropNodesBeyondMaxSpanLength() {
+      spans.indices.forEach { currentPos in
+        spans[currentPos].keys.forEach { currentSpanLength in
+          if currentSpanLength > maxSpanLength {
+            spans[currentPos].removeValue(forKey: currentSpanLength)
+          }
+        }
+      }
     }
   }
 }
