@@ -603,7 +603,7 @@
 			attributes = {
 				BuildIndependentTargetsInParallel = YES;
 				LastSwiftUpdateCheck = 1510;
-				LastUpgradeCheck = 1600;
+				LastUpgradeCheck = 1620;
 				TargetAttributes = {
 					5B49A3BF2B95D9890031E450 = {
 						CreatedOnToolsVersion = 15.1;
@@ -1051,7 +1051,6 @@
 					"$(OTHER_CFLAGS)",
 					"-fcxx-modules",
 				);
-				STRIP_SWIFT_SYMBOLS = NO;
 				SWIFT_VERSION = 6.0;
 			};
 			name = Debug;
@@ -1099,7 +1098,6 @@
 					"$(OTHER_CFLAGS)",
 					"-fcxx-modules",
 				);
-				STRIP_SWIFT_SYMBOLS = NO;
 				SWIFT_COMPILATION_MODE = wholemodule;
 				SWIFT_VERSION = 6.0;
 			};
