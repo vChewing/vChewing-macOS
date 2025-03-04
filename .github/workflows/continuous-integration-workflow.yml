@@ -8,13 +8,13 @@ on:
 jobs:
   build:
     name: Build
-    runs-on: macOS-13
+    runs-on: macos-14
     env:
         GIT_SSL_NO_VERIFY: true
     steps:
-      - uses: maxim-lobanov/setup-xcode@v1
+      - uses: maxim-lobanov/setup-xcode@v1.6.0
         with:
-          xcode-version: '^15.1'
+          xcode-version: '16.1.0'
       - uses: actions/checkout@v1
       - name: Clean
         run: make spmClean
