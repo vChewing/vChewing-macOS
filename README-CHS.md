@@ -40,11 +40,9 @@ P.S.: 威注音输入法的 Shift 按键监测功能仅借由对 NSEvent 讯号�
 
 建置用系统需求：
 
-- 至少 macOS 12 Monterey & Xcode 13.4.1。
-    - 原因：Swift 封包管理支援与 Swift 5.5 所需，且仓库内包含了需要 Xcode 13.4.1 才能正常编译的内容（App 型安装程式）。
-    - 我们已经没有条件测试比 Xcode 13.4.1 更老的环境了。硬要在这个环境下编译的话，可能需要额外安装[新版 Swift](https://www.swift.org/download/) 才可以。
-- 推荐 Xcode 14 以提升建置速度。
-    - 注：Xcode 14 强制抛弃了 macOS 10.11-10.12 的建置目标支援。
+- 至少 macOS 13 Ventura & Xcode 15.3。
+    - 原因：Swift 封包管理支援、以及原厂辞典建置程式对 Swift 5.10 新的 concurrency 安全特性 API 的依赖，等。
+    - 我们已经没有条件测试比 Xcode 15.3 更老的环境了。硬要在这个环境下编译的话，可能需要额外安装[新版 Swift](https://www.swift.org/download/) 才可以。
 - 请使用正式发行版 Xcode，且最小子版本号越高越好（因为 Bug 相对而言最少）。
     - 如果是某个大版本的 Xcode 的 Release Candidate 版本的话，我们可能会对此做相容性测试。
 
