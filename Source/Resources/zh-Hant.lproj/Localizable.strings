@@ -193,7 +193,7 @@
 "i18n:aboutWindow.APP_NAME" = "vChewing for macOS";
 "i18n:aboutWindow.BUGREPORT_BUTTON" = "故障提報";
 "i18n:aboutWindow.DEV_CREW" = "威注音 macOS 程式研發：Shiki Suen, Isaac Xen, Hiraku Wang, 等。\n威注音詞庫維護：Shiki Suen。\nDijkstra 爬軌算法實作：Shiki Suen。";
-"i18n:aboutWindow.DISCLAIMER_TEXT" = "免責聲明：威注音專案對小麥注音官方專案內贈的小麥注音原版詞庫內容不負任何責任。威注音輸入法專用的威注音官方詞庫不包含任何「會在法理上妨礙威注音在全球傳播」的「與地緣政治及政治意識形態有關的」內容。威註音專案與 OpenVanilla 專案之間無合作關係、無隸屬關係。";
+"i18n:aboutWindow.DISCLAIMER_TEXT" = "補記：1) Megrez Compositor (天權星組字引擎) 自 v4 起使用 LGPLv3 授權，但對於 Swift 專案中的靜態鏈接之情形有額外准許。2) 威注音輸入法使用了《先鋒語料庫 (Vanguard Corpus)》，該語料庫由多個外部資源數據組成，這些數據的來源在其 GitHub 儲存庫 (`vChewing/libvchewing-data`) 中有列出。先鋒語料庫的資料建置程式藉由 3-Clause BSD 授權釋出。";
 "i18n:aboutWindow.LICENSE_TITLE" = "麻理去商標授權合約 (MIT-NTL License):";
 "i18n:aboutWindow.OK_BUTTON" = "確定";
 "i18n:aboutWindow.WEBSITE_BUTTON" = "網站";
