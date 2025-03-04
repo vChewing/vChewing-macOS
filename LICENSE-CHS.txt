@@ -1,4 +1,4 @@
-免责声明：威注音专案对小麦注音官方专案内赠的小麦注音原版词库内容不负任何责任。威注音输入法专用的威注音官方词库不包含任何「会在法理上妨碍威注音在全球传播」的「与地缘政治及政治意识形态有关的」内容。威注音专案与 OpenVanilla 专案之间无合作关系、无隶属关系。
+补记：1) Megrez Compositor (天权星组字引擎) 自 v4 起使用 LGPLv3 授权，但对于 Swift 专案中的静态链接有例外。2) 威注音输入法使用了《先锋语料库 (Vanguard Corpus)》，该语料库由多个外部资源数据组成，这些数据的来源在其 GitHub 储存库 (`vChewing/libvchewing-data`) 中有列出。先锋语料库的资料建置程式借由 3-Clause BSD 授权释出。
 
 vChewing macOS: MIT-NTL License 麻理（去商标）授权合约
 
