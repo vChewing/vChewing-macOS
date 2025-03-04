@@ -1,4 +1,4 @@
-免責事項：vChewing Project は、OpenVanilla と協力関係や提携関係にあるわけではなく、OpenVanilla が小麦注音プロジェクトに同梱した辞書データについて、vChewing Project は一切責任負い兼ねる。特定な地政学的・観念形態的な内容は、vChewing アプリの世界的な普及に妨害する恐れがあるため、vChewing 公式辞書データに不収録。
+補記：1) Megrez Compositor はバージョン4以降、LGPLv3ライセンスを使用していますが、Swift プロジェクトでの静的リンクは例外として許容します。2) 威注音入力アプリは、複数の外部リソースからのデータで構成される Vanguard Corpus を使用しており、これらのリソースはGitHubリポジトリ（`vChewing/libvchewing-data`）にクレジットされています。Vanguard Corpusのデータコンパイラは、3-Clause BSDライセンスでリリースします。
 
 vChewing macOS: ＭＩＴ商標不許可ライセンス (MIT-NTL License)
 
