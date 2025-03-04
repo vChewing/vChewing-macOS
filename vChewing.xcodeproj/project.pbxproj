@@ -111,7 +111,6 @@
 		5B09307928B6FC3F0021F8C5 /* zh-Hans */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.html; lineEnding = 0; name = "zh-Hans"; path = "zh-Hans.lproj/shortcuts.html"; sourceTree = "<group>"; };
 		5B09307A28B6FC400021F8C5 /* en */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.html; lineEnding = 0; name = en; path = en.lproj/shortcuts.html; sourceTree = "<group>"; };
 		5B09307B28B6FC410021F8C5 /* ja */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.html; lineEnding = 0; name = ja; path = ja.lproj/shortcuts.html; sourceTree = "<group>"; };
-		5B0C5EDF27C7D9870078037C /* dataCompiler.swift */ = {isa = PBXFileReference; explicitFileType = sourcecode.swift; fileEncoding = 4; indentWidth = 2; lineEnding = 0; path = dataCompiler.swift; sourceTree = "<group>"; tabWidth = 2; usesTabs = 0; };
 		5B18BA6F27C7BD8B0056EB19 /* LICENSE-CHS.txt */ = {isa = PBXFileReference; lastKnownFileType = text; path = "LICENSE-CHS.txt"; sourceTree = "<group>"; };
 		5B18BA7027C7BD8B0056EB19 /* Makefile */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.make; path = Makefile; sourceTree = "<group>"; };
 		5B18BA7127C7BD8B0056EB19 /* README-CHS.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = "README-CHS.md"; sourceTree = "<group>"; };
@@ -119,7 +118,7 @@
 		5B18BA7327C7BD8C0056EB19 /* LICENSE-JPN.txt */ = {isa = PBXFileReference; lastKnownFileType = text; path = "LICENSE-JPN.txt"; sourceTree = "<group>"; };
 		5B18BA7427C7BD8C0056EB19 /* LICENSE-CHT.txt */ = {isa = PBXFileReference; lastKnownFileType = text; path = "LICENSE-CHT.txt"; sourceTree = "<group>"; };
 		5B20430B28BEFC0C00BFC6FD /* vChewing.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = vChewing.entitlements; sourceTree = "<group>"; };
-		5B2CA1E52B130869002634EE /* vChewingFactoryDatabase.sqlite */ = {isa = PBXFileReference; lastKnownFileType = file; name = vChewingFactoryDatabase.sqlite; path = Data/Build/Release/vChewingFactoryDatabase.sqlite; sourceTree = "<group>"; };
+		5B2CA1E52B130869002634EE /* vChewingFactoryDatabase.sqlite */ = {isa = PBXFileReference; lastKnownFileType = file; name = vChewingFactoryDatabase.sqlite; path = "Data/Build/Release/vanguardSQL-Legacy/vChewingFactoryDatabase.sqlite"; sourceTree = "<group>"; };
 		5B2DB17127AF8771006D874E /* Makefile */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.make; name = Makefile; path = Data/Makefile; sourceTree = "<group>"; };
 		5B30F11227BA568800484E24 /* vChewingKeyLayout.bundle */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.plug-in"; path = vChewingKeyLayout.bundle; sourceTree = "<group>"; };
 		5B312684287800DE001AA720 /* FAQ.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = FAQ.md; sourceTree = "<group>"; };
@@ -185,10 +184,10 @@
 		5BF4A44628E5820C002AF9C5 /* vChewingInstaller.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = vChewingInstaller.entitlements; sourceTree = "<group>"; };
 		5BF9DA2228840E6200DBD48E /* template-usersymbolphrases.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; lineEnding = 0; path = "template-usersymbolphrases.txt"; sourceTree = "<group>"; usesTabs = 0; };
 		5BF9DA2328840E6200DBD48E /* template-exclusions.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; lineEnding = 0; path = "template-exclusions.txt"; sourceTree = "<group>"; usesTabs = 0; };
-		5BF9DA2428840E6200DBD48E /* template-associatedPhrases-chs.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; lineEnding = 0; name = "template-associatedPhrases-chs.txt"; path = "../Data/components/chs/template-associatedPhrases-chs.txt"; sourceTree = "<group>"; usesTabs = 0; };
+		5BF9DA2428840E6200DBD48E /* template-associatedPhrases-chs.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; lineEnding = 0; name = "template-associatedPhrases-chs.txt"; path = "../Data/Sources/LibVanguardChewingData/Resources/components/chs/template-associatedPhrases-chs.txt"; sourceTree = "<group>"; usesTabs = 0; };
 		5BF9DA2528840E6200DBD48E /* template-replacements.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; lineEnding = 0; path = "template-replacements.txt"; sourceTree = "<group>"; usesTabs = 0; };
 		5BF9DA2628840E6200DBD48E /* template-userphrases.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; lineEnding = 0; path = "template-userphrases.txt"; sourceTree = "<group>"; usesTabs = 0; };
-		5BF9DA2C2884247800DBD48E /* template-associatedPhrases-cht.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; lineEnding = 0; name = "template-associatedPhrases-cht.txt"; path = "../Data/components/cht/template-associatedPhrases-cht.txt"; sourceTree = "<group>"; };
+		5BF9DA2C2884247800DBD48E /* template-associatedPhrases-cht.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; lineEnding = 0; name = "template-associatedPhrases-cht.txt"; path = "../Data/Sources/LibVanguardChewingData/Resources/components/cht/template-associatedPhrases-cht.txt"; sourceTree = "<group>"; };
 		5BFC63C428D487AE004A77B7 /* Fuziki_NSAttributedTextView */ = {isa = PBXFileReference; lastKnownFileType = wrapper; name = Fuziki_NSAttributedTextView; path = Packages/Fuziki_NSAttributedTextView; sourceTree = "<group>"; };
 		5BFC63C728D49511004A77B7 /* vChewing_IMKUtils */ = {isa = PBXFileReference; lastKnownFileType = wrapper; name = vChewing_IMKUtils; path = Packages/vChewing_IMKUtils; sourceTree = "<group>"; };
 		5BFC63CA28D49B2B004A77B7 /* vChewing_UpdateSputnik */ = {isa = PBXFileReference; lastKnownFileType = wrapper; name = vChewing_UpdateSputnik; path = Packages/vChewing_UpdateSputnik; sourceTree = "<group>"; };
@@ -255,14 +254,6 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
-		5B0C5EDE27C7D94C0078037C /* DataCompiler */ = {
-			isa = PBXGroup;
-			children = (
-				5B0C5EDF27C7D9870078037C /* dataCompiler.swift */,
-			);
-			path = DataCompiler;
-			sourceTree = "<group>";
-		};
 		5B18BA7527C7BF6D0056EB19 /* MiscRootFiles */ = {
 			isa = PBXGroup;
 			children = (
@@ -432,7 +423,6 @@
 				5B20430B28BEFC0C00BFC6FD /* vChewing.entitlements */,
 				5BBD627827B6C4D900271480 /* Update-Info.plist */,
 				5B18BA7027C7BD8B0056EB19 /* Makefile */,
-				5B0C5EDE27C7D94C0078037C /* DataCompiler */,
 				6ACA41E715FC1D9000935EF6 /* Installer */,
 				6A0D4EC215FC0D3C00ABF4B3 /* Source */,
 				5B2F2BB4286216A500B8557B /* vChewingTests */,
@@ -730,43 +720,17 @@
 			inputFileListPaths = (
 			);
 			inputPaths = (
-				"$(SRCROOT)/Source/Data/components/chs/phrases-custom-chs.txt",
-				"$(SRCROOT)/Source/Data/components/chs/phrases-moe-chs.txt",
-				"$(SRCROOT)/Source/Data/components/chs/phrases-tabe-chs.txt",
-				"$(SRCROOT)/Source/Data/components/chs/phrases-vchewing-chs.txt",
-				"$(SRCROOT)/Source/Data/components/cht/phrases-custom-cht.txt",
-				"$(SRCROOT)/Source/Data/components/cht/phrases-moe-cht.txt",
-				"$(SRCROOT)/Source/Data/components/cht/phrases-tabe-cht.txt",
-				"$(SRCROOT)/Source/Data/components/cht/phrases-vchewing-cht.txt",
-				"$(SRCROOT)/Source/Data/components/common/char-kanji-cns.txt",
-				"$(SRCROOT)/Source/Data/components/common/char-kanji-core.txt",
-				"$(SRCROOT)/Source/Data/components/common/char-kanji-phrasesonly.txt",
-				"$(SRCROOT)/Source/Data/components/common/char-misc-bpmf.txt",
-				"$(SRCROOT)/Source/Data/components/common/char-misc-nonkanji.txt",
-				"$(SRCROOT)/Source/Data/components/common/data-punctuations.txt",
-				"$(SRCROOT)/Source/Data/components/common/data-symbols.txt",
-				"$(SRCROOT)/Source/Data/components/common/data-zhuyinwen.txt",
-				"$(SRCROOT)/Source/Data/components/common/phone-header.txt",
-				"$(SRCROOT)/DataCompiler/dataCompiler.swift",
-				"$(SRCROOT)/Source/Data/components/chs/phrases-custom-genshin-chs.txt",
-				"$(SRCROOT)/Source/Data/components/cht/phrases-custom-genshin-cht.txt",
-				"$(SRCROOT)/Source/Data/components/chs/phrases-custom-seikyuutetsudou-chs.txt",
-				"$(SRCROOT)/Source/Data/components/cht/phrases-custom-seikyuutetsudou-cht.txt",
+				"$(SRCROOT)/Source/Data/",
 			);
 			name = "Run Script (Build Dictionary Data)";
 			outputFileListPaths = (
 			);
 			outputPaths = (
-				"$(SRCROOT)/Source/Data/Build/Release/vChewingFactoryDatabase.sqlite",
-				"$(SRCROOT)/Source/Data/Build/Release/vChewingFactoryDatabase.sqlite-journal",
 				"$(SRCROOT)/Source/Data/Build/Release/",
-				"$(SRCROOT)/Source/Data/data-chs.txt",
-				"$(SRCROOT)/Source/Data/data-cht.txt",
-				"$(SRCROOT)/Source/Data/Build/Release/vChewingFactoryDatabase.sql",
 			);
 			runOnlyForDeploymentPostprocessing = 0;
-			shellPath = /bin/sh;
-			shellScript = "# Type a script or drag a script file from your workspace to insert its path.\ncd ${SRCROOT}/Source/Data/\nswift ${SRCROOT}/DataCompiler/dataCompiler.swift\nsqlite3 ${SRCROOT}/Source/Data//Build/Release/vChewingFactoryDatabase.sqlite < ${SRCROOT}/Source/Data//Build/Release/vChewingFactoryDatabase.sql\n";
+			shellPath = /bin/bash;
+			shellScript = "# Type a script or drag a script file from your workspace to insert its path.\ncd ${SRCROOT}/Source/Data/\nswift run VCDataBuilder vanguardSQLLegacy\n";
 		};
 		6A225A2023679F5F00F685C6 /* ShellScript */ = {
 			isa = PBXShellScriptBuildPhase;
