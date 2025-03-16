@@ -20,7 +20,7 @@ import SwiftExtension
 extension SessionCtl {
   // MARK: Public
 
-  public override func menu() -> NSMenu {
+  override public func menu() -> NSMenu {
     .init().appendItems(self) {
       NSMenu.Item(verbatim: currentRAMUsageDescription)
       NSMenu.Item(
@@ -151,7 +151,7 @@ extension SessionCtl {
   }
 
   @objc
-  public override func showPreferences(_: Any? = nil) {
+  override public func showPreferences(_: Any? = nil) {
     osCheck: if #available(macOS 13, *) {
       switch NSEvent.keyModifierFlags {
       case .option: break osCheck
@@ -437,7 +437,7 @@ extension SessionCtl {
   var currentRAMUsageDescription: String? {
     guard PrefMgr.shared.isDebugModeEnabled else { return nil }
     guard let currentMemorySizeInBytes = NSApplication.memoryFootprint else { return nil }
-    let currentMemorySize: Double = (Double(currentMemorySizeInBytes) / 1024 / 1024)
+    let currentMemorySize: Double = (Double(currentMemorySizeInBytes) / 1_024 / 1_024)
       .rounded(toPlaces: 1)
     return "Total RAM Usage: \(currentMemorySize)MB"
   }

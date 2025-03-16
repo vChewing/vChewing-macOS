@@ -12,7 +12,7 @@ extension LMAssembly {
   struct LMPlainBopomofo {
     // MARK: Lifecycle
 
-    public init() {
+    init() {
       do {
         let rawData = jsnEtenDosSequence.data(using: .utf8) ?? .init([])
         let rawJSON = try JSONDecoder().decode([String: [String: String]].self, from: rawData)
@@ -26,13 +26,17 @@ extension LMAssembly {
       }
     }
 
-    // MARK: Public
+    // MARK: Internal
 
-    public var count: Int { dataMap.count }
+    @usableFromInline typealias DataMap = [String: [String: String]]
 
-    public var isLoaded: Bool { !dataMap.isEmpty }
+    let dataMap: DataMap
 
-    public func valuesFor(key: String, isCHS: Bool) -> [String] {
+    var count: Int { dataMap.count }
+
+    var isLoaded: Bool { !dataMap.isEmpty }
+
+    func valuesFor(key: String, isCHS: Bool) -> [String] {
       var pairs: [String] = []
       let subKey = isCHS ? "S" : "T"
       if let arrRangeRecords: String = dataMap[key]?[subKey] {
@@ -42,12 +46,6 @@ extension LMAssembly {
       return pairs
     }
 
-    public func hasValuesFor(key: String) -> Bool { dataMap.keys.contains(key) }
-
-    // MARK: Internal
-
-    @usableFromInline typealias DataMap = [String: [String: String]]
-
-    let dataMap: DataMap
+    func hasValuesFor(key: String) -> Bool { dataMap.keys.contains(key) }
   }
 }

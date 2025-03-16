@@ -25,7 +25,7 @@ extension LMAssembly {
     ///   - consolidate: 請且僅請對使用者語言模組啟用該參數：是否自動整理格式。
     ///   - defaultScore: 當某一筆資料內的權重資料毀損時，要施加的預設權重。
     ///   - forceDefaultScore: 啟用該選項的話，會強制施加預設權重、而無視原始權重資料。
-    public init(
+    init(
       reverse: Bool = false, consolidate: Bool = false, defaultScore scoreDefault: Double = 0,
       forceDefaultScore: Bool = false
     ) {
@@ -36,21 +36,35 @@ extension LMAssembly {
       self.shouldForceDefaultScore = forceDefaultScore
     }
 
-    // MARK: Public
+    // MARK: Internal
 
-    public private(set) var filePath: String?
+    private(set) var filePath: String?
+
+    /// 資料庫辭典。索引內容為注音字串，資料內容則為字串首尾範圍、方便自 strData 取資料。
+    var rangeMap: [String: [Range<String.Index>]] = [:]
+    /// 資料庫追加辭典。
+    var temporaryMap: [String: [Megrez.Unigram]] = [:]
+    /// 資料庫字串陣列。
+    var strData: String = ""
+    /// 聲明原始檔案內第一、二縱列的內容是否彼此顛倒。
+    var shouldReverse = false
+    var allowConsolidation = false
+    /// 當某一筆資料內的權重資料毀損時，要施加的預設權重。
+    var defaultScore: Double = 0
+    /// 啟用該選項的話，會強制施加預設權重、而無視原始權重資料。
+    var shouldForceDefaultScore = false
 
     /// 資料陣列內承載的資料筆數。
-    public var count: Int { rangeMap.count }
+    var count: Int { rangeMap.count }
 
     /// 檢測資料庫辭典內是否已經有載入的資料。
-    public var isLoaded: Bool { !rangeMap.isEmpty }
+    var isLoaded: Bool { !rangeMap.isEmpty }
 
     /// 將資料從檔案讀入至資料庫辭典內。
     /// - parameters:
     ///   - path: 給定路徑。
     @discardableResult
-    public mutating func open(_ path: String) -> Bool {
+    mutating func open(_ path: String) -> Bool {
       if isLoaded { return false }
 
       let oldPath = filePath
@@ -85,7 +99,7 @@ extension LMAssembly {
     /// 將資料從檔案讀入至資料庫辭典內。
     /// - parameters:
     ///   - path: 給定路徑。
-    public mutating func replaceData(textData rawStrData: String) {
+    mutating func replaceData(textData rawStrData: String) {
       if strData == rawStrData { return }
       strData = rawStrData
       var newMap: [String: [Range<String.Index>]] = [:]
@@ -104,7 +118,7 @@ extension LMAssembly {
     }
 
     /// 將當前語言模組的資料庫辭典自記憶體內卸除。
-    public mutating func clear() {
+    mutating func clear() {
       filePath = nil
       strData.removeAll()
       rangeMap.removeAll()
@@ -112,7 +126,7 @@ extension LMAssembly {
 
     // MARK: - Advanced features
 
-    public func saveData() {
+    func saveData() {
       guard let filePath = filePath else { return }
       var dataToWrite = strData
       do {
@@ -132,7 +146,7 @@ extension LMAssembly {
     /// 將當前資料庫辭典的內容以文本的形式輸出至 macOS 內建的 Console.app。
     ///
     /// 該功能僅作偵錯之用途。
-    public func dump() {
+    func dump() {
       var strDump = ""
       for entry in rangeMap {
         let netaRanges: [Range<String.Index>] = entry.value
@@ -148,7 +162,7 @@ extension LMAssembly {
     /// 根據給定的讀音索引鍵，來獲取資料庫辭典內的對應資料陣列的字串首尾範圍資料、據此自 strData 取得字串形式的資料、生成單元圖陣列。
     /// - parameters:
     ///   - key: 讀音索引鍵。
-    public func unigramsFor(key: String) -> [Megrez.Unigram] {
+    func unigramsFor(key: String) -> [Megrez.Unigram] {
       var grams: [Megrez.Unigram] = []
       if let arrRangeRecords: [Range<String.Index>] = rangeMap[key] {
         for netaRange in arrRangeRecords {
@@ -173,25 +187,9 @@ extension LMAssembly {
     /// 根據給定的讀音索引鍵來確認資料庫辭典內是否存在對應的資料。
     /// - parameters:
     ///   - key: 讀音索引鍵。
-    public func hasUnigramsFor(key: String) -> Bool {
+    func hasUnigramsFor(key: String) -> Bool {
       rangeMap[key] != nil
     }
-
-    // MARK: Internal
-
-    /// 資料庫辭典。索引內容為注音字串，資料內容則為字串首尾範圍、方便自 strData 取資料。
-    var rangeMap: [String: [Range<String.Index>]] = [:]
-    /// 資料庫追加辭典。
-    var temporaryMap: [String: [Megrez.Unigram]] = [:]
-    /// 資料庫字串陣列。
-    var strData: String = ""
-    /// 聲明原始檔案內第一、二縱列的內容是否彼此顛倒。
-    var shouldReverse = false
-    var allowConsolidation = false
-    /// 當某一筆資料內的權重資料毀損時，要施加的預設權重。
-    var defaultScore: Double = 0
-    /// 啟用該選項的話，會強制施加預設權重、而無視原始權重資料。
-    var shouldForceDefaultScore = false
   }
 }
 

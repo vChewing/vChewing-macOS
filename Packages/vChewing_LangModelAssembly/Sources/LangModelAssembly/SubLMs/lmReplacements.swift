@@ -12,20 +12,23 @@ extension LMAssembly {
   struct LMReplacements {
     // MARK: Lifecycle
 
-    public init() {
+    init() {
       self.rangeMap = [:]
     }
 
-    // MARK: Public
+    // MARK: Internal
 
-    public private(set) var filePath: String?
+    private(set) var filePath: String?
 
-    public var count: Int { rangeMap.count }
+    var rangeMap: [String: Range<String.Index>] = [:]
+    var strData: String = ""
 
-    public var isLoaded: Bool { !rangeMap.isEmpty }
+    var count: Int { rangeMap.count }
+
+    var isLoaded: Bool { !rangeMap.isEmpty }
 
     @discardableResult
-    public mutating func open(_ path: String) -> Bool {
+    mutating func open(_ path: String) -> Bool {
       if isLoaded { return false }
       let oldPath = filePath
       filePath = nil
@@ -50,7 +53,7 @@ extension LMAssembly {
     /// 將資料從檔案讀入至資料庫辭典內。
     /// - parameters:
     ///   - path: 給定路徑。
-    public mutating func replaceData(textData rawStrData: String) {
+    mutating func replaceData(textData rawStrData: String) {
       if strData == rawStrData { return }
       strData = rawStrData
       var newMap: [String: Range<String.Index>] = [:]
@@ -64,13 +67,13 @@ extension LMAssembly {
       newMap.removeAll()
     }
 
-    public mutating func clear() {
+    mutating func clear() {
       filePath = nil
       strData.removeAll()
       rangeMap.removeAll()
     }
 
-    public func saveData() {
+    func saveData() {
       guard let filePath = filePath else { return }
       do {
         try strData.write(toFile: filePath, atomically: true, encoding: .utf8)
@@ -79,7 +82,7 @@ extension LMAssembly {
       }
     }
 
-    public func dump() {
+    func dump() {
       var strDump = ""
       for entry in rangeMap {
         strDump += strData[entry.value] + "\n"
@@ -87,7 +90,7 @@ extension LMAssembly {
       vCLMLog(strDump)
     }
 
-    public func valuesFor(key: String) -> String {
+    func valuesFor(key: String) -> String {
       guard let range = rangeMap[key] else {
         return ""
       }
@@ -98,14 +101,9 @@ extension LMAssembly {
       return String(arrNeta[1])
     }
 
-    public func hasValuesFor(key: String) -> Bool {
+    func hasValuesFor(key: String) -> Bool {
       rangeMap[key] != nil
     }
-
-    // MARK: Internal
-
-    var rangeMap: [String: Range<String.Index>] = [:]
-    var strData: String = ""
   }
 }
 

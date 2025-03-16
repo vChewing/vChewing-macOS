@@ -76,7 +76,7 @@ extension Date {
   public var stringTag: String {
     let dateFormatter = DateFormatter()
     dateFormatter.dateFormat = "yyyyMMdd.HHmm"
-    dateFormatter.timeZone = .init(secondsFromGMT: +28800) ?? .current
+    dateFormatter.timeZone = .init(secondsFromGMT: +28_800) ?? .current
     let strDate = dateFormatter.string(from: self)
     return strDate
   }

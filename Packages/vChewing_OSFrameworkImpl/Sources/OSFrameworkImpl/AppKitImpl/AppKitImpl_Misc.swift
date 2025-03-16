@@ -280,7 +280,7 @@ extension Date {
     var dateDigits = dateDigits
     let strDateDigits = dateDigits.description
     switch strDateDigits.count {
-    case 3, 4: dateDigits = currentYear * 10000 + dateDigits
+    case 3, 4: dateDigits = currentYear * 10_000 + dateDigits
     case 8:
       if let theHighest = strDateDigits.first, "12".contains(theHighest) { break }
       return false
@@ -303,7 +303,7 @@ extension Date {
   public static var currentYear: Int {
     let formatter = DateFormatter()
     formatter.dateFormat = "yyyy"
-    return Int(formatter.string(from: Date())) ?? 1970
+    return Int(formatter.string(from: Date())) ?? 1_970
   }
 }
 

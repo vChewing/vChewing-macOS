@@ -54,7 +54,7 @@ public final class InputHandler: InputHandlerProtocol {
   public var currentTypingMethod: TypingMethod = .vChewingFactory
 
   /// 半衰模組的衰減指數
-  public let kEpsilon: Double = 0.000_001
+  public let kEpsilon: Double = 0.000001
 
   public var strCodePointBuffer = "" // 內碼輸入專用組碼區
   public var calligrapher = "" // 磁帶專用組筆區
