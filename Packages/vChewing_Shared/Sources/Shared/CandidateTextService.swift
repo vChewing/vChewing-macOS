@@ -69,7 +69,7 @@ public struct CandidateTextService: Codable {
     case selector(String)
   }
 
-  public static var finalSanityCheck: ((CandidateTextService) -> Bool)?
+  public static var finalSanityCheck: ((Self) -> Bool)?
 
   public let key: String
   public let reading: [String]

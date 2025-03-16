@@ -21,7 +21,7 @@ extension SessionCtl {
   /// 生成 IMK 選字窗專用的候選字串陣列。
   /// - Parameter sender: 呼叫了該函式的客體（無須使用）。
   /// - Returns: IMK 選字窗專用的候選字串陣列。
-  public override func candidates(_ sender: Any!) -> [Any]! {
+  override public func candidates(_ sender: Any!) -> [Any]! {
     _ = sender // 防止格式整理工具毀掉與此對應的參數。
     var arrResult = [String]()
 
@@ -81,7 +81,7 @@ extension SessionCtl {
 
   /// IMK 選字窗限定函式，只要選字窗內的高亮內容選擇出現變化了、就會呼叫這個函式。
   /// - Parameter currentSelection: 已經高亮選中的候選字詞內容。
-  public override func candidateSelectionChanged(_ currentSelection: NSAttributedString!) {
+  override public func candidateSelectionChanged(_ currentSelection: NSAttributedString!) {
     guard state.isCandidateContainer else { return }
     guard let candidateString = currentSelection?.string, !candidateString.isEmpty else { return }
     // Handle candidatePairHighlightChanged().
@@ -105,7 +105,7 @@ extension SessionCtl {
   /// IMK 選字窗限定函式，只要選字窗確認了某個候選字詞的選擇、就會呼叫這個函式。
   /// - Remark: 不要被 IMK 的 API 命名方式困惑到。這其實是 Confirm Selection 確認選字。
   /// - Parameter candidateString: 已經確認的候選字詞內容。
-  public override func candidateSelected(_ candidateString: NSAttributedString!) {
+  override public func candidateSelected(_ candidateString: NSAttributedString!) {
     guard state.isCandidateContainer else { return }
     let candidateString: String = candidateString?.string ?? ""
     if state.type == .ofAssociates {

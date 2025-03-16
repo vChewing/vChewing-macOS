@@ -89,7 +89,7 @@ extension LMAssembly.InputToken {
       switch type {
       case .year:
         var delta = DateComponents()
-        let thisYear = Calendar.current.dateComponents([.year], from: currentDate).year ?? 2018
+        let thisYear = Calendar.current.dateComponents([.year], from: currentDate).year ?? 2_018
         delta.year = max(deltaValue, thisYear * -1)
         dateToDescribe = Calendar.current.date(byAdding: delta, to: currentDate) ?? currentDate
       case .day:

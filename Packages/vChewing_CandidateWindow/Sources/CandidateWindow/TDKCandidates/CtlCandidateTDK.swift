@@ -59,9 +59,34 @@ public class CtlCandidateTDK: CtlCandidate, NSWindowDelegate {
     fatalError("init(coder:) has not been implemented")
   }
 
-  // MARK: Open
+  // MARK: Public
 
-  override open func updateDisplay() {
+  public static var currentMenu: NSMenu? {
+    willSet {
+      currentMenu?.cancelTracking()
+    }
+  }
+
+  public static var currentWindow: NSWindow? {
+    willSet {
+      currentWindow?.orderOut(nil)
+    }
+  }
+
+  // Already implemented in CandidatePool.
+  override public var highlightedIndex: Int {
+    get { Self.thePool.highlightedIndex }
+    set {
+      Self.thePool.highlight(at: newValue)
+      updateDisplay()
+    }
+  }
+
+  public var maxLinesPerPage: Int = 0
+  public var useCocoa: Bool = false
+  public var useMouseScrolling: Bool = true
+
+  override public func updateDisplay() {
     guard let window = window else { return }
     asyncOnMain { [weak self] in
       guard let self = self else { return }
@@ -96,33 +121,6 @@ public class CtlCandidateTDK: CtlCandidate, NSWindowDelegate {
     Self.thePool.tooltip = delegate?.candidateToolTip(shortened: !Self.thePool.isMatrix) ?? ""
     delegate?.candidatePairHighlightChanged(at: highlightedIndex)
   }
-
-  // MARK: Public
-
-  public static var currentMenu: NSMenu? {
-    willSet {
-      currentMenu?.cancelTracking()
-    }
-  }
-
-  public static var currentWindow: NSWindow? {
-    willSet {
-      currentWindow?.orderOut(nil)
-    }
-  }
-
-  // Already implemented in CandidatePool.
-  override public var highlightedIndex: Int {
-    get { Self.thePool.highlightedIndex }
-    set {
-      Self.thePool.highlight(at: newValue)
-      updateDisplay()
-    }
-  }
-
-  public var maxLinesPerPage: Int = 0
-  public var useCocoa: Bool = false
-  public var useMouseScrolling: Bool = true
 
   // MARK: - Public functions
 

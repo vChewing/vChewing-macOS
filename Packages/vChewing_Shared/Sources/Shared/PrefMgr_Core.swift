@@ -81,7 +81,7 @@ public class PrefMgr: NSObject, PrefMgrProtocol {
   @AppProperty(key: UserDef.kCheckAbusersOfSecureEventInputAPI.rawValue, defaultValue: true)
   public dynamic var checkAbusersOfSecureEventInputAPI: Bool
 
-  @AppProperty(key: UserDef.kDeltaOfCalendarYears.rawValue, defaultValue: -2000)
+  @AppProperty(key: UserDef.kDeltaOfCalendarYears.rawValue, defaultValue: -2_000)
   public dynamic var deltaOfCalendarYears: Int
 
   @AppProperty(key: UserDef.kMostRecentInputMode.rawValue, defaultValue: "")
