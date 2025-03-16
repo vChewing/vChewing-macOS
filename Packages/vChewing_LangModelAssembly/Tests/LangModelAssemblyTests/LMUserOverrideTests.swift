@@ -7,6 +7,7 @@
 // requirements defined in MIT License.
 
 import Foundation
+import Megrez
 import XCTest
 
 @testable import LangModelAssembly
@@ -166,6 +167,60 @@ final class LMUserOverrideTests: XCTestCase {
     XCTAssert(suggested.candidates.isEmpty)
   }
 
+  func testUOM_4_ObservationKeyGeneration() throws {
+    let sentence1: [Megrez.Node] = [
+      ("you1-die2", "幽蝶", -8.496),
+      ("neng2", "能", -5.36),
+      ("liu2-yi4", "留意", -4.407),
+      ("lv3-fang1", "呂方", -6.585),
+    ].map(Megrez.Node.fromTuplet)
+
+    let sentence2: [Megrez.Node] = [
+      ("you1-die2", "幽蝶", -8.496),
+      ("neng2", "能", -5.36),
+      ("liu2", "留", -5.245),
+      ("yi4", "亦", -5.205),
+      ("lv3-fang1", "呂方", -6.585),
+    ].map(Megrez.Node.fromTuplet)
+
+    let sentence3: [Megrez.Node] = [
+      ("you1-die2", "幽蝶", -8.496),
+      ("neng2", "能", -5.36),
+      ("liu2", "留", -5.245),
+      ("yi4-lv3", "一縷", -8.496),
+      ("fang1", "芳", -6.237),
+    ].map(Megrez.Node.fromTuplet)
+
+    let uom = LMAssembly.LMUserOverride(
+      capacity: capacity,
+      decayConstant: Double(halfLife)
+    )
+
+    // S2 vs S3，非插斷之情形。此時 Head 取游標正前方的相鄰節點。
+    do {
+      let key2v3 = uom.performObservation(
+        walkedBefore: sentence2,
+        walkedAfter: sentence3,
+        cursor: 4, // 此時的當前節點的詞音為 yi4-lv3 (一縷)。
+        timestamp: Date.now.timeIntervalSince1970
+      ) ?? ("NULL", "NULL")
+      XCTAssertTrue(key2v3 == ("((neng2,能),(liu2,留),yi4-lv3)", "一縷"))
+      // 避免出現這種狗屄倒肏的結果：
+      XCTAssertTrue(key2v3 != ("((liu2,留),(yi4-lv3,一縷),fang1)", "一縷"))
+    }
+
+    // S1 vs S2，乃插斷之情形。此時 Head 取游標位置起算的單字節點。
+    do {
+      let key1v2 = uom.performObservation(
+        walkedBefore: sentence1,
+        walkedAfter: sentence2,
+        cursor: 3, // 此時的當前節點的詞音為 liu2-yi4 (留意)。
+        timestamp: Date.now.timeIntervalSince1970
+      ) ?? ("NULL", "NULL")
+      XCTAssertTrue(key1v2 == ("((you1-die2,幽蝶),(neng2,能),liu2)", "留"))
+    }
+  }
+
   // MARK: Private
 
   private func observe(
@@ -181,5 +236,17 @@ final class LMUserOverrideTests: XCTestCase {
       forceHighScoreOverride: false,
       saveCallback: {}
     )
+  }
+}
+
+extension Megrez.Node {
+  fileprivate static func fromTuplet(
+    _ tuplet4Test: (keyChain: String, value: String, score: Double)
+  )
+    -> Megrez.Node {
+    let keyCells = tuplet4Test.keyChain.split(separator: "-").map(\.description)
+    return Megrez.Node(keyArray: keyCells, spanLength: keyCells.count, unigrams: [
+      .init(value: tuplet4Test.value, score: tuplet4Test.score),
+    ])
   }
 }
