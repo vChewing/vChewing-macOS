@@ -140,39 +140,63 @@ extension LMAssembly.LMUserOverride {
 
 // MARK: - Internal Methods in LMAssembly.
 
+extension Array where Element == Megrez.Node {
+  /// 在陣列內以給定游標位置找出對應的節點。
+  /// - Parameters:
+  ///   - cursor: 給定游標位置。
+  ///   - outCursorPastNode: 找出的節點的前端位置。
+  /// - Returns: 查找結果。
+  public func findNodeWithRange(at cursor: Int) -> (node: Megrez.Node, range: Range<Int>)? {
+    guard !isEmpty else { return nil }
+    let cursor = Swift.max(0, Swift.min(cursor, totalKeyCount - 1)) // 防呆
+    let range = contextRange(ofGivenCursor: cursor)
+    guard let rearNodeID = cursorRegionMap[cursor] else { return nil }
+    guard count - 1 >= rearNodeID else { return nil }
+    return (self[rearNodeID], range)
+  }
+}
+
 extension LMAssembly.LMUserOverride {
+  @discardableResult
   func performObservation(
     walkedBefore: [Megrez.Node], walkedAfter: [Megrez.Node],
     cursor: Int, timestamp: Double, saveCallback: (() -> ())? = nil
-  ) {
+  )
+    -> (key: String, candidate: String)? {
     // 參數合規性檢查。
-    guard !walkedAfter.isEmpty, !walkedBefore.isEmpty else { return }
-    guard walkedBefore.totalKeyCount == walkedAfter.totalKeyCount else { return }
+    let countBefore = walkedBefore.totalKeyCount
+    let countAfter = walkedAfter.totalKeyCount
+    guard countBefore == countAfter, countBefore * countAfter > 0 else { return nil }
     // 先判斷用哪種覆寫方法。
-    var actualCursor = 0
-    guard let currentNode = walkedAfter.findNode(at: cursor, target: &actualCursor) else { return }
+    let currentNodeResult = walkedAfter.findNodeWithRange(at: cursor)
+    guard let currentNodeResult else { return nil }
+    let currentNode = currentNodeResult.node
     // 當前節點超過三個字的話，就不記憶了。在這種情形下，使用者可以考慮新增自訂語彙。
-    guard currentNode.spanLength <= 3 else { return }
+    guard currentNode.spanLength <= 3 else { return nil }
     // 前一個節點得從前一次爬軌結果當中來找。
-    guard actualCursor > 0 else { return } // 該情況應該不會出現。
-    let currentNodeIndex = actualCursor
-    actualCursor -= 1
-    var prevNodeIndex = 0
-    guard let prevNode = walkedBefore.findNode(at: actualCursor, target: &prevNodeIndex)
-    else { return }
-
+    guard currentNodeResult.range.upperBound > 0 else { return nil } // 該例外應該不會出現。
+    let prevNodeResult = walkedBefore.findNodeWithRange(at: currentNodeResult.range.upperBound - 1)
+    guard let prevNodeResult else { return nil }
+    let prevNode = prevNodeResult.node
+    // 此處不宜僅比較 spanLength 長短差異，否則可能會生成無效的洞察 Key。
+    // 錯誤範例：`let breakingUp = currentNode.spanLength == 1 && prevNode.spanLength > 1`。
+    // 會生成這種錯誤結果：`"((liu2:留),(yi4-lv3:一縷),fang1)", "一縷"`。
+    // 對洞察 key 有效性的判斷鐵則：給出的建議候選字詞的讀音必須與洞察 key 的 head 端的讀音完全一致。
+    // 正確範例：`"((neng2:能),(liu2:留),yi4-lv3)", "一縷"`。
+    let currentNodeScope = currentNodeResult.range
+    let prevNodeScope = prevNodeResult.range
+    let scopeChanged = currentNodeScope != prevNodeScope
     let forceHighScoreOverride: Bool = currentNode.spanLength > prevNode.spanLength
-    let breakingUp = currentNode.spanLength == 1 && prevNode.spanLength > 1
-
-    let targetNodeIndex = breakingUp ? currentNodeIndex : prevNodeIndex
+    let targetNodeIndex = scopeChanged ? currentNodeScope.upperBound : prevNodeScope.upperBound
     let key: String = LMAssembly.LMUserOverride.formObservationKey(
       walkedNodes: walkedAfter, headIndex: targetNodeIndex
     )
-    guard !key.isEmpty else { return }
+    guard !key.isEmpty else { return nil }
     doObservation(
       key: key, candidate: currentNode.currentUnigram.value, timestamp: timestamp,
       forceHighScoreOverride: forceHighScoreOverride, saveCallback: saveCallback
     )
+    return (key, currentNode.value)
   }
 
   func fetchSuggestion(
