@@ -87,10 +87,10 @@ extension NSWorkspace {
 
     // MARK: Public
 
-    public static let hibernating = ActivationFlags(rawValue: 1 << 0)
-    public static let desktopLocked = ActivationFlags(rawValue: 1 << 1)
-    public static let sessionSwitchedOut = ActivationFlags(rawValue: 1 << 2)
-    public static let screenSaverRunning = ActivationFlags(rawValue: 1 << 3)
+    public static let hibernating = Self(rawValue: 1 << 0)
+    public static let desktopLocked = Self(rawValue: 1 << 1)
+    public static let sessionSwitchedOut = Self(rawValue: 1 << 2)
+    public static let screenSaverRunning = Self(rawValue: 1 << 3)
 
     public let rawValue: Int
   }

@@ -64,9 +64,9 @@ public class VwrCandidateTDKAppKit: NSView {
 // MARK: - Interface Renderer (with shared public variables).
 
 extension VwrCandidateTDKAppKit {
-  public override var isFlipped: Bool { true }
+  override public var isFlipped: Bool { true }
 
-  public override var fittingSize: NSSize { thePool.metrics.fittingSize }
+  override public var fittingSize: NSSize { thePool.metrics.fittingSize }
 
   public static var candidateListBackground: NSColor {
     let brightBackground = NSColor(red: 0.99, green: 0.99, blue: 0.99, alpha: 1.00)
@@ -74,7 +74,7 @@ extension VwrCandidateTDKAppKit {
     return NSApplication.isDarkMode ? darkBackground : brightBackground
   }
 
-  public override func draw(_: NSRect) {
+  override public func draw(_: NSRect) {
     let sizesCalculated = thePool.metrics
     // 先塗底色
     let allRect = NSRect(origin: .zero, size: sizesCalculated.fittingSize)
@@ -137,7 +137,7 @@ extension VwrCandidateTDKAppKit {
     return firstValidCell.index
   }
 
-  public override func mouseDown(with event: NSEvent) {
+  override public func mouseDown(with event: NSEvent) {
     guard let cellIndex = findCell(from: event) else { return }
     guard cellIndex != thePool.highlightedIndex else { return }
     thePool.highlight(at: cellIndex)
@@ -145,16 +145,16 @@ extension VwrCandidateTDKAppKit {
     setNeedsDisplay(bounds)
   }
 
-  public override func mouseDragged(with event: NSEvent) {
+  override public func mouseDragged(with event: NSEvent) {
     mouseDown(with: event)
   }
 
-  public override func mouseUp(with event: NSEvent) {
+  override public func mouseUp(with event: NSEvent) {
     guard let cellIndex = findCell(from: event) else { return }
     didSelectCandidateAt(cellIndex)
   }
 
-  public override func rightMouseUp(with event: NSEvent) {
+  override public func rightMouseUp(with event: NSEvent) {
     guard let cellIndex = findCell(from: event) else { return }
     clickedCell = thePool.candidateDataAll[cellIndex]
     let index = clickedCell.index

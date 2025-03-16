@@ -14,20 +14,34 @@ extension LMAssembly {
   struct LMAssociates {
     // MARK: Lifecycle
 
-    public init() {
+    init() {
       self.rangeMap = [:]
     }
 
-    // MARK: Public
+    // MARK: Internal
 
-    public private(set) var filePath: String?
+    private(set) var filePath: String?
 
-    public var count: Int { rangeMap.count }
+    var rangeMap: [String: [(Range<String.Index>, Int)]] = [:] // Range 只可能是一整行，所以必須得有 index。
+    var strData: String = ""
 
-    public var isLoaded: Bool { !rangeMap.isEmpty }
+    var count: Int { rangeMap.count }
+
+    var isLoaded: Bool { !rangeMap.isEmpty }
+
+    internal static func cnvNGramKeyFromPinyinToPhona(target: String) -> String {
+      guard target.contains("("), target.contains(","), target.contains(")") else {
+        return target
+      }
+      let arrTarget = target.dropLast().dropFirst().split(separator: ",")
+      guard arrTarget.count == 2 else { return target }
+      var arrTarget0 = String(arrTarget[0]).lowercased()
+      arrTarget0.convertToPhonabets()
+      return "(\(arrTarget0),\(arrTarget[1]))"
+    }
 
     @discardableResult
-    public mutating func open(_ path: String) -> Bool {
+    mutating func open(_ path: String) -> Bool {
       if isLoaded { return false }
       let oldPath = filePath
       filePath = nil
@@ -52,7 +66,7 @@ extension LMAssembly {
     /// 將資料從檔案讀入至資料庫辭典內。
     /// - parameters:
     ///   - path: 給定路徑。
-    public mutating func replaceData(textData rawStrData: String) {
+    mutating func replaceData(textData rawStrData: String) {
       if strData == rawStrData { return }
       strData = rawStrData
       var newMap: [String: [(Range<String.Index>, Int)]] = [:]
@@ -74,13 +88,13 @@ extension LMAssembly {
       newMap.removeAll()
     }
 
-    public mutating func clear() {
+    mutating func clear() {
       filePath = nil
       strData.removeAll()
       rangeMap.removeAll()
     }
 
-    public func saveData() {
+    func saveData() {
       guard let filePath = filePath else { return }
       do {
         try strData.write(toFile: filePath, atomically: true, encoding: .utf8)
@@ -89,7 +103,7 @@ extension LMAssembly {
       }
     }
 
-    public func valuesFor(pair: Megrez.KeyValuePaired) -> [String] {
+    func valuesFor(pair: Megrez.KeyValuePaired) -> [String] {
       var pairs: [String] = []
       let availableResults = [rangeMap[pair.toNGramKey], rangeMap[pair.value]].compactMap { $0 }
       availableResults.forEach { arrRangeRecords in
@@ -102,25 +116,9 @@ extension LMAssembly {
       return pairs.deduplicated
     }
 
-    public func hasValuesFor(pair: Megrez.KeyValuePaired) -> Bool {
+    func hasValuesFor(pair: Megrez.KeyValuePaired) -> Bool {
       if rangeMap[pair.toNGramKey] != nil { return true }
       return rangeMap[pair.value] != nil
-    }
-
-    // MARK: Internal
-
-    var rangeMap: [String: [(Range<String.Index>, Int)]] = [:] // Range 只可能是一整行，所以必須得有 index。
-    var strData: String = ""
-
-    internal static func cnvNGramKeyFromPinyinToPhona(target: String) -> String {
-      guard target.contains("("), target.contains(","), target.contains(")") else {
-        return target
-      }
-      let arrTarget = target.dropLast().dropFirst().split(separator: ",")
-      guard arrTarget.count == 2 else { return target }
-      var arrTarget0 = String(arrTarget[0]).lowercased()
-      arrTarget0.convertToPhonabets()
-      return "(\(arrTarget0),\(arrTarget[1]))"
     }
   }
 }

@@ -36,14 +36,14 @@ extension Binding {
 struct Tooltip: NSViewRepresentable {
   let tooltip: String
 
-  func makeNSView(context _: NSViewRepresentableContext<Tooltip>) -> NSView {
+  func makeNSView(context _: NSViewRepresentableContext<Self>) -> NSView {
     let view = NSView()
     view.toolTip = tooltip
 
     return view
   }
 
-  func updateNSView(_: NSView, context _: NSViewRepresentableContext<Tooltip>) {}
+  func updateNSView(_: NSView, context _: NSViewRepresentableContext<Self>) {}
 }
 
 @available(macOS 10.15, *)

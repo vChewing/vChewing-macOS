@@ -45,7 +45,7 @@ public class SessionCtl: IMKInputController {
 
   // MARK: Public
 
-  public private(set) weak static var currentInputController: SessionCtl?
+  public private(set) static weak var currentInputController: SessionCtl?
 
   public private(set) lazy var core: InputSession = .init(controller: self, client: client)
 }
@@ -55,7 +55,7 @@ public class SessionCtl: IMKInputController {
 extension SessionCtl {
   /// 啟用輸入法時，會觸發該函式。
   /// - Parameter sender: 呼叫了該函式的客體。
-  public override func activateServer(_ sender: Any!) {
+  override public func activateServer(_ sender: Any!) {
     super.activateServer(sender)
     Self.currentInputController = self
     core.activateServer(sender)
@@ -63,7 +63,7 @@ extension SessionCtl {
 
   /// 停用輸入法時，會觸發該函式。
   /// - Parameter sender: 呼叫了該函式的客體（無須使用）。
-  public override func deactivateServer(_ sender: Any!) {
+  override public func deactivateServer(_ sender: Any!) {
     core.deactivateServer(sender)
     super.deactivateServer(sender)
   }
@@ -75,7 +75,7 @@ extension SessionCtl {
   ///   - value: 輸入法在系統偏好設定當中的副本的 identifier，與 bundle identifier 類似。在輸入法的 info.plist 內定義。
   ///   - tag: 標記（無須使用）。
   ///   - sender: 呼叫了該函式的客體（無須使用）。
-  public override func setValue(_ value: Any!, forTag tag: Int, client sender: Any!) {
+  override public func setValue(_ value: Any!, forTag tag: Int, client sender: Any!) {
     core.setValue(value, forTag: tag, client: sender)
     super.setValue(value, forTag: tag, client: sender)
   }
@@ -91,7 +91,7 @@ extension SessionCtl {
   ///   - sender: 呼叫了該函式的客體（無須使用）。
   /// - Returns: 回「`true`」以將該按鍵已攔截處理的訊息傳遞給 IMK；回「`false`」則放行、不作處理。
   @objc(handleEvent:client:)
-  public override func handle(
+  override public func handle(
     _ event: NSEvent?,
     client sender: Any?
   )
@@ -108,7 +108,7 @@ extension SessionCtl {
   /// 「`commitComposition(_ message)`」遞交給客體。
   /// - Parameter sender: 呼叫了該函式的客體（無須使用）。
   /// - Returns: 返回一個 uint，其中承載了與系統 NSEvent 操作事件有關的掩碼集合（詳見 NSEvent.h）。
-  public override func recognizedEvents(_ sender: Any!) -> Int {
+  override public func recognizedEvents(_ sender: Any!) -> Int {
     core.recognizedEvents(sender)
   }
 
@@ -116,7 +116,7 @@ extension SessionCtl {
   /// 也就是說 handle(event:) 完全抓不到這個 Event。
   /// 這時需要在 commitComposition 這一關做一些收尾處理。
   /// - Parameter sender: 呼叫了該函式的客體（無須使用）。
-  public override func commitComposition(_ sender: Any!) {
+  override public func commitComposition(_ sender: Any!) {
     core.commitComposition(sender)
     // super.commitComposition(sender)  // 這句不要引入，否則每次切出輸入法時都會死當。
   }
@@ -124,24 +124,24 @@ extension SessionCtl {
   /// 指定輸入法要遞交出去的內容（雖然 InputMethodKit 可能並不會真的用到這個函式）。
   /// - Parameter sender: 呼叫了該函式的客體（無須使用）。
   /// - Returns: 字串內容，或者 nil。
-  public override func composedString(_ sender: Any!) -> Any! {
+  override public func composedString(_ sender: Any!) -> Any! {
     core.composedString(sender)
   }
 
   /// 輸入法要被換掉或關掉的時候，要做的事情。
   /// 不過好像因為 IMK 的 Bug 而並不會被執行。
-  public override func inputControllerWillClose() {
+  override public func inputControllerWillClose() {
     // 下述兩行用來防止尚未完成拼寫的注音內容被遞交出去。
     core.inputControllerWillClose()
   }
 
   /// 指定標記模式下被高亮的部分。
-  public override func selectionRange() -> NSRange {
+  override public func selectionRange() -> NSRange {
     core.selectionRange()
   }
 
   /// 該函式僅用來取消任何輸入法浮動視窗的顯示。
-  public override func hidePalettes() {
+  override public func hidePalettes() {
     core.hidePalettes()
   }
 }

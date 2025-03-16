@@ -16,7 +16,7 @@ import XCTest
 let testClient = FakeClient()
 
 extension SessionCtl {
-  public override func client() -> (IMKTextInput & NSObjectProtocol)! { testClient }
+  override public func client() -> (IMKTextInput & NSObjectProtocol)! { testClient }
 }
 
 func vCTestLog(_ str: String) {

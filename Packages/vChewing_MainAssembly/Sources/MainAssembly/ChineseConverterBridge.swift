@@ -112,10 +112,10 @@ public enum ChineseConverter {
       PrefMgr.shared.chineseConversionEnabled,
       PrefMgr.shared.shiftJISShinjitaiOutputEnabled
     ) {
-    case (false, true): return ChineseConverter.cnvTradToJIS(text)
-    case (true, false): return ChineseConverter.cnvTradToKangXi(text)
+    case (false, true): return Self.cnvTradToJIS(text)
+    case (true, false): return Self.cnvTradToKangXi(text)
     // 本來這兩個開關不該同時開啟的，但萬一被同時開啟了的話就這樣處理：
-    case (true, true): return ChineseConverter.cnvTradToJIS(text)
+    case (true, true): return Self.cnvTradToJIS(text)
     case (false, false): return text
     }
   }

@@ -9,7 +9,7 @@ public class LineReader {
 
   public init(
     file: FileHandle, encoding: String.Encoding = .utf8,
-    chunkSize: Int = 4096
+    chunkSize: Int = 4_096
   ) throws {
     let fileHandle = file
     self.encoding = encoding

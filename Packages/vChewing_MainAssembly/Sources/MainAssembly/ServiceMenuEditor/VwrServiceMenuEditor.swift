@@ -142,7 +142,7 @@ public class VwrServiceMenuEditor: NSViewController {
 
     tableColumn2.identifier = NSUserInterfaceItemIdentifier("colValue")
     tableColumn2.headerCell.title = "i18n:CandidateServiceMenuEditor.table.field.Value".localized
-    tableColumn2.maxWidth = 1000
+    tableColumn2.maxWidth = 1_000
     tableColumn2.minWidth = 40
     tableColumn2.resizingMask = [.autoresizingMask, .userResizingMask]
     tableColumn2.width = 480

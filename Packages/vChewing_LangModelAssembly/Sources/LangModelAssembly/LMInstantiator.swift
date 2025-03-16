@@ -52,7 +52,7 @@ extension LMAssembly {
       public var isSymbolEnabled = false
       public var isSCPCEnabled = false
       public var filterNonCNSReadings = false
-      public var deltaOfCalendarYears: Int = -2000
+      public var deltaOfCalendarYears: Int = -2_000
     }
 
     public static var asyncLoadingUserData: Bool = true
@@ -388,7 +388,7 @@ extension LMAssembly {
         userPhraseUnigrams = userPhraseUnigrams.map { currentUnigram in
           Megrez.Unigram(
             value: currentUnigram.value,
-            score: Swift.min(topScore + 0.000_114_514, currentUnigram.score)
+            score: Swift.min(topScore + 0.000114514, currentUnigram.score)
           )
         }
       }

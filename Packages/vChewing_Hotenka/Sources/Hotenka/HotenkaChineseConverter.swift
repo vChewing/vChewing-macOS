@@ -61,8 +61,8 @@ public enum DictType: Int, CaseIterable {
     }
   }
 
-  public static func match(rawKeyString: String) -> DictType? {
-    DictType.allCases.filter { $0.rawKeyString == rawKeyString }.first
+  public static func match(rawKeyString: String) -> Self? {
+    Self.allCases.filter { $0.rawKeyString == rawKeyString }.first
   }
 }
 
@@ -148,7 +148,7 @@ public class HotenkaChineseConverter {
 
     for dictType in dictFiles.keys {
       guard let arrFiles = dictFiles[dictType] else { continue }
-      if arrFiles.count <= 0 {
+      if arrFiles.isEmpty {
         continue
       }
 

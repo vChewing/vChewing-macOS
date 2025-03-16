@@ -23,7 +23,7 @@ extension NSEvent {
       self.flags = flags
       self.chars = chars
       self.charsSansModifiers = charsSansModifiers ?? chars
-      self.keyCode = keyCode ?? mapKeyCodesANSIForTests[chars] ?? 65535
+      self.keyCode = keyCode ?? mapKeyCodesANSIForTests[chars] ?? 65_535
     }
 
     // MARK: Public

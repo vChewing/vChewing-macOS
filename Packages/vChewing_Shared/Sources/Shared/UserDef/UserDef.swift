@@ -153,7 +153,7 @@ public enum UserDef: String, CaseIterable, Identifiable {
   // MARK: - SnapShot-Related Methods.
 
   public static func resetAll() {
-    UserDef.allCases.forEach {
+    Self.allCases.forEach {
       UserDefaults.current.removeObject(forKey: $0.rawValue)
     }
   }
@@ -161,7 +161,7 @@ public enum UserDef: String, CaseIterable, Identifiable {
   public static func load(from snapshot: Snapshot) {
     let data = snapshot.data
     guard !data.isEmpty else { return }
-    UserDef.allCases.forEach {
+    Self.allCases.forEach {
       UserDefaults.current.set(data[$0.rawValue], forKey: $0.rawValue)
     }
   }

@@ -22,7 +22,7 @@ public enum TypingMethod: Int, CaseIterable {
   mutating func revolveNext() {
     var theInt = rawValue
     theInt.revolveAsIndex(with: Self.allCases)
-    guard let nextMethod = TypingMethod(rawValue: theInt) else { return }
+    guard let nextMethod = Self(rawValue: theInt) else { return }
     self = nextMethod
   }
 

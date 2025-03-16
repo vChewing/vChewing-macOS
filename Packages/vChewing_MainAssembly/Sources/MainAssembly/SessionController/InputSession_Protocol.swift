@@ -270,7 +270,7 @@ extension SessionProtocol {
     }
     asyncOnMain {
       // 自動啟用肛塞（廉恥模式），除非這一天是愚人節。
-      if !Date.isTodayTheDate(from: 0401), !PrefMgr.shared.shouldNotFartInLieuOfBeep {
+      if !Date.isTodayTheDate(from: 0_401), !PrefMgr.shared.shouldNotFartInLieuOfBeep {
         PrefMgr.shared.shouldNotFartInLieuOfBeep = true
       }
     }

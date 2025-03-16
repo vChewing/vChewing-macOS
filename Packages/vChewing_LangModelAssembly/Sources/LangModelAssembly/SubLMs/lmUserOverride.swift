@@ -27,7 +27,7 @@ extension LMAssembly {
   class LMUserOverride {
     // MARK: Lifecycle
 
-    public init(
+    init(
       capacity: Int = 500,
       decayConstant: Double = LMUserOverride.kObservedOverrideHalfLife,
       dataURL: URL? = nil
@@ -37,11 +37,9 @@ extension LMAssembly {
       self.fileSaveLocationURL = dataURL
     }
 
-    // MARK: Public
-
-    public static let kObservedOverrideHalfLife: Double = 3600.0 * 6 // 6 小時半衰一次，能持續不到六天的記憶。
-
     // MARK: Internal
+
+    static let kObservedOverrideHalfLife: Double = 3_600.0 * 6 // 6 小時半衰一次，能持續不到六天的記憶。
 
     var mutCapacity: Int
     var mutDecayExponent: Double
@@ -64,7 +62,7 @@ extension LMAssembly.LMUserOverride {
     var timestamp: Double = 0.0
     var forceHighScoreOverride = false
 
-    static func == (lhs: Override, rhs: Override) -> Bool {
+    static func == (lhs: Self, rhs: Self) -> Bool {
       lhs.count == rhs.count && lhs.timestamp == rhs.timestamp
     }
 
@@ -86,7 +84,7 @@ extension LMAssembly.LMUserOverride {
     var count: Int = 0
     var overrides: [String: Override] = [:]
 
-    static func == (lhs: Observation, rhs: Observation) -> Bool {
+    static func == (lhs: Self, rhs: Self) -> Bool {
       lhs.count == rhs.count && lhs.overrides == rhs.overrides
     }
 
@@ -121,7 +119,7 @@ extension LMAssembly.LMUserOverride {
     var key: String
     var observation: Observation
 
-    static func == (lhs: KeyObservationPair, rhs: KeyObservationPair) -> Bool {
+    static func == (lhs: Self, rhs: Self) -> Bool {
       lhs.key == rhs.key && lhs.observation == rhs.observation
     }
 

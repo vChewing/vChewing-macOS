@@ -16,34 +16,34 @@ import Megrez
 extension LMAssembly {
   /// 磁帶模組，用來方便使用者自行擴充字根輸入法。
   struct LMCassette {
-    // MARK: Public
+    // MARK: Internal
 
-    public private(set) var filePath: String?
-    public private(set) var nameShort: String = ""
-    public private(set) var nameENG: String = ""
-    public private(set) var nameCJK: String = ""
-    public private(set) var nameIntl: String = ""
-    public private(set) var nullCandidate: String = ""
+    private(set) var filePath: String?
+    private(set) var nameShort: String = ""
+    private(set) var nameENG: String = ""
+    private(set) var nameCJK: String = ""
+    private(set) var nameIntl: String = ""
+    private(set) var nullCandidate: String = ""
     /// 一個漢字可能最多要用到多少碼。
-    public private(set) var maxKeyLength: Int = 1
-    public private(set) var selectionKeys: String = ""
-    public private(set) var endKeys: [String] = []
-    public private(set) var wildcardKey: String = ""
-    public private(set) var keysToDirectlyCommit: String = ""
-    public private(set) var keyNameMap: [String: String] = [:]
-    public private(set) var quickDefMap: [String: String] = [:]
-    public private(set) var charDefMap: [String: [String]] = [:]
-    public private(set) var charDefWildcardMap: [String: [String]] = [:]
-    public private(set) var symbolDefMap: [String: [String]] = [:]
-    public private(set) var reverseLookupMap: [String: [String]] = [:]
+    private(set) var maxKeyLength: Int = 1
+    private(set) var selectionKeys: String = ""
+    private(set) var endKeys: [String] = []
+    private(set) var wildcardKey: String = ""
+    private(set) var keysToDirectlyCommit: String = ""
+    private(set) var keyNameMap: [String: String] = [:]
+    private(set) var quickDefMap: [String: String] = [:]
+    private(set) var charDefMap: [String: [String]] = [:]
+    private(set) var charDefWildcardMap: [String: [String]] = [:]
+    private(set) var symbolDefMap: [String: [String]] = [:]
+    private(set) var reverseLookupMap: [String: [String]] = [:]
     /// 字根輸入法專用八股文：[字詞:頻次]。
-    public private(set) var octagramMap: [String: Int] = [:]
+    private(set) var octagramMap: [String: Int] = [:]
     /// 音韻輸入法專用八股文：[字詞:(頻次, 讀音)]。
-    public private(set) var octagramDividedMap: [String: (Int, String)] = [:]
-    public private(set) var areCandidateKeysShiftHeld: Bool = false
-    public private(set) var supplyQuickResults: Bool = false
-    public private(set) var supplyPartiallyMatchedResults: Bool = false
-    public var candidateKeysValidator: (String) -> Bool = { _ in false }
+    private(set) var octagramDividedMap: [String: (Int, String)] = [:]
+    private(set) var areCandidateKeysShiftHeld: Bool = false
+    private(set) var supplyQuickResults: Bool = false
+    private(set) var supplyPartiallyMatchedResults: Bool = false
+    var candidateKeysValidator: (String) -> Bool = { _ in false }
 
     // MARK: Private
 

@@ -82,7 +82,7 @@ public struct VwrSettingsPaneGeneral: View {
           UserDef.kClassicHaninKeyboardSymbolModeShortcutEnabled
             .bind($classicHaninKeyboardSymbolModeShortcutEnabled).render()
           UserDef.kUseSCPCTypingMode.bind($useSCPCTypingMode).render()
-          if Date.isTodayTheDate(from: 0401) {
+          if Date.isTodayTheDate(from: 0_401) {
             UserDef.kShouldNotFartInLieuOfBeep.bind(
               $shouldNotFartInLieuOfBeep.didChange { onFartControlChange() }
             ).render()

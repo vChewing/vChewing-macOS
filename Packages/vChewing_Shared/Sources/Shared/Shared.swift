@@ -201,18 +201,18 @@ public enum CandidateKey {
     var result = ValidationError.noError
     charValidityCheck: for neta in candidateKeys {
       if String(neta) == " " || forbiddenChars.contains(neta) {
-        result = CandidateKey.ValidationError.invalidCharacters
+        result = Self.ValidationError.invalidCharacters
         break charValidityCheck
       }
       for subNeta in neta.unicodeScalars {
         if !subNeta.isPrintableASCII {
-          result = CandidateKey.ValidationError.invalidCharacters
+          result = Self.ValidationError.invalidCharacters
           break charValidityCheck
         }
       }
     }
     if !(6 ... 10).contains(candidateKeys.count) {
-      result = CandidateKey.ValidationError.countMismatch
+      result = Self.ValidationError.countMismatch
     }
     return result == ValidationError.noError ? nil : result.description
   }
@@ -235,7 +235,7 @@ public enum Shared {
 
     // MARK: Public
 
-    public static var validCases: [InputMode] {
+    public static var validCases: [Self] {
       [.imeModeCHS, .imeModeCHT]
     }
 

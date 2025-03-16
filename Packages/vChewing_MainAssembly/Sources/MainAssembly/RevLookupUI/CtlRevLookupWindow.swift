@@ -47,12 +47,10 @@ class FrmRevLookupWindow: NSWindow {
     setupUI()
   }
 
-  // MARK: Public
-
-  public lazy var inputField = NSTextField()
-  public lazy var resultView = NSTextView()
-
   // MARK: Internal
+
+  lazy var inputField = NSTextField()
+  lazy var resultView = NSTextView()
 
   static func reloadData() {
     LMMgr.connectCoreDB()

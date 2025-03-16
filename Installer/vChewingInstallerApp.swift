@@ -32,12 +32,12 @@ struct vChewingInstallerApp: App {
         }
         MainView()
           .shadow(color: .black, radius: 3, x: 0, y: 0)
-      }.frame(width: 1000, height: 630)
+      }.frame(width: 1_000, height: 630)
         .onAppear {
           NSWindow.allowsAutomaticWindowTabbing = false
           NSApp.windows.forEach { window in
             window.titlebarAppearsTransparent = true
-            window.setContentSize(.init(width: 1000, height: 630))
+            window.setContentSize(.init(width: 1_000, height: 630))
             window.standardWindowButton(.closeButton)?.isHidden = true
             window.standardWindowButton(.miniaturizeButton)?.isHidden = true
             window.standardWindowButton(.zoomButton)?.isHidden = true

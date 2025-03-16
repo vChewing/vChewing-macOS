@@ -15,8 +15,8 @@ public struct KBEvent: InputSignalProtocol, Hashable {
   // MARK: Lifecycle
 
   public init(
-    with type: KBEvent.EventType? = nil,
-    modifierFlags: KBEvent.ModifierFlags? = nil,
+    with type: Self.EventType? = nil,
+    modifierFlags: Self.ModifierFlags? = nil,
     timestamp: TimeInterval? = nil,
     windowNumber: Int? = nil,
     characters: String? = nil,
@@ -53,8 +53,8 @@ public struct KBEvent: InputSignalProtocol, Hashable {
   public private(set) var keyCode: UInt16
 
   public func reinitiate(
-    with type: KBEvent.EventType? = nil,
-    modifierFlags: KBEvent.ModifierFlags? = nil,
+    with type: Self.EventType? = nil,
+    modifierFlags: Self.ModifierFlags? = nil,
     timestamp: TimeInterval? = nil,
     windowNumber: Int? = nil,
     characters: String? = nil,
@@ -62,9 +62,9 @@ public struct KBEvent: InputSignalProtocol, Hashable {
     isARepeat: Bool? = nil,
     keyCode: UInt16? = nil
   )
-    -> KBEvent {
+    -> Self {
     let oldChars: String = text
-    return KBEvent(
+    return Self(
       with: type ?? .keyDown,
       modifierFlags: modifierFlags ?? self.modifierFlags,
       timestamp: timestamp ?? self.timestamp,
@@ -90,18 +90,18 @@ extension KBEvent {
     // MARK: Public
 
     public static let capsLock =
-      ModifierFlags(rawValue: 1 << 16) // Set if Caps Lock key is pressed.
-    public static let shift = ModifierFlags(rawValue: 1 << 17) // Set if Shift key is pressed.
-    public static let control = ModifierFlags(rawValue: 1 << 18) // Set if Control key is pressed.
+      Self(rawValue: 1 << 16) // Set if Caps Lock key is pressed.
+    public static let shift = Self(rawValue: 1 << 17) // Set if Shift key is pressed.
+    public static let control = Self(rawValue: 1 << 18) // Set if Control key is pressed.
     public static let option =
-      ModifierFlags(rawValue: 1 << 19) // Set if Option or Alternate key is pressed.
-    public static let command = ModifierFlags(rawValue: 1 << 20) // Set if Command key is pressed.
+      Self(rawValue: 1 << 19) // Set if Option or Alternate key is pressed.
+    public static let command = Self(rawValue: 1 << 20) // Set if Command key is pressed.
     public static let numericPad =
-      ModifierFlags(rawValue: 1 << 21) // Set if any key in the numeric keypad is pressed.
-    public static let help = ModifierFlags(rawValue: 1 << 22) // Set if the Help key is pressed.
+      Self(rawValue: 1 << 21) // Set if any key in the numeric keypad is pressed.
+    public static let help = Self(rawValue: 1 << 22) // Set if the Help key is pressed.
     public static let function =
-      ModifierFlags(rawValue: 1 << 23) // Set if any function key is pressed.
-    public static let deviceIndependentFlagsMask = ModifierFlags(rawValue: 0xFFFF_0000)
+      Self(rawValue: 1 << 23) // Set if any function key is pressed.
+    public static let deviceIndependentFlagsMask = Self(rawValue: 0xFFFF_0000)
 
     public let rawValue: UInt
   }

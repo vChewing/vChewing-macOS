@@ -97,7 +97,7 @@ extension Megrez.Compositor {
 
 extension Megrez.Compositor {
   /// 用於追蹤搜尋過程中的狀態。
-  final private class SearchState: Hashable {
+  private final class SearchState: Hashable {
     // MARK: Lifecycle
 
     /// 初期化搜尋狀態。
@@ -143,11 +143,11 @@ extension Megrez.Compositor {
 
     // MARK: - Comparable 協定實作
 
-    static func < (lhs: PrioritizedState, rhs: PrioritizedState) -> Bool {
+    static func < (lhs: Self, rhs: Self) -> Bool {
       lhs.state.distance < rhs.state.distance
     }
 
-    static func == (lhs: PrioritizedState, rhs: PrioritizedState) -> Bool {
+    static func == (lhs: Self, rhs: Self) -> Bool {
       lhs.state == rhs.state
     }
   }

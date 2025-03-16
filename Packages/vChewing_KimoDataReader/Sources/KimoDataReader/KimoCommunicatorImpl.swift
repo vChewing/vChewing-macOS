@@ -13,11 +13,11 @@ public class KimoCommunicator: ObjcKimoCommunicator {
   public static let shared: KimoCommunicator = .init()
 
   public func prepareData(handler: @escaping (_ key: String, _ value: String) -> ()) {
-    guard KimoCommunicator.shared.establishConnection() else { return }
-    assert(KimoCommunicator.shared.hasValidConnection())
-    let loopAmount = KimoCommunicator.shared.userPhraseDBTotalAmountOfRows()
+    guard Self.shared.establishConnection() else { return }
+    assert(Self.shared.hasValidConnection())
+    let loopAmount = Self.shared.userPhraseDBTotalAmountOfRows()
     for i in 0 ..< loopAmount {
-      let fetched = KimoCommunicator.shared.userPhraseDBDictionary(atRow: i)
+      let fetched = Self.shared.userPhraseDBDictionary(atRow: i)
       guard let key = fetched["BPMF"], let text = fetched["Text"] else { continue }
       handler(key, text)
     }

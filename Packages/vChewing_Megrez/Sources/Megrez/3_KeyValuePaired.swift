@@ -71,30 +71,30 @@ extension Megrez {
     public var isValid: Bool { !keyArray.joined().isEmpty && !value.isEmpty }
     /// 將當前鍵值列印成一個字串，但如果該鍵值配對為空的話則僅列印「()」。
     public var toNGramKey: String { !isValid ? "()" : "(\(joinedKey()),\(value))" }
-    public var hardCopy: KeyValuePaired {
+    public var hardCopy: Self {
       .init(keyArray: keyArray, value: value, score: score)
     }
 
-    public static func == (lhs: KeyValuePaired, rhs: KeyValuePaired) -> Bool {
+    public static func == (lhs: Self, rhs: Self) -> Bool {
       lhs.hashValue == rhs.hashValue
     }
 
-    public static func < (lhs: KeyValuePaired, rhs: KeyValuePaired) -> Bool {
+    public static func < (lhs: Self, rhs: Self) -> Bool {
       (lhs.keyArray.count < rhs.keyArray.count)
         || (lhs.keyArray.count == rhs.keyArray.count && lhs.value < rhs.value)
     }
 
-    public static func > (lhs: KeyValuePaired, rhs: KeyValuePaired) -> Bool {
+    public static func > (lhs: Self, rhs: Self) -> Bool {
       (lhs.keyArray.count > rhs.keyArray.count)
         || (lhs.keyArray.count == rhs.keyArray.count && lhs.value > rhs.value)
     }
 
-    public static func <= (lhs: KeyValuePaired, rhs: KeyValuePaired) -> Bool {
+    public static func <= (lhs: Self, rhs: Self) -> Bool {
       (lhs.keyArray.count <= rhs.keyArray.count)
         || (lhs.keyArray.count == rhs.keyArray.count && lhs.value <= rhs.value)
     }
 
-    public static func >= (lhs: KeyValuePaired, rhs: KeyValuePaired) -> Bool {
+    public static func >= (lhs: Self, rhs: Self) -> Bool {
       (lhs.keyArray.count >= rhs.keyArray.count)
         || (lhs.keyArray.count == rhs.keyArray.count && lhs.value >= rhs.value)
     }
