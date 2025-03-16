@@ -99,7 +99,7 @@ extension Tekkon {
 
     /// 這些內容用來滿足 "Equatable, Hashable, ExpressibleByStringLiteral" 需求。
 
-    public static func == (lhs: Composer, rhs: Composer) -> Bool {
+    public static func == (lhs: Self, rhs: Self) -> Bool {
       lhs.value == rhs.value
     }
 

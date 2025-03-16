@@ -56,7 +56,7 @@ extension LMMgr {
       return result
     }
 
-    public var crossConverted: UserPhrase {
+    public var crossConverted: Self {
       if isConverted { return self }
       var result = self
       result.value = ChineseConverter.crossConvert(value)
@@ -249,9 +249,9 @@ extension LMMgr.UserPhrase {
     case .toBoost:
       neighborValue = currentWeight.findNeighborValue(from: fetchedScores, greater: true)
       if let realNeighborValue = neighborValue {
-        neighborValue = realNeighborValue + 0.000_001
+        neighborValue = realNeighborValue + 0.000001
       } else if let fetchedMax = fetchedScores.min(), currentWeight <= fetchedMax {
-        neighborValue = Swift.min(0, currentWeight + 0.000_001)
+        neighborValue = Swift.min(0, currentWeight + 0.000001)
       } else {
         // 理論上來講，這種情況不該出現。
         neighborValue = Swift.min(0, currentWeight + 1)
@@ -259,9 +259,9 @@ extension LMMgr.UserPhrase {
     case .toNerf:
       neighborValue = currentWeight.findNeighborValue(from: fetchedScores, greater: false)
       if let realNeighborValue = neighborValue {
-        neighborValue = realNeighborValue - 0.000_001
+        neighborValue = realNeighborValue - 0.000001
       } else if let fetchedMax = fetchedScores.max(), currentWeight >= fetchedMax {
-        neighborValue = Swift.max(-114.514, currentWeight - 0.000_001)
+        neighborValue = Swift.max(-114.514, currentWeight - 0.000001)
       } else {
         // 理論上來講，這種情況不該出現。
         neighborValue = Swift.max(-114.514, currentWeight - 1)

@@ -70,7 +70,7 @@ extension SettingsPanesCocoa {
                 UserDef.kAlwaysShowTooltipTextsHorizontally.render(fixWidth: innerContentWidth)
               }?.boxed()
             }
-            if Date.isTodayTheDate(from: 0401) {
+            if Date.isTodayTheDate(from: 0_401) {
               NSStackView.buildSection(width: innerContentWidth) {
                 UserDef.kShouldNotFartInLieuOfBeep
                   .render(fixWidth: innerContentWidth) { renderable in

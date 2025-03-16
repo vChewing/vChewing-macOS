@@ -197,7 +197,7 @@ extension LMAssembly.LMInstantiator {
           theScore *= -1 // 應對可能忘記寫負號的情形
         }
         if previousScore == theScore {
-          theScore -= i * 0.000_001
+          theScore -= i * 0.000001
           i += 1
         } else {
           previousScore = theScore

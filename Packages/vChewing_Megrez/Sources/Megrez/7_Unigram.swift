@@ -30,11 +30,11 @@ extension Megrez {
       "(" + value.description + "," + String(score) + ")"
     }
 
-    public static func == (lhs: Unigram, rhs: Unigram) -> Bool {
+    public static func == (lhs: Self, rhs: Self) -> Bool {
       lhs.hashValue == rhs.hashValue
     }
 
-    public static func < (lhs: Unigram, rhs: Unigram) -> Bool {
+    public static func < (lhs: Self, rhs: Self) -> Bool {
       lhs.value < rhs.value || (lhs.value == rhs.value && lhs.score < rhs.score)
     }
 

@@ -159,10 +159,10 @@ extension AppDelegate {
   @discardableResult
   public func checkMemoryUsage() -> Double {
     guard let currentMemorySizeInBytes = NSApplication.memoryFootprint else { return 0 }
-    let currentMemorySize: Double = (Double(currentMemorySizeInBytes) / 1024 / 1024)
+    let currentMemorySize: Double = (Double(currentMemorySizeInBytes) / 1_024 / 1_024)
       .rounded(toPlaces: 1)
     switch currentMemorySize {
-    case 1024...:
+    case 1_024...:
       vCLog("WARNING: EXCESSIVE MEMORY FOOTPRINT (\(currentMemorySize)MB).")
       let msgPackage = UNMutableNotificationContent()
       msgPackage.title = NSLocalizedString("vChewing", comment: "")

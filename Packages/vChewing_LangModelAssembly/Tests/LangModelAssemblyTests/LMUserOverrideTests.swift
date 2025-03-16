@@ -12,9 +12,9 @@ import XCTest
 
 @testable import LangModelAssembly
 
-private let nowTimeStamp: Double = 114_514 * 10000
+private let nowTimeStamp: Double = 114_514 * 10_000
 private let capacity = 5
-private let halfLife: Double = 5400
+private let halfLife: Double = 5_400
 private let nullURL = URL(fileURLWithPath: "/dev/null")
 
 // MARK: - LMUserOverrideTests

@@ -113,7 +113,7 @@ public class VwrClientListMgr: NSViewController {
     tableColumn1Cell.bezelStyle = .rounded
 
     tableColumn2.identifier = NSUserInterfaceItemIdentifier("colClient")
-    tableColumn2.maxWidth = 1000
+    tableColumn2.maxWidth = 1_000
     tableColumn2.minWidth = 40
     tableColumn2.resizingMask = [.autoresizingMask, .userResizingMask]
     tableColumn2.width = 546
