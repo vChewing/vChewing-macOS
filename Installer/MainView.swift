@@ -49,11 +49,15 @@ public struct MainView: View {
             ScrollView(.vertical, showsIndicators: true) {
               HStack {
                 Text(eulaContent + "\n" + eulaContentUpstream).textSelection(.enabled)
+                  .frame(maxWidth: .infinity, alignment: .leading)
                   .frame(maxWidth: 455)
                   .font(.custom("Tahoma", size: 11))
                 Spacer()
               }
-            }.padding(4).frame(height: 128)
+            }
+            .frame(maxWidth: .infinity, alignment: .leading)
+            .padding(4)
+            .frame(height: 128)
           }
           Text("i18n:installer.EULA_PROMPT_NOTICE").bold().padding(.bottom, 2)
         }
@@ -62,7 +66,7 @@ public struct MainView: View {
           Text("i18n:installer.DISCLAIMER_TEXT")
             .font(.custom("Tahoma", size: 11))
             .opacity(0.5)
-            .frame(maxWidth: .infinity)
+            .frame(maxWidth: .infinity, alignment: .leading)
           VStack(spacing: 4) {
             Button { installationButtonClicked() } label: {
               Text(
