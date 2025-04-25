@@ -1,5 +1,13 @@
 +.PHONY: all
 
+# 定义日期和时间变量
+DATE_DIR := $(shell date +%Y-%m-%d)
+DATE_FILE := $(shell date +%Y-%-m-%-d)
+TIME_FILE := $(shell date +%H.%M)
+ARCHIVE_DIR := $(HOME)/Library/Developer/Xcode/Archives/$(DATE_DIR)
+ARCHIVE_NAME := vChewingInstaller-$(DATE_FILE)-$(TIME_FILE).xcarchive
+ARCHIVE_PATH := $(ARCHIVE_DIR)/$(ARCHIVE_NAME)
+
 all: release
 install: install-release
 update:
@@ -29,11 +37,23 @@ spmClean:
 		fi; \
 	done;
 
-release: 
-	xcodebuild -project vChewing.xcodeproj -scheme vChewingInstaller -configuration Release $(BUILD_SETTINGS) build
+release:
+	@echo "Creating directory: $(ARCHIVE_DIR)"
+	@mkdir -p "$(ARCHIVE_DIR)"
+	@echo "Archiving to: $(ARCHIVE_PATH)"
+	xcodebuild archive \
+	-project vChewing.xcodeproj \
+	-scheme vChewingInstaller \
+	-configuration Release \
+	-archivePath "$(ARCHIVE_PATH)" \
+	-allowProvisioningUpdates
 
 debug: 
-	xcodebuild -project vChewing.xcodeproj -scheme vChewingInstaller -configuration Debug $(BUILD_SETTINGS) build
+	@echo "Building debug configuration"
+	xcodebuild build \
+	-project vChewing.xcodeproj \
+	-scheme vChewingInstaller \
+	-configuration Debug
 
 DSTROOT = /Library/Input Methods
 VC_APP_ROOT = $(DSTROOT)/vChewing.app
