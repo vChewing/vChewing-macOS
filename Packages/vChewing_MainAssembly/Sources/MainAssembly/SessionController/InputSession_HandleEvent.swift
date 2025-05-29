@@ -96,8 +96,8 @@ extension SessionProtocol {
           let status = NSLocalizedString("NotificationSwitchRevolver", comment: "")
           Notifier.notify(
             message: isCapsLockTurnedOn
-              ? "Caps Lock " + "Alphanumerical Input Mode".localized + "\n" + status
-              : "Chinese Input Mode".localized + "\n" + status
+              ? "[Caps Lock ON] " + "Alphanumerical Input Mode".localized + "\n" + status
+              : "[Caps Lock OFF] " + "Chinese Input Mode".localized + "\n" + status
           )
         }
       }
