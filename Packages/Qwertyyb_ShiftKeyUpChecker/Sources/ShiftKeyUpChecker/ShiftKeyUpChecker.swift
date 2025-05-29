@@ -26,15 +26,17 @@ public struct ShiftKeyUpChecker {
 
   public var toggleWithLShift = false
   public var toggleWithRShift = false
-  public var lShiftKeyCode: UInt16 = 56
-  public var rShiftKeyCode: UInt16 = 60
+  public let lShiftKeyCodeFlag: UInt16 = 56
+  public let rShiftKeyCodeFlag: UInt16 = 60
+  public let cplkKeyCode: UInt16 = 57
 
   public var enabled: Bool { toggleWithLShift || toggleWithRShift }
 
   // To confirm that only the shift key is "pressed-and-released".
   public mutating func check(_ event: NSEvent) -> Bool {
     var met: Bool = event.type == .flagsChanged
-    met = met && checkKeyCode.contains(event.keyCode)
+    met = met && event.keyCode != cplkKeyCode
+    met = met && checkKeyCodeFlags.contains(event.keyCode)
     met = met && event.keyCode == previousKeyCode // 檢查 KeyCode 一致性。
     met = met && event.modifierFlags.intersection(.deviceIndependentFlagsMask).isEmpty
     met = met && Date() - lastTime <= delayInterval
@@ -54,10 +56,10 @@ public struct ShiftKeyUpChecker {
   private var lastTime: Date = .init()
 
   private var checkModifier: NSEvent.ModifierFlags { .shift }
-  private var checkKeyCode: [UInt16] {
+  private var checkKeyCodeFlags: [UInt16] {
     var result = [UInt16]()
-    if toggleWithLShift { result.append(lShiftKeyCode) }
-    if toggleWithRShift { result.append(rShiftKeyCode) }
+    if toggleWithLShift { result.append(lShiftKeyCodeFlag) }
+    if toggleWithRShift { result.append(rShiftKeyCodeFlag) }
     return result
   }
 
@@ -66,7 +68,7 @@ public struct ShiftKeyUpChecker {
     // 注意：ModifierFlags 是 OptionSet，在使用 contains 時會在給定參數是「空集合」的時候返回 true（明明你可能想要 false）。
     isKeyDown = isKeyDown && event.modifierFlags
       .intersection(.deviceIndependentFlagsMask) == checkModifier
-    isKeyDown = isKeyDown && checkKeyCode.contains(event.keyCode)
+    isKeyDown = isKeyDown && checkKeyCodeFlags.contains(event.keyCode)
     lastTime = isKeyDown ? .init() : .init(timeInterval: .infinity * -1, since: Date())
     previousKeyCode = isKeyDown ? event.keyCode : nil
   }
