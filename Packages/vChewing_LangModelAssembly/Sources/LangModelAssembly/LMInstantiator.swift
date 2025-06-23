@@ -63,6 +63,8 @@ extension LMAssembly {
     // 簡體中文模型？
     public let isCHS: Bool
 
+    public internal(set) var inputTokenHashMap: [Int: Bool] = [:]
+
     // 在函式內部用以記錄狀態的開關。
     public private(set) var config = Config()
 
@@ -101,6 +103,10 @@ extension LMAssembly {
     // MARK: - 工具函式
 
     public func resetFactoryJSONModels() {}
+
+    public func purgeInputTokenHashMap() {
+      inputTokenHashMap.removeAll()
+    }
 
     public func loadUserPhrasesData(path: String, filterPath: String?) {
       @Sendable
@@ -402,6 +408,9 @@ extension LMAssembly {
         convertedValues.enumerated().forEach { absDelta, value in
           let newScore: Double = -80 - Double(absDelta) * 0.01
           result.append(.init(value: value, score: newScore))
+          let hashKey = "\(keyChain)\t\(value)".hashValue
+          vCLMLog("\(keyChain)\t\(value)" + inputTokenHashMap.description)
+          inputTokenHashMap[hashKey] = true
         }
         return result
       }.flatMap { $0 }
