@@ -229,4 +229,11 @@ public class LMMgr {
   public static func clearUserOverrideModelData(_ mode: Shared.InputMode = .imeModeNULL) {
     mode.langModel.clearUOMData()
   }
+
+  /// 清理語言模型記憶體，防止記憶體洩漏
+  public static func performMemoryCleanup() {
+    Shared.InputMode.validCases.forEach { mode in
+      mode.langModel.purgeInputTokenHashMap()
+    }
+  }
 }
