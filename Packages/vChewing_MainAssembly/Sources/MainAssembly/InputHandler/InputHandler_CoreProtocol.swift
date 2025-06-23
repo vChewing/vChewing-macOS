@@ -63,6 +63,7 @@ extension InputHandlerProtocol {
   public func clear() {
     clearComposerAndCalligrapher()
     compositor.clear()
+    currentLM.purgeInputTokenHashMap()
     currentTypingMethod = .vChewingFactory
     backupCursor = nil
   }
