@@ -17,6 +17,7 @@ public protocol CtlCandidateDelegate {
   func candidatePairRightClicked(at index: Int, action: CandidateContextMenuAction)
   func candidateToolTip(shortened: Bool) -> String
   func resetCandidateWindowOrigin()
+  func checkIsMacroTokenResult(_ index: Int) -> Bool
   @discardableResult
   func reverseLookup(for value: String) -> [String]
   var selectionKeys: String { get }

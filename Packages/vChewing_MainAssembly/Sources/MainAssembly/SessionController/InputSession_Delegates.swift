@@ -8,6 +8,7 @@
 
 import AppKit
 import IMKUtils
+import LangModelAssembly
 import NotifierUI
 import Shared
 
@@ -117,6 +118,17 @@ extension SessionProtocol {
   }
 
   public var showReverseLookupResult: Bool { PrefMgr.shared.showReverseLookupInCandidateUI }
+
+  public func checkIsMacroTokenResult(_ index: Int) -> Bool {
+    guard state.isCandidateContainer else { return false }
+    guard state.candidates.indices.contains(index) else { return false }
+    let target = state.candidates[index]
+    let keyChain = target.keyArray.joined(separator: "-")
+    let hashKey = "\(keyChain)\t\(target.value)".hashValue
+    let result = inputMode.langModel.inputTokenHashMap[hashKey]
+    if result != nil { NSSound.buzz() }
+    return result ?? false
+  }
 
   public func candidateToolTip(shortened: Bool) -> String {
     if state.type == .ofAssociates {
