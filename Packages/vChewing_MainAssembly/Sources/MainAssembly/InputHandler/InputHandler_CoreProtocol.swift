@@ -63,6 +63,7 @@ extension InputHandlerProtocol {
   public func clear() {
     clearComposerAndCalligrapher()
     compositor.clear()
+    currentLM.purgeInputTokenHashMap()
     currentTypingMethod = .vChewingFactory
     backupCursor = nil
   }
@@ -313,6 +314,15 @@ extension InputHandlerProtocol {
   /// 該函式的爬取順序是從頭到尾。
   func walk() {
     compositor.walk()
+
+    // 定期進行記憶體清理以防止洩漏（僅在 InputHandler 實例中執行）
+    if let handler = self as? InputHandler {
+      handler.memoryCleanupCounter += 1
+      if handler.memoryCleanupCounter >= handler.memoryCleanupInterval {
+        handler.memoryCleanupCounter = 0
+        handler.currentLM.purgeInputTokenHashMap()
+      }
+    }
 
     // 在偵錯模式開啟時，將 GraphViz 資料寫入至指定位置。
     if prefs.isDebugModeEnabled {
