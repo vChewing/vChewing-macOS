@@ -156,11 +156,13 @@ extension VwrCandidateTDKAppKit {
 
   override public func rightMouseUp(with event: NSEvent) {
     guard let cellIndex = findCell(from: event) else { return }
+    guard let delegate = controller?.delegate else { return }
     clickedCell = thePool.candidateDataAll[cellIndex]
     let index = clickedCell.index
     let candidateText = clickedCell.displayedText
-    let isEnabled: Bool = controller?.delegate?.isCandidateContextMenuEnabled ?? false
-    guard isEnabled, !candidateText.isEmpty, index >= 0 else { return }
+    let isEnabled: Bool = delegate.isCandidateContextMenuEnabled
+    let isMacroToken = delegate.checkIsMacroTokenResult(index)
+    guard isEnabled, !candidateText.isEmpty, !isMacroToken, index >= 0 else { return }
     prepareMenu()
     var clickPoint = convert(event.locationInWindow, to: self)
     clickPoint.y = bounds.height - clickPoint.y // 翻轉座標系
