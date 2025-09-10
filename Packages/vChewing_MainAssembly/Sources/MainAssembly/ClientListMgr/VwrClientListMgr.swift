@@ -76,6 +76,11 @@ public class VwrClientListMgr: NSViewController {
     scrollContainer.documentView = tblClients
     scrollContainer.hasVerticalScroller = true
     scrollContainer.hasHorizontalScroller = true
+
+    if #available(macOS 26, *) {
+      scrollContainer.borderType = .lineBorder
+    }
+
     if #available(macOS 11.0, *) {
       tblClients.style = .inset
     }
