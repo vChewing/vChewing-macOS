@@ -46,7 +46,7 @@ extension InputHandlerProtocol {
       case .kBackSpace: return handleBackSpace(input: input)
       case .kWindowsDelete: return handleDelete(input: input)
       case .kCarriageReturn, .kLineFeed:
-        let frontNode = compositor.walkedNodes.last
+        let frontNode = compositor.assembledSentence.last
         return handleEnter(input: input) {
           guard self.currentTypingMethod == .vChewingFactory else { return [] }
           guard let frontNode = frontNode else { return [] }

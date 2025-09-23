@@ -32,8 +32,8 @@ public final class InputHandler: InputHandlerProtocol {
     self.notificationCallback = notificationCallback
     /// 組字器初期化。因為是首次初期化變數，所以這裡不能用 ensureCompositor() 代勞。
     self.compositor = Megrez.Compositor(with: currentLM, separator: "-")
-    /// 同步組字器單個詞的幅位長度上限。
-    compositor.maxSpanLength = prefs.maxCandidateLength
+    /// 同步組字器單個詞的幅節長度上限。
+    compositor.maxSegLength = prefs.maxCandidateLength
     /// 注拼槽初期化。
     ensureKeyboardParser()
   }
@@ -53,7 +53,7 @@ public final class InputHandler: InputHandlerProtocol {
   /// 當前的打字模式。
   public var currentTypingMethod: TypingMethod = .vChewingFactory
 
-  /// 半衰模組的衰減指數
+  /// 漸退模組的衰減指數
   public let kEpsilon: Double = 0.000001
 
   public var strCodePointBuffer = "" // 內碼輸入專用組碼區

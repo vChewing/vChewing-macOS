@@ -2,32 +2,32 @@
 // ====================
 // This code is released under the SPDX-License-Identifier: `LGPL-3.0-or-later`.
 
-// MARK: - Megrez.SpanUnit
+// MARK: - Megrez.Segment
 
 extension Megrez {
-  /// 幅位乃指一組共享起點的節點。其實是個辭典：[幅位長度: 節點]。
-  public typealias SpanUnit = [Int: Node]
+  /// 組字引擎內的區段管理單元。實質上是一個以涵蓋長度為索引鍵、以節點為資料值的字典結構。
+  public typealias Segment = [Int: Node]
 }
 
-extension Megrez.SpanUnit {
-  /// 幅位乃指一組共享起點的節點。其實是個辭典：[幅位長度: 節點]。
-  /// - Remark: 因為 Node 不是 Struct，所以會在 Compositor 被拷貝的時候無法被真實複製。
-  /// 這樣一來，Compositor 複製品當中的 Node 的變化會被反應到原先的 Compositor 身上。
-  /// 這在某些情況下會造成意料之外的混亂情況，所以需要引入一個拷貝用的建構子。
-  public init(SpanUnit target: Megrez.SpanUnit) {
+extension Megrez.Segment {
+  /// 區段管理單元的複製建構函數。
+  /// - Remark: 由於 Node 採用類別設計而非結構體，因此在 Compositor 複製過程中無法自動執行深層複製。
+  /// 這會導致複製後的 Compositor 副本中的 Node 變更會影響到原始的 Compositor 副本。
+  /// 為了避免此類非預期的互動影響，特別提供此複製功能。
+  public init(segment target: Megrez.Segment) {
     self.init()
     target.forEach { theKey, theValue in
       self[theKey] = theValue.copy
     }
   }
 
-  /// 該幅位的硬拷貝。
-  public var hardCopy: Megrez.SpanUnit { .init(SpanUnit: self) }
+  /// 區段的深層複製版本。
+  public var hardCopy: Megrez.Segment { .init(segment: self) }
 
   // MARK: - Dynamic Variables
 
-  /// 該幅位單元內的所有節點當中持有最長幅位的節點長度。
-  /// 該變數受該幅位的自身操作函式而被動更新。
+  /// 區段單元內所有節點中具有最大涵蓋範圍的節點長度數值。
+  /// 此數值會隨著區段操作而自動更新。
   public var maxLength: Int { keys.max() ?? 0 }
 }
 
@@ -40,22 +40,22 @@ extension Megrez.Compositor {
   public func fetchOverlappingNodes(at givenLocation: Int) -> [(location: Int, node: Megrez.Node)] {
     var results = [(location: Int, node: Megrez.Node)]()
     let givenLocation = max(0, min(givenLocation, keys.count - 1))
-    guard spans.indices.contains(givenLocation) else { return results }
+    guard segments.indices.contains(givenLocation) else { return results }
 
     // 先獲取該位置的所有單字節點。
-    spans[givenLocation].keys.sorted().forEach { theSpanLength in
-      guard let node = spans[givenLocation][theSpanLength] else { return }
-      Self.insertAnchor(spanIndex: givenLocation, node: node, to: &results)
+    segments[givenLocation].keys.sorted().forEach { theSegLength in
+      guard let node = segments[givenLocation][theSegLength] else { return }
+      Self.insertAnchor(segmentIndex: givenLocation, node: node, to: &results)
     }
 
     // 再獲取以當前位置結尾或開頭的節點。
-    let begin: Int = givenLocation - min(givenLocation, maxSpanLength - 1)
+    let begin: Int = givenLocation - min(givenLocation, maxSegLength - 1)
     (begin ..< givenLocation).forEach { theLocation in
-      let (A, B): (Int, Int) = (givenLocation - theLocation + 1, spans[theLocation].maxLength)
+      let (A, B): (Int, Int) = (givenLocation - theLocation + 1, segments[theLocation].maxLength)
       guard A <= B else { return }
       (A ... B).forEach { theLength in
-        guard let node = spans[theLocation][theLength] else { return }
-        Self.insertAnchor(spanIndex: theLocation, node: node, to: &results)
+        guard let node = segments[theLocation][theLength] else { return }
+        Self.insertAnchor(segmentIndex: theLocation, node: node, to: &results)
       }
     }
 
@@ -64,14 +64,14 @@ extension Megrez.Compositor {
 
   /// 要在 fetchOverlappingNodes() 內使用的一個工具函式。
   private static func insertAnchor(
-    spanIndex location: Int, node: Megrez.Node,
+    segmentIndex location: Int, node: Megrez.Node,
     to targetContainer: inout [(location: Int, node: Megrez.Node)]
   ) {
     guard !node.keyArray.joined().isEmpty else { return }
     let anchor = (location: location, node: node)
     for i in 0 ... targetContainer.count {
       guard !targetContainer.isEmpty else { break }
-      guard targetContainer[i].node.spanLength <= anchor.node.spanLength else { continue }
+      guard targetContainer[i].node.segLength <= anchor.node.segLength else { continue }
       targetContainer.insert(anchor, at: i)
       return
     }

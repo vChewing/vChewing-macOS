@@ -168,8 +168,8 @@ extension InputHandlerProtocol {
       // 一邊吃一邊屙（僅對位列黑名單的 App 用這招限制組字區長度）。
       let textToCommit = commitOverflownComposition
 
-      // 看看半衰記憶模組是否會對目前的狀態給出自動選字建議。
-      retrieveUOMSuggestions(apply: true)
+      // 看看漸退記憶模組是否會對目前的狀態給出自動選字建議。
+      retrievePOMSuggestions(apply: true)
 
       // 之後就是更新組字區了。先清空注拼槽的內容。
       composer.clear()
@@ -380,8 +380,8 @@ extension InputHandlerProtocol {
       // 一邊吃一邊屙（僅對位列黑名單的 App 用這招限制組字區長度）。
       let textToCommit = commitOverflownComposition
 
-      // 看看半衰記憶模組是否會對目前的狀態給出自動選字建議。
-      retrieveUOMSuggestions(apply: true)
+      // 看看漸退記憶模組是否會對目前的狀態給出自動選字建議。
+      retrievePOMSuggestions(apply: true)
 
       // 之後就是更新組字區了。先清空注拼槽的內容。
       calligrapher.removeAll()
