@@ -76,7 +76,7 @@ public class CandidateCellData: Hashable {
   public var fontColorKey: NSColor {
     isHighlighted
       ? .selectedMenuItemTextColor.withAlphaComponent(0.9)
-      : .init(red: 142 / 255, green: 142 / 255, blue: 147 / 255, alpha: 1)
+      : Self.plainTextColor.withAlphaComponent(0.5)
   }
 
   public var hardCopy: CandidateCellData {

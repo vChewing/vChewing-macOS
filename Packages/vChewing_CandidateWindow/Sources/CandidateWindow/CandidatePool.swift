@@ -77,7 +77,12 @@ public class CandidatePool {
   public let padding: CGFloat = 2
   public let originDelta: CGFloat = 5
   public let cellTextHeight = CandidatePool.shitCell.textDimension.height
-  public let cellRadius: CGFloat = 4
+
+  public var cellRadius: CGFloat {
+    if #unavailable(macOS 11.0) { return 4 }
+    if #unavailable(macOS 26.0) { return 6 }
+    return floor(metrics.highlightedCandidate.height / 2)
+  }
 
   public var windowRadius: CGFloat { originDelta + cellRadius }
 

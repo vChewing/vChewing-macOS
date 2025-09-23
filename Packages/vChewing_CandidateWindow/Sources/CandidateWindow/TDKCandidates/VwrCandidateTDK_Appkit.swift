@@ -77,8 +77,14 @@ extension VwrCandidateTDKAppKit {
   override public func draw(_: NSRect) {
     let sizesCalculated = thePool.metrics
     // 先塗底色
+    if #unavailable(macOS 10.0) {
+      Self.candidateListBackground.setFill()
+    } else {
+      Self.candidateListBackground
+        .withAlphaComponent(NSApplication.uxLevel == .none ? 1 : 0.5)
+        .setFill()
+    }
     let allRect = NSRect(origin: .zero, size: sizesCalculated.fittingSize)
-    Self.candidateListBackground.setFill()
     NSBezierPath(roundedRect: allRect, xRadius: windowRadius, yRadius: windowRadius).fill()
     // 繪製高亮行背景與高亮候選字詞背景
     lineBackground(isCurrentLine: true, isMatrix: isMatrix).setFill()
@@ -225,7 +231,6 @@ extension VwrCandidateTDKAppKit {
 extension VwrCandidateTDKAppKit {
   private func lineBackground(isCurrentLine: Bool, isMatrix: Bool) -> NSColor {
     guard isCurrentLine, isMatrix else { return .clear }
-    guard NSApplication.isDarkMode else { return .white }
     return CandidateCellData.plainTextColor.withAlphaComponent(0.05)
   }
 
