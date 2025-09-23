@@ -52,8 +52,7 @@ public class LMMgr {
 
   public static func connectCoreDB(dbPath: String? = nil) {
     guard let path: String = dbPath ?? Self.getCoreDictionaryDBPath() else {
-      assertionFailure("vChewing factory SQLite data not found.")
-      return
+      preconditionFailure("vChewing factory SQLite data not found.")
     }
     let result = LMAssembly.LMInstantiator.connectSQLDB(dbPath: path)
     assert(result, "vChewing factory SQLite connection failed.")
