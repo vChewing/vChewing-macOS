@@ -105,8 +105,8 @@ class MainAssemblyTests: XCTestCase {
     testSession.deactivateServer(testClient)
   }
 
-  func clearTestUOM() {
-    testLM.clearUOMData()
+  func clearTestPOM() {
+    testLM.clearPOMData()
   }
 
   func typeSentenceOrCandidates(_ sequence: String) {

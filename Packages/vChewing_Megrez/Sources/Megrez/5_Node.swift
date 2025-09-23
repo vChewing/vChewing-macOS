@@ -5,42 +5,44 @@
 // MARK: - Megrez.Node
 
 extension Megrez {
-  /// 字詞節點。
+  /// 組字引擎中資料處理的基礎單位。
   ///
-  /// 一個節點由這些內容組成：幅位長度、索引鍵、以及一組單元圖。幅位長度就是指這個
-  /// 節點在組字器內橫跨了多少個字長。組字器負責構築自身的節點。對於由多個漢字組成
-  /// 的詞，組字器會將多個讀音索引鍵合併為一個讀音索引鍵、據此向語言模組請求對應的
-  /// 單元圖結果陣列。舉例說，如果一個詞有兩個漢字組成的話，那麼讀音也是有兩個、其
-  /// 索引鍵也是由兩個讀音組成的，那麼這個節點的幅位長度就是 2。
+  /// 節點物件整合了讀音索引鍵序列、涵蓋範圍長度、以及對應的單元圖資料集合。涵蓋範圍長度
+  /// 表示此節點在完整讀音序列中所佔據的位置數量。組字引擎會根據輸入序列自動產生
+  /// 對應的節點結構。對於包含多個字符的詞條，引擎會整合相關的多個讀音形成複合索引鍵，
+  /// 並從語言模型中獲取相應的單元圖資料集合。例如，包含兩個字符的詞條對應兩個讀音，
+  /// 其節點的涵蓋範圍長度為 2。
   public class Node: Equatable, Hashable, Codable {
     // MARK: Lifecycle
 
-    /// 生成一個字詞節點。
+    /// 建立新的節點物件副本。
     ///
-    /// 一個節點由這些內容組成：幅位長度、索引鍵、以及一組單元圖。幅位長度就是指這個
-    /// 節點在組字器內橫跨了多少個字長。組字器負責構築自身的節點。對於由多個漢字組成
-    /// 的詞，組字器會將多個讀音索引鍵合併為一個讀音索引鍵、據此向語言模組請求對應的
-    /// 單元圖結果陣列。舉例說，如果一個詞有兩個漢字組成的話，那麼讀音也是有兩個、其
-    /// 索引鍵也是由兩個讀音組成的，那麼這個節點的幅位長度就是 2。
+    /// 節點物件整合了讀音索引鍵序列、涵蓋範圍長度、以及對應的單元圖資料集合。涵蓋範圍長度
+    /// 表示此節點在完整讀音序列中所佔據的位置數量。組字引擎會根據輸入序列自動產生
+    /// 對應的節點結構。對於包含多個字符的詞條，引擎會整合相關的多個讀音形成複合索引鍵，
+    /// 並從語言模型中獲取相應的單元圖資料集合。例如，包含兩個字符的詞條對應兩個讀音，
+    /// 其節點的涵蓋範圍長度為 2。
     /// - Parameters:
-    ///   - keyArray: 給定索引鍵陣列，不得為空。
-    ///   - spanLength: 給定幅位長度，一般情況下與給定索引鍵陣列內的索引鍵數量一致。
-    ///   - unigrams: 給定單元圖陣列，不得為空。
-    public init(keyArray: [String] = [], spanLength: Int = 0, unigrams: [Megrez.Unigram] = []) {
+    ///   - keyArray: 輸入的索引鍵序列，不可為空集合。
+    ///   - segLength: 節點涵蓋範圍長度，通常與索引鍵序列元素數量相等。
+    ///   - unigrams: 關聯的單元圖資料集合，不可為空集合。
+    public init(keyArray: [String] = [], segLength: Int = 0, unigrams: [Megrez.Unigram] = []) {
+      self.id = FIUUID()
       self.keyArray = keyArray
-      self.spanLength = max(spanLength, 0)
+      self.segLength = max(segLength, 0)
       self.unigrams = unigrams
       self.currentOverrideType = .withNoOverrides
     }
 
-    /// 以指定字詞節點生成拷貝。
-    /// - Remark: 因為 Node 不是 Struct，所以會在 Compositor 被拷貝的時候無法被真實複製。
-    /// 這樣一來，Compositor 複製品當中的 Node 的變化會被反應到原先的 Compositor 身上。
-    /// 這在某些情況下會造成意料之外的混亂情況，所以需要引入一個拷貝用的建構子。
+    /// 通過複製現有節點來建立新副本。
+    /// - Remark: 由於 Node 採用類別設計而非結構體，因此在 Compositor 複製過程中無法自動執行深層複製。
+    /// 這會導致複製後的 Composer 副本中的 Node 變更會影響到原始的 Composer 副本。
+    /// 為了避免此類非預期的互動影響，特別提供此複製建構函數。
     public init(node: Node) {
+      self.id = FIUUID()
       self.overridingScore = node.overridingScore
       self.keyArray = node.keyArray
-      self.spanLength = node.spanLength
+      self.segLength = node.segLength
       self.unigrams = node.unigrams
       self.currentOverrideType = node.currentOverrideType
       self.currentUnigramIndex = node.currentUnigramIndex
@@ -54,28 +56,31 @@ extension Megrez {
     /// 當前狀態下權重最高的單元圖的權重數值。打比方說，如果該節點內的單元圖陣列是
     ///  [("a", -114), ("b", -514), ("c", -1919)] 的話，指定該覆寫行為則會導致該節
     ///  點返回的結果為 ("c", -114)。該覆寫行為多用於諸如使用者半衰記憶模組的建議
-    ///  行為。被覆寫的這個節點的狀態可能不會再被爬軌行為擅自改回。該覆寫行為無法
-    ///  防止其它節點被爬軌函式所支配。這種情況下就需要用到 overridingScore。
-    /// - withHighScore: 將該節點權重覆寫為 overridingScore，使其被爬軌函式所青睞。
+    ///  行為。被覆寫的這個節點的狀態可能不會再被組句行為擅自改回。該覆寫行為無法
+    ///  防止其它節點被組句函式所支配。這種情況下就需要用到 overridingScore。
+    /// - withHighScore: 將該節點權重覆寫為 overridingScore，使其被組句函式所青睞。
     public enum OverrideType: Int, Codable {
       case withNoOverrides = 0
       case withTopUnigramScore = 1
       case withHighScore = 2
     }
 
-    /// 一個用以覆寫權重的數值。該數值之高足以改變爬軌函式對該節點的讀取結果。這裡用
-    /// 「0」可能看似足夠了，但仍會使得該節點的覆寫狀態有被爬軌函式忽視的可能。比方說
+    /// 節點的唯一識別符。
+    public let id: FIUUID
+
+    /// 一個用以覆寫權重的數值。該數值之高足以改變組句函式對該節點的讀取結果。這裡用
+    /// 「0」可能看似足夠了，但仍會使得該節點的覆寫狀態有被組句函式忽視的可能。比方說
     /// 要針對索引鍵「a b c」複寫的資料值為「A B C」，使用大寫資料值來覆寫節點。這時，
-    /// 如果這個獨立的 c 有一個可以拮抗權重的詞「bc」的話，可能就會導致爬軌函式的算法
-    /// 找出「A->bc」的爬軌途徑（尤其是當 A 和 B 使用「0」作為複寫數值的情況下）。這樣
-    /// 一來，「A-B」就不一定始終會是爬軌函式的青睞結果了。所以，這裡一定要用大於 0 的
+    /// 如果這個獨立的 c 有一個可以拮抗權重的詞「bc」的話，可能就會導致組句函式的算法
+    /// 找出「A->bc」的組句途徑（尤其是當 A 和 B 使用「0」作為複寫數值的情況下）。這樣
+    /// 一來，「A-B」就不一定始終會是組句函式的青睞結果了。所以，這裡一定要用大於 0 的
     /// 數（比如野獸常數），以讓「c」更容易單獨被選中。
     public var overridingScore: Double = 114_514
 
     /// 索引鍵陣列。
     public private(set) var keyArray: [String]
-    /// 幅位長度。
-    public private(set) var spanLength: Int
+    /// 幅節長度。
+    public private(set) var segLength: Int
     /// 單元圖陣列。
     public private(set) var unigrams: [Megrez.Unigram]
     /// 該節點目前的覆寫狀態種類。
@@ -118,16 +123,44 @@ extension Megrez {
       }
     }
 
+    /// 節點覆寫狀態的動態屬性，允許直接讀取和設定覆寫狀態。
+    public var overrideStatus: NodeOverrideStatus {
+      get {
+        NodeOverrideStatus(
+          overridingScore: overridingScore,
+          currentOverrideType: currentOverrideType,
+          currentUnigramIndex: currentUnigramIndex
+        )
+      }
+      set {
+        overridingScore = newValue.overridingScore
+        currentOverrideType = newValue.currentOverrideType
+        // 防範 UnigramIndex 溢出，如果溢出則重設覆寫狀態
+        if newValue.currentUnigramIndex >= 0, newValue.currentUnigramIndex < unigrams.count {
+          currentUnigramIndex = newValue.currentUnigramIndex
+        } else {
+          reset()
+        }
+      }
+    }
+
     public static func == (lhs: Node, rhs: Node) -> Bool {
-      lhs.hashValue == rhs.hashValue
+      // 基於功能內容的等價性比較，排除 ID 字段
+      lhs.overridingScore == rhs.overridingScore &&
+        lhs.keyArray == rhs.keyArray &&
+        lhs.segLength == rhs.segLength &&
+        lhs.unigrams == rhs.unigrams &&
+        lhs.currentOverrideType == rhs.currentOverrideType &&
+        lhs.currentUnigramIndex == rhs.currentUnigramIndex
     }
 
     /// 做為預設雜湊函式。
     /// - Parameter hasher: 目前物件的雜湊碼。
     public func hash(into hasher: inout Hasher) {
+      hasher.combine(id)
       hasher.combine(overridingScore)
       hasher.combine(keyArray)
-      hasher.combine(spanLength)
+      hasher.combine(segLength)
       hasher.combine(unigrams)
       hasher.combine(currentOverrideType)
       hasher.combine(currentUnigramIndex)
@@ -178,99 +211,34 @@ extension Megrez {
   }
 }
 
-// MARK: - Array Extensions.
+// MARK: - NodeOverrideStatus
 
-extension Array where Element == Megrez.Node {
-  /// 從一個節點陣列當中取出目前的選字字串陣列。
-  public var values: [String] { map(\.value) }
+/// 節點覆寫狀態封裝結構，用於記錄 Node 的覆寫相關狀態。
+/// 這個結構體允許輕量級地複製和恢復節點狀態，避免完整複製整個 Compositor。
+public struct NodeOverrideStatus: Codable, Hashable {
+  // MARK: Lifecycle
 
-  /// 從一個節點陣列當中取出目前的索引鍵陣列。
-  public func joinedKeys(by separator: String = Megrez.Compositor.theSeparator) -> [String] {
-    map { $0.keyArray.lazy.joined(separator: separator) }
-  }
-
-  /// 從一個節點陣列當中取出目前的索引鍵陣列。
-  public var keyArrays: [[String]] { map(\.keyArray) }
-
-  /// 返回一連串的節點起點。結果為 (Result A, Result B) 辭典陣列。
-  /// Result A 以索引查座標，Result B 以座標查索引。
-  private var nodeBorderPointDictPair: (regionCursorMap: [Int: Int], cursorRegionMap: [Int: Int]) {
-    // Result A 以索引查座標，Result B 以座標查索引。
-    var resultA = [Int: Int]()
-    var resultB: [Int: Int] = [-1: 0] // 防呆
-    var cursorCounter = 0
-    enumerated().forEach { nodeCounter, neta in
-      resultA[nodeCounter] = cursorCounter
-      neta.keyArray.forEach { _ in
-        resultB[cursorCounter] = nodeCounter
-        cursorCounter += 1
-      }
-    }
-    resultA[count] = cursorCounter
-    resultB[cursorCounter] = count
-    return (resultA, resultB)
-  }
-
-  /// 返回一個辭典，以座標查索引。允許以游標位置查詢其屬於第幾個幅位座標（從 0 開始算）。
-  public var cursorRegionMap: [Int: Int] { nodeBorderPointDictPair.cursorRegionMap }
-
-  /// 總讀音單元數量。在絕大多數情況下，可視為總幅位長度。
-  public var totalKeyCount: Int { map(\.keyArray.count).reduce(0, +) }
-
-  /// 根據給定的游標，返回其前後最近的節點邊界。
-  /// - Parameter cursor: 給定的游標。
-  public func contextRange(ofGivenCursor cursor: Int) -> Range<Int> {
-    guard !isEmpty else { return 0 ..< 0 }
-    let lastSpanningLength = reversed()[0].keyArray.count
-    var nilReturn = (totalKeyCount - lastSpanningLength) ..< totalKeyCount
-    if cursor >= totalKeyCount { return nilReturn } // 防呆
-    let cursor = Swift.max(0, cursor) // 防呆
-    nilReturn = cursor ..< cursor
-    // 下文按道理來講不應該會出現 nilReturn。
-    let mapPair = nodeBorderPointDictPair
-    guard let rearNodeID = mapPair.cursorRegionMap[cursor] else { return nilReturn }
-    guard let rearIndex = mapPair.regionCursorMap[rearNodeID]
-    else { return nilReturn }
-    guard let frontIndex = mapPair.regionCursorMap[rearNodeID + 1]
-    else { return nilReturn }
-    return rearIndex ..< frontIndex
-  }
-
-  /// 在陣列內以給定游標位置找出對應的節點。
+  /// 初始化一個節點覆寫狀態
   /// - Parameters:
-  ///   - cursor: 給定游標位置。
-  ///   - outCursorPastNode: 找出的節點的前端位置。
-  /// - Returns: 查找結果。
-  public func findNode(at cursor: Int, target outCursorPastNode: inout Int) -> Megrez.Node? {
-    guard !isEmpty else { return nil }
-    let cursor = Swift.max(0, Swift.min(cursor, totalKeyCount - 1)) // 防呆
-    let range = contextRange(ofGivenCursor: cursor)
-    outCursorPastNode = range.upperBound
-    guard let rearNodeID = nodeBorderPointDictPair.1[cursor] else { return nil }
-    return count - 1 >= rearNodeID ? self[rearNodeID] : nil
+  ///   - overridingScore: 覆寫權重數值
+  ///   - currentOverrideType: 當前覆寫狀態種類
+  ///   - currentUnigramIndex: 當前單元圖索引位置
+  public init(
+    overridingScore: Double = 114_514,
+    currentOverrideType: Megrez.Node.OverrideType = .withNoOverrides,
+    currentUnigramIndex: Int = 0
+  ) {
+    self.overridingScore = overridingScore
+    self.currentOverrideType = currentOverrideType
+    self.currentUnigramIndex = currentUnigramIndex
   }
 
-  /// 在陣列內以給定游標位置找出對應的節點。
-  /// - Parameter cursor: 給定游標位置。
-  /// - Returns: 查找結果。
-  public func findNode(at cursor: Int) -> Megrez.Node? {
-    var useless = 0
-    return findNode(at: cursor, target: &useless)
-  }
+  // MARK: Public
 
-  /// 提供一組逐字的字音配對陣列（不使用 Megrez 的 KeyValuePaired 類型），但字音不匹配的節點除外。
-  public var smashedPairs: [(key: String, value: String)] {
-    var arrData = [(key: String, value: String)]()
-    forEach { node in
-      if node.isReadingMismatched, !node.keyArray.joined().isEmpty {
-        arrData.append((key: node.keyArray.joined(separator: "\t"), value: node.value))
-        return
-      }
-      let arrValueChars = node.value.map(\.description)
-      node.keyArray.enumerated().forEach { i, key in
-        arrData.append((key: key, value: arrValueChars[i]))
-      }
-    }
-    return arrData
-  }
+  /// 覆寫權重數值
+  public var overridingScore: Double
+  /// 當前覆寫狀態種類
+  public var currentOverrideType: Megrez.Node.OverrideType
+  /// 當前單元圖索引位置
+  public var currentUnigramIndex: Int
 }

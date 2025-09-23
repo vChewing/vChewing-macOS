@@ -91,14 +91,14 @@ extension InputHandlerProtocol {
     }
     let brailleProcessor = BrailleSputnik(standard: brailleStandard)
     return brailleProcessor.convertToBraille(
-      smashedPairs: compositor.walkedNodes.smashedPairs,
+      smashedPairs: compositor.assembledSentence.smashedPairs,
       extraInsertion: (reading: composer.value, cursor: compositor.cursor)
     )
   }
 
   private func specifyTextMarkupToCommit(behavior: CommitableMarkupType) -> String {
     var composed = ""
-    compositor.walkedNodes.smashedPairs.forEach { key, value in
+    compositor.assembledSentence.smashedPairs.forEach { key, value in
       var key = key
       if !prefs.cassetteEnabled {
         key =

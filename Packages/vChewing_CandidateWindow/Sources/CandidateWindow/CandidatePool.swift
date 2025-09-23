@@ -155,7 +155,7 @@ public class CandidatePool {
     Self.blankCell.locale = locale
     self.selectionKeys = selectionKeys.isEmpty ? "123456789" : selectionKeys
     var allCandidates = candidates.map {
-      CandidateCellData(key: " ", displayedText: $0.value, spanLength: $0.keyArray.count)
+      CandidateCellData(key: " ", displayedText: $0.value, segLength: $0.keyArray.count)
     }
     if allCandidates.isEmpty { allCandidates.append(Self.blankCell) }
     candidateDataAll = allCandidates
@@ -357,13 +357,13 @@ extension CandidatePool {
   }
 
   public func isFilterable(target index: Int) -> Bool {
-    let spanLength = candidateDataAll[index].spanLength
-    guard spanLength == 1 else { return true }
-    return cellsOf(spanLength: spanLength).count > 1
+    let segLength = candidateDataAll[index].segLength
+    guard segLength == 1 else { return true }
+    return cellsOf(segLength: segLength).count > 1
   }
 
-  public func cellsOf(spanLength: Int) -> [CandidateCellData] {
-    candidateDataAll.filter { $0.spanLength == spanLength }
+  public func cellsOf(segLength: Int) -> [CandidateCellData] {
+    candidateDataAll.filter { $0.segLength == segLength }
   }
 }
 

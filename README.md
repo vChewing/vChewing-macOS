@@ -89,10 +89,6 @@ P.S.: 威注音輸入法的 Shift 按鍵監測功能僅藉由對 NSEvent 訊號�
 
 - 僅供研發人員調試方便而使用的 App 版安裝程式 (by Lukhnos Liu & MJHsieh)，不對公眾使用。
 
-威注音專案目前還用到如下的來自 Lukhnos Liu 的算法：
-
-- 半衰記憶模組 MK2，被 Shiki Suen 用 Swift 重寫。
-
 威注音輸入法 macOS 版以 MIT-NTL License 授權釋出 (與 MIT 相容)：© 2021-2022 vChewing 專案。
 
 - 威注音輸入法 macOS 版程式維護：Shiki Suen。特別感謝 Isaac Xen 與 Hiraku Wong 等人的技術協力。

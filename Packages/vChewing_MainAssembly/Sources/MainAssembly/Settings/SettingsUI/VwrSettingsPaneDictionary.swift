@@ -41,8 +41,8 @@ public struct VwrSettingsPaneDictionary: View {
   @AppStorage(wrappedValue: true, UserDef.kSymbolInputEnabled.rawValue)
   private var symbolInputEnabled: Bool
 
-  @AppStorage(wrappedValue: true, UserDef.kFetchSuggestionsFromUserOverrideModel.rawValue)
-  private var fetchSuggestionsFromUserOverrideModel: Bool
+  @AppStorage(wrappedValue: true, UserDef.kFetchSuggestionsFromPerceptionOverrideModel.rawValue)
+  private var fetchSuggestionsFromPerceptionOverrideModel: Bool
 
   @AppStorage(wrappedValue: false, UserDef.kPhraseReplacementEnabled.rawValue)
   private var phraseReplacementEnabled: Bool
@@ -188,8 +188,8 @@ public struct VwrSettingsPaneDictionary: View {
               LMMgr.syncLMPrefs()
             }
           ).render()
-          UserDef.kFetchSuggestionsFromUserOverrideModel
-            .bind($fetchSuggestionsFromUserOverrideModel).render()
+          UserDef.kFetchSuggestionsFromPerceptionOverrideModel
+            .bind($fetchSuggestionsFromPerceptionOverrideModel).render()
           UserDef.kPhraseReplacementEnabled.bind(
             $phraseReplacementEnabled.didChange {
               LMMgr.syncLMPrefs()

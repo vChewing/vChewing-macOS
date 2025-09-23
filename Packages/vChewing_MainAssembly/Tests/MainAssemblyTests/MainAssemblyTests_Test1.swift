@@ -34,7 +34,7 @@ extension MainAssemblyTests {
   /// 測試基本的打字組句（不是ㄅ半注音）。
   func test101_InputHandler_BasicSentenceComposition() throws {
     PrefMgr.shared.useSCPCTypingMode = false
-    clearTestUOM()
+    clearTestPOM()
     vCTestLog("測試組句：高科技公司的年中獎金")
     testSession.resetInputHandler(forceComposerCleanup: true)
     typeSentenceOrCandidates("el dk ru4ej/ n 2k7su065j/ ru;3rup ")
@@ -46,7 +46,7 @@ extension MainAssemblyTests {
   /// 測試基本的逐字選字（ㄅ半注音）。
   func test102_InputHandler_BasicSCPCTyping() throws {
     PrefMgr.shared.useSCPCTypingMode = true
-    clearTestUOM()
+    clearTestPOM()
     vCTestLog("測試逐字選字：高科技公司的年中獎金")
     testSession.resetInputHandler(forceComposerCleanup: true)
     typeSentenceOrCandidates("el dk ru44ej/ 2n ")
@@ -70,7 +70,7 @@ extension MainAssemblyTests {
   func test103_InputHandler_RevolvingCandidates() throws {
     PrefMgr.shared.useSCPCTypingMode = false
     PrefMgr.shared.useRearCursorMode = false
-    clearTestUOM()
+    clearTestPOM()
 
     testSession.resetInputHandler(forceComposerCleanup: true)
     typeSentenceOrCandidates("el dk ru4ej/ n 2k7su065j/ ru;3rup ")
@@ -93,20 +93,20 @@ extension MainAssemblyTests {
     XCTAssertEqual(resultText2, "高科技公司的年終獎金")
   }
 
-  /// 測試藉由選字窗選字、且同時測試半衰記憶模組在此情況下的記憶資料生成與適用情況。
+  /// 測試藉由選字窗選字、且同時測試漸退記憶模組在此情況下的記憶資料生成與適用情況。
   /// - Remark: 這裡順便測試一下「在選字窗選字後自動推進游標」這個有被預設啟用的功能。
-  func test104_InputHandler_ManualCandidateSelectionAndUOM() throws {
+  func test104_InputHandler_ManualCandidateSelectionAndPOM() throws {
     PrefMgr.shared.useSCPCTypingMode = false
     PrefMgr.shared.useRearCursorMode = false
     PrefMgr.shared.moveCursorAfterSelectingCandidate = true
-    clearTestUOM()
+    clearTestPOM()
 
     var sequenceChars = "el dk ru4ej/ n 2k7su065j/ ru;3rup "
 
     testSession.resetInputHandler(forceComposerCleanup: true)
     typeSentenceOrCandidates(sequenceChars)
 
-    // Testing Manual Candidate Selection, UOM Observation, and Post-Candidate-Selection Cursor Jumping.
+    // Testing Manual Candidate Selection, POM Observation, and Post-Candidate-Selection Cursor Jumping.
 
     vCTestLog("測試選字窗選字：高科技公司的年終獎金 -> 高科技公司的年中獎金")
     let keyOne = NSEvent.KeyEventData(chars: "1")
@@ -119,11 +119,11 @@ extension MainAssemblyTests {
     XCTAssertEqual(resultText3, "高科技公司的年中獎金")
     XCTAssertEqual(testHandler.compositor.cursor, 10)
 
-    // Continuing UOM Tests (in the Current Context).
+    // Continuing POM Tests (in the Current Context).
 
-    vCTestLog("測試半衰記憶的適用範圍：「年終」的記憶應僅對下述給定上下文情形生效。")
+    vCTestLog("測試漸退記憶的適用範圍：「年終」的記憶應僅對下述給定上下文情形生效。")
     vCTestLog("- 該給定上下文情形為「((ㄍㄨㄥ-ㄙ,公司),(ㄉㄜ˙,的),ㄋㄧㄢˊ-ㄓㄨㄥ)」。")
-    clearTestUOM()
+    clearTestPOM()
     let keyTwo = NSEvent.KeyEventData(chars: "2")
     [dataArrowLeft, dataArrowLeft, dataArrowDown, keyTwo].map(\.asPairedEvents).flatMap { $0 }
       .forEach { theEvent in
@@ -156,7 +156,7 @@ extension MainAssemblyTests {
   /// 測試 inputHandler.commissionByCtrlOptionCommandEnter()。
   func test105_InputHandler_MiscCommissionTest() throws {
     PrefMgr.shared.useSCPCTypingMode = false
-    clearTestUOM()
+    clearTestPOM()
     vCTestLog("正在測試 inputHandler.commissionByCtrlOptionCommandEnter()。")
     testSession.resetInputHandler(forceComposerCleanup: true)
     typeSentenceOrCandidates("el dk ru4ej/ n 2k7")

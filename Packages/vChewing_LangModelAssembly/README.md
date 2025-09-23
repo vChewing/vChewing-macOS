@@ -14,7 +14,7 @@ LMAssembly 總命名空間也承載一些在套裝內共用的工具函式。
 - LMCoreEX：可以直接讀取 TXT 格式的帶有權重資料的語彙檔案的模組。
 - lmPlainBopomofo：專門用來讀取使用者自訂ㄅ半候選字順序覆蓋定義檔案（plist）的模組。
 - lmReplacements：專門用來讀取使用者語彙置換模式的辭典資料的模組。
-- lmUserOverride：半衰記憶模組。
+- lmPerceptionOverride：漸退記憶模組。
 
 ```
 // (c) 2021 and onwards The vChewing Project (MIT-NTL License).
