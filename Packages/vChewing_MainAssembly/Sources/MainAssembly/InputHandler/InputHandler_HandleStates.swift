@@ -36,7 +36,7 @@ extension InputHandlerProtocol {
     /// 換成由此處重新生成的原始資料在 IMEStateData 當中生成的 NSAttributeString。
     var displayTextSegments: [String] = handleAsCodePointInput
       ? [strCodePointBuffer]
-      : compositor.walkedNodes.values
+      : compositor.assembledSentence.values
     var cursor = handleAsCodePointInput
       ? displayTextSegments.joined().count
       : convertCursorForDisplay(compositor.cursor)
@@ -113,15 +113,15 @@ extension InputHandlerProtocol {
   func convertCursorForDisplay(_ rawCursor: Int) -> Int {
     var composedStringCursorIndex = 0
     var readingCursorIndex = 0
-    for theNode in compositor.walkedNodes {
+    for theNode in compositor.assembledSentence {
       let strNodeValue = theNode.value
       /// 藉下述步驟重新將「可見游標位置」對齊至「組字器內的游標所在的讀音位置」。
-      /// 每個節錨（NodeAnchor）都有自身的幅位長度（spanningLength），可以用來
+      /// 每個節錨（NodeAnchor）都有自身的幅節長度（segLength），可以用來
       /// 累加、以此為依據，來校正「可見游標位置」。
-      let spanningLength: Int = theNode.keyArray.count
-      if readingCursorIndex + spanningLength <= rawCursor {
+      let segLength: Int = theNode.keyArray.count
+      if readingCursorIndex + segLength <= rawCursor {
         composedStringCursorIndex += strNodeValue.count
-        readingCursorIndex += spanningLength
+        readingCursorIndex += segLength
         continue
       }
       if !theNode.isReadingMismatched {
@@ -135,7 +135,7 @@ extension InputHandlerProtocol {
       }
       guard readingCursorIndex < rawCursor else { continue }
       composedStringCursorIndex += strNodeValue.count
-      readingCursorIndex += spanningLength
+      readingCursorIndex += segLength
       readingCursorIndex = min(readingCursorIndex, rawCursor)
     }
     return composedStringCursorIndex
@@ -152,12 +152,12 @@ extension InputHandlerProtocol {
     }
     var result = IMEState.ofCandidates(
       candidates: generateArrayOfCandidates(fixOrder: prefs.useFixedCandidateOrderOnSelection),
-      displayTextSegments: compositor.walkedNodes.values,
+      displayTextSegments: compositor.assembledSentence.values,
       cursor: compositor.cursor
     )
     if !prefs.useRearCursorMode {
       let markerBackup = compositor.marker
-      compositor.jumpCursorBySpan(to: .rear, isMarker: true)
+      compositor.jumpCursorBySegment(to: .rear, isMarker: true)
       result.marker = compositor.marker
       compositor.marker = markerBackup
     }
@@ -258,11 +258,11 @@ extension InputHandlerProtocol {
     if input.isCursorBackward, input.isShiftHold {
       if compositor.marker > 0 {
         if input.isCommandHold || input.isOptionHold {
-          compositor.jumpCursorBySpan(to: .rear, isMarker: true)
+          compositor.jumpCursorBySegment(to: .rear, isMarker: true)
         } else {
           compositor.marker -= 1
           if isCursorCuttingChar(isMarker: true) {
-            compositor.jumpCursorBySpan(to: .rear, isMarker: true)
+            compositor.jumpCursorBySegment(to: .rear, isMarker: true)
           }
         }
         var marking = IMEState.ofMarking(
@@ -283,11 +283,11 @@ extension InputHandlerProtocol {
     if input.isCursorForward, input.isShiftHold {
       if compositor.marker < compositor.length {
         if input.isCommandHold || input.isOptionHold {
-          compositor.jumpCursorBySpan(to: .front, isMarker: true)
+          compositor.jumpCursorBySegment(to: .front, isMarker: true)
         } else {
           compositor.marker += 1
           if isCursorCuttingChar(isMarker: true) {
-            compositor.jumpCursorBySpan(to: .front, isMarker: true)
+            compositor.jumpCursorBySegment(to: .front, isMarker: true)
           }
         }
         var marking = IMEState.ofMarking(
@@ -674,15 +674,15 @@ extension InputHandlerProtocol {
       if compositor.cursor < compositor.length {
         compositor.marker = compositor.cursor
         if input.isCommandHold || input.isOptionHold {
-          compositor.jumpCursorBySpan(to: .front, isMarker: true)
+          compositor.jumpCursorBySegment(to: .front, isMarker: true)
         } else {
           compositor.marker += 1
           if isCursorCuttingChar(isMarker: true) {
-            compositor.jumpCursorBySpan(to: .front, isMarker: true)
+            compositor.jumpCursorBySegment(to: .front, isMarker: true)
           }
         }
         var marking = IMEState.ofMarking(
-          displayTextSegments: compositor.walkedNodes.values,
+          displayTextSegments: compositor.assembledSentence.values,
           markedReadings: Array(compositor.keys[currentMarkedRange()]),
           cursor: convertCursorForDisplay(compositor.cursor),
           marker: convertCursorForDisplay(compositor.marker)
@@ -697,7 +697,7 @@ extension InputHandlerProtocol {
         return handleEnd()
       }
       // 游標跳轉動作無論怎樣都會執行，但如果出了執行失敗的結果的話則觸發報錯流程。
-      if !compositor.jumpCursorBySpan(to: .front) {
+      if !compositor.jumpCursorBySegment(to: .front) {
         errorCallback?("33C3B580")
         return true
       }
@@ -706,7 +706,7 @@ extension InputHandlerProtocol {
       if compositor.cursor < compositor.length {
         compositor.cursor += 1
         if isCursorCuttingChar() {
-          compositor.jumpCursorBySpan(to: .front)
+          compositor.jumpCursorBySegment(to: .front)
         }
         session.switchState(generateStateOfInputting())
       } else {
@@ -738,15 +738,15 @@ extension InputHandlerProtocol {
       if compositor.cursor > 0 {
         compositor.marker = compositor.cursor
         if input.isCommandHold || input.isOptionHold {
-          compositor.jumpCursorBySpan(to: .rear, isMarker: true)
+          compositor.jumpCursorBySegment(to: .rear, isMarker: true)
         } else {
           compositor.marker -= 1
           if isCursorCuttingChar(isMarker: true) {
-            compositor.jumpCursorBySpan(to: .rear, isMarker: true)
+            compositor.jumpCursorBySegment(to: .rear, isMarker: true)
           }
         }
         var marking = IMEState.ofMarking(
-          displayTextSegments: compositor.walkedNodes.values,
+          displayTextSegments: compositor.assembledSentence.values,
           markedReadings: Array(compositor.keys[currentMarkedRange()]),
           cursor: convertCursorForDisplay(compositor.cursor),
           marker: convertCursorForDisplay(compositor.marker)
@@ -759,7 +759,7 @@ extension InputHandlerProtocol {
     } else if input.isOptionHold, !input.isShiftHold {
       if input.isControlHold { return handleHome() }
       // 游標跳轉動作無論怎樣都會執行，但如果出了執行失敗的結果的話則觸發報錯流程。
-      if !compositor.jumpCursorBySpan(to: .rear) {
+      if !compositor.jumpCursorBySegment(to: .rear) {
         errorCallback?("8D50DD9E")
         return true
       }
@@ -768,7 +768,7 @@ extension InputHandlerProtocol {
       if compositor.cursor > 0 {
         compositor.cursor -= 1
         if isCursorCuttingChar() {
-          compositor.jumpCursorBySpan(to: .rear)
+          compositor.jumpCursorBySegment(to: .rear)
         }
         session.switchState(generateStateOfInputting())
       } else {
@@ -789,7 +789,7 @@ extension InputHandlerProtocol {
     guard let session = session else { return false }
     let state = session.state
     if isComposerOrCalligrapherEmpty,
-       compositor.isEmpty || compositor.walkedNodes.isEmpty { return false }
+       compositor.isEmpty || compositor.assembledSentence.isEmpty { return false }
     guard state.type == .ofInputting else {
       guard state.type == .ofEmpty else {
         errorCallback?("6044F081")
@@ -810,14 +810,14 @@ extension InputHandlerProtocol {
       return true
     }
 
-    guard let region = compositor.walkedNodes.cursorRegionMap[actualNodeCursorPosition],
-          compositor.walkedNodes.count > region
+    guard let region = compositor.assembledSentence.cursorRegionMap[actualNodeCursorPosition],
+          compositor.assembledSentence.count > region
     else {
       errorCallback?("1CE6FFBD")
       return true
     }
 
-    let currentNode = compositor.walkedNodes[region]
+    let currentNode = compositor.assembledSentence[region]
 
     let currentPaired = (currentNode.keyArray, currentNode.value)
 

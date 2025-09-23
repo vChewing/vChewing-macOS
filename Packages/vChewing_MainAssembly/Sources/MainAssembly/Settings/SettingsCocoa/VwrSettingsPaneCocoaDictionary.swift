@@ -54,7 +54,7 @@ extension SettingsPanesCocoa {
         NSTabView.build {
           NSTabView.TabPage(title: "Ａ") {
             NSStackView.buildSection(width: innerContentWidth) {
-              UserDef.kFetchSuggestionsFromUserOverrideModel.render(fixWidth: innerContentWidth)
+              UserDef.kFetchSuggestionsFromPerceptionOverrideModel.render(fixWidth: innerContentWidth)
               UserDef.kFilterNonCNSReadingsForCHTInput
                 .render(fixWidth: innerContentWidth) { renderable in
                   renderable.currentControl?.target = self

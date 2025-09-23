@@ -10,7 +10,7 @@ import Foundation
 
 public protocol PrefMgrProtocol {
   var isDebugModeEnabled: Bool { get set }
-  var failureFlagForUOMObservation: Bool { get set }
+  var failureFlagForPOMObservation: Bool { get set }
   var candidateServiceMenuContents: [String] { get set }
   var respectClientAccentColor: Bool { get set }
   var alwaysUsePCBWithElectronBasedClients: Bool { get set }
@@ -42,7 +42,7 @@ public protocol PrefMgrProtocol {
   var minCellWidthForHorizontalMatrix: Int { get set }
   var chooseCandidateUsingSpace: Bool { get set }
   var allowBoostingSingleKanjiAsUserPhrase: Bool { get set }
-  var fetchSuggestionsFromUserOverrideModel: Bool { get set }
+  var fetchSuggestionsFromPerceptionOverrideModel: Bool { get set }
   var useFixedCandidateOrderOnSelection: Bool { get set }
   var autoCorrectReadingCombination: Bool { get set }
   var readingNarrationCoverage: Int { get set }

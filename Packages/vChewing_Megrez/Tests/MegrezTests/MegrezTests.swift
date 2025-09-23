@@ -10,32 +10,32 @@ import XCTest
 // MARK: - MegrezTestsBasic
 
 final class MegrezTestsBasic: XCTestCase {
-  func test01_Span() throws {
+  func test01_Segment() throws {
     let langModel = SimpleLM(input: strLMSampleDataLitch)
-    var span = Megrez.SpanUnit()
+    var segment = Megrez.Segment()
     let n1 = Megrez.Node(
-      keyArray: ["da4"], spanLength: 1, unigrams: langModel.unigramsFor(keyArray: ["da4"])
+      keyArray: ["da4"], segLength: 1, unigrams: langModel.unigramsFor(keyArray: ["da4"])
     )
     let n3 = Megrez.Node(
-      keyArray: ["da4", "qian2", "tian1"], spanLength: 3,
+      keyArray: ["da4", "qian2", "tian1"], segLength: 3,
       unigrams: langModel.unigramsFor(keyArray: ["da4-qian2-tian1"])
     )
-    XCTAssertEqual(span.maxLength, 0)
-    span[n1.spanLength] = n1
-    XCTAssertEqual(span.maxLength, 1)
-    span[n3.spanLength] = n3
-    XCTAssertEqual(span.maxLength, 3)
-    XCTAssertEqual(span[1], n1)
-    XCTAssertEqual(span[2], nil)
-    XCTAssertEqual(span[3], n3)
-    span.removeAll()
-    XCTAssertEqual(span.maxLength, 0)
-    XCTAssertEqual(span[1], nil)
-    XCTAssertEqual(span[2], nil)
-    XCTAssertEqual(span[3], nil)
+    XCTAssertEqual(segment.maxLength, 0)
+    segment[n1.segLength] = n1
+    XCTAssertEqual(segment.maxLength, 1)
+    segment[n3.segLength] = n3
+    XCTAssertEqual(segment.maxLength, 3)
+    XCTAssertEqual(segment[1], n1)
+    XCTAssertEqual(segment[2], nil)
+    XCTAssertEqual(segment[3], n3)
+    segment.removeAll()
+    XCTAssertEqual(segment.maxLength, 0)
+    XCTAssertEqual(segment[1], nil)
+    XCTAssertEqual(segment[2], nil)
+    XCTAssertEqual(segment[3], nil)
   }
 
-  func test02_Compositor_BasicSpanNodeGramInsertion() throws {
+  func test02_Compositor_BasicSegmentNodeGramInsertion() throws {
     let compositor = Megrez.Compositor(with: MockLM())
     XCTAssertEqual(compositor.separator, Megrez.Compositor.theSeparator)
     XCTAssertEqual(compositor.cursor, 0)
@@ -44,13 +44,13 @@ final class MegrezTestsBasic: XCTestCase {
     compositor.insertKey("s")
     XCTAssertEqual(compositor.cursor, 1)
     XCTAssertEqual(compositor.length, 1)
-    XCTAssertEqual(compositor.spans.count, 1)
-    XCTAssertEqual(compositor.spans[0].maxLength, 1)
-    XCTAssertEqual(compositor.spans[0][1]?.keyArray, ["s"])
+    XCTAssertEqual(compositor.segments.count, 1)
+    XCTAssertEqual(compositor.segments[0].maxLength, 1)
+    XCTAssertEqual(compositor.segments[0][1]?.keyArray, ["s"])
     compositor.dropKey(direction: .rear)
     XCTAssertEqual(compositor.cursor, 0)
     XCTAssertEqual(compositor.length, 0)
-    XCTAssertEqual(compositor.spans.count, 0)
+    XCTAssertEqual(compositor.segments.count, 0)
   }
 
   func test03_Compositor_DefendingInvalidOps() throws {
@@ -74,45 +74,45 @@ final class MegrezTestsBasic: XCTestCase {
     XCTAssertEqual(compositor.length, 0)
   }
 
-  /// 測試任何長度大於 1 的幅位。
-  func test04_Compositor_SpansAcrossPositions() throws {
+  /// 測試任何長度大於 1 的幅節。
+  func test04_Compositor_SegmentsAcrossPositions() throws {
     let compositor = Megrez.Compositor(with: MockLM())
     compositor.separator = ";"
     compositor.insertKey("h")
     compositor.insertKey("o")
     compositor.insertKey("g")
     XCTAssertTrue((compositor.cursor, compositor.length) == (3, 3))
-    XCTAssertTrue((compositor.spans.count) == 3)
-    XCTAssertTrue(compositor.spans[0].maxLength == 3)
-    XCTAssertTrue(compositor.spans[0][1]?.keyArray == ["h"])
-    XCTAssertTrue(compositor.spans[0][2]?.keyArray == ["h", "o"])
-    XCTAssertTrue(compositor.spans[0][3]?.keyArray == ["h", "o", "g"])
-    XCTAssertTrue(compositor.spans[1].maxLength == 2)
-    XCTAssertTrue(compositor.spans[1][1]?.keyArray == ["o"])
-    XCTAssertTrue(compositor.spans[1][2]?.keyArray == ["o", "g"])
-    XCTAssertTrue(compositor.spans[2].maxLength == 1)
-    XCTAssertTrue(compositor.spans[2][1]?.keyArray == ["g"])
+    XCTAssertTrue((compositor.segments.count) == 3)
+    XCTAssertTrue(compositor.segments[0].maxLength == 3)
+    XCTAssertTrue(compositor.segments[0][1]?.keyArray == ["h"])
+    XCTAssertTrue(compositor.segments[0][2]?.keyArray == ["h", "o"])
+    XCTAssertTrue(compositor.segments[0][3]?.keyArray == ["h", "o", "g"])
+    XCTAssertTrue(compositor.segments[1].maxLength == 2)
+    XCTAssertTrue(compositor.segments[1][1]?.keyArray == ["o"])
+    XCTAssertTrue(compositor.segments[1][2]?.keyArray == ["o", "g"])
+    XCTAssertTrue(compositor.segments[2].maxLength == 1)
+    XCTAssertTrue(compositor.segments[2][1]?.keyArray == ["g"])
   }
 
-  /// 測試對讀音鍵與幅位的刪除行為。
+  /// 測試對讀音鍵與幅節的刪除行為。
   ///
   /// 敝專案不使用石磬軟體及其成員們所使用的「前 (Before) / 後 (After)」術語體系，
   /// 而是採用「前方 (Front) / 後方 (Rear)」這種中英文表述都不產生歧義的講法。
-  func test05_Compositor_KeyAndSpanDeletionInAllDirections() throws {
+  func test05_Compositor_KeyAndSegmentDeletionInAllDirections() throws {
     let compositor = Megrez.Compositor(with: MockLM())
     compositor.insertKey("a")
     compositor.cursor = 0
     XCTAssertEqual(compositor.cursor, 0)
     XCTAssertEqual(compositor.length, 1)
-    XCTAssertEqual(compositor.spans.count, 1)
+    XCTAssertEqual(compositor.segments.count, 1)
     XCTAssertFalse(compositor.dropKey(direction: .rear))
     XCTAssertEqual(compositor.cursor, 0)
     XCTAssertEqual(compositor.length, 1)
-    XCTAssertEqual(compositor.spans.count, 1)
+    XCTAssertEqual(compositor.segments.count, 1)
     XCTAssertTrue(compositor.dropKey(direction: .front))
     XCTAssertEqual(compositor.cursor, 0)
     XCTAssertEqual(compositor.length, 0)
-    XCTAssertEqual(compositor.spans.count, 0)
+    XCTAssertEqual(compositor.segments.count, 0)
 
     func resetcompositorForTests() {
       compositor.clear()
@@ -121,68 +121,68 @@ final class MegrezTestsBasic: XCTestCase {
       compositor.insertKey("g")
     }
 
-    // 測試對幅位的刪除行為所產生的影響（從最前端開始往後方刪除）。
+    // 測試對幅節的刪除行為所產生的影響（從最前端開始往後方刪除）。
     do {
       resetcompositorForTests()
       XCTAssertFalse(compositor.dropKey(direction: .front))
       XCTAssertTrue(compositor.dropKey(direction: .rear))
       XCTAssertTrue((compositor.cursor, compositor.length) == (2, 2))
-      XCTAssertTrue((compositor.spans.count) == 2)
-      XCTAssertTrue(compositor.spans[0].maxLength == 2)
-      XCTAssertTrue(compositor.spans[0][1]?.keyArray == ["h"])
-      XCTAssertTrue(compositor.spans[0][2]?.keyArray == ["h", "o"])
-      XCTAssertTrue(compositor.spans[1].maxLength == 1)
-      XCTAssertTrue(compositor.spans[1][1]?.keyArray == ["o"])
+      XCTAssertTrue((compositor.segments.count) == 2)
+      XCTAssertTrue(compositor.segments[0].maxLength == 2)
+      XCTAssertTrue(compositor.segments[0][1]?.keyArray == ["h"])
+      XCTAssertTrue(compositor.segments[0][2]?.keyArray == ["h", "o"])
+      XCTAssertTrue(compositor.segments[1].maxLength == 1)
+      XCTAssertTrue(compositor.segments[1][1]?.keyArray == ["o"])
     }
 
-    // 測試對幅位的刪除行為所產生的影響（從最後端開始往前方刪除）。
+    // 測試對幅節的刪除行為所產生的影響（從最後端開始往前方刪除）。
     do {
       resetcompositorForTests()
       compositor.cursor = 0
       XCTAssertFalse(compositor.dropKey(direction: .rear))
       XCTAssertTrue(compositor.dropKey(direction: .front))
       XCTAssertTrue((compositor.cursor, compositor.length) == (0, 2))
-      XCTAssertTrue((compositor.spans.count) == 2)
-      XCTAssertTrue(compositor.spans[0].maxLength == 2)
-      XCTAssertTrue(compositor.spans[0][1]?.keyArray == ["o"])
-      XCTAssertTrue(compositor.spans[0][2]?.keyArray == ["o", "g"])
-      XCTAssertTrue(compositor.spans[1].maxLength == 1)
-      XCTAssertTrue(compositor.spans[1][1]?.keyArray == ["g"])
+      XCTAssertTrue((compositor.segments.count) == 2)
+      XCTAssertTrue(compositor.segments[0].maxLength == 2)
+      XCTAssertTrue(compositor.segments[0][1]?.keyArray == ["o"])
+      XCTAssertTrue(compositor.segments[0][2]?.keyArray == ["o", "g"])
+      XCTAssertTrue(compositor.segments[1].maxLength == 1)
+      XCTAssertTrue(compositor.segments[1][1]?.keyArray == ["g"])
     }
 
-    // 測試對幅位的刪除行為所產生的影響（從中間開始往後方刪除）。
+    // 測試對幅節的刪除行為所產生的影響（從中間開始往後方刪除）。
     do {
       resetcompositorForTests()
       compositor.cursor = 2
       XCTAssertTrue(compositor.dropKey(direction: .rear))
       XCTAssertTrue((compositor.cursor, compositor.length) == (1, 2))
-      XCTAssertTrue((compositor.spans.count) == 2)
-      XCTAssertTrue(compositor.spans[0].maxLength == 2)
-      XCTAssertTrue(compositor.spans[0][1]?.keyArray == ["h"])
-      XCTAssertTrue(compositor.spans[0][2]?.keyArray == ["h", "g"])
-      XCTAssertTrue(compositor.spans[1].maxLength == 1)
-      XCTAssertTrue(compositor.spans[1][1]?.keyArray == ["g"])
+      XCTAssertTrue((compositor.segments.count) == 2)
+      XCTAssertTrue(compositor.segments[0].maxLength == 2)
+      XCTAssertTrue(compositor.segments[0][1]?.keyArray == ["h"])
+      XCTAssertTrue(compositor.segments[0][2]?.keyArray == ["h", "g"])
+      XCTAssertTrue(compositor.segments[1].maxLength == 1)
+      XCTAssertTrue(compositor.segments[1][1]?.keyArray == ["g"])
     }
 
-    // 測試對幅位的刪除行為所產生的影響（從中間開始往前方刪除）。
+    // 測試對幅節的刪除行為所產生的影響（從中間開始往前方刪除）。
     do {
       let snapshot = compositor.config
       resetcompositorForTests()
       compositor.cursor = 1
       XCTAssertTrue(compositor.dropKey(direction: .front))
       XCTAssertTrue((compositor.cursor, compositor.length) == (1, 2))
-      XCTAssertTrue((compositor.spans.count) == 2)
-      XCTAssertTrue(compositor.spans[0].maxLength == 2)
-      XCTAssertTrue(compositor.spans[0][1]?.keyArray == ["h"])
-      XCTAssertTrue(compositor.spans[0][2]?.keyArray == ["h", "g"])
-      XCTAssertTrue(compositor.spans[1].maxLength == 1)
-      XCTAssertTrue(compositor.spans[1][1]?.keyArray == ["g"])
+      XCTAssertTrue((compositor.segments.count) == 2)
+      XCTAssertTrue(compositor.segments[0].maxLength == 2)
+      XCTAssertTrue(compositor.segments[0][1]?.keyArray == ["h"])
+      XCTAssertTrue(compositor.segments[0][2]?.keyArray == ["h", "g"])
+      XCTAssertTrue(compositor.segments[1].maxLength == 1)
+      XCTAssertTrue(compositor.segments[1][1]?.keyArray == ["g"])
       XCTAssertTrue(snapshot == compositor.config)
     }
   }
 
-  /// 測試在插入某個幅位之後、對其他幅位的影響。
-  func test06_Compositor_SpanInsertion() throws {
+  /// 測試在插入某個幅節之後、對其他幅節的影響。
+  func test06_Compositor_SegmentInsertion() throws {
     let compositor = Megrez.Compositor(with: MockLM())
     compositor.insertKey("是")
     compositor.insertKey("學")
@@ -190,21 +190,21 @@ final class MegrezTestsBasic: XCTestCase {
     compositor.cursor = 1
     compositor.insertKey("大")
     XCTAssert((compositor.cursor, compositor.length) == (2, 4))
-    XCTAssert(compositor.spans.count == 4)
-    XCTAssert(compositor.spans[0].maxLength == 4)
-    XCTAssert(compositor.spans[0][1]?.keyArray == ["是"])
-    XCTAssert(compositor.spans[0][2]?.keyArray == ["是", "大"])
-    XCTAssert(compositor.spans[0][3]?.keyArray == ["是", "大", "學"])
-    XCTAssert(compositor.spans[0][4]?.keyArray == ["是", "大", "學", "生"])
-    XCTAssert(compositor.spans[1].maxLength == 3)
-    XCTAssert(compositor.spans[1][1]?.keyArray == ["大"])
-    XCTAssert(compositor.spans[1][2]?.keyArray == ["大", "學"])
-    XCTAssert(compositor.spans[1][3]?.keyArray == ["大", "學", "生"])
-    XCTAssert(compositor.spans[2].maxLength == 2)
-    XCTAssert(compositor.spans[2][1]?.keyArray == ["學"])
-    XCTAssert(compositor.spans[2][2]?.keyArray == ["學", "生"])
-    XCTAssert(compositor.spans[3].maxLength == 1)
-    XCTAssert(compositor.spans[3][1]?.keyArray == ["生"])
+    XCTAssert(compositor.segments.count == 4)
+    XCTAssert(compositor.segments[0].maxLength == 4)
+    XCTAssert(compositor.segments[0][1]?.keyArray == ["是"])
+    XCTAssert(compositor.segments[0][2]?.keyArray == ["是", "大"])
+    XCTAssert(compositor.segments[0][3]?.keyArray == ["是", "大", "學"])
+    XCTAssert(compositor.segments[0][4]?.keyArray == ["是", "大", "學", "生"])
+    XCTAssert(compositor.segments[1].maxLength == 3)
+    XCTAssert(compositor.segments[1][1]?.keyArray == ["大"])
+    XCTAssert(compositor.segments[1][2]?.keyArray == ["大", "學"])
+    XCTAssert(compositor.segments[1][3]?.keyArray == ["大", "學", "生"])
+    XCTAssert(compositor.segments[2].maxLength == 2)
+    XCTAssert(compositor.segments[2][1]?.keyArray == ["學"])
+    XCTAssert(compositor.segments[2][2]?.keyArray == ["學", "生"])
+    XCTAssert(compositor.segments[3].maxLength == 1)
+    XCTAssert(compositor.segments[3][1]?.keyArray == ["生"])
   }
 
   /// 測試在一個很長的組字區內在中间刪除掉或者添入某個讀音鍵之後的影響。
@@ -217,30 +217,30 @@ final class MegrezTestsBasic: XCTestCase {
       compositor.cursor = 8
       XCTAssert(compositor.dropKey(direction: .rear))
       XCTAssert((compositor.cursor, compositor.length) == (7, 13))
-      XCTAssert(compositor.spans.count == 13)
-      XCTAssert(compositor.spans[0][5]?.keyArray.joined() == "無可奈何花")
-      XCTAssert(compositor.spans[1][5]?.keyArray.joined() == "可奈何花作")
-      XCTAssert(compositor.spans[2][5]?.keyArray.joined() == "奈何花作香")
-      XCTAssert(compositor.spans[3][5]?.keyArray.joined() == "何花作香蝶")
-      XCTAssert(compositor.spans[4][5]?.keyArray.joined() == "花作香蝶能")
-      XCTAssert(compositor.spans[5][5]?.keyArray.joined() == "作香蝶能留")
-      XCTAssert(compositor.spans[6][5]?.keyArray.joined() == "香蝶能留一")
-      XCTAssert(compositor.spans[7][5]?.keyArray.joined() == "蝶能留一縷")
-      XCTAssert(compositor.spans[8][5]?.keyArray.joined() == "能留一縷芳")
+      XCTAssert(compositor.segments.count == 13)
+      XCTAssert(compositor.segments[0][5]?.keyArray.joined() == "無可奈何花")
+      XCTAssert(compositor.segments[1][5]?.keyArray.joined() == "可奈何花作")
+      XCTAssert(compositor.segments[2][5]?.keyArray.joined() == "奈何花作香")
+      XCTAssert(compositor.segments[3][5]?.keyArray.joined() == "何花作香蝶")
+      XCTAssert(compositor.segments[4][5]?.keyArray.joined() == "花作香蝶能")
+      XCTAssert(compositor.segments[5][5]?.keyArray.joined() == "作香蝶能留")
+      XCTAssert(compositor.segments[6][5]?.keyArray.joined() == "香蝶能留一")
+      XCTAssert(compositor.segments[7][5]?.keyArray.joined() == "蝶能留一縷")
+      XCTAssert(compositor.segments[8][5]?.keyArray.joined() == "能留一縷芳")
     }
     do {
       XCTAssert(compositor.insertKey("幽"))
       XCTAssert((compositor.cursor, compositor.length) == (8, 14))
-      XCTAssert(compositor.spans.count == 14)
-      XCTAssert(compositor.spans[0][6]?.keyArray.joined() == "無可奈何花作")
-      XCTAssert(compositor.spans[1][6]?.keyArray.joined() == "可奈何花作香")
-      XCTAssert(compositor.spans[2][6]?.keyArray.joined() == "奈何花作香幽")
-      XCTAssert(compositor.spans[3][6]?.keyArray.joined() == "何花作香幽蝶")
-      XCTAssert(compositor.spans[4][6]?.keyArray.joined() == "花作香幽蝶能")
-      XCTAssert(compositor.spans[5][6]?.keyArray.joined() == "作香幽蝶能留")
-      XCTAssert(compositor.spans[6][6]?.keyArray.joined() == "香幽蝶能留一")
-      XCTAssert(compositor.spans[7][6]?.keyArray.joined() == "幽蝶能留一縷")
-      XCTAssert(compositor.spans[8][6]?.keyArray.joined() == "蝶能留一縷芳")
+      XCTAssert(compositor.segments.count == 14)
+      XCTAssert(compositor.segments[0][6]?.keyArray.joined() == "無可奈何花作")
+      XCTAssert(compositor.segments[1][6]?.keyArray.joined() == "可奈何花作香")
+      XCTAssert(compositor.segments[2][6]?.keyArray.joined() == "奈何花作香幽")
+      XCTAssert(compositor.segments[3][6]?.keyArray.joined() == "何花作香幽蝶")
+      XCTAssert(compositor.segments[4][6]?.keyArray.joined() == "花作香幽蝶能")
+      XCTAssert(compositor.segments[5][6]?.keyArray.joined() == "作香幽蝶能留")
+      XCTAssert(compositor.segments[6][6]?.keyArray.joined() == "香幽蝶能留一")
+      XCTAssert(compositor.segments[7][6]?.keyArray.joined() == "幽蝶能留一縷")
+      XCTAssert(compositor.segments[8][6]?.keyArray.joined() == "蝶能留一縷芳")
     }
   }
 }
@@ -259,7 +259,7 @@ final class MegrezTestsAdvanced: XCTestCase {
     "幽蝶能留一縷芳".forEach { i in
       compositor.insertKey(i.description)
     }
-    let result = compositor.walk()
+    let result = compositor.assemble()
     XCTAssertEqual(result.joinedKeys(by: ""), ["幽蝶", "能", "留", "一縷", "芳"])
     let hardCopy = compositor.copy
     XCTAssertEqual(hardCopy.config, compositor.config)
@@ -274,7 +274,7 @@ final class MegrezTestsAdvanced: XCTestCase {
     }
     NSLog("// Stress test started.")
     let startTime = CFAbsoluteTimeGetCurrent()
-    compositor.walk()
+    compositor.assemble()
     let timeElapsed = CFAbsoluteTimeGetCurrent() - startTime
     NSLog("// Stress test elapsed: \(timeElapsed)s.")
   }
@@ -289,11 +289,11 @@ final class MegrezTestsAdvanced: XCTestCase {
       XCTAssertTrue(compositor.insertKey(key.description))
     }
     print(compositor.keys)
-    let oldResult = compositor.walk().values
+    let oldResult = compositor.assemble().values
     XCTAssertEqual(oldResult, ["樹心", "封"])
     lm.reinit(input: newRawStringLM)
     compositor.update(updateExisting: true)
-    let newResult = compositor.walk().values
+    let newResult = compositor.assemble().values
     XCTAssertEqual(newResult, ["樹新風"])
   }
 
@@ -351,8 +351,8 @@ final class MegrezTestsAdvanced: XCTestCase {
       readings.forEach {
         compositor.insertKey($0.description)
       }
-      // 初始爬軌結果。
-      let assembledSentence = compositor.walk().map(\.value)
+      // 初始組句結果。
+      let assembledSentence = compositor.assemble().map(\.value)
       XCTAssertTrue(assembledSentence == ["科技", "公園"])
       // 測試候選字詞過濾。
       let gotBeginAt = compositor.fetchCandidates(at: 2, filter: .beginAt).map(\.value)
@@ -386,7 +386,7 @@ final class MegrezTestsAdvanced: XCTestCase {
   }
 
   /// 組字器的組字功能測試（單元圖，完整輸入讀音與聲調，完全匹配）。
-  func test13_Compositor_WalkAndOverrideWithUnigramAndCursorJump() throws {
+  func test13_Compositor_AssembleAndOverrideWithUnigramAndCursorJump() throws {
     let readings = "chao1 shang1 da4 qian2 tian1 wei2 zhi3 hai2 zai5 mai4 nai3 ji1"
     let mockLM = SimpleLM(input: strLMSampleDataLitch)
     let compositor = Megrez.Compositor(with: mockLM)
@@ -395,8 +395,8 @@ final class MegrezTestsAdvanced: XCTestCase {
     }
     XCTAssert(compositor.length == 12)
     XCTAssert(compositor.length == compositor.cursor)
-    // 初始爬軌結果。
-    var assembledSentence = compositor.walk().map(\.value)
+    // 初始組句結果。
+    var assembledSentence = compositor.assemble().map(\.value)
     XCTAssert(assembledSentence == ["超商", "大前天", "為止", "還", "在", "賣", "荔枝"])
     // 測試 DumpDOT。
     let expectedDumpDOT = """
@@ -416,46 +416,46 @@ final class MegrezTestsAdvanced: XCTestCase {
       XCTAssertTrue(
         compositorCopy1.overrideCandidate(.init(keyArray: ["ji1"], value: "雞"), at: 11)
       )
-      assembledSentence = compositorCopy1.walk().map(\.value)
+      assembledSentence = compositorCopy1.assemble().map(\.value)
       XCTAssert(assembledSentence == ["超商", "大前天", "為止", "還", "在", "賣", "乃", "雞"])
     }
     // 回到先前的測試，測試對整個詞的覆寫。
     XCTAssert(
       compositor.overrideCandidate(.init(keyArray: ["nai3", "ji1"], value: "奶雞"), at: 10)
     )
-    assembledSentence = compositor.walk().map(\.value)
+    assembledSentence = compositor.assemble().map(\.value)
     XCTAssert(assembledSentence == ["超商", "大前天", "為止", "還", "在", "賣", "奶雞"])
     // 測試游標跳轉。
     compositor.cursor = 10 // 向後
-    XCTAssert(compositor.jumpCursorBySpan(to: .rear))
+    XCTAssert(compositor.jumpCursorBySegment(to: .rear))
     XCTAssert(compositor.cursor == 9)
-    XCTAssert(compositor.jumpCursorBySpan(to: .rear))
+    XCTAssert(compositor.jumpCursorBySegment(to: .rear))
     XCTAssert(compositor.cursor == 8)
-    XCTAssert(compositor.jumpCursorBySpan(to: .rear))
+    XCTAssert(compositor.jumpCursorBySegment(to: .rear))
     XCTAssert(compositor.cursor == 7)
-    XCTAssert(compositor.jumpCursorBySpan(to: .rear))
+    XCTAssert(compositor.jumpCursorBySegment(to: .rear))
     XCTAssert(compositor.cursor == 5)
-    XCTAssert(compositor.jumpCursorBySpan(to: .rear))
+    XCTAssert(compositor.jumpCursorBySegment(to: .rear))
     XCTAssert(compositor.cursor == 2)
-    XCTAssert(compositor.jumpCursorBySpan(to: .rear))
+    XCTAssert(compositor.jumpCursorBySegment(to: .rear))
     XCTAssert(compositor.cursor == 0)
-    XCTAssertFalse(compositor.jumpCursorBySpan(to: .rear))
+    XCTAssertFalse(compositor.jumpCursorBySegment(to: .rear))
     XCTAssert(compositor.cursor == 0) // 接下來準備向前
-    XCTAssert(compositor.jumpCursorBySpan(to: .front))
+    XCTAssert(compositor.jumpCursorBySegment(to: .front))
     XCTAssert(compositor.cursor == 2)
-    XCTAssert(compositor.jumpCursorBySpan(to: .front))
+    XCTAssert(compositor.jumpCursorBySegment(to: .front))
     XCTAssert(compositor.cursor == 5)
-    XCTAssert(compositor.jumpCursorBySpan(to: .front))
+    XCTAssert(compositor.jumpCursorBySegment(to: .front))
     XCTAssert(compositor.cursor == 7)
-    XCTAssert(compositor.jumpCursorBySpan(to: .front))
+    XCTAssert(compositor.jumpCursorBySegment(to: .front))
     XCTAssert(compositor.cursor == 8)
-    XCTAssert(compositor.jumpCursorBySpan(to: .front))
+    XCTAssert(compositor.jumpCursorBySegment(to: .front))
     XCTAssert(compositor.cursor == 9)
-    XCTAssert(compositor.jumpCursorBySpan(to: .front))
+    XCTAssert(compositor.jumpCursorBySegment(to: .front))
     XCTAssert(compositor.cursor == 10)
-    XCTAssert(compositor.jumpCursorBySpan(to: .front))
+    XCTAssert(compositor.jumpCursorBySegment(to: .front))
     XCTAssert(compositor.cursor == 12)
-    XCTAssertFalse(compositor.jumpCursorBySpan(to: .front))
+    XCTAssertFalse(compositor.jumpCursorBySegment(to: .front))
     XCTAssert(compositor.cursor == 12)
   }
 
@@ -463,15 +463,15 @@ final class MegrezTestsAdvanced: XCTestCase {
   ///
   /// 注：敝引擎（Megrez 天權星）不支援 Bigram 與 Partial Key Matching。
   /// 對此有需求者請洽其繼任者「libHoma（護摩）」。
-  func test14_Compositor_WalkAndOverride_AnotherTest() throws {
+  func test14_Compositor_AssembleAndOverride_AnotherTest() throws {
     let readings: [Substring] = "you1 die2 neng2 liu2 yi4 lv3 fang1".split(separator: " ")
     let lm = SimpleLM(input: strLMSampleDataHutao)
     let compositor = Megrez.Compositor(with: lm)
     readings.forEach {
       compositor.insertKey($0.description)
     }
-    // 初始爬軌結果。
-    var assembledSentence = compositor.walk().map(\.value)
+    // 初始組句結果。
+    var assembledSentence = compositor.assemble().map(\.value)
     XCTAssert(assembledSentence == ["幽蝶", "能", "留意", "呂方"])
     // 測試覆寫「留」以試圖打斷「留意」。
     compositor.overrideCandidate(
@@ -481,13 +481,13 @@ final class MegrezTestsAdvanced: XCTestCase {
     compositor.overrideCandidate(
       .init((["yi4", "lv3"], "一縷")), at: 4, overrideType: .withHighScore
     )
-    assembledSentence = compositor.walk().map(\.value)
+    assembledSentence = compositor.assemble().map(\.value)
     XCTAssertEqual(assembledSentence, ["幽蝶", "能", "留", "一縷", "方"])
     // 對位置 7 這個最前方的座標位置使用節點覆寫。會在此過程中自動糾正成對位置 6 的覆寫。
     compositor.overrideCandidate(
       .init((["fang1"], "芳")), at: 7, overrideType: .withHighScore
     )
-    assembledSentence = compositor.walk().map(\.value)
+    assembledSentence = compositor.assemble().map(\.value)
     XCTAssert(assembledSentence == ["幽蝶", "能", "留", "一縷", "芳"])
     let expectedDOT = """
     digraph {\ngraph [ rankdir=LR ];\nBOS;\nBOS -> 優;\n優;\n優 -> 跌;\nBOS -> 幽蝶;\n\
@@ -507,7 +507,7 @@ final class MegrezTestsAdvanced: XCTestCase {
     readings.forEach {
       compositor.insertKey($0.description)
     }
-    let result = compositor.walk()
+    let result = compositor.assemble()
     var assembledSentence = result.map(\.value)
     XCTAssertEqual(result.values, ["水果汁"])
     // 測試針對第一個漢字的位置的操作。
@@ -516,7 +516,7 @@ final class MegrezTestsAdvanced: XCTestCase {
         XCTAssertTrue(
           compositor.overrideCandidate(.init(keyArray: ["shui3"], value: "💦"), at: 0)
         )
-        assembledSentence = compositor.walk().map(\.value)
+        assembledSentence = compositor.assemble().map(\.value)
         XCTAssertEqual(assembledSentence, ["💦", "果汁"])
       }
       do {
@@ -525,7 +525,7 @@ final class MegrezTestsAdvanced: XCTestCase {
             .init(keyArray: ["shui3", "guo3", "zhi1"], value: "水果汁"), at: 1
           )
         )
-        assembledSentence = compositor.walk().map(\.value)
+        assembledSentence = compositor.assemble().map(\.value)
         XCTAssertEqual(assembledSentence, ["水果汁"])
       }
       do {
@@ -533,7 +533,7 @@ final class MegrezTestsAdvanced: XCTestCase {
           // 再覆寫回來。
           compositor.overrideCandidate(.init(keyArray: ["shui3"], value: "💦"), at: 0)
         )
-        assembledSentence = compositor.walk().map(\.value)
+        assembledSentence = compositor.assemble().map(\.value)
         XCTAssertEqual(assembledSentence, ["💦", "果汁"])
       }
     }
@@ -544,14 +544,14 @@ final class MegrezTestsAdvanced: XCTestCase {
         XCTAssertTrue(
           compositor.overrideCandidate(.init(keyArray: ["guo3"], value: "裹"), at: 1)
         )
-        assembledSentence = compositor.walk().map(\.value)
+        assembledSentence = compositor.assemble().map(\.value)
         XCTAssertEqual(assembledSentence, ["💦", "裹", "之"])
       }
       do {
         XCTAssertTrue(
           compositor.overrideCandidate(.init(keyArray: ["zhi1"], value: "知"), at: 2)
         )
-        assembledSentence = compositor.walk().map(\.value)
+        assembledSentence = compositor.assemble().map(\.value)
         XCTAssertEqual(assembledSentence, ["💦", "裹", "知"])
       }
       do {
@@ -561,7 +561,7 @@ final class MegrezTestsAdvanced: XCTestCase {
             .init(keyArray: ["shui3", "guo3", "zhi1"], value: "水果汁"), at: 3
           )
         )
-        assembledSentence = compositor.walk().map(\.value)
+        assembledSentence = compositor.assemble().map(\.value)
         XCTAssertEqual(assembledSentence, ["水果汁"])
       }
     }
@@ -575,25 +575,25 @@ final class MegrezTestsAdvanced: XCTestCase {
     readings.forEach {
       compositor.insertKey($0.description)
     }
-    var result = compositor.walk()
+    var result = compositor.assemble()
     XCTAssertEqual(result.values, ["科技", "公園"])
 
     XCTAssertTrue(compositor.overrideCandidate(
       .init(keyArray: ["ji4", "gong1"], value: "濟公"), at: 1
     ))
-    result = compositor.walk()
+    result = compositor.assemble()
     XCTAssertEqual(result.values, ["顆", "濟公", "元"])
 
     XCTAssertTrue(compositor.overrideCandidate(
       .init(keyArray: ["gong1", "yuan2"], value: "公猿"), at: 2
     ))
-    result = compositor.walk()
+    result = compositor.assemble()
     XCTAssertEqual(result.values, ["科技", "公猿"])
 
     XCTAssertTrue(compositor.overrideCandidate(
       .init(keyArray: ["ke1", "ji4"], value: "科際"), at: 0
     ))
-    result = compositor.walk()
+    result = compositor.assemble()
     XCTAssertEqual(result.values, ["科際", "公猿"])
   }
 
@@ -605,18 +605,18 @@ final class MegrezTestsAdvanced: XCTestCase {
     readings.forEach {
       compositor.insertKey($0.description)
     }
-    var result = compositor.walk()
+    var result = compositor.assemble()
     XCTAssertEqual(result.values, ["大樹", "新的", "蜜蜂"])
     let pos = 2
 
     XCTAssertTrue(compositor.overrideCandidate(.init(keyArray: ["xin1"], value: "🆕"), at: pos))
-    result = compositor.walk()
+    result = compositor.assemble()
     XCTAssertEqual(result.values, ["大樹", "🆕", "的", "蜜蜂"])
 
     XCTAssertTrue(
       compositor.overrideCandidate(.init(keyArray: ["xin1", "de5"], value: "🆕"), at: pos)
     )
-    result = compositor.walk()
+    result = compositor.assemble()
     XCTAssertEqual(result.values, ["大樹", "🆕", "蜜蜂"])
   }
 }

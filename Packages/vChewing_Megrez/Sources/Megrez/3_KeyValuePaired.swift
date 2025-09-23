@@ -120,7 +120,7 @@ extension Megrez.Compositor {
   /// - endAt 僅獲取在當前游標位置結束的節點內的候選字。
   public enum CandidateFetchFilter { case all, beginAt, endAt }
 
-  /// 返回在當前位置的所有候選字詞（以詞音配對的形式）。如果組字器內有幅位、且游標
+  /// 返回在當前位置的所有候選字詞（以詞音配對的形式）。如果組字器內有幅節、且游標
   /// 位於組字器的（文字輸入順序的）最前方（也就是游標位置的數值是最大合規數值）的
   /// 話，那麼這裡會對 location 的位置自動減去 1、以免去在呼叫該函式後再處理的麻煩。
   /// - Parameter location: 游標位置，必須是顯示的游標位置、不得做任何事先糾偏處理。
@@ -151,8 +151,8 @@ extension Megrez.Compositor {
           guard theAnchor.location == location else { return }
         case .endAt:
           guard theNode.keyArray.last == keyAtCursor else { return }
-          switch theNode.spanLength {
-          case 2... where theAnchor.location + theAnchor.node.spanLength - 1 != location: return
+          switch theNode.segLength {
+          case 2... where theAnchor.location + theAnchor.node.segLength - 1 != location: return
           default: break
           }
         }
@@ -232,18 +232,19 @@ extension Megrez.Compositor {
 
     guard let overridden = overridden else { return false } // 啥也不覆寫。
 
-    (overridden.location ..< min(spans.count, overridden.location + overridden.node.spanLength))
+    (overridden.location ..< min(segments.count, overridden.location + overridden.node.segLength))
       .forEach { i in
-        /// 咱們還得弱化所有在相同的幅位座標的節點的複寫權重。舉例說之前爬軌的結果是「A BC」
-        /// 且 A 與 BC 都是被覆寫的結果，然後使用者現在在與 A 相同的幅位座標位置
+        /// 咱們還得弱化所有在相同的幅節座標的節點的複寫權重。舉例說之前組句的結果是「A BC」
+        /// 且 A 與 BC 都是被覆寫的結果，然後使用者現在在與 A 相同的幅節座標位置
         /// 選了「DEF」，那麼 BC 的覆寫狀態就有必要重設（但 A 不用重設）。
         arrOverlappedNodes = fetchOverlappingNodes(at: i)
         arrOverlappedNodes.forEach { anchor in
           if anchor.node == overridden.node { return }
           let anchorNodeKeyJoined = anchor.node.joinedKey(by: "\t")
           let overriddenNodeKeyJoined = overridden.node.joinedKey(by: "\t")
-          if !overriddenNodeKeyJoined.has(string: anchorNodeKeyJoined) || !overridden.node.value
-            .has(string: anchor.node.value) {
+          let joinedKeyContained = overriddenNodeKeyJoined.has(string: anchorNodeKeyJoined)
+          let valueContained = overridden.node.value.has(string: anchor.node.value)
+          if !joinedKeyContained || !valueContained {
             anchor.node.reset()
             return
           }

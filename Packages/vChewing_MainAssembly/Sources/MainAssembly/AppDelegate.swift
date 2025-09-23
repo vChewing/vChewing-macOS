@@ -82,21 +82,21 @@ extension AppDelegate {
 
     CandidateTextService.enableFinalSanityCheck()
 
-    // 一旦發現與使用者半衰模組的觀察行為有關的崩潰標記被開啟：
-    // 如果有開啟 Debug 模式的話，就將既有的半衰記憶資料檔案更名＋打上當時的時間戳。
-    // 如果沒有開啟 Debug 模式的話，則將半衰記憶資料直接清空。
-    if PrefMgr.shared.failureFlagForUOMObservation {
-      LMMgr.relocateWreckedUOMData()
-      PrefMgr.shared.failureFlagForUOMObservation = false
+    // 一旦發現與使用者漸退模組的觀察行為有關的崩潰標記被開啟：
+    // 如果有開啟 Debug 模式的話，就將既有的漸退記憶資料檔案更名＋打上當時的時間戳。
+    // 如果沒有開啟 Debug 模式的話，則將漸退記憶資料直接清空。
+    if PrefMgr.shared.failureFlagForPOMObservation {
+      LMMgr.relocateWreckedPOMData()
+      PrefMgr.shared.failureFlagForPOMObservation = false
       let msgPackage = UNMutableNotificationContent()
       msgPackage.title = NSLocalizedString("vChewing", comment: "")
       msgPackage.body = NSLocalizedString(
-        "vChewing crashed while handling previously loaded UOM observation data. These data files are cleaned now to ensure the usability.",
+        "vChewing crashed while handling previously loaded POM observation data. These data files are cleaned now to ensure the usability.",
         comment: ""
       )
       msgPackage.sound = .defaultCritical
       UNUserNotificationCenter.current().add(
-        .init(identifier: "vChewing.notification.uomCrash", content: msgPackage, trigger: nil),
+        .init(identifier: "vChewing.notification.pomCrash", content: msgPackage, trigger: nil),
         withCompletionHandler: nil
       )
     }
