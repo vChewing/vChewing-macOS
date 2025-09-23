@@ -9,6 +9,8 @@
 import AppKit
 import Shared
 
+// MARK: - PopupCompositionBuffer
+
 public class PopupCompositionBuffer: NSWindowController {
   // MARK: Lifecycle
 
@@ -16,31 +18,150 @@ public class PopupCompositionBuffer: NSWindowController {
     let contentRect = NSRect(x: 128.0, y: 128.0, width: 300.0, height: 20.0)
     let styleMask: NSWindow.StyleMask = [.borderless, .nonactivatingPanel]
     let panel = NSPanel(
-      contentRect: contentRect, styleMask: styleMask, backing: .buffered, defer: false
+      contentRect: contentRect,
+      styleMask: styleMask,
+      backing: .buffered,
+      defer: false
     )
     panel.level = NSWindow.Level(Int(max(CGShieldingWindowLevel(), kCGPopUpMenuWindowLevel)) + 1)
     panel.hasShadow = true
     panel.backgroundColor = .clear
     panel.isOpaque = false
-    self.messageTextField = NSTextField()
-    messageTextField.isEditable = false
-    messageTextField.isSelectable = false
-    messageTextField.isBezeled = false
-    messageTextField.textColor = NSColor.selectedMenuItemTextColor
-    messageTextField.drawsBackground = true
-    messageTextField.backgroundColor = NSColor.clear
-    messageTextField.font = .systemFont(ofSize: 18) // 不是最終值。
-    panel.contentView?.addSubview(messageTextField)
-    panel.contentView?.wantsLayer = true
-    panel.contentView?.shadow = .init()
-    panel.contentView?.shadow?.shadowBlurRadius = 6
-    panel.contentView?.shadow?.shadowColor = .black
-    panel.contentView?.shadow?.shadowOffset = .zero
-    if let layer = panel.contentView?.layer {
-      layer.cornerRadius = 9
-      layer.borderWidth = 1
-      layer.masksToBounds = true
+
+    self.visualEffectView = {
+      // LiquidGlass 效果會嚴重威脅到視窗後特殊背景下的文字可見性，只能棄用。
+      if #available(macOS 26.0, *), NSApplication.uxLevel == .liquidGlass {
+        #if compiler(>=6.2) && canImport(AppKit, _version: 26.0)
+          let resultView = NSGlassEffectView()
+          resultView.cornerRadius = 9
+          resultView.style = .clear
+          let bgTintColor: NSColor = !NSApplication.isDarkMode ? .white : .black
+          resultView.wantsLayer = true
+          resultView.layer?.cornerRadius = 9
+          resultView.layer?.masksToBounds = true
+          resultView.layer?.backgroundColor = bgTintColor.withAlphaComponent(0.1).cgColor
+          return resultView
+        #endif
+      }
+      if #available(macOS 10.10, *), NSApplication.uxLevel != .none {
+        let resultView = NSVisualEffectView()
+        resultView.material = .titlebar
+        resultView.blendingMode = .behindWindow
+        resultView.state = .active
+        // 設置圓角以保持原有的視覺特性
+        resultView.wantsLayer = true
+        resultView.layer?.cornerRadius = 9
+        resultView.layer?.masksToBounds = true
+        return resultView
+      }
+      return nil
+    }()
+
+    self.compositionView = PopupCompositionView(frame: contentRect)
+    let viewSize = compositionView.fittingSize
+
+    // 創建容器視圖作為 ZStack，設置固定尺寸
+    let containerView = NSView(frame: NSRect(origin: .zero, size: viewSize))
+    // 為容器視圖也設置圓角，確保整體一致性
+    containerView.wantsLayer = true
+    containerView.layer?.cornerRadius = 9
+    containerView.layer?.masksToBounds = true
+
+    // 設置背景視覺效果視圖
+    if let visualEffectView {
+      visualEffectView.translatesAutoresizingMaskIntoConstraints = false
+      containerView.addSubview(visualEffectView)
+      let visualConstraints = [
+        NSLayoutConstraint(
+          item: visualEffectView,
+          attribute: .top,
+          relatedBy: .equal,
+          toItem: containerView,
+          attribute: .top,
+          multiplier: 1,
+          constant: 0
+        ),
+        NSLayoutConstraint(
+          item: visualEffectView,
+          attribute: .leading,
+          relatedBy: .equal,
+          toItem: containerView,
+          attribute: .leading,
+          multiplier: 1,
+          constant: 0
+        ),
+        NSLayoutConstraint(
+          item: visualEffectView,
+          attribute: .trailing,
+          relatedBy: .equal,
+          toItem: containerView,
+          attribute: .trailing,
+          multiplier: 1,
+          constant: 0
+        ),
+        NSLayoutConstraint(
+          item: visualEffectView,
+          attribute: .bottom,
+          relatedBy: .equal,
+          toItem: containerView,
+          attribute: .bottom,
+          multiplier: 1,
+          constant: 0
+        ),
+      ]
+      containerView.addConstraints(visualConstraints)
     }
+
+    // 添加候選窗口內容視圖
+    compositionView.translatesAutoresizingMaskIntoConstraints = false
+    containerView.addSubview(compositionView)
+    let compositionConstraints = [
+      NSLayoutConstraint(
+        item: compositionView,
+        attribute: .top,
+        relatedBy: .equal,
+        toItem: containerView,
+        attribute: .top,
+        multiplier: 1,
+        constant: 0
+      ),
+      NSLayoutConstraint(
+        item: compositionView,
+        attribute: .leading,
+        relatedBy: .equal,
+        toItem: containerView,
+        attribute: .leading,
+        multiplier: 1,
+        constant: 0
+      ),
+      NSLayoutConstraint(
+        item: compositionView,
+        attribute: .trailing,
+        relatedBy: .equal,
+        toItem: containerView,
+        attribute: .trailing,
+        multiplier: 1,
+        constant: 0
+      ),
+      NSLayoutConstraint(
+        item: compositionView,
+        attribute: .bottom,
+        relatedBy: .equal,
+        toItem: containerView,
+        attribute: .bottom,
+        multiplier: 1,
+        constant: 0
+      ),
+    ]
+    containerView.addConstraints(compositionConstraints)
+
+    panel.contentView = containerView
+
+    // 設置尺寸變更回調
+    compositionView.onSizeChanged = { [weak panel] newSize in
+      panel?.setFrame(NSRect(origin: panel?.frame.origin ?? .zero, size: newSize), display: true)
+    }
+
     Self.currentWindow = panel
     super.init(window: panel)
   }
@@ -52,28 +173,14 @@ public class PopupCompositionBuffer: NSWindowController {
 
   // MARK: Public
 
-  public var isTypingDirectionVertical = false {
-    didSet {
-      if #unavailable(macOS 10.14) {
-        isTypingDirectionVertical = false
-      }
-    }
+  public var isTypingDirectionVertical: Bool {
+    get { compositionView.isTypingDirectionVertical }
+    set { compositionView.isTypingDirectionVertical = newValue }
   }
 
   public func sync(accent: NSColor?, locale: String) {
-    self.locale = locale
-    if let accent = accent {
-      self.accent = (accent.alphaComponent == 1) ? accent
-        .withAlphaComponent(Self.bgOpacity) : accent
-    } else {
-      self.accent = themeColorCocoa
-    }
-    let themeColor = adjustedThemeColor
+    compositionView.setupTheme(accent: accent, locale: locale)
     window?.backgroundColor = .clear
-    window?.contentView?.layer?.backgroundColor = themeColor.cgColor
-    window?.contentView?.layer?.borderColor = NSColor.white.withAlphaComponent(0.1).cgColor
-    messageTextField.backgroundColor = .clear
-    messageTextField.textColor = textColor
   }
 
   public func show(state: IMEStateProtocol, at point: NSPoint) {
@@ -82,8 +189,127 @@ public class PopupCompositionBuffer: NSWindowController {
       return
     }
 
+    let attributedString = compositionView.prepareAttributedString(from: state)
+    compositionView.updateTextContent(attributedString, markedRange: state.u16MarkedRange)
+
+    window?.orderFront(nil)
+    set(windowOrigin: point)
+  }
+
+  public func hide() {
+    window?.orderOut(nil)
+  }
+
+  // MARK: Internal
+
+  static let bgOpacity: CGFloat = 0.8
+
+  // MARK: Private
+
+  private static var currentWindow: NSWindow? {
+    willSet {
+      currentWindow?.orderOut(nil)
+    }
+  }
+
+  private let compositionView: PopupCompositionView
+  private let visualEffectView: NSView?
+
+  private func set(windowOrigin: NSPoint) {
+    guard let window = window else { return }
+    let windowSize = window.frame.size
+
+    var adjustedPoint = windowOrigin
+    var screenFrame = NSScreen.main?.visibleFrame ?? NSRect.seniorTheBeast
+    for frame in NSScreen.screens.map(\.visibleFrame).filter({ $0.contains(windowOrigin) }) {
+      screenFrame = frame
+      break
+    }
+
+    adjustedPoint.y = min(
+      max(adjustedPoint.y, screenFrame.minY + windowSize.height),
+      screenFrame.maxY
+    )
+    adjustedPoint.x = min(
+      max(adjustedPoint.x, screenFrame.minX),
+      screenFrame.maxX - windowSize.width
+    )
+
+    if compositionView.isTypingDirectionVertical {
+      window.setFrameTopLeftPoint(adjustedPoint)
+    } else {
+      window.setFrameOrigin(adjustedPoint)
+    }
+  }
+}
+
+// MARK: - PopupCompositionView
+
+internal class PopupCompositionView: NSView {
+  // MARK: Lifecycle
+
+  override init(frame frameRect: NSRect) {
+    self.messageTextField = NSTextField()
+    super.init(frame: frameRect)
+    setupView()
+  }
+
+  required init?(coder: NSCoder) {
+    self.messageTextField = NSTextField()
+    super.init(coder: coder)
+    setupView()
+  }
+
+  // MARK: Internal
+
+  var locale: String = ""
+  var accent: NSColor = .accentColor
+
+  var onSizeChanged: ((NSSize) -> ())?
+
+  var isTypingDirectionVertical = false {
+    didSet {
+      if #unavailable(macOS 10.14) {
+        isTypingDirectionVertical = false
+      }
+    }
+  }
+
+  var textShown: NSAttributedString = .init(string: "") {
+    didSet {
+      messageTextField.attributedStringValue = textShown
+      adjustSize()
+    }
+  }
+
+  func setupTheme(accent: NSColor?, locale: String) {
+    self.locale = locale
+    if let accent = accent {
+      self.accent =
+        (accent.alphaComponent == 1)
+          ? accent
+          .withAlphaComponent(PopupCompositionBuffer.bgOpacity) : accent
+    } else {
+      self.accent = themeColorCocoa
+    }
+    let themeColor = adjustedThemeColor
+    if #unavailable(macOS 10.9) {
+      layer?.backgroundColor = themeColor.cgColor
+    } else {
+      layer?.backgroundColor = themeColor.withAlphaComponent(0.5).cgColor
+    }
+    layer?.borderColor = NSColor.white.withAlphaComponent(0.1).cgColor
+    messageTextField.backgroundColor = .clear
+    messageTextField.textColor = textColor
+  }
+
+  func prepareAttributedString(
+    from state: IMEStateProtocol
+  )
+    -> NSAttributedString {
     let attrString: NSMutableAttributedString = .init(string: state.displayedTextConverted)
     let attrPCBHeader: NSMutableAttributedString = .init(string: "　")
+
     let verticalAttributes: [NSAttributedString.Key: Any] = [
       .kern: 0,
       .font: bufferFont(),
@@ -99,6 +325,7 @@ public class PopupCompositionBuffer: NSWindowController {
         return newStyle
       }(),
     ]
+
     let horizontalAttributes: [NSAttributedString.Key: Any] = [
       .font: bufferFont(),
       .kern: 0,
@@ -106,17 +333,21 @@ public class PopupCompositionBuffer: NSWindowController {
 
     if isTypingDirectionVertical {
       attrPCBHeader.setAttributes(
-        verticalAttributes, range: NSRange(location: 0, length: attrPCBHeader.length)
+        verticalAttributes,
+        range: NSRange(location: 0, length: attrPCBHeader.length)
       )
       attrString.setAttributes(
-        verticalAttributes, range: NSRange(location: 0, length: attrString.length)
+        verticalAttributes,
+        range: NSRange(location: 0, length: attrString.length)
       )
     } else {
       attrPCBHeader.setAttributes(
-        horizontalAttributes, range: NSRange(location: 0, length: attrPCBHeader.length)
+        horizontalAttributes,
+        range: NSRange(location: 0, length: attrPCBHeader.length)
       )
       attrString.setAttributes(
-        horizontalAttributes, range: NSRange(location: 0, length: attrString.length)
+        horizontalAttributes,
+        range: NSRange(location: 0, length: attrString.length)
       )
     }
 
@@ -178,50 +409,50 @@ public class PopupCompositionBuffer: NSWindowController {
     attrString.insert(attrPCBHeader, at: 0)
     attrString.insert(attrPCBHeader, at: attrString.length)
 
-    textShown = attrString
+    return attrString
+  }
+
+  func updateTextContent(_ attributedString: NSAttributedString, markedRange: Range<Int>) {
+    textShown = attributedString
     if let editor = messageTextField.currentEditor() {
-      editor.selectedRange = NSRange(state.u16MarkedRange)
-    }
-    window?.orderFront(nil)
-    set(windowOrigin: point)
-  }
-
-  public func hide() {
-    window?.orderOut(nil)
-  }
-
-  // MARK: Internal
-
-  var themeColorCocoa: NSColor {
-    switch locale {
-    case "zh-Hans": return .init(red: 255 / 255, green: 64 / 255, blue: 53 / 255,
-                                 alpha: Self.bgOpacity)
-    case "zh-Hant": return .init(red: 5 / 255, green: 127 / 255, blue: 255 / 255,
-                                 alpha: Self.bgOpacity)
-    case "ja": return .init(red: 167 / 255, green: 137 / 255, blue: 99 / 255, alpha: Self.bgOpacity)
-    default: return .init(red: 5 / 255, green: 127 / 255, blue: 255 / 255, alpha: Self.bgOpacity)
+      editor.selectedRange = NSRange(markedRange)
     }
   }
 
   // MARK: Private
 
-  private static let bgOpacity: CGFloat = 0.8
+  private let messageTextField: NSTextField
 
-  private static var currentWindow: NSWindow? {
-    willSet {
-      currentWindow?.orderOut(nil)
-    }
-  }
-
-  private var messageTextField: NSTextField
-  private var accent: NSColor = .accentColor
-
-  private var locale: String = ""
-
-  private var textShown: NSAttributedString = .init(string: "") {
-    didSet {
-      messageTextField.attributedStringValue = textShown
-      adjustSize()
+  private var themeColorCocoa: NSColor {
+    switch locale {
+    case "zh-Hans":
+      return .init(
+        red: 255 / 255,
+        green: 64 / 255,
+        blue: 53 / 255,
+        alpha: PopupCompositionBuffer.bgOpacity
+      )
+    case "zh-Hant":
+      return .init(
+        red: 5 / 255,
+        green: 127 / 255,
+        blue: 255 / 255,
+        alpha: PopupCompositionBuffer.bgOpacity
+      )
+    case "ja":
+      return .init(
+        red: 167 / 255,
+        green: 137 / 255,
+        blue: 99 / 255,
+        alpha: PopupCompositionBuffer.bgOpacity
+      )
+    default:
+      return .init(
+        red: 5 / 255,
+        green: 127 / 255,
+        blue: 255 / 255,
+        alpha: PopupCompositionBuffer.bgOpacity
+      )
     }
   }
 
@@ -241,36 +472,32 @@ public class PopupCompositionBuffer: NSWindowController {
     accent.blended(withFraction: NSApplication.isDarkMode ? 0.5 : 0.25, of: .black) ?? accent
   }
 
+  private func setupView() {
+    wantsLayer = true
+    shadow = .init()
+    shadow?.shadowBlurRadius = 6
+    shadow?.shadowColor = .black
+    shadow?.shadowOffset = .zero
+
+    if let layer = layer {
+      layer.cornerRadius = 9
+      layer.borderWidth = 1
+      layer.masksToBounds = true
+    }
+
+    messageTextField.isEditable = false
+    messageTextField.isSelectable = false
+    messageTextField.isBezeled = false
+    messageTextField.textColor = NSColor.selectedMenuItemTextColor
+    messageTextField.drawsBackground = true
+    messageTextField.backgroundColor = NSColor.clear
+    messageTextField.font = .systemFont(ofSize: 18) // 不是最終值。
+    addSubview(messageTextField)
+  }
+
   private func bufferFont(size: CGFloat = 18) -> NSFont {
     let defaultResult: CTFont? = CTFontCreateUIFontForLanguage(.system, size, locale as CFString)
     return defaultResult ?? NSFont.systemFont(ofSize: size)
-  }
-
-  private func set(windowOrigin: NSPoint) {
-    guard let window = window else { return }
-    let windowSize = window.frame.size
-
-    var adjustedPoint = windowOrigin
-    var screenFrame = NSScreen.main?.visibleFrame ?? NSRect.seniorTheBeast
-    for frame in NSScreen.screens.map(\.visibleFrame).filter({ $0.contains(windowOrigin) }) {
-      screenFrame = frame
-      break
-    }
-
-    adjustedPoint.y = min(
-      max(adjustedPoint.y, screenFrame.minY + windowSize.height),
-      screenFrame.maxY
-    )
-    adjustedPoint.x = min(
-      max(adjustedPoint.x, screenFrame.minX),
-      screenFrame.maxX - windowSize.width
-    )
-
-    if isTypingDirectionVertical {
-      window.setFrameTopLeftPoint(adjustedPoint)
-    } else {
-      window.setFrameOrigin(adjustedPoint)
-    }
   }
 
   private func adjustSize() {
@@ -290,6 +517,8 @@ public class PopupCompositionBuffer: NSWindowController {
       messageTextField.boundsRotation = 0
     }
     messageTextField.frame = rect
-    window?.setFrame(bigRect, display: true)
+
+    // 通知外部尺寸變更
+    onSizeChanged?(bigRect.size)
   }
 }
