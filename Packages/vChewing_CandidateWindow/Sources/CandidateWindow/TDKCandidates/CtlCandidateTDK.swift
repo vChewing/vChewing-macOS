@@ -196,11 +196,73 @@ public class CtlCandidateTDK: CtlCandidate, NSWindowDelegate {
   var observation: NSKeyValueObservation?
 
   func updateNSWindowModern(_ window: NSWindow) {
-    Self.currentView = theViewAppKit
+    // 獲取候選視圖並計算其尺寸
+    let candidateView = theViewAppKit
+    let viewSize = candidateView.fittingSize
+
+    // 創建背景視覺效果視圖
+    let visualEffectView: NSView? = {
+      if #available(macOS 26.0, *), NSApplication.uxLevel == .liquidGlass {
+        #if compiler(>=6.2) && canImport(AppKit, _version: 26.0)
+          let resultView = NSGlassEffectView()
+          resultView.cornerRadius = Self.thePool.windowRadius
+          resultView.style = .clear
+          let bgTintColor: NSColor = !NSApplication.isDarkMode ? .white : .black
+          resultView.wantsLayer = true
+          resultView.layer?.cornerRadius = Self.thePool.windowRadius
+          resultView.layer?.masksToBounds = true
+          resultView.layer?.backgroundColor = bgTintColor.withAlphaComponent(0.1).cgColor
+          return resultView
+        #endif
+      }
+      if #available(macOS 10.0, *), NSApplication.uxLevel != .none {
+        let resultView = NSVisualEffectView()
+        resultView.material = .hudWindow
+        resultView.blendingMode = .behindWindow
+        resultView.state = .active
+        // 設置圓角以保持原有的視覺特性
+        resultView.wantsLayer = true
+        resultView.layer?.cornerRadius = Self.thePool.windowRadius
+        resultView.layer?.masksToBounds = true
+        return resultView
+      }
+      return nil
+    }()
+
+    // 創建容器視圖作為 ZStack，設置固定尺寸
+    let containerView = NSView(frame: NSRect(origin: .zero, size: viewSize))
+    // 為容器視圖也設置圓角，確保整體一致性
+    containerView.wantsLayer = true
+    containerView.layer?.cornerRadius = Self.thePool.windowRadius
+    containerView.layer?.masksToBounds = true
+
+    // 設置背景視覺效果視圖
+    if let visualEffectView {
+      containerView.addSubview(visualEffectView)
+      visualEffectView.translatesAutoresizingMaskIntoConstraints = false
+      NSLayoutConstraint.activate([
+        visualEffectView.topAnchor.constraint(equalTo: containerView.topAnchor),
+        visualEffectView.leadingAnchor.constraint(equalTo: containerView.leadingAnchor),
+        visualEffectView.trailingAnchor.constraint(equalTo: containerView.trailingAnchor),
+        visualEffectView.bottomAnchor.constraint(equalTo: containerView.bottomAnchor),
+      ])
+    }
+
+    // 添加候選窗口內容視圖
+    containerView.addSubview(candidateView)
+    candidateView.translatesAutoresizingMaskIntoConstraints = false
+    NSLayoutConstraint.activate([
+      candidateView.topAnchor.constraint(equalTo: containerView.topAnchor),
+      candidateView.leadingAnchor.constraint(equalTo: containerView.leadingAnchor),
+      candidateView.trailingAnchor.constraint(equalTo: containerView.trailingAnchor),
+      candidateView.bottomAnchor.constraint(equalTo: containerView.bottomAnchor),
+    ])
+
+    Self.currentView = containerView
     window.isOpaque = false
     window.backgroundColor = .clear
     window.contentView = Self.currentView
-    window.setContentSize(Self.currentView.fittingSize)
+    window.setContentSize(viewSize)
     delegate?.resetCandidateWindowOrigin()
   }
 
