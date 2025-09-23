@@ -105,11 +105,11 @@ extension LMMgr {
       .appendingPathComponent(fileName)
   }
 
-  /// 使用者半衰記憶模組資料的存取頻次特別高，且資料新陳代謝速度快，所以只適合放在預設的使用者資料目錄下。
+  /// 使用者漸退記憶模組資料的存取頻次特別高，且資料新陳代謝速度快，所以只適合放在預設的使用者資料目錄下。
   /// 也就是「~/Library/Application Support/vChewing/」目錄下，且不會隨著使用者辭典目錄的改變而改變。
   /// - Parameter mode: 簡繁體輸入模式。
   /// - Returns: 資料路徑（URL）。
-  public static func userOverrideModelDataURL(_ mode: Shared.InputMode) -> URL {
+  public static func perceptionOverrideModelDataURL(_ mode: Shared.InputMode) -> URL {
     let fileName: String = {
       switch mode {
       case .imeModeCHS: return "vChewing_override-model-data-chs.dat"
@@ -358,7 +358,7 @@ extension LMMgr {
     if !userDataFolderExists {
       return false
     }
-    /// CandidateNode 資料與 UserOverrideModel 半衰模組資料檔案不需要強行確保存在。
+    /// CandidateNode 資料與 PerceptionOverrideModel 漸退模組資料檔案不需要強行確保存在。
     /// 前者的話，需要該檔案存在的人自己會建立。
     /// 後者的話，你在敲字時自己就會建立。
     var failed = false

@@ -5,14 +5,14 @@
 // MARK: - Megrez.Unigram
 
 extension Megrez {
-  /// 單元圖。
+  /// 語言模型的基礎資料單位結構。
   public struct Unigram: Equatable, CustomStringConvertible, Hashable, Codable {
     // MARK: Lifecycle
 
-    /// 初期化一筆「單元圖」。一筆單元圖由一筆資料值與一筆權重數值組成。
+    /// 建立語言模型基礎資料單位副本。基礎資料單位由詞彙內容與統計權重組成。
     /// - Parameters:
-    ///   - value: 資料值。
-    ///   - score: 權重（雙精度小數）。
+    ///   - value: 詞彙內容。
+    ///   - score: 統計權重（雙精度浮點數）。
     public init(value: String = "", score: Double = 0) {
       self.value = value
       self.score = score
@@ -20,9 +20,9 @@ extension Megrez {
 
     // MARK: Public
 
-    /// 資料值，通常是詞語或單個字。
+    /// 詞彙內容，可以是單字或詞組。
     public var value: String
-    /// 權重。
+    /// 統計權重。
     public var score: Double
 
     /// 將當前單元圖列印成一個字串。

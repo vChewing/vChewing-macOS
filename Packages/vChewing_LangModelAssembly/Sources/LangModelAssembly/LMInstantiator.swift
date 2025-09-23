@@ -34,10 +34,10 @@ extension LMAssembly {
     // 這句需要留著，不然無法被 package 外界存取。
     public init(
       isCHS: Bool = false,
-      uomDataURL: URL? = nil
+      pomDataURL: URL? = nil
     ) {
       self.isCHS = isCHS
-      self.lmUserOverride = .init(dataURL: uomDataURL)
+      self.lmPerceptionOverride = .init(dataURL: pomDataURL)
     }
 
     // MARK: Public
@@ -478,8 +478,8 @@ extension LMAssembly {
     var lmReplacements = LMReplacements()
     var lmAssociates = LMAssociates()
 
-    // 半衰记忆模组
-    var lmUserOverride: LMUserOverride
+    // 漸退记忆模组
+    var lmPerceptionOverride: LMPerceptionOverride
 
     // MARK: Private
 

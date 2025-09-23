@@ -60,8 +60,8 @@ public class PrefMgr: NSObject, PrefMgrProtocol {
   @AppProperty(key: UserDef.kIsDebugModeEnabled.rawValue, defaultValue: false)
   public dynamic var isDebugModeEnabled: Bool
 
-  @AppProperty(key: UserDef.kFailureFlagForUOMObservation.rawValue, defaultValue: false)
-  public dynamic var failureFlagForUOMObservation: Bool
+  @AppProperty(key: UserDef.kFailureFlagForPOMObservation.rawValue, defaultValue: false)
+  public dynamic var failureFlagForPOMObservation: Bool
 
   @AppProperty(
     key: UserDef.kCandidateServiceMenuContents.rawValue,
@@ -167,8 +167,8 @@ public class PrefMgr: NSObject, PrefMgrProtocol {
   @AppProperty(key: UserDef.kAllowBoostingSingleKanjiAsUserPhrase.rawValue, defaultValue: false)
   public dynamic var allowBoostingSingleKanjiAsUserPhrase: Bool
 
-  @AppProperty(key: UserDef.kFetchSuggestionsFromUserOverrideModel.rawValue, defaultValue: true)
-  public dynamic var fetchSuggestionsFromUserOverrideModel: Bool
+  @AppProperty(key: UserDef.kFetchSuggestionsFromPerceptionOverrideModel.rawValue, defaultValue: true)
+  public dynamic var fetchSuggestionsFromPerceptionOverrideModel: Bool
 
   @AppProperty(key: UserDef.kUseFixedCandidateOrderOnSelection.rawValue, defaultValue: false)
   public dynamic var useFixedCandidateOrderOnSelection: Bool

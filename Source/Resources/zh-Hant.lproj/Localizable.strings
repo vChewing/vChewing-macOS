@@ -49,7 +49,7 @@
 "Apple Chewing - Eten Traditional" = "Apple 倚天傳統鍵盤佈局";
 "Apple Zhuyin Bopomofo (Dachen)" = "Apple 標準注音鍵盤佈局 (大千)";
 "Apple Zhuyin Eten (Traditional)" = "Apple 倚天注音鍵盤佈局 (傳統)";
-"Applying typing suggestions from half-life user override model" = "在敲字時自動套用來自半衰記憶模組的建議";
+"Applying typing suggestions from perception override model" = "在敲字時自動套用來自漸退記憶模組的建議";
 "Associated Phrases" = "關聯詞語模式";
 "at the rear of the phrase (like Microsoft New Phonetic)" = "將游標置於詞語後方 // Windows 微軟新注音風格";
 "Auto-composite when the longest possible key is formed" = "在已經敲出最長可能碼的時候自動組字";
@@ -376,7 +376,7 @@
 "The lookup results are supplied by the CIN cassette module." = "反查結果取自 CIN 磁帶模組。";
 "The selected item is either not a valid macOS application bundle or not having a valid app bundle identifier." = "當前所選之物並非 macOS 應用程式封包，至少無法發現其唯一標幟（Bundle Identifier）。";
 "The selected item's identifier is already in the list." = "當前所選之封包的唯一標幟（Bundle Identifier）已被登記。";
-"The user override model only possesses memories temporarily. Each memory record gradually becomes ineffective within approximately less than 6 days. You can erase all memory records through the input method menu." = "半衰記憶模組僅持有臨時記憶之功能。每一筆記錄都會在六天之內逐漸變得徹底失效。您可以藉由輸入法選單清除全部的記憶記錄。";
+"The user override model only possesses memories temporarily. Each memory record gradually becomes ineffective within approximately less than 6 days. You can erase all memory records through the input method menu." = "漸退記憶模組僅持有臨時記憶之功能。每一筆記錄都會在六天之內逐漸變得徹底失效。您可以藉由輸入法選單清除全部的記憶記錄。";
 "theAssociates" = "關聯詞語";
 "theFilter" = "濾除清單";
 "thePhrases" = "自訂語彙";
@@ -395,7 +395,7 @@
 "This will also affect the row / column capacity of the candidate window." = "該選項也會影響到選字窗每行/每列最多顯示的候選字數量。";
 "This will batch-replace specified candidates." = "這將會對指定的候選字詞進行整詞取代。";
 "This will remove vChewing Input Method from this user account, requiring your confirmation." = "此舉會將威注音自當前系統使用者帳戶卸除。請確認。";
-"This will stop user override model from affecting how candidates get sorted." = "這將阻止半衰記憶模組影響候選字詞的陳列順序。";
+"This will stop user override model from affecting how candidates get sorted." = "這將阻止漸退記憶模組影響候選字詞的陳列順序。";
 "This will use the SQLite database deployed by the “make install” command from libvChewing-Data if possible." = "這將會優先使用由 libvChewing-Data 的 make install 部署的原廠辭典檔案。";
 "Toggle alphanumerical mode with Left-Shift" = "允許使用左側的 Shift 鍵切換英數輸入模式";
 "Toggle alphanumerical mode with Right-Shift" = "允許使用右側的 Shift 鍵切換英數輸入模式";
@@ -417,7 +417,7 @@
 "Use Phrase Replacement" = "使用語彙置換";
 "Use Space to confirm highlighted candidate in Per-Char Select Mode" = "在逐字選字模式當中使用空格鍵確認當前高亮候選字";
 "User phrase folder path is not customizable in macOS 10.9 - 10.12." = "在 macOS 10.9 - 10.12 系統下無法自訂使用者辭典目錄。";
-"vChewing crashed while handling previously loaded UOM observation data. These data files are cleaned now to ensure the usability." = "威注音輸入法的使用者半衰記憶模組在觀測時崩潰，相關半衰記憶資料檔案內容已全部清空。";
+"vChewing crashed while handling previously loaded POM observation data. These data files are cleaned now to ensure the usability." = "威注音輸入法的使用者漸退記憶模組在觀測時崩潰，相關漸退記憶資料檔案內容已全部清空。";
 "vChewing is rebooted due to a memory-excessive-usage problem. If convenient, please inform the developer that you are having this issue, stating whether you are using an Intel Mac or Apple Silicon Mac. An NSLog is generated with the current memory footprint size." = "威注音輸入法因記憶體用量過大的問題而重新啟動。如果您方便的話，請就這個問題知會該輸入法的主程式師、且請務必說明自己在用的是 Intel 機種還是 Apple Silicon 機種。當前輸入法記憶體用量已藉由 NSLog 記錄輸出。";
 "vChewing Preferences…" = "威注音偏好設定…";
 "vChewing" = "威注音輸入法";

@@ -104,9 +104,9 @@ extension SessionCtl {
         .act(#selector(callReverseLookupWindow(_:)))
         .hotkey(PrefMgr.shared.usingHotKeyRevLookup ? "/" : "", mask: [.command, .control])
       NSMenu.Item("Optimize Memorized Phrases")?
-        .act(#selector(removeUnigramsFromUOM(_:)))
+        .act(#selector(removeUnigramsFromPOM(_:)))
       NSMenu.Item("Clear Memorized Phrases")?
-        .act(#selector(clearUOM(_:)))
+        .act(#selector(clearPOM(_:)))
         .alternated()
 
       NSMenu.Item.separator() // ---------------------
@@ -412,15 +412,15 @@ extension SessionCtl {
   }
 
   @objc
-  public func removeUnigramsFromUOM(_: Any? = nil) {
-    LMMgr.removeUnigramsFromUserOverrideModel(IMEApp.currentInputMode)
-    LMMgr.removeUnigramsFromUserOverrideModel(IMEApp.currentInputMode.reversed)
+  public func removeUnigramsFromPOM(_: Any? = nil) {
+    LMMgr.removeUnigramsFromPerceptionOverrideModel(IMEApp.currentInputMode)
+    LMMgr.removeUnigramsFromPerceptionOverrideModel(IMEApp.currentInputMode.reversed)
   }
 
   @objc
-  public func clearUOM(_: Any? = nil) {
-    LMMgr.clearUserOverrideModelData(IMEApp.currentInputMode)
-    LMMgr.clearUserOverrideModelData(IMEApp.currentInputMode.reversed)
+  public func clearPOM(_: Any? = nil) {
+    LMMgr.clearPerceptionOverrideModelData(IMEApp.currentInputMode)
+    LMMgr.clearPerceptionOverrideModelData(IMEApp.currentInputMode.reversed)
   }
 
   @objc

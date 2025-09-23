@@ -15,7 +15,7 @@ Megrez Engine is a module made for processing lingual data of an input method.
   - 注意：`Megrez.Compositor.theSeparator` **沒有多執行緒安全性**。對該 API 的保留乃是出於相容性之考量。新專案請避免使用該 static API。
 - 以陣列的形式處理輸入的 key。
 - 在獲取候選字詞內容的時候，不會出現橫跨游標的詞。
-- 使用經過效能最佳化處理的 Dijkstra 的算法，擁有比 DAG-Relax 算法更優的效能。
+- 使用 DAG-DP 算法，擁有比 DAG-Relax Topology 算法更優的效能。
 
 ## 使用說明
 

@@ -16,10 +16,10 @@ import SwiftExtension
 
 extension Shared.InputMode {
   private static let lmCHS = LMAssembly.LMInstantiator(
-    isCHS: true, uomDataURL: LMMgr.userOverrideModelDataURL(.imeModeCHS)
+    isCHS: true, pomDataURL: LMMgr.perceptionOverrideModelDataURL(.imeModeCHS)
   )
   private static let lmCHT = LMAssembly.LMInstantiator(
-    isCHS: false, uomDataURL: LMMgr.userOverrideModelDataURL(.imeModeCHT)
+    isCHS: false, pomDataURL: LMMgr.perceptionOverrideModelDataURL(.imeModeCHT)
   )
 
   public var langModel: LMAssembly.LMInstantiator {
@@ -80,7 +80,7 @@ public class LMMgr {
           filterPath: userDictDataURL(mode: mode, type: .theFilter).path
         )
         mode.langModel.loadUserSymbolData(path: userDictDataURL(mode: mode, type: .theSymbols).path)
-        mode.langModel.loadUOMData()
+        mode.langModel.loadPOMData()
       }
 
       if PrefMgr.shared.associatedPhrasesEnabled { Self.loadUserAssociatesData() }
@@ -179,11 +179,11 @@ public class LMMgr {
     }
   }
 
-  // MARK: UOM
+  // MARK: POM
 
-  public static func saveUserOverrideModelData() {
+  public static func savePerceptionOverrideModelData() {
     let globalQueue = DispatchQueue(
-      label: "LMAssembly_UOM",
+      label: "LMAssembly_POM",
       qos: .unspecified,
       attributes: .concurrent
     )
@@ -191,7 +191,7 @@ public class LMMgr {
     Shared.InputMode.validCases.forEach { mode in
       group.enter()
       globalQueue.async {
-        mode.langModel.saveUOMData()
+        mode.langModel.savePOMData()
         group.leave()
       }
     }
@@ -200,14 +200,14 @@ public class LMMgr {
   }
 
   public static func bleachSpecifiedSuggestions(targets: [String], mode: Shared.InputMode) {
-    mode.langModel.bleachSpecifiedUOMSuggestions(targets: targets)
+    mode.langModel.bleachSpecifiedPOMSuggestions(targets: targets)
   }
 
-  public static func removeUnigramsFromUserOverrideModel(_ mode: Shared.InputMode) {
-    mode.langModel.bleachUOMUnigrams()
+  public static func removeUnigramsFromPerceptionOverrideModel(_ mode: Shared.InputMode) {
+    mode.langModel.bleachPOMUnigrams()
   }
 
-  public static func relocateWreckedUOMData() {
+  public static func relocateWreckedPOMData() {
     func dateStringTag(date givenDate: Date) -> String {
       let dateFormatter = DateFormatter()
       dateFormatter.dateFormat = "yyyyMMdd-HHmm"
@@ -216,18 +216,18 @@ public class LMMgr {
       return strDate
     }
 
-    let urls: [URL] = [userOverrideModelDataURL(.imeModeCHS), userOverrideModelDataURL(.imeModeCHT)]
+    let urls: [URL] = [perceptionOverrideModelDataURL(.imeModeCHS), perceptionOverrideModelDataURL(.imeModeCHT)]
     let folderURL = URL(fileURLWithPath: dataFolderPath(isDefaultFolder: true))
       .deletingLastPathComponent()
     urls.forEach { oldURL in
-      let newFileName = "[UOM-CRASH][\(dateStringTag(date: .init()))]\(oldURL.lastPathComponent)"
+      let newFileName = "[POM-CRASH][\(dateStringTag(date: .init()))]\(oldURL.lastPathComponent)"
       let newURL = folderURL.appendingPathComponent(newFileName)
       try? FileManager.default.moveItem(at: oldURL, to: newURL)
     }
   }
 
-  public static func clearUserOverrideModelData(_ mode: Shared.InputMode = .imeModeNULL) {
-    mode.langModel.clearUOMData()
+  public static func clearPerceptionOverrideModelData(_ mode: Shared.InputMode = .imeModeNULL) {
+    mode.langModel.clearPOMData()
   }
 
   /// 清理語言模型記憶體，防止記憶體洩漏

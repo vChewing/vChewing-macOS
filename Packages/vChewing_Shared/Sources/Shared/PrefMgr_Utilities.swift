@@ -107,7 +107,7 @@ extension PrefMgr {
       var strTypeParam = String(describing: theUserDef.dataType)
       // 忽略會被 Sandbox 擋到的選項、以及其他一些雜項。
       let blackList: [UserDef] = [
-        .kUserDataFolderSpecified, .kCassettePath, .kAppleLanguages, .kFailureFlagForUOMObservation,
+        .kUserDataFolderSpecified, .kCassettePath, .kAppleLanguages, .kFailureFlagForPOMObservation,
         .kMostRecentInputMode,
       ]
       guard !blackList.contains(theUserDef) else { continue }

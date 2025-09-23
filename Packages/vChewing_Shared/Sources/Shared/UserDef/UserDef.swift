@@ -14,7 +14,7 @@ public enum UserDef: String, CaseIterable, Identifiable {
   // MARK: - Cases.
 
   case kIsDebugModeEnabled = "_DebugMode"
-  case kFailureFlagForUOMObservation = "_FailureFlag_UOMObservation"
+  case kFailureFlagForPOMObservation = "_FailureFlag_POMObservation"
   case kCandidateServiceMenuContents = "CandidateServiceMenuContents"
   case kRespectClientAccentColor = "RespectClientAccentColor"
   case kAlwaysUsePCBWithElectronBasedClients = "AlwaysUsePCBWithElectronBasedClients"
@@ -66,7 +66,7 @@ public enum UserDef: String, CaseIterable, Identifiable {
   case kShouldNotFartInLieuOfBeep = "ShouldNotFartInLieuOfBeep"
   case kShowHanyuPinyinInCompositionBuffer = "ShowHanyuPinyinInCompositionBuffer"
   case kInlineDumpPinyinInLieuOfZhuyin = "InlineDumpPinyinInLieuOfZhuyin"
-  case kFetchSuggestionsFromUserOverrideModel = "FetchSuggestionsFromUserOverrideModel"
+  case kFetchSuggestionsFromPerceptionOverrideModel = "FetchSuggestionsFromPerceptionOverrideModel"
   case kUseFixedCandidateOrderOnSelection = "UseFixedCandidateOrderOnSelection"
   case kAutoCorrectReadingCombination = "AutoCorrectReadingCombination"
   case kReadingNarrationCoverage = "ReadingNarrationCoverage"
@@ -171,7 +171,7 @@ extension UserDef {
   public var dataType: DataType {
     switch self {
     case .kIsDebugModeEnabled: return .bool
-    case .kFailureFlagForUOMObservation: return .bool
+    case .kFailureFlagForPOMObservation: return .bool
     case .kCandidateServiceMenuContents: return .dictionary
     case .kRespectClientAccentColor: return .bool
     case .kAlwaysUsePCBWithElectronBasedClients: return .bool
@@ -223,7 +223,7 @@ extension UserDef {
     case .kShouldNotFartInLieuOfBeep: return .bool
     case .kShowHanyuPinyinInCompositionBuffer: return .bool
     case .kInlineDumpPinyinInLieuOfZhuyin: return .bool
-    case .kFetchSuggestionsFromUserOverrideModel: return .bool
+    case .kFetchSuggestionsFromPerceptionOverrideModel: return .bool
     case .kUseFixedCandidateOrderOnSelection: return .bool
     case .kAutoCorrectReadingCombination: return .bool
     case .kReadingNarrationCoverage: return .integer
@@ -275,7 +275,7 @@ extension UserDef {
     switch self {
     case .kIsDebugModeEnabled: return .init(userDef: self, shortTitle: "Debug Mode")
     case .kCandidateServiceMenuContents: return nil
-    case .kFailureFlagForUOMObservation: return nil
+    case .kFailureFlagForPOMObservation: return nil
     case .kRespectClientAccentColor: return .init(
         userDef: self, shortTitle: "i18n:userdef.kRespectClientAccentColor.shortTitle",
         description: "i18n:userdef.kRespectClientAccentColor.description"
@@ -517,8 +517,8 @@ extension UserDef {
         userDef: self, shortTitle: "Commit Hanyu-Pinyin instead on Ctrl(+Option)+Command+Enter",
         description: "i18n:UserDef.kInlineDumpPinyinInLieuOfZhuyin.description"
       )
-    case .kFetchSuggestionsFromUserOverrideModel: return .init(
-        userDef: self, shortTitle: "Applying typing suggestions from half-life user override model",
+    case .kFetchSuggestionsFromPerceptionOverrideModel: return .init(
+        userDef: self, shortTitle: "Applying typing suggestions from perception override model",
         description: "The user override model only possesses memories temporarily. Each memory record gradually becomes ineffective within approximately less than 6 days. You can erase all memory records through the input method menu."
       )
     case .kUseFixedCandidateOrderOnSelection: return .init(
