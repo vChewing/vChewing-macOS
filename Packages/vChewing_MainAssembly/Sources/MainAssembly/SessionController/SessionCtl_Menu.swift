@@ -110,7 +110,7 @@ extension SessionCtl {
         .alternated()
 
       NSMenu.Item.separator() // ---------------------
-      if #unavailable(macOS 13) {
+      if #unavailable(macOS 14) {
         NSMenu.Item("vChewing Preferences…")?
           .act(#selector(showPreferences(_:)))
           .nulled(silentMode)
@@ -152,7 +152,7 @@ extension SessionCtl {
 
   @objc
   override public func showPreferences(_: Any? = nil) {
-    osCheck: if #available(macOS 13, *) {
+    osCheck: if #available(macOS 14, *) {
       switch NSEvent.keyModifierFlags {
       case .option: break osCheck
       default: CtlSettingsUI.show()
@@ -170,7 +170,7 @@ extension SessionCtl {
     NSApp.popup()
   }
 
-  @available(macOS 13, *)
+  @available(macOS 14, *)
   @objc
   public func showSettingsSwiftUI(_: Any? = nil) {
     CtlSettingsUI.show()

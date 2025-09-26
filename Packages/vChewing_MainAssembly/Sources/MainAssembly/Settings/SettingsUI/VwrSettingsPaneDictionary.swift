@@ -14,7 +14,7 @@ import SwiftUI
 
 // MARK: - VwrSettingsPaneDictionary
 
-@available(macOS 13, *)
+@available(macOS 14, *)
 public struct VwrSettingsPaneDictionary: View {
   // MARK: - AppStorage Variables
 
@@ -56,7 +56,7 @@ public struct VwrSettingsPaneDictionary: View {
   private static let dlgOpenFile = NSOpenPanel()
 
   public var body: some View {
-    ScrollView {
+    NavigationStack {
       Form {
         // MARK: - User Data Folder Path Management
 
@@ -265,7 +265,7 @@ public struct VwrSettingsPaneDictionary: View {
 
 // MARK: - VwrSettingsPaneDictionary_Previews
 
-@available(macOS 13, *)
+@available(macOS 14, *)
 struct VwrSettingsPaneDictionary_Previews: PreviewProvider {
   static var previews: some View {
     VwrSettingsPaneDictionary()
