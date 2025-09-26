@@ -51,7 +51,7 @@ P.S.: 威注音输入法的 Shift 按键监测功能仅借由对 NSEvent 讯号�
 - 至少 macOS 12 Monterey。
   - 如需要在更旧版的系统下运行的话，请前往[威注音输入法主页](https://vchewing.github.io/README.html)下载 Aqua 纪念版威注音输入法，可支援自 macOS 10.9 开始至 macOS 12 Monterey 为止的系统版本。
 
-- **推荐最低系统版本**：macOS 13 Ventura。
+- **推荐最低系统版本**：macOS 14 Sonoma。
 
   - 同时建议**系统记忆体应至少 4GB**。威注音输入法占用记忆体约 115MB 左右（简繁双模式）、75MB左右（单模式），供参考。
     - 请务必使用 SSD 硬碟，否则可能会影响每次开机之后输入法首次载入的速度。从 10.10 Yosemite 开始，macOS 就已经是针对机械硬碟负优化的作业系统了。
