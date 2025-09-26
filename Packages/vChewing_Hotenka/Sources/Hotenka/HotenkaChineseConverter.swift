@@ -23,8 +23,8 @@
  CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
+import CSQLite3
 import Foundation
-import SQLite3
 
 #if os(Linux)
   import Glibc
