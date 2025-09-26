@@ -10,6 +10,7 @@ import BookmarkManager
 import OSFrameworkImpl
 import Shared
 import SwiftUI
+import UniformTypeIdentifiers
 
 // MARK: - VwrSettingsPaneCassette
 
@@ -62,46 +63,7 @@ public struct VwrSettingsPaneCassette: View {
                   )
                   return
                 }
-                Self.dlgOpenFile.showsResizeIndicator = true
-                Self.dlgOpenFile.showsHiddenFiles = true
-                Self.dlgOpenFile.canChooseFiles = true
-                Self.dlgOpenFile.canChooseDirectories = false
-                Self.dlgOpenFile.allowsMultipleSelection = false
-                if #available(macOS 11.0, *) {
-                  Self.dlgOpenFile.allowedContentTypes = ["cin2", "vcin", "cin"]
-                    .compactMap { .init(filenameExtension: $0) }
-                } else {
-                  Self.dlgOpenFile.allowedFileTypes = ["cin2", "vcin", "cin"]
-                }
-                Self.dlgOpenFile.allowsOtherFileTypes = true
-
-                let bolPreviousPathValidity = LMMgr.checkCassettePathValidity(
-                  cassettePath.expandingTildeInPath
-                )
-
-                if let window = CtlSettingsUI.shared?.window {
-                  Self.dlgOpenFile.beginSheetModal(for: window) { result in
-                    if result == NSApplication.ModalResponse.OK {
-                      guard let url = Self.dlgOpenFile.url else { return }
-                      if LMMgr.checkCassettePathValidity(url.path) {
-                        cassettePath = url.path
-                        LMMgr.loadCassetteData()
-                        BookmarkManager.shared.saveBookmark(for: url)
-                      } else {
-                        IMEApp.buzz()
-                        if !bolPreviousPathValidity {
-                          cassettePath = ""
-                        }
-                        return
-                      }
-                    } else {
-                      if !bolPreviousPathValidity {
-                        cassettePath = ""
-                      }
-                      return
-                    }
-                  }
-                }
+                isShowingFileImporter = true
               } label: {
                 Text("...")
               }
@@ -153,13 +115,44 @@ public struct VwrSettingsPaneCassette: View {
       minWidth: CtlSettingsUI.formWidth,
       maxHeight: CtlSettingsUI.contentMaxHeight
     )
+    .fileImporter(
+      isPresented: $isShowingFileImporter,
+      allowedContentTypes: [
+        UTType(filenameExtension: "cin2")!,
+        UTType(filenameExtension: "vcin")!,
+        UTType(filenameExtension: "cin")!,
+      ],
+      allowsMultipleSelection: false
+    ) { result in
+      let bolPreviousPathValidity = LMMgr.checkCassettePathValidity(
+        cassettePath.expandingTildeInPath
+      )
+
+      switch result {
+      case let .success(urls):
+        guard let url = urls.first else { return }
+        if LMMgr.checkCassettePathValidity(url.path) {
+          cassettePath = url.path
+          LMMgr.loadCassetteData()
+          BookmarkManager.shared.saveBookmark(for: url)
+        } else {
+          IMEApp.buzz()
+          if !bolPreviousPathValidity {
+            cassettePath = ""
+          }
+        }
+      case .failure:
+        if !bolPreviousPathValidity {
+          cassettePath = ""
+        }
+      }
+    }
   }
 
   // MARK: Private
 
-  // MARK: - Main View
-
-  private static let dlgOpenFile = NSOpenPanel()
+  @State
+  private var isShowingFileImporter = false
 
   // MARK: - AppStorage Variables
 
