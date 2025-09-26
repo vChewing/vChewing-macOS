@@ -233,6 +233,18 @@ extension LMAssembly.LMCassette {
   }
 
   mutating func clear() {
+    // 明確清理所有字典以釋放記憶體
+    keyNameMap.removeAll(keepingCapacity: false)
+    quickDefMap.removeAll(keepingCapacity: false)
+    charDefMap.removeAll(keepingCapacity: false)
+    charDefWildcardMap.removeAll(keepingCapacity: false)
+    symbolDefMap.removeAll(keepingCapacity: false)
+    reverseLookupMap.removeAll(keepingCapacity: false)
+    octagramMap.removeAll(keepingCapacity: false)
+    octagramDividedMap.removeAll(keepingCapacity: false)
+    endKeys.removeAll(keepingCapacity: false)
+
+    // 重置為初始狀態
     self = .init()
   }
 

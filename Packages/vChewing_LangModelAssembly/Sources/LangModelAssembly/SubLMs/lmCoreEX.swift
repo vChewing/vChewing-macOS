@@ -101,6 +101,11 @@ extension LMAssembly {
     ///   - path: 給定路徑。
     mutating func replaceData(textData rawStrData: String) {
       if strData == rawStrData { return }
+
+      // 清理之前的資料以釋放記憶體
+      rangeMap.removeAll(keepingCapacity: false)
+      temporaryMap.removeAll(keepingCapacity: false)
+
       strData = rawStrData
       var newMap: [String: [Range<String.Index>]] = [:]
       let shouldReverse = shouldReverse // 必需，否則下文的 closure 會出錯。
@@ -113,15 +118,16 @@ extension LMAssembly {
         }
       }
       rangeMap = newMap
-      newMap.removeAll()
-      temporaryMap.removeAll()
+      // 明確釋放 newMap 記憶體
+      newMap.removeAll(keepingCapacity: false)
     }
 
     /// 將當前語言模組的資料庫辭典自記憶體內卸除。
     mutating func clear() {
       filePath = nil
-      strData.removeAll()
-      rangeMap.removeAll()
+      strData.removeAll(keepingCapacity: false)
+      rangeMap.removeAll(keepingCapacity: false)
+      temporaryMap.removeAll(keepingCapacity: false)
     }
 
     // MARK: - Advanced features
