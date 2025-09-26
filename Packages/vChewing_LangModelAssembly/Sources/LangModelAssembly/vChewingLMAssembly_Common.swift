@@ -23,7 +23,7 @@ public enum LMAssembly {
 
     // MARK: Public
 
-    public var id: ObjectIdentifier { .init(rawValue as AnyObject) }
+    public var id: String { rawValue }
     public var localizedDescription: String { NSLocalizedString(rawValue, comment: "") }
   }
 
