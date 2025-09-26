@@ -11,11 +11,19 @@ import OSFrameworkImpl
 import Shared
 import SwiftExtension
 import SwiftUI
+import UniformTypeIdentifiers
 
 // MARK: - VwrSettingsPaneDictionary
 
 @available(macOS 14, *)
 public struct VwrSettingsPaneDictionary: View {
+  // MARK: - State Variables
+
+  @State
+  private var isShowingFolderImporter = false
+  @State
+  private var isShowingFileImporter = false
+
   // MARK: - AppStorage Variables
 
   @AppStorage(wrappedValue: "", UserDef.kUserDataFolderSpecified.rawValue)
@@ -51,9 +59,6 @@ public struct VwrSettingsPaneDictionary: View {
   var keykeyImportButtonDisabled = false
 
   private var fdrUserDataDefault: String { LMMgr.dataFolderPath(isDefaultFolder: true) }
-
-  private static let dlgOpenPath = NSOpenPanel()
-  private static let dlgOpenFile = NSOpenPanel()
 
   public var body: some View {
     NavigationStack {
@@ -104,46 +109,7 @@ public struct VwrSettingsPaneDictionary: View {
                     )
                     return
                   }
-                  Self.dlgOpenPath.title = NSLocalizedString(
-                    "Choose your desired user data folder.", comment: ""
-                  )
-                  Self.dlgOpenPath.showsResizeIndicator = true
-                  Self.dlgOpenPath.showsHiddenFiles = true
-                  Self.dlgOpenPath.canChooseFiles = false
-                  Self.dlgOpenPath.allowsMultipleSelection = false
-                  Self.dlgOpenPath.canChooseDirectories = true
-
-                  let bolPreviousFolderValidity = LMMgr.checkIfSpecifiedUserDataFolderValid(
-                    userDataFolderSpecified.expandingTildeInPath
-                  )
-
-                  if let window = CtlSettingsUI.shared?.window {
-                    Self.dlgOpenPath.beginSheetModal(for: window) { result in
-                      if result == NSApplication.ModalResponse.OK {
-                        guard let url = Self.dlgOpenPath.url else { return }
-                        // CommonDialog 讀入的路徑沒有結尾斜槓，這會導致檔案目錄合規性判定失準。
-                        // 所以要手動補回來。
-                        var newPath = url.path
-                        newPath.ensureTrailingSlash()
-                        if LMMgr.checkIfSpecifiedUserDataFolderValid(newPath) {
-                          userDataFolderSpecified = newPath
-                          BookmarkManager.shared.saveBookmark(for: url)
-                          AppDelegate.shared.updateDirectoryMonitorPath()
-                        } else {
-                          IMEApp.buzz()
-                          if !bolPreviousFolderValidity {
-                            userDataFolderSpecified = fdrUserDataDefault
-                          }
-                          return
-                        }
-                      } else {
-                        if !bolPreviousFolderValidity {
-                          userDataFolderSpecified = fdrUserDataDefault
-                        }
-                        return
-                      }
-                    }
-                  }
+                  isShowingFolderImporter = true
                 } label: {
                   Text("...")
                 }.frame(minWidth: 25)
@@ -167,6 +133,36 @@ public struct VwrSettingsPaneDictionary: View {
                   }
                 }
               ).render()
+            }
+          }
+          .fileImporter(
+            isPresented: $isShowingFolderImporter,
+            allowedContentTypes: [.folder],
+            allowsMultipleSelection: false
+          ) { result in
+            let bolPreviousFolderValidity = LMMgr.checkIfSpecifiedUserDataFolderValid(
+              userDataFolderSpecified.expandingTildeInPath
+            )
+
+            switch result {
+            case let .success(urls):
+              guard let url = urls.first else { return }
+              var newPath = url.path
+              newPath.ensureTrailingSlash()
+              if LMMgr.checkIfSpecifiedUserDataFolderValid(newPath) {
+                userDataFolderSpecified = newPath
+                BookmarkManager.shared.saveBookmark(for: url)
+                AppDelegate.shared.updateDirectoryMonitorPath()
+              } else {
+                IMEApp.buzz()
+                if !bolPreviousFolderValidity {
+                  userDataFolderSpecified = fdrUserDataDefault
+                }
+              }
+            case .failure:
+              if !bolPreviousFolderValidity {
+                userDataFolderSpecified = fdrUserDataDefault
+              }
             }
           }
         }
@@ -208,32 +204,29 @@ public struct VwrSettingsPaneDictionary: View {
             .render()
           LabeledContent("i18n:settings.importFromKimoTxt.label") {
             Button("…") {
-              Self.dlgOpenFile.title = NSLocalizedString(
-                "i18n:settings.importFromKimoTxt.label", comment: ""
-              ) + ":"
-              Self.dlgOpenFile.showsResizeIndicator = true
-              Self.dlgOpenFile.showsHiddenFiles = true
-              Self.dlgOpenFile.canChooseFiles = true
-              Self.dlgOpenFile.allowsMultipleSelection = false
-              Self.dlgOpenFile.canChooseDirectories = false
-              Self.dlgOpenFile.allowedContentTypes = [.init(filenameExtension: "txt")]
-                .compactMap { $0 }
+              isShowingFileImporter = true
+            }
+            .fileImporter(
+              isPresented: $isShowingFileImporter,
+              allowedContentTypes: [.plainText],
+              allowsMultipleSelection: false
+            ) { result in
+              keykeyImportButtonDisabled = true
+              defer { keykeyImportButtonDisabled = false }
 
-              if let window = CtlSettingsUI.shared?.window {
-                Self.dlgOpenFile.beginSheetModal(for: window) { result in
-                  if result == NSApplication.ModalResponse.OK {
-                    keykeyImportButtonDisabled = true
-                    defer { keykeyImportButtonDisabled = false }
-                    guard let url = Self.dlgOpenFile.url else { return }
-                    guard var rawString = try? String(contentsOf: url) else { return }
-                    let maybeCount = try? LMMgr.importYahooKeyKeyUserDictionary(text: &rawString)
-                    let count: Int = maybeCount ?? 0
-                    window.callAlert(title: String(
-                      format: "i18n:settings.importFromKimoTxt.finishedCount:%@".localized,
-                      count.description
-                    ))
-                  }
-                }
+              switch result {
+              case let .success(urls):
+                guard let url = urls.first else { return }
+                guard var rawString = try? String(contentsOf: url) else { return }
+                let maybeCount = try? LMMgr.importYahooKeyKeyUserDictionary(text: &rawString)
+                let count: Int = maybeCount ?? 0
+
+                CtlSettingsUI.shared?.window.callAlert(title: String(
+                  format: "i18n:settings.importFromKimoTxt.finishedCount:%@".localized,
+                  count.description
+                ))
+              case .failure:
+                break
               }
             }
             Button("i18n:settings.importFromKimoTxt.DirectlyImport") {
