@@ -20,7 +20,7 @@ private let loc: String =
 
 // MARK: - VwrPhraseEditorUI
 
-@available(macOS 13, *)
+@available(macOS 14, *)
 public struct VwrPhraseEditorUI: View {
   // MARK: Lifecycle
 
@@ -355,7 +355,7 @@ public struct VwrPhraseEditorUI: View {
 
 // MARK: - ContentView_Previews
 
-@available(macOS 13, *)
+@available(macOS 14, *)
 struct ContentView_Previews: PreviewProvider {
   static var previews: some View {
     VwrPhraseEditorUI()

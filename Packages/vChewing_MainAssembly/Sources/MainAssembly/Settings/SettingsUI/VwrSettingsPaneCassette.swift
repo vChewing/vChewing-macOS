@@ -13,12 +13,12 @@ import SwiftUI
 
 // MARK: - VwrSettingsPaneCassette
 
-@available(macOS 13, *)
+@available(macOS 14, *)
 public struct VwrSettingsPaneCassette: View {
   // MARK: Public
 
   public var body: some View {
-    ScrollView {
+    NavigationStack {
       Form {
         // MARK: - Cassette Data Path Management
 
@@ -181,9 +181,9 @@ public struct VwrSettingsPaneCassette: View {
 
 // MARK: - VwrSettingsPaneCassette_Previews
 
-@available(macOS 13, *)
+@available(macOS 14, *)
 struct VwrSettingsPaneCassette_Previews: PreviewProvider {
   static var previews: some View {
-    VwrSettingsPaneDictionary()
+    VwrSettingsPaneCassette()
   }
 }

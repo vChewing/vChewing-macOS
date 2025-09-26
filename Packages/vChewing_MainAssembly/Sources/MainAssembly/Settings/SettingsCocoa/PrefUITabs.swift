@@ -70,7 +70,7 @@ extension PrefUITabs {
     }
   }
 
-  @available(macOS 13, *)
+  @available(macOS 14, *)
   @ViewBuilder
   public var suiView: some View {
     switch self {

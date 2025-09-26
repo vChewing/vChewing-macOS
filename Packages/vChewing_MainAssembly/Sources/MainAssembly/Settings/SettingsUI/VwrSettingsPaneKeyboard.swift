@@ -13,14 +13,14 @@ import SwiftUI
 
 // MARK: - VwrSettingsPaneKeyboard
 
-@available(macOS 13, *)
+@available(macOS 14, *)
 public struct VwrSettingsPaneKeyboard: View {
   // MARK: Public
 
   // MARK: - Main View
 
   public var body: some View {
-    ScrollView {
+    NavigationStack {
       Form {
         Section {
           HStack(alignment: .top) {
@@ -82,7 +82,7 @@ public struct VwrSettingsPaneKeyboard: View {
 
 // MARK: - VwrSettingsPaneKeyboard_KeyboardShortcuts
 
-@available(macOS 13, *)
+@available(macOS 14, *)
 private struct VwrSettingsPaneKeyboard_KeyboardShortcuts: View {
   // MARK: Internal
 
@@ -145,7 +145,7 @@ private struct VwrSettingsPaneKeyboard_KeyboardShortcuts: View {
 
 // MARK: - VwrSettingsPaneKeyboard_Previews
 
-@available(macOS 13, *)
+@available(macOS 14, *)
 struct VwrSettingsPaneKeyboard_Previews: PreviewProvider {
   static var previews: some View {
     VwrSettingsPaneKeyboard()

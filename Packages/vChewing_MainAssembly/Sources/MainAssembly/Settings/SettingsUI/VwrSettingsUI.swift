@@ -11,7 +11,7 @@ import SwiftUI
 
 // MARK: - VwrSettingsUI
 
-@available(macOS 13, *)
+@available(macOS 14, *)
 public struct VwrSettingsUI: View {
   // MARK: Lifecycle
 
@@ -23,15 +23,15 @@ public struct VwrSettingsUI: View {
   /// 但由於這個畫面是藉由 NSHostingView 叫出來的、所以無法正確處理大型標題列。
   /// 目前還是暫時繼續用 NavigationView。
   public var body: some View {
-    NavigationView {
-      VStack {
+    NavigationSplitView(columnVisibility: $columnVisibility) {
+      Group {
         List(PrefUITabs.allCases, selection: $selectedTabID) { neta in
           if neta == PrefUITabs.tabGeneral {
             if let appIcon = NSImage(named: "IconSansMargin") {
               Image(nsImage: appIcon).resizable()
-                .frame(width: 86, height: 86)
+                .frame(width: 64, height: 64)
                 .frame(maxWidth: .infinity, alignment: .leading)
-                .padding([.top, .bottom], NSFont.systemFontSize / 2)
+                .padding([.top, .bottom], 6)
             }
           }
           NavigationLink(destination: neta.suiView) {
@@ -46,24 +46,41 @@ public struct VwrSettingsUI: View {
         VStack(alignment: .leading) {
           Text("v" + IMEApp.appMainVersionLabel.joined(separator: " Build "))
           Text(IMEApp.appSignedDateLabel)
-        }.settingsDescription().padding()
+        }
+        .settingsDescription().padding()
       }
-      .navigationTitle(PrefUITabs.tabGeneral.i18nTitle)
-      .frame(minWidth: 128, idealWidth: 128, maxWidth: 128)
-      PrefUITabs.tabGeneral.suiView
+      .navigationSplitViewColumnWidth(160)
+    } detail: {
+      Group {
+        if let selectedTab = selectedTabID {
+          selectedTab.suiView
+        } else {
+          PrefUITabs.tabGeneral.suiView
+        }
+      }
+      .id(selectedTabID) // 使用原始的 selectedTabID 作為 ID
     }
-    .frame(width: CtlSettingsUI.formWidth + 140, height: CtlSettingsUI.contentMaxHeight)
+    .frame(maxHeight: .infinity)
+    .onAppear {
+      // NavigationSplitView 需要明確的初始選擇
+      if selectedTabID == nil {
+        selectedTabID = .tabGeneral
+      }
+    }
   }
 
   // MARK: Private
 
   @State
   private var selectedTabID: PrefUITabs?
+
+  @State
+  private var columnVisibility: NavigationSplitViewVisibility = .doubleColumn
 }
 
 // MARK: - VwrSettingsUI_Previews
 
-@available(macOS 13, *)
+@available(macOS 14, *)
 struct VwrSettingsUI_Previews: PreviewProvider {
   static var previews: some View {
     VwrSettingsUI()

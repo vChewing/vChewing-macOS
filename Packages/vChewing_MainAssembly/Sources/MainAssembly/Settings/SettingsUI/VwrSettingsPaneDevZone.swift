@@ -12,14 +12,14 @@ import SwiftUI
 
 // MARK: - VwrSettingsPaneDevZone
 
-@available(macOS 13, *)
+@available(macOS 14, *)
 public struct VwrSettingsPaneDevZone: View {
   // MARK: Public
 
   // MARK: - Main View
 
   public var body: some View {
-    ScrollView {
+    NavigationStack {
       Form {
         Section(
           header: Text(
@@ -80,7 +80,7 @@ public struct VwrSettingsPaneDevZone: View {
 
 // MARK: - VwrSettingsPaneDevZone_Previews
 
-@available(macOS 13, *)
+@available(macOS 14, *)
 struct VwrSettingsPaneDevZone_Previews: PreviewProvider {
   static var previews: some View {
     VwrSettingsPaneDevZone()

@@ -17,7 +17,7 @@ private let kWindowTitleHeight: Double = 78
 
 // InputMethodServerPreferencesWindowControllerClass 非必需。
 
-@available(macOS 13, *)
+@available(macOS 14, *)
 public class CtlSettingsUI: NSWindowController, NSWindowDelegate {
   public static var shared: CtlSettingsUI?
 
@@ -26,18 +26,8 @@ public class CtlSettingsUI: NSWindowController, NSWindowDelegate {
     window?.setPosition(vertical: .top, horizontal: .right, padding: 20)
     window?.contentView = NSHostingView(
       rootView: VwrSettingsUI()
-        .fixedSize(horizontal: true, vertical: false)
         .ignoresSafeArea()
     )
-    let toolbar = NSToolbar(identifier: "vChewing.Settings.SwiftUI.Toolbar")
-    toolbar.allowsUserCustomization = false
-    toolbar.autosavesConfiguration = false
-    toolbar.sizeMode = .default
-    toolbar.delegate = self
-    toolbar.selectedItemIdentifier = nil
-    toolbar.showsBaselineSeparator = true
-    window?.toolbarStyle = .unifiedCompact
-    window?.toolbar = toolbar
     var preferencesTitleName = NSLocalizedString("vChewing Preferences…", comment: "")
     preferencesTitleName.removeLast()
     window?.title = preferencesTitleName
@@ -46,10 +36,11 @@ public class CtlSettingsUI: NSWindowController, NSWindowDelegate {
   public static func show() {
     if shared == nil {
       let newWindow = NSWindow(
-        contentRect: CGRect(x: 401, y: 295, width: 577, height: 568),
-        styleMask: [.titled, .closable, .miniaturizable],
+        contentRect: CGRect(x: 401, y: 295, width: 577, height: contentMaxHeight),
+        styleMask: [.titled, .closable, .miniaturizable, .fullSizeContentView],
         backing: .buffered, defer: true
       )
+      newWindow.titlebarAppearsTransparent = false
       let newInstance = CtlSettingsUI(window: newWindow)
       shared = newInstance
     }
@@ -66,44 +57,9 @@ public class CtlSettingsUI: NSWindowController, NSWindowDelegate {
   }
 }
 
-// MARK: NSToolbarDelegate
-
-@available(macOS 13, *)
-extension CtlSettingsUI: NSToolbarDelegate {
-  public var toolbarIdentifiers: [NSToolbarItem.Identifier] {
-    [.init("Collapse or Expand Sidebar")]
-  }
-
-  public func toolbarDefaultItemIdentifiers(_: NSToolbar) -> [NSToolbarItem.Identifier] {
-    toolbarIdentifiers
-  }
-
-  public func toolbarAllowedItemIdentifiers(_: NSToolbar) -> [NSToolbarItem.Identifier] {
-    toolbarIdentifiers
-  }
-
-  public func toolbarSelectableItemIdentifiers(_: NSToolbar) -> [NSToolbarItem.Identifier] {
-    []
-  }
-
-  public func toolbar(
-    _: NSToolbar, itemForItemIdentifier itemIdentifier: NSToolbarItem.Identifier,
-    willBeInsertedIntoToolbar _: Bool
-  )
-    -> NSToolbarItem? {
-    let item = NSToolbarItem(itemIdentifier: itemIdentifier)
-    item.isNavigational = true
-    item.target = window?.firstResponder
-    item.image = NSImage(named: "NSTouchBarSidebarTemplate") ?? .init()
-    item.tag = 0
-    item.action = #selector(NSSplitViewController.toggleSidebar(_:))
-    return item
-  }
-}
-
 // MARK: - Shared Static Variables and Constants
 
-@available(macOS 13, *)
+@available(macOS 14, *)
 extension CtlSettingsUI {
   public static let sentenceSeparator: String = {
     switch PrefMgr.shared.appleLanguages[0] {
@@ -118,17 +74,23 @@ extension CtlSettingsUI {
     }
   }()
 
-  public static let contentMaxHeight: Double = 490
+  public static let contentMaxHeight: Double = 560
 
   public static let formWidth: Double = {
+    let delta: Double
+    if #available(macOS 26, *) {
+      delta = 20
+    } else {
+      delta = 0
+    }
     switch PrefMgr.shared.appleLanguages[0] {
     case "ja":
-      return 520
+      return 520 + delta
     default:
       if PrefMgr.shared.appleLanguages[0].contains("zh-Han") {
-        return 500
+        return 500 + delta
       } else {
-        return 580
+        return 580 + delta
       }
     }
   }()
@@ -151,7 +113,7 @@ extension View {
 @available(macOS 10.15, *)
 extension View {
   public func formStyled() -> some View {
-    if #available(macOS 13, *) { return self.formStyle(.grouped) }
+    if #available(macOS 14, *) { return self.formStyle(.grouped) }
     return padding()
   }
 }

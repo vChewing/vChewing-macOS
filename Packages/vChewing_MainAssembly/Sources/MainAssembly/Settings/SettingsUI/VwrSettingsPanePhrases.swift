@@ -13,20 +13,20 @@ import SwiftUI
 
 // MARK: - VwrSettingsPanePhrases
 
-@available(macOS 13, *)
+@available(macOS 14, *)
 public struct VwrSettingsPanePhrases: View {
   public var body: some View {
-    ScrollView {
-      VStack {
+    NavigationStack {
+      List {
         GroupBox {
           VwrPhraseEditorUI(delegate: LMMgr.shared, window: CtlSettingsUI.shared?.window)
             .padding(4)
             .frame(maxWidth: .infinity)
             .frame(height: 440)
         }
+        .padding(4)
       }
-      .padding(4)
-      .padding()
+      .listStyle(.plain)
     }
     .frame(
       minWidth: CtlSettingsUI.formWidth,
@@ -37,7 +37,7 @@ public struct VwrSettingsPanePhrases: View {
 
 // MARK: - VwrSettingsPanePhrases_Previews
 
-@available(macOS 13, *)
+@available(macOS 14, *)
 struct VwrSettingsPanePhrases_Previews: PreviewProvider {
   static var previews: some View {
     VwrSettingsPanePhrases()

@@ -12,7 +12,7 @@ import SwiftUI
 
 // MARK: - VwrSettingsPaneCandidates
 
-@available(macOS 13, *)
+@available(macOS 14, *)
 public struct VwrSettingsPaneCandidates: View {
   // MARK: - AppStorage Variables
 
@@ -73,7 +73,7 @@ public struct VwrSettingsPaneCandidates: View {
   // MARK: - Main View
 
   public var body: some View {
-    ScrollView {
+    NavigationStack {
       Form {
         Section {
           UserDef.kUseRearCursorMode.bind($useRearCursorMode).render()
@@ -161,7 +161,7 @@ public struct VwrSettingsPaneCandidates: View {
 
 // MARK: - VwrSettingsPaneCandidates_Previews
 
-@available(macOS 13, *)
+@available(macOS 14, *)
 struct VwrSettingsPaneCandidates_Previews: PreviewProvider {
   static var previews: some View {
     VwrSettingsPaneCandidates()
@@ -170,7 +170,7 @@ struct VwrSettingsPaneCandidates_Previews: PreviewProvider {
 
 // MARK: - VwrSettingsPaneCandidates_SelectionKeys
 
-@available(macOS 13, *)
+@available(macOS 14, *)
 /// 出於與效能有關的隱憂，該部件單獨以一個 View Struct 實現。
 private struct VwrSettingsPaneCandidates_SelectionKeys: View {
   // MARK: Internal

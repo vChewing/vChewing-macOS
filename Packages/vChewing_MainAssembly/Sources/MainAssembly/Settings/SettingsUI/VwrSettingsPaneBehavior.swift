@@ -12,7 +12,7 @@ import SwiftUI
 
 // MARK: - VwrSettingsPaneBehavior
 
-@available(macOS 13, *)
+@available(macOS 14, *)
 public struct VwrSettingsPaneBehavior: View {
   // MARK: - AppStorage Variables
 
@@ -79,7 +79,7 @@ public struct VwrSettingsPaneBehavior: View {
   // MARK: - Main View
 
   public var body: some View {
-    ScrollView {
+    NavigationStack {
       Form {
         Section {
           UserDef.kShowNotificationsWhenTogglingCapsLock
@@ -155,7 +155,7 @@ public struct VwrSettingsPaneBehavior: View {
 
 // MARK: - VwrSettingsPaneBehavior_Previews
 
-@available(macOS 13, *)
+@available(macOS 14, *)
 struct VwrSettingsPaneBehavior_Previews: PreviewProvider {
   static var previews: some View {
     VwrSettingsPaneBehavior()

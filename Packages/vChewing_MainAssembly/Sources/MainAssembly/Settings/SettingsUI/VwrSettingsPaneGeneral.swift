@@ -12,7 +12,7 @@ import SwiftUI
 
 // MARK: - VwrSettingsPaneGeneral
 
-@available(macOS 13, *)
+@available(macOS 14, *)
 public struct VwrSettingsPaneGeneral: View {
   // MARK: Lifecycle
 
@@ -49,7 +49,7 @@ public struct VwrSettingsPaneGeneral: View {
   // MARK: - Main View
 
   public var body: some View {
-    ScrollView {
+    NavigationStack {
       Form {
         VStack(alignment: .leading) {
           Text(
@@ -176,7 +176,7 @@ public struct VwrSettingsPaneGeneral: View {
 
 // MARK: - VwrSettingsPaneGeneral_Previews
 
-@available(macOS 13, *)
+@available(macOS 14, *)
 struct VwrSettingsPaneGeneral_Previews: PreviewProvider {
   static var previews: some View {
     VwrSettingsPaneGeneral()

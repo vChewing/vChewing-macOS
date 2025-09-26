@@ -12,14 +12,14 @@ import SwiftUI
 
 // MARK: - VwrSettingsPaneOutput
 
-@available(macOS 13, *)
+@available(macOS 14, *)
 public struct VwrSettingsPaneOutput: View {
   // MARK: Public
 
   // MARK: - Main View
 
   public var body: some View {
-    ScrollView {
+    NavigationStack {
       Form {
         Section {
           UserDef.kChineseConversionEnabled.bind(
@@ -72,7 +72,7 @@ public struct VwrSettingsPaneOutput: View {
 
 // MARK: - VwrSettingsPaneOutput_Previews
 
-@available(macOS 13, *)
+@available(macOS 14, *)
 struct VwrSettingsPaneOutput_Previews: PreviewProvider {
   static var previews: some View {
     VwrSettingsPaneOutput()
