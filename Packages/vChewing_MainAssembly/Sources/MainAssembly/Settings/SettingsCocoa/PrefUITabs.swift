@@ -25,7 +25,7 @@ public enum PrefUITabs: String, CaseIterable, Identifiable, Hashable {
 
   // MARK: Public
 
-  public var id: ObjectIdentifier { .init(rawValue as NSString) }
+  public var id: String { rawValue }
 }
 
 extension PrefUITabs {
