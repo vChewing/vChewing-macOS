@@ -13,11 +13,15 @@ let package = Package(
       targets: ["Hotenka"]
     ),
   ],
-  dependencies: [],
+  dependencies: [
+    .package(path: "../CSQLite3"),
+  ],
   targets: [
     .target(
       name: "Hotenka",
-      dependencies: []
+      dependencies: [
+        .product(name: "CSQLite3", package: "CSQLite3"),
+      ]
     ),
     .testTarget(
       name: "HotenkaTests",

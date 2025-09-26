@@ -6,8 +6,8 @@
 // marks, or product names of Contributor, except as required to fulfill notice
 // requirements defined in MIT License.
 
+import CSQLite3
 import Foundation
-import SQLite3
 
 // MARK: - LMAssembly
 
