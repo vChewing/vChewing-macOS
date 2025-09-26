@@ -239,7 +239,8 @@ public enum Shared {
       [.imeModeCHS, .imeModeCHT]
     }
 
-    public var id: ObjectIdentifier { .init(rawValue as AnyObject) }
+    public var id: String { rawValue }
+
     public var reversed: Shared.InputMode {
       switch self {
       case .imeModeCHS:
