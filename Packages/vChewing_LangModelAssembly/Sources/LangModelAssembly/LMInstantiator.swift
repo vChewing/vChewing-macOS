@@ -104,6 +104,8 @@ extension LMAssembly {
 
     public func resetFactoryJSONModels() {}
 
+    /// 清除 InputToken HashMap。
+    /// 注意：此 HashMap 僅記錄由 InputToken（以 "MACRO@" 開頭的特殊標記）生成的 Unigram。
     public func purgeInputTokenHashMap() {
       inputTokenHashMap.removeAll()
     }
@@ -400,17 +402,24 @@ extension LMAssembly {
       }
       rawAllUnigrams = userPhraseUnigrams + rawAllUnigrams
 
+      // 定期清理 InputToken HashMap 以防止記憶體洩漏
+      cleanupInputTokenHashMapIfNeeded()
+
       // 分析且處理可能存在的 InputToken。
       rawAllUnigrams = rawAllUnigrams.map { unigram in
         let convertedValues = unigram.value.parseAsInputToken(isCHS: isCHS)
+        // 不是 InputToken 的话，直接返回原 Unigram
         guard !convertedValues.isEmpty else { return [unigram] }
+        // 只有確認是 InputToken 時才處理並寫入 HashMap
         var result = [Megrez.Unigram]()
         convertedValues.enumerated().forEach { absDelta, value in
           let newScore: Double = -80 - Double(absDelta) * 0.01
           result.append(.init(value: value, score: newScore))
+          // 僅為 InputToken 生成的 Unigram 寫入 HashMap
           let hashKey = "\(keyChain)\t\(value)".hashValue
-          vCLMLog("\(keyChain)\t\(value)" + inputTokenHashMap.description)
-          inputTokenHashMap[hashKey] = true
+          if inputTokenHashMap.count < 5_000 {
+            inputTokenHashMap[hashKey] = true
+          }
         }
         return result
       }.flatMap { $0 }
@@ -471,5 +480,17 @@ extension LMAssembly {
 
     // 半衰记忆模组
     var lmUserOverride: LMUserOverride
+
+    // MARK: Private
+
+    /// 當 HashMap 過大時自動清理
+    private func cleanupInputTokenHashMapIfNeeded() {
+      // 更積極的清理策略：超過 3000 條目就清理至 1000 條目
+      if inputTokenHashMap.count > 3_000 {
+        // 保留最近 1000 個條目，清理其餘的
+        let keysToRemove = Array(inputTokenHashMap.keys.dropLast(1_000))
+        keysToRemove.forEach { inputTokenHashMap.removeValue(forKey: $0) }
+      }
+    }
   }
 }
