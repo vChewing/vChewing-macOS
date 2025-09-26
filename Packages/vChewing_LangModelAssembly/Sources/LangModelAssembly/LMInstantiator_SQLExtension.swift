@@ -89,7 +89,11 @@ extension LMAssembly.LMInstantiator {
   ) {
     guard Self.ptrSQL != nil else { return }
     performStatementSansResult { ptrStatement in
-      sqlite3_prepare_v2(Self.ptrSQL, sqlQuery, -1, &ptrStatement, nil)
+      let preparation = sqlite3_prepare_v2(Self.ptrSQL, sqlQuery, -1, &ptrStatement, nil)
+      guard preparation == SQLITE_OK else {
+        vCLMLog("SQL prepare failed for query: \(sqlQuery)")
+        return
+      }
       while sqlite3_step(ptrStatement) == SQLITE_ROW {
         guard let rawValue = sqlite3_column_text(ptrStatement, column.id) else { continue }
         handler(String(cString: rawValue))
