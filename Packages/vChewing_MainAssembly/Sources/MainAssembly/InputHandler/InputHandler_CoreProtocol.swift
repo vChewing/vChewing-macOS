@@ -405,89 +405,6 @@ extension InputHandlerProtocol {
     return result
   }
 
-  /// 鞏固當前組字器游標上下文，防止在當前游標位置固化節點時給作業範圍以外的內容帶來不想要的變化。
-  ///
-  /// 打比方說輸入法原廠詞庫內有「章太炎」一詞，你敲「章太炎」，然後想把「太」改成「泰」以使其變成「章泰炎」。
-  /// **macOS 內建的注音輸入法不會在這個過程對這個詞除了「太」以外的部分有任何變動**，
-  /// 但所有 OV 系輸入法都對此有 Bug：會將這些部分全部重設為各自的讀音下的最高原始權重的漢字。
-  /// 也就是說，選字之後的結果可能會變成「張泰言」。
-  ///
-  /// - Remark: 類似的可以拿來測試的詞有「蔡依林」「周杰倫」。
-  ///
-  /// 測試時請務必也測試「敲長句子、且這種詞在句子中間出現時」的情況。
-  ///
-  /// 威注音輸入法截至 v1.9.3 SP2 版為止都受到上游的這個 Bug 的影響，且在 v1.9.4 版利用該函式修正了這個缺陷。
-  /// 該修正必須搭配至少天權星組字引擎 v2.0.2 版方可生效。算法可能比較囉唆，但至少在常用情形下不會再發生該問題。
-  /// - Parameter theCandidate: 要拿來覆寫的詞音配對。
-  func consolidateCursorContext(with theCandidate: Megrez.KeyValuePaired) {
-    let currentAssembledSentence = compositor.assembledSentence
-    let (currentCursor, currentMarker) = (compositor.cursor, compositor.marker)
-    let gridOverrideStatusMirror = compositor.createNodeOverrideStatusMirror()
-    var frontBoundaryEX = actualNodeCursorPosition + 1
-    var rearBoundaryEX = actualNodeCursorPosition
-    var debugIntelToPrint = ""
-    if compositor.overrideCandidate(theCandidate, at: actualNodeCursorPosition) {
-      compositor.assemble()
-      let range = compositor.assembledSentence.contextRange(ofGivenCursor: actualNodeCursorPosition)
-      rearBoundaryEX = range.lowerBound
-      frontBoundaryEX = range.upperBound
-      debugIntelToPrint.append("EX: \(rearBoundaryEX)..<\(frontBoundaryEX), ")
-    }
-    compositor.restoreFromNodeOverrideStatusMirror(gridOverrideStatusMirror)
-    compositor.assembledSentence = currentAssembledSentence
-    compositor.cursor = currentCursor
-    compositor.marker = currentMarker
-
-    let range = currentAssembledSentence.contextRange(ofGivenCursor: actualNodeCursorPosition)
-    var rearBoundary = min(range.lowerBound, rearBoundaryEX)
-    var frontBoundary = max(range.upperBound, frontBoundaryEX)
-
-    debugIntelToPrint.append("INI: \(rearBoundary)..<\(frontBoundary), ")
-
-    let cursorBackup = compositor.cursor
-    while compositor.cursor > rearBoundary { compositor.jumpCursorBySegment(to: .rear) }
-    rearBoundary = min(compositor.cursor, rearBoundary)
-    compositor.cursor = cursorBackup // 游標歸位，再接著計算。
-    while compositor.cursor < frontBoundary { compositor.jumpCursorBySegment(to: .front) }
-    frontBoundary = min(max(compositor.cursor, frontBoundary), compositor.length)
-    compositor.cursor = cursorBackup // 計算結束，游標歸位。
-
-    debugIntelToPrint.append("FIN: \(rearBoundary)..<\(frontBoundary)")
-    vCLog(debugIntelToPrint)
-
-    // 接下來獲取這個範圍內的節點位置陣列。
-    var nodeIndices = [Int]() // 僅作統計用。
-
-    var position = rearBoundary // 臨時統計用
-    while position < frontBoundary {
-      guard let regionIndex = compositor.assembledSentence.cursorRegionMap[position] else {
-        position += 1
-        continue
-      }
-      if !nodeIndices.contains(regionIndex) {
-        nodeIndices.append(regionIndex) // 新增統計
-        guard compositor.assembledSentence.count > regionIndex else { break } // 防呆
-        let currentNode = compositor.assembledSentence[regionIndex]
-        guard currentNode.keyArray.count == currentNode.value.count else {
-          compositor.overrideCandidate(currentNode.asCandidatePair, at: position)
-          position += currentNode.keyArray.count
-          continue
-        }
-        let values = currentNode.asCandidatePair.value.map(\.description)
-        for (subPosition, key) in currentNode.keyArray.enumerated() {
-          guard values.count > subPosition else { break } // 防呆，應該沒有發生的可能性
-          let thePair = Megrez.KeyValuePaired(
-            keyArray: [key], value: values[subPosition]
-          )
-          compositor.overrideCandidate(thePair, at: position)
-          position += 1
-        }
-        continue
-      }
-      position += 1
-    }
-  }
-
   /// 獲取候選字詞（包含讀音）陣列資料內容。
   func generateArrayOfCandidates(fixOrder: Bool = true) -> [(keyArray: [String], value: String)] {
     /// 警告：不要對游標前置風格使用 nodesCrossing，否則會導致游標行為與 macOS 內建注音輸入法不一致。
@@ -621,6 +538,126 @@ extension InputHandlerProtocol {
     let punctuation: String = arrPunctuations.joined()
     result.append(punctuation)
     return result
+  }
+}
+
+extension InputHandlerProtocol {
+  /// 鞏固當前組字器游標上下文，防止在當前游標位置固化節點時給作業範圍以外的內容帶來不想要的變化。
+  ///
+  /// 打比方說輸入法原廠詞庫內有「章太炎」一詞，你敲「章太炎」，然後想把「太」改成「泰」以使其變成「章泰炎」。
+  /// **macOS 內建的注音輸入法不會在這個過程對這個詞除了「太」以外的部分有任何變動**，
+  /// 但所有 OV 系輸入法都對此有 Bug：會將這些部分全部重設為各自的讀音下的最高原始權重的漢字。
+  /// 也就是說，選字之後的結果可能會變成「張泰言」。
+  ///
+  /// - Remark: 類似的可以拿來測試的詞有「蔡依林」「周杰倫」。
+  ///
+  /// 測試時請務必也測試「敲長句子、且這種詞在句子中間出現時」的情況。
+  ///
+  /// 威注音輸入法截至 v1.9.3 SP2 版為止都受到上游的這個 Bug 的影響，且在 v1.9.4 版利用該函式修正了這個缺陷。
+  /// 該修正必須搭配至少天權星組字引擎 v2.0.2 版方可生效。算法可能比較囉唆，但至少在常用情形下不會再發生該問題。
+  /// - Parameter theCandidate: 要拿來覆寫的詞音配對。
+  func consolidateCursorContext(with theCandidate: Megrez.KeyValuePaired) {
+    // 計算需要鞏固的範圍
+    let result = calculateConsolidationBoundaries(for: theCandidate)
+    let consolidationRange = result.range
+
+    // 記錄調試信息
+    vCLog(result.debugInfo)
+
+    // 接下來獲取這個範圍內的節點位置陣列。
+    var nodeIndices = [Int]() // 僅作統計用。
+
+    var position = consolidationRange.lowerBound // 臨時統計用
+    while position < consolidationRange.upperBound {
+      guard let regionIndex = compositor.assembledSentence.cursorRegionMap[position] else {
+        position += 1
+        continue
+      }
+      if !nodeIndices.contains(regionIndex) {
+        nodeIndices.append(regionIndex) // 新增統計
+        guard compositor.assembledSentence.count > regionIndex else { break } // 防呆
+        let currentNode = compositor.assembledSentence[regionIndex]
+        guard currentNode.keyArray.count == currentNode.value.count else {
+          compositor.overrideCandidate(currentNode.asCandidatePair, at: position)
+          position += currentNode.keyArray.count
+          continue
+        }
+        let values = currentNode.asCandidatePair.value.map { String($0) }
+        for (subPosition, key) in currentNode.keyArray.enumerated() {
+          guard values.count > subPosition else { break } // 防呆，應該沒有發生的可能性
+          let thePair = Megrez.KeyValuePaired(
+            keyArray: [key], value: values[subPosition]
+          )
+          compositor.overrideCandidate(thePair, at: position)
+          position += 1
+        }
+        continue
+      }
+      position += 1
+    }
+  }
+
+  /// 計算鞏固游標上下文時所需的邊界範圍。
+  /// - Parameter candidate: 要拿來覆寫的詞音配對。
+  /// - Returns: 需要處理的範圍和調試信息。
+  private func calculateConsolidationBoundaries(
+    for candidate: Megrez.KeyValuePaired
+  )
+    -> (range: Range<Int>, debugInfo: String) {
+    let currentAssembledSentence = compositor.assembledSentence
+
+    // 先計算實驗性邊界（如果候選字詞可以被覆蓋的話）
+    var frontBoundaryEX = actualNodeCursorPosition + 1
+    var rearBoundaryEX = actualNodeCursorPosition
+    var debugIntelToPrint = ""
+
+    let gridOverrideStatusMirror = compositor.createNodeOverrideStatusMirror()
+    let (currentCursor, currentMarker) = (compositor.cursor, compositor.marker)
+
+    defer {
+      compositor.restoreFromNodeOverrideStatusMirror(gridOverrideStatusMirror)
+      compositor.assembledSentence = currentAssembledSentence
+      compositor.cursor = currentCursor
+      compositor.marker = currentMarker
+    }
+
+    if compositor.overrideCandidate(candidate, at: actualNodeCursorPosition) {
+      compositor.assemble()
+      let range = compositor.assembledSentence.contextRange(ofGivenCursor: actualNodeCursorPosition)
+      rearBoundaryEX = range.lowerBound
+      frontBoundaryEX = range.upperBound
+      debugIntelToPrint.append("EX: \(rearBoundaryEX)..<\(frontBoundaryEX), ")
+    }
+
+    // 獲取初始範圍
+    let initialRange = currentAssembledSentence.contextRange(ofGivenCursor: actualNodeCursorPosition)
+    var rearBoundary = min(initialRange.lowerBound, rearBoundaryEX)
+    var frontBoundary = max(initialRange.upperBound, frontBoundaryEX)
+
+    debugIntelToPrint.append("INI: \(rearBoundary)..<\(frontBoundary), ")
+
+    // 通過游標移動來精確計算邊界
+    let cursorBackup = compositor.cursor
+    defer { compositor.cursor = cursorBackup }
+
+    // 計算後邊界
+    while compositor.cursor > rearBoundary {
+      compositor.jumpCursorBySegment(to: .rear)
+    }
+    rearBoundary = min(compositor.cursor, rearBoundary)
+
+    // 重置游標位置
+    compositor.cursor = cursorBackup
+
+    // 計算前邊界
+    while compositor.cursor < frontBoundary {
+      compositor.jumpCursorBySegment(to: .front)
+    }
+    frontBoundary = min(max(compositor.cursor, frontBoundary), compositor.length)
+
+    debugIntelToPrint.append("FIN: \(rearBoundary)..<\(frontBoundary)")
+
+    return (range: rearBoundary ..< frontBoundary, debugInfo: debugIntelToPrint)
   }
 }
 
