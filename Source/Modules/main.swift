@@ -12,6 +12,7 @@ import InputMethodKit
 import LangModelAssembly
 import MainAssembly
 import Shared
+import SwiftExtension
 import Uninstaller
 
 let cmdParameters = CommandLine.arguments.dropFirst(1)
@@ -84,13 +85,13 @@ default: exit(0)
 }
 
 guard let mainNibName = Bundle.main.infoDictionary?["NSMainNibFile"] as? String else {
-  NSLog("vChewingDebug: Fatal error: NSMainNibFile key not defined in Info.plist.")
+  Process.consoleLog("vChewingDebug: Fatal error: NSMainNibFile key not defined in Info.plist.")
   exit(-1)
 }
 
 let loaded = Bundle.main.loadNibNamed(mainNibName, owner: NSApp, topLevelObjects: nil)
 if !loaded {
-  NSLog("vChewingDebug: Fatal error: Cannot load \(mainNibName).")
+  Process.consoleLog("vChewingDebug: Fatal error: Cannot load \(mainNibName).")
   exit(-1)
 }
 
@@ -101,7 +102,7 @@ let kConnectionName = Bundle.main
 guard let bundleID = Bundle.main.bundleIdentifier,
       let server = IMKServer(name: kConnectionName, bundleIdentifier: bundleID)
 else {
-  NSLog(
+  Process.consoleLog(
     "vChewingDebug: Fatal error: Cannot initialize input method server with connection name retrieved from the plist, nor there's no connection name in the plist."
   )
   exit(-1)

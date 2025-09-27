@@ -39,9 +39,9 @@ private let testDataPath: String = packageRootPath + "/Tests/TestDictData/"
 
 final class HotenkaTests: XCTestCase {
   func testGeneratingPlist() throws {
-    NSLog("// Start loading from: \(packageRootPath)")
+    Hotenka.consoleLog("// Start loading from: \(packageRootPath)")
     let testInstance: HotenkaChineseConverter = .init(dictDir: testDataPath)
-    NSLog("// Loading complete. Generating plist dict file.")
+    Hotenka.consoleLog("// Loading complete. Generating plist dict file.")
     do {
       try PropertyListSerialization.data(
         fromPropertyList: testInstance.dict,
@@ -51,20 +51,20 @@ final class HotenkaTests: XCTestCase {
         to: URL(fileURLWithPath: testDataPath + "convdict.plist")
       )
     } catch {
-      NSLog("// Error on writing strings to file: \(error)")
+      Hotenka.consoleLog("// Error on writing strings to file: \(error)")
     }
   }
 
   func testSampleWithPlist() throws {
-    NSLog("// Start loading plist from: \(packageRootPath)")
+    Hotenka.consoleLog("// Start loading plist from: \(packageRootPath)")
     let testInstance2: HotenkaChineseConverter = .init(plistDir: testDataPath + "convdict.plist")
-    NSLog("// Successfully loading plist dictionary.")
+    Hotenka.consoleLog("// Successfully loading plist dictionary.")
 
     let oriString = "为中华崛起而读书"
     let result1 = testInstance2.convert(oriString, to: .zhHantTW)
     let result2 = testInstance2.convert(result1, to: .zhHantKX)
     let result3 = testInstance2.convert(result2, to: .zhHansJP)
-    NSLog("// Results: \(result1) \(result2) \(result3)")
+    Hotenka.consoleLog("// Results: \(result1) \(result2) \(result3)")
     XCTAssertEqual(result1, "為中華崛起而讀書")
     XCTAssertEqual(result2, "爲中華崛起而讀書")
     XCTAssertEqual(result3, "為中華崛起而読書")

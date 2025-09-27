@@ -10,6 +10,15 @@ import AppKit
 import Foundation
 import SwiftExtension
 
+#if canImport(OSLog)
+  import OSLog
+#endif
+
+public func vCLog(forced: Bool = false, _ strPrint: StringLiteralType) {
+  guard forced || UserDefaults.current.bool(forKey: "_DebugMode") else { return }
+  Process.consoleLog("vChewingDebug: \(strPrint)")
+}
+
 // MARK: - TooltipColorState
 
 public enum TooltipColorState {
@@ -215,12 +224,6 @@ public enum CandidateKey {
       result = Self.ValidationError.countMismatch
     }
     return result == ValidationError.noError ? nil : result.description
-  }
-}
-
-public func vCLog(_ strPrint: StringLiteralType) {
-  if UserDefaults.current.bool(forKey: "_DebugMode") {
-    NSLog("vChewingDebug: %@", strPrint)
   }
 }
 

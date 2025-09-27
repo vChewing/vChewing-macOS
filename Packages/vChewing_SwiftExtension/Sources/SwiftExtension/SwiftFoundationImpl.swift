@@ -8,6 +8,28 @@
 
 import Foundation
 
+#if canImport(OSLog)
+  import OSLog
+#endif
+
+extension Process {
+  public static func consoleLog<S: StringProtocol>(_ msg: S) {
+    let msgStr = msg.description
+    if #available(macOS 26.0, *) {
+      #if canImport(OSLog)
+        let logger = Logger(subsystem: "vChewing", category: "Log")
+        logger.log(level: .default, "\(msgStr, privacy: .public)")
+        return
+      #else
+        break
+      #endif
+    }
+
+    // 兼容旧系统
+    NSLog(msgStr)
+  }
+}
+
 // MARK: - String.localized extension
 
 extension StringLiteralType {
