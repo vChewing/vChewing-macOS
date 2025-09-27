@@ -24,9 +24,9 @@ final class LMCassetteTests: XCTestCase {
   func testCassetteLoadWubi86() throws {
     let pathCINFile = testDataPath + "wubi.cin"
     var lmCassette = LMAssembly.LMCassette()
-    NSLog("LMCassette: Start loading CIN.")
+    vCLMLog("LMCassette: Start loading CIN.")
     lmCassette.open(pathCINFile)
-    NSLog("LMCassette: Finished loading CIN. Entries: \(lmCassette.count)")
+    vCLMLog("LMCassette: Finished loading CIN. Entries: \(lmCassette.count)")
     print(lmCassette.unigramsFor(key: "aaaz"))
     XCTAssertEqual(lmCassette.keyNameMap.count, 26)
     XCTAssertEqual(lmCassette.charDefMap.count, 23_494)
@@ -45,9 +45,9 @@ final class LMCassetteTests: XCTestCase {
   func testCassetteLoadArray30() throws {
     let pathCINFile = testDataPath + "array30.cin2"
     var lmCassette = LMAssembly.LMCassette()
-    NSLog("LMCassette: Start loading CIN.")
+    vCLMLog("LMCassette: Start loading CIN.")
     lmCassette.open(pathCINFile)
-    NSLog("LMCassette: Finished loading CIN. Entries: \(lmCassette.count)")
+    vCLMLog("LMCassette: Finished loading CIN. Entries: \(lmCassette.count)")
     XCTAssertFalse(lmCassette.quickDefMap.isEmpty)
     print(lmCassette.quickSetsFor(key: ",.") ?? "")
     XCTAssertEqual(lmCassette.keyNameMap.count, 31)
