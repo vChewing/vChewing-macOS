@@ -32,6 +32,10 @@ import Foundation
   import Darwin
 #endif
 
+#if canImport(OSLog)
+  import OSLog
+#endif
+
 // MARK: - DictType
 
 public enum DictType: Int, CaseIterable {
@@ -66,6 +70,26 @@ public enum DictType: Int, CaseIterable {
   }
 }
 
+// MARK: - Hotenka
+
+public enum Hotenka {
+  static func consoleLog<S: StringProtocol>(_ msg: S) {
+    let msgStr = msg.description
+    if #available(macOS 26.0, *) {
+      #if canImport(OSLog)
+        let logger = Logger(subsystem: "vChewing", category: "Hotenka")
+        logger.log(level: .default, "\(msgStr, privacy: .public)")
+        return
+      #else
+        break
+      #endif
+    }
+
+    // 兼容旧系统
+    NSLog(msgStr)
+  }
+}
+
 // MARK: - HotenkaChineseConverter
 
 public class HotenkaChineseConverter {
@@ -80,7 +104,7 @@ public class HotenkaChineseConverter {
     self.dict = .init()
     self.dictFiles = .init()
     guard sqlite3_open(dbPath, &ptrSQL) == SQLITE_OK else {
-      NSLog("// Exception happened when connecting to SQLite database at: \(dbPath).")
+      Hotenka.consoleLog("// Exception happened when connecting to SQLite database at: \(dbPath).")
       self.ptrSQL = nil
       return
     }
@@ -96,7 +120,7 @@ public class HotenkaChineseConverter {
           .propertyList(from: rawData, format: nil) as? [String: [String: String]] ?? .init()
       self.dict = rawPlist
     } catch {
-      NSLog("// Exception happened when reading dict plist at: \(plistDir).")
+      Hotenka.consoleLog("// Exception happened when reading dict plist at: \(plistDir).")
       self.dict = .init()
     }
   }
@@ -108,7 +132,7 @@ public class HotenkaChineseConverter {
       let rawJSON = try JSONDecoder().decode([String: [String: String]].self, from: rawData)
       self.dict = rawJSON
     } catch {
-      NSLog("// Exception happened when reading dict json at: \(jsonDir).")
+      Hotenka.consoleLog("// Exception happened when reading dict json at: \(jsonDir).")
       self.dict = .init()
     }
   }

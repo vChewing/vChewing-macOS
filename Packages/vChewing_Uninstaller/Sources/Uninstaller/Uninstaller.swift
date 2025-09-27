@@ -26,7 +26,7 @@ public enum Uninstaller {
     )
     // 輸入法自毀處理。這裡不用「Bundle.main.bundleURL」是為了方便使用者以 sudo 身分來移除被錯誤安裝到系統目錄內的輸入法。
     guard let bundleID = Bundle.main.bundleIdentifier else {
-      NSLog("Failed to ensure the bundle identifier.")
+      Process.consoleLog("Failed to ensure the bundle identifier.")
       return -1
     }
 

@@ -9,9 +9,29 @@
 import Foundation
 import InputMethodKit
 
+#if canImport(OSLog)
+  import OSLog
+#endif
+
 // MARK: - TISInputSource Extension by The vChewing Project (MIT-NTL License).
 
 extension TISInputSource {
+  static func consoleLog<S: StringProtocol>(_ msg: S) {
+    let msgStr = msg.description
+    if #available(macOS 26.0, *) {
+      #if canImport(OSLog)
+        let logger = Logger(subsystem: "vChewing", category: "TISInputSource")
+        logger.log(level: .default, "\(msgStr, privacy: .public)")
+        return
+      #else
+        break
+      #endif
+    }
+
+    // 兼容旧系统
+    NSLog(msgStr)
+  }
+
   public struct KeyboardLayout: Identifiable {
     public var id: String
     public var titleLocalized: String
@@ -35,17 +55,17 @@ extension TISInputSource {
     let instances = TISInputSource.allRegisteredInstancesOfThisInputMethod
     if instances.isEmpty {
       // 有實例尚未登記。執行登記手續。
-      NSLog("Registering input source.")
+      consoleLog("Registering input source.")
       if !TISInputSource.registerInputSource() {
-        NSLog("Input source registration failed.")
+        consoleLog("Input source registration failed.")
         return false
       }
     }
     var succeeded = true
     instances.forEach {
-      NSLog("Enabling input source: \($0.identifier)")
+      consoleLog("Enabling input source: \($0.identifier)")
       if !$0.activate() {
-        NSLog("Failed from enabling input source: \($0.identifier)")
+        consoleLog("Failed from enabling input source: \($0.identifier)")
         succeeded = false
       }
     }
@@ -65,11 +85,11 @@ extension TISInputSource {
   @discardableResult
   public func select() -> Bool {
     if !isSelectable {
-      NSLog("Non-selectable: \(identifier)")
+      Self.consoleLog("Non-selectable: \(identifier)")
       return false
     }
     if TISSelectInputSource(self) != noErr {
-      NSLog("Failed from switching to \(identifier)")
+      Self.consoleLog("Failed from switching to \(identifier)")
       return false
     }
     return true

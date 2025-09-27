@@ -38,9 +38,9 @@ private let testDataPath: String = packageRootPath + "/Tests/TestDictData/"
 
 extension HotenkaTests {
   func testGeneratingSQLiteDB() throws {
-    NSLog("// Start loading from: \(packageRootPath)")
+    Hotenka.consoleLog("// Start loading from: \(packageRootPath)")
     let testInstance: HotenkaChineseConverter = .init(dictDir: testDataPath)
-    NSLog("// Loading complete. Generating SQLite database.")
+    Hotenka.consoleLog("// Loading complete. Generating SQLite database.")
     var ptrSQL: OpaquePointer?
     let dbPath = testDataPath + "convdict.sqlite"
 
@@ -99,15 +99,15 @@ extension HotenkaTests {
   }
 
   func testSampleWithSQLiteDB() throws {
-    NSLog("// Start loading plist from: \(packageRootPath)")
+    Hotenka.consoleLog("// Start loading plist from: \(packageRootPath)")
     let testInstance2: HotenkaChineseConverter = .init(sqliteDir: testDataPath + "convdict.sqlite")
-    NSLog("// Successfully loading sql dictionary.")
+    Hotenka.consoleLog("// Successfully loading sql dictionary.")
 
     let oriString = "为中华崛起而读书"
     let result1 = testInstance2.convert(oriString, to: .zhHantTW)
     let result2 = testInstance2.convert(result1, to: .zhHantKX)
     let result3 = testInstance2.convert(result2, to: .zhHansJP)
-    NSLog("// Results: \(result1) \(result2) \(result3)")
+    Hotenka.consoleLog("// Results: \(result1) \(result2) \(result3)")
     XCTAssertEqual(result1, "為中華崛起而讀書")
     XCTAssertEqual(result2, "爲中華崛起而讀書")
     XCTAssertEqual(result3, "為中華崛起而読書")

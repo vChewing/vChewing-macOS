@@ -3,6 +3,12 @@
 
 import AppKit
 
+#if canImport(OSLog)
+  import OSLog
+#endif
+
+// MARK: - BookmarkManager
+
 public class BookmarkManager {
   // MARK: Public
 
@@ -13,7 +19,7 @@ public class BookmarkManager {
     guard let bookmarkDic = getBookmarkData(url: url),
           let bookmarkURL = getBookmarkURL()
     else {
-      NSLog("Error getting data or bookmarkURL")
+      Self.consoleLog("Error getting data or bookmarkURL")
       return
     }
 
@@ -28,9 +34,9 @@ public class BookmarkManager {
         )
       }
       try data?.write(to: bookmarkURL)
-      NSLog("Did save data to url")
+      Self.consoleLog("Did save data to url")
     } catch {
-      NSLog("Couldn't save bookmarks")
+      Self.consoleLog("Couldn't save bookmarks")
     }
   }
 
@@ -61,17 +67,36 @@ public class BookmarkManager {
             }
           }
         } else {
-          if let fileBookmarks = NSKeyedUnarchiver
-            .unarchiveObject(with: fileData) as! [URL: Data]? {
+          if let fileBookmarks =
+            NSKeyedUnarchiver
+              .unarchiveObject(with: fileData) as! [URL: Data]? {
             for bookmark in fileBookmarks {
               restoreBookmark(key: bookmark.key, value: bookmark.value)
             }
           }
         }
       } catch {
-        NSLog("Couldn't load bookmarks")
+        Self.consoleLog("Couldn't load bookmarks")
       }
     }
+  }
+
+  // MARK: Internal
+
+  static func consoleLog<S: StringProtocol>(_ msg: S) {
+    let msgStr = msg.description
+    if #available(macOS 26.0, *) {
+      #if canImport(OSLog)
+        let logger = Logger(subsystem: "vChewing", category: "BookmarkManager")
+        logger.log(level: .default, "\(msgStr, privacy: .public)")
+        return
+      #else
+        break
+      #endif
+    }
+
+    // 兼容旧系统
+    NSLog(msgStr)
   }
 
   // MARK: Private
@@ -80,24 +105,25 @@ public class BookmarkManager {
     let restoredUrl: URL?
     var isStale = false
 
-    NSLog("Restoring \(key)")
+    Self.consoleLog("Restoring \(key)")
     do {
       restoredUrl = try URL(
-        resolvingBookmarkData: value, options: NSURL.BookmarkResolutionOptions.withSecurityScope,
+        resolvingBookmarkData: value,
+        options: NSURL.BookmarkResolutionOptions.withSecurityScope,
         relativeTo: nil,
         bookmarkDataIsStale: &isStale
       )
     } catch {
-      NSLog("Error restoring bookmarks")
+      Self.consoleLog("Error restoring bookmarks")
       restoredUrl = nil
     }
 
     if let url = restoredUrl {
       if isStale {
-        NSLog("URL is stale")
+        Self.consoleLog("URL is stale")
       } else {
         if !url.startAccessingSecurityScopedResource() {
-          NSLog("Couldn't access: \(url.path)")
+          Self.consoleLog("Couldn't access: \(url.path)")
         }
       }
     }
@@ -105,7 +131,8 @@ public class BookmarkManager {
 
   private func getBookmarkData(url: URL) -> [URL: Data]? {
     let data = try? url.bookmarkData(
-      options: NSURL.BookmarkCreationOptions.withSecurityScope, includingResourceValuesForKeys: nil,
+      options: NSURL.BookmarkCreationOptions.withSecurityScope,
+      includingResourceValuesForKeys: nil,
       relativeTo: nil
     )
     if let data = data {
