@@ -840,10 +840,48 @@ extension InputHandlerProtocol {
     }()
 
     if candidates.count > 1 {
-      consolidateNode(
-        candidate: candidates[newIndex], respectCursorPushing: false,
-        preConsolidate: false, skipObservation: true
-      )
+      let previousSentence = compositor.assembledSentence
+      vCLog("revolveCandidate: attempting to consolidate candidate \(newIndex): \(candidates[newIndex].value)")
+
+      // 重試機制：如果 consolidateNode 沒有改變組字器狀態，則重試最多 20 次
+      var retryCount = 0
+      let maxRetries = 20
+      var consolidationSucceeded = false
+
+      while retryCount < maxRetries {
+        consolidateNode(
+          candidate: candidates[newIndex], respectCursorPushing: false,
+          preConsolidate: retryCount == 0, skipObservation: true
+        )
+
+        let currentSentence = compositor.assembledSentence
+        if previousSentence.map(\.value) != currentSentence.map(\.value) {
+          vCLog("revolveCandidate: consolidateNode succeeded after \(retryCount + 1) attempts")
+          consolidationSucceeded = true
+          break
+        }
+
+        retryCount += 1
+        if retryCount < maxRetries {
+          vCLog("revolveCandidate: consolidateNode failed, retrying (\(retryCount)/\(maxRetries))")
+          // 第一次使用 preConsolidate，後續重試不使用，以避免重複相同的失敗原因
+        }
+      }
+
+      if !consolidationSucceeded {
+        vCLog("revolveCandidate: consolidateNode failed after \(maxRetries) attempts")
+        vCLog("revolveCandidate: previous: \(previousSentence.map(\.value))")
+        vCLog("revolveCandidate: current: \(compositor.assembledSentence.map(\.value))")
+        vCLog("revolveCandidate: candidate that failed: \(candidates[newIndex])")
+        vCLog("revolveCandidate: currentNode.isOverridden: \(currentNode.isOverridden)")
+        vCLog("revolveCandidate: actualNodeCursorPosition: \(actualNodeCursorPosition)")
+        errorCallback?("040CDB2A")
+        // 即使失敗也繼續顯示狀態，而不是直接返回
+      }
+    } else {
+      errorCallback?("F6644C24")
+      // 只有一個候選字的情況下，沒有輪替的必要，直接返回
+      return true
     }
 
     // 該動態函式僅用於此場合。
