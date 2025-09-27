@@ -392,7 +392,7 @@ extension LMAssembly {
       // 將兩句差分也是為了讓 rawUserUnigrams 的類型不受可能的影響。
       var userPhraseUnigrams = Array(lmUserPhrases.unigramsFor(key: keyChain).reversed())
       if keyArray.count == 1, let topScore = rawAllUnigrams.map(\.score).max() {
-        // 不再讓使用者自己加入的單漢字讀音權重進入爬軌體系。
+        // 不再讓使用者自己加入的單漢字讀音權重進入組句體系。
         userPhraseUnigrams = userPhraseUnigrams.map { currentUnigram in
           Megrez.Unigram(
             value: currentUnigram.value,

@@ -19,7 +19,7 @@
 "⚠︎ Failed from nerfing a candidate." = "⚠︎ 候選字詞降權失敗。";
 "⚠︎ Phrase replacement mode enabled, interfering user phrase entry." = "⚠︎ 語彙置換功能已啟用，會波及語彙自訂。";
 "⚠︎ This feature is useful ONLY WHEN the font you are using doesn't support dynamic vertical punctuations. However, typed vertical punctuations will always shown as vertical punctuations EVEN IF your editor has changed the typing direction to horizontal." = "⚠︎ 該功能當且僅當目前的排版字型不支援縱排標點動態顯示轉義的情況下才有用。一旦使用了，所有敲出去的標點都會被永久轉換為靜態縱排標點：哪怕當前編輯器的排版模式已經改成橫排，這些已經輸入的標點也都還是縱排標點字元。";
-"⚠︎ This may hinder the walking algorithm from giving appropriate results." = "⚠︎ 這可能會妨礙爬軌函式，使其無法給出正確的結果。";
+"⚠︎ This may hinder the sentence-composition algorithm from giving appropriate results." = "⚠︎ 這可能會妨礙組句函式，使其無法給出正確的結果。";
 "⚠︎ This will reboot the vChewing IME." = "⚠︎ 這將重啟威注音輸入法。";
 "⚠︎ Unhandlable: Chars and Readings in buffer doesn't match." = "⚠︎ 無法處理：組字區字數與讀音數不對應。";
 "1) Only macOS has IMKCandidates. Since it relies on a dedicated ObjC Bridging Header to expose necessary internal APIs to work, it hinders vChewing from completely modularized for multi-platform support.\n\n2) IMKCandidates is buggy. It is not likely to be completely fixed by Apple, and its devs are not allowed to talk about it to non-Apple individuals. That's why we have had enough with IMKCandidates. It is likely the reason why Apple had never used IMKCandidates in their official InputMethodKit sample projects (as of August 2023)." = "1) 只有 macOS 才有 IMKCandidates 可用。該元件依賴特製的 ObjC Bridging Header 才能工作，這妨礙了威注音輸入法的跨平台模組化。\n\n2) IMKCandidates 渾身是 Bug，且 Apple 不太可能修復之。甚至 InputMethodKit 的開發人員們都不被允許與任何非 Apple 員工討論這些內容。於是 IMKCandidates 基本上用不下去了，更遑論 IMKCandidates 未來可能發生的會導致相容性問題的內部改動。這很可能也是 Apple 官方 InputMethodKit 示範專案當中沒有用到 IMKCandidates 的原因之一（截至 2023 年 8 月）。";
@@ -189,10 +189,10 @@
 "Hsu" = "許氏國音自然排列";
 "Hualuo Pinyin with Numeral Intonation" = "華羅拼音+數字標調";
 "i18n:aboutWindow.ABOUT_APP_TITLE_FULL" = "關於 macOS 版「威注音輸入法」";
-"i18n:aboutWindow.APP_DERIVED_FROM" = "該專案曾由 OpenVanilla 小麥注音專案 (MIT-License) 衍生而來。";
+"i18n:aboutWindow.APP_DERIVED_FROM" = "　";
 "i18n:aboutWindow.APP_NAME" = "vChewing for macOS";
 "i18n:aboutWindow.BUGREPORT_BUTTON" = "故障提報";
-"i18n:aboutWindow.DEV_CREW" = "威注音 macOS 程式研發：Shiki Suen, Isaac Xen, Hiraku Wang, 等。\n威注音詞庫維護：Shiki Suen。\nDijkstra 爬軌算法實作：Shiki Suen。";
+"i18n:aboutWindow.DEV_CREW" = "威注音 macOS 程式研發：Shiki Suen, Isaac Xen, Hiraku Wang, 等。\n威注音詞庫維護：Shiki Suen。\nDAG-DP 組句算法實作：Shiki Suen。";
 "i18n:aboutWindow.DISCLAIMER_TEXT" = "補記：1) Megrez Compositor (天權星組字引擎) 自 v4 起使用 LGPLv3 授權，但對於 Swift 專案中的靜態鏈接之情形有額外准許。2) 威注音輸入法使用了《先鋒語料庫 (Vanguard Corpus)》，該語料庫由多個外部資源資料組成，這些資料的來源在其 GitHub 儲存庫 (`vChewing/libvchewing-data`) 中有列出。先鋒語料庫的資料建置程式藉由 3-Clause BSD 授權釋出。";
 "i18n:aboutWindow.LICENSE_TITLE" = "麻理去商標授權合約 (MIT-NTL License):";
 "i18n:aboutWindow.OK_BUTTON" = "確定";
@@ -264,7 +264,7 @@
 "i18n:UserDef.kUseShiftQuestionToCallServiceMenu.shortTitle" = "允許在選字窗內也使用「Shift+?」叫出服務選單";
 "IBM" = "IBM 排列";
 "If disabled, this will insert space instead." = "取消勾選的話，該按鍵會插入空格。";
-"If not filling the weight, it will be 0.0, the maximum one. An ideal weight situates in [-9.5, 0], making itself can be captured by the walking algorithm. The exception is -114.514, the disciplinary weight. The walking algorithm will ignore it unless it is the unique result." = "不填寫權重的話，預設權重為最高值「0」。理想的權重範圍在 [-9.5, 0] 這個閉區間內，可以被爬軌算法自動抓到。例外就是懲戒權重「-114.514」，屬於極端降權。這種情況下，除非是唯一結果，否則會被爬軌算法忽略掉。";
+"If not filling the weight, it will be 0.0, the maximum one. An ideal weight situates in [-9.5, 0], making itself can be captured by the sentence-composition algorithm. The exception is -114.514, the disciplinary weight. The sentence-composition algorithm will ignore it unless it is the unique result." = "不填寫權重的話，預設權重為最高值「0」。理想的權重範圍在 [-9.5, 0] 這個閉區間內，可以被組句算法自動抓到。例外就是懲戒權重「-114.514」，屬於極端降權。這種情況下，除非是唯一結果，否則會被組句算法忽略掉。";
 "If unchecked, the ESC key will try cleaning the unfinished readings / strokes first, and will commit the current composition buffer if there's no unfinished readings / strokes." = "若取消勾選，則 ESC 鍵會先嘗試清除未組成的讀音/字根；\n如果沒有未組成的讀音/字根的話，則會遞交當前組字區的內容。";
 "in front of the phrase (like macOS built-in Zhuyin IME)" = "將游標置於詞語前方 // macOS 內建注音風格";
 "Initial" = "首字";
