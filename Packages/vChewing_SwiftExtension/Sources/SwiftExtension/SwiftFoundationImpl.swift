@@ -233,3 +233,26 @@ public func asyncOnMain(
     }
   }
 }
+
+// MARK: - Total RAM Size.
+
+extension Process {
+  public static let totalMemoryGiB: Int = {
+    let rawBytes = Double(ProcessInfo.processInfo.physicalMemory)
+    return Int((rawBytes / pow(1_024.0, 3)).rounded(.down))
+  }()
+
+  public static let isAppleSilicon: Bool = {
+    var systeminfo = utsname()
+    uname(&systeminfo)
+    let machine = withUnsafeBytes(of: &systeminfo.machine) { bufPtr -> String in
+      let data = Data(bufPtr)
+      if let lastIndex = data.lastIndex(where: { $0 != 0 }) {
+        return String(data: data[0 ... lastIndex], encoding: .isoLatin1) ?? "x86_64"
+      } else {
+        return String(data: data, encoding: .isoLatin1) ?? "x86_64"
+      }
+    }
+    return machine == "arm64"
+  }()
+}

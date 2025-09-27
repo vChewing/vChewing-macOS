@@ -313,17 +313,7 @@ extension Date {
 
 extension NSApplication {
   public static var isAppleSilicon: Bool {
-    var systeminfo = utsname()
-    uname(&systeminfo)
-    let machine = withUnsafeBytes(of: &systeminfo.machine) { bufPtr -> String in
-      let data = Data(bufPtr)
-      if let lastIndex = data.lastIndex(where: { $0 != 0 }) {
-        return String(data: data[0 ... lastIndex], encoding: .isoLatin1) ?? "x86_64"
-      } else {
-        return String(data: data, encoding: .isoLatin1) ?? "x86_64"
-      }
-    }
-    return machine == "arm64"
+    Process.isAppleSilicon
   }
 }
 
@@ -399,4 +389,24 @@ extension NSPasteboard.PasteboardType {
     Self(rawValue: "com.apple.application-bundle") // import UniformTypeIdentifiers
   public static let kUTTypeUTF8PlainText = Self(rawValue: "public.utf8-plain-text")
   public static let kNSFilenamesPboardType = Self(rawValue: "NSFilenamesPboardType")
+}
+
+// MARK: - UXLevel
+
+extension NSApplication {
+  public enum UXLevel: Int {
+    case liquidGlass = 2
+    case material = 1
+    case none = 0
+  }
+
+  public static var uxLevel: UXLevel {
+    switch (Process.isAppleSilicon, Process.totalMemoryGiB) {
+    case (true, 16...): return .liquidGlass
+    case (true, ..<16): return .material
+    case (false, 8...): return .material
+    case (false, ..<8): return .none
+    case (_, _): return .none
+    }
+  }
 }
