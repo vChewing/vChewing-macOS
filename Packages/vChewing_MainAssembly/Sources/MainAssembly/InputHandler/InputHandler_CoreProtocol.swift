@@ -152,8 +152,15 @@ extension InputHandlerProtocol {
     else {
       return
     }
-    let gridBackup = compositor.copy
-    defer { compositor = gridBackup }
+    let gridOverrideStatusMirror = compositor.createNodeOverrideStatusMirror()
+    let currentAssembledSentence = compositor.assembledSentence
+    let (currentCursor, currentMarker) = (compositor.cursor, compositor.marker)
+    defer {
+      compositor.restoreFromNodeOverrideStatusMirror(gridOverrideStatusMirror)
+      compositor.assembledSentence = currentAssembledSentence
+      compositor.cursor = currentCursor
+      compositor.marker = currentMarker
+    }
     var theState = session.state
     let highlightedPair = theState.candidates[index]
     consolidateNode(
@@ -388,10 +395,14 @@ extension InputHandlerProtocol {
   /// - Parameter direction: 文字輸入方向意義上的方向。
   /// - Returns: 邊界距離。
   func getStepsToNearbyNodeBorder(direction: Megrez.Compositor.TypingDirection) -> Int {
-    let currentCursor = compositor.cursor
-    let testCompositor = compositor.copy
-    testCompositor.jumpCursorBySegment(to: direction)
-    return abs(testCompositor.cursor - currentCursor)
+    let (currentCursor, currentMarker) = (compositor.cursor, compositor.marker)
+    compositor.jumpCursorBySegment(to: direction)
+    let newCursor = compositor.cursor
+    let result = abs(newCursor - currentCursor)
+    // 還原游標位置。
+    compositor.cursor = currentCursor
+    compositor.marker = currentMarker
+    return result
   }
 
   /// 鞏固當前組字器游標上下文，防止在當前游標位置固化節點時給作業範圍以外的內容帶來不想要的變化。
@@ -409,19 +420,25 @@ extension InputHandlerProtocol {
   /// 該修正必須搭配至少天權星組字引擎 v2.0.2 版方可生效。算法可能比較囉唆，但至少在常用情形下不會再發生該問題。
   /// - Parameter theCandidate: 要拿來覆寫的詞音配對。
   func consolidateCursorContext(with theCandidate: Megrez.KeyValuePaired) {
-    let grid = compositor.copy // 因為會影響到 Node 自身的權重覆寫狀態，所以必須用 hardCopy。
+    let currentAssembledSentence = compositor.assembledSentence
+    let (currentCursor, currentMarker) = (compositor.cursor, compositor.marker)
+    let gridOverrideStatusMirror = compositor.createNodeOverrideStatusMirror()
     var frontBoundaryEX = actualNodeCursorPosition + 1
     var rearBoundaryEX = actualNodeCursorPosition
     var debugIntelToPrint = ""
-    if grid.overrideCandidate(theCandidate, at: actualNodeCursorPosition) {
-      grid.assemble()
-      let range = grid.assembledSentence.contextRange(ofGivenCursor: actualNodeCursorPosition)
+    if compositor.overrideCandidate(theCandidate, at: actualNodeCursorPosition) {
+      compositor.assemble()
+      let range = compositor.assembledSentence.contextRange(ofGivenCursor: actualNodeCursorPosition)
       rearBoundaryEX = range.lowerBound
       frontBoundaryEX = range.upperBound
       debugIntelToPrint.append("EX: \(rearBoundaryEX)..<\(frontBoundaryEX), ")
     }
+    compositor.restoreFromNodeOverrideStatusMirror(gridOverrideStatusMirror)
+    compositor.assembledSentence = currentAssembledSentence
+    compositor.cursor = currentCursor
+    compositor.marker = currentMarker
 
-    let range = compositor.assembledSentence.contextRange(ofGivenCursor: actualNodeCursorPosition)
+    let range = currentAssembledSentence.contextRange(ofGivenCursor: actualNodeCursorPosition)
     var rearBoundary = min(range.lowerBound, rearBoundaryEX)
     var frontBoundary = max(range.upperBound, frontBoundaryEX)
 
@@ -438,7 +455,7 @@ extension InputHandlerProtocol {
     debugIntelToPrint.append("FIN: \(rearBoundary)..<\(frontBoundary)")
     vCLog(debugIntelToPrint)
 
-    // 接下來獲取這個範圍內的媽的都不知道該怎麼講了。
+    // 接下來獲取這個範圍內的節點位置陣列。
     var nodeIndices = [Int]() // 僅作統計用。
 
     var position = rearBoundary // 臨時統計用
