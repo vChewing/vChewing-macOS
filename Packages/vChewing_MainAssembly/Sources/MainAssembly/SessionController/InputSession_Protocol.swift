@@ -225,13 +225,13 @@ extension SessionProtocol {
     inputHandler = InputHandler(
       lm: inputMode.langModel,
       pref: PrefMgr.shared,
-      errorCallback: callError,
+      errorCallback: Self.callError,
       notificationCallback: Notifier.notify
     )
     inputHandler?.session = self
   }
 
-  public func callError(_ logMessage: String) {
+  public static func callError(_ logMessage: String) {
     vCLog(logMessage)
     IMEApp.buzz()
   }
