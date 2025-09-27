@@ -219,7 +219,7 @@ extension SessionProtocol {
             Notifier
               .notify(message: "i18n:candidateServiceMenu.selectorResponse.succeeded".localized)
           } else {
-            callError("4DFDC487: Candidate Text Service Selector Responsiveness Failure.")
+            Self.callError("4DFDC487: Candidate Text Service Selector Responsiveness Failure.")
             Notifier.notify(message: "i18n:candidateServiceMenu.selectorResponse.failed".localized)
           }
         }
@@ -263,7 +263,7 @@ extension SessionProtocol {
     case .ofInputting where (0 ..< state.candidates.count).contains(index):
       let chosenStr = state.candidates[index].value
       guard !chosenStr.isEmpty, chosenStr != inputHandler.currentLM.nullCandidateInCassette else {
-        callError("907F9F64")
+        Self.callError("907F9F64")
         return
       }
       let strToCommitFirst = inputHandler.generateStateOfInputting(sansReading: true).displayedText

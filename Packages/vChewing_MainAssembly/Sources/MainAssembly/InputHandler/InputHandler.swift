@@ -43,7 +43,7 @@ public final class InputHandler: InputHandlerProtocol {
   public static var keySeparator: String { Megrez.Compositor.theSeparator }
 
   /// 委任物件 (SessionCtl)，以便呼叫其中的函式。
-  public var session: (SessionProtocol & CtlCandidateDelegate)?
+  public weak var session: (SessionProtocol & CtlCandidateDelegate)?
   public var prefs: PrefMgrProtocol
   public var errorCallback: ((String) -> ())?
   public var notificationCallback: ((String) -> ())?
