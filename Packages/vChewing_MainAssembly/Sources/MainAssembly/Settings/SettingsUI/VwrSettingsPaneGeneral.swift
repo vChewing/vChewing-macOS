@@ -38,7 +38,7 @@ public struct VwrSettingsPaneGeneral: View {
         if newValue == "auto" { newValue = "" }
         guard PrefMgr.shared.appleLanguages.joined() != newValue else { return }
         if !newValue.isEmpty { PrefMgr.shared.appleLanguages = [newValue] }
-        NSLog("vChewing App self-terminated due to UI language change.")
+        vCLog(forced: true, "vChewing App self-terminated due to UI language change.")
         NSApp.terminate(nil)
       }
     )

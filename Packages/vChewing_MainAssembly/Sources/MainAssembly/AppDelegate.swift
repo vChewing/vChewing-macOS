@@ -24,7 +24,8 @@ public class AppDelegate: NSObject, NSApplicationDelegate, UNUserNotificationCen
 
   public static var updateInfoSourceURL: URL? {
     guard let urlText = Bundle.main.infoDictionary?["UpdateInfoEndpoint"] as? String else {
-      NSLog(
+      vCLog(
+        forced: true,
         "vChewingDebug: Fatal error: Info.plist wrecked. It needs to have correct 'UpdateInfoEndpoint' value."
       )
       return nil

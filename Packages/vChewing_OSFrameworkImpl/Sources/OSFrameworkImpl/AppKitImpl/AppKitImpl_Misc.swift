@@ -21,7 +21,7 @@ extension Bundle {
       &code
     )
     guard status4Code == 0, let code = code else {
-      NSLog("Error from getCodeSignedDate(): Failed from retrieving status4Code.")
+      String.consoleLog("Error from getCodeSignedDate(): Failed from retrieving status4Code.")
       return nil
     }
     let status = SecCodeCopySigningInformation(
@@ -30,16 +30,16 @@ extension Bundle {
       &information
     )
     guard status == noErr else {
-      NSLog("Error from getCodeSignedDate(): Failed from retrieving code signing intelligence.")
+      String.consoleLog("Error from getCodeSignedDate(): Failed from retrieving code signing intelligence.")
       return nil
     }
     guard let dictionary = information as? [String: NSObject] else { return nil }
     guard dictionary[kSecCodeInfoIdentifier as String] != nil else {
-      NSLog("Error from getCodeSignedDate(): Target not signed.")
+      String.consoleLog("Error from getCodeSignedDate(): Target not signed.")
       return nil
     }
     guard let infoDate = dictionary[kSecCodeInfoTimestamp as String] as? Date else {
-      NSLog("Error from getCodeSignedDate(): Target signing timestamp is missing.")
+      String.consoleLog("Error from getCodeSignedDate(): Target signing timestamp is missing.")
       return nil
     }
     return infoDate as Date
@@ -233,10 +233,10 @@ extension FileManager {
           at: URL(fileURLWithPath: path), resultingItemURL: nil
         )
       } else {
-        NSLog("Item doesn't exist: \(path)")
+        String.consoleLog("Item doesn't exist: \(path)")
       }
     } catch let error as NSError {
-      NSLog("Failed from removing this object: \(path) || Error: \(error)")
+      String.consoleLog("Failed from removing this object: \(path) || Error: \(error)")
       return false
     }
     return true

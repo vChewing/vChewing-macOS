@@ -9,6 +9,7 @@
 import AppKit
 import IMKUtils
 import InputMethodKit
+import SwiftExtension
 
 extension MainView {
   public func removeThenInstallInputMethod() {
@@ -27,11 +28,11 @@ extension MainView {
         // 塞入垃圾桶
         try fileManager.trashItem(at: fileURL, resultingItemURL: nil)
       } else {
-        NSLog("File does not exist")
+        String.consoleLog("File does not exist")
       }
 
     } catch let error as NSError {
-      NSLog("An error took place: \(error)")
+      String.consoleLog("An error took place: \(error)")
     }
 
     let killTask = Process()
@@ -88,7 +89,8 @@ extension MainView {
     let imeBundleURL = theBundle.bundleURL
 
     if allRegisteredInstancesOfThisInputMethod.isEmpty {
-      NSLog("Registering input source \(imeIdentifier) at \(imeBundleURL.absoluteString).")
+      String
+        .consoleLog("Registering input source \(imeIdentifier) at \(imeBundleURL.absoluteString).")
       let status = (TISRegisterInputSource(imeBundleURL as CFURL) == noErr)
       if !status {
         isShowingAlertForMissingPostInstall = true
@@ -102,7 +104,7 @@ extension MainView {
           ) + "(#D41J0U8U)",
           imeIdentifier
         )
-        NSLog(message)
+        String.consoleLog(message)
       }
     }
 
@@ -118,9 +120,9 @@ extension MainView {
       if isActivated { return }
       // WARNING: macOS 12 may return false positives, hence forced activation.
       if neta.activate() {
-        NSLog("Input method enabled: \(imeIdentifier)")
+        String.consoleLog("Input method enabled: \(imeIdentifier)")
       } else {
-        NSLog("Failed to enable input method: \(imeIdentifier)")
+        String.consoleLog("Failed to enable input method: \(imeIdentifier)")
       }
     }
 
