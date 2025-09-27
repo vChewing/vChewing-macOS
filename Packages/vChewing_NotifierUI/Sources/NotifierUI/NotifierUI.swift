@@ -205,7 +205,8 @@ extension Notifier {
       }
     }
     shiftExistingWindowPositions()
-    asyncOnMain {
+    asyncOnMain { [weak self] in
+      guard let self = self else { return }
       self.performDisplayLifetime()
     }
   }
