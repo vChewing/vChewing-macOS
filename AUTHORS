@@ -24,11 +24,11 @@ Although there is no Lukhnos's Objective-C / C++ codes left in the current repos
     - App-style installer (only preserved for developer purposes).
     - Developer of Gramambular 2 language engine (removed since vChewing 1.5.4).
         - Shiki Suen's Megrez engine (MIT License) is basically a Swift-rewritten version of Gramambular 2 with further development.
-        - Lukhnos Liu's DAG walking algorithm implementation is deprecated from Megrez engine on January 2025. The successor is Shiki Suen's Dijkstra walking algorithm implementation.
+        - Lukhnos Liu's DAG sentence-composition algorithm implementation is deprecated from Megrez engine on 2025. The successor is Shiki Suen's DAG-DP sentence-composition algorithm implementation.
     - Developer of Mandarin syllable composer (removed since vChewing 1.5.7).
         - Shiki Suen's Tekkon engine is made from scratch and has no relationship to Mandarin syllable composer.
-    - Developer of the original C++ version of the User Override Module MK2.
-        - Shiki Suen is trying to rewrite this module in Swift (and CSharp) with further development.
+    - Developer of the original C++ version of the User Override Module MK2 (Half-Decay Method).
+        - Shiki Suen rewrote this module with a new method irrelated to half-decay.
 
 $ Special thanks to:
 

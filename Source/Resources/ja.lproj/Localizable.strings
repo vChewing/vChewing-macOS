@@ -19,7 +19,7 @@
 "⚠︎ Failed from nerfing a candidate." = "⚠︎ 指定された文字候補の優先順位を下げることに失敗ししました。";
 "⚠︎ Phrase replacement mode enabled, interfering user phrase entry." = "⚠︎ 言葉置換機能稼働中、新添付言葉にも影響。";
 "⚠︎ This feature is useful ONLY WHEN the font you are using doesn't support dynamic vertical punctuations. However, typed vertical punctuations will always shown as vertical punctuations EVEN IF your editor has changed the typing direction to horizontal." = "⚠︎ 該当の組版用フォントには縦書き（引用符・括弧）変換機能が備えていない限り、この機能を使う甲斐がある。一旦使うと、入力した全ての引用符・括弧は永遠的に縦書きの様式になる。例え入力を受けているアプリ（例えばワープロソフとなど）の書写方向は横書きと変えたとしても、これらの入力済みの引用符・括弧は全て縦書きの見た目であり、削除してから入力し直す必要になる。";
-"⚠︎ This may hinder the walking algorithm from giving appropriate results." = "⚠︎ ウォーキング算法に差し支えてしまい、正しくない結果が出る恐れがある。";
+"⚠︎ This may hinder the sentence-composition algorithm from giving appropriate results." = "⚠︎ センテンス構築算法に差し支えてしまい、正しくない結果が出る恐れがある。";
 "⚠︎ This will reboot the vChewing IME." = "⚠︎ これで威注音入力アプリを再起動。";
 "⚠︎ Unhandlable: Chars and Readings in buffer doesn't match." = "⚠︎ 対処不可：緩衝列の字数は読みの数と不同等。";
 "1) Only macOS has IMKCandidates. Since it relies on a dedicated ObjC Bridging Header to expose necessary internal APIs to work, it hinders vChewing from completely modularized for multi-platform support.\n\n2) IMKCandidates is buggy. It is not likely to be completely fixed by Apple, and its devs are not allowed to talk about it to non-Apple individuals. That's why we have had enough with IMKCandidates. It is likely the reason why Apple had never used IMKCandidates in their official InputMethodKit sample projects (as of August 2023)." = "1) IMKCandidates は macOS だけで利用可能のシステム構成部品であり、ObjC Bridging Header にて特殊の内部 API を使う必要があるため、本アプリの「他のシステムへの移植計画」に妨げています。\n\n2) IMKCandidates には数多くのバグがあり、そして Apple 社に修復される可能性はほぼゼロだと見込めます。さらに、Apple 社の IMKCandidates 開発参与者たちはそれについての一切内容を Apple 社以外の人と話すのは、会社の規則によって禁則事項です。従って、IMKCandidates をこのまま使い続くのは、本当にうんざりです。況してや、これからも、Apple 社が IMKCandidates に何か内部変化を導入して、新たなる互換性支障が生ずる恐れがあると見込めます。Apple の公式の InputMethodKit サンプルプロジェクトに、IMKCandidates が使われていなかった理由はこれこそだと推測できます（2023年8月までの話）。";
@@ -188,10 +188,10 @@
 "Hsu" = "許氏国音自然配列";
 "Hualuo Pinyin with Numeral Intonation" = "中華ローマ弁音 (ローマ字+数字音調)";
 "i18n:aboutWindow.ABOUT_APP_TITLE_FULL" = "macOS 版威注音入力アプリについて";
-"i18n:aboutWindow.APP_DERIVED_FROM" = "曾て OpenVanilla 小麦注音プロジェクト (MIT-License) から派生。";
+"i18n:aboutWindow.APP_DERIVED_FROM" = "　";
 "i18n:aboutWindow.APP_NAME" = "vChewing for macOS";
 "i18n:aboutWindow.BUGREPORT_BUTTON" = "問題を報告";
-"i18n:aboutWindow.DEV_CREW" = "macOS 版威注音の開発：Shiki Suen, Isaac Xen, Hiraku Wang, など。\n威注音語彙データの維持：Shiki Suen。\nDijkstra ウォーキング算法実作：Shiki Suen。";
+"i18n:aboutWindow.DEV_CREW" = "macOS 版威注音の開発：Shiki Suen, Isaac Xen, Hiraku Wang, など。\n威注音語彙データの維持：Shiki Suen。\nDAG-DP センテンス構築算法実作：Shiki Suen。";
 "i18n:aboutWindow.DISCLAIMER_TEXT" = "補記：1) Megrez Compositor はバージョン4以降、LGPLv3ライセンスを使用していますが、Swift プロジェクトでの静的リンクは例外として許容します。2) 威注音入力アプリは、複数の外部リソースからのデータで構成される Vanguard Corpus を使用しており、これらのリソースはGitHubリポジトリ（`vChewing/libvchewing-data`）にクレジットされています。Vanguard Corpusのデータコンパイラは、3-Clause BSDライセンスでリリースします。";
 "i18n:aboutWindow.LICENSE_TITLE" = "ＭＩＴ商標不許可ライセンス (MIT-NTL License):";
 "i18n:aboutWindow.OK_BUTTON" = "うむ";
@@ -263,7 +263,7 @@
 "i18n:UserDef.kUseShiftQuestionToCallServiceMenu.shortTitle" = "候補陳列ウィンドウで「Shift+?」でもサービスメニューを呼出";
 "IBM" = "IBM 配列";
 "If disabled, this will insert space instead." = "未チェックの場合、スペースを挿入。";
-"If not filling the weight, it will be 0.0, the maximum one. An ideal weight situates in [-9.5, 0], making itself can be captured by the walking algorithm. The exception is -114.514, the disciplinary weight. The walking algorithm will ignore it unless it is the unique result." = "優先度を記入しなかった場合、最高値「0」はデフォルト値です。理想な優先度の範囲は [-9.5, 0] 以内で、ウォーキング算法に捕まれられます。例外は懲戒値「-114.514」で、優先度を最低に極めた値であり、唯一結果のない場合、ウォーキング算法に無視されます。";
+"If not filling the weight, it will be 0.0, the maximum one. An ideal weight situates in [-9.5, 0], making itself can be captured by the sentence-composition algorithm. The exception is -114.514, the disciplinary weight. The sentence-composition algorithm will ignore it unless it is the unique result." = "優先度を記入しなかった場合、最高値「0」はデフォルト値です。理想な優先度の範囲は [-9.5, 0] 以内で、センテンス構築算法に捕まれられます。例外は懲戒値「-114.514」で、優先度を最低に極めた値であり、唯一結果のない場合、センテンス構築算法に無視されます。";
 "If unchecked, the ESC key will try cleaning the unfinished readings / strokes first, and will commit the current composition buffer if there's no unfinished readings / strokes." = "未チェックの場合、ESC キーはまず未完成の音読/筆画を消す。\n未完成の音読/筆画がない場合、全緩衝列をそのまま送り出す。";
 "in front of the phrase (like macOS built-in Zhuyin IME)" = "単語の前で // macOS 内蔵注音入力のやり方";
 "Initial" = "頭文字";

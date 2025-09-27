@@ -113,7 +113,7 @@ extension InputHandlerProtocol {
     // 回到正常流程。
     if !compositor.overrideCandidate(theCandidate, at: actualNodeCursorPosition) { return }
     let previousWalk = compositor.assembledSentence
-    // 開始爬軌。
+    // 開始組句。
     walk()
     let currentWalk = compositor.assembledSentence
 
@@ -671,7 +671,7 @@ extension InputHandlerProtocol {
   /// 在爬取組字結果之前，先將即將從組字區溢出的內容遞交出去。
   ///
   /// 在理想狀況之下，組字區多長都無所謂。但是，螢幕浮動組字窗的尺寸是有限的。
-  /// 於是，有必要限定組字區的長度。超過該長度的內容會在爬軌之前先遞交出去，
+  /// 於是，有必要限定組字區的長度。超過該長度的內容會在組句之前先遞交出去，
   /// 使其不再記入最大相似度估算的估算對象範圍。
   /// 用比較形象且生動卻有點噁心的解釋的話，蒼蠅一邊吃一邊屙。
   var commitOverflownComposition: String {

@@ -239,7 +239,7 @@ extension LMAssembly.LMPerceptionOverride {
     let currentNode = currentNodeResult.node
     // 當前節點超過三個字的話，就不記憶了。在這種情形下，使用者可以考慮新增自訂語彙。
     guard currentNode.segLength <= 3 else { return nil }
-    // 前一個節點得從前一次爬軌結果當中來找。
+    // 前一個節點得從前一次組句結果當中來找。
     guard currentNodeResult.range.upperBound > 0 else { return nil } // 該例外應該不會出現。
     let prevNodeResult = walkedBefore.findGramWithRange(at: currentNodeResult.range.upperBound - 1)
     guard let prevNodeResult else { return nil }

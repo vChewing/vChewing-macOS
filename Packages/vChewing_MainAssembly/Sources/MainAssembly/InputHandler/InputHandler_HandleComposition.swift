@@ -162,7 +162,7 @@ extension InputHandlerProtocol {
         narrateTheComposer(with: readingKey, when: prefs.readingNarrationCoverage == 1)
       }
 
-      // 讓組字器反爬軌格。
+      // 組句。
       walk()
 
       // 一邊吃一邊屙（僅對位列黑名單的 App 用這招限制組字區長度）。
@@ -374,7 +374,7 @@ extension InputHandlerProtocol {
         return true
       }
 
-      // 讓組字器反爬軌格。
+      // 組句。
       walk()
 
       // 一邊吃一邊屙（僅對位列黑名單的 App 用這招限制組字區長度）。
