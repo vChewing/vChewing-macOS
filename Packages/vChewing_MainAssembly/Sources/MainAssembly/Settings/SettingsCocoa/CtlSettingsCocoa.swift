@@ -27,7 +27,9 @@ public class CtlSettingsCocoa: NSWindowController, NSWindowDelegate {
         defer: true
       )
     )
-    panes.preload()
+    autoreleasepool {
+      panes.preload()
+    }
   }
 
   required init?(coder: NSCoder) {
@@ -38,50 +40,64 @@ public class CtlSettingsCocoa: NSWindowController, NSWindowDelegate {
 
   public static var shared: CtlSettingsCocoa?
 
-  override public func windowDidLoad() {
-    super.windowDidLoad()
-    window?.setPosition(vertical: .top, horizontal: .right, padding: 20)
-
-    var preferencesTitleName = NSLocalizedString("vChewing Preferences…", comment: "")
-    preferencesTitleName.removeLast()
-    let toolbar = NSToolbar(identifier: "vChewing.Settings.AppKit.Toolbar")
-    toolbar.allowsUserCustomization = false
-    toolbar.autosavesConfiguration = false
-    toolbar.sizeMode = .default
-    toolbar.delegate = self
-    toolbar.selectedItemIdentifier = PrefUITabs.tabGeneral.toolbarIdentifier
-    toolbar.showsBaselineSeparator = true
-    if #available(macOS 11.0, *) {
-      window?.toolbarStyle = .preference
+  override public func close() {
+    autoreleasepool {
+      super.close()
+      if NSApplication.isAppleSilicon {
+        Self.shared = nil
+      }
     }
-    window?.toolbar = toolbar
-    window?.title = "\(preferencesTitleName) (\(IMEApp.appVersionLabel))"
-    if #available(macOS 10.10, *) {
-      window?.titlebarAppearsTransparent = false
-    }
-    window?.allowsToolTipsWhenApplicationIsInactive = false
-    window?.autorecalculatesKeyViewLoop = false
-    window?.isRestorable = false
-    window?.animationBehavior = .default
-    window?.styleMask = [.titled, .closable, .miniaturizable]
-
-    use(view: panes.ctlPageGeneral.view, animate: false)
   }
 
+  override public func windowDidLoad() {
+    autoreleasepool {
+      super.windowDidLoad()
+      window?.setPosition(vertical: .top, horizontal: .right, padding: 20)
+
+      var preferencesTitleName = NSLocalizedString("vChewing Preferences…", comment: "")
+      preferencesTitleName.removeLast()
+      let toolbar = NSToolbar(identifier: "vChewing.Settings.AppKit.Toolbar")
+      toolbar.allowsUserCustomization = false
+      toolbar.autosavesConfiguration = false
+      toolbar.sizeMode = .default
+      toolbar.delegate = self
+      toolbar.selectedItemIdentifier = PrefUITabs.tabGeneral.toolbarIdentifier
+      toolbar.showsBaselineSeparator = true
+      if #available(macOS 11.0, *) {
+        window?.toolbarStyle = .preference
+      }
+      window?.toolbar = toolbar
+      window?.title = "\(preferencesTitleName) (\(IMEApp.appVersionLabel))"
+      if #available(macOS 10.10, *) {
+        window?.titlebarAppearsTransparent = false
+      }
+      window?.allowsToolTipsWhenApplicationIsInactive = false
+      window?.autorecalculatesKeyViewLoop = false
+      window?.isRestorable = false
+      window?.animationBehavior = .default
+      window?.styleMask = [.titled, .closable, .miniaturizable]
+
+      use(view: panes.ctlPageGeneral.view, animate: false)
+    }
+  }
+
+  @objc
   public static func show() {
-    if shared == nil {
-      shared = CtlSettingsCocoa()
+    autoreleasepool {
+      if shared == nil {
+        shared = CtlSettingsCocoa()
+      }
+      guard let shared = shared, let sharedWindow = shared.window else { return }
+      sharedWindow.delegate = shared
+      if !sharedWindow.isVisible {
+        shared.windowDidLoad()
+      }
+      sharedWindow.setPosition(vertical: .top, horizontal: .right, padding: 20)
+      sharedWindow.orderFrontRegardless() // 逼著視窗往最前方顯示
+      sharedWindow.level = .statusBar
+      shared.showWindow(shared)
+      NSApp.popup()
     }
-    guard let shared = shared, let sharedWindow = shared.window else { return }
-    sharedWindow.delegate = shared
-    if !sharedWindow.isVisible {
-      shared.windowDidLoad()
-    }
-    sharedWindow.setPosition(vertical: .top, horizontal: .right, padding: 20)
-    sharedWindow.orderFrontRegardless() // 逼著視窗往最前方顯示
-    sharedWindow.level = .statusBar
-    shared.showWindow(shared)
-    NSApp.popup()
   }
 
   // MARK: Internal
@@ -101,18 +117,20 @@ public class CtlSettingsCocoa: NSWindowController, NSWindowDelegate {
 
 extension CtlSettingsCocoa: NSToolbarDelegate {
   func use(view newView: NSView, animate: Bool = true) {
-    guard let window = window, let existingContentView = window.contentView else { return }
-    guard previousView != newView else { return }
-    newView.layoutSubtreeIfNeeded() // 第一遍，保證 macOS 10.9 系統下的顯示正確。
-    previousView = newView
-    let temporaryViewOld = NSView(frame: existingContentView.frame)
-    window.contentView = temporaryViewOld
-    var newWindowRect = NSRect(origin: window.frame.origin, size: newView.fittingSize)
-    newWindowRect.size.height += kWindowTitleHeight
-    newWindowRect.origin.y = window.frame.maxY - newWindowRect.height
-    window.setFrame(newWindowRect, display: true, animate: animate)
-    window.contentView = newView
-    newView.layoutSubtreeIfNeeded() // 第二遍，保證最近幾年的這幾版系統下的顯示正確。
+    autoreleasepool {
+      guard let window = window, let existingContentView = window.contentView else { return }
+      guard previousView != newView else { return }
+      newView.layoutSubtreeIfNeeded() // 第一遍，保證 macOS 10.9 系統下的顯示正確。
+      previousView = newView
+      let temporaryViewOld = NSView(frame: existingContentView.frame)
+      window.contentView = temporaryViewOld
+      var newWindowRect = NSRect(origin: window.frame.origin, size: newView.fittingSize)
+      newWindowRect.size.height += kWindowTitleHeight
+      newWindowRect.origin.y = window.frame.maxY - newWindowRect.height
+      window.setFrame(newWindowRect, display: true, animate: animate)
+      window.contentView = newView
+      newView.layoutSubtreeIfNeeded() // 第二遍，保證最近幾年的這幾版系統下的顯示正確。
+    }
   }
 
   var toolbarIdentifiers: [NSToolbarItem.Identifier] {
@@ -158,14 +176,16 @@ extension CtlSettingsCocoa: NSToolbarDelegate {
     willBeInsertedIntoToolbar _: Bool
   )
     -> NSToolbarItem? {
-    guard let tab = PrefUITabs(rawValue: itemIdentifier.rawValue) else { return nil }
-    let item = NSToolbarItem(itemIdentifier: itemIdentifier)
-    item.target = self
-    item.image = tab.icon
-    item.label = tab.i18nTitle
-    item.toolTip = tab.i18nTitle
-    item.tag = tab.cocoaTag
-    item.action = #selector(updateTab(_:))
-    return item
+    autoreleasepool {
+      guard let tab = PrefUITabs(rawValue: itemIdentifier.rawValue) else { return nil }
+      let item = NSToolbarItem(itemIdentifier: itemIdentifier)
+      item.target = self
+      item.image = tab.icon
+      item.label = tab.i18nTitle
+      item.toolTip = tab.i18nTitle
+      item.tag = tab.cocoaTag
+      item.action = #selector(updateTab(_:))
+      return item
+    }
   }
 }

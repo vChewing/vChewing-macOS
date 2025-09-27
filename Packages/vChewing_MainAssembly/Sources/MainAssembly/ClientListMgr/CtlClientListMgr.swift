@@ -21,7 +21,9 @@ public class CtlClientListMgr: NSWindowController {
         defer: true
       )
     )
-    viewController.loadView()
+    autoreleasepool {
+      viewController.loadView()
+    }
   }
 
   required init?(coder: NSCoder) {
@@ -32,35 +34,48 @@ public class CtlClientListMgr: NSWindowController {
 
   public static var shared: CtlClientListMgr?
 
-  override public func windowDidLoad() {
-    super.windowDidLoad()
-    let view = viewController.view
-    window?.contentView = view
-    if let window = window {
-      var frame = window.frame
-      frame.size = view.fittingSize
-      window.setFrame(frame, display: true)
+  override public func close() {
+    autoreleasepool {
+      super.close()
+      if NSApplication.isAppleSilicon {
+        Self.shared = nil
+      }
     }
-    window?.setPosition(vertical: .center, horizontal: .right, padding: 20)
+  }
+
+  override public func windowDidLoad() {
+    autoreleasepool {
+      super.windowDidLoad()
+      let view = viewController.view
+      window?.contentView = view
+      if let window = window {
+        var frame = window.frame
+        frame.size = view.fittingSize
+        window.setFrame(frame, display: true)
+      }
+      window?.setPosition(vertical: .center, horizontal: .right, padding: 20)
+    }
   }
 
   public static func show() {
-    if shared == nil {
-      shared = CtlClientListMgr()
+    autoreleasepool {
+      if shared == nil {
+        shared = CtlClientListMgr()
+      }
+      guard let shared = shared, let sharedWindow = shared.window else { return }
+      if !sharedWindow.isVisible {
+        shared.windowDidLoad()
+      }
+      sharedWindow.setPosition(vertical: .center, horizontal: .right, padding: 20)
+      sharedWindow.orderFrontRegardless() // 逼著視窗往最前方顯示
+      sharedWindow.title = "Client Manager".localized
+      sharedWindow.level = .statusBar
+      if #available(macOS 10.10, *) {
+        sharedWindow.titlebarAppearsTransparent = true
+      }
+      shared.showWindow(shared)
+      NSApp.popup()
     }
-    guard let shared = shared, let sharedWindow = shared.window else { return }
-    if !sharedWindow.isVisible {
-      shared.windowDidLoad()
-    }
-    sharedWindow.setPosition(vertical: .center, horizontal: .right, padding: 20)
-    sharedWindow.orderFrontRegardless() // 逼著視窗往最前方顯示
-    sharedWindow.title = "Client Manager".localized
-    sharedWindow.level = .statusBar
-    if #available(macOS 10.10, *) {
-      sharedWindow.titlebarAppearsTransparent = true
-    }
-    shared.showWindow(shared)
-    NSApp.popup()
   }
 
   // MARK: Internal
