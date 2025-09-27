@@ -280,7 +280,8 @@ extension SessionProtocol {
         self.inputMode = IMEApp.currentInputMode
       }
     }
-    asyncOnMain {
+    asyncOnMain { [weak self] in
+      guard let self = self else { return }
       // 清理掉上一個會話的選字窗及其選單。
       if self.candidateUI is CtlCandidateTDK {
         self.candidateUI = nil

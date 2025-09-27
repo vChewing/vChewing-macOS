@@ -200,8 +200,8 @@ extension SessionProtocol {
     recentMarkedText.text = string
     recentMarkedText.selectionRange = range
     if allowAsync, isServingIMEItself || !isActivated {
-      asyncOnMain {
-        guard let client = self.client() else { return }
+      asyncOnMain { [weak self] in
+        guard let self = self, let client = self.client() else { return }
         client.setMarkedText(
           newString,
           selectionRange: range,
