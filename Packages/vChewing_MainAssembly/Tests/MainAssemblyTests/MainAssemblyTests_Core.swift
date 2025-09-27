@@ -75,9 +75,10 @@ class MainAssemblyTests: XCTestCase {
 
   var testSession: InputSession {
     let session = Self._testSession ?? InputSession(
-      controller: nil,
-      client: testClient
-    )
+      controller: nil
+    ) {
+      testClient
+    }
     if Self._testSession == nil { Self._testSession = session }
     return session
   }
