@@ -19,17 +19,28 @@ class CtlRevLookupWindow: NSWindowController, NSWindowDelegate {
   @objc
   var observation: NSKeyValueObservation?
 
+  override func close() {
+    autoreleasepool {
+      super.close()
+      if NSApplication.isAppleSilicon {
+        Self.shared = nil
+      }
+    }
+  }
+
   static func show() {
-    if shared == nil { Self.shared = .init(window: FrmRevLookupWindow()) }
-    guard let shared = Self.shared,
-          let window = shared.window as? FrmRevLookupWindow else { return }
-    shared.window = window
-    window.delegate = shared
-    window.setPosition(vertical: .bottom, horizontal: .right, padding: 20)
-    window.orderFrontRegardless() // 逼著視窗往最前方顯示
-    window.level = .statusBar
-    shared.showWindow(shared)
-    NSApp.popup()
+    autoreleasepool {
+      if shared == nil { Self.shared = .init(window: FrmRevLookupWindow()) }
+      guard let shared = Self.shared,
+            let window = shared.window as? FrmRevLookupWindow else { return }
+      shared.window = window
+      window.delegate = shared
+      window.setPosition(vertical: .bottom, horizontal: .right, padding: 20)
+      window.orderFrontRegardless() // 逼著視窗往最前方顯示
+      window.level = .statusBar
+      shared.showWindow(shared)
+      NSApp.popup()
+    }
   }
 }
 
