@@ -33,27 +33,39 @@ public class CtlSettingsUI: NSWindowController, NSWindowDelegate {
     window?.title = preferencesTitleName
   }
 
+  override public func close() {
+    autoreleasepool {
+      super.close()
+      if NSApplication.isAppleSilicon {
+        Self.shared = nil
+      }
+    }
+  }
+
+  @objc
   public static func show() {
-    if shared == nil {
-      let newWindow = NSWindow(
-        contentRect: CGRect(x: 401, y: 295, width: 577, height: contentMaxHeight),
-        styleMask: [.titled, .closable, .miniaturizable, .fullSizeContentView],
-        backing: .buffered, defer: true
-      )
-      newWindow.titlebarAppearsTransparent = false
-      let newInstance = CtlSettingsUI(window: newWindow)
-      shared = newInstance
+    autoreleasepool {
+      if shared == nil {
+        let newWindow = NSWindow(
+          contentRect: CGRect(x: 401, y: 295, width: 577, height: contentMaxHeight),
+          styleMask: [.titled, .closable, .miniaturizable, .fullSizeContentView],
+          backing: .buffered, defer: true
+        )
+        newWindow.titlebarAppearsTransparent = false
+        let newInstance = CtlSettingsUI(window: newWindow)
+        shared = newInstance
+      }
+      guard let shared = shared, let sharedWindow = shared.window else { return }
+      sharedWindow.delegate = shared
+      if !sharedWindow.isVisible {
+        shared.windowDidLoad()
+      }
+      sharedWindow.setPosition(vertical: .top, horizontal: .right, padding: 20)
+      sharedWindow.orderFrontRegardless() // 逼著視窗往最前方顯示
+      sharedWindow.level = .statusBar
+      shared.showWindow(shared)
+      NSApp.popup()
     }
-    guard let shared = shared, let sharedWindow = shared.window else { return }
-    sharedWindow.delegate = shared
-    if !sharedWindow.isVisible {
-      shared.windowDidLoad()
-    }
-    sharedWindow.setPosition(vertical: .top, horizontal: .right, padding: 20)
-    sharedWindow.orderFrontRegardless() // 逼著視窗往最前方顯示
-    sharedWindow.level = .statusBar
-    shared.showWindow(shared)
-    NSApp.popup()
   }
 }
 
