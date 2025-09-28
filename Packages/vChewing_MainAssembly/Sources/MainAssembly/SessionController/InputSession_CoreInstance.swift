@@ -281,8 +281,7 @@ extension InputSession {
 
   public func client() -> (any IMKTextInput & NSObjectProtocol)! {
     /// API 層面的驚嘆號是無法去掉的（否則 IMK 會出錯），那這裡就必須手動 unwrap 確保沒有把 nullptr 丟出去。
-    if let unwrapped = inputController?.client() { return unwrapped }
-    return nil
+    inputController?.client() ?? theClient()
   }
 
   /// 輸入法要被換掉或關掉的時候，要做的事情。
