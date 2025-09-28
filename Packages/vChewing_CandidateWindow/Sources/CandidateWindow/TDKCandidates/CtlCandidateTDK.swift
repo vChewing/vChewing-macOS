@@ -196,6 +196,16 @@ public class CtlCandidateTDK: CtlCandidate, NSWindowDelegate {
   var observation: NSKeyValueObservation?
 
   func updateNSWindowModern(_ window: NSWindow) {
+    guard #available(macOS 10.13, *) else {
+      Self.currentView = theViewAppKit
+      window.isOpaque = false
+      window.backgroundColor = .clear
+      window.contentView = Self.currentView
+      window.setContentSize(Self.currentView.fittingSize)
+      delegate?.resetCandidateWindowOrigin()
+      return
+    }
+
     // 獲取候選視圖並計算其尺寸
     let candidateView = theViewAppKit
     let viewSize = candidateView.fittingSize

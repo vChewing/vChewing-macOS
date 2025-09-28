@@ -60,20 +60,65 @@ public class PopupCompositionBuffer: NSWindowController {
     self.compositionView = PopupCompositionView(frame: contentRect)
     let viewSize = compositionView.fittingSize
 
-    // 創建容器視圖作為 ZStack，設置固定尺寸
-    let containerView = NSView(frame: NSRect(origin: .zero, size: viewSize))
-    // 為容器視圖也設置圓角，確保整體一致性
-    containerView.wantsLayer = true
-    containerView.layer?.cornerRadius = 9
-    containerView.layer?.masksToBounds = true
+    if #available(macOS 10.13, *) {
+      // 創建容器視圖作為 ZStack，設置固定尺寸
+      let containerView = NSView(frame: NSRect(origin: .zero, size: viewSize))
+      // 為容器視圖也設置圓角，確保整體一致性
+      containerView.wantsLayer = true
+      containerView.layer?.cornerRadius = 9
+      containerView.layer?.masksToBounds = true
 
-    // 設置背景視覺效果視圖
-    if let visualEffectView {
-      visualEffectView.translatesAutoresizingMaskIntoConstraints = false
-      containerView.addSubview(visualEffectView)
-      let visualConstraints = [
+      // 設置背景視覺效果視圖
+      if let visualEffectView {
+        visualEffectView.translatesAutoresizingMaskIntoConstraints = false
+        containerView.addSubview(visualEffectView)
+        let visualConstraints = [
+          NSLayoutConstraint(
+            item: visualEffectView,
+            attribute: .top,
+            relatedBy: .equal,
+            toItem: containerView,
+            attribute: .top,
+            multiplier: 1,
+            constant: 0
+          ),
+          NSLayoutConstraint(
+            item: visualEffectView,
+            attribute: .leading,
+            relatedBy: .equal,
+            toItem: containerView,
+            attribute: .leading,
+            multiplier: 1,
+            constant: 0
+          ),
+          NSLayoutConstraint(
+            item: visualEffectView,
+            attribute: .trailing,
+            relatedBy: .equal,
+            toItem: containerView,
+            attribute: .trailing,
+            multiplier: 1,
+            constant: 0
+          ),
+          NSLayoutConstraint(
+            item: visualEffectView,
+            attribute: .bottom,
+            relatedBy: .equal,
+            toItem: containerView,
+            attribute: .bottom,
+            multiplier: 1,
+            constant: 0
+          ),
+        ]
+        containerView.addConstraints(visualConstraints)
+      }
+
+      // 添加候選窗口內容視圖
+      compositionView.translatesAutoresizingMaskIntoConstraints = false
+      containerView.addSubview(compositionView)
+      let compositionConstraints = [
         NSLayoutConstraint(
-          item: visualEffectView,
+          item: compositionView,
           attribute: .top,
           relatedBy: .equal,
           toItem: containerView,
@@ -82,7 +127,7 @@ public class PopupCompositionBuffer: NSWindowController {
           constant: 0
         ),
         NSLayoutConstraint(
-          item: visualEffectView,
+          item: compositionView,
           attribute: .leading,
           relatedBy: .equal,
           toItem: containerView,
@@ -91,7 +136,7 @@ public class PopupCompositionBuffer: NSWindowController {
           constant: 0
         ),
         NSLayoutConstraint(
-          item: visualEffectView,
+          item: compositionView,
           attribute: .trailing,
           relatedBy: .equal,
           toItem: containerView,
@@ -100,7 +145,7 @@ public class PopupCompositionBuffer: NSWindowController {
           constant: 0
         ),
         NSLayoutConstraint(
-          item: visualEffectView,
+          item: compositionView,
           attribute: .bottom,
           relatedBy: .equal,
           toItem: containerView,
@@ -109,53 +154,24 @@ public class PopupCompositionBuffer: NSWindowController {
           constant: 0
         ),
       ]
-      containerView.addConstraints(visualConstraints)
+      containerView.addConstraints(compositionConstraints)
+
+      panel.contentView = containerView
+    } else {
+      compositionView.translatesAutoresizingMaskIntoConstraints = true
+      compositionView.frame = NSRect(origin: .zero, size: contentRect.size)
+      panel.contentView = compositionView
+      panel.contentView?.wantsLayer = true
+      panel.contentView?.shadow = .init()
+      panel.contentView?.shadow?.shadowBlurRadius = 6
+      panel.contentView?.shadow?.shadowColor = .black
+      panel.contentView?.shadow?.shadowOffset = .zero
+      if let layer = panel.contentView?.layer {
+        layer.cornerRadius = 9
+        layer.borderWidth = 1
+        layer.masksToBounds = true
+      }
     }
-
-    // 添加候選窗口內容視圖
-    compositionView.translatesAutoresizingMaskIntoConstraints = false
-    containerView.addSubview(compositionView)
-    let compositionConstraints = [
-      NSLayoutConstraint(
-        item: compositionView,
-        attribute: .top,
-        relatedBy: .equal,
-        toItem: containerView,
-        attribute: .top,
-        multiplier: 1,
-        constant: 0
-      ),
-      NSLayoutConstraint(
-        item: compositionView,
-        attribute: .leading,
-        relatedBy: .equal,
-        toItem: containerView,
-        attribute: .leading,
-        multiplier: 1,
-        constant: 0
-      ),
-      NSLayoutConstraint(
-        item: compositionView,
-        attribute: .trailing,
-        relatedBy: .equal,
-        toItem: containerView,
-        attribute: .trailing,
-        multiplier: 1,
-        constant: 0
-      ),
-      NSLayoutConstraint(
-        item: compositionView,
-        attribute: .bottom,
-        relatedBy: .equal,
-        toItem: containerView,
-        attribute: .bottom,
-        multiplier: 1,
-        constant: 0
-      ),
-    ]
-    containerView.addConstraints(compositionConstraints)
-
-    panel.contentView = containerView
 
     // 設置尺寸變更回調
     compositionView.onSizeChanged = { [weak panel] newSize in
