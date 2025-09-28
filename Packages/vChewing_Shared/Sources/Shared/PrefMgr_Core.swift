@@ -146,8 +146,8 @@ public class PrefMgr: NSObject, PrefMgrProtocol {
   @AppProperty(key: UserDef.kUseShiftQuestionToCallServiceMenu.rawValue, defaultValue: true)
   public var useShiftQuestionToCallServiceMenu: Bool
 
-  @AppProperty(key: UserDef.kMoveCursorAfterSelectingCandidate.rawValue, defaultValue: true)
-  public dynamic var moveCursorAfterSelectingCandidate: Bool
+  @AppProperty(key: UserDef.kCursorPlacementAfterSelectingCandidate.rawValue, defaultValue: 1)
+  public dynamic var cursorPlacementAfterSelectingCandidate: Int
 
   @AppProperty(key: UserDef.kDodgeInvalidEdgeCandidateCursorPosition.rawValue, defaultValue: true)
   public dynamic var dodgeInvalidEdgeCandidateCursorPosition: Bool

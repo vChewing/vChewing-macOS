@@ -56,6 +56,20 @@ extension InputHandlerProtocol {
 
   public var isComposerUsingPinyin: Bool { composer.isPinyinMode }
 
+  public var moveCursorAfterSelectingCandidate: Bool {
+    /// prefs.cursorPlacementAfterSelectingCandidate 的參數說明：
+    /// 此設定用來指定候選字在選字窗內被確認後，游標應該位於何處。
+    /// 請注意，「呼出選字窗之前的游標位置」指的是選字窗出現前所記錄的游標位置。
+    /// 如果選擇向前推進一格，實際推進的距離會因您偏好的選字游標操作樣式而有所不同。
+    /// 有效值只有 0, 1, 2 這三個值。
+    /// 0: 什麼也不做；1: 向前推進一格；2: 復原呼出選字窗之前的游標位置。
+    prefs.cursorPlacementAfterSelectingCandidate == 1
+  }
+
+  public var restoreCursorAfterSelectingCandidate: Bool {
+    prefs.cursorPlacementAfterSelectingCandidate == 2
+  }
+
   // MARK: - Extracted methods and functions (Megrez).
 
   public var keySeparator: String { compositor.separator }
@@ -141,7 +155,7 @@ extension InputHandlerProtocol {
     }
 
     /// 若偏好設定內啟用了相關選項，則會在選字之後始終將游標推送至選字後的節錨的前方。
-    if prefs.moveCursorAfterSelectingCandidate, respectCursorPushing {
+    if moveCursorAfterSelectingCandidate, respectCursorPushing {
       compositor.jumpCursorBySegment(to: .front)
     }
   }

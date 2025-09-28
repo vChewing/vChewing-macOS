@@ -42,7 +42,6 @@ extension SettingsPanesCocoa {
               UserDef.kCandidateWindowShowOnlyOneLine.render(fixWidth: innerContentWidth)
               UserDef.kAlwaysExpandCandidateWindow.render(fixWidth: innerContentWidth)
               UserDef.kMinCellWidthForHorizontalMatrix.render(fixWidth: innerContentWidth)
-              UserDef.kRespectClientAccentColor.render(fixWidth: innerContentWidth)
             }?.boxed()
             NSView()
           }
@@ -53,10 +52,18 @@ extension SettingsPanesCocoa {
                 renderable.currentControl?.action = #selector(self.candidateKeysDidSet(_:))
                 renderable.currentControl?.alignment = .right
               }
+              UserDef.kUseRearCursorMode.render(fixWidth: innerContentWidth)
+              UserDef.kCursorPlacementAfterSelectingCandidate.render(fixWidth: innerContentWidth)
             }?.boxed()
             NSStackView.buildSection(width: innerContentWidth) {
-              UserDef.kUseRearCursorMode.render(fixWidth: innerContentWidth)
-              UserDef.kMoveCursorAfterSelectingCandidate.render(fixWidth: innerContentWidth)
+              UserDef.kShowCodePointInCandidateUI.render(fixWidth: innerContentWidth)
+              UserDef.kShowReverseLookupInCandidateUI.render(fixWidth: innerContentWidth)
+              UserDef.kUseFixedCandidateOrderOnSelection.render(fixWidth: innerContentWidth)
+            }?.boxed()
+            NSView()
+          }
+          NSTabView.TabPage(title: "Ｃ") {
+            NSStackView.buildSection(width: innerContentWidth) {
               UserDef.kUseDynamicCandidateWindowOrigin.render(fixWidth: innerContentWidth)
               UserDef.kDodgeInvalidEdgeCandidateCursorPosition.render(fixWidth: innerContentWidth)
               UserDef.kUseShiftQuestionToCallServiceMenu
@@ -80,15 +87,15 @@ extension SettingsPanesCocoa {
             }?.boxed()
             NSView()
           }
-          NSTabView.TabPage(title: "Ｃ") {
+          NSTabView.TabPage(title: "Ｄ") {
             NSStackView.buildSection(width: innerContentWidth) {
-              UserDef.kShowCodePointInCandidateUI.render(fixWidth: innerContentWidth)
-              UserDef.kShowReverseLookupInCandidateUI.render(fixWidth: innerContentWidth)
-              UserDef.kUseFixedCandidateOrderOnSelection.render(fixWidth: innerContentWidth)
               UserDef.kConsolidateContextOnCandidateSelection.render(fixWidth: innerContentWidth)
             }?.boxed()
             NSStackView.buildSection(width: innerContentWidth) {
               UserDef.kEnableMouseScrollingForTDKCandidatesCocoa.render(fixWidth: innerContentWidth)
+              UserDef.kRespectClientAccentColor.render(fixWidth: innerContentWidth)
+            }?.boxed()
+            NSStackView.buildSection(width: innerContentWidth) {
               NSStackView.build(.horizontal) {
                 "Where's IMK Candidate Window?".makeNSLabel(fixWidth: innerContentWidth)
                 NSView()

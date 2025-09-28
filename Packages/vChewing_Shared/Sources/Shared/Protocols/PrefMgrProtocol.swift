@@ -35,7 +35,7 @@ public protocol PrefMgrProtocol {
   var useHLtoMoveCompositorCursorInCandidateState: Bool { get set }
   var useJKtoMoveCompositorCursorInCandidateState: Bool { get set }
   var useShiftQuestionToCallServiceMenu: Bool { get set }
-  var moveCursorAfterSelectingCandidate: Bool { get set }
+  var cursorPlacementAfterSelectingCandidate: Int { get set }
   var dodgeInvalidEdgeCandidateCursorPosition: Bool { get set }
   var useDynamicCandidateWindowOrigin: Bool { get set }
   var useHorizontalCandidateList: Bool { get set }

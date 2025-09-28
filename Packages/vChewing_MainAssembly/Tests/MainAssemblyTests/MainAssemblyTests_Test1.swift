@@ -98,7 +98,7 @@ extension MainAssemblyTests {
   func test104_InputHandler_ManualCandidateSelectionAndPOM() throws {
     PrefMgr.shared.useSCPCTypingMode = false
     PrefMgr.shared.useRearCursorMode = false
-    PrefMgr.shared.moveCursorAfterSelectingCandidate = true
+    PrefMgr.shared.cursorPlacementAfterSelectingCandidate = 1
     clearTestPOM()
 
     var sequenceChars = "el dk ru4ej/ n 2k7su065j/ ru;3rup "
@@ -109,8 +109,17 @@ extension MainAssemblyTests {
     // Testing Manual Candidate Selection, POM Observation, and Post-Candidate-Selection Cursor Jumping.
 
     vCTestLog("測試選字窗選字：高科技公司的年終獎金 -> 高科技公司的年中獎金")
+    vCTestLog("Pref=1 nodes before candidate: \(testHandler.compositor.assembledSentence.values)")
+    vCTestLog(
+      "Pref=1 cursor before candidate: \(testHandler.compositor.cursor)/length: \(testHandler.compositor.length)"
+    )
+    dataArrowDown.asPairedEvents.forEach { theEvent in
+      let dismissed = !testSession.handleNSEvent(theEvent, client: testClient)
+      if theEvent.type == .keyDown { XCTAssertFalse(dismissed) }
+    }
+    vCTestLog("Pref=1 candidates: \(testSession.state.candidates.map { $0.value })")
     let keyOne = NSEvent.KeyEventData(chars: "1")
-    [dataArrowDown, keyOne].map(\.asPairedEvents).flatMap { $0 }.forEach { theEvent in
+    keyOne.asPairedEvents.forEach { theEvent in
       let dismissed = !testSession.handleNSEvent(theEvent, client: testClient)
       if theEvent.type == .keyDown { XCTAssertFalse(dismissed) }
     }
@@ -153,8 +162,78 @@ extension MainAssemblyTests {
     vCTestLog("- 已成功證實「年終」的記憶不會對除了給定上下文以外的情形生效。")
   }
 
+  /// 測試在選字後復原游標位置的功能，確保游標會回到叫出選字窗前的位置。
+  func test105_InputHandler_PostCandidateCursorPlacementRestore() throws {
+    PrefMgr.shared.useSCPCTypingMode = false
+    PrefMgr.shared.useRearCursorMode = false
+    PrefMgr.shared.cursorPlacementAfterSelectingCandidate = 2
+    clearTestPOM()
+
+    let sequenceChars = "el dk ru4ej/ n 2k7su065j/ ru;3rup "
+
+    testSession.resetInputHandler(forceComposerCleanup: true)
+    typeSentenceOrCandidates(sequenceChars)
+
+    [dataArrowLeft, dataArrowLeft].map(\.asPairedEvents).flatMap { $0 }.forEach { theEvent in
+      let dismissed = !testSession.handleNSEvent(theEvent, client: testClient)
+      if theEvent.type == .keyDown { XCTAssertFalse(dismissed) }
+    }
+
+    let nodesBeforeCandidate = testHandler.compositor.assembledSentence.values
+    XCTAssertFalse(nodesBeforeCandidate.isEmpty)
+    let readingCursorIndex = testHandler.actualNodeCursorPosition
+    var nodeIndex: Int?
+    var readingCursor = 0
+    for (index, node) in testHandler.compositor.assembledSentence.enumerated() {
+      let segmentLength = node.keyArray.count
+      if readingCursorIndex < readingCursor + segmentLength || index == nodesBeforeCandidate.count - 1 {
+        nodeIndex = index
+        break
+      }
+      readingCursor += segmentLength
+    }
+    guard let nodeIndex else {
+      XCTFail("Unable to locate node for cursor position: \(readingCursorIndex)")
+      return
+    }
+    let currentNodeValue = nodesBeforeCandidate[nodeIndex]
+    let cursorBeforeCandidate = testHandler.compositor.cursor
+
+    dataArrowDown.asPairedEvents.forEach { theEvent in
+      let dismissed = !testSession.handleNSEvent(theEvent, client: testClient)
+      if theEvent.type == .keyDown { XCTAssertFalse(dismissed) }
+    }
+
+    XCTAssertEqual(testSession.state.type, .ofCandidates)
+    let candidateValues = testSession.state.candidates.map { $0.value }
+    XCTAssertFalse(candidateValues.isEmpty)
+    let targetCandidate = candidateValues.first { $0 != currentNodeValue } ?? currentNodeValue
+    guard let candidateIndex = candidateValues.firstIndex(of: targetCandidate) else {
+      XCTFail("Target candidate not found. Candidates: \(candidateValues)")
+      return
+    }
+
+    let selectionKeys = Array(testSession.selectionKeys)
+    XCTAssertGreaterThan(selectionKeys.count, candidateIndex)
+    let targetKey = String(selectionKeys[candidateIndex])
+    let keyEvent = NSEvent.KeyEventData(chars: targetKey)
+    keyEvent.asPairedEvents.forEach { theEvent in
+      let dismissed = !testSession.handleNSEvent(theEvent, client: testClient)
+      if theEvent.type == NSEvent.EventType.keyDown { XCTAssertFalse(dismissed) }
+    }
+
+    let nodesAfterCandidate = testHandler.compositor.assembledSentence.values
+    XCTAssertEqual(nodesAfterCandidate.count, nodesBeforeCandidate.count)
+    XCTAssertEqual(nodesAfterCandidate[nodeIndex], targetCandidate)
+    let expectedText = nodesAfterCandidate.joined()
+    let resultText = testSession.state.displayedText
+    XCTAssertEqual(resultText, expectedText)
+    XCTAssertEqual(testHandler.compositor.cursor, cursorBeforeCandidate)
+    XCTAssertNil(testHandler.backupCursor)
+  }
+
   /// 測試 inputHandler.commissionByCtrlOptionCommandEnter()。
-  func test105_InputHandler_MiscCommissionTest() throws {
+  func test106_InputHandler_MiscCommissionTest() throws {
     PrefMgr.shared.useSCPCTypingMode = false
     clearTestPOM()
     vCTestLog("正在測試 inputHandler.commissionByCtrlOptionCommandEnter()。")

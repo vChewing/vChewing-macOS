@@ -52,8 +52,8 @@ public struct VwrSettingsPaneCandidates: View {
   @AppStorage(wrappedValue: true, UserDef.kUseShiftQuestionToCallServiceMenu.rawValue)
   public var useShiftQuestionToCallServiceMenu: Bool
 
-  @AppStorage(wrappedValue: true, UserDef.kMoveCursorAfterSelectingCandidate.rawValue)
-  private var moveCursorAfterSelectingCandidate: Bool
+  @AppStorage(wrappedValue: 1, UserDef.kCursorPlacementAfterSelectingCandidate.rawValue)
+  private var cursorPlacementAfterSelectingCandidate: Int
 
   @AppStorage(wrappedValue: true, UserDef.kUseDynamicCandidateWindowOrigin.rawValue)
   private var useDynamicCandidateWindowOrigin: Bool
@@ -77,7 +77,8 @@ public struct VwrSettingsPaneCandidates: View {
       Form {
         Section {
           UserDef.kUseRearCursorMode.bind($useRearCursorMode).render()
-          UserDef.kMoveCursorAfterSelectingCandidate.bind($moveCursorAfterSelectingCandidate)
+          UserDef.kCursorPlacementAfterSelectingCandidate
+            .bind($cursorPlacementAfterSelectingCandidate)
             .render()
           if !useRearCursorMode {
             UserDef.kUseDynamicCandidateWindowOrigin.bind($useDynamicCandidateWindowOrigin).render()
