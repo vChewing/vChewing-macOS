@@ -45,4 +45,47 @@ final class SharedTests: XCTestCase {
     print(rootNode.members.map(\.name))
     print(rootNode.members.compactMap(\.asServiceMenuNode?.service))
   }
+
+  func testEmacsCtrlNPMappings() throws {
+    guard let ctrlNScalar = UnicodeScalar(14),
+          let ctrlPScalar = UnicodeScalar(16) else {
+      XCTFail("Unable to create control character scalars.")
+      return
+    }
+    let ctrlNString = String(ctrlNScalar)
+    let ctrlPString = String(ctrlPScalar)
+
+    let ctrlNEvent = KBEvent(
+      modifierFlags: [.control],
+      characters: ctrlNString,
+      charactersIgnoringModifiers: ctrlNString,
+      keyCode: KeyCode.kNone.rawValue
+    )
+    let ctrlPEvent = KBEvent(
+      modifierFlags: [.control],
+      characters: ctrlPString,
+      charactersIgnoringModifiers: ctrlPString,
+      keyCode: KeyCode.kNone.rawValue
+    )
+
+    let horizontalCtrlN = ctrlNEvent.convertFromEmacsKeyEvent(isVerticalContext: false)
+    XCTAssertEqual(horizontalCtrlN.keyCode, KeyCode.kDownArrow.rawValue)
+    XCTAssertTrue(horizontalCtrlN.modifierFlags.isEmpty)
+    XCTAssertFalse(horizontalCtrlN.isEmacsKey)
+
+    let horizontalCtrlP = ctrlPEvent.convertFromEmacsKeyEvent(isVerticalContext: false)
+    XCTAssertEqual(horizontalCtrlP.keyCode, KeyCode.kUpArrow.rawValue)
+    XCTAssertTrue(horizontalCtrlP.modifierFlags.isEmpty)
+    XCTAssertFalse(horizontalCtrlP.isEmacsKey)
+
+    let verticalCtrlN = ctrlNEvent.convertFromEmacsKeyEvent(isVerticalContext: true)
+    XCTAssertEqual(verticalCtrlN.keyCode, KeyCode.kLeftArrow.rawValue)
+    XCTAssertTrue(verticalCtrlN.modifierFlags.isEmpty)
+    XCTAssertFalse(verticalCtrlN.isEmacsKey)
+
+    let verticalCtrlP = ctrlPEvent.convertFromEmacsKeyEvent(isVerticalContext: true)
+    XCTAssertEqual(verticalCtrlP.keyCode, KeyCode.kRightArrow.rawValue)
+    XCTAssertTrue(verticalCtrlP.modifierFlags.isEmpty)
+    XCTAssertFalse(verticalCtrlP.isEmacsKey)
+  }
 }
