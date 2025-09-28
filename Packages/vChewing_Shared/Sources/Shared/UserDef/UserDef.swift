@@ -50,7 +50,7 @@ public enum UserDef: String, CaseIterable, Identifiable {
   case kShiftJISShinjitaiOutputEnabled = "ShiftJISShinjitaiOutputEnabled"
   case kCurrencyNumeralsEnabled = "CurrencyNumeralsEnabled"
   case kHalfWidthPunctuationEnabled = "HalfWidthPunctuationEnable"
-  case kMoveCursorAfterSelectingCandidate = "MoveCursorAfterSelectingCandidate"
+  case kCursorPlacementAfterSelectingCandidate = "CursorBehaviorAfterConfirmingCandidate"
   case kDodgeInvalidEdgeCandidateCursorPosition = "DodgeInvalidEdgeCandidateCursorPosition"
   case kEscToCleanInputBuffer = "EscToCleanInputBuffer"
   case kAcceptLeadingIntonations = "AcceptLeadingIntonations"
@@ -207,7 +207,7 @@ extension UserDef {
     case .kShiftJISShinjitaiOutputEnabled: return .bool
     case .kCurrencyNumeralsEnabled: return .bool
     case .kHalfWidthPunctuationEnabled: return .bool
-    case .kMoveCursorAfterSelectingCandidate: return .bool
+    case .kCursorPlacementAfterSelectingCandidate: return .integer
     case .kDodgeInvalidEdgeCandidateCursorPosition: return .bool
     case .kEscToCleanInputBuffer: return .bool
     case .kAcceptLeadingIntonations: return .bool
@@ -427,8 +427,14 @@ extension UserDef {
         userDef: self,
         shortTitle: "Enable half-width punctuations"
       )
-    case .kMoveCursorAfterSelectingCandidate: return .init(
-        userDef: self, shortTitle: "Push the cursor in front of the phrase after selection"
+    case .kCursorPlacementAfterSelectingCandidate: return .init(
+        userDef: self, shortTitle: "i18n:UserDef.kCursorPlacementAfterSelectingCandidate.shortTitle:",
+        description: "i18n:UserDef.kCursorPlacementAfterSelectingCandidate.description",
+        options: [
+          0: "i18n:UserDef.kCursorPlacementAfterSelectingCandidate.option.0",
+          1: "i18n:UserDef.kCursorPlacementAfterSelectingCandidate.option.1",
+          2: "i18n:UserDef.kCursorPlacementAfterSelectingCandidate.option.2",
+        ]
       )
     case .kDodgeInvalidEdgeCandidateCursorPosition: return .init(
         userDef: self,

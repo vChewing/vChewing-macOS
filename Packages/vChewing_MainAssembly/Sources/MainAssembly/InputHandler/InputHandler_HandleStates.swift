@@ -147,8 +147,12 @@ extension InputHandlerProtocol {
   /// - Returns: 回呼一個新的選詞狀態，來就給定的候選字詞陣列資料內容顯示選字窗。
   public func generateStateOfCandidates(dodge: Bool = true) -> IMEStateProtocol {
     guard let session = session else { return IMEState.ofAbortion() }
+    let cursorBeforeCandidate = compositor.cursor
     if dodge, session.state.type == .ofInputting {
       dodgeInvalidEdgeCursorForCandidateState()
+    }
+    if restoreCursorAfterSelectingCandidate, backupCursor == nil {
+      backupCursor = cursorBeforeCandidate
     }
     var result = IMEState.ofCandidates(
       candidates: generateArrayOfCandidates(fixOrder: prefs.useFixedCandidateOrderOnSelection),

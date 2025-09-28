@@ -78,6 +78,9 @@ extension PrefMgr {
     if ![0, 1, 2].contains(beepSoundPreference) {
       beepSoundPreference = 2
     }
+    if ![0, 1, 2].contains(cursorPlacementAfterSelectingCandidate) {
+      cursorPlacementAfterSelectingCandidate = 0
+    }
   }
 }
 
