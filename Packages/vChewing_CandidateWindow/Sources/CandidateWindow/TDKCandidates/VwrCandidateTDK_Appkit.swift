@@ -77,12 +77,12 @@ extension VwrCandidateTDKAppKit {
   override public func draw(_: NSRect) {
     let sizesCalculated = thePool.metrics
     // 先塗底色
-    if #unavailable(macOS 10.0) {
-      Self.candidateListBackground.setFill()
-    } else {
+    if #available(macOS 10.13, *) {
       Self.candidateListBackground
         .withAlphaComponent(NSApplication.uxLevel == .none ? 1 : 0.5)
         .setFill()
+    } else {
+      Self.candidateListBackground.setFill()
     }
     let allRect = NSRect(origin: .zero, size: sizesCalculated.fittingSize)
     NSBezierPath(roundedRect: allRect, xRadius: windowRadius, yRadius: windowRadius).fill()
