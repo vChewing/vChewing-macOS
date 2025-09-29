@@ -269,12 +269,10 @@ public struct PathControl: NSViewRepresentable {
     // MARK: Lifecycle
 
     public init(
-      target: NSPathControl,
       acceptDrop: @escaping (NSPathControl, NSDraggingInfo) -> Bool
     ) {
       self.acceptDrop = acceptDrop
       super.init()
-      target.delegate = self
     }
 
     // MARK: Public
@@ -289,23 +287,29 @@ public struct PathControl: NSViewRepresentable {
       acceptDrop(pathControl, info)
     }
 
+    public func makeNSView() -> NSPathControl {
+      let pathCtl = NSPathControl()
+      pathCtl.allowsExpansionToolTips = true
+      pathCtl.translatesAutoresizingMaskIntoConstraints = false
+      pathCtl.font = NSFont.systemFont(ofSize: NSFont.smallSystemFontSize)
+      pathCtl.controlSize = .small
+      pathCtl.backgroundColor = .controlBackgroundColor
+      pathCtl.target = self
+      pathCtl.delegate = self
+      pathCtl.doubleAction = #selector(Coordinator.action)
+      pathCtl.setContentHuggingPriority(.defaultHigh, for: .vertical)
+      pathCtl.setContentCompressionResistancePriority(.defaultLow, for: .horizontal)
+      pathCtl.heightAnchor.constraint(equalToConstant: NSFont.smallSystemFontSize * 2).isActive = true
+      return pathCtl
+    }
+
     // MARK: Private
 
     private var acceptDrop: (NSPathControl, NSDraggingInfo) -> Bool
   }
 
   public func makeNSView(context: Context) -> NSPathControl {
-    pathCtl.allowsExpansionToolTips = true
-    pathCtl.translatesAutoresizingMaskIntoConstraints = false
-    pathCtl.font = NSFont.systemFont(ofSize: NSFont.smallSystemFontSize)
-    pathCtl.controlSize = .small
-    pathCtl.backgroundColor = .controlBackgroundColor
-    pathCtl.target = context.coordinator
-    pathCtl.doubleAction = #selector(Coordinator.action)
-    pathCtl.setContentHuggingPriority(.defaultHigh, for: .vertical)
-    pathCtl.setContentCompressionResistancePriority(.defaultLow, for: .horizontal)
-    pathCtl.heightAnchor.constraint(equalToConstant: NSFont.smallSystemFontSize * 2).isActive = true
-    return pathCtl
+    context.coordinator.makeNSView()
   }
 
   public func updateNSView(_ pathCtl: NSPathControl, context _: Context) {
@@ -314,7 +318,7 @@ public struct PathControl: NSViewRepresentable {
   }
 
   public func makeCoordinator() -> Coordinator {
-    Coordinator(target: pathCtl, acceptDrop: acceptDrop)
+    Coordinator(acceptDrop: acceptDrop)
   }
 
   // MARK: Private
@@ -322,7 +326,6 @@ public struct PathControl: NSViewRepresentable {
   @Binding
   private var path: String
 
-  private let pathCtl = NSPathControl()
   private var configuration: (NSPathControl) -> () = { _ in }
   private var acceptDrop: (NSPathControl, NSDraggingInfo) -> Bool = { _, _ in false }
 }
