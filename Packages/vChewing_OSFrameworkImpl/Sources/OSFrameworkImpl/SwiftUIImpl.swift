@@ -132,6 +132,13 @@ public struct TextEditorEX: NSViewRepresentable {
     }
 
     public func createTextViewStack() -> NSScrollView {
+      let scrollview = NSScrollView()
+      let textView: NSTextView = {
+        let result = NSTextView(frame: CGRect())
+        result.font = NSFont.systemFont(ofSize: 13, weight: .regular)
+        result.allowsUndo = true
+        return result
+      }()
       let contentSize = scrollview.contentSize
 
       if let n = textView.textContainer {
@@ -159,17 +166,6 @@ public struct TextEditorEX: NSViewRepresentable {
 
       return scrollview
     }
-
-    // MARK: Fileprivate
-
-    fileprivate lazy var textView: NSTextView = {
-      let result = NSTextView(frame: CGRect())
-      result.font = NSFont.systemFont(ofSize: 13, weight: .regular)
-      result.allowsUndo = true
-      return result
-    }()
-
-    fileprivate lazy var scrollview = NSScrollView()
   }
 
   public func makeNSView(context: Context) -> NSScrollView {
