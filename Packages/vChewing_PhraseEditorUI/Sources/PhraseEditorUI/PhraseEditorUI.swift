@@ -147,11 +147,14 @@ public struct VwrPhraseEditorUI: View {
         if selUserDataType != .theAssociates {
           HStack {
             TextField(lblAddPhraseTag4, text: $txtAddPhraseField4)
+              .autocorrectionDisabled(true)
           }
         }
         HStack {
           TextField(lblAddPhraseTag1, text: $txtAddPhraseField1)
+            .autocorrectionDisabled(true)
           TextField(lblAddPhraseTag2, text: $txtAddPhraseField2)
+            .autocorrectionDisabled(true)
           if selUserDataType == .thePhrases {
             TextField(
               lblAddPhraseTag3,
@@ -159,7 +162,9 @@ public struct VwrPhraseEditorUI: View {
                 guard let weightVal = Double(txtAddPhraseField3) else { return }
                 if weightVal > 0 { txtAddPhraseField3 = "" }
               }
-            ).help(PETerms.TooltipTexts.weightInputBox.localized)
+            )
+            .autocorrectionDisabled(true)
+            .help(PETerms.TooltipTexts.weightInputBox.localized)
           }
           Button("?") {
             guard let window = window else { return }
