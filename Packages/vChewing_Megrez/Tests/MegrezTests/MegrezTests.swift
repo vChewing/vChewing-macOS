@@ -2,22 +2,28 @@
 // ====================
 // This code is released under the SPDX-License-Identifier: `LGPL-3.0-or-later`.
 
-import AppKit
+import Foundation
+import Megrez
+import MegrezTestComponents
 import XCTest
 
-@testable import Megrez
+private typealias SimpleLM = MegrezTestComponents.SimpleLM
+private typealias MockLM = MegrezTestComponents.MockLM
 
 // MARK: - MegrezTestsBasic
 
 final class MegrezTestsBasic: XCTestCase {
   func test01_Segment() throws {
-    let langModel = SimpleLM(input: strLMSampleDataLitch)
+    let langModel = SimpleLM(input: MegrezTestComponents.strLMSampleDataLitch)
     var segment = Megrez.Segment()
     let n1 = Megrez.Node(
-      keyArray: ["da4"], segLength: 1, unigrams: langModel.unigramsFor(keyArray: ["da4"])
+      keyArray: ["da4"],
+      segLength: 1,
+      unigrams: langModel.unigramsFor(keyArray: ["da4"])
     )
     let n3 = Megrez.Node(
-      keyArray: ["da4", "qian2", "tian1"], segLength: 3,
+      keyArray: ["da4", "qian2", "tian1"],
+      segLength: 3,
       unigrams: langModel.unigramsFor(keyArray: ["da4-qian2-tian1"])
     )
     XCTAssertEqual(segment.maxLength, 0)
@@ -251,7 +257,7 @@ final class MegrezTestsAdvanced: XCTestCase {
   /// 組字器的分詞功能測試，同時測試組字器的硬拷貝功能。
   func test08_Compositor_WordSegmentation() throws {
     let regexToFilter = try Regex(".* 能留 .*\n")
-    let rawData = strLMSampleDataHutao.replacing(regexToFilter, with: "")
+    let rawData = MegrezTestComponents.strLMSampleDataHutao.replacing(regexToFilter, with: "")
     let compositor = Megrez.Compositor(
       with: SimpleLM(input: rawData, swapKeyValue: true, separator: ""),
       separator: ""
@@ -268,7 +274,7 @@ final class MegrezTestsAdvanced: XCTestCase {
   /// 組字器的組字壓力測試。
   func test09_Compositor_StressBench() throws {
     NSLog("// Stress test preparation begins.")
-    let compositor = Megrez.Compositor(with: SimpleLM(input: strLMStressData))
+    let compositor = Megrez.Compositor(with: SimpleLM(input: MegrezTestComponents.strLMStressData))
     (0 ..< 1_919).forEach { _ in
       compositor.insertKey("sheng1")
     }
@@ -281,7 +287,7 @@ final class MegrezTestsAdvanced: XCTestCase {
 
   func test10_Compositor_UpdateUnigramData() throws {
     let readings: [Substring] = "shu4 xin1 feng1".split(separator: " ")
-    let newRawStringLM = strLMSampleDataEmoji + "\nshu4-xin1-feng1 樹新風 -9\n"
+    let newRawStringLM = MegrezTestComponents.strLMSampleDataEmoji + "\nshu4-xin1-feng1 樹新風 -9\n"
     let regexToFilter = try Regex(".*(樹|新|風) .*")
     let lm = SimpleLM(input: newRawStringLM.replacing(regexToFilter, with: ""))
     let compositor = Megrez.Compositor(with: lm)
@@ -292,7 +298,7 @@ final class MegrezTestsAdvanced: XCTestCase {
     let oldResult = compositor.assemble().values
     XCTAssertEqual(oldResult, ["樹心", "封"])
     lm.reinit(input: newRawStringLM)
-    compositor.update(updateExisting: true)
+    compositor.assignNodes(updateExisting: true)
     let newResult = compositor.assemble().values
     XCTAssertEqual(newResult, ["樹新風"])
   }
@@ -300,7 +306,10 @@ final class MegrezTestsAdvanced: XCTestCase {
   /// `fetchCandidatesDeprecated` 這個方法在極端情況下（比如兩個連續讀音，等）會有故障，現已棄用。
   /// 目前這筆測試並不能曝露這個函式的問題，但卻能用來輔助測試其**繼任者**是否能完成一致的正確工作。
   func test11_Compositor_VerifyCandidateFetchResultsWithNewAPI() throws {
-    let theLM = SimpleLM(input: strLMSampleDataTechGuarden + "\n" + strLMSampleDataLitch)
+    let theLM = SimpleLM(
+      input: MegrezTestComponents.strLMSampleDataTechGuarden + "\n" + MegrezTestComponents
+        .strLMSampleDataLitch
+    )
     let rawReadings = "da4 qian2 tian1 zai5 ke1 ji4 gong1 yuan2 chao1 shang1"
     let compositor = Megrez.Compositor(with: theLM)
     rawReadings.split(separator: " ").forEach { key in
@@ -346,7 +355,7 @@ final class MegrezTestsAdvanced: XCTestCase {
     // 一號測試。
     do {
       let readings: [Substring] = "ke1 ji4 gong1 yuan2".split(separator: " ")
-      let mockLM = SimpleLM(input: strLMSampleDataTechGuarden)
+      let mockLM = SimpleLM(input: MegrezTestComponents.strLMSampleDataTechGuarden)
       let compositor = Megrez.Compositor(with: mockLM)
       readings.forEach {
         compositor.insertKey($0.description)
@@ -365,7 +374,10 @@ final class MegrezTestsAdvanced: XCTestCase {
     // 二號測試。
     do {
       let readings: [Substring] = "sheng1 sheng1".split(separator: " ")
-      let mockLM = SimpleLM(input: strLMStressData + "\n" + strLMSampleDataHutao)
+      let mockLM = SimpleLM(
+        input: MegrezTestComponents.strLMStressData + "\n" + MegrezTestComponents
+          .strLMSampleDataHutao
+      )
       let compositor = Megrez.Compositor(with: mockLM)
       readings.forEach {
         compositor.insertKey($0.description)
@@ -388,7 +400,7 @@ final class MegrezTestsAdvanced: XCTestCase {
   /// 組字器的組字功能測試（單元圖，完整輸入讀音與聲調，完全匹配）。
   func test13_Compositor_AssembleAndOverrideWithUnigramAndCursorJump() throws {
     let readings = "chao1 shang1 da4 qian2 tian1 wei2 zhi3 hai2 zai5 mai4 nai3 ji1"
-    let mockLM = SimpleLM(input: strLMSampleDataLitch)
+    let mockLM = SimpleLM(input: MegrezTestComponents.strLMSampleDataLitch)
     let compositor = Megrez.Compositor(with: mockLM)
     readings.split(separator: " ").forEach {
       compositor.insertKey($0.description)
@@ -465,7 +477,7 @@ final class MegrezTestsAdvanced: XCTestCase {
   /// 對此有需求者請洽其繼任者「libHoma（護摩）」。
   func test14_Compositor_AssembleAndOverride_AnotherTest() throws {
     let readings: [Substring] = "you1 die2 neng2 liu2 yi4 lv3 fang1".split(separator: " ")
-    let lm = SimpleLM(input: strLMSampleDataHutao)
+    let lm = SimpleLM(input: MegrezTestComponents.strLMSampleDataHutao)
     let compositor = Megrez.Compositor(with: lm)
     readings.forEach {
       compositor.insertKey($0.description)
@@ -475,17 +487,23 @@ final class MegrezTestsAdvanced: XCTestCase {
     XCTAssert(assembledSentence == ["幽蝶", "能", "留意", "呂方"])
     // 測試覆寫「留」以試圖打斷「留意」。
     compositor.overrideCandidate(
-      .init((["liu2"], "留")), at: 3, overrideType: .withHighScore
+      .init((["liu2"], "留")),
+      at: 3,
+      overrideType: .withHighScore
     )
     // 測試覆寫「一縷」以打斷「留意」與「呂方」。
     compositor.overrideCandidate(
-      .init((["yi4", "lv3"], "一縷")), at: 4, overrideType: .withHighScore
+      .init((["yi4", "lv3"], "一縷")),
+      at: 4,
+      overrideType: .withHighScore
     )
     assembledSentence = compositor.assemble().map(\.value)
     XCTAssertEqual(assembledSentence, ["幽蝶", "能", "留", "一縷", "方"])
     // 對位置 7 這個最前方的座標位置使用節點覆寫。會在此過程中自動糾正成對位置 6 的覆寫。
     compositor.overrideCandidate(
-      .init((["fang1"], "芳")), at: 7, overrideType: .withHighScore
+      .init((["fang1"], "芳")),
+      at: 7,
+      overrideType: .withHighScore
     )
     assembledSentence = compositor.assemble().map(\.value)
     XCTAssert(assembledSentence == ["幽蝶", "能", "留", "一縷", "芳"])
@@ -502,7 +520,7 @@ final class MegrezTestsAdvanced: XCTestCase {
   /// 針對完全覆蓋的節點的專項覆寫測試。
   func test15_Compositor_ResettingFullyOverlappedNodesOnOverride() throws {
     let readings: [Substring] = "shui3 guo3 zhi1".split(separator: " ")
-    let lm = SimpleLM(input: strLMSampleDataFruitJuice)
+    let lm = SimpleLM(input: MegrezTestComponents.strLMSampleDataFruitJuice)
     let compositor = Megrez.Compositor(with: lm)
     readings.forEach {
       compositor.insertKey($0.description)
@@ -522,7 +540,8 @@ final class MegrezTestsAdvanced: XCTestCase {
       do {
         XCTAssertTrue(
           compositor.overrideCandidate(
-            .init(keyArray: ["shui3", "guo3", "zhi1"], value: "水果汁"), at: 1
+            .init(keyArray: ["shui3", "guo3", "zhi1"], value: "水果汁"),
+            at: 1
           )
         )
         assembledSentence = compositor.assemble().map(\.value)
@@ -558,7 +577,8 @@ final class MegrezTestsAdvanced: XCTestCase {
         XCTAssertTrue(
           // 再覆寫回來。
           compositor.overrideCandidate(
-            .init(keyArray: ["shui3", "guo3", "zhi1"], value: "水果汁"), at: 3
+            .init(keyArray: ["shui3", "guo3", "zhi1"], value: "水果汁"),
+            at: 3
           )
         )
         assembledSentence = compositor.assemble().map(\.value)
@@ -570,7 +590,7 @@ final class MegrezTestsAdvanced: XCTestCase {
   /// 針對不完全覆蓋的節點的專項覆寫測試。
   func test16_Compositor_ResettingPartiallyOverlappedNodesOnOverride() throws {
     let readings: [Substring] = "ke1 ji4 gong1 yuan2".split(separator: " ")
-    let rawData = strLMSampleDataTechGuarden + "\ngong1-yuan2 公猿 -9"
+    let rawData = MegrezTestComponents.strLMSampleDataTechGuarden + "\ngong1-yuan2 公猿 -9"
     let compositor = Megrez.Compositor(with: SimpleLM(input: rawData))
     readings.forEach {
       compositor.insertKey($0.description)
@@ -578,21 +598,30 @@ final class MegrezTestsAdvanced: XCTestCase {
     var result = compositor.assemble()
     XCTAssertEqual(result.values, ["科技", "公園"])
 
-    XCTAssertTrue(compositor.overrideCandidate(
-      .init(keyArray: ["ji4", "gong1"], value: "濟公"), at: 1
-    ))
+    XCTAssertTrue(
+      compositor.overrideCandidate(
+        .init(keyArray: ["ji4", "gong1"], value: "濟公"),
+        at: 1
+      )
+    )
     result = compositor.assemble()
     XCTAssertEqual(result.values, ["顆", "濟公", "元"])
 
-    XCTAssertTrue(compositor.overrideCandidate(
-      .init(keyArray: ["gong1", "yuan2"], value: "公猿"), at: 2
-    ))
+    XCTAssertTrue(
+      compositor.overrideCandidate(
+        .init(keyArray: ["gong1", "yuan2"], value: "公猿"),
+        at: 2
+      )
+    )
     result = compositor.assemble()
     XCTAssertEqual(result.values, ["科技", "公猿"])
 
-    XCTAssertTrue(compositor.overrideCandidate(
-      .init(keyArray: ["ke1", "ji4"], value: "科際"), at: 0
-    ))
+    XCTAssertTrue(
+      compositor.overrideCandidate(
+        .init(keyArray: ["ke1", "ji4"], value: "科際"),
+        at: 0
+      )
+    )
     result = compositor.assemble()
     XCTAssertEqual(result.values, ["科際", "公猿"])
   }
@@ -600,7 +629,7 @@ final class MegrezTestsAdvanced: XCTestCase {
   func test17_Compositor_CandidateDisambiguation() throws {
     let readings: [Substring] = "da4 shu4 xin1 de5 mi4 feng1".split(separator: " ")
     let regexToFilter = try Regex("\nshu4-xin1 .*")
-    let rawData = strLMSampleDataEmoji.replacing(regexToFilter, with: "")
+    let rawData = MegrezTestComponents.strLMSampleDataEmoji.replacing(regexToFilter, with: "")
     let compositor = Megrez.Compositor(with: SimpleLM(input: rawData))
     readings.forEach {
       compositor.insertKey($0.description)
@@ -618,5 +647,96 @@ final class MegrezTestsAdvanced: XCTestCase {
     )
     result = compositor.assemble()
     XCTAssertEqual(result.values, ["大樹", "🆕", "蜜蜂"])
+  }
+
+  func test18_Composer_UOMMarginalCaseTest() throws {
+    let lm = SimpleLM(input: MegrezTestComponents.strLMSampleData_SaisoukiNoGaika)
+    let compositor = Megrez.Compositor(with: lm)
+    let readingKeys = ["zai4", "chuang4", "shi4", "de5", "kai3", "ge1"]
+    readingKeys.forEach {
+      _ = compositor.insertKey($0)
+    }
+    compositor.assemble()
+    let assembledBefore = compositor.assembledSentence.map(\.value).joined(separator: " ")
+    XCTAssertTrue("再 創 是的 凱歌" == assembledBefore)
+    // 測試此時生成的 keyForQueryingData 是否正確
+    let cursorShi = 2
+    let cursorShiDe = 3
+    let keyForQueryingDataAt2 = compositor.assembledSentence
+      .generateKeyForPerception(cursor: cursorShi)
+    XCTAssertEqual(keyForQueryingDataAt2?.ngramKey, "(zai4,再)&(chuang4,創)&(shi4-de5,是的)")
+    XCTAssertEqual(keyForQueryingDataAt2?.headReading, "shi4")
+    let keyForQueryingDataAt3 = compositor.assembledSentence
+      .generateKeyForPerception(cursor: cursorShiDe)
+    XCTAssertEqual(keyForQueryingDataAt3?.ngramKey, "(zai4,再)&(chuang4,創)&(shi4-de5,是的)")
+    XCTAssertEqual(keyForQueryingDataAt3?.headReading, "de5")
+    // 應能提供『是的』『似的』『凱歌』等候選
+    let pairsAtShiDeEnd = compositor.fetchCandidates(at: 4, filter: .endAt)
+    XCTAssertTrue(pairsAtShiDeEnd.map(\.value).contains("是的"))
+    XCTAssertTrue(pairsAtShiDeEnd.map(\.value).contains("似的"))
+    // 模擬使用者把『是』改為『世』，再合成：觀測應為 shortToLong
+    var obsCaptured: Megrez.PerceptionIntel?
+    _ = compositor.overrideCandidate(
+      .init(keyArray: ["shi4"], value: "世"),
+      at: cursorShi,
+      overrideType: .withHighScore,
+      enforceRetokenization: true,
+      perceptionHandler: { obsCaptured = $0 }
+    )
+    XCTAssertEqual(obsCaptured?.ngramKey, "(zai4,再)&(chuang4,創)&(shi4,世)")
+    // compositor.assemble() <- 已經組句了。
+    let assembledAfter = compositor.assembledSentence.map(\.value).joined(separator: " ")
+    XCTAssertTrue("再 創 世 的 凱歌" == assembledAfter)
+    // ====
+    let prevAssembly = compositor.assembledSentence
+    obsCaptured = nil
+    let overrideSucceeded = compositor.overrideCandidate(
+      .init(keyArray: ["shi4", "de5"], value: "是的"),
+      at: cursorShiDe,
+      overrideType: .withHighScore,
+      enforceRetokenization: true,
+      perceptionHandler: { obsCaptured = $0 }
+    )
+    XCTAssertEqual(obsCaptured?.ngramKey, "(chuang4,創)&(shi4,世)&(de5,的)")
+    XCTAssertTrue(overrideSucceeded)
+    let currentAssembly = compositor.assembledSentence
+    guard let afterHit = currentAssembly.findGram(at: cursorShiDe) else {
+      XCTFail("Expected current gram at cursor \(cursorShiDe)")
+      return
+    }
+    let border1 = afterHit.range.upperBound - 1
+    let border2 = prevAssembly.totalKeyCount - 1
+    let innerIndex = Swift.max(0, Swift.min(border1, border2))
+    guard let prevHit = prevAssembly.findGram(at: innerIndex) else {
+      XCTFail("Expected previous gram at cursor \(innerIndex)")
+      return
+    }
+    XCTAssertEqual(afterHit.gram.segLength, 2)
+    XCTAssertEqual(prevHit.gram.segLength, 1)
+    XCTAssertNotNil(obsCaptured)
+    XCTAssertEqual(obsCaptured?.scenario, .shortToLong)
+    XCTAssertEqual(obsCaptured?.candidate, "是的")
+
+    // 測試 POM 建議的候選覆寫
+    compositor.clear()
+    readingKeys.prefix(4).forEach {
+      _ = compositor.insertKey($0)
+    }
+
+    let pomSuggestedCandidate = Megrez.KeyValuePaired((["shi4"], "世", -0.07449307430679043))
+    let pomSuggestedCandidateOverrideCursor = 2
+    // let forceHighScoreOverride = false
+    // overrideType: forceHighScoreOverride ? .withHighScore : .withTopUnigramScore
+    compositor.overrideCandidate(
+      pomSuggestedCandidate,
+      at: pomSuggestedCandidateOverrideCursor,
+      overrideType: .withTopUnigramScore,
+      enforceRetokenization: true
+    )
+    compositor.assemble()
+    let assembledByPOM = compositor.assembledSentence
+      .map(\.value)
+      .joined(separator: " ")
+    XCTAssertEqual("再 創 世 的", assembledByPOM)
   }
 }

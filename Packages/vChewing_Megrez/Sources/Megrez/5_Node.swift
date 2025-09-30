@@ -43,7 +43,7 @@ extension Megrez {
       self.overridingScore = node.overridingScore
       self.keyArray = node.keyArray
       self.segLength = node.segLength
-      self.unigrams = node.unigrams
+      self.unigrams = node.unigrams.map(\.copy)
       self.currentOverrideType = node.currentOverrideType
       self.currentUnigramIndex = node.currentUnigramIndex
     }

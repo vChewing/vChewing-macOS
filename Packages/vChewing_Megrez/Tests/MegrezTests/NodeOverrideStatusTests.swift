@@ -2,8 +2,15 @@
 // ====================
 // This code is released under the SPDX-License-Identifier: `LGPL-3.0-or-later`.
 
-@testable import Megrez
+import MegrezTestComponents
 import XCTest
+
+@testable import Megrez
+
+private typealias SimpleLM = MegrezTestComponents.SimpleLM
+private typealias MockLM = MegrezTestComponents.MockLM
+
+// MARK: - NodeOverrideStatusTests
 
 final class NodeOverrideStatusTests: XCTestCase {
   /// 測試 FIUUID 的基本功能

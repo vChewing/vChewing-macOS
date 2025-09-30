@@ -10,14 +10,22 @@ import Foundation
 import Megrez
 
 extension LMAssembly.LMInstantiator {
-  public func supplyNumPadUnigrams(key: String) -> [Megrez.Unigram] {
+  public func supplyNumPadUnigrams(key: String, keyArray: [String]) -> [Megrez.Unigram] {
     guard let status = config.numPadFWHWStatus else { return [] }
     let initials = "_NumPad_"
     guard key.hasPrefix(initials) else { return [] }
     let char = key.replacingOccurrences(of: initials, with: "")
     guard char.count == 1 else { return [] }
-    let gram1 = Megrez.Unigram(value: char.applyingTransformFW2HW(reverse: status), score: 0)
-    let gram2 = Megrez.Unigram(value: char.applyingTransformFW2HW(reverse: !status), score: -0.1)
+    let gram1 = Megrez.Unigram(
+      keyArray: keyArray,
+      value: char.applyingTransformFW2HW(reverse: status),
+      score: 0
+    )
+    let gram2 = Megrez.Unigram(
+      keyArray: keyArray,
+      value: char.applyingTransformFW2HW(reverse: !status),
+      score: -0.1
+    )
     return [gram1, gram2]
   }
 }

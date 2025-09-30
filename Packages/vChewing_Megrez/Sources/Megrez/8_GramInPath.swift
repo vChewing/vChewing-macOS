@@ -12,23 +12,21 @@ extension Megrez {
   public struct GramInPath: Codable, Hashable {
     // MARK: Lifecycle
 
-    public init(keyArray: [String], gram: Unigram, isOverridden: Bool) {
-      self.keyArray = keyArray
+    public init(gram: Unigram, isOverridden: Bool) {
       self.gram = gram
       self.isOverridden = isOverridden
-      self.isReadingMismatched = keyArray.count != gram.value.count
     }
 
     // MARK: Public
 
     public let gram: Unigram
     public let isOverridden: Bool
-    public let keyArray: [String]
-    public let isReadingMismatched: Bool
 
+    public var keyArray: [String] { gram.keyArray }
     public var value: String { gram.value }
     public var score: Double { gram.score }
-    public var segLength: Int { keyArray.count }
+    public var segLength: Int { gram.segLength }
+    public var isReadingMismatched: Bool { gram.isReadingMismatched }
 
     /// 該節點當前狀態所展示的鍵值配對。
     public var asCandidatePair: KeyValuePaired {
@@ -149,49 +147,96 @@ extension Array where Element == Megrez.GramInPath {
     return arrData
   }
 
-  /// 生成用以洞察使用者覆寫行為的複元圖索引鍵，最多支援 3-gram。
+  /// 生成用以洞察使用者覆寫行為的複元圖索引鍵，最多支援指定長度的 n-gram（預設 3-gram）。
   ///
   /// - Remark: 除非有專門指定游標，否則身為 `[GramInPath]` 自身的
   /// 「陣列最尾端」（也就是打字方向上最前方）的那個 Gram 會被當成 Head。
+  /// 若游標落在多字詞節點內，Head 會選擇游標右方（文字輸入方向上的下一個）讀音。
+  /// - Parameters:
+  ///   - cursor: 指定用於當作 head 的游標位置；若為 nil 則取陣列尾端。
+  ///   - maxContext: 最多向前取用的上下文節點數（含 head），預設 3。
   public func generateKeyForPerception(
-    cursor: Int? = nil
+    cursor: Int? = nil,
+    maxContext: Int = 3
   )
     -> (ngramKey: String, candidate: String, headReading: String)? {
-    let perceptedGIP: Megrez.GramInPath?
-    if let cursor, (0 ..< self.totalKeyCount).contains(cursor) {
-      perceptedGIP = findGram(at: cursor)?.gram
-    } else {
-      perceptedGIP = last
-    }
-    guard let perceptedGIP else { return nil }
-    var arrGIPs = self
-    while arrGIPs.last?.gram != perceptedGIP.gram { arrGIPs.removeLast() }
-    var isHead = true
-    var outputCells = [String]()
-    loopProc: while !arrGIPs.isEmpty, let frontendPair = arrGIPs.last {
-      defer { arrGIPs = arrGIPs.dropLast() }
+    guard maxContext > 0 else { return nil }
 
-      func makeNGramKeyCell(isHead: Bool) -> String? {
-        // 字音數與字數不一致的內容會被拋棄。
-        guard !frontendPair.isReadingMismatched else { return nil }
-        guard !frontendPair.value.isEmpty else { return nil }
-        guard !frontendPair.keyArray.joined().isEmpty else { return nil }
-        let keyChain = frontendPair.keyArray.joined(separator: "-")
-        guard !keyChain.contains("_") else { return nil }
-        // 前置單元只記錄讀音，在其後的單元則同時記錄讀音與字詞
-        return isHead ? keyChain : "(\(keyChain):\(frontendPair.value))"
+    let headInfo: (pair: Megrez.GramInPath, range: Range<Int>)?
+    let resolvedCursor: Int
+    if let cursor, (0 ..< totalKeyCount).contains(cursor), let hit = findGram(at: cursor) {
+      headInfo = (pair: hit.gram, range: hit.range)
+      resolvedCursor = Swift.max(
+        hit.range.lowerBound,
+        Swift.min(cursor, hit.range.upperBound - 1)
+      )
+    } else if let tail = last {
+      let lowerBound = totalKeyCount - tail.keyArray.count
+      headInfo = (pair: tail, range: lowerBound ..< totalKeyCount)
+      resolvedCursor = Swift.max(lowerBound, totalKeyCount - 1)
+    } else {
+      headInfo = nil
+      resolvedCursor = 0
+    }
+
+    guard let headInfo else { return nil }
+    let headPair = headInfo.pair
+    let headRange = headInfo.range
+    let headKeyOffset = Swift.max(0, resolvedCursor - headRange.lowerBound)
+    guard headPair.keyArray.indices.contains(headKeyOffset) else { return nil }
+
+    let placeholder = "()"
+    let readingSeparator = Megrez.Compositor.theSeparator
+
+    func isPunctuation(_ pair: Megrez.GramInPath) -> Bool {
+      guard let firstReading = pair.keyArray.first else { return false }
+      return firstReading.first == "_"
+    }
+
+    func combinedString(for pair: Megrez.GramInPath) -> String? {
+      guard !pair.value.isEmpty else { return nil }
+      guard !pair.keyArray.isEmpty else { return nil }
+      let reading = pair.joinedCurrentKey(by: readingSeparator)
+      guard !reading.isEmpty else { return nil }
+      return "(\(reading),\(pair.value))"
+    }
+
+    guard let headIndex = lastIndex(where: { $0.gram === headPair.gram })
+      ?? firstIndex(of: headPair)
+    else { return nil }
+
+    var resultCells = [String](repeating: placeholder, count: maxContext)
+    resultCells[maxContext - 1] = combinedString(for: headPair) ?? placeholder
+
+    var contextSlot = maxContext - 2
+    var currentIndex = headIndex - 1
+    var encounteredPunctuation = false
+
+    while contextSlot >= 0 {
+      guard currentIndex >= 0 else {
+        resultCells[contextSlot] = placeholder
+        contextSlot -= 1
+        continue
+      }
+      let currentPair = self[currentIndex]
+      currentIndex -= 1
+
+      if encounteredPunctuation || isPunctuation(currentPair) {
+        encounteredPunctuation = true
+        resultCells[contextSlot] = placeholder
+        contextSlot -= 1
+        continue
       }
 
-      guard let keyCellStr = makeNGramKeyCell(isHead: isHead) else { break loopProc }
-      outputCells.insert(keyCellStr, at: 0)
-      if outputCells.count >= 3 { break loopProc }
-      if isHead { isHead = false }
+      resultCells[contextSlot] = combinedString(for: currentPair) ?? placeholder
+      contextSlot -= 1
     }
-    guard !outputCells.isEmpty else { return nil }
+
+    let headReading = headPair.keyArray[headKeyOffset]
     return (
-      "(\(outputCells.joined(separator: ",")))",
-      perceptedGIP.gram.value,
-      perceptedGIP.joinedCurrentKey(by: "-")
+      resultCells.joined(separator: "&"),
+      headPair.value,
+      headReading
     )
   }
 }

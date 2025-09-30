@@ -155,7 +155,7 @@ extension Megrez {
       keys.insert(key, at: cursor)
       let gridBackup = segments.map(\.hardCopy)
       resizeGrid(at: cursor, do: .expand)
-      let nodesInserted = update()
+      let nodesInserted = assignNodes()
       // 用來在 langModel.hasUnigramsFor() 結果不準確的時候防呆、恢復被搞壞的 segments。
       if nodesInserted == 0 {
         segments = gridBackup
@@ -178,7 +178,58 @@ extension Megrez {
       keys.remove(at: cursor - (isBackSpace ? 1 : 0))
       cursor -= isBackSpace ? 1 : 0 // 在縮節之前。
       resizeGrid(at: cursor, do: .shrink)
-      update()
+      assignNodes()
+      return true
+    }
+
+    /// 獲取當前標記得範圍。這個函式只能是函式、而非只讀變數。
+    /// - Returns: 當前標記範圍。
+    public func currentMarkedRange() -> Range<Int> {
+      min(cursor, marker) ..< max(cursor, marker)
+    }
+
+    /// 偵測是否出現游標切斷組字區內字元的情況。
+    public func isCursorCuttingChar(isMarker: Bool = false) -> Bool {
+      let index = isMarker ? marker : cursor
+      return assembledSentence.isCursorCuttingChar(cursor: index)
+    }
+
+    /// 判斷游標是否可以繼續沿著給定方向移動。
+    /// - Parameters:
+    ///   - direction: 指定方向（相對於文字輸入方向而言）。
+    ///   - isMarker: 是否為標記游標。
+    public func isCursorAtEdge(direction: TypingDirection, isMarker: Bool = false) -> Bool {
+      let pos = isMarker ? marker : cursor
+      switch direction {
+      case .front: return pos == length
+      case .rear: return pos == 0
+      }
+    }
+
+    /// 按步移動游標。如果遇到游標切斷組字區內字元的情況，則繼續移動行為、直至該情況消失為止。
+    /// - Parameters:
+    ///   - direction: 指定方向（相對於文字輸入方向而言）。
+    ///   - isMarker: 是否為標記游標。
+    public func moveCursorStepwise(
+      to direction: TypingDirection,
+      isMarker: Bool = false
+    )
+      -> Bool {
+      let delta: Int = switch direction {
+      case .front: 1
+      case .rear: -1
+      }
+      var pos: Int {
+        get { isMarker ? marker : cursor }
+        set { isMarker ? { marker = newValue }() : { cursor = newValue }() }
+      }
+      guard !isCursorAtEdge(direction: direction, isMarker: isMarker) else {
+        return false
+      }
+      pos += delta
+      if isCursorCuttingChar(isMarker: isMarker) {
+        return jumpCursorBySegment(to: direction, isMarker: isMarker)
+      }
       return true
     }
 
@@ -248,7 +299,7 @@ extension Megrez {
     /// 該特性可以用於「在選字窗內屏蔽了某個詞之後，立刻生效」這樣的軟體功能需求的實現。
     /// - Returns: 新增或影響了多少個節點。如果返回「0」則表示可能發生了錯誤。
     @discardableResult
-    public func update(updateExisting: Bool = false) -> Int {
+    public func assignNodes(updateExisting: Bool = false) -> Int {
       let maxSegLength = maxSegLength
       let rangeOfPositions: Range<Int>
       if updateExisting {
@@ -258,7 +309,8 @@ extension Megrez {
         let upperbound = Swift.min(cursor + maxSegLength, keys.count)
         rangeOfPositions = lowerbound ..< upperbound
       }
-      var nodesChanged = 0
+      var nodesChangedCounter = 0
+      var queryBuffer: [[String]: [Megrez.Unigram]] = [:]
       rangeOfPositions.forEach { position in
         let rangeOfLengths = 1 ... min(maxSegLength, rangeOfPositions.upperBound - position)
         rangeOfLengths.forEach { theLength in
@@ -267,7 +319,7 @@ extension Megrez {
           if (0 ..< segments.count).contains(position),
              let theNode = segments[position][theLength] {
             if !updateExisting { return }
-            let unigrams = getSortedUnigrams(keyArray: keyArraySliced)
+            let unigrams = getSortedUnigrams(keyArray: keyArraySliced, cache: &queryBuffer)
             // 自動銷毀無效的節點。
             if unigrams.isEmpty {
               if theNode.keyArray.count == 1 { return }
@@ -275,27 +327,46 @@ extension Megrez {
             } else {
               theNode.syncingUnigrams(from: unigrams)
             }
-            nodesChanged += 1
+            nodesChangedCounter += 1
             return
           }
-          let unigrams = getSortedUnigrams(keyArray: keyArraySliced)
+          let unigrams = getSortedUnigrams(keyArray: keyArraySliced, cache: &queryBuffer)
           guard !unigrams.isEmpty else { return }
           // 這裡原本用 Segment.addNode 來完成的，但直接當作字典來互動的話也沒差。
           segments[position][theLength] = .init(
             keyArray: keyArraySliced, segLength: theLength, unigrams: unigrams
           )
-          nodesChanged += 1
+          nodesChangedCounter += 1
         }
       }
-      return nodesChanged
+      queryBuffer.removeAll() // 手動清理，免得 ARC 拖時間。
+      if nodesChangedCounter > 0 {
+        assemble()
+      }
+      return nodesChangedCounter
     }
 
     // MARK: Private
 
-    private func getSortedUnigrams(keyArray: [String]) -> [Megrez.Unigram] {
-      langModel.unigramsFor(keyArray: keyArray).sorted {
-        $0.score > $1.score
+    private func getSortedUnigrams(
+      keyArray: [String],
+      cache: inout [[String]: [Megrez.Unigram]]
+    )
+      -> [Megrez.Unigram] {
+      if let cached = cache[keyArray] {
+        return cached.map(\.copy)
       }
+      let canonical = langModel
+        .unigramsFor(keyArray: keyArray)
+        .map { source -> Megrez.Unigram in
+          if source.keyArray == keyArray {
+            return source.copy
+          }
+          return source.copy(withKeyArray: keyArray)
+        }
+        .sorted { $0.score > $1.score }
+      cache[keyArray] = canonical
+      return canonical.map(\.copy)
     }
   }
 }
