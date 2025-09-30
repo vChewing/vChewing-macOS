@@ -154,7 +154,7 @@ extension LMAssembly.LMInstantiator {
         if theScore > 0 {
           theScore *= -1 // 應對可能忘記寫負號的情形
         }
-        grams.append(Megrez.Unigram(value: theValue, score: theScore))
+        grams.append(Megrez.Unigram(keyArray: ["_punctuation_list"], value: theValue, score: theScore))
       }
     }
     return grams
@@ -164,9 +164,9 @@ extension LMAssembly.LMInstantiator {
   /// - Remark: 該函式會無損地返回原廠辭典的結果，不受使用者控頻與資料過濾條件的影響，不包含全字庫的資料。
   /// - parameters:
   ///   - key: 讀音索引鍵。
-  public func factoryCoreUnigramsFor(key: String) -> [Megrez.Unigram] {
+  public func factoryCoreUnigramsFor(key: String, keyArray: [String]) -> [Megrez.Unigram] {
     // 此處需要把 ASCII 單引號換成連續兩個單引號，否則會有 SQLite 語句查詢故障。
-    factoryUnigramsFor(key: key, column: isCHS ? .theDataCHS : .theDataCHT)
+    factoryUnigramsFor(key: key, keyArray: keyArray, column: isCHS ? .theDataCHS : .theDataCHT)
   }
 
   /// 根據給定的讀音索引鍵，來獲取原廠標準資料庫辭典內的對應資料陣列的 UTF8 資料、就地分析、生成單元圖陣列。
@@ -174,7 +174,9 @@ extension LMAssembly.LMInstantiator {
   ///   - key: 讀音索引鍵。
   ///   - column: 資料欄位。
   func factoryUnigramsFor(
-    key: String, column: LMAssembly.LMInstantiator.CoreColumn
+    key: String,
+    keyArray: [String],
+    column: LMAssembly.LMInstantiator.CoreColumn
   )
     -> [Megrez.Unigram] {
     if key == "_punctuation_list" { return [] }
@@ -207,11 +209,11 @@ extension LMAssembly.LMInstantiator {
           previousScore = theScore
           i = 0
         }
-        grams.append(Megrez.Unigram(value: theValue, score: theScore))
+        grams.append(Megrez.Unigram(keyArray: keyArray, value: theValue, score: theScore))
         if !key.contains("_punctuation") { return }
         let halfValue = theValue.applyingTransformFW2HW(reverse: false)
         if halfValue != theValue {
-          gramsHW.append(Megrez.Unigram(value: halfValue, score: theScore))
+          gramsHW.append(Megrez.Unigram(keyArray: keyArray, value: halfValue, score: theScore))
         }
       }
     }

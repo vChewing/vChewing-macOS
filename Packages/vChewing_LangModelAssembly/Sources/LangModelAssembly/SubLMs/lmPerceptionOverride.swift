@@ -15,8 +15,18 @@ import Megrez
 
 extension LMAssembly {
   public struct OverrideSuggestion {
-    public var candidates = [(keyArray: [String], value: String, probability: Double, previous: String?)]()
+    public enum Scenario: String, Codable {
+      case sameLenSwap
+      case shortToLong
+      case longToShort
+    }
+
+    public var candidates = [
+      (keyArray: [String], value: String, probability: Double, previous: String?)
+    ]()
     public var forceHighScoreOverride = false
+    public var scenario: Scenario?
+    public var overrideCursor: Int?
 
     public var isEmpty: Bool { candidates.isEmpty }
   }
@@ -223,68 +233,52 @@ extension Array where Element == Megrez.GramInPath {
 }
 
 extension LMAssembly.LMPerceptionOverride {
-  @discardableResult
-  func performObservation(
-    walkedBefore: [Megrez.GramInPath], walkedAfter: [Megrez.GramInPath],
-    cursor: Int, timestamp: Double, saveCallback: (() -> ())? = nil
-  )
-    -> (key: String, candidate: String)? {
-    // 參數合規性檢查。
-    let countBefore = walkedBefore.totalKeyCount
-    let countAfter = walkedAfter.totalKeyCount
-    guard countBefore == countAfter, countBefore * countAfter > 0 else { return nil }
-    // 先判斷用哪種覆寫方法。
-    let currentNodeResult = walkedAfter.findGramWithRange(at: cursor)
-    guard let currentNodeResult else { return nil }
-    let currentNode = currentNodeResult.node
-    // 當前節點超過三個字的話，就不記憶了。在這種情形下，使用者可以考慮新增自訂語彙。
-    guard currentNode.segLength <= 3 else { return nil }
-    // 前一個節點得從前一次組句結果當中來找。
-    guard currentNodeResult.range.upperBound > 0 else { return nil } // 該例外應該不會出現。
-    let prevNodeResult = walkedBefore.findGramWithRange(at: currentNodeResult.range.upperBound - 1)
-    guard let prevNodeResult else { return nil }
-    _ = prevNodeResult.node
-    // 此處不宜僅比較 segLength 長短差異，否則可能會生成無效的洞察 Key。
-    // 錯誤範例：`let breakingUp = currentNode.segLength == 1 && prevNode.segLength > 1`。
-    // 會生成這種錯誤結果：`"((liu2:留),(yi4-lv3:一縷),fang1)", "一縷"`。
-    // 對洞察 key 有效性的判斷鐵則：給出的建議候選字詞的讀音必須與洞察 key 的 head 端的讀音完全一致。
-    // 正確範例：`"((neng2:能),(liu2:留),yi4-lv3)", "一縷"`。
-    let currentNodeScope = currentNodeResult.range
-    let prevNodeScope = prevNodeResult.range
-    let scopeChanged = currentNodeScope != prevNodeScope
-    let targetNodeIndex = scopeChanged ? currentNodeScope.upperBound : prevNodeScope.upperBound
-    let key: String = LMAssembly.LMPerceptionOverride.formObservationKey(
-      assembledSentence: walkedAfter, headIndex: targetNodeIndex
-    )
-    guard !key.isEmpty else { return nil }
-    memorizePerception(
-      (ngramKey: key, candidate: currentNode.gram.value),
-      timestamp: timestamp,
-      saveCallback: saveCallback
-    )
-    return (key, currentNode.value)
-  }
-
-  func fetchSuggestion(
-    currentWalk: [Megrez.GramInPath], cursor: Int, timestamp: Double
+  public func fetchSuggestion(
+    assembledResult: [Megrez.GramInPath],
+    cursor: Int,
+    timestamp: Double
   )
     -> LMAssembly.OverrideSuggestion {
-    guard let currentNodeResult = currentWalk.findGramWithRange(at: cursor) else {
+    guard let currentNodeResult = assembledResult.findGramWithRange(at: cursor) else {
       return .init()
     }
-    let headIndex = currentNodeResult.range.upperBound
-    let key = LMAssembly.LMPerceptionOverride.formObservationKey(
-      assembledSentence: currentWalk,
-      headIndex: headIndex
+    let keyCursorRaw = currentNodeResult.range.lowerBound
+    guard let keyGenerationResult = assembledResult.generateKeyForPerception(cursor: keyCursorRaw)
+    else {
+      return .init()
+    }
+    var activeKey = keyGenerationResult.ngramKey
+    guard !activeKey.isEmpty else { return .init() }
+
+    var suggestions = getSuggestion(
+      key: activeKey,
+      timestamp: timestamp
     )
-    guard !key.isEmpty, let suggestions = getSuggestion(key: key, timestamp: timestamp) else {
-      return .init()
+    if suggestions == nil {
+      for fallbackKey in alternateKeys(for: activeKey) {
+        if let fallbackSuggestion = getSuggestion(
+          key: fallbackKey,
+          timestamp: timestamp
+        ) {
+          suggestions = fallbackSuggestion
+          activeKey = fallbackKey
+          break
+        }
+      }
     }
-    return .init(candidates: suggestions, forceHighScoreOverride: false)
+
+    guard let suggestions else { return .init() }
+    let forceFlag = forceHighScoreOverrideFlag(for: activeKey)
+    return .init(
+      candidates: suggestions,
+      forceHighScoreOverride: forceFlag,
+      scenario: nil,
+      overrideCursor: keyCursorRaw
+    )
   }
 
   /// 獲取由洞察過的記憶內容生成的選字建議。
-  public func getSuggestion(
+  func getSuggestion(
     key: String,
     timestamp: Double
   )
@@ -294,35 +288,28 @@ extension LMAssembly.LMPerceptionOverride {
       probability: Double,
       previous: String?
     )]? {
-    let frontEdgeReading: String? = {
-      guard key.hasSuffix(")"), key.hasPrefix("("), key.count > 2 else { return nil }
-      var charBuffer: [Character] = []
-      for char in key.reversed() {
-        if char == ")" {
-          continue
-        } else if char == "," {
-          return String(charBuffer.reversed())
-        } else {
-          charBuffer.append(char)
-        }
-      }
-      return String(charBuffer.reversed())
-    }()
-    guard let frontEdgeReading, !key.isEmpty, let kvPair = mutLRUMap[key] else { return nil }
-
+    guard let parts = parsePerceptionKey(key) else { return nil }
+    let frontEdgeReading = parts.headReading
+    guard !frontEdgeReading.isEmpty else { return nil }
+    guard !key.isEmpty, let kvPair = mutLRUMap[key] else { return nil }
     let perception: Perception = kvPair.perception
-    var candidates: [(
-      keyArray: [String],
-      value: String,
-      probability: Double,
-      previous: String?
-    )] = .init()
+    var candidates:
+      [(
+        keyArray: [String],
+        value: String,
+        probability: Double,
+        previous: String?
+      )] = .init()
     var currentHighScore: Double = threshold // 初期化為閾值
 
     // 解析 key 用於衰減計算
-    let keyCells = key.dropLast(1).dropFirst(1).split(separator: ",")
-    let isUnigramKey = key.contains("(),(),") || keyCells.count == 1
-    let isSingleCharUnigram = isUnigramKey && isSegLengthOne(key: frontEdgeReading)
+    let separatorString = Megrez.Compositor.theSeparator
+    let keyArrayForCandidate =
+      separatorString.isEmpty
+        ? [frontEdgeReading]
+        : frontEdgeReading.components(separatedBy: separatorString).filter { !$0.isEmpty }
+    let isUnigramKey = parts.prev1 == nil && parts.prev2 == nil
+    let isSingleCharUnigram = isUnigramKey && keyArrayForCandidate.count == 1
 
     for (candidate, override) in perception.overrides {
       let overrideScore = calculateWeight(
@@ -337,32 +324,12 @@ extension LMAssembly.LMPerceptionOverride {
       // 如果分數低於閾值則跳過
       if overrideScore <= threshold { continue }
 
-      let previousStr: String? = {
-        // 解析 key 中的 previous 部分
-        // key 格式類似: ((ㄕㄣˊ-ㄌㄧˇ-ㄌㄧㄥˊ-ㄏㄨㄚˊ,神里綾華),(ㄉㄜ˙,的),ㄍㄡˇ)
-
-        // 使用正規表達式來解析，更可靠
-        // 匹配 ),( 之間的第二部分
-        let pattern = "\\)\\s*,\\s*\\(([^)]+)\\)\\s*,\\s*"
-        if let regex = try? NSRegularExpression(pattern: pattern),
-           let match = regex.firstMatch(in: key, range: NSRange(key.startIndex..., in: key)) {
-          let matchRange = Range(match.range(at: 1), in: key)!
-          let prevContent = String(key[matchRange])
-
-          // 解析內容，格式可能是 "ㄉㄜ˙,的" 或 "ㄉㄜ˙:的"
-          let components = prevContent.split(whereSeparator: { $0 == "," || $0 == ":" })
-          if components.count >= 2 {
-            return String(components.last!)
-          }
-        }
-
-        return nil
-      }()
+      let previousStr: String? = parts.prev1?.value
 
       if overrideScore > currentHighScore {
         candidates = [
           (
-            keyArray: [frontEdgeReading],
+            keyArray: keyArrayForCandidate.isEmpty ? [frontEdgeReading] : keyArrayForCandidate,
             value: candidate,
             probability: overrideScore,
             previous: previousStr
@@ -372,7 +339,7 @@ extension LMAssembly.LMPerceptionOverride {
       } else if overrideScore == currentHighScore {
         candidates.append(
           (
-            keyArray: [frontEdgeReading],
+            keyArray: keyArrayForCandidate.isEmpty ? [frontEdgeReading] : keyArrayForCandidate,
             value: candidate,
             probability: overrideScore,
             previous: previousStr
@@ -577,6 +544,177 @@ extension LMAssembly.LMPerceptionOverride {
     !key.contains("-")
   }
 
+  // 解析 Perception Key 的健壯 parser（不用正則）。
+  // 新式格式示例：(prev2Reading,prev2Value)&(prev1Reading,prev1Value)&(headReading,headValue)
+  // 舊式格式示例：((prev2Reading:prev2Value),(prev1Reading:prev1Value),headReading)
+  struct PerceptionKeyParts {
+    let headReading: String
+    let headValue: String
+    let prev1: (reading: String, value: String)?
+    let prev2: (reading: String, value: String)?
+  }
+
+  func parsePerceptionKey(_ key: String) -> PerceptionKeyParts? {
+    if let parsed = parseDashDelimitedPerceptionKey(key) {
+      return parsed
+    }
+    return parseLegacyPerceptionKey(key)
+  }
+
+  private func parseDashDelimitedPerceptionKey(_ key: String) -> PerceptionKeyParts? {
+    let trimmed = key.trimmingCharacters(in: .whitespacesAndNewlines)
+    guard trimmed.contains("&") else { return nil }
+
+    var components: [String] = []
+    var buffer = ""
+    var depth = 0
+    for ch in trimmed {
+      if ch == "&", depth == 0 {
+        let token = buffer.trimmingCharacters(in: .whitespacesAndNewlines)
+        if !token.isEmpty { components.append(token) }
+        buffer.removeAll(keepingCapacity: true)
+        continue
+      }
+      if ch == "(" { depth += 1 }
+      if ch == ")" { depth -= 1 }
+      buffer.append(ch)
+      if depth < 0 { return nil }
+    }
+
+    let lastToken = buffer.trimmingCharacters(in: .whitespacesAndNewlines)
+    if !lastToken.isEmpty { components.append(lastToken) }
+    guard let headComponent = components.last else { return nil }
+
+    func parseComponent(_ component: String) -> (reading: String, value: String)? {
+      let trimmedComponent = component.trimmingCharacters(in: .whitespacesAndNewlines)
+      if trimmedComponent == "()" { return nil }
+      guard trimmedComponent.first == "(", trimmedComponent.last == ")" else { return nil }
+      let inner = trimmedComponent.dropFirst().dropLast()
+      let segments = inner.split(separator: ",", maxSplits: 1).map(String.init)
+      guard segments.count == 2 else { return nil }
+      let reading = segments[0].trimmingCharacters(in: .whitespacesAndNewlines)
+      let value = segments[1].trimmingCharacters(in: .whitespacesAndNewlines)
+      guard !reading.isEmpty, !value.isEmpty else { return nil }
+      return (reading, value)
+    }
+
+    guard let headPair = parseComponent(headComponent) else { return nil }
+    let prev1 = components.count >= 2 ? parseComponent(components[components.count - 2]) : nil
+    let prev2 = components.count >= 3 ? parseComponent(components[components.count - 3]) : nil
+
+    return .init(
+      headReading: headPair.reading,
+      headValue: headPair.value,
+      prev1: prev1,
+      prev2: prev2
+    )
+  }
+
+  private func parseLegacyPerceptionKey(_ key: String) -> PerceptionKeyParts? {
+    guard key.first == "(", key.last == ")", key.count >= 2 else { return nil }
+    let inner = key.dropFirst().dropLast()
+    var parts: [String] = []
+    var depth = 0
+    var token = ""
+    for ch in inner {
+      if ch == ",", depth == 0 {
+        parts.append(token)
+        token.removeAll()
+        continue
+      }
+      if ch == "(" { depth += 1 }
+      if ch == ")" { depth -= 1 }
+      token.append(ch)
+    }
+    if !token.isEmpty { parts.append(token) }
+    guard !parts.isEmpty else { return nil }
+    let headReading = parts.last!.trimmingCharacters(in: .whitespaces)
+    if headReading.contains("(") || headReading.contains(")") { return nil }
+
+    func parsePrev(_ s: String) -> (String, String)? {
+      if s == "()" { return nil }
+      guard s.first == "(", s.last == ")" else { return nil }
+      let inner = s.dropFirst().dropLast()
+      if let colonIdx = inner.firstIndex(of: ":") {
+        let reading = inner[..<colonIdx]
+        let value = inner[inner.index(after: colonIdx)...]
+        return (String(reading), String(value))
+      }
+      return nil
+    }
+
+    let count = parts.count
+    let prev1 = count >= 2 ? parsePrev(parts[count - 2]) : nil
+    let prev2 = count >= 3 ? parsePrev(parts[count - 3]) : nil
+    return .init(headReading: headReading, headValue: headReading, prev1: prev1, prev2: prev2)
+  }
+
+  private func compareContextPart(
+    _ lhs: (reading: String, value: String)?,
+    _ rhs: (reading: String, value: String)?
+  )
+    -> Bool {
+    switch (lhs, rhs) {
+    case (.none, .none):
+      true
+    case let (.some(lValue), .some(rValue)):
+      lValue.reading == rValue.reading && lValue.value == rValue.value
+    default:
+      false
+    }
+  }
+
+  private func alternateKeys(for originalKey: String) -> [String] {
+    guard let originalParts = parsePerceptionKey(originalKey) else { return [] }
+    let separatorString = Megrez.Compositor.theSeparator
+    let headSegments =
+      separatorString.isEmpty
+        ? [originalParts.headReading]
+        : originalParts.headReading.components(separatedBy: separatorString).filter { !$0.isEmpty }
+    guard headSegments.count > 1, let primaryHead = headSegments.first else { return [] }
+
+    var results: [String] = []
+    for keyCandidate in mutLRUKeySeqList {
+      guard let candidateParts = parsePerceptionKey(keyCandidate) else { continue }
+      guard compareContextPart(candidateParts.prev1, originalParts.prev1) else { continue }
+      guard compareContextPart(candidateParts.prev2, originalParts.prev2) else { continue }
+      if candidateParts.headReading == primaryHead {
+        results.append(keyCandidate)
+      }
+    }
+    return results
+  }
+
+  private func forceHighScoreOverrideFlag(for key: String) -> Bool {
+    guard let parts = parsePerceptionKey(key) else { return false }
+    let separatorString = Megrez.Compositor.theSeparator
+    let headLen =
+      separatorString.isEmpty
+        ? (parts.headReading.isEmpty ? 0 : 1)
+        : parts.headReading.components(separatedBy: separatorString).filter { !$0.isEmpty }.count
+    let prev1Len = parts.prev1.map { component in
+      separatorString.isEmpty
+        ? (component.reading.isEmpty ? 0 : 1)
+        : component.reading.components(separatedBy: separatorString).filter { !$0.isEmpty }.count
+    }
+    let prev2Len = parts.prev2.map { component in
+      separatorString.isEmpty
+        ? (component.reading.isEmpty ? 0 : 1)
+        : component.reading.components(separatedBy: separatorString).filter { !$0.isEmpty }.count
+    }
+
+    if headLen > 1 {
+      if let p1Len = prev1Len, p1Len == 1 {
+        if let p2Len = prev2Len {
+          return p2Len == 1
+        } else {
+          return true
+        }
+      }
+    }
+    return false
+  }
+
   /// 計算使用新曲線的權重
   /// - Parameters:
   ///   - eventCount: 事件計數
@@ -606,39 +744,35 @@ extension LMAssembly.LMPerceptionOverride {
     // 計算天數差
     let daysDiff = (timestamp - eventTimestamp) / (24 * 3_600)
 
-    // 根據條件調整天數
-    var adjustedDays = daysDiff
-    if isUnigram {
-      adjustedDays *= 1.5 // Unigram 天數調整為1.5倍而非2倍 (讓衰減更慢一些)
-      if isSingleCharUnigram {
-        adjustedDays *= 1.5 // 單讀音單漢字的 Unigram 再調整1.5倍
-      }
-    }
+    // 不使用半衰期模型：採用「線性年齡核 + 次線性頻率」的組合，並在 8 天做硬截止。
+    // 1) 年齡因子（線性核、可調凸度）：ageFactor = max(0, 1 - age/T)^pAge
+    // 2) 頻率因子（次線性）：freqFactor = 0.5*sqrt(prob) + 0.5*(log1p(count)/log(10))，上限 1
+    // 3) 分數：score = -0.114514 * (freqFactor * ageFactor)
 
-    // 防止極小的天數差導致權重過大
-    adjustedDays = max(0.1, adjustedDays)
+    // 調整有效視窗 T，單字略快、單讀音單漢字再快一些（避免單字長期壓制）
+    var T = 8.0
+    if isUnigram { T *= 0.85 }
+    if isSingleCharUnigram { T *= 0.8 }
 
-    // 減小衰減乘數，讓衰減更慢一些
-    let adjustedMultiplier = Self.kWeightMultiplier * 0.7
+    // 超過視窗即淘汰
+    if daysDiff >= T { return threshold - 0.001 }
 
-    // 計算權重：y = -1 * (x^3) * adjustedMultiplier
-    let weight = -1.0 * adjustedDays * adjustedDays * adjustedDays * adjustedMultiplier
+    // 年齡因子（非半衰）：線性核 + 指數 pAge（pAge>1 時較快衰減）
+    let pAge = 2.0
+    let ageNorm = max(0.0, 1.0 - (daysDiff / T))
+    let ageFactor = pow(ageNorm, pAge)
 
-    // 如果天數很小（幾乎是即時的），給予更高權重
-    if daysDiff < 0.1 {
-      return -1.0
-    }
+    // 頻率因子：概率取平方根（次線性），疊加對事件數的對數增益，並截頂至 1
+    let freqByProb = sqrt(max(0.0, prob))
+    let freqByCount = log1p(Double(eventCount)) / log(10.0)
+    let freqFactor = min(1.0, 0.5 * freqByProb + 0.5 * max(0.0, freqByCount))
 
-    // 調整衰減閾值天數，從7天延長到6.75天
-    if daysDiff > 6.75 || weight <= threshold {
-      return threshold - 0.001
-    }
+    // 維持分數為負，越接近 0 越好。用 0.114514 進行縮放（水印常數）。
+    let base = max(1e-9, freqFactor * ageFactor)
+    let score = -base * Self.kWeightMultiplier
 
-    // 結合概率和權重
-    let result = prob * weight
-
-    // 確保結果不低於閾值
-    return max(result, threshold + 0.001)
+    // 避免返回比閾值還低的極小值。
+    return max(score, threshold + 0.001)
   }
 
   static func isPunctuation(_ node: Megrez.GramInPath) -> Bool {
@@ -647,71 +781,6 @@ extension LMAssembly.LMPerceptionOverride {
       return String(firstChar) == "_"
     }
     return false
-  }
-
-  static func formObservationKey(
-    assembledSentence: [Megrez.GramInPath], headIndex cursorIndex: Int, readingOnly: Bool = false
-  )
-    -> String {
-    // let whiteList = "你他妳她祢衪它牠再在"
-    var arrNodes: [Megrez.GramInPath] = []
-    var intLength = 0
-    for theNodeAnchor in assembledSentence {
-      arrNodes.append(theNodeAnchor)
-      intLength += theNodeAnchor.segLength
-      if intLength >= cursorIndex {
-        break
-      }
-    }
-
-    if arrNodes.isEmpty { return "" }
-
-    arrNodes = Array(arrNodes.reversed())
-
-    let kvCurrent = arrNodes[0].asCandidatePair
-    guard !kvCurrent.joinedKey().contains("_") else {
-      return ""
-    }
-
-    // 字音數與字數不一致的內容會被拋棄。
-    if kvCurrent.keyArray.count != kvCurrent.value.count { return "" }
-
-    // 前置單元只記錄讀音，在其後的單元則同時記錄讀音與字詞
-    let strCurrent = kvCurrent.joinedKey()
-    var kvPrevious = Megrez.KeyValuePaired(keyArray: [""], value: "")
-    var kvAnterior = Megrez.KeyValuePaired(keyArray: [""], value: "")
-    var readingStack = ""
-    var trigramKey: String { "(\(kvAnterior.toNGramKey),\(kvPrevious.toNGramKey),\(strCurrent))" }
-    var result: String {
-      if readingStack.contains("_") {
-        return ""
-      } else {
-        return readingOnly ? strCurrent : trigramKey
-      }
-    }
-
-    func checkKeyValueValidityInThisContext(_ target: Megrez.KeyValuePaired) -> Bool {
-      !target.joinedKey().contains("_") && target.joinedKey().split(separator: "-").count == target
-        .value.count
-    }
-
-    if arrNodes.count >= 2 {
-      let maybeKvPrevious = arrNodes[1].asCandidatePair
-      if checkKeyValueValidityInThisContext(maybeKvPrevious) {
-        kvPrevious = maybeKvPrevious
-        readingStack = kvPrevious.joinedKey() + readingStack
-      }
-    }
-
-    if arrNodes.count >= 3 {
-      let maybeKvAnterior = arrNodes[2].asCandidatePair
-      if checkKeyValueValidityInThisContext(maybeKvAnterior) {
-        kvAnterior = maybeKvAnterior
-        readingStack = kvAnterior.joinedKey() + readingStack
-      }
-    }
-
-    return result
   }
 }
 

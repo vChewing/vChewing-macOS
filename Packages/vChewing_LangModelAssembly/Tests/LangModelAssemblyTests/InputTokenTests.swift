@@ -88,8 +88,11 @@ final class InputTokenTests: XCTestCase {
       config.isSymbolEnabled = false
     }
     instance.insertTemporaryData(
-      keyArray: ["ㄐㄧㄣ", "ㄊㄧㄢ", "ㄖˋ", "ㄑㄧˊ"],
-      unigram: .init(value: "MACRO@DATE_YEARDELTA:-1945", score: -97.5),
+      unigram: .init(
+        keyArray: ["ㄐㄧㄣ", "ㄊㄧㄢ", "ㄖˋ", "ㄑㄧˊ"],
+        value: "MACRO@DATE_YEARDELTA:-1945",
+        score: -97.5
+      ),
       isFiltering: false
     )
     let x = instance.unigramsFor(keyArray: ["ㄐㄧㄣ", "ㄊㄧㄢ", "ㄖˋ", "ㄑㄧˊ"]).description

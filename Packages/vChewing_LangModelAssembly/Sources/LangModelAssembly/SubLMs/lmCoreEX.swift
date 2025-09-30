@@ -168,7 +168,8 @@ extension LMAssembly {
     /// 根據給定的讀音索引鍵，來獲取資料庫辭典內的對應資料陣列的字串首尾範圍資料、據此自 strData 取得字串形式的資料、生成單元圖陣列。
     /// - parameters:
     ///   - key: 讀音索引鍵。
-    func unigramsFor(key: String) -> [Megrez.Unigram] {
+    func unigramsFor(key: String, keyArray: [String]? = nil) -> [Megrez.Unigram] {
+      let keyArray = keyArray ?? key.split(separator: "-").map(\.description)
       var grams: [Megrez.Unigram] = []
       if let arrRangeRecords: [Range<String.Index>] = rangeMap[key] {
         for netaRange in arrRangeRecords {
@@ -181,7 +182,7 @@ extension LMAssembly {
           if theScore > 0 {
             theScore *= -1 // 應對可能忘記寫負號的情形
           }
-          grams.append(Megrez.Unigram(value: theValue, score: theScore))
+          grams.append(Megrez.Unigram(keyArray: keyArray, value: theValue, score: theScore))
         }
       }
       if let arrOtherRecords: [Megrez.Unigram] = temporaryMap[key] {

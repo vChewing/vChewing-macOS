@@ -5,44 +5,81 @@
 // MARK: - Megrez.Unigram
 
 extension Megrez {
-  /// 語言模型的基礎資料單位結構。
-  public struct Unigram: Equatable, CustomStringConvertible, Hashable, Codable {
+  /// 語言模型的基礎資料單位類型。
+  public final class Unigram: Codable, CustomStringConvertible, Equatable, Hashable {
     // MARK: Lifecycle
 
-    /// 建立語言模型基礎資料單位副本。基礎資料單位由詞彙內容與統計權重組成。
+    /// 建立語言模型基礎資料單位副本。基礎資料單位由索引鍵陣列、詞彙內容與統計權重組成。
     /// - Parameters:
+    ///   - keyArray: 對應的索引鍵陣列。
     ///   - value: 詞彙內容。
     ///   - score: 統計權重（雙精度浮點數）。
-    public init(value: String = "", score: Double = 0) {
+    public init(keyArray: [String] = [], value: String = "", score: Double = 0) {
+      self.keyArray = keyArray
       self.value = value
       self.score = score
     }
 
+    public required init(from decoder: any Decoder) throws {
+      let container = try decoder.container(keyedBy: CodingKeys.self)
+      self.keyArray = try container.decode([String].self, forKey: .keyArray)
+      self.value = try container.decode(String.self, forKey: .value)
+      self.score = try container.decode(Double.self, forKey: .score)
+    }
+
     // MARK: Public
 
+    /// 對應的索引鍵陣列。
+    public let keyArray: [String]
     /// 詞彙內容，可以是單字或詞組。
-    public var value: String
+    public let value: String
     /// 統計權重。
-    public var score: Double
+    public let score: Double
+
+    /// 段長（索引鍵陣列的元素數量）。
+    public var segLength: Int { keyArray.count }
+
+    /// 檢查是否「讀音字長與候選字字長不一致」。
+    public var isReadingMismatched: Bool { keyArray.count != value.count }
 
     /// 將當前單元圖列印成一個字串。
     public var description: String {
-      "(" + value.description + "," + String(score) + ")"
+      "(\(keyArray.joined(separator: "-")),\(value),\(score))"
     }
 
-    public static func == (lhs: Self, rhs: Self) -> Bool {
-      lhs.hashValue == rhs.hashValue
+    /// 單元圖的淺層複製品（保持相同的索引鍵陣列）。
+    public var copy: Unigram { copy(withKeyArray: nil) }
+
+    public static func == (lhs: Unigram, rhs: Unigram) -> Bool {
+      lhs.keyArray == rhs.keyArray && lhs.value == rhs.value && lhs.score == rhs.score
     }
 
-    public static func < (lhs: Self, rhs: Self) -> Bool {
-      lhs.value < rhs.value || (lhs.value == rhs.value && lhs.score < rhs.score)
+    /// 建立一個新的單元圖副本。
+    /// - Parameter keyArrayOverride: 若指定，則使用新的索引鍵陣列。
+    /// - Returns: 單元圖副本。
+    public func copy(withKeyArray keyArrayOverride: [String]? = nil) -> Unigram {
+      .init(keyArray: keyArrayOverride ?? keyArray, value: value, score: score)
     }
 
-    /// 做為預設雜湊函式。
-    /// - Parameter hasher: 目前物件的雜湊碼。
     public func hash(into hasher: inout Hasher) {
+      hasher.combine(keyArray)
       hasher.combine(value)
       hasher.combine(score)
+    }
+
+    public func encode(to encoder: any Encoder) throws {
+      var container = encoder.container(keyedBy: CodingKeys.self)
+      try container.encode(keyArray, forKey: .keyArray)
+      try container.encode(value, forKey: .value)
+      try container.encode(score, forKey: .score)
+    }
+
+    // MARK: Private
+
+    private enum CodingKeys: String, CodingKey {
+      case keyArray
+      case value
+      case score
     }
   }
 }

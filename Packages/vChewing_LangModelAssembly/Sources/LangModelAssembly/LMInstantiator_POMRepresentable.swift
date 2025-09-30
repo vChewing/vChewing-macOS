@@ -10,30 +10,26 @@ import Foundation
 import Megrez
 
 extension LMAssembly.LMInstantiator {
-  public func performPOMObservation(
-    walkedBefore: [Megrez.GramInPath],
-    walkedAfter: [Megrez.GramInPath],
-    cursor: Int,
+  public func memorizePerception(
+    _ perception: (ngramKey: String, candidate: String),
     timestamp: Double,
     saveCallback: (() -> ())? = nil
   ) {
-    lmPerceptionOverride.performObservation(
-      walkedBefore: walkedBefore,
-      walkedAfter: walkedAfter,
-      cursor: cursor,
+    lmPerceptionOverride.memorizePerception(
+      perception,
       timestamp: timestamp,
       saveCallback: saveCallback
     )
   }
 
   public func fetchPOMSuggestion(
-    currentWalk: [Megrez.GramInPath],
+    assembledResult: [Megrez.GramInPath],
     cursor: Int,
     timestamp: Double
   )
     -> LMAssembly.OverrideSuggestion {
     lmPerceptionOverride.fetchSuggestion(
-      currentWalk: currentWalk,
+      assembledResult: assembledResult,
       cursor: cursor,
       timestamp: timestamp
     )

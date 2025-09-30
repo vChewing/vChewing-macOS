@@ -11,6 +11,10 @@ let package = Package(
       name: "Megrez",
       targets: ["Megrez"]
     ),
+    .library(
+      name: "MegrezTestComponents",
+      targets: ["MegrezTestComponents"]
+    ),
   ],
   dependencies: [],
   targets: [
@@ -18,9 +22,18 @@ let package = Package(
       name: "Megrez",
       dependencies: []
     ),
+    .target(
+      name: "MegrezTestComponents",
+      dependencies: [
+        "Megrez",
+      ]
+    ),
     .testTarget(
       name: "MegrezTests",
-      dependencies: ["Megrez"]
+      dependencies: [
+        "Megrez",
+        "MegrezTestComponents",
+      ]
     ),
   ]
 )

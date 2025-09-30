@@ -68,7 +68,6 @@ extension Megrez {
       while currentPos > 0 {
         guard let node = parent[currentPos] else { break }
         let insertable = Megrez.GramInPath(
-          keyArray: node.keyArray,
           gram: node.currentUnigram,
           isOverridden: node.isOverridden
         )
