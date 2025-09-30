@@ -72,8 +72,8 @@ extension LMAssembly.LMInstantiator {
     guard !lookupResult.isEmpty else { return [] }
     lookupResult = lookupResult.map { $0.trimmingCharacters(in: .newlines) }
     return lookupResult.stableSort(by: { $0.count < $1.count }).stableSort {
-      Self.lmCassette.unigramsFor(key: $0).count
-        < Self.lmCassette.unigramsFor(key: $1).count
+      Self.lmCassette.unigramsFor(key: $0, keyArray: [$0]).count
+        < Self.lmCassette.unigramsFor(key: $1, keyArray: [$1]).count
     }
   }
 }

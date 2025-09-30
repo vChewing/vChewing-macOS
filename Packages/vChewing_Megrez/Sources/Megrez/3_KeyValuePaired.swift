@@ -169,18 +169,24 @@ extension Megrez.Compositor {
   ///   - candidate: 指定用來覆寫為的候選字（詞音鍵值配對）。
   ///   - location: 游標位置。
   ///   - overrideType: 指定覆寫行為。
+  ///   - enforceRetokenization: 是否強制重新分詞，對所有重疊節點施作重置與降權，以避免殘留舊節點狀態。
+  ///   - perceptionHandler: 覆寫成功後用於回傳觀測智慧的回呼。
   /// - Returns: 該操作是否成功執行。
   @discardableResult
   public func overrideCandidate(
     _ candidate: Megrez.KeyValuePaired, at location: Int,
-    overrideType: Megrez.Node.OverrideType = .withHighScore
+    overrideType: Megrez.Node.OverrideType = .withHighScore,
+    enforceRetokenization: Bool = false,
+    perceptionHandler: ((Megrez.PerceptionIntel) -> ())? = nil
   )
     -> Bool {
     overrideCandidateAgainst(
       keyArray: candidate.keyArray,
       at: location,
       value: candidate.value,
-      type: overrideType
+      type: overrideType,
+      enforceRetokenization: enforceRetokenization,
+      perceptionHandler: perceptionHandler
     )
   }
 
@@ -191,14 +197,25 @@ extension Megrez.Compositor {
   ///   - candidate: 指定用來覆寫為的候選字（字串）。
   ///   - location: 游標位置。
   ///   - overrideType: 指定覆寫行為。
+  ///   - enforceRetokenization: 是否強制重新分詞，對所有重疊節點施作重置與降權，以避免殘留舊節點狀態。
+  ///   - perceptionHandler: 覆寫成功後用於回傳觀測智慧的回呼。
   /// - Returns: 該操作是否成功執行。
   @discardableResult
   public func overrideCandidateLiteral(
     _ candidate: String,
-    at location: Int, overrideType: Megrez.Node.OverrideType = .withHighScore
+    at location: Int, overrideType: Megrez.Node.OverrideType = .withHighScore,
+    enforceRetokenization: Bool = false,
+    perceptionHandler: ((Megrez.PerceptionIntel) -> ())? = nil
   )
     -> Bool {
-    overrideCandidateAgainst(keyArray: nil, at: location, value: candidate, type: overrideType)
+    overrideCandidateAgainst(
+      keyArray: nil,
+      at: location,
+      value: candidate,
+      type: overrideType,
+      enforceRetokenization: enforceRetokenization,
+      perceptionHandler: perceptionHandler
+    )
   }
 
   // MARK: Internal implementations.
@@ -209,48 +226,226 @@ extension Megrez.Compositor {
   ///   - location: 游標位置。
   ///   - value: 資料值。
   ///   - type: 指定覆寫行為。
+  ///   - enforceRetokenization: 是否強制重新分詞，對所有重疊節點施作重置與降權，以避免殘留舊節點狀態。
+  ///   - perceptionHandler: 覆寫成功後用於回傳觀測智慧的回呼。
   /// - Returns: 該操作是否成功執行。
   internal func overrideCandidateAgainst(
     keyArray: [String]?,
     at location: Int,
     value: String,
-    type: Megrez.Node.OverrideType
+    type: Megrez.Node.OverrideType,
+    enforceRetokenization: Bool,
+    perceptionHandler: ((Megrez.PerceptionIntel) -> ())? = nil
   )
     -> Bool {
     let location = max(min(location, keys.count), 0) // 防呆
-    var arrOverlappedNodes: [(location: Int, node: Megrez.Node)] = fetchOverlappingNodes(at: min(
-      keys.count - 1,
-      location
-    ))
+    let effectiveLocation = min(keys.count - 1, location)
+
+    // 獲取重疊節點
+    let arrOverlappedNodes = fetchOverlappingNodes(at: effectiveLocation)
+
+    guard !arrOverlappedNodes.isEmpty else { return false }
+
+    // 用於觀測：覆寫生效前的 walk 與游標
+    let hasPerceptor = perceptionHandler != nil
+    let previouslyAssembled: [Megrez.GramInPath] = hasPerceptor ? assemble() : []
+    let beforeCursor = min(keys.count, location)
+
+    // 尋找相符的節點
     var overridden: (location: Int, node: Megrez.Node)?
+    var overriddenGram: Megrez.Unigram?
+    var errorHappened = false
+
     for anchor in arrOverlappedNodes {
-      if keyArray != nil, anchor.node.keyArray != keyArray { continue }
-      if !anchor.node.selectOverrideUnigram(value: value, type: type) { continue }
-      overridden = anchor
-      break
+      // 如果提供了keyArray，確認該節點包含這個keyArray
+      if let keyArray, anchor.node.keyArray != keyArray {
+        continue
+      }
+
+      overrideTask: do {
+        let selectionSucceeded = anchor.node.selectOverrideUnigram(
+          value: value,
+          type: type
+        )
+        overriddenGram = anchor.node.currentUnigram
+        guard selectionSucceeded else {
+          errorHappened = true
+          break overrideTask
+        }
+        overridden = anchor
+        break
+      }
     }
 
-    guard let overridden = overridden else { return false } // 啥也不覆寫。
+    // 如果沒有找到相符的節點，拋出錯誤
+    guard !errorHappened, let overridden, overriddenGram != nil else {
+      return false
+    }
 
-    (overridden.location ..< min(segments.count, overridden.location + overridden.node.segLength))
-      .forEach { i in
-        /// 咱們還得弱化所有在相同的幅節座標的節點的複寫權重。舉例說之前組句的結果是「A BC」
-        /// 且 A 與 BC 都是被覆寫的結果，然後使用者現在在與 A 相同的幅節座標位置
-        /// 選了「DEF」，那麼 BC 的覆寫狀態就有必要重設（但 A 不用重設）。
-        arrOverlappedNodes = fetchOverlappingNodes(at: i)
-        arrOverlappedNodes.forEach { anchor in
-          if anchor.node == overridden.node { return }
-          let anchorNodeKeyJoined = anchor.node.joinedKey(by: "\t")
-          let overriddenNodeKeyJoined = overridden.node.joinedKey(by: "\t")
-          let joinedKeyContained = overriddenNodeKeyJoined.has(string: anchorNodeKeyJoined)
-          let valueContained = overridden.node.value.has(string: anchor.node.value)
-          if !joinedKeyContained || !valueContained {
-            anchor.node.reset()
-            return
-          }
-          anchor.node.overridingScore /= 4
+    defer {
+      // 覆寫後組句與觀測：
+      let currentAssembled = assemble()
+      if let perceptionHandler, !previouslyAssembled.isEmpty {
+        // 供新版觀測 API（前/後路徑比較 + 三情境分類）
+        let perceptedIntel = Megrez.makePerceptionObservation(
+          previouslyAssembled: previouslyAssembled,
+          currentAssembled: currentAssembled,
+          cursor: beforeCursor
+        )
+        if let perceptedIntel {
+          perceptionHandler(perceptedIntel)
         }
       }
+    }
+
+    // 更新重疊節點的覆寫權重
+    let overriddenRange = overridden.location ..< min(
+      segments.count,
+      overridden.location + overridden.node.segLength
+    )
+
+    if enforceRetokenization {
+      let overriddenNodeRef = overridden.node
+      let demotionScore = -Swift.max(1.0, Swift.abs(overriddenNodeRef.overridingScore))
+      for i in overriddenRange {
+        let overlappingNodes = fetchOverlappingNodes(at: i)
+        for anchor in overlappingNodes where anchor.node !== overriddenNodeRef
+          && anchor.location <= overridden.location {
+          if shouldResetNode(anchor: anchor.node, overriddenNode: overriddenNodeRef) {
+            anchor.node.reset()
+          }
+          anchor.node.overrideStatus = .init(
+            overridingScore: demotionScore,
+            currentOverrideType: .withHighScore,
+            currentUnigramIndex: anchor.node.currentUnigramIndex
+          )
+        }
+      }
+    } else {
+      for i in overriddenRange {
+        let overlappingNodes = fetchOverlappingNodes(at: i)
+
+        for anchor in overlappingNodes where anchor.node != overridden.node {
+          // 檢查是否需要重設節點
+          let shouldReset = shouldResetNode(
+            anchor: anchor.node,
+            overriddenNode: overridden.node
+          )
+
+          if shouldReset {
+            anchor.node.reset()
+          } else {
+            anchor.node.overridingScore /= 4
+          }
+        }
+      }
+    }
     return true
+  }
+
+  /// 判斷一個節點是否需要被重設
+  /// - Parameters:
+  ///   - anchor: 待檢查的節點
+  ///   - overriddenNode: 已覆寫的節點
+  /// - Returns: 是否需要重設
+  private func shouldResetNode(anchor: Megrez.Node, overriddenNode: Megrez.Node) -> Bool {
+    let anchorValue = anchor.value
+    let overriddenValue = overriddenNode.value
+
+    let anchorNodeKeyJoined = anchor.keyArray.joined(separator: "\t")
+    let overriddenNodeKeyJoined = overriddenNode.keyArray.joined(separator: "\t")
+
+    var shouldReset = !overriddenNodeKeyJoined.has(string: anchorNodeKeyJoined)
+    shouldReset = shouldReset || !overriddenValue.has(string: anchorValue)
+
+    return shouldReset
+  }
+}
+
+// MARK: - Perception observation with pre/post walks
+
+extension Megrez {
+  /// 觀測上下文類型。
+  public enum POMObservationScenario: String, Codable {
+    /// 同長度更換。
+    case sameLenSwap
+    /// 短詞變長詞。
+    case shortToLong
+    /// 長詞變短詞。
+    case longToShort
+  }
+
+  /// 觀測上下文情形。
+  public struct PerceptionIntel: Codable, Hashable {
+    /// N-gram 索引鍵。
+    public let ngramKey: String
+    /// 候選字。
+    public let candidate: String
+    /// 頭部讀音。
+    public let headReading: String
+    /// 觀測場景。
+    public let scenario: POMObservationScenario
+    /// 強制高分覆寫。
+    public let forceHighScoreOverride: Bool
+    /// 語言模型分數。
+    public let scoreFromLM: Double
+  }
+
+  /// 根據候選字覆寫行為前後的組句結果，在指定游標位置得出觀測上下文之情形。
+  /// - Parameters:
+  ///   - previouslyAssembled: 候選字覆寫行為前的組句結果。
+  ///   - currentAssembled: 候選字覆寫行為後的組句結果。
+  ///   - cursor: 游標。
+  /// - Returns: 觀測上下文結果。
+  public static func makePerceptionObservation(
+    previouslyAssembled: [Megrez.GramInPath],
+    currentAssembled: [Megrez.GramInPath],
+    cursor: Int
+  )
+    -> PerceptionIntel? {
+    guard !previouslyAssembled.isEmpty, !currentAssembled.isEmpty else { return nil }
+
+    // 確認游標落在 currentAssembled 的有效節點
+    guard let afterHit = currentAssembled.findGram(at: cursor) else { return nil }
+    let current = afterHit.gram
+    let currentLen = current.segLength
+    if currentLen > 3 { return nil }
+
+    // 在 previouslyAssembled 中找到對應 head 的節點（使用 after 的節點區間上界 -1 作為內點）
+    let border1 = afterHit.range.upperBound - 1
+    let border2 = previouslyAssembled.totalKeyCount - 1
+    let innerIndex = Swift.max(0, Swift.min(border1, border2))
+    guard let beforeHit = previouslyAssembled.findGram(at: innerIndex) else { return nil }
+    let prevHead = beforeHit.gram
+    let prevLen = prevHead.segLength
+
+    let isBreakingUp = (currentLen == 1 && prevLen > 1)
+    let isShortToLong = (currentLen > prevLen)
+    let scenario: POMObservationScenario = switch (isBreakingUp, isShortToLong) {
+    case (true, _): .longToShort
+    case (false, true): .shortToLong
+    case (false, false): .sameLenSwap
+    }
+    let forceHSO = isShortToLong // 只有短→長時需要強推長詞
+
+    // 選擇用來形成觀測 key 的資料源：長→短使用 after，其他使用 before
+    let keySource = isBreakingUp ? currentAssembled : previouslyAssembled
+    let keyCursorRaw = Swift.max(
+      afterHit.range.lowerBound,
+      Swift.min(cursor, afterHit.range.upperBound - 1)
+    )
+    guard keySource.totalKeyCount > 0 else { return nil }
+    let keyCursor = Swift.max(0, Swift.min(keyCursorRaw, keySource.totalKeyCount - 1))
+
+    guard let keyGen = keySource.generateKeyForPerception(cursor: keyCursor) else { return nil }
+
+    return .init(
+      ngramKey: keyGen.ngramKey,
+      candidate: current.value,
+      headReading: keyGen.headReading,
+      scenario: scenario,
+      forceHighScoreOverride: forceHSO,
+      scoreFromLM: afterHit.gram.score
+    )
   }
 }

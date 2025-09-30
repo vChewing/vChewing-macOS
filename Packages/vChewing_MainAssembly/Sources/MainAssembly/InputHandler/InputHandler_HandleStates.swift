@@ -260,51 +260,49 @@ extension InputHandlerProtocol {
 
     // Shift + Left
     if input.isCursorBackward, input.isShiftHold {
-      if compositor.marker > 0 {
+      let moved: Bool = {
         if input.isCommandHold || input.isOptionHold {
           compositor.jumpCursorBySegment(to: .rear, isMarker: true)
         } else {
-          compositor.marker -= 1
-          if isCursorCuttingChar(isMarker: true) {
-            compositor.jumpCursorBySegment(to: .rear, isMarker: true)
-          }
+          compositor.moveCursorStepwise(to: .rear, isMarker: true)
         }
-        var marking = IMEState.ofMarking(
-          displayTextSegments: state.displayTextSegments,
-          markedReadings: Array(compositor.keys[currentMarkedRange()]),
-          cursor: convertCursorForDisplay(compositor.cursor),
-          marker: convertCursorForDisplay(compositor.marker)
-        )
-        marking.tooltipBackupForInputting = state.tooltipBackupForInputting
-        session.switchState(marking.markedRange.isEmpty ? marking.convertedToInputting : marking)
-      } else {
-        errorCallback?("1149908D")
+      }()
+      guard moved else {
+        errorCallback?("D326DEA3")
+        return true
       }
+      var marking = IMEState.ofMarking(
+        displayTextSegments: state.displayTextSegments,
+        markedReadings: Array(compositor.keys[currentMarkedRange()]),
+        cursor: convertCursorForDisplay(compositor.cursor),
+        marker: convertCursorForDisplay(compositor.marker)
+      )
+      marking.tooltipBackupForInputting = state.tooltipBackupForInputting
+      session.switchState(marking.markedRange.isEmpty ? marking.convertedToInputting : marking)
       return true
     }
 
     // Shift + Right
     if input.isCursorForward, input.isShiftHold {
-      if compositor.marker < compositor.length {
+      let moved: Bool = {
         if input.isCommandHold || input.isOptionHold {
           compositor.jumpCursorBySegment(to: .front, isMarker: true)
         } else {
-          compositor.marker += 1
-          if isCursorCuttingChar(isMarker: true) {
-            compositor.jumpCursorBySegment(to: .front, isMarker: true)
-          }
+          compositor.moveCursorStepwise(to: .front, isMarker: true)
         }
-        var marking = IMEState.ofMarking(
-          displayTextSegments: state.displayTextSegments,
-          markedReadings: Array(compositor.keys[currentMarkedRange()]),
-          cursor: convertCursorForDisplay(compositor.cursor),
-          marker: convertCursorForDisplay(compositor.marker)
-        )
-        marking.tooltipBackupForInputting = state.tooltipBackupForInputting
-        session.switchState(marking.markedRange.isEmpty ? marking.convertedToInputting : marking)
-      } else {
+      }()
+      guard moved else {
         errorCallback?("9B51408D")
+        return true
       }
+      var marking = IMEState.ofMarking(
+        displayTextSegments: state.displayTextSegments,
+        markedReadings: Array(compositor.keys[currentMarkedRange()]),
+        cursor: convertCursorForDisplay(compositor.cursor),
+        marker: convertCursorForDisplay(compositor.marker)
+      )
+      marking.tooltipBackupForInputting = state.tooltipBackupForInputting
+      session.switchState(marking.markedRange.isEmpty ? marking.convertedToInputting : marking)
       return true
     }
     return false
@@ -707,11 +705,7 @@ extension InputHandlerProtocol {
       }
       session.switchState(generateStateOfInputting())
     } else {
-      if compositor.cursor < compositor.length {
-        compositor.cursor += 1
-        if isCursorCuttingChar() {
-          compositor.jumpCursorBySegment(to: .front)
-        }
+      if compositor.moveCursorStepwise(to: .front) {
         session.switchState(generateStateOfInputting())
       } else {
         errorCallback?("A96AAD58")
@@ -741,13 +735,16 @@ extension InputHandlerProtocol {
       // Shift + left
       if compositor.cursor > 0 {
         compositor.marker = compositor.cursor
-        if input.isCommandHold || input.isOptionHold {
-          compositor.jumpCursorBySegment(to: .rear, isMarker: true)
-        } else {
-          compositor.marker -= 1
-          if isCursorCuttingChar(isMarker: true) {
+        let moved: Bool = {
+          if input.isCommandHold || input.isOptionHold {
             compositor.jumpCursorBySegment(to: .rear, isMarker: true)
+          } else {
+            compositor.moveCursorStepwise(to: .rear, isMarker: true)
           }
+        }()
+        guard moved else {
+          errorCallback?("D326DEA3")
+          return true
         }
         var marking = IMEState.ofMarking(
           displayTextSegments: compositor.assembledSentence.values,
@@ -769,11 +766,7 @@ extension InputHandlerProtocol {
       }
       session.switchState(generateStateOfInputting())
     } else {
-      if compositor.cursor > 0 {
-        compositor.cursor -= 1
-        if isCursorCuttingChar() {
-          compositor.jumpCursorBySegment(to: .rear)
-        }
+      if compositor.moveCursorStepwise(to: .rear) {
         session.switchState(generateStateOfInputting())
       } else {
         errorCallback?("7045E6F3")

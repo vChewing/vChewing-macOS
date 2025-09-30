@@ -207,18 +207,14 @@ extension InputHandlerProtocol {
       case .kDownArrow, .kLeftArrow, .kRightArrow, .kUpArrow:
         switch input.commonKeyModifierFlags {
         case [.option, .shift] where allowMovingCompositorCursor && input.isCursorForward:
-          if compositor.cursor < compositor.length {
-            compositor.cursor += 1
-            if isCursorCuttingChar() { compositor.jumpCursorBySegment(to: .front) }
+          if compositor.moveCursorStepwise(to: .front) {
             session.switchState(generateStateOfCandidates())
           } else {
             errorCallback?("D3006C85")
           }
           return true
         case [.option, .shift] where allowMovingCompositorCursor && input.isCursorBackward:
-          if compositor.cursor > 0 {
-            compositor.cursor -= 1
-            if isCursorCuttingChar() { compositor.jumpCursorBySegment(to: .rear) }
+          if compositor.moveCursorStepwise(to: .rear) {
             session.switchState(generateStateOfCandidates())
           } else {
             errorCallback?("DE9DAF0D")
@@ -283,18 +279,14 @@ extension InputHandlerProtocol {
       // keycode: 38 = J, 40 = K, 4 = H, 37 = L.
       switch input.keyCode {
       case 38 where allowMovingCompositorCursorByJK, 4 where allowMovingCompositorCursorByHL:
-        if compositor.cursor > 0 {
-          compositor.cursor -= 1
-          if isCursorCuttingChar() { compositor.jumpCursorBySegment(to: .rear) }
+        if compositor.moveCursorStepwise(to: .rear) {
           session.switchState(generateStateOfCandidates())
         } else {
           errorCallback?("6F389AE9")
         }
         return true
       case 40 where allowMovingCompositorCursorByJK, 37 where allowMovingCompositorCursorByHL:
-        if compositor.cursor < compositor.length {
-          compositor.cursor += 1
-          if isCursorCuttingChar() { compositor.jumpCursorBySegment(to: .front) }
+        if compositor.moveCursorStepwise(to: .front) {
           session.switchState(generateStateOfCandidates())
         } else {
           errorCallback?("EDBD27F2")
@@ -378,7 +370,7 @@ extension InputHandlerProtocol {
       }
 
       if shouldAutoSelectCandidate {
-        confirmHighlightedCandidate() // 此時的高亮候選字是第一個候選字。
+        confirmHighlightedCandidate() // 此时的高亮候選字是第一個候選字。
         session.switchState(IMEState.ofAbortion())
         return triageInput(event: input)
       }

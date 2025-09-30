@@ -12,7 +12,7 @@ import Megrez
 // MARK: - 日期時間便捷輸入功能
 
 extension LMAssembly.LMInstantiator {
-  func queryDateTimeUnigrams(with key: String = "") -> [Megrez.Unigram] {
+  func queryDateTimeUnigrams(with key: String = "", keyArray: [String]) -> [Megrez.Unigram] {
     guard let tokenTrigger = TokenTrigger(rawValue: key) else { return [] }
     var results = [Megrez.Unigram]()
     var tokens: [String] = []
@@ -62,7 +62,7 @@ extension LMAssembly.LMInstantiator {
     }
     var i: Double = -99
     for strValue in values.reversed() {
-      results.insert(.init(value: strValue, score: i), at: 0)
+      results.insert(.init(keyArray: keyArray, value: strValue, score: i), at: 0)
       i += 1
     }
     return results

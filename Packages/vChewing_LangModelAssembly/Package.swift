@@ -25,6 +25,7 @@ let package = Package(
         .product(name: "CSQLite3", package: "CSQLite3"),
         .product(name: "LineReader", package: "RMJay_LineReader"),
         .product(name: "Megrez", package: "vChewing_Megrez"),
+        .product(name: "MegrezTestComponents", package: "vChewing_Megrez"),
         .product(name: "SwiftExtension", package: "vChewing_SwiftExtension"),
       ]
     ),

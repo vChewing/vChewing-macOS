@@ -92,12 +92,10 @@ extension InputHandlerProtocol {
     guard isInvalidEdgeCursorSituation() else { return }
     backupCursor = compositor.cursor
     switch prefs.useRearCursorMode {
-    case false where compositor.cursor < compositor.length:
-      compositor.cursor += 1
-      if isCursorCuttingChar() { compositor.jumpCursorBySegment(to: .front) }
-    case true where compositor.cursor > 0:
-      compositor.cursor -= 1
-      if isCursorCuttingChar() { compositor.jumpCursorBySegment(to: .rear) }
+    case false where !compositor.isCursorAtEdge(direction: .front):
+      _ = compositor.moveCursorStepwise(to: .front)
+    case true where !compositor.isCursorAtEdge(direction: .rear):
+      _ = compositor.moveCursorStepwise(to: .rear)
     default: break
     }
   }
@@ -116,8 +114,10 @@ extension InputHandlerProtocol {
   ///   - preConsolidate: 在固化節點之前，先鞏固上下文。該選項可能會破壞在內文組字區內就地輪替候選字詞時的體驗。
   ///   - skipObservation: 不要讓漸退記憶模組對此做出觀察。
   public func consolidateNode(
-    candidate: (keyArray: [String], value: String), respectCursorPushing: Bool = true,
-    preConsolidate: Bool = false, skipObservation: Bool = false
+    candidate: (keyArray: [String], value: String),
+    respectCursorPushing: Bool = true,
+    preConsolidate: Bool = false,
+    skipObservation: Bool = false
   ) {
     let theCandidate: Megrez.KeyValuePaired = .init(candidate)
 
@@ -125,32 +125,29 @@ extension InputHandlerProtocol {
     if preConsolidate { consolidateCursorContext(with: theCandidate) }
 
     // 回到正常流程。
-    if !compositor.overrideCandidate(theCandidate, at: actualNodeCursorPosition) { return }
-    let previousWalk = compositor.assembledSentence
+    var pomObservation: Megrez.PerceptionIntel?
+    let overrideTaskResult = compositor.overrideCandidate(
+      theCandidate, at: actualNodeCursorPosition
+    ) { perceptionIntel in
+      pomObservation = perceptionIntel
+    }
+    if !overrideTaskResult { return }
     // 開始組句。
     walk()
-    let currentWalk = compositor.assembledSentence
 
     // 在可行的情況下更新使用者漸退記憶模組。
-    let currentNode = currentWalk.findGram(at: actualNodeCursorPosition)
-    guard let currentNode = currentNode else { return }
+    guard let pomObservation else { return }
 
-    pomProcessing: if currentNode.gram.score > -12,
+    pomProcessing: if pomObservation.scoreFromLM > -12,
                       prefs.fetchSuggestionsFromPerceptionOverrideModel {
       if skipObservation { break pomProcessing }
       vCLog("POM: Start Observation.")
-      // 這個過程可能會因為使用者漸退記憶模組內部資料錯亂、而導致輸入法在選字時崩潰。
-      // 於是在這裡引入災後狀況察覺專用變數，且先開啟該開關。順利執行完觀察後會關閉。
-      // 一旦輸入法崩潰，會在重啟時發現這個開關是開著的，屆時 AppDelegate 會做出應對。
       prefs.failureFlagForPOMObservation = true
-      // 令漸退記憶模組觀測給定的三元圖。
-      // 這個過程會讓漸退引擎根據當前上下文生成三元圖索引鍵。
-      currentLM.performPOMObservation(
-        walkedBefore: previousWalk, walkedAfter: currentWalk, cursor: actualNodeCursorPosition,
+      currentLM.memorizePerception(
+        (pomObservation.ngramKey, pomObservation.candidate),
         timestamp: Date().timeIntervalSince1970,
         saveCallback: LMMgr.savePerceptionOverrideModelData
       )
-      // 如果沒有出現崩框的話，那就將這個開關復位。
       prefs.failureFlagForPOMObservation = false
     }
 
@@ -178,7 +175,8 @@ extension InputHandlerProtocol {
     var theState = session.state
     let highlightedPair = theState.candidates[index]
     consolidateNode(
-      candidate: highlightedPair, respectCursorPushing: false,
+      candidate: highlightedPair,
+      respectCursorPushing: false,
       preConsolidate: PrefMgr.shared.consolidateContextOnCandidateSelection,
       skipObservation: true
     )
@@ -231,7 +229,7 @@ extension InputHandlerProtocol {
 
   /// 就地增刪詞之後，需要就地更新游標上下文單元圖資料。
   public func updateUnigramData() -> Bool {
-    let result = compositor.update(updateExisting: true)
+    let result = compositor.assignNodes(updateExisting: true)
     defer { walk() }
     return result > 0
   }
@@ -244,12 +242,10 @@ extension InputHandlerProtocol {
   /// 要拿給 Megrez 使用的特殊游標位址，用於各種與節點判定有關的操作。
   /// - Remark: 自 Megrez 引擎 v2.6.2 開始，該參數不得用於獲取候選字詞清單資料。相關函式僅接收原始 cursor 資料。
   public var actualNodeCursorPosition: Int {
-    compositor.cursor
-      -
-      (
-        (compositor.cursor == compositor.length || !prefs.useRearCursorMode) && compositor
-          .cursor > 0 ? 1 : 0
-      )
+    let atFrontEdge = compositor.isCursorAtEdge(direction: .front)
+    let atRearEdge = compositor.isCursorAtEdge(direction: .rear)
+    let delta = ((atFrontEdge || !prefs.useRearCursorMode) && !atRearEdge ? 1 : 0)
+    return compositor.cursor - delta
   }
 
   // MARK: - Extracted methods and functions (Tekkon).
@@ -292,8 +288,9 @@ extension InputHandlerProtocol {
 
   var readingForDisplay: String {
     if !prefs.cassetteEnabled {
-      return composer
-        .getInlineCompositionForDisplay(isHanyuPinyin: prefs.showHanyuPinyinInCompositionBuffer)
+      return composer.getInlineCompositionForDisplay(
+        isHanyuPinyin: prefs.showHanyuPinyinInCompositionBuffer
+      )
     }
     if !prefs.showTranslatedStrokesInCompositionBuffer { return calligrapher }
     return calligrapher.map(\.description).map {
@@ -315,18 +312,12 @@ extension InputHandlerProtocol {
   /// 獲取當前標記得範圍。這個函式只能是函式、而非只讀變數。
   /// - Returns: 當前標記範圍。
   func currentMarkedRange() -> Range<Int> {
-    min(compositor.cursor, compositor.marker) ..< max(compositor.cursor, compositor.marker)
+    compositor.currentMarkedRange()
   }
 
   /// 檢測是否出現游標切斷組字區內字符的情況
   func isCursorCuttingChar(isMarker: Bool = false) -> Bool {
-    let index = isMarker ? compositor.marker : compositor.cursor
-    var isBound = (index == compositor.assembledSentence.contextRange(ofGivenCursor: index).lowerBound)
-    if index == compositor.length { isBound = true }
-    let rawResult = compositor.assembledSentence.findGram(
-      at: index
-    )?.gram.isReadingMismatched ?? false
-    return !isBound && rawResult
+    compositor.isCursorCuttingChar(isMarker: isMarker)
   }
 
   /// 利用給定的讀音鏈來試圖爬取最接近的組字結果（最大相似度估算）。
@@ -460,18 +451,23 @@ extension InputHandlerProtocol {
     if !prefs.fetchSuggestionsFromPerceptionOverrideModel { return arrResult }
     /// 獲取來自漸退記憶模組的建議結果
     let suggestion = currentLM.fetchPOMSuggestion(
-      currentWalk: compositor.assembledSentence, cursor: actualNodeCursorPosition,
+      assembledResult: compositor.assembledSentence,
+      cursor: actualNodeCursorPosition,
       timestamp: Date().timeIntervalSince1970
     )
     let appendables: [(String, Megrez.Unigram)] = suggestion.candidates.map { pomCandidate in
       (
         pomCandidate.keyArray.joined(separator: compositor.separator),
-        .init(value: pomCandidate.value, score: pomCandidate.probability)
+        .init(
+          keyArray: pomCandidate.keyArray,
+          value: pomCandidate.value,
+          score: pomCandidate.probability
+        )
       )
     }
     arrResult.append(contentsOf: appendables)
     if apply {
-      /// 再看有沒有選字建議。有的話就遵循之、讓天權星引擎對指定節錨下的節點複寫權重。
+      // 再看有沒有選字建議。有的話就遵循之、讓天權星引擎對指定節錨下的節點複寫權重。
       if !suggestion.isEmpty, let newestSuggestedCandidate = suggestion.candidates.last {
         let overrideBehavior: Megrez.Node.OverrideType =
           suggestion.forceHighScoreOverride ? .withHighScore : .withTopUnigramScore
@@ -479,17 +475,23 @@ extension InputHandlerProtocol {
           key: newestSuggestedCandidate.keyArray.joined(separator: compositor.separator),
           value: newestSuggestedCandidate.value
         )
+        // 追加步驟：換算正確的游標位置，確保 POM 建議的候選字詞在正確的座標位置進行覆寫操作。
+        let cursorForOverride = suggestion.overrideCursor ?? actualNodeCursorPosition
+        let ngramKey = suggestedPair.toNGramKey
         vCLog(
-          "POM: Suggestion received, overriding the node score of the selected candidate: \(suggestedPair.toNGramKey)"
+          "POM: Overriding the node score of the suggested candidate: \(ngramKey) at \(cursorForOverride)"
         )
         if !compositor.overrideCandidate(
           suggestedPair,
-          at: actualNodeCursorPosition,
-          overrideType: overrideBehavior
+          at: cursorForOverride,
+          overrideType: overrideBehavior,
+          enforceRetokenization: true
         ) {
           compositor.overrideCandidateLiteral(
-            newestSuggestedCandidate.value, at: actualNodeCursorPosition,
-            overrideType: overrideBehavior
+            newestSuggestedCandidate.value,
+            at: cursorForOverride,
+            overrideType: overrideBehavior,
+            enforceRetokenization: true
           )
         }
         walk()
@@ -500,8 +502,10 @@ extension InputHandlerProtocol {
   }
 
   func letComposerAndCalligrapherDoBackSpace() {
-    _ = prefs.cassetteEnabled ? calligrapher = String(calligrapher.dropLast(1)) : composer
-      .doBackSpace()
+    _ =
+      prefs.cassetteEnabled
+        ? calligrapher = String(calligrapher.dropLast(1))
+        : composer.doBackSpace()
   }
 
   /// 檢測某個傳入的按鍵訊號是否為聲調鍵。
@@ -522,7 +526,9 @@ extension InputHandlerProtocol {
     // 注意：這一行為 SHIFT+ALT+主鍵盤數字鍵專用，強制無視不同地區的鍵盤在這個按鍵組合下的符號輸入差異。
     // 但如果去掉「input.isMainAreaNumKey」這個限定條件的話，可能會影響其他依賴 Shift 鍵輸入的符號。
     if input.isMainAreaNumKey,
-       input.commonKeyModifierFlags == [.option, .shift] { return "_shift_alt_punctuation_" }
+       input.commonKeyModifierFlags == [.option, .shift] {
+      return "_shift_alt_punctuation_"
+    }
     var result = ""
     switch (input.isControlHold, input.isOptionHold) {
     case (true, true): result.append("_alt_ctrl_punctuation_")
@@ -600,7 +606,8 @@ extension InputHandlerProtocol {
         for (subPosition, key) in currentNode.keyArray.enumerated() {
           guard values.count > subPosition else { break } // 防呆，應該沒有發生的可能性
           let thePair = Megrez.KeyValuePaired(
-            keyArray: [key], value: values[subPosition]
+            keyArray: [key],
+            value: values[subPosition]
           )
           compositor.overrideCandidate(thePair, at: position)
           position += 1
@@ -644,7 +651,9 @@ extension InputHandlerProtocol {
     }
 
     // 獲取初始範圍
-    let initialRange = currentAssembledSentence.contextRange(ofGivenCursor: actualNodeCursorPosition)
+    let initialRange = currentAssembledSentence.contextRange(
+      ofGivenCursor: actualNodeCursorPosition
+    )
     var rearBoundary = min(initialRange.lowerBound, rearBoundaryEX)
     var frontBoundary = max(initialRange.upperBound, frontBoundaryEX)
 

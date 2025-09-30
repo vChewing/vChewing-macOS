@@ -275,7 +275,8 @@ extension LMAssembly.LMCassette {
   /// 根據給定的字根索引鍵，來獲取資料庫辭典內的對應結果。
   /// - parameters:
   ///   - key: 讀音索引鍵。
-  func unigramsFor(key: String) -> [Megrez.Unigram] {
+  func unigramsFor(key: String, keyArray: [String]? = nil) -> [Megrez.Unigram] {
+    let keyArray = keyArray ?? key.split(separator: "-").map(\.description)
     let arrRaw = charDefMap[key]?.deduplicated ?? []
     var arrRawWildcard: [String] = []
     if let arrRawWildcardValues = charDefWildcardMap[key]?.deduplicated,
@@ -294,7 +295,7 @@ extension LMAssembly.LMCassette {
         return Double(arrResults.count) * -0.001 - 9.5
       }()
       lowestScore = min(theScore, lowestScore)
-      arrResults.append(.init(value: neta, score: theScore))
+      arrResults.append(.init(keyArray: keyArray, value: neta, score: theScore))
     }
     lowestScore = min(-9.5, lowestScore)
     if !arrRawWildcard.isEmpty {
@@ -308,7 +309,7 @@ extension LMAssembly.LMCassette {
           return Double(arrResults.count) * -0.001 - 9.7
         }()
         theScore += lowestScore
-        arrResults.append(.init(value: neta, score: theScore))
+        arrResults.append(.init(keyArray: keyArray, value: neta, score: theScore))
       }
     }
     return arrResults

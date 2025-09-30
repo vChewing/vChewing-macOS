@@ -235,7 +235,10 @@ extension LMAssembly {
     }
 
     public func isPairFiltered(pair: Megrez.KeyValuePaired) -> Bool {
-      lmFiltered.unigramsFor(key: pair.joinedKey()).map(\.value).contains(pair.value)
+      lmFiltered
+        .unigramsFor(key: pair.joinedKey(), keyArray: pair.keyArray)
+        .map(\.value)
+        .contains(pair.value)
     }
 
     /// 插入臨時資料。
@@ -244,11 +247,10 @@ extension LMAssembly {
     ///   - unigram: 要插入的單元圖。
     ///   - isFiltering: 是否有在過濾內容。
     public func insertTemporaryData(
-      keyArray: [String],
       unigram: Megrez.Unigram,
       isFiltering: Bool
     ) {
-      let keyChain = keyArray.joined(separator: "-")
+      let keyChain = unigram.keyArray.joined(separator: "-")
       _ =
         isFiltering
           ? lmFiltered.temporaryMap[keyChain, default: []].append(unigram)
@@ -322,7 +324,12 @@ extension LMAssembly {
     )
       -> Bool {
       factoryDictionaryOnly
-        ? factoryCoreUnigramsFor(key: keyArray.joined(separator: "-")).map(\.value).contains(value)
+        ? factoryCoreUnigramsFor(
+          key: keyArray.joined(separator: "-"),
+          keyArray: keyArray
+        )
+        .map(\.value)
+        .contains(value)
         : unigramsFor(keyArray: keyArray).map(\.value).contains(value)
     }
 
@@ -333,7 +340,7 @@ extension LMAssembly {
     /// - Returns: 是否在庫。
     public func countKeyValuePairs(keyArray: [String], factoryDictionaryOnly: Bool = false) -> Int {
       factoryDictionaryOnly
-        ? factoryCoreUnigramsFor(key: keyArray.joined(separator: "-")).count
+        ? factoryCoreUnigramsFor(key: keyArray.joined(separator: "-"), keyArray: keyArray).count
         : unigramsFor(keyArray: keyArray).count
     }
 
@@ -344,28 +351,37 @@ extension LMAssembly {
       let keyChain = keyArray.joined(separator: "-")
       guard !keyChain.isEmpty else { return [] }
       /// 給空格鍵指定輸出值。
-      if keyChain == " " { return [.init(value: " ")] }
+      if keyChain == " " { return [.init(keyArray: keyArray, value: " ")] }
 
       /// 準備不同的語言模組容器，開始逐漸往容器陣列內塞入資料。
       var rawAllUnigrams: [Megrez.Unigram] = []
 
-      if config.isCassetteEnabled { rawAllUnigrams += Self.lmCassette.unigramsFor(key: keyChain) }
+      if config.isCassetteEnabled {
+        rawAllUnigrams += Self.lmCassette.unigramsFor(key: keyChain, keyArray: keyArray)
+      }
 
       // 如果有檢測到使用者自訂逐字選字語料庫內的相關資料的話，在這裡先插入。
       if config.isSCPCEnabled {
         rawAllUnigrams += Self.lmPlainBopomofo.valuesFor(key: keyChain, isCHS: isCHS).map {
-          Megrez.Unigram(value: $0, score: 0)
+          Megrez.Unigram(keyArray: keyArray, value: $0, score: 0)
         }
       }
 
-      if !config.isCassetteEnabled || config.isCassetteEnabled && keyChain
-        .map(\.description)[0] == "_" {
+      if !config.isCassetteEnabled
+        || config.isCassetteEnabled && keyChain.map(\.description)[0] == "_" {
         // 先給出 NumPad 的結果。
-        rawAllUnigrams += supplyNumPadUnigrams(key: keyChain)
+        rawAllUnigrams += supplyNumPadUnigrams(key: keyChain, keyArray: keyArray)
         // LMMisc 與 LMCore 的 score 在 (-10.0, 0.0) 這個區間內。
-        rawAllUnigrams += factoryUnigramsFor(key: keyChain, column: .theDataCHEW)
+        rawAllUnigrams += factoryUnigramsFor(
+          key: keyChain,
+          keyArray: keyArray,
+          column: .theDataCHEW
+        )
         // 原廠核心辭典內容。
-        var coreUnigramsResult: [Megrez.Unigram] = factoryCoreUnigramsFor(key: keyChain)
+        var coreUnigramsResult: [Megrez.Unigram] = factoryCoreUnigramsFor(
+          key: keyChain,
+          keyArray: keyArray
+        )
         // 如果是繁體中文、且有開啟 CNS11643 全字庫讀音過濾開關的話，對原廠核心辭典內容追加過濾處理：
         if config.filterNonCNSReadings, !isCHS {
           coreUnigramsResult.removeAll { thisUnigram in
@@ -376,25 +392,36 @@ extension LMAssembly {
         rawAllUnigrams += coreUnigramsResult
 
         if config.isCNSEnabled {
-          rawAllUnigrams += factoryUnigramsFor(key: keyChain, column: .theDataCNS)
+          rawAllUnigrams += factoryUnigramsFor(
+            key: keyChain,
+            keyArray: keyArray,
+            column: .theDataCNS
+          )
         }
       }
 
       if config.isSymbolEnabled {
-        rawAllUnigrams += lmUserSymbols.unigramsFor(key: keyChain)
+        rawAllUnigrams += lmUserSymbols.unigramsFor(key: keyChain, keyArray: keyArray)
         if !config.isCassetteEnabled {
-          rawAllUnigrams += factoryUnigramsFor(key: keyChain, column: .theDataSYMB)
+          rawAllUnigrams += factoryUnigramsFor(
+            key: keyChain,
+            keyArray: keyArray,
+            column: .theDataSYMB
+          )
         }
       }
 
       // 用 reversed 指令讓使用者語彙檔案內的詞條優先順序隨著行數增加而逐漸增高。
       // 這樣一來就可以在就地新增語彙時徹底複寫優先權。
       // 將兩句差分也是為了讓 rawUserUnigrams 的類型不受可能的影響。
-      var userPhraseUnigrams = Array(lmUserPhrases.unigramsFor(key: keyChain).reversed())
+      var userPhraseUnigrams = Array(
+        lmUserPhrases.unigramsFor(key: keyChain, keyArray: keyArray).reversed()
+      )
       if keyArray.count == 1, let topScore = rawAllUnigrams.map(\.score).max() {
         // 不再讓使用者自己加入的單漢字讀音權重進入組句體系。
         userPhraseUnigrams = userPhraseUnigrams.map { currentUnigram in
           Megrez.Unigram(
+            keyArray: keyArray,
             value: currentUnigram.value,
             score: Swift.min(topScore + 0.000114514, currentUnigram.score)
           )
@@ -406,7 +433,7 @@ extension LMAssembly {
       cleanupInputTokenHashMapIfNeeded()
 
       // 分析且處理可能存在的 InputToken。
-      rawAllUnigrams = rawAllUnigrams.map { unigram in
+      let rawAllUnigramsToFlat: [[Megrez.Unigram]] = rawAllUnigrams.map { unigram in
         let convertedValues = unigram.value.parseAsInputToken(isCHS: isCHS)
         // 不是 InputToken 的话，直接返回原 Unigram
         guard !convertedValues.isEmpty else { return [unigram] }
@@ -414,7 +441,7 @@ extension LMAssembly {
         var result = [Megrez.Unigram]()
         convertedValues.enumerated().forEach { absDelta, value in
           let newScore: Double = -80 - Double(absDelta) * 0.01
-          result.append(.init(value: value, score: newScore))
+          result.append(.init(keyArray: keyArray, value: value, score: newScore))
           // 僅為 InputToken 生成的 Unigram 寫入 HashMap
           let hashKey = "\(keyChain)\t\(value)".hashValue
           if inputTokenHashMap.count < 5_000 {
@@ -422,10 +449,12 @@ extension LMAssembly {
           }
         }
         return result
-      }.flatMap { $0 }
+      }
+
+      rawAllUnigrams = rawAllUnigramsToFlat.flatMap { $0 }
 
       // 新增與日期、時間、星期有關的單元圖資料。
-      rawAllUnigrams.append(contentsOf: queryDateTimeUnigrams(with: keyChain))
+      rawAllUnigrams.append(contentsOf: queryDateTimeUnigrams(with: keyChain, keyArray: keyArray))
 
       if keyChain == "_punctuation_list" {
         rawAllUnigrams.append(contentsOf: getHaninSymbolMenuUnigrams())
@@ -434,14 +463,25 @@ extension LMAssembly {
       // 提前處理語彙置換。
       if config.isPhraseReplacementEnabled {
         for i in 0 ..< rawAllUnigrams.count {
-          let newValue = lmReplacements.valuesFor(key: rawAllUnigrams[i].value)
+          let oldUnigram = rawAllUnigrams[i]
+          let newValue = lmReplacements.valuesFor(key: oldUnigram.value)
           guard !newValue.isEmpty else { continue }
-          rawAllUnigrams[i].value = newValue
+          let newUnigram = Megrez.Unigram(
+            keyArray: oldUnigram.keyArray,
+            value: newValue,
+            score: oldUnigram.score
+          )
+          rawAllUnigrams[i] = newUnigram
         }
       }
 
       // 讓單元圖陣列自我過濾。在此基礎之上，對於相同詞值的多個單元圖，僅保留權重最大者。
-      rawAllUnigrams.consolidate(filter: .init(lmFiltered.unigramsFor(key: keyChain).map(\.value)))
+      rawAllUnigrams
+        .consolidate(
+          filter: .init(
+            lmFiltered.unigramsFor(key: keyChain, keyArray: keyArray).map(\.value)
+          )
+        )
       return rawAllUnigrams
     }
 
@@ -467,13 +507,22 @@ extension LMAssembly {
     // 聲明使用者語言模組。
     // 使用者語言模組使用多執行緒的話，可能會導致一些問題。有時間再仔細排查看看。
     var lmUserPhrases = LMCoreEX(
-      reverse: true, consolidate: true, defaultScore: 0, forceDefaultScore: false
+      reverse: true,
+      consolidate: true,
+      defaultScore: 0,
+      forceDefaultScore: false
     )
     var lmFiltered = LMCoreEX(
-      reverse: true, consolidate: true, defaultScore: 0, forceDefaultScore: true
+      reverse: true,
+      consolidate: true,
+      defaultScore: 0,
+      forceDefaultScore: true
     )
     var lmUserSymbols = LMCoreEX(
-      reverse: true, consolidate: true, defaultScore: -12.0, forceDefaultScore: true
+      reverse: true,
+      consolidate: true,
+      defaultScore: -12.0,
+      forceDefaultScore: true
     )
     var lmReplacements = LMReplacements()
     var lmAssociates = LMAssociates()

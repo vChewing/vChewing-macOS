@@ -41,7 +41,9 @@ extension SessionProtocol {
 
     let kvPair = state.data.userPhraseKVPair
     var userPhrase = LMMgr.UserPhrase(
-      keyArray: kvPair.keyArray, value: kvPair.value, inputMode: inputMode
+      keyArray: kvPair.keyArray,
+      value: kvPair.value,
+      inputMode: inputMode
     )
     var action = CandidateContextMenuAction.toBoost
     if Self.areWeNerfing { action = .toNerf }
@@ -64,8 +66,11 @@ extension SessionProtocol {
     // 因為上述操作不會立即生效（除非遞交組字區），所以暫時塞入臨時資料記錄。
     // 該臨時資料記錄會在接下來的語言模組資料重載過程中被自動清除。
     inputMode.langModel.insertTemporaryData(
-      keyArray: userPhrase.keyArray,
-      unigram: .init(value: userPhrase.value, score: userPhrase.weight ?? 0),
+      unigram: .init(
+        keyArray: userPhrase.keyArray,
+        value: userPhrase.value,
+        score: userPhrase.weight ?? 0
+      ),
       isFiltering: addToFilter
     )
     // 開始針對使用者漸退模組的清詞處理
@@ -136,12 +141,11 @@ extension SessionProtocol {
     } else if state.type == .ofInputting, state.isCandidateContainer {
       let useShift = inputMode.langModel.areCassetteCandidateKeysShiftHeld
       let theEmoji = useShift ? "⬆️" : "⚡️"
-      return shortened ? theEmoji : "\(theEmoji) " +
-        NSLocalizedString("Quick Candidates", comment: "")
+      return shortened ? theEmoji : "\(theEmoji) " + "Quick Candidates".localized
     } else if PrefMgr.shared.cassetteEnabled {
-      return shortened ? "📼" : "📼 " + NSLocalizedString("CIN Cassette Mode", comment: "")
+      return shortened ? "📼" : "📼 " + "CIN Cassette Mode".localized
     } else if state.type == .ofSymbolTable, state.node.containsCandidateServices {
-      return shortened ? "🌎" : "🌎 " + NSLocalizedString("Service Menu", comment: "")
+      return shortened ? "🌎" : "🌎 " + "Service Menu".localized
     }
     return ""
   }
@@ -164,16 +168,20 @@ extension SessionProtocol {
 
   public func candidatePairs(conv: Bool = false) -> [(keyArray: [String], value: String)] {
     if !state.isCandidateContainer || state.candidates.isEmpty { return [] }
-    if !conv || PrefMgr.shared.cns11643Enabled || state.candidates[0].keyArray.joined()
-      .contains("_punctuation") {
+    let keyChainOfFirstCandidate = state.candidates[0].keyArray.joined()
+    let punctuationKeyHeaderMatched = keyChainOfFirstCandidate.contains("_punctuation")
+    if !conv || PrefMgr.shared.cns11643Enabled || punctuationKeyHeaderMatched {
       return state.candidates
     }
-    let convertedCandidates = state.candidates.map { theCandidatePair -> (
-      keyArray: [String],
-      value: String
-    ) in
+    let convertedCandidates = state.candidates.map {
+      theCandidatePair -> (
+        keyArray: [String],
+        value: String
+      ) in
       var theCandidatePair = theCandidatePair
-      theCandidatePair.value = ChineseConverter.kanjiConversionIfRequired(theCandidatePair.value)
+      theCandidatePair.value = ChineseConverter.kanjiConversionIfRequired(
+        theCandidatePair.value
+      )
       return theCandidatePair
     }
     return convertedCandidates
@@ -230,7 +238,8 @@ extension SessionProtocol {
     case .ofCandidates where (0 ..< state.candidates.count).contains(index):
       let selectedValue = state.candidates[index]
       inputHandler.consolidateNode(
-        candidate: selectedValue, respectCursorPushing: true,
+        candidate: selectedValue,
+        respectCursorPushing: true,
         preConsolidate: PrefMgr.shared.consolidateContextOnCandidateSelection,
         skipObservation: !prefs.fetchSuggestionsFromPerceptionOverrideModel
       )
@@ -279,7 +288,9 @@ extension SessionProtocol {
 
     let rawPair = state.candidates[index]
     var userPhrase = LMMgr.UserPhrase(
-      keyArray: rawPair.keyArray, value: rawPair.value, inputMode: inputMode
+      keyArray: rawPair.keyArray,
+      value: rawPair.value,
+      inputMode: inputMode
     )
     userPhrase.updateWeight(basedOn: action)
     LMMgr.writeUserPhrasesAtOnce(userPhrase, areWeFiltering: action == .toFilter) {
@@ -293,8 +304,11 @@ extension SessionProtocol {
     // 因為上述操作不會立即生效（除非遞交組字區），所以暫時塞入臨時資料記錄。
     // 該臨時資料記錄會在接下來的語言模組資料重載過程中被自動清除。
     inputMode.langModel.insertTemporaryData(
-      keyArray: userPhrase.keyArray,
-      unigram: .init(value: userPhrase.value, score: userPhrase.weight ?? 0),
+      unigram: .init(
+        keyArray: userPhrase.keyArray,
+        value: userPhrase.value,
+        score: userPhrase.weight ?? 0
+      ),
       isFiltering: action == .toFilter
     )
 
@@ -308,24 +322,25 @@ extension SessionProtocol {
     let updateResult = inputHandler.updateUnigramData()
     // 清詞完畢
 
-    var newState: IMEStateProtocol = updateResult
-      ? inputHandler.generateStateOfCandidates(dodge: false)
-      : IMEState.ofCommitting(textToCommit: state.displayedText)
+    var newState: IMEStateProtocol =
+      updateResult
+        ? inputHandler.generateStateOfCandidates(dodge: false)
+        : IMEState.ofCommitting(textToCommit: state.displayedText)
     newState.tooltipDuration = 1.85
     var tooltipMessage = ""
     switch action {
     case .toBoost:
       newState.data.tooltipColorState = .normal
-      tooltipMessage = succeeded ? "+ Succeeded in boosting a candidate." :
-        "⚠︎ Failed from boosting a candidate."
+      tooltipMessage =
+        succeeded ? "+ Succeeded in boosting a candidate." : "⚠︎ Failed from boosting a candidate."
     case .toNerf:
       newState.data.tooltipColorState = .succeeded
-      tooltipMessage = succeeded ? "- Succeeded in nerfing a candidate." :
-        "⚠︎ Failed from nerfing a candidate."
+      tooltipMessage =
+        succeeded ? "- Succeeded in nerfing a candidate." : "⚠︎ Failed from nerfing a candidate."
     case .toFilter:
       newState.data.tooltipColorState = .warning
-      tooltipMessage = succeeded ? "! Succeeded in filtering a candidate." :
-        "⚠︎ Failed from filtering a candidate."
+      tooltipMessage =
+        succeeded ? "! Succeeded in filtering a candidate." : "⚠︎ Failed from filtering a candidate."
     }
     if !succeeded { newState.data.tooltipColorState = .redAlert }
     newState.tooltip = NSLocalizedString(tooltipMessage, comment: "")
