@@ -8,6 +8,81 @@
 
 import AppKit
 
+extension NSColor {
+  fileprivate static var dark: NSColor { NSColor(calibratedWhite: 0.12, alpha: 1) }
+}
+
+// MARK: - RoundedBadgeTextAttachmentCell
+
+private final class RoundedBadgeTextAttachmentCell: NSTextAttachmentCell {
+  // MARK: Lifecycle
+
+  init(
+    label: String,
+    attributes: [NSAttributedString.Key: Any],
+    backgroundColor: NSColor,
+    padding: NSEdgeInsets
+  ) {
+    self.text = NSAttributedString(string: label, attributes: attributes)
+    self.backgroundColor = backgroundColor
+    self.padding = padding
+
+    let constraint = NSSize(
+      width: CGFloat.greatestFiniteMagnitude,
+      height: CGFloat.greatestFiniteMagnitude
+    )
+    let textBounds = text.boundingRect(
+      with: constraint,
+      options: [.usesLineFragmentOrigin, .usesFontLeading]
+    )
+    var size = NSSize(
+      width: ceil(textBounds.width) + padding.left + padding.right,
+      height: ceil(textBounds.height) + padding.top + padding.bottom
+    )
+    if let font = attributes[.font] as? NSFont {
+      let ascent = font.ascender
+      let descent = -font.descender
+      let lineHeight = ceil(ascent + descent)
+      size.height = max(size.height, lineHeight + padding.top + padding.bottom)
+    }
+    self.cachedSize = size
+    self.cornerRadius = size.height / 2
+    super.init()
+  }
+
+  @available(*, unavailable)
+  required init(coder _: NSCoder) {
+    fatalError("init(coder:) has not been implemented")
+  }
+
+  // MARK: Internal
+
+  // MARK: NSTextAttachmentCell
+
+  override func cellSize() -> NSSize { cachedSize }
+
+  override func draw(withFrame cellFrame: NSRect, in controlView: NSView?, characterIndex: Int) {
+    backgroundColor.setFill()
+    NSBezierPath(roundedRect: cellFrame, xRadius: cornerRadius, yRadius: cornerRadius).fill()
+
+    let textRect = NSRect(
+      x: cellFrame.origin.x + padding.left,
+      y: cellFrame.origin.y + padding.bottom,
+      width: cellFrame.width - padding.left - padding.right,
+      height: cellFrame.height - padding.top - padding.bottom
+    )
+    text.draw(in: textRect)
+  }
+
+  // MARK: Private
+
+  private let text: NSAttributedString
+  private let backgroundColor: NSColor
+  private let cornerRadius: CGFloat
+  private let padding: NSEdgeInsets
+  private let cachedSize: NSSize
+}
+
 // MARK: - UI Metrics.
 
 extension CandidatePool {
@@ -41,6 +116,7 @@ extension CandidatePool {
       var accumulatedLineSize: NSSize = .zero
       var currentLineRect: CGRect { .init(origin: currentLineOrigin, size: accumulatedLineSize) }
       let lineHasHighlightedCell = currentLine.hasHighlightedCell
+
       currentLine.forEach { currentCell in
         currentCell.updateMetrics(pool: self, origin: currentOrigin)
         var cellDimension = currentCell.visualDimension
@@ -48,6 +124,7 @@ extension CandidatePool {
           cellDimension.width = max(minimumCellDimension.width, cellDimension.width)
         }
         cellDimension.height = max(minimumCellDimension.height, cellDimension.height)
+
         switch self.layout {
         case .horizontal:
           accumulatedLineSize.width += cellDimension.width
@@ -56,11 +133,13 @@ extension CandidatePool {
           accumulatedLineSize.height += cellDimension.height
           accumulatedLineSize.width = max(accumulatedLineSize.width, cellDimension.width)
         }
+
         if lineHasHighlightedCell {
           switch self.layout {
-          case .horizontal
-            where currentCell.isHighlighted: highlightedCellRect.size.width = cellDimension.width
-          case .vertical: highlightedCellRect.size.width = max(
+          case .horizontal where currentCell.isHighlighted:
+            highlightedCellRect.size.width = cellDimension.width
+          case .vertical:
+            highlightedCellRect.size.width = max(
               highlightedCellRect.size.width,
               cellDimension.width
             )
@@ -71,11 +150,13 @@ extension CandidatePool {
             highlightedCellRect.size.height = cellDimension.height
           }
         }
+
         switch self.layout {
         case .horizontal: currentOrigin.x += cellDimension.width
         case .vertical: currentOrigin.y += cellDimension.height
         }
       }
+
       if lineHasHighlightedCell {
         highlightedLineRect.origin = currentLineRect.origin
         switch self.layout {
@@ -85,6 +166,7 @@ extension CandidatePool {
           highlightedLineRect.size.width = currentLineRect.size.width
         }
       }
+
       switch self.layout {
       case .horizontal:
         highlightedLineRect.size.width = max(currentLineRect.size.width, highlightedLineRect.width)
@@ -97,7 +179,7 @@ extension CandidatePool {
           theCell.visualDimension.width = accumulatedLineSize.width
         }
       }
-      // 終末處理
+
       switch self.layout {
       case .horizontal:
         currentOrigin.x = originDelta
@@ -189,12 +271,15 @@ extension CandidatePool {
       arrLine.enumerated().forEach { cellID, currentCell in
         let cellString = NSMutableAttributedString(
           attributedString: currentCell.attributedString(
-            noSpacePadding: false, withHighlight: true, isMatrix: isMatrix
+            noSpacePadding: false,
+            withHighlight: true,
+            isMatrix: isMatrix
           )
         )
         if lineID != currentLineNumber {
           cellString.addAttribute(
-            .foregroundColor, value: NSColor.gray,
+            .foregroundColor,
+            value: NSColor.gray,
             range: .init(location: 0, length: cellString.string.utf16.count)
           )
         }
@@ -231,12 +316,15 @@ extension CandidatePool {
         let currentCell = lineData[inlineIndex]
         let cellString = NSMutableAttributedString(
           attributedString: currentCell.attributedString(
-            noSpacePadding: false, withHighlight: true, isMatrix: isMatrix
+            noSpacePadding: false,
+            withHighlight: true,
+            isMatrix: isMatrix
           )
         )
         if lineID != currentLineNumber {
           cellString.addAttribute(
-            .foregroundColor, value: NSColor.gray,
+            .foregroundColor,
+            value: NSColor.gray,
             range: .init(location: 0, length: cellString.string.utf16.count)
           )
         }
@@ -271,7 +359,7 @@ extension CandidatePool {
     let result = NSMutableAttributedString(string: "")
     result.append(attributedDescriptionPositionCounter)
     if !tooltip.isEmpty { result.append(attributedDescriptionTooltip) }
-    if !reverseLookupResult.isEmpty { result.append(attributedDescriptionReverseLookp) }
+    if !reverseLookupResult.isEmpty { result.append(attributedDescriptionReverseLookup) }
     result.addAttribute(
       .paragraphStyle,
       value: paragraphStyle,
@@ -281,55 +369,136 @@ extension CandidatePool {
   }
 
   private var attributedDescriptionPositionCounter: NSAttributedString {
-    let positionCounterColorBG = NSApplication.isDarkMode
-      ? NSColor(white: 0.215, alpha: 0.7)
-      : NSColor(white: 0.9, alpha: 0.7)
-    let positionCounterColorText = CandidateCellData.plainTextColor
-    let positionCounterTextSize = max(ceil(CandidateCellData.unifiedSize * 0.7), 11)
-    let attrPositionCounter: [NSAttributedString.Key: Any] = [
-      .kern: 0,
-      .font: Self.blankCell.phraseFontEmphasized(size: positionCounterTextSize),
-      .backgroundColor: positionCounterColorBG,
-      .foregroundColor: positionCounterColorText,
-    ]
-    let positionCounter = NSAttributedString(
-      string: " \(currentPositionLabelText) ", attributes: attrPositionCounter
-    )
-    return positionCounter
+    let attachment = NSTextAttachment()
+    let badgeCell = makePositionCounterBadgeCell()
+    attachment.attachmentCell = badgeCell
+    return .init(attachment: attachment)
   }
 
   private var attributedDescriptionTooltip: NSAttributedString {
     let positionCounterTextSize = max(ceil(CandidateCellData.unifiedSize * 0.7), 11)
+    let tooltipColorBG = Self.shitCell.clientThemeColor ?? Self.shitCell.themeColorCocoa
+    let tooltipColorText = NSColor.white
     let attrTooltip: [NSAttributedString.Key: Any] = [
       .kern: 0,
       .font: Self.blankCell.phraseFontEmphasized(size: positionCounterTextSize),
-      .foregroundColor: CandidateCellData.absoluteTextColor,
+      .foregroundColor: tooltipColorText,
     ]
-    let tooltipText = NSAttributedString(
-      string: " \(tooltip) ", attributes: attrTooltip
+    let fontSize = CGFloat(positionCounterTextSize)
+    let verticalInset = max((fontSize * 0.12).rounded(.up), 1)
+    let horizontalInset = max((fontSize * 0.12).rounded(.up), 1)
+    let attachment = NSTextAttachment()
+    let badgeCell = RoundedBadgeTextAttachmentCell(
+      label: " \(tooltip) ",
+      attributes: attrTooltip,
+      backgroundColor: tooltipColorBG,
+      padding: .init(
+        top: verticalInset,
+        left: horizontalInset,
+        bottom: verticalInset,
+        right: horizontalInset
+      )
     )
-    return tooltipText
+    attachment.attachmentCell = badgeCell
+    return .init(attachment: attachment)
   }
 
-  private var attributedDescriptionReverseLookp: NSAttributedString {
+  private var attributedDescriptionReverseLookup: NSAttributedString {
     let reverseLookupTextSize = max(ceil(CandidateCellData.unifiedSize * 0.6), 9)
+    let badgeFont = Self.blankCell.phraseFont(size: reverseLookupTextSize)
     let attrReverseLookup: [NSAttributedString.Key: Any] = [
       .kern: 0,
-      .font: Self.blankCell.phraseFont(size: reverseLookupTextSize),
+      .font: badgeFont,
       .foregroundColor: CandidateCellData.absoluteTextColor,
     ]
-    let attrReverseLookupSpacer: [NSAttributedString.Key: Any] = [
-      .kern: 0,
-      .font: Self.blankCell.phraseFont(size: reverseLookupTextSize),
-    ]
-    let result = NSMutableAttributedString(string: "", attributes: attrReverseLookupSpacer)
+    var segments: [String] = []
     var addedCounter = 0
     for neta in reverseLookupResult {
-      result.append(NSAttributedString(string: " ", attributes: attrReverseLookupSpacer))
-      result.append(NSAttributedString(string: " \(neta) ", attributes: attrReverseLookup))
+      segments.append(" \(neta) ")
       addedCounter += 1
       if maxLinesPerPage == 1, addedCounter == 2 { break }
     }
-    return result
+    guard !segments.isEmpty else { return NSAttributedString(string: "") }
+    let label = segments.joined()
+    let fontSize = CGFloat(reverseLookupTextSize)
+    let referenceHeight = positionCounterBadgeHeight()
+    let contentHeight = badgeContentHeight(label: label, attributes: attrReverseLookup)
+    let verticalInset = max((referenceHeight - contentHeight) / 2, 1)
+    let horizontalInset = max((fontSize * 0.45).rounded(.up), 4)
+    let attachment = NSTextAttachment()
+    let badgeCell = RoundedBadgeTextAttachmentCell(
+      label: label,
+      attributes: attrReverseLookup,
+      backgroundColor: .clear,
+      padding: .init(
+        top: verticalInset,
+        left: horizontalInset,
+        bottom: verticalInset,
+        right: horizontalInset
+      )
+    )
+    attachment.attachmentCell = badgeCell
+    return .init(attachment: attachment)
+  }
+}
+
+// MARK: - Badge Helpers
+
+extension CandidatePool {
+  fileprivate func makePositionCounterBadgeCell() -> RoundedBadgeTextAttachmentCell {
+    let positionCounterColorBG =
+      NSApplication.isDarkMode
+        ? NSColor(white: 0.215, alpha: 0.7)
+        : NSColor(white: 0.9, alpha: 0.7)
+    let positionCounterColorText = CandidateCellData.plainTextColor
+    let positionCounterTextSize = max(ceil(CandidateCellData.unifiedSize * 0.7), 11)
+    let badgeFont = Self.blankCell.phraseFontEmphasized(size: positionCounterTextSize)
+    let attrPositionCounter: [NSAttributedString.Key: Any] = [
+      .kern: 0,
+      .font: badgeFont,
+      .foregroundColor: positionCounterColorText,
+    ]
+    let fontSize = CGFloat(positionCounterTextSize)
+    let verticalInset = max((fontSize * 0.12).rounded(.up), 1)
+    let horizontalInset = max((fontSize * 0.45).rounded(.up), 4)
+    return RoundedBadgeTextAttachmentCell(
+      label: "\(currentPositionLabelText)",
+      attributes: attrPositionCounter,
+      backgroundColor: positionCounterColorBG,
+      padding: .init(
+        top: verticalInset,
+        left: horizontalInset,
+        bottom: verticalInset,
+        right: horizontalInset
+      )
+    )
+  }
+
+  fileprivate func positionCounterBadgeHeight() -> CGFloat {
+    makePositionCounterBadgeCell()
+      .cellSize().height
+  }
+
+  fileprivate func badgeContentHeight(
+    label: String,
+    attributes: [NSAttributedString.Key: Any]
+  )
+    -> CGFloat {
+    let constraint = NSSize(
+      width: CGFloat.greatestFiniteMagnitude,
+      height: CGFloat.greatestFiniteMagnitude
+    )
+    let textBounds = NSAttributedString(string: label, attributes: attributes).boundingRect(
+      with: constraint,
+      options: [.usesLineFragmentOrigin, .usesFontLeading]
+    )
+    var contentHeight = ceil(textBounds.height)
+    if let font = attributes[.font] as? NSFont {
+      let ascent = font.ascender
+      let descent = -font.descender
+      let lineHeight = ceil(ascent + descent)
+      contentHeight = max(contentHeight, lineHeight)
+    }
+    return contentHeight
   }
 }

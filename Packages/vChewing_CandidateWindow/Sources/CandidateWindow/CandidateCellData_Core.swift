@@ -65,6 +65,8 @@ public class CandidateCellData: Hashable {
   // 該候選字詞在當前行/列內的索引編號
   public var subIndex: Int = 0
 
+  public var clientThemeColor: NSColor?
+
   public var size: Double { Self.unifiedSize }
   public var fontSizeCandidate: Double { size }
   public var fontSizeKey: Double { max(ceil(fontSizeCandidate * 0.6), 11) }
