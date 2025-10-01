@@ -76,6 +76,9 @@ extension VwrCandidateTDKAppKit {
 
   override public func draw(_: NSRect) {
     let sizesCalculated = thePool.metrics
+    let alphaRatio = NSApplication.isDarkMode ? 0.75 : 1
+    let themeColor = controller?.delegate?.clientAccentColor?.withAlphaComponent(alphaRatio)
+    CandidatePool.shitCell.clientThemeColor = themeColor
     // 先塗底色
     if #available(macOS 10.13, *) {
       Self.candidateListBackground
@@ -98,8 +101,6 @@ extension VwrCandidateTDKAppKit {
     let allCells = thePool.candidateLines[thePool.lineRangeForCurrentPage].flatMap { $0 }
     allCells.forEach { currentCell in
       if currentCell.isHighlighted, !cellHighlightedDrawn {
-        let alphaRatio = NSApplication.isDarkMode ? 0.75 : 1
-        let themeColor = controller?.delegate?.clientAccentColor?.withAlphaComponent(alphaRatio)
         (themeColor ?? currentCell.themeColorCocoa).setFill()
         NSBezierPath(
           roundedRect: sizesCalculated.highlightedCandidate,
