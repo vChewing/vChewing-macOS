@@ -125,7 +125,7 @@ extension CandidatePool {
     }
     // 繪製附加內容
     let strPeripherals = attributedDescriptionBottomPanes
-    var dimensionPeripherals = strPeripherals.boundingDimension
+    var dimensionPeripherals = strPeripherals.getBoundingDimension(forceFallback: true)
     dimensionPeripherals.width = ceil(dimensionPeripherals.width)
     dimensionPeripherals.height = ceil(dimensionPeripherals.height)
     if finalContainerOrientation == .horizontal {

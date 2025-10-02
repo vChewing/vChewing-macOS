@@ -7,6 +7,7 @@
 // requirements defined in MIT License.
 
 import AppKit
+import CoreText
 import SwiftExtension
 
 // MARK: - Get Bundle Signature Timestamp
@@ -94,27 +95,219 @@ extension NSSize {
 
 // MARK: - NSAttributedString extension
 
-// Ref: https://developer.apple.com/library/archive/documentation/Cocoa/Conceptual/TextLayout/Tasks/StringHeight.html
-
 extension NSAttributedString {
-  private static let tmpTextStorage = NSTextStorage()
-  private static let tmpLayoutManager = NSLayoutManager()
-  private static let tmpTextContainer = NSTextContainer()
+  // MARK: Public API
 
+  /// 回傳該 NSAttributedString 的邊界尺寸。單行、無附件文本會走 CoreText 快路徑。
   @objc
-  public var boundingDimension: NSSize {
-    Self.tmpTextStorage.setAttributedString(self)
-    if Self.tmpLayoutManager.textContainers.isEmpty || Self.tmpLayoutManager.textContainers
-      .first !== Self.tmpTextContainer {
-      Self.tmpLayoutManager.addTextContainer(Self.tmpTextContainer)
+  public func getBoundingDimension(forceFallback: Bool = false) -> NSSize {
+    guard length > 0 else { return .zero }
+    let shouldFallback = forceFallback || containsLineBreaks || containsAttachments
+    let path: MeasurementPath = shouldFallback ? .textKitFallback : .fastSingleLine
+    return Self.measure(self, using: path)
+  }
+
+  // MARK: Private Helpers
+
+  private enum MeasurementPath: Hashable { case fastSingleLine, textKitFallback }
+
+  private struct CacheKey: Hashable {
+    let stringHash: Int
+    let attributesHash: Int
+    let path: MeasurementPath
+  }
+
+  private static let newlineSet = CharacterSet.newlines
+  private static let cacheQueue = DispatchQueue(
+    label: "org.vChewing.candidateWindow.measure.cache",
+    attributes: .concurrent
+  )
+  private static var cachedSizes: [CacheKey: NSSize] = [:]
+
+  private static let textKitQueue =
+    DispatchQueue(label: "org.vChewing.candidateWindow.measure.textkit")
+  private static let textKitContext: TextKitContext = .init()
+
+  private var containsLineBreaks: Bool { string.rangeOfCharacter(from: Self.newlineSet) != nil }
+
+  private var containsAttachments: Bool {
+    guard length > 0 else { return false }
+    var result = false
+    enumerateAttribute(
+      .attachment,
+      in: NSRange(location: 0, length: length),
+      options: []
+    ) { value, _, stop in
+      guard value != nil else { return }
+      result = true
+      stop.pointee = true
     }
-    if Self.tmpTextStorage.layoutManagers.isEmpty || Self.tmpTextStorage.layoutManagers
-      .first !== Self.tmpLayoutManager {
-      Self.tmpTextStorage.addLayoutManager(Self.tmpLayoutManager)
+    return result
+  }
+
+  private static func measure(
+    _ attributedString: NSAttributedString, using path: MeasurementPath
+  )
+    -> NSSize {
+    let key = cacheKey(for: attributedString, path: path)
+    if let cached = cachedSize(for: key) { return cached }
+
+    let measured: NSSize
+    switch path {
+    case .fastSingleLine: measured = coreTextSize(for: attributedString)
+    case .textKitFallback: measured = textKitSize(for: attributedString)
     }
-    Self.tmpTextContainer.lineFragmentPadding = 0
-    Self.tmpLayoutManager.glyphRange(for: Self.tmpTextContainer)
-    return Self.tmpLayoutManager.usedRect(for: Self.tmpTextContainer).size
+
+    store(size: measured, for: key)
+    return measured
+  }
+
+  private static func cachedSize(for key: CacheKey) -> NSSize? {
+    cacheQueue.sync { cachedSizes[key] }
+  }
+
+  private static func store(size: NSSize, for key: CacheKey) {
+    cacheQueue.async(flags: .barrier) { cachedSizes[key] = size }
+  }
+
+  private static func cacheKey(
+    for attributedString: NSAttributedString, path: MeasurementPath
+  )
+    -> CacheKey {
+    let stringHash = attributedString.string.hashValue
+    let attributesHash = attributeHash(for: attributedString)
+    return CacheKey(stringHash: stringHash, attributesHash: attributesHash, path: path)
+  }
+
+  private static func attributeHash(for attributedString: NSAttributedString) -> Int {
+    guard attributedString.length > 0 else { return 0 }
+    var hasher = Hasher()
+    let fullRange = NSRange(location: 0, length: attributedString.length)
+    attributedString.enumerateAttributes(in: fullRange, options: []) { attributes, range, _ in
+      hasher.combine(range.length)
+      let sortedPairs = attributes.sorted { lhs, rhs in lhs.key.rawValue < rhs.key.rawValue }
+      for (key, value) in sortedPairs {
+        hasher.combine(key.rawValue)
+        switch value {
+        case let font as NSFont:
+          hasher.combine(font.fontName)
+          hasher.combine(font.pointSize)
+          hasher.combine(font.fontDescriptor.symbolicTraits.rawValue)
+        case let number as NSNumber:
+          hasher.combine(number.doubleValue)
+        case let paragraph as NSParagraphStyle:
+          hasher.combine(paragraph.alignment.rawValue)
+          hasher.combine(paragraph.lineBreakMode.rawValue)
+          hasher.combine(paragraph.minimumLineHeight)
+          hasher.combine(paragraph.maximumLineHeight)
+          hasher.combine(paragraph.lineSpacing)
+        case let color as NSColor:
+          if let rgbColor = color.usingColorSpace(.sRGB) {
+            hasher.combine(rgbColor.redComponent)
+            hasher.combine(rgbColor.greenComponent)
+            hasher.combine(rgbColor.blueComponent)
+            hasher.combine(rgbColor.alphaComponent)
+          } else {
+            hasher.combine(color.description)
+          }
+        case let attachment as NSTextAttachment:
+          hasher.combine(ObjectIdentifier(attachment))
+          if #available(macOS 10.11, *) {
+            hasher.combine(NSStringFromRect(attachment.bounds))
+          }
+          if let cell = attachment.attachmentCell {
+            hasher.combine(String(describing: type(of: cell)))
+            let cellSize = cell.cellSize()
+            hasher.combine(cellSize.width)
+            hasher.combine(cellSize.height)
+          }
+        default:
+          hasher.combine(String(describing: value))
+        }
+      }
+    }
+    return hasher.finalize()
+  }
+
+  private static func coreTextSize(
+    for attributedString: NSAttributedString
+  )
+    -> NSSize {
+    let line = CTLineCreateWithAttributedString(attributedString as CFAttributedString)
+    var ascent: CGFloat = 0
+    var descent: CGFloat = 0
+    var leading: CGFloat = 0
+    let typographicWidth = CGFloat(
+      CTLineGetTypographicBounds(line, &ascent, &descent, &leading)
+    )
+    let glyphBounds = CTLineGetBoundsWithOptions(line, [.useGlyphPathBounds])
+    let widthFromGlyphs = max(0, glyphBounds.width)
+    let computedWidth = max(typographicWidth, widthFromGlyphs)
+
+    let fontMetrics = maximumFontMetrics(in: attributedString)
+    let typographicHeight = ascent + descent + leading
+    let fallbackHeight = fontMetrics.ascent + fontMetrics.descent
+    let height = ceil(max(typographicHeight, fallbackHeight))
+
+    return NSSize(width: ceil(max(computedWidth, 0)), height: height)
+  }
+
+  private static func textKitSize(for attributedString: NSAttributedString) -> NSSize {
+    textKitQueue.sync {
+      let context = textKitContext
+      context.textContainer.containerSize = NSSize(
+        width: CGFloat.greatestFiniteMagnitude,
+        height: CGFloat.greatestFiniteMagnitude
+      )
+      context.textStorage.setAttributedString(attributedString)
+      _ = context.layoutManager.glyphRange(for: context.textContainer)
+      context.layoutManager.ensureLayout(for: context.textContainer)
+      var usedRect = context.layoutManager.usedRect(for: context.textContainer)
+      if usedRect.isNull { usedRect = .zero }
+      return NSSize(
+        width: ceil(max(usedRect.width, 0)),
+        height: ceil(max(usedRect.height, 0))
+      )
+    }
+  }
+
+  private static func maximumFontMetrics(in attributedString: NSAttributedString)
+    -> (ascent: CGFloat, descent: CGFloat) {
+    guard attributedString.length > 0 else { return (0, 0) }
+    var maxAscent: CGFloat = 0
+    var maxDescent: CGFloat = 0
+    let fullRange = NSRange(location: 0, length: attributedString.length)
+    attributedString.enumerateAttribute(.font, in: fullRange, options: []) { value, _, _ in
+      guard let font = value as? NSFont else { return }
+      maxAscent = max(maxAscent, font.ascender)
+      maxDescent = max(maxDescent, abs(font.descender))
+    }
+    return (maxAscent, maxDescent)
+  }
+
+  private final class TextKitContext {
+    // MARK: Lifecycle
+
+    init() {
+      self.textStorage = NSTextStorage()
+      self.layoutManager = NSLayoutManager()
+      self.textContainer = NSTextContainer()
+      textContainer.containerSize = NSSize(
+        width: CGFloat.greatestFiniteMagnitude,
+        height: CGFloat.greatestFiniteMagnitude
+      )
+      textContainer.lineFragmentPadding = 0
+      textContainer.widthTracksTextView = false
+      textContainer.heightTracksTextView = false
+      layoutManager.addTextContainer(textContainer)
+      textStorage.addLayoutManager(layoutManager)
+    }
+
+    // MARK: Internal
+
+    let textStorage: NSTextStorage
+    let layoutManager: NSLayoutManager
+    let textContainer: NSTextContainer
   }
 }
 
