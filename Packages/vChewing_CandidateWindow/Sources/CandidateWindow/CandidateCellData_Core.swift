@@ -28,7 +28,7 @@ public class CandidateCellData: Hashable {
       height: Self.unifiedTextHeight
     )
     if displayedText.count > 1 {
-      textDimension.width = attributedString().boundingDimension.width
+      textDimension.width = attributedString().getBoundingDimension().width
     }
   }
 
