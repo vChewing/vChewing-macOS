@@ -7,6 +7,7 @@
 // requirements defined in MIT License.
 
 import AppKit
+import CoreText
 import Shared
 
 // MARK: - PopupCompositionBuffer
@@ -29,7 +30,6 @@ public class PopupCompositionBuffer: NSWindowController {
     panel.isOpaque = false
 
     self.visualEffectView = {
-      // LiquidGlass 效果會嚴重威脅到視窗後特殊背景下的文字可見性，只能棄用。
       if #available(macOS 26.0, *), NSApplication.uxLevel == .liquidGlass {
         #if compiler(>=6.2) && canImport(AppKit, _version: 26.0)
           let resultView = NSGlassEffectView()
@@ -127,14 +127,14 @@ public class PopupCompositionBuffer: NSWindowController {
       return
     }
 
-    let attributedString = compositionView.prepareAttributedString(from: state)
-    compositionView.updateTextContent(attributedString, markedRange: state.u16MarkedRange)
+    compositionView.update(using: state)
 
     window?.orderFront(nil)
     set(windowOrigin: point)
   }
 
   public func hide() {
+    compositionView.prepareForHide()
     window?.orderOut(nil)
   }
 
@@ -187,18 +187,30 @@ internal class PopupCompositionView: NSView {
   // MARK: Lifecycle
 
   override init(frame frameRect: NSRect) {
-    self.messageTextField = NSTextField()
+    self.caretLayer = CALayer()
     super.init(frame: frameRect)
-    setupView()
+    commonInit()
   }
 
   required init?(coder: NSCoder) {
-    self.messageTextField = NSTextField()
+    self.caretLayer = CALayer()
     super.init(coder: coder)
-    setupView()
+    commonInit()
+  }
+
+  deinit {
+    stopCaretBlinking()
   }
 
   // MARK: Internal
+
+  override var isFlipped: Bool {
+    true
+  }
+
+  override var intrinsicContentSize: NSSize {
+    cachedIntrinsicSize
+  }
 
   var locale: String = ""
   var accent: NSColor = .accentColor
@@ -207,26 +219,32 @@ internal class PopupCompositionView: NSView {
 
   var isTypingDirectionVertical = false {
     didSet {
-      if #unavailable(macOS 10.14) {
-        isTypingDirectionVertical = false
+      if oldValue != isTypingDirectionVertical {
+        updateLayout()
       }
     }
   }
 
-  var textShown: NSAttributedString = .init(string: "") {
-    didSet {
-      messageTextField.attributedStringValue = textShown
-      adjustSize()
+  override func draw(_ dirtyRect: NSRect) {
+    super.draw(dirtyRect)
+    guard !attributedText.string.isEmpty else { return }
+
+    let drawingPoint = textDrawingOrigin()
+
+    if usesVerticalTypesetting {
+      // 垂直書寫使用 Core Text
+      drawVerticalText(at: drawingPoint)
+    } else {
+      // 水平書寫使用標準方法
+      attributedText.draw(at: drawingPoint)
     }
   }
 
   func setupTheme(accent: NSColor?, locale: String) {
     self.locale = locale
     if let accent = accent {
-      self.accent =
-        (accent.alphaComponent == 1)
-          ? accent
-          .withAlphaComponent(PopupCompositionBuffer.bgOpacity) : accent
+      self.accent = (accent.alphaComponent == 1)
+        ? accent.withAlphaComponent(PopupCompositionBuffer.bgOpacity) : accent
     } else {
       self.accent = themeColorCocoa
     }
@@ -237,129 +255,54 @@ internal class PopupCompositionView: NSView {
       layer?.backgroundColor = themeColor.withAlphaComponent(0.5).cgColor
     }
     layer?.borderColor = NSColor.white.withAlphaComponent(0.1).cgColor
-    messageTextField.backgroundColor = .clear
-    messageTextField.textColor = textColor
+    caretLayer.backgroundColor = textColor.cgColor
+    needsDisplay = true
   }
 
-  func prepareAttributedString(
-    from state: IMEStateProtocol
-  )
-    -> NSAttributedString {
-    let attrString: NSMutableAttributedString = .init(string: state.displayedTextConverted)
-    let attrPCBHeader: NSMutableAttributedString = .init(string: "　")
-
-    let verticalAttributes: [NSAttributedString.Key: Any] = [
-      .kern: 0,
-      .font: bufferFont(),
-      .verticalGlyphForm: true,
-      .paragraphStyle: {
-        let newStyle = NSMutableParagraphStyle()
-        if #available(macOS 10.13, *) {
-          let fontSize = messageTextField.font?.pointSize ?? 18
-          newStyle.lineSpacing = fontSize / -3
-          newStyle.maximumLineHeight = fontSize
-          newStyle.minimumLineHeight = fontSize
-        }
-        return newStyle
-      }(),
-    ]
-
-    let horizontalAttributes: [NSAttributedString.Key: Any] = [
-      .font: bufferFont(),
-      .kern: 0,
-    ]
-
-    if isTypingDirectionVertical {
-      attrPCBHeader.setAttributes(
-        verticalAttributes,
-        range: NSRange(location: 0, length: attrPCBHeader.length)
-      )
-      attrString.setAttributes(
-        verticalAttributes,
-        range: NSRange(location: 0, length: attrString.length)
-      )
-    } else {
-      attrPCBHeader.setAttributes(
-        horizontalAttributes,
-        range: NSRange(location: 0, length: attrPCBHeader.length)
-      )
-      attrString.setAttributes(
-        horizontalAttributes,
-        range: NSRange(location: 0, length: attrString.length)
-      )
+  func update(using state: IMEStateProtocol) {
+    guard state.hasComposition else {
+      attributedText = NSAttributedString(string: "")
+      currentCaretIndex = 0
+      caretLayer.isHidden = true
+      stopCaretBlinking()
+      updateLayout()
+      return
     }
 
-    var markerAttributes: [NSAttributedString.Key: Any] {
-      var result: [NSAttributedString.Key: Any] = [
-        .kern: 0,
-        .font: bufferFont(),
-        .backgroundColor: markerColor,
-        .foregroundColor: markerTextColor,
-        .markedClauseSegment: 0,
-      ]
-      if isTypingDirectionVertical {
-        result[.paragraphStyle] = verticalAttributes[.paragraphStyle]
-        result[.verticalGlyphForm] = true
-      }
-      return result
-    }
-
-    // 在這個視窗內的下畫線繪製方法就得單獨設計了。
-    attrString.setAttributes(
-      markerAttributes,
-      range: NSRange(
-        location: state.u16MarkedRange.lowerBound,
-        length: state.u16MarkedRange.upperBound - state.u16MarkedRange.lowerBound
-      )
+    let attributed = prepareAttributedString(from: state)
+    attributedText = attributed
+    currentCaretIndex = max(0, min(state.u16Cursor, attributed.length))
+    markedRange = NSRange(
+      location: state.u16MarkedRange.lowerBound,
+      length: state.u16MarkedRange.upperBound - state.u16MarkedRange.lowerBound
     )
-
-    var cursorAttributes: [NSAttributedString.Key: Any] {
-      let shadow = NSShadow()
-      shadow.shadowBlurRadius = 4
-      shadow.shadowOffset.height = 1
-      shadow.shadowColor = .black
-      var result: [NSAttributedString.Key: Any] = [
-        .kern: -18,
-        .font: bufferFont(),
-        .foregroundColor: textColor,
-        .shadow: shadow,
-      ]
-      if isTypingDirectionVertical {
-        result[.paragraphStyle] = verticalAttributes[.paragraphStyle]
-        result[.verticalGlyphForm] = true
-        result[.baselineOffset] = 3
-      } else {
-        result[.baselineOffset] = -2
-      }
-      if #unavailable(macOS 10.13) {
-        result[.kern] = 0
-        result[.baselineOffset] = 0
-      }
-      return result
-    }
-
-    let attrCursor: NSAttributedString =
-      isTypingDirectionVertical
-        ? NSMutableAttributedString(string: "▔", attributes: cursorAttributes)
-        : NSMutableAttributedString(string: "_", attributes: cursorAttributes)
-    attrString.insert(attrCursor, at: state.u16Cursor)
-
-    attrString.insert(attrPCBHeader, at: 0)
-    attrString.insert(attrPCBHeader, at: attrString.length)
-
-    return attrString
+    updateLayout()
   }
 
-  func updateTextContent(_ attributedString: NSAttributedString, markedRange: Range<Int>) {
-    textShown = attributedString
-    if let editor = messageTextField.currentEditor() {
-      editor.selectedRange = NSRange(markedRange)
-    }
+  func prepareForHide() {
+    stopCaretBlinking()
+    caretLayer.isHidden = true
   }
 
   // MARK: Private
 
-  private let messageTextField: NSTextField
+  private let caretLayer: CALayer
+  private var attributedText: NSAttributedString = .init()
+  private var cachedIntrinsicSize: NSSize = .init(width: 300, height: 20)
+  private var currentCaretIndex: Int = 0
+  private var markedRange: NSRange = .init(location: NSNotFound, length: 0)
+
+  private var textPadding: CGFloat {
+    ceil(NSFont.systemFontSize / 2)
+  }
+
+  private var caretThickness: CGFloat {
+    usesVerticalTypesetting ? 2.0 : 1.5
+  }
+
+  private var usesVerticalTypesetting: Bool {
+    isTypingDirectionVertical
+  }
 
   private var themeColorCocoa: NSColor {
     switch locale {
@@ -395,7 +338,7 @@ internal class PopupCompositionView: NSView {
   }
 
   private var markerColor: NSColor {
-    .selectedMenuItemTextColor.withAlphaComponent(0.9)
+    NSColor.selectedMenuItemTextColor.withAlphaComponent(0.9)
   }
 
   private var markerTextColor: NSColor {
@@ -410,53 +353,301 @@ internal class PopupCompositionView: NSView {
     accent.blended(withFraction: NSApplication.isDarkMode ? 0.5 : 0.25, of: .black) ?? accent
   }
 
-  private func setupView() {
+  private func drawVerticalText(at point: CGPoint) {
+    let context: CGContext?
+    if #unavailable(macOS 10.10) {
+      guard let currentNSGraphicsContext = NSGraphicsContext.current else { return }
+      let contextPtr: Unmanaged<CGContext>? = Unmanaged
+        .fromOpaque(currentNSGraphicsContext.graphicsPort)
+      context = contextPtr?.takeUnretainedValue()
+    } else {
+      context = NSGraphicsContext.current?.cgContext
+    }
+    guard let context, attributedText.length > 0 else { return }
+
+    let measuredRect = attributedText.boundingRect(
+      with: CGSize(width: CGFloat.greatestFiniteMagnitude, height: CGFloat.greatestFiniteMagnitude),
+      options: [.usesLineFragmentOrigin, .usesFontLeading]
+    ).integral
+
+    let textWidth: CGFloat
+    let textHeight: CGFloat
+    if usesVerticalTypesetting {
+      textWidth = max(measuredRect.height, 1)
+      textHeight = max(measuredRect.width, 1)
+    } else {
+      textWidth = max(measuredRect.width, 1)
+      textHeight = max(measuredRect.height, 1)
+    }
+
+    let framesetter = CTFramesetterCreateWithAttributedString(attributedText)
+    let frameAttributes: [CFString: Any] = [
+      kCTFrameProgressionAttributeName: CTFrameProgression.rightToLeft.rawValue,
+    ]
+
+    context.saveGState()
+    context.textMatrix = .identity
+    context.translateBy(x: 0, y: bounds.height)
+    context.scaleBy(x: 1, y: -1)
+
+    let path = CGMutablePath()
+    let frameRect = CGRect(
+      x: point.x,
+      y: bounds.height - point.y - textHeight,
+      width: textWidth,
+      height: textHeight
+    )
+    path.addRect(frameRect)
+
+    let frame = CTFramesetterCreateFrame(
+      framesetter,
+      CFRangeMake(0, attributedText.length),
+      path,
+      frameAttributes as CFDictionary
+    )
+    CTFrameDraw(frame, context)
+    context.restoreGState()
+  }
+
+  private func commonInit() {
     wantsLayer = true
     shadow = .init()
     shadow?.shadowBlurRadius = 6
     shadow?.shadowColor = .black
     shadow?.shadowOffset = .zero
+    layer?.cornerRadius = 9
+    layer?.borderWidth = 1
+    layer?.masksToBounds = true
+    layer?.contentsScale = NSScreen.main?.backingScaleFactor ?? 2
 
-    if let layer = layer {
-      layer.cornerRadius = 9
-      layer.borderWidth = 1
-      layer.masksToBounds = true
+    caretLayer.opacity = 1
+    caretLayer.isHidden = true
+    caretLayer.cornerRadius = 0
+    caretLayer.backgroundColor = textColor.cgColor
+    layer?.addSublayer(caretLayer)
+
+    layer?.isGeometryFlipped = true
+    caretLayer.isGeometryFlipped = true
+
+    updateLayout()
+  }
+
+  private func updateLayout() {
+    let usedRect = attributedText.boundingRect(
+      with: CGSize(width: CGFloat.greatestFiniteMagnitude, height: CGFloat.greatestFiniteMagnitude),
+      options: [.usesLineFragmentOrigin, .usesFontLeading]
+    )
+
+    let contentWidth: CGFloat
+    let contentHeight: CGFloat
+    if usesVerticalTypesetting {
+      contentWidth = ceil(max(usedRect.height, 1))
+      contentHeight = ceil(max(usedRect.width, 1))
+    } else {
+      contentWidth = ceil(max(usedRect.width, 1))
+      contentHeight = ceil(max(usedRect.height, 1))
+    }
+    let paddedWidth = max(contentWidth + textPadding * 2, textPadding * 2)
+    let paddedHeight = max(contentHeight + textPadding * 2, textPadding * 2)
+
+    let newSize = NSSize(width: paddedWidth, height: paddedHeight)
+
+    if cachedIntrinsicSize != newSize {
+      cachedIntrinsicSize = newSize
+      invalidateIntrinsicContentSize()
+      onSizeChanged?(newSize)
     }
 
-    messageTextField.isEditable = false
-    messageTextField.isSelectable = false
-    messageTextField.isBezeled = false
-    messageTextField.textColor = NSColor.selectedMenuItemTextColor
-    messageTextField.drawsBackground = true
-    messageTextField.backgroundColor = NSColor.clear
-    messageTextField.font = .systemFont(ofSize: 18) // 不是最終值。
-    addSubview(messageTextField)
+    needsDisplay = true
+    updateCaretLayer()
+  }
+
+  private func updateCaretLayer() {
+    caretLayer.removeAnimation(forKey: "blink")
+    caretLayer.removeAnimation(forKey: "verticalPulse")
+
+    guard !attributedText.string.isEmpty || currentCaretIndex == 0 else {
+      caretLayer.isHidden = true
+      return
+    }
+
+    let caretRect = caretRectForCurrentText()
+    let origin = textDrawingOrigin()
+    caretLayer.frame = caretRect.offsetBy(dx: origin.x, dy: origin.y).integral
+
+    // 針對直書模式優化游標樣式
+    if usesVerticalTypesetting {
+      caretLayer.cornerRadius = caretLayer.frame.height / 2
+      caretLayer.backgroundColor = textColor.withAlphaComponent(0.9).cgColor
+    } else {
+      caretLayer.cornerRadius = caretLayer.frame.width / 2
+      caretLayer.backgroundColor = textColor.cgColor
+    }
+
+    caretLayer.isHidden = false
+    startCaretBlinking()
+  }
+
+  private func caretRectForCurrentText() -> CGRect {
+    let font = bufferFont()
+    let defaultHeight = font.pointSize * 1.2
+    let enhancedThickness = usesVerticalTypesetting ? caretThickness * 1.5 : caretThickness
+
+    guard !attributedText.string.isEmpty else {
+      if usesVerticalTypesetting {
+        // 直書模式：横向的遊標，稍微加寬以提高可見度
+        return CGRect(x: 0, y: 0, width: defaultHeight * 0.9, height: enhancedThickness)
+      } else {
+        // 橫書模式：縱向的遊標
+        return CGRect(x: 0, y: 0, width: caretThickness, height: defaultHeight)
+      }
+    }
+
+    let clamped = max(0, min(currentCaretIndex, attributedText.length))
+
+    // 計算光標前的文字範圍
+    let prefixString = attributedText.attributedSubstring(from: NSRange(
+      location: 0,
+      length: clamped
+    ))
+    let prefixRect = prefixString.boundingRect(
+      with: CGSize(width: CGFloat.greatestFiniteMagnitude, height: CGFloat.greatestFiniteMagnitude),
+      options: [.usesLineFragmentOrigin, .usesFontLeading]
+    )
+
+    if usesVerticalTypesetting {
+      // 直書模式：遊標沿縱向排列，寬度覆蓋整個行距
+      let caretAdvance = max(prefixRect.width, 0)
+      let caretSpan = max(prefixRect.height, font.pointSize * 1.1)
+      return CGRect(
+        x: -caretThickness,
+        y: caretAdvance,
+        width: caretSpan + caretThickness * 2,
+        height: enhancedThickness
+      )
+    } else {
+      // 橫書模式：遊標是縱向的線條
+      return CGRect(
+        x: prefixRect.width,
+        y: 0,
+        width: caretThickness,
+        height: defaultHeight
+      )
+    }
+  }
+
+  private func textDrawingOrigin() -> CGPoint {
+    CGPoint(x: textPadding, y: textPadding)
+  }
+
+  private func startCaretBlinking() {
+    caretLayer.removeAnimation(forKey: "blink")
+    caretLayer.removeAnimation(forKey: "verticalPulse")
+
+    if usesVerticalTypesetting {
+      // 直書模式：使用脈衝效果 + 透明度變化
+      let opacityAnimation = CABasicAnimation(keyPath: "opacity")
+      opacityAnimation.fromValue = 1.0
+      opacityAnimation.toValue = 0.3
+      opacityAnimation.duration = 0.4
+      opacityAnimation.autoreverses = true
+      opacityAnimation.repeatCount = .infinity
+
+      let scaleAnimation = CABasicAnimation(keyPath: "transform.scale")
+      scaleAnimation.fromValue = 1.0
+      scaleAnimation.toValue = 1.2
+      scaleAnimation.duration = 0.4
+      scaleAnimation.autoreverses = true
+      scaleAnimation.repeatCount = .infinity
+
+      let groupAnimation = CAAnimationGroup()
+      groupAnimation.animations = [opacityAnimation, scaleAnimation]
+      groupAnimation.duration = 0.4
+      groupAnimation.repeatCount = .infinity
+
+      caretLayer.add(groupAnimation, forKey: "verticalPulse")
+    } else {
+      // 橫書模式：標準閃爍動畫
+      let animation = CABasicAnimation(keyPath: "opacity")
+      animation.fromValue = 1.0
+      animation.toValue = 0.0
+      animation.duration = 0.35
+      animation.autoreverses = true
+      animation.repeatCount = .infinity
+      caretLayer.add(animation, forKey: "blink")
+    }
+  }
+
+  private func stopCaretBlinking() {
+    caretLayer.removeAnimation(forKey: "blink")
+    caretLayer.removeAnimation(forKey: "verticalPulse")
+    // 重置 layer 狀態
+    caretLayer.opacity = 1.0
+    caretLayer.transform = CATransform3DIdentity
+  }
+
+  private func prepareAttributedString(from state: IMEStateProtocol) -> NSAttributedString {
+    let attrString = NSMutableAttributedString(string: state.displayedTextConverted)
+
+    let baseFont = bufferFont()
+    let paragraphStyle: NSParagraphStyle = {
+      let style = NSMutableParagraphStyle()
+      style.lineBreakMode = .byClipping
+      // 直書模式需要特殊設定
+      if usesVerticalTypesetting, #available(macOS 10.13, *) {
+        // 使用較緊密的行高以改善直書顯示
+        let fontSize = baseFont.pointSize
+        style.maximumLineHeight = fontSize * 1.1
+        style.minimumLineHeight = fontSize * 1.1
+        style.lineSpacing = -fontSize * 0.1
+      }
+      return style
+    }()
+
+    var baseAttributes: [NSAttributedString.Key: Any] = [
+      .font: baseFont,
+      .foregroundColor: textColor,
+      .paragraphStyle: paragraphStyle,
+      .kern: 0,
+    ]
+
+    if usesVerticalTypesetting {
+      baseAttributes[.verticalGlyphForm] = true
+      // 直書模式的額外設定
+      baseAttributes[NSAttributedString.Key(rawValue: "CTVerticalForms")] = true
+    }
+
+    attrString.setAttributes(baseAttributes, range: NSRange(location: 0, length: attrString.length))
+
+    let markRange = state.u16MarkedRange
+    if markRange.lowerBound < markRange.upperBound,
+       markRange.upperBound <= attrString.length {
+      var markerAttributes: [NSAttributedString.Key: Any] = [
+        .backgroundColor: markerColor,
+        .foregroundColor: markerTextColor,
+        .font: baseFont,
+        .markedClauseSegment: 0,
+        .kern: 0,
+      ]
+      if usesVerticalTypesetting {
+        markerAttributes[.verticalGlyphForm] = true
+        markerAttributes[.paragraphStyle] = paragraphStyle
+        markerAttributes[NSAttributedString.Key(rawValue: "CTVerticalForms")] = true
+      }
+      attrString.addAttributes(
+        markerAttributes,
+        range: NSRange(
+          location: markRange.lowerBound,
+          length: markRange.upperBound - markRange.lowerBound
+        )
+      )
+    }
+
+    return attrString
   }
 
   private func bufferFont(size: CGFloat = 18) -> NSFont {
     let defaultResult: CTFont? = CTFontCreateUIFontForLanguage(.system, size, locale as CFString)
     return defaultResult ?? NSFont.systemFont(ofSize: size)
-  }
-
-  private func adjustSize() {
-    messageTextField.sizeToFit()
-    var rect = messageTextField.frame
-    if isTypingDirectionVertical {
-      rect = .init(x: rect.minX, y: rect.minY, width: rect.height * 1.5, height: rect.width)
-    }
-    var bigRect = rect
-    bigRect.size.width += NSFont.systemFontSize
-    bigRect.size.height += NSFont.systemFontSize
-    rect.origin.x = ceil(NSFont.systemFontSize / 2)
-    rect.origin.y = ceil(NSFont.systemFontSize / 2)
-    if isTypingDirectionVertical {
-      messageTextField.boundsRotation = 90
-    } else {
-      messageTextField.boundsRotation = 0
-    }
-    messageTextField.frame = rect
-
-    // 通知外部尺寸變更
-    onSizeChanged?(bigRect.size)
   }
 }
