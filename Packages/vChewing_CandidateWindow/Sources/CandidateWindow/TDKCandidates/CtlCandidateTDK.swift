@@ -248,91 +248,13 @@ public class CtlCandidateTDK: CtlCandidate, NSWindowDelegate {
 
     // 設置背景視覺效果視圖
     if let visualEffectView {
-      visualEffectView.translatesAutoresizingMaskIntoConstraints = false
       containerView.addSubview(visualEffectView)
-      let visualConstraints = [
-        NSLayoutConstraint(
-          item: visualEffectView,
-          attribute: .top,
-          relatedBy: .equal,
-          toItem: containerView,
-          attribute: .top,
-          multiplier: 1,
-          constant: 0
-        ),
-        NSLayoutConstraint(
-          item: visualEffectView,
-          attribute: .leading,
-          relatedBy: .equal,
-          toItem: containerView,
-          attribute: .leading,
-          multiplier: 1,
-          constant: 0
-        ),
-        NSLayoutConstraint(
-          item: visualEffectView,
-          attribute: .trailing,
-          relatedBy: .equal,
-          toItem: containerView,
-          attribute: .trailing,
-          multiplier: 1,
-          constant: 0
-        ),
-        NSLayoutConstraint(
-          item: visualEffectView,
-          attribute: .bottom,
-          relatedBy: .equal,
-          toItem: containerView,
-          attribute: .bottom,
-          multiplier: 1,
-          constant: 0
-        ),
-      ]
-      containerView.addConstraints(visualConstraints)
+      visualEffectView.pinEdges(to: containerView)
     }
 
     // 添加候選窗口內容視圖
-    candidateView.translatesAutoresizingMaskIntoConstraints = false
     containerView.addSubview(candidateView)
-    let candidateConstraints = [
-      NSLayoutConstraint(
-        item: candidateView,
-        attribute: .top,
-        relatedBy: .equal,
-        toItem: containerView,
-        attribute: .top,
-        multiplier: 1,
-        constant: 0
-      ),
-      NSLayoutConstraint(
-        item: candidateView,
-        attribute: .leading,
-        relatedBy: .equal,
-        toItem: containerView,
-        attribute: .leading,
-        multiplier: 1,
-        constant: 0
-      ),
-      NSLayoutConstraint(
-        item: candidateView,
-        attribute: .trailing,
-        relatedBy: .equal,
-        toItem: containerView,
-        attribute: .trailing,
-        multiplier: 1,
-        constant: 0
-      ),
-      NSLayoutConstraint(
-        item: candidateView,
-        attribute: .bottom,
-        relatedBy: .equal,
-        toItem: containerView,
-        attribute: .bottom,
-        multiplier: 1,
-        constant: 0
-      ),
-    ]
-    containerView.addConstraints(candidateConstraints)
+    candidateView.pinEdges(to: containerView)
 
     Self.currentView = containerView
     window.isOpaque = false
