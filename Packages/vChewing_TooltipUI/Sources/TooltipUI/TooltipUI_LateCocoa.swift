@@ -24,16 +24,26 @@ public class TooltipUI_LateCocoa: NSWindowController, TooltipUIProtocol {
     )
     panel.level = NSWindow.Level(Int(max(CGShieldingWindowLevel(), kCGPopUpMenuWindowLevel)) + 2)
     panel.hasShadow = true
-    panel.backgroundColor = NSColor.clear
-    panel.isOpaque = false
+    if #available(macOS 10.13, *) {
+      panel.backgroundColor = .clear
+      panel.isOpaque = false
+    } else {
+      panel.backgroundColor = NSColor.windowBackgroundColor
+      panel.isOpaque = true
+    }
     panel.isMovable = false
     self.tooltipView = TooltipContentView(frame: NSRect(origin: .zero, size: contentRect.size))
-    panel.contentView = tooltipView
     tooltipView.wantsLayer = true
     tooltipView.layer?.cornerRadius = 7
     tooltipView.layer?.backgroundColor = NSColor.controlBackgroundColor.cgColor
     tooltipView.layer?.masksToBounds = true
     tooltipView.textColor = NSColor.textColor
+    tooltipView.translatesAutoresizingMaskIntoConstraints = true
+    if #available(macOS 10.13, *) {
+      panel.contentView = tooltipView
+    } else {
+      panel.contentView = tooltipView
+    }
     Self.currentWindow = panel
     super.init(window: panel)
 
@@ -141,7 +151,10 @@ public class TooltipUI_LateCocoa: NSWindowController, TooltipUIProtocol {
       backgroundColor = textColor
       textColor = colorInterchange
     }
-    window?.contentView?.layer?.backgroundColor = backgroundColor.cgColor
+    tooltipView.layer?.backgroundColor = backgroundColor.cgColor
+    if let window, window.isOpaque {
+      window.backgroundColor = backgroundColor
+    }
     tooltipView.textColor = textColor
   }
 
@@ -539,3 +552,5 @@ private final class TooltipContentView: NSView {
     return ceil(maxAdvance)
   }
 }
+
+// MARK: - ShadowHostingView
