@@ -26,8 +26,13 @@ public class PopupCompositionBuffer: NSWindowController {
     )
     panel.level = NSWindow.Level(Int(max(CGShieldingWindowLevel(), kCGPopUpMenuWindowLevel)) + 1)
     panel.hasShadow = true
-    panel.backgroundColor = .clear
-    panel.isOpaque = false
+    if #available(macOS 10.13, *) {
+      panel.backgroundColor = .clear
+      panel.isOpaque = false
+    } else {
+      panel.backgroundColor = NSColor.windowBackgroundColor
+      panel.isOpaque = true
+    }
 
     self.visualEffectView = {
       if #available(macOS 26.0, *), NSApplication.uxLevel == .liquidGlass {
@@ -43,7 +48,7 @@ public class PopupCompositionBuffer: NSWindowController {
           return resultView
         #endif
       }
-      if #available(macOS 10.10, *), NSApplication.uxLevel != .none {
+      if #available(macOS 10.13, *), NSApplication.uxLevel != .none {
         let resultView = NSVisualEffectView()
         resultView.material = .titlebar
         resultView.blendingMode = .behindWindow
@@ -81,23 +86,25 @@ public class PopupCompositionBuffer: NSWindowController {
       panel.contentView = containerView
     } else {
       compositionView.translatesAutoresizingMaskIntoConstraints = true
-      compositionView.frame = NSRect(origin: .zero, size: contentRect.size)
+      compositionView.frame = NSRect(origin: .zero, size: viewSize)
       panel.contentView = compositionView
       panel.contentView?.wantsLayer = true
       panel.contentView?.shadow = .init()
       panel.contentView?.shadow?.shadowBlurRadius = 6
       panel.contentView?.shadow?.shadowColor = .black
       panel.contentView?.shadow?.shadowOffset = .zero
-      if let layer = panel.contentView?.layer {
-        layer.cornerRadius = 9
-        layer.borderWidth = 1
-        layer.masksToBounds = true
-      }
     }
 
     // 設置尺寸變更回調
-    compositionView.onSizeChanged = { [weak panel] newSize in
-      panel?.setFrame(NSRect(origin: panel?.frame.origin ?? .zero, size: newSize), display: true)
+    compositionView.onSizeChanged = { [weak panel, weak compositionView = self.compositionView] newSize in
+      if compositionView?.translatesAutoresizingMaskIntoConstraints ?? false {
+        compositionView?.frame = NSRect(origin: .zero, size: newSize)
+      }
+      panel?.setFrame(
+        NSRect(origin: panel?.frame.origin ?? .zero, size: newSize),
+        display: true
+      )
+      panel?.invalidateShadow()
     }
 
     Self.currentWindow = panel
@@ -118,7 +125,18 @@ public class PopupCompositionBuffer: NSWindowController {
 
   public func sync(accent: NSColor?, locale: String) {
     compositionView.setupTheme(accent: accent, locale: locale)
-    window?.backgroundColor = .clear
+    if let window {
+      if window.isOpaque {
+        if let cgColor = compositionView.layer?.backgroundColor,
+           let nsColor = NSColor(cgColor: cgColor) {
+          window.backgroundColor = nsColor
+        } else {
+          window.backgroundColor = NSColor.windowBackgroundColor
+        }
+      } else {
+        window.backgroundColor = .clear
+      }
+    }
   }
 
   public func show(state: IMEStateProtocol, at point: NSPoint) {
@@ -242,17 +260,21 @@ internal class PopupCompositionView: NSView {
 
   func setupTheme(accent: NSColor?, locale: String) {
     self.locale = locale
+    let alpha = desiredBackgroundAlpha
     if let accent = accent {
-      self.accent = (accent.alphaComponent == 1)
-        ? accent.withAlphaComponent(PopupCompositionBuffer.bgOpacity) : accent
+      if accent.alphaComponent == 1 {
+        self.accent = accent.withAlphaComponent(alpha)
+      } else {
+        self.accent = accent
+      }
     } else {
       self.accent = themeColorCocoa
     }
     let themeColor = adjustedThemeColor
-    if #unavailable(macOS 10.9) {
-      layer?.backgroundColor = themeColor.cgColor
-    } else {
+    if #available(macOS 10.13, *) {
       layer?.backgroundColor = themeColor.withAlphaComponent(0.5).cgColor
+    } else {
+      layer?.backgroundColor = themeColor.cgColor
     }
     layer?.borderColor = NSColor.white.withAlphaComponent(0.1).cgColor
     caretLayer.backgroundColor = textColor.cgColor
@@ -308,35 +330,16 @@ internal class PopupCompositionView: NSView {
   }
 
   private var themeColorCocoa: NSColor {
+    let alpha = desiredBackgroundAlpha
     switch locale {
     case "zh-Hans":
-      return .init(
-        red: 255 / 255,
-        green: 64 / 255,
-        blue: 53 / 255,
-        alpha: PopupCompositionBuffer.bgOpacity
-      )
+      return .init(red: 255 / 255, green: 64 / 255, blue: 53 / 255, alpha: alpha)
     case "zh-Hant":
-      return .init(
-        red: 5 / 255,
-        green: 127 / 255,
-        blue: 255 / 255,
-        alpha: PopupCompositionBuffer.bgOpacity
-      )
+      return .init(red: 5 / 255, green: 127 / 255, blue: 255 / 255, alpha: alpha)
     case "ja":
-      return .init(
-        red: 167 / 255,
-        green: 137 / 255,
-        blue: 99 / 255,
-        alpha: PopupCompositionBuffer.bgOpacity
-      )
+      return .init(red: 167 / 255, green: 137 / 255, blue: 99 / 255, alpha: alpha)
     default:
-      return .init(
-        red: 5 / 255,
-        green: 127 / 255,
-        blue: 255 / 255,
-        alpha: PopupCompositionBuffer.bgOpacity
-      )
+      return .init(red: 5 / 255, green: 127 / 255, blue: 255 / 255, alpha: alpha)
     }
   }
 
@@ -354,6 +357,13 @@ internal class PopupCompositionView: NSView {
 
   private var adjustedThemeColor: NSColor {
     accent.blended(withFraction: NSApplication.isDarkMode ? 0.5 : 0.25, of: .black) ?? accent
+  }
+
+  private var desiredBackgroundAlpha: CGFloat {
+    if #available(macOS 10.13, *) {
+      return PopupCompositionBuffer.bgOpacity
+    }
+    return 1
   }
 
   private func drawVerticalText(at point: CGPoint) {
