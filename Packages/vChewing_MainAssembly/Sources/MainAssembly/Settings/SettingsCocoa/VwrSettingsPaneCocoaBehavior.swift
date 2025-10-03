@@ -62,7 +62,7 @@ extension SettingsPanesCocoa {
               UserDef.kAlsoConfirmAssociatedCandidatesByEnter.render(fixWidth: innerContentWidth)
               UserDef.kUseSpaceToCommitHighlightedSCPCCandidate.render(fixWidth: innerContentWidth)
             }?.boxed()
-            if #available(macOS 10.14, *) {
+            if #available(macOS 10.13, *) {
               NSStackView.buildSection(width: innerContentWidth) {
                 if #available(macOS 12, *) {
                   UserDef.kShowNotificationsWhenTogglingCapsLock.render(fixWidth: innerContentWidth)
