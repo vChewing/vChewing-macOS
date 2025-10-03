@@ -279,7 +279,10 @@ private final class TooltipContentView: NSView {
   }
 
   private var usesVerticalTypesetting: Bool {
-    writingDirection == .vertical
+    if #available(macOS 10.13, *) {
+      return writingDirection == .vertical
+    }
+    return false
   }
 
   private func commonInit() {
