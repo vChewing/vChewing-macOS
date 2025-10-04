@@ -61,7 +61,6 @@
 		5BF9DA2A28840E6200DBD48E /* template-replacements.txt in Resources */ = {isa = PBXBuildFile; fileRef = 5BF9DA2528840E6200DBD48E /* template-replacements.txt */; };
 		5BF9DA2B28840E6200DBD48E /* template-userphrases.txt in Resources */ = {isa = PBXBuildFile; fileRef = 5BF9DA2628840E6200DBD48E /* template-userphrases.txt */; };
 		5BF9DA2D288427E000DBD48E /* template-associatedPhrases-cht.txt in Resources */ = {isa = PBXBuildFile; fileRef = 5BF9DA2C2884247800DBD48E /* template-associatedPhrases-cht.txt */; };
-		5BFC63C628D48806004A77B7 /* NSAttributedTextView in Frameworks */ = {isa = PBXBuildFile; productRef = 5BFC63C528D48806004A77B7 /* NSAttributedTextView */; };
 		5BFC63C928D49754004A77B7 /* IMKUtils in Frameworks */ = {isa = PBXBuildFile; productRef = 5BFC63C828D49754004A77B7 /* IMKUtils */; };
 		5BFC63CC28D49BBC004A77B7 /* UpdateSputnik in Frameworks */ = {isa = PBXBuildFile; productRef = 5BFC63CB28D49BBC004A77B7 /* UpdateSputnik */; };
 		5BFC63CF28D4ACA3004A77B7 /* LangModelAssembly in Frameworks */ = {isa = PBXBuildFile; productRef = 5BFC63CE28D4ACA3004A77B7 /* LangModelAssembly */; };
@@ -188,7 +187,6 @@
 		5BF9DA2528840E6200DBD48E /* template-replacements.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; lineEnding = 0; path = "template-replacements.txt"; sourceTree = "<group>"; usesTabs = 0; };
 		5BF9DA2628840E6200DBD48E /* template-userphrases.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; lineEnding = 0; path = "template-userphrases.txt"; sourceTree = "<group>"; usesTabs = 0; };
 		5BF9DA2C2884247800DBD48E /* template-associatedPhrases-cht.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; lineEnding = 0; name = "template-associatedPhrases-cht.txt"; path = "../Data/Sources/LibVanguardChewingData/Resources/components/cht/template-associatedPhrases-cht.txt"; sourceTree = "<group>"; };
-		5BFC63C428D487AE004A77B7 /* Fuziki_NSAttributedTextView */ = {isa = PBXFileReference; lastKnownFileType = wrapper; name = Fuziki_NSAttributedTextView; path = Packages/Fuziki_NSAttributedTextView; sourceTree = "<group>"; };
 		5BFC63C728D49511004A77B7 /* vChewing_IMKUtils */ = {isa = PBXFileReference; lastKnownFileType = wrapper; name = vChewing_IMKUtils; path = Packages/vChewing_IMKUtils; sourceTree = "<group>"; };
 		5BFC63CA28D49B2B004A77B7 /* vChewing_UpdateSputnik */ = {isa = PBXFileReference; lastKnownFileType = wrapper; name = vChewing_UpdateSputnik; path = Packages/vChewing_UpdateSputnik; sourceTree = "<group>"; };
 		5BFC63CD28D4AC98004A77B7 /* vChewing_LangModelAssembly */ = {isa = PBXFileReference; lastKnownFileType = wrapper; name = vChewing_LangModelAssembly; path = Packages/vChewing_LangModelAssembly; sourceTree = "<group>"; };
@@ -234,7 +232,6 @@
 				5BDB7A3928D4824A001AC277 /* BookmarkManager in Frameworks */,
 				5B963CA328D5C23600DCEE88 /* SwiftExtension in Frameworks */,
 				5B40113928D7050D00A9D4CB /* Shared in Frameworks */,
-				5BFC63C628D48806004A77B7 /* NSAttributedTextView in Frameworks */,
 				5BDB7A3B28D4824A001AC277 /* FolderMonitor in Frameworks */,
 				5BA8C30328DF0360004C5CC4 /* CandidateWindow in Frameworks */,
 				5BC5E01E28DDE4770094E427 /* NotifierUI in Frameworks */,
@@ -372,7 +369,6 @@
 			isa = PBXGroup;
 			children = (
 				5BDB7A3128D47587001AC277 /* DanielGalasko_FolderMonitor */,
-				5BFC63C428D487AE004A77B7 /* Fuziki_NSAttributedTextView */,
 				5BAD67E12ADAB62D005A4842 /* HangarRash_SwiftyCapsLockToggler */,
 				5BDB7A3028D47587001AC277 /* Jad_BookmarkManager */,
 				5BDB7A3428D47587001AC277 /* Qwertyyb_ShiftKeyUpChecker */,
@@ -542,7 +538,6 @@
 				5BDB7A4028D4824A001AC277 /* Megrez */,
 				5BDB7A4428D4824A001AC277 /* ShiftKeyUpChecker */,
 				5BDB7A4628D4824A001AC277 /* Tekkon */,
-				5BFC63C528D48806004A77B7 /* NSAttributedTextView */,
 				5BFC63C828D49754004A77B7 /* IMKUtils */,
 				5BFC63CB28D49BBC004A77B7 /* UpdateSputnik */,
 				5BFC63CE28D4ACA3004A77B7 /* LangModelAssembly */,
@@ -1397,10 +1392,6 @@
 		5BDB7A4628D4824A001AC277 /* Tekkon */ = {
 			isa = XCSwiftPackageProductDependency;
 			productName = Tekkon;
-		};
-		5BFC63C528D48806004A77B7 /* NSAttributedTextView */ = {
-			isa = XCSwiftPackageProductDependency;
-			productName = NSAttributedTextView;
 		};
 		5BFC63C828D49754004A77B7 /* IMKUtils */ = {
 			isa = XCSwiftPackageProductDependency;
