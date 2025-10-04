@@ -126,12 +126,38 @@ extension InputHandlerProtocol {
 
     // 回到正常流程。
     var pomObservation: Megrez.PerceptionIntel?
-    let overrideTaskResult = compositor.overrideCandidate(
-      theCandidate, at: actualNodeCursorPosition
-    ) { perceptionIntel in
-      pomObservation = perceptionIntel
+    var pomObservationPrimary: Megrez.PerceptionIntel?
+    var pomObservation2ndary: Megrez.PerceptionIntel?
+    // 嘗試覆寫：最多四次；偶數次強制 retokenization；
+    // 前兩次失敗後 bleach 掉可能干擾覆寫的 POM 觀測記憶，再進行後兩次。
+    var overrideTaskResult = false
+    var attempt = 0
+    while attempt < 4, !overrideTaskResult {
+      attempt += 1
+      let enforce = attempt % 2 == 0 // 偶數次強制 retokenization
+      overrideTaskResult = compositor.overrideCandidate(
+        theCandidate, at: actualNodeCursorPosition,
+        enforceRetokenization: enforce
+      ) { perceptionIntel in
+        // 奇數次寫入 primary，偶數次寫入 secondary。
+        if attempt % 2 == 1 {
+          pomObservationPrimary = perceptionIntel
+        } else {
+          pomObservation2ndary = perceptionIntel
+        }
+      }
+      // 前兩次都失敗 -> bleach & 清空嫌疑觀測干擾資料，然後進入後兩次循環。
+      if !overrideTaskResult, attempt == 2 {
+        currentLM.bleachSpecifiedPOMSuggestions(targets: [
+          pomObservationPrimary?.candidate,
+          pomObservation2ndary?.candidate,
+        ].compactMap { $0 })
+        pomObservationPrimary = nil
+        pomObservation2ndary = nil
+      }
     }
     if !overrideTaskResult { return }
+    pomObservation = pomObservation2ndary ?? pomObservationPrimary
     // 開始組句。
     walk()
 
