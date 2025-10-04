@@ -9,7 +9,6 @@
 import AppKit
 import CandidateWindow
 import IMKUtils
-import NSAttributedTextView
 import Shared
 
 // MARK: - Tooltip Display and Candidate Display Methods
