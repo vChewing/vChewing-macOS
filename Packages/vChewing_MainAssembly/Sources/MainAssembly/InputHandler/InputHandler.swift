@@ -53,9 +53,6 @@ public final class InputHandler: InputHandlerProtocol {
   /// 當前的打字模式。
   public var currentTypingMethod: TypingMethod = .vChewingFactory
 
-  /// 漸退模組的衰減指數
-  public let kEpsilon: Double = 0.000001
-
   public var strCodePointBuffer = "" // 內碼輸入專用組碼區
   public var calligrapher = "" // 磁帶專用組筆區
   public var composer: Tekkon.Composer = .init() // 注拼槽
