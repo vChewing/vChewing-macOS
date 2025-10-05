@@ -979,7 +979,7 @@ extension InputHandlerProtocol {
   /// - Returns: 告知 IMK「該按鍵是否已經被輸入法攔截處理」。
   func handleCapsLockAndAlphanumericalMode(input: InputSignalProtocol) -> Bool? {
     guard let session = session else { return nil }
-    let handleCapsLock = !PrefMgr.shared.bypassNonAppleCapsLockHandling && input.isCapsLockOn
+    let handleCapsLock = !prefs.bypassNonAppleCapsLockHandling && input.isCapsLockOn
     guard handleCapsLock || session.isASCIIMode else { return nil }
 
     // 低於 macOS 12 的系統無法偵測 CapsLock 的啟用狀態，

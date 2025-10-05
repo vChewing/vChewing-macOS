@@ -200,7 +200,7 @@ extension InputHandlerProtocol {
     consolidateNode(
       candidate: highlightedPair,
       respectCursorPushing: false,
-      preConsolidate: PrefMgr.shared.consolidateContextOnCandidateSelection,
+      preConsolidate: prefs.consolidateContextOnCandidateSelection,
       skipObservation: true
     )
     theState.data.displayTextSegments = compositor.assembledSentence.values
