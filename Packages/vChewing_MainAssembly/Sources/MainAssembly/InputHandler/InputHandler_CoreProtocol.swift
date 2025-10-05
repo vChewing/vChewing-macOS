@@ -40,9 +40,6 @@ public protocol InputHandlerProtocol: AnyObject {
   /// 當前的打字模式。
   var currentTypingMethod: TypingMethod { get set }
 
-  /// 漸退模組的衰減指數
-  var kEpsilon: Double { get }
-
   var strCodePointBuffer: String { get set } // 內碼輸入專用組碼區
   var calligrapher: String { get set } // 磁帶專用組筆區
   var composer: Tekkon.Composer { get set } // 注拼槽
