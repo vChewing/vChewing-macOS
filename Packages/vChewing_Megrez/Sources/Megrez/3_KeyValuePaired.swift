@@ -175,7 +175,7 @@ extension Megrez.Compositor {
   @discardableResult
   public func overrideCandidate(
     _ candidate: Megrez.KeyValuePaired, at location: Int,
-    overrideType: Megrez.Node.OverrideType = .withHighScore,
+    overrideType: Megrez.Node.OverrideType = .withSpecified,
     enforceRetokenization: Bool = false,
     perceptionHandler: ((Megrez.PerceptionIntel) -> ())? = nil
   )
@@ -184,6 +184,7 @@ extension Megrez.Compositor {
       keyArray: candidate.keyArray,
       at: location,
       value: candidate.value,
+      score: candidate.score < 0 ? candidate.score : nil,
       type: overrideType,
       enforceRetokenization: enforceRetokenization,
       perceptionHandler: perceptionHandler
@@ -203,7 +204,7 @@ extension Megrez.Compositor {
   @discardableResult
   public func overrideCandidateLiteral(
     _ candidate: String,
-    at location: Int, overrideType: Megrez.Node.OverrideType = .withHighScore,
+    at location: Int, overrideType: Megrez.Node.OverrideType = .withSpecified,
     enforceRetokenization: Bool = false,
     perceptionHandler: ((Megrez.PerceptionIntel) -> ())? = nil
   )
@@ -212,6 +213,7 @@ extension Megrez.Compositor {
       keyArray: nil,
       at: location,
       value: candidate,
+      score: nil,
       type: overrideType,
       enforceRetokenization: enforceRetokenization,
       perceptionHandler: perceptionHandler
@@ -225,6 +227,7 @@ extension Megrez.Compositor {
   ///   - keyArray: 索引鍵陣列，也就是詞音配對當中的讀音。
   ///   - location: 游標位置。
   ///   - value: 資料值。
+  ///   - score: 指定分數。
   ///   - type: 指定覆寫行為。
   ///   - enforceRetokenization: 是否強制重新分詞，對所有重疊節點施作重置與降權，以避免殘留舊節點狀態。
   ///   - perceptionHandler: 覆寫成功後用於回傳觀測智慧的回呼。
@@ -233,6 +236,7 @@ extension Megrez.Compositor {
     keyArray: [String]?,
     at location: Int,
     value: String,
+    score specifiedScore: Double? = nil,
     type: Megrez.Node.OverrideType,
     enforceRetokenization: Bool,
     perceptionHandler: ((Megrez.PerceptionIntel) -> ())? = nil
@@ -272,6 +276,18 @@ extension Megrez.Compositor {
           errorHappened = true
           break overrideTask
         }
+        if type == .withSpecified {
+          let baselineOverrideScore = 114_514.0
+          let desiredScore = specifiedScore ?? Swift.max(
+            anchor.node.overridingScore,
+            baselineOverrideScore
+          )
+          anchor.node.overrideStatus = .init(
+            overridingScore: desiredScore,
+            currentOverrideType: .withSpecified,
+            currentUnigramIndex: anchor.node.currentUnigramIndex
+          )
+        }
         overridden = anchor
         break
       }
@@ -287,7 +303,7 @@ extension Megrez.Compositor {
       let currentAssembled = assemble()
       if let perceptionHandler, !previouslyAssembled.isEmpty {
         // 供新版觀測 API（前/後路徑比較 + 三情境分類）
-        let perceptedIntel = Megrez.makePerceptionObservation(
+        let perceptedIntel = Megrez.makePerceptionIntel(
           previouslyAssembled: previouslyAssembled,
           currentAssembled: currentAssembled,
           cursor: beforeCursor
@@ -316,7 +332,7 @@ extension Megrez.Compositor {
           }
           anchor.node.overrideStatus = .init(
             overridingScore: demotionScore,
-            currentOverrideType: .withHighScore,
+            currentOverrideType: .withSpecified,
             currentUnigramIndex: anchor.node.currentUnigramIndex
           )
         }
@@ -397,7 +413,7 @@ extension Megrez {
   ///   - currentAssembled: 候選字覆寫行為後的組句結果。
   ///   - cursor: 游標。
   /// - Returns: 觀測上下文結果。
-  public static func makePerceptionObservation(
+  public static func makePerceptionIntel(
     previouslyAssembled: [Megrez.GramInPath],
     currentAssembled: [Megrez.GramInPath],
     cursor: Int
@@ -427,17 +443,42 @@ extension Megrez {
     case (false, false): .sameLenSwap
     }
     let forceHSO = isShortToLong // 只有短→長時需要強推長詞
-
-    // 選擇用來形成觀測 key 的資料源：長→短使用 after，其他使用 before
-    let keySource = isBreakingUp ? currentAssembled : previouslyAssembled
+    // 選擇用來形成觀測 key 的資料源：同長或變長時優先採用覆寫後的 walk
+    let primaryKeySource: [Megrez.GramInPath]
+    let fallbackKeySource: [Megrez.GramInPath]
+    switch scenario {
+    case .sameLenSwap:
+      primaryKeySource = currentAssembled
+      fallbackKeySource = previouslyAssembled
+    case .shortToLong:
+      primaryKeySource = previouslyAssembled
+      fallbackKeySource = currentAssembled
+    case .longToShort:
+      primaryKeySource = currentAssembled
+      fallbackKeySource = previouslyAssembled
+    }
     let keyCursorRaw = Swift.max(
       afterHit.range.lowerBound,
       Swift.min(cursor, afterHit.range.upperBound - 1)
     )
-    guard keySource.totalKeyCount > 0 else { return nil }
-    let keyCursor = Swift.max(0, Swift.min(keyCursorRaw, keySource.totalKeyCount - 1))
+    guard primaryKeySource.totalKeyCount > 0 || fallbackKeySource.totalKeyCount > 0 else {
+      return nil
+    }
+    let keyCursorPrimary = Swift.max(
+      0,
+      Swift.min(keyCursorRaw, max(primaryKeySource.totalKeyCount - 1, 0))
+    )
+    var keyGen = primaryKeySource.generateKeyForPerception(cursor: keyCursorPrimary)
 
-    guard let keyGen = keySource.generateKeyForPerception(cursor: keyCursor) else { return nil }
+    if keyGen == nil, fallbackKeySource.totalKeyCount > 0 {
+      let keyCursorFallback = Swift.max(
+        0,
+        Swift.min(keyCursorRaw, max(fallbackKeySource.totalKeyCount - 1, 0))
+      )
+      keyGen = fallbackKeySource.generateKeyForPerception(cursor: keyCursorFallback)
+    }
+
+    guard let keyGen else { return nil }
 
     return .init(
       ngramKey: keyGen.ngramKey,
