@@ -181,14 +181,15 @@ public class LMMgr {
 
   // MARK: POM
 
-  public static func savePerceptionOverrideModelData() {
+  public static func savePerceptionOverrideModelData(_ saveAllModes: Bool = true) {
     let globalQueue = DispatchQueue(
       label: "LMAssembly_POM",
       qos: .unspecified,
       attributes: .concurrent
     )
     let group = DispatchGroup()
-    Shared.InputMode.validCases.forEach { mode in
+    let cases = saveAllModes ? [IMEApp.currentInputMode] : Shared.InputMode.allCases
+    cases.forEach { mode in
       group.enter()
       globalQueue.async {
         mode.langModel.savePOMData()
