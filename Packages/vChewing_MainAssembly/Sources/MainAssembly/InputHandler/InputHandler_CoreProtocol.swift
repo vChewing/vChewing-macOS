@@ -500,7 +500,7 @@ extension InputHandlerProtocol {
       // 再看有沒有選字建議。有的話就遵循之、讓天權星引擎對指定節錨下的節點複寫權重。
       if !suggestion.isEmpty, let newestSuggestedCandidate = suggestion.candidates.last {
         let overrideBehavior: Megrez.Node.OverrideType =
-          suggestion.forceHighScoreOverride ? .withHighScore : .withTopUnigramScore
+          suggestion.forceHighScoreOverride ? .withSpecified : .withTopGramScore
         let suggestedPair: Megrez.KeyValuePaired = .init(
           key: newestSuggestedCandidate.keyArray.joined(separator: assembler.separator),
           value: newestSuggestedCandidate.value

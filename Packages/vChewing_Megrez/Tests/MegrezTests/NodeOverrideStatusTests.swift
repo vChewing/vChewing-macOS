@@ -10,6 +10,8 @@ import XCTest
 private typealias SimpleLM = MegrezTestComponents.SimpleLM
 private typealias MockLM = MegrezTestComponents.MockLM
 
+private let baselineOverrideScore: Double = 114_514
+
 // MARK: - NodeOverrideStatusTests
 
 final class NodeOverrideStatusTests: XCTestCase {
@@ -38,12 +40,12 @@ final class NodeOverrideStatusTests: XCTestCase {
   func testNodeOverrideStatus() throws {
     let status = NodeOverrideStatus(
       overridingScore: 100.0,
-      currentOverrideType: .withHighScore,
+      currentOverrideType: .withSpecified,
       currentUnigramIndex: 2
     )
 
     XCTAssertEqual(status.overridingScore, 100.0)
-    XCTAssertEqual(status.currentOverrideType, .withHighScore)
+    XCTAssertEqual(status.currentOverrideType, .withSpecified)
     XCTAssertEqual(status.currentUnigramIndex, 2)
 
     // 測試 Codable
@@ -74,29 +76,29 @@ final class NodeOverrideStatusTests: XCTestCase {
     // 測試初始狀態
     let initialStatus = node1.overrideStatus
     XCTAssertEqual(initialStatus.overridingScore, 114_514)
-    XCTAssertEqual(initialStatus.currentOverrideType, .withNoOverrides)
+    XCTAssertNil(initialStatus.currentOverrideType)
     XCTAssertEqual(initialStatus.currentUnigramIndex, 0)
 
     // 修改節點狀態
     node1.overridingScore = 200.0
-    _ = node1.selectOverrideUnigram(value: node1.unigrams[0].value, type: .withHighScore)
+    _ = node1.selectOverrideUnigram(value: node1.unigrams[0].value, type: .withSpecified)
 
     // 驗證通過 overrideStatus 能正確讀取
     let modifiedStatus = node1.overrideStatus
-    XCTAssertEqual(modifiedStatus.overridingScore, 200.0)
-    XCTAssertEqual(modifiedStatus.currentOverrideType, .withHighScore)
+    XCTAssertEqual(modifiedStatus.overridingScore, baselineOverrideScore)
+    XCTAssertEqual(modifiedStatus.currentOverrideType, .withSpecified)
     XCTAssertEqual(modifiedStatus.currentUnigramIndex, 0)
 
     // 測試通過 overrideStatus 設定狀態
     let newStatus = NodeOverrideStatus(
       overridingScore: 300.0,
-      currentOverrideType: .withTopUnigramScore,
+      currentOverrideType: .withTopGramScore,
       currentUnigramIndex: 0
     )
     node1.overrideStatus = newStatus
 
     XCTAssertEqual(node1.overridingScore, 300.0)
-    XCTAssertEqual(node1.currentOverrideType, .withTopUnigramScore)
+    XCTAssertEqual(node1.currentOverrideType, .withTopGramScore)
     XCTAssertEqual(node1.currentUnigramIndex, 0)
   }
 
@@ -112,14 +114,14 @@ final class NodeOverrideStatusTests: XCTestCase {
     // 嘗試設定溢出的索引
     let overflowStatus = NodeOverrideStatus(
       overridingScore: 100.0,
-      currentOverrideType: .withHighScore,
+      currentOverrideType: .withSpecified,
       currentUnigramIndex: 999 // 遠超出 unigrams 陣列範圍
     )
 
     node.overrideStatus = overflowStatus
 
     // 應該觸發重設，狀態回到初始值
-    XCTAssertEqual(node.currentOverrideType, .withNoOverrides)
+    XCTAssertNil(node.currentOverrideType)
     XCTAssertEqual(node.currentUnigramIndex, 0)
   }
 
@@ -138,12 +140,12 @@ final class NodeOverrideStatusTests: XCTestCase {
     // 修改一些節點的狀態
     if let node = compositor.segments[0][1] {
       node.overridingScore = 500.0
-      _ = node.selectOverrideUnigram(value: node.unigrams[0].value, type: .withHighScore)
+      _ = node.selectOverrideUnigram(value: node.unigrams[0].value, type: .withSpecified)
     }
 
     if let node = compositor.segments[1][2] {
       node.overridingScore = 600.0
-      _ = node.selectOverrideUnigram(value: node.unigrams[0].value, type: .withTopUnigramScore)
+      _ = node.selectOverrideUnigram(value: node.unigrams[0].value, type: .withTopGramScore)
     }
 
     // 創建鏡照
@@ -159,7 +161,7 @@ final class NodeOverrideStatusTests: XCTestCase {
 
     // 驗證狀態確實被重設
     if let node = compositor.segments[0][1] {
-      XCTAssertEqual(node.currentOverrideType, .withNoOverrides)
+      XCTAssertNil(node.currentOverrideType)
       XCTAssertEqual(node.currentUnigramIndex, 0)
     }
 
@@ -168,13 +170,13 @@ final class NodeOverrideStatusTests: XCTestCase {
 
     // 驗證狀態被正確恢復
     if let node = compositor.segments[0][1] {
-      XCTAssertEqual(node.overridingScore, 500.0)
-      XCTAssertEqual(node.currentOverrideType, .withHighScore)
+      XCTAssertEqual(node.overridingScore, baselineOverrideScore)
+      XCTAssertEqual(node.currentOverrideType, .withSpecified)
     }
 
     if let node = compositor.segments[1][2] {
-      XCTAssertEqual(node.overridingScore, 600.0)
-      XCTAssertEqual(node.currentOverrideType, .withTopUnigramScore)
+      XCTAssertEqual(node.overridingScore, baselineOverrideScore)
+      XCTAssertEqual(node.currentOverrideType, .withTopGramScore)
     }
   }
 
@@ -192,7 +194,7 @@ final class NodeOverrideStatusTests: XCTestCase {
     compositor.segments.forEach { segment in
       segment.values.forEach { node in
         node.overridingScore = Double.random(in: 100 ... 1_000)
-        _ = node.selectOverrideUnigram(value: node.unigrams[0].value, type: .withHighScore)
+        _ = node.selectOverrideUnigram(value: node.unigrams[0].value, type: .withSpecified)
         modifiedNodes += 1
       }
     }
@@ -209,8 +211,8 @@ final class NodeOverrideStatusTests: XCTestCase {
 
     // 鏡照應該包含所有修改的狀態
     for (_, status) in mirror {
-      XCTAssertEqual(status.currentOverrideType, .withHighScore)
-      XCTAssertTrue(status.overridingScore >= 100 && status.overridingScore <= 1_000)
+      XCTAssertEqual(status.currentOverrideType, .withSpecified)
+      XCTAssertEqual(status.overridingScore, baselineOverrideScore)
     }
 
     // 現在清空原始 compositor 的狀態
@@ -227,7 +229,7 @@ final class NodeOverrideStatusTests: XCTestCase {
     var restoredNodes = 0
     compositor.segments.forEach { segment in
       segment.values.forEach { node in
-        if node.currentOverrideType == .withHighScore {
+        if node.currentOverrideType == .withSpecified {
           restoredNodes += 1
         }
       }

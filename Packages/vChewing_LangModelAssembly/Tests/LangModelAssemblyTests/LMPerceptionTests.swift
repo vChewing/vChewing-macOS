@@ -348,14 +348,14 @@ final class LMPerceptionTests: XCTestCase {
     let overrideResult = validationCompositor.overrideCandidate(
       candidateSuggested,
       at: cursorForOverride,
-      overrideType: suggestion.forceHighScoreOverride ? .withHighScore : .withTopUnigramScore,
+      overrideType: suggestion.forceHighScoreOverride ? .withSpecified : .withTopGramScore,
       enforceRetokenization: true
     )
     if !overrideResult {
       validationCompositor.overrideCandidateLiteral(
         candidateSuggested.value,
         at: cursorForOverride,
-        overrideType: suggestion.forceHighScoreOverride ? .withHighScore : .withTopUnigramScore
+        overrideType: suggestion.forceHighScoreOverride ? .withSpecified : .withTopGramScore
       )
     }
     validationCompositor.assemble()

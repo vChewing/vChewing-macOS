@@ -50,7 +50,7 @@ extension MegrezTestComponents {
         if line.isEmpty || line.hasPrefix("#") {
           return
         }
-        let linestream = line.split(separator: " ")
+        let linestream = line.split { $0 == " " || $0 == "\t" }
         guard linestream.count == 3 else { return } // Megrez 不支援 Bigram。
         let col0 = String(linestream[0])
         let col1 = String(linestream[1])

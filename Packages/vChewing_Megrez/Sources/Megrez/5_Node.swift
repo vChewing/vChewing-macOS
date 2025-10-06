@@ -31,7 +31,7 @@ extension Megrez {
       self.keyArray = keyArray
       self.segLength = max(segLength, 0)
       self.unigrams = unigrams
-      self.currentOverrideType = .withNoOverrides
+      self.currentOverrideType = nil
     }
 
     /// 通過複製現有節點來建立新副本。
@@ -50,19 +50,14 @@ extension Megrez {
 
     // MARK: Public
 
-    /// 三種不同的針對一個節點的覆寫行為。
-    /// - withNoOverrides: 無覆寫行為。
-    /// - withTopUnigramScore: 使用指定的單元圖資料值來覆寫該節點，但卻使用
-    /// 當前狀態下權重最高的單元圖的權重數值。打比方說，如果該節點內的單元圖陣列是
-    ///  [("a", -114), ("b", -514), ("c", -1919)] 的話，指定該覆寫行為則會導致該節
-    ///  點返回的結果為 ("c", -114)。該覆寫行為多用於諸如使用者半衰記憶模組的建議
-    ///  行為。被覆寫的這個節點的狀態可能不會再被組句行為擅自改回。該覆寫行為無法
-    ///  防止其它節點被組句函式所支配。這種情況下就需要用到 overridingScore。
-    /// - withHighScore: 將該節點權重覆寫為 overridingScore，使其被組句函式所青睞。
+    /// 針對節點可能套用的覆寫行為種類。
+    /// - withTopGramScore: 專用於雙元圖的自動選取功能，但效力低於 withSpecified 模式。
+    /// 該覆寫行為無法防止其它節點被組句函式所支配。這種情況下就需要用到 overridingScore。
+    /// - withSpecified: 將該節點權重覆寫為 overridingScore，使其被組句函式所青睞。
+    /// 但是這個選項也可以允許搭配過低的 overridingScore 來起到 demote 的效果。
     public enum OverrideType: Int, Codable {
-      case withNoOverrides = 0
-      case withTopUnigramScore = 1
-      case withHighScore = 2
+      case withTopGramScore = 1
+      case withSpecified = 2
     }
 
     /// 節點的唯一識別符。
@@ -83,8 +78,8 @@ extension Megrez {
     public private(set) var segLength: Int
     /// 單元圖陣列。
     public private(set) var unigrams: [Megrez.Unigram]
-    /// 該節點目前的覆寫狀態種類。
-    public private(set) var currentOverrideType: Node.OverrideType
+    /// 該節點目前的覆寫狀態種類。為 `nil` 時表示無覆寫行為。
+    public private(set) var currentOverrideType: Node.OverrideType?
 
     /// 當前該節點所指向的（單元圖陣列內的）單元圖索引位置。
     public private(set) var currentUnigramIndex: Int = 0 {
@@ -103,7 +98,7 @@ extension Megrez {
     /// 檢查當前節點是否「讀音字長與候選字字長不一致」。
     public var isReadingMismatched: Bool { keyArray.count != value.count }
     /// 該節點是否處於被覆寫的狀態。
-    public var isOverridden: Bool { currentOverrideType != .withNoOverrides }
+    public var isOverridden: Bool { currentOverrideType != nil }
 
     /// 給出該節點內部單元圖陣列內目前被索引位置所指向的單元圖。
     public var currentUnigram: Megrez.Unigram {
@@ -116,10 +111,10 @@ extension Megrez {
     /// 給出目前的最高權重單元圖當中的權重值。該結果可能會受節點覆寫狀態所影響。
     public var score: Double {
       guard !unigrams.isEmpty else { return 0 }
-      switch currentOverrideType {
-      case .withHighScore: return overridingScore
-      case .withTopUnigramScore: return unigrams[0].score
-      default: return currentUnigram.score
+      guard let overrideType = currentOverrideType else { return currentUnigram.score }
+      switch overrideType {
+      case .withSpecified: return overridingScore
+      case .withTopGramScore: return unigrams[0].score
       }
     }
 
@@ -169,7 +164,7 @@ extension Megrez {
     /// 重設該節點的覆寫狀態、及其內部的單元圖索引位置指向。
     public func reset() {
       currentUnigramIndex = 0
-      currentOverrideType = .withNoOverrides
+      currentOverrideType = nil
     }
 
     /// 將索引鍵按照給定的分隔符銜接成一個字串。
@@ -197,13 +192,13 @@ extension Megrez {
     ///   - type: 覆寫行為種類。
     /// - Returns: 操作是否順利完成。
     public func selectOverrideUnigram(value: String, type: Node.OverrideType) -> Bool {
-      guard type != .withNoOverrides else {
-        return false
-      }
       for (i, gram) in unigrams.enumerated() {
         if value != gram.value { continue }
         currentUnigramIndex = i
         currentOverrideType = type
+        if overridingScore < 114_514 {
+          overridingScore = 114_514
+        }
         return true
       }
       return false
@@ -225,7 +220,7 @@ public struct NodeOverrideStatus: Codable, Hashable {
   ///   - currentUnigramIndex: 當前單元圖索引位置
   public init(
     overridingScore: Double = 114_514,
-    currentOverrideType: Megrez.Node.OverrideType = .withNoOverrides,
+    currentOverrideType: Megrez.Node.OverrideType? = nil,
     currentUnigramIndex: Int = 0
   ) {
     self.overridingScore = overridingScore
@@ -238,7 +233,7 @@ public struct NodeOverrideStatus: Codable, Hashable {
   /// 覆寫權重數值
   public var overridingScore: Double
   /// 當前覆寫狀態種類
-  public var currentOverrideType: Megrez.Node.OverrideType
+  public var currentOverrideType: Megrez.Node.OverrideType?
   /// 當前單元圖索引位置
   public var currentUnigramIndex: Int
 }
