@@ -24,10 +24,12 @@ public final class InputHandler: InputHandlerProtocol {
     lm: LMAssembly.LMInstantiator,
     pref: PrefMgrProtocol,
     errorCallback: ((_ message: String) -> ())? = nil,
-    notificationCallback: ((_ message: String) -> ())? = nil
+    notificationCallback: ((_ message: String) -> ())? = nil,
+    pomSaveCallback: (() -> ())?
   ) {
     self.prefs = pref
     self.currentLM = lm
+    self.pomSaveCallback = pomSaveCallback
     self.errorCallback = errorCallback
     self.notificationCallback = notificationCallback
     /// 組字器初期化。因為是首次初期化變數，所以這裡不能用 ensureCompositor() 代勞。
@@ -47,6 +49,7 @@ public final class InputHandler: InputHandlerProtocol {
   public var prefs: PrefMgrProtocol
   public var errorCallback: ((String) -> ())?
   public var notificationCallback: ((String) -> ())?
+  public var pomSaveCallback: (() -> ())?
 
   /// 用來記錄「叫出選字窗前」的游標位置的變數。
   public var backupCursor: Int?
