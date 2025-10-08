@@ -836,7 +836,9 @@ extension InputHandlerProtocol {
 
     if candidates.count > 1 {
       let previousSentence = assembler.assembledSentence
-      vCLog("revolveCandidate: attempting to consolidate candidate \(newIndex): \(candidates[newIndex].value)")
+      vCLog(
+        "revolveCandidate: attempting to consolidate candidate \(newIndex): \(candidates[newIndex].value)"
+      )
 
       // 重試機制：如果 consolidateNode 沒有改變組字器狀態，則重試最多 20 次
       var retryCount = 0
