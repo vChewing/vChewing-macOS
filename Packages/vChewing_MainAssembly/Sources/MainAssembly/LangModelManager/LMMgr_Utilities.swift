@@ -257,7 +257,7 @@ extension LMMgr {
   // MARK: - 寫入使用者檔案
 
   public static func writeUserPhrasesAtOnce(
-    _ userPhrase: UserPhrase, areWeFiltering: Bool,
+    _ userPhrase: UserPhraseInsertable, areWeFiltering: Bool,
     errorHandler: (() -> ())? = nil
   ) {
     let resultA = userPhrase.write(toFilter: areWeFiltering)
