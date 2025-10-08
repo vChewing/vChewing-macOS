@@ -9,6 +9,7 @@
 import AppKit
 import Foundation
 import KimoDataReader
+import LangModelAssembly
 import LineReader
 import Shared
 
@@ -129,40 +130,42 @@ extension LMMgr {
     allPhrasesCHS: [UserPhraseInsertable]
   )
     -> Bool {
-    let outputStrCHS = allPhrasesCHS.map(\.description).joined(separator: "\n")
-    let outputStrCHT = allPhrasesCHT.map(\.description).joined(separator: "\n")
-    var outputDataCHS = "\(outputStrCHS)\n".data(using: .utf8) ?? .init([])
-    var outputDataCHT = "\(outputStrCHT)\n".data(using: .utf8) ?? .init([])
-    let urlCHS = LMMgr.userDictDataURL(mode: .imeModeCHS, type: .thePhrases)
-    let urlCHT = LMMgr.userDictDataURL(mode: .imeModeCHT, type: .thePhrases)
+    LMAssembly.withFileHandleQueueSync {
+      let outputStrCHS = allPhrasesCHS.map(\.description).joined(separator: "\n")
+      let outputStrCHT = allPhrasesCHT.map(\.description).joined(separator: "\n")
+      var outputDataCHS = "\(outputStrCHS)\n".data(using: .utf8) ?? .init([])
+      var outputDataCHT = "\(outputStrCHT)\n".data(using: .utf8) ?? .init([])
+      let urlCHS = LMMgr.userDictDataURL(mode: .imeModeCHS, type: .thePhrases)
+      let urlCHT = LMMgr.userDictDataURL(mode: .imeModeCHT, type: .thePhrases)
 
-    let fileHandlerCHS = try? FileHandle(forUpdating: urlCHS)
-    let fileHandlerCHT = try? FileHandle(forUpdating: urlCHT)
-    guard let fileHandlerCHS = fileHandlerCHS,
-          let fileHandlerCHT = fileHandlerCHT else { return false }
-    defer {
-      fileHandlerCHS.closeFile()
-      fileHandlerCHT.closeFile()
-    }
-
-    if let sizeCHS = fileSize(for: urlCHS), sizeCHS > 0 {
-      fileHandlerCHS.seek(toFileOffset: sizeCHS)
-      if fileHandlerCHS.readDataToEndOfFile().first != 0x0A {
-        outputDataCHS.insert(0x0A, at: 0)
+      let fileHandlerCHS = try? FileHandle(forUpdating: urlCHS)
+      let fileHandlerCHT = try? FileHandle(forUpdating: urlCHT)
+      guard let fileHandlerCHS = fileHandlerCHS,
+            let fileHandlerCHT = fileHandlerCHT else { return false }
+      defer {
+        fileHandlerCHS.closeFile()
+        fileHandlerCHT.closeFile()
       }
-    }
-    fileHandlerCHS.seekToEndOfFile()
-    fileHandlerCHS.write(outputDataCHS)
 
-    if let sizeCHT = fileSize(for: urlCHT), sizeCHT > 0 {
-      fileHandlerCHT.seek(toFileOffset: sizeCHT)
-      if fileHandlerCHT.readDataToEndOfFile().first != 0x0A {
-        outputDataCHT.insert(0x0A, at: 0)
+      if let sizeCHS = fileSize(for: urlCHS), sizeCHS > 0 {
+        fileHandlerCHS.seek(toFileOffset: sizeCHS)
+        if fileHandlerCHS.readDataToEndOfFile().first != 0x0A {
+          outputDataCHS.insert(0x0A, at: 0)
+        }
       }
+      fileHandlerCHS.seekToEndOfFile()
+      fileHandlerCHS.write(outputDataCHS)
+
+      if let sizeCHT = fileSize(for: urlCHT), sizeCHT > 0 {
+        fileHandlerCHT.seek(toFileOffset: sizeCHT)
+        if fileHandlerCHT.readDataToEndOfFile().first != 0x0A {
+          outputDataCHT.insert(0x0A, at: 0)
+        }
+      }
+      fileHandlerCHT.seekToEndOfFile()
+      fileHandlerCHT.write(outputDataCHT)
+      return true
     }
-    fileHandlerCHT.seekToEndOfFile()
-    fileHandlerCHT.write(outputDataCHT)
-    return true
   }
 }
 
