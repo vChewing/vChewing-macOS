@@ -49,10 +49,10 @@ extension LMMgr {
     }
     guard KimoCommunicator.shared.establishConnection()
     else { throw KimoDataImportError.connectionFailure }
-    var allPhrasesCHT = [UserPhrase]()
-    var allPhrasesCHS = [UserPhrase]()
+    var allPhrasesCHT = [UserPhraseInsertable]()
+    var allPhrasesCHS = [UserPhraseInsertable]()
     KimoCommunicator.shared.prepareData { key, value in
-      let phraseCHT = UserPhrase(
+      let phraseCHT = UserPhraseInsertable(
         keyArray: key.components(separatedBy: ","),
         value: value,
         inputMode: .imeModeCHT,
@@ -88,14 +88,14 @@ extension LMMgr {
     text rawString: inout String
   ) throws
     -> Int {
-    var allPhrasesCHT = [UserPhrase]()
-    var allPhrasesCHS = [UserPhrase]()
+    var allPhrasesCHT = [UserPhraseInsertable]()
+    var allPhrasesCHS = [UserPhraseInsertable]()
     rawString.enumerateLines { currentLine, _ in
       let cells = currentLine.split(separator: "\t")
       guard cells.count >= 3, cells.first != "#", cells.first != "MJSR" else { return }
       let value = cells[0].description
       let keyArray = cells[1].split(separator: ",").map(\.description)
-      let phraseCHT = UserPhrase(
+      let phraseCHT = UserPhraseInsertable(
         keyArray: keyArray,
         value: value,
         inputMode: .imeModeCHT,
@@ -125,8 +125,8 @@ extension LMMgr {
   }
 
   private static func batchImportUserPhrasePairs(
-    allPhrasesCHT: [UserPhrase],
-    allPhrasesCHS: [UserPhrase]
+    allPhrasesCHT: [UserPhraseInsertable],
+    allPhrasesCHS: [UserPhraseInsertable]
   )
     -> Bool {
     let outputStrCHS = allPhrasesCHS.map(\.description).joined(separator: "\n")
