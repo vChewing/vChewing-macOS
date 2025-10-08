@@ -8,10 +8,7 @@
 
 /// 該檔案乃輸入調度模組當中「用來規定在選字窗出現時的按鍵行為」的部分。
 
-import CandidateWindow
-import InputMethodKit
-import Megrez
-import OSFrameworkImpl
+import Foundation
 import Shared
 
 // MARK: - § 對選字狀態進行調度 (Handle Candidate State).
@@ -114,7 +111,7 @@ extension InputHandlerProtocol {
     if dismissingCandidateWindow {
       if state.type == .ofAssociates
         || prefs.useSCPCTypingMode
-        || compositor.isEmpty {
+        || assembler.isEmpty {
         // 如果此時發現當前組字緩衝區為真空的情況的話，
         // 就將當前的組字緩衝區析構處理、強制重設輸入狀態。
         // 否則，一個本不該出現的真空組字緩衝區會使前後方向鍵與 BackSpace 鍵失靈。
@@ -149,13 +146,13 @@ extension InputHandlerProtocol {
         }
         var handleAssociates = !prefs.useSCPCTypingMode && prefs
           .associatedPhrasesEnabled // 關聯詞語功能專用。
-        handleAssociates = handleAssociates && compositor.cursor == compositor.length // 關聯詞語功能專用。
+        handleAssociates = handleAssociates && assembler.cursor == assembler.length // 關聯詞語功能專用。
         confirmHighlightedCandidate()
         // 關聯詞語。
         associatedPhrases: if handleAssociates {
           guard handleAssociates else { break associatedPhrases }
           guard input.commonKeyModifierFlags == .shift else { break associatedPhrases }
-          let pair = Megrez.KeyValuePaired(
+          let pair = KeyValuePaired(
             keyArray: highlightedCandidate.keyArray, value: highlightedCandidate.value
           )
           let associatedCandidates = generateArrayOfAssociates(withPair: pair)
@@ -207,30 +204,30 @@ extension InputHandlerProtocol {
       case .kDownArrow, .kLeftArrow, .kRightArrow, .kUpArrow:
         switch input.commonKeyModifierFlags {
         case [.option, .shift] where allowMovingCompositorCursor && input.isCursorForward:
-          if compositor.moveCursorStepwise(to: .front) {
+          if assembler.moveCursorStepwise(to: .front) {
             session.switchState(generateStateOfCandidates())
           } else {
             errorCallback?("D3006C85")
           }
           return true
         case [.option, .shift] where allowMovingCompositorCursor && input.isCursorBackward:
-          if compositor.moveCursorStepwise(to: .rear) {
+          if assembler.moveCursorStepwise(to: .rear) {
             session.switchState(generateStateOfCandidates())
           } else {
             errorCallback?("DE9DAF0D")
           }
           return true
         case .option where input.isCursorForward:
-          if compositor.cursor < compositor.length {
-            compositor.jumpCursorBySegment(to: .front)
+          if assembler.cursor < assembler.length {
+            assembler.jumpCursorBySegment(to: .front)
             session.switchState(generateStateOfCandidates())
           } else {
             errorCallback?("5D9F4819")
           }
           return true
         case .option where input.isCursorBackward:
-          if compositor.cursor > 0 {
-            compositor.jumpCursorBySegment(to: .rear)
+          if assembler.cursor > 0 {
+            assembler.jumpCursorBySegment(to: .rear)
             session.switchState(generateStateOfCandidates())
           } else {
             errorCallback?("34B6322D")
@@ -279,14 +276,14 @@ extension InputHandlerProtocol {
       // keycode: 38 = J, 40 = K, 4 = H, 37 = L.
       switch input.keyCode {
       case 38 where allowMovingCompositorCursorByJK, 4 where allowMovingCompositorCursorByHL:
-        if compositor.moveCursorStepwise(to: .rear) {
+        if assembler.moveCursorStepwise(to: .rear) {
           session.switchState(generateStateOfCandidates())
         } else {
           errorCallback?("6F389AE9")
         }
         return true
       case 40 where allowMovingCompositorCursorByJK, 37 where allowMovingCompositorCursorByHL:
-        if compositor.moveCursorStepwise(to: .front) {
+        if assembler.moveCursorStepwise(to: .front) {
           session.switchState(generateStateOfCandidates())
         } else {
           errorCallback?("EDBD27F2")

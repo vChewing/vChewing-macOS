@@ -109,9 +109,9 @@ extension MainAssemblyTests {
     // Testing Manual Candidate Selection, POM Observation, and Post-Candidate-Selection Cursor Jumping.
 
     vCTestLog("測試選字窗選字：高科技公司的年終獎金 -> 高科技公司的年中獎金")
-    vCTestLog("Pref=1 nodes before candidate: \(testHandler.compositor.assembledSentence.values)")
+    vCTestLog("Pref=1 nodes before candidate: \(testHandler.assembler.assembledSentence.values)")
     vCTestLog(
-      "Pref=1 cursor before candidate: \(testHandler.compositor.cursor)/length: \(testHandler.compositor.length)"
+      "Pref=1 cursor before candidate: \(testHandler.assembler.cursor)/length: \(testHandler.assembler.length)"
     )
     dataArrowDown.asPairedEvents.forEach { theEvent in
       let dismissed = !testSession.handleNSEvent(theEvent, client: testClient)
@@ -126,7 +126,7 @@ extension MainAssemblyTests {
     let resultText3 = testSession.state.displayedText
     vCTestLog("- // 組字結果：\(resultText3)")
     XCTAssertEqual(resultText3, "高科技公司的年中獎金")
-    XCTAssertEqual(testHandler.compositor.cursor, 10)
+    XCTAssertEqual(testHandler.assembler.cursor, 10)
 
     // Continuing POM Tests (in the Current Context).
 
@@ -179,12 +179,12 @@ extension MainAssemblyTests {
       if theEvent.type == .keyDown { XCTAssertFalse(dismissed) }
     }
 
-    let nodesBeforeCandidate = testHandler.compositor.assembledSentence.values
+    let nodesBeforeCandidate = testHandler.assembler.assembledSentence.values
     XCTAssertFalse(nodesBeforeCandidate.isEmpty)
     let readingCursorIndex = testHandler.actualNodeCursorPosition
     var nodeIndex: Int?
     var readingCursor = 0
-    for (index, node) in testHandler.compositor.assembledSentence.enumerated() {
+    for (index, node) in testHandler.assembler.assembledSentence.enumerated() {
       let segmentLength = node.keyArray.count
       if readingCursorIndex < readingCursor + segmentLength || index == nodesBeforeCandidate.count - 1 {
         nodeIndex = index
@@ -197,7 +197,7 @@ extension MainAssemblyTests {
       return
     }
     let currentNodeValue = nodesBeforeCandidate[nodeIndex]
-    let cursorBeforeCandidate = testHandler.compositor.cursor
+    let cursorBeforeCandidate = testHandler.assembler.cursor
 
     dataArrowDown.asPairedEvents.forEach { theEvent in
       let dismissed = !testSession.handleNSEvent(theEvent, client: testClient)
@@ -222,13 +222,13 @@ extension MainAssemblyTests {
       if theEvent.type == NSEvent.EventType.keyDown { XCTAssertFalse(dismissed) }
     }
 
-    let nodesAfterCandidate = testHandler.compositor.assembledSentence.values
+    let nodesAfterCandidate = testHandler.assembler.assembledSentence.values
     XCTAssertEqual(nodesAfterCandidate.count, nodesBeforeCandidate.count)
     XCTAssertEqual(nodesAfterCandidate[nodeIndex], targetCandidate)
     let expectedText = nodesAfterCandidate.joined()
     let resultText = testSession.state.displayedText
     XCTAssertEqual(resultText, expectedText)
-    XCTAssertEqual(testHandler.compositor.cursor, cursorBeforeCandidate)
+    XCTAssertEqual(testHandler.assembler.cursor, cursorBeforeCandidate)
     XCTAssertNil(testHandler.backupCursor)
   }
 
