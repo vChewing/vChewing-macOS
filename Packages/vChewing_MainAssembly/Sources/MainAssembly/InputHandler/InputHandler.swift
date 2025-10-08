@@ -22,7 +22,7 @@ public final class InputHandler: InputHandlerProtocol {
     pref: PrefMgrProtocol,
     errorCallback: ((_ message: String) -> ())? = nil,
     notificationCallback: ((_ message: String) -> ())? = nil,
-    pomSaveCallback: (() -> ())?
+    pomSaveCallback: (() -> ())? = nil
   ) {
     self.prefs = pref
     self.currentLM = lm
