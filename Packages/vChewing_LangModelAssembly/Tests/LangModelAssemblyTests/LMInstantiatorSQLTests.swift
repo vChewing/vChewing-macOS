@@ -32,19 +32,37 @@ final class LMInstantiatorSQLTests: XCTestCase {
     }
     XCTAssertEqual(
       instance.unigramsFor(keyArray: strBloatingKey).description,
-      "[(吹牛逼,-7.375), (吹牛屄,-7.399)]"
+      "[(ㄔㄨㄟ-ㄋㄧㄡˊ-ㄅㄧ,吹牛逼,-7.375), (ㄔㄨㄟ-ㄋㄧㄡˊ-ㄅㄧ,吹牛屄,-7.399)]"
     )
-    XCTAssertEqual(instance.unigramsFor(keyArray: strHaninSymbolMenuKey)[1].description, "(，,-9.9)")
-    XCTAssertEqual(instance.unigramsFor(keyArray: strRefutationKey).description, "[(㨃,-9.544)]")
-    XCTAssertEqual(instance.unigramsFor(keyArray: strBoobsKey).description, "[(ㄋㄟㄋㄟ,-1.0)]")
+    XCTAssertEqual(
+      instance.unigramsFor(keyArray: strHaninSymbolMenuKey)[1].description,
+      "(_punctuation_list,，,-9.9)"
+    )
+    XCTAssertEqual(
+      instance.unigramsFor(keyArray: strRefutationKey).description,
+      "[(ㄉㄨㄟˇ,㨃,-9.544)]"
+    )
+    XCTAssertEqual(
+      instance.unigramsFor(keyArray: strBoobsKey).description,
+      "[(ㄋㄟ-ㄋㄟ,ㄋㄟㄋㄟ,-1.0)]"
+    )
     instance.setOptions { config in
       config.isCNSEnabled = true
       config.isSymbolEnabled = true
     }
-    XCTAssertEqual(instance.unigramsFor(keyArray: strBloatingKey).last?.description, "(🌳🆕🐝,-13.0)")
-    XCTAssertEqual(instance.unigramsFor(keyArray: strHaninSymbolMenuKey)[1].description, "(，,-9.9)")
+    XCTAssertEqual(
+      instance.unigramsFor(keyArray: strBloatingKey).last?.description,
+      "(ㄔㄨㄟ-ㄋㄧㄡˊ-ㄅㄧ,🌳🆕🐝,-13.0)"
+    )
+    XCTAssertEqual(
+      instance.unigramsFor(keyArray: strHaninSymbolMenuKey)[1].description,
+      "(_punctuation_list,，,-9.9)"
+    )
     XCTAssertEqual(instance.unigramsFor(keyArray: strRefutationKey).count, 10)
-    XCTAssertEqual(instance.unigramsFor(keyArray: strBoobsKey).last?.description, "(☉☉,-13.0)")
+    XCTAssertEqual(
+      instance.unigramsFor(keyArray: strBoobsKey).last?.description,
+      "(ㄋㄟ-ㄋㄟ,☉☉,-13.0)"
+    )
     // 再測試反查。
     XCTAssertEqual(
       LMAssembly.LMInstantiator.getFactoryReverseLookupData(with: "和"),
@@ -61,12 +79,21 @@ final class LMInstantiatorSQLTests: XCTestCase {
       config.isSymbolEnabled = false
       config.filterNonCNSReadings = false
     }
-    XCTAssertEqual(instance.unigramsFor(keyArray: ["ㄨㄟ"]).description, "[(危,-6.0)]")
-    XCTAssertEqual(instance.unigramsFor(keyArray: ["ㄨㄟˊ"]).description, "[(危,-6.0)]")
+    XCTAssertEqual(
+      instance.unigramsFor(keyArray: ["ㄨㄟ"]).description,
+      "[(ㄨㄟ,危,-6.0)]"
+    )
+    XCTAssertEqual(
+      instance.unigramsFor(keyArray: ["ㄨㄟˊ"]).description,
+      "[(ㄨㄟˊ,危,-6.0)]"
+    )
     instance.setOptions { config in
       config.filterNonCNSReadings = true
     }
     XCTAssertEqual(instance.unigramsFor(keyArray: ["ㄨㄟ"]).description, "[]")
-    XCTAssertEqual(instance.unigramsFor(keyArray: ["ㄨㄟˊ"]).description, "[(危,-6.0)]")
+    XCTAssertEqual(
+      instance.unigramsFor(keyArray: ["ㄨㄟˊ"]).description,
+      "[(ㄨㄟˊ,危,-6.0)]"
+    )
   }
 }
