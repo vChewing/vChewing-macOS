@@ -31,10 +31,6 @@ extension SessionProtocol {
 
   public func candidateController() -> CtlCandidateProtocol? { candidateUI }
 
-  public func candidateSelectionConfirmedByInputHandler(at index: Int) {
-    candidatePairSelectionConfirmed(at: index)
-  }
-
   public func performUserPhraseOperation(addToFilter: Bool) -> Bool {
     guard let inputHandler = inputHandler, state.type == .ofMarking else { return false }
     var succeeded = true
