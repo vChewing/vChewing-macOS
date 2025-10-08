@@ -136,7 +136,7 @@ extension InputHandlerProtocol {
     // MARK: 批次集中處理某些常用功能鍵
 
     func confirmHighlightedCandidate() {
-      session.candidateSelectionConfirmedByInputHandler(at: ctlCandidate.highlightedIndex)
+      session.candidatePairSelectionConfirmed(at: ctlCandidate.highlightedIndex)
     }
 
     if let keyCodeType = KeyCode(rawValue: input.keyCode) {
@@ -327,7 +327,7 @@ extension InputHandlerProtocol {
 
     // 標準選字處理
     if let index = index, let candidateIndex = ctlCandidate.candidateIndexAtKeyLabelIndex(index) {
-      session.candidateSelectionConfirmedByInputHandler(at: candidateIndex)
+      session.candidatePairSelectionConfirmed(at: candidateIndex)
       return true
     }
 

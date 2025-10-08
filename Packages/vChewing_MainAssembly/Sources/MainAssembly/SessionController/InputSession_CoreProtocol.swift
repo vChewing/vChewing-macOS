@@ -26,7 +26,8 @@ import TooltipUI
 /// 檢查委任物件是否實現了方法：若存在的話，就調用委任物件內的版本。
 /// - Remark: 在輸入法的主函式中分配的 IMKServer 型別為客體應用程式創建的每個
 /// 輸入會話創建一個控制器型別。因此，對於每個輸入會話，都有一個對應的 IMKInputController。
-public protocol SessionProtocol: AnyObject, IMKInputControllerProtocol, CtlCandidateDelegate {
+public protocol SessionProtocol: AnyObject, IMKInputControllerProtocol, CtlCandidateDelegate,
+  SessionCoreProtocol {
   static var current: (any SessionProtocol)? { get set }
   /// 標記狀態來聲明目前新增的詞彙是否需要賦以非常低的權重。
   static var areWeNerfing: Bool { get set }
@@ -133,8 +134,8 @@ extension SessionProtocol {
     var textToCommit = ""
     // 過濾掉尚未完成拼寫的注音。
     let sansReading: Bool =
-      (state.type == .ofInputting) &&
-      (PrefMgr.shared.trimUnfinishedReadingsOnCommit || forceCleanup)
+      (state.type == .ofInputting)
+        && (PrefMgr.shared.trimUnfinishedReadingsOnCommit || forceCleanup)
     if state.hasComposition {
       textToCommit = inputHandler.generateStateOfInputting(sansReading: sansReading).displayedText
     }
@@ -200,7 +201,8 @@ extension SessionProtocol {
     }
     var textFrame = NSRect.seniorTheBeast
     let attributes: [AnyHashable: Any]? = client.attributes(
-      forCharacterIndex: 0, lineHeightRectangle: &textFrame
+      forCharacterIndex: 0,
+      lineHeightRectangle: &textFrame
     )
     let result = (attributes?[IMKTextOrientationName] as? NSNumber)?.intValue == 0 || false
     isVerticalTyping = result
@@ -264,8 +266,9 @@ extension SessionProtocol {
           }
         }
         // 檢查當前客體軟體是否採用 Web 技術構築（例：Electron）。
-        self.isClientElectronBased = NSRunningApplication
-          .isElectronBasedApp(identifier: senderBundleID)
+        self.isClientElectronBased =
+          NSRunningApplication
+            .isElectronBasedApp(identifier: senderBundleID)
       }
     }
     asyncOnMain {
@@ -299,10 +302,12 @@ extension SessionProtocol {
       self.initInputHandler()
       LMMgr.syncLMPrefs()
 
-      Self.theShiftKeyDetector.toggleWithLShift = PrefMgr.shared
-        .togglingAlphanumericalModeWithLShift
-      Self.theShiftKeyDetector.toggleWithRShift = PrefMgr.shared
-        .togglingAlphanumericalModeWithRShift
+      Self.theShiftKeyDetector.toggleWithLShift =
+        PrefMgr.shared
+          .togglingAlphanumericalModeWithLShift
+      Self.theShiftKeyDetector.toggleWithRShift =
+        PrefMgr.shared
+          .togglingAlphanumericalModeWithRShift
 
       if self.isASCIIMode, !IMEApp.isKeyboardJIS {
         if #available(macOS 10.15, *) {
