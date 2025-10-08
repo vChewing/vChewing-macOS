@@ -10,7 +10,8 @@ import AppKit
 
 // MARK: - CtlCandidateDelegate
 
-public protocol CtlCandidateDelegate {
+public protocol CtlCandidateDelegate: AnyObject {
+  func candidateController() -> CtlCandidateProtocol?
   func candidatePairs(conv: Bool) -> [(keyArray: [String], value: String)]
   func candidatePairSelectionConfirmed(at index: Int)
   func candidatePairHighlightChanged(at index: Int)
