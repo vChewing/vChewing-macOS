@@ -28,30 +28,12 @@ import Shared
 /// 的成員函式，但也只是生成副本、來交給輸入法控制器來處理而已。每個狀態都有
 /// 各自的構造器 (Constructor)。
 ///
-/// 輸入法控制器持下述狀態：
-///
-/// - **失活狀態 .ofDeactivated**: 使用者沒在使用輸入法、或者使用者已經切換到另一個客體應用來敲字。
-/// - **空狀態 .ofEmpty**: 使用者剛剛切換至該輸入法、卻還沒有任何輸入行為。
-/// 抑或是剛剛敲字遞交給客體應用、準備新的輸入行為。
-/// 威注音輸入法在「組字區與組音區/組筆區同時為空」、
-/// 且客體軟體正在準備接收使用者文字輸入行為的時候，會處於空狀態。
-/// 有時，威注音會利用呼叫空狀態的方式，讓組字區內已經顯示出來的內容遞交出去。
-/// - **關聯詞語狀態 .ofAssociates**: 逐字選字模式內的關聯詞語輸入狀態。
-/// - **中絕狀態 .ofAbortion**: 與 .ofEmpty() 類似，但會扔掉上一個狀態的內容、
-/// 不將這些內容遞交給客體應用。該狀態在處理完畢之後會被立刻切換至 .ofEmpty()。
-/// - **遞交狀態 .ofCommitting**: 該狀態會承載要遞交出去的內容，讓輸入法控制器處理時代為遞交。
-/// 該狀態在處理完畢之後會被立刻切換至 .ofEmpty()。如果直接呼叫處理該狀態的話，
-/// 在呼叫處理之前的組字區的內容會消失，除非你事先呼叫處理過 .ofEmpty()。
-/// - **輸入狀態 .ofInputting**: 使用者輸入了內容。此時會出現組字區（Compositor）。
-/// - **標記狀態 .ofMarking**: 使用者在組字區內標記某段範圍，
-/// 可以決定是添入新詞、還是將這個範圍的詞音組合放入語彙濾除清單。
-/// - **選字狀態 .ofCandidates**: 叫出選字窗、允許使用者選字。
-/// - **分類分層符號表狀態 .ofSymbolTable**: 分類分層符號表選單專用的狀態，有自身的特殊處理。
+/// 輸入法控制器持下述狀態請洽 StateType Enum 的 Documentation。
 public struct IMEState: IMEStateProtocol {
   // MARK: Lifecycle
 
-  init(
-    _ data: IMEStateDataProtocol = IMEStateData() as IMEStateDataProtocol,
+  public init(
+    _ data: IMEStateData = IMEStateData(),
     type: StateType = .ofEmpty
   ) {
     self.data = data
@@ -83,8 +65,8 @@ public struct IMEState: IMEStateProtocol {
   ///   - data: 資料載體。
   ///   - type: 狀態類型。
   ///   - node: 節點。
-  init(
-    _ data: IMEStateDataProtocol = IMEStateData() as IMEStateDataProtocol,
+  public init(
+    _ data: IMEStateData,
     type: StateType = .ofEmpty,
     node: CandidateNode
   ) {
@@ -97,7 +79,7 @@ public struct IMEState: IMEStateProtocol {
   // MARK: Public
 
   public var type: StateType = .ofEmpty
-  public var data: IMEStateDataProtocol = IMEStateData() as IMEStateDataProtocol
+  public var data: IMEStateData = .init()
   public var node: CandidateNode = .init(name: "")
 }
 
@@ -141,7 +123,10 @@ extension IMEState {
   }
 
   public static func ofMarking(
-    displayTextSegments: [String], markedReadings: [String], cursor: Int, marker: Int
+    displayTextSegments: [String],
+    markedReadings: [String],
+    cursor: Int,
+    marker: Int
   )
     -> IMEState {
     var result = IMEState(displayTextSegments: displayTextSegments, cursor: cursor)
@@ -165,7 +150,7 @@ extension IMEState {
   }
 
   public static func ofSymbolTable(node: CandidateNode) -> IMEState {
-    var result = IMEState(node: node)
+    var result = Self(IMEStateData(), node: node)
     result.type = .ofSymbolTable
     return result
   }
@@ -194,7 +179,7 @@ extension IMEState {
     set { data.marker = newValue }
   }
 
-  public var convertedToInputting: IMEStateProtocol {
+  public var convertedToInputting: Self {
     if type == .ofInputting { return self }
     var result = Self.ofInputting(
       displayTextSegments: data.displayTextSegments,
