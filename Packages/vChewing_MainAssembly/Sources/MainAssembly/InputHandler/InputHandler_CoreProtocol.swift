@@ -6,8 +6,7 @@
 // marks, or product names of Contributor, except as required to fulfill notice
 // requirements defined in MIT License.
 
-import AppKit
-import CandidateWindow
+import Foundation
 import LangModelAssembly
 import Megrez
 import Shared
@@ -19,6 +18,12 @@ import Tekkon
 /// 被封裝的「與 Megrez 組字引擎和 Tekkon 注拼引擎對接的」各種工具函式。
 /// 注意：不要把 composer 注拼槽與 compositor 組字器這兩個概念搞混。
 public protocol InputHandlerProtocol: AnyObject {
+  typealias Session = SessionCoreProtocol & CtlCandidateDelegate
+  typealias Composer = Tekkon.Composer
+  typealias Assembler = Megrez.Compositor
+  typealias KeyValuePaired = Megrez.KeyValuePaired
+  typealias Phonabet = Tekkon.Phonabet
+
   // MARK: - Type Properties
 
   static var keySeparator: String { get }
@@ -26,7 +31,7 @@ public protocol InputHandlerProtocol: AnyObject {
   // MARK: - Properties
 
   /// 委任物件 (SessionCtl)，以便呼叫其中的函式。
-  var session: (SessionProtocol & CtlCandidateDelegate)? { get set }
+  var session: Session? { get set }
 
   var prefs: PrefMgrProtocol { get set }
   var errorCallback: ((String) -> ())? { get set }
@@ -44,13 +49,13 @@ public protocol InputHandlerProtocol: AnyObject {
   var strCodePointBuffer: String { get set } // 內碼輸入專用組碼區
   var calligrapher: String { get set } // 磁帶專用組筆區
   var composer: Tekkon.Composer { get set } // 注拼槽
-  var compositor: Megrez.Compositor { get set } // 組字器
+  var assembler: Megrez.Compositor { get set } // 組字器
 }
 
 extension InputHandlerProtocol {
   // MARK: - Functions dealing with Megrez.
 
-  public var isCompositorEmpty: Bool { compositor.isEmpty }
+  public var isCompositorEmpty: Bool { assembler.isEmpty }
 
   public var isComposerUsingPinyin: Bool { composer.isPinyinMode }
 
@@ -70,11 +75,11 @@ extension InputHandlerProtocol {
 
   // MARK: - Extracted methods and functions (Megrez).
 
-  public var keySeparator: String { compositor.separator }
+  public var keySeparator: String { assembler.separator }
 
   public func clear() {
     clearComposerAndCalligrapher()
-    compositor.clear()
+    assembler.clear()
     currentLM.purgeInputTokenHashMap()
     currentTypingMethod = .vChewingFactory
     backupCursor = nil
@@ -88,19 +93,19 @@ extension InputHandlerProtocol {
     guard !prefs.useSCPCTypingMode else { return }
     guard prefs.dodgeInvalidEdgeCandidateCursorPosition else { return }
     guard isInvalidEdgeCursorSituation() else { return }
-    backupCursor = compositor.cursor
+    backupCursor = assembler.cursor
     switch prefs.useRearCursorMode {
-    case false where !compositor.isCursorAtEdge(direction: .front):
-      _ = compositor.moveCursorStepwise(to: .front)
-    case true where !compositor.isCursorAtEdge(direction: .rear):
-      _ = compositor.moveCursorStepwise(to: .rear)
+    case false where !assembler.isCursorAtEdge(direction: .front):
+      _ = assembler.moveCursorStepwise(to: .front)
+    case true where !assembler.isCursorAtEdge(direction: .rear):
+      _ = assembler.moveCursorStepwise(to: .rear)
     default: break
     }
   }
 
   public func restoreBackupCursor() {
     guard let theBackupCursor = backupCursor else { return }
-    compositor.cursor = Swift.max(Swift.min(theBackupCursor, compositor.length), 0)
+    assembler.cursor = Swift.max(Swift.min(theBackupCursor, assembler.length), 0)
     backupCursor = nil
   }
 
@@ -133,7 +138,7 @@ extension InputHandlerProtocol {
     while attempt < 4, !overrideTaskResult {
       attempt += 1
       let enforce = attempt % 2 == 0 // 偶數次強制 retokenization
-      overrideTaskResult = compositor.overrideCandidate(
+      overrideTaskResult = assembler.overrideCandidate(
         theCandidate, at: actualNodeCursorPosition,
         enforceRetokenization: enforce
       ) { perceptionIntel in
@@ -157,7 +162,7 @@ extension InputHandlerProtocol {
     if !overrideTaskResult { return }
     pomObservation = pomObservation2ndary ?? pomObservationPrimary
     // 開始組句。
-    walk()
+    assemble()
 
     // 在可行的情況下更新使用者漸退記憶模組。
     guard let pomObservation else { return }
@@ -177,7 +182,7 @@ extension InputHandlerProtocol {
 
     /// 若偏好設定內啟用了相關選項，則會在選字之後始終將游標推送至選字後的節錨的前方。
     if moveCursorAfterSelectingCandidate, respectCursorPushing {
-      compositor.jumpCursorBySegment(to: .front)
+      assembler.jumpCursorBySegment(to: .front)
     }
   }
 
@@ -187,14 +192,14 @@ extension InputHandlerProtocol {
     else {
       return
     }
-    let gridOverrideStatusMirror = compositor.createNodeOverrideStatusMirror()
-    let currentAssembledSentence = compositor.assembledSentence
-    let (currentCursor, currentMarker) = (compositor.cursor, compositor.marker)
+    let gridOverrideStatusMirror = assembler.createNodeOverrideStatusMirror()
+    let currentAssembledSentence = assembler.assembledSentence
+    let (currentCursor, currentMarker) = (assembler.cursor, assembler.marker)
     defer {
-      compositor.restoreFromNodeOverrideStatusMirror(gridOverrideStatusMirror)
-      compositor.assembledSentence = currentAssembledSentence
-      compositor.cursor = currentCursor
-      compositor.marker = currentMarker
+      assembler.restoreFromNodeOverrideStatusMirror(gridOverrideStatusMirror)
+      assembler.assembledSentence = currentAssembledSentence
+      assembler.cursor = currentCursor
+      assembler.marker = currentMarker
     }
     var theState = session.state
     let highlightedPair = theState.candidates[index]
@@ -204,18 +209,18 @@ extension InputHandlerProtocol {
       preConsolidate: prefs.consolidateContextOnCandidateSelection,
       skipObservation: true
     )
-    theState.data.displayTextSegments = compositor.assembledSentence.values
-    theState.data.cursor = convertCursorForDisplay(compositor.cursor)
-    let markerBackup = compositor.marker
-    if compositor.cursor == compositor.length {
-      compositor.jumpCursorBySegment(to: .rear, isMarker: true)
-    } else if compositor.cursor == 0 {
-      compositor.jumpCursorBySegment(to: .front, isMarker: true)
+    theState.data.displayTextSegments = assembler.assembledSentence.values
+    theState.data.cursor = convertCursorForDisplay(assembler.cursor)
+    let markerBackup = assembler.marker
+    if assembler.cursor == assembler.length {
+      assembler.jumpCursorBySegment(to: .rear, isMarker: true)
+    } else if assembler.cursor == 0 {
+      assembler.jumpCursorBySegment(to: .front, isMarker: true)
     } else {
-      compositor.jumpCursorBySegment(to: prefs.useRearCursorMode ? .front : .rear, isMarker: true)
+      assembler.jumpCursorBySegment(to: prefs.useRearCursorMode ? .front : .rear, isMarker: true)
     }
-    theState.data.marker = compositor.marker
-    compositor.marker = markerBackup
+    theState.data.marker = assembler.marker
+    assembler.marker = markerBackup
     session.state = theState // 直接就地取代，不經過 switchState 處理，免得選字窗被重新載入。
     session.updateCompositionBufferDisplay()
   }
@@ -253,23 +258,23 @@ extension InputHandlerProtocol {
 
   /// 就地增刪詞之後，需要就地更新游標上下文單元圖資料。
   public func updateUnigramData() -> Bool {
-    let result = compositor.assignNodes(updateExisting: true)
-    defer { walk() }
+    let result = assembler.assignNodes(updateExisting: true)
+    defer { assemble() }
     return result > 0
   }
 
   /// 警告：該參數僅代指組音區/組筆區域與組字區在目前狀態下被視為「空」。
   public var isConsideredEmptyForNow: Bool {
-    compositor.isEmpty && isComposerOrCalligrapherEmpty && currentTypingMethod == .vChewingFactory
+    assembler.isEmpty && isComposerOrCalligrapherEmpty && currentTypingMethod == .vChewingFactory
   }
 
   /// 要拿給 Megrez 使用的特殊游標位址，用於各種與節點判定有關的操作。
   /// - Remark: 自 Megrez 引擎 v2.6.2 開始，該參數不得用於獲取候選字詞清單資料。相關函式僅接收原始 cursor 資料。
   public var actualNodeCursorPosition: Int {
-    let atFrontEdge = compositor.isCursorAtEdge(direction: .front)
-    let atRearEdge = compositor.isCursorAtEdge(direction: .rear)
+    let atFrontEdge = assembler.isCursorAtEdge(direction: .front)
+    let atRearEdge = assembler.isCursorAtEdge(direction: .rear)
     let delta = ((atFrontEdge || !prefs.useRearCursorMode) && !atRearEdge ? 1 : 0)
-    return compositor.cursor - delta
+    return assembler.cursor - delta
   }
 
   // MARK: - Extracted methods and functions (Tekkon).
@@ -288,17 +293,17 @@ extension InputHandlerProtocol {
   /// 返回前一個游標位置的可解析的漢字筆畫。
   /// 返回的內容分別是：「完整讀音」「去掉聲調的讀音」「是否有聲調」。
   var previousParsableCalligraph: String? {
-    if compositor.cursor == 0 { return nil }
-    let cursorPrevious = max(compositor.cursor - 1, 0)
-    return compositor.keys[cursorPrevious]
+    if assembler.cursor == 0 { return nil }
+    let cursorPrevious = max(assembler.cursor - 1, 0)
+    return assembler.keys[cursorPrevious]
   }
 
   /// 返回前一個游標位置的可解析的漢字讀音。
   /// 返回的內容分別是：「完整讀音」「去掉聲調的讀音」「是否有聲調」。
   var previousParsableReading: (String, String, Bool)? {
-    if compositor.cursor == 0 { return nil }
-    let cursorPrevious = max(compositor.cursor - 1, 0)
-    let rawData = compositor.keys[cursorPrevious]
+    if assembler.cursor == 0 { return nil }
+    let cursorPrevious = max(assembler.cursor - 1, 0)
+    let rawData = assembler.keys[cursorPrevious]
     let components = rawData.map(\.description)
     var hasIntonation = false
     for neta in components {
@@ -323,12 +328,12 @@ extension InputHandlerProtocol {
   }
 
   func isInvalidEdgeCursorSituation(givenCursor: Int? = nil) -> Bool {
-    let cursorToCheck = givenCursor ?? compositor.cursor
+    let cursorToCheck = givenCursor ?? assembler.cursor
     // prefs.useRearCursorMode 為 0 (false) 時（macOS 注音選字），最後方的游標位置不合邏輯。
     // prefs.useRearCursorMode 為 1 (true) 時（微軟新注音選字），最前方的游標位置不合邏輯。
     switch prefs.useRearCursorMode {
     case false where cursorToCheck == 0: return true
-    case true where cursorToCheck == compositor.length: return true
+    case true where cursorToCheck == assembler.length: return true
     default: return false
     }
   }
@@ -336,12 +341,12 @@ extension InputHandlerProtocol {
   /// 獲取當前標記得範圍。這個函式只能是函式、而非只讀變數。
   /// - Returns: 當前標記範圍。
   func currentMarkedRange() -> Range<Int> {
-    compositor.currentMarkedRange()
+    assembler.currentMarkedRange()
   }
 
   /// 檢測是否出現游標切斷組字區內字符的情況
   func isCursorCuttingChar(isMarker: Bool = false) -> Bool {
-    compositor.isCursorCuttingChar(isMarker: isMarker)
+    assembler.isCursorCuttingChar(isMarker: isMarker)
   }
 
   /// 利用給定的讀音鏈來試圖爬取最接近的組字結果（最大相似度估算）。
@@ -349,12 +354,12 @@ extension InputHandlerProtocol {
   /// 該過程讀取的權重資料是經過 Viterbi 演算法計算得到的結果。
   ///
   /// 該函式的爬取順序是從頭到尾。
-  func walk() {
-    compositor.assemble()
+  func assemble() {
+    assembler.assemble()
 
     // 在偵錯模式開啟時，將 GraphViz 資料寫入至指定位置。
     if prefs.isDebugModeEnabled {
-      let result = compositor.dumpDOT
+      let result = assembler.dumpDOT
       let thePath = FileManager.default.urls(for: .cachesDirectory, in: .userDomainMask)[0].path
         .appending(
           "/vChewing-visualization.dot"
@@ -415,13 +420,13 @@ extension InputHandlerProtocol {
   /// - Parameter direction: 文字輸入方向意義上的方向。
   /// - Returns: 邊界距離。
   func getStepsToNearbyNodeBorder(direction: Megrez.Compositor.TypingDirection) -> Int {
-    let (currentCursor, currentMarker) = (compositor.cursor, compositor.marker)
-    compositor.jumpCursorBySegment(to: direction)
-    let newCursor = compositor.cursor
+    let (currentCursor, currentMarker) = (assembler.cursor, assembler.marker)
+    assembler.jumpCursorBySegment(to: direction)
+    let newCursor = assembler.cursor
     let result = abs(newCursor - currentCursor)
     // 還原游標位置。
-    compositor.cursor = currentCursor
-    compositor.marker = currentMarker
+    assembler.cursor = currentCursor
+    assembler.marker = currentMarker
     return result
   }
 
@@ -431,8 +436,8 @@ extension InputHandlerProtocol {
     /// 微軟新注音輸入法的游標後置風格也是不允許 nodeCrossing 的。
     var arrCandidates: [Megrez.KeyValuePaired] = {
       switch prefs.useRearCursorMode {
-      case false: return compositor.fetchCandidates(filter: .endAt)
-      case true: return compositor.fetchCandidates(filter: .beginAt)
+      case false: return assembler.fetchCandidates(filter: .endAt)
+      case true: return assembler.fetchCandidates(filter: .beginAt)
       }
     }()
 
@@ -466,13 +471,13 @@ extension InputHandlerProtocol {
     if !prefs.fetchSuggestionsFromPerceptionOverrideModel { return arrResult }
     /// 獲取來自漸退記憶模組的建議結果
     let suggestion = currentLM.fetchPOMSuggestion(
-      assembledResult: compositor.assembledSentence,
+      assembledResult: assembler.assembledSentence,
       cursor: actualNodeCursorPosition,
       timestamp: Date().timeIntervalSince1970
     )
     let appendables: [(String, Megrez.Unigram)] = suggestion.candidates.map { pomCandidate in
       (
-        pomCandidate.keyArray.joined(separator: compositor.separator),
+        pomCandidate.keyArray.joined(separator: assembler.separator),
         .init(
           keyArray: pomCandidate.keyArray,
           value: pomCandidate.value,
@@ -487,7 +492,7 @@ extension InputHandlerProtocol {
         let overrideBehavior: Megrez.Node.OverrideType =
           suggestion.forceHighScoreOverride ? .withHighScore : .withTopUnigramScore
         let suggestedPair: Megrez.KeyValuePaired = .init(
-          key: newestSuggestedCandidate.keyArray.joined(separator: compositor.separator),
+          key: newestSuggestedCandidate.keyArray.joined(separator: assembler.separator),
           value: newestSuggestedCandidate.value
         )
         // 追加步驟：換算正確的游標位置，確保 POM 建議的候選字詞在正確的座標位置進行覆寫操作。
@@ -496,20 +501,20 @@ extension InputHandlerProtocol {
         vCLog(
           "POM: Overriding the node score of the suggested candidate: \(ngramKey) at \(cursorForOverride)"
         )
-        if !compositor.overrideCandidate(
+        if !assembler.overrideCandidate(
           suggestedPair,
           at: cursorForOverride,
           overrideType: overrideBehavior,
           enforceRetokenization: true
         ) {
-          compositor.overrideCandidateLiteral(
+          assembler.overrideCandidateLiteral(
             newestSuggestedCandidate.value,
             at: cursorForOverride,
             overrideType: overrideBehavior,
             enforceRetokenization: true
           )
         }
-        walk()
+        assemble()
       }
     }
     arrResult = arrResult.stableSort { $0.1.score > $1.1.score }
@@ -604,16 +609,16 @@ extension InputHandlerProtocol {
 
     var position = consolidationRange.lowerBound // 臨時統計用
     while position < consolidationRange.upperBound {
-      guard let regionIndex = compositor.assembledSentence.cursorRegionMap[position] else {
+      guard let regionIndex = assembler.assembledSentence.cursorRegionMap[position] else {
         position += 1
         continue
       }
       if !nodeIndices.contains(regionIndex) {
         nodeIndices.append(regionIndex) // 新增統計
-        guard compositor.assembledSentence.count > regionIndex else { break } // 防呆
-        let currentNode = compositor.assembledSentence[regionIndex]
+        guard assembler.assembledSentence.count > regionIndex else { break } // 防呆
+        let currentNode = assembler.assembledSentence[regionIndex]
         guard currentNode.keyArray.count == currentNode.value.count else {
-          compositor.overrideCandidate(currentNode.asCandidatePair, at: position)
+          assembler.overrideCandidate(currentNode.asCandidatePair, at: position)
           position += currentNode.keyArray.count
           continue
         }
@@ -624,7 +629,7 @@ extension InputHandlerProtocol {
             keyArray: [key],
             value: values[subPosition]
           )
-          compositor.overrideCandidate(thePair, at: position)
+          assembler.overrideCandidate(thePair, at: position)
           position += 1
         }
         continue
@@ -640,26 +645,26 @@ extension InputHandlerProtocol {
     for candidate: Megrez.KeyValuePaired
   )
     -> (range: Range<Int>, debugInfo: String) {
-    let currentAssembledSentence = compositor.assembledSentence
+    let currentAssembledSentence = assembler.assembledSentence
 
     // 先計算實驗性邊界（如果候選字詞可以被覆蓋的話）
     var frontBoundaryEX = actualNodeCursorPosition + 1
     var rearBoundaryEX = actualNodeCursorPosition
     var debugIntelToPrint = ""
 
-    let gridOverrideStatusMirror = compositor.createNodeOverrideStatusMirror()
-    let (currentCursor, currentMarker) = (compositor.cursor, compositor.marker)
+    let gridOverrideStatusMirror = assembler.createNodeOverrideStatusMirror()
+    let (currentCursor, currentMarker) = (assembler.cursor, assembler.marker)
 
     defer {
-      compositor.restoreFromNodeOverrideStatusMirror(gridOverrideStatusMirror)
-      compositor.assembledSentence = currentAssembledSentence
-      compositor.cursor = currentCursor
-      compositor.marker = currentMarker
+      assembler.restoreFromNodeOverrideStatusMirror(gridOverrideStatusMirror)
+      assembler.assembledSentence = currentAssembledSentence
+      assembler.cursor = currentCursor
+      assembler.marker = currentMarker
     }
 
-    if compositor.overrideCandidate(candidate, at: actualNodeCursorPosition) {
-      compositor.assemble()
-      let range = compositor.assembledSentence.contextRange(ofGivenCursor: actualNodeCursorPosition)
+    if assembler.overrideCandidate(candidate, at: actualNodeCursorPosition) {
+      assembler.assemble()
+      let range = assembler.assembledSentence.contextRange(ofGivenCursor: actualNodeCursorPosition)
       rearBoundaryEX = range.lowerBound
       frontBoundaryEX = range.upperBound
       debugIntelToPrint.append("EX: \(rearBoundaryEX)..<\(frontBoundaryEX), ")
@@ -675,23 +680,23 @@ extension InputHandlerProtocol {
     debugIntelToPrint.append("INI: \(rearBoundary)..<\(frontBoundary), ")
 
     // 通過游標移動來精確計算邊界
-    let cursorBackup = compositor.cursor
-    defer { compositor.cursor = cursorBackup }
+    let cursorBackup = assembler.cursor
+    defer { assembler.cursor = cursorBackup }
 
     // 計算後邊界
-    while compositor.cursor > rearBoundary {
-      compositor.jumpCursorBySegment(to: .rear)
+    while assembler.cursor > rearBoundary {
+      assembler.jumpCursorBySegment(to: .rear)
     }
-    rearBoundary = min(compositor.cursor, rearBoundary)
+    rearBoundary = min(assembler.cursor, rearBoundary)
 
     // 重置游標位置
-    compositor.cursor = cursorBackup
+    assembler.cursor = cursorBackup
 
     // 計算前邊界
-    while compositor.cursor < frontBoundary {
-      compositor.jumpCursorBySegment(to: .front)
+    while assembler.cursor < frontBoundary {
+      assembler.jumpCursorBySegment(to: .front)
     }
-    frontBoundary = min(max(compositor.cursor, frontBoundary), compositor.length)
+    frontBoundary = min(max(assembler.cursor, frontBoundary), assembler.length)
 
     debugIntelToPrint.append("FIN: \(rearBoundary)..<\(frontBoundary)")
 
@@ -713,16 +718,16 @@ extension InputHandlerProtocol {
   /// 使其不再記入最大相似度估算的估算對象範圍。
   /// 用比較形象且生動卻有點噁心的解釋的話，蒼蠅一邊吃一邊屙。
   var commitOverflownComposition: String {
-    guard !compositor.assembledSentence.isEmpty,
-          compositor.length > compositorWidthLimit,
+    guard !assembler.assembledSentence.isEmpty,
+          assembler.length > compositorWidthLimit,
           let session = session,
           session.clientMitigationLevel >= 2
     else { return "" }
     // 回頭在這裡插上對 Steam 的 Client Identifier 的要求。
     var textToCommit = ""
-    while compositor.length > compositorWidthLimit {
-      var delta = compositor.length - compositorWidthLimit
-      let node = compositor.assembledSentence[0]
+    while assembler.length > compositorWidthLimit {
+      var delta = assembler.length - compositorWidthLimit
+      let node = assembler.assembledSentence[0]
       if node.isReadingMismatched {
         delta = node.keyArray.count
         textToCommit += node.asCandidatePair.value
@@ -730,13 +735,13 @@ extension InputHandlerProtocol {
         delta = min(delta, node.keyArray.count)
         textToCommit += node.asCandidatePair.value.map(\.description)[0 ..< delta].joined()
       }
-      let newCursor = max(compositor.cursor - delta, 0)
-      compositor.cursor = 0
+      let newCursor = max(assembler.cursor - delta, 0)
+      assembler.cursor = 0
       if !node.isReadingMismatched { consolidateCursorContext(with: node.asCandidatePair) }
       // 威注音不支援 Bigram，所以無須考慮前後節點「是否需要鞏固」。
-      for _ in 0 ..< delta { compositor.dropKey(direction: .front) }
-      compositor.cursor = newCursor
-      walk()
+      for _ in 0 ..< delta { assembler.dropKey(direction: .front) }
+      assembler.cursor = newCursor
+      assemble()
     }
     return textToCommit
   }

@@ -8,10 +8,8 @@
 
 /// 該檔案乃輸入調度模組的用以承載「根據按鍵行為來調控模式」的各種成員函式的部分。
 
-import AppKit
-import Megrez
+import Foundation
 import Shared
-import Tekkon
 
 // MARK: - § 根據按鍵行為來調控模式的函式 (Functions Interact With States).
 
@@ -36,10 +34,10 @@ extension InputHandlerProtocol {
     /// 換成由此處重新生成的原始資料在 IMEStateData 當中生成的 NSAttributeString。
     var displayTextSegments: [String] = handleAsCodePointInput
       ? [strCodePointBuffer]
-      : compositor.assembledSentence.values
+      : assembler.assembledSentence.values
     var cursor = handleAsCodePointInput
       ? displayTextSegments.joined().count
-      : convertCursorForDisplay(compositor.cursor)
+      : convertCursorForDisplay(assembler.cursor)
     let cursorSansReading = cursor
     // 先提出來讀音資料，減輕運算負擔。
     let reading: String = (sansReading || currentTypingMethod == .codePoint) ? "" :
@@ -113,7 +111,7 @@ extension InputHandlerProtocol {
   func convertCursorForDisplay(_ rawCursor: Int) -> Int {
     var composedStringCursorIndex = 0
     var readingCursorIndex = 0
-    for theNode in compositor.assembledSentence {
+    for theNode in assembler.assembledSentence {
       let strNodeValue = theNode.value
       /// 藉下述步驟重新將「可見游標位置」對齊至「組字器內的游標所在的讀音位置」。
       /// 每個節錨（NodeAnchor）都有自身的幅節長度（segLength），可以用來
@@ -147,7 +145,7 @@ extension InputHandlerProtocol {
   /// - Returns: 回呼一個新的選詞狀態，來就給定的候選字詞陣列資料內容顯示選字窗。
   public func generateStateOfCandidates(dodge: Bool = true) -> IMEStateProtocol {
     guard let session = session else { return IMEState.ofAbortion() }
-    let cursorBeforeCandidate = compositor.cursor
+    let cursorBeforeCandidate = assembler.cursor
     if dodge, session.state.type == .ofInputting {
       dodgeInvalidEdgeCursorForCandidateState()
     }
@@ -156,14 +154,14 @@ extension InputHandlerProtocol {
     }
     var result = IMEState.ofCandidates(
       candidates: generateArrayOfCandidates(fixOrder: prefs.useFixedCandidateOrderOnSelection),
-      displayTextSegments: compositor.assembledSentence.values,
-      cursor: compositor.cursor
+      displayTextSegments: assembler.assembledSentence.values,
+      cursor: assembler.cursor
     )
     if !prefs.useRearCursorMode {
-      let markerBackup = compositor.marker
-      compositor.jumpCursorBySegment(to: .rear, isMarker: true)
-      result.marker = compositor.marker
-      compositor.marker = markerBackup
+      let markerBackup = assembler.marker
+      assembler.jumpCursorBySegment(to: .rear, isMarker: true)
+      result.marker = assembler.marker
+      assembler.marker = markerBackup
     }
     return result
   }
@@ -184,7 +182,7 @@ extension InputHandlerProtocol {
   /// - Parameters:
   ///   - key: 給定的索引鍵（也就是給定的關聯詞語的開頭字）。
   /// - Returns: 回呼一個新的關聯詞語狀態，來就給定的關聯詞語陣列資料內容顯示選字窗。
-  public func generateStateOfAssociates(withPair pair: Megrez.KeyValuePaired) -> IMEStateProtocol {
+  public func generateStateOfAssociates(withPair pair: KeyValuePaired) -> IMEStateProtocol {
     IMEState.ofAssociates(candidates: generateArrayOfAssociates(withPair: pair))
   }
 
@@ -262,9 +260,9 @@ extension InputHandlerProtocol {
     if input.isCursorBackward, input.isShiftHold {
       let moved: Bool = {
         if input.isCommandHold || input.isOptionHold {
-          compositor.jumpCursorBySegment(to: .rear, isMarker: true)
+          assembler.jumpCursorBySegment(to: .rear, isMarker: true)
         } else {
-          compositor.moveCursorStepwise(to: .rear, isMarker: true)
+          assembler.moveCursorStepwise(to: .rear, isMarker: true)
         }
       }()
       guard moved else {
@@ -273,9 +271,9 @@ extension InputHandlerProtocol {
       }
       var marking = IMEState.ofMarking(
         displayTextSegments: state.displayTextSegments,
-        markedReadings: Array(compositor.keys[currentMarkedRange()]),
-        cursor: convertCursorForDisplay(compositor.cursor),
-        marker: convertCursorForDisplay(compositor.marker)
+        markedReadings: Array(assembler.keys[currentMarkedRange()]),
+        cursor: convertCursorForDisplay(assembler.cursor),
+        marker: convertCursorForDisplay(assembler.marker)
       )
       marking.tooltipBackupForInputting = state.tooltipBackupForInputting
       session.switchState(marking.markedRange.isEmpty ? marking.convertedToInputting : marking)
@@ -286,9 +284,9 @@ extension InputHandlerProtocol {
     if input.isCursorForward, input.isShiftHold {
       let moved: Bool = {
         if input.isCommandHold || input.isOptionHold {
-          compositor.jumpCursorBySegment(to: .front, isMarker: true)
+          assembler.jumpCursorBySegment(to: .front, isMarker: true)
         } else {
-          compositor.moveCursorStepwise(to: .front, isMarker: true)
+          assembler.moveCursorStepwise(to: .front, isMarker: true)
         }
       }()
       guard moved else {
@@ -297,9 +295,9 @@ extension InputHandlerProtocol {
       }
       var marking = IMEState.ofMarking(
         displayTextSegments: state.displayTextSegments,
-        markedReadings: Array(compositor.keys[currentMarkedRange()]),
-        cursor: convertCursorForDisplay(compositor.cursor),
-        marker: convertCursorForDisplay(compositor.marker)
+        markedReadings: Array(assembler.keys[currentMarkedRange()]),
+        cursor: convertCursorForDisplay(assembler.cursor),
+        marker: convertCursorForDisplay(assembler.marker)
       )
       marking.tooltipBackupForInputting = state.tooltipBackupForInputting
       session.switchState(marking.markedRange.isEmpty ? marking.convertedToInputting : marking)
@@ -327,12 +325,12 @@ extension InputHandlerProtocol {
       return true
     }
 
-    guard compositor.insertKey(customPunctuation) else {
+    guard assembler.insertKey(customPunctuation) else {
       errorCallback?("C0793A6D: 得檢查對應的語言模組的 hasUnigramsFor() 是否有誤判之情形。")
       return true
     }
 
-    walk()
+    assemble()
     // 一邊吃一邊屙（僅對位列黑名單的 App 用這招限制組字區長度）。
     let textToCommit = commitOverflownComposition
     var inputting = generateStateOfInputting()
@@ -447,15 +445,15 @@ extension InputHandlerProtocol {
         if prefs.cassetteEnabled {
           guard input.isShiftHold, calligrapher.isEmpty else { break shiftBksp }
           guard let prevReading = previousParsableCalligraph else { break shiftBksp }
-          compositor.dropKey(direction: .rear)
-          walk() // 這裡必須 Walk 一次、來更新目前被 walk 的內容。
+          assembler.dropKey(direction: .rear)
+          assemble() // 這裡必須 Walk 一次、來更新目前被 walk 的內容。
           calligrapher = prevReading
         } else {
           guard input.isShiftHold, isComposerOrCalligrapherEmpty else { break shiftBksp }
           guard let prevReading = previousParsableReading else { break shiftBksp }
           // prevReading 的內容分別是：「完整讀音」「去掉聲調的讀音」「是否有聲調」。
-          compositor.dropKey(direction: .rear)
-          walk() // 這裡必須 Walk 一次、來更新目前被 walk 的內容。
+          assembler.dropKey(direction: .rear)
+          assemble() // 這裡必須 Walk 一次、來更新目前被 walk 的內容。
           prevReading.1.map(\.description).forEach { composer.receiveKey(fromPhonabet: $0) }
         }
         session.switchState(generateStateOfInputting())
@@ -480,14 +478,14 @@ extension InputHandlerProtocol {
     }
 
     if isComposerOrCalligrapherEmpty {
-      if compositor.cursor <= 0 || actualSteps <= 0 {
+      if assembler.cursor <= 0 || actualSteps <= 0 {
         errorCallback?("9D69908D")
         return true
       }
       for _ in 0 ..< actualSteps {
-        compositor.dropKey(direction: .rear)
+        assembler.dropKey(direction: .rear)
       }
-      walk()
+      assemble()
     } else {
       _ = input.commonKeyModifierFlags == .option
         ? clearComposerAndCalligrapher()
@@ -540,14 +538,14 @@ extension InputHandlerProtocol {
     }
 
     if isComposerOrCalligrapherEmpty {
-      if compositor.cursor >= compositor.length || actualSteps <= 0 {
+      if assembler.cursor >= assembler.length || actualSteps <= 0 {
         errorCallback?("9B69938D")
         return true
       }
       for _ in 0 ..< actualSteps {
-        compositor.dropKey(direction: .front)
+        assembler.dropKey(direction: .front)
       }
-      walk()
+      assemble()
     } else {
       clearComposerAndCalligrapher()
     }
@@ -587,8 +585,8 @@ extension InputHandlerProtocol {
       return true
     }
 
-    if compositor.cursor != 0 {
-      compositor.cursor = 0
+    if assembler.cursor != 0 {
+      assembler.cursor = 0
       session.switchState(generateStateOfInputting())
     } else {
       errorCallback?("66D97F90")
@@ -611,8 +609,8 @@ extension InputHandlerProtocol {
       return true
     }
 
-    if compositor.cursor != compositor.length {
-      compositor.cursor = compositor.length
+    if assembler.cursor != assembler.length {
+      assembler.cursor = assembler.length
       session.switchState(generateStateOfInputting())
     } else {
       errorCallback?("9B69908E")
@@ -647,7 +645,7 @@ extension InputHandlerProtocol {
       }
       /// 如果注拼槽或組筆區不是空的話，則清空之。
       clearComposerAndCalligrapher()
-      switch compositor.isEmpty {
+      switch assembler.isEmpty {
       case false: session.switchState(generateStateOfInputting())
       case true: session.switchState(IMEState.ofAbortion())
       }
@@ -673,21 +671,21 @@ extension InputHandlerProtocol {
 
     if input.isShiftHold {
       // Shift + Right
-      if compositor.cursor < compositor.length {
-        compositor.marker = compositor.cursor
+      if assembler.cursor < assembler.length {
+        assembler.marker = assembler.cursor
         if input.isCommandHold || input.isOptionHold {
-          compositor.jumpCursorBySegment(to: .front, isMarker: true)
+          assembler.jumpCursorBySegment(to: .front, isMarker: true)
         } else {
-          compositor.marker += 1
+          assembler.marker += 1
           if isCursorCuttingChar(isMarker: true) {
-            compositor.jumpCursorBySegment(to: .front, isMarker: true)
+            assembler.jumpCursorBySegment(to: .front, isMarker: true)
           }
         }
         var marking = IMEState.ofMarking(
-          displayTextSegments: compositor.assembledSentence.values,
-          markedReadings: Array(compositor.keys[currentMarkedRange()]),
-          cursor: convertCursorForDisplay(compositor.cursor),
-          marker: convertCursorForDisplay(compositor.marker)
+          displayTextSegments: assembler.assembledSentence.values,
+          markedReadings: Array(assembler.keys[currentMarkedRange()]),
+          cursor: convertCursorForDisplay(assembler.cursor),
+          marker: convertCursorForDisplay(assembler.marker)
         )
         marking.tooltipBackupForInputting = state.tooltip
         session.switchState(marking)
@@ -699,13 +697,13 @@ extension InputHandlerProtocol {
         return handleEnd()
       }
       // 游標跳轉動作無論怎樣都會執行，但如果出了執行失敗的結果的話則觸發報錯流程。
-      if !compositor.jumpCursorBySegment(to: .front) {
+      if !assembler.jumpCursorBySegment(to: .front) {
         errorCallback?("33C3B580")
         return true
       }
       session.switchState(generateStateOfInputting())
     } else {
-      if compositor.moveCursorStepwise(to: .front) {
+      if assembler.moveCursorStepwise(to: .front) {
         session.switchState(generateStateOfInputting())
       } else {
         errorCallback?("A96AAD58")
@@ -733,13 +731,13 @@ extension InputHandlerProtocol {
 
     if input.isShiftHold {
       // Shift + left
-      if compositor.cursor > 0 {
-        compositor.marker = compositor.cursor
+      if assembler.cursor > 0 {
+        assembler.marker = assembler.cursor
         let moved: Bool = {
           if input.isCommandHold || input.isOptionHold {
-            compositor.jumpCursorBySegment(to: .rear, isMarker: true)
+            assembler.jumpCursorBySegment(to: .rear, isMarker: true)
           } else {
-            compositor.moveCursorStepwise(to: .rear, isMarker: true)
+            assembler.moveCursorStepwise(to: .rear, isMarker: true)
           }
         }()
         guard moved else {
@@ -747,10 +745,10 @@ extension InputHandlerProtocol {
           return true
         }
         var marking = IMEState.ofMarking(
-          displayTextSegments: compositor.assembledSentence.values,
-          markedReadings: Array(compositor.keys[currentMarkedRange()]),
-          cursor: convertCursorForDisplay(compositor.cursor),
-          marker: convertCursorForDisplay(compositor.marker)
+          displayTextSegments: assembler.assembledSentence.values,
+          markedReadings: Array(assembler.keys[currentMarkedRange()]),
+          cursor: convertCursorForDisplay(assembler.cursor),
+          marker: convertCursorForDisplay(assembler.marker)
         )
         marking.tooltipBackupForInputting = state.tooltip
         session.switchState(marking)
@@ -760,13 +758,13 @@ extension InputHandlerProtocol {
     } else if input.isOptionHold, !input.isShiftHold {
       if input.isControlHold { return handleHome() }
       // 游標跳轉動作無論怎樣都會執行，但如果出了執行失敗的結果的話則觸發報錯流程。
-      if !compositor.jumpCursorBySegment(to: .rear) {
+      if !assembler.jumpCursorBySegment(to: .rear) {
         errorCallback?("8D50DD9E")
         return true
       }
       session.switchState(generateStateOfInputting())
     } else {
-      if compositor.moveCursorStepwise(to: .rear) {
+      if assembler.moveCursorStepwise(to: .rear) {
         session.switchState(generateStateOfInputting())
       } else {
         errorCallback?("7045E6F3")
@@ -786,7 +784,7 @@ extension InputHandlerProtocol {
     guard let session = session else { return false }
     let state = session.state
     if isComposerOrCalligrapherEmpty,
-       compositor.isEmpty || compositor.assembledSentence.isEmpty { return false }
+       assembler.isEmpty || assembler.assembledSentence.isEmpty { return false }
     guard state.type == .ofInputting else {
       guard state.type == .ofEmpty else {
         errorCallback?("6044F081")
@@ -807,14 +805,14 @@ extension InputHandlerProtocol {
       return true
     }
 
-    guard let region = compositor.assembledSentence.cursorRegionMap[actualNodeCursorPosition],
-          compositor.assembledSentence.count > region
+    guard let region = assembler.assembledSentence.cursorRegionMap[actualNodeCursorPosition],
+          assembler.assembledSentence.count > region
     else {
       errorCallback?("1CE6FFBD")
       return true
     }
 
-    let currentNode = compositor.assembledSentence[region]
+    let currentNode = assembler.assembledSentence[region]
 
     let currentPaired = (currentNode.keyArray, currentNode.value)
 
@@ -837,7 +835,7 @@ extension InputHandlerProtocol {
     }()
 
     if candidates.count > 1 {
-      let previousSentence = compositor.assembledSentence
+      let previousSentence = assembler.assembledSentence
       vCLog("revolveCandidate: attempting to consolidate candidate \(newIndex): \(candidates[newIndex].value)")
 
       // 重試機制：如果 consolidateNode 沒有改變組字器狀態，則重試最多 20 次
@@ -851,7 +849,7 @@ extension InputHandlerProtocol {
           preConsolidate: retryCount == 0, skipObservation: true
         )
 
-        let currentSentence = compositor.assembledSentence
+        let currentSentence = assembler.assembledSentence
         if previousSentence.map(\.value) != currentSentence.map(\.value) {
           vCLog("revolveCandidate: consolidateNode succeeded after \(retryCount + 1) attempts")
           consolidationSucceeded = true
@@ -868,7 +866,7 @@ extension InputHandlerProtocol {
       if !consolidationSucceeded {
         vCLog("revolveCandidate: consolidateNode failed after \(maxRetries) attempts")
         vCLog("revolveCandidate: previous: \(previousSentence.map(\.value))")
-        vCLog("revolveCandidate: current: \(compositor.assembledSentence.map(\.value))")
+        vCLog("revolveCandidate: current: \(assembler.assembledSentence.map(\.value))")
         vCLog("revolveCandidate: candidate that failed: \(candidates[newIndex])")
         vCLog("revolveCandidate: currentNode.isOverridden: \(currentNode.isOverridden)")
         vCLog("revolveCandidate: actualNodeCursorPosition: \(actualNodeCursorPosition)")
@@ -917,8 +915,8 @@ extension InputHandlerProtocol {
     guard let session = session, session.state.type != .ofDeactivated else { return false }
     if alternative {
       if currentLM.hasUnigramsFor(keyArray: ["_punctuation_list"]) {
-        if isComposerOrCalligrapherEmpty, compositor.insertKey("_punctuation_list") {
-          walk()
+        if isComposerOrCalligrapherEmpty, assembler.insertKey("_punctuation_list") {
+          assemble()
           // 一邊吃一邊屙（僅對位列黑名單的 App 用這招限制組字區長度）。
           let textToCommit = commitOverflownComposition
           var inputting = generateStateOfInputting()
@@ -1017,7 +1015,7 @@ extension InputHandlerProtocol {
     // 僅憑藉 state.hasComposition 的話，並不能真實把握組字器的狀況。
     // 另外，這裡不要用「!input.isFunctionKeyHold」，
     // 否則會導致對上下左右鍵與翻頁鍵的判斷失效。
-    let notEmpty = state.hasComposition && !compositor.isEmpty && isComposerOrCalligrapherEmpty
+    let notEmpty = state.hasComposition && !assembler.isEmpty && isComposerOrCalligrapherEmpty
     let bannedModifiers: KBEvent.ModifierFlags = [.option, .shift, .command, .control]
     let noBannedModifiers = bannedModifiers.intersection(input.keyModifierFlags).isEmpty
     var triggered = input.isCursorClockLeft || input.isCursorClockRight
