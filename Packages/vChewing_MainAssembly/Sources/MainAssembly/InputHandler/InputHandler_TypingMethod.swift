@@ -8,7 +8,6 @@
 
 import Foundation
 import Shared
-import SwiftExtension
 
 // MARK: - TypingMethod
 

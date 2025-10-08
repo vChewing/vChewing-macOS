@@ -6,12 +6,9 @@
 // marks, or product names of Contributor, except as required to fulfill notice
 // requirements defined in MIT License.
 
-import AppKit
-import CandidateWindow
+import Foundation
 import LangModelAssembly
-import Megrez
 import Shared
-import Tekkon
 
 // MARK: - InputHandler
 
@@ -33,16 +30,16 @@ public final class InputHandler: InputHandlerProtocol {
     self.errorCallback = errorCallback
     self.notificationCallback = notificationCallback
     /// 組字器初期化。因為是首次初期化變數，所以這裡不能用 ensureCompositor() 代勞。
-    self.compositor = Megrez.Compositor(with: currentLM, separator: "-")
+    self.assembler = Assembler(with: currentLM, separator: "-")
     /// 同步組字器單個詞的幅節長度上限。
-    compositor.maxSegLength = prefs.maxCandidateLength
+    assembler.maxSegLength = prefs.maxCandidateLength
     /// 注拼槽初期化。
     ensureKeyboardParser()
   }
 
   // MARK: Public
 
-  public static var keySeparator: String { Megrez.Compositor.theSeparator }
+  public static var keySeparator: String { Assembler.theSeparator }
 
   /// 委任物件 (SessionCtl)，以便呼叫其中的函式。
   public weak var session: Session?
@@ -58,12 +55,12 @@ public final class InputHandler: InputHandlerProtocol {
 
   public var strCodePointBuffer = "" // 內碼輸入專用組碼區
   public var calligrapher = "" // 磁帶專用組筆區
-  public var composer: Tekkon.Composer = .init() // 注拼槽
-  public var compositor: Megrez.Compositor // 組字器
+  public var composer: Composer = .init() // 注拼槽
+  public var assembler: Assembler // 組字器
 
   public var currentLM: LMAssembly.LMInstantiator {
     didSet {
-      compositor.langModel = currentLM
+      assembler.langModel = currentLM
       clear()
     }
   }

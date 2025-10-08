@@ -9,11 +9,7 @@
 /// 該檔案乃輸入調度模組當中「用來規定當 IMK 接受按鍵訊號時且首次交給輸入調度模組處理時、
 /// 輸入調度模組要率先處理」的部分。據此判斷是否需要將按鍵處理委派給其它成員函式。
 
-import IMKUtils
-import InputMethodKit
-import LangModelAssembly
-import Megrez
-import OSFrameworkImpl
+import Foundation
 import Shared
 
 // MARK: - § 根據狀態調度按鍵輸入 (Handle Input with States) * Triage
@@ -46,11 +42,11 @@ extension InputHandlerProtocol {
       case .kBackSpace: return handleBackSpace(input: input)
       case .kWindowsDelete: return handleDelete(input: input)
       case .kCarriageReturn, .kLineFeed:
-        let frontNode = compositor.assembledSentence.last
+        let frontNode = assembler.assembledSentence.last
         return handleEnter(input: input) {
           guard self.currentTypingMethod == .vChewingFactory else { return [] }
           guard let frontNode = frontNode else { return [] }
-          let pair = Megrez.KeyValuePaired(keyArray: frontNode.keyArray, value: frontNode.value)
+          let pair = KeyValuePaired(keyArray: frontNode.keyArray, value: frontNode.value)
           let associates = self.generateArrayOfAssociates(withPair: pair)
           return associates
         }
@@ -84,8 +80,8 @@ extension InputHandlerProtocol {
             session.switchState(IMEState.ofAbortion())
             return true
           }
-          if compositor.cursor < compositor.length, compositor.insertKey(" ") {
-            walk()
+          if assembler.cursor < assembler.length, assembler.insertKey(" ") {
+            assemble()
             // 一邊吃一邊屙（僅對位列黑名單的 App 用這招限制組字區長度）。
             let textToCommit = commitOverflownComposition
             var inputting = generateStateOfInputting()
