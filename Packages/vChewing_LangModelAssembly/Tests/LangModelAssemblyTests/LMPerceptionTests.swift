@@ -262,7 +262,7 @@ final class LMPerceptionTests: XCTestCase {
     XCTAssertEqual(interruptionResult.headReading, "liu2")
   }
 
-  func testPOM_6_ActualCaseScenario() throws {
+  func testPOM_6_ActualCaseScenario_SaisoukiNoGaika() throws {
     let lm = SimpleLM(input: MegrezTestComponents.strLMSampleData_SaisoukiNoGaika)
     let pom = LMAssembly.LMPerceptionOverride(
       dataURL: URL(fileURLWithPath: "/dev/null")
@@ -363,6 +363,188 @@ final class LMPerceptionTests: XCTestCase {
       .map(\.value)
       .joined(separator: " ")
     XCTAssertEqual("再 創 世 的", assembledByPOM)
+  }
+
+  func testPOM_7_ActualCaseScenario_SaisoukiOnly() throws {
+    let lm = SimpleLM(input: MegrezTestComponents.strLMSampleData_SaisoukiNoGaika)
+    let pom = LMAssembly.LMPerceptionOverride(
+      dataURL: URL(fileURLWithPath: "/dev/null")
+    )
+    let compositor = Megrez.Compositor(with: lm)
+    let readingKeys = ["zai4", "chuang4", "shi4"]
+    readingKeys.forEach { compositor.insertKey($0) }
+    compositor.assemble()
+    let assembledBefore = compositor.assembledSentence.map(\.value).joined(separator: " ")
+    XCTAssertEqual("再 創 是", assembledBefore)
+
+    let cursorShi = 2
+    var obsCaptured: Megrez.PerceptionIntel?
+    let overrideSucceeded = compositor.overrideCandidate(
+      .init(keyArray: ["shi4"], value: "世"),
+      at: cursorShi,
+      enforceRetokenization: true
+    ) {
+      obsCaptured = $0
+    }
+    XCTAssertTrue(overrideSucceeded)
+    XCTAssertEqual(obsCaptured?.ngramKey, "(zai4,再)&(chuang4,創)&(shi4,世)")
+    guard let obsCaptured else {
+      preconditionFailure("Should have a capture.")
+    }
+
+    let assembledAfter = compositor.assembledSentence.map(\.value).joined(separator: " ")
+    XCTAssertEqual("再 創 世", assembledAfter)
+    pom.memorizePerception(
+      (obsCaptured.ngramKey, obsCaptured.candidate),
+      timestamp: Date().timeIntervalSince1970
+    )
+
+    let currentmemory = pom.getSavableData()
+    let firstObservationKey = currentmemory.first?.key
+    guard let firstObservationKey else {
+      preconditionFailure("POM memorized nothing, or something wrong happen.")
+    }
+    XCTAssertEqual(firstObservationKey, obsCaptured.ngramKey)
+
+    compositor.clear()
+    readingKeys.forEach { compositor.insertKey($0) }
+    compositor.assemble()
+
+    let assembledNow = compositor.assembledSentence.map(\.value).joined(separator: " ")
+    XCTAssertEqual("再 創 是", assembledNow)
+
+    let cursorToTest = compositor.cursor
+    let suggestion = pom.fetchSuggestion(
+      assembledResult: compositor.assembledSentence,
+      cursor: cursorToTest,
+      timestamp: Date().timeIntervalSince1970
+    )
+    XCTAssertTrue(!suggestion.isEmpty)
+    guard let firstSuggestionRAW = suggestion.candidates.first else {
+      preconditionFailure("POM suggested nothing, or something wrong happen.")
+    }
+
+    let candidateSuggested = Megrez.KeyValuePaired(
+      keyArray: firstSuggestionRAW.keyArray,
+      value: firstSuggestionRAW.value,
+      score: firstSuggestionRAW.probability
+    )
+    let cursorForOverride = suggestion.overrideCursor ?? cursorShi
+    let overrideResult = compositor.overrideCandidate(
+      candidateSuggested,
+      at: cursorForOverride,
+      overrideType: suggestion.forceHighScoreOverride ? .withSpecified : .withTopGramScore,
+      enforceRetokenization: true
+    )
+    if !overrideResult {
+      compositor.overrideCandidateLiteral(
+        candidateSuggested.value,
+        at: cursorForOverride,
+        overrideType: suggestion.forceHighScoreOverride ? .withSpecified : .withTopGramScore
+      )
+    }
+    compositor.assemble()
+    let assembledByPOM = compositor.assembledSentence.map(\.value).joined(separator: " ")
+    XCTAssertEqual("再 創 世", assembledByPOM)
+  }
+
+  func testPOM_8_ActualCaseScenario_BusinessEnglishSession() throws {
+    let lm = SimpleLM(input: MegrezTestComponents.strLMSampleData_BusinessEnglishSession)
+    let pom = LMAssembly.LMPerceptionOverride(
+      dataURL: URL(fileURLWithPath: "/dev/null")
+    )
+    let compositor = Megrez.Compositor(with: lm)
+    // 測試用句「再創世的凱歌」。
+    let readingKeys = ["shang1", "wu4", "ying1", "yu3", "hui4", "hua4"]
+    readingKeys.forEach { compositor.insertKey($0) }
+    compositor.assemble()
+    let assembledBefore = compositor.assembledSentence.map(\.value).joined(separator: " ")
+    XCTAssertTrue("商務 英語 繪畫" == assembledBefore)
+    // 測試此時生成的 keyForQueryingData 是否正確
+    let cursorHua = 5
+    let keyForQueryingDataAt5 = compositor.assembledSentence
+      .generateKeyForPerception(cursor: cursorHua)
+    XCTAssertEqual(keyForQueryingDataAt5?.ngramKey, "(shang1-wu4,商務)&(ying1-yu3,英語)&(hui4-hua4,繪畫)")
+    XCTAssertEqual(keyForQueryingDataAt5?.headReading, "hua4")
+    // 應能提供『是的』『似的』『凱歌』等候選
+    let pairsAtHuiHuaEnd = compositor.fetchCandidates(at: 6, filter: .endAt)
+    XCTAssertTrue(pairsAtHuiHuaEnd.map(\.value).contains("繪畫"))
+    XCTAssertTrue(pairsAtHuiHuaEnd.map(\.value).contains("會話"))
+    // 模擬使用者把『是』改為『世』，再合成：觀測應為 shortToLong
+    var obsCaptured: Megrez.PerceptionIntel?
+    let overrideSucceeded = compositor.overrideCandidate(
+      .init(keyArray: ["hui4", "hua4"], value: "會話"),
+      at: cursorHua,
+      enforceRetokenization: true
+    ) {
+      obsCaptured = $0
+    }
+    XCTAssertTrue(overrideSucceeded)
+    XCTAssertEqual(obsCaptured?.ngramKey, "(shang1-wu4,商務)&(ying1-yu3,英語)&(hui4-hua4,會話)")
+    guard let obsCaptured else {
+      preconditionFailure("Should have a capture.")
+    }
+    // compositor.assemble() <- 已經組句了。
+    let assembledAfter = compositor.assembledSentence.map(\.value).joined(separator: " ")
+    XCTAssertTrue("商務 英語 會話" == assembledAfter)
+    pom.memorizePerception(
+      (obsCaptured.ngramKey, obsCaptured.candidate),
+      timestamp: Date().timeIntervalSince1970
+    )
+    // 記憶完畢。先看看是否有記憶。
+    let currentmemory = pom.getSavableData()
+    let firstObservationKey = currentmemory.first?.key
+    guard let firstObservationKey else {
+      preconditionFailure("POM memorized nothing, or something wrong happen.")
+    }
+    XCTAssertEqual(firstObservationKey, obsCaptured.ngramKey)
+    // 然後是記憶效力測試：
+    let validationLM = SimpleLM(input: MegrezTestComponents.strLMSampleData_BusinessEnglishSession)
+    let validationCompositor = Megrez.Compositor(with: validationLM)
+    readingKeys.forEach { validationCompositor.insertKey($0) }
+    validationCompositor.assemble()
+    let cursorToTest = validationCompositor.cursor
+    let assembledNow = validationCompositor.assembledSentence
+      .map(\.value)
+      .joined(separator: " ")
+    XCTAssertTrue(
+      ["商務 英語 繪畫", "商務 英語 會話"].contains(assembledNow),
+      "Unexpected baseline assembly: \(assembledNow)"
+    )
+    let suggestion = pom.fetchSuggestion(
+      assembledResult: validationCompositor.assembledSentence,
+      cursor: cursorToTest,
+      timestamp: Date().timeIntervalSince1970
+    )
+    XCTAssertTrue(!suggestion.isEmpty)
+    guard let firstSuggestionRAW = suggestion.candidates.first else {
+      preconditionFailure("POM suggested nothing, or something wrong happen.")
+    }
+    print(firstSuggestionRAW)
+    let candidateSuggested = Megrez.KeyValuePaired(
+      keyArray: firstSuggestionRAW.keyArray,
+      value: firstSuggestionRAW.value,
+      score: firstSuggestionRAW.probability
+    )
+    let cursorForOverride = suggestion.overrideCursor ?? cursorHua
+    let overrideResult = validationCompositor.overrideCandidate(
+      candidateSuggested,
+      at: cursorForOverride,
+      overrideType: suggestion.forceHighScoreOverride ? .withSpecified : .withTopGramScore,
+      enforceRetokenization: true
+    )
+    if !overrideResult {
+      validationCompositor.overrideCandidateLiteral(
+        candidateSuggested.value,
+        at: cursorForOverride,
+        overrideType: suggestion.forceHighScoreOverride ? .withSpecified : .withTopGramScore
+      )
+    }
+    validationCompositor.assemble()
+    let assembledByPOM = validationCompositor.assembledSentence
+      .map(\.value)
+      .joined(separator: " ")
+    XCTAssertEqual("商務 英語 會話", assembledByPOM)
   }
 }
 
