@@ -40,7 +40,7 @@ extension SessionProtocol {
     var succeeded = true
 
     let kvPair = state.data.userPhraseKVPair
-    var userPhrase = LMMgr.UserPhrase(
+    var userPhrase = UserPhraseInsertable(
       keyArray: kvPair.keyArray,
       value: kvPair.value,
       inputMode: inputMode
@@ -287,7 +287,7 @@ extension SessionProtocol {
     var succeeded = true
 
     let rawPair = state.candidates[index]
-    var userPhrase = LMMgr.UserPhrase(
+    var userPhrase = UserPhraseInsertable(
       keyArray: rawPair.keyArray,
       value: rawPair.value,
       inputMode: inputMode
