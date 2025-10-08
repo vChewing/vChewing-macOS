@@ -28,11 +28,32 @@ public enum LMAssembly {
     public var localizedDescription: String { NSLocalizedString(rawValue, comment: "") }
   }
 
+  public static let fileHandleQueue: DispatchQueue = {
+    let queue = DispatchQueue(
+      label: "org.vChewing.LMMgr.unitedUserFileIOQueue"
+    )
+    queue.setSpecific(key: fileHandleQueueKey, value: fileHandleQueueIdentifier)
+    return queue
+  }()
+
+  @discardableResult
+  public static func withFileHandleQueueSync<T>(_ execute: () throws -> T) rethrows -> T {
+    if DispatchQueue.getSpecific(key: fileHandleQueueKey) == fileHandleQueueIdentifier {
+      return try execute()
+    }
+    return try fileHandleQueue.sync(execute: execute)
+  }
+
   // MARK: Internal
 
   enum FileErrors: Error {
     case fileHandleError(String)
   }
+
+  // MARK: Private
+
+  private static let fileHandleQueueKey = DispatchSpecificKey<UUID>()
+  private static let fileHandleQueueIdentifier = UUID()
 }
 
 // MARK: - String as SQL Command

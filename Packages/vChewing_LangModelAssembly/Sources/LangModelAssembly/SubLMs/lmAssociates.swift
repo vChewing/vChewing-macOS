@@ -21,8 +21,8 @@ extension LMAssembly {
     // MARK: Internal
 
     private(set) var filePath: String?
-
-    var rangeMap: [String: [(Range<String.Index>, Int)]] = [:] // Range 只可能是一整行，所以必須得有 index。
+    /// Range 只可能是一整行，所以必須得有 index。
+    var rangeMap: [String: [(Range<String.Index>, Int)]] = [:]
     var strData: String = ""
 
     var count: Int { rangeMap.count }
@@ -96,10 +96,12 @@ extension LMAssembly {
 
     func saveData() {
       guard let filePath = filePath else { return }
-      do {
-        try strData.write(toFile: filePath, atomically: true, encoding: .utf8)
-      } catch {
-        vCLMLog("Failed to save current database to: \(filePath)")
+      LMAssembly.withFileHandleQueueSync {
+        do {
+          try strData.write(toFile: filePath, atomically: true, encoding: .utf8)
+        } catch {
+          vCLMLog("Failed to save current database to: \(filePath)")
+        }
       }
     }
 
