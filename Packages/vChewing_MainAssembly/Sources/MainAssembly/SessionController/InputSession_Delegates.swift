@@ -130,9 +130,9 @@ extension SessionProtocol {
     let target = state.candidates[index]
     let keyChain = target.keyArray.joined(separator: "-")
     let hashKey = "\(keyChain)\t\(target.value)".hashValue
-    let result = inputMode.langModel.inputTokenHashMap[hashKey]
-    if result != nil { NSSound.buzz() }
-    return result ?? false
+    let result = Set(inputMode.langModel.inputTokenHashesArray).contains(hashKey)
+    if result { NSSound.buzz() }
+    return result
   }
 
   public func candidateToolTip(shortened: Bool) -> String {

@@ -63,10 +63,17 @@ extension LMAssembly {
     // 簡體中文模型？
     public let isCHS: Bool
 
-    public internal(set) var inputTokenHashMap: [Int: Bool] = [:]
-
     // 在函式內部用以記錄狀態的開關。
     public private(set) var config = Config()
+
+    public internal(set) var inputTokenHashesArray: ContiguousArray<Int> = [] {
+      didSet {
+        let currentSet = Set(inputTokenHashesArray)
+        let previousSet = Set(oldValue)
+        guard currentSet.hashValue != previousSet.hashValue else { return }
+        inputTokenHashesArray = inputTokenHashesArray.deduplicated
+      }
+    }
 
     public var isCassetteDataLoaded: Bool { Self.lmCassette.isLoaded }
 
@@ -107,7 +114,7 @@ extension LMAssembly {
     /// 清除 InputToken HashMap。
     /// 注意：此 HashMap 僅記錄由 InputToken（以 "MACRO@" 開頭的特殊標記）生成的 Unigram。
     public func purgeInputTokenHashMap() {
-      inputTokenHashMap.removeAll()
+      inputTokenHashesArray.removeAll()
     }
 
     public func loadUserPhrasesData(path: String, filterPath: String?) {
@@ -444,9 +451,7 @@ extension LMAssembly {
           result.append(.init(keyArray: keyArray, value: value, score: newScore))
           // 僅為 InputToken 生成的 Unigram 寫入 HashMap
           let hashKey = "\(keyChain)\t\(value)".hashValue
-          if inputTokenHashMap.count < 5_000 {
-            inputTokenHashMap[hashKey] = true
-          }
+          inputTokenHashesArray.append(hashKey)
         }
         return result
       }
@@ -535,10 +540,9 @@ extension LMAssembly {
     /// 當 HashMap 過大時自動清理
     private func cleanupInputTokenHashMapIfNeeded() {
       // 更積極的清理策略：超過 3000 條目就清理至 1000 條目
-      if inputTokenHashMap.count > 3_000 {
+      if inputTokenHashesArray.count > 3_000 {
         // 保留最近 1000 個條目，清理其餘的
-        let keysToRemove = Array(inputTokenHashMap.keys.dropLast(1_000))
-        keysToRemove.forEach { inputTokenHashMap.removeValue(forKey: $0) }
+        inputTokenHashesArray.removeFirst(1_000)
       }
     }
   }

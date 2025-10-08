@@ -67,10 +67,4 @@ public final class InputHandler: InputHandlerProtocol {
       clear()
     }
   }
-
-  // MARK: Internal
-
-  /// 記憶體清理計數器，用於防止記憶體洩漏
-  internal var memoryCleanupCounter = 0
-  internal let memoryCleanupInterval = 200 // 每 200 次操作清理一次，更積極地防止記憶體洩漏
 }
