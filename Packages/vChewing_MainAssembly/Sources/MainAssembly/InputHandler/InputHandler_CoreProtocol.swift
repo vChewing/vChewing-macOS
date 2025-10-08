@@ -123,6 +123,8 @@ extension InputHandlerProtocol {
     skipObservation: Bool = false
   ) {
     let theCandidate: Megrez.KeyValuePaired = .init(candidate)
+    let preservedSentenceBeforeConsolidation = assembler.assembledSentence
+    let preservedCursorPosition = actualNodeCursorPosition
 
     /// 必須先鞏固當前組字器游標上下文、以消滅意料之外的影響，但在內文組字區內就地輪替候選字詞時除外。
     if preConsolidate { consolidateCursorContext(with: theCandidate) }
@@ -163,6 +165,14 @@ extension InputHandlerProtocol {
     pomObservation = pomObservation2ndary ?? pomObservationPrimary
     // 開始組句。
     assemble()
+
+    if let adjustedObservation = Megrez.makePerceptionIntel(
+      previouslyAssembled: preservedSentenceBeforeConsolidation,
+      currentAssembled: assembler.assembledSentence,
+      cursor: preservedCursorPosition
+    ) {
+      pomObservation = adjustedObservation
+    }
 
     // 在可行的情況下更新使用者漸退記憶模組。
     guard let pomObservation else { return }
@@ -607,6 +617,11 @@ extension InputHandlerProtocol {
     // 接下來獲取這個範圍內的節點位置陣列。
     var nodeIndices = [Int]() // 僅作統計用。
 
+    let targetCursor = actualNodeCursorPosition
+    let candidateKeyCount = max(theCandidate.keyArray.count, 1)
+    let candidateRangeUpperBound = min(targetCursor + candidateKeyCount, assembler.length)
+    let candidateRange = targetCursor ..< candidateRangeUpperBound
+
     var position = consolidationRange.lowerBound // 臨時統計用
     while position < consolidationRange.upperBound {
       guard let regionIndex = assembler.assembledSentence.cursorRegionMap[position] else {
@@ -617,21 +632,64 @@ extension InputHandlerProtocol {
         nodeIndices.append(regionIndex) // 新增統計
         guard assembler.assembledSentence.count > regionIndex else { break } // 防呆
         let currentNode = assembler.assembledSentence[regionIndex]
-        guard currentNode.keyArray.count == currentNode.value.count else {
-          assembler.overrideCandidate(currentNode.asCandidatePair, at: position)
-          position += currentNode.keyArray.count
+        let nodeLength = currentNode.keyArray.count
+        guard nodeLength > 0 else {
+          position += 1
           continue
         }
+        let nodeStart = position
+        var nextPosition = nodeStart
+        let nodeRange = nodeStart ..< (nodeStart + nodeLength)
+        let overlapsTarget = nodeRange.overlaps(candidateRange)
+
+        if !overlapsTarget {
+          if overrideNodeAsWhole(currentNode, at: nodeStart) {
+            nextPosition += nodeLength
+            position = nextPosition
+            continue
+          }
+          // 若整節覆寫失敗，退回原邏輯逐字固化以維持穩定性。
+          let values = currentNode.asCandidatePair.value.map { String($0) }
+          guard values.count == currentNode.keyArray.count else {
+            nextPosition += nodeLength
+            position = nextPosition
+            continue
+          }
+          for (subPosition, key) in currentNode.keyArray.enumerated() {
+            guard values.count > subPosition else { break } // 防呆，應該沒有發生的可能性
+            let thePair = Megrez.KeyValuePaired(
+              keyArray: [key],
+              value: values[subPosition]
+            )
+            assembler.overrideCandidate(thePair, at: nextPosition)
+            nextPosition += 1
+          }
+          position = nextPosition
+          continue
+        }
+
+        // 針對目標節點保留原先逐字固化行為，以確保覆寫準確性。
         let values = currentNode.asCandidatePair.value.map { String($0) }
+        guard values.count == currentNode.keyArray.count else {
+          if overrideNodeAsWhole(currentNode, at: nodeStart) {
+            nextPosition += nodeLength
+            position = nextPosition
+            continue
+          }
+          nextPosition += nodeLength
+          position = nextPosition
+          continue
+        }
         for (subPosition, key) in currentNode.keyArray.enumerated() {
-          guard values.count > subPosition else { break } // 防呆，應該沒有發生的可能性
+          guard values.count > subPosition else { break }
           let thePair = Megrez.KeyValuePaired(
             keyArray: [key],
             value: values[subPosition]
           )
-          assembler.overrideCandidate(thePair, at: position)
-          position += 1
+          assembler.overrideCandidate(thePair, at: nextPosition)
+          nextPosition += 1
         }
+        position = nextPosition
         continue
       }
       position += 1
@@ -701,6 +759,27 @@ extension InputHandlerProtocol {
     debugIntelToPrint.append("FIN: \(rearBoundary)..<\(frontBoundary)")
 
     return (range: rearBoundary ..< frontBoundary, debugInfo: debugIntelToPrint)
+  }
+
+  private func overrideNodeAsWhole(
+    _ node: Megrez.GramInPath,
+    at startPosition: Int
+  )
+    -> Bool {
+    let candidate = node.asCandidatePair
+    if assembler.overrideCandidate(candidate, at: startPosition) {
+      return true
+    }
+    if assembler.overrideCandidate(
+      candidate,
+      at: startPosition,
+      overrideType: .withSpecified,
+      enforceRetokenization: true
+    ) {
+      return true
+    }
+    vCLog("Consolidation fallback to per-key override for node: \(candidate.value)")
+    return false
   }
 }
 
