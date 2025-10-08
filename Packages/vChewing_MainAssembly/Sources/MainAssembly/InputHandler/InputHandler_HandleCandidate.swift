@@ -266,23 +266,23 @@ extension InputHandlerProtocol {
 
     // MARK: J / K / H / L 鍵組字區的游標移動行為處理
 
-    let allowMovingCompositorCursorByJK = allowMovingCompositorCursor && prefs
+    let allowMovinCursorByJK = allowMovingCompositorCursor && prefs
       .useJKtoMoveCompositorCursorInCandidateState
-    let allowMovingCompositorCursorByHL = allowMovingCompositorCursor && prefs
+    let allowMovingCursorByHL = allowMovingCompositorCursor && prefs
       .useHLtoMoveCompositorCursorInCandidateState
 
-    checkMovingCompositorCursorByJKHL: if allowMovingCompositorCursorByJK || allowMovingCompositorCursorByHL {
+    checkMovingCompositorCursorByJKHL: if allowMovinCursorByJK || allowMovingCursorByHL {
       guard input.keyModifierFlags.isEmpty else { break checkMovingCompositorCursorByJKHL }
       // keycode: 38 = J, 40 = K, 4 = H, 37 = L.
       switch input.keyCode {
-      case 38 where allowMovingCompositorCursorByJK, 4 where allowMovingCompositorCursorByHL:
+      case 38 where allowMovinCursorByJK, 4 where allowMovingCursorByHL:
         if assembler.moveCursorStepwise(to: .rear) {
           session.switchState(generateStateOfCandidates())
         } else {
           errorCallback?("6F389AE9")
         }
         return true
-      case 40 where allowMovingCompositorCursorByJK, 37 where allowMovingCompositorCursorByHL:
+      case 40 where allowMovinCursorByJK, 37 where allowMovingCursorByHL:
         if assembler.moveCursorStepwise(to: .front) {
           session.switchState(generateStateOfCandidates())
         } else {
