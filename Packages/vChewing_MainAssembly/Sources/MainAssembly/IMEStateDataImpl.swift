@@ -12,19 +12,9 @@ import Shared
 import Tekkon
 import TooltipUI
 
-// MARK: - IMEStateData
+// MARK: - AttributedString 生成器
 
-public struct IMEStateData: IMEStateDataProtocol {
-  // MARK: Public
-
-  public var displayedText: String = "" {
-    didSet {
-      if displayedText.rangeOfCharacter(from: .newlines) != nil {
-        displayedText = displayedText.trimmingCharacters(in: .newlines)
-      }
-    }
-  }
-
+extension IMEStateData {
   public var displayedTextConverted: String {
     /// 先做繁簡轉換
     var result = ChineseConverter.kanjiConversionIfRequired(displayedText)
@@ -36,18 +26,6 @@ public struct IMEStateData: IMEStateDataProtocol {
   }
 
   // MARK: Cursor & Marker & Range for UTF8
-
-  public var cursor: Int = 0 {
-    didSet {
-      cursor = min(max(cursor, 0), displayedText.count)
-    }
-  }
-
-  public var marker: Int = 0 {
-    didSet {
-      marker = min(max(marker, 0), displayedText.count)
-    }
-  }
 
   public var markedRange: Range<Int> {
     min(cursor, marker) ..< max(cursor, marker)
@@ -77,28 +55,20 @@ public struct IMEStateData: IMEStateDataProtocol {
   public var markedTargetExists: Bool {
     let pair = userPhraseKVPair
     return LMMgr.checkIfPhrasePairExists(
-      userPhrase: pair.value, mode: IMEApp.currentInputMode, keyArray: pair.keyArray
+      userPhrase: pair.value,
+      mode: IMEApp.currentInputMode,
+      keyArray: pair.keyArray
     )
   }
 
   public var markedTargetIsCurrentlyFiltered: Bool {
     let pair = userPhraseKVPair
     return LMMgr.checkIfPhrasePairIsFiltered(
-      userPhrase: pair.value, mode: IMEApp.currentInputMode, keyArray: pair.keyArray
+      userPhrase: pair.value,
+      mode: IMEApp.currentInputMode,
+      keyArray: pair.keyArray
     )
   }
-
-  public var displayTextSegments = [String]() {
-    didSet {
-      displayedText = displayTextSegments.joined()
-    }
-  }
-
-  public var highlightAtSegment: Int?
-  public var reading: String = ""
-  public var markedReadings = [String]()
-  public var candidates = [(keyArray: [String], value: String)]()
-  public var textToCommit: String = ""
 
   public var isFilterable: Bool {
     guard isMarkedLengthValid else { return false } // 範圍長度必須合規。
@@ -111,13 +81,6 @@ public struct IMEStateData: IMEStateDataProtocol {
   public var isMarkedLengthValid: Bool {
     Self.allowedMarkLengthRange.contains(markedRange.count)
   }
-
-  // MARK: Tooltip neta.
-
-  public var tooltip: String = ""
-  public var tooltipDuration: Double = 1.0
-  public var tooltipBackupForInputting: String = ""
-  public var tooltipColorState: TooltipColorState = .normal
 
   // MARK: Internal
 
@@ -143,10 +106,10 @@ extension IMEStateData {
     for (i, neta) in displayTextSegments.enumerated() {
       let rangeNow = NSRange(location: newBegin, length: neta.utf16.count)
       /// 不能用 .thick，否則會看不到游標。
-      var theAttributes: [NSAttributedString.Key: Any]
-        = session.mark(forStyle: kTSMHiliteConvertedText, at: rangeNow)
-        as? [NSAttributedString.Key: Any]
-        ?? [.underlineStyle: NSUnderlineStyle.single.rawValue]
+      var theAttributes: [NSAttributedString.Key: Any] =
+        session.mark(forStyle: kTSMHiliteConvertedText, at: rangeNow)
+          as? [NSAttributedString.Key: Any]
+          ?? [.underlineStyle: NSUnderlineStyle.single.rawValue]
       theAttributes[.markedClauseSegment] = i
       attributedString.setAttributes(theAttributes, range: rangeNow)
       newBegin += neta.utf16.count
@@ -168,20 +131,20 @@ extension IMEStateData {
       location: u16MarkedRange.upperBound,
       length: displayedTextConverted.utf16.count - u16MarkedRange.upperBound
     )
-    var rawAttribute1: [NSAttributedString.Key: Any]
-      = session.mark(forStyle: kTSMHiliteConvertedText, at: range1)
-      as? [NSAttributedString.Key: Any]
-      ?? [.underlineStyle: NSUnderlineStyle.single.rawValue]
+    var rawAttribute1: [NSAttributedString.Key: Any] =
+      session.mark(forStyle: kTSMHiliteConvertedText, at: range1)
+        as? [NSAttributedString.Key: Any]
+        ?? [.underlineStyle: NSUnderlineStyle.single.rawValue]
     rawAttribute1[.markedClauseSegment] = 0
-    var rawAttribute2: [NSAttributedString.Key: Any]
-      = session.mark(forStyle: kTSMHiliteSelectedConvertedText, at: range2)
-      as? [NSAttributedString.Key: Any]
-      ?? [.underlineStyle: NSUnderlineStyle.thick.rawValue]
+    var rawAttribute2: [NSAttributedString.Key: Any] =
+      session.mark(forStyle: kTSMHiliteSelectedConvertedText, at: range2)
+        as? [NSAttributedString.Key: Any]
+        ?? [.underlineStyle: NSUnderlineStyle.thick.rawValue]
     rawAttribute2[.markedClauseSegment] = 1
-    var rawAttribute3: [NSAttributedString.Key: Any]
-      = session.mark(forStyle: kTSMHiliteConvertedText, at: range3)
-      as? [NSAttributedString.Key: Any]
-      ?? [.underlineStyle: NSUnderlineStyle.single.rawValue]
+    var rawAttribute3: [NSAttributedString.Key: Any] =
+      session.mark(forStyle: kTSMHiliteConvertedText, at: range3)
+        as? [NSAttributedString.Key: Any]
+        ?? [.underlineStyle: NSUnderlineStyle.single.rawValue]
     rawAttribute3[.markedClauseSegment] = 2
     attributedString.setAttributes(rawAttribute1, range: range1)
     attributedString.setAttributes(rawAttribute2, range: range2)
@@ -189,11 +152,12 @@ extension IMEStateData {
     return attributedString
   }
 
-  public func attributedStringPlaceholder(for session: IMKInputControllerProtocol) -> NSAttributedString {
-    let attributes: [NSAttributedString.Key: Any]
-      = session.mark(forStyle: kTSMHiliteSelectedRawText, at: .zero)
-      as? [NSAttributedString.Key: Any]
-      ?? [.underlineStyle: NSUnderlineStyle.single.rawValue]
+  public func attributedStringPlaceholder(for session: IMKInputControllerProtocol)
+    -> NSAttributedString {
+    let attributes: [NSAttributedString.Key: Any] =
+      session.mark(forStyle: kTSMHiliteSelectedRawText, at: .zero)
+        as? [NSAttributedString.Key: Any]
+        ?? [.underlineStyle: NSUnderlineStyle.single.rawValue]
     return .init(string: "¶", attributes: attributes)
   }
 }
@@ -247,15 +211,20 @@ extension IMEStateData {
         tooltipColorState = .denialInsufficiency
         return String(
           format: NSLocalizedString(
-            "\"%@\" length must ≥ 2 for a user phrase.", comment: ""
-          ) + "\n◆  " + readingDisplay, text
+            "\"%@\" length must ≥ 2 for a user phrase.",
+            comment: ""
+          ) + "\n◆  " + readingDisplay,
+          text
         )
       } else if markedRange.count > Self.allowedMarkLengthRange.upperBound {
         tooltipColorState = .denialOverflow
         return String(
           format: NSLocalizedString(
-            "\"%@\" length should ≤ %d for a user phrase.", comment: ""
-          ) + "\n◆  " + readingDisplay, text, Self.allowedMarkLengthRange.upperBound
+            "\"%@\" length should ≤ %d for a user phrase.",
+            comment: ""
+          ) + "\n◆  " + readingDisplay,
+          text,
+          Self.allowedMarkLengthRange.upperBound
         )
       }
 
@@ -267,14 +236,16 @@ extension IMEStateData {
             format: NSLocalizedString(
               "\"%@\" already exists:\n ENTER to boost, SHIFT+COMMAND+ENTER to nerf.",
               comment: ""
-            ) + "\n◆  " + readingDisplay, text
+            ) + "\n◆  " + readingDisplay,
+            text
           )
         case true:
           return String(
             format: NSLocalizedString(
               "\"%@\" already exists:\n ENTER to boost, SHIFT+COMMAND+ENTER to nerf, \n BackSpace or Delete key to exclude.",
               comment: ""
-            ) + "\n◆  " + readingDisplay, text
+            ) + "\n◆  " + readingDisplay,
+            text
           )
         }
       }
@@ -285,8 +256,7 @@ extension IMEStateData {
           format: NSLocalizedString(
             "\"%@\" selected. ENTER to unfilter this phrase.",
             comment: ""
-          ) +
-            "\n◆  "
+          ) + "\n◆  "
             + readingDisplay,
           text
         )
@@ -294,8 +264,8 @@ extension IMEStateData {
 
       tooltipColorState = .normal
       return String(
-        format: NSLocalizedString("\"%@\" selected. ENTER to add user phrase.", comment: "") +
-          "\n◆  "
+        format: NSLocalizedString("\"%@\" selected. ENTER to add user phrase.", comment: "")
+          + "\n◆  "
           + readingDisplay,
         text
       )
@@ -303,9 +273,12 @@ extension IMEStateData {
     tooltip = tooltipForMarking
     if PrefMgr.shared.phraseReplacementEnabled {
       tooltipColorState = .warning
-      tooltip += "\n" + NSLocalizedString(
-        "⚠︎ Phrase replacement mode enabled, interfering user phrase entry.", comment: ""
-      )
+      tooltip +=
+        "\n"
+        + NSLocalizedString(
+          "⚠︎ Phrase replacement mode enabled, interfering user phrase entry.",
+          comment: ""
+        )
     }
   }
 }
