@@ -669,16 +669,20 @@ extension LMAssembly.LMPerceptionOverride {
     let separatorString = Megrez.Compositor.theSeparator
     let headSegments =
       separatorString.isEmpty
-        ? [originalParts.headReading]
+        ? (originalParts.headReading.isEmpty ? [] : [originalParts.headReading])
         : originalParts.headReading.components(separatedBy: separatorString).filter { !$0.isEmpty }
-    guard headSegments.count > 1, let primaryHead = headSegments.first else { return [] }
+    guard let primaryHead = headSegments.first else { return [] }
+    let requireFullHeadMatch = headSegments.count == 1
 
     var results: [String] = []
     for keyCandidate in mutLRUKeySeqList {
       guard let candidateParts = parsePerceptionKey(keyCandidate) else { continue }
       guard compareContextPart(candidateParts.prev1, originalParts.prev1) else { continue }
       guard compareContextPart(candidateParts.prev2, originalParts.prev2) else { continue }
-      if candidateParts.headReading == primaryHead {
+      let matchesPrimaryHead = candidateParts.headReading == primaryHead
+      let matchesFullHead = candidateParts.headReading == originalParts.headReading
+      guard matchesFullHead || (!requireFullHeadMatch && matchesPrimaryHead) else { continue }
+      if keyCandidate != originalKey {
         results.append(keyCandidate)
       }
     }
