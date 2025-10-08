@@ -106,7 +106,7 @@ class MainAssemblyTests: XCTestCase {
   }
 
   func clearTestPOM() {
-    testLM.clearPOMData()
+    testHandler.currentLM.clearPOMData()
   }
 
   func typeSentenceOrCandidates(_ sequence: String) {
