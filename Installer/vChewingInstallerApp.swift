@@ -11,6 +11,8 @@ import SwiftUI
 
 @main
 struct vChewingInstallerApp: App {
+  // MARK: Internal
+
   var body: some Scene {
     WindowGroup {
       makeGradient()
@@ -27,21 +29,21 @@ struct vChewingInstallerApp: App {
           MainView()
             .shadow(color: .black, radius: 3, x: 0, y: 0)
         }
-      .onAppear {
-        NSWindow.allowsAutomaticWindowTabbing = false
-        NSApp.windows.forEach { window in
-          window.titlebarAppearsTransparent = true
-          window.setContentSize(.init(width: 1_000, height: 630))
-          window.standardWindowButton(.closeButton)?.isHidden = true
-          window.standardWindowButton(.miniaturizeButton)?.isHidden = true
-          window.standardWindowButton(.zoomButton)?.isHidden = true
-          window.styleMask.remove(.resizable)
-          window.orderFront(self)
+        .onAppear {
+          NSWindow.allowsAutomaticWindowTabbing = false
+          NSApp.windows.forEach { window in
+            window.titlebarAppearsTransparent = true
+            window.setContentSize(.init(width: 1_000, height: 630))
+            window.standardWindowButton(.closeButton)?.isHidden = true
+            window.standardWindowButton(.miniaturizeButton)?.isHidden = true
+            window.standardWindowButton(.zoomButton)?.isHidden = true
+            window.styleMask.remove(.resizable)
+            window.orderFront(self)
+          }
         }
-      }
-      .onDisappear {
-        NSApp.terminate(self)
-      }
+        .onDisappear {
+          NSApp.terminate(self)
+        }
     }
     .commands {
       CommandGroup(replacing: .newItem) {}
@@ -52,7 +54,10 @@ struct vChewingInstallerApp: App {
     }
   }
 
-  @ViewBuilder private func makeGradient() -> some View {
+  // MARK: Private
+
+  @ViewBuilder
+  private func makeGradient() -> some View {
     if #available(macOS 15.0, *) {
       MeshGradient(
         width: 2,
