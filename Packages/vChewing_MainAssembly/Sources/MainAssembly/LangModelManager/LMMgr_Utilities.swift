@@ -260,20 +260,22 @@ extension LMMgr {
     _ userPhrase: UserPhraseInsertable, areWeFiltering: Bool,
     errorHandler: (() -> ())? = nil
   ) {
-    let resultA = userPhrase.write(toFilter: areWeFiltering)
-    let resultB = userPhrase.crossConverted.write(toFilter: areWeFiltering)
-    guard resultA, resultB else {
-      if let errorHandler = errorHandler {
-        errorHandler()
+    LMAssembly.withFileHandleQueueSync {
+      let resultA = userPhrase.write(toFilter: areWeFiltering)
+      let resultB = userPhrase.crossConverted.write(toFilter: areWeFiltering)
+      guard resultA, resultB else {
+        if let errorHandler = errorHandler {
+          errorHandler()
+        }
+        return
       }
-      return
+      // The new FolderMonitor module does NOT monitor cases that files are modified
+      // by the current application itself, requiring additional manual loading process here.
+      if PrefMgr.shared.phraseEditorAutoReloadExternalModifications {
+        Broadcaster.shared.eventForReloadingPhraseEditor = .init()
+      }
+      loadUserPhrasesData(type: areWeFiltering ? .theFilter : .thePhrases)
     }
-    // The new FolderMonitor module does NOT monitor cases that files are modified
-    // by the current application itself, requiring additional manual loading process here.
-    if PrefMgr.shared.phraseEditorAutoReloadExternalModifications {
-      Broadcaster.shared.eventForReloadingPhraseEditor = .init()
-    }
-    loadUserPhrasesData(type: areWeFiltering ? .theFilter : .thePhrases)
   }
 
   // MARK: - 藉由語彙編輯器開啟使用者檔案
@@ -343,7 +345,9 @@ extension LMMgr {
           templateData = Data("".utf8)
         }
         do {
-          try templateData.write(to: URL(fileURLWithPath: filePath))
+          try LMAssembly.withFileHandleQueueSync {
+            try templateData.write(to: URL(fileURLWithPath: filePath))
+          }
         } catch {
           vCLog("Failed to write template data to: \(filePath)")
           return false

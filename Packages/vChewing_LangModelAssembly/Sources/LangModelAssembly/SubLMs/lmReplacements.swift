@@ -75,10 +75,12 @@ extension LMAssembly {
 
     func saveData() {
       guard let filePath = filePath else { return }
-      do {
-        try strData.write(toFile: filePath, atomically: true, encoding: .utf8)
-      } catch {
-        vCLMLog("Failed to save current database to: \(filePath)")
+      LMAssembly.withFileHandleQueueSync {
+        do {
+          try strData.write(toFile: filePath, atomically: true, encoding: .utf8)
+        } catch {
+          vCLMLog("Failed to save current database to: \(filePath)")
+        }
       }
     }
 

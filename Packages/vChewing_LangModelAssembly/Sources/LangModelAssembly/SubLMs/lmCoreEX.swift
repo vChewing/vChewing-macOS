@@ -134,18 +134,20 @@ extension LMAssembly {
 
     func saveData() {
       guard let filePath = filePath else { return }
-      var dataToWrite = strData
-      do {
-        if !temporaryMap.isEmpty {
-          temporaryMap.forEach { neta in
-            neta.value.forEach { unigram in
-              dataToWrite.append("\(unigram.value) \(neta.key) \(unigram.score.description)\n")
+      LMAssembly.withFileHandleQueueSync {
+        var dataToWrite = strData
+        do {
+          if !temporaryMap.isEmpty {
+            temporaryMap.forEach { neta in
+              neta.value.forEach { unigram in
+                dataToWrite.append("\(unigram.value) \(neta.key) \(unigram.score.description)\n")
+              }
             }
           }
+          try dataToWrite.write(toFile: filePath, atomically: true, encoding: .utf8)
+        } catch {
+          vCLMLog("Failed to save current database to: \(filePath)")
         }
-        try dataToWrite.write(toFile: filePath, atomically: true, encoding: .utf8)
-      } catch {
-        vCLMLog("Failed to save current database to: \(filePath)")
       }
     }
 

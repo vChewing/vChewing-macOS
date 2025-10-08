@@ -49,31 +49,33 @@ extension LMAssembly {
     /// - Returns: 結果正常或修復順利則為真，其餘為假。
     @discardableResult
     public static func fixEOF(path: String) -> Bool {
-      var fileSize: UInt64?
-      do {
-        let dict = try FileManager.default.attributesOfItem(atPath: path)
-        if let value = dict[FileAttributeKey.size] as? UInt64 { fileSize = value }
-      } catch {
-        vCLMLog("EOF Fix Failed: File Missing at \(path).")
-        return false
+      LMAssembly.withFileHandleQueueSync {
+        var fileSize: UInt64?
+        do {
+          let dict = try FileManager.default.attributesOfItem(atPath: path)
+          if let value = dict[FileAttributeKey.size] as? UInt64 { fileSize = value }
+        } catch {
+          vCLMLog("EOF Fix Failed: File Missing at \(path).")
+          return false
+        }
+        guard let fileSize = fileSize else { return false }
+        guard let writeFile = FileHandle(forUpdatingAtPath: path) else {
+          vCLMLog("EOF Fix Failed: File Not Writable at \(path).")
+          return false
+        }
+        defer { writeFile.closeFile() }
+        /// 注意：Swift 版 LMConsolidator 並未在此安排對 EOF 的去重複工序。
+        /// 但這個函式執行完之後往往就會 consolidate() 整理格式，所以不會有差。
+        writeFile.seek(toFileOffset: fileSize - 1)
+        if writeFile.readDataToEndOfFile().first != 0x0A {
+          vCLMLog("EOF Missing Confirmed, Start Fixing.")
+          var newData = Data()
+          newData.append(0x0A)
+          writeFile.write(newData)
+          vCLMLog("EOF Successfully Assured.")
+        }
+        return true
       }
-      guard let fileSize = fileSize else { return false }
-      guard let writeFile = FileHandle(forUpdatingAtPath: path) else {
-        vCLMLog("EOF Fix Failed: File Not Writable at \(path).")
-        return false
-      }
-      defer { writeFile.closeFile() }
-      /// 注意：Swift 版 LMConsolidator 並未在此安排對 EOF 的去重複工序。
-      /// 但這個函式執行完之後往往就會 consolidate() 整理格式，所以不會有差。
-      writeFile.seek(toFileOffset: fileSize - 1)
-      if writeFile.readDataToEndOfFile().first != 0x0A {
-        vCLMLog("EOF Missing Confirmed, Start Fixing.")
-        var newData = Data()
-        newData.append(0x0A)
-        writeFile.write(newData)
-        vCLMLog("EOF Successfully Assured.")
-      }
-      return false
     }
 
     /// 統整給定的字串。
@@ -138,29 +140,31 @@ extension LMAssembly {
       pragma shouldCheckPragma: Bool
     )
       -> Bool {
-      let pragmaResult = checkPragma(path: path)
-      if shouldCheckPragma {
-        if pragmaResult {
+      LMAssembly.withFileHandleQueueSync {
+        let pragmaResult = checkPragma(path: path)
+        if shouldCheckPragma {
+          if pragmaResult {
+            return true
+          }
+        }
+
+        let urlPath = URL(fileURLWithPath: path)
+        if FileManager.default.fileExists(atPath: path) {
+          do {
+            var strProcessed = try String(contentsOf: urlPath, encoding: .utf8)
+            consolidate(text: &strProcessed, pragma: shouldCheckPragma)
+            // Write consolidated file contents.
+            try strProcessed.write(to: urlPath, atomically: false, encoding: .utf8)
+          } catch {
+            vCLMLog("Consolidation Failed w/ File: \(path), error: \(error)")
+            return false
+          }
+          vCLMLog("Either Consolidation Successful Or No-Need-To-Consolidate.")
           return true
         }
+        vCLMLog("Consolidation Failed: File Missing at \(path).")
+        return false
       }
-
-      let urlPath = URL(fileURLWithPath: path)
-      if FileManager.default.fileExists(atPath: path) {
-        do {
-          var strProcessed = try String(contentsOf: urlPath, encoding: .utf8)
-          consolidate(text: &strProcessed, pragma: shouldCheckPragma)
-          // Write consolidated file contents.
-          try strProcessed.write(to: urlPath, atomically: false, encoding: .utf8)
-        } catch {
-          vCLMLog("Consolidation Failed w/ File: \(path), error: \(error)")
-          return false
-        }
-        vCLMLog("Either Consolidation Successful Or No-Need-To-Consolidate.")
-        return true
-      }
-      vCLMLog("Consolidation Failed: File Missing at \(path).")
-      return false
     }
   }
 }
