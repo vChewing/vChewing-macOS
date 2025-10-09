@@ -298,7 +298,7 @@ final class LMPerceptionTests: XCTestCase {
     ) {
       obsCaptured = $0
     }
-    XCTAssertEqual(obsCaptured?.ngramKey, "(zai4,再)&(chuang4,創)&(shi4,世)")
+    XCTAssertEqual(obsCaptured?.contextualizedGramKey, "(zai4,再)&(chuang4,創)&(shi4,世)")
     guard let obsCaptured else {
       preconditionFailure("Should have a capture.")
     }
@@ -306,7 +306,7 @@ final class LMPerceptionTests: XCTestCase {
     let assembledAfter = compositor.assembledSentence.map(\.value).joined(separator: " ")
     XCTAssertTrue("再 創 世 的 凱歌" == assembledAfter)
     pom.memorizePerception(
-      (obsCaptured.ngramKey, obsCaptured.candidate),
+      (obsCaptured.contextualizedGramKey, obsCaptured.candidate),
       timestamp: Date().timeIntervalSince1970
     )
     // 記憶完畢。先看看是否有記憶。
@@ -315,7 +315,7 @@ final class LMPerceptionTests: XCTestCase {
     guard let firstObservationKey else {
       preconditionFailure("POM memorized nothing, or something wrong happen.")
     }
-    XCTAssertEqual(firstObservationKey, obsCaptured.ngramKey)
+    XCTAssertEqual(firstObservationKey, obsCaptured.contextualizedGramKey)
     // 然後是記憶效力測試：
     let validationLM = SimpleLM(input: MegrezTestComponents.strLMSampleData_SaisoukiNoGaika)
     let validationCompositor = Megrez.Compositor(with: validationLM)
@@ -387,7 +387,7 @@ final class LMPerceptionTests: XCTestCase {
       obsCaptured = $0
     }
     XCTAssertTrue(overrideSucceeded)
-    XCTAssertEqual(obsCaptured?.ngramKey, "(zai4,再)&(chuang4,創)&(shi4,世)")
+    XCTAssertEqual(obsCaptured?.contextualizedGramKey, "(zai4,再)&(chuang4,創)&(shi4,世)")
     guard let obsCaptured else {
       preconditionFailure("Should have a capture.")
     }
@@ -395,7 +395,7 @@ final class LMPerceptionTests: XCTestCase {
     let assembledAfter = compositor.assembledSentence.map(\.value).joined(separator: " ")
     XCTAssertEqual("再 創 世", assembledAfter)
     pom.memorizePerception(
-      (obsCaptured.ngramKey, obsCaptured.candidate),
+      (obsCaptured.contextualizedGramKey, obsCaptured.candidate),
       timestamp: Date().timeIntervalSince1970
     )
 
@@ -404,7 +404,7 @@ final class LMPerceptionTests: XCTestCase {
     guard let firstObservationKey else {
       preconditionFailure("POM memorized nothing, or something wrong happen.")
     }
-    XCTAssertEqual(firstObservationKey, obsCaptured.ngramKey)
+    XCTAssertEqual(firstObservationKey, obsCaptured.contextualizedGramKey)
 
     compositor.clear()
     readingKeys.forEach { compositor.insertKey($0) }
@@ -480,7 +480,7 @@ final class LMPerceptionTests: XCTestCase {
       obsCaptured = $0
     }
     XCTAssertTrue(overrideSucceeded)
-    XCTAssertEqual(obsCaptured?.ngramKey, "(shang1-wu4,商務)&(ying1-yu3,英語)&(hui4-hua4,會話)")
+    XCTAssertEqual(obsCaptured?.contextualizedGramKey, "(shang1-wu4,商務)&(ying1-yu3,英語)&(hui4-hua4,會話)")
     guard let obsCaptured else {
       preconditionFailure("Should have a capture.")
     }
@@ -488,7 +488,7 @@ final class LMPerceptionTests: XCTestCase {
     let assembledAfter = compositor.assembledSentence.map(\.value).joined(separator: " ")
     XCTAssertTrue("商務 英語 會話" == assembledAfter)
     pom.memorizePerception(
-      (obsCaptured.ngramKey, obsCaptured.candidate),
+      (obsCaptured.contextualizedGramKey, obsCaptured.candidate),
       timestamp: Date().timeIntervalSince1970
     )
     // 記憶完畢。先看看是否有記憶。
@@ -497,7 +497,7 @@ final class LMPerceptionTests: XCTestCase {
     guard let firstObservationKey else {
       preconditionFailure("POM memorized nothing, or something wrong happen.")
     }
-    XCTAssertEqual(firstObservationKey, obsCaptured.ngramKey)
+    XCTAssertEqual(firstObservationKey, obsCaptured.contextualizedGramKey)
     // 然後是記憶效力測試：
     let validationLM = SimpleLM(input: MegrezTestComponents.strLMSampleData_BusinessEnglishSession)
     let validationCompositor = Megrez.Compositor(with: validationLM)
