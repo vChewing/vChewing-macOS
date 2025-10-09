@@ -27,11 +27,24 @@ extension LMAssembly.LMInstantiator {
     return result.isEmpty ? nil : result
   }
 
+  /// 磁帶模式專用：指定 `%quickphrases` 章節所定義的送詞鍵。
+  public var cassetteQuickPhraseCommissionKey: String? {
+    let key = Self.lmCassette.quickPhraseCommissionKey
+    return key.isEmpty ? nil : key
+  }
+
   /// 磁帶模式專用函式：調取 `%quick` 快速候選結果。
   /// - Parameter key: 按鍵字元。
   /// - Returns: 結果。
   public func cassetteQuickSetsFor(key: String) -> String? {
     Self.lmCassette.quickSetsFor(key: key)
+  }
+
+  /// 磁帶模式專用函式：調取 `%quickphrases` 詞彙候選結果。
+  /// - Parameter key: 按鍵字元。
+  /// - Returns: 結果。
+  public func cassetteQuickPhrases(for key: String) -> [String]? {
+    Self.lmCassette.quickPhrasesFor(key: key)
   }
 
   /// 磁帶模式專用函式：調取 `%symboldata` 符號選單查詢結果。
