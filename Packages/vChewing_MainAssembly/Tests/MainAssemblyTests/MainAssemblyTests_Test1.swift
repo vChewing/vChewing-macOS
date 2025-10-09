@@ -262,4 +262,99 @@ extension MainAssemblyTests {
     XCTAssertEqual(result, "⠛⠖⠁⠅⠢⠁⠛⠊⠆⠛⠲⠁⠎⠁⠙⠢")
     vCTestLog("成功完成測試 inputHandler.commissionByCtrlOptionCommandEnter()。")
   }
+
+  func test107_InputHandler_CassetteQuickPhraseSelection() throws {
+    let originalAsyncLoading = LMAssembly.LMInstantiator.asyncLoadingUserData
+    LMAssembly.LMInstantiator.asyncLoadingUserData = false
+    defer { LMAssembly.LMInstantiator.asyncLoadingUserData = originalAsyncLoading }
+
+    PrefMgr.shared.cassetteEnabled = true
+    LMMgr.syncLMPrefs()
+
+    let cassetteURL = URL(fileURLWithPath: #file)
+      .deletingLastPathComponent() // MainAssemblyTests
+      .deletingLastPathComponent() // Tests
+      .deletingLastPathComponent() // vChewing_MainAssembly
+      .deletingLastPathComponent() // Packages
+      .appendingPathComponent("vChewing_LangModelAssembly")
+      .appendingPathComponent("Tests")
+      .appendingPathComponent("TestCINData")
+      .appendingPathComponent("array30.cin2")
+
+    LMAssembly.LMInstantiator.loadCassetteData(path: cassetteURL.path)
+
+    testSession.resetInputHandler(forceComposerCleanup: true)
+
+    typeSentenceOrCandidates(",,,")
+    XCTAssertEqual(testHandler.calligrapher, ",,,")
+
+    let initialCandidates = testSession.state.candidates.map(\.value)
+    XCTAssertFalse(initialCandidates.isEmpty)
+    XCTAssertTrue(initialCandidates.allSatisfy { $0.count == 1 })
+
+    guard let quickPhraseKey = testHandler.currentLM.cassetteQuickPhraseCommissionKey else {
+      XCTFail("Quick phrase commission key missing")
+      return
+    }
+
+    typeSentenceOrCandidates(quickPhraseKey)
+
+    XCTAssertTrue(testHandler.calligrapher.isEmpty)
+    XCTAssertEqual(testSession.state.type, .ofEmpty)
+    XCTAssertEqual(testClient.toString(), "米糕")
+  }
+
+  func test108_InputHandler_CassetteQuickPhraseSymbolTableMultiple() throws {
+    let originalAsyncLoading = LMAssembly.LMInstantiator.asyncLoadingUserData
+    LMAssembly.LMInstantiator.asyncLoadingUserData = false
+    defer { LMAssembly.LMInstantiator.asyncLoadingUserData = originalAsyncLoading }
+
+    PrefMgr.shared.cassetteEnabled = true
+    LMMgr.syncLMPrefs()
+
+    let cassetteURL = URL(fileURLWithPath: #file)
+      .deletingLastPathComponent() // MainAssemblyTests
+      .deletingLastPathComponent() // Tests
+      .deletingLastPathComponent() // vChewing_MainAssembly
+      .deletingLastPathComponent() // Packages
+      .appendingPathComponent("vChewing_LangModelAssembly")
+      .appendingPathComponent("Tests")
+      .appendingPathComponent("TestCINData")
+      .appendingPathComponent("array30.cin2")
+
+    LMAssembly.LMInstantiator.loadCassetteData(path: cassetteURL.path)
+
+    testSession.resetInputHandler(forceComposerCleanup: true)
+
+    typeSentenceOrCandidates(",,,,")
+    XCTAssertEqual(testHandler.calligrapher, ",,,,")
+
+    guard let quickPhraseKey = testHandler.currentLM.cassetteQuickPhraseCommissionKey else {
+      XCTFail("Quick phrase commission key missing")
+      return
+    }
+
+    typeSentenceOrCandidates(quickPhraseKey)
+
+    XCTAssertEqual(testSession.state.type, .ofSymbolTable)
+    XCTAssertEqual(testSession.state.node.name, ",,,,")
+    XCTAssertEqual(
+      testSession.state.node.members.map(\.name),
+      ["炎炎", "迷迷糊糊", "熒熒"]
+    )
+    XCTAssertEqual(
+      testSession.state.candidates.map(\.value),
+      ["炎炎", "迷迷糊糊", "熒熒"]
+    )
+    XCTAssertTrue(testClient.toString().isEmpty)
+
+    let selectionKeys = Array(testSession.selectionKeys)
+    XCTAssertGreaterThan(selectionKeys.count, 1)
+
+    typeSentenceOrCandidates(String(selectionKeys[1]))
+
+    XCTAssertTrue(testHandler.calligrapher.isEmpty)
+    XCTAssertEqual(testSession.state.type, .ofEmpty)
+    XCTAssertEqual(testClient.toString(), "迷迷糊糊")
+  }
 }

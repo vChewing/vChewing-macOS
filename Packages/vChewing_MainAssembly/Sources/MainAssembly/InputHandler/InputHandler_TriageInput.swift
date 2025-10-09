@@ -170,6 +170,11 @@ extension InputHandlerProtocol {
       var cinDirectlyCommit = prefs.cassetteEnabled && !currentLM.keysToDirectlyCommit.isEmpty
       cinDirectlyCommit = cinDirectlyCommit && [.ofInputting, .ofEmpty].contains(state.type)
       cinDirectlyCommit = cinDirectlyCommit && currentLM.keysToDirectlyCommit.contains(input.text)
+      if cinDirectlyCommit,
+         let quickPhraseKey = currentLM.cassetteQuickPhraseCommissionKey,
+         quickPhraseKey == input.text {
+        cinDirectlyCommit = false
+      }
       guard !cinDirectlyCommit else { break triageByState }
 
       // 全形/半形阿拉伯數字輸入。
