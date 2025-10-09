@@ -272,7 +272,12 @@ extension InputHandlerProtocol {
 
     // 正式處理。
     var wildcardKey: String { currentLM.cassetteWildcardKey } // 花牌鍵。
+    let quickPhraseKey = currentLM.cassetteQuickPhraseCommissionKey
     let inputText = input.text
+    let isQuickPhraseKeyInput: Bool = {
+      guard let quickPhraseKey, !quickPhraseKey.isEmpty else { return false }
+      return inputText == quickPhraseKey
+    }()
     let isWildcardKeyInput: Bool = (inputText == wildcardKey && !wildcardKey.isEmpty)
 
     let skipStrokeHandling =
@@ -331,6 +336,29 @@ extension InputHandlerProtocol {
         session.switchState(result)
         return true
       }
+    }
+
+    if isQuickPhraseKeyInput {
+      guard !calligrapher.isEmpty else {
+        errorCallback?("8E1F0B8C: Quick phrase key requires existing strokes.")
+        return true
+      }
+      guard let phrases = currentLM.cassetteQuickPhrases(for: calligrapher), !phrases.isEmpty else {
+        errorCallback?("ABF4A62D: No quick phrases for key \(calligrapher).")
+        return true
+      }
+      if let quickPhraseKey, !quickPhraseKey.isEmpty, phrases.count == 1,
+         let phrase = phrases.first {
+        calligrapher.removeAll()
+        session.switchState(IMEState.ofCommitting(textToCommit: phrase))
+        return true
+      }
+      let phraseNode = CandidateNode(
+        name: calligrapher,
+        members: phrases.map { CandidateNode(name: $0) }
+      )
+      session.switchState(IMEState.ofSymbolTable(node: phraseNode))
+      return true
     }
 
     if !(state.type == .ofInputting && state.isCandidateContainer) {
