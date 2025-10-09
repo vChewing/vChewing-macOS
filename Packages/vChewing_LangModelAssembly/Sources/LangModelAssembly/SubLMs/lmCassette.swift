@@ -32,6 +32,8 @@ extension LMAssembly {
     private(set) var keysToDirectlyCommit: String = ""
     private(set) var keyNameMap: [String: String] = [:]
     private(set) var quickDefMap: [String: String] = [:]
+    private(set) var quickPhraseMap: [String: [String]] = [:]
+    private(set) var quickPhraseCommissionKey: String = ""
     private(set) var charDefMap: [String: [String]] = [:]
     private(set) var charDefWildcardMap: [String: [String]] = [:]
     private(set) var symbolDefMap: [String: [String]] = [:]
@@ -116,6 +118,7 @@ extension LMAssembly.LMCassette {
           }
         }
         var loadingOctagramData = false
+        var loadingQuickPhrases = false
         var keysUsedInCharDef: Set<String> = .init()
 
         for strLine in lineReader {
@@ -144,6 +147,8 @@ extension LMAssembly.LMCassette {
             case "%symboldef" where strSecondCell == "end": loadingSymbolDefinitions = false
             case "%octagram" where strSecondCell == "begin": loadingOctagramData = true
             case "%octagram" where strSecondCell == "end": loadingOctagramData = false
+            case "%quickphrases" where strSecondCell == "begin": loadingQuickPhrases = true
+            case "%quickphrases" where strSecondCell == "end": loadingQuickPhrases = false
             case "%ename" where nameENG.isEmpty:
               parseSubCells: for neta in strSecondCell.components(separatedBy: ";") {
                 let subNetaGroup = neta.components(separatedBy: ":")
@@ -168,6 +173,9 @@ extension LMAssembly.LMCassette {
               where wildcardKey.isEmpty: wildcardKey = strSecondCell.first?.description ?? ""
             case "%keys_to_directly_commit"
               where keysToDirectlyCommit.isEmpty: keysToDirectlyCommit = strSecondCell
+            case "%quickphrases_commission_key"
+              where quickPhraseCommissionKey.isEmpty:
+              quickPhraseCommissionKey = strSecondCell.first?.description ?? ""
             default: break processTags
             }
             continue
@@ -180,6 +188,35 @@ extension LMAssembly.LMCassette {
           } else if loadingQuickSets {
             theMaxKeyLength = max(theMaxKeyLength, cells[0].count)
             quickDefMap[strFirstCell, default: .init()].append(strSecondCell)
+          } else if loadingQuickPhrases {
+            theMaxKeyLength = max(theMaxKeyLength, strFirstCell.count)
+            var remainderLine = strLine.trimmingCharacters(in: .newlines)
+            if remainderLine.hasPrefix(strFirstCell) {
+              remainderLine.removeFirst(strFirstCell.count)
+            }
+            let trimmedRemainder = remainderLine.drop(while: { $0 == "\t" || $0 == " " })
+            let remainderString = String(trimmedRemainder)
+            var phraseCandidates: [String] = []
+            if isTabDelimiting {
+              phraseCandidates = remainderString.split(separator: "\t").map {
+                $0.trimmingCharacters(in: CharacterSet.whitespacesAndNewlines)
+              }
+            } else {
+              let trimmed = remainderString
+                .trimmingCharacters(in: CharacterSet.whitespacesAndNewlines)
+              if !trimmed.isEmpty { phraseCandidates = [trimmed] }
+            }
+            let sanitized = phraseCandidates
+              .map { $0.trimmingCharacters(in: CharacterSet.whitespacesAndNewlines) }
+              .filter { !$0.isEmpty && $0 != nullCandidate }
+            guard !sanitized.isEmpty else { continue }
+            var phrases = quickPhraseMap[strFirstCell, default: []]
+            phrases.append(contentsOf: sanitized)
+            phrases = phrases
+              .map { $0.trimmingCharacters(in: CharacterSet.whitespacesAndNewlines) }
+              .filter { !$0.isEmpty && $0 != nullCandidate }
+              .deduplicated
+            quickPhraseMap[strFirstCell] = phrases
           } else if loadingCharDefinitions, !loadingSymbolDefinitions {
             theMaxKeyLength = max(theMaxKeyLength, cells[0].count)
             charDefMap[strFirstCell, default: []].append(strSecondCell)
@@ -236,6 +273,7 @@ extension LMAssembly.LMCassette {
     // 明確清理所有字典以釋放記憶體
     keyNameMap.removeAll(keepingCapacity: false)
     quickDefMap.removeAll(keepingCapacity: false)
+    quickPhraseMap.removeAll(keepingCapacity: false)
     charDefMap.removeAll(keepingCapacity: false)
     charDefWildcardMap.removeAll(keepingCapacity: false)
     symbolDefMap.removeAll(keepingCapacity: false)
@@ -270,6 +308,15 @@ extension LMAssembly.LMCassette {
       }
     }
     return result.isEmpty ? nil : result.joined(separator: "\t")
+  }
+
+  func quickPhrasesFor(key: String) -> [String]? {
+    guard !key.isEmpty else { return nil }
+    guard let phrases = quickPhraseMap[key]?
+      .map({ $0.trimmingCharacters(in: .whitespacesAndNewlines) })
+      .filter({ !$0.isEmpty }) else { return nil }
+    let sanitized = phrases.filter { $0 != nullCandidate }.deduplicated
+    return sanitized.isEmpty ? nil : sanitized
   }
 
   /// 根據給定的字根索引鍵，來獲取資料庫辭典內的對應結果。
