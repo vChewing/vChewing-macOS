@@ -365,6 +365,9 @@ extension Megrez.Compositor {
   ///   - overriddenNode: 已覆寫的節點
   /// - Returns: 是否需要重設
   private func shouldResetNode(anchor: Megrez.Node, overriddenNode: Megrez.Node) -> Bool {
+    guard overriddenNode.segLength <= anchor.segLength else {
+      return true
+    }
     let anchorValue = anchor.value
     let overriddenValue = overriddenNode.value
 
@@ -393,8 +396,9 @@ extension Megrez {
 
   /// 觀測上下文情形。
   public struct PerceptionIntel: Codable, Hashable {
-    /// N-gram 索引鍵。
-    public let ngramKey: String
+    /// 將游標附近的上下文序列化成三段式的 gram 簽名，用於記憶回放比對。
+    /// 最後一段永遠紀錄覆寫後的候選字詞，其前兩段保留覆寫前的語境快照。
+    public let contextualizedGramKey: String
     /// 候選字。
     public let candidate: String
     /// 頭部讀音。
@@ -443,47 +447,78 @@ extension Megrez {
     case (false, false): .sameLenSwap
     }
     let forceHSO = isShortToLong // 只有短→長時需要強推長詞
-    // 選擇用來形成觀測 key 的資料源：同長或變長時優先採用覆寫後的 walk
-    let primaryKeySource: [Megrez.GramInPath]
-    let fallbackKeySource: [Megrez.GramInPath]
-    switch scenario {
-    case .sameLenSwap:
-      primaryKeySource = currentAssembled
-      fallbackKeySource = previouslyAssembled
-    case .shortToLong:
-      primaryKeySource = previouslyAssembled
-      fallbackKeySource = currentAssembled
-    case .longToShort:
-      primaryKeySource = currentAssembled
-      fallbackKeySource = previouslyAssembled
-    }
     let keyCursorRaw = Swift.max(
       afterHit.range.lowerBound,
       Swift.min(cursor, afterHit.range.upperBound - 1)
     )
-    guard primaryKeySource.totalKeyCount > 0 || fallbackKeySource.totalKeyCount > 0 else {
-      return nil
-    }
-    let keyCursorPrimary = Swift.max(
-      0,
-      Swift.min(keyCursorRaw, max(primaryKeySource.totalKeyCount - 1, 0))
-    )
-    var keyGen = primaryKeySource.generateKeyForPerception(cursor: keyCursorPrimary)
 
-    if keyGen == nil, fallbackKeySource.totalKeyCount > 0 {
-      let keyCursorFallback = Swift.max(
-        0,
-        Swift.min(keyCursorRaw, max(fallbackKeySource.totalKeyCount - 1, 0))
-      )
-      keyGen = fallbackKeySource.generateKeyForPerception(cursor: keyCursorFallback)
+    func clampedCursor(for source: [Megrez.GramInPath]) -> Int {
+      Swift.max(0, Swift.min(keyCursorRaw, max(source.totalKeyCount - 1, 0)))
+    }
+
+    func splitKeyParts(_ key: String) -> [String] {
+      let parts = key.split(separator: "&").map(String.init)
+      if parts.isEmpty { return ["()", "()", "()"] }
+      if parts.count >= 3 { return parts }
+      var padded = parts
+      while padded.count < 3 { padded.insert("()", at: 0) }
+      return padded
+    }
+
+    var keyGen: (ngramKey: String, candidate: String, headReading: String)?
+
+    switch scenario {
+    case .shortToLong:
+      let cursorPrev = clampedCursor(for: previouslyAssembled)
+      let cursorCurr = clampedCursor(for: currentAssembled)
+      let keyGenPrev = previouslyAssembled.generateKeyForPerception(cursor: cursorPrev)
+      let keyGenCurr = currentAssembled.generateKeyForPerception(cursor: cursorCurr)
+
+      if let keyGenPrev, let keyGenCurr {
+        var mergedParts = splitKeyParts(keyGenPrev.ngramKey)
+        let currentParts = splitKeyParts(keyGenCurr.ngramKey)
+        if let newHead = currentParts.last {
+          mergedParts[mergedParts.count - 1] = newHead
+        }
+        keyGen = (
+          ngramKey: mergedParts.joined(separator: "&"),
+          candidate: keyGenCurr.candidate,
+          headReading: keyGenCurr.headReading
+        )
+      } else {
+        keyGen = keyGenCurr ?? keyGenPrev
+      }
+
+    case .longToShort, .sameLenSwap:
+      let primarySource = currentAssembled
+      let fallbackSource = previouslyAssembled
+
+      if primarySource.totalKeyCount > 0 {
+        let cursorPrimary = clampedCursor(for: primarySource)
+        keyGen = primarySource.generateKeyForPerception(cursor: cursorPrimary)
+      }
+
+      if keyGen == nil, fallbackSource.totalKeyCount > 0 {
+        let cursorFallback = clampedCursor(for: fallbackSource)
+        keyGen = fallbackSource.generateKeyForPerception(cursor: cursorFallback)
+      }
     }
 
     guard let keyGen else { return nil }
 
+    let normalizedHeadReading: String = {
+      let separator = Megrez.Compositor.theSeparator
+      if scenario == .shortToLong || afterHit.gram.segLength > 1 {
+        let joined = afterHit.gram.joinedCurrentKey(by: separator)
+        return joined.isEmpty ? keyGen.headReading : joined
+      }
+      return keyGen.headReading
+    }()
+
     return .init(
-      ngramKey: keyGen.ngramKey,
+      contextualizedGramKey: keyGen.ngramKey,
       candidate: current.value,
-      headReading: keyGen.headReading,
+      headReading: normalizedHeadReading,
       scenario: scenario,
       forceHighScoreOverride: forceHSO,
       scoreFromLM: afterHit.gram.score

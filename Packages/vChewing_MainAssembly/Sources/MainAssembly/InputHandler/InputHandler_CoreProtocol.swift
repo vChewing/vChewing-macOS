@@ -183,7 +183,7 @@ extension InputHandlerProtocol {
       vCLog("POM: Start Observation.")
       prefs.failureFlagForPOMObservation = true
       currentLM.memorizePerception(
-        (pomObservation.ngramKey, pomObservation.candidate),
+        (pomObservation.contextualizedGramKey, pomObservation.candidate),
         timestamp: Date().timeIntervalSince1970,
         saveCallback: pomSaveCallback
       )

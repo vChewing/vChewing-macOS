@@ -758,4 +758,49 @@ public enum MegrezTestComponents {
   yu3 与 -9.461
   yu3-hui4 語彙 -5.224
   """
+
+  public static let strLMSampleData_DiJiaoSubmission = """
+  di4 地 -5.101
+  di4 第 -5.101
+  di4 帝 -5.248
+  di4 遞 -5.282
+  di4 弟 -5.286
+  di4 蒂 -5.536
+  di4 締 -6.52
+  di4 娣 -6.755
+  di4 的 -6.802
+  di4 玓 -6.904
+  di4 碲 -6.978
+  di4 睇 -7.026
+  di4 諦 -7.51
+  di4 棣 -7.29
+  di4 嵽 -7.655
+  di4 踶 -8.257
+  di4 菂 -8.382
+  di4 軑 -8.558
+  di4 螮 -8.558
+  di4 坔 -9.461
+  di4-jiao1 遞交 -5.22
+  di4-jiao1 締交 -6.99
+  jiao1 教 -5.52
+  jiao1 交 -5.187
+  jiao1 澆 -5.271
+  jiao1 焦 -5.272
+  jiao1 嬌 -5.284
+  jiao1 礁 -5.288
+  jiao1 茭 -5.295
+  jiao1 跤 -5.541
+  jiao1 膠 -5.584
+  jiao1 蕉 -5.695
+  jiao1 椒 -5.721
+  jiao1 驕 -5.735
+  jiao1 郊 -6.181
+  jiao1 蛟 -6.522
+  jiao1 鮫 -6.536
+  jiao1 鷦 -7.066
+  jiao1 姣 -7.225
+  jiao1 艽 -7.396
+  jiao1 燋 -7.956
+  jiao1 鵁 -8.558
+  """
 }
