@@ -546,6 +546,124 @@ final class LMPerceptionTests: XCTestCase {
       .joined(separator: " ")
     XCTAssertEqual("商務 英語 會話", assembledByPOM)
   }
+
+  func testPOM_9_ActualCaseScenario_DiJiaoSubmission() throws {
+    let lm = SimpleLM(input: MegrezTestComponents.strLMSampleData_DiJiaoSubmission)
+    let pom = LMAssembly.LMPerceptionOverride(dataURL: URL(fileURLWithPath: "/dev/null"))
+    let compositor = Megrez.Compositor(with: lm)
+    let readingKeys = ["di4", "jiao1"]
+    readingKeys.forEach { compositor.insertKey($0) }
+    compositor.assemble()
+
+    let overrideFirst = compositor.overrideCandidate(
+      .init(keyArray: ["di4"], value: "第"),
+      at: 0,
+      enforceRetokenization: true
+    )
+    XCTAssertTrue(overrideFirst)
+    compositor.assemble()
+
+    let assembledAfterFirst = compositor.assembledSentence.map(\.value).joined(separator: " ")
+    XCTAssertTrue(
+      ["第 交", "第 教"].contains(assembledAfterFirst),
+      "Unexpected assembly after forcing 第: \(assembledAfterFirst)"
+    )
+
+    let candidatesAtEnd = compositor.fetchCandidates(at: readingKeys.count, filter: .endAt)
+    guard let diJiaoCandidate = candidatesAtEnd.first(where: { $0.value == "遞交" }) else {
+      XCTFail("遞交 should be available as a candidate ending at the current cursor.")
+      return
+    }
+
+    var obsCaptured: Megrez.PerceptionIntel?
+    let overrideSucceeded = compositor.overrideCandidate(
+      diJiaoCandidate,
+      at: readingKeys.count,
+      enforceRetokenization: true
+    ) {
+      obsCaptured = $0
+    }
+    XCTAssertTrue(overrideSucceeded)
+    guard let obsCaptured else {
+      preconditionFailure("Should have a capture.")
+    }
+    XCTAssertEqual(obsCaptured.candidate, "遞交")
+    XCTAssertEqual(obsCaptured.contextualizedGramKey, "()&(di4,第)&(di4-jiao1,遞交)")
+
+    let assembledAfterSecond = compositor.assembledSentence.map(\.value).joined(separator: " ")
+    XCTAssertEqual("遞交", assembledAfterSecond)
+
+    pom.memorizePerception(
+      (obsCaptured.contextualizedGramKey, obsCaptured.candidate),
+      timestamp: Date().timeIntervalSince1970
+    )
+
+    let savedKeys = pom.getSavableData().map(\.key)
+    XCTAssertTrue(savedKeys.contains(obsCaptured.contextualizedGramKey))
+
+    let directSuggestion = pom.getSuggestion(
+      key: obsCaptured.contextualizedGramKey,
+      timestamp: Date().timeIntervalSince1970
+    )
+    XCTAssertEqual(directSuggestion?.first?.value, "遞交")
+
+    let validationLM = SimpleLM(input: MegrezTestComponents.strLMSampleData_DiJiaoSubmission)
+    let validationCompositor = Megrez.Compositor(with: validationLM)
+    readingKeys.forEach { validationCompositor.insertKey($0) }
+    validationCompositor.assemble()
+    _ = validationCompositor.overrideCandidate(
+      .init(keyArray: ["di4"], value: "第"),
+      at: 0,
+      enforceRetokenization: true
+    )
+    validationCompositor.assemble()
+
+    let baselineKey = validationCompositor.assembledSentence
+      .generateKeyForPerception(cursor: max(validationCompositor.cursor - 1, 0))
+    XCTAssertEqual(baselineKey?.ngramKey, "()&(di4,第)&(jiao1,交)")
+
+    let suggestion = pom.fetchSuggestion(
+      assembledResult: validationCompositor.assembledSentence,
+      cursor: validationCompositor.cursor,
+      timestamp: Date().timeIntervalSince1970
+    )
+    let savedDataDump = pom.getSavableData()
+      .map { "\($0.key): \($0.perception.overrides.keys.sorted())" }
+      .joined(separator: "; ")
+    XCTAssertFalse(
+      suggestion.isEmpty,
+      "Suggestion should not be empty. Saved data: [\(savedDataDump)]"
+    )
+    guard let firstSuggestionRAW = suggestion.candidates.first else {
+      preconditionFailure("POM suggested nothing, or something wrong happen.")
+    }
+    XCTAssertEqual(firstSuggestionRAW.value, "遞交")
+    XCTAssertEqual(firstSuggestionRAW.keyArray, ["di4", "jiao1"])
+
+    let candidateSuggested = Megrez.KeyValuePaired(
+      keyArray: firstSuggestionRAW.keyArray,
+      value: firstSuggestionRAW.value,
+      score: firstSuggestionRAW.probability
+    )
+    let cursorForOverride = suggestion.overrideCursor ?? 0
+    let overrideResult = validationCompositor.overrideCandidate(
+      candidateSuggested,
+      at: cursorForOverride,
+      overrideType: suggestion.forceHighScoreOverride ? .withSpecified : .withTopGramScore,
+      enforceRetokenization: true
+    )
+    if !overrideResult {
+      validationCompositor.overrideCandidateLiteral(
+        candidateSuggested.value,
+        at: cursorForOverride,
+        overrideType: suggestion.forceHighScoreOverride ? .withSpecified : .withTopGramScore,
+        enforceRetokenization: true
+      )
+    }
+    validationCompositor.assemble()
+    let assembledByPOM = validationCompositor.assembledSentence.map(\.value).joined(separator: " ")
+    XCTAssertEqual("遞交", assembledByPOM)
+  }
 }
 
 extension Megrez.Node {

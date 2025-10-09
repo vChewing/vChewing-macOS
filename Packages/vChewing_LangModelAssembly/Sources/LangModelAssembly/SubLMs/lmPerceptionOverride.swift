@@ -671,17 +671,31 @@ extension LMAssembly.LMPerceptionOverride {
       separatorString.isEmpty
         ? (originalParts.headReading.isEmpty ? [] : [originalParts.headReading])
         : originalParts.headReading.components(separatedBy: separatorString).filter { !$0.isEmpty }
-    guard let primaryHead = headSegments.first else { return [] }
-    let requireFullHeadMatch = headSegments.count == 1
+    let primaryHeadCandidates: Set<String> = {
+      guard let first = headSegments.first else { return [] }
+      guard let last = headSegments.last else { return [first] }
+      if first == last { return [first] }
+      return [first, last]
+    }()
+    guard !primaryHeadCandidates.isEmpty else { return [] }
 
     var results: [String] = []
     for keyCandidate in mutLRUKeySeqList {
       guard let candidateParts = parsePerceptionKey(keyCandidate) else { continue }
       guard compareContextPart(candidateParts.prev1, originalParts.prev1) else { continue }
       guard compareContextPart(candidateParts.prev2, originalParts.prev2) else { continue }
-      let matchesPrimaryHead = candidateParts.headReading == primaryHead
+      let candidateHeadSegments =
+        separatorString.isEmpty
+          ? (candidateParts.headReading.isEmpty ? [] : [candidateParts.headReading])
+          : candidateParts.headReading.components(
+            separatedBy: separatorString
+          ).filter { !$0.isEmpty }
+      let matchesPrimaryHead = candidateHeadSegments.contains(
+        where: primaryHeadCandidates.contains
+      )
       let matchesFullHead = candidateParts.headReading == originalParts.headReading
-      guard matchesFullHead || (!requireFullHeadMatch && matchesPrimaryHead) else { continue }
+      let matchesOriginalHead = candidateHeadSegments.contains(originalParts.headReading)
+      guard matchesFullHead || matchesPrimaryHead || matchesOriginalHead else { continue }
       if keyCandidate != originalKey {
         results.append(keyCandidate)
       }
