@@ -43,6 +43,7 @@ final class LMCassetteTests: XCTestCase {
   }
 
   func testCassetteLoadArray30() throws {
+    // "array30.cin2" 測試 quickphrase 時，用 `zzzj 歷歷在目` 這個測試例子即可。
     let pathCINFile = testDataPath + "array30.cin2"
     var lmCassette = LMAssembly.LMCassette()
     vCLMLog("LMCassette: Start loading CIN.")
@@ -62,5 +63,19 @@ final class LMCassetteTests: XCTestCase {
     XCTAssertEqual(lmCassette.maxKeyLength, 5)
     XCTAssertEqual(lmCassette.endKeys.count, 10)
     XCTAssertEqual(lmCassette.selectionKeys.count, 10)
+    XCTAssertEqual(lmCassette.quickPhraseMap.count, 4)
+    XCTAssertEqual(lmCassette.quickPhraseCommissionKey, "'")
+    XCTAssertEqual(lmCassette.quickPhrasesFor(key: ",,,") ?? [], ["米糕"])
+    XCTAssertEqual(lmCassette.quickPhrasesFor(key: "zzza") ?? [], ["需不需要"])
+  }
+
+  func testCassetteQuickPhraseParsingVariants() throws {
+    let pathCINFile = testDataPath + "quickphrases_multi.cin"
+    var lmCassette = LMAssembly.LMCassette()
+    XCTAssertTrue(lmCassette.open(pathCINFile))
+    XCTAssertTrue(lmCassette.quickPhraseCommissionKey.isEmpty)
+    XCTAssertEqual(lmCassette.quickPhraseMap.count, 2)
+    XCTAssertEqual(lmCassette.quickPhrasesFor(key: "ab") ?? [], ["Foo", "Bar"])
+    XCTAssertEqual(lmCassette.quickPhrasesFor(key: "ac") ?? [], ["Bar"])
   }
 }

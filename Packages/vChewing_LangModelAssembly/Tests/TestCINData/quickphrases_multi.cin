@@ -1,0 +1,14 @@
+%gen_inp
+# 純測試檔案，無實際意義。裡面有些行可能還是錯誤的。
+%nullcandidate 💩
+%keyname begin
+a A
+b B
+c C
+%keyname end
+%quickphrases begin
+ab	Foo	Bar
+ab Foo
+ac 💩
+ac  Bar  
+%quickphrases end
