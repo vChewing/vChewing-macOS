@@ -141,7 +141,6 @@ $tf/
 .Trashes
 .VolumeIcon.icns
 .vs/
-.vscode
 ._*
 aclocal.m4
 AppPackages/
