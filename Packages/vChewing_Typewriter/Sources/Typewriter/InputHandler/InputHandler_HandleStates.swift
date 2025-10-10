@@ -92,7 +92,7 @@ extension InputHandlerProtocol {
     guard !isComposerUsingPinyin else { return "" }
     guard composer.hasIntonation(withNothingElse: true) else { return "" }
     guard composer.intonation.value != " " else { return "" }
-    let result = NSMutableString()
+    let result = NSMutableString(capacity: 0)
     result
       .append(
         "Intonation mark. ENTER to commit.\nSPACE to insert into composition buffer."
@@ -890,7 +890,7 @@ extension InputHandlerProtocol {
 
     var newState = generateStateOfInputting()
     let locID = Bundle.main.preferredLocalizations[0]
-    let newTooltip = NSMutableString()
+    let newTooltip = NSMutableString(capacity: 0)
     newTooltip.insert("　" + candidates[newIndex].value, at: 0)
     if #available(macOS 10.13, *), isContextVertical(), locID != "en" {
       newTooltip.insert(
@@ -998,7 +998,9 @@ extension InputHandlerProtocol {
     /// 如果是 ASCII 當中的不可列印的字元的話，
     /// 不使用「insertText:replacementRange:」。
     /// 某些應用無法正常處理非 ASCII 字符的輸入。
+    #if canImport(Darwin)
     if input.isASCII, !input.charCode.isPrintableASCII { return false }
+    #endif
 
     // 將整個組字區的內容遞交給客體應用。
     session.switchState(State.ofCommitting(textToCommit: input.text.lowercased()))

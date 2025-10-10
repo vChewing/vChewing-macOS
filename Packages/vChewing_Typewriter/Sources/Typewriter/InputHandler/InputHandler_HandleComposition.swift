@@ -17,7 +17,11 @@ extension InputHandlerProtocol {
   /// - Returns: 告知 IMK「該按鍵是否已經被輸入法攔截處理」。
   func handleComposition(input: InputSignalProtocol) -> Bool? {
     // 不處理任何包含不可列印字元的訊號。
+    #if canImport(Darwin)
     let hardRequirementMet = !input.text.isEmpty && input.charCode.isPrintable
+    #else
+    let hardRequirementMet = !input.text.isEmpty
+    #endif
     switch currentTypingMethod {
     case .codePoint where hardRequirementMet:
       return handleCodePointComposition(input: input)
@@ -60,12 +64,14 @@ extension InputHandlerProtocol {
       when condition: Bool,
       allowDuplicates: Bool = true
     ) {
+      #if canImport(Darwin)
       guard condition else { return }
       let maybeKey = maybeKey ?? composer
         .phonabetKeyForQuery(pronounceableOnly: prefs.acceptLeadingIntonations)
       guard var keyToNarrate = maybeKey else { return }
       if composer.intonation == Phonabet(" ") { keyToNarrate.append("ˉ") }
       SpeechSputnik.shared.narrate(keyToNarrate, allowDuplicates: allowDuplicates)
+      #endif
     }
 
     // 這裡 inputValidityCheck() 是讓注拼槽檢查 charCode 這個 UniChar 是否是合法的注音輸入。
@@ -474,10 +480,14 @@ extension InputHandlerProtocol {
         session.switchState(updatedState)
         return true
       }
-      guard var char = "\(strCodePointBuffer)\(input.text)"
+      #if canImport(Darwin)
+      let parsedChar = "\(strCodePointBuffer)\(input.text)"
         .parsedAsHexLiteral(encoding: IMEApp.currentInputMode.nonUTFEncoding)?.first?
         .description
-      else {
+      #else
+      let parsedChar: String? = nil
+      #endif
+      guard var char = parsedChar else {
         errorCallback?("D220B880：輸入的字碼沒有對應的字元。")
         var updatedState = State.ofAbortion()
         updatedState.tooltipDuration = 0
@@ -511,6 +521,10 @@ extension InputHandlerProtocol {
   ///   - input: 輸入按鍵訊號。
   /// - Returns: 將按鍵行為「是否有處理掉」藉由 SessionCtl 回報給 IMK。
   fileprivate func handleHaninKeyboardSymbolModeInput(input: InputSignalProtocol) -> Bool {
+    #if !canImport(Darwin)
+    // Hanin keyboard symbol mode is not supported on non-Darwin platforms
+    return revolveTypingMethod(to: .vChewingFactory)
+    #else
     guard let session = session, session.state.type != .ofDeactivated else { return false }
     let charText = input.text.lowercased().applyingTransformFW2HW(reverse: false)
     guard CandidateNode.mapHaninKeyboardSymbols.keys.contains(charText) else {
@@ -532,5 +546,6 @@ extension InputHandlerProtocol {
     }
     currentTypingMethod = .vChewingFactory // 用完就關掉，但保持選字窗開啟，所以這裡不用呼叫 toggle 函式。
     return true
+    #endif
   }
 }

@@ -234,6 +234,7 @@ extension InputHandlerProtocol {
           }
           return true
         default:
+          #if canImport(AppKit)
           handleArrowKey: switch (keyCodeType, ctlCandidate.currentLayout) {
           case (.kLeftArrow, .horizontal), (.kUpArrow, .vertical): // Previous Candidate
             _ = ctlCandidate.highlightPreviousCandidate()
@@ -248,6 +249,17 @@ extension InputHandlerProtocol {
           default: break handleArrowKey
           }
           return true
+          #else
+          // On non-AppKit platforms, use simpler navigation
+          switch keyCodeType {
+          case .kLeftArrow, .kUpArrow:
+            _ = ctlCandidate.highlightPreviousCandidate()
+          case .kRightArrow, .kDownArrow:
+            _ = ctlCandidate.highlightNextCandidate()
+          default: break
+          }
+          return true
+          #endif
         }
       case .kHome:
         _ =
