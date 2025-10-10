@@ -998,9 +998,7 @@ extension InputHandlerProtocol {
     /// 如果是 ASCII 當中的不可列印的字元的話，
     /// 不使用「insertText:replacementRange:」。
     /// 某些應用無法正常處理非 ASCII 字符的輸入。
-    #if canImport(Darwin)
-      if input.isASCII, !input.charCode.isPrintableASCII { return false }
-    #endif
+    if input.isASCII, !input.charCode.isPrintableASCII { return false }
 
     // 將整個組字區的內容遞交給客體應用。
     session.switchState(State.ofCommitting(textToCommit: input.text.lowercased()))

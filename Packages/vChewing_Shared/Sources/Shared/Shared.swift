@@ -6,6 +6,7 @@
 // marks, or product names of Contributor, except as required to fulfill notice
 // requirements defined in MIT License.
 
+import CoreFoundation
 import Foundation
 import SwiftExtension
 
@@ -266,15 +267,13 @@ public enum Shared {
       }
     }
 
-    #if canImport(Darwin)
-      public var nonUTFEncoding: CFStringEncodings? {
-        switch self {
-        case .imeModeCHS: return .GB_18030_2000
-        case .imeModeCHT: return .big5_HKSCS_1999
-        default: return nil
-        }
+    public var nonUTFEncoding: UInt32? {
+      switch self {
+      case .imeModeCHS: return 1586 // .GB_18030_2000
+      case .imeModeCHT: return 2566 // .big5_HKSCS_1999
+      default: return nil
       }
-    #endif
+    }
 
     public var nonUTFEncodingInitials: String? {
       switch self {

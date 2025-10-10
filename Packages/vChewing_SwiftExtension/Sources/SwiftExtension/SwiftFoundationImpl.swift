@@ -6,6 +6,7 @@
 // marks, or product names of Contributor, except as required to fulfill notice
 // requirements defined in MIT License.
 
+import CoreFoundation
 import Foundation
 
 #if canImport(OSLog)
@@ -167,22 +168,15 @@ extension String {
 
 // MARK: - CharCode printability check for UniChar (CoreFoundation)
 
-#if canImport(Darwin)
-  // Ref: https://forums.swift.org/t/57085/5
-  extension UniChar {
-    public var isPrintable: Bool {
-      guard Unicode.Scalar(UInt32(self)) != nil else {
-        struct NotAWholeScalar: Error {}
-        return false
-      }
-      return true
-    }
-
-    public var isPrintableASCII: Bool {
-      (32 ... 126).contains(self)
-    }
+extension UInt16 {
+  public var isPrintableUniChar: Bool {
+    Unicode.Scalar(UInt32(self)) != nil
   }
-#endif
+
+  public var isPrintableASCII: Bool {
+    (32 ... 126).contains(self)
+  }
+}
 
 // MARK: - User Defaults Storage
 
@@ -272,25 +266,23 @@ extension BinaryInteger {
 // Refactored by: Isaac Xen
 
 extension String {
-  #if canImport(Darwin)
-    public func parsedAsHexLiteral(encoding: CFStringEncodings? = nil) -> String? {
-      guard !isEmpty else { return nil }
-      var charBytes = [Int8]()
-      var buffer: Int?
-      compactMap(\.hexDigitValue).forEach { neta in
-        if let validBuffer = buffer {
-          charBytes.append(.init(bitPattern: UInt8(validBuffer << 4 + neta)))
-          buffer = nil
-        } else {
-          buffer = neta
-        }
+  public func parsedAsHexLiteral(encoding: UInt32? = nil) -> String? {
+    guard !isEmpty else { return nil }
+    var charBytes = [Int8]()
+    var buffer: Int?
+    compactMap(\.hexDigitValue).forEach { neta in
+      if let validBuffer = buffer {
+        charBytes.append(.init(bitPattern: UInt8(validBuffer << 4 + neta)))
+        buffer = nil
+      } else {
+        buffer = neta
       }
-      let encodingUBE = CFStringBuiltInEncodings.UTF16BE.rawValue
-      let encodingRAW = encoding.map { UInt32($0.rawValue) } ?? encodingUBE
-      let result = CFStringCreateWithCString(nil, &charBytes, encodingRAW) as String?
-      return result?.isEmpty ?? true ? nil : result
     }
-  #endif
+    let encodingUBE: UInt32 = 268_435_712 // CFStringBuiltInEncodings.UTF16BE
+    let encodingRAW = encoding ?? encodingUBE
+    let result = CFStringCreateWithCString(nil, &charBytes, encodingRAW) as String?
+    return result?.isEmpty ?? true ? nil : result
+  }
 }
 
 // MARK: - Version Comparer.
