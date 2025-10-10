@@ -266,6 +266,7 @@ public enum Shared {
       }
     }
 
+    #if canImport(Darwin)
     public var nonUTFEncoding: CFStringEncodings? {
       switch self {
       case .imeModeCHS: return .GB_18030_2000
@@ -273,6 +274,7 @@ public enum Shared {
       default: return nil
       }
     }
+    #endif
 
     public var nonUTFEncodingInitials: String? {
       switch self {

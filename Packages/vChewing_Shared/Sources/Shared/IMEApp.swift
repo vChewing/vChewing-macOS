@@ -26,6 +26,7 @@ public enum IMEApp {
   }()
 
   public static let appMainVersionLabel: [String] = {
+    #if canImport(Darwin)
     guard let intBuild = Bundle.main.infoDictionary?[kCFBundleVersionKey as String] as? String,
           let strVer = Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String
     else {
@@ -33,9 +34,13 @@ public enum IMEApp {
     }
 
     return [strVer, intBuild]
+    #else
+    return ["1.14.514", "19190810"]
+    #endif
   }()
 
   public static let appSignedDateLabel: String = {
+    #if canImport(Darwin)
     let maybeDateModified: Date? = {
       guard let executableURL = Bundle.main.executableURL,
             let infoDate = (
@@ -55,6 +60,9 @@ public enum IMEApp {
     } else {
       return "Unsigned"
     }
+    #else
+    return "Unsigned"
+    #endif
   }()
 
   // MARK: - 輸入法的當前的簡繁體中文模式

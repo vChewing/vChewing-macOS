@@ -128,7 +128,7 @@ extension PrefMgr {
       case .dictionary:
         if let valParsed = value as? AppProperty<[String: Bool]> {
           strTypeParam = strTypeParam.replacingOccurrences(of: "ionary", with: "")
-          let stack = NSMutableString()
+          let stack = NSMutableString(capacity: 0)
           valParsed.wrappedValue.forEach { currentPair in
             stack.append("\(currentPair.key) \(currentPair.value) ")
           }

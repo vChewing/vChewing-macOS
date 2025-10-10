@@ -15,18 +15,20 @@ import Foundation
 extension Process {
   public static func consoleLog<S: StringProtocol>(_ msg: S) {
     let msgStr = msg.description
+    #if canImport(Darwin)
     if #available(macOS 26.0, *) {
       #if canImport(OSLog)
         let logger = Logger(subsystem: "vChewing", category: "Log")
         logger.log(level: .default, "\(msgStr, privacy: .public)")
         return
-      #else
-        break
       #endif
     }
 
     // 兼容旧系统
     NSLog(msgStr)
+    #else
+    print(msgStr)
+    #endif
   }
 }
 
@@ -42,14 +44,16 @@ extension FileManager {
 
 // MARK: - Trash a file if it exists.
 
+#if canImport(Darwin)
 extension FileManager {
   @discardableResult
   public static func trashTargetIfExists(_ path: String) -> Bool {
     do {
       if FileManager.default.fileExists(atPath: path) {
         // 塞入垃圾桶
+        var resultingURL: NSURL?
         try FileManager.default.trashItem(
-          at: URL(fileURLWithPath: path), resultingItemURL: nil
+          at: URL(fileURLWithPath: path), resultingItemURL: &resultingURL
         )
       } else {
         Process.consoleLog("Item doesn't exist: \(path)")
@@ -61,6 +65,7 @@ extension FileManager {
     return true
   }
 }
+#endif
 
 // MARK: - Check whether current date is the given date.
 
@@ -162,6 +167,7 @@ extension String {
 
 // MARK: - CharCode printability check for UniChar (CoreFoundation)
 
+#if canImport(Darwin)
 // Ref: https://forums.swift.org/t/57085/5
 extension UniChar {
   public var isPrintable: Bool {
@@ -176,6 +182,7 @@ extension UniChar {
     (32 ... 126).contains(self)
   }
 }
+#endif
 
 // MARK: - User Defaults Storage
 
@@ -265,6 +272,7 @@ extension BinaryInteger {
 // Refactored by: Isaac Xen
 
 extension String {
+  #if canImport(Darwin)
   public func parsedAsHexLiteral(encoding: CFStringEncodings? = nil) -> String? {
     guard !isEmpty else { return nil }
     var charBytes = [Int8]()
@@ -282,6 +290,7 @@ extension String {
     let result = CFStringCreateWithCString(nil, &charBytes, encodingRAW) as String?
     return result?.isEmpty ?? true ? nil : result
   }
+  #endif
 }
 
 // MARK: - Version Comparer.

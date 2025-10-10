@@ -6,6 +6,8 @@
 // marks, or product names of Contributor, except as required to fulfill notice
 // requirements defined in MIT License.
 
+#if canImport(Darwin)
+
 import AppKit
 import Shared
 import SwiftExtension
@@ -756,3 +758,5 @@ extension BinaryInteger {
     return formatter.string(from: NSDecimalNumber(string: "\(self)")) ?? ""
   }
 }
+
+#endif
