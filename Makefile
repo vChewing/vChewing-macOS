@@ -37,6 +37,9 @@ spmClean:
 		fi; \
 	done;
 
+spmLinuxTest-Typewriter:
+	docker run --rm -v '$(shell pwd):/workspace' -w /workspace/Packages/vChewing_Typewriter swift:latest swift test --filter InputHandlerTests
+
 release:
 	@echo "Creating directory: $(ARCHIVE_DIR)"
 	@mkdir -p "$(ARCHIVE_DIR)"

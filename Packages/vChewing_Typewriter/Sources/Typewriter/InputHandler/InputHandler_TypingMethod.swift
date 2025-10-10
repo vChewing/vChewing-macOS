@@ -29,7 +29,7 @@ public enum TypingMethod: Int, CaseIterable {
     switch self {
     case .vChewingFactory: return ""
     case .codePoint:
-      let commonTerm = NSMutableString()
+      let commonTerm = NSMutableString(capacity: 0)
       commonTerm.insert("Code Point Input.".localized, at: 0)
       if !vertical, let initials = IMEApp.currentInputMode.nonUTFEncodingInitials {
         commonTerm.insert("[\(initials)] ", at: 0)
@@ -61,14 +61,14 @@ extension InputHandlerProtocol {
     }
     switch newMethod {
     case .vChewingFactory:
-      session.switchState(IMEState.ofAbortion())
+      session.switchState(State.ofAbortion())
       return true
     case .codePoint:
       strCodePointBuffer.removeAll()
     case .haninKeyboardSymbol: break
     }
     var updatedState = generateStateOfInputting(sansReading: true)
-    session.switchState(IMEState.ofCommitting(textToCommit: updatedState.displayedText))
+    session.switchState(State.ofCommitting(textToCommit: updatedState.displayedText))
     updatedState = generateStateOfInputting(guarded: true)
     updatedState.tooltipDuration = 0
     updatedState.tooltip = newMethod.getTooltip(vertical: session.isVerticalTyping)
