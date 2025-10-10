@@ -129,68 +129,76 @@ extension InputHandlerProtocol {
     /// 必須先鞏固當前組字器游標上下文、以消滅意料之外的影響，但在內文組字區內就地輪替候選字詞時除外。
     if preConsolidate { consolidateCursorContext(with: theCandidate) }
 
-    // 回到正常流程。
-    var pomObservation: Megrez.PerceptionIntel?
-    var pomObservationPrimary: Megrez.PerceptionIntel?
-    var pomObservation2ndary: Megrez.PerceptionIntel?
-    // 嘗試覆寫：最多四次；偶數次強制 retokenization；
-    // 前兩次失敗後 bleach 掉可能干擾覆寫的 POM 觀測記憶，再進行後兩次。
+    // 先嘗試用 POM 建議覆寫（如果有完全匹配的記憶）。
+    let pomSuggestion = retrievePOMSuggestions(apply: false)
+      .first(where: {
+        $0.0 == theCandidate.keyArray.joined(separator: assembler.separator) && $0.1.value == theCandidate.value
+      })
     var overrideTaskResult = false
-    var attempt = 0
-    while attempt < 4, !overrideTaskResult {
-      attempt += 1
-      let enforce = attempt % 2 == 0 // 偶數次強制 retokenization
+    if pomSuggestion != nil {
+      // 強制 retokenization 並用 withSpecified 覆寫
       overrideTaskResult = assembler.overrideCandidate(
-        theCandidate, at: actualNodeCursorPosition,
-        enforceRetokenization: enforce
-      ) { perceptionIntel in
-        // 奇數次寫入 primary，偶數次寫入 secondary。
-        if attempt % 2 == 1 {
-          pomObservationPrimary = perceptionIntel
-        } else {
-          pomObservation2ndary = perceptionIntel
+        .init(keyArray: theCandidate.keyArray, value: theCandidate.value),
+        at: actualNodeCursorPosition,
+        overrideType: .withSpecified,
+        enforceRetokenization: true
+      )
+    }
+    // 若無 POM 建議或覆寫失敗，走原有覆寫流程
+    if !overrideTaskResult {
+      var pomObservation: Megrez.PerceptionIntel?
+      var pomObservationPrimary: Megrez.PerceptionIntel?
+      var pomObservation2ndary: Megrez.PerceptionIntel?
+      var attempt = 0
+      while attempt < 4, !overrideTaskResult {
+        attempt += 1
+        let enforce = attempt % 2 == 0 // 偶數次強制 retokenization
+        overrideTaskResult = assembler.overrideCandidate(
+          theCandidate, at: actualNodeCursorPosition,
+          enforceRetokenization: enforce
+        ) { perceptionIntel in
+          if attempt % 2 == 1 {
+            pomObservationPrimary = perceptionIntel
+          } else {
+            pomObservation2ndary = perceptionIntel
+          }
+        }
+        if !overrideTaskResult, attempt == 2 {
+          currentLM.bleachSpecifiedPOMSuggestions(targets: [
+            pomObservationPrimary?.candidate,
+            pomObservation2ndary?.candidate,
+          ].compactMap { $0 })
+          pomObservationPrimary = nil
+          pomObservation2ndary = nil
         }
       }
-      // 前兩次都失敗 -> bleach & 清空嫌疑觀測干擾資料，然後進入後兩次循環。
-      if !overrideTaskResult, attempt == 2 {
-        currentLM.bleachSpecifiedPOMSuggestions(targets: [
-          pomObservationPrimary?.candidate,
-          pomObservation2ndary?.candidate,
-        ].compactMap { $0 })
-        pomObservationPrimary = nil
-        pomObservation2ndary = nil
+      if !overrideTaskResult { return }
+      pomObservation = pomObservation2ndary ?? pomObservationPrimary
+      assemble()
+      if let adjustedObservation = Megrez.makePerceptionIntel(
+        previouslyAssembled: preservedSentenceBeforeConsolidation,
+        currentAssembled: assembler.assembledSentence,
+        cursor: preservedCursorPosition
+      ) {
+        pomObservation = adjustedObservation
       }
-    }
-    if !overrideTaskResult { return }
-    pomObservation = pomObservation2ndary ?? pomObservationPrimary
-    // 開始組句。
-    assemble()
-
-    if let adjustedObservation = Megrez.makePerceptionIntel(
-      previouslyAssembled: preservedSentenceBeforeConsolidation,
-      currentAssembled: assembler.assembledSentence,
-      cursor: preservedCursorPosition
-    ) {
-      pomObservation = adjustedObservation
-    }
-
-    // 在可行的情況下更新使用者漸退記憶模組。
-    guard let pomObservation else { return }
-
-    pomProcessing: if pomObservation.scoreFromLM > -12,
-                      prefs.fetchSuggestionsFromPerceptionOverrideModel {
-      if skipObservation { break pomProcessing }
-      vCLog("POM: Start Observation.")
-      prefs.failureFlagForPOMObservation = true
-      currentLM.memorizePerception(
-        (pomObservation.contextualizedGramKey, pomObservation.candidate),
-        timestamp: Date().timeIntervalSince1970,
-        saveCallback: pomSaveCallback
-      )
-      prefs.failureFlagForPOMObservation = false
+      guard let pomObservation else { return }
+      pomProcessing: if pomObservation.scoreFromLM > -12,
+                        prefs.fetchSuggestionsFromPerceptionOverrideModel {
+        if skipObservation { break pomProcessing }
+        vCLog("POM: Start Observation.")
+        prefs.failureFlagForPOMObservation = true
+        currentLM.memorizePerception(
+          (pomObservation.contextualizedGramKey, pomObservation.candidate),
+          timestamp: Date().timeIntervalSince1970,
+          saveCallback: pomSaveCallback
+        )
+        prefs.failureFlagForPOMObservation = false
+      }
+    } else {
+      assemble()
     }
 
-    /// 若偏好設定內啟用了相關選項，則會在選字之後始終將游標推送至選字後的節錨的前方。
     if moveCursorAfterSelectingCandidate, respectCursorPushing {
       assembler.jumpCursorBySegment(to: .front)
     }
@@ -497,33 +505,23 @@ extension InputHandlerProtocol {
     }
     arrResult.append(contentsOf: appendables)
     if apply {
-      // 再看有沒有選字建議。有的話就遵循之、讓天權星引擎對指定節錨下的節點複寫權重。
       if !suggestion.isEmpty, let newestSuggestedCandidate = suggestion.candidates.last {
-        let overrideBehavior: Megrez.Node.OverrideType =
-          suggestion.forceHighScoreOverride ? .withSpecified : .withTopGramScore
+        let overrideBehavior: Megrez.Node.OverrideType = .withSpecified
         let suggestedPair: Megrez.KeyValuePaired = .init(
           key: newestSuggestedCandidate.keyArray.joined(separator: assembler.separator),
           value: newestSuggestedCandidate.value
         )
-        // 追加步驟：換算正確的游標位置，確保 POM 建議的候選字詞在正確的座標位置進行覆寫操作。
         let cursorForOverride = suggestion.overrideCursor ?? actualNodeCursorPosition
         let ngramKey = suggestedPair.toNGramKey
         vCLog(
           "POM: Overriding the node score of the suggested candidate: \(ngramKey) at \(cursorForOverride)"
         )
-        if !assembler.overrideCandidate(
+        _ = assembler.overrideCandidate(
           suggestedPair,
           at: cursorForOverride,
           overrideType: overrideBehavior,
           enforceRetokenization: true
-        ) {
-          assembler.overrideCandidateLiteral(
-            newestSuggestedCandidate.value,
-            at: cursorForOverride,
-            overrideType: overrideBehavior,
-            enforceRetokenization: true
-          )
-        }
+        )
         assemble()
       }
     }
