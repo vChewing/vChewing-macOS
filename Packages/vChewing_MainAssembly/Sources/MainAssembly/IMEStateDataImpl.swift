@@ -10,7 +10,6 @@ import IMKUtils
 import InputMethodKit
 import Shared
 import Tekkon
-import TooltipUI
 
 // MARK: - AttributedString 生成器
 
