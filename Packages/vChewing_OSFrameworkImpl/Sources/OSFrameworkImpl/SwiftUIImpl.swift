@@ -201,10 +201,10 @@ extension AppProperty {
   public var projectedValue: Binding<Value> {
     .init(
       get: {
-        wrappedValue
+        self.wrappedValue
       },
       set: {
-        container.set($0, forKey: key)
+        self.container.set($0, forKey: self.key)
       }
     )
   }

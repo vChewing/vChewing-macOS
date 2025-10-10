@@ -71,10 +71,10 @@ public struct VwrSettingsPaneBehavior: View {
   private var shareAlphanumericalModeStatusAcrossClients: Bool
 
   @AppStorage(wrappedValue: true, UserDef.kShiftEisuToggleOffTogetherWithCapsLock.rawValue)
-  public dynamic var shiftEisuToggleOffTogetherWithCapsLock: Bool
+  public var shiftEisuToggleOffTogetherWithCapsLock: Bool
 
   @AppStorage(wrappedValue: false, UserDef.kBypassNonAppleCapsLockHandling.rawValue)
-  public dynamic var bypassNonAppleCapsLockHandling: Bool
+  public var bypassNonAppleCapsLockHandling: Bool
 
   // MARK: - Main View
 
