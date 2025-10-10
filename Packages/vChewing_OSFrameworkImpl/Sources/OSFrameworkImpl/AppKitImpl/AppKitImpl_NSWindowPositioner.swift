@@ -2,107 +2,112 @@
 // Written by Alexis Bridoux - https://github.com/ABridoux
 // Ref: https://gist.github.com/ABridoux/b935c21c7ead92033d39b357fae6366b
 
-import AppKit
 import SwiftExtension
-import SwiftUI
 
-// MARK: - NSWindow.Position
+#if canImport(AppKit)
 
-extension NSWindow {
-  public struct Position {
-    public static let defaultPadding: CGFloat = 16
+  import AppKit
 
-    public var vertical: Vertical
-    public var horizontal: Horizontal
-    public var padding = Self.defaultPadding
-  }
-}
+  // MARK: - NSWindow.Position
 
-extension NSWindow.Position {
-  public enum Horizontal {
-    case left, center, right
-  }
+  extension NSWindow {
+    public struct Position {
+      public static let defaultPadding: CGFloat = 16
 
-  public enum Vertical {
-    case top, center, bottom
-  }
-}
-
-// MARK: Logic
-
-extension NSWindow.Position {
-  public func value(forWindow windowRect: CGRect, inScreen screenRect: CGRect) -> CGPoint {
-    let xPosition = horizontal.valueFor(
-      screenRange: screenRect.minX ..< screenRect.maxX,
-      width: windowRect.width,
-      padding: padding
-    )
-
-    let yPosition = vertical.valueFor(
-      screenRange: screenRect.minY ..< screenRect.maxY,
-      height: windowRect.height,
-      padding: padding
-    )
-
-    return CGPoint(x: xPosition, y: yPosition)
-  }
-}
-
-extension NSWindow.Position.Horizontal {
-  public func valueFor(
-    screenRange: Range<CGFloat>,
-    width: CGFloat,
-    padding: CGFloat
-  )
-    -> CGFloat {
-    switch self {
-    case .left: return screenRange.lowerBound + padding
-    case .center: return (screenRange.upperBound + screenRange.lowerBound - width) / 2
-    case .right: return screenRange.upperBound - width - padding
+      public var vertical: Vertical
+      public var horizontal: Horizontal
+      public var padding = Self.defaultPadding
     }
   }
-}
 
-extension NSWindow.Position.Vertical {
-  public func valueFor(
-    screenRange: Range<CGFloat>,
-    height: CGFloat,
-    padding: CGFloat
-  )
-    -> CGFloat {
-    switch self {
-    case .top: return screenRange.upperBound - height - padding
-    case .center: return (screenRange.upperBound + screenRange.lowerBound - height) / 2
-    case .bottom: return screenRange.lowerBound + padding
+  extension NSWindow.Position {
+    public enum Horizontal {
+      case left, center, right
+    }
+
+    public enum Vertical {
+      case top, center, bottom
     }
   }
-}
 
-// MARK: - AppKit extension
+  // MARK: Logic
 
-extension NSWindow {
-  public func setPosition(_ position: Position, in screen: NSScreen?) {
-    guard let visibleFrame = (screen ?? self.screen)?.visibleFrame else { return }
-    let origin = position.value(forWindow: frame, inScreen: visibleFrame)
-    setFrameOrigin(origin)
+  extension NSWindow.Position {
+    public func value(forWindow windowRect: CGRect, inScreen screenRect: CGRect) -> CGPoint {
+      let xPosition = horizontal.valueFor(
+        screenRange: screenRect.minX ..< screenRect.maxX,
+        width: windowRect.width,
+        padding: padding
+      )
+
+      let yPosition = vertical.valueFor(
+        screenRange: screenRect.minY ..< screenRect.maxY,
+        height: windowRect.height,
+        padding: padding
+      )
+
+      return CGPoint(x: xPosition, y: yPosition)
+    }
   }
 
-  public func setPosition(
-    vertical: Position.Vertical,
-    horizontal: Position.Horizontal,
-    padding: CGFloat = Position.defaultPadding,
-    screen: NSScreen? = nil
-  ) {
-    setPosition(
-      Position(vertical: vertical, horizontal: horizontal, padding: padding),
-      in: screen
+  extension NSWindow.Position.Horizontal {
+    public func valueFor(
+      screenRange: Range<CGFloat>,
+      width: CGFloat,
+      padding: CGFloat
     )
+      -> CGFloat {
+      switch self {
+      case .left: return screenRange.lowerBound + padding
+      case .center: return (screenRange.upperBound + screenRange.lowerBound - width) / 2
+      case .right: return screenRange.upperBound - width - padding
+      }
+    }
   }
-}
+
+  extension NSWindow.Position.Vertical {
+    public func valueFor(
+      screenRange: Range<CGFloat>,
+      height: CGFloat,
+      padding: CGFloat
+    )
+      -> CGFloat {
+      switch self {
+      case .top: return screenRange.upperBound - height - padding
+      case .center: return (screenRange.upperBound + screenRange.lowerBound - height) / 2
+      case .bottom: return screenRange.lowerBound + padding
+      }
+    }
+  }
+
+  // MARK: - AppKit extension
+
+  extension NSWindow {
+    public func setPosition(_ position: Position, in screen: NSScreen?) {
+      guard let visibleFrame = (screen ?? self.screen)?.visibleFrame else { return }
+      let origin = position.value(forWindow: frame, inScreen: visibleFrame)
+      setFrameOrigin(origin)
+    }
+
+    public func setPosition(
+      vertical: Position.Vertical,
+      horizontal: Position.Horizontal,
+      padding: CGFloat = Position.defaultPadding,
+      screen: NSScreen? = nil
+    ) {
+      setPosition(
+        Position(vertical: vertical, horizontal: horizontal, padding: padding),
+        in: screen
+      )
+    }
+  }
+
+#endif
 
 // MARK: - SwiftUI modifier
 
 #if canImport(SwiftUI)
+  import SwiftUI
 
   /// - note: Idea from [LostMoa](https://lostmoa.com/blog/ReadingTheCurrentWindowInANewSwiftUILifecycleApp/)
   @available(macOS 10.15, *)
