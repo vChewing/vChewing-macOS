@@ -21,6 +21,7 @@ public final class InputHandler: InputHandlerProtocol {
     lm: LMAssembly.LMInstantiator,
     pref: PrefMgrProtocol,
     errorCallback: ((_ message: String) -> ())? = nil,
+    filterabilityChecker: ((_ state: IMEStateData) -> Bool)? = nil,
     notificationCallback: ((_ message: String) -> ())? = nil,
     pomSaveCallback: (() -> ())? = nil
   ) {
@@ -47,6 +48,7 @@ public final class InputHandler: InputHandlerProtocol {
   public var errorCallback: ((String) -> ())?
   public var notificationCallback: ((String) -> ())?
   public var pomSaveCallback: (() -> ())?
+  public var filterabilityChecker: ((_ state: IMEStateData) -> Bool)?
 
   /// 用來記錄「叫出選字窗前」的游標位置的變數。
   public var backupCursor: Int?
