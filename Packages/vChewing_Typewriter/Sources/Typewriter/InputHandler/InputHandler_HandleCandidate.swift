@@ -235,28 +235,28 @@ extension InputHandlerProtocol {
           return true
         default:
           #if canImport(AppKit)
-          handleArrowKey: switch (keyCodeType, ctlCandidate.currentLayout) {
-          case (.kLeftArrow, .horizontal), (.kUpArrow, .vertical): // Previous Candidate
-            _ = ctlCandidate.highlightPreviousCandidate()
-          case (.kDownArrow, .vertical), // Next Candidate
-               (.kRightArrow, .horizontal): // Next Candidate
-            _ = ctlCandidate.highlightNextCandidate()
-          case (.kLeftArrow, .vertical), // Previous Line
-               (.kUpArrow, .horizontal): // Previous Line
-            _ = ctlCandidate.showPreviousLine()
-          case (.kDownArrow, .horizontal), (.kRightArrow, .vertical): // Next Line
-            _ = ctlCandidate.showNextLine()
-          default: break handleArrowKey
-          }
+            handleArrowKey: switch (keyCodeType, ctlCandidate.currentLayout) {
+            case (.kLeftArrow, .horizontal), (.kUpArrow, .vertical): // Previous Candidate
+              _ = ctlCandidate.highlightPreviousCandidate()
+            case (.kDownArrow, .vertical), // Next Candidate
+                 (.kRightArrow, .horizontal): // Next Candidate
+              _ = ctlCandidate.highlightNextCandidate()
+            case (.kLeftArrow, .vertical), // Previous Line
+                 (.kUpArrow, .horizontal): // Previous Line
+              _ = ctlCandidate.showPreviousLine()
+            case (.kDownArrow, .horizontal), (.kRightArrow, .vertical): // Next Line
+              _ = ctlCandidate.showNextLine()
+            default: break handleArrowKey
+            }
           #else
-          // On non-Darwin platforms, use simplified arrow key navigation
-          switch keyCodeType {
-          case .kLeftArrow, .kUpArrow:
-            _ = ctlCandidate.highlightPreviousCandidate()
-          case .kRightArrow, .kDownArrow:
-            _ = ctlCandidate.highlightNextCandidate()
-          default: break
-          }
+            // 非 macOS 平台暫時僅支援橫書模式。
+            switch keyCodeType {
+            case .kLeftArrow, .kUpArrow:
+              _ = ctlCandidate.highlightPreviousCandidate()
+            case .kDownArrow, .kRightArrow:
+              _ = ctlCandidate.highlightNextCandidate()
+            default: break
+            }
           #endif
           return true
         }

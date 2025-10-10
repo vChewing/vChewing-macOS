@@ -238,7 +238,54 @@ public class MockSession: SessionCoreProtocol, CtlCandidateDelegate {
   public var isCandidateState: Bool { state.type == .ofCandidates }
 
   public func switchState(_ newState: MockIMEState) {
+    var previous = state
     state = newState
+    switch newState.type {
+    case .ofDeactivated:
+      // 這裡移除一些處理，轉而交給 commitComposition() 代為執行。
+      inputHandler?.clear()
+    // if ![.ofAbortion, .ofEmpty].contains(previous.type), !previous.displayedText.isEmpty {
+    //   clearInlineDisplay()
+    // }
+    case .ofAbortion, .ofCommitting, .ofEmpty:
+      innerCircle: switch newState.type {
+      case .ofAbortion:
+        previous = .ofEmpty()
+        state = previous
+      case .ofCommitting:
+        // commit(text: newState.textToCommit)
+        state = .ofEmpty()
+      default: break innerCircle
+      }
+      // candidateUI?.visible = false
+      // 全專案用以判斷「.Abortion」的地方僅此一處。
+      // if previous.hasComposition, ![.ofAbortion, .ofCommitting].contains(newState.type) {
+      //   commit(text: previous.displayedText)
+      // }
+      // 會在工具提示為空的時候自動消除顯示。
+      // showTooltip(newState.tooltip, duration: newState.tooltipDuration)
+      // clearInlineDisplay()
+      inputHandler?.clear()
+    case .ofInputting: break
+    // candidateUI?.visible = false
+    // if !newState.textToCommit.isEmpty {
+    //   commit(text: newState.textToCommit)
+    // }
+    // setInlineDisplayWithCursor()
+    // 會在工具提示為空的時候自動消除顯示。
+    // showTooltip(newState.tooltip, duration: newState.tooltipDuration)
+    // if newState.isCandidateContainer { showCandidates() }
+    case .ofMarking: break
+    // candidateUI?.visible = false
+    // setInlineDisplayWithCursor()
+    // showTooltip(newState.tooltip)
+    case .ofAssociates, .ofCandidates, .ofSymbolTable: break
+      // tooltipInstance.hide()
+      // setInlineDisplayWithCursor()
+      // showCandidates()
+    }
+    // 浮動組字窗的顯示判定
+    // updatePopupDisplayWithCursor()
   }
 
   public func updateCompositionBufferDisplay() {}
