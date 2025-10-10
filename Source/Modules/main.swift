@@ -7,13 +7,8 @@
 // requirements defined in MIT License.
 
 import AppKit
-import IMKUtils
 import InputMethodKit
-import LangModelAssembly
 import MainAssembly
-import Shared
-import SwiftExtension
-import Uninstaller
 
 let cmdParameters = CommandLine.arguments.dropFirst(1)
 
