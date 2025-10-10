@@ -60,23 +60,32 @@ class InputHandlerTests: XCTestCase {
 
   func typeSentence(_ sequence: String) {
     guard let testHandler else { return }
-    // 直接操作 InputHandler 的 composer 和 assembler，模擬打字過程
+    // 模擬 Zhuyin (注音) 輸入過程
+    // 在大千鍵盤佈局中，當 composer 有聲調時，或遇到空格/Enter時，會將 reading key 插入 assembler
     for char in sequence {
       let charStr = String(char)
-      if charStr == " " {
-        // 空格表示組字
-        if !testHandler.composer.isEmpty {
-          // 取得注音key並插入 assembler
-          if let key = testHandler.composer.phonabetKeyForQuery(pronounceableOnly: false) {
-            _ = testHandler.assembler.insertKey(key)
+      let isSpace = charStr == " "
+      
+      // 接收按鍵到 composer
+      testHandler.composer.receiveKey(fromString: isSpace ? " " : charStr)
+      
+      // 檢查是否應該提交 reading key 到 assembler
+      // 根據 InputHandler 的邏輯：有聲調 且 合法，或者 遇到確認鍵（空格/Enter）
+      let shouldInsertKey = testHandler.composer.hasIntonation() || isSpace
+      
+      if shouldInsertKey && !testHandler.composer.isEmpty {
+        // 取得 reading key 並插入 assembler
+        if let readingKey = testHandler.composer.phonabetKeyForQuery(pronounceableOnly: testHandler.prefs.acceptLeadingIntonations) {
+          // 檢查語言模型是否有此讀音（模擬 InputHandler 的行為）
+          if testHandler.currentLM.hasUnigramsFor(keyArray: [readingKey]) {
+            _ = testHandler.assembler.insertKey(readingKey)
           }
-          testHandler.composer.clear()
         }
-      } else {
-        // 其他字符塞入 composer
-        testHandler.composer.receiveKey(fromString: charStr)
+        // 清空 composer 準備下一個音節
+        testHandler.composer.clear()
       }
     }
+    
     // 組字
     testHandler.assemble()
   }
