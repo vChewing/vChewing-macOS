@@ -7,7 +7,6 @@
 // requirements defined in MIT License.
 
 import Foundation
-import InputMethodKit
 
 // MARK: - IMKHelper
 
@@ -43,49 +42,57 @@ public enum IMKHelper {
     "org.unknown.keylayout.vChewingIBM",
     "org.unknown.keylayout.vChewingMiTAC",
   ]
+}
 
-  public static var allowedAlphanumericalTISInputSources: [TISInputSource.KeyboardLayout] {
-    let allTISKeyboardLayouts = TISInputSource.getAllTISInputKeyboardLayoutMap()
-    return arrWhitelistedKeyLayoutsASCII.compactMap { allTISKeyboardLayouts[$0] }
-  }
+#if canImport(InputMethodKit)
 
-  public static var allowedBasicLayoutsAsTISInputSources: [TISInputSource.KeyboardLayout?] {
-    let allTISKeyboardLayouts = TISInputSource.getAllTISInputKeyboardLayoutMap()
-    // 為了保證清單順序，先弄幾個容器。
-    var containerA: [TISInputSource.KeyboardLayout?] = []
-    var containerB: [TISInputSource.KeyboardLayout?] = []
-    var containerC: [TISInputSource.KeyboardLayout] = []
+  import InputMethodKit
 
-    let filterSet = Array(
-      Set(arrWhitelistedKeyLayoutsASCII)
-        .subtracting(Set(arrDynamicBasicKeyLayouts))
-    )
-    let matchedGroupBasic = (arrWhitelistedKeyLayoutsASCII + arrDynamicBasicKeyLayouts).compactMap {
-      allTISKeyboardLayouts[$0]
+  extension IMKHelper {
+    public static var allowedAlphanumericalTISInputSources: [TISInputSource.KeyboardLayout] {
+      let allTISKeyboardLayouts = TISInputSource.getAllTISInputKeyboardLayoutMap()
+      return arrWhitelistedKeyLayoutsASCII.compactMap { allTISKeyboardLayouts[$0] }
     }
-    matchedGroupBasic.forEach { neta in
-      if filterSet.contains(neta.id) {
-        containerC.append(neta)
-      } else if neta.id.hasPrefix("com.apple") {
-        containerA.append(neta)
-      } else {
-        containerB.append(neta)
+
+    public static var allowedBasicLayoutsAsTISInputSources: [TISInputSource.KeyboardLayout?] {
+      let allTISKeyboardLayouts = TISInputSource.getAllTISInputKeyboardLayoutMap()
+      // 為了保證清單順序，先弄幾個容器。
+      var containerA: [TISInputSource.KeyboardLayout?] = []
+      var containerB: [TISInputSource.KeyboardLayout?] = []
+      var containerC: [TISInputSource.KeyboardLayout] = []
+
+      let filterSet = Array(
+        Set(arrWhitelistedKeyLayoutsASCII)
+          .subtracting(Set(arrDynamicBasicKeyLayouts))
+      )
+      let matchedGroupBasic = (arrWhitelistedKeyLayoutsASCII + arrDynamicBasicKeyLayouts).compactMap {
+        allTISKeyboardLayouts[$0]
       }
+      matchedGroupBasic.forEach { neta in
+        if filterSet.contains(neta.id) {
+          containerC.append(neta)
+        } else if neta.id.hasPrefix("com.apple") {
+          containerA.append(neta)
+        } else {
+          containerB.append(neta)
+        }
+      }
+
+      // 這裡的 nil 是用來讓選單插入分隔符用的。
+      if !containerA.isEmpty { containerA.append(nil) }
+      if !containerB.isEmpty { containerB.append(nil) }
+
+      return containerA + containerB + containerC
     }
-
-    // 這裡的 nil 是用來讓選單插入分隔符用的。
-    if !containerA.isEmpty { containerA.append(nil) }
-    if !containerB.isEmpty { containerB.append(nil) }
-
-    return containerA + containerB + containerC
   }
-}
 
-// MARK: - 與輸入法的具體的安裝過程有關的命令
+  // MARK: - 與輸入法的具體的安裝過程有關的命令
 
-extension IMKHelper {
-  @discardableResult
-  public static func registerInputMethod() -> Int32 {
-    TISInputSource.registerInputMethod() ? 0 : -1
+  extension IMKHelper {
+    @discardableResult
+    public static func registerInputMethod() -> Int32 {
+      TISInputSource.registerInputMethod() ? 0 : -1
+    }
   }
-}
+
+#endif
