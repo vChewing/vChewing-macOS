@@ -32,7 +32,7 @@ public class CtlCandidateTDK: CtlCandidate, NSWindowDelegate {
   // MARK: - Constructors
 
   public required init(_ layout: NSUserInterfaceLayoutOrientation = .horizontal) {
-    var contentRect = NSRect(x: 128.0, y: 128.0, width: 0.0, height: 0.0)
+    var contentRect = CGRect(x: 128.0, y: 128.0, width: 0.0, height: 0.0)
     let styleMask: NSWindow.StyleMask = [.nonactivatingPanel]
     let panel = NSPanel(
       contentRect: contentRect, styleMask: styleMask, backing: .buffered, defer: false
@@ -40,7 +40,7 @@ public class CtlCandidateTDK: CtlCandidate, NSWindowDelegate {
     panel.level = NSWindow.Level(Int(max(CGShieldingWindowLevel(), kCGPopUpMenuWindowLevel)) + 2)
     panel.hasShadow = true
     panel.backgroundColor = NSColor.clear
-    contentRect.origin = NSPoint.zero
+    contentRect.origin = CGPoint.zero
 
     super.init(layout)
     window = panel
@@ -240,7 +240,7 @@ public class CtlCandidateTDK: CtlCandidate, NSWindowDelegate {
     }()
 
     // 創建容器視圖作為 ZStack，設置固定尺寸
-    let containerView = NSView(frame: NSRect(origin: .zero, size: viewSize))
+    let containerView = NSView(frame: CGRect(origin: .zero, size: viewSize))
     // 為容器視圖也設置圓角，確保整體一致性
     containerView.wantsLayer = true
     containerView.layer?.cornerRadius = Self.thePool.windowRadius

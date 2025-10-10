@@ -124,7 +124,7 @@ extension CtlSettingsCocoa: NSToolbarDelegate {
       previousView = newView
       let temporaryViewOld = NSView(frame: existingContentView.frame)
       window.contentView = temporaryViewOld
-      var newWindowRect = NSRect(origin: window.frame.origin, size: newView.fittingSize)
+      var newWindowRect = CGRect(origin: window.frame.origin, size: newView.fittingSize)
       newWindowRect.size.height += kWindowTitleHeight
       newWindowRect.origin.y = window.frame.maxY - newWindowRect.height
       window.setFrame(newWindowRect, display: true, animate: animate)

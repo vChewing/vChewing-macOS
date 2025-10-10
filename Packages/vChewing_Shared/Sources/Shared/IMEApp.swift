@@ -6,8 +6,15 @@
 // marks, or product names of Contributor, except as required to fulfill notice
 // requirements defined in MIT License.
 
-import AppKit
-import Carbon
+#if canImport(AppKit)
+  import AppKit
+#else
+  import Foundation
+#endif
+
+#if canImport(Carbon)
+  import Carbon
+#endif
 
 // MARK: - IMEApp
 
@@ -58,17 +65,24 @@ public enum IMEApp {
 
   /// 當前鍵盤是否是 JIS 佈局
   public static var isKeyboardJIS: Bool {
-    KBGetLayoutType(Int16(LMGetKbdType())) == kKeyboardJIS
+    #if canImport(Carbon)
+      return KBGetLayoutType(Int16(LMGetKbdType())) == kKeyboardJIS
+    #else
+      // TODO: 需要找個方法判定 Linux 系統下怎樣辨識 JIS 鍵盤佈局。
+      return false
+    #endif
   }
 
   /// Fart or Beep?
   public static func buzz() {
-    let prefs = PrefMgr()
-    switch prefs.beepSoundPreference {
-    case 0: return
-    case 1: NSSound.beep()
-    default: NSSound.buzz(fart: !prefs.shouldNotFartInLieuOfBeep)
-    }
+    #if canImport(AppKit)
+      let prefs = PrefMgr()
+      switch prefs.beepSoundPreference {
+      case 0: return
+      case 1: NSSound.beep()
+      default: NSSound.buzz(fart: !prefs.shouldNotFartInLieuOfBeep)
+      }
+    #endif
   }
 }
 

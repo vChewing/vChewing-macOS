@@ -6,9 +6,6 @@
 // marks, or product names of Contributor, except as required to fulfill notice
 // requirements defined in MIT License.
 
-import AppKit
-import OSFrameworkImpl
-
 // MARK: - InputSignalProtocol
 
 public protocol InputSignalProtocol {

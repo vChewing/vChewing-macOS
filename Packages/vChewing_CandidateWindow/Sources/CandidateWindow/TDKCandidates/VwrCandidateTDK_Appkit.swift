@@ -58,7 +58,7 @@ public class VwrCandidateTDKAppKit: NSView {
 
   // MARK: Private
 
-  private var dimension: NSSize = .zero
+  private var dimension: CGSize = .zero
 }
 
 // MARK: - Interface Renderer (with shared public variables).
@@ -66,7 +66,7 @@ public class VwrCandidateTDKAppKit: NSView {
 extension VwrCandidateTDKAppKit {
   override public var isFlipped: Bool { true }
 
-  override public var fittingSize: NSSize { thePool.metrics.fittingSize }
+  override public var fittingSize: CGSize { thePool.metrics.fittingSize }
 
   public static var candidateListBackground: NSColor {
     let brightBackground = NSColor(red: 0.99, green: 0.99, blue: 0.99, alpha: 1.00)
@@ -74,7 +74,7 @@ extension VwrCandidateTDKAppKit {
     return NSApplication.isDarkMode ? darkBackground : brightBackground
   }
 
-  override public func draw(_: NSRect) {
+  override public func draw(_: CGRect) {
     let sizesCalculated = thePool.metrics
     let alphaRatio = NSApplication.isDarkMode ? 0.75 : 1
     let themeColor = controller?.delegate?.clientAccentColor?.withAlphaComponent(alphaRatio)
@@ -87,7 +87,7 @@ extension VwrCandidateTDKAppKit {
     } else {
       Self.candidateListBackground.setFill()
     }
-    let allRect = NSRect(origin: .zero, size: sizesCalculated.fittingSize)
+    let allRect = CGRect(origin: .zero, size: sizesCalculated.fittingSize)
     NSBezierPath(roundedRect: allRect, xRadius: windowRadius, yRadius: windowRadius).fill()
     // 繪製高亮行背景與高亮候選字詞背景
     lineBackground(isCurrentLine: true, isMatrix: isMatrix).setFill()
@@ -138,7 +138,7 @@ extension VwrCandidateTDKAppKit {
     guard bounds.contains(clickPoint) else { return nil }
     let flattenedCells = thePool.candidateLines[thePool.lineRangeForCurrentPage].flatMap { $0 }
     let filteredData: [CandidateCellData] = flattenedCells.filter { theCell in
-      NSRect(origin: theCell.visualOrigin, size: theCell.visualDimension).contains(clickPoint)
+      CGRect(origin: theCell.visualOrigin, size: theCell.visualDimension).contains(clickPoint)
     }
     guard let firstValidCell = filteredData.first else { return nil }
     return firstValidCell.index

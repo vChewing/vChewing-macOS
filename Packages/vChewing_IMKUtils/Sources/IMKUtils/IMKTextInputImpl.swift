@@ -20,7 +20,7 @@
         isVerticalTyping = false
         return
       }
-      var textFrame = NSRect.zero
+      var textFrame = CGRect.zero
       let attributes: [AnyHashable: Any]? = client.attributes(
         forCharacterIndex: 0, lineHeightRectangle: &textFrame
       )
@@ -30,8 +30,8 @@
   }
 
   extension IMKTextInput {
-    public func lineHeightRect(u16Cursor: Int) -> NSRect {
-      var lineHeightRect = NSRect.zero
+    public func lineHeightRect(u16Cursor: Int) -> CGRect {
+      var lineHeightRect = CGRect.zero
       var u16Cursor = u16Cursor
       // iMessage 的話，據此算出來的 lineHeightRect 結果的橫向座標起始點不準確。目前無解。
       while lineHeightRect.origin == .zero, u16Cursor >= 0 {

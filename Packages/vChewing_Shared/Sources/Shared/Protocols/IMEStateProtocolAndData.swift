@@ -8,7 +8,6 @@
 
 import Foundation
 import IMKUtils
-import InputMethodKit
 
 // MARK: - IMEStateProtocol
 
