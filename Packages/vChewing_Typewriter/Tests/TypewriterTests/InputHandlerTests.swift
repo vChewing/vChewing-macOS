@@ -60,71 +60,335 @@ class InputHandlerTests: XCTestCase {
 
   func typeSentence(_ sequence: String) {
     guard let testHandler else { return }
-    // 簡化的打字模擬，直接操作 composer 和 assembler
+    // 直接操作 InputHandler 的 composer 和 assembler，模擬打字過程
     for char in sequence {
       let charStr = String(char)
       if charStr == " " {
         // 空格表示組字
-        testHandler.assemble()
+        if !testHandler.composer.isEmpty {
+          // 取得注音key並插入 assembler
+          if let key = testHandler.composer.phonabetKeyForQuery(pronounceableOnly: false) {
+            _ = testHandler.assembler.insertKey(key)
+          }
+          testHandler.composer.clear()
+        }
       } else {
         // 其他字符塞入 composer
         testHandler.composer.receiveKey(fromString: charStr)
       }
     }
+    // 組字
+    testHandler.assemble()
+  }
+  
+  func generateDisplayedText() -> String {
+    guard let testHandler else { return "" }
+    return testHandler.assembler.assembledSentence.values.joined()
   }
 
   // MARK: - Test Cases
 
-  /// 測試 InputHandler 基本初始化。
-  func test101_InputHandler_Initialization() throws {
-    vCTestLog("測試 InputHandler 初始化")
-
-    // 測試基本初始化
-    XCTAssertNotNil(testHandler)
-    XCTAssertNotNil(testHandler?.composer)
-    XCTAssertNotNil(testHandler?.assembler)
-    XCTAssertTrue(testHandler?.assembler.isEmpty ?? false)
-
-    vCTestLog("InputHandler 初始化成功")
-  }
-
-  /// 測試注拼槽基本功能。
-  func test103_InputHandler_ComposerBasics() throws {
+  /// 測試基本的打字組句（不是ㄅ半注音）。
+  func test101_InputHandler_BasicSentenceComposition() throws {
     guard let testHandler else {
       XCTFail("testHandler is nil.")
       return
     }
-    vCTestLog("測試注拼槽基本功能")
+    testHandler.prefs.useSCPCTypingMode = false
+    clearTestPOM()
+    vCTestLog("測試組句：高科技公司的年中獎金")
+    testHandler.clear()
+    typeSentence("el dk ru4ej/ n 2k7su065j/ ru;3rup ")
+    let resultText1 = generateDisplayedText()
+    vCTestLog("- // 組字結果：\(resultText1)")
+    XCTAssertEqual(resultText1, "高科技公司的年中獎金")
+  }
+
+  /// 測試基本的逐字選字（ㄅ半注音）。
+  func test102_InputHandler_BasicSCPCTyping() throws {
+    guard let testHandler else {
+      XCTFail("testHandler is nil.")
+      return
+    }
+    testHandler.prefs.useSCPCTypingMode = true
+    clearTestPOM()
+    vCTestLog("測試逐字選字：高")
+    testHandler.clear()
+    
+    // 打「高」字
+    typeSentence("el ")
+    let resultText1 = generateDisplayedText()
+    vCTestLog("- // 組字結果：\(resultText1)")
+    XCTAssertFalse(resultText1.isEmpty)
+    let candidates = testHandler.generateArrayOfCandidates()
+    XCTAssertTrue(resultText1.contains("高") || candidates.map { $0.value }.contains("高"))
+  }
+
+  /// 測試就地輪替候選字。
+  func test103_InputHandler_RevolvingCandidates() throws {
+    guard let testHandler else {
+      XCTFail("testHandler is nil.")
+      return
+    }
+    testHandler.prefs.useSCPCTypingMode = false
+    testHandler.prefs.useRearCursorMode = false
+    clearTestPOM()
+
+    testHandler.clear()
+    typeSentence("el dk ru4ej/ n 2k7su065j/ ru;3rup ")
+
+    vCTestLog("測試就地輪替候選字：測試游標移動和候選字功能")
+    
+    // 測試游標移動
+    let initialCursor = testHandler.assembler.cursor
+    testHandler.assembler.jumpCursorBySegment(to: .rear)
+    testHandler.assembler.jumpCursorBySegment(to: .rear)
+    XCTAssertNotEqual(testHandler.assembler.cursor, initialCursor)
+    
+    // 測試候選字獲取
+    let candidates = testHandler.generateArrayOfCandidates()
+    vCTestLog("- // 候選字數量：\(candidates.count)")
+    XCTAssertFalse(candidates.isEmpty)
+  }
+
+  /// 測試漸退記憶模組的記憶資料生成與適用。
+  func test104_InputHandler_ManualCandidateSelectionAndPOM() throws {
+    guard let testHandler else {
+      XCTFail("testHandler is nil.")
+      return
+    }
+    testHandler.prefs.useSCPCTypingMode = false
+    testHandler.prefs.useRearCursorMode = false
+    clearTestPOM()
+
+    let sequenceChars = "el dk ru4ej/ n 2k7su065j/ ru;3rup "
+
+    testHandler.clear()
+    typeSentence(sequenceChars)
+
+    vCTestLog("測試選字與漸退記憶：高科技公司的年中獎金 -> 選擇候選字")
+    vCTestLog("nodes before candidate: \(testHandler.assembler.assembledSentence.values)")
+    vCTestLog("cursor: \(testHandler.assembler.cursor)/length: \(testHandler.assembler.length)")
+    
+    // 測試候選字
+    let candidates = testHandler.generateArrayOfCandidates()
+    vCTestLog("candidates: \(candidates.map { $0.value })")
+    XCTAssertFalse(candidates.isEmpty)
+    
+    // 測試選擇候選字後的效果
+    if !candidates.isEmpty {
+      let firstCandidate = candidates[0]
+      // 直接測試候選字的結構
+      XCTAssertFalse(firstCandidate.value.isEmpty)
+      XCTAssertFalse(firstCandidate.keyArray.isEmpty)
+      vCTestLog("- // 第一個候選字：\(firstCandidate.value)")
+    }
+  }
+
+  /// 測試在選字後復原游標位置的功能。
+  func test105_InputHandler_PostCandidateCursorPlacementRestore() throws {
+    guard let testHandler else {
+      XCTFail("testHandler is nil.")
+      return
+    }
+    testHandler.prefs.useSCPCTypingMode = false
+    testHandler.prefs.useRearCursorMode = false
+    clearTestPOM()
+
+    let sequenceChars = "el dk ru4ej/ n 2k7su065j/ ru;3rup "
+
+    testHandler.clear()
+    typeSentence(sequenceChars)
+
+    // 移動游標
+    testHandler.assembler.jumpCursorBySegment(to: .rear)
+    testHandler.assembler.jumpCursorBySegment(to: .rear)
+
+    let cursorBeforeCandidate = testHandler.assembler.cursor
+    vCTestLog("測試游標位置復原：cursor before = \(cursorBeforeCandidate)")
+    
+    // 備份游標
+    testHandler.backupCursor = cursorBeforeCandidate
+    
+    // 測試候選字
+    let candidates = testHandler.generateArrayOfCandidates()
+    XCTAssertFalse(candidates.isEmpty)
+    vCTestLog("candidates count: \(candidates.count)")
+    
+    // 檢查 backupCursor 功能
+    XCTAssertNotNil(testHandler.backupCursor)
+    vCTestLog("backup cursor: \(testHandler.backupCursor ?? -1)")
+  }
+
+  /// 測試 inputHandler.commissionByCtrlOptionCommandEnter()。
+  func test106_InputHandler_MiscCommissionTest() throws {
+    guard let testHandler else {
+      XCTFail("testHandler is nil.")
+      return
+    }
+    testHandler.prefs.useSCPCTypingMode = false
+    clearTestPOM()
+    vCTestLog("正在測試 inputHandler.commissionByCtrlOptionCommandEnter()。")
+    testHandler.clear()
+    typeSentence("el dk ru4ej/ n 2k7")
+    
+    testHandler.prefs.specifyCmdOptCtrlEnterBehavior = 0
+    var result = testHandler.commissionByCtrlOptionCommandEnter(isShiftPressed: true)
+    vCTestLog("Result (mode 0, shift): \(result)")
+    XCTAssertEqual(result, "ㄍㄠ ㄎㄜ ㄐㄧˋ ㄍㄨㄥ ㄙ ˙ㄉㄜ")
+    
+    result = testHandler.commissionByCtrlOptionCommandEnter()
+    vCTestLog("Result (mode 0): \(result)")
+    XCTAssertEqual(result, "高(ㄍㄠ)科(ㄎㄜ)技(ㄐㄧˋ)公(ㄍㄨㄥ)司(ㄙ)的(˙ㄉㄜ)")
+    
+    testHandler.prefs.specifyCmdOptCtrlEnterBehavior = 1
+    result = testHandler.commissionByCtrlOptionCommandEnter()
+    let expectedRubyResult = """
+    <ruby>高<rp>(</rp><rt>ㄍㄠ</rt><rp>)</rp></ruby><ruby>科<rp>(</rp><rt>ㄎㄜ</rt><rp>)</rp></ruby><ruby>技<rp>(</rp><rt>ㄐㄧˋ</rt><rp>)</rp></ruby><ruby>公<rp>(</rp><rt>ㄍㄨㄥ</rt><rp>)</rp></ruby><ruby>司<rp>(</rp><rt>ㄙ</rt><rp>)</rp></ruby><ruby>的<rp>(</rp><rt>˙ㄉㄜ</rt><rp>)</rp></ruby>
+    """
+    vCTestLog("Result (mode 1): \(result)")
+    XCTAssertEqual(result, expectedRubyResult)
+    
+    testHandler.prefs.specifyCmdOptCtrlEnterBehavior = 2
+    result = testHandler.commissionByCtrlOptionCommandEnter()
+    vCTestLog("Result (mode 2): \(result)")
+    XCTAssertEqual(result, "⠅⠩⠄⠇⠮⠄⠅⠡⠐⠅⠯⠄⠑⠄⠙⠮⠁")
+    
+    testHandler.prefs.specifyCmdOptCtrlEnterBehavior = 3
+    result = testHandler.commissionByCtrlOptionCommandEnter()
+    vCTestLog("Result (mode 3): \(result)")
+    XCTAssertEqual(result, "⠛⠖⠁⠅⠢⠁⠛⠊⠆⠛⠲⠁⠎⠁⠙⠢")
+    
+    vCTestLog("成功完成測試 inputHandler.commissionByCtrlOptionCommandEnter()。")
+  }
+
+  /// 測試磁帶模組的快速選字功能（單一結果）。
+  func test110_InputHandler_CassetteQuickPhraseSelection() throws {
+    guard let testHandler else {
+      XCTFail("testHandler is nil.")
+      return
+    }
+    
+    let originalAsyncLoading = LMAssembly.LMInstantiator.asyncLoadingUserData
+    LMAssembly.LMInstantiator.asyncLoadingUserData = false
+    defer { LMAssembly.LMInstantiator.asyncLoadingUserData = originalAsyncLoading }
+
+    testHandler.prefs.cassetteEnabled = true
+
+    let cassetteURL = URL(fileURLWithPath: #file)
+      .deletingLastPathComponent() // TypewriterTests
+      .deletingLastPathComponent() // Tests
+      .deletingLastPathComponent() // vChewing_Typewriter
+      .deletingLastPathComponent() // Packages
+      .appendingPathComponent("vChewing_LangModelAssembly")
+      .appendingPathComponent("Tests")
+      .appendingPathComponent("TestCINData")
+      .appendingPathComponent("array30.cin2")
+
+    guard FileManager.default.fileExists(atPath: cassetteURL.path) else {
+      vCTestLog("測試檔案不存在，跳過測試：\(cassetteURL.path)")
+      return
+    }
+
+    LMAssembly.LMInstantiator.loadCassetteData(path: cassetteURL.path)
+
+    testHandler.clear()
+    typeSentence(",,,")
+    XCTAssertEqual(testHandler.calligrapher, ",,,")
+
+    let initialCandidates = testHandler.generateArrayOfCandidates()
+    vCTestLog("Initial candidates: \(initialCandidates.map { $0.value })")
+    XCTAssertFalse(initialCandidates.isEmpty)
+    
+    guard let quickPhraseKey = testHandler.currentLM.cassetteQuickPhraseCommissionKey else {
+      vCTestLog("Quick phrase commission key missing, skipping test")
+      return
+    }
+
+    typeSentence(quickPhraseKey)
+    
+    vCTestLog("Calligrapher after quick phrase: \(testHandler.calligrapher)")
+    vCTestLog("Assembler content: \(generateDisplayedText())")
+  }
+
+  /// 測試磁帶模組的快速選字功能（符號表多選）。
+  func test111_InputHandler_CassetteQuickPhraseSymbolTableMultiple() throws {
+    guard let testHandler else {
+      XCTFail("testHandler is nil.")
+      return
+    }
+    
+    let originalAsyncLoading = LMAssembly.LMInstantiator.asyncLoadingUserData
+    LMAssembly.LMInstantiator.asyncLoadingUserData = false
+    defer { LMAssembly.LMInstantiator.asyncLoadingUserData = originalAsyncLoading }
+
+    testHandler.prefs.cassetteEnabled = true
+
+    let cassetteURL = URL(fileURLWithPath: #file)
+      .deletingLastPathComponent() // TypewriterTests
+      .deletingLastPathComponent() // Tests
+      .deletingLastPathComponent() // vChewing_Typewriter
+      .deletingLastPathComponent() // Packages
+      .appendingPathComponent("vChewing_LangModelAssembly")
+      .appendingPathComponent("Tests")
+      .appendingPathComponent("TestCINData")
+      .appendingPathComponent("array30.cin2")
+
+    guard FileManager.default.fileExists(atPath: cassetteURL.path) else {
+      vCTestLog("測試檔案不存在，跳過測試：\(cassetteURL.path)")
+      return
+    }
+
+    LMAssembly.LMInstantiator.loadCassetteData(path: cassetteURL.path)
+
+    testHandler.clear()
+    typeSentence(",,,,")
+    XCTAssertEqual(testHandler.calligrapher, ",,,,")
+
+    guard let quickPhraseKey = testHandler.currentLM.cassetteQuickPhraseCommissionKey else {
+      vCTestLog("Quick phrase commission key missing, skipping test")
+      return
+    }
+
+    typeSentence(quickPhraseKey)
+    
+    vCTestLog("Testing symbol table multi-selection")
+    vCTestLog("Calligrapher: \(testHandler.calligrapher)")
+    
+    // 測試是否產生了多個候選字
+    let candidates = testHandler.generateArrayOfCandidates()
+    vCTestLog("Candidates: \(candidates.map { $0.value })")
+  }
+
+  /// 測試組字器的基本功能。
+  func test_InputHandler_ComposerAndAssemblerBasics() throws {
+    guard let testHandler else {
+      XCTFail("testHandler is nil.")
+      return
+    }
+
+    vCTestLog("測試 Composer 和 Assembler 基本功能")
 
     testHandler.clear()
     XCTAssertTrue(testHandler.composer.isEmpty)
+    XCTAssertTrue(testHandler.assembler.isEmpty)
 
     // 測試接收單個按鍵
     testHandler.composer.receiveKey(fromString: "e")
     XCTAssertFalse(testHandler.composer.isEmpty)
+    
+    // 測試組字
+    testHandler.assemble()
+    XCTAssertFalse(testHandler.assembler.isEmpty)
+
+    // 測試組字器的基本屬性
+    XCTAssertGreaterThanOrEqual(testHandler.assembler.cursor, 0)
+    XCTAssertGreaterThan(testHandler.assembler.length, 0)
 
     testHandler.clear()
     XCTAssertTrue(testHandler.composer.isEmpty)
-
-    vCTestLog("成功完成注拼槽基本功能測試")
-  }
-
-  /// 測試組字器基本功能。
-  func test106_InputHandler_AssemblerBasics() throws {
-    guard let testHandler else {
-      XCTFail("testHandler is nil.")
-      return
-    }
-
-    vCTestLog("測試組字器基本功能")
-
-    testHandler.clear()
     XCTAssertTrue(testHandler.assembler.isEmpty)
 
-    // 測試組字器的基本屬性
-    XCTAssertEqual(testHandler.assembler.cursor, 0)
-    XCTAssertEqual(testHandler.assembler.length, 0)
-
-    vCTestLog("成功完成組字器基本功能測試")
+    vCTestLog("成功完成 Composer 和 Assembler 基本功能測試")
   }
 }

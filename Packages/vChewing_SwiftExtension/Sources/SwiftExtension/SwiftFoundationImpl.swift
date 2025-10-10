@@ -280,8 +280,11 @@ extension String {
     }
     let encodingUBE: UInt32 = 268_435_712 // CFStringBuiltInEncodings.UTF16BE
     let encodingRAW = encoding ?? encodingUBE
-    let result = CFStringCreateWithCString(nil, &charBytes, encodingRAW) as String?
-    return result?.isEmpty ?? true ? nil : result
+    guard let cfString = CFStringCreateWithCString(nil, &charBytes, encodingRAW) else {
+      return nil
+    }
+    let result = String(describing: cfString)
+    return result.isEmpty ? nil : result
   }
 }
 
