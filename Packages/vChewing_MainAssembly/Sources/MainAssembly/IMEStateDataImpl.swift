@@ -84,13 +84,13 @@ extension IMEStateData {
   // MARK: Internal
 
   static var allowedMarkLengthRange: ClosedRange<Int> {
-    Self.minCandidateLength ... PrefMgr.shared.maxCandidateLength
+    Self.minCandidateLength ... PrefMgr().maxCandidateLength
   }
 
   // MARK: Private
 
   private static var minCandidateLength: Int {
-    PrefMgr.shared.allowBoostingSingleKanjiAsUserPhrase ? 1 : 2
+    PrefMgr().allowBoostingSingleKanjiAsUserPhrase ? 1 : 2
   }
 }
 
@@ -174,9 +174,9 @@ extension IMEStateData {
       }
       neta.components(separatedBy: "-").forEach { subNeta in
         var subNeta = subNeta
-        if !PrefMgr.shared.cassetteEnabled {
-          if PrefMgr.shared.showHanyuPinyinInCompositionBuffer,
-             PrefMgr.shared.alwaysShowTooltipTextsHorizontally || !InputSession.isVerticalTyping {
+        if !PrefMgr().cassetteEnabled {
+          if PrefMgr().showHanyuPinyinInCompositionBuffer,
+             PrefMgr().alwaysShowTooltipTextsHorizontally || !InputSession.isVerticalTyping {
             // 恢復陰平標記->注音轉拼音->轉教科書式標調
             subNeta = Tekkon.restoreToneOneInPhona(target: subNeta)
             subNeta = Tekkon.cnvPhonaToHanyuPinyin(targetJoined: subNeta)
@@ -270,7 +270,7 @@ extension IMEStateData {
       )
     }
     tooltip = tooltipForMarking
-    if PrefMgr.shared.phraseReplacementEnabled {
+    if PrefMgr().phraseReplacementEnabled {
       tooltipColorState = .warning
       tooltip +=
         "\n"
