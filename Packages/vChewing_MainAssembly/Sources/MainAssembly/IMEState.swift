@@ -48,7 +48,7 @@ public struct IMEState: IMEStateProtocol {
     // 注意資料的設定順序，一定得先設定 displayTextSegments。
     data.displayTextSegments = displayTextSegments.map {
       if !InputSession.isVerticalTyping { return $0 }
-      guard PrefMgr.shared.hardenVerticalPunctuations else { return $0 }
+      guard PrefMgr().hardenVerticalPunctuations else { return $0 }
       var neta = $0
       ChineseConverter.hardenVerticalPunctuations(
         target: &neta,
