@@ -7,7 +7,7 @@
 // requirements defined in MIT License.
 
 import Foundation
-import LangModelAssembly
+@testable import LangModelAssembly
 import Shared
 @testable import Typewriter
 import XCTest
@@ -300,6 +300,10 @@ class InputHandlerTests: XCTestCase {
     }
 
     LMAssembly.LMInstantiator.loadCassetteData(path: cassetteURL.path)
+
+    let cassetteLM = LMAssembly.LMInstantiator.lmCassette
+    XCTAssertTrue(cassetteLM.isLoaded)
+    XCTAssertTrue(cassetteLM.count > 0)
 
     testHandler.clear()
     typeSentence(",,,")
