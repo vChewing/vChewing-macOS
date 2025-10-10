@@ -11,7 +11,7 @@ import InputMethodKit
 import Shared
 import Tekkon
 
-// MARK: - AttributedString 生成器
+// MARK: - AttributedString 材料生成器
 
 extension IMEStateData {
   public var displayedTextConverted: String {
@@ -22,31 +22,6 @@ extension IMEStateData {
       result = displayedText
     }
     return result
-  }
-
-  // MARK: Cursor & Marker & Range for UTF8
-
-  public var markedRange: Range<Int> {
-    min(cursor, marker) ..< max(cursor, marker)
-  }
-
-  // MARK: Cursor & Marker & Range for UTF16 (Read-Only)
-
-  /// IMK 協定的內文組字區的游標長度與游標位置無法正確統計 UTF8 高萬字（比如 emoji）的長度，
-  /// 所以在這裡必須做糾偏處理。因為在用 Swift，所以可以用「.utf16」取代「NSString.length()」。
-  /// 這樣就可以免除不必要的類型轉換。
-  public var u16Cursor: Int {
-    let upperBound = max(0, min(cursor, displayedText.count))
-    return displayedText.map(\.description)[0 ..< upperBound].joined().utf16.count
-  }
-
-  public var u16Marker: Int {
-    let upperBound = max(0, min(marker, displayedText.count))
-    return displayedText.map(\.description)[0 ..< upperBound].joined().utf16.count
-  }
-
-  public var u16MarkedRange: Range<Int> {
-    min(u16Cursor, u16Marker) ..< max(u16Cursor, u16Marker)
   }
 
   // MARK: Other data for non-empty states.
@@ -68,36 +43,13 @@ extension IMEStateData {
       keyArray: pair.keyArray
     )
   }
-
-  public var isFilterable: Bool {
-    guard isMarkedLengthValid else { return false } // 範圍長度必須合規。
-    guard markedTargetExists else { return false } // 必須得有在庫對象
-    guard markedReadings.count == 1 else { return true } // 如果幅長大於 1，則直接批准。
-    // 處理單個漢字的情形：當且僅當在庫量僅有一筆的時候，才禁止過濾。
-    return LMMgr.countPhrasePairs(keyArray: markedReadings, mode: IMEApp.currentInputMode) > 1
-  }
-
-  public var isMarkedLengthValid: Bool {
-    Self.allowedMarkLengthRange.contains(markedRange.count)
-  }
-
-  // MARK: Internal
-
-  static var allowedMarkLengthRange: ClosedRange<Int> {
-    Self.minCandidateLength ... PrefMgr().maxCandidateLength
-  }
-
-  // MARK: Private
-
-  private static var minCandidateLength: Int {
-    PrefMgr().allowBoostingSingleKanjiAsUserPhrase ? 1 : 2
-  }
 }
 
 // MARK: - AttributedString 生成器
 
 extension IMEStateData {
-  public func attributedStringNormal(for session: IMKInputControllerProtocol) -> NSAttributedString {
+  public func attributedStringNormal(for session: IMKInputControllerProtocol)
+    -> NSAttributedString {
     /// 考慮到因為滑鼠點擊等其它行為導致的組字區內容遞交情況，
     /// 這裡對組字區內容也加上康熙字轉換或者 JIS 漢字轉換處理。
     let attributedString = NSMutableAttributedString(string: displayedTextConverted)
@@ -116,7 +68,8 @@ extension IMEStateData {
     return attributedString
   }
 
-  public func attributedStringMarking(for session: IMKInputControllerProtocol) -> NSAttributedString {
+  public func attributedStringMarking(for session: IMKInputControllerProtocol)
+    -> NSAttributedString {
     /// 考慮到因為滑鼠點擊等其它行為導致的組字區內容遞交情況，
     /// 這裡對組字區內容也加上康熙字轉換或者 JIS 漢字轉換處理。
     let attributedString = NSMutableAttributedString(string: displayedTextConverted)
@@ -191,12 +144,6 @@ extension IMEStateData {
     return arrOutput.joined(separator: "\u{A0}")
   }
 
-  public var userPhraseKVPair: (keyArray: [String], value: String) {
-    let key = markedReadings
-    let value = displayedText.map(\.description)[markedRange].joined()
-    return (key, value)
-  }
-
   public mutating func updateTooltipForMarking() {
     var tooltipForMarking: String {
       let pair = userPhraseKVPair
@@ -229,7 +176,7 @@ extension IMEStateData {
 
       if markedTargetExists {
         tooltipColorState = .prompt
-        switch isFilterable {
+        switch LMMgr.isStateDataFilterableForMarked(self) {
         case false:
           return String(
             format: NSLocalizedString(
