@@ -154,6 +154,17 @@ public class LMMgr {
     mode.langModel.isPairFiltered(pair: .init(keyArray: keyArray, value: userPhrase))
   }
 
+  /// 偵測當前輸入狀態所標記的詞音配對是否可以被加入過濾清單。
+  public static func isStateDataFilterableForMarked(_ state: IMEStateData) -> Bool {
+    guard state.isMarkedLengthValid else { return false } // 範圍長度必須合規。
+    guard state.markedTargetExists else { return false } // 必須得有在庫對象
+    guard state.markedReadings.count == 1 else { return true } // 如果幅長大於 1，則直接批准。
+    // 處理單個漢字的情形：當且僅當在庫量僅有一筆的時候，才禁止過濾。
+    return countPhrasePairs(
+      keyArray: state.markedReadings, mode: IMEApp.currentInputMode
+    ) > 1
+  }
+
   public static func countPhrasePairs(
     keyArray: [String],
     mode: Shared.InputMode,
