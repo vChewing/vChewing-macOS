@@ -107,7 +107,7 @@ extension UserDefaults {
 // Ref: https://www.avanderlee.com/swift/property-wrappers/
 
 @propertyWrapper
-public struct AppProperty<Value> {
+public final class AppProperty<Value> {
   // MARK: Lifecycle
 
   public init(key: String, defaultValue: Value) {

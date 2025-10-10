@@ -11,8 +11,21 @@ import SwiftExtension
 
 // MARK: -
 
-@objcMembers
-public class PrefMgr: NSObject, PrefMgrProtocol {
+public struct PrefMgr: PrefMgrProtocol {
+  // MARK: Lifecycle
+
+  public init(
+    didAskForSyncingLMPrefs: (() -> ())? = nil,
+    didAskForRefreshingSpeechSputnik: (() -> ())? = nil,
+    didAskForSyncingShiftKeyDetectorPrefs: (() -> ())? = nil
+  ) {
+    self.didAskForSyncingLMPrefs = didAskForSyncingLMPrefs
+    self.didAskForRefreshingSpeechSputnik = didAskForRefreshingSpeechSputnik
+    self.didAskForSyncingShiftKeyDetectorPrefs = didAskForSyncingShiftKeyDetectorPrefs
+  }
+
+  // MARK: Public
+
   public static let kDefaultCandidateKeys = "123456"
   public static let kDefaultBasicKeyboardLayout = "com.apple.keylayout.ZhuyinBopomofo"
   public static let kDefaultAlphanumericalKeyboardLayout = {
@@ -58,78 +71,78 @@ public class PrefMgr: NSObject, PrefMgrProtocol {
   // MARK: - Settings (Tier 1)
 
   @AppProperty(key: UserDef.kIsDebugModeEnabled.rawValue, defaultValue: false)
-  public dynamic var isDebugModeEnabled: Bool
+  public var isDebugModeEnabled: Bool
 
   @AppProperty(key: UserDef.kFailureFlagForPOMObservation.rawValue, defaultValue: false)
-  public dynamic var failureFlagForPOMObservation: Bool
+  public var failureFlagForPOMObservation: Bool
 
   @AppProperty(
     key: UserDef.kCandidateServiceMenuContents.rawValue,
     defaultValue: kDefaultCandidateServiceMenuItem
   )
-  public dynamic var candidateServiceMenuContents: [String]
+  public var candidateServiceMenuContents: [String]
 
   @AppProperty(key: UserDef.kRespectClientAccentColor.rawValue, defaultValue: true)
-  public dynamic var respectClientAccentColor: Bool
+  public var respectClientAccentColor: Bool
 
   @AppProperty(key: UserDef.kAlwaysUsePCBWithElectronBasedClients.rawValue, defaultValue: true)
-  public dynamic var alwaysUsePCBWithElectronBasedClients: Bool
+  public var alwaysUsePCBWithElectronBasedClients: Bool
 
   @AppProperty(key: UserDef.kSecurityHardenedCompositionBuffer.rawValue, defaultValue: false)
-  public dynamic var securityHardenedCompositionBuffer: Bool
+  public var securityHardenedCompositionBuffer: Bool
 
   @AppProperty(key: UserDef.kCheckAbusersOfSecureEventInputAPI.rawValue, defaultValue: true)
-  public dynamic var checkAbusersOfSecureEventInputAPI: Bool
+  public var checkAbusersOfSecureEventInputAPI: Bool
 
   @AppProperty(key: UserDef.kDeltaOfCalendarYears.rawValue, defaultValue: -2_000)
-  public dynamic var deltaOfCalendarYears: Int
+  public var deltaOfCalendarYears: Int
 
   @AppProperty(key: UserDef.kMostRecentInputMode.rawValue, defaultValue: "")
-  public dynamic var mostRecentInputMode: String
+  public var mostRecentInputMode: String
 
   @AppProperty(key: UserDef.kCheckUpdateAutomatically.rawValue, defaultValue: false)
-  public dynamic var checkUpdateAutomatically: Bool
+  public var checkUpdateAutomatically: Bool
 
   @AppProperty(key: UserDef.kUseExternalFactoryDict.rawValue, defaultValue: false)
-  public dynamic var useExternalFactoryDict: Bool
+  public var useExternalFactoryDict: Bool
 
   @AppProperty(key: UserDef.kCassettePath.rawValue, defaultValue: "")
-  public dynamic var cassettePath: String
+  public var cassettePath: String
 
   @AppProperty(key: UserDef.kUserDataFolderSpecified.rawValue, defaultValue: "")
-  public dynamic var userDataFolderSpecified: String
+  public var userDataFolderSpecified: String
 
   @AppProperty(key: UserDef.kAppleLanguages.rawValue, defaultValue: [])
-  public dynamic var appleLanguages: [String]
+  public var appleLanguages: [String]
 
   @AppProperty(key: UserDef.kKeyboardParser.rawValue, defaultValue: 0)
-  public dynamic var keyboardParser: Int
+  public var keyboardParser: Int
 
   @AppProperty(
     key: UserDef.kBasicKeyboardLayout.rawValue, defaultValue: kDefaultBasicKeyboardLayout
   )
-  public dynamic var basicKeyboardLayout: String
+  public var basicKeyboardLayout: String
 
   @AppProperty(
     key: UserDef.kAlphanumericalKeyboardLayout.rawValue,
     defaultValue: kDefaultAlphanumericalKeyboardLayout
   )
-  public dynamic var alphanumericalKeyboardLayout: String
+  public var alphanumericalKeyboardLayout: String
 
   @AppProperty(key: UserDef.kShowNotificationsWhenTogglingCapsLock.rawValue, defaultValue: true)
-  public dynamic var showNotificationsWhenTogglingCapsLock: Bool
+  public var showNotificationsWhenTogglingCapsLock: Bool
 
   @AppProperty(key: UserDef.kAlwaysExpandCandidateWindow.rawValue, defaultValue: false)
-  public dynamic var alwaysExpandCandidateWindow: Bool
+  public var alwaysExpandCandidateWindow: Bool
 
   @AppProperty(key: UserDef.kCandidateWindowShowOnlyOneLine.rawValue, defaultValue: false)
-  public dynamic var candidateWindowShowOnlyOneLine: Bool
+  public var candidateWindowShowOnlyOneLine: Bool
 
   @AppProperty(key: UserDef.kShouldAutoReloadUserDataFiles.rawValue, defaultValue: true)
-  public dynamic var shouldAutoReloadUserDataFiles: Bool
+  public var shouldAutoReloadUserDataFiles: Bool
 
   @AppProperty(key: UserDef.kUseRearCursorMode.rawValue, defaultValue: false)
-  public dynamic var useRearCursorMode: Bool
+  public var useRearCursorMode: Bool
 
   @AppProperty(
     key: UserDef.kUseHLtoMoveCompositorCursorInCandidateState.rawValue,
@@ -147,210 +160,213 @@ public class PrefMgr: NSObject, PrefMgrProtocol {
   public var useShiftQuestionToCallServiceMenu: Bool
 
   @AppProperty(key: UserDef.kCursorPlacementAfterSelectingCandidate.rawValue, defaultValue: 1)
-  public dynamic var cursorPlacementAfterSelectingCandidate: Int
+  public var cursorPlacementAfterSelectingCandidate: Int
 
   @AppProperty(key: UserDef.kDodgeInvalidEdgeCandidateCursorPosition.rawValue, defaultValue: true)
-  public dynamic var dodgeInvalidEdgeCandidateCursorPosition: Bool
+  public var dodgeInvalidEdgeCandidateCursorPosition: Bool
 
   @AppProperty(key: UserDef.kUseDynamicCandidateWindowOrigin.rawValue, defaultValue: true)
-  public dynamic var useDynamicCandidateWindowOrigin: Bool
+  public var useDynamicCandidateWindowOrigin: Bool
 
   @AppProperty(key: UserDef.kUseHorizontalCandidateList.rawValue, defaultValue: true)
-  public dynamic var useHorizontalCandidateList: Bool
+  public var useHorizontalCandidateList: Bool
 
   @AppProperty(key: UserDef.kMinCellWidthForHorizontalMatrix.rawValue, defaultValue: 0)
-  public dynamic var minCellWidthForHorizontalMatrix: Int
+  public var minCellWidthForHorizontalMatrix: Int
 
   @AppProperty(key: UserDef.kChooseCandidateUsingSpace.rawValue, defaultValue: true)
-  public dynamic var chooseCandidateUsingSpace: Bool
+  public var chooseCandidateUsingSpace: Bool
 
   @AppProperty(key: UserDef.kAllowBoostingSingleKanjiAsUserPhrase.rawValue, defaultValue: false)
-  public dynamic var allowBoostingSingleKanjiAsUserPhrase: Bool
+  public var allowBoostingSingleKanjiAsUserPhrase: Bool
 
-  @AppProperty(key: UserDef.kFetchSuggestionsFromPerceptionOverrideModel.rawValue, defaultValue: true)
-  public dynamic var fetchSuggestionsFromPerceptionOverrideModel: Bool
+  @AppProperty(
+    key: UserDef.kFetchSuggestionsFromPerceptionOverrideModel.rawValue,
+    defaultValue: true
+  )
+  public var fetchSuggestionsFromPerceptionOverrideModel: Bool
 
   @AppProperty(key: UserDef.kUseFixedCandidateOrderOnSelection.rawValue, defaultValue: false)
-  public dynamic var useFixedCandidateOrderOnSelection: Bool
+  public var useFixedCandidateOrderOnSelection: Bool
 
   @AppProperty(key: UserDef.kAutoCorrectReadingCombination.rawValue, defaultValue: true)
-  public dynamic var autoCorrectReadingCombination: Bool
+  public var autoCorrectReadingCombination: Bool
 
   @AppProperty(key: UserDef.kAlsoConfirmAssociatedCandidatesByEnter.rawValue, defaultValue: false)
-  public dynamic var alsoConfirmAssociatedCandidatesByEnter: Bool
+  public var alsoConfirmAssociatedCandidatesByEnter: Bool
 
   @AppProperty(key: UserDef.kKeepReadingUponCompositionError.rawValue, defaultValue: false)
-  public dynamic var keepReadingUponCompositionError: Bool
+  public var keepReadingUponCompositionError: Bool
 
   @AppProperty(key: UserDef.kUpperCaseLetterKeyBehavior.rawValue, defaultValue: 0)
-  public dynamic var upperCaseLetterKeyBehavior: Int
+  public var upperCaseLetterKeyBehavior: Int
 
   @AppProperty(key: UserDef.kNumPadCharInputBehavior.rawValue, defaultValue: 0)
   public var numPadCharInputBehavior: Int
 
   @AppProperty(key: UserDef.kShiftEisuToggleOffTogetherWithCapsLock.rawValue, defaultValue: true)
-  public dynamic var shiftEisuToggleOffTogetherWithCapsLock: Bool
+  public var shiftEisuToggleOffTogetherWithCapsLock: Bool
 
   @AppProperty(key: UserDef.kBypassNonAppleCapsLockHandling.rawValue, defaultValue: false)
-  public dynamic var bypassNonAppleCapsLockHandling: Bool
+  public var bypassNonAppleCapsLockHandling: Bool
 
   @AppProperty(key: UserDef.kConsolidateContextOnCandidateSelection.rawValue, defaultValue: true)
-  public dynamic var consolidateContextOnCandidateSelection: Bool
+  public var consolidateContextOnCandidateSelection: Bool
 
   @AppProperty(key: UserDef.kHardenVerticalPunctuations.rawValue, defaultValue: false)
-  public dynamic var hardenVerticalPunctuations: Bool
+  public var hardenVerticalPunctuations: Bool
 
   @AppProperty(key: UserDef.kTrimUnfinishedReadingsOnCommit.rawValue, defaultValue: true)
-  public dynamic var trimUnfinishedReadingsOnCommit: Bool
+  public var trimUnfinishedReadingsOnCommit: Bool
 
   @AppProperty(key: UserDef.kAlwaysShowTooltipTextsHorizontally.rawValue, defaultValue: false)
-  public dynamic var alwaysShowTooltipTextsHorizontally: Bool
+  public var alwaysShowTooltipTextsHorizontally: Bool
 
   @AppProperty(
     key: UserDef.kClientsIMKTextInputIncapable.rawValue,
     defaultValue: kDefaultClientsIMKTextInputIncapable
   )
-  public dynamic var clientsIMKTextInputIncapable: [String: Bool]
+  public var clientsIMKTextInputIncapable: [String: Bool]
 
   @AppProperty(key: UserDef.kShowTranslatedStrokesInCompositionBuffer.rawValue, defaultValue: true)
-  public dynamic var showTranslatedStrokesInCompositionBuffer: Bool
+  public var showTranslatedStrokesInCompositionBuffer: Bool
 
   @AppProperty(key: UserDef.kForceCassetteChineseConversion.rawValue, defaultValue: 0)
-  public dynamic var forceCassetteChineseConversion: Int
+  public var forceCassetteChineseConversion: Int
 
   @AppProperty(key: UserDef.kShowReverseLookupInCandidateUI.rawValue, defaultValue: true)
-  public dynamic var showReverseLookupInCandidateUI: Bool
+  public var showReverseLookupInCandidateUI: Bool
 
   @AppProperty(key: UserDef.kShowCodePointInCandidateUI.rawValue, defaultValue: true)
-  public dynamic var showCodePointInCandidateUI: Bool
+  public var showCodePointInCandidateUI: Bool
 
   @AppProperty(
     key: UserDef.kAutoCompositeWithLongestPossibleCassetteKey.rawValue,
     defaultValue: true
   )
-  public dynamic var autoCompositeWithLongestPossibleCassetteKey: Bool
+  public var autoCompositeWithLongestPossibleCassetteKey: Bool
 
   @AppProperty(
     key: UserDef.kShareAlphanumericalModeStatusAcrossClients.rawValue,
     defaultValue: false
   )
-  public dynamic var shareAlphanumericalModeStatusAcrossClients: Bool
+  public var shareAlphanumericalModeStatusAcrossClients: Bool
 
   @AppProperty(
     key: UserDef.kPhraseEditorAutoReloadExternalModifications.rawValue,
     defaultValue: true
   )
-  public dynamic var phraseEditorAutoReloadExternalModifications: Bool
+  public var phraseEditorAutoReloadExternalModifications: Bool
 
   @AppProperty(
     key: UserDef.kClassicHaninKeyboardSymbolModeShortcutEnabled.rawValue,
     defaultValue: false
   )
-  public dynamic var classicHaninKeyboardSymbolModeShortcutEnabled: Bool
+  public var classicHaninKeyboardSymbolModeShortcutEnabled: Bool
 
   // MARK: - Settings (Tier 2)
 
   @AppProperty(key: UserDef.kUseSpaceToCommitHighlightedSCPCCandidate.rawValue, defaultValue: true)
-  public dynamic var useSpaceToCommitHighlightedSCPCCandidate: Bool
+  public var useSpaceToCommitHighlightedSCPCCandidate: Bool
 
   @AppProperty(
     key: UserDef.kEnableMouseScrollingForTDKCandidatesCocoa.rawValue,
     defaultValue: false
   )
-  public dynamic var enableMouseScrollingForTDKCandidatesCocoa: Bool
+  public var enableMouseScrollingForTDKCandidatesCocoa: Bool
 
   @AppProperty(
     key: UserDef.kDisableSegmentedThickUnderlineInMarkingModeForManagedClients.rawValue,
     defaultValue: false
   )
-  public dynamic var disableSegmentedThickUnderlineInMarkingModeForManagedClients: Bool
+  public var disableSegmentedThickUnderlineInMarkingModeForManagedClients: Bool
 
   // MARK: - Settings (Tier 3)
 
   @AppProperty(key: UserDef.kMaxCandidateLength.rawValue, defaultValue: 10)
-  public dynamic var maxCandidateLength: Int
+  public var maxCandidateLength: Int
 
   @AppProperty(key: UserDef.kBeepSoundPreference.rawValue, defaultValue: 2)
-  public dynamic var beepSoundPreference: Int
+  public var beepSoundPreference: Int
 
   @AppProperty(key: UserDef.kShouldNotFartInLieuOfBeep.rawValue, defaultValue: true)
-  public dynamic var shouldNotFartInLieuOfBeep: Bool
+  public var shouldNotFartInLieuOfBeep: Bool
 
   @AppProperty(key: UserDef.kShowHanyuPinyinInCompositionBuffer.rawValue, defaultValue: false)
-  public dynamic var showHanyuPinyinInCompositionBuffer: Bool
+  public var showHanyuPinyinInCompositionBuffer: Bool
 
   @AppProperty(key: UserDef.kInlineDumpPinyinInLieuOfZhuyin.rawValue, defaultValue: false)
-  public dynamic var inlineDumpPinyinInLieuOfZhuyin: Bool
+  public var inlineDumpPinyinInLieuOfZhuyin: Bool
 
   @AppProperty(key: UserDef.kFilterNonCNSReadingsForCHTInput.rawValue, defaultValue: false)
-  public dynamic var filterNonCNSReadingsForCHTInput: Bool
+  public var filterNonCNSReadingsForCHTInput: Bool
 
   @AppProperty(key: UserDef.kCurrencyNumeralsEnabled.rawValue, defaultValue: false)
-  public dynamic var currencyNumeralsEnabled: Bool
+  public var currencyNumeralsEnabled: Bool
 
   @AppProperty(key: UserDef.kHalfWidthPunctuationEnabled.rawValue, defaultValue: false)
-  public dynamic var halfWidthPunctuationEnabled: Bool
+  public var halfWidthPunctuationEnabled: Bool
 
   @AppProperty(key: UserDef.kEscToCleanInputBuffer.rawValue, defaultValue: true)
-  public dynamic var escToCleanInputBuffer: Bool
+  public var escToCleanInputBuffer: Bool
 
   @AppProperty(key: UserDef.kAcceptLeadingIntonations.rawValue, defaultValue: true)
-  public dynamic var acceptLeadingIntonations: Bool
+  public var acceptLeadingIntonations: Bool
 
   @AppProperty(key: UserDef.kSpecifyIntonationKeyBehavior.rawValue, defaultValue: 0)
-  public dynamic var specifyIntonationKeyBehavior: Int
+  public var specifyIntonationKeyBehavior: Int
 
   @AppProperty(key: UserDef.kSpecifyShiftBackSpaceKeyBehavior.rawValue, defaultValue: 0)
-  public dynamic var specifyShiftBackSpaceKeyBehavior: Int
+  public var specifyShiftBackSpaceKeyBehavior: Int
 
   @AppProperty(key: UserDef.kSpecifyShiftTabKeyBehavior.rawValue, defaultValue: false)
-  public dynamic var specifyShiftTabKeyBehavior: Bool
+  public var specifyShiftTabKeyBehavior: Bool
 
   @AppProperty(key: UserDef.kSpecifyShiftSpaceKeyBehavior.rawValue, defaultValue: false)
-  public dynamic var specifyShiftSpaceKeyBehavior: Bool
+  public var specifyShiftSpaceKeyBehavior: Bool
 
   @AppProperty(key: UserDef.kSpecifyCmdOptCtrlEnterBehavior.rawValue, defaultValue: 0)
-  public dynamic var specifyCmdOptCtrlEnterBehavior: Int
+  public var specifyCmdOptCtrlEnterBehavior: Int
 
   // MARK: - Optional settings
 
   @AppProperty(key: UserDef.kCandidateTextFontName.rawValue, defaultValue: "")
-  public dynamic var candidateTextFontName: String
+  public var candidateTextFontName: String
 
   // MARK: - Keyboard HotKey Enable / Disable
 
   @AppProperty(key: UserDef.kUsingHotKeySCPC.rawValue, defaultValue: true)
-  public dynamic var usingHotKeySCPC: Bool
+  public var usingHotKeySCPC: Bool
 
   @AppProperty(key: UserDef.kUsingHotKeyAssociates.rawValue, defaultValue: true)
-  public dynamic var usingHotKeyAssociates: Bool
+  public var usingHotKeyAssociates: Bool
 
   @AppProperty(key: UserDef.kUsingHotKeyCNS.rawValue, defaultValue: true)
-  public dynamic var usingHotKeyCNS: Bool
+  public var usingHotKeyCNS: Bool
 
   @AppProperty(key: UserDef.kUsingHotKeyKangXi.rawValue, defaultValue: true)
-  public dynamic var usingHotKeyKangXi: Bool
+  public var usingHotKeyKangXi: Bool
 
   @AppProperty(key: UserDef.kUsingHotKeyJIS.rawValue, defaultValue: true)
-  public dynamic var usingHotKeyJIS: Bool
+  public var usingHotKeyJIS: Bool
 
   @AppProperty(key: UserDef.kUsingHotKeyHalfWidthASCII.rawValue, defaultValue: true)
-  public dynamic var usingHotKeyHalfWidthASCII: Bool
+  public var usingHotKeyHalfWidthASCII: Bool
 
   @AppProperty(key: UserDef.kUsingHotKeyCurrencyNumerals.rawValue, defaultValue: true)
-  public dynamic var usingHotKeyCurrencyNumerals: Bool
+  public var usingHotKeyCurrencyNumerals: Bool
 
   @AppProperty(key: UserDef.kUsingHotKeyCassette.rawValue, defaultValue: true)
-  public dynamic var usingHotKeyCassette: Bool
+  public var usingHotKeyCassette: Bool
 
   @AppProperty(key: UserDef.kUsingHotKeyRevLookup.rawValue, defaultValue: true)
-  public dynamic var usingHotKeyRevLookup: Bool
+  public var usingHotKeyRevLookup: Bool
 
   @AppProperty(key: UserDef.kUsingHotKeyInputMode.rawValue, defaultValue: true)
-  public dynamic var usingHotKeyInputMode: Bool
+  public var usingHotKeyInputMode: Bool
 
   @AppProperty(key: UserDef.kCandidateListTextSize.rawValue, defaultValue: 16)
-  public dynamic var candidateListTextSize: Double {
+  public var candidateListTextSize: Double {
     didSet {
       // 必須確立條件，否則就會是無限迴圈。
       if !(12 ... 196).contains(candidateListTextSize) {
@@ -360,37 +376,37 @@ public class PrefMgr: NSObject, PrefMgrProtocol {
   }
 
   @AppProperty(key: UserDef.kReadingNarrationCoverage.rawValue, defaultValue: 0)
-  public dynamic var readingNarrationCoverage: Int {
+  public var readingNarrationCoverage: Int {
     didSet { didAskForRefreshingSpeechSputnik?() }
   }
 
   @AppProperty(key: UserDef.kTogglingAlphanumericalModeWithLShift.rawValue, defaultValue: true)
-  public dynamic var togglingAlphanumericalModeWithLShift: Bool {
+  public var togglingAlphanumericalModeWithLShift: Bool {
     didSet { didAskForSyncingShiftKeyDetectorPrefs?() }
   }
 
   @AppProperty(key: UserDef.kTogglingAlphanumericalModeWithRShift.rawValue, defaultValue: true)
-  public dynamic var togglingAlphanumericalModeWithRShift: Bool {
+  public var togglingAlphanumericalModeWithRShift: Bool {
     didSet { didAskForSyncingShiftKeyDetectorPrefs?() }
   }
 
   @AppProperty(key: UserDef.kCNS11643Enabled.rawValue, defaultValue: false)
-  public dynamic var cns11643Enabled: Bool {
+  public var cns11643Enabled: Bool {
     didSet { didAskForSyncingLMPrefs?() }
   }
 
   @AppProperty(key: UserDef.kSymbolInputEnabled.rawValue, defaultValue: true)
-  public dynamic var symbolInputEnabled: Bool {
+  public var symbolInputEnabled: Bool {
     didSet { didAskForSyncingLMPrefs?() }
   }
 
   @AppProperty(key: UserDef.kCassetteEnabled.rawValue, defaultValue: false)
-  public dynamic var cassetteEnabled: Bool {
+  public var cassetteEnabled: Bool {
     didSet { didAskForSyncingLMPrefs?() }
   }
 
   @AppProperty(key: UserDef.kChineseConversionEnabled.rawValue, defaultValue: false)
-  public dynamic var chineseConversionEnabled: Bool {
+  public var chineseConversionEnabled: Bool {
     didSet {
       // 康熙轉換與 JIS 轉換不能同時開啟，否則會出現某些奇奇怪怪的情況
       if chineseConversionEnabled, shiftJISShinjitaiOutputEnabled {
@@ -406,7 +422,7 @@ public class PrefMgr: NSObject, PrefMgrProtocol {
   }
 
   @AppProperty(key: UserDef.kShiftJISShinjitaiOutputEnabled.rawValue, defaultValue: false)
-  public dynamic var shiftJISShinjitaiOutputEnabled: Bool {
+  public var shiftJISShinjitaiOutputEnabled: Bool {
     didSet {
       // 康熙轉換與 JIS 轉換不能同時開啟，否則會出現某些奇奇怪怪的情況
       if shiftJISShinjitaiOutputEnabled, chineseConversionEnabled {
@@ -422,7 +438,7 @@ public class PrefMgr: NSObject, PrefMgrProtocol {
   }
 
   @AppProperty(key: UserDef.kCandidateKeys.rawValue, defaultValue: kDefaultCandidateKeys)
-  public dynamic var candidateKeys: String {
+  public var candidateKeys: String {
     didSet {
       let optimized = candidateKeys.lowercased().deduplicated
       if candidateKeys != optimized { candidateKeys = optimized }
@@ -433,17 +449,17 @@ public class PrefMgr: NSObject, PrefMgrProtocol {
   }
 
   @AppProperty(key: UserDef.kUseSCPCTypingMode.rawValue, defaultValue: false)
-  public dynamic var useSCPCTypingMode: Bool {
+  public var useSCPCTypingMode: Bool {
     didSet { didAskForSyncingLMPrefs?() }
   }
 
   @AppProperty(key: UserDef.kPhraseReplacementEnabled.rawValue, defaultValue: false)
-  public dynamic var phraseReplacementEnabled: Bool {
+  public var phraseReplacementEnabled: Bool {
     didSet { didAskForSyncingLMPrefs?() }
   }
 
   @AppProperty(key: UserDef.kAssociatedPhrasesEnabled.rawValue, defaultValue: false)
-  public dynamic var associatedPhrasesEnabled: Bool {
+  public var associatedPhrasesEnabled: Bool {
     didSet { didAskForSyncingLMPrefs?() }
   }
 }
