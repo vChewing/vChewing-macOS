@@ -7,9 +7,6 @@
 // requirements defined in MIT License.
 
 import InputMethodKit
-import LangModelAssembly
-@testable import MainAssembly
-import OSFrameworkImpl
 import Shared
 import XCTest
 

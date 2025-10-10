@@ -25,8 +25,8 @@ extension InputHandlerProtocol {
     sansReading: Bool = false,
     guarded: Bool = false
   )
-    -> IMEStateProtocol {
-    if isConsideredEmptyForNow, !guarded { return IMEState.ofAbortion() }
+    -> State {
+    if isConsideredEmptyForNow, !guarded { return State.ofAbortion() }
     restoreBackupCursor() // 只要叫了 Inputting 狀態，就盡可能還原游標備份。
     var segHighlightedAt: Int?
     let handleAsCodePointInput = currentTypingMethod == .codePoint && !sansReading
@@ -73,7 +73,7 @@ extension InputHandlerProtocol {
       displayTextSegments[i] = displayTextSegments[i].trimmingCharacters(in: .newlines)
     }
     /// 這裡生成準備要拿來回呼的「正在輸入」狀態。
-    var result = IMEState.ofInputting(
+    var result = State.ofInputting(
       displayTextSegments: displayTextSegments,
       cursor: cursor, highlightAt: segHighlightedAt
     )
@@ -92,7 +92,7 @@ extension InputHandlerProtocol {
     guard !isComposerUsingPinyin else { return "" }
     guard composer.hasIntonation(withNothingElse: true) else { return "" }
     guard composer.intonation.value != " " else { return "" }
-    let result = NSMutableString()
+    let result = NSMutableString(capacity: 0)
     result
       .append(
         "Intonation mark. ENTER to commit.\nSPACE to insert into composition buffer."
@@ -143,8 +143,8 @@ extension InputHandlerProtocol {
 
   /// 拿著給定的候選字詞陣列資料內容，切換至選字狀態。
   /// - Returns: 回呼一個新的選詞狀態，來就給定的候選字詞陣列資料內容顯示選字窗。
-  public func generateStateOfCandidates(dodge: Bool = true) -> IMEStateProtocol {
-    guard let session = session else { return IMEState.ofAbortion() }
+  public func generateStateOfCandidates(dodge: Bool = true) -> State {
+    guard let session = session else { return State.ofAbortion() }
     let cursorBeforeCandidate = assembler.cursor
     if dodge, session.state.type == .ofInputting {
       dodgeInvalidEdgeCursorForCandidateState()
@@ -152,7 +152,7 @@ extension InputHandlerProtocol {
     if restoreCursorAfterSelectingCandidate, backupCursor == nil {
       backupCursor = cursorBeforeCandidate
     }
-    var result = IMEState.ofCandidates(
+    var result = State.ofCandidates(
       candidates: generateArrayOfCandidates(fixOrder: prefs.useFixedCandidateOrderOnSelection),
       displayTextSegments: assembler.assembledSentence.values,
       cursor: assembler.cursor
@@ -182,8 +182,8 @@ extension InputHandlerProtocol {
   /// - Parameters:
   ///   - key: 給定的索引鍵（也就是給定的關聯詞語的開頭字）。
   /// - Returns: 回呼一個新的關聯詞語狀態，來就給定的關聯詞語陣列資料內容顯示選字窗。
-  public func generateStateOfAssociates(withPair pair: KeyValuePaired) -> IMEStateProtocol {
-    IMEState.ofAssociates(candidates: generateArrayOfAssociates(withPair: pair))
+  public func generateStateOfAssociates(withPair pair: KeyValuePaired) -> State {
+    State.ofAssociates(candidates: generateArrayOfAssociates(withPair: pair))
   }
 
   // MARK: - 用以處理就地新增自訂語彙時的行為
@@ -270,7 +270,7 @@ extension InputHandlerProtocol {
         errorCallback?("D326DEA3")
         return true
       }
-      var marking = IMEState.ofMarking(
+      var marking = State.ofMarking(
         displayTextSegments: state.displayTextSegments,
         markedReadings: Array(assembler.keys[currentMarkedRange()]),
         cursor: convertCursorForDisplay(assembler.cursor),
@@ -294,7 +294,7 @@ extension InputHandlerProtocol {
         errorCallback?("9B51408D")
         return true
       }
-      var marking = IMEState.ofMarking(
+      var marking = State.ofMarking(
         displayTextSegments: state.displayTextSegments,
         markedReadings: Array(assembler.keys[currentMarkedRange()]),
         cursor: convertCursorForDisplay(assembler.cursor),
@@ -347,7 +347,7 @@ extension InputHandlerProtocol {
     case 1:
       clear() // 這句不要砍，因為下文可能會回呼 candidateState。
       if let strToCommit = candidateState.candidates.first?.value, !strToCommit.isEmpty {
-        session.switchState(IMEState.ofCommitting(textToCommit: strToCommit))
+        session.switchState(State.ofCommitting(textToCommit: strToCommit))
       } else {
         session.switchState(candidateState)
       }
@@ -392,14 +392,14 @@ extension InputHandlerProtocol {
         : commissionByCtrlCommandEnter(isShiftPressed: input.isShiftHold)
     }
 
-    session.switchState(IMEState.ofCommitting(textToCommit: displayedText))
+    session.switchState(State.ofCommitting(textToCommit: displayedText))
 
     associatedPhrases: if !prefs.useSCPCTypingMode, prefs.associatedPhrasesEnabled {
       guard input.commonKeyModifierFlags == .shift else { break associatedPhrases }
       guard isComposerOrCalligrapherEmpty else { break associatedPhrases }
       let associatedCandidates = associatesData()
       guard !associatedCandidates.isEmpty else { break associatedPhrases }
-      session.switchState(IMEState.ofAssociates(candidates: associatedCandidates))
+      session.switchState(State.ofAssociates(candidates: associatedCandidates))
     }
 
     return true
@@ -460,7 +460,7 @@ extension InputHandlerProtocol {
         session.switchState(generateStateOfInputting())
         return true
       case 1:
-        session.switchState(IMEState.ofAbortion())
+        session.switchState(State.ofAbortion())
         return true
       default: break
       }
@@ -471,7 +471,7 @@ extension InputHandlerProtocol {
 
     switch input.commonKeyModifierFlags {
     case .shift:
-      session.switchState(IMEState.ofAbortion())
+      session.switchState(State.ofAbortion())
       return true
     case .option:
       actualSteps = steps
@@ -503,7 +503,7 @@ extension InputHandlerProtocol {
         }
       }
       session.switchState(result)
-    case true: session.switchState(IMEState.ofAbortion())
+    case true: session.switchState(State.ofAbortion())
     }
     return true
   }
@@ -531,7 +531,7 @@ extension InputHandlerProtocol {
     // 總之處理起來非常機車就是了。
     switch input.commonKeyModifierFlags {
     case .shift:
-      session.switchState(IMEState.ofAbortion())
+      session.switchState(State.ofAbortion())
       return true
     case .option:
       actualSteps = steps
@@ -555,7 +555,7 @@ extension InputHandlerProtocol {
     // 這裡不用「count > 0」，因為該整數變數只要「!isEmpty」那就必定滿足這個條件。
     switch inputting.displayedText.isEmpty {
     case false: session.switchState(inputting)
-    case true: session.switchState(IMEState.ofAbortion())
+    case true: session.switchState(State.ofAbortion())
     }
     return true
   }
@@ -637,18 +637,18 @@ extension InputHandlerProtocol {
     if prefs.escToCleanInputBuffer {
       /// 若啟用了該選項，則清空組字器的內容與注拼槽的內容。
       /// 此乃 macOS 內建注音輸入法預設之行為，但不太受 Windows 使用者群體之待見。
-      session.switchState(IMEState.ofAbortion())
+      session.switchState(State.ofAbortion())
     } else {
       if isComposerOrCalligrapherEmpty {
         let commitText = generateStateOfInputting(sansReading: true).displayedText
-        session.switchState(IMEState.ofCommitting(textToCommit: commitText))
+        session.switchState(State.ofCommitting(textToCommit: commitText))
         return true
       }
       /// 如果注拼槽或組筆區不是空的話，則清空之。
       clearComposerAndCalligrapher()
       switch assembler.isEmpty {
       case false: session.switchState(generateStateOfInputting())
-      case true: session.switchState(IMEState.ofAbortion())
+      case true: session.switchState(State.ofAbortion())
       }
     }
     return true
@@ -682,7 +682,7 @@ extension InputHandlerProtocol {
             assembler.jumpCursorBySegment(to: .front, isMarker: true)
           }
         }
-        var marking = IMEState.ofMarking(
+        var marking = State.ofMarking(
           displayTextSegments: assembler.assembledSentence.values,
           markedReadings: Array(assembler.keys[currentMarkedRange()]),
           cursor: convertCursorForDisplay(assembler.cursor),
@@ -745,7 +745,7 @@ extension InputHandlerProtocol {
           errorCallback?("D326DEA3")
           return true
         }
-        var marking = IMEState.ofMarking(
+        var marking = State.ofMarking(
           displayTextSegments: assembler.assembledSentence.values,
           markedReadings: Array(assembler.keys[currentMarkedRange()]),
           cursor: convertCursorForDisplay(assembler.cursor),
@@ -890,7 +890,7 @@ extension InputHandlerProtocol {
 
     var newState = generateStateOfInputting()
     let locID = Bundle.main.preferredLocalizations[0]
-    let newTooltip = NSMutableString()
+    let newTooltip = NSMutableString(capacity: 0)
     newTooltip.insert("　" + candidates[newIndex].value, at: 0)
     if #available(macOS 10.13, *), isContextVertical(), locID != "en" {
       newTooltip.insert(
@@ -941,15 +941,15 @@ extension InputHandlerProtocol {
           )
         vCLog("8EB3FB1A: " + errorMessage)
         let textToCommit = generateStateOfInputting(sansReading: true).displayedText
-        session.switchState(IMEState.ofCommitting(textToCommit: textToCommit))
-        session.switchState(IMEState.ofCommitting(textToCommit: isJIS ? "_" : "`"))
+        session.switchState(State.ofCommitting(textToCommit: textToCommit))
+        session.switchState(State.ofCommitting(textToCommit: isJIS ? "_" : "`"))
         return true
       }
     } else {
       // 得在這裡先 commit buffer，不然會導致「在摁 ESC 離開符號選單時會重複輸入上一次的組字區的內容」的不當行為。
       let textToCommit = generateStateOfInputting(sansReading: true).displayedText
-      session.switchState(IMEState.ofCommitting(textToCommit: textToCommit))
-      session.switchState(IMEState.ofSymbolTable(node: CandidateNode.root))
+      session.switchState(State.ofCommitting(textToCommit: textToCommit))
+      session.switchState(State.ofSymbolTable(node: CandidateNode.root))
       return true
     }
   }
@@ -966,8 +966,8 @@ extension InputHandlerProtocol {
     guard let rootNode = rootNode else { return false }
     // 得在這裡先 commit buffer，不然會導致「在摁 ESC 離開符號選單時會重複輸入上一次的組字區的內容」的不當行為。
     let textToCommit = generateStateOfInputting(sansReading: true).displayedText
-    session.switchState(IMEState.ofCommitting(textToCommit: textToCommit))
-    session.switchState(IMEState.ofSymbolTable(node: rootNode))
+    session.switchState(State.ofCommitting(textToCommit: textToCommit))
+    session.switchState(State.ofSymbolTable(node: rootNode))
     return true
   }
 
@@ -985,7 +985,7 @@ extension InputHandlerProtocol {
 
     // 低於 macOS 12 的系統無法偵測 CapsLock 的啟用狀態，
     // 所以這裡一律強制重置狀態為 .ofEmpty()。
-    session.switchState(IMEState.ofEmpty())
+    session.switchState(State.ofEmpty())
 
     // 字母鍵摁 Shift 的話，無須額外處理，因為直接就會敲出大寫字母。
     var shiftCapsLockHandling = input.isUpperCaseASCIILetterKey && session.isASCIIMode
@@ -1001,7 +1001,7 @@ extension InputHandlerProtocol {
     if input.isASCII, !input.charCode.isPrintableASCII { return false }
 
     // 將整個組字區的內容遞交給客體應用。
-    session.switchState(IMEState.ofCommitting(textToCommit: input.text.lowercased()))
+    session.switchState(State.ofCommitting(textToCommit: input.text.lowercased()))
 
     return true
   }
@@ -1013,7 +1013,7 @@ extension InputHandlerProtocol {
   /// - Returns: 告知 IMK「該按鍵是否已經被輸入法攔截處理」。
   func callCandidateState(input: InputSignalProtocol) -> Bool {
     guard let session = session else { return false }
-    var state: IMEStateProtocol { session.state }
+    var state: State { session.state }
     // 用上下左右鍵呼叫選字窗。
     // 僅憑藉 state.hasComposition 的話，並不能真實把握組字器的狀況。
     // 另外，這裡不要用「!input.isFunctionKeyHold」，
@@ -1027,7 +1027,7 @@ extension InputHandlerProtocol {
     triggered = triggered || (input.isTab && prefs.specifyShiftTabKeyBehavior)
     guard notEmpty, noBannedModifiers, triggered else { return false }
     // 開始決定是否切換至選字狀態。
-    let candidateState: IMEStateProtocol = generateStateOfCandidates()
+    let candidateState: State = generateStateOfCandidates()
     _ = candidateState.candidates.isEmpty ? errorCallback?("3572F238") : session
       .switchState(candidateState)
     return true
@@ -1049,7 +1049,7 @@ extension InputHandlerProtocol {
       }
       return strRAW.applyingTransformFW2HW(reverse: false)
     }()
-    session.switchState(IMEState.ofCommitting(textToCommit: newString))
+    session.switchState(State.ofCommitting(textToCommit: newString))
     return true
   }
 
@@ -1068,13 +1068,13 @@ extension InputHandlerProtocol {
           if prefs.upperCaseLetterKeyBehavior == 3, !isConsideredEmptyForNow { break }
           let commitText = generateStateOfInputting(sansReading: true).displayedText
           session
-            .switchState(IMEState.ofCommitting(textToCommit: commitText + inputText.lowercased()))
+            .switchState(State.ofCommitting(textToCommit: commitText + inputText.lowercased()))
           return true
         case 2, 4:
           if prefs.upperCaseLetterKeyBehavior == 4, !isConsideredEmptyForNow { break }
           let commitText = generateStateOfInputting(sansReading: true).displayedText
           session
-            .switchState(IMEState.ofCommitting(textToCommit: commitText + inputText.uppercased()))
+            .switchState(State.ofCommitting(textToCommit: commitText + inputText.uppercased()))
           return true
         default: // 包括 case 0。
           break
@@ -1112,9 +1112,9 @@ extension InputHandlerProtocol {
     currentLM.setOptions { config in
       config.numPadFWHWStatus = nil
     }
-    session.switchState(IMEState.ofEmpty())
+    session.switchState(State.ofEmpty())
     let charToCommit = inputText.applyingTransformFW2HW(reverse: fullWidthResult)
-    session.switchState(IMEState.ofCommitting(textToCommit: charToCommit))
+    session.switchState(State.ofCommitting(textToCommit: charToCommit))
     return true
   }
 
@@ -1131,8 +1131,8 @@ extension InputHandlerProtocol {
     let root = CandidateNode(name: queryString, symbols: result)
     // 得在這裡先 commit buffer，不然會導致「在摁 ESC 離開符號選單時會重複輸入上一次的組字區的內容」的不當行為。
     let textToCommit = generateStateOfInputting(sansReading: true).displayedText
-    session.switchState(IMEState.ofCommitting(textToCommit: textToCommit))
-    session.switchState(IMEState.ofSymbolTable(node: root))
+    session.switchState(State.ofCommitting(textToCommit: textToCommit))
+    session.switchState(State.ofSymbolTable(node: root))
     return true
   }
 }
