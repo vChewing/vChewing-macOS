@@ -1,0 +1,14 @@
+{
+  "makefile.configureOnOpen": false,
+
+  "files.exclude": {
+    ".build": true,
+    ".swiftpm": true,
+    "sqlite3.h": true
+  },
+  "search.exclude": {
+    ".build": true,
+    ".swiftpm": true,
+    "sqlite3.h": true
+  }
+}
