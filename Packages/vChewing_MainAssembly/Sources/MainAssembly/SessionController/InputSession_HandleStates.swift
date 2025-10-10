@@ -24,7 +24,7 @@ extension SessionProtocol {
   /// 不必要的互相干涉、打斷彼此的工作。
   /// - Note: 本來不用這麼複雜的，奈何 Swift Protocol 不允許給參數指定預設值。
   /// - Parameter newState: 新狀態。
-  public func switchState(_ newState: IMEStateProtocol) {
+  public func switchState(_ newState: State) {
     handle(state: newState, replace: true)
   }
 
@@ -39,7 +39,7 @@ extension SessionProtocol {
   /// - Parameters:
   ///   - newState: 新狀態。
   ///   - replace: 是否取代現有狀態。
-  public func handle(state newState: IMEStateProtocol, replace: Bool) {
+  public func handle(state newState: State, replace: Bool) {
     var previous = state
     if replace {
       var newState = newState
@@ -69,11 +69,11 @@ extension SessionProtocol {
     case .ofAbortion, .ofCommitting, .ofEmpty:
       innerCircle: switch newState.type {
       case .ofAbortion:
-        previous = IMEState.ofEmpty()
+        previous = .ofEmpty()
         if replace { state = previous }
       case .ofCommitting:
         commit(text: newState.textToCommit)
-        if replace { state = IMEState.ofEmpty() }
+        if replace { state = .ofEmpty() }
       default: break innerCircle
       }
       candidateUI?.visible = false

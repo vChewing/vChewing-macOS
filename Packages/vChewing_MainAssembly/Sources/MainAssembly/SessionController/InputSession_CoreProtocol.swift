@@ -15,6 +15,7 @@ import Shared
 import ShiftKeyUpChecker
 import SwiftExtension
 import TooltipUI
+import Typewriter
 
 // MARK: - SessionProtocol
 
@@ -27,8 +28,8 @@ import TooltipUI
 /// - Remark: 在輸入法的主函式中分配的 IMKServer 型別為客體應用程式創建的每個
 /// 輸入會話創建一個控制器型別。因此，對於每個輸入會話，都有一個對應的 IMKInputController。
 public protocol SessionProtocol: AnyObject, IMKInputControllerProtocol, CtlCandidateDelegate,
-  SessionCoreProtocol {
-  static var current: (any SessionProtocol)? { get set }
+  SessionCoreProtocol where Handler: InputHandlerProtocol {
+  static var current: Self? { get set }
   /// 標記狀態來聲明目前新增的詞彙是否需要賦以非常低的權重。
   static var areWeNerfing: Bool { get set }
   /// Shift 按鍵事件分析器的副本。
@@ -59,7 +60,7 @@ public protocol SessionProtocol: AnyObject, IMKInputControllerProtocol, CtlCandi
   /// 當前副本的客體是否是輸入法本體？
   var isServingIMEItself: Bool { get set }
   /// 輸入調度模組的副本。
-  var inputHandler: InputHandlerProtocol? { get set }
+  var inputHandler: Handler? { get set }
   /// 最近一個被 set 的 marked text。
   var recentMarkedText: (text: NSAttributedString?, selectionRange: NSRange?) { get set }
   /// 當前選字窗是否為縱向。（縱排輸入時，只會啟用縱排選字窗。）
@@ -70,12 +71,14 @@ public protocol SessionProtocol: AnyObject, IMKInputControllerProtocol, CtlCandi
   /// 由於每次動態獲取都會耗時，所以這裡直接靜態記載之。
   var clientBundleIdentifier: String { get set }
   /// 用以記錄當前輸入法狀態的變數。
-  var state: IMEStateProtocol { get set } // Has DidSet.
+  var state: State { get set } // Has DidSet.
   /// 記錄當前輸入環境是縱排輸入還是橫排輸入。
   var isVerticalTyping: Bool { get set }
   /// InputMode 需要在每次出現內容變更的時候都連帶重設組字器與各項語言模組，
   /// 順帶更新 IME 模組及 UserPrefs 當中對於當前語言模式的記載。
   var inputMode: Shared.InputMode { get set }
+
+  func initInputHandler()
 }
 
 extension SessionProtocol {
@@ -141,7 +144,7 @@ extension SessionProtocol {
     }
     // 威注音不再在這裡對 IMKTextInput 客體黑名單當中的應用做資安措施。
     // 有相關需求者，請在切換掉輸入法或者切換至新的客體應用之前敲一下 Shift+Delete。
-    switchState(IMEState.ofCommitting(textToCommit: textToCommit))
+    switchState(.ofCommitting(textToCommit: textToCommit))
   }
 
   /// 專門用來就地切換繁簡模式的函式。
@@ -222,18 +225,6 @@ extension SessionProtocol {
     }
   }
 
-  public func initInputHandler() {
-    inputHandler = InputHandler(
-      lm: inputMode.langModel,
-      pref: PrefMgr.shared,
-      errorCallback: Self.callError,
-      filterabilityChecker: LMMgr.isStateDataFilterableForMarked,
-      notificationCallback: Notifier.notify,
-      pomSaveCallback: { LMMgr.savePerceptionOverrideModelData(false) }
-    )
-    inputHandler?.session = self
-  }
-
   public static func callError(_ logMessage: String) {
     vCLog(logMessage)
     IMEApp.buzz()
@@ -244,7 +235,7 @@ extension SessionProtocol {
       guard let self = self else { return }
       self.isActivated = false
       self.resetInputHandler() // 這條會自動搞定 Empty 狀態。
-      self.switchState(IMEState.ofDeactivated())
+      self.switchState(.ofDeactivated())
       self.inputHandler = nil
       // IMK 選字窗可以不用 nil，不然反而會出問題。反正 IMK 選字窗記憶體開銷可以不計。
       if self.candidateUI is CtlCandidateTDK {
@@ -324,7 +315,7 @@ extension SessionProtocol {
         AppDelegate.shared.checkMemoryUsage()
       }
 
-      self.state = IMEState.ofEmpty()
+      self.state = .ofEmpty()
       self.isActivated = true // 登記啟用狀態。
       self.setKeyLayout()
     }

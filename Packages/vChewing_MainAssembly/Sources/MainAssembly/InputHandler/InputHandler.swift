@@ -9,6 +9,7 @@
 import Foundation
 import LangModelAssembly
 import Shared
+import Typewriter
 
 // MARK: - InputHandler
 
@@ -39,6 +40,9 @@ public final class InputHandler: InputHandlerProtocol {
   }
 
   // MARK: Public
+
+  public typealias State = IMEState
+  public typealias Session = InputSession
 
   public static var keySeparator: String { Assembler.theSeparator }
 

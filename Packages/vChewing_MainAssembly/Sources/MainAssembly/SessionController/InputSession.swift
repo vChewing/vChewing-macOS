@@ -9,6 +9,7 @@
 import CandidateWindow
 import IMKUtils
 import InputMethodKit
+import NotifierUI
 import PopupCompositionBuffer
 import Shared
 import ShiftKeyUpChecker
@@ -31,6 +32,9 @@ public final class InputSession: SessionProtocol {
 
   // MARK: Public
 
+  public typealias State = IMEState
+  public typealias Handler = InputHandler
+
   /// 標記狀態來聲明目前新增的詞彙是否需要賦以非常低的權重。
   public static var areWeNerfing: Bool = false
 
@@ -46,7 +50,7 @@ public final class InputSession: SessionProtocol {
   /// 一個共用辭典，專門用來給每個副本用的 isASCIIMode 追蹤用餐數。
   public static var isASCIIModeForEachClient: [String: Bool] = [:]
 
-  public static var current: (any SessionProtocol)? {
+  public static var current: InputSession? {
     get { _current }
     set { _current = newValue }
   }
@@ -105,7 +109,7 @@ public final class InputSession: SessionProtocol {
   public var isServingIMEItself: Bool = false
 
   /// 輸入調度模組的副本。
-  public var inputHandler: InputHandlerProtocol?
+  public var inputHandler: Handler?
 
   /// 最近一個被 set 的 marked text。
   public var recentMarkedText: (text: NSAttributedString?, selectionRange: NSRange?) = (nil, nil)
@@ -139,7 +143,7 @@ public final class InputSession: SessionProtocol {
   }
 
   /// 用以記錄當前輸入法狀態的變數。
-  public var state: IMEStateProtocol = IMEState.ofEmpty() {
+  public var state: State = .ofEmpty() {
     didSet {
       guard oldValue.type != state.type else { return }
       if PrefMgr.shared.isDebugModeEnabled {
@@ -176,9 +180,21 @@ public final class InputSession: SessionProtocol {
     }
   }
 
+  public func initInputHandler() {
+    inputHandler = InputHandler(
+      lm: inputMode.langModel,
+      pref: PrefMgr.shared,
+      errorCallback: Self.callError,
+      filterabilityChecker: LMMgr.isStateDataFilterableForMarked,
+      notificationCallback: Notifier.notify,
+      pomSaveCallback: { LMMgr.savePerceptionOverrideModelData(false) }
+    )
+    inputHandler?.session = self
+  }
+
   // MARK: Private
 
-  private static var _current: (any SessionProtocol)?
+  private static var _current: InputSession?
 }
 
 extension InputSession {

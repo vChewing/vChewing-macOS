@@ -17,8 +17,7 @@ import Tekkon
 /// 該檔案乃輸入調度模組的核心部分，主要承接型別初期化內容、協定內容、以及
 /// 被封裝的「與 Megrez 組字引擎和 Tekkon 注拼引擎對接的」各種工具函式。
 /// 注意：不要把 composer 注拼槽與 compositor 組字器這兩個概念搞混。
-public protocol InputHandlerProtocol: AnyObject {
-  typealias Session = SessionCoreProtocol & CtlCandidateDelegate
+public protocol InputHandlerProtocol: AnyObject, InputHandlerCoreProtocol {
   typealias Composer = Tekkon.Composer
   typealias Assembler = Megrez.Compositor
   typealias KeyValuePaired = Megrez.KeyValuePaired

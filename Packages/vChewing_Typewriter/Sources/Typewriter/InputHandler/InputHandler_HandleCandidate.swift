@@ -116,7 +116,7 @@ extension InputHandlerProtocol {
         // 就將當前的組字緩衝區析構處理、強制重設輸入狀態。
         // 否則，一個本不該出現的真空組字緩衝區會使前後方向鍵與 BackSpace 鍵失靈。
         // 所以這裡需要對 compositor.isEmpty 做判定。
-        session.switchState(IMEState.ofAbortion())
+        session.switchState(State.ofAbortion())
       } else {
         session.switchState(generateStateOfInputting())
         if input.isCursorBackward || input.isCursorForward, input.commonKeyModifierFlags == .shift {
@@ -125,7 +125,7 @@ extension InputHandlerProtocol {
       }
       if state.type == .ofSymbolTable, let nodePrevious = state.node.previous,
          !nodePrevious.members.isEmpty {
-        session.switchState(IMEState.ofSymbolTable(node: nodePrevious))
+        session.switchState(State.ofSymbolTable(node: nodePrevious))
       }
       return true
     }
@@ -141,7 +141,7 @@ extension InputHandlerProtocol {
       case .kCarriageReturn, .kLineFeed:
         if state.type == .ofAssociates,
            !(input.isShiftHold || prefs.alsoConfirmAssociatedCandidatesByEnter) {
-          session.switchState(IMEState.ofAbortion())
+          session.switchState(State.ofAbortion())
           return true
         }
         var handleAssociates = !prefs.useSCPCTypingMode && prefs
@@ -157,8 +157,8 @@ extension InputHandlerProtocol {
           )
           let associatedCandidates = generateArrayOfAssociates(withPair: pair)
           guard !associatedCandidates.isEmpty else { break associatedPhrases }
-          session.switchState(IMEState.ofCommitting(textToCommit: state.displayedText))
-          session.switchState(IMEState.ofAssociates(candidates: associatedCandidates))
+          session.switchState(State.ofCommitting(textToCommit: state.displayedText))
+          session.switchState(State.ofAssociates(candidates: associatedCandidates))
         }
         return true
       case .kTab:
@@ -368,7 +368,7 @@ extension InputHandlerProtocol {
 
       if shouldAutoSelectCandidate {
         confirmHighlightedCandidate() // 此时的高亮候選字是第一個候選字。
-        session.switchState(IMEState.ofAbortion())
+        session.switchState(State.ofAbortion())
         return triageInput(event: input)
       }
     }

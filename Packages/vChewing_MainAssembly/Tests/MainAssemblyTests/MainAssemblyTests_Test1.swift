@@ -11,6 +11,7 @@ import LangModelAssembly
 @testable import MainAssembly
 import OSFrameworkImpl
 import Shared
+@testable import Typewriter
 import XCTest
 
 extension MainAssemblyTests {
@@ -334,7 +335,7 @@ extension MainAssemblyTests {
     vCTestLog("正在測試 inputHandler.commissionByCtrlOptionCommandEnter()。")
     testSession.resetInputHandler(forceComposerCleanup: true)
     typeSentenceOrCandidates("el dk ru4ej/ n 2k7")
-    guard let handler = testSession.inputHandler as? InputHandler else {
+    guard let handler = testSession.inputHandler else {
       XCTAssertThrowsError("testSession.handler is nil.")
       return
     }

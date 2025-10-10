@@ -210,7 +210,7 @@ extension SessionProtocol {
     case .ofSymbolTable where (0 ..< state.node.members.count).contains(index):
       let node = state.node.members[index]
       if !node.members.isEmpty {
-        switchState(IMEState.ofSymbolTable(node: node))
+        switchState(.ofSymbolTable(node: node))
       } else if let serviceNode = node.asServiceMenuNode {
         switch serviceNode.service.value {
         case let .url(theURL):
@@ -227,9 +227,9 @@ extension SessionProtocol {
             Notifier.notify(message: "i18n:candidateServiceMenu.selectorResponse.failed".localized)
           }
         }
-        switchState(IMEState.ofAbortion())
+        switchState(.ofAbortion())
       } else {
-        switchState(IMEState.ofCommitting(textToCommit: node.name))
+        switchState(.ofCommitting(textToCommit: node.name))
       }
     case .ofCandidates where (0 ..< state.candidates.count).contains(index):
       let selectedValue = state.candidates[index]
@@ -239,25 +239,25 @@ extension SessionProtocol {
         preConsolidate: PrefMgr.shared.consolidateContextOnCandidateSelection,
         skipObservation: !prefs.fetchSuggestionsFromPerceptionOverrideModel
       )
-      var result: IMEStateProtocol = inputHandler.generateStateOfInputting()
+      var result: State = inputHandler.generateStateOfInputting()
       defer { switchState(result) } // 這是最終輸出結果。
       if PrefMgr.shared.useSCPCTypingMode {
-        switchState(IMEState.ofCommitting(textToCommit: result.displayedText))
+        switchState(.ofCommitting(textToCommit: result.displayedText))
         // 此時是逐字選字模式，所以「selectedValue.value」是單個字、不用追加處理。
         if PrefMgr.shared.associatedPhrasesEnabled {
           let associates = inputHandler.generateStateOfAssociates(
             withPair: .init(keyArray: selectedValue.keyArray, value: selectedValue.value)
           )
-          result = associates.candidates.isEmpty ? IMEState.ofEmpty() : associates
+          result = associates.candidates.isEmpty ? .ofEmpty() : associates
         } else {
-          result = IMEState.ofEmpty()
+          result = .ofEmpty()
         }
       }
     case .ofAssociates where (0 ..< state.candidates.count).contains(index):
       let selectedValue = state.candidates[index]
-      var result: IMEStateProtocol = IMEState.ofEmpty()
+      var result: State = .ofEmpty()
       defer { switchState(result) } // 這是最終輸出結果。
-      switchState(IMEState.ofCommitting(textToCommit: selectedValue.value))
+      switchState(.ofCommitting(textToCommit: selectedValue.value))
       guard PrefMgr.shared.associatedPhrasesEnabled else { return }
       // 此時是關聯詞語選字模式，所以「selectedValue.value」必須只保留最後一個字。
       // 不然的話，一旦你選中了由多個字組成的聯想候選詞，則連續聯想會被打斷。
@@ -273,7 +273,7 @@ extension SessionProtocol {
         return
       }
       let strToCommitFirst = inputHandler.generateStateOfInputting(sansReading: true).displayedText
-      switchState(IMEState.ofCommitting(textToCommit: strToCommitFirst + chosenStr))
+      switchState(.ofCommitting(textToCommit: strToCommitFirst + chosenStr))
     default: return
     }
   }
@@ -318,10 +318,10 @@ extension SessionProtocol {
     let updateResult = inputHandler.updateUnigramData()
     // 清詞完畢
 
-    var newState: IMEStateProtocol =
+    var newState: State =
       updateResult
         ? inputHandler.generateStateOfCandidates(dodge: false)
-        : IMEState.ofCommitting(textToCommit: state.displayedText)
+        : .ofCommitting(textToCommit: state.displayedText)
     newState.tooltipDuration = 1.85
     var tooltipMessage = ""
     switch action {

@@ -144,7 +144,7 @@ extension InputHandlerProtocol {
         // 根據「組字器是否為空」來判定回呼哪一種狀態。
         switch assembler.isEmpty {
         case false: session.switchState(generateStateOfInputting())
-        case true: session.switchState(IMEState.ofAbortion())
+        case true: session.switchState(State.ofAbortion())
         }
         return true // 向 IMK 報告說這個按鍵訊號已經被輸入法攔截處理了。
       }
@@ -185,14 +185,14 @@ extension InputHandlerProtocol {
 
       /// 逐字選字模式的處理。
       if prefs.useSCPCTypingMode {
-        let candidateState: IMEStateProtocol = generateStateOfCandidates()
+        let candidateState: State = generateStateOfCandidates()
         switch candidateState.candidates.count {
         case 2...: session.switchState(candidateState)
         case 1:
           let firstCandidate = candidateState.candidates.first! // 一定會有，所以強制拆包也無妨。
           let reading: [String] = firstCandidate.keyArray
           let text: String = firstCandidate.value
-          session.switchState(IMEState.ofCommitting(textToCommit: text))
+          session.switchState(State.ofCommitting(textToCommit: text))
 
           if prefs.associatedPhrasesEnabled {
             let associatedCandidates = generateArrayOfAssociates(withPairs: [.init(
@@ -201,8 +201,8 @@ extension InputHandlerProtocol {
             )])
             session.switchState(
               associatedCandidates.isEmpty
-                ? IMEState.ofEmpty()
-                : IMEState.ofAssociates(candidates: associatedCandidates)
+                ? State.ofEmpty()
+                : State.ofAssociates(candidates: associatedCandidates)
             )
           }
         default: break
@@ -299,7 +299,7 @@ extension InputHandlerProtocol {
       if calligrapher.isEmpty, isWildcardKeyInput {
         errorCallback?("3606B9C0")
         if input.beganWithLetter {
-          var newEmptyState = assembler.isEmpty ? IMEState.ofEmpty() : generateStateOfInputting()
+          var newEmptyState = assembler.isEmpty ? State.ofEmpty() : generateStateOfInputting()
           newEmptyState.tooltip = NSLocalizedString(
             "Wildcard key cannot be the initial key.",
             comment: ""
@@ -350,14 +350,14 @@ extension InputHandlerProtocol {
       if let quickPhraseKey, !quickPhraseKey.isEmpty, phrases.count == 1,
          let phrase = phrases.first {
         calligrapher.removeAll()
-        session.switchState(IMEState.ofCommitting(textToCommit: phrase))
+        session.switchState(State.ofCommitting(textToCommit: phrase))
         return true
       }
       let phraseNode = CandidateNode(
         name: calligrapher,
         members: phrases.map { CandidateNode(name: $0) }
       )
-      session.switchState(IMEState.ofSymbolTable(node: phraseNode))
+      session.switchState(State.ofSymbolTable(node: phraseNode))
       return true
     }
 
@@ -386,7 +386,7 @@ extension InputHandlerProtocol {
         // 根據「組字器是否為空」來判定回呼哪一種狀態。
         switch assembler.isEmpty {
         case false: session.switchState(generateStateOfInputting())
-        case true: session.switchState(IMEState.ofAbortion())
+        case true: session.switchState(State.ofAbortion())
         }
         return true // 向 IMK 報告說這個按鍵訊號已經被輸入法攔截處理了。
       }
@@ -420,14 +420,14 @@ extension InputHandlerProtocol {
 
       /// 逐字選字模式的處理。
       if prefs.useSCPCTypingMode {
-        let candidateState: IMEStateProtocol = generateStateOfCandidates()
+        let candidateState: State = generateStateOfCandidates()
         switch candidateState.candidates.count {
         case 2...: session.switchState(candidateState)
         case 1:
           let firstCandidate = candidateState.candidates.first! // 一定會有，所以強制拆包也無妨。
           let reading: [String] = firstCandidate.keyArray
           let text: String = firstCandidate.value
-          session.switchState(IMEState.ofCommitting(textToCommit: text))
+          session.switchState(State.ofCommitting(textToCommit: text))
 
           if prefs.associatedPhrasesEnabled {
             let associatedCandidates = generateArrayOfAssociates(withPairs: [.init(
@@ -436,8 +436,8 @@ extension InputHandlerProtocol {
             )])
             session.switchState(
               associatedCandidates.isEmpty
-                ? IMEState.ofEmpty()
-                : IMEState.ofAssociates(candidates: associatedCandidates)
+                ? State.ofEmpty()
+                : State.ofAssociates(candidates: associatedCandidates)
             )
           }
         default: break
@@ -479,7 +479,7 @@ extension InputHandlerProtocol {
         .description
       else {
         errorCallback?("D220B880：輸入的字碼沒有對應的字元。")
-        var updatedState = IMEState.ofAbortion()
+        var updatedState = State.ofAbortion()
         updatedState.tooltipDuration = 0
         updatedState.tooltip = "Invalid Code Point.".localized
         session.switchState(updatedState)
@@ -488,7 +488,7 @@ extension InputHandlerProtocol {
       }
       // 某些舊版 macOS 會在這裡生成的字元後面插入垃圾字元。這裡只保留起始字元。
       if char.count > 1 { char = char.map(\.description)[0] }
-      session.switchState(IMEState.ofCommitting(textToCommit: char))
+      session.switchState(State.ofCommitting(textToCommit: char))
       var updatedState = generateStateOfInputting(guarded: true)
       updatedState.tooltipDuration = 0
       updatedState.tooltip = TypingMethod.codePoint.getTooltip(vertical: session.isVerticalTyping)
@@ -523,12 +523,12 @@ extension InputHandlerProtocol {
     }
     // 得在這裡先 commit buffer，不然會導致「在摁 ESC 離開符號選單時會重複輸入上一次的組字區的內容」的不當行為。
     let textToCommit = generateStateOfInputting(sansReading: true).displayedText
-    session.switchState(IMEState.ofCommitting(textToCommit: textToCommit))
+    session.switchState(State.ofCommitting(textToCommit: textToCommit))
     if symbols.members.count == 1 {
       session
-        .switchState(IMEState.ofCommitting(textToCommit: symbols.members.map(\.name).joined()))
+        .switchState(State.ofCommitting(textToCommit: symbols.members.map(\.name).joined()))
     } else {
-      session.switchState(IMEState.ofSymbolTable(node: symbols))
+      session.switchState(State.ofSymbolTable(node: symbols))
     }
     currentTypingMethod = .vChewingFactory // 用完就關掉，但保持選字窗開啟，所以這裡不用呼叫 toggle 函式。
     return true
