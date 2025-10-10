@@ -45,10 +45,10 @@ open class CtlCandidate: NSWindowController, CtlCandidateProtocol {
     }
   }
 
-  open var windowTopLeftPoint: NSPoint {
+  open var windowTopLeftPoint: CGPoint {
     get {
-      guard let frameRect = window?.frame else { return NSPoint.zero }
-      return NSPoint(x: frameRect.minX, y: frameRect.maxY)
+      guard let frameRect = window?.frame else { return CGPoint.zero }
+      return CGPoint(x: frameRect.minX, y: frameRect.maxY)
     }
     set {
       asyncOnMain { [weak self] in

@@ -98,7 +98,7 @@
 
     /// 回傳該 NSAttributedString 的邊界尺寸。單行、無附件文本會走 CoreText 快路徑。
     @objc
-    public func getBoundingDimension(forceFallback: Bool = false) -> NSSize {
+    public func getBoundingDimension(forceFallback: Bool = false) -> CGSize {
       guard length > 0 else { return .zero }
       let shouldFallback = forceFallback || containsLineBreaks || containsAttachments
       let path: MeasurementPath = shouldFallback ? .textKitFallback : .fastSingleLine
@@ -120,7 +120,7 @@
       label: "org.vChewing.candidateWindow.measure.cache",
       attributes: .concurrent
     )
-    private static var cachedSizes: [CacheKey: NSSize] = [:]
+    private static var cachedSizes: [CacheKey: CGSize] = [:]
 
     private static let textKitQueue =
       DispatchQueue(label: "org.vChewing.candidateWindow.measure.textkit")
@@ -146,11 +146,11 @@
     private static func measure(
       _ attributedString: NSAttributedString, using path: MeasurementPath
     )
-      -> NSSize {
+      -> CGSize {
       let key = cacheKey(for: attributedString, path: path)
       if let cached = cachedSize(for: key) { return cached }
 
-      let measured: NSSize
+      let measured: CGSize
       switch path {
       case .fastSingleLine: measured = coreTextSize(for: attributedString)
       case .textKitFallback: measured = textKitSize(for: attributedString)
@@ -160,11 +160,11 @@
       return measured
     }
 
-    private static func cachedSize(for key: CacheKey) -> NSSize? {
+    private static func cachedSize(for key: CacheKey) -> CGSize? {
       cacheQueue.sync { cachedSizes[key] }
     }
 
-    private static func store(size: NSSize, for key: CacheKey) {
+    private static func store(size: CGSize, for key: CacheKey) {
       cacheQueue.async(flags: .barrier) { cachedSizes[key] = size }
     }
 
@@ -230,7 +230,7 @@
     private static func coreTextSize(
       for attributedString: NSAttributedString
     )
-      -> NSSize {
+      -> CGSize {
       let line = CTLineCreateWithAttributedString(attributedString as CFAttributedString)
       var ascent: CGFloat = 0
       var descent: CGFloat = 0
@@ -247,13 +247,13 @@
       let fallbackHeight = fontMetrics.ascent + fontMetrics.descent
       let height = ceil(max(typographicHeight, fallbackHeight))
 
-      return NSSize(width: ceil(max(computedWidth, 0)), height: height)
+      return CGSize(width: ceil(max(computedWidth, 0)), height: height)
     }
 
-    private static func textKitSize(for attributedString: NSAttributedString) -> NSSize {
+    private static func textKitSize(for attributedString: NSAttributedString) -> CGSize {
       textKitQueue.sync {
         let context = textKitContext
-        context.textContainer.containerSize = NSSize(
+        context.textContainer.containerSize = CGSize(
           width: CGFloat.greatestFiniteMagnitude,
           height: CGFloat.greatestFiniteMagnitude
         )
@@ -262,7 +262,7 @@
         context.layoutManager.ensureLayout(for: context.textContainer)
         var usedRect = context.layoutManager.usedRect(for: context.textContainer)
         if usedRect.isNull { usedRect = .zero }
-        return NSSize(
+        return CGSize(
           width: ceil(max(usedRect.width, 0)),
           height: ceil(max(usedRect.height, 0))
         )
@@ -290,7 +290,7 @@
         self.textStorage = NSTextStorage()
         self.layoutManager = NSLayoutManager()
         self.textContainer = NSTextContainer()
-        textContainer.containerSize = NSSize(
+        textContainer.containerSize = CGSize(
           width: CGFloat.greatestFiniteMagnitude,
           height: CGFloat.greatestFiniteMagnitude
         )
