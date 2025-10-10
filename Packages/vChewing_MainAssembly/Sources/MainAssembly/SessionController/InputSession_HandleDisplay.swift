@@ -31,7 +31,7 @@ extension SessionProtocol {
     return max(min(state.displayedTextConverted.utf16.count, u16Cursor), 0)
   }
 
-  public func lineHeightRect(zeroCursor: Bool = false) -> NSRect {
+  public func lineHeightRect(zeroCursor: Bool = false) -> CGRect {
     guard let client = client() else { return .seniorTheBeast }
     return client.lineHeightRect(u16Cursor: zeroCursor ? 0 : u16Cursor)
   }
@@ -43,10 +43,10 @@ extension SessionProtocol {
       return
     }
     let lineHeightRect = updateVerticalTypingStatus()
-    var finalOrigin: NSPoint = lineHeightRect.origin
+    var finalOrigin: CGPoint = lineHeightRect.origin
     let delta: Double = lineHeightRect.size.height + 4.0 // bottomOutOfScreenAdjustmentHeight
     if isVerticalTyping {
-      finalOrigin = NSPoint(
+      finalOrigin = CGPoint(
         x: lineHeightRect.origin.x + lineHeightRect.size.width + 5, y: lineHeightRect.origin.y
       )
     }
@@ -107,7 +107,7 @@ extension SessionProtocol {
 
   public func resetCandidateWindowOrigin() {
     let lhRect = lineHeightRect()
-    var tlPoint = NSPoint(x: lhRect.origin.x, y: lhRect.origin.y - 4.0)
+    var tlPoint = CGPoint(x: lhRect.origin.x, y: lhRect.origin.y - 4.0)
     tlPoint.x += isVerticalTyping ? (lhRect.size.width + 4.0) : 0
     candidateUI?.set(
       windowTopLeftPoint: tlPoint,

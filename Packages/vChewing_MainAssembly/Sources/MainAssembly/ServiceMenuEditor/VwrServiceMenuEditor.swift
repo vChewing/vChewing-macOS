@@ -274,7 +274,7 @@ extension VwrServiceMenuEditor {
     alert.addButton(withTitle: NSLocalizedString("Cancel", comment: ""))
 
     let maxFloat = Double(Float.greatestFiniteMagnitude)
-    let scrollview = NSScrollView(frame: NSRect(x: 0, y: 0, width: 512, height: 200))
+    let scrollview = NSScrollView(frame: CGRect(x: 0, y: 0, width: 512, height: 200))
     let contentSize = scrollview.contentSize
     scrollview.borderType = .noBorder
     scrollview.hasVerticalScroller = true
@@ -282,24 +282,24 @@ extension VwrServiceMenuEditor {
     scrollview.horizontalScroller?.scrollerStyle = .legacy
     scrollview.verticalScroller?.scrollerStyle = .legacy
     scrollview.autoresizingMask = [.width, .height]
-    let theTextView = NSTextView(frame: NSRect(
+    let theTextView = NSTextView(frame: CGRect(
       x: 0,
       y: 0,
       width: contentSize.width,
       height: contentSize.height
     ))
     scrollview.documentView = theTextView
-    theTextView.minSize = NSSize(width: 0.0, height: contentSize.height)
-    theTextView.maxSize = NSSize(width: maxFloat, height: maxFloat)
+    theTextView.minSize = CGSize(width: 0.0, height: contentSize.height)
+    theTextView.maxSize = CGSize(width: maxFloat, height: maxFloat)
     theTextView.isVerticallyResizable = true
     theTextView.isHorizontallyResizable = false
     theTextView.autoresizingMask = .width
-    theTextView.textContainer?.containerSize = NSSize(width: contentSize.width, height: maxFloat)
+    theTextView.textContainer?.containerSize = CGSize(width: contentSize.width, height: maxFloat)
     theTextView.textContainer?.widthTracksTextView = true
     theTextView.enclosingScrollView?.hasHorizontalScroller = true
     theTextView.isHorizontallyResizable = true
     theTextView.autoresizingMask = [.width, .height]
-    theTextView.textContainer?.containerSize = NSSize(width: maxFloat, height: maxFloat)
+    theTextView.textContainer?.containerSize = CGSize(width: maxFloat, height: maxFloat)
     theTextView.textContainer?.widthTracksTextView = false
     theTextView.toolTip = "i18n:CandidateServiceMenuEditor.formatGuide".localized
 

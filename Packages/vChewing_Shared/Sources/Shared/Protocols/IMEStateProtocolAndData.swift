@@ -8,7 +8,6 @@
 
 import Foundation
 import IMKUtils
-import InputMethodKit
 
 // MARK: - IMEStateProtocol
 
@@ -37,7 +36,9 @@ public protocol IMEStateProtocol {
   var u16Cursor: Int { get }
   var cursor: Int { get set }
   var marker: Int { get set }
-  func attributedString(for session: IMKInputControllerProtocol) -> NSAttributedString
+  #if canImport(Darwin)
+    func attributedString(for session: IMKInputControllerProtocol) -> NSAttributedString
+  #endif
 
   static func ofDeactivated() -> Self
   static func ofEmpty() -> Self

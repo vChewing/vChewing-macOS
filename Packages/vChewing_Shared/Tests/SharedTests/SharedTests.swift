@@ -17,15 +17,7 @@ final class SharedTests: XCTestCase {
     #"Ecosia: %s"# + "\t" + #"@WEB:https://www.ecosia.org/search?method=index&q=%s"#,
   ]
 
-  // MARK: - PrefMgr().dumpShellScriptBackup()
-
-  func testDumpedPrefs() throws {
-    let prefs = PrefMgr()
-    let fetched = prefs.dumpShellScriptBackup() ?? ""
-    XCTAssertFalse(fetched.isEmpty)
-  }
-
-  func testDataRestoration() throws {
+  func testCandidateServiceNodeTestDataRestoration() throws {
     let stacked = Self.testDataMap.parseIntoCandidateTextServiceStack()
     stacked.forEach { currentService in
       print(currentService)
@@ -44,6 +36,13 @@ final class SharedTests: XCTestCase {
     }
     print(rootNode.members.map(\.name))
     print(rootNode.members.compactMap(\.asServiceMenuNode?.service))
+  }
+
+  /// PrefMgr().dumpShellScriptBackup()
+  func testDumpedPrefs() throws {
+    let prefs = PrefMgr()
+    let fetched = prefs.dumpShellScriptBackup() ?? ""
+    XCTAssertFalse(fetched.isEmpty)
   }
 
   func testEmacsCtrlNPMappings() throws {

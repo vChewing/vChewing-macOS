@@ -17,7 +17,7 @@ public class TooltipUI_LateCocoa: NSWindowController, TooltipUIProtocol {
   // MARK: Lifecycle
 
   public init() {
-    let contentRect = NSRect(x: 128.0, y: 128.0, width: 300.0, height: 20.0)
+    let contentRect = CGRect(x: 128.0, y: 128.0, width: 300.0, height: 20.0)
     let styleMask: NSWindow.StyleMask = [.borderless, .nonactivatingPanel]
     let panel = NSPanel(
       contentRect: contentRect, styleMask: styleMask, backing: .buffered, defer: false
@@ -32,7 +32,7 @@ public class TooltipUI_LateCocoa: NSWindowController, TooltipUIProtocol {
       panel.isOpaque = true
     }
     panel.isMovable = false
-    self.tooltipView = TooltipContentView(frame: NSRect(origin: .zero, size: contentRect.size))
+    self.tooltipView = TooltipContentView(frame: CGRect(origin: .zero, size: contentRect.size))
     tooltipView.wantsLayer = true
     tooltipView.layer?.cornerRadius = 7
     tooltipView.layer?.backgroundColor = NSColor.controlBackgroundColor.cgColor
@@ -78,7 +78,7 @@ public class TooltipUI_LateCocoa: NSWindowController, TooltipUIProtocol {
   }
 
   public func show(
-    tooltip: String, at point: NSPoint,
+    tooltip: String, at point: CGPoint,
     bottomOutOfScreenAdjustmentHeight heightDelta: Double,
     direction: NSUserInterfaceLayoutOrientation = .horizontal, duration: Double
   ) {
@@ -193,13 +193,13 @@ public class TooltipUI_LateCocoa: NSWindowController, TooltipUIProtocol {
     updateWindowSize(to: tooltipView.intrinsicContentSize)
   }
 
-  private func updateWindowSize(to contentSize: NSSize) {
+  private func updateWindowSize(to contentSize: CGSize) {
     guard let window else { return }
-    let adjustedSize = NSSize(
+    let adjustedSize = CGSize(
       width: max(contentSize.width, TooltipContentView.minimumSize.width),
       height: max(contentSize.height, TooltipContentView.minimumSize.height)
     )
-    tooltipView.frame = NSRect(origin: .zero, size: adjustedSize)
+    tooltipView.frame = CGRect(origin: .zero, size: adjustedSize)
     window.setContentSize(adjustedSize)
     window.invalidateShadow()
   }
@@ -210,7 +210,7 @@ public class TooltipUI_LateCocoa: NSWindowController, TooltipUIProtocol {
 private final class TooltipContentView: NSView {
   // MARK: Lifecycle
 
-  override init(frame frameRect: NSRect) {
+  override init(frame frameRect: CGRect) {
     self.attributedText = NSAttributedString(string: "")
     super.init(frame: frameRect)
     commonInit()
@@ -223,17 +223,17 @@ private final class TooltipContentView: NSView {
 
   // MARK: Internal
 
-  static let minimumSize = NSSize(width: 32, height: 20)
+  static let minimumSize = CGSize(width: 32, height: 20)
 
   override var isFlipped: Bool {
     true
   }
 
-  override var intrinsicContentSize: NSSize {
+  override var intrinsicContentSize: CGSize {
     cachedIntrinsicSize
   }
 
-  var onIntrinsicSizeChanged: ((NSSize) -> ())?
+  var onIntrinsicSizeChanged: ((CGSize) -> ())?
 
   var text: String = "" {
     didSet {
@@ -259,7 +259,7 @@ private final class TooltipContentView: NSView {
     }
   }
 
-  override func draw(_ dirtyRect: NSRect) {
+  override func draw(_ dirtyRect: CGRect) {
     super.draw(dirtyRect)
     guard attributedText.length > 0 else { return }
 
@@ -267,9 +267,9 @@ private final class TooltipContentView: NSView {
     if usesVerticalTypesetting {
       drawVerticalText(at: origin)
     } else {
-      let drawingRect = NSRect(
+      let drawingRect = CGRect(
         origin: origin,
-        size: NSSize(
+        size: CGSize(
           width: bounds.width - textPadding * 2,
           height: bounds.height - textPadding * 2
         )
@@ -284,8 +284,8 @@ private final class TooltipContentView: NSView {
   // MARK: Private
 
   private var attributedText: NSAttributedString
-  private var cachedIntrinsicSize: NSSize = .init(width: 300, height: 20)
-  private var cachedTextMetrics: NSSize = .zero
+  private var cachedIntrinsicSize: CGSize = .init(width: 300, height: 20)
+  private var cachedTextMetrics: CGSize = .zero
 
   private var textPadding: CGFloat {
     ceil(NSFont.systemFontSize / 2)
@@ -361,7 +361,7 @@ private final class TooltipContentView: NSView {
     let paddedWidth = max(metrics.width + textPadding * 2, textPadding * 2)
     let paddedHeight = max(metrics.height + textPadding * 2, textPadding * 2)
 
-    let newSize = NSSize(width: paddedWidth, height: paddedHeight)
+    let newSize = CGSize(width: paddedWidth, height: paddedHeight)
     if cachedIntrinsicSize != newSize {
       cachedIntrinsicSize = newSize
       invalidateIntrinsicContentSize()
@@ -418,7 +418,7 @@ private final class TooltipContentView: NSView {
     CGPoint(x: textPadding, y: textPadding)
   }
 
-  private func calculateTextMetrics() -> NSSize {
+  private func calculateTextMetrics() -> CGSize {
     guard attributedText.length > 0 else {
       return .zero
     }
@@ -439,10 +439,10 @@ private final class TooltipContentView: NSView {
       }
     }
 
-    return NSSize(width: contentWidth, height: contentHeight)
+    return CGSize(width: contentWidth, height: contentHeight)
   }
 
-  private func measureVerticalTextSize() -> NSSize {
+  private func measureVerticalTextSize() -> CGSize {
     let font = tooltipFont()
     let normalizedText = normalizedVerticalString(attributedText.string)
 
@@ -483,7 +483,7 @@ private final class TooltipContentView: NSView {
     let finalWidth: CGFloat = max(ceil(suggestedSize.width), minimumWidth)
     let finalHeight: CGFloat = max(ceil(suggestedSize.height), minimumHeight)
 
-    return NSSize(width: finalWidth, height: finalHeight)
+    return CGSize(width: finalWidth, height: finalHeight)
   }
 
   private func normalizedVerticalString(_ text: String) -> String {

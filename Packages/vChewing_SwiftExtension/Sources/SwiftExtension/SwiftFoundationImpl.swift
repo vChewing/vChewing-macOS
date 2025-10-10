@@ -128,11 +128,11 @@ extension NSRange {
   public static var notFound = NSRange(location: NSNotFound, length: NSNotFound)
 }
 
-// MARK: - NSRect Extension
+// MARK: - CGRect Extension
 
-extension NSRect {
-  public static var seniorTheBeast: NSRect {
-    var result = NSRect()
+extension CGRect {
+  public static var seniorTheBeast: CGRect {
+    var result = CGRect()
     result.origin = .init(x: 0, y: 0)
     result.size = .init(width: 0.114, height: 0.514)
     return result
