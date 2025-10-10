@@ -20,9 +20,9 @@ func vCTestLog(_ str: String) {
 
 /// 威注音輸入法的 InputHandler 單元測試（Typewriter 模組）
 class InputHandlerTests: XCTestCase {
-  var testLM: LMAssembly.LMInstantiator!
-  var testHandler: MockInputHandler!
-  var testSession: MockSession!
+  var testLM: LMAssembly.LMInstantiator?
+  var testHandler: MockInputHandler?
+  var testSession: MockSession?
 
   // MARK: - Setup and Teardown
 
@@ -33,18 +33,21 @@ class InputHandlerTests: XCTestCase {
     UserDefaults.pendingUnitTests = true
 
     // 初始化測試 LM
-    testLM = LMAssembly.LMInstantiator(isCHS: false)
+    let lm = LMAssembly.LMInstantiator(isCHS: false)
+    testLM = lm
     LMAssembly.LMInstantiator.connectToTestSQLDB()
 
     // 初始化測試用的 handler 和 session
-    testHandler = MockInputHandler(lm: testLM, pref: PrefMgr())
-    testSession = MockSession()
-    testSession.inputHandler = testHandler
-    testHandler.session = testSession
+    let handler = MockInputHandler(lm: lm, pref: PrefMgr())
+    let session = MockSession()
+    handler.session = session
+    session.inputHandler = handler
+    testHandler = handler
+    testSession = session
   }
 
   override func tearDownWithError() throws {
-    testSession.switchState(MockIMEState.ofAbortion())
+    testSession?.switchState(MockIMEState.ofAbortion())
     UserDefaults.unitTests?.removeSuite(named: "org.atelierInmu.vChewing.Typewriter.UnitTests")
     UserDef.resetAll()
   }
@@ -52,10 +55,11 @@ class InputHandlerTests: XCTestCase {
   // MARK: - Utility Functions
 
   func clearTestPOM() {
-    testHandler.currentLM.clearPOMData()
+    testHandler?.currentLM.clearPOMData()
   }
 
   func typeSentence(_ sequence: String) {
+    guard let testHandler else { return }
     // 簡化的打字模擬，直接操作 composer 和 assembler
     for char in sequence {
       let charStr = String(char)
@@ -64,7 +68,7 @@ class InputHandlerTests: XCTestCase {
         testHandler.assemble()
       } else {
         // 其他字符塞入 composer
-        _ = testHandler.composer.receiveKey(fromString: charStr)
+        testHandler.composer.receiveKey(fromString: charStr)
       }
     }
   }
@@ -77,15 +81,19 @@ class InputHandlerTests: XCTestCase {
 
     // 測試基本初始化
     XCTAssertNotNil(testHandler)
-    XCTAssertNotNil(testHandler.composer)
-    XCTAssertNotNil(testHandler.assembler)
-    XCTAssertTrue(testHandler.assembler.isEmpty)
+    XCTAssertNotNil(testHandler?.composer)
+    XCTAssertNotNil(testHandler?.assembler)
+    XCTAssertTrue(testHandler?.assembler.isEmpty ?? false)
 
     vCTestLog("InputHandler 初始化成功")
   }
 
   /// 測試注拼槽基本功能。
   func test103_InputHandler_ComposerBasics() throws {
+    guard let testHandler else {
+      XCTFail("testHandler is nil.")
+      return
+    }
     vCTestLog("測試注拼槽基本功能")
 
     testHandler.clear()
@@ -103,6 +111,11 @@ class InputHandlerTests: XCTestCase {
 
   /// 測試組字器基本功能。
   func test106_InputHandler_AssemblerBasics() throws {
+    guard let testHandler else {
+      XCTFail("testHandler is nil.")
+      return
+    }
+
     vCTestLog("測試組字器基本功能")
 
     testHandler.clear()

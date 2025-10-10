@@ -7,6 +7,7 @@
 // requirements defined in MIT License.
 
 import Foundation
+import IMKUtils
 import LangModelAssembly
 import Megrez
 import Shared

@@ -18,6 +18,7 @@ let package = Package(
   dependencies: [
     .package(path: "../vChewing_BrailleSputnik"),
     .package(path: "../vChewing_LangModelAssembly"),
+    .package(path: "../vChewing_IMKUtils"),
     .package(path: "../vChewing_Megrez"),
     .package(path: "../vChewing_Shared"),
     .package(path: "../vChewing_SwiftExtension"),
@@ -39,7 +40,14 @@ let package = Package(
     ),
     .testTarget(
       name: "TypewriterTests",
-      dependencies: ["Typewriter"]
+      dependencies: [
+        "Typewriter",
+        .product(name: "IMKUtils", package: "vChewing_IMKUtils"),
+        .product(name: "LangModelAssembly", package: "vChewing_LangModelAssembly"),
+        .product(name: "Megrez", package: "vChewing_Megrez"),
+        .product(name: "Shared", package: "vChewing_Shared"),
+        .product(name: "Tekkon", package: "vChewing_Tekkon"),
+      ]
     ),
   ]
 )
