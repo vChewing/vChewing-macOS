@@ -25,7 +25,7 @@ import SwiftExtension
     ///   - windowTopLeftPoint: 給定的視窗顯示位置。
     ///   - heightDelta: 為了「防止選字窗抻出螢幕下方」而給定的預留高度。
     public func set(
-      windowTopLeftPoint: NSPoint,
+      windowTopLeftPoint: CGPoint,
       bottomOutOfScreenAdjustmentHeight heightDelta: Double,
       useGCD: Bool
     ) {

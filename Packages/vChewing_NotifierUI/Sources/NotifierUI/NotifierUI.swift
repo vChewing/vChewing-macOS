@@ -85,7 +85,7 @@ public class Notifier: NSWindowController {
 
     let textWH = lblMessage.frame
     let windowWidth = Double(4) * kLargeFontSize + textWH.width
-    let contentRect = NSRect(x: 0, y: 0, width: windowWidth, height: 60.0)
+    let contentRect = CGRect(x: 0, y: 0, width: windowWidth, height: 60.0)
     var windowRect = contentRect
     windowRect.origin.x = screenRect.maxX - windowRect.width - 20
     windowRect.origin.y = screenRect.maxY - ceil(2.5 * windowRect.height) - 10

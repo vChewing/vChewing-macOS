@@ -6,8 +6,6 @@
 // marks, or product names of Contributor, except as required to fulfill notice
 // requirements defined in MIT License.
 
-import Foundation
-
 public protocol PrefMgrProtocol {
   var isDebugModeEnabled: Bool { get set }
   var failureFlagForPOMObservation: Bool { get set }

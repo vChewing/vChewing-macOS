@@ -6,22 +6,31 @@
 // marks, or product names of Contributor, except as required to fulfill notice
 // requirements defined in MIT License.
 
-import Foundation
-import SwiftExtension
+#if canImport(Darwin)
 
-public enum OS {
-  public static let currentOSVersionString: String = {
-    let strSet = ProcessInfo().operatingSystemVersion
-    return "\(strSet.majorVersion).\(strSet.minorVersion).\(strSet.patchVersion)"
-  }()
+  import Foundation
+  import SwiftExtension
 
-  public static func ifAvailable(_ givenOSVersion: Double) -> Bool {
-    let rawResult = currentOSVersionString.versionCompare(givenOSVersion.description)
-    return [.orderedDescending].contains(rawResult)
+  public enum OS {
+    public static let currentOSVersionString: String = {
+      if #available(macOS 10.10, *) {
+        let strSet = ProcessInfo().operatingSystemVersion
+        return "\(strSet.majorVersion).\(strSet.minorVersion).\(strSet.patchVersion)"
+      }
+      let strSet = ProcessInfo().operatingSystemVersionString.components(separatedBy: " ")
+      guard strSet.count >= 2 else { return "10.9.0" }
+      return strSet[1]
+    }()
+
+    public static func ifAvailable(_ givenOSVersion: Double) -> Bool {
+      let rawResult = currentOSVersionString.versionCompare(givenOSVersion.description)
+      return [.orderedDescending].contains(rawResult)
+    }
+
+    public static func ifUnavailable(_ givenOSVersion: Double) -> Bool {
+      let rawResult = currentOSVersionString.versionCompare(givenOSVersion.description)
+      return [.orderedSame, .orderedAscending].contains(rawResult)
+    }
   }
 
-  public static func ifUnavailable(_ givenOSVersion: Double) -> Bool {
-    let rawResult = currentOSVersionString.versionCompare(givenOSVersion.description)
-    return [.orderedSame, .orderedAscending].contains(rawResult)
-  }
-}
+#endif

@@ -6,7 +6,11 @@
 // marks, or product names of Contributor, except as required to fulfill notice
 // requirements defined in MIT License.
 
-import AppKit
+#if canImport(AppKit)
+  import AppKit
+#else
+  import Foundation
+#endif
 
 // MARK: - CtlCandidateDelegate
 
@@ -28,7 +32,10 @@ public protocol CtlCandidateDelegate: AnyObject {
   var shouldAutoExpandCandidates: Bool { get }
   var isCandidateContextMenuEnabled: Bool { get }
   var showReverseLookupResult: Bool { get }
-  var clientAccentColor: NSColor? { get }
+
+  #if canImport(AppKit)
+    var clientAccentColor: NSColor? { get }
+  #endif
 }
 
 // MARK: - CtlCandidateProtocol
@@ -37,15 +44,16 @@ public protocol CtlCandidateProtocol {
   var tooltip: String { get set }
   var reverseLookupResult: [String] { get set }
   var locale: String { get set }
-  var currentLayout: NSUserInterfaceLayoutOrientation { get set }
+  #if canImport(AppKit)
+    var currentLayout: NSUserInterfaceLayoutOrientation { get set }
+    var candidateFont: NSFont { get set }
+  #endif
   var delegate: CtlCandidateDelegate? { get set }
   var highlightedIndex: Int { get set }
   var visible: Bool { get set }
-  var windowTopLeftPoint: NSPoint { get set }
-  var candidateFont: NSFont { get set }
+  var windowTopLeftPoint: CGPoint { get set }
   var useLangIdentifier: Bool { get set }
 
-  init(_ layout: NSUserInterfaceLayoutOrientation)
   func reloadData()
   func updateDisplay()
   func showNextPage() -> Bool
@@ -56,7 +64,7 @@ public protocol CtlCandidateProtocol {
   func highlightPreviousCandidate() -> Bool
   func candidateIndexAtKeyLabelIndex(_: Int) -> Int?
   func set(
-    windowTopLeftPoint: NSPoint,
+    windowTopLeftPoint: CGPoint,
     bottomOutOfScreenAdjustmentHeight height: Double,
     useGCD: Bool
   )

@@ -237,7 +237,7 @@ public struct ComboBox: NSViewRepresentable {
     comboBox.usesDataSource = false
     comboBox.completes = false
     comboBox.delegate = context.coordinator
-    comboBox.intercellSpacing = NSSize(width: 0.0, height: 10.0)
+    comboBox.intercellSpacing = CGSize(width: 0.0, height: 10.0)
     return comboBox
   }
 

@@ -27,7 +27,7 @@ private final class RoundedBadgeTextAttachmentCell: NSTextAttachmentCell {
     self.backgroundColor = backgroundColor
     self.padding = padding
 
-    let constraint = NSSize(
+    let constraint = CGSize(
       width: CGFloat.greatestFiniteMagnitude,
       height: CGFloat.greatestFiniteMagnitude
     )
@@ -35,7 +35,7 @@ private final class RoundedBadgeTextAttachmentCell: NSTextAttachmentCell {
       with: constraint,
       options: [.usesLineFragmentOrigin, .usesFontLeading]
     )
-    var size = NSSize(
+    var size = CGSize(
       width: ceil(textBounds.width) + padding.left + padding.right,
       height: ceil(textBounds.height) + padding.top + padding.bottom
     )
@@ -59,13 +59,13 @@ private final class RoundedBadgeTextAttachmentCell: NSTextAttachmentCell {
 
   // MARK: NSTextAttachmentCell
 
-  override func cellSize() -> NSSize { cachedSize }
+  override func cellSize() -> CGSize { cachedSize }
 
-  override func draw(withFrame cellFrame: NSRect, in controlView: NSView?, characterIndex: Int) {
+  override func draw(withFrame cellFrame: CGRect, in controlView: NSView?, characterIndex: Int) {
     backgroundColor.setFill()
     NSBezierPath(roundedRect: cellFrame, xRadius: cornerRadius, yRadius: cornerRadius).fill()
 
-    let textRect = NSRect(
+    let textRect = CGRect(
       x: cellFrame.origin.x + padding.left,
       y: cellFrame.origin.y + padding.bottom,
       width: cellFrame.width - padding.left - padding.right,
@@ -80,7 +80,7 @@ private final class RoundedBadgeTextAttachmentCell: NSTextAttachmentCell {
   private let backgroundColor: NSColor
   private let cornerRadius: CGFloat
   private let padding: NSEdgeInsets
-  private let cachedSize: NSSize
+  private let cachedSize: CGSize
 }
 
 // MARK: - UI Metrics.
@@ -88,10 +88,10 @@ private final class RoundedBadgeTextAttachmentCell: NSTextAttachmentCell {
 extension CandidatePool {
   public func updateMetrics() {
     // 開工
-    let initialOrigin: NSPoint = .init(x: originDelta, y: originDelta)
-    var totalAccuSize: NSSize = .zero
+    let initialOrigin: CGPoint = .init(x: originDelta, y: originDelta)
+    var totalAccuSize: CGSize = .zero
     // Origin is at the top-left corner.
-    var currentOrigin: NSPoint = initialOrigin
+    var currentOrigin: CGPoint = initialOrigin
     var highlightedCellRect: CGRect = .zero
     var highlightedLineRect: CGRect = .zero
     var currentPageLines = candidateLines[lineRangeForCurrentPage]
@@ -113,7 +113,7 @@ extension CandidatePool {
     let minimumCellDimension = Self.shitCell.visualDimension
     currentPageLines.forEach { currentLine in
       let currentLineOrigin = currentOrigin
-      var accumulatedLineSize: NSSize = .zero
+      var accumulatedLineSize: CGSize = .zero
       var currentLineRect: CGRect { .init(origin: currentLineOrigin, size: accumulatedLineSize) }
       let lineHasHighlightedCell = currentLine.hasHighlightedCell
 
@@ -484,7 +484,7 @@ extension CandidatePool {
     attributes: [NSAttributedString.Key: Any]
   )
     -> CGFloat {
-    let constraint = NSSize(
+    let constraint = CGSize(
       width: CGFloat.greatestFiniteMagnitude,
       height: CGFloat.greatestFiniteMagnitude
     )
