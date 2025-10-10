@@ -37,6 +37,7 @@ public protocol InputHandlerProtocol: AnyObject {
   var errorCallback: ((String) -> ())? { get set }
   var notificationCallback: ((String) -> ())? { get set }
   var pomSaveCallback: (() -> ())? { get set }
+  var filterabilityChecker: ((_ state: IMEStateData) -> Bool)? { get set }
 
   var currentLM: LMAssembly.LMInstantiator { get set }
 
