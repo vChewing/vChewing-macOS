@@ -6,26 +6,30 @@
 // marks, or product names of Contributor, except as required to fulfill notice
 // requirements defined in MIT License.
 
-import AppKit
-import AVFoundation
+#if canImport(AppKit)
 
-extension NSSound {
-  public static func buzz(fart: Bool = false) {
-    let filePath = Bundle.main.path(forResource: fart ? "Fart" : "Beep", ofType: "m4a")!
-    let fileURL = URL(fileURLWithPath: filePath)
-    var soundID: SystemSoundID = 0
-    AudioServicesCreateSystemSoundID(fileURL as CFURL, &soundID)
-    AudioServicesPlaySystemSound(soundID)
+  import AppKit
+  import AVFoundation
+
+  extension NSSound {
+    public static func buzz(fart: Bool = false) {
+      let filePath = Bundle.main.path(forResource: fart ? "Fart" : "Beep", ofType: "m4a")!
+      let fileURL = URL(fileURLWithPath: filePath)
+      var soundID: SystemSoundID = 0
+      AudioServicesCreateSystemSoundID(fileURL as CFURL, &soundID)
+      AudioServicesPlaySystemSound(soundID)
+    }
+
+    public static func buzz(fart: Bool = false, count: Int) {
+      if count <= 1 {
+        NSSound.buzz(fart: fart)
+        return
+      }
+      for _ in 0 ... count {
+        NSSound.buzz(fart: fart)
+        usleep(500_000)
+      }
+    }
   }
 
-  public static func buzz(fart: Bool = false, count: Int) {
-    if count <= 1 {
-      NSSound.buzz(fart: fart)
-      return
-    }
-    for _ in 0 ... count {
-      NSSound.buzz(fart: fart)
-      usleep(500_000)
-    }
-  }
-}
+#endif
