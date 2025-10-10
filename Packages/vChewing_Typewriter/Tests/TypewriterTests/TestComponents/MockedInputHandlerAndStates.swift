@@ -53,6 +53,15 @@ public struct MockIMEState: IMEStateProtocol {
   public var data: IMEStateData = .init()
   public var node: CandidateNode = .init(name: "")
 
+  // Additional properties required by protocol
+  public var displayedTextConverted: String {
+    data.displayedText
+  }
+
+  public var markedTargetIsCurrentlyFiltered: Bool {
+    false
+  }
+
   #if canImport(Darwin)
   public func attributedString(for session: IMKInputControllerProtocol) -> NSAttributedString {
     // Simplified implementation for testing
@@ -70,6 +79,63 @@ extension MockIMEState {
     data.displayTextSegments = displayTextSegments
     data.cursor = cursor
     data.marker = cursor
+  }
+
+  public static func ofDeactivated() -> MockIMEState { .init(type: .ofDeactivated) }
+  public static func ofEmpty() -> MockIMEState { .init(type: .ofEmpty) }
+  public static func ofAbortion() -> MockIMEState { .init(type: .ofAbortion) }
+
+  public static func ofCommitting(textToCommit: String) -> MockIMEState {
+    var result = MockIMEState(type: .ofCommitting)
+    result.textToCommit = textToCommit
+    return result
+  }
+
+  public static func ofAssociates(candidates: [(keyArray: [String], value: String)]) -> MockIMEState {
+    var result = MockIMEState(type: .ofAssociates)
+    result.candidates = candidates
+    return result
+  }
+
+  public static func ofInputting(
+    displayTextSegments: [String],
+    cursor: Int,
+    highlightAt highlightAtSegment: Int? = nil
+  ) -> MockIMEState {
+    var result = MockIMEState(displayTextSegments: displayTextSegments, cursor: cursor)
+    result.type = .ofInputting
+    if let readingAtSegment = highlightAtSegment {
+      result.data.highlightAtSegment = readingAtSegment
+    }
+    return result
+  }
+
+  public static func ofMarking(
+    displayTextSegments: [String],
+    markedReadings: [String],
+    cursor: Int,
+    marker: Int
+  ) -> MockIMEState {
+    var result = MockIMEState(displayTextSegments: displayTextSegments, cursor: cursor)
+    result.type = .ofMarking
+    result.data.marker = marker
+    result.data.markedReadings = markedReadings
+    return result
+  }
+
+  public static func ofCandidates(
+    candidates: [(keyArray: [String], value: String)],
+    displayTextSegments: [String],
+    cursor: Int
+  ) -> MockIMEState {
+    var result = MockIMEState(displayTextSegments: displayTextSegments, cursor: cursor)
+    result.type = .ofCandidates
+    result.data.candidates = candidates
+    return result
+  }
+
+  public static func ofSymbolTable(node: CandidateNode) -> MockIMEState {
+    .init(IMEStateData(), type: .ofSymbolTable, node: node)
   }
 }
 
@@ -139,7 +205,7 @@ public class MockInputHandler: InputHandlerProtocol {
 // MARK: - Mock Session
 
 /// Mock session implementation for testing
-public class MockSession: MockSessionProtocol {
+public class MockSession: SessionCoreProtocol, CtlCandidateDelegate {
   // MARK: Lifecycle
 
   public init() {
@@ -148,10 +214,54 @@ public class MockSession: MockSessionProtocol {
 
   // MARK: Public
 
+  public typealias State = MockIMEState
+  public typealias Handler = MockInputHandler
+
   public var state: MockIMEState = MockIMEState()
   public var inputHandler: MockInputHandler?
+  public var isASCIIMode: Bool = false
+  public var clientMitigationLevel: Int = 0
+  public var isVerticalTyping: Bool = false
+  public var isCandidateState: Bool { state.type == .ofCandidates }
+  public var showCodePointForCurrentCandidate: Bool = false
+  public var shouldAutoExpandCandidates: Bool = false
+  public var isCandidateContextMenuEnabled: Bool = false
+  public var showReverseLookupResult: Bool = false
+  public var selectionKeys: String = "123456789"
+
+  #if canImport(AppKit)
+  public var clientAccentColor: NSColor? = nil
+  #endif
 
   public func switchState(_ newState: MockIMEState) {
     state = newState
   }
+
+  public func updateCompositionBufferDisplay() {}
+
+  public func performUserPhraseOperation(addToFilter: Bool) -> Bool { false }
+
+  @discardableResult
+  public func updateVerticalTypingStatus() -> CGRect { .zero }
+
+  // MARK: - CtlCandidateDelegate conformance
+
+  public func candidateController() -> CtlCandidateProtocol? { nil }
+
+  public func candidatePairs(conv: Bool) -> [(keyArray: [String], value: String)] { [] }
+
+  public func candidatePairSelectionConfirmed(at index: Int) {}
+
+  public func candidatePairHighlightChanged(at index: Int) {}
+
+  public func candidatePairRightClicked(at index: Int, action: CandidateContextMenuAction) {}
+
+  public func candidateToolTip(shortened: Bool) -> String { "" }
+
+  public func resetCandidateWindowOrigin() {}
+
+  public func checkIsMacroTokenResult(_ index: Int) -> Bool { false }
+
+  @discardableResult
+  public func reverseLookup(for value: String) -> [String] { [] }
 }
