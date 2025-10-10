@@ -70,7 +70,7 @@ class FakeClient: NSObject, IMKTextInput {
   }
 
   func characterIndex(
-    for _: NSPoint,
+    for _: CGPoint,
     tracking _: IMKLocationToOffsetMappingMode,
     inMarkedRange _: UnsafeMutablePointer<ObjCBool>!
   )
@@ -80,7 +80,7 @@ class FakeClient: NSObject, IMKTextInput {
 
   func attributes(
     forCharacterIndex _: Int,
-    lineHeightRectangle _: UnsafeMutablePointer<NSRect>!
+    lineHeightRectangle _: UnsafeMutablePointer<CGRect>!
   )
     -> [AnyHashable: Any]! {
     [:]
@@ -128,7 +128,7 @@ class FakeClient: NSObject, IMKTextInput {
     return attributedString.attributedSubstring(from: usableRange).string
   }
 
-  func firstRect(forCharacterRange _: NSRange, actualRange _: NSRangePointer!) -> NSRect {
+  func firstRect(forCharacterRange _: NSRange, actualRange _: NSRangePointer!) -> CGRect {
     .zero
   }
 }

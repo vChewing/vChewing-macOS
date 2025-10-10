@@ -17,7 +17,7 @@ public protocol SessionCoreProtocol: AnyObject {
   func updateCompositionBufferDisplay()
   func performUserPhraseOperation(addToFilter: Bool) -> Bool
   @discardableResult
-  func updateVerticalTypingStatus() -> NSRect
+  func updateVerticalTypingStatus() -> CGRect
 
   /// 針對傳入的新狀態進行調度、且將當前會話控制器的狀態切換至新狀態。
   ///

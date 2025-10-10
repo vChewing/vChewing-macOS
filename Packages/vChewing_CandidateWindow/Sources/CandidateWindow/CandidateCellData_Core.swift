@@ -56,7 +56,7 @@ public class CandidateCellData: Hashable {
   public var locale = ""
   public var selectionKey: String
   public let displayedText: String
-  public private(set) var textDimension: NSSize
+  public private(set) var textDimension: CGSize
   public var segLength: Int
   public var isHighlighted: Bool = false
   public var whichLine: Int = 0

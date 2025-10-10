@@ -132,7 +132,7 @@ extension PrefUITabs {
     let matchedImage = NSImage(named: legacyName) ?? NSImage()
     let newImage = NSImage(size: matchedImage.size)
     newImage.lockFocus()
-    let imageRect = NSRect(origin: .zero, size: matchedImage.size)
+    let imageRect = CGRect(origin: .zero, size: matchedImage.size)
     matchedImage.draw(in: imageRect, from: imageRect, operation: .sourceOver, fraction: 0.85)
     newImage.unlockFocus()
     newImage.isTemplate = true
