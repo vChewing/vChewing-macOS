@@ -6,6 +6,7 @@
 // marks, or product names of Contributor, except as required to fulfill notice
 // requirements defined in MIT License.
 
+import CoreFoundation
 import Foundation
 
 #if canImport(OSLog)
@@ -15,18 +16,126 @@ import Foundation
 extension Process {
   public static func consoleLog<S: StringProtocol>(_ msg: S) {
     let msgStr = msg.description
-    if #available(macOS 26.0, *) {
-      #if canImport(OSLog)
-        let logger = Logger(subsystem: "vChewing", category: "Log")
-        logger.log(level: .default, "\(msgStr, privacy: .public)")
-        return
-      #else
-        break
-      #endif
+    #if canImport(Darwin)
+      if #available(macOS 26.0, *) {
+        #if canImport(OSLog)
+          let logger = Logger(subsystem: "vChewing", category: "Log")
+          logger.log(level: .default, "\(msgStr, privacy: .public)")
+          return
+        #endif
+      }
+
+      // 兼容旧系统
+      NSLog(msgStr)
+    #else
+      print(msgStr)
+    #endif
+  }
+}
+
+// MARK: - File Handle API Compatibility for macOS 10.15.3 and Earlier.
+
+#if canImport(Darwin)
+  @available(macOS, deprecated: 10.15.4)
+  extension FileHandle {
+    public func read(upToCount count: Int) throws -> Data? {
+      readData(ofLength: count)
     }
 
-    // 兼容旧系统
-    NSLog(msgStr)
+    public func readToEnd() throws -> Data? {
+      readDataToEndOfFile()
+    }
+  }
+#endif
+
+// MARK: - Real Home Dir for Sandboxed Apps
+
+extension FileManager {
+  public static let realHomeDir = URL(
+    fileURLWithPath: String(cString: getpwuid(getuid()).pointee.pw_dir),
+    isDirectory: true,
+    relativeTo: nil
+  )
+}
+
+// MARK: - Trash a file if it exists.
+
+#if canImport(Darwin)
+  extension FileManager {
+    @discardableResult
+    public static func trashTargetIfExists(_ path: String) -> Bool {
+      do {
+        if FileManager.default.fileExists(atPath: path) {
+          // 塞入垃圾桶
+          var resultingURL: NSURL?
+          try FileManager.default.trashItem(
+            at: URL(fileURLWithPath: path), resultingItemURL: &resultingURL
+          )
+        } else {
+          Process.consoleLog("Item doesn't exist: \(path)")
+        }
+      } catch let error as NSError {
+        Process.consoleLog("Failed from removing this object: \(path) || Error: \(error)")
+        return false
+      }
+      return true
+    }
+  }
+#endif
+
+// MARK: - Check whether current date is the given date.
+
+extension Date {
+  /// Check whether current date is the given date.
+  /// - Parameter dateDigits: `yyyyMMdd`, 8-digit integer. If only `MMdd`, then the year will be the current year.
+  /// - Returns: The result. Will return false if the given dateDigits is invalid.
+  public static func isTodayTheDate(from dateDigits: Int) -> Bool {
+    let currentYear = Self.currentYear
+    var dateDigits = dateDigits
+    let strDateDigits = dateDigits.description
+    switch strDateDigits.count {
+    case 3, 4: dateDigits = currentYear * 10_000 + dateDigits
+    case 8:
+      if let theHighest = strDateDigits.first, "12".contains(theHighest) { break }
+      return false
+    default: return false
+    }
+    let formatter = DateFormatter()
+    formatter.dateFormat = "yyyyMMdd"
+    var calendar = NSCalendar.current
+    calendar.timeZone = TimeZone.current
+    let components = calendar.dateComponents([.day, .month, .year], from: Date())
+    if let a = calendar.date(from: components), let b = formatter.date(
+      from: dateDigits.description
+    ),
+      a == b {
+      return true
+    }
+    return false
+  }
+
+  public static var currentYear: Int {
+    let formatter = DateFormatter()
+    formatter.dateFormat = "yyyy"
+    return Int(formatter.string(from: Date())) ?? 1_970
+  }
+}
+
+// MARK: - NSRange Extension
+
+extension NSRange {
+  public static var zero = NSRange(location: 0, length: 0)
+  public static var notFound = NSRange(location: NSNotFound, length: NSNotFound)
+}
+
+// MARK: - NSRect Extension
+
+extension NSRect {
+  public static var seniorTheBeast: NSRect {
+    var result = NSRect()
+    result.origin = .init(x: 0, y: 0)
+    result.size = .init(width: 0.114, height: 0.514)
+    return result
   }
 }
 
@@ -74,14 +183,9 @@ extension String {
 
 // MARK: - CharCode printability check for UniChar (CoreFoundation)
 
-// Ref: https://forums.swift.org/t/57085/5
-extension UniChar {
-  public var isPrintable: Bool {
-    guard Unicode.Scalar(UInt32(self)) != nil else {
-      struct NotAWholeScalar: Error {}
-      return false
-    }
-    return true
+extension UInt16 {
+  public var isPrintableUniChar: Bool {
+    Unicode.Scalar(UInt32(self)) != nil
   }
 
   public var isPrintableASCII: Bool {
@@ -177,7 +281,7 @@ extension BinaryInteger {
 // Refactored by: Isaac Xen
 
 extension String {
-  public func parsedAsHexLiteral(encoding: CFStringEncodings? = nil) -> String? {
+  public func parsedAsHexLiteral(encoding: UInt32? = nil) -> String? {
     guard !isEmpty else { return nil }
     var charBytes = [Int8]()
     var buffer: Int?
@@ -189,10 +293,13 @@ extension String {
         buffer = neta
       }
     }
-    let encodingUBE = CFStringBuiltInEncodings.UTF16BE.rawValue
-    let encodingRAW = encoding.map { UInt32($0.rawValue) } ?? encodingUBE
-    let result = CFStringCreateWithCString(nil, &charBytes, encodingRAW) as String?
-    return result?.isEmpty ?? true ? nil : result
+    let encodingUBE: UInt32 = 268_435_712 // CFStringBuiltInEncodings.UTF16BE
+    let encodingRAW = encoding ?? encodingUBE
+    guard let cfString = CFStringCreateWithCString(nil, &charBytes, encodingRAW) else {
+      return nil
+    }
+    let result = String(describing: cfString)
+    return result.isEmpty ? nil : result
   }
 }
 

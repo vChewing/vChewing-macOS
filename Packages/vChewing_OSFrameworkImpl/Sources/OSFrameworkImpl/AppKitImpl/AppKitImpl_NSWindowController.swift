@@ -6,77 +6,82 @@
 // marks, or product names of Contributor, except as required to fulfill notice
 // requirements defined in MIT License.
 
-import AppKit
 import SwiftExtension
 
-extension NSWindowController {
-  public func orderFront() {
-    window?.orderFront(self)
-  }
+#if canImport(AppKit)
 
-  /// 設定選字窗的顯示位置。
-  ///
-  /// 需注意：該函式會藉由設定選字窗左上角頂點的方式、使選字窗始終位於某個螢幕之內。
-  ///
-  /// - Parameters:
-  ///   - windowTopLeftPoint: 給定的視窗顯示位置。
-  ///   - heightDelta: 為了「防止選字窗抻出螢幕下方」而給定的預留高度。
-  public func set(
-    windowTopLeftPoint: NSPoint,
-    bottomOutOfScreenAdjustmentHeight heightDelta: Double,
-    useGCD: Bool
-  ) {
-    func doSet() {
-      guard let window = window, var screenFrame = NSScreen.main?.visibleFrame else { return }
-      let windowSize = window.frame.size
+  import AppKit
 
-      var adjustedPoint = windowTopLeftPoint
-      var delta = heightDelta
-      for frame in NSScreen.screens.map(\.visibleFrame)
-        .filter({ $0.contains(windowTopLeftPoint) }) {
-        screenFrame = frame
-        break
-      }
-
-      if delta > screenFrame.size.height / 2.0 { delta = 0.0 }
-
-      if adjustedPoint.y < screenFrame.minY + windowSize.height {
-        adjustedPoint.y = windowTopLeftPoint.y + windowSize.height + delta
-      }
-      adjustedPoint.y = min(adjustedPoint.y, screenFrame.maxY - 1.0)
-      adjustedPoint.x = min(
-        max(adjustedPoint.x, screenFrame.minX),
-        screenFrame.maxX - windowSize.width - 1.0
-      )
-
-      window.setFrameTopLeftPoint(adjustedPoint)
+  extension NSWindowController {
+    public func orderFront() {
+      window?.orderFront(self)
     }
 
-    if !useGCD { doSet() } else { asyncOnMain { doSet() } }
-  }
-}
+    /// 設定選字窗的顯示位置。
+    ///
+    /// 需注意：該函式會藉由設定選字窗左上角頂點的方式、使選字窗始終位於某個螢幕之內。
+    ///
+    /// - Parameters:
+    ///   - windowTopLeftPoint: 給定的視窗顯示位置。
+    ///   - heightDelta: 為了「防止選字窗抻出螢幕下方」而給定的預留高度。
+    public func set(
+      windowTopLeftPoint: NSPoint,
+      bottomOutOfScreenAdjustmentHeight heightDelta: Double,
+      useGCD: Bool
+    ) {
+      func doSet() {
+        guard let window = window, var screenFrame = NSScreen.main?.visibleFrame else { return }
+        let windowSize = window.frame.size
 
-extension NSWindow {
-  @discardableResult
-  public func callAlert(title: String, text: String? = nil) -> NSApplication
-    .ModalResponse {
-    (self as NSWindow?).callAlert(title: title, text: text)
-  }
-}
+        var adjustedPoint = windowTopLeftPoint
+        var delta = heightDelta
+        for frame in NSScreen.screens.map(\.visibleFrame)
+          .filter({ $0.contains(windowTopLeftPoint) }) {
+          screenFrame = frame
+          break
+        }
 
-extension NSWindow? {
-  @discardableResult
-  public func callAlert(title: String, text: String? = nil) -> NSApplication
-    .ModalResponse {
-    let alert = NSAlert()
-    alert.messageText = title
-    if let text = text { alert.informativeText = text }
-    alert.addButton(withTitle: NSLocalizedString("OK", comment: ""))
-    var result: NSApplication.ModalResponse = .alertFirstButtonReturn
-    guard let self = self else { return alert.runModal() }
-    alert.beginSheetModal(for: self) { theResponce in
-      result = theResponce
+        if delta > screenFrame.size.height / 2.0 { delta = 0.0 }
+
+        if adjustedPoint.y < screenFrame.minY + windowSize.height {
+          adjustedPoint.y = windowTopLeftPoint.y + windowSize.height + delta
+        }
+        adjustedPoint.y = min(adjustedPoint.y, screenFrame.maxY - 1.0)
+        adjustedPoint.x = min(
+          max(adjustedPoint.x, screenFrame.minX),
+          screenFrame.maxX - windowSize.width - 1.0
+        )
+
+        window.setFrameTopLeftPoint(adjustedPoint)
+      }
+
+      if !useGCD { doSet() } else { asyncOnMain { doSet() } }
     }
-    return result
   }
-}
+
+  extension NSWindow {
+    @discardableResult
+    public func callAlert(title: String, text: String? = nil) -> NSApplication
+      .ModalResponse {
+      (self as NSWindow?).callAlert(title: title, text: text)
+    }
+  }
+
+  extension NSWindow? {
+    @discardableResult
+    public func callAlert(title: String, text: String? = nil) -> NSApplication
+      .ModalResponse {
+      let alert = NSAlert()
+      alert.messageText = title
+      if let text = text { alert.informativeText = text }
+      alert.addButton(withTitle: NSLocalizedString("OK", comment: ""))
+      var result: NSApplication.ModalResponse = .alertFirstButtonReturn
+      guard let self = self else { return alert.runModal() }
+      alert.beginSheetModal(for: self) { theResponce in
+        result = theResponce
+      }
+      return result
+    }
+  }
+
+#endif
