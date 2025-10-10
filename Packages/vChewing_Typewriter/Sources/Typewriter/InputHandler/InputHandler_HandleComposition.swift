@@ -18,9 +18,9 @@ extension InputHandlerProtocol {
   func handleComposition(input: InputSignalProtocol) -> Bool? {
     // 不處理任何包含不可列印字元的訊號。
     #if canImport(Darwin)
-    let hardRequirementMet = !input.text.isEmpty && input.charCode.isPrintable
+      let hardRequirementMet = !input.text.isEmpty && input.charCode.isPrintable
     #else
-    let hardRequirementMet = !input.text.isEmpty
+      let hardRequirementMet = !input.text.isEmpty
     #endif
     switch currentTypingMethod {
     case .codePoint where hardRequirementMet:
@@ -65,12 +65,12 @@ extension InputHandlerProtocol {
       allowDuplicates: Bool = true
     ) {
       #if canImport(Darwin)
-      guard condition else { return }
-      let maybeKey = maybeKey ?? composer
-        .phonabetKeyForQuery(pronounceableOnly: prefs.acceptLeadingIntonations)
-      guard var keyToNarrate = maybeKey else { return }
-      if composer.intonation == Phonabet(" ") { keyToNarrate.append("ˉ") }
-      SpeechSputnik.shared.narrate(keyToNarrate, allowDuplicates: allowDuplicates)
+        guard condition else { return }
+        let maybeKey = maybeKey ?? composer
+          .phonabetKeyForQuery(pronounceableOnly: prefs.acceptLeadingIntonations)
+        guard var keyToNarrate = maybeKey else { return }
+        if composer.intonation == Phonabet(" ") { keyToNarrate.append("ˉ") }
+        SpeechSputnik.shared.narrate(keyToNarrate, allowDuplicates: allowDuplicates)
       #endif
     }
 
@@ -481,11 +481,11 @@ extension InputHandlerProtocol {
         return true
       }
       #if canImport(Darwin)
-      let parsedChar = "\(strCodePointBuffer)\(input.text)"
-        .parsedAsHexLiteral(encoding: IMEApp.currentInputMode.nonUTFEncoding)?.first?
-        .description
+        let parsedChar = "\(strCodePointBuffer)\(input.text)"
+          .parsedAsHexLiteral(encoding: IMEApp.currentInputMode.nonUTFEncoding)?.first?
+          .description
       #else
-      let parsedChar: String? = nil
+        let parsedChar: String? = nil
       #endif
       guard var char = parsedChar else {
         errorCallback?("D220B880：輸入的字碼沒有對應的字元。")
@@ -522,30 +522,30 @@ extension InputHandlerProtocol {
   /// - Returns: 將按鍵行為「是否有處理掉」藉由 SessionCtl 回報給 IMK。
   fileprivate func handleHaninKeyboardSymbolModeInput(input: InputSignalProtocol) -> Bool {
     #if !canImport(Darwin)
-    // Hanin keyboard symbol mode is not supported on non-Darwin platforms
-    return revolveTypingMethod(to: .vChewingFactory)
-    #else
-    guard let session = session, session.state.type != .ofDeactivated else { return false }
-    let charText = input.text.lowercased().applyingTransformFW2HW(reverse: false)
-    guard CandidateNode.mapHaninKeyboardSymbols.keys.contains(charText) else {
+      // Hanin keyboard symbol mode is not supported on non-Darwin platforms
       return revolveTypingMethod(to: .vChewingFactory)
-    }
-    guard charText.count == 1, let symbols = CandidateNode.queryHaninKeyboardSymbols(char: charText)
-    else {
-      errorCallback?("C1A760C7")
+    #else
+      guard let session = session, session.state.type != .ofDeactivated else { return false }
+      let charText = input.text.lowercased().applyingTransformFW2HW(reverse: false)
+      guard CandidateNode.mapHaninKeyboardSymbols.keys.contains(charText) else {
+        return revolveTypingMethod(to: .vChewingFactory)
+      }
+      guard charText.count == 1, let symbols = CandidateNode.queryHaninKeyboardSymbols(char: charText)
+      else {
+        errorCallback?("C1A760C7")
+        return true
+      }
+      // 得在這裡先 commit buffer，不然會導致「在摁 ESC 離開符號選單時會重複輸入上一次的組字區的內容」的不當行為。
+      let textToCommit = generateStateOfInputting(sansReading: true).displayedText
+      session.switchState(State.ofCommitting(textToCommit: textToCommit))
+      if symbols.members.count == 1 {
+        session
+          .switchState(State.ofCommitting(textToCommit: symbols.members.map(\.name).joined()))
+      } else {
+        session.switchState(State.ofSymbolTable(node: symbols))
+      }
+      currentTypingMethod = .vChewingFactory // 用完就關掉，但保持選字窗開啟，所以這裡不用呼叫 toggle 函式。
       return true
-    }
-    // 得在這裡先 commit buffer，不然會導致「在摁 ESC 離開符號選單時會重複輸入上一次的組字區的內容」的不當行為。
-    let textToCommit = generateStateOfInputting(sansReading: true).displayedText
-    session.switchState(State.ofCommitting(textToCommit: textToCommit))
-    if symbols.members.count == 1 {
-      session
-        .switchState(State.ofCommitting(textToCommit: symbols.members.map(\.name).joined()))
-    } else {
-      session.switchState(State.ofSymbolTable(node: symbols))
-    }
-    currentTypingMethod = .vChewingFactory // 用完就關掉，但保持選字窗開啟，所以這裡不用呼叫 toggle 函式。
-    return true
     #endif
   }
 }

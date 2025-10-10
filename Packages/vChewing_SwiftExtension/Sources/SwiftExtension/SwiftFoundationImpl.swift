@@ -16,18 +16,18 @@ extension Process {
   public static func consoleLog<S: StringProtocol>(_ msg: S) {
     let msgStr = msg.description
     #if canImport(Darwin)
-    if #available(macOS 26.0, *) {
-      #if canImport(OSLog)
-        let logger = Logger(subsystem: "vChewing", category: "Log")
-        logger.log(level: .default, "\(msgStr, privacy: .public)")
-        return
-      #endif
-    }
+      if #available(macOS 26.0, *) {
+        #if canImport(OSLog)
+          let logger = Logger(subsystem: "vChewing", category: "Log")
+          logger.log(level: .default, "\(msgStr, privacy: .public)")
+          return
+        #endif
+      }
 
-    // 兼容旧系统
-    NSLog(msgStr)
+      // 兼容旧系统
+      NSLog(msgStr)
     #else
-    print(msgStr)
+      print(msgStr)
     #endif
   }
 }
@@ -45,26 +45,26 @@ extension FileManager {
 // MARK: - Trash a file if it exists.
 
 #if canImport(Darwin)
-extension FileManager {
-  @discardableResult
-  public static func trashTargetIfExists(_ path: String) -> Bool {
-    do {
-      if FileManager.default.fileExists(atPath: path) {
-        // 塞入垃圾桶
-        var resultingURL: NSURL?
-        try FileManager.default.trashItem(
-          at: URL(fileURLWithPath: path), resultingItemURL: &resultingURL
-        )
-      } else {
-        Process.consoleLog("Item doesn't exist: \(path)")
+  extension FileManager {
+    @discardableResult
+    public static func trashTargetIfExists(_ path: String) -> Bool {
+      do {
+        if FileManager.default.fileExists(atPath: path) {
+          // 塞入垃圾桶
+          var resultingURL: NSURL?
+          try FileManager.default.trashItem(
+            at: URL(fileURLWithPath: path), resultingItemURL: &resultingURL
+          )
+        } else {
+          Process.consoleLog("Item doesn't exist: \(path)")
+        }
+      } catch let error as NSError {
+        Process.consoleLog("Failed from removing this object: \(path) || Error: \(error)")
+        return false
       }
-    } catch let error as NSError {
-      Process.consoleLog("Failed from removing this object: \(path) || Error: \(error)")
-      return false
+      return true
     }
-    return true
   }
-}
 #endif
 
 // MARK: - Check whether current date is the given date.
@@ -168,20 +168,20 @@ extension String {
 // MARK: - CharCode printability check for UniChar (CoreFoundation)
 
 #if canImport(Darwin)
-// Ref: https://forums.swift.org/t/57085/5
-extension UniChar {
-  public var isPrintable: Bool {
-    guard Unicode.Scalar(UInt32(self)) != nil else {
-      struct NotAWholeScalar: Error {}
-      return false
+  // Ref: https://forums.swift.org/t/57085/5
+  extension UniChar {
+    public var isPrintable: Bool {
+      guard Unicode.Scalar(UInt32(self)) != nil else {
+        struct NotAWholeScalar: Error {}
+        return false
+      }
+      return true
     }
-    return true
-  }
 
-  public var isPrintableASCII: Bool {
-    (32 ... 126).contains(self)
+    public var isPrintableASCII: Bool {
+      (32 ... 126).contains(self)
+    }
   }
-}
 #endif
 
 // MARK: - User Defaults Storage
@@ -273,23 +273,23 @@ extension BinaryInteger {
 
 extension String {
   #if canImport(Darwin)
-  public func parsedAsHexLiteral(encoding: CFStringEncodings? = nil) -> String? {
-    guard !isEmpty else { return nil }
-    var charBytes = [Int8]()
-    var buffer: Int?
-    compactMap(\.hexDigitValue).forEach { neta in
-      if let validBuffer = buffer {
-        charBytes.append(.init(bitPattern: UInt8(validBuffer << 4 + neta)))
-        buffer = nil
-      } else {
-        buffer = neta
+    public func parsedAsHexLiteral(encoding: CFStringEncodings? = nil) -> String? {
+      guard !isEmpty else { return nil }
+      var charBytes = [Int8]()
+      var buffer: Int?
+      compactMap(\.hexDigitValue).forEach { neta in
+        if let validBuffer = buffer {
+          charBytes.append(.init(bitPattern: UInt8(validBuffer << 4 + neta)))
+          buffer = nil
+        } else {
+          buffer = neta
+        }
       }
+      let encodingUBE = CFStringBuiltInEncodings.UTF16BE.rawValue
+      let encodingRAW = encoding.map { UInt32($0.rawValue) } ?? encodingUBE
+      let result = CFStringCreateWithCString(nil, &charBytes, encodingRAW) as String?
+      return result?.isEmpty ?? true ? nil : result
     }
-    let encodingUBE = CFStringBuiltInEncodings.UTF16BE.rawValue
-    let encodingRAW = encoding.map { UInt32($0.rawValue) } ?? encodingUBE
-    let result = CFStringCreateWithCString(nil, &charBytes, encodingRAW) as String?
-    return result?.isEmpty ?? true ? nil : result
-  }
   #endif
 }
 

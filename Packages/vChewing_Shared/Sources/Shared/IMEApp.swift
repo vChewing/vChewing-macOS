@@ -27,41 +27,41 @@ public enum IMEApp {
 
   public static let appMainVersionLabel: [String] = {
     #if canImport(Darwin)
-    guard let intBuild = Bundle.main.infoDictionary?[kCFBundleVersionKey as String] as? String,
-          let strVer = Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String
-    else {
-      return ["1.14.514", "19190810"]
-    }
+      guard let intBuild = Bundle.main.infoDictionary?[kCFBundleVersionKey as String] as? String,
+            let strVer = Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String
+      else {
+        return ["1.14.514", "19190810"]
+      }
 
-    return [strVer, intBuild]
+      return [strVer, intBuild]
     #else
-    return ["1.14.514", "19190810"]
+      return ["1.14.514", "19190810"]
     #endif
   }()
 
   public static let appSignedDateLabel: String = {
     #if canImport(Darwin)
-    let maybeDateModified: Date? = {
-      guard let executableURL = Bundle.main.executableURL,
-            let infoDate = (
-              try? executableURL
-                .resourceValues(forKeys: [.contentModificationDateKey])
-            )?.contentModificationDate
-      else {
-        return nil
-      }
-      return infoDate
-    }()
+      let maybeDateModified: Date? = {
+        guard let executableURL = Bundle.main.executableURL,
+              let infoDate = (
+                try? executableURL
+                  .resourceValues(forKeys: [.contentModificationDateKey])
+              )?.contentModificationDate
+        else {
+          return nil
+        }
+        return infoDate
+      }()
 
-    if let theDate = Bundle.main.getCodeSignedDate() {
-      return theDate.stringTag
-    } else if let theDate = maybeDateModified {
-      return "\(theDate.stringTag) Unsigned"
-    } else {
-      return "Unsigned"
-    }
+      if let theDate = Bundle.main.getCodeSignedDate() {
+        return theDate.stringTag
+      } else if let theDate = maybeDateModified {
+        return "\(theDate.stringTag) Unsigned"
+      } else {
+        return "Unsigned"
+      }
     #else
-    return "Unsigned"
+      return "Unsigned"
     #endif
   }()
 

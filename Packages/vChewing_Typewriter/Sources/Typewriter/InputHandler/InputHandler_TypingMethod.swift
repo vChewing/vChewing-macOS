@@ -32,9 +32,9 @@ public enum TypingMethod: Int, CaseIterable {
       let commonTerm = NSMutableString(capacity: 0)
       commonTerm.insert("Code Point Input.".localized, at: 0)
       #if canImport(Darwin)
-      if !vertical, let initials = IMEApp.currentInputMode.nonUTFEncodingInitials {
-        commonTerm.insert("[\(initials)] ", at: 0)
-      }
+        if !vertical, let initials = IMEApp.currentInputMode.nonUTFEncodingInitials {
+          commonTerm.insert("[\(initials)] ", at: 0)
+        }
       #endif
       return commonTerm.description
     case .haninKeyboardSymbol:

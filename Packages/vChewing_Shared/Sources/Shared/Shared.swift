@@ -267,13 +267,13 @@ public enum Shared {
     }
 
     #if canImport(Darwin)
-    public var nonUTFEncoding: CFStringEncodings? {
-      switch self {
-      case .imeModeCHS: return .GB_18030_2000
-      case .imeModeCHT: return .big5_HKSCS_1999
-      default: return nil
+      public var nonUTFEncoding: CFStringEncodings? {
+        switch self {
+        case .imeModeCHS: return .GB_18030_2000
+        case .imeModeCHT: return .big5_HKSCS_1999
+        default: return nil
+        }
       }
-    }
     #endif
 
     public var nonUTFEncodingInitials: String? {

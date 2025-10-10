@@ -15,14 +15,14 @@ import Tekkon
 import XCTest
 
 #if canImport(AppKit)
-import AppKit
+  import AppKit
 #endif
 
 #if canImport(InputMethodKit)
-import InputMethodKit
+  import InputMethodKit
 #endif
 
-// MARK: - Mock IMEState
+// MARK: - MockIMEState
 
 /// Mock implementation of IMEState for testing purposes
 public struct MockIMEState: IMEStateProtocol {
@@ -63,10 +63,10 @@ public struct MockIMEState: IMEStateProtocol {
   }
 
   #if canImport(Darwin)
-  public func attributedString(for session: IMKInputControllerProtocol) -> NSAttributedString {
-    // Simplified implementation for testing
-    return NSAttributedString(string: data.displayedText)
-  }
+    public func attributedString(for session: IMKInputControllerProtocol) -> NSAttributedString {
+      // Simplified implementation for testing
+      NSAttributedString(string: data.displayedText)
+    }
   #endif
 }
 
@@ -101,7 +101,8 @@ extension MockIMEState {
     displayTextSegments: [String],
     cursor: Int,
     highlightAt highlightAtSegment: Int? = nil
-  ) -> MockIMEState {
+  )
+    -> MockIMEState {
     var result = MockIMEState(displayTextSegments: displayTextSegments, cursor: cursor)
     result.type = .ofInputting
     if let readingAtSegment = highlightAtSegment {
@@ -115,7 +116,8 @@ extension MockIMEState {
     markedReadings: [String],
     cursor: Int,
     marker: Int
-  ) -> MockIMEState {
+  )
+    -> MockIMEState {
     var result = MockIMEState(displayTextSegments: displayTextSegments, cursor: cursor)
     result.type = .ofMarking
     result.data.marker = marker
@@ -127,7 +129,8 @@ extension MockIMEState {
     candidates: [(keyArray: [String], value: String)],
     displayTextSegments: [String],
     cursor: Int
-  ) -> MockIMEState {
+  )
+    -> MockIMEState {
     var result = MockIMEState(displayTextSegments: displayTextSegments, cursor: cursor)
     result.type = .ofCandidates
     result.data.candidates = candidates
@@ -139,7 +142,7 @@ extension MockIMEState {
   }
 }
 
-// MARK: - Mock Session Protocol
+// MARK: - MockSessionProtocol
 
 /// Mock session protocol for testing
 public protocol MockSessionProtocol: AnyObject {
@@ -147,7 +150,7 @@ public protocol MockSessionProtocol: AnyObject {
   func switchState(_ newState: MockIMEState)
 }
 
-// MARK: - Mock InputHandler
+// MARK: - MockInputHandler
 
 /// Mock implementation of InputHandler for testing purposes
 public class MockInputHandler: InputHandlerProtocol {
@@ -168,7 +171,7 @@ public class MockInputHandler: InputHandlerProtocol {
     self.notificationCallback = notificationCallback
     self.filterabilityChecker = filterabilityChecker
     self.assembler = Assembler(with: currentLM, separator: "-")
-    self.assembler.maxSegLength = prefs.maxCandidateLength
+    assembler.maxSegLength = prefs.maxCandidateLength
     ensureKeyboardParser()
   }
 
@@ -202,7 +205,7 @@ public class MockInputHandler: InputHandlerProtocol {
   }
 }
 
-// MARK: - Mock Session
+// MARK: - MockSession
 
 /// Mock session implementation for testing
 public class MockSession: SessionCoreProtocol, CtlCandidateDelegate {
@@ -217,21 +220,21 @@ public class MockSession: SessionCoreProtocol, CtlCandidateDelegate {
   public typealias State = MockIMEState
   public typealias Handler = MockInputHandler
 
-  public var state: MockIMEState = MockIMEState()
+  public var state: MockIMEState = .init()
   public var inputHandler: MockInputHandler?
   public var isASCIIMode: Bool = false
   public var clientMitigationLevel: Int = 0
   public var isVerticalTyping: Bool = false
-  public var isCandidateState: Bool { state.type == .ofCandidates }
   public var showCodePointForCurrentCandidate: Bool = false
   public var shouldAutoExpandCandidates: Bool = false
   public var isCandidateContextMenuEnabled: Bool = false
   public var showReverseLookupResult: Bool = false
   public var selectionKeys: String = "123456789"
-
   #if canImport(AppKit)
-  public var clientAccentColor: NSColor? = nil
+    public var clientAccentColor: NSColor?
   #endif
+
+  public var isCandidateState: Bool { state.type == .ofCandidates }
 
   public func switchState(_ newState: MockIMEState) {
     state = newState

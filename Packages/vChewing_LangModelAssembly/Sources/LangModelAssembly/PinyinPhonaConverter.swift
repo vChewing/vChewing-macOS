@@ -37,13 +37,13 @@ extension String {
 extension String {
   fileprivate var isNotPureAlphanumerical: Bool {
     #if canImport(Darwin)
-    let regex = ".*[^A-Za-z0-9].*"
-    let testString = NSPredicate(format: "SELF MATCHES %@", regex)
-    return testString.evaluate(with: self)
+      let regex = ".*[^A-Za-z0-9].*"
+      let testString = NSPredicate(format: "SELF MATCHES %@", regex)
+      return testString.evaluate(with: self)
     #else
-    // 在非 Darwin 平台上使用正則表達式
-    let pattern = ".*[^A-Za-z0-9].*"
-    return range(of: pattern, options: .regularExpression) != nil
+      // 在非 Darwin 平台上使用正則表達式
+      let pattern = ".*[^A-Za-z0-9].*"
+      return range(of: pattern, options: .regularExpression) != nil
     #endif
   }
 }

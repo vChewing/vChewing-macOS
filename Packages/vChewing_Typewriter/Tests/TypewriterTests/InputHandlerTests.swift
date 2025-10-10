@@ -20,8 +20,6 @@ func vCTestLog(_ str: String) {
 
 /// 威注音輸入法的 InputHandler 單元測試（Typewriter 模組）
 class InputHandlerTests: XCTestCase {
-  // MARK: - Properties
-
   var testLM: LMAssembly.LMInstantiator!
   var testHandler: MockInputHandler!
   var testSession: MockSession!
@@ -76,44 +74,44 @@ class InputHandlerTests: XCTestCase {
   /// 測試 InputHandler 基本初始化。
   func test101_InputHandler_Initialization() throws {
     vCTestLog("測試 InputHandler 初始化")
-    
+
     // 測試基本初始化
     XCTAssertNotNil(testHandler)
     XCTAssertNotNil(testHandler.composer)
     XCTAssertNotNil(testHandler.assembler)
     XCTAssertTrue(testHandler.assembler.isEmpty)
-    
+
     vCTestLog("InputHandler 初始化成功")
   }
 
   /// 測試注拼槽基本功能。
   func test103_InputHandler_ComposerBasics() throws {
     vCTestLog("測試注拼槽基本功能")
-    
+
     testHandler.clear()
     XCTAssertTrue(testHandler.composer.isEmpty)
-    
+
     // 測試接收單個按鍵
     testHandler.composer.receiveKey(fromString: "e")
     XCTAssertFalse(testHandler.composer.isEmpty)
-    
+
     testHandler.clear()
     XCTAssertTrue(testHandler.composer.isEmpty)
-    
+
     vCTestLog("成功完成注拼槽基本功能測試")
   }
 
   /// 測試組字器基本功能。
   func test106_InputHandler_AssemblerBasics() throws {
     vCTestLog("測試組字器基本功能")
-    
+
     testHandler.clear()
     XCTAssertTrue(testHandler.assembler.isEmpty)
-    
+
     // 測試組字器的基本屬性
     XCTAssertEqual(testHandler.assembler.cursor, 0)
     XCTAssertEqual(testHandler.assembler.length, 0)
-    
+
     vCTestLog("成功完成組字器基本功能測試")
   }
 }

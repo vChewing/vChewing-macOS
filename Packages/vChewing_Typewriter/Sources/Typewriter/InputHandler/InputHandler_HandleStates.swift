@@ -999,7 +999,7 @@ extension InputHandlerProtocol {
     /// 不使用「insertText:replacementRange:」。
     /// 某些應用無法正常處理非 ASCII 字符的輸入。
     #if canImport(Darwin)
-    if input.isASCII, !input.charCode.isPrintableASCII { return false }
+      if input.isASCII, !input.charCode.isPrintableASCII { return false }
     #endif
 
     // 將整個組字區的內容遞交給客體應用。
