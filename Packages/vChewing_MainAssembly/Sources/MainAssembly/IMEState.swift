@@ -40,26 +40,6 @@ public struct IMEState: IMEStateProtocol {
     self.type = type
   }
 
-  /// 內部專用初期化函式，僅用於生成「有輸入內容」的狀態。
-  /// - Parameters:
-  ///   - displayTextSegments: 用以顯示的文本的字詞字串陣列，其中包含正在輸入的讀音或字根。
-  ///   - cursor: 要顯示的游標（UTF8）。
-  fileprivate init(displayTextSegments: [String], cursor: Int) {
-    // 注意資料的設定順序，一定得先設定 displayTextSegments。
-    data.displayTextSegments = displayTextSegments.map {
-      if !InputSession.isVerticalTyping { return $0 }
-      guard PrefMgr().hardenVerticalPunctuations else { return $0 }
-      var neta = $0
-      ChineseConverter.hardenVerticalPunctuations(
-        target: &neta,
-        convert: InputSession.isVerticalTyping
-      )
-      return neta
-    }
-    data.cursor = cursor
-    data.marker = cursor
-  }
-
   /// 泛用初期化函式。
   /// - Parameters:
   ///   - data: 資料載體。
@@ -85,7 +65,28 @@ public struct IMEState: IMEStateProtocol {
 
 // MARK: - 針對不同的狀態，規定不同的構造器
 
-extension IMEState {
+extension IMEStateProtocol {
+  /// 內部專用初期化函式，僅用於生成「有輸入內容」的狀態。
+  /// - Parameters:
+  ///   - displayTextSegments: 用以顯示的文本的字詞字串陣列，其中包含正在輸入的讀音或字根。
+  ///   - cursor: 要顯示的游標（UTF8）。
+  fileprivate init(displayTextSegments: [String], cursor: Int) {
+    self.init(.init(), type: .ofEmpty)
+    // 注意資料的設定順序，一定得先設定 displayTextSegments。
+    data.displayTextSegments = displayTextSegments.map {
+      if !InputSession.isVerticalTyping { return $0 }
+      guard PrefMgr().hardenVerticalPunctuations else { return $0 }
+      var neta = $0
+      ChineseConverter.hardenVerticalPunctuations(
+        target: &neta,
+        convert: InputSession.isVerticalTyping
+      )
+      return neta
+    }
+    data.cursor = cursor
+    data.marker = cursor
+  }
+
   public static func ofDeactivated() -> IMEState { .init(type: .ofDeactivated) }
   public static func ofEmpty() -> IMEState { .init(type: .ofEmpty) }
   public static func ofAbortion() -> IMEState { .init(type: .ofAbortion) }
@@ -150,59 +151,15 @@ extension IMEState {
   }
 
   public static func ofSymbolTable(node: CandidateNode) -> IMEState {
-    var result = Self(IMEStateData(), node: node)
-    result.type = .ofSymbolTable
-    return result
+    .init(IMEStateData(), type: .ofSymbolTable, node: node)
   }
 }
 
 // MARK: - 規定一個狀態該怎樣返回自己的資料值
 
-extension IMEState {
-  public var isFilterable: Bool { data.isFilterable }
+extension IMEStateProtocol {
   public var markedTargetIsCurrentlyFiltered: Bool { data.markedTargetIsCurrentlyFiltered }
-  public var isMarkedLengthValid: Bool { data.isMarkedLengthValid }
-  public var displayedText: String { data.displayedText }
   public var displayedTextConverted: String { data.displayedTextConverted }
-  public var displayTextSegments: [String] { data.displayTextSegments }
-  public var markedRange: Range<Int> { data.markedRange }
-  public var u16MarkedRange: Range<Int> { data.u16MarkedRange }
-  public var u16Cursor: Int { data.u16Cursor }
-
-  public var cursor: Int {
-    get { data.cursor }
-    set { data.cursor = newValue }
-  }
-
-  public var marker: Int {
-    get { data.marker }
-    set { data.marker = newValue }
-  }
-
-  public var convertedToInputting: Self {
-    if type == .ofInputting { return self }
-    var result = Self.ofInputting(
-      displayTextSegments: data.displayTextSegments,
-      cursor: data.cursor
-    )
-    result.tooltip = data.tooltipBackupForInputting
-    return result
-  }
-
-  public var candidates: [(keyArray: [String], value: String)] {
-    get { data.candidates }
-    set { data.candidates = newValue }
-  }
-
-  public var textToCommit: String {
-    get { data.textToCommit }
-    set { data.textToCommit = newValue }
-  }
-
-  public var tooltip: String {
-    get { data.tooltip }
-    set { data.tooltip = newValue }
-  }
 
   public func attributedString(for session: IMKInputControllerProtocol) -> NSAttributedString {
     switch type {
@@ -216,31 +173,5 @@ extension IMEState {
     default: break
     }
     return data.attributedStringNormal(for: session)
-  }
-
-  /// 該參數僅用作輔助判斷。在 InputHandler 內使用的話，必須再檢查 !compositor.isEmpty。
-  public var hasComposition: Bool {
-    switch type {
-    case .ofCandidates, .ofInputting, .ofMarking: return true
-    default: return false
-    }
-  }
-
-  public var isCandidateContainer: Bool {
-    switch type {
-    case .ofSymbolTable: return !node.members.isEmpty
-    case .ofAssociates, .ofCandidates, .ofInputting: return !candidates.isEmpty
-    default: return false
-    }
-  }
-
-  public var tooltipBackupForInputting: String {
-    get { data.tooltipBackupForInputting }
-    set { data.tooltipBackupForInputting = newValue }
-  }
-
-  public var tooltipDuration: Double {
-    get { type == .ofMarking ? 0 : data.tooltipDuration }
-    set { data.tooltipDuration = newValue }
   }
 }
