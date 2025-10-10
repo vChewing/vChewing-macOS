@@ -17,8 +17,7 @@ import Tekkon
 /// 該檔案乃輸入調度模組的核心部分，主要承接型別初期化內容、協定內容、以及
 /// 被封裝的「與 Megrez 組字引擎和 Tekkon 注拼引擎對接的」各種工具函式。
 /// 注意：不要把 composer 注拼槽與 compositor 組字器這兩個概念搞混。
-public protocol InputHandlerProtocol: AnyObject {
-  typealias Session = SessionCoreProtocol & CtlCandidateDelegate
+public protocol InputHandlerProtocol: AnyObject, InputHandlerCoreProtocol {
   typealias Composer = Tekkon.Composer
   typealias Assembler = Megrez.Compositor
   typealias KeyValuePaired = Megrez.KeyValuePaired
@@ -133,7 +132,8 @@ extension InputHandlerProtocol {
     // 先嘗試用 POM 建議覆寫（如果有完全匹配的記憶）。
     let pomSuggestion = retrievePOMSuggestions(apply: false)
       .first(where: {
-        $0.0 == theCandidate.keyArray.joined(separator: assembler.separator) && $0.1.value == theCandidate.value
+        $0.0 == theCandidate.keyArray.joined(separator: assembler.separator)
+          && $0.1.value == theCandidate.value
       })
     var overrideTaskResult = false
     if pomSuggestion != nil {

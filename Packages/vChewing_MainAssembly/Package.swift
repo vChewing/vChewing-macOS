@@ -31,6 +31,7 @@ let package = Package(
     .package(path: "../vChewing_Shared"),
     .package(path: "../vChewing_SwiftExtension"),
     .package(path: "../vChewing_Tekkon"),
+    .package(path: "../vChewing_Typewriter"),
     .package(path: "../vChewing_TooltipUI"),
     .package(path: "../vChewing_Uninstaller"),
     .package(path: "../vChewing_UpdateSputnik"),
@@ -57,6 +58,7 @@ let package = Package(
         .product(name: "SwiftExtension", package: "vChewing_SwiftExtension"),
         .product(name: "SwiftyCapsLockToggler", package: "HangarRash_SwiftyCapsLockToggler"),
         .product(name: "Tekkon", package: "vChewing_Tekkon"),
+        .product(name: "Typewriter", package: "vChewing_Typewriter"),
         .product(name: "TooltipUI", package: "vChewing_TooltipUI"),
         .product(name: "Uninstaller", package: "vChewing_Uninstaller"),
         .product(name: "UpdateSputnik", package: "vChewing_UpdateSputnik"),
@@ -67,7 +69,10 @@ let package = Package(
     ),
     .testTarget(
       name: "MainAssemblyTests",
-      dependencies: ["MainAssembly"]
+      dependencies: [
+        "MainAssembly",
+        .product(name: "Typewriter", package: "vChewing_Typewriter"),
+      ]
     ),
   ]
 )

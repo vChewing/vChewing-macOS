@@ -77,7 +77,7 @@ extension SessionProtocol {
 
     // 如果是 deactivated 狀態的話，強制糾正其為 empty()。
     if state.type == .ofDeactivated {
-      state = IMEState.ofEmpty()
+      state = .ofEmpty()
       return handleKeyDown(event: event)
     }
 
@@ -123,7 +123,7 @@ extension SessionProtocol {
     /// 除非核心辭典有載入，否則一律蜂鳴。
     if !LMMgr.isCoreDBConnected {
       if (event as InputSignalProtocol).isReservedKey { return false }
-      var newState: IMEStateProtocol = IMEState.ofEmpty()
+      var newState: State = .ofEmpty()
       newState.tooltip = NSLocalizedString("Factory dictionary not loaded yet.", comment: "")
       newState.tooltipDuration = 1.85
       newState.data.tooltipColorState = .redAlert
@@ -184,7 +184,7 @@ extension SessionProtocol {
 
       // 將 Apple 動態鍵盤佈局的 RAW 輸出轉為 ABC 輸出，除非轉換結果與轉換前的內容一致。
       if IMKHelper.isDynamicBasicKeyboardLayoutEnabled, event.text != eventToDeal.text {
-        switchState(IMEState.ofCommitting(textToCommit: eventToDeal.text))
+        switchState(.ofCommitting(textToCommit: eventToDeal.text))
         return true
       }
     }

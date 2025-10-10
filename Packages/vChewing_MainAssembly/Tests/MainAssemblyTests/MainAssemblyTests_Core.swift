@@ -110,9 +110,10 @@ class MainAssemblyTests: XCTestCase {
   }
 
   func typeSentenceOrCandidates(_ sequence: String) {
+    let isCandidateContainer = testSession.state.isCandidateContainer
+    let stateType = testSession.state.type
     if !(
-      [.ofEmpty, .ofInputting].contains(testSession.state.type) || testSession.state
-        .isCandidateContainer
+      [.ofEmpty, .ofInputting].contains(stateType) || isCandidateContainer
     ) { return }
     let typingSequence: [NSEvent] = sequence.compactMap { charRAW in
       var finalArray = [NSEvent]()

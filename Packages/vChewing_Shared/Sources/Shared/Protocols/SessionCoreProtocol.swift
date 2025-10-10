@@ -11,7 +11,10 @@ import Foundation
 // MARK: - SessionCoreProtocol
 
 public protocol SessionCoreProtocol: AnyObject {
-  var state: IMEStateProtocol { get set } // Has DidSet.
+  associatedtype State: IMEStateProtocol
+  associatedtype Handler: InputHandlerCoreProtocol
+    where Handler.State == Handler.Session.State, Handler.State == State
+  var state: State { get set } // Has DidSet.
   var isASCIIMode: Bool { get }
   var clientMitigationLevel: Int { get }
   func updateCompositionBufferDisplay()
@@ -29,5 +32,13 @@ public protocol SessionCoreProtocol: AnyObject {
   /// 不必要的互相干涉、打斷彼此的工作。
   /// - Note: 本來不用這麼複雜的，奈何 Swift Protocol 不允許給參數指定預設值。
   /// - Parameter newState: 新狀態。
-  func switchState(_ newState: IMEStateProtocol)
+  func switchState(_ newState: State)
+}
+
+// MARK: - InputHandlerCoreProtocol
+
+public protocol InputHandlerCoreProtocol: AnyObject {
+  associatedtype State: IMEStateProtocol
+  associatedtype Session: SessionCoreProtocol & CtlCandidateDelegate
+    where Session.State == Session.Handler.State, Session.State == State
 }

@@ -24,7 +24,7 @@ extension SessionProtocol {
   /// 不必要的互相干涉、打斷彼此的工作。
   /// - Note: 本來不用這麼複雜的，奈何 Swift Protocol 不允許給參數指定預設值。
   /// - Parameter newState: 新狀態。
-  public func switchState(_ newState: IMEStateProtocol) {
+  public func switchState(_ newState: State) {
     handle(state: newState, replace: true)
   }
 
@@ -39,7 +39,7 @@ extension SessionProtocol {
   /// - Parameters:
   ///   - newState: 新狀態。
   ///   - replace: 是否取代現有狀態。
-  public func handle(state newState: IMEStateProtocol, replace: Bool) {
+  public func handle(state newState: State, replace: Bool) {
     var previous = state
     if replace {
       var newState = newState
@@ -59,9 +59,6 @@ extension SessionProtocol {
     switch newState.type {
     case .ofDeactivated:
       // 這裡移除一些處理，轉而交給 commitComposition() 代為執行。
-      // 這裡不需要 clearInlineDisplay() ，否則會觸發無限迴圈。
-      // 對於 IMK 選字窗的顯示狀態糾正的行為交給 inputMode.didSet() 來處理。
-      // 此處的 hidePalettes() 僅適合由新的 Session 來呼叫，否則可能會干擾到新的 Session。
       inputHandler?.clear()
       if ![.ofAbortion, .ofEmpty].contains(previous.type), !previous.displayedText.isEmpty {
         clearInlineDisplay()
@@ -69,11 +66,11 @@ extension SessionProtocol {
     case .ofAbortion, .ofCommitting, .ofEmpty:
       innerCircle: switch newState.type {
       case .ofAbortion:
-        previous = IMEState.ofEmpty()
+        previous = .ofEmpty()
         if replace { state = previous }
       case .ofCommitting:
         commit(text: newState.textToCommit)
-        if replace { state = IMEState.ofEmpty() }
+        if replace { state = .ofEmpty() }
       default: break innerCircle
       }
       candidateUI?.visible = false

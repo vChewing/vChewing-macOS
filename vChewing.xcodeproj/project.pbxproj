@@ -90,6 +90,7 @@
 		5B09307928B6FC3F0021F8C5 /* zh-Hans */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.html; lineEnding = 0; name = "zh-Hans"; path = "zh-Hans.lproj/shortcuts.html"; sourceTree = "<group>"; };
 		5B09307A28B6FC400021F8C5 /* en */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.html; lineEnding = 0; name = en; path = en.lproj/shortcuts.html; sourceTree = "<group>"; };
 		5B09307B28B6FC410021F8C5 /* ja */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.html; lineEnding = 0; name = ja; path = ja.lproj/shortcuts.html; sourceTree = "<group>"; };
+		5B09A5172E9957F3002C2EC3 /* vChewing_Typewriter */ = {isa = PBXFileReference; lastKnownFileType = wrapper; name = vChewing_Typewriter; path = Packages/vChewing_Typewriter; sourceTree = "<group>"; };
 		5B18BA6F27C7BD8B0056EB19 /* LICENSE-CHS.txt */ = {isa = PBXFileReference; lastKnownFileType = text; path = "LICENSE-CHS.txt"; sourceTree = "<group>"; };
 		5B18BA7027C7BD8B0056EB19 /* Makefile */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.make; path = Makefile; sourceTree = "<group>"; };
 		5B18BA7127C7BD8B0056EB19 /* README-CHS.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = "README-CHS.md"; sourceTree = "<group>"; };
@@ -349,6 +350,7 @@
 				5B963CA128D5C22D00DCEE88 /* vChewing_SwiftExtension */,
 				5BDB7A3628D47587001AC277 /* vChewing_Tekkon */,
 				5BC5E01F28DDEFD80094E427 /* vChewing_TooltipUI */,
+				5B09A5172E9957F3002C2EC3 /* vChewing_Typewriter */,
 				5B40113A28D71B8700A9D4CB /* vChewing_Uninstaller */,
 				5BFC63CA28D49B2B004A77B7 /* vChewing_UpdateSputnik */,
 			);
