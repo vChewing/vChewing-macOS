@@ -1,8 +1,11 @@
 %gen_inp
-# 行列輸入法 30 鍵版鍵碼表 array30 for cin2 (v2023-1.0), 2023-06-20
-# 官方下載網址 https://github.com/gontera/array30
+# 行列輸入法 30 鍵版鍵碼表 array30 for vChewing (v2023-1.0), 2025-10-10
+# （本檔案僅供單元測試用，沒有收錄完整的行列詞彙。有需求者請洽老刀索取完整版。）
+# 除了行列詞語以外的原始資料日期：2023-06-20。
+# 官方下載網址 https://github.com/gontera/array30/cin2
+# vChewing（威注音）計畫網址 https://github.com/vChewing/vChewing-macOS/
+# cin2 格式說明 https://vchewing.github.io/CIN_EVOLUTION.html
 # 有關本鍵碼表使用說明，請參閱 https://github.com/gontera/array30/wiki
-
 
 %ename array30
 %cname 行列30
@@ -12,11 +15,8 @@
 %endkey 1234567890
 %wildcardkey *
 %nullcandidate 💩
-%space_style 2
-%phase_auto_skip_endkey
-%flag_disp_full_match
-%flag_disp_partial_match
-%keys_to_directly_commit !@#$%^&*()-_=+[{]}\|:'"<>?
+%keys_to_directly_commit `~!@#$%^&*()-_=+[{]}\|:'"<>?
+%quickphrases_commission_key '
 %keyname begin
 a 1-
 b 5v
@@ -33386,3 +33386,15 @@ w9	ω
 # End of CJK Symbols & Punctuation (w+0~9)
 %symboldef end
 %chardef end
+
+%octagram begin
+%octagram end
+
+%quickphrases begin
+,,, 米糕
+,,,, 炎炎
+,,,, 迷迷糊糊
+,,,, 熒熒
+zzza 需不需要
+zzzj 歷歷在目
+%quickphrases end
