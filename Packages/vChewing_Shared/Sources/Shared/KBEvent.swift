@@ -369,9 +369,9 @@ extension KBEvent {
     case lineSeparator = 0x2028
     case paragraphSeparator = 0x2029
 
-    // MARK: Internal
+    // MARK: Public
 
-    var unicodeScalar: Unicode.Scalar { .init(rawValue) ?? .init(0) }
+    public var unicodeScalar: Unicode.Scalar { .init(rawValue) ?? .init(0) }
   }
 }
 
