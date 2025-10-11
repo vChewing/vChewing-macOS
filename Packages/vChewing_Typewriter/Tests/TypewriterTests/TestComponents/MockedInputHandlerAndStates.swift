@@ -25,7 +25,7 @@ import XCTest
 
 // MARK: - MockIMEState
 
-/// Mock implementation of IMEState for testing purposes
+/// 專門用於單元測試的模擬 IMEState 類型。
 public struct MockIMEState: IMEStateProtocol {
   // MARK: Lifecycle
 
@@ -143,17 +143,9 @@ extension MockIMEState {
   }
 }
 
-// MARK: - MockSessionProtocol
-
-/// Mock session protocol for testing
-public protocol MockSessionProtocol: AnyObject {
-  var state: MockIMEState { get set }
-  func switchState(_ newState: MockIMEState)
-}
-
 // MARK: - MockInputHandler
 
-/// Mock implementation of InputHandler for testing purposes
+/// 專門用於單元測試的模擬 InputHandler 類型。
 public class MockInputHandler: InputHandlerProtocol {
   // MARK: Lifecycle
 
@@ -208,7 +200,7 @@ public class MockInputHandler: InputHandlerProtocol {
 
 // MARK: - MockSession
 
-/// Mock session implementation for testing
+/// 專門用於單元測試的模擬會話類型。
 public class MockSession: SessionCoreProtocol, CtlCandidateDelegate {
   // MARK: Lifecycle
 

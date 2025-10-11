@@ -16,7 +16,7 @@ func vCTestLog(_ str: String) {
   print("[VCLOG] \(str)")
 }
 
-// MARK: - KeyCode Mapping for Tests
+// MARK: - 測試用鍵碼對照
 
 /// ANSI 鍵盤字符到 KeyCode 的映射表（用於測試）
 let mapKeyCodesANSIForTests: [String: UInt16] = [
@@ -28,10 +28,10 @@ let mapKeyCodesANSIForTests: [String: UInt16] = [
 ]
 
 let cassetteURL4Array30CIN2 = URL(fileURLWithPath: #file)
-  .deletingLastPathComponent() // TypewriterTests
-  .deletingLastPathComponent() // Tests
-  .deletingLastPathComponent() // vChewing_Typewriter
-  .deletingLastPathComponent() // Packages
+  .deletingLastPathComponent() // TypewriterTests 資料夾
+  .deletingLastPathComponent() // Tests 資料夾
+  .deletingLastPathComponent() // vChewing_Typewriter 專案資料夾
+  .deletingLastPathComponent() // Packages 根目錄
   .appendingPathComponent("vChewing_LangModelAssembly")
   .appendingPathComponent("Tests")
   .appendingPathComponent("TestCINData")
@@ -45,7 +45,7 @@ class InputHandlerTests: XCTestCase {
   var testHandler: MockInputHandler?
   var testSession: MockSession?
 
-  // MARK: - Setup and Teardown
+  // MARK: - 測試前後流程
 
   override func setUpWithError() throws {
     // 設定專用於單元測試的 UserDefaults
@@ -73,7 +73,7 @@ class InputHandlerTests: XCTestCase {
     UserDef.resetAll()
   }
 
-  // MARK: - Utility Functions
+  // MARK: - 工具函式
 
   func clearTestPOM() {
     testHandler?.currentLM.clearPOMData()
@@ -107,7 +107,7 @@ class InputHandlerTests: XCTestCase {
     return testHandler.assembler.assembledSentence.values.joined()
   }
 
-  // MARK: - Test Cases
+  // MARK: - 測試案例
 
   /// 測試基本的打字組句（不是ㄅ半注音）。
   func test01_InputHandler_BasicSentenceComposition() throws {
@@ -332,8 +332,7 @@ class InputHandlerTests: XCTestCase {
     // 只有單筆結果時，得立刻遞交出去。組筆區應該是有結果的。
     let result = generateDisplayedText()
     vCTestLog("Result after quick phrase: '\(result)'")
-    // Single result quick phrases commit directly, so assembler might be empty
-    // but the state should be appropriate for commit
+    // 單一結果的快速片語會立即遞交，因此組字器可能維持為空；此時仍需檢查狀態是否合理
     XCTAssertTrue(testSession.state.type == .ofEmpty || !result.isEmpty)
   }
 
