@@ -476,9 +476,12 @@ extension InputHandlerProtocol {
         session.switchState(updatedState)
         return true
       }
-      let parsedChar = "\(strCodePointBuffer)\(input.text)"
-        .parsedAsHexLiteral(encoding: IMEApp.currentInputMode.nonUTFEncoding)?.first?
-        .description
+      let hexSequence = "\(strCodePointBuffer)\(input.text)"
+      let parsedChar = CodePointDecoder.decode(
+        hexString: hexSequence,
+        encodingID: IMEApp.currentInputMode.nonUTFEncoding,
+        encodingHint: IMEApp.currentInputMode.nonUTFEncodingInitials
+      )?.first?.description
       guard var char = parsedChar else {
         errorCallback?("D220B880：輸入的字碼沒有對應的字元。")
         var updatedState = State.ofAbortion()
