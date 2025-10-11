@@ -36,9 +36,13 @@ extension String {
 /// 檢測字串是否包含半形英數內容
 extension String {
   fileprivate var isNotPureAlphanumerical: Bool {
-    let regex = ".*[^A-Za-z0-9].*"
-    let testString = NSPredicate(format: "SELF MATCHES %@", regex)
-    return testString.evaluate(with: self)
+    let x = unicodeScalars.map(\.value).filter {
+      if $0 >= 48, $0 <= 57 { return false }
+      if $0 >= 65, $0 <= 90 { return false }
+      if $0 >= 97, $0 <= 122 { return false }
+      return true
+    }
+    return !x.isEmpty
   }
 }
 
