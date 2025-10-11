@@ -288,34 +288,6 @@ extension BinaryInteger {
   }
 }
 
-// MARK: - Parse String As Hex Literal
-
-// Original author: Shiki Suen
-// Refactored by: Isaac Xen
-
-extension String {
-  public func parsedAsHexLiteral(encoding: UInt32? = nil) -> String? {
-    guard !isEmpty else { return nil }
-    var charBytes = [Int8]()
-    var buffer: Int?
-    compactMap(\.hexDigitValue).forEach { neta in
-      if let validBuffer = buffer {
-        charBytes.append(.init(bitPattern: UInt8(validBuffer << 4 + neta)))
-        buffer = nil
-      } else {
-        buffer = neta
-      }
-    }
-    let encodingUBE: UInt32 = 268_435_712 // CFStringBuiltInEncodings.UTF16BE
-    let encodingRAW = encoding ?? encodingUBE
-    guard let cfString = CFStringCreateWithCString(nil, &charBytes, encodingRAW) else {
-      return nil
-    }
-    let result = String(describing: cfString)
-    return result.isEmpty ? nil : result
-  }
-}
-
 // MARK: - Version Comparer.
 
 extension String {
