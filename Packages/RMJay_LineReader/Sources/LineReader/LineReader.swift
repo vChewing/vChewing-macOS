@@ -1,6 +1,7 @@
 // (c) 2019 and onwards Robert Muckle-Jones (Apache 2.0 License).
 
 import Foundation
+import SwiftExtension
 
 // MARK: - LineReader
 
@@ -36,7 +37,7 @@ public class LineReader {
       }
 
       fileRead: do {
-        let nextData = try fileHandle.read(upToCount: chunkSize)
+        let nextData = try fileHandle.readData(upToCount: chunkSize)
         if let nextData = nextData, !nextData.isEmpty {
           buffer.append(nextData)
           continue
