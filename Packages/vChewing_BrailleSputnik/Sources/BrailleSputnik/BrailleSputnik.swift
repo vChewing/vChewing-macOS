@@ -103,7 +103,7 @@ extension BrailleSputnik {
     else { return resultStack }
     Self.sharedComposer.clear()
     rawReading.forEach { char in
-      Self.sharedComposer.receiveKey(fromPhonabet: char.description)
+      Self.sharedComposer.receiveKey(fromPhonabet: char.unicodeScalars.first)
     }
     let consonant = Self.sharedComposer.consonant.value
     let semivowel = Self.sharedComposer.semivowel.value
