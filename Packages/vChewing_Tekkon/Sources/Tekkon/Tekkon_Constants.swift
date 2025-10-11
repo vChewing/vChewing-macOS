@@ -1,10 +1,6 @@
-// (c) 2022 and onwards The vChewing Project (MIT-NTL License).
+// (c) 2022 and onwards The vChewing Project (LGPL v3.0 License or later).
 // ====================
-// This code is released under the MIT license (SPDX-License-Identifier: MIT)
-// ... with NTL restriction stating that:
-// No trademark license is granted to use the trade names, trademarks, service
-// marks, or product names of Contributor, except as required to fulfill notice
-// requirements defined in MIT License.
+// This code is released under the SPDX-License-Identifier: `LGPL-3.0-or-later`.
 
 /// The namespace for this package.
 public enum Tekkon {
@@ -13,26 +9,26 @@ public enum Tekkon {
   // MARK: - Static Constants
 
   /// 引擎僅接受這些記號作為聲母
-  public static let allowedConsonants: [String] = [
+  public static let allowedConsonants: [Unicode.Scalar] = [
     "ㄅ", "ㄆ", "ㄇ", "ㄈ", "ㄉ", "ㄊ", "ㄋ", "ㄌ",
     "ㄍ", "ㄎ", "ㄏ", "ㄐ", "ㄑ", "ㄒ",
     "ㄓ", "ㄔ", "ㄕ", "ㄖ", "ㄗ", "ㄘ", "ㄙ",
   ]
 
   /// 引擎僅接受這些記號作為介母
-  public static let allowedSemivowels: [String] = ["ㄧ", "ㄨ", "ㄩ"]
+  public static let allowedSemivowels: [Unicode.Scalar] = ["ㄧ", "ㄨ", "ㄩ"]
 
   /// 引擎僅接受這些記號作為韻母
-  public static let allowedVowels: [String] = [
+  public static let allowedVowels: [Unicode.Scalar] = [
     "ㄚ", "ㄛ", "ㄜ", "ㄝ", "ㄞ", "ㄟ",
     "ㄠ", "ㄡ", "ㄢ", "ㄣ", "ㄤ", "ㄥ", "ㄦ",
   ]
 
   /// 引擎僅接受這些記號作為聲調
-  public static let allowedIntonations: [String] = [" ", "ˊ", "ˇ", "ˋ", "˙"]
+  public static let allowedIntonations: [Unicode.Scalar] = [" ", "ˊ", "ˇ", "ˋ", "˙"]
 
   /// 引擎僅接受這些記號作為注音（聲介韻調四個集合加起來）
-  public static var allowedPhonabets: [String] {
+  public static var allowedPhonabets: [Unicode.Scalar] {
     allowedConsonants + allowedSemivowels + allowedVowels + allowedIntonations
   }
 
@@ -243,10 +239,10 @@ public enum Tekkon {
 
   /// 韋氏拼音專用會用到的陣列，用 Strings 反而省事一些。
   /// 這裡同時兼容大千注音的調號數字，所以也將 6、7 號數字鍵放在允許範圍內。
-  static var mapWadeGilesPinyinKeys: String = mapArayuruPinyin + "'"
+  static let mapWadeGilesPinyinKeys: String = mapArayuruPinyin + "'"
 
   /// 任何拼音都會用到的聲調鍵陣列
-  static let mapArayuruPinyinIntonation: [String: String] = [
+  static let mapArayuruPinyinIntonation: [Unicode.Scalar: Unicode.Scalar] = [
     "1": " ", "2": "ˊ", "3": "ˇ", "4": "ˋ", "5": "˙", "6": "ˊ", "7": "˙", " ": " ",
   ]
   /// 漢語拼音排列專用處理陣列
@@ -895,7 +891,7 @@ public enum Tekkon {
   ///
   /// 威注音輸入法 macOS 版使用了 Ukelele 佈局來完成對諸如倚天傳統等其它注音鍵盤排列的支援。
   /// 如果要將鐵恨模組拿給別的平台的輸入法使用的話，恐怕需要針對這些注音鍵盤排列各自新增專用陣列才可以。
-  static let mapQwertyDachen: [String: String] = [
+  static let mapQwertyDachen: [Unicode.Scalar: Unicode.Scalar] = [
     "0": "ㄢ", "1": "ㄅ", "2": "ㄉ", "3": "ˇ", "4": "ˋ", "5": "ㄓ", "6": "ˊ", "7": "˙", "8": "ㄚ",
     "9": "ㄞ", "-": "ㄦ",
     ",": "ㄝ", ".": "ㄡ", "/": "ㄥ", ";": "ㄤ", "a": "ㄇ", "b": "ㄖ", "c": "ㄏ", "d": "ㄎ", "e": "ㄍ",
@@ -909,7 +905,7 @@ public enum Tekkon {
   ///
   /// 在這裡將二十六個字母寫全，也只是為了方便做 validity check。
   /// 這裡提前對複音按鍵做處理，然後再用程式判斷介母類型、據此判斷是否需要做複音切換。
-  static let mapDachenCP26StaticKeys: [String: String] = [
+  static let mapDachenCP26StaticKeys: [Unicode.Scalar: Unicode.Scalar] = [
     "a": "ㄇ", "b": "ㄖ", "c": "ㄏ", "d": "ㄎ", "e": "ㄍ", "f": "ㄑ", "g": "ㄕ", "h": "ㄘ", "i": "ㄞ",
     "j": "ㄨ", "k": "ㄜ",
     "l": "ㄤ", "m": "ㄩ", "n": "ㄙ", "o": "ㄢ", "p": "ㄦ", "q": "ㄅ", "r": "ㄐ", "s": "ㄋ", "t": "ㄓ",
@@ -921,7 +917,7 @@ public enum Tekkon {
   ///
   /// 在這裡將二十六個字母寫全，也只是為了方便做 validity check。
   /// 這裡提前對複音按鍵做處理，然後再用程式判斷介母類型、據此判斷是否需要做複音切換。
-  static let mapHsuStaticKeys: [String: String] = [
+  static let mapHsuStaticKeys: [Unicode.Scalar: Unicode.Scalar] = [
     "a": "ㄘ", "b": "ㄅ", "c": "ㄕ", "d": "ㄉ", "e": "ㄧ", "f": "ㄈ", "g": "ㄍ", "h": "ㄏ", "i": "ㄞ",
     "j": "ㄐ", "k": "ㄎ",
     "l": "ㄌ", "m": "ㄇ", "n": "ㄋ", "o": "ㄡ", "p": "ㄆ", "r": "ㄖ", "s": "ㄙ", "t": "ㄊ", "u": "ㄩ",
@@ -933,7 +929,7 @@ public enum Tekkon {
   ///
   /// 在這裡將二十六個字母寫全，也只是為了方便做 validity check。
   /// 這裡提前對複音按鍵做處理，然後再用程式判斷介母類型、據此判斷是否需要做複音切換。
-  static let mapETen26StaticKeys: [String: String] = [
+  static let mapETen26StaticKeys: [Unicode.Scalar: Unicode.Scalar] = [
     "a": "ㄚ", "b": "ㄅ", "c": "ㄕ", "d": "ㄉ", "e": "ㄧ", "f": "ㄈ", "g": "ㄓ", "h": "ㄏ", "i": "ㄞ",
     "j": "ㄖ", "k": "ㄎ",
     "l": "ㄌ", "m": "ㄇ", "n": "ㄋ", "o": "ㄛ", "p": "ㄆ", "q": "ㄗ", "r": "ㄜ", "s": "ㄙ", "t": "ㄊ",
@@ -945,7 +941,7 @@ public enum Tekkon {
   ///
   /// 在這裡將二十六個字母寫全，也只是為了方便做 validity check。
   /// 這裡提前對複音按鍵做處理，然後再用程式判斷介母類型、據此判斷是否需要做複音切換。
-  static let mapStarlightStaticKeys: [String: String] = [
+  static let mapStarlightStaticKeys: [Unicode.Scalar: Unicode.Scalar] = [
     "a": "ㄚ", "b": "ㄅ", "c": "ㄘ", "d": "ㄉ", "e": "ㄜ", "f": "ㄈ", "g": "ㄍ", "h": "ㄏ", "i": "ㄧ",
     "j": "ㄓ", "k": "ㄎ",
     "l": "ㄌ", "m": "ㄇ", "n": "ㄋ", "o": "ㄛ", "p": "ㄆ", "q": "ㄔ", "r": "ㄖ", "s": "ㄙ", "t": "ㄊ",
@@ -959,7 +955,7 @@ public enum Tekkon {
   ///
   /// 在這裡將二十六個字母寫全，也只是為了方便做 validity check。
   /// 這裡提前對複音按鍵做處理，然後再用程式判斷介母類型、據此判斷是否需要做複音切換。
-  static let mapAlvinLiuStaticKeys: [String: String] = [
+  static let mapAlvinLiuStaticKeys: [Unicode.Scalar: Unicode.Scalar] = [
     "q": "ㄑ", "w": "ㄠ", "e": "ㄜ", "r": "ㄖ", "t": "ㄊ", "y": "ㄩ", "u": "ㄨ", "i": "ㄧ", "o": "ㄛ",
     "p": "ㄆ", "a": "ㄚ",
     "s": "ㄙ", "d": "ㄉ", "f": "ㄈ", "g": "ㄍ", "h": "ㄏ", "j": "ㄐ", "k": "ㄎ", "l": "ㄦ", "z": "ㄗ",
@@ -968,7 +964,7 @@ public enum Tekkon {
   ]
 
   /// 倚天傳統排列專用處理陣列。
-  static let mapQwertyETenTraditional: [String: String] = [
+  static let mapQwertyETenTraditional: [Unicode.Scalar: Unicode.Scalar] = [
     "'": "ㄘ", ",": "ㄓ", "-": "ㄥ", ".": "ㄔ", "/": "ㄕ", "0": "ㄤ", "1": "˙", "2": "ˊ", "3": "ˇ",
     "4": "ˋ", "7": "ㄑ",
     "8": "ㄢ", "9": "ㄣ", ";": "ㄗ", "=": "ㄦ", "a": "ㄚ", "b": "ㄅ", "c": "ㄒ", "d": "ㄉ", "e": "ㄧ",
@@ -979,7 +975,7 @@ public enum Tekkon {
   ]
 
   /// IBM排列專用處理陣列。
-  static let mapQwertyIBM: [String: String] = [
+  static let mapQwertyIBM: [Unicode.Scalar: Unicode.Scalar] = [
     ",": "ˇ", "-": "ㄏ", ".": "ˋ", "/": "˙", "0": "ㄎ", "1": "ㄅ", "2": "ㄆ", "3": "ㄇ", "4": "ㄈ",
     "5": "ㄉ", "6": "ㄊ",
     "7": "ㄋ", "8": "ㄌ", "9": "ㄍ", ";": "ㄠ", "a": "ㄧ", "b": "ㄥ", "c": "ㄣ", "d": "ㄩ", "e": "ㄒ",
@@ -990,7 +986,7 @@ public enum Tekkon {
   ]
 
   /// 精業排列專用處理陣列。
-  static let mapSeigyou: [String: String] = [
+  static let mapSeigyou: [Unicode.Scalar: Unicode.Scalar] = [
     "a": "ˇ", "b": "ㄒ", "c": "ㄌ", "d": "ㄋ", "e": "ㄊ", "f": "ㄎ", "g": "ㄑ", "h": "ㄕ", "i": "ㄛ",
     "j": "ㄘ", "k": "ㄜ",
     "l": "ㄠ", "m": "ㄙ", "n": "ㄖ", "o": "ㄟ", "p": "ㄣ", "q": "ˊ", "r": "ㄍ", "s": "ㄇ", "t": "ㄐ",
@@ -1001,7 +997,7 @@ public enum Tekkon {
   ]
 
   /// 偽精業排列專用處理陣列。
-  static let mapFakeSeigyou: [String: String] = [
+  static let mapFakeSeigyou: [Unicode.Scalar: Unicode.Scalar] = [
     "a": "ˇ", "b": "ㄒ", "c": "ㄌ", "d": "ㄋ", "e": "ㄊ", "f": "ㄎ", "g": "ㄑ", "h": "ㄕ", "i": "ㄛ",
     "j": "ㄘ", "k": "ㄜ",
     "l": "ㄠ", "m": "ㄙ", "n": "ㄖ", "o": "ㄟ", "p": "ㄣ", "q": "ˊ", "r": "ㄍ", "s": "ㄇ", "t": "ㄐ",
@@ -1012,7 +1008,7 @@ public enum Tekkon {
   ]
 
   /// 神通排列專用處理陣列。
-  static let mapQwertyMiTAC: [String: String] = [
+  static let mapQwertyMiTAC: [Unicode.Scalar: Unicode.Scalar] = [
     ",": "ㄓ", "-": "ㄦ", ".": "ㄔ", "/": "ㄕ", "0": "ㄥ", "1": "˙", "2": "ˊ", "3": "ˇ", "4": "ˋ",
     "5": "ㄞ", "6": "ㄠ",
     "7": "ㄢ", "8": "ㄣ", "9": "ㄤ", ";": "ㄝ", "a": "ㄚ", "b": "ㄅ", "c": "ㄘ", "d": "ㄉ", "e": "ㄜ",

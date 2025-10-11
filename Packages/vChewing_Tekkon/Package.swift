@@ -4,7 +4,7 @@ import PackageDescription
 let package = Package(
   name: "Tekkon",
   platforms: [
-    .macOS(.v10_11),
+    .macOS(.v10_13),
   ],
   products: [
     .library(
@@ -20,7 +20,11 @@ let package = Package(
     ),
     .testTarget(
       name: "TekkonTests",
-      dependencies: ["Tekkon"]
+      dependencies: ["Tekkon"],
+      linkerSettings: [
+        .linkedFramework("XCTest", .when(platforms: [.macOS])),
+        .linkedFramework("Foundation", .when(platforms: [.macOS])),
+      ]
     ),
   ]
 )

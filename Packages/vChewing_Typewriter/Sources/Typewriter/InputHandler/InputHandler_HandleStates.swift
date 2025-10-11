@@ -455,7 +455,9 @@ extension InputHandlerProtocol {
           // prevReading 的內容分別是：「完整讀音」「去掉聲調的讀音」「是否有聲調」。
           assembler.dropKey(direction: .rear)
           assemble() // 這裡必須 Walk 一次、來更新目前被 walk 的內容。
-          prevReading.1.map(\.description).forEach { composer.receiveKey(fromPhonabet: $0) }
+          prevReading.1.map(\.description).forEach {
+            composer.receiveKey(fromPhonabet: $0.unicodeScalars.first)
+          }
         }
         session.switchState(generateStateOfInputting())
         return true
