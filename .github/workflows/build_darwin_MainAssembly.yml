@@ -7,7 +7,7 @@ on:
 
 jobs:
   build:
-    name: Build
+    name: test-macOS-MainAssembly
     runs-on: macos-14
     env:
         GIT_SSL_NO_VERIFY: true
@@ -20,3 +20,5 @@ jobs:
         run: make spmClean
       - name: Build
         run: make spmDebug
+      - name: Test
+        run: swift test -c release --no-parallel --package-path ./Packages/vChewing_MainAssembly/

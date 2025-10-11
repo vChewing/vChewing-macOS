@@ -1,0 +1,19 @@
+name: unit-test-typewriter
+on:
+  push:
+    branches: [ "main" ]
+
+jobs:
+  build:
+    name: test-linux-typewriter
+    runs-on: ubuntu-latest
+    env:
+        GIT_SSL_NO_VERIFY: true
+        DEVELOPER_DIR: /Applications/Xcode.app/Contents/Developer
+    steps:
+      - uses: SwiftyLab/setup-swift@latest
+      - uses: actions/checkout@v1
+      - name: Clean
+        run: make spmClean
+      - name: Test
+        run: swift test -c release --no-parallel --package-path ./Packages/vChewing_Typewriter/
