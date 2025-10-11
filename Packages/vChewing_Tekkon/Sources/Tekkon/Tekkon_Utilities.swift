@@ -1,10 +1,6 @@
-// (c) 2022 and onwards The vChewing Project (MIT-NTL License).
+// (c) 2022 and onwards The vChewing Project (LGPL v3.0 License or later).
 // ====================
-// This code is released under the MIT license (SPDX-License-Identifier: MIT)
-// ... with NTL restriction stating that:
-// No trademark license is granted to use the trade names, trademarks, service
-// marks, or product names of Contributor, except as required to fulfill notice
-// requirements defined in MIT License.
+// This code is released under the SPDX-License-Identifier: `LGPL-3.0-or-later`.
 
 extension Tekkon {
   // MARK: - Phonabet to Hanyu-Pinyin Conversion Processing
@@ -37,7 +33,7 @@ extension Tekkon {
   /// - Returns: 經過轉換處理的讀音。
   public static func cnvPhonaToTextbookStyle(target: String) -> String {
     var newString = target
-    if String(target.reversed()[0]) == "˙" {
+    if target.last == "˙" {
       newString = String(target.dropLast())
       newString.insert("˙", at: newString.startIndex)
     }
@@ -75,9 +71,9 @@ extension Tekkon {
       guard let value = Tekkon.mapHanyuPinyin[key] else { continue }
       result = result.swapping(key, with: value)
     }
-    for key in Tekkon.mapArayuruPinyinIntonation.keys.sorted(by: { $0.count > $1.count }) {
+    for key in Tekkon.mapArayuruPinyinIntonation.keys {
       guard let value = Tekkon.mapArayuruPinyinIntonation[key] else { continue }
-      result = result.swapping(key, with: (key == "1") ? newToneOne : value)
+      result = result.swapping(String(key), with: (key == "1") ? newToneOne : String(value))
     }
     return result
   }
@@ -85,6 +81,18 @@ extension Tekkon {
 
 /// 檢測字串是否包含半形英數內容
 extension String {
+  fileprivate var isNotPureAlphanumerical: Bool {
+    let x = unicodeScalars.map(\.value).filter {
+      if $0 >= 48, $0 <= 57 { return false }
+      if $0 >= 65, $0 <= 90 { return false }
+      if $0 >= 97, $0 <= 122 { return false }
+      return true
+    }
+    return !x.isEmpty
+  }
+}
+
+extension Character {
   fileprivate var isNotPureAlphanumerical: Bool {
     let x = unicodeScalars.map(\.value).filter {
       if $0 >= 48, $0 <= 57 { return false }
@@ -104,7 +112,7 @@ extension StringProtocol {
     let targetArray = Array(target.description.unicodeScalars)
     guard !target.isEmpty else { return isEmpty }
     guard count >= target.count else { return false }
-    for index in 0 ..< selfArray.count {
+    for index in selfArray.indices {
       let range = index ..< (Swift.min(index + targetArray.count, selfArray.count))
       let ripped = Array(selfArray[range])
       if ripped == targetArray { return true }
@@ -112,39 +120,18 @@ extension StringProtocol {
     return false
   }
 
-  func sliced(by separator: any StringProtocol = "") -> [String] {
-    let selfArray = Array(unicodeScalars)
-    let arrSeparator = Array(separator.description.unicodeScalars)
-    var result: [String] = []
-    var buffer: [Unicode.Scalar] = []
-    var sleepCount = 0
-    for index in 0 ..< selfArray.count {
-      let currentChar = selfArray[index]
-      let range = index ..< (Swift.min(index + arrSeparator.count, selfArray.count))
-      let ripped = Array(selfArray[range])
-      if ripped.isEmpty { continue }
-      if ripped == arrSeparator {
-        sleepCount = range.count
-        result.append(buffer.map { String($0) }.joined())
-        buffer.removeAll()
-      }
-      if sleepCount < 1 {
-        buffer.append(currentChar)
-      }
-      sleepCount -= 1
-    }
-    result.append(buffer.map { String($0) }.joined())
-    buffer.removeAll()
-    return result
+  func has(scalar target: Unicode.Scalar) -> Bool {
+    let targetStr = String(Character(target))
+    return has(string: targetStr)
   }
 
-  func swapping(_ target: String, with newString: String) -> String {
+  func swapping(_ target: some StringProtocol, with newString: some StringProtocol) -> String {
     let selfArray = Array(unicodeScalars)
     let arrTarget = Array(target.description.unicodeScalars)
-    var result = ""
+    var result = [String]()
     var buffer: [Unicode.Scalar] = []
     var sleepCount = 0
-    for index in 0 ..< selfArray.count {
+    for index in selfArray.indices {
       let currentChar = selfArray[index]
       let range = index ..< (Swift.min(index + arrTarget.count, selfArray.count))
       let ripped = Array(selfArray[range])
@@ -152,7 +139,7 @@ extension StringProtocol {
       if ripped == arrTarget {
         sleepCount = ripped.count
         result.append(buffer.map { String($0) }.joined())
-        result.append(newString)
+        result.append(newString.description)
         buffer.removeAll()
       }
       if sleepCount < 1 {
@@ -162,6 +149,6 @@ extension StringProtocol {
     }
     result.append(buffer.map { String($0) }.joined())
     buffer.removeAll()
-    return result
+    return result.joined()
   }
 }

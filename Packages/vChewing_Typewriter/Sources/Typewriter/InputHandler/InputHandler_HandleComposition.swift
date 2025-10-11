@@ -82,13 +82,15 @@ extension InputHandlerProtocol {
         // prevReading 的內容分別是：「完整讀音」「去掉聲調的讀音」「是否有聲調」。
         guard let prevReading = previousParsableReading, isIntonationKey(input) else { break proc }
         var theComposer = composer
-        prevReading.0.map(\.description).forEach { theComposer.receiveKey(fromPhonabet: $0) }
+        prevReading.0.map(\.description).forEach {
+          theComposer.receiveKey(fromPhonabet: $0.unicodeScalars.first)
+        }
         // 發現要覆寫的聲調與覆寫對象的聲調雷同的情況的話，直接跳過處理。
         let oldIntonation: Phonabet = theComposer.intonation
         theComposer.receiveKey(fromString: inputText)
         if theComposer.intonation == oldIntonation,
            prefs.specifyIntonationKeyBehavior == 1 { break proc }
-        theComposer.intonation.clear()
+        if theComposer.hasIntonation() { theComposer.doBackSpace() }
         // 檢查新的漢字字音是否在庫。
         let temporaryReadingKey = theComposer.getComposition()
         if currentLM.hasUnigramsFor(keyArray: [temporaryReadingKey]) {
@@ -137,7 +139,7 @@ extension InputHandlerProtocol {
         errorCallback?("B49C0979：語彙庫內無「\(readingKey)」的匹配記錄。")
 
         if prefs.keepReadingUponCompositionError {
-          composer.intonation.clear() // 砍掉聲調。
+          if composer.hasIntonation() { composer.doBackSpace() }
           session.switchState(generateStateOfInputting())
           return true
         }

@@ -326,8 +326,10 @@ extension InputHandlerProtocol {
     let components = rawData.map(\.description)
     var hasIntonation = false
     for neta in components {
-      if !Tekkon.allowedPhonabets.contains(neta) || neta == " " { return nil }
-      if Tekkon.allowedIntonations.contains(neta) { hasIntonation = true }
+      let char = neta.unicodeScalars.first
+      guard let char else { return nil }
+      if !Tekkon.allowedPhonabets.contains(char) || neta == " " { return nil }
+      if Tekkon.allowedIntonations.contains(char) { hasIntonation = true }
     }
     if hasIntonation, components.count == 1 { return nil } // 剔除純聲調之情形
     let rawDataSansIntonation = hasIntonation ? components.dropLast(1).joined() : rawData

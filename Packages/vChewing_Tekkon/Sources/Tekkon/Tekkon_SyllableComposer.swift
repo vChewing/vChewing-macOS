@@ -1,10 +1,6 @@
-// (c) 2022 and onwards The vChewing Project (MIT-NTL License).
+// (c) 2022 and onwards The vChewing Project (LGPL v3.0 License or later).
 // ====================
-// This code is released under the MIT license (SPDX-License-Identifier: MIT)
-// ... with NTL restriction stating that:
-// No trademark license is granted to use the trade names, trademarks, service
-// marks, or product names of Contributor, except as required to fulfill notice
-// requirements defined in MIT License.
+// This code is released under the SPDX-License-Identifier: `LGPL-3.0-or-later`.
 
 // MARK: - Tekkon.Composer
 
@@ -18,7 +14,7 @@ extension Tekkon {
   /// 因為是 String Literal，所以初期化時可以藉由 @input 參數指定初期已經傳入的按鍵訊號。
   /// 還可以在初期化時藉由 @arrange 參數來指定注音排列（預設為「.ofDachen」大千佈局）。
   @frozen
-  public struct Composer: Equatable, Codable, Hashable, ExpressibleByStringLiteral {
+  public struct Composer: Codable, Hashable, Sendable {
     // MARK: Lifecycle
 
     // MARK: 注拼槽對外處理函式
@@ -26,7 +22,7 @@ extension Tekkon {
     /// 初期化一個新的注拼槽。可以藉由 @input 參數指定初期已經傳入的按鍵訊號。
     /// 還可以在初期化時藉由 @arrange 參數來指定注音排列（預設為「.ofDachen」大千佈局）。
     /// - Parameters:
-    ///   - input: 傳入的 String 內容，用以處理單個字符。
+    ///   - input: 傳入的 String 內容，用以處理單個字元。
     ///   - arrange: 要使用的注音排列。
     ///   - correction: 是否對錯誤的注音讀音組合做出自動糾正處理。
     public init(
@@ -39,37 +35,25 @@ extension Tekkon {
       receiveKey(fromString: input)
     }
 
-    public init(stringLiteral value: String) {
-      self.init(value)
-    }
-
-    public init(unicodeScalarLiteral value: String) {
-      self.init(stringLiteral: value)
-    }
-
-    public init(extendedGraphemeClusterLiteral value: String) {
-      self.init(stringLiteral: value)
-    }
-
     // MARK: Public
 
     /// 聲母。
-    public var consonant: Phonabet = .init()
+    public internal(set) var consonant: Phonabet = .init()
 
     /// 介母。
-    public var semivowel: Phonabet = .init()
+    public internal(set) var semivowel: Phonabet = .init()
 
     /// 韻母。
-    public var vowel: Phonabet = .init()
+    public internal(set) var vowel: Phonabet = .init()
 
     /// 聲調。
-    public var intonation: Phonabet = .init()
+    public internal(set) var intonation: Phonabet = .init()
 
     /// 拼音組音區。
-    public var romajiBuffer: String = .init()
+    public internal(set) var romajiBuffer: String = .init()
 
     /// 注音排列種類。預設情況下是大千排列（Windows / macOS 預設注音排列）。
-    public var parser: MandarinParser = .ofDachen
+    public internal(set) var parser: MandarinParser = .ofDachen
 
     /// 是否對錯誤的注音讀音組合做出自動糾正處理。
     public var phonabetCombinationCorrectionEnabled = false
@@ -96,12 +80,6 @@ extension Tekkon {
     }
 
     // MARK: - Misc Definitions
-
-    /// 這些內容用來滿足 "Equatable, Hashable, ExpressibleByStringLiteral" 需求。
-
-    public static func == (lhs: Self, rhs: Self) -> Bool {
-      lhs.value == rhs.value
-    }
 
     /// 統計有效的聲介韻（調）個數。
     /// - Parameter withIntonation: 是否統計聲調。
@@ -161,7 +139,7 @@ extension Tekkon {
 
     // MARK: - Public Functions
 
-    /// 用於檢測「某個輸入字符訊號的合規性」的函式。
+    /// 用於檢測「某個輸入字元訊號的合規性」的函式。
     ///
     /// 注意：回傳結果會受到當前注音排列 parser 屬性的影響。
     /// - Parameters:
@@ -171,49 +149,62 @@ extension Tekkon {
       return inputValidityCheck(charStr: String(scalar))
     }
 
-    /// 用於檢測「某個輸入字符訊號的合規性」的函式。
+    /// 用於檢測「某個輸入字元訊號的合規性」的函式。
     ///
     /// 注意：回傳結果會受到當前注音排列 parser 屬性的影響。
     /// - Parameters:
     ///   - charStr: 傳入的字元（String）。
     public func inputValidityCheck(charStr input: String) -> Bool {
+      guard let scalar = input.unicodeScalars.first else { return false }
       switch parser {
       case .ofDachen:
-        return Tekkon.mapQwertyDachen[input] != nil
+        return Tekkon.mapQwertyDachen[scalar] != nil
       case .ofDachen26:
-        return Tekkon.mapDachenCP26StaticKeys[input] != nil
+        return Tekkon.mapDachenCP26StaticKeys[scalar] != nil
       case .ofETen:
-        return Tekkon.mapQwertyETenTraditional[input] != nil
+        return Tekkon.mapQwertyETenTraditional[scalar] != nil
       case .ofHsu:
-        return Tekkon.mapHsuStaticKeys[input] != nil
+        return Tekkon.mapHsuStaticKeys[scalar] != nil
       case .ofETen26:
-        return Tekkon.mapETen26StaticKeys[input] != nil
+        return Tekkon.mapETen26StaticKeys[scalar] != nil
       case .ofIBM:
-        return Tekkon.mapQwertyIBM[input] != nil
+        return Tekkon.mapQwertyIBM[scalar] != nil
       case .ofMiTAC:
-        return Tekkon.mapQwertyMiTAC[input] != nil
+        return Tekkon.mapQwertyMiTAC[scalar] != nil
       case .ofSeigyou:
-        return Tekkon.mapSeigyou[input] != nil
+        return Tekkon.mapSeigyou[scalar] != nil
       case .ofFakeSeigyou:
-        return Tekkon.mapFakeSeigyou[input] != nil
+        return Tekkon.mapFakeSeigyou[scalar] != nil
       case .ofStarlight:
-        return Tekkon.mapStarlightStaticKeys[input] != nil
+        return Tekkon.mapStarlightStaticKeys[scalar] != nil
       case .ofAlvinLiu:
-        return Tekkon.mapAlvinLiuStaticKeys[input] != nil
+        return Tekkon.mapAlvinLiuStaticKeys[scalar] != nil
       case .ofWadeGilesPinyin:
-        return Tekkon.mapWadeGilesPinyinKeys.has(string: input)
+        return Tekkon.mapWadeGilesPinyinKeys.unicodeScalars.contains(scalar)
       case .ofHanyuPinyin, .ofHualuoPinyin, .ofSecondaryPinyin, .ofUniversalPinyin, .ofYalePinyin:
-        return Tekkon.mapArayuruPinyin.has(string: input)
+        return Tekkon.mapArayuruPinyin.unicodeScalars.contains(scalar)
       }
     }
 
     /// 接受傳入的按鍵訊號時的處理，處理對象為 String。
-    /// 另有同名函式可處理 UniChar 訊號。
+    /// 另有同名函式可處理 UniChar 與 Unicode Scalar 訊號。
     ///
     /// 如果是諸如複合型注音排列的話，翻譯結果有可能為空，但翻譯過程已經處理好聲介韻調分配了。
     /// - Parameters:
     ///   - fromString: 傳入的 String 內容。
-    public mutating func receiveKey(fromString input: String = "") {
+    public mutating func receiveKey(fromString inputStr: String = "") {
+      guard let input = inputStr.unicodeScalars.first else { return }
+      receiveKey(fromScalar: input)
+    }
+
+    /// 接受傳入的按鍵訊號時的處理，處理對象為 Unicode Scalar。
+    /// 另有同名函式可處理 UniChar 與 String 訊號。
+    ///
+    /// 如果是諸如複合型注音排列的話，翻譯結果有可能為空，但翻譯過程已經處理好聲介韻調分配了。
+    /// - Parameters:
+    ///   - fromString: 傳入的 String 內容。
+    public mutating func receiveKey(fromScalar input: Unicode.Scalar?) {
+      guard let input else { return }
       guard isPinyinMode else {
         receiveKey(fromPhonabet: translate(key: input))
         return
@@ -226,7 +217,7 @@ extension Tekkon {
         if romajiBuffer.count > maxCount - 1 {
           romajiBuffer = String(romajiBuffer.dropFirst())
         }
-        let romajiBufferBackup = romajiBuffer + input
+        let romajiBufferBackup = romajiBuffer + String(Character(input))
         receiveSequence(romajiBufferBackup, isRomaji: true)
         romajiBuffer = romajiBufferBackup
       }
@@ -240,7 +231,7 @@ extension Tekkon {
     ///   - fromCharCode: 傳入的 UniChar 內容。
     public mutating func receiveKey(fromCharCode inputCharCode: UInt16 = 0) {
       if let scalar = UnicodeScalar(inputCharCode) {
-        receiveKey(fromString: String(scalar))
+        receiveKey(fromScalar: scalar)
       }
     }
 
@@ -248,7 +239,8 @@ extension Tekkon {
     /// 主要就是將注音符號拆分辨識且分配到正確的貯存位置而已。
     /// - Parameters:
     ///   - fromPhonabet: 傳入的單個注音符號字串。
-    public mutating func receiveKey(fromPhonabet phonabet: String = "") {
+    public mutating func receiveKey(fromPhonabet phonabet: Unicode.Scalar?) {
+      guard let phonabet else { return }
       var thePhone: Phonabet = .init(phonabet)
       if phonabetCombinationCorrectionEnabled {
         switch phonabet {
@@ -270,7 +262,7 @@ extension Tekkon {
           if "ㄜ".doesHave(vowel.value) { vowel <~ "ㄝ" }
           if "ㄝ".doesHave(vowel.value) { thePhone <~ "ㄩ" }
         case "ㄅ", "ㄆ", "ㄇ", "ㄈ":
-          if ["ㄨㄛ", "ㄨㄥ"].contains(semivowel.value + vowel.value) { semivowel.clear() }
+          if ["ㄨㄛ", "ㄨㄥ"].contains(semivowel + vowel) { semivowel.clear() }
         default: break
         }
         if [.vowel, .intonation].contains(thePhone.type), "ㄓㄔㄕㄗㄘㄙ".doesHave(consonant.value) {
@@ -326,7 +318,7 @@ extension Tekkon {
         dictResult = mapWadeGilesPinyin[givenSequence]
       default: break
       }
-      dictResult?.forEach { receiveKey(fromPhonabet: $0.description) }
+      dictResult?.unicodeScalars.forEach { receiveKey(fromPhonabet: $0) }
       return value
     }
 
@@ -398,6 +390,8 @@ extension Tekkon {
       return validKeyAvailable ? readingKey : nil
     }
 
+    // MARK: Internal
+
     // MARK: - Parser Processing
 
     // 注拼槽對內處理用函式都在這一小節。
@@ -407,39 +401,39 @@ extension Tekkon {
     /// 倚天或許氏鍵盤的處理函式會將分配過程代為處理過，此時回傳結果為空字串。
     /// - Parameters:
     ///   - key: 傳入的 String 訊號。
-    public mutating func translate(key: String = "") -> String {
-      guard !isPinyinMode else { return "" }
+    internal mutating func translate(key: Unicode.Scalar) -> Unicode.Scalar? {
+      guard !isPinyinMode else { return nil }
       switch parser {
       case .ofDachen:
-        return Tekkon.mapQwertyDachen[key] ?? ""
+        return Tekkon.mapQwertyDachen[key]
       case .ofDachen26:
         return handleDachen26(key: key)
       case .ofETen:
-        return Tekkon.mapQwertyETenTraditional[key] ?? ""
+        return Tekkon.mapQwertyETenTraditional[key]
       case .ofHsu:
         return handleHsu(key: key)
       case .ofETen26:
         return handleETen26(key: key)
       case .ofIBM:
-        return Tekkon.mapQwertyIBM[key] ?? ""
+        return Tekkon.mapQwertyIBM[key]
       case .ofMiTAC:
-        return Tekkon.mapQwertyMiTAC[key] ?? ""
+        return Tekkon.mapQwertyMiTAC[key]
       case .ofSeigyou:
-        return Tekkon.mapSeigyou[key] ?? ""
+        return Tekkon.mapSeigyou[key]
       case .ofFakeSeigyou:
-        return Tekkon.mapFakeSeigyou[key] ?? ""
+        return Tekkon.mapFakeSeigyou[key]
       case .ofStarlight:
         return handleStarlight(key: key)
       case .ofAlvinLiu:
         return handleAlvinLiu(key: key)
       default:
-        return ""
+        return nil
       }
     }
 
     /// 所有動態注音排列都會用到的共用糾錯處理步驟。
     /// - Parameter incomingPhonabet: 傳入的注音 Phonabet。
-    public mutating func commonFixWhenHandlingDynamicArrangeInputs(
+    internal mutating func commonFixWhenHandlingDynamicArrangeInputs(
       target incomingPhonabet: Phonabet
     ) {
       // 處理特殊情形。
@@ -472,8 +466,8 @@ extension Tekkon {
     /// 回傳結果是空字串的話，不要緊，因為該函式內部已經處理過分配過程了。
     /// - Parameters:
     ///   - key: 傳入的 String 訊號。
-    public mutating func handleETen26(key: String = "") -> String {
-      var strReturn = Tekkon.mapETen26StaticKeys[key] ?? ""
+    internal mutating func handleETen26(key: Unicode.Scalar) -> Unicode.Scalar? {
+      guard var strReturn = Tekkon.mapETen26StaticKeys[key] else { return nil }
 
       let keysToHandleHere = "dfhjklmnpqtw"
 
@@ -514,7 +508,7 @@ extension Tekkon {
       if value == "ㄍ˙" { consonant <~ "ㄑ" }
 
       // 這些按鍵在上文處理過了，就不要再回傳了。
-      if keysToHandleHere.doesHave(key) { strReturn = "" }
+      if keysToHandleHere.doesHave(key) { return nil }
 
       // 回傳結果是空字串的話，不要緊，因為上文已經代處理過分配過程了。
       return strReturn
@@ -525,8 +519,8 @@ extension Tekkon {
     /// 回傳結果是空的話，不要緊，因為該函式內部已經處理過分配過程了。
     /// - Parameters:
     ///   - key: 傳入的 String 訊號。
-    public mutating func handleHsu(key: String = "") -> String {
-      var strReturn = Tekkon.mapHsuStaticKeys[key] ?? ""
+    internal mutating func handleHsu(key: Unicode.Scalar) -> Unicode.Scalar? {
+      guard var strReturn = Tekkon.mapHsuStaticKeys[key] else { return nil }
 
       let keysToHandleHere = "acdefghjklmns"
 
@@ -579,7 +573,7 @@ extension Tekkon {
       if value == "ㄔ˙" { consonant <~ "ㄑ" }
 
       // 這些按鍵在上文處理過了，就不要再回傳了。
-      if keysToHandleHere.doesHave(key) { strReturn = "" }
+      if keysToHandleHere.doesHave(key) { return nil }
 
       // 回傳結果是空的話，不要緊，因為上文已經代處理過分配過程了。
       return strReturn
@@ -590,8 +584,8 @@ extension Tekkon {
     /// 回傳結果是空的話，不要緊，因為該函式內部已經處理過分配過程了。
     /// - Parameters:
     ///   - key: 傳入的 String 訊號。
-    public mutating func handleStarlight(key: String) -> String {
-      var strReturn = Tekkon.mapStarlightStaticKeys[key] ?? ""
+    internal mutating func handleStarlight(key: Unicode.Scalar) -> Unicode.Scalar? {
+      guard var strReturn = Tekkon.mapStarlightStaticKeys[key] else { return nil }
 
       let keysToHandleHere = "efgklmnt"
 
@@ -625,7 +619,7 @@ extension Tekkon {
       }
 
       // 這些按鍵在上文處理過了，就不要再回傳了。
-      if keysToHandleHere.doesHave(key) { strReturn = "" }
+      if keysToHandleHere.doesHave(key) { return nil }
 
       // 回傳結果是空的話，不要緊，因為上文已經代處理過分配過程了。
       return strReturn
@@ -636,8 +630,8 @@ extension Tekkon {
     /// 回傳結果是空的話，不要緊，因為該函式內部已經處理過分配過程了。
     /// - Parameters:
     ///   - key: 傳入的 String 訊號。
-    public mutating func handleDachen26(key: String = "") -> String {
-      var strReturn = Tekkon.mapDachenCP26StaticKeys[key] ?? ""
+    internal mutating func handleDachen26(key: Unicode.Scalar) -> Unicode.Scalar? {
+      guard var strReturn = Tekkon.mapDachenCP26StaticKeys[key] else { return nil }
 
       switch key {
       case "e" where isPronounceable: strReturn = "ˊ"
@@ -663,7 +657,7 @@ extension Tekkon {
         case (_, "ㄡ"):
           vowel.clear()
           strReturn = "ㄩ"
-        case _, ("ㄩ", "ㄡ"):
+        default:
           strReturn = (!semivowel.isEmpty || !"ㄐㄑㄒ".doesHave(consonant.value)) ? "ㄡ" : "ㄩ"
         }
       case "u":
@@ -676,7 +670,7 @@ extension Tekkon {
           strReturn = "ㄚ"
         case (_, "ㄚ"):
           strReturn = "ㄧ"
-        case (_, _): strReturn = semivowel.isEmpty ? "ㄧ" : "ㄚ"
+        default: strReturn = semivowel.isEmpty ? "ㄧ" : "ㄚ"
         }
       default: break
       }
@@ -691,8 +685,8 @@ extension Tekkon {
     /// - Remark: 該處理兼顧了「原旨排列方案」與「微軟新注音相容排列方案」。
     /// - Parameters:
     ///   - key: 傳入的 String 訊號。
-    public mutating func handleAlvinLiu(key: String) -> String {
-      var strReturn = Tekkon.mapAlvinLiuStaticKeys[key] ?? ""
+    internal mutating func handleAlvinLiu(key: Unicode.Scalar) -> Unicode.Scalar? {
+      guard var strReturn = Tekkon.mapAlvinLiuStaticKeys[key] else { return nil }
 
       // 前置處理專有特殊情形。
       if strReturn != "ㄦ" && !vowel.isEmpty { fixValue("ㄦ", "ㄌ") }
@@ -737,23 +731,14 @@ extension Tekkon {
       }
 
       // 這些按鍵在上文處理過了，就不要再回傳了。
-      if keysToHandleHere.doesHave(key) { strReturn = "" }
+      if keysToHandleHere.doesHave(key) { return nil }
 
       // 回傳結果是空字串的話，不要緊，因為上文已經代處理過分配過程了。
       return strReturn
     }
 
-    public func hash(into hasher: inout Hasher) {
-      hasher.combine(consonant)
-      hasher.combine(semivowel)
-      hasher.combine(vowel)
-      hasher.combine(intonation)
-    }
-
-    // MARK: Internal
-
     /// 按需更新拼音組音區的內容顯示。
-    mutating func updateRomajiBuffer() {
+    internal mutating func updateRomajiBuffer() {
       romajiBuffer = Tekkon
         .cnvPhonaToHanyuPinyin(targetJoined: consonant.value + semivowel.value + vowel.value)
     }
@@ -762,8 +747,8 @@ extension Tekkon {
     /// - Parameters:
     ///   - strOf: 要取代的內容。
     ///   - strWith: 要取代成的內容。
-    mutating func fixValue(_ strOf: String, _ strWith: String = "") {
-      guard !strOf.isEmpty, !strWith.isEmpty else { return }
+    internal mutating func fixValue(_ strOf: Unicode.Scalar, _ strWith: Unicode.Scalar) {
+      guard Phonabet(strOf).isValid, Phonabet(strWith).isValid else { return }
       let theOld = Phonabet(strOf)
       switch theOld {
       case consonant: consonant.clear()
@@ -780,5 +765,9 @@ extension Tekkon {
 extension String {
   fileprivate func doesHave(_ target: String) -> Bool {
     has(string: target)
+  }
+
+  fileprivate func doesHave(_ target: Unicode.Scalar) -> Bool {
+    has(scalar: target)
   }
 }
