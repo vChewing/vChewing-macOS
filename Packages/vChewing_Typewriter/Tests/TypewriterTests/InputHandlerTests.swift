@@ -73,7 +73,7 @@ class InputHandlerTests: XCTestCase {
     guard let testHandler else { return }
     // 使用 KBEvent 模擬輸入，類似 MainAssembly 的 typeSentenceOrCandidates
     // 這樣可以正確處理注音、磁帶等各種輸入模式
-    
+
     // 為每個字符建立 KBEvent（按下事件）
     let typingSequence: [KBEvent] = sequence.map { charRAW in
       let charStr = String(charRAW)
@@ -85,7 +85,7 @@ class InputHandlerTests: XCTestCase {
         keyCode: keyCode
       )
     }
-    
+
     // 處理每個 keyDown 事件
     typingSequence.forEach { event in
       _ = testHandler.triageInput(event: event)
@@ -306,7 +306,7 @@ class InputHandlerTests: XCTestCase {
 
     let cassetteLM = LMAssembly.LMInstantiator.lmCassette
     XCTAssertTrue(cassetteLM.isLoaded)
-    XCTAssertTrue(cassetteLM.count > 0)
+    XCTAssertTrue(!cassetteLM.charDefMap.isEmpty)
 
     testHandler.clear()
     typeSentence(",,,")
