@@ -27,6 +27,16 @@ let mapKeyCodesANSIForTests: [String: UInt16] = [
   ".": 47, "/": 44, " ": 49,
 ]
 
+let cassetteURL4Array30CIN2 = URL(fileURLWithPath: #file)
+  .deletingLastPathComponent() // TypewriterTests
+  .deletingLastPathComponent() // Tests
+  .deletingLastPathComponent() // vChewing_Typewriter
+  .deletingLastPathComponent() // Packages
+  .appendingPathComponent("vChewing_LangModelAssembly")
+  .appendingPathComponent("Tests")
+  .appendingPathComponent("TestCINData")
+  .appendingPathComponent("array30.cin2")
+
 // MARK: - InputHandlerTests
 
 /// 威注音輸入法的 InputHandler 單元測試（Typewriter 模組）
@@ -275,8 +285,8 @@ class InputHandlerTests: XCTestCase {
 
   /// 測試磁帶模組的快速選字功能（單一結果）。
   func test10_InputHandler_CassetteQuickPhraseSelection() throws {
-    guard let testHandler else {
-      XCTFail("testHandler is nil.")
+    guard let testHandler, let testSession else {
+      XCTFail("testHandler and testSession at least one of them is nil.")
       return
     }
 
@@ -287,15 +297,7 @@ class InputHandlerTests: XCTestCase {
     testHandler.prefs.cassetteEnabled = true
     testHandler.currentTypingMethod = .vChewingFactory
 
-    let cassetteURL = URL(fileURLWithPath: #file)
-      .deletingLastPathComponent() // TypewriterTests
-      .deletingLastPathComponent() // Tests
-      .deletingLastPathComponent() // vChewing_Typewriter
-      .deletingLastPathComponent() // Packages
-      .appendingPathComponent("vChewing_LangModelAssembly")
-      .appendingPathComponent("Tests")
-      .appendingPathComponent("TestCINData")
-      .appendingPathComponent("array30.cin2")
+    let cassetteURL = cassetteURL4Array30CIN2
 
     guard FileManager.default.fileExists(atPath: cassetteURL.path) else {
       vCTestLog("測試檔案不存在，跳過測試：\(cassetteURL.path)")
@@ -319,32 +321,26 @@ class InputHandlerTests: XCTestCase {
 
     typeSentence(quickPhraseKey)
 
-    // After typing the quick phrase key, the calligrapher should be cleared and we should have a result
-    typeSentence(",,,")
-    XCTAssertEqual(testHandler.calligrapher, ",,,")
-
-    guard let quickPhraseKey = testHandler.currentLM.cassetteQuickPhraseCommissionKey else {
-      vCTestLog("Quick phrase commission key missing, skipping test")
-      return
-    }
-
-    typeSentence(quickPhraseKey)
-
-    // After typing the quick phrase key, a single result should be selected and committed
+    // 打完 QuickPhrase 確認鍵之後，組筆區的內容應該會被清空、且此時應該有結果遞交出去。
+    let currentState = testSession.state
+    XCTAssertTrue(
+      currentState.type == .ofEmpty || currentState.type == .ofSymbolTable,
+      "Quick phrase with single result should either commit directly or open a symbol table, got \(currentState.type)."
+    )
+    // ↑MockSession 會在遞交結果時回復為 .ofEmpty，因此此處允許 .ofEmpty。
     XCTAssertTrue(testHandler.calligrapher.isEmpty)
-    // For single-result quick phrases, the result is committed immediately
-    // The assembler should contain the committed text
+    // 只有單筆結果時，得立刻遞交出去。組筆區應該是有結果的。
     let result = generateDisplayedText()
     vCTestLog("Result after quick phrase: '\(result)'")
     // Single result quick phrases commit directly, so assembler might be empty
     // but the state should be appropriate for commit
-    XCTAssertTrue(testSession?.state.type == .ofEmpty || !result.isEmpty)
+    XCTAssertTrue(testSession.state.type == .ofEmpty || !result.isEmpty)
   }
 
   /// 測試磁帶模組的快速選字功能（符號表多選）。
   func test11_InputHandler_CassetteQuickPhraseSymbolTableMultiple() throws {
-    guard let testHandler else {
-      XCTFail("testHandler is nil.")
+    guard let testHandler, let testSession else {
+      XCTFail("testHandler and testSession at least one of them is nil.")
       return
     }
 
@@ -354,15 +350,7 @@ class InputHandlerTests: XCTestCase {
 
     testHandler.prefs.cassetteEnabled = true
 
-    let cassetteURL = URL(fileURLWithPath: #file)
-      .deletingLastPathComponent() // TypewriterTests
-      .deletingLastPathComponent() // Tests
-      .deletingLastPathComponent() // vChewing_Typewriter
-      .deletingLastPathComponent() // Packages
-      .appendingPathComponent("vChewing_LangModelAssembly")
-      .appendingPathComponent("Tests")
-      .appendingPathComponent("TestCINData")
-      .appendingPathComponent("array30.cin2")
+    let cassetteURL = cassetteURL4Array30CIN2
 
     guard FileManager.default.fileExists(atPath: cassetteURL.path) else {
       vCTestLog("測試檔案不存在，跳過測試：\(cassetteURL.path)")
@@ -385,8 +373,16 @@ class InputHandlerTests: XCTestCase {
     vCTestLog("Testing symbol table multi-selection")
     vCTestLog("Calligrapher: \(testHandler.calligrapher)")
 
+    XCTAssertEqual(testSession.state.type, .ofSymbolTable)
+    XCTAssertEqual(testSession.state.node.name, ",,,,")
+    XCTAssertEqual(testHandler.calligrapher, ",,,,")
+
     // 測試是否產生了多個候選字
-    let candidates = testHandler.generateArrayOfCandidates()
-    vCTestLog("Candidates: \(candidates.map { $0.value })")
+    let symbolCandidates = testSession.state.node.members.map { $0.name }
+    XCTAssertEqual(symbolCandidates, ["炎炎", "迷迷糊糊", "熒熒"])
+
+    let stateCandidates = testSession.state.data.candidates.map { $0.value }
+    XCTAssertEqual(stateCandidates, symbolCandidates)
+    vCTestLog("Candidates: \(symbolCandidates)")
   }
 }
