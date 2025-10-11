@@ -35,6 +35,9 @@ let package = Package(
         .product(name: "Shared", package: "vChewing_Shared"),
         .product(name: "SwiftExtension", package: "vChewing_SwiftExtension"),
         .product(name: "Tekkon", package: "vChewing_Tekkon"),
+      ],
+      linkerSettings: [
+        .linkedLibrary("iconv", .when(platforms: [.macOS])),
       ]
     ),
     .testTarget(
@@ -46,6 +49,9 @@ let package = Package(
         .product(name: "Megrez", package: "vChewing_Megrez"),
         .product(name: "Shared", package: "vChewing_Shared"),
         .product(name: "Tekkon", package: "vChewing_Tekkon"),
+      ],
+      linkerSettings: [
+        .linkedLibrary("iconv", .when(platforms: [.macOS])),
       ]
     ),
   ]
