@@ -8,7 +8,7 @@
 "Continue" = "Continue";
 "Fatal Error" = "Fatal Error";
 "i18n:installer.ACCEPT_INSTALLATION" = "I Accept";
-"i18n:installer.APP_DERIVED_FROM" = "　";
+"i18n:installer.DONATION_MESSAGE" = "Please consider donation. Details: https://vchewing.github.io";
 "i18n:installer.APP_NAME" = "vChewing for macOS";
 "i18n:installer.CANCEL_INSTALLATION" = "Cancel";
 "i18n:installer.DEV_CREW" = "vChewing macOS Development: Shiki Suen, Isaac Xen, Hiraku Wang, etc.\nvChewing Phrase Database Maintained by Shiki Suen.\nSentence-composition algorithm (DAG-DP) implemented by Shiki Suen.";

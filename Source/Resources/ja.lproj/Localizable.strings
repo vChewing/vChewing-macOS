@@ -188,7 +188,7 @@
 "Hsu" = "許氏国音自然配列";
 "Hualuo Pinyin with Numeral Intonation" = "中華ローマ弁音 (ローマ字+数字音調)";
 "i18n:aboutWindow.ABOUT_APP_TITLE_FULL" = "macOS 版威注音入力アプリについて";
-"i18n:aboutWindow.APP_DERIVED_FROM" = "　";
+"i18n:aboutWindow.DONATION_MESSAGE" = "ご寄付をご検討ください。関連情報：https://vChewing.github.io";
 "i18n:aboutWindow.APP_NAME" = "vChewing for macOS";
 "i18n:aboutWindow.BUGREPORT_BUTTON" = "問題を報告";
 "i18n:aboutWindow.DEV_CREW" = "macOS 版威注音の開発：Shiki Suen, Isaac Xen, Hiraku Wang, など。\n威注音語彙データの維持：Shiki Suen。\nDAG-DP センテンス構築算法実作：Shiki Suen。";

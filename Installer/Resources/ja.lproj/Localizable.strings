@@ -8,7 +8,7 @@
 "Continue" = "続行";
 "Fatal Error" = "致命錯乱";
 "i18n:installer.ACCEPT_INSTALLATION" = "承認する";
-"i18n:installer.APP_DERIVED_FROM" = "　";
+"i18n:installer.DONATION_MESSAGE" = "ご寄付をご検討ください。関連情報：https://vChewing.github.io";
 "i18n:installer.APP_NAME" = "vChewing for macOS";
 "i18n:installer.CANCEL_INSTALLATION" = "取消";
 "i18n:installer.DEV_CREW" = "macOS 版威注音の開発：Shiki Suen, Isaac Xen, Hiraku Wang, など。\n威注音語彙データの維持：Shiki Suen。\nDAG-DP センテンス構築算法実作：Shiki Suen。";

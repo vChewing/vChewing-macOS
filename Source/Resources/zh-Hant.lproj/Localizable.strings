@@ -189,7 +189,7 @@
 "Hsu" = "許氏國音自然排列";
 "Hualuo Pinyin with Numeral Intonation" = "華羅拼音+數字標調";
 "i18n:aboutWindow.ABOUT_APP_TITLE_FULL" = "關於 macOS 版「威注音輸入法」";
-"i18n:aboutWindow.APP_DERIVED_FROM" = "　";
+"i18n:aboutWindow.DONATION_MESSAGE" = "請考慮對敝專案捐贈。詳情：https://vchewing.github.io";
 "i18n:aboutWindow.APP_NAME" = "vChewing for macOS";
 "i18n:aboutWindow.BUGREPORT_BUTTON" = "故障提報";
 "i18n:aboutWindow.DEV_CREW" = "威注音 macOS 程式研發：Shiki Suen, Isaac Xen, Hiraku Wang, 等。\n威注音詞庫維護：Shiki Suen。\nDAG-DP 組句算法實作：Shiki Suen。";

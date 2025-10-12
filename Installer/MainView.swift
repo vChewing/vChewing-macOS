@@ -39,7 +39,7 @@ public struct MainView: View {
                 Text("i18n:installer.APP_NAME").fontWeight(.heavy).lineLimit(1)
                 Text("v\(versionString) Build \(installingVersion)").lineLimit(1)
               }.fixedSize()
-              Text("i18n:installer.APP_DERIVED_FROM").font(.custom("Tahoma", size: 11))
+              Text("i18n:installer.DONATION_MESSAGE").font(.custom("Tahoma", size: 11))
               Text(Self.strCopyrightLabel).font(.custom("Tahoma", size: 11))
               Text("i18n:installer.DEV_CREW").font(.custom("Tahoma", size: 11))
                 .padding([.vertical], 2)
