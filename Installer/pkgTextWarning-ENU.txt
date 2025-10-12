@@ -1,10 +1,12 @@
 Notice:
 1. Relogin is strongly recommended if this is the first time you install vChewing to this system account.
 
-2. Due to a bug in macOS 10.x and 11.x, if you are trying to install this input method on macOS releases earlier than macOS 12 Monterey, PLEASE manually choose the install target to the user folder. Otherwise, there will be problems when you are trying to install this input method to later versions when your OS gets upgraded to macOS 12 Monterey or later. The following terminal command can solve such probelems by removing all incorrectly-installed files (must use sudo):
+2. Please consider donation to this project. You can read related information from https://vChewing.github.io website.
+
+3. Important to those users who previously used this software on macOS 11 and earlier: Due to a bug in macOS 10.x and 11.x, if you are trying to install this input method on macOS releases earlier than macOS 12 Monterey, PLEASE manually choose the install target to the user folder. Otherwise, there will be problems when you are trying to install this input method to later versions when your OS gets upgraded to macOS 12 Monterey or later. The following terminal command can solve such probelems by removing all incorrectly-installed files (must use sudo):
     sudo bash /Users/$(stat -f%Su /dev/console)/Library/Input\ Methods/vChewing.app/Contents/Resources/fixinstall.sh
 
-3. IT maintainers can also use this terminal deploy command, regardless the macOS version:
+4. IT maintainers can also use this terminal deploy command, regardless the macOS version:
     installer -pkg ~/Downloads/vChewing-macOS-?.?.?-unsigned.pkg -target CurrentUserHomeDirectory
 
 Warm Regards,

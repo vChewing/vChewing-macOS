@@ -1,10 +1,12 @@
 注意事项：
 一、安装完毕之后，如果输入法无法正常使用的话，请重新登入即可。
 
-二、macOS 10.x-11.x 系统有 Bug、令该安装程式无法自动将安装目标设为当前使用者资料夹。如果您在 macOS 12 Monterey 之前的系统安装该输入法的话，请务必“手动”将安装目的地设为当前使用者资料夹。否则，当您今后（在升级系统之后）升级输入法的时候，可能会出现各种混乱情况。下述 sudo 指令会将任何安装到错误位置的档案全部移除：
+二、请考虑对敝专案捐赠。相关资讯请洽 https://vChewing.github.io 网站。
+
+三、在 macOS 10.x-11.x 系统下此前安装过威注音输入法的用户请注意：这几版系统有 Bug、令该安装程式无法自动将安装目标设为当前使用者资料夹。如果您在 macOS 12 Monterey 之前的系统安装该输入法的话，请务必“手动”将安装目的地设为当前使用者资料夹。否则，当您今后（在升级系统之后）升级输入法的时候，可能会出现各种混乱情况。下述 sudo 指令会将任何安装到错误位置的档案全部移除：
     sudo bash /Users/$(stat -f%Su /dev/console)/Library/Input\ Methods/vChewing.app/Contents/Resources/fixinstall.sh
 
-三、终端部署指令（不限作业系统版本）：
+四、终端部署指令（不限作业系统版本）：
     installer -pkg ~/Downloads/vChewing-macOS-?.?.?-unsigned.pkg -target CurrentUserHomeDirectory
 
 顺颂时祺
