@@ -70,7 +70,7 @@ public class VwrAboutCocoa: NSViewController {
         NSStackView.build(.vertical) {
           appNameAndVersionString.makeNSLabel(fixWidth: contentWidth - imgWidth - 10)
           makeFormattedLabel(
-            verbatim: "i18n:aboutWindow.APP_DERIVED_FROM".localized
+            verbatim: "i18n:aboutWindow.DONATION_MESSAGE".localized
               + "\n"
               + Self.copyrightLabel,
             size: 11,

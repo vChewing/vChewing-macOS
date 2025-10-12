@@ -189,7 +189,7 @@
 "Hsu" = "Hsu";
 "Hualuo Pinyin with Numeral Intonation" = "Hualuo Pinyin with Numeral Intonation";
 "i18n:aboutWindow.ABOUT_APP_TITLE_FULL" = "About vChewing for macOS";
-"i18n:aboutWindow.APP_DERIVED_FROM" = "　";
+"i18n:aboutWindow.DONATION_MESSAGE" = "Please consider donation. Details: https://vchewing.github.io";
 "i18n:aboutWindow.APP_NAME" = "vChewing for macOS";
 "i18n:aboutWindow.BUGREPORT_BUTTON" = "Bug Report";
 "i18n:aboutWindow.DEV_CREW" = "vChewing macOS Development: Shiki Suen, Isaac Xen, Hiraku Wang, etc.\nvChewing Phrase Database Maintained by Shiki Suen.\nSentence-composition algorithm (DAG-DP) implemented by Shiki Suen.";

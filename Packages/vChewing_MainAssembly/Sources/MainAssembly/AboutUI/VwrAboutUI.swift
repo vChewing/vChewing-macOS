@@ -44,7 +44,7 @@ extension VwrAboutUI: View {
                 )
                 .lineLimit(1)
               }.fixedSize()
-              Text("i18n:aboutWindow.APP_DERIVED_FROM").font(.custom("Tahoma", size: 11))
+              Text("i18n:aboutWindow.DONATION_MESSAGE").font(.custom("Tahoma", size: 11))
               Text(Self.copyrightLabel).font(.custom("Tahoma", size: 11))
               Text("i18n:aboutWindow.DEV_CREW").font(.custom("Tahoma", size: 11))
                 .padding([.vertical], 2)
