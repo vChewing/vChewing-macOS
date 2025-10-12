@@ -8,7 +8,7 @@
 "Continue" = "繼續";
 "Fatal Error" = "安裝錯誤";
 "i18n:installer.ACCEPT_INSTALLATION" = "我接受";
-"i18n:installer.APP_DERIVED_FROM" = "　";
+"i18n:installer.DONATION_MESSAGE" = "請考慮對敝專案捐贈。詳情：https://vchewing.github.io";
 "i18n:installer.APP_NAME" = "vChewing for macOS";
 "i18n:installer.CANCEL_INSTALLATION" = "取消安裝";
 "i18n:installer.DEV_CREW" = "威注音 macOS 程式研發：Shiki Suen, Isaac Xen, Hiraku Wang, 等。\n威注音詞庫維護：Shiki Suen。\nDAG-DP 組句算法實作：Shiki Suen。";
