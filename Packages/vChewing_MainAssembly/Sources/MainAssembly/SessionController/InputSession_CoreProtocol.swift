@@ -245,6 +245,7 @@ extension SessionProtocol {
   }
 
   public func performServerActivation(client: ClientObj?) {
+    hidePalettes()
     asyncOnMain { [weak self] in
       guard let self = self else { return }
       if let senderBundleID: String = client?.bundleIdentifier() {

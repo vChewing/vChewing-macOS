@@ -216,6 +216,7 @@ extension InputSession {
   }
 
   public func setValue(_ value: Any!, forTag tag: Int, client sender: Any!) {
+    hidePalettes()
     asyncOnMain { [weak self] in
       guard let self = self else { return }
       let newMode: Shared
