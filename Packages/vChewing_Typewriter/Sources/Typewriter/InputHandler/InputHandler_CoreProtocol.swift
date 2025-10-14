@@ -524,7 +524,8 @@ extension InputHandlerProtocol {
         let overrideBehavior: Megrez.Node.OverrideType = .withSpecified
         let suggestedPair: Megrez.KeyValuePaired = .init(
           key: newestSuggestedCandidate.keyArray.joined(separator: assembler.separator),
-          value: newestSuggestedCandidate.value
+          value: newestSuggestedCandidate.value,
+          score: newestSuggestedCandidate.probability
         )
         let cursorForOverride = suggestion.overrideCursor ?? actualNodeCursorPosition
         let ngramKey = suggestedPair.toNGramKey
