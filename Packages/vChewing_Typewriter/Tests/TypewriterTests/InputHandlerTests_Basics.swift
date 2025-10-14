@@ -174,6 +174,7 @@ class InputHandlerTests: XCTestCase {
   }
 
   override func tearDownWithError() throws {
+    testHandler?.errorCallback = nil
     testSession?.switchState(MockIMEState.ofAbortion())
     UserDefaults.unitTests?.removeSuite(named: "org.atelierInmu.vChewing.Typewriter.UnitTests")
     UserDef.resetAll()

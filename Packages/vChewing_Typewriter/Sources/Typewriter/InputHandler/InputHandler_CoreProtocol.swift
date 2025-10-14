@@ -165,10 +165,22 @@ extension InputHandlerProtocol {
           }
         }
         if !overrideTaskResult, attempt == 2 {
-          currentLM.bleachSpecifiedPOMSuggestions(targets: [
+          let contextualTargets = [
+            pomObservationPrimary
+              .map { (ngramKey: $0.contextualizedGramKey, candidate: $0.candidate) },
+            pomObservation2ndary
+              .map { (ngramKey: $0.contextualizedGramKey, candidate: $0.candidate) },
+          ].compactMap { $0 }
+          if !contextualTargets.isEmpty {
+            currentLM.bleachSpecifiedPOMSuggestions(targets: contextualTargets)
+          }
+          let candidateTargets = [
             pomObservationPrimary?.candidate,
             pomObservation2ndary?.candidate,
-          ].compactMap { $0 })
+          ].compactMap { $0 }
+          if !candidateTargets.isEmpty {
+            currentLM.bleachSpecifiedPOMSuggestions(targets: Array(Set(candidateTargets)))
+          }
           pomObservationPrimary = nil
           pomObservation2ndary = nil
         }
@@ -530,6 +542,10 @@ extension InputHandlerProtocol {
     }
     arrResult = arrResult.stableSort { $0.1.score > $1.1.score }
     return arrResult
+  }
+
+  public func activePOMCandidateValues() -> [String] {
+    retrievePOMSuggestions(apply: false).map { $0.1.value }
   }
 
   func letComposerAndCalligrapherDoBackSpace() {

@@ -9,6 +9,7 @@
 import AppKit
 import IMKUtils
 import LangModelAssembly
+import Megrez
 import NotifierUI
 import Shared
 
@@ -53,6 +54,15 @@ extension SessionProtocol {
     // 後續操作。
     let valueCurrent = userPhrase.value
     let valueReversed = ChineseConverter.crossConvert(valueCurrent)
+    let separator = inputHandler.keySeparator.isEmpty
+      ? Megrez.Compositor.theSeparator
+      : inputHandler.keySeparator
+    let headReading = userPhrase.keyArray.joined(separator: separator)
+    var candidateTargets = inputHandler.activePOMCandidateValues()
+    if !valueCurrent.isEmpty {
+      candidateTargets.append(valueCurrent)
+    }
+    let uniqueCandidateTargets = Array(Set(candidateTargets.filter { !$0.isEmpty }))
 
     // 更新組字器內的單元圖資料。
     // 註：如果已經排除的內容是該讀音下唯一的記錄的話，
@@ -70,7 +80,15 @@ extension SessionProtocol {
       isFiltering: addToFilter
     )
     // 開始針對使用者漸退模組的清詞處理
-    LMMgr.bleachSpecifiedSuggestions(targets: [valueCurrent], mode: IMEApp.currentInputMode)
+    if !uniqueCandidateTargets.isEmpty {
+      LMMgr.bleachSpecifiedSuggestions(
+        targets: uniqueCandidateTargets,
+        mode: IMEApp.currentInputMode
+      )
+    }
+    if !headReading.isEmpty {
+      LMMgr.bleachSpecifiedSuggestions(headReadings: [headReading], mode: IMEApp.currentInputMode)
+    }
     LMMgr.bleachSpecifiedSuggestions(
       targets: [valueReversed],
       mode: IMEApp.currentInputMode.reversed
