@@ -283,7 +283,21 @@ public class MockSession: SessionCoreProtocol, CtlCandidateDelegate {
 
   public func updateCompositionBufferDisplay() {}
 
-  public func performUserPhraseOperation(addToFilter: Bool) -> Bool { false }
+  public func performUserPhraseOperation(addToFilter: Bool) -> Bool {
+    guard let inputHandler = inputHandler, state.type == .ofMarking else { return false }
+    var succeeded = true
+    let kvPair = state.data.userPhraseKVPair
+    var userPhrase = UserPhraseInsertable(
+      keyArray: kvPair.keyArray,
+      value: kvPair.value,
+      inputMode: IMEApp.currentInputMode
+    )
+    // 該單元測試僅測試當前函式是否有清除 POM 內部的相關資料。
+    // 不然的話，該函式的目的與結果可能會被 POM 既有資料所干涉。
+    inputHandler.currentLM.bleachSpecifiedPOMSuggestions(targets: [userPhrase.value])
+    // 清詞完畢
+    return true
+  }
 
   @discardableResult
   public func updateVerticalTypingStatus() -> CGRect { .zero }
@@ -292,7 +306,10 @@ public class MockSession: SessionCoreProtocol, CtlCandidateDelegate {
 
   public func candidateController() -> CtlCandidateProtocol? { nil }
 
-  public func candidatePairs(conv: Bool) -> [(keyArray: [String], value: String)] { [] }
+  public func candidatePairs(conv _: Bool) -> [(keyArray: [String], value: String)] {
+    if !state.isCandidateContainer || state.candidates.isEmpty { return [] }
+    return state.candidates
+  }
 
   public func candidatePairSelectionConfirmed(at index: Int) {
     guard let inputHandler = inputHandler else { return }
