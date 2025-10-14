@@ -285,16 +285,33 @@ public class MockSession: SessionCoreProtocol, CtlCandidateDelegate {
 
   public func performUserPhraseOperation(addToFilter: Bool) -> Bool {
     guard let inputHandler = inputHandler, state.type == .ofMarking else { return false }
-    var succeeded = true
     let kvPair = state.data.userPhraseKVPair
-    var userPhrase = UserPhraseInsertable(
+    let userPhrase = UserPhraseInsertable(
       keyArray: kvPair.keyArray,
       value: kvPair.value,
       inputMode: IMEApp.currentInputMode
     )
+    inputHandler.currentLM.insertTemporaryData(
+      unigram: .init(
+        keyArray: userPhrase.keyArray,
+        value: userPhrase.value,
+        score: userPhrase.weight ?? 0
+      ),
+      isFiltering: addToFilter
+    )
     // 該單元測試僅測試當前函式是否有清除 POM 內部的相關資料。
     // 不然的話，該函式的目的與結果可能會被 POM 既有資料所干涉。
-    inputHandler.currentLM.bleachSpecifiedPOMSuggestions(targets: [userPhrase.value])
+    var pomTargets = inputHandler.activePOMCandidateValues()
+    pomTargets.append(userPhrase.value)
+    let uniqueTargets = Array(Set(pomTargets.filter { !$0.isEmpty }))
+    if !uniqueTargets.isEmpty {
+      inputHandler.currentLM.bleachSpecifiedPOMSuggestions(targets: uniqueTargets)
+    }
+    let separator = inputHandler.keySeparator.isEmpty ? Megrez.Compositor.theSeparator : inputHandler.keySeparator
+    let headReading = userPhrase.keyArray.joined(separator: separator)
+    if !headReading.isEmpty {
+      inputHandler.currentLM.bleachSpecifiedPOMSuggestions(headReadings: [headReading])
+    }
     // 清詞完畢
     return true
   }

@@ -289,6 +289,7 @@ extension LMAssembly.LMPerceptionOverride {
       previous: String?
     )]? {
     guard let parts = parsePerceptionKey(key) else { return nil }
+    guard !shouldIgnorePerception(parts) else { return nil }
     let frontEdgeReading = parts.headReading
     guard !frontEdgeReading.isEmpty else { return nil }
     guard !key.isEmpty, let kvPair = mutLRUMap[key] else { return nil }
@@ -360,6 +361,7 @@ extension LMAssembly.LMPerceptionOverride {
     let candidate = perception.candidate
     // 檢查 key 是否有效
     guard !key.isEmpty else { return }
+    guard !shouldIgnoreKey(key) else { return }
     // 更新現有的洞察
     if let theNeta = mutLRUMap[key] {
       theNeta.perception.update(candidate: candidate, timestamp: timestamp)
@@ -400,18 +402,96 @@ extension LMAssembly.LMPerceptionOverride {
     }
   }
 
-  func bleachSpecifiedSuggestions(targets: [String], saveCallback: (() -> ())? = nil) {
+  /// 清除指定的建議（基於 context + candidate 對）
+  func bleachSpecifiedSuggestions(
+    targets: [(ngramKey: String, candidate: String)],
+    saveCallback: (() -> ())? = nil
+  ) {
     if targets.isEmpty { return }
     var hasChanges = false
+    var keysToRemoveCompletely: [String] = []
 
-    // 使用過濾方式更新 mutLRUMap
-    let keysToRemove = mutLRUMap.keys.filter { key in
-      let perception = mutLRUMap[key]?.perception
-      return perception?.overrides.keys.contains(where: { targets.contains($0) }) ?? false
+    // 遍歷目標列表，針對每個 (ngramKey, candidate) 對進行移除
+    for target in targets {
+      guard let pair = mutLRUMap[target.ngramKey] else { continue }
+      let perception = pair.perception
+
+      // 移除指定的 candidate override
+      if perception.overrides.removeValue(forKey: target.candidate) != nil {
+        hasChanges = true
+
+        // 如果 perception 已經沒有任何 overrides，則標記整個 key 需要移除
+        if perception.overrides.isEmpty {
+          keysToRemoveCompletely.append(target.ngramKey)
+        }
+      }
+    }
+
+    // 移除已經沒有任何 overrides 的 keys
+    if !keysToRemoveCompletely.isEmpty {
+      keysToRemoveCompletely.forEach { mutLRUMap.removeValue(forKey: $0) }
+    }
+
+    if hasChanges {
+      resetLRUList()
+      saveCallback?() ?? saveData()
+    }
+  }
+
+  /// 清除指定的建議（基於 candidate，移除所有上下文中的該候選詞）
+  func bleachSpecifiedSuggestions(candidateTargets: [String], saveCallback: (() -> ())? = nil) {
+    if candidateTargets.isEmpty { return }
+    var hasChanges = false
+    var keysToRemoveCompletely: [String] = []
+
+    // 遍歷所有 keys，檢查其 perception 中是否有需要清除的 overrides
+    for key in mutLRUMap.keys {
+      guard let pair = mutLRUMap[key] else { continue }
+      let perception = pair.perception
+
+      // 找出需要移除的 override keys
+      let overridesToRemove = perception.overrides.keys.filter { candidateTargets.contains($0) }
+
+      if !overridesToRemove.isEmpty {
+        hasChanges = true
+
+        // 移除指定的 overrides
+        overridesToRemove.forEach { perception.overrides.removeValue(forKey: $0) }
+
+        // 如果 perception 已經沒有任何 overrides，則標記整個 key 需要移除
+        if perception.overrides.isEmpty {
+          keysToRemoveCompletely.append(key)
+        }
+      }
+    }
+
+    // 移除已經沒有任何 overrides 的 keys
+    if !keysToRemoveCompletely.isEmpty {
+      keysToRemoveCompletely.forEach { mutLRUMap.removeValue(forKey: $0) }
+    }
+
+    if hasChanges {
+      resetLRUList()
+      saveCallback?() ?? saveData()
+    }
+  }
+
+  /// 清除指定讀音（head reading）底下的所有建議。
+  func bleachSpecifiedSuggestions(headReadingTargets: [String], saveCallback: (() -> ())? = nil) {
+    let targets = Set(headReadingTargets.filter { !$0.isEmpty })
+    guard !targets.isEmpty else { return }
+    var hasChanges = false
+    var keysToRemove: [String] = []
+
+    for key in mutLRUMap.keys {
+      guard let parts = parsePerceptionKey(key) else { continue }
+      if targets.contains(parts.headReading) {
+        hasChanges = true
+        keysToRemove.append(key)
+      }
     }
 
     if !keysToRemove.isEmpty {
-      hasChanges = true
       keysToRemove.forEach { mutLRUMap.removeValue(forKey: $0) }
     }
 
@@ -423,7 +503,13 @@ extension LMAssembly.LMPerceptionOverride {
 
   /// 自 LRU 辭典內移除所有的單元圖。
   func bleachUnigrams(saveCallback: (() -> ())? = nil) {
-    let keysToRemove = mutLRUMap.keys.filter { $0.contains("(),()") }
+    var keysToRemove: [String] = []
+    for key in mutLRUMap.keys {
+      guard let parts = parsePerceptionKey(key) else { continue }
+      if parts.prev1 == nil, parts.prev2 == nil {
+        keysToRemove.append(key)
+      }
+    }
     if !keysToRemove.isEmpty {
       keysToRemove.forEach { mutLRUMap.removeValue(forKey: $0) }
       resetLRUList()
@@ -432,6 +518,7 @@ extension LMAssembly.LMPerceptionOverride {
   }
 
   public func resetLRUList() {
+    purgeUnderscorePrefixedKeys()
     mutLRUKeySeqList.removeAll()
     let mapLRUSorted = mutLRUMap.sorted {
       $0.value.latestTimeStamp > $1.value.latestTimeStamp
@@ -469,6 +556,7 @@ extension LMAssembly.LMPerceptionOverride {
   public func loadData(from data: [KeyPerceptionPair]) {
     var newMap = [String: KeyPerceptionPair]()
     data.forEach { currentPair in
+      guard !shouldIgnoreKey(currentPair.key) else { return }
       newMap[currentPair.key] = currentPair
     }
     mutLRUMap = newMap
@@ -545,8 +633,7 @@ extension LMAssembly.LMPerceptionOverride {
   }
 
   // 解析 Perception Key 的健壯 parser（不用正則）。
-  // 新式格式示例：(prev2Reading,prev2Value)&(prev1Reading,prev1Value)&(headReading,headValue)
-  // 舊式格式示例：((prev2Reading:prev2Value),(prev1Reading:prev1Value),headReading)
+  // 現行格式示例：(prev2Reading,prev2Value)&(prev1Reading,prev1Value)&(headReading,headValue)
   struct PerceptionKeyParts {
     let headReading: String
     let headValue: String
@@ -555,13 +642,10 @@ extension LMAssembly.LMPerceptionOverride {
   }
 
   func parsePerceptionKey(_ key: String) -> PerceptionKeyParts? {
-    if let parsed = parseDashDelimitedPerceptionKey(key) {
-      return parsed
-    }
-    return parseLegacyPerceptionKey(key)
+    parseDelimitedPerceptionKey(key)
   }
 
-  private func parseDashDelimitedPerceptionKey(_ key: String) -> PerceptionKeyParts? {
+  private func parseDelimitedPerceptionKey(_ key: String) -> PerceptionKeyParts? {
     let trimmed = key.trimmingCharacters(in: .whitespacesAndNewlines)
     guard trimmed.contains("&") else { return nil }
 
@@ -610,45 +694,6 @@ extension LMAssembly.LMPerceptionOverride {
     )
   }
 
-  private func parseLegacyPerceptionKey(_ key: String) -> PerceptionKeyParts? {
-    guard key.first == "(", key.last == ")", key.count >= 2 else { return nil }
-    let inner = key.dropFirst().dropLast()
-    var parts: [String] = []
-    var depth = 0
-    var token = ""
-    for ch in inner {
-      if ch == ",", depth == 0 {
-        parts.append(token)
-        token.removeAll()
-        continue
-      }
-      if ch == "(" { depth += 1 }
-      if ch == ")" { depth -= 1 }
-      token.append(ch)
-    }
-    if !token.isEmpty { parts.append(token) }
-    guard !parts.isEmpty else { return nil }
-    let headReading = parts.last!.trimmingCharacters(in: .whitespaces)
-    if headReading.contains("(") || headReading.contains(")") { return nil }
-
-    func parsePrev(_ s: String) -> (String, String)? {
-      if s == "()" { return nil }
-      guard s.first == "(", s.last == ")" else { return nil }
-      let inner = s.dropFirst().dropLast()
-      if let colonIdx = inner.firstIndex(of: ":") {
-        let reading = inner[..<colonIdx]
-        let value = inner[inner.index(after: colonIdx)...]
-        return (String(reading), String(value))
-      }
-      return nil
-    }
-
-    let count = parts.count
-    let prev1 = count >= 2 ? parsePrev(parts[count - 2]) : nil
-    let prev2 = count >= 3 ? parsePrev(parts[count - 3]) : nil
-    return .init(headReading: headReading, headValue: headReading, prev1: prev1, prev2: prev2)
-  }
-
   private func compareContextPart(
     _ lhs: (reading: String, value: String)?,
     _ rhs: (reading: String, value: String)?
@@ -666,6 +711,7 @@ extension LMAssembly.LMPerceptionOverride {
 
   private func alternateKeys(for originalKey: String) -> [String] {
     guard let originalParts = parsePerceptionKey(originalKey) else { return [] }
+    guard !shouldIgnorePerception(originalParts) else { return [] }
     let separatorString = Megrez.Compositor.theSeparator
     let headSegments =
       separatorString.isEmpty
@@ -682,6 +728,7 @@ extension LMAssembly.LMPerceptionOverride {
     var results: [String] = []
     for keyCandidate in mutLRUKeySeqList {
       guard let candidateParts = parsePerceptionKey(keyCandidate) else { continue }
+      guard !shouldIgnorePerception(candidateParts) else { continue }
       guard compareContextPart(candidateParts.prev1, originalParts.prev1) else { continue }
       guard compareContextPart(candidateParts.prev2, originalParts.prev2) else { continue }
       let candidateHeadSegments =
@@ -705,6 +752,7 @@ extension LMAssembly.LMPerceptionOverride {
 
   private func forceHighScoreOverrideFlag(for key: String) -> Bool {
     guard let parts = parsePerceptionKey(key) else { return false }
+    guard !shouldIgnorePerception(parts) else { return false }
     let separatorString = Megrez.Compositor.theSeparator
     let headLen =
       separatorString.isEmpty
@@ -799,6 +847,37 @@ extension LMAssembly.LMPerceptionOverride {
       return String(firstChar) == "_"
     }
     return false
+  }
+
+  private func shouldIgnorePerception(_ parts: PerceptionKeyParts) -> Bool {
+    let readings = [parts.headReading, parts.prev1?.reading, parts.prev2?.reading]
+      .compactMap { $0 }
+    return readings.contains { containsUnderscorePrefixedReading($0) }
+  }
+
+  private func shouldIgnoreKey(_ key: String) -> Bool {
+    guard let parts = parsePerceptionKey(key) else { return false }
+    return shouldIgnorePerception(parts)
+  }
+
+  private func containsUnderscorePrefixedReading(_ reading: String) -> Bool {
+    readingSegments(from: reading).contains { $0.hasPrefix("_") }
+  }
+
+  private func readingSegments(from reading: String) -> [String] {
+    let trimmed = reading.trimmingCharacters(in: .whitespacesAndNewlines)
+    guard !trimmed.isEmpty else { return [] }
+    let separator = Megrez.Compositor.theSeparator
+    if separator.isEmpty { return [trimmed] }
+    return trimmed
+      .components(separatedBy: separator)
+      .map { $0.trimmingCharacters(in: .whitespacesAndNewlines) }
+  }
+
+  private func purgeUnderscorePrefixedKeys() {
+    let invalidKeys = mutLRUMap.keys.filter { shouldIgnoreKey($0) }
+    guard !invalidKeys.isEmpty else { return }
+    invalidKeys.forEach { mutLRUMap.removeValue(forKey: $0) }
   }
 }
 
