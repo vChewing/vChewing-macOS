@@ -400,8 +400,42 @@ extension LMAssembly.LMPerceptionOverride {
     }
   }
 
-  func bleachSpecifiedSuggestions(targets: [String], saveCallback: (() -> ())? = nil) {
+  /// 清除指定的建議（基於 context + candidate 對）
+  func bleachSpecifiedSuggestions(targets: [(ngramKey: String, candidate: String)], saveCallback: (() -> ())? = nil) {
     if targets.isEmpty { return }
+    var hasChanges = false
+    var keysToRemoveCompletely: [String] = []
+
+    // 遍歷目標列表，針對每個 (ngramKey, candidate) 對進行移除
+    for target in targets {
+      guard let pair = mutLRUMap[target.ngramKey] else { continue }
+      let perception = pair.perception
+      
+      // 移除指定的 candidate override
+      if perception.overrides.removeValue(forKey: target.candidate) != nil {
+        hasChanges = true
+        
+        // 如果 perception 已經沒有任何 overrides，則標記整個 key 需要移除
+        if perception.overrides.isEmpty {
+          keysToRemoveCompletely.append(target.ngramKey)
+        }
+      }
+    }
+
+    // 移除已經沒有任何 overrides 的 keys
+    if !keysToRemoveCompletely.isEmpty {
+      keysToRemoveCompletely.forEach { mutLRUMap.removeValue(forKey: $0) }
+    }
+
+    if hasChanges {
+      resetLRUList()
+      saveCallback?() ?? saveData()
+    }
+  }
+
+  /// 清除指定的建議（基於 candidate，移除所有上下文中的該候選詞）
+  func bleachSpecifiedSuggestions(candidateTargets: [String], saveCallback: (() -> ())? = nil) {
+    if candidateTargets.isEmpty { return }
     var hasChanges = false
     var keysToRemoveCompletely: [String] = []
 
@@ -411,7 +445,7 @@ extension LMAssembly.LMPerceptionOverride {
       let perception = pair.perception
       
       // 找出需要移除的 override keys
-      let overridesToRemove = perception.overrides.keys.filter { targets.contains($0) }
+      let overridesToRemove = perception.overrides.keys.filter { candidateTargets.contains($0) }
       
       if !overridesToRemove.isEmpty {
         hasChanges = true

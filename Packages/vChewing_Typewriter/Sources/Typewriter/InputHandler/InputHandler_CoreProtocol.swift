@@ -166,8 +166,8 @@ extension InputHandlerProtocol {
         }
         if !overrideTaskResult, attempt == 2 {
           currentLM.bleachSpecifiedPOMSuggestions(targets: [
-            pomObservationPrimary?.candidate,
-            pomObservation2ndary?.candidate,
+            pomObservationPrimary.map { (ngramKey: $0.contextualizedGramKey, candidate: $0.candidate) },
+            pomObservation2ndary.map { (ngramKey: $0.contextualizedGramKey, candidate: $0.candidate) },
           ].compactMap { $0 })
           pomObservationPrimary = nil
           pomObservation2ndary = nil
