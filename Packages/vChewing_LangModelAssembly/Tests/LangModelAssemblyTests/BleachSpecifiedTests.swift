@@ -104,16 +104,40 @@ final class BleachSpecifiedTests: XCTestCase {
       print("After bleach - key '\(key)' no longer exists in mutLRUMap")
     }
     
-    // 整個 key 是否被刪除了？
-    if pom.mutLRUMap[key] == nil {
-      print("整個 key 被刪除了（這可能是問題所在）")
-      XCTFail("清除單個候選詞不應該刪除整個 key，如果還有其他候選詞的話")
-    } else {
+    // 驗證修復結果：key 應該還在，但只有 candidate2 被移除
+    XCTAssertNotNil(pom.mutLRUMap[key], "清除單個候選詞不應該刪除整個 key，如果還有其他候選詞的話")
+    
+    if let overrides = pom.mutLRUMap[key]?.perception.overrides {
       print("key 還在，檢查 overrides")
-      let overrides = pom.mutLRUMap[key]!.perception.overrides
       XCTAssertFalse(overrides.keys.contains(candidate2), "candidate2 應該被刪除")
-      // 如果邏輯正確，candidate1 和 candidate3 應該還在
-      // 但當前實現可能會刪除整個 key
+      XCTAssertTrue(overrides.keys.contains(candidate1), "candidate1 應該還在")
+      XCTAssertTrue(overrides.keys.contains(candidate3), "candidate3 應該還在")
+      XCTAssertEqual(overrides.count, 2, "應該還有 2 個 overrides")
     }
+  }
+  
+  func testBleachSpecifiedSuggestionsRemovesKeyWhenAllOverridesRemoved() throws {
+    let pom = LMAssembly.LMPerceptionOverride(capacity: 10)
+    let timestamp = Date.now.timeIntervalSince1970
+    
+    // 為同一個 key 記憶一個候選詞
+    let key = "((test,測試),(key,鍵),target)"
+    let candidate = "唯一目標"
+    
+    pom.memorizePerception((ngramKey: key, candidate: candidate), timestamp: timestamp)
+    
+    // 檢查是否能獲取建議
+    let suggestions = pom.getSuggestion(key: key, timestamp: timestamp + 100)
+    XCTAssertNotNil(suggestions, "應該能獲取建議")
+    
+    // 清除唯一的候選詞
+    pom.bleachSpecifiedSuggestions(targets: [candidate])
+    
+    // 整個 key 應該被移除了
+    XCTAssertNil(pom.mutLRUMap[key], "當所有 overrides 都被移除後，整個 key 應該被刪除")
+    
+    // 確認無法再獲取建議
+    let afterSuggestions = pom.getSuggestion(key: key, timestamp: timestamp + 100)
+    XCTAssertNil(afterSuggestions, "清除後應該無法獲取建議")
   }
 }

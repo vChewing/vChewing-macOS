@@ -403,16 +403,32 @@ extension LMAssembly.LMPerceptionOverride {
   func bleachSpecifiedSuggestions(targets: [String], saveCallback: (() -> ())? = nil) {
     if targets.isEmpty { return }
     var hasChanges = false
+    var keysToRemoveCompletely: [String] = []
 
-    // 使用過濾方式更新 mutLRUMap
-    let keysToRemove = mutLRUMap.keys.filter { key in
-      let perception = mutLRUMap[key]?.perception
-      return perception?.overrides.keys.contains(where: { targets.contains($0) }) ?? false
+    // 遍歷所有 keys，檢查其 perception 中是否有需要清除的 overrides
+    for key in mutLRUMap.keys {
+      guard let pair = mutLRUMap[key] else { continue }
+      let perception = pair.perception
+      
+      // 找出需要移除的 override keys
+      let overridesToRemove = perception.overrides.keys.filter { targets.contains($0) }
+      
+      if !overridesToRemove.isEmpty {
+        hasChanges = true
+        
+        // 移除指定的 overrides
+        overridesToRemove.forEach { perception.overrides.removeValue(forKey: $0) }
+        
+        // 如果 perception 已經沒有任何 overrides，則標記整個 key 需要移除
+        if perception.overrides.isEmpty {
+          keysToRemoveCompletely.append(key)
+        }
+      }
     }
 
-    if !keysToRemove.isEmpty {
-      hasChanges = true
-      keysToRemove.forEach { mutLRUMap.removeValue(forKey: $0) }
+    // 移除已經沒有任何 overrides 的 keys
+    if !keysToRemoveCompletely.isEmpty {
+      keysToRemoveCompletely.forEach { mutLRUMap.removeValue(forKey: $0) }
     }
 
     if hasChanges {
