@@ -47,6 +47,7 @@ let package = Package(
         .product(name: "IMKUtils", package: "vChewing_IMKUtils"),
         .product(name: "LangModelAssembly", package: "vChewing_LangModelAssembly"),
         .product(name: "Megrez", package: "vChewing_Megrez"),
+        .product(name: "MegrezTestComponents", package: "vChewing_Megrez"),
         .product(name: "Shared", package: "vChewing_Shared"),
         .product(name: "Tekkon", package: "vChewing_Tekkon"),
       ],
