@@ -364,7 +364,7 @@ extension InputHandlerTests {
       modifierFlags: .option,
       timestamp: Date().timeIntervalSince1970,
       windowNumber: nil,
-      characters: "`KeyCode.kSymbolMenuPhysicalKeyIntl`",
+      characters: "`",
       charactersIgnoringModifiers: "`",
       isARepeat: false,
       keyCode: KeyCode.kSymbolMenuPhysicalKeyIntl.rawValue

@@ -7,8 +7,10 @@
 // requirements defined in MIT License.
 
 import InputMethodKit
-import LangModelAssembly
+@testable import LangModelAssembly
 @testable import MainAssembly
+import Megrez
+import MegrezTestComponents
 import OSFrameworkImpl
 import Shared
 @testable import Typewriter
@@ -360,5 +362,42 @@ extension MainAssemblyTests {
     XCTAssertTrue(testHandler.calligrapher.isEmpty)
     XCTAssertEqual(testSession.state.type, .ofEmpty)
     XCTAssertEqual(testClient.toString(), "迷迷糊糊")
+  }
+
+  func test109_InputHandler_CodePointInputCheck() throws {
+    let testCodes: [(Shared.InputMode, String)] = [
+      (.imeModeCHS, "C8D0"),
+      (.imeModeCHT, "A462"),
+    ]
+
+    // 模擬 `Opt+~` 熱鍵組合觸發碼點模式。
+    let symbolMenuKeyData = NSEvent.KeyEventData(
+      type: .keyDown,
+      flags: .option,
+      chars: "`",
+      charsSansModifiers: "`",
+      keyCode: KeyCode.kSymbolMenuPhysicalKeyIntl.rawValue
+    )
+    let symbolMenuKeyEvents = symbolMenuKeyData.asPairedEvents
+    testSession.switchState(.ofAbortion())
+
+    for (langMode, codePointHexStr) in testCodes {
+      defer {
+        // 切換至 Abortion 狀態會自動清理 Handler，此時會連帶重設 typingMethod。
+        testSession.switchState(.ofAbortion())
+        testClient.clear()
+      }
+      PrefMgr().mostRecentInputMode = langMode.rawValue
+      XCTAssertEqual(testHandler.currentTypingMethod, .vChewingFactory)
+      for nsEv in symbolMenuKeyEvents {
+        XCTAssertTrue(testSession.handleNSEvent(nsEv, client: testClient))
+      }
+      XCTAssertEqual(testHandler.currentTypingMethod, .codePoint)
+      vCTestLog("Testing code point input for mode \(langMode) with code point \(codePointHexStr)")
+      typeSentenceOrCandidates(codePointHexStr)
+      XCTAssertEqual(testClient.toString(), "刃")
+      vCTestLog("-> Result: \(testClient.toString())")
+    }
+    vCTestLog("成功完成碼點輸入測試。")
   }
 }
