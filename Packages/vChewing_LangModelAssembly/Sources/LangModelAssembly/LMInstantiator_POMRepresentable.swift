@@ -48,13 +48,21 @@ extension LMAssembly.LMInstantiator {
   }
 
   /// 清除指定的 POM 建議（基於 context + candidate 對）
-  public func bleachSpecifiedPOMSuggestions(targets: [(ngramKey: String, candidate: String)], saveCallback: (() -> ())? = nil) {
+  public func bleachSpecifiedPOMSuggestions(
+    targets: [(ngramKey: String, candidate: String)],
+    saveCallback: (() -> ())? = nil
+  ) {
     lmPerceptionOverride.bleachSpecifiedSuggestions(targets: targets, saveCallback: saveCallback)
   }
-  
+
   /// 清除指定的 POM 建議（基於 candidate，移除所有上下文中的該候選詞）
   public func bleachSpecifiedPOMSuggestions(targets: [String], saveCallback: (() -> ())? = nil) {
     lmPerceptionOverride.bleachSpecifiedSuggestions(candidateTargets: targets, saveCallback: saveCallback)
+  }
+
+  /// 清除指定讀音（head reading）底下的所有 POM 建議
+  public func bleachSpecifiedPOMSuggestions(headReadings: [String], saveCallback: (() -> ())? = nil) {
+    lmPerceptionOverride.bleachSpecifiedSuggestions(headReadingTargets: headReadings, saveCallback: saveCallback)
   }
 
   public func bleachPOMUnigrams(saveCallback: (() -> ())? = nil) {

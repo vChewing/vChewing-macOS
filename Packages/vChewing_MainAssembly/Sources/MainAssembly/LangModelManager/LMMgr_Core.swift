@@ -215,6 +215,10 @@ public class LMMgr {
     mode.langModel.bleachSpecifiedPOMSuggestions(targets: targets)
   }
 
+  public static func bleachSpecifiedSuggestions(headReadings: [String], mode: Shared.InputMode) {
+    mode.langModel.bleachSpecifiedPOMSuggestions(headReadings: headReadings)
+  }
+
   public static func removeUnigramsFromPerceptionOverrideModel(_ mode: Shared.InputMode) {
     mode.langModel.bleachPOMUnigrams()
   }

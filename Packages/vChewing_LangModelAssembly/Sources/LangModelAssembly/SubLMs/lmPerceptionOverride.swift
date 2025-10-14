@@ -410,11 +410,11 @@ extension LMAssembly.LMPerceptionOverride {
     for target in targets {
       guard let pair = mutLRUMap[target.ngramKey] else { continue }
       let perception = pair.perception
-      
+
       // 移除指定的 candidate override
       if perception.overrides.removeValue(forKey: target.candidate) != nil {
         hasChanges = true
-        
+
         // 如果 perception 已經沒有任何 overrides，則標記整個 key 需要移除
         if perception.overrides.isEmpty {
           keysToRemoveCompletely.append(target.ngramKey)
@@ -443,16 +443,16 @@ extension LMAssembly.LMPerceptionOverride {
     for key in mutLRUMap.keys {
       guard let pair = mutLRUMap[key] else { continue }
       let perception = pair.perception
-      
+
       // 找出需要移除的 override keys
       let overridesToRemove = perception.overrides.keys.filter { candidateTargets.contains($0) }
-      
+
       if !overridesToRemove.isEmpty {
         hasChanges = true
-        
+
         // 移除指定的 overrides
         overridesToRemove.forEach { perception.overrides.removeValue(forKey: $0) }
-        
+
         // 如果 perception 已經沒有任何 overrides，則標記整個 key 需要移除
         if perception.overrides.isEmpty {
           keysToRemoveCompletely.append(key)
@@ -463,6 +463,31 @@ extension LMAssembly.LMPerceptionOverride {
     // 移除已經沒有任何 overrides 的 keys
     if !keysToRemoveCompletely.isEmpty {
       keysToRemoveCompletely.forEach { mutLRUMap.removeValue(forKey: $0) }
+    }
+
+    if hasChanges {
+      resetLRUList()
+      saveCallback?() ?? saveData()
+    }
+  }
+
+  /// 清除指定讀音（head reading）底下的所有建議。
+  func bleachSpecifiedSuggestions(headReadingTargets: [String], saveCallback: (() -> ())? = nil) {
+    let targets = Set(headReadingTargets.filter { !$0.isEmpty })
+    guard !targets.isEmpty else { return }
+    var hasChanges = false
+    var keysToRemove: [String] = []
+
+    for key in mutLRUMap.keys {
+      guard let parts = parsePerceptionKey(key) else { continue }
+      if targets.contains(parts.headReading) {
+        hasChanges = true
+        keysToRemove.append(key)
+      }
+    }
+
+    if !keysToRemove.isEmpty {
+      keysToRemove.forEach { mutLRUMap.removeValue(forKey: $0) }
     }
 
     if hasChanges {

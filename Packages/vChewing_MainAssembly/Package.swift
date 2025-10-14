@@ -50,6 +50,7 @@ let package = Package(
         .product(name: "KimoDataReader", package: "vChewing_KimoDataReader"),
         .product(name: "LangModelAssembly", package: "vChewing_LangModelAssembly"),
         .product(name: "Megrez", package: "vChewing_Megrez"),
+        .product(name: "MegrezTestComponents", package: "vChewing_Megrez"),
         .product(name: "NotifierUI", package: "vChewing_NotifierUI"),
         .product(name: "PhraseEditorUI", package: "vChewing_PhraseEditorUI"),
         .product(name: "PopupCompositionBuffer", package: "vChewing_PopupCompositionBuffer"),
