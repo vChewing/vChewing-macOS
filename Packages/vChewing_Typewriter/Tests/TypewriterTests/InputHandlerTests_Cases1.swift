@@ -468,6 +468,12 @@ extension InputHandlerTests {
     // 此時「流易」權重最高，因為是 POM 推薦資料。
     XCTAssertEqual(testHandler.assembler.assembledSentence.map(\.value).joined(), "流易")
     XCTAssertEqual(testSession.state.displayedText, "流易")
+    // 檢查 assembler 內部的 nodes 確保「流易」的 OverridingScore 必須不能是「114_514」。
+    // 不然的話，會出現 POM 記憶劫持使用者片語的情況。
+    // 判斷方法是：任何雙字詞節點都不該有「score == 114_514」。
+    // 測試目的：在套用 POM 建議時，OverridingScore 得是 POM 建議的權重。
+    let allNodes: [Megrez.Node] = testHandler.assembler.segments.compactMap { $0[2] }
+    XCTAssertTrue(allNodes.allSatisfy { $0.score != 114_514 })
     // 嘗試觸發就地加詞的 method。這在目前的這個單元測試內不會實際加詞，但會嘗試清空相關的 POM 記憶。
     // 咱們先用 revolveCandidate 的功能將該節點換成別的雙字候選詞。
     let candidateStateTemporary1 = testHandler.generateStateOfCandidates()
@@ -503,5 +509,37 @@ extension InputHandlerTests {
     let encodedJSONStr2 = String(data: encodedJSON2, encoding: .utf8) ?? "N/A"
     // 到這一步如果 Asserts 都通過的話就證明手動加詞時的 Bleacher 是成功的。
     XCTAssertTrue(!encodedJSONStr2.contains(#"()&()&(ㄌㄧㄡˊ-ㄧˋ,流易)"#))
+  }
+
+  func test_IH111_POMStopShortKeyArrFromHijackingLongKeyArr() throws {
+    // 測試目的：在套用 POM 建議時，OverridingScore 得是 POM 建議的權重。
+    // 備註：該測試用例沒必要鏡照至 MainAssemblyTests。
+    guard let testHandler, let testSession else {
+      XCTFail("testHandler and testSession at least one of them is nil.")
+      return
+    }
+    testHandler.prefs.useSCPCTypingMode = false
+    clearTestPOM()
+    vCTestLog("測試組句：年中")
+    testSession.resetInputHandler(forceComposerCleanup: true)
+    typeSentence("su065j/ ")
+    XCTAssertEqual(testHandler.assembler.assembledSentence.map(\.value), ["年中"])
+    XCTAssertTrue(testHandler.assembler.moveCursorStepwise(to: .rear))
+    XCTAssertTrue(testHandler.assembler.moveCursorStepwise(to: .rear))
+    XCTAssertFalse(testHandler.assembler.moveCursorStepwise(to: .rear))
+    XCTAssertTrue(testHandler.assembler.isCursorAtEdge(direction: .rear))
+    testSession.switchState(testHandler.generateStateOfCandidates())
+    let candidates1 = testSession.state.candidates.map(\.value).prefix(10)
+    XCTAssertEqual(candidates1, ["年", "粘", "黏"])
+    testSession.candidatePairSelectionConfirmed(at: 2) // 黏
+    XCTAssertEqual(testHandler.assembler.assembledSentence.map(\.value), ["黏", "中"])
+    testSession.switchState(.ofAbortion())
+    // 模擬手動加詞的情況。
+    testHandler.currentLM.insertTemporaryData(
+      unigram: .init(keyArray: ["ㄋㄧㄢˊ", "ㄓㄨㄥ"], value: "年終", score: 0),
+      isFiltering: false
+    )
+    typeSentence("su065j/ ")
+    XCTAssertEqual(testHandler.assembler.assembledSentence.map(\.value), ["年終"])
   }
 }
