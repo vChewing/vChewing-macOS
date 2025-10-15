@@ -18,9 +18,9 @@ final class POMDataManagementTests: XCTestCase {
 
     // 新增一些測試數據
     let testData = [
-      ("((test1,測試1),(key,鍵),target)", "目標1"),
-      ("((test2,測試2),(key,鍵),target)", "目標2"),
-      ("((test3,測試3),(key,鍵),target)", "目標3"),
+      ("(test1,測試1)&(key,鍵)&(target,target)", "目標1"),
+      ("(test2,測試2)&(key,鍵)&(target,target)", "目標2"),
+      ("(test3,測試3)&(key,鍵)&(target,target)", "目標3"),
     ]
 
     let timestamp = Date.now.timeIntervalSince1970
@@ -46,7 +46,7 @@ final class POMDataManagementTests: XCTestCase {
   func testTimestampBasedDecay() throws {
     let pom = LMAssembly.LMPerceptionOverride(capacity: 10)
 
-    let key = "((test,測試),(key,鍵),target)"
+    let key = "(test,測試)&(key,鍵)&(target,target)"
     let candidate = "目標"
     let baseTimestamp = Date.now.timeIntervalSince1970
 

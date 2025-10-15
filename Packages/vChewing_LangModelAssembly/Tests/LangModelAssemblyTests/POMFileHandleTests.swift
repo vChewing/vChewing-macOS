@@ -23,7 +23,7 @@ final class POMFileHandleTests: XCTestCase {
 
     // 先添加一些數據
     pom.memorizePerception(
-      (ngramKey: "((test,測試),(key,鍵),target)", candidate: "目標"),
+      (ngramKey: "(test,測試)&(key,鍵)&(target,target)", candidate: "目標"),
       timestamp: Date.now.timeIntervalSince1970
     )
 
@@ -70,7 +70,7 @@ final class POMFileHandleTests: XCTestCase {
 
     // 現在添加一些新數據並保存，應該會覆蓋舊格式
     pom.memorizePerception(
-      (ngramKey: "((new,新),(data,數據),test)", candidate: "測試"),
+      (ngramKey: "(new,新)&(data,數據)&(test,test)", candidate: "測試"),
       timestamp: Date.now.timeIntervalSince1970
     )
     pom.saveData(toURL: tempURL)
@@ -98,8 +98,8 @@ final class POMFileHandleTests: XCTestCase {
 
     // 添加測試數據
     let testData = [
-      ("((test1,測試1),(key,鍵),target)", "目標1"),
-      ("((test2,測試2),(key,鍵),target)", "目標2"),
+      ("(test1,測試1)&(key,鍵)&(target,target)", "目標1"),
+      ("(test2,測試2)&(key,鍵)&(target,target)", "目標2"),
     ]
 
     let timestamp = Date.now.timeIntervalSince1970
