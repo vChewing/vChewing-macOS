@@ -13,11 +13,15 @@
 
   extension NSSound {
     public static func buzz(fart: Bool = false) {
-      let filePath = Bundle.main.path(forResource: fart ? "Fart" : "Beep", ofType: "m4a")!
+      let resName = fart ? "Fart" : "Beep"
+      let filePath = Bundle.main.path(forResource: resName, ofType: "m4a")
+      guard let filePath else { return }
       let fileURL = URL(fileURLWithPath: filePath)
       var soundID: SystemSoundID = 0
       AudioServicesCreateSystemSoundID(fileURL as CFURL, &soundID)
       AudioServicesPlaySystemSound(soundID)
+      // No need for AudioServicesDisposeSystemSoundID(soundID).
+      // Reason: It hinders audio from being played back.
     }
 
     public static func buzz(fart: Bool = false, count: Int) {
