@@ -8,6 +8,7 @@
 
 import Foundation
 @testable import LangModelAssembly
+import LMAssemblyMaterials4Tests
 import Shared
 @testable import Typewriter
 import XCTest
@@ -19,9 +20,21 @@ func vCTestLog(_ str: String) {
 // MARK: - 測試用 KBEvent 按鍵實例
 
 extension KBEvent.KeyEventData {
+  static let dataArrowHome = KBEvent.KeyEventData(
+    chars: KBEvent.SpecialKey.home.unicodeScalar.description,
+    keyCode: KeyCode.kHome.rawValue
+  )
+  static let dataArrowEnd = KBEvent.KeyEventData(
+    chars: KBEvent.SpecialKey.end.unicodeScalar.description,
+    keyCode: KeyCode.kEnd.rawValue
+  )
   static let dataArrowLeft = KBEvent.KeyEventData(
     chars: KBEvent.SpecialKey.leftArrow.unicodeScalar.description,
     keyCode: KeyCode.kLeftArrow.rawValue
+  )
+  static let dataArrowRight = KBEvent.KeyEventData(
+    chars: KBEvent.SpecialKey.rightArrow.unicodeScalar.description,
+    keyCode: KeyCode.kRightArrow.rawValue
   )
   static let dataArrowDown = KBEvent.KeyEventData(
     chars: KBEvent.SpecialKey.downArrow.unicodeScalar.description,
@@ -162,7 +175,7 @@ class InputHandlerTests: XCTestCase {
     // 初始化測試 LM
     let lm = LMAssembly.LMInstantiator(isCHS: false)
     testLM = lm
-    LMAssembly.LMInstantiator.connectToTestSQLDB()
+    LMAssembly.LMInstantiator.connectToTestSQLDB(sqlTestCoreLMData)
 
     // 初始化測試用的 handler 和 session
     let handler = MockInputHandler(lm: lm, pref: PrefMgr())

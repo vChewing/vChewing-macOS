@@ -49,6 +49,7 @@ let package = Package(
         .product(name: "IMKUtils", package: "vChewing_IMKUtils"),
         .product(name: "KimoDataReader", package: "vChewing_KimoDataReader"),
         .product(name: "LangModelAssembly", package: "vChewing_LangModelAssembly"),
+        .product(name: "LMAssemblyMaterials4Tests", package: "vChewing_LangModelAssembly"),
         .product(name: "Megrez", package: "vChewing_Megrez"),
         .product(name: "NotifierUI", package: "vChewing_NotifierUI"),
         .product(name: "PhraseEditorUI", package: "vChewing_PhraseEditorUI"),
