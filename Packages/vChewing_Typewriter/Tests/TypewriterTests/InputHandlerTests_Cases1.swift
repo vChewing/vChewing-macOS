@@ -29,14 +29,14 @@ extension InputHandlerTests {
     }
     testHandler.prefs.useSCPCTypingMode = false
     clearTestPOM()
-    vCTestLog("測試組句：高科技公司的年中獎金")
+    vCTestLog("測試組句：幽蝶能留一縷芳，但這裡暫時先期待失敗結果「優跌能留意旅方」")
     testSession.resetInputHandler(forceComposerCleanup: true)
-    typeSentence("el dk ru4ej/ n 2k7su065j/ ru;3rup ")
+    typeSentence("u. 2u,6s/6xu.6u4xm3z; ")
     let resultText1 = generateDisplayedText()
     vCTestLog("- // 組字結果：\(resultText1)")
-    XCTAssertEqual(resultText1, "高科技公司的年中獎金")
+    XCTAssertEqual(resultText1, "優跌能留意旅方")
     XCTAssertTrue(testHandler.triageInput(event: KBEvent.KeyEventData.dataEnterReturn.asEvent))
-    XCTAssertEqual(testSession.recentCommissions.joined(), "高科技公司的年中獎金")
+    XCTAssertEqual(testSession.recentCommissions.joined(), "優跌能留意旅方")
   }
 
   /// 測試基本的逐字選字（ㄅ半注音）。
@@ -51,14 +51,14 @@ extension InputHandlerTests {
     }
     testHandler.prefs.useSCPCTypingMode = true
     clearTestPOM()
-    vCTestLog("測試逐字選字：高")
+    vCTestLog("測試逐字選字：優")
     testHandler.clear()
-    typeSentence("el ") // 打「高」字的讀音：「ㄍㄠ」，最後空格是陰平聲調。
+    typeSentence("u. ") // 打「優」字的讀音：「ㄧㄡ」，最後空格是陰平聲調。
     let resultText1 = generateDisplayedText()
     vCTestLog("- // 組字結果：\(resultText1)")
     XCTAssertFalse(resultText1.isEmpty)
     let candidates = testHandler.generateArrayOfCandidates()
-    XCTAssertTrue(resultText1.contains("高") || candidates.map { $0.value }.contains("高"))
+    XCTAssertTrue(resultText1.contains("優") || candidates.map { $0.value }.contains("優"))
     // 測試到此為止，於 MainAssembly 的同名測試繼續。
   }
 
@@ -72,15 +72,20 @@ extension InputHandlerTests {
     testHandler.prefs.useRearCursorMode = false
     clearTestPOM()
     testSession.resetInputHandler(forceComposerCleanup: true)
-    typeSentence("el dk ru4ej/ n 2k7su065j/ ru;3rup ")
-    vCTestLog("測試就地輪替候選字：高科技公司的年中獎金 -> 高科技公司的年終獎金")
-    let eventDataChain: [KBEvent.KeyEventData] = [.dataArrowLeft, .dataArrowLeft, .dataTab]
+    typeSentence("u. 2u,6s/6xu.6u4xm3z; ")
+    vCTestLog("測試就地輪替候選字：優跌能留意旅方 -> 幽蝶能留一縷芳")
+    let eventDataChain: [KBEvent.KeyEventData] = [
+      .dataArrowHome, .dataArrowRight, .dataTab, .dataTab,
+      .dataArrowRight, .dataTab, .dataArrowRight, .dataArrowRight,
+      .dataArrowRight, .dataArrowRight, .dataTab, .dataArrowRight,
+      .dataTab, .dataTab, .dataTab,
+    ]
     eventDataChain.map(\.asEvent).forEach { theEvent in
       _ = testHandler.triageInput(event: theEvent)
     }
     let resultText2 = testSession.state.displayedText
     vCTestLog("- // 組字結果：\(resultText2)")
-    XCTAssertEqual(resultText2, "高科技公司的年終獎金")
+    XCTAssertEqual(resultText2, "幽蝶能留一縷芳")
   }
 
   /// 測試漸退記憶模組的記憶資料生成與適用。
@@ -94,61 +99,66 @@ extension InputHandlerTests {
     testHandler.prefs.cursorPlacementAfterSelectingCandidate = 1
     clearTestPOM()
 
-    var sequenceChars = "el dk ru4ej/ n 2k7su065j/ ru;3rup "
+    var sequenceChars = "u. 2u,6s/6xu.6u4xm3z; "
 
     testSession.resetInputHandler(forceComposerCleanup: true)
     typeSentence(sequenceChars)
+    XCTAssertEqual(testHandler.assembler.cursor, 7)
 
     // Testing Manual Candidate Selection, POM Observation, and Post-Candidate-Selection Cursor Jumping.
 
-    vCTestLog("測試選字窗選字：高科技公司的年終獎金 -> 高科技公司的年中獎金")
+    vCTestLog("測試選字窗選字：優跌能留意旅方 -> 幽蝶能留一縷芳")
     vCTestLog("Pref=1 nodes before candidate: \(testHandler.assembler.assembledSentence.values)")
     vCTestLog(
       "Pref=1 cursor before candidate: \(testHandler.assembler.cursor)/length: \(testHandler.assembler.length)"
     )
-    XCTAssertTrue(
-      testHandler.triageInput(event: KBEvent.KeyEventData.dataArrowDown.asEvent)
-    )
     vCTestLog("Pref=1 candidates: \(testSession.state.candidates.map { $0.value })")
-    testSession.candidatePairSelectionConfirmed(at: 1) // 「金」
-    let resultText3 = testSession.state.displayedText
-    vCTestLog("- // 組字結果：\(resultText3)")
-    XCTAssertEqual(resultText3, "高科技公司的年中獎金")
-    XCTAssertEqual(testHandler.assembler.cursor, 10)
+    XCTAssertTrue(testHandler.triageInput(event: KBEvent.KeyEventData.dataArrowLeft.asEvent))
+    XCTAssertTrue(testHandler.triageInput(event: KBEvent.KeyEventData.dataArrowDown.asEvent))
+    testSession.candidatePairSelectionConfirmed(at: 0) // 「一縷」
+    // 此時游標應該有往前推進一格。
+    XCTAssertEqual(testHandler.assembler.cursor, 7)
+    XCTAssertTrue(testHandler.triageInput(event: KBEvent.KeyEventData.dataArrowDown.asEvent))
+    testSession.candidatePairSelectionConfirmed(at: 3) // 「芳」
+    vCTestLog("- // 組字結果：\(testSession.state.displayedText)")
+    XCTAssertEqual(testSession.state.displayedText, "優跌能留一縷芳")
+    XCTAssertEqual(testHandler.assembler.cursor, 7)
+
+    // 把頭兩個節點也做選字。
+    XCTAssertEqual(testSession.state.type, .ofInputting)
+    XCTAssertTrue(testHandler.triageInput(event: KBEvent.KeyEventData.dataArrowHome.asEvent))
+    XCTAssertTrue(testHandler.triageInput(event: KBEvent.KeyEventData.dataArrowRight.asEvent))
+    XCTAssertEqual(testHandler.assembler.cursor, 1)
+    XCTAssertTrue(testHandler.triageInput(event: KBEvent.KeyEventData.dataArrowDown.asEvent))
+    testSession.candidatePairSelectionConfirmed(at: 2) // 「幽」
+    XCTAssertEqual(testHandler.assembler.cursor, 2)
+    XCTAssertEqual(testSession.state.displayedText, "幽跌能留一縷芳")
+    testSession.switchState(testHandler.generateStateOfCandidates())
+    testSession.candidatePairSelectionConfirmed(at: 1) // 「蝶」
+    XCTAssertEqual(testSession.state.displayedText, "幽蝶能留一縷芳")
+    XCTAssertEqual(testHandler.assembler.cursor, 4)
 
     // Continuing POM Tests (in the Current Context).
 
-    vCTestLog("測試漸退記憶的適用範圍：「年終」的記憶應僅對下述給定上下文情形生效。")
-    vCTestLog("- 該給定上下文情形為「(ㄍㄨㄥ-ㄙ,公司)&(ㄉㄜ˙,的)」且頭部讀音為「ㄋㄧㄢˊ-ㄓㄨㄥ」。")
-    clearTestPOM()
-    let eventDataChain1: [KBEvent.KeyEventData] = [
-      .dataArrowLeft, .dataArrowLeft, .dataArrowDown,
-    ]
-    eventDataChain1.map(\.asEvent).forEach { theEvent in
-      _ = testHandler.triageInput(event: theEvent)
-    }
-    testSession.candidatePairSelectionConfirmed(at: 1) // 「年終」
-    let resultText4 = testSession.state.displayedText
-    vCTestLog("- // 組字結果：\(resultText4)")
-    XCTAssertEqual(resultText4, "高科技公司的年終獎金")
-
+    vCTestLog("測試漸退記憶的適用範圍：此時已經生成的「芳」的記憶應僅對下述給定上下文情形生效。")
+    vCTestLog("- 該給定上下文情形為「(ㄌㄧㄡˊ,留)&(ㄧˋ-ㄌㄩˇ,一縷)」且頭部讀音為「ㄈㄤ」。")
     vCTestLog("- 清空組字區，重新打剛才那句話來測試。")
     testSession.switchState(.ofAbortion())
     typeSentence(sequenceChars)
     let resultText5 = testSession.state.displayedText
     vCTestLog("- // 組字結果：\(resultText5)")
-    XCTAssertEqual(resultText5, "高科技公司的年終獎金")
+    XCTAssertEqual(resultText5, "幽蝶能留一縷芳")
     vCTestLog("- 已成功證實「年終」的記憶對該給定上下文情形生效。")
 
     vCTestLog("- 清空組字區，重新打另一句話來測試。")
     testSession.switchState(.ofAbortion())
 
-    sequenceChars = "ru4ej/ 2k7su065j/ ru;3rup "
+    sequenceChars = "u. 2u,6s/6xu.6z; "
     typeSentence(sequenceChars)
-    let resultText6 = testSession.state.displayedText
-    vCTestLog("- // 組字結果：\(resultText6)")
-    XCTAssertEqual(resultText6, "濟公的年中獎金")
-    vCTestLog("- 已成功證實「年終」的記憶不會對除了給定上下文以外的情形生效。")
+    vCTestLog("- // 組字結果：\(testSession.state.displayedText)")
+    XCTAssertEqual(testSession.state.displayedText, "幽蝶能留方")
+    XCTAssertNotEqual(testSession.state.displayedText, "幽蝶能留芳")
+    vCTestLog("- 已成功證實「芳」的記憶不會對除了給定上下文以外的情形生效。")
   }
 
   /// 測試在選字後復原游標位置的功能。
@@ -221,28 +231,28 @@ extension InputHandlerTests {
     clearTestPOM()
     vCTestLog("正在測試 inputHandler.commissionByCtrlOptionCommandEnter()。")
     testSession.resetInputHandler(forceComposerCleanup: true)
-    typeSentence("el dk ru4ej/ n 2k7")
+    typeSentence("dk ru4204el ")
     guard let handler = testSession.inputHandler else {
       XCTAssertThrowsError("testSession.handler is nil.")
       return
     }
     testHandler.prefs.specifyCmdOptCtrlEnterBehavior = 0
     var result = handler.commissionByCtrlOptionCommandEnter(isShiftPressed: true)
-    XCTAssertEqual(result, "ㄍㄠ ㄎㄜ ㄐㄧˋ ㄍㄨㄥ ㄙ ˙ㄉㄜ")
+    XCTAssertEqual(result, "ㄎㄜ ㄐㄧˋ ㄉㄢˋ ㄍㄠ")
     result = handler.commissionByCtrlOptionCommandEnter() // isShiftPressed 的參數預設是 false。
-    XCTAssertEqual(result, "高(ㄍㄠ)科(ㄎㄜ)技(ㄐㄧˋ)公(ㄍㄨㄥ)司(ㄙ)的(˙ㄉㄜ)")
+    XCTAssertEqual(result, "科(ㄎㄜ)技(ㄐㄧˋ)蛋(ㄉㄢˋ)糕(ㄍㄠ)")
     testHandler.prefs.specifyCmdOptCtrlEnterBehavior = 1
     result = handler.commissionByCtrlOptionCommandEnter()
     let expectedRubyResult = """
-    <ruby>高<rp>(</rp><rt>ㄍㄠ</rt><rp>)</rp></ruby><ruby>科<rp>(</rp><rt>ㄎㄜ</rt><rp>)</rp></ruby><ruby>技<rp>(</rp><rt>ㄐㄧˋ</rt><rp>)</rp></ruby><ruby>公<rp>(</rp><rt>ㄍㄨㄥ</rt><rp>)</rp></ruby><ruby>司<rp>(</rp><rt>ㄙ</rt><rp>)</rp></ruby><ruby>的<rp>(</rp><rt>˙ㄉㄜ</rt><rp>)</rp></ruby>
+    <ruby>科<rp>(</rp><rt>ㄎㄜ</rt><rp>)</rp></ruby><ruby>技<rp>(</rp><rt>ㄐㄧˋ</rt><rp>)</rp></ruby><ruby>蛋<rp>(</rp><rt>ㄉㄢˋ</rt><rp>)</rp></ruby><ruby>糕<rp>(</rp><rt>ㄍㄠ</rt><rp>)</rp></ruby>
     """
     XCTAssertEqual(result, expectedRubyResult)
     testHandler.prefs.specifyCmdOptCtrlEnterBehavior = 2
     result = handler.commissionByCtrlOptionCommandEnter()
-    XCTAssertEqual(result, "⠅⠩⠄⠇⠮⠄⠅⠡⠐⠅⠯⠄⠑⠄⠙⠮⠁")
+    XCTAssertEqual(result, "⠇⠮⠄⠅⠡⠐⠙⠧⠐⠅⠩⠄")
     testHandler.prefs.specifyCmdOptCtrlEnterBehavior = 3
     result = handler.commissionByCtrlOptionCommandEnter()
-    XCTAssertEqual(result, "⠛⠖⠁⠅⠢⠁⠛⠊⠆⠛⠲⠁⠎⠁⠙⠢")
+    XCTAssertEqual(result, "⠅⠢⠁⠛⠊⠆⠙⠧⠆⠛⠖⠁")
     vCTestLog("成功完成測試 inputHandler.commissionByCtrlOptionCommandEnter()。")
   }
 
@@ -529,10 +539,10 @@ extension InputHandlerTests {
     XCTAssertFalse(testHandler.assembler.moveCursorStepwise(to: .rear))
     XCTAssertTrue(testHandler.assembler.isCursorAtEdge(direction: .rear))
     testSession.switchState(testHandler.generateStateOfCandidates())
-    let candidates1 = testSession.state.candidates.map(\.value).prefix(10)
-    XCTAssertEqual(candidates1, ["年", "粘", "黏"])
+    let candidates1 = testSession.state.candidates.map(\.value).prefix(3)
+    XCTAssertEqual(candidates1, ["年", "黏", "粘"])
     testSession.candidatePairSelectionConfirmed(at: 2) // 黏
-    XCTAssertEqual(testHandler.assembler.assembledSentence.map(\.value), ["黏", "中"])
+    XCTAssertEqual(testHandler.assembler.assembledSentence.map(\.value), ["粘", "中"])
     testSession.switchState(.ofAbortion())
     // 模擬手動加詞的情況。
     testHandler.currentLM.insertTemporaryData(

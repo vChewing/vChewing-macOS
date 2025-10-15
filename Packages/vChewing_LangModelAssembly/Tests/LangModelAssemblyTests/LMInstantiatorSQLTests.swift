@@ -7,17 +7,18 @@
 // requirements defined in MIT License.
 
 import Foundation
+import LMAssemblyMaterials4Tests
 import XCTest
 
 @testable import LangModelAssembly
 
-private let strBloatingKey: [String] = ["ㄔㄨㄟ", "ㄋㄧㄡˊ", "ㄅㄧ"]
+private let strCakeKey: [String] = ["ㄉㄢˋ", "ㄍㄠ"]
 private let strHaninSymbolMenuKey: [String] = ["_punctuation_list"]
-private let strRefutationKey: [String] = ["ㄉㄨㄟˇ"]
+private let strZhongKey: [String] = ["ㄓㄨㄥ"]
 private let strBoobsKey: [String] = ["ㄋㄟ", "ㄋㄟ"]
 private let expectedReverseLookupResults: [String] = [
-  "ㄏㄨㄛˊ", "ㄏㄜ˙", "ㄏㄨㄛ", "ㄉㄨㄥ", "ㄏㄜˊ",
-  "ㄏㄜˋ", "ㄏㄢˋ", "ㄏㄨˊ", "ㄏㄨㄛ˙", "ㄏㄨㄛˋ",
+  "ㄏㄜˋ", "ㄏㄜ˙", "ㄏㄜˊ", "ㄏㄨㄛ", "ㄏㄨˊ",
+  "ㄏㄨㄛ˙", "ㄏㄨㄛˊ", "ㄏㄨㄛˋ", "ㄏㄢˋ", "ㄉㄨㄥ",
 ]
 
 // MARK: - LMInstantiatorSQLTests
@@ -25,22 +26,19 @@ private let expectedReverseLookupResults: [String] = [
 final class LMInstantiatorSQLTests: XCTestCase {
   func testSQL() throws {
     let instance = LMAssembly.LMInstantiator(isCHS: true)
-    XCTAssertTrue(LMAssembly.LMInstantiator.connectToTestSQLDB())
+    XCTAssertTrue(!sqlTestCoreLMData.isEmpty)
+    XCTAssertTrue(LMAssembly.LMInstantiator.connectToTestSQLDB(sqlTestCoreLMData))
     instance.setOptions { config in
       config.isCNSEnabled = false
       config.isSymbolEnabled = false
     }
     XCTAssertEqual(
-      instance.unigramsFor(keyArray: strBloatingKey).description,
-      "[(ㄔㄨㄟ-ㄋㄧㄡˊ-ㄅㄧ,吹牛逼,-7.375), (ㄔㄨㄟ-ㄋㄧㄡˊ-ㄅㄧ,吹牛屄,-7.399)]"
+      instance.unigramsFor(keyArray: strCakeKey).description,
+      "[(ㄉㄢˋ-ㄍㄠ,蛋糕,-4.073)]"
     )
     XCTAssertEqual(
-      instance.unigramsFor(keyArray: strHaninSymbolMenuKey)[1].description,
+      instance.getHaninSymbolMenuUnigrams()[1].description,
       "(_punctuation_list,，,-9.9)"
-    )
-    XCTAssertEqual(
-      instance.unigramsFor(keyArray: strRefutationKey).description,
-      "[(ㄉㄨㄟˇ,㨃,-9.544)]"
     )
     XCTAssertEqual(
       instance.unigramsFor(keyArray: strBoobsKey).description,
@@ -51,14 +49,14 @@ final class LMInstantiatorSQLTests: XCTestCase {
       config.isSymbolEnabled = true
     }
     XCTAssertEqual(
-      instance.unigramsFor(keyArray: strBloatingKey).last?.description,
-      "(ㄔㄨㄟ-ㄋㄧㄡˊ-ㄅㄧ,🌳🆕🐝,-13.0)"
+      instance.unigramsFor(keyArray: strCakeKey).last?.description,
+      "(ㄉㄢˋ-ㄍㄠ,🧁,-13.000001)"
     )
     XCTAssertEqual(
-      instance.unigramsFor(keyArray: strHaninSymbolMenuKey)[1].description,
+      instance.getHaninSymbolMenuUnigrams()[1].description,
       "(_punctuation_list,，,-9.9)"
     )
-    XCTAssertEqual(instance.unigramsFor(keyArray: strRefutationKey).count, 10)
+    XCTAssertEqual(instance.unigramsFor(keyArray: strZhongKey).count, 21)
     XCTAssertEqual(
       instance.unigramsFor(keyArray: strBoobsKey).last?.description,
       "(ㄋㄟ-ㄋㄟ,☉☉,-13.0)"
@@ -73,27 +71,30 @@ final class LMInstantiatorSQLTests: XCTestCase {
 
   func testCNSMask() throws {
     let instance = LMAssembly.LMInstantiator(isCHS: false)
-    XCTAssertTrue(LMAssembly.LMInstantiator.connectToTestSQLDB())
+    XCTAssertTrue(LMAssembly.LMInstantiator.connectToTestSQLDB(sqlTestCoreLMData))
     instance.setOptions { config in
       config.isCNSEnabled = false
       config.isSymbolEnabled = false
       config.filterNonCNSReadings = false
     }
     XCTAssertEqual(
-      instance.unigramsFor(keyArray: ["ㄨㄟ"]).description,
-      "[(ㄨㄟ,危,-6.0)]"
+      instance.unigramsFor(keyArray: ["ㄨㄟ"]).first(where: { $0.value == "危" })?.description,
+      "(ㄨㄟ,危,-5.287)"
     )
     XCTAssertEqual(
-      instance.unigramsFor(keyArray: ["ㄨㄟˊ"]).description,
-      "[(ㄨㄟˊ,危,-6.0)]"
+      instance.unigramsFor(keyArray: ["ㄨㄟˊ"]).first(where: { $0.value == "危" })?.description,
+      "(ㄨㄟˊ,危,-5.287)"
     )
     instance.setOptions { config in
       config.filterNonCNSReadings = true
     }
-    XCTAssertEqual(instance.unigramsFor(keyArray: ["ㄨㄟ"]).description, "[]")
     XCTAssertEqual(
-      instance.unigramsFor(keyArray: ["ㄨㄟˊ"]).description,
-      "[(ㄨㄟˊ,危,-6.0)]"
+      instance.unigramsFor(keyArray: ["ㄨㄟ"]).first(where: { $0.value == "危" }),
+      nil
+    )
+    XCTAssertEqual(
+      instance.unigramsFor(keyArray: ["ㄨㄟˊ"]).first(where: { $0.value == "危" })?.description,
+      "(ㄨㄟˊ,危,-5.287)"
     )
   }
 }
