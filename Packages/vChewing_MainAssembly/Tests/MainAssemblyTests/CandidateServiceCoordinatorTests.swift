@@ -111,30 +111,30 @@ class CandidateServiceCoordinatorTests: XCTestCase {
 
   func testSelector_Braille1947() throws {
     let stacked = Self.testDataMap.parseIntoCandidateTextServiceStack(
-      candidate: "高科技公司的",
-      reading: ["ㄍㄠ", "ㄎㄜ", "ㄐㄧˋ", "ㄍㄨㄥ", "ㄙ", "ㄉㄜ˙"]
+      candidate: "幽蝶能留一縷芳",
+      reading: ["ㄧㄡ", "ㄉㄧㄝˊ", "ㄋㄥˊ", "ㄌㄧㄡˊ", "ㄧˋ", "ㄌㄩˇ", "ㄈㄤ"]
     )
     let theService = stacked[5]
     switch theService.value {
     case .url: break
     case .selector:
       let response = theService.responseFromSelector
-      let expectedResponse = "⠅⠩⠄⠇⠮⠄⠅⠡⠐⠅⠯⠄⠑⠄⠙⠮⠁"
+      let expectedResponse = "⠎⠄⠙⠬⠂⠝⠵⠂⠉⠎⠂⠡⠐⠉⠳⠈⠟⠭⠄"
       XCTAssertEqual(response, expectedResponse)
     }
   }
 
   func testSelector_Braille2018() throws {
     let stacked = Self.testDataMap.parseIntoCandidateTextServiceStack(
-      candidate: "高科技公司的",
-      reading: ["ㄍㄠ", "ㄎㄜ", "ㄐㄧˋ", "ㄍㄨㄥ", "ㄙ", "ㄉㄜ˙"]
+      candidate: "幽蝶能留一縷芳",
+      reading: ["ㄧㄡ", "ㄉㄧㄝˊ", "ㄋㄥˊ", "ㄌㄧㄡˊ", "ㄧˋ", "ㄌㄩˇ", "ㄈㄤ"]
     )
     let theService = stacked[6]
     switch theService.value {
     case .url: break
     case .selector:
       let response = theService.responseFromSelector
-      let expectedResponse = "⠛⠖⠁⠅⠢⠁⠛⠊⠆⠛⠲⠁⠎⠁⠙⠢"
+      let expectedResponse = "⠳⠁⠙⠑⠂⠝⠼⠂⠇⠳⠂⠊⠆⠇⠬⠄⠋⠦⠁"
       XCTAssertEqual(response, expectedResponse)
     }
   }

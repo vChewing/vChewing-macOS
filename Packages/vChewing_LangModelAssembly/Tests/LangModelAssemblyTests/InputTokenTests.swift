@@ -7,6 +7,7 @@
 // requirements defined in MIT License.
 
 import Foundation
+import LMAssemblyMaterials4Tests
 import XCTest
 
 @testable import LangModelAssembly
@@ -82,7 +83,7 @@ final class InputTokenTests: XCTestCase {
 
   func testGeneratedResultsFromLMInstantiator() throws {
     let instance = LMAssembly.LMInstantiator(isCHS: true)
-    XCTAssertTrue(LMAssembly.LMInstantiator.connectToTestSQLDB())
+    XCTAssertTrue(LMAssembly.LMInstantiator.connectToTestSQLDB(sqlTestCoreLMData))
     instance.setOptions { config in
       config.isCNSEnabled = false
       config.isSymbolEnabled = false

@@ -324,7 +324,8 @@ extension LMAssembly.LMInstantiator {
 
 extension LMAssembly.LMInstantiator {
   @discardableResult
-  public static func connectToTestSQLDB() -> Bool {
-    Self.connectSQLDB(dbPath: #":memory:"#) && sqlTestCoreLMData.runAsSQLExec(dbPointer: &ptrSQL)
+  public static func connectToTestSQLDB(_ str: String) -> Bool {
+    guard !str.isEmpty else { return false }
+    return Self.connectSQLDB(dbPath: #":memory:"#) && str.runAsSQLExec(dbPointer: &ptrSQL)
   }
 }

@@ -46,6 +46,7 @@ let package = Package(
         "Typewriter",
         .product(name: "IMKUtils", package: "vChewing_IMKUtils"),
         .product(name: "LangModelAssembly", package: "vChewing_LangModelAssembly"),
+        .product(name: "LMAssemblyMaterials4Tests", package: "vChewing_LangModelAssembly"),
         .product(name: "Megrez", package: "vChewing_Megrez"),
         .product(name: "MegrezTestComponents", package: "vChewing_Megrez"),
         .product(name: "Shared", package: "vChewing_Shared"),

@@ -8,6 +8,7 @@
 
 import InputMethodKit
 import LangModelAssembly
+import LMAssemblyMaterials4Tests
 @testable import MainAssembly
 import OSFrameworkImpl
 import Shared
@@ -45,7 +46,7 @@ class MainAssemblyTests: XCTestCase {
   static var _testSession: InputSession?
 
   var testLM = LMAssembly.LMInstantiator.construct { _ in
-    LMAssembly.LMInstantiator.connectToTestSQLDB()
+    LMAssembly.LMInstantiator.connectToTestSQLDB(sqlTestCoreLMData)
   }
 
   // MARK: - Utilities
@@ -54,9 +55,17 @@ class MainAssemblyTests: XCTestCase {
     chars: NSEvent.SpecialKey.leftArrow.unicodeScalar.description,
     keyCode: KeyCode.kLeftArrow.rawValue
   )
+  let dataArrowRight = NSEvent.KeyEventData(
+    chars: NSEvent.SpecialKey.rightArrow.unicodeScalar.description,
+    keyCode: KeyCode.kRightArrow.rawValue
+  )
   let dataArrowDown = NSEvent.KeyEventData(
     chars: NSEvent.SpecialKey.downArrow.unicodeScalar.description,
     keyCode: KeyCode.kDownArrow.rawValue
+  )
+  let dataArrowHome = NSEvent.KeyEventData(
+    chars: NSEvent.SpecialKey.home.unicodeScalar.description,
+    keyCode: KeyCode.kHome.rawValue
   )
   let dataEnterReturn = NSEvent.KeyEventData(
     chars: NSEvent.SpecialKey.carriageReturn.unicodeScalar.description,
@@ -242,7 +251,7 @@ class MainAssemblyTests: XCTestCase {
     UserDefaults.pendingUnitTests = true
     LMMgr.prepareForUnitTests()
     testLM = LMAssembly.LMInstantiator.construct { _ in
-      LMAssembly.LMInstantiator.connectToTestSQLDB()
+      LMAssembly.LMInstantiator.connectToTestSQLDB(sqlTestCoreLMData)
     }
     Self._testHandler = nil
     Self._testSession = nil
