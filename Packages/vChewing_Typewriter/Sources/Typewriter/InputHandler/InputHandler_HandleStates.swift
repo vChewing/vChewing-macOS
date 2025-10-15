@@ -240,9 +240,12 @@ extension InputHandlerProtocol {
     // BackSpace & Delete
     if input.isBackSpace || input.isDelete {
       let tooltipMessage = "! Succeeded in filtering a user phrase."
-      let isMarkingFilterable = filterabilityChecker?(state.data) ?? false
+      guard let filterabilityChecker else {
+        errorCallback?("FF333223")
+        return true
+      }
+      let isMarkingFilterable = filterabilityChecker(state.data)
       if !isMarkingFilterable {
-        errorCallback?("1F88B191")
         return true
       }
       if !session.performUserPhraseOperation(addToFilter: true) {
