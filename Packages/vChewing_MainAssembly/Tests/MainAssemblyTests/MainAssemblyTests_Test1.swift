@@ -16,6 +16,8 @@ import Shared
 @testable import Typewriter
 import XCTest
 
+// 本文的單元測試用例從 001 與 101 起算。
+
 extension MainAssemblyTests {
   func test001_ClientTest_BundleIdentifier() throws {
     guard let identifier = testSession.client()?.bundleIdentifier() else {

@@ -126,3 +126,17 @@ func vCLMLog(_ strPrint: StringLiteralType) {
     Process.consoleLog("vChewingDebug: \(strPrint)")
   }
 }
+
+// MARK: - Runtime Context Management
+
+extension LMAssembly {
+  public static func applyEnvironmentDefaults() {
+    LMAssembly.LMInstantiator.asyncLoadingUserData = !UserDefaults.pendingUnitTests
+  }
+
+  public static func resetSharedState(restoreAsyncLoadingStrategy: Bool = true) {
+    LMAssembly.LMInstantiator.resetSharedResources(
+      restoreAsyncLoadingStrategy: restoreAsyncLoadingStrategy
+    )
+  }
+}
