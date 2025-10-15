@@ -208,6 +208,9 @@ extension LMMgr {
   )[0]
 
   public static func dataFolderPath(isDefaultFolder: Bool) -> String {
+    if #available(macOS 10.15, *), UserDefaults.pendingUnitTests {
+      return unitTestFolderPath(isDefaultFolder: isDefaultFolder)
+    }
     var userDictPathSpecified = PrefMgr.shared.userDataFolderSpecified.expandingTildeInPath
     var userDictPathDefault =
       Self.appSupportURL.appendingPathComponent("vChewing").path.expandingTildeInPath

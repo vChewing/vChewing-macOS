@@ -15,18 +15,67 @@ import SwiftExtension
 // MARK: - Input Mode Extension for Language Models
 
 extension Shared.InputMode {
-  private static let lmCHS = LMAssembly.LMInstantiator(
-    isCHS: true, pomDataURL: LMMgr.perceptionOverrideModelDataURL(.imeModeCHS)
-  )
-  private static let lmCHT = LMAssembly.LMInstantiator(
-    isCHS: false, pomDataURL: LMMgr.perceptionOverrideModelDataURL(.imeModeCHT)
-  )
+  private struct LangModelCache {
+    // MARK: Lifecycle
+
+    init() {
+      self.chs = LMAssembly.LMInstantiator(
+        isCHS: true,
+        pomDataURL: LMMgr.perceptionOverrideModelDataURL(.imeModeCHS)
+      )
+      self.cht = LMAssembly.LMInstantiator(
+        isCHS: false,
+        pomDataURL: LMMgr.perceptionOverrideModelDataURL(.imeModeCHT)
+      )
+    }
+
+    // MARK: Internal
+
+    let cht: LMAssembly.LMInstantiator
+    let chs: LMAssembly.LMInstantiator
+
+    func model(for mode: Shared.InputMode) -> LMAssembly.LMInstantiator {
+      switch mode {
+      case .imeModeCHS: return chs
+      case .imeModeCHT: return cht
+      case .imeModeNULL: return .init()
+      }
+    }
+  }
+
+  private static var productionCache = LangModelCache()
+  private static var unitTestCache: LangModelCache?
+
+  private static var activeCache: LangModelCache {
+    if UserDefaults.pendingUnitTests {
+      if unitTestCache == nil {
+        unitTestCache = LangModelCache()
+      }
+      LMAssembly.applyEnvironmentDefaults()
+      return unitTestCache!
+    }
+    LMAssembly.applyEnvironmentDefaults()
+    return productionCache
+  }
+
+  public static func resetLangModelCache(forUnitTests: Bool? = nil) {
+    switch forUnitTests {
+    case true?:
+      unitTestCache = nil
+    case false?:
+      productionCache = LangModelCache()
+    case nil:
+      productionCache = LangModelCache()
+      unitTestCache = nil
+    }
+  }
 
   public var langModel: LMAssembly.LMInstantiator {
     switch self {
-    case .imeModeCHS: return Self.lmCHS
-    case .imeModeCHT: return Self.lmCHT
-    case .imeModeNULL: return .init()
+    case .imeModeNULL:
+      return .init()
+    default:
+      return Self.activeCache.model(for: self)
     }
   }
 }
@@ -34,9 +83,26 @@ extension Shared.InputMode {
 // MARK: - LMMgr
 
 public class LMMgr {
+  // MARK: Public
+
   public static var shared = LMMgr()
 
   public static var isCoreDBConnected: Bool { LMAssembly.LMInstantiator.isSQLDBConnected }
+
+  public static func prepareForUnitTests() {
+    guard UserDefaults.pendingUnitTests else { return }
+    if #available(macOS 10.15, *) {
+      prepareUnitTestSandbox()
+    }
+    Shared.InputMode.resetLangModelCache(forUnitTests: true)
+    LMAssembly.applyEnvironmentDefaults()
+  }
+
+  public static func resetAfterUnitTests() {
+    Shared.InputMode.resetLangModelCache()
+    resetUnitTestSandbox()
+    LMAssembly.resetSharedState()
+  }
 
   // MARK: - Functions reacting directly with language models.
 
@@ -253,6 +319,69 @@ public class LMMgr {
   public static func performMemoryCleanup() {
     Shared.InputMode.validCases.forEach { mode in
       mode.langModel.purgeInputTokenHashMap()
+    }
+  }
+
+  // MARK: Internal
+
+  // MARK: Unit Test Sandbox
+
+  @available(macOS 10.15, *)
+  internal static func unitTestFolderPath(isDefaultFolder: Bool) -> String {
+    var path = unitTestDataURL(isDefaultFolder: isDefaultFolder).path
+    path.ensureTrailingSlash()
+    return path
+  }
+
+  @available(macOS 10.15, *)
+  internal static func unitTestDataURL(isDefaultFolder: Bool) -> URL {
+    prepareUnitTestSandbox()
+    guard let defaultURL = unitTestDefaultURL, let customURL = unitTestCustomURL else {
+      fatalError("Unit test sandbox unavailable.")
+    }
+    return isDefaultFolder ? defaultURL : customURL
+  }
+
+  @available(macOS 10.15, *)
+  internal static func prepareUnitTestSandbox() {
+    guard UserDefaults.pendingUnitTests else { return }
+    if let defaultURL = unitTestDefaultURL, let customURL = unitTestCustomURL {
+      ensureDirectoryExists(defaultURL)
+      ensureDirectoryExists(customURL)
+      return
+    }
+    let root = FileManager.default.temporaryDirectory
+      .appendingPathComponent("vChewing-UnitTests", isDirectory: true)
+      .appendingPathComponent(ProcessInfo.processInfo.globallyUniqueString, isDirectory: true)
+    let defaultURL = root.appendingPathComponent("UserDataDefault", isDirectory: true)
+    let customURL = root.appendingPathComponent("UserDataCustom", isDirectory: true)
+    ensureDirectoryExists(defaultURL)
+    ensureDirectoryExists(customURL)
+    unitTestRootURL = root
+    unitTestDefaultURL = defaultURL
+    unitTestCustomURL = customURL
+  }
+
+  internal static func resetUnitTestSandbox() {
+    if let root = unitTestRootURL {
+      try? FileManager.default.removeItem(at: root)
+    }
+    unitTestRootURL = nil
+    unitTestDefaultURL = nil
+    unitTestCustomURL = nil
+  }
+
+  // MARK: Private
+
+  private static var unitTestRootURL: URL?
+  private static var unitTestDefaultURL: URL?
+  private static var unitTestCustomURL: URL?
+
+  private static func ensureDirectoryExists(_ url: URL) {
+    do {
+      try FileManager.default.createDirectory(at: url, withIntermediateDirectories: true)
+    } catch {
+      assertionFailure("Failed to ensure unit test sandbox directory: \(error)")
     }
   }
 }
