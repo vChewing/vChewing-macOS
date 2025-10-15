@@ -89,6 +89,12 @@ class MainAssemblyTests: XCTestCase {
     UserDefaults.unitTests = .init(suiteName: "org.atelierInmu.vChewing.MainAssembly.UnitTests")
     UserDef.resetAll()
     UserDefaults.pendingUnitTests = true
+    LMMgr.prepareForUnitTests()
+    testLM = LMAssembly.LMInstantiator.construct { _ in
+      LMAssembly.LMInstantiator.connectToTestSQLDB()
+    }
+    Self._testHandler = nil
+    Self._testSession = nil
     testSession.activateServer(testClient)
     testSession.isActivated = true
     testSession.inputHandler = testHandler
@@ -99,6 +105,7 @@ class MainAssemblyTests: XCTestCase {
 
   override func tearDownWithError() throws {
     testSession.switchState(IMEState.ofAbortion())
+    LMMgr.resetAfterUnitTests()
     UserDefaults.unitTests?.removeSuite(named: "org.atelierInmu.vChewing.MainAssembly.UnitTests")
     UserDef.resetAll()
     testClient.clear()

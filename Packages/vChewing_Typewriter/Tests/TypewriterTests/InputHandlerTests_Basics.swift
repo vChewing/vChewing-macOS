@@ -176,6 +176,7 @@ class InputHandlerTests: XCTestCase {
   override func tearDownWithError() throws {
     testHandler?.errorCallback = nil
     testSession?.switchState(MockIMEState.ofAbortion())
+    LMAssembly.resetSharedState()
     UserDefaults.unitTests?.removeSuite(named: "org.atelierInmu.vChewing.Typewriter.UnitTests")
     UserDef.resetAll()
   }
