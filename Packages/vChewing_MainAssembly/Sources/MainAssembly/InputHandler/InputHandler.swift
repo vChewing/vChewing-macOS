@@ -30,6 +30,7 @@ public final class InputHandler: InputHandlerProtocol {
     self.currentLM = lm
     self.pomSaveCallback = pomSaveCallback
     self.errorCallback = errorCallback
+    self.filterabilityChecker = filterabilityChecker
     self.notificationCallback = notificationCallback
     /// 組字器初期化。因為是首次初期化變數，所以這裡不能用 ensureCompositor() 代勞。
     self.assembler = Assembler(with: currentLM, separator: "-")
