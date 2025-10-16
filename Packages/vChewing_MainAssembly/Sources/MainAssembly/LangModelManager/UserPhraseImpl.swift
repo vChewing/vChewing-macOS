@@ -44,7 +44,8 @@ extension UserPhraseInsertable {
       keyArray: keyArray,
       value: ChineseConverter.crossConvert(value),
       inputMode: inputMode.reversed,
-      isConverted: true
+      isConverted: true,
+      weight: weight
     )
   }
 
