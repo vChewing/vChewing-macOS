@@ -85,6 +85,7 @@ extension InputHandlerProtocol {
       case [.option, .command] where input.keyCode == 27: .toNerf // 減號鍵
       case [.option, .command] where input.keyCode == 24: .toBoost // 英數鍵盤的等號加號鍵；JIS 鍵盤的 ^ 號鍵。
       case _ where input.isOptionHold && input.isCommandHold && input.isDelete: .toFilter
+      case _ where input.isOptionHold && input.isCommandHold && input.isBackSpace: .toFilter
       default: nil
       }
       guard let action else { break manipulator }
