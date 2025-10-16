@@ -231,7 +231,7 @@ extension SessionProtocol {
   }
 
   public func performServerDeactivation() {
-    asyncOnMain { [weak self] in
+    let deactivation = { [weak self] in
       guard let self = self else { return }
       self.isActivated = false
       self.resetInputHandler() // 這條會自動搞定 Empty 狀態。
@@ -242,11 +242,16 @@ extension SessionProtocol {
         self.candidateUI = nil
       }
     }
+    if UserDefaults.pendingUnitTests {
+      deactivation()
+    } else {
+      asyncOnMain(execute: deactivation)
+    }
   }
 
   public func performServerActivation(client: ClientObj?) {
     hidePalettes()
-    asyncOnMain { [weak self] in
+    let activation1 = { [weak self] in
       guard let self = self else { return }
       if let senderBundleID: String = client?.bundleIdentifier() {
         vCLog("activateServer(\(senderBundleID))")
@@ -264,19 +269,34 @@ extension SessionProtocol {
             .isElectronBasedApp(identifier: senderBundleID)
       }
     }
-    asyncOnMain {
+    if UserDefaults.pendingUnitTests {
+      activation1()
+    } else {
+      asyncOnMain(execute: activation1)
+    }
+    let activation2 = {
       // 自動啟用肛塞（廉恥模式），除非這一天是愚人節。
       if !Date.isTodayTheDate(from: 0_401), !PrefMgr.shared.shouldNotFartInLieuOfBeep {
         PrefMgr.shared.shouldNotFartInLieuOfBeep = true
       }
     }
-    asyncOnMain { [weak self] in
+    if UserDefaults.pendingUnitTests {
+      activation2()
+    } else {
+      asyncOnMain(execute: activation2)
+    }
+    let activation3 = { [weak self] in
       guard let self = self else { return }
       if self.inputMode != IMEApp.currentInputMode {
         self.inputMode = IMEApp.currentInputMode
       }
     }
-    asyncOnMain { [weak self] in
+    if UserDefaults.pendingUnitTests {
+      activation3()
+    } else {
+      asyncOnMain(execute: activation3)
+    }
+    let activation4 = { [weak self] in
       guard let self = self else { return }
       // 清理掉上一個會話的選字窗及其選單。
       if self.candidateUI is CtlCandidateTDK {
@@ -287,7 +307,12 @@ extension SessionProtocol {
       CtlCandidateTDK.currentWindow?.orderOut(nil)
       CtlCandidateTDK.currentWindow = nil
     }
-    asyncOnMain { [weak self] in
+    if UserDefaults.pendingUnitTests {
+      activation4()
+    } else {
+      asyncOnMain(execute: activation4)
+    }
+    let activation5 = { [weak self] in
       guard let self = self else { return }
       if self.isActivated { return }
 
@@ -312,13 +337,23 @@ extension SessionProtocol {
         }
       }
 
-      asyncOnMain {
-        AppDelegate.shared.checkMemoryUsage()
+      let memoryCheck = {
+        _ = AppDelegate.shared.checkMemoryUsage()
+      }
+      if UserDefaults.pendingUnitTests {
+        memoryCheck()
+      } else {
+        asyncOnMain(execute: memoryCheck)
       }
 
       self.state = .ofEmpty()
       self.isActivated = true // 登記啟用狀態。
       self.setKeyLayout()
+    }
+    if UserDefaults.pendingUnitTests {
+      activation5()
+    } else {
+      asyncOnMain(execute: activation5)
     }
   }
 }
