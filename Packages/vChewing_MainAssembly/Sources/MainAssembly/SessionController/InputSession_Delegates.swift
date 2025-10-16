@@ -296,8 +296,18 @@ extension SessionProtocol {
     }
   }
 
-  public func candidatePairRightClicked(at index: Int, action: CandidateContextMenuAction) {
-    guard let inputHandler = inputHandler, isCandidateContextMenuEnabled else { return }
+  public func candidatePairContextMenuActionTriggered(
+    at index: Int, action: CandidateContextMenuAction
+  ) {
+    guard isCandidateContextMenuEnabled else { return }
+    candidatePairManipulated(at: index, action: action)
+  }
+
+  public func candidatePairManipulated(
+    at index: Int,
+    action: CandidateContextMenuAction
+  ) {
+    guard let inputHandler = inputHandler else { return }
     var succeeded = true
 
     let rawPair = state.candidates[index]
@@ -307,6 +317,7 @@ extension SessionProtocol {
       inputMode: inputMode
     )
     userPhrase.updateWeight(basedOn: action)
+
     LMMgr.writeUserPhrasesAtOnce(userPhrase, areWeFiltering: action == .toFilter) {
       succeeded = false
     }

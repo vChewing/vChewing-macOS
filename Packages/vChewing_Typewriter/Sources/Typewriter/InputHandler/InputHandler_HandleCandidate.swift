@@ -73,13 +73,16 @@ extension InputHandlerProtocol {
 
     // MARK: 選字窗內使用熱鍵升權、降權、刪詞。
 
-    manipulator: if session.isCandidateContextMenuEnabled {
+    manipulator: if state.type == .ofCandidates {
       let candidates = state.candidates
       let highlightedIndex = ctlCandidate.highlightedIndex
+      let isFilter = input.isDelete || input.isBackSpace
       if !(0 ..< candidates.count).contains(ctlCandidate.highlightedIndex) { break manipulator }
-      if candidates[highlightedIndex].keyArray.count < 2 || candidates[highlightedIndex].value
-        .count < 2 {
-        break manipulator
+      if !prefs.allowBoostingSingleKanjiAsUserPhrase || isFilter {
+        if candidates[highlightedIndex].keyArray.count < 2 || candidates[highlightedIndex].value
+          .count < 2 {
+          break manipulator
+        }
       }
       let action: CandidateContextMenuAction? = switch input.commonKeyModifierFlags {
       case [.option, .command] where input.keyCode == 27: .toNerf // 減號鍵
@@ -89,7 +92,7 @@ extension InputHandlerProtocol {
       default: nil
       }
       guard let action else { break manipulator }
-      session.candidatePairRightClicked(at: highlightedIndex, action: action)
+      session.candidatePairManipulated(at: highlightedIndex, action: action)
       return true
     }
 
