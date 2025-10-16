@@ -245,7 +245,7 @@ extension SessionProtocol {
     if UserDefaults.pendingUnitTests {
       deactivation()
     } else {
-      asyncOnMain(deactivation)
+      asyncOnMain(execute: deactivation)
     }
   }
 
@@ -272,7 +272,7 @@ extension SessionProtocol {
     if UserDefaults.pendingUnitTests {
       activation1()
     } else {
-      asyncOnMain(activation1)
+      asyncOnMain(execute: activation1)
     }
     let activation2 = {
       // 自動啟用肛塞（廉恥模式），除非這一天是愚人節。
@@ -283,7 +283,7 @@ extension SessionProtocol {
     if UserDefaults.pendingUnitTests {
       activation2()
     } else {
-      asyncOnMain(activation2)
+      asyncOnMain(execute: activation2)
     }
     let activation3 = { [weak self] in
       guard let self = self else { return }
@@ -294,7 +294,7 @@ extension SessionProtocol {
     if UserDefaults.pendingUnitTests {
       activation3()
     } else {
-      asyncOnMain(activation3)
+      asyncOnMain(execute: activation3)
     }
     let activation4 = { [weak self] in
       guard let self = self else { return }
@@ -310,7 +310,7 @@ extension SessionProtocol {
     if UserDefaults.pendingUnitTests {
       activation4()
     } else {
-      asyncOnMain(activation4)
+      asyncOnMain(execute: activation4)
     }
     let activation5 = { [weak self] in
       guard let self = self else { return }
@@ -338,12 +338,12 @@ extension SessionProtocol {
       }
 
       let memoryCheck = {
-        AppDelegate.shared.checkMemoryUsage()
+        _ = AppDelegate.shared.checkMemoryUsage()
       }
       if UserDefaults.pendingUnitTests {
         memoryCheck()
       } else {
-        asyncOnMain(memoryCheck)
+        asyncOnMain(execute: memoryCheck)
       }
 
       self.state = .ofEmpty()
@@ -353,7 +353,7 @@ extension SessionProtocol {
     if UserDefaults.pendingUnitTests {
       activation5()
     } else {
-      asyncOnMain(activation5)
+      asyncOnMain(execute: activation5)
     }
   }
 }

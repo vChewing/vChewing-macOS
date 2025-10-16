@@ -161,6 +161,7 @@ public class LMMgr {
           filterPath: nil
         )
       case .theFilter:
+        // We have to enforce the toggle of async loading here for this case:
         if UserDefaults.pendingUnitTests {
           Self.reloadUserFilterDirectly(mode: mode)
         } else {
