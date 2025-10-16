@@ -163,8 +163,13 @@ public class LMMgr {
           filterPath: nil
         )
       case .theFilter:
-        asyncOnMain {
+        // We have to enforce the toggle of async loading here for this case:
+        if UserDefaults.pendingUnitTests {
           Self.reloadUserFilterDirectly(mode: mode)
+        } else {
+          asyncOnMain {
+            Self.reloadUserFilterDirectly(mode: mode)
+          }
         }
       case .theReplacements:
         if PrefMgr.shared.phraseReplacementEnabled { Self.loadUserPhraseReplacement() }
