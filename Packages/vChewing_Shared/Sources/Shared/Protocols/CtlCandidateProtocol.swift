@@ -19,7 +19,10 @@ public protocol CtlCandidateDelegate: AnyObject {
   func candidatePairs(conv: Bool) -> [(keyArray: [String], value: String)]
   func candidatePairSelectionConfirmed(at index: Int)
   func candidatePairHighlightChanged(at index: Int)
-  func candidatePairRightClicked(at index: Int, action: CandidateContextMenuAction)
+  func candidatePairContextMenuActionTriggered(
+    at index: Int, action: CandidateContextMenuAction
+  )
+  func candidatePairManipulated(at index: Int, action: CandidateContextMenuAction)
   func candidateToolTip(shortened: Bool) -> String
   func resetCandidateWindowOrigin()
   func checkIsMacroTokenResult(_ index: Int) -> Bool
