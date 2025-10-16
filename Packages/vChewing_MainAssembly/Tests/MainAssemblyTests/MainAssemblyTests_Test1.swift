@@ -34,6 +34,34 @@ extension MainAssemblyTests {
     testClient.clear()
   }
 
+  func test011_LMMgr_UnitTestSandboxIO() throws {
+    let directories = [
+      (label: "default", url: LMMgr.unitTestDataURL(isDefaultFolder: true)),
+      (label: "custom", url: LMMgr.unitTestDataURL(isDefaultFolder: false)),
+    ]
+    let fileManager = FileManager.default
+
+    for (label, folderURL) in directories {
+      let path = folderURL.path
+      var isDirectory = ObjCBool(false)
+      XCTAssertTrue(
+        fileManager.fileExists(atPath: path, isDirectory: &isDirectory),
+        "Missing \(label) folder at: \(path)"
+      )
+      XCTAssertTrue(isDirectory.boolValue, "Path is not directory for \(label) folder at: \(path)")
+      XCTAssertTrue(fileManager.isReadableFile(atPath: path), "Unreadable \(label) folder at: \(path)")
+      XCTAssertTrue(fileManager.isWritableFile(atPath: path), "Unwritable \(label) folder at: \(path)")
+
+      let payload = "io-check-\(UUID().uuidString)"
+      let fileURL = folderURL.appendingPathComponent("io-check-\(UUID().uuidString).txt")
+
+      try Data(payload.utf8).write(to: fileURL, options: [.atomic])
+      let readBack = try String(contentsOf: fileURL, encoding: .utf8)
+      XCTAssertEqual(readBack, payload, "Mismatched content for \(label) folder at: \(path)")
+      try fileManager.removeItem(at: fileURL)
+    }
+  }
+
   // MARK: - Input Handler Tests.
 
   /// 測試基本的打字組句（不是ㄅ半注音）。
