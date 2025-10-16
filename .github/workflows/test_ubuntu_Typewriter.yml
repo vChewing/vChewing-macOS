@@ -16,4 +16,4 @@ jobs:
       - name: Clean
         run: make spmClean
       - name: Test
-        run: swift test -c release --no-parallel --package-path ./Packages/vChewing_Typewriter/
+        run: swift test --no-parallel --package-path ./Packages/vChewing_Typewriter/

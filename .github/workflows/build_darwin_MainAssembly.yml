@@ -21,4 +21,4 @@ jobs:
       - name: Build
         run: make spmDebug
       - name: Test
-        run: swift test -c release --no-parallel --package-path ./Packages/vChewing_MainAssembly/
+        run: swift test --no-parallel --package-path ./Packages/vChewing_MainAssembly/
