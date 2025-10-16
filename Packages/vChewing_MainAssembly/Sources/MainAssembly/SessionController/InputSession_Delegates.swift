@@ -71,7 +71,7 @@ extension SessionProtocol {
 
     // 因為上述操作不會立即生效（除非遞交組字區），所以暫時塞入臨時資料記錄。
     // 該臨時資料記錄會在接下來的語言模組資料重載過程中被自動清除。
-    inputMode.langModel.insertTemporaryData(
+    inputHandler.currentLM.insertTemporaryData(
       unigram: .init(
         keyArray: userPhrase.keyArray,
         value: userPhrase.value,
@@ -320,6 +320,18 @@ extension SessionProtocol {
 
     LMMgr.writeUserPhrasesAtOnce(userPhrase, areWeFiltering: action == .toFilter) {
       succeeded = false
+    }
+
+    // 直接同步重載目前使用中的語言模組，以避免單元測試時不同 LM 實例之間資料不同步。
+    if succeeded, UserDefaults.pendingUnitTests {
+      let phrasesPath = LMMgr.userDictDataURL(mode: inputMode, type: .thePhrases).path
+      if action == .toFilter {
+        inputHandler.currentLM.reloadUserFilterDirectly(
+          path: LMMgr.userDictDataURL(mode: inputMode, type: .theFilter).path
+        )
+      } else {
+        inputHandler.currentLM.loadUserPhrasesData(path: phrasesPath, filterPath: nil)
+      }
     }
 
     // 後續操作。
