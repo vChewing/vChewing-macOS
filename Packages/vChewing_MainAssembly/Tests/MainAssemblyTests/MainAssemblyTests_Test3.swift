@@ -83,9 +83,12 @@ extension MainAssemblyTests {
         backupDataString,
         getSubLMDataFromMemory(),
         """
-        If this assertion fails, investige why LMMgr fails from writing data under its UnitTests mode.
+        If this assertion fails. First, confirm whether UTSIO (`test011_LMMgr_UnitTestSandboxIO`) fails.
+        If fail, investige why LMMgr fails from writing data under its UnitTests mode.
         Maybe both Xcode and Swift Package Manager are barrierd by their Sandboxes regarding file I/O.
         Maybe the user dictionary path for the UniteTest mode of LMMgr and LMAssembly needs change.
+        If UTSIO succeeded, then something else must be wrong with the interaction of LMMgr...
+        ... or an internal issue in LMMgr.
         """
       )
       switch action {
