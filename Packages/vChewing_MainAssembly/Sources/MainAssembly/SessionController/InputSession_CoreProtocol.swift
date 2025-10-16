@@ -231,7 +231,7 @@ extension SessionProtocol {
   }
 
   public func performServerDeactivation() {
-    asyncOnMain { [weak self] in
+    let deactivation = { [weak self] in
       guard let self = self else { return }
       self.isActivated = false
       self.resetInputHandler() // 這條會自動搞定 Empty 狀態。
@@ -241,6 +241,11 @@ extension SessionProtocol {
       if self.candidateUI is CtlCandidateTDK {
         self.candidateUI = nil
       }
+    }
+    if UserDefaults.pendingUnitTests {
+      deactivation()
+    } else {
+      asyncOnMain(deactivation)
     }
   }
 
