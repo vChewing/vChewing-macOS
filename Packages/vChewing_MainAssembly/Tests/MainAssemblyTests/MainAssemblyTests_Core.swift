@@ -66,6 +66,157 @@ class MainAssemblyTests: XCTestCase {
     chars: NSEvent.SpecialKey.tab.unicodeScalar.description,
     keyCode: KeyCode.kTab.rawValue
   )
+  let backspaceEvent = NSEvent.KeyEventData(
+    type: .keyDown,
+    chars: NSEvent.SpecialKey.delete.unicodeScalar.description,
+    charsSansModifiers: NSEvent.SpecialKey.delete.unicodeScalar.description,
+    keyCode: KeyCode.kBackSpace.rawValue
+  )
+  let escapeEvent = NSEvent.KeyEventData(
+    type: .keyDown,
+    chars: String(UnicodeScalar(0x1B)!),
+    charsSansModifiers: String(UnicodeScalar(0x1B)!),
+    keyCode: KeyCode.kEscape.rawValue
+  )
+  let deleteForwardEvent = NSEvent.KeyEventData(
+    type: .keyDown,
+    chars: NSEvent.SpecialKey.deleteForward.unicodeScalar.description,
+    charsSansModifiers: NSEvent.SpecialKey.deleteForward.unicodeScalar.description,
+    keyCode: KeyCode.kWindowsDelete.rawValue
+  )
+  let shiftLeftEvent = NSEvent.KeyEventData(
+    type: .keyDown,
+    flags: .shift,
+    chars: NSEvent.SpecialKey.leftArrow.unicodeScalar.description,
+    charsSansModifiers: NSEvent.SpecialKey.leftArrow.unicodeScalar.description,
+    keyCode: KeyCode.kLeftArrow.rawValue
+  )
+  let optionRightEvent = NSEvent.KeyEventData(
+    type: .keyDown,
+    flags: .option,
+    chars: NSEvent.SpecialKey.rightArrow.unicodeScalar.description,
+    charsSansModifiers: NSEvent.SpecialKey.rightArrow.unicodeScalar.description,
+    keyCode: KeyCode.kRightArrow.rawValue
+  )
+  let optionShiftRightEvent = NSEvent.KeyEventData(
+    type: .keyDown,
+    flags: [.option, .shift],
+    chars: NSEvent.SpecialKey.rightArrow.unicodeScalar.description,
+    charsSansModifiers: NSEvent.SpecialKey.rightArrow.unicodeScalar.description,
+    keyCode: KeyCode.kRightArrow.rawValue
+  )
+  let optionLeftEvent = NSEvent.KeyEventData(
+    type: .keyDown,
+    flags: .option,
+    chars: NSEvent.SpecialKey.leftArrow.unicodeScalar.description,
+    charsSansModifiers: NSEvent.SpecialKey.leftArrow.unicodeScalar.description,
+    keyCode: KeyCode.kLeftArrow.rawValue
+  )
+  let nextCandidateEvent = NSEvent.KeyEventData(
+    type: .keyDown,
+    chars: NSEvent.SpecialKey.downArrow.unicodeScalar.description,
+    charsSansModifiers: NSEvent.SpecialKey.downArrow.unicodeScalar.description,
+    keyCode: KeyCode.kDownArrow.rawValue
+  )
+  let optionCommandMinusEvent = NSEvent.KeyEventData(
+    type: .keyDown,
+    flags: [.option, .command],
+    chars: "-",
+    charsSansModifiers: "-",
+    keyCode: mapKeyCodesANSIForTests["-"] ?? 27
+  )
+  let optionCommandEqualEvent = NSEvent.KeyEventData(
+    type: .keyDown,
+    flags: [.option, .command],
+    chars: "=",
+    charsSansModifiers: "=",
+    keyCode: mapKeyCodesANSIForTests["="] ?? 24
+  )
+  let optionCommandDeleteEventPC = NSEvent.KeyEventData(
+    type: .keyDown,
+    flags: [.option, .command],
+    chars: NSEvent.SpecialKey.deleteForward.unicodeScalar.description,
+    charsSansModifiers: NSEvent.SpecialKey.deleteForward.unicodeScalar.description,
+    keyCode: KeyCode.kWindowsDelete.rawValue
+  )
+  let optionCommandBackspaceEventPC = NSEvent.KeyEventData(
+    type: .keyDown,
+    flags: [.option, .command],
+    chars: NSEvent.SpecialKey.delete.unicodeScalar.description,
+    charsSansModifiers: NSEvent.SpecialKey.delete.unicodeScalar.description,
+    keyCode: KeyCode.kBackSpace.rawValue
+  )
+  let optionCommandBackspaceEventMacAsDelete = NSEvent.KeyEventData(
+    type: .keyDown,
+    flags: [.option, .command, .function],
+    chars: NSEvent.SpecialKey.delete.unicodeScalar.description,
+    charsSansModifiers: NSEvent.SpecialKey.delete.unicodeScalar.description,
+    keyCode: KeyCode.kBackSpace.rawValue
+  )
+  let symbolMenuKeyEventIntlWithOpt = NSEvent.KeyEventData(
+    type: .keyDown,
+    flags: .option,
+    chars: #"`"#,
+    charsSansModifiers: #"`"#,
+    keyCode: KeyCode.kSymbolMenuPhysicalKeyIntl.rawValue
+  )
+  let spaceEvent = NSEvent.KeyEventData(
+    chars: " ",
+    keyCode: KeyCode.kSpace.rawValue
+  )
+  let pageDownEvent = NSEvent.KeyEventData(
+    chars: NSEvent.SpecialKey.pageDown.unicodeScalar.description,
+    keyCode: KeyCode.kPageDown.rawValue
+  )
+  let tabEvent = NSEvent.KeyEventData(
+    chars: NSEvent.SpecialKey.tab.unicodeScalar.description,
+    keyCode: KeyCode.kTab.rawValue
+  )
+  let homeEvent = NSEvent.KeyEventData(
+    chars: NSEvent.SpecialKey.home.unicodeScalar.description,
+    keyCode: KeyCode.kHome.rawValue
+  )
+  let endEvent = NSEvent.KeyEventData(
+    chars: NSEvent.SpecialKey.end.unicodeScalar.description,
+    keyCode: KeyCode.kEnd.rawValue
+  )
+  let escEvent = NSEvent.KeyEventData(
+    chars: String(UnicodeScalar(0x1B)!),
+    charsSansModifiers: String(UnicodeScalar(0x1B)!),
+    keyCode: KeyCode.kEscape.rawValue
+  )
+  let optionBackspaceEvent = NSEvent.KeyEventData(
+    type: .keyDown,
+    flags: .option,
+    chars: NSEvent.SpecialKey.delete.unicodeScalar.description,
+    charsSansModifiers: NSEvent.SpecialKey.delete.unicodeScalar.description,
+    keyCode: KeyCode.kBackSpace.rawValue
+  )
+  let shiftBackspaceEvent = NSEvent.KeyEventData(
+    type: .keyDown,
+    flags: .shift,
+    chars: NSEvent.SpecialKey.delete.unicodeScalar.description,
+    charsSansModifiers: NSEvent.SpecialKey.delete.unicodeScalar.description,
+    keyCode: KeyCode.kBackSpace.rawValue
+  )
+  let forwardDeleteEvent = NSEvent.KeyEventData(
+    chars: NSEvent.SpecialKey.deleteForward.unicodeScalar.description,
+    keyCode: KeyCode.kWindowsDelete.rawValue
+  )
+  let optionForwardDeleteEvent = NSEvent.KeyEventData(
+    type: .keyDown,
+    flags: .option,
+    chars: NSEvent.SpecialKey.deleteForward.unicodeScalar.description,
+    charsSansModifiers: NSEvent.SpecialKey.deleteForward.unicodeScalar.description,
+    keyCode: KeyCode.kWindowsDelete.rawValue
+  )
+  let shiftEnterEvent = NSEvent.KeyEventData(
+    type: .keyDown,
+    flags: .shift,
+    chars: NSEvent.SpecialKey.enter.unicodeScalar.description,
+    charsSansModifiers: NSEvent.SpecialKey.enter.unicodeScalar.description,
+    keyCode: KeyCode.kLineFeed.rawValue
+  )
 
   var testHandler: InputHandler {
     let result = Self._testHandler ?? InputHandler(lm: testLM, pref: PrefMgr.shared)
@@ -133,6 +284,57 @@ class MainAssemblyTests: XCTestCase {
       let dismissed = !testSession.handleNSEvent(theEvent, client: testClient)
       if theEvent.type == .keyDown { XCTAssertFalse(dismissed) }
     }
+  }
+
+  @discardableResult
+  func handleKeyEvent(
+    _ data: NSEvent.KeyEventData,
+    shouldHandle: Bool = true
+  )
+    -> Bool {
+    var handled = false
+    data.asPairedEvents.forEach { event in
+      let result = testSession.handleNSEvent(event, client: testClient)
+      if event.type == .keyDown {
+        if shouldHandle {
+          XCTAssertTrue(result, "Expected keyDown to be handled for keyCode \(data.keyCode).")
+        } else {
+          XCTAssertFalse(result, "Expected keyDown to pass through for keyCode \(data.keyCode).")
+        }
+        handled = result
+      }
+    }
+    return handled
+  }
+
+  func handleEvents(
+    _ events: [NSEvent],
+    shouldHandle: Bool = true
+  ) {
+    events.forEach { event in
+      let result = testSession.handleNSEvent(event, client: testClient)
+      if event.type == .keyDown {
+        if shouldHandle {
+          XCTAssertTrue(result, "Expected keyDown to be handled for keyCode \(event.keyCode).")
+        } else {
+          XCTAssertFalse(result, "Expected keyDown to pass through for keyCode \(event.keyCode).")
+        }
+      }
+    }
+  }
+
+  @discardableResult
+  /// 預設測試序列是「科技蛋糕」。
+  func prepareBasicComposition(sequence: String) -> String {
+    testHandler.prefs.useSCPCTypingMode = false
+    clearTestPOM()
+    testSession.resetInputHandler(forceComposerCleanup: true)
+    testClient.clear()
+    typeSentenceOrCandidates(sequence)
+    if testSession.state.type != .ofInputting {
+      testSession.switchState(testHandler.generateStateOfInputting())
+    }
+    return testSession.state.displayedText
   }
 }
 
