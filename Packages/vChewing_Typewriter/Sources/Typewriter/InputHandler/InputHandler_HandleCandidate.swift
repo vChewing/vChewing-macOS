@@ -89,7 +89,7 @@ extension InputHandlerProtocol {
       default: nil
       }
       guard let action else { break manipulator }
-      session.candidatePairRightClicked(at: highlightedIndex, action: action)
+      session.candidatePairManipulated(at: highlightedIndex, action: action)
       return true
     }
 

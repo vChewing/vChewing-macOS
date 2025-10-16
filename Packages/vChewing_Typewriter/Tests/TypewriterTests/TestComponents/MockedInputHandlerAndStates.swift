@@ -392,7 +392,14 @@ public class MockSession: SessionCoreProtocol, CtlCandidateDelegate {
 
   public func candidatePairHighlightChanged(at index: Int) {}
 
-  public func candidatePairRightClicked(at index: Int, action: CandidateContextMenuAction) {}
+  public func candidatePairContextMenuActionTriggered(
+    at index: Int, action: CandidateContextMenuAction
+  ) {}
+
+  public func candidatePairManipulated(
+    at index: Int,
+    action: CandidateContextMenuAction
+  ) {}
 
   public func candidateToolTip(shortened: Bool) -> String { "" }
 
@@ -412,7 +419,9 @@ public class MockSession: SessionCoreProtocol, CtlCandidateDelegate {
       (state.type == .ofInputting)
         && (inputHandler.prefs.trimUnfinishedReadingsOnCommit || forceCleanup)
     if state.hasComposition {
-      textToCommit = inputHandler.generateStateOfInputting(sansReading: sansReading).displayedText
+      textToCommit = inputHandler.generateStateOfInputting(
+        sansReading: sansReading
+      ).displayedText
     }
     // 威注音不再在這裡對 IMKTextInput 客體黑名單當中的應用做資安措施。
     // 有相關需求者，請在切換掉輸入法或者切換至新的客體應用之前敲一下 Shift+Delete。
