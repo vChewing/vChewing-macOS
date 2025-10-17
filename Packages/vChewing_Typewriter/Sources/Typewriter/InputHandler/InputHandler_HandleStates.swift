@@ -92,7 +92,7 @@ extension InputHandlerProtocol {
     guard !isComposerUsingPinyin else { return "" }
     guard composer.hasIntonation(withNothingElse: true) else { return "" }
     guard composer.intonation.value != " " else { return "" }
-    let result = NSMutableString(capacity: 0)
+    var result = ContiguousArray<String>()
     result
       .append(
         "Intonation mark. ENTER to commit.\nSPACE to insert into composition buffer."
@@ -102,7 +102,7 @@ extension InputHandlerProtocol {
       result.append("\n")
       result.append("It will attempt to combine with the incoming phonabet input.".localized)
     }
-    return result.description
+    return result.joined()
   }
 
   /// 將組字器內的游標位置資料轉換成可以正確顯示的游標位置資料。
@@ -896,7 +896,7 @@ extension InputHandlerProtocol {
 
     var newState = generateStateOfInputting()
     let locID = Bundle.main.preferredLocalizations[0]
-    let newTooltip = NSMutableString(capacity: 0)
+    var newTooltip = ContiguousArray<String>()
     newTooltip.insert("　" + candidates[newIndex].value, at: 0)
     if #available(macOS 10.13, *), isContextVertical(), locID != "en" {
       newTooltip.insert(
@@ -906,7 +906,7 @@ extension InputHandlerProtocol {
     } else {
       newTooltip.insert((newIndex + 1).description + " / " + candidates.count.description, at: 0)
     }
-    newState.tooltip = newTooltip.description
+    newState.tooltip = newTooltip.joined()
     vCLog(newState.tooltip)
     newState.tooltipDuration = 0
     session.switchState(newState)
