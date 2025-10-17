@@ -58,7 +58,7 @@ public class SecurityAgentHelper {
     var messageForEntries: [String] = [messageHeader]
     results.forEach { matchedPID, matchedApp in
       defer { Self.reportedPIDs.append(matchedPID) }
-      let strBuilder = NSMutableString(string: "[PID: \(matchedPID)]")
+      var strBuilder = ContiguousArray<String>(["[PID: \(matchedPID)]"])
       // 第一行
       let bundleURL = matchedApp.bundleURL ?? matchedApp.executableURL
       if let bundleURL = bundleURL {
@@ -73,7 +73,7 @@ public class SecurityAgentHelper {
       if let bundleURL = bundleURL {
         strBuilder.append("\n→ \(bundleURL.path)")
       }
-      messageForEntries.append(strBuilder.description)
+      messageForEntries.append(strBuilder.joined())
     }
     messageForEntries.append(messageFooter)
     // 從這裡開始組裝訊息訊息內容。

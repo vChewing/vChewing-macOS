@@ -132,9 +132,9 @@ extension UserPhraseInsertable {
   )
     -> Bool {
     LMAssembly.withFileHandleQueueSync {
-      let debugOutput = NSMutableString()
+      var debugOutput = ContiguousArray<String>()
       defer {
-        if debugOutput.length > 0 { vCLog(debugOutput.description) }
+        if !debugOutput.isEmpty { vCLog(debugOutput.joined(separator: "\n")) }
       }
       if confirm {
         guard isValid else {

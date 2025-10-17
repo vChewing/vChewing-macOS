@@ -89,7 +89,7 @@ extension LMMgr: PhraseEditorDelegate {
   }
 
   public func tagOverrides(in strProcessed: inout String, mode: Shared.InputMode) {
-    let outputStack: NSMutableString = .init()
+    var outputStack: ContiguousArray<String> = .init()
     for currentLine in strProcessed.split(separator: "\n") {
       let arr = currentLine.split(separator: " ")
       guard arr.count >= 2 else { continue }
@@ -103,6 +103,6 @@ extension LMMgr: PhraseEditorDelegate {
       if replace { outputStack.append(" #𝙾𝚟𝚎𝚛𝚛𝚒𝚍𝚎") }
       outputStack.append("\n")
     }
-    strProcessed = outputStack.description
+    strProcessed = outputStack.joined()
   }
 }

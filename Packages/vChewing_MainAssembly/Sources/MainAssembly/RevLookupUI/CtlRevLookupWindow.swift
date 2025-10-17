@@ -172,7 +172,7 @@ class FrmRevLookupWindow: NSWindow {
     guard !input.isEmpty else { return }
     button.isEnabled = false
     inputField.isEnabled = false
-    let strBuilder = NSMutableString()
+    var strBuilder = ContiguousArray<String>()
     strBuilder.append("\n")
     strBuilder.append("Char\tReading(s)\n".localized)
     strBuilder.append("==\t====\n")
@@ -191,7 +191,7 @@ class FrmRevLookupWindow: NSWindow {
         i += 1
       }
     }
-    resultView.string = strBuilder.description
+    resultView.string = strBuilder.joined()
     button.isEnabled = true
     inputField.isEnabled = true
   }
