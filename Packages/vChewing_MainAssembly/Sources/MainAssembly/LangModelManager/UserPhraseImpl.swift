@@ -179,20 +179,22 @@ extension UserPhraseInsertable {
       guard fileSize >= bufferLength else { return true }
       let blankData = Data([UInt8](repeating: 0x0, count: bufferLength)) // 用來搞填充的垃圾資料
       let sharpData = Data([0x23]) // Sharp Sign (#)
+      let lfData = Data([0x0A]) // Line Feed '\n'
       fileHandle.seek(toFileOffset: 0) // 從頭開始讀取處理。
-      for currentOffset in -1 ..< (Int(fileSize) - bufferLength - 1) {
+      for currentWorkingOffset in 0 ... (Int(fileSize) - bufferLength) {
         /// !! 注意：FileHandle 的 seek 位置會在每次 readData() / write() 之後都有變動。
-        // 確定手術位置
-        let currentWorkingOffset = UInt64(currentOffset + 1)
-        // 讀取且檢查當前位元組
-        fileHandle.seek(toFileOffset: UInt64(max(0, currentOffset)))
-        let currentByte = fileHandle.readData(ofLength: 1)
-        guard currentByte != sharpData else { continue }
+        // 只在「行首或換行（LF）之後」嘗試匹配；此外，若前一位元組是 # 則略過。
+        if currentWorkingOffset > 0 {
+          fileHandle.seek(toFileOffset: UInt64(currentWorkingOffset - 1))
+          let previousByte = fileHandle.readData(ofLength: 1)
+          if previousByte == sharpData { continue }
+          guard previousByte == lfData else { continue }
+        }
         // 開始手術
-        fileHandle.seek(toFileOffset: currentWorkingOffset)
+        fileHandle.seek(toFileOffset: UInt64(currentWorkingOffset))
         let dataScoped = fileHandle.readData(ofLength: bufferLength)
         guard [data1, data2].contains(dataScoped) else { continue }
-        fileHandle.seek(toFileOffset: currentWorkingOffset)
+        fileHandle.seek(toFileOffset: UInt64(currentWorkingOffset))
         fileHandle.write(blankData)
       }
       LMMgr.reloadUserFilterDirectly(mode: inputMode)
