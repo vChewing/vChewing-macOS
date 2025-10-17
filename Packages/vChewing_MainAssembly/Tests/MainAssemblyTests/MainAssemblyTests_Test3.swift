@@ -7,14 +7,15 @@
 // requirements defined in MIT License.
 
 import InputMethodKit
-@testable import LangModelAssembly
-@testable import MainAssembly
 import Megrez
 import MegrezTestComponents
 import OSFrameworkImpl
 import Shared
-@testable import Typewriter
 import XCTest
+
+@testable import LangModelAssembly
+@testable import MainAssembly
+@testable import Typewriter
 
 // 本文的單元測試用例從 301 起算。
 
@@ -39,7 +40,7 @@ extension MainAssemblyTests {
       typeSentenceOrCandidates("su065j/ ") // Nian2 Zhong1.
       XCTAssertEqual(testSession.state.type, .ofInputting)
       XCTAssertEqual(testSession.state.displayedText, "年中") // Default value.
-      handleEvents(dataArrowDown.asPairedEvents)
+      press(dataArrowDown)
       XCTAssertEqual(testSession.state.type, .ofCandidates)
       XCTAssertEqual(testSession.state.candidates.map(\.value).prefix(2), ["年中", "年終"])
     }
@@ -50,7 +51,7 @@ extension MainAssemblyTests {
       XCTAssertTrue(candidates.map(\.value).contains(target))
       checkCandidates: for _ in 0 ..< candidates.count {
         guard testSession.state.displayedText != target else { break checkCandidates }
-        handleEvents(tabEvent.asPairedEvents)
+        press(tabEvent)
       }
       XCTAssertEqual(testSession.state.displayedText, target) // Default value.
     }
@@ -68,7 +69,7 @@ extension MainAssemblyTests {
       try tearDownWithError()
       try setUpWithError()
       prepareBasicState4ThisTest()
-      navigateCandidateHighlightToValue(target)
+      highlightCandidateToValue(target)
       func getSubLMDataFromMemory() -> String {
         switch action {
         case .toBoost, .toNerf: testHandler.currentLM.lmUserPhrases.strData
@@ -76,7 +77,7 @@ extension MainAssemblyTests {
         }
       }
       let backupDataString = getSubLMDataFromMemory()
-      handleEvents(eventDef.asPairedEvents)
+      press(eventDef)
       XCTAssertNotEqual(
         backupDataString,
         getSubLMDataFromMemory(),

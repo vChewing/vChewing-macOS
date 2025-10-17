@@ -7,14 +7,15 @@
 // requirements defined in MIT License.
 
 import InputMethodKit
-@testable import LangModelAssembly
-@testable import MainAssembly
 import Megrez
 import MegrezTestComponents
 import OSFrameworkImpl
 import Shared
-@testable import Typewriter
 import XCTest
+
+@testable import LangModelAssembly
+@testable import MainAssembly
+@testable import Typewriter
 
 // 本文的單元測試用例從 201 起算。
 
@@ -27,7 +28,7 @@ extension MainAssemblyTests {
     let originalNodes = testHandler.assembler.assembledSentence.values
     XCTAssertEqual(testHandler.assembler.cursor, originalLength)
 
-    _ = handleKeyEvent(homeEvent)
+    _ = press(homeEvent)
     XCTAssertEqual(testHandler.assembler.cursor, 0)
     XCTAssertEqual(testHandler.assembler.assembledSentence.values, originalNodes)
     let homeState = testHandler.generateStateOfInputting()
@@ -35,7 +36,7 @@ extension MainAssemblyTests {
     XCTAssertEqual(homeState.displayedText, originalText)
     testSession.switchState(homeState)
 
-    _ = handleKeyEvent(endEvent)
+    _ = press(endEvent)
     XCTAssertEqual(testHandler.assembler.cursor, originalLength)
     XCTAssertEqual(testHandler.assembler.assembledSentence.values, originalNodes)
     let endState = testHandler.generateStateOfInputting()
@@ -49,7 +50,7 @@ extension MainAssemblyTests {
       chars: NSEvent.SpecialKey.upArrow.unicodeScalar.description,
       keyCode: KeyCode.kUpArrow.rawValue
     )
-    _ = handleKeyEvent(clockHorizontal)
+    _ = press(clockHorizontal)
     XCTAssertEqual(testHandler.assembler.cursor, cursorAfterEnd)
     let horizontalState = testHandler.generateStateOfInputting()
     XCTAssertEqual(horizontalState.cursor, endState.cursor)
@@ -61,7 +62,7 @@ extension MainAssemblyTests {
       chars: NSEvent.SpecialKey.rightArrow.unicodeScalar.description,
       keyCode: KeyCode.kRightArrow.rawValue
     )
-    _ = handleKeyEvent(clockVertical)
+    _ = press(clockVertical)
     XCTAssertEqual(testHandler.assembler.cursor, cursorAfterEnd)
     let verticalState = testHandler.generateStateOfInputting()
     XCTAssertEqual(verticalState.cursor, endState.cursor)
@@ -73,7 +74,7 @@ extension MainAssemblyTests {
   func test202_InputHandler_EscapeBehaviorVariants() throws {
     testHandler.prefs.escToCleanInputBuffer = true
     _ = prepareBasicComposition(sequence: "dk ru4204ek ")
-    _ = handleKeyEvent(escEvent)
+    _ = press(escEvent)
     XCTAssertTrue(testHandler.isComposerOrCalligrapherEmpty)
     XCTAssertEqual(testHandler.assembler.length, 0)
     XCTAssertTrue(testClient.toString().isEmpty)
@@ -83,7 +84,7 @@ extension MainAssemblyTests {
 
     testHandler.prefs.escToCleanInputBuffer = false
     let visibleBeforeEsc = prepareBasicComposition(sequence: "dk ru4204ek ")
-    _ = handleKeyEvent(escEvent)
+    _ = press(escEvent)
     XCTAssertEqual(testClient.toString(), visibleBeforeEsc)
     XCTAssertTrue(testHandler.isComposerOrCalligrapherEmpty)
     XCTAssertEqual(testHandler.assembler.length, 0)
@@ -96,7 +97,7 @@ extension MainAssemblyTests {
     testClient.clear()
     typeSentenceOrCandidates("el")
     XCTAssertFalse(testHandler.isComposerOrCalligrapherEmpty)
-    _ = handleKeyEvent(escEvent)
+    _ = press(escEvent)
     XCTAssertTrue(
       testSession.state.type == .ofAbortion || testSession.state.type == .ofEmpty
     )
@@ -107,7 +108,7 @@ extension MainAssemblyTests {
   func test203_InputHandler_BackspaceAndDeleteBranches() throws {
     _ = prepareBasicComposition(sequence: "dk ru4204ek ")
     var nodesBeforeOptionBackspace = testHandler.assembler.assembledSentence.values
-    _ = handleKeyEvent(optionBackspaceEvent)
+    _ = press(optionBackspaceEvent)
     let nodesAfterOptionBackspace = testHandler.assembler.assembledSentence.values
     XCTAssertEqual(nodesAfterOptionBackspace.count, max(nodesBeforeOptionBackspace.count - 1, 0))
     var normalizedState = testHandler.generateStateOfInputting()
@@ -122,7 +123,7 @@ extension MainAssemblyTests {
 
     _ = prepareBasicComposition(sequence: "dk ru4204ek ")
     testHandler.prefs.specifyShiftBackSpaceKeyBehavior = 1
-    _ = handleKeyEvent(shiftBackspaceEvent)
+    _ = press(shiftBackspaceEvent)
     XCTAssertTrue(testHandler.isComposerOrCalligrapherEmpty)
     XCTAssertEqual(testHandler.assembler.length, 0)
     XCTAssertTrue(
@@ -134,15 +135,18 @@ extension MainAssemblyTests {
     testHandler.assembler.cursor = 0
     testSession.switchState(testHandler.generateStateOfInputting())
     let stateBeforeForwardDelete = testHandler.generateStateOfInputting()
-    _ = handleKeyEvent(forwardDeleteEvent)
+    _ = press(forwardDeleteEvent)
     normalizedState = testHandler.generateStateOfInputting()
-    XCTAssertLessThan(normalizedState.displayedText.count, stateBeforeForwardDelete.displayedText.count)
+    XCTAssertLessThan(
+      normalizedState.displayedText.count,
+      stateBeforeForwardDelete.displayedText.count
+    )
 
     _ = prepareBasicComposition(sequence: "dk ru4204ek ")
     testHandler.assembler.cursor = 0
     testSession.switchState(testHandler.generateStateOfInputting())
     nodesBeforeOptionBackspace = testHandler.assembler.assembledSentence.values
-    _ = handleKeyEvent(optionForwardDeleteEvent)
+    _ = press(optionForwardDeleteEvent)
     let nodesAfterOptionForward = testHandler.assembler.assembledSentence.values
     XCTAssertEqual(nodesAfterOptionForward.count, max(nodesBeforeOptionBackspace.count - 1, 0))
     normalizedState = testHandler.generateStateOfInputting()
@@ -150,13 +154,13 @@ extension MainAssemblyTests {
 
     testSession.resetInputHandler(forceComposerCleanup: true)
     testClient.clear()
-    handleEvents(symbolMenuKeyEventIntlWithOpt.asPairedEvents)
+    press(symbolMenuKeyEventIntlWithOpt)
     XCTAssertEqual(testHandler.currentTypingMethod, .codePoint)
 
     typeSentenceOrCandidates("1A2")
     XCTAssertEqual(testHandler.strCodePointBuffer.uppercased(), "1A2")
 
-    _ = handleKeyEvent(optionBackspaceEvent)
+    _ = press(optionBackspaceEvent)
     XCTAssertEqual(testHandler.currentTypingMethod, .codePoint)
     XCTAssertEqual(testHandler.strCodePointBuffer, "")
 
@@ -164,27 +168,21 @@ extension MainAssemblyTests {
     typeSentenceOrCandidates("1A2")
     XCTAssertEqual(testHandler.strCodePointBuffer.uppercased(), "1A2")
 
-    _ = handleKeyEvent(backspaceEvent)
+    _ = press(backspaceEvent)
     XCTAssertEqual(testHandler.strCodePointBuffer.uppercased(), "1A")
     XCTAssertEqual(testHandler.currentTypingMethod, .codePoint)
 
-    _ = handleKeyEvent(backspaceEvent)
+    _ = press(backspaceEvent)
     XCTAssertEqual(testHandler.strCodePointBuffer, "1")
     XCTAssertEqual(testHandler.currentTypingMethod, .codePoint)
 
-    _ = handleKeyEvent(backspaceEvent)
+    _ = press(backspaceEvent)
     XCTAssertEqual(testHandler.strCodePointBuffer, "")
     XCTAssertEqual(testHandler.currentTypingMethod, .vChewingFactory)
   }
 
   func test205_InputHandler_PunctuationFeaturesAndSymbolMenus() throws {
     testHandler.prefs.useSCPCTypingMode = false
-
-    func resetForPunctuation() {
-      testSession.resetInputHandler(forceComposerCleanup: true)
-      testSession.switchState(.ofEmpty())
-      testClient.clear()
-    }
 
     let shiftPeriodEvent = NSEvent.KeyEventData(
       type: .keyDown,
@@ -194,33 +192,33 @@ extension MainAssemblyTests {
       keyCode: mapKeyCodesANSIForTests["."] ?? 47
     )
 
-    resetForPunctuation()
+    resetToEmptyAndClear()
     testHandler.prefs.halfWidthPunctuationEnabled = false
-    _ = handleKeyEvent(shiftPeriodEvent)
+    _ = press(shiftPeriodEvent)
     XCTAssertEqual(testSession.state.type, .ofInputting)
     XCTAssertEqual(testSession.state.displayedText, "。")
     testSession.switchState(.ofAbortion())
 
-    resetForPunctuation()
+    resetToEmptyAndClear()
     testHandler.prefs.halfWidthPunctuationEnabled = true
-    _ = handleKeyEvent(shiftPeriodEvent)
+    _ = press(shiftPeriodEvent)
     XCTAssertEqual(testSession.state.type, .ofInputting)
     XCTAssertEqual(testSession.state.displayedText, ".")
     testSession.switchState(.ofAbortion())
 
     // 測試普通符號選單。
-    resetForPunctuation()
+    resetToEmptyAndClear()
     testHandler.prefs.halfWidthPunctuationEnabled = false
     var symbolMenuEvent = symbolMenuKeyEventIntlWithOpt
     symbolMenuEvent.flags = []
-    _ = handleKeyEvent(symbolMenuEvent)
+    _ = press(symbolMenuEvent)
     XCTAssertEqual(testSession.state.type, .ofSymbolTable)
     testSession.switchState(.ofAbortion())
 
     // 測試漢音符號選單（Hanin Symbols）。注意測資裡面僅包含開頭幾個符號。
-    resetForPunctuation()
+    resetToEmptyAndClear()
     symbolMenuEvent.flags = [.option, .shift]
-    _ = handleKeyEvent(symbolMenuEvent)
+    _ = press(symbolMenuEvent)
     XCTAssertEqual(testSession.state.type, .ofCandidates)
     XCTAssertFalse(testSession.state.candidates.isEmpty)
     XCTAssertEqual(testSession.state.candidates[1].value, "，")
@@ -238,7 +236,7 @@ extension MainAssemblyTests {
       charsSansModifiers: "1",
       keyCode: mapKeyCodesANSIForTests["1"] ?? 18
     )
-    _ = handleKeyEvent(optionOneEvent)
+    _ = press(optionOneEvent)
     XCTAssertEqual(testClient.toString(), "1".applyingTransformFW2HW(reverse: false))
     XCTAssertTrue(testSession.state.type == .ofEmpty || testSession.state.type == .ofCommitting)
     testClient.clear()
@@ -261,19 +259,13 @@ extension MainAssemblyTests {
     testSession.switchState(.ofEmpty())
     testClient.clear()
     testHandler.prefs.halfWidthPunctuationEnabled = true
-    _ = handleKeyEvent(optionShiftTwoEvent)
+    _ = press(optionShiftTwoEvent)
     XCTAssertEqual(testClient.toString(), "2".applyingTransformFW2HW(reverse: false))
     XCTAssertTrue(testSession.state.type == .ofEmpty || testSession.state.type == .ofCommitting)
   }
 
   func test207_InputHandler_NumPadBehaviors() throws {
     testHandler.prefs.useSCPCTypingMode = false
-
-    func resetToEmptyState() {
-      testSession.resetInputHandler(forceComposerCleanup: true)
-      testSession.switchState(.ofEmpty())
-      testClient.clear()
-    }
 
     let keypadSeven = NSEvent.KeyEventData(
       type: .keyDown,
@@ -284,32 +276,32 @@ extension MainAssemblyTests {
     )
 
     testHandler.prefs.numPadCharInputBehavior = 0
-    resetToEmptyState()
-    _ = handleKeyEvent(keypadSeven)
+    resetToEmptyAndClear()
+    _ = press(keypadSeven)
     XCTAssertEqual(testClient.toString(), "7")
     XCTAssertTrue(
       testSession.state.type == .ofCommitting || testSession.state.type == .ofEmpty
     )
 
     testHandler.prefs.numPadCharInputBehavior = 1
-    resetToEmptyState()
-    _ = handleKeyEvent(keypadSeven)
+    resetToEmptyAndClear()
+    _ = press(keypadSeven)
     XCTAssertEqual(testClient.toString(), "7".applyingTransformFW2HW(reverse: true))
     XCTAssertTrue(
       testSession.state.type == .ofCommitting || testSession.state.type == .ofEmpty
     )
 
     testHandler.prefs.numPadCharInputBehavior = 2
-    resetToEmptyState()
-    _ = handleKeyEvent(keypadSeven)
+    resetToEmptyAndClear()
+    _ = press(keypadSeven)
     XCTAssertEqual(testSession.state.type, .ofInputting)
     XCTAssertTrue(testClient.toString().isEmpty)
     XCTAssertEqual(testSession.state.displayedText, "7")
     testSession.switchState(.ofAbortion())
 
     testHandler.prefs.numPadCharInputBehavior = 3
-    resetToEmptyState()
-    _ = handleKeyEvent(keypadSeven)
+    resetToEmptyAndClear()
+    _ = press(keypadSeven)
     XCTAssertEqual(testSession.state.type, .ofInputting)
     XCTAssertTrue(testClient.toString().isEmpty)
     XCTAssertEqual(testSession.state.displayedText, "7".applyingTransformFW2HW(reverse: true))
@@ -317,7 +309,7 @@ extension MainAssemblyTests {
 
     testHandler.prefs.numPadCharInputBehavior = 4
     let baseline = prepareBasicComposition(sequence: "dk ru4204ek ")
-    _ = handleKeyEvent(keypadSeven)
+    _ = press(keypadSeven)
     var updatedState = testHandler.generateStateOfInputting()
     XCTAssertEqual(updatedState.displayedText, baseline + "7")
     testSession.switchState(.ofAbortion())
@@ -325,9 +317,12 @@ extension MainAssemblyTests {
 
     testHandler.prefs.numPadCharInputBehavior = 5
     let baselineFull = prepareBasicComposition(sequence: "dk ru4204ek ")
-    _ = handleKeyEvent(keypadSeven)
+    _ = press(keypadSeven)
     updatedState = testHandler.generateStateOfInputting()
-    XCTAssertEqual(updatedState.displayedText, baselineFull + "7".applyingTransformFW2HW(reverse: true))
+    XCTAssertEqual(
+      updatedState.displayedText,
+      baselineFull + "7".applyingTransformFW2HW(reverse: true)
+    )
     testSession.switchState(.ofAbortion())
     testSession.resetInputHandler(forceComposerCleanup: true)
   }
@@ -343,7 +338,7 @@ extension MainAssemblyTests {
 
     testHandler.prefs.upperCaseLetterKeyBehavior = 1
     let baseline1 = prepareBasicComposition(sequence: "dk ru4204ek ")
-    _ = handleKeyEvent(shiftAEvent)
+    _ = press(shiftAEvent)
     XCTAssertEqual(testClient.toString(), baseline1 + "a")
     XCTAssertTrue(testSession.state.type == .ofEmpty || testSession.state.type == .ofCommitting)
     testClient.clear()
@@ -351,7 +346,7 @@ extension MainAssemblyTests {
     testSession.switchState(.ofAbortion())
     testHandler.prefs.upperCaseLetterKeyBehavior = 2
     let baseline2 = prepareBasicComposition(sequence: "dk ru4204ek ")
-    _ = handleKeyEvent(shiftAEvent)
+    _ = press(shiftAEvent)
     XCTAssertEqual(testClient.toString(), baseline2 + "A")
     XCTAssertTrue(testSession.state.type == .ofEmpty || testSession.state.type == .ofCommitting)
     testClient.clear()
@@ -360,7 +355,7 @@ extension MainAssemblyTests {
     testHandler.prefs.upperCaseLetterKeyBehavior = 3
     testSession.resetInputHandler(forceComposerCleanup: true)
     testClient.clear()
-    _ = handleKeyEvent(shiftAEvent)
+    _ = press(shiftAEvent)
     XCTAssertEqual(testClient.toString(), "a")
     XCTAssertTrue(testSession.state.type == .ofEmpty || testSession.state.type == .ofCommitting)
     testClient.clear()
@@ -369,7 +364,7 @@ extension MainAssemblyTests {
     testHandler.prefs.upperCaseLetterKeyBehavior = 4
     testSession.resetInputHandler(forceComposerCleanup: true)
     testClient.clear()
-    _ = handleKeyEvent(shiftAEvent)
+    _ = press(shiftAEvent)
     XCTAssertEqual(testClient.toString(), "A")
     XCTAssertTrue(testSession.state.type == .ofEmpty || testSession.state.type == .ofCommitting)
   }
@@ -385,68 +380,44 @@ extension MainAssemblyTests {
 
     let candidateSequence = "u. 2u,6s/6xu.6u4xm3z; "
 
-    @discardableResult
-    func openCandidateWindow(cursor override: Int? = nil) -> CtlCandidateProtocol? {
-      let composition = prepareBasicComposition(sequence: candidateSequence)
-      XCTAssertFalse(composition.isEmpty)
-
-      if let override {
-        let limited = Swift.max(0, Swift.min(override, testHandler.assembler.length))
-        testHandler.assembler.cursor = limited
-        testSession.switchState(testHandler.generateStateOfInputting())
-      }
-
-      let candidateState = testHandler.generateStateOfCandidates()
-      XCTAssertFalse(candidateState.candidates.isEmpty)
-      testSession.switchState(candidateState)
-      testSession.showCandidates()
-      let controller = testSession.candidateController()
-      XCTAssertNotNil(controller)
-      return controller
-    }
-
     // Candidate cancellation via Backspace.
-    if let _ = openCandidateWindow() {
-      let displayedBefore = testSession.state.displayedText
-      _ = handleKeyEvent(backspaceEvent)
-      XCTAssertEqual(testSession.state.type, .ofInputting)
-      XCTAssertEqual(testSession.state.displayedText, displayedBefore)
+    _ = prepareBasicComposition(sequence: candidateSequence)
+    if openCandidates() != nil {
+      cancelCandidates(with: backspaceEvent)
     }
     testSession.switchState(.ofAbortion())
     testClient.clear()
 
     // Candidate cancellation via Escape.
-    if let _ = openCandidateWindow() {
-      let displayedBefore = testSession.state.displayedText
-      _ = handleKeyEvent(escapeEvent)
-      XCTAssertTrue(testSession.state.type == .ofInputting || testSession.state.type == .ofAbortion)
-      XCTAssertEqual(testSession.state.displayedText, displayedBefore)
+    _ = prepareBasicComposition(sequence: candidateSequence)
+    if openCandidates() != nil {
+      cancelCandidates(with: escapeEvent)
     }
     testSession.switchState(.ofAbortion())
     testClient.clear()
 
     // Candidate cancellation via Forward Delete.
-    if let _ = openCandidateWindow() {
-      let displayedBefore = testSession.state.displayedText
-      _ = handleKeyEvent(deleteForwardEvent)
-      XCTAssertEqual(testSession.state.type, .ofInputting)
-      XCTAssertEqual(testSession.state.displayedText, displayedBefore)
+    _ = prepareBasicComposition(sequence: candidateSequence)
+    if openCandidates() != nil {
+      cancelCandidates(with: deleteForwardEvent)
     }
     testSession.switchState(.ofAbortion())
     testClient.clear()
 
     // Shift+Left cancels candidates then transitions into marking state.
-    if let _ = openCandidateWindow(cursor: Swift.max(testHandler.assembler.length - 1, 1)) {
-      _ = handleKeyEvent(shiftLeftEvent)
+    _ = prepareBasicComposition(sequence: candidateSequence)
+    if openCandidates(cursor: Swift.max(testHandler.assembler.length - 1, 1)) != nil {
+      press(shiftLeftEvent)
       XCTAssertEqual(testSession.state.type, .ofMarking)
     }
     testSession.switchState(.ofAbortion())
     testClient.clear()
 
     // Option+Right moves cursor by segment while staying in candidate state.
-    if let _ = openCandidateWindow(cursor: 1) {
+    _ = prepareBasicComposition(sequence: candidateSequence)
+    if openCandidates(cursor: 1) != nil {
       let cursorBefore = testHandler.assembler.cursor
-      _ = handleKeyEvent(optionRightEvent)
+      press(optionRightEvent)
       XCTAssertEqual(testSession.state.type, .ofCandidates)
       XCTAssertGreaterThan(testHandler.assembler.cursor, cursorBefore)
     }
@@ -454,9 +425,10 @@ extension MainAssemblyTests {
     testClient.clear()
 
     // Option+Shift+Right performs stepwise cursor advance.
-    if let _ = openCandidateWindow(cursor: 1) {
+    _ = prepareBasicComposition(sequence: candidateSequence)
+    if openCandidates(cursor: 1) != nil {
       let cursorBefore = testHandler.assembler.cursor
-      _ = handleKeyEvent(optionShiftRightEvent)
+      press(optionShiftRightEvent)
       XCTAssertEqual(testSession.state.type, .ofCandidates)
       XCTAssertEqual(testHandler.assembler.cursor, cursorBefore + 1)
     }
@@ -464,46 +436,22 @@ extension MainAssemblyTests {
     testClient.clear()
 
     // Option+Command shortcuts trigger context menu actions (nerf & boost).
-    if openCandidateWindow() != nil {
+    _ = prepareBasicComposition(sequence: candidateSequence)
+    if openCandidates() != nil {
       var repositionAttempts = 0
       while repositionAttempts < testHandler.assembler.assembledSentence.count {
         let hasEligibleCandidate = testSession.state.candidates.contains { pair in
           pair.value.count >= 2 && pair.keyArray.joined().count >= 2
         }
         if hasEligibleCandidate { break }
-        _ = handleKeyEvent(optionLeftEvent)
+        press(optionLeftEvent)
         repositionAttempts += 1
       }
 
-      func highlightEligibleCandidate() {
-        guard var controller = testSession.candidateController() else {
-          XCTFail("Missing candidate controller while searching eligible candidate.")
-          return
-        }
-        var highlightedIndex = controller.highlightedIndex
-        var highlightedCandidate = testSession.state.candidates[highlightedIndex]
-        var attempts = 0
-        while attempts < testSession.state.candidates.count,
-              highlightedCandidate.value.count < 2
-              || highlightedCandidate.keyArray.joined().count < 2 {
-          _ = handleKeyEvent(nextCandidateEvent)
-          guard let updatedController = testSession.candidateController() else {
-            XCTFail("Candidate controller unexpectedly nil during iteration.")
-            return
-          }
-          controller = updatedController
-          highlightedIndex = controller.highlightedIndex
-          guard testSession.state.candidates.indices.contains(highlightedIndex) else { break }
-          highlightedCandidate = testSession.state.candidates[highlightedIndex]
-          attempts += 1
-        }
-        XCTAssertGreaterThanOrEqual(highlightedCandidate.value.count, 2)
-        XCTAssertGreaterThanOrEqual(highlightedCandidate.keyArray.joined().count, 2)
-      }
-
+      // Highlight an eligible candidate (length >= 2 for both value and reading keys).
       highlightEligibleCandidate()
 
-      _ = handleKeyEvent(optionCommandMinusEvent)
+      press(optionCommandMinusEvent)
       XCTAssertEqual(testSession.state.type, .ofCandidates)
       XCTAssertFalse(testSession.state.tooltip.isEmpty)
       XCTAssertEqual(testSession.state.data.tooltipColorState, .succeeded)
@@ -514,7 +462,7 @@ extension MainAssemblyTests {
       testSession.showCandidates()
       highlightEligibleCandidate()
 
-      _ = handleKeyEvent(optionCommandEqualEvent)
+      press(optionCommandEqualEvent)
       XCTAssertEqual(testSession.state.type, .ofCandidates)
       XCTAssertFalse(testSession.state.tooltip.isEmpty)
       XCTAssertEqual(testSession.state.data.tooltipColorState, .normal)
@@ -527,11 +475,10 @@ extension MainAssemblyTests {
     XCTAssertEqual(testSession.state.type, .ofInputting)
     XCTAssertEqual(testSession.state.displayedText, "科技蛋糕")
     XCTAssertTrue(testHandler.assembler.isCursorAtEdge(direction: .front))
-    handleEvents(dataArrowDown.asPairedEvents) // 叫出選字窗。
+    press(dataArrowDown) // 叫出選字窗。
     XCTAssertEqual(testSession.state.type, .ofCandidates)
     XCTAssertEqual(testSession.state.candidates.first?.value, "蛋糕")
-    let serviceMenuKeyEventPair = symbolMenuKeyEventIntlWithOpt.asPairedEvents
-    handleEvents(serviceMenuKeyEventPair)
+    press(symbolMenuKeyEventIntlWithOpt)
     XCTAssertEqual(testSession.state.type, .ofSymbolTable)
     XCTAssertEqual(testSession.state.candidates.first?.value.prefix(16), "Unicode Metadata")
     // 該測試到此為止，僅確保服務選單能正常顯示即可。原因：無法就單元測試做剪貼簿沙箱處理。
@@ -543,7 +490,7 @@ extension MainAssemblyTests {
 
     func verifyCandidateCall(with eventData: NSEvent.KeyEventData) {
       _ = prepareBasicComposition(sequence: "dk ru4204ek ")
-      _ = handleKeyEvent(eventData)
+      _ = press(eventData)
       XCTAssertEqual(testSession.state.type, .ofCandidates)
       XCTAssertFalse(testSession.state.candidates.isEmpty)
       testSession.switchState(.ofAbortion())
@@ -558,11 +505,11 @@ extension MainAssemblyTests {
     XCTAssertEqual(testSession.state.type, .ofInputting)
     XCTAssertEqual(testSession.state.displayedText, "科技")
     XCTAssertTrue(testHandler.assembler.isCursorAtEdge(direction: .front))
-    handleEvents(dataArrowDown.asPairedEvents) // 叫出選字窗。
+    press(dataArrowDown) // 叫出選字窗。
     XCTAssertEqual(testSession.state.type, .ofCandidates)
     XCTAssertEqual(testSession.state.displayedText, "科技")
     // 在選字窗內預設情況下用 Tab 會高亮選擇下一個候選字詞。
-    XCTAssertTrue(handleKeyEvent(tabEvent))
+    XCTAssertTrue(press(tabEvent))
     XCTAssertEqual(testSession.state.displayedText, "科際") // 生效了。
   }
 
@@ -573,7 +520,7 @@ extension MainAssemblyTests {
     XCTAssertEqual(testSession.state.displayedText, "科技")
     XCTAssertTrue(testHandler.assembler.isCursorAtEdge(direction: .front))
     let cursorBeforeCallingCandidateWindow = testSession.state.cursor
-    handleEvents(dataArrowDown.asPairedEvents) // 叫出選字窗。
+    press(dataArrowDown) // 叫出選字窗。
     XCTAssertEqual(testSession.state.type, .ofCandidates)
     let cursorAfterCallingCandidateWindow = testSession.state.cursor
     XCTAssertNotEqual(cursorBeforeCallingCandidateWindow, cursorAfterCallingCandidateWindow)

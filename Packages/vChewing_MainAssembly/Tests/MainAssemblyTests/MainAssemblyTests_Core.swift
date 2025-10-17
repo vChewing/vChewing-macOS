@@ -9,10 +9,11 @@
 import InputMethodKit
 import LangModelAssembly
 import LMAssemblyMaterials4Tests
-@testable import MainAssembly
 import OSFrameworkImpl
 import Shared
 import XCTest
+
+@testable import MainAssembly
 
 let testClient = FakeClient()
 
@@ -234,11 +235,13 @@ class MainAssemblyTests: XCTestCase {
   }
 
   var testSession: InputSession {
-    let session = Self._testSession ?? InputSession(
-      controller: nil
-    ) {
-      testClient
-    }
+    let session =
+      Self._testSession
+        ?? InputSession(
+          controller: nil
+        ) {
+          testClient
+        }
     if Self._testSession == nil { Self._testSession = session }
     return session
   }
@@ -279,9 +282,7 @@ class MainAssemblyTests: XCTestCase {
   func typeSentenceOrCandidates(_ sequence: String) {
     let isCandidateContainer = testSession.state.isCandidateContainer
     let stateType = testSession.state.type
-    if !(
-      [.ofEmpty, .ofInputting].contains(stateType) || isCandidateContainer
-    ) { return }
+    if !([.ofEmpty, .ofInputting].contains(stateType) || isCandidateContainer) { return }
     let typingSequence: [NSEvent] = sequence.compactMap { charRAW in
       var finalArray = [NSEvent]()
       let char = charRAW.description
@@ -349,7 +350,8 @@ class MainAssemblyTests: XCTestCase {
 
 extension LMAssembly.LMInstantiator {
   static func construct(
-    isCHS: Bool = false, completionHandler: @escaping (_ this: LMAssembly.LMInstantiator) -> ()
+    isCHS: Bool = false,
+    completionHandler: @escaping (_ this: LMAssembly.LMInstantiator) -> ()
   )
     -> LMAssembly.LMInstantiator {
     let this = LMAssembly.LMInstantiator(isCHS: isCHS)

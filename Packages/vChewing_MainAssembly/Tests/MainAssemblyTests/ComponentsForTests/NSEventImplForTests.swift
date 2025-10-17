@@ -82,9 +82,16 @@ extension NSEvent {
   )
     -> NSEvent? {
     Self.keyEvent(
-      with: type, location: .zero, modifierFlags: flags, timestamp: .init(),
-      windowNumber: 0, context: nil, characters: chars,
-      charactersIgnoringModifiers: charsSansModifiers ?? chars, isARepeat: false, keyCode: keyCode
+      with: type,
+      location: .zero,
+      modifierFlags: flags,
+      timestamp: .init(),
+      windowNumber: 0,
+      context: nil,
+      characters: chars,
+      charactersIgnoringModifiers: charsSansModifiers ?? chars,
+      isARepeat: false,
+      keyCode: keyCode
     )
   }
 }
