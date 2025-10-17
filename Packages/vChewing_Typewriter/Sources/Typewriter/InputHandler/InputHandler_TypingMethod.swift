@@ -29,12 +29,12 @@ public enum TypingMethod: Int, CaseIterable {
     switch self {
     case .vChewingFactory: return ""
     case .codePoint:
-      let commonTerm = NSMutableString(capacity: 0)
+      var commonTerm = ContiguousArray<String>()
       commonTerm.insert("Code Point Input.".localized, at: 0)
       if !vertical, let initials = IMEApp.currentInputMode.nonUTFEncodingInitials {
         commonTerm.insert("[\(initials)] ", at: 0)
       }
-      return commonTerm.description
+      return commonTerm.joined()
     case .haninKeyboardSymbol:
       return "\("Hanin Keyboard Symbol Input.".localized)"
     }
