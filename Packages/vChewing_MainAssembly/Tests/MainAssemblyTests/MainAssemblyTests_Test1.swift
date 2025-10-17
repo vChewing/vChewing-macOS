@@ -7,14 +7,15 @@
 // requirements defined in MIT License.
 
 import InputMethodKit
-@testable import LangModelAssembly
-@testable import MainAssembly
 import Megrez
 import MegrezTestComponents
 import OSFrameworkImpl
 import Shared
-@testable import Typewriter
 import XCTest
+
+@testable import LangModelAssembly
+@testable import MainAssembly
+@testable import Typewriter
 
 // 本文的單元測試用例從 001 與 101 起算。
 
@@ -49,8 +50,14 @@ extension MainAssemblyTests {
         "Missing \(label) folder at: \(path)"
       )
       XCTAssertTrue(isDirectory.boolValue, "Path is not directory for \(label) folder at: \(path)")
-      XCTAssertTrue(fileManager.isReadableFile(atPath: path), "Unreadable \(label) folder at: \(path)")
-      XCTAssertTrue(fileManager.isWritableFile(atPath: path), "Unwritable \(label) folder at: \(path)")
+      XCTAssertTrue(
+        fileManager.isReadableFile(atPath: path),
+        "Unreadable \(label) folder at: \(path)"
+      )
+      XCTAssertTrue(
+        fileManager.isWritableFile(atPath: path),
+        "Unwritable \(label) folder at: \(path)"
+      )
 
       let payload = "io-check-\(UUID().uuidString)"
       let fileURL = folderURL.appendingPathComponent("io-check-\(UUID().uuidString).txt")
@@ -87,12 +94,7 @@ extension MainAssemblyTests {
     testSession.resetInputHandler(forceComposerCleanup: true)
     typeSentenceOrCandidates("u. 32u,62s/6xu.6")
     typeSentenceOrCandidates("1u4")
-    [
-      dataArrowDown, dataArrowDown,
-    ].map(\.asPairedEvents).flatMap { $0 }.forEach { theEvent in
-      let dismissed = !testSession.handleNSEvent(theEvent, client: testClient)
-      if theEvent.type == .keyDown { XCTAssertFalse(dismissed) }
-    }
+    press([dataArrowDown, dataArrowDown])
     typeSentenceOrCandidates("2")
     typeSentenceOrCandidates("xm3")
     typeSentenceOrCandidates("6")
@@ -122,10 +124,7 @@ extension MainAssemblyTests {
       dataArrowRight, dataArrowRight, dataTab, dataArrowRight,
       dataTab, dataTab, dataTab,
     ]
-    eventDataChain.map(\.asPairedEvents).flatMap { $0 }.forEach { theEvent in
-      let dismissed = !testSession.handleNSEvent(theEvent, client: testClient)
-      if theEvent.type == .keyDown { XCTAssertFalse(dismissed) }
-    }
+    press(eventDataChain)
     let resultText2 = testSession.state.displayedText
     vCTestLog("- // 組字結果：\(resultText2)")
     XCTAssertEqual(resultText2, "幽蝶能留一縷芳")
@@ -152,17 +151,11 @@ extension MainAssemblyTests {
       "Pref=1 cursor before candidate: \(testHandler.assembler.cursor)/length: \(testHandler.assembler.length)"
     )
     vCTestLog("Pref=1 candidates: \(testSession.state.candidates.map { $0.value })")
-    [dataArrowLeft, dataArrowDown].map(\.asPairedEvents).flatMap { $0 }.forEach { theEvent in
-      let dismissed = !testSession.handleNSEvent(theEvent, client: testClient)
-      if theEvent.type == .keyDown { XCTAssertFalse(dismissed) }
-    }
+    press([dataArrowLeft, dataArrowDown])
     testSession.candidatePairSelectionConfirmed(at: 0) // 「一縷」
     // 此時游標應該有往前推進一格。
     XCTAssertEqual(testHandler.assembler.cursor, 7)
-    [dataArrowDown].map(\.asPairedEvents).flatMap { $0 }.forEach { theEvent in
-      let dismissed = !testSession.handleNSEvent(theEvent, client: testClient)
-      if theEvent.type == .keyDown { XCTAssertFalse(dismissed) }
-    }
+    press([dataArrowDown])
     testSession.candidatePairSelectionConfirmed(at: 3) // 「芳」
     vCTestLog("- // 組字結果：\(testSession.state.displayedText)")
     XCTAssertEqual(testSession.state.displayedText, "優跌能留一縷芳")
@@ -170,15 +163,9 @@ extension MainAssemblyTests {
 
     // 把頭兩個節點也做選字。
     XCTAssertEqual(testSession.state.type, .ofInputting)
-    [dataArrowHome, dataArrowRight].map(\.asPairedEvents).flatMap { $0 }.forEach { theEvent in
-      let dismissed = !testSession.handleNSEvent(theEvent, client: testClient)
-      if theEvent.type == .keyDown { XCTAssertFalse(dismissed) }
-    }
+    press([dataArrowHome, dataArrowRight])
     XCTAssertEqual(testHandler.assembler.cursor, 1)
-    [dataArrowDown].map(\.asPairedEvents).flatMap { $0 }.forEach { theEvent in
-      let dismissed = !testSession.handleNSEvent(theEvent, client: testClient)
-      if theEvent.type == .keyDown { XCTAssertFalse(dismissed) }
-    }
+    press([dataArrowDown])
     testSession.candidatePairSelectionConfirmed(at: 2) // 「幽」
     XCTAssertEqual(testHandler.assembler.cursor, 2)
     XCTAssertEqual(testSession.state.displayedText, "幽跌能留一縷芳")
@@ -222,10 +209,7 @@ extension MainAssemblyTests {
     testSession.resetInputHandler(forceComposerCleanup: true)
     typeSentenceOrCandidates(sequenceChars)
 
-    [dataArrowLeft, dataArrowLeft].map(\.asPairedEvents).flatMap { $0 }.forEach { theEvent in
-      let dismissed = !testSession.handleNSEvent(theEvent, client: testClient)
-      if theEvent.type == .keyDown { XCTAssertFalse(dismissed) }
-    }
+    press([dataArrowLeft, dataArrowLeft])
 
     let nodesBeforeCandidate = testHandler.assembler.assembledSentence.values
     XCTAssertFalse(nodesBeforeCandidate.isEmpty)
@@ -234,7 +218,8 @@ extension MainAssemblyTests {
     var readingCursor = 0
     for (index, node) in testHandler.assembler.assembledSentence.enumerated() {
       let segmentLength = node.keyArray.count
-      if readingCursorIndex < readingCursor + segmentLength || index == nodesBeforeCandidate.count - 1 {
+      if readingCursorIndex < readingCursor + segmentLength
+        || index == nodesBeforeCandidate.count - 1 {
         nodeIndex = index
         break
       }
@@ -247,10 +232,7 @@ extension MainAssemblyTests {
     let currentNodeValue = nodesBeforeCandidate[nodeIndex]
     let cursorBeforeCandidate = testHandler.assembler.cursor
 
-    dataArrowDown.asPairedEvents.forEach { theEvent in
-      let dismissed = !testSession.handleNSEvent(theEvent, client: testClient)
-      if theEvent.type == .keyDown { XCTAssertFalse(dismissed) }
-    }
+    press(dataArrowDown)
 
     XCTAssertEqual(testSession.state.type, .ofCandidates)
     let candidateValues = testSession.state.candidates.map { $0.value }
@@ -261,14 +243,7 @@ extension MainAssemblyTests {
       return
     }
 
-    let selectionKeys = Array(testSession.selectionKeys)
-    XCTAssertGreaterThan(selectionKeys.count, candidateIndex)
-    let targetKey = String(selectionKeys[candidateIndex])
-    let keyEvent = NSEvent.KeyEventData(chars: targetKey)
-    keyEvent.asPairedEvents.forEach { theEvent in
-      let dismissed = !testSession.handleNSEvent(theEvent, client: testClient)
-      if theEvent.type == NSEvent.EventType.keyDown { XCTAssertFalse(dismissed) }
-    }
+    selectCandidate(at: candidateIndex)
 
     let nodesAfterCandidate = testHandler.assembler.assembledSentence.values
     XCTAssertEqual(nodesAfterCandidate.count, nodesBeforeCandidate.count)
@@ -312,26 +287,12 @@ extension MainAssemblyTests {
   }
 
   func test107_InputHandler_CassetteQuickPhraseSelection() throws {
-    let originalAsyncLoading = LMAssembly.LMInstantiator.asyncLoadingUserData
-    LMAssembly.LMInstantiator.asyncLoadingUserData = false
-    defer { LMAssembly.LMInstantiator.asyncLoadingUserData = originalAsyncLoading }
-
-    testHandler.prefs.cassetteEnabled = true
-    LMMgr.syncLMPrefs()
-
-    let cassetteURL = URL(fileURLWithPath: #file)
-      .deletingLastPathComponent() // MainAssemblyTests
-      .deletingLastPathComponent() // Tests
-      .deletingLastPathComponent() // vChewing_MainAssembly
-      .deletingLastPathComponent() // Packages
-      .appendingPathComponent("vChewing_LangModelAssembly")
-      .appendingPathComponent("Tests")
-      .appendingPathComponent("TestCINData")
-      .appendingPathComponent("array30.cin2")
-
-    LMAssembly.LMInstantiator.loadCassetteData(path: cassetteURL.path)
-
-    testSession.resetInputHandler(forceComposerCleanup: true)
+    withSynchronousLMUserData {
+      testHandler.prefs.cassetteEnabled = true
+      LMMgr.syncLMPrefs()
+      LMAssembly.LMInstantiator.loadCassetteData(path: cassettePath(named: "array30.cin2"))
+      testSession.resetInputHandler(forceComposerCleanup: true)
+    }
 
     typeSentenceOrCandidates(",,,")
     XCTAssertEqual(testHandler.calligrapher, ",,,")
@@ -353,26 +314,12 @@ extension MainAssemblyTests {
   }
 
   func test108_InputHandler_CassetteQuickPhraseSymbolTableMultiple() throws {
-    let originalAsyncLoading = LMAssembly.LMInstantiator.asyncLoadingUserData
-    LMAssembly.LMInstantiator.asyncLoadingUserData = false
-    defer { LMAssembly.LMInstantiator.asyncLoadingUserData = originalAsyncLoading }
-
-    testHandler.prefs.cassetteEnabled = true
-    LMMgr.syncLMPrefs()
-
-    let cassetteURL = URL(fileURLWithPath: #file)
-      .deletingLastPathComponent() // MainAssemblyTests
-      .deletingLastPathComponent() // Tests
-      .deletingLastPathComponent() // vChewing_MainAssembly
-      .deletingLastPathComponent() // Packages
-      .appendingPathComponent("vChewing_LangModelAssembly")
-      .appendingPathComponent("Tests")
-      .appendingPathComponent("TestCINData")
-      .appendingPathComponent("array30.cin2")
-
-    LMAssembly.LMInstantiator.loadCassetteData(path: cassetteURL.path)
-
-    testSession.resetInputHandler(forceComposerCleanup: true)
+    withSynchronousLMUserData {
+      testHandler.prefs.cassetteEnabled = true
+      LMMgr.syncLMPrefs()
+      LMAssembly.LMInstantiator.loadCassetteData(path: cassettePath(named: "array30.cin2"))
+      testSession.resetInputHandler(forceComposerCleanup: true)
+    }
 
     typeSentenceOrCandidates(",,,,")
     XCTAssertEqual(testHandler.calligrapher, ",,,,")
@@ -396,10 +343,7 @@ extension MainAssemblyTests {
     )
     XCTAssertTrue(testClient.toString().isEmpty)
 
-    let selectionKeys = Array(testSession.selectionKeys)
-    XCTAssertGreaterThan(selectionKeys.count, 1)
-
-    typeSentenceOrCandidates(String(selectionKeys[1]))
+    selectCandidate(at: 1)
 
     XCTAssertTrue(testHandler.calligrapher.isEmpty)
     XCTAssertEqual(testSession.state.type, .ofEmpty)
@@ -412,15 +356,6 @@ extension MainAssemblyTests {
       (.imeModeCHT, "A462"),
     ]
 
-    // 模擬 `Opt+~` 熱鍵組合觸發碼點模式。
-    let symbolMenuKeyData = NSEvent.KeyEventData(
-      type: .keyDown,
-      flags: .option,
-      chars: "`",
-      charsSansModifiers: "`",
-      keyCode: KeyCode.kSymbolMenuPhysicalKeyIntl.rawValue
-    )
-    let symbolMenuKeyEvents = symbolMenuKeyData.asPairedEvents
     testSession.switchState(.ofAbortion())
 
     for (langMode, codePointHexStr) in testCodes {
@@ -431,12 +366,10 @@ extension MainAssemblyTests {
       }
       PrefMgr().mostRecentInputMode = langMode.rawValue
       XCTAssertEqual(testHandler.currentTypingMethod, .vChewingFactory)
-      for nsEv in symbolMenuKeyEvents {
-        XCTAssertTrue(testSession.handleNSEvent(nsEv, client: testClient))
-      }
+      enterCodePointMode()
       XCTAssertEqual(testHandler.currentTypingMethod, .codePoint)
       vCTestLog("Testing code point input for mode \(langMode) with code point \(codePointHexStr)")
-      typeSentenceOrCandidates(codePointHexStr)
+      typeCodePoint(codePointHexStr)
       XCTAssertEqual(testClient.toString(), "刃")
       vCTestLog("-> Result: \(testClient.toString())")
     }
