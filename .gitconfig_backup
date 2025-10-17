@@ -14,7 +14,7 @@
         remote = origin
         merge = refs/heads/main
 [submodule "Source/Data"]
-        url = https://gitee.com/vChewing/libvchewing-data
+	    url = https://gitlink.org.cn/vChewing/vChewing-VanguardLexicon.git
 [branch "upd/dev"]
         remote = origin
         merge = refs/heads/upd/dev
