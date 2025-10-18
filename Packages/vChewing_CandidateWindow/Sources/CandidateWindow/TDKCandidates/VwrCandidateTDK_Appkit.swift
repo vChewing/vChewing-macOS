@@ -7,8 +7,7 @@
 // requirements defined in MIT License.
 
 import AppKit
-import OSFrameworkImpl
-import Shared
+import Shared_DarwinImpl
 
 // MARK: - VwrCandidateTDKAppKit
 
@@ -77,8 +76,11 @@ extension VwrCandidateTDKAppKit {
   override public func draw(_: CGRect) {
     let sizesCalculated = thePool.metrics
     let alphaRatio = NSApplication.isDarkMode ? 0.75 : 1
-    let themeColor = controller?.delegate?.clientAccentColor?.withAlphaComponent(alphaRatio)
-    CandidatePool.shitCell.clientThemeColor = themeColor
+    var themeColor: NSColor?
+    if let delegate = controller?.delegate as? CtlCandidateDelegate {
+      themeColor = delegate.clientAccentColor?.withAlphaComponent(alphaRatio)
+      CandidatePool.shitCell.clientThemeColor = themeColor
+    }
     // 先塗底色
     if #available(macOS 10.13, *) {
       Self.candidateListBackground

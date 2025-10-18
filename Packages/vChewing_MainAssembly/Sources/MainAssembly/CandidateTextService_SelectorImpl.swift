@@ -6,10 +6,7 @@
 // marks, or product names of Contributor, except as required to fulfill notice
 // requirements defined in MIT License.
 
-import BrailleSputnik
 import Foundation
-import Shared
-import Tekkon
 
 extension CandidateTextService {
   // MARK: - Final Sanity Check Implementation.

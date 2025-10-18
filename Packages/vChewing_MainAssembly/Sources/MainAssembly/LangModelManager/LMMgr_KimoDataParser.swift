@@ -7,11 +7,6 @@
 // requirements defined in MIT License.
 
 import AppKit
-import Foundation
-import KimoDataReader
-import LangModelAssembly
-import LineReader
-import Shared
 
 extension LMMgr {
   public enum KimoDataImportError: Error, LocalizedError {

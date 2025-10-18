@@ -8,7 +8,7 @@
 
 import AppKit
 import CoreText
-import Shared
+import Shared_DarwinImpl
 
 // MARK: - PopupCompositionBuffer
 

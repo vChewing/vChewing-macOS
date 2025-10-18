@@ -6,13 +6,7 @@
 // marks, or product names of Contributor, except as required to fulfill notice
 // requirements defined in MIT License.
 
-import IMKUtils
-import InputMethodKit
-import NotifierUI
-import OSFrameworkImpl
-import Shared
-import SwiftExtension
-import SwiftyCapsLockToggler
+import AppKit
 
 // MARK: - Facade
 
@@ -32,7 +26,7 @@ extension SessionProtocol {
 
     // 就這傳入的 NSEvent 都還有可能是 nil，Apple InputMethodKit 團隊到底在搞三小。
     // 只針對特定類型的 client() 進行處理。
-    guard let event = event, sender is IMKTextInput else {
+    guard let event = event, sender is ClientObj else {
       resetInputHandler(forceComposerCleanup: true)
       return false
     }

@@ -6,16 +6,7 @@
 // marks, or product names of Contributor, except as required to fulfill notice
 // requirements defined in MIT License.
 
-import CandidateWindow
-import IMKUtils
 import InputMethodKit
-import NotifierUI
-import PopupCompositionBuffer
-import Shared
-import ShiftKeyUpChecker
-import SwiftExtension
-import TooltipUI
-import Typewriter
 
 // MARK: - SessionProtocol
 

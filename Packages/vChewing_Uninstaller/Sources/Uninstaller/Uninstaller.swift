@@ -9,6 +9,8 @@
 import AppKit
 import OSFrameworkImpl
 
+// MARK: - Uninstaller
+
 public enum Uninstaller {
   // MARK: - Uninstall the input method.
 
@@ -80,5 +82,28 @@ public enum Uninstaller {
       NSApp.terminate(nil)
     }
     return 0
+  }
+}
+
+// MARK: - Trash a file if it exists.
+
+extension FileManager {
+  @discardableResult
+  public static func trashTargetIfExists(_ path: String) -> Bool {
+    do {
+      if FileManager.default.fileExists(atPath: path) {
+        // 塞入垃圾桶
+        var resultingURL: NSURL?
+        try FileManager.default.trashItem(
+          at: URL(fileURLWithPath: path), resultingItemURL: &resultingURL
+        )
+      } else {
+        Process.consoleLog("Item doesn't exist: \(path)")
+      }
+    } catch let error as NSError {
+      Process.consoleLog("Failed from removing this object: \(path) || Error: \(error)")
+      return false
+    }
+    return true
   }
 }

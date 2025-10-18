@@ -10,7 +10,6 @@ import InputMethodKit
 import Megrez
 import MegrezTestComponents
 import OSFrameworkImpl
-import Shared
 import XCTest
 
 @testable import LangModelAssembly

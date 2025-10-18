@@ -6,11 +6,7 @@
 // marks, or product names of Contributor, except as required to fulfill notice
 // requirements defined in MIT License.
 
-import CandidateWindow
 import Foundation
-import LangModelAssembly
-import Megrez
-import Shared
 
 // MARK: - UserPhraseInsertable Extensions.
 

@@ -7,10 +7,6 @@
 // requirements defined in MIT License.
 
 import AppKit
-import BookmarkManager
-import Foundation
-import OSFrameworkImpl
-import Shared
 
 // MARK: - SettingsPanesCocoa.Dictionary
 

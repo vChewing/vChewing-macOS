@@ -8,7 +8,7 @@
 
 import Foundation
 import LangModelAssembly
-import Shared
+import Shared_DarwinImpl
 
 public protocol PhraseEditorDelegate {
   var currentInputMode: Shared.InputMode { get }

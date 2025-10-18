@@ -14,14 +14,14 @@ let package = Package(
   ],
   dependencies: [
     .package(path: "../vChewing_LangModelAssembly"),
-    .package(path: "../vChewing_Shared"),
+    .package(path: "../vChewing_Shared_DarwinImpl"),
   ],
   targets: [
     .target(
       name: "PhraseEditorUI",
       dependencies: [
         .product(name: "LangModelAssembly", package: "vChewing_LangModelAssembly"),
-        .product(name: "Shared", package: "vChewing_Shared"),
+        .product(name: "Shared_DarwinImpl", package: "vChewing_Shared_DarwinImpl"),
       ]
     ),
   ]

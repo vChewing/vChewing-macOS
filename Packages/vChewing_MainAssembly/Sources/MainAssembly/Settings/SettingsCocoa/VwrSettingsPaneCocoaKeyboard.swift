@@ -7,9 +7,6 @@
 // requirements defined in MIT License.
 
 import AppKit
-import Foundation
-import IMKUtils
-import Shared
 
 extension SettingsPanesCocoa {
   public class Keyboard: NSViewController {

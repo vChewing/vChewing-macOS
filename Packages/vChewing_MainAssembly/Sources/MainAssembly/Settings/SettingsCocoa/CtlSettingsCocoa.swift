@@ -7,7 +7,6 @@
 // requirements defined in MIT License.
 
 import AppKit
-import Shared
 
 private let kWindowTitleHeight: Double = 78
 

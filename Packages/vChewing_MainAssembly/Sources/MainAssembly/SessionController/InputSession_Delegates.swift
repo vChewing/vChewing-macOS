@@ -7,11 +7,6 @@
 // requirements defined in MIT License.
 
 import AppKit
-import IMKUtils
-import LangModelAssembly
-import Megrez
-import NotifierUI
-import Shared
 
 // MARK: - SessionCtl + SessionProtocol
 
@@ -30,7 +25,7 @@ extension SessionProtocol {
     return result
   }
 
-  public func candidateController() -> CtlCandidateProtocol? { candidateUI }
+  public func candidateController() -> CtlCandidateProtocolCore? { candidateUI }
 
   public func performUserPhraseOperation(addToFilter: Bool) -> Bool {
     guard let inputHandler = inputHandler, state.type == .ofMarking else { return false }

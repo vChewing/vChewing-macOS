@@ -7,10 +7,6 @@
 // requirements defined in MIT License.
 
 import Foundation
-import LangModelAssembly
-import Megrez
-import Shared
-import Tekkon
 
 // MARK: - InputHandlerProtocol
 
@@ -37,6 +33,8 @@ public protocol InputHandlerProtocol: AnyObject, InputHandlerCoreProtocol {
   var notificationCallback: ((String) -> ())? { get set }
   var pomSaveCallback: (() -> ())? { get set }
   var filterabilityChecker: ((_ state: IMEStateData) -> Bool)? { get set }
+  var isJISKeyboard: (() -> Bool)? { get set }
+  var narrator: (any SpeechNarratorProtocol)? { get set }
 
   var currentLM: LMAssembly.LMInstantiator { get set }
 
