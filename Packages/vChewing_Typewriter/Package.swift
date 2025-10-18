@@ -5,6 +5,9 @@ import PackageDescription
 
 let package = Package(
   name: "Typewriter",
+  platforms: [
+    .macOS(.v11),
+  ],
   products: [
     .library(
       name: "Typewriter",
