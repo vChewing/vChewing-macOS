@@ -6,13 +6,21 @@
 // marks, or product names of Contributor, except as required to fulfill notice
 // requirements defined in MIT License.
 
+import Shared
+
 #if canImport(AppKit)
 
   import AppKit
 
   // MARK: - NSEvent + InputSignalProtocol
 
-  extension NSEvent: InputSignalProtocol {
+  #if hasFeature(RetroactiveAttribute)
+    extension NSEvent: @retroactive InputSignalProtocol {}
+  #else
+    extension NSEvent: InputSignalProtocol {}
+  #endif
+
+  extension NSEvent {
     public var keyModifierFlags: KBEvent.ModifierFlags {
       .init(rawValue: keyModifierFlagsNS.rawValue)
     }

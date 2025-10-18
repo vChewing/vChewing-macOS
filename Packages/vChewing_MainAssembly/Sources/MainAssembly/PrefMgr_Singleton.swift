@@ -7,24 +7,46 @@
 // requirements defined in MIT License.
 
 import Shared
+import Shared_DarwinImpl
 
 extension PrefMgr {
-  public static let shared: PrefMgr = .init(
-    didAskForSyncingLMPrefs: {
-      if PrefMgr.shared.phraseReplacementEnabled {
-        LMMgr.loadUserPhraseReplacement()
+  public static let shared: PrefMgr = {
+    var result = PrefMgr(
+      didAskForSyncingLMPrefs: {
+        if PrefMgr.shared.phraseReplacementEnabled {
+          LMMgr.loadUserPhraseReplacement()
+        }
+        if PrefMgr.shared.associatedPhrasesEnabled {
+          LMMgr.loadUserAssociatesData()
+        }
+        LMMgr.syncLMPrefs()
+      },
+      didAskForRefreshingSpeechSputnik: SpeechSputnik.shared.refreshStatus,
+      didAskForSyncingShiftKeyDetectorPrefs: {
+        InputSession.theShiftKeyDetector.toggleWithLShift =
+          PrefMgr.shared
+            .togglingAlphanumericalModeWithLShift
+        InputSession.theShiftKeyDetector.toggleWithRShift =
+          PrefMgr.shared
+            .togglingAlphanumericalModeWithRShift
       }
-      if PrefMgr.shared.associatedPhrasesEnabled {
-        LMMgr.loadUserAssociatesData()
-      }
-      LMMgr.syncLMPrefs()
-    },
-    didAskForRefreshingSpeechSputnik: SpeechSputnik.shared.refreshStatus,
-    didAskForSyncingShiftKeyDetectorPrefs: {
-      InputSession.theShiftKeyDetector.toggleWithLShift = PrefMgr.shared
-        .togglingAlphanumericalModeWithLShift
-      InputSession.theShiftKeyDetector.toggleWithRShift = PrefMgr.shared
-        .togglingAlphanumericalModeWithRShift
+    )
+    result.candidateKeyValidator = { candidateKeys in
+      result.validate(candidateKeys: candidateKeys)
     }
-  )
+    return result
+  }()
+}
+
+// MARK: Guarded Method for Validating Candidate Keys.
+
+extension PrefMgr {
+  public func validate(candidateKeys: String) -> String? {
+    var excluded = ""
+    if useJKtoMoveCompositorCursorInCandidateState { excluded.append("jk") }
+    if useHLtoMoveCompositorCursorInCandidateState { excluded.append("hl") }
+    if useShiftQuestionToCallServiceMenu { excluded.append("?") }
+    excluded.append(IMEApp.isKeyboardJIS ? "_" : "`~")
+    return CandidateKey.validate(keys: candidateKeys, excluding: excluded)
+  }
 }

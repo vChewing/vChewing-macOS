@@ -12,6 +12,7 @@ import InputMethodKit
 import NotifierUI
 import PopupCompositionBuffer
 import Shared
+import Shared_DarwinImpl
 import ShiftKeyUpChecker
 import SwiftExtension
 import TooltipUI
@@ -86,7 +87,7 @@ public final class InputSession: SessionProtocol {
   public var previouslyHandledEvents = [KBEvent]()
 
   /// 目前在用的的選字窗副本。
-  public var candidateUI: (any CtlCandidateProtocol)?
+  public var candidateUI: (any CtlCandidateProtocolCore)?
 
   /// 工具提示視窗的副本。
   public lazy var tooltipInstance: any TooltipUIProtocol = {

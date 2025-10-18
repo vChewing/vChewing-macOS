@@ -14,6 +14,7 @@
   import Foundation
   import IMKUtils
   import OSFrameworkImpl
+  import Shared
 
   // MARK: - UserDefRenderableCocoa
 

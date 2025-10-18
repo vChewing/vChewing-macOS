@@ -66,7 +66,7 @@ extension InputHandlerProtocol {
           .phonabetKeyForQuery(pronounceableOnly: prefs.acceptLeadingIntonations)
         guard var keyToNarrate = maybeKey else { return }
         if composer.intonation == Phonabet(" ") { keyToNarrate.append("ˉ") }
-        SpeechSputnik.shared.narrate(keyToNarrate, allowDuplicates: allowDuplicates)
+        narrator?.narrate(keyToNarrate, allowDuplicates: allowDuplicates)
       #endif
     }
 

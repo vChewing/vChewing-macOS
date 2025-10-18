@@ -12,6 +12,7 @@ import InputMethodKit
 import NotifierUI
 import PopupCompositionBuffer
 import Shared
+import Shared_DarwinImpl
 import ShiftKeyUpChecker
 import SwiftExtension
 import TooltipUI

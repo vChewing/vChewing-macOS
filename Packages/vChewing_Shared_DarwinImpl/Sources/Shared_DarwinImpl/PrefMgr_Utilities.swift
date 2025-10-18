@@ -7,24 +7,9 @@
 // requirements defined in MIT License.
 
 import Foundation
+import InputMethodKit
+import Shared
 import SwiftExtension
-
-#if canImport(InputMethodKit)
-  import InputMethodKit
-#endif
-
-// MARK: Guarded Method for Validating Candidate Keys.
-
-extension PrefMgr {
-  public func validate(candidateKeys: String) -> String? {
-    var excluded = ""
-    if useJKtoMoveCompositorCursorInCandidateState { excluded.append("jk") }
-    if useHLtoMoveCompositorCursorInCandidateState { excluded.append("hl") }
-    if useShiftQuestionToCallServiceMenu { excluded.append("?") }
-    excluded.append(IMEApp.isKeyboardJIS ? "_" : "`~")
-    return CandidateKey.validate(keys: candidateKeys, excluding: excluded)
-  }
-}
 
 // MARK: Auto parameter fix procedures, executed everytime on InputSession.activateServer().
 

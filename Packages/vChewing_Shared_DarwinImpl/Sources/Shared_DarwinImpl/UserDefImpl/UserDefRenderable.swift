@@ -9,6 +9,7 @@
 #if canImport(SwiftUI)
 
   import Foundation
+  import Shared
   import SwiftUI
 
   // MARK: - UserDefRenderable

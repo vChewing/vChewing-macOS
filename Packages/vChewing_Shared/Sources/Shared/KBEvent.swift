@@ -7,7 +7,7 @@
 // requirements defined in MIT License.
 
 import Foundation
-import IMKUtils
+import SwiftExtension
 
 // MARK: - KBEvent
 
@@ -196,7 +196,8 @@ extension KBEvent {
     KeyCode(rawValue: keyCode) == KeyCode.kJISAlphanumericalKey
   }
 
-  public var isJISKanaSwappingKey: Bool { KeyCode(rawValue: keyCode) == KeyCode.kJISKanaSwappingKey
+  public var isJISKanaSwappingKey: Bool {
+    KeyCode(rawValue: keyCode) == KeyCode.kJISKanaSwappingKey
   }
 
   public var isNumericPadKey: Bool { arrNumpadKeyCodes.contains(keyCode) }
@@ -443,9 +444,12 @@ public enum KeyCode: UInt16 {
   public func toKBEvent() -> KBEvent {
     .init(
       modifierFlags: [],
-      timestamp: TimeInterval(), windowNumber: 0,
-      characters: "", charactersIgnoringModifiers: "",
-      isARepeat: false, keyCode: rawValue
+      timestamp: TimeInterval(),
+      windowNumber: 0,
+      characters: "",
+      charactersIgnoringModifiers: "",
+      isARepeat: false,
+      keyCode: rawValue
     )
   }
 
@@ -546,14 +550,14 @@ enum KeyCodeBlackListed: UInt16 {
 
 // 摁 Alt+Shift+主鍵盤區域數字鍵 的話，根據不同的 macOS 鍵盤佈局種類，會出現不同的符號結果。
 // 然而呢，KeyCode 卻是一致的。於是這裡直接準備一個換算表來用。
-let mapMainAreaNumKey: [UInt16: String] = [
+public let mapMainAreaNumKey: [UInt16: String] = [
   18: "1", 19: "2", 20: "3", 21: "4", 23: "5", 22: "6", 26: "7", 28: "8", 25: "9", 29: "0",
 ]
 
 /// 數字小鍵盤區域的按鍵的 KeyCode。
 ///
 /// 注意：第 95 號 Key Code（逗號）為 JIS 佈局特有的數字小鍵盤按鍵。
-let arrNumpadKeyCodes: [UInt16] = [
+public let arrNumpadKeyCodes: [UInt16] = [
   65,
   67,
   69,
@@ -577,7 +581,7 @@ let arrNumpadKeyCodes: [UInt16] = [
 // MARK: - EmacsKey
 
 public enum EmacsKey {
-  static let charKeyMapHorizontal: [UInt16: UInt16] = [
+  public static let charKeyMapHorizontal: [UInt16: UInt16] = [
     6: 124,
     2: 123,
     1: 115,
@@ -587,7 +591,7 @@ public enum EmacsKey {
     14: 125,
     16: 126,
   ]
-  static let charKeyMapVertical: [UInt16: UInt16] = [
+  public static let charKeyMapVertical: [UInt16: UInt16] = [
     6: 125,
     2: 126,
     1: 115,

@@ -21,7 +21,9 @@ extension InputHandlerProtocol {
   /// - Returns: 告知 IMK「該按鍵是否已經被輸入法攔截處理」。
   func handleCandidate(input: InputSignalProtocol, ignoringModifiers: Bool = false) -> Bool {
     guard let session = session else { return false }
-    guard var ctlCandidate = session.candidateController() else { return false }
+    guard var ctlCandidate = session.candidateController() else {
+      return false
+    }
     let state = session.state
     guard state.isCandidateContainer else { return false } // 會自動判斷「isEmpty」。
     guard ctlCandidate.visible else { return false }
@@ -395,7 +397,7 @@ extension InputHandlerProtocol {
     let ctrlShiftCMD: Bool = input.commonKeyModifierFlags == [.control, .command, .shift]
     if ctrlShiftCMD || ctrlCMD {
       // 此處 JIS 鍵盤判定無法用於螢幕鍵盤。所以，螢幕鍵盤的場合，系統會依照 US 鍵盤的判定方案。
-      switch (input.keyCode, IMEApp.isKeyboardJIS) {
+      switch (input.keyCode, isJISKeyboard?() ?? false) {
       case (30, true), (33, false):
         _ = ctlCandidate.highlightPreviousCandidate() ? {}() : errorCallback?("8B144DCD")
         return true

@@ -17,11 +17,13 @@ public struct PrefMgr: PrefMgrProtocol {
   public init(
     didAskForSyncingLMPrefs: (() -> ())? = nil,
     didAskForRefreshingSpeechSputnik: (() -> ())? = nil,
-    didAskForSyncingShiftKeyDetectorPrefs: (() -> ())? = nil
+    didAskForSyncingShiftKeyDetectorPrefs: (() -> ())? = nil,
+    candidateKeyValidator: ((String) -> (String?))? = nil
   ) {
     self.didAskForSyncingLMPrefs = didAskForSyncingLMPrefs
     self.didAskForRefreshingSpeechSputnik = didAskForRefreshingSpeechSputnik
     self.didAskForSyncingShiftKeyDetectorPrefs = didAskForSyncingShiftKeyDetectorPrefs
+    self.candidateKeyValidator = candidateKeyValidator
   }
 
   // MARK: Public
@@ -67,6 +69,7 @@ public struct PrefMgr: PrefMgrProtocol {
   public var didAskForSyncingLMPrefs: (() -> ())?
   public var didAskForRefreshingSpeechSputnik: (() -> ())?
   public var didAskForSyncingShiftKeyDetectorPrefs: (() -> ())?
+  public var candidateKeyValidator: ((String) -> String?)?
 
   // MARK: - Settings (Tier 1)
 
@@ -442,7 +445,7 @@ public struct PrefMgr: PrefMgrProtocol {
     didSet {
       let optimized = candidateKeys.lowercased().deduplicated
       if candidateKeys != optimized { candidateKeys = optimized }
-      if validate(candidateKeys: candidateKeys) != nil {
+      if candidateKeyValidator?(candidateKeys) != nil {
         candidateKeys = Self.kDefaultCandidateKeys
       }
     }

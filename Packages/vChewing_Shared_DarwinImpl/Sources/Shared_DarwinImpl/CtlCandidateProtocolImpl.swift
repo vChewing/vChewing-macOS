@@ -6,14 +6,17 @@
 // marks, or product names of Contributor, except as required to fulfill notice
 // requirements defined in MIT License.
 
-import Foundation
+import AppKit
+import Shared
 
-// MARK: - IMEApp
+// MARK: - CtlCandidateDelegate
 
-public enum IMEApp {
-  // MARK: - 輸入法的當前的簡繁體中文模式
+public protocol CtlCandidateDelegate: CtlCandidateDelegateCore {
+  var clientAccentColor: NSColor? { get }
+}
 
-  public static var currentInputMode: Shared.InputMode {
-    .init(rawValue: PrefMgr().mostRecentInputMode) ?? .imeModeNULL
-  }
+// MARK: - CtlCandidateProtocol
+
+public protocol CtlCandidateProtocol: CtlCandidateProtocolCore {
+  var candidateFont: NSFont { get set }
 }

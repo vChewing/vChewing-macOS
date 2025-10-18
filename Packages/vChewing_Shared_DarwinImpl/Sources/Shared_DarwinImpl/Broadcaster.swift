@@ -6,16 +6,12 @@
 // marks, or product names of Contributor, except as required to fulfill notice
 // requirements defined in MIT License.
 
-#if canImport(Darwin)
+import Foundation
 
-  import Foundation
+@objcMembers
+public class Broadcaster: NSObject {
+  public static var shared = Broadcaster()
 
-  @objcMembers
-  public class Broadcaster: NSObject {
-    public static var shared = Broadcaster()
-
-    public dynamic var eventForReloadingPhraseEditor = UUID()
-    public dynamic var eventForClosingAllPanels = UUID()
-  }
-
-#endif
+  public dynamic var eventForReloadingPhraseEditor = UUID()
+  public dynamic var eventForClosingAllPanels = UUID()
+}

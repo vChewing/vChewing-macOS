@@ -156,7 +156,7 @@ extension InputHandlerProtocol {
       revolveCandidateWithBrackets: if ctrlShiftCMD || ctrlCMD {
         if state.type != .ofInputting { break revolveCandidateWithBrackets }
         // 此處 JIS 鍵盤判定無法用於螢幕鍵盤。所以，螢幕鍵盤的場合，系統會依照 US 鍵盤的判定方案。
-        switch (input.keyCode, IMEApp.isKeyboardJIS) {
+        switch (input.keyCode, isJISKeyboard?() ?? false) {
         case (30, true), (33, false): return revolveCandidate(reverseOrder: true)
         case (30, false), (42, true): return revolveCandidate(reverseOrder: false)
         default: break

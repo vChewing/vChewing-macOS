@@ -33,6 +33,13 @@ extension RangeReplaceableCollection where Element: Hashable {
   }
 }
 
+// MARK: - UILayoutOrientation
+
+public enum UILayoutOrientation: Int, Sendable {
+  case horizontal = 0
+  case vertical = 1
+}
+
 // MARK: - Ensuring trailing slash of a string
 
 extension String {

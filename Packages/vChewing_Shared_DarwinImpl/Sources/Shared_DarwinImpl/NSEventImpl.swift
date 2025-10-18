@@ -6,10 +6,12 @@
 // marks, or product names of Contributor, except as required to fulfill notice
 // requirements defined in MIT License.
 
+import Shared
+
 #if canImport(AppKit)
 
   import AppKit
-  import IMKUtils
+  import SwiftExtension
 
   // MARK: - NSEvent Extension - Reconstructors
 
