@@ -156,7 +156,9 @@ class FrmRevLookupWindow: NSWindow {
     inputField.isBezeled = true
     inputField.isEditable = true
     inputField.isSelectable = true
-    inputField.lineBreakMode = .byClipping
+    if #available(macOS 10.10, *) {
+      inputField.lineBreakMode = .byClipping
+    }
     inputField.textColor = NSColor.controlTextColor
     inputField.cell.map { $0 as? NSTextFieldCell }??.isScrollable = true
     inputField.cell.map { $0 as? NSTextFieldCell }??.sendsActionOnEndEditing = true
