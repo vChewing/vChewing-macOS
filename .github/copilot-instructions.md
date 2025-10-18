@@ -49,13 +49,15 @@ This file provides GitHub Copilot-specific coding instructions. For comprehensiv
 - Keep descriptions concise.
 - Reference: https://www.conventionalcommits.org/
 
-## Things to Avoid
+## Things to Beware / Avoid
 - When implementing new APIs for InputSession and InputHandler, please put them onto the protocols if possible.
 - Gate new APIs with availability checks (e.g. conditional compilation via `canImport(Darwin)` and Swift `@available` annotations) so shared packages keep compiling on Linux. The shipping Xcode target requires macOS 12+, but legacy macOS releases are maintained in a separate repository.
 - This repo has no dependency of InterfaceBuilder assets. AppKit is used by default with self-crafted result builder DSLs to make the coding experience similar to SwiftUI. SwiftUI in this project is only used for About window and SettingsUI. On macOS 10.9 Mavericks till macOS 13 Ventura, this repo uses SettingsCocoa (AppKit Result Builder DSL).
 - User data is not expected to be referred from hard-coded path, unless it is necessary in Test targets of a Swift package.
 - This repository uses XCTest for unit tests used among Swift packages situated in `./Packages` folder.
 - Only for local Copilot: Unless being specifically told, please Do Not Touch those lexicon scripts (and compiled lexicon targets) compiled in the git-submodule `libvchewing-data`.
+- The platforms in Swift package manifest file is ignored on non-Darwin platforms. Swift FOSS Foundation APIs on Darwin can be unavailable on earlier macOS releases due to Apple's deliberate intention of never backporting new Foundation APIs. Your removal of platforms can make some of those components not able to be compiled against macOS releases earlier than macOS 11.
+- Most vChewing-specific packages prefer to use a dedicated file to handle `@_exported import XXX` dependency definitions to avoid insertion of `import XXX` to all files having codes dependent to `XXX`. This makes code-mirroring tasks (to the legacy repository of vChewing) much easier. Try not to break this convention if possible.
 
 ## Reference Files and Folders
 - `./Packages/vChewing_MainAssembly/Sources/MainAssembly/SessionController/`: `SessionCtl.swift` is the IMK entry point working with candidate window, IME settings, etc. However, most of its tasks are delegated to `InputSession*.swift` files in this folder.
