@@ -7,9 +7,6 @@
 // requirements defined in MIT License.
 
 import AppKit
-import PopupCompositionBuffer
-import Shared
-import SwiftExtension
 
 // MARK: - 狀態調度 (State Handling)
 

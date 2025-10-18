@@ -7,9 +7,6 @@
 // requirements defined in MIT License.
 
 import AppKit
-import LangModelAssembly
-import Shared
-import SwiftExtension
 
 // MARK: - CtlRevLookupWindow
 

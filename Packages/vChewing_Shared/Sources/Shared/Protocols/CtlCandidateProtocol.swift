@@ -6,16 +6,12 @@
 // marks, or product names of Contributor, except as required to fulfill notice
 // requirements defined in MIT License.
 
-#if canImport(AppKit)
-  import AppKit
-#else
-  import Foundation
-#endif
+import Foundation
 
-// MARK: - CtlCandidateDelegate
+// MARK: - CtlCandidateDelegateCore
 
-public protocol CtlCandidateDelegate: AnyObject {
-  func candidateController() -> CtlCandidateProtocol?
+public protocol CtlCandidateDelegateCore: AnyObject {
+  func candidateController() -> CtlCandidateProtocolCore?
   func candidatePairs(conv: Bool) -> [(keyArray: [String], value: String)]
   func candidatePairSelectionConfirmed(at index: Int)
   func candidatePairHighlightChanged(at index: Int)
@@ -35,27 +31,20 @@ public protocol CtlCandidateDelegate: AnyObject {
   var shouldAutoExpandCandidates: Bool { get }
   var isCandidateContextMenuEnabled: Bool { get }
   var showReverseLookupResult: Bool { get }
-
-  #if canImport(AppKit)
-    var clientAccentColor: NSColor? { get }
-  #endif
 }
 
-// MARK: - CtlCandidateProtocol
+// MARK: - CtlCandidateProtocolCore
 
-public protocol CtlCandidateProtocol {
+public protocol CtlCandidateProtocolCore {
   var tooltip: String { get set }
   var reverseLookupResult: [String] { get set }
   var locale: String { get set }
-  #if canImport(AppKit)
-    var currentLayout: NSUserInterfaceLayoutOrientation { get set }
-    var candidateFont: NSFont { get set }
-  #endif
-  var delegate: CtlCandidateDelegate? { get set }
+  var delegate: CtlCandidateDelegateCore? { get set }
   var highlightedIndex: Int { get set }
   var visible: Bool { get set }
   var windowTopLeftPoint: CGPoint { get set }
   var useLangIdentifier: Bool { get set }
+  var currentLayout: UILayoutOrientation { get set }
 
   func reloadData()
   func updateDisplay()

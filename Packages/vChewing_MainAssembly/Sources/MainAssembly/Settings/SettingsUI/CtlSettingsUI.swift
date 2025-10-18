@@ -6,9 +6,6 @@
 // marks, or product names of Contributor, except as required to fulfill notice
 // requirements defined in MIT License.
 
-import BookmarkManager
-import IMKUtils
-import Shared
 import SwiftUI
 
 private let kWindowTitleHeight: Double = 78

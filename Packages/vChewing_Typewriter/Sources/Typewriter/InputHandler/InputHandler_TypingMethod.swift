@@ -6,9 +6,6 @@
 // marks, or product names of Contributor, except as required to fulfill notice
 // requirements defined in MIT License.
 
-import Foundation
-import Shared
-
 // MARK: - TypingMethod
 
 public enum TypingMethod: Int, CaseIterable {

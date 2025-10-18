@@ -6,7 +6,6 @@
 // marks, or product names of Contributor, except as required to fulfill notice
 // requirements defined in MIT License.
 
-import CoreFoundation
 import Foundation
 
 #if canImport(OSLog)
@@ -70,31 +69,6 @@ extension FileManager {
     relativeTo: nil
   )
 }
-
-// MARK: - Trash a file if it exists.
-
-#if canImport(Darwin)
-  extension FileManager {
-    @discardableResult
-    public static func trashTargetIfExists(_ path: String) -> Bool {
-      do {
-        if FileManager.default.fileExists(atPath: path) {
-          // 塞入垃圾桶
-          var resultingURL: NSURL?
-          try FileManager.default.trashItem(
-            at: URL(fileURLWithPath: path), resultingItemURL: &resultingURL
-          )
-        } else {
-          Process.consoleLog("Item doesn't exist: \(path)")
-        }
-      } catch let error as NSError {
-        Process.consoleLog("Failed from removing this object: \(path) || Error: \(error)")
-        return false
-      }
-      return true
-    }
-  }
-#endif
 
 // MARK: - Check whether current date is the given date.
 

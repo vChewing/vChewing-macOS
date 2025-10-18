@@ -7,8 +7,6 @@
 // requirements defined in MIT License.
 
 import Foundation
-import Shared
-import SwiftExtension
 
 extension CandidateNode {
   public static func load(url: URL) {

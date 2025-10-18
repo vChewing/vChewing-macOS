@@ -6,10 +6,6 @@
 // marks, or product names of Contributor, except as required to fulfill notice
 // requirements defined in MIT License.
 
-import BookmarkManager
-import OSFrameworkImpl
-import Shared
-import SwiftExtension
 import SwiftUI
 import UniformTypeIdentifiers
 

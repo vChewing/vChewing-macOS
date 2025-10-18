@@ -1,18 +1,14 @@
 // (c) 2021 and onwards The vChewing Project (MIT-NTL License).
 // ====================
-// Fallback code-point decoding utilities leveraging iconv on every platform.
-
-import Foundation
-#if canImport(Musl)
-  import Musl
-#elseif canImport(Glibc)
-  import Glibc
-#elseif canImport(Darwin)
-  import Darwin
-#endif
+// This code is released under the MIT license (SPDX-License-Identifier: MIT)
+// ... with NTL restriction stating that:
+// No trademark license is granted to use the trade names, trademarks, service
+// marks, or product names of Contributor, except as required to fulfill notice
+// requirements defined in MIT License.
 
 // MARK: - CodePointDecoder
 
+/// Fallback code-point decoding utilities leveraging iconv on every platform.
 enum CodePointDecoder {
   // MARK: Internal
 

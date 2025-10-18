@@ -6,8 +6,22 @@
 // marks, or product names of Contributor, except as required to fulfill notice
 // requirements defined in MIT License.
 
+@_exported import BookmarkManager
+@_exported import BrailleSputnik
+@_exported import CandidateWindow
+@_exported import FolderMonitor
+@_exported import Hotenka
 @_exported import IMKUtils
+@_exported import KimoDataReader
 @_exported import LangModelAssembly
-@_exported import Shared
-@_exported import SwiftExtension
+@_exported import LMAssemblyMaterials4Tests
+@_exported import NotifierUI
+@_exported import PhraseEditorUI
+@_exported import PopupCompositionBuffer
+@_exported import Shared_DarwinImpl
+@_exported import ShiftKeyUpChecker
+@_exported import SwiftyCapsLockToggler
+@_exported import TooltipUI
+@_exported import Typewriter
 @_exported import Uninstaller
+@_exported import UpdateSputnik

@@ -7,11 +7,6 @@
 // requirements defined in MIT License.
 
 import Foundation
-import LangModelAssembly
-import NotifierUI
-import PhraseEditorUI
-import Shared
-import SwiftExtension
 
 // MARK: - Implements Conforming to Phrase Editor Delegate Protocol
 
