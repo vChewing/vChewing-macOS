@@ -12,11 +12,15 @@ let package = Package(
       targets: ["IMKUtils"]
     ),
   ],
-  dependencies: [],
+  dependencies: [
+    .package(path: "../vChewing_SwiftExtension"),
+  ],
   targets: [
     .target(
       name: "IMKUtils",
-      dependencies: []
+      dependencies: [
+        .product(name: "SwiftExtension", package: "vChewing_SwiftExtension"),
+      ]
     ),
   ]
 )

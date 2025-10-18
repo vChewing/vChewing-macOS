@@ -38,13 +38,6 @@ final class SharedTests: XCTestCase {
     print(rootNode.members.compactMap(\.asServiceMenuNode?.service))
   }
 
-  /// PrefMgr().dumpShellScriptBackup()
-  func testDumpedPrefs() throws {
-    let prefs = PrefMgr()
-    let fetched = prefs.dumpShellScriptBackup() ?? ""
-    XCTAssertFalse(fetched.isEmpty)
-  }
-
   func testEmacsCtrlNPMappings() throws {
     guard let ctrlNScalar = UnicodeScalar(14),
           let ctrlPScalar = UnicodeScalar(16) else {

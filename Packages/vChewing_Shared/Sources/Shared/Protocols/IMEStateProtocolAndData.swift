@@ -6,9 +6,6 @@
 // marks, or product names of Contributor, except as required to fulfill notice
 // requirements defined in MIT License.
 
-import Foundation
-import IMKUtils
-
 // MARK: - IMEStateProtocol
 
 // 所有 IMEState 均遵守該協定：
@@ -36,9 +33,6 @@ public protocol IMEStateProtocol {
   var u16Cursor: Int { get }
   var cursor: Int { get set }
   var marker: Int { get set }
-  #if canImport(Darwin)
-    func attributedString(for session: IMKInputControllerProtocol) -> NSAttributedString
-  #endif
 
   static func ofDeactivated() -> Self
   static func ofEmpty() -> Self

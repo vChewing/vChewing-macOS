@@ -7,9 +7,6 @@
 // requirements defined in MIT License.
 
 import AppKit
-import Foundation
-import OSFrameworkImpl
-import Shared
 
 // MARK: - VwrServiceMenuEditor
 

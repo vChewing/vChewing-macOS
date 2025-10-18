@@ -7,11 +7,10 @@
 // requirements defined in MIT License.
 
 import AppKit
-import OSFrameworkImpl
-import Shared
+import Shared_DarwinImpl
 import SwiftExtension
 
-extension NSUserInterfaceLayoutOrientation {
+extension UILayoutOrientation {
   fileprivate var layoutTDK: CandidatePool.LayoutOrientation {
     switch self {
     case .horizontal:
@@ -31,7 +30,7 @@ public class CtlCandidateTDK: CtlCandidate, NSWindowDelegate {
 
   // MARK: - Constructors
 
-  public required init(_ layout: NSUserInterfaceLayoutOrientation = .horizontal) {
+  public required init(_ layout: UILayoutOrientation = .horizontal) {
     var contentRect = CGRect(x: 128.0, y: 128.0, width: 0.0, height: 0.0)
     let styleMask: NSWindow.StyleMask = [.nonactivatingPanel]
     let panel = NSPanel(

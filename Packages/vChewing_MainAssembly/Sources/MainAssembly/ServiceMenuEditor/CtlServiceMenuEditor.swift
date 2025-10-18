@@ -7,7 +7,6 @@
 // requirements defined in MIT License.
 
 import AppKit
-import Foundation
 
 public class CtlServiceMenuEditor: NSWindowController {
   // MARK: Lifecycle

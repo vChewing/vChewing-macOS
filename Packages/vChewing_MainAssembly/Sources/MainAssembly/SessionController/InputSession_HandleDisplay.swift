@@ -7,9 +7,6 @@
 // requirements defined in MIT License.
 
 import AppKit
-import CandidateWindow
-import IMKUtils
-import Shared
 
 // MARK: - Tooltip Display and Candidate Display Methods
 
@@ -50,7 +47,7 @@ extension SessionProtocol {
         x: lineHeightRect.origin.x + lineHeightRect.size.width + 5, y: lineHeightRect.origin.y
       )
     }
-    let tooltipContentDirection: NSUserInterfaceLayoutOrientation = {
+    let tooltipContentDirection: UILayoutOrientation = {
       if PrefMgr.shared.alwaysShowTooltipTextsHorizontally { return .horizontal }
       return isVerticalTyping ? .vertical : .horizontal
     }()
@@ -75,7 +72,7 @@ extension SessionProtocol {
     isVerticalCandidateWindow = isVerticalCandidateWindow || isServiceMenu
 
     /// 無論是田所選字窗還是 IMK 選字窗，在這裡都有必要重新初期化。
-    let candidateLayout: NSUserInterfaceLayoutOrientation =
+    let candidateLayout: UILayoutOrientation =
       (isVerticalCandidateWindow ? .vertical : .horizontal)
 
     let isInputtingWithCandidates = state.type == .ofInputting && state.isCandidateContainer

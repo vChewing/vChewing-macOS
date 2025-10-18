@@ -13,7 +13,7 @@ public protocol TooltipUIProtocol {
   func show(
     tooltip: String, at point: CGPoint,
     bottomOutOfScreenAdjustmentHeight heightDelta: Double,
-    direction: NSUserInterfaceLayoutOrientation, duration: Double
+    direction: UILayoutOrientation, duration: Double
   )
 
   func hide()

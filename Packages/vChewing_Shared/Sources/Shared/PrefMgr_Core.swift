@@ -7,9 +7,8 @@
 // requirements defined in MIT License.
 
 import Foundation
-import SwiftExtension
 
-// MARK: -
+// MARK: - PrefMgr
 
 public struct PrefMgr: PrefMgrProtocol {
   // MARK: Lifecycle
@@ -17,11 +16,13 @@ public struct PrefMgr: PrefMgrProtocol {
   public init(
     didAskForSyncingLMPrefs: (() -> ())? = nil,
     didAskForRefreshingSpeechSputnik: (() -> ())? = nil,
-    didAskForSyncingShiftKeyDetectorPrefs: (() -> ())? = nil
+    didAskForSyncingShiftKeyDetectorPrefs: (() -> ())? = nil,
+    candidateKeyValidator: ((String) -> (String?))? = nil
   ) {
     self.didAskForSyncingLMPrefs = didAskForSyncingLMPrefs
     self.didAskForRefreshingSpeechSputnik = didAskForRefreshingSpeechSputnik
     self.didAskForSyncingShiftKeyDetectorPrefs = didAskForSyncingShiftKeyDetectorPrefs
+    self.candidateKeyValidator = candidateKeyValidator
   }
 
   // MARK: Public
@@ -67,6 +68,7 @@ public struct PrefMgr: PrefMgrProtocol {
   public var didAskForSyncingLMPrefs: (() -> ())?
   public var didAskForRefreshingSpeechSputnik: (() -> ())?
   public var didAskForSyncingShiftKeyDetectorPrefs: (() -> ())?
+  public var candidateKeyValidator: ((String) -> String?)?
 
   // MARK: - Settings (Tier 1)
 
@@ -442,7 +444,7 @@ public struct PrefMgr: PrefMgrProtocol {
     didSet {
       let optimized = candidateKeys.lowercased().deduplicated
       if candidateKeys != optimized { candidateKeys = optimized }
-      if validate(candidateKeys: candidateKeys) != nil {
+      if candidateKeyValidator?(candidateKeys) != nil {
         candidateKeys = Self.kDefaultCandidateKeys
       }
     }
@@ -461,5 +463,39 @@ public struct PrefMgr: PrefMgrProtocol {
   @AppProperty(key: UserDef.kAssociatedPhrasesEnabled.rawValue, defaultValue: false)
   public var associatedPhrasesEnabled: Bool {
     didSet { didAskForSyncingLMPrefs?() }
+  }
+}
+
+extension PrefMgr {
+  /// Fix Odd Preferences for platform-independent purposes only.
+  public func fixOddPreferencesCore() {
+    // 自動糾正選字鍵 (利用其 didSet 特性)
+    candidateKeys = candidateKeys
+    // 注拼槽注音排列選項糾錯。
+    if KeyboardParser(rawValue: keyboardParser) == nil {
+      keyboardParser = 0
+    }
+    // 其它多元選項參數自動糾錯。
+    if ![0, 1, 2].contains(specifyIntonationKeyBehavior) {
+      specifyIntonationKeyBehavior = 0
+    }
+    if ![0, 1, 2].contains(specifyShiftBackSpaceKeyBehavior) {
+      specifyShiftBackSpaceKeyBehavior = 0
+    }
+    if ![0, 1, 2, 3, 4].contains(upperCaseLetterKeyBehavior) {
+      upperCaseLetterKeyBehavior = 0
+    }
+    if ![0, 1, 2].contains(readingNarrationCoverage) {
+      readingNarrationCoverage = 0
+    }
+    if ![0, 1, 2, 3].contains(specifyCmdOptCtrlEnterBehavior) {
+      specifyCmdOptCtrlEnterBehavior = 0
+    }
+    if ![0, 1, 2].contains(beepSoundPreference) {
+      beepSoundPreference = 2
+    }
+    if ![0, 1, 2].contains(cursorPlacementAfterSelectingCandidate) {
+      cursorPlacementAfterSelectingCandidate = 0
+    }
   }
 }

@@ -7,10 +7,6 @@
 // requirements defined in MIT License.
 
 import AppKit
-import LangModelAssembly
-import NotifierUI
-import Shared
-import SwiftExtension
 
 // MARK: - Input Mode Extension for Language Models
 

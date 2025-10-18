@@ -7,10 +7,6 @@
 // requirements defined in MIT License.
 
 import AppKit
-import BookmarkManager
-import LangModelAssembly
-import Shared
-import SwiftExtension
 
 /// 使用者辭典資料預設範例檔案名稱。
 private let kTemplateNameUserPhrases = "template-userphrases"

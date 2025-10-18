@@ -6,8 +6,6 @@
 // marks, or product names of Contributor, except as required to fulfill notice
 // requirements defined in MIT License.
 
-import Shared
-import SwiftExtension
 import SwiftUI
 
 // MARK: - VwrSettingsPaneCandidates

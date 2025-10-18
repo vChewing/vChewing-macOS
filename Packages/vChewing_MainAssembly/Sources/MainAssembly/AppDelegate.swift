@@ -7,11 +7,6 @@
 // requirements defined in MIT License.
 
 import AppKit
-import FolderMonitor
-import Shared
-import SwiftExtension
-import Uninstaller
-import UpdateSputnik
 import UserNotifications
 
 // MARK: - AppDelegate

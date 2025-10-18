@@ -6,18 +6,7 @@
 // marks, or product names of Contributor, except as required to fulfill notice
 // requirements defined in MIT License.
 
-import Foundation
-import IMKUtils
-
-// MARK: - IMKHelper Extension
-
-extension IMKHelper {
-  public static var currentBasicKeyboardLayout: String {
-    UserDefaults.current.string(forKey: "BasicKeyboardLayout") ?? ""
-  }
-
-  public static var isDynamicBasicKeyboardLayoutEnabled: Bool {
-    Self.arrDynamicBasicKeyLayouts
-      .contains(currentBasicKeyboardLayout) || !currentBasicKeyboardLayout.isEmpty
-  }
-}
+@_exported import IMKUtils
+@_exported import OSFrameworkImpl
+@_exported import Shared
+@_exported import SwiftExtension

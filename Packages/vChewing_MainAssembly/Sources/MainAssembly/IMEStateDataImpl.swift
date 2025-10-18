@@ -6,10 +6,7 @@
 // marks, or product names of Contributor, except as required to fulfill notice
 // requirements defined in MIT License.
 
-import IMKUtils
-import InputMethodKit
-import Shared
-import Tekkon
+import AppKit
 
 // MARK: - AttributedString 材料生成器
 

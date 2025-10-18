@@ -39,6 +39,6 @@ public protocol SessionCoreProtocol: AnyObject {
 
 public protocol InputHandlerCoreProtocol: AnyObject {
   associatedtype State: IMEStateProtocol
-  associatedtype Session: SessionCoreProtocol & CtlCandidateDelegate
+  associatedtype Session: SessionCoreProtocol & CtlCandidateDelegateCore
     where Session.State == Session.Handler.State, Session.State == State
 }

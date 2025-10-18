@@ -7,7 +7,6 @@
 // requirements defined in MIT License.
 
 import Foundation
-import IMKUtils
 import LangModelAssembly
 import Megrez
 import Shared
@@ -62,13 +61,6 @@ public struct MockIMEState: IMEStateProtocol {
   public var markedTargetIsCurrentlyFiltered: Bool {
     false
   }
-
-  #if canImport(Darwin)
-    public func attributedString(for session: IMKInputControllerProtocol) -> NSAttributedString {
-      // Simplified implementation for testing
-      NSAttributedString(string: data.displayedText)
-    }
-  #endif
 }
 
 // MARK: - Extension to provide static constructors
@@ -189,6 +181,8 @@ public class MockInputHandler: InputHandlerProtocol {
   public var calligrapher = ""
   public var composer: Tekkon.Composer = .init()
   public var assembler: Megrez.Compositor
+  public var isJISKeyboard: (() -> Bool)? = { false }
+  public var narrator: (any SpeechNarratorProtocol)?
 
   public var currentLM: LMAssembly.LMInstantiator {
     didSet {
@@ -201,7 +195,7 @@ public class MockInputHandler: InputHandlerProtocol {
 // MARK: - MockSession
 
 /// 專門用於單元測試的模擬會話類型。
-public class MockSession: SessionCoreProtocol, CtlCandidateDelegate {
+public class MockSession: SessionCoreProtocol, CtlCandidateDelegateCore {
   // MARK: Lifecycle
 
   public init() {
@@ -321,7 +315,7 @@ public class MockSession: SessionCoreProtocol, CtlCandidateDelegate {
 
   // MARK: - CtlCandidateDelegate conformance
 
-  public func candidateController() -> CtlCandidateProtocol? { nil }
+  public func candidateController() -> CtlCandidateProtocolCore? { nil }
 
   public func candidatePairs(conv _: Bool) -> [(keyArray: [String], value: String)] {
     if !state.isCandidateContainer || state.candidates.isEmpty { return [] }

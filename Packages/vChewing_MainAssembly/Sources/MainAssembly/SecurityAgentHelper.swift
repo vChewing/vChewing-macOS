@@ -8,8 +8,6 @@
 
 import AppKit
 import Carbon
-import OSFrameworkImpl
-import Shared
 
 public class SecurityAgentHelper {
   // MARK: Lifecycle

@@ -7,9 +7,6 @@
 // requirements defined in MIT License.
 
 import AppKit
-import BookmarkManager
-import Foundation
-import Shared
 
 // MARK: - SettingsPanesCocoa.Cassette
 

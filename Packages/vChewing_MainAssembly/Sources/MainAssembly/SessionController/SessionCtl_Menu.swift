@@ -7,11 +7,6 @@
 // requirements defined in MIT License.
 
 import AppKit
-import IMKUtils
-import NotifierUI
-import OSFrameworkImpl
-import Shared
-import SwiftExtension
 
 // MARK: - IME Menu Manager
 

@@ -7,7 +7,6 @@
 // requirements defined in MIT License.
 
 import AppKit
-import Shared
 import SwiftUI
 
 // MARK: - PrefUITabs

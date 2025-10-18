@@ -7,24 +7,7 @@
 // requirements defined in MIT License.
 
 import Foundation
-import SwiftExtension
-
-#if canImport(InputMethodKit)
-  import InputMethodKit
-#endif
-
-// MARK: Guarded Method for Validating Candidate Keys.
-
-extension PrefMgr {
-  public func validate(candidateKeys: String) -> String? {
-    var excluded = ""
-    if useJKtoMoveCompositorCursorInCandidateState { excluded.append("jk") }
-    if useHLtoMoveCompositorCursorInCandidateState { excluded.append("hl") }
-    if useShiftQuestionToCallServiceMenu { excluded.append("?") }
-    excluded.append(IMEApp.isKeyboardJIS ? "_" : "`~")
-    return CandidateKey.validate(keys: candidateKeys, excluding: excluded)
-  }
-}
+import InputMethodKit
 
 // MARK: Auto parameter fix procedures, executed everytime on InputSession.activateServer().
 
@@ -33,11 +16,10 @@ extension PrefMgr {
     if #unavailable(macOS 12) {
       showNotificationsWhenTogglingCapsLock = false
     }
+
     if appleLanguages.isEmpty {
       UserDefaults.current.removeObject(forKey: UserDef.kAppleLanguages.rawValue)
     }
-    // 自動糾正選字鍵 (利用其 didSet 特性)
-    candidateKeys = candidateKeys
     // 客體黑名單資料類型升級。
     if let clients = UserDefaults.current.object(
       forKey: UserDef.kClientsIMKTextInputIncapable.rawValue
@@ -48,46 +30,17 @@ extension PrefMgr {
         clientsIMKTextInputIncapable[neta] = true
       }
     }
-    // 注拼槽注音排列選項糾錯。
-    if KeyboardParser(rawValue: keyboardParser) == nil {
-      keyboardParser = 0
-    }
 
-    #if canImport(InputMethodKit)
-      // 基礎鍵盤排列選項糾錯。
-      let matchedResults = TISInputSource.match(identifiers: [
-        basicKeyboardLayout,
-        alphanumericalKeyboardLayout,
-      ])
-      if !matchedResults.contains(where: { $0.identifier == basicKeyboardLayout }) {
-        basicKeyboardLayout = Self.kDefaultBasicKeyboardLayout
-      }
-      if !matchedResults.contains(where: { $0.identifier == alphanumericalKeyboardLayout }) {
-        alphanumericalKeyboardLayout = Self.kDefaultAlphanumericalKeyboardLayout
-      }
-    #endif
-
-    // 其它多元選項參數自動糾錯。
-    if ![0, 1, 2].contains(specifyIntonationKeyBehavior) {
-      specifyIntonationKeyBehavior = 0
+    // 基礎鍵盤排列選項糾錯。
+    let matchedResults = TISInputSource.match(identifiers: [
+      basicKeyboardLayout,
+      alphanumericalKeyboardLayout,
+    ])
+    if !matchedResults.contains(where: { $0.identifier == basicKeyboardLayout }) {
+      basicKeyboardLayout = Self.kDefaultBasicKeyboardLayout
     }
-    if ![0, 1, 2].contains(specifyShiftBackSpaceKeyBehavior) {
-      specifyShiftBackSpaceKeyBehavior = 0
-    }
-    if ![0, 1, 2, 3, 4].contains(upperCaseLetterKeyBehavior) {
-      upperCaseLetterKeyBehavior = 0
-    }
-    if ![0, 1, 2].contains(readingNarrationCoverage) {
-      readingNarrationCoverage = 0
-    }
-    if ![0, 1, 2, 3].contains(specifyCmdOptCtrlEnterBehavior) {
-      specifyCmdOptCtrlEnterBehavior = 0
-    }
-    if ![0, 1, 2].contains(beepSoundPreference) {
-      beepSoundPreference = 2
-    }
-    if ![0, 1, 2].contains(cursorPlacementAfterSelectingCandidate) {
-      cursorPlacementAfterSelectingCandidate = 0
+    if !matchedResults.contains(where: { $0.identifier == alphanumericalKeyboardLayout }) {
+      alphanumericalKeyboardLayout = Self.kDefaultAlphanumericalKeyboardLayout
     }
   }
 }

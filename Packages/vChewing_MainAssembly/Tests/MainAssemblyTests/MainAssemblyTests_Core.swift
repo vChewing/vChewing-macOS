@@ -10,7 +10,6 @@ import InputMethodKit
 import LangModelAssembly
 import LMAssemblyMaterials4Tests
 import OSFrameworkImpl
-import Shared
 import XCTest
 
 @testable import MainAssembly

@@ -7,8 +7,6 @@
 // requirements defined in MIT License.
 
 import InputMethodKit
-import OSFrameworkImpl
-import Shared
 import XCTest
 
 @testable import LangModelAssembly
@@ -75,7 +73,7 @@ extension MainAssemblyTests {
   /// 可選擇在開啟前覆寫游標位置。
   /// 回傳候選窗控制器（若存在）。
   @discardableResult
-  func openCandidates(cursor override: Int? = nil) -> CtlCandidateProtocol? {
+  func openCandidates(cursor override: Int? = nil) -> CtlCandidateProtocolCore? {
     if let override {
       let limited = Swift.max(0, Swift.min(override, testHandler.assembler.length))
       testHandler.assembler.cursor = limited

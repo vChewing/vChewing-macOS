@@ -7,8 +7,6 @@
 // requirements defined in MIT License.
 
 import AppKit
-import Foundation
-import Shared
 
 extension SettingsPanesCocoa {
   public class Output: NSViewController {

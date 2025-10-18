@@ -128,6 +128,7 @@
 		5BA8C30128DEFE4F004C5CC4 /* vChewing_CandidateWindow */ = {isa = PBXFileReference; lastKnownFileType = wrapper; name = vChewing_CandidateWindow; path = Packages/vChewing_CandidateWindow; sourceTree = "<group>"; };
 		5BAD29D12B7E1A1B0013D695 /* vChewing_KimoDataReader */ = {isa = PBXFileReference; lastKnownFileType = wrapper; name = vChewing_KimoDataReader; path = Packages/vChewing_KimoDataReader; sourceTree = "<group>"; };
 		5BAD67E12ADAB62D005A4842 /* HangarRash_SwiftyCapsLockToggler */ = {isa = PBXFileReference; lastKnownFileType = wrapper; name = HangarRash_SwiftyCapsLockToggler; path = Packages/HangarRash_SwiftyCapsLockToggler; sourceTree = "<group>"; };
+		5BBB42A42EA3E55A0097FA88 /* vChewing_Shared_DarwinImpl */ = {isa = PBXFileReference; lastKnownFileType = folder; name = vChewing_Shared_DarwinImpl; path = "/Users/shikisuen/Repos/!vChewing/vChewing-macOS/Packages/vChewing_Shared_DarwinImpl"; sourceTree = "<absolute>"; };
 		5BBBB75D27AED54C0023B93A /* Beep.m4a */ = {isa = PBXFileReference; lastKnownFileType = file; path = Beep.m4a; sourceTree = "<group>"; };
 		5BBBB75E27AED54C0023B93A /* Fart.m4a */ = {isa = PBXFileReference; lastKnownFileType = file; path = Fart.m4a; sourceTree = "<group>"; };
 		5BBC2DA228F5212100C986F6 /* RelocationDetector.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RelocationDetector.swift; sourceTree = "<group>"; };
@@ -347,6 +348,7 @@
 				5B765F07293A250000122315 /* vChewing_PhraseEditorUI */,
 				5BC5E02228DE07250094E427 /* vChewing_PopupCompositionBuffer */,
 				5B963C9E28D5C14600DCEE88 /* vChewing_Shared */,
+				5BBB42A42EA3E55A0097FA88 /* vChewing_Shared_DarwinImpl */,
 				5B963CA128D5C22D00DCEE88 /* vChewing_SwiftExtension */,
 				5BDB7A3628D47587001AC277 /* vChewing_Tekkon */,
 				5BC5E01F28DDEFD80094E427 /* vChewing_TooltipUI */,

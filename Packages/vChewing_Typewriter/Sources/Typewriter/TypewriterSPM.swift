@@ -6,16 +6,17 @@
 // marks, or product names of Contributor, except as required to fulfill notice
 // requirements defined in MIT License.
 
-#if canImport(Darwin)
+@_exported import BrailleSputnik
+@_exported import LangModelAssembly
+@_exported import Megrez
+@_exported import Shared
+@_exported import SwiftExtension
+@_exported import Tekkon
 
-  import Foundation
-
-  @objcMembers
-  public class Broadcaster: NSObject {
-    public static var shared = Broadcaster()
-
-    public dynamic var eventForReloadingPhraseEditor = UUID()
-    public dynamic var eventForClosingAllPanels = UUID()
-  }
-
+#if canImport(Musl)
+  @_exported import Musl
+#elseif canImport(Glibc)
+  @_exported import Glibc
+#elseif canImport(Darwin)
+  @_exported import Darwin
 #endif

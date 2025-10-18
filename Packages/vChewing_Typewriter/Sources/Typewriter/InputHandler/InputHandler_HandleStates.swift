@@ -9,7 +9,6 @@
 /// 該檔案乃輸入調度模組的用以承載「根據按鍵行為來調控模式」的各種成員函式的部分。
 
 import Foundation
-import Shared
 
 // MARK: - § 根據按鍵行為來調控模式的函式 (Functions Interact With States).
 

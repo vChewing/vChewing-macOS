@@ -7,10 +7,6 @@
 // requirements defined in MIT License.
 
 import AppKit
-import Foundation
-import LangModelAssembly
-import Shared
-import SwiftExtension
 
 // MARK: - SettingsPanesCocoa.Phrases
 

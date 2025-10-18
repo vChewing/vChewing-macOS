@@ -6,8 +6,6 @@
 // marks, or product names of Contributor, except as required to fulfill notice
 // requirements defined in MIT License.
 
-import Foundation
-
 public enum LatinKeyboardMappings: String, CaseIterable {
   case qwerty = "com.apple.keylayout.ABC"
   case qwertyBritish = "com.apple.keylayout.British"

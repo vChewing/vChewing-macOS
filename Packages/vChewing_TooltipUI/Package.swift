@@ -13,15 +13,13 @@ let package = Package(
     ),
   ],
   dependencies: [
-    .package(path: "../vChewing_OSFrameworkImpl"),
-    .package(path: "../vChewing_Shared"),
+    .package(path: "../vChewing_Shared_DarwinImpl"),
   ],
   targets: [
     .target(
       name: "TooltipUI",
       dependencies: [
-        .product(name: "OSFrameworkImpl", package: "vChewing_OSFrameworkImpl"),
-        .product(name: "Shared", package: "vChewing_Shared"),
+        .product(name: "Shared_DarwinImpl", package: "vChewing_Shared_DarwinImpl"),
       ]
     ),
   ]

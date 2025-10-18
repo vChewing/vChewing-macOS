@@ -9,7 +9,6 @@
 /// 該檔案用來處理 InputHandler.HandleInput() 當中的與組字有關的行為。
 
 import Foundation
-import Shared
 
 extension InputHandlerProtocol {
   /// 用來處理 InputHandler.HandleInput() 當中的與組字有關的行為。
@@ -60,14 +59,12 @@ extension InputHandlerProtocol {
       when condition: Bool,
       allowDuplicates: Bool = true
     ) {
-      #if canImport(Darwin)
-        guard condition else { return }
-        let maybeKey = maybeKey ?? composer
-          .phonabetKeyForQuery(pronounceableOnly: prefs.acceptLeadingIntonations)
-        guard var keyToNarrate = maybeKey else { return }
-        if composer.intonation == Phonabet(" ") { keyToNarrate.append("ˉ") }
-        SpeechSputnik.shared.narrate(keyToNarrate, allowDuplicates: allowDuplicates)
-      #endif
+      guard condition, let narrator else { return }
+      let maybeKey = maybeKey ?? composer
+        .phonabetKeyForQuery(pronounceableOnly: prefs.acceptLeadingIntonations)
+      guard var keyToNarrate = maybeKey else { return }
+      if composer.intonation == Phonabet(" ") { keyToNarrate.append("ˉ") }
+      narrator.narrate(keyToNarrate, allowDuplicates: allowDuplicates)
     }
 
     // 這裡 inputValidityCheck() 是讓注拼槽檢查 charCode 這個 UniChar 是否是合法的注音輸入。

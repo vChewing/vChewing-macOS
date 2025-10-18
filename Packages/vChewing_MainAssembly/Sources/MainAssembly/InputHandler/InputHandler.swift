@@ -7,9 +7,6 @@
 // requirements defined in MIT License.
 
 import Foundation
-import LangModelAssembly
-import Shared
-import Typewriter
 
 // MARK: - InputHandler
 
@@ -47,6 +44,8 @@ public final class InputHandler: InputHandlerProtocol {
 
   public static var keySeparator: String { Assembler.theSeparator }
 
+  public var isJISKeyboard: (() -> Bool)? = { IMEApp.isKeyboardJIS }
+
   /// 委任物件 (SessionCtl)，以便呼叫其中的函式。
   public weak var session: Session?
   public var prefs: PrefMgrProtocol
@@ -54,6 +53,7 @@ public final class InputHandler: InputHandlerProtocol {
   public var notificationCallback: ((String) -> ())?
   public var pomSaveCallback: (() -> ())?
   public var filterabilityChecker: ((_ state: IMEStateData) -> Bool)?
+  public var narrator: (any SpeechNarratorProtocol)? = SpeechSputnik.shared
 
   /// 用來記錄「叫出選字窗前」的游標位置的變數。
   public var backupCursor: Int?
