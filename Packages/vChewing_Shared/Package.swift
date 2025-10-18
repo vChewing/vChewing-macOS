@@ -3,9 +3,6 @@ import PackageDescription
 
 let package = Package(
   name: "Shared",
-  platforms: [
-    .macOS(.v11),
-  ],
   products: [
     .library(
       name: "Shared",
