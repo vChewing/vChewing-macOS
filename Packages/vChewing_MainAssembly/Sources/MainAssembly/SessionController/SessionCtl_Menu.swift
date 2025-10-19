@@ -189,7 +189,12 @@ extension SessionCtl {
 
   @objc
   public func showCheatSheet(_: Any? = nil) {
-    autoreleasepool {}
+    autoreleasepool {
+      guard let url = Bundle.main.url(forResource: "shortcuts", withExtension: "html") else {
+        return
+      }
+      FileOpenMethod.safari.open(url: url)
+    }
   }
 
   @objc
