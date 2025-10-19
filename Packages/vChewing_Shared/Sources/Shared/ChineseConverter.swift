@@ -61,7 +61,7 @@ public enum ChineseConverter {
 
   // MARK: Private
 
-  private static var punctuationConversionTable: [(String, String)] = [
+  private static let punctuationConversionTable: [(String, String)] = [
     ("【", "︻"), ("】", "︼"), ("〖", "︗"), ("〗", "︘"), ("〔", "︹"), ("〕", "︺"), ("《", "︽"), ("》", "︾"),
     ("〈", "︿"), ("〉", "﹀"), ("「", "﹁"), ("」", "﹂"), ("『", "﹃"), ("』", "﹄"), ("｛", "︷"), ("｝", "︸"),
     ("（", "︵"), ("）", "︶"), ("［", "﹇"), ("］", "﹈"), ("…", "⋮"),
