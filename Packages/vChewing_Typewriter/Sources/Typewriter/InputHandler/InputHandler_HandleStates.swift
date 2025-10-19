@@ -854,7 +854,7 @@ extension InputHandlerProtocol {
       while retryCount < maxRetries {
         consolidateNode(
           candidate: candidates[newIndex], respectCursorPushing: false,
-          preConsolidate: retryCount == 0, skipObservation: true
+          preConsolidate: retryCount > 0, skipObservation: true
         )
 
         let currentSentence = assembler.assembledSentence
