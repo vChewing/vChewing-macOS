@@ -6,7 +6,7 @@
 
 extension Megrez {
   /// 語言模型的基礎資料單位類型。
-  public final class Unigram: Codable, CustomStringConvertible, Equatable, Hashable {
+  public struct Unigram: Codable, CustomStringConvertible, Equatable, Hashable {
     // MARK: Lifecycle
 
     /// 建立語言模型基礎資料單位副本。基礎資料單位由索引鍵陣列、詞彙內容與統計權重組成。
@@ -14,21 +14,31 @@ extension Megrez {
     ///   - keyArray: 對應的索引鍵陣列。
     ///   - value: 詞彙內容。
     ///   - score: 統計權重（雙精度浮點數）。
-    public init(keyArray: [String] = [], value: String = "", score: Double = 0) {
+    ///   - id: 指定識別碼，預設會自動生成。
+    public init(
+      keyArray: [String] = [],
+      value: String = "",
+      score: Double = 0,
+      id: FIUUID = .init()
+    ) {
+      self.id = id
       self.keyArray = keyArray
       self.value = value
       self.score = score
     }
 
-    public required init(from decoder: any Decoder) throws {
+    public init(from decoder: any Decoder) throws {
       let container = try decoder.container(keyedBy: CodingKeys.self)
       self.keyArray = try container.decode([String].self, forKey: .keyArray)
       self.value = try container.decode(String.self, forKey: .value)
       self.score = try container.decode(Double.self, forKey: .score)
+      self.id = .init()
     }
 
     // MARK: Public
 
+    /// 單元圖識別碼。
+    public let id: FIUUID
     /// 對應的索引鍵陣列。
     public let keyArray: [String]
     /// 詞彙內容，可以是單字或詞組。
@@ -48,16 +58,16 @@ extension Megrez {
     }
 
     /// 單元圖的淺層複製品（保持相同的索引鍵陣列）。
-    public var copy: Unigram { copy(withKeyArray: nil) }
+    public var copy: Self { copy(withKeyArray: nil) }
 
-    public static func == (lhs: Unigram, rhs: Unigram) -> Bool {
+    public static func == (lhs: Self, rhs: Self) -> Bool {
       lhs.keyArray == rhs.keyArray && lhs.value == rhs.value && lhs.score == rhs.score
     }
 
     /// 建立一個新的單元圖副本。
     /// - Parameter keyArrayOverride: 若指定，則使用新的索引鍵陣列。
     /// - Returns: 單元圖副本。
-    public func copy(withKeyArray keyArrayOverride: [String]? = nil) -> Unigram {
+    public func copy(withKeyArray keyArrayOverride: [String]? = nil) -> Self {
       .init(keyArray: keyArrayOverride ?? keyArray, value: value, score: score)
     }
 

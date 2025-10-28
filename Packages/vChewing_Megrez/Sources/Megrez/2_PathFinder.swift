@@ -63,6 +63,7 @@ extension Megrez {
 
       // 回溯構建最佳路徑
       var currentPos = keyCount
+      var reversedSentence = [Megrez.GramInPath]()
 
       // 從終點開始回溯
       while currentPos > 0 {
@@ -71,8 +72,12 @@ extension Megrez {
           gram: node.currentUnigram,
           isOverridden: node.isOverridden
         )
-        newAssembledSentence.insert(insertable, at: 0)
+        reversedSentence.append(insertable)
         currentPos -= node.keyArray.count
+      }
+
+      if !reversedSentence.isEmpty {
+        newAssembledSentence = reversedSentence.reversed()
       }
     }
   }
