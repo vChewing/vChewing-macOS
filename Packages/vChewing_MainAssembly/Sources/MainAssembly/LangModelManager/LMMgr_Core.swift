@@ -78,7 +78,7 @@ extension Shared.InputMode {
 
 // MARK: - LMMgr
 
-public class LMMgr {
+public final class LMMgr {
   // MARK: Public
 
   public static var shared = LMMgr()
@@ -260,22 +260,7 @@ public class LMMgr {
   // MARK: POM
 
   public static func savePerceptionOverrideModelData(_ saveAllModes: Bool = true) {
-    let globalQueue = DispatchQueue(
-      label: "LMAssembly_POM",
-      qos: .unspecified,
-      attributes: .concurrent
-    )
-    let group = DispatchGroup()
-    let cases = saveAllModes ? [IMEApp.currentInputMode] : Shared.InputMode.allCases
-    cases.forEach { mode in
-      group.enter()
-      globalQueue.async {
-        mode.langModel.savePOMData()
-        group.leave()
-      }
-    }
-    _ = group.wait(timeout: .distantFuture)
-    group.notify(queue: DispatchQueue.main) {}
+    pomSavingCoordinator.savePerceptionOverrideModelData(saveAllModes: saveAllModes)
   }
 
   public static func bleachSpecifiedSuggestions(targets: [String], mode: Shared.InputMode) {
@@ -374,6 +359,11 @@ public class LMMgr {
 
   // MARK: Private
 
+  // Debouncer for POM saves (keep compatible with 10.9)
+  private static let pomSavingCoordinator = POMSavingCoordinator(
+    queueName: "LMAssembly_POM", pomDebounceInterval: 2.0
+  )
+
   private static var unitTestRootURL: URL?
   private static var unitTestDefaultURL: URL?
   private static var unitTestCustomURL: URL?
@@ -383,6 +373,70 @@ public class LMMgr {
       try FileManager.default.createDirectory(at: url, withIntermediateDirectories: true)
     } catch {
       assertionFailure("Failed to ensure unit test sandbox directory: \(error)")
+    }
+  }
+}
+
+// MARK: LMMgr.POMSavingCoordinator
+
+extension LMMgr {
+  private final class POMSavingCoordinator {
+    // MARK: Lifecycle
+
+    init(
+      queueName: String,
+      pomDebounceInterval: TimeInterval = 2.0
+    ) {
+      self.pomDebounceQueue = DispatchQueue(label: queueName)
+      self.pomDebounceInterval = pomDebounceInterval
+      self.pomPendingSave4AllModes = false
+      self.pomDebounceToken = 0
+    }
+
+    // MARK: Internal
+
+    func savePerceptionOverrideModelData(
+      saveAllModes: Bool = true
+    ) {
+      // 這樣故意繞到 Static 方法上，是為了防止在 async block 裡面引用到 self。
+      Self.savePerceptionOverrideModelData(saveAllModes, coordinator: self)
+    }
+
+    // MARK: Private
+
+    private let pomDebounceQueue: DispatchQueue
+    private let pomDebounceInterval: TimeInterval
+    private var pomPendingSave4AllModes: Bool
+    private var pomDebounceToken: Int
+
+    private static func savePerceptionOverrideModelData(
+      _ saveAllModes: Bool = true,
+      coordinator c: POMSavingCoordinator
+    ) {
+      // Debounce frequent save requests to reduce IO churn.
+      c.pomDebounceQueue.async {
+        // Merge intent (escalate to all-modes if any pending requested it)
+        c.mergeIntent4PendingSaveAllModes(saveAllModes)
+        // Increment token to cancel any pending scheduled save
+        c.pomDebounceToken &+= 1
+        let currentToken = c.pomDebounceToken
+        let interval = c.pomDebounceInterval
+        // Sleep-based debounce to support macOS 10.9
+        let usec = UInt32(interval * 1_000_000.0)
+        usleep(usec)
+        // If a new request arrived during debounce, skip this run
+        if currentToken != c.pomDebounceToken { return }
+        let doAll = c.pomPendingSave4AllModes
+        c.pomPendingSave4AllModes = false
+        let cases = doAll ? Shared.InputMode.allCases : [IMEApp.currentInputMode]
+        cases.forEach { mode in
+          mode.langModel.savePOMData()
+        }
+      }
+    }
+
+    private func mergeIntent4PendingSaveAllModes(_ bool: Bool) {
+      pomPendingSave4AllModes = pomPendingSave4AllModes || bool
     }
   }
 }
