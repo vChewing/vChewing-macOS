@@ -45,9 +45,9 @@
 ### 關鍵模組
 
 - Packages/vChewing_MainAssembly：IMK 進入點與整合（SessionCtl → InputSession）。InputSession 也參與態械管理。
-- Packages/vChewing_Typewriter：輸入處理邏輯、態械與鍵盤事件分診
+- Packages/vChewing_Typewriter：輸入處理邏輯、態械與鍵盤事件分診。
 - Packages/vChewing_Tekkon：注音（ㄅㄆㄇㄈ）鍵盤與音節組合。
-- Packages/vChewing_Megrez：句子組裝（DAG 動態規劃求最大分數路徑）。
+- Packages/vChewing_Megrez：句子組裝（DAG-DP 動態規劃求最大分數路徑）。
 - Packages/vChewing_LangModelAssembly：語言模型匯流與資料來源整合。
 - Source/Data：字典與語料的編譯器與產物（git 子模組）。
 
@@ -67,9 +67,9 @@
 注拼並擊處理引擎「Tekkon (齊鐵恨)」提供鍵盤布局（如標準注音、倚天、許氏等）與音節組合規則，將鍵盤事件流轉為合法的注音鍵序列。
 
 - 該引擎的並擊是指：聲母介母韻母可以亂序輸入，但聲調鍵確認音節組合。
-- 非法鍵組會被拒收或等待補齊（如聲母後必須接介音/韻母；輕聲與聲調處理）
-- 支援多種鍵盤排列與使用者偏好（如「ㄓㄔㄕ」是否允許單獨作韻）
-- 產物是「鍵序列」，之後交由語言模型查詢
+- 非法鍵組會被拒收或等待補齊（如聲母後必須接介音/韻母；輕聲與聲調處理）。
+- 支援多種鍵盤排列與使用者偏好（如「ㄓㄔㄕ」是否允許單獨作韻）。
+- 產物是「鍵序列」，之後交由語言模型查詢。
 
 > 關鍵檔案：Packages/vChewing_Tekkon/Sources/Tekkon/
 
@@ -83,10 +83,10 @@ Typewriter 是可以在 Linux 系統下建置的 Swift Package，以一個比較
 
 ### KBEvent 轉換與分診
 
-- SessionCtl 將 NSEvent 轉 KBEvent
+- SessionCtl 將 NSEvent 轉 KBEvent；
 - InputHandler 根據 KBEvent 與目前 IMEState 決定：
   - 交由 Tekkon 組音、或
-  - 觸發候選導覽、遞交（俗稱「上屏」）、撤銷等動作
+  - 觸發候選導覽、遞交（俗稱「上屏」）、撤銷等動作。
 
 ### IMEState 狀態與轉移
 
