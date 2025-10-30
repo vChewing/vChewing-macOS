@@ -96,6 +96,9 @@ public struct PrefMgr: PrefMgrProtocol {
   @AppProperty(key: UserDef.kCheckAbusersOfSecureEventInputAPI.rawValue, defaultValue: true)
   public var checkAbusersOfSecureEventInputAPI: Bool
 
+  @AppProperty(key: UserDef.kEnableVoiceOverForCandidatesAndComposition.rawValue, defaultValue: true)
+  public var enableVoiceOverForCandidatesAndComposition: Bool
+
   @AppProperty(key: UserDef.kDeltaOfCalendarYears.rawValue, defaultValue: -2_000)
   public var deltaOfCalendarYears: Int
 

@@ -54,6 +54,9 @@
     /// Handle session state changes and announce appropriate content to VoiceOver.
     /// - Parameter session: The current input session.
     public func handle(session: InputSession) {
+      // Check if feature is enabled in preferences
+      guard PrefMgr.shared.enableVoiceOverForCandidatesAndComposition else { return }
+
       // Check if VoiceOver is enabled
       guard isVoiceOverEnabled else { return }
 
@@ -81,6 +84,7 @@
       candidates: [(keyArray: [String], value: String)],
       highlightedIndex: Int
     ) {
+      guard PrefMgr.shared.enableVoiceOverForCandidatesAndComposition else { return }
       guard isVoiceOverEnabled else { return }
       guard !isSecureInputActive else { return }
 
@@ -107,6 +111,7 @@
     ///   - compositionText: The text being composed.
     ///   - cursorPosition: Optional cursor position within the composition.
     public func announceComposition(compositionText: String, cursorPosition: Int? = nil) {
+      guard PrefMgr.shared.enableVoiceOverForCandidatesAndComposition else { return }
       guard isVoiceOverEnabled else { return }
       guard !isSecureInputActive else { return }
 

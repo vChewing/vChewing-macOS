@@ -14,6 +14,7 @@ public protocol PrefMgrProtocol {
   var alwaysUsePCBWithElectronBasedClients: Bool { get set }
   var securityHardenedCompositionBuffer: Bool { get set }
   var checkAbusersOfSecureEventInputAPI: Bool { get set }
+  var enableVoiceOverForCandidatesAndComposition: Bool { get set }
   var deltaOfCalendarYears: Int { get set }
   var mostRecentInputMode: String { get set }
   var useExternalFactoryDict: Bool { get set }

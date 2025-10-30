@@ -20,6 +20,7 @@ public enum UserDef: String, CaseIterable, Identifiable {
   case kAlwaysUsePCBWithElectronBasedClients = "AlwaysUsePCBWithElectronBasedClients"
   case kSecurityHardenedCompositionBuffer = "SecurityHardenedCompositionBuffer"
   case kCheckAbusersOfSecureEventInputAPI = "CheckAbusersOfSecureEventInputAPI"
+  case kEnableVoiceOverForCandidatesAndComposition = "EnableVoiceOverForCandidatesAndComposition"
   case kDeltaOfCalendarYears = "DeltaOfCalendarYears"
   case kMostRecentInputMode = "MostRecentInputMode"
   case kCassettePath = "CassettePath"
@@ -177,6 +178,7 @@ extension UserDef {
     case .kAlwaysUsePCBWithElectronBasedClients: return .bool
     case .kSecurityHardenedCompositionBuffer: return .bool
     case .kCheckAbusersOfSecureEventInputAPI: return .bool
+    case .kEnableVoiceOverForCandidatesAndComposition: return .bool
     case .kDeltaOfCalendarYears: return .integer
     case .kMostRecentInputMode: return .string
     case .kCassettePath: return .string
@@ -291,6 +293,10 @@ extension UserDef {
     case .kCheckAbusersOfSecureEventInputAPI: return .init(
         userDef: self, shortTitle: "i18n:UserDef.kCheckAbusersOfSecureEventInputAPI.shortTitle",
         description: "i18n:userdef.kCheckAbusersOfSecureEventInputAPI.description"
+      )
+    case .kEnableVoiceOverForCandidatesAndComposition: return .init(
+        userDef: self, shortTitle: "Enable VoiceOver announcements for input",
+        description: "When enabled, vChewing will announce candidate selections and composition changes to VoiceOver. Automatically disabled in secure input mode (e.g., password fields) for privacy."
       )
     case .kDeltaOfCalendarYears: return nil
     case .kMostRecentInputMode: return nil
