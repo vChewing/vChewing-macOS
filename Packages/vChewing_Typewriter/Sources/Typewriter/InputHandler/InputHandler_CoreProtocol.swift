@@ -115,7 +115,7 @@ extension InputHandlerProtocol {
   ///   - preConsolidate: 在固化節點之前，先鞏固上下文。該選項可能會破壞在內文組字區內就地輪替候選字詞時的體驗。
   ///   - skipObservation: 不要讓漸退記憶模組對此做出觀察。
   public func consolidateNode(
-    candidate: (keyArray: [String], value: String),
+    candidate: CandidateInState,
     respectCursorPushing: Bool = true,
     preConsolidate: Bool = false,
     skipObservation: Bool = false
@@ -411,7 +411,7 @@ extension InputHandlerProtocol {
     keyArray: [String],
     value: String
   )] {
-    var arrResult: [(keyArray: [String], value: String)] = []
+    var arrResult: [CandidateInState] = []
     pairs.forEach { pair in
       if currentLM.hasAssociatedPhrasesFor(pair: pair) {
         let arrFetched: [String] = currentLM.associatedPhrasesFor(pair: pair)
@@ -462,7 +462,7 @@ extension InputHandlerProtocol {
   }
 
   /// 獲取候選字詞（包含讀音）陣列資料內容。
-  func generateArrayOfCandidates(fixOrder: Bool = true) -> [(keyArray: [String], value: String)] {
+  func generateArrayOfCandidates(fixOrder: Bool = true) -> [CandidateInState] {
     /// 警告：不要對游標前置風格使用 nodesCrossing，否則會導致游標行為與 macOS 內建注音輸入法不一致。
     /// 微軟新注音輸入法的游標後置風格也是不允許 nodeCrossing 的。
     var arrCandidates: [Megrez.KeyValuePaired] = {
