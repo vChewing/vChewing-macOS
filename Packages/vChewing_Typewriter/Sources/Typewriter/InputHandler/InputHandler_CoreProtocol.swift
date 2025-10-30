@@ -215,9 +215,9 @@ extension InputHandlerProtocol {
     }
   }
 
-  public func previewCompositionBufferForCandidate(at index: Int) {
+  public func previewCurrentCandidateAtCompositionBuffer() {
     guard let session = session, session.state.type == .ofCandidates,
-          (0 ..< session.state.candidates.count).contains(index)
+          let highlightedPair = session.state.currentCandidate
     else {
       return
     }
@@ -231,7 +231,6 @@ extension InputHandlerProtocol {
       assembler.marker = currentMarker
     }
     var theState = session.state
-    let highlightedPair = theState.candidates[index]
     consolidateNode(
       candidate: highlightedPair,
       respectCursorPushing: false,

@@ -61,6 +61,9 @@ open class CtlCandidate: NSWindowController, CtlCandidateProtocol {
   open var visible = false {
     didSet {
       NSObject.cancelPreviousPerformRequests(withTarget: self)
+      if let delegate, oldValue != visible {
+        delegate.candidatePairHighlightChanged(at: visible ? 0 : nil)
+      }
       asyncOnMain { [weak self] in
         guard let self = self else { return }
         _ = self.visible ? self.window?.orderFront(self) : self.window?.orderOut(self)
