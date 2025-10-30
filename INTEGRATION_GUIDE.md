@@ -79,6 +79,8 @@ var highlightedCandidateIndex: Int = 0 {
 
 **Location**: After composer updates
 
+**Note**: This is optional if state changes already trigger VoiceOver updates. Use only if you want more granular composition announcements.
+
 ```swift
 // After updating the composer (注拼槽)
 func handlePhoneticInput(_ key: String) {
@@ -86,7 +88,7 @@ func handlePhoneticInput(_ key: String) {
   
   // ... existing state update code ...
   
-  // Notify VoiceOver of composition change
+  // Notify VoiceOver of composition change (optional if state changes cover this)
   #if canImport(AppKit)
     notifyVoiceOverCompositionChange(
       text: composer.value,
@@ -98,9 +100,9 @@ func handlePhoneticInput(_ key: String) {
 
 ### 4. Candidate Window Configuration
 
-**File**: Where candidate window is created (likely in `Packages/vChewing_CandidateWindow/`)
+**File**: Candidate window controller (look in `Packages/vChewing_CandidateWindow/Sources/CandidateWindow/` for files like `CtlCandidate.swift` or similar)
 
-**Location**: In candidate window initialization
+**Location**: In candidate window initialization or `windowDidLoad()`
 
 ```swift
 // In candidate window controller initialization
@@ -142,7 +144,7 @@ func createCandidateWindow() -> NSWindow {
 
 **For SwiftUI (SettingsUI)**
 
-**File**: `Packages/vChewing_MainAssembly/Sources/MainAssembly/Settings/SettingsUI/VwrSettingsPaneGeneral.swift`
+**File**: Look for appropriate settings pane file in `Packages/vChewing_MainAssembly/Sources/MainAssembly/Settings/SettingsUI/` (e.g., accessibility or general settings pane)
 
 Add toggle in appropriate settings pane:
 
@@ -162,7 +164,7 @@ private var enableVoiceOverForCandidatesAndComposition: Bool = true
 
 **For Cocoa (SettingsCocoa)**
 
-**File**: `Packages/vChewing_MainAssembly/Sources/MainAssembly/Settings/SettingsCocoa/VwrSettingsPaneCocoaGeneral.swift`
+**File**: Look for appropriate settings pane file in `Packages/vChewing_MainAssembly/Sources/MainAssembly/Settings/SettingsCocoa/` (e.g., accessibility or general settings pane)
 
 Add using DSL:
 
@@ -213,9 +215,9 @@ extension InputHandler {
     // Transition to new state
     transitionToState(newState)
     
-    // Notify VoiceOver of composition (this is redundant if transitionToState already calls notifyVoiceOverStateChange)
-    // Only call if you want more specific composition announcements
-    // notifyVoiceOverCompositionChange(text: compositionText, cursorPosition: composer.cursor)
+    // Note: updateVoiceOver() is called automatically in transitionToState via switchState
+    // Only call notifyVoiceOverCompositionChange separately if you need more granular announcements
+    // Example: notifyVoiceOverCompositionChange(text: compositionText, cursorPosition: composer.cursor)
   }
 }
 ```
