@@ -196,12 +196,14 @@ extension SessionProtocol {
     return convertedCandidates
   }
 
-  public func candidatePairHighlightChanged(at theIndex: Int) {
+  public func candidatePairHighlightChanged(at theIndex: Int?) {
     guard let inputHandler = inputHandler else { return }
-    guard state.isCandidateContainer else { return }
+    guard state.highlightedCandidateIndex != theIndex else { return }
+    state.highlightedCandidateIndex = theIndex
+    guard state.isCandidateContainer, let theIndex else { return }
     switch state.type {
     case .ofCandidates where (0 ..< state.candidates.count).contains(theIndex):
-      inputHandler.previewCompositionBufferForCandidate(at: theIndex)
+      inputHandler.previewCurrentCandidateAtCompositionBuffer()
     case .ofSymbolTable where (0 ..< state.node.members.count).contains(theIndex):
       let node = state.node.members[theIndex]
       if node.members.isEmpty {
