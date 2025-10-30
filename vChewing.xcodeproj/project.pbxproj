@@ -669,7 +669,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/bash;
-			shellScript = "# Type a script or drag a script file from your workspace to insert its path.\ncd ${SRCROOT}/Source/Data/\nswift run VCDataBuilder vanguardSQLLegacy\n";
+			shellScript = "# Type a script or drag a script file from your workspace to insert its path.\ncd ${SRCROOT}/Source/Data/\n/usr/bin/swift run -c release VCDataBuilder vanguardSQLLegacy\n";
 		};
 		6A225A2023679F5F00F685C6 /* ShellScript */ = {
 			isa = PBXShellScriptBuildPhase;
