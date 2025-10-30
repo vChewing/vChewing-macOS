@@ -84,7 +84,7 @@ extension MockIMEState {
     return result
   }
 
-  public static func ofAssociates(candidates: [(keyArray: [String], value: String)]) -> MockIMEState {
+  public static func ofAssociates(candidates: [CandidateInState]) -> MockIMEState {
     var result = MockIMEState(type: .ofAssociates)
     result.candidates = candidates
     return result
@@ -119,7 +119,7 @@ extension MockIMEState {
   }
 
   public static func ofCandidates(
-    candidates: [(keyArray: [String], value: String)],
+    candidates: [CandidateInState],
     displayTextSegments: [String],
     cursor: Int
   )
@@ -328,7 +328,7 @@ public class MockSession: SessionCoreProtocol, CtlCandidateDelegateCore {
 
   public func candidateController() -> CtlCandidateProtocolCore? { nil }
 
-  public func candidatePairs(conv _: Bool) -> [(keyArray: [String], value: String)] {
+  public func candidatePairs(conv _: Bool) -> [CandidateInState] {
     if !state.isCandidateContainer || state.candidates.isEmpty { return [] }
     return state.candidates
   }
