@@ -25,7 +25,7 @@ public class CandidatePool {
   ///   - direction: 橫向排列還是縱向排列（預設情況下是縱向）。
   ///   - locale: 區域編碼。例：「zh-Hans」或「zh-Hant」。
   public init(
-    candidates: [(keyArray: [String], value: String)], lines: Int = 3,
+    candidates: [CandidateInState], lines: Int = 3,
     isExpanded expanded: Bool = true, selectionKeys: String = "123456789",
     layout: LayoutOrientation = .vertical, locale: String = ""
   ) {
@@ -148,7 +148,7 @@ public class CandidatePool {
   ///   - direction: 橫向排列還是縱向排列（預設情況下是縱向）。
   ///   - locale: 區域編碼。例：「zh-Hans」或「zh-Hant」。
   private func construct(
-    candidates: [(keyArray: [String], value: String)], selectionKeys: String = "123456789",
+    candidates: [CandidateInState], selectionKeys: String = "123456789",
     layout: LayoutOrientation = .vertical, locale: String = ""
   ) {
     self.layout = layout

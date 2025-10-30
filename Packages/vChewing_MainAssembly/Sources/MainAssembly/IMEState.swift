@@ -100,7 +100,7 @@ extension IMEStateProtocol {
     return result
   }
 
-  public static func ofAssociates(candidates: [(keyArray: [String], value: String)]) -> IMEState {
+  public static func ofAssociates(candidates: [CandidateInState]) -> IMEState {
     var result = IMEState(type: .ofAssociates)
     result.candidates = candidates
     return result
@@ -136,7 +136,7 @@ extension IMEStateProtocol {
   }
 
   public static func ofCandidates(
-    candidates: [(keyArray: [String], value: String)],
+    candidates: [CandidateInState],
     displayTextSegments: [String],
     cursor: Int
   )
