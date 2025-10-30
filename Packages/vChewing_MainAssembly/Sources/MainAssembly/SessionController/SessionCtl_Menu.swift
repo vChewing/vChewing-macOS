@@ -144,352 +144,288 @@ extension SessionCtl {
 
   @objc
   public func switchInputMode(_: Any? = nil) {
-    autoreleasepool {
-      core?.toggleInputMode()
-    }
+    core?.toggleInputMode()
   }
 
   @objc
   override public func showPreferences(_: Any? = nil) {
-    autoreleasepool {
-      osCheck: if #available(macOS 14, *) {
-        switch NSEvent.keyModifierFlags {
-        case .option: break osCheck
-        default: CtlSettingsUI.show()
-        }
-        NSApp.popup()
-        return
+    osCheck: if #available(macOS 14, *) {
+      switch NSEvent.keyModifierFlags {
+      case .option: break osCheck
+      default: CtlSettingsUI.show()
       }
-      CtlSettingsCocoa.show()
       NSApp.popup()
+      return
     }
+    CtlSettingsCocoa.show()
+    NSApp.popup()
   }
 
   @objc
   public func showSettingsAppKit(_: Any? = nil) {
-    autoreleasepool {
-      CtlSettingsCocoa.show()
-      NSApp.popup()
-    }
+    CtlSettingsCocoa.show()
+    NSApp.popup()
   }
 
   @available(macOS 14, *)
   @objc
   public func showSettingsSwiftUI(_: Any? = nil) {
-    autoreleasepool {
-      CtlSettingsUI.show()
-      NSApp.popup()
-    }
+    CtlSettingsUI.show()
+    NSApp.popup()
   }
 
   @objc
   public func showCheatSheet(_: Any? = nil) {
-    autoreleasepool {
-      guard let url = Bundle.main.url(forResource: "shortcuts", withExtension: "html") else {
-        return
-      }
-      FileOpenMethod.safari.open(url: url)
+    guard let url = Bundle.main.url(forResource: "shortcuts", withExtension: "html") else {
+      return
     }
+    FileOpenMethod.safari.open(url: url)
   }
 
   @objc
   public func showClientListMgr(_: Any? = nil) {
-    autoreleasepool {
-      CtlClientListMgr.show()
-      NSApp.popup()
-    }
+    CtlClientListMgr.show()
+    NSApp.popup()
   }
 
   @objc
   public func showServiceMenuEditor(_: Any? = nil) {
-    autoreleasepool {
-      CtlServiceMenuEditor.show()
-      NSApp.popup()
-    }
+    CtlServiceMenuEditor.show()
+    NSApp.popup()
   }
 
   @objc
   public func toggleCassetteMode(_: Any? = nil) {
-    autoreleasepool {
-      core?.resetInputHandler(forceComposerCleanup: true)
-      if !PrefMgr.shared.cassetteEnabled,
-         !LMMgr.checkCassettePathValidity(PrefMgr.shared.cassettePath) {
-        asyncOnMain {
-          IMEApp.buzz()
-          let alert = NSAlert(error: "Path invalid or file access error.".localized)
-          let informativeText =
-            "Please reconfigure the cassette path to a valid one before enabling this mode."
-          alert.informativeText = informativeText.localized
-          let result = alert.runModal()
-          NSApp.popup()
-          if result == NSApplication.ModalResponse.alertFirstButtonReturn {
-            LMMgr.resetCassettePath()
-            PrefMgr.shared.cassetteEnabled = false
-          }
+    core?.resetInputHandler(forceComposerCleanup: true)
+    if !PrefMgr.shared.cassetteEnabled,
+       !LMMgr.checkCassettePathValidity(PrefMgr.shared.cassettePath) {
+      asyncOnMain {
+        IMEApp.buzz()
+        let alert = NSAlert(error: "Path invalid or file access error.".localized)
+        let informativeText =
+          "Please reconfigure the cassette path to a valid one before enabling this mode."
+        alert.informativeText = informativeText.localized
+        let result = alert.runModal()
+        NSApp.popup()
+        if result == NSApplication.ModalResponse.alertFirstButtonReturn {
+          LMMgr.resetCassettePath()
+          PrefMgr.shared.cassetteEnabled = false
         }
-        return
       }
-      Notifier.notify(
-        message: "CIN Cassette Mode".localized + "\n"
-          + (
-            PrefMgr.shared.cassetteEnabled.toggled()
-              ? "NotificationSwitchON".localized
-              : "NotificationSwitchOFF".localized
-          )
-      )
-      if let core, !core.inputMode.langModel.isCassetteDataLoaded {
-        LMMgr.loadCassetteData()
-      }
+      return
+    }
+    Notifier.notify(
+      message: "CIN Cassette Mode".localized + "\n"
+        + (
+          PrefMgr.shared.cassetteEnabled.toggled()
+            ? "NotificationSwitchON".localized
+            : "NotificationSwitchOFF".localized
+        )
+    )
+    if let core, !core.inputMode.langModel.isCassetteDataLoaded {
+      LMMgr.loadCassetteData()
     }
   }
 
   @objc
   public func toggleSCPCTypingMode(_: Any? = nil) {
-    autoreleasepool {
-      core?.resetInputHandler(forceComposerCleanup: true)
-      Notifier.notify(
-        message: "Per-Char Select Mode".localized + "\n"
-          + (
-            PrefMgr.shared.useSCPCTypingMode.toggled()
-              ? "NotificationSwitchON".localized
-              : "NotificationSwitchOFF".localized
-          )
-      )
-    }
+    core?.resetInputHandler(forceComposerCleanup: true)
+    Notifier.notify(
+      message: "Per-Char Select Mode".localized + "\n"
+        + (
+          PrefMgr.shared.useSCPCTypingMode.toggled()
+            ? "NotificationSwitchON".localized
+            : "NotificationSwitchOFF".localized
+        )
+    )
   }
 
   @objc
   public func toggleChineseConverter(_: Any? = nil) {
-    autoreleasepool {
-      core?.resetInputHandler(forceComposerCleanup: true)
-      Notifier.notify(
-        message: "Force KangXi Writing".localized + "\n"
-          + (
-            PrefMgr.shared.chineseConversionEnabled.toggled()
-              ? "NotificationSwitchON".localized
-              : "NotificationSwitchOFF".localized
-          )
-      )
-    }
+    core?.resetInputHandler(forceComposerCleanup: true)
+    Notifier.notify(
+      message: "Force KangXi Writing".localized + "\n"
+        + (
+          PrefMgr.shared.chineseConversionEnabled.toggled()
+            ? "NotificationSwitchON".localized
+            : "NotificationSwitchOFF".localized
+        )
+    )
   }
 
   @objc
   public func toggleShiftJISShinjitaiOutput(_: Any? = nil) {
-    autoreleasepool {
-      core?.resetInputHandler(forceComposerCleanup: true)
-      Notifier.notify(
-        message: "JIS Shinjitai Output".localized + "\n"
-          + (
-            PrefMgr.shared.shiftJISShinjitaiOutputEnabled.toggled()
-              ? "NotificationSwitchON".localized
-              : "NotificationSwitchOFF".localized
-          )
-      )
-    }
+    core?.resetInputHandler(forceComposerCleanup: true)
+    Notifier.notify(
+      message: "JIS Shinjitai Output".localized + "\n"
+        + (
+          PrefMgr.shared.shiftJISShinjitaiOutputEnabled.toggled()
+            ? "NotificationSwitchON".localized
+            : "NotificationSwitchOFF".localized
+        )
+    )
   }
 
   @objc
   public func toggleCurrencyNumerals(_: Any? = nil) {
-    autoreleasepool {
-      core?.resetInputHandler(forceComposerCleanup: true)
-      Notifier.notify(
-        message: "Currency Numeral Output".localized + "\n"
-          + (
-            PrefMgr.shared.currencyNumeralsEnabled.toggled()
-              ? "NotificationSwitchON".localized
-              : "NotificationSwitchOFF".localized
-          )
-      )
-    }
+    core?.resetInputHandler(forceComposerCleanup: true)
+    Notifier.notify(
+      message: "Currency Numeral Output".localized + "\n"
+        + (
+          PrefMgr.shared.currencyNumeralsEnabled.toggled()
+            ? "NotificationSwitchON".localized
+            : "NotificationSwitchOFF".localized
+        )
+    )
   }
 
   @objc
   public func toggleHalfWidthPunctuation(_: Any? = nil) {
-    autoreleasepool {
-      core?.resetInputHandler(forceComposerCleanup: true)
-      Notifier.notify(
-        message: "Half-Width Punctuation Mode".localized + "\n"
-          + (
-            PrefMgr.shared.halfWidthPunctuationEnabled.toggled()
-              ? "NotificationSwitchON".localized
-              : "NotificationSwitchOFF".localized
-          )
-      )
-    }
+    core?.resetInputHandler(forceComposerCleanup: true)
+    Notifier.notify(
+      message: "Half-Width Punctuation Mode".localized + "\n"
+        + (
+          PrefMgr.shared.halfWidthPunctuationEnabled.toggled()
+            ? "NotificationSwitchON".localized
+            : "NotificationSwitchOFF".localized
+        )
+    )
   }
 
   @objc
   public func toggleCNS11643Enabled(_: Any? = nil) {
-    autoreleasepool {
-      core?.resetInputHandler(forceComposerCleanup: true)
-      Notifier.notify(
-        message: "CNS11643 Mode".localized + "\n"
-          + (
-            PrefMgr.shared.cns11643Enabled.toggled()
-              ? "NotificationSwitchON".localized
-              : "NotificationSwitchOFF".localized
-          )
-      )
-    }
+    core?.resetInputHandler(forceComposerCleanup: true)
+    Notifier.notify(
+      message: "CNS11643 Mode".localized + "\n"
+        + (
+          PrefMgr.shared.cns11643Enabled.toggled()
+            ? "NotificationSwitchON".localized
+            : "NotificationSwitchOFF".localized
+        )
+    )
   }
 
   @objc
   public func toggleSymbolEnabled(_: Any? = nil) {
-    autoreleasepool {
-      core?.resetInputHandler(forceComposerCleanup: true)
-      Notifier.notify(
-        message: "Symbol & Emoji Input".localized + "\n"
-          + (
-            PrefMgr.shared.symbolInputEnabled.toggled()
-              ? "NotificationSwitchON".localized
-              : "NotificationSwitchOFF".localized
-          )
-      )
-    }
+    core?.resetInputHandler(forceComposerCleanup: true)
+    Notifier.notify(
+      message: "Symbol & Emoji Input".localized + "\n"
+        + (
+          PrefMgr.shared.symbolInputEnabled.toggled()
+            ? "NotificationSwitchON".localized
+            : "NotificationSwitchOFF".localized
+        )
+    )
   }
 
   @objc
   public func toggleAssociatedPhrasesEnabled(_: Any? = nil) {
-    autoreleasepool {
-      core?.resetInputHandler(forceComposerCleanup: true)
-      Notifier.notify(
-        message: "Associated Phrases".localized + "\n"
-          + (
-            PrefMgr.shared.associatedPhrasesEnabled.toggled()
-              ? "NotificationSwitchON".localized
-              : "NotificationSwitchOFF".localized
-          )
-      )
-    }
+    core?.resetInputHandler(forceComposerCleanup: true)
+    Notifier.notify(
+      message: "Associated Phrases".localized + "\n"
+        + (
+          PrefMgr.shared.associatedPhrasesEnabled.toggled()
+            ? "NotificationSwitchON".localized
+            : "NotificationSwitchOFF".localized
+        )
+    )
   }
 
   @objc
   public func togglePhraseReplacement(_: Any? = nil) {
-    autoreleasepool {
-      core?.resetInputHandler(forceComposerCleanup: true)
-      Notifier.notify(
-        message: "Use Phrase Replacement".localized + "\n"
-          + (
-            PrefMgr.shared.phraseReplacementEnabled.toggled()
-              ? "NotificationSwitchON".localized
-              : "NotificationSwitchOFF".localized
-          )
-      )
-    }
+    core?.resetInputHandler(forceComposerCleanup: true)
+    Notifier.notify(
+      message: "Use Phrase Replacement".localized + "\n"
+        + (
+          PrefMgr.shared.phraseReplacementEnabled.toggled()
+            ? "NotificationSwitchON".localized
+            : "NotificationSwitchOFF".localized
+        )
+    )
   }
 
   @objc
   public func selfUninstall(_: Any? = nil) {
-    autoreleasepool {
-      AppDelegate.shared.selfUninstall()
-    }
+    AppDelegate.shared.selfUninstall()
   }
 
   @objc
   public func selfTerminate(_: Any? = nil) {
-    autoreleasepool {
-      NSApp.popup()
-      NSApp.terminate(nil)
-    }
+    NSApp.popup()
+    NSApp.terminate(nil)
   }
 
   @objc
   public func checkForUpdate(_: Any? = nil) {
-    autoreleasepool {
-      let bundleID = core?.clientBundleIdentifier
-      AppDelegate.shared.checkUpdate(forced: true) {
-        bundleID == "com.apple.SecurityAgent"
-      }
+    let bundleID = core?.clientBundleIdentifier
+    AppDelegate.shared.checkUpdate(forced: true) {
+      bundleID == "com.apple.SecurityAgent"
     }
   }
 
   @objc
   public func openUserDataFolder(_: Any? = nil) {
-    autoreleasepool {
-      guard LMMgr.userDataFolderExists else { return }
-      let url = URL(fileURLWithPath: LMMgr.dataFolderPath(isDefaultFolder: false))
-      FileOpenMethod.finder.open(url: url)
-    }
+    guard LMMgr.userDataFolderExists else { return }
+    let url = URL(fileURLWithPath: LMMgr.dataFolderPath(isDefaultFolder: false))
+    FileOpenMethod.finder.open(url: url)
   }
 
   @objc
   public func openAppSupportFolderFromContainer(_: Any? = nil) {
-    autoreleasepool {
-      FileOpenMethod.finder.open(url: LMMgr.appSupportURL)
-    }
+    FileOpenMethod.finder.open(url: LMMgr.appSupportURL)
   }
 
   @objc
   public func openUserPhrases(_: Any? = nil) {
-    autoreleasepool {
-      LMMgr.openUserDictFile(type: .thePhrases, dual: optionKeyPressed, alt: optionKeyPressed)
-    }
+    LMMgr.openUserDictFile(type: .thePhrases, dual: optionKeyPressed, alt: optionKeyPressed)
   }
 
   @objc
   public func openExcludedPhrases(_: Any? = nil) {
-    autoreleasepool {
-      LMMgr.openUserDictFile(type: .theFilter, dual: optionKeyPressed, alt: optionKeyPressed)
-    }
+    LMMgr.openUserDictFile(type: .theFilter, dual: optionKeyPressed, alt: optionKeyPressed)
   }
 
   @objc
   public func openUserSymbols(_: Any? = nil) {
-    autoreleasepool {
-      LMMgr.openUserDictFile(type: .theSymbols, dual: optionKeyPressed, alt: optionKeyPressed)
-    }
+    LMMgr.openUserDictFile(type: .theSymbols, dual: optionKeyPressed, alt: optionKeyPressed)
   }
 
   @objc
   public func openPhraseReplacement(_: Any? = nil) {
-    autoreleasepool {
-      LMMgr.openUserDictFile(type: .theReplacements, dual: optionKeyPressed, alt: optionKeyPressed)
-    }
+    LMMgr.openUserDictFile(type: .theReplacements, dual: optionKeyPressed, alt: optionKeyPressed)
   }
 
   @objc
   public func openAssociatedPhrases(_: Any? = nil) {
-    autoreleasepool {
-      LMMgr.openUserDictFile(type: .theAssociates, dual: optionKeyPressed, alt: optionKeyPressed)
-    }
+    LMMgr.openUserDictFile(type: .theAssociates, dual: optionKeyPressed, alt: optionKeyPressed)
   }
 
   @objc
   public func reloadUserPhrasesData(_: Any? = nil) {
-    autoreleasepool {
-      LMMgr.initUserLangModels()
-    }
+    LMMgr.initUserLangModels()
   }
 
   @objc
   public func callReverseLookupWindow(_: Any? = nil) {
-    autoreleasepool {
-      CtlRevLookupWindow.show()
-    }
+    CtlRevLookupWindow.show()
   }
 
   @objc
   public func removeUnigramsFromPOM(_: Any? = nil) {
-    autoreleasepool {
-      LMMgr.removeUnigramsFromPerceptionOverrideModel(IMEApp.currentInputMode)
-      LMMgr.removeUnigramsFromPerceptionOverrideModel(IMEApp.currentInputMode.reversed)
-    }
+    LMMgr.removeUnigramsFromPerceptionOverrideModel(IMEApp.currentInputMode)
+    LMMgr.removeUnigramsFromPerceptionOverrideModel(IMEApp.currentInputMode.reversed)
   }
 
   @objc
   public func clearPOM(_: Any? = nil) {
-    autoreleasepool {
-      LMMgr.clearPerceptionOverrideModelData(IMEApp.currentInputMode)
-      LMMgr.clearPerceptionOverrideModelData(IMEApp.currentInputMode.reversed)
-    }
+    LMMgr.clearPerceptionOverrideModelData(IMEApp.currentInputMode)
+    LMMgr.clearPerceptionOverrideModelData(IMEApp.currentInputMode.reversed)
   }
 
   @objc
   public func showAbout(_: Any? = nil) {
-    autoreleasepool {
-      CtlAboutUI.show()
-      NSApp.popup()
-    }
+    CtlAboutUI.show()
+    NSApp.popup()
   }
 
   // MARK: Internal
