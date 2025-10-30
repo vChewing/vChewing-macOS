@@ -8,37 +8,25 @@
 
 // MARK: - IMEStateProtocol
 
+public typealias CandidateInState = (keyArray: [String], value: String)
+
+// MARK: - IMEStateProtocol
+
 // 所有 IMEState 均遵守該協定：
 public protocol IMEStateProtocol {
   init(_ data: IMEStateData, type: StateType)
   init(_ data: IMEStateData, type: StateType, node: CandidateNode)
   var type: StateType { get }
   var data: IMEStateData { get set }
-  var candidates: [(keyArray: [String], value: String)] { get set }
-  var hasComposition: Bool { get }
-  var isCandidateContainer: Bool { get }
-  var displayedText: String { get }
   var displayedTextConverted: String { get }
-  var textToCommit: String { get set }
-  var tooltip: String { get set }
-  var tooltipDuration: Double { get set }
-  var convertedToInputting: Self { get }
-  var isMarkedLengthValid: Bool { get }
   var markedTargetIsCurrentlyFiltered: Bool { get }
   var node: CandidateNode { get set }
-  var displayTextSegments: [String] { get }
-  var tooltipBackupForInputting: String { get set }
-  var markedRange: Range<Int> { get }
-  var u16MarkedRange: Range<Int> { get }
-  var u16Cursor: Int { get }
-  var cursor: Int { get set }
-  var marker: Int { get set }
 
   static func ofDeactivated() -> Self
   static func ofEmpty() -> Self
   static func ofAbortion() -> Self
   static func ofCommitting(textToCommit: String) -> Self
-  static func ofAssociates(candidates: [(keyArray: [String], value: String)]) -> Self
+  static func ofAssociates(candidates: [CandidateInState]) -> Self
   static func ofInputting(
     displayTextSegments: [String],
     cursor: Int,
@@ -51,7 +39,7 @@ public protocol IMEStateProtocol {
     marker: Int
   ) -> Self
   static func ofCandidates(
-    candidates: [(keyArray: [String], value: String)],
+    candidates: [CandidateInState],
     displayTextSegments: [String],
     cursor: Int
   ) -> Self
@@ -94,9 +82,13 @@ extension IMEStateProtocol {
     return result
   }
 
-  public var candidates: [(keyArray: [String], value: String)] {
+  public var candidates: [CandidateInState] {
     get { data.candidates }
     set { data.candidates = newValue }
+  }
+
+  public var currentCandidate: CandidateInState? {
+    data.currentCandidate
   }
 
   public var textToCommit: String {
@@ -125,6 +117,11 @@ extension IMEStateProtocol {
     }
   }
 
+  public var highlightedCandidateIndex: Int? {
+    get { data.highlightedCandidateIndex }
+    set { data.highlightedCandidateIndex = newValue }
+  }
+
   public var tooltipBackupForInputting: String {
     get { data.tooltipBackupForInputting }
     set { data.tooltipBackupForInputting = newValue }
@@ -148,15 +145,30 @@ public struct IMEStateData {
   public var highlightAtSegment: Int?
   public var reading: String = ""
   public var markedReadings = [String]()
-  public var candidates = [(keyArray: [String], value: String)]()
+  public var candidates = [CandidateInState]()
   public var textToCommit: String = ""
-
-  // MARK: Tooltip neta.
 
   public var tooltip: String = ""
   public var tooltipDuration: Double = 1.0
   public var tooltipBackupForInputting: String = ""
   public var tooltipColorState: TooltipColorState = .normal
+
+  public var highlightedCandidateIndex: Int? {
+    didSet {
+      guard let newValue = highlightedCandidateIndex else { return }
+      // SymbolTable 的 members 會自動給 candidates 鏡照一份內容。
+      if candidates.isEmpty || !candidates.indices.contains(newValue) {
+        highlightedCandidateIndex = nil
+      }
+    }
+  }
+
+  public var currentCandidate: CandidateInState? {
+    guard let idxCandidate = highlightedCandidateIndex else { return nil }
+    guard !candidates.isEmpty else { return nil }
+    guard candidates.indices.contains(idxCandidate) else { return nil }
+    return candidates[idxCandidate]
+  }
 
   public var cursor: Int = 0 {
     didSet {
@@ -215,7 +227,7 @@ extension IMEStateData {
     Self.allowedMarkLengthRange.contains(markedRange.count)
   }
 
-  public var userPhraseKVPair: (keyArray: [String], value: String) {
+  public var userPhraseKVPair: CandidateInState {
     let key = markedReadings
     let value = displayedText.map(\.description)[markedRange].joined()
     return (key, value)

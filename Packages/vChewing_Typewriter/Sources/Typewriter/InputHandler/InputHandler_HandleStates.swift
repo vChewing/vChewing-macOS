@@ -372,7 +372,7 @@ extension InputHandlerProtocol {
   @discardableResult
   func handleEnter(
     input: InputSignalProtocol, readingOnly: Bool = false,
-    associatesData: @escaping () -> ([(keyArray: [String], value: String)]) = { [] }
+    associatesData: @escaping () -> ([CandidateInState]) = { [] }
   )
     -> Bool {
     guard let session = session else { return false }
