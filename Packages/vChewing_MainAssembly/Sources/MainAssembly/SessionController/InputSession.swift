@@ -120,9 +120,7 @@ public final class InputSession: SessionProtocol {
   public weak var inputControllerAssigned: SessionCtl?
 
   public var inputController: SessionCtl? {
-    autoreleasepool {
-      inputControllerAssigned ?? SessionCtl.currentInputController
-    }
+    inputControllerAssigned ?? SessionCtl.currentInputController
   }
 
   /// 用以存儲客體的 bundleIdentifier。
