@@ -395,7 +395,7 @@ public class MockSession: SessionCoreProtocol, CtlCandidateDelegateCore {
     }
   }
 
-  public func candidatePairHighlightChanged(at index: Int) {}
+  public func candidatePairHighlightChanged(at index: Int?) {}
 
   public func candidatePairContextMenuActionTriggered(
     at index: Int, action: CandidateContextMenuAction
