@@ -14,7 +14,7 @@ public protocol CtlCandidateDelegateCore: AnyObject {
   func candidateController() -> CtlCandidateProtocolCore?
   func candidatePairs(conv: Bool) -> [CandidateInState]
   func candidatePairSelectionConfirmed(at index: Int)
-  func candidatePairHighlightChanged(at index: Int)
+  func candidatePairHighlightChanged(at index: Int?)
   func candidatePairContextMenuActionTriggered(
     at index: Int, action: CandidateContextMenuAction
   )
