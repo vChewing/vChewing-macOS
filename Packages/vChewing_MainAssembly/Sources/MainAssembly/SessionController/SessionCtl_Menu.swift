@@ -144,7 +144,7 @@ extension SessionCtl {
 
   @objc
   public func switchInputMode(_: Any? = nil) {
-    core?.toggleInputMode()
+    core.toggleInputMode()
   }
 
   @objc
@@ -196,7 +196,7 @@ extension SessionCtl {
 
   @objc
   public func toggleCassetteMode(_: Any? = nil) {
-    core?.resetInputHandler(forceComposerCleanup: true)
+    core.resetInputHandler(forceComposerCleanup: true)
     if !PrefMgr.shared.cassetteEnabled,
        !LMMgr.checkCassettePathValidity(PrefMgr.shared.cassettePath) {
       asyncOnMain {
@@ -222,14 +222,14 @@ extension SessionCtl {
             : "NotificationSwitchOFF".localized
         )
     )
-    if let core, !core.inputMode.langModel.isCassetteDataLoaded {
+    if !core.inputMode.langModel.isCassetteDataLoaded {
       LMMgr.loadCassetteData()
     }
   }
 
   @objc
   public func toggleSCPCTypingMode(_: Any? = nil) {
-    core?.resetInputHandler(forceComposerCleanup: true)
+    core.resetInputHandler(forceComposerCleanup: true)
     Notifier.notify(
       message: "Per-Char Select Mode".localized + "\n"
         + (
@@ -242,7 +242,7 @@ extension SessionCtl {
 
   @objc
   public func toggleChineseConverter(_: Any? = nil) {
-    core?.resetInputHandler(forceComposerCleanup: true)
+    core.resetInputHandler(forceComposerCleanup: true)
     Notifier.notify(
       message: "Force KangXi Writing".localized + "\n"
         + (
@@ -255,7 +255,7 @@ extension SessionCtl {
 
   @objc
   public func toggleShiftJISShinjitaiOutput(_: Any? = nil) {
-    core?.resetInputHandler(forceComposerCleanup: true)
+    core.resetInputHandler(forceComposerCleanup: true)
     Notifier.notify(
       message: "JIS Shinjitai Output".localized + "\n"
         + (
@@ -268,7 +268,7 @@ extension SessionCtl {
 
   @objc
   public func toggleCurrencyNumerals(_: Any? = nil) {
-    core?.resetInputHandler(forceComposerCleanup: true)
+    core.resetInputHandler(forceComposerCleanup: true)
     Notifier.notify(
       message: "Currency Numeral Output".localized + "\n"
         + (
@@ -281,7 +281,7 @@ extension SessionCtl {
 
   @objc
   public func toggleHalfWidthPunctuation(_: Any? = nil) {
-    core?.resetInputHandler(forceComposerCleanup: true)
+    core.resetInputHandler(forceComposerCleanup: true)
     Notifier.notify(
       message: "Half-Width Punctuation Mode".localized + "\n"
         + (
@@ -294,7 +294,7 @@ extension SessionCtl {
 
   @objc
   public func toggleCNS11643Enabled(_: Any? = nil) {
-    core?.resetInputHandler(forceComposerCleanup: true)
+    core.resetInputHandler(forceComposerCleanup: true)
     Notifier.notify(
       message: "CNS11643 Mode".localized + "\n"
         + (
@@ -307,7 +307,7 @@ extension SessionCtl {
 
   @objc
   public func toggleSymbolEnabled(_: Any? = nil) {
-    core?.resetInputHandler(forceComposerCleanup: true)
+    core.resetInputHandler(forceComposerCleanup: true)
     Notifier.notify(
       message: "Symbol & Emoji Input".localized + "\n"
         + (
@@ -320,7 +320,7 @@ extension SessionCtl {
 
   @objc
   public func toggleAssociatedPhrasesEnabled(_: Any? = nil) {
-    core?.resetInputHandler(forceComposerCleanup: true)
+    core.resetInputHandler(forceComposerCleanup: true)
     Notifier.notify(
       message: "Associated Phrases".localized + "\n"
         + (
@@ -333,7 +333,7 @@ extension SessionCtl {
 
   @objc
   public func togglePhraseReplacement(_: Any? = nil) {
-    core?.resetInputHandler(forceComposerCleanup: true)
+    core.resetInputHandler(forceComposerCleanup: true)
     Notifier.notify(
       message: "Use Phrase Replacement".localized + "\n"
         + (
@@ -357,7 +357,7 @@ extension SessionCtl {
 
   @objc
   public func checkForUpdate(_: Any? = nil) {
-    let bundleID = core?.clientBundleIdentifier
+    let bundleID = core.clientBundleIdentifier
     AppDelegate.shared.checkUpdate(forced: true) {
       bundleID == "com.apple.SecurityAgent"
     }
@@ -431,7 +431,7 @@ extension SessionCtl {
   // MARK: Internal
 
   var optionKeyPressed: Bool { NSEvent.keyModifierFlags.contains(.option) }
-  var silentMode: Bool { core?.clientBundleIdentifier == "com.apple.SecurityAgent" }
+  var silentMode: Bool { core.clientBundleIdentifier == "com.apple.SecurityAgent" }
 
   var currentRAMUsageDescription: String? {
     guard PrefMgr.shared.isDebugModeEnabled else { return nil }

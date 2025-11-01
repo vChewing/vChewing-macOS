@@ -25,6 +25,7 @@ public class SessionCtl: IMKInputController {
   /// 對用以設定委任物件的控制器型別進行初期化處理。
   override public init() {
     super.init()
+    _ = core // Force initialization.
     Self.currentInputController = self
   }
 
@@ -38,6 +39,7 @@ public class SessionCtl: IMKInputController {
   ///   - inputClient: 用以接受輸入的客體應用物件
   override public init!(server: IMKServer!, delegate: Any!, client inputClient: Any!) {
     super.init(server: server, delegate: delegate, client: inputClient)
+    _ = core // Force initialization.
     Self.currentInputController = self
   }
 
@@ -45,7 +47,10 @@ public class SessionCtl: IMKInputController {
 
   public private(set) static weak var currentInputController: SessionCtl?
 
-  public private(set) var core: InputSession?
+  public private(set) lazy var core: InputSession = .init(
+    controller: self,
+    client: { [weak self] in self?.client() as? InputSession.ClientObj }
+  )
 }
 
 // MARK: - IMKStateSetting 協定規定的方法
@@ -57,16 +62,14 @@ extension SessionCtl {
     super.activateServer(sender)
     autoreleasepool {
       Self.currentInputController = self
-      core = .init(controller: self, client: client)
-      core?.activateServer(sender)
+      core.activateServer(sender)
     }
   }
 
   /// 停用輸入法時，會觸發該函式。
   /// - Parameter sender: 呼叫了該函式的客體（無須使用）。
   override public func deactivateServer(_ sender: Any!) {
-    core?.deactivateServer(sender)
-    core = nil
+    core.deactivateServer(sender)
     super.deactivateServer(sender)
   }
 
@@ -78,7 +81,7 @@ extension SessionCtl {
   ///   - tag: 標記（無須使用）。
   ///   - sender: 呼叫了該函式的客體（無須使用）。
   override public func setValue(_ value: Any!, forTag tag: Int, client sender: Any!) {
-    core?.setValue(value, forTag: tag, client: sender)
+    core.setValue(value, forTag: tag, client: sender)
     super.setValue(value, forTag: tag, client: sender)
   }
 }
@@ -98,7 +101,7 @@ extension SessionCtl {
     client sender: Any?
   )
     -> Bool {
-    core?.handleNSEvent(event, client: sender) ?? false
+    core.handleNSEvent(event, client: sender)
   }
 
   /// 該函式的回饋結果決定了輸入法會攔截且捕捉哪些類型的輸入裝置操作事件。
@@ -111,9 +114,7 @@ extension SessionCtl {
   /// - Parameter sender: 呼叫了該函式的客體（無須使用）。
   /// - Returns: 返回一個 uint，其中承載了與系統 NSEvent 操作事件有關的掩碼集合（詳見 NSEvent.h）。
   override public func recognizedEvents(_ sender: Any!) -> Int {
-    if let preparedResult = core?.recognizedEvents(sender) { return preparedResult }
-    let events: NSEvent.EventTypeMask = [.keyDown, .flagsChanged, .keyUp]
-    return Int(events.rawValue)
+    core.recognizedEvents(sender)
   }
 
   /// 有時會出現某些 App 攔截輸入法的 Ctrl+Enter / Shift+Enter 熱鍵的情況。
@@ -121,7 +122,7 @@ extension SessionCtl {
   /// 這時需要在 commitComposition 這一關做一些收尾處理。
   /// - Parameter sender: 呼叫了該函式的客體（無須使用）。
   override public func commitComposition(_ sender: Any!) {
-    core?.commitComposition(sender)
+    core.commitComposition(sender)
     // super.commitComposition(sender)  // 這句不要引入，否則每次切出輸入法時都會死當。
   }
 
@@ -129,23 +130,23 @@ extension SessionCtl {
   /// - Parameter sender: 呼叫了該函式的客體（無須使用）。
   /// - Returns: 字串內容，或者 nil。
   override public func composedString(_ sender: Any!) -> Any! {
-    core?.composedString(sender)
+    core.composedString(sender)
   }
 
   /// 輸入法要被換掉或關掉的時候，要做的事情。
   /// 不過好像因為 IMK 的 Bug 而並不會被執行。
   override public func inputControllerWillClose() {
     // 下述兩行用來防止尚未完成拼寫的注音內容被遞交出去。
-    core?.inputControllerWillClose()
+    core.inputControllerWillClose()
   }
 
   /// 指定標記模式下被高亮的部分。
   override public func selectionRange() -> NSRange {
-    core?.selectionRange() ?? .zero
+    core.selectionRange()
   }
 
   /// 該函式僅用來取消任何輸入法浮動視窗的顯示。
   override public func hidePalettes() {
-    core?.hidePalettes()
+    core.hidePalettes()
   }
 }
