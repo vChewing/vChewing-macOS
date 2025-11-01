@@ -14,7 +14,7 @@ import Shared_DarwinImpl
 /// 田所選字窗的 AppKit 简单版本，繪製效率不受 SwiftUI 的限制。
 /// 該版本可以使用更少的系統資源來繪製選字窗。
 
-public class VwrCandidateTDKAppKit: NSView {
+public class VwrCandidateTDKAppKit: AXIrresponsiveView {
   // MARK: Lifecycle
 
   // MARK: - Constructors.
@@ -247,24 +247,24 @@ extension VwrCandidateTDKAppKit {
   }
 }
 
-// MARK: - Debug Module Using Swift UI.
-
-import SwiftUI
-
 // MARK: - VwrCandidateTDKAppKitForSwiftUI
 
-@available(macOS 10.15, *)
-public struct VwrCandidateTDKAppKitForSwiftUI: NSViewRepresentable {
-  public weak var controller: CtlCandidateTDK?
-  public var thePool: CandidatePool
+#if canImport(SwiftUI)
+  import SwiftUI
 
-  public func makeNSView(context _: Context) -> VwrCandidateTDKAppKit {
-    let nsView = VwrCandidateTDKAppKit(thePool: thePool)
-    nsView.controller = controller
-    return nsView
-  }
+  @available(macOS 10.15, *)
+  public struct VwrCandidateTDKAppKitForSwiftUI: NSViewRepresentable {
+    public weak var controller: CtlCandidateTDK?
+    public var thePool: CandidatePool
 
-  public func updateNSView(_ nsView: VwrCandidateTDKAppKit, context _: Context) {
-    nsView.thePool = thePool
+    public func makeNSView(context _: Context) -> VwrCandidateTDKAppKit {
+      let nsView = VwrCandidateTDKAppKit(thePool: thePool)
+      nsView.controller = controller
+      return nsView
+    }
+
+    public func updateNSView(_ nsView: VwrCandidateTDKAppKit, context _: Context) {
+      nsView.thePool = thePool
+    }
   }
-}
+#endif
