@@ -407,7 +407,7 @@ extension LMMgr {
     private let pomDebounceQueue: DispatchQueue
     private let pomDebounceInterval: TimeInterval
     private var pomPendingSave4AllModes: Bool
-    private var pomDebounceToken: Int
+    private var pomDebounceToken: UInt64
 
     private static func savePerceptionOverrideModelData(
       _ saveAllModes: Bool = true,
@@ -417,20 +417,28 @@ extension LMMgr {
       c.pomDebounceQueue.async {
         // Merge intent (escalate to all-modes if any pending requested it)
         c.mergeIntent4PendingSaveAllModes(saveAllModes)
-        // Increment token to cancel any pending scheduled save
         c.pomDebounceToken &+= 1
-        let currentToken = c.pomDebounceToken
-        let interval = c.pomDebounceInterval
-        // Sleep-based debounce to support macOS 10.9
-        let usec = UInt32(interval * 1_000_000.0)
-        usleep(usec)
-        // If a new request arrived during debounce, skip this run
-        if currentToken != c.pomDebounceToken { return }
-        let doAll = c.pomPendingSave4AllModes
-        c.pomPendingSave4AllModes = false
-        let cases = doAll ? Shared.InputMode.allCases : [IMEApp.currentInputMode]
-        cases.forEach { mode in
-          mode.langModel.savePOMData()
+        let scheduledToken = c.pomDebounceToken
+        let interval = max(c.pomDebounceInterval, 0)
+        c.pomDebounceQueue.asyncAfter(deadline: .now() + interval) { [weak c] in
+          guard let coordinator = c else { return }
+          guard coordinator.pomDebounceToken == scheduledToken else { return }
+          let shouldSaveAll = coordinator.pomPendingSave4AllModes
+          coordinator.pomPendingSave4AllModes = false
+          let targetModes: [Shared.InputMode]
+          if shouldSaveAll {
+            targetModes = Shared.InputMode.validCases
+          } else {
+            let currentMode = IMEApp.currentInputMode
+            targetModes = currentMode == .imeModeNULL ? [] : [currentMode]
+          }
+          guard !targetModes.isEmpty else { return }
+          AppDelegate.shared.suppressUserDataMonitor(
+            for: Swift.max(0.8, coordinator.pomDebounceInterval + 0.2)
+          )
+          targetModes.forEach { mode in
+            mode.langModel.savePOMData()
+          }
         }
       }
     }
