@@ -31,7 +31,7 @@ public class CtlCandidateTDK: CtlCandidate, NSWindowDelegate {
   // MARK: - Constructors
 
   public required init(_ layout: UILayoutOrientation = .horizontal) {
-    var contentRect = CGRect(x: 128.0, y: 128.0, width: 0.0, height: 0.0)
+    let contentRect = CGRect(x: 128.0, y: 128.0, width: 0.0, height: 0.0)
     let styleMask: NSWindow.StyleMask = [.nonactivatingPanel]
     let panel = NSPanel(
       contentRect: contentRect, styleMask: styleMask, backing: .buffered, defer: false
@@ -39,7 +39,6 @@ public class CtlCandidateTDK: CtlCandidate, NSWindowDelegate {
     panel.level = NSWindow.Level(Int(max(CGShieldingWindowLevel(), kCGPopUpMenuWindowLevel)) + 2)
     panel.hasShadow = true
     panel.backgroundColor = NSColor.clear
-    contentRect.origin = CGPoint.zero
 
     super.init(layout)
     window = panel
@@ -189,12 +188,73 @@ public class CtlCandidateTDK: CtlCandidate, NSWindowDelegate {
     Self.thePool.calculateCandidateIndex(subIndex: id)
   }
 
-  // MARK: Internal
+  // MARK: Private
+
+  private static var thePool: CandidatePool = .init(candidates: [])
+  private static var currentView: NSView = .init()
 
   @objc
-  var observation: NSKeyValueObservation?
+  private var observation: NSKeyValueObservation?
 
-  func updateNSWindowModern(_ window: NSWindow) {
+  // 創建背景視覺效果視圖
+  private let visualEffectView: NSView? = {
+    if #available(macOS 26.0, *), NSApplication.uxLevel == .liquidGlass {
+      #if compiler(>=6.2) && canImport(AppKit, _version: 26.0)
+        let resultView = NSGlassEffectView()
+        return resultView
+      #endif
+    }
+    if #available(macOS 10.10, *), NSApplication.uxLevel != .none {
+      let resultView = NSVisualEffectView()
+      return resultView
+    }
+    return nil
+  }()
+
+  private var theViewAppKit: NSView {
+    VwrCandidateTDKAppKit(controller: self, thePool: Self.thePool)
+  }
+
+  private var theViewLegacy: NSView {
+    let textField = NSTextField()
+    textField.isSelectable = false
+    textField.isEditable = false
+    textField.isBordered = false
+    textField.backgroundColor = .clear
+    textField.allowsEditingTextAttributes = false
+    textField.preferredMaxLayoutWidth = textField.frame.width
+    textField.attributedStringValue = Self.thePool.attributedDescription
+    textField.sizeToFit()
+    textField.backgroundColor = .clear
+    return textField
+  }
+
+  private func updateEffectView() {
+    if #available(macOS 26.0, *), NSApplication.uxLevel == .liquidGlass {
+      #if compiler(>=6.2) && canImport(AppKit, _version: 26.0)
+        guard let resultView = visualEffectView as? NSGlassEffectView else { return }
+        resultView.cornerRadius = Self.thePool.windowRadius
+        resultView.style = .clear
+        let bgTintColor: NSColor = !NSApplication.isDarkMode ? .white : .black
+        resultView.wantsLayer = true
+        resultView.layer?.cornerRadius = Self.thePool.windowRadius
+        resultView.layer?.masksToBounds = true
+        resultView.layer?.backgroundColor = bgTintColor.withAlphaComponent(0.1).cgColor
+      #endif
+    }
+    if #available(macOS 10.10, *), NSApplication.uxLevel != .none {
+      guard let resultView = visualEffectView as? NSVisualEffectView else { return }
+      resultView.material = .titlebar
+      resultView.blendingMode = .behindWindow
+      resultView.state = .active
+      // 設置圓角以保持原有的視覺特性
+      resultView.wantsLayer = true
+      resultView.layer?.cornerRadius = Self.thePool.windowRadius
+      resultView.layer?.masksToBounds = true
+    }
+  }
+
+  private func updateNSWindowModern(_ window: NSWindow) {
     guard #available(macOS 10.13, *) else {
       Self.currentView = theViewAppKit
       window.isOpaque = false
@@ -209,34 +269,8 @@ public class CtlCandidateTDK: CtlCandidate, NSWindowDelegate {
     let candidateView = theViewAppKit
     let viewSize = candidateView.fittingSize
 
-    // 創建背景視覺效果視圖
-    let visualEffectView: NSView? = {
-      if #available(macOS 26.0, *), NSApplication.uxLevel == .liquidGlass {
-        #if compiler(>=6.2) && canImport(AppKit, _version: 26.0)
-          let resultView = NSGlassEffectView()
-          resultView.cornerRadius = Self.thePool.windowRadius
-          resultView.style = .clear
-          let bgTintColor: NSColor = !NSApplication.isDarkMode ? .white : .black
-          resultView.wantsLayer = true
-          resultView.layer?.cornerRadius = Self.thePool.windowRadius
-          resultView.layer?.masksToBounds = true
-          resultView.layer?.backgroundColor = bgTintColor.withAlphaComponent(0.1).cgColor
-          return resultView
-        #endif
-      }
-      if #available(macOS 10.10, *), NSApplication.uxLevel != .none {
-        let resultView = NSVisualEffectView()
-        resultView.material = .titlebar
-        resultView.blendingMode = .behindWindow
-        resultView.state = .active
-        // 設置圓角以保持原有的視覺特性
-        resultView.wantsLayer = true
-        resultView.layer?.cornerRadius = Self.thePool.windowRadius
-        resultView.layer?.masksToBounds = true
-        return resultView
-      }
-      return nil
-    }()
+    // 更新背景視覺效果視圖
+    updateEffectView()
 
     // 創建容器視圖作為 ZStack，設置固定尺寸
     let containerView = NSView(frame: CGRect(origin: .zero, size: viewSize))
@@ -263,7 +297,7 @@ public class CtlCandidateTDK: CtlCandidate, NSWindowDelegate {
     delegate?.resetCandidateWindowOrigin()
   }
 
-  func handleMouseScroll(deltaX: CGFloat, deltaY: CGFloat) {
+  private func handleMouseScroll(deltaX: CGFloat, deltaY: CGFloat) {
     switch (deltaX, deltaY, Self.thePool.layout) {
     case (0, 1..., .vertical), (1..., 0, .horizontal): highlightNextCandidate()
     case (..<0, 0, .horizontal), (0, ..<0, .vertical): highlightPreviousCandidate()
@@ -271,28 +305,5 @@ public class CtlCandidateTDK: CtlCandidate, NSWindowDelegate {
     case (0, ..<0, .horizontal), (..<0, 0, .vertical): showPreviousLine()
     case (_, _, _): break
     }
-  }
-
-  // MARK: Private
-
-  private static var thePool: CandidatePool = .init(candidates: [])
-  private static var currentView: NSView = .init()
-
-  private var theViewAppKit: NSView {
-    VwrCandidateTDKAppKit(controller: self, thePool: Self.thePool)
-  }
-
-  private var theViewLegacy: NSView {
-    let textField = NSTextField()
-    textField.isSelectable = false
-    textField.isEditable = false
-    textField.isBordered = false
-    textField.backgroundColor = .clear
-    textField.allowsEditingTextAttributes = false
-    textField.preferredMaxLayoutWidth = textField.frame.width
-    textField.attributedStringValue = Self.thePool.attributedDescription
-    textField.sizeToFit()
-    textField.backgroundColor = .clear
-    return textField
   }
 }
