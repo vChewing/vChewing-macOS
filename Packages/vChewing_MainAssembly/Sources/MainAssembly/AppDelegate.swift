@@ -56,6 +56,11 @@ extension AppDelegate {
       }
     }
   }
+
+  /// 在指定時間內暫時忽略使用者資料夾的檔案事件。
+  func suppressUserDataMonitor(for interval: TimeInterval) {
+    folderMonitor.suppressEvents(for: interval)
+  }
 }
 
 // MARK: - Public Functions

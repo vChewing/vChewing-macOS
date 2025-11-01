@@ -84,6 +84,15 @@ public class FolderMonitor {
     didSet { updateDebouncer() }
   }
 
+  /// 在指定時間內忽略檔案事件的通知回撥。
+  public func suppressEvents(for interval: TimeInterval) {
+    guard interval > 0 else { return }
+    let deadline = Date().addingTimeInterval(interval)
+    ignoreEventsLock.lock()
+    if deadline > ignoreEventsUntil { ignoreEventsUntil = deadline }
+    ignoreEventsLock.unlock()
+  }
+
   // MARK: Monitoring
 
   /// Listen for changes to the directory (if we are not already).
@@ -121,6 +130,12 @@ public class FolderMonitor {
 
   // MARK: Private
 
+  private enum CloudStatus {
+    case unknown
+    case ubiquitous
+    case notUbiquitous
+  }
+
   /// A file descriptor for the monitored directory.
   private var monitoredFolderFileDescriptor: CInt = -1
   /// A dispatch queue used for sending file changes in the directory.
@@ -137,6 +152,10 @@ public class FolderMonitor {
     .ubiquitousItemDownloadingStatusKey,
     .ubiquitousItemIsDownloadingKey,
   ]
+  private let ignoreEventsLock = NSLock()
+  private var ignoreEventsUntil = Date.distantPast
+
+  private var directoryCloudStatus: CloudStatus = .unknown
 
   private func updateDebouncer() {
     eventDebouncer?.invalidate()
@@ -157,11 +176,13 @@ public class FolderMonitor {
   }
 
   private func notifyIfReady() {
+    guard !shouldIgnoreDueToSelfWrites() else { return }
     guard !shouldDeferDueToCloudDownload() else { return }
     folderDidChange?()
   }
 
   private func shouldDeferDueToCloudDownload() -> Bool {
+    guard isDirectoryBackedByICloud() else { return false }
     let fileManager = FileManager.default
     let options: FileManager.DirectoryEnumerationOptions = [.skipsSubdirectoryDescendants]
     let directoryURL = url
@@ -183,5 +204,24 @@ public class FolderMonitor {
       if values.ubiquitousItemIsDownloading == true { return true }
     }
     return false
+  }
+
+  private func shouldIgnoreDueToSelfWrites() -> Bool {
+    ignoreEventsLock.lock()
+    let deadline = ignoreEventsUntil
+    ignoreEventsLock.unlock()
+    return Date() < deadline
+  }
+
+  private func isDirectoryBackedByICloud() -> Bool {
+    if directoryCloudStatus == .unknown {
+      if let values = try? url.resourceValues(forKeys: [.isUbiquitousItemKey]),
+         values.isUbiquitousItem == true {
+        directoryCloudStatus = .ubiquitous
+      } else {
+        directoryCloudStatus = .notUbiquitous
+      }
+    }
+    return directoryCloudStatus == .ubiquitous
   }
 }
