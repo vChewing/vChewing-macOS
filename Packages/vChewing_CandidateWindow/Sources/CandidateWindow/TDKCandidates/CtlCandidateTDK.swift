@@ -31,7 +31,7 @@ public class CtlCandidateTDK: CtlCandidate, NSWindowDelegate {
   // MARK: - Constructors
 
   public required init(_ layout: UILayoutOrientation = .horizontal) {
-    var contentRect = CGRect(x: 128.0, y: 128.0, width: 0.0, height: 0.0)
+    let contentRect = CGRect(x: 128.0, y: 128.0, width: 0.0, height: 0.0)
     let styleMask: NSWindow.StyleMask = [.nonactivatingPanel]
     let panel = NSPanel(
       contentRect: contentRect, styleMask: styleMask, backing: .buffered, defer: false
@@ -39,7 +39,6 @@ public class CtlCandidateTDK: CtlCandidate, NSWindowDelegate {
     panel.level = NSWindow.Level(Int(max(CGShieldingWindowLevel(), kCGPopUpMenuWindowLevel)) + 2)
     panel.hasShadow = true
     panel.backgroundColor = NSColor.clear
-    contentRect.origin = CGPoint.zero
 
     super.init(layout)
     window = panel
@@ -213,7 +212,7 @@ public class CtlCandidateTDK: CtlCandidate, NSWindowDelegate {
     let visualEffectView: NSView? = {
       if #available(macOS 26.0, *), NSApplication.uxLevel == .liquidGlass {
         #if compiler(>=6.2) && canImport(AppKit, _version: 26.0)
-          let resultView = NSGlassEffectView()
+          let resultView = AXIrresponsiveView4NSLiquidGlass()
           resultView.cornerRadius = Self.thePool.windowRadius
           resultView.style = .clear
           let bgTintColor: NSColor = !NSApplication.isDarkMode ? .white : .black
@@ -225,7 +224,7 @@ public class CtlCandidateTDK: CtlCandidate, NSWindowDelegate {
         #endif
       }
       if #available(macOS 10.10, *), NSApplication.uxLevel != .none {
-        let resultView = NSVisualEffectView()
+        let resultView = AXIrresponsiveView4NSVisualFX()
         resultView.material = .titlebar
         resultView.blendingMode = .behindWindow
         resultView.state = .active
@@ -239,7 +238,7 @@ public class CtlCandidateTDK: CtlCandidate, NSWindowDelegate {
     }()
 
     // 創建容器視圖作為 ZStack，設置固定尺寸
-    let containerView = NSView(frame: CGRect(origin: .zero, size: viewSize))
+    let containerView = AXIrresponsiveView(frame: CGRect(origin: .zero, size: viewSize))
     // 為容器視圖也設置圓角，確保整體一致性
     containerView.wantsLayer = true
     containerView.layer?.cornerRadius = Self.thePool.windowRadius
@@ -276,7 +275,7 @@ public class CtlCandidateTDK: CtlCandidate, NSWindowDelegate {
   // MARK: Private
 
   private static var thePool: CandidatePool = .init(candidates: [])
-  private static var currentView: NSView = .init()
+  private static var currentView: NSView = AXIrresponsiveView()
 
   private var theViewAppKit: NSView {
     VwrCandidateTDKAppKit(controller: self, thePool: Self.thePool)
@@ -296,3 +295,134 @@ public class CtlCandidateTDK: CtlCandidate, NSWindowDelegate {
     return textField
   }
 }
+
+// MARK: - AXIrresponsivePanel
+
+public class AXIrresponsivePanel: NSPanel {
+  // MARK: Lifecycle
+
+  convenience init() {
+    let contentRect = CGRect(x: 128.0, y: 128.0, width: 0.0, height: 0.0)
+    let styleMask: NSWindow.StyleMask = [.nonactivatingPanel]
+    self.init(
+      contentRect: contentRect, styleMask: styleMask, backing: .buffered, defer: false
+    )
+
+    // 如仍想在 10.10+ 以呼叫方式加強語義（非必要，因為已覆寫）：
+    if #available(macOS 10.10, *) {
+      self.setAccessibilityElement(false)
+      self.setAccessibilityRole(.unknown)
+    }
+  }
+
+  // MARK: Public
+
+  // macOS 10.10+：讓此 Panel 不是可存取元素
+  @available(macOS 10.10, *)
+  override public func isAccessibilityElement() -> Bool {
+    false
+  }
+
+  // macOS 10.10+：角色回報為 unknown（避免成為具名可聚焦元素）
+  @available(macOS 10.10, *)
+  override public func accessibilityRole() -> NSAccessibility.Role? {
+    .unknown
+  }
+
+  // macOS 10.9 與更早：舊式 API，直接忽略此元素
+  @objc
+  override public func accessibilityIsIgnored() -> Bool {
+    true
+  }
+}
+
+// MARK: - AXIrresponsiveView
+
+public class AXIrresponsiveView: NSView {
+  // MARK: Lifecycle
+
+  override init(frame: NSRect) {
+    super.init(frame: frame)
+
+    // 如仍想在 10.10+ 以呼叫方式加強語義（非必要，因為已覆寫）：
+    if #available(macOS 10.10, *) {
+      self.setAccessibilityElement(false)
+    }
+  }
+
+  required init?(coder: NSCoder) {
+    super.init(coder: coder)
+  }
+
+  // MARK: Public
+
+  // macOS 10.10+：讓此 Panel 不是可存取元素
+  @available(macOS 10.10, *)
+  override public func isAccessibilityElement() -> Bool {
+    false
+  }
+
+  // macOS 10.9 與更早：舊式 API，直接忽略此元素
+  @objc
+  override public func accessibilityIsIgnored() -> Bool {
+    true
+  }
+}
+
+// MARK: - AXIrresponsiveView4NSVisualFX
+
+@available(macOS 10.10, *)
+public class AXIrresponsiveView4NSVisualFX: NSVisualEffectView {
+  // MARK: Lifecycle
+
+  override init(frame: NSRect) {
+    super.init(frame: frame)
+  }
+
+  required init?(coder: NSCoder) {
+    super.init(coder: coder)
+  }
+
+  // MARK: Public
+
+  // macOS 10.10+：讓此 Panel 不是可存取元素
+  override public func isAccessibilityElement() -> Bool {
+    false
+  }
+
+  // macOS 10.9 與更早：舊式 API，直接忽略此元素
+  @objc
+  override public func accessibilityIsIgnored() -> Bool {
+    true
+  }
+}
+
+// MARK: - AXIrresponsiveView4NSLiquidGlass
+
+#if compiler(>=6.2) && canImport(AppKit, _version: 26.0)
+  @available(macOS 26, *)
+  public class AXIrresponsiveView4NSLiquidGlass: NSGlassEffectView {
+    // MARK: Lifecycle
+
+    override init(frame: NSRect) {
+      super.init(frame: frame)
+    }
+
+    required init?(coder: NSCoder) {
+      super.init(coder: coder)
+    }
+
+    // MARK: Public
+
+    // macOS 10.10+：讓此 Panel 不是可存取元素
+    override public func isAccessibilityElement() -> Bool {
+      false
+    }
+
+    // macOS 10.9 與更早：舊式 API，直接忽略此元素
+    @objc
+    override public func accessibilityIsIgnored() -> Bool {
+      true
+    }
+  }
+#endif
