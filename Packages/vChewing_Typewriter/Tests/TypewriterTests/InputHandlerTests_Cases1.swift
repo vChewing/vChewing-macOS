@@ -552,4 +552,171 @@ extension InputHandlerTests {
     typeSentence("su065j/ ")
     XCTAssertEqual(testHandler.assembler.assembledSentence.map(\.value), ["年終"])
   }
+
+  func test_IH112_RomanNumeralInputCheck() throws {
+    guard let testHandler, let testSession else {
+      XCTFail("testHandler and testSession at least one of them is nil.")
+      return
+    }
+
+    // 模擬 `Opt+~` 熱鍵組合觸發羅馬數字模式。
+    let symbolMenuKeyEvent = KBEvent(
+      with: .keyDown,
+      modifierFlags: .option,
+      timestamp: Date().timeIntervalSince1970,
+      windowNumber: nil,
+      characters: "`",
+      charactersIgnoringModifiers: "`",
+      isARepeat: false,
+      keyCode: KeyCode.kSymbolMenuPhysicalKeyIntl.rawValue
+    )
+
+    func resetToRomanNumeralTypingMethod() throws {
+      // 初始打字模式（TypingMethod）是威注音原廠模式。
+      testSession.switchState(.ofAbortion())
+      XCTAssertEqual(testHandler.currentTypingMethod, .vChewingFactory)
+      // 開始輪替。
+      var attempts = 0
+      revolvingTypingMethod: while testHandler.currentTypingMethod != .romanNumerals {
+        defer { attempts += 1 }
+        XCTAssertTrue(testHandler.triageInput(event: symbolMenuKeyEvent))
+        if attempts > TypingMethod.allCases.count {
+          break revolvingTypingMethod
+        }
+      }
+      XCTAssertEqual(testHandler.currentTypingMethod, .romanNumerals)
+    }
+
+    vCTestLog("Testing roman numeral input: 1994")
+    try resetToRomanNumeralTypingMethod()
+    typeSentence("1994")
+    XCTAssertEqual(testSession.recentCommissions.last, "MCMXCIV")
+    vCTestLog("-> Result: \(testSession.recentCommissions.last ?? "NULL")")
+
+    // 另外測試一個數字。
+    try resetToRomanNumeralTypingMethod()
+    vCTestLog("Testing roman numeral input: 1042")
+    typeSentence("1042")
+    XCTAssertEqual(testSession.recentCommissions.last, "MXLII")
+    vCTestLog("-> Result: \(testSession.recentCommissions.last ?? "NULL")")
+
+    vCTestLog("成功完成羅馬數字輸入測試。")
+  }
+
+  /// 測試羅馬數字模式下的空格鍵功能
+  func test_IH113_RomanNumeralSpaceKeyHandling() throws {
+    guard let testHandler, let testSession else {
+      XCTFail("testHandler and testSession at least one of them is nil.")
+      return
+    }
+    clearTestPOM()
+
+    // 建立空格鍵事件
+    let spaceKeyEvent = KBEvent(
+      with: .keyDown,
+      modifierFlags: [],
+      timestamp: Date().timeIntervalSince1970,
+      windowNumber: nil,
+      characters: " ",
+      charactersIgnoringModifiers: " ",
+      isARepeat: false,
+      keyCode: KeyCode.kSpace.rawValue
+    )
+
+    // 建立符號選單按鍵事件（Option + `）
+    let symbolMenuKeyEvent = KBEvent(
+      with: .keyDown,
+      modifierFlags: .option,
+      timestamp: Date().timeIntervalSince1970,
+      windowNumber: nil,
+      characters: "`",
+      charactersIgnoringModifiers: "`",
+      isARepeat: false,
+      keyCode: KeyCode.kSymbolMenuPhysicalKeyIntl.rawValue
+    )
+
+    testSession.switchState(.ofAbortion())
+
+    // 進入羅馬數字模式
+    XCTAssertTrue(testHandler.triageInput(event: symbolMenuKeyEvent))
+    XCTAssertEqual(testHandler.currentTypingMethod, .codePoint)
+    XCTAssertTrue(testHandler.triageInput(event: symbolMenuKeyEvent))
+    XCTAssertEqual(testHandler.currentTypingMethod, .haninKeyboardSymbol)
+    XCTAssertTrue(testHandler.triageInput(event: symbolMenuKeyEvent))
+    XCTAssertEqual(testHandler.currentTypingMethod, .romanNumerals)
+
+    // 測試一：空格鍵在緩衝區為空時應觸發 ofAbortion
+    vCTestLog("測試一：空格鍵在緩衝區為空時")
+    var errorCallbackTriggered = false
+    testHandler.errorCallback = { errorID in
+      vCTestLog("錯誤回呼被觸發，ID 為：\(errorID)")
+      errorCallbackTriggered = true
+    }
+    XCTAssertTrue(testHandler.triageInput(event: spaceKeyEvent))
+    XCTAssertTrue(errorCallbackTriggered, "緩衝區為空時應觸發錯誤回呼")
+    // ofAbortion() 狀態在狀態機中自動轉換為 ofEmpty()
+    XCTAssertEqual(testSession.state.type, .ofEmpty, "狀態應在 ofAbortion 轉換後變為 ofEmpty")
+
+    // 測試二：空格鍵在緩衝區有內容時應遞交羅馬數字
+    vCTestLog("測試二：空格鍵鍵入 '42' 應遞交 'XLII'")
+    testSession.switchState(.ofAbortion())
+    XCTAssertTrue(testHandler.triageInput(event: symbolMenuKeyEvent))
+    XCTAssertTrue(testHandler.triageInput(event: symbolMenuKeyEvent))
+    XCTAssertTrue(testHandler.triageInput(event: symbolMenuKeyEvent))
+    XCTAssertEqual(testHandler.currentTypingMethod, .romanNumerals)
+
+    typeSentence("42")
+    XCTAssertTrue(testHandler.triageInput(event: spaceKeyEvent))
+    XCTAssertEqual(testSession.recentCommissions.last, "XLII", "鍵入 '42' 應遞交 'XLII'")
+    XCTAssertEqual(testSession.state.type, .ofEmpty, "狀態應在成功遞交後變為 ofEmpty")
+    XCTAssertEqual(
+      testHandler.currentTypingMethod,
+      .vChewingFactory,
+      "遞交後應返回威注音預設的打字方法"
+    )
+    vCTestLog("-> Result: \(testSession.recentCommissions.last ?? "NULL")")
+
+    // 測試三：空格鍵用於三位數
+    vCTestLog("測試三：空格鍵鍵入 '999' 應遞交 'CMXCIX'")
+    testSession.switchState(.ofAbortion())
+    XCTAssertTrue(testHandler.triageInput(event: symbolMenuKeyEvent))
+    XCTAssertTrue(testHandler.triageInput(event: symbolMenuKeyEvent))
+    XCTAssertTrue(testHandler.triageInput(event: symbolMenuKeyEvent))
+    XCTAssertEqual(testHandler.currentTypingMethod, .romanNumerals)
+
+    typeSentence("999")
+    XCTAssertTrue(testHandler.triageInput(event: spaceKeyEvent))
+    XCTAssertEqual(testSession.recentCommissions.last, "CMXCIX", "鍵入 '999' 應遞交 'CMXCIX'")
+    XCTAssertEqual(testSession.state.type, .ofEmpty, "狀態應在成功遞交後變為 ofEmpty")
+    XCTAssertEqual(
+      testHandler.currentTypingMethod,
+      .vChewingFactory,
+      "遞交後應返回威注音預設的打字方法"
+    )
+    vCTestLog("-> Result: \(testSession.recentCommissions.last ?? "NULL")")
+
+    // 測試四：Enter 鍵仍應正常工作（既有功能）
+    vCTestLog("測試四：Enter 鍵鍵入 '2023' 應遞交 'MMXXIII'")
+    testSession.switchState(.ofAbortion())
+    XCTAssertTrue(testHandler.triageInput(event: symbolMenuKeyEvent))
+    XCTAssertTrue(testHandler.triageInput(event: symbolMenuKeyEvent))
+    XCTAssertTrue(testHandler.triageInput(event: symbolMenuKeyEvent))
+    XCTAssertEqual(testHandler.currentTypingMethod, .romanNumerals)
+
+    typeSentence("2023")
+    XCTAssertEqual(
+      testSession.recentCommissions.last,
+      "MMXXIII",
+      "四位數輸入 '2023' 應自動遞交 'MMXXIII'"
+    )
+    XCTAssertEqual(testSession.state.type, .ofEmpty, "狀態應在自動遞交後變為 ofEmpty")
+    XCTAssertEqual(
+      testHandler.currentTypingMethod,
+      .vChewingFactory,
+      "遞交後應返回威注音預設的打字方法"
+    )
+    vCTestLog("-> Result: \(testSession.recentCommissions.last ?? "NULL")")
+
+    vCTestLog("成功完成羅馬數字空格鍵測試。")
+  }
 }

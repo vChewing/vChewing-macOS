@@ -253,6 +253,12 @@
 "i18n:UserDef.kReadingNarrationCoverage.shortTitle" = "Reading composer contents to narrate";
 "i18n:userdef.kRespectClientAccentColor.description" = "This will force the highlighted candidate background color to follow the accent color of the current client app, behaving like what macOS built-in input methods do. If it doesn't have one (or the system accent color is set with a non-default value), then the system accent color will be used instead. Note that this won't be effective if either JIS or KangXi conversion mode is enabled.";
 "i18n:userdef.kRespectClientAccentColor.shortTitle" = "Respect accent colors of the client app and the system";
+"i18n:UserDef.kRomanNumeralOutputFormat.description" = "Roman Numeral Input Mode can be switched to while using [Opt]+[Symbol Menu Key] to revolve the current typing method, supporting integers in the closed range of [1, 3999]. After a successful or failed input, this mode will be automatically switched off.";
+"i18n:UserDef.kRomanNumeralOutputFormat.option.0" = "ASCII Uppercase";
+"i18n:UserDef.kRomanNumeralOutputFormat.option.1" = "ASCII Lowercase";
+"i18n:UserDef.kRomanNumeralOutputFormat.option.2" = "Unicode Roman Numerals (Uppercase)";
+"i18n:UserDef.kRomanNumeralOutputFormat.option.3" = "Unicode Roman Numerals (Lowercase)";
+"i18n:UserDef.kRomanNumeralOutputFormat.shortTitle" = "Roman Numeral Output Format";
 "i18n:UserDef.kShiftEisuToggleOffTogetherWithCapsLock.description" = "This does: 1) On macOS 12 and later, if the Caps Lock gets turned off, then the internal switch for Shift-key / JIS-Eisu-key Alphanumerical Mode Toggle will also be switched off. 2) If you have turned off the same switch by JIS-Eisu key, then the Caps Lock gets turned off together. Note: vChewing has no way to recognize single hits of Shift key when Caps Lock is on.";
 "i18n:UserDef.kShiftEisuToggleOffTogetherWithCapsLock.shortTitle" = "Sync the off state between Caps Lock and Shift / Eisu Alphanumerical Toggle";
 "i18n:UserDef.kShowCodePointInCandidateUI.shortTitle" = "Show Unicode codepoint metadata in candidate window";
@@ -410,6 +416,10 @@
 "Type them into inline composition buffer" = "Type them into inline composition buffer";
 "Typing Settings:" = "Typing Settings:";
 "Typing Style:" = "Typing Style:";
+"typingMethod.romanNumerals.error.invalidCharacter" = "Only valid digits are allowed. E.g.: [1, 9] for the largest digit; [0, 9] for other digits.";
+"typingMethod.romanNumerals.error.invalidInput" = "Invalid input.";
+"typingMethod.romanNumerals.error.valueOutOfRange" = "Value out of range (1-3999).";
+"typingMethod.romanNumerals.tooltip" = "Roman Numeral Input.";
 "UI Language:" = "UI Language:";
 "Unable to create the user phrase file." = "Unable to create the user phrase file.";
 "Uncheck" = "Uncheck";
