@@ -279,6 +279,15 @@
 "Intonation mark. ENTER to commit.\nSPACE to insert into composition buffer." = "Intonation mark. ENTER to commit.\nSPACE to insert into composition buffer.";
 "Invalid Code Point." = "Invalid Code Point.";
 "Invalid Selection Keys." = "Invalid Selection Keys.";
+"typingMethod.romanNumerals.tooltip" = "Roman Numeral Input.";
+"typingMethod.romanNumerals.error.invalidCharacter" = "Invalid character. Only digits (0-9) and N are allowed.";
+"typingMethod.romanNumerals.error.invalidInput" = "Invalid input.";
+"typingMethod.romanNumerals.error.valueOutOfRange" = "Value out of range (0-3999).";
+"typingMethod.romanNumerals.outputFormatTitle" = "Roman Numeral Output Format";
+"typingMethod.romanNumerals.format.uppercaseASCII" = "ASCII Uppercase";
+"typingMethod.romanNumerals.format.lowercaseASCII" = "ASCII Lowercase";
+"typingMethod.romanNumerals.format.uppercaseFullWidth" = "Full-Width Uppercase";
+"typingMethod.romanNumerals.format.lowercaseFullWidth" = "Full-Width Lowercase";
 "It will attempt to combine with the incoming phonabet input." = "It will attempt to combine with the incoming phonabet input.";
 "ja" = "Japanese";
 "Japanese" = "Japanese";
