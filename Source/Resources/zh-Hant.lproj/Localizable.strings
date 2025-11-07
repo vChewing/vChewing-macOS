@@ -279,6 +279,15 @@
 "Intonation mark. ENTER to commit.\nSPACE to insert into composition buffer." = "聲調符號。敲 Enter 以遞交。\n敲空格鍵以插入組字區。";
 "Invalid Code Point." = "內碼不正確。";
 "Invalid Selection Keys." = "選字鍵參數資料值不規範。";
+"typingMethod.romanNumerals.tooltip" = "羅馬數字輸入。";
+"typingMethod.romanNumerals.error.invalidCharacter" = "無效字符。僅允許數字（0-9）與 N。";
+"typingMethod.romanNumerals.error.invalidInput" = "無效輸入。";
+"typingMethod.romanNumerals.error.valueOutOfRange" = "數值超出範圍（0-3999）。";
+"typingMethod.romanNumerals.outputFormatTitle" = "羅馬數字輸出格式";
+"typingMethod.romanNumerals.format.uppercaseASCII" = "ASCII 大寫";
+"typingMethod.romanNumerals.format.lowercaseASCII" = "ASCII 小寫";
+"typingMethod.romanNumerals.format.uppercaseFullWidth" = "全形大寫";
+"typingMethod.romanNumerals.format.lowercaseFullWidth" = "全形小寫";
 "It will attempt to combine with the incoming phonabet input." = "該聲調亦會嘗試與接下來輸入的注音相組合。";
 "ja" = "和文";
 "Japanese" = "和語";

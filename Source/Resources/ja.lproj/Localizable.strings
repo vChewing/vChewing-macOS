@@ -278,6 +278,15 @@
 "Intonation mark. ENTER to commit.\nSPACE to insert into composition buffer." = "音調記号。ENTER で送り出す。\nSPACE で入力緩衝列に挿入。";
 "Invalid Code Point." = "コードポイントは正しくない。";
 "Invalid Selection Keys." = "候補用キーによる不具合。";
+"typingMethod.romanNumerals.tooltip" = "ローマ数字入力。";
+"typingMethod.romanNumerals.error.invalidCharacter" = "無効な文字。数字（0-9）と N のみ許可されます。";
+"typingMethod.romanNumerals.error.invalidInput" = "無効な入力。";
+"typingMethod.romanNumerals.error.valueOutOfRange" = "範囲外の値（0-3999）。";
+"typingMethod.romanNumerals.outputFormatTitle" = "ローマ数字出力形式";
+"typingMethod.romanNumerals.format.uppercaseASCII" = "ASCII大文字";
+"typingMethod.romanNumerals.format.lowercaseASCII" = "ASCII小文字";
+"typingMethod.romanNumerals.format.uppercaseFullWidth" = "全角大文字";
+"typingMethod.romanNumerals.format.lowercaseFullWidth" = "全角小文字";
 "It will attempt to combine with the incoming phonabet input." = "この音調は次の注音入力と組み合わす。";
 "ja" = "和語";
 "Japanese" = "和語";
