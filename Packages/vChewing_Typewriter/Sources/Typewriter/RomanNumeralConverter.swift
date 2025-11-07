@@ -20,6 +20,9 @@ public enum RomanNumeralOutputFormat: Int, CaseIterable {
 // MARK: - RomanNumeralConverter
 
 public enum RomanNumeralConverter {
+  /// Maximum value supported for Roman numeral conversion (exclusive)
+  public static let maxValue = 4000
+  
   /// Convert an integer (0-3999) to Roman numeral representation
   /// - Parameters:
   ///   - number: The number to convert (0-3999)
@@ -32,7 +35,7 @@ public enum RomanNumeralConverter {
     }
     
     // Check range
-    guard number > 0, number < 4000 else {
+    guard number > 0, number < maxValue else {
       return nil
     }
     
