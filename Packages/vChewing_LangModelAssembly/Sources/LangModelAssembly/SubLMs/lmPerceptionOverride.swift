@@ -46,6 +46,7 @@ extension LMAssembly {
       self.mutCapacity = max(capacity, 1) // Ensures that this integer value is always > 0.
       self.thresholdProvider = thresholdProvider
       self.fileSaveLocationURL = dataURL
+      self.previouslySavedHash = Int.min
     }
 
     // MARK: Public
@@ -65,6 +66,7 @@ extension LMAssembly {
     var mutLRUKeySeqList: [String] = []
     var mutLRUMap: [String: KeyPerceptionPair] = [:]
     var fileSaveLocationURL: URL?
+    var previouslySavedHash: Int
 
     var threshold: Double {
       let fallbackValue = Self.kDecayThreshold
@@ -563,26 +565,38 @@ extension LMAssembly.LMPerceptionOverride {
     resetLRUList()
   }
 
-  func saveData(toURL fileURL: URL? = nil) {
+  func saveData(toURL fileURL: URL? = nil, skipDebounce: Bool = false) {
     guard let fileURL: URL = fileURL ?? fileSaveLocationURL else {
       vCLMLog("POM saveData() failed. At least the file Save URL is not set for the current POM.")
       return
     }
+    // Debounce 由外部模組負責。 LMPerceptionOverride 不負責 Debounce。
     // 此處不要使用 JSONSerialization，不然執行緒會炸掉。
     let encoder = JSONEncoder()
-    do {
-      let toSave = getSavableData()
-      vCLMLog("POM: Attempting to save \(toSave.count) items to \(fileURL.path)")
-
-      let jsonData = try encoder.encode(toSave)
-      vCLMLog("POM: Successfully encoded data, size: \(jsonData.count) bytes")
-
-      try jsonData.write(to: fileURL)
-      vCLMLog("POM: Successfully saved data to file")
-    } catch {
-      vCLMLog("POM Error: Unable to save data, abort saving. Details: \(error)")
+    let toSave = getSavableData()
+    let hash = toSave.hashValue
+    if previouslySavedHash == hash {
+      vCLMLog("POM Skip: Data not changed. Skipping the encoding-saving process.")
       return
     }
+    vCLMLog("POM: Attempting to save \(toSave.count) items to \(fileURL.path)")
+
+    func debouncedSaveAction() {
+      do {
+        vCLMLog("POM: Attempting to save \(toSave.count) items to \(fileURL.path)")
+
+        let jsonData = try encoder.encode(toSave)
+        vCLMLog("POM: Successfully encoded data, size: \(jsonData.count) bytes")
+
+        try jsonData.write(to: fileURL)
+        previouslySavedHash = hash
+        vCLMLog("POM: Successfully saved data to file")
+      } catch {
+        vCLMLog("POM Error: Unable to save data, abort saving. Details: \(error)")
+        return
+      }
+    }
+    debouncedSaveAction()
   }
 
   func loadData(fromURL fileURL: URL? = nil) {
