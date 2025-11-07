@@ -8,12 +8,12 @@
 "Continue" = "Continue";
 "Fatal Error" = "Fatal Error";
 "i18n:installer.ACCEPT_INSTALLATION" = "I Accept";
-"i18n:installer.DONATION_MESSAGE" = "Please consider donation. Details: https://vchewing.github.io";
 "i18n:installer.APP_NAME" = "vChewing for macOS";
 "i18n:installer.CANCEL_INSTALLATION" = "Cancel";
 "i18n:installer.DEV_CREW" = "vChewing macOS Development: Shiki Suen, Isaac Xen, Hiraku Wang, etc.\nvChewing Phrase Database Maintained by Shiki Suen.\nSentence-composition algorithm (DAG-DP) implemented by Shiki Suen.";
 "i18n:installer.DISCLAIMER_TEXT" = "NOTE: 1) Megrez Compositor since v4 uses LGPLv3 license with exceptions for static linking in Swift projects. 2) vChewing IME uses Vanguard Corpus which consists of data from multiple external resources which are credited in its GitHub repository (`vChewing/libvchewing-data` repository). The data compiler of Vanguard Corpus is licensed using 3-Clause BSD License.";
 "i18n:installer.DO_APP_UPGRADE" = "Accept & Upgrade";
+"i18n:installer.DONATION_MESSAGE" = "Please consider donation. Details: https://vchewing.github.io";
 "i18n:installer.EULA_PROMPT_NOTICE" = "By installing the software, you must accept the terms above.";
 "i18n:installer.INSTALLER_APP_TITLE_FULL" = "vChewing Installer";
 "i18n:installer.INSTALLER_APP_TITLE" = "vChewing Installer";
