@@ -362,26 +362,28 @@ public final class Debouncer {
   // MARK: Public
 
   public func schedule(_ block: @escaping () -> ()) {
-    lock.lock()
-    let previousTimer = timer
-    let newTimer = DispatchSource.makeTimerSource(queue: queue)
-    newTimer.schedule(deadline: .now() + delay)
-    newTimer.setEventHandler { [weak self, weak newTimer] in
-      block()
-      self?.completeActiveTimer(expected: newTimer)
+    lock.withLock {
+      let previousTimer = timer
+      let newTimer = DispatchSource.makeTimerSource(queue: queue)
+      newTimer.schedule(deadline: .now() + delay)
+      let timerID = UUID()
+      activeTimerID = timerID
+      newTimer.setEventHandler { [weak self] in
+        block()
+        self?.completeActiveTimer(id: timerID)
+      }
+      timer = newTimer
+      previousTimer?.cancel()
+      newTimer.resume()
     }
-    timer = newTimer
-    lock.unlock()
-
-    previousTimer?.cancel()
-    newTimer.resume()
   }
 
   public func invalidate() {
-    lock.lock()
-    timer?.cancel()
-    timer = nil
-    lock.unlock()
+    lock.withLock {
+      timer?.cancel()
+      timer = nil
+      activeTimerID = nil
+    }
   }
 
   // MARK: Private
@@ -389,14 +391,55 @@ public final class Debouncer {
   private let delay: TimeInterval
   private let queue: DispatchQueue
   private var timer: DispatchSourceTimer?
+  private var activeTimerID: UUID?
   private let lock = NSLock()
 
-  private func completeActiveTimer(expected: DispatchSourceTimer?) {
-    lock.lock()
-    defer { lock.unlock() }
-    guard let expected = expected, let currentTimer = timer else { return }
-    if currentTimer === expected { timer = nil }
+  private func completeActiveTimer(id: UUID) {
+    lock.withLock {
+      if activeTimerID == id {
+        timer = nil
+        activeTimerID = nil
+      }
+    }
   }
+}
+
+// MARK: - NSMutex
+
+/// A simple NSMutex implementation using NSLock for macOS 10.9+ compatibility.
+/// Provides thread-safe access to a wrapped value.
+public final class NSMutex<Value>: Sendable {
+  // MARK: Lifecycle
+
+  public init(_ value: Value) {
+    self.storedValue = value
+  }
+
+  // MARK: Public
+
+  public var value: Value {
+    get {
+      withLock { $0 }
+    }
+    set {
+      withLock { $0 = newValue }
+    }
+  }
+
+  /// Access the value with exclusive access (read and write).
+  public func withLock<Result>(_ body: (inout Value) throws -> Result) rethrows -> Result {
+    try lock.withLock { try body(&storedValue) }
+  }
+
+  /// Read the value with exclusive access (read-only).
+  public func withLockRead<Result>(_ body: (Value) throws -> Result) rethrows -> Result {
+    try lock.withLock { try body(storedValue) }
+  }
+
+  // MARK: Private
+
+  nonisolated(unsafe) private var storedValue: Value
+  private let lock = NSLock()
 }
 
 // MARK: - CRC32
