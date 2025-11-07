@@ -189,11 +189,11 @@
 "Hsu" = "许氏国音自然排列";
 "Hualuo Pinyin with Numeral Intonation" = "华罗拼音+数字标调";
 "i18n:aboutWindow.ABOUT_APP_TITLE_FULL" = "关于 macOS 版「威注音输入法」";
-"i18n:aboutWindow.DONATION_MESSAGE" = "请考虑对敝专案捐赠。详情：https://vchewing.github.io";
 "i18n:aboutWindow.APP_NAME" = "vChewing for macOS";
 "i18n:aboutWindow.BUGREPORT_BUTTON" = "故障提报";
 "i18n:aboutWindow.DEV_CREW" = "威注音 macOS 程式研发：Shiki Suen, Isaac Xen, Hiraku Wang, 等。\n威注音词库维护：Shiki Suen。\nDAG-DP 组句算法实作：Shiki Suen。";
 "i18n:aboutWindow.DISCLAIMER_TEXT" = "补记：1) Megrez Compositor (天权星组字引擎) 自 v4 起使用 LGPLv3 授权，但对于 Swift 专案中的静态链接之情形有额外准许。2) 威注音输入法使用了《先锋语料库 (Vanguard Corpus)》，该语料库由多个外部资源数据组成，这些数据的来源在其 GitHub 储存库 (`vChewing/libvchewing-data`) 中有列出。先锋语料库的资料建置程式借由 3-Clause BSD 授权释出。";
+"i18n:aboutWindow.DONATION_MESSAGE" = "请考虑对敝专案捐赠。详情：https://vchewing.github.io";
 "i18n:aboutWindow.LICENSE_TITLE" = "麻理去商标授权合约 (MIT-NTL License):";
 "i18n:aboutWindow.OK_BUTTON" = "确定";
 "i18n:aboutWindow.WEBSITE_BUTTON" = "网站";
@@ -271,6 +271,7 @@
 "If disabled, this will insert space instead." = "取消勾选的话，该按键会插入空格。";
 "If not filling the weight, it will be 0.0, the maximum one. An ideal weight situates in [-9.5, 0], making itself can be captured by the sentence-composition algorithm. The exception is -114.514, the disciplinary weight. The sentence-composition algorithm will ignore it unless it is the unique result." = "不填写权重的话，预设权重为最高值「0」。理想的权重范围在 [-9.5, 0] 这个闭区间内，可以被组句算法自动抓到。例外就是惩戒权重「-114.514」，属于极端降权。这种情况下，除非是唯一结果，否则会被组句算法忽略掉。";
 "If unchecked, the ESC key will try cleaning the unfinished readings / strokes first, and will commit the current composition buffer if there's no unfinished readings / strokes." = "若取消勾选，则 ESC 键会先尝试清除未组成的读音/字根；\n如果没有未组成的读音/字根的话，则会递交当前组字区的内容。";
+"imeMenu.totalRAMUsed.labelHeader" = "[运存占用量]";
 "in front of the phrase (like macOS built-in Zhuyin IME)" = "将游标置于词语前方 // macOS 内建注音风格";
 "Initial" = "首字";
 "Inline comments are not supported in associated phrases." = "关联词语不支援行内注解。";
