@@ -12,11 +12,15 @@ let package = Package(
       targets: ["FolderMonitor"]
     ),
   ],
-  dependencies: [],
+  dependencies: [
+    .package(path: "../vChewing_SwiftExtension"),
+  ],
   targets: [
     .target(
       name: "FolderMonitor",
-      dependencies: []
+      dependencies: [
+        .product(name: "SwiftExtension", package: "vChewing_SwiftExtension"),
+      ]
     ),
   ]
 )

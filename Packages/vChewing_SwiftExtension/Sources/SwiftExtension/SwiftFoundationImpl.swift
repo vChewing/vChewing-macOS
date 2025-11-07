@@ -344,3 +344,57 @@ extension Process {
     return machine == "arm64"
   }()
 }
+
+// MARK: - Debouncer
+
+public final class Debouncer {
+  // MARK: Lifecycle
+
+  public init(delay: TimeInterval, queue: DispatchQueue) {
+    self.delay = delay
+    self.queue = queue
+  }
+
+  deinit {
+    invalidate()
+  }
+
+  // MARK: Public
+
+  public func schedule(_ block: @escaping () -> ()) {
+    lock.lock()
+    let previousTimer = timer
+    let newTimer = DispatchSource.makeTimerSource(queue: queue)
+    newTimer.schedule(deadline: .now() + delay)
+    newTimer.setEventHandler { [weak self, weak newTimer] in
+      block()
+      self?.completeActiveTimer(expected: newTimer)
+    }
+    timer = newTimer
+    lock.unlock()
+
+    previousTimer?.cancel()
+    newTimer.resume()
+  }
+
+  public func invalidate() {
+    lock.lock()
+    timer?.cancel()
+    timer = nil
+    lock.unlock()
+  }
+
+  // MARK: Private
+
+  private let delay: TimeInterval
+  private let queue: DispatchQueue
+  private var timer: DispatchSourceTimer?
+  private let lock = NSLock()
+
+  private func completeActiveTimer(expected: DispatchSourceTimer?) {
+    lock.lock()
+    defer { lock.unlock() }
+    guard let expected = expected, let currentTimer = timer else { return }
+    if currentTimer === expected { timer = nil }
+  }
+}
