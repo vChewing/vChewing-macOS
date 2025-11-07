@@ -1126,14 +1126,19 @@ extension InputHandlerProtocol {
   func commitRomanNumeral(session: Session) -> Bool {
     let inputStr = strCodePointBuffer
     
+    func handleErrorState(msg: String) {
+      var newErrorState = State.ofEmpty()
+      if !msg.isEmpty {
+        newErrorState.tooltip = msg
+        newErrorState.tooltipDuration = 1.85
+        session.switchState(newErrorState)
+      }
+    }
+    
     // Parse the input to integer
     guard let number = parseRomanNumeralInput(inputStr) else {
-      errorCallback?("typingMethod.romanNumerals.error.invalidInput".localized)
-      var updatedState = State.ofAbortion()
-      updatedState.tooltipDuration = 0
-      updatedState.tooltip = "typingMethod.romanNumerals.error.invalidInput".localized
-      session.switchState(updatedState)
-      currentTypingMethod = .romanNumerals
+      handleErrorState(msg: "typingMethod.romanNumerals.error.invalidInput".localized)
+      errorCallback?("A3D5B7F9")
       return true
     }
     
@@ -1143,12 +1148,8 @@ extension InputHandlerProtocol {
     
     // Convert to roman numeral
     guard let romanNumeral = RomanNumeralConverter.convert(number, format: format) else {
-      errorCallback?("typingMethod.romanNumerals.error.valueOutOfRange".localized)
-      var updatedState = State.ofAbortion()
-      updatedState.tooltipDuration = 0
-      updatedState.tooltip = "typingMethod.romanNumerals.error.valueOutOfRange".localized
-      session.switchState(updatedState)
-      currentTypingMethod = .romanNumerals
+      handleErrorState(msg: "typingMethod.romanNumerals.error.valueOutOfRange".localized)
+      errorCallback?("2E8C4D61")
       return true
     }
     
