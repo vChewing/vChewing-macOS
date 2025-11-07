@@ -8,12 +8,12 @@
 "Continue" = "続行";
 "Fatal Error" = "致命錯乱";
 "i18n:installer.ACCEPT_INSTALLATION" = "承認する";
-"i18n:installer.DONATION_MESSAGE" = "ご寄付をご検討ください。関連情報：https://vChewing.github.io";
 "i18n:installer.APP_NAME" = "vChewing for macOS";
 "i18n:installer.CANCEL_INSTALLATION" = "取消";
 "i18n:installer.DEV_CREW" = "macOS 版威注音の開発：Shiki Suen, Isaac Xen, Hiraku Wang, など。\n威注音語彙データの維持：Shiki Suen。\nDAG-DP センテンス構築算法実作：Shiki Suen。";
 "i18n:installer.DISCLAIMER_TEXT" = "補記：1) Megrez Compositor はバージョン4以降、LGPLv3ライセンスを使用していますが、Swift プロジェクトでの静的リンクは例外として許容します。2) 威注音入力アプリは、複数の外部リソースからのデータで構成される Vanguard Corpus を使用しており、これらのリソースはGitHubリポジトリ（`vChewing/libvchewing-data`）にクレジットされています。Vanguard Corpusのデータコンパイラは、3-Clause BSDライセンスでリリースします。";
 "i18n:installer.DO_APP_UPGRADE" = "承認と更新";
+"i18n:installer.DONATION_MESSAGE" = "ご寄付をご検討ください。関連情報：https://vChewing.github.io";
 "i18n:installer.EULA_PROMPT_NOTICE" = "このアプリを実装するために、上記の条約を承認すべきである。";
 "i18n:installer.INSTALLER_APP_TITLE_FULL" = "威注音入力 実装用アプリ";
 "i18n:installer.INSTALLER_APP_TITLE" = "威注音入力 実装用アプリ";
