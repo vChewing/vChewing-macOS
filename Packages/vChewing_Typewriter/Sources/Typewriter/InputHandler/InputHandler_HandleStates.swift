@@ -1162,13 +1162,9 @@ extension InputHandlerProtocol {
     return true
   }
   
-  /// Parse the input string (which may contain N for 0) into an integer
+  /// Parse the input string into an integer
   private func parseRomanNumeralInput(_ input: String) -> Int? {
-    // Handle "N" as 0
-    if input == "N" {
-      return 0
-    }
-    // Otherwise parse as integer
+    // Parse as integer (zero is not supported in Roman numerals)
     return Int(input)
   }
 

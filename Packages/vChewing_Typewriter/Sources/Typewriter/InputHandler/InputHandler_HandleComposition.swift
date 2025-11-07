@@ -521,14 +521,14 @@ extension InputHandlerProtocol {
     guard let session = session, input.text.count == 1 else { return nil }
     let char = input.text
     
-    // Only accept digits (0-9) and N
-    guard char.rangeOfCharacter(from: CharacterSet.decimalDigits.union(CharacterSet(charactersIn: "Nn"))) != nil else {
+    // Only accept digits (1-9, no zero since Roman numerals don't include zero)
+    guard char.rangeOfCharacter(from: CharacterSet.decimalDigits) != nil else {
       errorCallback?("typingMethod.romanNumerals.error.invalidCharacter".localized)
       return true
     }
     
     // Append the character to buffer
-    strCodePointBuffer.append(char.uppercased())
+    strCodePointBuffer.append(char)
     
     // Check if we need to auto-commit (on 4th character)
     if strCodePointBuffer.count >= 4 {
