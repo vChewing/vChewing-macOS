@@ -189,11 +189,11 @@
 "Hsu" = "Hsu";
 "Hualuo Pinyin with Numeral Intonation" = "Hualuo Pinyin with Numeral Intonation";
 "i18n:aboutWindow.ABOUT_APP_TITLE_FULL" = "About vChewing for macOS";
-"i18n:aboutWindow.DONATION_MESSAGE" = "Please consider donation. Details: https://vchewing.github.io";
 "i18n:aboutWindow.APP_NAME" = "vChewing for macOS";
 "i18n:aboutWindow.BUGREPORT_BUTTON" = "Bug Report";
 "i18n:aboutWindow.DEV_CREW" = "vChewing macOS Development: Shiki Suen, Isaac Xen, Hiraku Wang, etc.\nvChewing Phrase Database Maintained by Shiki Suen.\nSentence-composition algorithm (DAG-DP) implemented by Shiki Suen.";
 "i18n:aboutWindow.DISCLAIMER_TEXT" = "NOTE: 1) Megrez Compositor since v4 uses LGPLv3 license with exceptions for static linking in Swift projects. 2) vChewing IME uses Vanguard Corpus which consists of data from multiple external resources which are credited in its GitHub repository (`vChewing/libvchewing-data` repository). The data compiler of Vanguard Corpus is licensed using 3-Clause BSD License.";
+"i18n:aboutWindow.DONATION_MESSAGE" = "Please consider donation. Details: https://vchewing.github.io";
 "i18n:aboutWindow.LICENSE_TITLE" = "MIT-NTL License:";
 "i18n:aboutWindow.OK_BUTTON" = "I Accept";
 "i18n:aboutWindow.WEBSITE_BUTTON" = "Website";
@@ -271,6 +271,7 @@
 "If disabled, this will insert space instead." = "If disabled, this will insert space instead.";
 "If not filling the weight, it will be 0.0, the maximum one. An ideal weight situates in [-9.5, 0], making itself can be captured by the sentence-composition algorithm. The exception is -114.514, the disciplinary weight. The sentence-composition algorithm will ignore it unless it is the unique result." = "If not filling the weight, it will be 0.0, the maximum one. An ideal weight situates in [-9.5, 0], making itself can be captured by the sentence-composition algorithm. The exception is -114.514, the disciplinary weight. The sentence-composition algorithm will ignore it unless it is the unique result.";
 "If unchecked, the ESC key will try cleaning the unfinished readings / strokes first, and will commit the current composition buffer if there's no unfinished readings / strokes." = "If unchecked, the ESC key will try cleaning the unfinished readings / strokes first, and will commit the current composition buffer if there's no unfinished readings / strokes.";
+"imeMenu.totalRAMUsed.labelHeader" = "[RAM USED]";
 "in front of the phrase (like macOS built-in Zhuyin IME)" = "in front of the phrase (like macOS built-in Zhuyin IME)";
 "Initial" = "Initial";
 "Inline comments are not supported in associated phrases." = "Inline comments are not supported in associated phrases.";

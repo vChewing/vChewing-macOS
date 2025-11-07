@@ -434,10 +434,9 @@ extension SessionCtl {
   var silentMode: Bool { core.clientBundleIdentifier == "com.apple.SecurityAgent" }
 
   var currentRAMUsageDescription: String? {
-    guard PrefMgr.shared.isDebugModeEnabled else { return nil }
     guard let currentMemorySizeInBytes = NSApplication.memoryFootprint else { return nil }
     let currentMemorySize: Double = (Double(currentMemorySizeInBytes) / 1_024 / 1_024)
       .rounded(toPlaces: 1)
-    return "Total RAM Usage: \(currentMemorySize)MB"
+    return "imeMenu.totalRAMUsed.labelHeader".localized + " \(currentMemorySize)MB"
   }
 }
