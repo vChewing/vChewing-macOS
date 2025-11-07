@@ -1155,11 +1155,9 @@ extension InputHandlerProtocol {
     
     // 提交結果
     session.switchState(State.ofCommitting(textToCommit: romanNumeral))
-    var updatedState = generateStateOfInputting(guarded: true)
-    updatedState.tooltipDuration = 0
-    updatedState.tooltip = TypingMethod.romanNumerals.getTooltip(vertical: session.isVerticalTyping)
-    session.switchState(updatedState)
-    currentTypingMethod = .romanNumerals
+    // 羅馬數字提交後切換到 Empty 狀態，因為羅馬數字不是連續輸入的內容
+    session.switchState(State.ofEmpty())
+    currentTypingMethod = .vChewingFactory
     return true
   }
   

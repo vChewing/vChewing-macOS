@@ -601,4 +601,105 @@ extension InputHandlerTests {
 
     vCTestLog("成功完成羅馬數字輸入測試。")
   }
+
+  /// 測試羅馬數字模式下的空格鍵功能
+  func test_IH113_RomanNumeralSpaceKeyHandling() throws {
+    guard let testHandler, let testSession else {
+      XCTFail("testHandler and testSession at least one of them is nil.")
+      return
+    }
+    clearTestPOM()
+
+    // Create a space key event
+    let spaceKeyEvent = KBEvent(
+      with: .keyDown,
+      modifierFlags: [],
+      timestamp: Date().timeIntervalSince1970,
+      windowNumber: nil,
+      characters: " ",
+      charactersIgnoringModifiers: " ",
+      isARepeat: false,
+      keyCode: KeyCode.kSpace.rawValue
+    )
+
+    // Create symbol menu key event (Option + `)
+    let symbolMenuKeyEvent = KBEvent(
+      with: .keyDown,
+      modifierFlags: .option,
+      timestamp: Date().timeIntervalSince1970,
+      windowNumber: nil,
+      characters: "`",
+      charactersIgnoringModifiers: "`",
+      isARepeat: false,
+      keyCode: KeyCode.kSymbolMenuPhysicalKeyIntl.rawValue
+    )
+
+    testSession.switchState(.ofAbortion())
+
+    // Enter Roman Numerals mode
+    XCTAssertTrue(testHandler.triageInput(event: symbolMenuKeyEvent))
+    XCTAssertEqual(testHandler.currentTypingMethod, .codePoint)
+    XCTAssertTrue(testHandler.triageInput(event: symbolMenuKeyEvent))
+    XCTAssertEqual(testHandler.currentTypingMethod, .haninKeyboardSymbol)
+    XCTAssertTrue(testHandler.triageInput(event: symbolMenuKeyEvent))
+    XCTAssertEqual(testHandler.currentTypingMethod, .romanNumerals)
+
+    // Test 1: Space key with empty buffer should trigger ofAbortion
+    vCTestLog("Test 1: Space key with empty buffer")
+    var errorCallbackTriggered = false
+    testHandler.errorCallback = { errorID in
+      vCTestLog("Error callback triggered with ID: \(errorID)")
+      errorCallbackTriggered = true
+    }
+    XCTAssertTrue(testHandler.triageInput(event: spaceKeyEvent))
+    XCTAssertTrue(errorCallbackTriggered, "Error callback should be triggered for empty buffer")
+    // State transitions to ofAbortion and then immediately to ofEmpty
+    XCTAssertEqual(testSession.state.type, .ofEmpty, "State should be ofEmpty after ofAbortion transition")
+
+    // Test 2: Space key with buffer content should commit Roman numeral
+    vCTestLog("Test 2: Space key with '42' should commit 'XLII'")
+    testSession.switchState(.ofAbortion())
+    XCTAssertTrue(testHandler.triageInput(event: symbolMenuKeyEvent))
+    XCTAssertTrue(testHandler.triageInput(event: symbolMenuKeyEvent))
+    XCTAssertTrue(testHandler.triageInput(event: symbolMenuKeyEvent))
+    XCTAssertEqual(testHandler.currentTypingMethod, .romanNumerals)
+    
+    typeSentence("42")
+    XCTAssertTrue(testHandler.triageInput(event: spaceKeyEvent))
+    XCTAssertEqual(testSession.recentCommissions.last, "XLII", "Should commit 'XLII' for input '42'")
+    XCTAssertEqual(testSession.state.type, .ofEmpty, "State should be ofEmpty after successful commit")
+    XCTAssertEqual(testHandler.currentTypingMethod, .vChewingFactory, "Should return to vChewingFactory mode after commit")
+    vCTestLog("-> Result: \(testSession.recentCommissions.last ?? "NULL")")
+
+    // Test 3: Space key with 3-digit number
+    vCTestLog("Test 3: Space key with '999' should commit 'CMXCIX'")
+    testSession.switchState(.ofAbortion())
+    XCTAssertTrue(testHandler.triageInput(event: symbolMenuKeyEvent))
+    XCTAssertTrue(testHandler.triageInput(event: symbolMenuKeyEvent))
+    XCTAssertTrue(testHandler.triageInput(event: symbolMenuKeyEvent))
+    XCTAssertEqual(testHandler.currentTypingMethod, .romanNumerals)
+    
+    typeSentence("999")
+    XCTAssertTrue(testHandler.triageInput(event: spaceKeyEvent))
+    XCTAssertEqual(testSession.recentCommissions.last, "CMXCIX", "Should commit 'CMXCIX' for input '999'")
+    XCTAssertEqual(testSession.state.type, .ofEmpty, "State should be ofEmpty after successful commit")
+    XCTAssertEqual(testHandler.currentTypingMethod, .vChewingFactory, "Should return to vChewingFactory mode after commit")
+    vCTestLog("-> Result: \(testSession.recentCommissions.last ?? "NULL")")
+
+    // Test 4: Enter key should still work (existing functionality)
+    vCTestLog("Test 4: Enter key with '2023' should commit 'MMXXIII'")
+    testSession.switchState(.ofAbortion())
+    XCTAssertTrue(testHandler.triageInput(event: symbolMenuKeyEvent))
+    XCTAssertTrue(testHandler.triageInput(event: symbolMenuKeyEvent))
+    XCTAssertTrue(testHandler.triageInput(event: symbolMenuKeyEvent))
+    XCTAssertEqual(testHandler.currentTypingMethod, .romanNumerals)
+    
+    typeSentence("2023")
+    XCTAssertEqual(testSession.recentCommissions.last, "MMXXIII", "Should auto-commit 'MMXXIII' for 4-digit input '2023'")
+    XCTAssertEqual(testSession.state.type, .ofEmpty, "State should be ofEmpty after auto-commit")
+    XCTAssertEqual(testHandler.currentTypingMethod, .vChewingFactory, "Should return to vChewingFactory mode after commit")
+    vCTestLog("-> Result: \(testSession.recentCommissions.last ?? "NULL")")
+
+    vCTestLog("成功完成羅馬數字空格鍵測試。")
+  }
 }
