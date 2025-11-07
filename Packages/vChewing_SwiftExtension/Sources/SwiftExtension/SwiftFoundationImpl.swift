@@ -366,9 +366,11 @@ public final class Debouncer {
     let previousTimer = timer
     let newTimer = DispatchSource.makeTimerSource(queue: queue)
     newTimer.schedule(deadline: .now() + delay)
-    newTimer.setEventHandler { [weak self, weak newTimer] in
+    let timerID = UUID()
+    activeTimerID = timerID
+    newTimer.setEventHandler { [weak self] in
       block()
-      self?.completeActiveTimer(expected: newTimer)
+      self?.completeActiveTimer(id: timerID)
     }
     timer = newTimer
     lock.unlock()
@@ -381,6 +383,7 @@ public final class Debouncer {
     lock.lock()
     timer?.cancel()
     timer = nil
+    activeTimerID = nil
     lock.unlock()
   }
 
@@ -389,13 +392,16 @@ public final class Debouncer {
   private let delay: TimeInterval
   private let queue: DispatchQueue
   private var timer: DispatchSourceTimer?
+  private var activeTimerID: UUID?
   private let lock = NSLock()
 
-  private func completeActiveTimer(expected: DispatchSourceTimer?) {
+  private func completeActiveTimer(id: UUID) {
     lock.lock()
     defer { lock.unlock() }
-    guard let expected = expected, let currentTimer = timer else { return }
-    if currentTimer === expected { timer = nil }
+    if activeTimerID == id {
+      timer = nil
+      activeTimerID = nil
+    }
   }
 }
 
