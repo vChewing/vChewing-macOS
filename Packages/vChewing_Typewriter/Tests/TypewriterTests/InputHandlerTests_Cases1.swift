@@ -594,9 +594,9 @@ extension InputHandlerTests {
     XCTAssertTrue(testHandler.triageInput(event: symbolMenuKeyEvent))
     XCTAssertTrue(testHandler.triageInput(event: symbolMenuKeyEvent))
     XCTAssertEqual(testHandler.currentTypingMethod, .romanNumerals)
-    vCTestLog("Testing roman numeral input: 42")
-    typeSentence("0042")
-    XCTAssertEqual(testSession.recentCommissions.last, "XLII")
+    vCTestLog("Testing roman numeral input: 1042")
+    typeSentence("1042")
+    XCTAssertEqual(testSession.recentCommissions.last, "MXLII")
     vCTestLog("-> Result: \(testSession.recentCommissions.last ?? "NULL")")
 
     vCTestLog("成功完成羅馬數字輸入測試。")

@@ -27,6 +27,14 @@ final class RomanNumeralTests: XCTestCase {
     XCTAssertEqual(RomanNumeralConverter.convert(900, format: .uppercaseASCII), "CM")
     XCTAssertEqual(RomanNumeralConverter.convert(1000, format: .uppercaseASCII), "M")
     
+    // Test numbers with zeros (valid when not leading)
+    XCTAssertEqual(RomanNumeralConverter.convert(10, format: .uppercaseASCII), "X")
+    XCTAssertEqual(RomanNumeralConverter.convert(20, format: .uppercaseASCII), "XX")
+    XCTAssertEqual(RomanNumeralConverter.convert(100, format: .uppercaseASCII), "C")
+    XCTAssertEqual(RomanNumeralConverter.convert(200, format: .uppercaseASCII), "CC")
+    XCTAssertEqual(RomanNumeralConverter.convert(1000, format: .uppercaseASCII), "M")
+    XCTAssertEqual(RomanNumeralConverter.convert(2000, format: .uppercaseASCII), "MM")
+    
     // Test compound numbers
     XCTAssertEqual(RomanNumeralConverter.convert(3, format: .uppercaseASCII), "III")
     XCTAssertEqual(RomanNumeralConverter.convert(27, format: .uppercaseASCII), "XXVII")
