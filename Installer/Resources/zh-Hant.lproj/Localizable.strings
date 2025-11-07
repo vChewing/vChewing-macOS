@@ -8,12 +8,12 @@
 "Continue" = "繼續";
 "Fatal Error" = "安裝錯誤";
 "i18n:installer.ACCEPT_INSTALLATION" = "我接受";
-"i18n:installer.DONATION_MESSAGE" = "請考慮對敝專案捐贈。詳情：https://vchewing.github.io";
 "i18n:installer.APP_NAME" = "vChewing for macOS";
 "i18n:installer.CANCEL_INSTALLATION" = "取消安裝";
 "i18n:installer.DEV_CREW" = "威注音 macOS 程式研發：Shiki Suen, Isaac Xen, Hiraku Wang, 等。\n威注音詞庫維護：Shiki Suen。\nDAG-DP 組句算法實作：Shiki Suen。";
 "i18n:installer.DISCLAIMER_TEXT" = "補記：1) Megrez Compositor (天權星組字引擎) 自 v4 起使用 LGPLv3 授權，但對於 Swift 專案中的靜態鏈接之情形有額外准許。2) 威注音輸入法使用了《先鋒語料庫 (Vanguard Corpus)》，該語料庫由多個外部資源資料組成，這些資料的來源在其 GitHub 儲存庫 (`vChewing/libvchewing-data`) 中有列出。先鋒語料庫的資料建置程式藉由 3-Clause BSD 授權釋出。";
 "i18n:installer.DO_APP_UPGRADE" = "接受並升級";
+"i18n:installer.DONATION_MESSAGE" = "請考慮對敝專案捐贈。詳情：https://vchewing.github.io";
 "i18n:installer.EULA_PROMPT_NOTICE" = "若要安裝該軟體，請接受上述條款。";
 "i18n:installer.INSTALLER_APP_TITLE_FULL" = "威注音輸入法安裝程式";
 "i18n:installer.INSTALLER_APP_TITLE" = "威注音安裝程式";
