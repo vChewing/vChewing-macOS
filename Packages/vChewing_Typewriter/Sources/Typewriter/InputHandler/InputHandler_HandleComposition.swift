@@ -20,6 +20,8 @@ extension InputHandlerProtocol {
     switch currentTypingMethod {
     case .codePoint where hardRequirementMet:
       return handleCodePointComposition(input: input)
+    case .romanNumerals where hardRequirementMet:
+      return handleRomanNumeralComposition(input: input)
     case .haninKeyboardSymbol where [[], .shift].contains(input.keyModifierFlags):
       return handleHaninKeyboardSymbolModeInput(input: input)
     case .vChewingFactory where hardRequirementMet && prefs.cassetteEnabled:
@@ -504,6 +506,69 @@ extension InputHandlerProtocol {
       currentTypingMethod = .codePoint
       return true
     }
+  }
+}
+
+// MARK: - 處理羅馬數字輸入狀態（Handle Roman Numeral Inputs）
+
+extension InputHandlerProtocol {
+  /// 處理羅馬數字輸入。
+  /// - Parameters:
+  ///   - input: 輸入按鍵訊號。
+  /// - Returns: 將按鍵行為「是否有處理掉」藉由 SessionCtl 回報給 IMK。
+  fileprivate func handleRomanNumeralComposition(input: InputSignalProtocol) -> Bool? {
+    guard !input.isReservedKey else { return nil }
+    guard let session = session, input.text.count == 1 else { return nil }
+    let char = input.text
+
+    func handleErrorState(msg: String) {
+      var newErrorState = State.ofAbortion()
+      if !msg.isEmpty {
+        newErrorState.tooltip = msg
+        newErrorState.tooltipDuration = 2
+        newErrorState.data.tooltipColorState = .redAlert
+        session.switchState(newErrorState)
+      }
+    }
+
+    // 以空白鍵遞交已經組成的數字。
+    if input.isSpace {
+      if !strCodePointBuffer.isEmpty {
+        return commitRomanNumeral(session: session)
+      } else {
+        errorCallback?("CC9346D5")
+        return true
+      }
+    }
+
+    // 驗證輸入：首位數字必須是 1-9，其餘數字可以是 0-9
+    guard char.rangeOfCharacter(from: CharacterSet.decimalDigits) != nil else {
+      handleErrorState(msg: "typingMethod.romanNumerals.error.invalidCharacter".localized)
+      errorCallback?("FC7EF8CD")
+      return true
+    }
+
+    // 首位數字不能是 0
+    if strCodePointBuffer.isEmpty, char == "0" {
+      handleErrorState(msg: "typingMethod.romanNumerals.error.invalidCharacter".localized)
+      errorCallback?("7B09F1E4")
+      return true
+    }
+
+    // 將字元追加至緩衝區
+    strCodePointBuffer.append(char)
+
+    // 檢查是否需要自動提交（第 4 個字元時）
+    if strCodePointBuffer.count >= 4 {
+      return commitRomanNumeral(session: session)
+    }
+
+    // 更新狀態並顯示當前緩衝區內容
+    var updatedState = generateStateOfInputting(guarded: true)
+    updatedState.tooltipDuration = 0
+    updatedState.tooltip = TypingMethod.romanNumerals.getTooltip(vertical: session.isVerticalTyping)
+    session.switchState(updatedState)
+    return true
   }
 }
 
