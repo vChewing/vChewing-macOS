@@ -1122,12 +1122,12 @@ extension InputHandlerProtocol {
 
   // MARK: - 處理羅馬數字提交（Roman Numeral Commit）
 
-  /// Convert and commit the roman numeral from buffer
+  /// 轉換並提交緩衝區內的羅馬數字
   func commitRomanNumeral(session: Session) -> Bool {
     let inputStr = strCodePointBuffer
     
     func handleErrorState(msg: String) {
-      var newErrorState = State.ofEmpty()
+      var newErrorState = State.ofAbortion()
       if !msg.isEmpty {
         newErrorState.tooltip = msg
         newErrorState.tooltipDuration = 1.85
@@ -1135,25 +1135,25 @@ extension InputHandlerProtocol {
       }
     }
     
-    // Parse the input to integer
+    // 將輸入解析為整數
     guard let number = parseRomanNumeralInput(inputStr) else {
       handleErrorState(msg: "typingMethod.romanNumerals.error.invalidInput".localized)
       errorCallback?("A3D5B7F9")
       return true
     }
     
-    // Get the output format from preferences
+    // 從偏好設定取得輸出格式
     let formatValue = prefs.romanNumeralOutputFormat
     let format = RomanNumeralOutputFormat(rawValue: formatValue) ?? .uppercaseASCII
     
-    // Convert to roman numeral
+    // 轉換為羅馬數字
     guard let romanNumeral = RomanNumeralConverter.convert(number, format: format) else {
       handleErrorState(msg: "typingMethod.romanNumerals.error.valueOutOfRange".localized)
       errorCallback?("2E8C4D61")
       return true
     }
     
-    // Commit the result
+    // 提交結果
     session.switchState(State.ofCommitting(textToCommit: romanNumeral))
     var updatedState = generateStateOfInputting(guarded: true)
     updatedState.tooltipDuration = 0
@@ -1163,9 +1163,9 @@ extension InputHandlerProtocol {
     return true
   }
   
-  /// Parse the input string into an integer
+  /// 將輸入字串解析為整數
   private func parseRomanNumeralInput(_ input: String) -> Int? {
-    // Parse as integer (zero is not supported in Roman numerals)
+    // 解析為整數（羅馬數字不支援零）
     return Int(input)
   }
 
