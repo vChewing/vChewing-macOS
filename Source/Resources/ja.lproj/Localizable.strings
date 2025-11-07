@@ -279,7 +279,7 @@
 "Invalid Code Point." = "コードポイントは正しくない。";
 "Invalid Selection Keys." = "候補用キーによる不具合。";
 "typingMethod.romanNumerals.tooltip" = "ローマ数字入力。";
-"typingMethod.romanNumerals.error.invalidCharacter" = "無効な文字。数字（1-9）のみ許可されます。";
+"typingMethod.romanNumerals.error.invalidCharacter" = "有効な数字のみ許可されます。例：最上位桁は [1, 9]、他の桁は [0, 9]。";
 "typingMethod.romanNumerals.error.invalidInput" = "無効な入力。";
 "typingMethod.romanNumerals.error.valueOutOfRange" = "範囲外の値（1-3999）。";
 "typingMethod.romanNumerals.outputFormatTitle" = "ローマ数字出力形式";

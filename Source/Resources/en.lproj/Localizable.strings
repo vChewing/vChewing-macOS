@@ -280,7 +280,7 @@
 "Invalid Code Point." = "Invalid Code Point.";
 "Invalid Selection Keys." = "Invalid Selection Keys.";
 "typingMethod.romanNumerals.tooltip" = "Roman Numeral Input.";
-"typingMethod.romanNumerals.error.invalidCharacter" = "Invalid character. Only digits (1-9) are allowed.";
+"typingMethod.romanNumerals.error.invalidCharacter" = "Only valid digits are allowed. E.g.: [1, 9] for the largest digit; [0, 9] for other digits.";
 "typingMethod.romanNumerals.error.invalidInput" = "Invalid input.";
 "typingMethod.romanNumerals.error.valueOutOfRange" = "Value out of range (1-3999).";
 "typingMethod.romanNumerals.outputFormatTitle" = "Roman Numeral Output Format";

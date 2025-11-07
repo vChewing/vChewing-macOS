@@ -521,8 +521,14 @@ extension InputHandlerProtocol {
     guard let session = session, input.text.count == 1 else { return nil }
     let char = input.text
     
-    // Only accept digits (1-9, no zero since Roman numerals don't include zero)
+    // Validate input: first digit must be 1-9, subsequent digits can be 0-9
     guard char.rangeOfCharacter(from: CharacterSet.decimalDigits) != nil else {
+      errorCallback?("typingMethod.romanNumerals.error.invalidCharacter".localized)
+      return true
+    }
+    
+    // First digit cannot be 0
+    if strCodePointBuffer.isEmpty && char == "0" {
       errorCallback?("typingMethod.romanNumerals.error.invalidCharacter".localized)
       return true
     }
