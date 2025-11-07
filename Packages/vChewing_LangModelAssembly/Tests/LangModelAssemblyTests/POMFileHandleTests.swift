@@ -55,6 +55,7 @@ final class POMFileHandleTests: XCTestCase {
   func testLoadOldFormatFile() throws {
     // 測試加載舊格式 "{}" 文件的處理
     let tempURL = URL(fileURLWithPath: NSTemporaryDirectory()).appendingPathComponent("test_pom_old_format.json")
+    let journalURL = tempURL.appendingPathExtension("journal")
 
     // 創建舊格式文件
     try "{}".write(to: tempURL, atomically: false, encoding: .utf8)
@@ -80,14 +81,39 @@ final class POMFileHandleTests: XCTestCase {
       let fileContent = try String(contentsOf: tempURL, encoding: .utf8)
       print("保存新數據後文件內容: '\(fileContent.prefix(50))...'")
 
-      XCTAssertTrue(fileContent.hasPrefix("["), "新保存的文件應該以 '[' 開頭（陣列格式）")
-      XCTAssertFalse(fileContent.trimmingCharacters(in: .whitespacesAndNewlines) == "{}", "不應該再是舊的 '{}' 格式")
+      XCTAssertFalse(
+        fileContent.trimmingCharacters(in: .whitespacesAndNewlines) == "{}",
+        "不應該再是舊的 '{}' 格式"
+      )
+
+      let data = fileContent.data(using: .utf8) ?? .init()
+      let decoded = try JSONDecoder().decode(
+        [LMAssembly.LMPerceptionOverride.KeyPerceptionPair].self,
+        from: data
+      )
+      XCTAssertLessThanOrEqual(decoded.count, 1)
     } catch {
       print("讀取保存後文件失敗: \(error)")
     }
 
+    // 若快照仍為空，則日誌必須存在並包含變更
+    if let snapshot = try? Data(contentsOf: tempURL),
+       let decoded = try? JSONDecoder().decode(
+         [LMAssembly.LMPerceptionOverride.KeyPerceptionPair].self,
+         from: snapshot
+       ), decoded.isEmpty {
+      XCTAssertTrue(FileManager.default.fileExists(atPath: journalURL.path))
+      let journalContent = try String(contentsOf: journalURL, encoding: .utf8)
+      XCTAssertFalse(journalContent.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty)
+    }
+
+    let reloaded = LMAssembly.LMPerceptionOverride(capacity: 10, dataURL: tempURL)
+    reloaded.loadData(fromURL: tempURL)
+    XCTAssertEqual(reloaded.getSavableData().count, 1)
+
     // 清理
     try? FileManager.default.removeItem(at: tempURL)
+    try? FileManager.default.removeItem(at: journalURL)
   }
 
   func testSaveWithLogging() throws {
@@ -111,22 +137,79 @@ final class POMFileHandleTests: XCTestCase {
     pom.saveData(toURL: tempURL)
 
     // 驗證保存成功
-    do {
-      let fileContent = try String(contentsOf: tempURL, encoding: .utf8)
-      XCTAssertFalse(fileContent.isEmpty, "保存的文件不應該為空")
-      XCTAssertTrue(fileContent.contains("test1"), "文件應該包含測試數據")
+    let fileContent = try String(contentsOf: tempURL, encoding: .utf8)
+    XCTAssertFalse(fileContent.isEmpty, "保存的文件不應該為空")
 
-      // 嘗試解析 JSON
-      let data = fileContent.data(using: .utf8)!
-      let decoder = JSONDecoder()
-      let decoded = try decoder.decode([LMAssembly.LMPerceptionOverride.KeyPerceptionPair].self, from: data)
-      XCTAssertEqual(decoded.count, testData.count, "解碼的項目數應該正確")
-
-    } catch {
-      XCTFail("保存或驗證失敗: \(error)")
+    let data = fileContent.data(using: .utf8) ?? .init()
+    let decoder = JSONDecoder()
+    let decoded = try decoder.decode([LMAssembly.LMPerceptionOverride.KeyPerceptionPair].self, from: data)
+    let journalURL = tempURL.appendingPathExtension("journal")
+    if decoded.count < testData.count {
+      XCTAssertTrue(FileManager.default.fileExists(atPath: journalURL.path))
+      let journalContent = try String(contentsOf: journalURL, encoding: .utf8)
+      XCTAssertFalse(journalContent.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty)
     }
+
+    let pomReloaded = LMAssembly.LMPerceptionOverride(capacity: 10, dataURL: tempURL)
+    pomReloaded.loadData(fromURL: tempURL)
+    let reloaded = pomReloaded.getSavableData()
+    XCTAssertEqual(reloaded.count, testData.count, "重新載入後的項目數應該與原始資料一致")
 
     // 清理
     try? FileManager.default.removeItem(at: tempURL)
+    try? FileManager.default.removeItem(at: journalURL)
+  }
+
+  func testJournalReplayKeepsDataConsistency() throws {
+    let tempURL = URL(fileURLWithPath: NSTemporaryDirectory()).appendingPathComponent("test_pom_journal.json")
+    let journalURL = tempURL.appendingPathExtension("journal")
+    defer {
+      try? FileManager.default.removeItem(at: tempURL)
+      try? FileManager.default.removeItem(at: journalURL)
+    }
+
+    let timestamp = Date.now.timeIntervalSince1970
+
+    // 初次保存會產生完整快照
+    let pom = LMAssembly.LMPerceptionOverride(capacity: 10, dataURL: tempURL)
+    pom.memorizePerception(
+      (ngramKey: "(k1,k1)&(k2,k2)&(k3,k3)", candidate: "c1"),
+      timestamp: timestamp
+    )
+    pom.saveData(toURL: tempURL)
+
+    let baseSnapshotAfterFirstSave = try Data(contentsOf: tempURL)
+    let decodedAfterFirstSave = try JSONDecoder().decode(
+      [LMAssembly.LMPerceptionOverride.KeyPerceptionPair].self,
+      from: baseSnapshotAfterFirstSave
+    )
+    XCTAssertEqual(decodedAfterFirstSave.count, 1)
+    XCTAssertFalse(FileManager.default.fileExists(atPath: journalURL.path))
+
+    // 第二次保存會寫入追加式日誌
+    pom.memorizePerception(
+      (ngramKey: "(k4,k4)&(k5,k5)&(k6,k6)", candidate: "c2"),
+      timestamp: timestamp
+    )
+    pom.saveData(toURL: tempURL)
+
+    // 基礎快照仍保有舊資料，變更被寫入日誌
+    let baseSnapshotAfterSecondSave = try Data(contentsOf: tempURL)
+    let decodedAfterSecondSave = try JSONDecoder().decode(
+      [LMAssembly.LMPerceptionOverride.KeyPerceptionPair].self,
+      from: baseSnapshotAfterSecondSave
+    )
+    XCTAssertEqual(decodedAfterSecondSave.count, 1)
+
+    XCTAssertTrue(FileManager.default.fileExists(atPath: journalURL.path))
+    let journalContent = try String(contentsOf: journalURL)
+    XCTAssertFalse(journalContent.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty)
+
+    // 重新載入應能重放日誌並還原到最新狀態
+    let pomReloaded = LMAssembly.LMPerceptionOverride(capacity: 10, dataURL: tempURL)
+    pomReloaded.loadData(fromURL: tempURL)
+    let savableAfterReload = pomReloaded.getSavableData()
+    XCTAssertEqual(savableAfterReload.count, 2)
+    XCTAssertTrue(savableAfterReload.contains { $0.key.contains("k6") })
   }
 }
