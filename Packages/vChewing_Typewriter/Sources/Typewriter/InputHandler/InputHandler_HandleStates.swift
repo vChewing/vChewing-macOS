@@ -29,17 +29,18 @@ extension InputHandlerProtocol {
     restoreBackupCursor() // 只要叫了 Inputting 狀態，就盡可能還原游標備份。
     var segHighlightedAt: Int?
     let handleAsCodePointInput = currentTypingMethod == .codePoint && !sansReading
+    let handleAsRomanNumeralInput = currentTypingMethod == .romanNumerals && !sansReading
     /// 「更新內文組字區 (Update the composing buffer)」是指要求客體軟體將組字緩衝區的內容
     /// 換成由此處重新生成的原始資料在 IMEStateData 當中生成的 NSAttributeString。
-    var displayTextSegments: [String] = handleAsCodePointInput
+    var displayTextSegments: [String] = handleAsCodePointInput || handleAsRomanNumeralInput
       ? [strCodePointBuffer]
       : assembler.assembledSentence.values
-    var cursor = handleAsCodePointInput
+    var cursor = handleAsCodePointInput || handleAsRomanNumeralInput
       ? displayTextSegments.joined().count
       : convertCursorForDisplay(assembler.cursor)
     let cursorSansReading = cursor
     // 先提出來讀音資料，減輕運算負擔。
-    let reading: String = (sansReading || currentTypingMethod == .codePoint) ? "" :
+    let reading: String = (sansReading || currentTypingMethod == .codePoint || currentTypingMethod == .romanNumerals) ? "" :
       readingForDisplay
     if !reading.isEmpty {
       var newDisplayTextSegments = [String]()
@@ -377,6 +378,11 @@ extension InputHandlerProtocol {
     guard let session = session else { return false }
     let state = session.state
 
+    // Special handling for roman numerals mode with buffer content
+    if currentTypingMethod == .romanNumerals, !strCodePointBuffer.isEmpty {
+      return commitRomanNumeral(session: session)
+    }
+
     guard currentTypingMethod == .vChewingFactory else {
       return revolveTypingMethod(to: .vChewingFactory)
     }
@@ -433,6 +439,26 @@ extension InputHandlerProtocol {
         strCodePointBuffer = strCodePointBuffer.dropLast(1).description
         if input.commonKeyModifierFlags == .option {
           return revolveTypingMethod(to: .codePoint)
+        }
+        if !strCodePointBuffer.isEmpty {
+          refreshState()
+          return true
+        }
+      }
+      return revolveTypingMethod(to: .vChewingFactory)
+    }
+
+    if currentTypingMethod == .romanNumerals {
+      if !strCodePointBuffer.isEmpty {
+        func refreshState() {
+          var updatedState = generateStateOfInputting(guarded: true)
+          updatedState.tooltipDuration = 0
+          updatedState.tooltip = session.state.tooltip
+          session.switchState(updatedState)
+        }
+        strCodePointBuffer = strCodePointBuffer.dropLast(1).description
+        if input.commonKeyModifierFlags == .option {
+          return revolveTypingMethod(to: .romanNumerals)
         }
         if !strCodePointBuffer.isEmpty {
           refreshState()
@@ -1092,6 +1118,58 @@ extension InputHandlerProtocol {
       }
     }
     return false
+  }
+
+  // MARK: - 處理羅馬數字提交（Roman Numeral Commit）
+
+  /// Convert and commit the roman numeral from buffer
+  func commitRomanNumeral(session: Session) -> Bool {
+    let inputStr = strCodePointBuffer
+    
+    // Parse the input to integer
+    guard let number = parseRomanNumeralInput(inputStr) else {
+      errorCallback?("typingMethod.romanNumerals.error.invalidInput".localized)
+      var updatedState = State.ofAbortion()
+      updatedState.tooltipDuration = 0
+      updatedState.tooltip = "typingMethod.romanNumerals.error.invalidInput".localized
+      session.switchState(updatedState)
+      currentTypingMethod = .romanNumerals
+      return true
+    }
+    
+    // Get the output format from preferences
+    let formatValue = prefs.romanNumeralOutputFormat
+    let format = RomanNumeralOutputFormat(rawValue: formatValue) ?? .uppercaseASCII
+    
+    // Convert to roman numeral
+    guard let romanNumeral = RomanNumeralConverter.convert(number, format: format) else {
+      errorCallback?("typingMethod.romanNumerals.error.valueOutOfRange".localized)
+      var updatedState = State.ofAbortion()
+      updatedState.tooltipDuration = 0
+      updatedState.tooltip = "typingMethod.romanNumerals.error.valueOutOfRange".localized
+      session.switchState(updatedState)
+      currentTypingMethod = .romanNumerals
+      return true
+    }
+    
+    // Commit the result
+    session.switchState(State.ofCommitting(textToCommit: romanNumeral))
+    var updatedState = generateStateOfInputting(guarded: true)
+    updatedState.tooltipDuration = 0
+    updatedState.tooltip = TypingMethod.romanNumerals.getTooltip(vertical: session.isVerticalTyping)
+    session.switchState(updatedState)
+    currentTypingMethod = .romanNumerals
+    return true
+  }
+  
+  /// Parse the input string (which may contain N for 0) into an integer
+  private func parseRomanNumeralInput(_ input: String) -> Int? {
+    // Handle "N" as 0
+    if input == "N" {
+      return 0
+    }
+    // Otherwise parse as integer
+    return Int(input)
   }
 
   // MARK: - 處理數字小鍵盤的文字輸入行為（NumPad）

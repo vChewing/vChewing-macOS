@@ -303,6 +303,9 @@ public struct PrefMgr: PrefMgrProtocol {
   @AppProperty(key: UserDef.kFilterNonCNSReadingsForCHTInput.rawValue, defaultValue: false)
   public var filterNonCNSReadingsForCHTInput: Bool
 
+  @AppProperty(key: UserDef.kRomanNumeralOutputFormat.rawValue, defaultValue: 0)
+  public var romanNumeralOutputFormat: Int
+
   @AppProperty(key: UserDef.kCurrencyNumeralsEnabled.rawValue, defaultValue: false)
   public var currencyNumeralsEnabled: Bool
 

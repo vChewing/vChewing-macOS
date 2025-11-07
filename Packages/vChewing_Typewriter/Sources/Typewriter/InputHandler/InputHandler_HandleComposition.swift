@@ -20,6 +20,8 @@ extension InputHandlerProtocol {
     switch currentTypingMethod {
     case .codePoint where hardRequirementMet:
       return handleCodePointComposition(input: input)
+    case .romanNumerals where hardRequirementMet:
+      return handleRomanNumeralComposition(input: input)
     case .haninKeyboardSymbol where [[], .shift].contains(input.keyModifierFlags):
       return handleHaninKeyboardSymbolModeInput(input: input)
     case .vChewingFactory where hardRequirementMet && prefs.cassetteEnabled:
@@ -504,6 +506,51 @@ extension InputHandlerProtocol {
       currentTypingMethod = .codePoint
       return true
     }
+  }
+}
+
+// MARK: - 處理羅馬數字輸入狀態（Handle Roman Numeral Inputs）
+
+extension InputHandlerProtocol {
+  /// 處理羅馬數字輸入。
+  /// - Parameters:
+  ///   - input: 輸入按鍵訊號。
+  /// - Returns: 將按鍵行為「是否有處理掉」藉由 SessionCtl 回報給 IMK。
+  fileprivate func handleRomanNumeralComposition(input: InputSignalProtocol) -> Bool? {
+    guard !input.isReservedKey else { return nil }
+    guard let session = session, input.text.count == 1 else { return nil }
+    let char = input.text
+    
+    // Only accept digits (0-9) and N
+    guard char.rangeOfCharacter(from: CharacterSet.decimalDigits.union(CharacterSet(charactersIn: "Nn"))) != nil else {
+      errorCallback?("typingMethod.romanNumerals.error.invalidCharacter".localized)
+      return true
+    }
+    
+    // Append the character to buffer
+    strCodePointBuffer.append(char.uppercased())
+    
+    // Check if we need to auto-commit (on 4th character)
+    if strCodePointBuffer.count >= 4 {
+      return commitRomanNumeral(session: session)
+    }
+    
+    // Update state with current buffer
+    var updatedState = generateStateOfInputting(guarded: true)
+    updatedState.tooltipDuration = 0
+    updatedState.tooltip = TypingMethod.romanNumerals.getTooltip(vertical: session.isVerticalTyping)
+    session.switchState(updatedState)
+    return true
+  }
+  
+  /// Parse the input string (which may contain N for 0) into an integer
+  private func parseRomanNumeralInput(_ input: String) -> Int? {
+    // Handle "N" as 0
+    if input == "N" {
+      return 0
+    }
+    // Otherwise parse as integer
+    return Int(input)
   }
 }
 
