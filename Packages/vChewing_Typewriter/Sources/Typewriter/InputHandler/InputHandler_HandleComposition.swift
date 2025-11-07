@@ -542,16 +542,6 @@ extension InputHandlerProtocol {
     session.switchState(updatedState)
     return true
   }
-  
-  /// Parse the input string (which may contain N for 0) into an integer
-  private func parseRomanNumeralInput(_ input: String) -> Int? {
-    // Handle "N" as 0
-    if input == "N" {
-      return 0
-    }
-    // Otherwise parse as integer
-    return Int(input)
-  }
 }
 
 // MARK: - 處理漢音鍵盤符號輸入狀態（Handle Hanin Keyboard Symbol Inputs）
