@@ -280,9 +280,9 @@
 "Invalid Code Point." = "内码不正确。";
 "Invalid Selection Keys." = "选字键参数资料值不规范。";
 "typingMethod.romanNumerals.tooltip" = "罗马数字输入。";
-"typingMethod.romanNumerals.error.invalidCharacter" = "无效字符。仅允许数字（0-9）与 N。";
+"typingMethod.romanNumerals.error.invalidCharacter" = "无效字符。仅允许数字（1-9）。";
 "typingMethod.romanNumerals.error.invalidInput" = "无效输入。";
-"typingMethod.romanNumerals.error.valueOutOfRange" = "数值超出范围（0-3999）。";
+"typingMethod.romanNumerals.error.valueOutOfRange" = "数值超出范围（1-3999）。";
 "typingMethod.romanNumerals.outputFormatTitle" = "罗马数字输出格式";
 "typingMethod.romanNumerals.format.uppercaseASCII" = "ASCII 大写";
 "typingMethod.romanNumerals.format.lowercaseASCII" = "ASCII 小写";

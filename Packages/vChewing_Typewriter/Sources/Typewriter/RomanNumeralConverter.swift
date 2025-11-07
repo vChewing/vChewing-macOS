@@ -23,18 +23,13 @@ public enum RomanNumeralConverter {
   /// Maximum value supported for Roman numeral conversion (exclusive)
   public static let maxValue = 4000
   
-  /// Convert an integer (0-3999) to Roman numeral representation
+  /// Convert an integer (1-3999) to Roman numeral representation
   /// - Parameters:
-  ///   - number: The number to convert (0-3999)
+  ///   - number: The number to convert (1-3999)
   ///   - format: The output format for the Roman numeral
   /// - Returns: The Roman numeral string, or nil if the number is out of range
   public static func convert(_ number: Int, format: RomanNumeralOutputFormat = .uppercaseASCII) -> String? {
-    // Handle special case for 0
-    if number == 0 {
-      return formatString("N", format: format)
-    }
-    
-    // Check range
+    // Check range (Roman numerals don't include zero)
     guard number > 0, number < maxValue else {
       return nil
     }
@@ -85,19 +80,40 @@ public enum RomanNumeralConverter {
   }
   
   /// Convert ASCII Roman numerals to Unicode Roman numeral characters (U+2160-U+217F)
+  /// Uses compound Unicode characters where available (II, III, IV, VI, VII, VIII, IX, XI, XII)
   private static func convertToUnicodeRomanNumerals(_ roman: String, lowercase: Bool) -> String {
+    // Try to use compound Unicode Roman numerals first
+    let uppercaseCompounds: [String: String] = [
+      "XII": "\u{216B}", "XI": "\u{216A}", "IX": "\u{2168}", "VIII": "\u{2167}",
+      "VII": "\u{2166}", "VI": "\u{2165}", "IV": "\u{2163}", "III": "\u{2162}",
+      "II": "\u{2161}"
+    ]
+    let lowercaseCompounds: [String: String] = [
+      "XII": "\u{217B}", "XI": "\u{217A}", "IX": "\u{2178}", "VIII": "\u{2177}",
+      "VII": "\u{2176}", "VI": "\u{2175}", "IV": "\u{2173}", "III": "\u{2172}",
+      "II": "\u{2171}"
+    ]
+    let compounds = lowercase ? lowercaseCompounds : uppercaseCompounds
+    
+    var result = roman
+    // Replace compound numerals first (longer matches first)
+    for (ascii, unicode) in compounds.sorted(by: { $0.key.count > $1.key.count }) {
+      result = result.replacingOccurrences(of: ascii, with: unicode)
+    }
+    
+    // Then replace individual characters
     let uppercaseMap: [Character: String] = [
       "I": "\u{2160}", "V": "\u{2164}", "X": "\u{2169}",
-      "L": "\u{216C}", "C": "\u{216D}", "D": "\u{216E}", "M": "\u{216F}",
-      "N": "Ⓝ" // Using circled N for zero since there's no standard Unicode Roman numeral for 0
+      "L": "\u{216C}", "C": "\u{216D}", "D": "\u{216E}", "M": "\u{216F}"
     ]
     let lowercaseMap: [Character: String] = [
       "I": "\u{2170}", "V": "\u{2174}", "X": "\u{2179}",
-      "L": "\u{217C}", "C": "\u{217D}", "D": "\u{217E}", "M": "\u{217F}",
-      "N": "ⓝ" // Using circled n for zero
+      "L": "\u{217C}", "C": "\u{217D}", "D": "\u{217E}", "M": "\u{217F}"
     ]
     
     let map = lowercase ? lowercaseMap : uppercaseMap
-    return roman.map { map[$0] ?? String($0) }.joined()
+    result = result.map { map[$0] ?? String($0) }.joined()
+    
+    return result
   }
 }

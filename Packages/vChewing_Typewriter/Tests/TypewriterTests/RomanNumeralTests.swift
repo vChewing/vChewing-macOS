@@ -12,10 +12,7 @@ import XCTest
 
 final class RomanNumeralTests: XCTestCase {
   func testRomanNumeralConversion() {
-    // Test 0 (N)
-    XCTAssertEqual(RomanNumeralConverter.convert(0, format: .uppercaseASCII), "N")
-    
-    // Test basic numbers
+    // Test basic numbers (starting from 1, no zero in Roman numerals)
     XCTAssertEqual(RomanNumeralConverter.convert(1, format: .uppercaseASCII), "I")
     XCTAssertEqual(RomanNumeralConverter.convert(4, format: .uppercaseASCII), "IV")
     XCTAssertEqual(RomanNumeralConverter.convert(5, format: .uppercaseASCII), "V")
@@ -40,7 +37,8 @@ final class RomanNumeralTests: XCTestCase {
     // Test lowercase
     XCTAssertEqual(RomanNumeralConverter.convert(1994, format: .lowercaseASCII), "mcmxciv")
     
-    // Test out of range
+    // Test out of range (including 0)
+    XCTAssertNil(RomanNumeralConverter.convert(0, format: .uppercaseASCII))
     XCTAssertNil(RomanNumeralConverter.convert(-1, format: .uppercaseASCII))
     XCTAssertNil(RomanNumeralConverter.convert(RomanNumeralConverter.maxValue, format: .uppercaseASCII))
   }
@@ -57,25 +55,36 @@ final class RomanNumeralTests: XCTestCase {
     XCTAssertEqual(lowerASCII, "xlii")
     
     // Test full-width formats (should use Unicode Roman numeral characters U+2160-U+217F)
+    // With compound Unicode characters: XL = Ⅹ + Ⅼ, II = Ⅱ (compound)
     let upperFullWidth = RomanNumeralConverter.convert(testNumber, format: .uppercaseFullWidth)
     XCTAssertNotNil(upperFullWidth)
-    // XL = \u{2169}\u{216C}, II = \u{2160}\u{2160}
-    XCTAssertEqual(upperFullWidth, "\u{2169}\u{216C}\u{2160}\u{2160}")
+    XCTAssertEqual(upperFullWidth, "\u{2169}\u{216C}\u{2161}") // Ⅹ Ⅼ Ⅱ
     
     let lowerFullWidth = RomanNumeralConverter.convert(testNumber, format: .lowercaseFullWidth)
     XCTAssertNotNil(lowerFullWidth)
-    // xl = \u{2179}\u{217C}, ii = \u{2170}\u{2170}
-    XCTAssertEqual(lowerFullWidth, "\u{2179}\u{217C}\u{2170}\u{2170}")
+    XCTAssertEqual(lowerFullWidth, "\u{2179}\u{217C}\u{2171}") // ⅹ ⅼ ⅱ
   }
   
-  func testUnicodeRomanNumeralZero() {
-    // Test that N (for 0) is converted properly in Unicode format
-    let upperFullWidth = RomanNumeralConverter.convert(0, format: .uppercaseFullWidth)
-    XCTAssertNotNil(upperFullWidth)
-    XCTAssertEqual(upperFullWidth, "Ⓝ")
+  func testUnicodeRomanNumeralCompounds() {
+    // Test that compound Unicode characters are used where available
+    // 3 = III should use Ⅲ (U+2162)
+    let three = RomanNumeralConverter.convert(3, format: .uppercaseFullWidth)
+    XCTAssertEqual(three, "\u{2162}") // Ⅲ
     
-    let lowerFullWidth = RomanNumeralConverter.convert(0, format: .lowercaseFullWidth)
-    XCTAssertNotNil(lowerFullWidth)
-    XCTAssertEqual(lowerFullWidth, "ⓝ")
+    // 4 = IV should use Ⅳ (U+2163)
+    let four = RomanNumeralConverter.convert(4, format: .uppercaseFullWidth)
+    XCTAssertEqual(four, "\u{2163}") // Ⅳ
+    
+    // 9 = IX should use Ⅸ (U+2168)
+    let nine = RomanNumeralConverter.convert(9, format: .uppercaseFullWidth)
+    XCTAssertEqual(nine, "\u{2168}") // Ⅸ
+    
+    // 12 = XII should use Ⅻ (U+216B)
+    let twelve = RomanNumeralConverter.convert(12, format: .uppercaseFullWidth)
+    XCTAssertEqual(twelve, "\u{216B}") // Ⅻ
+    
+    // Test lowercase versions
+    let threeLower = RomanNumeralConverter.convert(3, format: .lowercaseFullWidth)
+    XCTAssertEqual(threeLower, "\u{2172}") // ⅲ
   }
 }

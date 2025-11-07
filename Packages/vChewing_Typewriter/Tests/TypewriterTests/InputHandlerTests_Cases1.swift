@@ -588,20 +588,6 @@ extension InputHandlerTests {
     XCTAssertEqual(testSession.recentCommissions.last, "MCMXCIV")
     vCTestLog("-> Result: \(testSession.recentCommissions.last ?? "NULL")")
 
-    // Test with N for 0
-    testSession.switchState(.ofAbortion())
-    XCTAssertTrue(testHandler.triageInput(event: symbolMenuKeyEvent))
-    XCTAssertTrue(testHandler.triageInput(event: symbolMenuKeyEvent))
-    XCTAssertTrue(testHandler.triageInput(event: symbolMenuKeyEvent))
-    XCTAssertEqual(testHandler.currentTypingMethod, .romanNumerals)
-    vCTestLog("Testing roman numeral input: N (0)")
-    typeSentence("N")
-    // Need to manually commit since N is only 1 character
-    let enterEvent = KBEvent.KeyEventData.dataEnterReturn.asEvent
-    XCTAssertTrue(testHandler.triageInput(event: enterEvent))
-    XCTAssertEqual(testSession.recentCommissions.last, "N")
-    vCTestLog("-> Result: \(testSession.recentCommissions.last ?? "NULL")")
-
     // Test another number
     testSession.switchState(.ofAbortion())
     XCTAssertTrue(testHandler.triageInput(event: symbolMenuKeyEvent))
