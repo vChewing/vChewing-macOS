@@ -653,7 +653,7 @@ extension InputHandlerTests {
     }
     XCTAssertTrue(testHandler.triageInput(event: spaceKeyEvent))
     XCTAssertTrue(errorCallbackTriggered, "Error callback should be triggered for empty buffer")
-    // State transitions to ofAbortion and then immediately to ofEmpty
+    // ofAbortion() state automatically transitions to ofEmpty() in the state machine
     XCTAssertEqual(testSession.state.type, .ofEmpty, "State should be ofEmpty after ofAbortion transition")
 
     // Test 2: Space key with buffer content should commit Roman numeral
