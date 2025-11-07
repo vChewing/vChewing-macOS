@@ -520,19 +520,30 @@ extension InputHandlerProtocol {
     guard !input.isReservedKey else { return nil }
     guard let session = session, input.text.count == 1 else { return nil }
     let char = input.text
-    
+
+    func handleErrorState(msg: String) {
+      var newErrorState = State.ofEmpty()
+      if !msg.isEmpty {
+        newErrorState.tooltip = msg
+        newErrorState.tooltipDuration = 1.85
+        session.switchState(newErrorState)
+      }
+    }
+
     // Validate input: first digit must be 1-9, subsequent digits can be 0-9
     guard char.rangeOfCharacter(from: CharacterSet.decimalDigits) != nil else {
-      errorCallback?("typingMethod.romanNumerals.error.invalidCharacter".localized)
+      handleErrorState(msg: "typingMethod.romanNumerals.error.invalidCharacter".localized)
+      errorCallback?("FC7EF8CD")
       return true
     }
-    
+
     // First digit cannot be 0
     if strCodePointBuffer.isEmpty && char == "0" {
-      errorCallback?("typingMethod.romanNumerals.error.invalidCharacter".localized)
+      handleErrorState(msg: "typingMethod.romanNumerals.error.invalidCharacter".localized)
+      errorCallback?("7B09F1E4")
       return true
     }
-    
+
     // Append the character to buffer
     strCodePointBuffer.append(char)
     
