@@ -398,3 +398,38 @@ public final class Debouncer {
     if currentTimer === expected { timer = nil }
   }
 }
+
+// MARK: - CRC32
+
+public enum CRC32 {
+  // MARK: Public
+
+  public static func checksum(data: Data) -> UInt32 {
+    var crc: UInt32 = 0xFFFFFFFF
+    data.forEach { byte in
+      let index = Int((crc ^ UInt32(byte)) & 0xFF)
+      crc = (crc >> 8) ^ table[index]
+    }
+    return crc ^ 0xFFFFFFFF
+  }
+
+  // MARK: Private
+
+  private static let table: [UInt32] = {
+    var table = [UInt32](repeating: 0, count: 256)
+    let polynomial: UInt32 = 0xEDB88320
+
+    for i in 0 ..< 256 {
+      var crc = UInt32(i)
+      for _ in 0 ..< 8 {
+        if crc & 1 == 1 {
+          crc = (crc >> 1) ^ polynomial
+        } else {
+          crc >>= 1
+        }
+      }
+      table[i] = crc
+    }
+    return table
+  }()
+}
