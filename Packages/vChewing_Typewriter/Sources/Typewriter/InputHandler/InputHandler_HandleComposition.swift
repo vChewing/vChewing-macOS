@@ -522,7 +522,7 @@ extension InputHandlerProtocol {
     let char = input.text
 
     func handleErrorState(msg: String) {
-      var newErrorState = State.ofEmpty()
+      var newErrorState = State.ofAbortion()
       if !msg.isEmpty {
         newErrorState.tooltip = msg
         newErrorState.tooltipDuration = 1.85
