@@ -253,6 +253,12 @@
 "i18n:UserDef.kReadingNarrationCoverage.shortTitle" = "要唸讀的組音區內容";
 "i18n:userdef.kRespectClientAccentColor.description" = "這會使田所選字窗的高亮候選字詞背景色優先改用當前接收文字輸入的客體應用的強調主題色，與 macOS 內建輸入法的行為一致。如果當前接收文字輸入的客體應用沒有專門指定強調主題色（或者系統主題色被設定為非預設值）的話，則會自動改用系統偏好設定內的系統全局強調主題色。注意：該特性在啟用了 JIS / 康熙文字轉換模式時不會生效。";
 "i18n:userdef.kRespectClientAccentColor.shortTitle" = "遵循客體應用或系統全局的強調色偏好設定";
+"i18n:UserDef.kRomanNumeralOutputFormat.description" = "羅馬數字輸入模式可以在敲 [Opt]+[符號選單鍵] 切換輸入方式時啟用，支援 [1, 3999] 閉區間內的整數。輸入成功或失敗後，該模式會自動關閉。";
+"i18n:UserDef.kRomanNumeralOutputFormat.option.0" = "ASCII 大寫";
+"i18n:UserDef.kRomanNumeralOutputFormat.option.1" = "ASCII 小寫";
+"i18n:UserDef.kRomanNumeralOutputFormat.option.2" = "萬國碼羅馬數字(大寫)";
+"i18n:UserDef.kRomanNumeralOutputFormat.option.3" = "萬國碼羅馬數字(小寫)";
+"i18n:UserDef.kRomanNumeralOutputFormat.shortTitle" = "羅馬數字輸出格式";
 "i18n:UserDef.kShiftEisuToggleOffTogetherWithCapsLock.description" = "勾選該選項後：1) [至少 macOS 12 起] Caps Lock 在關掉的時候，會連帶關掉由 Shift 鍵 / JIS 英數鍵負責控制的英數模式；2) 在藉由 JIS 英數鍵關掉其控制的英數模式的時候，也會關掉 Caps Lock。註：威注音無法在 Caps Lock 亮燈的時候感知 Shift 鍵的單獨敲擊事件。";
 "i18n:UserDef.kShiftEisuToggleOffTogetherWithCapsLock.shortTitle" = "使「Shift 鍵 / JIS 英数鍵」英數模式的關閉狀態與 Caps Lock 的關閉狀態保持彼此同步";
 "i18n:UserDef.kShowCodePointInCandidateUI.shortTitle" = "在選字窗內顯示當前候選字的統一碼碼位";
@@ -410,6 +416,10 @@
 "Type them into inline composition buffer" = "直接鍵入內文組字區";
 "Typing Settings:" = "敲字設定:";
 "Typing Style:" = "輸入風格:";
+"typingMethod.romanNumerals.error.invalidCharacter" = "僅允許有效數字。例如：首位數字為 [1, 9]；其他位數字為 [0, 9]。";
+"typingMethod.romanNumerals.error.invalidInput" = "無效輸入。";
+"typingMethod.romanNumerals.error.valueOutOfRange" = "數值超出範圍（1-3999）。";
+"typingMethod.romanNumerals.tooltip" = "羅馬數字輸入。";
 "UI Language:" = "介面語言:";
 "Unable to create the user phrase file." = "無法創建自訂語彙檔案。";
 "Uncheck" = "取消勾選";

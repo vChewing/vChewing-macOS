@@ -252,6 +252,12 @@
 "i18n:UserDef.kReadingNarrationCoverage.shortTitle" = "音読組立の朗読";
 "i18n:userdef.kRespectClientAccentColor.description" = "これで田所候補陳列ウィンドウの「選択中の候補の背景色」を「今が文字入力を受けている客体アプリのアクセントカラー」と一致することになる。もしその客体アプリ自体のアクセントカラーが未指定であり、あるいはシステムのアクセントカラーがデフォルト値ではないのなら、システム設定でのアクセントカラーに準ず。１つ例外状況：JIS / 康熙字体変換モードがONの場合、このチェックは効かぬ。";
 "i18n:userdef.kRespectClientAccentColor.shortTitle" = "客体アプリ・システムのアクセントカラーに準ず";
+"i18n:UserDef.kRomanNumeralOutputFormat.description" = "ローマ数字打込モードは [Opt]+[符号メニューキー] を使用中に打込方式を切り替えるときに有効にすることができ、[1, 3999] の閉区間内の整数をサポートしています。出力が成功したか失敗したかにかかわらず、このモードは自動的にオフになります。";
+"i18n:UserDef.kRomanNumeralOutputFormat.option.0" = "ASCII大文字";
+"i18n:UserDef.kRomanNumeralOutputFormat.option.1" = "ASCII小文字";
+"i18n:UserDef.kRomanNumeralOutputFormat.option.2" = "Unicodeローマ数字 大文字";
+"i18n:UserDef.kRomanNumeralOutputFormat.option.3" = "Unicodeローマ数字 小文字";
+"i18n:UserDef.kRomanNumeralOutputFormat.shortTitle" = "ローマ数字出力形式";
 "i18n:UserDef.kShiftEisuToggleOffTogetherWithCapsLock.description" = "このチェックを入れると：イ）[macOS 12 以降] CapsLockがオフした時に、「Shiftキー・JIS英数キー」の共有していた内部のスイッチもオフにする；ロ）「JIS英数キー」でそのキーに応ずる英数モードがオフした時に、CapsLockもオフにする。尚、CapsLockがオンの時に、「Shiftキーだけを打った」行為は検知できません。";
 "i18n:UserDef.kShiftEisuToggleOffTogetherWithCapsLock.shortTitle" = "「Shiftキー・JIS英数キー」による英数モードのオフ状態をCapsLockのオフ状態と同期する";
 "i18n:UserDef.kShowCodePointInCandidateUI.shortTitle" = "候補陳列ウィンドウで Unicode のコードポイント情報を示す";
@@ -409,6 +415,10 @@
 "Type them into inline composition buffer" = "入力緩衝列にローマ字入力";
 "Typing Settings:" = "入力設定:";
 "Typing Style:" = "入力習慣:";
+"typingMethod.romanNumerals.error.invalidCharacter" = "有効な数字のみ許可されます。例：最上位桁は [1, 9]、他の桁は [0, 9]。";
+"typingMethod.romanNumerals.error.invalidInput" = "無効な打込。";
+"typingMethod.romanNumerals.error.valueOutOfRange" = "範囲外の値（1-3999）。";
+"typingMethod.romanNumerals.tooltip" = "ローマ数字打込。";
 "UI Language:" = "表示用言語:";
 "Unable to create the user phrase file." = "ユーザー辞書ファイルの作成は失敗しました。";
 "Uncheck" = "チェックの外す";

@@ -36,6 +36,7 @@ public struct VwrSettingsPaneOutput: View {
           ).render()
           UserDef.kInlineDumpPinyinInLieuOfZhuyin.bind($inlineDumpPinyinInLieuOfZhuyin).render()
           UserDef.kTrimUnfinishedReadingsOnCommit.bind($trimUnfinishedReadingsOnCommit).render()
+          UserDef.kRomanNumeralOutputFormat.bind($romanNumeralOutputFormat).render()
         }
         Section(header: Text("Experimental:")) {
           UserDef.kHardenVerticalPunctuations.bind($hardenVerticalPunctuations).render()
@@ -66,6 +67,9 @@ public struct VwrSettingsPaneOutput: View {
 
   @AppStorage(wrappedValue: false, UserDef.kHardenVerticalPunctuations.rawValue)
   private var hardenVerticalPunctuations: Bool
+
+  @AppStorage(wrappedValue: 0, UserDef.kRomanNumeralOutputFormat.rawValue)
+  private var romanNumeralOutputFormat: Int
 }
 
 // MARK: - VwrSettingsPaneOutput_Previews

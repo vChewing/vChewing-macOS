@@ -77,6 +77,14 @@ extension InputHandlerProtocol {
             session.switchState(State.ofAbortion())
             return true
           }
+          if currentTypingMethod == .romanNumerals {
+            if strCodePointBuffer.isEmpty {
+              errorCallback?("A8F3C5D2")
+              session.switchState(State.ofAbortion())
+              return true
+            }
+            return commitRomanNumeral(session: session)
+          }
           if assembler.cursor < assembler.length, assembler.insertKey(" ") {
             assemble()
             // 一邊吃一邊屙（僅對位列黑名單的 App 用這招限制組字區長度）。

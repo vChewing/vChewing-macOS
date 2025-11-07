@@ -12,6 +12,7 @@ public enum TypingMethod: Int, CaseIterable {
   case vChewingFactory // 自動指派: 0
   case codePoint // 自動指派: 1
   case haninKeyboardSymbol // 自動指派: 2
+  case romanNumerals // 自動指派: 3
 
   // MARK: Internal
 
@@ -34,6 +35,8 @@ public enum TypingMethod: Int, CaseIterable {
       return commonTerm.joined()
     case .haninKeyboardSymbol:
       return "\("Hanin Keyboard Symbol Input.".localized)"
+    case .romanNumerals:
+      return "typingMethod.romanNumerals.tooltip".localized
     }
   }
 }
@@ -63,6 +66,8 @@ extension InputHandlerProtocol {
     case .codePoint:
       strCodePointBuffer.removeAll()
     case .haninKeyboardSymbol: break
+    case .romanNumerals:
+      strCodePointBuffer.removeAll()
     }
     var updatedState = generateStateOfInputting(sansReading: true)
     session.switchState(State.ofCommitting(textToCommit: updatedState.displayedText))
