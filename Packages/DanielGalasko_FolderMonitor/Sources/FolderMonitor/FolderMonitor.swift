@@ -35,9 +35,9 @@ public class FolderMonitor {
   public func suppressEvents(for interval: TimeInterval) {
     guard interval > 0 else { return }
     let deadline = Date().addingTimeInterval(interval)
-    ignoreEventsLock.lock()
-    if deadline > ignoreEventsUntil { ignoreEventsUntil = deadline }
-    ignoreEventsLock.unlock()
+    ignoreEventsLock.withLock {
+      if deadline > ignoreEventsUntil { ignoreEventsUntil = deadline }
+    }
   }
 
   // MARK: Monitoring
@@ -154,10 +154,10 @@ public class FolderMonitor {
   }
 
   private func shouldIgnoreDueToSelfWrites() -> Bool {
-    ignoreEventsLock.lock()
-    let deadline = ignoreEventsUntil
-    ignoreEventsLock.unlock()
-    return Date() < deadline
+    ignoreEventsLock.withLock {
+      let deadline = ignoreEventsUntil
+      return Date() < deadline
+    }
   }
 
   private func isDirectoryBackedByICloud() -> Bool {
