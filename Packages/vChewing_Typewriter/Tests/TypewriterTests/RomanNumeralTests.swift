@@ -42,7 +42,7 @@ final class RomanNumeralTests: XCTestCase {
     
     // Test out of range
     XCTAssertNil(RomanNumeralConverter.convert(-1, format: .uppercaseASCII))
-    XCTAssertNil(RomanNumeralConverter.convert(4000, format: .uppercaseASCII))
+    XCTAssertNil(RomanNumeralConverter.convert(RomanNumeralConverter.maxValue, format: .uppercaseASCII))
   }
   
   func testRomanNumeralFormats() {
