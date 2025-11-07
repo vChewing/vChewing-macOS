@@ -53,7 +53,9 @@ extension LMAssembly {
     // MARK: Public
 
     public func setCapacity(_ capacity: Int) {
-      mutCapacity = max(capacity, 1)
+      lock.withLock {
+        mutCapacity = max(capacity, 1)
+      }
     }
 
     // MARK: Internal
@@ -97,6 +99,8 @@ extension LMAssembly {
     private var needsFullSnapshot = false
     /// 記錄每個鍵上次被標記（queued）或寫入的時間戳（Unix time interval）。僅存在於記憶體中。
     private var lastLogTimestampByKey: [String: TimeInterval] = [:]
+    /// 用於保護所有可變狀態的鎖，確保執行緒安全。
+    private let lock = NSLock()
   }
 }
 
@@ -297,31 +301,33 @@ extension LMAssembly.LMPerceptionOverride {
     var activeKey = keyGenerationResult.ngramKey
     guard !activeKey.isEmpty else { return .init() }
 
-    var suggestions = getSuggestion(
-      key: activeKey,
-      timestamp: timestamp
-    )
-    if suggestions == nil {
-      for fallbackKey in alternateKeys(for: activeKey) {
-        if let fallbackSuggestion = getSuggestion(
-          key: fallbackKey,
-          timestamp: timestamp
-        ) {
-          suggestions = fallbackSuggestion
-          activeKey = fallbackKey
-          break
+    return lock.withLock {
+      var suggestions = getSuggestion(
+        key: activeKey,
+        timestamp: timestamp
+      )
+      if suggestions == nil {
+        for fallbackKey in alternateKeys(for: activeKey) {
+          if let fallbackSuggestion = getSuggestion(
+            key: fallbackKey,
+            timestamp: timestamp
+          ) {
+            suggestions = fallbackSuggestion
+            activeKey = fallbackKey
+            break
+          }
         }
       }
-    }
 
-    guard let suggestions else { return .init() }
-    let forceFlag = forceHighScoreOverrideFlag(for: activeKey)
-    return .init(
-      candidates: suggestions,
-      forceHighScoreOverride: forceFlag,
-      scenario: nil,
-      overrideCursor: keyCursorRaw
-    )
+      guard let suggestions else { return .init() }
+      let forceFlag = forceHighScoreOverrideFlag(for: activeKey)
+      return .init(
+        candidates: suggestions,
+        forceHighScoreOverride: forceFlag,
+        scenario: nil,
+        overrideCursor: keyCursorRaw
+      )
+    }
   }
 
   /// 獲取由洞察過的記憶內容生成的選字建議。
@@ -409,48 +415,51 @@ extension LMAssembly.LMPerceptionOverride {
     // 檢查 key 是否有效
     guard !key.isEmpty else { return }
     guard !shouldIgnoreKey(key) else { return }
-    // 更新現有的洞察
-    if let theNeta = mutLRUMap[key] {
-      theNeta.perception.update(candidate: candidate, timestamp: timestamp)
 
-      // 移除舊的項目引用
-      if let index = mutLRUKeySeqList.firstIndex(where: { $0 == key }) {
-        mutLRUKeySeqList.remove(at: index)
+    lock.withLock {
+      // 更新現有的洞察
+      if let theNeta = mutLRUMap[key] {
+        theNeta.perception.update(candidate: candidate, timestamp: timestamp)
+
+        // 移除舊的項目引用
+        if let index = mutLRUKeySeqList.firstIndex(where: { $0 == key }) {
+          mutLRUKeySeqList.remove(at: index)
+        }
+
+        // 更新 Map 和 List
+        mutLRUMap[key] = theNeta
+        mutLRUKeySeqList.insert(key, at: 0)
+        markKeyForUpsert(key)
+
+        print("LMPerceptionOverride: 已更新現有洞察: \(key)")
+      } else {
+        // 建立新的 perception
+        let perception: Perception = .init()
+        perception.update(
+          candidate: candidate,
+          timestamp: timestamp
+        )
+
+        let koPair = KeyPerceptionPair(key: key, perception: perception)
+
+        // 先將 key 添加到 map 和 list 的開頭
+        mutLRUMap[key] = koPair
+        mutLRUKeySeqList.insert(key, at: 0)
+
+        // 如果超過容量，則移除最後一個。
+        // Capacity 始終大於 0，所以不用擔心 .removeLast() 會吃到空值而出錯。
+        if mutLRUKeySeqList.count > mutCapacity {
+          let removedKey = mutLRUKeySeqList.removeLast()
+          mutLRUMap.removeValue(forKey: removedKey)
+          markKeyForRemoval(removedKey)
+        }
+        markKeyForUpsert(key)
+
+        print("LMPerceptionOverride: 已完成新洞察: \(key)")
       }
-
-      // 更新 Map 和 List
-      mutLRUMap[key] = theNeta
-      mutLRUKeySeqList.insert(key, at: 0)
-      markKeyForUpsert(key)
-
-      print("LMPerceptionOverride: 已更新現有洞察: \(key)")
-      saveCallback?() ?? saveData()
-    } else {
-      // 建立新的 perception
-      let perception: Perception = .init()
-      perception.update(
-        candidate: candidate,
-        timestamp: timestamp
-      )
-
-      let koPair = KeyPerceptionPair(key: key, perception: perception)
-
-      // 先將 key 添加到 map 和 list 的開頭
-      mutLRUMap[key] = koPair
-      mutLRUKeySeqList.insert(key, at: 0)
-
-      // 如果超過容量，則移除最後一個。
-      // Capacity 始終大於 0，所以不用擔心 .removeLast() 會吃到空值而出錯。
-      if mutLRUKeySeqList.count > mutCapacity {
-        let removedKey = mutLRUKeySeqList.removeLast()
-        mutLRUMap.removeValue(forKey: removedKey)
-        markKeyForRemoval(removedKey)
-      }
-      markKeyForUpsert(key)
-
-      print("LMPerceptionOverride: 已完成新洞察: \(key)")
-      saveCallback?() ?? saveData()
     }
+
+    saveCallback?() ?? saveData()
   }
 
   /// 清除指定的建議（基於 context + candidate 對）
@@ -459,37 +468,45 @@ extension LMAssembly.LMPerceptionOverride {
     saveCallback: (() -> ())? = nil
   ) {
     if targets.isEmpty { return }
-    var hasChanges = false
-    var keysToRemoveCompletely: [String] = []
-    var keysNeedingUpsert: Set<String> = []
 
-    // 遍歷目標列表，針對每個 (ngramKey, candidate) 對進行移除
-    for target in targets {
-      guard let pair = mutLRUMap[target.ngramKey] else { continue }
-      let perception = pair.perception
+    let hasChanges: Bool = lock.withLock {
+      var hasChanges = false
+      var keysToRemoveCompletely: [String] = []
+      var keysNeedingUpsert: Set<String> = []
 
-      // 移除指定的 candidate override
-      if perception.overrides.removeValue(forKey: target.candidate) != nil {
-        hasChanges = true
+      // 遍歷目標列表，針對每個 (ngramKey, candidate) 對進行移除
+      for target in targets {
+        guard let pair = mutLRUMap[target.ngramKey] else { continue }
+        let perception = pair.perception
 
-        // 如果 perception 已經沒有任何 overrides，則標記整個 key 需要移除
-        if perception.overrides.isEmpty {
-          keysToRemoveCompletely.append(target.ngramKey)
+        // 移除指定的 candidate override
+        if perception.overrides.removeValue(forKey: target.candidate) != nil {
+          hasChanges = true
+
+          // 如果 perception 已經沒有任何 overrides，則標記整個 key 需要移除
+          if perception.overrides.isEmpty {
+            keysToRemoveCompletely.append(target.ngramKey)
+          }
+          keysNeedingUpsert.insert(target.ngramKey)
         }
-        keysNeedingUpsert.insert(target.ngramKey)
       }
-    }
 
-    // 移除已經沒有任何 overrides 的 keys
-    if !keysToRemoveCompletely.isEmpty {
-      keysToRemoveCompletely.forEach { mutLRUMap.removeValue(forKey: $0) }
+      // 移除已經沒有任何 overrides 的 keys
+      if !keysToRemoveCompletely.isEmpty {
+        keysToRemoveCompletely.forEach { mutLRUMap.removeValue(forKey: $0) }
+      }
+
+      if hasChanges {
+        resetLRUList()
+        keysNeedingUpsert.subtract(keysToRemoveCompletely)
+        keysNeedingUpsert.forEach { markKeyForUpsert($0) }
+        keysToRemoveCompletely.forEach { markKeyForRemoval($0) }
+      }
+
+      return hasChanges
     }
 
     if hasChanges {
-      resetLRUList()
-      keysNeedingUpsert.subtract(keysToRemoveCompletely)
-      keysNeedingUpsert.forEach { markKeyForUpsert($0) }
-      keysToRemoveCompletely.forEach { markKeyForRemoval($0) }
       saveCallback?() ?? saveData()
     }
   }
@@ -497,42 +514,50 @@ extension LMAssembly.LMPerceptionOverride {
   /// 清除指定的建議（基於 candidate，移除所有上下文中的該候選詞）
   func bleachSpecifiedSuggestions(candidateTargets: [String], saveCallback: (() -> ())? = nil) {
     if candidateTargets.isEmpty { return }
-    var hasChanges = false
-    var keysToRemoveCompletely: [String] = []
-    var keysNeedingUpsert: Set<String> = []
 
-    // 遍歷所有 keys，檢查其 perception 中是否有需要清除的 overrides
-    for key in mutLRUMap.keys {
-      guard let pair = mutLRUMap[key] else { continue }
-      let perception = pair.perception
+    let hasChanges: Bool = lock.withLock {
+      var hasChanges = false
+      var keysToRemoveCompletely: [String] = []
+      var keysNeedingUpsert: Set<String> = []
 
-      // 找出需要移除的 override keys
-      let overridesToRemove = perception.overrides.keys.filter { candidateTargets.contains($0) }
+      // 遍歷所有 keys，檢查其 perception 中是否有需要清除的 overrides
+      for key in mutLRUMap.keys {
+        guard let pair = mutLRUMap[key] else { continue }
+        let perception = pair.perception
 
-      if !overridesToRemove.isEmpty {
-        hasChanges = true
+        // 找出需要移除的 override keys
+        let overridesToRemove = perception.overrides.keys.filter { candidateTargets.contains($0) }
 
-        // 移除指定的 overrides
-        overridesToRemove.forEach { perception.overrides.removeValue(forKey: $0) }
-        keysNeedingUpsert.insert(key)
+        if !overridesToRemove.isEmpty {
+          hasChanges = true
 
-        // 如果 perception 已經沒有任何 overrides，則標記整個 key 需要移除
-        if perception.overrides.isEmpty {
-          keysToRemoveCompletely.append(key)
+          // 移除指定的 overrides
+          overridesToRemove.forEach { perception.overrides.removeValue(forKey: $0) }
+          keysNeedingUpsert.insert(key)
+
+          // 如果 perception 已經沒有任何 overrides，則標記整個 key 需要移除
+          if perception.overrides.isEmpty {
+            keysToRemoveCompletely.append(key)
+          }
         }
       }
-    }
 
-    // 移除已經沒有任何 overrides 的 keys
-    if !keysToRemoveCompletely.isEmpty {
-      keysToRemoveCompletely.forEach { mutLRUMap.removeValue(forKey: $0) }
+      // 移除已經沒有任何 overrides 的 keys
+      if !keysToRemoveCompletely.isEmpty {
+        keysToRemoveCompletely.forEach { mutLRUMap.removeValue(forKey: $0) }
+      }
+
+      if hasChanges {
+        resetLRUList()
+        keysNeedingUpsert.subtract(keysToRemoveCompletely)
+        keysNeedingUpsert.forEach { markKeyForUpsert($0) }
+        keysToRemoveCompletely.forEach { markKeyForRemoval($0) }
+      }
+
+      return hasChanges
     }
 
     if hasChanges {
-      resetLRUList()
-      keysNeedingUpsert.subtract(keysToRemoveCompletely)
-      keysNeedingUpsert.forEach { markKeyForUpsert($0) }
-      keysToRemoveCompletely.forEach { markKeyForRemoval($0) }
       saveCallback?() ?? saveData()
     }
   }
@@ -541,41 +566,56 @@ extension LMAssembly.LMPerceptionOverride {
   func bleachSpecifiedSuggestions(headReadingTargets: [String], saveCallback: (() -> ())? = nil) {
     let targets = Set(headReadingTargets.filter { !$0.isEmpty })
     guard !targets.isEmpty else { return }
-    var hasChanges = false
-    var keysToRemove: [String] = []
 
-    for key in mutLRUMap.keys {
-      guard let parts = parsePerceptionKey(key) else { continue }
-      if targets.contains(parts.headReading) {
-        hasChanges = true
-        keysToRemove.append(key)
+    let hasChanges: Bool = lock.withLock {
+      var hasChanges = false
+      var keysToRemove: [String] = []
+
+      for key in mutLRUMap.keys {
+        guard let parts = parsePerceptionKey(key) else { continue }
+        if targets.contains(parts.headReading) {
+          hasChanges = true
+          keysToRemove.append(key)
+        }
       }
-    }
 
-    if !keysToRemove.isEmpty {
-      keysToRemove.forEach { mutLRUMap.removeValue(forKey: $0) }
+      if !keysToRemove.isEmpty {
+        keysToRemove.forEach { mutLRUMap.removeValue(forKey: $0) }
+      }
+
+      if hasChanges {
+        keysToRemove.forEach { markKeyForRemoval($0) }
+        resetLRUList()
+      }
+
+      return hasChanges
     }
 
     if hasChanges {
-      keysToRemove.forEach { markKeyForRemoval($0) }
-      resetLRUList()
       saveCallback?() ?? saveData()
     }
   }
 
   /// 自 LRU 辭典內移除所有的單元圖。
   func bleachUnigrams(saveCallback: (() -> ())? = nil) {
-    var keysToRemove: [String] = []
-    for key in mutLRUMap.keys {
-      guard let parts = parsePerceptionKey(key) else { continue }
-      if parts.prev1 == nil, parts.prev2 == nil {
-        keysToRemove.append(key)
+    let hasChanges: Bool = lock.withLock {
+      var keysToRemove: [String] = []
+      for key in mutLRUMap.keys {
+        guard let parts = parsePerceptionKey(key) else { continue }
+        if parts.prev1 == nil, parts.prev2 == nil {
+          keysToRemove.append(key)
+        }
       }
+      if !keysToRemove.isEmpty {
+        keysToRemove.forEach { mutLRUMap.removeValue(forKey: $0) }
+        resetLRUList()
+        keysToRemove.forEach { markKeyForRemoval($0) }
+        return true
+      }
+      return false
     }
-    if !keysToRemove.isEmpty {
-      keysToRemove.forEach { mutLRUMap.removeValue(forKey: $0) }
-      resetLRUList()
-      keysToRemove.forEach { markKeyForRemoval($0) }
+
+    if hasChanges {
       saveCallback?() ?? saveData()
     }
   }
@@ -593,13 +633,15 @@ extension LMAssembly.LMPerceptionOverride {
 
   /// 將記憶中的覆寫資料清空，並重置日誌追蹤狀態。
   public func clearData() {
-    mutLRUMap = [:]
-    mutLRUKeySeqList = []
-    pendingUpsertKeys.removeAll()
-    pendingRemovedKeys.removeAll()
-    journalEntriesSinceLastCompaction = 0
-    needsFullSnapshot = true
-    previouslySavedHash = ""
+    lock.withLock {
+      mutLRUMap = [:]
+      mutLRUKeySeqList = []
+      pendingUpsertKeys.removeAll()
+      pendingRemovedKeys.removeAll()
+      journalEntriesSinceLastCompaction = 0
+      needsFullSnapshot = true
+      previouslySavedHash = ""
+    }
   }
 
   /// 同時清除記憶體與磁碟上的快照與日誌。
@@ -618,19 +660,23 @@ extension LMAssembly.LMPerceptionOverride {
   }
 
   public func getSavableData() -> [KeyPerceptionPair] {
-    mutLRUMap.values.sorted {
-      $0.latestTimeStamp > $1.latestTimeStamp
+    lock.withLock {
+      mutLRUMap.values.sorted {
+        $0.latestTimeStamp > $1.latestTimeStamp
+      }
     }
   }
 
   public func loadData(from data: [KeyPerceptionPair]) {
-    var newMap = [String: KeyPerceptionPair]()
-    data.forEach { currentPair in
-      guard !shouldIgnoreKey(currentPair.key) else { return }
-      newMap[currentPair.key] = currentPair
+    lock.withLock {
+      var newMap = [String: KeyPerceptionPair]()
+      data.forEach { currentPair in
+        guard !shouldIgnoreKey(currentPair.key) else { return }
+        newMap[currentPair.key] = currentPair
+      }
+      mutLRUMap = newMap
+      resetLRUList()
     }
-    mutLRUMap = newMap
-    resetLRUList()
   }
 
   /// 透過追加式日誌或完整快照將變更後的覆寫資料寫回磁碟。
@@ -642,12 +688,18 @@ extension LMAssembly.LMPerceptionOverride {
       vCLMLog("POM saveData() failed. At least the file Save URL is not set for the current POM.")
       return
     }
+
+    // Check if file exists and set needsFullSnapshot if needed
     let fileManager = FileManager.default
-    if !fileManager.fileExists(atPath: fileURL.path) {
-      needsFullSnapshot = true
+    lock.withLock {
+      if !fileManager.fileExists(atPath: fileURL.path) {
+        needsFullSnapshot = true
+      }
     }
 
-    if needsFullSnapshot {
+    // Check if full snapshot is needed
+    let shouldDoFullSnapshot = lock.withLock { needsFullSnapshot }
+    if shouldDoFullSnapshot {
       do {
         try writeFullSnapshot(to: fileURL, force: true)
       } catch {
@@ -656,19 +708,24 @@ extension LMAssembly.LMPerceptionOverride {
       return
     }
 
-    let records = preparePendingJournalRecords()
+    // Prepare records under lock
+    let records = lock.withLock { preparePendingJournalRecords() }
     guard !records.isEmpty else {
       vCLMLog("POM Skip: No pending journal entries to flush.")
       return
     }
 
+    // Perform I/O outside of lock, then update state under lock
     do {
       try appendJournal(records, baseURL: fileURL)
-      pendingUpsertKeys.removeAll()
-      pendingRemovedKeys.removeAll()
-      journalEntriesSinceLastCompaction += records.count
 
-      if shouldCompactJournal(for: fileURL) {
+      lock.withLock {
+        pendingUpsertKeys.removeAll()
+        pendingRemovedKeys.removeAll()
+        journalEntriesSinceLastCompaction += records.count
+      }
+
+      if lock.withLock({ shouldCompactJournal(for: fileURL) }) {
         try writeFullSnapshot(to: fileURL, force: false)
       }
     } catch {
@@ -1008,6 +1065,14 @@ extension LMAssembly.LMPerceptionOverride {
     lastLogTimestampByKey[key] = now
   }
 
+  /// 清理 lastLogTimestampByKey 中過期的條目以防止記憶體洩漏。
+  /// 此方法應定期調用（例如在 saveData 或 writeFullSnapshot 之後）。
+  private func cleanupOldTimestamps() {
+    let now = Date().timeIntervalSince1970
+    let threshold = now - (Self.perKeyThrottleInterval * 10) // 保留最近 20 秒的記錄
+    lastLogTimestampByKey = lastLogTimestampByKey.filter { $0.value > threshold }
+  }
+
   /// 建立待寫入日誌的記錄列表。
   private func preparePendingJournalRecords() -> [JournalRecord] {
     if needsFullSnapshot { return [] }
@@ -1095,23 +1160,35 @@ extension LMAssembly.LMPerceptionOverride {
   /// 將現有覆寫資料完整輸出為快照，並重置日誌狀態。
   private func writeFullSnapshot(to baseURL: URL, force: Bool) throws {
     let encoder = JSONEncoder()
-    let toSave = getSavableData()
+    let toSave = getSavableData() // Already locked internally
     // 先編碼再計算 deterministic hex（避免使用 Swift 的 hashValue）
     let jsonData = try encoder.encode(toSave)
     let crc = computeHexCRC32(jsonData)
 
-    if !force, previouslySavedHash == crc {
-      vCLMLog("POM Snapshot: Hash unchanged, skipping rewrite.")
-    } else {
-      try jsonData.write(to: baseURL, options: .atomic)
-      previouslySavedHash = crc
-      vCLMLog("POM Snapshot: Wrote \(toSave.count) items to \(baseURL.path)")
+    let shouldWrite = lock.withLock {
+      if !force, previouslySavedHash == crc {
+        return false
+      }
+      return true
     }
 
-    pendingUpsertKeys.removeAll()
-    pendingRemovedKeys.removeAll()
-    journalEntriesSinceLastCompaction = 0
-    needsFullSnapshot = false
+    if shouldWrite {
+      try jsonData.write(to: baseURL, options: .atomic)
+      lock.withLock {
+        previouslySavedHash = crc
+      }
+      vCLMLog("POM Snapshot: Wrote \(toSave.count) items to \(baseURL.path)")
+    } else {
+      vCLMLog("POM Snapshot: Hash unchanged, skipping rewrite.")
+    }
+
+    lock.withLock {
+      pendingUpsertKeys.removeAll()
+      pendingRemovedKeys.removeAll()
+      journalEntriesSinceLastCompaction = 0
+      needsFullSnapshot = false
+      cleanupOldTimestamps() // 清理過期的時間戳記以防止記憶體洩漏
+    }
     removeJournalFile(for: baseURL)
   }
 
@@ -1129,42 +1206,44 @@ extension LMAssembly.LMPerceptionOverride {
       let lines = content.split(whereSeparator: { $0.isNewline })
       guard !lines.isEmpty else { return }
 
-      var mutated = false
-      for line in lines {
-        let trimmed = line.trimmingCharacters(in: .whitespacesAndNewlines)
-        guard !trimmed.isEmpty else { continue }
-        guard let recordData = trimmed.data(using: .utf8) else { continue }
+      lock.withLock {
+        var mutated = false
+        for line in lines {
+          let trimmed = line.trimmingCharacters(in: .whitespacesAndNewlines)
+          guard !trimmed.isEmpty else { continue }
+          guard let recordData = trimmed.data(using: .utf8) else { continue }
 
-        do {
-          let record = try decoder.decode(JournalRecord.self, from: recordData)
-          switch record.operation {
-          case .clear:
-            mutLRUMap.removeAll()
-            mutated = true
-          case .removeKey:
-            if let key = record.key {
-              mutLRUMap.removeValue(forKey: key)
+          do {
+            let record = try decoder.decode(JournalRecord.self, from: recordData)
+            switch record.operation {
+            case .clear:
+              mutLRUMap.removeAll()
               mutated = true
+            case .removeKey:
+              if let key = record.key {
+                mutLRUMap.removeValue(forKey: key)
+                mutated = true
+              }
+            case .upsert:
+              if let pair = record.pair, !shouldIgnoreKey(pair.key) {
+                mutLRUMap[pair.key] = pair
+                mutated = true
+              }
             }
-          case .upsert:
-            if let pair = record.pair, !shouldIgnoreKey(pair.key) {
-              mutLRUMap[pair.key] = pair
-              mutated = true
-            }
+          } catch {
+            vCLMLog("POM Journal: Failed to decode record. Details: \(error)")
+            continue
           }
-        } catch {
-          vCLMLog("POM Journal: Failed to decode record. Details: \(error)")
-          continue
         }
-      }
 
-      if mutated {
-        resetLRUList()
-      }
+        if mutated {
+          resetLRUList()
+        }
 
-      pendingUpsertKeys.removeAll()
-      pendingRemovedKeys.removeAll()
-      journalEntriesSinceLastCompaction = 0
+        pendingUpsertKeys.removeAll()
+        pendingRemovedKeys.removeAll()
+        journalEntriesSinceLastCompaction = 0
+      }
     } catch {
       vCLMLog("POM Journal: Unable to replay log. Details: \(error)")
     }
