@@ -552,4 +552,67 @@ extension InputHandlerTests {
     typeSentence("su065j/ ")
     XCTAssertEqual(testHandler.assembler.assembledSentence.map(\.value), ["年終"])
   }
+
+  func test_IH112_RomanNumeralInputCheck() throws {
+    guard let testHandler, let testSession else {
+      XCTFail("testHandler and testSession at least one of them is nil.")
+      return
+    }
+
+    // 模擬 `Opt+~` 熱鍵組合觸發羅馬數字模式。
+    let symbolMenuKeyEvent = KBEvent(
+      with: .keyDown,
+      modifierFlags: .option,
+      timestamp: Date().timeIntervalSince1970,
+      windowNumber: nil,
+      characters: "`",
+      charactersIgnoringModifiers: "`",
+      isARepeat: false,
+      keyCode: KeyCode.kSymbolMenuPhysicalKeyIntl.rawValue
+    )
+    testSession.switchState(.ofAbortion())
+
+    // Test uppercase ASCII format (default)
+    XCTAssertEqual(testHandler.currentTypingMethod, .vChewingFactory)
+    // First toggle to codePoint
+    XCTAssertTrue(testHandler.triageInput(event: symbolMenuKeyEvent))
+    XCTAssertEqual(testHandler.currentTypingMethod, .codePoint)
+    // Second toggle to haninKeyboardSymbol
+    XCTAssertTrue(testHandler.triageInput(event: symbolMenuKeyEvent))
+    XCTAssertEqual(testHandler.currentTypingMethod, .haninKeyboardSymbol)
+    // Third toggle to romanNumerals
+    XCTAssertTrue(testHandler.triageInput(event: symbolMenuKeyEvent))
+    XCTAssertEqual(testHandler.currentTypingMethod, .romanNumerals)
+    vCTestLog("Testing roman numeral input: 1994")
+    typeSentence("1994")
+    XCTAssertEqual(testSession.recentCommissions.last, "MCMXCIV")
+    vCTestLog("-> Result: \(testSession.recentCommissions.last ?? "NULL")")
+
+    // Test with N for 0
+    testSession.switchState(.ofAbortion())
+    XCTAssertTrue(testHandler.triageInput(event: symbolMenuKeyEvent))
+    XCTAssertTrue(testHandler.triageInput(event: symbolMenuKeyEvent))
+    XCTAssertTrue(testHandler.triageInput(event: symbolMenuKeyEvent))
+    XCTAssertEqual(testHandler.currentTypingMethod, .romanNumerals)
+    vCTestLog("Testing roman numeral input: N (0)")
+    typeSentence("N")
+    // Need to manually commit since N is only 1 character
+    let enterEvent = KBEvent.KeyEventData.dataEnterReturn.asEvent
+    XCTAssertTrue(testHandler.triageInput(event: enterEvent))
+    XCTAssertEqual(testSession.recentCommissions.last, "N")
+    vCTestLog("-> Result: \(testSession.recentCommissions.last ?? "NULL")")
+
+    // Test another number
+    testSession.switchState(.ofAbortion())
+    XCTAssertTrue(testHandler.triageInput(event: symbolMenuKeyEvent))
+    XCTAssertTrue(testHandler.triageInput(event: symbolMenuKeyEvent))
+    XCTAssertTrue(testHandler.triageInput(event: symbolMenuKeyEvent))
+    XCTAssertEqual(testHandler.currentTypingMethod, .romanNumerals)
+    vCTestLog("Testing roman numeral input: 42")
+    typeSentence("0042")
+    XCTAssertEqual(testSession.recentCommissions.last, "XLII")
+    vCTestLog("-> Result: \(testSession.recentCommissions.last ?? "NULL")")
+
+    vCTestLog("成功完成羅馬數字輸入測試。")
+  }
 }

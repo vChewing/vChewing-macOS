@@ -93,6 +93,7 @@ public enum UserDef: String, CaseIterable, Identifiable {
   case kClassicHaninKeyboardSymbolModeShortcutEnabled =
     "ClassicHaninKeyboardSymbolModeShortcutEnabled"
   case kFilterNonCNSReadingsForCHTInput = "FilterNonCNSReadingsForCHTInput"
+  case kRomanNumeralOutputFormat = "RomanNumeralOutputFormat"
 
   case kUseSpaceToCommitHighlightedSCPCCandidate = "UseSpaceToCommitHighlightedSCPCCandidate"
   case kEnableMouseScrollingForTDKCandidatesCocoa = "EnableMouseScrollingForTDKCandidatesCocoa"
@@ -249,6 +250,7 @@ extension UserDef {
     case .kPhraseEditorAutoReloadExternalModifications: return .bool
     case .kClassicHaninKeyboardSymbolModeShortcutEnabled: return .bool
     case .kFilterNonCNSReadingsForCHTInput: return .bool
+    case .kRomanNumeralOutputFormat: return .integer
     case .kUseSpaceToCommitHighlightedSCPCCandidate: return .bool
     case .kEnableMouseScrollingForTDKCandidatesCocoa: return .bool
     case .kDisableSegmentedThickUnderlineInMarkingModeForManagedClients: return .bool
@@ -651,6 +653,16 @@ extension UserDef {
       )
     case .kFilterNonCNSReadingsForCHTInput: return .init(
         userDef: self, shortTitle: "i18n:UserDef.kFilterNonCNSReadingsForCHTInput.shortTitle"
+      )
+    case .kRomanNumeralOutputFormat: return .init(
+        userDef: self,
+        shortTitle: "typingMethod.romanNumerals.outputFormatTitle",
+        options: [
+          0: "typingMethod.romanNumerals.format.uppercaseASCII",
+          1: "typingMethod.romanNumerals.format.lowercaseASCII",
+          2: "typingMethod.romanNumerals.format.uppercaseFullWidth",
+          3: "typingMethod.romanNumerals.format.lowercaseFullWidth"
+        ]
       )
     case .kUseSpaceToCommitHighlightedSCPCCandidate: return .init(
         userDef: self,
