@@ -56,11 +56,26 @@ final class RomanNumeralTests: XCTestCase {
     let lowerASCII = RomanNumeralConverter.convert(testNumber, format: .lowercaseASCII)
     XCTAssertEqual(lowerASCII, "xlii")
     
-    // Test full-width formats (these depend on the applyingTransformFW2HW implementation)
+    // Test full-width formats (should use Unicode Roman numeral characters U+2160-U+217F)
     let upperFullWidth = RomanNumeralConverter.convert(testNumber, format: .uppercaseFullWidth)
     XCTAssertNotNil(upperFullWidth)
+    // XL = \u{2169}\u{216C}, II = \u{2160}\u{2160}
+    XCTAssertEqual(upperFullWidth, "\u{2169}\u{216C}\u{2160}\u{2160}")
     
     let lowerFullWidth = RomanNumeralConverter.convert(testNumber, format: .lowercaseFullWidth)
     XCTAssertNotNil(lowerFullWidth)
+    // xl = \u{2179}\u{217C}, ii = \u{2170}\u{2170}
+    XCTAssertEqual(lowerFullWidth, "\u{2179}\u{217C}\u{2170}\u{2170}")
+  }
+  
+  func testUnicodeRomanNumeralZero() {
+    // Test that N (for 0) is converted properly in Unicode format
+    let upperFullWidth = RomanNumeralConverter.convert(0, format: .uppercaseFullWidth)
+    XCTAssertNotNil(upperFullWidth)
+    XCTAssertEqual(upperFullWidth, "Ⓝ")
+    
+    let lowerFullWidth = RomanNumeralConverter.convert(0, format: .lowercaseFullWidth)
+    XCTAssertNotNil(lowerFullWidth)
+    XCTAssertEqual(lowerFullWidth, "ⓝ")
   }
 }

@@ -78,9 +78,26 @@ public enum RomanNumeralConverter {
     case .lowercaseASCII:
       return roman.lowercased()
     case .uppercaseFullWidth:
-      return roman.applyingTransformFW2HW(reverse: true)
+      return convertToUnicodeRomanNumerals(roman, lowercase: false)
     case .lowercaseFullWidth:
-      return roman.lowercased().applyingTransformFW2HW(reverse: true)
+      return convertToUnicodeRomanNumerals(roman, lowercase: true)
     }
+  }
+  
+  /// Convert ASCII Roman numerals to Unicode Roman numeral characters (U+2160-U+217F)
+  private static func convertToUnicodeRomanNumerals(_ roman: String, lowercase: Bool) -> String {
+    let uppercaseMap: [Character: String] = [
+      "I": "\u{2160}", "V": "\u{2164}", "X": "\u{2169}",
+      "L": "\u{216C}", "C": "\u{216D}", "D": "\u{216E}", "M": "\u{216F}",
+      "N": "Ⓝ" // Using circled N for zero since there's no standard Unicode Roman numeral for 0
+    ]
+    let lowercaseMap: [Character: String] = [
+      "I": "\u{2170}", "V": "\u{2174}", "X": "\u{2179}",
+      "L": "\u{217C}", "C": "\u{217D}", "D": "\u{217E}", "M": "\u{217F}",
+      "N": "ⓝ" // Using circled n for zero
+    ]
+    
+    let map = lowercase ? lowercaseMap : uppercaseMap
+    return roman.map { map[$0] ?? String($0) }.joined()
   }
 }
