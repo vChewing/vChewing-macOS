@@ -20,21 +20,21 @@ public enum RomanNumeralOutputFormat: Int, CaseIterable {
 // MARK: - RomanNumeralConverter
 
 public enum RomanNumeralConverter {
-  /// Maximum value supported for Roman numeral conversion (exclusive)
+  /// 羅馬數字轉換支援的最大值（不含）
   public static let maxValue = 4000
   
-  /// Convert an integer (1-3999) to Roman numeral representation
+  /// 將整數（1-3999）轉換為羅馬數字表示
   /// - Parameters:
-  ///   - number: The number to convert (1-3999)
-  ///   - format: The output format for the Roman numeral
-  /// - Returns: The Roman numeral string, or nil if the number is out of range
+  ///   - number: 要轉換的數字（1-3999）
+  ///   - format: 羅馬數字的輸出格式
+  /// - Returns: 羅馬數字字串，若數字超出範圍則返回 nil
   public static func convert(_ number: Int, format: RomanNumeralOutputFormat = .uppercaseASCII) -> String? {
-    // Check range (Roman numerals don't include zero)
+    // 檢查範圍（羅馬數字不包括零）
     guard number > 0, number < maxValue else {
       return nil
     }
     
-    // Roman numeral conversion table
+    // 羅馬數字轉換對照表
     let romanValues: [(Int, String)] = [
       (1000, "M"),
       (900, "CM"),
@@ -65,7 +65,7 @@ public enum RomanNumeralConverter {
     return formatString(result, format: format)
   }
   
-  /// Format a Roman numeral string according to the specified format
+  /// 根據指定格式將羅馬數字字串進行格式化
   private static func formatString(_ roman: String, format: RomanNumeralOutputFormat) -> String {
     switch format {
     case .uppercaseASCII:
@@ -79,10 +79,10 @@ public enum RomanNumeralConverter {
     }
   }
   
-  /// Convert ASCII Roman numerals to Unicode Roman numeral characters (U+2160-U+217F)
-  /// Uses compound Unicode characters where available (II, III, IV, VI, VII, VIII, IX, XI, XII)
+  /// 將 ASCII 羅馬數字轉換為 Unicode 羅馬數字字元（U+2160-U+217F）
+  /// 在可用的情況下使用複合 Unicode 字元（II、III、IV、VI、VII、VIII、IX、XI、XII）
   private static func convertToUnicodeRomanNumerals(_ roman: String, lowercase: Bool) -> String {
-    // Try to use compound Unicode Roman numerals first
+    // 優先使用複合 Unicode 羅馬數字
     let uppercaseCompounds: [String: String] = [
       "XII": "\u{216B}", "XI": "\u{216A}", "IX": "\u{2168}", "VIII": "\u{2167}",
       "VII": "\u{2166}", "VI": "\u{2165}", "IV": "\u{2163}", "III": "\u{2162}",
@@ -96,12 +96,12 @@ public enum RomanNumeralConverter {
     let compounds = lowercase ? lowercaseCompounds : uppercaseCompounds
     
     var result = roman
-    // Replace compound numerals first (longer matches first)
+    // 優先替換複合數字（較長的匹配優先）
     for (ascii, unicode) in compounds.sorted(by: { $0.key.count > $1.key.count }) {
       result = result.replacingOccurrences(of: ascii, with: unicode)
     }
     
-    // Then replace individual characters
+    // 然後替換單個字元
     let uppercaseMap: [Character: String] = [
       "I": "\u{2160}", "V": "\u{2164}", "X": "\u{2169}",
       "L": "\u{216C}", "C": "\u{216D}", "D": "\u{216E}", "M": "\u{216F}"

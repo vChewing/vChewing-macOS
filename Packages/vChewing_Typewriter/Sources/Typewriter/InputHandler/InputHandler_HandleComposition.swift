@@ -530,29 +530,29 @@ extension InputHandlerProtocol {
       }
     }
 
-    // Validate input: first digit must be 1-9, subsequent digits can be 0-9
+    // 驗證輸入：首位數字必須是 1-9，其餘數字可以是 0-9
     guard char.rangeOfCharacter(from: CharacterSet.decimalDigits) != nil else {
       handleErrorState(msg: "typingMethod.romanNumerals.error.invalidCharacter".localized)
       errorCallback?("FC7EF8CD")
       return true
     }
 
-    // First digit cannot be 0
+    // 首位數字不能是 0
     if strCodePointBuffer.isEmpty && char == "0" {
       handleErrorState(msg: "typingMethod.romanNumerals.error.invalidCharacter".localized)
       errorCallback?("7B09F1E4")
       return true
     }
 
-    // Append the character to buffer
+    // 將字元追加至緩衝區
     strCodePointBuffer.append(char)
     
-    // Check if we need to auto-commit (on 4th character)
+    // 檢查是否需要自動提交（第 4 個字元時）
     if strCodePointBuffer.count >= 4 {
       return commitRomanNumeral(session: session)
     }
     
-    // Update state with current buffer
+    // 更新狀態並顯示當前緩衝區內容
     var updatedState = generateStateOfInputting(guarded: true)
     updatedState.tooltipDuration = 0
     updatedState.tooltip = TypingMethod.romanNumerals.getTooltip(vertical: session.isVerticalTyping)
