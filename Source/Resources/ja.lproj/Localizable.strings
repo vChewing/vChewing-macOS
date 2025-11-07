@@ -188,11 +188,11 @@
 "Hsu" = "許氏国音自然配列";
 "Hualuo Pinyin with Numeral Intonation" = "中華ローマ弁音 (ローマ字+数字音調)";
 "i18n:aboutWindow.ABOUT_APP_TITLE_FULL" = "macOS 版威注音入力アプリについて";
-"i18n:aboutWindow.DONATION_MESSAGE" = "ご寄付をご検討ください。関連情報：https://vChewing.github.io";
 "i18n:aboutWindow.APP_NAME" = "vChewing for macOS";
 "i18n:aboutWindow.BUGREPORT_BUTTON" = "問題を報告";
 "i18n:aboutWindow.DEV_CREW" = "macOS 版威注音の開発：Shiki Suen, Isaac Xen, Hiraku Wang, など。\n威注音語彙データの維持：Shiki Suen。\nDAG-DP センテンス構築算法実作：Shiki Suen。";
 "i18n:aboutWindow.DISCLAIMER_TEXT" = "補記：1) Megrez Compositor はバージョン4以降、LGPLv3ライセンスを使用していますが、Swift プロジェクトでの静的リンクは例外として許容します。2) 威注音入力アプリは、複数の外部リソースからのデータで構成される Vanguard Corpus を使用しており、これらのリソースはGitHubリポジトリ（`vChewing/libvchewing-data`）にクレジットされています。Vanguard Corpusのデータコンパイラは、3-Clause BSDライセンスでリリースします。";
+"i18n:aboutWindow.DONATION_MESSAGE" = "ご寄付をご検討ください。関連情報：https://vChewing.github.io";
 "i18n:aboutWindow.LICENSE_TITLE" = "ＭＩＴ商標不許可ライセンス (MIT-NTL License):";
 "i18n:aboutWindow.OK_BUTTON" = "うむ";
 "i18n:aboutWindow.WEBSITE_BUTTON" = "公式HP";
@@ -270,6 +270,7 @@
 "If disabled, this will insert space instead." = "未チェックの場合、スペースを挿入。";
 "If not filling the weight, it will be 0.0, the maximum one. An ideal weight situates in [-9.5, 0], making itself can be captured by the sentence-composition algorithm. The exception is -114.514, the disciplinary weight. The sentence-composition algorithm will ignore it unless it is the unique result." = "優先度を記入しなかった場合、最高値「0」はデフォルト値です。理想な優先度の範囲は [-9.5, 0] 以内で、センテンス構築算法に捕まれられます。例外は懲戒値「-114.514」で、優先度を最低に極めた値であり、唯一結果のない場合、センテンス構築算法に無視されます。";
 "If unchecked, the ESC key will try cleaning the unfinished readings / strokes first, and will commit the current composition buffer if there's no unfinished readings / strokes." = "未チェックの場合、ESC キーはまず未完成の音読/筆画を消す。\n未完成の音読/筆画がない場合、全緩衝列をそのまま送り出す。";
+"imeMenu.totalRAMUsed.labelHeader" = "[RAM使用量]";
 "in front of the phrase (like macOS built-in Zhuyin IME)" = "単語の前で // macOS 内蔵注音入力のやり方";
 "Initial" = "頭文字";
 "Inline comments are not supported in associated phrases." = "インラインメモは連想語彙辞書で使えません。";
