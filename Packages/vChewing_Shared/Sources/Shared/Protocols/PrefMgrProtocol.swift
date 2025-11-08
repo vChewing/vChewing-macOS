@@ -91,6 +91,7 @@ public protocol PrefMgrProtocol {
   var specifyCmdOptCtrlEnterBehavior: Int { get set }
   var candidateTextFontName: String { get set }
   var candidateKeys: String { get set }
+  var candidateNarrationToggleType: Int { get set }
   var useSCPCTypingMode: Bool { get set }
   var phraseReplacementEnabled: Bool { get set }
   var associatedPhrasesEnabled: Bool { get set }

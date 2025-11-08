@@ -224,6 +224,11 @@
 "i18n:UserDef.kBeepSoundPreference.shortTitle" = "蜂鸣音效";
 "i18n:UserDef.kBypassNonAppleCapsLockHandling.description" = "这不会影响到自 macOS 10.14 开始的系统内建的同名功能。";
 "i18n:UserDef.kBypassNonAppleCapsLockHandling.shortTitle" = "不使用威注音输入法内建的 Caps Lock 处理";
+"i18n:UserDef.kCandidateNarrationToggleType.description" = "设定何时以文字转语音朗读候选字词，便于透过听觉确认当前高亮显示的候选字词。若有同音候选，系统会查询可由使用者自订的关联词语资料库，尝试说明各字；准确度取决于该资料库的品质。";
+"i18n:UserDef.kCandidateNarrationToggleType.option.alwaysOff" = "总是关闭";
+"i18n:UserDef.kCandidateNarrationToggleType.option.alwaysOn" = "总是开启";
+"i18n:UserDef.kCandidateNarrationToggleType.option.onlyWhenVoiceOverIsOn" = "仅在 VoiceOver 开启时";
+"i18n:UserDef.kCandidateNarrationToggleType.shortTitle" = "候选字词念读模式:";
 "i18n:userdef.kCheckAbusersOfSecureEventInputAPI.description" = "这种滥用会导致系统内的所有第三方输入法全都无法正常使用（在输入法选单内会变成灰色）。针对需要填写敏感数据的场合，使用 SecureEventInput 无可厚非。但是，用 EnableSecureEventInput() 开启该模式之后，就有义务在输入窗格失焦的那一刻呼叫 DisableSecureEventInput() 来结束这种状态。这种状态还常见于后台辅助 App 当中、或者某个 App 在叫出该模式之后失去响应（这样的话，哪怕被切换到后台，SecureEventInput 也不会自动解除）。";
 "i18n:UserDef.kCheckAbusersOfSecureEventInputAPI.shortTitle" = "主动检测正在滥用 SecureEventInput API 的后台进程";
 "i18n:UserDef.kCNS11643Enabled.shortTitle" = "启用 CNS11643 全字库支援 (2025-09-30)";

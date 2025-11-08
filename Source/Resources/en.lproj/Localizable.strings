@@ -224,6 +224,11 @@
 "i18n:UserDef.kBeepSoundPreference.shortTitle" = "Beep Sound";
 "i18n:UserDef.kBypassNonAppleCapsLockHandling.description" = "This won't affect the same feature offered by macOS since 10.14 Mojave and later.";
 "i18n:UserDef.kBypassNonAppleCapsLockHandling.shortTitle" = "Bypass the vChewing built-in Caps Lock handling";
+"i18n:UserDef.kCandidateNarrationToggleType.description" = "Controls when candidate selections are read aloud (text-to-speech). This allows you highlight selections by ear. If multiple candidates share a pronunciation, the system consults the user-customizable Associated Phrases database to explain each character; the accuracy of the explanation depends on the quality of that database.";
+"i18n:UserDef.kCandidateNarrationToggleType.option.alwaysOff" = "Always Off";
+"i18n:UserDef.kCandidateNarrationToggleType.option.alwaysOn" = "Always On";
+"i18n:UserDef.kCandidateNarrationToggleType.option.onlyWhenVoiceOverIsOn" = "Only When VoiceOver is On";
+"i18n:UserDef.kCandidateNarrationToggleType.shortTitle" = "Candidate Narration Mode:";
 "i18n:userdef.kCheckAbusersOfSecureEventInputAPI.description" = "Such abuse of SecureEventInput API in the background can hinder all 3rd-party input methods from being able to switch to. It is fine to use SecureEventInput for sensitive input fields. However, an app calling EnableSecureEventInput() is responsible to call DisableSecureEventInput() immediately right after the input field loses focus. This situation may also happen if an app is hanging in the background (or working as a helper application in the background) with its SecureEventInput left enabled.";
 "i18n:UserDef.kCheckAbusersOfSecureEventInputAPI.shortTitle" = "Actively check those processes abusing the SecureEventInput API";
 "i18n:UserDef.kCNS11643Enabled.shortTitle" = "Enable CNS11643 Support (2025-09-30)";
