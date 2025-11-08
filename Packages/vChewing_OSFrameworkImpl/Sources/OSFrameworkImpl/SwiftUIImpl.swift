@@ -298,7 +298,7 @@
         pathCtl.backgroundColor = .controlBackgroundColor
         pathCtl.target = self
         pathCtl.delegate = self
-        pathCtl.doubleAction = #selector(Coordinator.action)
+        pathCtl.doubleAction = #selector(Self.action)
         pathCtl.setContentHuggingPriority(.defaultHigh, for: .vertical)
         pathCtl.setContentCompressionResistancePriority(.defaultLow, for: .horizontal)
         pathCtl.heightAnchor.constraint(equalToConstant: NSFont.smallSystemFontSize * 2).isActive = true
