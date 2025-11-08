@@ -216,6 +216,18 @@ extension SessionProtocol {
       updateCompositionBufferDisplay()
     default: break
     }
+    voiceOverTask: if let narratable = inputMode.langModel.prepareCandidateNarrationPair(state) {
+      let voiceOverIsOn: Bool
+      if #available(macOS 10.13, *) {
+        voiceOverIsOn = NSWorkspace.shared.isVoiceOverEnabled
+      } else {
+        voiceOverIsOn = !NSRunningApplication.runningApplications(
+          withBundleIdentifier: "com.apple.VoiceOver"
+        ).isEmpty
+      }
+      guard voiceOverIsOn else { break voiceOverTask }
+      SpeechSputnik.shared.narrate(narratable.readingToNarrate)
+    }
   }
 
   public func candidatePairSelectionConfirmed(at index: Int) {
