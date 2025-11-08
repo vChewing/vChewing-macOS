@@ -83,8 +83,9 @@ strongifiedSelf
 --extensionacl on-declarations
 --funcattributes prev-line
 --indent 2
---maxwidth 100
+--maxwidth 120
 --typeattributes prev-line
+--computedvarattrs prev-line
 --storedvarattrs prev-line
 --voidtype tuple
 --wraparguments before-first
