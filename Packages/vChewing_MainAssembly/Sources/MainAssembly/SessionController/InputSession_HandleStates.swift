@@ -76,7 +76,11 @@ extension SessionProtocol {
         commit(text: previous.displayedText)
       }
       // 會在工具提示為空的時候自動消除顯示。
-      showTooltip(newState.tooltip, duration: newState.tooltipDuration)
+      showTooltip(
+        newState.tooltip,
+        colorState: newState.data.tooltipColorState,
+        duration: newState.tooltipDuration
+      )
       clearInlineDisplay()
       inputHandler?.clear()
     case .ofInputting:
@@ -86,12 +90,19 @@ extension SessionProtocol {
       }
       setInlineDisplayWithCursor()
       // 會在工具提示為空的時候自動消除顯示。
-      showTooltip(newState.tooltip, duration: newState.tooltipDuration)
+      showTooltip(
+        newState.tooltip,
+        colorState: newState.data.tooltipColorState,
+        duration: newState.tooltipDuration
+      )
       if newState.isCandidateContainer { showCandidates() }
     case .ofMarking:
       candidateUI?.visible = false
       setInlineDisplayWithCursor()
-      showTooltip(newState.tooltip)
+      showTooltip(
+        newState.tooltip,
+        colorState: newState.data.tooltipColorState
+      )
     case .ofAssociates, .ofCandidates, .ofSymbolTable:
       tooltipInstance.hide()
       setInlineDisplayWithCursor()
