@@ -33,7 +33,11 @@ extension SessionProtocol {
     return client.lineHeightRect(u16Cursor: zeroCursor ? 0 : u16Cursor)
   }
 
-  public func showTooltip(_ tooltip: String, duration: Double = 0) {
+  public func showTooltip(
+    _ tooltip: String,
+    colorState: TooltipColorState = .normal,
+    duration: Double = 0
+  ) {
     guard client() != nil else { return }
     if tooltip.isEmpty {
       tooltipInstance.hide()
@@ -55,7 +59,7 @@ extension SessionProtocol {
     do {
       tooltipInstance.hide()
       tooltipInstance = Self.makeTooltipUI()
-      tooltipInstance.setColor(state: state.data.tooltipColorState)
+      tooltipInstance.setColor(state: colorState)
     }
     // 再設定其文字顯示內容並顯示。
     tooltipInstance.show(

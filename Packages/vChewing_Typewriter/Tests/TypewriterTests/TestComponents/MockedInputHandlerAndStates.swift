@@ -250,7 +250,11 @@ public class MockSession: SessionCoreProtocol, CtlCandidateDelegateCore {
       //   commit(text: previous.displayedText)
       // }
       // 會在工具提示為空的時候自動消除顯示。
-      // showTooltip(newState.tooltip, duration: newState.tooltipDuration)
+      // showTooltip(
+      //   newState.tooltip,
+      //   colorState: newState.data.tooltipColorState,
+      //   duration: newState.tooltipDuration
+      // )
       // clearInlineDisplay()
       inputHandler?.clear()
     case .ofInputting: break
@@ -260,12 +264,19 @@ public class MockSession: SessionCoreProtocol, CtlCandidateDelegateCore {
     // }
     // setInlineDisplayWithCursor()
     // 會在工具提示為空的時候自動消除顯示。
-    // showTooltip(newState.tooltip, duration: newState.tooltipDuration)
+    // showTooltip(
+    //   newState.tooltip,
+    //   colorState: newState.data.tooltipColorState,
+    //   duration: newState.tooltipDuration
+    // )
     // if newState.isCandidateContainer { showCandidates() }
     case .ofMarking: break
     // candidateUI?.visible = false
     // setInlineDisplayWithCursor()
-    // showTooltip(newState.tooltip)
+    // showTooltip(
+    //   newState.tooltip,
+    //   colorState: newState.data.tooltipColorState
+    // )
     case .ofAssociates, .ofCandidates, .ofSymbolTable: break
       // tooltipInstance.hide()
       // setInlineDisplayWithCursor()
