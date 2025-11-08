@@ -216,6 +216,12 @@ extension SessionProtocol {
       updateCompositionBufferDisplay()
     default: break
     }
+
+    voiceOverTask: if voiceOverIsOn() {
+      let narratable = inputMode.langModel.prepareCandidateNarrationPair(state)
+      guard let narratable else { break voiceOverTask }
+      SpeechSputnik.shared.narrate(narratable.readingToNarrate)
+    }
   }
 
   public func candidatePairSelectionConfirmed(at index: Int) {
@@ -379,5 +385,23 @@ extension SessionProtocol {
     if !succeeded { newState.data.tooltipColorState = .redAlert }
     newState.tooltip = NSLocalizedString(tooltipMessage, comment: "")
     switchState(newState)
+  }
+}
+
+extension SessionProtocol {
+  // 0: Always Off, 1: Always On, 2: Only When VoiceOver is On
+  private func voiceOverIsOn() -> Bool {
+    switch PrefMgr.shared.candidateNarrationToggleType {
+    case 1: return true
+    case 2:
+      if #available(macOS 10.13, *) {
+        return NSWorkspace.shared.isVoiceOverEnabled
+      } else {
+        return !NSRunningApplication.runningApplications(
+          withBundleIdentifier: "com.apple.VoiceOver"
+        ).isEmpty
+      }
+    default: return false
+    }
   }
 }

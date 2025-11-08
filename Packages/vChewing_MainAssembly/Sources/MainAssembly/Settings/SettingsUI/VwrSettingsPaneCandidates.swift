@@ -68,6 +68,9 @@ public struct VwrSettingsPaneCandidates: View {
   @AppStorage(wrappedValue: false, UserDef.kEnableMouseScrollingForTDKCandidatesCocoa.rawValue)
   private var enableMouseScrollingForTDKCandidatesCocoa: Bool
 
+  @AppStorage(wrappedValue: 0, UserDef.kCandidateNarrationToggleType.rawValue)
+  private var candidateNarrationToggleType: Int
+
   // MARK: - Main View
 
   public var body: some View {
@@ -132,6 +135,7 @@ public struct VwrSettingsPaneCandidates: View {
             .render()
           UserDef.kConsolidateContextOnCandidateSelection
             .bind($consolidateContextOnCandidateSelection).render()
+          UserDef.kCandidateNarrationToggleType.bind($candidateNarrationToggleType).render()
         }
 
         // MARK: (header: Text("Experimental:"))

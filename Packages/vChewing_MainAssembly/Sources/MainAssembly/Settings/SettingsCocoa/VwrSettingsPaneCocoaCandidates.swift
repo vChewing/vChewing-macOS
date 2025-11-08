@@ -83,6 +83,9 @@ extension SettingsPanesCocoa {
                     .action = #selector(self.performCandidateKeysSanityCheck(_:))
                 }
             }?.boxed()
+            NSStackView.buildSection(width: innerContentWidth) {
+              UserDef.kCandidateNarrationToggleType.render(fixWidth: innerContentWidth)
+            }?.boxed()
             NSView()
           }
           NSTabView.TabPage(title: "Ｄ") {
