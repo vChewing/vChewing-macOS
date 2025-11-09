@@ -56,7 +56,8 @@ extension LMAssembly {
     }
 
     public static var asyncLoadingUserData: Bool = true
-
+    // 與關聯詞語有關的惰性載入器，可由外部登記。
+    public static var associatesLazyLoader: (() -> ())?
     // SQLite 連線是否已經建立。
     public internal(set) static var isSQLDBConnected: Bool = false
 
@@ -544,6 +545,16 @@ extension LMAssembly {
 
     // 漸退记忆模组
     var lmPerceptionOverride: LMPerceptionOverride
+
+    // 確保關聯詞語資料在首次剛需時得以即時載入。
+    internal func ensureAssociatesLoaded() {
+      if !lmAssociates.isLoaded {
+        let wasAsync = Self.asyncLoadingUserData
+        Self.asyncLoadingUserData = false
+        Self.associatesLazyLoader?()
+        Self.asyncLoadingUserData = wasAsync
+      }
+    }
 
     #if DEBUG
       /// Allows unit tests to mutate individual sub-language models without exposing them publicly.
