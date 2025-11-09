@@ -338,6 +338,9 @@ public struct PrefMgr: PrefMgrProtocol {
   @AppProperty(key: UserDef.kCandidateTextFontName.rawValue, defaultValue: "")
   public var candidateTextFontName: String
 
+  @AppProperty(key: UserDef.kCandidateNarrationToggleType.rawValue, defaultValue: 0)
+  public var candidateNarrationToggleType: Int
+
   // MARK: - Keyboard HotKey Enable / Disable
 
   @AppProperty(key: UserDef.kUsingHotKeySCPC.rawValue, defaultValue: true)
@@ -502,6 +505,9 @@ extension PrefMgr {
     }
     if ![0, 1, 2].contains(cursorPlacementAfterSelectingCandidate) {
       cursorPlacementAfterSelectingCandidate = 0
+    }
+    if ![0, 1, 2].contains(candidateNarrationToggleType) {
+      candidateNarrationToggleType = 0
     }
   }
 }

@@ -102,6 +102,7 @@ public enum UserDef: String, CaseIterable, Identifiable {
 
   case kCandidateTextFontName = "CandidateTextFontName"
   case kCandidateKeys = "CandidateKeys"
+  case kCandidateNarrationToggleType = "CandidateNarrationToggleType"
 
   case kAssociatedPhrasesEnabled = "AssociatedPhrasesEnabled"
   case kPhraseReplacementEnabled = "PhraseReplacementEnabled"
@@ -256,6 +257,7 @@ extension UserDef {
     case .kDisableSegmentedThickUnderlineInMarkingModeForManagedClients: return .bool
     case .kCandidateTextFontName: return .string
     case .kCandidateKeys: return .string
+    case .kCandidateNarrationToggleType: return .integer
     case .kAssociatedPhrasesEnabled: return .bool
     case .kPhraseReplacementEnabled: return .bool
     case .kUsingHotKeySCPC: return .bool
@@ -682,6 +684,15 @@ extension UserDef {
         userDef: self, shortTitle: "Selection Keys:",
         inlinePrompt: "Choose or hit Enter to confim your prefered keys for selecting candidates.",
         description: "This will also affect the row / column capacity of the candidate window."
+      )
+    case .kCandidateNarrationToggleType: return .init(
+        userDef: self, shortTitle: "i18n:UserDef.kCandidateNarrationToggleType.shortTitle",
+        description: "i18n:UserDef.kCandidateNarrationToggleType.description",
+        options: [
+          0: "i18n:UserDef.kCandidateNarrationToggleType.option.alwaysOn",
+          1: "i18n:UserDef.kCandidateNarrationToggleType.option.alwaysOff",
+          2: "i18n:UserDef.kCandidateNarrationToggleType.option.onlyWhenVoiceOverIsOn",
+        ]
       )
     case .kAssociatedPhrasesEnabled: return nil
     case .kPhraseReplacementEnabled: return .init(

@@ -217,15 +217,22 @@ extension SessionProtocol {
     default: break
     }
     voiceOverTask: if let narratable = inputMode.langModel.prepareCandidateNarrationPair(state) {
-      let voiceOverIsOn: Bool
-      if #available(macOS 10.13, *) {
-        voiceOverIsOn = NSWorkspace.shared.isVoiceOverEnabled
-      } else {
-        voiceOverIsOn = !NSRunningApplication.runningApplications(
-          withBundleIdentifier: "com.apple.VoiceOver"
-        ).isEmpty
+      let toggleType = PrefMgr.shared.candidateNarrationToggleType
+      // 0: Always On, 1: Always Off, 2: Only When VoiceOver is On
+      guard toggleType != 1 else { break voiceOverTask }
+      
+      if toggleType == 2 {
+        let voiceOverIsOn: Bool
+        if #available(macOS 10.13, *) {
+          voiceOverIsOn = NSWorkspace.shared.isVoiceOverEnabled
+        } else {
+          voiceOverIsOn = !NSRunningApplication.runningApplications(
+            withBundleIdentifier: "com.apple.VoiceOver"
+          ).isEmpty
+        }
+        guard voiceOverIsOn else { break voiceOverTask }
       }
-      guard voiceOverIsOn else { break voiceOverTask }
+      
       SpeechSputnik.shared.narrate(narratable.readingToNarrate)
     }
   }

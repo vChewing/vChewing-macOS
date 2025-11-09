@@ -227,6 +227,11 @@
 "i18n:userdef.kCheckAbusersOfSecureEventInputAPI.description" = "Such abuse of SecureEventInput API in the background can hinder all 3rd-party input methods from being able to switch to. It is fine to use SecureEventInput for sensitive input fields. However, an app calling EnableSecureEventInput() is responsible to call DisableSecureEventInput() immediately right after the input field loses focus. This situation may also happen if an app is hanging in the background (or working as a helper application in the background) with its SecureEventInput left enabled.";
 "i18n:UserDef.kCheckAbusersOfSecureEventInputAPI.shortTitle" = "Actively check those processes abusing the SecureEventInput API";
 "i18n:UserDef.kCNS11643Enabled.shortTitle" = "Enable CNS11643 Support (2025-09-30)";
+"i18n:UserDef.kCandidateNarrationToggleType.description" = "Controls when candidate selections should be narrated using text-to-speech. This feature helps users confirm their candidate selection audibly.";
+"i18n:UserDef.kCandidateNarrationToggleType.option.alwaysOn" = "Always On";
+"i18n:UserDef.kCandidateNarrationToggleType.option.alwaysOff" = "Always Off";
+"i18n:UserDef.kCandidateNarrationToggleType.option.onlyWhenVoiceOverIsOn" = "Only When VoiceOver is On";
+"i18n:UserDef.kCandidateNarrationToggleType.shortTitle" = "Candidate Narration Mode:";
 "i18n:UserDef.kCursorPlacementAfterSelectingCandidate.description" = "This defines the cursor position after a candidate is confirmed through the candidate window. Note that the Pre-Candidate-Window Cursor Position is the cursor position snapshotted right before the candidate window shows up. If you choose to let it move a step front, the step length may vary, depending on your preferred candidate cursor selection style.";
 "i18n:UserDef.kCursorPlacementAfterSelectingCandidate.option.0" = "No Adjustments";
 "i18n:UserDef.kCursorPlacementAfterSelectingCandidate.option.1" = "A Step Front";
