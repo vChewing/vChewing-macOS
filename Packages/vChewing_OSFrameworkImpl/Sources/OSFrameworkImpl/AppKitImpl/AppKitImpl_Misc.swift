@@ -488,7 +488,12 @@
 
     public static var uxLevel: UXLevel {
       switch (Process.isAppleSilicon, Process.totalMemoryGiB) {
-      case (true, 16...): return .liquidGlass
+      case (true, 16...):
+        if #available(macOS 27, *) {
+          return .liquidGlass
+        } else {
+          return .material
+        }
       case (true, ..<16): return .material
       case (false, 8...): return .material
       case (false, ..<8): return .none
