@@ -689,8 +689,8 @@ extension UserDef {
         userDef: self, shortTitle: "i18n:UserDef.kCandidateNarrationToggleType.shortTitle",
         description: "i18n:UserDef.kCandidateNarrationToggleType.description",
         options: [
-          0: "i18n:UserDef.kCandidateNarrationToggleType.option.alwaysOn",
-          1: "i18n:UserDef.kCandidateNarrationToggleType.option.alwaysOff",
+          0: "i18n:UserDef.kCandidateNarrationToggleType.option.alwaysOff",
+          1: "i18n:UserDef.kCandidateNarrationToggleType.option.alwaysOn",
           2: "i18n:UserDef.kCandidateNarrationToggleType.option.onlyWhenVoiceOverIsOn",
         ]
       )

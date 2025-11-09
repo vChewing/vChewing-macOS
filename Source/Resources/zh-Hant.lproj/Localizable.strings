@@ -228,8 +228,8 @@
 "i18n:UserDef.kCheckAbusersOfSecureEventInputAPI.shortTitle" = "主動偵測正在濫用 SecureEventInput API 的後檯執行緒";
 "i18n:UserDef.kCNS11643Enabled.shortTitle" = "啟用 CNS11643 全字庫支援 (2025-09-30)";
 "i18n:UserDef.kCandidateNarrationToggleType.description" = "控制何時應使用文字轉語音朗讀候選詞。此功能可幫助使用者以聽覺確認其候選詞選擇。";
-"i18n:UserDef.kCandidateNarrationToggleType.option.alwaysOn" = "總是開啟";
 "i18n:UserDef.kCandidateNarrationToggleType.option.alwaysOff" = "總是關閉";
+"i18n:UserDef.kCandidateNarrationToggleType.option.alwaysOn" = "總是開啟";
 "i18n:UserDef.kCandidateNarrationToggleType.option.onlyWhenVoiceOverIsOn" = "僅在 VoiceOver 開啟時";
 "i18n:UserDef.kCandidateNarrationToggleType.shortTitle" = "候選詞朗讀模式：";
 "i18n:UserDef.kCursorPlacementAfterSelectingCandidate.description" = "此設定用來指定候選字在選字窗內被確認後，游標應該位於何處。請注意，「呼出選字窗之前的游標位置」指的是選字窗出現前所記錄的游標位置。如果選擇向前推進一格，實際推進的距離會因您偏好的選字游標操作樣式而有所不同。";

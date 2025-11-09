@@ -218,8 +218,8 @@ extension SessionProtocol {
     }
     voiceOverTask: if let narratable = inputMode.langModel.prepareCandidateNarrationPair(state) {
       let toggleType = PrefMgr.shared.candidateNarrationToggleType
-      // 0: Always On, 1: Always Off, 2: Only When VoiceOver is On
-      guard toggleType != 1 else { break voiceOverTask }
+      // 0: Always Off, 1: Always On, 2: Only When VoiceOver is On
+      guard toggleType != 0 else { break voiceOverTask }
       
       if toggleType == 2 {
         let voiceOverIsOn: Bool
