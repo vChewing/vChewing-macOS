@@ -110,6 +110,12 @@ public final class LMMgr {
     // 如果發現自訂目錄不可用，則會自動抹去自訂目錄設定、改採預設目錄。
     // 所以這裡不需要特別處理。
     Self.loadUserPhrasesData()
+    // 就關聯詞語登記惰性載入器，會趁首次需要完成載入。
+    LMAssembly.LMInstantiator.associatesLazyLoader = {
+      if PrefMgr.shared.associatedPhrasesEnabled {
+        Self.loadUserAssociatesData()
+      }
+    }
   }
 
   public static func connectCoreDB(dbPath: String? = nil) {
