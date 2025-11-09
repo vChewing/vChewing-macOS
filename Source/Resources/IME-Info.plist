@@ -135,6 +135,8 @@
 	<string>org.atelierInmu.inputmethod.vChewing</string>
 	<key>TISParticipatesInTouchBar</key>
 	<false/>
+	<key>UIDesignRequiresCompatibility</key>
+	<true/>
 	<key>UpdateInfoEndpoint</key>
 	<string>https://gitee.com/vchewing/vChewing-macOS/raw/main/Update-Info.plist</string>
 	<key>UpdateInfoEndpointLegacy</key>
