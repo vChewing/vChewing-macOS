@@ -25,7 +25,7 @@ extension UILayoutOrientation {
 
 // MARK: - CtlCandidateTDK
 
-public class CtlCandidateTDK: CtlCandidate, NSWindowDelegate {
+public final class CtlCandidateTDK: CtlCandidate, NSWindowDelegate {
   // MARK: Lifecycle
 
   // MARK: - Constructors
@@ -39,16 +39,29 @@ public class CtlCandidateTDK: CtlCandidate, NSWindowDelegate {
     panel.level = NSWindow.Level(Int(max(CGShieldingWindowLevel(), kCGPopUpMenuWindowLevel)) + 2)
     panel.hasShadow = true
     panel.backgroundColor = NSColor.clear
+    self.candidateView = Self.currentView
 
     super.init(layout)
+    candidateView.controller = self
     window = panel
     Self.currentWindow = panel
     window?.delegate = self
     currentLayout = layout
+    // 設置背景視覺效果視圖
+    if !Self.shouldDisableVisualEffectView {
+      if window?.contentView == nil {
+        window?.contentView = NSView()
+      }
+      if let visualEffectView, let contentView = window?.contentView {
+        contentView.addSubview(visualEffectView)
+        visualEffectView.pinEdges(to: contentView)
+      }
+    }
 
     self.observation = Broadcaster.shared
       .observe(\.eventForClosingAllPanels, options: [.new]) { _, _ in
         self.visible = false
+        Self.thePool.cleanData()
       }
   }
 
@@ -125,7 +138,7 @@ public class CtlCandidateTDK: CtlCandidate, NSWindowDelegate {
   override public func reloadData() {
     CandidateCellData.unifiedSize = candidateFont.pointSize
     guard let delegate = delegate else { return }
-    Self.thePool = .init(
+    Self.thePool.reinit(
       candidates: delegate.candidatePairs(conv: true), lines: maxLinesPerPage,
       isExpanded: delegate.shouldAutoExpandCandidates,
       selectionKeys: delegate.selectionKeys, layout: currentLayout.layoutTDK, locale: locale
@@ -190,8 +203,15 @@ public class CtlCandidateTDK: CtlCandidate, NSWindowDelegate {
 
   // MARK: Private
 
-  private static var thePool: CandidatePool = .init(candidates: [])
-  private static var currentView: NSView = .init()
+  private static let shouldDisableVisualEffectView: Bool = {
+    if #available(macOS 10.13, *) {
+      return false
+    }
+    return true
+  }()
+
+  private static let thePool: CandidatePool = .init(candidates: [])
+  private static let currentView: VwrCandidateTDKAppKit = .init(thePool: thePool)
 
   @objc
   private var observation: NSKeyValueObservation?
@@ -211,11 +231,9 @@ public class CtlCandidateTDK: CtlCandidate, NSWindowDelegate {
     return nil
   }()
 
-  private var theViewAppKit: NSView {
-    VwrCandidateTDKAppKit(controller: self, thePool: Self.thePool)
-  }
+  private let candidateView: VwrCandidateTDKAppKit
 
-  private var theViewLegacy: NSView {
+  private var candidateViewLegacy4Debug: NSView {
     let textField = NSTextField()
     textField.isSelectable = false
     textField.isEditable = false
@@ -255,44 +273,42 @@ public class CtlCandidateTDK: CtlCandidate, NSWindowDelegate {
   }
 
   private func updateNSWindowModern(_ window: NSWindow) {
-    guard #available(macOS 10.13, *) else {
-      Self.currentView = theViewAppKit
+    // 同步 Metrics
+    Self.thePool.updateMetrics()
+
+    // fittingSize 跟随新的 metrics
+    candidateView.invalidateIntrinsicContentSize()
+    candidateView.setNeedsDisplay(candidateView.bounds)
+
+    guard !Self.shouldDisableVisualEffectView else {
       window.isOpaque = false
       window.backgroundColor = .clear
-      window.contentView = Self.currentView
-      window.setContentSize(Self.currentView.fittingSize)
+      window.contentView = candidateView
+      window.setContentSize(candidateView.fittingSize)
       delegate?.resetCandidateWindowOrigin()
       return
     }
 
-    // 獲取候選視圖並計算其尺寸
-    let candidateView = theViewAppKit
-    let viewSize = candidateView.fittingSize
-
     // 更新背景視覺效果視圖
     updateEffectView()
 
-    // 創建容器視圖作為 ZStack，設置固定尺寸
-    let containerView = NSView(frame: CGRect(origin: .zero, size: viewSize))
+    let viewSize = candidateView.fittingSize
+    guard let containerView = window.contentView else { return }
+    containerView.setFrameSize(viewSize)
     // 為容器視圖也設置圓角，確保整體一致性
     containerView.wantsLayer = true
     containerView.layer?.cornerRadius = Self.thePool.windowRadius
     containerView.layer?.masksToBounds = true
 
-    // 設置背景視覺效果視圖
-    if let visualEffectView {
-      containerView.addSubview(visualEffectView)
-      visualEffectView.pinEdges(to: containerView)
+    // 添加候選窗口內容視圖
+    if containerView.subviews.allSatisfy({ !($0 is VwrCandidateTDKAppKit) }) {
+      containerView.addSubview(candidateView)
+      candidateView.pinEdges(to: containerView)
     }
 
-    // 添加候選窗口內容視圖
-    containerView.addSubview(candidateView)
-    candidateView.pinEdges(to: containerView)
-
-    Self.currentView = containerView
     window.isOpaque = false
     window.backgroundColor = .clear
-    window.contentView = Self.currentView
+    window.contentView = containerView
     window.setContentSize(viewSize)
     delegate?.resetCandidateWindowOrigin()
   }

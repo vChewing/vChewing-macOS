@@ -13,7 +13,7 @@ import SwiftExtension
 // MARK: - CandidatePool
 
 /// 候選字窗會用到的資料池單位，即用即拋。
-public class CandidatePool {
+public final class CandidatePool {
   // MARK: Lifecycle
 
   // MARK: - Constructors
@@ -136,6 +136,36 @@ public class CandidatePool {
     currentLineNumber ..< min(candidateLines.count, currentLineNumber + maxLinesPerPage)
   }
 
+  /// 初期化一個候選字窗專用資料池。
+  /// - Parameters:
+  ///   - candidates: 要塞入的候選字詞陣列。
+  ///   - selectionKeys: 選字鍵。
+  ///   - direction: 橫向排列還是縱向排列（預設情況下是縱向）。
+  ///   - locale: 區域編碼。例：「zh-Hans」或「zh-Hant」。
+  public func reinit(
+    candidates: [CandidateInState], lines: Int = 3,
+    isExpanded expanded: Bool = true, selectionKeys: String = "123456789",
+    layout: LayoutOrientation = .vertical, locale: String = ""
+  ) {
+    _maxLinesPerPage = max(1, lines)
+    isExpanded = expanded
+    self.layout = .horizontal
+    self.selectionKeys = "123456789"
+    candidateDataAll = []
+    // 以上只是為了糊弄 compiler。接下來才是正式的初期化。
+    construct(candidates: candidates, selectionKeys: selectionKeys, layout: layout, locale: locale)
+  }
+
+  public func cleanData() {
+    recordedLineRangeForCurrentPage = nil
+    previouslyRecordedLineRangeForPreviousPage = nil
+    currentLineNumber = 0
+    metrics = .allZeroed
+    isExpanded = false
+    tooltip = ""
+    reverseLookupResult = []
+  }
+
   // MARK: Private
 
   private var recordedLineRangeForCurrentPage: Range<Int>?
@@ -154,6 +184,7 @@ public class CandidatePool {
     self.layout = layout
     Self.blankCell.locale = locale
     self.selectionKeys = selectionKeys.isEmpty ? "123456789" : selectionKeys
+    cleanData()
     var allCandidates = candidates.map {
       CandidateCellData(key: " ", displayedText: $0.value, segLength: $0.keyArray.count)
     }
@@ -166,9 +197,9 @@ public class CandidatePool {
       candidate.whichLine = candidateLines.count
       var isOverflown: Bool = (currentColumn.count == maxLineCapacity) && !currentColumn.isEmpty
       if layout == .horizontal {
-        isOverflown = isOverflown
-          || currentColumn.map { $0.cellLength() }.reduce(0, +) > maxRowWidth - candidate
-          .cellLength()
+        let accumulatedWidth: Double = currentColumn.map { $0.cellLength() }.reduce(0, +)
+        let remainingSpaceWidth: Double = maxRowWidth - candidate.cellLength()
+        isOverflown = isOverflown || accumulatedWidth > remainingSpaceWidth
       }
       if isOverflown {
         candidateLines.append(currentColumn)

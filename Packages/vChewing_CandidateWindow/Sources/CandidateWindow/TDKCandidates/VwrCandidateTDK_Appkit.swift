@@ -14,7 +14,7 @@ import Shared_DarwinImpl
 /// 田所選字窗的 AppKit 简单版本，繪製效率不受 SwiftUI 的限制。
 /// 該版本可以使用更少的系統資源來繪製選字窗。
 
-public class VwrCandidateTDKAppKit: NSView {
+public final class VwrCandidateTDKAppKit: NSView {
   // MARK: Lifecycle
 
   // MARK: - Constructors.

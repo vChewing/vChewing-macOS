@@ -12,7 +12,7 @@ import Shared
 // MARK: - CandidateCellData
 
 /// 用來管理選字窗內顯示的候選字的單位。用 class 型別會比較方便一些。
-public class CandidateCellData: Hashable {
+public final class CandidateCellData: Hashable {
   // MARK: Lifecycle
 
   public init(
