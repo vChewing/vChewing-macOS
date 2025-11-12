@@ -12,6 +12,10 @@ import AppKit
 
 extension SettingsPanesCocoa {
   public class Phrases: NSViewController {
+    // MARK: Lifecycle
+
+    deinit { observation?.invalidate() }
+
     // MARK: Public
 
     override public func loadView() {

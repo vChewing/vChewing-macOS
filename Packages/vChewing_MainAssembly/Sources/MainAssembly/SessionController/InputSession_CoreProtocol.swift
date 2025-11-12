@@ -78,7 +78,7 @@ extension SessionProtocol {
   public static var isVerticalTyping: Bool { Self.current?.isVerticalTyping ?? false }
 
   public static func makeTooltipUI() -> TooltipUIProtocol {
-    TooltipUI_LateCocoa()
+    TooltipUI()
   }
 
   public var selectionKeys: String {

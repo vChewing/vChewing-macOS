@@ -23,6 +23,8 @@ public class PEReloadEventObserver: NSObject, ObservableObject {
       }
   }
 
+  deinit { observation?.invalidate() }
+
   // MARK: Public
 
   public static let shared = PEReloadEventObserver()

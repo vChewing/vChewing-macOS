@@ -70,6 +70,8 @@ public final class CtlCandidateTDK: CtlCandidate, NSWindowDelegate {
     fatalError("init(coder:) has not been implemented")
   }
 
+  deinit { observation?.invalidate() }
+
   // MARK: Public
 
   public static var currentMenu: NSMenu? {
@@ -215,7 +217,6 @@ public final class CtlCandidateTDK: CtlCandidate, NSWindowDelegate {
 
   @objc
   private var observation: NSKeyValueObservation?
-
   // 創建背景視覺效果視圖
   private let visualEffectView: NSView? = {
     if #available(macOS 27.0, *), NSApplication.uxLevel == .liquidGlass {
