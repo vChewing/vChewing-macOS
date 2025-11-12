@@ -71,7 +71,7 @@ final class SubTestCase: Sendable {
 
 // MARK: - TekkonTestsKeyboardArrangmentsStatic
 
-class TekkonTestsKeyboardArrangmentsStatic: XCTestCase {
+final class TekkonTestsKeyboardArrangmentsStatic: XCTestCase {
   static func checkEq(
     _ counter: inout Int,
     _ composer: inout Tekkon.Composer,
@@ -112,7 +112,7 @@ class TekkonTestsKeyboardArrangmentsStatic: XCTestCase {
 
 // MARK: - TekkonTestsKeyboardArrangmentsDynamic
 
-class TekkonTestsKeyboardArrangmentsDynamic: XCTestCase {
+final class TekkonTestsKeyboardArrangmentsDynamic: XCTestCase {
   typealias Parser = Tekkon.MandarinParser
 
   func testDynamicKeyLayouts() {

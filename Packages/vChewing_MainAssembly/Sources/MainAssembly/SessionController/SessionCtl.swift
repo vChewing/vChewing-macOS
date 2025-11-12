@@ -19,7 +19,7 @@ import InputMethodKit
 /// - Remark: 在輸入法的主函式中分配的 IMKServer 型別為客體應用程式創建的每個
 /// 輸入會話創建一個控制器型別。因此，對於每個輸入會話，都有一個對應的 IMKInputController。
 @objc(SessionCtl) // 必須加上 ObjC，因為 IMK 是用 ObjC 寫的。
-public class SessionCtl: IMKInputController {
+public final class SessionCtl: IMKInputController {
   // MARK: Lifecycle
 
   /// 對用以設定委任物件的控制器型別進行初期化處理。

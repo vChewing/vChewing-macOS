@@ -10,7 +10,7 @@ import AppKit
 
 // MARK: - VwrClientListMgr
 
-public class VwrClientListMgr: NSViewController {
+public final class VwrClientListMgr: NSViewController {
   // MARK: Public
 
   override public func loadView() {

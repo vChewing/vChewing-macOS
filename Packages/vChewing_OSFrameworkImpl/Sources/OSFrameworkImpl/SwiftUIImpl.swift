@@ -107,7 +107,7 @@
 
     // MARK: Public
 
-    public class Coordinator: NSObject, NSTextViewDelegate {
+    public final class Coordinator: NSObject, NSTextViewDelegate {
       // MARK: Lifecycle
 
       public init(text: Binding<String>) {
@@ -267,7 +267,7 @@
 
     // MARK: Public
 
-    public class Coordinator: NSObject, NSPathControlDelegate {
+    public final class Coordinator: NSObject, NSPathControlDelegate {
       // MARK: Lifecycle
 
       public init(

@@ -8,7 +8,7 @@
 
 import InputMethodKit
 
-class FakeClient: NSObject, IMKTextInput {
+final class FakeClient: NSObject, IMKTextInput {
   var attributedString: NSMutableAttributedString = .init(string: "")
   var selectedRangeStored: NSRange = .notFound
   var markedRangeStored: NSRange = .notFound

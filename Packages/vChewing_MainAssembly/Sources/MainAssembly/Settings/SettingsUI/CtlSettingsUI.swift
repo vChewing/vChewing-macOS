@@ -15,7 +15,7 @@ private let kWindowTitleHeight: Double = 78
 // InputMethodServerPreferencesWindowControllerClass 非必需。
 
 @available(macOS 14, *)
-public class CtlSettingsUI: NSWindowController, NSWindowDelegate {
+public final class CtlSettingsUI: NSWindowController, NSWindowDelegate {
   public static var shared: CtlSettingsUI?
 
   override public func windowDidLoad() {

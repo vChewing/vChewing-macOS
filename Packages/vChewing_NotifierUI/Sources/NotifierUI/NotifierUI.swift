@@ -12,7 +12,7 @@ import SwiftExtension
 
 // MARK: - Notifier
 
-public class Notifier: NSWindowController {
+public final class Notifier: NSWindowController {
   // MARK: Lifecycle
 
   @discardableResult

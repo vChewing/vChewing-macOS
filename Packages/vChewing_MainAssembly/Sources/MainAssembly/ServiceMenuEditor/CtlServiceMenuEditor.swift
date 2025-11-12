@@ -8,7 +8,7 @@
 
 import AppKit
 
-public class CtlServiceMenuEditor: NSWindowController {
+public final class CtlServiceMenuEditor: NSWindowController {
   // MARK: Lifecycle
 
   public init() {

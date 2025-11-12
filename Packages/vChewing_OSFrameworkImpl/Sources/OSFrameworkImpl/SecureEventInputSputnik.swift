@@ -17,7 +17,7 @@
 
   // MARK: - SecureEventInputSputnik
 
-  public class SecureEventInputSputnik {
+  public final class SecureEventInputSputnik {
     // MARK: Lifecycle
 
     public init() {

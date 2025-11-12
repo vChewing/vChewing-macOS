@@ -13,7 +13,7 @@ import Foundation
 
 // MARK: - UserDefRenderableCocoa
 
-public class UserDefRenderableCocoa: NSObject, Identifiable {
+public final class UserDefRenderableCocoa: NSObject, Identifiable {
   // MARK: Lifecycle
 
   public init(def: UserDef) {

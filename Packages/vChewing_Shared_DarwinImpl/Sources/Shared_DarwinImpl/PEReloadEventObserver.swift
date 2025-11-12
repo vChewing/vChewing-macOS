@@ -12,7 +12,7 @@ import Combine
 // MARK: - PEReloadEventObserver
 
 @available(macOS 10.15, *)
-public class PEReloadEventObserver: NSObject, ObservableObject {
+public final class PEReloadEventObserver: NSObject, ObservableObject {
   // MARK: Lifecycle
 
   override public init() {

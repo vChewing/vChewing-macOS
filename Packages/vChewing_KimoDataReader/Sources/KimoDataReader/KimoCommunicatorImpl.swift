@@ -9,7 +9,7 @@
 import Foundation
 import ObjcKimoCommunicator
 
-public class KimoCommunicator: ObjcKimoCommunicator {
+public final class KimoCommunicator: ObjcKimoCommunicator {
   public static let shared: KimoCommunicator = .init()
 
   public func prepareData(handler: @escaping (_ key: String, _ value: String) -> ()) {

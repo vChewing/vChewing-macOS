@@ -28,7 +28,7 @@ extension LMAssembly {
   ///
   /// LMI 會根據需要分別載入原廠語言模組和其他個別的子語言模組。LMI 本身不會記錄這些
   /// 語言模組的相關資料的存放位置，僅藉由參數來讀取相關訊息。
-  public class LMInstantiator: LangModelProtocol {
+  public final class LMInstantiator: LangModelProtocol {
     // MARK: Lifecycle
 
     // 這句需要留著，不然無法被 package 外界存取。

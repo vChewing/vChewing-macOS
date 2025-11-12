@@ -9,7 +9,7 @@ import AppKit
 
 // MARK: - BookmarkManager
 
-public class BookmarkManager {
+public final class BookmarkManager {
   // MARK: Public
 
   public static let shared = BookmarkManager()

@@ -23,10 +23,11 @@ final class NodeOverrideStatusTests: XCTestCase {
     // 確保每個 UUID 都是唯一的
     XCTAssertNotEqual(uuid1, uuid2)
 
-    // 測試 UUID 字符串格式
+    // 測試 UUID 字串格式
     let uuidString = uuid1.uuidString()
-    XCTAssertEqual(uuidString.count, 36) // 標準 UUID 格式長度
+    XCTAssertEqual(uuidString.count, 36)
     XCTAssertTrue(uuidString.contains("-"))
+    XCTAssertTrue(uuidString.allSatisfy { $0 == "-" || "0123456789ABCDEF".contains($0) })
 
     // 測試 Codable
     let encoder = JSONEncoder()

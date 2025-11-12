@@ -11,7 +11,7 @@ import AppKit
 // MARK: - SettingsPanesCocoa.Phrases
 
 extension SettingsPanesCocoa {
-  public class Phrases: NSViewController {
+  public final class Phrases: NSViewController {
     // MARK: Lifecycle
 
     deinit { observation?.invalidate() }

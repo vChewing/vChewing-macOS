@@ -19,7 +19,7 @@ extension VwrAboutCocoa {
 
 // MARK: - VwrAboutCocoa
 
-public class VwrAboutCocoa: NSViewController {
+public final class VwrAboutCocoa: NSViewController {
   // MARK: Public
 
   override public func loadView() {

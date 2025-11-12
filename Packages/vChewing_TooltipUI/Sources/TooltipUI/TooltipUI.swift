@@ -12,7 +12,7 @@ import Shared_DarwinImpl
 
 // MARK: - TooltipUI
 
-public class TooltipUI: NSWindowController, TooltipUIProtocol {
+public final class TooltipUI: NSWindowController, TooltipUIProtocol {
   // MARK: Lifecycle
 
   public init() {
