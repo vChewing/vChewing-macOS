@@ -60,10 +60,8 @@ extension SessionCtl {
   /// - Parameter sender: 呼叫了該函式的客體。
   override public func activateServer(_ sender: Any!) {
     super.activateServer(sender)
-    autoreleasepool {
-      Self.currentInputController = self
-      core.activateServer(sender)
-    }
+    Self.currentInputController = self
+    core.activateServer(sender)
   }
 
   /// 停用輸入法時，會觸發該函式。
