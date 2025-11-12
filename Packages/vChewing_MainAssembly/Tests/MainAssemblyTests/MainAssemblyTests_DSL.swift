@@ -82,7 +82,7 @@ extension MainAssemblyTests {
     let candState = testHandler.generateStateOfCandidates()
     XCTAssertFalse(candState.candidates.isEmpty)
     testSession.switchState(candState)
-    testSession.showCandidates()
+    testSession.toggleCandidateUIVisibility(true)
     return testSession.candidateController()
   }
 
@@ -105,7 +105,7 @@ extension MainAssemblyTests {
   func highlightCandidateToValue(_ value: String, maxSteps: Int = 256) {
     // Ensure candidate controller exists and the window is visible.
     if testSession.candidateController() == nil {
-      testSession.showCandidates()
+      testSession.toggleCandidateUIVisibility(true)
     }
     guard var controller = testSession.candidateController() else {
       XCTFail("Missing candidate controller while navigating to '\(value)'.")

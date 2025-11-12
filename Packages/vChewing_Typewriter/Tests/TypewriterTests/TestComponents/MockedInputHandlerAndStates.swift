@@ -207,6 +207,7 @@ public class MockSession: SessionCoreProtocol, CtlCandidateDelegateCore {
   public typealias State = MockIMEState
   public typealias Handler = MockInputHandler
 
+  public let id: UUID = .init()
   public var state: MockIMEState = .init()
   public var inputHandler: MockInputHandler?
   public var isASCIIMode: Bool = false
@@ -216,6 +217,7 @@ public class MockSession: SessionCoreProtocol, CtlCandidateDelegateCore {
   public var shouldAutoExpandCandidates: Bool = false
   public var isCandidateContextMenuEnabled: Bool = false
   public var showReverseLookupResult: Bool = false
+  public var ui: SessionUIProtocol?
   public var selectionKeys: String = "123456789"
   public var recentCommissions = [String]()
   #if canImport(AppKit)

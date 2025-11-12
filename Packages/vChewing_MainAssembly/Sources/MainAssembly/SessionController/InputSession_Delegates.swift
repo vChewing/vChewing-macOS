@@ -25,7 +25,7 @@ extension SessionProtocol {
     return result
   }
 
-  public func candidateController() -> CtlCandidateProtocolCore? { candidateUI }
+  public func candidateController() -> CtlCandidateProtocolCore? { ui?.candidateUI }
 
   public func performUserPhraseOperation(addToFilter: Bool) -> Bool {
     guard let inputHandler = inputHandler, state.type == .ofMarking else { return false }
@@ -108,16 +108,7 @@ extension SessionProtocol {
     guard !NSApp.isAccentColorCustomized else { return fallbackValue }
     if #unavailable(macOS 10.14) { return fallbackValue }
     // 此處因為沒有對 client() 的強引用，所以不會耽誤很多時間。
-    let urls = NSRunningApplication.runningApplications(
-      withBundleIdentifier: client()?.bundleIdentifier() ?? ""
-    ).compactMap(\.bundleURL)
-    let bundles = urls.compactMap { Bundle(url: $0) }
-    for bundle in bundles {
-      let bundleAccentColor = bundle.getAccentColor()
-      guard bundleAccentColor != .accentColor else { continue }
-      return bundleAccentColor
-    }
-    return fallbackValue
+    return NSRunningApplication.findAccentColor(with: client()?.bundleIdentifier())
   }
 
   public var shouldAutoExpandCandidates: Bool {

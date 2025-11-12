@@ -30,13 +30,6 @@ public final class InputSession: SessionProtocol {
   /// 標記狀態來聲明目前新增的詞彙是否需要賦以非常低的權重。
   public static var areWeNerfing: Bool = false
 
-  /// Shift 按鍵事件分析器的副本。
-  /// - Remark: 警告：該工具必須為 Struct 且全專案只能有一個唯一初期化副本。否則會在動 Caps Lock 的時候誤以為是在摁 Shift。
-  public static var theShiftKeyDetector = ShiftKeyUpChecker(
-    useLShift: PrefMgr.shared.togglingAlphanumericalModeWithLShift,
-    useRShift: PrefMgr.shared.togglingAlphanumericalModeWithRShift
-  )
-
   /// 給所有副本共用的 isASCIIMode 追蹤用餐數。
   public static var isASCIIModeForAllClients = false
   /// 一個共用辭典，專門用來給每個副本用的 isASCIIMode 追蹤用餐數。
@@ -58,6 +51,10 @@ public final class InputSession: SessionProtocol {
     }
   }
 
+  public let id: UUID = .init()
+
+  public var ui: (any SessionUIProtocol)? = SessionUI.shared
+
   public let prefs: any PrefMgrProtocol = PrefMgr.shared
 
   public private(set) lazy var sharedAlertForInputModeToggling: NSAlert = {
@@ -74,18 +71,6 @@ public final class InputSession: SessionProtocol {
 
   /// 上一個被處理過的鍵盤事件。
   public var previouslyHandledEvents = [KBEvent]()
-
-  /// 目前在用的的選字窗副本。
-  public var candidateUI: (any CtlCandidateProtocol)?
-
-  /// 工具提示視窗的副本。
-  public lazy var tooltipInstance: any TooltipUIProtocol = InputSession.makeTooltipUI()
-
-  /// 浮動組字窗的副本。
-  public lazy var popupCompositionBuffer: PopupCompositionBuffer = .init()
-
-  /// 用來標記當前副本是否已處於活動狀態。
-  public var isActivated: Bool = false
 
   /// 當前副本的客體是否是輸入法本體？
   public var isServingIMEItself: Bool = false
@@ -108,6 +93,16 @@ public final class InputSession: SessionProtocol {
 
   /// IMKInputController 副本。
   public weak var inputControllerAssigned: SessionCtl?
+
+  /// 用來標記當前副本是否已處於活動狀態。
+  public var isActivated: Bool {
+    get {
+      ui?.currentSessionID == id
+    }
+    set {
+      ui?.currentSessionID = newValue ? id : .init()
+    }
+  }
 
   public var inputController: SessionCtl? {
     inputControllerAssigned ?? SessionCtl.currentInputController
@@ -196,13 +191,17 @@ extension InputSession {
   }
 
   public func setValue(_ value: Any!, forTag tag: Int, client sender: Any!) {
-    hidePalettes()
+    if isCurrentSession {
+      hidePalettes()
+    }
     asyncOnMain { [weak self] in
-      guard let self = self else { return }
+      guard let this = self else { return }
       let newMode: Shared
         .InputMode = .init(rawValue: value as? String ?? PrefMgr.shared.mostRecentInputMode) ??
         .imeModeNULL
-      if self.inputMode != newMode { self.inputMode = newMode }
+      if this.inputMode != newMode {
+        this.inputMode = newMode
+      }
     }
   }
 

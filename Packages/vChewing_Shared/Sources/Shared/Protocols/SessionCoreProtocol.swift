@@ -14,9 +14,11 @@ public protocol SessionCoreProtocol: AnyObject {
   associatedtype State: IMEStateProtocol
   associatedtype Handler: InputHandlerCoreProtocol
     where Handler.State == Handler.Session.State, Handler.State == State
+  var id: UUID { get }
   var state: State { get set } // Has DidSet.
   var isASCIIMode: Bool { get }
   var clientMitigationLevel: Int { get }
+  var ui: SessionUIProtocol? { get }
   func updateCompositionBufferDisplay()
   func performUserPhraseOperation(addToFilter: Bool) -> Bool
   @discardableResult
@@ -33,6 +35,12 @@ public protocol SessionCoreProtocol: AnyObject {
   /// - Note: 本來不用這麼複雜的，奈何 Swift Protocol 不允許給參數指定預設值。
   /// - Parameter newState: 新狀態。
   func switchState(_ newState: State)
+}
+
+extension SessionCoreProtocol {
+  public var isCurrentSession: Bool {
+    id == ui?.currentSessionID
+  }
 }
 
 // MARK: - InputHandlerCoreProtocol

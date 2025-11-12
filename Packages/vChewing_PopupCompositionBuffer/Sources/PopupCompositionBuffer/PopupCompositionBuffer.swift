@@ -12,7 +12,7 @@ import Shared_DarwinImpl
 
 // MARK: - PopupCompositionBuffer
 
-public class PopupCompositionBuffer: NSWindowController {
+public class PopupCompositionBuffer: NSWindowController, PCBProtocol {
   // MARK: Lifecycle
 
   public init() {
@@ -24,7 +24,6 @@ public class PopupCompositionBuffer: NSWindowController {
       backing: .buffered,
       defer: false
     )
-    panel.level = NSWindow.Level(Int(max(CGShieldingWindowLevel(), kCGPopUpMenuWindowLevel)) + 1)
     panel.hasShadow = true
     if #available(macOS 10.13, *) {
       panel.backgroundColor = .clear
@@ -133,7 +132,11 @@ public class PopupCompositionBuffer: NSWindowController {
     set { compositionView.isTypingDirectionVertical = newValue }
   }
 
-  public func sync(accent: NSColor?, locale: String) {
+  public func sync(accent: HSBA?, locale: String) {
+    sync(accentAsNSColor: accent?.nsColor, locale: locale)
+  }
+
+  public func sync(accentAsNSColor accent: NSColor?, locale: String) {
     compositionView.setupTheme(accent: accent, locale: locale)
     if let window {
       if window.isOpaque {
@@ -149,7 +152,7 @@ public class PopupCompositionBuffer: NSWindowController {
     }
   }
 
-  public func show(state: IMEStateProtocol, at point: CGPoint) {
+  public func show(state: some IMEStateProtocol, at point: CGPoint) {
     if !state.hasComposition {
       hide()
       return
@@ -159,6 +162,8 @@ public class PopupCompositionBuffer: NSWindowController {
 
     window?.orderFront(nil)
     set(windowOrigin: point)
+    window?.level = NSWindow.Level(Int(max(CGShieldingWindowLevel(), kCGPopUpMenuWindowLevel)) + 1)
+    window?.setIsVisible(true)
   }
 
   public func hide() {
