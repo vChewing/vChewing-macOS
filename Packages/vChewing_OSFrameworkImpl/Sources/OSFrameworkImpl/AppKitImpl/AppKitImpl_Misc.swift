@@ -79,8 +79,11 @@
       // Check the existence of the Electron framework bundle.
       guard let urlFrameworks = privateFrameworksURL else { return false }
       guard let paths = try? FileManager.default.contentsOfDirectory(
-        at: urlFrameworks, includingPropertiesForKeys: nil, options: []
-      ) else { return false }
+        at: urlFrameworks,
+        includingPropertiesForKeys: nil,
+        options: []
+      )
+      else { return false }
       for path in paths {
         let pathLC = path.absoluteString.lowercased()
         if pathLC.contains("electron") { return true }
@@ -144,7 +147,8 @@
     }
 
     private static func measure(
-      _ attributedString: NSAttributedString, using path: MeasurementPath
+      _ attributedString: NSAttributedString,
+      using path: MeasurementPath
     )
       -> CGSize {
       let key = cacheKey(for: attributedString, path: path)
@@ -169,7 +173,8 @@
     }
 
     private static func cacheKey(
-      for attributedString: NSAttributedString, path: MeasurementPath
+      for attributedString: NSAttributedString,
+      path: MeasurementPath
     )
       -> CacheKey {
       let stringHash = attributedString.string.hashValue
@@ -431,10 +436,12 @@
   }
 
   extension Bundle {
-    public func getAccentColor() -> NSColor {
+    fileprivate func getAccentColor() -> NSColor {
       let defaultResult: NSColor = .accentColor
-      let queryPhrase = localizedInfoDictionary?["NSAccentColorName"] as? String ??
-        infoDictionary?["NSAccentColorName"] as? String
+      let queryPhrase =
+        localizedInfoDictionary?["NSAccentColorName"] as? String ?? infoDictionary?[
+          "NSAccentColorName"
+        ] as? String
       guard let queryPhrase = queryPhrase, !queryPhrase.isEmpty else { return defaultResult }
       guard #available(macOS 10.13, *) else { return defaultResult }
       return NSColor(named: queryPhrase, bundle: self) ?? defaultResult
@@ -444,16 +451,13 @@
   extension NSRunningApplication {
     private static var temporatyBundlePtr: Bundle?
 
-    public static func findAccentColor(with bundleIdentifier: String) -> NSColor {
+    public static func findAccentColor(with bundleIdentifier: String?) -> NSColor? {
+      guard let bundleIdentifier else { return nil }
       let matchedRunningApps = Self.runningApplications(withBundleIdentifier: bundleIdentifier)
-      guard let matchedAppURL = matchedRunningApps.first?.bundleURL else { return .accentColor }
+      guard let matchedAppURL = matchedRunningApps.first?.bundleURL else { return nil }
       Self.temporatyBundlePtr = Bundle(url: matchedAppURL)
       defer { temporatyBundlePtr = nil }
-      let bundleColor = Self.temporatyBundlePtr?.getAccentColor().usingColorSpace(.deviceRGB)
-      guard let bundleColor = bundleColor else { return .accentColor }
-      let h = bundleColor.hueComponent
-      let s = bundleColor.saturationComponent
-      return .init(hue: h, saturation: s, brightness: 128, alpha: 1)
+      return Self.temporatyBundlePtr?.getAccentColor().usingColorSpace(.deviceRGB)
     }
   }
 
@@ -499,6 +503,38 @@
       case (false, ..<8): return .none
       case (_, _): return .none
       }
+    }
+  }
+
+  extension NSColor {
+    public var asHSBA: HSBA {
+      .init(
+        hue: hueComponent,
+        saturation: saturationComponent,
+        brightness: brightnessComponent,
+        alpha: alphaComponent
+      )
+    }
+  }
+
+  extension HSBA {
+    /// 轉換為 NSColor（僅 macOS）。確保數值合法。
+    public var nsColor: NSColor {
+      let h = hue.isFinite ? max(0, min(1, hue)) : 0
+      let s = saturation.isFinite ? max(0, min(1, saturation)) : 0
+      let b = brightness.isFinite ? max(0, min(1, brightness)) : 0
+      let a = alpha.isFinite ? max(0, min(1, alpha)) : 1
+      return NSColor(hue: h, saturation: s, brightness: b, alpha: a)
+    }
+
+    /// 從 NSColor 初始化（僅 macOS）。
+    public init(_ nsColor: NSColor) {
+      self.init(
+        hue: nsColor.hueComponent,
+        saturation: nsColor.saturationComponent,
+        brightness: nsColor.brightnessComponent,
+        alpha: nsColor.alphaComponent
+      )
     }
   }
 

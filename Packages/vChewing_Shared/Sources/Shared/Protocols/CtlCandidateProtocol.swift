@@ -35,7 +35,7 @@ public protocol CtlCandidateDelegateCore: AnyObject {
 
 // MARK: - CtlCandidateProtocolCore
 
-public protocol CtlCandidateProtocolCore {
+public protocol CtlCandidateProtocolCore: AnyObject {
   var tooltip: String { get set }
   var reverseLookupResult: [String] { get set }
   var locale: String { get set }

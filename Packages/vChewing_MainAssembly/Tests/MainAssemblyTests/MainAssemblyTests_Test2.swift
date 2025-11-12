@@ -458,7 +458,7 @@ extension MainAssemblyTests {
       // Refresh candidates after nerfing for the boost path.
       let refreshedState = testHandler.generateStateOfCandidates(dodge: false)
       testSession.switchState(refreshedState)
-      testSession.showCandidates()
+      testSession.toggleCandidateUIVisibility(true)
       highlightEligibleCandidate()
 
       press(optionCommandEqualEvent)

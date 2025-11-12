@@ -51,6 +51,8 @@ public struct KBEvent: InputSignalProtocol, Hashable {
   public private(set) var isARepeat: Bool
   public private(set) var keyCode: UInt16
 
+  public var typeID: UInt { UInt(type.rawValue) }
+
   public func reinitiate(
     with type: Self.EventType? = nil,
     modifierFlags: Self.ModifierFlags? = nil,

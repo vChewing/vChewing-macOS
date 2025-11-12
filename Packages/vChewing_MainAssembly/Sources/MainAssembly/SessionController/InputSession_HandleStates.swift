@@ -70,7 +70,7 @@ extension SessionProtocol {
         if replace { state = .ofEmpty() }
       default: break innerCircle
       }
-      candidateUI?.visible = false
+      toggleCandidateUIVisibility(false)
       // 全專案用以判斷「.Abortion」的地方僅此一處。
       if previous.hasComposition, ![.ofAbortion, .ofCommitting].contains(newState.type) {
         commit(text: previous.displayedText)
@@ -84,7 +84,7 @@ extension SessionProtocol {
       clearInlineDisplay()
       inputHandler?.clear()
     case .ofInputting:
-      candidateUI?.visible = false
+      toggleCandidateUIVisibility(false)
       if !newState.textToCommit.isEmpty {
         commit(text: newState.textToCommit)
       }
@@ -95,18 +95,20 @@ extension SessionProtocol {
         colorState: newState.data.tooltipColorState,
         duration: newState.tooltipDuration
       )
-      if newState.isCandidateContainer { showCandidates() }
+      if newState.isCandidateContainer {
+        toggleCandidateUIVisibility(true)
+      }
     case .ofMarking:
-      candidateUI?.visible = false
+      toggleCandidateUIVisibility(false)
       setInlineDisplayWithCursor()
       showTooltip(
         newState.tooltip,
         colorState: newState.data.tooltipColorState
       )
     case .ofAssociates, .ofCandidates, .ofSymbolTable:
-      tooltipInstance.hide()
+      showTooltip(nil)
       setInlineDisplayWithCursor()
-      showCandidates()
+      toggleCandidateUIVisibility(true)
     }
     // 浮動組字窗的顯示判定
     updatePopupDisplayWithCursor()
@@ -119,15 +121,19 @@ extension SessionProtocol {
 
   /// 浮動組字窗的顯示判定
   public func updatePopupDisplayWithCursor() {
+    guard isCurrentSession else { return }
     if state.hasComposition, clientMitigationLevel >= 2 {
       updateVerticalTypingStatus()
-      popupCompositionBuffer.isTypingDirectionVertical = isVerticalTyping
-      popupCompositionBuffer.sync(accent: clientAccentColor, locale: localeForFontFallbacks)
-      popupCompositionBuffer.show(
+      ui?.pcb?.isTypingDirectionVertical = isVerticalTyping
+      ui?.pcb?.sync(
+        accent: clientAccentColor?.asHSBA,
+        locale: localeForFontFallbacks
+      )
+      ui?.pcb?.show(
         state: state, at: lineHeightRect(zeroCursor: true).origin
       )
     } else {
-      popupCompositionBuffer.hide()
+      ui?.pcb?.hide()
     }
   }
 

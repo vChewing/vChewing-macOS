@@ -476,3 +476,26 @@ public enum CRC32 {
     return table
   }()
 }
+
+// MARK: - HSBA
+
+/// 一個簡單的顏色結構體，用於跨平台（包括 Linux）承載 HSBA 顏色值。
+/// 每個分量均為 Double 類型，範圍 0.0 ~ 1.0。
+public struct HSBA {
+  // MARK: Lifecycle
+
+  /// 初始化 HSBA 顏色。
+  public init(hue: Double, saturation: Double, brightness: Double, alpha: Double = 1.0) {
+    self.hue = max(0.0, min(1.0, hue))
+    self.saturation = max(0.0, min(1.0, saturation))
+    self.brightness = max(0.0, min(1.0, brightness))
+    self.alpha = max(0.0, min(1.0, alpha))
+  }
+
+  // MARK: Public
+
+  public var hue: Double
+  public var saturation: Double
+  public var brightness: Double
+  public var alpha: Double
+}

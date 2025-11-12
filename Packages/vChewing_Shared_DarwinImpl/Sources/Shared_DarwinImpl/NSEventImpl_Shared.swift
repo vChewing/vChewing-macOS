@@ -17,6 +17,8 @@ import AppKit
 #endif
 
 extension NSEvent {
+  public var typeID: UInt { type.rawValue }
+
   public var keyModifierFlags: KBEvent.ModifierFlags {
     .init(rawValue: keyModifierFlagsNS.rawValue)
   }

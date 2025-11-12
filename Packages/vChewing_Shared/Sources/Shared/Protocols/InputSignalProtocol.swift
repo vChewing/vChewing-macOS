@@ -9,6 +9,7 @@
 // MARK: - InputSignalProtocol
 
 public protocol InputSignalProtocol {
+  var typeID: UInt { get }
   var keyModifierFlags: KBEvent.ModifierFlags { get }
   var isTypingVertical: Bool { get }
   var text: String { get }

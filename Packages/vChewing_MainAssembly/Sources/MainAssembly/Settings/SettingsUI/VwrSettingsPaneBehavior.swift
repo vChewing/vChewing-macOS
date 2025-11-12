@@ -121,14 +121,12 @@ public struct VwrSettingsPaneBehavior: View {
           VStack(alignment: .leading) {
             UserDef.kTogglingAlphanumericalModeWithLShift.bind(
               $togglingAlphanumericalModeWithLShift.didChange {
-                InputSession.theShiftKeyDetector
-                  .toggleWithLShift = togglingAlphanumericalModeWithLShift
+                SessionUI.shared.resyncShiftKeyUpCheckerSettings()
               }
             ).render()
             UserDef.kTogglingAlphanumericalModeWithRShift.bind(
               $togglingAlphanumericalModeWithRShift.didChange {
-                InputSession.theShiftKeyDetector
-                  .toggleWithRShift = togglingAlphanumericalModeWithRShift
+                SessionUI.shared.resyncShiftKeyUpCheckerSettings()
               }
             ).render()
             Spacer()
