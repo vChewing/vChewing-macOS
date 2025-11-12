@@ -16,129 +16,127 @@ extension SessionCtl {
   // MARK: Public
 
   override public func menu() -> NSMenu {
-    autoreleasepool {
-      NSMenu().appendItems(self) {
-        NSMenu.Item(verbatim: currentRAMUsageDescription)
-        NSMenu.Item(
-          verbatim: String(
-            format: "Switch to %@ Input Mode".localized,
-            IMEApp.currentInputMode.reversed.localizedDescription
-          )
-        )?.act(#selector(switchInputMode(_:)))
-          .hotkey(PrefMgr.shared.usingHotKeyInputMode ? "D" : "", mask: [.command, .control])
-        NSMenu.Item("Per-Char Select Mode")?
-          .act(#selector(toggleSCPCTypingMode(_:)))
-          .state(PrefMgr.shared.useSCPCTypingMode)
-          .hotkey(PrefMgr.shared.usingHotKeySCPC ? "P" : "", mask: [.command, .control])
-        NSMenu.Item("Associated Phrases")?
-          .act(#selector(toggleAssociatedPhrasesEnabled(_:)))
-          .state(PrefMgr.shared.associatedPhrasesEnabled)
-          .hotkey(PrefMgr.shared.usingHotKeyAssociates ? "O" : "", mask: [.command, .control])
-        NSMenu.Item("Edit Associated Phrases…")?
-          .act(#selector(openAssociatedPhrases(_:)))
-          .alternated()
-          .hotkey(
-            PrefMgr.shared.usingHotKeyAssociates ? "O" : "",
-            mask: [.command, .option, .control]
-          )
-          .nulled(silentMode)
-        NSMenu.Item("CIN Cassette Mode")?
-          .act(#selector(toggleCassetteMode(_:)))
-          .state(PrefMgr.shared.cassetteEnabled)
-          .hotkey(PrefMgr.shared.usingHotKeyCassette ? "I" : "", mask: [.command, .control])
-        NSMenu.Item("CNS11643 Mode")?
-          .act(#selector(toggleCNS11643Enabled(_:)))
-          .state(PrefMgr.shared.cns11643Enabled)
-          .hotkey(PrefMgr.shared.usingHotKeyCNS ? "L" : "", mask: [.command, .control])
-        NSMenu.Item("Force KangXi Writing")?
-          .act(#selector(toggleChineseConverter(_:)))
-          .state(PrefMgr.shared.chineseConversionEnabled)
-          .hotkey(PrefMgr.shared.usingHotKeyKangXi ? "K" : "", mask: [.command, .control])
-          .nulled(IMEApp.currentInputMode != .imeModeCHT)
-        NSMenu.Item("JIS Shinjitai Output")?
-          .act(#selector(toggleShiftJISShinjitaiOutput(_:)))
-          .state(PrefMgr.shared.shiftJISShinjitaiOutputEnabled)
-          .hotkey(PrefMgr.shared.usingHotKeyJIS ? "J" : "", mask: [.command, .control])
-          .nulled(IMEApp.currentInputMode != .imeModeCHT)
-        NSMenu.Item("Currency Numeral Output")?
-          .act(#selector(toggleCurrencyNumerals(_:)))
-          .state(PrefMgr.shared.currencyNumeralsEnabled)
-          .hotkey(PrefMgr.shared.usingHotKeyCurrencyNumerals ? "M" : "", mask: [.command, .control])
-        NSMenu.Item("Half-Width Punctuation Mode")?
-          .act(#selector(toggleHalfWidthPunctuation(_:)))
-          .state(PrefMgr.shared.halfWidthPunctuationEnabled)
-          .hotkey(PrefMgr.shared.usingHotKeyHalfWidthASCII ? "H" : "", mask: [.command, .control])
-        NSMenu.Item("Use Phrase Replacement")?
-          .act(#selector(togglePhraseReplacement(_:)))
-          .state(PrefMgr.shared.phraseReplacementEnabled)
-        NSMenu.Item("Edit Phrase Replacement Table…")?
-          .act(#selector(openPhraseReplacement(_:)))
-          .alternated().nulled(silentMode)
-        NSMenu.Item("Symbol & Emoji Input")?
-          .act(#selector(toggleSymbolEnabled(_:)))
-          .state(PrefMgr.shared.symbolInputEnabled)
-        NSMenu.Item("Edit User Symbol & Emoji Data…")?
-          .act(#selector(openUserSymbols(_:)))
-          .alternated().nulled(silentMode)
+    NSMenu().appendItems(self) {
+      NSMenu.Item(verbatim: currentRAMUsageDescription)
+      NSMenu.Item(
+        verbatim: String(
+          format: "Switch to %@ Input Mode".localized,
+          IMEApp.currentInputMode.reversed.localizedDescription
+        )
+      )?.act(#selector(switchInputMode(_:)))
+        .hotkey(PrefMgr.shared.usingHotKeyInputMode ? "D" : "", mask: [.command, .control])
+      NSMenu.Item("Per-Char Select Mode")?
+        .act(#selector(toggleSCPCTypingMode(_:)))
+        .state(PrefMgr.shared.useSCPCTypingMode)
+        .hotkey(PrefMgr.shared.usingHotKeySCPC ? "P" : "", mask: [.command, .control])
+      NSMenu.Item("Associated Phrases")?
+        .act(#selector(toggleAssociatedPhrasesEnabled(_:)))
+        .state(PrefMgr.shared.associatedPhrasesEnabled)
+        .hotkey(PrefMgr.shared.usingHotKeyAssociates ? "O" : "", mask: [.command, .control])
+      NSMenu.Item("Edit Associated Phrases…")?
+        .act(#selector(openAssociatedPhrases(_:)))
+        .alternated()
+        .hotkey(
+          PrefMgr.shared.usingHotKeyAssociates ? "O" : "",
+          mask: [.command, .option, .control]
+        )
+        .nulled(silentMode)
+      NSMenu.Item("CIN Cassette Mode")?
+        .act(#selector(toggleCassetteMode(_:)))
+        .state(PrefMgr.shared.cassetteEnabled)
+        .hotkey(PrefMgr.shared.usingHotKeyCassette ? "I" : "", mask: [.command, .control])
+      NSMenu.Item("CNS11643 Mode")?
+        .act(#selector(toggleCNS11643Enabled(_:)))
+        .state(PrefMgr.shared.cns11643Enabled)
+        .hotkey(PrefMgr.shared.usingHotKeyCNS ? "L" : "", mask: [.command, .control])
+      NSMenu.Item("Force KangXi Writing")?
+        .act(#selector(toggleChineseConverter(_:)))
+        .state(PrefMgr.shared.chineseConversionEnabled)
+        .hotkey(PrefMgr.shared.usingHotKeyKangXi ? "K" : "", mask: [.command, .control])
+        .nulled(IMEApp.currentInputMode != .imeModeCHT)
+      NSMenu.Item("JIS Shinjitai Output")?
+        .act(#selector(toggleShiftJISShinjitaiOutput(_:)))
+        .state(PrefMgr.shared.shiftJISShinjitaiOutputEnabled)
+        .hotkey(PrefMgr.shared.usingHotKeyJIS ? "J" : "", mask: [.command, .control])
+        .nulled(IMEApp.currentInputMode != .imeModeCHT)
+      NSMenu.Item("Currency Numeral Output")?
+        .act(#selector(toggleCurrencyNumerals(_:)))
+        .state(PrefMgr.shared.currencyNumeralsEnabled)
+        .hotkey(PrefMgr.shared.usingHotKeyCurrencyNumerals ? "M" : "", mask: [.command, .control])
+      NSMenu.Item("Half-Width Punctuation Mode")?
+        .act(#selector(toggleHalfWidthPunctuation(_:)))
+        .state(PrefMgr.shared.halfWidthPunctuationEnabled)
+        .hotkey(PrefMgr.shared.usingHotKeyHalfWidthASCII ? "H" : "", mask: [.command, .control])
+      NSMenu.Item("Use Phrase Replacement")?
+        .act(#selector(togglePhraseReplacement(_:)))
+        .state(PrefMgr.shared.phraseReplacementEnabled)
+      NSMenu.Item("Edit Phrase Replacement Table…")?
+        .act(#selector(openPhraseReplacement(_:)))
+        .alternated().nulled(silentMode)
+      NSMenu.Item("Symbol & Emoji Input")?
+        .act(#selector(toggleSymbolEnabled(_:)))
+        .state(PrefMgr.shared.symbolInputEnabled)
+      NSMenu.Item("Edit User Symbol & Emoji Data…")?
+        .act(#selector(openUserSymbols(_:)))
+        .alternated().nulled(silentMode)
 
-        NSMenu.Item.separator() // ---------------------
-        NSMenu.Item("Open User Dictionary Folder")?
-          .act(#selector(openUserDataFolder(_:)))
-          .nulled(silentMode)
-        NSMenu.Item("Open App Support Folder")?
-          .act(#selector(openAppSupportFolderFromContainer(_:)))
-          .alternated().nulled(silentMode)
-        NSMenu.Item("Edit vChewing User Phrases…")?
-          .act(#selector(openUserPhrases(_:)))
-          .nulled(silentMode)
-        NSMenu.Item("Reload User Phrases")?
-          .act(#selector(reloadUserPhrasesData(_:)))
-        NSMenu.Item("Edit Excluded Phrases…")?
-          .act(#selector(openExcludedPhrases(_:)))
-          .alternated().nulled(silentMode)
-        NSMenu.Item(verbatim: "Reverse Lookup (Phonabets)".localized.withEllipsis)?
-          .act(#selector(callReverseLookupWindow(_:)))
-          .hotkey(PrefMgr.shared.usingHotKeyRevLookup ? "/" : "", mask: [.command, .control])
-        NSMenu.Item("Optimize Memorized Phrases")?
-          .act(#selector(removeUnigramsFromPOM(_:)))
-        NSMenu.Item("Clear Memorized Phrases")?
-          .act(#selector(clearPOM(_:)))
-          .alternated()
+      NSMenu.Item.separator() // ---------------------
+      NSMenu.Item("Open User Dictionary Folder")?
+        .act(#selector(openUserDataFolder(_:)))
+        .nulled(silentMode)
+      NSMenu.Item("Open App Support Folder")?
+        .act(#selector(openAppSupportFolderFromContainer(_:)))
+        .alternated().nulled(silentMode)
+      NSMenu.Item("Edit vChewing User Phrases…")?
+        .act(#selector(openUserPhrases(_:)))
+        .nulled(silentMode)
+      NSMenu.Item("Reload User Phrases")?
+        .act(#selector(reloadUserPhrasesData(_:)))
+      NSMenu.Item("Edit Excluded Phrases…")?
+        .act(#selector(openExcludedPhrases(_:)))
+        .alternated().nulled(silentMode)
+      NSMenu.Item(verbatim: "Reverse Lookup (Phonabets)".localized.withEllipsis)?
+        .act(#selector(callReverseLookupWindow(_:)))
+        .hotkey(PrefMgr.shared.usingHotKeyRevLookup ? "/" : "", mask: [.command, .control])
+      NSMenu.Item("Optimize Memorized Phrases")?
+        .act(#selector(removeUnigramsFromPOM(_:)))
+      NSMenu.Item("Clear Memorized Phrases")?
+        .act(#selector(clearPOM(_:)))
+        .alternated()
 
-        NSMenu.Item.separator() // ---------------------
-        if #unavailable(macOS 14) {
-          NSMenu.Item("vChewing Preferences…")?
-            .act(#selector(showPreferences(_:)))
-            .nulled(silentMode)
-        } else {
-          NSMenu.Item(verbatim: "vChewing Preferences…".localized + " (SwiftUI)")?
-            .act(#selector(showSettingsSwiftUI(_:)))
-            .nulled(silentMode)
-          NSMenu.Item(verbatim: "vChewing Preferences…".localized + " (AppKit)")?
-            .act(#selector(showSettingsAppKit(_:)))
-            .alternated().nulled(silentMode)
-        }
-        NSMenu.Item(verbatim: "Client Manager".localized.withEllipsis)?
-          .act(#selector(showClientListMgr(_:)))
+      NSMenu.Item.separator() // ---------------------
+      if #unavailable(macOS 14) {
+        NSMenu.Item("vChewing Preferences…")?
+          .act(#selector(showPreferences(_:)))
           .nulled(silentMode)
-        NSMenu.Item(verbatim: "Service Menu Editor".localized.withEllipsis)?
-          .act(#selector(showServiceMenuEditor(_:)))
+      } else {
+        NSMenu.Item(verbatim: "vChewing Preferences…".localized + " (SwiftUI)")?
+          .act(#selector(showSettingsSwiftUI(_:)))
+          .nulled(silentMode)
+        NSMenu.Item(verbatim: "vChewing Preferences…".localized + " (AppKit)")?
+          .act(#selector(showSettingsAppKit(_:)))
           .alternated().nulled(silentMode)
-        NSMenu.Item("Check for Updates…")?
-          .act(#selector(checkForUpdate(_:)))
-          .nulled(silentMode)
-        NSMenu.Item("Reboot vChewing…")?
-          .act(#selector(selfTerminate(_:)))
-        NSMenu.Item("CheatSheet")?
-          .act(#selector(showCheatSheet(_:)))
-          .nulled(silentMode)
-        NSMenu.Item("About vChewing…")?
-          .act(#selector(showAbout(_:)))
-          .nulled(silentMode)
-        NSMenu.Item("Uninstall vChewing…")?
-          .act(#selector(selfUninstall(_:)))
-          .nulled(silentMode || !optionKeyPressed)
       }
+      NSMenu.Item(verbatim: "Client Manager".localized.withEllipsis)?
+        .act(#selector(showClientListMgr(_:)))
+        .nulled(silentMode)
+      NSMenu.Item(verbatim: "Service Menu Editor".localized.withEllipsis)?
+        .act(#selector(showServiceMenuEditor(_:)))
+        .alternated().nulled(silentMode)
+      NSMenu.Item("Check for Updates…")?
+        .act(#selector(checkForUpdate(_:)))
+        .nulled(silentMode)
+      NSMenu.Item("Reboot vChewing…")?
+        .act(#selector(selfTerminate(_:)))
+      NSMenu.Item("CheatSheet")?
+        .act(#selector(showCheatSheet(_:)))
+        .nulled(silentMode)
+      NSMenu.Item("About vChewing…")?
+        .act(#selector(showAbout(_:)))
+        .nulled(silentMode)
+      NSMenu.Item("Uninstall vChewing…")?
+        .act(#selector(selfUninstall(_:)))
+        .nulled(silentMode || !optionKeyPressed)
     }
   }
 

@@ -61,17 +61,15 @@ public final class InputSession: SessionProtocol {
   public let prefs: any PrefMgrProtocol = PrefMgr.shared
 
   public private(set) lazy var sharedAlertForInputModeToggling: NSAlert = {
-    autoreleasepool {
-      let alert = NSAlert()
-      alert.alertStyle = .informational
-      alert.messageText = "Target Input Mode Activation Required".localized
-      alert
-        .informativeText =
-        "You are proceeding to System Preferences to enable the Input Source which corresponds to the input mode you are going to switch to."
-          .localized
-      alert.addButton(withTitle: "OK".localized)
-      return alert
-    }
+    let alert = NSAlert()
+    alert.alertStyle = .informational
+    alert.messageText = "Target Input Mode Activation Required".localized
+    alert
+      .informativeText =
+      "You are proceeding to System Preferences to enable the Input Source which corresponds to the input mode you are going to switch to."
+        .localized
+    alert.addButton(withTitle: "OK".localized)
+    return alert
   }()
 
   /// 上一個被處理過的鍵盤事件。
@@ -81,18 +79,10 @@ public final class InputSession: SessionProtocol {
   public var candidateUI: (any CtlCandidateProtocol)?
 
   /// 工具提示視窗的副本。
-  public lazy var tooltipInstance: any TooltipUIProtocol = {
-    autoreleasepool {
-      InputSession.makeTooltipUI()
-    }
-  }()
+  public lazy var tooltipInstance: any TooltipUIProtocol = InputSession.makeTooltipUI()
 
   /// 浮動組字窗的副本。
-  public lazy var popupCompositionBuffer: PopupCompositionBuffer = {
-    autoreleasepool {
-      PopupCompositionBuffer()
-    }
-  }()
+  public lazy var popupCompositionBuffer: PopupCompositionBuffer = .init()
 
   /// 用來標記當前副本是否已處於活動狀態。
   public var isActivated: Bool = false
