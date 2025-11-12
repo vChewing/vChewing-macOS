@@ -33,14 +33,22 @@ extension SessionProtocol {
     return client.lineHeightRect(u16Cursor: zeroCursor ? 0 : u16Cursor)
   }
 
+  public func toggleCandidateUIVisibility(_ newValue: Bool, refresh: Bool = true) {
+    guard isCurrentSession else { return }
+    switch (newValue, refresh) {
+    case (false, _), (true, false): ui?.candidateUI?.visible = newValue
+    case (true, true): showCandidates()
+    }
+  }
+
   public func showTooltip(
-    _ tooltip: String,
+    _ tooltip: String?,
     colorState: TooltipColorState = .normal,
     duration: Double = 0
   ) {
-    guard client() != nil else { return }
-    if tooltip.isEmpty {
-      tooltipInstance.hide()
+    guard isCurrentSession, client() != nil else { return }
+    guard let tooltip, !tooltip.isEmpty else {
+      ui?.tooltipUI?.hide()
       return
     }
     let lineHeightRect = updateVerticalTypingStatus()
@@ -55,21 +63,18 @@ extension SessionProtocol {
       if PrefMgr.shared.alwaysShowTooltipTextsHorizontally { return .horizontal }
       return isVerticalTyping ? .vertical : .horizontal
     }()
-    // 強制重新初期化，因為有顯示滯後性。
-    do {
-      tooltipInstance.hide()
-      tooltipInstance = Self.makeTooltipUI()
-      tooltipInstance.setColor(state: colorState)
-    }
+    // 先隱藏，因為有顯示滯後性。
+    ui?.tooltipUI?.hide()
+    ui?.tooltipUI?.setColor(state: colorState)
     // 再設定其文字顯示內容並顯示。
-    tooltipInstance.show(
+    ui?.tooltipUI?.show(
       tooltip: tooltip, at: finalOrigin, bottomOutOfScreenAdjustmentHeight: delta,
       direction: tooltipContentDirection, duration: duration
     )
   }
 
-  public func showCandidates() {
-    guard client() != nil else { return }
+  private func showCandidates() {
+    guard isCurrentSession, client() != nil else { return }
     updateVerticalTypingStatus()
     let isServiceMenu = state.type == .ofSymbolTable && state.node.containsCandidateServices
     isVerticalCandidateWindow = isVerticalTyping || !PrefMgr.shared.useHorizontalCandidateList
@@ -81,27 +86,29 @@ extension SessionProtocol {
 
     let isInputtingWithCandidates = state.type == .ofInputting && state.isCandidateContainer
     /// 先取消既有的選字窗的內容顯示。否則可能會重複生成選字窗的 NSWindow()。
-    candidateUI?.visible = false
-    candidateUI = CtlCandidateTDK(candidateLayout)
+    ui?.candidateUI?.visible = false
+    ui?.candidateUI?.currentLayout = candidateLayout
     var singleLine = isVerticalTyping || PrefMgr.shared.candidateWindowShowOnlyOneLine
     singleLine = singleLine || isInputtingWithCandidates
     singleLine = singleLine || isServiceMenu
 
-    (candidateUI as? CtlCandidateTDK)?.maxLinesPerPage = singleLine ? 1 : 4
+    (ui?.candidateUI as? CtlCandidateTDK)?.maxLinesPerPage = singleLine ? 1 : 4
 
-    candidateUI?.candidateFont = Self.candidateFont(
-      name: PrefMgr.shared.candidateTextFontName, size: PrefMgr.shared.candidateListTextSize
-    )
+    if let candidateUI = ui?.candidateUI as? CtlCandidateTDK {
+      candidateUI.candidateFont = Self.candidateFont(
+        name: PrefMgr.shared.candidateTextFontName, size: PrefMgr.shared.candidateListTextSize
+      )
+    }
 
-    candidateUI?.locale = localeForFontFallbacks
+    ui?.candidateUI?.locale = localeForFontFallbacks
 
-    if let ctlCandidateCurrent = candidateUI as? CtlCandidateTDK {
+    if let ctlCandidateCurrent = ui?.candidateUI as? CtlCandidateTDK {
       ctlCandidateCurrent.useMouseScrolling = PrefMgr.shared
         .enableMouseScrollingForTDKCandidatesCocoa
     }
 
-    candidateUI?.delegate = self // 會自動觸發田所選字窗的資料重載。
-    candidateUI?.visible = true
+    ui?.candidateUI?.delegate = self // 會自動觸發田所選字窗的資料重載。
+    ui?.candidateUI?.visible = true
 
     resetCandidateWindowOrigin()
   }
@@ -110,7 +117,7 @@ extension SessionProtocol {
     let lhRect = lineHeightRect()
     var tlPoint = CGPoint(x: lhRect.origin.x, y: lhRect.origin.y - 4.0)
     tlPoint.x += isVerticalTyping ? (lhRect.size.width + 4.0) : 0
-    candidateUI?.set(
+    ui?.candidateUI?.set(
       windowTopLeftPoint: tlPoint,
       bottomOutOfScreenAdjustmentHeight: lhRect.size.height + 4.0,
       useGCD: true

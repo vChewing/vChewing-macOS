@@ -12,11 +12,15 @@ let package = Package(
       targets: ["ShiftKeyUpChecker"]
     ),
   ],
-  dependencies: [],
+  dependencies: [
+    .package(path: "../vChewing_Shared"),
+  ],
   targets: [
     .target(
       name: "ShiftKeyUpChecker",
-      dependencies: []
+      dependencies: [
+        .product(name: "Shared", package: "vChewing_Shared"),
+      ]
     ),
   ]
 )

@@ -20,12 +20,7 @@ extension PrefMgr {
       },
       didAskForRefreshingSpeechSputnik: SpeechSputnik.shared.refreshStatus,
       didAskForSyncingShiftKeyDetectorPrefs: {
-        InputSession.theShiftKeyDetector.toggleWithLShift =
-          PrefMgr.shared
-            .togglingAlphanumericalModeWithLShift
-        InputSession.theShiftKeyDetector.toggleWithRShift =
-          PrefMgr.shared
-            .togglingAlphanumericalModeWithRShift
+        SessionUI.shared.resyncShiftKeyUpCheckerSettings()
       }
     )
     result.candidateKeyValidator = { candidateKeys in

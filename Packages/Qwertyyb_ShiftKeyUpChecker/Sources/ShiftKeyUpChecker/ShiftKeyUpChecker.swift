@@ -3,6 +3,7 @@
 // This code is released under the MIT license (SPDX-License-Identifier: MIT)
 
 import AppKit
+import Shared
 
 extension Date {
   fileprivate static func - (lhs: Date, rhs: Date) -> TimeInterval {
@@ -12,7 +13,7 @@ extension Date {
 
 // MARK: - ShiftKeyUpChecker
 
-public struct ShiftKeyUpChecker {
+public class ShiftKeyUpChecker: ShiftKeyUpCheckerProtocol {
   // MARK: Lifecycle
 
   // MARK: - 威注音輸入法專有部分
@@ -33,12 +34,12 @@ public struct ShiftKeyUpChecker {
   public var enabled: Bool { toggleWithLShift || toggleWithRShift }
 
   // To confirm that only the shift key is "pressed-and-released".
-  public mutating func check(_ event: NSEvent) -> Bool {
-    var met: Bool = event.type == .flagsChanged
+  public func check(_ event: some InputSignalProtocol) -> Bool {
+    var met: Bool = event.typeID == NSEvent.EventType.flagsChanged.rawValue
     met = met && event.keyCode != cplkKeyCode
     met = met && checkKeyCodeFlags.contains(event.keyCode)
     met = met && event.keyCode == previousKeyCode // 檢查 KeyCode 一致性。
-    met = met && event.modifierFlags.intersection(.deviceIndependentFlagsMask).isEmpty
+    met = met && event.keyModifierFlags.intersection(.deviceIndependentFlagsMask).isEmpty
     met = met && Date() - lastTime <= delayInterval
     _ = met ? lastTime = Date(timeInterval: .infinity * -1, since: Date()) :
       registerModifierKeyDown(event: event)
@@ -55,7 +56,7 @@ public struct ShiftKeyUpChecker {
   private var previousKeyCode: UInt16?
   private var lastTime: Date = .init()
 
-  private var checkModifier: NSEvent.ModifierFlags { .shift }
+  private var checkModifier: KBEvent.ModifierFlags { .shift }
   private var checkKeyCodeFlags: [UInt16] {
     var result = [UInt16]()
     if toggleWithLShift { result.append(lShiftKeyCodeFlag) }
@@ -63,11 +64,11 @@ public struct ShiftKeyUpChecker {
     return result
   }
 
-  private mutating func registerModifierKeyDown(event: NSEvent) {
-    var isKeyDown: Bool = event.type == .flagsChanged
+  private func registerModifierKeyDown(event: some InputSignalProtocol) {
+    var isKeyDown: Bool = event.typeID == NSEvent.EventType.flagsChanged.rawValue
     // 注意：ModifierFlags 是 OptionSet，在使用 contains 時會在給定參數是「空集合」的時候返回 true（明明你可能想要 false）。
-    isKeyDown = isKeyDown && event.modifierFlags
-      .intersection(.deviceIndependentFlagsMask) == checkModifier
+    let intersected = event.keyModifierFlags.intersection(.deviceIndependentFlagsMask)
+    isKeyDown = isKeyDown && intersected == checkModifier
     isKeyDown = isKeyDown && checkKeyCodeFlags.contains(event.keyCode)
     lastTime = isKeyDown ? .init() : .init(timeInterval: .infinity * -1, since: Date())
     previousKeyCode = isKeyDown ? event.keyCode : nil

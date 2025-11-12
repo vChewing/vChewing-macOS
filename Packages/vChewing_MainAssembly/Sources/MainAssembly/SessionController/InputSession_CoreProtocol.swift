@@ -23,9 +23,6 @@ public protocol SessionProtocol: AnyObject, IMKInputControllerProtocol, CtlCandi
   static var current: Self? { get set }
   /// 標記狀態來聲明目前新增的詞彙是否需要賦以非常低的權重。
   static var areWeNerfing: Bool { get set }
-  /// Shift 按鍵事件分析器的副本。
-  /// - Remark: 警告：該工具必須為 Struct 且全專案只能有一個唯一初期化副本。否則會在動 Caps Lock 的時候誤以為是在摁 Shift。
-  static var theShiftKeyDetector: ShiftKeyUpChecker { get set }
   /// 記錄當前輸入環境是縱排輸入還是橫排輸入。
   static var isVerticalTyping: Bool { get }
   /// 用以記錄最近存取過的十個客體（亂序），相關內容會在客體管理器當中用得到。
@@ -40,12 +37,6 @@ public protocol SessionProtocol: AnyObject, IMKInputControllerProtocol, CtlCandi
   var sharedAlertForInputModeToggling: NSAlert { get }
   /// 上一個被處理過的鍵盤事件。
   var previouslyHandledEvents: [KBEvent] { get set }
-  /// 目前在用的的選字窗副本。
-  var candidateUI: CtlCandidateProtocol? { get set }
-  /// 工具提示視窗的副本。
-  var tooltipInstance: any TooltipUIProtocol { get set }
-  /// 浮動組字窗的副本。
-  var popupCompositionBuffer: PopupCompositionBuffer { get set }
   /// 用來標記當前副本是否已處於活動狀態。
   var isActivated: Bool { get set }
   /// 當前副本的客體是否是輸入法本體？
@@ -76,10 +67,6 @@ extension SessionProtocol {
   public typealias ClientObj = IMKTextInput & NSObjectProtocol
 
   public static var isVerticalTyping: Bool { Self.current?.isVerticalTyping ?? false }
-
-  public static func makeTooltipUI() -> TooltipUIProtocol {
-    TooltipUI()
-  }
 
   public var selectionKeys: String {
     // 磁帶模式的 `%quick` 有單獨的選字鍵判定，會在資料不合規時使用 1234567890 選字鍵。
@@ -120,6 +107,10 @@ extension SessionProtocol {
       resetInputHandler()
       setKeyLayout()
     }
+  }
+
+  public func syncCurrentSessionID() {
+    ui?.currentSessionID = id
   }
 
   /// 重設輸入調度模組，會將當前尚未遞交的內容遞交出去。
@@ -228,10 +219,7 @@ extension SessionProtocol {
       self.resetInputHandler() // 這條會自動搞定 Empty 狀態。
       self.switchState(.ofDeactivated())
       self.inputHandler = nil
-      // IMK 選字窗可以不用 nil，不然反而會出問題。反正 IMK 選字窗記憶體開銷可以不計。
-      if self.candidateUI is CtlCandidateTDK {
-        self.candidateUI = nil
-      }
+      // 選字窗不用管，交給新的 Session 的 ActivateServer 來管理。
     }
     if UserDefaults.pendingUnitTests {
       deactivation()
@@ -242,6 +230,7 @@ extension SessionProtocol {
 
   public func performServerActivation(client: ClientObj?) {
     hidePalettes()
+    syncCurrentSessionID()
     let activation1 = { [weak self] in
       guard let self = self else { return }
       if let senderBundleID: String = client?.bundleIdentifier() {
@@ -287,12 +276,8 @@ extension SessionProtocol {
     } else {
       asyncOnMain(execute: activation3)
     }
-    let activation4 = { [weak self] in
-      guard let self = self else { return }
-      // 清理掉上一個會話的選字窗及其選單。
-      if self.candidateUI is CtlCandidateTDK {
-        self.candidateUI = nil
-      }
+    let activation4 = {
+      // 選字窗不用管，交給新的 Session 的 ActivateServer 來管理。
       CtlCandidateTDK.currentMenu?.cancelTracking()
       CtlCandidateTDK.currentMenu = nil
       CtlCandidateTDK.currentWindow?.orderOut(nil)
@@ -311,16 +296,19 @@ extension SessionProtocol {
       self.initInputHandler()
       LMMgr.syncLMPrefs()
 
-      Self.theShiftKeyDetector.toggleWithLShift =
-        PrefMgr.shared
-          .togglingAlphanumericalModeWithLShift
-      Self.theShiftKeyDetector.toggleWithRShift =
-        PrefMgr.shared
-          .togglingAlphanumericalModeWithRShift
+      let shiftKeyDetector = ui?.shiftKeyUpChecker
+      if let shiftKeyDetector {
+        shiftKeyDetector.toggleWithLShift =
+          PrefMgr.shared
+            .togglingAlphanumericalModeWithLShift
+        shiftKeyDetector.toggleWithRShift =
+          PrefMgr.shared
+            .togglingAlphanumericalModeWithRShift
+      }
 
       if self.isASCIIMode, !IMEApp.isKeyboardJIS {
         if #available(macOS 10.15, *) {
-          if !Self.theShiftKeyDetector.enabled {
+          if let shiftKeyDetector, !shiftKeyDetector.enabled {
             self.isASCIIMode = false
           }
         } else {
