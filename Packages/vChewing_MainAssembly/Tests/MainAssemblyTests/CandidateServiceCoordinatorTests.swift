@@ -10,7 +10,7 @@ import InputMethodKit
 import Shared
 import XCTest
 
-class CandidateServiceCoordinatorTests: XCTestCase {
+final class CandidateServiceCoordinatorTests: XCTestCase {
   // MARK: Internal
 
   static let testDataMap: [String] = [

@@ -9,7 +9,7 @@
 import AppKit
 import Carbon
 
-public class SecurityAgentHelper {
+public final class SecurityAgentHelper {
   // MARK: Lifecycle
 
   private init() {

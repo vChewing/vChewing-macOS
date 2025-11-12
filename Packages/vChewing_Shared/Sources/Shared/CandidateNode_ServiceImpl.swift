@@ -21,7 +21,7 @@ extension CandidateNode {
     !members.compactMap(\.asServiceMenuNode).isEmpty
   }
 
-  public class ServiceMenuNode: CandidateNode {
+  public final class ServiceMenuNode: CandidateNode {
     // MARK: Lifecycle
 
     public init(

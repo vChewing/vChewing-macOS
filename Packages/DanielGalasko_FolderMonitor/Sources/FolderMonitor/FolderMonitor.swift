@@ -7,7 +7,7 @@ import SwiftExtension
 
 // MARK: - FolderMonitor
 
-public class FolderMonitor {
+public final class FolderMonitor {
   // MARK: Lifecycle
 
   // MARK: Initializers

@@ -9,7 +9,7 @@
 import Foundation
 
 @objcMembers
-public class Broadcaster: NSObject {
+public final class Broadcaster: NSObject {
   public static var shared = Broadcaster()
 
   public dynamic var eventForReloadingPhraseEditor = UUID()

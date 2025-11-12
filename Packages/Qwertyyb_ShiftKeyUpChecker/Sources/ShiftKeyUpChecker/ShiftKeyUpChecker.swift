@@ -13,7 +13,7 @@ extension Date {
 
 // MARK: - ShiftKeyUpChecker
 
-public class ShiftKeyUpChecker: ShiftKeyUpCheckerProtocol {
+public final class ShiftKeyUpChecker: ShiftKeyUpCheckerProtocol {
   // MARK: Lifecycle
 
   // MARK: - 威注音輸入法專有部分

@@ -12,7 +12,7 @@ extension Megrez {
   /// 對應的節點結構。對於包含多個字符的詞條，引擎會整合相關的多個讀音形成複合索引鍵，
   /// 並從語言模型中獲取相應的單元圖資料集合。例如，包含兩個字符的詞條對應兩個讀音，
   /// 其節點的涵蓋範圍長度為 2。
-  public class Node: Equatable, Hashable, Codable {
+  public final class Node: Equatable, Hashable, Codable {
     // MARK: Lifecycle
 
     /// 建立新的節點物件副本。

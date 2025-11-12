@@ -14,7 +14,7 @@ private let kWindowTitleHeight: Double = 78
 
 // InputMethodServerPreferencesWindowControllerClass 非必需。
 
-public class CtlSettingsCocoa: NSWindowController, NSWindowDelegate {
+public final class CtlSettingsCocoa: NSWindowController, NSWindowDelegate {
   // MARK: Lifecycle
 
   public init() {

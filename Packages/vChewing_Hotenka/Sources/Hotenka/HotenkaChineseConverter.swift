@@ -92,7 +92,7 @@ public enum Hotenka {
 
 // MARK: - HotenkaChineseConverter
 
-public class HotenkaChineseConverter {
+public final class HotenkaChineseConverter {
   // MARK: Lifecycle
 
   deinit {

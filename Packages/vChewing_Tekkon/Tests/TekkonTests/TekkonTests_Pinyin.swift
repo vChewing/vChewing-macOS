@@ -7,7 +7,7 @@ import XCTest
 
 // MARK: - TekkonTestsPinyin
 
-class TekkonTestsPinyin: XCTestCase {
+final class TekkonTestsPinyin: XCTestCase {
   func testHanyuPinyinKeyReceivingAndCompositions() {
     var composer = Tekkon.Composer(arrange: .ofHanyuPinyin)
     var toneMarkerIndicator = true

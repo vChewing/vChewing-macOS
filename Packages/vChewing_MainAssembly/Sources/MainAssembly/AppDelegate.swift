@@ -12,7 +12,7 @@ import UserNotifications
 // MARK: - AppDelegate
 
 @objc(AppDelegate)
-public class AppDelegate: NSObject, NSApplicationDelegate, UNUserNotificationCenterDelegate {
+public final class AppDelegate: NSObject, NSApplicationDelegate, UNUserNotificationCenterDelegate {
   // MARK: Public
 
   public static let shared = AppDelegate()

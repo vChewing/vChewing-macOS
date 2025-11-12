@@ -11,7 +11,7 @@ import AppKit
 // MARK: - SettingsPanesCocoa.Cassette
 
 extension SettingsPanesCocoa {
-  public class Cassette: NSViewController {
+  public final class Cassette: NSViewController {
     // MARK: Public
 
     override public func loadView() {
