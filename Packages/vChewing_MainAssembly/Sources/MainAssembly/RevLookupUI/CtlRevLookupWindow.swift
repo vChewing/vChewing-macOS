@@ -10,7 +10,7 @@ import AppKit
 
 // MARK: - CtlRevLookupWindow
 
-class CtlRevLookupWindow: NSWindowController, NSWindowDelegate {
+final class CtlRevLookupWindow: NSWindowController, NSWindowDelegate {
   static var shared: CtlRevLookupWindow?
 
   @objc
@@ -43,7 +43,7 @@ class CtlRevLookupWindow: NSWindowController, NSWindowDelegate {
 
 // MARK: - FrmRevLookupWindow
 
-class FrmRevLookupWindow: NSWindow {
+final class FrmRevLookupWindow: NSWindow {
   // MARK: Lifecycle
 
   init() {

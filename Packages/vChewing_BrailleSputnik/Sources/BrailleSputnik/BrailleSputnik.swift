@@ -10,7 +10,7 @@ import Tekkon
 
 // MARK: - BrailleSputnik
 
-public class BrailleSputnik {
+public final class BrailleSputnik {
   // MARK: Lifecycle
 
   public init(standard: BrailleStandard) {

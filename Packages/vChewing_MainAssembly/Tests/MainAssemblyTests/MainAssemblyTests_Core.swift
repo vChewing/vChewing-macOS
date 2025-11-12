@@ -36,7 +36,7 @@ func vCTestLog(_ str: String) {
 ///
 /// 該單元測試使用獨立的語彙資料，因此會在選字時的候選字
 /// 順序等方面與威注音輸入法實際使用時的體驗有差異。
-class MainAssemblyTests: XCTestCase {
+final class MainAssemblyTests: XCTestCase {
   static let testServer = IMKServer(
     name: "org.atelierInmu.vChewing.MainAssembly.UnitTests_Connection",
     bundleIdentifier: "org.atelierInmu.vChewing.MainAssembly.UnitTests"

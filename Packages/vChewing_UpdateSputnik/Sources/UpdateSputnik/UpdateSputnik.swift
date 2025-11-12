@@ -11,7 +11,7 @@ import SwiftExtension
 
 // MARK: - UpdateSputnik
 
-public class UpdateSputnik {
+public final class UpdateSputnik {
   // MARK: Lifecycle
 
   public init() {}

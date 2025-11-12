@@ -10,7 +10,7 @@ import AppKit
 
 // MARK: - SettingsPanesCocoa
 
-public class SettingsPanesCocoa {
+public final class SettingsPanesCocoa {
   public static let windowWidth: CGFloat = 614
 
   public static var contentWidth: CGFloat { windowWidth - 65 }
@@ -53,7 +53,7 @@ extension SettingsPanesCocoa {
 
 // MARK: - SettingsPreview
 
-class SettingsPreview: NSViewController {
+final class SettingsPreview: NSViewController {
   let panes = SettingsPanesCocoa()
 
   override func loadView() {

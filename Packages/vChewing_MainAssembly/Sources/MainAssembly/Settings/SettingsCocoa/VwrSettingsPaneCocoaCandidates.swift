@@ -9,7 +9,7 @@
 import AppKit
 
 extension SettingsPanesCocoa {
-  public class Candidates: NSViewController {
+  public final class Candidates: NSViewController {
     // MARK: Public
 
     override public func loadView() {

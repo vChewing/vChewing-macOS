@@ -43,7 +43,7 @@ extension CandidateTextService {
   }
 
   @objcMembers
-  public class CandidatePairServicable: NSObject {
+  public final class CandidatePairServicable: NSObject {
     // MARK: Lifecycle
 
     public init(value: String, reading: [String] = []) {
@@ -75,7 +75,7 @@ extension CandidateTextService {
   }
 
   @objc
-  public class Coordinator: NSObject {
+  public final class Coordinator: NSObject {
     // MARK: Public
 
     public func runTask(selectorName: String, candidate param: CandidatePairServicable) -> String? {

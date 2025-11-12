@@ -9,7 +9,7 @@
 import AppKit
 import SwiftUI
 
-public class CtlAboutUI: NSWindowController, NSWindowDelegate {
+public final class CtlAboutUI: NSWindowController, NSWindowDelegate {
   // MARK: Lifecycle
 
   public init(forceLegacy: Bool = false) {

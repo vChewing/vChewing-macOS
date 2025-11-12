@@ -189,7 +189,7 @@ extension UserDefRenderable<Double> {
 
 @available(macOS 10.15, *)
 public struct ComboBox: NSViewRepresentable {
-  public class Coordinator: NSObject, NSComboBoxDelegate {
+  public final class Coordinator: NSObject, NSComboBoxDelegate {
     // MARK: Lifecycle
 
     public init(_ parent: ComboBox) {

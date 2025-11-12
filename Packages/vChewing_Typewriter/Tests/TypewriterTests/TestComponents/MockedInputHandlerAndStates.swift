@@ -138,7 +138,7 @@ extension MockIMEState {
 // MARK: - MockInputHandler
 
 /// 專門用於單元測試的模擬 InputHandler 類型。
-public class MockInputHandler: InputHandlerProtocol {
+public final class MockInputHandler: InputHandlerProtocol {
   // MARK: Lifecycle
 
   public init(
@@ -195,7 +195,7 @@ public class MockInputHandler: InputHandlerProtocol {
 // MARK: - MockSession
 
 /// 專門用於單元測試的模擬會話類型。
-public class MockSession: SessionCoreProtocol, CtlCandidateDelegateCore {
+public final class MockSession: SessionCoreProtocol, CtlCandidateDelegateCore {
   // MARK: Lifecycle
 
   public init() {
