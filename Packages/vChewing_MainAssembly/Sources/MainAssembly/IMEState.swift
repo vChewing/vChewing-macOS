@@ -158,17 +158,17 @@ extension IMEStateProtocol {
   public var markedTargetIsCurrentlyFiltered: Bool { data.markedTargetIsCurrentlyFiltered }
   public var displayedTextConverted: String { data.displayedTextConverted }
 
-  public func attributedString(for session: IMKInputControllerProtocol) -> NSAttributedString {
+  public var attributedString: NSAttributedString {
     switch type {
-    case .ofMarking: return data.attributedStringMarking(for: session)
-    case .ofCandidates where cursor != marker: return data.attributedStringMarking(for: session)
+    case .ofMarking: return data.attributedStringMarking
+    case .ofCandidates where cursor != marker: return data.attributedStringMarking
     case .ofCandidates where cursor == marker: break
-    case .ofAssociates: return data.attributedStringPlaceholder(for: session)
+    case .ofAssociates: return data.attributedStringPlaceholder
     case .ofSymbolTable where displayedText.isEmpty || node.containsCandidateServices:
-      return data.attributedStringPlaceholder(for: session)
+      return data.attributedStringPlaceholder
     case .ofSymbolTable where !displayedText.isEmpty: break
     default: break
     }
-    return data.attributedStringNormal(for: session)
+    return data.attributedStringNormal
   }
 }
