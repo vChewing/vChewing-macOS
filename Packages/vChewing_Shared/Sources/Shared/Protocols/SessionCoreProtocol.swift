@@ -16,7 +16,8 @@ public protocol SessionCoreProtocol: AnyObject {
     where Handler.State == Handler.Session.State, Handler.State == State
   /// 僅用來決定 UI 面板先照顧哪個 Session 用，不宜用來判斷 isActivated。
   var id: UUID { get }
-  var state: State { get set } // Has DidSet.
+  /// 用以記錄當前輸入法狀態的變數。(有 DidSet)
+  var state: State { get set }
   var isASCIIMode: Bool { get }
   var clientMitigationLevel: Int { get }
   var ui: SessionUIProtocol? { get }
@@ -48,6 +49,6 @@ extension SessionCoreProtocol {
 
 public protocol InputHandlerCoreProtocol: AnyObject {
   associatedtype State: IMEStateProtocol
-  associatedtype Session: SessionCoreProtocol & CtlCandidateDelegateCore
+  associatedtype Session: SessionCoreProtocol & CtlCandidateDelegate
     where Session.State == Session.Handler.State, Session.State == State
 }

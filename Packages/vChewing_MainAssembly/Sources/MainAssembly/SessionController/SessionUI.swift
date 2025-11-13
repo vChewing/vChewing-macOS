@@ -31,7 +31,7 @@ public final class SessionUI: SessionUIProtocol {
   public let tooltipUI: (any TooltipUIProtocol)? = TooltipUI()
 
   /// 目前在用的的選字窗副本。
-  public let candidateUI: (any CtlCandidateProtocolCore)? = CtlCandidateTDK(
+  public let candidateUI: (any CtlCandidateProtocol)? = CtlCandidateTDK(
     PrefMgr.shared.useHorizontalCandidateList ? .horizontal : .vertical
   )
 }

@@ -133,11 +133,7 @@ public final class PopupCompositionBuffer: NSWindowController, PCBProtocol {
   }
 
   public func sync(accent: HSBA?, locale: String) {
-    sync(accentAsNSColor: accent?.nsColor, locale: locale)
-  }
-
-  public func sync(accentAsNSColor accent: NSColor?, locale: String) {
-    compositionView.setupTheme(accent: accent, locale: locale)
+    compositionView.setupTheme(accent: accent?.nsColor, locale: locale)
     if let window {
       if window.isOpaque {
         if let cgColor = compositionView.layer?.backgroundColor,

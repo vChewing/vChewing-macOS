@@ -17,7 +17,7 @@ public protocol SessionUIProtocol: AnyObject {
   var capsLockToggler: (any CapsLockTogglerProtocol)? { get }
   var pcb: (any PCBProtocol)? { get }
   var tooltipUI: (any TooltipUIProtocol)? { get }
-  var candidateUI: (any CtlCandidateProtocolCore)? { get }
+  var candidateUI: (any CtlCandidateProtocol)? { get }
 }
 
 // MARK: - ShiftKeyUpCheckerProtocol

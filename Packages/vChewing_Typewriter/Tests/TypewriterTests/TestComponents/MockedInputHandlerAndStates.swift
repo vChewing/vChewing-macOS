@@ -195,7 +195,7 @@ public final class MockInputHandler: InputHandlerProtocol {
 // MARK: - MockSession
 
 /// 專門用於單元測試的模擬會話類型。
-public final class MockSession: SessionCoreProtocol, CtlCandidateDelegateCore {
+public final class MockSession: SessionCoreProtocol, CtlCandidateDelegate {
   // MARK: Lifecycle
 
   public init() {
@@ -220,9 +220,7 @@ public final class MockSession: SessionCoreProtocol, CtlCandidateDelegateCore {
   public var ui: SessionUIProtocol?
   public var selectionKeys: String = "123456789"
   public var recentCommissions = [String]()
-  #if canImport(AppKit)
-    public var clientAccentColor: NSColor?
-  #endif
+  public var clientAccentColor: HSBA?
 
   public var isCandidateState: Bool { state.type == .ofCandidates }
 
@@ -328,7 +326,7 @@ public final class MockSession: SessionCoreProtocol, CtlCandidateDelegateCore {
 
   // MARK: - CtlCandidateDelegate conformance
 
-  public func candidateController() -> CtlCandidateProtocolCore? { nil }
+  public func candidateController() -> CtlCandidateProtocol? { nil }
 
   public func candidatePairs(conv _: Bool) -> [CandidateInState] {
     if !state.isCandidateContainer || state.candidates.isEmpty { return [] }
