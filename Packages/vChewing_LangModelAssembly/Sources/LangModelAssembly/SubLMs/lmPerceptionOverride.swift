@@ -1101,7 +1101,7 @@ extension LMAssembly.LMPerceptionOverride {
     let fileManager = FileManager.default
 
     if !fileManager.fileExists(atPath: journalURL.path) {
-      fileManager.createFile(atPath: journalURL.path, contents: nil, attributes: nil)
+      _ = fileManager.createFile(atPath: journalURL.path, contents: nil, attributes: nil)
     }
 
     let handle = try FileHandle(forWritingTo: journalURL)
