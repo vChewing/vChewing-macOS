@@ -21,10 +21,19 @@ import InputMethodKit
 public protocol SessionProtocol: AnyObject, IMKInputControllerProtocol, CtlCandidateDelegate,
   SessionCoreProtocol where Handler: InputHandlerProtocol {
   static var current: Self? { get set }
+  /// 輸入調度模組的副本。
+  var inputHandler: Handler? { get set }
+  /// 當前副本的客體是否是輸入法本體？
+  var isServingIMEItself: Bool { get set }
+  /// 用以存儲客體的 bundleIdentifier。
+  /// 由於每次動態獲取都會耗時，所以這裡直接靜態記載之。
+  var clientBundleIdentifier: String { get set }
+  /// 當前客體應用是否採用 Web 技術構築（例：Electron）。
+  var isClientElectronBased: Bool { get set }
+  /// 共用的 NSAlert 副本、用於在輸入法切換失敗時提示使用者修改系統偏好設定。
+  var sharedAlertForInputModeToggling: NSAlert { get }
   /// 標記狀態來聲明目前新增的詞彙是否需要賦以非常低的權重。
   static var areWeNerfing: Bool { get set }
-  /// 記錄當前輸入環境是縱排輸入還是橫排輸入。
-  static var isVerticalTyping: Bool { get }
   /// 用以記錄最近存取過的十個客體（亂序），相關內容會在客體管理器當中用得到。
   static var recentClientBundleIdentifiers: [String: Int] { get set } // Has DidSet.
   /// 給所有副本共用的 isASCIIMode 追蹤用餐數。
@@ -32,33 +41,24 @@ public protocol SessionProtocol: AnyObject, IMKInputControllerProtocol, CtlCandi
   /// 一個共用辭典，專門用來給每個副本用的 isASCIIMode 追蹤用餐數。
   static var isASCIIModeForEachClient: [String: Bool] { get set }
   /// 偏好設定。
-  var prefs: PrefMgrProtocol { get }
-  /// 共用的 NSAlert 副本、用於在輸入法切換失敗時提示使用者修改系統偏好設定。
-  var sharedAlertForInputModeToggling: NSAlert { get }
+  var prefs: PrefMgrProtocol { get set }
   /// 上一個被處理過的鍵盤事件。
   var previouslyHandledEvents: [KBEvent] { get set }
   /// 用來標記當前副本是否已處於活動狀態。
   var isActivated: Bool { get set }
-  /// 當前副本的客體是否是輸入法本體？
-  var isServingIMEItself: Bool { get set }
-  /// 輸入調度模組的副本。
-  var inputHandler: Handler? { get set }
   /// 最近一個被 set 的 marked text。
   var recentMarkedText: (text: NSAttributedString?, selectionRange: NSRange?) { get set }
   /// 當前選字窗是否為縱向。（縱排輸入時，只會啟用縱排選字窗。）
   var isVerticalCandidateWindow: Bool { get set }
-  /// 當前客體應用是否採用 Web 技術構築（例：Electron）。
-  var isClientElectronBased: Bool { get set }
-  /// 用以存儲客體的 bundleIdentifier。
-  /// 由於每次動態獲取都會耗時，所以這裡直接靜態記載之。
-  var clientBundleIdentifier: String { get set }
-  /// 用以記錄當前輸入法狀態的變數。
-  var state: State { get set } // Has DidSet.
   /// 記錄當前輸入環境是縱排輸入還是橫排輸入。
   var isVerticalTyping: Bool { get set }
   /// InputMode 需要在每次出現內容變更的時候都連帶重設組字器與各項語言模組，
   /// 順帶更新 IME 模組及 UserPrefs 當中對於當前語言模式的記載。
   var inputMode: Shared.InputMode { get set }
+  /// 記錄語言模型配置同步專用函式。
+  var synchronizer4LMPrefs: (() -> ())? { get set }
+  /// 蜂鳴專用函式。
+  var buzzer: (() -> ())? { get set }
 
   func initInputHandler()
 }
@@ -66,20 +66,21 @@ public protocol SessionProtocol: AnyObject, IMKInputControllerProtocol, CtlCandi
 extension SessionProtocol {
   public typealias ClientObj = IMKTextInput & NSObjectProtocol
 
+  /// 記錄當前輸入環境是縱排輸入還是橫排輸入。
   public static var isVerticalTyping: Bool { Self.current?.isVerticalTyping ?? false }
 
   public var selectionKeys: String {
     // 磁帶模式的 `%quick` 有單獨的選字鍵判定，會在資料不合規時使用 1234567890 選字鍵。
     cassetteQuick: if state.type == .ofInputting, state.isCandidateContainer {
-      guard PrefMgr.shared.cassetteEnabled else { break cassetteQuick }
+      guard prefs.cassetteEnabled else { break cassetteQuick }
       guard let cinCandidateKey = inputMode.langModel.cassetteSelectionKey,
-            PrefMgr.shared.validate(candidateKeys: cinCandidateKey) == nil
+            prefs.validate(candidateKeys: cinCandidateKey) == nil
       else {
         return "1234567890"
       }
       return cinCandidateKey
     }
-    return PrefMgr.shared.candidateKeys
+    return prefs.candidateKeys
   }
 
   /// 給每個副本用的 isASCIIMode 追蹤用餐數。
@@ -99,7 +100,7 @@ extension SessionProtocol {
         ? Self.isASCIIModeForAllClients : isASCIIModeForThisClient
     }
     set {
-      if PrefMgr.shared.shareAlphanumericalModeStatusAcrossClients {
+      if prefs.shareAlphanumericalModeStatusAcrossClients {
         Self.isASCIIModeForAllClients = newValue
       } else {
         isASCIIModeForThisClient = newValue
@@ -120,7 +121,7 @@ extension SessionProtocol {
     // 過濾掉尚未完成拼寫的注音。
     let sansReading: Bool =
       (state.type == .ofInputting)
-        && (PrefMgr.shared.trimUnfinishedReadingsOnCommit || forceCleanup)
+        && (prefs.trimUnfinishedReadingsOnCommit || forceCleanup)
     if state.hasComposition {
       textToCommit = inputHandler.generateStateOfInputting(sansReading: sansReading).displayedText
     }
@@ -169,12 +170,12 @@ extension SessionProtocol {
       Self.current?.hidePalettes()
       Self.current = self
       self.initInputHandler()
-      LMMgr.syncLMPrefs()
+      synchronizer4LMPrefs?()
       // 下述兩行很有必要，否則輸入法會在手動重啟之後無法立刻生效。
       let maybeClient = theClient ?? self.client()
       self.activateServer(maybeClient)
       // GCD 會觸發 didSet，所以不用擔心。
-      self.inputMode = .init(rawValue: PrefMgr.shared.mostRecentInputMode) ?? .imeModeNULL
+      self.inputMode = .init(rawValue: prefs.mostRecentInputMode) ?? .imeModeNULL
     }
   }
 
@@ -200,16 +201,16 @@ extension SessionProtocol {
       guard let self = self else { return }
       guard let client = self.client(), !self.isServingIMEItself else { return }
       if self.isASCIIMode, IMKHelper.isDynamicBasicKeyboardLayoutEnabled {
-        client.overrideKeyboard(withKeyboardNamed: PrefMgr.shared.alphanumericalKeyboardLayout)
+        client.overrideKeyboard(withKeyboardNamed: prefs.alphanumericalKeyboardLayout)
         return
       }
-      client.overrideKeyboard(withKeyboardNamed: PrefMgr.shared.basicKeyboardLayout)
+      client.overrideKeyboard(withKeyboardNamed: prefs.basicKeyboardLayout)
     }
   }
 
-  public static func callError(_ logMessage: String) {
+  public func callError(_ logMessage: String) {
     vCLog(logMessage)
-    IMEApp.buzz()
+    buzzer?()
   }
 
   public func performServerDeactivation() {
@@ -238,7 +239,7 @@ extension SessionProtocol {
         self.isServingIMEItself = Bundle.main.bundleIdentifier == senderBundleID
         self.clientBundleIdentifier = senderBundleID
         // 只要使用者沒有勾選檢查更新、沒有主動做出要檢查更新的操作，就不要檢查更新。
-        if PrefMgr.shared.checkUpdateAutomatically {
+        if prefs.checkUpdateAutomatically {
           AppDelegate.shared.checkUpdate(forced: false) {
             senderBundleID == "com.apple.SecurityAgent"
           }
@@ -254,10 +255,11 @@ extension SessionProtocol {
     } else {
       asyncOnMain(execute: activation1)
     }
-    let activation2 = {
+    let activation2 = { [weak self] in
+      guard let this = self else { return }
       // 自動啟用肛塞（廉恥模式），除非這一天是愚人節。
-      if !Date.isTodayTheDate(from: 0_401), !PrefMgr.shared.shouldNotFartInLieuOfBeep {
-        PrefMgr.shared.shouldNotFartInLieuOfBeep = true
+      if !Date.isTodayTheDate(from: 0_401), !this.prefs.shouldNotFartInLieuOfBeep {
+        this.prefs.shouldNotFartInLieuOfBeep = true
       }
     }
     if UserDefaults.pendingUnitTests {
@@ -289,30 +291,30 @@ extension SessionProtocol {
       asyncOnMain(execute: activation4)
     }
     let activation5 = { [weak self] in
-      guard let self = self else { return }
-      if self.isActivated { return }
+      guard let this = self else { return }
+      if this.isActivated { return }
 
       // 這裡不需要 setValue()，因為 IMK 會在自動呼叫 activateServer() 之後自動執行 setValue()。
-      self.initInputHandler()
-      LMMgr.syncLMPrefs()
+      this.initInputHandler()
+      this.synchronizer4LMPrefs?()
 
-      let shiftKeyDetector = ui?.shiftKeyUpChecker
+      let shiftKeyDetector = this.ui?.shiftKeyUpChecker
       if let shiftKeyDetector {
         shiftKeyDetector.toggleWithLShift =
-          PrefMgr.shared
+          this.prefs
             .togglingAlphanumericalModeWithLShift
         shiftKeyDetector.toggleWithRShift =
-          PrefMgr.shared
+          this.prefs
             .togglingAlphanumericalModeWithRShift
       }
 
-      if self.isASCIIMode, !IMEApp.isKeyboardJIS {
+      if this.isASCIIMode, !IMEApp.isKeyboardJIS {
         if #available(macOS 10.15, *) {
           if let shiftKeyDetector, !shiftKeyDetector.enabled {
-            self.isASCIIMode = false
+            this.isASCIIMode = false
           }
         } else {
-          self.isASCIIMode = false
+          this.isASCIIMode = false
         }
       }
 
@@ -325,9 +327,9 @@ extension SessionProtocol {
         asyncOnMain(execute: memoryCheck)
       }
 
-      self.state = .ofEmpty()
-      self.isActivated = true // 登記啟用狀態。
-      self.setKeyLayout()
+      this.state = .ofEmpty()
+      this.isActivated = true // 登記啟用狀態。
+      this.setKeyLayout()
     }
     if UserDefaults.pendingUnitTests {
       activation5()

@@ -79,14 +79,15 @@ extension SessionProtocol {
     if #available(macOS 12, *) {
       if event.type == .flagsChanged, event.keyCode == KeyCode.kCapsLock.rawValue {
         asyncOnMain { [weak self] in
-          let isCapsLockTurnedOn = self?.ui?.capsLockToggler?.isOn ?? false
-          if PrefMgr.shared.shiftEisuToggleOffTogetherWithCapsLock, !isCapsLockTurnedOn,
+          guard let this = self else { return }
+          let isCapsLockTurnedOn = this.ui?.capsLockToggler?.isOn ?? false
+          if this.prefs.shiftEisuToggleOffTogetherWithCapsLock, !isCapsLockTurnedOn,
              self?.isASCIIMode ?? false {
             self?.isASCIIMode.toggle()
           }
           self?.resetInputHandler()
-          guard PrefMgr.shared.showNotificationsWhenTogglingCapsLock else { return }
-          guard !PrefMgr.shared.bypassNonAppleCapsLockHandling else { return }
+          guard this.prefs.showNotificationsWhenTogglingCapsLock else { return }
+          guard !this.prefs.bypassNonAppleCapsLockHandling else { return }
           let status = NSLocalizedString("NotificationSwitchRevolver", comment: "")
           Notifier.notify(
             message: isCapsLockTurnedOn
@@ -122,7 +123,7 @@ extension SessionProtocol {
       newState.tooltipDuration = 1.85
       newState.data.tooltipColorState = .redAlert
       switchState(newState)
-      Self.callError("CoreLM not loaded yet.")
+      callError("CoreLM not loaded yet.")
       return true
     }
 
@@ -146,9 +147,9 @@ extension SessionProtocol {
 
     // 在啟用注音排列而非拼音輸入的情況下，強制將當前鍵盤佈局翻譯為美規鍵盤（或指定的其它鍵盤佈局）。
     if !inputHandler.isComposerUsingPinyin || IMKHelper.isDynamicBasicKeyboardLayoutEnabled {
-      var defaultLayout = LatinKeyboardMappings(rawValue: PrefMgr.shared.basicKeyboardLayout) ??
+      var defaultLayout = LatinKeyboardMappings(rawValue: prefs.basicKeyboardLayout) ??
         .qwerty
-      if let parser = KeyboardParser(rawValue: PrefMgr.shared.keyboardParser) {
+      if let parser = KeyboardParser(rawValue: prefs.keyboardParser) {
         switch parser {
         case .ofDachen26, .ofFakeSeigyou, .ofIBM, .ofSeigyou, .ofStandard: defaultLayout = .qwerty
         default: break
@@ -202,7 +203,7 @@ extension SessionProtocol {
         : NSLocalizedString("Chinese Input Mode", comment: "") + "\n" + status
     )
     if var cplk = ui?.capsLockToggler {
-      if PrefMgr.shared.shiftEisuToggleOffTogetherWithCapsLock, oldValue, !newValue,
+      if prefs.shiftEisuToggleOffTogetherWithCapsLock, oldValue, !newValue,
          cplk.isOn {
         cplk.isOn.toggle()
       }

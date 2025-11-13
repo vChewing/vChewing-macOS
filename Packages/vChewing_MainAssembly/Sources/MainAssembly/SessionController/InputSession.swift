@@ -53,9 +53,13 @@ public final class InputSession: SessionProtocol {
 
   public let id: UUID = .init()
 
+  public var buzzer: (() -> ())? = IMEApp.buzz
+
+  public var synchronizer4LMPrefs: (() -> ())? = LMMgr.syncLMPrefs
+
   public var ui: (any SessionUIProtocol)? = SessionUI.shared
 
-  public let prefs: any PrefMgrProtocol = PrefMgr.shared
+  public var prefs: any PrefMgrProtocol = PrefMgr.shared
 
   public private(set) lazy var sharedAlertForInputModeToggling: NSAlert = {
     let alert = NSAlert()
@@ -114,7 +118,7 @@ public final class InputSession: SessionProtocol {
   public var state: State = .ofEmpty() {
     didSet {
       guard oldValue.type != state.type else { return }
-      if PrefMgr.shared.isDebugModeEnabled {
+      if prefs.isDebugModeEnabled {
         var stateDescription = state.type.rawValue
         if state.type == .ofCommitting { stateDescription += "(\(state.textToCommit))" }
         vCLog("Current State: \(stateDescription), client: \(clientBundleIdentifier)")
@@ -130,7 +134,7 @@ public final class InputSession: SessionProtocol {
   public var inputMode: Shared.InputMode = .imeModeNULL {
     willSet {
       /// 將新的簡繁輸入模式提報給 Prefs 模組。IMEApp 模組會據此計算正確的資料值。
-      PrefMgr.shared.mostRecentInputMode = newValue.rawValue
+      prefs.mostRecentInputMode = newValue.rawValue
     }
     didSet {
       /// SQLite 資料庫是在 AppDelegate 階段就載入的，所以這裡不需要再 Lazy-Load。
@@ -143,7 +147,7 @@ public final class InputSession: SessionProtocol {
         /// 清空注拼槽＋同步最新的注拼槽排列設定。
         inputHandler?.ensureKeyboardParser()
         /// 將輸入法偏好設定同步至語言模組內。
-        LMMgr.syncLMPrefs()
+        synchronizer4LMPrefs?()
       }
     }
   }
@@ -152,7 +156,7 @@ public final class InputSession: SessionProtocol {
     inputHandler = InputHandler(
       lm: inputMode.langModel,
       pref: PrefMgr.shared,
-      errorCallback: Self.callError,
+      errorCallback: callError,
       filterabilityChecker: LMMgr.isStateDataFilterableForMarked,
       notificationCallback: Notifier.notify,
       pomSaveCallback: { LMMgr.savePerceptionOverrideModelData(false) }
@@ -190,7 +194,7 @@ extension InputSession {
     asyncOnMain { [weak self] in
       guard let this = self else { return }
       let newMode: Shared
-        .InputMode = .init(rawValue: value as? String ?? PrefMgr.shared.mostRecentInputMode) ??
+        .InputMode = .init(rawValue: value as? String ?? this.prefs.mostRecentInputMode) ??
         .imeModeNULL
       if this.inputMode != newMode {
         this.inputMode = newMode

@@ -77,8 +77,10 @@ extension VwrCandidateTDKAppKit {
     let sizesCalculated = thePool.metrics
     let alphaRatio = NSApplication.isDarkMode ? 0.75 : 1
     var themeColor: NSColor?
-    if let delegate = controller?.delegate as? CtlCandidateDelegate {
-      themeColor = delegate.clientAccentColor?.withAlphaComponent(alphaRatio)
+    if let delegate = controller?.delegate as? CtlCandidateDelegate,
+       var hsba = delegate.clientAccentColor {
+      hsba.alpha = alphaRatio
+      themeColor = hsba.nsColor
       CandidatePool.shitCell.clientThemeColor = themeColor
     }
     // 先塗底色

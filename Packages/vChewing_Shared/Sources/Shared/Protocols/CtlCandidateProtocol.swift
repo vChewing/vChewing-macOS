@@ -8,10 +8,10 @@
 
 import Foundation
 
-// MARK: - CtlCandidateDelegateCore
+// MARK: - CtlCandidateDelegate
 
-public protocol CtlCandidateDelegateCore: AnyObject {
-  func candidateController() -> CtlCandidateProtocolCore?
+public protocol CtlCandidateDelegate: AnyObject {
+  func candidateController() -> CtlCandidateProtocol?
   func candidatePairs(conv: Bool) -> [CandidateInState]
   func candidatePairSelectionConfirmed(at index: Int)
   func candidatePairHighlightChanged(at index: Int?)
@@ -31,23 +31,26 @@ public protocol CtlCandidateDelegateCore: AnyObject {
   var shouldAutoExpandCandidates: Bool { get }
   var isCandidateContextMenuEnabled: Bool { get }
   var showReverseLookupResult: Bool { get }
+  var clientAccentColor: HSBA? { get }
 }
 
-// MARK: - CtlCandidateProtocolCore
+// MARK: - CtlCandidateProtocol
 
-public protocol CtlCandidateProtocolCore: AnyObject {
+public protocol CtlCandidateProtocol: AnyObject {
   var tooltip: String { get set }
   var reverseLookupResult: [String] { get set }
   var locale: String { get set }
-  var delegate: CtlCandidateDelegateCore? { get set }
+  var delegate: CtlCandidateDelegate? { get set }
   var highlightedIndex: Int { get set }
   var visible: Bool { get set }
+  var maxLinesPerPage: Int { get set }
   var windowTopLeftPoint: CGPoint { get set }
   var useLangIdentifier: Bool { get set }
   var currentLayout: UILayoutOrientation { get set }
 
   func reloadData()
   func updateDisplay()
+  func assignCandidateFont(name: String?, size: Double)
   func showNextPage() -> Bool
   func showPreviousPage() -> Bool
   func showNextLine() -> Bool

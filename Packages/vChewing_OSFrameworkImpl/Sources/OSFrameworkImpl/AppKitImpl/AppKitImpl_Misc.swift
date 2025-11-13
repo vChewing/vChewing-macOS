@@ -451,13 +451,15 @@
   extension NSRunningApplication {
     private static var temporatyBundlePtr: Bundle?
 
-    public static func findAccentColor(with bundleIdentifier: String?) -> NSColor? {
+    public static func findAccentColor(with bundleIdentifier: String?) -> HSBA? {
       guard let bundleIdentifier else { return nil }
       let matchedRunningApps = Self.runningApplications(withBundleIdentifier: bundleIdentifier)
       guard let matchedAppURL = matchedRunningApps.first?.bundleURL else { return nil }
       Self.temporatyBundlePtr = Bundle(url: matchedAppURL)
       defer { temporatyBundlePtr = nil }
-      return Self.temporatyBundlePtr?.getAccentColor().usingColorSpace(.deviceRGB)
+      return Self.temporatyBundlePtr?.getAccentColor().usingColorSpace(
+        .deviceRGB
+      )?.asHSBA
     }
   }
 

@@ -95,9 +95,50 @@ public final class CtlCandidateTDK: CtlCandidate, NSWindowDelegate {
     }
   }
 
-  public var maxLinesPerPage: Int = 0
   public var useCocoa: Bool = false
   public var useMouseScrolling: Bool = true
+
+  /// FB10978412: Since macOS 11 Big Sur, CTFontCreateUIFontForLanguage cannot
+  /// distinguish zh-Hans and zh-Hant with correct adoptation of proper PingFang SC/TC variants.
+  /// Update: This has been fixed in macOS 13.
+  ///
+  /// Instructions for Apple Developer relations to reveal this bug:
+  ///
+  /// 0) Please go to Step 1. Reason: IMK Candidate Window support has been removed in this repo.
+  /// 1) Make sure the usage of ".languageIdentifier" is disabled in the Dev Zone of the vChewing Preferences.
+  /// 2) Run "make update" in the project folder to download the latest git-submodule of dictionary file.
+  /// 3) Compile the target "vChewingInstaller", run it. It will install the input method into
+  ///    "~/Library/Input Methods/" folder. Remember to ENABLE BOTH "vChewing-CHS"
+  ///    and "vChewing-CHT" input sources in System Preferences / Settings.
+  /// 4) Type Zhuyin "ej3" (ㄍㄨˇ) (or "gu3" in Pinyin if you enabled Pinyin typing in vChewing Preferences.)
+  ///    using both "vChewing-CHS" and "vChewing-CHT", and check the candidate window by pressing SPACE key.
+  /// 5) Do NOT enable either KangXi conversion mode nor JIS conversion mode. They are disabled by default.
+  /// 6) Expecting the glyph differences of the candidate "骨" between PingFang SC and PingFang TC when rendering
+  ///    the candidate window in different "vChewing-CHS" and "vChewing-CHT" input modes.
+  override public func assignCandidateFont(name: String? = nil, size: Double) {
+    let finalReturnFont: NSFont = {
+      switch IMEApp.currentInputMode {
+      case .imeModeCHS:
+        return CTFontCreateUIFontForLanguage(.system, size, "zh-Hans" as CFString)
+          ?? NSFont.systemFont(ofSize: size)
+      case .imeModeCHT:
+        return (
+          prefs.shiftJISShinjitaiOutputEnabled || prefs
+            .chineseConversionEnabled
+        )
+          ? CTFontCreateUIFontForLanguage(.system, size, "ja" as CFString)
+          : CTFontCreateUIFontForLanguage(.system, size, "zh-Hant" as CFString)
+      default:
+        return CTFontCreateUIFontForLanguage(.system, size, nil)
+      }
+    }()
+      ?? NSFont.systemFont(ofSize: size)
+    if let name = name, !name.isEmpty {
+      candidateFont = NSFont(name: name, size: size) ?? finalReturnFont
+    } else {
+      candidateFont = finalReturnFont
+    }
+  }
 
   override public func updateDisplay() {
     guard let window = window else { return }
@@ -105,6 +146,7 @@ public final class CtlCandidateTDK: CtlCandidate, NSWindowDelegate {
       guard let self = self else { return }
       self.updateNSWindowModern(window)
     }
+    useMouseScrolling = prefs.enableMouseScrollingForTDKCandidatesCocoa
     // 先擦除之前的反查结果。
     reverseLookupResult = []
     // 再更新新的反查结果。
@@ -134,8 +176,6 @@ public final class CtlCandidateTDK: CtlCandidate, NSWindowDelegate {
     Self.thePool.tooltip = delegate?.candidateToolTip(shortened: !Self.thePool.isMatrix) ?? ""
     delegate?.candidatePairHighlightChanged(at: highlightedIndex)
   }
-
-  // MARK: - Public functions
 
   override public func reloadData() {
     CandidateCellData.unifiedSize = candidateFont.pointSize
@@ -214,6 +254,8 @@ public final class CtlCandidateTDK: CtlCandidate, NSWindowDelegate {
 
   private static let thePool: CandidatePool = .init(candidates: [])
   private static let currentView: VwrCandidateTDKAppKit = .init(thePool: thePool)
+
+  private let prefs = PrefMgr()
 
   @objc
   private var observation: NSKeyValueObservation?

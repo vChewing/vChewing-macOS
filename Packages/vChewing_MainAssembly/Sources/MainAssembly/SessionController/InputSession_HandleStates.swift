@@ -126,7 +126,7 @@ extension SessionProtocol {
       updateVerticalTypingStatus()
       ui?.pcb?.isTypingDirectionVertical = isVerticalTyping
       ui?.pcb?.sync(
-        accent: clientAccentColor?.asHSBA,
+        accent: clientAccentColor,
         locale: localeForFontFallbacks
       )
       ui?.pcb?.show(
@@ -143,7 +143,7 @@ extension SessionProtocol {
     // 包括早期版本的騰訊 QQNT 在內，有些客體的 client.setMarkedText() 無法正常處理 .thick 下劃線。
     mitigation: if clientMitigationLevel == 1 {
       guard state.type == .ofMarking || state.isCandidateContainer else { break mitigation }
-      if !PrefMgr.shared
+      if !prefs
         .disableSegmentedThickUnderlineInMarkingModeForManagedClients { break mitigation }
       let neo = NSMutableAttributedString(attributedString: attributedStringSecured.value)
       let rangeNeo = NSRange(location: 0, length: neo.string.utf16.count)
@@ -163,7 +163,7 @@ extension SessionProtocol {
   /// 注意：必須在 IMK 的 commitComposition 函式當中也間接或者直接執行這個處理。
   private func commit(text: String) {
     guard !text.isEmpty else { return }
-    let phE = PrefMgr.shared.phraseReplacementEnabled && text.count > 1
+    let phE = prefs.phraseReplacementEnabled && text.count > 1
     var text = text.trimmingCharacters(in: .newlines)
     var replaced = false
     if phE, let queried = inputHandler?.currentLM.queryReplacementValue(key: text) {

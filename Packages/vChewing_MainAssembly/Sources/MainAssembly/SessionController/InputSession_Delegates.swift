@@ -12,12 +12,12 @@ import AppKit
 
 extension SessionProtocol {
   public var clientMitigationLevel: Int {
-    var result = PrefMgr.shared.securityHardenedCompositionBuffer ? 2 : 0
+    var result = prefs.securityHardenedCompositionBuffer ? 2 : 0
     if isClientElectronBased {
-      let newVal = PrefMgr.shared.alwaysUsePCBWithElectronBasedClients ? 2 : 1
+      let newVal = prefs.alwaysUsePCBWithElectronBasedClients ? 2 : 1
       result = Swift.max(newVal, result)
     }
-    let toMitigate = PrefMgr.shared.clientsIMKTextInputIncapable[clientBundleIdentifier]
+    let toMitigate = prefs.clientsIMKTextInputIncapable[clientBundleIdentifier]
     if let toMitigate = toMitigate {
       let mitigationValue = toMitigate ? 2 : 1
       result = Swift.max(mitigationValue, result)
@@ -25,7 +25,7 @@ extension SessionProtocol {
     return result
   }
 
-  public func candidateController() -> CtlCandidateProtocolCore? { ui?.candidateUI }
+  public func candidateController() -> CtlCandidateProtocol? { ui?.candidateUI }
 
   public func performUserPhraseOperation(addToFilter: Bool) -> Bool {
     guard let inputHandler = inputHandler, state.type == .ofMarking else { return false }
@@ -97,22 +97,21 @@ extension SessionProtocol {
 
 extension SessionProtocol {
   public var isCandidateState: Bool { state.isCandidateContainer }
-  public var showCodePointForCurrentCandidate: Bool { PrefMgr.shared.showCodePointInCandidateUI }
+  public var showCodePointForCurrentCandidate: Bool { prefs.showCodePointInCandidateUI }
 
-  public var clientAccentColor: NSColor? {
-    var nullResponse = !PrefMgr.shared.respectClientAccentColor
-    nullResponse = nullResponse || PrefMgr.shared.shiftJISShinjitaiOutputEnabled
-    nullResponse = nullResponse || PrefMgr.shared.chineseConversionEnabled
+  public var clientAccentColor: HSBA? {
+    var nullResponse = !prefs.respectClientAccentColor
+    nullResponse = nullResponse || prefs.shiftJISShinjitaiOutputEnabled
+    nullResponse = nullResponse || prefs.chineseConversionEnabled
     guard !nullResponse else { return nil }
-    let fallbackValue = NSColor.accentColor
-    guard !NSApp.isAccentColorCustomized else { return fallbackValue }
-    if #unavailable(macOS 10.14) { return fallbackValue }
+    guard !NSApp.isAccentColorCustomized else { return nil }
+    if #unavailable(macOS 10.14) { return nil }
     // 此處因為沒有對 client() 的強引用，所以不會耽誤很多時間。
     return NSRunningApplication.findAccentColor(with: client()?.bundleIdentifier())
   }
 
   public var shouldAutoExpandCandidates: Bool {
-    guard !PrefMgr.shared.alwaysExpandCandidateWindow else { return true }
+    guard !prefs.alwaysExpandCandidateWindow else { return true }
     guard state.type == .ofSymbolTable else { return state.type == .ofAssociates }
     return state.node.previous != nil
   }
@@ -122,7 +121,7 @@ extension SessionProtocol {
       && !clientBundleIdentifier.contains("com.raycast.macos")
   }
 
-  public var showReverseLookupResult: Bool { PrefMgr.shared.showReverseLookupInCandidateUI }
+  public var showReverseLookupResult: Bool { prefs.showReverseLookupInCandidateUI }
 
   public func checkIsMacroTokenResult(_ index: Int) -> Bool {
     guard state.isCandidateContainer else { return false }
@@ -142,7 +141,7 @@ extension SessionProtocol {
       let useShift = inputMode.langModel.areCassetteCandidateKeysShiftHeld
       let theEmoji = useShift ? "⬆️" : "⚡️"
       return shortened ? theEmoji : "\(theEmoji) " + "Quick Candidates".localized
-    } else if PrefMgr.shared.cassetteEnabled {
+    } else if prefs.cassetteEnabled {
       return shortened ? "📼" : "📼 " + "CIN Cassette Mode".localized
     } else if state.type == .ofSymbolTable, state.node.containsCandidateServices {
       return shortened ? "🌎" : "🌎 " + "Service Menu".localized
@@ -154,7 +153,7 @@ extension SessionProtocol {
   public func reverseLookup(for value: String) -> [String] {
     let blankResult: [String] = []
     // 這一段專門處理「反查」。
-    if !PrefMgr.shared.showReverseLookupInCandidateUI { return blankResult }
+    if !prefs.showReverseLookupInCandidateUI { return blankResult }
     if state.type == .ofInputting, state.isCandidateContainer,
        inputHandler?.currentLM.nullCandidateInCassette == value {
       return blankResult
@@ -170,7 +169,7 @@ extension SessionProtocol {
     if !state.isCandidateContainer || state.candidates.isEmpty { return [] }
     let keyChainOfFirstCandidate = state.candidates[0].keyArray.joined()
     let punctuationKeyHeaderMatched = keyChainOfFirstCandidate.contains("_punctuation")
-    if !conv || PrefMgr.shared.cns11643Enabled || punctuationKeyHeaderMatched {
+    if !conv || prefs.cns11643Enabled || punctuationKeyHeaderMatched {
       return state.candidates
     }
     let convertedCandidates = state.candidates.map {
@@ -235,7 +234,7 @@ extension SessionProtocol {
             Notifier
               .notify(message: "i18n:candidateServiceMenu.selectorResponse.succeeded".localized)
           } else {
-            Self.callError("4DFDC487: Candidate Text Service Selector Responsiveness Failure.")
+            callError("4DFDC487: Candidate Text Service Selector Responsiveness Failure.")
             Notifier.notify(message: "i18n:candidateServiceMenu.selectorResponse.failed".localized)
           }
         }
@@ -248,15 +247,15 @@ extension SessionProtocol {
       inputHandler.consolidateNode(
         candidate: selectedValue,
         respectCursorPushing: true,
-        preConsolidate: PrefMgr.shared.consolidateContextOnCandidateSelection,
+        preConsolidate: prefs.consolidateContextOnCandidateSelection,
         skipObservation: !prefs.fetchSuggestionsFromPerceptionOverrideModel
       )
       var result: State = inputHandler.generateStateOfInputting()
       defer { switchState(result) } // 這是最終輸出結果。
-      if PrefMgr.shared.useSCPCTypingMode {
+      if prefs.useSCPCTypingMode {
         switchState(.ofCommitting(textToCommit: result.displayedText))
         // 此時是逐字選字模式，所以「selectedValue.value」是單個字、不用追加處理。
-        if PrefMgr.shared.associatedPhrasesEnabled {
+        if prefs.associatedPhrasesEnabled {
           let associates = inputHandler.generateStateOfAssociates(
             withPair: .init(keyArray: selectedValue.keyArray, value: selectedValue.value)
           )
@@ -270,7 +269,7 @@ extension SessionProtocol {
       var result: State = .ofEmpty()
       defer { switchState(result) } // 這是最終輸出結果。
       switchState(.ofCommitting(textToCommit: selectedValue.value))
-      guard PrefMgr.shared.associatedPhrasesEnabled else { return }
+      guard prefs.associatedPhrasesEnabled else { return }
       // 此時是關聯詞語選字模式，所以「selectedValue.value」必須只保留最後一個字。
       // 不然的話，一旦你選中了由多個字組成的聯想候選詞，則連續聯想會被打斷。
       guard let valueKept = selectedValue.value.last?.description else { return }
@@ -281,7 +280,7 @@ extension SessionProtocol {
     case .ofInputting where (0 ..< state.candidates.count).contains(index):
       let chosenStr = state.candidates[index].value
       guard !chosenStr.isEmpty, chosenStr != inputHandler.currentLM.nullCandidateInCassette else {
-        Self.callError("907F9F64")
+        callError("907F9F64")
         return
       }
       let strToCommitFirst = inputHandler.generateStateOfInputting(sansReading: true).displayedText
@@ -382,7 +381,7 @@ extension SessionProtocol {
 extension SessionProtocol {
   // 0: Always Off, 1: Always On, 2: Only When VoiceOver is On
   private func voiceOverIsOn() -> Bool {
-    switch PrefMgr.shared.candidateNarrationToggleType {
+    switch prefs.candidateNarrationToggleType {
     case 1: return true
     case 2:
       if #available(macOS 10.13, *) {

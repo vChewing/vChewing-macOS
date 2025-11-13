@@ -32,7 +32,7 @@ extension PrefMgr {
 
 // MARK: Guarded Method for Validating Candidate Keys.
 
-extension PrefMgr {
+extension PrefMgrProtocol {
   public func validate(candidateKeys: String) -> String? {
     var excluded = ""
     if useJKtoMoveCompositorCursorInCandidateState { excluded.append("jk") }

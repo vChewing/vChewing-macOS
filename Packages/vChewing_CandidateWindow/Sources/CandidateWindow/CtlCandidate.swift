@@ -31,6 +31,7 @@ open class CtlCandidate: NSWindowController, CtlCandidateProtocol {
   open var currentLayout: UILayoutOrientation = .horizontal
   open var locale: String = ""
   open var useLangIdentifier: Bool = false
+  open var maxLinesPerPage: Int = 1
   open var reverseLookupResult: [String] = []
 
   open var highlightedIndex: Int = .max
@@ -38,7 +39,7 @@ open class CtlCandidate: NSWindowController, CtlCandidateProtocol {
     ofSize: min(196, max(12, Double(UserDefaults.current.integer(forKey: "CandidateListTextSize"))))
   )
 
-  open var delegate: CtlCandidateDelegateCore? {
+  open var delegate: CtlCandidateDelegate? {
     didSet {
       guard let delegate = delegate else { return }
       if delegate.isCandidateState { reloadData() }
@@ -92,6 +93,8 @@ open class CtlCandidate: NSWindowController, CtlCandidateProtocol {
     let blendingAgainstTarget: NSColor = NSApplication.isDarkMode ? NSColor.black : NSColor.white
     return result.blended(withFraction: colorBlendAmount, of: blendingAgainstTarget)!
   }
+
+  open func assignCandidateFont(name: String?, size: Double) {}
 
   @discardableResult
   open func showNextLine() -> Bool {
