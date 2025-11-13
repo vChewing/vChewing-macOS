@@ -259,6 +259,7 @@ final class MainAssemblyTests: XCTestCase {
     Self._testSession = nil
     testSession.activateServer(testClient)
     testSession.isActivated = true
+    testSession.syncCurrentSessionID()
     testSession.inputHandler = testHandler
     testHandler.session = testSession
     LMMgr.syncLMPrefs()

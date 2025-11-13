@@ -109,6 +109,10 @@ extension SessionProtocol {
     }
   }
 
+  public func syncCurrentSessionID() {
+    ui?.currentSessionID = id
+  }
+
   /// 重設輸入調度模組，會將當前尚未遞交的內容遞交出去。
   public func resetInputHandler(forceComposerCleanup forceCleanup: Bool = false) {
     guard let inputHandler = inputHandler else { return }
@@ -226,6 +230,7 @@ extension SessionProtocol {
 
   public func performServerActivation(client: ClientObj?) {
     hidePalettes()
+    syncCurrentSessionID()
     let activation1 = { [weak self] in
       guard let self = self else { return }
       if let senderBundleID: String = client?.bundleIdentifier() {
