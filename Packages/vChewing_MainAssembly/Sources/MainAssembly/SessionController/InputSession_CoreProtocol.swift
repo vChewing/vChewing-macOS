@@ -210,10 +210,11 @@ extension SessionProtocol {
 
   public func performServerDeactivation() {
     let deactivation = { [weak self] in
-      guard let this = self else { return }
-      this.resetInputHandler() // 這條會自動搞定 Empty 狀態。
-      this.switchState(.ofDeactivated())
-      this.inputHandler = nil
+      guard let self = self else { return }
+      self.isActivated = false
+      self.resetInputHandler() // 這條會自動搞定 Empty 狀態。
+      self.switchState(.ofDeactivated())
+      self.inputHandler = nil
       // 選字窗不用管，交給新的 Session 的 ActivateServer 來管理。
     }
     if UserDefaults.pendingUnitTests {
@@ -225,7 +226,6 @@ extension SessionProtocol {
 
   public func performServerActivation(client: ClientObj?) {
     hidePalettes()
-    isActivated = true // 登記啟用狀態。這一步驟必須不得異步完成。
     let activation1 = { [weak self] in
       guard let self = self else { return }
       if let senderBundleID: String = client?.bundleIdentifier() {
@@ -321,6 +321,7 @@ extension SessionProtocol {
       }
 
       self.state = .ofEmpty()
+      self.isActivated = true // 登記啟用狀態。
       self.setKeyLayout()
     }
     if UserDefaults.pendingUnitTests {

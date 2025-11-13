@@ -91,18 +91,11 @@ public final class InputSession: SessionProtocol {
 
   public var theClient: () -> ClientObj?
 
+  /// 用來標記當前副本是否已處於活動狀態。
+  public var isActivated: Bool = false
+
   /// IMKInputController 副本。
   public weak var inputControllerAssigned: SessionCtl?
-
-  /// 用來標記當前副本是否已處於活動狀態。
-  public var isActivated: Bool {
-    get {
-      ui?.currentSessionID == id
-    }
-    set {
-      ui?.currentSessionID = newValue ? id : .init()
-    }
-  }
 
   public var inputController: SessionCtl? {
     inputControllerAssigned ?? SessionCtl.currentInputController
