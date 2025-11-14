@@ -239,13 +239,21 @@ extension InputSession {
 
   public func cancelComposition() { inputController?.cancelComposition() }
 
-  /// 指定輸入法要遞交出去的內容（雖然 InputMethodKit 可能並不會真的用到這個函式）。
+  /// 指定輸入法要遞交出去的內容（個別 IMKInputClient 會呼叫這個函式）。
   /// - Parameter sender: 呼叫了該函式的客體（無須使用）。
   /// - Returns: 字串內容，或者 nil。
   public func composedString(_ sender: Any!) -> Any! {
     _ = sender // 防止格式整理工具毀掉與此對應的參數。
-    guard state.hasComposition else { return "" }
-    return state.displayedTextConverted
+    guard let inputHandler else { return "" }
+    var textToCommit = ""
+    // 過濾掉尚未完成拼寫的注音。
+    let sansReading: Bool = state.type == .ofInputting
+    if state.hasComposition {
+      textToCommit = inputHandler
+        .generateStateOfInputting(sansReading: sansReading)
+        .displayedTextConverted
+    }
+    return textToCommit
   }
 
   public func selectionRange() -> NSRange {
