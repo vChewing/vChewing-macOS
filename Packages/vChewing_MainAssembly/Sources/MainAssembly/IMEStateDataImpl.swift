@@ -106,11 +106,25 @@ extension IMEStateData {
   public var attributedStringNormal: NSAttributedString {
     /// 考慮到因為滑鼠點擊等其它行為導致的組字區內容遞交情況，
     /// 這裡對組字區內容也加上康熙字轉換或者 JIS 漢字轉換處理。
-    AttrStrULStyle.pack(
-      displayTextSegments.map {
-        (convertTextIfNeeded($0), .single)
-      }
-    )
+    let convertedBase = displayedTextConverted
+    guard !displayTextSegments.isEmpty else {
+      return AttrStrULStyle.single.getMarkedAttrStr(convertedBase, clauseSegment: 0)
+    }
+    // 使用 displayedTextConverted 作為基礎字串，用 displayTextSegments 的長度來切分。
+    // displayTextSegments 可能包含讀音（Tekkon），不能直接使用其內容。
+    var segments: [AttrStrULStyle.StyledPair] = []
+    var startIndex = convertedBase.startIndex
+    for segment in displayTextSegments {
+      let segmentLength = segment.count
+      guard segmentLength > 0 else { continue }
+      let endIndex = convertedBase.index(startIndex, offsetBy: segmentLength, limitedBy: convertedBase.endIndex) 
+        ?? convertedBase.endIndex
+      let extractedSegment = String(convertedBase[startIndex..<endIndex])
+      segments.append((extractedSegment, .single))
+      startIndex = endIndex
+      if startIndex >= convertedBase.endIndex { break }
+    }
+    return AttrStrULStyle.pack(segments)
   }
 
   public var attributedStringMarking: NSAttributedString {
