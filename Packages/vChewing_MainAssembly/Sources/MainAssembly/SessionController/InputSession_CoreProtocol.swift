@@ -123,7 +123,9 @@ extension SessionProtocol {
       (state.type == .ofInputting)
         && (prefs.trimUnfinishedReadingsOnCommit || forceCleanup)
     if state.hasComposition {
-      textToCommit = inputHandler.generateStateOfInputting(sansReading: sansReading).displayedText
+      textToCommit = inputHandler
+        .generateStateOfInputting(sansReading: sansReading)
+        .displayedTextConverted
     }
     // 威注音不再在這裡對 IMKTextInput 客體黑名單當中的應用做資安措施。
     // 有相關需求者，請在切換掉輸入法或者切換至新的客體應用之前敲一下 Shift+Delete。
