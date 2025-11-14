@@ -56,11 +56,10 @@ extension SessionProtocol {
     switch newState.type {
     case .ofDeactivated:
       // 這裡移除一些處理，轉而交給 commitComposition() 代為執行。
+      clearInlineDisplay()
       inputHandler?.clear()
-      if ![.ofAbortion, .ofEmpty].contains(previous.type), !previous.displayedText.isEmpty {
-        clearInlineDisplay()
-      }
     case .ofAbortion, .ofCommitting, .ofEmpty:
+      toggleCandidateUIVisibility(false)
       innerCircle: switch newState.type {
       case .ofAbortion:
         previous = .ofEmpty()
@@ -68,12 +67,10 @@ extension SessionProtocol {
       case .ofCommitting:
         commit(text: newState.textToCommit)
         if replace { state = .ofEmpty() }
-      default: break innerCircle
-      }
-      toggleCandidateUIVisibility(false)
-      // 全專案用以判斷「.Abortion」的地方僅此一處。
-      if previous.hasComposition, ![.ofAbortion, .ofCommitting].contains(newState.type) {
-        commit(text: previous.displayedText)
+      default:
+        if previous.hasComposition {
+          commit(text: previous.displayedText)
+        }
       }
       // 會在工具提示為空的時候自動消除顯示。
       showTooltip(
@@ -86,6 +83,7 @@ extension SessionProtocol {
     case .ofInputting:
       toggleCandidateUIVisibility(false)
       if !newState.textToCommit.isEmpty {
+        clearInlineDisplay() // WeChat 相容所需。
         commit(text: newState.textToCommit)
       }
       setInlineDisplayWithCursor()
