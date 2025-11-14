@@ -2,13 +2,19 @@
   "makefile.configureOnOpen": false,
 
   "files.exclude": {
+    "Build": true,
     ".build": true,
     ".swiftpm": true,
+    "**/.build": true,
+    "**/.swiftpm": true,
     "sqlite3.h": true
   },
   "search.exclude": {
+    "Build": true,
     ".build": true,
     ".swiftpm": true,
+    "**/.build": true,
+    "**/.swiftpm": true,
     "sqlite3.h": true
   }
 }
