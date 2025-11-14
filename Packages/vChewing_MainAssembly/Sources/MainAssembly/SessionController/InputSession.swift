@@ -245,7 +245,8 @@ extension InputSession {
   public func composedString(_ sender: Any!) -> Any! {
     _ = sender // 防止格式整理工具毀掉與此對應的參數。
     guard state.hasComposition else { return "" }
-    return state.displayedTextConverted
+    // 返回不包含讀音的文本，避免某些客體應用（如微信）遞交時包含讀音片段。
+    return state.data.displayedTextConvertedSansReading
   }
 
   public func selectionRange() -> NSRange {

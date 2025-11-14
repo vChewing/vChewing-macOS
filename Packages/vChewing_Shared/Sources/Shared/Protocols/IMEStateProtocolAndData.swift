@@ -195,6 +195,17 @@ public struct IMEStateData {
       }
     }
   }
+
+  /// 返回不包含讀音的顯示文本（用於遞交）。
+  /// 濾除 highlightAtSegment 所指向的讀音片段。
+  public var displayedTextSansReading: String {
+    guard let highlightIdx = highlightAtSegment,
+          displayTextSegments.indices.contains(highlightIdx)
+    else { return displayedText }
+    var segments = displayTextSegments
+    segments.remove(at: highlightIdx)
+    return segments.joined()
+  }
 }
 
 extension IMEStateData {

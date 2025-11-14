@@ -25,6 +25,10 @@ extension IMEStateData {
     convertTextIfNeeded(displayedText)
   }
 
+  public var displayedTextConvertedSansReading: String {
+    convertTextIfNeeded(displayedTextSansReading)
+  }
+
   public var displayTextSegmentsConverted: [String] {
     displayTextSegments.map(convertTextIfNeeded)
   }
@@ -106,23 +110,29 @@ extension IMEStateData {
   public var attributedStringNormal: NSAttributedString {
     /// 考慮到因為滑鼠點擊等其它行為導致的組字區內容遞交情況，
     /// 這裡對組字區內容也加上康熙字轉換或者 JIS 漢字轉換處理。
-    let convertedBase = displayedTextConverted
+    /// 注意：AttributedString 用於顯示，因此包含讀音片段；但其基礎文本（用於計算長度）
+    /// 應該是不包含讀音的，以防某些客體應用從 AttributedString 中提取文本時包含讀音。
+    let baseText = displayedTextConvertedSansReading
     guard !displayTextSegments.isEmpty else {
-      return AttrStrULStyle.single.getMarkedAttrStr(convertedBase, clauseSegment: 0)
+      return AttrStrULStyle.single.getMarkedAttrStr(baseText, clauseSegment: 0)
     }
-    // 使用 displayedTextConverted 作為基礎字串，用 displayTextSegments 的長度來切分。
-    // displayTextSegments 可能包含讀音（Tekkon），不能直接使用其內容。
+    // 建構屬性字串：使用無讀音的文本作為基礎，但根據 displayTextSegments 分段標記。
+    // displayTextSegments 可能包含讀音片段（highlightAtSegment 所指位置），需跳過。
     var segments: [AttrStrULStyle.StyledPair] = []
-    var startIndex = convertedBase.startIndex
-    for segment in displayTextSegments {
+    var startIndex = baseText.startIndex
+    for (idx, segment) in displayTextSegments.enumerated() {
+      // 跳過讀音片段
+      if let highlightIdx = highlightAtSegment, idx == highlightIdx {
+        continue
+      }
       let segmentLength = segment.count
       guard segmentLength > 0 else { continue }
-      let endIndex = convertedBase.index(startIndex, offsetBy: segmentLength, limitedBy: convertedBase.endIndex) 
-        ?? convertedBase.endIndex
-      let extractedSegment = String(convertedBase[startIndex..<endIndex])
+      let endIndex = baseText.index(startIndex, offsetBy: segmentLength, limitedBy: baseText.endIndex)
+        ?? baseText.endIndex
+      let extractedSegment = String(baseText[startIndex..<endIndex])
       segments.append((extractedSegment, .single))
       startIndex = endIndex
-      if startIndex >= convertedBase.endIndex { break }
+      if startIndex >= baseText.endIndex { break }
     }
     return AttrStrULStyle.pack(segments)
   }
@@ -130,7 +140,8 @@ extension IMEStateData {
   public var attributedStringMarking: NSAttributedString {
     /// 考慮到因為滑鼠點擊等其它行為導致的組字區內容遞交情況，
     /// 這裡對組字區內容也加上康熙字轉換或者 JIS 漢字轉換處理。
-    let converted = displayedTextConverted.map(\.description)
+    /// 使用不包含讀音的文本作為基礎，以防某些客體應用提取文本時包含讀音。
+    let converted = displayedTextConvertedSansReading.map(\.description)
     let range2 = markedRange
     let range1 = 0 ..< markedRange.lowerBound
     let range3 = markedRange.upperBound ..< converted.count

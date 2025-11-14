@@ -614,7 +614,8 @@ private class PopupCompositionView: NSView {
   }
 
   private func prepareAttributedString(from state: IMEStateProtocol) -> NSAttributedString {
-    let attrString = NSMutableAttributedString(string: state.displayedTextConverted)
+    // 使用不包含讀音的文本，以防止讀音被誤認為是要遞交的內容。
+    let attrString = NSMutableAttributedString(string: state.data.displayedTextConvertedSansReading)
 
     let baseFont = bufferFont()
     let paragraphStyle: NSParagraphStyle = {
