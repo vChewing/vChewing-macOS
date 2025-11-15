@@ -69,8 +69,8 @@ final class FrmRevLookupWindow: NSWindow {
     if inputField.stringValue.isEmpty { return }
     resultView.string = "\n" + "Loading…".localized
     asyncOnMain { [weak self] in
-      guard let self = self else { return }
-      self.updateResult(with: self.inputField.stringValue)
+      guard let this = self else { return }
+      this.updateResult(with: this.inputField.stringValue)
     }
   }
 

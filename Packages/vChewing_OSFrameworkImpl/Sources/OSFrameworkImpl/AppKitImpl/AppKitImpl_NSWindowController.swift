@@ -76,8 +76,8 @@ import SwiftExtension
       if let text = text { alert.informativeText = text }
       alert.addButton(withTitle: NSLocalizedString("OK", comment: ""))
       var result: NSApplication.ModalResponse = .alertFirstButtonReturn
-      guard let self = self else { return alert.runModal() }
-      alert.beginSheetModal(for: self) { theResponce in
+      guard let this = self else { return alert.runModal() }
+      alert.beginSheetModal(for: this) { theResponce in
         result = theResponce
       }
       return result
