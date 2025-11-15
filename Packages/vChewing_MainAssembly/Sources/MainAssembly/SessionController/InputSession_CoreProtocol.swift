@@ -167,17 +167,17 @@ extension SessionProtocol {
   /// 所有建構子都會執行的共用部分，在 super.init() 之後執行。
   public func construct(client theClient: (IMKTextInput & NSObjectProtocol)? = nil) {
     asyncOnMain { [weak self] in
-      guard let self = self else { return }
+      guard let this = self else { return }
       // 關掉所有之前的副本的視窗。
       Self.current?.hidePalettes()
-      Self.current = self
-      self.initInputHandler()
-      synchronizer4LMPrefs?()
+      Self.current = this
+      this.initInputHandler()
+      this.synchronizer4LMPrefs?()
       // 下述兩行很有必要，否則輸入法會在手動重啟之後無法立刻生效。
-      let maybeClient = theClient ?? self.client()
-      self.activateServer(maybeClient)
+      let maybeClient = theClient ?? this.client()
+      this.activateServer(maybeClient)
       // GCD 會觸發 didSet，所以不用擔心。
-      self.inputMode = .init(rawValue: prefs.mostRecentInputMode) ?? .imeModeNULL
+      this.inputMode = .init(rawValue: this.prefs.mostRecentInputMode) ?? .imeModeNULL
     }
   }
 
@@ -200,13 +200,17 @@ extension SessionProtocol {
   /// 強制重設當前鍵盤佈局、使其與偏好設定同步。
   public func setKeyLayout() {
     asyncOnMain { [weak self] in
-      guard let self = self else { return }
-      guard let client = self.client(), !self.isServingIMEItself else { return }
-      if self.isASCIIMode, IMKHelper.isDynamicBasicKeyboardLayoutEnabled {
-        client.overrideKeyboard(withKeyboardNamed: prefs.alphanumericalKeyboardLayout)
+      guard let this = self else { return }
+      guard let client = this.client(), !this.isServingIMEItself else { return }
+      if this.isASCIIMode, IMKHelper.isDynamicBasicKeyboardLayoutEnabled {
+        client.overrideKeyboard(
+          withKeyboardNamed: this.prefs.alphanumericalKeyboardLayout
+        )
         return
       }
-      client.overrideKeyboard(withKeyboardNamed: prefs.basicKeyboardLayout)
+      client.overrideKeyboard(
+        withKeyboardNamed: this.prefs.basicKeyboardLayout
+      )
     }
   }
 
@@ -217,11 +221,11 @@ extension SessionProtocol {
 
   public func performServerDeactivation() {
     let deactivation = { [weak self] in
-      guard let self = self else { return }
-      self.isActivated = false
-      self.resetInputHandler() // 這條會自動搞定 Empty 狀態。
-      self.switchState(.ofDeactivated())
-      self.inputHandler = nil
+      guard let this = self else { return }
+      this.isActivated = false
+      this.resetInputHandler() // 這條會自動搞定 Empty 狀態。
+      this.switchState(.ofDeactivated())
+      this.inputHandler = nil
       // 選字窗不用管，交給新的 Session 的 ActivateServer 來管理。
     }
     if UserDefaults.pendingUnitTests {
@@ -235,19 +239,19 @@ extension SessionProtocol {
     hidePalettes()
     syncCurrentSessionID()
     let activation1 = { [weak self] in
-      guard let self = self else { return }
+      guard let this = self else { return }
       if let senderBundleID: String = client?.bundleIdentifier() {
         vCLog("activateServer(\(senderBundleID))")
-        self.isServingIMEItself = Bundle.main.bundleIdentifier == senderBundleID
-        self.clientBundleIdentifier = senderBundleID
+        this.isServingIMEItself = Bundle.main.bundleIdentifier == senderBundleID
+        this.clientBundleIdentifier = senderBundleID
         // 只要使用者沒有勾選檢查更新、沒有主動做出要檢查更新的操作，就不要檢查更新。
-        if prefs.checkUpdateAutomatically {
+        if this.prefs.checkUpdateAutomatically {
           AppDelegate.shared.checkUpdate(forced: false) {
             senderBundleID == "com.apple.SecurityAgent"
           }
         }
         // 檢查當前客體軟體是否採用 Web 技術構築（例：Electron）。
-        self.isClientElectronBased =
+        this.isClientElectronBased =
           NSRunningApplication
             .isElectronBasedApp(identifier: senderBundleID)
       }
@@ -270,9 +274,9 @@ extension SessionProtocol {
       asyncOnMain(execute: activation2)
     }
     let activation3 = { [weak self] in
-      guard let self = self else { return }
-      if self.inputMode != IMEApp.currentInputMode {
-        self.inputMode = IMEApp.currentInputMode
+      guard let this = self else { return }
+      if this.inputMode != IMEApp.currentInputMode {
+        this.inputMode = IMEApp.currentInputMode
       }
     }
     if UserDefaults.pendingUnitTests {

@@ -60,7 +60,7 @@ extension SessionProtocol {
       inputHandler?.clear()
     case .ofAbortion, .ofCommitting, .ofEmpty:
       toggleCandidateUIVisibility(false)
-      innerCircle: switch newState.type {
+      switch newState.type {
       case .ofAbortion:
         previous = .ofEmpty()
         if replace { state = previous }
@@ -207,11 +207,11 @@ extension SessionProtocol {
     recentMarkedText.selectionRange = range
     if allowAsync, isServingIMEItself || !isActivated {
       asyncOnMain { [weak self] in
-        guard let self = self, let client = self.client() else { return }
+        guard let this = self, let client = this.client() else { return }
         client.setMarkedText(
           newString,
           selectionRange: range,
-          replacementRange: self.replacementRange()
+          replacementRange: this.replacementRange()
         )
       }
     } else {

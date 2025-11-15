@@ -205,8 +205,8 @@ import SwiftExtension
       result.makeSimpleConstraint(.width, relation: .greaterThanOrEqual, value: minWidth)
       result.makeSimpleConstraint(.height, relation: .greaterThanOrEqual, value: minHeight)
       result.contentView = self
-      if let self = self as? NSStackView, self.orientation == .horizontal {
-        self.spacing = 0
+      if let this = self as? NSStackView, this.orientation == .horizontal {
+        this.spacing = 0
       }
       return result
     }

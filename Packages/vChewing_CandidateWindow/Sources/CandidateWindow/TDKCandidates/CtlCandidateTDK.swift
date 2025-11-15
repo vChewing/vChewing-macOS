@@ -143,8 +143,8 @@ public final class CtlCandidateTDK: CtlCandidate, NSWindowDelegate {
   override public func updateDisplay() {
     guard let window = window else { return }
     asyncOnMain { [weak self] in
-      guard let self = self else { return }
-      self.updateNSWindowModern(window)
+      guard let this = self else { return }
+      this.updateNSWindowModern(window)
     }
     useMouseScrolling = prefs.enableMouseScrollingForTDKCandidatesCocoa
     // 先擦除之前的反查结果。

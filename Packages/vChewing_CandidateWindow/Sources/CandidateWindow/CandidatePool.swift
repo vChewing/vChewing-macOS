@@ -229,8 +229,8 @@ extension CandidatePool {
   public func update() {
     if #available(macOS 10.15, *) {
       asyncOnMain { [weak self] in
-        guard let self = self else { return }
-        self.objectWillChange.send()
+        guard let this = self else { return }
+        this.objectWillChange.send()
       }
     }
   }
