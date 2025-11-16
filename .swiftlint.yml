@@ -1,11 +1,8 @@
 excluded:
   - .git**
   - Packages/Build/**
-  - Build/**
-  - "**/.build/**"
-  - "**/.index-build/**"
-  - "**/resource_bundle_accessor.swift"
-  - Packages/**/.build/**
+  - Build
+  - .index-build
   - resource_bundle_accessor.swift
   - Pods
   - R.generated.swift
