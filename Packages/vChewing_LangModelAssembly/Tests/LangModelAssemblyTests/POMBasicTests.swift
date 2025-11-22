@@ -376,7 +376,7 @@ extension Megrez.GramInPath {
     let keyCells = tuplet4Test.keyChain.split(separator: "-").map(\.description)
     return Megrez.GramInPath(
       gram: .init(keyArray: keyCells, value: tuplet4Test.value, score: tuplet4Test.score),
-      isOverridden: false
+      isExplicit: false
     )
   }
 }

@@ -48,6 +48,14 @@ extension KBEvent.KeyEventData {
     chars: KBEvent.SpecialKey.tab.unicodeScalar.description,
     keyCode: KeyCode.kTab.rawValue
   )
+  static let forwardDelete = KBEvent.KeyEventData(
+    chars: KBEvent.SpecialKey.deleteForward.unicodeScalar.description,
+    keyCode: KeyCode.kWindowsDelete.rawValue
+  )
+  static let backspace = KBEvent.KeyEventData(
+    chars: KBEvent.SpecialKey.backspace.unicodeScalar.description,
+    keyCode: KeyCode.kBackSpace.rawValue
+  )
 }
 
 extension KBEvent {
