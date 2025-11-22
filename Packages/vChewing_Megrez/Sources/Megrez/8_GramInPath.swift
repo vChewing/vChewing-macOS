@@ -12,15 +12,21 @@ extension Megrez {
   public struct GramInPath: Codable, Hashable {
     // MARK: Lifecycle
 
-    public init(gram: Unigram, isOverridden: Bool) {
+    public init(
+      gram: Unigram,
+      isOverridden: Bool,
+      isExplicitlyOverridden: Bool = false
+    ) {
       self.gram = gram
       self.isOverridden = isOverridden
+      self.isExplicitlyOverridden = isExplicitlyOverridden
     }
 
     // MARK: Public
 
     public let gram: Unigram
     public let isOverridden: Bool
+    public let isExplicitlyOverridden: Bool
 
     public var keyArray: [String] { gram.keyArray }
     public var value: String { gram.value }
@@ -122,6 +128,9 @@ extension Array where Element == Megrez.GramInPath {
     return !isBound && rawResult
   }
 
+  /// 偵測游標是否切斷區域。
+  ///
+  /// 此處不需要針對 cursor 做邊界檢查。
   public func isCursorCuttingRegion(cursor: Int) -> Bool {
     let index = cursor
     var isBound = (index == contextRange(ofGivenCursor: index).lowerBound)

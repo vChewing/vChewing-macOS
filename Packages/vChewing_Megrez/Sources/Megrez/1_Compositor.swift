@@ -167,14 +167,15 @@ extension Megrez {
 
     /// 朝著指定方向砍掉一個與游標相鄰的讀音。
     ///
-    /// 在威注音的術語體系當中，「與文字輸入方向相反的方向」為向後（Rear），反之則為向前（Front）。
+    /// 在 Megrez 的術語體系當中，「與文字輸入方向相反的方向」為向後（Rear），反之則為向前（Front）。
     /// 如果是朝著與文字輸入方向相反的方向砍的話，游標位置會自動遞減。
     /// - Parameter direction: 指定方向（相對於文字輸入方向而言）。
     /// - Returns: 該操作是否成功執行。
     @discardableResult
     public func dropKey(direction: TypingDirection) -> Bool {
+      guard !keys.isEmpty else { return false }
+      guard !isCursorAtEdge(direction: direction) else { return false }
       let isBackSpace: Bool = direction == .rear ? true : false
-      guard cursor != (isBackSpace ? 0 : keys.count) else { return false }
       keys.remove(at: cursor - (isBackSpace ? 1 : 0))
       cursor -= isBackSpace ? 1 : 0 // 在縮節之前。
       resizeGrid(at: cursor, do: .shrink)
@@ -235,7 +236,7 @@ extension Megrez {
 
     /// 按幅節來前後移動游標。
     ///
-    /// 在威注音的術語體系當中，「與文字輸入方向相反的方向」為向後（Rear），反之則為向前（Front）。
+    /// 在 Megrez 的術語體系當中，「與文字輸入方向相反的方向」為向後（Rear），反之則為向前（Front）。
     /// - Parameters:
     ///   - direction: 指定移動方向（相對於文字輸入方向而言）。
     ///   - isMarker: 要移動的是否為作為選擇標記的副游標（而非打字用的主游標）。
