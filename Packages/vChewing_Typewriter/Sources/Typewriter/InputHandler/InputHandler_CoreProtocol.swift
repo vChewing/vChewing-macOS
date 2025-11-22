@@ -471,12 +471,7 @@ extension InputHandlerProtocol {
   func generateArrayOfCandidates(fixOrder: Bool = true) -> [CandidateInState] {
     /// 警告：不要對游標前置風格使用 nodesCrossing，否則會導致游標行為與 macOS 內建注音輸入法不一致。
     /// 微軟新注音輸入法的游標後置風格也是不允許 nodeCrossing 的。
-    var arrCandidates: [Megrez.KeyValuePaired] = {
-      switch prefs.useRearCursorMode {
-      case false: return assembler.fetchCandidates(filter: .endAt)
-      case true: return assembler.fetchCandidates(filter: .beginAt)
-      }
-    }()
+    var arrCandidates = fetchRawQueriedCandidatesFromAssembler()
 
     /// 原理：nodes 這個回饋結果包含一堆子陣列，分別對應不同詞長的候選字。
     /// 這裡先對陣列排序、讓最長候選字的子陣列的優先權最高。
@@ -606,6 +601,19 @@ extension InputHandlerProtocol {
     let punctuation: String = arrPunctuations.joined()
     result.append(punctuation)
     return result
+  }
+
+  private func fetchRawQueriedCandidatesFromAssembler(
+    filterOverride givenFilter: Assembler.CandidateFetchFilter? = nil
+  )
+    -> [Megrez.KeyValuePaired] {
+    if let givenFilter {
+      return assembler.fetchCandidates(filter: givenFilter)
+    }
+    switch prefs.useRearCursorMode {
+    case false: return assembler.fetchCandidates(filter: .endAt)
+    case true: return assembler.fetchCandidates(filter: .beginAt)
+    }
   }
 }
 
