@@ -93,8 +93,11 @@ extension InputHandlerProtocol {
         // 檢查新的漢字字音是否在庫。
         let temporaryReadingKey = theComposer.getComposition()
         if currentLM.hasUnigramsFor(keyArray: [temporaryReadingKey]) {
+          // 此處刻意使用 Assembler 的 API（assembler.dropKey）以避免呼叫
+          // InputHandler 的 dropKey 中所包含的 KeyDropContext 回補邏輯。
           assembler.dropKey(direction: .rear)
-          assemble() // 這裡必須 Walk 一次、來更新目前被 walk 的內容。
+          // 這裡必須 Walk 一次、來更新目前被 walk 的內容。
+          assemble()
           composer = theComposer
           // 這裡不需要回呼 generateStateOfInputting()，因為當前輸入的聲調鍵一定是合規的、會在之後回呼 generateStateOfInputting()。
           overrideHappened = true

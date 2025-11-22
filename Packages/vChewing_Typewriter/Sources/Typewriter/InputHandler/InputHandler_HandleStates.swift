@@ -475,6 +475,8 @@ extension InputHandlerProtocol {
         if prefs.cassetteEnabled {
           guard input.isShiftHold, calligrapher.isEmpty else { break shiftBksp }
           guard let prevReading = previousParsableCalligraph else { break shiftBksp }
+          // 此處刻意使用 Assembler 的 API（assembler.dropKey）以避免呼叫
+          // InputHandler 的 dropKey 中所包含的 KeyDropContext 回補邏輯。
           assembler.dropKey(direction: .rear)
           assemble() // 這裡必須 Walk 一次、來更新目前被 walk 的內容。
           calligrapher = prevReading
@@ -482,6 +484,8 @@ extension InputHandlerProtocol {
           guard input.isShiftHold, isComposerOrCalligrapherEmpty else { break shiftBksp }
           guard let prevReading = previousParsableReading else { break shiftBksp }
           // prevReading 的內容分別是：「完整讀音」「去掉聲調的讀音」「是否有聲調」。
+          // 此處刻意使用 Assembler 的 API（assembler.dropKey）以避免呼叫
+          // InputHandler 的 dropKey 中所包含的 KeyDropContext 回補邏輯。
           assembler.dropKey(direction: .rear)
           assemble() // 這裡必須 Walk 一次、來更新目前被 walk 的內容。
           prevReading.1.map(\.description).forEach {
@@ -514,8 +518,14 @@ extension InputHandlerProtocol {
         errorCallback?("9D69908D")
         return true
       }
+      var isConsolidated = false
       for _ in 0 ..< actualSteps {
-        assembler.dropKey(direction: .rear)
+        if !isConsolidated {
+          dropKey(direction: .rear)
+          isConsolidated = true
+        } else {
+          assembler.dropKey(direction: .rear)
+        }
       }
       assemble()
     } else {
@@ -574,8 +584,14 @@ extension InputHandlerProtocol {
         errorCallback?("9B69938D")
         return true
       }
+      var isConsolidated = false
       for _ in 0 ..< actualSteps {
-        assembler.dropKey(direction: .front)
+        if !isConsolidated {
+          dropKey(direction: .front)
+          isConsolidated = true
+        } else {
+          assembler.dropKey(direction: .front)
+        }
       }
       assemble()
     } else {
