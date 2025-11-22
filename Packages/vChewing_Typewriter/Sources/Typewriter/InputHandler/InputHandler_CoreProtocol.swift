@@ -713,7 +713,7 @@ extension InputHandlerProtocol {
           suggestedPair,
           at: cursorForOverride,
           overrideType: overrideBehavior,
-          isExplicitlyOverridden: false,  // POM auto-suggestions are not explicit overrides
+          isExplicitlyOverridden: false,
           enforceRetokenization: true
         )
         assemble()
