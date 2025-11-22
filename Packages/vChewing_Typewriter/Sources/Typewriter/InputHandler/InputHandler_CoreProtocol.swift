@@ -698,7 +698,7 @@ extension InputHandlerProtocol {
     arrResult.append(contentsOf: appendables)
     if apply {
       if !suggestion.isEmpty, let newestSuggestedCandidate = suggestion.candidates.last {
-        let overrideBehavior: Megrez.Node.OverrideType = .withSpecified
+        let overrideBehavior: Megrez.Node.OverrideType = .withTopGramScore
         let suggestedPair: Megrez.KeyValuePaired = .init(
           key: newestSuggestedCandidate.keyArray.joined(separator: assembler.separator),
           value: newestSuggestedCandidate.value,
@@ -713,6 +713,7 @@ extension InputHandlerProtocol {
           suggestedPair,
           at: cursorForOverride,
           overrideType: overrideBehavior,
+          isExplicitlyOverridden: false,  // POM auto-suggestions are not explicit overrides
           enforceRetokenization: true
         )
         assemble()
@@ -930,7 +931,13 @@ extension InputHandlerProtocol {
       for: direction,
       from: self
     )
-    guard let context else { return assembler.dropKey(direction: direction) }
+    guard let context else {
+      let result = assembler.dropKey(direction: direction)
+      // When there's no explicit override context, clear all non-explicit overrides
+      // This ensures POM-applied overrides don't persist after key deletion
+      assembler.clearNonExplicitOverrides()
+      return result
+    }
     guard assembler.dropKey(direction: direction) else { return false }
     guard !context.remainingKeys.isEmpty else { return true }
 

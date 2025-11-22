@@ -528,6 +528,9 @@ extension InputHandlerProtocol {
         }
       }
       assemble()
+      // Clear any non-explicit overrides that may have been reapplied by POM
+      // This prevents automatic suggestions from persisting after key deletion
+      assembler.clearNonExplicitOverrides()
     } else {
       _ = input.commonKeyModifierFlags == .option
         ? clearComposerAndCalligrapher()
@@ -594,6 +597,9 @@ extension InputHandlerProtocol {
         }
       }
       assemble()
+      // Clear any non-explicit overrides that may have been reapplied by POM
+      // This prevents automatic suggestions from persisting after key deletion
+      assembler.clearNonExplicitOverrides()
     } else {
       clearComposerAndCalligrapher()
     }

@@ -183,6 +183,20 @@ extension Megrez {
       return true
     }
 
+    /// 清除所有非明確覆寫的覆寫狀態。
+    /// 這用於清除自動套用的覆寫（如 POM 建議），同時保留使用者明確選擇的覆寫。
+    public func clearNonExplicitOverrides() {
+      segments.forEach { segment in
+        segment.values.forEach { node in
+          // Clear overrides that are not explicitly chosen by the user
+          // This includes POM auto-suggestions (.withTopGramScore) but not manual selections (.withSpecified)
+          if !node.isExplicitlyOverridden, node.currentOverrideType == .withTopGramScore {
+            node.reset()
+          }
+        }
+      }
+    }
+
     /// 獲取當前標記得範圍。這個函式只能是函式、而非只讀變數。
     /// - Returns: 當前標記範圍。
     public func currentMarkedRange() -> Range<Int> {
