@@ -156,7 +156,7 @@ extension Megrez.Compositor {
           default: break
           }
         }
-        result.append(.init(keyArray: theNode.keyArray, value: gram.value))
+        result.append(.init(keyArray: theNode.keyArray, value: gram.value, score: gram.score))
       }
     }
     return result
@@ -176,6 +176,7 @@ extension Megrez.Compositor {
   public func overrideCandidate(
     _ candidate: Megrez.KeyValuePaired, at location: Int,
     overrideType: Megrez.Node.OverrideType = .withSpecified,
+    isExplicitlyOverridden: Bool = false,
     enforceRetokenization: Bool = false,
     perceptionHandler: ((Megrez.PerceptionIntel) -> ())? = nil
   )
@@ -186,6 +187,7 @@ extension Megrez.Compositor {
       value: candidate.value,
       score: candidate.score < 0 ? candidate.score : nil,
       type: overrideType,
+      isExplicitlyOverridden: isExplicitlyOverridden,
       enforceRetokenization: enforceRetokenization,
       perceptionHandler: perceptionHandler
     )
@@ -205,6 +207,7 @@ extension Megrez.Compositor {
   public func overrideCandidateLiteral(
     _ candidate: String,
     at location: Int, overrideType: Megrez.Node.OverrideType = .withSpecified,
+    isExplicitlyOverridden: Bool = false,
     enforceRetokenization: Bool = false,
     perceptionHandler: ((Megrez.PerceptionIntel) -> ())? = nil
   )
@@ -215,6 +218,7 @@ extension Megrez.Compositor {
       value: candidate,
       score: nil,
       type: overrideType,
+      isExplicitlyOverridden: isExplicitlyOverridden,
       enforceRetokenization: enforceRetokenization,
       perceptionHandler: perceptionHandler
     )
@@ -238,6 +242,7 @@ extension Megrez.Compositor {
     value: String,
     score specifiedScore: Double? = nil,
     type: Megrez.Node.OverrideType,
+    isExplicitlyOverridden: Bool,
     enforceRetokenization: Bool,
     perceptionHandler: ((Megrez.PerceptionIntel) -> ())? = nil
   )
@@ -285,6 +290,7 @@ extension Megrez.Compositor {
           anchor.node.overrideStatus = .init(
             overridingScore: desiredScore,
             currentOverrideType: .withSpecified,
+            isExplicitlyOverridden: isExplicitlyOverridden,
             currentUnigramIndex: anchor.node.currentUnigramIndex
           )
         }
@@ -333,6 +339,7 @@ extension Megrez.Compositor {
           anchor.node.overrideStatus = .init(
             overridingScore: demotionScore,
             currentOverrideType: .withSpecified,
+            isExplicitlyOverridden: anchor.node.isExplicitlyOverridden,
             currentUnigramIndex: anchor.node.currentUnigramIndex
           )
         }

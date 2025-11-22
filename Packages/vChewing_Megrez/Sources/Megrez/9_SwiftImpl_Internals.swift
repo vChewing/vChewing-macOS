@@ -5,6 +5,17 @@
 // This package is trying to deprecate its dependency of Foundation, hence this file.
 
 extension StringProtocol {
+  /// 檢查字串中是否包含指定子字串。
+  ///
+  /// - 注意：此方法不仰賴 Foundation API，而是以 Unicode Scalar 為單位執行逐位比對。
+  ///         因此在處理複雜的 Compose 字元（如合字）時結果可能與 Foundation 的 substring
+  ///         搜尋略有差異；但該實作在純 Swift 環境下效能良好且不會引入 Foundation 的相依性。
+  /// - Parameters:
+  ///   - target: 要查找的子字串（可接受任何符合 StringProtocol 的型別）。
+  /// - Returns: 如果找到則回傳 true，否則回傳 false。
+  ///
+  /// 範例：
+  /// "abcd".has(string: "bc")  => true
   func has(string target: any StringProtocol) -> Bool {
     let selfArray = Array(unicodeScalars)
     let targetArray = Array(target.description.unicodeScalars)
@@ -19,6 +30,16 @@ extension StringProtocol {
   }
 
   func sliced(by separator: any StringProtocol = "") -> [String] {
+    /// 以指定分界字元拆分字串，回傳字串陣列；等同於 `split` 的功能，但不使用 Foundation。
+    ///
+    /// - 注意：該實作會將分隔符視為完整字串進行比對（以 Unicode Scalar 為基準），
+    ///         若分隔符為空字串，則會視為不做分割。
+    /// - Parameters:
+    ///   - separator: 作為斷詞分界的字串，預設為空字串。
+    /// - Returns: 拆分後的字串陣列，若輸入為空回傳空陣列（視實作情況）。
+    ///
+    /// 範例：
+    /// "a-b-c".sliced(by: "-") => ["a","b","c"]
     let selfArray = Array(unicodeScalars)
     let arrSeparator = Array(separator.description.unicodeScalars)
     var result: [String] = []
@@ -44,6 +65,18 @@ extension StringProtocol {
     return result
   }
 
+  /// 以純 Swift 方法將字串中的指定子字串替換為另一字串。
+  ///
+  /// - Parameters:
+  ///   - target: 要被替換的子字串。
+  ///   - newString: 替換為的新字串。
+  /// - Returns: 替換完成的字串。
+  ///
+  /// 注意：此函式使用 Unicode Scalar 做逐個比對，不會使用 Foundation 的 replace API，
+  /// 因此在面對某些特殊 Unicode 合字組合時，行為可能與 Foundation 產生差異。
+  ///
+  /// 範例：
+  /// "a-b-c".swapping("-","+") => "a+b+c"
   func swapping(_ target: String, with newString: String) -> String {
     let selfArray = Array(unicodeScalars)
     let arrTarget = Array(target.description.unicodeScalars)
@@ -161,7 +194,14 @@ public struct FIUUID: Hashable, Codable, Sendable {
   public let highBits: UInt64
   public let lowBits: UInt64
 
-  /// 以標準 UUID 字串形式返回識別值（預設為大寫）。
+  /// 以標準 UUID 格式（xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx）返回識別字串。
+  ///
+  /// - Parameters:
+  ///   - uppercase: 是否回傳大寫字母（預設 true）。
+  /// - Returns: 符合 UUID 標準格式的字串表示。
+  ///
+  /// 範例：
+  /// FIUUID().uuidString() => "AABBCCDD-..."
   public func uuidString(uppercase: Bool = true) -> String {
     var bytes = [UInt8](repeating: 0, count: 16)
     Self.write(bigEndian: highBits, to: &bytes, offset: 0)
@@ -207,6 +247,9 @@ public struct FIUUID: Hashable, Codable, Sendable {
     return result
   }
 
+  /// 取得 16 進位字元的數值表示，支援大小寫字母與數字 0~9。
+  /// - Parameter character: 要轉換的 16 進位字元。
+  /// - Returns: 對應的數值（0..15），若非合法 16 進位字元則回傳 nil。
   private static func hexValue(of character: Character) -> UInt8? {
     switch character {
     case "0" ... "9":

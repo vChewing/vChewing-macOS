@@ -70,7 +70,7 @@ extension Megrez {
         guard let node = parent[currentPos] else { break }
         let insertable = Megrez.GramInPath(
           gram: node.currentUnigram,
-          isOverridden: node.isOverridden
+          isExplicit: node.isExplicitlyOverridden
         )
         reversedSentence.append(insertable)
         currentPos -= node.keyArray.count
