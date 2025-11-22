@@ -480,19 +480,85 @@ extension InputHandlerProtocol {
       return arrCandidates.map { ($0.keyArray, $0.value) }
     }
 
-    let arrSuggestedUnigrams: [(String, Megrez.Unigram)] = retrievePOMSuggestions(apply: false)
+    let arrSuggestedUnigrams: [(String, Megrez.Unigram)] = retrievePOMSuggestions(
+      apply: false,
+      rawCandidates: arrCandidates
+    )
     let arrSuggestedCandidates: [Megrez.KeyValuePaired] = arrSuggestedUnigrams.map {
-      Megrez.KeyValuePaired(key: $0.0, value: $0.1.value)
+      Megrez.KeyValuePaired(
+        keyArray: $0.1.keyArray,
+        value: $0.1.value,
+        score: $0.1.score
+      )
     }
-    arrCandidates = arrSuggestedCandidates.filter { arrCandidates.contains($0) } + arrCandidates
-    arrCandidates = arrCandidates.deduplicated
+
+    let rawCandidateSignatures: Set<Megrez.KeyValuePaired> = Set(
+      arrCandidates.map(makeCanonicalPair(from:))
+    )
+    let filteredSuggestedCandidates = arrSuggestedCandidates.filter {
+      rawCandidateSignatures.contains(makeCanonicalPair(from: $0))
+    }
+    arrCandidates = filteredSuggestedCandidates + arrCandidates
+    arrCandidates = deduplicateCandidatesPreservingOrder(arrCandidates)
     arrCandidates = arrCandidates.stableSort { $0.keyArray.count > $1.keyArray.count }
     return arrCandidates.map { ($0.keyArray, $0.value) }
   }
 
+  /// 移除重複候選字詞（以讀音 + 詞值做鍵），維持原順序。
+  func deduplicateCandidatesPreservingOrder(
+    _ candidates: [Megrez.KeyValuePaired]
+  )
+    -> [Megrez.KeyValuePaired] {
+    var seen = Set<Megrez.KeyValuePaired>()
+    return candidates.filter { candidate in
+      let signature = makeCanonicalPair(from: candidate)
+      if seen.contains(signature) { return false }
+      seen.insert(signature)
+      return true
+    }
+  }
+
+  /// 將 POM 建議過濾成適合覆寫的單元圖，會剔除分數低於當前原始候選的項目。
+  func filterPOMAppendables(
+    from suggestion: LMAssembly.OverrideSuggestion,
+    rawCandidates: [Megrez.KeyValuePaired]
+  )
+    -> [(String, Megrez.Unigram)] {
+    guard !suggestion.isEmpty else { return [] }
+
+    let separator = assembler.separator
+    let rawLookup = rawCandidates.reduce(into: [Megrez.KeyValuePaired: Double]()) { partialResult, item in
+      let signature = makeCanonicalPair(from: item)
+      let currentScore = item.score
+      if let existingScore = partialResult[signature] {
+        partialResult[signature] = max(existingScore, currentScore)
+      } else {
+        partialResult[signature] = currentScore
+      }
+    }
+
+    return suggestion.candidates.compactMap { candidate in
+      let keyString = candidate.keyArray.joined(separator: separator)
+      let suggestedUnigram = Megrez.Unigram(
+        keyArray: candidate.keyArray,
+        value: candidate.value,
+        score: candidate.probability
+      )
+      let signature = makeCanonicalPair(keyArray: candidate.keyArray, value: suggestedUnigram.value)
+      if let rawScore = rawLookup[signature], suggestedUnigram.score < rawScore {
+        return nil
+      }
+      return (keyString, suggestedUnigram)
+    }
+  }
+
   /// 向漸退引擎詢問可能的選字建議、且套用給組字器內的當前游標位置。
   @discardableResult
-  func retrievePOMSuggestions(apply: Bool) -> [(String, Megrez.Unigram)] {
+  func retrievePOMSuggestions(
+    apply: Bool,
+    rawCandidates: [Megrez.KeyValuePaired]? = nil
+  )
+    -> [(String, Megrez.Unigram)] {
     var arrResult = [(String, Megrez.Unigram)]()
     /// 如果逐字選字模式有啟用的話，直接放棄執行這個函式。
     if prefs.useSCPCTypingMode { return arrResult }
@@ -504,16 +570,10 @@ extension InputHandlerProtocol {
       cursor: actualNodeCursorPosition,
       timestamp: Date().timeIntervalSince1970
     )
-    let appendables: [(String, Megrez.Unigram)] = suggestion.candidates.map { pomCandidate in
-      (
-        pomCandidate.keyArray.joined(separator: assembler.separator),
-        .init(
-          keyArray: pomCandidate.keyArray,
-          value: pomCandidate.value,
-          score: pomCandidate.probability
-        )
-      )
-    }
+    // 以組字器實際返回的候選字詞權重來過濾 POM 建議：
+    // 若建議的分數比當前候選的最高權重還低，則忽略以避免覆寫。
+    let rawCandidates = rawCandidates ?? fetchRawQueriedCandidatesFromAssembler()
+    let appendables = filterPOMAppendables(from: suggestion, rawCandidates: rawCandidates)
     arrResult.append(contentsOf: appendables)
     if apply {
       if !suggestion.isEmpty, let newestSuggestedCandidate = suggestion.candidates.last {
@@ -803,6 +863,14 @@ extension InputHandlerProtocol {
     }
     vCLog("Consolidation fallback to per-key override for node: \(candidate.value)")
     return false
+  }
+
+  private func makeCanonicalPair(from pair: Megrez.KeyValuePaired) -> Megrez.KeyValuePaired {
+    makeCanonicalPair(keyArray: pair.keyArray, value: pair.value)
+  }
+
+  private func makeCanonicalPair(keyArray: [String], value: String) -> Megrez.KeyValuePaired {
+    Megrez.KeyValuePaired(keyArray: keyArray, value: value, score: 0)
   }
 }
 
