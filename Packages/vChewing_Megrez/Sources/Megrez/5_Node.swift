@@ -45,6 +45,7 @@ extension Megrez {
       self.segLength = node.segLength
       self.unigrams = node.unigrams.map(\.copy)
       self.currentOverrideType = node.currentOverrideType
+      self.isExplicitlyOverridden = node.isExplicitlyOverridden
       self.currentUnigramIndex = node.currentUnigramIndex
     }
 
@@ -80,6 +81,8 @@ extension Megrez {
     public private(set) var unigrams: [Megrez.Unigram]
     /// 該節點目前的覆寫狀態種類。為 `nil` 時表示無覆寫行為。
     public private(set) var currentOverrideType: Node.OverrideType?
+    /// 是否為使用者明確覆寫（explicit override）、而非出於自動機制進行的複寫。
+    public private(set) var isExplicitlyOverridden: Bool = false
 
     /// 當前該節點所指向的（單元圖陣列內的）單元圖索引位置。
     public private(set) var currentUnigramIndex: Int = 0 {
@@ -124,12 +127,14 @@ extension Megrez {
         NodeOverrideStatus(
           overridingScore: overridingScore,
           currentOverrideType: currentOverrideType,
+          isExplicitlyOverridden: isExplicitlyOverridden,
           currentUnigramIndex: currentUnigramIndex
         )
       }
       set {
         overridingScore = newValue.overridingScore
         currentOverrideType = newValue.currentOverrideType
+        isExplicitlyOverridden = newValue.isExplicitlyOverridden
         // 防範 UnigramIndex 溢出，如果溢出則重設覆寫狀態
         if newValue.currentUnigramIndex >= 0, newValue.currentUnigramIndex < unigrams.count {
           currentUnigramIndex = newValue.currentUnigramIndex
@@ -221,10 +226,12 @@ public struct NodeOverrideStatus: Codable, Hashable {
   public init(
     overridingScore: Double = 114_514,
     currentOverrideType: Megrez.Node.OverrideType? = nil,
+    isExplicitlyOverridden: Bool = false,
     currentUnigramIndex: Int = 0
   ) {
     self.overridingScore = overridingScore
     self.currentOverrideType = currentOverrideType
+    self.isExplicitlyOverridden = isExplicitlyOverridden
     self.currentUnigramIndex = currentUnigramIndex
   }
 
@@ -236,4 +243,6 @@ public struct NodeOverrideStatus: Codable, Hashable {
   public var currentOverrideType: Megrez.Node.OverrideType?
   /// 當前單元圖索引位置
   public var currentUnigramIndex: Int
+  /// 使用者是否明確覆寫（explicit override）
+  public var isExplicitlyOverridden: Bool
 }
