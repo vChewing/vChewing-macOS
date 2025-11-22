@@ -107,7 +107,7 @@ extension LMAssembly {
 // MARK: - Private Structures
 
 extension LMAssembly.LMPerceptionOverride {
-  public struct Override: Hashable, Encodable, Decodable {
+  public struct Override: Hashable, Encodable, Decodable, CustomStringConvertible {
     // MARK: Lifecycle
 
     fileprivate init(count: Int, timestamp: Double) {
@@ -125,6 +125,17 @@ extension LMAssembly.LMPerceptionOverride {
 
     public fileprivate(set) var count: Int = 0
     public fileprivate(set) var timestamp: Double = 0.0
+
+    // MARK: - CustomStringConvertible
+
+    public var description: String {
+      let encoder = JSONEncoder()
+      encoder.outputFormatting = []
+      if let jsonData = try? encoder.encode(self), let json = String(data: jsonData, encoding: .utf8) {
+        return json
+      }
+      return "Override(count: \(count), timestamp: \(timestamp))"
+    }
 
     public static func == (lhs: Self, rhs: Self) -> Bool {
       lhs.count == rhs.count && lhs.timestamp == rhs.timestamp
@@ -149,7 +160,7 @@ extension LMAssembly.LMPerceptionOverride {
     }
   }
 
-  public final class Perception: Hashable, Encodable, Decodable {
+  public final class Perception: Hashable, Encodable, Decodable, CustomStringConvertible {
     // MARK: Lifecycle
 
     fileprivate init() {}
@@ -162,6 +173,17 @@ extension LMAssembly.LMPerceptionOverride {
     // MARK: Public
 
     public fileprivate(set) var overrides: [String: Override] = [:]
+
+    // MARK: - CustomStringConvertible
+
+    public var description: String {
+      let encoder = JSONEncoder()
+      encoder.outputFormatting = .sortedKeys
+      if let jsonData = try? encoder.encode(self), let json = String(data: jsonData, encoding: .utf8) {
+        return json
+      }
+      return "Perception(count: \(count), overrides: \(overrides.keys.sorted()))"
+    }
 
     public static func == (lhs: Perception, rhs: Perception) -> Bool {
       lhs.count == rhs.count && lhs.overrides == rhs.overrides
@@ -196,7 +218,7 @@ extension LMAssembly.LMPerceptionOverride {
     }
   }
 
-  public final class KeyPerceptionPair: Hashable, Encodable, Decodable {
+  public final class KeyPerceptionPair: Hashable, Encodable, Decodable, CustomStringConvertible {
     // MARK: Lifecycle
 
     fileprivate init(key: String, perception: Perception) {
@@ -217,6 +239,17 @@ extension LMAssembly.LMPerceptionOverride {
 
     public var latestTimeStamp: Double {
       perception.overrides.values.map(\.timestamp).max() ?? 0
+    }
+
+    // MARK: - CustomStringConvertible
+
+    public var description: String {
+      let encoder = JSONEncoder()
+      encoder.outputFormatting = [.sortedKeys]
+      if let jsonData = try? encoder.encode(self), let json = String(data: jsonData, encoding: .utf8) {
+        return json
+      }
+      return "KeyPerceptionPair(key: \(key), perception: \(perception))"
     }
 
     public static func == (lhs: KeyPerceptionPair, rhs: KeyPerceptionPair) -> Bool {
