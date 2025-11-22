@@ -118,7 +118,8 @@ extension InputHandlerProtocol {
     candidate: CandidateInState,
     respectCursorPushing: Bool = true,
     preConsolidate: Bool = false,
-    skipObservation: Bool = false
+    skipObservation: Bool = false,
+    explicitlyChosen: Bool = false
   ) {
     let theCandidate: Megrez.KeyValuePaired = .init(candidate)
     let preservedSentenceBeforeConsolidation = assembler.assembledSentence
@@ -140,6 +141,7 @@ extension InputHandlerProtocol {
         .init(keyArray: theCandidate.keyArray, value: theCandidate.value),
         at: actualNodeCursorPosition,
         overrideType: .withSpecified,
+        isExplicitlyOverridden: explicitlyChosen,
         enforceRetokenization: true
       )
     }
@@ -154,6 +156,7 @@ extension InputHandlerProtocol {
         let enforce = attempt % 2 == 0 // 偶數次強制 retokenization
         overrideTaskResult = assembler.overrideCandidate(
           theCandidate, at: actualNodeCursorPosition,
+          isExplicitlyOverridden: explicitlyChosen,
           enforceRetokenization: enforce
         ) { perceptionIntel in
           if attempt % 2 == 1 {
@@ -778,17 +781,19 @@ extension InputHandlerProtocol {
 
   private func overrideNodeAsWhole(
     _ node: Megrez.GramInPath,
-    at startPosition: Int
+    at startPosition: Int,
+    explicitlyChosen: Bool = false
   )
     -> Bool {
     let candidate = node.asCandidatePair
-    if assembler.overrideCandidate(candidate, at: startPosition) {
+    if assembler.overrideCandidate(candidate, at: startPosition, isExplicitlyOverridden: explicitlyChosen) {
       return true
     }
     if assembler.overrideCandidate(
       candidate,
       at: startPosition,
       overrideType: .withSpecified,
+      isExplicitlyOverridden: explicitlyChosen,
       enforceRetokenization: true
     ) {
       return true

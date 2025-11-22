@@ -354,7 +354,8 @@ public final class MockSession: SessionCoreProtocol, CtlCandidateDelegate {
         candidate: selectedValue,
         respectCursorPushing: true,
         preConsolidate: inputHandler.prefs.consolidateContextOnCandidateSelection,
-        skipObservation: !inputHandler.prefs.fetchSuggestionsFromPerceptionOverrideModel
+        skipObservation: !inputHandler.prefs.fetchSuggestionsFromPerceptionOverrideModel,
+        explicitlyChosen: true
       )
       var result: State = inputHandler.generateStateOfInputting()
       defer { switchState(result) } // 這是最終輸出結果。
