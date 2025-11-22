@@ -170,4 +170,99 @@ extension InputHandlerTests {
     typeSentence("su065j/ ")
     XCTAssertEqual(testHandler.assembler.assembledSentence.map(\.value), ["年終"])
   }
+
+  func test_IH303_POMIgnoresLowerWeightSuggestedUnigramMatchingRawQueriedUnigram() throws {
+    guard let testHandler, let testSession else {
+      XCTFail("testHandler and testSession at least one of them is nil.")
+      return
+    }
+    testHandler.prefs.useSCPCTypingMode = false
+    testHandler.prefs.fetchSuggestionsFromPerceptionOverrideModel = true
+    clearTestPOM()
+    testSession.resetInputHandler(forceComposerCleanup: true)
+
+    // 測試目的：當 POM 提供與當前 raw queried （來自 factory / 使用者片語 / 磁帶）
+    // 相同的詞+讀音，但 POM 的權重比原始查詢結果更低時，該建議應被忽略。
+    let readingKeyChainStr = "gjo3eji35 "
+    typeSentence(readingKeyChainStr)
+    XCTAssertEqual(testHandler.assembler.assembledSentence.map(\.value).joined(), "水果汁")
+
+    guard let keyGen = testHandler.assembler.assembledSentence.generateKeyForPerception(
+      cursor: testHandler.actualNodeCursorPosition
+    ) else {
+      XCTFail("Failed to generate perception key from assembled sentence.")
+      return
+    }
+
+    let ngramKey = keyGen.ngramKey
+    let candidateValue = keyGen.candidate
+    // 確認該節點的 keyArray 確實會在組字器返回的候選清單中對應到 candidate。
+    // 從目前組句結果中的該節點取得完整的 keyArray。
+    guard let gramPair = testHandler.assembler.assembledSentence.findGram(
+      at: testHandler.actualNodeCursorPosition
+    )
+    else {
+      XCTFail("Failed to locate current GramInPath")
+      return
+    }
+    let keyArray = gramPair.gram.keyArray
+    let candidateFetchFilter: Megrez.Compositor.CandidateFetchFilter =
+      testHandler.prefs.useRearCursorMode ? .beginAt : .endAt
+    let rawCandidates = testHandler.assembler.fetchCandidates(filter: candidateFetchFilter)
+    guard let rawCandidate = rawCandidates.first(where: {
+      $0.keyArray == keyArray && $0.value == candidateValue
+    }) else {
+      XCTFail("Unable to locate raw candidate for keyArray \(keyArray) and value \(candidateValue).")
+      return
+    }
+
+    // 情境 A：插入近期（高權重）的 POM 記錄；預期建議清單會包含該候選字詞
+    testHandler.currentLM.memorizePerception(
+      (ngramKey, candidateValue),
+      timestamp: Date().timeIntervalSince1970
+    )
+    var suggestionPairs = testHandler.retrievePOMSuggestions(apply: false)
+    var suggestions = suggestionPairs.map { $0.1.value }
+    XCTAssertTrue(suggestions.contains(candidateValue))
+    if let candidateUnigram = suggestionPairs.first(where: { $0.1.value == candidateValue }) {
+      XCTAssertGreaterThanOrEqual(candidateUnigram.1.score, rawCandidate.score)
+    }
+
+    // 清除並插入舊時戳（低權重）POM 記錄；預期該建議會被忽略
+    clearTestPOM()
+    // 使用遠古時間戳，讓計算出的權重極可能低於閾值
+    let oldTimestamp = Date().timeIntervalSince1970 - 24 * 3_600 * 100
+    testHandler.currentLM.memorizePerception(
+      (ngramKey, candidateValue),
+      timestamp: oldTimestamp
+    )
+    suggestionPairs = testHandler.retrievePOMSuggestions(apply: false)
+    suggestions = suggestionPairs.map { $0.1.value }
+    XCTAssertTrue(suggestions.isEmpty)
+    XCTAssertFalse(suggestions.contains(candidateValue))
+  }
+
+  func test_IH303_FilterPOMAppendablesRejectsLowerScoreMatches() throws {
+    guard let testHandler else {
+      XCTFail("testHandler is nil.")
+      return
+    }
+
+    var suggestion = LMAssembly.OverrideSuggestion()
+    suggestion.candidates = [
+      (keyArray: ["ㄅ"], value: "波", probability: -0.30, previous: nil),
+      (keyArray: ["ㄅ"], value: "玻", probability: -0.15, previous: nil),
+      (keyArray: ["ㄅ"], value: "坡", probability: -0.05, previous: nil),
+    ]
+
+    let rawCandidates: [Megrez.KeyValuePaired] = [
+      .init(keyArray: ["ㄅ"], value: "波", score: -0.10),
+      .init(keyArray: ["ㄅ"], value: "波", score: -0.25),
+      .init(keyArray: ["ㄅ"], value: "玻", score: -0.30),
+    ]
+
+    let filtered = testHandler.filterPOMAppendables(from: suggestion, rawCandidates: rawCandidates)
+    XCTAssertFalse(filtered.contains(where: { $0.1.value == "波" }))
+    XCTAssertEqual(filtered.map { $0.1.value }, ["玻", "坡"])
+  }
 }
