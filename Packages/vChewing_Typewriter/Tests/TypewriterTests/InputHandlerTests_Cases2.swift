@@ -179,4 +179,210 @@ extension InputHandlerTests {
     XCTAssertEqual(testHandler.assembler.cursor, cursorBeforeCandidate)
     XCTAssertNil(testHandler.backupCursor)
   }
+
+  func test_IH204_DropKeyAgainstAnOverriddenCandidate() throws {
+    guard let testHandler, let testSession else {
+      XCTFail("testHandler and testSession at least one of them is nil.")
+      return
+    }
+    // 關掉這個開關就可以停用 POM，不需要再 clearTestPOM()。
+    testHandler.prefs.fetchSuggestionsFromPerceptionOverrideModel = false
+    testHandler.prefs.useSCPCTypingMode = false
+    testHandler.prefs.useRearCursorMode = false
+    // 使用大千（注音）解析器輸入三字詞「水果汁」。
+    testHandler.prefs.keyboardParser = KeyboardParser.ofStandard.rawValue
+    testHandler.ensureKeyboardParser()
+
+    // 定義 keyEventData
+    let forwardDelete = KBEvent.KeyEventData.forwardDelete.asEvent
+    let backspace = KBEvent.KeyEventData.backspace.asEvent
+
+    // 重置並輸入對應「水果汁」的大千（注音）鍵序。
+    func restoreTestState(manualCandidateSelection: Bool = true) throws {
+      testSession.switchState(.ofAbortion())
+      testSession.resetInputHandler(forceComposerCleanup: true)
+      typeSentence("gjo3eji35 ") // 大千鍵序對應「水果汁」，尾端有空白鍵
+      XCTAssertEqual(
+        testHandler.assembler.assembledSentence.values.joined(),
+        "水果汁"
+      ) // 確認我們獲得預期的組字結果
+      if manualCandidateSelection {
+        // 選取候選以標記節點為手動覆寫（固化）狀態
+        testSession.switchState(testHandler.generateStateOfCandidates())
+        testSession.candidatePairSelectionConfirmed(at: 0)
+        // 基本一致性檢查
+        XCTAssertEqual(testHandler.assembler.assembledSentence.values, ["水果汁"])
+      }
+    }
+
+    // 案例 A1 (ForwardDelete)：從節點後側向前刪除一個讀音鍵（Forward Delete），預期結果："果汁"
+    do {
+      try restoreTestState()
+      XCTAssertTrue(testHandler.triageInput(event: KBEvent.KeyEventData.dataArrowHome.asEvent))
+      XCTAssertTrue(testHandler.triageInput(event: forwardDelete))
+      XCTAssertEqual(
+        testHandler.assembler.assembledSentence.values.joined(),
+        "果汁",
+        "向前方刪除一個讀音鍵後仍應保留剩餘子鍵的使用者覆寫結果。"
+      )
+      // 大千鍵序對應「水」
+      typeSentence("gjo3")
+      // 下述斷言可證明「水果汁」並未被算法選中。
+      XCTAssertEqual(testHandler.assembler.assembledSentence.map(\.segLength), [1, 2])
+      // 取消強制手動候選字選擇。
+      try restoreTestState(manualCandidateSelection: false)
+      XCTAssertTrue(testHandler.triageInput(event: KBEvent.KeyEventData.dataArrowHome.asEvent))
+      XCTAssertTrue(testHandler.triageInput(event: forwardDelete))
+      XCTAssertEqual(testHandler.assembler.assembledSentence.values.joined(), "果汁")
+      typeSentence("gjo3")
+      // 下述斷言可證明「水果汁」被算法選中。
+      XCTAssertEqual(testHandler.assembler.assembledSentence.map(\.segLength), [3])
+    }
+
+    // 案例 A2 (BackSpace)：從節點前側向後刪除一個讀音鍵（BackSpace），預期結果："水果"
+    do {
+      try restoreTestState()
+      // 將游標移到尾端，並按下 BackSpace 鍵以刪除最後一個字
+      XCTAssertTrue(testHandler.triageInput(event: KBEvent.KeyEventData.dataArrowEnd.asEvent))
+      XCTAssertTrue(testHandler.triageInput(event: backspace))
+      XCTAssertEqual(
+        testHandler.assembler.assembledSentence.values.joined(),
+        "水果",
+        "向後方刪除一個讀音鍵後仍應保留剩餘子鍵的使用者覆寫結果。"
+      )
+      typeSentence("5 ") // 大千鍵序對應「汁」，尾端有空白鍵
+      XCTAssertNotEqual(testHandler.assembler.assembledSentence.values.joined(), "水果汁")
+      XCTAssertEqual(testHandler.assembler.assembledSentence.values.joined(), "水果之")
+      // 取消強制手動候選字選擇。
+      try restoreTestState(manualCandidateSelection: false)
+      XCTAssertTrue(testHandler.assembler.isCursorAtEdge(direction: .front))
+      XCTAssertTrue(testHandler.triageInput(event: backspace))
+      XCTAssertEqual(testHandler.assembler.assembledSentence.values.joined(), "水果")
+      typeSentence("5 ") // 大千鍵序對應「汁」，尾端有空白鍵
+      XCTAssertEqual(testHandler.assembler.assembledSentence.values.joined(), "水果汁")
+      XCTAssertNotEqual(testHandler.assembler.assembledSentence.values.joined(), "水果之")
+    }
+
+    // 案例 B1 (ForwardDelete)：中間刪除（游標位於中間，前方刪除）→ 預期結果：「水|果汁」->「水汁」。
+    // 中間刪除測試：將游標移至第二個位置（Home + RightArrow），執行前方刪除以移除第二個鍵。
+    // 預期剩餘字元（第一與第三）仍為使用者原先手動覆寫的字詞，例如：「水果汁」刪除「果」後 -> 「水汁」。
+    do {
+      try restoreTestState()
+      XCTAssertTrue(testHandler.triageInput(event: KBEvent.KeyEventData.dataArrowHome.asEvent))
+      XCTAssertTrue(testHandler.triageInput(event: KBEvent.KeyEventData.dataArrowRight.asEvent))
+      XCTAssertTrue(testHandler.triageInput(event: forwardDelete))
+      let result = testHandler.assembler.assembledSentence.values.joined()
+      // 驗證：組字結果長度應減少一個，且左側字仍為「水」；右側字為「汁」。
+      XCTAssertEqual(result.count, 2)
+      XCTAssertTrue(result.hasPrefix("水"))
+      XCTAssertTrue(result.hasSuffix("汁"))
+      XCTAssertTrue(
+        testHandler.currentLM.hasKeyValuePairFor(
+          keyArray: ["ㄕㄨㄟˇ"],
+          value: result.prefix(1).description
+        )
+      )
+      XCTAssertTrue(
+        testHandler.currentLM.hasKeyValuePairFor(
+          keyArray: ["ㄓ"],
+          value: result.suffix(1).description
+        )
+      )
+    }
+
+    // 案例 B2 (Backspace)：中間刪除（游標位於中間，後方刪除）→ 預期結果：「水果|汁」->「水汁」。
+    // 中間刪除測試：將游標移至第二個位置的右側（End + LeftArrow），執行後方刪除以移除第二個鍵。
+    // 預期剩餘字元（第一與第三）仍為使用者原先手動覆寫的字詞，例如：「水果汁」刪除「果」後 -> 「水汁」。
+    do {
+      try restoreTestState()
+      XCTAssertTrue(testHandler.triageInput(event: KBEvent.KeyEventData.dataArrowEnd.asEvent))
+      XCTAssertTrue(testHandler.triageInput(event: KBEvent.KeyEventData.dataArrowLeft.asEvent))
+      XCTAssertTrue(testHandler.triageInput(event: backspace))
+      let result = testHandler.assembler.assembledSentence.values.joined()
+      // 驗證：組字結果長度應減少一個，且左側字仍為「水」；右側字為「汁」。
+      XCTAssertEqual(result.count, 2)
+      XCTAssertTrue(result.hasPrefix("水"))
+      XCTAssertTrue(result.hasSuffix("汁"))
+      XCTAssertTrue(
+        testHandler.currentLM.hasKeyValuePairFor(
+          keyArray: ["ㄕㄨㄟˇ"],
+          value: result.prefix(1).description
+        )
+      )
+      XCTAssertTrue(
+        testHandler.currentLM.hasKeyValuePairFor(
+          keyArray: ["ㄓ"],
+          value: result.suffix(1).description
+        )
+      )
+    }
+
+    // 案例 C1 (Opt+ForwardDelete)：中間刪除（游標位於中間，前方刪除）→ 預期結果：「水|果汁」->「水」。
+    // 中間刪除測試：將游標移至第二個位置（Home + RightArrow），摁住 Option 執行前方刪除以移除第二個鍵。
+    // 預期剩餘字元（第一）仍為使用者原先手動覆寫的字詞，例如：「水果汁」刪除「果汁」後 -> 「水」。
+    do {
+      try restoreTestState()
+      XCTAssertTrue(testHandler.triageInput(event: KBEvent.KeyEventData.dataArrowHome.asEvent))
+      XCTAssertTrue(testHandler.triageInput(event: KBEvent.KeyEventData.dataArrowRight.asEvent))
+      XCTAssertTrue(testHandler.triageInput(event: forwardDelete.reinitiate(modifierFlags: .option)))
+      let result = testHandler.assembler.assembledSentence.values.joined()
+      // 驗證：組字結果長度應減少2個，且只剩「水」。
+      XCTAssertEqual(result.count, 1)
+      XCTAssertTrue(result.hasPrefix("水"))
+      XCTAssertTrue(
+        testHandler.currentLM.hasKeyValuePairFor(
+          keyArray: ["ㄕㄨㄟˇ"],
+          value: result.prefix(1).description
+        )
+      )
+      XCTAssertEqual(
+        testHandler.assembler.assembledSentence.values.joined(),
+        "水",
+        "在 `水|果汁` 的位置按 Option+Delete 後，應保留左側節點，結果為 '水'。"
+      )
+    }
+
+    // 案例 C2 (Opt+Backspace)：中間刪除（游標位於中間，後方刪除）→ 預期結果：「水果|汁」->「汁」。
+    // 中間刪除測試：將游標移至第二個位置的右側（End + LeftArrow），摁住 Option 執行後方刪除以移除第二個鍵。
+    // 預期剩餘字元（第三）仍為使用者原先手動覆寫的字詞，例如：「水果汁」刪除「水果」後 -> 「汁」。
+    do {
+      try restoreTestState()
+      XCTAssertTrue(testHandler.triageInput(event: KBEvent.KeyEventData.dataArrowEnd.asEvent))
+      XCTAssertTrue(testHandler.triageInput(event: KBEvent.KeyEventData.dataArrowLeft.asEvent))
+      XCTAssertTrue(testHandler.triageInput(event: backspace.reinitiate(modifierFlags: .option)))
+      let result = testHandler.assembler.assembledSentence.values.joined()
+      // 驗證：組字結果長度應減少2個，且只剩「汁」。
+      XCTAssertEqual(result.count, 1)
+      XCTAssertTrue(result.hasSuffix("汁"))
+      XCTAssertTrue(
+        testHandler.currentLM.hasKeyValuePairFor(
+          keyArray: ["ㄓ"],
+          value: result.suffix(1).description
+        )
+      )
+      XCTAssertEqual(
+        testHandler.assembler.assembledSentence.values.joined(),
+        "汁",
+        "在 `水果|汁` 的位置按 Option+Backspace 後，應保留右側節點，結果為 '汁'。"
+      )
+    }
+
+    // 案例 D1 (Bksp, POM)：確保在重新打字沒有經過選字窗的確認的情況下的結果不受 POM 影響。
+    do {
+      clearTestPOM()
+      XCTAssertTrue(testHandler.currentLM.lmPerceptionOverride.getSavableData().isEmpty)
+      testHandler.prefs.fetchSuggestionsFromPerceptionOverrideModel = true
+      try restoreTestState(manualCandidateSelection: true) // 生成 POM 記憶
+      let pomDesc = testHandler.currentLM.lmPerceptionOverride.getSavableData()
+      XCTAssertFalse(pomDesc.isEmpty)
+      XCTAssertTrue(pomDesc.map(\.key).description.contains("ㄕㄨㄟˇ-ㄍㄨㄛˇ-ㄓ"))
+      try restoreTestState(manualCandidateSelection: false)
+      XCTAssertTrue(testHandler.assembler.isCursorAtEdge(direction: .front))
+      XCTAssertTrue(testHandler.triageInput(event: backspace))
+      typeSentence("5 ") // 「ㄓ」+ 陰平聲調
+      XCTAssert(testHandler.assembler.assembledSentence.allSatisfy { !$0.isExplicit })
+      XCTAssertNotEqual(testHandler.assembler.assembledSentence.map(\.value), ["水", "果汁"])
+      XCTAssertEqual(testHandler.assembler.assembledSentence.map(\.value), ["水果汁"])
+    }
+  }
 }

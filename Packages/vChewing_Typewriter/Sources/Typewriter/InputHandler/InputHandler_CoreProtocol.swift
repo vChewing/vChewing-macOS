@@ -50,6 +50,124 @@ public protocol InputHandlerProtocol: AnyObject, InputHandlerCoreProtocol {
   var assembler: Megrez.Compositor { get set } // 組字器
 }
 
+// MARK: - KeyDropContext
+
+/// KeyDropContext：負責封裝在使用者手動覆寫節點時，於執行刪除鍵（dropKey）前所需
+/// 的上下文資訊與重覆寫行為。
+///
+/// 說明：當使用者在候選節點上做手動覆寫（例如在選字窗內選字），之後若使用刪除
+/// 鍵以刪除該節點內的一個子鍵（子讀音），有可能造成剩餘的子鍵被 Megrez 重新
+/// 分詞或依 LM 權重改選，導致原本手動覆寫不再保有。此結構會在 `dropKey` 被呼叫
+/// 時嘗試捕捉目前節點資訊，提供兩種回補策略：
+/// 1) `reapplyCombined`：嘗試將刪除後的新鍵陣列（整合後）以整節覆寫套用回組字引擎，
+///    使其依然為使用者手動選定的候選。 此方式優先採用，若成功則可保證結果的
+///    原子性與一致性。
+/// 2) `reapplyPerKey`：當整節覆寫失敗時，退而求其次對刪除後的每個子鍵（remainingKeys）
+///    逐一套用單鍵覆寫（single-key override）以重建使用者意圖，避免整節重新分詞
+///    造成優先候選不同。
+///
+/// 注意：這個結構為 `InputHandlerProtocol` 的輔助型別，對 Megrez 與 LM 的互動有
+/// 明確依賴；在產生 context 時若無法取得需要的上下文（如被覆寫節點、節點長度
+/// 與讀音對齊等），則會回傳 `nil` 表示不進行回補處理。
+private struct KeyDropContext {
+  /// 節點起始位置（相對於組字鍵陣列的索引）。
+  let nodeStart: Int
+  /// 節點內部的鍵序陣列（通常為注音或拼音鍵序）。
+  let keys: [String]
+  /// 節點對應的字串資料值陣列（分割成 char 的原始字元陣列）。
+  let values: [String]
+  /// 在節點內被移除（刪除）的子鍵索引。
+  let removedIndex: Int
+
+  /// 刪除指定子鍵後，節點剩下的鍵序陣列（不含被刪除的鍵）。
+  var remainingKeys: [String] {
+    keys.enumerated().compactMap { $0.offset == removedIndex ? nil : $0.element }
+  }
+
+  /// 刪除指定子鍵後，剩下的字串資料值（結合為一個字串）。
+  var remainingValue: String {
+    values.enumerated().compactMap { $0.offset == removedIndex ? nil : $0.element }.joined()
+  }
+
+  /// 生成手動覆寫 DropKey 的上下文。
+  /// - Parameters:
+  ///   - direction: DropKey 的方向（前方/後方）。
+  ///   - inputHandler: 呼叫者（通常為 InputHandler 的實作）。
+  /// - Returns: 當可在目前游標位置判定為「手動覆寫」且該節點可安全回補的情況下，
+  ///   回傳 `KeyDropContext`；否則回傳 nil。
+  static func getManualOverrideKeyDropContext<T: InputHandlerProtocol>(
+    for direction: T.Assembler.TypingDirection,
+    from inputHandler: T
+  )
+    -> Self? {
+    guard inputHandler.assembler.keys.count > 1 else { return nil }
+    guard !inputHandler.assembler.isCursorAtEdge(direction: direction) else { return nil }
+    let currentAssembly = inputHandler.assembler.assembledSentence
+    let cursorAfterTask = switch direction {
+    case .front: inputHandler.assembler.cursor + 1
+    case .rear: inputHandler.assembler.cursor - 1
+    }
+    guard currentAssembly.isCursorCuttingRegion(
+      cursor: cursorAfterTask
+    ) else { return nil }
+    let affectedRegionID = currentAssembly.cursorRegionMap[cursorAfterTask]
+    guard let affectedRegionID else { return nil }
+    let affectedRegion = currentAssembly[affectedRegionID]
+    guard affectedRegion.isExplicit else { return nil }
+    guard !affectedRegion.isReadingMismatched else { return nil }
+    let nodeRange = currentAssembly.contextRange(ofGivenCursor: cursorAfterTask)
+    let nodeStart = nodeRange.lowerBound
+    let nodeLength = nodeRange.count
+    guard nodeLength > 0 else { return nil }
+    let values = affectedRegion.asCandidatePair.value.map { String($0) }
+    guard values.count == nodeLength else { return nil }
+    let removedIndex = switch direction {
+    case .front: inputHandler.assembler.cursor - nodeStart
+    case .rear: inputHandler.assembler.cursor - 1 - nodeStart
+    }
+    guard (0 ..< nodeLength).contains(removedIndex) else { return nil }
+    return .init(
+      nodeStart: nodeStart,
+      keys: affectedRegion.keyArray,
+      values: values,
+      removedIndex: removedIndex
+    )
+  }
+
+  /// 試圖以「整節」覆寫的方式回補刪除後的節點（若節點已被分割或不存在則失敗）。
+  /// - Parameters:
+  ///   - target: InputHandler 實例目標。
+  /// - Returns: 覆寫成功與否的布林值。
+  func reapplyCombined<T: InputHandlerProtocol>(to target: T) -> Bool {
+    let startPosition = min(max(nodeStart, 0), target.assembler.length)
+    return target.assembler.overrideCandidate(
+      .init(keyArray: remainingKeys, value: remainingValue),
+      at: startPosition,
+      overrideType: .withSpecified,
+      isExplicitlyOverridden: true, // <- Questionable.
+      enforceRetokenization: true
+    )
+  }
+
+  /// 逐鍵覆寫：當整節回補失敗時，對每個剩餘子鍵試圖進行單鍵覆寫，以恢復原先的節點
+  /// 中所選定的字面值。該方法不會變動游標或 marker。
+  /// - Parameters:
+  ///   - target: InputHandler 實例目標。
+  func reapplyPerKey<T: InputHandlerProtocol>(to target: T) {
+    for (index, key) in keys.enumerated() where index != removedIndex {
+      let value = values[index]
+      let newPosition = nodeStart + (index > removedIndex ? index - 1 : index)
+      _ = target.assembler.overrideCandidate(
+        .init(keyArray: [key], value: value),
+        at: min(max(newPosition, 0), target.assembler.length),
+        overrideType: .withSpecified,
+        isExplicitlyOverridden: true, // <- Questionable.
+        enforceRetokenization: true
+      )
+    }
+  }
+}
+
 extension InputHandlerProtocol {
   // MARK: - Functions dealing with Megrez.
 
@@ -118,14 +236,15 @@ extension InputHandlerProtocol {
     candidate: CandidateInState,
     respectCursorPushing: Bool = true,
     preConsolidate: Bool = false,
-    skipObservation: Bool = false
+    skipObservation: Bool = false,
+    explicitlyChosen: Bool = false
   ) {
     let theCandidate: Megrez.KeyValuePaired = .init(candidate)
     let preservedSentenceBeforeConsolidation = assembler.assembledSentence
     let preservedCursorPosition = actualNodeCursorPosition
 
     /// 必須先鞏固當前組字器游標上下文、以消滅意料之外的影響，但在內文組字區內就地輪替候選字詞時除外。
-    if preConsolidate { consolidateCursorContext(with: theCandidate) }
+    if preConsolidate { consolidateCursorContext(with: theCandidate, explicitlyChosen: explicitlyChosen) }
 
     // 先嘗試用 POM 建議覆寫（如果有完全匹配的記憶）。
     let pomSuggestion = retrievePOMSuggestions(apply: false)
@@ -140,6 +259,7 @@ extension InputHandlerProtocol {
         .init(keyArray: theCandidate.keyArray, value: theCandidate.value),
         at: actualNodeCursorPosition,
         overrideType: .withSpecified,
+        isExplicitlyOverridden: explicitlyChosen,
         enforceRetokenization: true
       )
     }
@@ -154,6 +274,7 @@ extension InputHandlerProtocol {
         let enforce = attempt % 2 == 0 // 偶數次強制 retokenization
         overrideTaskResult = assembler.overrideCandidate(
           theCandidate, at: actualNodeCursorPosition,
+          isExplicitlyOverridden: explicitlyChosen,
           enforceRetokenization: enforce
         ) { perceptionIntel in
           if attempt % 2 == 1 {
@@ -577,16 +698,26 @@ extension InputHandlerProtocol {
     arrResult.append(contentsOf: appendables)
     if apply {
       if !suggestion.isEmpty, let newestSuggestedCandidate = suggestion.candidates.last {
-        let overrideBehavior: Megrez.Node.OverrideType = .withSpecified
+        let overrideBehavior: Megrez.Node.OverrideType = suggestion.forceHighScoreOverride
+          ? .withSpecified
+          : .withTopGramScore
         let suggestedPair: Megrez.KeyValuePaired = .init(
           key: newestSuggestedCandidate.keyArray.joined(separator: assembler.separator),
           value: newestSuggestedCandidate.value,
           score: newestSuggestedCandidate.probability
         )
         let cursorForOverride = suggestion.overrideCursor ?? actualNodeCursorPosition
+        if let gramHit = assembler.assembledSentence.findGram(at: cursorForOverride) {
+          if gramHit.gram.keyArray.count > newestSuggestedCandidate.keyArray.count {
+            vCLog(
+              "POM: Skip applying suggestion \(suggestedPair.toNGramKey) because it would shorten an existing node."
+            )
+            return arrResult.stableSort { $0.1.score > $1.1.score }
+          }
+        }
         let ngramKey = suggestedPair.toNGramKey
         vCLog(
-          "POM: Overriding the node score of the suggested candidate: \(ngramKey) at \(cursorForOverride)"
+          "POM: Applying suggestion \(ngramKey) at \(cursorForOverride) via \(overrideBehavior)"
         )
         _ = assembler.overrideCandidate(
           suggestedPair,
@@ -689,9 +820,9 @@ extension InputHandlerProtocol {
   /// 威注音輸入法截至 v1.9.3 SP2 版為止都受到上游的這個 Bug 的影響，且在 v1.9.4 版利用該函式修正了這個缺陷。
   /// 該修正必須搭配至少天權星組字引擎 v2.0.2 版方可生效。算法可能比較囉唆，但至少在常用情形下不會再發生該問題。
   /// - Parameter theCandidate: 要拿來覆寫的詞音配對。
-  func consolidateCursorContext(with theCandidate: Megrez.KeyValuePaired) {
+  func consolidateCursorContext(with theCandidate: Megrez.KeyValuePaired, explicitlyChosen: Bool = false) {
     // 計算需要鞏固的範圍
-    let result = calculateConsolidationBoundaries(for: theCandidate)
+    let result = calculateConsolidationBoundaries(for: theCandidate, explicitlyChosen: explicitlyChosen)
     let consolidationRange = result.range
 
     // 記錄調試信息
@@ -726,7 +857,7 @@ extension InputHandlerProtocol {
         let overlapsTarget = nodeRange.overlaps(candidateRange)
 
         if !overlapsTarget {
-          if overrideNodeAsWhole(currentNode, at: nodeStart) {
+          if overrideNodeAsWhole(currentNode, at: nodeStart, explicitlyChosen: explicitlyChosen) {
             nextPosition += nodeLength
             position = nextPosition
             continue
@@ -744,7 +875,11 @@ extension InputHandlerProtocol {
               keyArray: [key],
               value: values[subPosition]
             )
-            assembler.overrideCandidate(thePair, at: nextPosition)
+            assembler.overrideCandidate(
+              thePair,
+              at: nextPosition,
+              isExplicitlyOverridden: explicitlyChosen
+            )
             nextPosition += 1
           }
           position = nextPosition
@@ -754,7 +889,7 @@ extension InputHandlerProtocol {
         // 針對目標節點保留原先逐字固化行為，以確保覆寫準確性。
         let values = currentNode.asCandidatePair.value.map { String($0) }
         guard values.count == currentNode.keyArray.count else {
-          if overrideNodeAsWhole(currentNode, at: nodeStart) {
+          if overrideNodeAsWhole(currentNode, at: nodeStart, explicitlyChosen: explicitlyChosen) {
             nextPosition += nodeLength
             position = nextPosition
             continue
@@ -769,7 +904,11 @@ extension InputHandlerProtocol {
             keyArray: [key],
             value: values[subPosition]
           )
-          assembler.overrideCandidate(thePair, at: nextPosition)
+          assembler.overrideCandidate(
+            thePair,
+            at: nextPosition,
+            isExplicitlyOverridden: explicitlyChosen
+          )
           nextPosition += 1
         }
         position = nextPosition
@@ -779,11 +918,56 @@ extension InputHandlerProtocol {
     }
   }
 
+  /// 刪除鍵（dropKey）處理：該函式會在必要時判定「當前游標旁是否存在被手動覆寫的
+  /// 節點（overridden node）」。若該情形成立，則會嘗試以兩個步驟回補使用者的手動
+  /// 覆寫意圖，以防止 LM 或 Megrez 重新分詞後導致選字被改變。
+  ///
+  /// 假設游標/候選/刪除方向的範例為：`(0, A1-B1-C1, front)` 與 `(3, X1-Y1-Z1, rear)`。
+  /// 在刪除其中一個鍵後，期望的結果分別為 `(0, B1-C1)` 以及 `(2, X1-Y1)`。
+  /// 然而，實際上，由於不同候選項之分數可能會導致排序變化，結果可能會變成
+  /// `(0, B2-C2)` 與 `(2, X2-Y2)`。
+  /// 類似情形還有：`(1, A1-B1-C1, front)` 與 `(2, X1-Y1-Z1, rear)`，
+  /// 預期結果為 `(1, A1-C1)` 與 `(1, X1-Z1)`，但實際上可能因候選分數差異
+  /// 而變成 `(1, A2-C2)` 與 `(1, X2-Z2)`。敝 API 得負責避免上述情況發生、
+  /// 以維持使用者對手動覆寫（override）之預期行為。
+  ///
+  /// 回補策略：
+  /// 1) 先判斷該刪除是否會導致游標切斷目前覆寫的節點。若是，則產生 KeyDropContext 上下文。
+  /// 2) 若產生上下文成功，則先執行 `assembler.dropKey(direction:)`，再依序嘗試：
+  ///    a. `reapplyCombined`：以整節新鍵陣列做整體覆寫，若成功則早早返回 true。
+  ///    b. `reapplyPerKey`：若整節覆寫失敗，則對剩下每個子鍵做單鍵覆寫，嘗試維持使用者之覆寫意圖。
+  ///
+  /// 其他注意事項：
+  /// - 當上下文無法建立時（例如該節點非手動覆寫、節點長度與讀音不對齊、或游標並非
+  ///   位於切斷節點的情況），會回退至直接呼叫 `assembler.dropKey` 的行為。
+  @discardableResult
+  func dropKey(direction: Assembler.TypingDirection) -> Bool {
+    // 先嘗試生成手動覆寫的上下文（如果是從選字窗手動覆寫而來），
+    // 若無上下文，直接讓 Megrez 處理 dropKey。
+    let context = KeyDropContext.getManualOverrideKeyDropContext(
+      for: direction,
+      from: self
+    )
+    guard let context else {
+      guard assembler.dropKey(direction: direction) else { return false }
+      return true
+    }
+    guard assembler.dropKey(direction: direction) else { return false }
+    guard !context.remainingKeys.isEmpty else { return true }
+
+    if context.reapplyCombined(to: self) {
+      return true
+    }
+    context.reapplyPerKey(to: self)
+    return true
+  }
+
   /// 計算鞏固游標上下文時所需的邊界範圍。
   /// - Parameter candidate: 要拿來覆寫的詞音配對。
   /// - Returns: 需要處理的範圍和調試信息。
   private func calculateConsolidationBoundaries(
-    for candidate: Megrez.KeyValuePaired
+    for candidate: Megrez.KeyValuePaired,
+    explicitlyChosen: Bool = false
   )
     -> (range: Range<Int>, debugInfo: String) {
     let currentAssembledSentence = assembler.assembledSentence
@@ -803,7 +987,11 @@ extension InputHandlerProtocol {
       assembler.marker = currentMarker
     }
 
-    if assembler.overrideCandidate(candidate, at: actualNodeCursorPosition) {
+    if assembler.overrideCandidate(
+      candidate,
+      at: actualNodeCursorPosition,
+      isExplicitlyOverridden: false
+    ) {
       assembler.assemble()
       let range = assembler.assembledSentence.contextRange(ofGivenCursor: actualNodeCursorPosition)
       rearBoundaryEX = range.lowerBound
@@ -846,17 +1034,19 @@ extension InputHandlerProtocol {
 
   private func overrideNodeAsWhole(
     _ node: Megrez.GramInPath,
-    at startPosition: Int
+    at startPosition: Int,
+    explicitlyChosen: Bool = false
   )
     -> Bool {
     let candidate = node.asCandidatePair
-    if assembler.overrideCandidate(candidate, at: startPosition) {
+    if assembler.overrideCandidate(candidate, at: startPosition, isExplicitlyOverridden: explicitlyChosen) {
       return true
     }
     if assembler.overrideCandidate(
       candidate,
       at: startPosition,
       overrideType: .withSpecified,
+      isExplicitlyOverridden: explicitlyChosen,
       enforceRetokenization: true
     ) {
       return true
