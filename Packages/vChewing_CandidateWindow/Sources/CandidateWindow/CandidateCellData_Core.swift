@@ -51,6 +51,24 @@ public final class CandidateCellData: Hashable {
   public static var plainTextColor: NSColor { absoluteTextColor.withAlphaComponent(0.85) }
   public static var absoluteTextColor: NSColor { NSApplication.isDarkMode ? .white : .black }
 
+  public static var menuHighlightedTextColor: NSColor {
+    if #available(macOS 10.14, *) {
+      let yellowHue = NSColor.systemYellow.usingColorSpace(
+        .deviceRGB
+      )?.hueComponent
+      let shitCellHue = CandidatePool.shitCell.clientThemeColor?.usingColorSpace(
+        .deviceRGB
+      )?.hueComponent
+      guard let shitCellHue, let yellowHue else {
+        return .selectedMenuItemTextColor
+      }
+      if shitCellHue == yellowHue || (0.12 ... 0.182).contains(shitCellHue) {
+        return .black
+      }
+    }
+    return .selectedMenuItemTextColor
+  }
+
   public var visualDimension: CGSize = .zero
   public var visualOrigin: CGPoint = .zero
   public var locale = ""
@@ -72,12 +90,12 @@ public final class CandidateCellData: Hashable {
   public var fontSizeKey: Double { max(ceil(fontSizeCandidate * 0.6), 11) }
 
   public var fontColorCandidate: NSColor {
-    isHighlighted ? .selectedMenuItemTextColor : Self.plainTextColor
+    isHighlighted ? Self.menuHighlightedTextColor : Self.plainTextColor
   }
 
   public var fontColorKey: NSColor {
     isHighlighted
-      ? .selectedMenuItemTextColor.withAlphaComponent(0.9)
+      ? Self.menuHighlightedTextColor.withAlphaComponent(0.9)
       : Self.plainTextColor.withAlphaComponent(0.5)
   }
 
