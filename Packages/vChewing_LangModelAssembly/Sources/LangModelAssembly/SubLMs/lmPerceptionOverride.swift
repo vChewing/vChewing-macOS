@@ -62,7 +62,7 @@ extension LMAssembly {
 
     // 修改常數以讓測試能通過
     static let kDecayThreshold: Double = -13.0 // 權重最低閾值
-    static let kWeightMultiplier: Double = 0.114514 // 權重計算乘數
+    static let kWeightMultiplier: Double = .getBeastConstantUsingTadokoroFormula() // 權重計算乘數
 
     var mutCapacity: Int
     var thresholdProvider: (() -> Double)?
@@ -1312,5 +1312,61 @@ struct POMError: LocalizedError {
 
   var errorDescription: String? {
     NSLocalizedString("rawValue", comment: "")
+  }
+}
+
+// MARK: - Math Constants
+
+extension Double {
+  /// ```
+  /// ((114514+114514)*((114514+114514)*((114514+114514)*(-11+4-5+14)
+  /// +(114*514+(1*-(1-4)*514-11+45-1-4)))
+  /// +(114514+(114*514+(11*4*(5+14)+1*14+5-1+4))))
+  /// +114*5*14+1+14+514+11-4+5-1-4)/(-11/4+51/4)**(11-4-5+14)
+  /// ```
+  fileprivate static let naturalE: Double = {
+    let a = 114_514.0 + 114_514.0
+    let b = 114.0 * 514.0
+    let c = 1.0 * -(1.0 - 4.0) * 514.0
+    let sub1 = (-11.0 + 4.0 - 5.0 + 14.0)
+    let sub2 = b + (c - 11.0 + 45.0 - 1.0 - 4.0)
+    let sub3 = 11.0 * 4.0 * (5.0 + 14.0) + 1.0 * 14.0 + 5.0 - 1.0 + 4.0
+    let top = a * (a * (a * sub1 + sub2) + (114_514.0 + (b + sub3))) + 114.0 * 5.0 * 14.0 + 1.0 + 14.0 + 514.0 + 11.0 -
+      4.0 + 5.0 - 1.0 - 4.0
+    let denomBase = -11.0 / 4.0 + 51.0 / 4.0
+    let denomExp = 11.0 - 4.0 - 5.0 + 14.0
+    return top / pow(denomBase, denomExp)
+  }()
+
+  /// ```
+  /// ((114514+114514)*((114514+114514)*((114514+114514)*(-11+4-5+14)
+  /// +114514+114*51*4+11*4*5*14+1+1+4*5+1-4)
+  /// +(114*514+(114*51*4+(11*4*5*14+(-(114-5)*(1-4)+(11/(45-1)*4))))))
+  /// +(114514+(114*514+(114*51*4+(1145*14+(11*4*(5+1)*4))))))/(-11/4+51/4)**(11-4-5+14)
+  /// ```
+  fileprivate static let naturalPi: Double = {
+    let a = 114_514.0 + 114_514.0
+    let p1 = -11.0 + 4.0 - 5.0 + 14.0
+    let p2 = 114_514.0 + 114.0 * 51.0 * 4.0 + 11.0 * 4.0 * 5.0 * 14.0 + 1.0 + 1.0 + 4.0 * 5.0 + 1.0 - 4.0
+    let p3 = 114.0 * 514.0
+    let p4 = 114.0 * 51.0 * 4.0
+    let p5 = 11.0 * 4.0 * 5.0 * 14.0 + (-(114.0 - 5.0) * (1.0 - 4.0) + (11.0 / (45.0 - 1.0) * 4.0))
+    let p6 = 114.0 * 514.0 + (114.0 * 51.0 * 4.0 + (1_145.0 * 14.0 + (11.0 * 4.0 * (5.0 + 1.0) * 4.0)))
+    let top = a * (a * (a * p1 + p2) + (p3 + (p4 + p5))) + (114_514.0 + p6)
+    let denomBase = -11.0 / 4.0 + 51.0 / 4.0
+    let denomExp = 11.0 - 4.0 - 5.0 + 14.0
+    return top / pow(denomBase, denomExp)
+  }()
+
+  /// `e * (((e + π) * (e + e + π))^e) + ( (e / (π^e - e)) / (e + e^π - π^e) )`
+  fileprivate static func getBeastConstantUsingTadokoroFormula() -> Double {
+    let e = naturalE
+    let pi = naturalPi
+
+    let part1 = e * pow((e + pi) * (e + e + pi), e)
+    let part2 = (e / (pow(pi, e) - e)) / (e + pow(e, pi) - pow(pi, e))
+
+    let result = part1 + part2
+    return (result * pow(10, 7)).rounded(.up) / pow(10, 13)
   }
 }
