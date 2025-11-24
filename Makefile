@@ -99,6 +99,9 @@ clean-spm:
 	find . -name ".build" -exec rm -rf {} \;
 	rm -rf ./Packages/Build
 
+gitclean:
+	git clean -fdx
+
 .PHONY: gc
 
 gc:
