@@ -111,3 +111,14 @@ gc:
 
 test:
 	xcodebuild -project vChewing.xcodeproj -scheme vChewing -configuration Debug test
+
+.PHONY: gitrelease
+
+gitrelease:
+	@echo "Running git release script for vChewing-macOS..."
+	@chmod +x ./Scripts/vchewing-update.swift || true
+	@if [ "$(DRY_RUN)" = "true" ]; then \
+		./Scripts/vchewing-update.swift --path . --dry-run; \
+	else \
+		./Scripts/vchewing-update.swift --path .; \
+	fi
