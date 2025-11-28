@@ -22,98 +22,53 @@ extension SessionProtocol {
   /// - Note: 本來不用這麼複雜的，奈何 Swift Protocol 不允許給參數指定預設值。
   /// - Parameter newState: 新狀態。
   public func switchState(_ newState: State) {
-    handle(state: newState, replace: true)
-  }
-
-  /// 針對傳入的新狀態進行調度。
-  ///
-  /// 先將舊狀態單獨記錄起來，再將新舊狀態作為參數，
-  /// 根據新狀態本身的狀態種類來判斷交給哪一個專門的函式來處理。
-  /// - Remark: ⚠️ 任何在這個函式當中被改變的變數均不得是靜態 (Static) 變數。
-  /// 針對某一個客體的 deactivateServer() 可能會在使用者切換到另一個客體應用
-  /// 且開始敲字之後才會執行。這個過程會使得不同的 SessionCtl 副本之間出現
-  /// 不必要的互相干涉、打斷彼此的工作。
-  /// - Parameters:
-  ///   - newState: 新狀態。
-  ///   - replace: 是否取代現有狀態。
-  public func handle(state newState: State, replace: Bool) {
-    var previous = state
-    if replace {
-      var newState = newState
-      /// IMK 有如下限制：
-      /// 1. 內文組字區要想顯示游標的話，所有下劃線的粗細必須相等。
-      /// 2. 如果所有線段粗細相等的話，給 client().setMarkedText() 塞入的 selectionRange 的長度必須得是 0。
-      /// 不然的話，游標會頑固地出現在內文組字區的正前方（文字輸入順序上的前方）。
-      /// 3. 從 macOS 14 開始，粗細相等的相鄰下劃線會顯示成一整個線段。該行為改變恐怕是 macOS 故意所為。
-      ///
-      /// 於是乎，此處特地針對 .ofInputtingState 專門將內文組字區的 marker 設定到 cursor 的位置。
-      /// 這是一招隔山打牛的方法，讓此時的 selectionRange 的長度必定是 0。
-      if newState.type == .ofInputting, clientMitigationLevel < 2 {
-        newState.data.marker = newState.data.cursor
-      }
-      state = newState
-    }
-    switch newState.type {
-    case .ofDeactivated:
-      // 這裡移除一些處理，轉而交給 commitComposition() 代為執行。
-      clearInlineDisplay()
-      inputHandler?.clear()
+    let previous = state
+    let next = getMitigatedState(newState)
+    state = next
+    switch next.type {
+    case .ofDeactivated: break // macOS 不再處理 deactivated 狀態。
     case .ofAbortion, .ofCommitting, .ofEmpty:
-      toggleCandidateUIVisibility(false)
-      switch newState.type {
-      case .ofAbortion:
-        previous = .ofEmpty()
-        if replace { state = previous }
-      case .ofCommitting:
-        commit(text: newState.textToCommit)
-        if replace { state = .ofEmpty() }
-      default:
-        if previous.hasComposition {
-          commit(text: previous.displayedText)
-        }
+      if next.type == .ofCommitting {
+        // `commit()` 會自行完成 JIS / 康熙轉換。
+        commit(text: next.textToCommit)
+      } else if next.type == .ofEmpty, previous.hasComposition {
+        // `commit()` 會自行完成 JIS / 康熙轉換。
+        commit(text: previous.displayedText)
       }
-      // 會在工具提示為空的時候自動消除顯示。
-      showTooltip(
-        newState.tooltip,
-        colorState: newState.data.tooltipColorState,
-        duration: newState.tooltipDuration
-      )
-      clearInlineDisplay()
       inputHandler?.clear()
+      if state.type != .ofEmpty {
+        state = .ofEmpty()
+      }
     case .ofInputting:
-      toggleCandidateUIVisibility(false)
-      if !newState.textToCommit.isEmpty {
-        clearInlineDisplay() // WeChat 相容所需。
-        commit(text: newState.textToCommit)
-      }
-      setInlineDisplayWithCursor()
-      // 會在工具提示為空的時候自動消除顯示。
-      showTooltip(
-        newState.tooltip,
-        colorState: newState.data.tooltipColorState,
-        duration: newState.tooltipDuration
-      )
-      if newState.isCandidateContainer {
-        toggleCandidateUIVisibility(true)
-      }
-    case .ofMarking:
-      toggleCandidateUIVisibility(false)
-      setInlineDisplayWithCursor()
-      showTooltip(
-        newState.tooltip,
-        colorState: newState.data.tooltipColorState
-      )
+      commit(text: next.textToCommit, clearDisplayBeforeCommit: true)
+    case .ofMarking: break // 採統一後置處理。
     case .ofAssociates, .ofCandidates, .ofSymbolTable:
       showTooltip(nil)
-      setInlineDisplayWithCursor()
-      toggleCandidateUIVisibility(true)
     }
-    // 浮動組字窗的顯示判定
-    updatePopupDisplayWithCursor()
+    // 會在工具提示為空的時候自動消除顯示。
+    showTooltip(
+      state.tooltip,
+      colorState: state.data.tooltipColorState,
+      duration: state.tooltipDuration
+    )
+    toggleCandidateUIVisibility(state.isCandidateContainer)
+    updateCompositionBufferDisplay()
   }
 
   public func updateCompositionBufferDisplay() {
-    setInlineDisplayWithCursor()
+    let display: Bool? = switch state.type {
+    case .ofDeactivated: nil // macOS 不處理這個狀態。
+    case .ofAbortion, .ofCommitting, .ofEmpty: false
+    case .ofInputting: true
+    case .ofMarking: true
+    case .ofAssociates, .ofCandidates, .ofSymbolTable: true
+    }
+    guard let display else { return }
+    if display {
+      setInlineDisplayWithCursor()
+    } else {
+      clearInlineDisplay()
+    }
     updatePopupDisplayWithCursor()
   }
 
@@ -159,8 +114,12 @@ extension SessionProtocol {
 
   /// 遞交組字區內容。
   /// 注意：必須在 IMK 的 commitComposition 函式當中也間接或者直接執行這個處理。
-  private func commit(text: String) {
+  public func commit(text: String, clearDisplayBeforeCommit: Bool) {
     guard !text.isEmpty else { return }
+    // WeChat 相容所需。
+    if clearDisplayBeforeCommit {
+      clearInlineDisplay()
+    }
     let phE = prefs.phraseReplacementEnabled && text.count > 1
     var text = text.trimmingCharacters(in: .newlines)
     var replaced = false
@@ -188,6 +147,22 @@ extension SessionProtocol {
     } else {
       doCommit(buffer)
     }
+  }
+
+  /// IMK 有如下限制：
+  /// 1. 內文組字區要想顯示游標的話，所有下劃線的粗細必須相等。
+  /// 2. 如果所有線段粗細相等的話，給 client().setMarkedText() 塞入的 selectionRange 的長度必須得是 0。
+  /// 不然的話，游標會頑固地出現在內文組字區的正前方（文字輸入順序上的前方）。
+  /// 3. 從 macOS 14 開始，粗細相等的相鄰下劃線會顯示成一整個線段。該行為改變恐怕是 macOS 故意所為。
+  ///
+  /// 於是乎，此處特地針對 .ofInputtingState 專門將內文組字區的 marker 設定到 cursor 的位置。
+  /// 這是一招隔山打牛的方法，讓此時的 selectionRange 的長度必定是 0。
+  public func getMitigatedState(_ givenState: State) -> State {
+    var givenState = givenState
+    if givenState.type == .ofInputting, clientMitigationLevel < 2 {
+      givenState.data.marker = givenState.data.cursor
+    }
+    return givenState
   }
 
   /// 把 setMarkedText 包裝一下，按需啟用 GCD。

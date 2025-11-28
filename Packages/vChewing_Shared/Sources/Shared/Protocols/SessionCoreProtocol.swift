@@ -26,6 +26,15 @@ public protocol SessionCoreProtocol: AnyObject {
   @discardableResult
   func updateVerticalTypingStatus() -> CGRect
 
+  func toggleCandidateUIVisibility(_ newValue: Bool, refresh: Bool)
+  func commit(text: String, clearDisplayBeforeCommit: Bool)
+  func showTooltip(
+    _ string: String?,
+    colorState: TooltipColorState,
+    duration: Double
+  )
+  func getMitigatedState(_ givenState: State) -> State
+
   /// 針對傳入的新狀態進行調度、且將當前會話控制器的狀態切換至新狀態。
   ///
   /// 先將舊狀態單獨記錄起來，再將新舊狀態作為參數，
@@ -42,6 +51,22 @@ public protocol SessionCoreProtocol: AnyObject {
 extension SessionCoreProtocol {
   public var isCurrentSession: Bool {
     id == ui?.currentSessionID
+  }
+
+  public func toggleCandidateUIVisibility(_ newValue: Bool, refresh: Bool = true) {
+    toggleCandidateUIVisibility(newValue, refresh: refresh)
+  }
+
+  public func commit(text: String, clearDisplayBeforeCommit: Bool = false) {
+    commit(text: text, clearDisplayBeforeCommit: clearDisplayBeforeCommit)
+  }
+
+  public func showTooltip(
+    _ string: String?,
+    colorState: TooltipColorState = .normal,
+    duration: Double = 0
+  ) {
+    showTooltip(string, colorState: colorState, duration: duration)
   }
 }
 

@@ -33,7 +33,7 @@ extension SessionProtocol {
     return client.lineHeightRect(u16Cursor: zeroCursor ? 0 : u16Cursor)
   }
 
-  public func toggleCandidateUIVisibility(_ newValue: Bool, refresh: Bool = true) {
+  public func toggleCandidateUIVisibility(_ newValue: Bool, refresh: Bool) {
     guard isCurrentSession else { return }
     switch (newValue, refresh) {
     case (false, _), (true, false): ui?.candidateUI?.visible = newValue
@@ -43,8 +43,8 @@ extension SessionProtocol {
 
   public func showTooltip(
     _ tooltip: String?,
-    colorState: TooltipColorState = .normal,
-    duration: Double = 0
+    colorState: TooltipColorState,
+    duration: Double
   ) {
     guard isCurrentSession, client() != nil else { return }
     guard let tooltip, !tooltip.isEmpty else {

@@ -229,7 +229,7 @@ extension InputSession {
   /// 也就是說 handle(event:) 完全抓不到這個 Event。
   /// 這時需要在 commitComposition 這一關做一些收尾處理。
   /// - Parameter sender: 呼叫了該函式的客體（無須使用）。
-  public func commitComposition(_ sender: Any!) {
+  public func commitCompositionByOS(_ sender: Any!) {
     _ = sender // 防止格式整理工具毀掉與此對應的參數。
     resetInputHandler()
     clearInlineDisplay()

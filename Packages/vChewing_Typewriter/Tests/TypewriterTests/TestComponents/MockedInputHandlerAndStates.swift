@@ -225,65 +225,37 @@ public final class MockSession: SessionCoreProtocol, CtlCandidateDelegate {
   public var isCandidateState: Bool { state.type == .ofCandidates }
 
   public func switchState(_ newState: MockIMEState) {
-    var previous = state
-    state = newState
-    switch newState.type {
-    case .ofDeactivated:
-      // 這裡移除一些處理，轉而交給 commitComposition() 代為執行。
-      inputHandler?.clear()
-    // if ![.ofAbortion, .ofEmpty].contains(previous.type), !previous.displayedText.isEmpty {
-    //   clearInlineDisplay()
-    // }
+    let previous = state
+    let next = getMitigatedState(newState)
+    state = next
+    switch next.type {
+    case .ofDeactivated: break // macOS 不再處理 deactivated 狀態。
     case .ofAbortion, .ofCommitting, .ofEmpty:
-      innerCircle: switch newState.type {
-      case .ofAbortion:
-        previous = .ofEmpty()
-        state = previous
-      case .ofCommitting:
-        recentCommissions.append(newState.textToCommit)
-        state = .ofEmpty()
-      default: break innerCircle
+      if next.type == .ofCommitting {
+        // `commit()` 會自行完成 JIS / 康熙轉換。
+        commit(text: next.textToCommit)
+      } else if next.type == .ofEmpty, previous.hasComposition {
+        // `commit()` 會自行完成 JIS / 康熙轉換。
+        commit(text: previous.displayedTextConverted)
       }
-      // candidateUI?.visible = false
-      // 全專案用以判斷「.Abortion」的地方僅此一處。
-      // if previous.hasComposition, ![.ofAbortion, .ofCommitting].contains(newState.type) {
-      //   commit(text: previous.displayedText)
-      // }
-      // 會在工具提示為空的時候自動消除顯示。
-      // showTooltip(
-      //   newState.tooltip,
-      //   colorState: newState.data.tooltipColorState,
-      //   duration: newState.tooltipDuration
-      // )
-      // clearInlineDisplay()
       inputHandler?.clear()
-    case .ofInputting: break
-    // candidateUI?.visible = false
-    // if !newState.textToCommit.isEmpty {
-    //   commit(text: newState.textToCommit)
-    // }
-    // setInlineDisplayWithCursor()
-    // 會在工具提示為空的時候自動消除顯示。
-    // showTooltip(
-    //   newState.tooltip,
-    //   colorState: newState.data.tooltipColorState,
-    //   duration: newState.tooltipDuration
-    // )
-    // if newState.isCandidateContainer { showCandidates() }
-    case .ofMarking: break
-    // candidateUI?.visible = false
-    // setInlineDisplayWithCursor()
-    // showTooltip(
-    //   newState.tooltip,
-    //   colorState: newState.data.tooltipColorState
-    // )
-    case .ofAssociates, .ofCandidates, .ofSymbolTable: break
-      // tooltipInstance.hide()
-      // setInlineDisplayWithCursor()
-      // showCandidates()
+      if state.type != .ofEmpty {
+        state = .ofEmpty()
+      }
+    case .ofInputting:
+      commit(text: next.textToCommit, clearDisplayBeforeCommit: true)
+    case .ofMarking: break // 採統一後置處理。
+    case .ofAssociates, .ofCandidates, .ofSymbolTable:
+      showTooltip(nil)
     }
-    // 浮動組字窗的顯示判定
-    // updatePopupDisplayWithCursor()
+    // 會在工具提示為空的時候自動消除顯示。
+    showTooltip(
+      state.tooltip,
+      colorState: state.data.tooltipColorState,
+      duration: state.tooltipDuration
+    )
+    toggleCandidateUIVisibility(state.isCandidateContainer)
+    updateCompositionBufferDisplay()
   }
 
   public func updateCompositionBufferDisplay() {}
@@ -433,4 +405,13 @@ public final class MockSession: SessionCoreProtocol, CtlCandidateDelegate {
     // 有相關需求者，請在切換掉輸入法或者切換至新的客體應用之前敲一下 Shift+Delete。
     switchState(.ofCommitting(textToCommit: textToCommit))
   }
+
+  public func toggleCandidateUIVisibility(_: Bool, refresh _: Bool) {}
+  public func commit(text: String, clearDisplayBeforeCommit _: Bool) {
+    guard !text.isEmpty else { return }
+    recentCommissions.append(text)
+  }
+
+  public func getMitigatedState(_ givenState: State) -> State { givenState }
+  public func showTooltip(_: String?, colorState _: TooltipColorState, duration _: Double) {}
 }

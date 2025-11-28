@@ -20,7 +20,7 @@ import XCTest
 
 extension MainAssemblyTests {
   func test201_InputHandler_HomeEndAndClockKeys() throws {
-    let originalText = prepareBasicComposition(sequence: "dk ru4204ek ")
+    let originalText = prepareBasicComposition(sequence: "dk ru4204el ")
     XCTAssertFalse(originalText.isEmpty)
 
     let originalLength = testHandler.assembler.length
@@ -72,7 +72,7 @@ extension MainAssemblyTests {
 
   func test202_InputHandler_EscapeBehaviorVariants() throws {
     testHandler.prefs.escToCleanInputBuffer = true
-    _ = prepareBasicComposition(sequence: "dk ru4204ek ")
+    _ = prepareBasicComposition(sequence: "dk ru4204el ")
     _ = press(escEvent)
     XCTAssertTrue(testHandler.isComposerOrCalligrapherEmpty)
     XCTAssertEqual(testHandler.assembler.length, 0)
@@ -82,7 +82,7 @@ extension MainAssemblyTests {
     )
 
     testHandler.prefs.escToCleanInputBuffer = false
-    let visibleBeforeEsc = prepareBasicComposition(sequence: "dk ru4204ek ")
+    let visibleBeforeEsc = prepareBasicComposition(sequence: "dk ru4204el ")
     _ = press(escEvent)
     XCTAssertEqual(testClient.toString(), visibleBeforeEsc)
     XCTAssertTrue(testHandler.isComposerOrCalligrapherEmpty)
@@ -105,7 +105,7 @@ extension MainAssemblyTests {
   }
 
   func test203_InputHandler_BackspaceAndDeleteBranches() throws {
-    _ = prepareBasicComposition(sequence: "dk ru4204ek ")
+    _ = prepareBasicComposition(sequence: "dk ru4204el ")
     var nodesBeforeOptionBackspace = testHandler.assembler.assembledSentence.values
     _ = press(optionBackspaceEvent)
     let nodesAfterOptionBackspace = testHandler.assembler.assembledSentence.values
@@ -114,13 +114,13 @@ extension MainAssemblyTests {
     XCTAssertEqual(testSession.state.type, normalizedState.type)
     XCTAssertEqual(testSession.state.displayedText, normalizedState.displayedText)
 
-    _ = prepareBasicComposition(sequence: "dk ru4204ek ")
+    _ = prepareBasicComposition(sequence: "dk ru4204el ")
     let stateBeforeBackspace = testHandler.generateStateOfInputting()
     _ = handleKeyEvent(backspaceEvent)
     normalizedState = testHandler.generateStateOfInputting()
     XCTAssertLessThan(normalizedState.displayedText.count, stateBeforeBackspace.displayedText.count)
 
-    _ = prepareBasicComposition(sequence: "dk ru4204ek ")
+    _ = prepareBasicComposition(sequence: "dk ru4204el ")
     testHandler.prefs.specifyShiftBackSpaceKeyBehavior = 1
     _ = press(shiftBackspaceEvent)
     XCTAssertTrue(testHandler.isComposerOrCalligrapherEmpty)
@@ -130,7 +130,7 @@ extension MainAssemblyTests {
     )
     testHandler.prefs.specifyShiftBackSpaceKeyBehavior = 0 // Default value.
 
-    _ = prepareBasicComposition(sequence: "dk ru4204ek ")
+    _ = prepareBasicComposition(sequence: "dk ru4204el ")
     testHandler.assembler.cursor = 0
     testSession.switchState(testHandler.generateStateOfInputting())
     let stateBeforeForwardDelete = testHandler.generateStateOfInputting()
@@ -141,7 +141,7 @@ extension MainAssemblyTests {
       stateBeforeForwardDelete.displayedText.count
     )
 
-    _ = prepareBasicComposition(sequence: "dk ru4204ek ")
+    _ = prepareBasicComposition(sequence: "dk ru4204el ")
     testHandler.assembler.cursor = 0
     testSession.switchState(testHandler.generateStateOfInputting())
     nodesBeforeOptionBackspace = testHandler.assembler.assembledSentence.values
@@ -178,6 +178,21 @@ extension MainAssemblyTests {
     _ = press(backspaceEvent)
     XCTAssertEqual(testHandler.strCodePointBuffer, "")
     XCTAssertEqual(testHandler.currentTypingMethod, .vChewingFactory)
+  }
+
+  func test204_SwitchStateEmptyCommitsComposition() throws {
+    let prepared = prepareBasicComposition(sequence: "dk ru4204el ")
+    XCTAssertFalse(prepared.isEmpty)
+
+    let bufferedState = testSession.state
+    XCTAssertEqual(bufferedState.type, .ofInputting)
+
+    testClient.clear()
+    testSession.switchState(.ofEmpty())
+
+    XCTAssertEqual(testClient.toString(), bufferedState.displayedText)
+    XCTAssertEqual(testSession.state.type, .ofEmpty)
+    XCTAssertTrue(testHandler.isComposerOrCalligrapherEmpty)
   }
 
   func test205_InputHandler_PunctuationFeaturesAndSymbolMenus() throws {
@@ -307,7 +322,7 @@ extension MainAssemblyTests {
     testSession.switchState(.ofAbortion())
 
     testHandler.prefs.numPadCharInputBehavior = 4
-    let baseline = prepareBasicComposition(sequence: "dk ru4204ek ")
+    let baseline = prepareBasicComposition(sequence: "dk ru4204el ")
     _ = press(keypadSeven)
     var updatedState = testHandler.generateStateOfInputting()
     XCTAssertEqual(updatedState.displayedText, baseline + "7")
@@ -315,7 +330,7 @@ extension MainAssemblyTests {
     testSession.resetInputHandler(forceComposerCleanup: true)
 
     testHandler.prefs.numPadCharInputBehavior = 5
-    let baselineFull = prepareBasicComposition(sequence: "dk ru4204ek ")
+    let baselineFull = prepareBasicComposition(sequence: "dk ru4204el ")
     _ = press(keypadSeven)
     updatedState = testHandler.generateStateOfInputting()
     XCTAssertEqual(
@@ -336,7 +351,7 @@ extension MainAssemblyTests {
     )
 
     testHandler.prefs.upperCaseLetterKeyBehavior = 1
-    let baseline1 = prepareBasicComposition(sequence: "dk ru4204ek ")
+    let baseline1 = prepareBasicComposition(sequence: "dk ru4204el ")
     _ = press(shiftAEvent)
     XCTAssertEqual(testClient.toString(), baseline1 + "a")
     XCTAssertTrue(testSession.state.type == .ofEmpty || testSession.state.type == .ofCommitting)
@@ -344,7 +359,7 @@ extension MainAssemblyTests {
 
     testSession.switchState(.ofAbortion())
     testHandler.prefs.upperCaseLetterKeyBehavior = 2
-    let baseline2 = prepareBasicComposition(sequence: "dk ru4204ek ")
+    let baseline2 = prepareBasicComposition(sequence: "dk ru4204el ")
     _ = press(shiftAEvent)
     XCTAssertEqual(testClient.toString(), baseline2 + "A")
     XCTAssertTrue(testSession.state.type == .ofEmpty || testSession.state.type == .ofCommitting)
@@ -488,7 +503,7 @@ extension MainAssemblyTests {
     testHandler.prefs.specifyShiftTabKeyBehavior = true
 
     func verifyCandidateCall(with eventData: NSEvent.KeyEventData) {
-      _ = prepareBasicComposition(sequence: "dk ru4204ek ")
+      _ = prepareBasicComposition(sequence: "dk ru4204el ")
       _ = press(eventData)
       XCTAssertEqual(testSession.state.type, .ofCandidates)
       XCTAssertFalse(testSession.state.candidates.isEmpty)
