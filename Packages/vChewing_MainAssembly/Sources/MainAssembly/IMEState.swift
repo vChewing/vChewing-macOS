@@ -44,13 +44,24 @@ public struct IMEState: IMEStateProtocol {
   ///   - node: 節點。
   public init(
     _ data: IMEStateData,
-    type: StateType = .ofEmpty,
+    type: StateType = .ofSymbolTable,
     node: CandidateNode
   ) {
     self.data = data
     self.type = type
     self.node = node
     self.data.candidates = node.members.map { ([""], $0.name) }
+    if node.members.isEmpty {
+      var newDisplayTextSegments = [node.name]
+      Self.hardenVerticalPunctuationsIfNeeded(&newDisplayTextSegments)
+      self.data.displayTextSegments = newDisplayTextSegments
+      self.data.cursor = self.data.displayTextSegments.first?.count ?? node.name.count
+      self.data.marker = self.data.cursor
+    } else {
+      self.data.displayTextSegments.removeAll()
+      self.data.cursor = 0
+      self.data.marker = 0
+    }
   }
 
   // MARK: Public
@@ -70,18 +81,21 @@ extension IMEStateProtocol {
   fileprivate init(displayTextSegments: [String], cursor: Int) {
     self.init(.init(), type: .ofEmpty)
     // 注意資料的設定順序，一定得先設定 displayTextSegments。
-    data.displayTextSegments = displayTextSegments.map {
-      if !InputSession.isVerticalTyping { return $0 }
-      guard PrefMgr().hardenVerticalPunctuations else { return $0 }
-      var neta = $0
-      ChineseConverter.hardenVerticalPunctuations(
-        target: &neta,
-        convert: InputSession.isVerticalTyping
-      )
-      return neta
-    }
+    var newDisplayTextSegments = displayTextSegments
+    Self.hardenVerticalPunctuationsIfNeeded(&newDisplayTextSegments)
+    data.displayTextSegments = newDisplayTextSegments
     data.cursor = cursor
     data.marker = cursor
+  }
+
+  fileprivate static func hardenVerticalPunctuationsIfNeeded(_ target: inout [String]) {
+    if !InputSession.isVerticalTyping || !PrefMgr().hardenVerticalPunctuations { return }
+    target.indices.forEach { i in
+      ChineseConverter.hardenVerticalPunctuations(
+        target: &target[i],
+        convert: true
+      )
+    }
   }
 
   public static func ofDeactivated() -> IMEState { .init(type: .ofDeactivated) }
