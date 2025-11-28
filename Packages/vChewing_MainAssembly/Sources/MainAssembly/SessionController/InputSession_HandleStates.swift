@@ -21,7 +21,14 @@ extension SessionProtocol {
   /// 不必要的互相干涉、打斷彼此的工作。
   /// - Note: 本來不用這麼複雜的，奈何 Swift Protocol 不允許給參數指定預設值。
   /// - Parameter newState: 新狀態。
-  public func switchState(_ newState: State) {
+  public func switchState(_ newState: State, caller: StaticString, line: Int) {
+    if prefs.isDebugModeEnabled || UserDefaults.pendingUnitTests {
+      let stateStr = "\(state.type.rawValue) -> \(newState.type.rawValue)"
+      let callerTag = "\(caller)@[L\(line)]"
+      let stack = Thread.callStackSymbols.prefix(7).joined(separator: "\n")
+      vCLog("StateChanging: \(stateStr), tag: \(callerTag);\nstack: \(stack)")
+    }
+    // 正式處理。
     let previous = state
     let next = getMitigatedState(newState)
     state = next
