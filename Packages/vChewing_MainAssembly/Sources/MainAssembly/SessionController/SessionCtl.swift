@@ -120,8 +120,8 @@ extension SessionCtl {
   /// 這時需要在 commitComposition 這一關做一些收尾處理。
   /// - Parameter sender: 呼叫了該函式的客體（無須使用）。
   override public func commitComposition(_ sender: Any!) {
-    core.commitComposition(sender)
-    // super.commitComposition(sender)  // 這句不要引入，否則每次切出輸入法時都會死當。
+    core.commitCompositionByOS(sender)
+    // `super.commitComposition(sender)` 這句不要引入，否則每次切出輸入法時都會死當。
   }
 
   /// 指定輸入法要遞交出去的內容（雖然 InputMethodKit 可能並不會真的用到這個函式）。
