@@ -9,7 +9,11 @@
 import Foundation
 
 extension CandidateNode {
-  public static func load(url: URL) {
+  public static func load(url: URL? = nil) {
+    guard let url, url.isFileURL else {
+      Self.root = defaultSymbolRoot
+      return
+    }
     asyncOnMain {
       // 這兩個變數單獨拿出來，省得每次都重建還要浪費算力。
       var arrLines = [String.SubSequence]()
