@@ -410,4 +410,28 @@ extension InputHandlerTests {
 
     vCTestLog("成功完成羅馬數字空格鍵測試。")
   }
+
+  func test_IH109_SymbolMenuKeyTablePreviewInCompositionBuffer() throws {
+    guard let testHandler, let testSession else {
+      XCTFail("testHandler and testSession at least one of them is nil.")
+      return
+    }
+    CandidateNode.load()
+    let event4SymbolMenu = KBEvent.KeyEventData.symbolMenuKeyEventIntl.asEvent
+    testSession.resetInputHandler(forceComposerCleanup: true)
+    XCTAssert(testHandler.triageInput(event: event4SymbolMenu))
+    XCTAssertEqual(testSession.state.type, .ofSymbolTable)
+
+    testSession.candidatePairHighlightChanged(at: 0)
+    XCTAssertEqual(testSession.state.highlightedCandidateIndex, 0)
+    XCTAssertEqual(testSession.state.displayedTextConverted, "　")
+
+    testSession.candidatePairHighlightChanged(at: 1)
+    XCTAssertEqual(testSession.state.highlightedCandidateIndex, 1)
+    XCTAssertEqual(testSession.state.displayedTextConverted, "｀")
+
+    testSession.candidatePairHighlightChanged(at: 2)
+    XCTAssertEqual(testSession.state.highlightedCandidateIndex, 2)
+    XCTAssertEqual(testSession.state.displayedTextConverted, "")
+  }
 }

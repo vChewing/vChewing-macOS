@@ -56,6 +56,10 @@ extension KBEvent.KeyEventData {
     chars: KBEvent.SpecialKey.backspace.unicodeScalar.description,
     keyCode: KeyCode.kBackSpace.rawValue
   )
+  static let symbolMenuKeyEventIntl = KBEvent.KeyEventData(
+    chars: "`",
+    keyCode: KeyCode.kSymbolMenuPhysicalKeyIntl.rawValue
+  )
 }
 
 extension KBEvent {
