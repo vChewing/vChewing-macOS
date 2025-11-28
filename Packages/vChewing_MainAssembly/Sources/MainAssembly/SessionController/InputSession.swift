@@ -191,14 +191,11 @@ extension InputSession {
     if isCurrentSession {
       hidePalettes()
     }
-    asyncOnMain { [weak self] in
-      guard let this = self else { return }
-      let newMode: Shared
-        .InputMode = .init(rawValue: value as? String ?? this.prefs.mostRecentInputMode) ??
-        .imeModeNULL
-      if this.inputMode != newMode {
-        this.inputMode = newMode
-      }
+    let newMode: Shared.InputMode = .init(
+      rawValue: value as? String ?? prefs.mostRecentInputMode
+    ) ?? .imeModeNULL
+    if inputMode != newMode {
+      inputMode = newMode
     }
   }
 
