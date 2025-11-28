@@ -224,7 +224,14 @@ public final class MockSession: SessionCoreProtocol, CtlCandidateDelegate {
 
   public var isCandidateState: Bool { state.type == .ofCandidates }
 
-  public func switchState(_ newState: MockIMEState) {
+  public func switchState(_ newState: MockIMEState, caller: StaticString, line: Int) {
+    if PrefMgr().isDebugModeEnabled || UserDefaults.pendingUnitTests {
+      let stateStr = "\(state.type.rawValue) -> \(newState.type.rawValue)"
+      let callerTag = "\(caller)@[L\(line)]"
+      let stack = Thread.callStackSymbols.prefix(7).joined(separator: "\n")
+      vCLog("StateChanging: \(stateStr), tag: \(callerTag);\nstack: \(stack)")
+    }
+    // 正式處理。
     let previous = state
     let next = getMitigatedState(newState)
     state = next

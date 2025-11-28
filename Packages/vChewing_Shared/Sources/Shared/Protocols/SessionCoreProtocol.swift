@@ -45,10 +45,14 @@ public protocol SessionCoreProtocol: AnyObject {
   /// 不必要的互相干涉、打斷彼此的工作。
   /// - Note: 本來不用這麼複雜的，奈何 Swift Protocol 不允許給參數指定預設值。
   /// - Parameter newState: 新狀態。
-  func switchState(_ newState: State)
+  func switchState(_ newState: State, caller: StaticString, line: Int)
 }
 
 extension SessionCoreProtocol {
+  public func switchState(_ newState: State, caller: StaticString = #function, line: Int = #line) {
+    switchState(newState, caller: caller, line: line)
+  }
+
   public var isCurrentSession: Bool {
     id == ui?.currentSessionID
   }
