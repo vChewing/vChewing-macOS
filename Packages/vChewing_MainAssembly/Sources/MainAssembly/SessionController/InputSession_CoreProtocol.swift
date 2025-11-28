@@ -163,7 +163,7 @@ extension SessionProtocol {
       return
     }
     let status = "NotificationSwitchRevolver".localized
-    asyncOnMain {
+    asyncOnMain(bypassAsync: UserDefaults.pendingUnitTests) {
       Notifier.notify(
         message: nowMode.reversed.localizedDescription + "\n" + status
       )
@@ -173,7 +173,7 @@ extension SessionProtocol {
 
   /// 所有建構子都會執行的共用部分，在 super.init() 之後執行。
   public func construct(client theClient: (IMKTextInput & NSObjectProtocol)? = nil) {
-    asyncOnMain { [weak self] in
+    asyncOnMain(bypassAsync: UserDefaults.pendingUnitTests) { [weak self] in
       guard let this = self else { return }
       // 關掉所有之前的副本的視窗。
       Self.current?.hidePalettes()
@@ -206,7 +206,7 @@ extension SessionProtocol {
 
   /// 強制重設當前鍵盤佈局、使其與偏好設定同步。
   public func setKeyLayout() {
-    asyncOnMain { [weak self] in
+    asyncOnMain(bypassAsync: UserDefaults.pendingUnitTests) { [weak self] in
       guard let this = self else { return }
       guard let client = this.client(), !this.isServingIMEItself else { return }
       if this.isASCIIMode, IMKHelper.isDynamicBasicKeyboardLayoutEnabled {
@@ -227,7 +227,7 @@ extension SessionProtocol {
   }
 
   public func performServerDeactivation() {
-    guard Self.current?.id != self.id else { return }
+    guard Self.current?.id != id else { return }
     isActivated = false
     // `resetInputHandler()` 會自動搞定 Empty 狀態。
     resetInputHandler(commitExisting: false)
@@ -238,109 +238,71 @@ extension SessionProtocol {
   public func performServerActivation(client: ClientObj?) {
     hidePalettes()
     syncCurrentSessionID()
-    let activation1 = { [weak self] in
-      guard let this = self else { return }
-      if let senderBundleID: String = client?.bundleIdentifier() {
-        vCLog("activateServer(\(senderBundleID))")
-        this.isServingIMEItself = Bundle.main.bundleIdentifier == senderBundleID
-        this.clientBundleIdentifier = senderBundleID
-        // 只要使用者沒有勾選檢查更新、沒有主動做出要檢查更新的操作，就不要檢查更新。
-        if this.prefs.checkUpdateAutomatically {
+    let this = self
+    if let senderBundleID: String = client?.bundleIdentifier() {
+      vCLog("activateServer(\(senderBundleID))")
+      this.isServingIMEItself = Bundle.main.bundleIdentifier == senderBundleID
+      this.clientBundleIdentifier = senderBundleID
+      // 只要使用者沒有勾選檢查更新、沒有主動做出要檢查更新的操作，就不要檢查更新。
+      if this.prefs.checkUpdateAutomatically {
+        asyncOnMain(bypassAsync: UserDefaults.pendingUnitTests) {
           AppDelegate.shared.checkUpdate(forced: false) {
             senderBundleID == "com.apple.SecurityAgent"
           }
         }
-        // 檢查當前客體軟體是否採用 Web 技術構築（例：Electron）。
-        this.isClientElectronBased =
-          NSRunningApplication
-            .isElectronBasedApp(identifier: senderBundleID)
       }
+      // 檢查當前客體軟體是否採用 Web 技術構築（例：Electron）。
+      this.isClientElectronBased =
+        NSRunningApplication
+          .isElectronBasedApp(identifier: senderBundleID)
     }
-    if UserDefaults.pendingUnitTests {
-      activation1()
-    } else {
-      asyncOnMain(execute: activation1)
+    // 自動啟用肛塞（廉恥模式），除非這一天是愚人節。
+    if !Date.isTodayTheDate(from: 0_401), !this.prefs.shouldNotFartInLieuOfBeep {
+      this.prefs.shouldNotFartInLieuOfBeep = true
     }
-    let activation2 = { [weak self] in
-      guard let this = self else { return }
-      // 自動啟用肛塞（廉恥模式），除非這一天是愚人節。
-      if !Date.isTodayTheDate(from: 0_401), !this.prefs.shouldNotFartInLieuOfBeep {
-        this.prefs.shouldNotFartInLieuOfBeep = true
-      }
+    if this.inputMode != IMEApp.currentInputMode {
+      this.inputMode = IMEApp.currentInputMode
     }
-    if UserDefaults.pendingUnitTests {
-      activation2()
-    } else {
-      asyncOnMain(execute: activation2)
-    }
-    let activation3 = { [weak self] in
-      guard let this = self else { return }
-      if this.inputMode != IMEApp.currentInputMode {
-        this.inputMode = IMEApp.currentInputMode
-      }
-    }
-    if UserDefaults.pendingUnitTests {
-      activation3()
-    } else {
-      asyncOnMain(execute: activation3)
-    }
-    let activation4 = {
-      // 選字窗不用管，交給新的 Session 的 ActivateServer 來管理。
+    // 選字窗不用管，交給新的 Session 的 ActivateServer 來管理。
+    asyncOnMain(bypassAsync: UserDefaults.pendingUnitTests) {
       CtlCandidateTDK.currentMenu?.cancelTracking()
       CtlCandidateTDK.currentMenu = nil
       CtlCandidateTDK.currentWindow?.orderOut(nil)
       CtlCandidateTDK.currentWindow = nil
     }
-    if UserDefaults.pendingUnitTests {
-      activation4()
-    } else {
-      asyncOnMain(execute: activation4)
+
+    // 下面這段步驟 無論 isActivated 是否為 true 都得執行。
+    // 不然的話，可能會在 FileSaveDialog 內無法正常打字（所有 events 全部被忽略掉）。
+    // 這裡不需要 setValue()，因為 IMK 會在自動呼叫 activateServer() 之後自動執行 setValue()。
+    this.initInputHandler()
+    this.synchronizer4LMPrefs?()
+    let shiftKeyDetector = this.ui?.shiftKeyUpChecker
+    if let shiftKeyDetector {
+      shiftKeyDetector.toggleWithLShift =
+        this.prefs
+          .togglingAlphanumericalModeWithLShift
+      shiftKeyDetector.toggleWithRShift =
+        this.prefs
+          .togglingAlphanumericalModeWithRShift
     }
-    let activation5 = { [weak self] in
-      guard let this = self else { return }
-      if this.isActivated { return }
-
-      // 這裡不需要 setValue()，因為 IMK 會在自動呼叫 activateServer() 之後自動執行 setValue()。
-      this.initInputHandler()
-      this.synchronizer4LMPrefs?()
-
-      let shiftKeyDetector = this.ui?.shiftKeyUpChecker
-      if let shiftKeyDetector {
-        shiftKeyDetector.toggleWithLShift =
-          this.prefs
-            .togglingAlphanumericalModeWithLShift
-        shiftKeyDetector.toggleWithRShift =
-          this.prefs
-            .togglingAlphanumericalModeWithRShift
-      }
-
-      if this.isASCIIMode, !IMEApp.isKeyboardJIS {
-        if #available(macOS 10.15, *) {
-          if let shiftKeyDetector, !shiftKeyDetector.enabled {
-            this.isASCIIMode = false
-          }
-        } else {
+    if this.isASCIIMode, !IMEApp.isKeyboardJIS {
+      if #available(macOS 10.15, *) {
+        if let shiftKeyDetector, !shiftKeyDetector.enabled {
           this.isASCIIMode = false
         }
-      }
-
-      let memoryCheck = {
-        _ = AppDelegate.shared.checkMemoryUsage()
-      }
-      if UserDefaults.pendingUnitTests {
-        memoryCheck()
       } else {
-        asyncOnMain(execute: memoryCheck)
+        this.isASCIIMode = false
       }
-
-      this.state = .ofEmpty()
-      this.isActivated = true // 登記啟用狀態。
-      this.setKeyLayout()
     }
-    if UserDefaults.pendingUnitTests {
-      activation5()
-    } else {
-      asyncOnMain(execute: activation5)
+
+    this.state = .ofEmpty()
+    this.isActivated = true // 登記啟用狀態。
+    this.setKeyLayout()
+
+    if !UserDefaults.pendingUnitTests {
+      asyncOnMain {
+        AppDelegate.shared.checkMemoryUsage()
+      }
     }
   }
 }

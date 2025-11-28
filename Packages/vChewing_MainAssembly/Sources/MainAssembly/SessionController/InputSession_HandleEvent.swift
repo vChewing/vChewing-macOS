@@ -78,7 +78,7 @@ extension SessionProtocol {
     // Caps Lock 通知與切換處理，要求至少 macOS 12 Monterey。
     if #available(macOS 12, *) {
       if event.type == .flagsChanged, event.keyCode == KeyCode.kCapsLock.rawValue {
-        asyncOnMain { [weak self] in
+        asyncOnMain(bypassAsync: UserDefaults.pendingUnitTests) { [weak self] in
           guard let this = self else { return }
           let isCapsLockTurnedOn = this.ui?.capsLockToggler?.isOn ?? false
           if this.prefs.shiftEisuToggleOffTogetherWithCapsLock, !isCapsLockTurnedOn,

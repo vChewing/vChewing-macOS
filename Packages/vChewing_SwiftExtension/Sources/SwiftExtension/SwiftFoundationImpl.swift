@@ -291,8 +291,13 @@ extension String {
 // MARK: - Async Task
 
 public func asyncOnMain(
+  bypassAsync: Bool = false,
   execute work: @escaping @convention(block) () -> ()
 ) {
+  guard !bypassAsync else {
+    work()
+    return
+  }
   if #available(macOS 10.15, *) {
     Task { @MainActor in
       work()
@@ -304,8 +309,13 @@ public func asyncOnMain(
 
 public func asyncOnMain(
   after delayInterval: TimeInterval,
+  bypassAsync: Bool = false,
   execute work: @escaping @convention(block) () -> ()
 ) {
+  guard !bypassAsync else {
+    work()
+    return
+  }
   let delayInterval = Swift.max(0, delayInterval)
   if #available(macOS 10.15, *) {
     Task { @MainActor in

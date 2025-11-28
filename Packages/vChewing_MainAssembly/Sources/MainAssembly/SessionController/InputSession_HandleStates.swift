@@ -147,11 +147,7 @@ extension SessionProtocol {
       )
     }
 
-    if isServingIMEItself {
-      asyncOnMain {
-        doCommit(buffer)
-      }
-    } else {
+    asyncOnMain(bypassAsync: !isServingIMEItself || UserDefaults.pendingUnitTests) {
       doCommit(buffer)
     }
   }
@@ -187,19 +183,14 @@ extension SessionProtocol {
     else { return }
     recentMarkedText.text = string
     recentMarkedText.selectionRange = range
-    if allowAsync, isServingIMEItself || !isActivated {
-      asyncOnMain { [weak self] in
-        guard let this = self, let client = this.client() else { return }
-        client.setMarkedText(
-          newString,
-          selectionRange: range,
-          replacementRange: this.replacementRange()
-        )
-      }
-    } else {
-      guard let client = client() else { return }
+    var async = allowAsync && !UserDefaults.pendingUnitTests
+    async = async && (isServingIMEItself || !isActivated)
+    asyncOnMain(bypassAsync: !async) { [weak self] in
+      guard let this = self, let client = this.client() else { return }
       client.setMarkedText(
-        string, selectionRange: range, replacementRange: replacementRange()
+        newString,
+        selectionRange: range,
+        replacementRange: this.replacementRange()
       )
     }
   }
