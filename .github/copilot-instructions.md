@@ -58,6 +58,8 @@ This file provides GitHub Copilot-specific coding instructions. For comprehensiv
 - Only for local Copilot: Unless being specifically told, please Do Not Touch those lexicon scripts (and compiled lexicon targets) compiled in the git-submodule `libvchewing-data`.
 - The platforms in Swift package manifest file is ignored on non-Darwin platforms. Swift FOSS Foundation APIs on Darwin can be unavailable on earlier macOS releases due to Apple's deliberate intention of never backporting new Foundation APIs. Your removal of platforms can make some of those components not able to be compiled against macOS releases earlier than macOS 11.
 - Most vChewing-specific packages prefer to use a dedicated file to handle `@_exported import XXX` dependency definitions to avoid insertion of `import XXX` to all files having codes dependent to `XXX`. This makes code-mirroring tasks (to the legacy repository of vChewing) much easier. Try not to break this convention if possible.
+- Always confirm the current type of shell you are using (e.g., `powershell` or `zsh` or `bash`) before executing shell commands / writing shell scripts.
+- If your current environment is macOS, please hesitate your use of python3 scripts unless being specifically told. Instead, prioritize powershell scripts or csharp scripts while running on macOS. If both powershell and csharp scripts are not available, you can use Swift scripts as the last resort. If Swift can't do it, use `python3` in lieu of `python`.
 
 ## Reference Files and Folders
 - `./Packages/vChewing_MainAssembly/Sources/MainAssembly/SessionController/`: `SessionCtl.swift` is the IMK entry point working with candidate window, IME settings, etc. However, most of its tasks are delegated to `InputSession*.swift` files in this folder.
