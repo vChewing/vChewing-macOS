@@ -374,4 +374,51 @@ extension MainAssemblyTests {
     }
     vCTestLog("成功完成碼點輸入測試。")
   }
+
+  /// 測試在內文組字區對 SymbolTable 狀態的選字窗的高亮內容的預覽。
+  func test110_InputHandler_SymbolMenuKeyTablePreviewInCompositionBuffer() throws {
+    CandidateNode.load()
+    handleKeyEvent(symbolMenuKeyEventIntl)
+    XCTAssertEqual(testSession.state.type, .ofSymbolTable)
+
+    testSession.candidatePairHighlightChanged(at: 0)
+    XCTAssertEqual(testSession.state.highlightedCandidateIndex, 0)
+    XCTAssertEqual(testSession.state.displayedTextConverted, "　")
+    XCTAssertEqual(testSession.state.displayTextSegments, ["　"])
+    XCTAssertEqual(testSession.state.attributedString.string, "　")
+
+    testSession.candidatePairHighlightChanged(at: 1)
+    XCTAssertEqual(testSession.state.highlightedCandidateIndex, 1)
+    XCTAssertEqual(testSession.state.displayedTextConverted, "｀")
+    XCTAssertEqual(testSession.state.displayTextSegments, ["｀"])
+    XCTAssertEqual(testSession.state.attributedString.string, "｀")
+
+    testSession.candidatePairHighlightChanged(at: 2)
+    XCTAssertEqual(testSession.state.highlightedCandidateIndex, 2)
+    XCTAssertEqual(testSession.state.displayedTextConverted, "")
+    XCTAssertEqual(testSession.state.displayTextSegments, [])
+    XCTAssertEqual(
+      testSession.state.attributedString.string,
+      testSession.state.data.attributedStringPlaceholder.string
+    )
+  }
+
+  func test111_InputHandler_SymbolTableInitSetsDisplaySegments() throws {
+    CandidateNode.load()
+    // 選一個有子元件的候選節點（Leaf Candidate）。
+    let root = CandidateNode.root
+    var leafCandidate: CandidateNode?
+    func findLeaf(_ node: CandidateNode) {
+      if leafCandidate != nil { return }
+      if node.members.isEmpty { leafCandidate = node; return }
+      for m in node.members { findLeaf(m) }
+    }
+    findLeaf(root)
+    guard let leaf = leafCandidate else { XCTFail("No leaf candidate found."); return }
+    testSession.switchState(.ofSymbolTable(node: leaf))
+    XCTAssertEqual(testSession.state.type, .ofSymbolTable)
+    XCTAssertFalse(testSession.state.node.name.isEmpty)
+    XCTAssertEqual(testSession.state.data.displayTextSegments, [testSession.state.node.name])
+    XCTAssertEqual(testSession.state.data.displayedText, testSession.state.node.name)
+  }
 }

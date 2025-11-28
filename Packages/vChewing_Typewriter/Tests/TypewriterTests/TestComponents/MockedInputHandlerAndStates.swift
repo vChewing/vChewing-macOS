@@ -45,6 +45,16 @@ public struct MockIMEState: IMEStateProtocol {
     self.type = type
     self.node = node
     self.data.candidates = node.members.map { ([""], $0.name) }
+    if node.members.isEmpty {
+      self.data.displayTextSegments = [node.name]
+      self.data.cursor = node.name.count
+      self.data.marker = self.data.cursor
+    } else {
+      self.data.displayTextSegments.removeAll()
+      self.data.displayedText.removeAll()
+      self.data.cursor = 0
+      self.data.marker = 0
+    }
   }
 
   // MARK: Public
