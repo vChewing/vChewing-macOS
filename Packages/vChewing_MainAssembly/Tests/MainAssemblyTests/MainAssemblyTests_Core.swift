@@ -162,6 +162,10 @@ final class MainAssemblyTests: XCTestCase {
     charsSansModifiers: NSEvent.SpecialKey.delete.unicodeScalar.description,
     keyCode: KeyCode.kBackSpace.rawValue
   )
+  let symbolMenuKeyEventIntl = NSEvent.KeyEventData(
+    chars: "`",
+    keyCode: KeyCode.kSymbolMenuPhysicalKeyIntl.rawValue
+  )
   let symbolMenuKeyEventIntlWithOpt = NSEvent.KeyEventData(
     type: .keyDown,
     flags: .option,
