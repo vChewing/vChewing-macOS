@@ -375,7 +375,27 @@ public final class MockSession: SessionCoreProtocol, CtlCandidateDelegate {
     }
   }
 
-  public func candidatePairHighlightChanged(at index: Int?) {}
+  public func candidatePairHighlightChanged(at theIndex: Int?) {
+    guard let inputHandler = inputHandler else { return }
+    guard state.highlightedCandidateIndex != theIndex else { return }
+    state.highlightedCandidateIndex = theIndex
+    guard state.isCandidateContainer, let theIndex else { return }
+    switch state.type {
+    case .ofCandidates where (0 ..< state.candidates.count).contains(theIndex):
+      inputHandler.previewCurrentCandidateAtCompositionBuffer()
+    case .ofSymbolTable where (0 ..< state.node.members.count).contains(theIndex):
+      let node = state.node.members[theIndex]
+      if node.members.isEmpty {
+        state.data.displayedText = node.name
+        state.data.cursor = node.name.count
+      } else {
+        state.data.displayedText.removeAll()
+        state.data.cursor = 0
+      }
+      updateCompositionBufferDisplay()
+    default: break
+    }
+  }
 
   public func candidatePairContextMenuActionTriggered(
     at index: Int, action: CandidateContextMenuAction
