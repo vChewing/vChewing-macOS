@@ -197,11 +197,13 @@ extension SessionProtocol {
     case .ofSymbolTable where (0 ..< state.node.members.count).contains(theIndex):
       let node = state.node.members[theIndex]
       if node.members.isEmpty {
-        state.data.displayedText = node.name
+        state.data.displayTextSegments = [node.name] // 會同步更新 `displayedText`。
         state.data.cursor = node.name.count
+        state.data.marker = state.data.cursor
       } else {
-        state.data.displayedText.removeAll()
+        state.data.displayTextSegments.removeAll() // 會同步更新 `displayedText`。
         state.data.cursor = 0
+        state.data.marker = 0
       }
       updateCompositionBufferDisplay()
     default: break
