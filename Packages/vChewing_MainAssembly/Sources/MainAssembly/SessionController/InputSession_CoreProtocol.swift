@@ -115,8 +115,15 @@ extension SessionProtocol {
   }
 
   /// 重設輸入調度模組，會將當前尚未遞交的內容遞交出去。
-  public func resetInputHandler(forceComposerCleanup forceCleanup: Bool = false) {
+  public func resetInputHandler(
+    forceComposerCleanup forceCleanup: Bool = false,
+    commitExisting: Bool = true
+  ) {
     guard let inputHandler = inputHandler else { return }
+    guard commitExisting else {
+      switchState(.ofEmpty())
+      return
+    }
     var textToCommit = ""
     // 過濾掉尚未完成拼寫的注音。
     let sansReading: Bool =
@@ -220,20 +227,12 @@ extension SessionProtocol {
   }
 
   public func performServerDeactivation() {
-    let deactivation = { [weak self] in
-      guard let this = self else { return }
-      this.isActivated = false
-      // `resetInputHandler()` 會自動搞定 Empty 狀態。
-      this.resetInputHandler()
-      // macOS 不再處理 deactivated 狀態。
-      // 不需要淨空 inputHandler。真的需要淨空的時候會由
-      // 選字窗不用管，交給新的 Session 的 ActivateServer 來管理。
-    }
-    if UserDefaults.pendingUnitTests {
-      deactivation()
-    } else {
-      asyncOnMain(execute: deactivation)
-    }
+    guard Self.current?.id != self.id else { return }
+    isActivated = false
+    // `resetInputHandler()` 會自動搞定 Empty 狀態。
+    resetInputHandler(commitExisting: false)
+    // macOS 不再處理 deactivated 狀態。
+    // 選字窗不用管，交給新的 Session 的 ActivateServer 來管理。
   }
 
   public func performServerActivation(client: ClientObj?) {
