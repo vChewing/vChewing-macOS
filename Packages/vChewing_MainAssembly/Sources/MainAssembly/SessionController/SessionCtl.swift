@@ -99,7 +99,16 @@ extension SessionCtl {
     client sender: Any?
   )
     -> Bool {
-    core.handleNSEvent(event, client: sender)
+    let result = core.handleNSEvent(event, client: sender)
+    if !result, PrefMgr.shared.isDebugModeEnabled {
+      let stack = Thread.callStackSymbols.prefix(7).joined(separator: "\n")
+      if let newEvent = event?.copyAsKBEvent {
+        vCLog("OmitNSEvent: \(newEvent);\nstack: \(stack)")
+      } else {
+        vCLog("OmitNSEvent: [RAW]\(event.debugDescription);\nstack: \(stack)")
+      }
+    }
+    return result
   }
 
   /// 該函式的回饋結果決定了輸入法會攔截且捕捉哪些類型的輸入裝置操作事件。
