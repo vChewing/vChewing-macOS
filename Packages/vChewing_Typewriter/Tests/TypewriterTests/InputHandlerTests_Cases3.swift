@@ -10,6 +10,7 @@ import Foundation
 import Megrez
 import MegrezTestComponents
 import Shared
+import Tekkon
 import XCTest
 
 @testable import LangModelAssembly
@@ -36,10 +37,10 @@ extension InputHandlerTests {
       let cells = currentLine.split(separator: " ")
       guard cells.count >= 3 else { return }
       guard ["liu2-yi4", "liu2", "yi4"].contains(cells[0]) else { return }
-      let readingArray: [String] = cells[0]
-        .replacingOccurrences(of: "liu2", with: "ㄌㄧㄡˊ")
-        .replacingOccurrences(of: "yi4", with: "ㄧˋ")
-        .split(separator: "-").map(\.description)
+      let readingChainPinyin = cells[0]
+      let readingArray: [String] = Tekkon.cnvHanyuPinyinToPhona(
+        targetJoined: readingChainPinyin.description
+      ).split(separator: "-").map(\.description)
       let cellScoreStr = cells[2].description
       guard let cellScore = Double(cellScoreStr) else { return }
       let unigram = Megrez.Unigram(
