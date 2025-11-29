@@ -230,7 +230,7 @@
 "i18n:UserDef.kCandidateNarrationToggleType.shortTitle" = "候補読み上げモード:";
 "i18n:userdef.kCheckAbusersOfSecureEventInputAPI.description" = "このような不正利用は「システム内蔵入力以外の全ての入力アプリがメニューで灰色状態で選べなくて使えない」の元凶である。センシティブな資料の記入どころでSecureEventInputをEnableSecureEventInput()で使うのは当然であるが、「入力中」状態が終わった後必ずDisableSecureEventInput()で状態解消すべきだと義務である。いくつかヘルパーアプリも、あるいはSecureEventInputを呼び起こしてからすぐ固まったアプリも、この状態になりやすい。特に、他のアプリの画面へ切り替えたとしても、固まったアプリのSecureEventInput状態は自動的に解消できぬ。";
 "i18n:UserDef.kCheckAbusersOfSecureEventInputAPI.shortTitle" = "SecureEventInput API を不正利用しているバクグラウンド・プロセスを自動検知";
-"i18n:UserDef.kCNS11643Enabled.shortTitle" = "全字庫モード // 入力可能な漢字数を倍増す (2025-09-30)";
+"i18n:UserDef.kCNS11643Enabled.shortTitle" = "全字庫モード // 入力可能な漢字数を倍増す (2025-11-10)";
 "i18n:UserDef.kCursorPlacementAfterSelectingCandidate.description" = "候補陳列ウィンドウで候補を確定した後のカーソル位置を指定します。なお、「候補陳列ウィンドウ呼び出し前のカーソル位置」とは、候補陳列ウィンドウが表示される直前に記録されたカーソル位置を意味します。前方へ一歩進める設定を選んだ場合、その歩幅はお好みのカーソル候補呼出操作スタイルによって変わる場合がございます。";
 "i18n:UserDef.kCursorPlacementAfterSelectingCandidate.option.0" = "調整しない";
 "i18n:UserDef.kCursorPlacementAfterSelectingCandidate.option.1" = "前へ一歩進める";
