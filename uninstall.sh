@@ -26,7 +26,7 @@ rm ~/Library/Receipts/org.atelierInmu.vChewing.plist
 rm -rf ~/Library/Preferences/org.atelierInmu.inputmethod.vChewing.plist
 
 # If you have ever tried the initial alpha builds of vChewing, you also remove:
-# 如果您有使用過早於威注音 1.2.0 的威注音內部測試版本的話，對應的輸入法偏好設定檔案：
+# 如果您有使用過早於唯音 1.2.0 的唯音內部測試版本的話，對應的輸入法偏好設定檔案：
 rm -rf ~/Library/Preferences/org.openvanilla.inputmethod.vChewing.plist
 
 # If it is not properly installed, you also check the following possible paths to remove:

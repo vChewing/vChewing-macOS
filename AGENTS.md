@@ -1,6 +1,6 @@
 # AGENTS.md
 
-This handbook briefs AI coding assistants on the vChewing (威注音) macOS repository. Use only English or zh-Hant-TW for docs/comments/reviews; zh-Hans is allowed only in filename stems ending with -CHS.
+This handbook briefs AI coding assistants on the vChewing (唯音) macOS repository. Use only English or zh-Hant-TW for docs/comments/reviews; zh-Hans is allowed only in filename stems ending with -CHS.
 
 ## 1. Project Snapshot
 

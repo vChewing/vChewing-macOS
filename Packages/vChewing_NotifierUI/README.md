@@ -1,6 +1,6 @@
 # NotifierUI
 
-威注音的飄雲通知視窗。
+唯音的飄雲通知視窗。
 
 ```
 // (c) 2021 and onwards The vChewing Project (MIT-NTL License).

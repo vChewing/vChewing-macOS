@@ -17,7 +17,7 @@ public enum IMKHelper {
     var strValue: String = ""
   }
 
-  /// 威注音有專門統計過，實際上會有差異的英數鍵盤佈局只有這幾種。
+  /// 唯音有專門統計過，實際上會有差異的英數鍵盤佈局只有這幾種。
   /// 精簡成這種清單的話，不但節省 SwiftUI 的繪製壓力，也方便使用者做選擇。
   public static let arrWhitelistedKeyLayoutsASCII: [String] = {
     var results = LatinKeyboardMappings.allCases

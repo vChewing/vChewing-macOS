@@ -10,4 +10,4 @@
     installer -pkg ~/Downloads/vChewing-macOS-?.?.?-unsigned.pkg -target CurrentUserHomeDirectory
 
 よろしくお願いいたします。
-威注音入力アプリ
+唯音入力アプリ

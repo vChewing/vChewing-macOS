@@ -10,13 +10,13 @@
 "i18n:installer.ACCEPT_INSTALLATION" = "我接受";
 "i18n:installer.APP_NAME" = "vChewing for macOS";
 "i18n:installer.CANCEL_INSTALLATION" = "取消安装";
-"i18n:installer.DEV_CREW" = "威注音 macOS 程式研发：Shiki Suen, Isaac Xen, Hiraku Wang, 等。\n威注音词库维护：Shiki Suen。\nDAG-DP 组句算法实作：Shiki Suen。";
-"i18n:installer.DISCLAIMER_TEXT" = "补记：1) Megrez Compositor (天权星组字引擎) 自 v4 起使用 LGPLv3 授权，但对于 Swift 专案中的静态链接之情形有额外准许。2) 威注音输入法使用了《先锋语料库 (Vanguard Corpus)》，该语料库由多个外部资源数据组成，这些数据的来源在其 GitHub 储存库 (`vChewing/libvchewing-data`) 中有列出。先锋语料库的资料建置程式借由 3-Clause BSD 授权释出。";
+"i18n:installer.DEV_CREW" = "唯音 macOS 程式研发：Shiki Suen, Isaac Xen, Hiraku Wang, 等。\n唯音词库维护：Shiki Suen。\nDAG-DP 组句算法实作：Shiki Suen。";
+"i18n:installer.DISCLAIMER_TEXT" = "补记：1) Megrez Compositor (天权星组字引擎) 自 v4 起使用 LGPLv3 授权，但对于 Swift 专案中的静态链接之情形有额外准许。2) 唯音输入法使用了《先锋语料库 (Vanguard Corpus)》，该语料库由多个外部资源数据组成，这些数据的来源在其 GitHub 储存库 (`vChewing/libvchewing-data`) 中有列出。先锋语料库的资料建置程式借由 3-Clause BSD 授权释出。";
 "i18n:installer.DO_APP_UPGRADE" = "接受并升级";
 "i18n:installer.DONATION_MESSAGE" = "请考虑对敝专案捐赠。详情：https://vchewing.github.io";
 "i18n:installer.EULA_PROMPT_NOTICE" = "若要安装该软件，请接受上述条款。";
-"i18n:installer.INSTALLER_APP_TITLE_FULL" = "威注音输入法安装程式";
-"i18n:installer.INSTALLER_APP_TITLE" = "威注音安装程式";
+"i18n:installer.INSTALLER_APP_TITLE_FULL" = "唯音输入法安装程式";
+"i18n:installer.INSTALLER_APP_TITLE" = "唯音安装程式";
 "i18n:installer.LICENSE_TITLE" = "麻理去商标授权合约 (MIT-NTL License):";
 "i18n:installer.STOPPING_THE_OLD_VERSION" = "等待旧版完全停用，大约需要一分钟…";
 "Input method may not be fully enabled. Please enable it through System Preferences > Keyboard > Input Sources." = "输入法已经安装好，但可能没有完全启用。请从「系统偏好设定」 > 「键盘」 > 「输入方式」分页加入输入法。";
@@ -24,7 +24,7 @@
 "Installation Successful" = "安装成功";
 "OK" = "确定";
 "Stopping the old version. This may take up to one minute…" = "正在试图结束正在运行的旧版输入法，大概需要一分钟…";
-"vChewing Input Method" = "威注音输入法";
-"vChewing is ready to use. \n\nPlease relogin if this is the first time you install it in this user account." = "威注音输入法安装成功。\n\n若是在當前使用者帳戶內首次安裝的話，請重新登入。";
+"vChewing Input Method" = "唯音输入法";
+"vChewing is ready to use. \n\nPlease relogin if this is the first time you install it in this user account." = "唯音输入法安装成功。\n\n若是在當前使用者帳戶內首次安裝的話，請重新登入。";
 "vChewing is upgraded, but please log out or reboot for the new version to be fully functional." = "vChewing 安装完成，但建议您登出或重新开机，以便顺利使用新版。";
 "Warning" = "安装不完整";

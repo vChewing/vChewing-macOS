@@ -1,6 +1,6 @@
 # Protocols
 
-威注音輸入法用到的各種 Swift 功能擴張。
+唯音輸入法用到的各種 Swift 功能擴張。
 
 ```
 // (c) 2021 and onwards The vChewing Project (MIT-NTL License).

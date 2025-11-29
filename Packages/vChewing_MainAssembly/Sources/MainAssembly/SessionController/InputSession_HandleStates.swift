@@ -177,7 +177,7 @@ extension SessionProtocol {
   public func doSetMarkedText(_ string: NSAttributedString, allowAsync: Bool = true) {
     // 得複製一份，因為 NSAttributedString 不支援 Sendable 特性。
     let newString = string.copy() as? NSAttributedString ?? .init(string: string.string)
-    // 威注音用不到 replacementRange，所以不用檢查 replacementRange 的異動情況。
+    // 唯音用不到 replacementRange，所以不用檢查 replacementRange 的異動情況。
     let range = selectionRange()
     guard !(string.isEqual(to: recentMarkedText.text) && recentMarkedText.selectionRange == range)
     else { return }

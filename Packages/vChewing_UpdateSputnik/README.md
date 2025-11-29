@@ -1,6 +1,6 @@
 # UpdateSputnik
 
-威注音輸入法的自動更新模組。
+唯音輸入法的自動更新模組。
 
 ```
 // (c) 2021 and onwards The vChewing Project (MIT-NTL License).

@@ -1,6 +1,6 @@
 # CLAUDE.md
 
-Guidance for Claude-family coding agents working on the vChewing (威注音) macOS repository. Treat `AGENTS.md` as canonical for architecture and workflow; align with `.github/copilot-instructions.md` for shared guardrails. Use only English or zh-Hant-TW in documentation/comments/reviews; zh-Hans is allowed only in filename stems ending with -CHS.
+Guidance for Claude-family coding agents working on the vChewing (唯音) macOS repository. Treat `AGENTS.md` as canonical for architecture and workflow; align with `.github/copilot-instructions.md` for shared guardrails. Use only English or zh-Hant-TW in documentation/comments/reviews; zh-Hans is allowed only in filename stems ending with -CHS.
 
 ## Quick Checklist
 

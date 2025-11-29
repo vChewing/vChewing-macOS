@@ -71,7 +71,7 @@ extension SessionCtl {
     super.deactivateServer(sender)
   }
 
-  /// 切換至某一個輸入法的某個副本時（比如威注音的簡體輸入法副本與繁體輸入法副本），會觸發該函式。
+  /// 切換至某一個輸入法的某個副本時（比如唯音的簡體輸入法副本與繁體輸入法副本），會觸發該函式。
   /// - Remark: 當系統呼叫 activateServer() 的時候，setValue() 會被自動呼叫。
   /// 但是，手動呼叫 activateServer() 的時候，setValue() 不會被自動呼叫。
   /// - Parameters:

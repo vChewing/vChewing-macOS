@@ -393,7 +393,7 @@ extension LMMgr {
 
 // MARK: - 將當前輸入法的所有使用者辭典資料傾印成 JSON
 
-// 威注音輸入法並非可永續的專案。用單個 JSON 檔案遷移資料的話，可方便其他程式開發者們實作相關功能。
+// 唯音輸入法並非可永續的專案。用單個 JSON 檔案遷移資料的話，可方便其他程式開發者們實作相關功能。
 
 extension LMMgr {
   @discardableResult

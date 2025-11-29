@@ -1,6 +1,6 @@
 # NotifierUI
 
-威注音的浮動組字窗。
+唯音的浮動組字窗。
 
 ```
 // (c) 2021 and onwards The vChewing Project (MIT-NTL License).

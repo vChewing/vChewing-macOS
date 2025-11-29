@@ -1,8 +1,8 @@
-# 威注音（vChewing）演算法說明
+# 唯音（vChewing）演算法說明
 
-本文件說明威注音（vChewing）在 macOS 上的核心演算法與模組分工，涵蓋：注音符號（ㄅㄆㄇㄈ）與鍵盤配置、輸入態械（FSM）、組句引擎（Megrez，採用 DAG 動態規劃），以及語言模型匯流（LangModelAssembly）和字典資料來源（Source/Data 子模組）。
+本文件說明唯音（vChewing）在 macOS 上的核心演算法與模組分工，涵蓋：注音符號（ㄅㄆㄇㄈ）與鍵盤配置、輸入態械（FSM）、組句引擎（Megrez，採用 DAG 動態規劃），以及語言模型匯流（LangModelAssembly）和字典資料來源（Source/Data 子模組）。
 
-> 威注音的「威」取自「威而鋼」的「威」。
+> 唯音的「威」取自「威而鋼」的「威」。
 
 ## 建置與測試
 

@@ -3,11 +3,11 @@
 
 二、請考慮對敝專案捐贈。相關資訊請洽 https://vChewing.github.io 網站。
 
-三、在 macOS 10.x-11.x 系統下此前安裝過威注音輸入法的用戶請注意：這幾版系統有 Bug、令該安裝程式無法自動將安裝目標設為當前使用者資料夾。如果您在 macOS 12 Monterey 之前的系統安裝該輸入法的話，請務必「手動」將安裝目的地設為當前使用者資料夾。否則，當您今後（在升級系統之後）升級輸入法的時候，可能會出現各種混亂情況。下述 sudo 指令會將任何安裝到錯誤位置的檔案全部移除：
+三、在 macOS 10.x-11.x 系統下此前安裝過唯音輸入法的用戶請注意：這幾版系統有 Bug、令該安裝程式無法自動將安裝目標設為當前使用者資料夾。如果您在 macOS 12 Monterey 之前的系統安裝該輸入法的話，請務必「手動」將安裝目的地設為當前使用者資料夾。否則，當您今後（在升級系統之後）升級輸入法的時候，可能會出現各種混亂情況。下述 sudo 指令會將任何安裝到錯誤位置的檔案全部移除：
     sudo bash /Users/$(stat -f%Su /dev/console)/Library/Input\ Methods/vChewing.app/Contents/Resources/fixinstall.sh
 
 四、終端部署指令（不限作業系統版本）：
     installer -pkg ~/Downloads/vChewing-macOS-?.?.?-unsigned.pkg -target CurrentUserHomeDirectory
 
 順頌時祺
-威注音輸入法
+唯音輸入法

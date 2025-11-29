@@ -1,6 +1,6 @@
 # NotifierUI
 
-威注音的工具提示視窗。
+唯音的工具提示視窗。
 
 ```
 // (c) 2021 and onwards The vChewing Project (MIT-NTL License).

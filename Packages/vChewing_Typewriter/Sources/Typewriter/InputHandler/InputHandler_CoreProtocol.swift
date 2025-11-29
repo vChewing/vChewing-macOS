@@ -817,7 +817,7 @@ extension InputHandlerProtocol {
   ///
   /// 測試時請務必也測試「敲長句子、且這種詞在句子中間出現時」的情況。
   ///
-  /// 威注音輸入法截至 v1.9.3 SP2 版為止都受到上游的這個 Bug 的影響，且在 v1.9.4 版利用該函式修正了這個缺陷。
+  /// 唯音輸入法截至 v1.9.3 SP2 版為止都受到上游的這個 Bug 的影響，且在 v1.9.4 版利用該函式修正了這個缺陷。
   /// 該修正必須搭配至少天權星組字引擎 v2.0.2 版方可生效。算法可能比較囉唆，但至少在常用情形下不會再發生該問題。
   /// - Parameter theCandidate: 要拿來覆寫的詞音配對。
   func consolidateCursorContext(with theCandidate: Megrez.KeyValuePaired, explicitlyChosen: Bool = false) {
@@ -1098,7 +1098,7 @@ extension InputHandlerProtocol {
       let newCursor = max(assembler.cursor - delta, 0)
       assembler.cursor = 0
       if !node.isReadingMismatched { consolidateCursorContext(with: node.asCandidatePair) }
-      // 威注音不支援 Bigram，所以無須考慮前後節點「是否需要鞏固」。
+      // 唯音不支援 Bigram，所以無須考慮前後節點「是否需要鞏固」。
       for _ in 0 ..< delta { assembler.dropKey(direction: .front) }
       assembler.cursor = newCursor
       assemble()

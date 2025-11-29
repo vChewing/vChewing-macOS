@@ -1,10 +1,10 @@
-補記：1) Megrez Compositor はバージョン4以降、LGPLv3ライセンスを使用していますが、Swift プロジェクトでの静的リンクは例外として許容します。2) 威注音入力アプリは、複数の外部リソースからのデータで構成される Vanguard Corpus を使用しており、これらのリソースはGitHubリポジトリ（`vChewing/libvchewing-data`）にクレジットされています。Vanguard Corpusのデータコンパイラは、3-Clause BSDライセンスでリリースします。
+補記：1) Megrez Compositor はバージョン4以降、LGPLv3ライセンスを使用していますが、Swift プロジェクトでの静的リンクは例外として許容します。2) 唯音入力アプリは、複数の外部リソースからのデータで構成される Vanguard Corpus を使用しており、これらのリソースはGitHubリポジトリ（`vChewing/libvchewing-data`）にクレジットされています。Vanguard Corpusのデータコンパイラは、3-Clause BSDライセンスでリリースします。
 
 vChewing macOS: ＭＩＴ商標不許可ライセンス (MIT-NTL License)
 
 © 2021 and onwards The vChewing Project.
-macOS 版威注音の開発：Shiki Suen, Isaac Xen, Hiraku Wang, など。
-威注音語彙データの維持：Shiki Suen。
+macOS 版唯音の開発：Shiki Suen, Isaac Xen, Hiraku Wang, など。
+唯音語彙データの維持：Shiki Suen。
 
 以下に定める条件に従い、本ソフトウェアおよび関連文書のファイル（以下「ソフトウェア」）の複製を取得するすべての人に対し、ソフトウェアを無制限に扱うことを無償で許可します。これには、ソフトウェアの複製を使用、複写、変更、結合、掲載、頒布、サブライセンス、および/または販売する権利、およびソフトウェアを提供する相手に同じことを許可する権利も無制限に含まれます。
 

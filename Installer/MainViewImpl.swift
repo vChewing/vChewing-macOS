@@ -114,7 +114,7 @@ extension MainView {
     allRegisteredInstancesOfThisInputMethod.forEach { neta in
       let isActivated = neta.isActivated
       defer {
-        // 如果使用者在升級安裝或再次安裝之前已經有啟用威注音任一簡繁模式的話，則標記安裝成功。
+        // 如果使用者在升級安裝或再次安裝之前已經有啟用唯音任一簡繁模式的話，則標記安裝成功。
         // 這樣可以尊重某些使用者「僅使用簡體中文」或「僅使用繁體中文」的習慣。
         mainInputSourceEnabled = mainInputSourceEnabled || isActivated
       }

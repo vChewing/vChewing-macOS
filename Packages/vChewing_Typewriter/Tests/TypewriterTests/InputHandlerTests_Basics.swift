@@ -170,7 +170,7 @@ let cassetteURL4Array30CIN2 = URL(fileURLWithPath: #file)
 
 // MARK: - InputHandlerTests
 
-/// 威注音輸入法的 InputHandler 單元測試（Typewriter 模組）
+/// 唯音輸入法的 InputHandler 單元測試（Typewriter 模組）
 final class InputHandlerTests: XCTestCase {
   var testLM: LMAssembly.LMInstantiator?
   var testHandler: MockInputHandler?

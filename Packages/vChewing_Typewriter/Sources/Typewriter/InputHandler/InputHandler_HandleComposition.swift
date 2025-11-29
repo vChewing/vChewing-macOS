@@ -48,8 +48,8 @@ extension InputHandlerProtocol {
 
     // 哪怕不啟用支援對「先輸入聲調、後輸入注音」的情況的支援，對 keyConsumedByReading 的處理得保留。
     // 不然的話，「敲 Space 叫出選字窗」的功能會失效。
-    // 究其原因，乃是因為威注音所用的鐵恨注拼引擎「有在處理陰平聲調」的緣故。
-    // 對於某些動態注音排列，威注音會依賴包括陰平聲調鍵在內的聲調按鍵做結算判斷。
+    // 究其原因，乃是因為唯音所用的鐵恨注拼引擎「有在處理陰平聲調」的緣故。
+    // 對於某些動態注音排列，唯音會依賴包括陰平聲調鍵在內的聲調按鍵做結算判斷。
     var keyConsumedByReading = false
     let skipPhoneticHandling =
       input.isReservedKey || input.isNumericPadKey || input.isNonLaptopFunctionKey

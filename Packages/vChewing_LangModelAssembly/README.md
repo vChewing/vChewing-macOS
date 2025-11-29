@@ -1,6 +1,6 @@
 # LangModelAssembly
 
-威注音輸入法的語言模組總成套裝，以 LMAssembly 命名空間承載下述唯二對外物件：
+唯音輸入法的語言模組總成套裝，以 LMAssembly 命名空間承載下述唯二對外物件：
 
 - LMConsolidator：自動格式整理模組。
 - LMInstantiator：語言模組副本化模組，亦集成一些自身功能擴展。

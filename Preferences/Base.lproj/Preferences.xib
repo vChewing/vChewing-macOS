@@ -30,7 +30,7 @@
                         </constraints>
                         <textFieldCell key="cell" id="RtS-zx-Tvg">
                             <font key="font" metaFont="cellTitle"/>
-                            <string key="title">請洽輸入法選單「威注音偏好設定…」。
+                            <string key="title">請洽輸入法選單「唯音偏好設定…」。
 IMEメニューにて「入力機能設定…」をお用いください。
 Please use "vChewing Preferences…" in the IME menu.
 -------

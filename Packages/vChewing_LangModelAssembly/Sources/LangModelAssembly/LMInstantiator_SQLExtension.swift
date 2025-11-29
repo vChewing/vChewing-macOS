@@ -13,7 +13,7 @@ import Megrez
 // MARK: - LMAssembly.LMInstantiator.CoreColumn
 
 /* ==============
- 因應 Apple 對 8GB 運行記憶體的病態偏執，威注音的原廠辭典格式更換為 SQLite、以圖減少對記憶體的佔用。
+ 因應 Apple 對 8GB 運行記憶體的病態偏執，唯音的原廠辭典格式更換為 SQLite、以圖減少對記憶體的佔用。
  資料結構如下：
    CREATE TABLE IF NOT EXISTS DATA_MAIN (
      theKey TEXT NOT NULL,
