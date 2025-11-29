@@ -2,6 +2,35 @@
   "fill" : "automatic",
   "groups" : [
     {
+      "layers" : [
+        {
+          "image-name" : "Yui.svg",
+          "name" : "Yui",
+          "opacity-specializations" : [
+            {
+              "appearance" : "dark",
+              "value" : 1
+            }
+          ],
+          "position" : {
+            "scale" : 1.5,
+            "translation-in-points" : [
+              19.1796875,
+              5.5625
+            ]
+          }
+        }
+      ],
+      "shadow" : {
+        "kind" : "neutral",
+        "opacity" : 0.5
+      },
+      "translucency" : {
+        "enabled" : true,
+        "value" : 0.5
+      }
+    },
+    {
       "blend-mode-specializations" : [
         {
           "appearance" : "dark",
@@ -12,6 +41,7 @@
       "layers" : [
         {
           "blend-mode" : "normal",
+          "hidden" : true,
           "image-name" : "IMELogoV4-A2.svg",
           "name" : "IMELogoV4-A2",
           "position" : {
@@ -50,6 +80,7 @@
             }
           ],
           "glass" : true,
+          "hidden" : true,
           "image-name" : "IMELogoV4-A3.svg",
           "name" : "IMELogoV4-A3",
           "position" : {
