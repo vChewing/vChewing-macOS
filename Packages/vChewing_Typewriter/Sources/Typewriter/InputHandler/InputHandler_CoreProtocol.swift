@@ -708,9 +708,12 @@ extension InputHandlerProtocol {
         )
         let cursorForOverride = suggestion.overrideCursor ?? actualNodeCursorPosition
         if let gramHit = assembler.assembledSentence.findGram(at: cursorForOverride) {
-          if gramHit.gram.keyArray.count > newestSuggestedCandidate.keyArray.count {
+          let existingLen = gramHit.gram.keyArray.count
+          let suggestedLen = newestSuggestedCandidate.keyArray.count
+          if existingLen > suggestedLen,
+             newestSuggestedCandidate.probability <= gramHit.gram.score {
             vCLog(
-              "POM: Skip applying suggestion \(suggestedPair.toNGramKey) because it would shorten an existing node."
+              "POM: Skip applying suggestion \(suggestedPair.toNGramKey) because the existing longer node has higher score (\(gramHit.gram.score))."
             )
             return arrResult.stableSort { $0.1.score > $1.1.score }
           }
