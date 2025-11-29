@@ -1,8 +1,4 @@
 {
-  "info" : {
-    "author" : "xcode",
-    "version" : 1
-  },
   "images" : [
     {
       "filename" : "icon_1024.png",
@@ -11,16 +7,16 @@
       "size" : "1024x1024"
     },
     {
-      "idiom" : "mac",
       "filename" : "icon_16.png",
+      "idiom" : "mac",
       "scale" : "1x",
       "size" : "16x16"
     },
     {
       "filename" : "icon_32.png",
       "idiom" : "mac",
-      "size" : "16x16",
-      "scale" : "2x"
+      "scale" : "2x",
+      "size" : "16x16"
     },
     {
       "filename" : "icon_32.png",
@@ -29,46 +25,50 @@
       "size" : "32x32"
     },
     {
-      "scale" : "2x",
       "filename" : "icon_64.png",
-      "size" : "32x32",
-      "idiom" : "mac"
+      "idiom" : "mac",
+      "scale" : "2x",
+      "size" : "32x32"
     },
     {
-      "scale" : "1x",
-      "idiom" : "mac",
       "filename" : "icon_128.png",
+      "idiom" : "mac",
+      "scale" : "1x",
       "size" : "128x128"
     },
     {
-      "size" : "128x128",
       "filename" : "icon_256.png",
       "idiom" : "mac",
-      "scale" : "2x"
-    },
-    {
-      "filename" : "icon_256.png",
-      "size" : "256x256",
-      "idiom" : "mac",
-      "scale" : "1x"
-    },
-    {
       "scale" : "2x",
-      "size" : "256x256",
-      "idiom" : "mac",
-      "filename" : "icon_512.png"
+      "size" : "128x128"
     },
     {
+      "filename" : "icon_256.png",
       "idiom" : "mac",
-      "size" : "512x512",
+      "scale" : "1x",
+      "size" : "256x256"
+    },
+    {
       "filename" : "icon_512.png",
-      "scale" : "1x"
-    },
-    {
       "idiom" : "mac",
       "scale" : "2x",
-      "size" : "512x512",
-      "filename" : "icon_1024.png"
+      "size" : "256x256"
+    },
+    {
+      "filename" : "icon_512.png",
+      "idiom" : "mac",
+      "scale" : "1x",
+      "size" : "512x512"
+    },
+    {
+      "filename" : "icon_1024.png",
+      "idiom" : "mac",
+      "scale" : "2x",
+      "size" : "512x512"
     }
-  ]
+  ],
+  "info" : {
+    "author" : "xcode",
+    "version" : 1
+  }
 }
