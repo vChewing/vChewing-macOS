@@ -32,31 +32,10 @@ extension InputHandlerTests {
     testHandler.prefs.fetchSuggestionsFromPerceptionOverrideModel = true
     clearTestPOM()
     testSession.resetInputHandler(forceComposerCleanup: true)
-    var extractedGrams: [Megrez.Unigram] = []
-    MegrezTestComponents.strLMSampleDataHutao.enumerateLines { currentLine, _ in
-      let cells = currentLine.split(separator: " ")
-      guard cells.count >= 3 else { return }
-      guard ["liu2-yi4", "liu2", "yi4"].contains(cells[0]) else { return }
-      let readingChainPinyin = cells[0]
-      let readingArray: [String] = Tekkon.cnvHanyuPinyinToPhona(
-        targetJoined: readingChainPinyin.description
-      ).split(separator: "-").map(\.description)
-      let cellScoreStr = cells[2].description
-      guard let cellScore = Double(cellScoreStr) else { return }
-      let unigram = Megrez.Unigram(
-        keyArray: readingArray, value: cells[1].description, score: cellScore
-      )
-      if unigram.segLength > 1 {
-        extractedGrams.insert(
-          .init(keyArray: readingArray, value: cells[1].description, score: cellScore),
-          at: 0
-        )
-      } else {
-        extractedGrams.append(
-          .init(keyArray: readingArray, value: cells[1].description, score: cellScore)
-        )
-      }
-    }
+    var extractedGrams = extractGrams(
+      from: MegrezTestComponents.strLMSampleDataHutao,
+      readingsToKeep: ["liu2-yi4", "liu2", "yi4"]
+    )
     extractedGrams = extractedGrams.filter {
       $0.segLength > 1 || $0.score > -6
     }
