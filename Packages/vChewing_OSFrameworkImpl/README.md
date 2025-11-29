@@ -1,6 +1,6 @@
 # OSFrameworkImpl
 
-威注音輸入法針對 Cocoa 的一些功能擴充，使程式維護體驗更佳。
+唯音輸入法針對 Cocoa 的一些功能擴充，使程式維護體驗更佳。
 
 ```
 // (c) 2021 and onwards The vChewing Project (MIT-NTL License).

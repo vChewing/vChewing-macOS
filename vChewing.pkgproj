@@ -837,19 +837,19 @@
 										<key>LANGUAGE</key>
 										<string>Simplified Chinese</string>
 										<key>VALUE</key>
-										<string>威注音输入法</string>
+										<string>唯音输入法</string>
 									</dict>
 									<dict>
 										<key>LANGUAGE</key>
 										<string>Japanese</string>
 										<key>VALUE</key>
-										<string>威注音入力アプリ</string>
+										<string>唯音入力アプリ</string>
 									</dict>
 									<dict>
 										<key>LANGUAGE</key>
 										<string>Traditional Chinese</string>
 										<key>VALUE</key>
-										<string>威注音輸入法</string>
+										<string>唯音輸入法</string>
 									</dict>
 								</array>
 								<key>TYPE</key>
@@ -1095,19 +1095,19 @@
 						<key>LANGUAGE</key>
 						<string>Simplified Chinese</string>
 						<key>VALUE</key>
-						<string>威注音输入法</string>
+						<string>唯音输入法</string>
 					</dict>
 					<dict>
 						<key>LANGUAGE</key>
 						<string>Japanese</string>
 						<key>VALUE</key>
-						<string>威注音入力アプリ</string>
+						<string>唯音入力アプリ</string>
 					</dict>
 					<dict>
 						<key>LANGUAGE</key>
 						<string>Traditional Chinese</string>
 						<key>VALUE</key>
-						<string>威注音輸入法</string>
+						<string>唯音輸入法</string>
 					</dict>
 				</array>
 			</dict>

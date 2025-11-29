@@ -76,7 +76,7 @@ extension LMAssembly.LMCassette {
   /// - `%ename` 決定磁帶的英文名、`%cname` 決定磁帶的 CJK 名稱、
   /// `%sname` 決定磁帶的最短英文縮寫名稱、`%intlname` 決定磁帶的本地化名稱綜合字串。
   /// - `%encoding` 不處理，因為 Swift 只認 UTF-8。
-  /// - `%selkey`  不處理，因為威注音輸入法有自己的選字鍵體系。
+  /// - `%selkey`  不處理，因為唯音輸入法有自己的選字鍵體系。
   /// - `%endkey` 是會觸發組字事件的按鍵。
   /// - `%wildcardkey` 決定磁帶的萬能鍵名稱，只有第一個字元會生效。
   /// - `%nullcandidate` 用來指明 `%quick` 字段給出的候選字當中有哪一種是無效的。

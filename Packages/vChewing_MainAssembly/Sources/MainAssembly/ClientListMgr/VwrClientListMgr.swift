@@ -269,7 +269,7 @@ extension VwrClientListMgr {
     theTextView.textContainer?.containerSize = CGSize(width: maxFloat, height: maxFloat)
     theTextView.textContainer?.widthTracksTextView = false
 
-    // 預先填寫近期用過威注音輸入法的客體軟體，最多二十筆。
+    // 預先填寫近期用過唯音輸入法的客體軟體，最多二十筆。
     theTextView.textContainer?.textView?.string = {
       let recentClients = InputSession.recentClientBundleIdentifiers.keys.compactMap {
         PrefMgr.shared.clientsIMKTextInputIncapable.keys.contains($0) ? nil : $0

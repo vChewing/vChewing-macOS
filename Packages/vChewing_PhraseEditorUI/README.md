@@ -1,6 +1,6 @@
 # PhraseEditorUI
 
-威注音語彙編輯器。
+唯音語彙編輯器。
 
 ```
 // (c) 2021 and onwards The vChewing Project (MIT-NTL License).

@@ -32,7 +32,7 @@ public enum Uninstaller {
       return -1
     }
 
-    // 自威注音 v2.3.0 開始，沙箱限制了威注音的某些行為，所以該函式不再受理 sudo 模式下的操作。
+    // 自唯音 v2.3.0 開始，沙箱限制了唯音的某些行為，所以該函式不再受理 sudo 模式下的操作。
     if isSudo {
       print(
         "vChewing binary does not support sudo-uninstall since v2.3.0. Please use the bundled uninstall.sh instead.\n\nIf you want to fix the installation (i.e. removing all incorrectly installed files outside of the current user folder), please use the bundled fixinstall.sh instead.\n\nIf you don't know how to proceed, please bring either the uninstall.sh / install.sh or the instruction article https://vchewing.github.io/UNINSTALL.html to Apple Support (support.apple.com) for help. Their senior advisors can understand these uninstall instructions."

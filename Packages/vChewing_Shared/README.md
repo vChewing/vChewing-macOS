@@ -1,6 +1,6 @@
 # Protocols
 
-威注音輸入法用到的各種協定與共用靜態內容、以及少許全局共用工具函式。
+唯音輸入法用到的各種協定與共用靜態內容、以及少許全局共用工具函式。
 
 ```
 // (c) 2021 and onwards The vChewing Project (MIT-NTL License).

@@ -1,10 +1,10 @@
-补记：1) Megrez Compositor (天权星组字引擎) 自 v4 起使用 LGPLv3 授权，但对于 Swift 专案中的静态链接有例外。2) 威注音输入法使用了《先锋语料库 (Vanguard Corpus)》，该语料库由多个外部资源数据组成，这些数据的来源在其 GitHub 储存库 (`vChewing/libvchewing-data`) 中有列出。先锋语料库的资料建置程式借由 3-Clause BSD 授权释出。
+补记：1) Megrez Compositor (天权星组字引擎) 自 v4 起使用 LGPLv3 授权，但对于 Swift 专案中的静态链接有例外。2) 唯音输入法使用了《先锋语料库 (Vanguard Corpus)》，该语料库由多个外部资源数据组成，这些数据的来源在其 GitHub 储存库 (`vChewing/libvchewing-data`) 中有列出。先锋语料库的资料建置程式借由 3-Clause BSD 授权释出。
 
 vChewing macOS: MIT-NTL License 麻理（去商标）授权合约
 
 © 2021 and onwards The vChewing Project.
-威注音 macOS 程式研发：Shiki Suen, Isaac Xen, Hiraku Wang, 等。
-威注音词库维护：Shiki Suen。
+唯音 macOS 程式研发：Shiki Suen, Isaac Xen, Hiraku Wang, 等。
+唯音词库维护：Shiki Suen。
 
 软件之著作权利人依此麻理授权条款，将其对于软件之著作权利授权释出，只须使用者践履以下二项麻理授权条款叙明之义务性规定，其即享有对此软件程式及其相关说明文档自由不受限制地进行利用之权利，范围包括「使用、重制、修改、合并、出版、散布、再授权、及贩售程式重制作品」等诸多方面之应用，而散布程式之人、更可将上述权利传递予其后收受程式之后手，倘若其后收受程式之人亦服膺以下二项麻理授权条款之义务性规定，则其对程式亦享有与前手运用范围相同之同一权利。
 

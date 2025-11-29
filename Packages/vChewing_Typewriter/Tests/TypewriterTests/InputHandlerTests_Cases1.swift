@@ -263,7 +263,7 @@ extension InputHandlerTests {
     )
 
     func resetToRomanNumeralTypingMethod() throws {
-      // 初始打字模式（TypingMethod）是威注音原廠模式。
+      // 初始打字模式（TypingMethod）是唯音原廠模式。
       testSession.switchState(.ofAbortion())
       XCTAssertEqual(testHandler.currentTypingMethod, .vChewingFactory)
       // 開始輪替。
@@ -363,7 +363,7 @@ extension InputHandlerTests {
     XCTAssertEqual(
       testHandler.currentTypingMethod,
       .vChewingFactory,
-      "遞交後應返回威注音預設的打字方法"
+      "遞交後應返回唯音預設的打字方法"
     )
     vCTestLog("-> Result: \(testSession.recentCommissions.last ?? "NULL")")
 
@@ -382,7 +382,7 @@ extension InputHandlerTests {
     XCTAssertEqual(
       testHandler.currentTypingMethod,
       .vChewingFactory,
-      "遞交後應返回威注音預設的打字方法"
+      "遞交後應返回唯音預設的打字方法"
     )
     vCTestLog("-> Result: \(testSession.recentCommissions.last ?? "NULL")")
 
@@ -404,7 +404,7 @@ extension InputHandlerTests {
     XCTAssertEqual(
       testHandler.currentTypingMethod,
       .vChewingFactory,
-      "遞交後應返回威注音預設的打字方法"
+      "遞交後應返回唯音預設的打字方法"
     )
     vCTestLog("-> Result: \(testSession.recentCommissions.last ?? "NULL")")
 

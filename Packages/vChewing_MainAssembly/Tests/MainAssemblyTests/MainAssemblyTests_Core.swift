@@ -26,16 +26,16 @@ func vCTestLog(_ str: String) {
 
 // MARK: - MainAssemblyTests
 
-/// 威注音輸入法的控制模組單元測試。
-/// - Remark: 歡迎來到威注音輸入法的控制模組單元測試。
+/// 唯音輸入法的控制模組單元測試。
+/// - Remark: 歡迎來到唯音輸入法的控制模組單元測試。
 ///
-/// 不似其他同類產品的單元測試，威注音輸入法的單元測試
+/// 不似其他同類產品的單元測試，唯音輸入法的單元測試
 /// 會盡量模擬使用者的日常打字擊鍵行為與使用方法。
 /// 單元測試的內容可能算不上豐富，但會隨著今後來自各位
 /// 使用者所提報的故障、而繼續逐漸擴大測試範圍。
 ///
 /// 該單元測試使用獨立的語彙資料，因此會在選字時的候選字
-/// 順序等方面與威注音輸入法實際使用時的體驗有差異。
+/// 順序等方面與唯音輸入法實際使用時的體驗有差異。
 final class MainAssemblyTests: XCTestCase {
   static let testServer = IMKServer(
     name: "org.atelierInmu.vChewing.MainAssembly.UnitTests_Connection",

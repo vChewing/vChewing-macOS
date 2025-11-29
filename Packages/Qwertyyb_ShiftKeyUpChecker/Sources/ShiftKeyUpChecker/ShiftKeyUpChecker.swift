@@ -16,7 +16,7 @@ extension Date {
 public final class ShiftKeyUpChecker: ShiftKeyUpCheckerProtocol {
   // MARK: Lifecycle
 
-  // MARK: - 威注音輸入法專有部分
+  // MARK: - 唯音輸入法專有部分
 
   public init(useLShift: Bool = false, useRShift: Bool = false) {
     self.toggleWithLShift = useLShift
@@ -50,7 +50,7 @@ public final class ShiftKeyUpChecker: ShiftKeyUpCheckerProtocol {
 
   // MARK: - 與業火五筆共用的內容
 
-  /// 實現邏輯基本上是相同的，只是威注音這邊的行文風格習慣可能與業火五筆有不同。
+  /// 實現邏輯基本上是相同的，只是唯音這邊的行文風格習慣可能與業火五筆有不同。
 
   private let delayInterval = 0.2
   private var previousKeyCode: UInt16?

@@ -21,7 +21,7 @@ extension LMAssembly.LMInstantiator {
   public var areCassetteCandidateKeysShiftHeld: Bool { Self.lmCassette.areCandidateKeysShiftHeld }
   /// 磁帶模式專用：需要直接递交的按键。
   public var keysToDirectlyCommit: String { Self.lmCassette.keysToDirectlyCommit }
-  /// 磁帶模式專用：選字鍵，在威注音輸入法當中僅優先用於快速模式。
+  /// 磁帶模式專用：選字鍵，在唯音輸入法當中僅優先用於快速模式。
   public var cassetteSelectionKey: String? {
     let result = Self.lmCassette.selectionKeys
     return result.isEmpty ? nil : result
