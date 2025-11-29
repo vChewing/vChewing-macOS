@@ -64,8 +64,8 @@ extension Tekkon {
     newToneOne: String = ""
   )
     -> String {
-    /// 如果當前內容有任何除了半形英數內容以外的內容的話，就直接放棄轉換。
-    if targetJoined.contains("_") || !targetJoined.isNotPureAlphanumerical { return targetJoined }
+    /// 如果當前內容含有底線或包含任何不在允許列表中的字元（英數、空白、Tab、連字號），則放棄轉換。
+    if targetJoined.contains("_") || targetJoined.isNotAllowedCharOfPinyinChain { return targetJoined }
     var result = targetJoined
     for key in Tekkon.mapHanyuPinyin.keys.sorted(by: { $0.count > $1.count }) {
       guard let value = Tekkon.mapHanyuPinyin[key] else { continue }
@@ -81,11 +81,15 @@ extension Tekkon {
 
 /// 檢測字串是否包含半形英數內容
 extension String {
-  fileprivate var isNotPureAlphanumerical: Bool {
+  fileprivate var isNotAllowedCharOfPinyinChain: Bool {
     let x = unicodeScalars.map(\.value).filter {
+      // allowed: 0-9, A-Z, a-z, space(32), tab(9), dash(45)
       if $0 >= 48, $0 <= 57 { return false }
       if $0 >= 65, $0 <= 90 { return false }
       if $0 >= 97, $0 <= 122 { return false }
+      if $0 == 32 { return false } // space
+      if $0 == 9 { return false } // tab
+      if $0 == 45 { return false } // -
       return true
     }
     return !x.isEmpty
@@ -93,11 +97,15 @@ extension String {
 }
 
 extension Character {
-  fileprivate var isNotPureAlphanumerical: Bool {
+  fileprivate var isNotAllowedCharOfPinyinChain: Bool {
     let x = unicodeScalars.map(\.value).filter {
+      // allowed: 0-9, A-Z, a-z, space(32), tab(9), dash(45)
       if $0 >= 48, $0 <= 57 { return false }
       if $0 >= 65, $0 <= 90 { return false }
       if $0 >= 97, $0 <= 122 { return false }
+      if $0 == 32 { return false } // space
+      if $0 == 9 { return false } // tab
+      if $0 == 45 { return false } // -
       return true
     }
     return !x.isEmpty

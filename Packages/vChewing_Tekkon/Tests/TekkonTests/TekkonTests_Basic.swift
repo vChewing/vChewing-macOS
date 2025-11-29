@@ -201,6 +201,7 @@ final class TekkonTestsBasic: XCTestCase {
     XCTAssertEqual(Tekkon.cnvPhonaToTextbookStyle(target: "ㄓㄜ˙"), "˙ㄓㄜ")
     XCTAssertEqual(Tekkon.cnvPhonaToHanyuPinyin(targetJoined: "ㄍㄢˋ"), "gan4")
     XCTAssertEqual(Tekkon.cnvHanyuPinyinToTextbookStyle(targetJoined: "起(qi3)居(ju1)"), "起(qǐ)居(jū)")
+    XCTAssertEqual(Tekkon.cnvHanyuPinyinToPhona(targetJoined: "bian4"), "ㄅㄧㄢˋ")
     XCTAssertEqual(Tekkon.cnvHanyuPinyinToPhona(targetJoined: "bian4-le5-tian1"), "ㄅㄧㄢˋ-ㄌㄜ˙-ㄊㄧㄢ")
     // 測試這種情形：「如果傳入的字串不包含任何半形英數內容的話，那麼應該直接將傳入的字串原樣返回」。
     XCTAssertEqual(Tekkon.cnvHanyuPinyinToPhona(targetJoined: "ㄅㄧㄢˋ-˙ㄌㄜ-ㄊㄧㄢ"), "ㄅㄧㄢˋ-˙ㄌㄜ-ㄊㄧㄢ")
