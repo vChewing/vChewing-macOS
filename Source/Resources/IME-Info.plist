@@ -37,7 +37,7 @@
 				<key>TISIconLabels</key>
 				<dict>
 					<key>Primary</key>
-					<string>简ㄋ</string>
+					<string>简唯</string>
 				</dict>
 				<key>TISInputSourceID</key>
 				<string>org.atelierInmu.inputmethod.vChewing.IMECHS</string>
@@ -66,7 +66,7 @@
 				<key>TISIconLabels</key>
 				<dict>
 					<key>Primary</key>
-					<string>繁ㄋ</string>
+					<string>繁唯</string>
 				</dict>
 				<key>TISInputSourceID</key>
 				<string>org.atelierInmu.inputmethod.vChewing.IMECHT</string>
