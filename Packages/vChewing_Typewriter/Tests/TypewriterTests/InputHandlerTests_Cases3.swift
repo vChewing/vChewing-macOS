@@ -245,4 +245,257 @@ extension InputHandlerTests {
     XCTAssertFalse(filtered.contains(where: { $0.1.value == "波" }))
     XCTAssertEqual(filtered.map { $0.1.value }, ["玻", "坡"])
   }
+
+  func test_IH304_SaisoukiNoGaika() throws {
+    // 備註：該測試用例不適合鏡照至 MainAssemblyTests。
+    guard let testHandler, let testSession else {
+      XCTFail("testHandler and testSession at least one of them is nil.")
+      return
+    }
+    testHandler.prefs.useSCPCTypingMode = false // Use Dachen.
+    testHandler.prefs.fetchSuggestionsFromPerceptionOverrideModel = true
+    let assembler = testHandler.assembler
+    let pom = testHandler.currentLM.lmPerceptionOverride
+    clearTestPOM()
+    testSession.resetInputHandler(forceComposerCleanup: true)
+    let extractedGrams = extractGrams(
+      from: MegrezTestComponents.strLMSampleData_SaisoukiNoGaika
+    )
+    print(extractedGrams)
+    extractedGrams.forEach {
+      testHandler.currentLM.insertTemporaryData(unigram: $0, isFiltering: false)
+    }
+    testHandler.currentLM.insertTemporaryData(
+      unigram: .init(keyArray: ["ㄗㄞˋ"], value: "在"),
+      isFiltering: true
+    )
+    XCTAssert(testHandler.currentLM.hasUnigramsFor(keyArray: ["ㄗㄞˋ"]))
+    XCTAssert(testHandler.currentLM.hasUnigramsFor(keyArray: ["ㄎㄞˇ", "ㄍㄜ"]))
+    // 測試用句「再創世的凱歌」。
+    let readingKeys4Sentence = ["y94", "tj;4", "g4", "2k7", "d93", "ek "]
+    typeSentence(readingKeys4Sentence.joined())
+    let assembledBefore = assembler.assembledSentence.map(\.value).joined(separator: " ")
+    XCTAssertEqual("再 創 是的 凱歌", assembledBefore)
+    // ====================
+    // 測試此時生成的 keyForQueryingData 是否正確
+    let cursorShi = 2
+    let cursorShiDe = 3
+    let keyForQueryingDataAt2 = assembler.assembledSentence
+      .generateKeyForPerception(cursor: cursorShi)
+    XCTAssertEqual(keyForQueryingDataAt2?.ngramKey, "(ㄗㄞˋ,再)&(ㄔㄨㄤˋ,創)&(ㄕˋ-ㄉㄜ˙,是的)")
+    XCTAssertEqual(keyForQueryingDataAt2?.headReading, "ㄕˋ")
+    let keyForQueryingDataAt3 = assembler.assembledSentence
+      .generateKeyForPerception(cursor: cursorShiDe)
+    XCTAssertEqual(keyForQueryingDataAt3?.ngramKey, "(ㄗㄞˋ,再)&(ㄔㄨㄤˋ,創)&(ㄕˋ-ㄉㄜ˙,是的)")
+    XCTAssertEqual(keyForQueryingDataAt3?.headReading, "ㄉㄜ˙")
+    // 應能提供『是的』『似的』『凱歌』等候選
+    let pairsAtShiDeEnd = assembler.fetchCandidates(at: 4, filter: .endAt)
+    XCTAssertTrue(pairsAtShiDeEnd.map(\.value).contains("是的"))
+    XCTAssertTrue(pairsAtShiDeEnd.map(\.value).contains("似的"))
+    // 模擬使用者把『是』改為『世』，再合成：觀測應為 shortToLong
+    var obsCaptured: Megrez.PerceptionIntel?
+    _ = assembler.overrideCandidate(
+      .init(keyArray: ["ㄕˋ"], value: "世"),
+      at: cursorShi,
+      enforceRetokenization: true
+    ) {
+      obsCaptured = $0
+    }
+    XCTAssertEqual(obsCaptured?.contextualizedGramKey, "(ㄗㄞˋ,再)&(ㄔㄨㄤˋ,創)&(ㄕˋ,世)")
+    guard let obsCaptured else {
+      preconditionFailure("Should have a capture.")
+    }
+    // assembler.assemble() <- 已經組句了。
+    let assembledAfter = assembler.assembledSentence.map(\.value).joined(separator: " ")
+    XCTAssertTrue("再 創 世 的 凱歌" == assembledAfter)
+    pom.memorizePerception(
+      (obsCaptured.contextualizedGramKey, obsCaptured.candidate),
+      timestamp: Date().timeIntervalSince1970
+    )
+    // 記憶完畢。先看看是否有記憶。
+    let currentmemory = pom.getSavableData()
+    let firstObservationKey = currentmemory.first?.key
+    guard let firstObservationKey else {
+      preconditionFailure("POM memorized nothing, or something wrong happen.")
+    }
+    XCTAssertEqual(firstObservationKey, obsCaptured.contextualizedGramKey)
+    // 然後是記憶效力測試：
+    testHandler.clear()
+    testHandler.prefs.fetchSuggestionsFromPerceptionOverrideModel = false
+    typeSentence(readingKeys4Sentence.prefix(4).joined())
+    let cursorToTest = assembler.cursor
+    let assembledNow = assembler.assembledSentence
+      .map(\.value)
+      .joined(separator: " ")
+    XCTAssertTrue(
+      ["再 創 是的", "再 創 世 的"].contains(assembledNow),
+      "Unexpected baseline assembly: \(assembledNow)"
+    )
+    // 再試試整句。
+    do {
+      typeSentence(readingKeys4Sentence.suffix(2).joined())
+      let assembledNow2 = assembler.assembledSentence
+        .map(\.value)
+        .joined(separator: " ")
+      XCTAssertTrue(
+        ["再 創 是的 凱歌", "再 創 世 的 凱歌"].contains(assembledNow2),
+        "Unexpected baseline assembly: \(assembledNow2)"
+      )
+      assembler.dropKey(direction: .rear)
+      assembler.dropKey(direction: .rear)
+      testHandler.assemble()
+    }
+
+    let suggestion = pom.fetchSuggestion(
+      assembledResult: assembler.assembledSentence,
+      cursor: cursorToTest,
+      timestamp: Date().timeIntervalSince1970
+    )
+    XCTAssertTrue(!suggestion.isEmpty)
+    guard let firstSuggestionRAW = suggestion.candidates.first else {
+      XCTFail("POM suggested nothing, or something wrong happen.")
+      return
+    }
+    print(firstSuggestionRAW)
+    let candidateSuggested = Megrez.KeyValuePaired(
+      keyArray: firstSuggestionRAW.keyArray,
+      value: firstSuggestionRAW.value,
+      score: firstSuggestionRAW.probability
+    )
+    let cursorForOverride = suggestion.overrideCursor ?? cursorShi
+    let overrideResult = assembler.overrideCandidate(
+      candidateSuggested,
+      at: cursorForOverride,
+      overrideType: suggestion.forceHighScoreOverride ? .withSpecified : .withTopGramScore,
+      enforceRetokenization: true
+    )
+    if !overrideResult {
+      assembler.overrideCandidateLiteral(
+        candidateSuggested.value,
+        at: cursorForOverride,
+        overrideType: suggestion.forceHighScoreOverride ? .withSpecified : .withTopGramScore
+      )
+    }
+    assembler.assemble()
+    let assembledByPOM = assembler.assembledSentence
+      .map(\.value)
+      .joined(separator: " ")
+    XCTAssertEqual("再 創 世 的", assembledByPOM)
+    // 追加真實場景測試。
+    testHandler.clear()
+    testHandler.prefs.fetchSuggestionsFromPerceptionOverrideModel = true
+    typeSentence(readingKeys4Sentence.prefix(3).joined())
+    XCTAssertEqual("再創世", assembler.assembledSentence.map(\.value).joined())
+    typeSentence(readingKeys4Sentence[3]) // 4th
+    XCTAssertEqual("再創世的", assembler.assembledSentence.map(\.value).joined())
+    typeSentence(readingKeys4Sentence[4 ... 5].joined()) // 5th ~ 6th
+    XCTAssertEqual("再創世的凱歌", assembler.assembledSentence.map(\.value).joined())
+  }
+
+  func test_IH305_SaisoukiOnly() throws {
+    // 備註：該測試用例不適合鏡照至 MainAssemblyTests。
+    guard let testHandler, let testSession else {
+      XCTFail("testHandler and testSession at least one of them is nil.")
+      return
+    }
+    testHandler.prefs.useSCPCTypingMode = false // Use Dachen.
+    testHandler.prefs.fetchSuggestionsFromPerceptionOverrideModel = true
+    let assembler = testHandler.assembler
+    let pom = testHandler.currentLM.lmPerceptionOverride
+    clearTestPOM()
+    testSession.resetInputHandler(forceComposerCleanup: true)
+    let extractedGrams = extractGrams(
+      from: MegrezTestComponents.strLMSampleData_SaisoukiNoGaika
+    )
+    print(extractedGrams)
+    extractedGrams.forEach {
+      testHandler.currentLM.insertTemporaryData(unigram: $0, isFiltering: false)
+    }
+    testHandler.currentLM.insertTemporaryData(
+      unigram: .init(keyArray: ["ㄗㄞˋ"], value: "在"),
+      isFiltering: true
+    )
+    XCTAssert(testHandler.currentLM.hasUnigramsFor(keyArray: ["ㄗㄞˋ"]))
+    XCTAssert(testHandler.currentLM.hasUnigramsFor(keyArray: ["ㄎㄞˇ", "ㄍㄜ"]))
+    // 測試用句「再創世的凱歌」。
+    let readingKeys4Sentence = ["y94", "tj;4", "g4"]
+    typeSentence(readingKeys4Sentence.joined())
+    let assembledBefore = assembler.assembledSentence.map(\.value).joined(separator: " ")
+    XCTAssertEqual("再 創 是", assembledBefore)
+    // ====================
+    let cursorShi = 2
+    var obsCaptured: Megrez.PerceptionIntel?
+    let overrideSucceeded = assembler.overrideCandidate(
+      .init(keyArray: ["ㄕˋ"], value: "世"),
+      at: cursorShi,
+      enforceRetokenization: true
+    ) {
+      obsCaptured = $0
+    }
+    XCTAssertTrue(overrideSucceeded)
+    XCTAssertEqual(obsCaptured?.contextualizedGramKey, "(ㄗㄞˋ,再)&(ㄔㄨㄤˋ,創)&(ㄕˋ,世)")
+    guard let obsCaptured else {
+      preconditionFailure("Should have a capture.")
+    }
+
+    let assembledAfter = assembler.assembledSentence.map(\.value).joined(separator: " ")
+    XCTAssertEqual("再 創 世", assembledAfter)
+    pom.memorizePerception(
+      (obsCaptured.contextualizedGramKey, obsCaptured.candidate),
+      timestamp: Date().timeIntervalSince1970
+    )
+
+    let currentmemory = pom.getSavableData()
+    let firstObservationKey = currentmemory.first?.key
+    guard let firstObservationKey else {
+      preconditionFailure("POM memorized nothing, or something wrong happen.")
+    }
+    XCTAssertEqual(firstObservationKey, obsCaptured.contextualizedGramKey)
+
+    testHandler.clear()
+    testHandler.prefs.fetchSuggestionsFromPerceptionOverrideModel = false
+    typeSentence(readingKeys4Sentence.joined())
+
+    let assembledNow = assembler.assembledSentence.map(\.value).joined(separator: " ")
+    XCTAssertEqual("再 創 是", assembledNow)
+    testHandler.prefs.fetchSuggestionsFromPerceptionOverrideModel = true
+
+    let cursorToTest = assembler.cursor
+    let suggestion = pom.fetchSuggestion(
+      assembledResult: assembler.assembledSentence,
+      cursor: cursorToTest,
+      timestamp: Date().timeIntervalSince1970
+    )
+    XCTAssertTrue(!suggestion.isEmpty)
+    guard let firstSuggestionRAW = suggestion.candidates.first else {
+      preconditionFailure("POM suggested nothing, or something wrong happen.")
+    }
+
+    let candidateSuggested = Megrez.KeyValuePaired(
+      keyArray: firstSuggestionRAW.keyArray,
+      value: firstSuggestionRAW.value,
+      score: firstSuggestionRAW.probability
+    )
+    let cursorForOverride = suggestion.overrideCursor ?? cursorShi
+    let overrideResult = assembler.overrideCandidate(
+      candidateSuggested,
+      at: cursorForOverride,
+      overrideType: suggestion.forceHighScoreOverride ? .withSpecified : .withTopGramScore,
+      enforceRetokenization: true
+    )
+    if !overrideResult {
+      assembler.overrideCandidateLiteral(
+        candidateSuggested.value,
+        at: cursorForOverride,
+        overrideType: suggestion.forceHighScoreOverride ? .withSpecified : .withTopGramScore
+      )
+    }
+    testHandler.assemble()
+    let assembledByPOM = assembler.assembledSentence.map(\.value).joined(separator: " ")
+    XCTAssertEqual("再 創 世", assembledByPOM)
+    // 追加真實場景測試。此時 prefs.fetchSuggestionsFromPerceptionOverrideModel 是 true。
+    testHandler.clear()
+    typeSentence(readingKeys4Sentence.joined())
+    XCTAssertEqual("再 創 世", assembler.assembledSentence.map(\.value).joined(separator: " "))
+  }
 }
