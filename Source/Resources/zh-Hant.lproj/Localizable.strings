@@ -231,7 +231,7 @@
 "i18n:UserDef.kCandidateNarrationToggleType.shortTitle" = "候選字詞唸讀模式:";
 "i18n:userdef.kCheckAbusersOfSecureEventInputAPI.description" = "這種濫用會導致系統內的所有第三方輸入法全都無法正常使用（在輸入法選單內會變成灰色）。針對需要填寫敏感資料的場合，使用 SecureEventInput 無可厚非。但是，用 EnableSecureEventInput() 開啟該模式之後，就有義務在輸入窗格失焦的那一刻呼叫 DisableSecureEventInput() 來結束這種狀態。這種狀態還常見於後檯輔助 App 當中、或者某個 App 在叫出該模式之後失去回應（這樣的話，哪怕被切換到後檯，SecureEventInput 也不會自動解除）。";
 "i18n:UserDef.kCheckAbusersOfSecureEventInputAPI.shortTitle" = "主動偵測正在濫用 SecureEventInput API 的後檯執行緒";
-"i18n:UserDef.kCNS11643Enabled.shortTitle" = "啟用 CNS11643 全字庫支援 (2025-09-30)";
+"i18n:UserDef.kCNS11643Enabled.shortTitle" = "啟用 CNS11643 全字庫支援 (2025-11-10)";
 "i18n:UserDef.kCursorPlacementAfterSelectingCandidate.description" = "此設定用來指定候選字在選字窗內被確認後，游標應該位於何處。請注意，「呼出選字窗之前的游標位置」指的是選字窗出現前所記錄的游標位置。如果選擇向前推進一格，實際推進的距離會因您偏好的選字游標操作樣式而有所不同。";
 "i18n:UserDef.kCursorPlacementAfterSelectingCandidate.option.0" = "不調整";
 "i18n:UserDef.kCursorPlacementAfterSelectingCandidate.option.1" = "向前推進一格";
