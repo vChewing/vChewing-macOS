@@ -18,5 +18,10 @@ let package = Package(
       name: "BookmarkManager",
       dependencies: []
     ),
+    .testTarget(
+      name: "BookmarkManagerTests",
+      dependencies: ["BookmarkManager"],
+      path: "Tests/BookmarkManagerTests"
+    ),
   ]
 )
