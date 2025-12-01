@@ -113,6 +113,11 @@ extension AppDelegate {
     PrefMgr.shared.fixOddPreferences()
   }
 
+  public func applicationWillTerminate(_: Notification) {
+    // 確保應用終止時停止所有已啟動的 security-scoped 資源
+    BookmarkManager.shared.stopAllSecurityScopedAccesses()
+  }
+
   public func updateDirectoryMonitorPath() {
     folderMonitor.stopMonitoring()
     folderMonitor = FolderMonitor(
