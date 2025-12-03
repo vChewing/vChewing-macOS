@@ -77,7 +77,12 @@ extension MainView {
       NSApp.terminateWithDelay()
     }
 
-    _ = try? NSApp.shell("/usr/bin/xattr -drs com.apple.quarantine \(kTargetPartialPath)")
+    do {
+      // 使用 exec 而不是 shell -c，避免將路徑或變數插入到 shell 字串，降低注入風險。
+      _ = try NSApp.exec("/usr/bin/xattr", args: ["-drs", "com.apple.quarantine", kTargetPartialPath])
+    } catch {
+      // 忽略執行錯誤，維持原有行為
+    }
 
     guard let theBundle = Bundle(url: imeURLInstalled),
           let imeIdentifier = theBundle.bundleIdentifier
