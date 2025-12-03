@@ -252,10 +252,12 @@ extension MainAssemblyTests {
   ) {
     var stack = services.parseIntoCandidateTextServiceStack(candidate: candidate, reading: reading)
     let before = stack.count
+    let previous = CandidateTextService.finalSanityCheck
     CandidateTextService.enableFinalSanityCheck()
     stack = services.parseIntoCandidateTextServiceStack(candidate: candidate, reading: reading)
     let after = stack.count
     XCTAssertGreaterThan(before, after)
+    CandidateTextService.finalSanityCheck = previous
   }
 
   // MARK: - 常用斷言

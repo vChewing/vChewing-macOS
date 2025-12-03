@@ -9,27 +9,32 @@
 import Foundation
 
 extension CandidateTextService {
-  // MARK: - Final Sanity Check Implementation.
+  // 白名單：以 enum 型別列出所有允許的 selector；使用 enum 以利在編譯期檢查與方法映射。
+  public enum AllowedSelector: String, CaseIterable {
+    case copyUnicodeMetadata = "copyUnicodeMetadata:"
+    case copyRubyHTMLZhuyinTextbookStyle = "copyRubyHTMLZhuyinTextbookStyle:"
+    case copyRubyHTMLHanyuPinyinTextbookStyle = "copyRubyHTMLHanyuPinyinTextbookStyle:"
+    case copyInlineZhuyinAnnotationTextbookStyle = "copyInlineZhuyinAnnotationTextbookStyle:"
+    case copyInlineHanyuPinyinAnnotationTextbookStyle = "copyInlineHanyuPinyinAnnotationTextbookStyle:"
+    case copyBraille1947 = "copyBraille1947:"
+    case copyBraille2018 = "copyBraille2018:"
 
-  public static func enableFinalSanityCheck() {
-    finalSanityCheck = finalSanityCheckImplemented
+    // MARK: Internal
+
+    var selectorName: String { rawValue }
   }
 
-  private static func finalSanityCheckImplemented(_ target: CandidateTextService) -> Bool {
-    switch target.value {
-    case .url: return true
-    case let .selector(strSelector):
-      guard target.candidateText != "%s" else { return true } // 防止誤傷到編輯器。
-      switch strSelector {
-      case "copyUnicodeMetadata:": return true
-      case _ where strSelector.hasPrefix("copyRuby"),
-           _ where strSelector.hasPrefix("copyBraille"),
-           _ where strSelector.hasPrefix("copyInline"):
-        return !target.reading.joined().isEmpty // 以便應對 [""] 的情況。
-      default: return true
-      }
-    }
-  }
+  // MARK: - Final Sanity Check Registration.
+
+  // Register the default allowed selector set into the shared CandidateTextService
+  // module. This runs on module initialization and ensures the Shared module's
+  // final sanity check has a concrete whitelist to validate against.
+  public static let registerAllowedSelectors: () = {
+    CandidateTextService.allowedSelectorSet = Set(Self.AllowedSelector.allCases.map { $0.rawValue })
+  }()
+
+  // (The default FinalSanityCheck implementation now lives in `Shared/CandidateTextService`.
+  // The registration above ensures Shared has the allowed selector whitelist.)
 
   // MARK: - Selector Methods, CandidatePairServicable, and the Coordinator.
 
@@ -80,8 +85,25 @@ extension CandidateTextService {
 
     public func runTask(selectorName: String, candidate param: CandidatePairServicable) -> String? {
       guard !selectorName.isEmpty, !param.value.isEmpty else { return nil }
-      guard responds(to: Selector(selectorName)) else { return nil }
-      performSelector(onMainThread: Selector(selectorName), with: param, waitUntilDone: true)
+      // older runtime checks removed in favor of strongly-typed mapping
+      // 在執行前再檢查是否在白名單中，並改以 enum/action 映射執行，避免使用 performSelector。
+      guard let action = AllowedSelector(rawValue: selectorName) else { return nil }
+      switch action {
+      case .copyUnicodeMetadata:
+        copyUnicodeMetadata(param)
+      case .copyRubyHTMLZhuyinTextbookStyle:
+        copyRubyHTMLZhuyinTextbookStyle(param)
+      case .copyRubyHTMLHanyuPinyinTextbookStyle:
+        copyRubyHTMLHanyuPinyinTextbookStyle(param)
+      case .copyInlineZhuyinAnnotationTextbookStyle:
+        copyInlineZhuyinAnnotationTextbookStyle(param)
+      case .copyInlineHanyuPinyinAnnotationTextbookStyle:
+        copyInlineHanyuPinyinAnnotationTextbookStyle(param)
+      case .copyBraille1947:
+        copyBraille1947(param)
+      case .copyBraille2018:
+        copyBraille2018(param)
+      }
       defer { result = nil }
       return result
     }
@@ -146,6 +168,9 @@ extension CandidateTextService {
     private var result: String?
   }
 }
+
+// Ensure the allowed selector set registration runs when this module is loaded.
+private let _ignoredRegisterAllowedSelectors: () = CandidateTextService.registerAllowedSelectors
 
 extension CandidateTextService.Coordinator {
   fileprivate func copyInlineAnnotationCommon(

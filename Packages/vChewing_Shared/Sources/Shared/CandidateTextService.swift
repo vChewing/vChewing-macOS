@@ -43,12 +43,24 @@ public struct CandidateTextService: Codable {
       let encodedParam = param
         .addingPercentEncoding(withAllowedCharacters: CharacterSet.urlQueryAllowed)
       guard let encodedParam = encodedParam else { return nil }
-      let newURL = URL(string: temporaryRawValue.replacingOccurrences(
-        of: #"%s"#,
-        with: encodedParam
-      ))
-      guard let newURL = newURL else { return nil }
-      finalServiceValue = .url(newURL)
+      let rawURLStr = temporaryRawValue.replacingOccurrences(of: #"%s"#, with: encodedParam)
+      guard let components = URLComponents(string: rawURLStr),
+            let scheme = components.scheme?.lowercased() else { return nil }
+      switch scheme {
+      case "http", "https":
+        // 必須有 host
+        guard components.host != nil, let url = components.url else { return nil }
+        finalServiceValue = .url(url)
+      // Explicitly reject other schemes (e.g. mailto/data/javascript) at parse time.
+      // Only `http` and `https` are processed as URLs.
+      case "file":
+        // 'file' scheme is intentionally rejected and must not be processed.
+        // This move prevents the IME from directly accessing local files via
+        // candidate services, reducing potential local file access risks.
+        return nil
+      default:
+        return nil
+      }
     default: return nil
     }
     guard let finalServiceValue = finalServiceValue else { return nil }
@@ -71,12 +83,71 @@ public struct CandidateTextService: Codable {
 
   public static var finalSanityCheck: ((Self) -> Bool)?
 
+  /// 允許 `file` scheme 的目錄限制清單（預設僅包含 NSTemporaryDirectory 與 Downloads）
+  public static var allowedFileBaseDirectories: [URL] = {
+    var dirs: [URL] = []
+    dirs.append(FileManager.default.temporaryDirectory)
+    if let downloads = FileManager.default.urls(for: .downloadsDirectory, in: .userDomainMask).first {
+      dirs.append(downloads)
+    }
+    return dirs
+  }()
+
+  /// The list of selector names which are allowed to be executed by selector
+  /// services (must be registered by consumers, e.g., `MainAssembly`). When the
+  /// set is empty the selector check will deny-by-default.
+  public static var allowedSelectorSet: Set<String> = []
+
   public let key: String
   public let reading: [String]
   public let menuTitle: String
   public let definedValue: String
   public let value: ServiceValue
   public let candidateText: String
+
+  /// Convenience helpers used by tests to enable/disable a final sanity check.
+  /// Enabling sets a deny-by-default sanity check that validates URL schemes and
+  /// selectors against the pre-registered whitelist in `allowedSelectorSet`.
+  public static func enableFinalSanityCheck() {
+    Self.finalSanityCheck = defaultFinalSanityCheck
+  }
+
+  public static func disableFinalSanityCheck() {
+    Self.finalSanityCheck = nil
+  }
+
+  // MARK: Internal
+
+  /// The default implementation of final sanity checks. Deny-by-default policy
+  /// is enforced: only `http` and `https` and allowed selectors are permitted;
+  /// `http/https` must have a host; `file` scheme is explicitly rejected at parse time.
+  internal static func defaultFinalSanityCheck(_ target: Self) -> Bool {
+    let allowedURLSchemes: Set<String> = ["http", "https"]
+    let allowedSelectors: Set<String> = Self.allowedSelectorSet
+    switch target.value {
+    case let .url(url):
+      guard let scheme = url.scheme?.lowercased() else { return false }
+      if allowedURLSchemes.contains(scheme) {
+        if scheme == "http" || scheme == "https" { return url.host != nil }
+        return true
+      }
+      // 'file' scheme is disallowed by default (reject at parsing time), therefore
+      // the default sanity check will not accept 'file' URLs.
+      // All remaining schemes are rejected.
+      return false
+    case let .selector(strSelector):
+      // When candidateText remains the placeholder, the copy selectors still
+      // make sense; otherwise, selector must exist in the allowed set.
+      guard target.candidateText == "%s" else { return allowedSelectors.contains(strSelector) }
+      if allowedSelectors.contains(strSelector) {
+        if strSelector.hasPrefix("copyRuby") || strSelector.hasPrefix("copyInline") {
+          return !target.reading.joined().isEmpty
+        }
+        return true
+      }
+      return false
+    }
+  }
 }
 
 // MARK: RawRepresentable
