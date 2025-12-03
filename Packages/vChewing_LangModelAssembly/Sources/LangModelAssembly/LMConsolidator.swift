@@ -119,7 +119,7 @@ extension LMAssembly {
       // Step 3: Deduplication.
       let arrData = strProcessed.split(separator: "\n")
       // 下面兩行的 reversed 是首尾顛倒，免得破壞最新的 override 資訊。
-      let arrDataDeduplicated = Array(NSOrderedSet(array: arrData.reversed()).array as! [String])
+      let arrDataDeduplicated = Array(arrData.reversed()).deduplicated
       strProcessed = arrDataDeduplicated.reversed().joined(separator: "\n") + "\n"
 
       // Step 4: Remove duplicated newlines at the end of the file.
