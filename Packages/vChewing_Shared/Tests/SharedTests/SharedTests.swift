@@ -17,6 +17,16 @@ final class SharedTests: XCTestCase {
     #"Ecosia: %s"# + "\t" + #"@WEB:https://www.ecosia.org/search?method=index&q=%s"#,
   ]
 
+  override func setUp() {
+    super.setUp()
+    CandidateTextService.disableFinalSanityCheck()
+  }
+
+  override func tearDown() {
+    CandidateTextService.disableFinalSanityCheck()
+    super.tearDown()
+  }
+
   func testCandidateServiceNodeTestDataRestoration() throws {
     let stacked = Self.testDataMap.parseIntoCandidateTextServiceStack()
     stacked.forEach { currentService in
@@ -79,5 +89,36 @@ final class SharedTests: XCTestCase {
     XCTAssertEqual(verticalCtrlP.keyCode, KeyCode.kRightArrow.rawValue)
     XCTAssertTrue(verticalCtrlP.modifierFlags.isEmpty)
     XCTAssertFalse(verticalCtrlP.isEmacsKey)
+  }
+
+  func testCandidateTextServiceURLSchemeFiltering() throws {
+    CandidateTextService.enableFinalSanityCheck()
+    // Reject javascript scheme
+    XCTAssertNil(CandidateTextService(key: "js", definedValue: "@URL:javascript:alert(1)", param: "a"))
+    // Accept https scheme
+    let ok = CandidateTextService(key: "Bing", definedValue: "@URL:https://www.bing.com/search?q=%s", param: "test")
+    XCTAssertNotNil(ok)
+    // Reject data scheme
+    XCTAssertNil(CandidateTextService(key: "data", definedValue: "@URL:data:text/plain,hello", param: "test"))
+  }
+
+  func testCandidateTextServiceMailtoValidation() throws {
+    CandidateTextService.enableFinalSanityCheck()
+    // Mailto is no longer allowed; should return nil even for valid address.
+    XCTAssertNil(CandidateTextService(key: "mail", definedValue: "@URL:mailto:invalid-address", param: "a"))
+    XCTAssertNil(CandidateTextService(key: "mail2", definedValue: "@URL:mailto:someone@example.com", param: "a"))
+  }
+
+  func testCandidateTextServiceFileSchemeOnlyWithinAllowedDirs() throws {
+    CandidateTextService.enableFinalSanityCheck()
+    // Create a temporary file path inside NSTemporaryDirectory -> should be accepted
+    let temp = FileManager.default.temporaryDirectory.appendingPathComponent("testfile.txt")
+    let def = "@URL:file:\(temp.path)"
+    let svc = CandidateTextService(key: "file", definedValue: def, param: "a")
+    // 'file' scheme is now fully rejected
+    XCTAssertNil(svc)
+    // Now a path outside allowed dirs (root) should be rejected
+    let def2 = "@URL:file:/etc/passwd"
+    XCTAssertNil(CandidateTextService(key: "file2", definedValue: def2, param: "a"))
   }
 }
