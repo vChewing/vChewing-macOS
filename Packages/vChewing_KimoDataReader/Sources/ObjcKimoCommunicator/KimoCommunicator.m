@@ -17,24 +17,27 @@
 #import <os/log.h>
 
 void ConsoleLog(NSString *format, ...) {
-    va_list args;
-    va_start(args, format);
+  va_list args;
+  va_start(args, format);
 
-    if (@available(macOS 26, *)) {
-        // 使用 os_log，避免 <private> 問題
-        os_log_t log = os_log_create("vChewing", "KimoCommunicator");
-        va_list copy;
-        va_copy(copy, args);
-        NSString *fullMessage = [[NSString alloc] initWithFormat:format arguments:copy];
-        va_end(copy);
-        // 使用 %{public}@ 來公開顯示字串，避免模糊；根據需要調整級別如 OS_LOG_TYPE_DEBUG
-        os_log_with_type(log, OS_LOG_TYPE_DEFAULT, "%{public}@", fullMessage);
-    } else {
-        // 回退到 NSLog，兼容舊系統
-        NSString *fullMessage = [[NSString alloc] initWithFormat:format arguments:args];
-        NSLog(@"%@", fullMessage);
-    }
-    va_end(args);
+  if (@available(macOS 26, *)) {
+    // 使用 os_log，避免 <private> 問題
+    os_log_t log = os_log_create("vChewing", "KimoCommunicator");
+    va_list copy;
+    va_copy(copy, args);
+    NSString *fullMessage = [[NSString alloc] initWithFormat:format
+                                                   arguments:copy];
+    va_end(copy);
+    // 使用 %{public}@ 來公開顯示字串，避免模糊；根據需要調整級別如
+    // OS_LOG_TYPE_DEBUG
+    os_log_with_type(log, OS_LOG_TYPE_DEFAULT, "%{public}@", fullMessage);
+  } else {
+    // 回退到 NSLog，兼容舊系統
+    NSString *fullMessage = [[NSString alloc] initWithFormat:format
+                                                   arguments:args];
+    NSLog(@"%@", fullMessage);
+  }
+  va_end(args);
 }
 
 #define kYahooKimoDataObjectConnectionName @"YahooKeyKeyService"
@@ -69,8 +72,9 @@ void ConsoleLog(NSString *format, ...) {
   }
   if (result) {
     [_xpcConnection setProtocolForProxy:@protocol(KimoUserDataReaderService)];
-    ConsoleLog(@"vChewingDebug: Connection successful. Available data amount: %d.\n",
-          [_xpcConnection userPhraseDBNumberOfRow]);
+    ConsoleLog(
+        @"vChewingDebug: Connection successful. Available data amount: %d.\n",
+        [_xpcConnection userPhraseDBNumberOfRow]);
   }
   return result;
 }
@@ -93,7 +97,7 @@ void ConsoleLog(NSString *format, ...) {
                                    : 0;
 }
 
-- (NSDictionary<NSString*, NSString*> *)userPhraseDBDictionaryAtRow:(int)row {
+- (NSDictionary<NSString *, NSString *> *)userPhraseDBDictionaryAtRow:(int)row {
   return [self hasValidConnection]
              ? [_xpcConnection userPhraseDBDictionaryAtRow:row]
              : [NSDictionary alloc];
