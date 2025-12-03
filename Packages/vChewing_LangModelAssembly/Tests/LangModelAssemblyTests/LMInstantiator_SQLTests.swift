@@ -8,6 +8,7 @@
 
 import Foundation
 import LMAssemblyMaterials4Tests
+import Megrez
 import XCTest
 
 @testable import LangModelAssembly
@@ -24,6 +25,8 @@ private let expectedReverseLookupResults: [String] = [
 // MARK: - LMInstantiatorSQLTests
 
 final class LMInstantiatorSQLTests: XCTestCase {
+  // MARK: Internal
+
   func testSQL() throws {
     let instance = LMAssembly.LMInstantiator(isCHS: true)
     XCTAssertTrue(!sqlTestCoreLMData.isEmpty)
@@ -96,5 +99,65 @@ final class LMInstantiatorSQLTests: XCTestCase {
       instance.unigramsFor(keyArray: ["ㄨㄟˊ"]).first(where: { $0.value == "危" })?.description,
       "(ㄨㄟˊ,危,-5.287)"
     )
+  }
+
+  func testFactoryKeyWithApostropheIsFound() throws {
+    // 確保包含尾隨單引號的 key 能正確從資料庫擷取。
+    let instance = LMAssembly.LMInstantiator(isCHS: true)
+    let sqlSetup = """
+    CREATE TABLE IF NOT EXISTS DATA_MAIN (
+      theKey TEXT NOT NULL,
+      theDataCHS TEXT,
+      theDataCHT TEXT,
+      theDataCNS TEXT,
+      theDataMISC TEXT,
+      theDataSYMB TEXT,
+      theDataCHEW TEXT,
+      PRIMARY KEY (theKey)
+    ) WITHOUT ROWID;
+    INSERT INTO DATA_MAIN(theKey, theDataCHS) VALUES ('k''', '1 value');
+    """
+
+    XCTAssertTrue(LMAssembly.LMInstantiator.connectToTestSQLDB(sqlSetup))
+    let grams = instance.unigramsFor(keyArray: ["k'"])
+    XCTAssertTrue(grammarContainsValue(grams, "value"))
+    LMAssembly.LMInstantiator.disconnectSQLDB()
+  }
+
+  func testFactoryCNSAndExistenceWithApostropheKey() throws {
+    let instance = LMAssembly.LMInstantiator(isCHS: false)
+    let sqlSetup = """
+    CREATE TABLE IF NOT EXISTS DATA_MAIN (
+      theKey TEXT NOT NULL,
+      theDataCHS TEXT,
+      theDataCHT TEXT,
+      theDataCNS TEXT,
+      theDataMISC TEXT,
+      theDataSYMB TEXT,
+      theDataCHEW TEXT,
+      PRIMARY KEY (theKey)
+    ) WITHOUT ROWID;
+    INSERT INTO DATA_MAIN(theKey, theDataCNS) VALUES ('k''', 'cnsval');
+    """
+    XCTAssertTrue(LMAssembly.LMInstantiator.connectToTestSQLDB(sqlSetup))
+    // 透過 connectToTestSQLDB 確認資料庫連線已建立
+    // 檢查 CNS 過濾執行緒
+    guard let cnsv = instance.factoryCNSFilterThreadFor(key: "k'") else {
+      XCTFail("Expected CNS result for key")
+      return
+    }
+    XCTAssertTrue(cnsv.contains("cnsval"))
+    // 檢查該 key 的 theDataCNS 欄位是否存在
+    let encryptedKeyForCheck = "k'"
+    let q = "SELECT * FROM DATA_MAIN WHERE theKey = ? AND theDataCNS IS NOT NULL"
+    let existsCNS = LMAssembly.LMInstantiator.hasSQLResult(strStmt: q, params: [encryptedKeyForCheck])
+    XCTAssertTrue(existsCNS)
+    LMAssembly.LMInstantiator.disconnectSQLDB()
+  }
+
+  // MARK: Private
+
+  private func grammarContainsValue(_ grams: [Megrez.Unigram], _ value: String) -> Bool {
+    grams.contains(where: { $0.value == value })
   }
 }

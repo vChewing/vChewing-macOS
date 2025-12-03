@@ -84,6 +84,7 @@ extension LMAssembly.LMInstantiator {
 
   fileprivate static func querySQL(
     strStmt sqlQuery: String,
+    params: [String] = [],
     coreColumn column: CoreColumn,
     handler: (String) -> ()
   ) {
@@ -94,6 +95,12 @@ extension LMAssembly.LMInstantiator {
         vCLMLog("SQL prepare failed for query: \(sqlQuery)")
         return
       }
+      // 綁定參數（如果有的話）
+      for (i, param) in params.enumerated() {
+        let idx = Int32(i + 1)
+        let utf8 = (param as NSString).utf8String
+        _ = sqlite3_bind_text(ptrStatement, idx, utf8, -1, unsafeBitCast(-1, to: sqlite3_destructor_type.self))
+      }
       while sqlite3_step(ptrStatement) == SQLITE_ROW {
         guard let rawValue = sqlite3_column_text(ptrStatement, column.id) else { continue }
         handler(String(cString: rawValue))
@@ -101,14 +108,34 @@ extension LMAssembly.LMInstantiator {
     }
   }
 
-  fileprivate static func hasSQLResult(strStmt sqlQuery: String) -> Bool {
+  internal static func hasSQLResult(strStmt sqlQuery: String, params: [String] = []) -> Bool {
     guard Self.ptrSQL != nil else { return false }
     var sqlQuery = sqlQuery
     if sqlQuery.last == ";" { sqlQuery = sqlQuery.dropLast(1).description } // 防呆設計。
     guard !sqlQuery.isEmpty else { return false }
+    // 若提供了參數，確保 sqlQuery 使用匹配的佔位符號（?）對應每個參數。
+    if !params.isEmpty {
+      let placeholderCount = sqlQuery.filter { $0 == "?" }.count
+      if placeholderCount != params.count {
+        vCLMLog(
+          "SQL param placeholder count mismatch: query=\(sqlQuery) expected=\(params.count) found=\(placeholderCount)"
+        )
+        return false
+      }
+    }
+
     return performStatement { ptrStatement in
       let wrappedQuery = "SELECT EXISTS(\(sqlQuery));"
-      sqlite3_prepare_v2(Self.ptrSQL, wrappedQuery, -1, &ptrStatement, nil)
+      let prep = sqlite3_prepare_v2(Self.ptrSQL, wrappedQuery, -1, &ptrStatement, nil)
+      if prep != SQLITE_OK {
+        if let err = sqlite3_errmsg(Self.ptrSQL) { vCLMLog("sqlite3_prepare_v2 failed: \(String(cString: err))") }
+        return false
+      }
+      for (i, param) in params.enumerated() {
+        let idx = Int32(i + 1)
+        let cParam = (param as NSString).utf8String
+        _ = sqlite3_bind_text(ptrStatement, idx, cParam, -1, unsafeBitCast(-1, to: sqlite3_destructor_type.self))
+      }
       while sqlite3_step(ptrStatement) == SQLITE_ROW {
         return sqlite3_column_int(ptrStatement, 0) == 1
       }
@@ -119,10 +146,17 @@ extension LMAssembly.LMInstantiator {
   /// 获取字根反查资料。
   public static func getFactoryReverseLookupData(with kanji: String) -> [String]? {
     var results: [String] = []
-    let sqlQuery = "SELECT * FROM DATA_REV WHERE theChar='\(kanji)';"
+    // 使用 prepared statement 並綁定參數以避免 SQL injection
+    let sqlQuery = "SELECT * FROM DATA_REV WHERE theChar = ?;"
     guard Self.ptrSQL != nil else { return nil }
     performStatementSansResult { ptrStatement in
-      sqlite3_prepare_v2(Self.ptrSQL, sqlQuery, -1, &ptrStatement, nil)
+      if sqlite3_prepare_v2(Self.ptrSQL, sqlQuery, -1, &ptrStatement, nil) == SQLITE_OK {
+        // 綁定 kanji 參數
+        let cKanji = (kanji as NSString).utf8String
+        _ = sqlite3_bind_text(ptrStatement, 1, cKanji, -1, unsafeBitCast(-1, to: sqlite3_destructor_type.self))
+      } else {
+        vCLMLog("SQL prepare failed for query: \(sqlQuery)")
+      }
       while sqlite3_step(ptrStatement) == SQLITE_ROW {
         guard let rawValue = sqlite3_column_text(ptrStatement, 1) else { continue }
         results.append(
@@ -165,7 +199,7 @@ extension LMAssembly.LMInstantiator {
   /// - parameters:
   ///   - key: 讀音索引鍵。
   public func factoryCoreUnigramsFor(key: String, keyArray: [String]) -> [Megrez.Unigram] {
-    // 此處需要把 ASCII 單引號換成連續兩個單引號，否則會有 SQLite 語句查詢故障。
+    // 此處無須逸出 ASCII 單引號，因為我們使用了 prepared statement 參數綁定。
     factoryUnigramsFor(key: key, keyArray: keyArray, column: isCHS ? .theDataCHS : .theDataCHT)
   }
 
@@ -182,10 +216,11 @@ extension LMAssembly.LMInstantiator {
     if key == "_punctuation_list" { return [] }
     var grams: [Megrez.Unigram] = []
     var gramsHW: [Megrez.Unigram] = []
-    // 此處需要把 ASCII 單引號換成連續兩個單引號，否則會有 SQLite 語句查詢故障。
-    let encryptedKey = Self.cnvPhonabetToASCII(key.replacingOccurrences(of: "'", with: "''"))
-    let sqlQuery = "SELECT * FROM DATA_MAIN WHERE theKey='\(encryptedKey)';"
-    Self.querySQL(strStmt: sqlQuery, coreColumn: column) { currentResult in
+    // 此處無須逸出 ASCII 單引號，因為我們使用了 prepared statement 參數綁定。
+    let encryptedKey = Self.cnvPhonabetToASCII(key)
+    // 使用 prepared statement 並綁定參數以避免 SQL injection
+    let sqlQuery = "SELECT * FROM DATA_MAIN WHERE theKey = ?;"
+    Self.querySQL(strStmt: sqlQuery, params: [encryptedKey], coreColumn: column) { currentResult in
       var i: Double = 0
       var previousScore: Double?
       currentResult.split(separator: "\t").forEach { strNetaSet in
@@ -226,14 +261,15 @@ extension LMAssembly.LMInstantiator {
   /// - parameters:
   ///   - key: 讀音索引鍵。
   ///   - column: 資料欄位。
-  private func factoryCNSFilterThreadFor(key: String) -> String? {
+  internal func factoryCNSFilterThreadFor(key: String) -> String? {
     let column = CoreColumn.theDataCNS
     if key == "_punctuation_list" { return nil }
     var results: [String] = []
-    // 此處需要把 ASCII 單引號換成連續兩個單引號，否則會有 SQLite 語句查詢故障。
-    let encryptedKey = Self.cnvPhonabetToASCII(key.replacingOccurrences(of: "'", with: "''"))
-    let sqlQuery = "SELECT * FROM DATA_MAIN WHERE theKey='\(encryptedKey)';"
-    Self.querySQL(strStmt: sqlQuery, coreColumn: column) { currentResult in
+    // 此處無須逸出 ASCII 單引號，因為我們使用了 prepared statement 參數綁定。
+    let encryptedKey = Self.cnvPhonabetToASCII(key)
+    // 使用 prepared statement 並綁定參數以避免 SQL injection
+    let sqlQuery = "SELECT * FROM DATA_MAIN WHERE theKey = ?;"
+    Self.querySQL(strStmt: sqlQuery, params: [encryptedKey], coreColumn: column) { currentResult in
       results.append(currentResult)
     }
     return results.joined(separator: "\t")
@@ -247,11 +283,11 @@ extension LMAssembly.LMInstantiator {
     let column: CoreColumn = isCHS ? .theDataCHS : .theDataCHT
     // 此處需要把 ASCII 單引號換成連續兩個單引號，否則會有 SQLite 語句查詢故障。
     let encryptedKey = Self
-      .cnvPhonabetToASCII(keyArray.joined(separator: "-").replacingOccurrences(of: "'", with: "''"))
+      .cnvPhonabetToASCII(keyArray.joined(separator: "-"))
     // 此處為特例，無須以分號結尾。回頭整句塞到「SELECT EXISTS();」當中執行。
-    let sqlQuery =
-      "SELECT * FROM DATA_MAIN WHERE theKey='\(encryptedKey)' AND \(column.name) IS NOT NULL"
-    return Self.hasSQLResult(strStmt: sqlQuery)
+    // column.name 來自 enum，為安全的欄位識別符。encryptedKey 攜帶使用者輸入，需綁定。
+    let sqlQuery = "SELECT * FROM DATA_MAIN WHERE theKey = ? AND \(column.name) IS NOT NULL"
+    return Self.hasSQLResult(strStmt: sqlQuery, params: [encryptedKey])
   }
 
   /// 檢查該當 Unigram 結果是否完全符合台澎金馬 CNS11643 的規定讀音。
