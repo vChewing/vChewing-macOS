@@ -155,9 +155,12 @@ public final class HotenkaChineseConverter {
       "zh2CN": [String: String](),
     ]
 
+    // 建立基底檔案目錄 URL，確保為本機檔案路徑
+    let baseURL = URL(fileURLWithPath: dictDir)
     let enumerator = FileManager.default.enumerator(atPath: dictDir)
     guard let filePaths = enumerator?.allObjects as? [String] else { return }
-    let arrFiles = filePaths.filter { $0.contains(".txt") }.compactMap { URL(string: dictDir + $0) }
+    // 以 fileURLWithPath + appendingPathComponent 的方式建立檔案 URL，避免 URL(string:) 解析為網路 URL
+    let arrFiles = filePaths.filter { $0.contains(".txt") }.map { baseURL.appendingPathComponent($0) }
     for theURL in arrFiles {
       let fullFilename = theURL.lastPathComponent
       let mainFilename = fullFilename.substring(to: fullFilename.range(of: ".").lowerBound)
@@ -209,16 +212,19 @@ public final class HotenkaChineseConverter {
   public func query(dict dictType: DictType, key searchKey: String) -> String? {
     guard ptrSQL != nil else { return dict[dictType.rawKeyString]?[searchKey] }
     var ptrStatement: OpaquePointer?
-    let sqlQuery =
-      "SELECT * FROM DATA_HOTENKA WHERE dict=\(dictType.rawValue) AND theKey='\(searchKey)';"
-    sqlite3_prepare_v2(ptrSQL, sqlQuery, -1, &ptrStatement, nil)
-    defer {
-      sqlite3_finalize(ptrStatement)
-      ptrStatement = nil
-    }
+    let sqlQuery = "SELECT theValue FROM DATA_HOTENKA WHERE dict=? AND theKey=?;"
+    // 使用 prepared statement 與 bind 參數以避免 SQL 注入
+    let preparation = sqlite3_prepare_v2(ptrSQL, sqlQuery, -1, &ptrStatement, nil)
+    guard preparation == SQLITE_OK else { return nil }
+    defer { sqlite3_finalize(ptrStatement); ptrStatement = nil }
+    // 綁定 dict 與 key
+    _ = sqlite3_bind_int(ptrStatement, 1, Int32(dictType.rawValue))
+    let cKey = (searchKey as NSString).utf8String
+    _ = sqlite3_bind_text(ptrStatement, 2, cKey, -1, unsafeBitCast(-1, to: sqlite3_destructor_type.self))
     // 此處只需要用到第一筆結果。
     while sqlite3_step(ptrStatement) == SQLITE_ROW {
-      guard let rawValue = sqlite3_column_text(ptrStatement, 2) else { continue }
+      // 因為 SELECT theValue 回傳的是第 0 欄位
+      guard let rawValue = sqlite3_column_text(ptrStatement, 0) else { continue }
       return String(cString: rawValue)
     }
     return nil
