@@ -31,6 +31,8 @@ extension SessionProtocol {
       return false
     }
 
+    syncCurrentSessionID()
+
     // 用 Shift 開關半形英數模式，僅對 macOS 10.15 及之後的 macOS 有效。
     // 警告：這裡的 event 必須是原始 event 且不能被 var，否則會影響 Shift 中英模式判定。
     if ui?.shiftKeyUpChecker?.check(event) ?? false {
