@@ -6,7 +6,8 @@
 	<true/>
 	<key>com.apple.security.temporary-exception.files.home-relative-path.read-write</key>
 	<array>
-		<string>/</string>
+		<string>/Library/Containers/$(PRODUCT_BUNDLE_IDENTIFIER)</string>
+		<string>/Library/Mobile Documents/com~apple~CloudDocs/vChewing/</string>
 	</array>
 	<key>com.apple.security.temporary-exception.mach-lookup.global-name</key>
 	<array>
