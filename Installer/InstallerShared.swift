@@ -157,17 +157,22 @@ extension StringLiteralType {
 // MARK: - Shell
 
 extension NSApplication {
-  public func shell(_ command: String) throws -> String {
+  /// 以安全的方式執行可執行檔與參數，避免將使用者輸入插入到 shell 的 -c 字串中，降低命令注入風險。
+  /// - Parameters:
+  ///   - executable: 可執行檔完整路徑，例如 "/usr/bin/xattr"。
+  ///   - args: 參數陣列，會被直接傳給 `Process.arguments` 使用。
+  /// - Returns: 回傳執行結果 stdout 的字串表示。
+  public func exec(_ executable: String, args: [String]) throws -> String {
     let task = Process()
     let pipe = Pipe()
 
     task.standardOutput = pipe
     task.standardError = pipe
-    task.arguments = ["-c", command]
+    task.arguments = args
     if #available(macOS 10.13, *) {
-      task.executableURL = URL(fileURLWithPath: "/bin/zsh")
+      task.executableURL = URL(fileURLWithPath: executable)
     } else {
-      task.launchPath = "/bin/zsh"
+      task.launchPath = executable
     }
     task.standardInput = nil
 
@@ -183,9 +188,7 @@ extension NSApplication {
       if let data = data, let str = String(data: data, encoding: .utf8) {
         output.append(str)
       }
-    } catch {
-      return ""
-    }
+    } catch { return "" }
     return output
   }
 }
