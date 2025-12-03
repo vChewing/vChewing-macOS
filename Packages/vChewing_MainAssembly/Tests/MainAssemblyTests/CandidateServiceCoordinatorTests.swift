@@ -23,6 +23,16 @@ final class CandidateServiceCoordinatorTests: XCTestCase {
     #"Braille 2018: %s"# + "\t" + #"@SEL:copyBraille2018:"#,
   ]
 
+  override func setUp() {
+    super.setUp()
+    CandidateTextService.disableFinalSanityCheck()
+  }
+
+  override func tearDown() {
+    CandidateTextService.disableFinalSanityCheck()
+    super.tearDown()
+  }
+
   func testSelector_FinalSanityCheck() throws {
     assertServiceCountReducedAfterFinalSanityCheck(
       services: Self.testDataMap,
@@ -109,6 +119,23 @@ final class CandidateServiceCoordinatorTests: XCTestCase {
       reading: ["ㄧㄡ", "ㄉㄧㄝˊ", "ㄋㄥˊ", "ㄌㄧㄡˊ", "ㄧˋ", "ㄌㄩˇ", "ㄈㄤ"],
       expected: expectedResponse
     )
+  }
+
+  func testSelector_BlockedSelectorRejected() throws {
+    // 確認一個不在白名單內的 selector 會被 finalSanityCheck 阻擋
+    CandidateTextService.enableFinalSanityCheck()
+    let raw = ["Evil: %s\t@SEL:executeArbitrary:"]
+    let stacked = raw.parseIntoCandidateTextServiceStack(candidate: "A", reading: ["ㄚ"]) // 嘗試使用一個 candidate
+    XCTAssertTrue(stacked.isEmpty)
+    CandidateTextService.disableFinalSanityCheck()
+  }
+
+  func testURL_JavascriptSchemeIsBlocked() throws {
+    CandidateTextService.enableFinalSanityCheck()
+    let raw = ["EvilURL: %s\t@URL:javascript:alert('X')"]
+    let stacked = raw.parseIntoCandidateTextServiceStack(candidate: "A", reading: ["ㄚ"]) // 嘗試使用一個 candidate
+    XCTAssertTrue(stacked.isEmpty)
+    CandidateTextService.disableFinalSanityCheck()
   }
 
   // MARK: Private
