@@ -139,8 +139,10 @@ extension LMMgr {
     let isFolderWritable = FileManager.default.isWritableFile(atPath: folderPath ?? "")
     // vCLog("mgrLM: Exist: \(folderExist), IsFolder: \(isFolder.boolValue), isWritable: \(isFolderWritable)")
     if ((folderExist && !isFolder.boolValue) || !folderExist) || !isFolderWritable {
+      Broadcaster.shared.lmMgrDataFolderPathInvalidityConfirmed = folderPath ?? ""
       return false
     }
+    Broadcaster.shared.lmMgrDataFolderPathInvalidityConfirmed = nil
     return true
   }
 
@@ -150,7 +152,13 @@ extension LMMgr {
     let isExist = FileManager.default.fileExists(atPath: cassettePath ?? "", isDirectory: &isFolder)
     // The above "&" mutates the "isFolder" value to the real one received by the "isExist".
     let isReadable = FileManager.default.isReadableFile(atPath: cassettePath ?? "")
-    return !isFolder.boolValue && isExist && isReadable
+    let result = !isFolder.boolValue && isExist && isReadable
+    if !result {
+      Broadcaster.shared.lmMgrCassettePathInvalidityConfirmed = cassettePath ?? ""
+    } else {
+      Broadcaster.shared.lmMgrCassettePathInvalidityConfirmed = nil
+    }
+    return result
   }
 
   // 檢查給定的目錄是否存在寫入合規性、且糾偏，不接受任何傳入變數。

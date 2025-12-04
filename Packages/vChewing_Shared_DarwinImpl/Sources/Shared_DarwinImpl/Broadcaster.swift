@@ -14,4 +14,6 @@ public final class Broadcaster: NSObject {
 
   public dynamic var eventForReloadingPhraseEditor = UUID()
   public dynamic var eventForClosingAllPanels = UUID()
+  public dynamic var lmMgrDataFolderPathInvalidityConfirmed: String?
+  public dynamic var lmMgrCassettePathInvalidityConfirmed: String?
 }
