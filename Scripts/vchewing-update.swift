@@ -28,6 +28,30 @@ enum Shell {
       return (task.terminationStatus, str)
     }
   }
+
+  @discardableResult
+  static func runExec(
+    _ executable: String,
+    args: [String] = [],
+    cwd: String? = nil,
+    captureOutput: Bool = true,
+    trim: Bool = true
+  )
+    -> (status: Int32, output: String) {
+    let task = Process()
+    let pipe = Pipe()
+    task.executableURL = URL(fileURLWithPath: executable)
+    task.arguments = args
+    if let cwd = cwd { task.currentDirectoryPath = cwd }
+    task.standardOutput = pipe
+    task.standardError = pipe
+    do { try task.run() } catch { return (-1, "Error: \(error)") }
+    let data = pipe.fileHandleForReading.readDataToEndOfFile()
+    task.waitUntilExit()
+    let str = String(data: data, encoding: .utf8) ?? ""
+    if !trim { return (task.terminationStatus, str) }
+    return (task.terminationStatus, str.trimmingCharacters(in: .whitespacesAndNewlines))
+  }
 }
 
 func usage() {
@@ -73,31 +97,36 @@ func nowStamp() -> String {
 let commitTime = nowStamp()
 let updateCommitMsg = "Update Data - \(commitTime)"
 
-// 1) run make update
+// 1) 執行 make update
 print("Running 'make update' in \(repoPath) ...")
 if dryRun {
   print("dry-run enabled: skipping 'make update'")
 } else {
-  let res = Shell.run("make update", cwd: repoPath)
+  let res = Shell.runExec("/usr/bin/make", args: ["update"], cwd: repoPath)
   print(res.output)
   if res.status != 0 {
     print("make update failed (status \(res.status))")
-    // Continue? exit for now
+    // 是否繼續？目前先退出
     exit(2)
   }
 }
 
-// 2) detect submodule changes using git submodule status for robust detection
-let smStatus = Shell.run("git submodule status --recursive", cwd: repoPath, trim: false)
+// 2) 使用 git submodule status 偵測子模組變更（較為穩健）
+let smStatus = Shell.runExec(
+  "/usr/bin/git",
+  args: ["submodule", "status", "--recursive"],
+  cwd: repoPath,
+  trim: false
+)
 let smLines = smStatus.output.split(separator: "\n").map { String($0) }
 let changedSmLines = smLines.filter { line in
-  // lines start with ' ' for up-to-date; '+' or '-' or 'U' indicate changed/uncommitted
+  // 若開頭是 ' ' 表示 up-to-date；'+'、'-' 或 'U' 表示已變更或未提交
   guard let firstChar = line.first else { return false }
   return firstChar != " "
 }
 
 let submodulePaths = changedSmLines.map { line -> String in
-  // line format: "<status> <sha> <path> (details)" -> we want the path (comps[1])
+  // 行格式: "<status> <sha> <path> (details)" -> 我們要取 path (comps[1])
   let comps = line.split(separator: " ")
   return comps.count >= 2 ? String(comps[1]) : line
 }
@@ -107,14 +136,18 @@ if !submodulePaths.isEmpty {
   if dryRun {
     print("dry-run: skipping commit of submodules")
   } else {
-    // Add and commit submodule pointer updates explicitly
+    // 明確加入並 commit 子模組的 pointer 更新
     for sm in submodulePaths {
-      _ = Shell.run("git add \(sm)", cwd: repoPath)
+      _ = Shell.runExec("/usr/bin/git", args: ["add", sm], cwd: repoPath)
     }
-    let commitRes = Shell.run("git commit -m \"\(updateCommitMsg)\"", cwd: repoPath)
+    let commitRes = Shell.runExec(
+      "/usr/bin/git",
+      args: ["commit", "-m", updateCommitMsg],
+      cwd: repoPath
+    )
     if commitRes.status != 0 {
       print("Failed to commit submodule changes: \(commitRes.output)")
-      // Don't continue version bump if submodule commit failed
+      // 若子模組 commit 失敗，則不要繼續做版本升級
       exit(4)
     }
     print("Committed: \(updateCommitMsg)")
@@ -123,7 +156,7 @@ if !submodulePaths.isEmpty {
   print("No submodule changes detected via 'git submodule status'.")
 }
 
-// 3) find highest tag
+// 3) 找出最高版本標籤 (highest tag)
 let tagOut = Shell.run(
   "git fetch --tags && git tag --list --sort=-v:refname | head -n 1",
   cwd: repoPath
@@ -131,7 +164,7 @@ let tagOut = Shell.run(
 let highestTag = tagOut.output.trimmingCharacters(in: .whitespacesAndNewlines)
 print("Highest tag: \(highestTag)")
 
-// --- New: read current MARKETING_VERSION & CURRENT_PROJECT_VERSION from Xcode project
+// --- 新增: 從 Xcode 專案讀取目前的 MARKETING_VERSION 與 CURRENT_PROJECT_VERSION
 func locatePbxproj(at repo: String) -> String? {
   let fm = FileManager.default
   if let files = try? fm.contentsOfDirectory(atPath: repo) {
@@ -144,24 +177,34 @@ func locatePbxproj(at repo: String) -> String? {
 
 func parsePbxProjectVersionAndBuild(_ pbxPath: String) -> (String, String) {
   var content = ""
-  do { content = try String(contentsOfFile: pbxPath, encoding: .utf8) } catch { return ("0.0.0", "0") }
-  // Find MARKETING_VERSION and CURRENT_PROJECT_VERSION
-  let marketingRegex = try? NSRegularExpression(pattern: "MARKETING_VERSION = ([0-9]+\\.[0-9]+\\.[0-9]+);", options: [])
-  let buildRegex = try? NSRegularExpression(pattern: "CURRENT_PROJECT_VERSION = ([0-9]+);", options: [])
+  do { content = try String(contentsOfFile: pbxPath, encoding: .utf8) } catch {
+    return ("0.0.0", "0")
+  }
+  // 尋找 MARKETING_VERSION 與 CURRENT_PROJECT_VERSION
+  let marketingRegex = try? NSRegularExpression(
+    pattern: "MARKETING_VERSION = ([0-9]+\\.[0-9]+\\.[0-9]+);",
+    options: []
+  )
+  let buildRegex = try? NSRegularExpression(
+    pattern: "CURRENT_PROJECT_VERSION = ([0-9]+);",
+    options: []
+  )
   var market = "0.0.0"
   var build = "0"
-  if let mrx = marketingRegex, let match = mrx.firstMatch(
-    in: content,
-    options: [],
-    range: NSRange(content.startIndex..., in: content)
-  ) {
+  if let mrx = marketingRegex,
+     let match = mrx.firstMatch(
+       in: content,
+       options: [],
+       range: NSRange(content.startIndex..., in: content)
+     ) {
     if let range = Range(match.range(at: 1), in: content) { market = String(content[range]) }
   }
-  if let brx = buildRegex, let match = brx.firstMatch(
-    in: content,
-    options: [],
-    range: NSRange(content.startIndex..., in: content)
-  ) {
+  if let brx = buildRegex,
+     let match = brx.firstMatch(
+       in: content,
+       options: [],
+       range: NSRange(content.startIndex..., in: content)
+     ) {
     if let range = Range(match.range(at: 1), in: content) { build = String(content[range]) }
   }
   return (market, build)
@@ -170,17 +213,25 @@ func parsePbxProjectVersionAndBuild(_ pbxPath: String) -> (String, String) {
 func isLegacyByMacOSDeployment(_ pbxPath: String) -> Bool {
   var content = ""
   do { content = try String(contentsOfFile: pbxPath, encoding: .utf8) } catch { return false }
-  // find all MACOSX_DEPLOYMENT_TARGET occurrences and choose minimal
-  let regex = try? NSRegularExpression(pattern: "MACOSX_DEPLOYMENT_TARGET = ([0-9]+\\.[0-9]+);", options: [])
+  // 找出所有 MACOSX_DEPLOYMENT_TARGET 的出現，並選擇最小值（最低部署版本）
+  let regex = try? NSRegularExpression(
+    pattern: "MACOSX_DEPLOYMENT_TARGET = ([0-9]+\\.[0-9]+);",
+    options: []
+  )
   var minVer: (Int, Int)?
   if let rx = regex {
-    let ms = rx.matches(in: content, options: [], range: NSRange(content.startIndex..., in: content))
+    let ms = rx.matches(
+      in: content,
+      options: [],
+      range: NSRange(content.startIndex..., in: content)
+    )
     for m in ms {
       if let r = Range(m.range(at: 1), in: content) {
         let v = String(content[r])
         let comps = v.split(separator: ".").map { Int($0) ?? 0 }
         if comps.count >= 2 {
-          let major = comps[0], minor = comps[1]
+          let major = comps[0]
+          let minor = comps[1]
           if minVer == nil || (major, minor) < minVer! { minVer = (major, minor) }
         }
       }
@@ -207,9 +258,12 @@ if let pbx = locatePbxproj(at: repoPath) {
 func bumpTagFromProject(version: String, useLegacySuffix: Bool) -> (String, Bool) {
   var tag = version
   var isLegacy = useLegacySuffix
-  // If version string contains -legacy suffix, remove it
-  if tag.hasSuffix("-legacy") { isLegacy = true; tag = String(tag.dropLast(7)) }
-  // parse semver: major.minor.patch
+  // 若版本字串包含 -legacy 後綴，則移除
+  if tag.hasSuffix("-legacy") {
+    isLegacy = true
+    tag = String(tag.dropLast(7))
+  }
+  // 解析 semver: major.minor.patch
   let comps = tag.split(separator: ".").map { Int($0) ?? 0 }
   let major = comps.count > 0 ? comps[0] : 0
   let minor = comps.count > 1 ? comps[1] : 0
@@ -222,7 +276,7 @@ func bumpTagFromProject(version: String, useLegacySuffix: Bool) -> (String, Bool
 let (newTag, isLegacy) = bumpTagFromProject(version: currentVer, useLegacySuffix: projectIsLegacy)
 print("New tag: \(newTag) (legacy? \(isLegacy))")
 
-// 4) compute build number: major*1000 + minor*100 + patch*10
+// 4) 計算 build number: major*1000 + minor*100 + patch*10
 let base = newTag.components(separatedBy: "-").first ?? newTag
 let parts = base.split(separator: ".").map { Int($0) ?? 0 }
 let major = parts.count > 0 ? parts[0] : 0
@@ -231,7 +285,7 @@ let patch = parts.count > 2 ? parts[2] : 0
 let buildNum = major * 1_000 + minor * 100 + patch * 10
 print("Computed build number: \(buildNum)")
 
-// 5) run BuildVersionSpecifier.swift
+// 5) 執行 BuildVersionSpecifier.swift
 if FileManager.default.fileExists(atPath: repoPath + "/BuildVersionSpecifier.swift") {
   print("Running BuildVersionSpecifier.swift \(base) \(buildNum)")
   if dryRun {
@@ -241,7 +295,7 @@ if FileManager.default.fileExists(atPath: repoPath + "/BuildVersionSpecifier.swi
       "chmod +x ./BuildVersionSpecifier.swift && ./BuildVersionSpecifier.swift \(base) \(buildNum)",
       cwd: repoPath
     )
-    // commit version changes - ensure no submodule changes remain
+    // commit 版本變更 - 確保沒有遺留的子模組改動
     let smCheck = Shell.run(
       "git submodule status --recursive | sed -n '1,200p'",
       cwd: repoPath,
@@ -267,15 +321,15 @@ if FileManager.default.fileExists(atPath: repoPath + "/BuildVersionSpecifier.swi
   exit(3)
 }
 
-// 6) create tag
+// 6) 建立 tag
 if dryRun {
   print("dry-run: skipping tag creation for \(newTag)")
 } else {
-  _ = Shell.run("git tag -f \"\(newTag)\"", cwd: repoPath)
+  _ = Shell.runExec("/usr/bin/git", args: ["tag", "-f", newTag], cwd: repoPath)
   print("Tag \(newTag) created/updated.")
 }
 
-// 7) revert Update-Info.plist changes from version commit (only the file). Use the parent of the last [VersionUp] commit when possible.
+// 7) 回復 Update-Info.plist 在版本提交時的變更（僅限該檔案）。若可能則使用最後一個 [VersionUp] 提交的 parent commit
 let updateInfoPath = "Update-Info.plist"
 if FileManager.default.fileExists(atPath: repoPath + "/\(updateInfoPath)") {
   print("Reverting \(updateInfoPath) to previous commit state (only file)")
@@ -290,13 +344,22 @@ if FileManager.default.fileExists(atPath: repoPath + "/\(updateInfoPath)") {
     if versionUpCommitRes.status == 0, !versionUpCommitRes.output.isEmpty {
       let commitHash = versionUpCommitRes.output.split(separator: "\n").first.map(String.init) ?? ""
       if !commitHash.isEmpty {
-        parentHash = Shell.run("git rev-parse \(commitHash)^", cwd: repoPath).output
+        parentHash =
+          Shell.runExec("/usr/bin/git", args: ["rev-parse", "\(commitHash)^"], cwd: repoPath).output
       }
     }
-    if parentHash.isEmpty { parentHash = Shell.run("git rev-parse HEAD~1", cwd: repoPath).output }
-    _ = Shell.run("git checkout \(parentHash) -- \(updateInfoPath)", cwd: repoPath)
-    _ = Shell.run("git add \(updateInfoPath)", cwd: repoPath)
-    _ = Shell.run("git commit -m \"[SUPPRESSOR]\"", cwd: repoPath)
+    if parentHash
+      .isEmpty {
+      parentHash =
+        Shell.runExec("/usr/bin/git", args: ["rev-parse", "HEAD~1"], cwd: repoPath).output
+    }
+    _ = Shell.runExec(
+      "/usr/bin/git",
+      args: ["checkout", parentHash, "--", updateInfoPath],
+      cwd: repoPath
+    )
+    _ = Shell.runExec("/usr/bin/git", args: ["add", updateInfoPath], cwd: repoPath)
+    _ = Shell.runExec("/usr/bin/git", args: ["commit", "-m", "[SUPPRESSOR]"], cwd: repoPath)
     print("Committed [SUPPRESSOR]")
   }
 } else {
@@ -305,4 +368,4 @@ if FileManager.default.fileExists(atPath: repoPath + "/\(updateInfoPath)") {
 
 print("Done. Dry-run: \(dryRun). Remember scripts will not push to remote by default.")
 
-// End of script
+// 腳本結束
