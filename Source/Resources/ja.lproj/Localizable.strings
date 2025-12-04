@@ -208,6 +208,8 @@
 "i18n:KimoDataImportError.connectionFailure.errMsg" = "「直接読み込む」作動失敗：両アプリの NSConnection 通信はできませんでした。\n\n- 「直接読込」を続行する前に、まずは Yahoo! KeyKey そのアプリを実行すること。弊アプリは Yahoo! KeyKey をすでに１度呼び覚ませてみたため、すぐにもう一度「直接読込」するのも可能です。\n\n- 今の実行中の弊アプリはご自分で Xcode で組み立てた場合、Xcode プロジェクトの Sandbox Entitlements の配置の正しさをご確認ください。\n\n- 今のパソコンは Intel Mac ではない場合、必ず Rosetta 2 をご実装ください。Yahoo! KeyKey の実行には Rosetta 2 は必要条件です。\n\n- 上記のすべての状況を排除したら、多分「__objc_empty_cache」という肝心なる API は今のこのシステムでもう利用できないと推測できます。この API がない限り、Yahoo! KeyKey の実行は不可能です。今のこのシステムの「Console.app」で Yahoo! KeyKey の故障報告の有無をご確認ください。";
 "i18n:KimoDataImportError.fileHandlerFailure.errMsg" = "新しい資料はユーザー辞書データファイルに書き込むのはできませんでした。";
 "i18n:kimoImportButton.DragFileToHere" = "ここにドラッグして";
+"i18n:LMMgr.accessFailure.cassette.description" = "カセットファイルを正しくご指定してから、このモードのご使用を。";
+"i18n:LMMgr.accessFailure.cassette.title" = "ファイルアクセス失敗、或いはご指定したファイル位置情報は使えぬ。";
 "i18n:securityAgentHelper.warningMessage.footer" = "このメッセージが出た時に、唯音がすでに「DisableSecureEventInput()」を実行してみました。これで入力ソースメニューで唯音は利用できる状態になったかもしれませんが、下記のステップはおすすめです：\n\nイ）今のこのメッセージの画面のスクリーンショットを撮って置いてください。後ほど使えます。\n\nロ）もし、今でも入力ソースメニューで唯音は利用できぬ状態でしたら、上記のプロセスを（強制）中止してください。そうすれば、それぞれのSecureEventInput状態は解消できて、入力ソースメニューで唯音はすぐ利用できることになります。\n\nハ）もし、該当プロセスは Mac App Store のアプリからのものでしたら、該当アプリを Apple 社にご通報ください。状況と必要性次第、該当アプリは Mac App Store からしばらく取り下がて、支障解決まで Mac App Store 提供中止になるかもしれません。\n\nニ）該当プロセスは Mac App Store からダウンロードしたものか否か、それぞれの開発元にこの支障をご通報ください。今のこのメッセージの画面のスクリーンショットを該当開発元に送れば、必要なる情報は該当開発元に全部お知らせすることができます。\n\nホ）一部のユーザーから、関連する実行中のアプリやサービス（特にパスワードマネージャー、macCatalyst ベースのパスワードログイン作業、またはシェル経由のパスワードログイン作業）を終了し、その後に画面／現在のユーザーセッションをロックして再度解除すると、今回の問題が緩和されたとの報告があります。";
 "i18n:securityAgentHelper.warningMessage.header" = "唯音入力アプリ（略称「唯音」）は「他のバックグラウンド・プロセスがSecureEventInputを正しく利用していない」と検出しました。このような不正利用は「システム内蔵入力以外の全ての入力アプリがメニューで灰色状態で選べなくて使えない」の元凶です。\n\nセンシティブな資料の記入どころでSecureEventInputをEnableSecureEventInput()で使うのは当然ですが、「入力中」状態が終わった後必ずDisableSecureEventInput()で状態解消すべきだと義務です。いくつかヘルパーアプリも、あるいはSecureEventInputを呼び起こしてからすぐ固まったアプリも、この状態になりやすいです。特に、他のアプリの画面へ切り替えたとしても、固まったアプリのSecureEventInput状態は自動的に解消できません。\n\n検出した該当プロセスは:";
 "i18n:securityAgentHelper.warningMessage.title" = "SecureEventInput の不正利用が検出";
@@ -326,7 +328,6 @@
 "Otherwise, only the candidate keys are allowed to confirm associates." = "未チェックの場合、連想候補を選べられるのは言選りキーのみ。";
 "Output Settings:" = "出力設定:";
 "Override the previous reading's intonation with candidate-reset" = "カーソルの後部の音読みの音調を上書きし、候補選択状態を戻す";
-"Path invalid or file access error." = "ファイルアクセス失敗、或いはご指定したファイル位置情報は使えぬ。";
 "Per-Char Select Mode" = "全候補入力モード";
 "Phonetic Parser:" = "注音配列:";
 "Phrase Editor" = "辞書編集";
@@ -338,7 +339,6 @@
 "Please manage the list of those clients here which are: 1) IMKTextInput-incompatible; 2) suspected from abusing the contents of the inline composition buffer. A client listed here, if checked, will use popup composition buffer with maximum 20 reading counts holdable." = "下記の客体アプリはここでご登録を：１）IMKTextInput 議定規約に反するもの；２）文脈内入力緩衝列の内容の不正利用容疑のあるもの。「登録済みのアプリ」にチェックを入れると、「吹き出し入力緩衝列ウィンドウ」と「緩衝列容量制限」を起用し、容量制限は最大限音読み２０箇とする。";
 "Please manually enter the identifier(s)." = "ご自分で唯一識別子（Bundle Identifier）のご入力を。";
 "Please manually implement the symbols of this menu \nin the user phrase file with “_punctuation_list” key." = "このメニューのお用いには、ご自分でユーザー辞書で\n「_punctuation_list」キーの符号記録のご補充が必要でござる。";
-"Please reconfigure the cassette path to a valid one before enabling this mode." = "カセットファイルを正しくご指定してから、このモードのご使用を。";
 "Please select Simplified / Traditional Chinese mode above." = "まずは上記のメニューで簡体/繁体中国語モードをお選びください。";
 "Please select…" = "お選びを…";
 "Please try again." = "お選び直しください。";

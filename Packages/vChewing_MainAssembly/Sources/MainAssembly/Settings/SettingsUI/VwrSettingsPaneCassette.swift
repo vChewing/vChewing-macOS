@@ -77,11 +77,11 @@ public struct VwrSettingsPaneCassette: View {
                 if let window = CtlSettingsUI.shared?.window {
                   IMEApp.buzz()
                   let alert = NSAlert(error: NSLocalizedString(
-                    "Path invalid or file access error.",
+                    "i18n:LMMgr.accessFailure.cassette.title",
                     comment: ""
                   ))
                   alert.informativeText = NSLocalizedString(
-                    "Please reconfigure the cassette path to a valid one before enabling this mode.",
+                    "i18n:LMMgr.accessFailure.cassette.description",
                     comment: ""
                   )
                   alert.beginSheetModal(for: window) { _ in
