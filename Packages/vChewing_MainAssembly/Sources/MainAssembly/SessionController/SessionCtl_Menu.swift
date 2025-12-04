@@ -199,9 +199,9 @@ extension SessionCtl {
        !LMMgr.checkCassettePathValidity(PrefMgr.shared.cassettePath) {
       asyncOnMain(bypassAsync: UserDefaults.pendingUnitTests) {
         IMEApp.buzz()
-        let alert = NSAlert(error: "Path invalid or file access error.".localized)
+        let alert = NSAlert(error: "i18n:LMMgr.accessFailure.cassette.title".localized)
         let informativeText =
-          "Please reconfigure the cassette path to a valid one before enabling this mode."
+          "i18n:LMMgr.accessFailure.cassette.description"
         alert.informativeText = informativeText.localized
         let result = alert.runModal()
         NSApp.popup()

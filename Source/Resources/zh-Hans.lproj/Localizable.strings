@@ -209,6 +209,8 @@
 "i18n:KimoDataImportError.connectionFailure.errMsg" = "「直接汇入」功能失败：无法成功建立 NSConnection 跨执行绪通讯。\n\n- 在执行该步骤之前，请确保奇摩输入法有在运行。唯音输入法已经在此刻发起了一次对奇摩输入法的运行呼叫请求，于是您可以立刻再次重试。\n\n- 如果您当前运行的唯音输入法的程式包是您自己建置的话，请检查专案内的 Sandbox 权能组态设定档案（Entitlements）、看看是否发生了与此有关的内容变更。\n\n- 如果这台 Mac 并未使用 Intel CPU 的话，请先安装 Rosetta 2，否则奇摩输入法将无法运作。\n\n- 如果以上状况都被排除了的话，那么 __objc_empty_cache 这个 API 可能在当前版本的作业系统内被移除了。这个 API 对奇摩输入法而言至关重要。请检查您当前的作业系统内建的「系统监视程式 Console.app」，确认一下是否有与奇摩输入法有关的程式崩溃报告。";
 "i18n:KimoDataImportError.fileHandlerFailure.errMsg" = "没能将新的资料成功写入到使用者自订语汇辞典当中。";
 "i18n:kimoImportButton.DragFileToHere" = "请将档案拽到这边";
+"i18n:LMMgr.accessFailure.cassette.description" = "在启用该模式之前，请事先正确设定磁带档案路径。";
+"i18n:LMMgr.accessFailure.cassette.title" = "档案存取失败，或者路径不合规。";
 "i18n:securityAgentHelper.warningMessage.footer" = "当这则讯息呈现出来的时候，唯音已经尝试呼叫 `DisableSecureEventInput()` 来试图解除这个状态。以下是唯音建议您采取的行动：\n\n0. 将这则讯息视窗留一份屏幕撷图、以备接下来的需要。\n\n1. 如果输入法选单内的唯音仍旧处于无法选取的状态（下文简称「灰色不可用状态」），则请考虑结束上述进程、以迫使其释放各自的 SecureEventInput 状态。这将立刻解除唯音的灰色不可用状态。\n\n2. 如果该进程所属的 App 来自于 Mac App Store 的话，请向 Apple 检举其对 SecureEventInput 的滥用。Apple 会在必要的情况下对这类 App 采取措施，比如：临时下架，直至软件开发者解决相关故障。\n\n3. 无论该进程是否来自于 Mac App Store，也都请您向相关的开发者/提供方提报该故障。您可以将这则讯息的屏幕撷图给他们看，因为里面已经包含了用以检测该故障的必要资讯。\n\n4. 有用户回报，先关闭相关的运行中应用与服务（尤其是密码管理器、基于 macCatalyst 的密码登录作业、或任何以 Shell 执行的密码登录作业），再锁定并解锁屏幕／当前账号的桌面工作阶段，有时能暂时缓解当前问题。";
 "i18n:securityAgentHelper.warningMessage.header" = "唯音有检测到下述后台进程有在滥用 SecureEventInput。这种滥用会导致系统内的所有第三方输入法全都无法正常使用（在输入法选单内会变成灰色）。\n\n针对需要填写敏感数据的场合，使用 SecureEventInput 无可厚非。但是，用 EnableSecureEventInput() 开启该模式之后，就有义务在输入窗格失焦的那一刻呼叫 DisableSecureEventInput() 来结束这种状态。这种状态还常见于后台辅助 App 当中、或者某个 App 在叫出该模式之后失去响应（这样的话，哪怕被切换到后台，SecureEventInput 也不会自动解除）。\n\n被侦测到的进程如下:";
 "i18n:securityAgentHelper.warningMessage.title" = "检测到对 SecureEventInput 的滥用行为";
@@ -327,7 +329,6 @@
 "Otherwise, only the candidate keys are allowed to confirm associates." = "不勾选这一项的话，就只能用选字键来选取关联词语。";
 "Output Settings:" = "输出设定:";
 "Override the previous reading's intonation with candidate-reset" = "尝试对游标正后方的字音覆写声调，且重设其选字状态";
-"Path invalid or file access error." = "档案存取失败，或者路径不合规。";
 "Per-Char Select Mode" = "模拟逐字选字输入";
 "Phonetic Parser:" = "注音排列:";
 "Phrase Editor" = "语汇编辑器";
@@ -339,7 +340,6 @@
 "Please manage the list of those clients here which are: 1) IMKTextInput-incompatible; 2) suspected from abusing the contents of the inline composition buffer. A client listed here, if checked, will use popup composition buffer with maximum 20 reading counts holdable." = "请在此管理这两类客体应用：1) 不遵守 IMKTextInput 协定；2）有滥用内文组字区的嫌疑。您可以勾选上述客体应用、以启用下述特性：启用浮动组字窗、且对组字区内容设定容量上限（最多二十个读音）。";
 "Please manually enter the identifier(s)." = "请手动键入唯一标帜（Bundle Identifier）。";
 "Please manually implement the symbols of this menu \nin the user phrase file with “_punctuation_list” key." = "请自行以「_punctuation_list」索引键\n在使用者自订语汇档案内扩充该符号选单的内容。";
-"Please reconfigure the cassette path to a valid one before enabling this mode." = "在启用该模式之前，请事先正确设定磁带档案路径。";
 "Please select Simplified / Traditional Chinese mode above." = "请先借由上方选单选择简繁模式。";
 "Please select…" = "请选择…";
 "Please try again." = "请重试。";
