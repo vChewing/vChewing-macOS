@@ -58,8 +58,14 @@
 
 ### 4. vChewing 的澄清
 
-根據 README.md 第37行以及相關 Discussion：
-> P.S.: 唯音輸入法的 Shift 按鍵監測功能僅藉由對 NSEvent 訊號資料流的上下文關係的觀測來實現，僅接觸藉由 macOS 系統內建的 InputMethodKit 當中的 IMKServer 傳來的 NSEvent 訊號資料流、而無須監聽系統全局鍵盤事件，也無須向使用者申請用以達成這類「可能會引發資安疑慮」的行為所需的輔助權限，更不會將您的電腦內的任何資料傳出去（本來就是這樣，且自唯音 2.3.0 版引入的 Sandbox 特性更杜絕了這種可能性）。
+根據 README.md 第37行以及相關 Discussion，vChewing 澄清其 Shift 按鍵監測功能：
+
+- 僅藉由對 NSEvent 訊號資料流的上下文關係的觀測來實現
+- 僅接觸藉由 macOS 系統內建的 InputMethodKit 當中的 IMKServer 傳來的 NSEvent 訊號資料流
+- 無須監聽系統全局鍵盤事件
+- 無須向使用者申請用以達成這類「可能會引發資安疑慮」的行為所需的輔助權限
+- 更不會將您的電腦內的任何資料傳出去
+- 自 vChewing 2.3.0 版引入的 Sandbox 特性更杜絕了這種可能性
 
 ## 抄襲嫌疑判定
 
