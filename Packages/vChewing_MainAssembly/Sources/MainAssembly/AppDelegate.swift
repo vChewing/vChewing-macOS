@@ -51,7 +51,7 @@ extension AppDelegate {
       if PrefMgr.shared.shouldAutoReloadUserDataFiles || forced { LMMgr.initUserLangModels() }
       asyncOnMain(after: 0.1) {
         if PrefMgr.shared.phraseEditorAutoReloadExternalModifications {
-          Broadcaster.shared.eventForReloadingPhraseEditor = .init()
+          Broadcaster.shared.postEventForReloadingPhraseEditor()
         }
       }
     }
