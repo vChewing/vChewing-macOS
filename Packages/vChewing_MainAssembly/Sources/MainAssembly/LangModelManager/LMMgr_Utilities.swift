@@ -229,7 +229,7 @@ extension LMMgr {
   }
 
   public static func cassettePath() -> String {
-    let rawCassettePath = PrefMgr.shared.cassettePath
+    let rawCassettePath = PrefMgr.shared.cassettePath.expandingTildeInPath
     if UserDefaults.current.object(forKey: UserDef.kCassettePath.rawValue) != nil {
       BookmarkManager.shared.loadBookmarks()
       if Self.checkCassettePathValidity(rawCassettePath) { return rawCassettePath }
