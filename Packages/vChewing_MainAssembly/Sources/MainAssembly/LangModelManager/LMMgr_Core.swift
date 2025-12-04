@@ -79,6 +79,17 @@ extension Shared.InputMode {
 // MARK: - LMMgr
 
 public final class LMMgr {
+  // MARK: Lifecycle
+
+  private init() {
+    initObserver()
+  }
+
+  deinit {
+    observationDataFolderInvalidity?.invalidate()
+    observationCassettePathInvalidity?.invalidate()
+  }
+
   // MARK: Public
 
   public static var shared = LMMgr()
@@ -374,12 +385,63 @@ public final class LMMgr {
   private static var unitTestDefaultURL: URL?
   private static var unitTestCustomURL: URL?
 
+  // MARK: - Broadcaster Observers
+
+  private var observationDataFolderInvalidity: NSKeyValueObservation?
+  private var observationCassettePathInvalidity: NSKeyValueObservation?
+
   private static func ensureDirectoryExists(_ url: URL) {
     do {
       try FileManager.default.createDirectory(at: url, withIntermediateDirectories: true)
     } catch {
       assertionFailure("Failed to ensure unit test sandbox directory: \(error)")
     }
+  }
+
+  private func initObserver() {
+    // 觀察 Broadcaster 的失效路徑事件，並在必要時顯示警示視窗。
+    observationDataFolderInvalidity = Broadcaster.shared
+      .observe(\.lmMgrDataFolderPathInvalidityConfirmed, options: [.new, .old]) { _, change in
+        let newValue = change.newValue ?? nil
+        let oldValue = change.oldValue ?? nil
+        // 若新舊值未實際變化（兩者皆為 nil，或字串完全相同），則不做任何處理。
+        if oldValue == newValue { return }
+        // 只有在發現 invalidity（非 nil 且非空字串）時才顯示警示
+        guard let path = newValue, !path.isEmpty else { return }
+        asyncOnMain(bypassAsync: UserDefaults.pendingUnitTests) {
+          // 若當前已存在 modal 視窗，避免再開啟重複的 modal。
+          if NSApp.modalWindow != nil { return }
+          // 無動作：已停用 cooldown，觀察器改以舊/新值比較來避免重複警示。
+          IMEApp.buzz()
+          let alert = NSAlert()
+          alert.messageText = "i18n:LMMgr.pathInvalidityFound.userDataFolder.title".localized
+          alert.informativeText = "i18n:LMMgr.pathInvalidityFound.userDataFolder.description".localized
+          alert.addButton(withTitle: "OK".localized)
+          _ = alert.runModal()
+          NSApp.popup()
+        }
+      }
+
+    observationCassettePathInvalidity = Broadcaster.shared
+      .observe(\.lmMgrCassettePathInvalidityConfirmed, options: [.new, .old]) { _, change in
+        let newValue = change.newValue ?? nil
+        let oldValue = change.oldValue ?? nil
+        // 若新舊值未實際變化（兩者皆為 nil，或字串完全相同），則不做任何處理。
+        if oldValue == newValue { return }
+        guard let path = newValue, !path.isEmpty else { return }
+        asyncOnMain(bypassAsync: UserDefaults.pendingUnitTests) {
+          // 若當前已存在 modal 視窗，避免再開啟重複的 modal。
+          if NSApp.modalWindow != nil { return }
+          // 無動作：已停用 cooldown，觀察器改以舊/新值比較來避免重複警示。
+          IMEApp.buzz()
+          let alert = NSAlert()
+          alert.messageText = "i18n:LMMgr.pathInvalidityFound.cassette.title".localized
+          alert.informativeText = "i18n:LMMgr.pathInvalidityFound.cassette.description".localized
+          alert.addButton(withTitle: "OK".localized)
+          _ = alert.runModal()
+          NSApp.popup()
+        }
+      }
   }
 }
 
