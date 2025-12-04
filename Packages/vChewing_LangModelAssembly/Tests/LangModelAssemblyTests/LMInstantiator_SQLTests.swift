@@ -102,7 +102,7 @@ final class LMInstantiatorSQLTests: XCTestCase {
   }
 
   func testFactoryKeyWithApostropheIsFound() throws {
-    // Ensure DB with a key containing trailing apostrophe can be retrieved correctly.
+    // 確保包含尾隨單引號的 key 能正確從資料庫擷取。
     let instance = LMAssembly.LMInstantiator(isCHS: true)
     let sqlSetup = """
     CREATE TABLE IF NOT EXISTS DATA_MAIN (
@@ -140,14 +140,14 @@ final class LMInstantiatorSQLTests: XCTestCase {
     INSERT INTO DATA_MAIN(theKey, theDataCNS) VALUES ('k''', 'cnsval');
     """
     XCTAssertTrue(LMAssembly.LMInstantiator.connectToTestSQLDB(sqlSetup))
-    // Confirmed DB connection established via connectToTestSQLDB
-    // Check CNS filter thread
+    // 透過 connectToTestSQLDB 確認資料庫連線已建立
+    // 檢查 CNS 過濾執行緒
     guard let cnsv = instance.factoryCNSFilterThreadFor(key: "k'") else {
       XCTFail("Expected CNS result for key")
       return
     }
     XCTAssertTrue(cnsv.contains("cnsval"))
-    // Check existence of theDataCNS column specifically for this key
+    // 檢查該 key 的 theDataCNS 欄位是否存在
     let encryptedKeyForCheck = "k'"
     let q = "SELECT * FROM DATA_MAIN WHERE theKey = ? AND theDataCNS IS NOT NULL"
     let existsCNS = LMAssembly.LMInstantiator.hasSQLResult(strStmt: q, params: [encryptedKeyForCheck])
