@@ -10,10 +10,54 @@ import Foundation
 
 @objcMembers
 public final class Broadcaster: NSObject {
+  // MARK: Public
+
   public static var shared = Broadcaster()
 
-  public dynamic var eventForReloadingPhraseEditor = UUID()
-  public dynamic var eventForClosingAllPanels = UUID()
-  public dynamic var lmMgrDataFolderPathInvalidityConfirmed: String?
-  public dynamic var lmMgrCassettePathInvalidityConfirmed: String?
+  public private(set) dynamic var eventForReloadingPhraseEditor = UUID()
+  public private(set) dynamic var eventForClosingAllPanels = UUID()
+  public private(set) dynamic var lmMgrDataFolderPathInvalidityConfirmed: String?
+  public private(set) dynamic var lmMgrCassettePathInvalidityConfirmed: String?
+
+  public func confirmLmMgrDataFolderPathInvalidity(
+    _ path: String?
+  ) {
+    queue.sync {
+      self.lmMgrDataFolderPathInvalidityConfirmed = path
+    }
+  }
+
+  public func confirmLmMgrCassettePathInvalidity(
+    _ path: String?
+  ) {
+    queue.sync {
+      self.lmMgrCassettePathInvalidityConfirmed = path
+    }
+  }
+
+  public func clearLmMgrDataFolderPathInvalidity() {
+    queue.sync { self.lmMgrDataFolderPathInvalidityConfirmed = nil }
+  }
+
+  public func clearLmMgrCassettePathInvalidity() {
+    queue.sync { self.lmMgrCassettePathInvalidityConfirmed = nil }
+  }
+
+  public func postEventForReloadingPhraseEditor() {
+    queue.sync {
+      self.eventForReloadingPhraseEditor = UUID()
+    }
+  }
+
+  public func postEventForClosingAllPanels() {
+    queue.sync {
+      self.eventForClosingAllPanels = UUID()
+    }
+  }
+
+  // MARK: Private
+
+  private let queue = DispatchQueue(
+    label: "org.vchewing.vChewing_Shared_DarwinImpl.Broadcaster"
+  )
 }

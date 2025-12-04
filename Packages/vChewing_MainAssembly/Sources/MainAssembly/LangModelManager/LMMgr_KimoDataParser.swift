@@ -71,7 +71,7 @@ extension LMMgr {
 
     let result = allPhrasesCHT.count
     if result > 0 {
-      Broadcaster.shared.eventForReloadingPhraseEditor = .init()
+      Broadcaster.shared.postEventForReloadingPhraseEditor()
     }
     return result
   }
@@ -115,7 +115,7 @@ extension LMMgr {
 
     let result = allPhrasesCHT.count
     if result > 0 {
-      Broadcaster.shared.eventForReloadingPhraseEditor = .init()
+      Broadcaster.shared.postEventForReloadingPhraseEditor()
     }
     return result
   }

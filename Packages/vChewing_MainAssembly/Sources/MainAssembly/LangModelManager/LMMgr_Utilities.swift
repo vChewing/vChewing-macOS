@@ -139,10 +139,10 @@ extension LMMgr {
     let isFolderWritable = FileManager.default.isWritableFile(atPath: folderPath ?? "")
     // vCLog("mgrLM: Exist: \(folderExist), IsFolder: \(isFolder.boolValue), isWritable: \(isFolderWritable)")
     if ((folderExist && !isFolder.boolValue) || !folderExist) || !isFolderWritable {
-      Broadcaster.shared.lmMgrDataFolderPathInvalidityConfirmed = folderPath ?? ""
+      Broadcaster.shared.confirmLmMgrDataFolderPathInvalidity(folderPath ?? "")
       return false
     }
-    Broadcaster.shared.lmMgrDataFolderPathInvalidityConfirmed = nil
+    Broadcaster.shared.clearLmMgrDataFolderPathInvalidity()
     return true
   }
 
@@ -154,9 +154,9 @@ extension LMMgr {
     let isReadable = FileManager.default.isReadableFile(atPath: cassettePath ?? "")
     let result = !isFolder.boolValue && isExist && isReadable
     if !result {
-      Broadcaster.shared.lmMgrCassettePathInvalidityConfirmed = cassettePath ?? ""
+      Broadcaster.shared.confirmLmMgrCassettePathInvalidity(cassettePath ?? "")
     } else {
-      Broadcaster.shared.lmMgrCassettePathInvalidityConfirmed = nil
+      Broadcaster.shared.clearLmMgrCassettePathInvalidity()
     }
     return result
   }
@@ -284,7 +284,7 @@ extension LMMgr {
       // The new FolderMonitor module does NOT monitor cases that files are modified
       // by the current application itself, requiring additional manual loading process here.
       if PrefMgr.shared.phraseEditorAutoReloadExternalModifications {
-        Broadcaster.shared.eventForReloadingPhraseEditor = .init()
+        Broadcaster.shared.postEventForReloadingPhraseEditor()
       }
       loadUserPhrasesData(type: areWeFiltering ? .theFilter : .thePhrases)
     }

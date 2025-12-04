@@ -266,7 +266,7 @@ extension InputSession {
   }
 
   public func hidePalettes() {
-    Broadcaster.shared.eventForClosingAllPanels = .init()
+    Broadcaster.shared.postEventForClosingAllPanels()
   }
 
   public func menu() -> NSMenu! { inputController?.menu() }
