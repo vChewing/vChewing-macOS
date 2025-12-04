@@ -26,15 +26,14 @@ extension CandidateTextService {
 
   // MARK: - Final Sanity Check Registration.
 
-  // Register the default allowed selector set into the shared CandidateTextService
-  // module. This runs on module initialization and ensures the Shared module's
-  // final sanity check has a concrete whitelist to validate against.
+  // 將預設允許的 selector 集合註冊到共享的 CandidateTextService 模組中。
+  // 此操作在模組初始化時執行，確保 Shared 模組的最終完整性檢查擁有具體的白名單供驗證之用。
   public static let registerAllowedSelectors: () = {
     CandidateTextService.allowedSelectorSet = Set(Self.AllowedSelector.allCases.map { $0.rawValue })
   }()
 
-  // (The default FinalSanityCheck implementation now lives in `Shared/CandidateTextService`.
-  // The registration above ensures Shared has the allowed selector whitelist.)
+  // （預設的 FinalSanityCheck 實作現位於 `Shared/CandidateTextService`。
+  // 上述註冊確保 Shared 擁有允許的 selector 白名單。）
 
   // MARK: - Selector Methods, CandidatePairServicable, and the Coordinator.
 
@@ -85,7 +84,7 @@ extension CandidateTextService {
 
     public func runTask(selectorName: String, candidate param: CandidatePairServicable) -> String? {
       guard !selectorName.isEmpty, !param.value.isEmpty else { return nil }
-      // older runtime checks removed in favor of strongly-typed mapping
+      // 移除舊有的 runtime 檢查，改用強型別映射。
       // 在執行前再檢查是否在白名單中，並改以 enum/action 映射執行，避免使用 performSelector。
       guard let action = AllowedSelector(rawValue: selectorName) else { return nil }
       switch action {
