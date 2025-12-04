@@ -109,14 +109,14 @@ final class LMInstantiatorSQLInjectionTests: XCTestCase {
       LMAssembly.LMInstantiator
         .connectToTestSQLDB("CREATE TABLE IF NOT EXISTS DATA_REV (theChar TEXT NOT NULL, theReadings TEXT NOT NULL);")
     )
-    // Insert a test row so that the query actually returns a result during the placeholder test.
+    // 插入一筆測試資料，以便佔位符號測試時確實能回傳結果。
     XCTAssertTrue(
       LMAssembly.LMInstantiator
         .connectToTestSQLDB(
           "CREATE TABLE IF NOT EXISTS DATA_REV (theChar TEXT NOT NULL, theReadings TEXT NOT NULL); INSERT OR REPLACE INTO DATA_REV (theChar, theReadings) VALUES ('A', 'z');"
         )
     )
-    // Proper use: placeholder matches params
+    // 正確使用方式：佔位符號數量與參數數量匹配
     let proper = LMAssembly.LMInstantiator.hasSQLResult(
       strStmt: "SELECT * FROM DATA_REV WHERE theChar = ?",
       params: ["A"]
@@ -126,7 +126,7 @@ final class LMInstantiatorSQLInjectionTests: XCTestCase {
       "hasSQLResult should accept queries with matching placeholders and params but returned false"
     )
 
-    // Mismatched: params provided but no placeholders -> should return false
+    // 不匹配情況：提供了參數陣列但查詢語句中沒有佔位符號 -> 應回傳 false
     let mismatch = LMAssembly.LMInstantiator.hasSQLResult(
       strStmt: "SELECT * FROM DATA_REV WHERE theChar = 'A'",
       params: ["A"]

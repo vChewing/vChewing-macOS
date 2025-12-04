@@ -9,19 +9,18 @@
 import Foundation
 import XCTest
 
-/// The following test suite is not executable in Xcode since it is incompatible
-/// with Xcode Unit Test Sandbox.
+/// 以下測試套件無法在 Xcode 中執行，因為與 Xcode 單元測試沙箱機制不相容。
 final class ShellArgumentsScanTests: XCTestCase {
   func testNoUnsafeShellArgumentUsagesOutsideAllowedFiles() throws {
-    // This test uses file system access and scanning which doesn't work under
-    // Xcode Unit Test sandbox. Skip when running inside Xcode.
+    // 此測試使用檔案系統存取與掃描功能，在 Xcode 單元測試沙箱下無法運作。
+    // 在 Xcode 中執行時跳過此測試。
     let env = ProcessInfo.processInfo.environment
     try XCTSkipIf(
       env["XCTestConfigurationFilePath"] != nil || env["XCODE_VERSION_ACTUAL"] != nil || env["XCODE_VERSION_MAJOR"] !=
         nil,
       "Skipping test under Xcode due to Unit Test sandbox restrictions"
     )
-    // Determine repository root by walking upwards from current dir until vChewing.xcodeproj exists.
+    // 向上遍歷目錄直到找到 vChewing.xcodeproj，以確定 repository 根目錄位置。
     var cwd = URL(fileURLWithPath: FileManager.default.currentDirectoryPath)
     var root: URL?
     while true {
@@ -38,7 +37,7 @@ final class ShellArgumentsScanTests: XCTestCase {
     let fm = FileManager.default
     let enumerator = fm.enumerator(at: repoRoot, includingPropertiesForKeys: nil)!
     var matches: [String] = []
-    // Allowed paths: only scripts are allowed to use -lc/-c style for dev/admin scripts.
+    // 允許的路徑：僅限腳本允許使用 -lc/-c 風格的開發／管理腳本。
     let allowedPaths = [
       "Scripts/vchewing-update.swift",
     ]
@@ -46,13 +45,13 @@ final class ShellArgumentsScanTests: XCTestCase {
     while let node = enumerator.nextObject() as? URL {
       let path = node.path
       if path.hasSuffix(".swift") || path.hasSuffix(".sh") {
-        // Skip the Source/Data submodule content; it is allowed to contain dev tools
-        // and scripts which may intentionally use '-c' style invocations.
+        // 跳過 Source/Data submodule 內容；允許它包含可能刻意使用 '-c' 風格呼叫的
+        // 開發工具與腳本。
         if path.contains("/Source/Data/") { continue }
-        // Skip paths in Source/Data (submodule) and any paths explicitly whitelisted
+        // 跳過 Source/Data（submodule）中的路徑以及任何明確列入白名單的路徑
         if allowedPaths.contains(where: { path.contains($0) }) { continue }
 
-        // Read file content
+        // 讀取檔案內容
         guard let content = try? String(contentsOf: node, encoding: .utf8) else { continue }
         if content.contains("task.arguments = [\"-c\"") || content.contains("task.arguments = [\"-lc\"") {
           matches.append(path)

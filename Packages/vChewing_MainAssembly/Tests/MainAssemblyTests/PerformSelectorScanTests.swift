@@ -9,19 +9,18 @@
 import Foundation
 import XCTest
 
-/// The following test suite is not executable in Xcode since it is incompatible
-/// with Xcode Unit Test Sandbox.
+/// 以下測試套件無法在 Xcode 中執行，因為與 Xcode 單元測試沙箱機制不相容。
 final class PerformSelectorScanTests: XCTestCase {
   func testPerformSelectorNotUsedOutsideSubmodules() throws {
-    // This test performs repo-wide file system scanning which is incompatible with
-    // Xcode's Unit Test sandbox. We skip when the test is run under Xcode.
+    // 此測試執行全 repo 檔案系統掃描，與 Xcode 單元測試沙箱不相容。
+    // 在 Xcode 中執行時跳過此測試。
     let env = ProcessInfo.processInfo.environment
     try XCTSkipIf(
       env["XCTestConfigurationFilePath"] != nil || env["XCODE_VERSION_ACTUAL"] != nil || env["XCODE_VERSION_MAJOR"] !=
         nil,
       "Skipping test under Xcode due to Unit Test sandbox restrictions"
     )
-    // Walk repo root to ensure there are no 'performSelector(' usages in non-submodule code.
+    // 遍歷 repo 根目錄，確保在 non-submodule 程式碼中沒有使用 'performSelector(' 語句。
     var cwd = URL(fileURLWithPath: FileManager.default.currentDirectoryPath)
     var root: URL?
     while true {
@@ -40,10 +39,10 @@ final class PerformSelectorScanTests: XCTestCase {
     var matches: [String] = []
     while let node = enumerator.nextObject() as? URL {
       let path = node.path
-      // Ignore test files and test helpers under any Tests directories;
-      // they may include the literal string "performSelector(" for test purposes.
+      // 忽略 Tests 目錄下的測試檔案與測試輔助工具；
+      // 它們可能包含字面字串 "performSelector(" 用於測試目的。
       if path.contains("/Tests/") { continue }
-      if path.contains("/Source/Data/") { continue } // submodule allowed
+      if path.contains("/Source/Data/") { continue } // submodule 允許使用
       if path.hasSuffix(".swift") {
         guard let content = try? String(contentsOf: node, encoding: .utf8) else { continue }
         if content.contains("performSelector(onMainThread:") || content.contains("performSelector(") {

@@ -11,27 +11,28 @@ import XCTest
 
 final class OSFrameworkImplExecTests: XCTestCase {
   func testExecEchoReturnsArgument() throws {
-    // Use /bin/echo which is available on macOS
+    // 使用 macOS 上可用的 /bin/echo
     let out = try NSApplication.exec("/bin/echo", args: ["hello-world"])
     XCTAssertTrue(out.contains("hello-world"), "exec should return the echoed output")
   }
 
   func testExecDoesNotInterpretMetaCharacters() throws {
-    // If args are interpreted by a shell, this would output two words.
-    let out = try NSApplication.exec("/bin/echo", args: ["hello; echo injected"]) // payload contains a`;` semi-colon
-    // The output should be the single string we passed, not `injected` printed separately by a second shell command.
+    // 若 args 被 shell 解析，會輸出兩個單詞。
+    let out = try NSApplication.exec("/bin/echo", args: ["hello; echo injected"]) // payload 包含 `;` 分號
+    // 輸出應該是我們傳遞的單一字串，而非由第二個 shell 指令分別印出 `injected`。
     XCTAssertTrue(
       out.contains("hello; echo injected"),
       "exec should treat the argument as a single argument, not a shell command"
     )
-    // The echo output itself may contain the string 'injected' as it is part of the argument; ensure we did not run a shell command to create a file in the previous step.
+    // echo 輸出本身可能包含字串 'injected'，因為它是參數的一部分；
+    // 確保我們在前一步驟中沒有執行 shell 指令來建立檔案。
 
-    // If args are interpreted by a shell, injection might run `touch` and create a file.
+    // 若 args 被 shell 解析，注入可能會執行 `touch` 並建立檔案。
     let tmpFile = FileManager.default.temporaryDirectory.appendingPathComponent("vchewing_exec_injected_test")
     try? FileManager.default.removeItem(at: tmpFile)
     let suspiciousArg = "; touch \(tmpFile.path)"
     _ = try NSApplication.exec("/bin/echo", args: [suspiciousArg])
-    // The temporary file should NOT exist, as the `touch` should not be executed by exec.
+    // 臨時檔案應該不存在，因為 `touch` 不應該被 exec 執行。
     XCTAssertFalse(
       FileManager.default.fileExists(atPath: tmpFile.path),
       "exec should not invoke shell and thus should not execute the injected 'touch' command"

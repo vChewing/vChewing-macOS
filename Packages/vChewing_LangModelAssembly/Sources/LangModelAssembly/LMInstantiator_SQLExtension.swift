@@ -113,7 +113,7 @@ extension LMAssembly.LMInstantiator {
     var sqlQuery = sqlQuery
     if sqlQuery.last == ";" { sqlQuery = sqlQuery.dropLast(1).description } // 防呆設計。
     guard !sqlQuery.isEmpty else { return false }
-    // If parameters are provided, ensure the sqlQuery uses matching placeholders (?) for each param.
+    // 若提供了參數，確保 sqlQuery 使用匹配的佔位符號（?）對應每個參數。
     if !params.isEmpty {
       let placeholderCount = sqlQuery.filter { $0 == "?" }.count
       if placeholderCount != params.count {
@@ -199,7 +199,7 @@ extension LMAssembly.LMInstantiator {
   /// - parameters:
   ///   - key: 讀音索引鍵。
   public func factoryCoreUnigramsFor(key: String, keyArray: [String]) -> [Megrez.Unigram] {
-    // No need to escape ASCII single quote here because we use prepared statement parameter binding.
+    // 此處無須逸出 ASCII 單引號，因為我們使用了 prepared statement 參數綁定。
     factoryUnigramsFor(key: key, keyArray: keyArray, column: isCHS ? .theDataCHS : .theDataCHT)
   }
 
@@ -216,7 +216,7 @@ extension LMAssembly.LMInstantiator {
     if key == "_punctuation_list" { return [] }
     var grams: [Megrez.Unigram] = []
     var gramsHW: [Megrez.Unigram] = []
-    // No need to escape ASCII single quote here because we use prepared statement parameter binding.
+    // 此處無須逸出 ASCII 單引號，因為我們使用了 prepared statement 參數綁定。
     let encryptedKey = Self.cnvPhonabetToASCII(key)
     // 使用 prepared statement 並綁定參數以避免 SQL injection
     let sqlQuery = "SELECT * FROM DATA_MAIN WHERE theKey = ?;"
@@ -265,7 +265,7 @@ extension LMAssembly.LMInstantiator {
     let column = CoreColumn.theDataCNS
     if key == "_punctuation_list" { return nil }
     var results: [String] = []
-    // No need to escape ASCII single quote here because we use prepared statement parameter binding.
+    // 此處無須逸出 ASCII 單引號，因為我們使用了 prepared statement 參數綁定。
     let encryptedKey = Self.cnvPhonabetToASCII(key)
     // 使用 prepared statement 並綁定參數以避免 SQL injection
     let sqlQuery = "SELECT * FROM DATA_MAIN WHERE theKey = ?;"
