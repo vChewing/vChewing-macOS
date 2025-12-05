@@ -434,4 +434,59 @@ extension InputHandlerTests {
     XCTAssertEqual(testSession.state.highlightedCandidateIndex, 2)
     XCTAssertEqual(testSession.state.displayedTextConverted, "")
   }
+
+  func test_IH110_IntonationKeyBehavior() throws {
+    /// IntonationKeyBehavior 分為 [0, 1, 2] 三個情況，這裡只測試前兩種情況：
+    /// - 0: 嘗試對游標正後方的字音覆寫聲調，且重設其選字狀態。
+    /// - 1: 僅在鍵入的聲調與游標正後方的字音不同時，嘗試覆寫。
+    /// - 2: 始終在內文組字區內鍵入聲調符號。
+    guard let testHandler, let testSession else {
+      XCTFail("testHandler and testSession at least one of them is nil.")
+      return
+    }
+    let testKanjiData = """
+    ㄒㄧㄢ 先 -1
+    ㄒㄧㄢˊ 嫌 -1
+    ㄒㄧㄢˊ 鹹 -2
+    ㄒㄧㄢˇ 顯 -1
+    ㄒㄧㄢˋ 線 -1
+    """
+    let extractedGrams = extractGrams(from: testKanjiData)
+    print(extractedGrams)
+    extractedGrams.forEach {
+      testHandler.currentLM.insertTemporaryData(unigram: $0, isFiltering: false)
+    }
+    defer {
+      testHandler.currentLM.clearTemporaryData(isFiltering: false)
+    }
+    testHandler.prefs.fetchSuggestionsFromPerceptionOverrideModel = false
+    clearTestPOM()
+    // 測試 pref case 0。
+    do {
+      testHandler.clear()
+      testHandler.prefs.specifyIntonationKeyBehavior = 0
+      typeSentence("vu06") // 打「嫌」字的讀音：「ㄒㄧㄢˊ」，最後空格是陰平聲調。
+      XCTAssertEqual(testSession.state.displayedText, "嫌")
+      XCTAssert(testHandler.triageInput(event: KBEvent.KeyEventData.dataTab.asEvent))
+      XCTAssertEqual(testSession.state.displayedText, "鹹")
+      typeSentence("6")
+      XCTAssertEqual(testSession.state.displayedText, "嫌", "得復位")
+      typeSentence("4")
+      XCTAssertEqual(testSession.state.displayedText, "線")
+    }
+    // 測試 pref case 1。
+    do {
+      testHandler.clear()
+      testHandler.prefs.specifyIntonationKeyBehavior = 1
+      typeSentence("vu06") // 打「嫌」字的讀音：「ㄒㄧㄢˊ」，最後空格是陰平聲調。
+      XCTAssertEqual(testSession.state.displayedText, "嫌")
+      XCTAssert(testHandler.triageInput(event: KBEvent.KeyEventData.dataTab.asEvent))
+      XCTAssertEqual(testSession.state.displayedText, "鹹")
+      typeSentence("6")
+      XCTAssertEqual(testSession.state.displayedText, "鹹ˊ", "不得復位")
+      XCTAssert(testHandler.triageInput(event: KBEvent.KeyEventData.backspace.asEvent))
+      typeSentence("4")
+      XCTAssertEqual(testSession.state.displayedText, "線")
+    }
+  }
 }
