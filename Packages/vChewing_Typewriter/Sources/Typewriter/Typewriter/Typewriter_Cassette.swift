@@ -29,211 +29,235 @@ public struct CassetteTypewriter<Handler: InputHandlerProtocol>: TypewriterProto
     let state = session.state
     let currentLM = handler.currentLM
     let prefs = handler.prefs
+    let wildcardKey = currentLM.cassetteWildcardKey
+    let quickPhraseCommissionKey = currentLM.cassetteQuickPhraseCommissionKey
 
-    // 準備處理 `%quick` 選字行為。
-    var handleQuickCandidate = true
-    if currentLM.areCassetteCandidateKeysShiftHeld { handleQuickCandidate = input.isShiftHold }
-    let hasQuickCandidates: Bool = state.type == .ofInputting && state.isCandidateContainer
-
-    // 處理 `%symboldef` 選字行為。
-    if handler.handleCassetteSymbolTable(input: input) {
+    // 先處理快選（%quick 與 %symboldef），避免後續流程誤吞按鍵。
+    if processCassetteQuickSelection(input: input, state: state, wildcardKey: wildcardKey) {
       return true
-    } else if hasQuickCandidates, input.text != currentLM.cassetteWildcardKey {
-      // 處理 `%quick` 選字行為（當且僅當與 `%symboldef` 衝突的情況下）。
-      let candidateHandled = handler.handleCandidate(input: input, ignoringModifiers: true)
-      guard !(handleQuickCandidate && candidateHandled) else { return true }
-    } else {
-      // 處理 `%quick` 選字行為。
-      let candidateHandled = handler.handleCandidate(input: input, ignoringModifiers: true)
-      guard !(hasQuickCandidates && candidateHandled)
-      else { return true }
     }
 
-    // 正式處理。
-    var wildcardKey: String { currentLM.cassetteWildcardKey } // 花牌鍵。
-    let quickPhraseKey = currentLM.cassetteQuickPhraseCommissionKey
     let inputText = input.text
-    let isQuickPhraseKeyInput: Bool = {
-      guard let quickPhraseKey, !quickPhraseKey.isEmpty else { return false }
-      return inputText == quickPhraseKey
-    }()
-    let isWildcardKeyInput: Bool = (inputText == wildcardKey && !wildcardKey.isEmpty)
+    let isWildcardKeyInput = inputText == wildcardKey && !wildcardKey.isEmpty
+    let isQuickPhraseKeyInput = matchesQuickPhraseKey(inputText, key: quickPhraseCommissionKey)
+    var confirmCombination = input.isSpace
 
     let skipStrokeHandling =
       input.isReservedKey || input.isNumericPadKey || input.isNonLaptopFunctionKey
-        || input.isControlHold || input.isOptionHold || input.isCommandHold // || input.isShiftHold
-    var confirmCombination = input.isSpace
+        || input.isControlHold || input.isOptionHold || input.isCommandHold
 
-    var isLongestPossibleKeyFormed: Bool {
-      guard !isWildcardKeyInput,
-            prefs.autoCompositeWithLongestPossibleCassetteKey
-      else { return false }
-      return !currentLM.hasCassetteWildcardResultsFor(
-        key: handler.calligrapher
-      ) && !handler.calligrapher.isEmpty
+    let isLongestPossibleKeyFormed = shouldFormLongestCassetteKey(
+      isWildcardKeyInput: isWildcardKeyInput
+    )
+    let isStrokesFull = handler.calligrapher.count >= currentLM.maxCassetteKeyLength
+      || isLongestPossibleKeyFormed
+
+    // 進行筆畫預處理：阻擋非法按鍵、處理花牌開頭、更新組筆狀態與快選清單。
+    if let handled = handleStrokePreprocessing(
+      inputText: inputText,
+      isWildcardKeyInput: isWildcardKeyInput,
+      isStrokesFull: isStrokesFull,
+      skipStrokeHandling: skipStrokeHandling,
+      beganWithLetter: input.beganWithLetter,
+      session: session
+    ) {
+      return handled
     }
 
-    var isStrokesFull: Bool {
-      handler.calligrapher.count >= currentLM.maxCassetteKeyLength || isLongestPossibleKeyFormed
-    }
-
-    prehandling: if !skipStrokeHandling && currentLM.isThisCassetteKeyAllowed(key: inputText) {
-      if handler.calligrapher.isEmpty, isWildcardKeyInput {
-        errorCallback("3606B9C0")
-        if input.beganWithLetter {
-          var newEmptyState =
-            handler.assembler.isEmpty
-              ? State.ofEmpty()
-              : handler.generateStateOfInputting()
-          newEmptyState.tooltip = "Wildcard key cannot be the initial key.".localized
-          newEmptyState.data.tooltipColorState = .redAlert
-          newEmptyState.tooltipDuration = 1.0
-          session.switchState(newEmptyState)
-          return true
-        }
-        handler.notificationCallback?(
-          "Wildcard key cannot be the initial key.".localized
-        )
-        return nil
-      }
-      if isStrokesFull {
-        errorCallback("2268DD51: calligrapher is full, clearing calligrapher.")
-        handler.calligrapher.removeAll()
-      } else {
-        handler.calligrapher.append(inputText)
-      }
-      if isWildcardKeyInput {
-        break prehandling
-      }
-
-      if !isStrokesFull {
-        var result = handler.generateStateOfInputting()
-        if !handler.calligrapher.isEmpty,
-           let fetched = currentLM.cassetteQuickSetsFor(key: handler.calligrapher)?.split(
-             separator: "\t"
-           ) {
-          result.candidates = fetched.enumerated().map {
-            (keyArray: [($0.offset + 1).description], value: $0.element.description)
-          }
-        }
-        session.switchState(result)
-        return true
-      }
-    }
-
+    // 快句鍵：在組筆區已有內容時直接觸發，支援唯一候選快速提交或進入符號表。
     if isQuickPhraseKeyInput {
-      guard !handler.calligrapher.isEmpty else {
-        errorCallback("8E1F0B8C: Quick phrase key requires existing strokes.")
-        return true
-      }
-      let phrases = currentLM.cassetteQuickPhrases(for: handler.calligrapher)
-      guard let phrases, !phrases.isEmpty else {
-        errorCallback("ABF4A62D: No quick phrases for key \(handler.calligrapher).")
-        return true
-      }
-      if let quickPhraseKey, !quickPhraseKey.isEmpty, phrases.count == 1,
-         let phrase = phrases.first {
-        handler.calligrapher.removeAll()
-        session.switchState(State.ofCommitting(textToCommit: phrase))
-        return true
-      }
-      let phraseNode = CandidateNode(
-        name: handler.calligrapher,
-        members: phrases.map { CandidateNode(name: $0) }
+      return handleQuickPhraseKey(
+        session: session,
+        quickPhraseKey: quickPhraseCommissionKey,
+        phrases: currentLM.cassetteQuickPhrases(for: handler.calligrapher)
       )
-      session.switchState(State.ofSymbolTable(node: phraseNode))
-      return true
     }
 
     if !(state.type == .ofInputting && state.isCandidateContainer) {
       confirmCombination = confirmCombination || input.isEnter
     }
 
+    // 決定是否要進行組字：滿筆長自動組字、花牌搭配筆畫、或空白/Enter 強制組字。
     var combineStrokes =
       (isStrokesFull && prefs.autoCompositeWithLongestPossibleCassetteKey)
         || (isWildcardKeyInput && !handler.calligrapher.isEmpty)
-
-    // 如果當前的按鍵是 Enter 或 Space 的話，這時就可以取出 calligrapher 內的筆畫來做檢查了。
-    // 來看看詞庫內到底有沒有對應的讀音索引。這裡用了類似「|=」的判斷處理方式。
     combineStrokes = combineStrokes || (!handler.calligrapher.isEmpty && confirmCombination)
-    ifCombineStrokes: if combineStrokes {
-      // 警告：calligrapher 不能為空，否則組字引擎會炸。
-      guard !handler.calligrapher.isEmpty else { break ifCombineStrokes }
-      if input.isControlHold, input.isCommandHold, input.isEnter,
-         !input.isOptionHold, !input.isShiftHold, handler.composer.isEmpty {
-        return handler.handleEnter(input: input, readingOnly: true)
-      }
-      // 向語言模型詢問是否有對應的記錄。
-      if !currentLM.hasUnigramsFor(keyArray: [handler.calligrapher]) {
-        errorCallback("B49C0979_Cassette：語彙庫內無「\(handler.calligrapher)」的匹配記錄。")
-        handler.calligrapher.removeAll()
-        // 根據「組字器是否為空」來判定回呼哪一種狀態。
-        switch handler.assembler.isEmpty {
-        case false: session.switchState(handler.generateStateOfInputting())
-        case true: session.switchState(State.ofAbortion())
-        }
-        return true // 向 IMK 報告說這個按鍵訊號已經被輸入法攔截處理了。
-      }
 
-      // 將該讀音插入至組字器內的軌格當中。
-      // 提前過濾掉一些不合規的按鍵訊號輸入，免得相關按鍵訊號被送給 Megrez 引發輸入法崩潰。
-      if input.isInvalid {
-        errorCallback("BFE387CC: 不合規的按鍵輸入。")
-        return true
-      } else if !handler.assembler.insertKey(handler.calligrapher) {
-        errorCallback("61F6B11F: 得檢查對應的語言模組的 hasUnigramsFor() 是否有誤判之情形。")
-        return true
-      }
-
-      // 組句。
-      handler.assemble()
-
-      // 一邊吃一邊屙（僅對位列黑名單的 App 用這招限制組字區長度）。
-      let textToCommit = handler.commitOverflownComposition
-
-      // 看看漸退記憶模組是否會對目前的狀態給出自動選字建議。
-      handler.retrievePOMSuggestions(apply: true)
-
-      // 之後就是更新組字區了。先清空注拼槽的內容。
-      handler.calligrapher.removeAll()
-
-      // 再以回呼組字狀態的方式來執行 setInlineDisplayWithCursor()。
-      var inputting = handler.generateStateOfInputting()
-      inputting.textToCommit = textToCommit
-      session.switchState(inputting)
-
-      /// 逐字選字模式的處理。
-      if prefs.useSCPCTypingMode {
-        let candidateState: State = handler.generateStateOfCandidates()
-        switch candidateState.candidates.count {
-        case 2...: session.switchState(candidateState)
-        case 1:
-          let firstCandidate = candidateState.candidates.first! // 一定會有，所以強制拆包也無妨。
-          let reading: [String] = firstCandidate.keyArray
-          let text: String = firstCandidate.value
-          session.switchState(State.ofCommitting(textToCommit: text))
-
-          if prefs.associatedPhrasesEnabled {
-            let associatedCandidates = handler.generateArrayOfAssociates(
-              withPairs: [
-                .init(
-                  keyArray: reading,
-                  value: text
-                ),
-              ]
-            )
-            session.switchState(
-              associatedCandidates.isEmpty
-                ? State.ofEmpty()
-                : State.ofAssociates(candidates: associatedCandidates)
-            )
-          }
-        default: break
-        }
-      }
-      // 將「這個按鍵訊號已經被輸入法攔截處理了」的結果藉由 SessionCtl 回報給 IMK。
-      return true
+    if combineStrokes {
+      return handleCassetteCombination(
+        input: input,
+        isWildcardKeyInput,
+        session: session,
+        prefs: prefs
+      )
     }
     return nil
+  }
+
+  // MARK: Private
+
+  private func processCassetteQuickSelection(
+    input: some InputSignalProtocol,
+    state: State,
+    wildcardKey: String
+  )
+    -> Bool {
+    let currentLM = handler.currentLM
+    let hasQuickCandidates = state.type == .ofInputting && state.isCandidateContainer
+    var handleQuickCandidate = true
+    if currentLM.areCassetteCandidateKeysShiftHeld { handleQuickCandidate = input.isShiftHold }
+
+    if handler.handleCassetteSymbolTable(input: input) { return true }
+
+    let candidateHandled = handler.handleCandidate(input: input, ignoringModifiers: true)
+    if hasQuickCandidates, input.text != wildcardKey {
+      return handleQuickCandidate && candidateHandled
+    }
+    return hasQuickCandidates && candidateHandled
+  }
+
+  private func matchesQuickPhraseKey(_ inputText: String, key: String?) -> Bool {
+    guard let key, !key.isEmpty else { return false }
+    return inputText == key
+  }
+
+  private func shouldFormLongestCassetteKey(
+    isWildcardKeyInput: Bool
+  )
+    -> Bool {
+    guard !isWildcardKeyInput, handler.prefs.autoCompositeWithLongestPossibleCassetteKey else {
+      return false
+    }
+    return !handler.currentLM.hasCassetteWildcardResultsFor(key: handler.calligrapher)
+      && !handler.calligrapher.isEmpty
+  }
+
+  private func handleStrokePreprocessing(
+    inputText: String,
+    isWildcardKeyInput: Bool,
+    isStrokesFull: Bool,
+    skipStrokeHandling: Bool,
+    beganWithLetter: Bool,
+    session: Session
+  )
+    -> Bool? {
+    let currentLM = handler.currentLM
+    guard !skipStrokeHandling, currentLM.isThisCassetteKeyAllowed(key: inputText) else {
+      return nil
+    }
+    if handler.calligrapher.isEmpty, isWildcardKeyInput {
+      return handleLeadingWildcard(session: session, beganWithLetter: beganWithLetter)
+    }
+    if isStrokesFull {
+      errorCallback("2268DD51: calligrapher is full, clearing calligrapher.")
+      handler.calligrapher.removeAll()
+    } else {
+      handler.calligrapher.append(inputText)
+    }
+    if isWildcardKeyInput { return nil }
+    return renderQuickSetsIfNeeded(session: session, isStrokesFull: isStrokesFull)
+  }
+
+  private func handleLeadingWildcard(session: Session, beganWithLetter: Bool) -> Bool? {
+    errorCallback("3606B9C0")
+    if beganWithLetter {
+      var newEmptyState = handler.assembler.isEmpty ? State.ofEmpty() : handler.generateStateOfInputting()
+      newEmptyState.tooltip = "Wildcard key cannot be the initial key.".localized
+      newEmptyState.data.tooltipColorState = .redAlert
+      newEmptyState.tooltipDuration = 1.0
+      session.switchState(newEmptyState)
+      return true
+    }
+    handler.notificationCallback?("Wildcard key cannot be the initial key.".localized)
+    return nil
+  }
+
+  private func renderQuickSetsIfNeeded(session: Session, isStrokesFull: Bool) -> Bool? {
+    guard !isStrokesFull else { return nil }
+    var result = handler.generateStateOfInputting()
+    if !handler.calligrapher.isEmpty,
+       let fetched = handler.currentLM.cassetteQuickSetsFor(key: handler.calligrapher)?.split(
+         separator: "\t"
+       ) {
+      result.candidates = fetched.enumerated().map {
+        (keyArray: [($0.offset + 1).description], value: $0.element.description)
+      }
+    }
+    session.switchState(result)
+    return true
+  }
+
+  private func handleQuickPhraseKey(
+    session: Session,
+    quickPhraseKey: String?,
+    phrases: [String]?
+  )
+    -> Bool {
+    guard !handler.calligrapher.isEmpty else {
+      errorCallback("8E1F0B8C: Quick phrase key requires existing strokes.")
+      return true
+    }
+    guard let phrases, !phrases.isEmpty else {
+      errorCallback("ABF4A62D: No quick phrases for key \(handler.calligrapher).")
+      return true
+    }
+    if let quickPhraseKey, !quickPhraseKey.isEmpty, phrases.count == 1,
+       let phrase = phrases.first {
+      handler.calligrapher.removeAll()
+      session.switchState(State.ofCommitting(textToCommit: phrase))
+      return true
+    }
+    let phraseNode = CandidateNode(
+      name: handler.calligrapher,
+      members: phrases.map { CandidateNode(name: $0) }
+    )
+    session.switchState(State.ofSymbolTable(node: phraseNode))
+    return true
+  }
+
+  private func handleCassetteCombination(
+    input: some InputSignalProtocol,
+    _ isWildcardKeyInput: Bool,
+    session: Session,
+    prefs: some PrefMgrProtocol
+  )
+    -> Bool? {
+    // 執行真正的組字：插入讀音、呼叫組句、處理溢出、刷新狀態並考慮逐字選字模式。
+    let currentLM = handler.currentLM
+    guard !handler.calligrapher.isEmpty else { return nil }
+    if input.isControlHold, input.isCommandHold, input.isEnter,
+       !input.isOptionHold, !input.isShiftHold, handler.composer.isEmpty {
+      return handler.handleEnter(input: input, readingOnly: true)
+    }
+    if !currentLM.hasUnigramsFor(keyArray: [handler.calligrapher]) {
+      errorCallback("B49C0979_Cassette：語彙庫內無「\(handler.calligrapher)」的匹配記錄。")
+      handler.calligrapher.removeAll()
+      switch handler.assembler.isEmpty {
+      case false: session.switchState(handler.generateStateOfInputting())
+      case true: session.switchState(State.ofAbortion())
+      }
+      return true
+    }
+    if input.isInvalid {
+      errorCallback("BFE387CC: 不合規的按鍵輸入。")
+      return true
+    }
+    guard handler.assembler.insertKey(handler.calligrapher) else {
+      errorCallback("61F6B11F: 得檢查對應的語言模組的 hasUnigramsFor() 是否有誤判之情形。")
+      return true
+    }
+
+    handler.assemble()
+    let textToCommit = handler.commitOverflownComposition
+    handler.retrievePOMSuggestions(apply: true)
+    handler.calligrapher.removeAll()
+
+    var inputting = handler.generateStateOfInputting()
+    inputting.textToCommit = textToCommit
+    session.switchState(inputting)
+
+    // 處理逐字選字。
+    handler.handleTypewriterSCPCTasks()
+    return true
   }
 }
