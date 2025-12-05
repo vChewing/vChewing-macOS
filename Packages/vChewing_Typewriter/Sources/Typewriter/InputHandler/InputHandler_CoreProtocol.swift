@@ -742,16 +742,6 @@ extension InputHandlerProtocol {
         : composer.doBackSpace()
   }
 
-  /// 檢測某個傳入的按鍵訊號是否為聲調鍵。
-  /// - Parameter input: 傳入的按鍵訊號。
-  /// - Returns: 判斷結果：是否為聲調鍵。
-  func isIntonationKey(_ input: InputSignalProtocol) -> Bool {
-    var theComposer = composer // 複製一份用來做實驗。
-    theComposer.clear() // 清空各種槽的內容。
-    theComposer.receiveKey(fromString: input.text)
-    return theComposer.hasIntonation(withNothingElse: true)
-  }
-
   /// 生成標點符號索引鍵頭。
   /// - Parameter input: 輸入的按鍵訊號。
   /// - Returns: 生成的標點符號索引鍵頭。
