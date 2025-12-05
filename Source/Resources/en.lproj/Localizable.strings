@@ -50,6 +50,8 @@
 "Apple Zhuyin Bopomofo (Dachen)" = "Apple Zhuyin Bopomofo (Standard)";
 "Apple Zhuyin Eten (Traditional)" = "Apple Zhuyin Eten (Traditional)";
 "Applying typing suggestions from perception override model" = "Applying typing suggestions from perception override model";
+"i18n:UserDef.kReducePOMLifetimeToNoMoreThan12Hours.shortTitle" = "Enable rapid forgetting mode";
+"i18n:UserDef.kReducePOMLifetimeToNoMoreThan12Hours.description" = "When enabled, the perception override model's forgetting cycle will be reduced from approximately one week to within 12 hours, clearing infrequently used memory records more quickly.";
 "Associated Phrases" = "Associated Phrases";
 "at the rear of the phrase (like Microsoft New Phonetic)" = "at the rear of the phrase (like Microsoft New Phonetic)";
 "Auto-composite when the longest possible key is formed" = "Auto-composite when the longest possible key is formed";

@@ -40,6 +40,9 @@ public struct VwrSettingsPaneDictionary: View {
   @AppStorage(wrappedValue: true, UserDef.kFetchSuggestionsFromPerceptionOverrideModel.rawValue)
   private var fetchSuggestionsFromPerceptionOverrideModel: Bool
 
+  @AppStorage(wrappedValue: false, UserDef.kReducePOMLifetimeToNoMoreThan12Hours.rawValue)
+  private var reducePOMLifetimeToNoMoreThan12Hours: Bool
+
   @AppStorage(wrappedValue: false, UserDef.kPhraseReplacementEnabled.rawValue)
   private var phraseReplacementEnabled: Bool
 
@@ -186,6 +189,8 @@ public struct VwrSettingsPaneDictionary: View {
           ).render()
           UserDef.kFetchSuggestionsFromPerceptionOverrideModel
             .bind($fetchSuggestionsFromPerceptionOverrideModel).render()
+          UserDef.kReducePOMLifetimeToNoMoreThan12Hours
+            .bind($reducePOMLifetimeToNoMoreThan12Hours).render()
           UserDef.kPhraseReplacementEnabled.bind(
             $phraseReplacementEnabled.didChange {
               LMMgr.syncLMPrefs()

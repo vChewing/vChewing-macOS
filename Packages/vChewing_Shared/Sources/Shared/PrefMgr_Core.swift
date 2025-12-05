@@ -188,6 +188,9 @@ public struct PrefMgr: PrefMgrProtocol {
   )
   public var fetchSuggestionsFromPerceptionOverrideModel: Bool
 
+  @AppProperty(key: UserDef.kReducePOMLifetimeToNoMoreThan12Hours.rawValue, defaultValue: false)
+  public var reducePOMLifetimeToNoMoreThan12Hours: Bool
+
   @AppProperty(key: UserDef.kUseFixedCandidateOrderOnSelection.rawValue, defaultValue: false)
   public var useFixedCandidateOrderOnSelection: Bool
 

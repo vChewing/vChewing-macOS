@@ -50,6 +50,8 @@
 "Apple Zhuyin Bopomofo (Dachen)" = "Apple 标准注音键盘布局 (大千)";
 "Apple Zhuyin Eten (Traditional)" = "Apple 倚天注音键盘布局 (传统)";
 "Applying typing suggestions from perception override model" = "在敲字时自动套用来自漸退记忆模组的建议";
+"i18n:UserDef.kReducePOMLifetimeToNoMoreThan12Hours.shortTitle" = "启用急速遗忘模式";
+"i18n:UserDef.kReducePOMLifetimeToNoMoreThan12Hours.description" = "启用后，渐退记忆模组的遗忘周期将从约一周降低至 12 小时内，更快地清除不常用的记忆记录。";
 "Associated Phrases" = "关联词语模式";
 "at the rear of the phrase (like Microsoft New Phonetic)" = "将游标置于词语后方 // Windows 微软新注音风格";
 "Auto-composite when the longest possible key is formed" = "在已经敲出最长可能码的时候自动组字";

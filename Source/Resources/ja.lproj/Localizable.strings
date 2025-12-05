@@ -50,6 +50,8 @@
 "Apple Zhuyin Bopomofo (Dachen)" = "Apple 注音ボポモフォ（大千標準）";
 "Apple Zhuyin Eten (Traditional)" = "Apple 注音ボポモフォ（倚天伝統）";
 "Applying typing suggestions from perception override model" = "入力中で臨時記憶モジュールからお薦めの候補を自動的に選ぶ";
+"i18n:UserDef.kReducePOMLifetimeToNoMoreThan12Hours.shortTitle" = "急速忘却モードを有効にする";
+"i18n:UserDef.kReducePOMLifetimeToNoMoreThan12Hours.description" = "有効にすると、認識オーバーライドモデルの忘却サイクルが約1週間から12時間以内に短縮され、使用頻度の低いメモリレコードがより迅速にクリアされます。";
 "Associated Phrases" = "関連語彙モード";
 "at the rear of the phrase (like Microsoft New Phonetic)" = "単語の後で // Microsoft 新注音入力のやり方";
 "Auto-composite when the longest possible key is formed" = "最長可能キーができた場合、文字を組み立つ";

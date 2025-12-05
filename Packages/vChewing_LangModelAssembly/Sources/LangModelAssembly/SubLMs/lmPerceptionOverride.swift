@@ -48,6 +48,7 @@ extension LMAssembly {
       self.thresholdProvider = thresholdProvider
       self.fileSaveLocationURL = dataURL
       self.previouslySavedHash = ""
+      self.prefs = PrefMgr()
     }
 
     // MARK: Public
@@ -71,6 +72,8 @@ extension LMAssembly {
     var fileSaveLocationURL: URL?
     /// 記錄最近一次快照的雜湊值（hex string），以避免重複寫入。
     var previouslySavedHash: String
+    /// PrefMgr instance for reading preferences in real-time
+    var prefs: PrefMgr
 
     var threshold: Double {
       let fallbackValue = Self.kDecayThreshold
@@ -1014,7 +1017,8 @@ extension LMAssembly.LMPerceptionOverride {
     // 3) 分數：score = -0.114514 * (freqFactor * ageFactor)
 
     // 調整有效視窗 T，單字略快、單讀音單漢字再快一些（避免單字長期壓制）
-    var T = 8.0
+    // 根據偏好設定決定基礎時間窗 T：如果啟用急速遺忘模式，則從約一週降低至 12 小時內
+    var T = prefs.reducePOMLifetimeToNoMoreThan12Hours ? 0.5 : 8.0
     if isUnigram { T *= 0.85 }
     if isSingleCharUnigram { T *= 0.8 }
 
