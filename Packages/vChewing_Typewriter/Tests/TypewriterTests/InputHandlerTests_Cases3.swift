@@ -44,6 +44,9 @@ extension InputHandlerTests {
     additionalUnigrams.forEach {
       testHandler.currentLM.insertTemporaryData(unigram: $0, isFiltering: false)
     }
+    defer {
+      testHandler.currentLM.clearTemporaryData(isFiltering: false)
+    }
     let fetchedExtraUnigrams1 = testHandler.currentLM.unigramsFor(keyArray: ["ㄌㄧㄡˊ", "ㄧˋ"])
     XCTAssert(Set(fetchedExtraUnigrams1).count == 4)
     XCTAssertEqual(Set(additionalUnigrams.prefix(4)), Set(fetchedExtraUnigrams1))
@@ -147,6 +150,9 @@ extension InputHandlerTests {
       unigram: .init(keyArray: ["ㄋㄧㄢˊ", "ㄓㄨㄥ"], value: "年終", score: 0),
       isFiltering: false
     )
+    defer {
+      testHandler.currentLM.clearTemporaryData(isFiltering: false)
+    }
     typeSentence("su065j/ ")
     XCTAssertEqual(testHandler.assembler.assembledSentence.map(\.value), ["年終"])
   }
@@ -269,6 +275,9 @@ extension InputHandlerTests {
       unigram: .init(keyArray: ["ㄗㄞˋ"], value: "在"),
       isFiltering: true
     )
+    defer {
+      testHandler.currentLM.clearTemporaryData(isFiltering: false)
+    }
     XCTAssert(testHandler.currentLM.hasUnigramsFor(keyArray: ["ㄗㄞˋ"]))
     XCTAssert(testHandler.currentLM.hasUnigramsFor(keyArray: ["ㄎㄞˇ", "ㄍㄜ"]))
     // 測試用句「再創世的凱歌」。
@@ -415,6 +424,9 @@ extension InputHandlerTests {
       unigram: .init(keyArray: ["ㄗㄞˋ"], value: "在"),
       isFiltering: true
     )
+    defer {
+      testHandler.currentLM.clearTemporaryData(isFiltering: false)
+    }
     XCTAssert(testHandler.currentLM.hasUnigramsFor(keyArray: ["ㄗㄞˋ"]))
     XCTAssert(testHandler.currentLM.hasUnigramsFor(keyArray: ["ㄎㄞˇ", "ㄍㄜ"]))
     // 測試用句「再創世的凱歌」。
