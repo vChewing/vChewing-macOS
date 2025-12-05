@@ -30,7 +30,6 @@ public final class PhonabetTypeWriter<InputHandler: InputHandlerProtocol>: Typew
     var inputText = (input.inputTextIgnoringModifiers ?? input.text)
     inputText = inputText.lowercased().applyingTransformFW2HW(reverse: false)
     let existedIntonation = handler.composer.intonation
-    var overrideHappened = false
 
     // 哪怕不啟用支援對「先輸入聲調、後輸入注音」的情況的支援，對 keyConsumedByReading 的處理得保留。
     // 不然的話，「敲 Space 叫出選字窗」的功能會失效。
@@ -47,45 +46,18 @@ public final class PhonabetTypeWriter<InputHandler: InputHandlerProtocol>: Typew
     // 函式 composer.receiveKey() 可以既接收 String 又接收 UniChar。
     if (!skipPhoneticHandling && handler.composer.inputValidityCheck(charStr: inputText)) ||
       confirmCombination {
-      // 引入 macOS 內建注音輸入法的行為，允許用除了陰平以外的聲調鍵覆寫前一個漢字的讀音。
-      // 但如果要覆寫的內容會導致游標身後的字音沒有對應的辭典記錄的話，那就只蜂鳴警告一下。
-      proc: if [0, 1].contains(prefs.specifyIntonationKeyBehavior), handler.composer.isEmpty,
-               !input.isSpace {
-        // prevReading 的內容分別是：「完整讀音」「去掉聲調的讀音」「是否有聲調」。
-        guard let prevReading = handler.previousParsableReading, isIntonationKey(input) else { break proc }
-        var theComposer = handler.composer
-        prevReading.0.map(\.description).forEach {
-          theComposer.receiveKey(fromPhonabet: $0.unicodeScalars.first)
-        }
-        // 發現要覆寫的聲調與覆寫對象的聲調雷同的情況的話，直接跳過處理。
-        let oldIntonation: Phonabet = theComposer.intonation
-        theComposer.receiveKey(fromString: inputText)
-        if theComposer.intonation == oldIntonation,
-           prefs.specifyIntonationKeyBehavior == 1 { break proc }
-        if theComposer.hasIntonation() { theComposer.doBackSpace() }
-        // 檢查新的漢字字音是否在庫。
-        let temporaryReadingKey = theComposer.getComposition()
-        if handler.currentLM.hasUnigramsFor(keyArray: [temporaryReadingKey]) {
-          // 此處刻意使用 Assembler 的 API（assembler.dropKey）以避免呼叫
-          // InputHandler 的 dropKey 中所包含的 KeyDropContext 回補邏輯。
-          handler.assembler.dropKey(direction: .rear)
-          // 這裡必須 Walk 一次、來更新目前被 walk 的內容。
-          handler.assemble()
-          handler.composer = theComposer
-          // 這裡不需要回呼 generateStateOfInputting()，因為當前輸入的聲調鍵一定是合規的、會在之後回呼 generateStateOfInputting()。
-          overrideHappened = true
-        } else {
-          errorCallback("4B0DD2D4：語彙庫內無「\(temporaryReadingKey)」的匹配記錄，放棄覆寫游標身後的內容。")
-          return true
-        }
+      if let overrideHandled = performRearIntonationOverrideIfNeeded(
+        input,
+        inputText: &inputText
+      ) {
+        return overrideHandled
       }
-
       // 鐵恨引擎並不具備對 Enter (CR / LF) 鍵的具體判斷能力，所以在這裡單獨處理。
       handler.composer.receiveKey(fromString: confirmCombination ? " " : inputText)
       keyConsumedByReading = true
       narrateTheComposer(
         narrator: handler.narrator,
-        when: !overrideHappened && prefs.readingNarrationCoverage >= 2,
+        when: prefs.readingNarrationCoverage >= 2,
         allowDuplicates: false
       )
 
@@ -135,7 +107,9 @@ public final class PhonabetTypeWriter<InputHandler: InputHandlerProtocol>: Typew
         errorCallback("22017F76: 不合規的按鍵輸入。")
         return true
       } else if !handler.assembler.insertKey(readingKey) {
-        errorCallback("3CF278C9: 得檢查對應的語言模組的 hasUnigramsFor() 是否有誤判之情形。")
+        errorCallback(
+          "3CF278C9: 得檢查對應的語言模組的 hasUnigramsFor() 是否有誤判之情形。"
+        )
         return true
       } else {
         narrateTheComposer(
@@ -160,11 +134,6 @@ public final class PhonabetTypeWriter<InputHandler: InputHandlerProtocol>: Typew
       // 再以回呼組字狀態的方式來執行 setInlineDisplayWithCursor()。
       var inputting = handler.generateStateOfInputting()
       inputting.textToCommit = textToCommit
-      if overrideHappened {
-        inputting.tooltip = "Previous intonation has been overridden.".localized
-        inputting.tooltipDuration = 2
-        inputting.data.tooltipColorState = .normal
-      }
       session.switchState(inputting)
 
       /// 逐字選字模式的處理。
@@ -224,9 +193,53 @@ public final class PhonabetTypeWriter<InputHandler: InputHandlerProtocol>: Typew
     }
     return nil
   }
+
+  // MARK: Private
+
+  private var intonationKeyBehavior: IntonationKeyBehavior {
+    .init(pref: handler.prefs)
+  }
 }
 
 extension PhonabetTypeWriter {
+  /// 以結構化形式返回前一個游標位置的讀音與字面資訊。
+  /// - Returns: 可用於聲調覆寫的讀音快照。
+  func getPreviousRearSyllableSnapshot() -> RearSyllableSnapshot? {
+    let assembler = handler.assembler
+    if assembler.cursor == 0 { return nil }
+    let cursorPrevious = max(assembler.cursor - 1, 0)
+    guard assembler.keys.indices.contains(cursorPrevious) else { return nil }
+    let readingKey = assembler.keys[cursorPrevious]
+    guard !readingKey.isEmpty else { return nil }
+    var playbackComposer = handler.composer
+    playbackComposer.clear()
+    // 直接使用注音符號重建 composer 狀態，繞過鍵盤佈局轉換。
+    if playbackComposer.isPinyinMode {
+      playbackComposer.receiveSequence(readingKey, isRomaji: true)
+    } else {
+      for scalar in readingKey.unicodeScalars {
+        playbackComposer.receiveKey(fromPhonabet: scalar)
+      }
+    }
+    let cachedIntonation = playbackComposer.intonation.isValid ? playbackComposer.intonation : nil
+    if playbackComposer.hasIntonation() { playbackComposer.doBackSpace() }
+    // 注意：移除聲調後的 composer 可能無法查詢，但仍可用於重建讀音。
+    let surfaceText: String? = {
+      let gramHit = assembler.assembledSentence.findGram(at: cursorPrevious)
+      guard let gramHit else { return nil }
+      let offset = cursorPrevious - gramHit.range.lowerBound
+      let characters = gramHit.gram.value.map(\.description)
+      if characters.indices.contains(offset) { return characters[offset] }
+      return gramHit.gram.value
+    }()
+    return RearSyllableSnapshot(
+      readingKey: readingKey,
+      composerSansIntonation: playbackComposer,
+      intonation: cachedIntonation,
+      surfaceText: surfaceText
+    )
+  }
+
   func narrateTheComposer(
     narrator: (any SpeechNarratorProtocol)?,
     with maybeKey: String? = nil,
@@ -251,5 +264,178 @@ extension PhonabetTypeWriter {
     theComposer.clear() // 清空各種槽的內容。
     theComposer.receiveKey(fromString: input.text)
     return theComposer.hasIntonation(withNothingElse: true)
+  }
+
+  /// 引入 macOS 內建注音輸入法的行為，允許用除了陰平以外的聲調鍵覆寫前一個漢字的讀音。
+  /// 但如果要覆寫的內容會導致游標身後的字音沒有對應的辭典記錄的話，那就只蜂鳴警告一下。
+  func performRearIntonationOverrideIfNeeded(
+    _ input: InputSignalProtocol,
+    inputText: inout String
+  )
+    -> Bool? {
+    guard let session = handler.session else { return nil }
+    guard !intonationKeyBehavior.skipHandling else { return nil }
+    guard handler.composer.isEmpty else { return nil }
+    guard !input.isSpace else { return nil }
+    guard isIntonationKey(input) else { return nil }
+    guard let snapshot = getPreviousRearSyllableSnapshot() else { return nil }
+    // 將輸入的按鍵轉換為實際的聲調符號，以便與快照中的聲調進行比較。
+    var tempComposer = handler.composer
+    tempComposer.clear()
+    tempComposer.receiveKey(fromString: inputText)
+    let incomingIntonation = tempComposer.intonation
+    guard incomingIntonation.isValid else { return true }
+    if let existingIntonation = snapshot.intonation,
+       existingIntonation == incomingIntonation,
+       intonationKeyBehavior.onlyOverrideDifferentTones {
+      return nil
+    }
+    guard let overrideRequest = snapshot.makeOverrideRequest(
+      newIntonation: incomingIntonation
+    ) else {
+      errorCallback("E2FAD61C：覆寫聲調時無法生成讀音快照。")
+      return true
+    }
+    switch overrideRearKey(with: overrideRequest) {
+    case .success:
+      handler.retrievePOMSuggestions(apply: true)
+      let textToCommit = handler.commitOverflownComposition
+      var refreshedState = handler.generateStateOfInputting()
+      refreshedState.textToCommit = textToCommit
+      refreshedState.tooltip = "Previous intonation has been overridden.".localized
+      refreshedState.tooltipDuration = 2
+      refreshedState.data.tooltipColorState = .normal
+      session.switchState(refreshedState)
+      return true
+    case .noLexiconRecord:
+      let replacementReading = overrideRequest.replacementReading
+      errorCallback(
+        "4B0DD2D4：語彙庫內無「\(replacementReading)」的匹配記錄，放棄覆寫游標身後的內容。"
+      )
+      return true
+    case .cursorAtRearestPosition, .stateMismatch:
+      return nil
+    case .failedToFinalize:
+      errorCallback("E0F67CE5：覆寫聲調時發生非預期錯誤。")
+      return true
+    }
+  }
+
+  /// 處理游標身後單一讀音的聲調覆寫需求。
+  /// - Parameter request: 聲調覆寫請求資料。
+  /// - Returns: 覆寫結果狀態。
+  fileprivate func overrideRearKey(with request: ToneOverrideRequest) -> ToneOverrideResult {
+    let assembler = handler.assembler
+    guard assembler.cursor > 0 else { return .stateMismatch }
+    let targetIndex = assembler.cursor - 1
+    guard assembler.keys.indices.contains(targetIndex) else { return .stateMismatch }
+    guard assembler.keys[targetIndex] == request.originalReading else { return .stateMismatch }
+    guard assembler.langModel.hasUnigramsFor(keyArray: [request.replacementReading]) else {
+      return .noLexiconRecord
+    }
+    guard assembler.dropKey(direction: .rear) else { return .cursorAtRearestPosition }
+    /// 從這個位置開始，assembler 的內容已有所改變，得重新組句。
+    defer {
+      handler.assemble()
+    }
+    guard assembler.insertKey(request.replacementReading) else {
+      _ = assembler.dropKey(direction: .front)
+      _ = assembler.insertKey(request.originalReading)
+      return .failedToFinalize
+    }
+    return .success
+  }
+
+  // MARK: - RearSyllableSnapshot
+
+  struct RearSyllableSnapshot {
+    /// 組字器當中的既有讀音索引鍵。
+    let readingKey: String
+    /// 不含聲調的注拼槽狀態，供覆寫運算重建讀音字串。
+    let composerSansIntonation: Tekkon.Composer
+    /// 原本的聲調內容（若有）。
+    let intonation: Tekkon.Phonabet?
+    /// 對應的字面顯示內容（若可取得）。
+    let surfaceText: String?
+
+    /// 生成對應的聲調覆寫請求資料。
+    /// - Parameter newIntonation: 使用者新指定的聲調。
+    /// - Returns: 供組字器消化的覆寫請求。
+    func makeOverrideRequest(newIntonation: Tekkon.Phonabet) -> ToneOverrideRequest? {
+      var composerCopy = composerSansIntonation
+      // 直接使用注音符號，繞過鍵盤佈局轉換。
+      if let scalar = newIntonation.value.unicodeScalars.first {
+        composerCopy.receiveKey(fromPhonabet: scalar)
+      }
+      guard let replacementReading = composerCopy
+        .phonabetKeyForQuery(pronounceableOnly: true)
+      else {
+        return nil
+      }
+      return ToneOverrideRequest(
+        originalReading: readingKey,
+        replacementReading: replacementReading,
+        newIntonation: newIntonation,
+        surfaceText: surfaceText
+      )
+    }
+  }
+
+  // MARK: - ToneOverrideRequest
+
+  struct ToneOverrideRequest {
+    /// 原本存在於組字器內的讀音索引鍵。
+    let originalReading: String
+    /// 準備覆寫的新讀音索引鍵。
+    let replacementReading: String
+    /// 使用者指定的新聲調內容。
+    let newIntonation: Tekkon.Phonabet
+    /// 供未來延伸用途的字面顯示內容。
+    let surfaceText: String?
+  }
+
+  // MARK: - ToneOverrideResult
+
+  enum ToneOverrideResult {
+    /// 覆寫成功。
+    case success
+    /// 缺少對應的語彙記錄。
+    case noLexiconRecord
+    /// 游標或讀音狀態不符預期。
+    case stateMismatch
+    /// 游標身後沒有位置了，也就是說游標已經位於最後方的位置。
+    case cursorAtRearestPosition
+    /// 插入新讀音時未能完成必要的節點更新。
+    case failedToFinalize
+  }
+
+  // MARK: - IntonationKeyBehavior
+
+  enum IntonationKeyBehavior: Int {
+    /// 嘗試對游標正後方的字音覆寫聲調，且重設其選字狀態。
+    case overridePreviousPosIntonationWithCandidateReset = 0
+    /// 僅在鍵入的聲調與游標正後方的字音不同時，嘗試覆寫。
+    case onlyOverridePreviousPosIfDifferentTone = 1
+    /// 始終在內文組字區內鍵入聲調符號。
+    case alwaysTypeIntonationsToTheCompositionBuffer = 2
+
+    // MARK: Lifecycle
+
+    init(pref: (any PrefMgrProtocol)? = nil) {
+      self = .init(
+        rawValue: (pref ?? PrefMgr()).specifyIntonationKeyBehavior
+      ) ?? .overridePreviousPosIntonationWithCandidateReset
+    }
+
+    // MARK: Internal
+
+    /// 僅在鍵入的聲調與游標正後方的字音不同時，嘗試覆寫。
+    var onlyOverrideDifferentTones: Bool {
+      self == .onlyOverridePreviousPosIfDifferentTone
+    }
+
+    var skipHandling: Bool {
+      self == .alwaysTypeIntonationsToTheCompositionBuffer
+    }
   }
 }
