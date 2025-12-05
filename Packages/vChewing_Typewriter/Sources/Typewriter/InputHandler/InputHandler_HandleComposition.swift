@@ -31,4 +31,31 @@ extension InputHandlerProtocol {
     default: return nil
     }
   }
+
+  func handleTypewriterSCPCTasks() {
+    // 僅在啟用逐字選字模式時執行，避免干擾一般組字流程。
+    guard prefs.useSCPCTypingMode else { return }
+    guard let session = session else { return }
+    let candidateState: State = generateStateOfCandidates()
+    switch candidateState.candidates.count {
+    case 2...: session.switchState(candidateState)
+    case 1:
+      let firstCandidate = candidateState.candidates.first!
+      let reading: [String] = firstCandidate.keyArray
+      let text: String = firstCandidate.value
+      session.switchState(State.ofCommitting(textToCommit: text))
+
+      if prefs.associatedPhrasesEnabled {
+        let associatedCandidates = generateArrayOfAssociates(
+          withPairs: [.init(keyArray: reading, value: text)]
+        )
+        session.switchState(
+          associatedCandidates.isEmpty
+            ? State.ofEmpty()
+            : State.ofAssociates(candidates: associatedCandidates)
+        )
+      }
+    default: return
+    }
+  }
 }
