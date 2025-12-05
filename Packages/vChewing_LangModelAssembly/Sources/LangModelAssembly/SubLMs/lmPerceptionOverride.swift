@@ -10,6 +10,7 @@
 
 import Foundation
 import Megrez
+import Shared
 import SwiftExtension
 
 // MARK: - LMAssembly.OverrideSuggestion
@@ -42,13 +43,14 @@ extension LMAssembly {
     public init(
       capacity: Int = 500,
       thresholdProvider: (() -> Double)? = nil,
-      dataURL: URL? = nil
+      dataURL: URL? = nil,
+      prefMgr: PrefMgr? = nil
     ) {
       self.mutCapacity = max(capacity, 1) // Ensures that this integer value is always > 0.
       self.thresholdProvider = thresholdProvider
       self.fileSaveLocationURL = dataURL
       self.previouslySavedHash = ""
-      self.prefs = PrefMgr()
+      self.prefs = prefMgr ?? PrefMgr()
     }
 
     // MARK: Public
@@ -73,7 +75,7 @@ extension LMAssembly {
     /// 記錄最近一次快照的雜湊值（hex string），以避免重複寫入。
     var previouslySavedHash: String
     /// PrefMgr instance for reading preferences in real-time
-    var prefs: PrefMgr
+    public var prefs: PrefMgr
 
     var threshold: Double {
       let fallbackValue = Self.kDecayThreshold
@@ -1023,7 +1025,7 @@ extension LMAssembly.LMPerceptionOverride {
     if isSingleCharUnigram { T *= 0.8 }
 
     // 超過視窗即淘汰
-    if daysDiff >= T { return threshold - 0.001 }
+    if daysDiff > T { return threshold - 0.001 }
 
     // 年齡因子（非半衰）：線性核 + 指數 pAge（pAge>1 時較快衰減）
     let pAge = 2.0
