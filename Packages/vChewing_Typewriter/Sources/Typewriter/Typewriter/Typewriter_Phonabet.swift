@@ -6,9 +6,9 @@
 // marks, or product names of Contributor, except as required to fulfill notice
 // requirements defined in MIT License.
 
-// MARK: - PhonabetTypeWriter
+// MARK: - PhonabetTypewriter
 
-public final class PhonabetTypeWriter<InputHandler: InputHandlerProtocol>: TypewriterProtocol {
+public final class PhonabetTypewriter<InputHandler: InputHandlerProtocol>: TypewriterProtocol {
   // MARK: Lifecycle
 
   public init(_ handler: InputHandler) {
@@ -201,7 +201,7 @@ public final class PhonabetTypeWriter<InputHandler: InputHandlerProtocol>: Typew
   }
 }
 
-extension PhonabetTypeWriter {
+extension PhonabetTypewriter {
   /// 以結構化形式返回前一個游標位置的讀音與字面資訊。
   /// - Returns: 可用於聲調覆寫的讀音快照。
   func getPreviousRearSyllableSnapshot() -> RearSyllableSnapshot? {
