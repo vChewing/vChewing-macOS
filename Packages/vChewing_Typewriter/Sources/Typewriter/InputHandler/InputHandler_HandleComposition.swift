@@ -40,7 +40,7 @@ extension InputHandlerProtocol {
   /// - Parameter input: 輸入訊號。
   /// - Returns: 告知 IMK「該按鍵是否已經被輸入法攔截處理」。
   fileprivate func handlePhonabetComposition(input: InputSignalProtocol) -> Bool? {
-    PhonabetTypeWriter(self).handle(input)
+    PhonabetTypewriter(self).handle(input)
   }
 }
 
