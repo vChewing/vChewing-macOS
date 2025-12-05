@@ -96,6 +96,9 @@ final class InputTokenTests: XCTestCase {
       ),
       isFiltering: false
     )
+    defer {
+      instance.clearTemporaryData(isFiltering: false)
+    }
     let x = instance.unigramsFor(keyArray: ["ㄐㄧㄣ", "ㄊㄧㄢ", "ㄖˋ", "ㄑㄧˊ"]).description
     print(x)
     LMAssembly.LMInstantiator.disconnectSQLDB()

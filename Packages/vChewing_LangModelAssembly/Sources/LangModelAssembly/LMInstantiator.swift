@@ -275,6 +275,11 @@ extension LMAssembly {
           : lmUserPhrases.temporaryMap[keyChain, default: []].append(unigram)
     }
 
+    /// 該函式主要供單元測試所用。
+    public func clearTemporaryData(isFiltering: Bool) {
+      _ = isFiltering ? lmFiltered.clear() : lmUserPhrases.clear()
+    }
+
     /// 自當前記憶體取得指定使用者子語言模組內的原始資料體。
     /// - Parameters:
     ///   - targetType: 操作對象。
