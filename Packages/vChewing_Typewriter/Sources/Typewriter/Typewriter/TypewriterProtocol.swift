@@ -9,12 +9,12 @@
 // MARK: - TypewriterProtocol
 
 public protocol TypewriterProtocol {
-  associatedtype InputHandler: InputHandlerProtocol
-  typealias State = InputHandler.State
-  typealias Session = InputHandler.Session
-  var handler: InputHandler { get }
-  init(_ handler: InputHandler)
-  func handle(_ input: InputSignalProtocol) -> Bool?
+  associatedtype Handler: InputHandlerProtocol
+  typealias State = Handler.State
+  typealias Session = Handler.Session
+  var handler: Handler { get }
+  init(_ handler: Handler)
+  func handle(_ input: some InputSignalProtocol) -> Bool?
 }
 
 extension TypewriterProtocol {
