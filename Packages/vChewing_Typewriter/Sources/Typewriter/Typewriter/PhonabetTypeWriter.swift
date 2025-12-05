@@ -213,14 +213,17 @@ extension PhonabetTypeWriter {
     guard !readingKey.isEmpty else { return nil }
     var playbackComposer = handler.composer
     playbackComposer.clear()
+    // 直接使用注音符號重建 composer 狀態，繞過鍵盤佈局轉換。
     if playbackComposer.isPinyinMode {
       playbackComposer.receiveSequence(readingKey, isRomaji: true)
     } else {
-      playbackComposer.receiveSequence(readingKey)
+      for scalar in readingKey.unicodeScalars {
+        playbackComposer.receiveKey(fromPhonabet: scalar)
+      }
     }
     let cachedIntonation = playbackComposer.intonation.isValid ? playbackComposer.intonation : nil
     if playbackComposer.hasIntonation() { playbackComposer.doBackSpace() }
-    guard playbackComposer.isPronounceable else { return nil }
+    // 注意：移除聲調後的 composer 可能無法查詢，但仍可用於重建讀音。
     let surfaceText: String? = {
       guard let gramHit = assembler.assembledSentence.findGram(at: cursorPrevious) else {
         return nil
@@ -279,7 +282,11 @@ extension PhonabetTypeWriter {
     guard !input.isSpace else { return nil }
     guard isIntonationKey(input) else { return nil }
     guard let snapshot = getPreviousRearSyllableSnapshot() else { return nil }
-    let incomingIntonation = Phonabet(inputText)
+    // 將輸入的按鍵轉換為實際的聲調符號，以便與快照中的聲調進行比較。
+    var tempComposer = handler.composer
+    tempComposer.clear()
+    tempComposer.receiveKey(fromString: inputText)
+    let incomingIntonation = tempComposer.intonation
     guard incomingIntonation.isValid else { return true }
     if let existingIntonation = snapshot.intonation,
        existingIntonation == incomingIntonation,
@@ -359,7 +366,10 @@ extension PhonabetTypeWriter {
     /// - Returns: 供組字器消化的覆寫請求。
     func makeOverrideRequest(newIntonation: Tekkon.Phonabet) -> ToneOverrideRequest? {
       var composerCopy = composerSansIntonation
-      composerCopy.receiveKey(fromString: newIntonation.value)
+      // 直接使用注音符號，繞過鍵盤佈局轉換。
+      if let scalar = newIntonation.value.unicodeScalars.first {
+        composerCopy.receiveKey(fromPhonabet: scalar)
+      }
       guard let replacementReading = composerCopy
         .phonabetKeyForQuery(pronounceableOnly: true)
       else {
