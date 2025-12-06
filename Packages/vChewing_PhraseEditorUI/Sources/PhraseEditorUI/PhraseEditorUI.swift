@@ -191,10 +191,7 @@ public struct VwrPhraseEditorUI: View {
     }.onDisappear {
       selInputMode = .imeModeNULL
       selUserDataType = .thePhrases
-      txtContent = NSLocalizedString(
-        "Please select Simplified / Traditional Chinese mode above.",
-        comment: ""
-      )
+      txtContent = "Please select Simplified / Traditional Chinese mode above.".localized
       isLoading = true
       Self.txtContentStorage = ""
     }.onAppear {
@@ -208,7 +205,7 @@ public struct VwrPhraseEditorUI: View {
     guard let delegate = delegate else { return }
     updateLabels()
     clearAllFields()
-    txtContent = NSLocalizedString("Loading…", comment: "")
+    txtContent = "Loading…".localized
     isLoading = true
     asyncOnMain {
       txtContent = delegate.retrieveData(mode: selInputMode, type: selUserDataType)
@@ -219,9 +216,7 @@ public struct VwrPhraseEditorUI: View {
 
   // MARK: Internal
 
-  static var txtContentStorage: String = NSLocalizedString(
-    "Please select Simplified / Traditional Chinese mode above.", comment: ""
-  )
+  static var txtContentStorage: String = "Please select Simplified / Traditional Chinese mode above.".localized
 
   @State
   var lblAddPhraseTag1 = PETerms.AddPhrases.locPhrase.localized.0
@@ -331,7 +326,7 @@ public struct VwrPhraseEditorUI: View {
   private func saveAndReload() {
     guard let delegate = delegate, selInputMode != .imeModeNULL else { return }
     let toSave = txtContent
-    txtContent = NSLocalizedString("Loading…", comment: "")
+    txtContent = "Loading…".localized
     isLoading = true
     let newResult = delegate.saveData(mode: selInputMode, type: selUserDataType, data: toSave)
     txtContent = newResult
@@ -383,7 +378,7 @@ public enum PETerms {
       if self == .locAdd {
         return loc.prefix(2) == "zh" ? ("添入", "") : loc.prefix(2) == "ja" ? ("記入", "") : ("Add", "")
       }
-      let rawArray = NSLocalizedString(rawValue, comment: "").components(separatedBy: " ")
+      let rawArray = rawValue.localized.components(separatedBy: " ")
       if rawArray.isEmpty { return ("N/A", "N/A") }
       let val1: String = rawArray[0]
       let val2: String = (rawArray.count >= 2) ? rawArray[1] : ""

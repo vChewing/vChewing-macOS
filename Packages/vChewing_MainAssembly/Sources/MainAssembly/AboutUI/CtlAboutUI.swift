@@ -66,7 +66,7 @@ public final class CtlAboutUI: NSWindowController, NSWindowDelegate {
       if #available(macOS 10.10, *) {
         window.titlebarAppearsTransparent = true
       }
-      window.title = "i18n:aboutWindow.ABOUT_APP_TITLE_FULL"
+      window.title = "i18n:AboutWindow.ABOUT_APP_TITLE_FULL"
         .localized + " (v\(IMEApp.appMainVersionLabel.joined(separator: " Build ")))"
     }
   }
@@ -114,7 +114,7 @@ public final class CtlAboutUI: NSWindowController, NSWindowDelegate {
           .fixedSize(horizontal: true, vertical: false)
           .ignoresSafeArea()
       )
-      window?.title = "i18n:aboutWindow.ABOUT_APP_TITLE_FULL"
+      window?.title = "i18n:AboutWindow.ABOUT_APP_TITLE_FULL"
         .localized + " (v\(IMEApp.appMainVersionLabel.joined(separator: " Build ")))"
     }
   }

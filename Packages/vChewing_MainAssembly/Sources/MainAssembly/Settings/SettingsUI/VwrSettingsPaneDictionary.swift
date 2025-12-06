@@ -76,7 +76,7 @@ public struct VwrSettingsPaneDictionary: View {
                 PathControl(pathDroppable: $userDataFolderSpecified) { pathControl in
                   pathControl.allowedTypes = ["public.folder", "public.directory"]
                   pathControl
-                    .placeholderString = "Please drag the desired target from Finder to this place."
+                    .placeholderString = "i18n:UI.Help.pleaseDragTheDesiredTargetFromFinderToThisPlace"
                     .localized
                 } acceptDrop: { pathControl, info in
                   let urls = info.draggingPasteboard.readObjects(forClasses: [NSURL.self])

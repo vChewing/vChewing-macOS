@@ -150,7 +150,7 @@ extension SettingsPanesCocoa {
       pathCtl.makeSimpleConstraint(.height, relation: .equal, value: NSFont.smallSystemFontSize * 2)
       pathCtl.makeSimpleConstraint(.width, relation: .greaterThanOrEqual, value: windowWidth - 145)
       pathCtl.url = URL(fileURLWithPath: LMMgr.dataFolderPath(isDefaultFolder: false))
-      pathCtl.toolTip = "Please drag the desired target from Finder to this place.".localized
+      pathCtl.toolTip = "i18n:UI.Help.pleaseDragTheDesiredTargetFromFinderToThisPlace".localized
     }
 
     @IBAction
@@ -203,9 +203,7 @@ extension SettingsPanesCocoa {
         return
       }
       let dlgOpenFile = NSOpenPanel()
-      dlgOpenFile.title = NSLocalizedString(
-        "i18n:settings.importFromKimoTxt.label", comment: ""
-      ) + ":"
+      dlgOpenFile.title = "i18n:settings.importFromKimoTxt.label".localized + ":"
       dlgOpenFile.showsResizeIndicator = true
       dlgOpenFile.showsHiddenFiles = true
       dlgOpenFile.canChooseFiles = true
@@ -285,9 +283,7 @@ extension SettingsPanesCocoa.Dictionary: NSPathControlDelegate {
       return
     }
     let dlgOpenPath = NSOpenPanel()
-    dlgOpenPath.title = NSLocalizedString(
-      "Choose your desired user data folder.", comment: ""
-    )
+    dlgOpenPath.title = "i18n:Settings.Help.chooseYourDesiredUserDataFolder".localized
     dlgOpenPath.showsResizeIndicator = true
     dlgOpenPath.showsHiddenFiles = true
     dlgOpenPath.canChooseFiles = false

@@ -229,16 +229,11 @@ extension VwrClientListMgr {
   func btnAddClientClicked(_: Any) {
     guard let window = CtlClientListMgr.shared?.window else { return }
     let alert = NSAlert()
-    alert.messageText = NSLocalizedString(
-      "Please enter the client app bundle identifier(s) you want to register.", comment: ""
-    )
-    alert.informativeText = NSLocalizedString(
-      "One record per line. Use Option+Enter to break lines.\nBlank lines will be dismissed.",
-      comment: ""
-    )
-    alert.addButton(withTitle: NSLocalizedString("OK", comment: ""))
-    alert.addButton(withTitle: NSLocalizedString("Just Select", comment: "") + "…")
-    alert.addButton(withTitle: NSLocalizedString("Cancel", comment: ""))
+    alert.messageText = "i18n:UI.Help.pleaseEnterTheClientAppBundleIdentifierSYouWantToRegister".localized
+    alert.informativeText = "i18n:UI.Help.oneRecordPerLineUseOptionEnterToBreakLinesBlankLinesWillBeDismissed".localized
+    alert.addButton(withTitle: "i18n:Button.Ok".localized)
+    alert.addButton(withTitle: "i18n:UI.Option.justSelect".localized + "…")
+    alert.addButton(withTitle: "i18n:Button.Cancel".localized)
 
     let maxFloat = Double(Float.greatestFiniteMagnitude)
     let scrollview = NSScrollView(frame: CGRect(x: 0, y: 0, width: 370, height: 200))
@@ -289,15 +284,13 @@ extension VwrClientListMgr {
         if #unavailable(macOS 10.13) {
           window
             .callAlert(
-              title: "Please drag the apps into the Client Manager window from Finder."
+              title: "i18n:UI.Help.pleaseDragTheAppsIntoTheClientManagerWindowFromFinder"
                 .localized
             )
           break resultCheck
         }
         let dlgOpenPath = NSOpenPanel()
-        dlgOpenPath.title = NSLocalizedString(
-          "Choose the target application bundle.", comment: ""
-        )
+        dlgOpenPath.title = "i18n:Settings.Help.chooseTheTargetApplicationBundle".localized
         dlgOpenPath.showsResizeIndicator = true
         dlgOpenPath.allowsMultipleSelection = true
         if #available(macOS 11.0, *) {
@@ -313,11 +306,8 @@ extension VwrClientListMgr {
           switch result {
           case .OK:
             for url in dlgOpenPath.urls {
-              let title = NSLocalizedString(
-                "The selected item is either not a valid macOS application bundle or not having a valid app bundle identifier.",
-                comment: ""
-              )
-              let text = url.path + "\n\n" + NSLocalizedString("Please try again.", comment: "")
+              let title = "i18n:Error.theSelectedItemIsEitherNotAValidMacosApplicationBundleOrNotHavingAValidAppBundleIdentifier".localized
+              let text = url.path + "\n\n" + "i18n:UI.Message.pleaseTryAgain".localized
               guard let bundle = Bundle(url: url) else {
                 CtlClientListMgr.shared?.window.callAlert(title: title, text: text)
                 return
@@ -329,13 +319,13 @@ extension VwrClientListMgr {
               let isIdentifierAlreadyRegistered = Self.clientsList.contains(identifier)
               let alert2 = NSAlert()
               alert2.messageText =
-                "Do you want to enable the popup composition buffer for this client?".localized
+                "i18n:Dialog.doYouWantToEnableThePopupCompositionBufferForThisClient".localized
               alert2.informativeText = "\(identifier)\n\n"
                 +
-                "Some client apps may have different compatibility issues in IMKTextInput implementation."
+                "i18n:Settings.Help.someClientAppsMayHaveDifferentCompatibilityIssuesInImktextinputImplementation"
                 .localized
-              alert2.addButton(withTitle: "Yes".localized)
-              alert2.addButton(withTitle: "No".localized)
+              alert2.addButton(withTitle: "i18n:Button.Yes".localized)
+              alert2.addButton(withTitle: "i18n:Button.No".localized)
               alert2.beginSheetModal(for: window) { result2 in
                 let oldValue = PrefMgr.shared.clientsIMKTextInputIncapable[identifier]
                 let newValue = result2 == .alertFirstButtonReturn

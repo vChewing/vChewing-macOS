@@ -129,7 +129,14 @@ extension CGRect {
 // MARK: - String.localized extension
 
 extension StringLiteralType {
-  public var localized: String { NSLocalizedString(description, comment: "") }
+  public var localized: String {
+    if #available(macOS 12, *) {
+      return .init(localized: String.LocalizationValue(description))
+    } else {
+      // 保留這個 NSLocalizedString 用例，因為這是語法糖的 Backend。
+      return NSLocalizedString(description, comment: "")
+    }
+  }
 }
 
 // MARK: - Root Extensions (classDeduplicated)

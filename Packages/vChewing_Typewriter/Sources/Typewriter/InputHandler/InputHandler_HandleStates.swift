@@ -230,7 +230,7 @@ extension InputHandlerProtocol {
         tooltipColorState = .succeeded
       }
       var newState = generateStateOfInputting()
-      newState.tooltip = NSLocalizedString(tooltipMessage, comment: "")
+      newState.tooltip = tooltipMessage.localized
       newState.data.tooltipColorState = tooltipColorState
       newState.tooltipDuration = 1.85
       session.switchState(newState)
@@ -254,7 +254,7 @@ extension InputHandlerProtocol {
         return true
       }
       var newState = generateStateOfInputting()
-      newState.tooltip = NSLocalizedString(tooltipMessage, comment: "")
+      newState.tooltip = tooltipMessage.localized
       newState.data.tooltipColorState = .warning
       newState.tooltipDuration = 1.85
       session.switchState(newState)
@@ -983,10 +983,7 @@ extension InputHandlerProtocol {
         return true
       } else {
         let errorMessage =
-          NSLocalizedString(
-            "Please manually implement the symbols of this menu \nin the user phrase file with “_punctuation_list” key.",
-            comment: ""
-          )
+          "Please manually implement the symbols of this menu \nin the user phrase file with \"_punctuation_list\" key.".localized
         vCLog("8EB3FB1A: " + errorMessage)
         let textToCommit = generateStateOfInputting(sansReading: true).displayedText
         session.switchState(State.ofCommitting(textToCommit: textToCommit))

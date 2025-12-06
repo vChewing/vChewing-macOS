@@ -136,15 +136,15 @@ extension SessionProtocol {
 
   public func candidateToolTip(shortened: Bool) -> String {
     if state.type == .ofAssociates {
-      return shortened ? "⇧" : NSLocalizedString("Hold ⇧ to choose associates.", comment: "")
+      return shortened ? "⇧" : "i18n:UI.Label.holdToChooseAssociates".localized
     } else if state.type == .ofInputting, state.isCandidateContainer {
       let useShift = inputMode.langModel.areCassetteCandidateKeysShiftHeld
       let theEmoji = useShift ? "⬆️" : "⚡️"
-      return shortened ? theEmoji : "\(theEmoji) " + "Quick Candidates".localized
+      return shortened ? theEmoji : "\(theEmoji) " + "i18n:UI.Label.quickCandidates".localized
     } else if prefs.cassetteEnabled {
-      return shortened ? "📼" : "📼 " + "CIN Cassette Mode".localized
+      return shortened ? "📼" : "📼 " + "i18n:TypingMode.Cassette".localized
     } else if state.type == .ofSymbolTable, state.node.containsCandidateServices {
-      return shortened ? "🌎" : "🌎 " + "Service Menu".localized
+      return shortened ? "🌎" : "🌎 " + "i18n:Menu.ServiceMenu".localized
     }
     return ""
   }
@@ -376,7 +376,7 @@ extension SessionProtocol {
         succeeded ? "! Succeeded in filtering a candidate." : "⚠︎ Failed from filtering a candidate."
     }
     if !succeeded { newState.data.tooltipColorState = .redAlert }
-    newState.tooltip = NSLocalizedString(tooltipMessage, comment: "")
+    newState.tooltip = tooltipMessage.localized
     switchState(newState)
   }
 }

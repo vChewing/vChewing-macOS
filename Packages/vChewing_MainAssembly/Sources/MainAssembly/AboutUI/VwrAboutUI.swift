@@ -37,19 +37,19 @@ extension VwrAboutUI: View {
             }
             VStack(alignment: .leading) {
               HStack {
-                Text("i18n:aboutWindow.APP_NAME").fontWeight(.heavy).lineLimit(1)
+                Text("i18n:AboutWindow.APP_NAME").fontWeight(.heavy).lineLimit(1)
                 Text(
                   "v\(IMEApp.appMainVersionLabel.joined(separator: " Build ")) - \(IMEApp.appSignedDateLabel)"
                 )
                 .lineLimit(1)
               }.fixedSize()
-              Text("i18n:aboutWindow.DONATION_MESSAGE").font(.custom("Tahoma", size: 11))
+              Text("i18n:AboutWindow.DONATION_MESSAGE").font(.custom("Tahoma", size: 11))
               Text(Self.copyrightLabel).font(.custom("Tahoma", size: 11))
-              Text("i18n:aboutWindow.DEV_CREW").font(.custom("Tahoma", size: 11))
+              Text("i18n:AboutWindow.DEV_CREW").font(.custom("Tahoma", size: 11))
                 .padding([.vertical], 2)
             }
           }
-          GroupBox(label: Text("i18n:aboutWindow.LICENSE_TITLE")) {
+          GroupBox(label: Text("i18n:AboutWindow.LICENSE_TITLE")) {
             ScrollView(.vertical, showsIndicators: true) {
               HStack {
                 Text(Self.eulaContent + "\n" + Self.eulaContentUpstream).textSelection(.enabled)
@@ -62,7 +62,7 @@ extension VwrAboutUI: View {
         }
         Divider()
         HStack(alignment: .top) {
-          Text("i18n:aboutWindow.DISCLAIMER_TEXT")
+          Text("i18n:AboutWindow.DISCLAIMER_TEXT")
             .font(.custom("Tahoma", size: 11))
             .opacity(0.5)
             .frame(maxWidth: .infinity)
@@ -70,7 +70,7 @@ extension VwrAboutUI: View {
             Button {
               CtlAboutUI.shared?.window?.close()
             } label: {
-              Text("i18n:aboutWindow.OK_BUTTON").frame(width: 114)
+              Text("i18n:AboutWindow.OK_BUTTON").frame(width: 114)
             }
             .keyboardShortcut(.defaultAction)
             Button {
@@ -78,14 +78,14 @@ extension VwrAboutUI: View {
                 NSWorkspace.shared.open(url)
               }
             } label: {
-              Text("i18n:aboutWindow.WEBSITE_BUTTON").frame(width: 114)
+              Text("i18n:AboutWindow.WEBSITE_BUTTON").frame(width: 114)
             }
             Button {
               if let url = URL(string: "https://vchewing.github.io/BUGREPORT.html") {
                 NSWorkspace.shared.open(url)
               }
             } label: {
-              Text("i18n:aboutWindow.BUGREPORT_BUTTON").frame(width: 114)
+              Text("i18n:AboutWindow.BUGREPORT_BUTTON").frame(width: 114)
             }
           }.fixedSize(horizontal: true, vertical: true)
         }

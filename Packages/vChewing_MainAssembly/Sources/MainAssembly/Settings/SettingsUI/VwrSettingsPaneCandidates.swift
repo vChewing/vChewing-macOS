@@ -189,7 +189,7 @@ private struct VwrSettingsPaneCandidates_SelectionKeys: View {
         if let errorResult = PrefMgr.shared.validate(candidateKeys: keys) {
           if let window = CtlSettingsUI.shared?.window, !keys.isEmpty {
             IMEApp.buzz()
-            let alert = NSAlert(error: NSLocalizedString("Invalid Selection Keys.", comment: ""))
+            let alert = NSAlert(error: "i18n:Error.InvalidSelectionKeys".localized)
             alert.informativeText = errorResult
             alert.beginSheetModal(for: window) { _ in
               candidateKeys = PrefMgr.kDefaultCandidateKeys

@@ -35,7 +35,7 @@ public final class VwrAboutCocoa: NSViewController {
   let imgWidth: CGFloat = 63
 
   var appNameAndVersionString: NSAttributedString {
-    let strResult = NSMutableAttributedString(string: "i18n:aboutWindow.APP_NAME".localized)
+    let strResult = NSMutableAttributedString(string: "i18n:AboutWindow.APP_NAME".localized)
     strResult.addAttribute(
       .font,
       value: {
@@ -68,19 +68,19 @@ public final class VwrAboutCocoa: NSViewController {
         NSStackView.build(.vertical) {
           appNameAndVersionString.makeNSLabel(fixWidth: contentWidth - imgWidth - 10)
           makeFormattedLabel(
-            verbatim: "i18n:aboutWindow.DONATION_MESSAGE".localized
+            verbatim: "i18n:AboutWindow.DONATION_MESSAGE".localized
               + "\n"
               + Self.copyrightLabel,
             size: 11,
             isBold: false, fixWidth: contentWidth - imgWidth - 10
           )
           makeFormattedLabel(
-            verbatim: "i18n:aboutWindow.DEV_CREW".localized,
+            verbatim: "i18n:AboutWindow.DEV_CREW".localized,
             size: 11,
             isBold: false, fixWidth: contentWidth - imgWidth - 10
           )
           makeFormattedLabel(
-            verbatim: "i18n:aboutWindow.LICENSE_TITLE".localized,
+            verbatim: "i18n:AboutWindow.LICENSE_TITLE".localized,
             size: 11,
             isBold: false, fixWidth: contentWidth - imgWidth - 10
           )
@@ -89,7 +89,7 @@ public final class VwrAboutCocoa: NSViewController {
       }
       NSStackView.build(.horizontal) {
         NSStackView.build(.vertical) {
-          "i18n:aboutWindow.DISCLAIMER_TEXT".makeNSLabel(
+          "i18n:AboutWindow.DISCLAIMER_TEXT".makeNSLabel(
             descriptive: true, fixWidth: contentWidth - 120
           )
           NSView()
@@ -101,16 +101,16 @@ public final class VwrAboutCocoa: NSViewController {
         NSStackView.build(.vertical, spacing: verticalButtonStackSpacing, width: 114) {
           addKeyEquivalent(
             NSButton(
-              "i18n:aboutWindow.OK_BUTTON",
+              "i18n:AboutWindow.OK_BUTTON",
               target: self, action: #selector(btnOKAction(_:))
             )
           )
           NSButton(
-            "i18n:aboutWindow.WEBSITE_BUTTON",
+            "i18n:AboutWindow.WEBSITE_BUTTON",
             target: self, action: #selector(btnWebSiteAction(_:))
           )
           NSButton(
-            "i18n:aboutWindow.BUGREPORT_BUTTON",
+            "i18n:AboutWindow.BUGREPORT_BUTTON",
             target: self, action: #selector(btnBugReportAction(_:))
           )
         }

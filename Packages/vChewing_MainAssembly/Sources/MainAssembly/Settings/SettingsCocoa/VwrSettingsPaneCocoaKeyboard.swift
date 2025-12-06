@@ -33,12 +33,12 @@ extension SettingsPanesCocoa {
             "Quick Setup:".makeNSLabel(fixWidth: contentWidth)
             NSView()
             NSButton(
-              verbatim: "↻ㄅ" + " " + "Dachen Trad.".localized,
+              verbatim: "↻ㄅ" + " " + "i18n:KeyboardLayout.DachenTrad".localized,
               target: self,
               action: #selector(quickSetupButtonDachen(_:))
             )
             NSButton(
-              verbatim: "↻ㄅ" + " " + "Eten Trad.".localized,
+              verbatim: "↻ㄅ" + " " + "i18n:KeyboardLayout.EtenTrad2".localized,
               target: self,
               action: #selector(quickSetupButtonEtenTraditional(_:))
             )

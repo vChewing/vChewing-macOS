@@ -52,14 +52,8 @@ public struct VwrSettingsPaneGeneral: View {
         VStack(alignment: .leading) {
           Text(
             "\u{2022} "
-              + NSLocalizedString(
-                "Please use mouse wheel to scroll each page if needed. The CheatSheet is available in the IME menu.",
-                comment: ""
-              ) + "\n\u{2022} "
-              + NSLocalizedString(
-                "Note: The “Delete ⌫” key on Mac keyboard is named as “BackSpace ⌫” here in order to distinguish the real “Delete ⌦” key from full-sized desktop keyboards. If you want to use the real “Delete ⌦” key on a Mac keyboard with no numpad equipped, you have to press “Fn+⌫” instead.",
-                comment: ""
-              )
+              + "i18n:UI.Help.pleaseUseMouseWheelToScrollEachPageIfNeededTheCheatsheetIsAvailableInTheImeMenu".localized + "\n\u{2022} "
+              + "i18n:Settings.Help.noteAboutDeleteKey".localized
           )
           .settingsDescription()
           UserDef.kAppleLanguages.bind($appleLanguageTag).render()
@@ -142,18 +136,15 @@ public struct VwrSettingsPaneGeneral: View {
 
   private func onFartControlChange() {
     let content = String(
-      format: NSLocalizedString(
-        "You are about to uncheck this fart suppressor. You are responsible for all consequences lead by letting people nearby hear the fart sound come from your computer. We strongly advise against unchecking this in any public circumstance that prohibits NSFW netas.",
-        comment: ""
-      )
+      format: "i18n:Settings.Warning.youAreAboutToUncheckThisFartSuppressorYouAreResponsibleForAllConsequencesLeadByLettingPeopleNearbyHearTheFartSoundComeFromYourComputerWeStronglyAdviseAgainstUncheckingThisInAnyPublicCircumstanceThatProhibitsNsfwNetas".localized
     )
-    let alert = NSAlert(error: NSLocalizedString("Warning", comment: ""))
+    let alert = NSAlert(error: "i18n:Dialog.warning".localized)
     alert.informativeText = content
-    alert.addButton(withTitle: NSLocalizedString("Uncheck", comment: ""))
+    alert.addButton(withTitle: "i18n:UI.Button.uncheck".localized)
     alert.buttons.forEach { button in
       button.hasDestructiveAction = true
     }
-    alert.addButton(withTitle: NSLocalizedString("Leave it checked", comment: ""))
+    alert.addButton(withTitle: "i18n:Settings.Help.leaveItChecked".localized)
     if let window = CtlSettingsUI.shared?.window, !shouldNotFartInLieuOfBeep {
       shouldNotFartInLieuOfBeep = true
       alert.beginSheetModal(for: window) { result in

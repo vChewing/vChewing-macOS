@@ -46,34 +46,34 @@ extension CandidateNode {
 
   // MARK: - Static data.
 
-  static let catCommonSymbols = NSLocalizedString("catCommonSymbols", comment: "")
-  static let catHoriBrackets = NSLocalizedString("catHoriBrackets", comment: "")
-  static let catVertBrackets = NSLocalizedString("catVertBrackets", comment: "")
-  static let catAlphabets = NSLocalizedString("catAlphabets", comment: "")
-  static let catRadicals = NSLocalizedString("catRadicals", comment: "")
-  static let catSpecialNumbers = NSLocalizedString("catSpecialNumbers", comment: "")
-  static let catMathSymbols = NSLocalizedString("catMathSymbols", comment: "")
-  static let catCurrencyUnits = NSLocalizedString("catCurrencyUnits", comment: "")
-  static let catSpecialSymbols = NSLocalizedString("catSpecialSymbols", comment: "")
-  static let catUnicodeSymbols = NSLocalizedString("catUnicodeSymbols", comment: "")
-  static let catCircledKanjis = NSLocalizedString("catCircledKanjis", comment: "")
-  static let catCircledKataKana = NSLocalizedString("catCircledKataKana", comment: "")
-  static let catBracketKanjis = NSLocalizedString("catBracketKanjis", comment: "")
-  static let catSingleTableLines = NSLocalizedString("catSingleTableLines", comment: "")
-  static let catDoubleTableLines = NSLocalizedString("catDoubleTableLines", comment: "")
-  static let catFillingBlocks = NSLocalizedString("catFillingBlocks", comment: "")
-  static let catLineSegments = NSLocalizedString("catLineSegments", comment: "")
-  static let catKana = NSLocalizedString("catKana", comment: "")
-  static let catCombinations = NSLocalizedString("catCombinations", comment: "")
-  static let catPhonabets = NSLocalizedString("catPhonabets", comment: "")
-  static let catCircledASCII = NSLocalizedString("catCircledASCII", comment: "")
-  static let catBracketedASCII = NSLocalizedString("catBracketedASCII", comment: "")
-  static let catMusicSymbols = NSLocalizedString("catMusicSymbols", comment: "")
-  static let catThai = NSLocalizedString("catThai", comment: "")
-  static let catYi = NSLocalizedString("catYi", comment: "")
+  static let catCommonSymbols = "catCommonSymbols".localized
+  static let catHoriBrackets = "catHoriBrackets".localized
+  static let catVertBrackets = "catVertBrackets".localized
+  static let catAlphabets = "catAlphabets".localized
+  static let catRadicals = "catRadicals".localized
+  static let catSpecialNumbers = "catSpecialNumbers".localized
+  static let catMathSymbols = "catMathSymbols".localized
+  static let catCurrencyUnits = "catCurrencyUnits".localized
+  static let catSpecialSymbols = "catSpecialSymbols".localized
+  static let catUnicodeSymbols = "catUnicodeSymbols".localized
+  static let catCircledKanjis = "catCircledKanjis".localized
+  static let catCircledKataKana = "catCircledKataKana".localized
+  static let catBracketKanjis = "catBracketKanjis".localized
+  static let catSingleTableLines = "catSingleTableLines".localized
+  static let catDoubleTableLines = "catDoubleTableLines".localized
+  static let catFillingBlocks = "catFillingBlocks".localized
+  static let catLineSegments = "catLineSegments".localized
+  static let catKana = "catKana".localized
+  static let catCombinations = "catCombinations".localized
+  static let catPhonabets = "catPhonabets".localized
+  static let catCircledASCII = "catCircledASCII".localized
+  static let catBracketedASCII = "catBracketedASCII".localized
+  static let catMusicSymbols = "catMusicSymbols".localized
+  static let catThai = "catThai".localized
+  static let catYi = "catYi".localized
 
   static func strCountStrokes(_ count: Int) -> String {
-    String(format: NSLocalizedString("%@-Stroke", comment: ""), count.kanji)
+    String(format: "%@-Stroke".localized, count.kanji)
   }
 
   private static let defaultSymbolRoot: CandidateNode = .init(

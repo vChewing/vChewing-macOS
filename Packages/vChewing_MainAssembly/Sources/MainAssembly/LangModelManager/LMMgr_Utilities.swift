@@ -296,16 +296,14 @@ extension LMMgr {
     if !Self.chkUserLMFilesExist(.imeModeCHS)
       || !Self.chkUserLMFilesExist(.imeModeCHT) {
       let content = String(
-        format: NSLocalizedString(
-          "Please check the permission at \"%@\".", comment: ""
-        ),
+        format: "i18n:Error.pleaseCheckThePermissionAt:%@".localized,
         Self.dataFolderPath(isDefaultFolder: false)
       )
       asyncOnMain {
         let alert = NSAlert()
-        alert.messageText = NSLocalizedString("Unable to create the user phrase file.", comment: "")
+        alert.messageText = "i18n:Error.unableToCreateTheUserPhraseFile".localized
         alert.informativeText = content
-        alert.addButton(withTitle: NSLocalizedString("OK", comment: ""))
+        alert.addButton(withTitle: "i18n:Button.Ok".localized)
         alert.runModal()
         NSApp.popup()
       }
