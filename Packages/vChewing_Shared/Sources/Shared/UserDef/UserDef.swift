@@ -94,6 +94,7 @@ public enum UserDef: String, CaseIterable, Identifiable {
     "ClassicHaninKeyboardSymbolModeShortcutEnabled"
   case kFilterNonCNSReadingsForCHTInput = "FilterNonCNSReadingsForCHTInput"
   case kRomanNumeralOutputFormat = "RomanNumeralOutputFormat"
+  case kReducePOMLifetimeToNoMoreThan12Hours = "ReducePOMLifetimeToNoMoreThan12Hours"
 
   case kUseSpaceToCommitHighlightedSCPCCandidate = "UseSpaceToCommitHighlightedSCPCCandidate"
   case kEnableMouseScrollingForTDKCandidatesCocoa = "EnableMouseScrollingForTDKCandidatesCocoa"
@@ -252,6 +253,7 @@ extension UserDef {
     case .kClassicHaninKeyboardSymbolModeShortcutEnabled: return .bool
     case .kFilterNonCNSReadingsForCHTInput: return .bool
     case .kRomanNumeralOutputFormat: return .integer
+    case .kReducePOMLifetimeToNoMoreThan12Hours: return .bool
     case .kUseSpaceToCommitHighlightedSCPCCandidate: return .bool
     case .kEnableMouseScrollingForTDKCandidatesCocoa: return .bool
     case .kDisableSegmentedThickUnderlineInMarkingModeForManagedClients: return .bool
@@ -530,6 +532,10 @@ extension UserDef {
     case .kFetchSuggestionsFromPerceptionOverrideModel: return .init(
         userDef: self, shortTitle: "Applying typing suggestions from perception override model",
         description: "The user override model only possesses memories temporarily. Each memory record gradually becomes ineffective within approximately less than 6 days. You can erase all memory records through the input method menu."
+      )
+    case .kReducePOMLifetimeToNoMoreThan12Hours: return .init(
+        userDef: self, shortTitle: "i18n:UserDef.kReducePOMLifetimeToNoMoreThan12Hours.shortTitle",
+        description: "i18n:UserDef.kReducePOMLifetimeToNoMoreThan12Hours.description"
       )
     case .kUseFixedCandidateOrderOnSelection: return .init(
         userDef: self, shortTitle: "Always use fixed listing order in candidate window",

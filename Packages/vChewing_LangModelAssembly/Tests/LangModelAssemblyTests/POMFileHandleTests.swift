@@ -6,8 +6,6 @@
 // marks, or product names of Contributor, except as required to fulfill notice
 // requirements defined in MIT License.
 
-// POM 已徹底重寫，使用與 Lukhnos Liu 和 MJHsieh 完全不同的方法。
-
 import Foundation
 import Megrez
 import XCTest

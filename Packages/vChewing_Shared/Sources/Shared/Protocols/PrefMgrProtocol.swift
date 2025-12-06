@@ -41,6 +41,7 @@ public protocol PrefMgrProtocol {
   var chooseCandidateUsingSpace: Bool { get set }
   var allowBoostingSingleKanjiAsUserPhrase: Bool { get set }
   var fetchSuggestionsFromPerceptionOverrideModel: Bool { get set }
+  var reducePOMLifetimeToNoMoreThan12Hours: Bool { get set }
   var useFixedCandidateOrderOnSelection: Bool { get set }
   var autoCorrectReadingCombination: Bool { get set }
   var readingNarrationCoverage: Int { get set }

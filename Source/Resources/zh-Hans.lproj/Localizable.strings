@@ -262,6 +262,8 @@
 "i18n:UserDef.kReadingNarrationCoverage.option.nothing" = "不念读";
 "i18n:UserDef.kReadingNarrationCoverage.option.realtime" = "实时念读组音区的任何变化";
 "i18n:UserDef.kReadingNarrationCoverage.shortTitle" = "要念读的组音区内容";
+"i18n:UserDef.kReducePOMLifetimeToNoMoreThan12Hours.description" = "启用后，渐退记忆模组的遗忘周期将从约一周降低至 12 小时内，更快地清除不常用的记忆记录。";
+"i18n:UserDef.kReducePOMLifetimeToNoMoreThan12Hours.shortTitle" = "启用急速遗忘模式";
 "i18n:userdef.kRespectClientAccentColor.description" = "这会使田所选字窗的高亮候选字词背景色优先改用当前接收文字输入的客体应用的强调主题色，与 macOS 内建输入法的行为一致。如果当前接收文字输入的客体应用没有专门指定强调主题色（或者系统主题色被设定为非预设值）的话，则会自动改用系统偏好设定内的系统全局强调主题色。注意：该特性在启用了 JIS / 康熙文字转换模式时不会生效。";
 "i18n:userdef.kRespectClientAccentColor.shortTitle" = "遵循客体应用或系统全局的强调色偏好设定";
 "i18n:UserDef.kRomanNumeralOutputFormat.description" = "罗马数字输入模式可以在敲 [Opt]+[符号选单键] 切换输入方式时启用，支援 [1, 3999] 闭区间内的整数。输入成功或失败后，该模式会自动关闭。";
