@@ -130,7 +130,7 @@ public final class UpdateSputnik {
         "You are already using the latest version.",
         comment: ""
       )
-      alert.addButton(withTitle: NSLocalizedString("OK", comment: ""))
+      alert.addButton(withTitle: "OK".localized)
       alert.runModal()
       NSApp.popup()
       return
@@ -230,7 +230,7 @@ public final class UpdateSputnik {
     let content = message
     alert.messageText = NSLocalizedString("Update Check Failed", comment: "")
     alert.informativeText = content
-    alert.addButton(withTitle: NSLocalizedString("OK", comment: ""))
+    alert.addButton(withTitle: "OK".localized)
     alert.runModal()
     NSApp.popup()
   }

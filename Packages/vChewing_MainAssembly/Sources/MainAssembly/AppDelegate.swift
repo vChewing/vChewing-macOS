@@ -89,11 +89,10 @@ extension AppDelegate {
       LMMgr.relocateWreckedPOMData()
       PrefMgr.shared.failureFlagForPOMObservation = false
       let msgPackage = UNMutableNotificationContent()
-      msgPackage.title = NSLocalizedString("vChewing", comment: "")
-      msgPackage.body = NSLocalizedString(
-        "vChewing crashed while handling previously loaded POM observation data. These data files are cleaned now to ensure the usability.",
-        comment: ""
-      )
+      msgPackage.title = "vChewing".localized
+      msgPackage.body =
+        "vChewing crashed while handling previously loaded POM observation data. These data files are cleaned now to ensure the usability."
+          .localized
       msgPackage.sound = .defaultCritical
       UNUserNotificationCenter.current().add(
         .init(identifier: "vChewing.notification.pomCrash", content: msgPackage, trigger: nil),
@@ -135,21 +134,18 @@ extension AppDelegate {
 
   public func selfUninstall() {
     let content = String(
-      format: NSLocalizedString(
-        "This will remove vChewing Input Method from this user account, requiring your confirmation.",
-        comment: ""
-      )
+      format: "This will remove vChewing Input Method from this user account, requiring your confirmation.".localized
     )
     let alert = NSAlert()
-    alert.messageText = NSLocalizedString("Uninstallation", comment: "")
+    alert.messageText = "Uninstallation".localized
     alert.informativeText = content
-    alert.addButton(withTitle: NSLocalizedString("OK", comment: ""))
+    alert.addButton(withTitle: "OK".localized)
     if #available(macOS 11, *) {
       alert.buttons.forEach { button in
         button.hasDestructiveAction = true
       }
     }
-    alert.addButton(withTitle: NSLocalizedString("Not Now", comment: ""))
+    alert.addButton(withTitle: "Not Now".localized)
     let result = alert.runModal()
     NSApp.popup()
     guard result == NSApplication.ModalResponse.alertFirstButtonReturn else { return }
@@ -171,11 +167,11 @@ extension AppDelegate {
     case 1_024...:
       vCLog("WARNING: EXCESSIVE MEMORY FOOTPRINT (\(currentMemorySize)MB).")
       let msgPackage = UNMutableNotificationContent()
-      msgPackage.title = NSLocalizedString("vChewing", comment: "")
-      msgPackage.body = NSLocalizedString(
-        "vChewing is rebooted due to a memory-excessive-usage problem. If convenient, please inform the developer that you are having this issue, stating whether you are using an Intel Mac or Apple Silicon Mac. An NSLog is generated with the current memory footprint size.",
-        comment: ""
-      )
+      msgPackage.title = "vChewing".localized
+      msgPackage
+        .body =
+        "vChewing is rebooted due to a memory-excessive-usage problem. If convenient, please inform the developer that you are having this issue, stating whether you are using an Intel Mac or Apple Silicon Mac. An NSLog is generated with the current memory footprint size."
+          .localized
       UNUserNotificationCenter.current().add(
         .init(
           identifier: "vChewing.notification.memoryExcessiveUsage",

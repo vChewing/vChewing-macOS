@@ -267,8 +267,8 @@ extension VwrServiceMenuEditor {
     alert.informativeText = NSLocalizedString(
       "i18n:CandidateServiceMenuEditor.howToGetGuide", comment: ""
     )
-    alert.addButton(withTitle: NSLocalizedString("OK", comment: ""))
-    alert.addButton(withTitle: NSLocalizedString("Cancel", comment: ""))
+    alert.addButton(withTitle: "OK".localized)
+    alert.addButton(withTitle: "Cancel".localized)
 
     let maxFloat = Double(Float.greatestFiniteMagnitude)
     let scrollview = NSScrollView(frame: CGRect(x: 0, y: 0, width: 512, height: 200))

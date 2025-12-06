@@ -236,9 +236,9 @@ extension VwrClientListMgr {
       "One record per line. Use Option+Enter to break lines.\nBlank lines will be dismissed.",
       comment: ""
     )
-    alert.addButton(withTitle: NSLocalizedString("OK", comment: ""))
+    alert.addButton(withTitle: "OK".localized)
     alert.addButton(withTitle: NSLocalizedString("Just Select", comment: "") + "…")
-    alert.addButton(withTitle: NSLocalizedString("Cancel", comment: ""))
+    alert.addButton(withTitle: "Cancel".localized)
 
     let maxFloat = Double(Float.greatestFiniteMagnitude)
     let scrollview = NSScrollView(frame: CGRect(x: 0, y: 0, width: 370, height: 200))

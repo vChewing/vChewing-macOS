@@ -305,7 +305,7 @@ extension LMMgr {
         let alert = NSAlert()
         alert.messageText = NSLocalizedString("Unable to create the user phrase file.", comment: "")
         alert.informativeText = content
-        alert.addButton(withTitle: NSLocalizedString("OK", comment: ""))
+        alert.addButton(withTitle: "OK".localized)
         alert.runModal()
         NSApp.popup()
       }
