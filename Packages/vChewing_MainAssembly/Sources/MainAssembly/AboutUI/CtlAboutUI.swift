@@ -67,7 +67,7 @@ public final class CtlAboutUI: NSWindowController, NSWindowDelegate {
         window.titlebarAppearsTransparent = true
       }
       window.title = "i18n:aboutWindow.ABOUT_APP_TITLE_FULL"
-        .localized + " (v\(IMEApp.appMainVersionLabel.joined(separator: " Build ")))"
+        .i18n + " (v\(IMEApp.appMainVersionLabel.joined(separator: " Build ")))"
     }
   }
 
@@ -115,7 +115,7 @@ public final class CtlAboutUI: NSWindowController, NSWindowDelegate {
           .ignoresSafeArea()
       )
       window?.title = "i18n:aboutWindow.ABOUT_APP_TITLE_FULL"
-        .localized + " (v\(IMEApp.appMainVersionLabel.joined(separator: " Build ")))"
+        .i18n + " (v\(IMEApp.appMainVersionLabel.joined(separator: " Build ")))"
     }
   }
 }

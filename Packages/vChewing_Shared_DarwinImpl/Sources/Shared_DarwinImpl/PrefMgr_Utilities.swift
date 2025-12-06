@@ -104,14 +104,14 @@ extension PrefMgr {
           strDashLine, metaData.shortTitle,
           strDashLine, metaData.prompt,
           metaData.popupPrompt, metaData.description, metaData.toolTip,
-        ].compactMap { $0 }.map(\.localized)
+        ].compactMap { $0 }.map(\.i18n)
         texts.forEach { currentLines in
           currentLines.split(separator: "\n").forEach { currentLine in
             consoleOutput.append("# \(currentLine)\n")
           }
         }
         metaData.options?.sorted(by: { $0.key < $1.key }).forEach { pair in
-          consoleOutput.append("# - \(pair.key): \(pair.value.localized)\n")
+          consoleOutput.append("# - \(pair.key): \(pair.value.i18n)\n")
         }
       } else {
         consoleOutput.append("# No comments supplied by the engineer.\n")

@@ -175,7 +175,7 @@ extension SettingsPanesCocoa.Phrases: NSTextViewDelegate, NSTextFieldDelegate {
     updateLabels()
     clearAllFields()
     isLoading = true
-    tfdPETextEditor.string = NSLocalizedString("Loading…", comment: "")
+    tfdPETextEditor.string = "Loading…".i18n
     asyncOnMain { [weak self] in
       guard let this = self else { return }
       this.tfdPETextEditor.string = LMMgr.retrieveData(
@@ -239,9 +239,8 @@ extension SettingsPanesCocoa.Phrases: NSTextViewDelegate, NSTextFieldDelegate {
         return (result == "Phrase") ? "Phrases" : result
       }()
       (txtPEField3.cell as? NSTextFieldCell)?.placeholderString = ""
-      (txtPECommentField.cell as? NSTextFieldCell)?.placeholderString = NSLocalizedString(
-        "Inline comments are not supported in associated phrases.", comment: ""
-      )
+      (txtPECommentField.cell as? NSTextFieldCell)?
+        .placeholderString = "Inline comments are not supported in associated phrases.".i18n
     case .theSymbols:
       (txtPEField1.cell as? NSTextFieldCell)?.placeholderString = PETerminology.AddPhrases.locPhrase
         .localized.0
@@ -285,9 +284,9 @@ extension SettingsPanesCocoa.Phrases: NSTextViewDelegate, NSTextFieldDelegate {
 
     // Buttons.
     btnPEReload.title = "↻"
-    btnPEReload.toolTip = NSLocalizedString("Reload", comment: "")
-    btnPEConsolidate.title = NSLocalizedString("Consolidate", comment: "")
-    btnPESave.title = NSLocalizedString("Save", comment: "")
+    btnPEReload.toolTip = "Reload".i18n
+    btnPEConsolidate.title = "Consolidate".i18n
+    btnPESave.title = "Save".i18n
     btnPEAdd.title = PETerminology.AddPhrases.locAdd.localized.0
     btnPEOpenExternally.title = "…"
 
@@ -388,7 +387,7 @@ extension SettingsPanesCocoa.Phrases: NSTextViewDelegate, NSTextFieldDelegate {
   func savePEButtonClicked(_: NSButton) {
     let toSave = tfdPETextEditor.string
     isLoading = true
-    tfdPETextEditor.string = NSLocalizedString("Loading…", comment: "")
+    tfdPETextEditor.string = "Loading…".i18n
     let newResult = LMMgr.saveData(mode: selInputMode, type: selUserDataType, data: toSave)
     tfdPETextEditor.string = newResult
     isLoading = false
@@ -458,7 +457,7 @@ private enum PETerminology {
         let loc = PrefMgr.shared.appleLanguages[0]
         return loc.prefix(2) == "zh" ? ("添入", "") : loc.prefix(2) == "ja" ? ("記入", "") : ("Add", "")
       }
-      let rawArray = NSLocalizedString(rawValue, comment: "").components(separatedBy: " ")
+      let rawArray = rawValue.i18n.components(separatedBy: " ")
       if rawArray.isEmpty { return ("N/A", "N/A") }
       let val1: String = rawArray[0]
       let val2: String = (rawArray.count >= 2) ? rawArray[1] : ""
@@ -472,7 +471,7 @@ private enum PETerminology {
 
     // MARK: Public
 
-    public var localized: String { rawValue.localized }
+    public var localized: String { rawValue.i18n }
 
     public static func sampleDictionaryContent(
       for type: LMAssembly
@@ -484,14 +483,14 @@ private enum PETerminology {
       case .thePhrases:
         result =
           "Example:\nCandidate Reading-Reading Weight #Comment\nCandidate Reading-Reading #Comment"
-            .localized + "\n\n"
+            .i18n + "\n\n"
             + weightInputBox.localized
-      case .theFilter: result = "Example:\nCandidate Reading-Reading #Comment".localized
-      case .theReplacements: result = "Example:\nOldPhrase NewPhrase #Comment".localized
+      case .theFilter: result = "Example:\nCandidate Reading-Reading #Comment".i18n
+      case .theReplacements: result = "Example:\nOldPhrase NewPhrase #Comment".i18n
       case .theAssociates:
         result = "Example:\nInitial RestPhrase\nInitial RestPhrase1 RestPhrase2 RestPhrase3..."
-          .localized
-      case .theSymbols: result = "Example:\nCandidate Reading-Reading #Comment".localized
+          .i18n
+      case .theSymbols: result = "Example:\nCandidate Reading-Reading #Comment".i18n
       }
       return result
     }

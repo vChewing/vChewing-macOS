@@ -50,9 +50,9 @@ public final class SecurityAgentHelper {
       results[reportedPID] = nil
     }
     guard !results.isEmpty else { return }
-    let messageTitle = "i18n:securityAgentHelper.warningMessage.title".localized
-    let messageHeader = "i18n:securityAgentHelper.warningMessage.header".localized
-    let messageFooter = "i18n:securityAgentHelper.warningMessage.footer".localized
+    let messageTitle = "i18n:securityAgentHelper.warningMessage.title".i18n
+    let messageHeader = "i18n:securityAgentHelper.warningMessage.header".i18n
+    let messageFooter = "i18n:securityAgentHelper.warningMessage.footer".i18n
     var messageForEntries: [String] = [messageHeader]
     results.forEach { matchedPID, matchedApp in
       defer { Self.reportedPIDs.append(matchedPID) }

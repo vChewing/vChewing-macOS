@@ -134,7 +134,7 @@ public struct VwrSettingsPaneBehavior: View {
               Text(" ") +
                 Text(LocalizedStringKey("This feature requires macOS \("10.15") and above."))
                 + Text(CtlSettingsUI.sentenceSeparator)
-                + Text("i18n:settings.shiftKeyASCIITogle.description".localized)
+                + Text("i18n:settings.shiftKeyASCIITogle.description".i18n)
             }.settingsDescription()
           }
           UserDef.kShiftEisuToggleOffTogetherWithCapsLock

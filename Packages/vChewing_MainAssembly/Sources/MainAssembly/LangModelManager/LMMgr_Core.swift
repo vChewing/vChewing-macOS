@@ -136,7 +136,7 @@ public final class LMMgr {
     let result = LMAssembly.LMInstantiator.connectSQLDB(dbPath: path)
     assert(result, "vChewing factory SQLite connection failed.")
     Notifier.notify(
-      message: NSLocalizedString("Core Dict loading complete.", comment: "")
+      message: "Core Dict loading complete.".i18n
     )
   }
 
@@ -414,9 +414,9 @@ public final class LMMgr {
           // 無動作：已停用 cooldown，觀察器改以舊/新值比較來避免重複警示。
           IMEApp.buzz()
           let alert = NSAlert()
-          alert.messageText = "i18n:LMMgr.pathInvalidityFound.userDataFolder.title".localized
-          alert.informativeText = "i18n:LMMgr.pathInvalidityFound.userDataFolder.description".localized
-          alert.addButton(withTitle: "OK".localized)
+          alert.messageText = "i18n:LMMgr.pathInvalidityFound.userDataFolder.title".i18n
+          alert.informativeText = "i18n:LMMgr.pathInvalidityFound.userDataFolder.description".i18n
+          alert.addButton(withTitle: "OK".i18n)
           _ = alert.runModal()
           NSApp.popup()
         }
@@ -435,9 +435,9 @@ public final class LMMgr {
           // 無動作：已停用 cooldown，觀察器改以舊/新值比較來避免重複警示。
           IMEApp.buzz()
           let alert = NSAlert()
-          alert.messageText = "i18n:LMMgr.pathInvalidityFound.cassette.title".localized
-          alert.informativeText = "i18n:LMMgr.pathInvalidityFound.cassette.description".localized
-          alert.addButton(withTitle: "OK".localized)
+          alert.messageText = "i18n:LMMgr.pathInvalidityFound.cassette.title".i18n
+          alert.informativeText = "i18n:LMMgr.pathInvalidityFound.cassette.description".i18n
+          alert.addButton(withTitle: "OK".i18n)
           _ = alert.runModal()
           NSApp.popup()
         }

@@ -145,7 +145,7 @@ public struct VwrSettingsPaneCandidates: View {
             let title = "The End of Support for IMK Candidate Window"
             let explanation =
               "1) Only macOS has IMKCandidates. Since it relies on a dedicated ObjC Bridging Header to expose necessary internal APIs to work, it hinders vChewing from completely modularized for multi-platform support.\n\n2) IMKCandidates is buggy. It is not likely to be completely fixed by Apple, and its devs are not allowed to talk about it to non-Apple individuals. That's why we have had enough with IMKCandidates. It is likely the reason why Apple had never used IMKCandidates in their official InputMethodKit sample projects (as of August 2023)."
-            window.callAlert(title: title.localized, text: explanation.localized)
+            window.callAlert(title: title.i18n, text: explanation.i18n)
           }
         }
 
@@ -189,7 +189,7 @@ private struct VwrSettingsPaneCandidates_SelectionKeys: View {
         if let errorResult = PrefMgr.shared.validate(candidateKeys: keys) {
           if let window = CtlSettingsUI.shared?.window, !keys.isEmpty {
             IMEApp.buzz()
-            let alert = NSAlert(error: NSLocalizedString("Invalid Selection Keys.", comment: ""))
+            let alert = NSAlert(error: "Invalid Selection Keys.".i18n)
             alert.informativeText = errorResult
             alert.beginSheetModal(for: window) { _ in
               candidateKeys = PrefMgr.kDefaultCandidateKeys

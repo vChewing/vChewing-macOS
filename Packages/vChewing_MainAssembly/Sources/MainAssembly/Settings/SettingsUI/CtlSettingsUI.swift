@@ -25,7 +25,7 @@ public final class CtlSettingsUI: NSWindowController, NSWindowDelegate {
       rootView: VwrSettingsUI()
         .ignoresSafeArea()
     )
-    var preferencesTitleName = NSLocalizedString("vChewing Preferences…", comment: "")
+    var preferencesTitleName = "vChewing Preferences…".i18n
     preferencesTitleName.removeLast()
     window?.title = preferencesTitleName
   }

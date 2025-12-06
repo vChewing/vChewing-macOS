@@ -96,11 +96,11 @@ extension InputHandlerProtocol {
     result
       .append(
         "Intonation mark. ENTER to commit.\nSPACE to insert into composition buffer."
-          .localized
+          .i18n
       )
     if prefs.acceptLeadingIntonations {
       result.append("\n")
-      result.append("It will attempt to combine with the incoming phonabet input.".localized)
+      result.append("It will attempt to combine with the incoming phonabet input.".i18n)
     }
     return result.joined()
   }
@@ -230,7 +230,7 @@ extension InputHandlerProtocol {
         tooltipColorState = .succeeded
       }
       var newState = generateStateOfInputting()
-      newState.tooltip = NSLocalizedString(tooltipMessage, comment: "")
+      newState.tooltip = tooltipMessage.i18n
       newState.data.tooltipColorState = tooltipColorState
       newState.tooltipDuration = 1.85
       session.switchState(newState)
@@ -254,7 +254,7 @@ extension InputHandlerProtocol {
         return true
       }
       var newState = generateStateOfInputting()
-      newState.tooltip = NSLocalizedString(tooltipMessage, comment: "")
+      newState.tooltip = tooltipMessage.i18n
       newState.data.tooltipColorState = .warning
       newState.tooltipDuration = 1.85
       session.switchState(newState)
@@ -983,10 +983,8 @@ extension InputHandlerProtocol {
         return true
       } else {
         let errorMessage =
-          NSLocalizedString(
-            "Please manually implement the symbols of this menu \nin the user phrase file with “_punctuation_list” key.",
-            comment: ""
-          )
+          "Please manually implement the symbols of this menu \nin the user phrase file with “_punctuation_list” key."
+            .i18n
         vCLog("8EB3FB1A: " + errorMessage)
         let textToCommit = generateStateOfInputting(sansReading: true).displayedText
         session.switchState(State.ofCommitting(textToCommit: textToCommit))
@@ -1155,7 +1153,7 @@ extension InputHandlerProtocol {
 
     // 將輸入解析為整數
     guard let number = parseRomanNumeralInput(inputStr) else {
-      handleErrorState(msg: "typingMethod.romanNumerals.error.invalidInput".localized)
+      handleErrorState(msg: "typingMethod.romanNumerals.error.invalidInput".i18n)
       errorCallback?("A3D5B7F9")
       return true
     }
@@ -1166,7 +1164,7 @@ extension InputHandlerProtocol {
 
     // 轉換為羅馬數字
     guard let romanNumeral = RomanNumeralConverter.convert(number, format: format) else {
-      handleErrorState(msg: "typingMethod.romanNumerals.error.valueOutOfRange".localized)
+      handleErrorState(msg: "typingMethod.romanNumerals.error.valueOutOfRange".i18n)
       errorCallback?("2E8C4D61")
       return true
     }

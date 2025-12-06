@@ -20,7 +20,7 @@ extension SessionCtl {
       NSMenu.Item(verbatim: currentRAMUsageDescription)
       NSMenu.Item(
         verbatim: String(
-          format: "Switch to %@ Input Mode".localized,
+          format: "Switch to %@ Input Mode".i18n,
           IMEApp.currentInputMode.reversed.localizedDescription
         )
       )?.act(#selector(switchInputMode(_:)))
@@ -95,7 +95,7 @@ extension SessionCtl {
       NSMenu.Item("Edit Excluded Phrases…")?
         .act(#selector(openExcludedPhrases(_:)))
         .alternated().nulled(silentMode)
-      NSMenu.Item(verbatim: "Reverse Lookup (Phonabets)".localized.withEllipsis)?
+      NSMenu.Item(verbatim: "Reverse Lookup (Phonabets)".i18n.withEllipsis)?
         .act(#selector(callReverseLookupWindow(_:)))
         .hotkey(PrefMgr.shared.usingHotKeyRevLookup ? "/" : "", mask: [.command, .control])
       NSMenu.Item("Optimize Memorized Phrases")?
@@ -110,17 +110,17 @@ extension SessionCtl {
           .act(#selector(showPreferences(_:)))
           .nulled(silentMode)
       } else {
-        NSMenu.Item(verbatim: "vChewing Preferences…".localized + " (SwiftUI)")?
+        NSMenu.Item(verbatim: "vChewing Preferences…".i18n + " (SwiftUI)")?
           .act(#selector(showSettingsSwiftUI(_:)))
           .nulled(silentMode)
-        NSMenu.Item(verbatim: "vChewing Preferences…".localized + " (AppKit)")?
+        NSMenu.Item(verbatim: "vChewing Preferences…".i18n + " (AppKit)")?
           .act(#selector(showSettingsAppKit(_:)))
           .alternated().nulled(silentMode)
       }
-      NSMenu.Item(verbatim: "Client Manager".localized.withEllipsis)?
+      NSMenu.Item(verbatim: "Client Manager".i18n.withEllipsis)?
         .act(#selector(showClientListMgr(_:)))
         .nulled(silentMode)
-      NSMenu.Item(verbatim: "Service Menu Editor".localized.withEllipsis)?
+      NSMenu.Item(verbatim: "Service Menu Editor".i18n.withEllipsis)?
         .act(#selector(showServiceMenuEditor(_:)))
         .alternated().nulled(silentMode)
       NSMenu.Item("Check for Updates…")?
@@ -199,10 +199,10 @@ extension SessionCtl {
        !LMMgr.checkCassettePathValidity(PrefMgr.shared.cassettePath) {
       asyncOnMain(bypassAsync: UserDefaults.pendingUnitTests) {
         IMEApp.buzz()
-        let alert = NSAlert(error: "i18n:LMMgr.accessFailure.cassette.title".localized)
+        let alert = NSAlert(error: "i18n:LMMgr.accessFailure.cassette.title".i18n)
         let informativeText =
           "i18n:LMMgr.accessFailure.cassette.description"
-        alert.informativeText = informativeText.localized
+        alert.informativeText = informativeText.i18n
         let result = alert.runModal()
         NSApp.popup()
         if result == NSApplication.ModalResponse.alertFirstButtonReturn {
@@ -213,11 +213,11 @@ extension SessionCtl {
       return
     }
     Notifier.notify(
-      message: "CIN Cassette Mode".localized + "\n"
+      message: "CIN Cassette Mode".i18n + "\n"
         + (
           PrefMgr.shared.cassetteEnabled.toggled()
-            ? "NotificationSwitchON".localized
-            : "NotificationSwitchOFF".localized
+            ? "NotificationSwitchON".i18n
+            : "NotificationSwitchOFF".i18n
         )
     )
     if !core.inputMode.langModel.isCassetteDataLoaded {
@@ -229,11 +229,11 @@ extension SessionCtl {
   public func toggleSCPCTypingMode(_: Any? = nil) {
     core.resetInputHandler(forceComposerCleanup: true)
     Notifier.notify(
-      message: "Per-Char Select Mode".localized + "\n"
+      message: "Per-Char Select Mode".i18n + "\n"
         + (
           PrefMgr.shared.useSCPCTypingMode.toggled()
-            ? "NotificationSwitchON".localized
-            : "NotificationSwitchOFF".localized
+            ? "NotificationSwitchON".i18n
+            : "NotificationSwitchOFF".i18n
         )
     )
   }
@@ -242,11 +242,11 @@ extension SessionCtl {
   public func toggleChineseConverter(_: Any? = nil) {
     core.resetInputHandler(forceComposerCleanup: true)
     Notifier.notify(
-      message: "Force KangXi Writing".localized + "\n"
+      message: "Force KangXi Writing".i18n + "\n"
         + (
           PrefMgr.shared.chineseConversionEnabled.toggled()
-            ? "NotificationSwitchON".localized
-            : "NotificationSwitchOFF".localized
+            ? "NotificationSwitchON".i18n
+            : "NotificationSwitchOFF".i18n
         )
     )
   }
@@ -255,11 +255,11 @@ extension SessionCtl {
   public func toggleShiftJISShinjitaiOutput(_: Any? = nil) {
     core.resetInputHandler(forceComposerCleanup: true)
     Notifier.notify(
-      message: "JIS Shinjitai Output".localized + "\n"
+      message: "JIS Shinjitai Output".i18n + "\n"
         + (
           PrefMgr.shared.shiftJISShinjitaiOutputEnabled.toggled()
-            ? "NotificationSwitchON".localized
-            : "NotificationSwitchOFF".localized
+            ? "NotificationSwitchON".i18n
+            : "NotificationSwitchOFF".i18n
         )
     )
   }
@@ -268,11 +268,11 @@ extension SessionCtl {
   public func toggleCurrencyNumerals(_: Any? = nil) {
     core.resetInputHandler(forceComposerCleanup: true)
     Notifier.notify(
-      message: "Currency Numeral Output".localized + "\n"
+      message: "Currency Numeral Output".i18n + "\n"
         + (
           PrefMgr.shared.currencyNumeralsEnabled.toggled()
-            ? "NotificationSwitchON".localized
-            : "NotificationSwitchOFF".localized
+            ? "NotificationSwitchON".i18n
+            : "NotificationSwitchOFF".i18n
         )
     )
   }
@@ -281,11 +281,11 @@ extension SessionCtl {
   public func toggleHalfWidthPunctuation(_: Any? = nil) {
     core.resetInputHandler(forceComposerCleanup: true)
     Notifier.notify(
-      message: "Half-Width Punctuation Mode".localized + "\n"
+      message: "Half-Width Punctuation Mode".i18n + "\n"
         + (
           PrefMgr.shared.halfWidthPunctuationEnabled.toggled()
-            ? "NotificationSwitchON".localized
-            : "NotificationSwitchOFF".localized
+            ? "NotificationSwitchON".i18n
+            : "NotificationSwitchOFF".i18n
         )
     )
   }
@@ -294,11 +294,11 @@ extension SessionCtl {
   public func toggleCNS11643Enabled(_: Any? = nil) {
     core.resetInputHandler(forceComposerCleanup: true)
     Notifier.notify(
-      message: "CNS11643 Mode".localized + "\n"
+      message: "CNS11643 Mode".i18n + "\n"
         + (
           PrefMgr.shared.cns11643Enabled.toggled()
-            ? "NotificationSwitchON".localized
-            : "NotificationSwitchOFF".localized
+            ? "NotificationSwitchON".i18n
+            : "NotificationSwitchOFF".i18n
         )
     )
   }
@@ -307,11 +307,11 @@ extension SessionCtl {
   public func toggleSymbolEnabled(_: Any? = nil) {
     core.resetInputHandler(forceComposerCleanup: true)
     Notifier.notify(
-      message: "Symbol & Emoji Input".localized + "\n"
+      message: "Symbol & Emoji Input".i18n + "\n"
         + (
           PrefMgr.shared.symbolInputEnabled.toggled()
-            ? "NotificationSwitchON".localized
-            : "NotificationSwitchOFF".localized
+            ? "NotificationSwitchON".i18n
+            : "NotificationSwitchOFF".i18n
         )
     )
   }
@@ -320,11 +320,11 @@ extension SessionCtl {
   public func toggleAssociatedPhrasesEnabled(_: Any? = nil) {
     core.resetInputHandler(forceComposerCleanup: true)
     Notifier.notify(
-      message: "Associated Phrases".localized + "\n"
+      message: "Associated Phrases".i18n + "\n"
         + (
           PrefMgr.shared.associatedPhrasesEnabled.toggled()
-            ? "NotificationSwitchON".localized
-            : "NotificationSwitchOFF".localized
+            ? "NotificationSwitchON".i18n
+            : "NotificationSwitchOFF".i18n
         )
     )
   }
@@ -333,11 +333,11 @@ extension SessionCtl {
   public func togglePhraseReplacement(_: Any? = nil) {
     core.resetInputHandler(forceComposerCleanup: true)
     Notifier.notify(
-      message: "Use Phrase Replacement".localized + "\n"
+      message: "Use Phrase Replacement".i18n + "\n"
         + (
           PrefMgr.shared.phraseReplacementEnabled.toggled()
-            ? "NotificationSwitchON".localized
-            : "NotificationSwitchOFF".localized
+            ? "NotificationSwitchON".i18n
+            : "NotificationSwitchOFF".i18n
         )
     )
   }
@@ -435,6 +435,6 @@ extension SessionCtl {
     guard let currentMemorySizeInBytes = NSApplication.memoryFootprint else { return nil }
     let currentMemorySize: Double = (Double(currentMemorySizeInBytes) / 1_024 / 1_024)
       .rounded(toPlaces: 1)
-    return "imeMenu.totalRAMUsed.labelHeader".localized + " \(currentMemorySize)MB"
+    return "imeMenu.totalRAMUsed.labelHeader".i18n + " \(currentMemorySize)MB"
   }
 }

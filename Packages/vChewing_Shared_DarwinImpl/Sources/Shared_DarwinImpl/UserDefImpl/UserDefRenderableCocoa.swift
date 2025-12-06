@@ -21,7 +21,7 @@ public final class UserDefRenderableCocoa: NSObject, Identifiable {
     if let rawOptions = def.metaData?.options, !rawOptions.isEmpty {
       var newOptions: [Int: String] = [:]
       rawOptions.forEach { key, value in
-        newOptions[key] = value.localized
+        newOptions[key] = value.i18n
       }
       self.optionsLocalized = rawOptions.sorted(by: { $0.key < $1.key })
     } else {
@@ -60,16 +60,16 @@ public final class UserDefRenderableCocoa: NSObject, Identifiable {
       return
     }
     var stringStack = [String]()
-    if let promptText = metaData.inlinePrompt?.localized, !promptText.isEmpty {
+    if let promptText = metaData.inlinePrompt?.i18n, !promptText.isEmpty {
       stringStack.append(promptText)
     }
-    if let descText = metaData.description?.localized, !descText.isEmpty {
+    if let descText = metaData.description?.i18n, !descText.isEmpty {
       stringStack.append(descText)
     }
     if metaData.minimumOS > 10.9 {
       var strOSReq = " "
       strOSReq += String(
-        format: "This feature requires macOS %@ and above.".localized, arguments: ["12.0"]
+        format: "This feature requires macOS %@ and above.".i18n, arguments: ["12.0"]
       )
       stringStack.append(strOSReq)
     }
@@ -234,7 +234,7 @@ extension UserDefRenderableCocoa {
             options: [.continuouslyUpdatesValue: true]
           )
           optionsLocalizedAsIdentifiables.forEach { entity in
-            guard let obj = entity?.0, let title = entity?.1.localized else {
+            guard let obj = entity?.0, let title = entity?.1.i18n else {
               dropMenu.addItem(.separator())
               return
             }
@@ -253,7 +253,7 @@ extension UserDefRenderableCocoa {
             options: [.continuouslyUpdatesValue: true]
           )
           optionsLocalized.forEach { entity in
-            guard let tag = entity?.0, let title = entity?.1.localized else {
+            guard let tag = entity?.0, let title = entity?.1.i18n else {
               dropMenu.addItem(.separator())
               return
             }

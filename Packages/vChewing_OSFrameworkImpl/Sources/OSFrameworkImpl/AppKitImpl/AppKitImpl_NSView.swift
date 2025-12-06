@@ -54,7 +54,7 @@ import SwiftExtension
     }
 
     public convenience init(_ title: String, target: AnyObject?, action: Selector?) {
-      self.init(verbatim: title.localized, target: target, action: action)
+      self.init(verbatim: title.i18n, target: target, action: action)
     }
   }
 
@@ -193,7 +193,7 @@ import SwiftExtension
     public func boxed(title: String = "") -> NSBox {
       let maxDimension = fittingSize
       let result = NSBox()
-      result.title = title.localized
+      result.title = title.i18n
       if result.title.isEmpty {
         result.titlePosition = .noTitle
       }
@@ -385,7 +385,7 @@ import SwiftExtension
       fixWidth: CGFloat? = nil
     )
       -> NSTextField {
-      let rawAttributedString = NSMutableAttributedString(string: localized ? self.localized : self)
+      let rawAttributedString = NSMutableAttributedString(string: localized ? i18n : self)
       rawAttributedString.addAttributes(
         [.kern: 0],
         range: .init(location: 0, length: rawAttributedString.length)
@@ -446,7 +446,7 @@ import SwiftExtension
       tabPages.forEach { currentPage in
         finalTabView.addTabViewItem({
           let currentItem = NSTabViewItem(identifier: UUID())
-          currentItem.label = currentPage.title.localized
+          currentItem.label = currentPage.title.i18n
           let stacked = NSStackView.build(.vertical) {
             currentPage.view
           }
@@ -504,7 +504,7 @@ import SwiftExtension
       @ArrayBuilder<NSMenuItem?> items: () -> [NSMenuItem?]
     )
       -> NSMenuItem? {
-      guard let title = title?.localized, !title.isEmpty else { return nil }
+      guard let title = title?.i18n, !title.isEmpty else { return nil }
       return buildSubMenu(verbatim: title, items: items)
     }
 
@@ -528,7 +528,7 @@ import SwiftExtension
     }
 
     public convenience init?(_ title: String?) {
-      guard let title = title?.localized, !title.isEmpty else { return nil }
+      guard let title = title?.i18n, !title.isEmpty else { return nil }
       self.init(verbatim: title)
     }
 
@@ -600,7 +600,7 @@ import SwiftExtension
       postDrag: ((URL) -> ())? = nil
     ) {
       self.init(
-        verbatim: givenTitle?.localized,
+        verbatim: givenTitle?.i18n,
         target: target,
         action: action,
         postDrag: postDrag

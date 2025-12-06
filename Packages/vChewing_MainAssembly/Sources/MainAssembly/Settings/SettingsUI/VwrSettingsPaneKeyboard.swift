@@ -27,13 +27,13 @@ public struct VwrSettingsPaneKeyboard: View {
               keyboardParser = 0
               basicKeyboardLayout = "com.apple.keylayout.ZhuyinBopomofo"
             } label: {
-              Text("↻ㄅ" + " " + NSLocalizedString("Dachen Trad.", comment: ""))
+              Text("↻ㄅ" + " " + "Dachen Trad.".i18n)
             }
             Button {
               keyboardParser = 1
               basicKeyboardLayout = "com.apple.keylayout.ZhuyinEten"
             } label: {
-              Text("↻ㄅ" + " " + NSLocalizedString("Eten Trad.", comment: ""))
+              Text("↻ㄅ" + " " + "Eten Trad.".i18n)
             }
             Button {
               keyboardParser = 100

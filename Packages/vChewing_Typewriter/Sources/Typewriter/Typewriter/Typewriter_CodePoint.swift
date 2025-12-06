@@ -52,7 +52,7 @@ public struct CodePointTypewriter<Handler: InputHandlerProtocol>: TypewriterProt
         errorCallback("D220B880：輸入的字碼沒有對應的字元。")
         var updatedState = State.ofAbortion()
         updatedState.tooltipDuration = 0
-        updatedState.tooltip = "Invalid Code Point.".localized
+        updatedState.tooltip = "Invalid Code Point.".i18n
         session.switchState(updatedState)
         handler.currentTypingMethod = .codePoint
         return true

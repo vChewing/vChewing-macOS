@@ -68,7 +68,7 @@ case 2:
     let maybeCount = try? LMMgr.importYahooKeyKeyUserDictionary(text: &rawString)
     let count: Int = maybeCount ?? 0
     let msg = String(
-      format: "i18n:settings.importFromKimoTxt.finishedCount:%@".localized,
+      format: "i18n:settings.importFromKimoTxt.finishedCount:%@".i18n,
       count.description
     )
     print("[Kimo Import] \(msg)")

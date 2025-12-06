@@ -54,14 +54,14 @@ public struct RomanNumeralTypewriter<Handler: InputHandlerProtocol>: TypewriterP
 
     // 驗證輸入：首位數字必須是 1-9，其餘數字可以是 0-9
     guard char.rangeOfCharacter(from: CharacterSet.decimalDigits) != nil else {
-      handleErrorState(msg: "typingMethod.romanNumerals.error.invalidCharacter".localized)
+      handleErrorState(msg: "typingMethod.romanNumerals.error.invalidCharacter".i18n)
       errorCallback("FC7EF8CD")
       return true
     }
 
     // 首位數字不能是 0
     if handler.strCodePointBuffer.isEmpty, char == "0" {
-      handleErrorState(msg: "typingMethod.romanNumerals.error.invalidCharacter".localized)
+      handleErrorState(msg: "typingMethod.romanNumerals.error.invalidCharacter".i18n)
       errorCallback("7B09F1E4")
       return true
     }

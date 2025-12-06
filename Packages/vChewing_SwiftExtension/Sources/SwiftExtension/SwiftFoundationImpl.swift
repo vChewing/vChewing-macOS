@@ -126,10 +126,10 @@ extension CGRect {
   }
 }
 
-// MARK: - String.localized extension
+// MARK: - String.i18n extension
 
 extension StringLiteralType {
-  public var localized: String { NSLocalizedString(description, comment: "") }
+  public var i18n: String { NSLocalizedString(description, comment: "") }
 }
 
 // MARK: - Root Extensions (classDeduplicated)
