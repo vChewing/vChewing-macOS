@@ -222,7 +222,7 @@
 "i18n:settings.importFromKimoTxt.finishedCount:%@" = "Imported %@ new records.";
 "i18n:settings.importFromKimoTxt.label" = "Import Yahoo! KeyKey User Dictionary file";
 "i18n:settings.shiftKeyASCIITogle.description" = "This feature only needs to parse consecutive NSEvents passed by macOS built-in InputMethodKit framework, hence no necessity of asking end-users for extra privileges of monitoring global keyboard inputs. You are free to investigate our codebase or reverse-engineer this input method to see whether the above statement is trustable. Also, this Shift-key toggle won't work if CapsLock is ON.";
-"i18n:userdef.kAlwaysUsePCBWithElectronBasedClients.description" = "Electron-based apps are notorious in unpredictable (buggy) IMKTextInput API interactive behaviors. Most of such apps are unlikely to have their individual issues of such solved correctly on-time due to various out-of-control reasons, hence why this toggle is enabled by default.";
+"i18n:UserDef.kAlwaysUsePCBWithElectronBasedClients.description" = "Electron-based apps are notorious in unpredictable (buggy) IMKTextInput API interactive behaviors. Most of such apps are unlikely to have their individual issues of such solved correctly on-time due to various out-of-control reasons, hence why this toggle is enabled by default.";
 "i18n:UserDef.kAlwaysUsePCBWithElectronBasedClients.shortTitle" = "Always use popup composition buffer for Electron-based client apps";
 "i18n:UserDef.kBeepSoundPreference.option.0" = "Muted";
 "i18n:UserDef.kBeepSoundPreference.option.1" = "Use OS Settings";
@@ -235,7 +235,7 @@
 "i18n:UserDef.kCandidateNarrationToggleType.option.alwaysOn" = "Always On";
 "i18n:UserDef.kCandidateNarrationToggleType.option.onlyWhenVoiceOverIsOn" = "Only When VoiceOver is On";
 "i18n:UserDef.kCandidateNarrationToggleType.shortTitle" = "Candidate Narration Mode:";
-"i18n:userdef.kCheckAbusersOfSecureEventInputAPI.description" = "Such abuse of SecureEventInput API in the background can hinder all 3rd-party input methods from being able to switch to. It is fine to use SecureEventInput for sensitive input fields. However, an app calling EnableSecureEventInput() is responsible to call DisableSecureEventInput() immediately right after the input field loses focus. This situation may also happen if an app is hanging in the background (or working as a helper application in the background) with its SecureEventInput left enabled.";
+"i18n:UserDef.kCheckAbusersOfSecureEventInputAPI.description" = "Such abuse of SecureEventInput API in the background can hinder all 3rd-party input methods from being able to switch to. It is fine to use SecureEventInput for sensitive input fields. However, an app calling EnableSecureEventInput() is responsible to call DisableSecureEventInput() immediately right after the input field loses focus. This situation may also happen if an app is hanging in the background (or working as a helper application in the background) with its SecureEventInput left enabled.";
 "i18n:UserDef.kCheckAbusersOfSecureEventInputAPI.shortTitle" = "Actively check those processes abusing the SecureEventInput API";
 "i18n:UserDef.kCNS11643Enabled.shortTitle" = "Enable CNS11643 Support (2025-11-10)";
 "i18n:UserDef.kCursorPlacementAfterSelectingCandidate.description" = "This defines the cursor position after a candidate is confirmed through the candidate window. Note that the Pre-Candidate-Window Cursor Position is the cursor position snapshotted right before the candidate window shows up. If you choose to let it move a step front, the step length may vary, depending on your preferred candidate cursor selection style.";
@@ -248,7 +248,7 @@
 "i18n:UserDef.kInlineDumpPinyinInLieuOfZhuyin.description" = "Contents committed by Command+Option+Ctrl+Enter may vary depending on related behavior settings.";
 "i18n:UserDef.kMinCellWidthForHorizontalMatrix.option.0" = "2 Kanjis";
 "i18n:UserDef.kMinCellWidthForHorizontalMatrix.option.1" = "2 Emojis (Wider)";
-"i18n:userdef.kMinCellWidthForHorizontalMatrix.shortTitle" = "Minimum cell width for horizontal matrix:";
+"i18n:UserDef.kMinCellWidthForHorizontalMatrix.shortTitle" = "Minimum cell width for horizontal matrix:";
 "i18n:UserDef.kNumPadCharInputBehavior.description" = "Choose the behavior of numeric pad inputs.";
 "i18n:UserDef.kNumPadCharInputBehavior.option.0" = "Always directly commit half-width chars";
 "i18n:UserDef.kNumPadCharInputBehavior.option.1" = "Always directly commit full-width chars";
@@ -264,8 +264,8 @@
 "i18n:UserDef.kReadingNarrationCoverage.shortTitle" = "Reading composer contents to narrate";
 "i18n:UserDef.kReducePOMLifetimeToNoMoreThan12Hours.description" = "When enabled, the perception override model's forgetting cycle will be reduced from approximately one week to within 12 hours, clearing infrequently used memory records more quickly.";
 "i18n:UserDef.kReducePOMLifetimeToNoMoreThan12Hours.shortTitle" = "Enable rapid forgetting mode";
-"i18n:userdef.kRespectClientAccentColor.description" = "This will force the highlighted candidate background color to follow the accent color of the current client app, behaving like what macOS built-in input methods do. If it doesn't have one (or the system accent color is set with a non-default value), then the system accent color will be used instead. Note that this won't be effective if either JIS or KangXi conversion mode is enabled.";
-"i18n:userdef.kRespectClientAccentColor.shortTitle" = "Respect accent colors of the client app and the system";
+"i18n:UserDef.kRespectClientAccentColor.description" = "This will force the highlighted candidate background color to follow the accent color of the current client app, behaving like what macOS built-in input methods do. If it doesn't have one (or the system accent color is set with a non-default value), then the system accent color will be used instead. Note that this won't be effective if either JIS or KangXi conversion mode is enabled.";
+"i18n:UserDef.kRespectClientAccentColor.shortTitle" = "Respect accent colors of the client app and the system";
 "i18n:UserDef.kRomanNumeralOutputFormat.description" = "Roman Numeral Input Mode can be switched to while using [Opt]+[Symbol Menu Key] to revolve the current typing method, supporting integers in the closed range of [1, 3999]. After a successful or failed input, this mode will be automatically switched off.";
 "i18n:UserDef.kRomanNumeralOutputFormat.option.0" = "ASCII Uppercase";
 "i18n:UserDef.kRomanNumeralOutputFormat.option.1" = "ASCII Lowercase";

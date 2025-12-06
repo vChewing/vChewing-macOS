@@ -283,12 +283,12 @@ extension UserDef {
     case .kCandidateServiceMenuContents: return nil
     case .kFailureFlagForPOMObservation: return nil
     case .kRespectClientAccentColor: return .init(
-        userDef: self, shortTitle: "i18n:userdef.kRespectClientAccentColor.shortTitle",
-        description: "i18n:userdef.kRespectClientAccentColor.description"
+        userDef: self, shortTitle: "i18n:UserDef.kRespectClientAccentColor.shortTitle",
+        description: "i18n:UserDef.kRespectClientAccentColor.description"
       )
     case .kAlwaysUsePCBWithElectronBasedClients: return .init(
         userDef: self, shortTitle: "i18n:UserDef.kAlwaysUsePCBWithElectronBasedClients.shortTitle",
-        description: "i18n:userdef.kAlwaysUsePCBWithElectronBasedClients.description"
+        description: "i18n:UserDef.kAlwaysUsePCBWithElectronBasedClients.description"
       )
     case .kSecurityHardenedCompositionBuffer: return .init(
         userDef: self, shortTitle: "Security-harden the composition buffer for all clients",
@@ -296,7 +296,7 @@ extension UserDef {
       )
     case .kCheckAbusersOfSecureEventInputAPI: return .init(
         userDef: self, shortTitle: "i18n:UserDef.kCheckAbusersOfSecureEventInputAPI.shortTitle",
-        description: "i18n:userdef.kCheckAbusersOfSecureEventInputAPI.description"
+        description: "i18n:UserDef.kCheckAbusersOfSecureEventInputAPI.description"
       )
     case .kDeltaOfCalendarYears: return nil
     case .kMostRecentInputMode: return nil
@@ -397,7 +397,7 @@ extension UserDef {
         options: [0: "Vertical", 1: "Horizontal"]
       )
     case .kMinCellWidthForHorizontalMatrix: return .init(
-        userDef: self, shortTitle: "i18n:userdef.kMinCellWidthForHorizontalMatrix.shortTitle",
+        userDef: self, shortTitle: "i18n:UserDef.kMinCellWidthForHorizontalMatrix.shortTitle",
         options: [
           0: "i18n:UserDef.kMinCellWidthForHorizontalMatrix.option.0",
           1: "i18n:UserDef.kMinCellWidthForHorizontalMatrix.option.1",
