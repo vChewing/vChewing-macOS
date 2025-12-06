@@ -983,8 +983,7 @@ extension InputHandlerProtocol {
         return true
       } else {
         let errorMessage =
-          NSLocalizedString(
-            "Please manually implement the symbols of this menu \nin the user phrase file with “_punctuation_list” key.",
+          NSLocalizedString("i18n:Instruction.manuallyImplementSymbolsInUserFile",
             comment: ""
           )
         vCLog("8EB3FB1A: " + errorMessage)

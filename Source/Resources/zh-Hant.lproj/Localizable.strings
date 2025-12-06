@@ -466,3 +466,9 @@
 "i18n:Update.newVersionAvailableDetails:%@:%@:%@:%@" = "目前使用的唯音官方版本是 %1$@ (%2$@)，網路上有更新版本 %3$@ (%4$@) 可供下載。是否要前往唯音網站下載新版來安裝？";
 "i18n:General.zhHans" = "簡體中文";
 "i18n:General.zhHant" = "繁體中文";
+"i18n:General.rawValue" = "原始值";
+"i18n:Help.deleteKeyNote" = "注意：Mac 鍵盤的「Delete ⌫」鍵在此被稱作「BackSpace 退格鍵 ⌫」以與 PC 鍵盤的真正的「Delete ⌦」鍵彼此區分開。若您想在沒有數字小鍵盤的 Mac 電腦上使用真正的「Delete ⌦」按鍵的話，請改用「Fn+⌫」。";
+"i18n:Instruction.checkPermissionAt" = "請檢查此處的存取權限：\"%@\".";
+"i18n:Instruction.manuallyImplementSymbolsInUserFile" = "請自行以「_punctuation_list」索引鍵\n在使用者自訂語彙檔案內擴充該符號選單的內容。";
+"i18n:Symbol.backslash" = "\\";
+"i18n:Window.serviceMenu" = "服務選單";

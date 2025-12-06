@@ -466,3 +466,9 @@
 "i18n:Update.newVersionAvailableDetails:%@:%@:%@:%@" = "You're currently using vChewing %@ (%@), a new version %@ (%@) is now available. Do you want to visit vChewing's website to download the version?";
 "i18n:General.zhHans" = "Simplified Chinese";
 "i18n:General.zhHant" = "Traditional Chinese";
+"i18n:General.rawValue" = "rawValue";
+"i18n:Help.deleteKeyNote" = "Note: The "Delete ⌫" key on Mac keyboard is named as "BackSpace ⌫" here in order to distinguish the real "Delete ⌦" key from full-sized desktop keyboards. If you want to use the real "Delete ⌦" key on a Mac keyboard with no numpad equipped, you have to press "Fn+⌫" instead.";
+"i18n:Instruction.checkPermissionAt" = "Please check the permission at \"%@\".";
+"i18n:Instruction.manuallyImplementSymbolsInUserFile" = "Please manually implement the symbols of this menu \nin the user phrase file with "_punctuation_list" key.";
+"i18n:Symbol.backslash" = "\\";
+"i18n:Window.serviceMenu" = "Service Menu";

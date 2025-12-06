@@ -465,3 +465,9 @@
 "i18n:Update.newVersionAvailableDetails:%@:%@:%@:%@" = "今のご使用していた唯音入力アプリのバージョンは「%1$@ (%2$@)」であり、ネットでもっと新しいバージョン「%3$@ (%4$@)」の下載せはできるらしい。お下載せしますか？";
 "i18n:General.zhHans" = "簡體中国語";
 "i18n:General.zhHant" = "繁體中国語";
+"i18n:General.rawValue" = "生の値";
+"i18n:Help.deleteKeyNote" = "注意：Mac キーボードの「Delete ⌫」キーは、フルサイズデスクトップキーボードの真の「Delete ⌦」キーと区別するため、ここでは「BackSpace ⌫」という名前になっています。テンキーが装備されていない Mac キーボードで真の「Delete ⌦」キーを使用したい場合は、代わりに「Fn+⌫」を押してください。";
+"i18n:Instruction.checkPermissionAt" = "\"%@\" のアクセス許可を確認してください。";
+"i18n:Instruction.manuallyImplementSymbolsInUserFile" = "「_punctuation_list」キーを使用して、ユーザー語彙ファイル内にこのメニューの記号を手動で実装してください。";
+"i18n:Symbol.backslash" = "\\";
+"i18n:Window.serviceMenu" = "サービスメニュー";

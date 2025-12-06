@@ -56,7 +56,7 @@ public struct VwrSettingsPaneGeneral: View {
                 comment: ""
               ) + "\n\u{2022} "
               + NSLocalizedString(
-                "Note: The “Delete ⌫” key on Mac keyboard is named as “BackSpace ⌫” here in order to distinguish the real “Delete ⌦” key from full-sized desktop keyboards. If you want to use the real “Delete ⌦” key on a Mac keyboard with no numpad equipped, you have to press “Fn+⌫” instead.",
+                "i18n:Help.deleteKeyNote",
                 comment: ""
               )
           )
