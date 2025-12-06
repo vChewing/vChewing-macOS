@@ -69,7 +69,7 @@ public final class UserDefRenderableCocoa: NSObject, Identifiable {
     if metaData.minimumOS > 10.9 {
       var strOSReq = " "
       strOSReq += String(
-        format: "This feature requires macOS %@ and above.".localized, arguments: ["12.0"]
+        format: "i18n:Update.requiresMacosVersion:%@".localized, arguments: ["12.0"]
       )
       stringStack.append(strOSReq)
     }

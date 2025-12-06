@@ -210,7 +210,7 @@ extension VwrServiceMenuEditor {
 extension VwrServiceMenuEditor {
   @IBAction
   func btnShowInstructionsClicked(_: Any) {
-    let strTitle = "How to Fill".localized
+    let strTitle = "i18n:Window.howToFill".localized
     let strFillGuide = "i18n:CandidateServiceMenuEditor.formatGuide".localized
     windowController?.window.callAlert(title: strTitle, text: strFillGuide)
   }
@@ -267,8 +267,8 @@ extension VwrServiceMenuEditor {
     alert.informativeText = NSLocalizedString(
       "i18n:CandidateServiceMenuEditor.howToGetGuide", comment: ""
     )
-    alert.addButton(withTitle: NSLocalizedString("OK", comment: ""))
-    alert.addButton(withTitle: NSLocalizedString("Cancel", comment: ""))
+    alert.addButton(withTitle: NSLocalizedString("i18n:Common.ok", comment: ""))
+    alert.addButton(withTitle: NSLocalizedString("i18n:Common.cancel", comment: ""))
 
     let maxFloat = Double(Float.greatestFiniteMagnitude)
     let scrollview = NSScrollView(frame: CGRect(x: 0, y: 0, width: 512, height: 200))

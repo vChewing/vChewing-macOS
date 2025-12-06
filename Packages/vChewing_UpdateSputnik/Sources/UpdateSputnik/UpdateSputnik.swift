@@ -91,7 +91,7 @@ public final class UpdateSputnik {
     guard let plist = plist else {
       asyncOnMain { [weak self] in
         guard let this = self else { return }
-        this.showError(message: NSLocalizedString("Plist downloaded is nil.", comment: ""))
+        this.showError(message: NSLocalizedString("i18n:Validation.plistIsNil", comment: ""))
         this.currentTask = nil
       }
       return
@@ -104,8 +104,7 @@ public final class UpdateSputnik {
     else {
       asyncOnMain { [weak self] in
         guard let this = self else { return }
-        this.showError(message: NSLocalizedString(
-          "Plist downloaded cannot be parsed correctly.",
+        this.showError(message: NSLocalizedString("i18n:Validation.plistCannotBeParsed",
           comment: ""
         ))
         this.currentTask = nil
@@ -125,20 +124,18 @@ public final class UpdateSputnik {
       guard isCurrentCheckForced else { return }
       if intRemoteVersion == intCurrentVersion, crossDistroNotification { break versionCheck }
       let alert = NSAlert()
-      alert.messageText = NSLocalizedString("Update Check Completed", comment: "")
-      alert.informativeText = NSLocalizedString(
-        "You are already using the latest version.",
+      alert.messageText = NSLocalizedString("i18n:Update.checkCompleted", comment: "")
+      alert.informativeText = NSLocalizedString("i18n:Update.alreadyLatestVersion",
         comment: ""
       )
-      alert.addButton(withTitle: NSLocalizedString("OK", comment: ""))
+      alert.addButton(withTitle: NSLocalizedString("i18n:Common.ok", comment: ""))
       alert.runModal()
       NSApp.popup()
       return
     }
 
     var content = String(
-      format: NSLocalizedString(
-        "You're currently using vChewing %@ (%@), a new version %@ (%@) is now available. Do you want to visit vChewing's website to download the version?",
+      format: NSLocalizedString("i18n:Update.newVersionAvailableDetails:%@:%@:%@:%@",
         comment: ""
       ),
       strCurrentVersionShortened,
@@ -149,19 +146,18 @@ public final class UpdateSputnik {
     if crossDistroNotification {
       content.append("\n\n")
       content.append(
-        NSLocalizedString(
-          "This update will upgrade vChewing from Aqua Special Edition to Mainstream Release (recommended for your current OS version).",
+        NSLocalizedString("i18n:Update.aquaToMainstreamUpgrade",
           comment: ""
         )
       )
     }
     let alert = NSAlert()
     alert.informativeText = content
-    alert.messageText = NSLocalizedString("New Version Available", comment: "")
-    let strVisitWebsite = NSLocalizedString("Visit Website", comment: "")
+    alert.messageText = NSLocalizedString("i18n:Update.newVersionAvailable", comment: "")
+    let strVisitWebsite = NSLocalizedString("i18n:Action.visitWebsite", comment: "")
     alert.addButton(withTitle: "\(strVisitWebsite) (Gitee)")
     alert.addButton(withTitle: "\(strVisitWebsite) (GitHub)")
-    alert.addButton(withTitle: NSLocalizedString("Not Now", comment: ""))
+    alert.addButton(withTitle: NSLocalizedString("i18n:Common.notNow", comment: ""))
 
     guard let siteInfoURLString = plist["\(kUpdateInfoPageURLKey)"] as? String,
           let siteURL = URL(string: siteInfoURLString),
@@ -228,9 +224,9 @@ public final class UpdateSputnik {
     if !isCurrentCheckForced { return }
     let alert = NSAlert()
     let content = message
-    alert.messageText = NSLocalizedString("Update Check Failed", comment: "")
+    alert.messageText = NSLocalizedString("i18n:Update.checkFailed", comment: "")
     alert.informativeText = content
-    alert.addButton(withTitle: NSLocalizedString("OK", comment: ""))
+    alert.addButton(withTitle: NSLocalizedString("i18n:Common.ok", comment: ""))
     alert.runModal()
     NSApp.popup()
   }

@@ -175,8 +175,7 @@ extension IMEStateData {
       if markedRange.count < Self.allowedMarkLengthRange.lowerBound {
         tooltipColorState = .denialInsufficiency
         return String(
-          format: NSLocalizedString(
-            "\"%@\" length must ≥ 2 for a user phrase.",
+          format: NSLocalizedString("i18n:Symbol.backslash"%@\" length must ≥ 2 for a user phrase.",
             comment: ""
           ) + "\n◆  " + readingDisplay,
           text
@@ -184,8 +183,7 @@ extension IMEStateData {
       } else if markedRange.count > Self.allowedMarkLengthRange.upperBound {
         tooltipColorState = .denialOverflow
         return String(
-          format: NSLocalizedString(
-            "\"%@\" length should ≤ %d for a user phrase.",
+          format: NSLocalizedString("i18n:Symbol.backslash"%@\" length should ≤ %d for a user phrase.",
             comment: ""
           ) + "\n◆  " + readingDisplay,
           text,
@@ -198,16 +196,14 @@ extension IMEStateData {
         switch LMMgr.isStateDataFilterableForMarked(self) {
         case false:
           return String(
-            format: NSLocalizedString(
-              "\"%@\" already exists:\n ENTER to boost, SHIFT+COMMAND+ENTER to nerf.",
+            format: NSLocalizedString("i18n:Symbol.backslash"%@\" already exists:\n ENTER to boost, SHIFT+COMMAND+ENTER to nerf.",
               comment: ""
             ) + "\n◆  " + readingDisplay,
             text
           )
         case true:
           return String(
-            format: NSLocalizedString(
-              "\"%@\" already exists:\n ENTER to boost, SHIFT+COMMAND+ENTER to nerf, \n BackSpace or Delete key to exclude.",
+            format: NSLocalizedString("i18n:Symbol.backslash"%@\" already exists:\n ENTER to boost, SHIFT+COMMAND+ENTER to nerf, \n BackSpace or Delete key to exclude.",
               comment: ""
             ) + "\n◆  " + readingDisplay,
             text
@@ -218,8 +214,7 @@ extension IMEStateData {
       if markedTargetIsCurrentlyFiltered {
         tooltipColorState = .information
         return String(
-          format: NSLocalizedString(
-            "\"%@\" selected. ENTER to unfilter this phrase.",
+          format: NSLocalizedString("i18n:Symbol.backslash"%@\" selected. ENTER to unfilter this phrase.",
             comment: ""
           ) + "\n◆  "
             + readingDisplay,
@@ -229,7 +224,7 @@ extension IMEStateData {
 
       tooltipColorState = .normal
       return String(
-        format: NSLocalizedString("\"%@\" selected. ENTER to add user phrase.", comment: "")
+        format: NSLocalizedString("i18n:Symbol.backslash"%@\" selected. ENTER to add user phrase.", comment: "")
           + "\n◆  "
           + readingDisplay,
         text
@@ -240,8 +235,7 @@ extension IMEStateData {
       tooltipColorState = .warning
       tooltip +=
         "\n"
-        + NSLocalizedString(
-          "⚠︎ Phrase replacement mode enabled, interfering user phrase entry.",
+        + NSLocalizedString("i18n:Status.phraseReplacementModeInterfering",
           comment: ""
         )
     }

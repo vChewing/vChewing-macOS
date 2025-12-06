@@ -52,8 +52,7 @@ public struct VwrSettingsPaneGeneral: View {
         VStack(alignment: .leading) {
           Text(
             "\u{2022} "
-              + NSLocalizedString(
-                "Please use mouse wheel to scroll each page if needed. The CheatSheet is available in the IME menu.",
+              + NSLocalizedString("i18n:Instruction.useMouseWheelToScroll",
                 comment: ""
               ) + "\n\u{2022} "
               + NSLocalizedString(
@@ -142,18 +141,17 @@ public struct VwrSettingsPaneGeneral: View {
 
   private func onFartControlChange() {
     let content = String(
-      format: NSLocalizedString(
-        "You are about to uncheck this fart suppressor. You are responsible for all consequences lead by letting people nearby hear the fart sound come from your computer. We strongly advise against unchecking this in any public circumstance that prohibits NSFW netas.",
+      format: NSLocalizedString("i18n:Warning.fartSuppressorUncheck",
         comment: ""
       )
     )
-    let alert = NSAlert(error: NSLocalizedString("Warning", comment: ""))
+    let alert = NSAlert(error: NSLocalizedString("i18n:Common.warning", comment: ""))
     alert.informativeText = content
-    alert.addButton(withTitle: NSLocalizedString("Uncheck", comment: ""))
+    alert.addButton(withTitle: NSLocalizedString("i18n:Common.uncheck", comment: ""))
     alert.buttons.forEach { button in
       button.hasDestructiveAction = true
     }
-    alert.addButton(withTitle: NSLocalizedString("Leave it checked", comment: ""))
+    alert.addButton(withTitle: NSLocalizedString("i18n:Instruction.leaveItChecked", comment: ""))
     if let window = CtlSettingsUI.shared?.window, !shouldNotFartInLieuOfBeep {
       shouldNotFartInLieuOfBeep = true
       alert.beginSheetModal(for: window) { result in

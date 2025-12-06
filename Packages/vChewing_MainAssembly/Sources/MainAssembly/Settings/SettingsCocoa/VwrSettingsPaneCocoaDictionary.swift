@@ -150,7 +150,7 @@ extension SettingsPanesCocoa {
       pathCtl.makeSimpleConstraint(.height, relation: .equal, value: NSFont.smallSystemFontSize * 2)
       pathCtl.makeSimpleConstraint(.width, relation: .greaterThanOrEqual, value: windowWidth - 145)
       pathCtl.url = URL(fileURLWithPath: LMMgr.dataFolderPath(isDefaultFolder: false))
-      pathCtl.toolTip = "Please drag the desired target from Finder to this place.".localized
+      pathCtl.toolTip = "i18n:Instruction.dragTargetFromFinder".localized
     }
 
     @IBAction
@@ -285,8 +285,7 @@ extension SettingsPanesCocoa.Dictionary: NSPathControlDelegate {
       return
     }
     let dlgOpenPath = NSOpenPanel()
-    dlgOpenPath.title = NSLocalizedString(
-      "Choose your desired user data folder.", comment: ""
+    dlgOpenPath.title = NSLocalizedString("i18n:Instruction.chooseUserDataFolder", comment: ""
     )
     dlgOpenPath.showsResizeIndicator = true
     dlgOpenPath.showsHiddenFiles = true

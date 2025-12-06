@@ -53,7 +53,7 @@ public final class CtlSettingsCocoa: NSWindowController, NSWindowDelegate {
       super.windowDidLoad()
       window?.setPosition(vertical: .top, horizontal: .right, padding: 20)
 
-      var preferencesTitleName = NSLocalizedString("vChewing Preferences…", comment: "")
+      var preferencesTitleName = NSLocalizedString("i18n:Menu.vchewingPreferences", comment: "")
       preferencesTitleName.removeLast()
       let toolbar = NSToolbar(identifier: "vChewing.Settings.AppKit.Toolbar")
       toolbar.allowsUserCustomization = false

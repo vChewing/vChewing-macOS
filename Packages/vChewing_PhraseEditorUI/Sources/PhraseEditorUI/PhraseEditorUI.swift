@@ -167,7 +167,7 @@ public struct VwrPhraseEditorUI: View {
           Button("?") {
             guard let window = window else { return }
             window.callAlert(
-              title: "You may follow:".localized,
+              title: "i18n:Instruction.youMayFollow".localized,
               text: PETerms.TooltipTexts.sampleDictionaryContent(for: selUserDataType)
             )
           }.disabled(window == nil)
@@ -191,8 +191,7 @@ public struct VwrPhraseEditorUI: View {
     }.onDisappear {
       selInputMode = .imeModeNULL
       selUserDataType = .thePhrases
-      txtContent = NSLocalizedString(
-        "Please select Simplified / Traditional Chinese mode above.",
+      txtContent = NSLocalizedString("i18n:Instruction.selectChineseMode",
         comment: ""
       )
       isLoading = true
@@ -208,7 +207,7 @@ public struct VwrPhraseEditorUI: View {
     guard let delegate = delegate else { return }
     updateLabels()
     clearAllFields()
-    txtContent = NSLocalizedString("Loading…", comment: "")
+    txtContent = NSLocalizedString("i18n:Loading.loading", comment: "")
     isLoading = true
     asyncOnMain {
       txtContent = delegate.retrieveData(mode: selInputMode, type: selUserDataType)
@@ -219,8 +218,7 @@ public struct VwrPhraseEditorUI: View {
 
   // MARK: Internal
 
-  static var txtContentStorage: String = NSLocalizedString(
-    "Please select Simplified / Traditional Chinese mode above.", comment: ""
+  static var txtContentStorage: String = NSLocalizedString("i18n:Instruction.selectChineseMode", comment: ""
   )
 
   @State
@@ -331,7 +329,7 @@ public struct VwrPhraseEditorUI: View {
   private func saveAndReload() {
     guard let delegate = delegate, selInputMode != .imeModeNULL else { return }
     let toSave = txtContent
-    txtContent = NSLocalizedString("Loading…", comment: "")
+    txtContent = NSLocalizedString("i18n:Loading.loading", comment: "")
     isLoading = true
     let newResult = delegate.saveData(mode: selInputMode, type: selUserDataType, data: toSave)
     txtContent = newResult
@@ -411,12 +409,12 @@ public enum PETerms {
           "Example:\nCandidate Reading-Reading Weight #Comment\nCandidate Reading-Reading #Comment"
             .localized + "\n\n"
             + weightInputBox.localized
-      case .theFilter: result = "Example:\nCandidate Reading-Reading #Comment".localized
-      case .theReplacements: result = "Example:\nOldPhrase NewPhrase #Comment".localized
+      case .theFilter: result = "i18n:Editor.exampleCandidateReadingComment".localized
+      case .theReplacements: result = "i18n:Editor.exampleOldPhraseNewPhrase".localized
       case .theAssociates:
         result = "Example:\nInitial RestPhrase\nInitial RestPhrase1 RestPhrase2 RestPhrase3..."
           .localized
-      case .theSymbols: result = "Example:\nCandidate Reading-Reading #Comment".localized
+      case .theSymbols: result = "i18n:Editor.exampleCandidateReadingComment".localized
       }
       return result
     }

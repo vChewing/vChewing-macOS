@@ -100,7 +100,7 @@ extension InputHandlerProtocol {
       )
     if prefs.acceptLeadingIntonations {
       result.append("\n")
-      result.append("It will attempt to combine with the incoming phonabet input.".localized)
+      result.append("i18n:Instruction.attemptToCombineWithIncoming".localized)
     }
     return result.joined()
   }
@@ -1155,7 +1155,7 @@ extension InputHandlerProtocol {
 
     // 將輸入解析為整數
     guard let number = parseRomanNumeralInput(inputStr) else {
-      handleErrorState(msg: "typingMethod.romanNumerals.error.invalidInput".localized)
+      handleErrorState(msg: "i18n:TypingMethod.romanNumerals.error.invalidInput".localized)
       errorCallback?("A3D5B7F9")
       return true
     }
@@ -1166,7 +1166,7 @@ extension InputHandlerProtocol {
 
     // 轉換為羅馬數字
     guard let romanNumeral = RomanNumeralConverter.convert(number, format: format) else {
-      handleErrorState(msg: "typingMethod.romanNumerals.error.valueOutOfRange".localized)
+      handleErrorState(msg: "i18n:TypingMethod.romanNumerals.error.valueOutOfRange".localized)
       errorCallback?("2E8C4D61")
       return true
     }

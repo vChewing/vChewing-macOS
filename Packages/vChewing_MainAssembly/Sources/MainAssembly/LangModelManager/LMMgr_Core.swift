@@ -136,7 +136,7 @@ public final class LMMgr {
     let result = LMAssembly.LMInstantiator.connectSQLDB(dbPath: path)
     assert(result, "vChewing factory SQLite connection failed.")
     Notifier.notify(
-      message: NSLocalizedString("Core Dict loading complete.", comment: "")
+      message: NSLocalizedString("i18n:Loading.coreDictComplete", comment: "")
     )
   }
 
@@ -416,7 +416,7 @@ public final class LMMgr {
           let alert = NSAlert()
           alert.messageText = "i18n:LMMgr.pathInvalidityFound.userDataFolder.title".localized
           alert.informativeText = "i18n:LMMgr.pathInvalidityFound.userDataFolder.description".localized
-          alert.addButton(withTitle: "OK".localized)
+          alert.addButton(withTitle: "i18n:Common.ok".localized)
           _ = alert.runModal()
           NSApp.popup()
         }
@@ -437,7 +437,7 @@ public final class LMMgr {
           let alert = NSAlert()
           alert.messageText = "i18n:LMMgr.pathInvalidityFound.cassette.title".localized
           alert.informativeText = "i18n:LMMgr.pathInvalidityFound.cassette.description".localized
-          alert.addButton(withTitle: "OK".localized)
+          alert.addButton(withTitle: "i18n:Common.ok".localized)
           _ = alert.runModal()
           NSApp.popup()
         }

@@ -229,16 +229,14 @@ extension VwrClientListMgr {
   func btnAddClientClicked(_: Any) {
     guard let window = CtlClientListMgr.shared?.window else { return }
     let alert = NSAlert()
-    alert.messageText = NSLocalizedString(
-      "Please enter the client app bundle identifier(s) you want to register.", comment: ""
+    alert.messageText = NSLocalizedString("i18n:Instruction.enterClientBundleIdentifier", comment: ""
     )
-    alert.informativeText = NSLocalizedString(
-      "One record per line. Use Option+Enter to break lines.\nBlank lines will be dismissed.",
+    alert.informativeText = NSLocalizedString("i18n:Editor.oneRecordPerLine",
       comment: ""
     )
-    alert.addButton(withTitle: NSLocalizedString("OK", comment: ""))
-    alert.addButton(withTitle: NSLocalizedString("Just Select", comment: "") + "…")
-    alert.addButton(withTitle: NSLocalizedString("Cancel", comment: ""))
+    alert.addButton(withTitle: NSLocalizedString("i18n:Common.ok", comment: ""))
+    alert.addButton(withTitle: NSLocalizedString("i18n:Common.justSelect", comment: "") + "…")
+    alert.addButton(withTitle: NSLocalizedString("i18n:Common.cancel", comment: ""))
 
     let maxFloat = Double(Float.greatestFiniteMagnitude)
     let scrollview = NSScrollView(frame: CGRect(x: 0, y: 0, width: 370, height: 200))
@@ -295,8 +293,7 @@ extension VwrClientListMgr {
           break resultCheck
         }
         let dlgOpenPath = NSOpenPanel()
-        dlgOpenPath.title = NSLocalizedString(
-          "Choose the target application bundle.", comment: ""
+        dlgOpenPath.title = NSLocalizedString("i18n:Instruction.chooseTargetAppBundle", comment: ""
         )
         dlgOpenPath.showsResizeIndicator = true
         dlgOpenPath.allowsMultipleSelection = true
@@ -313,11 +310,10 @@ extension VwrClientListMgr {
           switch result {
           case .OK:
             for url in dlgOpenPath.urls {
-              let title = NSLocalizedString(
-                "The selected item is either not a valid macOS application bundle or not having a valid app bundle identifier.",
+              let title = NSLocalizedString("i18n:Validation.selectedItemNotValidAppBundle",
                 comment: ""
               )
-              let text = url.path + "\n\n" + NSLocalizedString("Please try again.", comment: "")
+              let text = url.path + "\n\n" + NSLocalizedString("i18n:Instruction.tryAgain", comment: "")
               guard let bundle = Bundle(url: url) else {
                 CtlClientListMgr.shared?.window.callAlert(title: title, text: text)
                 return
@@ -329,13 +325,13 @@ extension VwrClientListMgr {
               let isIdentifierAlreadyRegistered = Self.clientsList.contains(identifier)
               let alert2 = NSAlert()
               alert2.messageText =
-                "Do you want to enable the popup composition buffer for this client?".localized
+                "i18n:Instruction.enablePopupCompositionBuffer".localized
               alert2.informativeText = "\(identifier)\n\n"
                 +
                 "Some client apps may have different compatibility issues in IMKTextInput implementation."
                 .localized
-              alert2.addButton(withTitle: "Yes".localized)
-              alert2.addButton(withTitle: "No".localized)
+              alert2.addButton(withTitle: "i18n:Common.yes".localized)
+              alert2.addButton(withTitle: "i18n:Common.no".localized)
               alert2.beginSheetModal(for: window) { result2 in
                 let oldValue = PrefMgr.shared.clientsIMKTextInputIncapable[identifier]
                 let newValue = result2 == .alertFirstButtonReturn

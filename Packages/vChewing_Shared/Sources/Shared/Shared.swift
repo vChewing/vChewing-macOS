@@ -167,19 +167,16 @@ public enum CandidateKey {
       switch self {
       case .invalidCharacters:
         return "- "
-          + NSLocalizedString(
-            "Candidate keys can only contain printable ASCII characters like alphanumericals.",
+          + NSLocalizedString("i18n:Validation.candidateKeysOnlyPrintableAscii",
             comment: ""
           ) + "\n" + "- " + NSLocalizedString(
             "i18n:CandidateKey.ValidationError.AssignedForOtherPurposes", comment: ""
-          ) + "\n" + "- " + NSLocalizedString(
-            "Candidate keys cannot contain space.", comment: ""
+          ) + "\n" + "- " + NSLocalizedString("i18n:Validation.candidateKeysCannotContainSpace", comment: ""
           )
       case .countMismatch:
         return "- "
-          + NSLocalizedString(
-            "Minimum 6 candidate keys allowed.", comment: ""
-          ) + "\n" + "- " + NSLocalizedString("Maximum 10 candidate keys allowed.", comment: "")
+          + NSLocalizedString("i18n:Validation.minimum6CandidateKeysAllowed", comment: ""
+          ) + "\n" + "- " + NSLocalizedString("i18n:Validation.maximum10CandidateKeysAllowed", comment: "")
       case .noError:
         return ""
       }

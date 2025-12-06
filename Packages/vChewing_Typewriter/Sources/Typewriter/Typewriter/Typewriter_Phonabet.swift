@@ -313,7 +313,7 @@ extension PhonabetTypewriter {
       let textToCommit = handler.commitOverflownComposition
       var refreshedState = handler.generateStateOfInputting()
       refreshedState.textToCommit = textToCommit
-      refreshedState.tooltip = "Previous intonation has been overridden.".localized
+      refreshedState.tooltip = "i18n:Status.previousIntonationOverridden".localized
       refreshedState.tooltipDuration = 2
       refreshedState.data.tooltipColorState = .normal
       session.switchState(refreshedState)

@@ -43,7 +43,7 @@ extension SettingsPanesCocoa {
   }
 
   public static func warnAboutComDlg32Inavailability() {
-    let title = "Please drag the desired target from Finder to this place.".localized
+    let title = "i18n:Instruction.dragTargetFromFinder".localized
     let message =
       "[Technical Reason] macOS releases earlier than 10.13 have an issue: If calling NSOpenPanel directly from an input method, both the input method and its current client app hang in a dead-loop. Furthermore, it makes other apps hang in the same way when you switch into another app. If you don't want to hard-reboot your computer, your last resort is to use SSH to connect to your current computer from another computer and kill the input method process by Terminal commands. That's why vChewing cannot offer access to NSOpenPanel for macOS 10.12 and earlier."
         .localized

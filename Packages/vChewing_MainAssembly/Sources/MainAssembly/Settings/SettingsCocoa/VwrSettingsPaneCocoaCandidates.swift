@@ -139,7 +139,7 @@ extension SettingsPanesCocoa {
         PrefMgr.shared.candidateKeys = keys
         return
       }
-      let alert = NSAlert(error: NSLocalizedString("Invalid Selection Keys.", comment: ""))
+      let alert = NSAlert(error: NSLocalizedString("i18n:Validation.invalidSelectionKeys", comment: ""))
       alert.informativeText = errorResult
       IMEApp.buzz()
       if let window = CtlSettingsCocoa.shared?.window {

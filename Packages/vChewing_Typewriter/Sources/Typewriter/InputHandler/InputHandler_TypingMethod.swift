@@ -28,15 +28,15 @@ public enum TypingMethod: Int, CaseIterable {
     case .vChewingFactory: return ""
     case .codePoint:
       var commonTerm = ContiguousArray<String>()
-      commonTerm.insert("Code Point Input.".localized, at: 0)
+      commonTerm.insert("i18n:Feature.codePointInput".localized, at: 0)
       if !vertical, let initials = IMEApp.currentInputMode.nonUTFEncodingInitials {
         commonTerm.insert("[\(initials)] ", at: 0)
       }
       return commonTerm.joined()
     case .haninKeyboardSymbol:
-      return "\("Hanin Keyboard Symbol Input.".localized)"
+      return "\("i18n:Feature.haninKeyboardSymbolInput".localized)"
     case .romanNumerals:
-      return "typingMethod.romanNumerals.tooltip".localized
+      return "i18n:TypingMethod.romanNumerals.tooltip".localized
     }
   }
 }
