@@ -77,7 +77,7 @@ public struct VwrSettingsPaneDictionary: View {
                   pathControl.allowedTypes = ["public.folder", "public.directory"]
                   pathControl
                     .placeholderString = "Please drag the desired target from Finder to this place."
-                    .localized
+                    .i18n
                 } acceptDrop: { pathControl, info in
                   let urls = info.draggingPasteboard.readObjects(forClasses: [NSURL.self])
                   guard let url = urls?.first as? URL else { return false }
@@ -227,7 +227,7 @@ public struct VwrSettingsPaneDictionary: View {
                 let count: Int = maybeCount ?? 0
 
                 CtlSettingsUI.shared?.window.callAlert(title: String(
-                  format: "i18n:settings.importFromKimoTxt.finishedCount:%@".localized,
+                  format: "i18n:settings.importFromKimoTxt.finishedCount:%@".i18n,
                   count.description
                 ))
               case .failure:
@@ -239,7 +239,7 @@ public struct VwrSettingsPaneDictionary: View {
                 let count = try LMMgr.importYahooKeyKeyUserDictionaryByXPC()
                 CtlSettingsUI.shared?.window.callAlert(
                   title: String(
-                    format: "i18n:settings.importFromKimoTxt.finishedCount:%@".localized,
+                    format: "i18n:settings.importFromKimoTxt.finishedCount:%@".i18n,
                     count.description
                   )
                 )

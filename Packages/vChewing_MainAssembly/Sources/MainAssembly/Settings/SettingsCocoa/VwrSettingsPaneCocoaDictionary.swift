@@ -111,12 +111,12 @@ extension SettingsPanesCocoa {
         let count: Int = maybeCount ?? 0
         CtlSettingsCocoa.shared?.window.callAlert(
           title: String(
-            format: "i18n:settings.importFromKimoTxt.finishedCount:%@".localized,
+            format: "i18n:settings.importFromKimoTxt.finishedCount:%@".i18n,
             count.description
           )
         )
       }
-      dragRetrieverKimo.title = "i18n:kimoImportButton.DragFileToHere".localized
+      dragRetrieverKimo.title = "i18n:kimoImportButton.DragFileToHere".i18n
       dragRetrieverKimo.target = self
       dragRetrieverKimo.action = #selector(importYahooKeyKeyUserDictionaryData(_:))
       return dragRetrieverKimo
@@ -150,7 +150,7 @@ extension SettingsPanesCocoa {
       pathCtl.makeSimpleConstraint(.height, relation: .equal, value: NSFont.smallSystemFontSize * 2)
       pathCtl.makeSimpleConstraint(.width, relation: .greaterThanOrEqual, value: windowWidth - 145)
       pathCtl.url = URL(fileURLWithPath: LMMgr.dataFolderPath(isDefaultFolder: false))
-      pathCtl.toolTip = "Please drag the desired target from Finder to this place.".localized
+      pathCtl.toolTip = "Please drag the desired target from Finder to this place.".i18n
     }
 
     @IBAction
@@ -184,7 +184,7 @@ extension SettingsPanesCocoa {
         let count = try LMMgr.importYahooKeyKeyUserDictionaryByXPC()
         CtlSettingsCocoa.shared?.window.callAlert(
           title: String(
-            format: "i18n:settings.importFromKimoTxt.finishedCount:%@".localized,
+            format: "i18n:settings.importFromKimoTxt.finishedCount:%@".i18n,
             count.description
           )
         )
@@ -203,9 +203,7 @@ extension SettingsPanesCocoa {
         return
       }
       let dlgOpenFile = NSOpenPanel()
-      dlgOpenFile.title = NSLocalizedString(
-        "i18n:settings.importFromKimoTxt.label", comment: ""
-      ) + ":"
+      dlgOpenFile.title = "i18n:settings.importFromKimoTxt.label".i18n + ":"
       dlgOpenFile.showsResizeIndicator = true
       dlgOpenFile.showsHiddenFiles = true
       dlgOpenFile.canChooseFiles = true
@@ -225,7 +223,7 @@ extension SettingsPanesCocoa {
           let maybeCount = try? LMMgr.importYahooKeyKeyUserDictionary(text: &rawString)
           let count: Int = maybeCount ?? 0
           window.callAlert(title: String(
-            format: "i18n:settings.importFromKimoTxt.finishedCount:%@".localized,
+            format: "i18n:settings.importFromKimoTxt.finishedCount:%@".i18n,
             count.description
           ))
         }
@@ -285,9 +283,7 @@ extension SettingsPanesCocoa.Dictionary: NSPathControlDelegate {
       return
     }
     let dlgOpenPath = NSOpenPanel()
-    dlgOpenPath.title = NSLocalizedString(
-      "Choose your desired user data folder.", comment: ""
-    )
+    dlgOpenPath.title = "Choose your desired user data folder.".i18n
     dlgOpenPath.showsResizeIndicator = true
     dlgOpenPath.showsHiddenFiles = true
     dlgOpenPath.canChooseFiles = false

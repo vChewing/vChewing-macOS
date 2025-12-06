@@ -136,15 +136,15 @@ extension SessionProtocol {
 
   public func candidateToolTip(shortened: Bool) -> String {
     if state.type == .ofAssociates {
-      return shortened ? "⇧" : NSLocalizedString("Hold ⇧ to choose associates.", comment: "")
+      return shortened ? "⇧" : "Hold ⇧ to choose associates.".i18n
     } else if state.type == .ofInputting, state.isCandidateContainer {
       let useShift = inputMode.langModel.areCassetteCandidateKeysShiftHeld
       let theEmoji = useShift ? "⬆️" : "⚡️"
-      return shortened ? theEmoji : "\(theEmoji) " + "Quick Candidates".localized
+      return shortened ? theEmoji : "\(theEmoji) " + "Quick Candidates".i18n
     } else if prefs.cassetteEnabled {
-      return shortened ? "📼" : "📼 " + "CIN Cassette Mode".localized
+      return shortened ? "📼" : "📼 " + "CIN Cassette Mode".i18n
     } else if state.type == .ofSymbolTable, state.node.containsCandidateServices {
-      return shortened ? "🌎" : "🌎 " + "Service Menu".localized
+      return shortened ? "🌎" : "🌎 " + "Service Menu".i18n
     }
     return ""
   }
@@ -234,10 +234,10 @@ extension SessionProtocol {
             NSPasteboard.general.declareTypes([.string], owner: nil)
             NSPasteboard.general.setString(response, forType: .string)
             Notifier
-              .notify(message: "i18n:candidateServiceMenu.selectorResponse.succeeded".localized)
+              .notify(message: "i18n:candidateServiceMenu.selectorResponse.succeeded".i18n)
           } else {
             callError("4DFDC487: Candidate Text Service Selector Responsiveness Failure.")
-            Notifier.notify(message: "i18n:candidateServiceMenu.selectorResponse.failed".localized)
+            Notifier.notify(message: "i18n:candidateServiceMenu.selectorResponse.failed".i18n)
           }
         }
         switchState(.ofAbortion())
@@ -376,7 +376,7 @@ extension SessionProtocol {
         succeeded ? "! Succeeded in filtering a candidate." : "⚠︎ Failed from filtering a candidate."
     }
     if !succeeded { newState.data.tooltipColorState = .redAlert }
-    newState.tooltip = NSLocalizedString(tooltipMessage, comment: "")
+    newState.tooltip = tooltipMessage.i18n
     switchState(newState)
   }
 }

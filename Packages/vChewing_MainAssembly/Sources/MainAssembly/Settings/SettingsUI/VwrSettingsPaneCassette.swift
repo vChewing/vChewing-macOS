@@ -32,7 +32,7 @@ public struct VwrSettingsPaneCassette: View {
                 pathControl.allowedTypes = ["cin2", "cin", "vcin"]
                 pathControl
                   .placeholderString = "Please drag the desired target from Finder to this place."
-                  .localized
+                  .i18n
               } acceptDrop: { pathControl, info in
                 let urls = info.draggingPasteboard.readObjects(forClasses: [NSURL.self])
                 guard let url = urls?.first as? URL else { return false }
@@ -76,14 +76,8 @@ public struct VwrSettingsPaneCassette: View {
               if cassetteEnabled, !LMMgr.checkCassettePathValidity(cassettePath) {
                 if let window = CtlSettingsUI.shared?.window {
                   IMEApp.buzz()
-                  let alert = NSAlert(error: NSLocalizedString(
-                    "i18n:LMMgr.accessFailure.cassette.title",
-                    comment: ""
-                  ))
-                  alert.informativeText = NSLocalizedString(
-                    "i18n:LMMgr.accessFailure.cassette.description",
-                    comment: ""
-                  )
+                  let alert = NSAlert(error: "i18n:LMMgr.accessFailure.cassette.title".i18n)
+                  alert.informativeText = "i18n:LMMgr.accessFailure.cassette.description".i18n
                   alert.beginSheetModal(for: window) { _ in
                   }
                 }

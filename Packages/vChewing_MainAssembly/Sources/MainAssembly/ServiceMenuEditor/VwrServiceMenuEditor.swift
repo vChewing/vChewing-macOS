@@ -128,7 +128,7 @@ public final class VwrServiceMenuEditor: NSViewController {
 
     tableColumn1.identifier = NSUserInterfaceItemIdentifier("colTitle")
     tableColumn1.headerCell.title = "i18n:CandidateServiceMenuEditor.table.field.MenuTitle"
-      .localized
+      .i18n
     tableColumn1.maxWidth = 280
     tableColumn1.minWidth = 200
     tableColumn1.resizingMask = [.autoresizingMask, .userResizingMask]
@@ -143,7 +143,7 @@ public final class VwrServiceMenuEditor: NSViewController {
     tableColumn1Cell.textColor = NSColor.controlTextColor
 
     tableColumn2.identifier = NSUserInterfaceItemIdentifier("colValue")
-    tableColumn2.headerCell.title = "i18n:CandidateServiceMenuEditor.table.field.Value".localized
+    tableColumn2.headerCell.title = "i18n:CandidateServiceMenuEditor.table.field.Value".i18n
     tableColumn2.maxWidth = 1_000
     tableColumn2.minWidth = 40
     tableColumn2.resizingMask = [.autoresizingMask, .userResizingMask]
@@ -210,8 +210,8 @@ extension VwrServiceMenuEditor {
 extension VwrServiceMenuEditor {
   @IBAction
   func btnShowInstructionsClicked(_: Any) {
-    let strTitle = "How to Fill".localized
-    let strFillGuide = "i18n:CandidateServiceMenuEditor.formatGuide".localized
+    let strTitle = "How to Fill".i18n
+    let strFillGuide = "i18n:CandidateServiceMenuEditor.formatGuide".i18n
     windowController?.window.callAlert(title: strTitle, text: strFillGuide)
   }
 
@@ -261,14 +261,10 @@ extension VwrServiceMenuEditor {
   func btnAddServiceClicked(_: Any) {
     guard let window = windowController?.window else { return }
     let alert = NSAlert()
-    alert.messageText = NSLocalizedString(
-      "i18n:CandidateServiceMenuEditor.prompt", comment: ""
-    )
-    alert.informativeText = NSLocalizedString(
-      "i18n:CandidateServiceMenuEditor.howToGetGuide", comment: ""
-    )
-    alert.addButton(withTitle: NSLocalizedString("OK", comment: ""))
-    alert.addButton(withTitle: NSLocalizedString("Cancel", comment: ""))
+    alert.messageText = "i18n:CandidateServiceMenuEditor.prompt".i18n
+    alert.informativeText = "i18n:CandidateServiceMenuEditor.howToGetGuide".i18n
+    alert.addButton(withTitle: "OK".i18n)
+    alert.addButton(withTitle: "Cancel".i18n)
 
     let maxFloat = Double(Float.greatestFiniteMagnitude)
     let scrollview = NSScrollView(frame: CGRect(x: 0, y: 0, width: 512, height: 200))
@@ -298,7 +294,7 @@ extension VwrServiceMenuEditor {
     theTextView.autoresizingMask = [.width, .height]
     theTextView.textContainer?.containerSize = CGSize(width: maxFloat, height: maxFloat)
     theTextView.textContainer?.widthTracksTextView = false
-    theTextView.toolTip = "i18n:CandidateServiceMenuEditor.formatGuide".localized
+    theTextView.toolTip = "i18n:CandidateServiceMenuEditor.formatGuide".i18n
 
     alert.accessoryView = scrollview
     alert.beginSheetModal(at: window) { result in

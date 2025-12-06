@@ -90,11 +90,11 @@ extension SessionProtocol {
           self?.resetInputHandler()
           guard this.prefs.showNotificationsWhenTogglingCapsLock else { return }
           guard !this.prefs.bypassNonAppleCapsLockHandling else { return }
-          let status = NSLocalizedString("NotificationSwitchRevolver", comment: "")
+          let status = "NotificationSwitchRevolver".i18n
           Notifier.notify(
             message: isCapsLockTurnedOn
-              ? "[Caps Lock ON] " + "Alphanumerical Input Mode".localized + "\n" + status
-              : "[Caps Lock OFF] " + "Chinese Input Mode".localized + "\n" + status
+              ? "[Caps Lock ON] " + "Alphanumerical Input Mode".i18n + "\n" + status
+              : "[Caps Lock OFF] " + "Chinese Input Mode".i18n + "\n" + status
           )
         }
       }
@@ -121,7 +121,7 @@ extension SessionProtocol {
     if !LMMgr.isCoreDBConnected {
       if (event as InputSignalProtocol).isReservedKey { return false }
       var newState: State = .ofEmpty()
-      newState.tooltip = NSLocalizedString("Factory dictionary not loaded yet.", comment: "")
+      newState.tooltip = "Factory dictionary not loaded yet.".i18n
       newState.tooltipDuration = 1.85
       newState.data.tooltipColorState = .redAlert
       switchState(newState)
@@ -196,13 +196,13 @@ extension SessionProtocol {
 
   /// 切換英數模式開關。
   private func toggleAlphanumericalMode() {
-    let status = "NotificationSwitchRevolver".localized
+    let status = "NotificationSwitchRevolver".i18n
     let oldValue = isASCIIMode
     let newValue = isASCIIMode.toggled()
     Notifier.notify(
       message: newValue
-        ? NSLocalizedString("Alphanumerical Input Mode", comment: "") + "\n" + status
-        : NSLocalizedString("Chinese Input Mode", comment: "") + "\n" + status
+        ? "Alphanumerical Input Mode".i18n + "\n" + status
+        : "Chinese Input Mode".i18n + "\n" + status
     )
     if var cplk = ui?.capsLockToggler {
       if prefs.shiftEisuToggleOffTogetherWithCapsLock, oldValue, !newValue,

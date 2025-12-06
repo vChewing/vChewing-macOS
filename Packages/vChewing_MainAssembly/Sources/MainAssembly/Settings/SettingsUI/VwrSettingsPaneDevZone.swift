@@ -23,7 +23,7 @@ public struct VwrSettingsPaneDevZone: View {
           header: Text(
             "Warning: This page is for testing future features. \nFeatures listed here may not work as expected."
           ),
-          footer: Text("Some previous options are moved to other tabs.".localized)
+          footer: Text("Some previous options are moved to other tabs.".i18n)
             .settingsDescription()
         ) {
           UserDef.kSecurityHardenedCompositionBuffer

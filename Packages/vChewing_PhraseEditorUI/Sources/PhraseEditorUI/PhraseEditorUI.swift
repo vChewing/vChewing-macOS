@@ -167,7 +167,7 @@ public struct VwrPhraseEditorUI: View {
           Button("?") {
             guard let window = window else { return }
             window.callAlert(
-              title: "You may follow:".localized,
+              title: "You may follow:".i18n,
               text: PETerms.TooltipTexts.sampleDictionaryContent(for: selUserDataType)
             )
           }.disabled(window == nil)
@@ -191,10 +191,7 @@ public struct VwrPhraseEditorUI: View {
     }.onDisappear {
       selInputMode = .imeModeNULL
       selUserDataType = .thePhrases
-      txtContent = NSLocalizedString(
-        "Please select Simplified / Traditional Chinese mode above.",
-        comment: ""
-      )
+      txtContent = "Please select Simplified / Traditional Chinese mode above.".i18n
       isLoading = true
       Self.txtContentStorage = ""
     }.onAppear {
@@ -208,7 +205,7 @@ public struct VwrPhraseEditorUI: View {
     guard let delegate = delegate else { return }
     updateLabels()
     clearAllFields()
-    txtContent = NSLocalizedString("Loading…", comment: "")
+    txtContent = "Loading…".i18n
     isLoading = true
     asyncOnMain {
       txtContent = delegate.retrieveData(mode: selInputMode, type: selUserDataType)
@@ -219,9 +216,7 @@ public struct VwrPhraseEditorUI: View {
 
   // MARK: Internal
 
-  static var txtContentStorage: String = NSLocalizedString(
-    "Please select Simplified / Traditional Chinese mode above.", comment: ""
-  )
+  static var txtContentStorage: String = "Please select Simplified / Traditional Chinese mode above.".i18n
 
   @State
   var lblAddPhraseTag1 = PETerms.AddPhrases.locPhrase.localized.0
@@ -331,7 +326,7 @@ public struct VwrPhraseEditorUI: View {
   private func saveAndReload() {
     guard let delegate = delegate, selInputMode != .imeModeNULL else { return }
     let toSave = txtContent
-    txtContent = NSLocalizedString("Loading…", comment: "")
+    txtContent = "Loading…".i18n
     isLoading = true
     let newResult = delegate.saveData(mode: selInputMode, type: selUserDataType, data: toSave)
     txtContent = newResult
@@ -383,7 +378,7 @@ public enum PETerms {
       if self == .locAdd {
         return loc.prefix(2) == "zh" ? ("添入", "") : loc.prefix(2) == "ja" ? ("記入", "") : ("Add", "")
       }
-      let rawArray = NSLocalizedString(rawValue, comment: "").components(separatedBy: " ")
+      let rawArray = rawValue.i18n.components(separatedBy: " ")
       if rawArray.isEmpty { return ("N/A", "N/A") }
       let val1: String = rawArray[0]
       let val2: String = (rawArray.count >= 2) ? rawArray[1] : ""
@@ -397,7 +392,7 @@ public enum PETerms {
 
     // MARK: Public
 
-    public var localized: String { rawValue.localized }
+    public var localized: String { rawValue.i18n }
 
     public static func sampleDictionaryContent(
       for type: LMAssembly
@@ -409,14 +404,14 @@ public enum PETerms {
       case .thePhrases:
         result =
           "Example:\nCandidate Reading-Reading Weight #Comment\nCandidate Reading-Reading #Comment"
-            .localized + "\n\n"
+            .i18n + "\n\n"
             + weightInputBox.localized
-      case .theFilter: result = "Example:\nCandidate Reading-Reading #Comment".localized
-      case .theReplacements: result = "Example:\nOldPhrase NewPhrase #Comment".localized
+      case .theFilter: result = "Example:\nCandidate Reading-Reading #Comment".i18n
+      case .theReplacements: result = "Example:\nOldPhrase NewPhrase #Comment".i18n
       case .theAssociates:
         result = "Example:\nInitial RestPhrase\nInitial RestPhrase1 RestPhrase2 RestPhrase3..."
-          .localized
-      case .theSymbols: result = "Example:\nCandidate Reading-Reading #Comment".localized
+          .i18n
+      case .theSymbols: result = "Example:\nCandidate Reading-Reading #Comment".i18n
       }
       return result
     }

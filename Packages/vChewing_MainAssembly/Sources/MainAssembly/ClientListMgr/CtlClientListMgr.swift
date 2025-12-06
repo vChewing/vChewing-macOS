@@ -67,7 +67,7 @@ public final class CtlClientListMgr: NSWindowController {
       }
       sharedWindow.setPosition(vertical: .center, horizontal: .right, padding: 20)
       sharedWindow.orderFrontRegardless() // 逼著視窗往最前方顯示
-      sharedWindow.title = "Client Manager".localized
+      sharedWindow.title = "Client Manager".i18n
       sharedWindow.level = .statusBar
       if #available(macOS 10.10, *) {
         sharedWindow.titlebarAppearsTransparent = true

@@ -64,12 +64,12 @@ public final class InputSession: SessionProtocol {
   public private(set) lazy var sharedAlertForInputModeToggling: NSAlert = {
     let alert = NSAlert()
     alert.alertStyle = .informational
-    alert.messageText = "Target Input Mode Activation Required".localized
+    alert.messageText = "Target Input Mode Activation Required".i18n
     alert
       .informativeText =
       "You are proceeding to System Preferences to enable the Input Source which corresponds to the input mode you are going to switch to."
-        .localized
-    alert.addButton(withTitle: "OK".localized)
+        .i18n
+    alert.addButton(withTitle: "OK".i18n)
     return alert
   }()
 

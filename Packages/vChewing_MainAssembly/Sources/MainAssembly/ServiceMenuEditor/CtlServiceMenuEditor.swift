@@ -69,7 +69,7 @@ public final class CtlServiceMenuEditor: NSWindowController {
       }
       sharedWindow.setPosition(vertical: .center, horizontal: .right, padding: 20)
       sharedWindow.orderFrontRegardless() // 逼著視窗往最前方顯示
-      sharedWindow.title = "Service Menu Editor".localized
+      sharedWindow.title = "Service Menu Editor".i18n
       sharedWindow.level = .statusBar
       if #available(macOS 10.10, *) {
         sharedWindow.titlebarAppearsTransparent = true

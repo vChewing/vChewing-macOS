@@ -25,7 +25,8 @@ public enum LMAssembly {
     // MARK: Public
 
     public var id: String { rawValue }
-    public var localizedDescription: String { NSLocalizedString(rawValue, comment: "") }
+
+    public var localizedDescription: String { rawValue.i18n }
   }
 
   public static let fileHandleQueue: DispatchQueue = {
