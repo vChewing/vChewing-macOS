@@ -168,7 +168,7 @@
 "Example:\nCandidate Reading-Reading #Comment" = "【範例】\n候選字詞 讀音-讀音 #註解";
 "Example:\nCandidate Reading-Reading Weight #Comment\nCandidate Reading-Reading #Comment" = "【範例】\n候選字詞 讀音-讀音 權重 #註解\n候選字詞 讀音-讀音 #註解";
 "Example:\nInitial RestPhrase\nInitial RestPhrase1 RestPhrase2 RestPhrase3..." = "【範例】\n首字 候選\n首字 候選1 候選2 候選3...";
-"Example:\nOldPhrase NewPhrase #Comment" =  "【範例】\n要替換的詞 替換成的詞 #註解";
+"Example:\nOldPhrase NewPhrase #Comment" = "【範例】\n要替換的詞 替換成的詞 #註解";
 "Experience" = "體驗設定";
 "Experimental:" = "實驗性:";
 "Factory dictionary not loaded yet." = "原廠辭典尚未完成載入。";
@@ -222,7 +222,7 @@
 "i18n:settings.importFromKimoTxt.finishedCount:%@" = "匯入了 %@ 筆新記錄。";
 "i18n:settings.importFromKimoTxt.label" = "匯入奇摩輸入法自訂詞資料庫";
 "i18n:settings.shiftKeyASCIITogle.description" = "該功能只需要對藉由 macOS 內建的輸入法框架傳來的 NSEvent 做上下文分析，自然沒有「向使用者尋求系統全局鍵盤事件監聽權限」之必要。您可自行審視敝輸入法的原始程式碼倉庫、或對敝輸入法逆向工程，以自行證實此處所言之真假。另註：這個 Shift 鍵切換開關在 CapsLock 燈亮時無效。";
-"i18n:userdef.kAlwaysUsePCBWithElectronBasedClients.description" = "基於 Electron 技術構建的客體往往臭名昭彰於各自的對 IMKTextInput API 的「行為難以預測、難以保證」的實作上。更糟糕的是，這類 App 的開發者們均有著各自的不可控的原因、而難以保證他們的 App 的這種問題能被及時地、妥當地解決。這也是為什麼這個開關在預設情況下處於開啟狀態。";
+"i18n:UserDef.kAlwaysUsePCBWithElectronBasedClients.description" = "基於 Electron 技術構建的客體往往臭名昭彰於各自的對 IMKTextInput API 的「行為難以預測、難以保證」的實作上。更糟糕的是，這類 App 的開發者們均有著各自的不可控的原因、而難以保證他們的 App 的這種問題能被及時地、妥當地解決。這也是為什麼這個開關在預設情況下處於開啟狀態。";
 "i18n:UserDef.kAlwaysUsePCBWithElectronBasedClients.shortTitle" = "對基於 Electron 技術構建的客體軟體一律強制啟用浮動組字窗";
 "i18n:UserDef.kBeepSoundPreference.option.0" = "靜音";
 "i18n:UserDef.kBeepSoundPreference.option.1" = "使用系統音效";
@@ -235,7 +235,7 @@
 "i18n:UserDef.kCandidateNarrationToggleType.option.alwaysOn" = "總是開啟";
 "i18n:UserDef.kCandidateNarrationToggleType.option.onlyWhenVoiceOverIsOn" = "僅在 VoiceOver 開啟時";
 "i18n:UserDef.kCandidateNarrationToggleType.shortTitle" = "候選字詞唸讀模式:";
-"i18n:userdef.kCheckAbusersOfSecureEventInputAPI.description" = "這種濫用會導致系統內的所有第三方輸入法全都無法正常使用（在輸入法選單內會變成灰色）。針對需要填寫敏感資料的場合，使用 SecureEventInput 無可厚非。但是，用 EnableSecureEventInput() 開啟該模式之後，就有義務在輸入窗格失焦的那一刻呼叫 DisableSecureEventInput() 來結束這種狀態。這種狀態還常見於後檯輔助 App 當中、或者某個 App 在叫出該模式之後失去回應（這樣的話，哪怕被切換到後檯，SecureEventInput 也不會自動解除）。";
+"i18n:UserDef.kCheckAbusersOfSecureEventInputAPI.description" = "這種濫用會導致系統內的所有第三方輸入法全都無法正常使用（在輸入法選單內會變成灰色）。針對需要填寫敏感資料的場合，使用 SecureEventInput 無可厚非。但是，用 EnableSecureEventInput() 開啟該模式之後，就有義務在輸入窗格失焦的那一刻呼叫 DisableSecureEventInput() 來結束這種狀態。這種狀態還常見於後檯輔助 App 當中、或者某個 App 在叫出該模式之後失去回應（這樣的話，哪怕被切換到後檯，SecureEventInput 也不會自動解除）。";
 "i18n:UserDef.kCheckAbusersOfSecureEventInputAPI.shortTitle" = "主動偵測正在濫用 SecureEventInput API 的後檯執行緒";
 "i18n:UserDef.kCNS11643Enabled.shortTitle" = "啟用 CNS11643 全字庫支援 (2025-11-10)";
 "i18n:UserDef.kCursorPlacementAfterSelectingCandidate.description" = "此設定用來指定候選字在選字窗內被確認後，游標應該位於何處。請注意，「呼出選字窗之前的游標位置」指的是選字窗出現前所記錄的游標位置。如果選擇向前推進一格，實際推進的距離會因您偏好的選字游標操作樣式而有所不同。";
@@ -248,7 +248,7 @@
 "i18n:UserDef.kInlineDumpPinyinInLieuOfZhuyin.description" = "藉由 Command+Option+Ctrl+Enter 輸出的內容受對應的行為設定所影響。";
 "i18n:UserDef.kMinCellWidthForHorizontalMatrix.option.0" = "兩個漢字";
 "i18n:UserDef.kMinCellWidthForHorizontalMatrix.option.1" = "兩個繪文字（更寬）";
-"i18n:userdef.kMinCellWidthForHorizontalMatrix.shortTitle" = "橫向多列選字窗最低單元寬度:";
+"i18n:UserDef.kMinCellWidthForHorizontalMatrix.shortTitle" = "橫向多列選字窗最低單元寬度:";
 "i18n:UserDef.kNumPadCharInputBehavior.description" = "指定數字小鍵盤的輸入行為。";
 "i18n:UserDef.kNumPadCharInputBehavior.option.0" = "始終以半形文字直接遞交";
 "i18n:UserDef.kNumPadCharInputBehavior.option.1" = "始終以全形文字直接遞交";
@@ -264,8 +264,8 @@
 "i18n:UserDef.kReadingNarrationCoverage.shortTitle" = "要唸讀的組音區內容";
 "i18n:UserDef.kReducePOMLifetimeToNoMoreThan12Hours.description" = "啟用後，漸退記憶模組的遺忘週期將從約一週降低至 12 小時內，更快地清除不常用的記憶記錄。";
 "i18n:UserDef.kReducePOMLifetimeToNoMoreThan12Hours.shortTitle" = "啟用急速遺忘模式";
-"i18n:userdef.kRespectClientAccentColor.description" = "這會使田所選字窗的高亮候選字詞背景色優先改用當前接收文字輸入的客體應用的強調主題色，與 macOS 內建輸入法的行為一致。如果當前接收文字輸入的客體應用沒有專門指定強調主題色（或者系統主題色被設定為非預設值）的話，則會自動改用系統偏好設定內的系統全局強調主題色。注意：該特性在啟用了 JIS / 康熙文字轉換模式時不會生效。";
-"i18n:userdef.kRespectClientAccentColor.shortTitle" = "遵循客體應用或系統全局的強調色偏好設定";
+"i18n:UserDef.kRespectClientAccentColor.description" = "這會使田所選字窗的高亮候選字詞背景色優先改用當前接收文字輸入的客體應用的強調主題色，與 macOS 內建輸入法的行為一致。如果當前接收文字輸入的客體應用沒有專門指定強調主題色（或者系統主題色被設定為非預設值）的話，則會自動改用系統偏好設定內的系統全局強調主題色。注意：該特性在啟用了 JIS / 康熙文字轉換模式時不會生效。";
+"i18n:UserDef.kRespectClientAccentColor.shortTitle" = "遵循客體應用或系統全局的強調色偏好設定";
 "i18n:UserDef.kRomanNumeralOutputFormat.description" = "羅馬數字輸入模式可以在敲 [Opt]+[符號選單鍵] 切換輸入方式時啟用，支援 [1, 3999] 閉區間內的整數。輸入成功或失敗後，該模式會自動關閉。";
 "i18n:UserDef.kRomanNumeralOutputFormat.option.0" = "ASCII 大寫";
 "i18n:UserDef.kRomanNumeralOutputFormat.option.1" = "ASCII 小寫";
