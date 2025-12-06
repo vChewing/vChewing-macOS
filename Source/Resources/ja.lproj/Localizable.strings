@@ -261,6 +261,8 @@
 "i18n:UserDef.kReadingNarrationCoverage.option.nothing" = "朗読せずに";
 "i18n:UserDef.kReadingNarrationCoverage.option.realtime" = "いずれの変化が起きたときに";
 "i18n:UserDef.kReadingNarrationCoverage.shortTitle" = "音読組立の朗読";
+"i18n:UserDef.kReducePOMLifetimeToNoMoreThan12Hours.description" = "有効にすると、臨時記憶モジュールの忘却サイクルが約1週間から12時間以内に短縮され、使用頻度の低いメモリレコードがより迅速にクリアされます。";
+"i18n:UserDef.kReducePOMLifetimeToNoMoreThan12Hours.shortTitle" = "急速忘却モードを有効にする";
 "i18n:userdef.kRespectClientAccentColor.description" = "これで田所候補陳列ウィンドウの「選択中の候補の背景色」を「今が文字入力を受けている客体アプリのアクセントカラー」と一致することになる。もしその客体アプリ自体のアクセントカラーが未指定であり、あるいはシステムのアクセントカラーがデフォルト値ではないのなら、システム設定でのアクセントカラーに準ず。１つ例外状況：JIS / 康熙字体変換モードがONの場合、このチェックは効かぬ。";
 "i18n:userdef.kRespectClientAccentColor.shortTitle" = "客体アプリ・システムのアクセントカラーに準ず";
 "i18n:UserDef.kRomanNumeralOutputFormat.description" = "ローマ数字打込モードは [Opt]+[符号メニューキー] を使用中に打込方式を切り替えるときに有効にすることができ、[1, 3999] の閉区間内の整数をサポートしています。出力が成功したか失敗したかにかかわらず、このモードは自動的にオフになります。";

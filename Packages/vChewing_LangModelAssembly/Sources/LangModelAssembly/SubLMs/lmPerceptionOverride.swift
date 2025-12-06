@@ -6,10 +6,9 @@
 // marks, or product names of Contributor, except as required to fulfill notice
 // requirements defined in MIT License.
 
-// POM 已徹底重寫，使用與 Lukhnos Liu 和 MJHsieh 完全不同的方法。
-
 import Foundation
 import Megrez
+import Shared
 import SwiftExtension
 
 // MARK: - LMAssembly.OverrideSuggestion
@@ -36,21 +35,30 @@ extension LMAssembly {
 // MARK: - LMAssembly.LMPerceptionOverride
 
 extension LMAssembly {
+  /// 漸退記憶模組，用來學習使用者的打字行為偏好、且在之後的打字過程中給出建議。
+  ///
+  /// POM 使用野獸常數作為衰減曲線。
+  /// 預設整個生存週期是八天，但可以藉由偏好設定銳減至 12 小時內。
   public final class LMPerceptionOverride {
     // MARK: Lifecycle
 
     public init(
       capacity: Int = 500,
       thresholdProvider: (() -> Double)? = nil,
-      dataURL: URL? = nil
+      dataURL: URL? = nil,
+      prefMgr: PrefMgr? = nil
     ) {
-      self.mutCapacity = max(capacity, 1) // Ensures that this integer value is always > 0.
+      self.mutCapacity = max(capacity, 1) // 該參數得始終大於 0.
       self.thresholdProvider = thresholdProvider
       self.fileSaveLocationURL = dataURL
       self.previouslySavedHash = ""
+      self.prefs = prefMgr ?? PrefMgr()
     }
 
     // MARK: Public
+
+    /// PrefMgr 副本
+    public var prefs: PrefMgr
 
     public func setCapacity(_ capacity: Int) {
       lock.withLock {
@@ -60,9 +68,10 @@ extension LMAssembly {
 
     // MARK: Internal
 
-    // 修改常數以讓測試能通過
-    static let kDecayThreshold: Double = -13.0 // 權重最低閾值
-    static let kWeightMultiplier: Double = .getBeastConstantUsingTadokoroFormula() // 權重計算乘數
+    /// 權重最低閾值。
+    static let kDecayThreshold: Double = -9.5
+    /// 權重計算乘數
+    static let kWeightMultiplier: Double = .getBeastConstantUsingTadokoroFormula()
 
     var mutCapacity: Int
     var thresholdProvider: (() -> Double)?
@@ -1013,17 +1022,18 @@ extension LMAssembly.LMPerceptionOverride {
     // 2) 頻率因子（次線性）：freqFactor = 0.5*sqrt(prob) + 0.5*(log1p(count)/log(10))，上限 1
     // 3) 分數：score = -0.114514 * (freqFactor * ageFactor)
 
-    // 調整有效視窗 T，單字略快、單讀音單漢字再快一些（避免單字長期壓制）
-    var T = 8.0
-    if isUnigram { T *= 0.85 }
-    if isSingleCharUnigram { T *= 0.8 }
+    // 調整有效視窗 wT，單字略快、單讀音單漢字再快一些（避免單字長期壓制）
+    // 根據偏好設定決定基礎時間窗 wT：如果啟用急速遺忘模式，則從約一週降低至 12 小時內
+    var wT = prefs.reducePOMLifetimeToNoMoreThan12Hours ? 0.5 : 8.0
+    if isUnigram { wT *= 0.85 }
+    if isSingleCharUnigram { wT *= 0.8 }
 
-    // 超過視窗即淘汰
-    if daysDiff >= T { return threshold - 0.001 }
+    // 超過或抵達視窗即淘汰
+    if daysDiff >= wT { return threshold - 0.001 }
 
     // 年齡因子（非半衰）：線性核 + 指數 pAge（pAge>1 時較快衰減）
     let pAge = 2.0
-    let ageNorm = max(0.0, 1.0 - (daysDiff / T))
+    let ageNorm = max(0.0, 1.0 - (daysDiff / wT))
     let ageFactor = pow(ageNorm, pAge)
 
     // 頻率因子：概率取平方根（次線性），疊加對事件數的對數增益，並截頂至 1

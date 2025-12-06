@@ -262,6 +262,8 @@
 "i18n:UserDef.kReadingNarrationCoverage.option.nothing" = "Do not narrate";
 "i18n:UserDef.kReadingNarrationCoverage.option.realtime" = "All changes in reading composer";
 "i18n:UserDef.kReadingNarrationCoverage.shortTitle" = "Reading composer contents to narrate";
+"i18n:UserDef.kReducePOMLifetimeToNoMoreThan12Hours.description" = "When enabled, the perception override model's forgetting cycle will be reduced from approximately one week to within 12 hours, clearing infrequently used memory records more quickly.";
+"i18n:UserDef.kReducePOMLifetimeToNoMoreThan12Hours.shortTitle" = "Enable rapid forgetting mode";
 "i18n:userdef.kRespectClientAccentColor.description" = "This will force the highlighted candidate background color to follow the accent color of the current client app, behaving like what macOS built-in input methods do. If it doesn't have one (or the system accent color is set with a non-default value), then the system accent color will be used instead. Note that this won't be effective if either JIS or KangXi conversion mode is enabled.";
 "i18n:userdef.kRespectClientAccentColor.shortTitle" = "Respect accent colors of the client app and the system";
 "i18n:UserDef.kRomanNumeralOutputFormat.description" = "Roman Numeral Input Mode can be switched to while using [Opt]+[Symbol Menu Key] to revolve the current typing method, supporting integers in the closed range of [1, 3999]. After a successful or failed input, this mode will be automatically switched off.";
