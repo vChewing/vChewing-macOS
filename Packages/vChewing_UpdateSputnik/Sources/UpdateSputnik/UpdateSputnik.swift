@@ -91,7 +91,7 @@ public final class UpdateSputnik {
     guard let plist = plist else {
       asyncOnMain { [weak self] in
         guard let this = self else { return }
-        this.showError(message: NSLocalizedString("i18n:Validation.plistIsNil", comment: ""))
+        this.showError(message: "i18n:Validation.plistIsNil".localized)
         this.currentTask = nil
       }
       return
@@ -104,9 +104,7 @@ public final class UpdateSputnik {
     else {
       asyncOnMain { [weak self] in
         guard let this = self else { return }
-        this.showError(message: NSLocalizedString("i18n:Validation.plistCannotBeParsed",
-          comment: ""
-        ))
+        this.showError(message: "i18n:Validation.plistCannotBeParsed".localized)
         this.currentTask = nil
       }
       return
@@ -124,20 +122,16 @@ public final class UpdateSputnik {
       guard isCurrentCheckForced else { return }
       if intRemoteVersion == intCurrentVersion, crossDistroNotification { break versionCheck }
       let alert = NSAlert()
-      alert.messageText = NSLocalizedString("i18n:Update.checkCompleted", comment: "")
-      alert.informativeText = NSLocalizedString("i18n:Update.alreadyLatestVersion",
-        comment: ""
-      )
-      alert.addButton(withTitle: NSLocalizedString("i18n:Common.ok", comment: ""))
+      alert.messageText = "i18n:Update.checkCompleted".localized
+      alert.informativeText = "i18n:Update.alreadyLatestVersion".localized
+      alert.addButton(withTitle: "i18n:Common.ok".localized)
       alert.runModal()
       NSApp.popup()
       return
     }
 
     var content = String(
-      format: NSLocalizedString("i18n:Update.newVersionAvailableDetails:%@:%@:%@:%@",
-        comment: ""
-      ),
+      format: "i18n:Update.newVersionAvailableDetails:%@:%@:%@:%@".localized,
       strCurrentVersionShortened,
       intCurrentVersion.description,
       strRemoteVersionShortened,
@@ -146,18 +140,16 @@ public final class UpdateSputnik {
     if crossDistroNotification {
       content.append("\n\n")
       content.append(
-        NSLocalizedString("i18n:Update.aquaToMainstreamUpgrade",
-          comment: ""
-        )
+        "i18n:Update.aquaToMainstreamUpgrade".localized
       )
     }
     let alert = NSAlert()
     alert.informativeText = content
-    alert.messageText = NSLocalizedString("i18n:Update.newVersionAvailable", comment: "")
-    let strVisitWebsite = NSLocalizedString("i18n:Action.visitWebsite", comment: "")
+    alert.messageText = "i18n:Update.newVersionAvailable".localized
+    let strVisitWebsite = "i18n:Action.visitWebsite".localized
     alert.addButton(withTitle: "\(strVisitWebsite) (Gitee)")
     alert.addButton(withTitle: "\(strVisitWebsite) (GitHub)")
-    alert.addButton(withTitle: NSLocalizedString("i18n:Common.notNow", comment: ""))
+    alert.addButton(withTitle: "i18n:Common.notNow".localized)
 
     guard let siteInfoURLString = plist["\(kUpdateInfoPageURLKey)"] as? String,
           let siteURL = URL(string: siteInfoURLString),
@@ -224,9 +216,9 @@ public final class UpdateSputnik {
     if !isCurrentCheckForced { return }
     let alert = NSAlert()
     let content = message
-    alert.messageText = NSLocalizedString("i18n:Update.checkFailed", comment: "")
+    alert.messageText = "i18n:Update.checkFailed".localized
     alert.informativeText = content
-    alert.addButton(withTitle: NSLocalizedString("i18n:Common.ok", comment: ""))
+    alert.addButton(withTitle: "i18n:Common.ok".localized)
     alert.runModal()
     NSApp.popup()
   }

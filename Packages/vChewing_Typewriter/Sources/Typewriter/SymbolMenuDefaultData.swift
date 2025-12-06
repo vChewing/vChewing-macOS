@@ -46,34 +46,34 @@ extension CandidateNode {
 
   // MARK: - Static data.
 
-  static let catCommonSymbols = NSLocalizedString("i18n:Category.commonSymbols", comment: "")
-  static let catHoriBrackets = NSLocalizedString("i18n:Category.horiBrackets", comment: "")
-  static let catVertBrackets = NSLocalizedString("i18n:Category.vertBrackets", comment: "")
-  static let catAlphabets = NSLocalizedString("i18n:Category.alphabets", comment: "")
-  static let catRadicals = NSLocalizedString("i18n:Category.radicals", comment: "")
-  static let catSpecialNumbers = NSLocalizedString("i18n:Category.specialNumbers", comment: "")
-  static let catMathSymbols = NSLocalizedString("i18n:Category.mathSymbols", comment: "")
-  static let catCurrencyUnits = NSLocalizedString("i18n:Category.currencyUnits", comment: "")
-  static let catSpecialSymbols = NSLocalizedString("i18n:Category.specialSymbols", comment: "")
-  static let catUnicodeSymbols = NSLocalizedString("i18n:Category.unicodeSymbols", comment: "")
-  static let catCircledKanjis = NSLocalizedString("i18n:Category.circledKanjis", comment: "")
-  static let catCircledKataKana = NSLocalizedString("i18n:Category.circledKataKana", comment: "")
-  static let catBracketKanjis = NSLocalizedString("i18n:Category.bracketKanjis", comment: "")
-  static let catSingleTableLines = NSLocalizedString("i18n:Category.singleTableLines", comment: "")
-  static let catDoubleTableLines = NSLocalizedString("i18n:Category.doubleTableLines", comment: "")
-  static let catFillingBlocks = NSLocalizedString("i18n:Category.fillingBlocks", comment: "")
-  static let catLineSegments = NSLocalizedString("i18n:Category.lineSegments", comment: "")
-  static let catKana = NSLocalizedString("i18n:Category.kana", comment: "")
-  static let catCombinations = NSLocalizedString("i18n:Category.combinations", comment: "")
-  static let catPhonabets = NSLocalizedString("i18n:Category.phonabets", comment: "")
-  static let catCircledASCII = NSLocalizedString("i18n:Category.circledAscii", comment: "")
-  static let catBracketedASCII = NSLocalizedString("i18n:Category.bracketedAscii", comment: "")
-  static let catMusicSymbols = NSLocalizedString("i18n:Category.musicSymbols", comment: "")
-  static let catThai = NSLocalizedString("i18n:Category.thai", comment: "")
-  static let catYi = NSLocalizedString("i18n:Category.yi", comment: "")
+  static let catCommonSymbols = "i18n:Category.commonSymbols".localized
+  static let catHoriBrackets = "i18n:Category.horiBrackets".localized
+  static let catVertBrackets = "i18n:Category.vertBrackets".localized
+  static let catAlphabets = "i18n:Category.alphabets".localized
+  static let catRadicals = "i18n:Category.radicals".localized
+  static let catSpecialNumbers = "i18n:Category.specialNumbers".localized
+  static let catMathSymbols = "i18n:Category.mathSymbols".localized
+  static let catCurrencyUnits = "i18n:Category.currencyUnits".localized
+  static let catSpecialSymbols = "i18n:Category.specialSymbols".localized
+  static let catUnicodeSymbols = "i18n:Category.unicodeSymbols".localized
+  static let catCircledKanjis = "i18n:Category.circledKanjis".localized
+  static let catCircledKataKana = "i18n:Category.circledKataKana".localized
+  static let catBracketKanjis = "i18n:Category.bracketKanjis".localized
+  static let catSingleTableLines = "i18n:Category.singleTableLines".localized
+  static let catDoubleTableLines = "i18n:Category.doubleTableLines".localized
+  static let catFillingBlocks = "i18n:Category.fillingBlocks".localized
+  static let catLineSegments = "i18n:Category.lineSegments".localized
+  static let catKana = "i18n:Category.kana".localized
+  static let catCombinations = "i18n:Category.combinations".localized
+  static let catPhonabets = "i18n:Category.phonabets".localized
+  static let catCircledASCII = "i18n:Category.circledAscii".localized
+  static let catBracketedASCII = "i18n:Category.bracketedAscii".localized
+  static let catMusicSymbols = "i18n:Category.musicSymbols".localized
+  static let catThai = "i18n:Category.thai".localized
+  static let catYi = "i18n:Category.yi".localized
 
   static func strCountStrokes(_ count: Int) -> String {
-    String(format: NSLocalizedString("i18n:General.stroke:%@", comment: ""), count.kanji)
+    String(format: "i18n:General.stroke:%@".localized, count.kanji)
   }
 
   private static let defaultSymbolRoot: CandidateNode = .init(

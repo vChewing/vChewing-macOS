@@ -74,7 +74,7 @@ import SwiftExtension
       let alert = NSAlert()
       alert.messageText = title
       if let text = text { alert.informativeText = text }
-      alert.addButton(withTitle: NSLocalizedString("i18n:Common.ok", comment: ""))
+      alert.addButton(withTitle: "i18n:Common.ok".localized)
       var result: NSApplication.ModalResponse = .alertFirstButtonReturn
       guard let this = self else { return alert.runModal() }
       alert.beginSheetModal(for: this) { theResponce in

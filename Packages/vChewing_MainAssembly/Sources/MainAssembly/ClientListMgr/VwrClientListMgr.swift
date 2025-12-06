@@ -229,14 +229,11 @@ extension VwrClientListMgr {
   func btnAddClientClicked(_: Any) {
     guard let window = CtlClientListMgr.shared?.window else { return }
     let alert = NSAlert()
-    alert.messageText = NSLocalizedString("i18n:Instruction.enterClientBundleIdentifier", comment: ""
-    )
-    alert.informativeText = NSLocalizedString("i18n:Editor.oneRecordPerLine",
-      comment: ""
-    )
-    alert.addButton(withTitle: NSLocalizedString("i18n:Common.ok", comment: ""))
-    alert.addButton(withTitle: NSLocalizedString("i18n:Common.justSelect", comment: "") + "…")
-    alert.addButton(withTitle: NSLocalizedString("i18n:Common.cancel", comment: ""))
+    alert.messageText = "i18n:Instruction.enterClientBundleIdentifier".localized
+    alert.informativeText = "i18n:Editor.oneRecordPerLine".localized
+    alert.addButton(withTitle: "i18n:Common.ok".localized)
+    alert.addButton(withTitle: "i18n:Common.justSelect".localized + "…")
+    alert.addButton(withTitle: "i18n:Common.cancel".localized)
 
     let maxFloat = Double(Float.greatestFiniteMagnitude)
     let scrollview = NSScrollView(frame: CGRect(x: 0, y: 0, width: 370, height: 200))
@@ -293,8 +290,7 @@ extension VwrClientListMgr {
           break resultCheck
         }
         let dlgOpenPath = NSOpenPanel()
-        dlgOpenPath.title = NSLocalizedString("i18n:Instruction.chooseTargetAppBundle", comment: ""
-        )
+        dlgOpenPath.title = "i18n:Instruction.chooseTargetAppBundle".localized
         dlgOpenPath.showsResizeIndicator = true
         dlgOpenPath.allowsMultipleSelection = true
         if #available(macOS 11.0, *) {
@@ -310,10 +306,8 @@ extension VwrClientListMgr {
           switch result {
           case .OK:
             for url in dlgOpenPath.urls {
-              let title = NSLocalizedString("i18n:Validation.selectedItemNotValidAppBundle",
-                comment: ""
-              )
-              let text = url.path + "\n\n" + NSLocalizedString("i18n:Instruction.tryAgain", comment: "")
+              let title = "i18n:Validation.selectedItemNotValidAppBundle".localized
+              let text = url.path + "\n\n" + "i18n:Instruction.tryAgain".localized
               guard let bundle = Bundle(url: url) else {
                 CtlClientListMgr.shared?.window.callAlert(title: title, text: text)
                 return

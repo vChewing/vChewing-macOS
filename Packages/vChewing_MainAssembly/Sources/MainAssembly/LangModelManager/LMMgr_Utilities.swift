@@ -302,9 +302,9 @@ extension LMMgr {
       )
       asyncOnMain {
         let alert = NSAlert()
-        alert.messageText = NSLocalizedString("i18n:Validation.unableToCreateUserPhraseFile", comment: "")
+        alert.messageText = "i18n:Validation.unableToCreateUserPhraseFile".localized
         alert.informativeText = content
-        alert.addButton(withTitle: NSLocalizedString("i18n:Common.ok", comment: ""))
+        alert.addButton(withTitle: "i18n:Common.ok".localized)
         alert.runModal()
         NSApp.popup()
       }

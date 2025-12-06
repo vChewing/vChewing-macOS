@@ -203,9 +203,7 @@ extension SettingsPanesCocoa {
         return
       }
       let dlgOpenFile = NSOpenPanel()
-      dlgOpenFile.title = NSLocalizedString(
-        "i18n:settings.importFromKimoTxt.label", comment: ""
-      ) + ":"
+      dlgOpenFile.title = "i18n:settings.importFromKimoTxt.label".localized + ":"
       dlgOpenFile.showsResizeIndicator = true
       dlgOpenFile.showsHiddenFiles = true
       dlgOpenFile.canChooseFiles = true
@@ -285,8 +283,7 @@ extension SettingsPanesCocoa.Dictionary: NSPathControlDelegate {
       return
     }
     let dlgOpenPath = NSOpenPanel()
-    dlgOpenPath.title = NSLocalizedString("i18n:Instruction.chooseUserDataFolder", comment: ""
-    )
+    dlgOpenPath.title = "i18n:Instruction.chooseUserDataFolder".localized
     dlgOpenPath.showsResizeIndicator = true
     dlgOpenPath.showsHiddenFiles = true
     dlgOpenPath.canChooseFiles = false

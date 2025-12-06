@@ -191,9 +191,7 @@ public struct VwrPhraseEditorUI: View {
     }.onDisappear {
       selInputMode = .imeModeNULL
       selUserDataType = .thePhrases
-      txtContent = NSLocalizedString("i18n:Instruction.selectChineseMode",
-        comment: ""
-      )
+      txtContent = "i18n:Instruction.selectChineseMode".localized
       isLoading = true
       Self.txtContentStorage = ""
     }.onAppear {
@@ -207,7 +205,7 @@ public struct VwrPhraseEditorUI: View {
     guard let delegate = delegate else { return }
     updateLabels()
     clearAllFields()
-    txtContent = NSLocalizedString("i18n:Loading.loading", comment: "")
+    txtContent = "i18n:Loading.loading".localized
     isLoading = true
     asyncOnMain {
       txtContent = delegate.retrieveData(mode: selInputMode, type: selUserDataType)
@@ -218,8 +216,7 @@ public struct VwrPhraseEditorUI: View {
 
   // MARK: Internal
 
-  static var txtContentStorage: String = NSLocalizedString("i18n:Instruction.selectChineseMode", comment: ""
-  )
+  static var txtContentStorage: String = "i18n:Instruction.selectChineseMode".localized
 
   @State
   var lblAddPhraseTag1 = PETerms.AddPhrases.locPhrase.localized.0
@@ -329,7 +326,7 @@ public struct VwrPhraseEditorUI: View {
   private func saveAndReload() {
     guard let delegate = delegate, selInputMode != .imeModeNULL else { return }
     let toSave = txtContent
-    txtContent = NSLocalizedString("i18n:Loading.loading", comment: "")
+    txtContent = "i18n:Loading.loading".localized
     isLoading = true
     let newResult = delegate.saveData(mode: selInputMode, type: selUserDataType, data: toSave)
     txtContent = newResult

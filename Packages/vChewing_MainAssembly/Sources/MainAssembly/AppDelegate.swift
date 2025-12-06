@@ -89,10 +89,8 @@ extension AppDelegate {
       LMMgr.relocateWreckedPOMData()
       PrefMgr.shared.failureFlagForPOMObservation = false
       let msgPackage = UNMutableNotificationContent()
-      msgPackage.title = NSLocalizedString("i18n:App.name", comment: "")
-      msgPackage.body = NSLocalizedString("i18n:Status.pomDataCleanedAfterCrash",
-        comment: ""
-      )
+      msgPackage.title = "i18n:App.name".localized
+      msgPackage.body = "i18n:Status.pomDataCleanedAfterCrash".localized
       msgPackage.sound = .defaultCritical
       UNUserNotificationCenter.current().add(
         .init(identifier: "vChewing.notification.pomCrash", content: msgPackage, trigger: nil),
@@ -134,20 +132,18 @@ extension AppDelegate {
 
   public func selfUninstall() {
     let content = String(
-      format: NSLocalizedString("i18n:Action.confirmRemoveVchewing",
-        comment: ""
-      )
+      format: "i18n:Action.confirmRemoveVchewing".localized
     )
     let alert = NSAlert()
-    alert.messageText = NSLocalizedString("i18n:Action.uninstallation", comment: "")
+    alert.messageText = "i18n:Action.uninstallation".localized
     alert.informativeText = content
-    alert.addButton(withTitle: NSLocalizedString("i18n:Common.ok", comment: ""))
+    alert.addButton(withTitle: "i18n:Common.ok".localized)
     if #available(macOS 11, *) {
       alert.buttons.forEach { button in
         button.hasDestructiveAction = true
       }
     }
-    alert.addButton(withTitle: NSLocalizedString("i18n:Common.notNow", comment: ""))
+    alert.addButton(withTitle: "i18n:Common.notNow".localized)
     let result = alert.runModal()
     NSApp.popup()
     guard result == NSApplication.ModalResponse.alertFirstButtonReturn else { return }
@@ -169,10 +165,8 @@ extension AppDelegate {
     case 1_024...:
       vCLog("WARNING: EXCESSIVE MEMORY FOOTPRINT (\(currentMemorySize)MB).")
       let msgPackage = UNMutableNotificationContent()
-      msgPackage.title = NSLocalizedString("i18n:App.name", comment: "")
-      msgPackage.body = NSLocalizedString("i18n:Status.rebootedDueToMemoryExcessiveUsage",
-        comment: ""
-      )
+      msgPackage.title = "i18n:App.name".localized
+      msgPackage.body = "i18n:Status.rebootedDueToMemoryExcessiveUsage".localized
       UNUserNotificationCenter.current().add(
         .init(
           identifier: "vChewing.notification.memoryExcessiveUsage",

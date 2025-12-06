@@ -261,14 +261,10 @@ extension VwrServiceMenuEditor {
   func btnAddServiceClicked(_: Any) {
     guard let window = windowController?.window else { return }
     let alert = NSAlert()
-    alert.messageText = NSLocalizedString(
-      "i18n:CandidateServiceMenuEditor.prompt", comment: ""
-    )
-    alert.informativeText = NSLocalizedString(
-      "i18n:CandidateServiceMenuEditor.howToGetGuide", comment: ""
-    )
-    alert.addButton(withTitle: NSLocalizedString("i18n:Common.ok", comment: ""))
-    alert.addButton(withTitle: NSLocalizedString("i18n:Common.cancel", comment: ""))
+    alert.messageText = "i18n:CandidateServiceMenuEditor.prompt".localized
+    alert.informativeText = "i18n:CandidateServiceMenuEditor.howToGetGuide".localized
+    alert.addButton(withTitle: "i18n:Common.ok".localized)
+    alert.addButton(withTitle: "i18n:Common.cancel".localized)
 
     let maxFloat = Double(Float.greatestFiniteMagnitude)
     let scrollview = NSScrollView(frame: CGRect(x: 0, y: 0, width: 512, height: 200))

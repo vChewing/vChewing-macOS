@@ -983,9 +983,7 @@ extension InputHandlerProtocol {
         return true
       } else {
         let errorMessage =
-          NSLocalizedString("i18n:Instruction.manuallyImplementSymbolsInUserFile",
-            comment: ""
-          )
+          "i18n:Instruction.manuallyImplementSymbolsInUserFile".localized
         vCLog("8EB3FB1A: " + errorMessage)
         let textToCommit = generateStateOfInputting(sansReading: true).displayedText
         session.switchState(State.ofCommitting(textToCommit: textToCommit))

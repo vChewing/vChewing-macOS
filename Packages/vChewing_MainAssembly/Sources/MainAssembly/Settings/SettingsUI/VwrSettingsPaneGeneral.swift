@@ -52,13 +52,8 @@ public struct VwrSettingsPaneGeneral: View {
         VStack(alignment: .leading) {
           Text(
             "\u{2022} "
-              + NSLocalizedString("i18n:Instruction.useMouseWheelToScroll",
-                comment: ""
-              ) + "\n\u{2022} "
-              + NSLocalizedString(
-                "i18n:Help.deleteKeyNote",
-                comment: ""
-              )
+              + "i18n:Instruction.useMouseWheelToScroll".localized + "\n\u{2022} "
+              + "i18n:Help.deleteKeyNote".localized
           )
           .settingsDescription()
           UserDef.kAppleLanguages.bind($appleLanguageTag).render()
@@ -141,17 +136,15 @@ public struct VwrSettingsPaneGeneral: View {
 
   private func onFartControlChange() {
     let content = String(
-      format: NSLocalizedString("i18n:Warning.fartSuppressorUncheck",
-        comment: ""
-      )
+      format: "i18n:Warning.fartSuppressorUncheck".localized
     )
-    let alert = NSAlert(error: NSLocalizedString("i18n:Common.warning", comment: ""))
+    let alert = NSAlert(error: "i18n:Common.warning".localized)
     alert.informativeText = content
-    alert.addButton(withTitle: NSLocalizedString("i18n:Common.uncheck", comment: ""))
+    alert.addButton(withTitle: "i18n:Common.uncheck".localized)
     alert.buttons.forEach { button in
       button.hasDestructiveAction = true
     }
-    alert.addButton(withTitle: NSLocalizedString("i18n:Instruction.leaveItChecked", comment: ""))
+    alert.addButton(withTitle: "i18n:Instruction.leaveItChecked".localized)
     if let window = CtlSettingsUI.shared?.window, !shouldNotFartInLieuOfBeep {
       shouldNotFartInLieuOfBeep = true
       alert.beginSheetModal(for: window) { result in

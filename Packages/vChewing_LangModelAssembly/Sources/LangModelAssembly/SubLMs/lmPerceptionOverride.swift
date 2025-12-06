@@ -1321,7 +1321,7 @@ struct POMError: LocalizedError {
   var rawValue: String
 
   var errorDescription: String? {
-    NSLocalizedString("i18n:General.rawValue", comment: "")
+    "i18n:General.rawValue".localized
   }
 }
 

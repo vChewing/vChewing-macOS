@@ -128,9 +128,9 @@
     public var vChewingLocalizedName: String {
       switch identifier {
       case "com.apple.keylayout.ZhuyinBopomofo":
-        return NSLocalizedString("i18n:KeyboardLayout.appleZhuyinBopomofoDachen", comment: "")
+        return "i18n:KeyboardLayout.appleZhuyinBopomofoDachen".localized
       case "com.apple.keylayout.ZhuyinEten":
-        return NSLocalizedString("i18n:KeyboardLayout.appleZhuyinEtenTraditional", comment: "")
+        return "i18n:KeyboardLayout.appleZhuyinEtenTraditional".localized
       default: return localizedName
       }
     }

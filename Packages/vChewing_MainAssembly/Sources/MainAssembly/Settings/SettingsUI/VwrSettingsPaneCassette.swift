@@ -76,14 +76,8 @@ public struct VwrSettingsPaneCassette: View {
               if cassetteEnabled, !LMMgr.checkCassettePathValidity(cassettePath) {
                 if let window = CtlSettingsUI.shared?.window {
                   IMEApp.buzz()
-                  let alert = NSAlert(error: NSLocalizedString(
-                    "i18n:LMMgr.accessFailure.cassette.title",
-                    comment: ""
-                  ))
-                  alert.informativeText = NSLocalizedString(
-                    "i18n:LMMgr.accessFailure.cassette.description",
-                    comment: ""
-                  )
+                  let alert = NSAlert(error: "i18n:LMMgr.accessFailure.cassette.title".localized)
+                  alert.informativeText = "i18n:LMMgr.accessFailure.cassette.description".localized
                   alert.beginSheetModal(for: window) { _ in
                   }
                 }

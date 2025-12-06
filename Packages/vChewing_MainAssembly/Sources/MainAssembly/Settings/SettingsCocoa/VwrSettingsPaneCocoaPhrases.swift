@@ -175,7 +175,7 @@ extension SettingsPanesCocoa.Phrases: NSTextViewDelegate, NSTextFieldDelegate {
     updateLabels()
     clearAllFields()
     isLoading = true
-    tfdPETextEditor.string = NSLocalizedString("i18n:Loading.loading", comment: "")
+    tfdPETextEditor.string = "i18n:Loading.loading".localized
     asyncOnMain { [weak self] in
       guard let this = self else { return }
       this.tfdPETextEditor.string = LMMgr.retrieveData(
@@ -239,8 +239,7 @@ extension SettingsPanesCocoa.Phrases: NSTextViewDelegate, NSTextFieldDelegate {
         return (result == "Phrase") ? "Phrases" : result
       }()
       (txtPEField3.cell as? NSTextFieldCell)?.placeholderString = ""
-      (txtPECommentField.cell as? NSTextFieldCell)?.placeholderString = NSLocalizedString("i18n:Validation.inlineCommentsNotSupportedInAssociatedPhrases", comment: ""
-      )
+      (txtPECommentField.cell as? NSTextFieldCell)?.placeholderString = "i18n:Validation.inlineCommentsNotSupportedInAssociatedPhrases".localized
     case .theSymbols:
       (txtPEField1.cell as? NSTextFieldCell)?.placeholderString = PETerminology.AddPhrases.locPhrase
         .localized.0
@@ -284,9 +283,9 @@ extension SettingsPanesCocoa.Phrases: NSTextViewDelegate, NSTextFieldDelegate {
 
     // Buttons.
     btnPEReload.title = "↻"
-    btnPEReload.toolTip = NSLocalizedString("i18n:Common.reload", comment: "")
-    btnPEConsolidate.title = NSLocalizedString("i18n:Common.consolidate", comment: "")
-    btnPESave.title = NSLocalizedString("i18n:Common.save", comment: "")
+    btnPEReload.toolTip = "i18n:Common.reload".localized
+    btnPEConsolidate.title = "i18n:Common.consolidate".localized
+    btnPESave.title = "i18n:Common.save".localized
     btnPEAdd.title = PETerminology.AddPhrases.locAdd.localized.0
     btnPEOpenExternally.title = "…"
 
@@ -387,7 +386,7 @@ extension SettingsPanesCocoa.Phrases: NSTextViewDelegate, NSTextFieldDelegate {
   func savePEButtonClicked(_: NSButton) {
     let toSave = tfdPETextEditor.string
     isLoading = true
-    tfdPETextEditor.string = NSLocalizedString("i18n:Loading.loading", comment: "")
+    tfdPETextEditor.string = "i18n:Loading.loading".localized
     let newResult = LMMgr.saveData(mode: selInputMode, type: selUserDataType, data: toSave)
     tfdPETextEditor.string = newResult
     isLoading = false

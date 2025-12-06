@@ -124,19 +124,17 @@ extension SettingsPanesCocoa {
     @IBAction
     func onFartControlChange(_: NSControl) {
       let content = String(
-        format: NSLocalizedString("i18n:Warning.fartSuppressorUncheck",
-          comment: ""
-        )
+        format: "i18n:Warning.fartSuppressorUncheck".localized
       )
-      let alert = NSAlert(error: NSLocalizedString("i18n:Common.warning", comment: ""))
+      let alert = NSAlert(error: "i18n:Common.warning".localized)
       alert.informativeText = content
-      alert.addButton(withTitle: NSLocalizedString("i18n:Common.uncheck", comment: ""))
+      alert.addButton(withTitle: "i18n:Common.uncheck".localized)
       if #available(macOS 11, *) {
         alert.buttons.forEach { button in
           button.hasDestructiveAction = true
         }
       }
-      alert.addButton(withTitle: NSLocalizedString("i18n:Instruction.leaveItChecked", comment: ""))
+      alert.addButton(withTitle: "i18n:Instruction.leaveItChecked".localized)
       let window = CtlSettingsCocoa.shared?.window
       if !PrefMgr.shared.shouldNotFartInLieuOfBeep {
         PrefMgr.shared.shouldNotFartInLieuOfBeep = true

@@ -235,9 +235,7 @@ extension IMEStateData {
       tooltipColorState = .warning
       tooltip +=
         "\n"
-        + NSLocalizedString("i18n:Status.phraseReplacementModeInterfering",
-          comment: ""
-        )
+        + "i18n:Status.phraseReplacementModeInterfering".localized
     }
   }
 }

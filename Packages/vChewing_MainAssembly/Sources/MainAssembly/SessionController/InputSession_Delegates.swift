@@ -136,7 +136,7 @@ extension SessionProtocol {
 
   public func candidateToolTip(shortened: Bool) -> String {
     if state.type == .ofAssociates {
-      return shortened ? "⇧" : NSLocalizedString("i18n:Instruction.holdShiftToChooseAssociates", comment: "")
+      return shortened ? "⇧" : "i18n:Instruction.holdShiftToChooseAssociates".localized
     } else if state.type == .ofInputting, state.isCandidateContainer {
       let useShift = inputMode.langModel.areCassetteCandidateKeysShiftHeld
       let theEmoji = useShift ? "⬆️" : "⚡️"

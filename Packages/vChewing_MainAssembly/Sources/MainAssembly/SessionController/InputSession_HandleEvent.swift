@@ -90,7 +90,7 @@ extension SessionProtocol {
           self?.resetInputHandler()
           guard this.prefs.showNotificationsWhenTogglingCapsLock else { return }
           guard !this.prefs.bypassNonAppleCapsLockHandling else { return }
-          let status = NSLocalizedString("i18n:Notification.switchRevolver", comment: "")
+          let status = "i18n:Notification.switchRevolver".localized
           Notifier.notify(
             message: isCapsLockTurnedOn
               ? "[Caps Lock ON] " + "i18n:InputMode.alphanumerical".localized + "\n" + status
@@ -121,7 +121,7 @@ extension SessionProtocol {
     if !LMMgr.isCoreDBConnected {
       if (event as InputSignalProtocol).isReservedKey { return false }
       var newState: State = .ofEmpty()
-      newState.tooltip = NSLocalizedString("i18n:Loading.factoryDictNotLoadedYet", comment: "")
+      newState.tooltip = "i18n:Loading.factoryDictNotLoadedYet".localized
       newState.tooltipDuration = 1.85
       newState.data.tooltipColorState = .redAlert
       switchState(newState)
@@ -201,8 +201,8 @@ extension SessionProtocol {
     let newValue = isASCIIMode.toggled()
     Notifier.notify(
       message: newValue
-        ? NSLocalizedString("i18n:InputMode.alphanumerical", comment: "") + "\n" + status
-        : NSLocalizedString("i18n:InputMode.chinese", comment: "") + "\n" + status
+        ? "i18n:InputMode.alphanumerical".localized + "\n" + status
+        : "i18n:InputMode.chinese".localized + "\n" + status
     )
     if var cplk = ui?.capsLockToggler {
       if prefs.shiftEisuToggleOffTogetherWithCapsLock, oldValue, !newValue,

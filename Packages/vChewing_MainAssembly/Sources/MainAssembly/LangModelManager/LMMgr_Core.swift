@@ -136,7 +136,7 @@ public final class LMMgr {
     let result = LMAssembly.LMInstantiator.connectSQLDB(dbPath: path)
     assert(result, "vChewing factory SQLite connection failed.")
     Notifier.notify(
-      message: NSLocalizedString("i18n:Loading.coreDictComplete", comment: "")
+      message: "i18n:Loading.coreDictComplete".localized
     )
   }
 
