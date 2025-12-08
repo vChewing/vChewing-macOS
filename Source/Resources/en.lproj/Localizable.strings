@@ -206,8 +206,14 @@
 "i18n:CandidateServiceMenuEditor.prompt" = "Please input the service metadata you want to register.";
 "i18n:CandidateServiceMenuEditor.table.field.MenuTitle" = "Menu Item Title";
 "i18n:CandidateServiceMenuEditor.table.field.Value" = "Defined Value";
-"i18n:KimoDataImportError.connectionFailure.errMsg" = "Directly Import is not available due to an NSConnection failure.\n\n- Please enable Yahoo! KeyKey Input Method and run it prior to performing the current action. vChewing now have just triggered Yahoo! KeyKey Input Method to run, so you can retry the import immediately.\n\n- If this copy of vChewing is compiled by yourself, please double-check the Sandbox Entitlements you have modified.\n\n- If this mac is not an Intel Mac, then Rosetta 2 is required to run Yahoo! KeyKey Input Method.\n\n- If all of the above reasons are not met in this case, then the __objc_empty_cache API might be unavailable in the current system. This API is crucial in order to let Yahoo! KeyKey Input Method run. Please double check the Console.app in your system to see whether there are any crash reports related to Yahoo! KeyKey Input Method.";
-"i18n:KimoDataImportError.fileHandlerFailure.errMsg" = "Failed in writing new user phrases data.";
+"i18n:KimoDataImportError.dataExtractionFailure.errMsg" = "Failed from getting importable data. Either the source file is missing or corrupted.";
+"i18n:KimoDataImportError.lexiconWritingFailure.errMsg" = "Failed in writing new user phrases data.";
+"i18n:KimoDataReader.KDRException.fileNameInsane" = "The file name of the given URL does not make sense. It should have a valid file name.";
+"i18n:KimoDataReader.KDRException.fileNotExist" = "Target file missing.";
+"i18n:KimoDataReader.KDRException.manjusriTextReadingError" = "Failed to read data from Manjusri text format.";
+"i18n:KimoDataReader.KDRException.notFileURL" = "The given URL is not a file URL.";
+"i18n:KimoDataReader.KDRException.sqliteDatabaseReadingError" = "Failed to read data from CEROD‑encrypted SQLite database.";
+"i18n:KimoDataReader.KDRException.wrongFileExtension" = "The file name of the given URL indicates an incompatible file extension. Only ‘txt’ and ‘db’ are accepted file extensions.";
 "i18n:kimoImportButton.DragFileToHere" = "DRAG FILE TO HERE";
 "i18n:LMMgr.accessFailure.cassette.description" = "Please reconfigure the cassette path to a valid one before enabling this mode.";
 "i18n:LMMgr.accessFailure.cassette.title" = "Path invalid or file access error.";
@@ -219,8 +225,9 @@
 "i18n:securityAgentHelper.warningMessage.header" = "vChewing has detected that the following background processes are abusing the SecureEventInput, hindering all 3rd-party input methods from being able to switch to.\n\nIt is fine to use SecureEventInput for sensitive input fields. However, an app calling EnableSecureEventInput() is responsible to call DisableSecureEventInput() immediately right after the input field loses focus. This situation may also happen if an app is hanging in the background (or working as a helper application in the background) with its SecureEventInput left enabled.\n\nThe found processes are:";
 "i18n:securityAgentHelper.warningMessage.title" = "SecureEventInput Abuse Detected";
 "i18n:settings.importFromKimoTxt.DirectlyImport" = "Directly Import";
-"i18n:settings.importFromKimoTxt.finishedCount:%@" = "Imported %@ new records.";
+"i18n:settings.importFromKimoTxt.finishedCount:%@%@" = "Found %@ entries. %@ new records imported.";
 "i18n:settings.importFromKimoTxt.label" = "Import Yahoo! KeyKey User Dictionary file";
+"i18n:settings.importFromKimoTxt.postOpsNotice" = "Other entires are either already-in-database or have validity problems. If you want to dump all data to a dedicated text file, you may want to use KeyKeyUserDBKit (GitHub Repository `vChewing/KeyKeyUserDBKit`) instead.";
 "i18n:settings.shiftKeyASCIITogle.description" = "This feature only needs to parse consecutive NSEvents passed by macOS built-in InputMethodKit framework, hence no necessity of asking end-users for extra privileges of monitoring global keyboard inputs. You are free to investigate our codebase or reverse-engineer this input method to see whether the above statement is trustable. Also, this Shift-key toggle won't work if CapsLock is ON.";
 "i18n:UserDef.kAlwaysUsePCBWithElectronBasedClients.description" = "Electron-based apps are notorious in unpredictable (buggy) IMKTextInput API interactive behaviors. Most of such apps are unlikely to have their individual issues of such solved correctly on-time due to various out-of-control reasons, hence why this toggle is enabled by default.";
 "i18n:UserDef.kAlwaysUsePCBWithElectronBasedClients.shortTitle" = "Always use popup composition buffer for Electron-based client apps";

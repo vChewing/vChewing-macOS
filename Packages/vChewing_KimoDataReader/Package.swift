@@ -12,16 +12,21 @@ let package = Package(
       targets: ["KimoDataReader"]
     ),
   ],
+  dependencies: [
+    .package(path: "../CSQLite3"),
+  ],
   targets: [
     // Targets are the basic building blocks of a package, defining a module or a test suite.
     // Targets can depend on other targets in this package and products from dependencies.
     .target(
-      name: "ObjcKimoCommunicator",
-      publicHeadersPath: "include"
+      name: "KeyKeyUserDBKit",
+      dependencies: [
+        .product(name: "CSQLite3", package: "CSQLite3"),
+      ]
     ),
     .target(
       name: "KimoDataReader",
-      dependencies: ["ObjcKimoCommunicator"]
+      dependencies: ["KeyKeyUserDBKit"]
     ),
     .testTarget(
       name: "KimoDataReaderTests",

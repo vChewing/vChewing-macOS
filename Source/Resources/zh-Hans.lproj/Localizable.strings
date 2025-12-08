@@ -206,8 +206,14 @@
 "i18n:CandidateServiceMenuEditor.prompt" = "请键入您要登记的服务资料。";
 "i18n:CandidateServiceMenuEditor.table.field.MenuTitle" = "选单条目名称";
 "i18n:CandidateServiceMenuEditor.table.field.Value" = "定义资料值";
-"i18n:KimoDataImportError.connectionFailure.errMsg" = "「直接汇入」功能失败：无法成功建立 NSConnection 跨执行绪通讯。\n\n- 在执行该步骤之前，请确保奇摩输入法有在运行。唯音输入法已经在此刻发起了一次对奇摩输入法的运行呼叫请求，于是您可以立刻再次重试。\n\n- 如果您当前运行的唯音输入法的程式包是您自己建置的话，请检查专案内的 Sandbox 权能组态设定档案（Entitlements）、看看是否发生了与此有关的内容变更。\n\n- 如果这台 Mac 并未使用 Intel CPU 的话，请先安装 Rosetta 2，否则奇摩输入法将无法运作。\n\n- 如果以上状况都被排除了的话，那么 __objc_empty_cache 这个 API 可能在当前版本的作业系统内被移除了。这个 API 对奇摩输入法而言至关重要。请检查您当前的作业系统内建的「系统监视程式 Console.app」，确认一下是否有与奇摩输入法有关的程式崩溃报告。";
-"i18n:KimoDataImportError.fileHandlerFailure.errMsg" = "没能将新的资料成功写入到使用者自订语汇辞典当中。";
+"i18n:KimoDataImportError.dataExtractionFailure.errMsg" = "「直接汇入」功能失败：原始档案不存在或损毁。";
+"i18n:KimoDataImportError.lexiconWritingFailure.errMsg" = "没能将新的资料成功写入到使用者自订语汇辞典当中。";
+"i18n:KimoDataReader.KDRException.fileNameInsane" = "提供的 URL 档案名称不合理，必须包含有效的档案名称。";
+"i18n:KimoDataReader.KDRException.fileNotExist" = "目标档案不存在。";
+"i18n:KimoDataReader.KDRException.manjusriTextReadingError" = "无法从文殊（Manjusri）文字格式读取资料。";
+"i18n:KimoDataReader.KDRException.notFileURL" = "提供的 URL 不是档案 URL。";
+"i18n:KimoDataReader.KDRException.sqliteDatabaseReadingError" = "无法从 CEROD 加密的 SQLite 资料库读取资料。";
+"i18n:KimoDataReader.KDRException.wrongFileExtension" = "提供的 URL 档案副档名不符规定，只接受「txt」与「db」两种副档名。";
 "i18n:kimoImportButton.DragFileToHere" = "请将档案拽到这边";
 "i18n:LMMgr.accessFailure.cassette.description" = "在启用该模式之前，请事先正确设定磁带档案路径。";
 "i18n:LMMgr.accessFailure.cassette.title" = "档案存取失败，或者路径不合规。";
@@ -219,8 +225,9 @@
 "i18n:securityAgentHelper.warningMessage.header" = "唯音有检测到下述后台进程有在滥用 SecureEventInput。这种滥用会导致系统内的所有第三方输入法全都无法正常使用（在输入法选单内会变成灰色）。\n\n针对需要填写敏感数据的场合，使用 SecureEventInput 无可厚非。但是，用 EnableSecureEventInput() 开启该模式之后，就有义务在输入窗格失焦的那一刻呼叫 DisableSecureEventInput() 来结束这种状态。这种状态还常见于后台辅助 App 当中、或者某个 App 在叫出该模式之后失去响应（这样的话，哪怕被切换到后台，SecureEventInput 也不会自动解除）。\n\n被侦测到的进程如下:";
 "i18n:securityAgentHelper.warningMessage.title" = "检测到对 SecureEventInput 的滥用行为";
 "i18n:settings.importFromKimoTxt.DirectlyImport" = "直接汇入";
-"i18n:settings.importFromKimoTxt.finishedCount:%@" = "汇入了 %@ 笔新记录。";
+"i18n:settings.importFromKimoTxt.finishedCount:%@%@" = "已从总共 %@ 笔资料中成功汇入 %@ 笔新资料。";
 "i18n:settings.importFromKimoTxt.label" = "汇入奇摩输入法自订词资料库";
+"i18n:settings.importFromKimoTxt.postOpsNotice" = "其余尚未汇入的资料可能是已有的记录、或记录本身不合理。若您想把全部资料完整导出为独立文字档，建议改用 KeyKeyUserDBKit（GitHub 仓库: vChewing/KeyKeyUserDBKit）来操作。";
 "i18n:settings.shiftKeyASCIITogle.description" = "该功能只需要对借由 macOS 内建的输入法框架传来的 NSEvent 做上下文分析，自然没有「向使用者寻求系统全局键盘事件监听权限」之必要。您可自行审视敝输入法的原始程式码仓库、或对敝输入法逆向工程，以自行证实此处所言之真假。另注：这个 Shift 键切换开关在 CapsLock 灯亮时无效。";
 "i18n:UserDef.kAlwaysUsePCBWithElectronBasedClients.description" = "基于 Electron 技术构建的客体往往臭名昭彰于各自的对 IMKTextInput API 的「行为难以预测、难以保证」的实作上。更糟糕的是，这类 App 的开发者们均有着各自的不可控的原因、而难以保证他们的 App 的这种问题能被及时地、妥当地解决。这也是为什么这个开关在预设情况下处于开启状态。";
 "i18n:UserDef.kAlwaysUsePCBWithElectronBasedClients.shortTitle" = "对基于 Electron 技术构建的客体软体一律强制启用浮动组字窗";

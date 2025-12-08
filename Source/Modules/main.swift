@@ -59,17 +59,18 @@ case 2:
       exit(1)
     }
     let url = URL(fileURLWithPath: path)
-    guard var rawString = try? String(contentsOf: url) else {
-      print(
-        "[Kimo Import] Given file path is either invalid or not accessible. Read access is needed for this operation."
-      )
+    let maybeCount: (totalFound: Int, importedCount: Int)?
+    do {
+      maybeCount = try LMMgr.importYahooKeyKeyUserDictionary(url: url)
+    } catch {
+      print(error.localizedDescription)
       exit(1)
     }
-    let maybeCount = try? LMMgr.importYahooKeyKeyUserDictionary(text: &rawString)
-    let count: Int = maybeCount ?? 0
+    let countResult: (totalFound: Int, importedCount: Int) = maybeCount ?? (0, 0)
     let msg = String(
-      format: "i18n:settings.importFromKimoTxt.finishedCount:%@".i18n,
-      count.description
+      format: "i18n:settings.importFromKimoTxt.finishedCount:%@%@".i18n,
+      countResult.totalFound.description,
+      countResult.importedCount.description
     )
     print("[Kimo Import] \(msg)")
     exit(0)

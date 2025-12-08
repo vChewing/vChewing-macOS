@@ -205,8 +205,14 @@
 "i18n:CandidateServiceMenuEditor.prompt" = "登録したいサービスのメタデータを入力してください。";
 "i18n:CandidateServiceMenuEditor.table.field.MenuTitle" = "メニュー項目タイトル";
 "i18n:CandidateServiceMenuEditor.table.field.Value" = "定義値";
-"i18n:KimoDataImportError.connectionFailure.errMsg" = "「直接読み込む」作動失敗：両アプリの NSConnection 通信はできませんでした。\n\n- 「直接読込」を続行する前に、まずは Yahoo! KeyKey そのアプリを実行すること。弊アプリは Yahoo! KeyKey をすでに１度呼び覚ませてみたため、すぐにもう一度「直接読込」するのも可能です。\n\n- 今の実行中の弊アプリはご自分で Xcode で組み立てた場合、Xcode プロジェクトの Sandbox Entitlements の配置の正しさをご確認ください。\n\n- 今のパソコンは Intel Mac ではない場合、必ず Rosetta 2 をご実装ください。Yahoo! KeyKey の実行には Rosetta 2 は必要条件です。\n\n- 上記のすべての状況を排除したら、多分「__objc_empty_cache」という肝心なる API は今のこのシステムでもう利用できないと推測できます。この API がない限り、Yahoo! KeyKey の実行は不可能です。今のこのシステムの「Console.app」で Yahoo! KeyKey の故障報告の有無をご確認ください。";
-"i18n:KimoDataImportError.fileHandlerFailure.errMsg" = "新しい資料はユーザー辞書データファイルに書き込むのはできませんでした。";
+"i18n:KimoDataImportError.dataExtractionFailure.errMsg" = "「直接読み込む」作動失敗：データソースファイルが存在しないか、あるいはデータが壊れたと判断しました。";
+"i18n:KimoDataImportError.lexiconWritingFailure.errMsg" = "新しい資料はユーザー辞書データファイルに書き込むのはできませんでした。";
+"i18n:KimoDataReader.KDRException.fileNameInsane" = "指定されたURLのファイル名がおかしいです。有効なファイル名を含んでいる必要があります。";
+"i18n:KimoDataReader.KDRException.fileNotExist" = "対象ファイルが見つかりませんでした。";
+"i18n:KimoDataReader.KDRException.manjusriTextReadingError" = "文殊（Manjusri）テキスト形式からのデータ読み込みに失敗しました。";
+"i18n:KimoDataReader.KDRException.notFileURL" = "指定されたURLはファイルURLではないと判断しました。";
+"i18n:KimoDataReader.KDRException.sqliteDatabaseReadingError" = "CEROD暗号化されたSQLiteデータベースからのデータ読み込みに失敗しました。";
+"i18n:KimoDataReader.KDRException.wrongFileExtension" = "指定されたURLの拡張子が対応できません。「txt」および「db」の拡張子のみ対応しています。";
 "i18n:kimoImportButton.DragFileToHere" = "ここにドラッグして";
 "i18n:LMMgr.accessFailure.cassette.description" = "カセットファイルを正しくご指定してから、このモードのご使用を。";
 "i18n:LMMgr.accessFailure.cassette.title" = "ファイルアクセス失敗、或いはご指定したファイル位置情報は使えぬ。";
@@ -218,8 +224,9 @@
 "i18n:securityAgentHelper.warningMessage.header" = "唯音入力アプリ（略称「唯音」）は「他のバックグラウンド・プロセスがSecureEventInputを正しく利用していない」と検出しました。このような不正利用は「システム内蔵入力以外の全ての入力アプリがメニューで灰色状態で選べなくて使えない」の元凶です。\n\nセンシティブな資料の記入どころでSecureEventInputをEnableSecureEventInput()で使うのは当然ですが、「入力中」状態が終わった後必ずDisableSecureEventInput()で状態解消すべきだと義務です。いくつかヘルパーアプリも、あるいはSecureEventInputを呼び起こしてからすぐ固まったアプリも、この状態になりやすいです。特に、他のアプリの画面へ切り替えたとしても、固まったアプリのSecureEventInput状態は自動的に解消できません。\n\n検出した該当プロセスは:";
 "i18n:securityAgentHelper.warningMessage.title" = "SecureEventInput の不正利用が検出";
 "i18n:settings.importFromKimoTxt.DirectlyImport" = "直接読込";
-"i18n:settings.importFromKimoTxt.finishedCount:%@" = "新しい記録は %@ つ読み込みました。";
+"i18n:settings.importFromKimoTxt.finishedCount:%@%@" = "合計 %@ 件中、%@ 件の新しいデータを読み込みました。";
 "i18n:settings.importFromKimoTxt.label" = "Yahoo! KeyKey ユーザー辞書ファイルを読込";
+"i18n:settings.importFromKimoTxt.postOpsNotice" = "読み込まなかった分は不合理か、あるいは今のデータベースにすでに既存しています。すべてのデータを独立したテキストファイルとして完全にお書き出ししたい場合は、KeyKeyUserDBKit（GitHub 倉庫: vChewing/KeyKeyUserDBKit）をご利用ください。";
 "i18n:settings.shiftKeyASCIITogle.description" = "この機能の利用する NSEvent は、macOS 内蔵の入力アプリ共用モジュール「InputMethodKit」から提供した NSEvent のみであり、その NSEvent 文脈関係で「Shift キーは１回押したかどうか」と判断することはできる。この事実に疑いを持つ者は、本アプリのソースコードを審査するか、あるいは本アプリを逆向工程（分解工学, いわゆる「Reverse-Engineering」）するがよい。なお、Shiftキーによるこの切り替えは、CapsLockがONの時には効かぬ。";
 "i18n:UserDef.kAlwaysUsePCBWithElectronBasedClients.description" = "ほとんどの「Electron で構築したアプリ」は IMKTextInput API の実作についての支障があり、その実作した API の挙動は予測できなくて、バグ退治もとても困難だと考えられています。このようなアプリの開発者たちにもそれぞれの原因でこのような支障を解決する策も動力も極めて少ないと認識されております。故に、このスイッチの最初値はONにしました。";
 "i18n:UserDef.kAlwaysUsePCBWithElectronBasedClients.shortTitle" = "Electron で構築した全ての客体アプリに「吹き出し入力緩衝列ウィンドウ」を強制的に起用";

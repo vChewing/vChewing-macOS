@@ -7,117 +7,135 @@
 // requirements defined in MIT License.
 
 import AppKit
+import UniformTypeIdentifiers
+
+#if hasFeature(RetroactiveAttribute)
+  extension KimoDataReader.KDRException: @retroactive LocalizedError {}
+#else
+  extension KimoDataReader.KDRException: LocalizedError {}
+#endif
+
+extension KimoDataReader.KDRException {
+  public var errorDescription: String? {
+    description
+  }
+
+  // MARK: Private
+
+  public var description: String {
+    switch self {
+    case let .sqliteDatabaseReadingError(subError):
+      return "\n\n\(i18nKeyHeader.i18n)\n\n\(subError.localizedDescription)"
+    case let .manjusriTextReadingError(subError):
+      return "\n\n\(i18nKeyHeader.i18n)\n\n\(subError.localizedDescription)"
+    case let .notFileURL(url):
+      return "\n\n\(i18nKeyHeader.i18n)\n\nFile Path: \(url.standardizedFileURL.path)"
+    case let .fileNotExist(url):
+      return "\n\n\(i18nKeyHeader.i18n)\n\nFile Path: \(url.standardizedFileURL.path)"
+    case let .fileNameInsane(url):
+      return "\n\n\(i18nKeyHeader.i18n)\n\nFile Path: \(url.standardizedFileURL.path)"
+    case let .wrongFileExtension(url):
+      return "\n\n\(i18nKeyHeader.i18n)\n\nFile Path: \(url.standardizedFileURL.path)"
+    }
+  }
+}
 
 extension LMMgr {
   public enum KimoDataImportError: Error, LocalizedError {
-    case connectionFailure
-    case fileHandlerFailure
+    case dataExtractionFailureMsg(String)
+    case dataExtractionFailure(Error)
+    case lexiconWritingFailure
 
     // MARK: Public
 
     public var errorDescription: String? {
       switch self {
-      case .fileHandlerFailure: return "i18n:KimoDataImportError.fileHandlerFailure.errMsg"
-        .i18n
-      case .connectionFailure: return "i18n:KimoDataImportError.connectionFailure.errMsg".i18n
+      case let .dataExtractionFailureMsg(msg):
+        return "i18n:KimoDataImportError.dataExtractionFailure.errMsg".i18n
+          + "\n\nMessage: \(msg)"
+      case let .dataExtractionFailure(error):
+        return "i18n:KimoDataImportError.dataExtractionFailure.errMsg".i18n
+          + "\n\n\(error.localizedDescription)"
+      case .lexiconWritingFailure:
+        return "i18n:KimoDataImportError.lexiconWritingFailure.errMsg".i18n
       }
     }
   }
 
-  /// 藉由 XPC 通訊的方式匯入自奇摩輸入法使用者自訂詞資料庫檔案。
-  /// - Parameter rawString: 原始 TXT 檔案內容。
-  /// - Returns: 成功匯入的資料數量。
-  @discardableResult
-  public static func importYahooKeyKeyUserDictionaryByXPC() throws -> Int {
-    let kimoBundleID = "com.yahoo.inputmethod.KeyKey"
-    if #unavailable(macOS 11) {
-      NSWorkspace.shared.launchApplication(
-        withBundleIdentifier: kimoBundleID,
-        additionalEventParamDescriptor: nil,
-        launchIdentifier: nil
-      )
-    } else {
-      guard let imeURL = NSWorkspace.shared.urlForApplication(withBundleIdentifier: kimoBundleID)
-      else {
-        throw KimoDataImportError.connectionFailure
-      }
-      NSWorkspace.shared.openApplication(at: imeURL, configuration: .init())
-    }
-    guard KimoCommunicator.shared.establishConnection()
-    else { throw KimoDataImportError.connectionFailure }
-    var allPhrasesCHT = [UserPhraseInsertable]()
-    var allPhrasesCHS = [UserPhraseInsertable]()
-    KimoCommunicator.shared.prepareData { key, value in
-      let phraseCHT = UserPhraseInsertable(
-        keyArray: key.components(separatedBy: ","),
-        value: value,
-        inputMode: .imeModeCHT,
-        isConverted: false
-      )
-      guard phraseCHT.isValid, !phraseCHT.isDuplicated else { return }
-      guard !(phraseCHT.value.count == 1 && phraseCHT.keyArray.count == 1) else { return }
-      allPhrasesCHT.append(phraseCHT)
-      let phraseCHS = phraseCHT.crossConverted
-      guard phraseCHS.isValid, !phraseCHS.isDuplicated else { return }
-      guard !(phraseCHS.value.count == 1 && phraseCHS.keyArray.count == 1) else { return }
-      allPhrasesCHS.append(phraseCHS)
-    }
-
-    guard Self
-      .batchImportUserPhrasePairs(allPhrasesCHT: allPhrasesCHT, allPhrasesCHS: allPhrasesCHS)
-    else {
-      throw KimoDataImportError.fileHandlerFailure
-    }
-
-    let result = allPhrasesCHT.count
-    if result > 0 {
-      Broadcaster.shared.postEventForReloadingPhraseEditor()
-    }
-    return result
-  }
-
-  /// 匯入自奇摩輸入法使用者自訂詞資料庫匯出的 TXT 檔案。
-  /// - Parameter rawString: 原始 TXT 檔案內容。
+  /// 匯入自奇摩輸入法使用者自訂詞資料庫匯出的 TXT 檔案、或原始 SQLite 檔案 `SmartMandarinUserData.db`。
+  /// - Parameter rawString: 原始檔案內容。
   /// - Returns: 成功匯入的資料數量。
   @discardableResult
   public static func importYahooKeyKeyUserDictionary(
-    text rawString: inout String
+    url: URL? = nil
   ) throws
-    -> Int {
+    -> (totalFound: Int, importedCount: Int) {
+    // 判斷 URL 來源：使用者透過 File Open Panel 選擇的 URL 是 security-scoped 的
+    let isUserProvidedURL = url != nil
+    let url = url ?? FileManager.realHomeDir
+      .appendingPathComponent("Library")
+      .appendingPathComponent("Application Support")
+      .appendingPathComponent("Yahoo! KeyKey")
+      .appendingPathComponent("SmartMandarinUserData.db")
     var allPhrasesCHT = [UserPhraseInsertable]()
     var allPhrasesCHS = [UserPhraseInsertable]()
-    rawString.enumerateLines { currentLine, _ in
-      let cells = currentLine.split(separator: "\t")
-      guard cells.count >= 3, cells.first != "#", cells.first != "MJSR" else { return }
-      let value = cells[0].description
-      let keyArray = cells[1].split(separator: ",").map(\.description)
-      let phraseCHT = UserPhraseInsertable(
-        keyArray: keyArray,
-        value: value,
-        inputMode: .imeModeCHT,
-        isConverted: false
-      )
-      guard phraseCHT.isValid, !phraseCHT.isDuplicated else { return }
-      guard !(phraseCHT.value.count == 1 && phraseCHT.keyArray.count == 1) else { return }
-      allPhrasesCHT.append(phraseCHT)
-      let phraseCHS = phraseCHT.crossConverted
-      guard phraseCHS.isValid, !phraseCHS.isDuplicated else { return }
-      guard !(phraseCHS.value.count == 1 && phraseCHS.keyArray.count == 1) else { return }
-      allPhrasesCHS.append(phraseCHS)
+    var entriesDiscovered = 0
+    do {
+      // 只有使用者透過 File Open Panel 提供的 URL 才需要 security-scoped 存取。
+      // 手動構造的預設路徑使用 Entitlement 權限直接存取。
+      let securityScopedAccessStarted = isUserProvidedURL && url.startAccessingSecurityScopedResource()
+      defer {
+        if securityScopedAccessStarted {
+          url.stopAccessingSecurityScopedResource()
+        }
+      }
+      // 檢查檔案是否存在
+      guard FileManager.default.fileExists(atPath: url.path) else {
+        throw KimoDataImportError.dataExtractionFailureMsg(
+          "File not found at: \(url.path)"
+        )
+      }
+      // 檢查檔案是否可讀
+      guard FileManager.default.isReadableFile(atPath: url.path) else {
+        throw KimoDataImportError.dataExtractionFailureMsg(
+          "File not readable (Sandbox access denied?): \(url.path)"
+        )
+      }
+      try KimoDataReader.shared.prepareData(url: url) { keyArray, value in
+        entriesDiscovered += 1
+        let phraseCHT = UserPhraseInsertable(
+          keyArray: keyArray,
+          value: value,
+          inputMode: .imeModeCHT,
+          isConverted: false
+        )
+        guard phraseCHT.isValid, !phraseCHT.isDuplicated else { return }
+        guard !(phraseCHT.value.count == 1 && phraseCHT.keyArray.count == 1) else { return }
+        allPhrasesCHT.append(phraseCHT)
+        let phraseCHS = phraseCHT.crossConverted
+        guard phraseCHS.isValid, !phraseCHS.isDuplicated else { return }
+        guard !(phraseCHS.value.count == 1 && phraseCHS.keyArray.count == 1) else { return }
+        allPhrasesCHS.append(phraseCHS)
+      }
+    } catch let error as KimoDataImportError {
+      // 如果已經是 KimoDataImportError，直接重新拋出，避免二次包裝
+      throw error
+    } catch {
+      throw KimoDataImportError.dataExtractionFailure(error)
     }
-    guard !allPhrasesCHT.isEmpty else { return 0 }
+    guard !allPhrasesCHT.isEmpty else { return (entriesDiscovered, 0) }
 
     guard Self
       .batchImportUserPhrasePairs(allPhrasesCHT: allPhrasesCHT, allPhrasesCHS: allPhrasesCHS)
     else {
-      throw KimoDataImportError.fileHandlerFailure
+      throw KimoDataImportError.lexiconWritingFailure
     }
 
     let result = allPhrasesCHT.count
     if result > 0 {
       Broadcaster.shared.postEventForReloadingPhraseEditor()
     }
-    return result
+    return (entriesDiscovered, result)
   }
 
   private static func batchImportUserPhrasePairs(

@@ -4,14 +4,14 @@
 <dict>
 	<key>com.apple.security.files.bookmarks.app-scope</key>
 	<true/>
+	<key>com.apple.security.temporary-exception.files.home-relative-path.read-only</key>
+	<array>
+		<string>/Library/Application Support/Yahoo! KeyKey/SmartMandarinUserData.db</string>
+	</array>
 	<key>com.apple.security.temporary-exception.files.home-relative-path.read-write</key>
 	<array>
 		<string>/Library/Containers/$(PRODUCT_BUNDLE_IDENTIFIER)</string>
 		<string>/Library/Mobile Documents/com~apple~CloudDocs/vChewing/</string>
-	</array>
-	<key>com.apple.security.temporary-exception.mach-lookup.global-name</key>
-	<array>
-		<string>YahooKeyKeyService</string>
 	</array>
 	<key>com.apple.security.temporary-exception.mach-register.global-name</key>
 	<string>$(PRODUCT_BUNDLE_IDENTIFIER)_Connection</string>
