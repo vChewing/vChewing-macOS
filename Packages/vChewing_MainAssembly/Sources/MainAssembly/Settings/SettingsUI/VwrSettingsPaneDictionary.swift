@@ -213,7 +213,9 @@ public struct VwrSettingsPaneDictionary: View {
             }
             .fileImporter(
               isPresented: $isShowingFileImporter,
-              allowedContentTypes: [.plainText],
+              allowedContentTypes: ["txt", "db"].compactMap {
+                .init(filenameExtension: $0)
+              },
               allowsMultipleSelection: false
             ) { result in
               keykeyImportButtonDisabled = true
@@ -222,33 +224,13 @@ public struct VwrSettingsPaneDictionary: View {
               switch result {
               case let .success(urls):
                 guard let url = urls.first else { return }
-                guard var rawString = try? String(contentsOf: url) else { return }
-                let maybeCount = try? LMMgr.importYahooKeyKeyUserDictionary(text: &rawString)
-                let count: Int = maybeCount ?? 0
-
-                CtlSettingsUI.shared?.window.callAlert(title: String(
-                  format: "i18n:settings.importFromKimoTxt.finishedCount:%@".i18n,
-                  count.description
-                ))
+                task4ImportingKeyKeyUserDict(url)
               case .failure:
                 break
               }
             }
             Button("i18n:settings.importFromKimoTxt.DirectlyImport") {
-              do {
-                let count = try LMMgr.importYahooKeyKeyUserDictionaryByXPC()
-                CtlSettingsUI.shared?.window.callAlert(
-                  title: String(
-                    format: "i18n:settings.importFromKimoTxt.finishedCount:%@".i18n,
-                    count.description
-                  )
-                )
-              } catch {
-                let error = NSAlert(error: error)
-                error.beginSheetModal(at: CtlSettingsUI.shared?.window) { _ in
-                  // DO NOTHING.
-                }
-              }
+              task4ImportingKeyKeyUserDict()
             }
           }.disabled(keykeyImportButtonDisabled)
         }
@@ -258,6 +240,29 @@ public struct VwrSettingsPaneDictionary: View {
       minWidth: CtlSettingsUI.formWidth,
       maxHeight: CtlSettingsUI.contentMaxHeight
     )
+  }
+
+  private func task4ImportingKeyKeyUserDict(_ url: URL? = nil) {
+    do {
+      let countResult = try LMMgr.importYahooKeyKeyUserDictionary(url: url)
+      let allImported = countResult.importedCount == countResult.totalFound
+      let postOpsNotice: String? = allImported
+        ? nil
+        : "i18n:settings.importFromKimoTxt.postOpsNotice".i18n
+      CtlSettingsUI.shared?.window.callAlert(
+        title: String(
+          format: "i18n:settings.importFromKimoTxt.finishedCount:%@%@".i18n,
+          countResult.totalFound.description,
+          countResult.importedCount.description
+        ),
+        text: postOpsNotice
+      )
+    } catch {
+      let error = NSAlert(error: error)
+      error.beginSheetModal(at: CtlSettingsUI.shared?.window) { _ in
+        // DO NOTHING.
+      }
+    }
   }
 }
 

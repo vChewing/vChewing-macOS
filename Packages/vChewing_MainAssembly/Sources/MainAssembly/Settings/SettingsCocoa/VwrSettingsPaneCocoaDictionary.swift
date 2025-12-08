@@ -92,7 +92,7 @@ extension SettingsPanesCocoa {
                   NSButton(
                     "i18n:settings.importFromKimoTxt.DirectlyImport",
                     target: self,
-                    action: #selector(importYahooKeyKeyUserDictionaryDataXPC(_:))
+                    action: #selector(importKeyKeyUserPhraseSQLiteDBAction(_:))
                   )
                 }
               }
@@ -105,20 +105,12 @@ extension SettingsPanesCocoa {
     }
 
     func importKimoDragButton() -> NSFileDragRetrieverButton {
-      dragRetrieverKimo.postDragHandler = { url in
-        guard var rawString = try? String(contentsOf: url) else { return }
-        let maybeCount = try? LMMgr.importYahooKeyKeyUserDictionary(text: &rawString)
-        let count: Int = maybeCount ?? 0
-        CtlSettingsCocoa.shared?.window.callAlert(
-          title: String(
-            format: "i18n:settings.importFromKimoTxt.finishedCount:%@".i18n,
-            count.description
-          )
-        )
+      dragRetrieverKimo.postDragHandler = { [weak self] url in
+        self?.task4ImportingKeyKeyUserDict(url)
       }
       dragRetrieverKimo.title = "i18n:kimoImportButton.DragFileToHere".i18n
       dragRetrieverKimo.target = self
-      dragRetrieverKimo.action = #selector(importYahooKeyKeyUserDictionaryData(_:))
+      dragRetrieverKimo.action = #selector(importKeyKeyUserDictionaryDataAction(_:))
       return dragRetrieverKimo
     }
 
@@ -179,25 +171,12 @@ extension SettingsPanesCocoa {
     }
 
     @IBAction
-    func importYahooKeyKeyUserDictionaryDataXPC(_: NSButton) {
-      do {
-        let count = try LMMgr.importYahooKeyKeyUserDictionaryByXPC()
-        CtlSettingsCocoa.shared?.window.callAlert(
-          title: String(
-            format: "i18n:settings.importFromKimoTxt.finishedCount:%@".i18n,
-            count.description
-          )
-        )
-      } catch {
-        let error = NSAlert(error: error)
-        error.beginSheetModal(at: CtlSettingsCocoa.shared?.window) { _ in
-          // DO NOTHING.
-        }
-      }
+    func importKeyKeyUserPhraseSQLiteDBAction(_: NSButton) {
+      task4ImportingKeyKeyUserDict()
     }
 
     @IBAction
-    func importYahooKeyKeyUserDictionaryData(_: NSButton) {
+    func importKeyKeyUserDictionaryDataAction(_: NSButton) {
       guard #available(macOS 10.13, *) else {
         SettingsPanesCocoa.warnAboutComDlg32Inavailability()
         return
@@ -209,23 +188,45 @@ extension SettingsPanesCocoa {
       dlgOpenFile.canChooseFiles = true
       dlgOpenFile.allowsMultipleSelection = false
       dlgOpenFile.canChooseDirectories = false
+      let allowedExtensions: [String] = ["txt", "db"]
       if #unavailable(macOS 11) {
-        dlgOpenFile.allowedFileTypes = ["txt"]
+        dlgOpenFile.allowedFileTypes = allowedExtensions
       } else {
-        dlgOpenFile.allowedContentTypes = [.init(filenameExtension: "txt")].compactMap { $0 }
+        dlgOpenFile.allowedContentTypes = allowedExtensions.compactMap {
+          .init(filenameExtension: $0)
+        }
       }
 
       let window = CtlSettingsCocoa.shared?.window
       dlgOpenFile.beginSheetModal(at: window) { result in
         if result == NSApplication.ModalResponse.OK {
           guard let url = dlgOpenFile.url else { return }
-          guard var rawString = try? String(contentsOf: url) else { return }
-          let maybeCount = try? LMMgr.importYahooKeyKeyUserDictionary(text: &rawString)
-          let count: Int = maybeCount ?? 0
-          window.callAlert(title: String(
-            format: "i18n:settings.importFromKimoTxt.finishedCount:%@".i18n,
-            count.description
-          ))
+          self.task4ImportingKeyKeyUserDict(url)
+        }
+      }
+    }
+
+    // MARK: Private
+
+    private func task4ImportingKeyKeyUserDict(_ url: URL? = nil) {
+      do {
+        let countResult = try LMMgr.importYahooKeyKeyUserDictionary(url: url)
+        let allImported = countResult.importedCount == countResult.totalFound
+        let postOpsNotice: String? = allImported
+          ? nil
+          : "i18n:settings.importFromKimoTxt.postOpsNotice".i18n
+        CtlSettingsCocoa.shared?.window.callAlert(
+          title: String(
+            format: "i18n:settings.importFromKimoTxt.finishedCount:%@%@".i18n,
+            countResult.totalFound.description,
+            countResult.importedCount.description
+          ),
+          text: postOpsNotice
+        )
+      } catch {
+        let error = NSAlert(error: error)
+        error.beginSheetModal(at: CtlSettingsCocoa.shared?.window) { _ in
+          // DO NOTHING.
         }
       }
     }
