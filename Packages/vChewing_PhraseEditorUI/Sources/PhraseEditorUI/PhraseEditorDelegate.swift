@@ -10,8 +10,9 @@ import Foundation
 import LangModelAssembly
 import Shared_DarwinImpl
 
-public protocol PhraseEditorDelegate {
+public protocol PhraseEditorDelegate: AnyObject {
   var currentInputMode: Shared.InputMode { get }
+  var isCassetteModeEnabledInLM: Bool { get set }
   func retrieveData(mode: Shared.InputMode, type: LMAssembly.ReplacableUserDataType) -> String
   @discardableResult
   func saveData(
@@ -20,8 +21,6 @@ public protocol PhraseEditorDelegate {
     data: String
   )
     -> String
-  func checkIfPhrasePairExists(userPhrase: String, mode: Shared.InputMode, key unigramKey: String)
-    -> Bool
   func consolidate(text strProcessed: inout String, pragma shouldCheckPragma: Bool)
   func openPhraseFile(
     mode: Shared.InputMode,
@@ -29,4 +28,10 @@ public protocol PhraseEditorDelegate {
     using: FileOpenMethod
   )
   func tagOverrides(in strProcessed: inout String, mode: Shared.InputMode)
+  func performAsyncTaskBypassingCassetteMode<T>(
+    _ task: @Sendable @escaping (@Sendable @escaping () -> ()) throws -> T
+  ) rethrows -> T
+  func performSyncTaskBypassingCassetteMode<T>(
+    _ task: () throws -> T
+  ) rethrows -> T
 }

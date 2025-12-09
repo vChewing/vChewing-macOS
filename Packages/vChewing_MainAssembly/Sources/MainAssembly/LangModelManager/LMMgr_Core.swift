@@ -221,12 +221,20 @@ public final class LMMgr {
     userPhrase: String,
     mode: Shared.InputMode,
     keyArray: [String],
-    factoryDictionaryOnly: Bool = false
+    factoryDictionaryOnly: Bool = false,
+    cassetteModeAlreadyBypassed: Bool = false
   )
     -> Bool {
-    mode.langModel.hasKeyValuePairFor(
-      keyArray: keyArray, value: userPhrase, factoryDictionaryOnly: factoryDictionaryOnly
-    )
+    if cassetteModeAlreadyBypassed {
+      return mode.langModel.hasKeyValuePairFor(
+        keyArray: keyArray, value: userPhrase, factoryDictionaryOnly: factoryDictionaryOnly
+      )
+    }
+    return shared.performSyncTaskBypassingCassetteMode {
+      mode.langModel.hasKeyValuePairFor(
+        keyArray: keyArray, value: userPhrase, factoryDictionaryOnly: factoryDictionaryOnly
+      )
+    }
   }
 
   public static func checkIfPhrasePairIsFiltered(
