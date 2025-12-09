@@ -423,16 +423,12 @@ extension SettingsPanesCocoa.Phrases: NSTextViewDelegate, NSTextFieldDelegate {
       }
       if !this.txtPECommentField.stringValue
         .isEmpty { arrResult.append("#" + this.txtPECommentField.stringValue) }
-      if LMMgr.shared.checkIfPhrasePairExists(
-        userPhrase: this.txtPEField1.stringValue, mode: this.selInputMode,
-        key: this.txtPEField2.stringValue
-      ) {
-        arrResult.append(" #𝙾𝚟𝚎𝚛𝚛𝚒𝚍𝚎")
-      }
+      var resultTaggable = arrResult.joined(separator: " ")
+      LMMgr.shared.tagOverrides(in: &resultTaggable, mode: this.selInputMode)
       if let lastChar = this.tfdPETextEditor.string.last, !"\n".contains(lastChar) {
-        arrResult.insert("\n", at: 0)
+        resultTaggable.insert("\n", at: resultTaggable.startIndex)
       }
-      this.tfdPETextEditor.string.append(arrResult.joined(separator: " ") + "\n")
+      this.tfdPETextEditor.string.append(resultTaggable)
       this.clearAllFields()
     }
   }
