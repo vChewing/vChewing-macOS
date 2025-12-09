@@ -22,10 +22,8 @@ public enum Uninstaller {
   )
     -> Int32 {
     let isSudo = NSApplication.isSudoMode
-    let realHomeDir = URL(
-      fileURLWithFileSystemRepresentation: getpwuid(getuid()).pointee.pw_dir, isDirectory: true,
-      relativeTo: nil
-    )
+    var realHomeDir = URL(fileURLWithPath: String(cString: getpwuid(getuid()).pointee.pw_dir))
+    realHomeDir = realHomeDir.standardizedFileURL
     // 輸入法自毀處理。這裡不用「Bundle.main.bundleURL」是為了方便使用者以 sudo 身分來移除被錯誤安裝到系統目錄內的輸入法。
     guard let bundleID = Bundle.main.bundleIdentifier else {
       Process.consoleLog("Failed to ensure the bundle identifier.")

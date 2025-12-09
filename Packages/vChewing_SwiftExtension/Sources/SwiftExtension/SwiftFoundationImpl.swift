@@ -63,11 +63,11 @@ extension FileHandle {
 // MARK: - Real Home Dir for Sandboxed Apps
 
 extension FileManager {
-  public static let realHomeDir = URL(
-    fileURLWithPath: String(cString: getpwuid(getuid()).pointee.pw_dir),
-    isDirectory: true,
-    relativeTo: nil
-  )
+  public static let realHomeDir: URL = {
+    // Avoid relativeTo: parameter (10.11+) to stay compatible with 10.9.
+    let url = URL(fileURLWithPath: String(cString: getpwuid(getuid()).pointee.pw_dir))
+    return url.standardizedFileURL
+  }()
 }
 
 // MARK: - Check whether current date is the given date.
