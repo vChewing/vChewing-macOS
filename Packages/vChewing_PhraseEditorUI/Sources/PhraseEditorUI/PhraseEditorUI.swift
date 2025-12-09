@@ -299,16 +299,12 @@ public struct VwrPhraseEditorUI: View {
       arrResult.append(weightVal.description)
     }
     if !txtAddPhraseField4.isEmpty { arrResult.append("#" + txtAddPhraseField4) }
-    if let delegate = delegate,
-       delegate.checkIfPhrasePairExists(
-         userPhrase: txtAddPhraseField1, mode: selInputMode, key: txtAddPhraseField2
-       ) {
-      arrResult.append(" #𝙾𝚟𝚎𝚛𝚛𝚒𝚍𝚎")
-    }
+    var resultTaggable = arrResult.joined(separator: " ")
+    delegate?.tagOverrides(in: &resultTaggable, mode: selInputMode)
     if let lastChar = txtContent.last, !"\n".contains(lastChar) {
-      arrResult.insert("\n", at: 0)
+      resultTaggable.insert("\n", at: resultTaggable.startIndex)
     }
-    txtContent.append(arrResult.joined(separator: " ") + "\n")
+    txtContent.append(resultTaggable)
     clearAllFields()
   }
 
