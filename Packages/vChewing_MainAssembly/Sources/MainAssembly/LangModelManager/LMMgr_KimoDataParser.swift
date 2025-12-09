@@ -101,21 +101,23 @@ extension LMMgr {
           "File not readable (Sandbox access denied?): \(url.path)"
         )
       }
-      try KimoDataReader.shared.prepareData(url: url) { keyArray, value in
-        entriesDiscovered += 1
-        let phraseCHT = UserPhraseInsertable(
-          keyArray: keyArray,
-          value: value,
-          inputMode: .imeModeCHT,
-          isConverted: false
-        )
-        guard phraseCHT.isValid, !phraseCHT.isDuplicated else { return }
-        guard !(phraseCHT.value.count == 1 && phraseCHT.keyArray.count == 1) else { return }
-        allPhrasesCHT.append(phraseCHT)
-        let phraseCHS = phraseCHT.crossConverted
-        guard phraseCHS.isValid, !phraseCHS.isDuplicated else { return }
-        guard !(phraseCHS.value.count == 1 && phraseCHS.keyArray.count == 1) else { return }
-        allPhrasesCHS.append(phraseCHS)
+      try shared.performSyncTaskBypassingCassetteMode {
+        try KimoDataReader.shared.prepareData(url: url) { keyArray, value in
+          entriesDiscovered += 1
+          let phraseCHT = UserPhraseInsertable(
+            keyArray: keyArray,
+            value: value,
+            inputMode: .imeModeCHT,
+            isConverted: false
+          )
+          guard phraseCHT.isValid, !phraseCHT.isDuplicated else { return }
+          guard !(phraseCHT.value.count == 1 && phraseCHT.keyArray.count == 1) else { return }
+          allPhrasesCHT.append(phraseCHT)
+          let phraseCHS = phraseCHT.crossConverted
+          guard phraseCHS.isValid, !phraseCHS.isDuplicated else { return }
+          guard !(phraseCHS.value.count == 1 && phraseCHS.keyArray.count == 1) else { return }
+          allPhrasesCHS.append(phraseCHS)
+        }
       }
     } catch let error as KimoDataImportError {
       // 如果已經是 KimoDataImportError，直接重新拋出，避免二次包裝

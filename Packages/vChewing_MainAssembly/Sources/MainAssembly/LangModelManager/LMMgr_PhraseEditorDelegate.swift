@@ -13,6 +13,19 @@ import Foundation
 extension LMMgr: PhraseEditorDelegate {
   public var currentInputMode: Shared.InputMode { IMEApp.currentInputMode }
 
+  public var isCassetteModeEnabledInLM: Bool {
+    get {
+      IMEApp.currentInputMode.langModel.config.isCassetteEnabled
+    }
+    set {
+      Shared.InputMode.allCases.forEach {
+        $0.langModel.setOptions { config in
+          config.isCassetteEnabled = newValue
+        }
+      }
+    }
+  }
+
   public func openPhraseFile(
     mode: Shared.InputMode,
     type: LMAssembly.ReplacableUserDataType,
@@ -23,15 +36,6 @@ extension LMMgr: PhraseEditorDelegate {
 
   public func consolidate(text strProcessed: inout String, pragma shouldCheckPragma: Bool) {
     LMAssembly.LMConsolidator.consolidate(text: &strProcessed, pragma: shouldCheckPragma)
-  }
-
-  public func checkIfPhrasePairExists(
-    userPhrase: String,
-    mode: Shared.InputMode,
-    key unigramKey: String
-  )
-    -> Bool {
-    Self.checkIfPhrasePairExists(userPhrase: userPhrase, mode: mode, keyArray: [unigramKey])
   }
 
   public func retrieveData(
@@ -84,20 +88,70 @@ extension LMMgr: PhraseEditorDelegate {
   }
 
   public func tagOverrides(in strProcessed: inout String, mode: Shared.InputMode) {
-    var outputStack: ContiguousArray<String> = .init()
-    for currentLine in strProcessed.split(separator: "\n") {
-      let arr = currentLine.split(separator: " ")
-      guard arr.count >= 2 else { continue }
-      let exists = Self.checkIfPhrasePairExists(
-        userPhrase: arr[0].description, mode: mode,
-        keyArray: arr[1].split(separator: "-").map(\.description),
-        factoryDictionaryOnly: true
-      )
-      outputStack.append(currentLine.description)
-      let replace = !currentLine.contains(" #𝙾𝚟𝚎𝚛𝚛𝚒𝚍𝚎") && exists
-      if replace { outputStack.append(" #𝙾𝚟𝚎𝚛𝚛𝚒𝚍𝚎") }
-      outputStack.append("\n")
+    performSyncTaskBypassingCassetteMode {
+      var outputStack: ContiguousArray<String> = .init()
+      for currentLine in strProcessed.split(separator: "\n") {
+        let arr = currentLine.split(separator: " ")
+        guard arr.count >= 2 else { continue }
+        let exists = Self.checkIfPhrasePairExists(
+          userPhrase: arr[0].description, mode: mode,
+          keyArray: arr[1].split(separator: "-").map(\.description),
+          factoryDictionaryOnly: true,
+          cassetteModeAlreadyBypassed: true
+        )
+        outputStack.append(currentLine.description)
+        let replace = !currentLine.contains(" #𝙾𝚟𝚎𝚛𝚛𝚒𝚍𝚎") && exists
+        if replace { outputStack.append(" #𝙾𝚟𝚎𝚛𝚛𝚒𝚍𝚎") }
+        outputStack.append("\n")
+      }
+      strProcessed = outputStack.joined()
     }
-    strProcessed = outputStack.joined()
+  }
+
+  public func performAsyncTaskBypassingCassetteMode<T>(
+    _ task: @Sendable @escaping (@Sendable @escaping () -> ()) throws -> T
+  ) rethrows
+    -> T {
+    if !PrefMgr.shared.cassetteEnabled {
+      return try task {}
+    }
+    Shared.InputMode.allCases.forEach {
+      $0.langModel.setOptions { config in
+        config.isCassetteEnabled = false
+      }
+    }
+    @Sendable
+    func trailingOp() {
+      let cassetteEnabled = PrefMgr.shared.cassetteEnabled
+      Shared.InputMode.allCases.forEach {
+        $0.langModel.setOptions { config in
+          config.isCassetteEnabled = cassetteEnabled
+        }
+      }
+    }
+    return try task(trailingOp)
+  }
+
+  public func performSyncTaskBypassingCassetteMode<T>(
+    _ task: () throws -> T
+  ) rethrows
+    -> T {
+    if !PrefMgr.shared.cassetteEnabled {
+      return try task()
+    }
+    Shared.InputMode.allCases.forEach {
+      $0.langModel.setOptions { config in
+        config.isCassetteEnabled = false
+      }
+    }
+    defer {
+      let cassetteEnabled = PrefMgr.shared.cassetteEnabled
+      Shared.InputMode.allCases.forEach {
+        $0.langModel.setOptions { config in
+          config.isCassetteEnabled = cassetteEnabled
+        }
+      }
+    }
+    return try task()
   }
 }
