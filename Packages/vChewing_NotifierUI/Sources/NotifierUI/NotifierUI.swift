@@ -43,13 +43,17 @@ public final class Notifier: NSWindowController {
         self.isNew = false
       }
     }
-    let kLargeFontSize: Double = 17
-    let kSmallFontSize: Double = 15
+    let kLargeFontSize: CGFloat = 17
+    let kSmallFontSize: CGFloat = 15
+    let horizontalPadding: CGFloat = 12
+    let extraRightSpacing: CGFloat = 64
+    let iconSize: CGFloat = 64
+    let gapBetweenLabelAndIcon: CGFloat = 6
     let messageArray = message.components(separatedBy: "\n")
 
     let paraStyle = NSMutableParagraphStyle()
     paraStyle.setParagraphStyle(NSParagraphStyle.default)
-    paraStyle.alignment = .center
+    paraStyle.alignment = .left
     let attrTitle: [NSAttributedString.Key: Any] = [
       .kern: 0,
       .foregroundColor: NSColor.controlTextColor,
@@ -84,7 +88,7 @@ public final class Notifier: NSWindowController {
     lblMessage.sizeToFit()
 
     let textWH = lblMessage.frame
-    let windowWidth = Double(4) * kLargeFontSize + textWH.width
+    let windowWidth = textWH.width + horizontalPadding * 2 + extraRightSpacing
     let contentRect = CGRect(x: 0, y: 0, width: windowWidth, height: 60.0)
     var windowRect = contentRect
     windowRect.origin.x = screenRect.maxX - windowRect.width - 20
@@ -123,11 +127,35 @@ public final class Notifier: NSWindowController {
     theWindow.isMovable = false
     theWindow.contentView?.addSubview(lblMessage)
 
-    let x = lblMessage.frame.origin.x
     let y = ((theWindow.frame.height) - textWH.height) / 1.9
-    let newOrigin = CGPoint(x: x, y: y)
+    let newOrigin = CGPoint(x: horizontalPadding, y: y)
     lblMessage.frame.origin = newOrigin
-    lblMessage.frame.size.width += Double(4) * kLargeFontSize
+
+    if let appIcon = NSApplication.shared.applicationIconImage {
+      let iconView = NSImageView()
+      iconView.image = appIcon
+      iconView.imageScaling = .scaleAxesIndependently
+      iconView.alphaValue = 0.5
+      iconView.wantsLayer = true
+      let iconFrame = CGRect(x: 0, y: 0, width: iconSize, height: iconSize)
+      iconView.frame = iconFrame
+      let iconX = CGFloat(windowWidth - iconSize)
+      let iconY = ((theWindow.frame.height) - CGFloat(iconSize)) / 2.0
+      iconView.frame.origin = CGPoint(x: iconX, y: iconY)
+      theWindow.contentView?.addSubview(iconView)
+      let maxLabelWidth = CGFloat(windowWidth - iconSize - gapBetweenLabelAndIcon - horizontalPadding)
+      if lblMessage.frame.width > maxLabelWidth {
+        lblMessage.frame.size.width = maxLabelWidth
+        if let cell = lblMessage.cell as? NSTextFieldCell {
+          cell.wraps = true
+          cell.truncatesLastVisibleLine = false
+          cell.lineBreakMode = .byWordWrapping
+        }
+        lblMessage.sizeToFit()
+        let newY = ((theWindow.frame.height) - lblMessage.frame.height) / 1.9
+        lblMessage.frame.origin.y = newY
+      }
+    }
 
     super.init(window: theWindow)
     display()
