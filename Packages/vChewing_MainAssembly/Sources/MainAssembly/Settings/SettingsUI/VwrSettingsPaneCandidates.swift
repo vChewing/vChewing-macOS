@@ -41,6 +41,9 @@ public struct VwrSettingsPaneCandidates: View {
   @AppStorage(wrappedValue: false, UserDef.kUseRearCursorMode.rawValue)
   private var useRearCursorMode: Bool
 
+  @AppStorage(wrappedValue: 0, UserDef.kCandidateStateJKHLBehavior.rawValue)
+  private var candidateStateJKHLBehavior: Int
+
   @AppStorage(wrappedValue: false, UserDef.kUseHLtoMoveCompositorCursorInCandidateState.rawValue)
   private var useHLtoMoveCompositorCursorInCandidateState: Bool
 
@@ -87,6 +90,12 @@ public struct VwrSettingsPaneCandidates: View {
           }
           UserDef.kDodgeInvalidEdgeCandidateCursorPosition
             .bind($dodgeInvalidEdgeCandidateCursorPosition).render()
+          UserDef.kCandidateStateJKHLBehavior.bind(
+            $candidateStateJKHLBehavior.didChange {
+              // 利用該變數的 didSet 屬性自糾。
+              PrefMgr.shared.candidateKeys = PrefMgr.shared.candidateKeys
+            }
+          ).render().pickerStyle(RadioGroupPickerStyle())
           UserDef.kUseShiftQuestionToCallServiceMenu.bind(
             $useShiftQuestionToCallServiceMenu.didChange {
               // 利用該變數的 didSet 屬性自糾。

@@ -64,6 +64,12 @@ extension SettingsPanesCocoa {
             NSStackView.buildSection(width: innerContentWidth) {
               UserDef.kUseDynamicCandidateWindowOrigin.render(fixWidth: innerContentWidth)
               UserDef.kDodgeInvalidEdgeCandidateCursorPosition.render(fixWidth: innerContentWidth)
+              UserDef.kCandidateStateJKHLBehavior
+                .render(fixWidth: innerContentWidth) { renderable in
+                  renderable.currentControl?.target = self
+                  renderable.currentControl?
+                    .action = #selector(self.performCandidateKeysSanityCheck(_:))
+                }
               UserDef.kUseShiftQuestionToCallServiceMenu
                 .render(fixWidth: innerContentWidth) { renderable in
                   renderable.currentControl?.target = self
