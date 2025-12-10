@@ -44,12 +44,6 @@ public struct VwrSettingsPaneCandidates: View {
   @AppStorage(wrappedValue: 0, UserDef.kCandidateStateJKHLBehavior.rawValue)
   private var candidateStateJKHLBehavior: Int
 
-  @AppStorage(wrappedValue: false, UserDef.kUseHLtoMoveCompositorCursorInCandidateState.rawValue)
-  private var useHLtoMoveCompositorCursorInCandidateState: Bool
-
-  @AppStorage(wrappedValue: false, UserDef.kUseJKtoMoveCompositorCursorInCandidateState.rawValue)
-  private var useJKtoMoveCompositorCursorInCandidateState: Bool
-
   @AppStorage(wrappedValue: true, UserDef.kUseShiftQuestionToCallServiceMenu.rawValue)
   public var useShiftQuestionToCallServiceMenu: Bool
 
@@ -98,18 +92,6 @@ public struct VwrSettingsPaneCandidates: View {
           ).render().pickerStyle(RadioGroupPickerStyle())
           UserDef.kUseShiftQuestionToCallServiceMenu.bind(
             $useShiftQuestionToCallServiceMenu.didChange {
-              // 利用該變數的 didSet 屬性自糾。
-              PrefMgr.shared.candidateKeys = PrefMgr.shared.candidateKeys
-            }
-          ).render()
-          UserDef.kUseJKtoMoveCompositorCursorInCandidateState.bind(
-            $useJKtoMoveCompositorCursorInCandidateState.didChange {
-              // 利用該變數的 didSet 屬性自糾。
-              PrefMgr.shared.candidateKeys = PrefMgr.shared.candidateKeys
-            }
-          ).render()
-          UserDef.kUseHLtoMoveCompositorCursorInCandidateState.bind(
-            $useHLtoMoveCompositorCursorInCandidateState.didChange {
               // 利用該變數的 didSet 屬性自糾。
               PrefMgr.shared.candidateKeys = PrefMgr.shared.candidateKeys
             }

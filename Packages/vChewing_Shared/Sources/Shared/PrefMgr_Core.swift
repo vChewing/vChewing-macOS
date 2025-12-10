@@ -149,18 +149,6 @@ public struct PrefMgr: PrefMgrProtocol {
   @AppProperty(key: UserDef.kCandidateStateJKHLBehavior.rawValue, defaultValue: 0)
   public var candidateStateJKHLBehavior: Int
 
-  @AppProperty(
-    key: UserDef.kUseHLtoMoveCompositorCursorInCandidateState.rawValue,
-    defaultValue: false
-  )
-  public var useHLtoMoveCompositorCursorInCandidateState: Bool
-
-  @AppProperty(
-    key: UserDef.kUseJKtoMoveCompositorCursorInCandidateState.rawValue,
-    defaultValue: false
-  )
-  public var useJKtoMoveCompositorCursorInCandidateState: Bool
-
   @AppProperty(key: UserDef.kUseShiftQuestionToCallServiceMenu.rawValue, defaultValue: true)
   public var useShiftQuestionToCallServiceMenu: Bool
 

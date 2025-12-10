@@ -293,10 +293,6 @@
 "i18n:UserDef.kCandidateStateJKHLBehavior.option.0" = "未指派";
 "i18n:UserDef.kCandidateStateJKHLBehavior.option.1" = "JK 移動組字區游標；HL 翻選字窗行列";
 "i18n:UserDef.kCandidateStateJKHLBehavior.option.2" = "HL 移動組字區游標；JK 翻選字窗行列";
-"i18n:UserDef.kUseHLtoMoveCompositorCursorInCandidateState.description" = "⚠︎ 這將自動禁止 H / L 鍵用作選字鍵。另外，該功能在磁帶模式的「%quick」快速選字狀態下無效。";
-"i18n:UserDef.kUseHLtoMoveCompositorCursorInCandidateState.shortTitle" = "在選字窗顯示時允許以 H / L 鍵移動組字區游標";
-"i18n:UserDef.kUseJKtoMoveCompositorCursorInCandidateState.description" = "⚠︎ 這將自動禁止 J / K 鍵用作選字鍵。另外，該功能在磁帶模式的「%quick」快速選字狀態下無效。";
-"i18n:UserDef.kUseJKtoMoveCompositorCursorInCandidateState.shortTitle" = "在選字窗顯示時允許以 J / K 鍵移動組字區游標";
 "i18n:UserDef.kUseShiftQuestionToCallServiceMenu.shortTitle" = "允許在選字窗內也使用「Shift+?」叫出服務選單";
 "IBM" = "IBM 排列";
 "If disabled, this will insert space instead." = "取消勾選的話，該按鍵會插入空格。";

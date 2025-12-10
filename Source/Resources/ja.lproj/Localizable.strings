@@ -292,10 +292,6 @@
 "i18n:UserDef.kCandidateStateJKHLBehavior.option.0" = "未設定";
 "i18n:UserDef.kCandidateStateJKHLBehavior.option.1" = "JKで入力緩衝列のカーソルを移動；HLで現在の行・列を切り替え";
 "i18n:UserDef.kCandidateStateJKHLBehavior.option.2" = "HLで入力緩衝列のカーソルを移動；JKで現在の行・列を切り替え";
-"i18n:UserDef.kUseHLtoMoveCompositorCursorInCandidateState.description" = "⚠︎ これで「H / L」キーは言選り用キー陣列から自動的に外されます。尚、この機能はカセットモードの「%quick」による早速候補入力状態では利用できません。";
-"i18n:UserDef.kUseHLtoMoveCompositorCursorInCandidateState.shortTitle" = "候補陳列が見えるとき、「H / L」キーで入力緩衝列のカーソルを移す";
-"i18n:UserDef.kUseJKtoMoveCompositorCursorInCandidateState.description" = "⚠︎ これで「J / K」キーは言選り用キー陣列から自動的に外されます。尚、この機能はカセットモードの「%quick」による早速候補入力状態では利用できません。";
-"i18n:UserDef.kUseJKtoMoveCompositorCursorInCandidateState.shortTitle" = "候補陳列が見えるとき、「J / K」キーで入力緩衝列のカーソルを移す";
 "i18n:UserDef.kUseShiftQuestionToCallServiceMenu.shortTitle" = "候補陳列ウィンドウで「Shift+?」でもサービスメニューを呼出";
 "IBM" = "IBM 配列";
 "If disabled, this will insert space instead." = "未チェックの場合、スペースを挿入。";
