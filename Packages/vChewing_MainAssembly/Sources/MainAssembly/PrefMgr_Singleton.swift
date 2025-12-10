@@ -35,8 +35,8 @@ extension PrefMgr {
 extension PrefMgrProtocol {
   public func validate(candidateKeys: String) -> String? {
     var excluded = ""
-    if useJKtoMoveCompositorCursorInCandidateState { excluded.append("jk") }
-    if useHLtoMoveCompositorCursorInCandidateState { excluded.append("hl") }
+    if candidateStateJKHLBehavior == 1 { excluded.append("jk") }
+    if candidateStateJKHLBehavior == 2 { excluded.append("hl") }
     if useShiftQuestionToCallServiceMenu { excluded.append("?") }
     excluded.append(IMEApp.isKeyboardJIS ? "_" : "`~")
     return CandidateKey.validate(keys: candidateKeys, excluding: excluded)

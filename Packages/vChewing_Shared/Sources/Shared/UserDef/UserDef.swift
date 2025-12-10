@@ -36,6 +36,7 @@ public enum UserDef: String, CaseIterable, Identifiable {
   case kAppleLanguages = "AppleLanguages"
   case kShouldAutoReloadUserDataFiles = "ShouldAutoReloadUserDataFiles"
   case kUseRearCursorMode = "UseRearCursorMode"
+  case kCandidateStateJKHLBehavior = "CandidateStateJKHLBehavior"
   case kUseHLtoMoveCompositorCursorInCandidateState = "UseHLtoMoveCompositorCursorInCandidateState"
   case kUseJKtoMoveCompositorCursorInCandidateState = "UseJKtoMoveCompositorCursorInCandidateState"
   case kUseShiftQuestionToCallServiceMenu = "UseShiftQuestionToCallServiceMenu"
@@ -196,6 +197,7 @@ extension UserDef {
     case .kAppleLanguages: return .array
     case .kShouldAutoReloadUserDataFiles: return .bool
     case .kUseRearCursorMode: return .bool
+    case .kCandidateStateJKHLBehavior: return .integer
     case .kUseHLtoMoveCompositorCursorInCandidateState: return .bool
     case .kUseJKtoMoveCompositorCursorInCandidateState: return .bool
     case .kUseShiftQuestionToCallServiceMenu: return .bool
@@ -371,6 +373,15 @@ extension UserDef {
         options: [
           0: "in front of the phrase (like macOS built-in Zhuyin IME)",
           1: "at the rear of the phrase (like Microsoft New Phonetic)",
+        ]
+      )
+    case .kCandidateStateJKHLBehavior: return .init(
+        userDef: self, shortTitle: "i18n:UserDef.kCandidateStateJKHLBehavior.shortTitle",
+        description: "i18n:UserDef.kCandidateStateJKHLBehavior.description",
+        options: [
+          0: "i18n:UserDef.kCandidateStateJKHLBehavior.option.0",
+          1: "i18n:UserDef.kCandidateStateJKHLBehavior.option.1",
+          2: "i18n:UserDef.kCandidateStateJKHLBehavior.option.2",
         ]
       )
     case .kUseHLtoMoveCompositorCursorInCandidateState: return .init(

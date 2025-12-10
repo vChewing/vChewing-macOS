@@ -280,10 +280,8 @@ extension InputHandlerProtocol {
 
     // MARK: J / K / H / L 鍵組字區的游標移動行為處理
 
-    let allowMovinCursorByJK = allowMovingCompositorCursor && prefs
-      .useJKtoMoveCompositorCursorInCandidateState
-    let allowMovingCursorByHL = allowMovingCompositorCursor && prefs
-      .useHLtoMoveCompositorCursorInCandidateState
+    let allowMovinCursorByJK = allowMovingCompositorCursor && prefs.candidateStateJKHLBehavior == 1
+    let allowMovingCursorByHL = allowMovingCompositorCursor && prefs.candidateStateJKHLBehavior == 2
 
     checkMovingCompositorCursorByJKHL: if allowMovinCursorByJK || allowMovingCursorByHL {
       guard input.keyModifierFlags.isEmpty else { break checkMovingCompositorCursorByJKHL }
@@ -320,7 +318,7 @@ extension InputHandlerProtocol {
     let matched: String = (shaltShiftHold ? input.inputTextIgnoringModifiers ?? "" : inputText)
       .lowercased()
     // 如果允許 J / K 鍵前後移動組字區游標的話，則不再將 J / K 鍵盤視為選字鍵。
-    if !(prefs.useJKtoMoveCompositorCursorInCandidateState && "jk".contains(matched)) {
+    if !(prefs.candidateStateJKHLBehavior == 1 && "jk".contains(matched)) {
       checkSelectionKey: for keyPair in session.selectionKeys.enumerated() {
         guard matched == keyPair.element.lowercased() else { continue }
         index = Int(keyPair.offset)
@@ -328,7 +326,7 @@ extension InputHandlerProtocol {
       }
     }
     // 如果允許 H / L 鍵前後移動組字區游標的話，則不再將 H / L 鍵盤視為選字鍵。
-    if !(prefs.useHLtoMoveCompositorCursorInCandidateState && "hl".contains(matched)) {
+    if !(prefs.candidateStateJKHLBehavior == 2 && "hl".contains(matched)) {
       checkSelectionKey: for keyPair in session.selectionKeys.enumerated() {
         guard matched == keyPair.element.lowercased() else { continue }
         index = Int(keyPair.offset)

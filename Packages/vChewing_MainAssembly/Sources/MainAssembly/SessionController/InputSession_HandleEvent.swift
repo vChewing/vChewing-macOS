@@ -147,6 +147,27 @@ extension SessionProtocol {
       eventToDeal = eventToDeal.convertFromEmacsKeyEvent(isVerticalContext: verticalProcessing)
     }
 
+    // JKHL 鍵翻選字窗行列處理：將組字區游標移動鍵（JK 或 HL）轉換為對應的翻行列鍵（方向鍵）。
+    if state.isCandidateContainer, eventToDeal.keyModifierFlags.isEmpty {
+      let behavior = prefs.candidateStateJKHLBehavior
+      // behavior == 1: JK 移動游標，HL 翻行列
+      // behavior == 2: HL 移動游標，JK 翻行列
+      let rowFlippingKeyCodes: [UInt16] = behavior == 1 ? [4, 37] : (behavior == 2 ? [38, 40] : [])
+      if rowFlippingKeyCodes.contains(eventToDeal.keyCode) {
+        // 根據候選窗口佈局（橫向/縱向）決定轉換為哪個方向鍵
+        let isVertical = isVerticalCandidateWindow
+        let newKeyCode: UInt16
+        switch eventToDeal.keyCode {
+        case 38: newKeyCode = isVertical ? 125 : 124 // J -> Down(橫) / Right(縱)
+        case 40: newKeyCode = isVertical ? 126 : 123 // K -> Up(橫) / Left(縱)
+        case 4: newKeyCode = isVertical ? 123 : 126 // H -> Left(橫) / Up(縱)
+        case 37: newKeyCode = isVertical ? 124 : 125 // L -> Right(橫) / Down(縱)
+        default: newKeyCode = eventToDeal.keyCode
+        }
+        eventToDeal = eventToDeal.reinitiate(keyCode: newKeyCode)
+      }
+    }
+
     // 在啟用注音排列而非拼音輸入的情況下，強制將當前鍵盤佈局翻譯為美規鍵盤（或指定的其它鍵盤佈局）。
     if !inputHandler.isComposerUsingPinyin || IMKHelper.isDynamicBasicKeyboardLayoutEnabled {
       var defaultLayout = LatinKeyboardMappings(rawValue: prefs.basicKeyboardLayout) ??

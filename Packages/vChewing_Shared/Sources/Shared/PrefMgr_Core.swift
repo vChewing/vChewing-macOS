@@ -146,6 +146,9 @@ public struct PrefMgr: PrefMgrProtocol {
   @AppProperty(key: UserDef.kUseRearCursorMode.rawValue, defaultValue: false)
   public var useRearCursorMode: Bool
 
+  @AppProperty(key: UserDef.kCandidateStateJKHLBehavior.rawValue, defaultValue: 0)
+  public var candidateStateJKHLBehavior: Int
+
   @AppProperty(
     key: UserDef.kUseHLtoMoveCompositorCursorInCandidateState.rawValue,
     defaultValue: false
@@ -511,6 +514,9 @@ extension PrefMgr {
     }
     if ![0, 1, 2].contains(candidateNarrationToggleType) {
       candidateNarrationToggleType = 0
+    }
+    if ![0, 1, 2].contains(candidateStateJKHLBehavior) {
+      candidateStateJKHLBehavior = 0
     }
   }
 }
