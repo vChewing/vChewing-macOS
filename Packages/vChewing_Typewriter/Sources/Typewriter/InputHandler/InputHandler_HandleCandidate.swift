@@ -294,7 +294,7 @@ extension InputHandlerProtocol {
           errorCallback?("6F389AE9")
         }
         return true
-      case 40 where allowMovinCursorByJK, 37 where allowMovingCursorByHL:
+      case 40 where allowMovingCursorByJK, 37 where allowMovingCursorByHL:
         if assembler.moveCursorStepwise(to: .front) {
           session.switchState(generateStateOfCandidates())
         } else {
