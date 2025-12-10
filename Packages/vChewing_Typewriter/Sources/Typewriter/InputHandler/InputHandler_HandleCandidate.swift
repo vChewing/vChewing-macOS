@@ -280,14 +280,14 @@ extension InputHandlerProtocol {
 
     // MARK: J / K / H / L 鍵組字區的游標移動行為處理
 
-    let allowMovinCursorByJK = allowMovingCompositorCursor && prefs.candidateStateJKHLBehavior == 1
+    let allowMovingCursorByJK = allowMovingCompositorCursor && prefs.candidateStateJKHLBehavior == 1
     let allowMovingCursorByHL = allowMovingCompositorCursor && prefs.candidateStateJKHLBehavior == 2
 
-    checkMovingCompositorCursorByJKHL: if allowMovinCursorByJK || allowMovingCursorByHL {
+    checkMovingCompositorCursorByJKHL: if allowMovingCursorByJK || allowMovingCursorByHL {
       guard input.keyModifierFlags.isEmpty else { break checkMovingCompositorCursorByJKHL }
       // keycode: 38 = J, 40 = K, 4 = H, 37 = L.
       switch input.keyCode {
-      case 38 where allowMovinCursorByJK, 4 where allowMovingCursorByHL:
+      case 38 where allowMovingCursorByJK, 4 where allowMovingCursorByHL:
         if assembler.moveCursorStepwise(to: .rear) {
           session.switchState(generateStateOfCandidates())
         } else {

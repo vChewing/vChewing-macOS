@@ -152,10 +152,12 @@ extension SessionProtocol {
       let behavior = prefs.candidateStateJKHLBehavior
       // behavior == 1: JK 移動游標，HL 翻行列
       // behavior == 2: HL 移動游標，JK 翻行列
+      // Key codes: H=4, L=37, J=38, K=40
       let rowFlippingKeyCodes: [UInt16] = behavior == 1 ? [4, 37] : (behavior == 2 ? [38, 40] : [])
       if rowFlippingKeyCodes.contains(eventToDeal.keyCode) {
         // 根據候選窗口佈局（橫向/縱向）決定轉換為哪個方向鍵
         let isVertical = isVerticalCandidateWindow
+        // Arrow key codes: Left=123, Right=124, Down=125, Up=126
         let newKeyCode: UInt16
         switch eventToDeal.keyCode {
         case 38: newKeyCode = isVertical ? 125 : 124 // J -> Down(橫) / Right(縱)
