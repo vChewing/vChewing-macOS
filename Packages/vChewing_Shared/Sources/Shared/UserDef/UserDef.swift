@@ -497,8 +497,8 @@ extension UserDef {
       )
     case .kAllowBoostingSingleKanjiAsUserPhrase: return .init(
         userDef: self,
-        shortTitle: "Allow boosting / excluding a candidate of single kanji when marking",
-        description: "⚠︎ This may hinder the sentence-composition algorithm from giving appropriate results."
+        shortTitle: "i18n:UserDef.kAllowBoostingSingleKanjiAsUserPhrase.shortTitle",
+        description: "i18n:UserDef.kAllowBoostingSingleKanjiAsUserPhrase.description"
       )
     case .kUseSCPCTypingMode: return .init(
         userDef: self, shortTitle: "Emulating select-candidate-per-character mode",

@@ -19,7 +19,6 @@
 "⚠︎ Failed from nerfing a candidate." = "⚠︎ Failed from nerfing a candidate.";
 "⚠︎ Phrase replacement mode enabled, interfering user phrase entry." = "⚠︎ Phrase replacement mode enabled, interfering user phrase entry.";
 "⚠︎ This feature is useful ONLY WHEN the font you are using doesn't support dynamic vertical punctuations. However, typed vertical punctuations will always shown as vertical punctuations EVEN IF your editor has changed the typing direction to horizontal." = "⚠︎ This feature is useful ONLY WHEN the font you are using doesn't support dynamic vertical punctuations. However, typed vertical punctuations will always shown as vertical punctuations EVEN IF your editor has changed the typing direction to horizontal.";
-"⚠︎ This may hinder the sentence-composition algorithm from giving appropriate results." = "⚠︎ This may hinder the sentence-composition algorithm from giving appropriate results.";
 "⚠︎ This will reboot the vChewing IME." = "⚠︎ This will reboot the vChewing IME.";
 "⚠︎ Unhandlable: Chars and Readings in buffer doesn't match." = "⚠︎ Unhandlable: Chars and Readings in buffer doesn't match.";
 "1) Only macOS has IMKCandidates. Since it relies on a dedicated ObjC Bridging Header to expose necessary internal APIs to work, it hinders vChewing from completely modularized for multi-platform support.\n\n2) IMKCandidates is buggy. It is not likely to be completely fixed by Apple, and its devs are not allowed to talk about it to non-Apple individuals. That's why we have had enough with IMKCandidates. It is likely the reason why Apple had never used IMKCandidates in their official InputMethodKit sample projects (as of August 2023)." = "1) Only macOS has IMKCandidates. Since it relies on a dedicated ObjC Bridging Header to expose necessary internal APIs to work, it hinders vChewing from completely modularized for multi-platform support.\n\n2) IMKCandidates is buggy. It is not likely to be completely fixed by Apple, and its devs are not allowed to talk about it to non-Apple individuals. That's why we have had enough with IMKCandidates. It is likely the reason why Apple had never used IMKCandidates in their official InputMethodKit sample projects (as of August 2023).";
@@ -30,7 +29,6 @@
 "Adjust candidate window location according to current node length" = "Adjust candidate window location according to current node length";
 "All strokes in the composition buffer will be shown as ASCII keyboard characters unless this option is enabled. Stroke is definable in the “%keyname” section of the CIN file." = "All strokes in the composition buffer will be shown as ASCII keyboard characters unless this option is enabled. Stroke is definable in the “%keyname” section of the CIN file.";
 "Allow backspace-editing miscomposed readings" = "Allow backspace-editing miscomposed readings";
-"Allow boosting / excluding a candidate of single kanji when marking" = "Allow boosting / excluding a candidate of single kanji when marking";
 "Allow using Enter key to confirm associated candidate selection" = "Allow using Enter key to confirm associated candidate selection";
 "Alphanumerical Input Mode" = "Alphanumerical Input Mode";
 "Alphanumerical Layout:" = "Alphanumerical Layout:";
@@ -229,6 +227,8 @@
 "i18n:settings.importFromKimoTxt.label" = "Import Yahoo! KeyKey User Dictionary file";
 "i18n:settings.importFromKimoTxt.postOpsNotice" = "Other entires are either already-in-database or have validity problems. If you want to dump all data to a dedicated text file, you may want to use KeyKeyUserDBKit (GitHub Repository `vChewing/KeyKeyUserDBKit`) instead.";
 "i18n:settings.shiftKeyASCIITogle.description" = "This feature only needs to parse consecutive NSEvents passed by macOS built-in InputMethodKit framework, hence no necessity of asking end-users for extra privileges of monitoring global keyboard inputs. You are free to investigate our codebase or reverse-engineer this input method to see whether the above statement is trustable. Also, this Shift-key toggle won't work if CapsLock is ON.";
+"i18n:UserDef.kAllowBoostingSingleKanjiAsUserPhrase.description" = "⚠️💀 This may hinder the sentence-composition algorithm from giving appropriate results. You are urged to turn this switch off at all costs, unless you really know what you are doing.";
+"i18n:UserDef.kAllowBoostingSingleKanjiAsUserPhrase.shortTitle" = "Allow boosting / excluding a candidate of single kanji";
 "i18n:UserDef.kAlwaysUsePCBWithElectronBasedClients.description" = "Electron-based apps are notorious in unpredictable (buggy) IMKTextInput API interactive behaviors. Most of such apps are unlikely to have their individual issues of such solved correctly on-time due to various out-of-control reasons, hence why this toggle is enabled by default.";
 "i18n:UserDef.kAlwaysUsePCBWithElectronBasedClients.shortTitle" = "Always use popup composition buffer for Electron-based client apps";
 "i18n:UserDef.kBeepSoundPreference.option.0" = "Muted";
@@ -242,6 +242,11 @@
 "i18n:UserDef.kCandidateNarrationToggleType.option.alwaysOn" = "Always On";
 "i18n:UserDef.kCandidateNarrationToggleType.option.onlyWhenVoiceOverIsOn" = "Only When VoiceOver is On";
 "i18n:UserDef.kCandidateNarrationToggleType.shortTitle" = "Candidate Narration Mode:";
+"i18n:UserDef.kCandidateStateJKHLBehavior.description" = "⚠︎ Regarding these specific composition-buffer-cursor-flipping-keys: 1) This will automatically prevent JKHL to be used as candidate keys; 2) They won't work with '%quick' candidates in cassette mode.";
+"i18n:UserDef.kCandidateStateJKHLBehavior.option.0" = "Unassigned";
+"i18n:UserDef.kCandidateStateJKHLBehavior.option.1" = "JK to move cursor in the composition buffer; HL to flip current candidate row / column";
+"i18n:UserDef.kCandidateStateJKHLBehavior.option.2" = "HL to move cursor in the composition buffer; JK to flip current candidate row / column";
+"i18n:UserDef.kCandidateStateJKHLBehavior.shortTitle" = "JKHL key behavior in candidate window:";
 "i18n:UserDef.kCheckAbusersOfSecureEventInputAPI.description" = "Such abuse of SecureEventInput API in the background can hinder all 3rd-party input methods from being able to switch to. It is fine to use SecureEventInput for sensitive input fields. However, an app calling EnableSecureEventInput() is responsible to call DisableSecureEventInput() immediately right after the input field loses focus. This situation may also happen if an app is hanging in the background (or working as a helper application in the background) with its SecureEventInput left enabled.";
 "i18n:UserDef.kCheckAbusersOfSecureEventInputAPI.shortTitle" = "Actively check those processes abusing the SecureEventInput API";
 "i18n:UserDef.kCNS11643Enabled.shortTitle" = "Enable CNS11643 Support (2025-11-10)";
@@ -288,11 +293,6 @@
 "i18n:UserDef.kSpecifyCmdOptCtrlEnterBehavior.option.2" = "Commit Mandarin Braille (1947)";
 "i18n:UserDef.kSpecifyCmdOptCtrlEnterBehavior.option.3" = "Commit Mandarin Braille (GF0019-2018)";
 "i18n:UserDef.kSpecifyCmdOptCtrlEnterBehavior.shortTitle" = "Command+Option+Ctrl+Enter:";
-"i18n:UserDef.kCandidateStateJKHLBehavior.shortTitle" = "JKHL key behavior in candidate window:";
-"i18n:UserDef.kCandidateStateJKHLBehavior.description" = "⚠︎ Regarding these specific composition-buffer-cursor-flipping-keys: 1) This will automatically prevent JKHL to be used as candidate keys; 2) They won't work with '%quick' candidates in cassette mode.";
-"i18n:UserDef.kCandidateStateJKHLBehavior.option.0" = "Unassigned";
-"i18n:UserDef.kCandidateStateJKHLBehavior.option.1" = "JK to move cursor in the composition buffer; HL to flip current candidate row / column";
-"i18n:UserDef.kCandidateStateJKHLBehavior.option.2" = "HL to move cursor in the composition buffer; JK to flip current candidate row / column";
 "i18n:UserDef.kUseShiftQuestionToCallServiceMenu.shortTitle" = "Also use Shift+? to call Service Menu in Candidate Window";
 "IBM" = "IBM";
 "If disabled, this will insert space instead." = "If disabled, this will insert space instead.";

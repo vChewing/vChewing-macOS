@@ -19,7 +19,6 @@
 "⚠︎ Failed from nerfing a candidate." = "⚠︎ 候選字詞降權失敗。";
 "⚠︎ Phrase replacement mode enabled, interfering user phrase entry." = "⚠︎ 語彙置換功能已啟用，會波及語彙自訂。";
 "⚠︎ This feature is useful ONLY WHEN the font you are using doesn't support dynamic vertical punctuations. However, typed vertical punctuations will always shown as vertical punctuations EVEN IF your editor has changed the typing direction to horizontal." = "⚠︎ 該功能當且僅當目前的排版字型不支援縱排標點動態顯示轉義的情況下才有用。一旦使用了，所有敲出去的標點都會被永久轉換為靜態縱排標點：哪怕當前編輯器的排版模式已經改成橫排，這些已經輸入的標點也都還是縱排標點字元。";
-"⚠︎ This may hinder the sentence-composition algorithm from giving appropriate results." = "⚠︎ 這可能會妨礙組句函式，使其無法給出正確的結果。";
 "⚠︎ This will reboot the vChewing IME." = "⚠︎ 這將重啟唯音輸入法。";
 "⚠︎ Unhandlable: Chars and Readings in buffer doesn't match." = "⚠︎ 無法處理：組字區字數與讀音數不對應。";
 "1) Only macOS has IMKCandidates. Since it relies on a dedicated ObjC Bridging Header to expose necessary internal APIs to work, it hinders vChewing from completely modularized for multi-platform support.\n\n2) IMKCandidates is buggy. It is not likely to be completely fixed by Apple, and its devs are not allowed to talk about it to non-Apple individuals. That's why we have had enough with IMKCandidates. It is likely the reason why Apple had never used IMKCandidates in their official InputMethodKit sample projects (as of August 2023)." = "1) 只有 macOS 才有 IMKCandidates 可用。該元件依賴特製的 ObjC Bridging Header 才能工作，這妨礙了唯音輸入法的跨平台模組化。\n\n2) IMKCandidates 渾身是 Bug，且 Apple 不太可能修復之。甚至 InputMethodKit 的開發人員們都不被允許與任何非 Apple 員工討論這些內容。於是 IMKCandidates 基本上用不下去了，更遑論 IMKCandidates 未來可能發生的會導致相容性問題的內部改動。這很可能也是 Apple 官方 InputMethodKit 示範專案當中沒有用到 IMKCandidates 的原因之一（截至 2023 年 8 月）。";
@@ -30,7 +29,6 @@
 "Adjust candidate window location according to current node length" = "根據當前位置的字詞長度，自動調整選字窗的位置";
 "All strokes in the composition buffer will be shown as ASCII keyboard characters unless this option is enabled. Stroke is definable in the “%keyname” section of the CIN file." = "不啟用該選項的話，在組字區內的字根將會以原始鍵盤按鍵名稱來顯示。所有關於字根的定義，均請洽 CIN 磁帶檔案內的「%keyname」章節。";
 "Allow backspace-editing miscomposed readings" = "允許對無效的讀音使用 BackSpace 編輯";
-"Allow boosting / excluding a candidate of single kanji when marking" = "允許藉由標記模式將可以就地升權/排除的候選字詞的最短詞長設為單個漢字";
 "Allow using Enter key to confirm associated candidate selection" = "允許使用 Enter 確認當前選中的關聯詞語";
 "Alphanumerical Input Mode" = "英數輸入模式";
 "Alphanumerical Layout:" = "英數鍵盤佈局:";
@@ -229,6 +227,8 @@
 "i18n:settings.importFromKimoTxt.label" = "匯入奇摩輸入法自訂詞資料庫";
 "i18n:settings.importFromKimoTxt.postOpsNotice" = "其餘尚未匯入的資料可能是已有的記錄、或記錄本身不合理。若您想把全部資料完整導出為獨立文字檔，建議改用 KeyKeyUserDBKit（GitHub 倉庫: vChewing/KeyKeyUserDBKit）來操作。";
 "i18n:settings.shiftKeyASCIITogle.description" = "該功能只需要對藉由 macOS 內建的輸入法框架傳來的 NSEvent 做上下文分析，自然沒有「向使用者尋求系統全局鍵盤事件監聽權限」之必要。您可自行審視敝輸入法的原始程式碼倉庫、或對敝輸入法逆向工程，以自行證實此處所言之真假。另註：這個 Shift 鍵切換開關在 CapsLock 燈亮時無效。";
+"i18n:UserDef.kAllowBoostingSingleKanjiAsUserPhrase.description" = "⚠️💀 這可能會妨礙組句函式，使其無法給出正確的結果。開發者極力勸阻您啟用該功能，除非您真的知道您在做什麼。";
+"i18n:UserDef.kAllowBoostingSingleKanjiAsUserPhrase.shortTitle" = "允許對單個漢字進行升權或排除";
 "i18n:UserDef.kAlwaysUsePCBWithElectronBasedClients.description" = "基於 Electron 技術構建的客體往往臭名昭彰於各自的對 IMKTextInput API 的「行為難以預測、難以保證」的實作上。更糟糕的是，這類 App 的開發者們均有著各自的不可控的原因、而難以保證他們的 App 的這種問題能被及時地、妥當地解決。這也是為什麼這個開關在預設情況下處於開啟狀態。";
 "i18n:UserDef.kAlwaysUsePCBWithElectronBasedClients.shortTitle" = "對基於 Electron 技術構建的客體軟體一律強制啟用浮動組字窗";
 "i18n:UserDef.kBeepSoundPreference.option.0" = "靜音";
@@ -242,6 +242,11 @@
 "i18n:UserDef.kCandidateNarrationToggleType.option.alwaysOn" = "總是開啟";
 "i18n:UserDef.kCandidateNarrationToggleType.option.onlyWhenVoiceOverIsOn" = "僅在 VoiceOver 開啟時";
 "i18n:UserDef.kCandidateNarrationToggleType.shortTitle" = "候選字詞唸讀模式:";
+"i18n:UserDef.kCandidateStateJKHLBehavior.description" = "⚠︎ 關於這些特定的組字區游標移動鍵：1) 這將自動禁止 JKHL 用作選字鍵；2) 該功能在磁帶模式的「%quick」快速選字狀態下無效。";
+"i18n:UserDef.kCandidateStateJKHLBehavior.option.0" = "未指派";
+"i18n:UserDef.kCandidateStateJKHLBehavior.option.1" = "JK 移動組字區游標；HL 翻選字窗行列";
+"i18n:UserDef.kCandidateStateJKHLBehavior.option.2" = "HL 移動組字區游標；JK 翻選字窗行列";
+"i18n:UserDef.kCandidateStateJKHLBehavior.shortTitle" = "選字窗內的 JKHL 鍵行為：";
 "i18n:UserDef.kCheckAbusersOfSecureEventInputAPI.description" = "這種濫用會導致系統內的所有第三方輸入法全都無法正常使用（在輸入法選單內會變成灰色）。針對需要填寫敏感資料的場合，使用 SecureEventInput 無可厚非。但是，用 EnableSecureEventInput() 開啟該模式之後，就有義務在輸入窗格失焦的那一刻呼叫 DisableSecureEventInput() 來結束這種狀態。這種狀態還常見於後檯輔助 App 當中、或者某個 App 在叫出該模式之後失去回應（這樣的話，哪怕被切換到後檯，SecureEventInput 也不會自動解除）。";
 "i18n:UserDef.kCheckAbusersOfSecureEventInputAPI.shortTitle" = "主動偵測正在濫用 SecureEventInput API 的後檯執行緒";
 "i18n:UserDef.kCNS11643Enabled.shortTitle" = "啟用 CNS11643 全字庫支援 (2025-11-10)";
@@ -288,11 +293,6 @@
 "i18n:UserDef.kSpecifyCmdOptCtrlEnterBehavior.option.2" = "遞交國語點字 (1947)";
 "i18n:UserDef.kSpecifyCmdOptCtrlEnterBehavior.option.3" = "遞交國通盲文 (GF0019-2018)";
 "i18n:UserDef.kSpecifyCmdOptCtrlEnterBehavior.shortTitle" = "Command+Option+Ctrl+Enter:";
-"i18n:UserDef.kCandidateStateJKHLBehavior.shortTitle" = "選字窗內的 JKHL 鍵行為：";
-"i18n:UserDef.kCandidateStateJKHLBehavior.description" = "⚠︎ 關於這些特定的組字區游標移動鍵：1) 這將自動禁止 JKHL 用作選字鍵；2) 該功能在磁帶模式的「%quick」快速選字狀態下無效。";
-"i18n:UserDef.kCandidateStateJKHLBehavior.option.0" = "未指派";
-"i18n:UserDef.kCandidateStateJKHLBehavior.option.1" = "JK 移動組字區游標；HL 翻選字窗行列";
-"i18n:UserDef.kCandidateStateJKHLBehavior.option.2" = "HL 移動組字區游標；JK 翻選字窗行列";
 "i18n:UserDef.kUseShiftQuestionToCallServiceMenu.shortTitle" = "允許在選字窗內也使用「Shift+?」叫出服務選單";
 "IBM" = "IBM 排列";
 "If disabled, this will insert space instead." = "取消勾選的話，該按鍵會插入空格。";
