@@ -147,9 +147,12 @@ extension InputHandlerProtocol {
           session.switchState(State.ofAbortion())
           return true
         }
-        var handleAssociates = !prefs.useSCPCTypingMode && prefs
-          .associatedPhrasesEnabled // 關聯詞語功能專用。
-        handleAssociates = handleAssociates && assembler.cursor == assembler.length // 關聯詞語功能專用。
+        // 關聯詞語功能專用。
+        let handleAssociates: Bool = [
+          !prefs.useSCPCTypingMode,
+          prefs.associatedPhrasesEnabled,
+          assembler.isCursorAtEdge(direction: .front),
+        ].reduce(true) { $0 && $1 }
         confirmHighlightedCandidate()
         // 關聯詞語。
         associatedPhrases: if handleAssociates {
