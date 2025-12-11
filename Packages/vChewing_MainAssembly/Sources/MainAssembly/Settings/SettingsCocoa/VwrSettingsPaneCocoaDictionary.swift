@@ -128,17 +128,23 @@ extension SettingsPanesCocoa {
 
     func prepareUserDictionaryFolderPathControl(_ pathCtl: NSPathControl) {
       pathCtl.delegate = self
+      if let cell = pathCtl.cell as? NSPathCell {
+        cell.lineBreakMode = .byTruncatingTail
+        cell.truncatesLastVisibleLine = true
+      }
       pathCtl.allowsExpansionToolTips = true
       pathCtl.translatesAutoresizingMaskIntoConstraints = false
-      pathCtl.font = NSFont.systemFont(ofSize: NSFont.smallSystemFontSize)
+      pathCtl.font = NSFont(name: "Arial Narrow", size: NSFont.smallSystemFontSize)
+        ?? NSFont.systemFont(ofSize: NSFont.smallSystemFontSize)
       if #available(macOS 10.10, *) {
         pathCtl.controlSize = .small
       }
       pathCtl.backgroundColor = .controlBackgroundColor
       pathCtl.target = self
       pathCtl.doubleAction = #selector(pathControlDoubleAction(_:))
+      pathCtl.setContentHuggingPriority(.defaultLow, for: .horizontal)
       pathCtl.setContentHuggingPriority(.defaultHigh, for: .vertical)
-      pathCtl.setContentCompressionResistancePriority(.defaultHigh, for: .horizontal)
+      pathCtl.setContentCompressionResistancePriority(.defaultLow, for: .horizontal)
       pathCtl.makeSimpleConstraint(.height, relation: .equal, value: NSFont.smallSystemFontSize * 2)
       pathCtl.makeSimpleConstraint(.width, relation: .greaterThanOrEqual, value: windowWidth - 145)
       pathCtl.url = URL(fileURLWithPath: LMMgr.dataFolderPath(isDefaultFolder: false))
