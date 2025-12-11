@@ -80,6 +80,14 @@ extension SessionProtocol {
       }
       return cinCandidateKey
     }
+    // 如果有啟用 JKHL 鍵的特殊行為的話，則不再將 JKHL 鍵盤視為選字鍵。
+    // 注意：無論 candidateStateJKHLBehavior 是 1 還是 2，JKHL 四個鍵都有特定用途，
+    // 因此都需要排除在選字鍵之外。
+    if prefs.candidateStateJKHLBehavior != 0 {
+      return prefs.candidateKeys.filter {
+        !"jkhl".contains($0.lowercased())
+      }
+    }
     return prefs.candidateKeys
   }
 

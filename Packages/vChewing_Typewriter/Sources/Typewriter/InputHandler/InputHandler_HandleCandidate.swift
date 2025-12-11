@@ -281,35 +281,6 @@ extension InputHandlerProtocol {
       }
     }
 
-    // MARK: J / K / H / L 鍵組字區的游標移動行為處理
-
-    let allowMovinCursorByJK = allowMovingCompositorCursor && prefs
-      .useJKtoMoveCompositorCursorInCandidateState
-    let allowMovingCursorByHL = allowMovingCompositorCursor && prefs
-      .useHLtoMoveCompositorCursorInCandidateState
-
-    checkMovingCompositorCursorByJKHL: if allowMovinCursorByJK || allowMovingCursorByHL {
-      guard input.keyModifierFlags.isEmpty else { break checkMovingCompositorCursorByJKHL }
-      // keycode: 38 = J, 40 = K, 4 = H, 37 = L.
-      switch input.keyCode {
-      case 38 where allowMovinCursorByJK, 4 where allowMovingCursorByHL:
-        if assembler.moveCursorStepwise(to: .rear) {
-          session.switchState(generateStateOfCandidates())
-        } else {
-          errorCallback?("6F389AE9")
-        }
-        return true
-      case 40 where allowMovinCursorByJK, 37 where allowMovingCursorByHL:
-        if assembler.moveCursorStepwise(to: .front) {
-          session.switchState(generateStateOfCandidates())
-        } else {
-          errorCallback?("EDBD27F2")
-        }
-        return true
-      default: break checkMovingCompositorCursorByJKHL
-      }
-    }
-
     // MARK: 關聯詞語處理 (Associated Phrases) 以及標準選字處理
 
     if state.type == .ofAssociates, !input.isShiftHold { return false }
@@ -322,21 +293,13 @@ extension InputHandlerProtocol {
     }
     let matched: String = (shaltShiftHold ? input.inputTextIgnoringModifiers ?? "" : inputText)
       .lowercased()
-    // 如果允許 J / K 鍵前後移動組字區游標的話，則不再將 J / K 鍵盤視為選字鍵。
-    if !(prefs.useJKtoMoveCompositorCursorInCandidateState && "jk".contains(matched)) {
-      checkSelectionKey: for keyPair in session.selectionKeys.enumerated() {
-        guard matched == keyPair.element.lowercased() else { continue }
-        index = Int(keyPair.offset)
-        break checkSelectionKey
-      }
-    }
-    // 如果允許 H / L 鍵前後移動組字區游標的話，則不再將 H / L 鍵盤視為選字鍵。
-    if !(prefs.useHLtoMoveCompositorCursorInCandidateState && "hl".contains(matched)) {
-      checkSelectionKey: for keyPair in session.selectionKeys.enumerated() {
-        guard matched == keyPair.element.lowercased() else { continue }
-        index = Int(keyPair.offset)
-        break checkSelectionKey
-      }
+
+    // 選字鍵處理。
+    // 注意：JKHL 鍵的排除已在 session.selectionKeys 中處理，此處無需額外過濾。
+    checkSelectionKey: for keyPair in session.selectionKeys.enumerated() {
+      guard matched == keyPair.element.lowercased() else { continue }
+      index = Int(keyPair.offset)
+      break checkSelectionKey
     }
 
     // 標準選字處理

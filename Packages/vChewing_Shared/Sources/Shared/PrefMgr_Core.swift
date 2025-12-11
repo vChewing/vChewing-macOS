@@ -146,17 +146,8 @@ public struct PrefMgr: PrefMgrProtocol {
   @AppProperty(key: UserDef.kUseRearCursorMode.rawValue, defaultValue: false)
   public var useRearCursorMode: Bool
 
-  @AppProperty(
-    key: UserDef.kUseHLtoMoveCompositorCursorInCandidateState.rawValue,
-    defaultValue: false
-  )
-  public var useHLtoMoveCompositorCursorInCandidateState: Bool
-
-  @AppProperty(
-    key: UserDef.kUseJKtoMoveCompositorCursorInCandidateState.rawValue,
-    defaultValue: false
-  )
-  public var useJKtoMoveCompositorCursorInCandidateState: Bool
+  @AppProperty(key: UserDef.kCandidateStateJKHLBehavior.rawValue, defaultValue: 0)
+  public var candidateStateJKHLBehavior: Int
 
   @AppProperty(key: UserDef.kUseShiftQuestionToCallServiceMenu.rawValue, defaultValue: true)
   public var useShiftQuestionToCallServiceMenu: Bool
@@ -511,6 +502,29 @@ extension PrefMgr {
     }
     if ![0, 1, 2].contains(candidateNarrationToggleType) {
       candidateNarrationToggleType = 0
+    }
+    if ![0, 1, 2].contains(candidateStateJKHLBehavior) {
+      candidateStateJKHLBehavior = 0
+    }
+    migrateDeprecatedSettings()
+  }
+
+  private func migrateDeprecatedSettings() {
+    // 遷移舊設定。
+    if candidateStateJKHLBehavior == 0 {
+      let defaults = UserDefaults.standard
+      let legacyJK = defaults.bool(forKey: "UseJKtoMoveCompositorCursorInCandidateState")
+      let legacyHL = defaults.bool(forKey: "UseHLtoMoveCompositorCursorInCandidateState")
+      switch (legacyJK, legacyHL) {
+      case (true, false): candidateStateJKHLBehavior = 1
+      case (false, true): candidateStateJKHLBehavior = 2
+      case (true, true): candidateStateJKHLBehavior = 1
+      default: break
+      }
+      if legacyJK || legacyHL {
+        defaults.removeObject(forKey: "UseJKtoMoveCompositorCursorInCandidateState")
+        defaults.removeObject(forKey: "UseHLtoMoveCompositorCursorInCandidateState")
+      }
     }
   }
 }

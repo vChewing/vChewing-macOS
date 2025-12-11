@@ -138,13 +138,11 @@ extension SessionProtocol {
         .reinitiate(charactersIgnoringModifiers: isVerticalTyping ? "Vertical" : "Horizontal")
     }
 
-    // 使 NSEvent 自翻譯，這樣可以讓 Emacs NSEvent 變成標準 NSEvent。
-    // 注意不要針對 Empty 空狀態使用這個轉換，否則會使得相關組合鍵第交出垃圾字元。
-    if eventToDeal.isEmacsKey {
-      if state.type == .ofEmpty { return false }
-      let verticalProcessing = (state.isCandidateContainer) ? isVerticalCandidateWindow :
-        isVerticalTyping
-      eventToDeal = eventToDeal.convertFromEmacsKeyEvent(isVerticalContext: verticalProcessing)
+    // 處理 Emacs 與 VIM 的熱鍵模擬。
+    if let handledEmacVIM = reinterpreteKeyDownEventAsVIMEmacsKey(
+      event: &eventToDeal
+    ) {
+      return handledEmacVIM
     }
 
     // 在啟用注音排列而非拼音輸入的情況下，強制將當前鍵盤佈局翻譯為美規鍵盤（或指定的其它鍵盤佈局）。
@@ -210,5 +208,114 @@ extension SessionProtocol {
         cplk.isOn.toggle()
       }
     }
+  }
+}
+
+// MARK: - VIM / EMacs Key Handlers.
+
+extension SessionProtocol {
+  private func reinterpreteKeyDownEventAsVIMEmacsKey(event eventToDeal: inout KBEvent) -> Bool? {
+    // 使 NSEvent 自翻譯，這樣可以讓 Emacs NSEvent 變成標準 NSEvent。
+    if eventToDeal.isEmacsKey {
+      // 注意不要針對 Empty 空狀態使用這個轉換，否則會使得相關組合鍵遞交出垃圾字元。
+      if state.type == .ofEmpty { return false }
+      let verticalProcessing = (state.isCandidateContainer) ? isVerticalCandidateWindow :
+        isVerticalTyping
+      eventToDeal = eventToDeal.convertFromEmacsKeyEvent(isVerticalContext: verticalProcessing)
+    }
+
+    // JKHL 鍵處理。
+    handlingJKHL4CandidateState: do {
+      let behavior = prefs.candidateStateJKHLBehavior
+      let allConditionMet4handlingJKHL4CandidateState: Bool = [
+        behavior != 0,
+        state.isCandidateContainer,
+        eventToDeal.keyModifierFlags.isEmpty,
+      ].reduce(true) { $0 && $1 }
+      guard allConditionMet4handlingJKHL4CandidateState else {
+        break handlingJKHL4CandidateState
+      }
+
+      // JKHL 鍵處理（僅「組字區的游標移動」）。
+      checkMovingICBCursorByJKHL: do {
+        let isICBCursorMovable = state.type == .ofCandidates && !prefs.useSCPCTypingMode
+
+        let allowMovingCursorByJK = isICBCursorMovable && prefs.candidateStateJKHLBehavior == 1
+        let allowMovingCursorByHL = isICBCursorMovable && prefs.candidateStateJKHLBehavior == 2
+
+        // keycode: 38 = J, 40 = K, 4 = H, 37 = L.
+        switch eventToDeal.keyCode {
+        case 38 where allowMovingCursorByJK, 4 where allowMovingCursorByHL:
+          eventToDeal = eventToDeal.reinitiate(
+            with: .keyDown,
+            modifierFlags: [.option, .shift],
+            characters: (
+              isVerticalTyping ? KBEvent.SpecialKey.downArrow : KBEvent.SpecialKey.rightArrow
+            ).unicodeScalar.description,
+            charactersIgnoringModifiers: nil,
+            isARepeat: false,
+            keyCode: (
+              isVerticalTyping ? KeyCode.kDownArrow : KeyCode.kRightArrow
+            ).rawValue
+          )
+          break handlingJKHL4CandidateState
+        case 40 where allowMovingCursorByJK, 37 where allowMovingCursorByHL:
+          eventToDeal = eventToDeal.reinitiate(
+            with: .keyDown,
+            modifierFlags: [.option, .shift],
+            characters: (
+              isVerticalTyping ? KBEvent.SpecialKey.upArrow : KBEvent.SpecialKey.leftArrow
+            ).unicodeScalar.description,
+            charactersIgnoringModifiers: nil,
+            isARepeat: false,
+            keyCode: (
+              isVerticalTyping ? KeyCode.kUpArrow : KeyCode.kLeftArrow
+            ).rawValue
+          )
+          break handlingJKHL4CandidateState
+        default: break checkMovingICBCursorByJKHL
+        }
+      }
+
+      // JKHL 鍵處理（僅翻選字窗行列）。
+      checkFlippingHighlightedRowByJKHL: do {
+        /// 將翻行列鍵（HL 或 JK）轉換為對應的方向鍵。
+        // behavior == 1: JK 移動游標，HL 翻行列
+        // behavior == 2: HL 移動游標，JK 翻行列
+        // keycode: 38 = J, 40 = K, 4 = H, 37 = L.
+        let rowFlippingKeyCodes: [UInt16]
+        switch behavior {
+        case 1: rowFlippingKeyCodes = [4, 37] // H, L
+        case 2: rowFlippingKeyCodes = [38, 40] // J, K
+        default: rowFlippingKeyCodes = []
+        }
+        guard rowFlippingKeyCodes.contains(eventToDeal.keyCode) else {
+          break checkFlippingHighlightedRowByJKHL
+        }
+
+        // 根據候選窗口佈局（橫向/縱向）決定轉換為哪個方向鍵
+        // - 縱向窗：使用 Left(123)/Right(124) 翻列
+        // - 橫向窗：使用 Up(126)/Down(125) 翻行
+        // VIM 鍵位思維：H/K = 往 PREV，L/J = 往 NEXT。
+        let isVertical = isVerticalCandidateWindow
+        let pair: (UInt16, KBEvent.SpecialKey)?
+        switch (eventToDeal.keyCode, isVertical) {
+        case (37, true), (38, true): pair = (124, .rightArrow) // L/J (縱排) -> Right
+        case (37, false), (38, false): pair = (125, .downArrow) // L/J (橫排) -> Down
+        case (4, true), (40, true): pair = (123, .leftArrow) // H/K (縱排) -> Left
+        case (4, false), (40, false): pair = (126, .upArrow) // H/K (橫排) -> Up
+        default: pair = nil
+        }
+        guard let (newKeyCode, newSpecialKey) = pair else {
+          break checkFlippingHighlightedRowByJKHL
+        }
+        eventToDeal = eventToDeal.reinitiate(
+          characters: newSpecialKey.unicodeScalar.description,
+          keyCode: newKeyCode
+        )
+      }
+    }
+
+    return nil
   }
 }

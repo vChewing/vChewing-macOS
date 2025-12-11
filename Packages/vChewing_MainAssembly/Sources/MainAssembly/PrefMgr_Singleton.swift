@@ -35,8 +35,8 @@ extension PrefMgr {
 extension PrefMgrProtocol {
   public func validate(candidateKeys: String) -> String? {
     var excluded = ""
-    if useJKtoMoveCompositorCursorInCandidateState { excluded.append("jk") }
-    if useHLtoMoveCompositorCursorInCandidateState { excluded.append("hl") }
+    // 這個選項只要不是 0，那就是這四個鍵都被佔用了。
+    if candidateStateJKHLBehavior != 0 { excluded.append("jkhl") }
     if useShiftQuestionToCallServiceMenu { excluded.append("?") }
     excluded.append(IMEApp.isKeyboardJIS ? "_" : "`~")
     return CandidateKey.validate(keys: candidateKeys, excluding: excluded)
