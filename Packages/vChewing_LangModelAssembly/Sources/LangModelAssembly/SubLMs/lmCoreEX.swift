@@ -170,10 +170,27 @@ extension LMAssembly {
     /// 根據給定的讀音索引鍵，來獲取資料庫辭典內的對應資料陣列的字串首尾範圍資料、據此自 strData 取得字串形式的資料、生成單元圖陣列。
     /// - parameters:
     ///   - key: 讀音索引鍵。
-    func unigramsFor(key: String, keyArray: [String]? = nil) -> [Megrez.Unigram] {
+    func unigramsFor(
+      key: String,
+      keyArray: [String]? = nil,
+      omitNonTemporarySingleCharNonSymbolUnigrams: Bool = false
+    )
+      -> [Megrez.Unigram] {
       let keyArray = keyArray ?? key.split(separator: "-").map(\.description)
+      let singleSegLength: Bool = keyArray.count == 1
+      let noPunctuations = keyArray.allSatisfy { !$0.hasPrefix("_") }
       var grams: [Megrez.Unigram] = []
-      if let arrRangeRecords: [Range<String.Index>] = rangeMap[key] {
+      factorySQLiteResults: if let arrRangeRecords: [Range<String.Index>] = rangeMap[key] {
+        // 完全排除使用者詞庫中的單漢字結果，避免其影響組字結果。
+        // 但是單元測試等臨時資料除外，因為單元測試會依賴臨時資料的注入。
+        do {
+          let omitUserPhrases: Bool = [
+            omitNonTemporarySingleCharNonSymbolUnigrams,
+            singleSegLength,
+            noPunctuations,
+          ].reduce(true) { $0 && $1 }
+          guard !omitUserPhrases else { break factorySQLiteResults }
+        }
         for netaRange in arrRangeRecords {
           let neta = strData[netaRange].split(separator: " ")
           let theValue: String = shouldReverse ? String(neta[0]) : String(neta[1])
