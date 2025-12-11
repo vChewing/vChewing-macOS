@@ -278,6 +278,7 @@ public final class LMMgr {
         config.isCassetteEnabled = PrefMgr.shared.cassetteEnabled
         config.filterNonCNSReadings = PrefMgr.shared.filterNonCNSReadingsForCHTInput
         config.deltaOfCalendarYears = PrefMgr.shared.deltaOfCalendarYears
+        config.allowBoostingSingleKanjiAsUserPhrase = PrefMgr.shared.allowBoostingSingleKanjiAsUserPhrase
       }
     }
   }

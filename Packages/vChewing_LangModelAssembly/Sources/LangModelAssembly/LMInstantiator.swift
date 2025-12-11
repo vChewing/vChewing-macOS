@@ -53,6 +53,7 @@ extension LMAssembly {
       public var isSCPCEnabled = false
       public var filterNonCNSReadings = false
       public var deltaOfCalendarYears: Int = -2_000
+      public var allowBoostingSingleKanjiAsUserPhrase = false
     }
 
     public static var asyncLoadingUserData: Bool = true
@@ -437,8 +438,13 @@ extension LMAssembly {
       // 用 reversed 指令讓使用者語彙檔案內的詞條優先順序隨著行數增加而逐漸增高。
       // 這樣一來就可以在就地新增語彙時徹底複寫優先權。
       // 將兩句差分也是為了讓 rawUserUnigrams 的類型不受可能的影響。
+      let allowBoostingSingleKanji = config.allowBoostingSingleKanjiAsUserPhrase
       var userPhraseUnigrams = Array(
-        lmUserPhrases.unigramsFor(key: keyChain, keyArray: keyArray).reversed()
+        lmUserPhrases.unigramsFor(
+          key: keyChain,
+          keyArray: keyArray,
+          omitNonTemporarySingleCharNonSymbolUnigrams: !allowBoostingSingleKanji
+        ).reversed()
       )
       if keyArray.count == 1, let topScore = rawAllUnigrams.map(\.score).max() {
         // 不再讓使用者自己加入的單漢字讀音權重進入組句體系。
