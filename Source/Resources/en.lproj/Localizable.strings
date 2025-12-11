@@ -288,10 +288,11 @@
 "i18n:UserDef.kSpecifyCmdOptCtrlEnterBehavior.option.2" = "Commit Mandarin Braille (1947)";
 "i18n:UserDef.kSpecifyCmdOptCtrlEnterBehavior.option.3" = "Commit Mandarin Braille (GF0019-2018)";
 "i18n:UserDef.kSpecifyCmdOptCtrlEnterBehavior.shortTitle" = "Command+Option+Ctrl+Enter:";
-"i18n:UserDef.kUseHLtoMoveCompositorCursorInCandidateState.description" = "⚠︎ This will automatically prevent H and L from being used as candidate keys. Also, this won't work with ‘%quick’ candidates in cassette mode.";
-"i18n:UserDef.kUseHLtoMoveCompositorCursorInCandidateState.shortTitle" = "Use H / L to Move Buffer Cursor While Choosing Candidates";
-"i18n:UserDef.kUseJKtoMoveCompositorCursorInCandidateState.description" = "⚠︎ This will automatically prevent J and K from being used as candidate keys. Also, this won't work with ‘%quick’ candidates in cassette mode.";
-"i18n:UserDef.kUseJKtoMoveCompositorCursorInCandidateState.shortTitle" = "Use J / K to Move Buffer Cursor While Choosing Candidates";
+"i18n:UserDef.kCandidateStateJKHLBehavior.shortTitle" = "JKHL key behavior in candidate window:";
+"i18n:UserDef.kCandidateStateJKHLBehavior.description" = "⚠︎ Regarding these specific composition-buffer-cursor-flipping-keys: 1) This will automatically prevent JKHL to be used as candidate keys; 2) They won't work with '%quick' candidates in cassette mode.";
+"i18n:UserDef.kCandidateStateJKHLBehavior.option.0" = "Unassigned";
+"i18n:UserDef.kCandidateStateJKHLBehavior.option.1" = "JK to move cursor in the composition buffer; HL to flip current candidate row / column";
+"i18n:UserDef.kCandidateStateJKHLBehavior.option.2" = "HL to move cursor in the composition buffer; JK to flip current candidate row / column";
 "i18n:UserDef.kUseShiftQuestionToCallServiceMenu.shortTitle" = "Also use Shift+? to call Service Menu in Candidate Window";
 "IBM" = "IBM";
 "If disabled, this will insert space instead." = "If disabled, this will insert space instead.";

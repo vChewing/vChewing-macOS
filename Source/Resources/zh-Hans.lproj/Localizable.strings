@@ -288,10 +288,11 @@
 "i18n:UserDef.kSpecifyCmdOptCtrlEnterBehavior.option.2" = "递交国语点字 (1947)";
 "i18n:UserDef.kSpecifyCmdOptCtrlEnterBehavior.option.3" = "递交国通盲文 (GF0019-2018)";
 "i18n:UserDef.kSpecifyCmdOptCtrlEnterBehavior.shortTitle" = "Command+Option+Ctrl+Enter:";
-"i18n:UserDef.kUseHLtoMoveCompositorCursorInCandidateState.description" = "⚠︎ 这将自动禁止 H / L 键用作选字键。另外，该功能在磁带模式的“%quick”快速选字状态下无效。";
-"i18n:UserDef.kUseHLtoMoveCompositorCursorInCandidateState.shortTitle" = "在选字窗显示时允许以 H / L 键移动组字区游标";
-"i18n:UserDef.kUseJKtoMoveCompositorCursorInCandidateState.description" = "⚠︎ 这将自动禁止 J / K 键用作选字键。另外，该功能在磁带模式的“%quick”快速选字状态下无效。";
-"i18n:UserDef.kUseJKtoMoveCompositorCursorInCandidateState.shortTitle" = "在选字窗显示时允许以 J / K 键移动组字区游标";
+"i18n:UserDef.kCandidateStateJKHLBehavior.shortTitle" = "选字窗内的 JKHL 键行为：";
+"i18n:UserDef.kCandidateStateJKHLBehavior.description" = "⚠︎ 关于这些特定的组字区游标移动键：1) 这将自动禁止 JKHL 用作选字键；2) 该功能在磁带模式的「%quick」快速选字状态下无效。";
+"i18n:UserDef.kCandidateStateJKHLBehavior.option.0" = "未指派";
+"i18n:UserDef.kCandidateStateJKHLBehavior.option.1" = "JK 移动组字区游标；HL 翻选字窗行列";
+"i18n:UserDef.kCandidateStateJKHLBehavior.option.2" = "HL 移动组字区游标；JK 翻选字窗行列";
 "i18n:UserDef.kUseShiftQuestionToCallServiceMenu.shortTitle" = "允许在选字窗内也使用「Shift+?」叫出服务选单";
 "IBM" = "IBM 排列";
 "If disabled, this will insert space instead." = "取消勾选的话，该按键会插入空格。";

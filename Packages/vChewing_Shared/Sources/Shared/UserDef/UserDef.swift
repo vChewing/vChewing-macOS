@@ -36,8 +36,7 @@ public enum UserDef: String, CaseIterable, Identifiable {
   case kAppleLanguages = "AppleLanguages"
   case kShouldAutoReloadUserDataFiles = "ShouldAutoReloadUserDataFiles"
   case kUseRearCursorMode = "UseRearCursorMode"
-  case kUseHLtoMoveCompositorCursorInCandidateState = "UseHLtoMoveCompositorCursorInCandidateState"
-  case kUseJKtoMoveCompositorCursorInCandidateState = "UseJKtoMoveCompositorCursorInCandidateState"
+  case kCandidateStateJKHLBehavior = "CandidateStateJKHLBehavior"
   case kUseShiftQuestionToCallServiceMenu = "UseShiftQuestionToCallServiceMenu"
   case kUseDynamicCandidateWindowOrigin = "UseDynamicCandidateWindowOrigin"
   case kUseHorizontalCandidateList = "UseHorizontalCandidateList"
@@ -196,8 +195,7 @@ extension UserDef {
     case .kAppleLanguages: return .array
     case .kShouldAutoReloadUserDataFiles: return .bool
     case .kUseRearCursorMode: return .bool
-    case .kUseHLtoMoveCompositorCursorInCandidateState: return .bool
-    case .kUseJKtoMoveCompositorCursorInCandidateState: return .bool
+    case .kCandidateStateJKHLBehavior: return .integer
     case .kUseShiftQuestionToCallServiceMenu: return .bool
     case .kUseDynamicCandidateWindowOrigin: return .bool
     case .kUseHorizontalCandidateList: return .bool
@@ -373,15 +371,14 @@ extension UserDef {
           1: "at the rear of the phrase (like Microsoft New Phonetic)",
         ]
       )
-    case .kUseHLtoMoveCompositorCursorInCandidateState: return .init(
-        userDef: self,
-        shortTitle: "i18n:UserDef.kUseHLtoMoveCompositorCursorInCandidateState.shortTitle",
-        description: "i18n:UserDef.kUseHLtoMoveCompositorCursorInCandidateState.description"
-      )
-    case .kUseJKtoMoveCompositorCursorInCandidateState: return .init(
-        userDef: self,
-        shortTitle: "i18n:UserDef.kUseJKtoMoveCompositorCursorInCandidateState.shortTitle",
-        description: "i18n:UserDef.kUseJKtoMoveCompositorCursorInCandidateState.description"
+    case .kCandidateStateJKHLBehavior: return .init(
+        userDef: self, shortTitle: "i18n:UserDef.kCandidateStateJKHLBehavior.shortTitle",
+        description: "i18n:UserDef.kCandidateStateJKHLBehavior.description",
+        options: [
+          0: "i18n:UserDef.kCandidateStateJKHLBehavior.option.0",
+          1: "i18n:UserDef.kCandidateStateJKHLBehavior.option.1",
+          2: "i18n:UserDef.kCandidateStateJKHLBehavior.option.2",
+        ]
       )
     case .kUseShiftQuestionToCallServiceMenu: return .init(
         userDef: self,
