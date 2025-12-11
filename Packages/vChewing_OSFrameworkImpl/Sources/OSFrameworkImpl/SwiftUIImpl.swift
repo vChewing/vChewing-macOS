@@ -291,14 +291,20 @@
 
       public func makeNSView() -> NSPathControl {
         let pathCtl = NSPathControl()
+        if let cell = pathCtl.cell as? NSPathCell {
+          cell.lineBreakMode = .byTruncatingTail
+          cell.truncatesLastVisibleLine = true
+        }
         pathCtl.allowsExpansionToolTips = true
         pathCtl.translatesAutoresizingMaskIntoConstraints = false
-        pathCtl.font = NSFont.systemFont(ofSize: NSFont.smallSystemFontSize)
+        pathCtl.font = NSFont(name: "Arial Narrow", size: NSFont.smallSystemFontSize)
+          ?? NSFont.systemFont(ofSize: NSFont.smallSystemFontSize)
         pathCtl.controlSize = .small
         pathCtl.backgroundColor = .controlBackgroundColor
         pathCtl.target = self
         pathCtl.delegate = self
         pathCtl.doubleAction = #selector(Self.action)
+        pathCtl.setContentHuggingPriority(.defaultLow, for: .horizontal)
         pathCtl.setContentHuggingPriority(.defaultHigh, for: .vertical)
         pathCtl.setContentCompressionResistancePriority(.defaultLow, for: .horizontal)
         pathCtl.heightAnchor.constraint(equalToConstant: NSFont.smallSystemFontSize * 2).isActive = true
