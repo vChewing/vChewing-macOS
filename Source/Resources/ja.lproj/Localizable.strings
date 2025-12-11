@@ -19,7 +19,6 @@
 "⚠︎ Failed from nerfing a candidate." = "⚠︎ 指定された文字候補の優先順位を下げることに失敗ししました。";
 "⚠︎ Phrase replacement mode enabled, interfering user phrase entry." = "⚠︎ 言葉置換機能稼働中、新添付言葉にも影響。";
 "⚠︎ This feature is useful ONLY WHEN the font you are using doesn't support dynamic vertical punctuations. However, typed vertical punctuations will always shown as vertical punctuations EVEN IF your editor has changed the typing direction to horizontal." = "⚠︎ 該当の組版用フォントには縦書き（引用符・括弧）変換機能が備えていない限り、この機能を使う甲斐がある。一旦使うと、入力した全ての引用符・括弧は永遠的に縦書きの様式になる。例え入力を受けているアプリ（例えばワープロソフとなど）の書写方向は横書きと変えたとしても、これらの入力済みの引用符・括弧は全て縦書きの見た目であり、削除してから入力し直す必要になる。";
-"⚠︎ This may hinder the sentence-composition algorithm from giving appropriate results." = "⚠︎ センテンス構築算法に差し支えてしまい、正しくない結果が出る恐れがある。";
 "⚠︎ This will reboot the vChewing IME." = "⚠︎ これで唯音入力アプリを再起動。";
 "⚠︎ Unhandlable: Chars and Readings in buffer doesn't match." = "⚠︎ 対処不可：緩衝列の字数は読みの数と不同等。";
 "1) Only macOS has IMKCandidates. Since it relies on a dedicated ObjC Bridging Header to expose necessary internal APIs to work, it hinders vChewing from completely modularized for multi-platform support.\n\n2) IMKCandidates is buggy. It is not likely to be completely fixed by Apple, and its devs are not allowed to talk about it to non-Apple individuals. That's why we have had enough with IMKCandidates. It is likely the reason why Apple had never used IMKCandidates in their official InputMethodKit sample projects (as of August 2023)." = "1) IMKCandidates は macOS だけで利用可能のシステム構成部品であり、ObjC Bridging Header にて特殊の内部 API を使う必要があるため、本アプリの「他のシステムへの移植計画」に妨げています。\n\n2) IMKCandidates には数多くのバグがあり、そして Apple 社に修復される可能性はほぼゼロだと見込めます。さらに、Apple 社の IMKCandidates 開発参与者たちはそれについての一切内容を Apple 社以外の人と話すのは、会社の規則によって禁則事項です。従って、IMKCandidates をこのまま使い続くのは、本当にうんざりです。況してや、これからも、Apple 社が IMKCandidates に何か内部変化を導入して、新たなる互換性支障が生ずる恐れがあると見込めます。Apple の公式の InputMethodKit サンプルプロジェクトに、IMKCandidates が使われていなかった理由はこれこそだと推測できます（2023年8月までの話）。";
@@ -30,7 +29,6 @@
 "Adjust candidate window location according to current node length" = "カーソル所在位置の単語の長さによって候補陳列ウィンドウの位置を調整";
 "All strokes in the composition buffer will be shown as ASCII keyboard characters unless this option is enabled. Stroke is definable in the “%keyname” section of the CIN file." = "これをチェックしないと、全ての筆画は ASCII キーネームで入力緩衝列で表示してしまうことになる。CIN ファイルの「%keyname」というところで筆画の定義はできる。";
 "Allow backspace-editing miscomposed readings" = "効かぬ音読みを BackSpace で再編集";
-"Allow boosting / excluding a candidate of single kanji when marking" = "マーキングモードで即排除/即最優先にできる候補の文字数の最低限は１字とする";
 "Allow using Enter key to confirm associated candidate selection" = "Enter キーを連想語彙候補の確認のために使う";
 "Alphanumerical Input Mode" = "英數入力モード";
 "Alphanumerical Layout:" = "英数キーボード:";
@@ -228,6 +226,8 @@
 "i18n:settings.importFromKimoTxt.label" = "Yahoo! KeyKey ユーザー辞書ファイルを読込";
 "i18n:settings.importFromKimoTxt.postOpsNotice" = "読み込まなかった分は不合理か、あるいは今のデータベースにすでに既存しています。すべてのデータを独立したテキストファイルとして完全にお書き出ししたい場合は、KeyKeyUserDBKit（GitHub 倉庫: vChewing/KeyKeyUserDBKit）をご利用ください。";
 "i18n:settings.shiftKeyASCIITogle.description" = "この機能の利用する NSEvent は、macOS 内蔵の入力アプリ共用モジュール「InputMethodKit」から提供した NSEvent のみであり、その NSEvent 文脈関係で「Shift キーは１回押したかどうか」と判断することはできる。この事実に疑いを持つ者は、本アプリのソースコードを審査するか、あるいは本アプリを逆向工程（分解工学, いわゆる「Reverse-Engineering」）するがよい。なお、Shiftキーによるこの切り替えは、CapsLockがONの時には効かぬ。";
+"i18n:UserDef.kAllowBoostingSingleKanjiAsUserPhrase.description" = "⚠️💀 センテンス構築算法に差し支えてしまい、正しくない結果が出る恐れがあります。ご自分は何かをしようとしているのかを弁えていない限り、このスィッチを常にOFFすることだと開発者からの是正勧告です。";
+"i18n:UserDef.kAllowBoostingSingleKanjiAsUserPhrase.shortTitle" = "排除/最優先にできる候補の文字数の最低限は１字とする";
 "i18n:UserDef.kAlwaysUsePCBWithElectronBasedClients.description" = "ほとんどの「Electron で構築したアプリ」は IMKTextInput API の実作についての支障があり、その実作した API の挙動は予測できなくて、バグ退治もとても困難だと考えられています。このようなアプリの開発者たちにもそれぞれの原因でこのような支障を解決する策も動力も極めて少ないと認識されております。故に、このスイッチの最初値はONにしました。";
 "i18n:UserDef.kAlwaysUsePCBWithElectronBasedClients.shortTitle" = "Electron で構築した全ての客体アプリに「吹き出し入力緩衝列ウィンドウ」を強制的に起用";
 "i18n:UserDef.kBeepSoundPreference.option.0" = "鳴らず";
@@ -241,6 +241,11 @@
 "i18n:UserDef.kCandidateNarrationToggleType.option.alwaysOn" = "常にオン";
 "i18n:UserDef.kCandidateNarrationToggleType.option.onlyWhenVoiceOverIsOn" = "VoiceOver がオンの時のみ";
 "i18n:UserDef.kCandidateNarrationToggleType.shortTitle" = "候補読み上げモード:";
+"i18n:UserDef.kCandidateStateJKHLBehavior.description" = "⚠︎ 入力緩衝列カーソル移動用キーについて：1) JKHL は言選り用キー陣列から自動的に外されます；2) カセットモードの「%quick」による早速候補入力状態では利用できません。";
+"i18n:UserDef.kCandidateStateJKHLBehavior.option.0" = "未設定";
+"i18n:UserDef.kCandidateStateJKHLBehavior.option.1" = "JKで入力緩衝列のカーソルを移動；HLで現在の行・列を切り替え";
+"i18n:UserDef.kCandidateStateJKHLBehavior.option.2" = "HLで入力緩衝列のカーソルを移動；JKで現在の行・列を切り替え";
+"i18n:UserDef.kCandidateStateJKHLBehavior.shortTitle" = "候補陳列ウィンドウでのJKHLキーの動作：";
 "i18n:UserDef.kCheckAbusersOfSecureEventInputAPI.description" = "このような不正利用は「システム内蔵入力以外の全ての入力アプリがメニューで灰色状態で選べなくて使えない」の元凶である。センシティブな資料の記入どころでSecureEventInputをEnableSecureEventInput()で使うのは当然であるが、「入力中」状態が終わった後必ずDisableSecureEventInput()で状態解消すべきだと義務である。いくつかヘルパーアプリも、あるいはSecureEventInputを呼び起こしてからすぐ固まったアプリも、この状態になりやすい。特に、他のアプリの画面へ切り替えたとしても、固まったアプリのSecureEventInput状態は自動的に解消できぬ。";
 "i18n:UserDef.kCheckAbusersOfSecureEventInputAPI.shortTitle" = "SecureEventInput API を不正利用しているバクグラウンド・プロセスを自動検知";
 "i18n:UserDef.kCNS11643Enabled.shortTitle" = "全字庫モード // 入力可能な漢字数を倍増す (2025-11-10)";
@@ -287,11 +292,6 @@
 "i18n:UserDef.kSpecifyCmdOptCtrlEnterBehavior.option.2" = "中国語点字 (1947) を送出";
 "i18n:UserDef.kSpecifyCmdOptCtrlEnterBehavior.option.3" = "中国語点字 (GF0019-2018) を送出";
 "i18n:UserDef.kSpecifyCmdOptCtrlEnterBehavior.shortTitle" = "Command+Option+Ctrl+Enter:";
-"i18n:UserDef.kCandidateStateJKHLBehavior.shortTitle" = "候補陳列ウィンドウでのJKHLキーの動作：";
-"i18n:UserDef.kCandidateStateJKHLBehavior.description" = "⚠︎ 入力緩衝列カーソル移動用キーについて：1) JKHL は言選り用キー陣列から自動的に外されます；2) カセットモードの「%quick」による早速候補入力状態では利用できません。";
-"i18n:UserDef.kCandidateStateJKHLBehavior.option.0" = "未設定";
-"i18n:UserDef.kCandidateStateJKHLBehavior.option.1" = "JKで入力緩衝列のカーソルを移動；HLで現在の行・列を切り替え";
-"i18n:UserDef.kCandidateStateJKHLBehavior.option.2" = "HLで入力緩衝列のカーソルを移動；JKで現在の行・列を切り替え";
 "i18n:UserDef.kUseShiftQuestionToCallServiceMenu.shortTitle" = "候補陳列ウィンドウで「Shift+?」でもサービスメニューを呼出";
 "IBM" = "IBM 配列";
 "If disabled, this will insert space instead." = "未チェックの場合、スペースを挿入。";
