@@ -27,6 +27,7 @@ extension InputHandlerTests {
       XCTFail("testHandler and testSession at least one of them is nil.")
       return
     }
+    testHandler.prefs.enforceETenDOSCandidateSequence = false
     testHandler.prefs.useSCPCTypingMode = false
     clearTestPOM()
     vCTestLog("測試組句：幽蝶能留一縷芳，但這裡暫時先期待失敗結果「優跌能留意旅方」")
@@ -416,6 +417,7 @@ extension InputHandlerTests {
       XCTFail("testHandler and testSession at least one of them is nil.")
       return
     }
+    testHandler.prefs.enforceETenDOSCandidateSequence = false
     CandidateNode.load()
     let event4SymbolMenu = KBEvent.KeyEventData.symbolMenuKeyEventIntl.asEvent
     testSession.resetInputHandler(forceComposerCleanup: true)
@@ -444,6 +446,7 @@ extension InputHandlerTests {
       XCTFail("testHandler and testSession at least one of them is nil.")
       return
     }
+    testHandler.prefs.enforceETenDOSCandidateSequence = false
     let testKanjiData = """
     ㄒㄧㄢ 先 -1
     ㄒㄧㄢˊ 嫌 -1

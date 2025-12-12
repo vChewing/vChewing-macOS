@@ -595,11 +595,11 @@ extension InputHandlerProtocol {
     /// 這裡先對陣列排序、讓最長候選字的子陣列的優先權最高。
     /// 這個過程不會傷到子陣列內部的排序。
     if arrCandidates.isEmpty { return .init() }
-    var finalResult = [CandidateInState]()
     // 決定是否根據漸退記憶模組的建議來調整候選字詞的順序。
     let skipPOMHandling: Bool = fixOrder
       || !prefs.fetchSuggestionsFromPerceptionOverrideModel
       || prefs.useSCPCTypingMode
+      || currentTypingMethod != .vChewingFactory
     switch skipPOMHandling {
     case false:
       let arrSuggestedUnigrams: [(String, Megrez.Unigram)] = retrievePOMSuggestions(
@@ -623,11 +623,46 @@ extension InputHandlerProtocol {
       arrCandidates = filteredSuggestedCandidates + arrCandidates
       arrCandidates = deduplicateCandidatesPreservingOrder(arrCandidates)
       arrCandidates = arrCandidates.stableSort { $0.keyArray.count > $1.keyArray.count }
-      finalResult = arrCandidates.map { ($0.keyArray, $0.value) }
-    case true:
-      finalResult = arrCandidates.map { ($0.keyArray, $0.value) }
+    case true: break
     }
-    return finalResult
+
+    eTenSequenceEnforcement: if prefs.enforceETenDOSCandidateSequence {
+      guard currentTypingMethod == .vChewingFactory else {
+        break eTenSequenceEnforcement
+      }
+      var (arr4SingleSegment, arr4LongerSegments): (
+        [Megrez.KeyValuePaired], [Megrez.KeyValuePaired]
+      ) = ([], [])
+      var singleReadings: [String] = []
+      var singleReadingsInserted: Set<Int> = []
+      arrCandidates.forEach { currentPair in
+        switch currentPair.keyArray.count > 1 {
+        case true: arr4LongerSegments.append(currentPair)
+        case false:
+          if let currentReading = currentPair.keyArray.first {
+            let hash = currentReading.hashValue
+            if !singleReadingsInserted.contains(hash) {
+              singleReadingsInserted.insert(hash)
+              singleReadings.append(currentReading)
+            }
+          }
+          arr4SingleSegment.append(currentPair)
+        }
+      }
+      // 當且僅當單漢字讀音只有一種時，套用倚天中文 DOS 的候選字排序。
+      guard singleReadings.count == 1, let reading = singleReadings.first else {
+        break eTenSequenceEnforcement
+      }
+      let seq4ETen = currentLM.queryETenDOSSequence(reading: reading)
+      guard !seq4ETen.isEmpty else { break eTenSequenceEnforcement }
+      let arrSeq4ETen: [Megrez.KeyValuePaired] = seq4ETen.map {
+        .init(key: reading, value: $0, score: 0)
+      }
+      arrCandidates = arr4LongerSegments + deduplicateCandidatesPreservingOrder(
+        arrSeq4ETen + arr4SingleSegment
+      )
+    }
+    return arrCandidates.map { ($0.keyArray, $0.value) }
   }
 
   /// 移除重複候選字詞（以讀音 + 詞值做鍵），維持原順序。
