@@ -390,6 +390,7 @@ extension LMAssembly {
     /// - Parameter key: 給定的讀音字串。
     /// - Returns: 對應的經過處理的單元圖陣列。
     public func unigramsFor(keyArray: [String]) -> [Megrez.Unigram] {
+      // `config.bypassUserPhrasesData` 啟用時，除了 Associated Phrases 以外的資料全部忽略。
       let keyChain = keyArray.joined(separator: "-")
       guard !keyChain.isEmpty else { return [] }
       /// 給空格鍵指定輸出值。
@@ -431,7 +432,7 @@ extension LMAssembly {
         }
       }
 
-      if config.isSymbolEnabled {
+      if !config.bypassUserPhrasesData, config.isSymbolEnabled {
         rawAllUnigrams += lmUserSymbols.unigramsFor(key: keyChain, keyArray: keyArray)
         if !config.isCassetteEnabled {
           rawAllUnigrams += factoryUnigramsFor(
@@ -445,25 +446,27 @@ extension LMAssembly {
       // 用 reversed 指令讓使用者語彙檔案內的詞條優先順序隨著行數增加而逐漸增高。
       // 這樣一來就可以在就地新增語彙時徹底複寫優先權。
       // 將兩句差分也是為了讓 rawUserUnigrams 的類型不受可能的影響。
-      let allowBoostingSingleKanji = config.allowRescoringSingleKanjiCandidates
-      var userPhraseUnigrams = Array(
-        lmUserPhrases.unigramsFor(
-          key: keyChain,
-          keyArray: keyArray,
-          omitNonTemporarySingleCharNonSymbolUnigrams: !allowBoostingSingleKanji
-        ).reversed()
-      )
-      if keyArray.count == 1, let topScore = rawAllUnigrams.map(\.score).max() {
-        // 不再讓使用者自己加入的單漢字讀音權重進入組句體系。
-        userPhraseUnigrams = userPhraseUnigrams.map { currentUnigram in
-          Megrez.Unigram(
+      if !config.bypassUserPhrasesData {
+        let allowBoostingSingleKanji = config.allowRescoringSingleKanjiCandidates
+        var userPhraseUnigrams = Array(
+          lmUserPhrases.unigramsFor(
+            key: keyChain,
             keyArray: keyArray,
-            value: currentUnigram.value,
-            score: Swift.min(topScore + 0.000114514, currentUnigram.score)
-          )
+            omitNonTemporarySingleCharNonSymbolUnigrams: !allowBoostingSingleKanji
+          ).reversed()
+        )
+        if keyArray.count == 1, let topScore = rawAllUnigrams.map(\.score).max() {
+          // 不再讓使用者自己加入的單漢字讀音權重進入組句體系。
+          userPhraseUnigrams = userPhraseUnigrams.map { currentUnigram in
+            Megrez.Unigram(
+              keyArray: keyArray,
+              value: currentUnigram.value,
+              score: Swift.min(topScore + 0.000114514, currentUnigram.score)
+            )
+          }
         }
+        rawAllUnigrams = userPhraseUnigrams + rawAllUnigrams
       }
-      rawAllUnigrams = userPhraseUnigrams + rawAllUnigrams
 
       // 定期清理 InputToken HashMap 以防止記憶體洩漏
       cleanupInputTokenHashMapIfNeeded()
@@ -511,7 +514,7 @@ extension LMAssembly {
       }
 
       // 提前處理語彙置換。
-      if config.isPhraseReplacementEnabled {
+      if !config.bypassUserPhrasesData, config.isPhraseReplacementEnabled {
         for i in 0 ..< rawAllUnigrams.count {
           let oldUnigram = rawAllUnigrams[i]
           let newValue = lmReplacements.valuesFor(key: oldUnigram.value)
@@ -526,12 +529,12 @@ extension LMAssembly {
       }
 
       // 讓單元圖陣列自我過濾。在此基礎之上，對於相同詞值的多個單元圖，僅保留權重最大者。
-      rawAllUnigrams
-        .consolidate(
-          filter: .init(
-            lmFiltered.unigramsFor(key: keyChain, keyArray: keyArray).map(\.value)
-          )
+      let dataAsFilter: Set<String> = config.bypassUserPhrasesData
+        ? []
+        : .init(
+          lmFiltered.unigramsFor(key: keyChain, keyArray: keyArray).map(\.value)
         )
+      rawAllUnigrams.consolidate(filter: dataAsFilter)
       return rawAllUnigrams
     }
 

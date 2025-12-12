@@ -79,7 +79,9 @@ public struct PrefMgr: PrefMgrProtocol {
   public var failureFlagForPOMObservation: Bool
 
   @AppProperty(key: UserDef.kUserPhrasesDatabaseBypassed.rawValue, defaultValue: false)
-  public var userPhrasesDatabaseBypassed: Bool
+  public var userPhrasesDatabaseBypassed: Bool {
+    didSet { didAskForSyncingLMPrefs?() }
+  }
 
   @AppProperty(
     key: UserDef.kCandidateServiceMenuContents.rawValue,
