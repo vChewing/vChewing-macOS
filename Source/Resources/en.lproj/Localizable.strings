@@ -227,8 +227,8 @@
 "i18n:settings.importFromKimoTxt.label" = "Import Yahoo! KeyKey User Dictionary file";
 "i18n:settings.importFromKimoTxt.postOpsNotice" = "Other entires are either already-in-database or have validity problems. If you want to dump all data to a dedicated text file, you may want to use KeyKeyUserDBKit (GitHub Repository `vChewing/KeyKeyUserDBKit`) instead.";
 "i18n:settings.shiftKeyASCIITogle.description" = "This feature only needs to parse consecutive NSEvents passed by macOS built-in InputMethodKit framework, hence no necessity of asking end-users for extra privileges of monitoring global keyboard inputs. You are free to investigate our codebase or reverse-engineer this input method to see whether the above statement is trustable. Also, this Shift-key toggle won't work if CapsLock is ON.";
-"i18n:UserDef.kAllowBoostingSingleKanjiAsUserPhrase.description" = "⚠️💀 This may hinder the sentence-composition algorithm from giving appropriate results. You are urged to turn this switch off at all costs, unless you really know what you are doing.";
-"i18n:UserDef.kAllowBoostingSingleKanjiAsUserPhrase.shortTitle" = "Allow boosting / excluding a candidate of single kanji";
+"i18n:UserDef.kAllowRescoringSingleKanjiCandidates.description" = "⚠️💀 This may hinder the sentence-composition algorithm from giving appropriate results. You are urged to turn this switch off at all costs, unless you really know what you are doing.";
+"i18n:UserDef.kAllowRescoringSingleKanjiCandidates.shortTitle" = "Allow boosting / excluding a candidate of single kanji";
 "i18n:UserDef.kAlwaysUsePCBWithElectronBasedClients.description" = "Electron-based apps are notorious in unpredictable (buggy) IMKTextInput API interactive behaviors. Most of such apps are unlikely to have their individual issues of such solved correctly on-time due to various out-of-control reasons, hence why this toggle is enabled by default.";
 "i18n:UserDef.kAlwaysUsePCBWithElectronBasedClients.shortTitle" = "Always use popup composition buffer for Electron-based client apps";
 "i18n:UserDef.kBeepSoundPreference.option.0" = "Muted";

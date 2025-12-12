@@ -33,13 +33,26 @@ extension SettingsPanesCocoa {
             .makeNSLabel(fixWidth: contentWidth)
           NSView()
         }
-        NSStackView.buildSection(width: contentWidth) {
-          UserDef.kSecurityHardenedCompositionBuffer.render(fixWidth: contentWidth)
-          UserDef.kAlwaysUsePCBWithElectronBasedClients.render(fixWidth: contentWidth)
-          UserDef.kDisableSegmentedThickUnderlineInMarkingModeForManagedClients
-            .render(fixWidth: contentWidth)
-          UserDef.kCheckAbusersOfSecureEventInputAPI.render(fixWidth: contentWidth)
-        }?.boxed()
+        NSTabView.build {
+          NSTabView.TabPage(title: "Ａ") {
+            NSStackView.buildSection(width: innerContentWidth) {
+              UserDef.kSecurityHardenedCompositionBuffer.render(fixWidth: innerContentWidth)
+              UserDef.kAlwaysUsePCBWithElectronBasedClients.render(fixWidth: innerContentWidth)
+              UserDef.kDisableSegmentedThickUnderlineInMarkingModeForManagedClients
+                .render(fixWidth: innerContentWidth)
+            }?.boxed()
+            NSView()
+          }
+          NSTabView.TabPage(title: "Ｂ") {
+            NSStackView.buildSection(width: innerContentWidth) {
+              UserDef.kCheckAbusersOfSecureEventInputAPI.render(fixWidth: innerContentWidth)
+            }?.boxed()
+            NSStackView.buildSection(width: innerContentWidth) {
+              UserDef.kAllowRescoringSingleKanjiCandidates.render(fixWidth: innerContentWidth)
+            }?.boxed()
+            NSView()
+          }
+        }?.makeSimpleConstraint(.width, relation: .equal, value: tabContainerWidth)
         NSStackView.build(.horizontal, insets: .new(all: 0, left: 16, right: 16)) {
           "Some previous options are moved to other tabs."
             .makeNSLabel(descriptive: true, fixWidth: contentWidth)

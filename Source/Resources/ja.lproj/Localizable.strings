@@ -226,8 +226,8 @@
 "i18n:settings.importFromKimoTxt.label" = "Yahoo! KeyKey ユーザー辞書ファイルを読込";
 "i18n:settings.importFromKimoTxt.postOpsNotice" = "読み込まなかった分は不合理か、あるいは今のデータベースにすでに既存しています。すべてのデータを独立したテキストファイルとして完全にお書き出ししたい場合は、KeyKeyUserDBKit（GitHub 倉庫: vChewing/KeyKeyUserDBKit）をご利用ください。";
 "i18n:settings.shiftKeyASCIITogle.description" = "この機能の利用する NSEvent は、macOS 内蔵の入力アプリ共用モジュール「InputMethodKit」から提供した NSEvent のみであり、その NSEvent 文脈関係で「Shift キーは１回押したかどうか」と判断することはできる。この事実に疑いを持つ者は、本アプリのソースコードを審査するか、あるいは本アプリを逆向工程（分解工学, いわゆる「Reverse-Engineering」）するがよい。なお、Shiftキーによるこの切り替えは、CapsLockがONの時には効かぬ。";
-"i18n:UserDef.kAllowBoostingSingleKanjiAsUserPhrase.description" = "⚠️💀 センテンス構築算法に差し支えてしまい、正しくない結果が出る恐れがあります。ご自分は何かをしようとしているのかを弁えていない限り、このスィッチを常にOFFすることだと開発者からの是正勧告です。";
-"i18n:UserDef.kAllowBoostingSingleKanjiAsUserPhrase.shortTitle" = "排除/最優先にできる候補の文字数の最低限は１字とする";
+"i18n:UserDef.kAllowRescoringSingleKanjiCandidates.description" = "⚠️💀 センテンス構築算法に差し支えてしまい、正しくない結果が出る恐れがあります。ご自分は何かをしようとしているのかを弁えていない限り、このスィッチを常にOFFすることだと開発者からの是正勧告です。";
+"i18n:UserDef.kAllowRescoringSingleKanjiCandidates.shortTitle" = "排除/最優先にできる候補の文字数の最低限は１字とする";
 "i18n:UserDef.kAlwaysUsePCBWithElectronBasedClients.description" = "ほとんどの「Electron で構築したアプリ」は IMKTextInput API の実作についての支障があり、その実作した API の挙動は予測できなくて、バグ退治もとても困難だと考えられています。このようなアプリの開発者たちにもそれぞれの原因でこのような支障を解決する策も動力も極めて少ないと認識されております。故に、このスイッチの最初値はONにしました。";
 "i18n:UserDef.kAlwaysUsePCBWithElectronBasedClients.shortTitle" = "Electron で構築した全ての客体アプリに「吹き出し入力緩衝列ウィンドウ」を強制的に起用";
 "i18n:UserDef.kBeepSoundPreference.option.0" = "鳴らず";

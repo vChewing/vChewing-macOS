@@ -186,7 +186,7 @@ extension VwrCandidateTDKAppKit {
       !isMacroToken,
       index >= 0,
     ]
-    singleKanjiCheck: if !prefs.allowBoostingSingleKanjiAsUserPhrase {
+    singleKanjiCheck: if !prefs.allowRescoringSingleKanjiCandidates {
       guard let firstKey = candidate.keyArray.first else { break singleKanjiCheck }
       let segLengthIsOne = candidate.keyArray.count == 1
       let isPunctuation = firstKey.hasPrefix("_")

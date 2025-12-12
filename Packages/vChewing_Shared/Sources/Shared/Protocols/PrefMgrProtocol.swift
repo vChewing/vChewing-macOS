@@ -38,7 +38,7 @@ public protocol PrefMgrProtocol {
   var useHorizontalCandidateList: Bool { get set }
   var minCellWidthForHorizontalMatrix: Int { get set }
   var chooseCandidateUsingSpace: Bool { get set }
-  var allowBoostingSingleKanjiAsUserPhrase: Bool { get set }
+  var allowRescoringSingleKanjiCandidates: Bool { get set }
   var enforceETenDOSCandidateSequence: Bool { get set }
   var fetchSuggestionsFromPerceptionOverrideModel: Bool { get set }
   var reducePOMLifetimeToNoMoreThan12Hours: Bool { get set }

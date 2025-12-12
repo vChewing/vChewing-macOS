@@ -19,13 +19,7 @@ public struct VwrSettingsPaneDevZone: View {
   public var body: some View {
     NavigationStack {
       Form {
-        Section(
-          header: Text(
-            "Warning: This page is for testing future features. \nFeatures listed here may not work as expected."
-          ),
-          footer: Text("Some previous options are moved to other tabs.".i18n)
-            .settingsDescription()
-        ) {
+        Section {
           UserDef.kSecurityHardenedCompositionBuffer
             .bind($securityHardenedCompositionBuffer)
             .render()
@@ -35,9 +29,20 @@ public struct VwrSettingsPaneDevZone: View {
           UserDef.kDisableSegmentedThickUnderlineInMarkingModeForManagedClients
             .bind($disableSegmentedThickUnderlineInMarkingModeForManagedClients)
             .render()
+        } header: {
+          Text(
+            "Warning: This page is for testing future features. \nFeatures listed here may not work as expected."
+          )
+        }
+        Section {
           UserDef.kCheckAbusersOfSecureEventInputAPI
             .bind($checkAbusersOfSecureEventInputAPI)
             .render()
+          UserDef.kAllowRescoringSingleKanjiCandidates.bind($allowRescoringSingleKanjiCandidates)
+            .render()
+        } footer: {
+          Text("Some previous options are moved to other tabs.".i18n)
+            .settingsDescription()
         }
       }.formStyled()
     }
@@ -50,6 +55,12 @@ public struct VwrSettingsPaneDevZone: View {
   // MARK: Private
 
   // MARK: - AppStorage Variables
+
+  @AppStorage(
+    wrappedValue: false,
+    UserDef.kAllowRescoringSingleKanjiCandidates.rawValue
+  )
+  private var allowRescoringSingleKanjiCandidates: Bool
 
   @AppStorage(
     wrappedValue: false,

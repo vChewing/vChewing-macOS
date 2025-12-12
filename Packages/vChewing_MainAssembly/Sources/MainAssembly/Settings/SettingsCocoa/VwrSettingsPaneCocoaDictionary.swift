@@ -86,11 +86,7 @@ extension SettingsPanesCocoa {
                 renderable.currentControl?
                   .action = #selector(self.lmmgrSyncLMPrefsWithReplacementTable(_:))
               }
-              UserDef.kAllowBoostingSingleKanjiAsUserPhrase.render(fixWidth: innerContentWidth)
             }?.boxed()
-            NSView()
-          }
-          NSTabView.TabPage(title: "Ｃ") {
             NSStackView.buildSection(width: innerContentWidth) {
               NSStackView.build(.horizontal) {
                 "i18n:settings.importFromKimoTxt.label".makeNSLabel(fixWidth: innerContentWidth)

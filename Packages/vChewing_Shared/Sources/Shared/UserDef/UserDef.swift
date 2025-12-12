@@ -58,7 +58,7 @@ public enum UserDef: String, CaseIterable, Identifiable {
   case kSpecifyShiftTabKeyBehavior = "SpecifyShiftTabKeyBehavior"
   case kSpecifyShiftSpaceKeyBehavior = "SpecifyShiftSpaceKeyBehavior"
   case kSpecifyCmdOptCtrlEnterBehavior = "SpecifyCmdOptCtrlEnterBehavior"
-  case kAllowBoostingSingleKanjiAsUserPhrase = "AllowBoostingSingleKanjiAsUserPhrase"
+  case kAllowRescoringSingleKanjiCandidates = "AllowRescoringSingleKanjiCandidates"
   case kUseSCPCTypingMode = "UseSCPCTypingMode"
   case kMaxCandidateLength = "MaxCandidateLength"
   case kBeepSoundPreference = "BeepSoundPreference"
@@ -218,7 +218,7 @@ extension UserDef {
     case .kSpecifyShiftTabKeyBehavior: return .bool
     case .kSpecifyShiftSpaceKeyBehavior: return .bool
     case .kSpecifyCmdOptCtrlEnterBehavior: return .integer
-    case .kAllowBoostingSingleKanjiAsUserPhrase: return .bool
+    case .kAllowRescoringSingleKanjiCandidates: return .bool
     case .kUseSCPCTypingMode: return .bool
     case .kMaxCandidateLength: return .integer
     case .kBeepSoundPreference: return .integer
@@ -497,10 +497,10 @@ extension UserDef {
           3: "i18n:UserDef.kSpecifyCmdOptCtrlEnterBehavior.option.3",
         ]
       )
-    case .kAllowBoostingSingleKanjiAsUserPhrase: return .init(
+    case .kAllowRescoringSingleKanjiCandidates: return .init(
         userDef: self,
-        shortTitle: "i18n:UserDef.kAllowBoostingSingleKanjiAsUserPhrase.shortTitle",
-        description: "i18n:UserDef.kAllowBoostingSingleKanjiAsUserPhrase.description"
+        shortTitle: "i18n:UserDef.kAllowRescoringSingleKanjiCandidates.shortTitle",
+        description: "i18n:UserDef.kAllowRescoringSingleKanjiCandidates.description"
       )
     case .kUseSCPCTypingMode: return .init(
         userDef: self, shortTitle: "Emulating select-candidate-per-character mode",

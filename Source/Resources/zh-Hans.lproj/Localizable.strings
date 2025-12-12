@@ -227,8 +227,8 @@
 "i18n:settings.importFromKimoTxt.label" = "汇入奇摩输入法自订词资料库";
 "i18n:settings.importFromKimoTxt.postOpsNotice" = "其余尚未汇入的资料可能是已有的记录、或记录本身不合理。若您想把全部资料完整导出为独立文字档，建议改用 KeyKeyUserDBKit（GitHub 仓库: vChewing/KeyKeyUserDBKit）来操作。";
 "i18n:settings.shiftKeyASCIITogle.description" = "该功能只需要对借由 macOS 内建的输入法框架传来的 NSEvent 做上下文分析，自然没有「向使用者寻求系统全局键盘事件监听权限」之必要。您可自行审视敝输入法的原始程式码仓库、或对敝输入法逆向工程，以自行证实此处所言之真假。另注：这个 Shift 键切换开关在 CapsLock 灯亮时无效。";
-"i18n:UserDef.kAllowBoostingSingleKanjiAsUserPhrase.description" = "⚠️💀 这可能会妨碍组句函式，使其无法给出正确的结果。开发者极力劝阻您启用该功能，除非您真的知道您在做什么。";
-"i18n:UserDef.kAllowBoostingSingleKanjiAsUserPhrase.shortTitle" = "允许对单个汉字进行升权或排除";
+"i18n:UserDef.kAllowRescoringSingleKanjiCandidates.description" = "⚠️💀 这可能会妨碍组句函式，使其无法给出正确的结果。开发者极力劝阻您启用该功能，除非您真的知道您在做什么。";
+"i18n:UserDef.kAllowRescoringSingleKanjiCandidates.shortTitle" = "允许对单个汉字进行升权或排除";
 "i18n:UserDef.kAlwaysUsePCBWithElectronBasedClients.description" = "基于 Electron 技术构建的客体往往臭名昭彰于各自的对 IMKTextInput API 的「行为难以预测、难以保证」的实作上。更糟糕的是，这类 App 的开发者们均有着各自的不可控的原因、而难以保证他们的 App 的这种问题能被及时地、妥当地解决。这也是为什么这个开关在预设情况下处于开启状态。";
 "i18n:UserDef.kAlwaysUsePCBWithElectronBasedClients.shortTitle" = "对基于 Electron 技术构建的客体软体一律强制启用浮动组字窗";
 "i18n:UserDef.kBeepSoundPreference.option.0" = "静音";
