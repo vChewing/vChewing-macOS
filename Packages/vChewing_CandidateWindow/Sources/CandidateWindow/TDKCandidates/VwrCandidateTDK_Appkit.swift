@@ -176,10 +176,28 @@ extension VwrCandidateTDKAppKit {
     guard let delegate = controller?.delegate else { return }
     clickedCell = thePool.candidateDataAll[cellIndex]
     let index = clickedCell.index
+    guard let candidate = delegate.getCandidate(at: index) else { return }
     let candidateText = clickedCell.displayedText
-    let isEnabled: Bool = delegate.isCandidateContextMenuEnabled
+    let isEnabledInSession: Bool = delegate.isCandidateContextMenuEnabled
     let isMacroToken = delegate.checkIsMacroTokenResult(index)
-    guard isEnabled, !candidateText.isEmpty, !isMacroToken, index >= 0 else { return }
+    var conditions: [Bool] = [
+      isEnabledInSession,
+      !candidateText.isEmpty,
+      !isMacroToken,
+      index >= 0,
+    ]
+    singleKanjiCheck: if !prefs.allowBoostingSingleKanjiAsUserPhrase {
+      guard let firstKey = candidate.keyArray.first else { break singleKanjiCheck }
+      let segLengthIsOne = candidate.keyArray.count == 1
+      let isPunctuation = firstKey.hasPrefix("_")
+      let shouldDisableMenu = !isPunctuation && segLengthIsOne
+      if shouldDisableMenu {
+        delegate.callError("44E0B7CF: 當前輸入法偏好設定不允許單個漢字被控頻或被刪除。")
+      }
+      conditions.append(!shouldDisableMenu)
+    }
+    let allConditionsMet = conditions.reduce(true) { $0 && $1 }
+    guard allConditionsMet else { return }
     prepareMenu()
     var clickPoint = convert(event.locationInWindow, to: self)
     clickPoint.y = bounds.height - clickPoint.y // 翻轉座標系
