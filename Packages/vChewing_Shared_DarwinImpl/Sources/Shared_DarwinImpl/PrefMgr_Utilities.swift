@@ -13,6 +13,7 @@ import InputMethodKit
 
 extension PrefMgr {
   public func fixOddPreferences() {
+    fixOddPreferencesCore()
     if #unavailable(macOS 12) {
       showNotificationsWhenTogglingCapsLock = false
     }
