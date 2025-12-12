@@ -117,8 +117,15 @@ extension SessionProtocol {
   }
 
   public var isCandidateContextMenuEnabled: Bool {
-    state.type == .ofCandidates && !clientBundleIdentifier.contains("com.apple.Spotlight")
-      && !clientBundleIdentifier.contains("com.raycast.macos")
+    let blacklistedClients: Set<String> = [
+      "com.apple.Spotlight",
+      "com.raycast.macos",
+    ]
+    let conditions: [Bool] = [
+      state.type == .ofCandidates,
+      blacklistedClients.allSatisfy { !clientBundleIdentifier.contains($0) },
+    ]
+    return conditions.reduce(true) { $0 && $1 }
   }
 
   public var showReverseLookupResult: Bool { prefs.showReverseLookupInCandidateUI }
