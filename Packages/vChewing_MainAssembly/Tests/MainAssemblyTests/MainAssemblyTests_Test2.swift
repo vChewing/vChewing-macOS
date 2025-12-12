@@ -542,6 +542,7 @@ extension MainAssemblyTests {
 
   /// 測試在啟用逐字選字模式下的關聯詞語功能。
   func test214_InputHandler_AssociatedPhraseTriggers_SCPC() throws {
+    // 該測試已針對倚天中文DOS鍵盤排序更新過內容。
     testHandler.currentLM.injectTestData(
       associates: { lmAssociatesObj in
         lmAssociatesObj.replaceData(textData: "芳 苑 鄰 香 心 齡 訊 草 華 蹤 魂 名錄 名\n")
@@ -551,8 +552,8 @@ extension MainAssemblyTests {
     testHandler.prefs.associatedPhrasesEnabled = true
     XCTAssertTrue(!testHandler.currentLM.lmAssociates.strData.isEmpty)
     typeSentenceOrCandidates("z; ")
-    XCTAssertEqual(testSession.state.candidates[3].value, "芳")
-    typeSentenceOrCandidates("4")
+    XCTAssertEqual(testSession.state.candidates[1].value, "芳")
+    typeSentenceOrCandidates("2")
     XCTAssertEqual(testClient.toString(), "芳")
     print(testSession.state.candidates)
     XCTAssertEqual(testSession.state.type, .ofAssociates)
@@ -568,6 +569,7 @@ extension MainAssemblyTests {
 
   /// 測試在不啟用逐字選字模式下的關聯詞語功能。
   func test215_InputHandler_AssociatedPhraseTriggers_NonSCPC() throws {
+    testHandler.prefs.enforceETenDOSCandidateSequence = false
     testHandler.currentLM.injectTestData(
       associates: { lmAssociatesObj in
         lmAssociatesObj.replaceData(textData: "芳 苑 鄰 香 心 齡 訊 草 華 蹤 魂 名錄 名\n")

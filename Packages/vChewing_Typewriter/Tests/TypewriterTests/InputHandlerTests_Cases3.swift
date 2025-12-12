@@ -129,6 +129,7 @@ extension InputHandlerTests {
       XCTFail("testHandler and testSession at least one of them is nil.")
       return
     }
+    testHandler.prefs.enforceETenDOSCandidateSequence = false
     testHandler.prefs.useSCPCTypingMode = false
     clearTestPOM()
     vCTestLog("測試組句：年中")
@@ -258,6 +259,7 @@ extension InputHandlerTests {
       XCTFail("testHandler and testSession at least one of them is nil.")
       return
     }
+    testHandler.prefs.enforceETenDOSCandidateSequence = false
     testHandler.prefs.useSCPCTypingMode = false // Use Dachen.
     testHandler.prefs.fetchSuggestionsFromPerceptionOverrideModel = true
     let assembler = testHandler.assembler
@@ -407,6 +409,7 @@ extension InputHandlerTests {
       XCTFail("testHandler and testSession at least one of them is nil.")
       return
     }
+    testHandler.prefs.enforceETenDOSCandidateSequence = false
     testHandler.prefs.useSCPCTypingMode = false // Use Dachen.
     testHandler.prefs.fetchSuggestionsFromPerceptionOverrideModel = true
     let assembler = testHandler.assembler

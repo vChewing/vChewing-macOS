@@ -27,6 +27,7 @@ extension InputHandlerTests {
       XCTFail("testHandler is nil.")
       return
     }
+    testHandler.prefs.enforceETenDOSCandidateSequence = false
     testHandler.prefs.useSCPCTypingMode = false
     testHandler.prefs.useRearCursorMode = false
     clearTestPOM()
@@ -53,6 +54,7 @@ extension InputHandlerTests {
       XCTFail("testHandler and testSession at least one of them is nil.")
       return
     }
+    testHandler.prefs.enforceETenDOSCandidateSequence = false
     testHandler.prefs.useSCPCTypingMode = false
     testHandler.prefs.useRearCursorMode = false
     testHandler.prefs.cursorPlacementAfterSelectingCandidate = 1
@@ -185,6 +187,7 @@ extension InputHandlerTests {
       XCTFail("testHandler and testSession at least one of them is nil.")
       return
     }
+    testHandler.prefs.enforceETenDOSCandidateSequence = false
     // 關掉這個開關就可以停用 POM，不需要再 clearTestPOM()。
     testHandler.prefs.fetchSuggestionsFromPerceptionOverrideModel = false
     testHandler.prefs.useSCPCTypingMode = false

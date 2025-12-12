@@ -87,18 +87,23 @@ extension MainAssemblyTests {
 
   /// 測試基本的逐字選字（ㄅ半注音）。
   func test102_InputHandler_BasicSCPCTyping() throws {
+    // 該測試已針對倚天中文DOS鍵盤排序更新過內容。
     testHandler.prefs.useSCPCTypingMode = true
     clearTestPOM()
     vCTestLog("測試組句：幽蝶能留一縷芳")
     testSession.resetInputHandler(forceComposerCleanup: true)
-    typeSentenceOrCandidates("u. 32u,62s/6xu.6")
-    typeSentenceOrCandidates("1u4")
-    press([dataArrowDown, dataArrowDown])
-    typeSentenceOrCandidates("2")
+    typeSentenceOrCandidates("u. 3")
+    typeSentenceOrCandidates("2u,62")
+    typeSentenceOrCandidates("s/6")
+    typeSentenceOrCandidates("xu.63")
+    typeSentenceOrCandidates("u4")
+    press([dataArrowDown, dataArrowDown, dataArrowDown])
+    typeSentenceOrCandidates("3")
     typeSentenceOrCandidates("xm3")
-    typeSentenceOrCandidates("6")
+    press([dataArrowDown])
+    typeSentenceOrCandidates("1")
     typeSentenceOrCandidates("z; ")
-    typeSentenceOrCandidates("4")
+    typeSentenceOrCandidates("2")
     let resultText1 = testClient.toString()
     vCTestLog("- // 組字結果：\(resultText1)")
     XCTAssertEqual(resultText1, "幽蝶能留一縷芳")
@@ -107,6 +112,7 @@ extension MainAssemblyTests {
 
   /// 測試就地輪替候選字。
   func test103_InputHandler_RevolvingCandidates() throws {
+    testHandler.prefs.enforceETenDOSCandidateSequence = false
     testHandler.prefs.useSCPCTypingMode = false
     testHandler.prefs.useRearCursorMode = false
     clearTestPOM()
@@ -132,6 +138,7 @@ extension MainAssemblyTests {
   /// 測試藉由選字窗選字、且同時測試漸退記憶模組在此情況下的記憶資料生成與適用情況。
   /// - Remark: 這裡順便測試一下「在選字窗選字後自動推進游標」這個有被預設啟用的功能。
   func test104_InputHandler_ManualCandidateSelectionAndPOM() throws {
+    testHandler.prefs.enforceETenDOSCandidateSequence = false
     testHandler.prefs.useSCPCTypingMode = false
     testHandler.prefs.useRearCursorMode = false
     testHandler.prefs.cursorPlacementAfterSelectingCandidate = 1
