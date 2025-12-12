@@ -79,6 +79,7 @@ final class LMInstantiatorSQLTests: XCTestCase {
       config.isCNSEnabled = false
       config.isSymbolEnabled = false
       config.filterNonCNSReadings = false
+      config.alwaysSupplyETenDOSUnigrams = false
     }
     XCTAssertEqual(
       instance.unigramsFor(keyArray: ["ㄨㄟ"]).first(where: { $0.value == "危" })?.description,

@@ -279,6 +279,7 @@ public final class LMMgr {
         config.filterNonCNSReadings = PrefMgr.shared.filterNonCNSReadingsForCHTInput
         config.deltaOfCalendarYears = PrefMgr.shared.deltaOfCalendarYears
         config.allowBoostingSingleKanjiAsUserPhrase = PrefMgr.shared.allowBoostingSingleKanjiAsUserPhrase
+        config.alwaysSupplyETenDOSUnigrams = PrefMgr.shared.enforceETenDOSCandidateSequence
       }
     }
   }
