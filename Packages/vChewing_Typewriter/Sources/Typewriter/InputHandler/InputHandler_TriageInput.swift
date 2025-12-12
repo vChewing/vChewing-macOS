@@ -15,6 +15,7 @@ extension InputHandlerProtocol {
   public func triageInput(event input: InputSignalProtocol) -> Bool {
     guard let session = session else { return false }
     var state: State { session.state }
+    currentLM.syncPrefs()
 
     // MARK: - 按鍵碼分診（Triage by KeyCode）
 
