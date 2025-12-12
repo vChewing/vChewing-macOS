@@ -234,6 +234,15 @@ public final class MockSession: SessionCoreProtocol, CtlCandidateDelegate {
 
   public var isCandidateState: Bool { state.type == .ofCandidates }
 
+  public func callError(_ logMessage: String) {
+    vCLog(logMessage)
+  }
+
+  public func getCandidate(at index: Int) -> CandidateInState? {
+    guard state.candidates.indices.contains(index) else { return nil }
+    return state.candidates[index]
+  }
+
   public func switchState(_ newState: MockIMEState, caller: StaticString, line: Int) {
     if PrefMgr().isDebugModeEnabled || UserDefaults.pendingUnitTests {
       let stateStr = "\(state.type.rawValue) -> \(newState.type.rawValue)"
