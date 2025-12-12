@@ -78,6 +78,9 @@ public struct PrefMgr: PrefMgrProtocol {
   @AppProperty(key: UserDef.kFailureFlagForPOMObservation.rawValue, defaultValue: false)
   public var failureFlagForPOMObservation: Bool
 
+  @AppProperty(key: UserDef.kUserPhrasesDatabaseBypassed.rawValue, defaultValue: false)
+  public var userPhrasesDatabaseBypassed: Bool
+
   @AppProperty(
     key: UserDef.kCandidateServiceMenuContents.rawValue,
     defaultValue: kDefaultCandidateServiceMenuItem

@@ -9,6 +9,7 @@
 public protocol PrefMgrProtocol {
   var isDebugModeEnabled: Bool { get set }
   var failureFlagForPOMObservation: Bool { get set }
+  var userPhrasesDatabaseBypassed: Bool { get set }
   var candidateServiceMenuContents: [String] { get set }
   var respectClientAccentColor: Bool { get set }
   var alwaysUsePCBWithElectronBasedClients: Bool { get set }

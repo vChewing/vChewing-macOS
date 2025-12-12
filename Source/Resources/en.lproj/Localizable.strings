@@ -295,6 +295,8 @@
 "i18n:UserDef.kSpecifyCmdOptCtrlEnterBehavior.option.2" = "Commit Mandarin Braille (1947)";
 "i18n:UserDef.kSpecifyCmdOptCtrlEnterBehavior.option.3" = "Commit Mandarin Braille (GF0019-2018)";
 "i18n:UserDef.kSpecifyCmdOptCtrlEnterBehavior.shortTitle" = "Command+Option+Ctrl+Enter:";
+"i18n:UserDef.kUserPhrasesDatabaseBypassed.description" = "When enabled, all editable data in your User Phrases folder will be ignored (except Associated Phrases data). The developer may ask you to enable this to help determine whether it suppresses certain pernicious issues related to sentence composition.";
+"i18n:UserDef.kUserPhrasesDatabaseBypassed.shortTitle" = "Bypass the User Phrases database";
 "i18n:UserDef.kUseShiftQuestionToCallServiceMenu.shortTitle" = "Also use Shift+? to call Service Menu in Candidate Window";
 "IBM" = "IBM";
 "If disabled, this will insert space instead." = "If disabled, this will insert space instead.";

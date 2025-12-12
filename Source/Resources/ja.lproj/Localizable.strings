@@ -294,6 +294,8 @@
 "i18n:UserDef.kSpecifyCmdOptCtrlEnterBehavior.option.2" = "中国語点字 (1947) を送出";
 "i18n:UserDef.kSpecifyCmdOptCtrlEnterBehavior.option.3" = "中国語点字 (GF0019-2018) を送出";
 "i18n:UserDef.kSpecifyCmdOptCtrlEnterBehavior.shortTitle" = "Command+Option+Ctrl+Enter:";
+"i18n:UserDef.kUserPhrasesDatabaseBypassed.description" = "これを有効にすると、ユーザー辞書フォルダ内の（関連語彙データ以外の）すべての編集可能なデータが無視されます。開発者が言葉の組み立てに関連する特定の悪質な故障が抑制されるかどうか（すなわち、そのユーザー辞書データに原因があるかどうか）を確認するために、有効化するよう依頼することがあります。";
+"i18n:UserDef.kUserPhrasesDatabaseBypassed.shortTitle" = "ユーザー辞書を無効化";
 "i18n:UserDef.kUseShiftQuestionToCallServiceMenu.shortTitle" = "候補陳列ウィンドウで「Shift+?」でもサービスメニューを呼出";
 "IBM" = "IBM 配列";
 "If disabled, this will insert space instead." = "未チェックの場合、スペースを挿入。";

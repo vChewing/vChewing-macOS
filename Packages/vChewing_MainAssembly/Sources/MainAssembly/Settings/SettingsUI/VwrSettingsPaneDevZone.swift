@@ -38,6 +38,9 @@ public struct VwrSettingsPaneDevZone: View {
           UserDef.kCheckAbusersOfSecureEventInputAPI
             .bind($checkAbusersOfSecureEventInputAPI)
             .render()
+          UserDef.kUserPhrasesDatabaseBypassed
+            .bind($bypassNonAppleCapsLockHandling)
+            .render()
           UserDef.kAllowRescoringSingleKanjiCandidates.bind($allowRescoringSingleKanjiCandidates)
             .render()
         } footer: {
@@ -61,6 +64,12 @@ public struct VwrSettingsPaneDevZone: View {
     UserDef.kAllowRescoringSingleKanjiCandidates.rawValue
   )
   private var allowRescoringSingleKanjiCandidates: Bool
+
+  @AppStorage(
+    wrappedValue: false,
+    UserDef.kBypassNonAppleCapsLockHandling.rawValue
+  )
+  private var bypassNonAppleCapsLockHandling: Bool
 
   @AppStorage(
     wrappedValue: false,
