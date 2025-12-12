@@ -55,7 +55,7 @@ extension LMAssembly {
       public var alwaysSupplyETenDOSUnigrams = true
       public var filterNonCNSReadings = false
       public var deltaOfCalendarYears: Int = -2_000
-      public var allowBoostingSingleKanjiAsUserPhrase = false
+      public var allowRescoringSingleKanjiCandidates = false
     }
 
     public static var asyncLoadingUserData: Bool = true
@@ -129,7 +129,7 @@ extension LMAssembly {
       config.isCassetteEnabled = prefs.cassetteEnabled
       config.filterNonCNSReadings = prefs.filterNonCNSReadingsForCHTInput
       config.deltaOfCalendarYears = prefs.deltaOfCalendarYears
-      config.allowBoostingSingleKanjiAsUserPhrase = prefs.allowBoostingSingleKanjiAsUserPhrase
+      config.allowRescoringSingleKanjiCandidates = prefs.allowRescoringSingleKanjiCandidates
       config.alwaysSupplyETenDOSUnigrams = prefs.enforceETenDOSCandidateSequence
     }
 
@@ -443,7 +443,7 @@ extension LMAssembly {
       // 用 reversed 指令讓使用者語彙檔案內的詞條優先順序隨著行數增加而逐漸增高。
       // 這樣一來就可以在就地新增語彙時徹底複寫優先權。
       // 將兩句差分也是為了讓 rawUserUnigrams 的類型不受可能的影響。
-      let allowBoostingSingleKanji = config.allowBoostingSingleKanjiAsUserPhrase
+      let allowBoostingSingleKanji = config.allowRescoringSingleKanjiCandidates
       var userPhraseUnigrams = Array(
         lmUserPhrases.unigramsFor(
           key: keyChain,

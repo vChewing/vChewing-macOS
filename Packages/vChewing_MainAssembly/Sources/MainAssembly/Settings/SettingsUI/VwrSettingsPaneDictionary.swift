@@ -49,9 +49,6 @@ public struct VwrSettingsPaneDictionary: View {
   @AppStorage(wrappedValue: false, UserDef.kPhraseReplacementEnabled.rawValue)
   private var phraseReplacementEnabled: Bool
 
-  @AppStorage(wrappedValue: false, UserDef.kAllowBoostingSingleKanjiAsUserPhrase.rawValue)
-  private var allowBoostingSingleKanjiAsUserPhrase: Bool
-
   @AppStorage(wrappedValue: false, UserDef.kFilterNonCNSReadingsForCHTInput.rawValue)
   private var filterNonCNSReadingsForCHTInput: Bool
 
@@ -213,8 +210,6 @@ public struct VwrSettingsPaneDictionary: View {
         }
 
         Section {
-          UserDef.kAllowBoostingSingleKanjiAsUserPhrase.bind($allowBoostingSingleKanjiAsUserPhrase)
-            .render()
           LabeledContent("i18n:settings.importFromKimoTxt.label") {
             Button("…") {
               isShowingFileImporter = true

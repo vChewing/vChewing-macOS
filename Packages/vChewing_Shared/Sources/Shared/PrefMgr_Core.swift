@@ -170,8 +170,8 @@ public struct PrefMgr: PrefMgrProtocol {
   @AppProperty(key: UserDef.kChooseCandidateUsingSpace.rawValue, defaultValue: true)
   public var chooseCandidateUsingSpace: Bool
 
-  @AppProperty(key: UserDef.kAllowBoostingSingleKanjiAsUserPhrase.rawValue, defaultValue: false)
-  public var allowBoostingSingleKanjiAsUserPhrase: Bool
+  @AppProperty(key: UserDef.kAllowRescoringSingleKanjiCandidates.rawValue, defaultValue: false)
+  public var allowRescoringSingleKanjiCandidates: Bool
 
   @AppProperty(
     key: UserDef.kFetchSuggestionsFromPerceptionOverrideModel.rawValue,
@@ -513,9 +513,11 @@ extension PrefMgr {
   }
 
   private func migrateDeprecatedSettings() {
+    let defaults = UserDefaults.standard
+    // 移除被刻意作廢的設定。
+    defaults.removeObject(forKey: "AllowBoostingSingleKanjiAsUserPhrase")
     // 遷移舊設定。
     if candidateStateJKHLBehavior == 0 {
-      let defaults = UserDefaults.standard
       let legacyJK = defaults.bool(forKey: "UseJKtoMoveCompositorCursorInCandidateState")
       let legacyHL = defaults.bool(forKey: "UseHLtoMoveCompositorCursorInCandidateState")
       switch (legacyJK, legacyHL) {

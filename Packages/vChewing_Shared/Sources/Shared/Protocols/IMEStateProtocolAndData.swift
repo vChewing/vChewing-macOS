@@ -238,6 +238,6 @@ extension IMEStateData {
   }
 
   public static var minCandidateLength: Int {
-    PrefMgr().allowBoostingSingleKanjiAsUserPhrase ? 1 : 2
+    PrefMgr().allowRescoringSingleKanjiCandidates ? 1 : 2
   }
 }

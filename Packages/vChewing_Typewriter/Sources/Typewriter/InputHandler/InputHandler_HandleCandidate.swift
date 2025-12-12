@@ -77,7 +77,7 @@ extension InputHandlerProtocol {
       let highlightedIndex = ctlCandidate.highlightedIndex
       let isFilter = input.isDelete || input.isBackSpace
       if !(0 ..< candidates.count).contains(ctlCandidate.highlightedIndex) { break manipulator }
-      if !prefs.allowBoostingSingleKanjiAsUserPhrase || isFilter {
+      if !prefs.allowRescoringSingleKanjiCandidates || isFilter {
         if candidates[highlightedIndex].keyArray.count < 2 || candidates[highlightedIndex].value
           .count < 2 {
           break manipulator
