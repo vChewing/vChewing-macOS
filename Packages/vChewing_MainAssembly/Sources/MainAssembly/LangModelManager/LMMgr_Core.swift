@@ -270,17 +270,7 @@ public final class LMMgr {
 
   public static func syncLMPrefs() {
     Shared.InputMode.validCases.forEach { mode in
-      mode.langModel.setOptions { config in
-        config.isPhraseReplacementEnabled = PrefMgr.shared.phraseReplacementEnabled
-        config.isCNSEnabled = PrefMgr.shared.cns11643Enabled
-        config.isSymbolEnabled = PrefMgr.shared.symbolInputEnabled
-        config.isSCPCEnabled = PrefMgr.shared.useSCPCTypingMode
-        config.isCassetteEnabled = PrefMgr.shared.cassetteEnabled
-        config.filterNonCNSReadings = PrefMgr.shared.filterNonCNSReadingsForCHTInput
-        config.deltaOfCalendarYears = PrefMgr.shared.deltaOfCalendarYears
-        config.allowBoostingSingleKanjiAsUserPhrase = PrefMgr.shared.allowBoostingSingleKanjiAsUserPhrase
-        config.alwaysSupplyETenDOSUnigrams = PrefMgr.shared.enforceETenDOSCandidateSequence
-      }
+      mode.langModel.syncPrefs()
     }
   }
 
