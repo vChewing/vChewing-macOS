@@ -336,6 +336,10 @@ extension LMAssembly {
       }
     }
 
+    public func queryETenDOSSequence(reading: String) -> [String] {
+      Self.lmPlainBopomofo.valuesFor(key: reading, isCHS: isCHS)
+    }
+
     /// 根據給定的索引鍵來確認各個資料庫陣列內是否存在對應的資料。
     /// - Parameter key: 索引鍵陣列。
     /// - Returns: 是否在庫。
