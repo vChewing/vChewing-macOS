@@ -595,34 +595,39 @@ extension InputHandlerProtocol {
     /// 這裡先對陣列排序、讓最長候選字的子陣列的優先權最高。
     /// 這個過程不會傷到子陣列內部的排序。
     if arrCandidates.isEmpty { return .init() }
-
+    var finalResult = [CandidateInState]()
     // 決定是否根據漸退記憶模組的建議來調整候選字詞的順序。
-    if !prefs.fetchSuggestionsFromPerceptionOverrideModel || prefs.useSCPCTypingMode || fixOrder {
-      return arrCandidates.map { ($0.keyArray, $0.value) }
-    }
-
-    let arrSuggestedUnigrams: [(String, Megrez.Unigram)] = retrievePOMSuggestions(
-      apply: false,
-      rawCandidates: arrCandidates
-    )
-    let arrSuggestedCandidates: [Megrez.KeyValuePaired] = arrSuggestedUnigrams.map {
-      Megrez.KeyValuePaired(
-        keyArray: $0.1.keyArray,
-        value: $0.1.value,
-        score: $0.1.score
+    let skipPOMHandling: Bool = fixOrder
+      || !prefs.fetchSuggestionsFromPerceptionOverrideModel
+      || prefs.useSCPCTypingMode
+    switch skipPOMHandling {
+    case false:
+      let arrSuggestedUnigrams: [(String, Megrez.Unigram)] = retrievePOMSuggestions(
+        apply: false,
+        rawCandidates: arrCandidates
       )
-    }
+      let arrSuggestedCandidates: [Megrez.KeyValuePaired] = arrSuggestedUnigrams.map {
+        Megrez.KeyValuePaired(
+          keyArray: $0.1.keyArray,
+          value: $0.1.value,
+          score: $0.1.score
+        )
+      }
 
-    let rawCandidateSignatures: Set<Megrez.KeyValuePaired> = Set(
-      arrCandidates.map(makeCanonicalPair(from:))
-    )
-    let filteredSuggestedCandidates = arrSuggestedCandidates.filter {
-      rawCandidateSignatures.contains(makeCanonicalPair(from: $0))
+      let rawCandidateSignatures: Set<Megrez.KeyValuePaired> = Set(
+        arrCandidates.map(makeCanonicalPair(from:))
+      )
+      let filteredSuggestedCandidates = arrSuggestedCandidates.filter {
+        rawCandidateSignatures.contains(makeCanonicalPair(from: $0))
+      }
+      arrCandidates = filteredSuggestedCandidates + arrCandidates
+      arrCandidates = deduplicateCandidatesPreservingOrder(arrCandidates)
+      arrCandidates = arrCandidates.stableSort { $0.keyArray.count > $1.keyArray.count }
+      finalResult = arrCandidates.map { ($0.keyArray, $0.value) }
+    case true:
+      finalResult = arrCandidates.map { ($0.keyArray, $0.value) }
     }
-    arrCandidates = filteredSuggestedCandidates + arrCandidates
-    arrCandidates = deduplicateCandidatesPreservingOrder(arrCandidates)
-    arrCandidates = arrCandidates.stableSort { $0.keyArray.count > $1.keyArray.count }
-    return arrCandidates.map { ($0.keyArray, $0.value) }
+    return finalResult
   }
 
   /// 移除重複候選字詞（以讀音 + 詞值做鍵），維持原順序。
