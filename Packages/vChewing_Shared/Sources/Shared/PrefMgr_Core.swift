@@ -185,6 +185,9 @@ public struct PrefMgr: PrefMgrProtocol {
   @AppProperty(key: UserDef.kUseFixedCandidateOrderOnSelection.rawValue, defaultValue: false)
   public var useFixedCandidateOrderOnSelection: Bool
 
+  @AppProperty(key: UserDef.kEnforceETenDOSCandidateSequence.rawValue, defaultValue: true)
+  public var enforceETenDOSCandidateSequence: Bool
+
   @AppProperty(key: UserDef.kAutoCorrectReadingCombination.rawValue, defaultValue: true)
   public var autoCorrectReadingCombination: Bool
 

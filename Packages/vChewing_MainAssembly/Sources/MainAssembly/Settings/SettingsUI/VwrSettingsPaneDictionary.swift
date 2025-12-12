@@ -28,6 +28,9 @@ public struct VwrSettingsPaneDictionary: View {
   @AppStorage(wrappedValue: true, UserDef.kShouldAutoReloadUserDataFiles.rawValue)
   private var shouldAutoReloadUserDataFiles: Bool
 
+  @AppStorage(wrappedValue: true, UserDef.kEnforceETenDOSCandidateSequence.rawValue)
+  private var enforceETenDOSCandidateSequence: Bool
+
   @AppStorage(wrappedValue: false, UserDef.kUseExternalFactoryDict.rawValue)
   private var useExternalFactoryDict: Bool
 
@@ -167,6 +170,11 @@ public struct VwrSettingsPaneDictionary: View {
         }
 
         Section {
+          UserDef.kEnforceETenDOSCandidateSequence.bind(
+            $enforceETenDOSCandidateSequence.didChange {
+              LMMgr.syncLMPrefs()
+            }
+          ).render()
           UserDef.kUseExternalFactoryDict.bind(
             $useExternalFactoryDict.didChange {
               LMMgr.connectCoreDB()
