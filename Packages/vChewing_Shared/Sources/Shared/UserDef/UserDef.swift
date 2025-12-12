@@ -15,6 +15,7 @@ public enum UserDef: String, CaseIterable, Identifiable {
 
   case kIsDebugModeEnabled = "_DebugMode"
   case kFailureFlagForPOMObservation = "_FailureFlag_POMObservation"
+  case kUserPhrasesDatabaseBypassed = "UserPhrasesDatabaseBypassed"
   case kCandidateServiceMenuContents = "CandidateServiceMenuContents"
   case kRespectClientAccentColor = "RespectClientAccentColor"
   case kAlwaysUsePCBWithElectronBasedClients = "AlwaysUsePCBWithElectronBasedClients"
@@ -175,6 +176,7 @@ extension UserDef {
     switch self {
     case .kIsDebugModeEnabled: return .bool
     case .kFailureFlagForPOMObservation: return .bool
+    case .kUserPhrasesDatabaseBypassed: return .bool
     case .kCandidateServiceMenuContents: return .dictionary
     case .kRespectClientAccentColor: return .bool
     case .kAlwaysUsePCBWithElectronBasedClients: return .bool
@@ -280,8 +282,12 @@ extension UserDef {
   public var metaData: MetaData? {
     switch self {
     case .kIsDebugModeEnabled: return .init(userDef: self, shortTitle: "Debug Mode")
-    case .kCandidateServiceMenuContents: return nil
     case .kFailureFlagForPOMObservation: return nil
+    case .kUserPhrasesDatabaseBypassed: return .init(
+        userDef: self, shortTitle: "i18n:UserDef.kUserPhrasesDatabaseBypassed.shortTitle",
+        description: "i18n:UserDef.kUserPhrasesDatabaseBypassed.description"
+      )
+    case .kCandidateServiceMenuContents: return nil
     case .kRespectClientAccentColor: return .init(
         userDef: self, shortTitle: "i18n:UserDef.kRespectClientAccentColor.shortTitle",
         description: "i18n:UserDef.kRespectClientAccentColor.description"

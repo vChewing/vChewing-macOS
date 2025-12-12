@@ -48,6 +48,9 @@ extension SettingsPanesCocoa {
               UserDef.kCheckAbusersOfSecureEventInputAPI.render(fixWidth: innerContentWidth)
             }?.boxed()
             NSStackView.buildSection(width: innerContentWidth) {
+              UserDef.kUserPhrasesDatabaseBypassed.render(fixWidth: innerContentWidth)
+            }?.boxed()
+            NSStackView.buildSection(width: innerContentWidth) {
               UserDef.kAllowRescoringSingleKanjiCandidates.render(fixWidth: innerContentWidth)
             }?.boxed()
             NSView()

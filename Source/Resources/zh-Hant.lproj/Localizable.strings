@@ -295,6 +295,8 @@
 "i18n:UserDef.kSpecifyCmdOptCtrlEnterBehavior.option.2" = "遞交國語點字 (1947)";
 "i18n:UserDef.kSpecifyCmdOptCtrlEnterBehavior.option.3" = "遞交國通盲文 (GF0019-2018)";
 "i18n:UserDef.kSpecifyCmdOptCtrlEnterBehavior.shortTitle" = "Command+Option+Ctrl+Enter:";
+"i18n:UserDef.kUserPhrasesDatabaseBypassed.description" = "啟用後，使用者辭典資料夾內所有可編輯的資料將被忽略（但關聯詞語除外）。開發者可能會請您啟用此項，以協助確認與組句有關的某些惡性故障是否與使用者辭典資料內容有關。";
+"i18n:UserDef.kUserPhrasesDatabaseBypassed.shortTitle" = "繞過使用者語彙資料庫";
 "i18n:UserDef.kUseShiftQuestionToCallServiceMenu.shortTitle" = "允許在選字窗內也使用「Shift+?」叫出服務選單";
 "IBM" = "IBM 排列";
 "If disabled, this will insert space instead." = "取消勾選的話，該按鍵會插入空格。";
