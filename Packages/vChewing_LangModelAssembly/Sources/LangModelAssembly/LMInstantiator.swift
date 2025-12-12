@@ -56,6 +56,7 @@ extension LMAssembly {
       public var filterNonCNSReadings = false
       public var deltaOfCalendarYears: Int = -2_000
       public var allowRescoringSingleKanjiCandidates = false
+      public var bypassUserPhrasesData = false
     }
 
     public static var asyncLoadingUserData: Bool = true
@@ -131,6 +132,7 @@ extension LMAssembly {
       config.deltaOfCalendarYears = prefs.deltaOfCalendarYears
       config.allowRescoringSingleKanjiCandidates = prefs.allowRescoringSingleKanjiCandidates
       config.alwaysSupplyETenDOSUnigrams = prefs.enforceETenDOSCandidateSequence
+      config.bypassUserPhrasesData = prefs.userPhrasesDatabaseBypassed
     }
 
     public func resetFactoryJSONModels() {}
