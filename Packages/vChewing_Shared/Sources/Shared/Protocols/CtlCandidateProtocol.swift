@@ -13,6 +13,8 @@ import Foundation
 public protocol CtlCandidateDelegate: AnyObject {
   func candidateController() -> CtlCandidateProtocol?
   func candidatePairs(conv: Bool) -> [CandidateInState]
+  func callError(_: String)
+  func getCandidate(at: Int) -> CandidateInState?
   func candidatePairSelectionConfirmed(at index: Int)
   func candidatePairHighlightChanged(at index: Int?)
   func candidatePairContextMenuActionTriggered(

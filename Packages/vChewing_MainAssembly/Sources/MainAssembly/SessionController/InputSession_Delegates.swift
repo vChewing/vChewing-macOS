@@ -130,6 +130,11 @@ extension SessionProtocol {
 
   public var showReverseLookupResult: Bool { prefs.showReverseLookupInCandidateUI }
 
+  public func getCandidate(at index: Int) -> CandidateInState? {
+    guard state.candidates.indices.contains(index) else { return nil }
+    return state.candidates[index]
+  }
+
   public func checkIsMacroTokenResult(_ index: Int) -> Bool {
     guard state.isCandidateContainer else { return false }
     guard state.candidates.indices.contains(index) else { return false }
