@@ -72,6 +72,11 @@ extension SettingsPanesCocoa {
           }
           NSTabView.TabPage(title: "Ｂ") {
             NSStackView.buildSection(width: innerContentWidth) {
+              UserDef.kEnforceETenDOSCandidateSequence
+                .render(fixWidth: innerContentWidth) { renderable in
+                  renderable.currentControl?.target = self
+                  renderable.currentControl?.action = #selector(self.lmmgrSyncLMPrefs(_:))
+                }
               UserDef.kUseExternalFactoryDict.render(fixWidth: innerContentWidth) { renderable in
                 renderable.currentControl?.target = self
                 renderable.currentControl?.action = #selector(self.lmmgrConnectCoreDB(_:))
@@ -83,6 +88,9 @@ extension SettingsPanesCocoa {
               }
               UserDef.kAllowBoostingSingleKanjiAsUserPhrase.render(fixWidth: innerContentWidth)
             }?.boxed()
+            NSView()
+          }
+          NSTabView.TabPage(title: "Ｃ") {
             NSStackView.buildSection(width: innerContentWidth) {
               NSStackView.build(.horizontal) {
                 "i18n:settings.importFromKimoTxt.label".makeNSLabel(fixWidth: innerContentWidth)

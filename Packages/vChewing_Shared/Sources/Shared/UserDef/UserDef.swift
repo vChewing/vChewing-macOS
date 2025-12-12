@@ -92,6 +92,7 @@ public enum UserDef: String, CaseIterable, Identifiable {
   case kClassicHaninKeyboardSymbolModeShortcutEnabled =
     "ClassicHaninKeyboardSymbolModeShortcutEnabled"
   case kFilterNonCNSReadingsForCHTInput = "FilterNonCNSReadingsForCHTInput"
+  case kEnforceETenDOSCandidateSequence = "enforceETenDOSCandidateSequence"
   case kRomanNumeralOutputFormat = "RomanNumeralOutputFormat"
   case kReducePOMLifetimeToNoMoreThan12Hours = "ReducePOMLifetimeToNoMoreThan12Hours"
 
@@ -250,6 +251,7 @@ extension UserDef {
     case .kPhraseEditorAutoReloadExternalModifications: return .bool
     case .kClassicHaninKeyboardSymbolModeShortcutEnabled: return .bool
     case .kFilterNonCNSReadingsForCHTInput: return .bool
+    case .kEnforceETenDOSCandidateSequence: return .bool
     case .kRomanNumeralOutputFormat: return .integer
     case .kReducePOMLifetimeToNoMoreThan12Hours: return .bool
     case .kUseSpaceToCommitHighlightedSCPCCandidate: return .bool
@@ -658,6 +660,11 @@ extension UserDef {
       )
     case .kFilterNonCNSReadingsForCHTInput: return .init(
         userDef: self, shortTitle: "i18n:UserDef.kFilterNonCNSReadingsForCHTInput.shortTitle"
+      )
+    case .kEnforceETenDOSCandidateSequence: return .init(
+        userDef: self,
+        shortTitle: "i18n:UserDef.kEnforceETenDOSCandidateSequence.shortTitle",
+        description: "i18n:UserDef.kEnforceETenDOSCandidateSequence.description"
       )
     case .kRomanNumeralOutputFormat: return .init(
         userDef: self,

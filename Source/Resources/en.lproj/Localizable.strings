@@ -256,6 +256,8 @@
 "i18n:UserDef.kCursorPlacementAfterSelectingCandidate.option.2" = "Restore Pre-Candidate-Window Cursor Position";
 "i18n:UserDef.kCursorPlacementAfterSelectingCandidate.shortTitle:" = "Post-Candidate Cursor Position:";
 "i18n:UserDef.kDodgeInvalidEdgeCandidateCursorPosition.shortTitle" = "Dodge Invalid Edge Candidate Cursor Position";
+"i18n:UserDef.kEnforceETenDOSCandidateSequence.description" = "This option is provided for users who prefer the ETen Chinese DOS candidate ordering. Many such users developed their ordering intuition while using the ETen Chinese DOS input method and wish to use the same order here. Note: the select-candidate-per-character mode always follows this ordering and is not affected by this setting.";
+"i18n:UserDef.kEnforceETenDOSCandidateSequence.shortTitle" = "Enforce Eten DOS Sequence on all single-kanji candidates";
 "i18n:UserDef.kFilterNonCNSReadingsForCHTInput.shortTitle" = "Filter Non-CNS11643 factory readings (CHT input only)";
 "i18n:UserDef.kInlineDumpPinyinInLieuOfZhuyin.description" = "Contents committed by Command+Option+Ctrl+Enter may vary depending on related behavior settings.";
 "i18n:UserDef.kMinCellWidthForHorizontalMatrix.option.0" = "2 Kanjis";

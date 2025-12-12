@@ -255,6 +255,8 @@
 "i18n:UserDef.kCursorPlacementAfterSelectingCandidate.option.2" = "候補陳列ウィンドウ呼び出し前のカーソル位置に戻す";
 "i18n:UserDef.kCursorPlacementAfterSelectingCandidate.shortTitle:" = "候補確定後のカーソル位置:";
 "i18n:UserDef.kDodgeInvalidEdgeCandidateCursorPosition.shortTitle" = "端末での不合理的な候補選択用カーソル位置を是正";
+"i18n:UserDef.kEnforceETenDOSCandidateSequence.description" = "このスイッチは、倚天中国語DOSの候補順に慣れたユーザー向けに用意されております。候補の陳列順番を手動で管理したいという需要の多くがこの並びに起因するためです。なお、全候補選択入力モードでは常にこの並び順が適用され、このスイッチの影響は受けません。";
+"i18n:UserDef.kEnforceETenDOSCandidateSequence.shortTitle" = "単漢字候補の陳列順番を倚天中国語DOS順に強制する";
 "i18n:UserDef.kFilterNonCNSReadingsForCHTInput.shortTitle" = "全字庫以外の音読みを内蔵辞書繁体中国語検索結果から除く";
 "i18n:UserDef.kInlineDumpPinyinInLieuOfZhuyin.description" = "Command+Option+Ctrl+Enter で送り出したものは、それに関する作動設定次第です。";
 "i18n:UserDef.kMinCellWidthForHorizontalMatrix.option.0" = "２つの漢字（幅の狭い）";

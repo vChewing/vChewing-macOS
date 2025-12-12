@@ -256,6 +256,8 @@
 "i18n:UserDef.kCursorPlacementAfterSelectingCandidate.option.2" = "复原呼出选字窗之前的游标位置";
 "i18n:UserDef.kCursorPlacementAfterSelectingCandidate.shortTitle:" = "候选字确认后的游标位置:";
 "i18n:UserDef.kDodgeInvalidEdgeCandidateCursorPosition.shortTitle" = "糾正不合理的端点选字游标位置";
+"i18n:UserDef.kEnforceETenDOSCandidateSequence.description" = "对敝输入法的候选字的顺序有着强烈的手动调整之需求的使用者们往往都是从倚天中文 DOS 开始积累了对候选字的直觉记忆、希望能使用这种候选字排序，故提供该选项。逐字选字模式会始终遵循该排序特性，不受该开关所影响。";
+"i18n:UserDef.kEnforceETenDOSCandidateSequence.shortTitle" = "对所有单汉字候选字强制施加倚天中文DOS系统排序";
 "i18n:UserDef.kFilterNonCNSReadingsForCHTInput.shortTitle" = "仅繁体中文: 原厂辞典仅返回符合全字库读音的结果";
 "i18n:UserDef.kInlineDumpPinyinInLieuOfZhuyin.description" = "借由 Command+Option+Ctrl+Enter 输出的内容受对应的行为设定所影响。";
 "i18n:UserDef.kMinCellWidthForHorizontalMatrix.option.0" = "两个汉字";
