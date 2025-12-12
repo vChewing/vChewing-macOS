@@ -51,6 +51,7 @@ extension LMAssembly {
       public var isCNSEnabled = false
       public var isSymbolEnabled = false
       public var isSCPCEnabled = false
+      public var alwaysSupplyETenDOSUnigrams = true
       public var filterNonCNSReadings = false
       public var deltaOfCalendarYears: Int = -2_000
       public var allowBoostingSingleKanjiAsUserPhrase = false
@@ -380,17 +381,6 @@ extension LMAssembly {
       /// 準備不同的語言模組容器，開始逐漸往容器陣列內塞入資料。
       var rawAllUnigrams: [Megrez.Unigram] = []
 
-      if config.isCassetteEnabled {
-        rawAllUnigrams += Self.lmCassette.unigramsFor(key: keyChain, keyArray: keyArray)
-      }
-
-      // 如果有檢測到使用者自訂逐字選字語料庫內的相關資料的話，在這裡先插入。
-      if config.isSCPCEnabled {
-        rawAllUnigrams += Self.lmPlainBopomofo.valuesFor(key: keyChain, isCHS: isCHS).map {
-          Megrez.Unigram(keyArray: keyArray, value: $0, score: 0)
-        }
-      }
-
       if !config.isCassetteEnabled
         || config.isCassetteEnabled && keyChain.map(\.description)[0] == "_" {
         // 先給出 NumPad 的結果。
@@ -464,7 +454,7 @@ extension LMAssembly {
       // 分析且處理可能存在的 InputToken。
       let rawAllUnigramsToFlat: [[Megrez.Unigram]] = rawAllUnigrams.map { unigram in
         let convertedValues = unigram.value.parseAsInputToken(isCHS: isCHS)
-        // 不是 InputToken 的话，直接返回原 Unigram
+        // 不是 InputToken 的話，直接返回原 Unigram
         guard !convertedValues.isEmpty else { return [unigram] }
         // 只有確認是 InputToken 時才處理並寫入 HashMap
         var result = [Megrez.Unigram]()
@@ -479,6 +469,22 @@ extension LMAssembly {
       }
 
       rawAllUnigrams = rawAllUnigramsToFlat.flatMap { $0 }
+
+      if config.isCassetteEnabled {
+        rawAllUnigrams.insert(
+          contentsOf: Self.lmCassette.unigramsFor(key: keyChain, keyArray: keyArray),
+          at: 0
+        )
+      } else if config.isSCPCEnabled || config.alwaysSupplyETenDOSUnigrams {
+        // 追加倚天中文 DOS 候選字排序。
+        rawAllUnigrams += Self.lmPlainBopomofo.valuesFor(key: keyChain, isCHS: isCHS).map {
+          Megrez.Unigram(
+            keyArray: keyArray,
+            value: $0,
+            score: config.isSCPCEnabled ? 0 : -9.5
+          )
+        }
+      }
 
       // 新增與日期、時間、星期有關的單元圖資料。
       rawAllUnigrams.append(contentsOf: queryDateTimeUnigrams(with: keyChain, keyArray: keyArray))
@@ -554,7 +560,7 @@ extension LMAssembly {
     var lmReplacements = LMReplacements()
     var lmAssociates = LMAssociates()
 
-    // 漸退记忆模组
+    // 漸退記憶模組
     var lmPerceptionOverride: LMPerceptionOverride
 
     // 確保關聯詞語資料在首次剛需時得以即時載入。
