@@ -408,7 +408,7 @@ extension LMAssembly.LMPerceptionOverride {
       separatorString.isEmpty
         ? [frontEdgeReading]
         : frontEdgeReading.components(separatedBy: separatorString).filter { !$0.isEmpty }
-    let isUnigramKey = parts.prev1 == nil && parts.prev2 == nil
+    let isUnigramKey = parts.previous == nil && parts.anterior == nil
     let isSingleCharUnigram = isUnigramKey && keyArrayForCandidate.count == 1
 
     for (candidate, override) in perception.overrides {
@@ -424,7 +424,7 @@ extension LMAssembly.LMPerceptionOverride {
       // 如果分數低於閾值則跳過
       if overrideScore <= threshold { continue }
 
-      let previousStr: String? = parts.prev1?.value
+      let previousStr: String? = parts.previous?.value
 
       if overrideScore > currentHighScore {
         candidates = [
@@ -648,7 +648,7 @@ extension LMAssembly.LMPerceptionOverride {
       var keysToRemove: [String] = []
       for key in mutLRUMap.keys {
         guard let parts = parsePerceptionKey(key) else { continue }
-        if parts.prev1 == nil, parts.prev2 == nil {
+        if parts.previous == nil, parts.anterior == nil {
           keysToRemove.append(key)
         }
       }
@@ -840,12 +840,12 @@ extension LMAssembly.LMPerceptionOverride {
   }
 
   // 解析 Perception Key 的健壯 parser（不用正則）。
-  // 現行格式示例：(prev2Reading,prev2Value)&(prev1Reading,prev1Value)&(headReading,headValue)
+  // 現行格式示例：(anteReading,anteValue)&(prevReading,prevValue)&(headReading,headValue)
   struct PerceptionKeyParts {
     let headReading: String
     let headValue: String
-    let prev1: (reading: String, value: String)?
-    let prev2: (reading: String, value: String)?
+    let previous: (reading: String, value: String)?
+    let anterior: (reading: String, value: String)?
   }
 
   func parsePerceptionKey(_ key: String) -> PerceptionKeyParts? {
@@ -890,14 +890,14 @@ extension LMAssembly.LMPerceptionOverride {
     }
 
     guard let headPair = parseComponent(headComponent) else { return nil }
-    let prev1 = components.count >= 2 ? parseComponent(components[components.count - 2]) : nil
-    let prev2 = components.count >= 3 ? parseComponent(components[components.count - 3]) : nil
+    let previous = components.count >= 2 ? parseComponent(components[components.count - 2]) : nil
+    let anterior = components.count >= 3 ? parseComponent(components[components.count - 3]) : nil
 
     return .init(
       headReading: headPair.reading,
       headValue: headPair.value,
-      prev1: prev1,
-      prev2: prev2
+      previous: previous,
+      anterior: anterior
     )
   }
 
@@ -936,8 +936,8 @@ extension LMAssembly.LMPerceptionOverride {
     for keyCandidate in mutLRUKeySeqList {
       guard let candidateParts = parsePerceptionKey(keyCandidate) else { continue }
       guard !shouldIgnorePerception(candidateParts) else { continue }
-      guard compareContextPart(candidateParts.prev1, originalParts.prev1) else { continue }
-      guard compareContextPart(candidateParts.prev2, originalParts.prev2) else { continue }
+      guard compareContextPart(candidateParts.previous, originalParts.previous) else { continue }
+      guard compareContextPart(candidateParts.anterior, originalParts.anterior) else { continue }
       let candidateHeadSegments =
         separatorString.isEmpty
           ? (candidateParts.headReading.isEmpty ? [] : [candidateParts.headReading])
@@ -965,21 +965,21 @@ extension LMAssembly.LMPerceptionOverride {
       separatorString.isEmpty
         ? (parts.headReading.isEmpty ? 0 : 1)
         : parts.headReading.components(separatedBy: separatorString).filter { !$0.isEmpty }.count
-    let prev1Len = parts.prev1.map { component in
+    let previousLen = parts.previous.map { component in
       separatorString.isEmpty
         ? (component.reading.isEmpty ? 0 : 1)
         : component.reading.components(separatedBy: separatorString).filter { !$0.isEmpty }.count
     }
-    let prev2Len = parts.prev2.map { component in
+    let anteriorLen = parts.anterior.map { component in
       separatorString.isEmpty
         ? (component.reading.isEmpty ? 0 : 1)
         : component.reading.components(separatedBy: separatorString).filter { !$0.isEmpty }.count
     }
 
     if headLen > 1 {
-      if let p1Len = prev1Len, p1Len == 1 {
-        if let p2Len = prev2Len {
-          return p2Len == 1
+      if let previousLen, previousLen == 1 {
+        if let anteriorLen {
+          return anteriorLen == 1
         } else {
           return true
         }
@@ -1058,7 +1058,7 @@ extension LMAssembly.LMPerceptionOverride {
   }
 
   private func shouldIgnorePerception(_ parts: PerceptionKeyParts) -> Bool {
-    let readings = [parts.headReading, parts.prev1?.reading, parts.prev2?.reading]
+    let readings = [parts.headReading, parts.previous?.reading, parts.anterior?.reading]
       .compactMap { $0 }
     return readings.contains { containsUnderscorePrefixedReading($0) }
   }

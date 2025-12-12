@@ -319,8 +319,8 @@ final class POMBasicTests: XCTestCase {
     }
     XCTAssertEqual(parsed.headReading, "ㄧˋ-ㄧˋ")
     XCTAssertEqual(parsed.headValue, "意譯")
-    XCTAssertNil(parsed.prev1)
-    XCTAssertNil(parsed.prev2)
+    XCTAssertNil(parsed.previous)
+    XCTAssertNil(parsed.anterior)
   }
 
   func testPOM_BS08_ParsePerceptionKeyContextualParts() throws {
@@ -332,10 +332,10 @@ final class POMBasicTests: XCTestCase {
     }
     XCTAssertEqual(parsed.headReading, "ㄓ")
     XCTAssertEqual(parsed.headValue, "隻")
-    XCTAssertEqual(parsed.prev1?.reading, "ㄎㄞ-ㄕˇ")
-    XCTAssertEqual(parsed.prev1?.value, "開始")
-    XCTAssertEqual(parsed.prev2?.reading, "ㄧ")
-    XCTAssertEqual(parsed.prev2?.value, "一")
+    XCTAssertEqual(parsed.previous?.reading, "ㄎㄞ-ㄕˇ")
+    XCTAssertEqual(parsed.previous?.value, "開始")
+    XCTAssertEqual(parsed.anterior?.reading, "ㄧ")
+    XCTAssertEqual(parsed.anterior?.value, "一")
   }
 
   func testPOM_BS09_IgnoresUnderscorePrefixedReadings() throws {
