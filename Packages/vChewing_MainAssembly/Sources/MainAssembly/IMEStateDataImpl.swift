@@ -66,10 +66,7 @@ extension IMEStateData {
   }
 
   public var attributedStringPlaceholder: NSAttributedString {
-    AttrStrULStyle.single.getMarkedAttrStr(
-      inlinePreeditPlaceholderChar,
-      clauseSegment: 0
-    )
+    getAttributedStringPlaceholder()
   }
 }
 

@@ -297,8 +297,11 @@ extension IMEStateData {
     )
   }
 
-  public var inlinePreeditPlaceholderChar: String {
-    "¶"
+  public func getAttributedStringPlaceholder(_ char: Unicode.Scalar = " ") -> NSAttributedString {
+    AttrStrULStyle.single.getMarkedAttrStr(
+      char.description,
+      clauseSegment: 0
+    )
   }
 
   /// - Remark: Converter 為 nil 時不做追加漢字轉換。
