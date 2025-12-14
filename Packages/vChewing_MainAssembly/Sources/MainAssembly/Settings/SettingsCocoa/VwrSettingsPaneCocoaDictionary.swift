@@ -150,7 +150,7 @@ extension SettingsPanesCocoa {
       pathCtl.setContentHuggingPriority(.defaultHigh, for: .vertical)
       pathCtl.setContentCompressionResistancePriority(.defaultLow, for: .horizontal)
       pathCtl.makeSimpleConstraint(.height, relation: .equal, value: NSFont.smallSystemFontSize * 2)
-      pathCtl.makeSimpleConstraint(.width, relation: .greaterThanOrEqual, value: windowWidth - 145)
+      pathCtl.makeSimpleConstraint(.width, relation: .equal, value: windowWidth - 145)
       pathCtl.url = URL(fileURLWithPath: LMMgr.dataFolderPath(isDefaultFolder: false))
       pathCtl.toolTip = "Please drag the desired target from Finder to this place.".i18n
     }

@@ -82,7 +82,7 @@ extension SettingsPanesCocoa {
       pathCtl.setContentHuggingPriority(.defaultHigh, for: .vertical)
       pathCtl.setContentCompressionResistancePriority(.defaultLow, for: .horizontal)
       pathCtl.makeSimpleConstraint(.height, relation: .equal, value: NSFont.smallSystemFontSize * 2)
-      pathCtl.makeSimpleConstraint(.width, relation: .greaterThanOrEqual, value: windowWidth - 145)
+      pathCtl.makeSimpleConstraint(.width, relation: .equal, value: windowWidth - 145)
       let currentPath = LMMgr.cassettePath()
       pathCtl.url = currentPath.isEmpty ? nil : URL(fileURLWithPath: LMMgr.cassettePath())
       pathCtl.toolTip = "Please drag the desired target from Finder to this place.".i18n
