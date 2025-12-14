@@ -6,6 +6,8 @@
 // marks, or product names of Contributor, except as required to fulfill notice
 // requirements defined in MIT License.
 
+import Foundation
+
 // MARK: - IMEStateProtocol
 
 public typealias CandidateInState = (keyArray: [String], value: String)
@@ -239,5 +241,92 @@ extension IMEStateData {
 
   public static var minCandidateLength: Int {
     PrefMgr().allowRescoringSingleKanjiCandidates ? 1 : 2
+  }
+}
+
+// MARK: - AttributedString 樣式組裝 API
+
+extension IMEStateData {
+  /// IMKInputController 的 `mark(forStyle:)` 只可能會標出這些值。
+  /// 該值乃使用 hopper disassembler 分析 IMK 而得出。
+  public enum AttrStrULStyle: Int {
+    case none = 0
+    /// #1, kTSMHiliteConvertedText & kTSMHiliteSelectedRawText
+    case single = 1
+    /// #2, kTSMHiliteSelectedConvertedText
+    case thick = 2
+    /// #3, 尚未被 TSM 使用。或可用給 kTSMHiliteSelectedRawText 與 1 區分。
+    case double = 3
+
+    // MARK: Public
+
+    public typealias StyledPair = (string: String, style: Self)
+
+    public static func pack(_ pairs: [StyledPair]) -> NSAttributedString {
+      let result = NSMutableAttributedString()
+      var clauseSegment = 0
+      for (string, style) in pairs {
+        guard !string.isEmpty else { continue }
+        result.append(style.getMarkedAttrStr(string, clauseSegment: clauseSegment))
+        clauseSegment += 1
+      }
+      return result
+    }
+
+    public func getDict(clauseSegment: Int? = nil) -> [NSAttributedString.Key: Any] {
+      var result: [NSAttributedString.Key: Any] = [Self.keyName4UL: rawValue]
+      result[Self.keyName4CS] = clauseSegment
+      return result
+    }
+
+    public func getMarkedAttrStr(_ rawStr: String, clauseSegment: Int? = nil) -> NSAttributedString {
+      let result = NSMutableAttributedString(string: rawStr)
+      let rangeNow = NSRange(location: 0, length: rawStr.utf16.count)
+      result.setAttributes(getDict(clauseSegment: clauseSegment), range: rangeNow)
+      return result
+    }
+
+    // MARK: Private
+
+    private static let keyName4UL = NSAttributedString.Key(
+      rawValue: "NSUnderline"
+    )
+
+    private static let keyName4CS = NSAttributedString.Key(
+      rawValue: "NSMarkedClauseSegment"
+    )
+  }
+
+  public var inlinePreeditPlaceholderChar: String {
+    "¶"
+  }
+
+  /// - Remark: Converter 為 nil 時不做追加漢字轉換。
+  public func getAttributedStringNormal(
+    _ converter: ((String) -> String)?
+  )
+    -> NSAttributedString {
+    AttrStrULStyle.pack(
+      displayTextSegments.map {
+        (converter?($0) ?? $0, .single)
+      }
+    )
+  }
+
+  /// - Remark: Converter 為 nil 時不做追加漢字轉換。
+  public func getAttributedStringMarking(
+    _ converter: ((String) -> String)?
+  )
+    -> NSAttributedString {
+    let converted = (converter?(displayedText) ?? displayedText).map(\.description)
+    let range2 = markedRange
+    let range1 = 0 ..< markedRange.lowerBound
+    let range3 = markedRange.upperBound ..< converted.count
+    let pairs: [AttrStrULStyle.StyledPair] = [
+      (converted[range1].joined(), .single),
+      (converted[range2].joined(), .thick),
+      (converted[range3].joined(), .single),
+    ]
+    return AttrStrULStyle.pack(pairs)
   }
 }
