@@ -207,8 +207,8 @@ extension SessionProtocol {
       forCharacterIndex: 0,
       lineHeightRectangle: &textFrame
     )
-    let result = (attributes?[IMKTextOrientationName] as? NSNumber)?.intValue == 0 || false
-    isVerticalTyping = result
+    let imkTO = (attributes?[IMKTextOrientationName] as? NSNumber)?.intValue
+    isVerticalTyping = imkTO == 0
     return textFrame
   }
 
