@@ -15,8 +15,13 @@ extension SessionProtocol {
   // 對此類 App 有疑慮者，可以將這類 App 登記到客體管理員當中。
   // 這樣，不但強制使用（限制讀音 20 個的）浮動組字窗，而且內文組字區只會顯示一個空格。
   public var attributedStringSecured: (value: NSAttributedString, range: NSRange) {
-    clientMitigationLevel >= 2
-      ? (state.data.attributedStringPlaceholder, NSRange(location: 0, length: 0))
+    // 這個針對 Discord 的 特殊相容策略對 Discord 網頁端無效。
+    let isDiscordClient = client()?.bundleIdentifier()?.hasSuffix(".Discord") ?? false
+    let securedPlaceholder = isDiscordClient
+      ? state.data.getAttributedStringPlaceholder("_")
+      : state.data.attributedStringPlaceholder
+    return clientMitigationLevel >= 2
+      ? (securedPlaceholder, NSRange(location: 0, length: 0))
       : (state.attributedString, NSRange(state.u16MarkedRange))
   }
 
