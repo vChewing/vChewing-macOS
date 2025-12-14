@@ -78,11 +78,6 @@ public struct PrefMgr: PrefMgrProtocol {
   @AppProperty(key: UserDef.kFailureFlagForPOMObservation.rawValue, defaultValue: false)
   public var failureFlagForPOMObservation: Bool
 
-  @AppProperty(key: UserDef.kUserPhrasesDatabaseBypassed.rawValue, defaultValue: false)
-  public var userPhrasesDatabaseBypassed: Bool {
-    didSet { didAskForSyncingLMPrefs?() }
-  }
-
   @AppProperty(
     key: UserDef.kCandidateServiceMenuContents.rawValue,
     defaultValue: kDefaultCandidateServiceMenuItem
@@ -374,6 +369,11 @@ public struct PrefMgr: PrefMgrProtocol {
 
   @AppProperty(key: UserDef.kUsingHotKeyInputMode.rawValue, defaultValue: true)
   public var usingHotKeyInputMode: Bool
+
+  @AppProperty(key: UserDef.kUserPhrasesDatabaseBypassed.rawValue, defaultValue: false)
+  public var userPhrasesDatabaseBypassed: Bool {
+    didSet { didAskForSyncingLMPrefs?() }
+  }
 
   @AppProperty(key: UserDef.kCandidateListTextSize.rawValue, defaultValue: 16)
   public var candidateListTextSize: Double {
