@@ -3,8 +3,10 @@
 
 import Foundation
 
-public let sqlTestCoreLMData: String = {
-  let url = Bundle.module.url(forResource: "vanguardLegacy_test", withExtension: "sql")
-  guard let url else { return "" }
-  return (try? String(contentsOf: url)) ?? ""
-}()
+public enum LMATestsData {
+  public static let sqlTestCoreLMData: String = {
+    let url = Bundle.module.url(forResource: "vanguardLegacy_test", withExtension: "sql")
+    guard let url else { return "" }
+    return (try? String(contentsOf: url)) ?? ""
+  }()
+}

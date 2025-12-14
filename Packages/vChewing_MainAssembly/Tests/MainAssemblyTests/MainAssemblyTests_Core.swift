@@ -46,7 +46,7 @@ final class MainAssemblyTests: XCTestCase {
   static var _testSession: InputSession?
 
   var testLM = LMAssembly.LMInstantiator.construct { _ in
-    LMAssembly.LMInstantiator.connectToTestSQLDB(sqlTestCoreLMData)
+    LMAssembly.LMInstantiator.connectToTestSQLDB(LMATestsData.sqlTestCoreLMData)
   }
 
   // MARK: - Utilities
@@ -257,7 +257,7 @@ final class MainAssemblyTests: XCTestCase {
     UserDefaults.pendingUnitTests = true
     LMMgr.prepareForUnitTests()
     testLM = LMAssembly.LMInstantiator.construct { _ in
-      LMAssembly.LMInstantiator.connectToTestSQLDB(sqlTestCoreLMData)
+      LMAssembly.LMInstantiator.connectToTestSQLDB(LMATestsData.sqlTestCoreLMData)
     }
     Self._testHandler = nil
     Self._testSession = nil

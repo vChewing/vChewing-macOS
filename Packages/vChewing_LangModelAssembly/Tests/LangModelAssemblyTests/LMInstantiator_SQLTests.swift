@@ -29,8 +29,8 @@ final class LMInstantiatorSQLTests: XCTestCase {
 
   func testSQL() throws {
     let instance = LMAssembly.LMInstantiator(isCHS: true)
-    XCTAssertTrue(!sqlTestCoreLMData.isEmpty)
-    XCTAssertTrue(LMAssembly.LMInstantiator.connectToTestSQLDB(sqlTestCoreLMData))
+    XCTAssertTrue(!LMATestsData.sqlTestCoreLMData.isEmpty)
+    XCTAssertTrue(LMAssembly.LMInstantiator.connectToTestSQLDB(LMATestsData.sqlTestCoreLMData))
     instance.setOptions { config in
       config.isCNSEnabled = false
       config.isSymbolEnabled = false
@@ -74,7 +74,7 @@ final class LMInstantiatorSQLTests: XCTestCase {
 
   func testCNSMask() throws {
     let instance = LMAssembly.LMInstantiator(isCHS: false)
-    XCTAssertTrue(LMAssembly.LMInstantiator.connectToTestSQLDB(sqlTestCoreLMData))
+    XCTAssertTrue(LMAssembly.LMInstantiator.connectToTestSQLDB(LMATestsData.sqlTestCoreLMData))
     instance.setOptions { config in
       config.isCNSEnabled = false
       config.isSymbolEnabled = false

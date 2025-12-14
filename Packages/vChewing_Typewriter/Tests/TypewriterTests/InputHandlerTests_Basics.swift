@@ -187,7 +187,7 @@ final class InputHandlerTests: XCTestCase {
     // 初始化測試 LM
     let lm = LMAssembly.LMInstantiator(isCHS: false)
     testLM = lm
-    LMAssembly.LMInstantiator.connectToTestSQLDB(sqlTestCoreLMData)
+    LMAssembly.LMInstantiator.connectToTestSQLDB(LMATestsData.sqlTestCoreLMData)
 
     // 初始化測試用的 handler 和 session
     let handler = MockInputHandler(lm: lm, pref: PrefMgr())
