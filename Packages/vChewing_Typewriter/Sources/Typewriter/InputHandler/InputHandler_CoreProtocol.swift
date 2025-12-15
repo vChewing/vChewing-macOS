@@ -144,7 +144,7 @@ private struct KeyDropContext {
       .init(keyArray: remainingKeys, value: remainingValue),
       at: startPosition,
       overrideType: .withSpecified,
-      isExplicitlyOverridden: true, // <- Questionable.
+      isExplicitlyOverridden: true, // <- 此處標記為顯式覆寫存有疑義。
       enforceRetokenization: true
     )
   }
@@ -161,7 +161,7 @@ private struct KeyDropContext {
         .init(keyArray: [key], value: value),
         at: min(max(newPosition, 0), target.assembler.length),
         overrideType: .withSpecified,
-        isExplicitlyOverridden: true, // <- Questionable.
+        isExplicitlyOverridden: true, // <- 此處標記為顯式覆寫存有疑義。
         enforceRetokenization: true
       )
     }
