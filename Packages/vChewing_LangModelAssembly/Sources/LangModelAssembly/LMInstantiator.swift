@@ -12,6 +12,8 @@ import Shared
 import SwiftExtension
 
 extension LMAssembly {
+  typealias ScoreAssigner = (CandidateInState?) -> Double
+
   /// 語言模組副本化模組（LMInstantiator，下稱「LMI」）自身為符合天權星組字引擎內
   /// 的 LangModelProtocol 協定的模組、統籌且整理來自其它子模組的資料（包括使
   /// 用者語彙、繪文字模組、語彙濾除表、原廠語言模組等）。
@@ -562,19 +564,21 @@ extension LMAssembly {
     var lmUserPhrases = LMCoreEX(
       reverse: true,
       consolidate: true,
-      defaultScore: 0,
+      defaultScore: { _ in
+        0
+      },
       forceDefaultScore: false
     )
     var lmFiltered = LMCoreEX(
       reverse: true,
       consolidate: true,
-      defaultScore: 0,
+      defaultScore: { _ in 0 },
       forceDefaultScore: true
     )
     var lmUserSymbols = LMCoreEX(
       reverse: true,
       consolidate: true,
-      defaultScore: -12.0,
+      defaultScore: { _ in -12.0 },
       forceDefaultScore: true
     )
     var lmReplacements = LMReplacements()

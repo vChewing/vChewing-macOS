@@ -26,13 +26,15 @@ extension LMAssembly {
     ///   - defaultScore: 當某一筆資料內的權重資料毀損時，要施加的預設權重。
     ///   - forceDefaultScore: 啟用該選項的話，會強制施加預設權重、而無視原始權重資料。
     init(
-      reverse: Bool = false, consolidate: Bool = false, defaultScore scoreDefault: Double = 0,
+      reverse: Bool = false,
+      consolidate: Bool = false,
+      defaultScore scoreDefault: ScoreAssigner? = nil,
       forceDefaultScore: Bool = false
     ) {
       self.rangeMap = [:]
       self.allowConsolidation = consolidate
       self.shouldReverse = reverse
-      self.defaultScore = scoreDefault
+      self.defaultScore = scoreDefault ?? defaultScore
       self.shouldForceDefaultScore = forceDefaultScore
     }
 
@@ -50,7 +52,7 @@ extension LMAssembly {
     var shouldReverse = false
     var allowConsolidation = false
     /// 當某一筆資料內的權重資料毀損時，要施加的預設權重。
-    var defaultScore: Double = 0
+    var defaultScore: ScoreAssigner = { _ in 0 }
     /// 啟用該選項的話，會強制施加預設權重、而無視原始權重資料。
     var shouldForceDefaultScore = false
 
@@ -194,9 +196,11 @@ extension LMAssembly {
         for netaRange in arrRangeRecords {
           let neta = strData[netaRange].split(separator: " ")
           let theValue: String = shouldReverse ? String(neta[0]) : String(neta[1])
-          var theScore = defaultScore
+          var theScore: Double
           if neta.count >= 3, !shouldForceDefaultScore, !neta[2].contains("#") {
-            theScore = .init(String(neta[2])) ?? defaultScore
+            theScore = .init(String(neta[2])) ?? defaultScore((keyArray, theValue))
+          } else {
+            theScore = defaultScore(nil)
           }
           if theScore > 0 {
             theScore *= -1 // 應對可能忘記寫負號的情形

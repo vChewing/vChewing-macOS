@@ -41,7 +41,10 @@ private let sampleData: String = #"""
 final class LMCoreEXTests: XCTestCase {
   func testLMCoreEXAsFactoryCoreDict() throws {
     var lmTest = LMAssembly.LMCoreEX(
-      reverse: false, consolidate: false, defaultScore: 0, forceDefaultScore: false
+      reverse: false,
+      consolidate: false,
+      defaultScore: { _ in 0 },
+      forceDefaultScore: false
     )
     lmTest.replaceData(textData: sampleData)
     XCTAssertEqual(lmTest.count, 3)
