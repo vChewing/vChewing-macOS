@@ -263,7 +263,7 @@ extension IMEStateData {
     public typealias StyledPair = (string: String, style: Self)
 
     public static func pack(_ pairs: [StyledPair]) -> NSAttributedString {
-      let result = NSMutableAttributedString()
+      let result = NSMutableAttributedString(string: "")
       var clauseSegment = 0
       for (string, style) in pairs {
         guard !string.isEmpty else { continue }
