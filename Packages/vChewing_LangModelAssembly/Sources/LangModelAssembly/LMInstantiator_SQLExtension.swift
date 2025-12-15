@@ -198,9 +198,28 @@ extension LMAssembly.LMInstantiator {
   /// - Remark: 該函式會無損地返回原廠辭典的結果，不受使用者控頻與資料過濾條件的影響，不包含全字庫的資料。
   /// - parameters:
   ///   - key: 讀音索引鍵。
-  public func factoryCoreUnigramsFor(key: String, keyArray: [String]) -> [Megrez.Unigram] {
+  ///   - keyArray: 讀音索引陣列。
+  ///   - onlyFindSupersets: 僅找出超集。預設為 false 表示不找出超集。
+  public func factoryCoreUnigramsFor(
+    key: String,
+    keyArray: [String],
+    onlyFindSupersets: Bool = false
+  )
+    -> [Megrez.Unigram] {
     // 此處無須逸出 ASCII 單引號，因為我們使用了 prepared statement 參數綁定。
-    factoryUnigramsFor(key: key, keyArray: keyArray, column: isCHS ? .theDataCHS : .theDataCHT)
+    if onlyFindSupersets {
+      return factorySupersetUnigramsFor(
+        subsetKey: key,
+        subsetKeyArray: keyArray,
+        column: isCHS ? .theDataCHS : .theDataCHT
+      )
+    } else {
+      return factoryUnigramsFor(
+        key: key,
+        keyArray: keyArray,
+        column: isCHS ? .theDataCHS : .theDataCHT
+      )
+    }
   }
 
   /// 根據給定的讀音索引鍵，來獲取原廠標準資料庫辭典內的對應資料陣列的 UTF8 資料、就地分析、生成單元圖陣列。
@@ -249,6 +268,83 @@ extension LMAssembly.LMInstantiator {
         let halfValue = theValue.applyingTransformFW2HW(reverse: false)
         if halfValue != theValue {
           gramsHW.append(Megrez.Unigram(keyArray: keyArray, value: halfValue, score: theScore))
+        }
+      }
+    }
+    grams.append(contentsOf: gramsHW)
+    return grams
+  }
+
+  /// 根據給定的讀音索引鍵（子集合），回傳所有包含該子集合作為連續段落的 Superset 單元圖陣列。
+  /// - parameters:
+  ///   - subsetKey: 子集合索引鍵（例如 "A-B-C"）。
+  ///   - subsetKeyArray: 子集合索引鍵的陣列形式（例如 ["A","B","C"]）。
+  ///   - column: 資料欄位。
+  func factorySupersetUnigramsFor(
+    subsetKey: String,
+    subsetKeyArray: [String],
+    column: LMAssembly.LMInstantiator.CoreColumn
+  )
+    -> [Megrez.Unigram] {
+    if subsetKey == "_punctuation_list" { return [] }
+    var grams: [Megrez.Unigram] = []
+    var gramsHW: [Megrez.Unigram] = []
+
+    let encryptedKey = Self.cnvPhonabetToASCII(subsetKey)
+    // 使用 LIKE 搜尋包含該子集合的 superset key，並排除完全相等的 key
+    let sqlQuery =
+      "SELECT theKey, \(column.name) FROM DATA_MAIN WHERE (theKey LIKE ? OR theKey LIKE ? OR theKey LIKE ?) AND theKey != ?;"
+    performStatementSansResult { ptrStatement in
+      if sqlite3_prepare_v2(Self.ptrSQL, sqlQuery, -1, &ptrStatement, nil) == SQLITE_OK {
+        let p1 = encryptedKey + "-%"
+        let p2 = "%-" + encryptedKey
+        let p3 = "%-" + encryptedKey + "-%"
+        let params = [p1, p2, p3, encryptedKey]
+        for (i, param) in params.enumerated() {
+          let idx = Int32(i + 1)
+          let cParam = (param as NSString).utf8String
+          _ = sqlite3_bind_text(ptrStatement, idx, cParam, -1, unsafeBitCast(-1, to: sqlite3_destructor_type.self))
+        }
+      } else {
+        vCLMLog("SQL prepare failed for query: \(sqlQuery)")
+      }
+
+      while sqlite3_step(ptrStatement) == SQLITE_ROW {
+        guard let rawKey = sqlite3_column_text(ptrStatement, 0) else { continue }
+        guard let rawValue = sqlite3_column_text(ptrStatement, 1) else { continue }
+        let supEncrypted = String(cString: rawKey)
+        let currentResult = String(cString: rawValue)
+        let supKeyPhonabet = Self.restorePhonabetFromASCII(supEncrypted)
+        let supKeyArray = supKeyPhonabet.split(separator: "-").map { String($0) }
+
+        var i: Double = 0
+        var previousScore: Double?
+        currentResult.split(separator: "\t").forEach { strNetaSet in
+          let neta = Array(
+            strNetaSet.trimmingCharacters(in: .newlines).split(separator: " ")
+              .reversed()
+          )
+          let theValue: String = .init(neta[0])
+          var theScore = column.defaultScore
+          if neta.count >= 2, let thisScore = Double(String(neta[1])) {
+            theScore = thisScore
+          }
+          if theScore > 0 {
+            theScore *= -1
+          }
+          if previousScore == theScore {
+            theScore -= i * 0.000001
+            i += 1
+          } else {
+            previousScore = theScore
+            i = 0
+          }
+          grams.append(Megrez.Unigram(keyArray: supKeyArray, value: theValue, score: theScore))
+          if !supEncrypted.contains("_punctuation") { return }
+          let halfValue = theValue.applyingTransformFW2HW(reverse: false)
+          if halfValue != theValue {
+            gramsHW.append(Megrez.Unigram(keyArray: supKeyArray, value: halfValue, score: theScore))
+          }
         }
       }
     }

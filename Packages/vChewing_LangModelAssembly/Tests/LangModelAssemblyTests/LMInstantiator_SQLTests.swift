@@ -156,6 +156,48 @@ final class LMInstantiatorSQLTests: XCTestCase {
     LMAssembly.LMInstantiator.disconnectSQLDB()
   }
 
+  func testFactorySupersetUnigramsFor() throws {
+    let instance = LMAssembly.LMInstantiator(isCHS: true)
+    let sqlSetup = """
+    CREATE TABLE IF NOT EXISTS DATA_MAIN (
+      theKey TEXT NOT NULL,
+      theDataCHS TEXT,
+      theDataCHT TEXT,
+      theDataCNS TEXT,
+      theDataMISC TEXT,
+      theDataSYMB TEXT,
+      theDataCHEW TEXT,
+      PRIMARY KEY (theKey)
+    ) WITHOUT ROWID;
+    INSERT INTO DATA_MAIN(theKey, theDataCHS) VALUES ('A-B-C', '-9.0 base');
+    INSERT INTO DATA_MAIN(theKey, theDataCHS) VALUES ('Z-A-B-C', '-1.0 zval');
+    INSERT INTO DATA_MAIN(theKey, theDataCHS) VALUES ('A-B-C-F', '-2.0 fval');
+    INSERT INTO DATA_MAIN(theKey, theDataCHS) VALUES ('M-A-B-C-Q', '-3.0 mval');
+    """
+
+    XCTAssertTrue(LMAssembly.LMInstantiator.connectToTestSQLDB(sqlSetup))
+
+    let grams = instance.factorySupersetUnigramsFor(
+      subsetKey: "A-B-C",
+      subsetKeyArray: ["A", "B", "C"],
+      column: .theDataCHS
+    )
+
+    XCTAssertTrue(gramsContainValue(grams, "zval"))
+    XCTAssertTrue(gramsContainValue(grams, "fval"))
+    XCTAssertTrue(gramsContainValue(grams, "mval"))
+    XCTAssertFalse(gramsContainValue(grams, "base"))
+
+    // 確認返回的 keyArray 為 superset（長度大於子集合）
+    if let z = grams.first(where: { $0.value == "zval" }) {
+      XCTAssertEqual(z.keyArray.count, 4)
+    } else {
+      XCTFail("Expected zval unigram")
+    }
+
+    LMAssembly.LMInstantiator.disconnectSQLDB()
+  }
+
   // MARK: Private
 
   private func gramsContainValue(_ grams: [Megrez.Unigram], _ value: String) -> Bool {
