@@ -210,4 +210,63 @@ final class POMFileHandleTests: XCTestCase {
     XCTAssertEqual(savableAfterReload.count, 2)
     XCTAssertTrue(savableAfterReload.contains { $0.key.contains("k6") })
   }
+
+  func testJournalReplayIgnoresInvalidEntries() throws {
+    let tempURL = URL(fileURLWithPath: NSTemporaryDirectory()).appendingPathComponent("test_pom_journal_invalid.json")
+    let journalURL = tempURL.appendingPathExtension("journal")
+    defer {
+      try? FileManager.default.removeItem(at: tempURL)
+      try? FileManager.default.removeItem(at: journalURL)
+    }
+
+    let now = Date.now.timeIntervalSince1970
+    let future = now + 86_400
+
+    // 建立日誌檔案：包含一條合法 upsert，以及多條不合法項目（使用 JSONSerialization 構造以避開轉義問題）
+    let validUpsertDict: [String: Any] = [
+      "operation": "upsert",
+      "pair": [
+        "k": "(a,啊)&(b,吧)&(c,此)",
+        "p": ["ovr": ["目標": ["cnt": 1, "ts": now]]],
+      ],
+    ]
+    let emptyKeyUpsertDict: [String: Any] = [
+      "operation": "upsert",
+      "pair": [
+        "k": "",
+        "p": ["ovr": ["壞": ["cnt": 1, "ts": now]]],
+      ],
+    ]
+    let futureTsUpsertDict: [String: Any] = [
+      "operation": "upsert",
+      "pair": [
+        "k": "(x,欸)&(y,乙)&(z,子)",
+        "p": ["ovr": ["未來": ["cnt": 1, "ts": future]]],
+      ],
+    ]
+    let zeroCountUpsertDict: [String: Any] = [
+      "operation": "upsert",
+      "pair": [
+        "k": "(m,目)&(n,哪)&(o,哦)",
+        "p": ["ovr": ["零": ["cnt": 0, "ts": now]]],
+      ],
+    ]
+    let validRemoveDict: [String: Any] = ["operation": "removeKey", "key": "(a,啊)&(b,吧)&(c,此)"]
+
+    var lines: [String] = []
+    for obj in [validUpsertDict, emptyKeyUpsertDict, futureTsUpsertDict, zeroCountUpsertDict, validRemoveDict] {
+      let data = try JSONSerialization.data(withJSONObject: obj, options: [])
+      if let s = String(data: data, encoding: .utf8) { lines.append(s) }
+    }
+    let journalContent = lines.joined(separator: "\n")
+    try journalContent.write(to: journalURL, atomically: true, encoding: .utf8)
+
+    // 載入並重播日誌
+    let pom = LMAssembly.LMPerceptionOverride(capacity: 10, dataURL: tempURL)
+    pom.loadData(fromURL: tempURL)
+
+    // 因為最後有 removeKey，最終應該沒有項目
+    let savable = pom.getSavableData()
+    XCTAssertTrue(savable.isEmpty, "日誌中不合法的 upsert 應被忽略，且最後的 removeKey 會移除合法項目")
+  }
 }

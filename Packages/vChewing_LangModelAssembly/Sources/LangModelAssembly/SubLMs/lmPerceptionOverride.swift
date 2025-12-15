@@ -1262,6 +1262,13 @@ extension LMAssembly.LMPerceptionOverride {
 
           do {
             let record = try decoder.decode(JournalRecord.self, from: recordData)
+
+            // 驗證日誌記錄合理性，避免受損或惡意日誌影響記憶
+            guard isValidJournalRecord(record) else {
+              vCLMLog("POM Journal: Ignored invalid journal record: \(trimmed.prefix(200))")
+              continue
+            }
+
             switch record.operation {
             case .clear:
               mutLRUMap.removeAll()
@@ -1293,6 +1300,38 @@ extension LMAssembly.LMPerceptionOverride {
       }
     } catch {
       vCLMLog("POM Journal: Unable to replay log. Details: \(error)")
+    }
+  }
+
+  /// 檢查 journal record 的合理性以避免受損或惡意資料回放。
+  private func isValidJournalRecord(_ record: JournalRecord) -> Bool {
+    switch record.operation {
+    case .clear:
+      return true
+    case .removeKey:
+      guard let key = record.key, !key.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty else { return false }
+      // 拒絕 underscore-prefixed keys（標點或特殊鍵）
+      if shouldIgnoreKey(key) { return false }
+      return true
+    case .upsert:
+      guard let pair = record.pair else { return false }
+      let key = pair.key.trimmingCharacters(in: .whitespacesAndNewlines)
+      guard !key.isEmpty else { return false }
+      // 不接受被標記為應忽略的 key
+      if shouldIgnoreKey(key) { return false }
+      // 基本格式檢查
+      guard parsePerceptionKey(key) != nil else { return false }
+      // perception 內必須有 overrides
+      if pair.perception.overrides.isEmpty { return false }
+      // 檢查每個 override 的合理性
+      let now = Date().timeIntervalSince1970
+      for (candidate, override) in pair.perception.overrides {
+        let cand = candidate.trimmingCharacters(in: .whitespacesAndNewlines)
+        if cand.isEmpty || cand.count > 128 { return false }
+        if override.count <= 0 || override.count > 10_000 { return false }
+        if override.timestamp <= 0 || override.timestamp > now + 3_600 { return false }
+      }
+      return true
     }
   }
 
