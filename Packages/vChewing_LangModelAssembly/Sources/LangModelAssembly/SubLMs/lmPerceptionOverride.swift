@@ -81,6 +81,10 @@ extension LMAssembly {
     /// 記錄最近一次快照的雜湊值（hex string），以避免重複寫入。
     var previouslySavedHash: String
 
+    /// 僅供測試：注入的建議用於測試中以繞過內部評分邏輯。
+    /// 設置後，`fetchSuggestion` 會立即返回此建議並將其清除。
+    var testInjectedSuggestion: LMAssembly.OverrideSuggestion?
+
     var threshold: Double {
       let fallbackValue = Self.kDecayThreshold
       guard let thresholdCalculated = thresholdProvider?() else { return fallbackValue }
@@ -348,6 +352,10 @@ extension LMAssembly.LMPerceptionOverride {
     guard !activeKey.isEmpty else { return .init() }
 
     return lock.withLock {
+      if let injected = testInjectedSuggestion {
+        testInjectedSuggestion = nil
+        return injected
+      }
       var suggestions = getSuggestion(
         key: activeKey,
         timestamp: timestamp
