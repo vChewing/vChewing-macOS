@@ -756,14 +756,18 @@ extension InputHandlerProtocol {
         )
         let cursorForOverride = suggestion.overrideCursor ?? actualNodeCursorPosition
         if let gramHit = assembler.assembledSentence.findGram(at: cursorForOverride) {
-          let existingLen = gramHit.gram.keyArray.count
-          let suggestedLen = newestSuggestedCandidate.keyArray.count
-          if existingLen > suggestedLen,
-             newestSuggestedCandidate.probability <= gramHit.gram.score {
-            vCLog(
-              "POM: Skip applying suggestion \(suggestedPair.toNGramKey) because the existing longer node has higher score (\(gramHit.gram.score))."
-            )
-            return arrResult.stableSort { $0.1.score > $1.1.score }
+          if gramHit.gram.keyArray.count > newestSuggestedCandidate.keyArray.count {
+            // 若建議會將現有節點縮短（short->long 替換），要求建議的分數
+            // 必須明顯高於既有節點分數才允許套用（避免微小差異導致惡性覆寫）。
+            let existingScore = gramHit.gram.score
+            let suggestedScore = newestSuggestedCandidate.probability
+            // 預設門檻：需要至少超越既有節點 0.5 分（可視為安全餘量）
+            if !pomShortToLongAllowed(existingScore: existingScore, suggestedScore: suggestedScore) {
+              vCLog(
+                "POM: Skip applying suggestion \(suggestedPair.toNGramKey) because it would shorten an existing node without sufficient margin (existing=\(existingScore), suggested=\(suggestedScore))."
+              )
+              return arrResult.stableSort { $0.1.score > $1.1.score }
+            }
           }
         }
         let ngramKey = suggestedPair.toNGramKey
@@ -783,11 +787,20 @@ extension InputHandlerProtocol {
     return arrResult
   }
 
+  // MARK: - POM short->long replacement helper
+
+  /// 判斷是否允許 POM 建議將現有節點由短取代為長（short->long）。
+  ///
+  /// 條件：建議分數必須超過既有節點分數加上安全餘量（margin）。
+  func pomShortToLongAllowed(existingScore: Double, suggestedScore: Double) -> Bool {
+    let requiredMargin = 0.5
+    return suggestedScore > existingScore + requiredMargin
+  }
+
   func letComposerAndCalligrapherDoBackSpace() {
-    _ =
-      prefs.cassetteEnabled
-        ? calligrapher = String(calligrapher.dropLast(1))
-        : composer.doBackSpace()
+    _ = prefs.cassetteEnabled
+      ? calligrapher = String(calligrapher.dropLast(1))
+      : composer.doBackSpace()
   }
 
   /// 生成標點符號索引鍵頭。

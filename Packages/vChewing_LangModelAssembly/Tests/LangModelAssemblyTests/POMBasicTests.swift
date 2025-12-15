@@ -426,6 +426,45 @@ final class POMBasicTests: XCTestCase {
       "若候選提供一致的 previous context，應接受單段 primary match"
     )
   }
+
+  func testPOM_BS14_GetSuggestionIncludesPreviousField() throws {
+    let pom = LMAssembly.LMPerceptionOverride(capacity: 10)
+    let now = Date.now.timeIntervalSince1970
+
+    // Bigram 候選字詞（帶有 `previous`）
+    let candidateKey = "()&(A,A)&(B,cand)"
+    pom.memorizePerception((ngramKey: candidateKey, candidate: "cand"), timestamp: now)
+
+    guard let suggestions = pom.getSuggestion(key: candidateKey, timestamp: now + 1) else {
+      XCTFail("Expected suggestion for candidateKey")
+      return
+    }
+    // getSuggestion 應回傳 previous 欄位為先前值的 tuple
+    XCTAssertTrue(suggestions.contains { $0.value == "cand" && $0.previous == "A" })
+  }
+
+  func testPOM_BS15_SplitCandidateCombinedHeadAccepted() throws {
+    let pom = LMAssembly.LMPerceptionOverride(capacity: 10)
+    let now = Date.now.timeIntervalSince1970
+
+    // 原始的多段頭部：BC
+    let originalKey = "()&()&(BC,BC)"
+    // 拆分候選：previous=B head=C
+    let splitCandidate = "()&(B,B)&(C,cand)"
+
+    pom.memorizePerception((ngramKey: splitCandidate, candidate: "split"), timestamp: now)
+
+    // 對 splitCandidate 直接呼叫 getSuggestion 應成功取得建議
+    guard let suggestions = pom.getSuggestion(key: splitCandidate, timestamp: now + 1) else {
+      XCTFail("Expected suggestion for splitCandidate")
+      return
+    }
+    XCTAssertTrue(suggestions.contains { $0.value == "split" })
+
+    // 對 original 呼叫 alternateKeysForTesting 應包含 splitCandidate
+    let fallbacks = pom.alternateKeysForTesting(originalKey)
+    XCTAssertTrue(fallbacks.contains(splitCandidate))
+  }
 }
 
 extension Megrez.Node {

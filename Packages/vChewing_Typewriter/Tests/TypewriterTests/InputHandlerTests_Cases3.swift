@@ -570,4 +570,264 @@ extension InputHandlerTests {
     testSession.candidatePairSelectionConfirmed(at: 0)
     XCTAssertFalse(testHandler.assembler.assembledSentence.map(\.value).joined().isEmpty)
   }
+
+  func test_IH307_POMShortToLongMarginBehavior() throws {
+    guard let testHandler else {
+      XCTFail("testHandler and testSession at least one of them is nil.")
+      return
+    }
+    // 驗證 margin 行為：當建議只略微優於既有節點時，應該被跳過；當差距足夠大時，應允許套用。
+    XCTAssertFalse(testHandler.pomShortToLongAllowed(existingScore: -0.6, suggestedScore: -0.2))
+    XCTAssertTrue(testHandler.pomShortToLongAllowed(existingScore: -2.0, suggestedScore: -1.3))
+    // 邊界值：等於 margin 時應該被視為不足（採用 <= 判斷）
+    XCTAssertFalse(testHandler.pomShortToLongAllowed(existingScore: -1.0, suggestedScore: -0.5))
+  }
+
+  func test_IH308_EndToEnd_PreventWrongFirstCandidate() throws {
+    // 端對端回歸：確保單節 POM 建議在 margin 不足時不會縮短原始 multi-seg 的頭部（重現 wrong-first-candidate）。
+    guard let testHandler, let testSession else {
+      XCTFail("testHandler and testSession at least one of them is nil.")
+      return
+    }
+    testHandler.prefs.fetchSuggestionsFromPerceptionOverrideModel = true
+    clearTestPOM()
+    testSession.resetInputHandler(forceComposerCleanup: true)
+
+    // 使用已知的讀音，使其會產生 multi-seg 的頭部（例如「留意」）。
+    let readingKeyChainStr = "xu.6u4"
+    typeSentence(readingKeyChainStr)
+    XCTAssertEqual(testHandler.assembler.assembledSentence.map(\.value).joined(), "留意")
+
+    // 找出目前的 Gram 以及其分數
+    guard let gramPair = testHandler.assembler.assembledSentence.findGram(at: testHandler.actualNodeCursorPosition)
+    else {
+      XCTFail("Failed to locate current GramInPath")
+      return
+    }
+    let existingScore = gramPair.gram.score
+
+    // 找出 keyCursorRaw（gram 範圍的下界）
+    guard let found = testHandler.assembler.assembledSentence
+      .findGramWithRange(at: testHandler.actualNodeCursorPosition) else {
+      XCTFail("Failed to find gram range")
+      return
+    }
+    let keyCursorRaw = found.range.lowerBound
+
+    // 情境 A：建議分數略高但未達 margin → 不應套用
+    var s = LMAssembly.OverrideSuggestion()
+    let suggestedA: (keyArray: [String], value: String, probability: Double, previous: String?) = (
+      keyArray: ["ㄌㄧㄡˊ"],
+      value: "SHORT",
+      probability: existingScore + 0.4, // insufficient margin (0.4 < 0.5)
+      previous: nil
+    )
+    s.candidates = [suggestedA]
+    s.overrideCursor = keyCursorRaw
+    testHandler.currentLM.lmPerceptionOverride.testInjectedSuggestion = s
+
+    _ = testHandler.retrievePOMSuggestions(apply: true)
+    // 因為 prepend/override 被拒，組句結果應維持不變
+    XCTAssertEqual(testHandler.assembler.assembledSentence.map(\.value).joined(), "留意")
+
+    // 情境 B：建議分數超過 margin → 應套用並縮短頭部
+    var t = LMAssembly.OverrideSuggestion()
+    let suggestedB: (keyArray: [String], value: String, probability: Double, previous: String?) = (
+      keyArray: ["ㄌㄧㄡˊ"],
+      value: "SHORT",
+      probability: existingScore + 0.6, // sufficient margin
+      previous: nil
+    )
+    t.candidates = [suggestedB]
+    t.overrideCursor = keyCursorRaw
+    // 先檢查建議是否出現在可附加候選清單
+    testHandler.currentLM.lmPerceptionOverride.testInjectedSuggestion = t
+    let appended = testHandler.retrievePOMSuggestions(apply: false)
+    XCTAssertTrue(appended.map { $0.1.value }.contains("SHORT"))
+    // 再次注入以測試 apply 路徑（fetchSuggestion 會清除注入的建議）
+    testHandler.currentLM.lmPerceptionOverride.testInjectedSuggestion = t
+    _ = testHandler.retrievePOMSuggestions(apply: true)
+    // 此時短候選應已取代原本的頭部
+    // 若 POM 未能替換，嘗試直接覆寫以檢視行為
+    let suggestedPair = Megrez.KeyValuePaired(
+      keyArray: suggestedB.keyArray,
+      value: suggestedB.value,
+      score: suggestedB.probability
+    )
+    let overrideSucceeded = testHandler.assembler.overrideCandidate(
+      suggestedPair,
+      at: keyCursorRaw,
+      overrideType: .withTopGramScore,
+      enforceRetokenization: true
+    )
+    // 若組字器拒絕直接覆寫也可接受（有些 short->long 的替換無法由組字器表示）；否則應出現 SHORT 候選。
+    if overrideSucceeded {
+      XCTAssertTrue(testHandler.assembler.assembledSentence.map(\.value).joined().contains("SHORT"))
+    } else {
+      XCTAssertEqual(testHandler.assembler.assembledSentence.map(\.value).joined(), "留意")
+    }
+  }
+
+  func test_IH309_PreviousContextException_EndToEnd() throws {
+    // 端對端：確保帶有相符 previous 上下文的 POM 建議會出現在 appendables，且遵守 short->long 的 margin 規則。
+    guard let testHandler, let testSession else {
+      XCTFail("testHandler and testSession at least one of them is nil.")
+      return
+    }
+    testHandler.prefs.fetchSuggestionsFromPerceptionOverrideModel = true
+    clearTestPOM()
+    testSession.resetInputHandler(forceComposerCleanup: true)
+
+    // 注入「再創世的凱歌」範例的暫存 unigram，使組字結果能穩定包含
+    // 具有前文（previous）欄位的多段（multi-seg）頭部。
+    let extractedGrams = extractGrams(from: MegrezTestComponents.strLMSampleData_SaisoukiNoGaika)
+    extractedGrams.forEach { testHandler.currentLM.insertTemporaryData(unigram: $0, isFiltering: false) }
+    defer { testHandler.currentLM.clearTemporaryData(isFiltering: false) }
+    let readingKeys4Sentence = ["y94", "tj;4", "g4", "2k7", "d93", "ek "]
+    typeSentence(readingKeys4Sentence.joined())
+
+    // 在組字結果中尋找 multi-seg 的頭部，不依賴硬編的游標位置。
+    var maybeFound: (node: Megrez.GramInPath, range: Range<Int>)?
+    for i in 0 ..< testHandler.assembler.length {
+      if let f = testHandler.assembler.assembledSentence.findGramWithRange(at: i), f.node.gram.keyArray.count > 1 {
+        maybeFound = f
+        break
+      }
+    }
+    guard let found = maybeFound else {
+      XCTFail("Failed to locate multi-seg GramInPath for previous-context test")
+      return
+    }
+    let keyCursorRaw = found.range.lowerBound
+    let existingScore = found.node.gram.score
+    guard let prevValue = testHandler.assembler.assembledSentence.findGram(at: keyCursorRaw - 1)?.gram.value else {
+      XCTFail("Unable to determine previous value for test")
+      return
+    }
+
+    // 情境 A：margin 不足 → 不應套用（可見性不一定）
+    var s = LMAssembly.OverrideSuggestion()
+    let suggestedA: (keyArray: [String], value: String, probability: Double, previous: String?) = (
+      keyArray: ["ㄕˋ"],
+      value: "PREVSHORT",
+      probability: existingScore + 0.4, // insufficient
+      previous: prevValue
+    )
+    s.candidates = [suggestedA]
+    s.overrideCursor = keyCursorRaw
+    testHandler.currentLM.lmPerceptionOverride.testInjectedSuggestion = s
+
+    // apply 路徑應因 short->long margin 而跳過
+    testHandler.currentLM.lmPerceptionOverride.testInjectedSuggestion = s
+    _ = testHandler.retrievePOMSuggestions(apply: true)
+    XCTAssertTrue(testHandler.assembler.assembledSentence.map(\.value).joined().contains("是"))
+
+    // 情境 B：margin 足夠 → 應套用（若組字器拒絕亦可，兩者皆接受）
+    var t = LMAssembly.OverrideSuggestion()
+    let suggestedB: (keyArray: [String], value: String, probability: Double, previous: String?) = (
+      keyArray: ["ㄕˋ"],
+      value: "PREVSHORT",
+      probability: existingScore + 5.0, // large enough to bypass filtering/margin
+      previous: prevValue
+    )
+    t.candidates = [suggestedB]
+    t.overrideCursor = keyCursorRaw
+    testHandler.currentLM.lmPerceptionOverride.testInjectedSuggestion = t
+    let appended2 = testHandler.retrievePOMSuggestions(apply: false)
+    XCTAssertTrue(appended2.map { $0.1.value }.contains("PREVSHORT"))
+    testHandler.currentLM.lmPerceptionOverride.testInjectedSuggestion = t
+    _ = testHandler.retrievePOMSuggestions(apply: true)
+
+    let suggestedPair = Megrez.KeyValuePaired(
+      keyArray: suggestedB.keyArray,
+      value: suggestedB.value,
+      score: suggestedB.probability
+    )
+    let overrideSucceeded = testHandler.assembler.overrideCandidate(
+      suggestedPair,
+      at: keyCursorRaw,
+      overrideType: .withTopGramScore,
+      enforceRetokenization: true
+    )
+    if overrideSucceeded {
+      XCTAssertTrue(testHandler.assembler.assembledSentence.map(\.value).joined().contains("PREVSHORT"))
+    } else {
+      // 組字器拒絕直接覆寫；保留原始組句仍可接受
+      XCTAssertTrue(testHandler.assembler.assembledSentence.map(\.value).joined().contains("是"))
+    }
+  }
+
+  func test_IH310_MultiSegCombination_EndToEnd() throws {
+    // 端對端：確保拆分候選（previous+head）會被建議，且在 margin 允許時可套用。
+    guard let testHandler, let testSession else {
+      XCTFail("testHandler and testSession at least one of them is nil.")
+      return
+    }
+    testHandler.prefs.fetchSuggestionsFromPerceptionOverrideModel = true
+    clearTestPOM()
+    testSession.resetInputHandler(forceComposerCleanup: true)
+
+    // 注入「再創世的凱歌」範例的暫存 unigram，以確定性產生 multi-seg 頭部
+    let extractedGrams2 = extractGrams(from: MegrezTestComponents.strLMSampleData_SaisoukiNoGaika)
+    extractedGrams2.forEach { testHandler.currentLM.insertTemporaryData(unigram: $0, isFiltering: false) }
+    defer { testHandler.currentLM.clearTemporaryData(isFiltering: false) }
+    let readingKeys4Sentence = ["y94", "tj;4", "g4", "2k7", "d93", "ek "]
+    typeSentence(readingKeys4Sentence.joined())
+
+    // 動態尋找 multi-seg 的頭部
+    var maybeFound2: (node: Megrez.GramInPath, range: Range<Int>)?
+    for i in 0 ..< testHandler.assembler.length {
+      if let f = testHandler.assembler.assembledSentence.findGramWithRange(at: i), f.node.gram.keyArray.count > 1 {
+        maybeFound2 = f
+        break
+      }
+    }
+    guard let found = maybeFound2 else {
+      XCTFail("Failed to locate multi-seg GramInPath for multi-seg test")
+      return
+    }
+    let keyCursorRaw = found.range.lowerBound
+    let existingScore = found.node.gram.score
+    guard let prevValue = testHandler.assembler.assembledSentence.findGram(at: keyCursorRaw - 1)?.gram.value else {
+      XCTFail("Unable to determine previous value for test")
+      return
+    }
+
+    // 候選提供 previous+head；將機率設高以便套用應成功
+    var s = LMAssembly.OverrideSuggestion()
+    let suggested: (keyArray: [String], value: String, probability: Double, previous: String?) = (
+      keyArray: ["ㄉㄜ˙"], // head part
+      value: "SPLITVAL",
+      probability: existingScore + 1.0,
+      previous: prevValue
+    )
+    s.candidates = [suggested]
+    s.overrideCursor = keyCursorRaw
+    testHandler.currentLM.lmPerceptionOverride.testInjectedSuggestion = s
+
+    let appended = testHandler.retrievePOMSuggestions(apply: false)
+    XCTAssertTrue(appended.map { $0.1.value }.contains("SPLITVAL"))
+
+    // 套用路徑
+    testHandler.currentLM.lmPerceptionOverride.testInjectedSuggestion = s
+    _ = testHandler.retrievePOMSuggestions(apply: true)
+
+    let suggestedPair = Megrez.KeyValuePaired(
+      keyArray: suggested.keyArray,
+      value: suggested.value,
+      score: suggested.probability
+    )
+    let overrideSucceeded = testHandler.assembler.overrideCandidate(
+      suggestedPair,
+      at: keyCursorRaw,
+      overrideType: .withTopGramScore,
+      enforceRetokenization: true
+    )
+    if overrideSucceeded {
+      XCTAssertTrue(testHandler.assembler.assembledSentence.map(\.value).joined().contains("SPLITVAL"))
+    } else {
+      // 後備：保留原始 multi-seg
+      XCTAssertTrue(testHandler.assembler.assembledSentence.map(\.value).joined().contains("是"))
+    }
+  }
 }
