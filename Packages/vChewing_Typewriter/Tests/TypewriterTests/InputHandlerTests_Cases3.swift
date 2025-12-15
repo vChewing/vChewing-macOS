@@ -513,4 +513,61 @@ extension InputHandlerTests {
     typeSentence(readingKeys4Sentence.joined())
     XCTAssertEqual("再 創 世", assembler.assembledSentence.map(\.value).joined(separator: " "))
   }
+
+  func test_IH306_ConsolidationWhenCursorAtNodeEdge() throws {
+    guard let testHandler, let testSession else {
+      XCTFail("testHandler and testSession at least one of them is nil.")
+      return
+    }
+
+    // 情境 A：後置游標模式，游標位於後端邊緣
+    testHandler.prefs.useSCPCTypingMode = false
+    testHandler.prefs.fetchSuggestionsFromPerceptionOverrideModel = true
+    testHandler.prefs.useRearCursorMode = true
+    testSession.resetInputHandler(forceComposerCleanup: true)
+    typeSentence("xu.6u4")
+    XCTAssertEqual(testHandler.assembler.assembledSentence.map(\.value).joined(), "留意")
+    testHandler.assembler.cursor = testHandler.assembler.length
+    XCTAssertEqual(
+      testHandler.assembler.cursor,
+      testHandler.assembler.length,
+      "cursor: \(testHandler.assembler.cursor), length: \(testHandler.assembler.length)"
+    )
+    // `actualNodeCursorPosition` 應指向最後一個節點索引
+    XCTAssertEqual(testHandler.actualNodeCursorPosition, max(testHandler.assembler.length - 1, 0))
+    // 直接產生候選狀態以避免 MockSession 的額外狀態變化
+    let indBeforeCandidateGeneration = testHandler.assembler.cursor
+    XCTAssertEqual(indBeforeCandidateGeneration, testHandler.assembler.length)
+    let candidateState = testHandler.generateStateOfCandidates()
+    let cursorAfterCandidateGeneration = testHandler.assembler.cursor
+    // `generateStateOfCandidates` 可能會為了避免無效邊緣游標而移動游標；確認其結果為有效位置
+    XCTAssertFalse(
+      testHandler.isInvalidEdgeCursorSituation(),
+      "Cursor remains at invalid edge: \(cursorAfterCandidateGeneration)"
+    )
+    // 診斷：同時檢查 `endAt` 候選
+    let rawCandidatesEnd = testHandler.assembler.fetchCandidates(filter: .endAt)
+    XCTAssertFalse(rawCandidatesEnd.isEmpty, "raw endAt candidates should not be empty")
+    XCTAssertFalse(
+      candidateState.candidates.isEmpty,
+      "generated state candidates should not be empty"
+    )
+    // 現在將狀態套用到 session，並確認選字能正常運作
+    testSession.switchState(candidateState)
+    testSession.candidatePairSelectionConfirmed(at: 0)
+    // 確認選字沒有崩潰且組字結果非空
+    XCTAssertFalse(testHandler.assembler.assembledSentence.map(\.value).joined().isEmpty)
+
+    // 情境 B：前置游標模式，游標位於前端邊緣
+    testHandler.clear()
+    testHandler.prefs.useRearCursorMode = false
+    testSession.resetInputHandler(forceComposerCleanup: true)
+    typeSentence("xu.6u4")
+    XCTAssertEqual(testHandler.assembler.assembledSentence.map(\.value).joined(), "留意")
+    testHandler.assembler.cursor = 0
+    XCTAssertEqual(testHandler.assembler.cursor, 0)
+    testSession.switchState(testHandler.generateStateOfCandidates())
+    testSession.candidatePairSelectionConfirmed(at: 0)
+    XCTAssertFalse(testHandler.assembler.assembledSentence.map(\.value).joined().isEmpty)
+  }
 }

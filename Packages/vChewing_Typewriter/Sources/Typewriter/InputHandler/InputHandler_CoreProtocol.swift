@@ -361,9 +361,9 @@ extension InputHandlerProtocol {
     theState.data.displayTextSegments = assembler.assembledSentence.values
     theState.data.cursor = convertCursorForDisplay(assembler.cursor)
     let markerBackup = assembler.marker
-    if assembler.cursor == assembler.length {
+    if assembler.isCursorAtEdge(direction: .front) {
       assembler.jumpCursorBySegment(to: .rear, isMarker: true)
-    } else if assembler.cursor == 0 {
+    } else if assembler.isCursorAtEdge(direction: .rear) {
       assembler.jumpCursorBySegment(to: .front, isMarker: true)
     } else {
       assembler.jumpCursorBySegment(to: prefs.useRearCursorMode ? .front : .rear, isMarker: true)
@@ -420,10 +420,17 @@ extension InputHandlerProtocol {
   /// 要拿給 Megrez 使用的特殊游標位址，用於各種與節點判定有關的操作。
   /// - Remark: 自 Megrez 引擎 v2.6.2 開始，該參數不得用於獲取候選字詞清單資料。相關函式僅接收原始 cursor 資料。
   public var actualNodeCursorPosition: Int {
+    // 防止指向虛位；`assembler.length` 表示最前端的虛位（cursor 可達）。
+    // `actualNodeCursorPosition` 應回傳對應 `assembler.keys.indices` 的真實索引。
+    let validIndices = assembler.keys.indices
     let atFrontEdge = assembler.isCursorAtEdge(direction: .front)
     let atRearEdge = assembler.isCursorAtEdge(direction: .rear)
     let delta = ((atFrontEdge || !prefs.useRearCursorMode) && !atRearEdge ? 1 : 0)
-    return assembler.cursor - delta
+    let pos = Swift.min(
+      assembler.cursor - delta,
+      validIndices.last ?? validIndices.upperBound
+    )
+    return Swift.max(pos, 0)
   }
 
   public func activePOMCandidateValues() -> [String] {
@@ -486,6 +493,7 @@ extension InputHandlerProtocol {
     let cursorToCheck = givenCursor ?? assembler.cursor
     // prefs.useRearCursorMode 為 0 (false) 時（macOS 注音選字），最後方的游標位置不合邏輯。
     // prefs.useRearCursorMode 為 1 (true) 時（微軟新注音選字），最前方的游標位置不合邏輯。
+    // 註：cursor == 0 的時候為最後方。方法遵循 `assembler.isCursorAtEdge(` 的實作。
     switch prefs.useRearCursorMode {
     case false where cursorToCheck == 0: return true
     case true where cursorToCheck == assembler.length: return true
@@ -832,8 +840,12 @@ extension InputHandlerProtocol {
       return assembler.fetchCandidates(filter: givenFilter)
     }
     switch prefs.useRearCursorMode {
-    case false: return assembler.fetchCandidates(filter: .endAt)
-    case true: return assembler.fetchCandidates(filter: .beginAt)
+    case false,
+         true where assembler.isCursorAtEdge(direction: .front):
+      return assembler.fetchCandidates(filter: .endAt)
+    case true,
+         false where assembler.isCursorAtEdge(direction: .rear):
+      return assembler.fetchCandidates(filter: .beginAt)
     }
   }
 }
