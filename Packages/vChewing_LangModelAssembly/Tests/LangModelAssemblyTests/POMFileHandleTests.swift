@@ -265,8 +265,49 @@ final class POMFileHandleTests: XCTestCase {
     let pom = LMAssembly.LMPerceptionOverride(capacity: 10, dataURL: tempURL)
     pom.loadData(fromURL: tempURL)
 
-    // 因為最後有 removeKey，最終應該沒有項目
+    // 當日誌中含有不合法記錄時，整個日誌應視為受損並被自動刪除
+    XCTAssertFalse(FileManager.default.fileExists(atPath: journalURL.path), "受損的日誌檔應該被刪除")
+
+    // 最終記憶體應該沒有項目（因為移除了日誌、未應用任何 upsert）
     let savable = pom.getSavableData()
-    XCTAssertTrue(savable.isEmpty, "日誌中不合法的 upsert 應被忽略，且最後的 removeKey 會移除合法項目")
+    XCTAssertTrue(savable.isEmpty, "日誌中不合法的 upsert 應被忽略，且最終無項目")
+  }
+
+  func testCorruptedJournalIsRemoved() throws {
+    let tempURL = URL(fileURLWithPath: NSTemporaryDirectory()).appendingPathComponent("test_pom_journal_corrupt.json")
+    let journalURL = tempURL.appendingPathExtension("journal")
+    defer {
+      try? FileManager.default.removeItem(at: tempURL)
+      try? FileManager.default.removeItem(at: journalURL)
+    }
+
+    let now = Date.now.timeIntervalSince1970
+
+    // 建立日誌檔案：先一條合法 upsert，再一行明顯的非 JSON 文本
+    let validUpsertDict: [String: Any] = [
+      "operation": "upsert",
+      "pair": [
+        "k": "(a,啊)&(b,吧)&(c,此)",
+        "p": ["ovr": ["目標": ["cnt": 1, "ts": now]]],
+      ],
+    ]
+
+    var lines: [String] = []
+    let data = try JSONSerialization.data(withJSONObject: validUpsertDict, options: [])
+    if let s = String(data: data, encoding: .utf8) { lines.append(s) }
+    lines.append("THIS IS NOT JSON")
+    let journalContent = lines.joined(separator: "\n")
+    try journalContent.write(to: journalURL, atomically: true, encoding: .utf8)
+
+    // 載入並重播日誌
+    let pom = LMAssembly.LMPerceptionOverride(capacity: 10, dataURL: tempURL)
+    pom.loadData(fromURL: tempURL)
+
+    // 應該偵測到損毀並刪除日誌
+    XCTAssertFalse(FileManager.default.fileExists(atPath: journalURL.path), "含有非 JSON 行的日誌應該被刪除")
+
+    // 並且記憶體應保持空
+    let savable = pom.getSavableData()
+    XCTAssertTrue(savable.isEmpty, "受損日誌未應用任何 upsert，記憶體應該為空")
   }
 }

@@ -1253,40 +1253,50 @@ extension LMAssembly.LMPerceptionOverride {
       let lines = content.split(whereSeparator: { $0.isNewline })
       guard !lines.isEmpty else { return }
 
+      // 先一次性解析並驗證所有記錄；若任何一條記錄無法解析或驗證失敗，視為日誌受損並刪除整個日誌檔
+      var recordsToApply: [JournalRecord] = []
+      for line in lines {
+        let trimmed = line.trimmingCharacters(in: .whitespacesAndNewlines)
+        guard !trimmed.isEmpty else { continue }
+        guard let recordData = trimmed.data(using: .utf8) else { continue }
+
+        do {
+          let record = try decoder.decode(JournalRecord.self, from: recordData)
+          guard isValidJournalRecord(record) else {
+            vCLMLog(
+              "POM Journal: Detected corrupted journal record during validation, deleting journal: \(trimmed.prefix(200))"
+            )
+            removeJournalFile(for: baseURL)
+            return
+          }
+          recordsToApply.append(record)
+        } catch {
+          vCLMLog(
+            "POM Journal: Failed to decode record during validation. Details: \(error). Removing journal file to avoid replay of corrupted data."
+          )
+          removeJournalFile(for: baseURL)
+          return
+        }
+      }
+
+      // 全部驗證通過後再一次性應用
       lock.withLock {
         var mutated = false
-        for line in lines {
-          let trimmed = line.trimmingCharacters(in: .whitespacesAndNewlines)
-          guard !trimmed.isEmpty else { continue }
-          guard let recordData = trimmed.data(using: .utf8) else { continue }
-
-          do {
-            let record = try decoder.decode(JournalRecord.self, from: recordData)
-
-            // 驗證日誌記錄合理性，避免受損或惡意日誌影響記憶
-            guard isValidJournalRecord(record) else {
-              vCLMLog("POM Journal: Ignored invalid journal record: \(trimmed.prefix(200))")
-              continue
-            }
-
-            switch record.operation {
-            case .clear:
-              mutLRUMap.removeAll()
+        for record in recordsToApply {
+          switch record.operation {
+          case .clear:
+            mutLRUMap.removeAll()
+            mutated = true
+          case .removeKey:
+            if let key = record.key {
+              mutLRUMap.removeValue(forKey: key)
               mutated = true
-            case .removeKey:
-              if let key = record.key {
-                mutLRUMap.removeValue(forKey: key)
-                mutated = true
-              }
-            case .upsert:
-              if let pair = record.pair, !shouldIgnoreKey(pair.key) {
-                mutLRUMap[pair.key] = pair
-                mutated = true
-              }
             }
-          } catch {
-            vCLMLog("POM Journal: Failed to decode record. Details: \(error)")
-            continue
+          case .upsert:
+            if let pair = record.pair, !shouldIgnoreKey(pair.key) {
+              mutLRUMap[pair.key] = pair
+              mutated = true
+            }
           }
         }
 
