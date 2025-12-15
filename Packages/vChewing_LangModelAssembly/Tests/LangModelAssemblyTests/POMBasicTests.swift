@@ -350,6 +350,82 @@ final class POMBasicTests: XCTestCase {
     XCTAssertTrue(pom.mutLRUMap.isEmpty, "Keys containing '-_' segments should be ignored")
     XCTAssertNil(pom.getSuggestion(key: dashedKey, timestamp: nowTimeStamp + 1))
   }
+
+  func testPOM_BS10_AlternateKeysDoesNotMatchShortSegments() throws {
+    let pom = LMAssembly.LMPerceptionOverride(capacity: 10)
+    let now = Date.now.timeIntervalSince1970
+
+    // 多段 head: BC
+    let originalKey = "()&()&(BC,BC)"
+    // 切成兩段的候選： previous=B head=C
+    let splitCandidate = "()&(B,B)&(C,C)"
+
+    pom.memorizePerception((ngramKey: splitCandidate, candidate: "split"), timestamp: now)
+    pom.memorizePerception((ngramKey: originalKey, candidate: "orig"), timestamp: now)
+
+    let fallbacks = pom.alternateKeysForTesting(originalKey)
+    XCTAssertTrue(
+      fallbacks.contains(splitCandidate),
+      "短段候選應被視為多段原始 head 的 fallback（保留既有行為） — got: \(fallbacks)"
+    )
+  }
+
+  func testPOM_BS11_AlternateKeysAllowsPrimaryMatchForSingleSegmentOriginal() throws {
+    let pom = LMAssembly.LMPerceptionOverride(capacity: 10)
+    let now = Date.now.timeIntervalSince1970
+
+    // 原始為單段 head: B
+    let originalKey = "()&()&(B,orig)"
+    // 另一個以相同 head B（但 value 不同）的候選
+    let candidate = "()&()&(B,b2)"
+
+    pom.memorizePerception((ngramKey: candidate, candidate: "c2"), timestamp: now)
+    pom.memorizePerception((ngramKey: originalKey, candidate: "orig"), timestamp: now)
+
+    let fallbacks = pom.alternateKeysForTesting(originalKey)
+    XCTAssertTrue(
+      fallbacks.contains(candidate),
+      "原始為單段 head 時，應允許以 primary segment 配對為 fallback"
+    )
+  }
+
+  func testPOM_BS12_AlternateKeysRejectsSingleSegmentPrimaryMatchForMultiSegmentOriginal() throws {
+    let pom = LMAssembly.LMPerceptionOverride(capacity: 10)
+    let now = Date.now.timeIntervalSince1970
+
+    // 原始為多段 head: B-C（使用 Compositor.theSeparator = "-"）
+    let originalKey = "()&()&(B-C,orig)"
+    // 單段候選僅匹配 primary segment B
+    let candidate = "()&()&(B,cand)"
+
+    pom.memorizePerception((ngramKey: candidate, candidate: "c1"), timestamp: now)
+    pom.memorizePerception((ngramKey: originalKey, candidate: "orig"), timestamp: now)
+
+    let fallbacks = pom.alternateKeysForTesting(originalKey)
+    XCTAssertFalse(
+      fallbacks.contains(candidate),
+      "當原始有多段 head 時，不應只以 primary segment 配對單段候選"
+    )
+  }
+
+  func testPOM_BS13_AlternateKeysAllowsSingleSegmentPrimaryWhenPreviousMatches() throws {
+    let pom = LMAssembly.LMPerceptionOverride(capacity: 10)
+    let now = Date.now.timeIntervalSince1970
+
+    // 原始為多段 head 且有 previous: A & (B-C)
+    let originalKey = "()&(A,A)&(B-C,orig)"
+    // 單段候選匹配 primary B，但帶有相同的 previous A
+    let candidate = "()&(A,A)&(B,cand)"
+
+    pom.memorizePerception((ngramKey: candidate, candidate: "c1"), timestamp: now)
+    pom.memorizePerception((ngramKey: originalKey, candidate: "orig"), timestamp: now)
+
+    let fallbacks = pom.alternateKeysForTesting(originalKey)
+    XCTAssertTrue(
+      fallbacks.contains(candidate),
+      "若候選提供一致的 previous context，應接受單段 primary match"
+    )
+  }
 }
 
 extension Megrez.Node {

@@ -914,13 +914,18 @@ extension LMAssembly.LMPerceptionOverride {
     _ rhs: (reading: String, value: String)?
   )
     -> Bool {
+    // 若原始（rhs）沒有上下文，則無論 lhs 為何都接受該候選。
+    // 這允許短段候選（可能帶有額外的 previous/anterior 上下文）
+    // 被視為多段原始的備選。
+    if rhs == nil { return true }
+
     switch (lhs, rhs) {
     case (.none, .none):
-      true
+      return true
     case let (.some(lValue), .some(rValue)):
-      lValue.reading == rValue.reading && lValue.value == rValue.value
+      return lValue.reading == rValue.reading && lValue.value == rValue.value
     default:
-      false
+      return false
     }
   }
 
@@ -957,12 +962,53 @@ extension LMAssembly.LMPerceptionOverride {
       )
       let matchesFullHead = candidateParts.headReading == originalParts.headReading
       let matchesOriginalHead = candidateHeadSegments.contains(originalParts.headReading)
-      guard matchesFullHead || matchesPrimaryHead || matchesOriginalHead else { continue }
+      // 若候選的 previous 與 head 串接後等於原始 head（例如切分候選
+      // (B,B)&(C,C) 與原始 (BC,BC)），則視為匹配。
+      let candidateCombinedHead: String = {
+        if let prev = candidateParts.previous { return prev.reading + candidateParts.headReading }
+        return candidateParts.headReading
+      }()
+      let matchesCombinedHead = candidateCombinedHead == originalParts.headReading
+
+      // 處理 primary segment 配對的特例：
+      // 當原始 head 有多個 segment，且候選為單段時，僅靠 primary segment 配對會導致
+      // 單段候選插斷多段原始頭（例如原始為 B-C，但候選僅為 B）。為避免誤插斷，
+      // 對於這種 single-seg primary match 我們會拒絕；例外情況為該候選同時提供且其
+      // `previous` 與原始 `previous` 完全相同時，此時才接受（以保留測試案例「再創世的凱歌」的
+      // short->long 使用情境）。
+      let originalSegmentCount = headSegments.count
+      let candidateSegmentCount = candidateHeadSegments.count
+
+      let acceptMatch: Bool = {
+        if matchesFullHead || matchesOriginalHead || matchesCombinedHead { return true }
+        if matchesPrimaryHead {
+          // 若原始 head 有多個 segment，且候選只有單段，僅靠 primary segment 配對可能會導致
+          // 單段候選插斷多段原始頭（例如原始為 B-C，但候選僅為 B）。
+          // 在此情況下，僅在候選提供與原始一致的 previous context 時才接受（可避免誤插斷
+          // 同時保留 Saisouki 的 short->long 場景）。
+          if originalSegmentCount > 1, candidateSegmentCount == 1 {
+            if let cPrev = candidateParts.previous, let oPrev = originalParts.previous {
+              if cPrev.reading == oPrev.reading, cPrev.value == oPrev.value { return true }
+            }
+            return false
+          }
+          return true
+        }
+        return false
+      }()
+
+      guard acceptMatch else { continue }
+
       if keyCandidate != originalKey {
         results.append(keyCandidate)
       }
     }
     return results
+  }
+
+  // 僅供單元測試使用：用於專門曝露替代 Key 的 API。
+  internal func alternateKeysForTesting(_ originalKey: String) -> [String] {
+    alternateKeys(for: originalKey)
   }
 
   private func forceHighScoreOverrideFlag(for key: String) -> Bool {
