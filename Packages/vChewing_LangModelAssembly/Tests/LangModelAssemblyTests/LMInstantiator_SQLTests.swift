@@ -121,7 +121,7 @@ final class LMInstantiatorSQLTests: XCTestCase {
 
     XCTAssertTrue(LMAssembly.LMInstantiator.connectToTestSQLDB(sqlSetup))
     let grams = instance.unigramsFor(keyArray: ["k'"])
-    XCTAssertTrue(grammarContainsValue(grams, "value"))
+    XCTAssertTrue(gramsContainValue(grams, "value"))
     LMAssembly.LMInstantiator.disconnectSQLDB()
   }
 
@@ -158,7 +158,7 @@ final class LMInstantiatorSQLTests: XCTestCase {
 
   // MARK: Private
 
-  private func grammarContainsValue(_ grams: [Megrez.Unigram], _ value: String) -> Bool {
+  private func gramsContainValue(_ grams: [Megrez.Unigram], _ value: String) -> Bool {
     grams.contains(where: { $0.value == value })
   }
 }
