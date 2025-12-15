@@ -327,16 +327,16 @@ extension LMAssembly {
         if save { lmAssociates.saveData() }
       case .theFilter:
         lmFiltered.replaceData(textData: rawText)
-        if save { lmAssociates.saveData() }
+        if save { lmFiltered.saveData() }
       case .theReplacements:
         lmReplacements.replaceData(textData: rawText)
-        if save { lmAssociates.saveData() }
+        if save { lmReplacements.saveData() }
       case .thePhrases:
         lmUserPhrases.replaceData(textData: rawText)
-        if save { lmAssociates.saveData() }
+        if save { lmUserPhrases.saveData() }
       case .theSymbols:
         lmUserSymbols.replaceData(textData: rawText)
-        if save { lmAssociates.saveData() }
+        if save { lmUserSymbols.saveData() }
       }
     }
 
@@ -394,15 +394,17 @@ extension LMAssembly {
     public func unigramsFor(keyArray: [String]) -> [Megrez.Unigram] {
       // `config.bypassUserPhrasesData` 啟用時，除了 Associated Phrases 以外的資料全部忽略。
       let keyChain = keyArray.joined(separator: "-")
-      guard !keyChain.isEmpty else { return [] }
+      let noEmptyKey = !keyArray.isEmpty && keyArray.allSatisfy { !$0.isEmpty }
+      guard noEmptyKey else { return [] }
       /// 給空格鍵指定輸出值。
-      if keyChain == " " { return [.init(keyArray: keyArray, value: " ")] }
+      let asciiSpace = " "
+      if keyArray == [asciiSpace] { return [.init(keyArray: keyArray, value: asciiSpace)] }
 
       /// 準備不同的語言模組容器，開始逐漸往容器陣列內塞入資料。
       var rawAllUnigrams: [Megrez.Unigram] = []
 
       if !config.isCassetteEnabled
-        || config.isCassetteEnabled && keyChain.map(\.description)[0] == "_" {
+        || config.isCassetteEnabled && (keyArray.first?.hasPrefix("_") ?? false) {
         // 先給出 NumPad 的結果。
         rawAllUnigrams += supplyNumPadUnigrams(key: keyChain, keyArray: keyArray)
         // LMMisc 與 LMCore 的 score 在 (-10.0, 0.0) 這個區間內。
@@ -655,7 +657,8 @@ extension LMAssembly {
       // 更積極的清理策略：超過 3000 條目就清理至 1000 條目
       if inputTokenHashesArray.count > 3_000 {
         // 保留最近 1000 個條目，清理其餘的
-        inputTokenHashesArray.removeFirst(1_000)
+        let toRemove = inputTokenHashesArray.count - 1_000
+        inputTokenHashesArray.removeFirst(toRemove)
       }
     }
   }
