@@ -16,7 +16,6 @@ vChewing macOS: MIT-NTL License 麻理（去商標）授權合約
 
 $ 在該專案內也用到了下述第三方:
 
-- ShiftKeyUpChecker: (c) 2019 and onwards Qwertyyb (March Yang) (MIT License).
 - LineReader: (c) 2019 and onwards Robert Muckle-Jones (Apache 2.0 License).
 - SwiftUI Preferences UI Framework: (c) 2018 and onwards Sindre Sorhus (MIT License).
 - SwiftUI VDKComboBox: (c) 2022 and onwards Bryan Jones (CC BY-SA 4.0)
