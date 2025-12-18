@@ -45,7 +45,6 @@
 		5BF9DA2B28840E6200DBD48E /* template-userphrases.txt in Resources */ = {isa = PBXBuildFile; fileRef = 5BF9DA2628840E6200DBD48E /* template-userphrases.txt */; };
 		5BF9DA2D288427E000DBD48E /* template-associatedPhrases-cht.txt in Resources */ = {isa = PBXBuildFile; fileRef = 5BF9DA2C2884247800DBD48E /* template-associatedPhrases-cht.txt */; };
 		5BFC63D128D4B9F7004A77B7 /* IMKUtils in Frameworks */ = {isa = PBXBuildFile; productRef = 5BFC63D028D4B9F7004A77B7 /* IMKUtils */; };
-		6A187E2616004C5900466B2E /* MainMenu.xib in Resources */ = {isa = PBXBuildFile; fileRef = 6A187E2816004C5900466B2E /* MainMenu.xib */; };
 		6A2E40F6253A69DA00D1AE1D /* Images.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 6A2E40F5253A69DA00D1AE1D /* Images.xcassets */; };
 		6A2E40F9253A6AA000D1AE1D /* Images.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 6A2E40F5253A69DA00D1AE1D /* Images.xcassets */; };
 		6ACA41FA15FC1D9000935EF6 /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = 6ACA41EA15FC1D9000935EF6 /* InfoPlist.strings */; };
@@ -174,7 +173,6 @@
 		5BFC63CD28D4AC98004A77B7 /* vChewing_LangModelAssembly */ = {isa = PBXFileReference; lastKnownFileType = wrapper; name = vChewing_LangModelAssembly; path = Packages/vChewing_LangModelAssembly; sourceTree = "<group>"; };
 		6A0D4EA215FC0D2D00ABF4B3 /* vChewing.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = vChewing.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		6A0D4EF515FC0DA600ABF4B3 /* IME-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = "IME-Info.plist"; sourceTree = "<group>"; };
-		6A15B32521A51F2300B92CD3 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = Base; path = Base.lproj/MainMenu.xib; sourceTree = "<group>"; };
 		6A2E40F5253A69DA00D1AE1D /* Images.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Images.xcassets; sourceTree = "<group>"; };
 		6ACA41CB15FC1D7500935EF6 /* vChewingInstaller.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = vChewingInstaller.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		6ACA41EB15FC1D9000935EF6 /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/InfoPlist.strings; sourceTree = "<group>"; };
@@ -278,14 +276,6 @@
 				5BE69F142B77DC230053F160 /* Localizable.strings */,
 			);
 			path = Resources;
-			sourceTree = "<group>";
-		};
-		5B62A33B27AE7C7F00A19448 /* WindowNIBs */ = {
-			isa = PBXGroup;
-			children = (
-				6A187E2816004C5900466B2E /* MainMenu.xib */,
-			);
-			path = WindowNIBs;
 			sourceTree = "<group>";
 		};
 		5B62A35027AE7F6600A19448 /* Data */ = {
@@ -411,7 +401,6 @@
 				5BF255CC28B2690B003ECB60 /* Headers */,
 				6A0D4F1215FC0EB100ABF4B3 /* Modules */,
 				5B62A33027AE78E500A19448 /* Resources */,
-				5B62A33B27AE7C7F00A19448 /* WindowNIBs */,
 			);
 			path = Source;
 			sourceTree = "<group>";
@@ -609,7 +598,6 @@
 				5BF9DA2728840E6200DBD48E /* template-usersymbolphrases.txt in Resources */,
 				5BBC2DA128F51C0400C986F6 /* LICENSE-CHS.txt in Resources */,
 				5BF9DA2A28840E6200DBD48E /* template-replacements.txt in Resources */,
-				6A187E2616004C5900466B2E /* MainMenu.xib in Resources */,
 				5BBBB75F27AED54C0023B93A /* Beep.m4a in Resources */,
 				5BC2652227E04B7E00700291 /* uninstall.sh in Resources */,
 				5BAD0CD527D701F6003D127F /* vChewingKeyLayout.bundle in Resources */,
@@ -764,14 +752,6 @@
 				5BE69F172B77DC290053F160 /* ja */,
 			);
 			name = Localizable.strings;
-			sourceTree = "<group>";
-		};
-		6A187E2816004C5900466B2E /* MainMenu.xib */ = {
-			isa = PBXVariantGroup;
-			children = (
-				6A15B32521A51F2300B92CD3 /* Base */,
-			);
-			name = MainMenu.xib;
 			sourceTree = "<group>";
 		};
 		6ACA41EA15FC1D9000935EF6 /* InfoPlist.strings */ = {

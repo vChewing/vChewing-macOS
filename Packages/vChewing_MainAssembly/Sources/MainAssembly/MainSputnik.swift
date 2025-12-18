@@ -17,9 +17,6 @@ public final class MainSputnik4IME {
     if let varArgsResult = Self.handleVarArgs() {
       exit(varArgsResult)
     }
-    if let nibLoadingResult = Self.handleNIBLoadingTask() {
-      exit(nibLoadingResult)
-    }
     guard let theServer = Self.handleIMKConnection() else {
       Process.consoleLog(
         "vChewingDebug: Fatal error: Cannot initialize input method server with connection name retrieved from the plist, or there's no connection name in the plist."
@@ -36,6 +33,8 @@ public final class MainSputnik4IME {
   public func runNSApp() {
     // 下述内容取代 RunLoop.main.run()
     NSApplication.shared.delegate = AppDelegate.shared
+    NSApplication.shared.setValue(nil, forKey: "mainWindow") // 輸入法不需要主視窗。
+    NSApp.mainMenu = AppDelegate.shared.buildNSAppMainMenu()
     _ = NSApplicationMain(CommandLine.argc, CommandLine.unsafeArgv)
   }
 
@@ -125,20 +124,6 @@ public final class MainSputnik4IME {
       }
       return 0
     default: return 0
-    }
-    return nil
-  }
-
-  private static func handleNIBLoadingTask() -> Int32? {
-    guard let mainNibName = Bundle.main.infoDictionary?["NSMainNibFile"] as? String else {
-      Process.consoleLog("vChewingDebug: Fatal error: NSMainNibFile key not defined in Info.plist.")
-      return 1
-    }
-
-    let loaded = Bundle.main.loadNibNamed(mainNibName, owner: NSApp, topLevelObjects: nil)
-    if !loaded {
-      Process.consoleLog("vChewingDebug: Fatal error: Cannot load \(mainNibName).")
-      return 1
     }
     return nil
   }

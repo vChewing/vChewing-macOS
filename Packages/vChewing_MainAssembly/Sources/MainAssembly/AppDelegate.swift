@@ -230,6 +230,44 @@ extension AppDelegate {
     return currentMemorySize
   }
 
+  /// 以此取代 `MainMenu.xib`。
+  public func buildNSAppMainMenu() -> NSMenu {
+    NSMenu(title: "MainMenu").appendItems {
+      NSMenu.buildSubMenu(verbatim: "vChewing") {
+        NSMenu.Item("About vChewing")?
+          .act(#selector(about(_:)))
+          .withTarget(self)
+        NSMenu.Item.separator()
+        NSMenu.Item("Close")?
+          .act(#selector(NSWindow.performClose(_:)))
+          .hotkey("w", mask: [.command])
+      }
+
+      NSMenu.buildSubMenu(verbatim: "Edit") {
+        NSMenu.Item("Undo")?
+          .act(#selector(UndoManager.undo))
+          .hotkey("z", mask: [.command])
+        NSMenu.Item("Redo")?
+          .act(#selector(UndoManager.redo))
+          .hotkey("Z", mask: [.command, .shift])
+        NSMenu.Item.separator()
+        NSMenu.Item("Cut")?
+          .act(#selector(NSText.cut(_:)))
+          .hotkey("x", mask: [.command])
+        NSMenu.Item("Copy")?
+          .act(#selector(NSText.copy(_:)))
+          .hotkey("c", mask: [.command])
+        NSMenu.Item("Paste")?
+          .act(#selector(NSText.paste(_:)))
+          .hotkey("v", mask: [.command])
+        NSMenu.Item("Select All")?
+          .act(#selector(NSText.selectAll(_:)))
+          .hotkey("a", mask: [.command])
+        NSMenu.Item.separator()
+      }
+    }
+  }
+
   // New About Window
   @IBAction
   public func about(_: Any) {
