@@ -5,7 +5,9 @@
 "Cannot copy the file to the destination." = "Cannot copy the file to the destination.";
 "Cannot find input source %@ after registration." = "Cannot find input source %@ after registration.";
 "Cannot register input source %@ at %@." = "Cannot register input source %@ at %@.";
+"Continue Installation" = "Continue Installation";
 "Continue" = "Continue";
+"Download Mainstream Releases" = "Download Mainstream Releases";
 "Fatal Error" = "Fatal Error";
 "i18n:installer.ACCEPT_INSTALLATION" = "I Accept";
 "i18n:installer.APP_NAME" = "vChewing for macOS";
@@ -19,11 +21,15 @@
 "i18n:installer.INSTALLER_APP_TITLE" = "vChewing Installer";
 "i18n:installer.LICENSE_TITLE" = "MIT-NTL License:";
 "i18n:installer.STOPPING_THE_OLD_VERSION" = "Stopping the old version. This may take up to one minute…";
+"i18n:installer.SUPPORTING_OS:%@" = "This distro supports macOS %@ and later.";
 "Input method may not be fully enabled. Please enable it through System Preferences > Keyboard > Input Sources." = "Input method may not be fully enabled. Please enable it through System Preferences > Keyboard > Input Sources.";
 "Install Failed" = "Install Failed";
 "Installation Successful" = "Installation Successful";
 "OK" = "OK";
+"Please use mainstream releases for the current system version." = "Please use mainstream releases for the current system version.";
+"Quit Installation" = "Quit Installation";
 "Stopping the old version. This may take up to one minute…" = "Stopping the old version. This may take up to one minute…";
+"The current installer only installs version suitable for macOS 10.9 Mavericks, and it theoreotically works with macOS 10.10 Yosemite - macOS 12 Monterey. Meanwhile, the mainstream releases is made available for most recent macOS release." = "The current installer only installs version suitable for macOS 10.9 Mavericks, and it theoreotically works with macOS 10.10 Yosemite - macOS 12 Monterey. Meanwhile, the mainstream releases is made available for most recent macOS release.";
 "vChewing Input Method" = "vChewing Input Method";
 "vChewing is ready to use. \n\nPlease relogin if this is the first time you install it in this user account." = "vChewing is ready to use. \n\nPlease relogin if this is the first time you install it in this user account.";
 "vChewing is upgraded, but please log out or reboot for the new version to be fully functional." = "vChewing is upgraded, but please log out or reboot for the new version to be fully functional.";

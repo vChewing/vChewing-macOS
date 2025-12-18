@@ -5,7 +5,9 @@
 "Cannot copy the file to the destination." = "无法将输入法拷贝至目的地。";
 "Cannot find input source %@ after registration." = "在注册完输入法 \"%@\" 之后仍然无法找到该输入法。";
 "Cannot register input source %@ at %@." = "无法从档案位置 %2$@ 安装输入法 \"%1$@\"。";
+"Continue Installation" = "继续安装";
 "Continue" = "继续";
+"Download Mainstream Releases" = "下载主流版本";
 "Fatal Error" = "安装错误";
 "i18n:installer.ACCEPT_INSTALLATION" = "我接受";
 "i18n:installer.APP_NAME" = "vChewing for macOS";
@@ -19,11 +21,15 @@
 "i18n:installer.INSTALLER_APP_TITLE" = "唯音安装程式";
 "i18n:installer.LICENSE_TITLE" = "麻理去商标授权合约 (MIT-NTL License):";
 "i18n:installer.STOPPING_THE_OLD_VERSION" = "等待旧版完全停用，大约需要一分钟…";
+"i18n:installer.SUPPORTING_OS:%@" = "该发行版支援 macOS %@ 及之后的系统版本。";
 "Input method may not be fully enabled. Please enable it through System Preferences > Keyboard > Input Sources." = "输入法已经安装好，但可能没有完全启用。请从「系统偏好设定」 > 「键盘」 > 「输入方式」分页加入输入法。";
 "Install Failed" = "安装失败";
 "Installation Successful" = "安装成功";
 "OK" = "确定";
+"Please use mainstream releases for the current system version." = "请就您目前的系统版本使用本产品的主流发行版。";
+"Quit Installation" = "退出安装程式";
 "Stopping the old version. This may take up to one minute…" = "正在试图结束正在运行的旧版输入法，大概需要一分钟…";
+"The current installer only installs version suitable for macOS 10.9 Mavericks, and it theoreotically works with macOS 10.10 Yosemite - macOS 12 Monterey. Meanwhile, the mainstream releases is made available for most recent macOS release." = "当前的安装包所安装的版本是针对 macOS 10.9 特供的版本，或许也可以在 macOS 10.10 至 macOS 12 Montery 这几个版本的系统内使用。而主流版本则针对最新的几版 macOS 开发。";
 "vChewing Input Method" = "唯音输入法";
 "vChewing is ready to use. \n\nPlease relogin if this is the first time you install it in this user account." = "唯音输入法安装成功。\n\n若是在當前使用者帳戶內首次安裝的話，請重新登入。";
 "vChewing is upgraded, but please log out or reboot for the new version to be fully functional." = "vChewing 安装完成，但建议您登出或重新开机，以便顺利使用新版。";
