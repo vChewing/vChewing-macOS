@@ -298,7 +298,7 @@ public func asyncOnMain(
     work()
     return
   }
-  if #available(macOS 10.15, *) {
+  if #available(macOS 12, *) {
     Task { @MainActor in
       work()
     }
@@ -317,7 +317,7 @@ public func asyncOnMain(
     return
   }
   let delayInterval = Swift.max(0, delayInterval)
-  if #available(macOS 10.15, *) {
+  if #available(macOS 12, *) {
     Task { @MainActor in
       if delayInterval > 0 {
         let delay = UInt64(delayInterval * 1_000_000_000)
