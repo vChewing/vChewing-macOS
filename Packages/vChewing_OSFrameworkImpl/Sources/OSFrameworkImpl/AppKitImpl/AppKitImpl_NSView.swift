@@ -544,9 +544,27 @@ import SwiftExtension
     }
 
     @discardableResult
-    public func alternated(sure sured: Bool = true) -> NSMenuItem {
-      isAlternate = sured
+    public func alternated(_ assured: Bool = true) -> NSMenuItem {
+      isAlternate = assured
       keyEquivalentModifierMask = .option
+      return self
+    }
+
+    @discardableResult
+    public func withTarget(_ target: AnyObject?) -> NSMenuItem {
+      self.target = target
+      return self
+    }
+
+    @discardableResult
+    public func visible(_ isVisible: Bool) -> NSMenuItem {
+      isHidden = !isVisible
+      return self
+    }
+
+    @discardableResult
+    public func disabled(_ isDisabled: Bool) -> NSMenuItem {
+      isEnabled = !isDisabled
       return self
     }
 
