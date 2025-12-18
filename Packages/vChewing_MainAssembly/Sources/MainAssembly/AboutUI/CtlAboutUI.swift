@@ -47,27 +47,10 @@ public final class CtlAboutUI: NSWindowController, NSWindowDelegate {
   }
 
   override public func windowDidLoad() {
-    autoreleasepool {
-      super.windowDidLoad()
-      guard let window = window else { return }
-      if #available(macOS 12, *), !useLegacyView {
-        windowDidLoadSwiftUI()
-        return
-      }
-      let theViewController = viewController ?? VwrAboutCocoa()
-      viewController = theViewController
-      window.contentViewController = viewController
-      let size = theViewController.view.fittingSize
-      window.setPosition(vertical: .top, horizontal: .left, padding: 20)
-      window.setFrame(.init(origin: window.frame.origin, size: size), display: true)
-      window.standardWindowButton(.closeButton)?.isHidden = true
-      window.standardWindowButton(.miniaturizeButton)?.isHidden = true
-      window.standardWindowButton(.zoomButton)?.isHidden = true
-      if #available(macOS 10.10, *) {
-        window.titlebarAppearsTransparent = true
-      }
-      window.title = "i18n:aboutWindow.ABOUT_APP_TITLE_FULL"
-        .i18n + " (v\(IMEApp.appMainVersionLabel.joined(separator: " Build ")))"
+    if #available(macOS 10.10, *) {
+      windowDidLoadSinceYosemite()
+    } else {
+      windowDidLoad4Mavericks()
     }
   }
 
@@ -90,6 +73,46 @@ public final class CtlAboutUI: NSWindowController, NSWindowDelegate {
       sharedWindow.level = .statusBar
       shared.showWindow(shared)
       NSApp.popup()
+    }
+  }
+
+  public func windowDidLoad4Mavericks() {
+    autoreleasepool {
+      super.windowDidLoad()
+      guard let window = window, let theView = viewController?.view else { return }
+      window.contentView = theView
+      let size = theView.fittingSize
+      window.setPosition(vertical: .top, horizontal: .left, padding: 20)
+      window.setFrame(.init(origin: window.frame.origin, size: size), display: true)
+      window.standardWindowButton(.closeButton)?.isHidden = true
+      window.standardWindowButton(.miniaturizeButton)?.isHidden = true
+      window.standardWindowButton(.zoomButton)?.isHidden = true
+      window.title = "i18n:aboutWindow.ABOUT_APP_TITLE_FULL"
+        .i18n + " (v\(IMEApp.appMainVersionLabel.joined(separator: " Build ")))"
+    }
+  }
+
+  @available(macOS 10.10, *)
+  public func windowDidLoadSinceYosemite() {
+    autoreleasepool {
+      super.windowDidLoad()
+      guard let window = window else { return }
+      if #available(macOS 12, *), !useLegacyView {
+        windowDidLoadSwiftUI()
+        return
+      }
+      let theViewController = viewController ?? VwrAboutCocoa()
+      viewController = theViewController
+      window.contentViewController = viewController
+      let size = theViewController.view.fittingSize
+      window.setPosition(vertical: .top, horizontal: .left, padding: 20)
+      window.setFrame(.init(origin: window.frame.origin, size: size), display: true)
+      window.standardWindowButton(.closeButton)?.isHidden = true
+      window.standardWindowButton(.miniaturizeButton)?.isHidden = true
+      window.standardWindowButton(.zoomButton)?.isHidden = true
+      window.titlebarAppearsTransparent = true
+      window.title = "i18n:aboutWindow.ABOUT_APP_TITLE_FULL"
+        .i18n + " (v\(IMEApp.appMainVersionLabel.joined(separator: " Build ")))"
     }
   }
 

@@ -90,7 +90,7 @@ public final class VwrAboutCocoa: NSViewController {
       NSStackView.build(.horizontal) {
         NSStackView.build(.vertical) {
           "i18n:aboutWindow.DISCLAIMER_TEXT".makeNSLabel(
-            descriptive: true, fixWidth: contentWidth - 120
+            descriptive: true, fixWidth: contentWidth - 140
           )
           NSView()
         }
@@ -161,7 +161,10 @@ public final class VwrAboutCocoa: NSViewController {
     clipView.autoresizingMask = [.width, .height]
     clipView.drawsBackground = false
     scrollView.contentView = clipView
-    scrollView.makeSimpleConstraint(.width, relation: .equal, value: 430)
+    scrollView.makeSimpleConstraint(
+      .width, relation: .equal, value: contentWidth - imgWidth - 30
+    )
+    scrollView.setContentCompressionResistancePriority(.defaultLow, for: .horizontal)
     scrollView.hasVerticalScroller = true
     scrollView.hasHorizontalScroller = false
     scrollView.scrollerStyle = .legacy
