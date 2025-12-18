@@ -17,7 +17,6 @@ macOS 版唯音の開発：Shiki Suen, Isaac Xen, Hiraku Wang, など。
 $ 他の用いた一部のモジュール:
 
 - LineReader: (c) 2019 and onwards Robert Muckle-Jones (Apache 2.0 License).
-- SwiftUI Preferences UI Framework: (c) 2018 and onwards Sindre Sorhus (MIT License).
 - SwiftUI VDKComboBox: (c) 2022 and onwards Bryan Jones (CC BY-SA 4.0)
 - Note that Hotenka Chinese Converter is rewritten by Shiki Suen (using Swift) from Nick Chen's Objective-C library "NCChineseConverter" (MIT License).
 
