@@ -111,17 +111,28 @@ import SwiftExtension
 
   /// - note: Idea from [LostMoa](https://lostmoa.com/blog/ReadingTheCurrentWindowInANewSwiftUILifecycleApp/)
   @available(macOS 10.15, *)
-  public struct HostingWindowFinder: NSViewRepresentable {
-    public var callback: (NSWindow?) -> ()
+  private struct HostingWindowFinder: NSViewRepresentable {
+    var callback: (NSWindow) -> ()
 
-    public func makeNSView(context _: Self.Context) -> NSView {
-      let view = NSView()
-      asyncOnMain { callback(view.window) }
+    func makeNSView(context: Self.Context) -> NSView {
+      let view = BridgingView()
+      view.callback = callback
       return view
     }
 
-    public func updateNSView(_ nsView: NSView, context _: Context) {
-      asyncOnMain { callback(nsView.window) }
+    func updateNSView(_ nsView: NSView, context: Context) {}
+  }
+
+  @available(macOS 10.15, *)
+  private class BridgingView: NSView {
+    var callback: ((NSWindow) -> ())?
+
+    override func draw(_ dirtyRect: NSRect) {
+      super.draw(dirtyRect)
+
+      if let window = window {
+        callback?(window)
+      }
     }
   }
 
@@ -133,7 +144,7 @@ import SwiftExtension
     func body(content: Content) -> some View {
       content.background(
         HostingWindowFinder {
-          $0?.setPosition(position, in: screen)
+          $0.setPosition(position, in: screen)
         }
       )
     }
