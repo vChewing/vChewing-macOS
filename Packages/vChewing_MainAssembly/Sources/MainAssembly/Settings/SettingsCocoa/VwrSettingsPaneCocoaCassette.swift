@@ -19,6 +19,7 @@ extension SettingsPanesCocoa {
       view = body ?? .init()
       (view as? NSStackView)?.alignment = .centerX
       view.makeSimpleConstraint(.width, relation: .equal, value: windowWidth)
+      prepareCassetteFolderPathControl(pctCassetteFilePath) // 需要這第二次。
     }
 
     // MARK: Internal
