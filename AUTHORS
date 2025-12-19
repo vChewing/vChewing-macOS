@@ -10,20 +10,6 @@ $ 3rd-Party Modules Used:
 - SwiftUI VDKComboBox: (c) 2022 and onwards Bryan Jones (CC BY-SA 4.0)
 - Note that Hotenka Chinese Converter is rewritten by Shiki Suen (using Swift) from Nick Chen's Objective-C library "NCChineseConverter" (MIT License).
 
-$ Contributors and volunteers of the upstream repo, having no responsibility in discussing anything in the current repo:
-
-- Mengjuei Hsieh:
-    - McBopomofo for macOS 1.x main developer and architect.
-    - App-style installer (only preserved for developer purposes) // Only the part of the Objective-C version of the isAppBundleTranslocated().
-
-Although there is no Lukhnos's Objective-C / C++ codes left in the current repository, we still credit him for his previous work:
-
-- Lukhnos Liu:
-    - App-style installer (only preserved for developer purposes).
-    - Developer of Gramambular 2 language engine (removed since vChewing 1.5.4).
-    - Developer of Mandarin syllable composer (removed since vChewing 1.5.7).
-    - Developer of the original C++ version of the User Override Module MK2 (Half-Decay Method) (removed after the release of vChewing 3.9.2).
-
 $ Special thanks to:
 
 - Pan93412 and Ryan Wu in promotion of this project.

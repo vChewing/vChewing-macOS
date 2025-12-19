@@ -88,10 +88,6 @@ P.S.: 唯音輸入法的 Shift 按鍵監測功能僅藉由對 NSEvent 訊號資�
 
 ## 應用授權
 
-唯音專案目前僅用到 OpenVanilla for Mac 的下述程式組件（MIT License）：
-
-- 僅供研發人員調試方便而使用的 App 版安裝程式 (by Lukhnos Liu & MJHsieh)，不對公眾使用。
-
 唯音輸入法 macOS 版以 MIT-NTL License 授權釋出 (與 MIT 相容)：© 2021-2022 vChewing 專案。
 
 - 唯音輸入法 macOS 版程式維護：Shiki Suen。特別感謝 Isaac Xen 與 Hiraku Wong 等人的技術協力。
@@ -99,7 +95,7 @@ P.S.: 唯音輸入法的 Shift 按鍵監測功能僅藉由對 NSEvent 訊號資�
 - 天權星語彙處理引擎：Shiki Suen (MIT-NTL License)。
 - 唯音詞庫由 Shiki Suen 維護，以 3-Clause BSD License 授權釋出。其中的詞頻資料[由 NAER 授權用於非商業用途](https://twitter.com/ShikiSuen/status/1479329302713831424)。
 
-使用者可自由使用、散播本軟體，惟散播時必須完整保留版權聲明及軟體授權、且「一旦經過修改便不可以再繼續使用唯音的產品名稱」。換言之，這條相對上游 MIT 而言新增的規定就是：你 Fork 可以，但 Fork 成單獨發行的產品名稱時就必須修改產品名稱。這條新增規定對 OpenVanilla 與唯音雙方都有益，免得各自的旗號被盜版下載販子等挪用做意外用途。
+使用者可自由使用、散播本軟體，惟散播時必須完整保留版權聲明及軟體授權、且「一旦經過修改便不可以再繼續使用唯音的產品名稱」。換言之，這條相對上游 MIT 而言新增的規定就是：你 Fork 可以，但 Fork 成單獨發行的產品名稱時就必須修改產品名稱。
 
 ## 資料來源
 
