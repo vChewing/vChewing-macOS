@@ -109,6 +109,7 @@
 		5B49A3D72B95DACE0031E450 /* zh-Hant */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "zh-Hant"; path = "zh-Hant.lproj/InfoPlist.strings"; sourceTree = "<group>"; };
 		5B49A3D82B95DACE0031E450 /* zh-Hans */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "zh-Hans"; path = "zh-Hans.lproj/InfoPlist.strings"; sourceTree = "<group>"; };
 		5B49A3D92B95DACE0031E450 /* ja */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = ja; path = ja.lproj/InfoPlist.strings; sourceTree = "<group>"; };
+		5B4BB4CC2EF596A300B3BAAA /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
 		5B60EAC02EF4892200FFB49E /* vChewing_InstallerAssembly */ = {isa = PBXFileReference; lastKnownFileType = wrapper; name = vChewing_InstallerAssembly; path = Packages/vChewing_InstallerAssembly; sourceTree = "<group>"; };
 		5B60EAC12EF4892C00FFB49E /* vChewing_InstallerAssembly */ = {isa = PBXFileReference; lastKnownFileType = wrapper; name = vChewing_InstallerAssembly; path = Packages/vChewing_InstallerAssembly; sourceTree = "<group>"; };
 		5B65B919284D0185007C558B /* README.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = README.md; sourceTree = "<group>"; };
@@ -232,6 +233,7 @@
 		5B49A3C12B95D9890031E450 /* vChewingDebuggable */ = {
 			isa = PBXGroup;
 			children = (
+				5B4BB4CC2EF596A300B3BAAA /* Info.plist */,
 				5B49A3D42B95DACE0031E450 /* InfoPlist.strings */,
 				5B49A3C22B95D9890031E450 /* vChewingDebuggableApp.swift */,
 				5B49A3C42B95D9890031E450 /* ContentView.swift */,
@@ -811,6 +813,7 @@
 				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = vChewingDebuggable/Info.plist;
 				INFOPLIST_KEY_NSHumanReadableCopyright = "";
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
@@ -860,6 +863,7 @@
 				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = vChewingDebuggable/Info.plist;
 				INFOPLIST_KEY_NSHumanReadableCopyright = "";
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
