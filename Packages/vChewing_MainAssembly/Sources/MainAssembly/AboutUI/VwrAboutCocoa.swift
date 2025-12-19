@@ -113,6 +113,7 @@ public final class VwrAboutCocoa: NSViewController {
             "i18n:aboutWindow.BUGREPORT_BUTTON",
             target: self, action: #selector(btnBugReportAction(_:))
           )
+          NSView()
         }
       }
     }?.withInsets(
