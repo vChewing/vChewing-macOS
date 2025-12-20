@@ -41,6 +41,27 @@ extension SessionProtocol {
       return true
     }
 
+    // Caps Lock 通知與切換處理。
+    if ui?.capsLockHitChecker?.check(event) ?? false {
+      asyncOnMain(bypassAsync: UserDefaults.pendingUnitTests) { [weak self] in
+        guard let this = self else { return }
+        let isCapsLockTurnedOn = this.ui?.capsLockToggler?.isOn ?? false
+        if this.prefs.shiftEisuToggleOffTogetherWithCapsLock, !isCapsLockTurnedOn,
+           self?.isASCIIMode ?? false {
+          self?.isASCIIMode.toggle()
+        }
+        self?.resetInputHandler()
+        guard this.prefs.showNotificationsWhenTogglingCapsLock else { return }
+        guard !this.prefs.bypassNonAppleCapsLockHandling else { return }
+        let status = "NotificationSwitchRevolver".i18n
+        Notifier.notify(
+          message: isCapsLockTurnedOn
+            ? "[Caps Lock ON] " + "Alphanumerical Input Mode".i18n + "\n" + status
+            : "[Caps Lock OFF] " + "Chinese Input Mode".i18n + "\n" + status
+        )
+      }
+    }
+
     guard let newEvent = event.copyAsKBEvent else { return false }
 
     switch newEvent.type {
@@ -75,29 +96,6 @@ extension SessionProtocol {
     if state.type == .ofDeactivated {
       state = .ofEmpty()
       return handleKeyDown(event: event)
-    }
-
-    // Caps Lock 通知與切換處理，要求至少 macOS 12 Monterey。
-    if #available(macOS 12, *) {
-      if event.type == .flagsChanged, event.keyCode == KeyCode.kCapsLock.rawValue {
-        asyncOnMain(bypassAsync: UserDefaults.pendingUnitTests) { [weak self] in
-          guard let this = self else { return }
-          let isCapsLockTurnedOn = this.ui?.capsLockToggler?.isOn ?? false
-          if this.prefs.shiftEisuToggleOffTogetherWithCapsLock, !isCapsLockTurnedOn,
-             self?.isASCIIMode ?? false {
-            self?.isASCIIMode.toggle()
-          }
-          self?.resetInputHandler()
-          guard this.prefs.showNotificationsWhenTogglingCapsLock else { return }
-          guard !this.prefs.bypassNonAppleCapsLockHandling else { return }
-          let status = "NotificationSwitchRevolver".i18n
-          Notifier.notify(
-            message: isCapsLockTurnedOn
-              ? "[Caps Lock ON] " + "Alphanumerical Input Mode".i18n + "\n" + status
-              : "[Caps Lock OFF] " + "Chinese Input Mode".i18n + "\n" + status
-          )
-        }
-      }
     }
 
     // 用 JIS 鍵盤的英數切換鍵來切換中英文模式。
