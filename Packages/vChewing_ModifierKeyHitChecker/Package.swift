@@ -2,14 +2,14 @@
 import PackageDescription
 
 let package = Package(
-  name: "ShiftKeyUpChecker",
+  name: "ModifierKeyHitChecker",
   platforms: [
     .macOS(.v11),
   ],
   products: [
     .library(
-      name: "ShiftKeyUpChecker",
-      targets: ["ShiftKeyUpChecker"]
+      name: "ModifierKeyHitChecker",
+      targets: ["ModifierKeyHitChecker"]
     ),
   ],
   dependencies: [
@@ -17,7 +17,7 @@ let package = Package(
   ],
   targets: [
     .target(
-      name: "ShiftKeyUpChecker",
+      name: "ModifierKeyHitChecker",
       dependencies: [
         .product(name: "Shared", package: "vChewing_Shared"),
       ]

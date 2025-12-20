@@ -143,7 +143,7 @@
 		5BDB7A3128D47587001AC277 /* DanielGalasko_FolderMonitor */ = {isa = PBXFileReference; lastKnownFileType = wrapper; name = DanielGalasko_FolderMonitor; path = Packages/DanielGalasko_FolderMonitor; sourceTree = "<group>"; };
 		5BDB7A3228D47587001AC277 /* vChewing_Hotenka */ = {isa = PBXFileReference; lastKnownFileType = wrapper; name = vChewing_Hotenka; path = Packages/vChewing_Hotenka; sourceTree = "<group>"; };
 		5BDB7A3328D47587001AC277 /* vChewing_Megrez */ = {isa = PBXFileReference; lastKnownFileType = wrapper; name = vChewing_Megrez; path = Packages/vChewing_Megrez; sourceTree = "<group>"; };
-		5BDB7A3428D47587001AC277 /* vChewing_ShiftKeyUpChecker */ = {isa = PBXFileReference; lastKnownFileType = wrapper; name = vChewing_ShiftKeyUpChecker; path = Packages/vChewing_ShiftKeyUpChecker; sourceTree = "<group>"; };
+		5BDB7A3428D47587001AC277 /* vChewing_ModifierKeyHitChecker */ = {isa = PBXFileReference; lastKnownFileType = wrapper; name = vChewing_ModifierKeyHitChecker; path = Packages/vChewing_ModifierKeyHitChecker; sourceTree = "<group>"; };
 		5BDB7A3528D47587001AC277 /* RMJay_LineReader */ = {isa = PBXFileReference; lastKnownFileType = wrapper; name = RMJay_LineReader; path = Packages/RMJay_LineReader; sourceTree = "<group>"; };
 		5BDB7A3628D47587001AC277 /* vChewing_Tekkon */ = {isa = PBXFileReference; lastKnownFileType = wrapper; name = vChewing_Tekkon; path = Packages/vChewing_Tekkon; sourceTree = "<group>"; };
 		5BDCBB4727B4F6C600D0CC59 /* zh-Hant */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "zh-Hant"; path = "zh-Hant.lproj/InfoPlist.strings"; sourceTree = "<group>"; };
@@ -333,7 +333,7 @@
 				5BC5E02228DE07250094E427 /* vChewing_PopupCompositionBuffer */,
 				5B963C9E28D5C14600DCEE88 /* vChewing_Shared */,
 				5BBB42A42EA3E55A0097FA88 /* vChewing_Shared_DarwinImpl */,
-				5BDB7A3428D47587001AC277 /* vChewing_ShiftKeyUpChecker */,
+				5BDB7A3428D47587001AC277 /* vChewing_ModifierKeyHitChecker */,
 				5B963CA128D5C22D00DCEE88 /* vChewing_SwiftExtension */,
 				5BDB7A3628D47587001AC277 /* vChewing_Tekkon */,
 				5BC5E01F28DDEFD80094E427 /* vChewing_TooltipUI */,
