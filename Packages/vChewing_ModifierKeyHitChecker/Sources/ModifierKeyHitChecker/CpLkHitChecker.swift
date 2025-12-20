@@ -18,7 +18,7 @@ import Shared
 /// - 不同輸入法、不同 Host App（Electron）行為不一致
 /// - Press-and-hold 必須整組作廢
 /// - 同一組物理敲擊，最多只能觸發一次
-public final class CpLkHitChecker {
+public final class CpLkHitChecker: HitCheckerProtocol {
   // MARK: Lifecycle
 
   public init() {}

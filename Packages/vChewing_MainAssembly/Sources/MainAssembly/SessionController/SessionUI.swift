@@ -21,6 +21,9 @@ public final class SessionUI: SessionUIProtocol {
     useRShift: PrefMgr.shared.togglingAlphanumericalModeWithRShift
   )
 
+  /// CapsLock 按键事件分析器的副本。
+  public let capsLockHitChecker: (any HitCheckerProtocol)? = CpLkHitChecker()
+
   /// 用來控制 CapsLock 狀態的模組的副本。
   public let capsLockToggler: (any CapsLockTogglerProtocol)? = CapsLockToggler.shared
 

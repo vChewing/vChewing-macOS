@@ -14,10 +14,17 @@ public protocol SessionUIProtocol: AnyObject {
   /// 僅用來決定 UI 面板先照顧哪個 Session 用，不宜用來判斷 isActivated。
   var currentSessionID: UUID { get set }
   var shiftKeyUpChecker: (any ShiftKeyUpCheckerProtocol)? { get }
+  var capsLockHitChecker: (any HitCheckerProtocol)? { get }
   var capsLockToggler: (any CapsLockTogglerProtocol)? { get }
   var pcb: (any PCBProtocol)? { get }
   var tooltipUI: (any TooltipUIProtocol)? { get }
   var candidateUI: (any CtlCandidateProtocol)? { get }
+}
+
+// MARK: - HitCheckerProtocol
+
+public protocol HitCheckerProtocol: AnyObject {
+  func check(_ event: some InputSignalProtocol) -> Bool
 }
 
 // MARK: - ShiftKeyUpCheckerProtocol
