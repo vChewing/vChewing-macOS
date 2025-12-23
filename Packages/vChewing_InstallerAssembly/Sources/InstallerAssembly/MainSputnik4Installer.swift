@@ -23,16 +23,12 @@ public final class MainSputnik4Installer {
     if let isLegacyDistro {
       AppInstallerDelegate.shared.isLegacyDistro = isLegacyDistro
     }
-    if #available(macOS 12, *), !AppInstallerDelegate.shared.isLegacyDistro {
-      // Legacy: preserve original behavior
-      NSApplication.shared.delegate = AppInstallerDelegate.shared
-      CtlAppInstaller4SwiftUI.show()
-      NSApplication.shared.setValue(
-        CtlAppInstaller4SwiftUI.shared?.window,
-        forKey: "mainWindow"
-      )
-      NSApp.mainMenu = AppInstallerDelegate.shared.buildNSAppMainMenu()
-      _ = NSApplicationMain(CommandLine.argc, CommandLine.unsafeArgv)
+    let isOptPressed = NSEvent.modifierFlags.intersection(
+      .deviceIndependentFlagsMask
+    ).contains(.command)
+    let newInstaller = !AppInstallerDelegate.shared.isLegacyDistro && !isOptPressed
+    if #available(macOS 12, *), newInstaller {
+      InstallerApp4SwiftUI.main()
     } else {
       NSApplication.shared.delegate = AppInstallerDelegate.shared
       CtlAppInstaller4Cocoa.show()
