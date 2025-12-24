@@ -86,7 +86,6 @@ xattr -dr com.apple.quarantine ~/Downloads/vChewingInstaller.app
 1. 在「vChewing_Shared」封包當中的 Shared.swift 檔案內的 UserDef 這個 Enum 當中添入新的記錄，用以規定該資料值在 UserDefaults plist 當中的名稱。
 2. 在「vChewing_Shared」封包當中的 PrefMgrProtocol 當中添入對應的新資料值的規範。
 3. 在 PrefMgr.swfit 當中依照 PrefMgrProtocol 的變動來添入對應的新資料值。
-4. 與小麥注音不同的是，唯音給 Bool 類型引入了 toggled() 特性，會先 toggle() 再回傳操作後的資料值結果。如果您需要讓參數在行將變化、或者變化之後自動做些什麼的話，請擴充該參數的 willSet 或 didSet 特性、而不需要再另外設定函式（除非需要再傳入特定的參數）。
 
 ### 唯音 2.7.0 版好像改很兇，但又幾乎沒有新功能。究竟改了哪些內容？
 

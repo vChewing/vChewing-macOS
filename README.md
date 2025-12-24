@@ -35,9 +35,9 @@
 >- 可以自動整理使用者語彙檔案格式、自訂關聯詞語。
 >- ……
 
-唯音分支專案及唯音詞庫由孫志貴（Shiki Suen）維護，其內容屬於可在 Gitee 公開展示的合法內容。小麥注音官方原始倉庫內的詞庫的內容均與孫志貴無關。
+唯音分支專案及唯音詞庫（先鋒語料庫）由孫志貴（Shiki Suen）維護，其內容屬於可在 Gitee 公開展示的合法內容。但這些內容在被整理收入先鋒語料庫之前的原始資料的合規性不屬於維護者的負責範圍之內。
 
-P.S.: 唯音輸入法的 Shift 按鍵監測功能僅藉由對 NSEvent 訊號資料流的上下文關係的觀測來實現，僅接觸藉由 macOS 系統內建的 InputMethodKit 當中的 IMKServer 傳來的 NSEvent 訊號資料流、而無須監聽系統全局鍵盤事件，也無須向使用者申請用以達成這類「可能會引發資安疑慮」的行為所需的輔助權限，更不會將您的電腦內的任何資料傳出去（本來就是這樣，且自唯音 2.3.0 版引入的 Sandbox 特性更杜絕了這種可能性）。請放心使用。Shift 中英模式切換功能要求至少 macOS 10.15 Catalina 才可以用。
+> 資安宣告：唯音輸入法的 Shift 按鍵監測功能僅藉由對 NSEvent 訊號資料流的上下文關係的觀測來實現，僅接觸藉由 macOS 系統內建的 InputMethodKit 當中的 IMKServer 傳來的 NSEvent 訊號資料流、而無須監聽系統全局鍵盤事件，也無須向使用者申請用以達成這類「可能會引發資安疑慮」的行為所需的輔助權限，更不會將您的電腦內的任何資料傳出去（本來就是這樣，且自唯音 2.3.0 版引入的 Sandbox 特性更杜絕了這種可能性）。請放心使用。Shift 中英模式切換功能要求至少 macOS 10.15 Catalina 才可以用。
 
 ## 系統需求
 
@@ -80,42 +80,23 @@ P.S.: 唯音輸入法的 Shift 按鍵監測功能僅藉由對 NSEvent 訊號資�
 
 > 之前說「在成功之後執行 `make` 即可組建、再執行 `make install` 可以觸發唯音的安裝程式」，這對新版唯音而言**當且僅當**使用純 Swift 編譯腳本工序時方可使用。目前的 libvchewing-data 模組已經針對 macOS 版唯音實裝了純 Swift 詞庫編譯腳本。
 
-第一次安裝完，日後程式碼或詞庫有任何修改，只要重覆上述流程，再次安裝唯音即可。
+第一次安裝完之後，如有修改原廠辭典與程式碼的話，只要重覆上述流程重新安裝輸入法即可。
 
-要注意的是 macOS 可能會限制同一次 login session 能終結同一個輸入法的執行進程的次數（安裝程式透過 kill input method process 來讓新版的輸入法生效）。如果安裝若干次後，發現程式修改的結果並沒有出現、或甚至輸入法已無法再選用，只需要登出目前的 macOS 系統帳號、再重新登入即可。
+如果安裝若干次後，發現程式修改的結果並沒有出現、或甚至輸入法已無法再選用的話，請重新登入系統。
 
-補記: 該輸入法是在 2021 年 11 月初「28ae7deb4092f067539cff600397292e66a5dd56」這一版小麥注音建置的基礎上完成的。因為在清洗詞庫的時候清洗了全部的 git commit 歷史，所以無法自動從小麥注音官方倉庫上游繼承任何改動，只能手動同步任何在此之後的程式修正。最近一次同步參照是上游主倉庫的 2.2.2 版、以及 zonble 的分支「5cb6819e132a02bbcba77dbf083ada418750dab7」。
+## 關於該倉庫的歷史記錄
+
+該輸入法早於 4.1.3 版的記錄全部放在[vChewing-macOS-AncientArchive](https://github.com/vChewing/vChewing-macOS-AncientArchive)倉庫內。
 
 ## 應用授權
 
 唯音輸入法 macOS 版以 MIT-NTL License 授權釋出 (與 MIT 相容)：© 2021-2022 vChewing 專案。
 
 - 唯音輸入法 macOS 版程式維護：Shiki Suen。特別感謝 Isaac Xen 與 Hiraku Wong 等人的技術協力。
-- 鐵恨注音並擊處理引擎：Shiki Suen (MIT-NTL License)。
-- 天權星語彙處理引擎：Shiki Suen (MIT-NTL License)。
-- 唯音詞庫由 Shiki Suen 維護，以 3-Clause BSD License 授權釋出。其中的詞頻資料[由 NAER 授權用於非商業用途](https://twitter.com/ShikiSuen/status/1479329302713831424)。
+- 鐵恨注音並擊處理引擎：Shiki Suen (AGPL-3.0-or-later License)。
+- 天權星語彙處理引擎：Shiki Suen (AGPL-3.0-or-later License)。
+- 唯音詞庫（先鋒語料庫）由 Shiki Suen 維護，以 3-Clause BSD License 授權釋出。其中的詞頻資料[由 NAER 授權用於非商業用途](https://twitter.com/ShikiSuen/status/1479329302713831424)。
 
 使用者可自由使用、散播本軟體，惟散播時必須完整保留版權聲明及軟體授權、且「一旦經過修改便不可以再繼續使用唯音的產品名稱」。換言之，這條相對上游 MIT 而言新增的規定就是：你 Fork 可以，但 Fork 成單獨發行的產品名稱時就必須修改產品名稱。
-
-## 資料來源
-
-原廠詞庫主要詞語資料來源：
-
-- 《重編國語辭典修訂本 2015》的六字以內的詞語資料 (CC BY-ND 3.0)。
-- 《CNS11643中文標準交換碼全字庫(簡稱全字庫)》 (OGDv1 License)。
-- LibTaBE (by Pai-Hsiang Hsiao under 3-Clause BSD License)。
-- [《新加坡華語資料庫》](https://www.languagecouncils.sg/mandarin/ch/learning-resources/singaporean-mandarin-database)。
-- 原始詞頻資料取自 NAER，有經過換算處理與按需調整。
-    - 唯音並未使用由 LibTaBE 內建的來自 Sinica 語料庫的詞頻資料。
-- 唯音語彙庫作者自行維護新增的詞語資料，包括：
-    - 盡可能所有字詞的陸規審音與齊鐵恨廣播讀音。
-    - 中國大陸常用資訊電子術語等常用語，以確保簡體中文母語者在使用輸入法時不會受到審音差異的困擾。
-- 其他使用者建議收錄的資料。
-
-## 參與研發時的注意事項
-
-歡迎參與唯音的研發。論及相關細則，請洽該倉庫內的「[CONTRIBUTING.md](./CONTRIBUTING.md)」檔案、以及《[常見問題解答](./FAQ.md)》。
-
-敝專案採用了《[貢獻者品行準則承約書 v2.1](./code-of-conduct.md)》。考慮到上游鏈接給出的中文版翻譯與英文原文嚴重不符合的情況（會出現因執法與被執法雙方的認知偏差導致的矛盾，非常容易變成敵我矛盾），敝專案使用了自行翻譯的版本、且新增了一些能促進雙方共識的註解。
 
 $ EOF.

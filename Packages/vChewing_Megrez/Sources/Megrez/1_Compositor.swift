@@ -243,8 +243,6 @@ extension Megrez {
     /// 具體用法可以是這樣：你在標記模式下，
     /// 如果出現了「副游標切了某個字音數量不相等的節點」的情況的話，
     /// 則直接用這個函式將副游標往前推到接下來的正常的位置上。
-    /// // 該特性不適用於小麥注音，除非小麥注音重新設計 InputState 且修改 KeyHandler、
-    /// 將標記游標交給敝引擎來管理。屆時，NSStringUtils 將徹底卸任。
     /// - Returns: 該操作是否順利完成。
     @discardableResult
     public func jumpCursorBySegment(
