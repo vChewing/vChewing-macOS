@@ -140,7 +140,7 @@
 		5BC5E02228DE07250094E427 /* vChewing_PopupCompositionBuffer */ = {isa = PBXFileReference; lastKnownFileType = wrapper; name = vChewing_PopupCompositionBuffer; path = Packages/vChewing_PopupCompositionBuffer; sourceTree = "<group>"; };
 		5BDA45492B97588B00DFA179 /* vChewing_OSFrameworkImpl */ = {isa = PBXFileReference; lastKnownFileType = wrapper; name = vChewing_OSFrameworkImpl; path = Packages/vChewing_OSFrameworkImpl; sourceTree = "<group>"; };
 		5BDB7A3028D47587001AC277 /* Jad_BookmarkManager */ = {isa = PBXFileReference; lastKnownFileType = wrapper; name = Jad_BookmarkManager; path = Packages/Jad_BookmarkManager; sourceTree = "<group>"; };
-		5BDB7A3128D47587001AC277 /* DanielGalasko_FolderMonitor */ = {isa = PBXFileReference; lastKnownFileType = wrapper; name = DanielGalasko_FolderMonitor; path = Packages/DanielGalasko_FolderMonitor; sourceTree = "<group>"; };
+		5BDB7A3128D47587001AC277 /* vChewing_FolderMonitor */ = {isa = PBXFileReference; lastKnownFileType = wrapper; name = vChewing_FolderMonitor; path = Packages/vChewing_FolderMonitor; sourceTree = "<group>"; };
 		5BDB7A3228D47587001AC277 /* vChewing_Hotenka */ = {isa = PBXFileReference; lastKnownFileType = wrapper; name = vChewing_Hotenka; path = Packages/vChewing_Hotenka; sourceTree = "<group>"; };
 		5BDB7A3328D47587001AC277 /* vChewing_Megrez */ = {isa = PBXFileReference; lastKnownFileType = wrapper; name = vChewing_Megrez; path = Packages/vChewing_Megrez; sourceTree = "<group>"; };
 		5BDB7A3428D47587001AC277 /* vChewing_ModifierKeyHitChecker */ = {isa = PBXFileReference; lastKnownFileType = wrapper; name = vChewing_ModifierKeyHitChecker; path = Packages/vChewing_ModifierKeyHitChecker; sourceTree = "<group>"; };
@@ -314,12 +314,12 @@
 		5BDB7A2D28D47570001AC277 /* Packages */ = {
 			isa = PBXGroup;
 			children = (
-				5BDB7A3128D47587001AC277 /* DanielGalasko_FolderMonitor */,
 				5BAD67E12ADAB62D005A4842 /* HangarRash_SwiftyCapsLockToggler */,
 				5BDB7A3028D47587001AC277 /* Jad_BookmarkManager */,
 				5BDB7A3528D47587001AC277 /* RMJay_LineReader */,
 				5B6CA6272B8A1C9200A85050 /* vChewing_BrailleSputnik */,
 				5BA8C30128DEFE4F004C5CC4 /* vChewing_CandidateWindow */,
+				5BDB7A3128D47587001AC277 /* vChewing_FolderMonitor */,
 				5BDB7A3228D47587001AC277 /* vChewing_Hotenka */,
 				5BFC63C728D49511004A77B7 /* vChewing_IMKUtils */,
 				5B60EAC12EF4892C00FFB49E /* vChewing_InstallerAssembly */,

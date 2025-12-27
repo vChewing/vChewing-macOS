@@ -13,7 +13,7 @@ let package = Package(
     ),
   ],
   dependencies: [
-    .package(path: "../DanielGalasko_FolderMonitor"),
+    .package(path: "../vChewing_FolderMonitor"),
     .package(path: "../HangarRash_SwiftyCapsLockToggler"),
     .package(path: "../Jad_BookmarkManager"),
     .package(path: "../vChewing_ModifierKeyHitChecker"),
@@ -37,7 +37,7 @@ let package = Package(
       dependencies: [
         .product(name: "BookmarkManager", package: "Jad_BookmarkManager"),
         .product(name: "CandidateWindow", package: "vChewing_CandidateWindow"),
-        .product(name: "FolderMonitor", package: "DanielGalasko_FolderMonitor"),
+        .product(name: "FolderMonitor", package: "vChewing_FolderMonitor"),
         .product(name: "Hotenka", package: "vChewing_Hotenka"),
         .product(name: "IMKUtils", package: "vChewing_IMKUtils"),
         .product(name: "KimoDataReader", package: "vChewing_KimoDataReader"),
