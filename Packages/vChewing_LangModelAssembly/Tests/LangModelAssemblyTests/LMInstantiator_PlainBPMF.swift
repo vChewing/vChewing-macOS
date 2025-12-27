@@ -12,7 +12,7 @@ import XCTest
 
 @testable import LangModelAssembly
 
-final class LMPlainBPMFTests: XCTestCase {
+extension LMInstantiatorTests {
   func testLMPlainBPMFDataQuery() throws {
     let instance1 = LMAssembly.LMInstantiator(isCHS: false).setOptions { config in
       config.isSCPCEnabled = true

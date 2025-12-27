@@ -175,27 +175,30 @@ extension LMAssembly {
     func unigramsFor(
       key: String,
       keyArray: [String]? = nil,
-      omitNonTemporarySingleCharNonSymbolUnigrams: Bool = false
+      omitNonTemporarySingleCharNonSymbolUnigrams: Bool = false,
+      factorySingleReadingValueHashes: Set<Int> = []
     )
       -> [Megrez.Unigram] {
       let keyArray = keyArray ?? key.split(separator: "-").map(\.description)
       let singleSegLength: Bool = keyArray.count == 1
       let noPunctuations = keyArray.allSatisfy { !$0.hasPrefix("_") }
       var grams: [Megrez.Unigram] = []
-      factorySQLiteResults: if let arrRangeRecords: [Range<String.Index>] = rangeMap[key] {
-        // 完全排除使用者詞庫中的單漢字結果，避免其影響組字結果。
-        // 但是單元測試等臨時資料除外，因為單元測試會依賴臨時資料的注入。
-        do {
-          let omitUserPhrases: Bool = [
-            omitNonTemporarySingleCharNonSymbolUnigrams,
-            singleSegLength,
-            noPunctuations,
-          ].reduce(true) { $0 && $1 }
-          guard !omitUserPhrases else { break factorySQLiteResults }
-        }
+      let omitUserPhrases: Bool = [
+        omitNonTemporarySingleCharNonSymbolUnigrams,
+        singleSegLength,
+        noPunctuations,
+      ].reduce(true) { $0 && $1 }
+      if let arrRangeRecords: [Range<String.Index>] = rangeMap[key] {
         for netaRange in arrRangeRecords {
           let neta = strData[netaRange].split(separator: " ")
           let theValue: String = shouldReverse ? String(neta[0]) : String(neta[1])
+          let valueHash = theValue.hashValue
+          // 完全排除使用者詞庫中的單漢字結果（除非原廠辭典並未包含這個配對），避免其影響組字結果。
+          checkOmission: if omitUserPhrases {
+            let isFactoryValue = factorySingleReadingValueHashes.contains(valueHash)
+            guard isFactoryValue else { break checkOmission }
+            continue
+          }
           var theScore: Double
           if neta.count >= 3, !shouldForceDefaultScore, !neta[2].contains("#") {
             theScore = .init(String(neta[2])) ?? defaultScore((keyArray, theValue))
@@ -209,7 +212,12 @@ extension LMAssembly {
         }
       }
       if let arrOtherRecords: [Megrez.Unigram] = temporaryMap[key] {
-        grams.append(contentsOf: arrOtherRecords)
+        // 完全排除使用者詞庫中的單漢字結果（除非原廠辭典並未包含這個配對），避免其影響組字結果。
+        let arrOtherRecordsFiltered = arrOtherRecords.filter {
+          guard omitUserPhrases else { return true }
+          return !factorySingleReadingValueHashes.contains($0.value.hashValue)
+        }
+        grams.append(contentsOf: arrOtherRecordsFiltered)
       }
       return grams
     }

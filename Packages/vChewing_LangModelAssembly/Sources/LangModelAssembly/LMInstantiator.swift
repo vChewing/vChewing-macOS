@@ -402,30 +402,31 @@ extension LMAssembly {
 
       /// 準備不同的語言模組容器，開始逐漸往容器陣列內塞入資料。
       var rawAllUnigrams: [Megrez.Unigram] = []
+      var factoryCoreUnigramsResult: [Megrez.Unigram] = []
 
       if !config.isCassetteEnabled
         || config.isCassetteEnabled && (keyArray.first?.hasPrefix("_") ?? false) {
         // 先給出 NumPad 的結果。
         rawAllUnigrams += supplyNumPadUnigrams(key: keyChain, keyArray: keyArray)
-        // LMMisc 與 LMCore 的 score 在 (-10.0, 0.0) 這個區間內。
+        // 注音文資料等雜項資料。LMMisc 與 LMCore 的 score 在 (-10.0, 0.0) 這個區間內。
         rawAllUnigrams += factoryUnigramsFor(
           key: keyChain,
           keyArray: keyArray,
           column: .theDataCHEW
         )
         // 原廠核心辭典內容。
-        var coreUnigramsResult: [Megrez.Unigram] = factoryCoreUnigramsFor(
+        factoryCoreUnigramsResult = factoryCoreUnigramsFor(
           key: keyChain,
           keyArray: keyArray
         )
         // 如果是繁體中文、且有開啟 CNS11643 全字庫讀音過濾開關的話，對原廠核心辭典內容追加過濾處理：
         if config.filterNonCNSReadings, !isCHS {
-          coreUnigramsResult.removeAll { thisUnigram in
+          factoryCoreUnigramsResult.removeAll { thisUnigram in
             !checkCNSConformation(for: thisUnigram, keyArray: keyArray)
           }
         }
         // 正式追加原廠核心辭典檢索結果。
-        rawAllUnigrams += coreUnigramsResult
+        rawAllUnigrams += factoryCoreUnigramsResult
 
         if config.isCNSEnabled {
           rawAllUnigrams += factoryUnigramsFor(
@@ -452,11 +453,15 @@ extension LMAssembly {
       // 將兩句差分也是為了讓 rawUserUnigrams 的類型不受可能的影響。
       if !config.bypassUserPhrasesData {
         let allowBoostingSingleKanji = config.allowRescoringSingleKanjiCandidates
+        let factorySingleReadingValueHashes: [Int] = factoryCoreUnigramsResult.compactMap {
+          $0.keyArray.count == 1 ? $0.hashValue : nil
+        }
         var userPhraseUnigrams = Array(
           lmUserPhrases.unigramsFor(
             key: keyChain,
             keyArray: keyArray,
-            omitNonTemporarySingleCharNonSymbolUnigrams: !allowBoostingSingleKanji
+            omitNonTemporarySingleCharNonSymbolUnigrams: !allowBoostingSingleKanji,
+            factorySingleReadingValueHashes: Set(factorySingleReadingValueHashes)
           ).reversed()
         )
         if keyArray.count == 1, let topScore = rawAllUnigrams.map(\.score).max() {
