@@ -59,7 +59,7 @@ extension LMAssembly {
     /// 資料陣列內承載的資料筆數。
     var count: Int { rangeMap.count }
 
-    /// 檢測資料庫辭典內是否已經有載入的資料。
+    /// 偵測資料庫辭典內是否已經有載入的資料。
     var isLoaded: Bool { !rangeMap.isEmpty }
 
     /// 將資料從檔案讀入至資料庫辭典內。

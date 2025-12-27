@@ -267,7 +267,7 @@ extension PhonabetTypewriter {
     narrator.narrate(keyToNarrate, allowDuplicates: allowDuplicates)
   }
 
-  /// 檢測某個傳入的按鍵訊號是否為聲調鍵。
+  /// 偵測某個傳入的按鍵訊號是否為聲調鍵。
   /// - Parameter input: 傳入的按鍵訊號。
   /// - Returns: 判斷結果：是否為聲調鍵。
   func isIntonationKey(_ input: InputSignalProtocol) -> Bool {

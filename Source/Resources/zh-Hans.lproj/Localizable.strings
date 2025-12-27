@@ -55,7 +55,7 @@
 "Auto-convert traditional Chinese glyphs to KangXi characters" = "自动将繁体中文字转为康熙正体字";
 "auto" = "与系统设定一致";
 "Automatically correct reading combinations when typing" = "敲字时自动纠正读音组合";
-"Automatically reload user data files if changes detected" = "自动检测并载入使用者语汇档案变更";
+"Automatically reload user data files if changes detected" = "自动侦测并载入使用者语汇档案变更";
 "Basic Keyboard Layout:" = "基础键盘布局:";
 "Cancel" = "取消";
 "Candidate keys can only contain printable ASCII characters like alphanumericals." = "选字键只能是英数等 ASCII 可列印字元。";
@@ -216,12 +216,12 @@
 "i18n:LMMgr.accessFailure.cassette.description" = "在启用该模式之前，请事先正确设定磁带档案路径。";
 "i18n:LMMgr.accessFailure.cassette.title" = "档案存取失败，或者路径不合规。";
 "i18n:LMMgr.pathInvalidityFound.cassette.description" = "请打开唯音偏好设定以重新确认磁带档案路径的设定。";
-"i18n:LMMgr.pathInvalidityFound.cassette.title" = "检测到磁带档案存取问题";
+"i18n:LMMgr.pathInvalidityFound.cassette.title" = "侦测到磁带档案存取问题";
 "i18n:LMMgr.pathInvalidityFound.userDataFolder.description" = "请打开唯音偏好设定以重新确认使用者语汇资料夹的路径设定。";
-"i18n:LMMgr.pathInvalidityFound.userDataFolder.title" = "检测到使用者语汇资料夹存取问题";
-"i18n:securityAgentHelper.warningMessage.footer" = "当这则讯息呈现出来的时候，唯音已经尝试呼叫 `DisableSecureEventInput()` 来试图解除这个状态。以下是唯音建议您采取的行动：\n\n0. 将这则讯息视窗留一份屏幕撷图、以备接下来的需要。\n\n1. 如果输入法选单内的唯音仍旧处于无法选取的状态（下文简称「灰色不可用状态」），则请考虑结束上述进程、以迫使其释放各自的 SecureEventInput 状态。这将立刻解除唯音的灰色不可用状态。\n\n2. 如果该进程所属的 App 来自于 Mac App Store 的话，请向 Apple 检举其对 SecureEventInput 的滥用。Apple 会在必要的情况下对这类 App 采取措施，比如：临时下架，直至软件开发者解决相关故障。\n\n3. 无论该进程是否来自于 Mac App Store，也都请您向相关的开发者/提供方提报该故障。您可以将这则讯息的屏幕撷图给他们看，因为里面已经包含了用以检测该故障的必要资讯。\n\n4. 有使用者回报，先关闭相关的运行中应用与服务（尤其是密码管理器、基于 macCatalyst 的密码登录作业、或任何以 Shell 执行的密码登录作业），再锁定并解锁屏幕／当前账号的桌面工作阶段，有时能暂时缓解当前问题。";
-"i18n:securityAgentHelper.warningMessage.header" = "唯音有检测到下述后台进程有在滥用 SecureEventInput。这种滥用会导致系统内的所有第三方输入法全都无法正常使用（在输入法选单内会变成灰色）。\n\n针对需要填写敏感数据的场合，使用 SecureEventInput 无可厚非。但是，用 EnableSecureEventInput() 开启该模式之后，就有义务在输入窗格失焦的那一刻呼叫 DisableSecureEventInput() 来结束这种状态。这种状态还常见于后台辅助 App 当中、或者某个 App 在叫出该模式之后失去响应（这样的话，哪怕被切换到后台，SecureEventInput 也不会自动解除）。\n\n被侦测到的进程如下:";
-"i18n:securityAgentHelper.warningMessage.title" = "检测到对 SecureEventInput 的滥用行为";
+"i18n:LMMgr.pathInvalidityFound.userDataFolder.title" = "侦测到使用者语汇资料夹存取问题";
+"i18n:securityAgentHelper.warningMessage.footer" = "当这则讯息呈现出来的时候，唯音已经尝试呼叫 `DisableSecureEventInput()` 来试图解除这个状态。以下是唯音建议您采取的行动：\n\n0. 将这则讯息视窗留一份屏幕撷图、以备接下来的需要。\n\n1. 如果输入法选单内的唯音仍旧处于无法选取的状态（下文简称「灰色不可用状态」），则请考虑结束上述进程、以迫使其释放各自的 SecureEventInput 状态。这将立刻解除唯音的灰色不可用状态。\n\n2. 如果该进程所属的 App 来自于 Mac App Store 的话，请向 Apple 检举其对 SecureEventInput 的滥用。Apple 会在必要的情况下对这类 App 采取措施，比如：临时下架，直至软件开发者解决相关故障。\n\n3. 无论该进程是否来自于 Mac App Store，也都请您向相关的开发者/提供方提报该故障。您可以将这则讯息的屏幕撷图给他们看，因为里面已经包含了用以侦测该故障的必要资讯。\n\n4. 有使用者回报，先关闭相关的运行中应用与服务（尤其是密码管理器、基于 macCatalyst 的密码登录作业、或任何以 Shell 执行的密码登录作业），再锁定并解锁屏幕／当前账号的桌面工作阶段，有时能暂时缓解当前问题。";
+"i18n:securityAgentHelper.warningMessage.header" = "唯音有侦测到下述后台进程有在滥用 SecureEventInput。这种滥用会导致系统内的所有第三方输入法全都无法正常使用（在输入法选单内会变成灰色）。\n\n针对需要填写敏感数据的场合，使用 SecureEventInput 无可厚非。但是，用 EnableSecureEventInput() 开启该模式之后，就有义务在输入窗格失焦的那一刻呼叫 DisableSecureEventInput() 来结束这种状态。这种状态还常见于后台辅助 App 当中、或者某个 App 在叫出该模式之后失去响应（这样的话，哪怕被切换到后台，SecureEventInput 也不会自动解除）。\n\n被侦测到的进程如下:";
+"i18n:securityAgentHelper.warningMessage.title" = "侦测到对 SecureEventInput 的滥用行为";
 "i18n:settings.importFromKimoTxt.DirectlyImport" = "直接汇入";
 "i18n:settings.importFromKimoTxt.finishedCount:%@%@" = "已从总共 %@ 笔资料中成功汇入 %@ 笔新资料。";
 "i18n:settings.importFromKimoTxt.label" = "汇入奇摩输入法自订词资料库";
@@ -248,7 +248,7 @@
 "i18n:UserDef.kCandidateStateJKHLBehavior.option.2" = "HL 移动组字区游标；JK 翻选字窗行列";
 "i18n:UserDef.kCandidateStateJKHLBehavior.shortTitle" = "选字窗内的 JKHL 键行为：";
 "i18n:UserDef.kCheckAbusersOfSecureEventInputAPI.description" = "这种滥用会导致系统内的所有第三方输入法全都无法正常使用（在输入法选单内会变成灰色）。针对需要填写敏感数据的场合，使用 SecureEventInput 无可厚非。但是，用 EnableSecureEventInput() 开启该模式之后，就有义务在输入窗格失焦的那一刻呼叫 DisableSecureEventInput() 来结束这种状态。这种状态还常见于后台辅助 App 当中、或者某个 App 在叫出该模式之后失去响应（这样的话，哪怕被切换到后台，SecureEventInput 也不会自动解除）。";
-"i18n:UserDef.kCheckAbusersOfSecureEventInputAPI.shortTitle" = "主动检测正在滥用 SecureEventInput API 的后台进程";
+"i18n:UserDef.kCheckAbusersOfSecureEventInputAPI.shortTitle" = "主动侦测正在滥用 SecureEventInput API 的后台进程";
 "i18n:UserDef.kCNS11643Enabled.shortTitle" = "启用 CNS11643 全字库支援 (2025-11-10)";
 "i18n:UserDef.kCursorPlacementAfterSelectingCandidate.description" = "此设定用来指定候选字在选字窗内被确认后，游标应该位于何处。请注意，「呼出选字窗之前的游标位置」指的是选字窗出现前所记录的游标位置。如果选择向前推进一格，实际推进的距离会因您偏好的选字游标操作样式而有所不同。";
 "i18n:UserDef.kCursorPlacementAfterSelectingCandidate.option.0" = "不调整";

@@ -55,7 +55,7 @@
 "Auto-convert traditional Chinese glyphs to KangXi characters" = "自動將繁體中文字轉為康熙正體字";
 "auto" = "與系統設定一致";
 "Automatically correct reading combinations when typing" = "敲字時自動糾正讀音組合";
-"Automatically reload user data files if changes detected" = "自動檢測並載入使用者語彙檔案變更";
+"Automatically reload user data files if changes detected" = "自動偵測並載入使用者語彙檔案變更";
 "Basic Keyboard Layout:" = "基礎鍵盤佈局:";
 "Cancel" = "取消";
 "Candidate keys can only contain printable ASCII characters like alphanumericals." = "選字鍵只能是英數等 ASCII 可列印字元。";

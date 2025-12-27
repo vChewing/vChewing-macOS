@@ -507,7 +507,7 @@ extension InputHandlerProtocol {
     assembler.currentMarkedRange()
   }
 
-  /// 檢測是否出現游標切斷組字區內字符的情況
+  /// 偵測是否出現游標切斷組字區內字符的情況
   func isCursorCuttingChar(isMarker: Bool = false) -> Bool {
     assembler.isCursorCuttingChar(isMarker: isMarker)
   }

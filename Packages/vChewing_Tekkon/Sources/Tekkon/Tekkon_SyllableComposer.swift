@@ -139,7 +139,7 @@ extension Tekkon {
 
     // MARK: - Public Functions
 
-    /// 用於檢測「某個輸入字元訊號的合規性」的函式。
+    /// 用於偵測「某個輸入字元訊號的合規性」的函式。
     ///
     /// 注意：回傳結果會受到當前注音排列 parser 屬性的影響。
     /// - Parameters:
@@ -149,7 +149,7 @@ extension Tekkon {
       return inputValidityCheck(charStr: String(scalar))
     }
 
-    /// 用於檢測「某個輸入字元訊號的合規性」的函式。
+    /// 用於偵測「某個輸入字元訊號的合規性」的函式。
     ///
     /// 注意：回傳結果會受到當前注音排列 parser 屬性的影響。
     /// - Parameters:
@@ -344,7 +344,7 @@ extension Tekkon {
       }
     }
 
-    /// 用來檢測是否有調號的函式，預設情況下不判定聲調以外的內容的存無。
+    /// 用來偵測是否有調號的函式，預設情況下不判定聲調以外的內容的存無。
     /// - Parameters:
     ///   - withNothingElse: 追加判定「槽內是否僅有調號」。
     public func hasIntonation(withNothingElse: Bool = false) -> Bool {
