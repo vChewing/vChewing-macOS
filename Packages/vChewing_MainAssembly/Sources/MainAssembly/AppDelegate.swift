@@ -68,6 +68,7 @@ extension AppDelegate {
     asyncOnMain(after: 0.1) {
       // forced 用於剛剛切換了辭典檔案目錄的場合。
       // 先執行 initUserLangModels() 可以在目標辭典檔案不存在的情況下先行生成空白範本檔案。
+      vCLog("[FolderMonitor] User Dictionary data changes detected.")
       if PrefMgr.shared.shouldAutoReloadUserDataFiles || forced { LMMgr.initUserLangModels() }
       asyncOnMain(after: 0.1) {
         if PrefMgr.shared.phraseEditorAutoReloadExternalModifications {
