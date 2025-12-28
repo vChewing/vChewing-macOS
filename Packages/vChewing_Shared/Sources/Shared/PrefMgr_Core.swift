@@ -140,6 +140,9 @@ public struct PrefMgr: PrefMgrProtocol {
   @AppProperty(key: UserDef.kShowNotificationsWhenTogglingShift.rawValue, defaultValue: true)
   public var showNotificationsWhenTogglingShift: Bool
 
+  @AppProperty(key: UserDef.kSpecifiedNotifyUIColorScheme.rawValue, defaultValue: 0)
+  public var specifiedNotifyUIColorScheme: Int
+
   @AppProperty(key: UserDef.kAlwaysExpandCandidateWindow.rawValue, defaultValue: false)
   public var alwaysExpandCandidateWindow: Bool
 

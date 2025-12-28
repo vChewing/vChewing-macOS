@@ -71,6 +71,9 @@ public struct VwrSettingsPaneBehavior: View {
   @AppStorage(wrappedValue: true, UserDef.kShowNotificationsWhenTogglingShift.rawValue)
   private var showNotificationsWhenTogglingShift: Bool
 
+  @AppStorage(wrappedValue: 0, UserDef.kSpecifiedNotifyUIColorScheme.rawValue)
+  private var specifiedNotifyUIColorScheme: Int
+
   @AppStorage(wrappedValue: false, UserDef.kShareAlphanumericalModeStatusAcrossClients.rawValue)
   private var shareAlphanumericalModeStatusAcrossClients: Bool
 
@@ -86,6 +89,8 @@ public struct VwrSettingsPaneBehavior: View {
     NavigationStack {
       Form {
         Section {
+          UserDef.kSpecifiedNotifyUIColorScheme
+            .bind($specifiedNotifyUIColorScheme).render()
           UserDef.kShowNotificationsWhenTogglingCapsLock
             .bind($showNotificationsWhenTogglingCapsLock).render()
           UserDef.kShowNotificationsWhenTogglingEisu

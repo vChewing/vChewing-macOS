@@ -33,6 +33,7 @@ public enum UserDef: String, CaseIterable, Identifiable {
   case kShowNotificationsWhenTogglingCapsLock = "ShowNotificationsWhenTogglingCapsLock"
   case kShowNotificationsWhenTogglingEisu = "ShowNotificationsWhenTogglingEisu"
   case kShowNotificationsWhenTogglingShift = "ShowNotificationsWhenTogglingShift"
+  case kSpecifiedNotifyUIColorScheme = "OverrideNotifyUIColorScheme"
   case kCandidateListTextSize = "CandidateListTextSize"
   case kAlwaysExpandCandidateWindow = "AlwaysExpandCandidateWindow"
   case kCandidateWindowShowOnlyOneLine = "CandidateWindowShowOnlyOneLine"
@@ -196,6 +197,7 @@ extension UserDef {
     case .kShowNotificationsWhenTogglingCapsLock: return .bool
     case .kShowNotificationsWhenTogglingEisu: return .bool
     case .kShowNotificationsWhenTogglingShift: return .bool
+    case .kSpecifiedNotifyUIColorScheme: return .integer
     case .kCandidateListTextSize: return .double
     case .kAlwaysExpandCandidateWindow: return .bool
     case .kCandidateWindowShowOnlyOneLine: return .bool
@@ -352,6 +354,16 @@ extension UserDef {
         shortTitle: "i18n:UserDef.kShowNotificationsWhenTogglingShift.title",
         description: "i18n:UserDef.kShowNotificationsWhenTogglingShift.description",
         minimumOS: 10.15
+      )
+    case .kSpecifiedNotifyUIColorScheme: return .init(
+        userDef: self,
+        shortTitle: "i18n:UserDef.kSpecifiedNotifyUIColorScheme.title",
+        minimumOS: 10.14,
+        options: [
+          -1: "i18n:UserDef.kSpecifiedNotifyUIColorScheme.option.enforceBright",
+          0: "i18n:UserDef.kSpecifiedNotifyUIColorScheme.option.notSpecified",
+          1: "i18n:UserDef.kSpecifiedNotifyUIColorScheme.option.enforceDark",
+        ]
       )
     case .kCandidateListTextSize: return .init(
         userDef: self,

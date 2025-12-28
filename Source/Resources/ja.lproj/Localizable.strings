@@ -293,6 +293,10 @@
 "i18n:UserDef.kShowNotificationsWhenTogglingEisu.title" = "JIS英数キーでASCII入力モード切り替えの時に吹出通知メッセージを";
 "i18n:UserDef.kShowNotificationsWhenTogglingShift.description" = "☠️ これをONにすると、ASCII モードの点滅状態をすばやく確認することが難しくなる恐れです。";
 "i18n:UserDef.kShowNotificationsWhenTogglingShift.title" = "ShiftキーでASCII入力モード切り替えの時に吹出通知メッセージを";
+"i18n:UserDef.kSpecifiedNotifyUIColorScheme.option.enforceBright" = "ライト (明るい)";
+"i18n:UserDef.kSpecifiedNotifyUIColorScheme.option.enforceDark" = "ダーク (暗い)";
+"i18n:UserDef.kSpecifiedNotifyUIColorScheme.option.notSpecified" = "不指定";
+"i18n:UserDef.kSpecifiedNotifyUIColorScheme.title" = "通知ウインドウの外観モード:";
 "i18n:UserDef.kSpecifyCmdOptCtrlEnterBehavior.description" = "カセットモードがONにした場合、このショートカットで点字を送り出すのはできなくて、代わりに「発音表記（丸括弧仕様）」を送り出します。尚、他の点字機能のご希望の場合、他の特別の点字ツールソフトのご使用はお薦めです。";
 "i18n:UserDef.kSpecifyCmdOptCtrlEnterBehavior.option.0" = "発音表記（丸括弧仕様）を送出";
 "i18n:UserDef.kSpecifyCmdOptCtrlEnterBehavior.option.1" = "発音表記（HTML ルビ仕様）を送出";

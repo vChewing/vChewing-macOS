@@ -28,6 +28,7 @@ public protocol PrefMgrProtocol {
   var showNotificationsWhenTogglingCapsLock: Bool { get set }
   var showNotificationsWhenTogglingEisu: Bool { get set }
   var showNotificationsWhenTogglingShift: Bool { get set }
+  var specifiedNotifyUIColorScheme: Int { get set }
   var candidateListTextSize: Double { get set }
   var alwaysExpandCandidateWindow: Bool { get set }
   var candidateWindowShowOnlyOneLine: Bool { get set }

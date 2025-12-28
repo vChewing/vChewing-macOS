@@ -104,6 +104,9 @@ extension SettingsPanesCocoa {
           }
           NSTabView.TabPage(title: "Ｅ") {
             NSStackView.buildSection(width: innerContentWidth) {
+              if #available(macOS 10.14, *) {
+                UserDef.kSpecifiedNotifyUIColorScheme.render(fixWidth: innerContentWidth)
+              }
               if #available(macOS 12, *) {
                 UserDef.kShowNotificationsWhenTogglingCapsLock.render(fixWidth: innerContentWidth)
               }

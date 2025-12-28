@@ -294,6 +294,10 @@
 "i18n:UserDef.kShowNotificationsWhenTogglingEisu.title" = "Show notifications when toggling ASCII mode by hitting Eisu";
 "i18n:UserDef.kShowNotificationsWhenTogglingShift.description" = "☠️ This may let you feel harder to quickly identify the current ASCII mode ON/OFF status.";
 "i18n:UserDef.kShowNotificationsWhenTogglingShift.title" = "Show notifications when toggling ASCII mode by hitting Shift";
+"i18n:UserDef.kSpecifiedNotifyUIColorScheme.option.enforceBright" = "Bright Mode";
+"i18n:UserDef.kSpecifiedNotifyUIColorScheme.option.enforceDark" = "Dark Mode";
+"i18n:UserDef.kSpecifiedNotifyUIColorScheme.option.notSpecified" = "Not Specified";
+"i18n:UserDef.kSpecifiedNotifyUIColorScheme.title" = "Notifier Window Color Scheme:";
 "i18n:UserDef.kSpecifyCmdOptCtrlEnterBehavior.description" = "This hotkey commits bracketed annotation instead of braille sequence if cassette mode is enabled. Also, please consider using those dedicated braille utility softwares if you have more professional necessities.";
 "i18n:UserDef.kSpecifyCmdOptCtrlEnterBehavior.option.0" = "Commit Bracketed Annotation";
 "i18n:UserDef.kSpecifyCmdOptCtrlEnterBehavior.option.1" = "Commit HTML Ruby Annotation";

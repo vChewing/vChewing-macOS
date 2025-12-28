@@ -294,6 +294,10 @@
 "i18n:UserDef.kShowNotificationsWhenTogglingEisu.title" = "以 JIS 英数键切换输入法/中英模式时显示通知";
 "i18n:UserDef.kShowNotificationsWhenTogglingShift.description" = "☠️ 这可能会让您难以快速识别目前的 ASCII 模式开/关状态。";
 "i18n:UserDef.kShowNotificationsWhenTogglingShift.title" = "以 Shift 切换输入法/中英模式时显示通知";
+"i18n:UserDef.kSpecifiedNotifyUIColorScheme.option.enforceBright" = "浅色模式";
+"i18n:UserDef.kSpecifiedNotifyUIColorScheme.option.enforceDark" = "深色模式";
+"i18n:UserDef.kSpecifiedNotifyUIColorScheme.option.notSpecified" = "不指定";
+"i18n:UserDef.kSpecifiedNotifyUIColorScheme.title" = "通知飘窗配色外观:";
 "i18n:UserDef.kSpecifyCmdOptCtrlEnterBehavior.description" = "在磁带模式下，该热键组合将不再递交点字阵列（届时会改为递交括弧注解标记）。如另有对点字/盲文功能的更专业的需求的话，请考虑使用专门的点字/盲文工具软体。";
 "i18n:UserDef.kSpecifyCmdOptCtrlEnterBehavior.option.0" = "递交括弧注解标记";
 "i18n:UserDef.kSpecifyCmdOptCtrlEnterBehavior.option.1" = "递交 HTML Ruby 注解标记";
