@@ -60,14 +60,6 @@ extension SettingsPanesCocoa {
               UserDef.kAlsoConfirmAssociatedCandidatesByEnter.render(fixWidth: innerContentWidth)
               UserDef.kUseSpaceToCommitHighlightedSCPCCandidate.render(fixWidth: innerContentWidth)
             }?.boxed()
-            if #available(macOS 10.13, *) {
-              NSStackView.buildSection(width: innerContentWidth) {
-                if #available(macOS 12, *) {
-                  UserDef.kShowNotificationsWhenTogglingCapsLock.render(fixWidth: innerContentWidth)
-                }
-                UserDef.kAlwaysShowTooltipTextsHorizontally.render(fixWidth: innerContentWidth)
-              }?.boxed()
-            }
             if Date.isTodayTheDate(from: 0_401) {
               NSStackView.buildSection(width: innerContentWidth) {
                 UserDef.kShouldNotFartInLieuOfBeep
@@ -107,6 +99,21 @@ extension SettingsPanesCocoa {
                 }
               }
               UserDef.kShiftEisuToggleOffTogetherWithCapsLock.render(fixWidth: innerContentWidth)
+            }?.boxed()
+            NSView()
+          }
+          NSTabView.TabPage(title: "Ｅ") {
+            NSStackView.buildSection(width: innerContentWidth) {
+              if #available(macOS 12, *) {
+                UserDef.kShowNotificationsWhenTogglingCapsLock.render(fixWidth: innerContentWidth)
+              }
+              if #available(macOS 10.15, *) {
+                UserDef.kShowNotificationsWhenTogglingShift.render(fixWidth: innerContentWidth)
+              }
+              UserDef.kShowNotificationsWhenTogglingEisu.render(fixWidth: innerContentWidth)
+              if #available(macOS 10.13, *) {
+                UserDef.kAlwaysShowTooltipTextsHorizontally.render(fixWidth: innerContentWidth)
+              }
             }?.boxed()
             NSView()
           }

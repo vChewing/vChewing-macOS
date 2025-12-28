@@ -65,6 +65,12 @@ public struct VwrSettingsPaneBehavior: View {
   @AppStorage(wrappedValue: true, UserDef.kShowNotificationsWhenTogglingCapsLock.rawValue)
   private var showNotificationsWhenTogglingCapsLock: Bool
 
+  @AppStorage(wrappedValue: true, UserDef.kShowNotificationsWhenTogglingEisu.rawValue)
+  private var showNotificationsWhenTogglingEisu: Bool
+
+  @AppStorage(wrappedValue: true, UserDef.kShowNotificationsWhenTogglingShift.rawValue)
+  private var showNotificationsWhenTogglingShift: Bool
+
   @AppStorage(wrappedValue: false, UserDef.kShareAlphanumericalModeStatusAcrossClients.rawValue)
   private var shareAlphanumericalModeStatusAcrossClients: Bool
 
@@ -82,6 +88,10 @@ public struct VwrSettingsPaneBehavior: View {
         Section {
           UserDef.kShowNotificationsWhenTogglingCapsLock
             .bind($showNotificationsWhenTogglingCapsLock).render()
+          UserDef.kShowNotificationsWhenTogglingEisu
+            .bind($showNotificationsWhenTogglingEisu).render()
+          UserDef.kShowNotificationsWhenTogglingShift
+            .bind($showNotificationsWhenTogglingShift).render()
           UserDef.kAlwaysShowTooltipTextsHorizontally.bind($alwaysShowTooltipTextsHorizontally)
             .render()
             .disabled(Bundle.main.preferredLocalizations[0] == "en")

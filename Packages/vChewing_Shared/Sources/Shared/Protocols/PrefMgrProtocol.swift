@@ -26,6 +26,8 @@ public protocol PrefMgrProtocol {
   var basicKeyboardLayout: String { get set }
   var alphanumericalKeyboardLayout: String { get set }
   var showNotificationsWhenTogglingCapsLock: Bool { get set }
+  var showNotificationsWhenTogglingEisu: Bool { get set }
+  var showNotificationsWhenTogglingShift: Bool { get set }
   var candidateListTextSize: Double { get set }
   var alwaysExpandCandidateWindow: Bool { get set }
   var candidateWindowShowOnlyOneLine: Bool { get set }

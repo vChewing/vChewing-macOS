@@ -36,7 +36,10 @@ extension SessionProtocol {
     // 用 Shift 開關半形英數模式，僅對 macOS 10.15 及之後的 macOS 有效。
     // 警告：這裡的 event 必須是原始 event 且不能被 var，否則會影響 Shift 中英模式判定。
     if ui?.shiftKeyUpChecker?.check(event) ?? false {
-      toggleAlphanumericalMode()
+      vCLog("Shift key tap detected, toggling Alphanumerical Mode if should.")
+      toggleAlphanumericalMode(
+        popNotification: prefs.showNotificationsWhenTogglingShift
+      )
       // Shift 處理完畢之後也有必要立刻返回處理結果。
       return true
     }
@@ -45,6 +48,7 @@ extension SessionProtocol {
     if ui?.capsLockHitChecker?.check(event) ?? false {
       asyncOnMain(bypassAsync: UserDefaults.pendingUnitTests) { [weak self] in
         guard let this = self else { return }
+        vCLog("CapsLock key tap detected, toggling Alphanumerical Mode if should.")
         let isCapsLockTurnedOn = this.ui?.capsLockToggler?.isOn ?? false
         if this.prefs.shiftEisuToggleOffTogetherWithCapsLock, !isCapsLockTurnedOn,
            self?.isASCIIMode ?? false {
@@ -100,7 +104,10 @@ extension SessionProtocol {
 
     // 用 JIS 鍵盤的英數切換鍵來切換中英文模式。
     if event.type == .keyDown, event.isJISAlphanumericalKey {
-      toggleAlphanumericalMode()
+      vCLog("JIS Eisu key tap detected, toggling Alphanumerical Mode if should.")
+      toggleAlphanumericalMode(
+        popNotification: prefs.showNotificationsWhenTogglingEisu
+      )
       return true // Adobe Photoshop 相容：對 JIS 英數切換鍵傳入事件一律立刻返回 true。
     }
 
@@ -191,19 +198,21 @@ extension SessionProtocol {
   }
 
   /// 切換英數模式開關。
-  private func toggleAlphanumericalMode() {
-    let status = "NotificationSwitchRevolver".i18n
-    let oldValue = isASCIIMode
-    let newValue = isASCIIMode.toggled()
-    Notifier.notify(
-      message: newValue
-        ? "Alphanumerical Input Mode".i18n + "\n" + status
-        : "Chinese Input Mode".i18n + "\n" + status
-    )
+  private func toggleAlphanumericalMode(popNotification: Bool = true) {
     if var cplk = ui?.capsLockToggler {
+      let oldValue = isASCIIMode
+      let newValue = isASCIIMode.toggled()
       if prefs.shiftEisuToggleOffTogetherWithCapsLock, oldValue, !newValue,
          cplk.isOn {
         cplk.isOn.toggle()
+        if popNotification {
+          let status = "NotificationSwitchRevolver".i18n
+          Notifier.notify(
+            message: newValue
+              ? "Alphanumerical Input Mode".i18n + "\n" + status
+              : "Chinese Input Mode".i18n + "\n" + status
+          )
+        }
       }
     }
   }

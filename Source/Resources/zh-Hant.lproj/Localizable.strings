@@ -289,6 +289,11 @@
 "i18n:UserDef.kShiftEisuToggleOffTogetherWithCapsLock.description" = "勾選該選項後：1) [至少 macOS 12 起] Caps Lock 在關掉的時候，會連帶關掉由 Shift 鍵 / JIS 英數鍵負責控制的英數模式；2) 在藉由 JIS 英數鍵關掉其控制的英數模式的時候，也會關掉 Caps Lock。註：唯音無法在 Caps Lock 亮燈的時候感知 Shift 鍵的單獨敲擊事件。";
 "i18n:UserDef.kShiftEisuToggleOffTogetherWithCapsLock.shortTitle" = "使「Shift 鍵 / JIS 英数鍵」英數模式的關閉狀態與 Caps Lock 的關閉狀態保持彼此同步";
 "i18n:UserDef.kShowCodePointInCandidateUI.shortTitle" = "在選字窗內顯示當前候選字的統一碼碼位";
+"i18n:UserDef.kShowNotificationsWhenTogglingCapsLock.title" = "以 Caps Lock 切換輸入法/中英模式時顯示通知";
+"i18n:UserDef.kShowNotificationsWhenTogglingEisu.description" = "☠️ 這可能會讓您難以快速識別目前的 ASCII 模式開/關狀態。";
+"i18n:UserDef.kShowNotificationsWhenTogglingEisu.title" = "以 JIS 英數鍵切換輸入法/中英模式時顯示通知";
+"i18n:UserDef.kShowNotificationsWhenTogglingShift.description" = "☠️ 這可能會讓您難以快速識別目前的 ASCII 模式開/關狀態。";
+"i18n:UserDef.kShowNotificationsWhenTogglingShift.title" = "以 Shift 切換輸入法/中英模式時顯示通知";
 "i18n:UserDef.kSpecifyCmdOptCtrlEnterBehavior.description" = "在磁帶模式下，該熱鍵組合將不再遞交點字陣列（屆時會改為遞交括弧註解標記）。如另有對點字/盲文功能的更專業的需求的話，請考慮使用專門的點字/盲文工具軟體。";
 "i18n:UserDef.kSpecifyCmdOptCtrlEnterBehavior.option.0" = "遞交括弧註解標記";
 "i18n:UserDef.kSpecifyCmdOptCtrlEnterBehavior.option.1" = "遞交 HTML Ruby 註解標記";
@@ -390,7 +395,6 @@
 "Shift+Letter:" = "Shift+字母鍵:";
 "Show available reverse-lookup results in candidate window" = "在選字窗內顯示可用的字根反查結果";
 "Show Hanyu-Pinyin in the inline composition buffer" = "拼音並擊（組字區內顯示漢語拼音）";
-"Show notifications when toggling Caps Lock" = "以 Caps Lock 切換輸入法/中英模式時顯示通知";
 "Show translated strokes in composition buffer" = "在組字區內顯示字根、而非原始鍵盤碼";
 "Simplified Chinese" = "簡體中文";
 "Some client apps may have different compatibility issues in IMKTextInput implementation." = "有些客体应用可能会有不同的 IMKTextInput 实作相容问题。";

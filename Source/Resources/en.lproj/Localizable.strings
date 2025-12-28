@@ -289,6 +289,11 @@
 "i18n:UserDef.kShiftEisuToggleOffTogetherWithCapsLock.description" = "This does: 1) On macOS 12 and later, if the Caps Lock gets turned off, then the internal switch for Shift-key / JIS-Eisu-key Alphanumerical Mode Toggle will also be switched off. 2) If you have turned off the same switch by JIS-Eisu key, then the Caps Lock gets turned off together. Note: vChewing has no way to recognize single hits of Shift key when Caps Lock is on.";
 "i18n:UserDef.kShiftEisuToggleOffTogetherWithCapsLock.shortTitle" = "Sync the off state between Caps Lock and Shift / Eisu Alphanumerical Toggle";
 "i18n:UserDef.kShowCodePointInCandidateUI.shortTitle" = "Show Unicode codepoint metadata in candidate window";
+"i18n:UserDef.kShowNotificationsWhenTogglingCapsLock.title" = "Show notifications when toggling Caps Lock";
+"i18n:UserDef.kShowNotificationsWhenTogglingEisu.description" = "☠️ This may let you feel harder to quickly identify the current ASCII mode ON/OFF status.";
+"i18n:UserDef.kShowNotificationsWhenTogglingEisu.title" = "Show notifications when toggling ASCII mode by hitting Eisu";
+"i18n:UserDef.kShowNotificationsWhenTogglingShift.description" = "☠️ This may let you feel harder to quickly identify the current ASCII mode ON/OFF status.";
+"i18n:UserDef.kShowNotificationsWhenTogglingShift.title" = "Show notifications when toggling ASCII mode by hitting Shift";
 "i18n:UserDef.kSpecifyCmdOptCtrlEnterBehavior.description" = "This hotkey commits bracketed annotation instead of braille sequence if cassette mode is enabled. Also, please consider using those dedicated braille utility softwares if you have more professional necessities.";
 "i18n:UserDef.kSpecifyCmdOptCtrlEnterBehavior.option.0" = "Commit Bracketed Annotation";
 "i18n:UserDef.kSpecifyCmdOptCtrlEnterBehavior.option.1" = "Commit HTML Ruby Annotation";
@@ -390,7 +395,6 @@
 "Shift+Letter:" = "Shift+Letter:";
 "Show available reverse-lookup results in candidate window" = "Show available reverse-lookup results in candidate window";
 "Show Hanyu-Pinyin in the inline composition buffer" = "Show Hanyu-Pinyin in the inline composition buffer";
-"Show notifications when toggling Caps Lock" = "Show notifications when toggling Caps Lock";
 "Show translated strokes in composition buffer" = "Show translated strokes in composition buffer";
 "Simplified Chinese" = "Simplified Chinese";
 "Some client apps may have different compatibility issues in IMKTextInput implementation." = "Some client apps may have different compatibility issues in IMKTextInput implementation.";

@@ -134,6 +134,12 @@ public struct PrefMgr: PrefMgrProtocol {
   @AppProperty(key: UserDef.kShowNotificationsWhenTogglingCapsLock.rawValue, defaultValue: true)
   public var showNotificationsWhenTogglingCapsLock: Bool
 
+  @AppProperty(key: UserDef.kShowNotificationsWhenTogglingEisu.rawValue, defaultValue: true)
+  public var showNotificationsWhenTogglingEisu: Bool
+
+  @AppProperty(key: UserDef.kShowNotificationsWhenTogglingShift.rawValue, defaultValue: true)
+  public var showNotificationsWhenTogglingShift: Bool
+
   @AppProperty(key: UserDef.kAlwaysExpandCandidateWindow.rawValue, defaultValue: false)
   public var alwaysExpandCandidateWindow: Bool
 

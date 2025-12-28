@@ -288,6 +288,11 @@
 "i18n:UserDef.kShiftEisuToggleOffTogetherWithCapsLock.description" = "このチェックを入れると：イ）[macOS 12 以降] CapsLockがオフした時に、「Shiftキー・JIS英数キー」の共有していた内部のスイッチもオフにする；ロ）「JIS英数キー」でそのキーに応ずる英数モードがオフした時に、CapsLockもオフにする。尚、CapsLockがオンの時に、「Shiftキーだけを打った」行為は検知できません。";
 "i18n:UserDef.kShiftEisuToggleOffTogetherWithCapsLock.shortTitle" = "「Shiftキー・JIS英数キー」による英数モードのオフ状態をCapsLockのオフ状態と同期する";
 "i18n:UserDef.kShowCodePointInCandidateUI.shortTitle" = "候補陳列ウィンドウで Unicode のコードポイント情報を示す";
+"i18n:UserDef.kShowNotificationsWhenTogglingCapsLock.title" = "Caps Lock でASCII入力モード切り替えの時に吹出通知メッセージを";
+"i18n:UserDef.kShowNotificationsWhenTogglingEisu.description" = "☠️ これをONにすると、ASCII モードの点滅状態をすばやく確認することが難しくなる恐れです。";
+"i18n:UserDef.kShowNotificationsWhenTogglingEisu.title" = "JIS英数キーでASCII入力モード切り替えの時に吹出通知メッセージを";
+"i18n:UserDef.kShowNotificationsWhenTogglingShift.description" = "☠️ これをONにすると、ASCII モードの点滅状態をすばやく確認することが難しくなる恐れです。";
+"i18n:UserDef.kShowNotificationsWhenTogglingShift.title" = "ShiftキーでASCII入力モード切り替えの時に吹出通知メッセージを";
 "i18n:UserDef.kSpecifyCmdOptCtrlEnterBehavior.description" = "カセットモードがONにした場合、このショートカットで点字を送り出すのはできなくて、代わりに「発音表記（丸括弧仕様）」を送り出します。尚、他の点字機能のご希望の場合、他の特別の点字ツールソフトのご使用はお薦めです。";
 "i18n:UserDef.kSpecifyCmdOptCtrlEnterBehavior.option.0" = "発音表記（丸括弧仕様）を送出";
 "i18n:UserDef.kSpecifyCmdOptCtrlEnterBehavior.option.1" = "発音表記（HTML ルビ仕様）を送出";
@@ -389,7 +394,6 @@
 "Shift+Letter:" = "Shift+文字キー:";
 "Show available reverse-lookup results in candidate window" = "候補陳列ウィンドウで可能な逆引参照結果を示す";
 "Show Hanyu-Pinyin in the inline composition buffer" = "弁音合併入力（入力緩衝列で音読みを漢語弁音に）";
-"Show notifications when toggling Caps Lock" = "Caps Lock で切り替えの時に吹出通知メッセージを";
 "Show translated strokes in composition buffer" = "原始キーネームでなく、筆画を入力緩衝列で表示する";
 "Simplified Chinese" = "簡体中国語";
 "Some client apps may have different compatibility issues in IMKTextInput implementation." = "それぞれの客体アプリには、それぞれの IMKTextInput 不具合はあるかもしれません。";

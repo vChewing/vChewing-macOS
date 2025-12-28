@@ -31,6 +31,8 @@ public enum UserDef: String, CaseIterable, Identifiable {
   case kBasicKeyboardLayout = "BasicKeyboardLayout"
   case kAlphanumericalKeyboardLayout = "AlphanumericalKeyboardLayout"
   case kShowNotificationsWhenTogglingCapsLock = "ShowNotificationsWhenTogglingCapsLock"
+  case kShowNotificationsWhenTogglingEisu = "ShowNotificationsWhenTogglingEisu"
+  case kShowNotificationsWhenTogglingShift = "ShowNotificationsWhenTogglingShift"
   case kCandidateListTextSize = "CandidateListTextSize"
   case kAlwaysExpandCandidateWindow = "AlwaysExpandCandidateWindow"
   case kCandidateWindowShowOnlyOneLine = "CandidateWindowShowOnlyOneLine"
@@ -192,6 +194,8 @@ extension UserDef {
     case .kBasicKeyboardLayout: return .string
     case .kAlphanumericalKeyboardLayout: return .string
     case .kShowNotificationsWhenTogglingCapsLock: return .bool
+    case .kShowNotificationsWhenTogglingEisu: return .bool
+    case .kShowNotificationsWhenTogglingShift: return .bool
     case .kCandidateListTextSize: return .double
     case .kAlwaysExpandCandidateWindow: return .bool
     case .kCandidateWindowShowOnlyOneLine: return .bool
@@ -334,7 +338,20 @@ extension UserDef {
         description: "Choose the macOS-level alphanumerical keyboard layout. This setting is for Shift-toggled alphanumerical mode only."
       )
     case .kShowNotificationsWhenTogglingCapsLock: return .init(
-        userDef: self, shortTitle: "Show notifications when toggling Caps Lock", minimumOS: 12
+        userDef: self,
+        shortTitle: "i18n:UserDef.kShowNotificationsWhenTogglingCapsLock.title",
+        minimumOS: 12
+      )
+    case .kShowNotificationsWhenTogglingEisu: return .init(
+        userDef: self,
+        shortTitle: "i18n:UserDef.kShowNotificationsWhenTogglingEisu.title",
+        description: "i18n:UserDef.kShowNotificationsWhenTogglingEisu.description"
+      )
+    case .kShowNotificationsWhenTogglingShift: return .init(
+        userDef: self,
+        shortTitle: "i18n:UserDef.kShowNotificationsWhenTogglingShift.title",
+        description: "i18n:UserDef.kShowNotificationsWhenTogglingShift.description",
+        minimumOS: 10.15
       )
     case .kCandidateListTextSize: return .init(
         userDef: self,
