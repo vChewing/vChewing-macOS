@@ -192,13 +192,20 @@ public final class CandidatePool {
     candidateDataAll = allCandidates
     candidateLines.removeAll()
     var currentColumn: [CandidateCellData] = []
+    let minCellWidth = Self.blankCell.cellLength()
+    // 注意：此處使用 _maxLinesPerPage 而非 isMatrix，因為 cleanData() 會重設 isExpanded。
+    let shouldCalculateRowWidth = (layout == .horizontal) && (_maxLinesPerPage > 1)
     for (i, candidate) in candidateDataAll.enumerated() {
       candidate.index = i
       candidate.whichLine = candidateLines.count
       var isOverflown: Bool = (currentColumn.count == maxLineCapacity) && !currentColumn.isEmpty
-      if layout == .horizontal {
-        let accumulatedWidth: Double = currentColumn.map { $0.cellLength() }.reduce(0, +)
-        let remainingSpaceWidth: Double = maxRowWidth - candidate.cellLength()
+      if shouldCalculateRowWidth {
+        // 使用倍數化寬度來計算行容量。
+        let accumulatedWidth: Double = currentColumn.map {
+          $0.cellWidthMultiplied(minCellWidth: minCellWidth)
+        }.reduce(0, +)
+        let candidateWidth = candidate.cellWidthMultiplied(minCellWidth: minCellWidth)
+        let remainingSpaceWidth: Double = maxRowWidth - candidateWidth
         isOverflown = isOverflown || accumulatedWidth > remainingSpaceWidth
       }
       if isOverflown {
@@ -482,6 +489,7 @@ extension CandidatePool {
   fileprivate func selectNewNeighborRow(direction: VerticalDirection) {
     let currentSubIndex = candidateDataAll[highlightedIndex].subIndex
     var result = currentSubIndex
+    let minCellWidth = Self.blankCell.cellLength()
     branch: switch direction {
     case .up:
       if currentLineNumber <= 0 {
@@ -494,13 +502,15 @@ extension CandidatePool {
       }
       if currentLineNumber >= candidateLines
         .count - 1 { currentLineNumber = candidateLines.count - 1 }
-      result = currentSubIndex
-      // 考慮到選字窗末行往往都是將選字窗貼左排列的（而非左右平鋪排列），所以這裡對「↑」鍵不採用這段特殊處理。
-      // if candidateLines[currentLineNumber].count != candidateLines[currentLineNumber - 1].count {
-      //   let ratio: Double = min(1, Double(currentSubIndex) / Double(candidateLines[currentLineNumber].count))
-      //   result = max(Int(floor(Double(candidateLines[currentLineNumber - 1].count) * ratio)), result)
-      // }
       let targetRow = candidateLines[currentLineNumber - 1]
+      // Horizontal matrix 模式：基於 X 軸位置找最接近的 cell。
+      if _maxLinesPerPage > 1 {
+        let currentRow = candidateLines[currentLineNumber]
+        result = Self.findClosestSubIndex(
+          from: (currentRow, currentSubIndex),
+          to: targetRow, minCellWidth: minCellWidth
+        )
+      }
       let newSubIndex = min(result, targetRow.count - 1)
       highlight(at: targetRow[newSubIndex].index)
       fixLineRange(isBackward: true)
@@ -513,19 +523,15 @@ extension CandidatePool {
         fixLineRange(isBackward: true)
         break branch
       }
-      result = currentSubIndex
-      // 特殊處理。
-      if candidateLines[currentLineNumber].count != candidateLines[currentLineNumber + 1].count {
-        let ratio: Double = min(
-          1,
-          Double(currentSubIndex) / Double(candidateLines[currentLineNumber].count)
-        )
-        result = max(
-          Int(floor(Double(candidateLines[currentLineNumber + 1].count) * ratio)),
-          result
+      let targetRow = candidateLines[currentLineNumber + 1]
+      // Horizontal matrix 模式：基於 X 軸位置找最接近的 cell。
+      if _maxLinesPerPage > 1 {
+        let currentRow = candidateLines[currentLineNumber]
+        result = Self.findClosestSubIndex(
+          from: (currentRow, currentSubIndex),
+          to: targetRow, minCellWidth: minCellWidth
         )
       }
-      let targetRow = candidateLines[currentLineNumber + 1]
       let newSubIndex = min(result, targetRow.count - 1)
       highlight(at: targetRow[newSubIndex].index)
       fixLineRange(isBackward: false)
@@ -562,6 +568,44 @@ extension CandidatePool {
       highlight(at: targetColumn[newSubIndex].index)
       fixLineRange(isBackward: false)
     }
+  }
+}
+
+extension CandidatePool {
+  /// 計算從一行移動到另一行時，基於 X 軸位置找到最接近的 cell 的 subIndex。
+  fileprivate static func findClosestSubIndex(
+    from sourceIntel: (row: [CandidateCellData], subIndex: Int),
+    to targetRow: [CandidateCellData], minCellWidth: Double
+  )
+    -> Int {
+    let (sourceRow, sourceSubIndex) = sourceIntel
+    guard !targetRow.isEmpty else { return 0 }
+    // 計算當前 cell 的 X 軸中心位置。
+    var currentCellCenterX: Double = 0
+    for (i, cell) in sourceRow.enumerated() {
+      let cellWidth = cell.cellWidthMultiplied(minCellWidth: minCellWidth)
+      if i < sourceSubIndex {
+        currentCellCenterX += cellWidth
+      } else if i == sourceSubIndex {
+        currentCellCenterX += cellWidth / 2
+        break
+      }
+    }
+    // 在目標行中找到 X 位置最接近的 cell。
+    var bestIndex = 0
+    var bestDistance = Double.greatestFiniteMagnitude
+    var accumulatedX: Double = 0
+    for (i, cell) in targetRow.enumerated() {
+      let cellWidth = cell.cellWidthMultiplied(minCellWidth: minCellWidth)
+      let cellCenterX = accumulatedX + cellWidth / 2
+      let distance = abs(cellCenterX - currentCellCenterX)
+      if distance < bestDistance {
+        bestDistance = distance
+        bestIndex = i
+      }
+      accumulatedX += cellWidth
+    }
+    return bestIndex
   }
 }
 

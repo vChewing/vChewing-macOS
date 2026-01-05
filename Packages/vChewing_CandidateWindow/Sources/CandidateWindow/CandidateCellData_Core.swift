@@ -144,8 +144,20 @@ public final class CandidateCellData: Hashable {
   public func cellLength(isMatrix: Bool = true) -> Double {
     let factor: CGFloat = (Self.internalPrefs.minCellWidthForHorizontalMatrix == 0) ? 1.5 : 2
     let minLength = ceil(Self.unifiedCharDimension * factor + size * 1.25)
-    if displayedText.count <= 2, isMatrix { return minLength }
+    if displayedText.count <= 1, isMatrix { return minLength }
     return textDimension.width
+  }
+
+  /// 計算倍數化後的 cell 寬度。用於 horizontal matrix 模式，確保每個 cell 寬度是最低寬度的倍數。
+  /// - Parameter minCellWidth: 最小 cell 寬度（通常是 blankCell.cellLength()）。
+  /// - Returns: 倍數化後的寬度。
+  public func cellWidthMultiplied(minCellWidth: Double) -> Double {
+    guard minCellWidth > 0 else { return textDimension.width }
+    // 對於短文字（≤1 字），使用最小寬度。
+    if displayedText.count <= 1 { return minCellWidth }
+    // 對於長文字，計算需要多少個最小寬度單位。
+    let multiplier = ceil(textDimension.width / minCellWidth)
+    return multiplier * minCellWidth
   }
 
   public func attributedString(
