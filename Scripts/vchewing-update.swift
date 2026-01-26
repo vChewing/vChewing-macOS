@@ -95,7 +95,7 @@ func nowStamp() -> String {
 }
 
 let commitTime = nowStamp()
-let updateCommitMsg = "Update Data - \(commitTime)"
+let updateCommitMsg = "DictionaryData - \(commitTime)"
 
 // 1) 執行 make update
 print("Running 'make update' in \(repoPath) ...")

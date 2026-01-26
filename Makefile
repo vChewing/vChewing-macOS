@@ -11,7 +11,7 @@ ARCHIVE_PATH := $(ARCHIVE_DIR)/$(ARCHIVE_NAME)
 all: release
 install: install-release
 update:
-	@git restore Source/Data/
+	@git restore DictionaryData/
 	git submodule update --init --recursive --remote --force
 
 ifdef ARCHS
@@ -93,7 +93,7 @@ clean:
 	make clean --file=./Packages/Makefile || true
 	xcodebuild -scheme vChewingInstaller -configuration Debug $(BUILD_SETTINGS)  clean
 	xcodebuild -scheme vChewingInstaller -configuration Release $(BUILD_SETTINGS) clean
-	make clean --file=./Source/Data/Makefile || true
+	make clean --file=./DictionaryData/Makefile || true
 
 clean-spm:
 	find . -name ".build" -exec rm -rf {} \;
