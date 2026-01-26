@@ -3,9 +3,9 @@
 <plist version="1.0">
 <dict>
 	<key>CFBundleShortVersionString</key>
-	<string>4.2.3</string>
+	<string>4.2.4</string>
 	<key>CFBundleVersion</key>
-	<string>4230</string>
+	<string>4240</string>
 	<key>IsMainStreamDistro</key>
 	<true/>
 	<key>UpdateInfoEndpoint</key>
