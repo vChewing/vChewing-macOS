@@ -201,18 +201,21 @@ extension SessionProtocol {
   private func toggleAlphanumericalMode(popNotification: Bool = true) {
     if var cplk = ui?.capsLockToggler {
       let oldValue = isASCIIMode
-      let newValue = isASCIIMode.toggled()
+      isASCIIMode.toggle()
+      let newValue = isASCIIMode
+
       if prefs.shiftEisuToggleOffTogetherWithCapsLock, oldValue, !newValue,
          cplk.isOn {
         cplk.isOn.toggle()
-        if popNotification {
-          let status = "NotificationSwitchRevolver".i18n
-          Notifier.notify(
-            message: newValue
-              ? "Alphanumerical Input Mode".i18n + "\n" + status
-              : "Chinese Input Mode".i18n + "\n" + status
-          )
-        }
+      }
+
+      if popNotification {
+        let status = "NotificationSwitchRevolver".i18n
+        Notifier.notify(
+          message: newValue
+            ? "Alphanumerical Input Mode".i18n + "\n" + status
+            : "Chinese Input Mode".i18n + "\n" + status
+        )
       }
     }
   }
