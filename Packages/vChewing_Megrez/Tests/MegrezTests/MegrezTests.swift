@@ -279,9 +279,9 @@ final class MegrezTestsAdvanced: XCTestCase {
       compositor.insertKey("sheng1")
     }
     NSLog("// Stress test started.")
-    let startTime = CFAbsoluteTimeGetCurrent()
+    let startTime = Date().timeIntervalSinceReferenceDate
     compositor.assemble()
-    let timeElapsed = CFAbsoluteTimeGetCurrent() - startTime
+    let timeElapsed = Date().timeIntervalSinceReferenceDate - startTime
     NSLog("// Stress test elapsed: \(timeElapsed)s.")
   }
 
