@@ -229,3 +229,4 @@ _UpgradeReport_Files/
 __pycache__/
 ~$*
 DataCompiler/dataCompiler.exe
+.vscode/launch.json
