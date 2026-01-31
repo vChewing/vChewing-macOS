@@ -6,7 +6,9 @@
 // marks, or product names of Contributor, except as required to fulfill notice
 // requirements defined in MIT License.
 
-import CoreFoundation
+#if canImport(CoreFoundation)
+  import CoreFoundation
+#endif
 import Foundation
 @_exported import SwiftExtension
 

@@ -14,14 +14,6 @@ import Tekkon
 @testable import Typewriter
 import XCTest
 
-#if canImport(AppKit)
-  import AppKit
-#endif
-
-#if canImport(InputMethodKit)
-  import InputMethodKit
-#endif
-
 // MARK: - MockIMEState
 
 /// 專門用於單元測試的模擬 IMEState 類型。

@@ -8,6 +8,12 @@
 
 // MARK: - CodePointDecoder
 
+#if canImport(WinSDK)
+  import WinSDK
+#endif
+
+// MARK: - CodePointDecoder
+
 /// Fallback code-point decoding utilities leveraging iconv on every platform.
 enum CodePointDecoder {
   // MARK: Internal
@@ -36,42 +42,79 @@ enum CodePointDecoder {
   private static func decode(bytes: [UInt8], using encoding: String) -> String? {
     guard !bytes.isEmpty else { return nil }
 
-    let descriptor: iconv_t = encoding.withCString { fromPtr in
-      "UTF-8".withCString { toPtr in
-        iconv_open(toPtr, fromPtr)
+    #if canImport(Darwin) || canImport(Glibc) || canImport(Musl)
+      let descriptor: iconv_t = encoding.withCString { fromPtr in
+        "UTF-8".withCString { toPtr in
+          iconv_open(toPtr, fromPtr)
+        }
       }
-    }
-    guard descriptor != iconv_t(bitPattern: -1) else { return nil }
-    defer { iconv_close(descriptor) }
+      guard descriptor != iconv_t(bitPattern: -1) else { return nil }
+      defer { iconv_close(descriptor) }
 
-    var input = bytes.map { Int8(bitPattern: $0) }
-    var inBytesLeft = input.count
-    var output = [Int8](repeating: 0, count: max(4, input.count * 4))
-    var outBytesLeft = output.count
-    var producedCount = 0
+      var input = bytes.map { Int8(bitPattern: $0) }
+      var inBytesLeft = input.count
+      var output = [Int8](repeating: 0, count: max(4, input.count * 4))
+      var outBytesLeft = output.count
+      var producedCount = 0
 
-    let conversionSucceeded = input.withUnsafeMutableBufferPointer { inBuffer -> Bool in
-      guard let inBase = inBuffer.baseAddress else { return false }
-      return output.withUnsafeMutableBufferPointer { outBuffer -> Bool in
-        guard let outBase = outBuffer.baseAddress else { return false }
-        var inOptional: UnsafeMutablePointer<Int8>? = inBase
-        var outOptional: UnsafeMutablePointer<Int8>? = outBase
-        let result = iconv(
-          descriptor,
-          &inOptional,
-          &inBytesLeft,
-          &outOptional,
-          &outBytesLeft
-        )
-        guard result != -1 else { return false }
-        producedCount = outBuffer.count - outBytesLeft
-        return true
+      let conversionSucceeded = input.withUnsafeMutableBufferPointer { inBuffer -> Bool in
+        guard let inBase = inBuffer.baseAddress else { return false }
+        return output.withUnsafeMutableBufferPointer { outBuffer -> Bool in
+          guard let outBase = outBuffer.baseAddress else { return false }
+          var inOptional: UnsafeMutablePointer<Int8>? = inBase
+          var outOptional: UnsafeMutablePointer<Int8>? = outBase
+          let result = iconv(
+            descriptor,
+            &inOptional,
+            &inBytesLeft,
+            &outOptional,
+            &outBytesLeft
+          )
+          guard result != -1 else { return false }
+          producedCount = outBuffer.count - outBytesLeft
+          return true
+        }
       }
-    }
 
-    guard conversionSucceeded, producedCount > 0 else { return nil }
-    let utf8Bytes = output.prefix(producedCount).map { UInt8(bitPattern: $0) }
-    return String(bytes: utf8Bytes, encoding: .utf8)
+      guard conversionSucceeded, producedCount > 0 else { return nil }
+      let utf8Bytes = output.prefix(producedCount).map { UInt8(bitPattern: $0) }
+      return String(bytes: utf8Bytes, encoding: .utf8)
+    #else
+      // Fallback for platforms without iconv (e.g., Windows).
+      let enc = encoding.uppercased()
+
+      #if canImport(WinSDK) || os(Windows)
+        // Helper to invoke WinAPI conversion MultiByteToWideChar
+        func decodeWindows(codePage: UInt32) -> String? {
+          bytes.withUnsafeBytes { rawPtr -> String? in
+            guard let base = rawPtr.baseAddress else { return nil }
+            let mbPtr = base.assumingMemoryBound(to: Int8.self)
+            let needed = MultiByteToWideChar(UInt32(codePage), 0, mbPtr, Int32(bytes.count), nil, 0)
+            guard needed > 0 else { return nil }
+            var wide = [WCHAR](repeating: 0, count: Int(needed))
+            let got = MultiByteToWideChar(UInt32(codePage), 0, mbPtr, Int32(bytes.count), &wide, needed)
+            guard got == needed else { return nil }
+            let u16 = wide.map { UInt16($0) }
+            return String(decoding: u16, as: UTF16.self)
+          }
+        }
+
+        if enc.contains("GB18030") { return decodeWindows(codePage: 54_936) }
+        if enc.contains("GBK") || enc.contains("GB2312") { return decodeWindows(codePage: 936) }
+        if enc.contains("BIG5") || enc.contains("CP950") { return decodeWindows(codePage: 950) }
+      #endif
+
+      // Generic fallbacks (UTF-8 / UTF-16 / ISO Latin 1)
+      if enc == "UTF-16BE" { return decodeAsUTF16BE(bytes: bytes) }
+      if let s = String(bytes: bytes, encoding: .utf8) { return s }
+      if let s = String(bytes: bytes, encoding: .utf16BigEndian) { return s }
+      if let s = String(bytes: bytes, encoding: .utf16LittleEndian) { return s }
+      if let s = String(bytes: bytes, encoding: .utf32) { return s }
+      if let s = String(bytes: bytes, encoding: .utf32BigEndian) { return s }
+      if let s = String(bytes: bytes, encoding: .utf32LittleEndian) { return s }
+      if let s = String(bytes: bytes, encoding: .isoLatin1) { return s }
+      return nil
+    #endif
   }
 
   private static func decodeAsUTF16BE(bytes: [UInt8]) -> String? {

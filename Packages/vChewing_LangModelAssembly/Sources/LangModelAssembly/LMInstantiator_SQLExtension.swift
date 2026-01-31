@@ -98,8 +98,9 @@ extension LMAssembly.LMInstantiator {
       // 綁定參數（如果有的話）
       for (i, param) in params.enumerated() {
         let idx = Int32(i + 1)
-        let utf8 = (param as NSString).utf8String
-        _ = sqlite3_bind_text(ptrStatement, idx, utf8, -1, unsafeBitCast(-1, to: sqlite3_destructor_type.self))
+        param.withCString { cStr in
+          _ = sqlite3_bind_text(ptrStatement, idx, cStr, -1, unsafeBitCast(-1, to: sqlite3_destructor_type.self))
+        }
       }
       while sqlite3_step(ptrStatement) == SQLITE_ROW {
         guard let rawValue = sqlite3_column_text(ptrStatement, column.id) else { continue }
@@ -133,8 +134,9 @@ extension LMAssembly.LMInstantiator {
       }
       for (i, param) in params.enumerated() {
         let idx = Int32(i + 1)
-        let cParam = (param as NSString).utf8String
-        _ = sqlite3_bind_text(ptrStatement, idx, cParam, -1, unsafeBitCast(-1, to: sqlite3_destructor_type.self))
+        param.withCString { cStr in
+          _ = sqlite3_bind_text(ptrStatement, idx, cStr, -1, unsafeBitCast(-1, to: sqlite3_destructor_type.self))
+        }
       }
       while sqlite3_step(ptrStatement) == SQLITE_ROW {
         return sqlite3_column_int(ptrStatement, 0) == 1
@@ -152,8 +154,9 @@ extension LMAssembly.LMInstantiator {
     performStatementSansResult { ptrStatement in
       if sqlite3_prepare_v2(Self.ptrSQL, sqlQuery, -1, &ptrStatement, nil) == SQLITE_OK {
         // 綁定 kanji 參數
-        let cKanji = (kanji as NSString).utf8String
-        _ = sqlite3_bind_text(ptrStatement, 1, cKanji, -1, unsafeBitCast(-1, to: sqlite3_destructor_type.self))
+        kanji.withCString { cKanji in
+          _ = sqlite3_bind_text(ptrStatement, 1, cKanji, -1, unsafeBitCast(-1, to: sqlite3_destructor_type.self))
+        }
       } else {
         vCLMLog("SQL prepare failed for query: \(sqlQuery)")
       }
@@ -302,8 +305,9 @@ extension LMAssembly.LMInstantiator {
         let params = [p1, p2, p3, encryptedKey]
         for (i, param) in params.enumerated() {
           let idx = Int32(i + 1)
-          let cParam = (param as NSString).utf8String
-          _ = sqlite3_bind_text(ptrStatement, idx, cParam, -1, unsafeBitCast(-1, to: sqlite3_destructor_type.self))
+          param.withCString { cParam in
+            _ = sqlite3_bind_text(ptrStatement, idx, cParam, -1, unsafeBitCast(-1, to: sqlite3_destructor_type.self))
+          }
         }
       } else {
         vCLMLog("SQL prepare failed for query: \(sqlQuery)")

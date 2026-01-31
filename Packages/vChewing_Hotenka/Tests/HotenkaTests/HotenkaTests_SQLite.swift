@@ -72,29 +72,33 @@ extension HotenkaTests {
       "HOTENKA: SQLite Table Creation Failed."
     )
 
-    assert(sqlite3_exec(ptrSQL, "begin;", nil, nil, nil) == SQLITE_OK)
+    XCTAssertTrue(sqlite3_exec(ptrSQL, "begin;", nil, nil, nil) == SQLITE_OK)
 
     testInstance.dict.forEach { dictName, subDict in
-      guard let dictID = DictType.match(rawKeyString: dictName)?.rawValue else { return }
+      Hotenka.consoleLog("// Debug: inserting dictName=\(dictName) subCount=\(subDict.count)")
+      guard let dictID = DictType.match(rawKeyString: dictName)?.rawValue
+      else { Hotenka.consoleLog("// Debug: dictName \(dictName) not matched to DictType"); return }
       subDict.forEach { key, value in
         var ptrStatement: OpaquePointer?
         let sqlInsertion = "INSERT INTO DATA_HOTENKA (dict, theKey, theValue) VALUES (?, ?, ?)"
-        assert(
+        XCTAssertTrue(
           sqlite3_prepare_v2(ptrSQL, sqlInsertion, -1, &ptrStatement, nil) == SQLITE_OK,
           "HOTENKA: Failed from preparing: \(sqlInsertion)"
         )
         // bind values
         _ = sqlite3_bind_int(ptrStatement, 1, Int32(dictID))
-        let k = (key as NSString).utf8String
-        _ = sqlite3_bind_text(ptrStatement, 2, k, -1, unsafeBitCast(-1, to: sqlite3_destructor_type.self))
-        let v = (value as NSString).utf8String
-        _ = sqlite3_bind_text(ptrStatement, 3, v, -1, unsafeBitCast(-1, to: sqlite3_destructor_type.self))
-        assert(sqlite3_step(ptrStatement) == SQLITE_DONE, "HOTENKA: Failed from stepping: bound insert")
+        key.withCString { kptr in
+          _ = sqlite3_bind_text(ptrStatement, 2, kptr, -1, unsafeBitCast(-1, to: sqlite3_destructor_type.self))
+        }
+        value.withCString { vptr in
+          _ = sqlite3_bind_text(ptrStatement, 3, vptr, -1, unsafeBitCast(-1, to: sqlite3_destructor_type.self))
+        }
+        XCTAssertTrue(sqlite3_step(ptrStatement) == SQLITE_DONE, "HOTENKA: Failed from stepping: bound insert")
         sqlite3_finalize(ptrStatement)
         ptrStatement = nil
       }
     }
-    assert(sqlite3_exec(ptrSQL, "commit;", nil, nil, nil) == SQLITE_OK)
+    XCTAssertTrue(sqlite3_exec(ptrSQL, "commit;", nil, nil, nil) == SQLITE_OK)
     sqlite3_close_v2(ptrSQL)
   }
 
@@ -128,38 +132,46 @@ extension HotenkaTests {
     var ptrStatement: OpaquePointer?
     let sqlIns = "INSERT OR REPLACE INTO DATA_HOTENKA (dict, theKey, theValue) VALUES (0, ?, ?)"
     XCTAssertTrue(sqlite3_prepare_v2(ptrSQL, sqlIns, -1, &ptrStatement, nil) == SQLITE_OK)
-    _ = sqlite3_bind_text(
-      ptrStatement,
-      1,
-      (normalKey as NSString).utf8String,
-      -1,
-      unsafeBitCast(-1, to: sqlite3_destructor_type.self)
-    )
-    _ = sqlite3_bind_text(
-      ptrStatement,
-      2,
-      (normalVal as NSString).utf8String,
-      -1,
-      unsafeBitCast(-1, to: sqlite3_destructor_type.self)
-    )
+    normalKey.withCString { c in
+      _ = sqlite3_bind_text(
+        ptrStatement,
+        1,
+        c,
+        -1,
+        unsafeBitCast(-1, to: sqlite3_destructor_type.self)
+      )
+    }
+    normalVal.withCString { c in
+      _ = sqlite3_bind_text(
+        ptrStatement,
+        2,
+        c,
+        -1,
+        unsafeBitCast(-1, to: sqlite3_destructor_type.self)
+      )
+    }
     XCTAssertTrue(sqlite3_step(ptrStatement) == SQLITE_DONE)
     sqlite3_finalize(ptrStatement)
     // 插入第二個 Key
     XCTAssertTrue(sqlite3_prepare_v2(ptrSQL, sqlIns, -1, &ptrStatement, nil) == SQLITE_OK)
-    _ = sqlite3_bind_text(
-      ptrStatement,
-      1,
-      (normalKey2 as NSString).utf8String,
-      -1,
-      unsafeBitCast(-1, to: sqlite3_destructor_type.self)
-    )
-    _ = sqlite3_bind_text(
-      ptrStatement,
-      2,
-      (normalVal2 as NSString).utf8String,
-      -1,
-      unsafeBitCast(-1, to: sqlite3_destructor_type.self)
-    )
+    normalKey2.withCString { c in
+      _ = sqlite3_bind_text(
+        ptrStatement,
+        1,
+        c,
+        -1,
+        unsafeBitCast(-1, to: sqlite3_destructor_type.self)
+      )
+    }
+    normalVal2.withCString { c in
+      _ = sqlite3_bind_text(
+        ptrStatement,
+        2,
+        c,
+        -1,
+        unsafeBitCast(-1, to: sqlite3_destructor_type.self)
+      )
+    }
     XCTAssertTrue(sqlite3_step(ptrStatement) == SQLITE_DONE)
     sqlite3_finalize(ptrStatement)
     sqlite3_close_v2(ptrSQL)

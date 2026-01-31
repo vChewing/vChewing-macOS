@@ -8,6 +8,16 @@
 
 import Foundation
 
+#if canImport(Musl)
+  @_exported import Musl
+#elseif canImport(Glibc)
+  @_exported import Glibc
+#elseif canImport(Darwin)
+  @_exported import Darwin
+#elseif canImport(ucrt)
+  @_exported import ucrt
+#endif
+
 #if canImport(OSLog)
   import OSLog
 #endif
@@ -65,8 +75,20 @@ extension FileHandle {
 extension FileManager {
   public static let realHomeDir: URL = {
     // Avoid relativeTo: parameter (10.11+) to stay compatible with 10.9.
-    let url = URL(fileURLWithPath: String(cString: getpwuid(getuid()).pointee.pw_dir))
-    return url.standardizedFileURL
+    #if canImport(Darwin) || canImport(Glibc) || canImport(Musl)
+      let url = URL(fileURLWithPath: String(cString: getpwuid(getuid()).pointee.pw_dir))
+      return url.standardizedFileURL
+    #else
+      // Windows (or other non-POSIX platforms): try environment vars then fall back to Foundation API
+      if let userProfile = ProcessInfo.processInfo.environment["USERPROFILE"] {
+        return URL(fileURLWithPath: userProfile).standardizedFileURL
+      } else if let home = ProcessInfo.processInfo.environment["HOME"] {
+        return URL(fileURLWithPath: home).standardizedFileURL
+      } else {
+        // This one has potential bugs plagued in the implementation of Foundation on Windows.
+        return FileManager.default.homeDirectoryForCurrentUser.standardizedFileURL
+      }
+    #endif
   }()
 }
 
@@ -341,17 +363,22 @@ extension Process {
   }()
 
   public static let isAppleSilicon: Bool = {
-    var systeminfo = utsname()
-    uname(&systeminfo)
-    let machine = withUnsafeBytes(of: &systeminfo.machine) { bufPtr -> String in
-      let data = Data(bufPtr)
-      if let lastIndex = data.lastIndex(where: { $0 != 0 }) {
-        return String(data: data[0 ... lastIndex], encoding: .isoLatin1) ?? "x86_64"
-      } else {
-        return String(data: data, encoding: .isoLatin1) ?? "x86_64"
+    #if canImport(Darwin) || canImport(Glibc) || canImport(Musl)
+      var systeminfo = utsname()
+      uname(&systeminfo)
+      let machine = withUnsafeBytes(of: &systeminfo.machine) { bufPtr -> String in
+        let data = Data(bufPtr)
+        if let lastIndex = data.lastIndex(where: { $0 != 0 }) {
+          return String(data: data[0 ... lastIndex], encoding: .isoLatin1) ?? "x86_64"
+        } else {
+          return String(data: data, encoding: .isoLatin1) ?? "x86_64"
+        }
       }
-    }
-    return machine == "arm64"
+      return machine == "arm64"
+    #else
+      // On platforms without uname/utsname (e.g., Windows), assume not Apple Silicon
+      return false
+    #endif
   }()
 }
 

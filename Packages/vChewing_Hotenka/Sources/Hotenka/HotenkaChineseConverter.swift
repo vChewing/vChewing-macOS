@@ -26,10 +26,14 @@
 import CSQLite3
 import Foundation
 
-#if os(Linux)
+#if canImport(Musl)
+  import Musl
+#elseif canImport(Glibc)
   import Glibc
-#else
+#elseif canImport(Darwin)
   import Darwin
+#elseif canImport(ucrt)
+  import ucrt
 #endif
 
 #if canImport(OSLog)
@@ -80,8 +84,6 @@ public enum Hotenka {
         let logger = Logger(subsystem: "vChewing", category: "Hotenka")
         logger.log(level: .default, "\(msgStr, privacy: .public)")
         return
-      #else
-        break
       #endif
     }
 
@@ -109,6 +111,38 @@ public final class HotenkaChineseConverter {
       return
     }
     sqlite3_exec(ptrSQL, "PRAGMA journal_mode = OFF;", nil, nil, nil)
+
+    // Sanity check: verify a sample key exists (helps detect CRLF/trimming/sql bind issues on platforms)
+    do {
+      var ptrStatement: OpaquePointer?
+      let checkQuery = "SELECT theValue FROM DATA_HOTENKA WHERE dict=0 AND theKey = ? LIMIT 1;"
+      if sqlite3_prepare_v2(ptrSQL, checkQuery, -1, &ptrStatement, nil) == SQLITE_OK {
+        "为".withCString { ckey in
+          _ = sqlite3_bind_text(ptrStatement, 1, ckey, -1, unsafeBitCast(-1, to: sqlite3_destructor_type.self))
+        }
+        if sqlite3_step(ptrStatement) == SQLITE_ROW, let raw = sqlite3_column_text(ptrStatement, 0) {
+          Hotenka.consoleLog("// SQLite sanity: found sample mapping -> \(String(cString: raw))")
+        } else {
+          Hotenka.consoleLog("// SQLite sanity: sample mapping not found for dict=0 key='为'")
+        }
+        sqlite3_finalize(ptrStatement)
+        ptrStatement = nil
+      }
+
+      // Count rows per dict to verify population
+      for id in 0 ... 5 {
+        var cntStmt: OpaquePointer?
+        let cntQuery = "SELECT COUNT(*) FROM DATA_HOTENKA WHERE dict=\(id);"
+        if sqlite3_prepare_v2(ptrSQL, cntQuery, -1, &cntStmt, nil) == SQLITE_OK {
+          if sqlite3_step(cntStmt) == SQLITE_ROW {
+            let cnt = sqlite3_column_int(cntStmt, 0)
+            Hotenka.consoleLog("// SQLite rows for dict=\(id): \(cnt)")
+          }
+          sqlite3_finalize(cntStmt)
+          cntStmt = nil
+        }
+      }
+    }
   }
 
   public init(plistDir: String) {
@@ -185,15 +219,17 @@ public final class HotenkaChineseConverter {
         }
         do {
           let arrLines = try String(contentsOfFile: filePath, encoding: .utf8)
-            .split(separator: "\n")
+            .split(whereSeparator: { $0.isNewline })
           for line in arrLines {
-            let arrWords = line.split(separator: "\t")
+            let arrWords = line.split(separator: "\t", maxSplits: 1, omittingEmptySubsequences: false)
             if arrWords.count == 2 {
+              let key = String(arrWords[0]).trimmingCharacters(in: .whitespacesAndNewlines)
+              let val = String(arrWords[1]).trimmingCharacters(in: .whitespacesAndNewlines)
               if var theSubDict = dict[dictType] {
-                theSubDict[String(arrWords[0])] = String(arrWords[1])
+                theSubDict[key] = val
                 dict[dictType] = theSubDict
               } else {
-                dict[dictType] = .init()
+                dict[dictType] = [key: val]
               }
             }
           }
@@ -202,7 +238,7 @@ public final class HotenkaChineseConverter {
         }
       }
     }
-    sleep(1)
+    Thread.sleep(forTimeInterval: 1)
   }
 
   // MARK: Public
@@ -219,8 +255,9 @@ public final class HotenkaChineseConverter {
     defer { sqlite3_finalize(ptrStatement); ptrStatement = nil }
     // 綁定 dict 與 key
     _ = sqlite3_bind_int(ptrStatement, 1, Int32(dictType.rawValue))
-    let cKey = (searchKey as NSString).utf8String
-    _ = sqlite3_bind_text(ptrStatement, 2, cKey, -1, unsafeBitCast(-1, to: sqlite3_destructor_type.self))
+    searchKey.withCString { cKey in
+      _ = sqlite3_bind_text(ptrStatement, 2, cKey, -1, unsafeBitCast(-1, to: sqlite3_destructor_type.self))
+    }
     // 此處只需要用到第一筆結果。
     while sqlite3_step(ptrStatement) == SQLITE_ROW {
       // 因為 SELECT theValue 回傳的是第 0 欄位
