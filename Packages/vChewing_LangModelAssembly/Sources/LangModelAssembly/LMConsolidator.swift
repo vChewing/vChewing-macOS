@@ -20,28 +20,31 @@ extension LMAssembly {
     /// - Parameter path: 給定檔案路徑。
     /// - Returns: 結果正常則為真，其餘為假。
     public static func checkPragma(path: String) -> Bool {
-      if FileManager.default.fileExists(atPath: path) {
-        do {
-          guard let fileHandle = FileHandle(forReadingAtPath: path) else {
-            throw FileErrors.fileHandleError("")
-          }
-          let lineReader = try LineReader(file: fileHandle)
-          for strLine in lineReader { // 不需要 i=0，因為第一遍迴圈就出結果。
-            if strLine != kPragmaHeader {
-              vCLMLog("Header Mismatch, Starting In-Place Consolidation.")
-              return false
-            } else {
-              vCLMLog("Header Verification Succeeded: \(strLine).")
-              return true
+      LMAssembly.withFileHandleQueueSync {
+        if FileManager.default.fileExists(atPath: path) {
+          do {
+            guard let fileHandle = FileHandle(forReadingAtPath: path) else {
+              throw FileErrors.fileHandleError("")
             }
+            defer { fileHandle.closeFile() }
+            let lineReader = try LineReader(file: fileHandle)
+            for strLine in lineReader { // 不需要 i=0，因為第一遍迴圈就出結果。
+              if strLine != kPragmaHeader {
+                vCLMLog("Header Mismatch, Starting In-Place Consolidation.")
+                return false
+              } else {
+                vCLMLog("Header Verification Succeeded: \(strLine).")
+                return true
+              }
+            }
+          } catch {
+            vCLMLog("Header Verification Failed: File Access Error.")
+            return false
           }
-        } catch {
-          vCLMLog("Header Verification Failed: File Access Error.")
-          return false
         }
+        vCLMLog("Header Verification Failed: File Missing.")
+        return false
       }
-      vCLMLog("Header Verification Failed: File Missing.")
-      return false
     }
 
     /// 檢查檔案是否以空行結尾，如果缺失則補充之。

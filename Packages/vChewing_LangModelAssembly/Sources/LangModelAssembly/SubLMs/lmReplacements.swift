@@ -33,11 +33,12 @@ extension LMAssembly {
       let oldPath = filePath
       filePath = nil
 
-      LMConsolidator.fixEOF(path: path)
-      LMConsolidator.consolidate(path: path, pragma: true)
-
       do {
-        let rawStrData = try String(contentsOfFile: path, encoding: .utf8)
+        let rawStrData: String = try LMAssembly.withFileHandleQueueSync {
+          LMConsolidator.fixEOF(path: path)
+          LMConsolidator.consolidate(path: path, pragma: true)
+          return try String(contentsOfFile: path, encoding: .utf8)
+        }
         replaceData(textData: rawStrData)
       } catch {
         filePath = oldPath

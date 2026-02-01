@@ -72,21 +72,21 @@ extension LMAssembly {
       let oldPath = filePath
       filePath = nil
 
-      var consolidated = false
-
-      if allowConsolidation {
-        LMConsolidator.fixEOF(path: path)
-        LMConsolidator.consolidate(path: path, pragma: true)
-        consolidated = true
-      }
-
+      let consolidated = allowConsolidation
       do {
-        var rawStrData = try String(contentsOfFile: path, encoding: .utf8)
-        if !consolidated {
-          rawStrData = rawStrData.replacingOccurrences(of: "\t", with: " ")
-          rawStrData = rawStrData.replacingOccurrences(of: "\r", with: "\n")
+        let rawStrData: String = try LMAssembly.withFileHandleQueueSync {
+          if allowConsolidation {
+            LMConsolidator.fixEOF(path: path)
+            LMConsolidator.consolidate(path: path, pragma: true)
+          }
+          return try String(contentsOfFile: path, encoding: .utf8)
         }
-        replaceData(textData: rawStrData)
+        var processed = rawStrData
+        if !consolidated {
+          processed = processed.replacingOccurrences(of: "\t", with: " ")
+          processed = processed.replacingOccurrences(of: "\r", with: "\n")
+        }
+        replaceData(textData: processed)
       } catch {
         filePath = oldPath
         vCLMLog("\(error)")
