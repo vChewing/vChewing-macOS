@@ -24,7 +24,7 @@ let package = Package(
     .target(
       name: "LMAssemblyMaterials4Tests",
       resources: [
-        .process("Resources/vanguardLegacy_test.sql"),
+        .process("Resources"),
       ],
       swiftSettings: [
         .defaultIsolation(MainActor.self), // set Default Actor Isolation

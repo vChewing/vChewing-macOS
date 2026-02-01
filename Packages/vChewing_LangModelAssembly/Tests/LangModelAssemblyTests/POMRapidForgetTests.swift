@@ -9,7 +9,7 @@
 import Foundation
 import Megrez
 import Shared
-import XCTest
+import Testing
 
 @testable import LangModelAssembly
 
@@ -19,92 +19,100 @@ private let capacity = 5
 private let dayInSeconds: Double = 24 * 3_600 // 一天的秒數
 private let nullURL = URL(fileURLWithPath: "/dev/null")
 
-// MARK: - POMRapidForgetTests
+// MARK: - POMTestSuite.POMRapidForgetTests
 
-final class POMRapidForgetTests: XCTestCase {
-  override func setUp() {
-    super.setUp()
-    // Enable unit test mode for UserDefaults
-    UserDefaults.pendingUnitTests = true
-  }
+extension POMTestSuite {
+  // MARK: - POMRapidForgetTests
 
-  override func tearDown() {
-    // Clean up test defaults
-    UserDefaults.unitTests?.removeObject(forKey: "ReducePOMLifetimeToNoMoreThan12Hours")
-    UserDefaults.pendingUnitTests = false
-    super.tearDown()
-  }
+  @Suite(.serialized)
+  final class POMRapidForgetTests {
+    // MARK: Lifecycle
 
-  /// 測試急速遺忘模式：當啟用後，記憶在 12 小時（0.5 天）後應該被遺忘
-  func testPOM_RapidForget_01_EnabledMode() throws {
-    // 設置 UserDefaults 值
-    UserDefaults.unitTests?.set(true, forKey: "ReducePOMLifetimeToNoMoreThan12Hours")
+    init() {
+      // 設置 UserDefaults 值
+      UserDefaults.pendingUnitTests = true
+    }
 
-    let pom = LMAssembly.LMPerceptionOverride(
-      capacity: capacity,
-      dataURL: nullURL
-    )
+    deinit {
+      UserDefaults.unitTests?.removeObject(forKey: "ReducePOMLifetimeToNoMoreThan12Hours")
+      UserDefaults.pendingUnitTests = false
+    }
 
-    let key1 = "(ㄕㄣˊ-ㄌㄧˇ-ㄌㄧㄥˊ-ㄏㄨㄚˊ,神里綾華)&(ㄉㄜ˙,的)&(ㄍㄡˇ,狗)"
-    let expectedSuggestion = "狗"
-    pom.memorizePerception((key1, expectedSuggestion), timestamp: nowTimeStamp)
+    // MARK: Internal
 
-    // 即時查詢應該能找到結果
-    var suggested = pom.getSuggestion(key: key1, timestamp: nowTimeStamp)
-    XCTAssertEqual(suggested?.first?.value ?? "", expectedSuggestion, "應該立即找到記憶")
+    /// 測試急速遺忘模式：當啟用後，記憶在 12 小時（0.5 天）後應該被遺忘
+    @Test
+    func testPOM_RapidForget_01_EnabledMode() throws {
+      // 設置 UserDefaults 值：啟用急速遺忘模式
+      UserDefaults.unitTests?.set(true, forKey: "ReducePOMLifetimeToNoMoreThan12Hours")
 
-    // 測試 6 小時內應該保留（0.25 天）
-    suggested = pom.getSuggestion(
-      key: key1,
-      timestamp: nowTimeStamp + (dayInSeconds * 0.25)
-    )
-    XCTAssertEqual(suggested?.first?.value ?? "", expectedSuggestion, "6 小時內記憶應該保留")
+      let pom = LMAssembly.LMPerceptionOverride(
+        capacity: capacity,
+        dataURL: nullURL
+      )
 
-    // 測試 12 小時（0.5 天）剛過後應該消失
-    suggested = pom.getSuggestion(
-      key: key1,
-      timestamp: nowTimeStamp + (dayInSeconds * 0.5) + 10
-    )
-    XCTAssertNil(suggested, "12 小時後記憶應該已經衰減到閾值以下")
-  }
+      let key1 = "(ㄕㄣˊ-ㄌㄧˇ-ㄌㄧㄥˊ-ㄏㄨㄚˊ,神里綾華)&(ㄉㄜ˙,的)&(ㄍㄡˇ,狗)"
+      let expectedSuggestion = "狗"
+      pom.memorizePerception((key1, expectedSuggestion), timestamp: nowTimeStamp)
 
-  /// 測試正常模式：當未啟用急速遺忘模式時，記憶在約一週後才會被遺忘
-  func testPOM_RapidForget_02_DisabledMode() throws {
-    // 確保 UserDefaults 值為 false
-    UserDefaults.unitTests?.set(false, forKey: "ReducePOMLifetimeToNoMoreThan12Hours")
+      // 即時查詢應該能找到結果
+      var suggested = pom.getSuggestion(key: key1, timestamp: nowTimeStamp)
+      #expect((suggested?.first?.value ?? "") == expectedSuggestion)
 
-    let pom = LMAssembly.LMPerceptionOverride(
-      capacity: capacity,
-      dataURL: nullURL
-    )
+      // 測試 6 小時內應該保留（0.25 天）
+      suggested = pom.getSuggestion(
+        key: key1,
+        timestamp: nowTimeStamp + (dayInSeconds * 0.25)
+      )
+      #expect((suggested?.first?.value ?? "") == expectedSuggestion)
 
-    let key1 = "(ㄕㄣˊ-ㄌㄧˇ-ㄌㄧㄥˊ-ㄏㄨㄚˊ,神里綾華)&(ㄉㄜ˙,的)&(ㄍㄡˇ,狗)"
-    let expectedSuggestion = "狗"
-    pom.memorizePerception((key1, expectedSuggestion), timestamp: nowTimeStamp)
+      // 測試 12 小時（0.5 天）剛過後應該消失
+      suggested = pom.getSuggestion(
+        key: key1,
+        timestamp: nowTimeStamp + (dayInSeconds * 0.5) + 10
+      )
+      #expect(suggested == nil)
+    }
 
-    // 即時查詢應該能找到結果
-    var suggested = pom.getSuggestion(key: key1, timestamp: nowTimeStamp)
-    XCTAssertEqual(suggested?.first?.value ?? "", expectedSuggestion, "應該立即找到記憶")
+    /// 測試正常模式：當未啟用急速遺忘模式時，記憶在約一週後才會被遺忘
+    @Test
+    func testPOM_RapidForget_02_DisabledMode() throws {
+      // 確保 UserDefaults 值為 false：關閉急速遺忘模式
+      UserDefaults.unitTests?.set(false, forKey: "ReducePOMLifetimeToNoMoreThan12Hours")
 
-    // 測試 12 小時內應該保留（0.5 天）
-    suggested = pom.getSuggestion(
-      key: key1,
-      timestamp: nowTimeStamp + (dayInSeconds * 0.5)
-    )
-    XCTAssertEqual(suggested?.first?.value ?? "", expectedSuggestion, "正常模式下 12 小時內記憶應該保留")
+      let pom = LMAssembly.LMPerceptionOverride(
+        capacity: capacity,
+        dataURL: nullURL
+      )
 
-    // 測試 2 天內應該保留
-    suggested = pom.getSuggestion(
-      key: key1,
-      timestamp: nowTimeStamp + (dayInSeconds * 2)
-    )
-    XCTAssertEqual(suggested?.first?.value ?? "", expectedSuggestion, "正常模式下 2 天內記憶應該保留")
+      let key1 = "(ㄕㄣˊ-ㄌㄧˇ-ㄌㄧㄥˊ-ㄏㄨㄚˊ,神里綾華)&(ㄉㄜ˙,的)&(ㄍㄡˇ,狗)"
+      let expectedSuggestion = "狗"
+      pom.memorizePerception((key1, expectedSuggestion), timestamp: nowTimeStamp)
 
-    // 測試 8 天後應該消失
-    suggested = pom.getSuggestion(
-      key: key1,
-      timestamp: nowTimeStamp + (dayInSeconds * 8) + 10
-    )
-    XCTAssertNil(suggested, "正常模式下 8 天後記憶應該已經衰減到閾值以下")
+      // 即時查詢應該能找到結果
+      var suggested = pom.getSuggestion(key: key1, timestamp: nowTimeStamp)
+      #expect((suggested?.first?.value ?? "") == expectedSuggestion)
+
+      // 測試 12 小時內應該保留（0.5 天）
+      suggested = pom.getSuggestion(
+        key: key1,
+        timestamp: nowTimeStamp + (dayInSeconds * 0.5)
+      )
+      #expect((suggested?.first?.value ?? "") == expectedSuggestion)
+
+      // 測試 2 天內應該保留
+      suggested = pom.getSuggestion(
+        key: key1,
+        timestamp: nowTimeStamp + (dayInSeconds * 2)
+      )
+      #expect((suggested?.first?.value ?? "") == expectedSuggestion)
+
+      // 測試 8 天後應該消失
+      suggested = pom.getSuggestion(
+        key: key1,
+        timestamp: nowTimeStamp + (dayInSeconds * 8) + 10
+      )
+      #expect(suggested == nil)
+    }
   }
 }

@@ -8,21 +8,25 @@
 
 import Foundation
 import LMAssemblyMaterials4Tests
-import XCTest
+import Testing
 
 @testable import LangModelAssembly
 
-final class InputTokenTests: XCTestCase {
+@Suite(.serialized)
+struct InputTokenTests {
+  @Test
   func testTranslatingTokens_1_TimeZone() throws {
     print("測試時區俗稱：" + "MACRO@TIMEZONE_SHORTENED".parseAsInputToken(isCHS: false).description)
     print("測試時區全稱：" + "MACRO@TIMEZONE".parseAsInputToken(isCHS: false).description)
   }
 
+  @Test
   func testTranslatingTokens_2_TimeNow() throws {
     print("測試時間時分：" + "MACRO@TIME_SHORTENED".parseAsInputToken(isCHS: false).description)
     print("測試帶秒時間：" + "MACRO@TIME".parseAsInputToken(isCHS: true).description)
   }
 
+  @Test
   func testTranslatingTokens_3_Date() throws {
     print("測試農曆：" + "MACRO@DATE_LUNA".parseAsInputToken(isCHS: true).description)
     print("測試二戰勝利紀年：" + "MACRO@DATE_YEARDELTA:-1945".parseAsInputToken(isCHS: true).description)
@@ -45,6 +49,7 @@ final class InputTokenTests: XCTestCase {
     print("測試長日期之明年：" + "MACRO@DATE_YEARDELTA:1".parseAsInputToken(isCHS: true).description)
   }
 
+  @Test
   func testTranslatingTokens_4_Week() throws {
     print("測試今天星期幾：" + "MACRO@WEEK".parseAsInputToken(isCHS: false).description)
     print("測試今天週幾：" + "MACRO@WEEK_SHORTENED".parseAsInputToken(isCHS: false).description)
@@ -57,6 +62,7 @@ final class InputTokenTests: XCTestCase {
     )
   }
 
+  @Test
   func testTranslatingTokens_5_Year() throws {
     print("測試今年：" + "MACRO@YEAR".parseAsInputToken(isCHS: false).description)
     print("測試今年干支：" + "MACRO@YEAR_GANZHI".parseAsInputToken(isCHS: false).description)
@@ -81,9 +87,10 @@ final class InputTokenTests: XCTestCase {
     )
   }
 
+  @Test
   func testGeneratedResultsFromLMInstantiator() throws {
     let instance = LMAssembly.LMInstantiator(isCHS: true)
-    XCTAssertTrue(LMAssembly.LMInstantiator.connectToTestSQLDB(LMATestsData.sqlTestCoreLMData))
+    #expect(LMAssembly.LMInstantiator.connectToTestSQLDB(LMATestsData.sqlTestCoreLMData))
     instance.setOptions { config in
       config.isCNSEnabled = false
       config.isSymbolEnabled = false

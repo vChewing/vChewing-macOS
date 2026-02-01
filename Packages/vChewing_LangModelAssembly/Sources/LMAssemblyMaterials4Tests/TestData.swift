@@ -18,4 +18,10 @@ public enum LMATestsData {
     guard let url else { return "" }
     return (try? String(contentsOf: url, encoding: .utf8)) ?? ""
   }()
+
+  public static func getCINPath4Tests(_ fileNameStem: String, ext: String) -> String? {
+    let url = Bundle.module.url(forResource: fileNameStem, withExtension: ext)
+    guard let url else { return nil }
+    return url.path
+  }
 }
