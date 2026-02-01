@@ -25,7 +25,7 @@
 
 import CSQLite3Lib
 import Foundation
-import XCTest
+import Testing
 
 @testable import Hotenka
 
@@ -37,6 +37,7 @@ private let packageRootPath = URL(fileURLWithPath: #file).pathComponents
 private let testDataPath: String = packageRootPath + "/Tests/TestDictData/"
 
 extension HotenkaTests {
+  @Test
   func testGeneratingSQLiteDB() throws {
     Hotenka.consoleLog("// Start loading from: \(packageRootPath)")
     let testInstance: HotenkaChineseConverter = .init(dictDir: testDataPath)
@@ -44,15 +45,15 @@ extension HotenkaTests {
     var ptrSQL: OpaquePointer?
     let dbPath = testDataPath + "convdict.sqlite"
 
-    XCTAssertTrue(
+    #expect(
       sqlite3_open(dbPath, &ptrSQL) == SQLITE_OK,
       "HOTENKA: SQLite Database Initialization Error."
     )
-    XCTAssertTrue(
+    #expect(
       sqlite3_exec(ptrSQL, "PRAGMA synchronous = OFF;", nil, nil, nil) == SQLITE_OK,
       "HOTENKA: SQLite synchronous OFF failed."
     )
-    XCTAssertTrue(
+    #expect(
       sqlite3_exec(ptrSQL, "PRAGMA journal_mode = OFF;", nil, nil, nil) == SQLITE_OK,
       "HOTENKA: SQLite journal_mode OFF failed."
     )
@@ -67,12 +68,12 @@ extension HotenkaTests {
     ) WITHOUT ROWID;
     """
 
-    XCTAssertTrue(
+    #expect(
       sqlite3_exec(ptrSQL, sqlMakeTableHotenka, nil, nil, nil) == SQLITE_OK,
       "HOTENKA: SQLite Table Creation Failed."
     )
 
-    XCTAssertTrue(sqlite3_exec(ptrSQL, "begin;", nil, nil, nil) == SQLITE_OK)
+    #expect(sqlite3_exec(ptrSQL, "begin;", nil, nil, nil) == SQLITE_OK)
 
     testInstance.dict.forEach { dictName, subDict in
       Hotenka.consoleLog("// Debug: inserting dictName=\(dictName) subCount=\(subDict.count)")
@@ -81,7 +82,7 @@ extension HotenkaTests {
       subDict.forEach { key, value in
         var ptrStatement: OpaquePointer?
         let sqlInsertion = "INSERT INTO DATA_HOTENKA (dict, theKey, theValue) VALUES (?, ?, ?)"
-        XCTAssertTrue(
+        #expect(
           sqlite3_prepare_v2(ptrSQL, sqlInsertion, -1, &ptrStatement, nil) == SQLITE_OK,
           "HOTENKA: Failed from preparing: \(sqlInsertion)"
         )
@@ -93,15 +94,16 @@ extension HotenkaTests {
         value.withCString { vptr in
           _ = sqlite3_bind_text(ptrStatement, 3, vptr, -1, unsafeBitCast(-1, to: sqlite3_destructor_type.self))
         }
-        XCTAssertTrue(sqlite3_step(ptrStatement) == SQLITE_DONE, "HOTENKA: Failed from stepping: bound insert")
+        #expect(sqlite3_step(ptrStatement) == SQLITE_DONE, "HOTENKA: Failed from stepping: bound insert")
         sqlite3_finalize(ptrStatement)
         ptrStatement = nil
       }
     }
-    XCTAssertTrue(sqlite3_exec(ptrSQL, "commit;", nil, nil, nil) == SQLITE_OK)
+    #expect(sqlite3_exec(ptrSQL, "commit;", nil, nil, nil) == SQLITE_OK)
     sqlite3_close_v2(ptrSQL)
   }
 
+  @Test
   func testSampleWithSQLiteDB() throws {
     Hotenka.consoleLog("// Start loading plist from: \(packageRootPath)")
     let testInstance2: HotenkaChineseConverter = .init(sqliteDir: testDataPath + "convdict.sqlite")
@@ -112,11 +114,12 @@ extension HotenkaTests {
     let result2 = testInstance2.convert(result1, to: .zhHantKX)
     let result3 = testInstance2.convert(result2, to: .zhHansJP)
     Hotenka.consoleLog("// Results: \(result1) \(result2) \(result3)")
-    XCTAssertEqual(result1, "為中華崛起而讀書")
-    XCTAssertEqual(result2, "爲中華崛起而讀書")
-    XCTAssertEqual(result3, "為中華崛起而読書")
+    #expect(result1 == "為中華崛起而讀書")
+    #expect(result2 == "爲中華崛起而讀書")
+    #expect(result3 == "為中華崛起而読書")
   }
 
+  @Test
   func testSQLInjectionVulnerableQuery() throws {
     // 測試：使用惡意查詢字串，應不會造成 SQL 注入或回傳非特定條件下的結果
     let testInstance2: HotenkaChineseConverter = .init(sqliteDir: testDataPath + "convdict.sqlite")
@@ -128,10 +131,10 @@ extension HotenkaTests {
     let normalVal2 = "v2"
     // 直接呼叫 SQLite 工具，插入資料
     var ptrSQL: OpaquePointer?
-    XCTAssertTrue(sqlite3_open(testDataPath + "convdict.sqlite", &ptrSQL) == SQLITE_OK)
+    #expect(sqlite3_open(testDataPath + "convdict.sqlite", &ptrSQL) == SQLITE_OK)
     var ptrStatement: OpaquePointer?
     let sqlIns = "INSERT OR REPLACE INTO DATA_HOTENKA (dict, theKey, theValue) VALUES (0, ?, ?)"
-    XCTAssertTrue(sqlite3_prepare_v2(ptrSQL, sqlIns, -1, &ptrStatement, nil) == SQLITE_OK)
+    #expect(sqlite3_prepare_v2(ptrSQL, sqlIns, -1, &ptrStatement, nil) == SQLITE_OK)
     normalKey.withCString { c in
       _ = sqlite3_bind_text(
         ptrStatement,
@@ -150,10 +153,10 @@ extension HotenkaTests {
         unsafeBitCast(-1, to: sqlite3_destructor_type.self)
       )
     }
-    XCTAssertTrue(sqlite3_step(ptrStatement) == SQLITE_DONE)
+    #expect(sqlite3_step(ptrStatement) == SQLITE_DONE)
     sqlite3_finalize(ptrStatement)
     // 插入第二個 Key
-    XCTAssertTrue(sqlite3_prepare_v2(ptrSQL, sqlIns, -1, &ptrStatement, nil) == SQLITE_OK)
+    #expect(sqlite3_prepare_v2(ptrSQL, sqlIns, -1, &ptrStatement, nil) == SQLITE_OK)
     normalKey2.withCString { c in
       _ = sqlite3_bind_text(
         ptrStatement,
@@ -172,18 +175,18 @@ extension HotenkaTests {
         unsafeBitCast(-1, to: sqlite3_destructor_type.self)
       )
     }
-    XCTAssertTrue(sqlite3_step(ptrStatement) == SQLITE_DONE)
+    #expect(sqlite3_step(ptrStatement) == SQLITE_DONE)
     sqlite3_finalize(ptrStatement)
     sqlite3_close_v2(ptrSQL)
 
     // 驗證：一般 key 查詢正確
     let res = testInstance2.query(dict: .zhHantTW, key: normalKey)
-    XCTAssertEqual(res, normalVal)
+    #expect(res == normalVal)
 
     // 嘗試注入查詢字串
     let malicious = "k2' OR 1=1 --"
     let res2 = testInstance2.query(dict: .zhHantTW, key: malicious)
     // 如果 query 使用 bind statements，res2 應為 nil（無精確 match）
-    XCTAssertNil(res2)
+    #expect(res2 == nil)
   }
 }
