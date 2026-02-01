@@ -7,19 +7,31 @@
 // requirements defined in MIT License.
 
 import Foundation
-import XCTest
+import Testing
 
 /// 以下測試套件無法在 Xcode 中執行，因為與 Xcode 單元測試沙箱機制不相容。
-final class PerformSelectorScanTests: XCTestCase {
-  func testPerformSelectorNotUsedOutsideSubmodules() throws {
-    // 此測試執行全 repo 檔案系統掃描，與 Xcode 單元測試沙箱不相容。
-    // 在 Xcode 中執行時跳過此測試。
+@Suite(.serialized)
+struct PerformSelectorScanTests {
+  /// This constant MUST BE Actor Neutral.
+  nonisolated static let isXcode: Bool = {
     let env = ProcessInfo.processInfo.environment
-    try XCTSkipIf(
-      env["XCTestConfigurationFilePath"] != nil || env["XCODE_VERSION_ACTUAL"] != nil || env["XCODE_VERSION_MAJOR"] !=
-        nil,
+    let shouldSkip: Bool =
+      env["XCTestConfigurationFilePath"] != nil
+        || env["XCODE_VERSION_ACTUAL"] != nil
+        || env["XCODE_VERSION_MAJOR"] != nil
+    return shouldSkip
+  }()
+
+  /// 此測試執行全 repo 檔案系統掃描，與 Xcode 單元測試沙箱不相容。
+  /// 在 Xcode 中執行時跳過此測試。
+  @Test(
+    ConditionTrait.enabled(
       "Skipping test under Xcode due to Unit Test sandbox restrictions"
-    )
+    ) {
+      !Self.isXcode
+    }
+  )
+  func testPerformSelectorNotUsedOutsideSubmodules() throws {
     // 遍歷 repo 根目錄，確保在 non-submodule 程式碼中沒有使用 'performSelector(' 語句。
     var cwd = URL(fileURLWithPath: FileManager.default.currentDirectoryPath)
     var root: URL?
@@ -32,7 +44,10 @@ final class PerformSelectorScanTests: XCTestCase {
       guard cwd.pathComponents.count > 1 else { break }
       cwd.deleteLastPathComponent()
     }
-    guard let repoRoot = root else { XCTFail("Repository root not found."); return }
+    guard let repoRoot = root else {
+      Issue.record("Repository root not found.")
+      return
+    }
 
     let fm = FileManager.default
     let enumerator = fm.enumerator(at: repoRoot, includingPropertiesForKeys: nil)!
@@ -50,6 +65,9 @@ final class PerformSelectorScanTests: XCTestCase {
         }
       }
     }
-    XCTAssertTrue(matches.isEmpty, "performSelector usage should be removed in non-submodule code; found: \(matches)")
+    #expect(
+      matches.isEmpty,
+      "performSelector usage should be removed in non-submodule code; found: \(matches)"
+    )
   }
 }

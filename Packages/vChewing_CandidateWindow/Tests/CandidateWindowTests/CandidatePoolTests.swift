@@ -7,11 +7,13 @@
 // requirements defined in MIT License.
 
 import AppKit
-import XCTest
+import Shared_DarwinImpl
+import Testing
 
 @testable import CandidateWindow
 
-final class CandidatePoolTests: XCTestCase {
+@Suite(.serialized)
+struct CandidatePoolTests {
   let testCandidates: [String] = [
     "二十四歲是學生", "二十四歲", "昏睡紅茶", "食雪漢", "意味深", "學生", "便乗",
     "迫真", "驚愕", "論證", "正論", "惱", "悲", "屑", "食", "雪", "漢", "意", "味",
@@ -26,6 +28,7 @@ final class CandidatePoolTests: XCTestCase {
     }
   }
 
+  @Test
   func testPoolHorizontal() throws {
     let pool = CandidatePool(
       candidates: testCandidatesConverted, selectionKeys: "123456", layout: .horizontal
@@ -41,6 +44,7 @@ final class CandidatePoolTests: XCTestCase {
     print(strOutput)
   }
 
+  @Test
   func testPoolVertical() throws {
     let pool = CandidatePool(
       candidates: testCandidatesConverted, selectionKeys: "123456", layout: .vertical

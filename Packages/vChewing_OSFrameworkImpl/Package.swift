@@ -27,7 +27,10 @@ let package = Package(
     ),
     .testTarget(
       name: "OSFrameworkImplTests",
-      dependencies: ["OSFrameworkImpl"]
+      dependencies: ["OSFrameworkImpl"],
+      swiftSettings: [
+        .defaultIsolation(MainActor.self), // set Default Actor Isolation
+      ]
     ),
   ]
 )

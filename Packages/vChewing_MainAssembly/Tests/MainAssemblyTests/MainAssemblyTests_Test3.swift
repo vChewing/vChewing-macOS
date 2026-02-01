@@ -10,7 +10,7 @@ import InputMethodKit
 import Megrez
 import MegrezTestComponents
 import OSFrameworkImpl
-import XCTest
+import Testing
 
 @testable import LangModelAssembly
 @testable import MainAssembly
@@ -34,39 +34,47 @@ extension MainAssemblyTests {
   }
 
   // To test: Boost, Nerf, and Filter.
+  @Test
   func test301_InputHandler_CandidateFilterShortcuts() throws {
     func prepareBasicState4ThisTest() {
       typeSentenceOrCandidates("su065j/ ") // Nian2 Zhong1.
-      XCTAssertEqual(testSession.state.type, .ofInputting)
-      XCTAssertEqual(testSession.state.displayedText, "年中") // Default value.
+      #expect(testSession.state.type == .ofInputting)
+      #expect(testSession.state.displayedText == "年中") // Default value.
       press(dataArrowDown)
-      XCTAssertEqual(testSession.state.type, .ofCandidates)
-      XCTAssertEqual(testSession.state.candidates.map(\.value).prefix(2), ["年中", "年終"])
+      #expect(testSession.state.type == .ofCandidates)
+      #expect(testSession.state.candidates.map(\.value).prefix(2) == ["年中", "年終"])
     }
 
     func navigateCandidateHighlightToValue(_ target: String) {
       let candidates = testSession.state.candidates
       guard !candidates.isEmpty else { return }
-      XCTAssertTrue(candidates.map(\.value).contains(target))
+      #expect(candidates.map(\.value).contains(target))
       checkCandidates: for _ in 0 ..< candidates.count {
         guard testSession.state.displayedText != target else { break checkCandidates }
         press(tabEvent)
       }
-      XCTAssertEqual(testSession.state.displayedText, target) // Default value.
+      #expect(testSession.state.displayedText == target) // Default value.
     }
 
-    testHandler.currentLM
-      .injectTestData(
-        userPhrases: { $0.replaceData(textData: "") },
-        userFilter: { $0.replaceData(textData: "") },
-        userSymbols: { $0.replaceData(textData: "") },
-        replacements: { $0.replaceData(textData: "") },
-        associates: { $0.replaceData(textData: "") }
-      )
+    func resetUserData() {
+      testHandler.currentLM
+        .injectTestData(
+          userPhrases: { $0.replaceData(textData: "") },
+          userFilter: { $0.replaceData(textData: "") },
+          userSymbols: { $0.replaceData(textData: "") },
+          replacements: { $0.replaceData(textData: "") },
+          associates: { $0.replaceData(textData: "") }
+        )
+    }
+
+    // Initial reset
+    resetUserData()
 
     for (action, eventDef, target) in testCases4CandidateWinowItemManipulators {
-      try tearDownWithError()
-      try setUpWithError()
+      // Reset user data for each iteration to ensure clean state
+      resetUserData()
+      // Reset state for each iteration
+      resetToAbortionAndClear()
       prepareBasicState4ThisTest()
       highlightCandidateToValue(target)
       func getSubLMDataFromMemory() -> String {
@@ -77,9 +85,8 @@ extension MainAssemblyTests {
       }
       let backupDataString = getSubLMDataFromMemory()
       press(eventDef)
-      XCTAssertNotEqual(
-        backupDataString,
-        getSubLMDataFromMemory(),
+      #expect(
+        backupDataString != getSubLMDataFromMemory(),
         """
         If this assertion fails. First, confirm whether UTSIO (`test011_LMMgr_UnitTestSandboxIO`) fails.
         If fails, investige why LMMgr fails from writing data under its UnitTests mode.
@@ -91,12 +98,12 @@ extension MainAssemblyTests {
       )
       switch action {
       case .toBoost:
-        XCTAssertEqual(testSession.state.candidates.map(\.value).prefix(2), ["年終", "年中"])
+        #expect(testSession.state.candidates.map(\.value).prefix(2) == ["年終", "年中"])
       case .toNerf:
-        XCTAssertEqual(testSession.state.candidates.map(\.value).prefix(2), ["年終", "年中"])
+        #expect(testSession.state.candidates.map(\.value).prefix(2) == ["年終", "年中"])
       case .toFilter:
-        XCTAssertEqual(testSession.state.candidates.map(\.value).prefix(1), ["年終"])
-        XCTAssertNotEqual(testSession.state.candidates.map(\.value).prefix(2), ["年終", "年中"])
+        #expect(testSession.state.candidates.map(\.value).prefix(1) == ["年終"])
+        #expect(testSession.state.candidates.map(\.value).prefix(2) != ["年終", "年中"])
       }
     }
   }

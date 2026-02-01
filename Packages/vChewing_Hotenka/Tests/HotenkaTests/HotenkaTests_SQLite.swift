@@ -1,45 +1,22 @@
 // Swiftified by (c) 2022 and onwards The vChewing Project (MIT-NTL License).
 // Rebranded from (c) Nick Chen's Obj-C library "NCChineseConverter" (MIT License).
-/*
- Permission is hereby granted, free of charge, to any person obtaining a copy of
- this software and associated documentation files (the "Software"), to deal in
- the Software without restriction, including without limitation the rights to
- use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of
- the Software, and to permit persons to whom the Software is furnished to do so,
- subject to the following conditions:
-
- 1. The above copyright notice and this permission notice shall be included in
- all copies or substantial portions of the Software.
-
- 2. No trademark license is granted to use the trade names, trademarks, service
- marks, or product names of Contributor, except as required to fulfill notice
- requirements above.
-
- THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
- IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS
- FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR
- COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER
- IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
- CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
- */
+// ====================
+// This code is released under the MIT license (SPDX-License-Identifier: MIT)
+// ... with NTL restriction stating that:
+// No trademark license is granted to use the trade names, trademarks, service
+// marks, or product names of Contributor, except as required to fulfill notice
+// requirements defined in MIT License.
 
 import CSQLite3Lib
 import Foundation
+import HotenkaTestDictData
 import Testing
 
 @testable import Hotenka
 
-private let packageRootPath = URL(fileURLWithPath: #file).pathComponents
-  .prefix(while: { $0 != "Tests" }).joined(
-    separator: "/"
-  ).dropFirst()
-
-private let testDataPath: String = packageRootPath + "/Tests/TestDictData/"
-
 extension HotenkaTests {
   @Test
   func testGeneratingSQLiteDB() throws {
-    Hotenka.consoleLog("// Start loading from: \(packageRootPath)")
     let testInstance: HotenkaChineseConverter = .init(dictDir: testDataPath)
     Hotenka.consoleLog("// Loading complete. Generating SQLite database.")
     var ptrSQL: OpaquePointer?
@@ -105,7 +82,6 @@ extension HotenkaTests {
 
   @Test
   func testSampleWithSQLiteDB() throws {
-    Hotenka.consoleLog("// Start loading plist from: \(packageRootPath)")
     let testInstance2: HotenkaChineseConverter = .init(sqliteDir: testDataPath + "convdict.sqlite")
     Hotenka.consoleLog("// Successfully loading sql dictionary.")
 

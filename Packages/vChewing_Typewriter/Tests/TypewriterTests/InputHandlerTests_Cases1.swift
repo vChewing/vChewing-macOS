@@ -33,6 +33,7 @@ extension InputHandlerTests {
     clearTestPOM()
     vCTestLog("測試組句：幽蝶能留一縷芳，但這裡暫時先期待失敗結果「優跌能留意旅方」")
     testSession.resetInputHandler(forceComposerCleanup: true)
+    // 打「幽蝶能留一縷芳」的讀音：「ㄧㄡ ㄉㄧㄝˊ ㄋㄥˊ ㄌㄧㄡˊ ㄧ ㄌㄩˇ ㄈㄤ」，最後空格是陰平聲調。
     typeSentence("u. 2u,6s/6xu.6u4xm3z; ")
     let resultText1 = generateDisplayedText()
     vCTestLog("- // 組字結果：\(resultText1)")

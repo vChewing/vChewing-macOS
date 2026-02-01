@@ -7,19 +7,31 @@
 // requirements defined in MIT License.
 
 import Foundation
-import XCTest
+import Testing
 
 /// 以下測試套件無法在 Xcode 中執行，因為與 Xcode 單元測試沙箱機制不相容。
-final class ShellArgumentsScanTests: XCTestCase {
-  func testNoUnsafeShellArgumentUsagesOutsideAllowedFiles() throws {
-    // 此測試使用檔案系統存取與掃描功能，在 Xcode 單元測試沙箱下無法運作。
-    // 在 Xcode 中執行時跳過此測試。
+@Suite(.serialized)
+struct ShellArgumentsScanTests {
+  /// This constant MUST BE Actor Neutral.
+  nonisolated static let isXcode: Bool = {
     let env = ProcessInfo.processInfo.environment
-    try XCTSkipIf(
-      env["XCTestConfigurationFilePath"] != nil || env["XCODE_VERSION_ACTUAL"] != nil || env["XCODE_VERSION_MAJOR"] !=
-        nil,
+    let shouldSkip: Bool =
+      env["XCTestConfigurationFilePath"] != nil
+        || env["XCODE_VERSION_ACTUAL"] != nil
+        || env["XCODE_VERSION_MAJOR"] != nil
+    return shouldSkip
+  }()
+
+  /// 此測試使用檔案系統存取與掃描功能，在 Xcode 單元測試沙箱下無法運作。
+  /// 在 Xcode 中執行時跳過此測試。
+  @Test(
+    ConditionTrait.enabled(
       "Skipping test under Xcode due to Unit Test sandbox restrictions"
-    )
+    ) {
+      !Self.isXcode
+    }
+  )
+  func testNoUnsafeShellArgumentUsagesOutsideAllowedFiles() throws {
     // 向上遍歷目錄直到找到 vChewing.xcodeproj，以確定 repository 根目錄位置。
     var cwd = URL(fileURLWithPath: FileManager.default.currentDirectoryPath)
     var root: URL?
@@ -32,7 +44,10 @@ final class ShellArgumentsScanTests: XCTestCase {
       guard cwd.pathComponents.count > 1 else { break }
       cwd.deleteLastPathComponent()
     }
-    guard let repoRoot = root else { XCTFail("Repository root not found."); return }
+    guard let repoRoot = root else {
+      Issue.record("Repository root not found.")
+      return
+    }
 
     let fm = FileManager.default
     let enumerator = fm.enumerator(at: repoRoot, includingPropertiesForKeys: nil)!
@@ -59,7 +74,7 @@ final class ShellArgumentsScanTests: XCTestCase {
         }
       }
     }
-    XCTAssertTrue(
+    #expect(
       matches.isEmpty,
       "Found -c/-lc style shell arguments in unexpected files: \(matches)\nAllowed paths: \(allowedPaths)"
     )

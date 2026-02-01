@@ -62,6 +62,7 @@ extension InputHandlerTests {
     testHandler.prefs.cursorPlacementAfterSelectingCandidate = 1
     clearTestPOM()
 
+    // 輸入「幽蝶能留一縷芳」的讀音鍵序。
     var sequenceChars = "u. 2u,6s/6xu.6u4xm3z; "
 
     testSession.resetInputHandler(forceComposerCleanup: true)
