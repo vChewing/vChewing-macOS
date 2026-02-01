@@ -7,9 +7,11 @@
 // requirements defined in MIT License.
 
 @testable import BrailleSputnik
-import XCTest
+import Testing
 
-final class BrailleSputnikTests: XCTestCase {
+@Suite("BrailleSputnik")
+final class BrailleSputnikTests {
+  @Test
   func testBrailleConversion() throws {
     // 大丘丘病了二丘丘瞧，三丘丘採藥四丘丘熬。
     var rawReadingStr = "ㄉㄚˋ-ㄑㄧㄡ-ㄑㄧㄡ-ㄅㄧㄥˋ-ㄌㄜ˙-ㄦˋ-ㄑㄧㄡ-ㄑㄧㄡ-ㄑㄧㄠˊ-_，"
@@ -20,9 +22,9 @@ final class BrailleSputnikTests: XCTestCase {
     }
     let processor = BrailleSputnik(standard: .of1947)
     let result1947 = processor.convertToBraille(smashedPairs: rawReadingArray)
-    XCTAssertEqual(result1947, "⠙⠜⠐⠚⠎⠄⠚⠎⠄⠕⠽⠐⠉⠮⠁⠱⠐⠚⠎⠄⠚⠎⠄⠚⠪⠂⠆⠑⠧⠄⠚⠎⠄⠚⠎⠄⠚⠺⠈⠪⠐⠑⠐⠚⠎⠄⠚⠎⠄⠩⠂⠤⠀")
+    #expect(result1947 == "⠙⠜⠐⠚⠎⠄⠚⠎⠄⠕⠽⠐⠉⠮⠁⠱⠐⠚⠎⠄⠚⠎⠄⠚⠪⠂⠆⠑⠧⠄⠚⠎⠄⠚⠎⠄⠚⠺⠈⠪⠐⠑⠐⠚⠎⠄⠚⠎⠄⠩⠂⠤⠀")
     processor.standard = .of2018
     let result2018 = processor.convertToBraille(smashedPairs: rawReadingArray)
-    XCTAssertEqual(result2018, "⠙⠔⠆⠅⠳⠁⠅⠳⠁⠃⠡⠆⠇⠢⠗⠆⠅⠳⠁⠅⠳⠁⠅⠜⠂⠐⠎⠧⠁⠅⠳⠁⠅⠳⠁⠉⠪⠄⠜⠆⠎⠆⠅⠳⠁⠅⠳⠁⠖⠂⠐⠆")
+    #expect(result2018 == "⠙⠔⠆⠅⠳⠁⠅⠳⠁⠃⠡⠆⠇⠢⠗⠆⠅⠳⠁⠅⠳⠁⠅⠜⠂⠐⠎⠧⠁⠅⠳⠁⠅⠳⠁⠉⠪⠄⠜⠆⠎⠆⠅⠳⠁⠅⠳⠁⠖⠂⠐⠆")
   }
 }
