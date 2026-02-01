@@ -6,52 +6,55 @@
 // marks, or product names of Contributor, except as required to fulfill notice
 // requirements defined in MIT License.
 
+import Foundation
 @testable import Shared
-import XCTest
+import Testing
 
-final class SharedTests: XCTestCase {
-  // MARK: - CandidateTextService (Basic Tests)
+@Suite("vChewing_Shared_Tests", .serialized)
+final class SharedTests {
+  // MARK: Lifecycle
 
-  static let testDataMap: [String] = [
-    #"Bing: %s"# + "\t" + #"@WEB:https://www.bing.com/search?q=%s"#,
-    #"Ecosia: %s"# + "\t" + #"@WEB:https://www.ecosia.org/search?method=index&q=%s"#,
-  ]
-
-  override func setUp() {
-    super.setUp()
+  init() {
+    // Keep final sanity check disabled by default for tests. Individual tests that
+    // need the check can enable it explicitly.
     CandidateTextService.disableFinalSanityCheck()
   }
 
-  override func tearDown() {
-    CandidateTextService.disableFinalSanityCheck()
-    super.tearDown()
+  deinit {
+    // Restore to default state.
+    mainSync {
+      CandidateTextService.enableFinalSanityCheck()
+    }
   }
 
+  // MARK: Internal
+
+  @Test
   func testCandidateServiceNodeTestDataRestoration() throws {
-    let stacked = Self.testDataMap.parseIntoCandidateTextServiceStack()
+    let stacked = testDataMap.parseIntoCandidateTextServiceStack()
     stacked.forEach { currentService in
       print(currentService)
     }
-    XCTAssertEqual(stacked.rawRepresentation, Self.testDataMap)
+    #expect(stacked.rawRepresentation == testDataMap)
   }
 
+  @Test
   func testCandidateServiceMenuNode() throws {
     let rootNode = CandidateTextService.getCurrentServiceMenu(
-      fromMap: Self.testDataMap,
+      fromMap: testDataMap,
       candidate: "🍰", reading: ["ㄉㄢˋ", "ㄍㄠ"]
     )
-    guard let rootNode = rootNode else {
-      XCTAssertThrowsError("Root Node Construction Failed.")
-      return
-    }
+    #expect(rootNode != nil)
+    guard let rootNode = rootNode else { return }
     print(rootNode.members.map(\.name))
     print(rootNode.members.compactMap(\.asServiceMenuNode?.service))
   }
 
+  @Test
   func testEmacsCtrlNPMappings() throws {
     guard let ctrlNScalar = UnicodeScalar(14),
           let ctrlPScalar = UnicodeScalar(16) else {
-      XCTFail("Unable to create control character scalars.")
+      Issue.record("Failed to create control character UnicodeScalars.")
       return
     }
     let ctrlNString = String(ctrlNScalar)
@@ -71,44 +74,47 @@ final class SharedTests: XCTestCase {
     )
 
     let horizontalCtrlN = ctrlNEvent.convertFromEmacsKeyEvent(isVerticalContext: false)
-    XCTAssertEqual(horizontalCtrlN.keyCode, KeyCode.kDownArrow.rawValue)
-    XCTAssertTrue(horizontalCtrlN.modifierFlags.isEmpty)
-    XCTAssertFalse(horizontalCtrlN.isEmacsKey)
+    #expect(horizontalCtrlN.keyCode == KeyCode.kDownArrow.rawValue)
+    #expect(horizontalCtrlN.modifierFlags.isEmpty)
+    #expect(!horizontalCtrlN.isEmacsKey)
 
     let horizontalCtrlP = ctrlPEvent.convertFromEmacsKeyEvent(isVerticalContext: false)
-    XCTAssertEqual(horizontalCtrlP.keyCode, KeyCode.kUpArrow.rawValue)
-    XCTAssertTrue(horizontalCtrlP.modifierFlags.isEmpty)
-    XCTAssertFalse(horizontalCtrlP.isEmacsKey)
+    #expect(horizontalCtrlP.keyCode == KeyCode.kUpArrow.rawValue)
+    #expect(horizontalCtrlP.modifierFlags.isEmpty)
+    #expect(!horizontalCtrlP.isEmacsKey)
 
     let verticalCtrlN = ctrlNEvent.convertFromEmacsKeyEvent(isVerticalContext: true)
-    XCTAssertEqual(verticalCtrlN.keyCode, KeyCode.kLeftArrow.rawValue)
-    XCTAssertTrue(verticalCtrlN.modifierFlags.isEmpty)
-    XCTAssertFalse(verticalCtrlN.isEmacsKey)
+    #expect(verticalCtrlN.keyCode == KeyCode.kLeftArrow.rawValue)
+    #expect(verticalCtrlN.modifierFlags.isEmpty)
+    #expect(!verticalCtrlN.isEmacsKey)
 
     let verticalCtrlP = ctrlPEvent.convertFromEmacsKeyEvent(isVerticalContext: true)
-    XCTAssertEqual(verticalCtrlP.keyCode, KeyCode.kRightArrow.rawValue)
-    XCTAssertTrue(verticalCtrlP.modifierFlags.isEmpty)
-    XCTAssertFalse(verticalCtrlP.isEmacsKey)
+    #expect(verticalCtrlP.keyCode == KeyCode.kRightArrow.rawValue)
+    #expect(verticalCtrlP.modifierFlags.isEmpty)
+    #expect(!verticalCtrlP.isEmacsKey)
   }
 
+  @Test
   func testCandidateTextServiceURLSchemeFiltering() throws {
     CandidateTextService.enableFinalSanityCheck()
     // Reject javascript scheme
-    XCTAssertNil(CandidateTextService(key: "js", definedValue: "@URL:javascript:alert(1)", param: "a"))
+    #expect(CandidateTextService(key: "js", definedValue: "@URL:javascript:alert(1)", param: "a") == nil)
     // Accept https scheme
     let ok = CandidateTextService(key: "Bing", definedValue: "@URL:https://www.bing.com/search?q=%s", param: "test")
-    XCTAssertNotNil(ok)
+    #expect(ok != nil)
     // Reject data scheme
-    XCTAssertNil(CandidateTextService(key: "data", definedValue: "@URL:data:text/plain,hello", param: "test"))
+    #expect(CandidateTextService(key: "data", definedValue: "@URL:data:text/plain,hello", param: "test") == nil)
   }
 
+  @Test
   func testCandidateTextServiceMailtoValidation() throws {
     CandidateTextService.enableFinalSanityCheck()
     // Mailto is no longer allowed; should return nil even for valid address.
-    XCTAssertNil(CandidateTextService(key: "mail", definedValue: "@URL:mailto:invalid-address", param: "a"))
-    XCTAssertNil(CandidateTextService(key: "mail2", definedValue: "@URL:mailto:someone@example.com", param: "a"))
+    #expect(CandidateTextService(key: "mail", definedValue: "@URL:mailto:invalid-address", param: "a") == nil)
+    #expect(CandidateTextService(key: "mail2", definedValue: "@URL:mailto:someone@example.com", param: "a") == nil)
   }
 
+  @Test
   func testCandidateTextServiceFileSchemeOnlyWithinAllowedDirs() throws {
     CandidateTextService.enableFinalSanityCheck()
     // Create a temporary file path inside NSTemporaryDirectory -> should be accepted
@@ -116,9 +122,18 @@ final class SharedTests: XCTestCase {
     let def = "@URL:file:\(temp.path)"
     let svc = CandidateTextService(key: "file", definedValue: def, param: "a")
     // 'file' scheme is now fully rejected
-    XCTAssertNil(svc)
+    #expect(svc == nil)
     // Now a path outside allowed dirs (root) should be rejected
     let def2 = "@URL:file:/etc/passwd"
-    XCTAssertNil(CandidateTextService(key: "file2", definedValue: def2, param: "a"))
+    #expect(CandidateTextService(key: "file2", definedValue: def2, param: "a") == nil)
   }
+
+  // MARK: Private
+
+  // MARK: - CandidateTextService (Basic Tests)
+
+  private let testDataMap: [String] = [
+    #"Bing: %s"# + "\t" + #"@WEB:https://www.bing.com/search?q=%s"#,
+    #"Ecosia: %s"# + "\t" + #"@WEB:https://www.ecosia.org/search?method=index&q=%s"#,
+  ]
 }
