@@ -8,13 +8,12 @@
 
 @testable import Shared
 @testable import Shared_DarwinImpl
-import XCTest
+import Testing
 
-final class SharedDarwinImplTests: XCTestCase {
-  /// PrefMgr().dumpShellScriptBackup()
-  func testDumpedPrefs() throws {
-    let prefs = PrefMgr()
-    let fetched = prefs.dumpShellScriptBackup() ?? ""
-    XCTAssertFalse(fetched.isEmpty)
-  }
+/// PrefMgr().dumpShellScriptBackup()
+@Test
+func testDumpedPrefs() async throws {
+  let prefs = PrefMgr()
+  let fetched = prefs.dumpShellScriptBackup() ?? ""
+  #expect(!fetched.isEmpty)
 }
