@@ -29,14 +29,14 @@ let package = Package(
     .target(
       name: "HotenkaTestDictData",
       resources: [
-        .process("Resources")
+        .process("Resources"),
       ]
     ),
     .testTarget(
       name: "HotenkaTests",
       dependencies: [
         "Hotenka",
-        "HotenkaTestDictData"
+        "HotenkaTestDictData",
       ],
       swiftSettings: [
         .defaultIsolation(MainActor.self), // set Default Actor Isolation

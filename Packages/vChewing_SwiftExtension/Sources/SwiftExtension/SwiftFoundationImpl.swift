@@ -470,7 +470,7 @@ nonisolated public final class Debouncer {
 
 /// A simple NSMutex implementation using NSLock for macOS 10.9+ compatibility.
 /// Provides thread-safe access to a wrapped value.
-public final class NSMutex<Value>: Sendable {
+nonisolated public final class NSMutex<Value>: Sendable {
   // MARK: Lifecycle
 
   public init(_ value: Value) {

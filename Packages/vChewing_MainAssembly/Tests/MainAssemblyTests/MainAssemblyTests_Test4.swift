@@ -6,11 +6,13 @@
 // marks, or product names of Contributor, except as required to fulfill notice
 // requirements defined in MIT License.
 
-import XCTest
+import Foundation
+import Testing
 
 @testable import MainAssembly
 
 extension MainAssemblyTests {
+  @Test
   func test401_Session_AttrStrAPITests() throws {
     let segments: [IMEStateData.AttrStrULStyle.StyledPair] = [
       ("", .single),
@@ -19,13 +21,13 @@ extension MainAssemblyTests {
       ("乙", .thick),
     ]
     let attributed = IMEStateData.AttrStrULStyle.pack(segments)
-    XCTAssertEqual(attributed.string, "甲乙")
+    #expect(attributed.string == "甲乙")
 
     var effectiveRange = NSRange(location: NSNotFound, length: 0)
     let firstValue = attributed.attribute(.markedClauseSegment, at: 0, effectiveRange: &effectiveRange)
       as? NSNumber
-    XCTAssertEqual(firstValue?.intValue, 0)
-    XCTAssertEqual(effectiveRange.length, "甲".utf16.count)
+    #expect(firstValue?.intValue == 0)
+    #expect(effectiveRange.length == "甲".utf16.count)
 
     let secondIndex = max(0, attributed.string.utf16.count - "乙".utf16.count)
     var secondRange = NSRange(location: NSNotFound, length: 0)
@@ -34,7 +36,7 @@ extension MainAssemblyTests {
       at: secondIndex,
       effectiveRange: &secondRange
     ) as? NSNumber
-    XCTAssertEqual(secondValue?.intValue, 1)
-    XCTAssertEqual(secondRange.length, "乙".utf16.count)
+    #expect(secondValue?.intValue == 1)
+    #expect(secondRange.length == "乙".utf16.count)
   }
 }

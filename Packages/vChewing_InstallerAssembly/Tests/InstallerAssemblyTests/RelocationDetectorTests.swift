@@ -9,22 +9,26 @@
 import Darwin
 import Foundation
 @testable import InstallerAssembly
-import XCTest
+import Testing
 
-final class RelocationDetectorTests: XCTestCase {
+@Suite(.serialized)
+struct RelocationDetectorTests {
+  @Test
   func testPathContainingAppTranslocationDetected() {
     let path = "/private/var/folders/xx/AppTranslocation/abcd/MyApp.app"
-    XCTAssertTrue(Reloc.isAppBundleTranslocated(atPath: path))
+    #expect(Reloc.isAppBundleTranslocated(atPath: path))
   }
 
+  @Test
   func testNoTranslocationForNormalPath() throws {
     let temp = FileManager.default.temporaryDirectory.appendingPathComponent(UUID().uuidString)
     try FileManager.default.createDirectory(at: temp, withIntermediateDirectories: true)
     defer { try? FileManager.default.removeItem(at: temp) }
 
-    XCTAssertFalse(Reloc.isAppBundleTranslocated(atPath: temp.path))
+    #expect(!Reloc.isAppBundleTranslocated(atPath: temp.path))
   }
 
+  @Test
   func testConservativeModeDetectsQuarantineXattr() throws {
     let temp = FileManager.default.temporaryDirectory.appendingPathComponent(UUID().uuidString)
     try FileManager.default.createDirectory(at: temp, withIntermediateDirectories: true)
@@ -40,7 +44,7 @@ final class RelocationDetectorTests: XCTestCase {
       setxattr(temp.path, "com.apple.quarantine", ptr.baseAddress, value.count, 0, 0)
     }
 
-    XCTAssertTrue(Reloc.isAppBundleTranslocated(atPath: temp.path, conservative: true))
-    XCTAssertFalse(Reloc.isAppBundleTranslocated(atPath: temp.path, conservative: false))
+    #expect(Reloc.isAppBundleTranslocated(atPath: temp.path, conservative: true))
+    #expect(!Reloc.isAppBundleTranslocated(atPath: temp.path, conservative: false))
   }
 }

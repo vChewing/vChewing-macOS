@@ -6,21 +6,25 @@
 // marks, or product names of Contributor, except as required to fulfill notice
 // requirements defined in MIT License.
 
+import AppKit
 import OSFrameworkImpl
-import XCTest
+import Testing
 
-final class OSFrameworkImplExecTests: XCTestCase {
+@Suite(.serialized)
+struct OSFrameworkImplExecTests {
+  @Test
   func testExecEchoReturnsArgument() throws {
     // 使用 macOS 上可用的 /bin/echo
     let out = try NSApplication.exec("/bin/echo", args: ["hello-world"])
-    XCTAssertTrue(out.contains("hello-world"), "exec should return the echoed output")
+    #expect(out.contains("hello-world"), "exec should return the echoed output")
   }
 
+  @Test
   func testExecDoesNotInterpretMetaCharacters() throws {
     // 若 args 被 shell 解析，會輸出兩個單詞。
     let out = try NSApplication.exec("/bin/echo", args: ["hello; echo injected"]) // payload 包含 `;` 分號
     // 輸出應該是我們傳遞的單一字串，而非由第二個 shell 指令分別印出 `injected`。
-    XCTAssertTrue(
+    #expect(
       out.contains("hello; echo injected"),
       "exec should treat the argument as a single argument, not a shell command"
     )
@@ -33,8 +37,8 @@ final class OSFrameworkImplExecTests: XCTestCase {
     let suspiciousArg = "; touch \(tmpFile.path)"
     _ = try NSApplication.exec("/bin/echo", args: [suspiciousArg])
     // 臨時檔案應該不存在，因為 `touch` 不應該被 exec 執行。
-    XCTAssertFalse(
-      FileManager.default.fileExists(atPath: tmpFile.path),
+    #expect(
+      !FileManager.default.fileExists(atPath: tmpFile.path),
       "exec should not invoke shell and thus should not execute the injected 'touch' command"
     )
   }

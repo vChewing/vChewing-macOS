@@ -10,14 +10,20 @@ import InputMethodKit
 import LangModelAssembly
 import LMAssemblyMaterials4Tests
 import OSFrameworkImpl
-import XCTest
+import Testing
 
 @testable import MainAssembly
 
-let testClient = FakeClient()
+nonisolated let testClientMutex: NSMutex<FakeClient> = NSMutex(FakeClient())
+
+nonisolated var testClient: FakeClient {
+  testClientMutex.value
+}
 
 extension SessionCtl {
-  override public func client() -> (IMKTextInput & NSObjectProtocol)! { testClient }
+  nonisolated override public func client() -> (IMKTextInput & NSObjectProtocol)! {
+    testClient
+  }
 }
 
 func vCTestLog(_ str: String) {
@@ -36,11 +42,45 @@ func vCTestLog(_ str: String) {
 ///
 /// 該單元測試使用獨立的語彙資料，因此會在選字時的候選字
 /// 順序等方面與唯音輸入法實際使用時的體驗有差異。
-final class MainAssemblyTests: XCTestCase {
-  static let testServer = IMKServer(
-    name: "org.atelierInmu.vChewing.MainAssembly.UnitTests_Connection",
-    bundleIdentifier: "org.atelierInmu.vChewing.MainAssembly.UnitTests"
-  )
+@Suite(.serialized)
+@MainActor
+final class MainAssemblyTests {
+  // MARK: Lifecycle
+
+  // MARK: - Preparing Unit Tests.
+
+  init() {
+    Self.ensureServerInitialized()
+    UserDefaults.unitTests = .init(suiteName: "org.atelierInmu.vChewing.MainAssembly.UnitTests")
+    UserDef.resetAll()
+    UserDefaults.pendingUnitTests = true
+    LMMgr.prepareForUnitTests()
+    testLM = LMAssembly.LMInstantiator.construct { _ in
+      LMAssembly.LMInstantiator.connectToTestSQLDB(LMATestsData.sqlTestCoreLMData)
+    }
+    Self._testHandler = nil
+    let session = InputSession(controller: nil, client: { testClient })
+    Self._testSession = session
+
+    // Manually perform essential initialization steps from performServerActivation
+    // without triggering the full method (which has actor isolation issues in Swift Testing).
+    session.syncCurrentSessionID()
+    session.clientBundleIdentifier = testClient.bundleIdentifier()
+    // Initialize input handler properly
+    session.inputHandler = testHandler
+    testHandler.session = session
+    // Set the initial state
+    session.state = .ofEmpty()
+    session.isActivated = true
+    // Sync language model preferences
+    LMMgr.syncLMPrefs()
+    testClient.clear()
+  }
+
+  // MARK: Internal
+
+  // Note: Lazily initialized to avoid early IMKServer creation that may cause issues
+  static var testServer: IMKServer?
 
   static var _testHandler: InputHandler?
   static var _testSession: InputSession?
@@ -238,45 +278,18 @@ final class MainAssemblyTests: XCTestCase {
   }
 
   var testSession: InputSession {
-    let session =
-      Self._testSession
-        ?? InputSession(
-          controller: nil
-        ) {
-          testClient
-        }
-    if Self._testSession == nil { Self._testSession = session }
+    guard let session = Self._testSession else {
+      fatalError("testSession accessed when init() is not completed yet")
+    }
     return session
   }
 
-  // MARK: - Preparing Unit Tests.
-
-  override func setUpWithError() throws {
-    UserDefaults.unitTests = .init(suiteName: "org.atelierInmu.vChewing.MainAssembly.UnitTests")
-    UserDef.resetAll()
-    UserDefaults.pendingUnitTests = true
-    LMMgr.prepareForUnitTests()
-    testLM = LMAssembly.LMInstantiator.construct { _ in
-      LMAssembly.LMInstantiator.connectToTestSQLDB(LMATestsData.sqlTestCoreLMData)
-    }
-    Self._testHandler = nil
-    Self._testSession = nil
-    testSession.activateServer(testClient)
-    testSession.isActivated = true
-    testSession.syncCurrentSessionID()
-    testSession.inputHandler = testHandler
-    testHandler.session = testSession
-    LMMgr.syncLMPrefs()
-    testClient.clear()
-  }
-
-  override func tearDownWithError() throws {
-    testSession.switchState(IMEState.ofAbortion())
-    LMMgr.resetAfterUnitTests()
-    UserDefaults.unitTests?.removeSuite(named: "org.atelierInmu.vChewing.MainAssembly.UnitTests")
-    UserDef.resetAll()
-    testClient.clear()
-    testSession.deactivateServer(testClient)
+  static func ensureServerInitialized() {
+    guard testServer == nil else { return }
+    testServer = IMKServer(
+      name: "org.atelierInmu.vChewing.MainAssembly.UnitTests_Connection",
+      bundleIdentifier: "org.atelierInmu.vChewing.MainAssembly.UnitTests"
+    )
   }
 
   func clearTestPOM() {
@@ -296,7 +309,7 @@ final class MainAssemblyTests: XCTestCase {
     }.flatMap { $0 }
     typingSequence.forEach { theEvent in
       let dismissed = !testSession.handleNSEvent(theEvent, client: testClient)
-      if theEvent.type == .keyDown { XCTAssertFalse(dismissed) }
+      if theEvent.type == .keyDown { #expect(!dismissed) }
     }
   }
 
@@ -311,9 +324,9 @@ final class MainAssemblyTests: XCTestCase {
       let result = testSession.handleNSEvent(event, client: testClient)
       if event.type == .keyDown {
         if shouldHandle {
-          XCTAssertTrue(result, "Expected keyDown to be handled for keyCode \(data.keyCode).")
+          #expect(result, "Expected keyDown to be handled for keyCode \(data.keyCode).")
         } else {
-          XCTAssertFalse(result, "Expected keyDown to pass through for keyCode \(data.keyCode).")
+          #expect(!result, "Expected keyDown to pass through for keyCode \(data.keyCode).")
         }
         handled = result
       }
@@ -329,9 +342,9 @@ final class MainAssemblyTests: XCTestCase {
       let result = testSession.handleNSEvent(event, client: testClient)
       if event.type == .keyDown {
         if shouldHandle {
-          XCTAssertTrue(result, "Expected keyDown to be handled for keyCode \(event.keyCode).")
+          #expect(result, "Expected keyDown to be handled for keyCode \(event.keyCode).")
         } else {
-          XCTAssertFalse(result, "Expected keyDown to pass through for keyCode \(event.keyCode).")
+          #expect(!result, "Expected keyDown to pass through for keyCode \(event.keyCode).")
         }
       }
     }
@@ -352,6 +365,7 @@ final class MainAssemblyTests: XCTestCase {
   }
 }
 
+@MainActor
 extension LMAssembly.LMInstantiator {
   static func construct(
     isCHS: Bool = false,

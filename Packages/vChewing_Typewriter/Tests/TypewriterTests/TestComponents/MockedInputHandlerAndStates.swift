@@ -197,7 +197,7 @@ public final class MockInputHandler: @MainActor InputHandlerProtocol {
 // MARK: - MockSession
 
 /// 專門用於單元測試的模擬會話類型。
-public final class MockSession: SessionCoreProtocol, CtlCandidateDelegate {
+public final class MockSession: @MainActor SessionCoreProtocol, CtlCandidateDelegate {
   // MARK: Lifecycle
 
   public init() {

@@ -1,12 +1,15 @@
 #if os(macOS)
 
   @testable import BookmarkManager
-  import XCTest
+  import Foundation
+  import SwiftExtension
+  import Testing
 
-  final class BookmarkManagerTests: XCTestCase {
-    var bmURL: URL?
+  @Suite(.serialized)
+  final class BookmarkManagerTests {
+    // MARK: Lifecycle
 
-    override func setUpWithError() throws {
+    init() throws {
       // 確保每個測試開始前為乾淨狀態
       BookmarkManager.shared.stopAllSecurityScopedAccesses()
 
@@ -15,21 +18,28 @@
       let tempFile = FileManager.default.temporaryDirectory
         .appendingPathComponent("Bookmarks-\(UUID().uuidString).dict")
       BookmarkManager.shared.setBookmarksURLOverride(tempFile)
-      bmURL = tempFile
+      self.bmURL = tempFile
       if let url = bmURL, FileManager.default.fileExists(atPath: url.path) {
         try? FileManager.default.removeItem(at: url)
       }
     }
 
-    override func tearDownWithError() throws {
-      BookmarkManager.shared.stopAllSecurityScopedAccesses()
-      if let url = bmURL, FileManager.default.fileExists(atPath: url.path) {
-        try? FileManager.default.removeItem(at: url)
+    deinit {
+      mainSync {
+        BookmarkManager.shared.stopAllSecurityScopedAccesses()
+        if let url = bmURL, FileManager.default.fileExists(atPath: url.path) {
+          try? FileManager.default.removeItem(at: url)
+        }
+        // 清除測試覆寫設定（最佳努力）
+        BookmarkManager.shared.setBookmarksURLOverride(nil)
       }
-      // 清除測試覆寫設定（最佳努力）
-      BookmarkManager.shared.setBookmarksURLOverride(nil)
     }
 
+    // MARK: Internal
+
+    var bmURL: URL?
+
+    @Test
     func testSaveCreatesBookmarksFileAndContainsEntry() throws {
       // 建立暫時資料夾以模擬使用者選擇
       let tempDir = FileManager.default.temporaryDirectory.appendingPathComponent(UUID().uuidString)
@@ -37,13 +47,13 @@
 
       BookmarkManager.shared.saveBookmark(for: tempDir)
 
-      XCTAssertNotNil(bmURL)
+      #expect(nil != bmURL)
       guard let bmURL = bmURL else { return } // 確保 bmURL 已拆包
       let data = try Data(contentsOf: bmURL)
       let dict = NSKeyedUnarchiver.unarchivedURLDataDictionaryCompat(from: data)
 
-      XCTAssertNotNil(dict)
-      XCTAssertTrue(
+      #expect(nil != dict)
+      #expect(
         dict?.keys.contains(where: { $0.path == tempDir.path }) ?? false,
         "Saved bookmark should include our temp folder URL"
       )
@@ -52,6 +62,7 @@
       try? FileManager.default.removeItem(at: tempDir)
     }
 
+    @Test
     func testLoadStartsAccessAndStopClears() throws {
       let tempDir = FileManager.default.temporaryDirectory.appendingPathComponent(UUID().uuidString)
       try FileManager.default.createDirectory(at: tempDir, withIntermediateDirectories: true)
@@ -67,13 +78,14 @@
       BookmarkManager.shared.stopAllSecurityScopedAccesses()
       let activeAfterStop = BookmarkManager.shared.activeSecurityScopedAccessURLs
 
-      XCTAssertEqual(activeAfterStop.count, 0, "All active security scoped accesses must be stopped")
+      #expect(activeAfterStop.isEmpty, "All active security scoped accesses must be stopped")
 
       _ = activeBeforeStop // 保留該變數以便在實際 macOS 環境下除錯
 
       try? FileManager.default.removeItem(at: tempDir)
     }
 
+    @Test
     func testSaveMultipleMergesBookmarks() throws {
       let tempDir1 = FileManager.default.temporaryDirectory.appendingPathComponent(UUID().uuidString)
       let tempDir2 = FileManager.default.temporaryDirectory.appendingPathComponent(UUID().uuidString)
@@ -85,15 +97,16 @@
       guard let bmURL = bmURL else { return } // 確保 bmURL 已拆包
       let data = try Data(contentsOf: bmURL)
       let dict = NSKeyedUnarchiver.unarchivedURLDataDictionaryCompat(from: data)
-      XCTAssertNotNil(dict)
+      #expect(nil != dict)
       let paths = dict?.keys.map { $0.path } ?? []
-      XCTAssertTrue(paths.contains(tempDir1.path), "Bookmarks should contain first path")
-      XCTAssertTrue(paths.contains(tempDir2.path), "Bookmarks should contain second path")
+      #expect(paths.contains(tempDir1.path), "Bookmarks should contain first path")
+      #expect(paths.contains(tempDir2.path), "Bookmarks should contain second path")
 
       try? FileManager.default.removeItem(at: tempDir1)
       try? FileManager.default.removeItem(at: tempDir2)
     }
 
+    @Test
     func testDecodeLegacyStringPathKey() throws {
       let tempDir = FileManager.default.temporaryDirectory.appendingPathComponent(UUID().uuidString)
       try FileManager.default.createDirectory(at: tempDir, withIntermediateDirectories: true)
@@ -117,12 +130,13 @@
       }
 
       let parsed = NSKeyedUnarchiver.unarchivedURLDataDictionaryCompat(from: archivedData)
-      XCTAssertNotNil(parsed)
-      XCTAssertTrue(parsed?.keys.contains(where: { $0.path == tempDir.path }) ?? false)
+      #expect(nil != parsed)
+      #expect(parsed?.keys.contains(where: { $0.path == tempDir.path }) ?? false)
 
       try? FileManager.default.removeItem(at: tempDir)
     }
 
+    @Test
     func testDecodeLegacyFileURLStringKey() throws {
       let tempDir = FileManager.default.temporaryDirectory.appendingPathComponent(UUID().uuidString)
       try FileManager.default.createDirectory(at: tempDir, withIntermediateDirectories: true)
@@ -147,12 +161,13 @@
       }
 
       let parsed = NSKeyedUnarchiver.unarchivedURLDataDictionaryCompat(from: archivedData)
-      XCTAssertNotNil(parsed)
-      XCTAssertTrue(parsed?.keys.contains(where: { $0.path == tempDir.path }) ?? false)
+      #expect(nil != parsed)
+      #expect(parsed?.keys.contains(where: { $0.path == tempDir.path }) ?? false)
 
       try? FileManager.default.removeItem(at: tempDir)
     }
 
+    @Test
     func testDecodeNSURLKeyNSDataValue() throws {
       let tempDir = FileManager.default.temporaryDirectory.appendingPathComponent(UUID().uuidString)
       try FileManager.default.createDirectory(at: tempDir, withIntermediateDirectories: true)
@@ -175,12 +190,13 @@
       }
 
       let parsed = NSKeyedUnarchiver.unarchivedURLDataDictionaryCompat(from: archivedData)
-      XCTAssertNotNil(parsed)
-      XCTAssertTrue(parsed?.keys.contains(where: { $0.path == tempDir.path }) ?? false)
+      #expect(nil != parsed)
+      #expect(parsed?.keys.contains(where: { $0.path == tempDir.path }) ?? false)
 
       try? FileManager.default.removeItem(at: tempDir)
     }
 
+    @Test
     func testDecodeLegacyFileURLLocalhostStringKey() throws {
       let tempDir = FileManager.default.temporaryDirectory.appendingPathComponent(UUID().uuidString)
       try FileManager.default.createDirectory(at: tempDir, withIntermediateDirectories: true)
@@ -205,12 +221,13 @@
       }
 
       let parsed = NSKeyedUnarchiver.unarchivedURLDataDictionaryCompat(from: archivedData)
-      XCTAssertNotNil(parsed)
-      XCTAssertTrue(parsed?.keys.contains(where: { $0.path == tempDir.path }) ?? false)
+      #expect(nil != parsed)
+      #expect(parsed?.keys.contains(where: { $0.path == tempDir.path }) ?? false)
 
       try? FileManager.default.removeItem(at: tempDir)
     }
 
+    @Test
     func testDecodeLegacyStringNSDataValue() throws {
       let tempDir = FileManager.default.temporaryDirectory.appendingPathComponent(UUID().uuidString)
       try FileManager.default.createDirectory(at: tempDir, withIntermediateDirectories: true)
@@ -234,12 +251,13 @@
       }
 
       let parsed = NSKeyedUnarchiver.unarchivedURLDataDictionaryCompat(from: archivedData)
-      XCTAssertNotNil(parsed)
-      XCTAssertTrue(parsed?.keys.contains(where: { $0.path == tempDir.path }) ?? false)
+      #expect(nil != parsed)
+      #expect(parsed?.keys.contains(where: { $0.path == tempDir.path }) ?? false)
 
       try? FileManager.default.removeItem(at: tempDir)
     }
 
+    @Test
     func testRejectNonFileURLStringKey() throws {
       let tempDir = FileManager.default.temporaryDirectory.appendingPathComponent(UUID().uuidString)
       try FileManager.default.createDirectory(at: tempDir, withIntermediateDirectories: true)
@@ -264,7 +282,7 @@
       }
 
       let parsed = NSKeyedUnarchiver.unarchivedURLDataDictionaryCompat(from: archivedData)
-      XCTAssertNil(parsed)
+      #expect(nil == parsed)
 
       try? FileManager.default.removeItem(at: tempDir)
     }

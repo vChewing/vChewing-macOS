@@ -8,9 +8,23 @@
 
 import InputMethodKit
 import Shared
-import XCTest
+import Testing
 
-final class CandidateServiceCoordinatorTests: XCTestCase {
+@Suite(.serialized)
+@MainActor
+final class CandidateServiceCoordinatorTests {
+  // MARK: Lifecycle
+
+  init() {
+    CandidateTextService.disableFinalSanityCheck()
+  }
+
+  deinit {
+    mainSync {
+      CandidateTextService.disableFinalSanityCheck()
+    }
+  }
+
   // MARK: Internal
 
   static let testDataMap: [String] = [
@@ -23,16 +37,7 @@ final class CandidateServiceCoordinatorTests: XCTestCase {
     #"Braille 2018: %s"# + "\t" + #"@SEL:copyBraille2018:"#,
   ]
 
-  override func setUp() {
-    super.setUp()
-    CandidateTextService.disableFinalSanityCheck()
-  }
-
-  override func tearDown() {
-    CandidateTextService.disableFinalSanityCheck()
-    super.tearDown()
-  }
-
+  @Test
   func testSelector_FinalSanityCheck() throws {
     assertServiceCountReducedAfterFinalSanityCheck(
       services: Self.testDataMap,
@@ -41,6 +46,7 @@ final class CandidateServiceCoordinatorTests: XCTestCase {
     )
   }
 
+  @Test
   func testSelector_UnicodeMetadata() throws {
     let expectedResponse =
       "胡 U+80E1 CJK UNIFIED IDEOGRAPH-80E1\n桃 U+6843 CJK UNIFIED IDEOGRAPH-6843"
@@ -53,6 +59,7 @@ final class CandidateServiceCoordinatorTests: XCTestCase {
     )
   }
 
+  @Test
   func testSelector_HTMLRubyZhuyinTextbookStyle() throws {
     let expectedResponse =
       "<ruby>甜<rp>(</rp><rt>ㄊㄧㄢˊ</rt><rp>)</rp></ruby><ruby>的<rp>(</rp><rt>˙ㄉㄜ</rt><rp>)</rp></ruby>"
@@ -65,6 +72,7 @@ final class CandidateServiceCoordinatorTests: XCTestCase {
     )
   }
 
+  @Test
   func testSelector_HTMLRubyPinyinTextbookStyle() throws {
     let expectedResponse =
       "<ruby>鐵<rp>(</rp><rt>tiě</rt><rp>)</rp></ruby><ruby>嘴<rp>(</rp><rt>zuǐ</rt><rp>)</rp></ruby>"
@@ -77,6 +85,7 @@ final class CandidateServiceCoordinatorTests: XCTestCase {
     )
   }
 
+  @Test
   func testSelector_InlineAnnotationZhuyinTextbookStyle() throws {
     let expectedResponse = "甜(ㄊㄧㄢˊ)的(˙ㄉㄜ)"
     assertCandidateServiceResponse(
@@ -88,6 +97,7 @@ final class CandidateServiceCoordinatorTests: XCTestCase {
     )
   }
 
+  @Test
   func testSelector_InlineAnnotationTextbookStyle() throws {
     let expectedResponse = "鐵(tiě)嘴(zuǐ)"
     assertCandidateServiceResponse(
@@ -99,6 +109,7 @@ final class CandidateServiceCoordinatorTests: XCTestCase {
     )
   }
 
+  @Test
   func testSelector_Braille1947() throws {
     let expectedResponse = "⠎⠄⠙⠬⠂⠝⠵⠂⠉⠎⠂⠡⠐⠉⠳⠈⠟⠭⠄"
     assertCandidateServiceResponse(
@@ -110,6 +121,7 @@ final class CandidateServiceCoordinatorTests: XCTestCase {
     )
   }
 
+  @Test
   func testSelector_Braille2018() throws {
     let expectedResponse = "⠳⠁⠙⠑⠂⠝⠼⠂⠇⠳⠂⠊⠆⠇⠬⠄⠋⠦⠁"
     assertCandidateServiceResponse(
@@ -121,20 +133,22 @@ final class CandidateServiceCoordinatorTests: XCTestCase {
     )
   }
 
+  @Test
   func testSelector_BlockedSelectorRejected() throws {
     // 確認一個不在白名單內的 selector 會被 finalSanityCheck 阻擋
     CandidateTextService.enableFinalSanityCheck()
     let raw = ["Evil: %s\t@SEL:executeArbitrary:"]
     let stacked = raw.parseIntoCandidateTextServiceStack(candidate: "A", reading: ["ㄚ"]) // 嘗試使用一個 candidate
-    XCTAssertTrue(stacked.isEmpty)
+    #expect(stacked.isEmpty)
     CandidateTextService.disableFinalSanityCheck()
   }
 
+  @Test
   func testURL_JavascriptSchemeIsBlocked() throws {
     CandidateTextService.enableFinalSanityCheck()
     let raw = ["EvilURL: %s\t@URL:javascript:alert('X')"]
     let stacked = raw.parseIntoCandidateTextServiceStack(candidate: "A", reading: ["ㄚ"]) // 嘗試使用一個 candidate
-    XCTAssertTrue(stacked.isEmpty)
+    #expect(stacked.isEmpty)
     CandidateTextService.disableFinalSanityCheck()
   }
 
@@ -152,14 +166,14 @@ final class CandidateServiceCoordinatorTests: XCTestCase {
       candidate: candidate,
       reading: reading
     )
-    XCTAssertTrue(stacked.indices.contains(index), "Service index out of range.")
+    #expect(stacked.indices.contains(index), "Service index out of range.")
     let theService = stacked[index]
     switch theService.value {
     case .url:
-      XCTFail("Unexpected URL service at index \(index).")
+      Issue.record("Unexpected URL service at index \(index).")
     case .selector:
       let response = theService.responseFromSelector
-      XCTAssertEqual(response, expected)
+      #expect(response == expected)
     }
   }
 
@@ -176,6 +190,6 @@ final class CandidateServiceCoordinatorTests: XCTestCase {
     CandidateTextService.enableFinalSanityCheck()
     stacked = services.parseIntoCandidateTextServiceStack(candidate: candidate, reading: reading)
     let count2 = stacked.count
-    XCTAssertGreaterThan(count1, count2)
+    #expect(count1 > count2)
   }
 }

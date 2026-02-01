@@ -7,7 +7,7 @@
 // requirements defined in MIT License.
 
 import InputMethodKit
-import XCTest
+import Testing
 
 @testable import LangModelAssembly
 @testable import MainAssembly
@@ -73,14 +73,14 @@ extension MainAssemblyTests {
   /// 可選擇在開啟前覆寫游標位置。
   /// 回傳候選窗控制器（若存在）。
   @discardableResult
-  func openCandidates(cursor override: Int? = nil) -> CtlCandidateProtocol? {
+  func openCandidateWindow(cursor override: Int? = nil) -> CtlCandidateProtocol? {
     if let override {
       let limited = Swift.max(0, Swift.min(override, testHandler.assembler.length))
       testHandler.assembler.cursor = limited
       testSession.switchState(testHandler.generateStateOfInputting())
     }
     let candState = testHandler.generateStateOfCandidates()
-    XCTAssertFalse(candState.candidates.isEmpty)
+    #expect(!(candState.candidates.isEmpty))
     testSession.switchState(candState)
     testSession.toggleCandidateUIVisibility(true)
     return testSession.candidateController()
@@ -108,20 +108,20 @@ extension MainAssemblyTests {
       testSession.toggleCandidateUIVisibility(true)
     }
     guard var controller = testSession.candidateController() else {
-      XCTFail("Missing candidate controller while navigating to '\(value)'.")
+      Issue.record("Missing candidate controller while navigating to '\(value)'.")
       return
     }
 
     // Resolve the target index by value.
     let values = testSession.state.candidates.map(\.value)
     guard let targetIndex = values.firstIndex(of: value) else {
-      XCTFail("Target candidate '\(value)' not found. Candidates: \(values)")
+      Issue.record("Target candidate '\(value)' not found. Candidates: \(values)")
       return
     }
 
     // If already highlighted at target, verify and return.
     if controller.highlightedIndex == targetIndex {
-      XCTAssertEqual(testSession.state.displayedText, value)
+      #expect(testSession.state.displayedText == value)
       return
     }
 
@@ -135,19 +135,19 @@ extension MainAssemblyTests {
       steps += 1
     }
 
-    XCTAssertEqual(testSession.state.displayedText, value)
+    #expect(testSession.state.displayedText == value)
   }
 
   /// Highlight to an eligible candidate by minimal constraints on candidate value and reading key length.
   /// This mirrors common usage in tests to find a candidate with at least 2 visible chars and 2 reading key chars.
   func highlightEligibleCandidate(minValueCount: Int = 2, minKeyLength: Int = 2) {
     guard var controller = testSession.candidateController() else {
-      XCTFail("Missing candidate controller while searching eligible candidate.")
+      Issue.record("Missing candidate controller while searching eligible candidate.")
       return
     }
     var highlightedIndex = controller.highlightedIndex
     guard testSession.state.candidates.indices.contains(highlightedIndex) else {
-      XCTFail("Highlighted index out of candidate range.")
+      Issue.record("Highlighted index out of candidate range.")
       return
     }
     var highlightedCandidate = testSession.state.candidates[highlightedIndex]
@@ -157,7 +157,7 @@ extension MainAssemblyTests {
           || highlightedCandidate.keyArray.joined().count < minKeyLength {
       highlightNextCandidate()
       guard let updated = testSession.candidateController() else {
-        XCTFail("Candidate controller unexpectedly nil during iteration.")
+        Issue.record("Candidate controller unexpectedly nil during iteration.")
         return
       }
       controller = updated
@@ -166,24 +166,24 @@ extension MainAssemblyTests {
       highlightedCandidate = testSession.state.candidates[highlightedIndex]
       attempts += 1
     }
-    XCTAssertGreaterThanOrEqual(highlightedCandidate.value.count, minValueCount)
-    XCTAssertGreaterThanOrEqual(highlightedCandidate.keyArray.joined().count, minKeyLength)
+    #expect(highlightedCandidate.value.count >= minValueCount)
+    #expect(highlightedCandidate.keyArray.joined().count >= minKeyLength)
   }
 
   /// 依 selectionKeys 對應以索引選取候選。
   func selectCandidate(at index: Int) {
     let keys = Array(testSession.selectionKeys)
-    XCTAssertGreaterThan(keys.count, index)
+    #expect(keys.count > index)
     let key = String(keys[index])
     press(NSEvent.KeyEventData(chars: key))
   }
 
   /// 以指定按鍵取消候選窗，並斷言狀態與顯示文字維持一致。
-  func cancelCandidates(with keyData: NSEvent.KeyEventData) {
-    let before = testSession.state.displayedText
+  func cancelCandidateWindowState(with keyData: NSEvent.KeyEventData) {
+    let dispTextPriorToAction = testSession.state.displayedText
     press(keyData)
-    XCTAssertTrue(testSession.state.type == .ofInputting || testSession.state.type == .ofAbortion)
-    XCTAssertEqual(testSession.state.displayedText, before)
+    #expect(testSession.state.type == .ofInputting || testSession.state.type == .ofAbortion)
+    #expect(testSession.state.displayedText == dispTextPriorToAction)
   }
 
   // MARK: - 卡匣資料輔助
@@ -196,26 +196,12 @@ extension MainAssemblyTests {
     body()
   }
 
-  /// 以目前測試檔為基準，依檔名組出卡匣資料路徑。
-  func cassettePath(named filename: String) -> String {
-    URL(fileURLWithPath: #file)
-      .deletingLastPathComponent() // MainAssemblyTests
-      .deletingLastPathComponent() // Tests
-      .deletingLastPathComponent() // vChewing_MainAssembly
-      .deletingLastPathComponent() // Packages
-      .appendingPathComponent("vChewing_LangModelAssembly")
-      .appendingPathComponent("Tests")
-      .appendingPathComponent("TestCINData")
-      .appendingPathComponent(filename)
-      .path
-  }
-
   // MARK: - 碼點模式輔助
 
   /// 進入碼點模式（預設熱鍵：Option + `）。
   func enterCodePointMode() {
     handleEvents(symbolMenuKeyEventIntlWithOpt.asPairedEvents)
-    XCTAssertEqual(testHandler.currentTypingMethod, .codePoint)
+    #expect(testHandler.currentTypingMethod == .codePoint)
   }
 
   /// 在碼點模式下輸入十六進位碼序列。
@@ -234,13 +220,13 @@ extension MainAssemblyTests {
     expected: String
   ) {
     let stack = services.parseIntoCandidateTextServiceStack(candidate: candidate, reading: reading)
-    XCTAssertTrue(stack.indices.contains(index), "Service index out of range.")
+    #expect(stack.indices.contains(index), "Service index out of range.")
     let service = stack[index]
     switch service.value {
     case .url:
-      XCTFail("Unexpected URL service for index \(index).")
+      Issue.record("Unexpected URL service for index \(index).")
     case .selector:
-      XCTAssertEqual(service.responseFromSelector, expected)
+      #expect(service.responseFromSelector == expected)
     }
   }
 
@@ -251,30 +237,30 @@ extension MainAssemblyTests {
     reading: [String]
   ) {
     var stack = services.parseIntoCandidateTextServiceStack(candidate: candidate, reading: reading)
-    let before = stack.count
+    let beforeFinalSanityCheck = stack.count
     let previous = CandidateTextService.finalSanityCheck
     CandidateTextService.enableFinalSanityCheck()
     stack = services.parseIntoCandidateTextServiceStack(candidate: candidate, reading: reading)
-    let after = stack.count
-    XCTAssertGreaterThan(before, after)
+    let afterFinalSanityCheck = stack.count
+    #expect(beforeFinalSanityCheck > afterFinalSanityCheck)
     CandidateTextService.finalSanityCheck = previous
   }
 
   // MARK: - 常用斷言
 
   func assertStateIsEmptyOrCommitting() {
-    XCTAssertTrue(testSession.state.type == .ofEmpty || testSession.state.type == .ofCommitting)
+    #expect(testSession.state.type == .ofEmpty || testSession.state.type == .ofCommitting)
   }
 
   func assertDisplayed(_ expected: String) {
-    XCTAssertEqual(testSession.state.displayedText, expected)
+    #expect(testSession.state.displayedText == expected)
   }
 
   func assertCursorUnchanged(_ old: Int) {
-    XCTAssertEqual(testHandler.assembler.cursor, old)
+    #expect(testHandler.assembler.cursor == old)
   }
 
   func assertCandidatesContain(_ value: String) {
-    XCTAssertTrue(testSession.state.candidates.map(\.value).contains(value))
+    #expect(testSession.state.candidates.map(\.value).contains(value))
   }
 }
