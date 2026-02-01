@@ -10,8 +10,8 @@ import Foundation
 @testable import LangModelAssembly
 import LMAssemblyMaterials4Tests
 import Shared
+import Testing
 @testable import Typewriter
-import XCTest
 
 func vCTestLog(_ str: String) {
   print("[VCLOG] \(str)")
@@ -171,14 +171,13 @@ let cassetteURL4Array30CIN2 = URL(fileURLWithPath: #file)
 // MARK: - InputHandlerTests
 
 /// 唯音輸入法的 InputHandler 單元測試（Typewriter 模組）
-final class InputHandlerTests: XCTestCase {
-  var testLM: LMAssembly.LMInstantiator?
-  var testHandler: MockInputHandler?
-  var testSession: MockSession?
+@Suite("InputHandlerTests", .serialized)
+final class InputHandlerTests {
+  // MARK: Lifecycle
 
   // MARK: - 測試前後流程
 
-  override func setUpWithError() throws {
+  init() throws {
     // 設定專用於單元測試的 UserDefaults
     UserDefaults.unitTests = .init(suiteName: "org.atelierInmu.vChewing.Typewriter.UnitTests")
     UserDef.resetAll()
@@ -186,7 +185,7 @@ final class InputHandlerTests: XCTestCase {
 
     // 初始化測試 LM
     let lm = LMAssembly.LMInstantiator(isCHS: false)
-    testLM = lm
+    self.testLM = lm
     LMAssembly.LMInstantiator.connectToTestSQLDB(LMATestsData.sqlTestCoreLMData)
 
     // 初始化測試用的 handler 和 session
@@ -194,17 +193,25 @@ final class InputHandlerTests: XCTestCase {
     let session = MockSession()
     handler.session = session
     session.inputHandler = handler
-    testHandler = handler
-    testSession = session
+    self.testHandler = handler
+    self.testSession = session
   }
 
-  override func tearDownWithError() throws {
-    testHandler?.errorCallback = nil
-    testSession?.switchState(MockIMEState.ofAbortion())
-    LMAssembly.resetSharedState()
+  deinit {
+    mainSync {
+      testHandler?.errorCallback = nil
+      testSession?.switchState(MockIMEState.ofAbortion())
+      LMAssembly.resetSharedState()
+    }
     UserDefaults.unitTests?.removeSuite(named: "org.atelierInmu.vChewing.Typewriter.UnitTests")
     UserDef.resetAll()
   }
+
+  // MARK: Internal
+
+  var testLM: LMAssembly.LMInstantiator?
+  var testHandler: MockInputHandler?
+  var testSession: MockSession?
 
   // MARK: - 工具函式
 
