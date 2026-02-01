@@ -111,19 +111,19 @@ extension Date {
 // MARK: - NSRange Extension
 
 extension NSRange {
-  public static var zero = NSRange(location: 0, length: 0)
-  public static var notFound = NSRange(location: NSNotFound, length: NSNotFound)
+  public static let zero = NSRange(location: 0, length: 0)
+  public static let notFound = NSRange(location: NSNotFound, length: NSNotFound)
 }
 
 // MARK: - CGRect Extension
 
 extension CGRect {
-  public static var seniorTheBeast: CGRect {
+  public static let seniorTheBeast: CGRect = {
     var result = CGRect()
     result.origin = .init(x: 0, y: 0)
     result.size = .init(width: 0.114, height: 0.514)
     return result
-  }
+  }()
 }
 
 // MARK: - String.i18n extension
