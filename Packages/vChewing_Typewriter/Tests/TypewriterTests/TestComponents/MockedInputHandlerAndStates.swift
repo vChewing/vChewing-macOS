@@ -11,8 +11,8 @@ import LangModelAssembly
 import Megrez
 import Shared
 import Tekkon
+import Testing
 @testable import Typewriter
-import XCTest
 
 // MARK: - MockIMEState
 
@@ -140,7 +140,7 @@ extension MockIMEState {
 // MARK: - MockInputHandler
 
 /// 專門用於單元測試的模擬 InputHandler 類型。
-public final class MockInputHandler: InputHandlerProtocol {
+public final class MockInputHandler: @MainActor InputHandlerProtocol {
   // MARK: Lifecycle
 
   public init(

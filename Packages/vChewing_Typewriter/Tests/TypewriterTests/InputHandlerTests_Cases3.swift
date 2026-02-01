@@ -11,7 +11,7 @@ import Megrez
 import MegrezTestComponents
 import Shared
 import Tekkon
-import XCTest
+import Testing
 
 @testable import LangModelAssembly
 @testable import Typewriter
@@ -22,10 +22,11 @@ private typealias MockLM = MegrezTestComponents.MockLM
 // MARK: - 測試案例 Vol 3 (POM Dedicated)
 
 extension InputHandlerTests {
+  @Test
   func test_IH301_POMBleacherIntegrationTest() throws {
     // 備註：該測試用例不適合鏡照至 MainAssemblyTests。
     guard let testHandler, let testSession else {
-      XCTFail("testHandler and testSession at least one of them is nil.")
+      Issue.record("testHandler and testSession at least one of them is nil.")
       return
     }
     testHandler.prefs.useSCPCTypingMode = false // Use Dachen.
@@ -48,85 +49,86 @@ extension InputHandlerTests {
       testHandler.currentLM.clearTemporaryData(isFiltering: false)
     }
     let fetchedExtraUnigrams1 = testHandler.currentLM.unigramsFor(keyArray: ["ㄌㄧㄡˊ", "ㄧˋ"])
-    XCTAssert(Set(fetchedExtraUnigrams1).count == 4)
-    XCTAssertEqual(Set(additionalUnigrams.prefix(4)), Set(fetchedExtraUnigrams1))
+    #expect(Set(fetchedExtraUnigrams1).count == 4)
+    #expect(Set(additionalUnigrams.prefix(4)) == Set(fetchedExtraUnigrams1))
     let jsonEncoder = JSONEncoder()
     jsonEncoder.outputFormatting = [.sortedKeys]
     let readingKeyChainStr = "xu.6u4"
     typeSentence(readingKeyChainStr)
     // 此時「留意」原始權重最高，會被自動選中。
-    XCTAssertEqual(testHandler.assembler.assembledSentence.map(\.value).joined(), "留意")
-    XCTAssertEqual(testSession.state.displayedText, "留意")
+    #expect(testHandler.assembler.assembledSentence.map(\.value).joined() == "留意")
+    #expect(testSession.state.displayedText == "留意")
     // let candidateCursor = testHandler.actualNodeCursorPosition
     testSession.switchState(testHandler.generateStateOfCandidates())
     let candidates1 = testSession.state.candidates.map(\.value).prefix(4)
-    XCTAssertEqual(candidates1, ["留意", "流溢", "流易", "流議"])
+    #expect(Array(candidates1) == ["留意", "流溢", "流易", "流議"])
     // 觸發選字窗選擇「流易」，該字詞在 Megrez 內的的頻分權重由常規區間（ -9.5 <= x <= 0）升至 114_514。
     testSession.candidatePairSelectionConfirmed(at: 2) // 「流易」
-    XCTAssertEqual(testHandler.assembler.assembledSentence.map(\.value).joined(), "流易")
-    XCTAssertEqual(testSession.state.displayedText, "流易")
+    #expect(testHandler.assembler.assembledSentence.map(\.value).joined() == "流易")
+    #expect(testSession.state.displayedText == "流易")
     // 此時應該有生成一些 POM 記憶。
     let pomData1 = testHandler.currentLM.lmPerceptionOverride.getSavableData()
     let encodedJSON1 = try jsonEncoder.encode(pomData1)
     let encodedJSONStr1 = String(data: encodedJSON1, encoding: .utf8) ?? "N/A"
     // 每次跑測試時，ts 時間戳都不同。所以不將 ts 的資料值納入 Assertion 對象。
-    XCTAssertTrue(encodedJSONStr1.contains(#"()&()&(ㄌㄧㄡˊ-ㄧˋ,流易)"#))
+    #expect(encodedJSONStr1.contains(#"()&()&(ㄌㄧㄡˊ-ㄧˋ,流易)"#))
     // 直接呼叫 EmptyState。這個過程會清空 InputHandler。
     testSession.switchState(.ofEmpty())
-    XCTAssertTrue(testHandler.assembler.isEmpty)
+    #expect(testHandler.assembler.isEmpty)
     // 重新打字。
     typeSentence(readingKeyChainStr)
     // 此時「流易」權重最高，因為是 POM 推薦資料。
-    XCTAssertEqual(testHandler.assembler.assembledSentence.map(\.value).joined(), "流易")
-    XCTAssertEqual(testSession.state.displayedText, "流易")
+    #expect(testHandler.assembler.assembledSentence.map(\.value).joined() == "流易")
+    #expect(testSession.state.displayedText == "流易")
     // 檢查 assembler 內部的 nodes 確保「流易」的 OverridingScore 必須不能是「114_514」。
     // 不然的話，會出現 POM 記憶劫持使用者片語的情況。
     // 判斷方法是：任何雙字詞節點都不該有「score == 114_514」。
     // 測試目的：在套用 POM 建議時，OverridingScore 得是 POM 建議的權重。
     let allNodes: [Megrez.Node] = testHandler.assembler.segments.compactMap { $0[2] }
-    XCTAssertTrue(allNodes.allSatisfy { $0.score != 114_514 })
+    #expect(allNodes.allSatisfy { $0.score != 114_514 })
     // 嘗試觸發就地加詞的 method。這在目前的這個單元測試內不會實際加詞，但會嘗試清空相關的 POM 記憶。
     // 咱們先用 revolveCandidate 的功能將該節點換成別的雙字候選詞。
     let candidateStateTemporary1 = testHandler.generateStateOfCandidates()
     let candidatesAssumed = candidateStateTemporary1.candidates.prefix(4).map(\.value)
-    XCTAssertEqual(candidatesAssumed, ["流易", "留意", "流溢", "流議"])
+    #expect(Array(candidatesAssumed) == ["流易", "留意", "流溢", "流議"])
     // 第三個候選字詞是「流溢」，咱們用這個做實驗。於是讓 revolver API 往正極方向輪兩下。
-    XCTAssertTrue(testHandler.revolveCandidate(reverseOrder: false))
-    XCTAssertTrue(testHandler.revolveCandidate(reverseOrder: false))
+    #expect(testHandler.revolveCandidate(reverseOrder: false))
+    #expect(testHandler.revolveCandidate(reverseOrder: false))
     // Revolver 輪轉完畢。這個過程不會影響 POM。開始確認當前候選字詞是「流溢」。
-    XCTAssertEqual(testHandler.assembler.assembledSentence.map(\.value).joined(), "流溢")
-    XCTAssertEqual(testSession.state.displayedText, "流溢")
-    XCTAssertEqual(testSession.state.type, .ofInputting)
+    #expect(testHandler.assembler.assembledSentence.map(\.value).joined() == "流溢")
+    #expect(testSession.state.displayedText == "流溢")
+    #expect(testSession.state.type == .ofInputting)
     // 然後呼叫 .ofMarking 狀態、以便接下來的對就地加詞 API 的觸發。
-    XCTAssertTrue(testHandler.assembler.isCursorAtEdge(direction: .front))
+    #expect(testHandler.assembler.isCursorAtEdge(direction: .front))
     var arrLeftEvent = KBEvent.KeyEventData.dataArrowLeft
     arrLeftEvent.flags.insert(.shift)
-    XCTAssertTrue(testHandler.triageInput(event: arrLeftEvent.asEvent))
-    XCTAssertTrue(testHandler.triageInput(event: arrLeftEvent.asEvent))
-    XCTAssertTrue(testHandler.assembler.isCursorAtEdge(direction: .rear, isMarker: true))
-    XCTAssertEqual(testSession.state.type, .ofMarking)
-    XCTAssertEqual(testSession.state.markedRange, 0 ..< 2)
+    #expect(testHandler.triageInput(event: arrLeftEvent.asEvent))
+    #expect(testHandler.triageInput(event: arrLeftEvent.asEvent))
+    #expect(testHandler.assembler.isCursorAtEdge(direction: .rear, isMarker: true))
+    #expect(testSession.state.type == .ofMarking)
+    #expect(testSession.state.markedRange == 0 ..< 2)
     // 這一行會觸發 handleMarkingState(input: Enter) 所排定觸發的 `performUserPhraseOperation`。
     // 此過程在 MockSession 會觸發 `inputHandler.currentLM.bleachSpecifiedPOMSuggestions`。
     // 註：真實 Session 會通過 `LMMgr.bleachSpecifiedSuggestions` 間接觸發該 API。
-    XCTAssertTrue(testHandler.triageInput(event: KBEvent.KeyEventData.dataEnterReturn.asEvent))
+    #expect(testHandler.triageInput(event: KBEvent.KeyEventData.dataEnterReturn.asEvent))
     let fetchablesNow = testHandler.currentLM.unigramsFor(keyArray: ["ㄌㄧㄡˊ", "ㄧˋ"])
     let assumedNewUnigram = Megrez.Unigram(keyArray: ["ㄌㄧㄡˊ", "ㄧˋ"], value: "流溢", score: 0)
-    XCTAssert(fetchablesNow.contains(assumedNewUnigram))
+    #expect(fetchablesNow.contains(assumedNewUnigram))
     // 現在應該假設 POM 當中任何妨礙 assumedNewUnigram 被選中的內容都被清掉了。
     // 看一下 POM 記憶。
     let pomData2 = testHandler.currentLM.lmPerceptionOverride.getSavableData()
     let encodedJSON2 = try jsonEncoder.encode(pomData2)
     let encodedJSONStr2 = String(data: encodedJSON2, encoding: .utf8) ?? "N/A"
     // 到這一步如果 Asserts 都通過的話就證明手動加詞時的 Bleacher 是成功的。
-    XCTAssertTrue(!encodedJSONStr2.contains(#"()&()&(ㄌㄧㄡˊ-ㄧˋ,流易)"#))
+    #expect(!encodedJSONStr2.contains(#"()&()&(ㄌㄧㄡˊ-ㄧˋ,流易)"#))
   }
 
+  @Test
   func test_IH302_POMStopShortKeyArrFromHijackingLongKeyArr() throws {
     // 測試目的：在套用 POM 建議時，OverridingScore 得是 POM 建議的權重。
     // 備註：該測試用例沒必要鏡照至 MainAssemblyTests。
     guard let testHandler, let testSession else {
-      XCTFail("testHandler and testSession at least one of them is nil.")
+      Issue.record("testHandler and testSession at least one of them is nil.")
       return
     }
     testHandler.prefs.enforceETenDOSCandidateSequence = false
@@ -135,16 +137,16 @@ extension InputHandlerTests {
     vCTestLog("測試組句：年中")
     testSession.resetInputHandler(forceComposerCleanup: true)
     typeSentence("su065j/ ")
-    XCTAssertEqual(testHandler.assembler.assembledSentence.map(\.value), ["年中"])
-    XCTAssertTrue(testHandler.assembler.moveCursorStepwise(to: .rear))
-    XCTAssertTrue(testHandler.assembler.moveCursorStepwise(to: .rear))
-    XCTAssertFalse(testHandler.assembler.moveCursorStepwise(to: .rear))
-    XCTAssertTrue(testHandler.assembler.isCursorAtEdge(direction: .rear))
+    #expect(testHandler.assembler.assembledSentence.map(\.value) == ["年中"])
+    #expect(testHandler.assembler.moveCursorStepwise(to: .rear))
+    #expect(testHandler.assembler.moveCursorStepwise(to: .rear))
+    #expect(!(testHandler.assembler.moveCursorStepwise(to: .rear)))
+    #expect(testHandler.assembler.isCursorAtEdge(direction: .rear))
     testSession.switchState(testHandler.generateStateOfCandidates())
     let candidates1 = testSession.state.candidates.map(\.value).prefix(3)
-    XCTAssertEqual(candidates1, ["年", "黏", "粘"])
+    #expect(Array(candidates1) == ["年", "黏", "粘"])
     testSession.candidatePairSelectionConfirmed(at: 2) // 黏
-    XCTAssertEqual(testHandler.assembler.assembledSentence.map(\.value), ["粘", "中"])
+    #expect(testHandler.assembler.assembledSentence.map(\.value) == ["粘", "中"])
     testSession.switchState(.ofAbortion())
     // 模擬手動加詞的情況。
     testHandler.currentLM.insertTemporaryData(
@@ -155,12 +157,13 @@ extension InputHandlerTests {
       testHandler.currentLM.clearTemporaryData(isFiltering: false)
     }
     typeSentence("su065j/ ")
-    XCTAssertEqual(testHandler.assembler.assembledSentence.map(\.value), ["年終"])
+    #expect(testHandler.assembler.assembledSentence.map(\.value) == ["年終"])
   }
 
+  @Test
   func test_IH303_POMIgnoresLowerWeightSuggestedUnigramMatchingRawQueriedUnigram() throws {
     guard let testHandler, let testSession else {
-      XCTFail("testHandler and testSession at least one of them is nil.")
+      Issue.record("testHandler and testSession at least one of them is nil.")
       return
     }
     testHandler.prefs.useSCPCTypingMode = false
@@ -172,12 +175,12 @@ extension InputHandlerTests {
     // 相同的詞+讀音，但 POM 的權重比原始查詢結果更低時，該建議應被忽略。
     let readingKeyChainStr = "gjo3eji35 "
     typeSentence(readingKeyChainStr)
-    XCTAssertEqual(testHandler.assembler.assembledSentence.map(\.value).joined(), "水果汁")
+    #expect(testHandler.assembler.assembledSentence.map(\.value).joined() == "水果汁")
 
     guard let keyGen = testHandler.assembler.assembledSentence.generateKeyForPerception(
       cursor: testHandler.actualNodeCursorPosition
     ) else {
-      XCTFail("Failed to generate perception key from assembled sentence.")
+      Issue.record("Failed to generate perception key from assembled sentence.")
       return
     }
 
@@ -189,7 +192,7 @@ extension InputHandlerTests {
       at: testHandler.actualNodeCursorPosition
     )
     else {
-      XCTFail("Failed to locate current GramInPath")
+      Issue.record("Failed to locate current GramInPath")
       return
     }
     let keyArray = gramPair.gram.keyArray
@@ -199,7 +202,7 @@ extension InputHandlerTests {
     guard let rawCandidate = rawCandidates.first(where: {
       $0.keyArray == keyArray && $0.value == candidateValue
     }) else {
-      XCTFail("Unable to locate raw candidate for keyArray \(keyArray) and value \(candidateValue).")
+      Issue.record("Unable to locate raw candidate for keyArray \(keyArray) and value \(candidateValue).")
       return
     }
 
@@ -210,9 +213,9 @@ extension InputHandlerTests {
     )
     var suggestionPairs = testHandler.retrievePOMSuggestions(apply: false)
     var suggestions = suggestionPairs.map { $0.1.value }
-    XCTAssertTrue(suggestions.contains(candidateValue))
+    #expect(suggestions.contains(candidateValue))
     if let candidateUnigram = suggestionPairs.first(where: { $0.1.value == candidateValue }) {
-      XCTAssertGreaterThanOrEqual(candidateUnigram.1.score, rawCandidate.score)
+      #expect(candidateUnigram.1.score >= rawCandidate.score)
     }
 
     // 清除並插入舊時戳（低權重）POM 記錄；預期該建議會被忽略
@@ -225,13 +228,14 @@ extension InputHandlerTests {
     )
     suggestionPairs = testHandler.retrievePOMSuggestions(apply: false)
     suggestions = suggestionPairs.map { $0.1.value }
-    XCTAssertTrue(suggestions.isEmpty)
-    XCTAssertFalse(suggestions.contains(candidateValue))
+    #expect(suggestions.isEmpty)
+    #expect(!(suggestions.contains(candidateValue)))
   }
 
+  @Test
   func test_IH303_FilterPOMAppendablesRejectsLowerScoreMatches() throws {
     guard let testHandler else {
-      XCTFail("testHandler is nil.")
+      Issue.record("testHandler is nil.")
       return
     }
 
@@ -249,14 +253,15 @@ extension InputHandlerTests {
     ]
 
     let filtered = testHandler.filterPOMAppendables(from: suggestion, rawCandidates: rawCandidates)
-    XCTAssertFalse(filtered.contains(where: { $0.1.value == "波" }))
-    XCTAssertEqual(filtered.map { $0.1.value }, ["玻", "坡"])
+    #expect(!(filtered.contains(where: { $0.1.value == "波" })))
+    #expect(filtered.map { $0.1.value } == ["玻", "坡"])
   }
 
+  @Test
   func test_IH304_SaisoukiNoGaika() throws {
     // 備註：該測試用例不適合鏡照至 MainAssemblyTests。
     guard let testHandler, let testSession else {
-      XCTFail("testHandler and testSession at least one of them is nil.")
+      Issue.record("testHandler and testSession at least one of them is nil.")
       return
     }
     testHandler.prefs.enforceETenDOSCandidateSequence = false
@@ -280,29 +285,29 @@ extension InputHandlerTests {
     defer {
       testHandler.currentLM.clearTemporaryData(isFiltering: false)
     }
-    XCTAssert(testHandler.currentLM.hasUnigramsFor(keyArray: ["ㄗㄞˋ"]))
-    XCTAssert(testHandler.currentLM.hasUnigramsFor(keyArray: ["ㄎㄞˇ", "ㄍㄜ"]))
+    #expect(testHandler.currentLM.hasUnigramsFor(keyArray: ["ㄗㄞˋ"]))
+    #expect(testHandler.currentLM.hasUnigramsFor(keyArray: ["ㄎㄞˇ", "ㄍㄜ"]))
     // 測試用句「再創世的凱歌」。
     let readingKeys4Sentence = ["y94", "tj;4", "g4", "2k7", "d93", "ek "]
     typeSentence(readingKeys4Sentence.joined())
-    let assembledBefore = assembler.assembledSentence.map(\.value).joined(separator: " ")
-    XCTAssertEqual("再 創 是的 凱歌", assembledBefore)
+    let assembledPriorToOverride = assembler.assembledSentence.map(\.value).joined(separator: " ")
+    #expect("再 創 是的 凱歌" == assembledPriorToOverride)
     // ====================
     // 測試此時生成的 keyForQueryingData 是否正確
     let cursorShi = 2
     let cursorShiDe = 3
     let keyForQueryingDataAt2 = assembler.assembledSentence
       .generateKeyForPerception(cursor: cursorShi)
-    XCTAssertEqual(keyForQueryingDataAt2?.ngramKey, "(ㄗㄞˋ,再)&(ㄔㄨㄤˋ,創)&(ㄕˋ-ㄉㄜ˙,是的)")
-    XCTAssertEqual(keyForQueryingDataAt2?.headReading, "ㄕˋ")
+    #expect(keyForQueryingDataAt2?.ngramKey == "(ㄗㄞˋ,再)&(ㄔㄨㄤˋ,創)&(ㄕˋ-ㄉㄜ˙,是的)")
+    #expect(keyForQueryingDataAt2?.headReading == "ㄕˋ")
     let keyForQueryingDataAt3 = assembler.assembledSentence
       .generateKeyForPerception(cursor: cursorShiDe)
-    XCTAssertEqual(keyForQueryingDataAt3?.ngramKey, "(ㄗㄞˋ,再)&(ㄔㄨㄤˋ,創)&(ㄕˋ-ㄉㄜ˙,是的)")
-    XCTAssertEqual(keyForQueryingDataAt3?.headReading, "ㄉㄜ˙")
+    #expect(keyForQueryingDataAt3?.ngramKey == "(ㄗㄞˋ,再)&(ㄔㄨㄤˋ,創)&(ㄕˋ-ㄉㄜ˙,是的)")
+    #expect(keyForQueryingDataAt3?.headReading == "ㄉㄜ˙")
     // 應能提供『是的』『似的』『凱歌』等候選
     let pairsAtShiDeEnd = assembler.fetchCandidates(at: 4, filter: .endAt)
-    XCTAssertTrue(pairsAtShiDeEnd.map(\.value).contains("是的"))
-    XCTAssertTrue(pairsAtShiDeEnd.map(\.value).contains("似的"))
+    #expect(pairsAtShiDeEnd.map(\.value).contains("是的"))
+    #expect(pairsAtShiDeEnd.map(\.value).contains("似的"))
     // 模擬使用者把『是』改為『世』，再合成：觀測應為 shortToLong
     var obsCaptured: Megrez.PerceptionIntel?
     _ = assembler.overrideCandidate(
@@ -312,13 +317,15 @@ extension InputHandlerTests {
     ) {
       obsCaptured = $0
     }
-    XCTAssertEqual(obsCaptured?.contextualizedGramKey, "(ㄗㄞˋ,再)&(ㄔㄨㄤˋ,創)&(ㄕˋ,世)")
+    #expect(obsCaptured?.contextualizedGramKey == "(ㄗㄞˋ,再)&(ㄔㄨㄤˋ,創)&(ㄕˋ,世)")
     guard let obsCaptured else {
       preconditionFailure("Should have a capture.")
     }
     // assembler.assemble() <- 已經組句了。
-    let assembledAfter = assembler.assembledSentence.map(\.value).joined(separator: " ")
-    XCTAssertTrue("再 創 世 的 凱歌" == assembledAfter)
+    let assembledFollowingOverride = assembler.assembledSentence
+      .map(\.value)
+      .joined(separator: " ")
+    #expect("再 創 世 的 凱歌" == assembledFollowingOverride)
     pom.memorizePerception(
       (obsCaptured.contextualizedGramKey, obsCaptured.candidate),
       timestamp: Date().timeIntervalSince1970
@@ -329,7 +336,7 @@ extension InputHandlerTests {
     guard let firstObservationKey else {
       preconditionFailure("POM memorized nothing, or something wrong happen.")
     }
-    XCTAssertEqual(firstObservationKey, obsCaptured.contextualizedGramKey)
+    #expect(firstObservationKey == obsCaptured.contextualizedGramKey)
     // 然後是記憶效力測試：
     testHandler.clear()
     testHandler.prefs.fetchSuggestionsFromPerceptionOverrideModel = false
@@ -338,7 +345,7 @@ extension InputHandlerTests {
     let assembledNow = assembler.assembledSentence
       .map(\.value)
       .joined(separator: " ")
-    XCTAssertTrue(
+    #expect(
       ["再 創 是的", "再 創 世 的"].contains(assembledNow),
       "Unexpected baseline assembly: \(assembledNow)"
     )
@@ -348,7 +355,7 @@ extension InputHandlerTests {
       let assembledNow2 = assembler.assembledSentence
         .map(\.value)
         .joined(separator: " ")
-      XCTAssertTrue(
+      #expect(
         ["再 創 是的 凱歌", "再 創 世 的 凱歌"].contains(assembledNow2),
         "Unexpected baseline assembly: \(assembledNow2)"
       )
@@ -362,9 +369,9 @@ extension InputHandlerTests {
       cursor: cursorToTest,
       timestamp: Date().timeIntervalSince1970
     )
-    XCTAssertTrue(!suggestion.isEmpty)
+    #expect(!suggestion.isEmpty)
     guard let firstSuggestionRAW = suggestion.candidates.first else {
-      XCTFail("POM suggested nothing, or something wrong happen.")
+      Issue.record("POM suggested nothing, or something wrong happen.")
       return
     }
     print(firstSuggestionRAW)
@@ -391,22 +398,23 @@ extension InputHandlerTests {
     let assembledByPOM = assembler.assembledSentence
       .map(\.value)
       .joined(separator: " ")
-    XCTAssertEqual("再 創 世 的", assembledByPOM)
+    #expect("再 創 世 的" == assembledByPOM)
     // 追加真實場景測試。
     testHandler.clear()
     testHandler.prefs.fetchSuggestionsFromPerceptionOverrideModel = true
     typeSentence(readingKeys4Sentence.prefix(3).joined())
-    XCTAssertEqual("再創世", assembler.assembledSentence.map(\.value).joined())
+    #expect("再創世" == assembler.assembledSentence.map(\.value).joined())
     typeSentence(readingKeys4Sentence[3]) // 4th
-    XCTAssertEqual("再創世的", assembler.assembledSentence.map(\.value).joined())
+    #expect("再創世的" == assembler.assembledSentence.map(\.value).joined())
     typeSentence(readingKeys4Sentence[4 ... 5].joined()) // 5th ~ 6th
-    XCTAssertEqual("再創世的凱歌", assembler.assembledSentence.map(\.value).joined())
+    #expect("再創世的凱歌" == assembler.assembledSentence.map(\.value).joined())
   }
 
+  @Test
   func test_IH305_SaisoukiOnly() throws {
     // 備註：該測試用例不適合鏡照至 MainAssemblyTests。
     guard let testHandler, let testSession else {
-      XCTFail("testHandler and testSession at least one of them is nil.")
+      Issue.record("testHandler and testSession at least one of them is nil.")
       return
     }
     testHandler.prefs.enforceETenDOSCandidateSequence = false
@@ -430,13 +438,13 @@ extension InputHandlerTests {
     defer {
       testHandler.currentLM.clearTemporaryData(isFiltering: false)
     }
-    XCTAssert(testHandler.currentLM.hasUnigramsFor(keyArray: ["ㄗㄞˋ"]))
-    XCTAssert(testHandler.currentLM.hasUnigramsFor(keyArray: ["ㄎㄞˇ", "ㄍㄜ"]))
+    #expect(testHandler.currentLM.hasUnigramsFor(keyArray: ["ㄗㄞˋ"]))
+    #expect(testHandler.currentLM.hasUnigramsFor(keyArray: ["ㄎㄞˇ", "ㄍㄜ"]))
     // 測試用句「再創世的凱歌」。
     let readingKeys4Sentence = ["y94", "tj;4", "g4"]
     typeSentence(readingKeys4Sentence.joined())
-    let assembledBefore = assembler.assembledSentence.map(\.value).joined(separator: " ")
-    XCTAssertEqual("再 創 是", assembledBefore)
+    let assembledPriorToOverride = assembler.assembledSentence.map(\.value).joined(separator: " ")
+    #expect("再 創 是" == assembledPriorToOverride)
     // ====================
     let cursorShi = 2
     var obsCaptured: Megrez.PerceptionIntel?
@@ -447,14 +455,14 @@ extension InputHandlerTests {
     ) {
       obsCaptured = $0
     }
-    XCTAssertTrue(overrideSucceeded)
-    XCTAssertEqual(obsCaptured?.contextualizedGramKey, "(ㄗㄞˋ,再)&(ㄔㄨㄤˋ,創)&(ㄕˋ,世)")
+    #expect(overrideSucceeded)
+    #expect(obsCaptured?.contextualizedGramKey == "(ㄗㄞˋ,再)&(ㄔㄨㄤˋ,創)&(ㄕˋ,世)")
     guard let obsCaptured else {
       preconditionFailure("Should have a capture.")
     }
 
     let assembledAfter = assembler.assembledSentence.map(\.value).joined(separator: " ")
-    XCTAssertEqual("再 創 世", assembledAfter)
+    #expect("再 創 世" == assembledAfter)
     pom.memorizePerception(
       (obsCaptured.contextualizedGramKey, obsCaptured.candidate),
       timestamp: Date().timeIntervalSince1970
@@ -465,14 +473,14 @@ extension InputHandlerTests {
     guard let firstObservationKey else {
       preconditionFailure("POM memorized nothing, or something wrong happen.")
     }
-    XCTAssertEqual(firstObservationKey, obsCaptured.contextualizedGramKey)
+    #expect(firstObservationKey == obsCaptured.contextualizedGramKey)
 
     testHandler.clear()
     testHandler.prefs.fetchSuggestionsFromPerceptionOverrideModel = false
     typeSentence(readingKeys4Sentence.joined())
 
     let assembledNow = assembler.assembledSentence.map(\.value).joined(separator: " ")
-    XCTAssertEqual("再 創 是", assembledNow)
+    #expect("再 創 是" == assembledNow)
     testHandler.prefs.fetchSuggestionsFromPerceptionOverrideModel = true
 
     let cursorToTest = assembler.cursor
@@ -481,7 +489,7 @@ extension InputHandlerTests {
       cursor: cursorToTest,
       timestamp: Date().timeIntervalSince1970
     )
-    XCTAssertTrue(!suggestion.isEmpty)
+    #expect(!suggestion.isEmpty)
     guard let firstSuggestionRAW = suggestion.candidates.first else {
       preconditionFailure("POM suggested nothing, or something wrong happen.")
     }
@@ -507,16 +515,17 @@ extension InputHandlerTests {
     }
     testHandler.assemble()
     let assembledByPOM = assembler.assembledSentence.map(\.value).joined(separator: " ")
-    XCTAssertEqual("再 創 世", assembledByPOM)
+    #expect("再 創 世" == assembledByPOM)
     // 追加真實場景測試。此時 prefs.fetchSuggestionsFromPerceptionOverrideModel 是 true。
     testHandler.clear()
     typeSentence(readingKeys4Sentence.joined())
-    XCTAssertEqual("再 創 世", assembler.assembledSentence.map(\.value).joined(separator: " "))
+    #expect("再 創 世" == assembler.assembledSentence.map(\.value).joined(separator: " "))
   }
 
+  @Test
   func test_IH306_ConsolidationWhenCursorAtNodeEdge() throws {
     guard let testHandler, let testSession else {
-      XCTFail("testHandler and testSession at least one of them is nil.")
+      Issue.record("testHandler and testSession at least one of them is nil.")
       return
     }
 
@@ -526,67 +535,68 @@ extension InputHandlerTests {
     testHandler.prefs.useRearCursorMode = true
     testSession.resetInputHandler(forceComposerCleanup: true)
     typeSentence("xu.6u4")
-    XCTAssertEqual(testHandler.assembler.assembledSentence.map(\.value).joined(), "留意")
+    #expect(testHandler.assembler.assembledSentence.map(\.value).joined() == "留意")
     testHandler.assembler.cursor = testHandler.assembler.length
-    XCTAssertEqual(
-      testHandler.assembler.cursor,
-      testHandler.assembler.length,
+    #expect(
+      testHandler.assembler.cursor == testHandler.assembler.length,
       "cursor: \(testHandler.assembler.cursor), length: \(testHandler.assembler.length)"
     )
     // `actualNodeCursorPosition` 應指向最後一個節點索引
-    XCTAssertEqual(testHandler.actualNodeCursorPosition, max(testHandler.assembler.length - 1, 0))
+    #expect(testHandler.actualNodeCursorPosition == max(testHandler.assembler.length - 1, 0))
     // 直接產生候選狀態以避免 MockSession 的額外狀態變化
-    let indBeforeCandidateGeneration = testHandler.assembler.cursor
-    XCTAssertEqual(indBeforeCandidateGeneration, testHandler.assembler.length)
+    let cursorPriorToGeneratingCandidateState = testHandler.assembler.cursor
+    #expect(cursorPriorToGeneratingCandidateState == testHandler.assembler.length)
     let candidateState = testHandler.generateStateOfCandidates()
-    let cursorAfterCandidateGeneration = testHandler.assembler.cursor
+    let cursorAfterGeneratingCandidateState = testHandler.assembler.cursor
     // `generateStateOfCandidates` 可能會為了避免無效邊緣游標而移動游標；確認其結果為有效位置
-    XCTAssertFalse(
-      testHandler.isInvalidEdgeCursorSituation(),
-      "Cursor remains at invalid edge: \(cursorAfterCandidateGeneration)"
+    #expect(
+      !testHandler.isInvalidEdgeCursorSituation(),
+      "Cursor remains at invalid edge: \(cursorAfterGeneratingCandidateState)"
     )
     // 診斷：同時檢查 `endAt` 候選
     let rawCandidatesEnd = testHandler.assembler.fetchCandidates(filter: .endAt)
-    XCTAssertFalse(rawCandidatesEnd.isEmpty, "raw endAt candidates should not be empty")
-    XCTAssertFalse(
-      candidateState.candidates.isEmpty,
+    #expect(!rawCandidatesEnd.isEmpty, "raw endAt candidates should not be empty")
+    #expect(
+      !candidateState.candidates.isEmpty,
       "generated state candidates should not be empty"
     )
     // 現在將狀態套用到 session，並確認選字能正常運作
     testSession.switchState(candidateState)
     testSession.candidatePairSelectionConfirmed(at: 0)
     // 確認選字沒有崩潰且組字結果非空
-    XCTAssertFalse(testHandler.assembler.assembledSentence.map(\.value).joined().isEmpty)
+    #expect(!(testHandler.assembler.assembledSentence.map(\.value)).joined().isEmpty)
 
     // 情境 B：前置游標模式，游標位於前端邊緣
     testHandler.clear()
     testHandler.prefs.useRearCursorMode = false
     testSession.resetInputHandler(forceComposerCleanup: true)
     typeSentence("xu.6u4")
-    XCTAssertEqual(testHandler.assembler.assembledSentence.map(\.value).joined(), "留意")
+    #expect(testHandler.assembler.assembledSentence.map(\.value).joined() == "留意")
     testHandler.assembler.cursor = 0
-    XCTAssertEqual(testHandler.assembler.cursor, 0)
+    #expect(testHandler.assembler.cursor == 0)
     testSession.switchState(testHandler.generateStateOfCandidates())
     testSession.candidatePairSelectionConfirmed(at: 0)
-    XCTAssertFalse(testHandler.assembler.assembledSentence.map(\.value).joined().isEmpty)
+    #expect(!(testHandler.assembler.assembledSentence.map(\.value)).joined().isEmpty)
   }
 
+  @Test
   func test_IH307_POMShortToLongMarginBehavior() throws {
     guard let testHandler else {
-      XCTFail("testHandler and testSession at least one of them is nil.")
+      Issue.record("testHandler and testSession at least one of them is nil.")
       return
     }
     // 驗證 margin 行為：當建議只略微優於既有節點時，應該被跳過；當差距足夠大時，應允許套用。
-    XCTAssertFalse(testHandler.pomShortToLongAllowed(existingScore: -0.6, suggestedScore: -0.2))
-    XCTAssertTrue(testHandler.pomShortToLongAllowed(existingScore: -2.0, suggestedScore: -1.3))
+    #expect(!(testHandler.pomShortToLongAllowed(existingScore: -0.6, suggestedScore: -0.2)))
+    #expect(testHandler.pomShortToLongAllowed(existingScore: -2.0, suggestedScore: -1.3))
     // 邊界值：等於 margin 時應該被視為不足（採用 <= 判斷）
-    XCTAssertFalse(testHandler.pomShortToLongAllowed(existingScore: -1.0, suggestedScore: -0.5))
+    #expect(!(testHandler.pomShortToLongAllowed(existingScore: -1.0, suggestedScore: -0.5)))
   }
 
+  @Test
   func test_IH308_EndToEnd_PreventWrongFirstCandidate() throws {
     // 端對端回歸：確保單節 POM 建議在 margin 不足時不會縮短原始 multi-seg 的頭部（重現 wrong-first-candidate）。
     guard let testHandler, let testSession else {
-      XCTFail("testHandler and testSession at least one of them is nil.")
+      Issue.record("testHandler and testSession at least one of them is nil.")
       return
     }
     testHandler.prefs.fetchSuggestionsFromPerceptionOverrideModel = true
@@ -596,12 +606,12 @@ extension InputHandlerTests {
     // 使用已知的讀音，使其會產生 multi-seg 的頭部（例如「留意」）。
     let readingKeyChainStr = "xu.6u4"
     typeSentence(readingKeyChainStr)
-    XCTAssertEqual(testHandler.assembler.assembledSentence.map(\.value).joined(), "留意")
+    #expect(testHandler.assembler.assembledSentence.map(\.value).joined() == "留意")
 
     // 找出目前的 Gram 以及其分數
     guard let gramPair = testHandler.assembler.assembledSentence.findGram(at: testHandler.actualNodeCursorPosition)
     else {
-      XCTFail("Failed to locate current GramInPath")
+      Issue.record("Failed to locate current GramInPath")
       return
     }
     let existingScore = gramPair.gram.score
@@ -609,7 +619,7 @@ extension InputHandlerTests {
     // 找出 keyCursorRaw（gram 範圍的下界）
     guard let found = testHandler.assembler.assembledSentence
       .findGramWithRange(at: testHandler.actualNodeCursorPosition) else {
-      XCTFail("Failed to find gram range")
+      Issue.record("Failed to find gram range")
       return
     }
     let keyCursorRaw = found.range.lowerBound
@@ -628,7 +638,7 @@ extension InputHandlerTests {
 
     _ = testHandler.retrievePOMSuggestions(apply: true)
     // 因為 prepend/override 被拒，組句結果應維持不變
-    XCTAssertEqual(testHandler.assembler.assembledSentence.map(\.value).joined(), "留意")
+    #expect(testHandler.assembler.assembledSentence.map(\.value).joined() == "留意")
 
     // 情境 B：建議分數超過 margin → 應套用並縮短頭部
     var t = LMAssembly.OverrideSuggestion()
@@ -643,7 +653,7 @@ extension InputHandlerTests {
     // 先檢查建議是否出現在可附加候選清單
     testHandler.currentLM.lmPerceptionOverride.testInjectedSuggestion = t
     let appended = testHandler.retrievePOMSuggestions(apply: false)
-    XCTAssertTrue(appended.map { $0.1.value }.contains("SHORT"))
+    #expect(appended.map { $0.1.value }.contains("SHORT"))
     // 再次注入以測試 apply 路徑（fetchSuggestion 會清除注入的建議）
     testHandler.currentLM.lmPerceptionOverride.testInjectedSuggestion = t
     _ = testHandler.retrievePOMSuggestions(apply: true)
@@ -662,16 +672,17 @@ extension InputHandlerTests {
     )
     // 若組字器拒絕直接覆寫也可接受（有些 short->long 的替換無法由組字器表示）；否則應出現 SHORT 候選。
     if overrideSucceeded {
-      XCTAssertTrue(testHandler.assembler.assembledSentence.map(\.value).joined().contains("SHORT"))
+      #expect(testHandler.assembler.assembledSentence.map(\.value).joined().contains("SHORT"))
     } else {
-      XCTAssertEqual(testHandler.assembler.assembledSentence.map(\.value).joined(), "留意")
+      #expect(testHandler.assembler.assembledSentence.map(\.value).joined() == "留意")
     }
   }
 
+  @Test
   func test_IH309_PreviousContextException_EndToEnd() throws {
     // 端對端：確保帶有相符 previous 上下文的 POM 建議會出現在 appendables，且遵守 short->long 的 margin 規則。
     guard let testHandler, let testSession else {
-      XCTFail("testHandler and testSession at least one of them is nil.")
+      Issue.record("testHandler and testSession at least one of them is nil.")
       return
     }
     testHandler.prefs.fetchSuggestionsFromPerceptionOverrideModel = true
@@ -695,13 +706,13 @@ extension InputHandlerTests {
       }
     }
     guard let found = maybeFound else {
-      XCTFail("Failed to locate multi-seg GramInPath for previous-context test")
+      Issue.record("Failed to locate multi-seg GramInPath for previous-context test")
       return
     }
     let keyCursorRaw = found.range.lowerBound
     let existingScore = found.node.gram.score
     guard let prevValue = testHandler.assembler.assembledSentence.findGram(at: keyCursorRaw - 1)?.gram.value else {
-      XCTFail("Unable to determine previous value for test")
+      Issue.record("Unable to determine previous value for test")
       return
     }
 
@@ -720,7 +731,7 @@ extension InputHandlerTests {
     // apply 路徑應因 short->long margin 而跳過
     testHandler.currentLM.lmPerceptionOverride.testInjectedSuggestion = s
     _ = testHandler.retrievePOMSuggestions(apply: true)
-    XCTAssertTrue(testHandler.assembler.assembledSentence.map(\.value).joined().contains("是"))
+    #expect(testHandler.assembler.assembledSentence.map(\.value).joined().contains("是"))
 
     // 情境 B：margin 足夠 → 應套用（若組字器拒絕亦可，兩者皆接受）
     var t = LMAssembly.OverrideSuggestion()
@@ -734,7 +745,7 @@ extension InputHandlerTests {
     t.overrideCursor = keyCursorRaw
     testHandler.currentLM.lmPerceptionOverride.testInjectedSuggestion = t
     let appended2 = testHandler.retrievePOMSuggestions(apply: false)
-    XCTAssertTrue(appended2.map { $0.1.value }.contains("PREVSHORT"))
+    #expect(appended2.map { $0.1.value }.contains("PREVSHORT"))
     testHandler.currentLM.lmPerceptionOverride.testInjectedSuggestion = t
     _ = testHandler.retrievePOMSuggestions(apply: true)
 
@@ -750,17 +761,18 @@ extension InputHandlerTests {
       enforceRetokenization: true
     )
     if overrideSucceeded {
-      XCTAssertTrue(testHandler.assembler.assembledSentence.map(\.value).joined().contains("PREVSHORT"))
+      #expect(testHandler.assembler.assembledSentence.map(\.value).joined().contains("PREVSHORT"))
     } else {
       // 組字器拒絕直接覆寫；保留原始組句仍可接受
-      XCTAssertTrue(testHandler.assembler.assembledSentence.map(\.value).joined().contains("是"))
+      #expect(testHandler.assembler.assembledSentence.map(\.value).joined().contains("是"))
     }
   }
 
+  @Test
   func test_IH310_MultiSegCombination_EndToEnd() throws {
     // 端對端：確保拆分候選（previous+head）會被建議，且在 margin 允許時可套用。
     guard let testHandler, let testSession else {
-      XCTFail("testHandler and testSession at least one of them is nil.")
+      Issue.record("testHandler and testSession at least one of them is nil.")
       return
     }
     testHandler.prefs.fetchSuggestionsFromPerceptionOverrideModel = true
@@ -783,13 +795,13 @@ extension InputHandlerTests {
       }
     }
     guard let found = maybeFound2 else {
-      XCTFail("Failed to locate multi-seg GramInPath for multi-seg test")
+      Issue.record("Failed to locate multi-seg GramInPath for multi-seg test")
       return
     }
     let keyCursorRaw = found.range.lowerBound
     let existingScore = found.node.gram.score
     guard let prevValue = testHandler.assembler.assembledSentence.findGram(at: keyCursorRaw - 1)?.gram.value else {
-      XCTFail("Unable to determine previous value for test")
+      Issue.record("Unable to determine previous value for test")
       return
     }
 
@@ -806,7 +818,7 @@ extension InputHandlerTests {
     testHandler.currentLM.lmPerceptionOverride.testInjectedSuggestion = s
 
     let appended = testHandler.retrievePOMSuggestions(apply: false)
-    XCTAssertTrue(appended.map { $0.1.value }.contains("SPLITVAL"))
+    #expect(appended.map { $0.1.value }.contains("SPLITVAL"))
 
     // 套用路徑
     testHandler.currentLM.lmPerceptionOverride.testInjectedSuggestion = s
@@ -824,10 +836,10 @@ extension InputHandlerTests {
       enforceRetokenization: true
     )
     if overrideSucceeded {
-      XCTAssertTrue(testHandler.assembler.assembledSentence.map(\.value).joined().contains("SPLITVAL"))
+      #expect(testHandler.assembler.assembledSentence.map(\.value).joined().contains("SPLITVAL"))
     } else {
       // 後備：保留原始 multi-seg
-      XCTAssertTrue(testHandler.assembler.assembledSentence.map(\.value).joined().contains("是"))
+      #expect(testHandler.assembler.assembledSentence.map(\.value).joined().contains("是"))
     }
   }
 }
