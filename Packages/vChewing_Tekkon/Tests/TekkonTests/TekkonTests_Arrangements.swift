@@ -3,8 +3,9 @@
 // This code is released under the SPDX-License-Identifier: `LGPL-3.0-or-later`.
 
 import Foundation
+import Testing
+
 @testable import Tekkon
-import XCTest
 
 // MARK: - Something Else
 
@@ -67,11 +68,107 @@ final class SubTestCase: Sendable {
     print(strError)
     return false
   }
+
+  /// 優化版驗證函數，重複使用已建立的 composer 副本
+  func verify(using composer: inout Tekkon.Composer) -> Bool {
+    composer.clear()
+    composer.ensureParser(arrange: parser)
+    let strResult = composer.receiveSequence(typing)
+    guard strResult != expected else { return true }
+    let parserTag = composer.parser.nameTag
+    let strError =
+      "MISMATCH (\(parserTag)): \"\(typing)\" -> \"\(strResult)\" != \"\(expected)\""
+    print(strError)
+    return false
+  }
+}
+
+// MARK: - TestCaseBatch
+
+/// 批量測試案例處理器，用於減少記憶體分配
+actor TestCaseBatch {
+  // MARK: Lifecycle
+
+  init(parser: Tekkon.MandarinParser, rawData: String) {
+    self.parser = parser
+    var cases: [(String, String)] = []
+    var isTitleLine = true
+    let parserIndex = Self.getParserIndex(parser)
+
+    rawData.parse(splitee: "\n") { theRange in
+      guard !isTitleLine else {
+        isTitleLine = false
+        return
+      }
+      let cells = rawData[theRange].split(separator: " ")
+      guard cells.count > parserIndex else { return }
+      let expected = cells[0].replacingOccurrences(of: "_", with: " ")
+      let typing = cells[parserIndex].description.replacingOccurrences(of: "_", with: " ")
+      guard typing.first != "`" else { return }
+      cases.append((typing: typing, expected: expected))
+    }
+    self.testData = cases
+  }
+
+  // MARK: Internal
+
+  let parser: Tekkon.MandarinParser
+  let testData: [(typing: String, expected: String)]
+
+  func runTests() async -> Int {
+    let indices = testData.indices
+    let chunkSize = 350
+    let failedCount = await withTaskGroup(of: Int.self, returning: Int.self) { group in
+      var failures = 0
+      for chunkStartPoint in stride(from: 0, to: indices.upperBound, by: chunkSize) {
+        let subIndiceMax = Swift.min(indices.upperBound, chunkStartPoint + chunkSize)
+        let subIndices = chunkStartPoint ..< subIndiceMax
+        for i in subIndices {
+          group.addTask {
+            var subFailures = 0
+            var composer = Tekkon.Composer(arrange: self.parser)
+            let strResult = composer.receiveSequence(self.testData[i].typing)
+            if strResult != self.testData[i].expected {
+              let parserTag = composer.parser.nameTag
+              let typingStr = self.testData[i].typing
+              let expectedStr = self.testData[i].expected
+              let strError =
+                "MISMATCH (\(parserTag)): \"\(typingStr)\" -> \"\(strResult)\" != \"\(expectedStr)\""
+              print(strError)
+              subFailures += 1
+            }
+            return subFailures
+          }
+        }
+        for await subFailures in group {
+          // Set operation name as key and operation result as value
+          failures += subFailures
+        }
+      }
+      return failures
+    }
+    return failedCount
+  }
+
+  // MARK: Private
+
+  private static func getParserIndex(_ parser: Tekkon.MandarinParser) -> Int {
+    switch parser {
+    case .ofDachen26: return 1
+    case .ofETen26: return 2
+    case .ofHsu: return 3
+    case .ofStarlight: return 4
+    case .ofAlvinLiu: return 5
+    default: return 1
+    }
+  }
 }
 
 // MARK: - TekkonTestsKeyboardArrangmentsStatic
 
-final class TekkonTestsKeyboardArrangmentsStatic: XCTestCase {
+@MainActor
+@Suite(.serialized)
+struct TekkonTestsKeyboardArrangmentsStatic {
   static func checkEq(
     _ counter: inout Int,
     _ composer: inout Tekkon.Composer,
@@ -87,7 +184,8 @@ final class TekkonTestsKeyboardArrangmentsStatic: XCTestCase {
     counter += 1
   }
 
-  func testQwertyDachenKeys() {
+  @Test("[Tekkon] StaticKeyLayout_Dachen")
+  func testQwertyDachenKeys() async throws {
     // Testing Dachen Traditional Mapping (QWERTY)
     var c = Tekkon.Composer(arrange: .ofDachen)
     var counter = 0
@@ -106,51 +204,44 @@ final class TekkonTestsKeyboardArrangmentsStatic: XCTestCase {
     Self.checkEq(&counter, &c, "hl3", "ㄘㄠˇ")
     Self.checkEq(&counter, &c, "5 ", "ㄓ ")
     Self.checkEq(&counter, &c, "193", "ㄅㄞˇ")
-    XCTAssertEqual(counter, 0)
+    #expect(counter == 0)
   }
 }
 
 // MARK: - TekkonTestsKeyboardArrangmentsDynamic
 
-final class TekkonTestsKeyboardArrangmentsDynamic: XCTestCase {
+@MainActor
+@Suite(.serialized)
+struct TekkonTestsKeyboardArrangmentsDynamic {
   typealias Parser = Tekkon.MandarinParser
 
-  func testDynamicKeyLayouts() {
-    // 遍歷所有動態鍵盤配置
-    for (idxRaw, parser) in Parser.allCases.filter(\.isDynamic).enumerated() {
-      var cases = [SubTestCase?]()
-      print(" -> [Tekkon] Preparing tests for dynamic keyboard handling...")
-      var isTitleLine = true
-      testTable4DynamicLayouts.parse(splitee: "\n") { theRange in
-        guard !isTitleLine else {
-          isTitleLine = false
-          return
-        }
-        let cells = testTable4DynamicLayouts[theRange].split(separator: " ")
-        let expected = cells[0]
-        let idx = idxRaw + 1
-        let typing = cells[idx]
-        let newTestCase = SubTestCase(
-          parser: parser,
-          typing: typing.description,
-          expected: expected.description
-        )
-        cases.append(newTestCase)
-      }
-      let timeTag = Date.now
-      print(" -> [Tekkon][(\(parser.nameTag))] Starting dynamic keyboard handling test ...")
-      let results = cases.compactMap { testCase in
-        (testCase?.verify() ?? true) ? 0 : 1
-      }.reduce(0, +)
-      XCTAssertEqual(
-        results, 0,
-        "[Failure] \(parser.nameTag) failed from being handled correctly with \(results) bad results."
-      )
-      let timeDelta = Date.now.timeIntervalSince1970 - timeTag.timeIntervalSince1970
-      let timeDeltaStr = String(format: "%.4f", timeDelta)
-      print(
-        " -> [Tekkon][(\(parser.nameTag))] Finished within \(timeDeltaStr) seconds."
-      )
-    }
+  @Test(
+    "[Tekkon] DynamicKeyLayouts",
+    arguments: Array(Parser.allCases.filter(\.isDynamic).enumerated())
+  )
+  func testDynamicKeyLayouts(
+    _ parserEnumerated: EnumeratedSequence<[Parser]>
+      .Element
+  ) async throws {
+    let parser = parserEnumerated.element
+    print(" -> [Tekkon] Preparing tests for dynamic keyboard handling...")
+
+    // 使用批量處理器以提升效能
+    let testBatch = TestCaseBatch(parser: parser, rawData: testTable4DynamicLayouts)
+
+    let timeTag = Date.now
+    print(" -> [Tekkon][(\(parser.nameTag))] Starting dynamic keyboard handling test ...")
+
+    let failures = await testBatch.runTests()
+
+    #expect(
+      failures == 0,
+      "[Failure] \(parser.nameTag) failed from being handled correctly with \(failures) bad results."
+    )
+    let timeDelta = Date.now.timeIntervalSince1970 - timeTag.timeIntervalSince1970
+    let timeDeltaStr = String(format: "%.4f", timeDelta)
+    print(
+      " -> [Tekkon][(\(parser.nameTag))] Finished within \(timeDeltaStr) seconds."
+    )
   }
 }
