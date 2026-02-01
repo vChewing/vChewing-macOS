@@ -8,7 +8,7 @@
 // requirements defined in MIT License.
 
 import Foundation
-import XCTest
+import Testing
 
 @testable import LangModelAssembly
 
@@ -38,7 +38,9 @@ private let sampleData: String = #"""
 
 // MARK: - LMCoreEXTests
 
-final class LMCoreEXTests: XCTestCase {
+@Suite(.serialized)
+struct LMCoreEXTests {
+  @Test
   func testLMCoreEXAsFactoryCoreDict() throws {
     var lmTest = LMAssembly.LMCoreEX(
       reverse: false,
@@ -47,12 +49,12 @@ final class LMCoreEXTests: XCTestCase {
       forceDefaultScore: false
     )
     lmTest.replaceData(textData: sampleData)
-    XCTAssertEqual(lmTest.count, 3)
+    #expect(lmTest.count == 3)
     let gao1 = lmTest.unigramsFor(key: "ㄍㄠ").map(\.value)
     let ke1 = lmTest.unigramsFor(key: "ㄎㄜ").map(\.value)
     let si1 = lmTest.unigramsFor(key: "ㄙ").map(\.value)
-    XCTAssertEqual(gao1, ["篙", "糕", "膏", "高"])
-    XCTAssertEqual(ke1, ["刻", "柯", "棵", "科", "顆"])
-    XCTAssertEqual(si1, ["司", "嘶", "思", "撕", "斯", "絲", "私"])
+    #expect(gao1 == ["篙", "糕", "膏", "高"])
+    #expect(ke1 == ["刻", "柯", "棵", "科", "顆"])
+    #expect(si1 == ["司", "嘶", "思", "撕", "斯", "絲", "私"])
   }
 }

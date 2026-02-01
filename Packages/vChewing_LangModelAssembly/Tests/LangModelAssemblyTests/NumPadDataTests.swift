@@ -7,30 +7,26 @@
 // requirements defined in MIT License.
 
 import Foundation
-import XCTest
+import Testing
 
 @testable import LangModelAssembly
 
-final class LMInstantiatorNumericPadTests: XCTestCase {
+@Suite(.serialized)
+struct LMInstantiatorNumericPadTests {
+  @Test
   func testNumPad() throws {
     let instance = LMAssembly.LMInstantiator(isCHS: true)
     instance.setOptions { config in
       config.numPadFWHWStatus = nil
     }
-    XCTAssertEqual(instance.unigramsFor(keyArray: ["_NumPad_0"]).description, "[]")
+    #expect(instance.unigramsFor(keyArray: ["_NumPad_0"]).description == "[]")
     instance.setOptions { config in
       config.numPadFWHWStatus = true
     }
-    XCTAssertEqual(
-      instance.unigramsFor(keyArray: ["_NumPad_0"]).description,
-      "[(_NumPad_0,０,0.0), (_NumPad_0,0,-0.1)]"
-    )
+    #expect(instance.unigramsFor(keyArray: ["_NumPad_0"]).description == "[(_NumPad_0,０,0.0), (_NumPad_0,0,-0.1)]")
     instance.setOptions { config in
       config.numPadFWHWStatus = false
     }
-    XCTAssertEqual(
-      instance.unigramsFor(keyArray: ["_NumPad_0"]).description,
-      "[(_NumPad_0,0,0.0), (_NumPad_0,０,-0.1)]"
-    )
+    #expect(instance.unigramsFor(keyArray: ["_NumPad_0"]).description == "[(_NumPad_0,0,0.0), (_NumPad_0,０,-0.1)]")
   }
 }

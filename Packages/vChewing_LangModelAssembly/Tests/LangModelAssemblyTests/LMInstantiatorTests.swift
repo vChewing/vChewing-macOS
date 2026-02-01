@@ -2,46 +2,55 @@
 // ====================
 // This code is released under the MIT license (SPDX-License-Identifier: MIT)
 
-import XCTest
+import Testing
 
 @testable import LangModelAssembly
 import LMAssemblyMaterials4Tests
 
-final class LMInstantiatorTests: XCTestCase {
-  override func tearDown() {
-    LMAssembly.LMInstantiator.disconnectSQLDB()
-  }
-
+@Suite(.serialized)
+struct LMInstantiatorTests {
+  @Test
   func testReplaceDataSavesToCorrectStore() {
+    defer {
+      LMAssembly.LMInstantiator.disconnectSQLDB()
+    }
     let lmi = LMAssembly.LMInstantiator()
     let sample = "foo bar\n"
 
     lmi.replaceData(textData: sample, for: .thePhrases, save: true)
-    XCTAssertTrue(lmi.retrieveData(from: .thePhrases).contains("foo bar"))
+    #expect(lmi.retrieveData(from: .thePhrases).contains("foo bar"))
 
     lmi.replaceData(textData: sample, for: .theFilter, save: true)
-    XCTAssertTrue(lmi.retrieveData(from: .theFilter).contains("foo bar"))
+    #expect(lmi.retrieveData(from: .theFilter).contains("foo bar"))
 
     lmi.replaceData(textData: sample, for: .theReplacements, save: true)
-    XCTAssertTrue(lmi.retrieveData(from: .theReplacements).contains("foo bar"))
+    #expect(lmi.retrieveData(from: .theReplacements).contains("foo bar"))
 
     lmi.replaceData(textData: sample, for: .theAssociates, save: true)
-    XCTAssertTrue(lmi.retrieveData(from: .theAssociates).contains("foo bar"))
+    #expect(lmi.retrieveData(from: .theAssociates).contains("foo bar"))
 
     lmi.replaceData(textData: sample, for: .theSymbols, save: true)
-    XCTAssertTrue(lmi.retrieveData(from: .theSymbols).contains("foo bar"))
+    #expect(lmi.retrieveData(from: .theSymbols).contains("foo bar"))
   }
 
+  @Test
   func testCleanupInputTokenHashMapRemovesToTargetSize() {
+    defer {
+      LMAssembly.LMInstantiator.disconnectSQLDB()
+    }
     let instance = LMAssembly.LMInstantiator()
     // Create 3500 dummy hashes
     instance.inputTokenHashesArray = ContiguousArray((0 ..< 3_500).map { $0 })
     // Trigger cleanup via a simple unigram query
     _ = instance.unigramsFor(keyArray: ["ㄎㄜ"])
-    XCTAssertEqual(instance.inputTokenHashesArray.count, 1_000)
+    #expect(instance.inputTokenHashesArray.count == 1_000)
   }
 
+  @Test
   func testQueryUserAddedKanjiByAPI() throws {
+    defer {
+      LMAssembly.LMInstantiator.disconnectSQLDB()
+    }
     let instance = LMAssembly.LMInstantiator()
     LMAssembly.LMInstantiator.connectToTestSQLDB(LMATestsData.sqlTestCoreLMData)
     let testSingleCharUnigramSymbol = "・"
@@ -60,7 +69,7 @@ final class LMInstantiatorTests: XCTestCase {
         keyArray: testReadingArray,
         omitNonTemporarySingleCharNonSymbolUnigrams: false
       ).map(\.value)
-      XCTAssert(subQueried1.contains(testSingleCharUnigramSymbol))
+      #expect(subQueried1.contains(testSingleCharUnigramSymbol))
     }
     do {
       let subQueried2 = instance.lmUserPhrases.unigramsFor(
@@ -68,16 +77,20 @@ final class LMInstantiatorTests: XCTestCase {
         keyArray: testReadingArray,
         omitNonTemporarySingleCharNonSymbolUnigrams: true
       ).map(\.value)
-      XCTAssert(subQueried2.contains(testSingleCharUnigramSymbol))
+      #expect(subQueried2.contains(testSingleCharUnigramSymbol))
     }
     do {
       let queried = instance.unigramsFor(keyArray: testReadingArray)
       let queriedValues = queried.map(\.value)
-      XCTAssert(queriedValues.contains(testSingleCharUnigramSymbol))
+      #expect(queriedValues.contains(testSingleCharUnigramSymbol))
     }
   }
 
+  @Test
   func testQueryUserAddedKanjiByRawString() throws {
+    defer {
+      LMAssembly.LMInstantiator.disconnectSQLDB()
+    }
     let instance = LMAssembly.LMInstantiator()
     LMAssembly.LMInstantiator.connectToTestSQLDB(LMATestsData.sqlTestCoreLMData)
     let testSingleCharUnigramSymbol = "・"
@@ -92,7 +105,7 @@ final class LMInstantiatorTests: XCTestCase {
         keyArray: testReadingArray,
         omitNonTemporarySingleCharNonSymbolUnigrams: false
       ).map(\.value)
-      XCTAssert(subQueried1.contains(testSingleCharUnigramSymbol))
+      #expect(subQueried1.contains(testSingleCharUnigramSymbol))
     }
     do {
       let subQueried2 = instance.lmUserPhrases.unigramsFor(
@@ -100,12 +113,37 @@ final class LMInstantiatorTests: XCTestCase {
         keyArray: testReadingArray,
         omitNonTemporarySingleCharNonSymbolUnigrams: true
       ).map(\.value)
-      XCTAssert(subQueried2.contains(testSingleCharUnigramSymbol))
+      #expect(subQueried2.contains(testSingleCharUnigramSymbol))
     }
     do {
       let queried = instance.unigramsFor(keyArray: testReadingArray)
       let queriedValues = queried.map(\.value)
-      XCTAssert(queriedValues.contains(testSingleCharUnigramSymbol))
+      #expect(queriedValues.contains(testSingleCharUnigramSymbol))
     }
+  }
+
+  @Test
+  func testLMPlainBPMFDataQuery() throws {
+    defer {
+      LMAssembly.LMInstantiator.disconnectSQLDB()
+    }
+    let instance1 = LMAssembly.LMInstantiator(isCHS: false).setOptions { config in
+      config.isSCPCEnabled = true
+    }
+    var liu2 = instance1.unigramsFor(keyArray: ["ㄌㄧㄡˊ"]).map(\.value).prefix(3)
+    var bao3 = instance1.unigramsFor(keyArray: ["ㄅㄠˇ"]).map(\.value).prefix(3)
+    var jie2 = instance1.unigramsFor(keyArray: ["ㄐㄧㄝˊ"]).map(\.value).prefix(3)
+    #expect(liu2 == ["劉", "流", "留"])
+    #expect(bao3 == ["保", "寶", "飽"])
+    #expect(jie2 == ["節", "潔", "傑"])
+    let instance2 = LMAssembly.LMInstantiator(isCHS: true).setOptions { config in
+      config.isSCPCEnabled = true
+    }
+    liu2 = instance2.unigramsFor(keyArray: ["ㄌㄧㄡˊ"]).map(\.value).prefix(3)
+    bao3 = instance2.unigramsFor(keyArray: ["ㄅㄠˇ"]).map(\.value).prefix(3)
+    jie2 = instance2.unigramsFor(keyArray: ["ㄐㄧㄝˊ"]).map(\.value).prefix(3)
+    #expect(liu2 == ["刘", "流", "留"])
+    #expect(bao3 == ["保", "宝", "饱"])
+    #expect(jie2 == ["节", "洁", "杰"])
   }
 }
