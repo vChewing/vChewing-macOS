@@ -17,7 +17,7 @@ let package = Package(
     ),
     .testTarget(
       name: "TekkonTests",
-      dependencies: ["Tekkon"]
+      dependencies: ["Tekkon"],
     ),
   ]
 )
