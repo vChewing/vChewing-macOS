@@ -24,7 +24,7 @@
  */
 
 import Foundation
-import XCTest
+import Testing
 
 @testable import Hotenka
 
@@ -37,7 +37,9 @@ private let testDataPath: String = packageRootPath + "/Tests/TestDictData/"
 
 // MARK: - HotenkaTests
 
-final class HotenkaTests: XCTestCase {
+@Suite("Hotenka")
+final class HotenkaTests {
+  @Test
   func testGeneratingPlist() throws {
     Hotenka.consoleLog("// Start loading from: \(packageRootPath)")
     let testInstance: HotenkaChineseConverter = .init(dictDir: testDataPath)
@@ -55,6 +57,7 @@ final class HotenkaTests: XCTestCase {
     }
   }
 
+  @Test
   func testSampleWithPlist() throws {
     Hotenka.consoleLog("// Start loading plist from: \(packageRootPath)")
     let testInstance2: HotenkaChineseConverter = .init(plistDir: testDataPath + "convdict.plist")
@@ -65,8 +68,8 @@ final class HotenkaTests: XCTestCase {
     let result2 = testInstance2.convert(result1, to: .zhHantKX)
     let result3 = testInstance2.convert(result2, to: .zhHansJP)
     Hotenka.consoleLog("// Results: \(result1) \(result2) \(result3)")
-    XCTAssertEqual(result1, "為中華崛起而讀書")
-    XCTAssertEqual(result2, "爲中華崛起而讀書")
-    XCTAssertEqual(result3, "為中華崛起而読書")
+    #expect(result1 == "為中華崛起而讀書")
+    #expect(result2 == "爲中華崛起而讀書")
+    #expect(result3 == "為中華崛起而読書")
   }
 }

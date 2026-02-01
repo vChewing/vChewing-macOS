@@ -24,7 +24,7 @@
  */
 
 import Foundation
-import XCTest
+import Testing
 
 @testable import Hotenka
 
@@ -36,6 +36,7 @@ private let packageRootPath = URL(fileURLWithPath: #file).pathComponents
 private let testDataPath: String = packageRootPath + "/Tests/TestDictData/"
 
 extension HotenkaTests {
+  @Test
   func testGeneratingJSON() throws {
     Hotenka.consoleLog("// Start loading from: \(packageRootPath)")
     let testInstance: HotenkaChineseConverter = .init(dictDir: testDataPath)
@@ -50,6 +51,7 @@ extension HotenkaTests {
     }
   }
 
+  @Test
   func testSampleWithJSON() throws {
     Hotenka.consoleLog("// Start loading json from: \(packageRootPath)")
     let testInstance2: HotenkaChineseConverter = .init(jsonDir: testDataPath + "convdict.json")
@@ -60,8 +62,8 @@ extension HotenkaTests {
     let result2 = testInstance2.convert(result1, to: .zhHantKX)
     let result3 = testInstance2.convert(result2, to: .zhHansJP)
     Hotenka.consoleLog("// Results: \(result1) \(result2) \(result3)")
-    XCTAssertEqual(result1, "為中華崛起而讀書")
-    XCTAssertEqual(result2, "爲中華崛起而讀書")
-    XCTAssertEqual(result3, "為中華崛起而読書")
+    #expect(result1 == "為中華崛起而讀書")
+    #expect(result2 == "爲中華崛起而讀書")
+    #expect(result3 == "為中華崛起而読書")
   }
 }
