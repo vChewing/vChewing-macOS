@@ -7,7 +7,10 @@
     ".swiftpm": true,
     "**/.build": true,
     "**/.swiftpm": true,
-    "sqlite3.h": true
+    "sqlite3.h": true,
+    "sqlite3.c": true,
+    "DictionaryData/CSQLite3": true,
+    "Packages/CSQLite3": true
   },
   "search.exclude": {
     "Build": true,
@@ -15,6 +18,9 @@
     ".swiftpm": true,
     "**/.build": true,
     "**/.swiftpm": true,
-    "sqlite3.h": true
+    "sqlite3.h": true,
+    "sqlite3.c": true,
+    "DictionaryData/CSQLite3": true,
+    "Packages/CSQLite3": true
   }
 }
