@@ -66,7 +66,9 @@ extension LMAssembly {
         defer { writeFile.closeFile() }
         /// 注意：Swift 版 LMConsolidator 並未在此安排對 EOF 的去重複工序。
         /// 但這個函式執行完之後往往就會 consolidate() 整理格式，所以不會有差。
-        writeFile.seek(toFileOffset: fileSize - 1)
+        if fileSize >= 1 {
+          writeFile.seek(toFileOffset: fileSize - 1)
+        }
         if writeFile.readDataToEndOfFile().first != 0x0A {
           vCLMLog("EOF Missing Confirmed, Start Fixing.")
           var newData = Data()
