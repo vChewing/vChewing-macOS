@@ -13,7 +13,7 @@ let package = Package(
     ),
   ],
   dependencies: [
-    .package(path: "../CSQLite3"),
+    .package(path: "../CSQLite3Lib"),
   ],
   targets: [
     // Targets are the basic building blocks of a package, defining a module or a test suite.
@@ -21,7 +21,7 @@ let package = Package(
     .target(
       name: "KeyKeyUserDBKit",
       dependencies: [
-        .product(name: "CSQLite3", package: "CSQLite3"),
+        .product(name: "CSQLite3Lib", package: "CSQLite3Lib"),
       ]
     ),
     .target(

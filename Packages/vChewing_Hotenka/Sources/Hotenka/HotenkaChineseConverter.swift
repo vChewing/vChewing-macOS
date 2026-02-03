@@ -23,7 +23,7 @@
  CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-import CSQLite3
+import CSQLite3Lib
 import Foundation
 
 #if canImport(Musl)

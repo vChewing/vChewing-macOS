@@ -14,7 +14,7 @@ let package = Package(
     ),
   ],
   dependencies: [
-    .package(path: "../CSQLite3"),
+    .package(path: "../CSQLite3Lib"),
     .package(path: "../RMJay_LineReader"),
     .package(path: "../vChewing_Megrez"),
     .package(path: "../vChewing_Shared"),
@@ -31,7 +31,7 @@ let package = Package(
       name: "LangModelAssembly",
       dependencies: [
         "LMAssemblyMaterials4Tests",
-        .product(name: "CSQLite3", package: "CSQLite3"),
+        .product(name: "CSQLite3Lib", package: "CSQLite3Lib"),
         .product(name: "LineReader", package: "RMJay_LineReader"),
         .product(name: "Megrez", package: "vChewing_Megrez"),
         .product(name: "Shared", package: "vChewing_Shared"),

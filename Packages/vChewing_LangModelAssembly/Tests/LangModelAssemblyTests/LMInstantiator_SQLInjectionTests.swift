@@ -6,7 +6,7 @@
 // marks, or product names of Contributor, except as required to fulfill notice
 // requirements defined in MIT License.
 
-import CSQLite3
+import CSQLite3Lib
 import Foundation
 import LMAssemblyMaterials4Tests
 import XCTest
