@@ -16,14 +16,14 @@ import Foundation
   import OSLog
 #endif
 
-public func vCLog(forced: Bool = false, _ strPrint: StringLiteralType) {
+nonisolated public func vCLog(forced: Bool = false, _ strPrint: StringLiteralType) {
   guard forced || UserDefaults.current.bool(forKey: "_DebugMode") else { return }
   Process.consoleLog("vChewingDebug: \(strPrint)")
 }
 
 // MARK: - TooltipColorState
 
-public enum TooltipColorState {
+nonisolated public enum TooltipColorState {
   case normal
   case information
   case redAlert
@@ -37,7 +37,7 @@ public enum TooltipColorState {
 // MARK: - StateType
 
 /// 用以讓每個狀態自描述的 enum。
-public enum StateType: String {
+nonisolated public enum StateType: String {
   /// **失活狀態 .ofDeactivated**: 使用者沒在使用輸入法、或者使用者已經切換到另一個客體應用來敲字。
   case ofDeactivated = "Deactivated"
   /// **空狀態 .ofEmpty**: 使用者剛剛切換至該輸入法、卻還沒有任何輸入行為。
@@ -68,7 +68,7 @@ public enum StateType: String {
 
 // MARK: - KeyboardParser
 
-public enum KeyboardParser: Int, CaseIterable {
+nonisolated public enum KeyboardParser: Int, CaseIterable {
   case ofStandard = 0
   case ofETen = 1
   case ofIBM = 4
@@ -156,9 +156,9 @@ public enum KeyboardParser: Int, CaseIterable {
 
 // MARK: - CandidateKey
 
-public enum CandidateKey {
+nonisolated public enum CandidateKey {
   /// 僅列舉那些需要專門檢查才能發現的那種無法自動排除的錯誤。
-  public enum ValidationError {
+  nonisolated public enum ValidationError {
     case noError
     case invalidCharacters
     case countMismatch
@@ -224,9 +224,9 @@ public enum CandidateKey {
 
 // MARK: - Shared
 
-public enum Shared {
+nonisolated public enum Shared {
   // The type of input modes.
-  public enum InputMode: String, CaseIterable, Identifiable {
+  nonisolated public enum InputMode: String, CaseIterable, Identifiable {
     case imeModeCHS = "org.atelierInmu.inputmethod.vChewing.IMECHS"
     case imeModeCHT = "org.atelierInmu.inputmethod.vChewing.IMECHT"
     case imeModeNULL = ""

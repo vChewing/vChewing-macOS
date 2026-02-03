@@ -1,4 +1,4 @@
-// swift-tools-version: 5.7
+// swift-tools-version: 6.2
 import PackageDescription
 
 let package = Package(
@@ -25,6 +25,9 @@ let package = Package(
       name: "LMAssemblyMaterials4Tests",
       resources: [
         .process("Resources/vanguardLegacy_test.sql"),
+      ],
+      swiftSettings: [
+        .defaultIsolation(MainActor.self), // set Default Actor Isolation
       ]
     ),
     .target(
@@ -37,11 +40,19 @@ let package = Package(
         .product(name: "Shared", package: "vChewing_Shared"),
         .product(name: "MegrezTestComponents", package: "vChewing_Megrez"),
         .product(name: "SwiftExtension", package: "vChewing_SwiftExtension"),
+      ],
+      swiftSettings: [
+        .defaultIsolation(MainActor.self), // set Default Actor Isolation
       ]
     ),
     .testTarget(
       name: "LangModelAssemblyTests",
-      dependencies: ["LangModelAssembly"]
+      dependencies: [
+        "LangModelAssembly",
+      ],
+      swiftSettings: [
+        .defaultIsolation(MainActor.self), // set Default Actor Isolation
+      ]
     ),
   ]
 )

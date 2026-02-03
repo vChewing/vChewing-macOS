@@ -1,4 +1,4 @@
-// swift-tools-version: 5.7
+// swift-tools-version: 6.2
 import PackageDescription
 
 let package = Package(
@@ -17,11 +17,17 @@ let package = Package(
       name: "Shared",
       dependencies: [
         .product(name: "SwiftExtension", package: "vChewing_SwiftExtension"),
+      ],
+      swiftSettings: [
+        .defaultIsolation(MainActor.self), // set Default Actor Isolation
       ]
     ),
     .testTarget(
       name: "SharedTests",
-      dependencies: ["Shared"]
+      dependencies: ["Shared"],
+      swiftSettings: [
+        .defaultIsolation(MainActor.self), // set Default Actor Isolation
+      ]
     ),
   ]
 )

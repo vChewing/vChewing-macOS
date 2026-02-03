@@ -146,6 +146,11 @@ extension CGRect {
     result.size = .init(width: 0.114, height: 0.514)
     return result
   }()
+
+  public static let zeroValue = CGRect(
+    origin: .init(x: 0, y: 0),
+    size: .init(width: 0, height: 0)
+  )
 }
 
 // MARK: - String.i18n extension
@@ -185,7 +190,7 @@ extension String {
 #endif
 
 extension String {
-  public var errorDescription: String? {
+  nonisolated public var errorDescription: String? {
     self
   }
 }
@@ -205,14 +210,26 @@ extension UInt16 {
 // MARK: - User Defaults Storage
 
 extension UserDefaults {
-  // 內部標記，看輸入法是否處於測試模式。
-  public static var pendingUnitTests = false
+  public static var pendingUnitTests: Bool {
+    get { _pendingUnitTests.value }
+    set { _pendingUnitTests.value = newValue }
+  }
 
-  public static var unitTests = UserDefaults(suiteName: "UnitTests")
+  public static var unitTests: UserDefaults? {
+    get { _unitTests.value }
+    set { _unitTests.value = newValue }
+  }
 
   public static var current: UserDefaults {
-    pendingUnitTests ? .unitTests ?? .standard : .standard
+    pendingUnitTests ? (unitTests ?? .standard) : .standard
   }
+
+  // MARK: - Private
+
+  nonisolated(unsafe) private static var _pendingUnitTests = NSMutex(false)
+  nonisolated(unsafe) private static var _unitTests: NSMutex<UserDefaults?> = .init(
+    UserDefaults(suiteName: "UnitTests")
+  )
 }
 
 // MARK: - AppProperty
@@ -314,7 +331,7 @@ extension String {
 
 public func asyncOnMain(
   bypassAsync: Bool = false,
-  execute work: @escaping @convention(block) () -> ()
+  execute work: @MainActor @escaping @Sendable @convention(block) () -> ()
 ) {
   guard !bypassAsync else {
     work()
@@ -332,7 +349,7 @@ public func asyncOnMain(
 public func asyncOnMain(
   after delayInterval: TimeInterval,
   bypassAsync: Bool = false,
-  execute work: @escaping @convention(block) () -> ()
+  execute work: @MainActor @escaping @Sendable @convention(block) () -> ()
 ) {
   guard !bypassAsync else {
     work()
@@ -352,6 +369,14 @@ public func asyncOnMain(
       work()
     }
   }
+}
+
+@discardableResult
+public func mainSync<T>(execute work: @MainActor () throws -> T) rethrows -> T {
+  if Thread.isMainThread {
+    return try work()
+  }
+  return try DispatchQueue.main.sync(execute: work)
 }
 
 // MARK: - Total RAM Size.
@@ -384,7 +409,7 @@ extension Process {
 
 // MARK: - Debouncer
 
-public final class Debouncer {
+nonisolated public final class Debouncer {
   // MARK: Lifecycle
 
   public init(delay: TimeInterval, queue: DispatchQueue) {
@@ -518,7 +543,7 @@ public enum CRC32 {
 
 /// 一個簡單的顏色結構體，用於跨平台（包括 Linux）承載 HSBA 顏色值。
 /// 每個分量均為 Double 類型，範圍 0.0 ~ 1.0。
-public struct HSBA {
+nonisolated public struct HSBA: Sendable {
   // MARK: Lifecycle
 
   /// 初始化 HSBA 顏色。

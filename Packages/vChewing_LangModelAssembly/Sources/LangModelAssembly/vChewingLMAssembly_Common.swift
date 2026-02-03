@@ -12,10 +12,10 @@ import SwiftExtension
 
 // MARK: - LMAssembly
 
-public enum LMAssembly {
+nonisolated public enum LMAssembly {
   // MARK: Public
 
-  public enum ReplacableUserDataType: String, CaseIterable, Identifiable {
+  nonisolated public enum ReplacableUserDataType: String, CaseIterable, Identifiable {
     case thePhrases
     case theFilter
     case theReplacements
@@ -29,7 +29,7 @@ public enum LMAssembly {
     public var localizedDescription: String { rawValue.i18n }
   }
 
-  public static let fileHandleQueue: DispatchQueue = {
+  nonisolated public static let fileHandleQueue: DispatchQueue = {
     let queue = DispatchQueue(
       label: "org.vChewing.LMMgr.unitedUserFileIOQueue"
     )
@@ -38,7 +38,7 @@ public enum LMAssembly {
   }()
 
   @discardableResult
-  public static func withFileHandleQueueSync<T>(_ execute: () throws -> T) rethrows -> T {
+  nonisolated public static func withFileHandleQueueSync<T>(_ execute: () throws -> T) rethrows -> T {
     if DispatchQueue.getSpecific(key: fileHandleQueueKey) == fileHandleQueueIdentifier {
       return try execute()
     }
@@ -47,14 +47,14 @@ public enum LMAssembly {
 
   // MARK: Internal
 
-  enum FileErrors: Error {
+  nonisolated enum FileErrors: Error {
     case fileHandleError(String)
   }
 
   // MARK: Private
 
-  private static let fileHandleQueueKey = DispatchSpecificKey<UUID>()
-  private static let fileHandleQueueIdentifier = UUID()
+  nonisolated private static let fileHandleQueueKey = DispatchSpecificKey<UUID>()
+  nonisolated private static let fileHandleQueueIdentifier = UUID()
 }
 
 // MARK: - String as SQL Command
@@ -121,7 +121,7 @@ func performStatementSansResult(_ handler: (inout OpaquePointer?) -> ()) {
   handler(&ptrStmt)
 }
 
-func vCLMLog(_ strPrint: StringLiteralType) {
+nonisolated func vCLMLog(_ strPrint: StringLiteralType) {
   let toLog = UserDefaults.standard.object(forKey: "_DebugMode") as? Bool ?? true
   if toLog {
     Process.consoleLog("vChewingDebug: \(strPrint)")

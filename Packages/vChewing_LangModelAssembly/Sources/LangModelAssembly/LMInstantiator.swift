@@ -89,7 +89,6 @@ extension LMAssembly {
     }
 
     public static func loadCassetteData(path: String) {
-      @Sendable
       func load() {
         if FileManager.default.isReadableFile(atPath: path) {
           Self.lmCassette.clear()
@@ -146,7 +145,6 @@ extension LMAssembly {
     }
 
     public func loadUserPhrasesData(path: String, filterPath: String?) {
-      @Sendable
       func loadMain() {
         if FileManager.default.isReadableFile(atPath: path) {
           lmUserPhrases.clear()
@@ -164,7 +162,6 @@ extension LMAssembly {
         }
       }
       guard let filterPath = filterPath else { return }
-      @Sendable
       func loadFilter() {
         if FileManager.default.isReadableFile(atPath: filterPath) {
           lmFiltered.clear()
@@ -195,7 +192,6 @@ extension LMAssembly {
     }
 
     public func loadUserSymbolData(path: String) {
-      @Sendable
       func load() {
         if FileManager.default.isReadableFile(atPath: path) {
           lmUserSymbols.clear()
@@ -215,7 +211,6 @@ extension LMAssembly {
     }
 
     public func loadUserAssociatesData(path: String) {
-      @Sendable
       func load() {
         if FileManager.default.isReadableFile(atPath: path) {
           lmAssociates.clear()
@@ -235,7 +230,6 @@ extension LMAssembly {
     }
 
     public func loadReplacementsData(path: String) {
-      @Sendable
       func load() {
         if FileManager.default.isReadableFile(atPath: path) {
           lmReplacements.clear()
@@ -549,9 +543,6 @@ extension LMAssembly {
 
     // MARK: Internal
 
-    // SQLite 連線所在的記憶體位置。
-    static var ptrSQL: OpaquePointer?
-
     /// 介紹一下幾個通用的語言模組型別：
     /// ----------------------
     /// LMCoreEX 是全功能通用型的模組，每一筆辭典記錄以 key 為注音、以 [Unigram] 陣列作為記錄內容。
@@ -565,6 +556,15 @@ extension LMAssembly {
     // 磁帶資料模組。「currentCassette」對外唯讀，僅用來讀取磁帶本身的中繼資料（Metadata）。
     static var lmCassette = LMCassette()
     static var lmPlainBopomofo = LMPlainBopomofo()
+
+    nonisolated static var ptrSQL: OpaquePointer? {
+      get {
+        mtxSQLPointer.value
+      }
+      set {
+        mtxSQLPointer.value = newValue
+      }
+    }
 
     // 聲明使用者語言模組。
     // 使用者語言模組使用多執行緒的話，可能會導致一些問題。有時間再仔細排查看看。
@@ -652,6 +652,10 @@ extension LMAssembly {
     #endif
 
     // MARK: Private
+
+    // SQLite 連線所在的記憶體位置。
+    nonisolated private static let mtxSQLPointer: NSMutex<OpaquePointer?> = .init(nil)
+    nonisolated private static let sqlLock: NSLock = .init()
 
     // MARK: - 工具函式
 

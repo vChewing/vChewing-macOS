@@ -1,4 +1,4 @@
-// swift-tools-version: 5.7
+// swift-tools-version: 6.2
 // The swift-tools-version declares the minimum version of Swift required to build this package.
 
 import PackageDescription
@@ -35,6 +35,9 @@ let package = Package(
         .product(name: "SwiftExtension", package: "vChewing_SwiftExtension"),
         .product(name: "Tekkon", package: "vChewing_Tekkon"),
       ],
+      swiftSettings: [
+        .defaultIsolation(MainActor.self), // set Default Actor Isolation
+      ],
       linkerSettings: [
         .linkedLibrary("iconv", .when(platforms: [.macOS])),
       ]
@@ -49,6 +52,9 @@ let package = Package(
         .product(name: "MegrezTestComponents", package: "vChewing_Megrez"),
         .product(name: "Shared", package: "vChewing_Shared"),
         .product(name: "Tekkon", package: "vChewing_Tekkon"),
+      ],
+      swiftSettings: [
+        .defaultIsolation(MainActor.self), // set Default Actor Isolation
       ],
       linkerSettings: [
         .linkedLibrary("iconv", .when(platforms: [.macOS])),

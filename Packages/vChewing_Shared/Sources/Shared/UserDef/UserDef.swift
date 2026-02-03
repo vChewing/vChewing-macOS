@@ -10,7 +10,7 @@ import Foundation
 
 // MARK: - UserDef
 
-public enum UserDef: String, CaseIterable, Identifiable {
+nonisolated public enum UserDef: String, CaseIterable, Identifiable {
   // MARK: - Cases.
 
   case kIsDebugModeEnabled = "_DebugMode"
