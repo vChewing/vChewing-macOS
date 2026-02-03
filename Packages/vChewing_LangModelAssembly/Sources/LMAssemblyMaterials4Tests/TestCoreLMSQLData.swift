@@ -16,6 +16,6 @@ public enum LMATestsData {
       url = Bundle.module.url(forResource: "vanguardLegacy_test", withExtension: "sql")
     #endif
     guard let url else { return "" }
-    return (try? String(contentsOf: url)) ?? ""
+    return (try? String(contentsOf: url, encoding: .utf8)) ?? ""
   }()
 }

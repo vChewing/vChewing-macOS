@@ -1,4 +1,4 @@
-// swift-tools-version: 5.7
+// swift-tools-version: 6.2
 import PackageDescription
 
 let package = Package(
@@ -17,11 +17,7 @@ let package = Package(
     ),
     .testTarget(
       name: "TekkonTests",
-      dependencies: ["Tekkon"],
-      linkerSettings: [
-        .linkedFramework("XCTest", .when(platforms: [.macOS])),
-        .linkedFramework("Foundation", .when(platforms: [.macOS])),
-      ]
+      dependencies: ["Tekkon"]
     ),
   ]
 )

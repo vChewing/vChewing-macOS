@@ -12,7 +12,7 @@ import LineReader
 // MARK: - LMAssembly.LMConsolidator
 
 extension LMAssembly {
-  public enum LMConsolidator {
+  nonisolated public enum LMConsolidator {
     public static let kPragmaHeader =
       "# 𝙵𝙾𝚁𝙼𝙰𝚃 𝚘𝚛𝚐.𝚊𝚝𝚎𝚕𝚒𝚎𝚛𝙸𝚗𝚖𝚞.𝚟𝚌𝚑𝚎𝚠𝚒𝚗𝚐.𝚞𝚜𝚎𝚛𝙻𝚊𝚗𝚐𝚞𝚊𝚐𝚎𝙼𝚘𝚍𝚎𝚕𝙳𝚊𝚝𝚊.𝚏𝚘𝚛𝚖𝚊𝚝𝚝𝚎𝚍"
 
@@ -175,7 +175,7 @@ extension LMAssembly {
 }
 
 extension String {
-  fileprivate mutating func regReplace(pattern: String, replaceWith: String = "") {
+  nonisolated fileprivate mutating func regReplace(pattern: String, replaceWith: String = "") {
     // Ref: https://stackoverflow.com/a/40993403/4162914 && https://stackoverflow.com/a/71291137/4162914
     do {
       let regex = try NSRegularExpression(

@@ -5,7 +5,7 @@ import SwiftExtension
 
 // MARK: - LineReader
 
-public final class LineReader {
+nonisolated public final class LineReader {
   // MARK: Lifecycle
 
   public init(
@@ -76,8 +76,8 @@ public final class LineReader {
 
 // MARK: Sequence
 
-extension LineReader: Sequence {
-  public func makeIterator() -> AnyIterator<String> {
+nonisolated extension LineReader: Sequence {
+  nonisolated public func makeIterator() -> AnyIterator<String> {
     AnyIterator {
       self.nextLine()
     }
