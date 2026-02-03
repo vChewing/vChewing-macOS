@@ -9,7 +9,7 @@ extension KeyKeyUserDBKit {
   ///
   /// 此協定定義了讀取使用者詞庫資料的通用介面，
   /// 可由資料庫 (`UserDatabase`) 或文字檔案 (`UserPhraseTextFileObj`) 實作。
-  public protocol UserPhraseDataSource: Sequence where Element == Gram {
+  public protocol UserPhraseDataSource {
     /// 候選字覆蓋記錄的預設權重
     static var candidateOverrideProbability: Double { get }
 

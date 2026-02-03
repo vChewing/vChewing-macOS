@@ -11,7 +11,7 @@ import Foundation
 // MARK: - InputHandler
 
 /// InputHandler 輸入調度模組。
-public final class InputHandler: InputHandlerProtocol {
+public final class InputHandler: @MainActor InputHandlerProtocol {
   // MARK: Lifecycle
 
   /// 初期化。

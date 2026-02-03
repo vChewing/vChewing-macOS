@@ -177,7 +177,7 @@ public final class Notifier: NSWindowController {
   // MARK: Public
 
   public static func notify(message: String) {
-    asyncOnMain { Self.message = message }
+    mainSync { Self.message = message }
   }
 
   // MARK: Internal

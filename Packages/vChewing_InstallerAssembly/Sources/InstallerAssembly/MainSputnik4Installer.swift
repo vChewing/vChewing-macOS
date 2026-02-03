@@ -19,6 +19,10 @@ public final class MainSputnik4Installer {
 
   // MARK: Public
 
+  public static func asyncInit() async -> MainSputnik4Installer {
+    MainSputnik4Installer()
+  }
+
   public func runNSApp(isLegacyDistro: Bool? = nil) {
     if let isLegacyDistro {
       AppInstallerDelegate.shared.isLegacyDistro = isLegacyDistro

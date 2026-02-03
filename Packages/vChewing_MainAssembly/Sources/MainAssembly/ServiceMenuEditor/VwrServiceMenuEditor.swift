@@ -44,7 +44,7 @@ public final class VwrServiceMenuEditor: NSViewController {
     "Add Service",
     target: self,
     action: #selector(btnAddServiceClicked(_:)),
-    postDrag: handleDrag
+    postDrag: { [weak self] url in self?.handleDrag(url) }
   )
   lazy var btnRemoveService = NSButton(
     "Remove Selected",

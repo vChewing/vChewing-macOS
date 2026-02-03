@@ -109,7 +109,7 @@ extension LMMgr: PhraseEditorDelegate {
   }
 
   public func performAsyncTaskBypassingCassetteMode<T>(
-    _ task: @Sendable @escaping (@Sendable @escaping () -> ()) throws -> T
+    _ task: @escaping (@escaping () -> ()) throws -> T
   ) rethrows
     -> T {
     if !PrefMgr.shared.cassetteEnabled {
@@ -120,7 +120,6 @@ extension LMMgr: PhraseEditorDelegate {
         config.isCassetteEnabled = false
       }
     }
-    @Sendable
     func trailingOp() {
       let cassetteEnabled = PrefMgr.shared.cassetteEnabled
       Shared.InputMode.allCases.forEach {

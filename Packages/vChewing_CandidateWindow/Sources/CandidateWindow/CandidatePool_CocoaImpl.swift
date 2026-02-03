@@ -59,7 +59,7 @@ private final class RoundedBadgeTextAttachmentCell: NSTextAttachmentCell {
 
   // MARK: NSTextAttachmentCell
 
-  override func cellSize() -> CGSize { cachedSize }
+  nonisolated override func cellSize() -> CGSize { cachedSize }
 
   override func draw(withFrame cellFrame: CGRect, in controlView: NSView?, characterIndex: Int) {
     backgroundColor.setFill()

@@ -181,19 +181,28 @@ extension SessionProtocol {
 
   /// 所有建構子都會執行的共用部分，在 super.init() 之後執行。
   public func construct(client theClient: (IMKTextInput & NSObjectProtocol)? = nil) {
-    asyncOnMain(bypassAsync: UserDefaults.pendingUnitTests) { [weak self] in
-      guard let this = self else { return }
-      // 關掉所有之前的副本的視窗。
-      Self.current?.hidePalettes()
-      Self.current = this
-      this.initInputHandler()
-      this.synchronizer4LMPrefs?()
-      // 下述兩行很有必要，否則輸入法會在手動重啟之後無法立刻生效。
-      let maybeClient = theClient ?? this.client()
-      this.activateServer(maybeClient)
-      // GCD 會觸發 didSet，所以不用擔心。
-      this.inputMode = .init(rawValue: this.prefs.mostRecentInputMode) ?? .imeModeNULL
+    // AsyncOnMain 自身的 Lambda Expression 可能與 Swift 6.2 的 Concurrency 相性不太好。
+    // 於是這裡單獨判斷。
+    if UserDefaults.pendingUnitTests {
+      constructSansAsync(client: theClient)
+    } else {
+      asyncOnMain { [weak self] in
+        self?.constructSansAsync(client: theClient)
+      }
     }
+  }
+
+  public func constructSansAsync(client theClient: (IMKTextInput & NSObjectProtocol)? = nil) {
+    // 關掉所有之前的副本的視窗。
+    Self.current?.hidePalettes()
+    Self.current = self
+    initInputHandler()
+    synchronizer4LMPrefs?()
+    // 下述兩行很有必要，否則輸入法會在手動重啟之後無法立刻生效。
+    let maybeClient = theClient ?? client()
+    activateServer(maybeClient)
+    // GCD 會觸發 didSet，所以不用擔心。
+    inputMode = .init(rawValue: prefs.mostRecentInputMode) ?? .imeModeNULL
   }
 
   @discardableResult

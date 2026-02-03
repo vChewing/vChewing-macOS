@@ -409,16 +409,10 @@ public final class LMMgr {
         // 只有在發現 invalidity（非 nil 且非空字串）時才顯示警示
         guard let path = newValue, !path.isEmpty else { return }
         asyncOnMain(bypassAsync: UserDefaults.pendingUnitTests) {
-          // 若當前已存在 modal 視窗，避免再開啟重複的 modal。
-          if NSApp.modalWindow != nil { return }
-          // 無動作：已停用 cooldown，觀察器改以舊/新值比較來避免重複警示。
-          IMEApp.buzz()
-          let alert = NSAlert()
-          alert.messageText = "i18n:LMMgr.pathInvalidityFound.userDataFolder.title".i18n
-          alert.informativeText = "i18n:LMMgr.pathInvalidityFound.userDataFolder.description".i18n
-          alert.addButton(withTitle: "OK".i18n)
-          _ = alert.runModal()
-          NSApp.popup()
+          self.callModalAlert(
+            msg: "i18n:LMMgr.pathInvalidityFound.userDataFolder.title".i18n,
+            infoText: "i18n:LMMgr.pathInvalidityFound.userDataFolder.description".i18n
+          )
         }
       }
 
@@ -430,18 +424,27 @@ public final class LMMgr {
         if oldValue == newValue { return }
         guard let path = newValue, !path.isEmpty else { return }
         asyncOnMain(bypassAsync: UserDefaults.pendingUnitTests) {
-          // 若當前已存在 modal 視窗，避免再開啟重複的 modal。
-          if NSApp.modalWindow != nil { return }
-          // 無動作：已停用 cooldown，觀察器改以舊/新值比較來避免重複警示。
-          IMEApp.buzz()
-          let alert = NSAlert()
-          alert.messageText = "i18n:LMMgr.pathInvalidityFound.cassette.title".i18n
-          alert.informativeText = "i18n:LMMgr.pathInvalidityFound.cassette.description".i18n
-          alert.addButton(withTitle: "OK".i18n)
-          _ = alert.runModal()
-          NSApp.popup()
+          self.callModalAlert(
+            msg: "i18n:LMMgr.pathInvalidityFound.cassette.title".i18n,
+            infoText: "i18n:LMMgr.pathInvalidityFound.cassette.description".i18n
+          )
         }
       }
+  }
+
+  nonisolated private func callModalAlert(msg: String, infoText: String) {
+    mainSync {
+      // 若當前已存在 modal 視窗，避免再開啟重複的 modal。
+      if NSApp.modalWindow != nil { return }
+      // 無動作：已停用 cooldown，觀察器改以舊/新值比較來避免重複警示。
+      IMEApp.buzz()
+      let alert = NSAlert()
+      alert.messageText = msg
+      alert.informativeText = infoText
+      alert.addButton(withTitle: "OK".i18n)
+      _ = alert.runModal()
+      NSApp.popup()
+    }
   }
 }
 
@@ -483,29 +486,33 @@ extension LMMgr {
     ) {
       // Debounce frequent save requests to reduce IO churn.
       c.pomDebounceQueue.async {
-        // Merge intent (escalate to all-modes if any pending requested it)
-        c.mergeIntent4PendingSaveAllModes(saveAllModes)
-        c.pomDebounceToken &+= 1
-        let scheduledToken = c.pomDebounceToken
-        let interval = max(c.pomDebounceInterval, 0)
-        c.pomDebounceQueue.asyncAfter(deadline: .now() + interval) { [weak c] in
-          guard let coordinator = c else { return }
-          guard coordinator.pomDebounceToken == scheduledToken else { return }
-          let shouldSaveAll = coordinator.pomPendingSave4AllModes
-          coordinator.pomPendingSave4AllModes = false
-          let targetModes: [Shared.InputMode]
-          if shouldSaveAll {
-            targetModes = Shared.InputMode.validCases
-          } else {
-            let currentMode = IMEApp.currentInputMode
-            targetModes = currentMode == .imeModeNULL ? [] : [currentMode]
-          }
-          guard !targetModes.isEmpty else { return }
-          AppDelegate.shared.suppressUserDataMonitor(
-            for: Swift.max(0.8, coordinator.pomDebounceInterval + 0.2)
-          )
-          targetModes.forEach { mode in
-            mode.langModel.savePOMData()
+        mainSync {
+          // Merge intent (escalate to all-modes if any pending requested it)
+          c.mergeIntent4PendingSaveAllModes(saveAllModes)
+          c.pomDebounceToken &+= 1
+          let scheduledToken = c.pomDebounceToken
+          let interval = max(c.pomDebounceInterval, 0)
+          c.pomDebounceQueue.asyncAfter(deadline: .now() + interval) { [weak c] in
+            mainSync {
+              guard let coordinator = c else { return }
+              guard coordinator.pomDebounceToken == scheduledToken else { return }
+              let shouldSaveAll = coordinator.pomPendingSave4AllModes
+              coordinator.pomPendingSave4AllModes = false
+              let targetModes: [Shared.InputMode]
+              if shouldSaveAll {
+                targetModes = Shared.InputMode.validCases
+              } else {
+                let currentMode = IMEApp.currentInputMode
+                targetModes = currentMode == .imeModeNULL ? [] : [currentMode]
+              }
+              guard !targetModes.isEmpty else { return }
+              AppDelegate.shared.suppressUserDataMonitor(
+                for: Swift.max(0.8, coordinator.pomDebounceInterval + 0.2)
+              )
+              targetModes.forEach { mode in
+                mode.langModel.savePOMData()
+              }
+            }
           }
         }
       }

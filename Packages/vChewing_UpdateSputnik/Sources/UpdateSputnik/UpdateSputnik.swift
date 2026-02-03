@@ -61,14 +61,18 @@ public final class UpdateSputnik {
       if let error = error {
         asyncOnMain { [weak self] in
           guard let this = self else { return }
-          if !this.silentMode {
-            this.showError(message: error.localizedDescription)
+          mainSync {
+            if !this.silentMode {
+              this.showError(message: error.localizedDescription)
+            }
+            this.currentTask = nil
           }
-          this.currentTask = nil
         }
         return
       }
-      self.data = data
+      mainSync {
+        self.data = data
+      }
     }
     task.resume()
     currentTask = task

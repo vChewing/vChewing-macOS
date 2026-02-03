@@ -34,7 +34,7 @@ public final class KimoDataReader {
     }
   }
 
-  public static let shared: KimoDataReader = .init()
+  public nonisolated static let shared: KimoDataReader = .init()
 
   public func prepareData(
     url: URL,
@@ -84,7 +84,7 @@ public final class KimoDataReader {
       default:
         throw KDRException.wrongFileExtension(url)
       }
-      for gram in userDB {
+      for gram in try userDB.fetchAllGrams() {
         guard gram.isUnigram, !gram.isCandidateOverride else { continue }
         handler(gram.keyArray, gram.current)
       }

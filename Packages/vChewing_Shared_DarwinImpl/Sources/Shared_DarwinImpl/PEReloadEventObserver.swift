@@ -18,12 +18,14 @@ public final class PEReloadEventObserver: NSObject, ObservableObject {
   override public init() {
     super.init()
     self.observation = Broadcaster.shared
-      .observe(\.eventForReloadingPhraseEditor, options: [.new]) { _, _ in
-        self.touch()
+      .observe(\.eventForReloadingPhraseEditor, options: [.new]) { [weak self] _, _ in
+        self?.touch()
       }
   }
 
-  deinit { observation?.invalidate() }
+  deinit {
+    mainSync { observation?.invalidate() }
+  }
 
   // MARK: Public
 
@@ -38,8 +40,10 @@ public final class PEReloadEventObserver: NSObject, ObservableObject {
   )
     -> Bool { lhs.id == rhs.id }
 
-  public func touch() {
-    id = UUID().uuidString
+  nonisolated public func touch() {
+    mainSync {
+      id = UUID().uuidString
+    }
   }
 
   // MARK: Private

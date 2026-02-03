@@ -30,6 +30,10 @@ public final class MainSputnik4IME {
 
   public let theServer: IMKServer
 
+  public static func asyncInit() async -> MainSputnik4IME {
+    MainSputnik4IME()
+  }
+
   public func runNSApp() {
     // 下述内容取代 RunLoop.main.run()
     NSApplication.shared.delegate = AppDelegate.shared

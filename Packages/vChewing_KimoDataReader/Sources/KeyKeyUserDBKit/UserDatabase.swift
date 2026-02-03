@@ -9,7 +9,7 @@ import Foundation
 
 extension KeyKeyUserDBKit {
   /// 使用者資料庫讀取器
-  public final class UserDatabase: Sendable, UserPhraseDataSource {
+  public final class UserDatabase: UserPhraseDataSource {
     // MARK: Lifecycle
 
     // MARK: - Initializers
@@ -262,7 +262,7 @@ extension KeyKeyUserDBKit {
       }
     }
 
-    fileprivate func prepareStatement(sql: String) throws -> OpaquePointer {
+    fileprivate nonisolated func prepareStatement(sql: String) throws -> OpaquePointer {
       try actor.sync {
         var statement: OpaquePointer?
         guard sqlite3_prepare_v2(db, sql, -1, &statement, nil) == SQLITE_OK else {
@@ -272,13 +272,13 @@ extension KeyKeyUserDBKit {
       }
     }
 
-    fileprivate func stepStatement(_ statement: OpaquePointer) -> Int32 {
+    fileprivate nonisolated func stepStatement(_ statement: OpaquePointer) -> Int32 {
       actor.sync {
         sqlite3_step(statement)
       }
     }
 
-    fileprivate func finalizeStatement(_ statement: OpaquePointer) {
+    fileprivate nonisolated func finalizeStatement(_ statement: OpaquePointer) {
       _ = actor.sync {
         sqlite3_finalize(statement)
       }
@@ -300,7 +300,7 @@ extension KeyKeyUserDBKit.UserDatabase: Sequence {
   public typealias Iterator = GramIterator
 
   /// 用於逐行迭代資料庫中所有 Gram 的迭代器
-  public final class GramIterator: IteratorProtocol, Sendable {
+  public final class GramIterator: IteratorProtocol {
     // MARK: Lifecycle
 
     fileprivate init(database: KeyKeyUserDBKit.UserDatabase) {
@@ -425,13 +425,13 @@ extension KeyKeyUserDBKit.UserDatabase: Sequence {
       }
     }
 
-    private func cleanupCurrentStatement() {
+    private nonisolated func cleanupCurrentStatement() {
       iteratorQueue.sync {
         cleanupCurrentStatementUnsafe()
       }
     }
 
-    private func cleanupCurrentStatementUnsafe() {
+    private nonisolated func cleanupCurrentStatementUnsafe() {
       if let statement = _currentStatement {
         database.finalizeStatement(statement)
         _currentStatement = nil
@@ -474,7 +474,7 @@ extension KeyKeyUserDBKit.UserDatabase {
   }
 
   /// 用於非同步逐行迭代資料庫中所有 Gram 的迭代器
-  public final class AsyncGramIterator: AsyncIteratorProtocol, Sendable {
+  public final class AsyncGramIterator: AsyncIteratorProtocol {
     // MARK: Lifecycle
 
     fileprivate init(database: KeyKeyUserDBKit.UserDatabase) {
@@ -599,13 +599,13 @@ extension KeyKeyUserDBKit.UserDatabase {
       }
     }
 
-    private func cleanupCurrentStatement() {
+    private nonisolated func cleanupCurrentStatement() {
       iteratorQueue.sync {
         cleanupCurrentStatementUnsafe()
       }
     }
 
-    private func cleanupCurrentStatementUnsafe() {
+    private nonisolated func cleanupCurrentStatementUnsafe() {
       if let statement = _currentStatement {
         database.finalizeStatement(statement)
         _currentStatement = nil

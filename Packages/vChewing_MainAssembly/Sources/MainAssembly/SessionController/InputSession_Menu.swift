@@ -8,14 +8,10 @@
 
 import AppKit
 
-// MARK: - IME Menu Manager
-
-// 因為選單部分的內容又臭又長，所以就單獨拉到一個檔案內管理了。
+// MARK: - IME Menu Sputnik
 
 extension SessionCtl {
-  // MARK: Public
-
-  override public func menu() -> NSMenu {
+  public func makeMenu() -> NSMenu {
     NSMenu().appendItems(self) {
       NSMenu.Item(verbatim: currentRAMUsageDescription)
       NSMenu.Item(
@@ -146,20 +142,6 @@ extension SessionCtl {
   }
 
   @objc
-  override public func showPreferences(_: Any? = nil) {
-    osCheck: if #available(macOS 14, *) {
-      switch NSEvent.keyModifierFlags {
-      case .option: break osCheck
-      default: CtlSettingsUI.show()
-      }
-      NSApp.popup()
-      return
-    }
-    CtlSettingsCocoa.show()
-    NSApp.popup()
-  }
-
-  @objc
   public func showSettingsAppKit(_: Any? = nil) {
     CtlSettingsCocoa.show()
     NSApp.popup()
@@ -220,7 +202,8 @@ extension SessionCtl {
             : "NotificationSwitchOFF".i18n
         )
     )
-    if !core.inputMode.langModel.isCassetteDataLoaded {
+    let cassetteDataLoaded = core.inputMode.langModel.isCassetteDataLoaded
+    if !cassetteDataLoaded {
       LMMgr.loadCassetteData()
     }
   }

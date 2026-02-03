@@ -1,4 +1,4 @@
-// swift-tools-version: 5.7
+// swift-tools-version: 6.2
 // The swift-tools-version declares the minimum version of Swift required to build this package.
 
 import PackageDescription
@@ -26,6 +26,9 @@ let package = Package(
         .product(name: "OSFrameworkImpl", package: "vChewing_OSFrameworkImpl"),
         .product(name: "Shared", package: "vChewing_Shared"),
         .product(name: "IMKUtils", package: "vChewing_IMKUtils"),
+      ],
+      swiftSettings: [
+        .defaultIsolation(MainActor.self), // set Default Actor Isolation
       ]
     ),
     .testTarget(
@@ -35,6 +38,9 @@ let package = Package(
         .product(name: "OSFrameworkImpl", package: "vChewing_OSFrameworkImpl"),
         .product(name: "Shared", package: "vChewing_Shared"),
         .product(name: "IMKUtils", package: "vChewing_IMKUtils"),
+      ],
+      swiftSettings: [
+        .defaultIsolation(MainActor.self), // set Default Actor Isolation
       ]
     ),
   ]

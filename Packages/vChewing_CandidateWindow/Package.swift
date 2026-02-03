@@ -1,4 +1,4 @@
-// swift-tools-version: 5.7
+// swift-tools-version: 6.2
 import PackageDescription
 
 let package = Package(
@@ -20,11 +20,17 @@ let package = Package(
       name: "CandidateWindow",
       dependencies: [
         .product(name: "Shared_DarwinImpl", package: "vChewing_Shared_DarwinImpl"),
+      ],
+      swiftSettings: [
+        .defaultIsolation(MainActor.self), // set Default Actor Isolation
       ]
     ),
     .testTarget(
       name: "CandidateWindowTests",
-      dependencies: ["CandidateWindow"]
+      dependencies: ["CandidateWindow"],
+      swiftSettings: [
+        .defaultIsolation(MainActor.self), // set Default Actor Isolation
+      ]
     ),
   ]
 )

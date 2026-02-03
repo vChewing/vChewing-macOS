@@ -22,7 +22,7 @@ extension KeyKeyUserDBKit {
   /// ## 加密方式
   /// - SQLite SEE AES-128-CCM
   /// - 密鑰: "mjsrexportmjsrex" (重複填充到 16 bytes)
-  public final class UserPhraseTextFileObj: Sendable, UserPhraseDataSource {
+  public final class UserPhraseTextFileObj: UserPhraseDataSource {
     // MARK: Lifecycle
 
     /// 從檔案路徑初始化

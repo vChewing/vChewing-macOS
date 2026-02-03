@@ -34,9 +34,11 @@ public final class SecurityAgentHelper {
     vCLog("SecurityAgentHelper is online, scanning SecureEventInput abusers every 60 seconds.")
   }
 
-  public func removeTimer() {
-    timer?.invalidate()
-    timer = nil
+  nonisolated public func removeTimer() {
+    mainSync {
+      timer?.invalidate()
+      timer = nil
+    }
   }
 
   @objc

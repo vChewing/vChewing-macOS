@@ -9,13 +9,18 @@
     import OSLog
   #endif
 
+  import SwiftExtension
+
   // MARK: - BookmarkManager
 
   public final class BookmarkManager {
     // MARK: Lifecycle
 
     deinit {
-      stopAllSecurityScopedAccesses()
+      let urls = startedAccessingURLs
+      mainSync {
+        urls.forEach(stopAccessingSecurityScopedResource)
+      }
     }
 
     // MARK: Public

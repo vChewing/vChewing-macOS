@@ -13,7 +13,7 @@ import SwiftExtension
 // MARK: - CandidatePool
 
 /// 候選字窗會用到的資料池單位，即用即拋。
-public final class CandidatePool {
+public final class CandidatePool: Sendable {
   // MARK: Lifecycle
 
   // MARK: - Constructors
@@ -156,7 +156,15 @@ public final class CandidatePool {
     construct(candidates: candidates, selectionKeys: selectionKeys, layout: layout, locale: locale)
   }
 
-  public func cleanData() {
+  nonisolated public func cleanData() {
+    mainSync {
+      self.cleanDataOnMain()
+    }
+  }
+
+  // MARK: Internal
+
+  func cleanDataOnMain() {
     recordedLineRangeForCurrentPage = nil
     previouslyRecordedLineRangeForPreviousPage = nil
     currentLineNumber = 0
@@ -184,7 +192,7 @@ public final class CandidatePool {
     self.layout = layout
     Self.blankCell.locale = locale
     self.selectionKeys = selectionKeys.isEmpty ? "123456789" : selectionKeys
-    cleanData()
+    cleanDataOnMain()
     var allCandidates = candidates.map {
       CandidateCellData(key: " ", displayedText: $0.value, segLength: $0.keyArray.count)
     }

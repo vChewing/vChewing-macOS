@@ -1,4 +1,4 @@
-// swift-tools-version: 5.7
+// swift-tools-version: 6.2
 import PackageDescription
 
 let package = Package(
@@ -20,6 +20,9 @@ let package = Package(
       name: "Uninstaller",
       dependencies: [
         .product(name: "OSFrameworkImpl", package: "vChewing_OSFrameworkImpl"),
+      ],
+      swiftSettings: [
+        .defaultIsolation(MainActor.self), // set Default Actor Isolation
       ]
     ),
   ]

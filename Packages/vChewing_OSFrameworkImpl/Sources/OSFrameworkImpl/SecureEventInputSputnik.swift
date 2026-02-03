@@ -81,25 +81,63 @@
     }
   }
 
-  extension NSWorkspace {
-    public struct ActivationFlags: OptionSet {
-      // MARK: Lifecycle
+  // MARK: - WorkspaceActivationFlags
 
-      public init(rawValue: Int) {
-        self.rawValue = rawValue
-      }
+  public struct WorkspaceActivationFlags: @unchecked Sendable {
+    // MARK: Lifecycle
 
-      // MARK: Public
-
-      public static let hibernating = Self(rawValue: 1 << 0)
-      public static let desktopLocked = Self(rawValue: 1 << 1)
-      public static let sessionSwitchedOut = Self(rawValue: 1 << 2)
-      public static let screenSaverRunning = Self(rawValue: 1 << 3)
-
-      public let rawValue: Int
+    public nonisolated init(rawValue: Int) {
+      self.rawValue = rawValue
     }
 
-    public static var activationFlags: ActivationFlags = []
+    // MARK: Public
+
+    public nonisolated static let hibernating = Self(rawValue: 1 << 0)
+    public nonisolated static let desktopLocked = Self(rawValue: 1 << 1)
+    public nonisolated static let sessionSwitchedOut = Self(rawValue: 1 << 2)
+    public nonisolated static let screenSaverRunning = Self(rawValue: 1 << 3)
+
+    public nonisolated(unsafe) var rawValue: Int
+
+    public nonisolated var isEmpty: Bool { rawValue == 0 }
+
+    // MARK: OptionSet conformance (nonisolated)
+
+    public nonisolated func union(_ other: Self) -> Self {
+      Self(rawValue: rawValue | other.rawValue)
+    }
+
+    public nonisolated func intersection(_ other: Self) -> Self {
+      Self(rawValue: rawValue & other.rawValue)
+    }
+
+    public nonisolated func symmetricDifference(_ other: Self) -> Self {
+      Self(rawValue: rawValue ^ other.rawValue)
+    }
+
+    public nonisolated mutating func insert(_ newMember: Self) {
+      rawValue = rawValue | newMember.rawValue
+    }
+
+    public nonisolated mutating func remove(_ member: Self) {
+      rawValue = rawValue & ~member.rawValue
+    }
+  }
+
+  // MARK: - WorkspaceActivationFlagsStore
+
+  public enum WorkspaceActivationFlagsStore {
+    public nonisolated(unsafe) static var flags: WorkspaceActivationFlags = .init(rawValue: 0)
+  }
+
+  extension NSWorkspace {
+    // Keep backward compatibility type alias
+    public typealias ActivationFlags = WorkspaceActivationFlags
+
+    public nonisolated static var activationFlags: WorkspaceActivationFlags {
+      get { WorkspaceActivationFlagsStore.flags }
+      set { WorkspaceActivationFlagsStore.flags = newValue }
+    }
   }
 
   extension NSRunningApplication {
@@ -110,10 +148,10 @@
   }
 
   extension SecureEventInputSputnik {
-    private static var combinePoolCocoa = [any NSObjectProtocol]()
+    nonisolated(unsafe) private static var combinePoolCocoa = [any NSObjectProtocol]()
 
     @available(macOS 10.15, *)
-    private static var combinePool = Set<AnyCancellable>()
+    nonisolated(unsafe) private static var combinePool = Set<AnyCancellable>()
 
     func oobe() {
       if #available(macOS 10.15, *) {

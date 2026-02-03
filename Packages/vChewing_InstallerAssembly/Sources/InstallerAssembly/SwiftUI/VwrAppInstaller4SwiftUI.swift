@@ -161,7 +161,9 @@ private final class InstallerMainViewModel: ObservableObject, InstallerVMProtoco
   }
 
   deinit {
-    stopTranslocationTimer()
+    mainSync {
+      stopTranslocationTimer()
+    }
   }
 
   // MARK: Internal

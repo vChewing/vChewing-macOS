@@ -113,8 +113,8 @@ public final class PopupCompositionBuffer: NSWindowController, PCBProtocol {
     super.init(window: panel)
 
     self.observation = Broadcaster.shared
-      .observe(\.eventForClosingAllPanels, options: [.new]) { _, _ in
-        self.hide()
+      .observe(\.eventForClosingAllPanels, options: [.new]) { [weak self] _, _ in
+        self?.hide()
       }
   }
 
@@ -123,7 +123,11 @@ public final class PopupCompositionBuffer: NSWindowController, PCBProtocol {
     fatalError("init(coder:) has not been implemented")
   }
 
-  deinit { observation?.invalidate() }
+  deinit {
+    mainSync {
+      observation?.invalidate()
+    }
+  }
 
   // MARK: Public
 
@@ -168,9 +172,11 @@ public final class PopupCompositionBuffer: NSWindowController, PCBProtocol {
     window?.setIsVisible(true)
   }
 
-  public func hide() {
-    compositionView.prepareForHide()
-    window?.orderOut(nil)
+  nonisolated public func hide() {
+    mainSync {
+      self.compositionView.prepareForHide()
+      self.window?.orderOut(nil)
+    }
   }
 
   // MARK: Internal
@@ -239,7 +245,14 @@ private class PopupCompositionView: NSView {
   }
 
   deinit {
-    stopCaretBlinking()
+    // Note: We use mainSync with availability check since deinit is nonisolated.
+    // On older macOS, we still call the method but it may produce a warning.
+    if #available(macOS 10.15, *) {
+      mainSync {
+        self.caretLayer.removeAnimation(forKey: "blink")
+        self.caretLayer.removeAnimation(forKey: "verticalPulse")
+      }
+    }
   }
 
   // MARK: Internal

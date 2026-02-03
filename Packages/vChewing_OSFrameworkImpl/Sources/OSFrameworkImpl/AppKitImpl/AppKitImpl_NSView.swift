@@ -286,91 +286,111 @@ import SwiftExtension
     )
       -> NSStackView? {
       guard !isEmpty else { return nil }
-      let outerStack = NSStackView()
-      if #unavailable(macOS 10.11) {
-        outerStack.hasEqualSpacing = true
-      } else {
-        outerStack.distribution = .equalSpacing
-      }
-      outerStack.orientation = orientation
+      return mainSync {
+        let outerStack = NSStackView()
+        if #unavailable(macOS 10.11) {
+          outerStack.hasEqualSpacing = true
+        } else {
+          outerStack.distribution = .equalSpacing
+        }
+        outerStack.orientation = orientation
 
-      if #unavailable(macOS 10.10) {
-        outerStack.spacing = Swift.max(1, outerStack.spacing) - 1
-      }
-      outerStack.spacing = spacing ?? outerStack.spacing
+        if #unavailable(macOS 10.10) {
+          outerStack.spacing = Swift.max(1, outerStack.spacing) - 1
+        }
+        outerStack.spacing = spacing ?? outerStack.spacing
 
-      outerStack.setHuggingPriority(.fittingSizeCompression, for: .horizontal)
-      outerStack.setHuggingPriority(.fittingSizeCompression, for: .vertical)
+        outerStack.setHuggingPriority(.fittingSizeCompression, for: .horizontal)
+        outerStack.setHuggingPriority(.fittingSizeCompression, for: .vertical)
 
-      forEach { subView in
-        if divider, !outerStack.views.isEmpty {
-          let divider = NSView()
-          divider.wantsLayer = true
-          divider.layer?.backgroundColor = NSColor.gray.withAlphaComponent(0.2).cgColor
+        forEach { subView in
+          if divider, !outerStack.views.isEmpty {
+            let divider = NSView()
+            divider.wantsLayer = true
+            divider.layer?.backgroundColor = NSColor.gray.withAlphaComponent(0.2).cgColor
+            switch orientation {
+            case .horizontal:
+              divider.makeSimpleConstraint(.width, relation: .equal, value: 1)
+            case .vertical:
+              divider.makeSimpleConstraint(.height, relation: .equal, value: 1)
+            @unknown default: break
+            }
+            divider.translatesAutoresizingMaskIntoConstraints = false
+            outerStack.addView(divider, in: orientation == .horizontal ? .leading : .top)
+          }
+          subView.layoutSubtreeIfNeeded()
           switch orientation {
           case .horizontal:
-            divider.makeSimpleConstraint(.width, relation: .equal, value: 1)
+            subView.makeSimpleConstraint(
+              .height,
+              relation: .greaterThanOrEqual,
+              value: subView.intrinsicContentSize.height
+            )
+            subView.makeSimpleConstraint(
+              .width,
+              relation: .greaterThanOrEqual,
+              value: subView.intrinsicContentSize.width
+            )
           case .vertical:
-            divider.makeSimpleConstraint(.height, relation: .equal, value: 1)
+            subView.makeSimpleConstraint(
+              .width,
+              relation: .greaterThanOrEqual,
+              value: subView.intrinsicContentSize.width
+            )
+            subView.makeSimpleConstraint(
+              .height,
+              relation: .greaterThanOrEqual,
+              value: subView.intrinsicContentSize.height
+            )
           @unknown default: break
           }
-          divider.translatesAutoresizingMaskIntoConstraints = false
-          outerStack.addView(divider, in: orientation == .horizontal ? .leading : .top)
+          subView.setContentCompressionResistancePriority(.defaultHigh, for: .horizontal)
+          subView.setContentCompressionResistancePriority(.defaultHigh, for: .vertical)
+          subView.translatesAutoresizingMaskIntoConstraints = false
+          outerStack.addView(subView, in: orientation == .horizontal ? .leading : .top)
         }
-        subView.layoutSubtreeIfNeeded()
+
         switch orientation {
         case .horizontal:
-          subView.makeSimpleConstraint(
-            .height,
-            relation: .greaterThanOrEqual,
-            value: subView.intrinsicContentSize.height
-          )
-          subView.makeSimpleConstraint(
-            .width,
-            relation: .greaterThanOrEqual,
-            value: subView.intrinsicContentSize.width
-          )
+          outerStack.alignment = .centerY
         case .vertical:
-          subView.makeSimpleConstraint(
-            .width,
-            relation: .greaterThanOrEqual,
-            value: subView.intrinsicContentSize.width
-          )
-          subView.makeSimpleConstraint(
-            .height,
-            relation: .greaterThanOrEqual,
-            value: subView.intrinsicContentSize.height
-          )
+          outerStack.alignment = .leading
         @unknown default: break
         }
-        subView.setContentCompressionResistancePriority(.defaultHigh, for: .horizontal)
-        subView.setContentCompressionResistancePriority(.defaultHigh, for: .vertical)
-        subView.translatesAutoresizingMaskIntoConstraints = false
-        outerStack.addView(subView, in: orientation == .horizontal ? .leading : .top)
+        return outerStack.withInsets(insets)
       }
-
-      switch orientation {
-      case .horizontal:
-        outerStack.alignment = .centerY
-      case .vertical:
-        outerStack.alignment = .leading
-      @unknown default: break
-      }
-      return outerStack.withInsets(insets)
     }
   }
 
   // MARK: - Make NSAttributedString into Label
 
   extension NSAttributedString {
-    public func makeNSLabel(fixWidth: CGFloat? = nil) -> NSTextField {
-      let textField = NSTextField()
-      textField.attributedStringValue = self
-      textField.isEditable = false
-      textField.isBordered = false
-      textField.backgroundColor = .clear
-      if let fixWidth = fixWidth {
-        textField.preferredMaxLayoutWidth = fixWidth
+    /// Seems that there is no way to persuade the compiler to believe that
+    /// both NSAttributedString and NSLabel are on the MainActor without
+    /// explicit `@MainActor` annotation (which breaks macOS 10.14- compatibility).
+    /// Therefore, we have to use NSKeyedArchiver to encode this NSAttributedString
+    /// into Plist Data and decode it on the MainActor as a new NSAttributedString
+    /// instance to solve this value-assignment issue.
+    nonisolated public func makeNSLabel(fixWidth: CGFloat? = nil) -> NSTextField {
+      let archivedData = (try? NSKeyedArchiver.archivedData(
+        withRootObject: self,
+        requiringSecureCoding: false
+      )) ?? .init([])
+      let textField: NSTextField = mainSync {
+        let textField = NSTextField()
+        textField.isEditable = false
+        textField.isBordered = false
+        textField.backgroundColor = .clear
+        if let fixWidth = fixWidth {
+          textField.preferredMaxLayoutWidth = fixWidth
+        }
+        if let decodedString = try? NSKeyedUnarchiver.unarchivedObject(
+          ofClass: NSAttributedString.self,
+          from: archivedData
+        ) {
+          textField.attributedStringValue = decodedString
+        }
+        return textField
       }
       return textField
     }
@@ -391,13 +411,15 @@ import SwiftExtension
         range: .init(location: 0, length: rawAttributedString.length)
       )
       let textField = rawAttributedString.makeNSLabel(fixWidth: fixWidth)
-      if descriptive {
-        if #available(macOS 10.10, *) {
-          textField.textColor = .secondaryLabelColor
-        } else {
-          textField.textColor = .textColor.withAlphaComponent(0.55)
+      mainSync {
+        if descriptive {
+          if #available(macOS 10.10, *) {
+            textField.textColor = .secondaryLabelColor
+          } else {
+            textField.textColor = .textColor.withAlphaComponent(0.55)
+          }
+          textField.font = NSFont.systemFont(ofSize: NSFont.smallSystemFontSize)
         }
-        textField.font = NSFont.systemFont(ofSize: NSFont.smallSystemFontSize)
       }
       return textField
     }
@@ -425,7 +447,9 @@ import SwiftExtension
         let viewsRendered = views()
         guard !viewsRendered.isEmpty else { return nil }
         func giveViews() -> [NSView?] { viewsRendered }
-        let result = NSStackView.build(.vertical, insets: .new(all: 14, top: 0), views: giveViews)
+        let result = mainSync {
+          NSStackView.build(.vertical, insets: .new(all: 14, top: 0), views: giveViews)
+        }
         guard let result = result else { return nil }
         self.view = result
       }
