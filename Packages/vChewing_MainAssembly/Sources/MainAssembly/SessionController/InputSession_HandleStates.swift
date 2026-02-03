@@ -139,7 +139,6 @@ extension SessionProtocol {
       buffer = ChineseConverter.kanjiConversionIfRequired(queried)
     }
 
-    @Sendable
     func doCommit(_ theBuffer: String) {
       guard let client = client() else { return }
       client.insertText(

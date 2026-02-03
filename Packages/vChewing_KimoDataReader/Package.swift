@@ -1,4 +1,4 @@
-// swift-tools-version: 5.7
+// swift-tools-version: 6.2
 // The swift-tools-version declares the minimum version of Swift required to build this package.
 
 import PackageDescription
@@ -26,11 +26,17 @@ let package = Package(
     ),
     .target(
       name: "KimoDataReader",
-      dependencies: ["KeyKeyUserDBKit"]
+      dependencies: ["KeyKeyUserDBKit"],
+      swiftSettings: [
+        .defaultIsolation(MainActor.self), // set Default Actor Isolation
+      ]
     ),
     .testTarget(
       name: "KimoDataReaderTests",
-      dependencies: ["KimoDataReader"]
+      dependencies: ["KimoDataReader"],
+      swiftSettings: [
+        .defaultIsolation(MainActor.self), // set Default Actor Isolation
+      ]
     ),
   ]
 )

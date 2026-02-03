@@ -18,6 +18,8 @@ open class CtlCandidate: NSWindowController, CtlCandidateProtocol {
     self.visible = false
   }
 
+  deinit {}
+
   // MARK: - 不需要在這裡仔細實作的內容。
 
   @available(*, unavailable)

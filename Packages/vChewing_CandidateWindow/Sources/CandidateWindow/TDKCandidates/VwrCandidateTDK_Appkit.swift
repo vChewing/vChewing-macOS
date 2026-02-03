@@ -44,7 +44,7 @@ public final class VwrCandidateTDKAppKit: NSView {
 
   var action: Selector?
   weak var target: AnyObject?
-  var theMenu: NSMenu?
+  nonisolated(unsafe) var theMenu: NSMenu?
   var clickedCell: CandidateCellData = CandidatePool.shitCell
 
   // MARK: - Variables used for rendering the UI.

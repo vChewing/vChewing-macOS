@@ -12,11 +12,11 @@
 
   // MARK: - IMKInputController + IMKInputControllerProtocol
 
-  extension IMKInputController: IMKInputControllerProtocol {}
+  nonisolated extension IMKInputController: IMKInputControllerProtocol {}
 
   // MARK: - IMKInputControllerProtocol
 
-  public protocol IMKInputControllerProtocol: IMKStateSetting {
+  nonisolated public protocol IMKInputControllerProtocol: IMKStateSetting {
     /// Activates the input method.
     func activateServer(_ sender: Any!)
 

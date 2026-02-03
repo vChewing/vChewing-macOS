@@ -10,7 +10,7 @@ import InputMethodKit
 
 // MARK: - InputSession
 
-public final class InputSession: SessionProtocol {
+public final class InputSession: @MainActor SessionProtocol, Sendable {
   // MARK: Lifecycle
 
   public init(
@@ -55,7 +55,7 @@ public final class InputSession: SessionProtocol {
 
   public var buzzer: (() -> ())? = IMEApp.buzz
 
-  public var synchronizer4LMPrefs: (() -> ())? = LMMgr.syncLMPrefs
+  public var synchronizer4LMPrefs: (() -> ())? = { LMMgr.syncLMPrefs() }
 
   public var ui: (any SessionUIProtocol)? = SessionUI.shared
 
@@ -220,6 +220,16 @@ extension InputSession {
 
   public func showPreferences(_ sender: Any!) {
     _ = sender // 防止格式整理工具毀掉與此對應的參數。
+    osCheck: if #available(macOS 14, *) {
+      switch NSEvent.keyModifierFlags {
+      case .option: break osCheck
+      default: CtlSettingsUI.show()
+      }
+      NSApp.popup()
+      return
+    }
+    CtlSettingsCocoa.show()
+    NSApp.popup()
   }
 
   /// 有時會出現某些 App 攔截輸入法的 Ctrl+Enter / Shift+Enter 熱鍵的情況。
@@ -232,9 +242,13 @@ extension InputSession {
     clearInlineDisplay()
   }
 
-  public func updateComposition() { inputController?.updateComposition() }
+  public func updateComposition() {
+    inputController?.updateComposition()
+  }
 
-  public func cancelComposition() { inputController?.cancelComposition() }
+  public func cancelComposition() {
+    inputController?.cancelComposition()
+  }
 
   /// 指定輸入法要遞交出去的內容（個別 IMKInputClient 會呼叫這個函式）。
   /// - Parameter sender: 呼叫了該函式的客體（無須使用）。
@@ -285,7 +299,7 @@ extension InputSession {
   /// 輸入法要被換掉或關掉的時候，要做的事情。
   /// 不過好像因為 IMK 的 Bug 而並不會被執行。
   public func inputControllerWillClose() {
-    // 下述兩行用來防止尚未完成拼寫的注音內容被遞交出去。
+    // 防止尚未完成拼寫的注音內容被遞交出去。
     resetInputHandler()
   }
 

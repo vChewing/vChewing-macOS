@@ -59,9 +59,8 @@ public final class CtlCandidateTDK: CtlCandidate, NSWindowDelegate {
     }
 
     self.observation = Broadcaster.shared
-      .observe(\.eventForClosingAllPanels, options: [.new]) { _, _ in
-        self.visible = false
-        Self.thePool.cleanData()
+      .observe(\.eventForClosingAllPanels, options: [.new]) { [weak self] _, _ in
+        self?.respondToEventsForClosingPanels()
       }
   }
 
@@ -70,7 +69,11 @@ public final class CtlCandidateTDK: CtlCandidate, NSWindowDelegate {
     fatalError("init(coder:) has not been implemented")
   }
 
-  deinit { observation?.invalidate() }
+  deinit {
+    mainSync {
+      observation?.invalidate()
+    }
+  }
 
   // MARK: Public
 
@@ -363,6 +366,13 @@ public final class CtlCandidateTDK: CtlCandidate, NSWindowDelegate {
     case (0, 1..., .horizontal), (1..., 0, .vertical): showNextLine()
     case (0, ..<0, .horizontal), (..<0, 0, .vertical): showPreviousLine()
     case (_, _, _): break
+    }
+  }
+
+  nonisolated private func respondToEventsForClosingPanels() {
+    mainSync {
+      self.visible = false
+      Self.thePool.cleanData()
     }
   }
 }

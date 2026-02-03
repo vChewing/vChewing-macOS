@@ -1,4 +1,4 @@
-// swift-tools-version: 5.7
+// swift-tools-version: 6.2
 // The swift-tools-version declares the minimum version of Swift required to build this package.
 
 import PackageDescription
@@ -26,6 +26,9 @@ let package = Package(
       path: "Framework",
       cSettings: [
         .headerSearchPath("include"),
+      ],
+      swiftSettings: [
+        .defaultIsolation(MainActor.self), // set Default Actor Isolation
       ]
     ),
     .target(
@@ -33,6 +36,9 @@ let package = Package(
       dependencies: [
         "CapsLockToggler",
         .product(name: "Shared", package: "vChewing_Shared"),
+      ],
+      swiftSettings: [
+        .defaultIsolation(MainActor.self), // set Default Actor Isolation
       ]
     ),
   ]

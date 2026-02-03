@@ -22,7 +22,9 @@ public final class FolderMonitor: NSObject, NSFilePresenter {
   }
 
   deinit {
-    stopMonitoring()
+    mainSync {
+      stopMonitoring()
+    }
   }
 
   // MARK: Public
@@ -38,12 +40,12 @@ public final class FolderMonitor: NSObject, NSFilePresenter {
   }
 
   /// NSFilePresenter 協議要求的 OperationQueue。
-  public var presentedItemOperationQueue: OperationQueue {
+  public nonisolated var presentedItemOperationQueue: OperationQueue {
     folderMonitorOperationQueue
   }
 
   /// NSFilePresenter 協議要求的監控對象。
-  public var presentedItemURL: URL? {
+  public nonisolated var presentedItemURL: URL? {
     url
   }
 
@@ -77,14 +79,18 @@ public final class FolderMonitor: NSObject, NSFilePresenter {
   // MARK: NSFilePresenter Events
 
   /// 當目錄下的子項目發生變動（寫入、移動、刪除）時由系統調用。
-  public func presentedSubitemDidChange(at url: URL) {
+  public nonisolated func presentedSubitemDidChange(at url: URL) {
     // 過濾掉因為雲端正在下載導致的頻繁更新
-    handleFolderDidChange()
+    mainSync {
+      handleFolderDidChange()
+    }
   }
 
   /// 當目錄本身發生屬性變動時調用。
-  public func presentedItemDidChange() {
-    handleFolderDidChange()
+  public nonisolated func presentedItemDidChange() {
+    mainSync {
+      handleFolderDidChange()
+    }
   }
 
   // MARK: Private
@@ -134,7 +140,7 @@ public final class FolderMonitor: NSObject, NSFilePresenter {
     guard !shouldDeferDueToCloudDownload() else { return }
 
     // 返回主執行緒執行回調，確保 UI 安全性
-    DispatchQueue.main.async { [weak self] in
+    asyncOnMain { [weak self] in
       self?.folderDidChange?()
     }
   }

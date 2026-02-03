@@ -10,6 +10,7 @@ import Foundation
 
 // MARK: - CtlCandidateDelegate
 
+@MainActor
 public protocol CtlCandidateDelegate: AnyObject {
   func candidateController() -> CtlCandidateProtocol?
   func candidatePairs(conv: Bool) -> [CandidateInState]

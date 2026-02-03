@@ -52,8 +52,8 @@ public final class TooltipUI: NSWindowController, TooltipUIProtocol {
     updateWindowSize(to: tooltipView.intrinsicContentSize)
 
     self.observation = Broadcaster.shared
-      .observe(\.eventForClosingAllPanels, options: [.new]) { _, _ in
-        self.hide()
+      .observe(\.eventForClosingAllPanels, options: [.new]) { [weak self] _, _ in
+        self?.hide()
       }
   }
 
@@ -63,7 +63,9 @@ public final class TooltipUI: NSWindowController, TooltipUIProtocol {
   }
 
   deinit {
-    observation?.invalidate()
+    mainSync {
+      observation?.invalidate()
+    }
   }
 
   // MARK: Public
@@ -165,9 +167,11 @@ public final class TooltipUI: NSWindowController, TooltipUIProtocol {
     setColor(state: .normal)
   }
 
-  public func hide() {
-    setColor(state: .normal)
-    window?.orderOut(nil)
+  nonisolated public func hide() {
+    mainSync {
+      self.setColor(state: .normal)
+      self.window?.orderOut(nil)
+    }
   }
 
   // MARK: Internal

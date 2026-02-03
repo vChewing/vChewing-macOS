@@ -10,6 +10,7 @@ import Foundation
 
 // MARK: - SessionCoreProtocol
 
+@MainActor
 public protocol SessionCoreProtocol: AnyObject {
   associatedtype State: IMEStateProtocol
   associatedtype Handler: InputHandlerCoreProtocol
@@ -76,6 +77,7 @@ extension SessionCoreProtocol {
 
 // MARK: - InputHandlerCoreProtocol
 
+@MainActor
 public protocol InputHandlerCoreProtocol: AnyObject {
   associatedtype State: IMEStateProtocol
   associatedtype Session: SessionCoreProtocol & CtlCandidateDelegate

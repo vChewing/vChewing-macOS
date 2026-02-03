@@ -10,6 +10,7 @@
 
   import AppKit
   import CoreText
+  import SwiftExtension
 
   // MARK: - Get Bundle Signature Timestamp
 
@@ -94,6 +95,34 @@
     }
   }
 
+  // MARK: - AttributedStringMeasurementCache
+
+  /// Isolated cache for NSAttributedString dimension measurements.
+  private enum AttributedStringMeasurementCache {
+    nonisolated enum MeasurementPath: Hashable, Sendable { case fastSingleLine, textKitFallback }
+
+    nonisolated struct CacheKey: Hashable, Sendable {
+      nonisolated let stringHash: Int
+      nonisolated let attributesHash: Int
+      nonisolated let path: MeasurementPath
+    }
+
+    nonisolated(unsafe) static var cachedSizes: [CacheKey: CGSize] = [:]
+
+    nonisolated static let cacheQueue = DispatchQueue(
+      label: "org.vChewing.candidateWindow.measure.cache",
+      attributes: .concurrent
+    )
+
+    nonisolated static func get(_ key: CacheKey) -> CGSize? {
+      cacheQueue.sync { cachedSizes[key] }
+    }
+
+    nonisolated static func set(_ size: CGSize, for key: CacheKey) {
+      cacheQueue.async(flags: .barrier) { cachedSizes[key] = size }
+    }
+  }
+
   // MARK: - NSAttributedString extension
 
   extension NSAttributedString {
@@ -104,29 +133,14 @@
     public func getBoundingDimension(forceFallback: Bool = false) -> CGSize {
       guard length > 0 else { return .zero }
       let shouldFallback = forceFallback || containsLineBreaks || containsAttachments
-      let path: MeasurementPath = shouldFallback ? .textKitFallback : .fastSingleLine
+      let path: AttributedStringMeasurementCache.MeasurementPath = shouldFallback ? .textKitFallback : .fastSingleLine
       return Self.measure(self, using: path)
     }
 
     // MARK: Private Helpers
 
-    private enum MeasurementPath: Hashable { case fastSingleLine, textKitFallback }
-
-    private struct CacheKey: Hashable {
-      let stringHash: Int
-      let attributesHash: Int
-      let path: MeasurementPath
-    }
-
     private static let newlineSet = CharacterSet.newlines
-    private static let cacheQueue = DispatchQueue(
-      label: "org.vChewing.candidateWindow.measure.cache",
-      attributes: .concurrent
-    )
-    private static var cachedSizes: [CacheKey: CGSize] = [:]
 
-    private static let textKitQueue =
-      DispatchQueue(label: "org.vChewing.candidateWindow.measure.textkit")
     private static let textKitContext: TextKitContext = .init()
 
     private var containsLineBreaks: Bool { string.rangeOfCharacter(from: Self.newlineSet) != nil }
@@ -148,11 +162,11 @@
 
     private static func measure(
       _ attributedString: NSAttributedString,
-      using path: MeasurementPath
+      using path: AttributedStringMeasurementCache.MeasurementPath
     )
       -> CGSize {
       let key = cacheKey(for: attributedString, path: path)
-      if let cached = cachedSize(for: key) { return cached }
+      if let cached = AttributedStringMeasurementCache.get(key) { return cached }
 
       let measured: CGSize
       switch path {
@@ -160,26 +174,18 @@
       case .textKitFallback: measured = textKitSize(for: attributedString)
       }
 
-      store(size: measured, for: key)
+      AttributedStringMeasurementCache.set(measured, for: key)
       return measured
-    }
-
-    private static func cachedSize(for key: CacheKey) -> CGSize? {
-      cacheQueue.sync { cachedSizes[key] }
-    }
-
-    private static func store(size: CGSize, for key: CacheKey) {
-      cacheQueue.async(flags: .barrier) { cachedSizes[key] = size }
     }
 
     private static func cacheKey(
       for attributedString: NSAttributedString,
-      path: MeasurementPath
+      path: AttributedStringMeasurementCache.MeasurementPath
     )
-      -> CacheKey {
+      -> AttributedStringMeasurementCache.CacheKey {
       let stringHash = attributedString.string.hashValue
       let attributesHash = attributeHash(for: attributedString)
-      return CacheKey(stringHash: stringHash, attributesHash: attributesHash, path: path)
+      return .init(stringHash: stringHash, attributesHash: attributesHash, path: path)
     }
 
     private static func attributeHash(for attributedString: NSAttributedString) -> Int {
@@ -256,7 +262,7 @@
     }
 
     private static func textKitSize(for attributedString: NSAttributedString) -> CGSize {
-      textKitQueue.sync {
+      mainSync {
         let context = textKitContext
         context.textContainer.containerSize = CGSize(
           width: CGFloat.greatestFiniteMagnitude,
@@ -266,7 +272,7 @@
         _ = context.layoutManager.glyphRange(for: context.textContainer)
         context.layoutManager.ensureLayout(for: context.textContainer)
         var usedRect = context.layoutManager.usedRect(for: context.textContainer)
-        if usedRect.isNull { usedRect = .zero }
+        if usedRect.isNull { usedRect = .zeroValue }
         return CGSize(
           width: ceil(max(usedRect.width, 0)),
           height: ceil(max(usedRect.height, 0))
@@ -455,7 +461,7 @@
   }
 
   extension NSRunningApplication {
-    private static var temporatyBundlePtr: Bundle?
+    nonisolated(unsafe) private static var temporatyBundlePtr: Bundle?
 
     public static func findAccentColor(with bundleIdentifier: String?) -> HSBA? {
       guard let bundleIdentifier else { return nil }
@@ -515,7 +521,7 @@
   }
 
   extension NSColor {
-    public var asHSBA: HSBA {
+    nonisolated public var asHSBA: HSBA {
       .init(
         hue: hueComponent,
         saturation: saturationComponent,
@@ -527,7 +533,7 @@
 
   extension HSBA {
     /// 轉換為 NSColor（僅 macOS）。確保數值合法。
-    public var nsColor: NSColor {
+    nonisolated public var nsColor: NSColor {
       let h = hue.isFinite ? max(0, min(1, hue)) : 0
       let s = saturation.isFinite ? max(0, min(1, saturation)) : 0
       let b = brightness.isFinite ? max(0, min(1, brightness)) : 0

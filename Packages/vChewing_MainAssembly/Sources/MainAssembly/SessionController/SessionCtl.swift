@@ -18,15 +18,19 @@ import InputMethodKit
 /// 檢查委任物件是否實現了方法：若存在的話，就調用委任物件內的版本。
 /// - Remark: 在輸入法的主函式中分配的 IMKServer 型別為客體應用程式創建的每個
 /// 輸入會話創建一個控制器型別。因此，對於每個輸入會話，都有一個對應的 IMKInputController。
+/// - Warning: 該型別處於 MainActor。但不能用 Swift 的手段釘死在 MainActor 上。
+/// 原因在於 IMK 的 Headers 與 Modern Swift 不相容。只能使用傳統手段迂迴處理。
 @objc(SessionCtl) // 必須加上 ObjC，因為 IMK 是用 ObjC 寫的。
-public final class SessionCtl: IMKInputController {
+public final class SessionCtl: IMKInputController, @unchecked Sendable {
   // MARK: Lifecycle
 
   /// 對用以設定委任物件的控制器型別進行初期化處理。
-  override public init() {
+  nonisolated override public init() {
     super.init()
-    _ = core // Force initialization.
-    Self.currentInputController = self
+    mainSync {
+      _ = core // Force initialization.
+      Self.currentInputController = self
+    }
   }
 
   /// 對用以設定委任物件的控制器型別進行初期化處理。
@@ -37,10 +41,12 @@ public final class SessionCtl: IMKInputController {
   ///   - server: IMKServer
   ///   - delegate: 客體物件
   ///   - inputClient: 用以接受輸入的客體應用物件
-  override public init!(server: IMKServer!, delegate: Any!, client inputClient: Any!) {
+  nonisolated override public init!(server: IMKServer!, delegate: Any!, client inputClient: Any!) {
     super.init(server: server, delegate: delegate, client: inputClient)
-    _ = core // Force initialization.
-    Self.currentInputController = self
+    mainSync {
+      _ = core // Force initialization.
+      Self.currentInputController = self
+    }
   }
 
   // MARK: Public
@@ -58,16 +64,22 @@ public final class SessionCtl: IMKInputController {
 extension SessionCtl {
   /// 啟用輸入法時，會觸發該函式。
   /// - Parameter sender: 呼叫了該函式的客體。
-  override public func activateServer(_ sender: Any!) {
+  nonisolated override public func activateServer(_ sender: Any!) {
     super.activateServer(sender)
-    Self.currentInputController = self
-    core.activateServer(sender)
+    let senderRef = wrap(sender)
+    mainSync {
+      Self.currentInputController = self
+      core.activateServer(unwrap(senderRef))
+    }
   }
 
   /// 停用輸入法時，會觸發該函式。
   /// - Parameter sender: 呼叫了該函式的客體（無須使用）。
-  override public func deactivateServer(_ sender: Any!) {
-    core.deactivateServer(sender)
+  nonisolated override public func deactivateServer(_ sender: Any!) {
+    let senderRef = wrap(sender)
+    mainSync {
+      core.deactivateServer(unwrap(senderRef))
+    }
     super.deactivateServer(sender)
   }
 
@@ -78,8 +90,16 @@ extension SessionCtl {
   ///   - value: 輸入法在系統偏好設定當中的副本的 identifier，與 bundle identifier 類似。在輸入法的 info.plist 內定義。
   ///   - tag: 標記（無須使用）。
   ///   - sender: 呼叫了該函式的客體（無須使用）。
-  override public func setValue(_ value: Any!, forTag tag: Int, client sender: Any!) {
-    core.setValue(value, forTag: tag, client: sender)
+  nonisolated override public func setValue(_ value: Any!, forTag tag: Int, client sender: Any!) {
+    let valueRef = wrap(value)
+    let senderRef = wrap(sender)
+    mainSync {
+      core.setValue(
+        unwrap(valueRef),
+        forTag: tag,
+        client: unwrap(senderRef)
+      )
+    }
     super.setValue(value, forTag: tag, client: sender)
   }
 }
@@ -94,21 +114,26 @@ extension SessionCtl {
   ///   - sender: 呼叫了該函式的客體（無須使用）。
   /// - Returns: 回「`true`」以將該按鍵已攔截處理的訊息傳遞給 IMK；回「`false`」則放行、不作處理。
   @objc(handleEvent:client:)
-  override public func handle(
+  nonisolated override public func handle(
     _ event: NSEvent?,
     client sender: Any?
   )
     -> Bool {
-    let result = core.handleNSEvent(event, client: sender)
-    if !result, PrefMgr.shared.isDebugModeEnabled {
-      let stack = Thread.callStackSymbols.prefix(7).joined(separator: "\n")
-      if let newEvent = event?.copyAsKBEvent {
-        vCLog("OmitNSEvent: \(newEvent);\nstack: \(stack)")
-      } else {
-        vCLog("OmitNSEvent: [RAW]\(event.debugDescription);\nstack: \(stack)")
+    let eventRef = wrap(event)
+    let senderRef = wrap(sender)
+    return mainSync {
+      let event = unwrap(eventRef) as? NSEvent
+      let result = core.handleNSEvent(event, client: unwrap(senderRef))
+      if !result, PrefMgr.shared.isDebugModeEnabled {
+        let stack = Thread.callStackSymbols.prefix(7).joined(separator: "\n")
+        if let newEvent = event?.copyAsKBEvent {
+          vCLog("OmitNSEvent: \(newEvent);\nstack: \(stack)")
+        } else {
+          vCLog("OmitNSEvent: [RAW]\(event.debugDescription);\nstack: \(stack)")
+        }
       }
+      return result
     }
-    return result
   }
 
   /// 該函式的回饋結果決定了輸入法會攔截且捕捉哪些類型的輸入裝置操作事件。
@@ -120,40 +145,80 @@ extension SessionCtl {
   /// 「`commitComposition(_ message)`」遞交給客體。
   /// - Parameter sender: 呼叫了該函式的客體（無須使用）。
   /// - Returns: 返回一個 uint，其中承載了與系統 NSEvent 操作事件有關的掩碼集合（詳見 NSEvent.h）。
-  override public func recognizedEvents(_ sender: Any!) -> Int {
-    core.recognizedEvents(sender)
+  nonisolated override public func recognizedEvents(_ sender: Any!) -> Int {
+    let senderRef = wrap(sender)
+    return mainSync {
+      core.recognizedEvents(unwrap(senderRef))
+    }
   }
 
   /// 有時會出現某些 App 攔截輸入法的 Ctrl+Enter / Shift+Enter 熱鍵的情況。
   /// 也就是說 handle(event:) 完全抓不到這個 Event。
   /// 這時需要在 commitComposition 這一關做一些收尾處理。
   /// - Parameter sender: 呼叫了該函式的客體（無須使用）。
-  override public func commitComposition(_ sender: Any!) {
-    core.commitCompositionByOS(sender)
+  nonisolated override public func commitComposition(_ sender: Any!) {
+    let senderRef = wrap(sender)
+    mainSync {
+      core.commitCompositionByOS(unwrap(senderRef))
+    }
     // `super.commitComposition(sender)` 這句不要引入，否則每次切出輸入法時都會死當。
   }
 
   /// 指定輸入法要遞交出去的內容（雖然 InputMethodKit 可能並不會真的用到這個函式）。
   /// - Parameter sender: 呼叫了該函式的客體（無須使用）。
   /// - Returns: 字串內容，或者 nil。
-  override public func composedString(_ sender: Any!) -> Any! {
-    core.composedString(sender)
+  nonisolated override public func composedString(_ sender: Any!) -> Any! {
+    let senderRef = wrap(sender)
+    return mainSync {
+      core.composedString(unwrap(senderRef))
+    }
   }
 
   /// 輸入法要被換掉或關掉的時候，要做的事情。
   /// 不過好像因為 IMK 的 Bug 而並不會被執行。
-  override public func inputControllerWillClose() {
-    // 下述兩行用來防止尚未完成拼寫的注音內容被遞交出去。
-    core.inputControllerWillClose()
+  nonisolated override public func inputControllerWillClose() {
+    // 防止尚未完成拼寫的注音內容被遞交出去。
+    mainSync {
+      core.inputControllerWillClose()
+    }
   }
 
   /// 指定標記模式下被高亮的部分。
-  override public func selectionRange() -> NSRange {
-    core.selectionRange()
+  nonisolated override public func selectionRange() -> NSRange {
+    mainSync {
+      core.selectionRange()
+    }
   }
 
   /// 該函式僅用來取消任何輸入法浮動視窗的顯示。
-  override public func hidePalettes() {
-    core.hidePalettes()
+  nonisolated override public func hidePalettes() {
+    mainSync {
+      core.hidePalettes()
+    }
+  }
+
+  nonisolated override public func menu() -> NSMenu {
+    mainSync {
+      makeMenu()
+    }
+  }
+
+  @objc
+  nonisolated override public func showPreferences(_: Any? = nil) {
+    mainSync {
+      core.showPreferences(nil)
+    }
+  }
+}
+
+extension IMKInputController {
+  nonisolated fileprivate func wrap(_ object: Any?) -> UInt? {
+    guard let object = object as? AnyObject else { return nil }
+    return UInt(bitPattern: Unmanaged.passUnretained(object).toOpaque())
+  }
+
+  nonisolated fileprivate func unwrap(_ addr: UInt?) -> Any? {
+    guard let addr = addr, let ptr = UnsafeMutableRawPointer(bitPattern: addr) else { return nil }
+    return Unmanaged<AnyObject>.fromOpaque(ptr).takeUnretainedValue()
   }
 }

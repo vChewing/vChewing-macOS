@@ -14,7 +14,6 @@
 @_exported import IMKUtils
 @_exported import KimoDataReader
 @_exported import LangModelAssembly
-@_exported import LMAssemblyMaterials4Tests
 @_exported import ModifierKeyHitChecker
 @_exported import NotifierUI
 @_exported import PhraseEditorUI

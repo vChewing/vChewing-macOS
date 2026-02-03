@@ -20,8 +20,8 @@ extension SettingsPanesCocoa {
 
     override public func loadView() {
       observation = Broadcaster.shared
-        .observe(\.eventForReloadingPhraseEditor, options: [.new]) { _, _ in
-          self.updatePhraseEditor()
+        .observe(\.eventForReloadingPhraseEditor, options: [.new]) { [weak self] _, _ in
+          self?.updatePhraseEditor()
         }
       initPhraseEditor()
       view = body ?? .init()
@@ -171,20 +171,24 @@ extension SettingsPanesCocoa.Phrases: NSTextViewDelegate, NSTextFieldDelegate {
     }
   }
 
-  func updatePhraseEditor() {
-    updateLabels()
-    clearAllFields()
-    isLoading = true
-    tfdPETextEditor.string = "Loading…".i18n
+  nonisolated func updatePhraseEditor() {
+    mainSync {
+      updateLabels()
+      clearAllFields()
+      isLoading = true
+      tfdPETextEditor.string = "Loading…".i18n
+    }
     asyncOnMain { [weak self] in
-      guard let this = self else { return }
-      this.tfdPETextEditor.string = LMMgr.retrieveData(
-        mode: this.selInputMode,
-        type: this.selUserDataType
-      )
-      this.tfdPETextEditor.toolTip = PETerminology.TooltipTexts
-        .sampleDictionaryContent(for: this.selUserDataType)
-      this.isLoading = false
+      mainSync { [weak self] in
+        guard let this = self else { return }
+        this.tfdPETextEditor.string = LMMgr.retrieveData(
+          mode: this.selInputMode,
+          type: this.selUserDataType
+        )
+        this.tfdPETextEditor.toolTip = PETerminology.TooltipTexts
+          .sampleDictionaryContent(for: this.selUserDataType)
+        this.isLoading = false
+      }
     }
   }
 

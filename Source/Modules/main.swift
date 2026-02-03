@@ -8,4 +8,4 @@
 
 import MainAssembly
 
-MainSputnik4IME().runNSApp()
+await MainSputnik4IME.asyncInit().runNSApp()

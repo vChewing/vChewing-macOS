@@ -18,7 +18,7 @@ extension PrefMgr {
         }
         LMMgr.syncLMPrefs()
       },
-      didAskForRefreshingSpeechSputnik: SpeechSputnik.shared.refreshStatus,
+      didAskForRefreshingSpeechSputnik: { SpeechSputnik.shared.refreshStatus() },
       didAskForSyncingShiftKeyDetectorPrefs: {
         SessionUI.shared.resyncShiftKeyUpCheckerSettings()
       }

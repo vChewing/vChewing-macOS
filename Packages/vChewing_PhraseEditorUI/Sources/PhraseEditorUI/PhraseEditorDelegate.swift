@@ -29,7 +29,7 @@ public protocol PhraseEditorDelegate: AnyObject {
   )
   func tagOverrides(in strProcessed: inout String, mode: Shared.InputMode)
   func performAsyncTaskBypassingCassetteMode<T>(
-    _ task: @Sendable @escaping (@Sendable @escaping () -> ()) throws -> T
+    _ task: @escaping (@escaping () -> ()) throws -> T
   ) rethrows -> T
   func performSyncTaskBypassingCassetteMode<T>(
     _ task: () throws -> T

@@ -69,18 +69,22 @@ import SwiftExtension
 
   extension NSWindow? {
     @discardableResult
-    public func callAlert(title: String, text: String? = nil) -> NSApplication
-      .ModalResponse {
-      let alert = NSAlert()
-      alert.messageText = title
-      if let text = text { alert.informativeText = text }
-      alert.addButton(withTitle: "OK".i18n)
-      var result: NSApplication.ModalResponse = .alertFirstButtonReturn
-      guard let this = self else { return alert.runModal() }
-      alert.beginSheetModal(for: this) { theResponce in
-        result = theResponce
+    public func callAlert(
+      title: String, text: String? = nil
+    )
+      -> NSApplication.ModalResponse {
+      mainSync {
+        let alert = NSAlert()
+        alert.messageText = title
+        if let text = text { alert.informativeText = text }
+        alert.addButton(withTitle: "OK".i18n)
+        var result: NSApplication.ModalResponse = .alertFirstButtonReturn
+        guard let this = self else { return alert.runModal() }
+        alert.beginSheetModal(for: this) { theResponce in
+          result = theResponce
+        }
+        return result
       }
-      return result
     }
   }
 

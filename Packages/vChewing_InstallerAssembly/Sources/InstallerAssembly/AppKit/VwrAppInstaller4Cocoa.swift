@@ -7,6 +7,7 @@
 // requirements defined in MIT License.
 
 import AppKit
+import SwiftExtension
 
 extension VwrAppInstaller4Cocoa {
   public static let copyrightLabel = Bundle.main
@@ -23,7 +24,9 @@ public final class VwrAppInstaller4Cocoa: NSViewController, InstallerVMProtocol 
   // MARK: Lifecycle
 
   deinit {
-    stopTranslocationTimer()
+    mainSync {
+      stopTranslocationTimer()
+    }
   }
 
   // MARK: Public

@@ -1,4 +1,4 @@
-// swift-tools-version: 5.7
+// swift-tools-version: 6.2
 import PackageDescription
 
 let package = Package(
@@ -42,7 +42,6 @@ let package = Package(
         .product(name: "Hotenka", package: "vChewing_Hotenka"),
         .product(name: "IMKUtils", package: "vChewing_IMKUtils"),
         .product(name: "KimoDataReader", package: "vChewing_KimoDataReader"),
-        .product(name: "LMAssemblyMaterials4Tests", package: "vChewing_LangModelAssembly"),
         .product(name: "NotifierUI", package: "vChewing_NotifierUI"),
         .product(name: "PhraseEditorUI", package: "vChewing_PhraseEditorUI"),
         .product(name: "PopupCompositionBuffer", package: "vChewing_PopupCompositionBuffer"),
@@ -57,6 +56,9 @@ let package = Package(
       resources: [
         .process("Resources"),
       ],
+      swiftSettings: [
+        .defaultIsolation(MainActor.self), // set Default Actor Isolation
+      ],
       plugins: [
         .plugin(name: "TextTemplateAssetInjectorPlugin", package: "vChewing-VanguardLexicon"),
         .plugin(name: "VanguardSQLLegacyPlugin", package: "vChewing-VanguardLexicon"),
@@ -66,6 +68,10 @@ let package = Package(
       name: "MainAssemblyTests",
       dependencies: [
         "MainAssembly",
+        .product(name: "LMAssemblyMaterials4Tests", package: "vChewing_LangModelAssembly"),
+      ],
+      swiftSettings: [
+        .defaultIsolation(MainActor.self), // set Default Actor Isolation
       ]
     ),
   ]

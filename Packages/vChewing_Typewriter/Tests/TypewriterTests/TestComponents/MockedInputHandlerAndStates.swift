@@ -312,7 +312,7 @@ public final class MockSession: SessionCoreProtocol, CtlCandidateDelegate {
   }
 
   @discardableResult
-  public func updateVerticalTypingStatus() -> CGRect { .zero }
+  public func updateVerticalTypingStatus() -> CGRect { .zeroValue }
 
   // MARK: - CtlCandidateDelegate conformance
 

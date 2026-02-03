@@ -1,4 +1,4 @@
-// swift-tools-version: 5.7
+// swift-tools-version: 6.2
 
 import PackageDescription
 
@@ -21,11 +21,26 @@ let package = Package(
       name: "Hotenka",
       dependencies: [
         .product(name: "CSQLite3Lib", package: "CSQLite3Lib"),
+      ],
+      swiftSettings: [
+        .defaultIsolation(MainActor.self), // set Default Actor Isolation
+      ]
+    ),
+    .target(
+      name: "HotenkaTestDictData",
+      resources: [
+        .process("Resources")
       ]
     ),
     .testTarget(
       name: "HotenkaTests",
-      dependencies: ["Hotenka"]
+      dependencies: [
+        "Hotenka",
+        "HotenkaTestDictData"
+      ],
+      swiftSettings: [
+        .defaultIsolation(MainActor.self), // set Default Actor Isolation
+      ]
     ),
   ]
 )

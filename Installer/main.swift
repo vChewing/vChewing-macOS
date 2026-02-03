@@ -8,4 +8,4 @@
 
 import InstallerAssembly
 
-MainSputnik4Installer().runNSApp()
+await MainSputnik4Installer.asyncInit().runNSApp()
