@@ -40,6 +40,7 @@ final class ShellArgumentsScanTests: XCTestCase {
     // 允許的路徑：僅限腳本允許使用 -lc/-c 風格的開發／管理腳本。
     let allowedPaths = [
       "Scripts/vchewing-update.swift",
+      "Scripts/vchewing-update-lexicon.swift",
     ]
 
     while let node = enumerator.nextObject() as? URL {

@@ -9,7 +9,6 @@
 /* Begin PBXBuildFile section */
 		5B09307628B6FC3B0021F8C5 /* shortcuts.html in Resources */ = {isa = PBXBuildFile; fileRef = 5B09307828B6FC3B0021F8C5 /* shortcuts.html */; };
 		5B269D392EF487D300A9F628 /* main.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B269D392EF487D300A9F627 /* main.swift */; };
-		5B2CA1E62B130869002634EE /* vChewingFactoryDatabase.sqlite in Resources */ = {isa = PBXBuildFile; fileRef = 5B2CA1E52B130869002634EE /* vChewingFactoryDatabase.sqlite */; };
 		5B49A3C32B95D9890031E450 /* vChewingDebuggableApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B49A3C22B95D9890031E450 /* vChewingDebuggableApp.swift */; };
 		5B49A3C52B95D9890031E450 /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B49A3C42B95D9890031E450 /* ContentView.swift */; };
 		5B49A3C72B95D98B0031E450 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 5B49A3C62B95D98B0031E450 /* Assets.xcassets */; };
@@ -36,10 +35,8 @@
 		5BE69F122B77DC230053F160 /* Localizable.strings in Resources */ = {isa = PBXBuildFile; fileRef = 5BE69F142B77DC230053F160 /* Localizable.strings */; };
 		5BF9DA2728840E6200DBD48E /* template-usersymbolphrases.txt in Resources */ = {isa = PBXBuildFile; fileRef = 5BF9DA2228840E6200DBD48E /* template-usersymbolphrases.txt */; };
 		5BF9DA2828840E6200DBD48E /* template-exclusions.txt in Resources */ = {isa = PBXBuildFile; fileRef = 5BF9DA2328840E6200DBD48E /* template-exclusions.txt */; };
-		5BF9DA2928840E6200DBD48E /* template-associatedPhrases-chs.txt in Resources */ = {isa = PBXBuildFile; fileRef = 5BF9DA2428840E6200DBD48E /* template-associatedPhrases-chs.txt */; };
 		5BF9DA2A28840E6200DBD48E /* template-replacements.txt in Resources */ = {isa = PBXBuildFile; fileRef = 5BF9DA2528840E6200DBD48E /* template-replacements.txt */; };
 		5BF9DA2B28840E6200DBD48E /* template-userphrases.txt in Resources */ = {isa = PBXBuildFile; fileRef = 5BF9DA2628840E6200DBD48E /* template-userphrases.txt */; };
-		5BF9DA2D288427E000DBD48E /* template-associatedPhrases-cht.txt in Resources */ = {isa = PBXBuildFile; fileRef = 5BF9DA2C2884247800DBD48E /* template-associatedPhrases-cht.txt */; };
 		6A2E40F6253A69DA00D1AE1D /* Images.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 6A2E40F5253A69DA00D1AE1D /* Images.xcassets */; };
 		6A2E40F9253A6AA000D1AE1D /* Images.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 6A2E40F5253A69DA00D1AE1D /* Images.xcassets */; };
 		6ACA41FA15FC1D9000935EF6 /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = 6ACA41EA15FC1D9000935EF6 /* InfoPlist.strings */; };
@@ -93,8 +90,6 @@
 		5B18BA7427C7BD8C0056EB19 /* LICENSE-CHT.txt */ = {isa = PBXFileReference; lastKnownFileType = text; path = "LICENSE-CHT.txt"; sourceTree = "<group>"; };
 		5B20430B28BEFC0C00BFC6FD /* vChewing.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = vChewing.entitlements; sourceTree = "<group>"; };
 		5B269D392EF487D300A9F627 /* main.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = main.swift; sourceTree = "<group>"; };
-		5B2CA1E52B130869002634EE /* vChewingFactoryDatabase.sqlite */ = {isa = PBXFileReference; lastKnownFileType = file; name = vChewingFactoryDatabase.sqlite; path = "DictionaryData/Build/Release/vanguardSQL-Legacy/vChewingFactoryDatabase.sqlite"; sourceTree = "<group>"; };
-		5B2DB17127AF8771006D874E /* Makefile */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.make; path = Makefile; sourceTree = "<group>"; };
 		5B30F11227BA568800484E24 /* vChewingKeyLayout.bundle */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.plug-in"; path = vChewingKeyLayout.bundle; sourceTree = "<group>"; };
 		5B312684287800DE001AA720 /* FAQ.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = FAQ.md; sourceTree = "<group>"; };
 		5B40113A28D71B8700A9D4CB /* vChewing_Uninstaller */ = {isa = PBXFileReference; lastKnownFileType = wrapper; name = vChewing_Uninstaller; path = Packages/vChewing_Uninstaller; sourceTree = "<group>"; };
@@ -272,15 +267,6 @@
 			path = Resources;
 			sourceTree = "<group>";
 		};
-		5B62A35027AE7F6600A19448 /* DictionaryData */ = {
-			isa = PBXGroup;
-			children = (
-				5B2CA1E52B130869002634EE /* vChewingFactoryDatabase.sqlite */,
-				5B2DB17127AF8771006D874E /* Makefile */,
-			);
-			name = DictionaryData;
-			sourceTree = "<group>";
-		};
 		5BBBB75C27AED54C0023B93A /* SoundFiles */ = {
 			isa = PBXGroup;
 			children = (
@@ -376,7 +362,6 @@
 				D47D73C127A7200500255A50 /* Frameworks */,
 				5BDC5CB127C28E8B00E1CCE2 /* KeyboardExtension */,
 				5B18BA7527C7BF6D0056EB19 /* MiscRootFiles */,
-				5B62A35027AE7F6600A19448 /* DictionaryData */,
 			);
 			sourceTree = "<group>";
 		};
@@ -465,7 +450,6 @@
 			buildPhases = (
 				6A0D4E9E15FC0D2D00ABF4B3 /* Sources */,
 				6A0D4E9F15FC0D2D00ABF4B3 /* Frameworks */,
-				5B9A5A00285184BB001FFCAF /* Run Script (Build Dictionary Data) */,
 				6A0D4EA015FC0D2D00ABF4B3 /* Resources */,
 				5BDC5CBE27C28E8B00E1CCE2 /* Embed Foundation Extensions */,
 				5B6F882E28D2F49F004EF52F /* Run Script (Build PKG Installer) */,
@@ -579,11 +563,8 @@
 				5B70F4EA2A0BE900005EA8C4 /* MenuIcon-SCVIM.png in Resources */,
 				D4E33D8F27A838F0006DB1CF /* InfoPlist.strings in Resources */,
 				5BBC2D9F28F51C0400C986F6 /* LICENSE-CHT.txt in Resources */,
-				5BF9DA2D288427E000DBD48E /* template-associatedPhrases-cht.txt in Resources */,
 				5BE69F122B77DC230053F160 /* Localizable.strings in Resources */,
 				5BBC2D9E28F51C0400C986F6 /* LICENSE.txt in Resources */,
-				5B2CA1E62B130869002634EE /* vChewingFactoryDatabase.sqlite in Resources */,
-				5BF9DA2928840E6200DBD48E /* template-associatedPhrases-chs.txt in Resources */,
 				5B09307628B6FC3B0021F8C5 /* shortcuts.html in Resources */,
 				5BF9DA2B28840E6200DBD48E /* template-userphrases.txt in Resources */,
 				5BF9DA2728840E6200DBD48E /* template-usersymbolphrases.txt in Resources */,
@@ -629,26 +610,6 @@
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/zsh;
 			shellScript = "# Type a script or drag a script file from your workspace to insert its path.\n# cd \"${SRCROOT}/\"\n# mkdir -p \"${SRCROOT}/Installer/PKGRoot/Library/Input Methods/\"\n# mkdir -p \"${SRCROOT}/Installer/PKGRoot/Library/Keyboard Layouts/\"\n# cp -a \"${BUILD_DIR}/Release/vChewing.app\" \"${SRCROOT}/Installer/PKGRoot/Library/Input Methods/\"\n# cp -a ${SRCROOT}/KeyboardExtension/vChewingKeyLayout.bundle \"${SRCROOT}/Installer/PKGRoot/Library/Keyboard Layouts/\"\n# cp -a ${SRCROOT}/KeyboardExtension/vChewingKeyLayout.bundle/Contents/Resources/vChewing*.keylayout \"${SRCROOT}/Installer/PKGRoot/Library/Keyboard Layouts/\"\n";
-		};
-		5B9A5A00285184BB001FFCAF /* Run Script (Build Dictionary Data) */ = {
-			isa = PBXShellScriptBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			inputFileListPaths = (
-			);
-			inputPaths = (
-				"$(SRCROOT)/DictionaryData/",
-			);
-			name = "Run Script (Build Dictionary Data)";
-			outputFileListPaths = (
-			);
-			outputPaths = (
-				"$(SRCROOT)/DictionaryData/Build/Release/",
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-			shellPath = /bin/bash;
-			shellScript = "# Type a script or drag a script file from your workspace to insert its path.\ncd ${SRCROOT}/DictionaryData/\n/usr/bin/swift run -c release VCDataBuilder vanguardSQLLegacy\n";
 		};
 		6A225A2023679F5F00F685C6 /* ShellScript */ = {
 			isa = PBXShellScriptBuildPhase;

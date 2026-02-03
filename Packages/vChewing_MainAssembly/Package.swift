@@ -30,6 +30,7 @@ let package = Package(
     .package(path: "../vChewing_TooltipUI"),
     .package(path: "../vChewing_Uninstaller"),
     .package(path: "../vChewing_UpdateSputnik"),
+    .package(url: "https://atomgit.com/vChewing/vChewing-VanguardLexicon.git", exact: "4.2.5"),
   ],
   targets: [
     .target(
@@ -54,7 +55,11 @@ let package = Package(
         .product(name: "UpdateSputnik", package: "vChewing_UpdateSputnik"),
       ],
       resources: [
-        .process("Resources/convdict.sqlite"),
+        .process("Resources"),
+      ],
+      plugins: [
+        .plugin(name: "TextTemplateAssetInjectorPlugin", package: "vChewing-VanguardLexicon"),
+        .plugin(name: "VanguardSQLLegacyPlugin", package: "vChewing-VanguardLexicon"),
       ]
     ),
     .testTarget(

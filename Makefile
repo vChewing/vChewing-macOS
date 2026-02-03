@@ -11,8 +11,13 @@ ARCHIVE_PATH := $(ARCHIVE_DIR)/$(ARCHIVE_NAME)
 all: release
 install: install-release
 update:
-	@git restore DictionaryData/
-	git submodule update --init --recursive --remote --force
+	@echo "Running lexicon update script for vChewing-macOS..."
+	@chmod +x ./Scripts/vchewing-update-lexicon.swift || true
+	@if [ "$(DRY_RUN)" = "true" ]; then \
+		./Scripts/vchewing-update-lexicon.swift --path . --dry-run; \
+	else \
+		./Scripts/vchewing-update-lexicon.swift --path .; \
+	fi
 
 ifdef ARCHS
 BUILD_SETTINGS += ARCHS="$(ARCHS)"

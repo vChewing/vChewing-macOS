@@ -97,64 +97,136 @@ func nowStamp() -> String {
 let commitTime = nowStamp()
 let updateCommitMsg = "DictionaryData - \(commitTime)"
 
-// 1) 執行 make update
-print("Running 'make update' in \(repoPath) ...")
-if dryRun {
-  print("dry-run enabled: skipping 'make update'")
-} else {
-  let res = Shell.runExec("/usr/bin/make", args: ["update"], cwd: repoPath)
-  print(res.output)
-  if res.status != 0 {
-    print("make update failed (status \(res.status))")
-    // 是否繼續？目前先退出
-    exit(2)
+// 1) 檢查並更新 DictionaryData (VanguardLexicon)
+// 由於不再使用 submodule，我們直接檢查 MainAssembly 的 Package.swift 是否需要更新 Dependency。
+
+let packageSwiftRelPath = "Packages/vChewing_MainAssembly/Package.swift"
+let packageResolvedRelPath = "Packages/vChewing_MainAssembly/Package.resolved"
+let packageDirRelPath = "Packages/vChewing_MainAssembly"
+let vanguardURL = "https://atomgit.com/vChewing/vChewing-VanguardLexicon.git"
+
+print("Checking VanguardLexicon version in \(packageSwiftRelPath)...")
+
+func performDictionaryUpdate() {
+  let packageSwiftPath = repoPath + "/" + packageSwiftRelPath
+  let packageDir = repoPath + "/" + packageDirRelPath
+
+  guard let content = try? String(contentsOfFile: packageSwiftPath, encoding: .utf8) else {
+    print("Error: Could not read \(packageSwiftPath)")
+    return
   }
-}
 
-// 2) 使用 git submodule status 偵測子模組變更（較為穩健）
-let smStatus = Shell.runExec(
-  "/usr/bin/git",
-  args: ["submodule", "status", "--recursive"],
-  cwd: repoPath,
-  trim: false
-)
-let smLines = smStatus.output.split(separator: "\n").map { String($0) }
-let changedSmLines = smLines.filter { line in
-  // 若開頭是 ' ' 表示 up-to-date；'+'、'-' 或 'U' 表示已變更或未提交
-  guard let firstChar = line.first else { return false }
-  return firstChar != " "
-}
+  // 尋找目前的 version
+  let escapedURL = NSRegularExpression.escapedPattern(for: vanguardURL)
+  let pattern = #"\.package\(url:\s*"\#(escapedURL)",\s*exact:\s*"([^"]+)"\),"#
 
-let submodulePaths = changedSmLines.map { line -> String in
-  // 行格式: "<status> <sha> <path> (details)" -> 我們要取 path (comps[1])
-  let comps = line.split(separator: " ")
-  return comps.count >= 2 ? String(comps[1]) : line
-}
+  guard let regex = try? NSRegularExpression(pattern: pattern, options: []) else {
+    print("Error: Invalid regex pattern")
+    return
+  }
 
-if !submodulePaths.isEmpty {
-  print("Detected submodule changes in: \(submodulePaths)")
-  if dryRun {
-    print("dry-run: skipping commit of submodules")
+  var currentVer: String?
+  var existingRange: Range<String.Index>?
+
+  if let match = regex.firstMatch(in: content, options: [], range: NSRange(content.startIndex..., in: content)) {
+    if let verRange = Range(match.range(at: 1), in: content) {
+      currentVer = String(content[verRange])
+      existingRange = verRange
+    }
+  }
+
+  // 取得 Remote tags
+  var remoteVer = currentVer
+  let lsRemote = Shell.runExec(
+    "/usr/bin/git",
+    args: ["ls-remote", "--tags", "--sort=-v:refname", vanguardURL],
+    trim: true
+  )
+  if lsRemote.status == 0 {
+    // output line format: <hash>\trefs/tags/<tag>
+    if let firstLine = lsRemote.output.split(separator: "\n").first {
+      let parts = firstLine.split(separator: "\t")
+      if parts.count >= 2 {
+        let ref = String(parts[1])
+        remoteVer = ref.replacingOccurrences(of: "refs/tags/", with: "")
+      }
+    }
   } else {
-    // 明確加入並 commit 子模組的 pointer 更新
-    for sm in submodulePaths {
-      _ = Shell.runExec("/usr/bin/git", args: ["add", sm], cwd: repoPath)
-    }
-    let commitRes = Shell.runExec(
-      "/usr/bin/git",
-      args: ["commit", "-m", updateCommitMsg],
-      cwd: repoPath
-    )
-    if commitRes.status != 0 {
-      print("Failed to commit submodule changes: \(commitRes.output)")
-      // 若子模組 commit 失敗，則不要繼續做版本升級
-      exit(4)
-    }
-    print("Committed: \(updateCommitMsg)")
+    print("Warning: Failed to query remote tags: \(lsRemote.output)")
   }
-} else {
-  print("No submodule changes detected via 'git submodule status'.")
+
+  var newContent = content
+  var pendingUpdate = false
+
+  if let current = currentVer, let remote = remoteVer, current != remote, let range = existingRange {
+    print("Update available: \(current) -> \(remote)")
+    if !dryRun {
+      newContent.replaceSubrange(range, with: remote)
+      pendingUpdate = true
+    } else {
+      print("dry-run: skipping update")
+    }
+  } else {
+    var msg = "VanguardLexicon is up to date or cannot be determined (Current: \(currentVer ?? "?")"
+    if let r = remoteVer, r != currentVer {
+      msg += ", Remote: \(r)"
+    }
+    msg += ")"
+    print(msg)
+  }
+
+  if pendingUpdate {
+    do {
+      try newContent.write(toFile: packageSwiftPath, atomically: true, encoding: .utf8)
+      print("Updated Package.swift to version \(remoteVer!)")
+
+      print("Running 'swift package resolve' in \(packageDir)...")
+      let resolve = Shell.runExec("/usr/bin/swift", args: ["package", "resolve"], cwd: packageDir)
+      if resolve.status != 0 {
+        print("Warning: swift package resolve failed: \(resolve.output)")
+      }
+    } catch {
+      print("Error writing Package.swift: \(error)")
+    }
+  }
+
+  // 2) 檢查檔案變更並 Commit
+  let status = Shell.runExec("/usr/bin/git", args: ["status", "--porcelain", packageDirRelPath], cwd: repoPath)
+  // Check if Package.swift or Package.resolved inside that folder are changed
+  if !status.output.isEmpty {
+    // Determine if relevant files changed
+    let lines = status.output.split(separator: "\n")
+    let relevantChanges = lines.contains { line in
+      line.contains("Package.swift") || line.contains("Package.resolved")
+    }
+
+    if relevantChanges {
+      print("Detected changes in DictionaryData related files.")
+      if dryRun {
+        print("dry-run: skipping commit")
+      } else {
+        var filesToAdd = [packageSwiftRelPath]
+        if FileManager.default.fileExists(atPath: repoPath + "/" + packageResolvedRelPath) {
+          filesToAdd.append(packageResolvedRelPath)
+        }
+        _ = Shell.runExec("/usr/bin/git", args: ["add"] + filesToAdd, cwd: repoPath)
+        let commit = Shell.runExec("/usr/bin/git", args: ["commit", "-m", updateCommitMsg], cwd: repoPath)
+        if commit.status != 0 {
+          print("Failed to commit DictionaryData changes: \(commit.output)")
+          // 失敗則退出
+          exit(4)
+        }
+        print("Committed: \(updateCommitMsg)")
+      }
+    } else {
+      print("Changes detected in MainAssembly but not Package.swift/resolved. Ignoring for DictionaryData update.")
+    }
+  } else {
+    print("No DictionaryData changes detected.")
+  }
 }
+
+performDictionaryUpdate()
 
 // 3) 找出最高版本標籤 (highest tag)
 let tagOut = Shell.run(
