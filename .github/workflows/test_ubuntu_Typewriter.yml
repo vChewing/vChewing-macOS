@@ -1,6 +1,8 @@
-name: unit-test-typewriter
+name: unit-test-typewriter-linux
 on:
   push:
+    branches: [ "main" ]
+  pull_request:
     branches: [ "main" ]
 
 jobs:
