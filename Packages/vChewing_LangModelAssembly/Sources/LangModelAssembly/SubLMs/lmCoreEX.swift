@@ -75,7 +75,7 @@ extension LMAssembly {
       let consolidated = allowConsolidation
       do {
         let rawStrData: String = try LMAssembly.withFileHandleQueueSync {
-          if allowConsolidation {
+          if consolidated {
             LMConsolidator.fixEOF(path: path)
             LMConsolidator.consolidate(path: path, pragma: true)
           }
