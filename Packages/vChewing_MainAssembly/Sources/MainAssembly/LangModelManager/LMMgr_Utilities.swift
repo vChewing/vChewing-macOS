@@ -27,11 +27,7 @@ extension LMMgr {
     ext: String
   )
     -> String? {
-    let factoryPath = Bundle.main.path(forResource: filenameSansExt, ofType: ext) ?? Bundle.module
-      .path(
-        forResource: filenameSansExt,
-        ofType: ext
-      )
+    let factoryPath = #bundle.path(forResource: filenameSansExt, ofType: ext)
     guard let factoryPath = factoryPath else { return nil }
     let factory = PrefMgr.shared.useExternalFactoryDict ? factory : true
     let containerPath = Self.appSupportURL
@@ -51,7 +47,7 @@ extension LMMgr {
   // MARK: - 獲取原廠核心語彙檔案（SQLite）的路徑（優先獲取 Containers 下的資料檔案）。
 
   public static func getCoreDictionaryDBPath(factory: Bool = false) -> String? {
-    guard let factoryResultURL = Bundle.main.url(
+    guard let factoryResultURL = #bundle.url(
       forResource: "vChewingFactoryDatabase",
       withExtension: "sqlite"
     ) else {

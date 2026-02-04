@@ -5,7 +5,16 @@ import Foundation
 
 public enum LMATestsData {
   public static let sqlTestCoreLMData: String = {
-    let url = Bundle.module.url(forResource: "vanguardLegacy_test", withExtension: "sql")
+    let url: URL?
+    #if canImport(Darwin)
+      if #available(macOS 12, *) {
+        url = #bundle.url(forResource: "vanguardLegacy_test", withExtension: "sql")
+      } else {
+        url = Bundle.module.url(forResource: "vanguardLegacy_test", withExtension: "sql")
+      }
+    #else
+      url = Bundle.module.url(forResource: "vanguardLegacy_test", withExtension: "sql")
+    #endif
     guard let url else { return "" }
     return (try? String(contentsOf: url)) ?? ""
   }()
