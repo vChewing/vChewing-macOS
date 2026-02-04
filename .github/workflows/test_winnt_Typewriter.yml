@@ -1,0 +1,31 @@
+name: unit-test-typewriter-WinNT
+on:
+  push:
+    branches: [ "main", "dev/WinNT" ]
+  pull_request:
+    branches: [ "main" ]
+
+jobs:
+  build:
+    name: test-winnt-typewriter
+    runs-on: windows-latest
+    env:
+      GIT_SSL_NO_VERIFY: true
+    steps:
+      - uses: actions/checkout@v4
+
+      # Windows Swift toolchain install
+      - name: Setup Swift toolchain (Windows)
+      # 建议固定到 tag/sha；这里先按官方示例用 main
+        uses: compnerd/gha-setup-swift@main
+        with:
+          source: swift.org
+          swift-version: swift-6.2-release
+          swift-build: 6.2-RELEASE
+          # 可选：cache: true
+
+      - name: Swift version + run tests (custom package-path)
+        shell: pwsh
+        run: |
+          swift --version
+          swift test --no-parallel --package-path ./Packages/vChewing_Typewriter/
