@@ -9,11 +9,10 @@ jobs:
     runs-on: ubuntu-latest
     env:
         GIT_SSL_NO_VERIFY: true
-        DEVELOPER_DIR: /Applications/Xcode.app/Contents/Developer
     steps:
       - uses: SwiftyLab/setup-swift@latest
       - uses: actions/checkout@v1
       - name: Clean
         run: make spmClean
       - name: Test
-        run: swift test --no-parallel --package-path ./Packages/vChewing_Typewriter/
+        run: swift --version && swift test --no-parallel --package-path ./Packages/vChewing_Typewriter/
