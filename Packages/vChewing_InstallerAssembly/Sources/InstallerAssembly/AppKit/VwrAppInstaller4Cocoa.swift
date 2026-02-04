@@ -45,7 +45,11 @@ public final class VwrAppInstaller4Cocoa: NSViewController, InstallerVMProtocol 
   var translocationTimer: DispatchSourceTimer?
 
   var config: InstallerUIConfig = .init() {
-    didSet { refreshUI() }
+    didSet {
+      DispatchQueue.main.async { [weak self] in
+        self?.refreshUI()
+      }
+    }
   }
 
   var appNameAndVersionString: NSAttributedString {
@@ -291,7 +295,12 @@ public final class VwrAppInstaller4Cocoa: NSViewController, InstallerVMProtocol 
         timeLabel.stringValue = "i18n:installer.STOPPING_TIMEOUT_REMAINING".i18n + ": \(self.config.timeRemaining)s"
       }
 
-      if #available(macOS 13, *), AppInstallerDelegate.shared.isLegacyDistro {
+      legacyAlert: if #available(macOS 13, *), AppInstallerDelegate.shared.isLegacyDistro {
+        if !config.isLegacyPackageNoticeEverShown {
+          config.isLegacyPackageNoticeEverShown = true
+        } else {
+          break legacyAlert
+        }
         NSSound.beep()
         let alert = NSAlert()
         alert.messageText = "Please use mainstream releases for the current system version.".i18n
