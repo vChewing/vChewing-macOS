@@ -6,6 +6,7 @@
 // marks, or product names of Contributor, except as required to fulfill notice
 // requirements defined in MIT License.
 
+import AppKit
 import Foundation
 import Testing
 
@@ -38,5 +39,20 @@ extension MainAssemblyTests {
     ) as? NSNumber
     #expect(secondValue?.intValue == 1)
     #expect(secondRange.length == "乙".utf16.count)
+  }
+
+  @Test
+  func test402_Session_QEMUCursorReleaseHotKeyOmission() throws {
+    // QEMU relies on `Control+Option+G` to release the mouse cursor.
+    // This test ensures that the input method ignores this hotkey (returns false).
+    let ctrlOptionGEvent = NSEvent.KeyEventData(
+      type: .keyDown,
+      flags: [.control, .option],
+      chars: "g",
+      charsSansModifiers: "g",
+      keyCode: mapKeyCodesANSIForTests["g"] ?? 5
+    )
+    resetToEmptyAndClear()
+    press(ctrlOptionGEvent, shouldHandle: false)
   }
 }
