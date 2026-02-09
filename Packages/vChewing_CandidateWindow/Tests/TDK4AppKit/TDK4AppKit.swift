@@ -10,10 +10,10 @@ import AppKit
 import Shared_DarwinImpl
 import Testing
 
-@testable import CandidateWindow
+@testable import TDK4AppKit
 
 @Suite(.serialized)
-struct CandidatePoolTests {
+struct TDK4AppKitTests {
   let testCandidates: [String] = [
     "二十四歲是學生", "二十四歲", "昏睡紅茶", "食雪漢", "意味深", "學生", "便乗",
     "迫真", "驚愕", "論證", "正論", "惱", "悲", "屑", "食", "雪", "漢", "意", "味",
@@ -30,7 +30,7 @@ struct CandidatePoolTests {
 
   @Test
   func testPoolHorizontal() throws {
-    let pool = CandidatePool(
+    let pool = TDK4AppKit.CandidatePool4AppKit(
       candidates: testCandidatesConverted, selectionKeys: "123456", layout: .horizontal
     )
     var strOutput = ""
@@ -46,7 +46,7 @@ struct CandidatePoolTests {
 
   @Test
   func testPoolVertical() throws {
-    let pool = CandidatePool(
+    let pool = TDK4AppKit.CandidatePool4AppKit(
       candidates: testCandidatesConverted, selectionKeys: "123456", layout: .vertical
     )
     var strOutput = ""

@@ -49,7 +49,7 @@ public protocol SessionProtocol: AnyObject, IMKInputControllerProtocol, CtlCandi
   /// 最近一個被 set 的 marked text。
   var recentMarkedText: (text: NSAttributedString?, selectionRange: NSRange?) { get set }
   /// 當前選字窗是否為縱向。（縱排輸入時，只會啟用縱排選字窗。）
-  var isVerticalCandidateWindow: Bool { get set }
+  var isVerticalCandidateWindow: Bool { get }
   /// 記錄當前輸入環境是縱排輸入還是橫排輸入。
   var isVerticalTyping: Bool { get set }
   /// InputMode 需要在每次出現內容變更的時候都連帶重設組字器與各項語言模組，
@@ -279,13 +279,6 @@ extension SessionProtocol {
     }
     if this.inputMode != IMEApp.currentInputMode {
       this.inputMode = IMEApp.currentInputMode
-    }
-    // 選字窗不用管，交給新的 Session 的 ActivateServer 來管理。
-    asyncOnMain(bypassAsync: UserDefaults.pendingUnitTests) {
-      CtlCandidateTDK.currentMenu?.cancelTracking()
-      CtlCandidateTDK.currentMenu = nil
-      CtlCandidateTDK.currentWindow?.orderOut(nil)
-      CtlCandidateTDK.currentWindow = nil
     }
 
     // 下面這段步驟 無論 isActivated 是否為 true 都得執行。

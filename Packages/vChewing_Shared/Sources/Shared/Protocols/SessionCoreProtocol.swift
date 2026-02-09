@@ -10,7 +10,6 @@ import Foundation
 
 // MARK: - SessionCoreProtocol
 
-@MainActor
 public protocol SessionCoreProtocol: AnyObject {
   associatedtype State: IMEStateProtocol
   associatedtype Handler: InputHandlerCoreProtocol
@@ -58,6 +57,10 @@ extension SessionCoreProtocol {
     id == ui?.currentSessionID
   }
 
+  public var isServiceMenuState: Bool {
+    state.type == .ofSymbolTable && state.node.containsCandidateServices
+  }
+
   public func toggleCandidateUIVisibility(_ newValue: Bool, refresh: Bool = true) {
     toggleCandidateUIVisibility(newValue, refresh: refresh)
   }
@@ -77,7 +80,6 @@ extension SessionCoreProtocol {
 
 // MARK: - InputHandlerCoreProtocol
 
-@MainActor
 public protocol InputHandlerCoreProtocol: AnyObject {
   associatedtype State: IMEStateProtocol
   associatedtype Session: SessionCoreProtocol & CtlCandidateDelegate

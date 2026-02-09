@@ -85,9 +85,6 @@ public final class InputSession: @MainActor SessionProtocol, Sendable {
   /// 最近一個被 set 的 marked text。
   public var recentMarkedText: (text: NSAttributedString?, selectionRange: NSRange?) = (nil, nil)
 
-  /// 當前選字窗是否為縱向。（縱排輸入時，只會啟用縱排選字窗。）
-  public var isVerticalCandidateWindow = false
-
   /// 當前客體應用是否採用 Web 技術構築（例：Electron）。
   public var isClientElectronBased = false
 

@@ -99,6 +99,32 @@ extension SessionProtocol {
   public var isCandidateState: Bool { state.isCandidateContainer }
   public var showCodePointForCurrentCandidate: Bool { prefs.showCodePointInCandidateUI }
 
+  /// 當前選字窗是否為縱向。（縱排輸入時，只會啟用縱排選字窗。）
+  public var isVerticalCandidateWindow: Bool {
+    isVerticalTyping
+      || !prefs.useHorizontalCandidateList
+      || isServiceMenuState
+  }
+
+  public var isCandidateWindowSingleLine: Bool {
+    isVerticalTyping
+      || prefs.candidateWindowShowOnlyOneLine
+      || state.type == .ofInputting && state.isCandidateContainer
+      || isServiceMenuState
+  }
+
+  public var localeForFontFallbacks: String {
+    switch inputMode {
+    case .imeModeCHS: return "zh-Hans"
+    case .imeModeCHT:
+      if !prefs.shiftJISShinjitaiOutputEnabled, !prefs.chineseConversionEnabled {
+        return "zh-Hant"
+      }
+      return "ja"
+    default: return ""
+    }
+  }
+
   public var clientAccentColor: HSBA? {
     var nullResponse = !prefs.respectClientAccentColor
     nullResponse = nullResponse || prefs.shiftJISShinjitaiOutputEnabled

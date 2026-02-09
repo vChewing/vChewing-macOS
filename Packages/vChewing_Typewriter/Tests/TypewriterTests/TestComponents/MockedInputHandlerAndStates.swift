@@ -226,6 +226,12 @@ public final class MockSession: @MainActor SessionCoreProtocol, CtlCandidateDele
 
   public var isCandidateState: Bool { state.type == .ofCandidates }
 
+  public var isCandidateWindowSingleLine: Bool { true }
+
+  public var isVerticalCandidateWindow: Bool { false }
+
+  public var localeForFontFallbacks: String { "zh-Hant" }
+
   public func callError(_ logMessage: String) {
     vCLog(logMessage)
   }

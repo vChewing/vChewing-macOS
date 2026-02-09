@@ -10,7 +10,6 @@ import Foundation
 
 // MARK: - CtlCandidateDelegate
 
-@MainActor
 public protocol CtlCandidateDelegate: AnyObject {
   func candidateController() -> CtlCandidateProtocol?
   func candidatePairs(conv: Bool) -> [CandidateInState]
@@ -30,6 +29,9 @@ public protocol CtlCandidateDelegate: AnyObject {
   var selectionKeys: String { get }
   var isVerticalTyping: Bool { get }
   var isCandidateState: Bool { get }
+  var isVerticalCandidateWindow: Bool { get }
+  var localeForFontFallbacks: String { get }
+  var isCandidateWindowSingleLine: Bool { get }
   var showCodePointForCurrentCandidate: Bool { get }
   var shouldAutoExpandCandidates: Bool { get }
   var isCandidateContextMenuEnabled: Bool { get }
@@ -40,20 +42,11 @@ public protocol CtlCandidateDelegate: AnyObject {
 // MARK: - CtlCandidateProtocol
 
 public protocol CtlCandidateProtocol: AnyObject {
-  var tooltip: String { get set }
-  var reverseLookupResult: [String] { get set }
-  var locale: String { get set }
   var delegate: CtlCandidateDelegate? { get set }
   var highlightedIndex: Int { get set }
   var visible: Bool { get set }
-  var maxLinesPerPage: Int { get set }
-  var windowTopLeftPoint: CGPoint { get set }
-  var useLangIdentifier: Bool { get set }
   var currentLayout: UILayoutOrientation { get set }
 
-  func reloadData()
-  func updateDisplay()
-  func assignCandidateFont(name: String?, size: Double)
   func showNextPage() -> Bool
   func showPreviousPage() -> Bool
   func showNextLine() -> Bool

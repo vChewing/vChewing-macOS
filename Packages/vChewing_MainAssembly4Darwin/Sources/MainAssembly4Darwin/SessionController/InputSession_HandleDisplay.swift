@@ -81,30 +81,12 @@ extension SessionProtocol {
   private func showCandidates() {
     guard isCurrentSession, client() != nil else { return }
     updateVerticalTypingStatus()
-    let isServiceMenu = state.type == .ofSymbolTable && state.node.containsCandidateServices
-    isVerticalCandidateWindow = isVerticalTyping || !prefs.useHorizontalCandidateList
-    isVerticalCandidateWindow = isVerticalCandidateWindow || isServiceMenu
 
-    /// 無論是田所選字窗還是 IMK 選字窗，在這裡都有必要重新初期化。
-    let candidateLayout: UILayoutOrientation =
-      (isVerticalCandidateWindow ? .vertical : .horizontal)
-
-    let isInputtingWithCandidates = state.type == .ofInputting && state.isCandidateContainer
     /// 先取消既有的選字窗的內容顯示。否則可能會重複生成選字窗的 NSWindow()。
     ui?.candidateUI?.visible = false
-    ui?.candidateUI?.currentLayout = candidateLayout
-    var singleLine = isVerticalTyping || prefs.candidateWindowShowOnlyOneLine
-    singleLine = singleLine || isInputtingWithCandidates
-    singleLine = singleLine || isServiceMenu
 
-    ui?.candidateUI?.maxLinesPerPage = singleLine ? 1 : 4
-
-    ui?.candidateUI?.assignCandidateFont(
-      name: prefs.candidateTextFontName, size: prefs.candidateListTextSize
-    )
-
-    ui?.candidateUI?.locale = localeForFontFallbacks
-    ui?.candidateUI?.delegate = self // 會自動觸發田所選字窗的資料重載。
+    // 會自動觸發田所選字窗的資料重載。這會讓選字窗自動從當前 Session 讀取最新的配置資料。
+    ui?.candidateUI?.delegate = self
     ui?.candidateUI?.visible = true
 
     resetCandidateWindowOrigin()
@@ -119,17 +101,5 @@ extension SessionProtocol {
       bottomOutOfScreenAdjustmentHeight: lhRect.size.height + 4.0,
       useGCD: true
     )
-  }
-
-  public var localeForFontFallbacks: String {
-    switch inputMode {
-    case .imeModeCHS: return "zh-Hans"
-    case .imeModeCHT:
-      if !prefs.shiftJISShinjitaiOutputEnabled, !prefs.chineseConversionEnabled {
-        return "zh-Hant"
-      }
-      return "ja"
-    default: return ""
-    }
   }
 }
