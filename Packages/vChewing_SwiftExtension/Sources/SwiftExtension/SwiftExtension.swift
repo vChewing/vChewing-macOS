@@ -35,7 +35,7 @@ extension RangeReplaceableCollection where Element: Hashable {
 
 // MARK: - UILayoutOrientation
 
-public enum UILayoutOrientation: Int, Sendable {
+public enum UILayoutOrientation: Int, Codable, Hashable, Sendable {
   case horizontal = 0
   case vertical = 1
 }
