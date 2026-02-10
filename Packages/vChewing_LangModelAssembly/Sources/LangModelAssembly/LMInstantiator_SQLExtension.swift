@@ -413,16 +413,21 @@ extension LMAssembly.LMInstantiator {
   /// - parameters:
   ///   - incoming: 傳入的未加密注音讀音字串。
   fileprivate static func cnvPhonabetToASCII(_ incoming: String) -> String {
-    var strOutput = incoming
-    if !strOutput.contains("_") {
-      for entry in Self.dicPhonabet2ASCII {
-        strOutput = strOutput.replacingOccurrences(of: entry.key, with: entry.value)
+    guard !incoming.contains("_") else { return incoming }
+    var result = ""
+    result.reserveCapacity(incoming.unicodeScalars.count)
+    for char in incoming {
+      if let mapped = charPhonabet2ASCII[char] {
+        result.append(mapped)
+      } else {
+        result.append(char)
       }
     }
-    return strOutput
+    return result
   }
 
-  fileprivate static let dicPhonabet2ASCII: [String: String] = [
+  /// 逐字元注音→ASCII 查表（一次遍歷取代 37 次 replacingOccurrences）。
+  private static let charPhonabet2ASCII: [Character: Character] = [
     "ㄅ": "b", "ㄆ": "p", "ㄇ": "m", "ㄈ": "f", "ㄉ": "d", "ㄊ": "t", "ㄋ": "n", "ㄌ": "l", "ㄍ": "g",
     "ㄎ": "k", "ㄏ": "h",
     "ㄐ": "j", "ㄑ": "q", "ㄒ": "x", "ㄓ": "Z", "ㄔ": "C", "ㄕ": "S", "ㄖ": "r", "ㄗ": "z", "ㄘ": "c",
@@ -438,16 +443,21 @@ extension LMAssembly.LMInstantiator {
   /// - parameters:
   ///   - incoming: 傳入的已加密注音讀音字串。
   fileprivate static func restorePhonabetFromASCII(_ incoming: String) -> String {
-    var strOutput = incoming
-    if !strOutput.contains("_") {
-      for entry in Self.dicPhonabet4ASCII {
-        strOutput = strOutput.replacingOccurrences(of: entry.key, with: entry.value)
+    guard !incoming.contains("_") else { return incoming }
+    var result = ""
+    result.reserveCapacity(incoming.unicodeScalars.count)
+    for char in incoming {
+      if let mapped = charPhonabet4ASCII[char] {
+        result.append(mapped)
+      } else {
+        result.append(char)
       }
     }
-    return strOutput
+    return result
   }
 
-  fileprivate static let dicPhonabet4ASCII: [String: String] = [
+  /// 逐字元 ASCII→注音 查表。
+  private static let charPhonabet4ASCII: [Character: String] = [
     "b": "ㄅ", "p": "ㄆ", "m": "ㄇ", "f": "ㄈ", "d": "ㄉ", "t": "ㄊ", "n": "ㄋ", "l": "ㄌ", "g": "ㄍ",
     "k": "ㄎ", "h": "ㄏ",
     "j": "ㄐ", "q": "ㄑ", "x": "ㄒ", "Z": "ㄓ", "C": "ㄔ", "S": "ㄕ", "r": "ㄖ", "z": "ㄗ", "c": "ㄘ",

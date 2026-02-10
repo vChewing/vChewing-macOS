@@ -20,7 +20,7 @@ extension LMAssembly {
 
     // MARK: Internal
 
-    private(set) var filePath: String?
+    var filePath: String?
     /// Range 只可能是一整行，所以必須得有 index。
     var rangeMap: [String: [(Range<String.Index>, Int)]] = [:]
     var strData: String = ""
@@ -86,7 +86,7 @@ extension LMAssembly {
         }
       }
       rangeMap = newMap
-      newMap.removeAll()
+      newMap.removeAll(keepingCapacity: false)
     }
 
     mutating func clear() {

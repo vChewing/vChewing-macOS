@@ -58,7 +58,7 @@ extension LMAssembly.LMInstantiator {
     let values = tokens.map { $0.parseAsInputToken(isCHS: isCHS) }.flatMap { $0 }.deduplicated
     values.forEach { currentValue in
       let hashKey = "\(key)\t\(currentValue)".hashValue
-      inputTokenHashesArray.append(hashKey)
+      inputTokenHashesArray.insert(hashKey)
     }
     var i: Double = -99
     for strValue in values.reversed() {

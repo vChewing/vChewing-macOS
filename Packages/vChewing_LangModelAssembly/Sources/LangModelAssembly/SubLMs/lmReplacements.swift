@@ -18,7 +18,7 @@ extension LMAssembly {
 
     // MARK: Internal
 
-    private(set) var filePath: String?
+    var filePath: String?
 
     var rangeMap: [String: Range<String.Index>] = [:]
     var strData: String = ""
@@ -65,7 +65,7 @@ extension LMAssembly {
         if theKey.first != "#" { newMap[theKey] = theRange }
       }
       rangeMap = newMap
-      newMap.removeAll()
+      newMap.removeAll(keepingCapacity: false)
     }
 
     mutating func clear() {

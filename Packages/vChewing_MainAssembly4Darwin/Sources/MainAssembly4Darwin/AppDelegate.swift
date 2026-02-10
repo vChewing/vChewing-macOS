@@ -100,50 +100,60 @@ extension AppDelegate {
 
     PrefMgr.shared.fixOddPreferences()
 
-    SecurityAgentHelper.shared.timer?.fire()
-
-    SpeechSputnik.shared.refreshStatus() // 根據現狀條件決定是否初期化語音引擎。
-
     CandidateTextService.enableFinalSanityCheck()
+
+    // 將不需要阻塞啟動流程的初期化工作延後至下一個 RunLoop 迭代。
+    asyncOnMain {
+      // 安全代理檢查（行程掃描）與語音引擎預熱無需在啟動瞬間完成。
+      SecurityAgentHelper.shared.timer?.fire()
+      SpeechSputnik.shared.refreshStatus() // 根據現狀條件決定是否初期化語音引擎。
+    }
 
     // 一旦發現與使用者漸退模組的觀察行為有關的崩潰標記被開啟：
     // 如果有開啟 Debug 模式的話，就將既有的漸退記憶資料檔案更名＋打上當時的時間戳。
     // 如果沒有開啟 Debug 模式的話，則將漸退記憶資料直接清空。
     if PrefMgr.shared.failureFlagForPOMObservation {
-      LMMgr.relocateWreckedPOMData()
       PrefMgr.shared.failureFlagForPOMObservation = false
-      if #available(macOS 10.14, *) {
-        let msgPackage = UNMutableNotificationContent()
-        msgPackage.title = "vChewing".i18n
-        msgPackage
-          .body =
-          "vChewing crashed while handling previously loaded POM observation data. These data files are cleaned now to ensure the usability."
-            .i18n
-        msgPackage.sound = .defaultCritical
-        UNUserNotificationCenter.current().add(
-          .init(identifier: "vChewing.notification.pomCrash", content: msgPackage, trigger: nil),
-          withCompletionHandler: nil
-        )
-      } else {
-        let userNotification = NSUserNotification()
-        userNotification.title = "vChewing".i18n
-        userNotification
-          .informativeText =
-          "vChewing crashed while handling previously loaded POM observation data. These data files are cleaned now to ensure the usability."
-            .i18n
-        userNotification.soundName = NSUserNotificationDefaultSoundName
-        NSUserNotificationCenter.default.deliver(userNotification)
+      asyncOnMain {
+        LMMgr.relocateWreckedPOMData()
+        if #available(macOS 10.14, *) {
+          let msgPackage = UNMutableNotificationContent()
+          msgPackage.title = "vChewing".i18n
+          msgPackage
+            .body =
+            "vChewing crashed while handling previously loaded POM observation data. These data files are cleaned now to ensure the usability."
+              .i18n
+          msgPackage.sound = .defaultCritical
+          UNUserNotificationCenter.current().add(
+            .init(identifier: "vChewing.notification.pomCrash", content: msgPackage, trigger: nil),
+            withCompletionHandler: nil
+          )
+        } else {
+          let userNotification = NSUserNotification()
+          userNotification.title = "vChewing".i18n
+          userNotification
+            .informativeText =
+            "vChewing crashed while handling previously loaded POM observation data. These data files are cleaned now to ensure the usability."
+              .i18n
+          userNotification.soundName = NSUserNotificationDefaultSoundName
+          NSUserNotificationCenter.default.deliver(userNotification)
+        }
       }
     }
 
-    LMMgr.connectCoreDB()
-    LMMgr.loadCassetteData()
-    LMMgr.initUserLangModels()
-    folderMonitor.folderDidChange = { [weak self] in
+    // 核心辭典連線、磁帶載入、使用者語模初始化：
+    // 延後至下一個 RunLoop 迭代以避免阻塞 applicationWillFinishLaunching。
+    asyncOnMain { [weak self] in
+      LMMgr.connectCoreDB()
+      LMMgr.loadCassetteData()
+      LMMgr.initUserLangModels()
       guard let this = self else { return }
-      this.reloadOnFolderChangeHappens()
+      this.folderMonitor.folderDidChange = { [weak this] in
+        guard let this = this else { return }
+        this.reloadOnFolderChangeHappens()
+      }
+      if LMMgr.userDataFolderExists { this.folderMonitor.startMonitoring() }
     }
-    if LMMgr.userDataFolderExists { folderMonitor.startMonitoring() }
 
     PrefMgr.shared.fixOddPreferences()
   }

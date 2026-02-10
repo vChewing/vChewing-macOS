@@ -15,19 +15,29 @@ import Foundation
 
 extension String {
   /// 分析傳入的原始辭典檔案（UTF-8 TXT）的資料。
+  /// 以直接掃描分隔符位置的方式取得每一行的 Range，無需建構 Substring 陣列。
   /// - Parameters:
   ///   - separator: 行內單元分隔符。
   ///   - task: 要執行的外包任務。
   func parse(
-    splitee separator: Element,
+    splitee separator: Character,
     task: @escaping (_ theRange: Range<String.Index>) -> ()
   ) {
-    var startIndex = startIndex
-    split(separator: separator).forEach { substring in
-      let theRange = range(of: substring, range: startIndex ..< endIndex)
-      guard let theRange = theRange else { return }
-      task(theRange)
-      startIndex = theRange.upperBound
+    guard !isEmpty else { return }
+    var lineStart = startIndex
+    var i = startIndex
+    while i < endIndex {
+      if self[i] == separator {
+        if lineStart < i {
+          task(lineStart ..< i)
+        }
+        lineStart = index(after: i)
+      }
+      i = index(after: i)
+    }
+    // 處理最後一行（若不以分隔符結尾）。
+    if lineStart < endIndex {
+      task(lineStart ..< endIndex)
     }
   }
 }

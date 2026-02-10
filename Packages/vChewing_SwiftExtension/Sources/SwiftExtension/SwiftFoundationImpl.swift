@@ -268,17 +268,35 @@ public struct AppProperty<Value: Sendable>: Sendable {
 
 // Ref: https://stackoverflow.com/a/40993403/4162914 && https://stackoverflow.com/a/71291137/4162914
 extension String {
-  public mutating func regReplace(pattern: String, replaceWith: String = "") {
+  nonisolated public mutating func regReplace(pattern: String, replaceWith: String = "") {
     do {
-      let regex = try NSRegularExpression(
-        pattern: pattern, options: [.caseInsensitive, .anchorsMatchLines]
-      )
+      let regex = try Self.cachedRegex(for: pattern)
       let range = NSRange(startIndex..., in: self)
       self = regex.stringByReplacingMatches(
         in: self, options: [], range: range, withTemplate: replaceWith
       )
     } catch { return }
   }
+
+  nonisolated private static func cachedRegex(for pattern: String) throws -> NSRegularExpression {
+    try regexCache.withLock { cache in
+      if let cached = cache[pattern] as? NSRegularExpression {
+        return cached
+      }
+      let regex = try NSRegularExpression(
+        pattern: pattern, options: [.caseInsensitive, .anchorsMatchLines]
+      )
+      cache[pattern] = regex
+      return regex
+    }
+  }
+
+  // MARK: Private
+
+  // MARK: - 快取已編譯的 NSRegularExpression
+
+  /// 以 pattern 為 key 快取已編譯的正規表示式，避免每次呼叫重新編譯。
+  nonisolated private static let regexCache: NSMutex<NSMutableDictionary> = .init(.init())
 }
 
 // MARK: - Localized String Extension for Integers and Floats
@@ -506,7 +524,7 @@ nonisolated public final class NSMutex<Value>: Sendable {
 
 // MARK: - CRC32
 
-public enum CRC32 {
+nonisolated public enum CRC32 {
   // MARK: Public
 
   public static func checksum(data: Data) -> UInt32 {

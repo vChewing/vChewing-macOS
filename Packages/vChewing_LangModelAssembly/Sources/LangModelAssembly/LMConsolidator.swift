@@ -8,6 +8,7 @@
 
 import Foundation
 import LineReader
+import SwiftExtension
 
 // MARK: - LMAssembly.LMConsolidator
 
@@ -171,20 +172,5 @@ extension LMAssembly {
         return false
       }
     }
-  }
-}
-
-extension String {
-  nonisolated fileprivate mutating func regReplace(pattern: String, replaceWith: String = "") {
-    // Ref: https://stackoverflow.com/a/40993403/4162914 && https://stackoverflow.com/a/71291137/4162914
-    do {
-      let regex = try NSRegularExpression(
-        pattern: pattern, options: [.caseInsensitive, .anchorsMatchLines]
-      )
-      let range = NSRange(startIndex..., in: self)
-      self = regex.stringByReplacingMatches(
-        in: self, options: [], range: range, withTemplate: replaceWith
-      )
-    } catch { return }
   }
 }

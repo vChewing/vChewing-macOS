@@ -39,7 +39,7 @@ extension LMAssembly.LMInstantiator {
     lmPerceptionOverride.loadData(fromURL: fileURL)
   }
 
-  public func savePOMData(toURL fileURL: URL? = nil) {
+  nonisolated public func savePOMData(toURL fileURL: URL? = nil) {
     lmPerceptionOverride.saveData(toURL: fileURL)
   }
 

@@ -40,7 +40,7 @@ extension LMAssembly {
 
     // MARK: Internal
 
-    private(set) var filePath: String?
+    var filePath: String?
 
     /// 資料庫辭典。索引內容為注音字串，資料內容則為字串首尾範圍、方便自 strData 取資料。
     var rangeMap: [String: [Range<String.Index>]] = [:]

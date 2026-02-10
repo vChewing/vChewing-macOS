@@ -237,13 +237,17 @@ private let tableMappingArabicDatesToChinese: [String: String] = {
   return result
 }()
 
+/// 預先排序好的 key 陣列（按長度遞減），避免每次呼叫重新排序。
+private let sortedArabicDateKeys: [String] = {
+  tableMappingArabicDatesToChinese.keys.sorted { $0.count > $1.count }
+}()
+
 extension String {
   /// 將給定的字串當中的阿拉伯數字轉為漢語小寫，逐字轉換。
   /// - Parameter target: 要進行轉換操作的對象，會直接修改該對象。
   fileprivate func convertArabicNumeralsToChinese(onlyDigits: Bool) -> String {
     var target = self
-    let sortedKeys = tableMappingArabicDatesToChinese.keys.sorted { $0.count > $1.count }
-    for key in sortedKeys {
+    for key in sortedArabicDateKeys {
       if onlyDigits, key.count > 1 { continue }
       guard let result = tableMappingArabicDatesToChinese[key] else { continue }
       target = target.replacingOccurrences(of: key, with: result)

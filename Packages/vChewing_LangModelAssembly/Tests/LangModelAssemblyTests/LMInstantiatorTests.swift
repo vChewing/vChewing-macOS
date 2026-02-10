@@ -40,10 +40,10 @@ struct LMInstantiatorTests {
     }
     let instance = LMAssembly.LMInstantiator()
     // Create 3500 dummy hashes
-    instance.inputTokenHashesArray = ContiguousArray((0 ..< 3_500).map { $0 })
+    instance.inputTokenHashesArray = Set((0 ..< 3_500).map { $0 })
     // Trigger cleanup via a simple unigram query
     _ = instance.unigramsFor(keyArray: ["ㄎㄜ"])
-    #expect(instance.inputTokenHashesArray.count == 1_000)
+    #expect(instance.inputTokenHashesArray.isEmpty)
   }
 
   @Test

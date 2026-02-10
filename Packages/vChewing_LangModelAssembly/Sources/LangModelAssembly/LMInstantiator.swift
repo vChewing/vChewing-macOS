@@ -40,7 +40,7 @@ extension LMAssembly {
       pomDataURL: URL? = nil
     ) {
       self.isCHS = isCHS
-      self.lmPerceptionOverride = .init(dataURL: pomDataURL)
+      self.mtxPerceptionOverride = .init(.init(dataURL: pomDataURL))
     }
 
     // MARK: Public
@@ -73,18 +73,11 @@ extension LMAssembly {
     // 在函式內部用以記錄狀態的開關。
     public private(set) var config = Config()
 
-    public internal(set) var inputTokenHashesArray: ContiguousArray<Int> = [] {
-      didSet {
-        let currentSet = Set(inputTokenHashesArray)
-        let previousSet = Set(oldValue)
-        guard currentSet.hashValue != previousSet.hashValue else { return }
-        inputTokenHashesArray = inputTokenHashesArray.deduplicated
-      }
-    }
+    public internal(set) var inputTokenHashesArray: Set<Int> = []
 
     public var isCassetteDataLoaded: Bool { Self.lmCassette.isLoaded }
 
-    public static func setCassetCandidateKeyValidator(_ validator: @escaping (String) -> Bool) {
+    public static func setCassetCandidateKeyValidator(_ validator: @Sendable @escaping (String) -> Bool) {
       Self.lmCassette.candidateKeysValidator = validator
     }
 
@@ -101,8 +94,21 @@ extension LMAssembly {
       if !Self.asyncLoadingUserData {
         load()
       } else {
-        asyncOnMain {
-          load()
+        // CIN 解析在背景佇列完成，僅在成功後把結果交回 MainActor。
+        let validator = Self.lmCassette.candidateKeysValidator
+        LMAssembly.fileHandleQueue.async {
+          guard FileManager.default.isReadableFile(atPath: path) else {
+            vCLMLog("lmCassette: File access failure: \(path)")
+            return
+          }
+          var newCassette = LMCassette()
+          newCassette.candidateKeysValidator = validator
+          newCassette.open(path)
+          let count = newCassette.count
+          asyncOnMain {
+            Self.lmCassette = newCassette
+            vCLMLog("lmCassette: \(count) entries of data loaded from: \(path)")
+          }
         }
       }
     }
@@ -157,8 +163,14 @@ extension LMAssembly {
       if !Self.asyncLoadingUserData {
         loadMain()
       } else {
-        asyncOnMain {
-          loadMain()
+        LMAssembly.readFileContentAsync(
+          path: path, shouldConsolidate: lmUserPhrases.allowConsolidation
+        ) { [weak self] content in
+          guard let self else { return }
+          self.lmUserPhrases.clear()
+          self.lmUserPhrases.replaceData(textData: content)
+          self.lmUserPhrases.filePath = path
+          vCLMLog("lmUserPhrases: \(self.lmUserPhrases.count) entries of data loaded from: \(path)")
         }
       }
       guard let filterPath = filterPath else { return }
@@ -174,8 +186,14 @@ extension LMAssembly {
       if !Self.asyncLoadingUserData {
         loadFilter()
       } else {
-        asyncOnMain {
-          loadFilter()
+        LMAssembly.readFileContentAsync(
+          path: filterPath, shouldConsolidate: lmFiltered.allowConsolidation
+        ) { [weak self] content in
+          guard let self else { return }
+          self.lmFiltered.clear()
+          self.lmFiltered.replaceData(textData: content)
+          self.lmFiltered.filePath = filterPath
+          vCLMLog("lmFiltered: \(self.lmFiltered.count) entries of data loaded from: \(filterPath)")
         }
       }
     }
@@ -204,8 +222,14 @@ extension LMAssembly {
       if !Self.asyncLoadingUserData {
         load()
       } else {
-        asyncOnMain {
-          load()
+        LMAssembly.readFileContentAsync(
+          path: path, shouldConsolidate: lmUserSymbols.allowConsolidation
+        ) { [weak self] content in
+          guard let self else { return }
+          self.lmUserSymbols.clear()
+          self.lmUserSymbols.replaceData(textData: content)
+          self.lmUserSymbols.filePath = path
+          vCLMLog("lmUserSymbol: \(self.lmUserSymbols.count) entries of data loaded from: \(path)")
         }
       }
     }
@@ -223,9 +247,21 @@ extension LMAssembly {
       if !Self.asyncLoadingUserData {
         load()
       } else {
-        asyncOnMain {
-          load()
-        }
+        loadUserAssociatesDataAsync(path: path)
+      }
+    }
+
+    /// 非同步讀取關聯詞語資料（懶載入路徑）。
+    public func loadUserAssociatesDataAsync(path: String) {
+      // LMAssociates.open() 一律 consolidate。
+      LMAssembly.readFileContentAsync(
+        path: path, shouldConsolidate: true
+      ) { [weak self] content in
+        guard let self else { return }
+        self.lmAssociates.clear()
+        self.lmAssociates.replaceData(textData: content)
+        self.lmAssociates.filePath = path
+        vCLMLog("lmAssociates: \(self.lmAssociates.count) entries of data loaded from: \(path)")
       }
     }
 
@@ -242,8 +278,15 @@ extension LMAssembly {
       if !Self.asyncLoadingUserData {
         load()
       } else {
-        asyncOnMain {
-          load()
+        // LMReplacements.open() 一律 consolidate，故 shouldConsolidate: true。
+        LMAssembly.readFileContentAsync(
+          path: path, shouldConsolidate: true
+        ) { [weak self] content in
+          guard let self else { return }
+          self.lmReplacements.clear()
+          self.lmReplacements.replaceData(textData: content)
+          self.lmReplacements.filePath = path
+          vCLMLog("lmReplacements: \(self.lmReplacements.count) entries of data loaded from: \(path)")
         }
       }
     }
@@ -447,18 +490,18 @@ extension LMAssembly {
       // 將兩句差分也是為了讓 rawUserUnigrams 的類型不受可能的影響。
       if !config.bypassUserPhrasesData {
         let allowBoostingSingleKanji = config.allowRescoringSingleKanjiCandidates
-        let factorySingleReadingValueHashes: [Int] = factoryCoreUnigramsResult.compactMap {
-          $0.keyArray.count == 1 ? $0.hashValue : nil
+        let factorySingleReadingValueHashes: Set<Int> = factoryCoreUnigramsResult.reduce(into: []) {
+          if $1.keyArray.count == 1 { $0.insert($1.hashValue) }
         }
         var userPhraseUnigrams = Array(
           lmUserPhrases.unigramsFor(
             key: keyChain,
             keyArray: keyArray,
             omitNonTemporarySingleCharNonSymbolUnigrams: !allowBoostingSingleKanji,
-            factorySingleReadingValueHashes: Set(factorySingleReadingValueHashes)
+            factorySingleReadingValueHashes: factorySingleReadingValueHashes
           ).reversed()
         )
-        if keyArray.count == 1, let topScore = rawAllUnigrams.map(\.score).max() {
+        if keyArray.count == 1, let topScore = rawAllUnigrams.lazy.map(\.score).max() {
           // 不再讓使用者自己加入的單漢字讀音權重進入組句體系。
           userPhraseUnigrams = userPhraseUnigrams.map { currentUnigram in
             Megrez.Unigram(
@@ -474,24 +517,23 @@ extension LMAssembly {
       // 定期清理 InputToken HashMap 以防止記憶體洩漏
       cleanupInputTokenHashMapIfNeeded()
 
-      // 分析且處理可能存在的 InputToken。
-      let rawAllUnigramsToFlat: [[Megrez.Unigram]] = rawAllUnigrams.map { unigram in
+      // 分析且處理可能存在的 InputToken（in-place 展開，避免双重陣列）。
+      var expandedUnigrams: [Megrez.Unigram] = []
+      expandedUnigrams.reserveCapacity(rawAllUnigrams.count)
+      for unigram in rawAllUnigrams {
         let convertedValues = unigram.value.parseAsInputToken(isCHS: isCHS)
-        // 不是 InputToken 的話，直接返回原 Unigram
-        guard !convertedValues.isEmpty else { return [unigram] }
-        // 只有確認是 InputToken 時才處理並寫入 HashMap
-        var result = [Megrez.Unigram]()
-        convertedValues.enumerated().forEach { absDelta, value in
-          let newScore: Double = -80 - Double(absDelta) * 0.01
-          result.append(.init(keyArray: keyArray, value: value, score: newScore))
-          // 僅為 InputToken 生成的 Unigram 寫入 HashMap
-          let hashKey = "\(keyChain)\t\(value)".hashValue
-          inputTokenHashesArray.append(hashKey)
+        if convertedValues.isEmpty {
+          expandedUnigrams.append(unigram)
+        } else {
+          for (absDelta, value) in convertedValues.enumerated() {
+            let newScore: Double = -80 - Double(absDelta) * 0.01
+            expandedUnigrams.append(.init(keyArray: keyArray, value: value, score: newScore))
+            let hashKey = "\(keyChain)\t\(value)".hashValue
+            inputTokenHashesArray.insert(hashKey)
+          }
         }
-        return result
       }
-
-      rawAllUnigrams = rawAllUnigramsToFlat.flatMap { $0 }
+      rawAllUnigrams = expandedUnigrams
 
       if config.isCassetteEnabled {
         rawAllUnigrams.insert(
@@ -591,8 +633,11 @@ extension LMAssembly {
     var lmReplacements = LMReplacements()
     var lmAssociates = LMAssociates()
 
-    // 漸退記憶模組
-    var lmPerceptionOverride: LMPerceptionOverride
+    // 漸退記憶模組（NSMutex 保證執行緒安全，故標記 nonisolated）
+    nonisolated var lmPerceptionOverride: LMPerceptionOverride {
+      get { mtxPerceptionOverride.value }
+      set { mtxPerceptionOverride.value = newValue }
+    }
 
     // 確保關聯詞語資料在首次剛需時得以即時載入。
     internal func ensureAssociatesLoaded() {
@@ -657,17 +702,17 @@ extension LMAssembly {
     nonisolated private static let mtxSQLPointer: NSMutex<OpaquePointer?> = .init(nil)
     nonisolated private static let sqlLock: NSLock = .init()
 
+    nonisolated private let mtxPerceptionOverride: NSMutex<LMPerceptionOverride>
+
     // MARK: - 工具函式
 
     private let prefs = PrefMgr()
 
     /// 當 HashMap 過大時自動清理
     private func cleanupInputTokenHashMapIfNeeded() {
-      // 更積極的清理策略：超過 3000 條目就清理至 1000 條目
+      // 超過 3000 條目就直接清空（Set 無法保留插入順序，故不做部分截斷）。
       if inputTokenHashesArray.count > 3_000 {
-        // 保留最近 1000 個條目，清理其餘的
-        let toRemove = inputTokenHashesArray.count - 1_000
-        inputTokenHashesArray.removeFirst(toRemove)
+        inputTokenHashesArray.removeAll(keepingCapacity: true)
       }
     }
   }

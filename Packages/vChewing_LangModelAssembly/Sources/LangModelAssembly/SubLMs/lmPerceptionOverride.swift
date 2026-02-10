@@ -39,26 +39,21 @@ extension LMAssembly {
   ///
   /// POM 使用野獸常數作為衰減曲線。
   /// 預設整個生存週期是八天，但可以藉由偏好設定銳減至 12 小時內。
-  public final class LMPerceptionOverride {
+  nonisolated public final class LMPerceptionOverride {
     // MARK: Lifecycle
 
     public init(
       capacity: Int = 500,
       thresholdProvider: (() -> Double)? = nil,
-      dataURL: URL? = nil,
-      prefMgr: PrefMgr? = nil
+      dataURL: URL? = nil
     ) {
       self.mutCapacity = max(capacity, 1) // 該參數得始終大於 0.
       self.thresholdProvider = thresholdProvider
       self.fileSaveLocationURL = dataURL
       self.previouslySavedHash = ""
-      self.prefs = prefMgr ?? PrefMgr()
     }
 
     // MARK: Public
-
-    /// PrefMgr 副本
-    public var prefs: PrefMgr
 
     public func setCapacity(_ capacity: Int) {
       lock.withLock {
@@ -120,7 +115,7 @@ extension LMAssembly {
 // MARK: - Private Structures
 
 extension LMAssembly.LMPerceptionOverride {
-  public struct Override: Hashable, Encodable, Decodable, CustomStringConvertible {
+  nonisolated public struct Override: Hashable, Encodable, Decodable, CustomStringConvertible {
     // MARK: Lifecycle
 
     fileprivate init(count: Int, timestamp: Double) {
@@ -173,7 +168,7 @@ extension LMAssembly.LMPerceptionOverride {
     }
   }
 
-  public final class Perception: Hashable, Encodable, Decodable, CustomStringConvertible {
+  nonisolated public final class Perception: Hashable, Encodable, Decodable, CustomStringConvertible {
     // MARK: Lifecycle
 
     fileprivate init() {}
@@ -233,7 +228,7 @@ extension LMAssembly.LMPerceptionOverride {
     }
   }
 
-  public final class KeyPerceptionPair: Hashable, Encodable, Decodable, CustomStringConvertible {
+  nonisolated public final class KeyPerceptionPair: Hashable, Encodable, Decodable, CustomStringConvertible {
     // MARK: Lifecycle
 
     fileprivate init(key: String, perception: Perception) {
@@ -292,13 +287,13 @@ extension LMAssembly.LMPerceptionOverride {
     }
   }
 
-  private enum JournalOperation: String, Codable {
+  nonisolated private enum JournalOperation: String, Codable {
     case upsert
     case removeKey
     case clear
   }
 
-  private struct JournalRecord: Codable {
+  nonisolated private struct JournalRecord: Codable {
     // MARK: Lifecycle
 
     init(operation: JournalOperation, key: String? = nil, pair: KeyPerceptionPair? = nil) {
@@ -323,7 +318,7 @@ extension Array where Element == Megrez.GramInPath {
   ///   - cursor: 給定游標位置。
   ///   - outCursorPastNode: 找出的節點的前端位置。
   /// - Returns: 查找結果。
-  public func findGramWithRange(at cursor: Int) -> (node: Megrez.GramInPath, range: Range<Int>)? {
+  nonisolated public func findGramWithRange(at cursor: Int) -> (node: Megrez.GramInPath, range: Range<Int>)? {
     guard !isEmpty else { return nil }
     let cursor = Swift.max(0, Swift.min(cursor, totalKeyCount - 1)) // 防呆
     let range = contextRange(ofGivenCursor: cursor)
@@ -334,7 +329,7 @@ extension Array where Element == Megrez.GramInPath {
 }
 
 extension LMAssembly.LMPerceptionOverride {
-  public func fetchSuggestion(
+  nonisolated public func fetchSuggestion(
     assembledResult: [Megrez.GramInPath],
     cursor: Int,
     timestamp: Double
@@ -385,7 +380,7 @@ extension LMAssembly.LMPerceptionOverride {
   }
 
   /// 獲取由洞察過的記憶內容生成的選字建議。
-  func getSuggestion(
+  nonisolated func getSuggestion(
     key: String,
     timestamp: Double
   )
@@ -459,7 +454,7 @@ extension LMAssembly.LMPerceptionOverride {
     return candidates.isEmpty ? nil : candidates // 確保當陣列為空時返回 nil
   }
 
-  public func memorizePerception(
+  nonisolated public func memorizePerception(
     _ perception: (ngramKey: String, candidate: String),
     timestamp: Double,
     saveCallback: (() -> ())? = nil
@@ -517,7 +512,7 @@ extension LMAssembly.LMPerceptionOverride {
   }
 
   /// 清除指定的建議（基於 context + candidate 對）
-  func bleachSpecifiedSuggestions(
+  nonisolated func bleachSpecifiedSuggestions(
     targets: [(ngramKey: String, candidate: String)],
     saveCallback: (() -> ())? = nil
   ) {
@@ -566,7 +561,7 @@ extension LMAssembly.LMPerceptionOverride {
   }
 
   /// 清除指定的建議（基於 candidate，移除所有上下文中的該候選詞）
-  func bleachSpecifiedSuggestions(candidateTargets: [String], saveCallback: (() -> ())? = nil) {
+  nonisolated func bleachSpecifiedSuggestions(candidateTargets: [String], saveCallback: (() -> ())? = nil) {
     if candidateTargets.isEmpty { return }
 
     let hasChanges: Bool = lock.withLock {
@@ -617,7 +612,7 @@ extension LMAssembly.LMPerceptionOverride {
   }
 
   /// 清除指定讀音（head reading）底下的所有建議。
-  func bleachSpecifiedSuggestions(headReadingTargets: [String], saveCallback: (() -> ())? = nil) {
+  nonisolated func bleachSpecifiedSuggestions(headReadingTargets: [String], saveCallback: (() -> ())? = nil) {
     let targets = Set(headReadingTargets.filter { !$0.isEmpty })
     guard !targets.isEmpty else { return }
 
@@ -651,7 +646,7 @@ extension LMAssembly.LMPerceptionOverride {
   }
 
   /// 自 LRU 辭典內移除所有的單元圖。
-  func bleachUnigrams(saveCallback: (() -> ())? = nil) {
+  nonisolated func bleachUnigrams(saveCallback: (() -> ())? = nil) {
     let hasChanges: Bool = lock.withLock {
       var keysToRemove: [String] = []
       for key in mutLRUMap.keys {
@@ -674,7 +669,7 @@ extension LMAssembly.LMPerceptionOverride {
     }
   }
 
-  public func resetLRUList() {
+  nonisolated public func resetLRUList() {
     purgeUnderscorePrefixedKeys()
     mutLRUKeySeqList.removeAll()
     let mapLRUSorted = mutLRUMap.sorted {
@@ -686,7 +681,7 @@ extension LMAssembly.LMPerceptionOverride {
   }
 
   /// 將記憶中的覆寫資料清空，並重置日誌追蹤狀態。
-  public func clearData() {
+  nonisolated public func clearData() {
     lock.withLock {
       mutLRUMap = [:]
       mutLRUKeySeqList = []
@@ -700,7 +695,7 @@ extension LMAssembly.LMPerceptionOverride {
 
   /// 同時清除記憶體與磁碟上的快照與日誌。
   /// - Parameter fileURL: 可選的覆寫儲存位置 URL。
-  func clearData(withURL fileURL: URL? = nil) {
+  nonisolated func clearData(withURL fileURL: URL? = nil) {
     clearData()
     guard let fileURL = fileURL ?? fileSaveLocationURL else {
       vCLMLog("POM Error: Unable to clear data because file URL is nil.")
@@ -713,7 +708,7 @@ extension LMAssembly.LMPerceptionOverride {
     }
   }
 
-  public func getSavableData() -> [KeyPerceptionPair] {
+  nonisolated public func getSavableData() -> [KeyPerceptionPair] {
     lock.withLock {
       mutLRUMap.values.sorted {
         $0.latestTimeStamp > $1.latestTimeStamp
@@ -721,7 +716,7 @@ extension LMAssembly.LMPerceptionOverride {
     }
   }
 
-  public func loadData(from data: [KeyPerceptionPair]) {
+  nonisolated public func loadData(from data: [KeyPerceptionPair]) {
     lock.withLock {
       var newMap = [String: KeyPerceptionPair]()
       data.forEach { currentPair in
@@ -737,7 +732,7 @@ extension LMAssembly.LMPerceptionOverride {
   /// - Parameters:
   ///   - fileURL: 可選的儲存路徑，覆寫預設位置。
   ///   - skipDebounce: 為了 API 相容性而保留，實際的防抖處理由外部負責。
-  func saveData(toURL fileURL: URL? = nil, skipDebounce _: Bool = false) {
+  nonisolated func saveData(toURL fileURL: URL? = nil, skipDebounce _: Bool = false) {
     guard let fileURL: URL = fileURL ?? fileSaveLocationURL else {
       vCLMLog("POM saveData() failed. At least the file Save URL is not set for the current POM.")
       return
@@ -789,7 +784,7 @@ extension LMAssembly.LMPerceptionOverride {
 
   /// 從磁碟載入覆寫資料並重播未處理的日誌。
   /// - Parameter fileURL: 可選的載入路徑，覆寫預設位置。
-  func loadData(fromURL fileURL: URL? = nil) {
+  nonisolated func loadData(fromURL fileURL: URL? = nil) {
     guard let fileURL: URL = fileURL ?? fileSaveLocationURL else {
       vCLMLog("POM loadData() failed. At least the file Load URL is not set for the current POM.")
       return
@@ -843,24 +838,24 @@ extension LMAssembly.LMPerceptionOverride {
 
 extension LMAssembly.LMPerceptionOverride {
   /// 判斷一個鍵是否為單漢字 (SegLength == 1)
-  private func isSegLengthOne(key: String) -> Bool {
+  nonisolated private func isSegLengthOne(key: String) -> Bool {
     !key.contains("-")
   }
 
   // 解析 Perception Key 的健壯 parser（不用正則）。
   // 現行格式示例：(anteReading,anteValue)&(prevReading,prevValue)&(headReading,headValue)
-  struct PerceptionKeyParts {
+  nonisolated struct PerceptionKeyParts {
     let headReading: String
     let headValue: String
     let previous: (reading: String, value: String)?
     let anterior: (reading: String, value: String)?
   }
 
-  func parsePerceptionKey(_ key: String) -> PerceptionKeyParts? {
+  nonisolated func parsePerceptionKey(_ key: String) -> PerceptionKeyParts? {
     parseDelimitedPerceptionKey(key)
   }
 
-  private func parseDelimitedPerceptionKey(_ key: String) -> PerceptionKeyParts? {
+  nonisolated private func parseDelimitedPerceptionKey(_ key: String) -> PerceptionKeyParts? {
     let trimmed = key.trimmingCharacters(in: .whitespacesAndNewlines)
     guard trimmed.contains("&") else { return nil }
 
@@ -909,7 +904,7 @@ extension LMAssembly.LMPerceptionOverride {
     )
   }
 
-  private func compareContextPart(
+  nonisolated private func compareContextPart(
     _ lhs: (reading: String, value: String)?,
     _ rhs: (reading: String, value: String)?
   )
@@ -929,7 +924,7 @@ extension LMAssembly.LMPerceptionOverride {
     }
   }
 
-  private func alternateKeys(for originalKey: String) -> [String] {
+  nonisolated private func alternateKeys(for originalKey: String) -> [String] {
     guard let originalParts = parsePerceptionKey(originalKey) else { return [] }
     guard !shouldIgnorePerception(originalParts) else { return [] }
     let separatorString = Megrez.Compositor.theSeparator
@@ -1007,11 +1002,11 @@ extension LMAssembly.LMPerceptionOverride {
   }
 
   // 僅供單元測試使用：用於專門曝露替代 Key 的 API。
-  internal func alternateKeysForTesting(_ originalKey: String) -> [String] {
+  nonisolated internal func alternateKeysForTesting(_ originalKey: String) -> [String] {
     alternateKeys(for: originalKey)
   }
 
-  private func forceHighScoreOverrideFlag(for key: String) -> Bool {
+  nonisolated private func forceHighScoreOverrideFlag(for key: String) -> Bool {
     guard let parts = parsePerceptionKey(key) else { return false }
     guard !shouldIgnorePerception(parts) else { return false }
     let separatorString = Megrez.Compositor.theSeparator
@@ -1051,7 +1046,7 @@ extension LMAssembly.LMPerceptionOverride {
   ///   - isUnigram: 是否為 Unigram
   ///   - isSingleCharUnigram: 是否為單讀音單漢字的 Unigram
   /// - Returns: 權重分數
-  internal func calculateWeight(
+  nonisolated internal func calculateWeight(
     eventCount: Int,
     totalCount: Int,
     eventTimestamp: Double,
@@ -1078,7 +1073,10 @@ extension LMAssembly.LMPerceptionOverride {
 
     // 調整有效視窗 wT，單字略快、單讀音單漢字再快一些（避免單字長期壓制）
     // 根據偏好設定決定基礎時間窗 wT：如果啟用急速遺忘模式，則從約一週降低至 12 小時內
-    var wT = prefs.reducePOMLifetimeToNoMoreThan12Hours ? 0.5 : 8.0
+    var wT: Double = {
+      let key = UserDef.kReducePOMLifetimeToNoMoreThan12Hours.rawValue
+      return UserDefaults.current.bool(forKey: key) ? 0.5 : 8.0
+    }()
     if isUnigram { wT *= 0.85 }
     if isSingleCharUnigram { wT *= 0.8 }
 
@@ -1103,7 +1101,7 @@ extension LMAssembly.LMPerceptionOverride {
     return max(score, threshold + 0.001)
   }
 
-  static func isPunctuation(_ node: Megrez.GramInPath) -> Bool {
+  nonisolated static func isPunctuation(_ node: Megrez.GramInPath) -> Bool {
     for key in node.keyArray {
       guard let firstChar = key.first else { continue }
       return String(firstChar) == "_"
@@ -1111,22 +1109,22 @@ extension LMAssembly.LMPerceptionOverride {
     return false
   }
 
-  private func shouldIgnorePerception(_ parts: PerceptionKeyParts) -> Bool {
+  nonisolated private func shouldIgnorePerception(_ parts: PerceptionKeyParts) -> Bool {
     let readings = [parts.headReading, parts.previous?.reading, parts.anterior?.reading]
       .compactMap { $0 }
     return readings.contains { containsUnderscorePrefixedReading($0) }
   }
 
-  private func shouldIgnoreKey(_ key: String) -> Bool {
+  nonisolated private func shouldIgnoreKey(_ key: String) -> Bool {
     guard let parts = parsePerceptionKey(key) else { return false }
     return shouldIgnorePerception(parts)
   }
 
-  private func containsUnderscorePrefixedReading(_ reading: String) -> Bool {
+  nonisolated private func containsUnderscorePrefixedReading(_ reading: String) -> Bool {
     readingSegments(from: reading).contains { $0.hasPrefix("_") }
   }
 
-  private func readingSegments(from reading: String) -> [String] {
+  nonisolated private func readingSegments(from reading: String) -> [String] {
     let trimmed = reading.trimmingCharacters(in: .whitespacesAndNewlines)
     guard !trimmed.isEmpty else { return [] }
     let separator = Megrez.Compositor.theSeparator
@@ -1136,14 +1134,14 @@ extension LMAssembly.LMPerceptionOverride {
       .map { $0.trimmingCharacters(in: .whitespacesAndNewlines) }
   }
 
-  private func purgeUnderscorePrefixedKeys() {
+  nonisolated private func purgeUnderscorePrefixedKeys() {
     let invalidKeys = mutLRUMap.keys.filter { shouldIgnoreKey($0) }
     guard !invalidKeys.isEmpty else { return }
     invalidKeys.forEach { mutLRUMap.removeValue(forKey: $0) }
   }
 
   /// 標記某鍵值需在下一次刷新時寫入日誌。
-  private func markKeyForUpsert(_ key: String) {
+  nonisolated private func markKeyForUpsert(_ key: String) {
     pendingRemovedKeys.remove(key)
     let now = Date().timeIntervalSince1970
     if let last = lastLogTimestampByKey[key], now - last < Self.perKeyThrottleInterval {
@@ -1155,7 +1153,7 @@ extension LMAssembly.LMPerceptionOverride {
   }
 
   /// 標記某鍵值已刪除，讓變更能寫入磁碟。
-  private func markKeyForRemoval(_ key: String) {
+  nonisolated private func markKeyForRemoval(_ key: String) {
     pendingUpsertKeys.remove(key)
     let now = Date().timeIntervalSince1970
     if let last = lastLogTimestampByKey[key], now - last < Self.perKeyThrottleInterval {
@@ -1168,14 +1166,14 @@ extension LMAssembly.LMPerceptionOverride {
 
   /// 清理 lastLogTimestampByKey 中過期的條目以防止記憶體洩漏。
   /// 此方法應定期調用（例如在 saveData 或 writeFullSnapshot 之後）。
-  private func cleanupOldTimestamps() {
+  nonisolated private func cleanupOldTimestamps() {
     let now = Date().timeIntervalSince1970
     let threshold = now - (Self.perKeyThrottleInterval * 10) // 保留最近 20 秒的記錄
     lastLogTimestampByKey = lastLogTimestampByKey.filter { $0.value > threshold }
   }
 
   /// 建立待寫入日誌的記錄列表。
-  private func preparePendingJournalRecords() -> [JournalRecord] {
+  nonisolated private func preparePendingJournalRecords() -> [JournalRecord] {
     if needsFullSnapshot { return [] }
     var results: [JournalRecord] = []
     let removalKeys = pendingRemovedKeys.sorted()
@@ -1195,7 +1193,7 @@ extension LMAssembly.LMPerceptionOverride {
   }
 
   /// 將編碼後的日誌記錄追加至副檔。
-  private func appendJournal(_ records: [JournalRecord], baseURL: URL) throws {
+  nonisolated private func appendJournal(_ records: [JournalRecord], baseURL: URL) throws {
     guard !records.isEmpty else { return }
     let journalURL = journalFileURL(for: baseURL)
     let encoder = JSONEncoder()
@@ -1230,13 +1228,13 @@ extension LMAssembly.LMPerceptionOverride {
   }
 
   /// 計算資料的 CRC32 雜湊並回傳十六進位字串表示，確保跨平台一致性。
-  private func computeHexCRC32(_ data: Data) -> String {
+  nonisolated private func computeHexCRC32(_ data: Data) -> String {
     let checksum = CRC32.checksum(data: data)
     return String(format: "%08x", checksum)
   }
 
   /// 判斷是否需要以新快照壓縮日誌。
-  private func shouldCompactJournal(for baseURL: URL) -> Bool {
+  nonisolated private func shouldCompactJournal(for baseURL: URL) -> Bool {
     let journalURL = journalFileURL(for: baseURL)
     let fileManager = FileManager.default
     guard fileManager.fileExists(atPath: journalURL.path) else { return false }
@@ -1259,7 +1257,7 @@ extension LMAssembly.LMPerceptionOverride {
   }
 
   /// 將現有覆寫資料完整輸出為快照，並重置日誌狀態。
-  private func writeFullSnapshot(to baseURL: URL, force: Bool) throws {
+  nonisolated private func writeFullSnapshot(to baseURL: URL, force: Bool) throws {
     let encoder = JSONEncoder()
     let toSave = getSavableData() // Already locked internally
     // 先編碼再計算 deterministic hex（避免使用 Swift 的 hashValue）
@@ -1294,7 +1292,7 @@ extension LMAssembly.LMPerceptionOverride {
   }
 
   /// 重播日誌操作以同步記憶體狀態。
-  private func replayJournal(from baseURL: URL) {
+  nonisolated private func replayJournal(from baseURL: URL) {
     let journalURL = journalFileURL(for: baseURL)
     let fileManager = FileManager.default
     guard fileManager.fileExists(atPath: journalURL.path) else { return }
@@ -1368,7 +1366,7 @@ extension LMAssembly.LMPerceptionOverride {
   }
 
   /// 檢查 journal record 的合理性以避免受損或惡意資料回放。
-  private func isValidJournalRecord(_ record: JournalRecord) -> Bool {
+  nonisolated private func isValidJournalRecord(_ record: JournalRecord) -> Bool {
     switch record.operation {
     case .clear:
       return true
@@ -1400,7 +1398,7 @@ extension LMAssembly.LMPerceptionOverride {
   }
 
   /// 在成功壓縮後刪除日誌副檔。
-  private func removeJournalFile(for baseURL: URL) {
+  nonisolated private func removeJournalFile(for baseURL: URL) {
     let journalURL = journalFileURL(for: baseURL)
     let fileManager = FileManager.default
     guard fileManager.fileExists(atPath: journalURL.path) else { return }
@@ -1413,17 +1411,17 @@ extension LMAssembly.LMPerceptionOverride {
   }
 
   /// 依據快照檔案 URL 推導日誌副檔的路徑。
-  private func journalFileURL(for baseURL: URL) -> URL {
+  nonisolated private func journalFileURL(for baseURL: URL) -> URL {
     baseURL.appendingPathExtension("journal")
   }
 }
 
 // MARK: - POMError
 
-struct POMError: LocalizedError {
-  var rawValue: String
+nonisolated struct POMError: LocalizedError {
+  nonisolated var rawValue: String
 
-  var errorDescription: String? {
+  nonisolated var errorDescription: String? {
     "rawValue".i18n
   }
 }
@@ -1437,7 +1435,7 @@ extension Double {
   /// +(114514+(114*514+(11*4*(5+14)+1*14+5-1+4))))
   /// +114*5*14+1+14+514+11-4+5-1-4)/(-11/4+51/4)**(11-4-5+14)
   /// ```
-  fileprivate static let naturalE: Double = {
+  nonisolated fileprivate static let naturalE: Double = {
     let a = 114_514.0 + 114_514.0
     let b = 114.0 * 514.0
     let c = 1.0 * -(1.0 - 4.0) * 514.0
@@ -1457,7 +1455,7 @@ extension Double {
   /// +(114*514+(114*51*4+(11*4*5*14+(-(114-5)*(1-4)+(11/(45-1)*4))))))
   /// +(114514+(114*514+(114*51*4+(1145*14+(11*4*(5+1)*4))))))/(-11/4+51/4)**(11-4-5+14)
   /// ```
-  fileprivate static let naturalPi: Double = {
+  nonisolated fileprivate static let naturalPi: Double = {
     let a = 114_514.0 + 114_514.0
     let p1 = -11.0 + 4.0 - 5.0 + 14.0
     let p2 = 114_514.0 + 114.0 * 51.0 * 4.0 + 11.0 * 4.0 * 5.0 * 14.0 + 1.0 + 1.0 + 4.0 * 5.0 + 1.0 - 4.0
@@ -1472,7 +1470,7 @@ extension Double {
   }()
 
   /// `e * (((e + π) * (e + e + π))^e) + ( (e / (π^e - e)) / (e + e^π - π^e) )`
-  fileprivate static func getBeastConstantUsingTadokoroFormula() -> Double {
+  nonisolated fileprivate static func getBeastConstantUsingTadokoroFormula() -> Double {
     let e = naturalE
     let pi = naturalPi
 
