@@ -43,9 +43,8 @@
 
 建置用系统需求：
 
-- 至少 macOS 13 Ventura & Xcode 15.3。
-    - 原因：Swift 封包管理支援、以及原厂辞典建置程式对 Swift 5.10 新的 concurrency 安全特性 API 的依赖，等。
-    - 我们已经没有条件测试比 Xcode 15.3 更老的环境了。硬要在这个环境下编译的话，可能需要额外安装[新版 Swift](https://www.swift.org/download/) 才可以。
+- **Xcode 26.3+ (macOS 15.6+ required)** 或单独安装的 **Swift 6.2 open-source toolchain** + **macOS 26 SDK**。
+    - 原因：Swift 6.2 成为必需版本（用于改进 concurrency 安全特性、SPM 6.2.4+ API 支持、CommandPlugin 改进等）。
 - 请使用正式发行版 Xcode，且最小子版本号越高越好（因为 Bug 相对而言最少）。
     - 如果是某个大版本的 Xcode 的 Release Candidate 版本的话，我们可能会对此做相容性测试。
 
@@ -74,11 +73,15 @@
 「File」->「Project/WorkspaceSettings...」->「Advanced」；
 选「Custom」->「Relative to Workspace」即可。不选的话，make 的过程会出错。
 ```
-在终端机内定位到唯音的克隆本地专案的本地仓库的目录之后，执行 `make update` 以获取最新词库。
 
-接下来就是直接开 Xcode 专案，Product -> Scheme 选「vChewingInstaller」，编译即可。
+在终端机内定位到唯音的克隆本地专案的本地仓库的目录之后，执行下列指令：
 
-> 之前说「在成功之后执行 `make` 即可组建、再执行 `make install` 可以触发唯音的安装程式」，这对新版唯音而言**当且仅当**使用纯 Swift 编译脚本工序时方可使用。目前的 libvchewing-data 模组已经针对 macOS 版唯音实装了纯 Swift 词库编译脚本。
+- `make update`：取得最新词库资源（使用远端 Swift Package plugin）。
+- `make release`：建置通用二进制版本（arm64 + x86_64），输出至 `Build/Products/Release/`。
+- `make archive`：建置通用版本并产生 `.xcarchive` 存档（含 dSYM），存入 Xcode Archives 目录。
+- `make debug`：快速侦错组建（单一架构）。
+
+或者直接开启 Xcode 专案，Product -> Scheme 选「vChewingInstaller」，编译即可。
 
 第一次安装完之后，如有修改原厂辞典与程式码的话，只要重复上述流程重新安装输入法即可。
 
