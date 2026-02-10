@@ -13,17 +13,19 @@ This handbook briefs AI coding assistants on the vChewing (唯音) macOS reposit
   - `vChewing_Tekkon`: Keyboard parsers, Zhuyin/Bopomofo composer, stroke cassette parser, phonabet utilities.
   - `vChewing_LangModelAssembly`: LM instantiation facade, user phrase memory, perception override, associated phrases.
   - Shared dependencies (`vChewing_Shared`, `vChewing_SwiftExtension`, `vChewing_OSFrameworkImpl`, etc.) supply utilities, result-builder UI DSL, notifications, and AppKit wrappers.
-- **Lexicon assets**: Submodule `Source/Data` (Swift-based tooling + generated blobs). Do not edit unless specifically asked.
+- **Lexicon assets**: Provided by remote Swift Package plugin `VanguardSQLLegacyPlugin` (from `vChewing-VanguardLexicon` repository). Compiled factory lexicons are injected into `vChewing_MainAssembly4Darwin` during build-time.
 
 ## 2. Environment & Build Paths
 
 - **Authoritative toolchain**: macOS 14.7+ (Sonoma recommended), Xcode 15.3+ with bundled Swift 5.10 or newer.
 - **Runtime target**: macOS 12 Monterey and newer. Older macOS support lives in another repo.
-- **Project entry**: `vChewing.xcodeproj` (scheme `vChewing`). Installer scaffolding: `vChewing.pkgproj`, SwiftUI installer app under `Installer/`.
+- **Build system**: Swift Package Manager (SwiftPM) 6.2.4+ via `Package.swift` root manifest. App bundle assembly and universal binary scripting via `Makefile` with `BundleApps` CommandPlugin.
 - **CLI builds**:
-  - `pwsh -NoLogo -Command "xcodebuild -project vChewing.xcodeproj -scheme vChewing -configuration Release build"`
-  - Package-only builds/tests: `pwsh -NoLogo -Command "cd Packages/vChewing_Typewriter; swift build"`, same for `swift test`.
-- **First-time setup**: `make update` (fetches/generated lexicons) then build. Ensure Xcode DerivedData location is set to “Relative to Workspace” to satisfy make recipes.
+  - Universal binary release: `make release` (builds arm64 + x86_64, creates signed .app bundles in `Build/Products/Release/`).
+  - Archive with dSYMs: `make archive` (creates `.xcarchive` in Xcode Archives folder).
+  - Debug native build: `make debug` (single-arch, target output in `.build/debug/`).
+  - Package-only tests: `cd Packages/vChewing_Typewriter && swift build && swift test`.
+- **First-time setup**: `make update` (fetches/generates lexicons) then `make release`. Ensure Xcode DerivedData location is set to "Relative to Workspace" to satisfy make recipes.
 
 ## 3. Repository Layout (quick map)
 
@@ -34,7 +36,8 @@ This handbook briefs AI coding assistants on the vChewing (唯音) macOS reposit
 - `Packages/vChewing_LangModelAssembly/Sources/LangModelAssembly/`: LM instantiators, perception override, associated phrase derivation.
 - `Packages/vChewing_OSFrameworkImpl/`: AppKit result-builder DSL for SettingsCocoa window, etc.
 - `Packages/vChewing_CandidateWindow/`: The Candidate window.
-- `Source/Data`: Submodule for lexicon tooling (`Makefile`, Swift build scripts, generated `Build/` assets).
+- `Plugins/BundleApps/`: CommandPlugin that assembles `.app` bundles and optional `.xcarchive` archives (codesigning, entitlements, SPM bundle filtering).
+- `Makefile`: Root-level automation for universal binary builds (`swift build --arch arm64/x86_64`, `lipo` merge), lexicon toolchain integration, and CommandPlugin invocation.
 - `Installer/`: SwiftUI installer app + pkg resources.
 
 ## 4. Runtime Flow & Key Concepts
@@ -56,9 +59,10 @@ Reference `algorithm.md` for the deep algorithm write-up (zh-Hant).
 - **User data paths**: Avoid hard-coded user data paths except where necessary in package test targets.
 - **State machine**: Prefer new `IMEState` enum cases and explicit transition APIs over boolean shortcuts. Follow existing `InputSession`/`InputHandler` protocol surfaces.
 - **Conditional APIs**: Guard platform-specific code (`#if canImport(Darwin)`) as needed; keep Linux compatibility in `Typewriter` package and its local dependnecies.
+- **Bundle resources**: SPM `#bundle` macro expands to `Bundle.module` from the auto-generated accessor. For packages with runtime resource lookup (e.g., `LangModelAssembly`), use custom `Bundle.currentSPM` accessor that checks `resourceURL` first, then falls back to `bundleURL`. This avoids codesign sand­box violations from files at `.app/` root.
 - **ObjC(++)/C(+=) style**: Follow Google Style Guide formatting for Objective-C(++) and C(++).
 - **Licensing**: Preserve MIT-NTL banners. Respect LGPL for Megrez and Tekkon; avoid mixing incompatible license assets.
-- **Lexicon tooling**: Generated data lives under `Source/Data/Build`. Scripts run via `make` or Swift command-line tools; do not check in regenerated blobs unless instructed.
+- **Lexicon tooling**: Factory lexicons are compiled by remote `VanguardSQLLegacyPlugin` (Swift Package plugin from `vChewing-VanguardLexicon` repository) and injected into `vChewing_MainAssembly4Darwin` at build-time via SPM build plugins. Do not modify or commit generated lexicon assets; they are transient build artifacts.
 
 ## 6. Testing Expectations
 
@@ -80,7 +84,6 @@ Reference `algorithm.md` for the deep algorithm write-up (zh-Hant).
 - [ ] Update `.strings` when adding user-visible strings.
 - [ ] Gate new APIs through protocols as needed.
 - [ ] Run relevant `swift test` targets.
-- [ ] Avoid touching `Source/Data` unless lexicon work is explicitly requested.
 - [ ] Align new keyboard layouts with Tekkon parsers and symbol tables.
 
 Questions from contributors should reference this file first; escalate only when guidance is missing or conflicting.
