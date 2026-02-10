@@ -3,47 +3,19 @@
 	archiveVersion = 1;
 	classes = {
 	};
-	objectVersion = 60;
+	objectVersion = 76;
 	objects = {
 
 /* Begin PBXBuildFile section */
-		5B09307628B6FC3B0021F8C5 /* shortcuts.html in Resources */ = {isa = PBXBuildFile; fileRef = 5B09307828B6FC3B0021F8C5 /* shortcuts.html */; };
-		5B269D392EF487D300A9F628 /* main.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B269D392EF487D300A9F627 /* main.swift */; };
-		5B49A3C32B95D9890031E450 /* vChewingDebuggableApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B49A3C22B95D9890031E450 /* vChewingDebuggableApp.swift */; };
-		5B49A3C52B95D9890031E450 /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B49A3C42B95D9890031E450 /* ContentView.swift */; };
-		5B49A3C72B95D98B0031E450 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 5B49A3C62B95D98B0031E450 /* Assets.xcassets */; };
-		5B49A3CA2B95D98B0031E450 /* Preview Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 5B49A3C92B95D98B0031E450 /* Preview Assets.xcassets */; };
-		5B49A3D02B95DA020031E450 /* MainAssembly in Frameworks */ = {isa = PBXBuildFile; productRef = 5B49A3CF2B95DA020031E450 /* MainAssembly */; };
-		5B49A3D12B95DA530031E450 /* Localizable.strings in Resources */ = {isa = PBXBuildFile; fileRef = 5BE69F142B77DC230053F160 /* Localizable.strings */; };
-		5B49A3D22B95DA880031E450 /* Images.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 6A2E40F5253A69DA00D1AE1D /* Images.xcassets */; };
-		5B49A3DA2B95DAD10031E450 /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = 5B49A3D42B95DACE0031E450 /* InfoPlist.strings */; };
-		5B60EAC32EF4893900FFB49E /* InstallerAssembly in Frameworks */ = {isa = PBXBuildFile; productRef = 5B60EAC22EF4893900FFB49E /* InstallerAssembly */; };
-		5B65FB342A9518DA007EEFB0 /* MainAssembly in Frameworks */ = {isa = PBXBuildFile; productRef = 5B65FB332A9518DA007EEFB0 /* MainAssembly */; };
-		5B70F4E92A0BE900005EA8C4 /* MenuIcon-TCVIM.png in Resources */ = {isa = PBXBuildFile; fileRef = 5B70F4E52A0BE900005EA8C4 /* MenuIcon-TCVIM.png */; };
-		5B70F4EA2A0BE900005EA8C4 /* MenuIcon-SCVIM.png in Resources */ = {isa = PBXBuildFile; fileRef = 5B70F4E62A0BE900005EA8C4 /* MenuIcon-SCVIM.png */; };
-		5B70F4EB2A0BE900005EA8C4 /* MenuIcon-SCVIM@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 5B70F4E72A0BE900005EA8C4 /* MenuIcon-SCVIM@2x.png */; };
-		5B70F4EC2A0BE900005EA8C4 /* MenuIcon-TCVIM@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 5B70F4E82A0BE900005EA8C4 /* MenuIcon-TCVIM@2x.png */; };
+		5B60EAC32EF4893900FFB49E /* InstallerAssembly4Darwin in Frameworks */ = {isa = PBXBuildFile; productRef = 5B60EAC22EF4893900FFB49E /* InstallerAssembly4Darwin */; };
+		5B65FB342A9518DA007EEFB0 /* MainAssembly4Darwin in Frameworks */ = {isa = PBXBuildFile; productRef = 5B65FB332A9518DA007EEFB0 /* MainAssembly4Darwin */; };
 		5B7DA80328BF6BC600D7B2AD /* fixinstall.sh in Resources */ = {isa = PBXBuildFile; fileRef = 5B7DA80228BF6BBA00D7B2AD /* fixinstall.sh */; };
-		5BAD0CD527D701F6003D127F /* vChewingKeyLayout.bundle in Resources */ = {isa = PBXBuildFile; fileRef = 5B30F11227BA568800484E24 /* vChewingKeyLayout.bundle */; };
-		5BBBB75F27AED54C0023B93A /* Beep.m4a in Resources */ = {isa = PBXBuildFile; fileRef = 5BBBB75D27AED54C0023B93A /* Beep.m4a */; };
-		5BBBB76027AED54C0023B93A /* Fart.m4a in Resources */ = {isa = PBXBuildFile; fileRef = 5BBBB75E27AED54C0023B93A /* Fart.m4a */; };
+		5B91852D2F3B0524006B48E8 /* vChewing.app in Resources */ = {isa = PBXBuildFile; fileRef = 5B9184D62F3B04DD006B48E8 /* vChewing.app */; };
 		5BBC2D9E28F51C0400C986F6 /* LICENSE.txt in Resources */ = {isa = PBXBuildFile; fileRef = 5B18BA7227C7BD8B0056EB19 /* LICENSE.txt */; };
 		5BBC2D9F28F51C0400C986F6 /* LICENSE-CHT.txt in Resources */ = {isa = PBXBuildFile; fileRef = 5B18BA7427C7BD8C0056EB19 /* LICENSE-CHT.txt */; };
 		5BBC2DA028F51C0400C986F6 /* LICENSE-JPN.txt in Resources */ = {isa = PBXBuildFile; fileRef = 5B18BA7327C7BD8C0056EB19 /* LICENSE-JPN.txt */; };
 		5BBC2DA128F51C0400C986F6 /* LICENSE-CHS.txt in Resources */ = {isa = PBXBuildFile; fileRef = 5B18BA6F27C7BD8B0056EB19 /* LICENSE-CHS.txt */; };
 		5BC2652227E04B7E00700291 /* uninstall.sh in Resources */ = {isa = PBXBuildFile; fileRef = 5BC2652127E04B7B00700291 /* uninstall.sh */; };
-		5BE69F122B77DC230053F160 /* Localizable.strings in Resources */ = {isa = PBXBuildFile; fileRef = 5BE69F142B77DC230053F160 /* Localizable.strings */; };
-		5BF9DA2728840E6200DBD48E /* template-usersymbolphrases.txt in Resources */ = {isa = PBXBuildFile; fileRef = 5BF9DA2228840E6200DBD48E /* template-usersymbolphrases.txt */; };
-		5BF9DA2828840E6200DBD48E /* template-exclusions.txt in Resources */ = {isa = PBXBuildFile; fileRef = 5BF9DA2328840E6200DBD48E /* template-exclusions.txt */; };
-		5BF9DA2A28840E6200DBD48E /* template-replacements.txt in Resources */ = {isa = PBXBuildFile; fileRef = 5BF9DA2528840E6200DBD48E /* template-replacements.txt */; };
-		5BF9DA2B28840E6200DBD48E /* template-userphrases.txt in Resources */ = {isa = PBXBuildFile; fileRef = 5BF9DA2628840E6200DBD48E /* template-userphrases.txt */; };
-		6A2E40F6253A69DA00D1AE1D /* Images.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 6A2E40F5253A69DA00D1AE1D /* Images.xcassets */; };
-		6A2E40F9253A6AA000D1AE1D /* Images.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 6A2E40F5253A69DA00D1AE1D /* Images.xcassets */; };
-		6ACA41FA15FC1D9000935EF6 /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = 6ACA41EA15FC1D9000935EF6 /* InfoPlist.strings */; };
-		6ACA41FC15FC1D9000935EF6 /* Localizable.strings in Resources */ = {isa = PBXBuildFile; fileRef = 6ACA41EE15FC1D9000935EF6 /* Localizable.strings */; };
-		6ACA420215FC1E5200935EF6 /* vChewing.app in Resources */ = {isa = PBXBuildFile; fileRef = 6A0D4EA215FC0D2D00ABF4B3 /* vChewing.app */; };
-		D47B92C027972AD100458394 /* main.swift in Sources */ = {isa = PBXBuildFile; fileRef = D47B92BF27972AC800458394 /* main.swift */; };
-		D4E33D8F27A838F0006DB1CF /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = D4E33D8D27A838F0006DB1CF /* InfoPlist.strings */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -70,17 +42,6 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
-		5B04305327B529D800CB65BC /* zh-Hans */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "zh-Hans"; path = "zh-Hans.lproj/InfoPlist.strings"; sourceTree = "<group>"; };
-		5B04305427B529D800CB65BC /* zh-Hans */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "zh-Hans"; path = "zh-Hans.lproj/Localizable.strings"; sourceTree = "<group>"; };
-		5B04305627B529D800CB65BC /* zh-Hans */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "zh-Hans"; path = "zh-Hans.lproj/InfoPlist.strings"; sourceTree = "<group>"; };
-		5B04305E27B5312E00CB65BC /* ja */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = ja; path = ja.lproj/InfoPlist.strings; sourceTree = "<group>"; };
-		5B04305F27B5312E00CB65BC /* ja */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = ja; path = ja.lproj/Localizable.strings; sourceTree = "<group>"; };
-		5B04306127B5312E00CB65BC /* ja */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = ja; path = ja.lproj/InfoPlist.strings; sourceTree = "<group>"; };
-		5B05A47B27AFF7CA00437698 /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/InfoPlist.strings; sourceTree = "<group>"; };
-		5B09307728B6FC3B0021F8C5 /* zh-Hant */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.html; lineEnding = 0; name = "zh-Hant"; path = "zh-Hant.lproj/shortcuts.html"; sourceTree = "<group>"; };
-		5B09307928B6FC3F0021F8C5 /* zh-Hans */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.html; lineEnding = 0; name = "zh-Hans"; path = "zh-Hans.lproj/shortcuts.html"; sourceTree = "<group>"; };
-		5B09307A28B6FC400021F8C5 /* en */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.html; lineEnding = 0; name = en; path = en.lproj/shortcuts.html; sourceTree = "<group>"; };
-		5B09307B28B6FC410021F8C5 /* ja */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.html; lineEnding = 0; name = ja; path = ja.lproj/shortcuts.html; sourceTree = "<group>"; };
 		5B09A5172E9957F3002C2EC3 /* vChewing_Typewriter */ = {isa = PBXFileReference; lastKnownFileType = wrapper; name = vChewing_Typewriter; path = Packages/vChewing_Typewriter; sourceTree = "<group>"; };
 		5B18BA6F27C7BD8B0056EB19 /* LICENSE-CHS.txt */ = {isa = PBXFileReference; lastKnownFileType = text; path = "LICENSE-CHS.txt"; sourceTree = "<group>"; };
 		5B18BA7027C7BD8B0056EB19 /* Makefile */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.make; path = Makefile; sourceTree = "<group>"; };
@@ -88,47 +49,26 @@
 		5B18BA7227C7BD8B0056EB19 /* LICENSE.txt */ = {isa = PBXFileReference; lastKnownFileType = text; path = LICENSE.txt; sourceTree = "<group>"; };
 		5B18BA7327C7BD8C0056EB19 /* LICENSE-JPN.txt */ = {isa = PBXFileReference; lastKnownFileType = text; path = "LICENSE-JPN.txt"; sourceTree = "<group>"; };
 		5B18BA7427C7BD8C0056EB19 /* LICENSE-CHT.txt */ = {isa = PBXFileReference; lastKnownFileType = text; path = "LICENSE-CHT.txt"; sourceTree = "<group>"; };
-		5B20430B28BEFC0C00BFC6FD /* vChewing.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = vChewing.entitlements; sourceTree = "<group>"; };
-		5B269D392EF487D300A9F627 /* main.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = main.swift; sourceTree = "<group>"; };
-		5B30F11227BA568800484E24 /* vChewingKeyLayout.bundle */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.plug-in"; path = vChewingKeyLayout.bundle; sourceTree = "<group>"; };
 		5B312684287800DE001AA720 /* FAQ.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = FAQ.md; sourceTree = "<group>"; };
 		5B40113A28D71B8700A9D4CB /* vChewing_Uninstaller */ = {isa = PBXFileReference; lastKnownFileType = wrapper; name = vChewing_Uninstaller; path = Packages/vChewing_Uninstaller; sourceTree = "<group>"; };
-		5B49A3C02B95D9890031E450 /* vChewingDebuggable.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = vChewingDebuggable.app; sourceTree = BUILT_PRODUCTS_DIR; };
-		5B49A3C22B95D9890031E450 /* vChewingDebuggableApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = vChewingDebuggableApp.swift; sourceTree = "<group>"; };
-		5B49A3C42B95D9890031E450 /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
-		5B49A3C62B95D98B0031E450 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
-		5B49A3C92B95D98B0031E450 /* Preview Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = "Preview Assets.xcassets"; sourceTree = "<group>"; };
-		5B49A3CB2B95D98B0031E450 /* vChewingDebuggable.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = vChewingDebuggable.entitlements; sourceTree = "<group>"; };
-		5B49A3D52B95DACE0031E450 /* Base */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = Base; path = Base.lproj/InfoPlist.strings; sourceTree = "<group>"; };
-		5B49A3D62B95DACE0031E450 /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/InfoPlist.strings; sourceTree = "<group>"; };
-		5B49A3D72B95DACE0031E450 /* zh-Hant */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "zh-Hant"; path = "zh-Hant.lproj/InfoPlist.strings"; sourceTree = "<group>"; };
-		5B49A3D82B95DACE0031E450 /* zh-Hans */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "zh-Hans"; path = "zh-Hans.lproj/InfoPlist.strings"; sourceTree = "<group>"; };
-		5B49A3D92B95DACE0031E450 /* ja */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = ja; path = ja.lproj/InfoPlist.strings; sourceTree = "<group>"; };
-		5B4BB4CC2EF596A300B3BAAA /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
-		5B60EAC02EF4892200FFB49E /* vChewing_InstallerAssembly */ = {isa = PBXFileReference; lastKnownFileType = wrapper; name = vChewing_InstallerAssembly; path = Packages/vChewing_InstallerAssembly; sourceTree = "<group>"; };
-		5B60EAC12EF4892C00FFB49E /* vChewing_InstallerAssembly */ = {isa = PBXFileReference; lastKnownFileType = wrapper; name = vChewing_InstallerAssembly; path = Packages/vChewing_InstallerAssembly; sourceTree = "<group>"; };
+		5B60EAC12EF4892C00FFB49E /* vChewing_InstallerAssembly4Darwin */ = {isa = PBXFileReference; lastKnownFileType = wrapper; name = vChewing_InstallerAssembly4Darwin; path = Packages/vChewing_InstallerAssembly4Darwin; sourceTree = "<group>"; };
 		5B65B919284D0185007C558B /* README.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = README.md; sourceTree = "<group>"; };
-		5B65FB322A9518C9007EEFB0 /* vChewing_MainAssembly */ = {isa = PBXFileReference; lastKnownFileType = wrapper; name = vChewing_MainAssembly; path = Packages/vChewing_MainAssembly; sourceTree = "<group>"; };
+		5B65FB322A9518C9007EEFB0 /* vChewing_MainAssembly4Darwin */ = {isa = PBXFileReference; lastKnownFileType = wrapper; name = vChewing_MainAssembly4Darwin; path = Packages/vChewing_MainAssembly4Darwin; sourceTree = "<group>"; };
 		5B6CA6272B8A1C9200A85050 /* vChewing_BrailleSputnik */ = {isa = PBXFileReference; lastKnownFileType = wrapper; name = vChewing_BrailleSputnik; path = Packages/vChewing_BrailleSputnik; sourceTree = "<group>"; };
-		5B70F4E52A0BE900005EA8C4 /* MenuIcon-TCVIM.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "MenuIcon-TCVIM.png"; sourceTree = "<group>"; };
-		5B70F4E62A0BE900005EA8C4 /* MenuIcon-SCVIM.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "MenuIcon-SCVIM.png"; sourceTree = "<group>"; };
-		5B70F4E72A0BE900005EA8C4 /* MenuIcon-SCVIM@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "MenuIcon-SCVIM@2x.png"; sourceTree = "<group>"; };
-		5B70F4E82A0BE900005EA8C4 /* MenuIcon-TCVIM@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "MenuIcon-TCVIM@2x.png"; sourceTree = "<group>"; };
 		5B765F07293A250000122315 /* vChewing_PhraseEditorUI */ = {isa = PBXFileReference; lastKnownFileType = wrapper; name = vChewing_PhraseEditorUI; path = Packages/vChewing_PhraseEditorUI; sourceTree = "<group>"; };
+		5B7CE1B42F3B2D9D0014EDFC /* Release-Version.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = "Release-Version.plist"; sourceTree = "<group>"; };
 		5B7DA80228BF6BBA00D7B2AD /* fixinstall.sh */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.script.sh; lineEnding = 0; path = fixinstall.sh; sourceTree = "<group>"; };
+		5B9184D62F3B04DD006B48E8 /* vChewing.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = vChewing.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		5B9184D72F3B04DD006B48E8 /* vChewingInstaller.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = vChewingInstaller.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		5B91852E2F3B080A006B48E8 /* Package.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Package.swift; sourceTree = "<group>"; };
 		5B963C9E28D5C14600DCEE88 /* vChewing_Shared */ = {isa = PBXFileReference; lastKnownFileType = wrapper; name = vChewing_Shared; path = Packages/vChewing_Shared; sourceTree = "<group>"; };
 		5B963CA128D5C22D00DCEE88 /* vChewing_SwiftExtension */ = {isa = PBXFileReference; lastKnownFileType = wrapper; name = vChewing_SwiftExtension; path = Packages/vChewing_SwiftExtension; sourceTree = "<group>"; };
 		5BA8C30128DEFE4F004C5CC4 /* vChewing_CandidateWindow */ = {isa = PBXFileReference; lastKnownFileType = wrapper; name = vChewing_CandidateWindow; path = Packages/vChewing_CandidateWindow; sourceTree = "<group>"; };
 		5BAD29D12B7E1A1B0013D695 /* vChewing_KimoDataReader */ = {isa = PBXFileReference; lastKnownFileType = wrapper; name = vChewing_KimoDataReader; path = Packages/vChewing_KimoDataReader; sourceTree = "<group>"; };
 		5BAD67E12ADAB62D005A4842 /* HangarRash_SwiftyCapsLockToggler */ = {isa = PBXFileReference; lastKnownFileType = wrapper; name = HangarRash_SwiftyCapsLockToggler; path = Packages/HangarRash_SwiftyCapsLockToggler; sourceTree = "<group>"; };
 		5BBB42A42EA3E55A0097FA88 /* vChewing_Shared_DarwinImpl */ = {isa = PBXFileReference; lastKnownFileType = folder; name = vChewing_Shared_DarwinImpl; path = "/Users/shikisuen/Repos/!vChewing/vChewing-macOS/Packages/vChewing_Shared_DarwinImpl"; sourceTree = "<absolute>"; };
-		5BBBB75D27AED54C0023B93A /* Beep.m4a */ = {isa = PBXFileReference; lastKnownFileType = file; path = Beep.m4a; sourceTree = "<group>"; };
-		5BBBB75E27AED54C0023B93A /* Fart.m4a */ = {isa = PBXFileReference; lastKnownFileType = file; path = Fart.m4a; sourceTree = "<group>"; };
 		5BBD627827B6C4D900271480 /* Update-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = "Update-Info.plist"; sourceTree = "<group>"; };
-		5BC0AAC927F58472002D33E9 /* pkgPreInstall.sh */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.script.sh; path = pkgPreInstall.sh; sourceTree = "<group>"; };
-		5BC0AACA27F58472002D33E9 /* pkgPostInstall.sh */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.script.sh; path = pkgPostInstall.sh; sourceTree = "<group>"; };
 		5BC2652127E04B7B00700291 /* uninstall.sh */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.script.sh; lineEnding = 0; path = uninstall.sh; sourceTree = "<group>"; };
-		5BC447A228656A1900EDC323 /* Placeholder.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Placeholder.swift; sourceTree = "<group>"; };
 		5BC447AB2865BEF500EDC323 /* AUTHORS */ = {isa = PBXFileReference; lastKnownFileType = text; path = AUTHORS; sourceTree = "<group>"; };
 		5BC5E01C28DDE4270094E427 /* vChewing_NotifierUI */ = {isa = PBXFileReference; lastKnownFileType = wrapper; name = vChewing_NotifierUI; path = Packages/vChewing_NotifierUI; sourceTree = "<group>"; };
 		5BC5E01F28DDEFD80094E427 /* vChewing_TooltipUI */ = {isa = PBXFileReference; lastKnownFileType = wrapper; name = vChewing_TooltipUI; path = Packages/vChewing_TooltipUI; sourceTree = "<group>"; };
@@ -141,48 +81,66 @@
 		5BDB7A3428D47587001AC277 /* vChewing_ModifierKeyHitChecker */ = {isa = PBXFileReference; lastKnownFileType = wrapper; name = vChewing_ModifierKeyHitChecker; path = Packages/vChewing_ModifierKeyHitChecker; sourceTree = "<group>"; };
 		5BDB7A3528D47587001AC277 /* RMJay_LineReader */ = {isa = PBXFileReference; lastKnownFileType = wrapper; name = RMJay_LineReader; path = Packages/RMJay_LineReader; sourceTree = "<group>"; };
 		5BDB7A3628D47587001AC277 /* vChewing_Tekkon */ = {isa = PBXFileReference; lastKnownFileType = wrapper; name = vChewing_Tekkon; path = Packages/vChewing_Tekkon; sourceTree = "<group>"; };
-		5BDCBB4727B4F6C600D0CC59 /* zh-Hant */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "zh-Hant"; path = "zh-Hant.lproj/InfoPlist.strings"; sourceTree = "<group>"; };
-		5BDCBB4827B4F6C600D0CC59 /* zh-Hant */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "zh-Hant"; path = "zh-Hant.lproj/Localizable.strings"; sourceTree = "<group>"; };
-		5BDCBB4927B4F6C700D0CC59 /* zh-Hant */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "zh-Hant"; path = "zh-Hant.lproj/InfoPlist.strings"; sourceTree = "<group>"; };
-		5BE69F132B77DC230053F160 /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/Localizable.strings; sourceTree = "<group>"; };
-		5BE69F152B77DC270053F160 /* zh-Hans */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "zh-Hans"; path = "zh-Hans.lproj/Localizable.strings"; sourceTree = "<group>"; };
-		5BE69F162B77DC280053F160 /* zh-Hant */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "zh-Hant"; path = "zh-Hant.lproj/Localizable.strings"; sourceTree = "<group>"; };
-		5BE69F172B77DC290053F160 /* ja */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = ja; path = ja.lproj/Localizable.strings; sourceTree = "<group>"; };
 		5BE8A8C4281EE65300197741 /* CONTRIBUTING.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = CONTRIBUTING.md; sourceTree = "<group>"; };
-		5BF255CD28B2694E003ECB60 /* vChewing-Bridging-Header.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "vChewing-Bridging-Header.h"; sourceTree = "<group>"; };
-		5BF4A44628E5820C002AF9C5 /* vChewingInstaller.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = vChewingInstaller.entitlements; sourceTree = "<group>"; };
-		5BF9DA2228840E6200DBD48E /* template-usersymbolphrases.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; lineEnding = 0; path = "template-usersymbolphrases.txt"; sourceTree = "<group>"; usesTabs = 0; };
-		5BF9DA2328840E6200DBD48E /* template-exclusions.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; lineEnding = 0; path = "template-exclusions.txt"; sourceTree = "<group>"; usesTabs = 0; };
-		5BF9DA2528840E6200DBD48E /* template-replacements.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; lineEnding = 0; path = "template-replacements.txt"; sourceTree = "<group>"; usesTabs = 0; };
-		5BF9DA2628840E6200DBD48E /* template-userphrases.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; lineEnding = 0; path = "template-userphrases.txt"; sourceTree = "<group>"; usesTabs = 0; };
 		5BFC63C728D49511004A77B7 /* vChewing_IMKUtils */ = {isa = PBXFileReference; lastKnownFileType = wrapper; name = vChewing_IMKUtils; path = Packages/vChewing_IMKUtils; sourceTree = "<group>"; };
 		5BFC63CA28D49B2B004A77B7 /* vChewing_UpdateSputnik */ = {isa = PBXFileReference; lastKnownFileType = wrapper; name = vChewing_UpdateSputnik; path = Packages/vChewing_UpdateSputnik; sourceTree = "<group>"; };
 		5BFC63CD28D4AC98004A77B7 /* vChewing_LangModelAssembly */ = {isa = PBXFileReference; lastKnownFileType = wrapper; name = vChewing_LangModelAssembly; path = Packages/vChewing_LangModelAssembly; sourceTree = "<group>"; };
-		6A0D4EA215FC0D2D00ABF4B3 /* vChewing.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = vChewing.app; sourceTree = BUILT_PRODUCTS_DIR; };
-		6A0D4EF515FC0DA600ABF4B3 /* IME-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = "IME-Info.plist"; sourceTree = "<group>"; };
-		6A2E40F5253A69DA00D1AE1D /* Images.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Images.xcassets; sourceTree = "<group>"; };
-		6ACA41CB15FC1D7500935EF6 /* vChewingInstaller.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = vChewingInstaller.app; sourceTree = BUILT_PRODUCTS_DIR; };
-		6ACA41EB15FC1D9000935EF6 /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/InfoPlist.strings; sourceTree = "<group>"; };
-		6ACA41EF15FC1D9000935EF6 /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/Localizable.strings; sourceTree = "<group>"; };
-		6ACA41F215FC1D9000935EF6 /* Installer-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; name = "Installer-Info.plist"; path = "Installer/Installer-Info.plist"; sourceTree = SOURCE_ROOT; };
-		D47B92BF27972AC800458394 /* main.swift */ = {isa = PBXFileReference; explicitFileType = sourcecode.swift; fileEncoding = 4; indentWidth = 2; lineEnding = 0; path = main.swift; sourceTree = "<group>"; tabWidth = 2; usesTabs = 0; };
-		D4E33D8E27A838F0006DB1CF /* Base */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = Base; path = Base.lproj/InfoPlist.strings; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
-/* Begin PBXFrameworksBuildPhase section */
-		5B49A3BD2B95D9890031E450 /* Frameworks */ = {
-			isa = PBXFrameworksBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-				5B49A3D02B95DA020031E450 /* MainAssembly in Frameworks */,
+/* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
+		5B9184C22F3B0244006B48E8 /* PBXFileSystemSynchronizedBuildFileExceptionSet */ = {
+			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
+			membershipExceptions = (
+				"RawImages/Icon-vChewing.pxd",
+				RawImages/NewInstallerBg.pxd,
+				"RawImages/vChewing-Web-BigChar.png",
+				"RawImages/vChewing-Web-SmallChar.png",
+				"RawImages/vChewingIME-OS26Icon.icon",
 			);
-			runOnlyForDeploymentPostprocessing = 0;
+			target = 6A0D4EA115FC0D2D00ABF4B3 /* vChewing */;
 		};
+		5B9184D12F3B0296006B48E8 /* PBXFileSystemSynchronizedBuildFileExceptionSet */ = {
+			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
+			membershipExceptions = (
+				/Localized/Resources/InfoPlist.strings,
+				/Localized/Resources/Localizable.strings,
+				main.swift,
+				Resources/Images.xcassets,
+			);
+			target = 6A0D4EA115FC0D2D00ABF4B3 /* vChewing */;
+		};
+		5B9184D22F3B0296006B48E8 /* PBXFileSystemSynchronizedBuildFileExceptionSet */ = {
+			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
+			membershipExceptions = (
+				/Localized/Resources/InfoPlist.strings,
+				/Localized/Resources/Localizable.strings,
+				main.swift,
+				Resources/Images.xcassets,
+			);
+			target = 6ACA41CA15FC1D7500935EF6 /* vChewingInstaller */;
+		};
+		5B9184D52F3B03D1006B48E8 /* PBXFileSystemSynchronizedBuildFileExceptionSet */ = {
+			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
+			membershipExceptions = (
+				Resources/Info.plist,
+			);
+			target = 6A0D4EA115FC0D2D00ABF4B3 /* vChewing */;
+		};
+/* End PBXFileSystemSynchronizedBuildFileExceptionSet section */
+
+/* Begin PBXFileSystemSynchronizedRootGroup section */
+		5B2E75B52F3B0DE800815675 /* Plugins */ = {isa = PBXFileSystemSynchronizedRootGroup; explicitFileTypes = {}; explicitFolders = (); path = Plugins; sourceTree = "<group>"; };
+		5B9184802F3B01A1006B48E8 /* vChewingIME_macOS */ = {isa = PBXFileSystemSynchronizedRootGroup; exceptions = (5B9184D52F3B03D1006B48E8 /* PBXFileSystemSynchronizedBuildFileExceptionSet */, ); explicitFileTypes = {}; explicitFolders = (); path = vChewingIME_macOS; sourceTree = "<group>"; };
+		5B9184C12F3B023A006B48E8 /* ValueAdd */ = {isa = PBXFileSystemSynchronizedRootGroup; exceptions = (5B9184C22F3B0244006B48E8 /* PBXFileSystemSynchronizedBuildFileExceptionSet */, ); explicitFileTypes = {}; explicitFolders = (); path = ValueAdd; sourceTree = "<group>"; };
+		5B9184C32F3B028C006B48E8 /* Installer_macOS */ = {isa = PBXFileSystemSynchronizedRootGroup; exceptions = (5B9184D12F3B0296006B48E8 /* PBXFileSystemSynchronizedBuildFileExceptionSet */, 5B9184D22F3B0296006B48E8 /* PBXFileSystemSynchronizedBuildFileExceptionSet */, ); explicitFileTypes = {}; explicitFolders = (); path = Installer_macOS; sourceTree = "<group>"; };
+/* End PBXFileSystemSynchronizedRootGroup section */
+
+/* Begin PBXFrameworksBuildPhase section */
 		6A0D4E9F15FC0D2D00ABF4B3 /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				5B65FB342A9518DA007EEFB0 /* MainAssembly in Frameworks */,
+				5B65FB342A9518DA007EEFB0 /* MainAssembly4Darwin in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -190,7 +148,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				5B60EAC32EF4893900FFB49E /* InstallerAssembly in Frameworks */,
+				5B60EAC32EF4893900FFB49E /* InstallerAssembly4Darwin in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -200,6 +158,9 @@
 		5B18BA7527C7BF6D0056EB19 /* MiscRootFiles */ = {
 			isa = PBXGroup;
 			children = (
+				5BBD627827B6C4D900271480 /* Update-Info.plist */,
+				5B7CE1B42F3B2D9D0014EDFC /* Release-Version.plist */,
+				5B18BA7027C7BD8B0056EB19 /* Makefile */,
 				5B7DA80228BF6BBA00D7B2AD /* fixinstall.sh */,
 				5BC2652127E04B7B00700291 /* uninstall.sh */,
 				5BC447AB2865BEF500EDC323 /* AUTHORS */,
@@ -215,84 +176,6 @@
 			name = MiscRootFiles;
 			sourceTree = "<group>";
 		};
-		5B2F2BB4286216A500B8557B /* vChewingTests */ = {
-			isa = PBXGroup;
-			children = (
-				5BC447A228656A1900EDC323 /* Placeholder.swift */,
-			);
-			path = vChewingTests;
-			sourceTree = "<group>";
-		};
-		5B49A3C12B95D9890031E450 /* vChewingDebuggable */ = {
-			isa = PBXGroup;
-			children = (
-				5B4BB4CC2EF596A300B3BAAA /* Info.plist */,
-				5B49A3D42B95DACE0031E450 /* InfoPlist.strings */,
-				5B49A3C22B95D9890031E450 /* vChewingDebuggableApp.swift */,
-				5B49A3C42B95D9890031E450 /* ContentView.swift */,
-				5B49A3C62B95D98B0031E450 /* Assets.xcassets */,
-				5B49A3CB2B95D98B0031E450 /* vChewingDebuggable.entitlements */,
-				5B49A3C82B95D98B0031E450 /* Preview Content */,
-			);
-			path = vChewingDebuggable;
-			sourceTree = "<group>";
-		};
-		5B49A3C82B95D98B0031E450 /* Preview Content */ = {
-			isa = PBXGroup;
-			children = (
-				5B49A3C92B95D98B0031E450 /* Preview Assets.xcassets */,
-			);
-			path = "Preview Content";
-			sourceTree = "<group>";
-		};
-		5B62A33027AE78E500A19448 /* Resources */ = {
-			isa = PBXGroup;
-			children = (
-				5B09307828B6FC3B0021F8C5 /* shortcuts.html */,
-				5BF9DA2328840E6200DBD48E /* template-exclusions.txt */,
-				5BF9DA2528840E6200DBD48E /* template-replacements.txt */,
-				5BF9DA2628840E6200DBD48E /* template-userphrases.txt */,
-				5BF9DA2228840E6200DBD48E /* template-usersymbolphrases.txt */,
-				6A0D4EEE15FC0DA600ABF4B3 /* Images */,
-				5BBBB76E27AED70B0023B93A /* MenuIcons */,
-				5BBBB75C27AED54C0023B93A /* SoundFiles */,
-				6A0D4EF515FC0DA600ABF4B3 /* IME-Info.plist */,
-				D4E33D8D27A838F0006DB1CF /* InfoPlist.strings */,
-				5BE69F142B77DC230053F160 /* Localizable.strings */,
-			);
-			path = Resources;
-			sourceTree = "<group>";
-		};
-		5BBBB75C27AED54C0023B93A /* SoundFiles */ = {
-			isa = PBXGroup;
-			children = (
-				5BBBB75D27AED54C0023B93A /* Beep.m4a */,
-				5BBBB75E27AED54C0023B93A /* Fart.m4a */,
-			);
-			path = SoundFiles;
-			sourceTree = "<group>";
-		};
-		5BBBB76E27AED70B0023B93A /* MenuIcons */ = {
-			isa = PBXGroup;
-			children = (
-				5B70F4E62A0BE900005EA8C4 /* MenuIcon-SCVIM.png */,
-				5B70F4E72A0BE900005EA8C4 /* MenuIcon-SCVIM@2x.png */,
-				5B70F4E52A0BE900005EA8C4 /* MenuIcon-TCVIM.png */,
-				5B70F4E82A0BE900005EA8C4 /* MenuIcon-TCVIM@2x.png */,
-			);
-			name = MenuIcons;
-			path = Source/Resources/MenuIcons;
-			sourceTree = SOURCE_ROOT;
-		};
-		5BBBB77827AEDB330023B93A /* Resources */ = {
-			isa = PBXGroup;
-			children = (
-				6ACA41EA15FC1D9000935EF6 /* InfoPlist.strings */,
-				6ACA41EE15FC1D9000935EF6 /* Localizable.strings */,
-			);
-			path = Resources;
-			sourceTree = "<group>";
-		};
 		5BDB7A2D28D47570001AC277 /* Packages */ = {
 			isa = PBXGroup;
 			children = (
@@ -304,10 +187,10 @@
 				5BDB7A3128D47587001AC277 /* vChewing_FolderMonitor */,
 				5BDB7A3228D47587001AC277 /* vChewing_Hotenka */,
 				5BFC63C728D49511004A77B7 /* vChewing_IMKUtils */,
-				5B60EAC12EF4892C00FFB49E /* vChewing_InstallerAssembly */,
+				5B60EAC12EF4892C00FFB49E /* vChewing_InstallerAssembly4Darwin */,
 				5BAD29D12B7E1A1B0013D695 /* vChewing_KimoDataReader */,
 				5BFC63CD28D4AC98004A77B7 /* vChewing_LangModelAssembly */,
-				5B65FB322A9518C9007EEFB0 /* vChewing_MainAssembly */,
+				5B65FB322A9518C9007EEFB0 /* vChewing_MainAssembly4Darwin */,
 				5BDB7A3328D47587001AC277 /* vChewing_Megrez */,
 				5BC5E01C28DDE4270094E427 /* vChewing_NotifierUI */,
 				5BDA45492B97588B00DFA179 /* vChewing_OSFrameworkImpl */,
@@ -326,120 +209,32 @@
 			name = Packages;
 			sourceTree = "<group>";
 		};
-		5BDC5CB127C28E8B00E1CCE2 /* KeyboardExtension */ = {
-			isa = PBXGroup;
-			children = (
-				5B30F11227BA568800484E24 /* vChewingKeyLayout.bundle */,
-			);
-			path = KeyboardExtension;
-			sourceTree = "<group>";
-		};
-		5BF255CC28B2690B003ECB60 /* Headers */ = {
-			isa = PBXGroup;
-			children = (
-				5BF255CD28B2694E003ECB60 /* vChewing-Bridging-Header.h */,
-			);
-			path = Headers;
-			sourceTree = "<group>";
-		};
 		6A0D4E9215FC0CFA00ABF4B3 = {
 			isa = PBXGroup;
 			children = (
+				5B91852E2F3B080A006B48E8 /* Package.swift */,
 				5BDB7A2D28D47570001AC277 /* Packages */,
-				5BF4A44628E5820C002AF9C5 /* vChewingInstaller.entitlements */,
-				5B20430B28BEFC0C00BFC6FD /* vChewing.entitlements */,
-				5BBD627827B6C4D900271480 /* Update-Info.plist */,
-				5B18BA7027C7BD8B0056EB19 /* Makefile */,
-				6ACA41E715FC1D9000935EF6 /* Installer */,
-				6A0D4EC215FC0D3C00ABF4B3 /* Source */,
-				5B2F2BB4286216A500B8557B /* vChewingTests */,
-				5B49A3C12B95D9890031E450 /* vChewingDebuggable */,
-				6A0D4EA315FC0D2D00ABF4B3 /* Products */,
-				D47D73C127A7200500255A50 /* Frameworks */,
-				5BDC5CB127C28E8B00E1CCE2 /* KeyboardExtension */,
+				5B9184C12F3B023A006B48E8 /* ValueAdd */,
+				5B2E75B52F3B0DE800815675 /* Plugins */,
+				6A0D4EC215FC0D3C00ABF4B3 /* Sources */,
 				5B18BA7527C7BF6D0056EB19 /* MiscRootFiles */,
+				5B9184D62F3B04DD006B48E8 /* vChewing.app */,
+				5B9184D72F3B04DD006B48E8 /* vChewingInstaller.app */,
 			);
 			sourceTree = "<group>";
 		};
-		6A0D4EA315FC0D2D00ABF4B3 /* Products */ = {
+		6A0D4EC215FC0D3C00ABF4B3 /* Sources */ = {
 			isa = PBXGroup;
 			children = (
-				6A0D4EA215FC0D2D00ABF4B3 /* vChewing.app */,
-				6ACA41CB15FC1D7500935EF6 /* vChewingInstaller.app */,
-				5B49A3C02B95D9890031E450 /* vChewingDebuggable.app */,
+				5B9184C32F3B028C006B48E8 /* Installer_macOS */,
+				5B9184802F3B01A1006B48E8 /* vChewingIME_macOS */,
 			);
-			name = Products;
-			sourceTree = "<group>";
-		};
-		6A0D4EC215FC0D3C00ABF4B3 /* Source */ = {
-			isa = PBXGroup;
-			children = (
-				5BF255CC28B2690B003ECB60 /* Headers */,
-				6A0D4F1215FC0EB100ABF4B3 /* Modules */,
-				5B62A33027AE78E500A19448 /* Resources */,
-			);
-			path = Source;
-			sourceTree = "<group>";
-		};
-		6A0D4EEE15FC0DA600ABF4B3 /* Images */ = {
-			isa = PBXGroup;
-			children = (
-				6A2E40F5253A69DA00D1AE1D /* Images.xcassets */,
-			);
-			path = Images;
-			sourceTree = "<group>";
-		};
-		6A0D4F1215FC0EB100ABF4B3 /* Modules */ = {
-			isa = PBXGroup;
-			children = (
-				D47B92BF27972AC800458394 /* main.swift */,
-			);
-			path = Modules;
-			sourceTree = "<group>";
-		};
-		6ACA41E715FC1D9000935EF6 /* Installer */ = {
-			isa = PBXGroup;
-			children = (
-				5B269D392EF487D300A9F627 /* main.swift */,
-				5BBBB77827AEDB330023B93A /* Resources */,
-				6ACA41F215FC1D9000935EF6 /* Installer-Info.plist */,
-				5BC0AACA27F58472002D33E9 /* pkgPostInstall.sh */,
-				5BC0AAC927F58472002D33E9 /* pkgPreInstall.sh */,
-			);
-			path = Installer;
-			sourceTree = "<group>";
-		};
-		D47D73C127A7200500255A50 /* Frameworks */ = {
-			isa = PBXGroup;
-			children = (
-				5B60EAC02EF4892200FFB49E /* vChewing_InstallerAssembly */,
-			);
-			name = Frameworks;
+			path = Sources;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
-		5B49A3BF2B95D9890031E450 /* vChewingDebuggable */ = {
-			isa = PBXNativeTarget;
-			buildConfigurationList = 5B49A3CE2B95D98B0031E450 /* Build configuration list for PBXNativeTarget "vChewingDebuggable" */;
-			buildPhases = (
-				5B49A3BC2B95D9890031E450 /* Sources */,
-				5B49A3BD2B95D9890031E450 /* Frameworks */,
-				5B49A3BE2B95D9890031E450 /* Resources */,
-			);
-			buildRules = (
-			);
-			dependencies = (
-			);
-			name = vChewingDebuggable;
-			packageProductDependencies = (
-				5B49A3CF2B95DA020031E450 /* MainAssembly */,
-			);
-			productName = vChewingDebuggable;
-			productReference = 5B49A3C02B95D9890031E450 /* vChewingDebuggable.app */;
-			productType = "com.apple.product-type.application";
-		};
 		6A0D4EA115FC0D2D00ABF4B3 /* vChewing */ = {
 			isa = PBXNativeTarget;
 			buildConfigurationList = 6A0D4EC015FC0D2E00ABF4B3 /* Build configuration list for PBXNativeTarget "vChewing" */;
@@ -454,12 +249,16 @@
 			);
 			dependencies = (
 			);
+			fileSystemSynchronizedGroups = (
+				5B9184802F3B01A1006B48E8 /* vChewingIME_macOS */,
+				5B9184C32F3B028C006B48E8 /* Installer_macOS */,
+			);
 			name = vChewing;
 			packageProductDependencies = (
-				5B65FB332A9518DA007EEFB0 /* MainAssembly */,
+				5B65FB332A9518DA007EEFB0 /* MainAssembly4Darwin */,
 			);
 			productName = vChewing;
-			productReference = 6A0D4EA215FC0D2D00ABF4B3 /* vChewing.app */;
+			productReference = 5B9184D62F3B04DD006B48E8 /* vChewing.app */;
 			productType = "com.apple.product-type.application";
 		};
 		6ACA41CA15FC1D7500935EF6 /* vChewingInstaller */ = {
@@ -478,10 +277,10 @@
 			);
 			name = vChewingInstaller;
 			packageProductDependencies = (
-				5B60EAC22EF4893900FFB49E /* InstallerAssembly */,
+				5B60EAC22EF4893900FFB49E /* InstallerAssembly4Darwin */,
 			);
 			productName = vChewingInstaller;
-			productReference = 6ACA41CB15FC1D7500935EF6 /* vChewingInstaller.app */;
+			productReference = 5B9184D72F3B04DD006B48E8 /* vChewingInstaller.app */;
 			productType = "com.apple.product-type.application";
 		};
 /* End PBXNativeTarget section */
@@ -492,11 +291,8 @@
 			attributes = {
 				BuildIndependentTargetsInParallel = YES;
 				LastSwiftUpdateCheck = 1510;
-				LastUpgradeCheck = 2600;
+				LastUpgradeCheck = 2630;
 				TargetAttributes = {
-					5B49A3BF2B95D9890031E450 = {
-						CreatedOnToolsVersion = 15.1;
-					};
 					6A0D4EA115FC0D2D00ABF4B3 = {
 						LastSwiftMigration = 1400;
 						ProvisioningStyle = Automatic;
@@ -508,7 +304,6 @@
 				};
 			};
 			buildConfigurationList = 6A0D4E9715FC0CFA00ABF4B3 /* Build configuration list for PBXProject "vChewing" */;
-			compatibilityVersion = "Xcode 3.2";
 			developmentRegion = en;
 			hasScannedForEncodings = 0;
 			knownRegions = (
@@ -522,55 +317,28 @@
 			packageReferences = (
 				5BC8EB7C2B7E1CC1004F5101 /* XCLocalSwiftPackageReference "Packages/vChewing_KimoDataReader" */,
 			);
-			productRefGroup = 6A0D4EA315FC0D2D00ABF4B3 /* Products */;
+			preferredProjectObjectVersion = 46;
+			productRefGroup = 6A0D4E9215FC0CFA00ABF4B3;
 			projectDirPath = "";
 			projectRoot = "";
 			targets = (
 				6A0D4EA115FC0D2D00ABF4B3 /* vChewing */,
 				6ACA41CA15FC1D7500935EF6 /* vChewingInstaller */,
-				5B49A3BF2B95D9890031E450 /* vChewingDebuggable */,
 			);
 		};
 /* End PBXProject section */
 
 /* Begin PBXResourcesBuildPhase section */
-		5B49A3BE2B95D9890031E450 /* Resources */ = {
-			isa = PBXResourcesBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-				5B49A3CA2B95D98B0031E450 /* Preview Assets.xcassets in Resources */,
-				5B49A3D22B95DA880031E450 /* Images.xcassets in Resources */,
-				5B49A3D12B95DA530031E450 /* Localizable.strings in Resources */,
-				5B49A3C72B95D98B0031E450 /* Assets.xcassets in Resources */,
-				5B49A3DA2B95DAD10031E450 /* InfoPlist.strings in Resources */,
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
 		6A0D4EA015FC0D2D00ABF4B3 /* Resources */ = {
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				5B70F4EC2A0BE900005EA8C4 /* MenuIcon-TCVIM@2x.png in Resources */,
-				5BF9DA2828840E6200DBD48E /* template-exclusions.txt in Resources */,
 				5B7DA80328BF6BC600D7B2AD /* fixinstall.sh in Resources */,
-				5B70F4E92A0BE900005EA8C4 /* MenuIcon-TCVIM.png in Resources */,
-				5BBBB76027AED54C0023B93A /* Fart.m4a in Resources */,
-				6A2E40F6253A69DA00D1AE1D /* Images.xcassets in Resources */,
-				5B70F4EA2A0BE900005EA8C4 /* MenuIcon-SCVIM.png in Resources */,
-				D4E33D8F27A838F0006DB1CF /* InfoPlist.strings in Resources */,
 				5BBC2D9F28F51C0400C986F6 /* LICENSE-CHT.txt in Resources */,
-				5BE69F122B77DC230053F160 /* Localizable.strings in Resources */,
 				5BBC2D9E28F51C0400C986F6 /* LICENSE.txt in Resources */,
-				5B09307628B6FC3B0021F8C5 /* shortcuts.html in Resources */,
-				5BF9DA2B28840E6200DBD48E /* template-userphrases.txt in Resources */,
-				5BF9DA2728840E6200DBD48E /* template-usersymbolphrases.txt in Resources */,
 				5BBC2DA128F51C0400C986F6 /* LICENSE-CHS.txt in Resources */,
-				5BF9DA2A28840E6200DBD48E /* template-replacements.txt in Resources */,
-				5BBBB75F27AED54C0023B93A /* Beep.m4a in Resources */,
 				5BC2652227E04B7E00700291 /* uninstall.sh in Resources */,
-				5BAD0CD527D701F6003D127F /* vChewingKeyLayout.bundle in Resources */,
 				5BBC2DA028F51C0400C986F6 /* LICENSE-JPN.txt in Resources */,
-				5B70F4EB2A0BE900005EA8C4 /* MenuIcon-SCVIM@2x.png in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -578,10 +346,7 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				6ACA420215FC1E5200935EF6 /* vChewing.app in Resources */,
-				6A2E40F9253A6AA000D1AE1D /* Images.xcassets in Resources */,
-				6ACA41FA15FC1D9000935EF6 /* InfoPlist.strings in Resources */,
-				6ACA41FC15FC1D9000935EF6 /* Localizable.strings in Resources */,
+				5B91852D2F3B0524006B48E8 /* vChewing.app in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -628,20 +393,10 @@
 /* End PBXShellScriptBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
-		5B49A3BC2B95D9890031E450 /* Sources */ = {
-			isa = PBXSourcesBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-				5B49A3C52B95D9890031E450 /* ContentView.swift in Sources */,
-				5B49A3C32B95D9890031E450 /* vChewingDebuggableApp.swift in Sources */,
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
 		6A0D4E9E15FC0D2D00ABF4B3 /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				D47B92C027972AD100458394 /* main.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -649,7 +404,6 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				5B269D392EF487D300A9F628 /* main.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -663,182 +417,7 @@
 		};
 /* End PBXTargetDependency section */
 
-/* Begin PBXVariantGroup section */
-		5B09307828B6FC3B0021F8C5 /* shortcuts.html */ = {
-			isa = PBXVariantGroup;
-			children = (
-				5B09307728B6FC3B0021F8C5 /* zh-Hant */,
-				5B09307928B6FC3F0021F8C5 /* zh-Hans */,
-				5B09307A28B6FC400021F8C5 /* en */,
-				5B09307B28B6FC410021F8C5 /* ja */,
-			);
-			name = shortcuts.html;
-			sourceTree = "<group>";
-		};
-		5B49A3D42B95DACE0031E450 /* InfoPlist.strings */ = {
-			isa = PBXVariantGroup;
-			children = (
-				5B49A3D52B95DACE0031E450 /* Base */,
-				5B49A3D62B95DACE0031E450 /* en */,
-				5B49A3D72B95DACE0031E450 /* zh-Hant */,
-				5B49A3D82B95DACE0031E450 /* zh-Hans */,
-				5B49A3D92B95DACE0031E450 /* ja */,
-			);
-			name = InfoPlist.strings;
-			sourceTree = "<group>";
-		};
-		5BE69F142B77DC230053F160 /* Localizable.strings */ = {
-			isa = PBXVariantGroup;
-			children = (
-				5BE69F132B77DC230053F160 /* en */,
-				5BE69F152B77DC270053F160 /* zh-Hans */,
-				5BE69F162B77DC280053F160 /* zh-Hant */,
-				5BE69F172B77DC290053F160 /* ja */,
-			);
-			name = Localizable.strings;
-			sourceTree = "<group>";
-		};
-		6ACA41EA15FC1D9000935EF6 /* InfoPlist.strings */ = {
-			isa = PBXVariantGroup;
-			children = (
-				6ACA41EB15FC1D9000935EF6 /* en */,
-				5BDCBB4727B4F6C600D0CC59 /* zh-Hant */,
-				5B04305327B529D800CB65BC /* zh-Hans */,
-				5B04305E27B5312E00CB65BC /* ja */,
-			);
-			name = InfoPlist.strings;
-			sourceTree = "<group>";
-		};
-		6ACA41EE15FC1D9000935EF6 /* Localizable.strings */ = {
-			isa = PBXVariantGroup;
-			children = (
-				6ACA41EF15FC1D9000935EF6 /* en */,
-				5BDCBB4827B4F6C600D0CC59 /* zh-Hant */,
-				5B04305427B529D800CB65BC /* zh-Hans */,
-				5B04305F27B5312E00CB65BC /* ja */,
-			);
-			name = Localizable.strings;
-			sourceTree = "<group>";
-		};
-		D4E33D8D27A838F0006DB1CF /* InfoPlist.strings */ = {
-			isa = PBXVariantGroup;
-			children = (
-				D4E33D8E27A838F0006DB1CF /* Base */,
-				5B05A47B27AFF7CA00437698 /* en */,
-				5BDCBB4927B4F6C700D0CC59 /* zh-Hant */,
-				5B04305627B529D800CB65BC /* zh-Hans */,
-				5B04306127B5312E00CB65BC /* ja */,
-			);
-			name = InfoPlist.strings;
-			sourceTree = "<group>";
-		};
-/* End PBXVariantGroup section */
-
 /* Begin XCBuildConfiguration section */
-		5B49A3CC2B95D98B0031E450 /* Debug */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
-				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
-				CLANG_ANALYZER_NONNULL = YES;
-				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
-				CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";
-				CLANG_ENABLE_MODULES = YES;
-				CLANG_ENABLE_OBJC_ARC = YES;
-				CLANG_ENABLE_OBJC_WEAK = YES;
-				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
-				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
-				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
-				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
-				CODE_SIGN_ENTITLEMENTS = vChewingDebuggable/vChewingDebuggable.entitlements;
-				CODE_SIGN_STYLE = Automatic;
-				COMBINE_HIDPI_IMAGES = YES;
-				CURRENT_PROJECT_VERSION = 4250;
-				DEBUG_INFORMATION_FORMAT = dwarf;
-				DEVELOPMENT_ASSET_PATHS = "\"vChewingDebuggable/Preview Content\"";
-				ENABLE_APP_SANDBOX = YES;
-				ENABLE_PREVIEWS = YES;
-				ENABLE_USER_SCRIPT_SANDBOXING = YES;
-				ENABLE_USER_SELECTED_FILES = readonly;
-				GCC_C_LANGUAGE_STANDARD = gnu17;
-				GCC_DYNAMIC_NO_PIC = NO;
-				GCC_OPTIMIZATION_LEVEL = 0;
-				GCC_PREPROCESSOR_DEFINITIONS = (
-					"DEBUG=1",
-					"$(inherited)",
-				);
-				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
-				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
-				GENERATE_INFOPLIST_FILE = YES;
-				INFOPLIST_FILE = vChewingDebuggable/Info.plist;
-				INFOPLIST_KEY_NSHumanReadableCopyright = "";
-				LD_RUNPATH_SEARCH_PATHS = (
-					"$(inherited)",
-					"@executable_path/../Frameworks",
-				);
-				LOCALIZATION_PREFERS_STRING_CATALOGS = YES;
-				MACOSX_DEPLOYMENT_TARGET = 14.2;
-				MARKETING_VERSION = 4.2.5;
-				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
-				MTL_FAST_MATH = YES;
-				PRODUCT_BUNDLE_IDENTIFIER = org.atelierInmu.vChewingDebuggable;
-				PRODUCT_NAME = "$(TARGET_NAME)";
-				SDKROOT = macosx;
-				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "DEBUG $(inherited)";
-				SWIFT_EMIT_LOC_STRINGS = YES;
-				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
-				SWIFT_VERSION = 5.0;
-			};
-			name = Debug;
-		};
-		5B49A3CD2B95D98B0031E450 /* Release */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
-				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
-				CLANG_ANALYZER_NONNULL = YES;
-				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
-				CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";
-				CLANG_ENABLE_MODULES = YES;
-				CLANG_ENABLE_OBJC_ARC = YES;
-				CLANG_ENABLE_OBJC_WEAK = YES;
-				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
-				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
-				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
-				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
-				CODE_SIGN_ENTITLEMENTS = vChewingDebuggable/vChewingDebuggable.entitlements;
-				CODE_SIGN_STYLE = Automatic;
-				COMBINE_HIDPI_IMAGES = YES;
-				CURRENT_PROJECT_VERSION = 4250;
-				DEVELOPMENT_ASSET_PATHS = "\"vChewingDebuggable/Preview Content\"";
-				ENABLE_APP_SANDBOX = YES;
-				ENABLE_NS_ASSERTIONS = NO;
-				ENABLE_PREVIEWS = YES;
-				ENABLE_USER_SCRIPT_SANDBOXING = YES;
-				ENABLE_USER_SELECTED_FILES = readonly;
-				GCC_C_LANGUAGE_STANDARD = gnu17;
-				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
-				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
-				GENERATE_INFOPLIST_FILE = YES;
-				INFOPLIST_FILE = vChewingDebuggable/Info.plist;
-				INFOPLIST_KEY_NSHumanReadableCopyright = "";
-				LD_RUNPATH_SEARCH_PATHS = (
-					"$(inherited)",
-					"@executable_path/../Frameworks",
-				);
-				LOCALIZATION_PREFERS_STRING_CATALOGS = YES;
-				MACOSX_DEPLOYMENT_TARGET = 14.2;
-				MARKETING_VERSION = 4.2.5;
-				MTL_ENABLE_DEBUG_INFO = NO;
-				MTL_FAST_MATH = YES;
-				PRODUCT_BUNDLE_IDENTIFIER = org.atelierInmu.vChewingDebuggable;
-				PRODUCT_NAME = "$(TARGET_NAME)";
-				SDKROOT = macosx;
-				SWIFT_EMIT_LOC_STRINGS = YES;
-				SWIFT_VERSION = 5.0;
-			};
-			name = Release;
-		};
 		6A0D4E9915FC0CFA00ABF4B3 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
@@ -950,7 +529,7 @@
 				CLANG_WARN_OBJC_IMPLICIT_ATOMIC_PROPERTIES = YES;
 				CLANG_WARN_OBJC_MISSING_PROPERTY_SYNTHESIS = YES;
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
-				CODE_SIGN_ENTITLEMENTS = vChewing.entitlements;
+				CODE_SIGN_ENTITLEMENTS = Sources/vChewingIME_macOS/Resources/vChewing.entitlements;
 				CODE_SIGN_IDENTITY = "-";
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
@@ -990,7 +569,7 @@
 				GCC_WARN_SHADOW = YES;
 				GCC_WARN_UNDECLARED_SELECTOR = YES;
 				GCC_WARN_UNINITIALIZED_AUTOS = YES;
-				INFOPLIST_FILE = "Source/Resources/IME-Info.plist";
+				INFOPLIST_FILE = Sources/vChewingIME_macOS/Resources/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/../Frameworks",
@@ -1003,7 +582,6 @@
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
 				SKIP_INSTALL = YES;
-				SWIFT_OBJC_BRIDGING_HEADER = "Source/Headers/vChewing-Bridging-Header.h";
 				SWIFT_VERSION = 5.0;
 				WRAPPER_EXTENSION = app;
 			};
@@ -1023,7 +601,7 @@
 				CLANG_WARN_OBJC_IMPLICIT_ATOMIC_PROPERTIES = YES;
 				CLANG_WARN_OBJC_MISSING_PROPERTY_SYNTHESIS = YES;
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
-				CODE_SIGN_ENTITLEMENTS = vChewing.entitlements;
+				CODE_SIGN_ENTITLEMENTS = Sources/vChewingIME_macOS/Resources/vChewing.entitlements;
 				CODE_SIGN_IDENTITY = "-";
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
@@ -1057,7 +635,7 @@
 				GCC_WARN_SHADOW = YES;
 				GCC_WARN_UNDECLARED_SELECTOR = YES;
 				GCC_WARN_UNINITIALIZED_AUTOS = YES;
-				INFOPLIST_FILE = "Source/Resources/IME-Info.plist";
+				INFOPLIST_FILE = Sources/vChewingIME_macOS/Resources/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/../Frameworks",
@@ -1069,7 +647,6 @@
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
 				SKIP_INSTALL = YES;
-				SWIFT_OBJC_BRIDGING_HEADER = "Source/Headers/vChewing-Bridging-Header.h";
 				SWIFT_VERSION = 5.0;
 				WRAPPER_EXTENSION = app;
 			};
@@ -1084,7 +661,7 @@
 				CLANG_ENABLE_OBJC_ARC = YES;
 				CLANG_ENABLE_OBJC_WEAK = YES;
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
-				CODE_SIGN_ENTITLEMENTS = vChewingInstaller.entitlements;
+				CODE_SIGN_ENTITLEMENTS = Sources/Installer_macOS/Resources/vChewingInstaller.entitlements;
 				CODE_SIGN_IDENTITY = "-";
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
@@ -1104,7 +681,7 @@
 				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
 				GCC_WARN_ABOUT_RETURN_TYPE = YES;
 				GCC_WARN_UNINITIALIZED_AUTOS = YES;
-				INFOPLIST_FILE = "Installer/Installer-Info.plist";
+				INFOPLIST_FILE = Sources/Installer_macOS/Resources/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/../Frameworks",
@@ -1131,7 +708,7 @@
 				CLANG_ENABLE_OBJC_ARC = YES;
 				CLANG_ENABLE_OBJC_WEAK = YES;
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
-				CODE_SIGN_ENTITLEMENTS = vChewingInstaller.entitlements;
+				CODE_SIGN_ENTITLEMENTS = Sources/Installer_macOS/Resources/vChewingInstaller.entitlements;
 				CODE_SIGN_IDENTITY = "-";
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
@@ -1145,7 +722,7 @@
 				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
 				GCC_WARN_ABOUT_RETURN_TYPE = YES;
 				GCC_WARN_UNINITIALIZED_AUTOS = YES;
-				INFOPLIST_FILE = "Installer/Installer-Info.plist";
+				INFOPLIST_FILE = Sources/Installer_macOS/Resources/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/../Frameworks",
@@ -1165,15 +742,6 @@
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
-		5B49A3CE2B95D98B0031E450 /* Build configuration list for PBXNativeTarget "vChewingDebuggable" */ = {
-			isa = XCConfigurationList;
-			buildConfigurations = (
-				5B49A3CC2B95D98B0031E450 /* Debug */,
-				5B49A3CD2B95D98B0031E450 /* Release */,
-			);
-			defaultConfigurationIsVisible = 0;
-			defaultConfigurationName = Release;
-		};
 		6A0D4E9715FC0CFA00ABF4B3 /* Build configuration list for PBXProject "vChewing" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
@@ -1211,17 +779,13 @@
 /* End XCLocalSwiftPackageReference section */
 
 /* Begin XCSwiftPackageProductDependency section */
-		5B49A3CF2B95DA020031E450 /* MainAssembly */ = {
+		5B60EAC22EF4893900FFB49E /* InstallerAssembly4Darwin */ = {
 			isa = XCSwiftPackageProductDependency;
-			productName = MainAssembly;
+			productName = InstallerAssembly4Darwin;
 		};
-		5B60EAC22EF4893900FFB49E /* InstallerAssembly */ = {
+		5B65FB332A9518DA007EEFB0 /* MainAssembly4Darwin */ = {
 			isa = XCSwiftPackageProductDependency;
-			productName = InstallerAssembly;
-		};
-		5B65FB332A9518DA007EEFB0 /* MainAssembly */ = {
-			isa = XCSwiftPackageProductDependency;
-			productName = MainAssembly;
+			productName = MainAssembly4Darwin;
 		};
 /* End XCSwiftPackageProductDependency section */
 	};

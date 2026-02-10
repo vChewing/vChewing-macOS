@@ -1,0 +1,895 @@
+<!DOCTYPE html>
+<html lang="zh-Hans">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+      <title>New Page</title>
+      <style>
+        body { font: 15px / 1.4 Tahoma; }
+        @media (prefers-color-scheme: dark) {
+          body { background: #333; color: white; }
+        }
+        td { padding-left: 10px; padding-right: 10px; min-width: auto; }
+        td:first-child { text-align: right; }
+        tr:nth-child(odd) { background-color: #88888820 }
+        tr:nth-child(even) { background-color: #88888830; }
+        tr:hover { background-color: #88888810; }
+      </style>
+  </head>
+  <body>
+    <h1><strong>键盘热键使用手册（macOS）</strong></h1>
+    <div>本文对应至少唯音 3.7.3 版。请利用滑鼠滚轮检视该页面。</div>
+    <div>为了简化下文表述，这里介绍一下本文会用到的 macOS 的键盘符号。注：</div>
+    <ol>
+      <li>BackSpace 与 Delete 采 Windows 称谓。</li>
+      <li>下表内的四个方向键的称谓，均为根据文字书写顺序方向而言的相对方向称谓。</li>
+      <li>简体中文使用者请注意本文「递交」一词的意义与「上屏」相同，英文都是「Commit」。</li>
+      <li>唯音不会对数字小键盘拦截响应（小键盘 Enter 键除外），除非有选字窗出现、且有数字小键盘内能输入的字符被设为选字键。</li>
+      <li>本文下文出现的所有「数字键」均指主键盘区域的数字键。</li>
+      <li>本文用语「（内文）组字区」代指「inline composition buffer」，在微软术语体系当中也被称作「pre-edit area」。</li>
+      <li>本文用语「组音区」是指由铁恨注拼引擎操纵的注音组音区。组音区会在使用者敲注音时出现在内文组字区内。输入法自组音区取得读音，在验证其具有对应的辞典记录之后，将其插入至天权星组字引擎。整个内文组字区相当于组字引擎与注拼引擎的统合外在表现。</li>
+      <li>为了保证表达与讨论的有效性、减少歧义，本文在讨论前后关系时，只用「往前/往后」「前方/后方」，且仅以文字书写方向为这些用语的方向参照。这与 Zonble 的「Before-After」前后术语逻辑体系不同：唯音在使用英文术语的情况下只用「Front / Rear (Back, Tail)」、「Forward / Backward」。</li>
+      <li>所谓「符号选单状态」仅代指分类波浪符号选单。</li>
+    </ol>
+    <div>&nbsp;</div>
+    <table>
+      <tr>
+        <td>
+          <div><strong>符号</strong></div>
+        </td>
+        <td>
+          <div><strong>mac 键盘</strong></div>
+        </td>
+      </tr>
+      <tr>
+        <td>
+          <div>⌘</div>
+        </td>
+        <td>
+          <div>CMD (Command / Windows / Super)</div>
+        </td>
+      </tr>
+      <tr>
+        <td>
+          <div>⌥</div>
+        </td>
+        <td>
+          <div>Alt (Option)</div>
+        </td>
+      </tr>
+      <tr>
+        <td>
+          <div>⌃</div>
+        </td>
+        <td>
+          <div>Ctrl (Control)</div>
+        </td>
+      </tr>
+      <tr>
+        <td>
+          <div>⇧</div>
+        </td>
+        <td>
+          <div>Shift</div>
+        </td>
+      </tr>
+      <tr>
+        <td>
+          <div>⇪</div>
+        </td>
+        <td>
+          <div>Caps (Caps Lock)</div>
+        </td>
+      </tr>
+      <tr>
+        <td>
+          <div>⌫</div>
+        </td>
+        <td>
+          <div>Bksp (BackSpace，被 Apple 称为 Delete)</div>
+        </td>
+      </tr>
+      <tr>
+        <td>
+          <div>⌦</div>
+        </td>
+        <td>
+          <div>Del (这才是真的 Delete)</div>
+        </td>
+      </tr>
+      <tr>
+        <td>
+          <div>⎋</div>
+        </td>
+        <td>
+          <div>Esc (Escape)</div>
+        </td>
+      </tr>
+      <tr>
+        <td>
+          <div>␣</div>
+        </td>
+        <td>
+          <div>Space (空格)</div>
+        </td>
+      </tr>
+      <tr>
+        <td>
+          <div>⇥</div>
+        </td>
+        <td>
+          <div>Tab</div>
+        </td>
+      </tr>
+      <tr>
+        <td>
+          <div>⏎</div>
+        </td>
+        <td>
+          <div>Return (与 Enter ⌤ 合并处理)</div>
+        </td>
+      </tr>
+      <tr>
+        <td>
+          <div>↑</div>
+        </td>
+        <td>
+          <div>左手方向键，也就是：横排书写时的上方向键，纵排书写时的右方向键</div>
+        </td>
+      </tr>
+      <tr>
+        <td>
+          <div>↓</div>
+        </td>
+        <td>
+          <div>右手方向键，也就是：横排书写时的下方向键，纵排书写时的左方向键</div>
+        </td>
+      </tr>
+      <tr>
+        <td>
+          <div>←</div>
+        </td>
+        <td>
+          <div>向后方向键，也就是：横排书写时的左方向键，纵排书写时的上方向键</div>
+        </td>
+      </tr>
+      <tr>
+        <td>
+          <div>→</div>
+        </td>
+        <td>
+          <div>向前方向键，也就是：横排书写时的右方向键，纵排书写时的下方向键</div>
+        </td>
+      </tr>
+      <tr>
+        <td>
+          <div>↖︎</div>
+        </td>
+        <td>
+          <div>Home</div>
+        </td>
+      </tr>
+      <tr>
+        <td>
+          <div>↘︎</div>
+        </td>
+        <td>
+          <div>End</div>
+        </td>
+      </tr>
+      <tr>
+        <td>
+          <div>⇞</div>
+        </td>
+        <td>
+          <div>PgUp (Page Up)</div>
+        </td>
+      </tr>
+      <tr>
+        <td>
+          <div>⇟</div>
+        </td>
+        <td>
+          <div>PgDn (Page Down)</div>
+        </td>
+      </tr>
+      <tr>
+        <td>
+          <div>☰</div>
+        </td>
+        <td>
+          <div>上下文选单键 (仅 PC 键盘)</div>
+        </td>
+      </tr>
+    </table>
+    <div>&nbsp;</div>
+    <div>下述热键用以作为模式切换开关，可在偏好设定内停用：</div>
+    <table>
+      <tr>
+        <td>
+          <div><strong>热键</strong></div>
+        </td>
+        <td>
+          <div><strong>模式</strong></div>
+        </td>
+      </tr>
+      <tr>
+        <td>
+          <div>⌃⇧⌘ P</div>
+        </td>
+        <td>
+          <div>模拟逐字选字输入（就是ㄅ半那样的输入方式）</div>
+        </td>
+      </tr>
+      <tr>
+        <td>
+          <div>⌃⇧⌘ K</div>
+        </td>
+        <td>
+          <div>康熙正体字模式（某些汉字会变成对应的康熙字元）</div>
+        </td>
+      </tr>
+      <tr>
+        <td>
+          <div>⌃⇧⌘ A</div>
+        </td>
+        <td>
+          <div>关联词语模式（就是ㄅ半的关联词语）</div>
+        </td>
+      </tr>
+      <tr>
+        <td>
+          <div>⌃⇧⌘ J</div>
+        </td>
+        <td>
+          <div>日文 JIS 新字体模式（方便在日本的网站线上邮购）</div>
+        </td>
+      </tr>
+      <tr>
+        <td>
+          <div>⌃⇧⌘ L</div>
+        </td>
+        <td>
+          <div>全字库模式（不另外安装全字库字型的话，某些候选字会显示成方块）</div>
+        </td>
+      </tr>
+      <tr>
+        <td>
+          <div>⌃⇧⌘ H</div>
+        </td>
+        <td>
+          <div>半形标点模式（程式虱专用）</div>
+        </td>
+      </tr>
+      <tr>
+        <td>
+          <div>⌃⇧⌘ M</div>
+        </td>
+        <td>
+          <div>大写汉字数字输出（会将「一二三四五」转为「壹贰参肆伍」）</div>
+        </td>
+      </tr>
+      <tr>
+        <td>
+          <div>⌃⇧⌘ I</div>
+        </td>
+        <td>
+          <div>磁带模式（CIN 表格模式）</div>
+        </td>
+      </tr>
+      <tr>
+        <td>
+          <div>⌃⇧⌘ D</div>
+        </td>
+        <td>
+          <div>简体/繁体输入模式切换</div>
+        </td>
+      </tr>
+    </table>
+    <div>&nbsp;</div>
+    <div>下述热键则为敲字时的基础功能：</div>
+    <table>
+      <tr>
+        <td>
+          <div><strong>热键</strong></div>
+        </td>
+        <td>
+          <div><strong>功能</strong></div>
+        </td>
+        <td>
+          <div><strong>备注</strong></div>
+        </td>
+      </tr>
+      <tr>
+        <td>
+          <div>⏎</div>
+        </td>
+        <td>
+          <div>‧ 递交输出当前组字区的全部内容。</div>
+        </td>
+        <td>
+          <div>组字区有内容时才会生效；</div>
+          <div>输入法并非处于标记模式时才会生效。</div>
+        </td>
+      </tr>
+      <tr>
+        <td>
+          <div>⇧⏎</div>
+        </td>
+        <td>
+          <div>‧ 将当前组字区内容递交出去之后、以文字输入方向最前端的已递交的节点内容作为索引资料、来试图叫出关联词语选字窗。</div>
+        </td>
+        <td>
+          <div>对逐字选字模式无效，因为组字选字模式另有安排。</div>
+        </td>
+      </tr>
+      <tr>
+        <td>
+          <div>⌥⇧⏎</div>
+        </td>
+        <td>
+          <div>‧ 递交输出当前组字区的全部内容，且用半形空格分隔每个字。</div>
+        </td>
+        <td>
+          <div>组字区有内容时才会生效。</div>
+        </td>
+      </tr>
+      <tr>
+        <td>
+          <div>⌥→</div>
+          <div>⌥←</div>
+        </td>
+        <td>
+          <div>‧ 令组字区游标向前移动一个词语节点</div>
+          <div>‧ 令组字区游标向后移动一个词语节点</div>
+        </td>
+        <td>
+          <div>组字区有内容时才会生效。</div>
+        </td>
+      </tr>
+      <tr>
+        <td>
+          <div>JIS英数键</div>
+        </td>
+        <td>
+          <div>‧ 中英文输入模式切换</div>
+        </td>
+        <td>
+          <div>只有 JIS 日语键盘才有这个按键。</div>
+        </td>
+      </tr>
+      <tr>
+        <td>
+          <div>⇧↑</div>
+          <div>⇧↓</div>
+        </td>
+        <td>
+          <div>‧ 以固定顺序就地轮替候选字（下一个候选字）</div>
+          <div>‧ 以固定顺序就地轮替候选字（上一个候选字）</div>
+        </td>
+        <td>
+          <div>组字区有内容时才会生效。</div>
+        </td>
+      </tr>
+      <tr>
+        <td>
+          <div>⌃⌘]</div>
+          <div>⌃⌘[</div>
+        </td>
+        <td>
+          <div>‧ 以固定顺序就地轮替候选字（下一个候选字）</div>
+          <div>‧ 以固定顺序就地轮替候选字（上一个候选字）</div>
+        </td>
+        <td>
+          <div>组字区有内容时才会生效。</div>
+        </td>
+      </tr>
+      <tr>
+        <td>
+          <div>☰</div>
+          <div>⇧☰</div>
+        </td>
+        <td>
+          <div>‧ 以固定顺序就地轮替候选字（下一个候选字）</div>
+          <div>‧ 以固定顺序就地轮替候选字（上一个候选字）</div>
+        </td>
+        <td>
+          <div>组字区有内容时才会生效。</div>
+        </td>
+      </tr>
+      <tr>
+        <td>
+          <div>⌥↑</div>
+          <div>⌥↓</div>
+        </td>
+        <td>
+          <div>‧ 以固定顺序就地轮替候选字（下一个候选字）</div>
+          <div>‧ 以固定顺序就地轮替候选字（上一个候选字）</div>
+        </td>
+        <td>
+          <div>组字区有内容时才会生效。</div>
+        </td>
+      </tr>
+      <tr>
+        <td>
+          <div>⇧␣</div>
+          <div>⇧⌘␣</div>
+        </td>
+        <td>
+          <div>‧ 以固定顺序就地轮替候选字（下一个候选字）</div>
+          <div>‧ 以固定顺序就地轮替候选字（上一个候选字）</div>
+        </td>
+        <td>
+          <div>同上，但可用左手单手操作：</div>
+          <div>大拇指可以从 ⌘ 扫到 ␣ 上。</div>
+        </td>
+      </tr>
+      <tr>
+        <td>
+          <div>⇥</div>
+          <div>⇧⇥</div>
+        </td>
+        <td>
+          <div>‧ 以固定顺序就地轮替候选字（下一个候选字）</div>
+          <div>‧ 以固定顺序就地轮替候选字（上一个候选字）</div>
+        </td>
+        <td>
+          <div>同上，可在偏好设定内改为呼叫选字窗。</div>
+          <div>无法用于脸书，因为脸书会拦截 Tab 键。</div>
+        </td>
+      </tr>
+      <tr>
+        <td>
+          <div>⌥⌃→</div>
+          <div>⌥⌃←</div>
+        </td>
+        <td>
+          <div>‧ 迅速将组字区内的游标挪到组字区最前方</div>
+          <div>‧ 迅速将组字区内的游标挪到组字区最后方</div>
+        </td>
+        <td>
+          <div>组字区有内容时才会生效。</div>
+        </td>
+      </tr>
+      <tr>
+        <td>
+          <div>↘︎</div>
+          <div>↖︎</div>
+        </td>
+        <td>
+          <div>‧ 迅速将组字区内的游标挪到组字区最前方</div>
+          <div>‧ 迅速将组字区内的游标挪到组字区最后方</div>
+        </td>
+        <td>
+          <div>同上。</div>
+        </td>
+      </tr>
+      <tr>
+        <td>
+          <div>⇧→</div>
+          <div>⇧←</div>
+        </td>
+        <td>
+          <div>控制组字区内的高亮标记选择范围，</div>
+          <div>之后可进行被荧幕所提示的操作。</div>
+        </td>
+        <td>
+          <div>组字区有内容时才会生效；</div>
+          <div>当有高亮选择内容时，输入法处于标记模式。</div>
+        </td>
+      </tr>
+      <tr>
+        <td>
+          <div>⏎</div>
+        </td>
+        <td>
+          <div>将当前高亮标记了的词音配对新增至使用者辞典。</div>
+          <div>如果已经是既有词音配对的话，则会提升其权重。</div>
+        </td>
+        <td>
+          <div>输入法处于标记模式时才会生效。</div>
+        </td>
+      </tr>
+      <tr>
+        <td>
+          <div>⇧⌘⏎</div>
+        </td>
+        <td>
+          <div>将高亮标记了的当前在库的词音配对的权重</div>
+          <div>压低至 -114.514。</div>
+        </td>
+        <td>
+          <div>输入法处于标记模式时才会生效；</div>
+          <div>相关记录存于使用者语汇档案当中；</div>
+          <div>对使用者关联词语无法生效。</div>
+        </td>
+      </tr>
+      <tr>
+        <td>
+          <div>⌫</div>
+          <div>⌦</div>
+        </td>
+        <td>
+          <div>将当前高亮标记了的词音配对新增至语汇滤除表，</div>
+          <div>输入法在拿读音查询在库语汇时会忽略相关结果。</div>
+          <div>也就是俗称的「就地删词」。</div>
+        </td>
+        <td>
+          <div>输入法处于标记模式时才会生效；</div>
+          <div>对使用者关联词语无法生效。</div>
+        </td>
+      </tr>
+      <tr>
+        <td>
+          <div>⇧⌦</div>
+        </td>
+        <td>
+          <div>清空当前组字区。</div>
+        </td>
+        <td>
+          <div>输入法不处于标记模式时才会生效。</div>
+          <div>组字区有内容时才会生效。</div>
+        </td>
+      </tr>
+      <tr>
+        <td>
+          <div>⇧⌫</div>
+        </td>
+        <td>
+          <div>析构掉游标身后的汉字读音，</div>
+          <div>使其等待新的声调输入。</div>
+        </td>
+        <td>
+          <div>输入法不处于标记模式时才会生效。</div>
+          <div>组字区有内容时才会生效。</div>
+          <div>该行为可在新版偏好设定内修改。</div>
+        </td>
+      </tr>
+      <tr>
+        <td>
+          <div>声调键</div>
+        </td>
+        <td>
+          <div>析构掉游标身后的汉字读音，</div>
+          <div>且使用声调键的读音复写之。</div>
+          <div>若发现不可析构，则直接输入声调。</div>
+        </td>
+        <td>
+          <div>输入法不处于标记模式时才会生效。</div>
+          <div>组字区有内容时才会生效。</div>
+          <div>该行为可在新版偏好设定内修改。</div>
+        </td>
+      </tr>
+      <tr>
+        <td>
+          <div>⌃⌥⌘⏎</div>
+        </td>
+        <td>
+          <div>将当前组字区递交为网页 Ruby 读音标记格式，</div>
+          <div>其拼音 / 注音书写符合教科书书写排版规范：</div>
+          <div>也就是拼音标调在字母上、注音先写轻声标记。</div>
+        </td>
+        <td>
+          <div>组字区有内容时才会生效；</div>
+          <div>可在偏好设定内设定是输出注音还是拼音。</div>
+        </td>
+      </tr>
+      <tr>
+        <td>
+          <div>⌃⌘⏎</div>
+        </td>
+        <td>
+          <div>将当前组字区的读音串单独递交输出，</div>
+          <div>输出的汉语拼音采 12345 数字标调、</div>
+          <div>输出的注音的轻声标记是在注音符号之后才写的。</div>
+        </td>
+        <td>
+          <div>组字区有内容时才会生效；</div>
+          <div>可在偏好设定内设定是输出注音还是拼音；</div>
+          <div>预设情况下，读音以西文半形空格相连。</div>
+        </td>
+      </tr>
+      <tr>
+        <td>
+          <div>⌃⇧⌘⏎</div>
+        </td>
+        <td>
+          <div>将当前组字区的读音串单独递交输出，</div>
+          <div>输出的汉语拼音采 12345 数字标调、</div>
+          <div>输出的注音的轻声标记是在注音符号之后才写的。</div>
+        </td>
+        <td>
+          <div>与⌃⇧⌘⏎几乎相同，</div>
+          <div>除了会以西文减号作为分隔符。</div>
+        </td>
+      </tr>
+      <tr>
+        <td>
+          <div>⇧␣</div>
+        </td>
+        <td>
+          <div>在组字区内没有内容时，输入全形空格</div>
+        </td>
+        <td>
+          <div>可摁住不放以连续输入。</div>
+        </td>
+      </tr>
+      <tr>
+        <td>
+          <div>摁住 ⌥⇧</div>
+          <div>敲数字键</div>
+        </td>
+        <td>
+          <div>输入全形阿拉伯数字</div>
+        </td>
+        <td>
+          <div>如果目前已经启用了半形标点模式的话，</div>
+          <div>则该热键会输入半形阿拉伯数字。</div>
+        </td>
+      </tr>
+      <tr>
+        <td>
+          <div>摁住 ⌥</div>
+          <div>敲数字键</div>
+        </td>
+        <td>
+          <div>输入半形阿拉伯数字</div>
+        </td>
+        <td>
+        </td>
+      </tr>
+      <tr>
+        <td>
+          <div>～</div>
+        </td>
+        <td>
+          <div>分类波浪符号选单（类似新酷音），</div>
+          <div>可在使用者辞典目录内写 symbols.dat 自订内容。</div>
+        </td>
+        <td>
+          <div>JIS 键盘注意：</div>
+          <div>得用右 Shift 左侧的「_」键取代「～」键。</div>
+        </td>
+      </tr>
+      <tr>
+        <td>
+          <div>⌥ ～</div>
+        </td>
+        <td>
+          <div>敲一下切换至内码输入模式；<br />再敲一下则切换至汉音键盘符号模式。</div>
+        </td>
+        <td>
+          <div>可借由 Enter / Esc / Delete 键关闭被这种方式启用的模式。</div>
+        </td>
+      </tr>
+      <tr>
+        <td>
+          <div>⌥⇧ ～</div>
+        </td>
+        <td>
+          <div>不分类的波浪符号选单（可自订）</div>
+        </td>
+        <td>
+          <div>JIS 键盘注意：</div>
+          <div>得用右 Shift 左侧的「_」键取代「～」键。</div>
+        </td>
+      </tr>
+      <tr>
+        <td>
+          <div>⇞</div>
+          <div>⇟</div>
+        </td>
+        <td>
+          <div>呼叫选字窗</div>
+        </td>
+        <td>
+          <div>组字区有内容时才会生效。</div>
+          <div>逐字选字模式会自动跳选字窗。</div>
+        </td>
+      </tr>
+      <tr>
+        <td>
+          <div>␣</div>
+        </td>
+        <td>
+          <div>呼叫选字窗</div>
+        </td>
+        <td>
+          <div>同上，但可在偏好设定内停用。</div>
+        </td>
+      </tr>
+      <tr>
+        <td>
+          <div>⎋</div>
+        </td>
+        <td>
+          <div>非标记模式下，清空整个组字区。</div>
+          <div>标记模式下，退出标记模式。</div>
+        </td>
+        <td>
+          <div>其在非标记模式下的行为可在偏好设定内停用，届时仅会清空注拼槽。</div>
+        </td>
+      </tr>
+      <tr>
+        <td>
+          <div>右⇧</div>
+          <div>左⇧</div>
+        </td>
+        <td>
+          <div>切换英数输入模式的开关。</div>
+        </td>
+        <td>
+          <div>左⇧可在偏好设定内停用。</div>
+        </td>
+      </tr>
+      <tr>
+        <td>
+          <div>⌥⌦</div>
+          <div>⌥⌫</div>
+        </td>
+        <td>
+          <div>删除一个字词节点。<br />⌥⌫ 会优先删除尚未完成的读音/字根。</div>
+        </td>
+        <td>
+          <div>组字区有内容时才会生效；<br />输入法并非处于标记模式时才会生效。</div>
+        </td>
+      </tr>
+    </table>
+    <div>&nbsp;</div>
+    <div>下述热键则为<strong>预设田所选字窗正在显示（也就是你正在选字）时</strong>可以用的功能：</div>
+    <table>
+      <tr>
+        <td>
+          <div><strong>热键</strong></div>
+        </td>
+        <td>
+          <div><strong>功能</strong></div>
+        </td>
+        <td>
+          <div><strong>备注</strong></div>
+        </td>
+      </tr>
+      <tr>
+        <td>
+          <div>⏎</div>
+        </td>
+        <td>
+          <div>确认选字窗内的当前候选字</div>
+        </td>
+        <td>
+          <div>关联词语选字时，该功能可在偏好设定内启用或停用。</div>
+        </td>
+      </tr>
+      <tr>
+        <td>
+          <div>⇧⏎</div>
+        </td>
+        <td>
+          <div>‧ 以文字输入方向最前端的已递交的节点内容作为索引资料、来试图叫出关联词语选字窗。</div>
+          <div>‧ 如果能成功叫出关联词语的话，会先递交当前组字区的内容。</div>
+        </td>
+        <td>
+          <div>‧ 关联词语仅会在游标处于组字区最前方的时候才可以触发。</div>
+          <div>‧ 对逐字选字模式无效，因为组字选字模式另有安排。</div>
+        </td>
+      </tr>
+      <tr>
+        <td>
+          <div>⌃⌘]</div>
+          <div>⌃⌘[</div>
+        </td>
+        <td>
+          <div>‧ 选字窗内选中下一个候选字（正向轮替）</div>
+          <div>‧ 选字窗内选中上一个候选字（反向轮替）</div>
+        </td>
+        <td>
+        </td>
+      </tr>
+      <tr>
+        <td>
+          <div>⇥</div>
+          <div>⇧⇥</div>
+        </td>
+        <td>
+          <div>‧ 选字窗内选中下一个候选字（正向轮替）</div>
+          <div>‧ 选字窗内选中上一个候选字（反向轮替）</div>
+        </td>
+        <td>
+          <div>可以在偏好设定内更改轮替对象为页，但是有例外：</div>
+          <div>当候选字词只有一页时，轮替对象仍为候选字词本身。</div>
+        </td>
+      </tr>
+      <tr>
+        <td>
+          <div>␣</div>
+          <div>⇧␣</div>
+        </td>
+        <td>
+          <div>根据输入法偏好设定来决定</div>
+          <div>是正向轮替页面还是候选字词</div>
+        </td>
+        <td>
+          <div>当候选字词只有一页时，轮替对象仍为候选字词本身。</div>
+        </td>
+      </tr>
+      <tr>
+        <td>
+          <div>⇞</div>
+          <div>⇟</div>
+        </td>
+        <td>
+          <div>翻页</div>
+        </td>
+        <td>
+          <div>候选字词只有一页时，轮替对象为候选字词本身。</div>
+        </td>
+      </tr>
+      <tr>
+        <td>
+          <div>↖︎</div>
+          <div>↘︎</div>
+        </td>
+        <td>
+          <div>‧ 选中第一个候选字</div>
+          <div>‧ 选中最后一个候选字</div>
+        </td>
+        <td>
+          <div>多余的操作会触发蜂鸣。</div>
+        </td>
+      </tr>
+      <tr>
+        <td>
+          <div>⎋</div>
+          <div>⌫</div>
+          <div>⌦</div>
+          <div>⇧→</div>
+          <div>⇧←</div>
+        </td>
+        <td>
+          <div>回退到上一层符号选单、或关掉选字窗</div>
+        </td>
+        <td>
+          <div>不是符号选单状态的场合，一律关掉选字窗。</div>
+          <div>其中，Esc 按键可能会导致 Spotlight 关闭。</div>
+        </td>
+      </tr>
+      <tr>
+        <td>
+          <div>摁住 ⇧</div>
+          <div>敲选字键</div>
+        </td>
+        <td>
+          <div>选择指定的联想候选词（会有注释）</div>
+        </td>
+        <td>
+          <div>与奇摩输入法行为一致。</div>
+        </td>
+      </tr>
+      <tr>
+        <td>
+          <div>⌥→</div>
+          <div>⌥←</div>
+        </td>
+        <td>
+          <div>在选字窗显示时移动组字区内的游标（以字词节点为单位，逐节移动）。</div>
+        </td>
+        <td>
+          <div></div>
+        </td>
+      </tr>
+      <tr>
+        <td>
+          <div>⇧⌥→</div>
+          <div>⇧⌥←</div>
+        </td>
+        <td>
+          <div>在选字窗显示时移动组字区内的游标（以单个幅长（读音）为单位，逐幅移动）。</div>
+        </td>
+        <td>
+          <div>如果发现移动后的游标出现了切割字元的情况的话，则会自动将游标继续移动至当前节点的边界。</div>
+        </td>
+      </tr>
+    </table>
+    <div>&nbsp;</div>
+    <div>$ EOF.</div>
+  </body>
+</html>

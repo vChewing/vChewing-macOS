@@ -55,7 +55,7 @@
 
 - [x] Harden Candidate Text Services (High)
   - 問題：`CandidateTextService` 允許以 `@URL:` 含 user-editable 的 URL 字串與 `@SEL:` 含 selector 的字串，並在 UI 中把這些輸入當作可執行動作（`NSWorkspace.shared.open(url)` 或 `performSelector`）執行。若使用者/偏好設定可由外部操控，攻擊者可將惡意 URL（javascript: 等）或任意 selector 放入偏好中以誘導執行。
-  - 主要檔案：`Packages/vChewing_Shared/Sources/Shared/CandidateTextService.swift`、`Packages/vChewing_MainAssembly/Sources/MainAssembly/CandidateTextService_SelectorImpl.swift`、`Packages/vChewing_MainAssembly/Sources/MainAssembly/SessionController/InputSession_Delegates.swift`
+  - 主要檔案：`Packages/vChewing_Shared/Sources/Shared/CandidateTextService.swift`、`Packages/vChewing_MainAssembly4Darwin/Sources/MainAssembly/CandidateTextService_SelectorImpl.swift`、`Packages/vChewing_MainAssembly4Darwin/Sources/MainAssembly/SessionController/InputSession_Delegates.swift`
   - 建議步驟：
     1. URL 白名單：`CandidateTextService` 構造時已限制 `@URL:` 只接受 `http`/`https` 這兩個 scheme。
     2. Selector 白名單：`finalSanityCheck` 已修改為 deny-by-default，並新增白名單（`copyUnicodeMetadata:`、`copyRuby*`、`copyInline*`、`copyBraille*`），且在 `Coordinator.runTask` 執行前再次檢查。已加入單元測試來驗證不允許的 `@SEL:` 或不安全 URL 被拒絕。
@@ -111,7 +111,7 @@
       - 註：目前已新增與強化 `build_darwin_MainAssembly.yml`，使 macOS CI:
         - 使用 `actions/checkout@v4` 並檢出 submodule。
         - 快取 SwiftPM 與 `.build` 產物以加速重複工作。
-        - 在 macOS Runner 上為關鍵 macOS-only package（`vChewing_Shared`, `vChewing_MainAssembly`, `vChewing_LangModelAssembly`, `vChewing_Hotenka`, `vChewing_OSFrameworkImpl`, `vChewing_UpdateSputnik`, `Jad_BookmarkManager`）逐一執行 `swift test`。
+        - 在 macOS Runner 上為關鍵 macOS-only package（`vChewing_Shared`, `vChewing_MainAssembly4Darwin`, `vChewing_LangModelAssembly`, `vChewing_Hotenka`, `vChewing_OSFrameworkImpl`, `vChewing_UpdateSputnik`, `Jad_BookmarkManager`）逐一執行 `swift test`。
         - 適當處理 `swift test` 回傳的 `no tests found` (exit code 1) 情況，不會使 CI 失敗。
 
     - 確認 `@URL:` 只接受 `http`/`https`（`file:`、`data:`、`javascript:`、`mailto:` 等均被拒絕）。

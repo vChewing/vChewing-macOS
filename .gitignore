@@ -120,6 +120,7 @@ $tf/
 .AppleDouble
 .axoCover/*
 .build
+.build-universal
 .builds
 .com.apple.timemachine.donotpresent
 .cr/personal

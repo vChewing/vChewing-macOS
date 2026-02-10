@@ -100,9 +100,9 @@ let updateCommitMsg = "DictionaryData - \(commitTime)"
 // 1) 檢查並更新 DictionaryData (VanguardLexicon)
 // 由於不再使用 submodule，我們直接檢查 MainAssembly 的 Package.swift 是否需要更新 Dependency。
 
-let packageSwiftRelPath = "Packages/vChewing_MainAssembly/Package.swift"
-let packageResolvedRelPath = "Packages/vChewing_MainAssembly/Package.resolved"
-let packageDirRelPath = "Packages/vChewing_MainAssembly"
+let packageSwiftRelPath = "Packages/vChewing_MainAssembly4Darwin/Package.swift"
+let packageResolvedRelPath = "Packages/vChewing_MainAssembly4Darwin/Package.resolved"
+let packageDirRelPath = "Packages/vChewing_MainAssembly4Darwin"
 let vanguardURL = "https://atomgit.com/vChewing/vChewing-VanguardLexicon.git"
 
 print("Checking VanguardLexicon version in \(packageSwiftRelPath)...")
@@ -219,7 +219,9 @@ func performDictionaryUpdate() {
         print("Committed: \(updateCommitMsg)")
       }
     } else {
-      print("Changes detected in MainAssembly but not Package.swift/resolved. Ignoring for DictionaryData update.")
+      print(
+        "Changes detected in MainAssembly4Darwin but not Package.swift/resolved. Ignoring for DictionaryData update."
+      )
     }
   } else {
     print("No DictionaryData changes detected.")

@@ -7,7 +7,7 @@ This handbook briefs AI coding assistants on the vChewing (唯音) macOS reposit
 - **Purpose**: Native Zhuyin / Bopomofo input method for macOS with optional phonetic and stroke keyboards, simplified ↔ traditional isolation, and sandboxed distribution installers.
 - **Implementation**: Pure Swift modules layered on AppKit/IMK. C(++)/ObjC(++) bridges exist only where Swift cannot interface directly with legacy assets.
 - **Primary packages**:
-  - `vChewing_MainAssembly`: IMK front-end (SessionCtl, InputSession, UI bridges, sandbox glue).
+  - `vChewing_MainAssembly4Darwin`: IMK front-end (SessionCtl, InputSession, UI bridges, sandbox glue).
   - `vChewing_Typewriter`: Typing FSM, Tekkon integration, user preference wiring, cassette/stroke handling.
   - `vChewing_Megrez`: DAG-DP compositor (sentence assembler) with perception override hooks (POM).
   - `vChewing_Tekkon`: Keyboard parsers, Zhuyin/Bopomofo composer, stroke cassette parser, phonabet utilities.
@@ -27,7 +27,7 @@ This handbook briefs AI coding assistants on the vChewing (唯音) macOS reposit
 
 ## 3. Repository Layout (quick map)
 
-- `Packages/vChewing_MainAssembly/.../SessionController/SessionCtl.swift`: IMK entry point. All NSEvent handling funnels through `InputSession*` files.
+- `Packages/vChewing_MainAssembly4Darwin/.../SessionController/SessionCtl.swift`: IMK entry point. All NSEvent handling funnels through `InputSession*` files.
 - `Packages/vChewing_Typewriter/Sources/Typewriter/InputHandler/`: FSM split across triage, composition, candidate handling, and commissions.
 - `Packages/vChewing_Megrez/Sources/Megrez/`: Compositor core (`0_Megrez.swift`, `2_PathFinder.swift`, etc.).
 - `Packages/vChewing_Tekkon/Sources/Tekkon/`: Keyboard parsers, composer, Zhuyin constants.

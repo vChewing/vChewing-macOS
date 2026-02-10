@@ -3,10 +3,10 @@
 all: debug
 
 debug:
-	swift build -c debug --package-path ./vChewing_MainAssembly/
+	swift build -c debug --package-path ./vChewing_MainAssembly4Darwin/
 
 release:
-	swift build -c release --package-path ./vChewing_MainAssembly/
+	swift build -c release --package-path ./vChewing_MainAssembly4Darwin/
 
 clean:
 	@for currentDir in $$(ls ./); do \

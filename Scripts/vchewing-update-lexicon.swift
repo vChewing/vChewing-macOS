@@ -75,8 +75,8 @@ while idx < CommandLine.arguments.count {
   }
 }
 
-let packageSwiftRelPath = "Packages/vChewing_MainAssembly/Package.swift"
-let packageDirRelPath = "Packages/vChewing_MainAssembly"
+let packageSwiftRelPath = "Packages/vChewing_MainAssembly4Darwin/Package.swift"
+let packageDirRelPath = "Packages/vChewing_MainAssembly4Darwin"
 let vanguardURL = "https://atomgit.com/vChewing/vChewing-VanguardLexicon.git"
 
 print("Checking VanguardLexicon version in \(packageSwiftRelPath)...")

@@ -687,14 +687,14 @@
 				<key>POSTINSTALL_PATH</key>
 				<dict>
 					<key>PATH</key>
-					<string>Installer/pkgPostInstall.sh</string>
+					<string>ValueAdd/PKGInstallerAssets/pkgPostInstall.sh</string>
 					<key>PATH_TYPE</key>
 					<integer>1</integer>
 				</dict>
 				<key>PREINSTALL_PATH</key>
 				<dict>
 					<key>PATH</key>
-					<string>Installer/pkgPreInstall.sh</string>
+					<string>ValueAdd/PKGInstallerAssets/pkgPreInstall.sh</string>
 					<key>PATH_TYPE</key>
 					<integer>1</integer>
 				</dict>
@@ -775,7 +775,7 @@
 						<key>BACKGROUND_PATH</key>
 						<dict>
 							<key>PATH</key>
-							<string>Installer/InstallerBg@2x.png</string>
+							<string>ValueAdd/PKGInstallerAssets/InstallerBg@2x.png</string>
 							<key>PATH_TYPE</key>
 							<integer>1</integer>
 						</dict>
@@ -790,7 +790,7 @@
 				<key>BACKGROUND_PATH</key>
 				<dict>
 					<key>PATH</key>
-					<string>Installer/InstallerBg@2x.png</string>
+					<string>ValueAdd/PKGInstallerAssets/InstallerBg@2x.png</string>
 					<key>PATH_TYPE</key>
 					<integer>1</integer>
 				</dict>
@@ -934,7 +934,7 @@
 						<key>VALUE</key>
 						<dict>
 							<key>PATH</key>
-							<string>Installer/pkgTextWarning-ENU.txt</string>
+							<string>ValueAdd/PKGInstallerAssets/pkgTextWarning-ENU.txt</string>
 							<key>PATH_TYPE</key>
 							<integer>1</integer>
 						</dict>
@@ -945,7 +945,7 @@
 						<key>VALUE</key>
 						<dict>
 							<key>PATH</key>
-							<string>Installer/pkgTextWarning-CHT.txt</string>
+							<string>ValueAdd/PKGInstallerAssets/pkgTextWarning-CHT.txt</string>
 							<key>PATH_TYPE</key>
 							<integer>1</integer>
 						</dict>
@@ -956,7 +956,7 @@
 						<key>VALUE</key>
 						<dict>
 							<key>PATH</key>
-							<string>Installer/pkgTextWarning-JPN.txt</string>
+							<string>ValueAdd/PKGInstallerAssets/pkgTextWarning-JPN.txt</string>
 							<key>PATH_TYPE</key>
 							<integer>1</integer>
 						</dict>
@@ -967,7 +967,7 @@
 						<key>VALUE</key>
 						<dict>
 							<key>PATH</key>
-							<string>Installer/pkgTextWarning-CHS.txt</string>
+							<string>ValueAdd/PKGInstallerAssets/pkgTextWarning-CHS.txt</string>
 							<key>PATH_TYPE</key>
 							<integer>1</integer>
 						</dict>
@@ -1041,7 +1041,7 @@
 						<key>VALUE</key>
 						<dict>
 							<key>PATH</key>
-							<string>Installer/pkgTextSuccessful-ENU.rtf</string>
+							<string>ValueAdd/PKGInstallerAssets/pkgTextSuccessful-ENU.rtf</string>
 							<key>PATH_TYPE</key>
 							<integer>1</integer>
 						</dict>
@@ -1052,7 +1052,7 @@
 						<key>VALUE</key>
 						<dict>
 							<key>PATH</key>
-							<string>Installer/pkgTextSuccessful-CHT.rtf</string>
+							<string>ValueAdd/PKGInstallerAssets/pkgTextSuccessful-CHT.rtf</string>
 							<key>PATH_TYPE</key>
 							<integer>1</integer>
 						</dict>
@@ -1063,7 +1063,7 @@
 						<key>VALUE</key>
 						<dict>
 							<key>PATH</key>
-							<string>Installer/pkgTextSuccessful-JPN.rtf</string>
+							<string>ValueAdd/PKGInstallerAssets/pkgTextSuccessful-JPN.rtf</string>
 							<key>PATH_TYPE</key>
 							<integer>1</integer>
 						</dict>
@@ -1074,7 +1074,7 @@
 						<key>VALUE</key>
 						<dict>
 							<key>PATH</key>
-							<string>Installer/pkgTextSuccessful-CHS.rtf</string>
+							<string>ValueAdd/PKGInstallerAssets/pkgTextSuccessful-CHS.rtf</string>
 							<key>PATH_TYPE</key>
 							<integer>1</integer>
 						</dict>

@@ -31,6 +31,7 @@ var strXcodeProjContent: String = ""
 var dirXcodeProjectFile = "./vChewing.xcodeproj/project.pbxproj"
 var dirPackageProjectFile = "./vChewing.pkgproj"
 var dirUpdateInfoPlist = "./Update-Info.plist"
+var dirUpdateInfoPlist4SPM = "./Release-Version.plist"
 var theDictionary: NSDictionary?
 
 if CommandLine.arguments.count == 3 {
@@ -74,4 +75,11 @@ if CommandLine.arguments.count == 3 {
   theDictionary?.setValue(verMarket, forKeyPath: "CFBundleShortVersionString")
   theDictionary?.write(toFile: dirUpdateInfoPlist, atomically: true)
   NSLog(" - 更新用通知 plist 版本資訊更新完成：\(verMarket) \(verBuild)。")
+
+  // Update SPM Compiled Bundles version update.
+  theDictionary = NSDictionary(contentsOfFile: dirUpdateInfoPlist4SPM)
+  theDictionary?.setValue(verBuild, forKeyPath: "CFBundleVersion")
+  theDictionary?.setValue(verMarket, forKeyPath: "CFBundleShortVersionString")
+  theDictionary?.write(toFile: dirUpdateInfoPlist4SPM, atomically: true)
+  NSLog(" - SPM 專案版本資訊更新完成：\(verMarket) \(verBuild)。")
 }

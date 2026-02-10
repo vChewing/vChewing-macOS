@@ -44,7 +44,7 @@
 
 ### 關鍵模組
 
-- Packages/vChewing_MainAssembly：IMK 進入點與整合（SessionCtl → InputSession）。InputSession 也參與態械管理。
+- Packages/vChewing_MainAssembly4Darwin：IMK 進入點與整合（SessionCtl → InputSession）。InputSession 也參與態械管理。
 - Packages/vChewing_Typewriter：輸入處理邏輯、態械與鍵盤事件分診。
 - Packages/vChewing_Tekkon：注音（ㄅㄆㄇㄈ）鍵盤與音節組合。
 - Packages/vChewing_Megrez：句子組裝（DAG-DP 動態規劃求最大分數路徑）。
@@ -182,8 +182,8 @@ LangModelAssembly 對多個子語言模型進行匯整、去重、替換與增�
 ## 關鍵檔案位置
 
 - MainAssembly：
-  - Packages/vChewing_MainAssembly/Sources/MainAssembly/SessionController/SessionCtl.swift
-  - Packages/vChewing_MainAssembly/Sources/MainAssembly/SessionController/InputSession*.swift
+  - Packages/vChewing_MainAssembly4Darwin/Sources/MainAssembly/SessionController/SessionCtl.swift
+  - Packages/vChewing_MainAssembly4Darwin/Sources/MainAssembly/SessionController/InputSession*.swift
 - Typewriter：
   - Packages/vChewing_Typewriter/Sources/Typewriter/InputHandler/*.swift
 - Tekkon：

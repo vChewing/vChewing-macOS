@@ -4,10 +4,10 @@
 
 參考路徑（重點模組與測試）：
 - Packages/vChewing_Typewriter/Sources/Typewriter/InputHandler/*
-- Packages/vChewing_MainAssembly/Sources/MainAssembly/SessionController/*
+- Packages/vChewing_MainAssembly4Darwin/Sources/MainAssembly/SessionController/*
 - 測試：
   - TypewriterTests: Packages/vChewing_Typewriter/Tests/TypewriterTests/*
-  - MainAssemblyTests: Packages/vChewing_MainAssembly/Tests/MainAssemblyTests/*
+  - MainAssemblyTests: Packages/vChewing_MainAssembly4Darwin/Tests/MainAssemblyTests/*
   - CandidateWindowTests、LangModelAssemblyTests 等輔助測試
 
 ---

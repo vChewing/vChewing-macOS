@@ -15,7 +15,7 @@ Guidance for Claude-family coding agents working on the vChewing (唯音) macOS 
 
 ## Entry Points
 
-- `Packages/vChewing_MainAssembly/.../SessionController/SessionCtl.swift`：IMK 入口；處理事件、更新 UI。
+- `Packages/vChewing_MainAssembly4Darwin/.../SessionController/SessionCtl.swift`：IMK 入口；處理事件、更新 UI。
 - `Packages/vChewing_Typewriter/Sources/Typewriter/InputHandler/`：FSM 實作、Tekkon/Megrez 橋接。
 - `Packages/vChewing_Tekkon/Sources/Tekkon/`：注音/拼音解析、組筆處理。
 - `Packages/vChewing_Megrez/Sources/Megrez/`：DAG-DP 組句器，兼任 POM 觀測資料生成器。
