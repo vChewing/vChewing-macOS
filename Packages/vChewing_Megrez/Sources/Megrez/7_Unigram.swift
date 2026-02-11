@@ -6,7 +6,7 @@
 
 extension Megrez {
   /// 語言模型的基礎資料單位類型。
-  public struct Unigram: Codable, CustomStringConvertible, Equatable, Hashable {
+  public struct Unigram: Codable, CustomStringConvertible, Equatable, Hashable, Sendable {
     // MARK: Lifecycle
 
     /// 建立語言模型基礎資料單位副本。基礎資料單位由索引鍵陣列、詞彙內容與統計權重組成。
