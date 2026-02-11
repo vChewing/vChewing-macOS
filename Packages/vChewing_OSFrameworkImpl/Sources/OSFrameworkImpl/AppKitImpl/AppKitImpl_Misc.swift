@@ -107,7 +107,7 @@
       nonisolated let path: MeasurementPath
     }
 
-    nonisolated(unsafe) static var cachedSizes: [CacheKey: CGSize] = [:]
+    nonisolated static let cachedSizes: NSMutex<[CacheKey: CGSize]> = .init([:])
 
     nonisolated static let cacheQueue = DispatchQueue(
       label: "org.vChewing.candidateWindow.measure.cache",
@@ -115,11 +115,11 @@
     )
 
     nonisolated static func get(_ key: CacheKey) -> CGSize? {
-      cacheQueue.sync { cachedSizes[key] }
+      cacheQueue.sync { cachedSizes.value[key] }
     }
 
     nonisolated static func set(_ size: CGSize, for key: CacheKey) {
-      cacheQueue.async(flags: .barrier) { cachedSizes[key] = size }
+      cacheQueue.async(flags: .barrier) { cachedSizes.value[key] = size }
     }
   }
 
@@ -461,15 +461,15 @@
   }
 
   extension NSRunningApplication {
-    nonisolated(unsafe) private static var temporatyBundlePtr: Bundle?
+    nonisolated private static let temporatyBundlePtr: NSMutex<Bundle?> = .init(nil)
 
     public static func findAccentColor(with bundleIdentifier: String?) -> HSBA? {
       guard let bundleIdentifier else { return nil }
       let matchedRunningApps = Self.runningApplications(withBundleIdentifier: bundleIdentifier)
       guard let matchedAppURL = matchedRunningApps.first?.bundleURL else { return nil }
-      Self.temporatyBundlePtr = Bundle(url: matchedAppURL)
-      defer { temporatyBundlePtr = nil }
-      return Self.temporatyBundlePtr?.getAccentColor().usingColorSpace(
+      Self.temporatyBundlePtr.value = Bundle(url: matchedAppURL)
+      defer { temporatyBundlePtr.value = nil }
+      return Self.temporatyBundlePtr.value?.getAccentColor().usingColorSpace(
         .deviceRGB
       )?.asHSBA
     }

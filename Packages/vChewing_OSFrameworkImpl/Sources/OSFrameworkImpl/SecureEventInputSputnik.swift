@@ -81,63 +81,30 @@
     }
   }
 
-  // MARK: - WorkspaceActivationFlags
-
-  public struct WorkspaceActivationFlags: @unchecked Sendable {
-    // MARK: Lifecycle
-
-    public nonisolated init(rawValue: Int) {
-      self.rawValue = rawValue
-    }
-
-    // MARK: Public
-
-    public nonisolated static let hibernating = Self(rawValue: 1 << 0)
-    public nonisolated static let desktopLocked = Self(rawValue: 1 << 1)
-    public nonisolated static let sessionSwitchedOut = Self(rawValue: 1 << 2)
-    public nonisolated static let screenSaverRunning = Self(rawValue: 1 << 3)
-
-    public nonisolated(unsafe) var rawValue: Int
-
-    public nonisolated var isEmpty: Bool { rawValue == 0 }
-
-    // MARK: OptionSet conformance (nonisolated)
-
-    public nonisolated func union(_ other: Self) -> Self {
-      Self(rawValue: rawValue | other.rawValue)
-    }
-
-    public nonisolated func intersection(_ other: Self) -> Self {
-      Self(rawValue: rawValue & other.rawValue)
-    }
-
-    public nonisolated func symmetricDifference(_ other: Self) -> Self {
-      Self(rawValue: rawValue ^ other.rawValue)
-    }
-
-    public nonisolated mutating func insert(_ newMember: Self) {
-      rawValue = rawValue | newMember.rawValue
-    }
-
-    public nonisolated mutating func remove(_ member: Self) {
-      rawValue = rawValue & ~member.rawValue
-    }
-  }
-
-  // MARK: - WorkspaceActivationFlagsStore
-
-  public enum WorkspaceActivationFlagsStore {
-    public nonisolated(unsafe) static var flags: WorkspaceActivationFlags = .init(rawValue: 0)
-  }
-
   extension NSWorkspace {
-    // Keep backward compatibility type alias
-    public typealias ActivationFlags = WorkspaceActivationFlags
+    nonisolated public struct ActivationFlags: OptionSet, Sendable {
+      // MARK: Lifecycle
 
-    public nonisolated static var activationFlags: WorkspaceActivationFlags {
-      get { WorkspaceActivationFlagsStore.flags }
-      set { WorkspaceActivationFlagsStore.flags = newValue }
+      public init(rawValue: Int) {
+        self.rawValue = rawValue
+      }
+
+      // MARK: Public
+
+      public static let hibernating = Self(rawValue: 1 << 0)
+      public static let desktopLocked = Self(rawValue: 1 << 1)
+      public static let sessionSwitchedOut = Self(rawValue: 1 << 2)
+      public static let screenSaverRunning = Self(rawValue: 1 << 3)
+
+      public let rawValue: Int
     }
+
+    nonisolated public static var activationFlags: ActivationFlags {
+      get { mtxActivationFlags.value }
+      set { mtxActivationFlags.value = newValue }
+    }
+
+    nonisolated private static let mtxActivationFlags: NSMutex<ActivationFlags> = .init([])
   }
 
   extension NSRunningApplication {

@@ -226,8 +226,8 @@ extension UserDefaults {
 
   // MARK: - Private
 
-  nonisolated(unsafe) private static var _pendingUnitTests = NSMutex(false)
-  nonisolated(unsafe) private static var _unitTests: NSMutex<UserDefaults?> = .init(
+  nonisolated private static let _pendingUnitTests = NSMutex(false)
+  nonisolated private static let _unitTests: NSMutex<UserDefaults?> = .init(
     UserDefaults(suiteName: "UnitTests")
   )
 }
