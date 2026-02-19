@@ -253,7 +253,11 @@ extension SessionProtocol {
   }
 
   public func performServerActivation(client: ClientObj?) {
-    hidePalettes()
+    // hidePalettes 僅用來關閉先前副本的所有浮動視窗，屬 fire-and-forget 性質，
+    // 用 asyncOnMain 可避免 Broadcaster.queue.sync 的排程開銷。
+    asyncOnMain(bypassAsync: UserDefaults.pendingUnitTests) { [weak self] in
+      self?.hidePalettes()
+    }
     syncCurrentSessionID()
     let this = self
     if let senderBundleID: String = client?.bundleIdentifier() {
@@ -269,13 +273,22 @@ extension SessionProtocol {
         }
       }
       // 檢查當前客體軟體是否採用 Web 技術構築（例：Electron）。
-      this.isClientElectronBased =
-        NSRunningApplication
-          .isElectronBasedApp(identifier: senderBundleID)
+      // isElectronBasedApp 涉及 NSRunningApplication 列舉、Bundle plist 讀取、
+      // FileManager 目錄掃描等 I/O 操作，延遲至下一個 RunLoop 迭代以避免阻塞啟用流程。
+      this.isClientElectronBased = false
+      asyncOnMain(bypassAsync: UserDefaults.pendingUnitTests) { [weak self] in
+        self?.isClientElectronBased =
+          NSRunningApplication
+            .isElectronBasedApp(identifier: senderBundleID)
+      }
     }
     // 自動啟用肛塞（廉恥模式），除非這一天是愚人節。
-    if !Date.isTodayTheDate(from: 0_401), !this.prefs.shouldNotFartInLieuOfBeep {
-      this.prefs.shouldNotFartInLieuOfBeep = true
+    // Date.isTodayTheDate 會建立 DateFormatter，延遲處理以避免阻塞。
+    asyncOnMain(bypassAsync: UserDefaults.pendingUnitTests) { [weak self] in
+      guard let this = self else { return }
+      if !Date.isTodayTheDate(from: 0_401), !this.prefs.shouldNotFartInLieuOfBeep {
+        this.prefs.shouldNotFartInLieuOfBeep = true
+      }
     }
     if this.inputMode != IMEApp.currentInputMode {
       this.inputMode = IMEApp.currentInputMode
