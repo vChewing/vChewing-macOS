@@ -59,11 +59,19 @@
       let ids = NSRunningApplication.runningApplications(withBundleIdentifier: identifier)
       guard !ids.isEmpty else { return false }
       for id in ids {
-        guard let bURL = id.bundleURL, let bundle = Bundle(url: bURL) else { continue }
-        if bundle.isElectronBasedApp { return true }
+        guard let bURL = id.bundleURL else { continue }
+        if let cachedResult = map4ElectronBasedApp.value[bURL] {
+          return cachedResult
+        }
+        guard let bundle = Bundle(url: bURL) else { continue }
+        let isElectronBasedApp = bundle.isElectronBasedApp
+        map4ElectronBasedApp.value[bURL] = isElectronBasedApp
+        if isElectronBasedApp { return true }
       }
       return false
     }
+
+    private static let map4ElectronBasedApp: NSMutex<[URL: Bool]> = .init([:])
   }
 
   // MARK: - Detect whether a bundle is Electron-based.
