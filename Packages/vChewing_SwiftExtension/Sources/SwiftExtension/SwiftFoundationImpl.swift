@@ -109,19 +109,23 @@ extension Date {
       return false
     default: return false
     }
-    let formatter = DateFormatter()
-    formatter.dateFormat = "yyyyMMdd"
+    let formatter = Self.dateFormaterAs4Y2M2D
     var calendar = NSCalendar.current
     calendar.timeZone = TimeZone.current
     let components = calendar.dateComponents([.day, .month, .year], from: Date())
-    if let a = calendar.date(from: components), let b = formatter.date(
-      from: dateDigits.description
-    ),
-      a == b {
+    let a = calendar.date(from: components)
+    let b = formatter.date(from: dateDigits.description)
+    if let a, let b, a == b {
       return true
     }
     return false
   }
+
+  private static let dateFormaterAs4Y2M2D: DateFormatter = {
+    let formatter = DateFormatter()
+    formatter.dateFormat = "yyyyMMdd"
+    return formatter
+  }()
 
   public static var currentYear: Int {
     let formatter = DateFormatter()
