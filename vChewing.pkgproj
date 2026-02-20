@@ -250,7 +250,7 @@
 											<key>GID</key>
 											<integer>0</integer>
 											<key>PATH</key>
-											<string>KeyboardExtension/vChewingKeyLayout.bundle/Contents/Resources/vChewing Dachen.keylayout</string>
+											<string>Sources/vChewingIME_macOS/Resources/vChewingKeyLayout.bundle/Contents/Resources/vChewing Dachen.keylayout</string>
 											<key>PATH_TYPE</key>
 											<integer>1</integer>
 											<key>PERMISSIONS</key>
@@ -266,7 +266,7 @@
 											<key>GID</key>
 											<integer>0</integer>
 											<key>PATH</key>
-											<string>KeyboardExtension/vChewingKeyLayout.bundle/Contents/Resources/vChewing ETen.keylayout</string>
+											<string>Sources/vChewingIME_macOS/Resources/vChewingKeyLayout.bundle/Contents/Resources/vChewing ETen.keylayout</string>
 											<key>PATH_TYPE</key>
 											<integer>1</integer>
 											<key>PERMISSIONS</key>
@@ -282,7 +282,7 @@
 											<key>GID</key>
 											<integer>0</integer>
 											<key>PATH</key>
-											<string>KeyboardExtension/vChewingKeyLayout.bundle/Contents/Resources/vChewing FakeSeigyou.keylayout</string>
+											<string>Sources/vChewingIME_macOS/Resources/vChewingKeyLayout.bundle/Contents/Resources/vChewing FakeSeigyou.keylayout</string>
 											<key>PATH_TYPE</key>
 											<integer>1</integer>
 											<key>PERMISSIONS</key>
@@ -298,7 +298,7 @@
 											<key>GID</key>
 											<integer>0</integer>
 											<key>PATH</key>
-											<string>KeyboardExtension/vChewingKeyLayout.bundle/Contents/Resources/vChewing IBM.keylayout</string>
+											<string>Sources/vChewingIME_macOS/Resources/vChewingKeyLayout.bundle/Contents/Resources/vChewing IBM.keylayout</string>
 											<key>PATH_TYPE</key>
 											<integer>1</integer>
 											<key>PERMISSIONS</key>
@@ -314,7 +314,7 @@
 											<key>GID</key>
 											<integer>0</integer>
 											<key>PATH</key>
-											<string>KeyboardExtension/vChewingKeyLayout.bundle/Contents/Resources/vChewing MiTAC.keylayout</string>
+											<string>Sources/vChewingIME_macOS/Resources/vChewingKeyLayout.bundle/Contents/Resources/vChewing MiTAC.keylayout</string>
 											<key>PATH_TYPE</key>
 											<integer>1</integer>
 											<key>PERMISSIONS</key>
@@ -342,7 +342,7 @@
 											<key>GID</key>
 											<integer>0</integer>
 											<key>PATH</key>
-											<string>KeyboardExtension/vChewingKeyLayout.bundle</string>
+											<string>Sources/vChewingIME_macOS/Resources/vChewingKeyLayout.bundle</string>
 											<key>PATH_TYPE</key>
 											<integer>1</integer>
 											<key>PERMISSIONS</key>
