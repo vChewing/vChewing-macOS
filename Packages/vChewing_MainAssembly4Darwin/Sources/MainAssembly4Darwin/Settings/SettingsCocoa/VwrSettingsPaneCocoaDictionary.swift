@@ -115,6 +115,7 @@ extension SettingsPanesCocoa {
       }
       dragRetrieverKimo.title = "i18n:kimoImportButton.DragFileToHere".i18n
       dragRetrieverKimo.target = self
+      dragRetrieverKimo.allowedTypes = ["txt", "db"]
       dragRetrieverKimo.action = #selector(importKeyKeyUserDictionaryDataAction(_:))
       return dragRetrieverKimo
     }
