@@ -99,7 +99,7 @@ public final class InputSession: @MainActor SessionProtocol, Sendable {
   public weak var inputControllerAssigned: SessionCtl?
 
   public var inputController: SessionCtl? {
-    inputControllerAssigned ?? SessionCtl.currentInputController
+    inputControllerAssigned
   }
 
   /// 用以存儲客體的 bundleIdentifier。

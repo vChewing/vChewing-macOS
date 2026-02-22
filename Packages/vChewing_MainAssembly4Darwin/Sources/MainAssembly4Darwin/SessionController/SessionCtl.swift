@@ -27,10 +27,6 @@ public final class SessionCtl: IMKInputController, @unchecked Sendable {
   /// 對用以設定委任物件的控制器型別進行初期化處理。
   nonisolated override public init() {
     super.init()
-    mainSync {
-      _ = core // Force initialization.
-      Self.currentInputController = self
-    }
   }
 
   /// 對用以設定委任物件的控制器型別進行初期化處理。
@@ -45,13 +41,10 @@ public final class SessionCtl: IMKInputController, @unchecked Sendable {
     super.init(server: server, delegate: delegate, client: inputClient)
     mainSync {
       _ = core // Force initialization.
-      Self.currentInputController = self
     }
   }
 
   // MARK: Public
-
-  public private(set) static weak var currentInputController: SessionCtl?
 
   public private(set) lazy var core: InputSession = .init(
     controller: self,
@@ -68,7 +61,6 @@ extension SessionCtl {
     super.activateServer(sender)
     let senderRef = wrap(sender)
     mainSync {
-      Self.currentInputController = self
       core.activateServer(unwrap(senderRef))
     }
   }
