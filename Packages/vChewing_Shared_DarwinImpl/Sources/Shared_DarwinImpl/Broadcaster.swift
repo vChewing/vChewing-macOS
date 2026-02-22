@@ -10,8 +10,6 @@ import Foundation
 
 @objcMembers
 public final class Broadcaster: NSObject {
-  // MARK: Public
-
   public static var shared = Broadcaster()
 
   public private(set) dynamic var eventForReloadingPhraseEditor = UUID()
@@ -22,7 +20,7 @@ public final class Broadcaster: NSObject {
   public func confirmLmMgrDataFolderPathInvalidity(
     _ path: String?
   ) {
-    queue.sync {
+    mainSync {
       self.lmMgrDataFolderPathInvalidityConfirmed = path
     }
   }
@@ -30,34 +28,29 @@ public final class Broadcaster: NSObject {
   public func confirmLmMgrCassettePathInvalidity(
     _ path: String?
   ) {
-    queue.sync {
+    mainSync {
       self.lmMgrCassettePathInvalidityConfirmed = path
     }
   }
 
   public func clearLmMgrDataFolderPathInvalidity() {
-    queue.sync { self.lmMgrDataFolderPathInvalidityConfirmed = nil }
+    mainSync { self.lmMgrDataFolderPathInvalidityConfirmed = nil }
   }
 
   public func clearLmMgrCassettePathInvalidity() {
-    queue.sync { self.lmMgrCassettePathInvalidityConfirmed = nil }
+    mainSync { self.lmMgrCassettePathInvalidityConfirmed = nil }
   }
 
   public func postEventForReloadingPhraseEditor() {
-    queue.sync {
+    // 該操作得異步進行，避免阻塞 MainActor。
+    asyncOnMain {
       self.eventForReloadingPhraseEditor = UUID()
     }
   }
 
   public func postEventForClosingAllPanels() {
-    queue.sync {
+    mainSync {
       self.eventForClosingAllPanels = UUID()
     }
   }
-
-  // MARK: Private
-
-  private let queue = DispatchQueue(
-    label: "org.vchewing.vChewing_Shared_DarwinImpl.Broadcaster"
-  )
 }
