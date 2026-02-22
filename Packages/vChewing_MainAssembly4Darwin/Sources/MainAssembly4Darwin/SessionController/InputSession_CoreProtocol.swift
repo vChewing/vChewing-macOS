@@ -193,8 +193,7 @@ extension SessionProtocol {
   }
 
   public func constructSansAsync(client theClient: (IMKTextInput & NSObjectProtocol)? = nil) {
-    // 關掉所有之前的副本的視窗。
-    Self.current?.hidePalettes()
+    // Self.current?.hidePalettes() <- 該操作由 activateServer() 全權負責。
     Self.current = self
     initInputHandler()
     synchronizer4LMPrefs?()
@@ -253,11 +252,26 @@ extension SessionProtocol {
   }
 
   public func performServerActivation(client: ClientObj?) {
-    // hidePalettes 僅用來關閉先前副本的所有浮動視窗，屬 fire-and-forget 性質，
-    // 用 asyncOnMain 可避免 Broadcaster.queue.sync 的排程開銷。
-    asyncOnMain(bypassAsync: UserDefaults.pendingUnitTests) { [weak self] in
-      self?.hidePalettes()
+    // MARK: 快速路徑 — 最佳化 CapsLock 中英頻繁切換的場景。
+
+    // 當目前的副本已處於活動狀態、仍為當前副本、且輸入調度模組仍存在時，
+    // 僅執行輕量更新即可，省去 initInputHandler()、asyncOnMain 任務排程等高成本操作。
+    // 原理：performServerDeactivation() 對當前副本是 no-op（因 guard 提前返回），
+    // 故 isActivated 仍為 true、inputHandler 仍然存在，無需重新初始化。
+    if isActivated, Self.current?.id == id, inputHandler != nil {
+      syncCurrentSessionID()
+      let resolvedInputMode = IMEApp.currentInputMode
+      if inputMode != resolvedInputMode {
+        inputMode = resolvedInputMode
+      }
+      state = .ofEmpty()
+      setKeyLayout()
+      return
     }
+
+    // MARK: 完整路徑 — 首次啟用或由其他副本接管後的重新啟用。
+
+    hidePalettes()
     syncCurrentSessionID()
     let this = self
     if let senderBundleID: String = client?.bundleIdentifier() {

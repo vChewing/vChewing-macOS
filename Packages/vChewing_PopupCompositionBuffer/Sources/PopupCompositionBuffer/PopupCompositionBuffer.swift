@@ -114,7 +114,9 @@ public final class PopupCompositionBuffer: NSWindowController, PCBProtocol {
 
     self.observation = Broadcaster.shared
       .observe(\.eventForClosingAllPanels, options: [.new]) { [weak self] _, _ in
-        self?.hide()
+        asyncOnMain {
+          self?.hide()
+        }
       }
   }
 

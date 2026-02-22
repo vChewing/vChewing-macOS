@@ -47,7 +47,9 @@ extension TDK4AppKit {
 
       self.observation = Broadcaster.shared
         .observe(\.eventForClosingAllPanels, options: [.new]) { [weak self] _, _ in
-          self?.respondToEventsForClosingPanels()
+          asyncOnMain {
+            self?.respondToEventsForClosingPanels()
+          }
         }
     }
 
