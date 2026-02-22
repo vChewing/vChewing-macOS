@@ -64,7 +64,7 @@
 		5B963C9E28D5C14600DCEE88 /* vChewing_Shared */ = {isa = PBXFileReference; lastKnownFileType = wrapper; name = vChewing_Shared; path = Packages/vChewing_Shared; sourceTree = "<group>"; };
 		5B963CA128D5C22D00DCEE88 /* vChewing_SwiftExtension */ = {isa = PBXFileReference; lastKnownFileType = wrapper; name = vChewing_SwiftExtension; path = Packages/vChewing_SwiftExtension; sourceTree = "<group>"; };
 		5BA8C30128DEFE4F004C5CC4 /* vChewing_CandidateWindow */ = {isa = PBXFileReference; lastKnownFileType = wrapper; name = vChewing_CandidateWindow; path = Packages/vChewing_CandidateWindow; sourceTree = "<group>"; };
-		5BAD29D12B7E1A1B0013D695 /* vChewing_KimoDataReader */ = {isa = PBXFileReference; lastKnownFileType = wrapper; name = vChewing_KimoDataReader; path = Packages/vChewing_KimoDataReader; sourceTree = "<group>"; };
+		5BAD29D12B7E1A1B0013D695 /* vChewing_OtherIMEDataReader */ = {isa = PBXFileReference; lastKnownFileType = wrapper; name = vChewing_OtherIMEDataReader; path = Packages/vChewing_OtherIMEDataReader; sourceTree = "<group>"; };
 		5BAD67E12ADAB62D005A4842 /* HangarRash_SwiftyCapsLockToggler */ = {isa = PBXFileReference; lastKnownFileType = wrapper; name = HangarRash_SwiftyCapsLockToggler; path = Packages/HangarRash_SwiftyCapsLockToggler; sourceTree = "<group>"; };
 		5BBB42A42EA3E55A0097FA88 /* vChewing_Shared_DarwinImpl */ = {isa = PBXFileReference; lastKnownFileType = folder; name = vChewing_Shared_DarwinImpl; path = "/Users/shikisuen/Repos/!vChewing/vChewing-macOS/Packages/vChewing_Shared_DarwinImpl"; sourceTree = "<absolute>"; };
 		5BBD627827B6C4D900271480 /* Update-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = "Update-Info.plist"; sourceTree = "<group>"; };
@@ -188,12 +188,12 @@
 				5BDB7A3228D47587001AC277 /* vChewing_Hotenka */,
 				5BFC63C728D49511004A77B7 /* vChewing_IMKUtils */,
 				5B60EAC12EF4892C00FFB49E /* vChewing_InstallerAssembly4Darwin */,
-				5BAD29D12B7E1A1B0013D695 /* vChewing_KimoDataReader */,
 				5BFC63CD28D4AC98004A77B7 /* vChewing_LangModelAssembly */,
 				5B65FB322A9518C9007EEFB0 /* vChewing_MainAssembly4Darwin */,
 				5BDB7A3328D47587001AC277 /* vChewing_Megrez */,
 				5BC5E01C28DDE4270094E427 /* vChewing_NotifierUI */,
 				5BDA45492B97588B00DFA179 /* vChewing_OSFrameworkImpl */,
+				5BAD29D12B7E1A1B0013D695 /* vChewing_OtherIMEDataReader */,
 				5B765F07293A250000122315 /* vChewing_PhraseEditorUI */,
 				5BC5E02228DE07250094E427 /* vChewing_PopupCompositionBuffer */,
 				5B963C9E28D5C14600DCEE88 /* vChewing_Shared */,
@@ -315,7 +315,7 @@
 			);
 			mainGroup = 6A0D4E9215FC0CFA00ABF4B3;
 			packageReferences = (
-				5BC8EB7C2B7E1CC1004F5101 /* XCLocalSwiftPackageReference "Packages/vChewing_KimoDataReader" */,
+				5BC8EB7C2B7E1CC1004F5101 /* XCLocalSwiftPackageReference "Packages/vChewing_OtherIMEDataReader" */,
 			);
 			preferredProjectObjectVersion = 46;
 			productRefGroup = 6A0D4E9215FC0CFA00ABF4B3;
@@ -772,9 +772,9 @@
 /* End XCConfigurationList section */
 
 /* Begin XCLocalSwiftPackageReference section */
-		5BC8EB7C2B7E1CC1004F5101 /* XCLocalSwiftPackageReference "Packages/vChewing_KimoDataReader" */ = {
+		5BC8EB7C2B7E1CC1004F5101 /* XCLocalSwiftPackageReference "Packages/vChewing_OtherIMEDataReader" */ = {
 			isa = XCLocalSwiftPackageReference;
-			relativePath = Packages/vChewing_KimoDataReader;
+			relativePath = Packages/vChewing_OtherIMEDataReader;
 		};
 /* End XCLocalSwiftPackageReference section */
 

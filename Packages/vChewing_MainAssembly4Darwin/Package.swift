@@ -20,7 +20,7 @@ let package = Package(
     .package(path: "../vChewing_CandidateWindow"),
     .package(path: "../vChewing_Hotenka"),
     .package(path: "../vChewing_IMKUtils"),
-    .package(path: "../vChewing_KimoDataReader"),
+    .package(path: "../vChewing_OtherIMEDataReader"),
     .package(path: "../vChewing_LangModelAssembly"), // Unit tests material deps.
     .package(path: "../vChewing_NotifierUI"),
     .package(path: "../vChewing_PhraseEditorUI"),
@@ -41,7 +41,7 @@ let package = Package(
         .product(name: "FolderMonitor", package: "vChewing_FolderMonitor"),
         .product(name: "Hotenka", package: "vChewing_Hotenka"),
         .product(name: "IMKUtils", package: "vChewing_IMKUtils"),
-        .product(name: "KimoDataReader", package: "vChewing_KimoDataReader"),
+        .product(name: "OtherIMEDataReader", package: "vChewing_OtherIMEDataReader"),
         .product(name: "NotifierUI", package: "vChewing_NotifierUI"),
         .product(name: "PhraseEditorUI", package: "vChewing_PhraseEditorUI"),
         .product(name: "PopupCompositionBuffer", package: "vChewing_PopupCompositionBuffer"),

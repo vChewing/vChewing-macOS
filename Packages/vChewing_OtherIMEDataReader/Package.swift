@@ -4,11 +4,11 @@
 import PackageDescription
 
 let package = Package(
-  name: "KimoDataReader",
+  name: "OtherIMEDataReader",
   products: [
     // Products define the executables and libraries a package produces, making them visible to other packages.
     .library(
-      name: "KimoDataReader",
+      name: "OtherIMEDataReader",
       targets: ["KimoDataReader"]
     ),
   ],
@@ -31,9 +31,6 @@ let package = Package(
         .defaultIsolation(MainActor.self), // set Default Actor Isolation
       ]
     ),
-    .testTarget(
-      name: "KimoDataReaderTests",
-      dependencies: ["KimoDataReader"],
       swiftSettings: [
         .defaultIsolation(MainActor.self), // set Default Actor Isolation
       ]
