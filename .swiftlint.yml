@@ -6,6 +6,7 @@ excluded:
   - resource_bundle_accessor.swift
   - Pods
   - R.generated.swift
+  - DictionaryData/*
   - .build # Where Swift Package Manager checks out dependency sources
 
 # 添加 Google Swift Style Guide 建議的規則
