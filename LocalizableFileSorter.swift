@@ -18,6 +18,9 @@ func handleFiles(_ handler: @escaping ((url: URL, fileName: String)) -> ()) {
     includingPropertiesForKeys: nil
   )?.compactMap { $0 as? URL }
   rawURLs?.forEach { url in
+    let componentsLowercased: Set<String> = Set(url.pathComponents.map { $0.lowercased() })
+    let bannedComponents: Set<String> = ["build", ".build"]
+    guard componentsLowercased.isDisjoint(with: bannedComponents) else { return }
     guard let fileName = url.pathComponents.last,
           fileName.lowercased() == "localizable.strings" else { return }
     handler((url, fileName))
