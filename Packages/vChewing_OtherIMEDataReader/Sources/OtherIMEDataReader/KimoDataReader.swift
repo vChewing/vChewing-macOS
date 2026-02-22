@@ -6,48 +6,20 @@ import Foundation
 import KeyKeyUserDBKit
 
 public final class KimoDataReader {
-  public enum KDRException: Error {
-    case notFileURL(URL)
-    case fileNotExist(URL)
-    case fileNameInsane(URL)
-    case wrongFileExtension(URL)
-    case sqliteDatabaseReadingError(Error)
-    case manjusriTextReadingError(Error)
-
-    // MARK: Public
-
-    public var i18nKeyHeader: String {
-      switch self {
-      case .notFileURL:
-        "i18n:KimoDataReader.KDRException.notFileURL"
-      case .fileNotExist:
-        "i18n:KimoDataReader.KDRException.fileNotExist"
-      case .fileNameInsane:
-        "i18n:KimoDataReader.KDRException.fileNameInsane"
-      case .wrongFileExtension:
-        "i18n:KimoDataReader.KDRException.wrongFileExtension"
-      case .sqliteDatabaseReadingError:
-        "i18n:KimoDataReader.KDRException.sqliteDatabaseReadingError"
-      case .manjusriTextReadingError:
-        "i18n:KimoDataReader.KDRException.manjusriTextReadingError"
-      }
-    }
-  }
-
   public nonisolated static let shared: KimoDataReader = .init()
 
   public func prepareData(
     url: URL,
     handler: @escaping (_ keyArray: [String], _ value: String) -> ()
   ) throws {
-    guard url.isFileURL else { throw KDRException.notFileURL(url) }
+    guard url.isFileURL else { throw OIDRException.notFileURL(url) }
     guard FileManager.default.fileExists(atPath: url.path) else {
-      throw KDRException.fileNotExist(url)
+      throw OIDRException.fileNotExist(url)
     }
     let filename = url.lastPathComponent
     let fileNameCells = filename.split(separator: ".")
     guard fileNameCells.count >= 2, fileNameCells.allSatisfy({ !$0.isEmpty }) else {
-      throw KDRException.fileNameInsane(url)
+      throw OIDRException.fileNameInsane(url)
     }
     let extensionName = fileNameCells[Swift.max(0, fileNameCells.indices.upperBound - 1)]
     var isSQLite = false
@@ -55,13 +27,13 @@ public final class KimoDataReader {
     func handleSubTaskWithError(subTask: () throws -> ()) throws {
       do {
         try subTask()
-      } catch let error as KDRException {
-        // 如果已經是 KDRException，直接重新拋出，避免二次包裝
+      } catch let error as OIDRException {
+        // 如果已經是 OIDRException，直接重新拋出，避免二次包裝
         throw error
       } catch {
         switch isSQLite {
-        case true: throw KDRException.sqliteDatabaseReadingError(error)
-        case false: throw KDRException.manjusriTextReadingError(error)
+        case true: throw OIDRException.sqliteCERODDatabaseReadingError(error)
+        case false: throw OIDRException.manjusriTextReadingError(error)
         }
       }
     }
@@ -82,7 +54,7 @@ public final class KimoDataReader {
         isSQLite = false
         userDB = try KeyKeyUserDBKit.UserPhraseTextFileObj(path: url.path)
       default:
-        throw KDRException.wrongFileExtension(url)
+        throw OIDRException.wrongFileExtension(url)
       }
       for gram in try userDB.fetchAllGrams() {
         guard gram.isUnigram, !gram.isCandidateOverride else { continue }

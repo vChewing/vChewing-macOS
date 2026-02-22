@@ -88,18 +88,24 @@ extension SettingsPanesCocoa {
                   .action = #selector(self.lmmgrSyncLMPrefsWithReplacementTable(_:))
               }
             }?.boxed()
+          }
+          NSTabView.TabPage(title: "Ｃ") {
             NSStackView.buildSection(width: innerContentWidth) {
-              NSStackView.build(.horizontal) {
-                "i18n:settings.importFromKimoTxt.label".makeNSLabel(fixWidth: innerContentWidth)
-                NSView()
-                NSStackView.build(.horizontal, spacing: 4) {
-                  importKimoDragButton()
-                  NSButton(
-                    "i18n:settings.importFromKimoTxt.DirectlyImport",
-                    target: self,
-                    action: #selector(importKeyKeyUserPhraseSQLiteDBAction(_:))
-                  )
+              NSStackView.build(.vertical) {
+                NSStackView.build(.horizontal) {
+                  "i18n:settings.importFromKimoTxt.label".makeNSLabel(fixWidth: innerContentWidth)
+                  NSView()
+                  NSStackView.build(.horizontal, spacing: 4) {
+                    importKimoDragButton()
+                    NSButton(
+                      "i18n:settings.importFromKimoTxt.DirectlyImport",
+                      target: self,
+                      action: #selector(importKeyKeyUserPhraseSQLiteDBAction(_:))
+                    )
+                  }
                 }
+                "i18n:settings.importFromKimoTxt.description"
+                  .makeNSLabel(descriptive: true, fixWidth: contentWidth)
               }
             }?.boxed()
             NSView()
@@ -113,7 +119,7 @@ extension SettingsPanesCocoa {
       dragRetrieverKimo.postDragHandler = { [weak self] url in
         self?.task4ImportingKeyKeyUserDict(url)
       }
-      dragRetrieverKimo.title = "i18n:kimoImportButton.DragFileToHere".i18n
+      dragRetrieverKimo.title = "i18n:fileDragImportButton.DragFileToHere".i18n
       dragRetrieverKimo.target = self
       dragRetrieverKimo.allowedTypes = ["txt", "db"]
       dragRetrieverKimo.action = #selector(importKeyKeyUserDictionaryDataAction(_:))

@@ -113,6 +113,7 @@ extension CtlSettingsUI {
 extension View {
   public func settingsDescription(maxWidth: CGFloat? = .infinity) -> some View {
     controlSize(.small)
+      .multilineTextAlignment(.leading)
       .frame(maxWidth: maxWidth, alignment: .leading)
       // TODO: Use `.foregroundStyle` when targeting macOS 12.
       .foregroundColor(.secondary)

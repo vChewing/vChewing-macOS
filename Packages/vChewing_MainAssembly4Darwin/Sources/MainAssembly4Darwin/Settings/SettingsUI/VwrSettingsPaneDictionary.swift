@@ -13,51 +13,7 @@ import UniformTypeIdentifiers
 
 @available(macOS 14, *)
 public struct VwrSettingsPaneDictionary: View {
-  // MARK: - State Variables
-
-  @State
-  private var isShowingFolderImporter = false
-  @State
-  private var isShowingFileImporter = false
-
-  // MARK: - AppStorage Variables
-
-  @AppStorage(wrappedValue: "", UserDef.kUserDataFolderSpecified.rawValue)
-  private var userDataFolderSpecified: String
-
-  @AppStorage(wrappedValue: true, UserDef.kShouldAutoReloadUserDataFiles.rawValue)
-  private var shouldAutoReloadUserDataFiles: Bool
-
-  @AppStorage(wrappedValue: true, UserDef.kEnforceETenDOSCandidateSequence.rawValue)
-  private var enforceETenDOSCandidateSequence: Bool
-
-  @AppStorage(wrappedValue: false, UserDef.kUseExternalFactoryDict.rawValue)
-  private var useExternalFactoryDict: Bool
-
-  @AppStorage(wrappedValue: false, UserDef.kCNS11643Enabled.rawValue)
-  private var cns11643Enabled: Bool
-
-  @AppStorage(wrappedValue: true, UserDef.kSymbolInputEnabled.rawValue)
-  private var symbolInputEnabled: Bool
-
-  @AppStorage(wrappedValue: true, UserDef.kFetchSuggestionsFromPerceptionOverrideModel.rawValue)
-  private var fetchSuggestionsFromPerceptionOverrideModel: Bool
-
-  @AppStorage(wrappedValue: false, UserDef.kReducePOMLifetimeToNoMoreThan12Hours.rawValue)
-  private var reducePOMLifetimeToNoMoreThan12Hours: Bool
-
-  @AppStorage(wrappedValue: false, UserDef.kPhraseReplacementEnabled.rawValue)
-  private var phraseReplacementEnabled: Bool
-
-  @AppStorage(wrappedValue: false, UserDef.kFilterNonCNSReadingsForCHTInput.rawValue)
-  private var filterNonCNSReadingsForCHTInput: Bool
-
-  // MARK: - Main View
-
-  @State
-  var keykeyImportButtonDisabled = false
-
-  private var fdrUserDataDefault: String { LMMgr.dataFolderPath(isDefaultFolder: true) }
+  // MARK: Public
 
   public var body: some View {
     NavigationStack {
@@ -210,32 +166,38 @@ public struct VwrSettingsPaneDictionary: View {
         }
 
         Section {
-          LabeledContent("i18n:settings.importFromKimoTxt.label") {
-            Button("…") {
-              isShowingFileImporter = true
-            }
-            .fileImporter(
-              isPresented: $isShowingFileImporter,
-              allowedContentTypes: ["txt", "db"].compactMap {
-                .init(filenameExtension: $0)
-              },
-              allowsMultipleSelection: false
-            ) { result in
-              keykeyImportButtonDisabled = true
-              defer { keykeyImportButtonDisabled = false }
+          VStack(alignment: .leading) {
+            LabeledContent("i18n:settings.importFromKimoTxt.label") {
+              Button("…") {
+                isShowingFileImporter = true
+              }
+              .fileImporter(
+                isPresented: $isShowingFileImporter,
+                allowedContentTypes: ["txt", "db"].compactMap {
+                  .init(filenameExtension: $0)
+                },
+                allowsMultipleSelection: false
+              ) { result in
+                keykeyImportButtonDisabled = true
+                defer { keykeyImportButtonDisabled = false }
 
-              switch result {
-              case let .success(urls):
-                guard let url = urls.first else { return }
-                task4ImportingKeyKeyUserDict(url)
-              case .failure:
-                break
+                switch result {
+                case let .success(urls):
+                  guard let url = urls.first else { return }
+                  task4ImportingKeyKeyUserDict(url)
+                case .failure:
+                  break
+                }
+              }
+              Button("i18n:settings.importFromKimoTxt.DirectlyImport") {
+                task4ImportingKeyKeyUserDict()
               }
             }
-            Button("i18n:settings.importFromKimoTxt.DirectlyImport") {
-              task4ImportingKeyKeyUserDict()
-            }
-          }.disabled(keykeyImportButtonDisabled)
+            .disabled(keykeyImportButtonDisabled)
+            .frame(maxWidth: .infinity)
+            Text(LocalizedStringKey("i18n:settings.importFromKimoTxt.description"))
+              .settingsDescription()
+          }
         }
       }.formStyled()
     }
@@ -244,6 +206,54 @@ public struct VwrSettingsPaneDictionary: View {
       maxHeight: CtlSettingsUI.contentMaxHeight
     )
   }
+
+  // MARK: Private
+
+  // MARK: - State Variables
+
+  @State
+  private var isShowingFolderImporter = false
+  @State
+  private var isShowingFileImporter = false
+
+  // MARK: - AppStorage Variables
+
+  @AppStorage(wrappedValue: "", UserDef.kUserDataFolderSpecified.rawValue)
+  private var userDataFolderSpecified: String
+
+  @AppStorage(wrappedValue: true, UserDef.kShouldAutoReloadUserDataFiles.rawValue)
+  private var shouldAutoReloadUserDataFiles: Bool
+
+  @AppStorage(wrappedValue: true, UserDef.kEnforceETenDOSCandidateSequence.rawValue)
+  private var enforceETenDOSCandidateSequence: Bool
+
+  @AppStorage(wrappedValue: false, UserDef.kUseExternalFactoryDict.rawValue)
+  private var useExternalFactoryDict: Bool
+
+  @AppStorage(wrappedValue: false, UserDef.kCNS11643Enabled.rawValue)
+  private var cns11643Enabled: Bool
+
+  @AppStorage(wrappedValue: true, UserDef.kSymbolInputEnabled.rawValue)
+  private var symbolInputEnabled: Bool
+
+  @AppStorage(wrappedValue: true, UserDef.kFetchSuggestionsFromPerceptionOverrideModel.rawValue)
+  private var fetchSuggestionsFromPerceptionOverrideModel: Bool
+
+  @AppStorage(wrappedValue: false, UserDef.kReducePOMLifetimeToNoMoreThan12Hours.rawValue)
+  private var reducePOMLifetimeToNoMoreThan12Hours: Bool
+
+  @AppStorage(wrappedValue: false, UserDef.kPhraseReplacementEnabled.rawValue)
+  private var phraseReplacementEnabled: Bool
+
+  @AppStorage(wrappedValue: false, UserDef.kFilterNonCNSReadingsForCHTInput.rawValue)
+  private var filterNonCNSReadingsForCHTInput: Bool
+
+  // MARK: - Main View
+
+  @State
+  private var keykeyImportButtonDisabled = false
+
+  private var fdrUserDataDefault: String { LMMgr.dataFolderPath(isDefaultFolder: true) }
 
   private func task4ImportingKeyKeyUserDict(_ url: URL? = nil) {
     do {

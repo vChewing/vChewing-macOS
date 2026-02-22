@@ -10,12 +10,12 @@ import AppKit
 import UniformTypeIdentifiers
 
 #if hasFeature(RetroactiveAttribute)
-  extension KimoDataReader.KDRException: @retroactive LocalizedError {}
+  extension OIDRException: @retroactive LocalizedError {}
 #else
-  extension KimoDataReader.KDRException: LocalizedError {}
+  extension OIDRException: LocalizedError {}
 #endif
 
-extension KimoDataReader.KDRException {
+extension OIDRException {
   public var errorDescription: String? {
     description
   }
@@ -23,25 +23,28 @@ extension KimoDataReader.KDRException {
   // MARK: Private
 
   public var description: String {
+    let headerLocalized = i18nKeyHeader.description.i18n
     switch self {
+    case let .sqliteCERODDatabaseReadingError(subError):
+      return "\n\n\(headerLocalized)\n\n\(subError.localizedDescription)"
     case let .sqliteDatabaseReadingError(subError):
-      return "\n\n\(i18nKeyHeader.i18n)\n\n\(subError.localizedDescription)"
+      return "\n\n\(headerLocalized)\n\n\(subError.localizedDescription)"
     case let .manjusriTextReadingError(subError):
-      return "\n\n\(i18nKeyHeader.i18n)\n\n\(subError.localizedDescription)"
+      return "\n\n\(headerLocalized)\n\n\(subError.localizedDescription)"
     case let .notFileURL(url):
-      return "\n\n\(i18nKeyHeader.i18n)\n\nFile Path: \(url.standardizedFileURL.path)"
+      return "\n\n\(headerLocalized)\n\nFile Path: \(url.standardizedFileURL.path)"
     case let .fileNotExist(url):
-      return "\n\n\(i18nKeyHeader.i18n)\n\nFile Path: \(url.standardizedFileURL.path)"
+      return "\n\n\(headerLocalized)\n\nFile Path: \(url.standardizedFileURL.path)"
     case let .fileNameInsane(url):
-      return "\n\n\(i18nKeyHeader.i18n)\n\nFile Path: \(url.standardizedFileURL.path)"
+      return "\n\n\(headerLocalized)\n\nFile Path: \(url.standardizedFileURL.path)"
     case let .wrongFileExtension(url):
-      return "\n\n\(i18nKeyHeader.i18n)\n\nFile Path: \(url.standardizedFileURL.path)"
+      return "\n\n\(headerLocalized)\n\nFile Path: \(url.standardizedFileURL.path)"
     }
   }
 }
 
 extension LMMgr {
-  public enum KimoDataImportError: Error, LocalizedError {
+  public enum OtherIMEDataImportError: Error, LocalizedError {
     case dataExtractionFailureMsg(String)
     case dataExtractionFailure(Error)
     case lexiconWritingFailure
@@ -51,19 +54,19 @@ extension LMMgr {
     public var errorDescription: String? {
       switch self {
       case let .dataExtractionFailureMsg(msg):
-        return "i18n:KimoDataImportError.dataExtractionFailure.errMsg".i18n
+        return "i18n:OtherIMEDataImportError.dataExtractionFailure.errMsg".i18n
           + "\n\nMessage: \(msg)"
       case let .dataExtractionFailure(error):
-        return "i18n:KimoDataImportError.dataExtractionFailure.errMsg".i18n
+        return "i18n:OtherIMEDataImportError.dataExtractionFailure.errMsg".i18n
           + "\n\n\(error.localizedDescription)"
       case .lexiconWritingFailure:
-        return "i18n:KimoDataImportError.lexiconWritingFailure.errMsg".i18n
+        return "i18n:OtherIMEDataImportError.lexiconWritingFailure.errMsg".i18n
       }
     }
   }
 
   /// 匯入自奇摩輸入法使用者自訂詞資料庫匯出的 TXT 檔案、或原始 SQLite 檔案 `SmartMandarinUserData.db`。
-  /// - Parameter rawString: 原始檔案內容。
+  /// - Parameter url: 原始檔案位置。
   /// - Returns: 成功匯入的資料數量。
   @discardableResult
   public static func importYahooKeyKeyUserDictionary(
@@ -91,13 +94,13 @@ extension LMMgr {
       }
       // 檢查檔案是否存在
       guard FileManager.default.fileExists(atPath: url.path) else {
-        throw KimoDataImportError.dataExtractionFailureMsg(
+        throw OtherIMEDataImportError.dataExtractionFailureMsg(
           "File not found at: \(url.path)"
         )
       }
       // 檢查檔案是否可讀
       guard FileManager.default.isReadableFile(atPath: url.path) else {
-        throw KimoDataImportError.dataExtractionFailureMsg(
+        throw OtherIMEDataImportError.dataExtractionFailureMsg(
           "File not readable (Sandbox access denied?): \(url.path)"
         )
       }
@@ -119,18 +122,18 @@ extension LMMgr {
           allPhrasesCHS.append(phraseCHS)
         }
       }
-    } catch let error as KimoDataImportError {
-      // 如果已經是 KimoDataImportError，直接重新拋出，避免二次包裝
+    } catch let error as OtherIMEDataImportError {
+      // 如果已經是 OtherIMEDataImportError，直接重新拋出，避免二次包裝
       throw error
     } catch {
-      throw KimoDataImportError.dataExtractionFailure(error)
+      throw OtherIMEDataImportError.dataExtractionFailure(error)
     }
     guard !allPhrasesCHT.isEmpty else { return (entriesDiscovered, 0) }
 
     guard Self
       .batchImportUserPhrasePairs(allPhrasesCHT: allPhrasesCHT, allPhrasesCHS: allPhrasesCHS)
     else {
-      throw KimoDataImportError.lexiconWritingFailure
+      throw OtherIMEDataImportError.lexiconWritingFailure
     }
 
     let result = allPhrasesCHT.count

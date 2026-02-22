@@ -16,23 +16,23 @@ extension KeyKeyUserDBKit {
     /// 讀取所有使用者單元圖
     /// - Returns: 單元圖陣列
     /// - Throws: 讀取過程中發生的錯誤
-    func fetchUnigrams() throws -> [Gram]
+    func fetchUnigrams() throws -> [KeyKeyGram]
 
     /// 讀取使用者雙元圖快取
     /// - Parameter limit: 限制回傳筆數 (nil 表示全部)
     /// - Returns: 雙元圖陣列
     /// - Throws: 讀取過程中發生的錯誤
-    func fetchBigrams(limit: Int?) throws -> [Gram]
+    func fetchBigrams(limit: Int?) throws -> [KeyKeyGram]
 
     /// 讀取候選字覆蓋快取
     /// - Returns: 候選字覆蓋陣列
     /// - Throws: 讀取過程中發生的錯誤
-    func fetchCandidateOverrides() throws -> [Gram]
+    func fetchCandidateOverrides() throws -> [KeyKeyGram]
 
     /// 讀取所有使用者資料，回傳包含所有 Unigram、Bigram 和 CandidateOverride 的陣列
     /// - Returns: 包含所有結果的 `[Gram]` 陣列
     /// - Throws: 讀取過程中發生的錯誤
-    func fetchAllGrams() throws -> [Gram]
+    func fetchAllGrams() throws -> [KeyKeyGram]
   }
 }
 
@@ -40,8 +40,8 @@ extension KeyKeyUserDBKit {
 
 extension KeyKeyUserDBKit.UserPhraseDataSource {
   /// 預設實作：讀取所有使用者資料
-  public func fetchAllGrams() throws -> [KeyKeyUserDBKit.Gram] {
-    var allGrams: [KeyKeyUserDBKit.Gram] = []
+  public func fetchAllGrams() throws -> [KeyKeyUserDBKit.KeyKeyGram] {
+    var allGrams: [KeyKeyUserDBKit.KeyKeyGram] = []
     allGrams.append(contentsOf: try fetchUnigrams())
     allGrams.append(contentsOf: try fetchBigrams(limit: nil))
     allGrams.append(contentsOf: try fetchCandidateOverrides())

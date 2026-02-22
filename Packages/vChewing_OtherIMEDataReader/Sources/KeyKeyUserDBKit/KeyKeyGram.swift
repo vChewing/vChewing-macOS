@@ -6,7 +6,7 @@
 
 extension KeyKeyUserDBKit {
   /// This is the basic Gram type extracted from our Homa Assembler with no backoff support.
-  public struct Gram: Codable, CustomStringConvertible, Equatable, Sendable, Hashable {
+  public struct KeyKeyGram: Codable, CustomStringConvertible, Equatable, Sendable, Hashable {
     // MARK: Lifecycle
 
     /// 從原始元組初始化 Gram

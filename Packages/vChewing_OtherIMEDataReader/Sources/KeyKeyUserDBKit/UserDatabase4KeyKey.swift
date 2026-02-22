@@ -131,7 +131,7 @@ extension KeyKeyUserDBKit {
     // MARK: - Public Methods
 
     /// 讀取所有使用者單元圖
-    public func fetchUnigrams() throws -> [Gram] {
+    public func fetchUnigrams() throws -> [KeyKeyGram] {
       try actor.sync {
         let sql = "SELECT qstring, current, probability FROM user_unigrams"
         var statement: OpaquePointer?
@@ -142,7 +142,7 @@ extension KeyKeyUserDBKit {
 
         defer { sqlite3_finalize(statement) }
 
-        var results: [Gram] = []
+        var results: [KeyKeyGram] = []
 
         while sqlite3_step(statement) == SQLITE_ROW {
           let qstring = String(cString: sqlite3_column_text(statement, 0))
@@ -150,7 +150,7 @@ extension KeyKeyUserDBKit {
           let probability = sqlite3_column_double(statement, 2)
 
           let keyArray = PhonaSet.decodeQueryStringAsKeyArray(qstring)
-          results.append(Gram(keyArray: keyArray, current: current, probability: probability))
+          results.append(KeyKeyGram(keyArray: keyArray, current: current, probability: probability))
         }
 
         return results
@@ -159,7 +159,7 @@ extension KeyKeyUserDBKit {
 
     /// 讀取使用者雙元圖快取
     /// - Parameter limit: 限制回傳筆數 (nil 表示全部)
-    public func fetchBigrams(limit: Int? = nil) throws -> [Gram] {
+    public func fetchBigrams(limit: Int? = nil) throws -> [KeyKeyGram] {
       try actor.sync {
         var sql = "SELECT qstring, previous, current FROM user_bigram_cache"
         if let limit {
@@ -174,7 +174,7 @@ extension KeyKeyUserDBKit {
 
         defer { sqlite3_finalize(statement) }
 
-        var results: [Gram] = []
+        var results: [KeyKeyGram] = []
 
         while sqlite3_step(statement) == SQLITE_ROW {
           let qstring = String(cString: sqlite3_column_text(statement, 0))
@@ -182,7 +182,7 @@ extension KeyKeyUserDBKit {
           let current = String(cString: sqlite3_column_text(statement, 2))
 
           let keyArray = PhonaSet.decodeQueryStringAsKeyArray(qstring)
-          results.append(Gram(keyArray: keyArray, current: current, previous: previous))
+          results.append(KeyKeyGram(keyArray: keyArray, current: current, previous: previous))
         }
 
         return results
@@ -190,7 +190,7 @@ extension KeyKeyUserDBKit {
     }
 
     /// 讀取候選字覆蓋快取
-    public func fetchCandidateOverrides() throws -> [Gram] {
+    public func fetchCandidateOverrides() throws -> [KeyKeyGram] {
       try actor.sync {
         let sql = "SELECT qstring, current FROM user_candidate_override_cache"
         var statement: OpaquePointer?
@@ -201,7 +201,7 @@ extension KeyKeyUserDBKit {
 
         defer { sqlite3_finalize(statement) }
 
-        var results: [Gram] = []
+        var results: [KeyKeyGram] = []
 
         while sqlite3_step(statement) == SQLITE_ROW {
           let qstring = String(cString: sqlite3_column_text(statement, 0))
@@ -209,7 +209,7 @@ extension KeyKeyUserDBKit {
 
           let keyArray = PhonaSet.decodeQueryStringAsKeyArray(qstring)
           results.append(
-            Gram(
+            KeyKeyGram(
               keyArray: keyArray,
               current: current,
               probability: Self.candidateOverrideProbability,
@@ -224,8 +224,8 @@ extension KeyKeyUserDBKit {
 
     /// 讀取所有使用者資料，回傳包含所有 Unigram、Bigram 和 CandidateOverride 的陣列
     /// - Returns: 包含所有結果的 `[Gram]` 陣列
-    public func fetchAllGrams() throws -> [Gram] {
-      var allGrams: [Gram] = []
+    public func fetchAllGrams() throws -> [KeyKeyGram] {
+      var allGrams: [KeyKeyGram] = []
       allGrams.append(contentsOf: try fetchUnigrams())
       allGrams.append(contentsOf: try fetchBigrams())
       allGrams.append(contentsOf: try fetchCandidateOverrides())
@@ -316,9 +316,9 @@ extension KeyKeyUserDBKit.UserDatabase: Sequence {
 
     // MARK: Public
 
-    public typealias Element = KeyKeyUserDBKit.Gram
+    public typealias Element = KeyKeyUserDBKit.KeyKeyGram
 
-    public func next() -> KeyKeyUserDBKit.Gram? {
+    public func next() -> KeyKeyUserDBKit.KeyKeyGram? {
       iteratorQueue.sync {
         while true {
           // 如果還沒有 statement，就準備下一個 phase 的 statement
@@ -380,27 +380,27 @@ extension KeyKeyUserDBKit.UserDatabase: Sequence {
       }
     }
 
-    private func mapCurrentRow(statement: OpaquePointer) -> KeyKeyUserDBKit.Gram {
+    private func mapCurrentRow(statement: OpaquePointer) -> KeyKeyUserDBKit.KeyKeyGram {
       switch _phase {
       case .unigrams:
         let qstring = String(cString: sqlite3_column_text(statement, 0))
         let current = String(cString: sqlite3_column_text(statement, 1))
         let probability = sqlite3_column_double(statement, 2)
         let keyArray = KeyKeyUserDBKit.PhonaSet.decodeQueryStringAsKeyArray(qstring)
-        return KeyKeyUserDBKit.Gram(keyArray: keyArray, current: current, probability: probability)
+        return KeyKeyUserDBKit.KeyKeyGram(keyArray: keyArray, current: current, probability: probability)
 
       case .bigrams:
         let qstring = String(cString: sqlite3_column_text(statement, 0))
         let previous = String(cString: sqlite3_column_text(statement, 1))
         let current = String(cString: sqlite3_column_text(statement, 2))
         let keyArray = KeyKeyUserDBKit.PhonaSet.decodeQueryStringAsKeyArray(qstring)
-        return KeyKeyUserDBKit.Gram(keyArray: keyArray, current: current, previous: previous)
+        return KeyKeyUserDBKit.KeyKeyGram(keyArray: keyArray, current: current, previous: previous)
 
       case .candidateOverrides:
         let qstring = String(cString: sqlite3_column_text(statement, 0))
         let current = String(cString: sqlite3_column_text(statement, 1))
         let keyArray = KeyKeyUserDBKit.PhonaSet.decodeQueryStringAsKeyArray(qstring)
-        return KeyKeyUserDBKit.Gram(
+        return KeyKeyUserDBKit.KeyKeyGram(
           keyArray: keyArray,
           current: current,
           probability: KeyKeyUserDBKit.UserDatabase.candidateOverrideProbability,
@@ -462,7 +462,7 @@ extension KeyKeyUserDBKit.UserDatabase {
   public struct AsyncGramSequence: AsyncSequence {
     // MARK: Public
 
-    public typealias Element = KeyKeyUserDBKit.Gram
+    public typealias Element = KeyKeyUserDBKit.KeyKeyGram
 
     public func makeAsyncIterator() -> AsyncGramIterator {
       AsyncGramIterator(database: database)
@@ -490,9 +490,9 @@ extension KeyKeyUserDBKit.UserDatabase {
 
     // MARK: Public
 
-    public typealias Element = KeyKeyUserDBKit.Gram
+    public typealias Element = KeyKeyUserDBKit.KeyKeyGram
 
-    public func next() async -> KeyKeyUserDBKit.Gram? {
+    public func next() async -> KeyKeyUserDBKit.KeyKeyGram? {
       iteratorQueue.sync {
         while true {
           // 如果還沒有 statement，就準備下一個 phase 的 statement
@@ -554,27 +554,27 @@ extension KeyKeyUserDBKit.UserDatabase {
       }
     }
 
-    private func mapCurrentRow(statement: OpaquePointer) -> KeyKeyUserDBKit.Gram {
+    private func mapCurrentRow(statement: OpaquePointer) -> KeyKeyUserDBKit.KeyKeyGram {
       switch _phase {
       case .unigrams:
         let qstring = String(cString: sqlite3_column_text(statement, 0))
         let current = String(cString: sqlite3_column_text(statement, 1))
         let probability = sqlite3_column_double(statement, 2)
         let keyArray = KeyKeyUserDBKit.PhonaSet.decodeQueryStringAsKeyArray(qstring)
-        return KeyKeyUserDBKit.Gram(keyArray: keyArray, current: current, probability: probability)
+        return KeyKeyUserDBKit.KeyKeyGram(keyArray: keyArray, current: current, probability: probability)
 
       case .bigrams:
         let qstring = String(cString: sqlite3_column_text(statement, 0))
         let previous = String(cString: sqlite3_column_text(statement, 1))
         let current = String(cString: sqlite3_column_text(statement, 2))
         let keyArray = KeyKeyUserDBKit.PhonaSet.decodeQueryStringAsKeyArray(qstring)
-        return KeyKeyUserDBKit.Gram(keyArray: keyArray, current: current, previous: previous)
+        return KeyKeyUserDBKit.KeyKeyGram(keyArray: keyArray, current: current, previous: previous)
 
       case .candidateOverrides:
         let qstring = String(cString: sqlite3_column_text(statement, 0))
         let current = String(cString: sqlite3_column_text(statement, 1))
         let keyArray = KeyKeyUserDBKit.PhonaSet.decodeQueryStringAsKeyArray(qstring)
-        return KeyKeyUserDBKit.Gram(
+        return KeyKeyUserDBKit.KeyKeyGram(
           keyArray: keyArray,
           current: current,
           probability: KeyKeyUserDBKit.UserDatabase.candidateOverrideProbability,

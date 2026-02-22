@@ -9,7 +9,7 @@ let package = Package(
     // Products define the executables and libraries a package produces, making them visible to other packages.
     .library(
       name: "OtherIMEDataReader",
-      targets: ["KimoDataReader"]
+      targets: ["OtherIMEDataReader"]
     ),
   ],
   dependencies: [
@@ -25,12 +25,10 @@ let package = Package(
       ]
     ),
     .target(
-      name: "KimoDataReader",
-      dependencies: ["KeyKeyUserDBKit"],
-      swiftSettings: [
-        .defaultIsolation(MainActor.self), // set Default Actor Isolation
-      ]
-    ),
+      name: "OtherIMEDataReader",
+      dependencies: [
+        "KeyKeyUserDBKit",
+      ],
       swiftSettings: [
         .defaultIsolation(MainActor.self), // set Default Actor Isolation
       ]

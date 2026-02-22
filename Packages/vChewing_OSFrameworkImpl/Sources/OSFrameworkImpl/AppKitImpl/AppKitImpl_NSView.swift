@@ -675,6 +675,8 @@ import SwiftExtension
       print(url.description)
     }
 
+    public var allowedTypes: [String] = ["txt"]
+
     override public func draggingEntered(_ sender: NSDraggingInfo) -> NSDragOperation {
       checkExtension(sender) ? .copy : NSDragOperation()
     }
@@ -690,10 +692,6 @@ import SwiftExtension
       postDragHandler(URL(fileURLWithPath: path))
       return true
     }
-
-    // MARK: Internal
-
-    var allowedTypes: [String] = ["txt"]
 
     // MARK: Fileprivate
 
