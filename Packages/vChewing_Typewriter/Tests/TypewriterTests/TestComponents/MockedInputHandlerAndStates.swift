@@ -242,7 +242,7 @@ public final class MockSession: @MainActor SessionCoreProtocol, CtlCandidateDele
   }
 
   public func switchState(_ newState: MockIMEState, caller: StaticString, line: Int) {
-    if PrefMgr().isDebugModeEnabled || UserDefaults.pendingUnitTests {
+    if PrefMgr.sharedSansDidSetOps.isDebugModeEnabled || UserDefaults.pendingUnitTests {
       let stateStr = "\(state.type.rawValue) -> \(newState.type.rawValue)"
       let callerTag = "\(caller)@[L\(line)]"
       let stack = Thread.callStackSymbols.prefix(7).joined(separator: "\n")

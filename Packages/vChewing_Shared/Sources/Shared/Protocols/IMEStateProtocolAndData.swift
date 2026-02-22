@@ -236,11 +236,11 @@ extension IMEStateData {
   }
 
   public static var allowedMarkLengthRange: ClosedRange<Int> {
-    Self.minCandidateLength ... PrefMgr().maxCandidateLength
+    Self.minCandidateLength ... PrefMgr.sharedSansDidSetOps.maxCandidateLength
   }
 
   public static var minCandidateLength: Int {
-    PrefMgr().allowRescoringSingleKanjiCandidates ? 1 : 2
+    PrefMgr.sharedSansDidSetOps.allowRescoringSingleKanjiCandidates ? 1 : 2
   }
 }
 

@@ -46,7 +46,7 @@ extension CandidateTextService {
     fromMap map: [String]? = nil, candidate: String, reading: [String]
   )
     -> CandidateNode? {
-    let fetchedRaw = map ?? PrefMgr().candidateServiceMenuContents
+    let fetchedRaw = map ?? PrefMgr.sharedSansDidSetOps.candidateServiceMenuContents
     let fetched = fetchedRaw.parseIntoCandidateTextServiceStack(
       candidate: candidate,
       reading: reading

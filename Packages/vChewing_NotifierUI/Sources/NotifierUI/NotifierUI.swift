@@ -195,7 +195,7 @@ public final class Notifier: NSWindowController {
   // MARK: - Private Declarations
 
   private static var instanceSet: NSMutableOrderedSet = .init()
-  private static let prefs = PrefMgr()
+  private static let prefs = PrefMgr.sharedSansDidSetOps
 
   private static var currentNSAppearance: NSAppearance? {
     if #available(macOS 10.14, *) {

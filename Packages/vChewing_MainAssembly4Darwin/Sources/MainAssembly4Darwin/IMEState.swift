@@ -89,7 +89,7 @@ extension IMEStateProtocol {
   }
 
   fileprivate static func hardenVerticalPunctuationsIfNeeded(_ target: inout [String]) {
-    if !InputSession.isVerticalTyping || !PrefMgr().hardenVerticalPunctuations { return }
+    if !InputSession.isVerticalTyping || !PrefMgr.shared.hardenVerticalPunctuations { return }
     target.indices.forEach { i in
       ChineseConverter.hardenVerticalPunctuations(
         target: &target[i],

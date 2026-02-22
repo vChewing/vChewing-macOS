@@ -71,7 +71,7 @@ extension IMEApp {
 
   /// Fart or Beep?
   public static func buzz() {
-    let prefs = PrefMgr()
+    let prefs = PrefMgr.sharedSansDidSetOps
     switch prefs.beepSoundPreference {
     case 0: return
     case 1: NSSound.beep()

@@ -189,7 +189,7 @@ final class InputHandlerTests {
     LMAssembly.LMInstantiator.connectToTestSQLDB(LMATestsData.sqlTestCoreLMData)
 
     // 初始化測試用的 handler 和 session
-    let handler = MockInputHandler(lm: lm, pref: PrefMgr())
+    let handler = MockInputHandler(lm: lm, pref: PrefMgr.sharedSansDidSetOps)
     let session = MockSession()
     handler.session = session
     session.inputHandler = handler

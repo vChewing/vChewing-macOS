@@ -12,12 +12,13 @@ import AppKit
 
 extension SessionCtl {
   public func makeMenu() -> NSMenu {
-    NSMenu().appendItems(self) {
+    let currentInputMode = IMEApp.currentInputMode
+    return NSMenu().appendItems(self) {
       NSMenu.Item(verbatim: currentRAMUsageDescription)
       NSMenu.Item(
         verbatim: String(
           format: "Switch to %@ Input Mode".i18n,
-          IMEApp.currentInputMode.reversed.localizedDescription
+          currentInputMode.reversed.localizedDescription
         )
       )?.act(#selector(switchInputMode(_:)))
         .hotkey(PrefMgr.shared.usingHotKeyInputMode ? "D" : "", mask: [.command, .control])
@@ -49,12 +50,12 @@ extension SessionCtl {
         .act(#selector(toggleChineseConverter(_:)))
         .state(PrefMgr.shared.chineseConversionEnabled)
         .hotkey(PrefMgr.shared.usingHotKeyKangXi ? "K" : "", mask: [.command, .control])
-        .nulled(IMEApp.currentInputMode != .imeModeCHT)
+        .nulled(currentInputMode != .imeModeCHT)
       NSMenu.Item("JIS Shinjitai Output")?
         .act(#selector(toggleShiftJISShinjitaiOutput(_:)))
         .state(PrefMgr.shared.shiftJISShinjitaiOutputEnabled)
         .hotkey(PrefMgr.shared.usingHotKeyJIS ? "J" : "", mask: [.command, .control])
-        .nulled(IMEApp.currentInputMode != .imeModeCHT)
+        .nulled(currentInputMode != .imeModeCHT)
       NSMenu.Item("Currency Numeral Output")?
         .act(#selector(toggleCurrencyNumerals(_:)))
         .state(PrefMgr.shared.currencyNumeralsEnabled)

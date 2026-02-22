@@ -259,7 +259,7 @@ extension TDK4AppKit {
     private static let thePool: CandidatePool4AppKit = .init(candidates: [])
     private static let currentView: VwrCandidateTDK4AppKit = .init(thePool: thePool)
 
-    private let prefs = PrefMgr()
+    private let prefs = PrefMgr.sharedSansDidSetOps
 
     @objc
     private var observation: NSKeyValueObservation?

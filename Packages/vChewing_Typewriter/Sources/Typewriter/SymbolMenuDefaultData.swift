@@ -750,7 +750,7 @@ extension CandidateNode {
 
 extension BinaryInteger {
   fileprivate var kanji: String {
-    guard let prefix = PrefMgr().appleLanguages.first?.prefix(2),
+    guard let prefix = PrefMgr.sharedSansDidSetOps.appleLanguages.first?.prefix(2),
           ["zh", "ja"].contains(prefix) else { return description }
     let formatter = NumberFormatter()
     formatter.locale = Locale(identifier: prefix.description)

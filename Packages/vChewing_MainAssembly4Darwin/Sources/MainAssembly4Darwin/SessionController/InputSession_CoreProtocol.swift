@@ -304,8 +304,9 @@ extension SessionProtocol {
         this.prefs.shouldNotFartInLieuOfBeep = true
       }
     }
-    if this.inputMode != IMEApp.currentInputMode {
-      this.inputMode = IMEApp.currentInputMode
+    let resolvedInputMode = IMEApp.currentInputMode
+    if this.inputMode != resolvedInputMode {
+      this.inputMode = resolvedInputMode
     }
 
     // 下面這段步驟 無論 isActivated 是否為 true 都得執行。

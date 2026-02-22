@@ -63,7 +63,7 @@ extension TDK4AppKit {
 
     // MARK: Private
 
-    private let prefs = PrefMgr()
+    private let prefs = PrefMgr.sharedSansDidSetOps
     private var dimension: CGSize = .zero
   }
 } // extension TDK4AppKit

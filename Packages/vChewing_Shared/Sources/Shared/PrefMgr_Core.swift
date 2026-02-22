@@ -10,7 +10,7 @@ import Foundation
 
 // MARK: - PrefMgr
 
-public struct PrefMgr: PrefMgrProtocol {
+public final class PrefMgr: PrefMgrProtocol, Sendable {
   // MARK: Lifecycle
 
   public init(
@@ -26,6 +26,8 @@ public struct PrefMgr: PrefMgrProtocol {
   }
 
   // MARK: Public
+
+  public static let sharedSansDidSetOps = PrefMgr()
 
   public static let kDefaultCandidateKeys = "123456"
   public static let kDefaultBasicKeyboardLayout = "com.apple.keylayout.ZhuyinBopomofo"

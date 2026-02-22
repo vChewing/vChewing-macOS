@@ -24,7 +24,7 @@ public enum ChineseConverter {
   /// 將指定字串內的小寫漢字數字轉換為大寫，會對轉換對象進行直接修改操作。
   /// - Parameter target: 轉換對象。
   public static func ensureCurrencyNumerals(target: inout String) {
-    let prefs = PrefMgr()
+    let prefs = PrefMgr.sharedSansDidSetOps
     if !prefs.currencyNumeralsEnabled { return }
     for key in currencyNumeralDictTable.keys {
       guard let result = currencyNumeralDictTable[key] else { continue }

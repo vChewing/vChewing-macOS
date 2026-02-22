@@ -706,7 +706,7 @@ extension LMAssembly {
 
     // MARK: - 工具函式
 
-    private let prefs = PrefMgr()
+    private let prefs = PrefMgr.sharedSansDidSetOps
 
     /// 當 HashMap 過大時自動清理
     private func cleanupInputTokenHashMapIfNeeded() {

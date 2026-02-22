@@ -393,7 +393,7 @@ extension MainAssemblyTests {
         testSession.switchState(.ofAbortion())
         testClient.clear()
       }
-      PrefMgr().mostRecentInputMode = langMode.rawValue
+      PrefMgr.shared.mostRecentInputMode = langMode.rawValue
       #expect(testHandler.currentTypingMethod == .vChewingFactory)
       enterCodePointMode()
       #expect(testHandler.currentTypingMethod == .codePoint)

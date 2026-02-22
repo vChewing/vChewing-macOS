@@ -17,7 +17,7 @@ public final class SpeechSputnik: SpeechNarratorProtocol {
   public static var shared: SpeechSputnik = .init()
 
   public func refreshStatus() {
-    switch PrefMgr().readingNarrationCoverage {
+    switch PrefMgr.sharedSansDidSetOps.readingNarrationCoverage {
     case 1, 2: narrate("　") // 讓語音引擎提前預熱。
     default: clear()
     }

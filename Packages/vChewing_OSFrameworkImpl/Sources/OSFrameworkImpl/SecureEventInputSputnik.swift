@@ -28,6 +28,9 @@
 
     public let shared = SecureEventInputSputnik()
 
+    /// Legacy method: reads the entire IORegistry root properties and returns their `.description`.
+    /// - Warning: This is expensive — it serialises a huge dictionary into a multiline string.
+    ///   Prefer ``getSecureInputPIDs()`` for SecureInput PID lookups.
     public static func getIORegListResults() -> String? {
       // Don't generate results under any of the following situations:
       // - Hibernation / LoggedOut / SwitchedOut / ScreenSaver situations.
@@ -44,6 +47,34 @@
       guard statusSucceeded == KERN_SUCCESS else { return nil }
       guard let dict: [CFString: Any] = dict as? [CFString: Any] else { return nil }
       return dict.description
+    }
+
+    /// Efficiently extracts `kCGSSessionSecureInputPID` PIDs from the IORegistry root
+    /// by directly traversing the dictionary structure (typically `IOConsoleUsers` array),
+    /// avoiding the expensive `.description` serialisation of the entire IORegistry root.
+    public static func getSecureInputPIDs() -> [Int32] {
+      guard NSWorkspace.activationFlags.isEmpty else { return [] }
+      var resultDictionaryCF: Unmanaged<CFMutableDictionary>?
+      defer { resultDictionaryCF = nil }
+      let statusSucceeded = IORegistryEntryCreateCFProperties(
+        IORegistryGetRootEntry(0), &resultDictionaryCF, kCFAllocatorDefault, IOOptionBits(0)
+      )
+      guard statusSucceeded == KERN_SUCCESS else { return [] }
+      guard let dict = resultDictionaryCF?.takeRetainedValue() as? [String: Any] else { return [] }
+      var pids = [Int32]()
+      // IOConsoleUsers is the standard location for per-session SecureInput PIDs.
+      if let consoleUsers = dict["IOConsoleUsers"] as? [[String: Any]] {
+        for userEntry in consoleUsers {
+          if let pid = userEntry["kCGSSessionSecureInputPID"] as? Int, pid != 0 {
+            pids.append(Int32(pid))
+          }
+        }
+      }
+      // Fallback: also check the root level in case the structure varies.
+      if pids.isEmpty, let pid = dict["kCGSSessionSecureInputPID"] as? Int, pid != 0 {
+        pids.append(Int32(pid))
+      }
+      return pids
     }
 
     /// Find all non-system processes using the SecureEventInput.
@@ -64,18 +95,16 @@
     public static func getRunningSecureInputApps(abusersOnly: Bool = false)
       -> [Int32: NSRunningApplication] {
       var result = [Int32: NSRunningApplication]()
-      guard let rawData = getIORegListResults() else { return result }
-      rawData.enumerateLines { currentLine, _ in
-        guard currentLine.contains("kCGSSessionSecureInputPID") else { return }
-        guard let filteredNumStr = Int32(currentLine.filter("0123456789".contains)) else { return }
-        guard let matchedApp = NSRunningApplication(processIdentifier: filteredNumStr)
-        else { return }
-        guard matchedApp.bundleIdentifier != "com.apple.SecurityAgent" else { return }
-        guard !(matchedApp.isLoginWindowWithLockedScreenOrScreenSaver) else { return }
+      let pids = getSecureInputPIDs()
+      guard !pids.isEmpty else { return result }
+      for pid in pids {
+        guard let matchedApp = NSRunningApplication(processIdentifier: pid) else { continue }
+        guard matchedApp.bundleIdentifier != "com.apple.SecurityAgent" else { continue }
+        guard !(matchedApp.isLoginWindowWithLockedScreenOrScreenSaver) else { continue }
         if abusersOnly {
-          guard !matchedApp.isActive else { return }
+          guard !matchedApp.isActive else { continue }
         }
-        result[filteredNumStr] = matchedApp
+        result[pid] = matchedApp
       }
       return result
     }

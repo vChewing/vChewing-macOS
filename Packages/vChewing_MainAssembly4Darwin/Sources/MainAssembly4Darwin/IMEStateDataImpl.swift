@@ -83,9 +83,9 @@ extension IMEStateData {
       }
       neta.components(separatedBy: "-").forEach { subNeta in
         var subNeta = subNeta
-        if !PrefMgr().cassetteEnabled {
-          if PrefMgr().showHanyuPinyinInCompositionBuffer,
-             PrefMgr().alwaysShowTooltipTextsHorizontally || !InputSession.isVerticalTyping {
+        if !PrefMgr.shared.cassetteEnabled {
+          if PrefMgr.shared.showHanyuPinyinInCompositionBuffer,
+             PrefMgr.shared.alwaysShowTooltipTextsHorizontally || !InputSession.isVerticalTyping {
             // 恢復陰平標記->注音轉拼音->轉教科書式標調
             subNeta = Tekkon.restoreToneOneInPhona(target: subNeta)
             subNeta = Tekkon.cnvPhonaToHanyuPinyin(targetJoined: subNeta)
@@ -160,7 +160,7 @@ extension IMEStateData {
       )
     }
     tooltip = tooltipForMarking
-    if PrefMgr().phraseReplacementEnabled {
+    if PrefMgr.shared.phraseReplacementEnabled {
       tooltipColorState = .warning
       tooltip +=
         "\n"

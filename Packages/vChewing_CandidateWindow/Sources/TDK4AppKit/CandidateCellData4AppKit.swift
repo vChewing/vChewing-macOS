@@ -47,7 +47,7 @@ extension TDK4AppKit {
       return paraStyle
     }()
 
-    static var internalPrefs = PrefMgr()
+    static var internalPrefs = PrefMgr.sharedSansDidSetOps
 
     static var unifiedSize: Double { internalPrefs.candidateListTextSize }
 

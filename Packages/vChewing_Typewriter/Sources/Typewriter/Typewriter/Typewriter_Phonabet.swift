@@ -434,7 +434,7 @@ extension PhonabetTypewriter {
 
     init(pref: (any PrefMgrProtocol)? = nil) {
       self = .init(
-        rawValue: (pref ?? PrefMgr()).specifyIntonationKeyBehavior
+        rawValue: (pref ?? PrefMgr.sharedSansDidSetOps).specifyIntonationKeyBehavior
       ) ?? .overridePreviousPosIntonationWithCandidateReset
     }
 

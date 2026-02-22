@@ -13,7 +13,7 @@ import Testing
 /// PrefMgr().dumpShellScriptBackup()
 @Test
 func testDumpedPrefs() async throws {
-  let prefs = PrefMgr()
+  let prefs = PrefMgr.sharedSansDidSetOps
   let fetched = prefs.dumpShellScriptBackup() ?? ""
   #expect(!fetched.isEmpty)
 }

@@ -193,7 +193,7 @@ public final class PopupCompositionBuffer: NSWindowController, PCBProtocol {
     }
   }
 
-  private let prefs = PrefMgr()
+  private let prefs = PrefMgr.sharedSansDidSetOps
 
   private let compositionView: PopupCompositionView
   private let visualEffectView: NSView?
