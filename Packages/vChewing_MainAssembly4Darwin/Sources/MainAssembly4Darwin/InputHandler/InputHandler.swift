@@ -29,7 +29,7 @@ public final class InputHandler: @MainActor InputHandlerProtocol {
     self.errorCallback = errorCallback
     self.filterabilityChecker = filterabilityChecker
     self.notificationCallback = notificationCallback
-    /// 組字器初期化。因為是首次初期化變數，所以這裡不能用 ensureCompositor() 代勞。
+    /// 組字器初期化。
     self.assembler = Assembler(with: currentLM, separator: "-")
     /// 同步組字器單個詞的幅節長度上限。
     assembler.maxSegLength = prefs.maxCandidateLength

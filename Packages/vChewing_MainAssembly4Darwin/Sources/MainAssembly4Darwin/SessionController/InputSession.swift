@@ -150,14 +150,25 @@ public final class InputSession: @MainActor SessionProtocol, Sendable {
   }
 
   public func initInputHandler() {
-    inputHandler = InputHandler(
-      lm: inputMode.langModel,
-      pref: PrefMgr.shared,
-      errorCallback: callError,
-      filterabilityChecker: LMMgr.isStateDataFilterableForMarked,
-      notificationCallback: Notifier.notify,
-      pomSaveCallback: { LMMgr.savePerceptionOverrideModelData(false) }
-    )
+    if let inputHandler {
+      inputHandler.currentLM = inputMode.langModel
+      inputHandler.prefs = PrefMgr.shared
+      inputHandler.errorCallback = callError
+      inputHandler.filterabilityChecker = LMMgr.isStateDataFilterableForMarked
+      inputHandler.notificationCallback = Notifier.notify
+      inputHandler.pomSaveCallback = { LMMgr.savePerceptionOverrideModelData(false) }
+      inputHandler.assembler.maxSegLength = prefs.maxCandidateLength
+      inputHandler.ensureKeyboardParser()
+    } else {
+      inputHandler = InputHandler(
+        lm: inputMode.langModel,
+        pref: PrefMgr.shared,
+        errorCallback: callError,
+        filterabilityChecker: LMMgr.isStateDataFilterableForMarked,
+        notificationCallback: Notifier.notify,
+        pomSaveCallback: { LMMgr.savePerceptionOverrideModelData(false) }
+      )
+    }
     inputHandler?.session = self
   }
 
