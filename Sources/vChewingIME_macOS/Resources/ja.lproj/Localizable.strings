@@ -1,12 +1,12 @@
 "- Succeeded in nerfing a candidate." = "- 指定された文字候補の優先順位を下げました。";
-"- Succeeded in nerfing a user phrase." = "- この語彙の（候補としての）優先順位を下げました。";
-"- Succeeded in unfiltering a phrase." = "- この語彙は排除リストから外しました。";
+"- Succeeded in nerfing a user phrase." = "- この文節の（候補としての）優先順位を下げました。";
+"- Succeeded in unfiltering a phrase." = "- この文節は排除リストから外しました。";
 "! Succeeded in filtering a candidate." = "! 指定された文字候補は排除リストに登録しました。";
-"! Succeeded in filtering a user phrase." = "! この語彙は排除リストに登録完了。";
+"! Succeeded in filtering a user phrase." = "! この文節は排除リストに登録完了。";
 "(Shift+)Space:" = "(Shift+)Space:";
 "[Technical Reason] macOS releases earlier than 10.13 have an issue: If calling NSOpenPanel directly from an input method, both the input method and its current client app hang in a dead-loop. Furthermore, it makes other apps hang in the same way when you switch into another app. If you don't want to hard-reboot your computer, your last resort is to use SSH to connect to your current computer from another computer and kill the input method process by Terminal commands. That's why vChewing cannot offer access to NSOpenPanel for macOS 10.12 and earlier." = "【技術上の原因説明】macOS 10.12 とそれ以前の macOS には、入力アプリが自ら NSOpenPanel を呼ぶと、入力アプリ自身も、全ての触れ合った客体アプリも、全部固まってしまう状態になります。こうなると、強引的にパソコン再起動や・或いは SSH で他のパソコンからこの入力アプリの強制停止が必要です。従って、弊アプリは macOS 10.12 とその以前の macOS には NSOpenPanel のアクセスの提供はできません。";
-"\"%@\" already exists:\n ENTER to boost, SHIFT+COMMAND+ENTER to nerf, \n BackSpace or Delete key to exclude." = "「%@」は既存語彙：\n　ENTER で最優先にし、SHIFT+COMMAND+ENTER で優先順位を下げる；\n　BackSpace 或いは Delete で排除。";
-"\"%@\" already exists:\n ENTER to boost, SHIFT+COMMAND+ENTER to nerf." = "「%@」は既存語彙：\n　ENTER で最優先にし、SHIFT+COMMAND+ENTER で優先順位を下げる。";
+"\"%@\" already exists:\n ENTER to boost, SHIFT+COMMAND+ENTER to nerf, \n BackSpace or Delete key to exclude." = "「%@」は既存文節：\n　ENTER で最優先にし、SHIFT+COMMAND+ENTER で優先順位を下げる；\n　BackSpace 或いは Delete で排除。";
+"\"%@\" already exists:\n ENTER to boost, SHIFT+COMMAND+ENTER to nerf." = "「%@」は既存文節：\n　ENTER で最優先にし、SHIFT+COMMAND+ENTER で優先順位を下げる。";
 "\"%@\" length must ≥ 2 for a user phrase." = "「%@」もう１つ文字のお選びを。";
 "\"%@\" length should ≤ %d for a user phrase." = "「%@」文字数過剰で登録不可、%d 文字以内にして下さい。";
 "\"%@\" selected. ENTER to add user phrase." = "「%@」を ENTER で辞書に登録。";
@@ -29,7 +29,7 @@
 "Adjust candidate window location according to current node length" = "カーソル所在位置の単語の長さによって候補陳列ウィンドウの位置を調整";
 "All strokes in the composition buffer will be shown as ASCII keyboard characters unless this option is enabled. Stroke is definable in the “%keyname” section of the CIN file." = "これをチェックしないと、全ての筆画は ASCII キーネームで入力緩衝列で表示してしまうことになる。CIN ファイルの「%keyname」というところで筆画の定義はできる。";
 "Allow backspace-editing miscomposed readings" = "効かぬ音読みを BackSpace で再編集";
-"Allow using Enter key to confirm associated candidate selection" = "Enter キーを連想語彙候補の確認のために使う";
+"Allow using Enter key to confirm associated candidate selection" = "Enter キーを連想文節候補の確認のために使う";
 "Alphanumerical Input Mode" = "英數入力モード";
 "Alphanumerical Layout:" = "英数キーボード:";
 "Also use “\\” or “¥” key for Hanin Keyboard Symbol Input" = "「\\」・「¥」キーでも漢音キーボード符号入力";
@@ -48,7 +48,7 @@
 "Apple Zhuyin Bopomofo (Dachen)" = "Apple 注音ボポモフォ（大千標準）";
 "Apple Zhuyin Eten (Traditional)" = "Apple 注音ボポモフォ（倚天伝統）";
 "Applying typing suggestions from perception override model" = "入力中で臨時記憶モジュールからお薦めの候補を自動的に選ぶ";
-"Associated Phrases" = "関連語彙モード";
+"Associated Phrases" = "関連文節モード";
 "at the rear of the phrase (like Microsoft New Phonetic)" = "単語の後で // Microsoft 新注音入力のやり方";
 "Auto-composite when the longest possible key is formed" = "最長可能キーができた場合、文字を組み立つ";
 "Auto-convert traditional Chinese glyphs to JIS Shinjitai characters" = "入力した繁体字を日文 JIS 新字体と自動変換";
@@ -143,7 +143,7 @@
 "Disassembling process does not work with non-phonetic reading keys." = "実の意味の音読みだけを解くことができる。";
 "Do you want to enable the popup composition buffer for this client?" = "この客体アプリに「吹き出し入力緩衝列ウィンドウ」を起用しますか？";
 "Due to security concerns, we don't consider implementing anything related to shell script execution here. An input method doing this without implementing App Sandbox will definitely have system-wide vulnerabilities, considering that its related UserDefaults are easily tamperable to execute malicious shell scripts. vChewing is designed to be invulnerable from this kind of attack. Also, official releases of vChewing are Sandboxed." = "セキュリティ上の懸念から、いかなるシェルスクリプトの実装も計画していません。App Sandbox の実装が無い場合には、関連する UserDefaults を容易に改ざんできることから、悪意のあるシェルスクリプトが実行される恐れがあり、従ってシステム全体に脆弱性を持つことは疑う余地がありません。唯音入力アプリの公式発行版は Sandbox 処理済みであり、そして唯音入力アプリは、このような脆弱性を持たないために、すでに（デザイン上の）安全処置済み。";
-"Edit Associated Phrases…" = "連想語彙を編集…";
+"Edit Associated Phrases…" = "連想文節を編集…";
 "Edit Excluded Phrases…" = "辞書条目排除リストを編集…";
 "Edit Phrase Replacement Table…" = "言葉置換表を編集…";
 "Edit User Symbol & Emoji Data…" = "ユーザー符号＆絵文字辞書を編集…";
@@ -188,7 +188,7 @@
 "i18n:aboutWindow.ABOUT_APP_TITLE_FULL" = "macOS 版唯音入力アプリについて";
 "i18n:aboutWindow.APP_NAME" = "vChewing for macOS";
 "i18n:aboutWindow.BUGREPORT_BUTTON" = "問題を報告";
-"i18n:aboutWindow.DEV_CREW" = "macOS 版唯音の開発：Shiki Suen, Isaac Xen, Hiraku Wang, など。\n唯音語彙データの維持：Shiki Suen。\nDAG-DP センテンス構築算法実作：Shiki Suen。";
+"i18n:aboutWindow.DEV_CREW" = "macOS 版唯音の開発：Shiki Suen, Isaac Xen, Hiraku Wang, など。\n唯音文節データの維持：Shiki Suen。\nDAG-DP センテンス構築算法実作：Shiki Suen。";
 "i18n:aboutWindow.DISCLAIMER_TEXT" = "補記：1) Megrez Compositor はバージョン4以降、LGPLv3ライセンスを使用していますが、Swift プロジェクトでの静的リンクは例外として許容します。2) 唯音入力アプリは、複数の外部リソースからのデータで構成される Vanguard Corpus を使用しており、これらのリソースはGitHubリポジトリ（`vChewing/libvchewing-data`）にクレジットされています。Vanguard Corpusのデータコンパイラは、3-Clause BSDライセンスでリリースします。";
 "i18n:aboutWindow.DONATION_MESSAGE" = "ご寄付をご検討ください。関連情報：https://vChewing.github.io";
 "i18n:aboutWindow.LICENSE_TITLE" = "ＭＩＴ商標不許可ライセンス (MIT-NTL License):";
@@ -236,7 +236,7 @@
 "i18n:UserDef.kBeepSoundPreference.shortTitle" = "SFX";
 "i18n:UserDef.kBypassNonAppleCapsLockHandling.description" = "macOS 10.14 からのシステム内蔵機能としての同じ機能に影響しません。";
 "i18n:UserDef.kBypassNonAppleCapsLockHandling.shortTitle" = "唯音入力アプリの内蔵CapsLock処理を不使用";
-"i18n:UserDef.kCandidateNarrationToggleType.description" = "テキスト読み上げで候補を読み上げるタイミングを設定します。ハイライト済みの候補を耳で確認できます。同じ発音の候補が複数ある場合は、ユーザー連想語彙データベースを参照して各漢字の説明を試みます。精度はそのデータベースの品質に依存します。";
+"i18n:UserDef.kCandidateNarrationToggleType.description" = "テキスト読み上げで候補を読み上げるタイミングを設定します。ハイライト済みの候補を耳で確認できます。同じ発音の候補が複数ある場合は、ユーザー連想文節データベースを参照して各漢字の説明を試みます。精度はそのデータベースの品質に依存します。";
 "i18n:UserDef.kCandidateNarrationToggleType.option.alwaysOff" = "常にオフ";
 "i18n:UserDef.kCandidateNarrationToggleType.option.alwaysOn" = "常にオン";
 "i18n:UserDef.kCandidateNarrationToggleType.option.onlyWhenVoiceOverIsOn" = "VoiceOver がオンの時のみ";
@@ -303,7 +303,7 @@
 "i18n:UserDef.kSpecifyCmdOptCtrlEnterBehavior.option.2" = "中国語点字 (1947) を送出";
 "i18n:UserDef.kSpecifyCmdOptCtrlEnterBehavior.option.3" = "中国語点字 (GF0019-2018) を送出";
 "i18n:UserDef.kSpecifyCmdOptCtrlEnterBehavior.shortTitle" = "Command+Option+Ctrl+Enter:";
-"i18n:UserDef.kUserPhrasesDatabaseBypassed.description" = "これを有効にすると、ユーザー辞書フォルダ内の（関連語彙データ以外の）すべての編集可能なデータが無視されます。開発者が言葉の組み立てに関連する特定の悪質な故障が抑制されるかどうか（すなわち、そのユーザー辞書データに原因があるかどうか）を確認するために、有効化するよう依頼することがあります。";
+"i18n:UserDef.kUserPhrasesDatabaseBypassed.description" = "これを有効にすると、ユーザー辞書フォルダ内の（関連文節データ以外の）すべての編集可能なデータが無視されます。開発者が言葉の組み立てに関連する特定の悪質な故障が抑制されるかどうか（すなわち、そのユーザー辞書データに原因があるかどうか）を確認するために、有効化するよう依頼することがあります。";
 "i18n:UserDef.kUserPhrasesDatabaseBypassed.shortTitle" = "ユーザー辞書を無効化";
 "i18n:UserDef.kUseShiftQuestionToCallServiceMenu.shortTitle" = "候補陳列ウィンドウで「Shift+?」でもサービスメニューを呼出";
 "IBM" = "IBM 配列";
@@ -313,7 +313,7 @@
 "imeMenu.totalRAMUsed.labelHeader" = "[RAM使用量]";
 "in front of the phrase (like macOS built-in Zhuyin IME)" = "単語の前で // macOS 内蔵注音入力のやり方";
 "Initial" = "頭文字";
-"Inline comments are not supported in associated phrases." = "インラインメモは連想語彙辞書で使えません。";
+"Inline comments are not supported in associated phrases." = "インラインメモは連想文節辞書で使えません。";
 "Intonation Key:" = "音調キー:";
 "Intonation mark. ENTER to commit.\nSPACE to insert into composition buffer." = "音調記号。ENTER で送り出す。\nSPACE で入力緩衝列に挿入。";
 "Invalid Code Point." = "コードポイントは正しくない。";
@@ -358,7 +358,7 @@
 "Per-Char Select Mode" = "全候補入力モード";
 "Phonetic Parser:" = "注音配列:";
 "Phrase Editor" = "辞書編集";
-"Phrase" = "語彙";
+"Phrase" = "文節";
 "Please check the permission at \"%@\"." = "「%@」に書き出す権限は不足らしい。";
 "Please drag the apps into the Client Manager window from Finder." = "Finder からアプリをこのウィンドウに直接にドラッグしてください。";
 "Please drag the desired target from Finder to this place." = "ご指定したいものは直接に Finder からこの辺にドラッグを。";
@@ -419,7 +419,7 @@
 "The selected item is either not a valid macOS application bundle or not having a valid app bundle identifier." = "今選んだんのは正しい macOS アプリバンドルではないと考えられる。少なくとも、唯一識別子は検出できぬ。";
 "The selected item's identifier is already in the list." = "今選んだバンドルの唯一識別子（Bundle Identifier）は既に登録済みである。";
 "The user override model only possesses memories temporarily. Each memory record gradually becomes ineffective within approximately less than 6 days. You can erase all memory records through the input method menu." = "臨時記憶モジュールは文字の通り「臨時的」の記憶をします。記録は六日間どんどん忘れてしまいます。入力アプリのメニューから全ての記録を消すことはできます。";
-"theAssociates" = "関連語彙";
+"theAssociates" = "関連文節";
 "theFilter" = "排除リスト";
 "thePhrases" = "ユーザー辞書";
 "There is a bug in macOS 10.9, preventing an input method from accessing its own file panels. Doing so will result in eternal hang-crash of not only the input method but all client apps it tries attached to, requiring SSH connection to this computer to terminate the input method process by executing “killall vChewing”. Due to possible concerns of the same possible issue in macOS 10.10 and 10.11, we completely disabled this feature." = "システムの支障の話ですが、macOS 10.9 (恐らく 10.10 - 10.12 も) には下記のバグはございます：入力アプリは自分のファイル操作パネルをアクセススロと、その入力アプリだけでなく、あれから入力アプリの触り合おうとした全ての客体アプリも「無限のカタマリ」その無反応な状態になってしまいます。その場合、SSH でこのパソコンで「killall vChewing」そのターミナルコマンドを実行すれば、及ぼされた客体アプリの反応は戻ります。そのため、開発側は上記のシステムバージョンに応じて、自身のファイルパネルアクセスを全て禁止としました。";
