@@ -28,5 +28,5 @@ open class CandidateNode {
 
   public var name: String
   public var members: [CandidateNode]
-  public var previous: CandidateNode?
+  public weak var previous: CandidateNode?
 }
