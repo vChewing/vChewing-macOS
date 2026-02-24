@@ -59,6 +59,8 @@ public protocol SessionProtocol: AnyObject, IMKInputControllerProtocol, CtlCandi
   var synchronizer4LMPrefs: (() -> ())? { get set }
   /// 蜂鳴專用函式。
   var buzzer: (() -> ())? { get set }
+  /// 上次實際套用至 client 的鍵盤佈局名稱，用以跳過重複的 overrideKeyboard() 呼叫。
+  var lastAppliedKeyboardLayout: String? { get set }
 
   func initInputHandler()
 }
@@ -221,19 +223,18 @@ extension SessionProtocol {
   }
 
   /// 強制重設當前鍵盤佈局、使其與偏好設定同步。
+  /// 內部會比對目標佈局與上次實際套用的佈局，若相同則跳過 `overrideKeyboard()` 阻塞操作。
   public func setKeyLayout() {
+    let targetLayout: String =
+      (isASCIIMode && IMKHelper.isDynamicBasicKeyboardLayoutEnabled)
+        ? prefs.alphanumericalKeyboardLayout
+        : prefs.basicKeyboardLayout
+    guard targetLayout != lastAppliedKeyboardLayout else { return }
+    lastAppliedKeyboardLayout = targetLayout
     asyncOnMain(bypassAsync: UserDefaults.pendingUnitTests) { [weak self] in
       guard let this = self else { return }
       guard let client = this.client(), !this.isServingIMEItself else { return }
-      if this.isASCIIMode, IMKHelper.isDynamicBasicKeyboardLayoutEnabled {
-        client.overrideKeyboard(
-          withKeyboardNamed: this.prefs.alphanumericalKeyboardLayout
-        )
-        return
-      }
-      client.overrideKeyboard(
-        withKeyboardNamed: this.prefs.basicKeyboardLayout
-      )
+      client.overrideKeyboard(withKeyboardNamed: targetLayout)
     }
   }
 

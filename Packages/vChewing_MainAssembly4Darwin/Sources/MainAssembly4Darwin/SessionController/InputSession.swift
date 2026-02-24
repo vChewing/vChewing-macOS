@@ -95,6 +95,9 @@ public final class InputSession: @MainActor SessionProtocol, Sendable {
   /// 用來標記當前副本是否已處於活動狀態。
   public var isActivated: Bool = false
 
+  /// 上次實際套用至 client 的鍵盤佈局名稱，用以跳過重複的 overrideKeyboard() 呼叫。
+  public var lastAppliedKeyboardLayout: String?
+
   /// IMKInputController 副本。
   public weak var inputControllerAssigned: SessionCtl?
 
