@@ -1,0 +1,30 @@
+InputMethodKit 的一個堪稱陳年大糞的設計缺陷
+
+很多中文打字用戶，無論用原廠輸入法、還是任何一款副廠輸入法，都會有中英文混打的需求。
+十幾年前開始自從 macOS 10.12 Sierra 引入基於 CpLk 的中英文輸入法切換功能以來，這個問題到現在就都沒消停過。
+長久以來對此問題的討論往往歸咎於輸入法本身：要麼是在用的副廠輸入法本身被抱怨，要麼是原廠中文輸入法本身被抱怨。
+
+筆者按順序羅列這些事實。先講兩個技術層面的：
+
+- InputMethodKit 的 IMKInputController 所有 API 呼叫都是在 MainActor 上的。然而，因為 ObjC Header 層面曝露的 API 與 Swift Concurrency 不相容的緣故，如果你要給輸入法做 Swift Concurrency Modernization 的話，你需要一些 Dirty Trick 方便將這些 API 傳入的參數重新從 MainActor 強制解讀。
+- macOS 10.7 開始引入 Objective-C ARC。這套 ARC 系統對 NSObject 副本的析構時機不可控，你無法用手動介入的方式使其暫緩析構或重新利用。而 InputMethodKit 的 API 在設計時是針對 macOS 10.5 Leopard 設計的。這就帶來了一些與 ARC 有關的 MainActor 調度壓力問題（甚至阻塞）。下文會提到具體的問題情形。
+
+再來討論使用者打字場景上的事實：
+
+- macOS 10.12 的這個 CpLk 切換功能的本質不是中英文打字模式切換，而是輸入法切換。
+- macOS 哪怕英文打字也是由一個專門的輸入法負責的。大部分英語鍵盤的電腦上，這個輸入法叫 Apple ABC，對應美規鍵盤。
+- 每個輸入法在剛被切換出來時，會觸發這個輸入法自身的 IMKInputController Instance 的創建以及其 activateServer 操作（以及可能有的一系列追加操作）。然後才是這個 Client 之前對接的輸入法的 IMKInputController 副本的 Deactivation。
+- 很多中英文混合打字的用戶經常會在 ABC 與中文輸入法之間來回切換。由於這種情況下兩者所服務的 IMKTextInput Client 是相同的，所以就出現了 MainActor 塞車。而且，過於高頻的來回切換，會給 IMKInputController 所用的 Objective-C ARC 帶來壓力。ARC 廢件釋放與物件交互都發生在 MainActor 上，必然會發生塞車。
+- 「在同一個 client 切換輸入法」的過程會牽涉到前後兩個 IMKInputController 副本各自的對 client() 的操作。輸入法開發者現在最佳的範式就是讓 deactivateServer 在 MainActor 上 Async 脫手操作、且不在 deactivateServer 階段做 client() API 的文字寫入/內容顯示交互，因為這種擦除操作會由系統代勞。但是，這個由系統代勞的擦除操作也是發生在 MainActor 上的。這就出現了 MainActor 的任務的時序衝突。InputMethodKit 內部應該是有自己的方式處理這個衝突，然而代價就是阻塞開銷。
+- 有些輸入法難免會在 activateServer 階段引入與 client() 有關的交互，但這個開銷可能在所難免，因為你可能必須得對 client 套用指定的 Ukelele 佈局。再加上 client() 身為 IMKTextInput Client 沒有真正意義上的 Async API，輸入法開發者只能假設所有這類 Client 的這些操作都是 MainActor 阻塞操作，然後乾瞪眼。
+
+這就導致那些經常用 CpLk 超高頻中英切換打字的使用者們必然會罵娘。但他們不知道問題爛在系統層面，於是就只能罵輸入法。或罵系統內建注音爛，或罵自己在用的副廠輸入法不修故障。
+
+這個現狀恐怕真的沒有解決方法，要淘汰的是 macOS 的整個 InputMethodKit 體系。整個 API 交互體系都需要刮骨療毒重新設計。
+
+或者，自力救濟（下述幾條都很重要）：
+- 所有 macOS 中文用戶都請關掉以 CpLk（「中/英」鍵）切換中英文輸入法的特性，讓系統遵循 macOS 10.11 El Capitan 為止的 CpLk 行為。
+- 中文輸入法開發者們都請集體給自己的輸入法實裝 CpLk 英打模式。英打模式下的 Layout 同步問題也可以用 client().overrideKeyboard() 來解決，不過這是個阻塞操作。而且，如果接收打字的視窗是輸入法自己的視窗的話，務必 MainActor Async 執行 `client().overrideKeyboard()`，否則必然會卡死幾十秒。
+- IMKInputController Subclass 不要擁有任何物件。所有與打字有關的業務模組全部塞到 singleton 或者可以複用的 instance 裡面。instance 与 IMKInputController Subclass 之间可以使用其他通讯交互手段。
+
+P.S.: macOS 26 在 AppKit / InputMethodKit 的 NSObject Types 的 ARC 回收方面的效率低下之故障反而放大了這個問題。
