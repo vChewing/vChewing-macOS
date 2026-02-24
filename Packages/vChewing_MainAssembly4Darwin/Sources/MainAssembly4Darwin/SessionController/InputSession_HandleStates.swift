@@ -174,14 +174,18 @@ extension SessionProtocol {
   ///   警告：replacementRange 不要亂填，否則會在 Microsoft Office 等軟體內出現故障。
   ///   該功能是給某些想設計「重新組字」功能的輸入法設計的，但一字多音的漢語在注音/拼音輸入這方面不適用這個輸入法特性。
   public func doSetMarkedText(_ string: NSAttributedString, allowAsync: Bool = true) {
-    // 得複製一份，因為 NSAttributedString 不支援 Sendable 特性。
-    let newString = string.copy() as? NSAttributedString ?? .init(string: string.string)
+    let isRecentMarkEmpty = recentMarkedText.text?.string.isEmpty ?? true
+    if string.string.isEmpty, isRecentMarkEmpty {
+      // No-op.
+      return
+    }
     // 唯音用不到 replacementRange，所以不用檢查 replacementRange 的異動情況。
-    let range = selectionRange()
+    let range = attributedStringSecured.range
     guard !(string.isEqual(to: recentMarkedText.text) && recentMarkedText.selectionRange == range)
     else { return }
-    recentMarkedText.text = string
-    recentMarkedText.selectionRange = range
+    recentMarkedText = (string, range)
+    // 得複製一份，因為 NSAttributedString 不支援 Sendable 特性。
+    let newString = string.copy() as? NSAttributedString ?? .init(string: string.string)
     var async = allowAsync && !UserDefaults.pendingUnitTests
     async = async && (isServingIMEItself || !isActivated)
     asyncOnMain(bypassAsync: !async) { [weak self] in
