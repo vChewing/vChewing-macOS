@@ -21,7 +21,7 @@ import InputMethodKit
 /// - Warning: 該型別處於 MainActor。但不能用 Swift 的手段釘死在 MainActor 上。
 /// 原因在於 IMK 的 Headers 與 Modern Swift 不相容。只能使用傳統手段迂迴處理。
 @objc(SessionCtl) // 必須加上 ObjC，因為 IMK 是用 ObjC 寫的。
-public final class SessionCtl: IMKInputController, @unchecked Sendable {
+nonisolated public final class SessionCtl: IMKInputController, @unchecked Sendable {
   // MARK: Lifecycle
 
   /// 對用以設定委任物件的控制器型別進行初期化處理。
@@ -38,18 +38,40 @@ public final class SessionCtl: IMKInputController, @unchecked Sendable {
   ///   - delegate: 客體物件
   ///   - inputClient: 用以接受輸入的客體應用物件
   nonisolated override public init!(server: IMKServer!, delegate: Any!, client inputClient: Any!) {
+    // Note: Seems that this constuctor gets called everytime this IME gets switched to.
+    // This happens even if the client() is the same IMKTextInput instance.
     super.init(server: server, delegate: delegate, client: inputClient)
     mainSync {
-      _ = core // Force initialization.
+      self.core = callCoreAtLeastOnce() // Force initialization.
     }
   }
 
   // MARK: Public
 
-  public private(set) lazy var core: InputSession = .init(
-    controller: self,
-    client: { [weak self] in self?.client() as? InputSession.ClientObj }
-  )
+  @MainActor
+  public weak var core: InputSession?
+
+  // MARK: Private
+
+  nonisolated private func getClientProvider() -> (() -> InputSession.ClientObj?) {
+    { [weak self] in
+      self?.client() as? InputSession.ClientObj
+    }
+  }
+
+  nonisolated private func callCoreAtLeastOnce() -> InputSession {
+    mainSync {
+      // 嘗試從快取中複用既有的 InputSession，以緩解 CapsLock 頻繁切換場景下的 ARC 壓力。
+      // 參見 DevLab/InputMethodKitPhuquingRetarded.txt 內的分析。
+      if let clientObj = self.client() as? NSObject,
+         let cached = InputSession.cachedSession(for: clientObj) {
+        cached.reassign(to: self, clientProvider: getClientProvider())
+        vCLog("InputSession reused. ID: \(cached.id.uuidString)")
+        return cached
+      }
+      return InputSession(controller: self, client: getClientProvider())
+    }
+  }
 }
 
 // MARK: - IMKStateSetting 協定規定的方法
@@ -61,7 +83,7 @@ extension SessionCtl {
     // super.activateServer(sender) <- CONSIDERED_USELESS_WITH_TROUBLES
     let senderRef = wrap(sender)
     mainSync {
-      core.activateServer(unwrap(senderRef))
+      core?.activateServer(unwrap(senderRef))
     }
   }
 
@@ -70,7 +92,7 @@ extension SessionCtl {
   nonisolated override public func deactivateServer(_ sender: Any!) {
     let senderRef = wrap(sender)
     mainSync {
-      core.deactivateServer(unwrap(senderRef))
+      core?.deactivateServer(unwrap(senderRef))
     }
     // super.deactivateServer(sender) <- CONSIDERED_USELESS_WITH_TROUBLES
   }
@@ -86,7 +108,7 @@ extension SessionCtl {
     let valueRef = wrap(value)
     let senderRef = wrap(sender)
     mainSync {
-      core.setValue(
+      core?.setValue(
         unwrap(valueRef),
         forTag: tag,
         client: unwrap(senderRef)
@@ -115,7 +137,7 @@ extension SessionCtl {
     let senderRef = wrap(sender)
     return mainSync {
       let event = unwrap(eventRef) as? NSEvent
-      let result = core.handleNSEvent(event, client: unwrap(senderRef))
+      let result = core?.handleNSEvent(event, client: unwrap(senderRef)) ?? false
       if !result, PrefMgr.shared.isDebugModeEnabled {
         let stack = Thread.callStackSymbols.prefix(7).joined(separator: "\n")
         if let newEvent = event?.copyAsKBEvent {
@@ -140,7 +162,7 @@ extension SessionCtl {
   nonisolated override public func recognizedEvents(_ sender: Any!) -> Int {
     let senderRef = wrap(sender)
     return mainSync {
-      core.recognizedEvents(unwrap(senderRef))
+      core?.recognizedEvents(unwrap(senderRef)) ?? 0
     }
   }
 
@@ -152,7 +174,7 @@ extension SessionCtl {
     let senderRef = wrap(sender)
     asyncOnMain { [weak self] in
       guard let senderRef else { return }
-      self?.core.commitCompositionByOS(senderRef)
+      self?.core?.commitCompositionByOS(senderRef)
     }
     // `super.commitComposition(sender)` 這句不要引入，否則每次切出輸入法時都會死當。
   }
@@ -163,7 +185,7 @@ extension SessionCtl {
   nonisolated override public func composedString(_ sender: Any!) -> Any! {
     let senderRef = wrap(sender)
     return mainSync {
-      core.composedString(unwrap(senderRef))
+      core?.composedString(unwrap(senderRef))
     }
   }
 
@@ -172,21 +194,21 @@ extension SessionCtl {
   nonisolated override public func inputControllerWillClose() {
     // 防止尚未完成拼寫的注音內容被遞交出去。
     asyncOnMain { [weak self] in
-      self?.core.inputControllerWillClose()
+      self?.core?.inputControllerWillClose()
     }
   }
 
   /// 指定標記模式下被高亮的部分。
   nonisolated override public func selectionRange() -> NSRange {
     mainSync {
-      core.selectionRange()
+      core?.selectionRange() ?? .notFound
     }
   }
 
   /// 該函式僅用來取消任何輸入法浮動視窗的顯示。
   nonisolated override public func hidePalettes() {
     asyncOnMain { [weak self] in
-      self?.core.hidePalettes()
+      self?.core?.hidePalettes()
     }
   }
 
@@ -199,7 +221,7 @@ extension SessionCtl {
   @objc
   nonisolated override public func showPreferences(_: Any? = nil) {
     mainSync {
-      core.showPreferences(nil)
+      core?.showPreferences(nil)
     }
   }
 }

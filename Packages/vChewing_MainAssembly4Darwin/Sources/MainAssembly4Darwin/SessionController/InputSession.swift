@@ -20,6 +20,12 @@ public final class InputSession: @MainActor SessionProtocol, Sendable {
     self.theClient = inputClient
     self.inputControllerAssigned = inputController
     construct(client: theClient())
+    registerInCache()
+    vCLog("InputSession constructed. ID: \(id.uuidString)")
+  }
+
+  nonisolated deinit {
+    vCLog("InputSession deconstructing. ID: \(id.uuidString)")
   }
 
   // MARK: Public
@@ -52,6 +58,8 @@ public final class InputSession: @MainActor SessionProtocol, Sendable {
   }
 
   public let id: UUID = .init()
+
+  public var clientObjectIdentifier: ObjectIdentifier?
 
   public var buzzer: (() -> ())? = IMEApp.buzz
 
@@ -175,9 +183,36 @@ public final class InputSession: @MainActor SessionProtocol, Sendable {
     inputHandler?.session = self
   }
 
+  // MARK: Internal
+
+  /// 從快取中查詢既有的 InputSession（以 client NSObject 的記憶體位址為鍵）。
+  static func cachedSession(for clientObj: NSObject) -> InputSession? {
+    sessionsByClient.object(forKey: clientObj)
+  }
+
+  /// 將自身註冊至快取。首次建構 InputSession 時呼叫。
+  func registerInCache() {
+    guard let clientObj = theClient() else { return }
+    Self.sessionsByClient.setObject(self, forKey: clientObj)
+  }
+
+  /// 重新綁定至新的 SessionCtl（快取命中時使用）。
+  /// 僅更新控制器參照與 client 閉包，不重新建構打字模組。
+  func reassign(to controller: SessionCtl, clientProvider: @escaping () -> ClientObj?) {
+    inputControllerAssigned = controller
+    theClient = clientProvider
+  }
+
   // MARK: Private
 
   private static var _current: InputSession?
+
+  // MARK: - Session 快取 (緩解 CapsLock 高頻切換場景下的 ARC 壓力)
+
+  /// 弱鍵快取：將 client NSObject（弱引用）映射至 InputSession（強引用）。
+  /// 當 client 被 ARC 回收後，對應條目會在下次存取時自動清除。
+  /// - Remark: 參見 DevLab/InputMethodKitPhuquingRetarded.txt 內的分析。
+  private static var sessionsByClient = NSMapTable<NSObject, InputSession>.weakToStrongObjects()
 }
 
 extension InputSession {

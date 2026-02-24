@@ -28,6 +28,8 @@ public protocol SessionProtocol: AnyObject, IMKInputControllerProtocol, CtlCandi
   /// 用以存儲客體的 bundleIdentifier。
   /// 由於每次動態獲取都會耗時，所以這裡直接靜態記載之。
   var clientBundleIdentifier: String { get set }
+  /// 最近的 Client 的 ObjectID，以記憶體位址來辨識。
+  var clientObjectIdentifier: ObjectIdentifier? { get set }
   /// 當前客體應用是否採用 Web 技術構築（例：Electron）。
   var isClientElectronBased: Bool { get set }
   /// 共用的 NSAlert 副本、用於在輸入法切換失敗時提示使用者修改系統偏好設定。
@@ -65,9 +67,11 @@ public protocol SessionProtocol: AnyObject, IMKInputControllerProtocol, CtlCandi
   func initInputHandler()
 }
 
-extension SessionProtocol {
-  public typealias ClientObj = IMKTextInput & NSObjectProtocol
+nonisolated extension SessionProtocol {
+  public typealias ClientObj = IMKTextInput & NSObjectProtocol & NSObject
+}
 
+extension SessionProtocol {
   /// 記錄當前輸入環境是縱排輸入還是橫排輸入。
   public static var isVerticalTyping: Bool { Self.current?.isVerticalTyping ?? false }
 
@@ -252,6 +256,16 @@ extension SessionProtocol {
     // 選字窗不用管，交給新的 Session 的 ActivateServer 來管理。
   }
 
+  public func isStillTheSameClientObj(_ client: NSObject?) -> Bool {
+    guard let client else { return false }
+    return clientObjectIdentifier == .init(client)
+  }
+
+  public func updateClientObjectIdentifier(_ client: ClientObj?) {
+    guard let client else { return }
+    clientObjectIdentifier = .init(client)
+  }
+
   public func performServerActivation(client: ClientObj?) {
     // MARK: 快速路徑 — 最佳化 CapsLock 中英頻繁切換的場景。
 
@@ -274,6 +288,7 @@ extension SessionProtocol {
 
     hidePalettes()
     syncCurrentSessionID()
+    Self.current = self
     let this = self
     if let senderBundleID: String = client?.bundleIdentifier() {
       vCLog("activateServer(\(senderBundleID))")
@@ -297,6 +312,7 @@ extension SessionProtocol {
             .isElectronBasedApp(identifier: senderBundleID)
       }
     }
+    this.updateClientObjectIdentifier(client)
     // 自動啟用肛塞（廉恥模式），除非這一天是愚人節。
     // Date.isTodayTheDate 會建立 DateFormatter，延遲處理以避免阻塞。
     asyncOnMain(bypassAsync: UserDefaults.pendingUnitTests) { [weak self] in
