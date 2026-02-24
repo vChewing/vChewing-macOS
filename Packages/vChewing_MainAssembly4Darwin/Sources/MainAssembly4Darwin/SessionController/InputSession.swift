@@ -188,7 +188,9 @@ extension InputSession {
   /// - Parameter sender: 呼叫了該函式的客體（無須使用）。
   public func deactivateServer(_ sender: Any!) {
     _ = sender
-    performServerDeactivation()
+    asyncOnMain { [weak self] in
+      self?.performServerDeactivation()
+    }
   }
 
   public func value(forTag tag: Int, client sender: Any!) -> Any! {
