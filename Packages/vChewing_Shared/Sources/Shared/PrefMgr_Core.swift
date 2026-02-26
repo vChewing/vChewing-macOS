@@ -110,6 +110,12 @@ public final class PrefMgr: PrefMgrProtocol, Sendable {
   @AppProperty(key: UserDef.kUseExternalFactoryDict.rawValue, defaultValue: false)
   public var useExternalFactoryDict: Bool
 
+  @AppProperty(
+    key: UserDef.kReplaceSymbolMenuNodeWithUserSuppliedData.rawValue,
+    defaultValue: true
+  )
+  public var replaceSymbolMenuNodeWithUserSuppliedData: Bool
+
   @AppProperty(key: UserDef.kCassettePath.rawValue, defaultValue: "")
   public var cassettePath: String
 

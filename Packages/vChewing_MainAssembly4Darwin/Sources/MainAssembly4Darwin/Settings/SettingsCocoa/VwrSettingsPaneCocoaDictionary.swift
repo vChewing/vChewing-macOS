@@ -82,6 +82,7 @@ extension SettingsPanesCocoa {
                 renderable.currentControl?.target = self
                 renderable.currentControl?.action = #selector(self.lmmgrConnectCoreDB(_:))
               }
+              UserDef.kReplaceSymbolMenuNodeWithUserSuppliedData.render(fixWidth: innerContentWidth)
               UserDef.kPhraseReplacementEnabled.render(fixWidth: innerContentWidth) { renderable in
                 renderable.currentControl?.target = self
                 renderable.currentControl?

@@ -16,6 +16,7 @@ nonisolated public enum UserDef: String, CaseIterable, Identifiable {
   case kIsDebugModeEnabled = "_DebugMode"
   case kFailureFlagForPOMObservation = "_FailureFlag_POMObservation"
   case kUserPhrasesDatabaseBypassed = "UserPhrasesDatabaseBypassed"
+  case kReplaceSymbolMenuNodeWithUserSuppliedData = "ReplaceSymbolMenuNodeWithUserSuppliedData"
   case kCandidateServiceMenuContents = "CandidateServiceMenuContents"
   case kRespectClientAccentColor = "RespectClientAccentColor"
   case kAlwaysUsePCBWithElectronBasedClients = "AlwaysUsePCBWithElectronBasedClients"
@@ -180,6 +181,7 @@ extension UserDef {
     case .kIsDebugModeEnabled: return .bool
     case .kFailureFlagForPOMObservation: return .bool
     case .kUserPhrasesDatabaseBypassed: return .bool
+    case .kReplaceSymbolMenuNodeWithUserSuppliedData: return .bool
     case .kCandidateServiceMenuContents: return .dictionary
     case .kRespectClientAccentColor: return .bool
     case .kAlwaysUsePCBWithElectronBasedClients: return .bool
@@ -292,6 +294,10 @@ extension UserDef {
     case .kUserPhrasesDatabaseBypassed: return .init(
         userDef: self, shortTitle: "i18n:UserDef.kUserPhrasesDatabaseBypassed.shortTitle",
         description: "i18n:UserDef.kUserPhrasesDatabaseBypassed.description"
+      )
+    case .kReplaceSymbolMenuNodeWithUserSuppliedData: return .init(
+        userDef: self, shortTitle: "i18n:UserDef.kReplaceSymbolMenuNodeWithUserSuppliedData.shortTitle",
+        description: "i18n:UserDef.kReplaceSymbolMenuNodeWithUserSuppliedData.description"
       )
     case .kCandidateServiceMenuContents: return nil
     case .kRespectClientAccentColor: return .init(

@@ -148,6 +148,9 @@ public struct VwrSettingsPaneDictionary: View {
               LMMgr.syncLMPrefs()
             }
           ).render()
+          UserDef.kReplaceSymbolMenuNodeWithUserSuppliedData.bind(
+            $replaceSymbolMenuNodeWithUserSuppliedData
+          ).render()
           UserDef.kPhraseReplacementEnabled.bind(
             $phraseReplacementEnabled.didChange {
               LMMgr.syncLMPrefs()
@@ -229,6 +232,9 @@ public struct VwrSettingsPaneDictionary: View {
 
   @AppStorage(wrappedValue: false, UserDef.kUseExternalFactoryDict.rawValue)
   private var useExternalFactoryDict: Bool
+
+  @AppStorage(wrappedValue: true, UserDef.kReplaceSymbolMenuNodeWithUserSuppliedData.rawValue)
+  public var replaceSymbolMenuNodeWithUserSuppliedData: Bool
 
   @AppStorage(wrappedValue: false, UserDef.kCNS11643Enabled.rawValue)
   private var cns11643Enabled: Bool

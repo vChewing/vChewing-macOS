@@ -10,10 +10,10 @@ import Foundation
 
 extension CandidateNode {
   public static func load(url: URL? = nil) {
-    guard let url, url.isFileURL else {
-      Self.root = defaultSymbolRoot
-      return
+    if root.members.isEmpty {
+      Self.factoryRoot = defaultSymbolRoot
     }
+    guard let url, url.isFileURL else { return }
     asyncOnMain {
       // 這兩個變數單獨拿出來，省得每次都重建還要浪費算力。
       var arrLines = [String.SubSequence]()
@@ -37,9 +37,12 @@ extension CandidateNode {
           default: break
           }
         }
-        Self.root = arrMembers.isEmpty ? defaultSymbolRoot : .init(name: "/", members: arrMembers)
+        Self.userSupplied = arrMembers.isEmpty ? defaultSymbolRoot : .init(
+          name: catUserSymbols,
+          members: arrMembers
+        )
       } catch {
-        Self.root = defaultSymbolRoot
+        Self.userSupplied = nil
       }
     }
   }
@@ -71,6 +74,7 @@ extension CandidateNode {
   static let catMusicSymbols = "catMusicSymbols".i18n
   static let catThai = "catThai".i18n
   static let catYi = "catYi".i18n
+  static let catUserSymbols = "……" // 暫時不做本地化。
 
   static func strCountStrokes(_ count: Int) -> String {
     String(format: "%@-Stroke".i18n, count.kanji)

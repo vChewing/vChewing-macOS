@@ -24,9 +24,34 @@ open class CandidateNode {
 
   // MARK: Public
 
-  public static var root: CandidateNode = .init(name: "/")
+  public static var factoryRoot: CandidateNode = .init(name: "/")
+  public static var userSupplied: CandidateNode?
+
+  public static var root: CandidateNode {
+    let merge = !PrefMgr.sharedSansDidSetOps.replaceSymbolMenuNodeWithUserSuppliedData
+    if merge != shouldMerge {
+      cachedFinalRoot = nil
+      shouldMerge = merge
+    }
+    return makeRootNodeUsingCurrentSettings()
+  }
 
   public var name: String
   public var members: [CandidateNode]
   public weak var previous: CandidateNode?
+
+  // MARK: Private
+
+  private static var shouldMerge = PrefMgr.sharedSansDidSetOps.replaceSymbolMenuNodeWithUserSuppliedData
+  private static var cachedFinalRoot: CandidateNode?
+
+  private static func makeRootNodeUsingCurrentSettings() -> CandidateNode {
+    guard let userSupplied else { return factoryRoot }
+    guard shouldMerge else { return userSupplied }
+    return CandidateNode(
+      name: "/",
+      members: factoryRoot.members + [userSupplied],
+      previous: nil
+    )
+  }
 }

@@ -279,6 +279,8 @@
 "i18n:UserDef.kReadingNarrationCoverage.shortTitle" = "音読組立の朗読";
 "i18n:UserDef.kReducePOMLifetimeToNoMoreThan12Hours.description" = "有効にすると、臨時記憶モジュールの忘却サイクルが約1週間から12時間以内に短縮され、使用頻度の低いメモリレコードがより迅速にクリアされます。";
 "i18n:UserDef.kReducePOMLifetimeToNoMoreThan12Hours.shortTitle" = "急速忘却モードを有効にする";
+"i18n:UserDef.kReplaceSymbolMenuNodeWithUserSuppliedData.description" = "修飾キーなしで[符号メニューキー]を単打すると階層符号メニューが表示されます。この機能を有効にすると、符号メニューにはユーザー辞書フォルダに任意で配置可能な `symbols.dat`（酷音符号データファイル形式に準拠）の内容のみが表示されます。この機能をオフにすると、ユーザー提供の内容はデフォルトの符号メニューのルートノードの末尾サブノードとして追加されます。";
+"i18n:UserDef.kReplaceSymbolMenuNodeWithUserSuppliedData.shortTitle" = "階層符号メニューの内容全体をユーザー提供の `symbols.dat` データで置き換える";
 "i18n:UserDef.kRespectClientAccentColor.description" = "これで田所候補陳列ウィンドウの「選択中の候補の背景色」を「今が文字入力を受けている客体アプリのアクセントカラー」と一致することになる。もしその客体アプリ自体のアクセントカラーが未指定であり、あるいはシステムのアクセントカラーがデフォルト値ではないのなら、システム設定でのアクセントカラーに準ず。１つ例外状況：JIS / 康熙字体変換モードがONの場合、このチェックは効かぬ。";
 "i18n:UserDef.kRespectClientAccentColor.shortTitle" = "客体アプリ・システムのアクセントカラーに準ず";
 "i18n:UserDef.kRomanNumeralOutputFormat.description" = "ローマ数字打込モードは [Opt]+[符号メニューキー] を使用中に打込方式を切り替えるときに有効にすることができ、[1, 3999] の閉区間内の整数をサポートしています。出力が成功したか失敗したかにかかわらず、このモードは自動的にオフになります。";
