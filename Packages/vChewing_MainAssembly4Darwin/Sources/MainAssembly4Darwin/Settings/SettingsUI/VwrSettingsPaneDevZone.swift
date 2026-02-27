@@ -12,88 +12,33 @@ import SwiftUI
 
 @available(macOS 14, *)
 public struct VwrSettingsPaneDevZone: View {
-  // MARK: Public
-
   // MARK: - Main View
 
   public var body: some View {
-    NavigationStack {
-      Form {
-        Section {
-          UserDef.kSecurityHardenedCompositionBuffer
-            .bind($securityHardenedCompositionBuffer)
-            .render()
-          UserDef.kAlwaysUsePCBWithElectronBasedClients
-            .bind($alwaysUsePCBWithElectronBasedClients)
-            .render()
-          UserDef.kDisableSegmentedThickUnderlineInMarkingModeForManagedClients
-            .bind($disableSegmentedThickUnderlineInMarkingModeForManagedClients)
-            .render()
-        } header: {
-          Text(
-            "Warning: This page is for testing future features. \nFeatures listed here may not work as expected."
-          )
-        }
-        Section {
-          UserDef.kCheckAbusersOfSecureEventInputAPI
-            .bind($checkAbusersOfSecureEventInputAPI)
-            .render()
-          UserDef.kUserPhrasesDatabaseBypassed
-            .bind($bypassNonAppleCapsLockHandling)
-            .render()
-          UserDef.kAllowRescoringSingleKanjiCandidates.bind($allowRescoringSingleKanjiCandidates)
-            .render()
-        } footer: {
-          Text("Some previous options are moved to other tabs.".i18n)
-            .settingsDescription()
-        }
-      }.formStyled()
-    }
-    .frame(
-      minWidth: CtlSettingsUI.formWidth,
-      maxHeight: CtlSettingsUI.contentMaxHeight
-    )
+    Form {
+      Section {
+        UserDef.kSecurityHardenedCompositionBuffer.renderUI()
+        UserDef.kAlwaysUsePCBWithElectronBasedClients.renderUI()
+        UserDef.kDisableSegmentedThickUnderlineInMarkingModeForManagedClients.renderUI()
+      } header: {
+        Text(
+          "Warning: This page is for testing future features. \nFeatures listed here may not work as expected."
+        )
+      }
+      Section {
+        UserDef.kCheckAbusersOfSecureEventInputAPI.renderUI()
+        UserDef.kUserPhrasesDatabaseBypassed.renderUI()
+        UserDef.kAllowRescoringSingleKanjiCandidates.renderUI()
+      } footer: {
+        Text("Some previous options are moved to other tabs.".i18n)
+          .settingsDescription()
+      }
+    }.formStyled()
+      .frame(
+        minWidth: CtlSettingsUI.formWidth,
+        maxHeight: CtlSettingsUI.contentMaxHeight
+      )
   }
-
-  // MARK: Private
-
-  // MARK: - AppStorage Variables
-
-  @AppStorage(
-    wrappedValue: false,
-    UserDef.kAllowRescoringSingleKanjiCandidates.rawValue
-  )
-  private var allowRescoringSingleKanjiCandidates: Bool
-
-  @AppStorage(
-    wrappedValue: false,
-    UserDef.kBypassNonAppleCapsLockHandling.rawValue
-  )
-  private var bypassNonAppleCapsLockHandling: Bool
-
-  @AppStorage(
-    wrappedValue: false,
-    UserDef.kDisableSegmentedThickUnderlineInMarkingModeForManagedClients.rawValue
-  )
-  private var disableSegmentedThickUnderlineInMarkingModeForManagedClients: Bool
-
-  @AppStorage(
-    wrappedValue: false,
-    UserDef.kSecurityHardenedCompositionBuffer.rawValue
-  )
-  private var securityHardenedCompositionBuffer: Bool
-
-  @AppStorage(
-    wrappedValue: true,
-    UserDef.kAlwaysUsePCBWithElectronBasedClients.rawValue
-  )
-  private var alwaysUsePCBWithElectronBasedClients: Bool
-
-  @AppStorage(
-    wrappedValue: true,
-    UserDef.kCheckAbusersOfSecureEventInputAPI.rawValue
-  )
-  private var checkAbusersOfSecureEventInputAPI: Bool
 }
 
 // MARK: - VwrSettingsPaneDevZone_Previews

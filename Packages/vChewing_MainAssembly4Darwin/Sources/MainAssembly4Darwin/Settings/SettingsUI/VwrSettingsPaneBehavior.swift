@@ -12,155 +12,69 @@ import SwiftUI
 
 @available(macOS 14, *)
 public struct VwrSettingsPaneBehavior: View {
-  // MARK: - AppStorage Variables
-
-  @AppStorage(wrappedValue: 2, UserDef.kBeepSoundPreference.rawValue)
-  private var kBeepSoundPreference: Int
-
-  @AppStorage(wrappedValue: true, UserDef.kChooseCandidateUsingSpace.rawValue)
-  private var chooseCandidateUsingSpace: Bool
-
-  @AppStorage(wrappedValue: true, UserDef.kEscToCleanInputBuffer.rawValue)
-  private var escToCleanInputBuffer: Bool
-
-  @AppStorage(wrappedValue: true, UserDef.kAcceptLeadingIntonations.rawValue)
-  private var acceptLeadingIntonations: Bool
-
-  @AppStorage(wrappedValue: 0, UserDef.kSpecifyIntonationKeyBehavior.rawValue)
-  private var specifyIntonationKeyBehavior: Int
-
-  @AppStorage(wrappedValue: 0, UserDef.kSpecifyShiftBackSpaceKeyBehavior.rawValue)
-  private var specifyShiftBackSpaceKeyBehavior: Int
-
-  @AppStorage(wrappedValue: false, UserDef.kSpecifyShiftTabKeyBehavior.rawValue)
-  private var specifyShiftTabKeyBehavior: Bool
-
-  @AppStorage(wrappedValue: false, UserDef.kSpecifyShiftSpaceKeyBehavior.rawValue)
-  private var specifyShiftSpaceKeyBehavior: Bool
-
-  @AppStorage(wrappedValue: 0, UserDef.kSpecifyCmdOptCtrlEnterBehavior.rawValue)
-  private var specifyCmdOptCtrlEnterBehavior: Int
-
-  @AppStorage(wrappedValue: true, UserDef.kUseSpaceToCommitHighlightedSCPCCandidate.rawValue)
-  private var useSpaceToCommitHighlightedSCPCCandidate: Bool
-
-  @AppStorage(wrappedValue: false, UserDef.kAlsoConfirmAssociatedCandidatesByEnter.rawValue)
-  private var alsoConfirmAssociatedCandidatesByEnter: Bool
-
-  @AppStorage(wrappedValue: true, UserDef.kTogglingAlphanumericalModeWithLShift.rawValue)
-  private var togglingAlphanumericalModeWithLShift: Bool
-
-  @AppStorage(wrappedValue: true, UserDef.kTogglingAlphanumericalModeWithRShift.rawValue)
-  private var togglingAlphanumericalModeWithRShift: Bool
-
-  @AppStorage(wrappedValue: 0, UserDef.kUpperCaseLetterKeyBehavior.rawValue)
-  private var upperCaseLetterKeyBehavior: Int
-
-  @AppStorage(wrappedValue: 0, UserDef.kNumPadCharInputBehavior.rawValue)
-  private var numPadCharInputBehavior: Int
-
-  @AppStorage(wrappedValue: false, UserDef.kAlwaysShowTooltipTextsHorizontally.rawValue)
-  private var alwaysShowTooltipTextsHorizontally: Bool
-
-  @AppStorage(wrappedValue: true, UserDef.kShowNotificationsWhenTogglingCapsLock.rawValue)
-  private var showNotificationsWhenTogglingCapsLock: Bool
-
-  @AppStorage(wrappedValue: true, UserDef.kShowNotificationsWhenTogglingEisu.rawValue)
-  private var showNotificationsWhenTogglingEisu: Bool
-
-  @AppStorage(wrappedValue: true, UserDef.kShowNotificationsWhenTogglingShift.rawValue)
-  private var showNotificationsWhenTogglingShift: Bool
-
-  @AppStorage(wrappedValue: 0, UserDef.kSpecifiedNotifyUIColorScheme.rawValue)
-  private var specifiedNotifyUIColorScheme: Int
-
-  @AppStorage(wrappedValue: false, UserDef.kShareAlphanumericalModeStatusAcrossClients.rawValue)
-  private var shareAlphanumericalModeStatusAcrossClients: Bool
-
-  @AppStorage(wrappedValue: true, UserDef.kShiftEisuToggleOffTogetherWithCapsLock.rawValue)
-  public var shiftEisuToggleOffTogetherWithCapsLock: Bool
-
-  @AppStorage(wrappedValue: false, UserDef.kBypassNonAppleCapsLockHandling.rawValue)
-  public var bypassNonAppleCapsLockHandling: Bool
-
   // MARK: - Main View
 
   public var body: some View {
-    NavigationStack {
-      Form {
-        Section {
-          UserDef.kSpecifiedNotifyUIColorScheme
-            .bind($specifiedNotifyUIColorScheme).render()
-          UserDef.kShowNotificationsWhenTogglingCapsLock
-            .bind($showNotificationsWhenTogglingCapsLock).render()
-          UserDef.kShowNotificationsWhenTogglingEisu
-            .bind($showNotificationsWhenTogglingEisu).render()
-          UserDef.kShowNotificationsWhenTogglingShift
-            .bind($showNotificationsWhenTogglingShift).render()
-          UserDef.kAlwaysShowTooltipTextsHorizontally.bind($alwaysShowTooltipTextsHorizontally)
-            .render()
-            .disabled(Bundle.main.preferredLocalizations[0] == "en")
-          UserDef.kBeepSoundPreference.bind($kBeepSoundPreference).render()
-        }
+    Form {
+      Section {
+        UserDef.kSpecifiedNotifyUIColorScheme.renderUI()
+        UserDef.kShowNotificationsWhenTogglingCapsLock.renderUI()
+        UserDef.kShowNotificationsWhenTogglingEisu.renderUI()
+        UserDef.kShowNotificationsWhenTogglingShift.renderUI()
+        UserDef.kAlwaysShowTooltipTextsHorizontally.renderUI()
+          .disabled(Bundle.main.preferredLocalizations[0] == "en")
+        UserDef.kBeepSoundPreference.renderUI()
+      }
 
-        Section {
-          UserDef.kChooseCandidateUsingSpace.bind($chooseCandidateUsingSpace).render()
-          UserDef.kEscToCleanInputBuffer.bind($escToCleanInputBuffer).render()
-          UserDef.kAlsoConfirmAssociatedCandidatesByEnter
-            .bind($alsoConfirmAssociatedCandidatesByEnter).render()
-          UserDef.kSpecifyShiftBackSpaceKeyBehavior.bind($specifyShiftBackSpaceKeyBehavior).render()
-          UserDef.kSpecifyShiftTabKeyBehavior.bind($specifyShiftTabKeyBehavior).render()
-            .pickerStyle(RadioGroupPickerStyle())
-          UserDef.kSpecifyCmdOptCtrlEnterBehavior.bind($specifyCmdOptCtrlEnterBehavior).render()
-          VStack(alignment: .leading) {
-            UserDef.kSpecifyShiftSpaceKeyBehavior.bind($specifyShiftSpaceKeyBehavior).render()
-            UserDef.kUseSpaceToCommitHighlightedSCPCCandidate
-              .bind($useSpaceToCommitHighlightedSCPCCandidate).render()
+      Section {
+        UserDef.kChooseCandidateUsingSpace.renderUI()
+        UserDef.kEscToCleanInputBuffer.renderUI()
+        UserDef.kAlsoConfirmAssociatedCandidatesByEnter.renderUI()
+        UserDef.kSpecifyShiftBackSpaceKeyBehavior.renderUI()
+        UserDef.kSpecifyShiftTabKeyBehavior.renderUI()
+          .pickerStyle(RadioGroupPickerStyle())
+        UserDef.kSpecifyCmdOptCtrlEnterBehavior.renderUI()
+        VStack(alignment: .leading) {
+          UserDef.kSpecifyShiftSpaceKeyBehavior.renderUI()
+          UserDef.kUseSpaceToCommitHighlightedSCPCCandidate.renderUI()
+        }
+      }
+
+      Section {
+        UserDef.kUpperCaseLetterKeyBehavior.renderUI()
+        UserDef.kNumPadCharInputBehavior.renderUI()
+      }
+
+      Section {
+        UserDef.kSpecifyIntonationKeyBehavior.renderUI()
+        UserDef.kAcceptLeadingIntonations.renderUI()
+      }
+
+      Section {
+        UserDef.kBypassNonAppleCapsLockHandling.renderUI()
+        UserDef.kShareAlphanumericalModeStatusAcrossClients.renderUI()
+        VStack(alignment: .leading) {
+          UserDef.kTogglingAlphanumericalModeWithLShift.renderUI {
+            SessionUI.shared.resyncShiftKeyUpCheckerSettings()
           }
-        }
-
-        Section {
-          UserDef.kUpperCaseLetterKeyBehavior.bind($upperCaseLetterKeyBehavior).render()
-          UserDef.kNumPadCharInputBehavior.bind($numPadCharInputBehavior).render()
-        }
-
-        Section {
-          UserDef.kSpecifyIntonationKeyBehavior.bind($specifyIntonationKeyBehavior).render()
-          UserDef.kAcceptLeadingIntonations.bind($acceptLeadingIntonations).render()
-        }
-
-        Section {
-          UserDef.kBypassNonAppleCapsLockHandling.bind($bypassNonAppleCapsLockHandling).render()
-          UserDef.kShareAlphanumericalModeStatusAcrossClients
-            .bind($shareAlphanumericalModeStatusAcrossClients).render()
-          VStack(alignment: .leading) {
-            UserDef.kTogglingAlphanumericalModeWithLShift.bind(
-              $togglingAlphanumericalModeWithLShift.didChange {
-                SessionUI.shared.resyncShiftKeyUpCheckerSettings()
-              }
-            ).render()
-            UserDef.kTogglingAlphanumericalModeWithRShift.bind(
-              $togglingAlphanumericalModeWithRShift.didChange {
-                SessionUI.shared.resyncShiftKeyUpCheckerSettings()
-              }
-            ).render()
-            Spacer()
-            Group {
-              Text(" ") +
-                Text(LocalizedStringKey("This feature requires macOS \("10.15") and above."))
-                + Text(CtlSettingsUI.sentenceSeparator)
-                + Text("i18n:settings.shiftKeyASCIITogle.description".i18n)
-            }.settingsDescription()
+          UserDef.kTogglingAlphanumericalModeWithRShift.renderUI {
+            SessionUI.shared.resyncShiftKeyUpCheckerSettings()
           }
-          UserDef.kShiftEisuToggleOffTogetherWithCapsLock
-            .bind($shiftEisuToggleOffTogetherWithCapsLock).render()
+          Spacer()
+          Group {
+            Text(" ") +
+              Text(LocalizedStringKey("This feature requires macOS \("10.15") and above."))
+              + Text(CtlSettingsUI.sentenceSeparator)
+              + Text("i18n:settings.shiftKeyASCIITogle.description".i18n)
+          }.settingsDescription()
         }
-      }.formStyled()
-    }
-    .frame(
-      minWidth: CtlSettingsUI.formWidth,
-      maxHeight: CtlSettingsUI.contentMaxHeight
-    )
+        UserDef.kShiftEisuToggleOffTogetherWithCapsLock.renderUI()
+      }
+    }.formStyled()
+      .frame(
+        minWidth: CtlSettingsUI.formWidth,
+        maxHeight: CtlSettingsUI.contentMaxHeight
+      )
   }
 }
 

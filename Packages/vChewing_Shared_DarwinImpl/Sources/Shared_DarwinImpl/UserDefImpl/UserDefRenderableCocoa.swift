@@ -273,7 +273,7 @@ extension UserDefRenderableCocoa {
         btnPopup.setFrameSize(btnPopup.fittingSize)
         btnPopup.select(itemShouldBeChosen)
         return btnPopup
-      case .array, .dictionary, .other: return nil
+      case .arrayOfStrings, .dictionary: return nil
       default: return nil
       }
     }

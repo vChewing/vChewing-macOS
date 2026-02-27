@@ -12,64 +12,34 @@ import SwiftUI
 
 @available(macOS 14, *)
 public struct VwrSettingsPaneOutput: View {
-  // MARK: Public
-
   // MARK: - Main View
 
   public var body: some View {
-    NavigationStack {
-      Form {
-        Section {
-          UserDef.kChineseConversionEnabled.bind(
-            $chineseConversionEnabled.didChange {
-              if chineseConversionEnabled, shiftJISShinjitaiOutputEnabled {
-                shiftJISShinjitaiOutputEnabled = false
-              }
-            }
-          ).render()
-          UserDef.kShiftJISShinjitaiOutputEnabled.bind(
-            $shiftJISShinjitaiOutputEnabled.didChange {
-              if chineseConversionEnabled, shiftJISShinjitaiOutputEnabled {
-                chineseConversionEnabled = false
-              }
-            }
-          ).render()
-          UserDef.kInlineDumpPinyinInLieuOfZhuyin.bind($inlineDumpPinyinInLieuOfZhuyin).render()
-          UserDef.kTrimUnfinishedReadingsOnCommit.bind($trimUnfinishedReadingsOnCommit).render()
-          UserDef.kRomanNumeralOutputFormat.bind($romanNumeralOutputFormat).render()
+    Form {
+      Section {
+        UserDef.kChineseConversionEnabled.renderUI {
+          if PrefMgr.shared.chineseConversionEnabled, PrefMgr.shared.shiftJISShinjitaiOutputEnabled {
+            PrefMgr.shared.shiftJISShinjitaiOutputEnabled = false
+          }
         }
-        Section(header: Text("Experimental:")) {
-          UserDef.kHardenVerticalPunctuations.bind($hardenVerticalPunctuations).render()
+        UserDef.kShiftJISShinjitaiOutputEnabled.renderUI {
+          if PrefMgr.shared.chineseConversionEnabled, PrefMgr.shared.shiftJISShinjitaiOutputEnabled {
+            PrefMgr.shared.chineseConversionEnabled = false
+          }
         }
-      }.formStyled()
-    }
-    .frame(
-      minWidth: CtlSettingsUI.formWidth,
-      maxHeight: CtlSettingsUI.contentMaxHeight
-    )
+        UserDef.kInlineDumpPinyinInLieuOfZhuyin.renderUI()
+        UserDef.kTrimUnfinishedReadingsOnCommit.renderUI()
+        UserDef.kRomanNumeralOutputFormat.renderUI()
+      }
+      Section(header: Text("Experimental:")) {
+        UserDef.kHardenVerticalPunctuations.renderUI()
+      }
+    }.formStyled()
+      .frame(
+        minWidth: CtlSettingsUI.formWidth,
+        maxHeight: CtlSettingsUI.contentMaxHeight
+      )
   }
-
-  // MARK: Private
-
-  // MARK: - AppStorage Variables
-
-  @AppStorage(wrappedValue: false, UserDef.kChineseConversionEnabled.rawValue)
-  private var chineseConversionEnabled: Bool
-
-  @AppStorage(wrappedValue: false, UserDef.kShiftJISShinjitaiOutputEnabled.rawValue)
-  private var shiftJISShinjitaiOutputEnabled: Bool
-
-  @AppStorage(wrappedValue: false, UserDef.kInlineDumpPinyinInLieuOfZhuyin.rawValue)
-  private var inlineDumpPinyinInLieuOfZhuyin: Bool
-
-  @AppStorage(wrappedValue: true, UserDef.kTrimUnfinishedReadingsOnCommit.rawValue)
-  private var trimUnfinishedReadingsOnCommit: Bool
-
-  @AppStorage(wrappedValue: false, UserDef.kHardenVerticalPunctuations.rawValue)
-  private var hardenVerticalPunctuations: Bool
-
-  @AppStorage(wrappedValue: 0, UserDef.kRomanNumeralOutputFormat.rawValue)
-  private var romanNumeralOutputFormat: Int
 }
 
 // MARK: - VwrSettingsPaneOutput_Previews

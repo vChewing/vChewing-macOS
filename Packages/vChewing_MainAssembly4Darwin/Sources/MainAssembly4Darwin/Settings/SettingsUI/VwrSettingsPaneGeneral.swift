@@ -47,59 +47,53 @@ public struct VwrSettingsPaneGeneral: View {
   // MARK: - Main View
 
   public var body: some View {
-    NavigationStack {
-      Form {
-        VStack(alignment: .leading) {
-          Text(
-            "\u{2022} " +
-              "Please use mouse wheel to scroll each page if needed. The CheatSheet is available in the IME menu."
-              .i18n
-              + "\n\u{2022} "
-              +
-              "Note: The “Delete ⌫” key on Mac keyboard is named as “BackSpace ⌫” here in order to distinguish the real “Delete ⌦” key from full-sized desktop keyboards. If you want to use the real “Delete ⌦” key on a Mac keyboard with no numpad equipped, you have to press “Fn+⌫” instead."
-              .i18n
-          )
-          .settingsDescription()
-          UserDef.kAppleLanguages.bind($appleLanguageTag).render()
+    Form {
+      VStack(alignment: .leading) {
+        Text(
+          "\u{2022} " +
+            "Please use mouse wheel to scroll each page if needed. The CheatSheet is available in the IME menu."
+            .i18n
+            + "\n\u{2022} "
+            +
+            "Note: The “Delete ⌫” key on Mac keyboard is named as “BackSpace ⌫” here in order to distinguish the real “Delete ⌦” key from full-sized desktop keyboards. If you want to use the real “Delete ⌦” key on a Mac keyboard with no numpad equipped, you have to press “Fn+⌫” instead."
+            .i18n
+        )
+        .settingsDescription()
+        UserDef.kAppleLanguages.bind($appleLanguageTag).render()
+      }
+
+      // MARK: (header: Text("Typing Settings:"))
+
+      Section {
+        UserDef.kReadingNarrationCoverage.renderUI {
+          SpeechSputnik.shared.refreshStatus()
         }
-
-        // MARK: (header: Text("Typing Settings:"))
-
-        Section {
-          UserDef.kReadingNarrationCoverage.bind(
-            $readingNarrationCoverage.didChange {
-              SpeechSputnik.shared.refreshStatus()
-            }
-          ).render()
-          UserDef.kAutoCorrectReadingCombination.bind($autoCorrectReadingCombination).render()
-          UserDef.kShowHanyuPinyinInCompositionBuffer.bind($showHanyuPinyinInCompositionBuffer)
-            .render()
-          UserDef.kKeepReadingUponCompositionError.bind($keepReadingUponCompositionError).render()
-          UserDef.kClassicHaninKeyboardSymbolModeShortcutEnabled
-            .bind($classicHaninKeyboardSymbolModeShortcutEnabled).render()
-          UserDef.kUseSCPCTypingMode.bind($useSCPCTypingMode).render()
-          if Date.isTodayTheDate(from: 0_401) {
-            UserDef.kShouldNotFartInLieuOfBeep.bind(
-              $shouldNotFartInLieuOfBeep.didChange { onFartControlChange() }
-            ).render()
+        UserDef.kAutoCorrectReadingCombination.renderUI()
+        UserDef.kShowHanyuPinyinInCompositionBuffer.renderUI()
+        UserDef.kKeepReadingUponCompositionError.renderUI()
+        UserDef.kClassicHaninKeyboardSymbolModeShortcutEnabled.renderUI()
+        UserDef.kUseSCPCTypingMode.renderUI()
+        if Date.isTodayTheDate(from: 0_401) {
+          UserDef.kShouldNotFartInLieuOfBeep.renderUI {
+            onFartControlChange()
           }
         }
+      }
 
-        // MARK: (header: Text("Misc Settings:"))
+      // MARK: (header: Text("Misc Settings:"))
 
-        Section {
-          HStack {
-            UserDef.kCheckUpdateAutomatically.bind($checkUpdateAutomatically).render()
-            Divider()
-            UserDef.kIsDebugModeEnabled.bind($isDebugModeEnabled).render()
-          }
+      Section {
+        HStack {
+          UserDef.kCheckUpdateAutomatically.renderUI()
+          Divider()
+          UserDef.kIsDebugModeEnabled.renderUI()
         }
-      }.formStyled()
-    }
-    .frame(
-      minWidth: CtlSettingsUI.formWidth,
-      maxHeight: CtlSettingsUI.contentMaxHeight
-    )
+      }
+    }.formStyled()
+      .frame(
+        minWidth: CtlSettingsUI.formWidth,
+        maxHeight: CtlSettingsUI.contentMaxHeight
+      )
   }
 
   // MARK: Internal
@@ -108,35 +102,6 @@ public struct VwrSettingsPaneGeneral: View {
   var appleLanguageTag: String
 
   // MARK: Private
-
-  // MARK: - AppStorage Variables
-
-  @AppStorage(wrappedValue: true, UserDef.kAutoCorrectReadingCombination.rawValue)
-  private var autoCorrectReadingCombination: Bool
-
-  @AppStorage(wrappedValue: 0, UserDef.kReadingNarrationCoverage.rawValue)
-  private var readingNarrationCoverage: Int
-
-  @AppStorage(wrappedValue: false, UserDef.kKeepReadingUponCompositionError.rawValue)
-  private var keepReadingUponCompositionError: Bool
-
-  @AppStorage(wrappedValue: false, UserDef.kShowHanyuPinyinInCompositionBuffer.rawValue)
-  private var showHanyuPinyinInCompositionBuffer: Bool
-
-  @AppStorage(wrappedValue: false, UserDef.kClassicHaninKeyboardSymbolModeShortcutEnabled.rawValue)
-  private var classicHaninKeyboardSymbolModeShortcutEnabled: Bool
-
-  @AppStorage(wrappedValue: false, UserDef.kUseSCPCTypingMode.rawValue)
-  private var useSCPCTypingMode: Bool
-
-  @AppStorage(wrappedValue: true, UserDef.kShouldNotFartInLieuOfBeep.rawValue)
-  private var shouldNotFartInLieuOfBeep: Bool
-
-  @AppStorage(wrappedValue: false, UserDef.kCheckUpdateAutomatically.rawValue)
-  private var checkUpdateAutomatically: Bool
-
-  @AppStorage(wrappedValue: false, UserDef.kIsDebugModeEnabled.rawValue)
-  private var isDebugModeEnabled: Bool
 
   private func onFartControlChange() {
     let content = String(
@@ -150,14 +115,14 @@ public struct VwrSettingsPaneGeneral: View {
       button.hasDestructiveAction = true
     }
     alert.addButton(withTitle: "Leave it checked".i18n)
-    if let window = CtlSettingsUI.shared?.window, !shouldNotFartInLieuOfBeep {
-      shouldNotFartInLieuOfBeep = true
+    if let window = CtlSettingsUI.shared?.window, !PrefMgr.shared.shouldNotFartInLieuOfBeep {
+      PrefMgr.shared.shouldNotFartInLieuOfBeep = true
       alert.beginSheetModal(for: window) { result in
         switch result {
         case .alertFirstButtonReturn:
-          shouldNotFartInLieuOfBeep = false
+          PrefMgr.shared.shouldNotFartInLieuOfBeep = false
         case .alertSecondButtonReturn:
-          shouldNotFartInLieuOfBeep = true
+          PrefMgr.shared.shouldNotFartInLieuOfBeep = true
         default: break
         }
         IMEApp.buzz()

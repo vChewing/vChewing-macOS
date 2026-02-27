@@ -38,10 +38,10 @@ extension PrefMgr {
       alphanumericalKeyboardLayout,
     ])
     if !matchedResults.contains(where: { $0.identifier == basicKeyboardLayout }) {
-      basicKeyboardLayout = Self.kDefaultBasicKeyboardLayout
+      basicKeyboardLayout = UserDef.kBasicKeyboardLayout.stringDefaultValue
     }
     if !matchedResults.contains(where: { $0.identifier == alphanumericalKeyboardLayout }) {
-      alphanumericalKeyboardLayout = Self.kDefaultAlphanumericalKeyboardLayout
+      alphanumericalKeyboardLayout = UserDef.kAlphanumericalKeyboardLayout.stringDefaultValue
     }
   }
 }
@@ -69,19 +69,17 @@ extension PrefMgr {
         with: "\\n"
       )
       guard let theUserDef = UserDef(rawValue: strKeyName) else { continue }
-      var strTypeParam = String(describing: theUserDef.dataType)
+      let strTypeParam = theUserDef.dataType.defaultsCommandTypeName
       // 忽略會被 Sandbox 擋到的選項、以及其他一些雜項。
       let blackList: [UserDef] = [
         .kUserDataFolderSpecified, .kCassettePath, .kAppleLanguages, .kFailureFlagForPOMObservation,
-        .kMostRecentInputMode,
+        .kMostRecentInputMode, .kCandidateServiceMenuContents,
       ]
       guard !blackList.contains(theUserDef) else { continue }
       var strValue = rawCells[3].dropLast(1).replacingOccurrences(of: "\n", with: "")
       typeCheck: switch theUserDef.dataType {
-      case .double: strTypeParam = strTypeParam.replacingOccurrences(of: "double", with: "float")
       case .dictionary:
         if let valParsed = value as? AppProperty<[String: Bool]> {
-          strTypeParam = strTypeParam.replacingOccurrences(of: "ionary", with: "")
           var stack = ContiguousArray<String>()
           valParsed.wrappedValue.forEach { currentPair in
             stack.append("\(currentPair.key) \(currentPair.value) ")
@@ -90,13 +88,12 @@ extension PrefMgr {
         } else {
           continue
         }
-      case .array:
+      case .arrayOfStrings:
         if let valParsed = value as? AppProperty<[String]> {
           strValue = valParsed.wrappedValue.joined(separator: " ")
         } else {
           continue
         }
-      case .other: continue // 忽略對終端機單行輸入不友好的選項。
       default: break typeCheck
       }
       if let metaData = theUserDef.metaData {

@@ -16,6 +16,16 @@ private let kWindowTitleHeight: Double = 78
 
 @available(macOS 14, *)
 public final class CtlSettingsUI: NSWindowController, NSWindowDelegate {
+  // MARK: Lifecycle
+
+  nonisolated deinit {
+    #if DEBUG
+      NSLog("[CtlSettingsUI] deinit called")
+    #endif
+  }
+
+  // MARK: Public
+
   public static var shared: CtlSettingsUI?
 
   override public func windowDidLoad() {
@@ -31,16 +41,25 @@ public final class CtlSettingsUI: NSWindowController, NSWindowDelegate {
   }
 
   override public func close() {
+    // 由於我們使用靜態 `shared` 變數保留 window controller，
+    // 因此每次關閉都要把它清掉，無論 CPU 架構為何。
+    // 另外必須把 contentView 從 window 抽離，
+    // 否則它會被 NSWindow 仍然持有，導致記憶體不會即時回收。
     autoreleasepool {
+      // 先行斷開 delegate 與內容，避免循環引用
+      window?.delegate = nil
+      // 此舉抽離 contentView。
+      window?.contentView = nil
       super.close()
-      if NSApplication.isAppleSilicon {
-        Self.shared = nil
-      }
+      Self.shared = nil
     }
   }
 
   @objc
   public static func show() {
+    // 避免在先前已關閉視窗的 controller 上誤觸復活；
+    // `shared` 會在 `close()` 或下方的 `windowWillClose(_:)`
+    // 中被清空。
     autoreleasepool {
       if shared == nil {
         let newWindow = NSWindow(
@@ -63,6 +82,17 @@ public final class CtlSettingsUI: NSWindowController, NSWindowDelegate {
       shared.showWindow(shared)
       NSApp.popup()
     }
+  }
+
+  // MARK: - NSWindowDelegate helpers
+
+  public func windowWillClose(_ notification: Notification) {
+    // 使用者按紅色關閉按鈕或 ⌘W 時走的是這條路徑，
+    // 不會觸發 NSWindowController.close() override，
+    // 因此必須在此處做同等的清理。
+    window?.delegate = nil
+    window?.contentView = nil
+    Self.shared = nil
   }
 }
 

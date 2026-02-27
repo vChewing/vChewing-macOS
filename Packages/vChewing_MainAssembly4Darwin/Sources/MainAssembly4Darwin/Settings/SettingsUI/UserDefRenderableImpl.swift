@@ -8,6 +8,182 @@
 
 import SwiftUI
 
+// MARK: - UserDef 自繪控件擴充（必須與特化 render() 同模組，以正確解析方法呼叫）
+
+/// 讓 UserDef 可直接產生帶有內建 @AppStorage 繫結的 SwiftUI 控件，
+/// 無需在各個 Pane 中重複宣告 @AppStorage 屬性。
+
+@available(macOS 14, *)
+extension UserDef {
+  /// 自動產生對應的 SwiftUI 控件，內建 @AppStorage 繫結，無需外部 Binding。
+  /// - Parameter onChange: 值變更後的額外回呼（選填）。
+  @ViewBuilder
+  public func renderUI(onChange: (() -> ())? = nil) -> some View {
+    UserDefRendered(for: self, onChange: onChange)
+  }
+}
+
+// MARK: - UserDefRendered
+
+@available(macOS 14, *)
+struct UserDefRendered: View {
+  // MARK: Lifecycle
+
+  init(for userDef: UserDef, onChange: (() -> ())? = nil) {
+    self.userDef = userDef
+    self.onChange = onChange
+  }
+
+  // MARK: Internal
+
+  var body: some View {
+    switch userDef.dataType {
+    case .bool:
+      _UDAutoViewBool(def: userDef, onChange: onChange)
+    case .integer:
+      _UDAutoViewInt(def: userDef, onChange: onChange)
+    case .double:
+      _UDAutoViewDouble(def: userDef, onChange: onChange)
+    case .string:
+      _UDAutoViewString(def: userDef, onChange: onChange)
+    default:
+      EmptyView()
+    }
+  }
+
+  // MARK: Private
+
+  private let userDef: UserDef
+  private let onChange: (() -> ())?
+}
+
+@available(macOS 14, *)
+extension UserDefRendered {
+  // MARK: - _UDAutoViewBool
+
+  /// 自繪 Bool 型偏好設定控件。
+  private struct _UDAutoViewBool: View {
+    // MARK: Lifecycle
+
+    init(def: UserDef, onChange: (() -> ())?) {
+      self.def = def
+      self.onChange = onChange
+      _value = AppStorage(wrappedValue: def.boolDefaultValue, def.rawValue)
+    }
+
+    // MARK: Internal
+
+    let def: UserDef
+    let onChange: (() -> ())?
+
+    var body: some View {
+      if let onChange {
+        def.bind($value.didChange(onChange)).render()
+      } else {
+        def.bind($value).render()
+      }
+    }
+
+    // MARK: Private
+
+    @AppStorage
+    private var value: Bool
+  }
+
+  // MARK: - _UDAutoViewInt
+
+  /// 自繪 Int 型偏好設定控件。
+  private struct _UDAutoViewInt: View {
+    // MARK: Lifecycle
+
+    init(def: UserDef, onChange: (() -> ())?) {
+      self.def = def
+      self.onChange = onChange
+      _value = AppStorage(wrappedValue: def.intDefaultValue, def.rawValue)
+    }
+
+    // MARK: Internal
+
+    let def: UserDef
+    let onChange: (() -> ())?
+
+    var body: some View {
+      if let onChange {
+        def.bind($value.didChange(onChange)).render()
+      } else {
+        def.bind($value).render()
+      }
+    }
+
+    // MARK: Private
+
+    @AppStorage
+    private var value: Int
+  }
+
+  // MARK: - _UDAutoViewDouble
+
+  /// 自繪 Double 型偏好設定控件。
+  private struct _UDAutoViewDouble: View {
+    // MARK: Lifecycle
+
+    init(def: UserDef, onChange: (() -> ())?) {
+      self.def = def
+      self.onChange = onChange
+      _value = AppStorage(wrappedValue: def.doubleDefaultValue, def.rawValue)
+    }
+
+    // MARK: Internal
+
+    let def: UserDef
+    let onChange: (() -> ())?
+
+    var body: some View {
+      if let onChange {
+        def.bind($value.didChange(onChange)).render()
+      } else {
+        def.bind($value).render()
+      }
+    }
+
+    // MARK: Private
+
+    @AppStorage
+    private var value: Double
+  }
+
+  // MARK: - _UDAutoViewString
+
+  /// 自繪 String 型偏好設定控件。
+  private struct _UDAutoViewString: View {
+    // MARK: Lifecycle
+
+    init(def: UserDef, onChange: (() -> ())?) {
+      self.def = def
+      self.onChange = onChange
+      _value = AppStorage(wrappedValue: def.stringDefaultValue, def.rawValue)
+    }
+
+    // MARK: Internal
+
+    let def: UserDef
+    let onChange: (() -> ())?
+
+    var body: some View {
+      if let onChange {
+        def.bind($value.didChange(onChange)).render()
+      } else {
+        def.bind($value).render()
+      }
+    }
+
+    // MARK: Private
+
+    @AppStorage
+    private var value: String
+  }
+}
+
 // MARK: - UserDefRenderable Extension
 
 extension UserDefRenderable<String> {
@@ -17,7 +193,7 @@ extension UserDefRenderable<String> {
       VStack(alignment: .leading) {
         Group {
           switch (def.dataType, def) {
-          case (.array, .kAppleLanguages):
+          case (.arrayOfStrings, .kAppleLanguages):
             Picker(LocalizedStringKey(metaData.shortTitle ?? ""), selection: binding) {
               Text(LocalizedStringKey("Follow OS settings")).tag("auto")
               Text(LocalizedStringKey("Simplified Chinese")).tag("zh-Hans")
@@ -42,7 +218,7 @@ extension UserDefRenderable<String> {
               ) { id in
                 let theEntry = IMKHelper.allowedAlphanumericalTISInputSources[id]
                 Text(theEntry.titleLocalized).tag(theEntry.id)
-              }.id(UUID())
+              }
             }
           case (.string, .kBasicKeyboardLayout):
             Picker(LocalizedStringKey(metaData.shortTitle ?? ""), selection: binding) {
@@ -56,7 +232,7 @@ extension UserDefRenderable<String> {
                 } else {
                   Divider()
                 }
-              }.id(UUID())
+              }
             }
           case (.string, .kCassettePath): EmptyView()
           case (.string, .kUserDataFolderSpecified): EmptyView()
@@ -119,7 +295,7 @@ extension UserDefRenderable<Int> {
               ForEach(KeyboardParser.allCases, id: \.self) { item in
                 if [7, 100].contains(item.rawValue) { Divider() }
                 Text(item.localizedMenuName).tag(item.rawValue)
-              }.id(UUID())
+              }
             }
           case .integer where !options.isEmpty:
             VStack(alignment: .leading) {

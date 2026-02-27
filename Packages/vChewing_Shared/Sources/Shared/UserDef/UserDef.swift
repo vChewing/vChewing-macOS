@@ -126,8 +126,43 @@ nonisolated public enum UserDef: String, CaseIterable, Identifiable {
 
   // MARK: Public
 
-  public enum DataType: CaseIterable {
-    case string, bool, integer, double, array, dictionary, other
+  // MARK: - DataType：以關聯值嵌入預設值的資料型別列舉。
+
+  /// 嵌入式資料型別列舉：每個 case 的關聯值即為該偏好設定的預設值。
+  /// 這使得 `UserDef.dataType` 成為預設值的唯一事實來源（Single Source of Truth）。
+  public enum DataType {
+    case string(String)
+    case bool(Bool)
+    case integer(Int)
+    case double(Double)
+    case arrayOfStrings([String])
+    case dictionary([String: Bool])
+
+    // MARK: Public
+
+    /// 從 DataType 關聯值取出預設值（以 `Any` 型別回傳）。
+    public var defaultValue: Any {
+      switch self {
+      case let .bool(v): return v
+      case let .integer(v): return v
+      case let .double(v): return v
+      case let .string(v): return v
+      case let .arrayOfStrings(v): return v
+      case let .dictionary(v): return v
+      }
+    }
+
+    /// 供 `defaults write` 指令匯出時使用的型別參數名稱。
+    public var defaultsCommandTypeName: String {
+      switch self {
+      case .string: return "string"
+      case .bool: return "bool"
+      case .integer: return "integer"
+      case .double: return "float"
+      case .arrayOfStrings: return "array"
+      case .dictionary: return "dict"
+      }
+    }
   }
 
   public struct MetaData {
@@ -175,118 +210,121 @@ nonisolated public enum UserDef: String, CaseIterable, Identifiable {
   }
 }
 
-extension UserDef {
+nonisolated extension UserDef {
+  // MARK: - dataType：以 DataType 關聯值嵌入預設值。
+
+  /// 回傳此偏好鍵對應的 DataType，其關聯值即為該偏好的預設值。
   public var dataType: DataType {
     switch self {
-    case .kIsDebugModeEnabled: return .bool
-    case .kFailureFlagForPOMObservation: return .bool
-    case .kUserPhrasesDatabaseBypassed: return .bool
-    case .kReplaceSymbolMenuNodeWithUserSuppliedData: return .bool
-    case .kCandidateServiceMenuContents: return .dictionary
-    case .kRespectClientAccentColor: return .bool
-    case .kAlwaysUsePCBWithElectronBasedClients: return .bool
-    case .kSecurityHardenedCompositionBuffer: return .bool
-    case .kCheckAbusersOfSecureEventInputAPI: return .bool
-    case .kDeltaOfCalendarYears: return .integer
-    case .kMostRecentInputMode: return .string
-    case .kCassettePath: return .string
-    case .kUserDataFolderSpecified: return .string
-    case .kCheckUpdateAutomatically: return .bool
-    case .kUseExternalFactoryDict: return .bool
-    case .kKeyboardParser: return .integer
-    case .kBasicKeyboardLayout: return .string
-    case .kAlphanumericalKeyboardLayout: return .string
-    case .kShowNotificationsWhenTogglingCapsLock: return .bool
-    case .kShowNotificationsWhenTogglingEisu: return .bool
-    case .kShowNotificationsWhenTogglingShift: return .bool
-    case .kSpecifiedNotifyUIColorScheme: return .integer
-    case .kCandidateListTextSize: return .double
-    case .kAlwaysExpandCandidateWindow: return .bool
-    case .kCandidateWindowShowOnlyOneLine: return .bool
-    case .kAppleLanguages: return .array
-    case .kShouldAutoReloadUserDataFiles: return .bool
-    case .kUseRearCursorMode: return .bool
-    case .kCandidateStateJKHLBehavior: return .integer
-    case .kUseShiftQuestionToCallServiceMenu: return .bool
-    case .kUseDynamicCandidateWindowOrigin: return .bool
-    case .kUseHorizontalCandidateList: return .bool
-    case .kMinCellWidthForHorizontalMatrix: return .integer
-    case .kChooseCandidateUsingSpace: return .bool
-    case .kCassetteEnabled: return .bool
-    case .kCNS11643Enabled: return .bool
-    case .kSymbolInputEnabled: return .bool
-    case .kChineseConversionEnabled: return .bool
-    case .kShiftJISShinjitaiOutputEnabled: return .bool
-    case .kCurrencyNumeralsEnabled: return .bool
-    case .kHalfWidthPunctuationEnabled: return .bool
-    case .kCursorPlacementAfterSelectingCandidate: return .integer
-    case .kDodgeInvalidEdgeCandidateCursorPosition: return .bool
-    case .kEscToCleanInputBuffer: return .bool
-    case .kAcceptLeadingIntonations: return .bool
-    case .kSpecifyIntonationKeyBehavior: return .integer
-    case .kSpecifyShiftBackSpaceKeyBehavior: return .integer
-    case .kSpecifyShiftTabKeyBehavior: return .bool
-    case .kSpecifyShiftSpaceKeyBehavior: return .bool
-    case .kSpecifyCmdOptCtrlEnterBehavior: return .integer
-    case .kAllowRescoringSingleKanjiCandidates: return .bool
-    case .kUseSCPCTypingMode: return .bool
-    case .kMaxCandidateLength: return .integer
-    case .kBeepSoundPreference: return .integer
-    case .kShouldNotFartInLieuOfBeep: return .bool
-    case .kShowHanyuPinyinInCompositionBuffer: return .bool
-    case .kInlineDumpPinyinInLieuOfZhuyin: return .bool
-    case .kFetchSuggestionsFromPerceptionOverrideModel: return .bool
-    case .kUseFixedCandidateOrderOnSelection: return .bool
-    case .kAutoCorrectReadingCombination: return .bool
-    case .kReadingNarrationCoverage: return .integer
-    case .kAlsoConfirmAssociatedCandidatesByEnter: return .bool
-    case .kKeepReadingUponCompositionError: return .bool
-    case .kBypassNonAppleCapsLockHandling: return .bool
-    case .kShiftEisuToggleOffTogetherWithCapsLock: return .bool
-    case .kTogglingAlphanumericalModeWithLShift: return .bool
-    case .kTogglingAlphanumericalModeWithRShift: return .bool
-    case .kUpperCaseLetterKeyBehavior: return .integer
-    case .kNumPadCharInputBehavior: return .integer
-    case .kConsolidateContextOnCandidateSelection: return .bool
-    case .kHardenVerticalPunctuations: return .bool
-    case .kTrimUnfinishedReadingsOnCommit: return .bool
-    case .kAlwaysShowTooltipTextsHorizontally: return .bool
-    case .kClientsIMKTextInputIncapable: return .dictionary
-    case .kShowTranslatedStrokesInCompositionBuffer: return .bool
-    case .kForceCassetteChineseConversion: return .integer
-    case .kShowReverseLookupInCandidateUI: return .bool
-    case .kShowCodePointInCandidateUI: return .bool
-    case .kAutoCompositeWithLongestPossibleCassetteKey: return .bool
-    case .kShareAlphanumericalModeStatusAcrossClients: return .bool
-    case .kPhraseEditorAutoReloadExternalModifications: return .bool
-    case .kClassicHaninKeyboardSymbolModeShortcutEnabled: return .bool
-    case .kFilterNonCNSReadingsForCHTInput: return .bool
-    case .kEnforceETenDOSCandidateSequence: return .bool
-    case .kRomanNumeralOutputFormat: return .integer
-    case .kReducePOMLifetimeToNoMoreThan12Hours: return .bool
-    case .kUseSpaceToCommitHighlightedSCPCCandidate: return .bool
-    case .kEnableMouseScrollingForTDKCandidatesCocoa: return .bool
-    case .kDisableSegmentedThickUnderlineInMarkingModeForManagedClients: return .bool
-    case .kCandidateTextFontName: return .string
-    case .kCandidateKeys: return .string
-    case .kCandidateNarrationToggleType: return .integer
-    case .kAssociatedPhrasesEnabled: return .bool
-    case .kPhraseReplacementEnabled: return .bool
-    case .kUsingHotKeySCPC: return .bool
-    case .kUsingHotKeyAssociates: return .bool
-    case .kUsingHotKeyCNS: return .bool
-    case .kUsingHotKeyKangXi: return .bool
-    case .kUsingHotKeyJIS: return .bool
-    case .kUsingHotKeyHalfWidthASCII: return .bool
-    case .kUsingHotKeyCurrencyNumerals: return .bool
-    case .kUsingHotKeyCassette: return .bool
-    case .kUsingHotKeyRevLookup: return .bool
-    case .kUsingHotKeyInputMode: return .bool
+    case .kIsDebugModeEnabled: return .bool(false)
+    case .kFailureFlagForPOMObservation: return .bool(false)
+    case .kUserPhrasesDatabaseBypassed: return .bool(false)
+    case .kReplaceSymbolMenuNodeWithUserSuppliedData: return .bool(true)
+    case .kCandidateServiceMenuContents: return .arrayOfStrings(Self.defaultValue4CandidateServiceMenuContents)
+    case .kRespectClientAccentColor: return .bool(true)
+    case .kAlwaysUsePCBWithElectronBasedClients: return .bool(true)
+    case .kSecurityHardenedCompositionBuffer: return .bool(false)
+    case .kCheckAbusersOfSecureEventInputAPI: return .bool(true)
+    case .kDeltaOfCalendarYears: return .integer(-2_000)
+    case .kMostRecentInputMode: return .string("")
+    case .kCassettePath: return .string("")
+    case .kUserDataFolderSpecified: return .string("")
+    case .kCheckUpdateAutomatically: return .bool(false)
+    case .kUseExternalFactoryDict: return .bool(false)
+    case .kKeyboardParser: return .integer(0)
+    case .kBasicKeyboardLayout: return .string(Self.kDefaultBasicKeyboardLayout)
+    case .kAlphanumericalKeyboardLayout: return .string(Self.kDefaultAlphanumericalKeyboardLayout)
+    case .kShowNotificationsWhenTogglingCapsLock: return .bool(true)
+    case .kShowNotificationsWhenTogglingEisu: return .bool(true)
+    case .kShowNotificationsWhenTogglingShift: return .bool(true)
+    case .kSpecifiedNotifyUIColorScheme: return .integer(0)
+    case .kCandidateListTextSize: return .double(16)
+    case .kAlwaysExpandCandidateWindow: return .bool(false)
+    case .kCandidateWindowShowOnlyOneLine: return .bool(false)
+    case .kAppleLanguages: return .arrayOfStrings([])
+    case .kShouldAutoReloadUserDataFiles: return .bool(true)
+    case .kUseRearCursorMode: return .bool(false)
+    case .kCandidateStateJKHLBehavior: return .integer(0)
+    case .kUseShiftQuestionToCallServiceMenu: return .bool(true)
+    case .kUseDynamicCandidateWindowOrigin: return .bool(true)
+    case .kUseHorizontalCandidateList: return .bool(true)
+    case .kMinCellWidthForHorizontalMatrix: return .integer(0)
+    case .kChooseCandidateUsingSpace: return .bool(true)
+    case .kCassetteEnabled: return .bool(false)
+    case .kCNS11643Enabled: return .bool(false)
+    case .kSymbolInputEnabled: return .bool(true)
+    case .kChineseConversionEnabled: return .bool(false)
+    case .kShiftJISShinjitaiOutputEnabled: return .bool(false)
+    case .kCurrencyNumeralsEnabled: return .bool(false)
+    case .kHalfWidthPunctuationEnabled: return .bool(false)
+    case .kCursorPlacementAfterSelectingCandidate: return .integer(1)
+    case .kDodgeInvalidEdgeCandidateCursorPosition: return .bool(true)
+    case .kEscToCleanInputBuffer: return .bool(true)
+    case .kAcceptLeadingIntonations: return .bool(true)
+    case .kSpecifyIntonationKeyBehavior: return .integer(0)
+    case .kSpecifyShiftBackSpaceKeyBehavior: return .integer(0)
+    case .kSpecifyShiftTabKeyBehavior: return .bool(false)
+    case .kSpecifyShiftSpaceKeyBehavior: return .bool(false)
+    case .kSpecifyCmdOptCtrlEnterBehavior: return .integer(0)
+    case .kAllowRescoringSingleKanjiCandidates: return .bool(false)
+    case .kUseSCPCTypingMode: return .bool(false)
+    case .kMaxCandidateLength: return .integer(10)
+    case .kBeepSoundPreference: return .integer(2)
+    case .kShouldNotFartInLieuOfBeep: return .bool(true)
+    case .kShowHanyuPinyinInCompositionBuffer: return .bool(false)
+    case .kInlineDumpPinyinInLieuOfZhuyin: return .bool(false)
+    case .kFetchSuggestionsFromPerceptionOverrideModel: return .bool(true)
+    case .kUseFixedCandidateOrderOnSelection: return .bool(false)
+    case .kAutoCorrectReadingCombination: return .bool(true)
+    case .kReadingNarrationCoverage: return .integer(0)
+    case .kAlsoConfirmAssociatedCandidatesByEnter: return .bool(false)
+    case .kKeepReadingUponCompositionError: return .bool(false)
+    case .kBypassNonAppleCapsLockHandling: return .bool(false)
+    case .kShiftEisuToggleOffTogetherWithCapsLock: return .bool(true)
+    case .kTogglingAlphanumericalModeWithLShift: return .bool(true)
+    case .kTogglingAlphanumericalModeWithRShift: return .bool(true)
+    case .kUpperCaseLetterKeyBehavior: return .integer(0)
+    case .kNumPadCharInputBehavior: return .integer(0)
+    case .kConsolidateContextOnCandidateSelection: return .bool(true)
+    case .kHardenVerticalPunctuations: return .bool(false)
+    case .kTrimUnfinishedReadingsOnCommit: return .bool(true)
+    case .kAlwaysShowTooltipTextsHorizontally: return .bool(false)
+    case .kClientsIMKTextInputIncapable: return .dictionary(Self.defaultValue4ClientsIMKTextInputIncapable)
+    case .kShowTranslatedStrokesInCompositionBuffer: return .bool(true)
+    case .kForceCassetteChineseConversion: return .integer(0)
+    case .kShowReverseLookupInCandidateUI: return .bool(true)
+    case .kShowCodePointInCandidateUI: return .bool(true)
+    case .kAutoCompositeWithLongestPossibleCassetteKey: return .bool(true)
+    case .kShareAlphanumericalModeStatusAcrossClients: return .bool(false)
+    case .kPhraseEditorAutoReloadExternalModifications: return .bool(true)
+    case .kClassicHaninKeyboardSymbolModeShortcutEnabled: return .bool(false)
+    case .kFilterNonCNSReadingsForCHTInput: return .bool(false)
+    case .kEnforceETenDOSCandidateSequence: return .bool(true)
+    case .kRomanNumeralOutputFormat: return .integer(0)
+    case .kReducePOMLifetimeToNoMoreThan12Hours: return .bool(false)
+    case .kUseSpaceToCommitHighlightedSCPCCandidate: return .bool(true)
+    case .kEnableMouseScrollingForTDKCandidatesCocoa: return .bool(false)
+    case .kDisableSegmentedThickUnderlineInMarkingModeForManagedClients: return .bool(false)
+    case .kCandidateTextFontName: return .string("")
+    case .kCandidateKeys: return .string(Self.kDefaultCandidateKeys)
+    case .kCandidateNarrationToggleType: return .integer(0)
+    case .kAssociatedPhrasesEnabled: return .bool(false)
+    case .kPhraseReplacementEnabled: return .bool(false)
+    case .kUsingHotKeySCPC: return .bool(true)
+    case .kUsingHotKeyAssociates: return .bool(true)
+    case .kUsingHotKeyCNS: return .bool(true)
+    case .kUsingHotKeyKangXi: return .bool(true)
+    case .kUsingHotKeyJIS: return .bool(true)
+    case .kUsingHotKeyHalfWidthASCII: return .bool(true)
+    case .kUsingHotKeyCurrencyNumerals: return .bool(true)
+    case .kUsingHotKeyCassette: return .bool(true)
+    case .kUsingHotKeyRevLookup: return .bool(true)
+    case .kUsingHotKeyInputMode: return .bool(true)
     }
   }
 }
 
-extension UserDef {
+nonisolated extension UserDef {
   public var metaData: MetaData? {
     switch self {
     case .kIsDebugModeEnabled: return .init(userDef: self, shortTitle: "Debug Mode")
@@ -770,5 +808,94 @@ extension UserDef {
         shortTitle: "CHS / CHT Input Mode Switch"
       )
     }
+  }
+}
+
+nonisolated extension UserDef {
+  // MARK: - 型別化預設值存取器（從 DataType 關聯值萃取）
+
+  /// Bool 型別預設值。若該偏好鍵的 DataType 不是 `.bool`，則回傳 `false`。
+  public var boolDefaultValue: Bool {
+    guard case let .bool(v) = dataType else { return false }
+    return v
+  }
+
+  /// Int 型別預設值。若該偏好鍵的 DataType 不是 `.integer`，則回傳 `0`。
+  public var intDefaultValue: Int {
+    guard case let .integer(v) = dataType else { return 0 }
+    return v
+  }
+
+  /// Double 型別預設值。若該偏好鍵的 DataType 不是 `.double`，則回傳 `0`。
+  public var doubleDefaultValue: Double {
+    guard case let .double(v) = dataType else { return 0 }
+    return v
+  }
+
+  /// String 型別預設值。若該偏好鍵的 DataType 不是 `.string`，則回傳空字串。
+  public var stringDefaultValue: String {
+    guard case let .string(v) = dataType else { return "" }
+    return v
+  }
+}
+
+nonisolated extension UserDef {
+  // MARK: - 預設值常數
+
+  /// 候選字服務選單的預設內容。
+  public static let defaultValue4CandidateServiceMenuContents: [String] = [
+    #"Unicode Metadata: %s"# + "\t" + #"@SEL:copyUnicodeMetadata:"#,
+    #"macOS Dict: %s"# + "\t" + #"@URL:dict://%s"#,
+    #"Bing: %s"# + "\t" + #"@WEB:https://www.bing.com/search?q=%s"#,
+    #"DuckDuckGo: %s"# + "\t" + #"@WEB:https://duckduckgo.com/?t=h_&q=%s"#,
+    #"Ecosia: %s"# + "\t" + #"@WEB:https://www.ecosia.org/search?method=index&q=%s"#,
+    #"Google: %s"# + "\t" + #"@WEB:https://www.google.com/search?q=%s"#,
+    #"MoeDict: %s"# + "\t" + #"@WEB:https://www.moedict.tw/%s"#,
+    #"Wikitonary: %s"# + "\t" + #"@WEB:https://zh.wiktionary.org/wiki/Special:Search?search=%s"#,
+    #"Unihan: %s"# + "\t" + #"@WEB:https://www.unicode.org/cgi-bin/GetUnihanData.pl?codepoint=%s"#,
+    #"Zi-Hi: %s"# + "\t" + #"@WEB:https://zi-hi.com/sp/uni/%s"#,
+    #"HTML Ruby Zhuyin: %s"# + "\t" + #"@SEL:copyRubyHTMLZhuyinTextbookStyle:"#,
+    #"HTML Ruby Pinyin: %s"# + "\t" + #"@SEL:copyRubyHTMLHanyuPinyinTextbookStyle:"#,
+    #"Zhuyin Annotation: %s"# + "\t" + #"@SEL:copyInlineZhuyinAnnotationTextbookStyle:"#,
+    #"Pinyin Annotation: %s"# + "\t" + #"@SEL:copyInlineHanyuPinyinAnnotationTextbookStyle:"#,
+    #"Braille 1947: %s"# + "\t" + #"@SEL:copyBraille1947:"#,
+    #"Braille 2018: %s"# + "\t" + #"@SEL:copyBraille2018:"#,
+    #"Baidu: %s"# + "\t" + #"@WEB:https://www.baidu.com/s?wd=%s"#,
+    #"BiliBili: %s"# + "\t" + #"@WEB:https://search.bilibili.com/all?keyword=%s"#,
+    #"Genshin BiliWiki: %s"# + "\t" + #"@WEB:https://wiki.biligame.com/ys/%s"#,
+    #"HSR BiliWiki: %s"# + "\t" + #"@WEB:https://wiki.biligame.com/sr/%s"#,
+  ]
+
+  /// IMK 文字輸入不相容的客體清單預設值。
+  public static let defaultValue4ClientsIMKTextInputIncapable: [String: Bool] = [
+    "com.valvesoftware.steam": true,
+    "jp.naver.line.mac": true,
+    "com.openai.chat": true,
+  ]
+
+  private static let kDefaultCandidateKeys = "123456"
+  private static let kDefaultBasicKeyboardLayout = "com.apple.keylayout.ZhuyinBopomofo"
+  private static let kDefaultAlphanumericalKeyboardLayout = {
+    if #available(macOS 10.13, *) {
+      return "com.apple.keylayout.ABC"
+    }
+    return "com.apple.keylayout.US"
+  }()
+}
+
+// MARK: - AppProperty 便利初始化器
+
+extension AppProperty {
+  /// 以 `UserDef` 為來源的便利初始化器：自動從 `DataType` 關聯值取得預設值。
+  ///
+  /// 此初始化器使 `UserDef.dataType` 成為預設值的唯一事實來源（Single Source of Truth），
+  /// 無需在 `PrefMgr` 中重複指定預設值。
+  public init(userDef: UserDef) {
+    guard let typedDefault = userDef.dataType.defaultValue as? Value else {
+      fatalError(
+        "[AppProperty] UserDef.\(userDef) 的 DataType 關聯值型別與 AppProperty<\(Value.self)> 不符。"
+      )
+    }
+    self.init(key: userDef.rawValue, defaultValue: typedDefault)
   }
 }

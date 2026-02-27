@@ -217,7 +217,7 @@ extension VwrServiceMenuEditor {
 
   @IBAction
   func btnResetServiceClicked(_: Any) {
-    PrefMgr.shared.candidateServiceMenuContents = PrefMgr.kDefaultCandidateServiceMenuItem
+    PrefMgr.shared.candidateServiceMenuContents = UserDef.defaultValue4CandidateServiceMenuContents
     tblServices.reloadData()
   }
 

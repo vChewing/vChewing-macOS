@@ -13,18 +13,16 @@ import SwiftUI
 @available(macOS 14, *)
 public struct VwrSettingsPanePhrases: View {
   public var body: some View {
-    NavigationStack {
-      List {
-        GroupBox {
-          VwrPhraseEditorUI(delegate: LMMgr.shared, window: CtlSettingsUI.shared?.window)
-            .padding(4)
-            .frame(maxWidth: .infinity)
-            .frame(height: 440)
-        }
-        .padding(4)
+    List {
+      GroupBox {
+        VwrPhraseEditorUI(delegate: LMMgr.shared, window: CtlSettingsUI.shared?.window)
+          .padding(4)
+          .frame(maxWidth: .infinity)
+          .frame(height: 440)
       }
-      .listStyle(.plain)
+      .padding(4)
     }
+    .listStyle(.plain)
     .frame(
       minWidth: CtlSettingsUI.formWidth,
       maxHeight: CtlSettingsUI.contentMaxHeight

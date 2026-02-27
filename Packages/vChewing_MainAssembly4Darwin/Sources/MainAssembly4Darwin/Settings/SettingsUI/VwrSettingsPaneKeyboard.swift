@@ -17,44 +17,42 @@ public struct VwrSettingsPaneKeyboard: View {
   // MARK: - Main View
 
   public var body: some View {
-    NavigationStack {
-      Form {
-        Section {
-          HStack(alignment: .top) {
-            Text("Quick Setup:")
-            Spacer()
-            Button {
-              keyboardParser = 0
-              basicKeyboardLayout = "com.apple.keylayout.ZhuyinBopomofo"
-            } label: {
-              Text("↻ㄅ" + " " + "Dachen Trad.".i18n)
-            }
-            Button {
-              keyboardParser = 1
-              basicKeyboardLayout = "com.apple.keylayout.ZhuyinEten"
-            } label: {
-              Text("↻ㄅ" + " " + "Eten Trad.".i18n)
-            }
-            Button {
-              keyboardParser = 100
-              basicKeyboardLayout = "com.apple.keylayout.ABC"
-            } label: {
-              Text("↻Ａ")
-            }
+    Form {
+      Section {
+        HStack(alignment: .top) {
+          Text("Quick Setup:")
+          Spacer()
+          Button {
+            keyboardParser = 0
+            basicKeyboardLayout = "com.apple.keylayout.ZhuyinBopomofo"
+          } label: {
+            Text("↻ㄅ" + " " + "Dachen Trad.".i18n)
           }
-          UserDef.kKeyboardParser.bind($keyboardParser).render()
-          UserDef.kBasicKeyboardLayout.bind($basicKeyboardLayout).render()
-          UserDef.kAlphanumericalKeyboardLayout.bind($alphanumericalKeyboardLayout).render()
+          Button {
+            keyboardParser = 1
+            basicKeyboardLayout = "com.apple.keylayout.ZhuyinEten"
+          } label: {
+            Text("↻ㄅ" + " " + "Eten Trad.".i18n)
+          }
+          Button {
+            keyboardParser = 100
+            basicKeyboardLayout = "com.apple.keylayout.ABC"
+          } label: {
+            Text("↻Ａ")
+          }
         }
-        Section(header: Text("Keyboard Shortcuts:")) {
-          VwrSettingsPaneKeyboard_KeyboardShortcuts()
-        }
-      }.formStyled()
-    }
-    .frame(
-      minWidth: CtlSettingsUI.formWidth,
-      maxHeight: CtlSettingsUI.contentMaxHeight
-    )
+        UserDef.kKeyboardParser.renderUI()
+        UserDef.kBasicKeyboardLayout.renderUI()
+        UserDef.kAlphanumericalKeyboardLayout.renderUI()
+      }
+      Section(header: Text("Keyboard Shortcuts:")) {
+        VwrSettingsPaneKeyboard_KeyboardShortcuts()
+      }
+    }.formStyled()
+      .frame(
+        minWidth: CtlSettingsUI.formWidth,
+        maxHeight: CtlSettingsUI.contentMaxHeight
+      )
   }
 
   // MARK: Private
@@ -65,79 +63,37 @@ public struct VwrSettingsPaneKeyboard: View {
   private var keyboardParser: Int
 
   @AppStorage(
-    wrappedValue: PrefMgr.kDefaultBasicKeyboardLayout,
+    wrappedValue: UserDef.kBasicKeyboardLayout.stringDefaultValue,
     UserDef.kBasicKeyboardLayout.rawValue
   )
   private var basicKeyboardLayout: String
-
-  @AppStorage(
-    wrappedValue: PrefMgr.kDefaultAlphanumericalKeyboardLayout,
-    UserDef.kAlphanumericalKeyboardLayout.rawValue
-  )
-  private var alphanumericalKeyboardLayout: String
 }
 
 // MARK: - VwrSettingsPaneKeyboard_KeyboardShortcuts
 
 @available(macOS 14, *)
 private struct VwrSettingsPaneKeyboard_KeyboardShortcuts: View {
-  // MARK: Internal
-
   // MARK: - Main View
 
   var body: some View {
     HStack(alignment: .top, spacing: NSFont.systemFontSize) {
       VStack(alignment: .leading) {
-        UserDef.kUsingHotKeySCPC.bind($usingHotKeySCPC).render()
-        UserDef.kUsingHotKeyAssociates.bind($usingHotKeyAssociates).render()
-        UserDef.kUsingHotKeyCNS.bind($usingHotKeyCNS).render()
-        UserDef.kUsingHotKeyKangXi.bind($usingHotKeyKangXi).render()
-        UserDef.kUsingHotKeyRevLookup.bind($usingHotKeyRevLookup).render()
+        UserDef.kUsingHotKeySCPC.renderUI()
+        UserDef.kUsingHotKeyAssociates.renderUI()
+        UserDef.kUsingHotKeyCNS.renderUI()
+        UserDef.kUsingHotKeyKangXi.renderUI()
+        UserDef.kUsingHotKeyRevLookup.renderUI()
       }
       Divider()
       VStack(alignment: .leading) {
-        UserDef.kUsingHotKeyJIS.bind($usingHotKeyJIS).render()
-        UserDef.kUsingHotKeyHalfWidthASCII.bind($usingHotKeyHalfWidthASCII).render()
-        UserDef.kUsingHotKeyCurrencyNumerals.bind($usingHotKeyCurrencyNumerals).render()
-        UserDef.kUsingHotKeyCassette.bind($usingHotKeyCassette).render()
-        UserDef.kUsingHotKeyInputMode.bind($usingHotKeyInputMode).render()
+        UserDef.kUsingHotKeyJIS.renderUI()
+        UserDef.kUsingHotKeyHalfWidthASCII.renderUI()
+        UserDef.kUsingHotKeyCurrencyNumerals.renderUI()
+        UserDef.kUsingHotKeyCassette.renderUI()
+        UserDef.kUsingHotKeyInputMode.renderUI()
       }
     }
   }
-
-  // MARK: Private
-
-  // MARK: - AppStorage Variables
-
-  @AppStorage(wrappedValue: true, UserDef.kUsingHotKeySCPC.rawValue)
-  private var usingHotKeySCPC: Bool
-
-  @AppStorage(wrappedValue: true, UserDef.kUsingHotKeyAssociates.rawValue)
-  private var usingHotKeyAssociates: Bool
-
-  @AppStorage(wrappedValue: true, UserDef.kUsingHotKeyCNS.rawValue)
-  private var usingHotKeyCNS: Bool
-
-  @AppStorage(wrappedValue: true, UserDef.kUsingHotKeyKangXi.rawValue)
-  private var usingHotKeyKangXi: Bool
-
-  @AppStorage(wrappedValue: true, UserDef.kUsingHotKeyJIS.rawValue)
-  private var usingHotKeyJIS: Bool
-
-  @AppStorage(wrappedValue: true, UserDef.kUsingHotKeyHalfWidthASCII.rawValue)
-  private var usingHotKeyHalfWidthASCII: Bool
-
-  @AppStorage(wrappedValue: true, UserDef.kUsingHotKeyCurrencyNumerals.rawValue)
-  private var usingHotKeyCurrencyNumerals: Bool
-
-  @AppStorage(wrappedValue: true, UserDef.kUsingHotKeyCassette.rawValue)
-  private var usingHotKeyCassette: Bool
-
-  @AppStorage(wrappedValue: true, UserDef.kUsingHotKeyRevLookup.rawValue)
-  private var usingHotKeyRevLookup: Bool
-
-  @AppStorage(wrappedValue: true, UserDef.kUsingHotKeyInputMode.rawValue)
-  private var usingHotKeyInputMode: Bool
 }
 
 // MARK: - VwrSettingsPaneKeyboard_Previews

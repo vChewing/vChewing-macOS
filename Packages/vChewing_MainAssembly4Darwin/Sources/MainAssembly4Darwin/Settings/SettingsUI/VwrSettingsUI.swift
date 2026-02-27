@@ -33,7 +33,7 @@ public struct VwrSettingsUI: View {
                 .padding([.top, .bottom], 6)
             }
           }
-          NavigationLink(destination: neta.suiView) {
+          NavigationLink(value: neta) {
             Label {
               Text(verbatim: neta.i18nTitle)
             } icon: {

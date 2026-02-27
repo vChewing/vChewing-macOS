@@ -16,198 +16,178 @@ public struct VwrSettingsPaneDictionary: View {
   // MARK: Public
 
   public var body: some View {
-    NavigationStack {
-      Form {
-        // MARK: - User Data Folder Path Management
+    Form {
+      // MARK: - User Data Folder Path Management
 
-        Section {
-          Group {
-            VStack(alignment: .leading) {
-              Text(
-                LocalizedStringKey(
-                  "Choose your desired user data folder path. Will be omitted if invalid."
-                )
+      Section {
+        Group {
+          VStack(alignment: .leading) {
+            Text(
+              LocalizedStringKey(
+                "Choose your desired user data folder path. Will be omitted if invalid."
               )
-              HStack(spacing: 3) {
-                PathControl(pathDroppable: $userDataFolderSpecified) { pathControl in
-                  pathControl.allowedTypes = ["public.folder", "public.directory"]
-                  pathControl
-                    .placeholderString = "Please drag the desired target from Finder to this place."
-                    .i18n
-                } acceptDrop: { pathControl, info in
-                  let urls = info.draggingPasteboard.readObjects(forClasses: [NSURL.self])
-                  guard let url = urls?.first as? URL else { return false }
-                  let bolPreviousFolderValidity = LMMgr.checkIfSpecifiedUserDataFolderValid(
-                    PrefMgr.shared.userDataFolderSpecified.expandingTildeInPath
-                  )
-                  var newPath = url.path
-                  newPath.ensureTrailingSlash()
-                  if LMMgr.checkIfSpecifiedUserDataFolderValid(newPath) {
-                    userDataFolderSpecified = newPath
-                    pathControl.url = url
-                    BookmarkManager.shared.saveBookmark(for: url)
-                    AppDelegate.shared.updateDirectoryMonitorPath()
-                    return true
-                  }
-                  // On Error:
-                  IMEApp.buzz()
-                  if !bolPreviousFolderValidity {
-                    userDataFolderSpecified = fdrUserDataDefault
-                    pathControl.url = URL(fileURLWithPath: fdrUserDataDefault)
-                  }
-                  return false
-                }
-                Button {
-                  if NSEvent.keyModifierFlags == .option, !userDataFolderSpecified.isEmpty {
-                    NSWorkspace.shared.activateFileViewerSelecting(
-                      [URL(fileURLWithPath: userDataFolderSpecified)]
-                    )
-                    return
-                  }
-                  isShowingFolderImporter = true
-                } label: {
-                  Text("...")
-                }.frame(minWidth: 25)
-                Button {
-                  userDataFolderSpecified = fdrUserDataDefault
-                } label: {
-                  Text("↻")
-                }.frame(minWidth: 25)
-              }
-              Spacer()
-              Text(
-                LocalizedStringKey(
-                  "Due to security concerns, we don't consider implementing anything related to shell script execution here. An input method doing this without implementing App Sandbox will definitely have system-wide vulnerabilities, considering that its related UserDefaults are easily tamperable to execute malicious shell scripts. vChewing is designed to be invulnerable from this kind of attack. Also, official releases of vChewing are Sandboxed."
-                )
-              )
-              .settingsDescription()
-              UserDef.kShouldAutoReloadUserDataFiles.bind(
-                $shouldAutoReloadUserDataFiles.didChange {
-                  if shouldAutoReloadUserDataFiles {
-                    LMMgr.initUserLangModels()
-                  }
-                }
-              ).render()
-            }
-          }
-          .fileImporter(
-            isPresented: $isShowingFolderImporter,
-            allowedContentTypes: [.folder],
-            allowsMultipleSelection: false
-          ) { result in
-            let bolPreviousFolderValidity = LMMgr.checkIfSpecifiedUserDataFolderValid(
-              userDataFolderSpecified.expandingTildeInPath
             )
-
-            switch result {
-            case let .success(urls):
-              guard let url = urls.first else { return }
-              var newPath = url.path
-              newPath.ensureTrailingSlash()
-              if LMMgr.checkIfSpecifiedUserDataFolderValid(newPath) {
-                userDataFolderSpecified = newPath
-                BookmarkManager.shared.saveBookmark(for: url)
-                AppDelegate.shared.updateDirectoryMonitorPath()
-              } else {
+            HStack(spacing: 3) {
+              PathControl(pathDroppable: $userDataFolderSpecified) { pathControl in
+                pathControl.allowedTypes = ["public.folder", "public.directory"]
+                pathControl
+                  .placeholderString = "Please drag the desired target from Finder to this place."
+                  .i18n
+              } acceptDrop: { pathControl, info in
+                let urls = info.draggingPasteboard.readObjects(forClasses: [NSURL.self])
+                guard let url = urls?.first as? URL else { return false }
+                let bolPreviousFolderValidity = LMMgr.checkIfSpecifiedUserDataFolderValid(
+                  PrefMgr.shared.userDataFolderSpecified.expandingTildeInPath
+                )
+                var newPath = url.path
+                newPath.ensureTrailingSlash()
+                if LMMgr.checkIfSpecifiedUserDataFolderValid(newPath) {
+                  userDataFolderSpecified = newPath
+                  pathControl.url = url
+                  BookmarkManager.shared.saveBookmark(for: url)
+                  AppDelegate.shared.updateDirectoryMonitorPath()
+                  return true
+                }
+                // On Error:
                 IMEApp.buzz()
                 if !bolPreviousFolderValidity {
                   userDataFolderSpecified = fdrUserDataDefault
+                  pathControl.url = URL(fileURLWithPath: fdrUserDataDefault)
                 }
+                return false
               }
-            case .failure:
+              Button {
+                if NSEvent.keyModifierFlags == .option, !userDataFolderSpecified.isEmpty {
+                  NSWorkspace.shared.activateFileViewerSelecting(
+                    [URL(fileURLWithPath: userDataFolderSpecified)]
+                  )
+                  return
+                }
+                isShowingFolderImporter = true
+              } label: {
+                Text("...")
+              }.frame(minWidth: 25)
+              Button {
+                userDataFolderSpecified = fdrUserDataDefault
+              } label: {
+                Text("↻")
+              }.frame(minWidth: 25)
+            }
+            Spacer()
+            Text(
+              LocalizedStringKey(
+                "Due to security concerns, we don't consider implementing anything related to shell script execution here. An input method doing this without implementing App Sandbox will definitely have system-wide vulnerabilities, considering that its related UserDefaults are easily tamperable to execute malicious shell scripts. vChewing is designed to be invulnerable from this kind of attack. Also, official releases of vChewing are Sandboxed."
+              )
+            )
+            .settingsDescription()
+            UserDef.kShouldAutoReloadUserDataFiles.renderUI {
+              if PrefMgr.shared.shouldAutoReloadUserDataFiles {
+                LMMgr.initUserLangModels()
+              }
+            }
+          }
+        }
+        .fileImporter(
+          isPresented: $isShowingFolderImporter,
+          allowedContentTypes: [.folder],
+          allowsMultipleSelection: false
+        ) { result in
+          let bolPreviousFolderValidity = LMMgr.checkIfSpecifiedUserDataFolderValid(
+            userDataFolderSpecified.expandingTildeInPath
+          )
+
+          switch result {
+          case let .success(urls):
+            guard let url = urls.first else { return }
+            var newPath = url.path
+            newPath.ensureTrailingSlash()
+            if LMMgr.checkIfSpecifiedUserDataFolderValid(newPath) {
+              userDataFolderSpecified = newPath
+              BookmarkManager.shared.saveBookmark(for: url)
+              AppDelegate.shared.updateDirectoryMonitorPath()
+            } else {
+              IMEApp.buzz()
               if !bolPreviousFolderValidity {
                 userDataFolderSpecified = fdrUserDataDefault
               }
             }
+          case .failure:
+            if !bolPreviousFolderValidity {
+              userDataFolderSpecified = fdrUserDataDefault
+            }
           }
         }
+      }
 
-        Section {
-          UserDef.kEnforceETenDOSCandidateSequence.bind(
-            $enforceETenDOSCandidateSequence.didChange {
-              LMMgr.syncLMPrefs()
-            }
-          ).render()
-          UserDef.kUseExternalFactoryDict.bind(
-            $useExternalFactoryDict.didChange {
-              LMMgr.connectCoreDB()
-            }
-          ).render()
-          UserDef.kFilterNonCNSReadingsForCHTInput.bind(
-            $filterNonCNSReadingsForCHTInput.didChange {
-              LMMgr.connectCoreDB()
-            }
-          ).render()
-          UserDef.kCNS11643Enabled.bind(
-            $cns11643Enabled.didChange {
-              LMMgr.syncLMPrefs()
-            }
-          ).render()
-          UserDef.kSymbolInputEnabled.bind(
-            $symbolInputEnabled.didChange {
-              LMMgr.syncLMPrefs()
-            }
-          ).render()
-          UserDef.kReplaceSymbolMenuNodeWithUserSuppliedData.bind(
-            $replaceSymbolMenuNodeWithUserSuppliedData
-          ).render()
-          UserDef.kPhraseReplacementEnabled.bind(
-            $phraseReplacementEnabled.didChange {
-              LMMgr.syncLMPrefs()
-              if phraseReplacementEnabled {
-                LMMgr.loadUserPhraseReplacement()
-              }
-            }
-          ).render()
+      Section {
+        UserDef.kEnforceETenDOSCandidateSequence.renderUI {
+          LMMgr.syncLMPrefs()
         }
-
-        Section {
-          UserDef.kFetchSuggestionsFromPerceptionOverrideModel
-            .bind($fetchSuggestionsFromPerceptionOverrideModel).render()
-          UserDef.kReducePOMLifetimeToNoMoreThan12Hours
-            .bind($reducePOMLifetimeToNoMoreThan12Hours).render()
+        UserDef.kUseExternalFactoryDict.renderUI {
+          LMMgr.connectCoreDB()
         }
-
-        Section {
-          VStack(alignment: .leading) {
-            LabeledContent("i18n:settings.importFromKimoTxt.label") {
-              Button("…") {
-                isShowingFileImporter = true
-              }
-              .fileImporter(
-                isPresented: $isShowingFileImporter,
-                allowedContentTypes: ["txt", "db"].compactMap {
-                  .init(filenameExtension: $0)
-                },
-                allowsMultipleSelection: false
-              ) { result in
-                keykeyImportButtonDisabled = true
-                defer { keykeyImportButtonDisabled = false }
-
-                switch result {
-                case let .success(urls):
-                  guard let url = urls.first else { return }
-                  task4ImportingKeyKeyUserDict(url)
-                case .failure:
-                  break
-                }
-              }
-              Button("i18n:settings.importFromKimoTxt.DirectlyImport") {
-                task4ImportingKeyKeyUserDict()
-              }
-            }
-            .disabled(keykeyImportButtonDisabled)
-            .frame(maxWidth: .infinity)
-            Text(LocalizedStringKey("i18n:settings.importFromKimoTxt.description"))
-              .settingsDescription()
+        UserDef.kFilterNonCNSReadingsForCHTInput.renderUI {
+          LMMgr.connectCoreDB()
+        }
+        UserDef.kCNS11643Enabled.renderUI {
+          LMMgr.syncLMPrefs()
+        }
+        UserDef.kSymbolInputEnabled.renderUI {
+          LMMgr.syncLMPrefs()
+        }
+        UserDef.kReplaceSymbolMenuNodeWithUserSuppliedData.renderUI()
+        UserDef.kPhraseReplacementEnabled.renderUI {
+          LMMgr.syncLMPrefs()
+          if PrefMgr.shared.phraseReplacementEnabled {
+            LMMgr.loadUserPhraseReplacement()
           }
         }
-      }.formStyled()
-    }
-    .frame(
-      minWidth: CtlSettingsUI.formWidth,
-      maxHeight: CtlSettingsUI.contentMaxHeight
-    )
+      }
+
+      Section {
+        UserDef.kFetchSuggestionsFromPerceptionOverrideModel.renderUI()
+        UserDef.kReducePOMLifetimeToNoMoreThan12Hours.renderUI()
+      }
+
+      Section {
+        VStack(alignment: .leading) {
+          LabeledContent("i18n:settings.importFromKimoTxt.label") {
+            Button("…") {
+              isShowingFileImporter = true
+            }
+            .fileImporter(
+              isPresented: $isShowingFileImporter,
+              allowedContentTypes: ["txt", "db"].compactMap {
+                .init(filenameExtension: $0)
+              },
+              allowsMultipleSelection: false
+            ) { result in
+              keykeyImportButtonDisabled = true
+              defer { keykeyImportButtonDisabled = false }
+
+              switch result {
+              case let .success(urls):
+                guard let url = urls.first else { return }
+                task4ImportingKeyKeyUserDict(url)
+              case .failure:
+                break
+              }
+            }
+            Button("i18n:settings.importFromKimoTxt.DirectlyImport") {
+              task4ImportingKeyKeyUserDict()
+            }
+          }
+          .disabled(keykeyImportButtonDisabled)
+          .frame(maxWidth: .infinity)
+          Text(LocalizedStringKey("i18n:settings.importFromKimoTxt.description"))
+            .settingsDescription()
+        }
+      }
+    }.formStyled()
+      .frame(
+        minWidth: CtlSettingsUI.formWidth,
+        maxHeight: CtlSettingsUI.contentMaxHeight
+      )
   }
 
   // MARK: Private
@@ -219,40 +199,10 @@ public struct VwrSettingsPaneDictionary: View {
   @State
   private var isShowingFileImporter = false
 
-  // MARK: - AppStorage Variables
+  // MARK: - AppStorage Variables（僅保留需經 PathControl 繫結的屬性）
 
   @AppStorage(wrappedValue: "", UserDef.kUserDataFolderSpecified.rawValue)
   private var userDataFolderSpecified: String
-
-  @AppStorage(wrappedValue: true, UserDef.kShouldAutoReloadUserDataFiles.rawValue)
-  private var shouldAutoReloadUserDataFiles: Bool
-
-  @AppStorage(wrappedValue: true, UserDef.kEnforceETenDOSCandidateSequence.rawValue)
-  private var enforceETenDOSCandidateSequence: Bool
-
-  @AppStorage(wrappedValue: false, UserDef.kUseExternalFactoryDict.rawValue)
-  private var useExternalFactoryDict: Bool
-
-  @AppStorage(wrappedValue: true, UserDef.kReplaceSymbolMenuNodeWithUserSuppliedData.rawValue)
-  public var replaceSymbolMenuNodeWithUserSuppliedData: Bool
-
-  @AppStorage(wrappedValue: false, UserDef.kCNS11643Enabled.rawValue)
-  private var cns11643Enabled: Bool
-
-  @AppStorage(wrappedValue: true, UserDef.kSymbolInputEnabled.rawValue)
-  private var symbolInputEnabled: Bool
-
-  @AppStorage(wrappedValue: true, UserDef.kFetchSuggestionsFromPerceptionOverrideModel.rawValue)
-  private var fetchSuggestionsFromPerceptionOverrideModel: Bool
-
-  @AppStorage(wrappedValue: false, UserDef.kReducePOMLifetimeToNoMoreThan12Hours.rawValue)
-  private var reducePOMLifetimeToNoMoreThan12Hours: Bool
-
-  @AppStorage(wrappedValue: false, UserDef.kPhraseReplacementEnabled.rawValue)
-  private var phraseReplacementEnabled: Bool
-
-  @AppStorage(wrappedValue: false, UserDef.kFilterNonCNSReadingsForCHTInput.rawValue)
-  private var filterNonCNSReadingsForCHTInput: Bool
 
   // MARK: - Main View
 
@@ -278,9 +228,7 @@ public struct VwrSettingsPaneDictionary: View {
       )
     } catch {
       let error = NSAlert(error: error)
-      error.beginSheetModal(at: CtlSettingsUI.shared?.window) { _ in
-        // DO NOTHING.
-      }
+      error.beginSheetModal(at: CtlSettingsUI.shared?.window)
     }
   }
 }
