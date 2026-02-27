@@ -394,6 +394,19 @@
 
   // MARK: - Memory Footprint Calculator
 
+  // 協助釋放 malloc zone 中未使用的頁面，使得後續的足跡
+  // 測量只計算實際有物理 backing 的記憶體。自我終止機制
+  // 依賴準確的值；若不這麼做，allocator 可能保留大量空
+  // 閒區塊而讓 RSS 看起來仍然很高。呼叫
+  // `malloc_zone_pressure_relief` 是官方文件建議的釋放方式。
+  extension NSApplication {
+    public static func purgeMallocZones() {
+      // `nil` 表示預設 zone；第二個參數是想要釋放的數量，但 zone
+      // 可視情況選擇不釋放。
+      malloc_zone_pressure_relief(nil, 0)
+    }
+  }
+
   // Ref: https://developer.apple.com/forums/thread/105088?answerId=357415022#357415022
   extension NSApplication {
     /// The memory footprint of the current application in bytes.

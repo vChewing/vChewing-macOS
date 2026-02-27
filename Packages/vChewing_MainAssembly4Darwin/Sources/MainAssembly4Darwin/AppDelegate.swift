@@ -206,39 +206,58 @@ extension AppDelegate {
   /// - Returns: 記憶體佔用量（MiB）。
   @discardableResult
   public func checkMemoryUsage() -> Double {
-    guard let currentMemorySizeInBytes = NSApplication.memoryFootprint else { return 0 }
-    let currentMemorySize: Double = (Double(currentMemorySizeInBytes) / 1_024 / 1_024)
-      .rounded(toPlaces: 1)
-    switch currentMemorySize {
-    case 1_024...:
-      vCLog("WARNING: EXCESSIVE MEMORY FOOTPRINT (\(currentMemorySize)MB).")
-      let title = "vChewing".i18n
-      let body =
-        "vChewing is rebooted due to a memory-excessive-usage problem. If convenient, please inform the developer that you are having this issue, stating whether you are using an Intel Mac or Apple Silicon Mac. An NSLog is generated with the current memory footprint size."
-          .i18n
-      if #available(macOS 10.14, *) {
-        let msgPackage = UNMutableNotificationContent()
-        msgPackage.title = title
-        msgPackage.body = body
-        UNUserNotificationCenter.current().add(
-          .init(
-            identifier: "vChewing.notification.memoryExcessiveUsage",
-            content: msgPackage, trigger: nil
-          ),
-          withCompletionHandler: nil
-        )
-      } else {
-        let userNotification = NSUserNotification()
-        userNotification.title = title
-        userNotification.informativeText = body
-        NSUserNotificationCenter.default.deliver(userNotification)
-      }
-      asyncOnMain(after: 0.3) {
-        NSApp.terminate(self)
-      }
-    default: break
+    // 先釋放 malloc zone 中未使用的頁面，讓後續讀到的值更貼近
+    // 真正佔用的物理記憶體。這對自盡機制至關重要，否則 allocator
+    // 可能保留大量空閒區而造成假高值。
+    NSApplication.purgeMallocZones()
+
+    func sample() -> Double {
+      guard let bytes = NSApplication.memoryFootprint else { return 0 }
+      return (Double(bytes) / 1_024 / 1_024).rounded(toPlaces: 1)
     }
+
+    let currentMemorySize = sample()
+    // 若第一次看起來超標，延遲短暫再測一次，避免因瞬間峰值就發起
+    // 自殺。第二次的數值將決定是否發動。
+    if currentMemorySize >= 1_024 {
+      asyncOnMain(after: 0.25) { [weak self] in
+        guard let self = self else { return }
+        let second = sample()
+        if second >= 1_024 {
+          self.memoryExceededNotification(size: second)
+        }
+      }
+    }
+
     return currentMemorySize
+  }
+
+  private func memoryExceededNotification(size: Double) {
+    vCLog("WARNING: EXCESSIVE MEMORY FOOTPRINT (\(size)MB).")
+    let title = "vChewing".i18n
+    let body =
+      "vChewing is rebooted due to a memory-excessive-usage problem. If convenient, please inform the developer that you are having this issue, stating whether you are using an Intel Mac or Apple Silicon Mac. An NSLog is generated with the current memory footprint size."
+        .i18n
+    if #available(macOS 10.14, *) {
+      let msgPackage = UNMutableNotificationContent()
+      msgPackage.title = title
+      msgPackage.body = body
+      UNUserNotificationCenter.current().add(
+        .init(
+          identifier: "vChewing.notification.memoryExcessiveUsage",
+          content: msgPackage, trigger: nil
+        ),
+        withCompletionHandler: nil
+      )
+    } else {
+      let userNotification = NSUserNotification()
+      userNotification.title = title
+      userNotification.informativeText = body
+      NSUserNotificationCenter.default.deliver(userNotification)
+    }
+    asyncOnMain(after: 0.3) {
+      NSApp.terminate(self)
+    }
   }
 
   /// 以此取代 `MainMenu.xib`。

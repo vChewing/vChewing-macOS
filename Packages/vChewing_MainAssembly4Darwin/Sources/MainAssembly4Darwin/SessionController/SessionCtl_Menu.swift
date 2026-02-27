@@ -416,6 +416,9 @@ extension SessionCtl {
   var silentMode: Bool { core?.clientBundleIdentifier == "com.apple.SecurityAgent" }
 
   var currentRAMUsageDescription: String? {
+    // 關閉 malloc zone 的空閒頁面，讓選單顯示的數值儘可能真實
+    // 而不是因為 allocator cache 還沒退回導致的人為偏高。
+    NSApplication.purgeMallocZones()
     guard let currentMemorySizeInBytes = NSApplication.memoryFootprint else { return nil }
     let currentMemorySize: Double = (Double(currentMemorySizeInBytes) / 1_024 / 1_024)
       .rounded(toPlaces: 1)
