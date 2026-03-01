@@ -63,7 +63,6 @@
 "Candidate Layout:" = "候選字窗佈局:";
 "Candidate Size:" = "候選字窗字號:";
 "Cassette mode is similar to the CIN support of the Yahoo! KeyKey IME, allowing users to use their own CIN tables to implement their stroked-based input schema (e.g. Wubi, Cangjie, Boshiamy, etc.) as a plan-B in vChewing IME. However, since vChewing won't compromise its phonabet input mode experience for this cassette mode, users might not feel comfortable enough comparing to their experiences with RIME (recommended) or OpenVanilla (deprecated)." = "磁帶模式類似於雅虎奇摩輸入法的 CIN 支援模式，允許使用者藉由 CIN 表格檔案擴充自己想要的筆畫輸入法（比如五筆、倉頡、嘸蝦米，等）。然而，因為唯音不打算為了這個功能而犧牲注音輸入的體驗，所以這個磁帶模式的體驗對於已經習慣 RIME 或者 OpenVanilla 的人群而言可能會稍微麻煩一些。";
-"Cassette" = "磁帶設定";
 "catAlphabets" = "字母";
 "catBracketedASCII" = "括英";
 "catBracketKanjis" = "括字";
@@ -134,8 +133,6 @@
 "Debug Mode" = "偵錯模式";
 "defaults write org.atelierInmu.inputmethod.vChewing CassettePath -string \"~/FilePathEndedWithoutTrailingSlash\"" = "defaults write org.atelierInmu.inputmethod.vChewing CassettePath -string \"~/不帶尾部斜槓的檔案路徑\"";
 "defaults write org.atelierInmu.inputmethod.vChewing UserDataFolderSpecified -string \"~/FolderPathEndedWithTrailingSlash/\"" = "defaults write org.atelierInmu.inputmethod.vChewing UserDataFolderSpecified -string \"~/帶尾部斜槓的資料夾路徑/\"";
-"DevZone" = "開發道場";
-"Dictionary" = "辭典設定";
 "Directly commit lowercased letters only if the compositor is empty" = "直接遞交小寫字母，除非組字區不為空";
 "Directly commit uppercased letters only if the compositor is empty" = "直接遞交大寫字母，除非組字區不為空";
 "Disable forced conversion for cassette outputs" = "對磁帶模式禁用繁簡轉換";
@@ -176,7 +173,6 @@
 "for revolving candidates" = "輪替候選字";
 "for revolving pages" = "輪替頁面";
 "Force KangXi Writing" = "康熙正體字模式";
-"General" = "通用設定";
 "Half-Width Punctuation Mode" = "半形標點模式";
 "Hanin Keyboard Symbol Input." = "漢音鍵盤符號模式。";
 "Hanyu Pinyin with Numeral Intonation" = "漢語拼音+數字標調";
@@ -330,7 +326,6 @@
 "Just Select" = "直接選取";
 "Key names in tooltip will be shown as symbols when the tooltip is vertical. However, this option will be ignored since tooltip will always be horizontal if the UI language is English." = "縱排輸入的情況下，工具提示內的按鍵名稱會以符號顯示。";
 "Keyboard Shortcuts:" = "鍵盤熱鍵:";
-"Keyboard" = "鍵盤設定";
 "Leave it checked" = "保持勾選";
 "Loading CHS Core Dict..." = "載入簡體中文核心辭典…";
 "Loading CHT Core Dict..." = "載入繁體中文核心辭典…";

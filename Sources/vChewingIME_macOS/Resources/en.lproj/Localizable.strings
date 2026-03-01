@@ -63,7 +63,6 @@
 "Candidate Layout:" = "Candidate Layout:";
 "Candidate Size:" = "Candidate Size:";
 "Cassette mode is similar to the CIN support of the Yahoo! KeyKey IME, allowing users to use their own CIN tables to implement their stroked-based input schema (e.g. Wubi, Cangjie, Boshiamy, etc.) as a plan-B in vChewing IME. However, since vChewing won't compromise its phonabet input mode experience for this cassette mode, users might not feel comfortable enough comparing to their experiences with RIME (recommended) or OpenVanilla (deprecated)." = "Cassette mode is similar to the CIN support of the Yahoo! KeyKey IME, allowing users to use their own CIN tables to implement their stroked-based input schema (e.g. Wubi, Cangjie, Boshiamy, etc.) as a plan-B in vChewing IME. However, since vChewing won't compromise its phonabet input mode experience for this cassette mode, users might not feel comfortable enough comparing to their experiences with RIME (recommended) or OpenVanilla (deprecated).";
-"Cassette" = "Cassette";
 "catAlphabets" = "Alphabets";
 "catBracketedASCII" = "BracketASCII";
 "catBracketKanjis" = "BracketKanjis";
@@ -134,8 +133,6 @@
 "Debug Mode" = "Debug Mode";
 "defaults write org.atelierInmu.inputmethod.vChewing CassettePath -string \"~/FilePathEndedWithoutTrailingSlash\"" = "defaults write org.atelierInmu.inputmethod.vChewing CassettePath -string \"~/FilePathEndedWithoutTrailingSlash\"";
 "defaults write org.atelierInmu.inputmethod.vChewing UserDataFolderSpecified -string \"~/FolderPathEndedWithTrailingSlash/\"" = "defaults write org.atelierInmu.inputmethod.vChewing UserDataFolderSpecified -string \"~/FolderPathEndedWithTrailingSlash/\"";
-"DevZone" = "DevZone";
-"Dictionary" = "Dictionary";
 "Directly commit lowercased letters only if the compositor is empty" = "Directly commit lowercased letters only if the compositor is empty";
 "Directly commit uppercased letters only if the compositor is empty" = "Directly commit uppercased letters only if the compositor is empty";
 "Disable forced conversion for cassette outputs" = "Disable forced conversion for cassette outputs";
@@ -176,7 +173,6 @@
 "for revolving candidates" = "for revolving candidates";
 "for revolving pages" = "for revolving pages";
 "Force KangXi Writing" = "Force KangXi Writing";
-"General" = "General";
 "Half-Width Punctuation Mode" = "Half-Width Punctuation Mode";
 "Hanin Keyboard Symbol Input." = "Hanin Keyboard Symbol Input.";
 "Hanyu Pinyin with Numeral Intonation" = "Hanyu Pinyin with Numeral Intonation";
@@ -330,7 +326,6 @@
 "Just Select" = "Just Select";
 "Key names in tooltip will be shown as symbols when the tooltip is vertical. However, this option will be ignored since tooltip will always be horizontal if the UI language is English." = "Key names in tooltip will be shown as symbols when the tooltip is vertical. However, this option will be ignored since tooltip will always be horizontal if the UI language is English.";
 "Keyboard Shortcuts:" = "Keyboard Shortcuts:";
-"Keyboard" = "Keyboard";
 "Leave it checked" = "Leave it checked";
 "Loading CHS Core Dict..." = "Loading CHS Core Dict...";
 "Loading CHT Core Dict..." = "Loading CHT Core Dict...";

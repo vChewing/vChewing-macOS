@@ -63,7 +63,6 @@
 "Candidate Layout:" = "入力候補陳列の仕様";
 "Candidate Size:" = "候補文字の字号:";
 "Cassette mode is similar to the CIN support of the Yahoo! KeyKey IME, allowing users to use their own CIN tables to implement their stroked-based input schema (e.g. Wubi, Cangjie, Boshiamy, etc.) as a plan-B in vChewing IME. However, since vChewing won't compromise its phonabet input mode experience for this cassette mode, users might not feel comfortable enough comparing to their experiences with RIME (recommended) or OpenVanilla (deprecated)." = "カセットモードは、CIN ファイルを用いて、（五筆や倉頡や嘸蝦米などのような）筆画入力を機能拡張できるモードである。ですが、単なる予備機能として提供したもののため、使いやすいかどうか、RIME や OpenVanilla などに比べられないかもしれん。";
-"Cassette" = "カセ設定";
 "catAlphabets" = "字母";
 "catBracketedASCII" = "括付英数";
 "catBracketKanjis" = "括付漢字";
@@ -133,8 +132,6 @@
 "Debug Mode" = "欠陥辿着モード";
 "defaults write org.atelierInmu.inputmethod.vChewing CassettePath -string \"~/FilePathEndedWithoutTrailingSlash\"" = "defaults write org.atelierInmu.inputmethod.vChewing CassettePath -string \"~/FilePathEndedWithoutTrailingSlash\"";
 "defaults write org.atelierInmu.inputmethod.vChewing UserDataFolderSpecified -string \"~/FolderPathEndedWithTrailingSlash/\"" = "defaults write org.atelierInmu.inputmethod.vChewing UserDataFolderSpecified -string \"~/FolderPathEndedWithTrailingSlash/\"";
-"DevZone" = "開発道場";
-"Dictionary" = "辞書設定";
 "Directly commit lowercased letters only if the compositor is empty" = "入力緩衝列がからっぽの時、ローマ字（小文字）を直接出力";
 "Directly commit uppercased letters only if the compositor is empty" = "入力緩衝列がからっぽの時、ローマ字（大文字）を直接出力";
 "Disable forced conversion for cassette outputs" = "カセットモードによる漢字出力の簡繁転換を行わずにする";
@@ -175,7 +172,6 @@
 "for revolving candidates" = "候補文字そのもの";
 "for revolving pages" = "候補陳列ページ";
 "Force KangXi Writing" = "康熙文字変換モード";
-"General" = "全般設定";
 "Half-Width Punctuation Mode" = "半角句読モード";
 "Hanin Keyboard Symbol Input." = "漢音キーボード符号入力。";
 "Hanyu Pinyin with Numeral Intonation" = "漢語弁音 (ローマ字+数字音調)";
@@ -329,7 +325,6 @@
 "Just Select" = "直接に選ぶ";
 "Key names in tooltip will be shown as symbols when the tooltip is vertical. However, this option will be ignored since tooltip will always be horizontal if the UI language is English." = "縦書き入力の場合、ヒントにはキーの名前は常に符号で表示する。";
 "Keyboard Shortcuts:" = "ショートカット:";
-"Keyboard" = "配列設定";
 "Leave it checked" = "チェックをそのままに";
 "Loading CHS Core Dict..." = "簡体中国語核心辞書読込中…";
 "Loading CHT Core Dict..." = "繁体中国語核心辞書読込中…";
