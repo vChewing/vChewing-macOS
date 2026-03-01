@@ -67,12 +67,7 @@ public struct VwrSettingsPaneCandidates: View {
       // MARK: (header: Text("Experimental:"))
 
       let imkEOSNoticeButton = Button("Where's IMK Candidate Window?") {
-        if let window = CtlSettingsUI.shared?.window {
-          let title = "The End of Support for IMK Candidate Window"
-          let explanation =
-            "1) Only macOS has IMKCandidates. Since it relies on a dedicated ObjC Bridging Header to expose necessary internal APIs to work, it hinders vChewing from completely modularized for multi-platform support.\n\n2) IMKCandidates is buggy. It is not likely to be completely fixed by Apple, and its devs are not allowed to talk about it to non-Apple individuals. That's why we have had enough with IMKCandidates. It is likely the reason why Apple had never used IMKCandidates in their official InputMethodKit sample projects (as of August 2023)."
-          window.callAlert(title: title.i18n, text: explanation.i18n)
-        }
+        isShowingIMKEOSNotice = true
       }
 
       Section(footer: imkEOSNoticeButton) {
@@ -83,9 +78,23 @@ public struct VwrSettingsPaneCandidates: View {
         minWidth: CtlSettingsUI.formWidth,
         maxHeight: CtlSettingsUI.contentMaxHeight
       )
+      .alert(
+        "The End of Support for IMK Candidate Window".i18n,
+        isPresented: $isShowingIMKEOSNotice
+      ) {
+        Button("OK".i18n, role: .cancel) {}
+      } message: {
+        Text(
+          "1) Only macOS has IMKCandidates. Since it relies on a dedicated ObjC Bridging Header to expose necessary internal APIs to work, it hinders vChewing from completely modularized for multi-platform support.\n\n2) IMKCandidates is buggy. It is not likely to be completely fixed by Apple, and its devs are not allowed to talk about it to non-Apple individuals. That\u{2019}s why we have had enough with IMKCandidates. It is likely the reason why Apple had never used IMKCandidates in their official InputMethodKit sample projects (as of August 2023)."
+            .i18n
+        )
+      }
   }
 
   // MARK: Private
+
+  @State
+  private var isShowingIMKEOSNotice = false
 
   // MARK: - AppStorage Variables（僅保留需在 View 條件中讀取的屬性）
 
@@ -122,19 +131,33 @@ private struct VwrSettingsPaneCandidates_SelectionKeys: View {
       ).lowercased().deduplicated
       // Start Error Handling.
       if let errorResult = PrefMgr.shared.validate(candidateKeys: keys) {
-        if let window = CtlSettingsUI.shared?.window, !keys.isEmpty {
+        if !keys.isEmpty {
           IMEApp.buzz()
-          let alert = NSAlert(error: "Invalid Selection Keys.".i18n)
-          alert.informativeText = errorResult
-          alert.beginSheetModal(for: window) { _ in
-            candidateKeys = UserDef.kCandidateKeys.stringDefaultValue
-          }
+          selectionKeyErrorMessage = errorResult
+          isShowingSelectionKeyError = true
         }
+      }
+    }
+    .alert(
+      "Invalid Selection Keys.".i18n,
+      isPresented: $isShowingSelectionKeyError
+    ) {
+      Button("OK".i18n, role: .cancel) {
+        candidateKeys = UserDef.kCandidateKeys.stringDefaultValue
+      }
+    } message: {
+      if let msg = selectionKeyErrorMessage {
+        Text(msg)
       }
     }
   }
 
   // MARK: Private
+
+  @State
+  private var isShowingSelectionKeyError = false
+  @State
+  private var selectionKeyErrorMessage: String?
 
   // MARK: - AppStorage Variables
 

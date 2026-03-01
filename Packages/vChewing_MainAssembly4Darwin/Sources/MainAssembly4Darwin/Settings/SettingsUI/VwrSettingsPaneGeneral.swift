@@ -94,6 +94,24 @@ public struct VwrSettingsPaneGeneral: View {
         minWidth: CtlSettingsUI.formWidth,
         maxHeight: CtlSettingsUI.contentMaxHeight
       )
+      .alert(
+        "Warning".i18n,
+        isPresented: $isShowingFartWarning
+      ) {
+        Button("Uncheck".i18n, role: .destructive) {
+          PrefMgr.shared.shouldNotFartInLieuOfBeep = false
+          IMEApp.buzz()
+        }
+        Button("Leave it checked".i18n, role: .cancel) {
+          PrefMgr.shared.shouldNotFartInLieuOfBeep = true
+          IMEApp.buzz()
+        }
+      } message: {
+        Text(
+          "You are about to uncheck this fart suppressor. You are responsible for all consequences lead by letting people nearby hear the fart sound come from your computer. We strongly advise against unchecking this in any public circumstance that prohibits NSFW netas."
+            .i18n
+        )
+      }
   }
 
   // MARK: Internal
@@ -103,30 +121,13 @@ public struct VwrSettingsPaneGeneral: View {
 
   // MARK: Private
 
+  @State
+  private var isShowingFartWarning = false
+
   private func onFartControlChange() {
-    let content = String(
-      format: "You are about to uncheck this fart suppressor. You are responsible for all consequences lead by letting people nearby hear the fart sound come from your computer. We strongly advise against unchecking this in any public circumstance that prohibits NSFW netas."
-        .i18n
-    )
-    let alert = NSAlert(error: "Warning".i18n)
-    alert.informativeText = content
-    alert.addButton(withTitle: "Uncheck".i18n)
-    alert.buttons.forEach { button in
-      button.hasDestructiveAction = true
-    }
-    alert.addButton(withTitle: "Leave it checked".i18n)
-    if let window = CtlSettingsUI.shared?.window, !PrefMgr.shared.shouldNotFartInLieuOfBeep {
+    if !PrefMgr.shared.shouldNotFartInLieuOfBeep {
       PrefMgr.shared.shouldNotFartInLieuOfBeep = true
-      alert.beginSheetModal(for: window) { result in
-        switch result {
-        case .alertFirstButtonReturn:
-          PrefMgr.shared.shouldNotFartInLieuOfBeep = false
-        case .alertSecondButtonReturn:
-          PrefMgr.shared.shouldNotFartInLieuOfBeep = true
-        default: break
-        }
-        IMEApp.buzz()
-      }
+      isShowingFartWarning = true
       return
     }
     IMEApp.buzz()

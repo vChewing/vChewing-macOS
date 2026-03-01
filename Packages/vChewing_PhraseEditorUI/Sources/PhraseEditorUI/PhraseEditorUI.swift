@@ -112,6 +112,7 @@ public struct VwrPhraseEditorUI: View {
           )
         }
         .labelsHidden()
+        Spacer()
         Button("Reload") {
           asyncOnMain { update() }
         }.disabled(selInputMode == .imeModeNULL || isLoading)

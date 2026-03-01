@@ -72,14 +72,10 @@ public struct VwrSettingsPaneCassette: View {
         }
         UserDef.kCassetteEnabled.renderUI {
           if PrefMgr.shared.cassetteEnabled, !LMMgr.checkCassettePathValidity(PrefMgr.shared.cassettePath) {
-            if let window = CtlSettingsUI.shared?.window {
-              IMEApp.buzz()
-              let alert = NSAlert(error: "i18n:LMMgr.accessFailure.cassette.title".i18n)
-              alert.informativeText = "i18n:LMMgr.accessFailure.cassette.description".i18n
-              alert.beginSheetModal(for: window)
-            }
+            IMEApp.buzz()
             LMMgr.resetCassettePath()
             PrefMgr.shared.cassetteEnabled = false
+            isShowingCassetteError = true
           } else {
             LMMgr.loadCassetteData()
           }
@@ -99,6 +95,14 @@ public struct VwrSettingsPaneCassette: View {
         minWidth: CtlSettingsUI.formWidth,
         maxHeight: CtlSettingsUI.contentMaxHeight
       )
+      .alert(
+        "i18n:LMMgr.accessFailure.cassette.title".i18n,
+        isPresented: $isShowingCassetteError
+      ) {
+        Button("OK".i18n, role: .cancel) {}
+      } message: {
+        Text("i18n:LMMgr.accessFailure.cassette.description".i18n)
+      }
       .fileImporter(
         isPresented: $isShowingFileImporter,
         allowedContentTypes: [
@@ -137,6 +141,8 @@ public struct VwrSettingsPaneCassette: View {
 
   @State
   private var isShowingFileImporter = false
+  @State
+  private var isShowingCassetteError = false
 
   // MARK: - AppStorage Variables（僅保留需經 PathControl 繫結的屬性）
 

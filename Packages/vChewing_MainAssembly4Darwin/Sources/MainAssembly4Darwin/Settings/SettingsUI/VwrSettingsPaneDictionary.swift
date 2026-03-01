@@ -188,6 +188,16 @@ public struct VwrSettingsPaneDictionary: View {
         minWidth: CtlSettingsUI.formWidth,
         maxHeight: CtlSettingsUI.contentMaxHeight
       )
+      .alert(
+        importAlertTitle,
+        isPresented: $isShowingImportAlert
+      ) {
+        Button("OK".i18n, role: .cancel) {}
+      } message: {
+        if let msg = importAlertMessage {
+          Text(msg)
+        }
+      }
   }
 
   // MARK: Private
@@ -198,6 +208,12 @@ public struct VwrSettingsPaneDictionary: View {
   private var isShowingFolderImporter = false
   @State
   private var isShowingFileImporter = false
+  @State
+  private var isShowingImportAlert = false
+  @State
+  private var importAlertTitle: String = ""
+  @State
+  private var importAlertMessage: String?
 
   // MARK: - AppStorage Variables（僅保留需經 PathControl 繫結的屬性）
 
@@ -215,20 +231,19 @@ public struct VwrSettingsPaneDictionary: View {
     do {
       let countResult = try LMMgr.importYahooKeyKeyUserDictionary(url: url)
       let allImported = countResult.importedCount == countResult.totalFound
-      let postOpsNotice: String? = allImported
+      importAlertTitle = String(
+        format: "i18n:settings.importFromKimoTxt.finishedCount:%@%@".i18n,
+        countResult.totalFound.description,
+        countResult.importedCount.description
+      )
+      importAlertMessage = allImported
         ? nil
         : "i18n:settings.importFromKimoTxt.postOpsNotice".i18n
-      CtlSettingsUI.shared?.window.callAlert(
-        title: String(
-          format: "i18n:settings.importFromKimoTxt.finishedCount:%@%@".i18n,
-          countResult.totalFound.description,
-          countResult.importedCount.description
-        ),
-        text: postOpsNotice
-      )
+      isShowingImportAlert = true
     } catch {
-      let error = NSAlert(error: error)
-      error.beginSheetModal(at: CtlSettingsUI.shared?.window)
+      importAlertTitle = error.localizedDescription
+      importAlertMessage = nil
+      isShowingImportAlert = true
     }
   }
 }
