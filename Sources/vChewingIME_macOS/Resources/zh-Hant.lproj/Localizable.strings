@@ -400,7 +400,7 @@
 "Show Hanyu-Pinyin in the inline composition buffer" = "拼音並擊（組字區內顯示漢語拼音）";
 "Show translated strokes in composition buffer" = "在組字區內顯示字根、而非原始鍵盤碼";
 "Simplified Chinese" = "簡體中文";
-"Some client apps may have different compatibility issues in IMKTextInput implementation." = "有些客体应用可能会有不同的 IMKTextInput 实作相容问题。";
+"Some client apps may have different compatibility issues in IMKTextInput implementation." = "有些客體應用可能會有不同的 IMKTextInput 實作相容問題。";
 "Some clients with web-based front UI may have issues rendering segmented thick underlines drawn by their implemented “setMarkedText()”. This option stops the input method from delivering segmented thick underlines to “client().setMarkedText()”. Note that segmented thick underlines are only used in marking mode, unless the client itself misimplements the IMKTextInput method “setMarkedText()”. This option only affects the inline composition buffer." = "部分採用 Web 前端介面設計的客體應用可能會無法正常繪製用於輸入法標記模式的分段式粗型下劃線。這個選項將會阻止輸入法藉由 client().setMarkedText() 函式向客體應用傳達對粗型下劃線的分段繪製請求。分段式粗型下劃線僅用於輸入法的標記模式，除非客體應用對 setMarkedText() 這個 IMKTextInput 協定方法的實作有問題。該選項僅影響內文組字區。";
 "Some features are unavailable for macOS 10.15 and macOS 11 due to API limitations." = "因系統 API 限制，個別功能無法對 macOS 10.15 和 macOS 11 提供。";
 "Some previous options are moved to other tabs." = "該頁面某些先前曾經有過的選項已被移往其它頁籤。";

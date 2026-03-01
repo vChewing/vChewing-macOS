@@ -8,163 +8,162 @@
 
 import AppKit
 
-// MARK: - VwrServiceMenuEditor
+// MARK: - SettingsPanesCocoa.Services
 
-public final class VwrServiceMenuEditor: NSViewController {
-  // MARK: Lifecycle
+extension SettingsPanesCocoa {
+  public final class Services: NSViewController {
+    // MARK: Public
 
-  public convenience init(windowController: NSWindowController? = nil) {
-    self.init()
-    self.windowController = windowController
-  }
+    override public func loadView() {
+      tblServices.reloadData()
+      view = body ?? .init()
+      (view as? NSStackView)?.alignment = .centerX
+      view.makeSimpleConstraint(.width, relation: .equal, value: windowWidth)
+      btnRemoveService.keyEquivalent = .init(NSEvent.SpecialKey.delete.unicodeScalar)
+    }
 
-  // MARK: Public
+    // MARK: Internal
 
-  override public func loadView() {
-    tblServices.reloadData()
-    view = body ?? .init()
-    (view as? NSStackView)?.alignment = .centerX
-    view.makeSimpleConstraint(.width, relation: .equal, value: windowWidth)
-    btnRemoveService.keyEquivalent = .init(NSEvent.SpecialKey.delete.unicodeScalar)
-  }
+    let tableHeight: CGFloat = 390
 
-  // MARK: Internal
+    lazy var tblServices: NSTableView = .init()
+    lazy var btnShowInstructions = NSButton(
+      "How to Fill",
+      target: self,
+      action: #selector(btnShowInstructionsClicked(_:))
+    )
+    lazy var btnAddService = NSFileDragRetrieverButton(
+      "Add Service",
+      target: self,
+      action: #selector(btnAddServiceClicked(_:)),
+      postDrag: { [weak self] url in self?.handleDrag(url) }
+    )
+    lazy var btnRemoveService = NSButton(
+      "Remove Selected",
+      target: self,
+      action: #selector(btnRemoveServiceClicked(_:))
+    )
+    lazy var btnResetService = NSButton(
+      "Reset Default",
+      target: self,
+      action: #selector(btnResetServiceClicked(_:))
+    )
+    lazy var btnCopyAllToClipboard = NSButton(
+      "Copy All to Clipboard",
+      target: self,
+      action: #selector(btnCopyAllToClipboardClicked(_:))
+    )
+    lazy var tableColumn1Cell = NSTextFieldCell()
+    lazy var tableColumn1 = NSTableColumn()
+    lazy var tableColumn2Cell = NSTextFieldCell()
+    lazy var tableColumn2 = NSTableColumn()
 
-  let windowWidth: CGFloat = 770
-  let contentWidth: CGFloat = 750
-  let tableHeight: CGFloat = 230
+    var windowWidth: CGFloat { SettingsPanesCocoa.windowWidth }
+    var contentWidth: CGFloat { SettingsPanesCocoa.contentWidth }
+    var innerContentWidth: CGFloat { SettingsPanesCocoa.innerContentWidth }
+    var tabContainerWidth: CGFloat { SettingsPanesCocoa.tabContainerWidth }
+    var contentHalfWidth: CGFloat { SettingsPanesCocoa.contentHalfWidth }
 
-  lazy var tblServices: NSTableView = .init()
-  lazy var btnShowInstructions = NSButton(
-    "How to Fill",
-    target: self,
-    action: #selector(btnShowInstructionsClicked(_:))
-  )
-  lazy var btnAddService = NSFileDragRetrieverButton(
-    "Add Service",
-    target: self,
-    action: #selector(btnAddServiceClicked(_:)),
-    postDrag: { [weak self] url in self?.handleDrag(url) }
-  )
-  lazy var btnRemoveService = NSButton(
-    "Remove Selected",
-    target: self,
-    action: #selector(btnRemoveServiceClicked(_:))
-  )
-  lazy var btnResetService = NSButton(
-    "Reset Default",
-    target: self,
-    action: #selector(btnResetServiceClicked(_:))
-  )
-  lazy var btnCopyAllToClipboard = NSButton(
-    "Copy All to Clipboard",
-    target: self,
-    action: #selector(btnCopyAllToClipboardClicked(_:))
-  )
-  lazy var tableColumn1Cell = NSTextFieldCell()
-  lazy var tableColumn1 = NSTableColumn()
-  lazy var tableColumn2Cell = NSTextFieldCell()
-  lazy var tableColumn2 = NSTableColumn()
-
-  weak var windowController: NSWindowController?
-
-  var body: NSView? {
-    NSStackView.build(.vertical, insets: .new(all: 14)) {
-      NSStackView.build(.horizontal) {
-        btnAddService
-        btnRemoveService
-        btnCopyAllToClipboard
-        btnShowInstructions
-        NSView()
-        btnResetService
-      }
-      makeScrollableTable()
-        .makeSimpleConstraint(.height, relation: .equal, value: tableHeight)
-      NSStackView.build(.horizontal) {
-        let descriptionWidth = contentWidth - 10
+    var body: NSView? {
+      NSStackView.build(.vertical, insets: .new(all: 14)) {
         NSStackView.build(.vertical) {
-          let strDescription = "i18n:CandidateServiceMenuEditor.description"
-          strDescription.makeNSLabel(descriptive: true, fixWidth: descriptionWidth)
-            .makeSimpleConstraint(.width, relation: .greaterThanOrEqual, value: descriptionWidth)
-          NSView()
-        }
+          NSStackView.build(.horizontal) {
+            btnAddService
+            btnRemoveService
+            btnCopyAllToClipboard
+            btnShowInstructions
+            NSView()
+            btnResetService
+          }
+          makeScrollableTable()
+            .makeSimpleConstraint(.height, relation: .equal, value: tableHeight)
+          NSStackView.build(.horizontal) {
+            let descriptionWidth = contentWidth
+            NSStackView.build(.vertical) {
+              let strDescription = "i18n:CandidateServiceMenuEditor.description"
+              strDescription.makeNSLabel(descriptive: true, fixWidth: descriptionWidth)
+                .makeSimpleConstraint(.width, relation: .greaterThanOrEqual, value: descriptionWidth)
+              NSView()
+            }
+          }
+        }?.boxed()
+        NSView().makeSimpleConstraint(.height, relation: .equal, value: NSFont.systemFontSize)
       }
     }
-  }
 
-  func makeScrollableTable() -> NSScrollView {
-    let scrollContainer = NSScrollView()
-    scrollContainer.scrollerStyle = .legacy
-    scrollContainer.autohidesScrollers = true
-    scrollContainer.documentView = tblServices
-    scrollContainer.hasVerticalScroller = true
-    scrollContainer.hasHorizontalScroller = true
+    func makeScrollableTable() -> NSScrollView {
+      let scrollContainer = NSScrollView()
+      scrollContainer.scrollerStyle = .legacy
+      scrollContainer.autohidesScrollers = true
+      scrollContainer.documentView = tblServices
+      scrollContainer.hasVerticalScroller = true
+      scrollContainer.hasHorizontalScroller = true
 
-    if #available(macOS 26, *) {
-      scrollContainer.borderType = .lineBorder
+      if #available(macOS 26, *) {
+        scrollContainer.borderType = .lineBorder
+      }
+
+      if #available(macOS 11.0, *) {
+        tblServices.style = .inset
+      }
+      tblServices.addTableColumn(tableColumn1)
+      tblServices.addTableColumn(tableColumn2)
+      tblServices.delegate = self
+      tblServices.allowsExpansionToolTips = true
+      tblServices.allowsMultipleSelection = true
+      tblServices.autoresizingMask = [.width, .height]
+      tblServices.autosaveTableColumns = false
+      tblServices.backgroundColor = NSColor.controlBackgroundColor
+      tblServices.columnAutoresizingStyle = .lastColumnOnlyAutoresizingStyle
+      tblServices.frame = CGRect(x: 0, y: 0, width: contentWidth - 20, height: tableHeight)
+      tblServices.gridColor = NSColor.clear
+      tblServices.intercellSpacing = CGSize(width: 15, height: 0)
+      tblServices.setContentHuggingPriority(.defaultHigh, for: .vertical)
+      tblServices.registerForDraggedTypes([.kUTTypeData, .kUTTypeFileURL])
+      tblServices.dataSource = self
+      tblServices.target = self
+      if #available(macOS 11.0, *) { tblServices.style = .inset }
+
+      tableColumn1.identifier = NSUserInterfaceItemIdentifier("colTitle")
+      tableColumn1.headerCell.title = "i18n:CandidateServiceMenuEditor.table.field.MenuTitle"
+        .i18n
+      tableColumn1.maxWidth = 280
+      tableColumn1.minWidth = 200
+      tableColumn1.resizingMask = [.autoresizingMask, .userResizingMask]
+      tableColumn1.width = 200
+      tableColumn1.dataCell = tableColumn1Cell
+
+      tableColumn1Cell.font = NSFont.systemFont(ofSize: 13)
+      tableColumn1Cell.isEditable = true
+      tableColumn1Cell.isSelectable = true
+      tableColumn1Cell.lineBreakMode = .byTruncatingTail
+      tableColumn1Cell.stringValue = "Text Cell"
+      tableColumn1Cell.textColor = NSColor.controlTextColor
+
+      tableColumn2.identifier = NSUserInterfaceItemIdentifier("colValue")
+      tableColumn2.headerCell.title = "i18n:CandidateServiceMenuEditor.table.field.Value".i18n
+      tableColumn2.maxWidth = 1_000
+      tableColumn2.minWidth = 40
+      tableColumn2.resizingMask = [.autoresizingMask, .userResizingMask]
+      tableColumn2.width = 480
+      tableColumn2.dataCell = tableColumn2Cell
+
+      tableColumn2Cell.backgroundColor = NSColor.controlBackgroundColor
+      tableColumn2Cell.font = NSFont.systemFont(ofSize: 13)
+      tableColumn2Cell.isEditable = true
+      tableColumn2Cell.isSelectable = true
+      tableColumn2Cell.lineBreakMode = .byTruncatingTail
+      tableColumn2Cell.stringValue = "Text Cell"
+      tableColumn2Cell.textColor = NSColor.controlTextColor
+
+      return scrollContainer
     }
-
-    if #available(macOS 11.0, *) {
-      tblServices.style = .inset
-    }
-    tblServices.addTableColumn(tableColumn1)
-    tblServices.addTableColumn(tableColumn2)
-    // tblServices.headerView = nil
-    tblServices.delegate = self
-    tblServices.allowsExpansionToolTips = true
-    tblServices.allowsMultipleSelection = true
-    tblServices.autoresizingMask = [.width, .height]
-    tblServices.autosaveTableColumns = false
-    tblServices.backgroundColor = NSColor.controlBackgroundColor
-    tblServices.columnAutoresizingStyle = .lastColumnOnlyAutoresizingStyle
-    tblServices.frame = CGRect(x: 0, y: 0, width: 728, height: tableHeight)
-    tblServices.gridColor = NSColor.clear
-    tblServices.intercellSpacing = CGSize(width: 15, height: 0)
-    tblServices.setContentHuggingPriority(.defaultHigh, for: .vertical)
-    tblServices.registerForDraggedTypes([.kUTTypeData, .kUTTypeFileURL])
-    tblServices.dataSource = self
-    tblServices.target = self
-    if #available(macOS 11.0, *) { tblServices.style = .inset }
-
-    tableColumn1.identifier = NSUserInterfaceItemIdentifier("colTitle")
-    tableColumn1.headerCell.title = "i18n:CandidateServiceMenuEditor.table.field.MenuTitle"
-      .i18n
-    tableColumn1.maxWidth = 280
-    tableColumn1.minWidth = 200
-    tableColumn1.resizingMask = [.autoresizingMask, .userResizingMask]
-    tableColumn1.width = 200
-    tableColumn1.dataCell = tableColumn1Cell
-
-    tableColumn1Cell.font = NSFont.systemFont(ofSize: 13)
-    tableColumn1Cell.isEditable = true
-    tableColumn1Cell.isSelectable = true
-    tableColumn1Cell.lineBreakMode = .byTruncatingTail
-    tableColumn1Cell.stringValue = "Text Cell"
-    tableColumn1Cell.textColor = NSColor.controlTextColor
-
-    tableColumn2.identifier = NSUserInterfaceItemIdentifier("colValue")
-    tableColumn2.headerCell.title = "i18n:CandidateServiceMenuEditor.table.field.Value".i18n
-    tableColumn2.maxWidth = 1_000
-    tableColumn2.minWidth = 40
-    tableColumn2.resizingMask = [.autoresizingMask, .userResizingMask]
-    tableColumn2.width = 480
-    tableColumn2.dataCell = tableColumn2Cell
-
-    tableColumn2Cell.backgroundColor = NSColor.controlBackgroundColor
-    tableColumn2Cell.font = NSFont.systemFont(ofSize: 13)
-    tableColumn2Cell.isEditable = true
-    tableColumn2Cell.isSelectable = true
-    tableColumn2Cell.lineBreakMode = .byTruncatingTail
-    tableColumn2Cell.stringValue = "Text Cell"
-    tableColumn2Cell.textColor = NSColor.controlTextColor
-
-    return scrollContainer
   }
 }
 
 // MARK: - UserDefaults Handlers.
 
-extension VwrServiceMenuEditor {
+extension SettingsPanesCocoa.Services {
   public static var servicesList: [CandidateTextService] {
     get {
       PrefMgr.shared.candidateServiceMenuContents.parseIntoCandidateTextServiceStack()
@@ -182,7 +181,7 @@ extension VwrServiceMenuEditor {
 
 // MARK: - Common Operation Methods.
 
-extension VwrServiceMenuEditor {
+extension SettingsPanesCocoa.Services {
   func refresh() {
     tblServices.reloadData()
     reassureButtonAvailability()
@@ -207,12 +206,12 @@ extension VwrServiceMenuEditor {
 
 // MARK: - IBActions.
 
-extension VwrServiceMenuEditor {
+extension SettingsPanesCocoa.Services {
   @IBAction
   func btnShowInstructionsClicked(_: Any) {
     let strTitle = "How to Fill".i18n
     let strFillGuide = "i18n:CandidateServiceMenuEditor.formatGuide".i18n
-    windowController?.window.callAlert(title: strTitle, text: strFillGuide)
+    CtlSettingsCocoa.shared?.window.callAlert(title: strTitle, text: strFillGuide)
   }
 
   @IBAction
@@ -259,7 +258,7 @@ extension VwrServiceMenuEditor {
 
   @IBAction
   func btnAddServiceClicked(_: Any) {
-    guard let window = windowController?.window else { return }
+    guard let window = CtlSettingsCocoa.shared?.window else { return }
     let alert = NSAlert()
     alert.messageText = "i18n:CandidateServiceMenuEditor.prompt".i18n
     alert.informativeText = "i18n:CandidateServiceMenuEditor.howToGetGuide".i18n
@@ -312,9 +311,9 @@ extension VwrServiceMenuEditor {
   }
 }
 
-// MARK: NSTableViewDelegate, NSTableViewDataSource
+// MARK: - SettingsPanesCocoa.Services + NSTableViewDelegate, NSTableViewDataSource
 
-extension VwrServiceMenuEditor: NSTableViewDelegate, NSTableViewDataSource {
+extension SettingsPanesCocoa.Services: NSTableViewDelegate, NSTableViewDataSource {
   public func numberOfRows(in _: NSTableView) -> Int {
     Self.servicesList.count
   }
@@ -334,7 +333,7 @@ extension VwrServiceMenuEditor: NSTableViewDelegate, NSTableViewDataSource {
       let colName = column.identifier.rawValue
       switch colName {
       case "colTitle": return Self.servicesList[row].key
-      case "colValue": return Self.servicesList[row].definedValue // TODO: 回頭這裡可能需要自訂。
+      case "colValue": return Self.servicesList[row].definedValue
       default: return ""
       }
     }
@@ -411,6 +410,6 @@ extension VwrServiceMenuEditor: NSTableViewDelegate, NSTableViewDataSource {
 // MARK: - Preview.
 
 @available(macOS 14.0, *)
-#Preview(traits: .fixedLayout(width: 770, height: 335)) {
-  VwrServiceMenuEditor()
+#Preview(traits: .fixedLayout(width: 614, height: 768)) {
+  SettingsPanesCocoa.Services()
 }

@@ -27,6 +27,8 @@ public final class SettingsPanesCocoa {
   public let ctlPagePhrases = SettingsPanesCocoa.Phrases()
   public let ctlPageCassette = SettingsPanesCocoa.Cassette()
   public let ctlPageKeyboard = SettingsPanesCocoa.Keyboard()
+  public let ctlPageClients = SettingsPanesCocoa.Clients()
+  public let ctlPageServices = SettingsPanesCocoa.Services()
   public let ctlPageDevZone = SettingsPanesCocoa.DevZone()
 }
 
@@ -40,6 +42,8 @@ extension SettingsPanesCocoa {
     ctlPagePhrases.loadView()
     ctlPageCassette.loadView()
     ctlPageKeyboard.loadView()
+    ctlPageClients.loadView()
+    ctlPageServices.loadView()
     ctlPageDevZone.loadView()
   }
 
@@ -76,6 +80,8 @@ final class SettingsPreview: NSViewController {
       NSTabView.TabPage(title: "PHRASES", view: panes.ctlPagePhrases.view)
       NSTabView.TabPage(title: "CASSETTE", view: panes.ctlPageCassette.view)
       NSTabView.TabPage(title: "KEYBOARD", view: panes.ctlPageKeyboard.view)
+      NSTabView.TabPage(title: "CLIENTS", view: panes.ctlPageClients.view)
+      NSTabView.TabPage(title: "SERVICES", view: panes.ctlPageServices.view)
       NSTabView.TabPage(title: "DEVZONE", view: panes.ctlPageDevZone.view)
     } ?? .init()
   }

@@ -21,6 +21,8 @@ public enum PrefUITabs: String, CaseIterable, Identifiable, Hashable {
   case tabPhrases = "Phrases"
   case tabCassette = "Cassette"
   case tabKeyboard = "Keyboard"
+  case tabClients = "Clients"
+  case tabServices = "Services"
   case tabDevZone = "DevZone"
 
   // MARK: Public
@@ -39,6 +41,8 @@ extension PrefUITabs {
     "Phrases": (Hans: "语汇编辑", Hant: "語彙編輯", Ja: "辞書編集"),
     "Cassette": (Hans: "磁带设定", Hant: "磁帶設定", Ja: "カセット設定"),
     "Keyboard": (Hans: "键盘设定", Hant: "鍵盤設定", Ja: "配列設定"),
+    "Clients": (Hans: "客体设定", Hant: "客體設定", Ja: "客体設定"),
+    "Services": (Hans: "服务设定", Hant: "服務設定", Ja: "サービス設定"),
     "DevZone": (Hans: "开发道场", Hant: "開發道場", Ja: "開発道場"),
   ]
 
@@ -53,7 +57,9 @@ extension PrefUITabs {
     case .tabPhrases: return 60
     case .tabCassette: return 70
     case .tabKeyboard: return 80
-    case .tabDevZone: return 90
+    case .tabClients: return 90
+    case .tabServices: return 100
+    case .tabDevZone: return 110
     }
   }
 
@@ -74,6 +80,8 @@ extension PrefUITabs {
     case .tabPhrases: VwrSettingsPanePhrases()
     case .tabCassette: VwrSettingsPaneCassette()
     case .tabKeyboard: VwrSettingsPaneKeyboard()
+    case .tabClients: VwrSettingsPaneClients()
+    case .tabServices: VwrSettingsPaneServices()
     case .tabDevZone: VwrSettingsPaneDevZone()
     }
   }
@@ -114,6 +122,10 @@ extension PrefUITabs {
           return "externaldrive.fill.badge.plus"
         case .tabKeyboard:
           return "keyboard.macwindow"
+        case .tabClients:
+          return "square.and.pencil"
+        case .tabServices:
+          return "gearshape.fill"
         case .tabDevZone:
           return "pc"
         }

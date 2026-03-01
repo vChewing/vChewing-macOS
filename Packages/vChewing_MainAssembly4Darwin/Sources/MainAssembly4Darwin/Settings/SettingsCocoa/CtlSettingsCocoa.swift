@@ -457,6 +457,8 @@ extension CtlSettingsCocoa {
     case .tabPhrases: return panes.ctlPagePhrases.view
     case .tabCassette: return panes.ctlPageCassette.view
     case .tabKeyboard: return panes.ctlPageKeyboard.view
+    case .tabClients: return panes.ctlPageClients.view
+    case .tabServices: return panes.ctlPageServices.view
     case .tabDevZone: return panes.ctlPageDevZone.view
     }
   }

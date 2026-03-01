@@ -8,136 +8,144 @@
 
 import AppKit
 
-// MARK: - VwrClientListMgr
+// MARK: - SettingsPanesCocoa.Clients
 
-public final class VwrClientListMgr: NSViewController {
-  // MARK: Public
+extension SettingsPanesCocoa {
+  public final class Clients: NSViewController {
+    // MARK: Public
 
-  override public func loadView() {
-    tblClients.reloadData()
-    view = body ?? .init()
-    (view as? NSStackView)?.alignment = .centerX
-    view.makeSimpleConstraint(.width, relation: .equal, value: windowWidth)
-    btnRemoveClient.keyEquivalent = .init(NSEvent.SpecialKey.delete.unicodeScalar)
-  }
+    override public func loadView() {
+      tblClients.reloadData()
+      view = body ?? .init()
+      (view as? NSStackView)?.alignment = .centerX
+      view.makeSimpleConstraint(.width, relation: .equal, value: windowWidth)
+      btnRemoveClient.keyEquivalent = .init(NSEvent.SpecialKey.delete.unicodeScalar)
+    }
 
-  // MARK: Internal
+    // MARK: Internal
 
-  let windowWidth: CGFloat = 770
-  let contentWidth: CGFloat = 750
-  let buttonWidth: CGFloat = 150
-  let tableHeight: CGFloat = 230
+    let buttonWidth: CGFloat = 150
+    let tableHeight: CGFloat = 390
 
-  lazy var tblClients: NSTableView = .init()
-  lazy var btnAddClient = NSButton(
-    "Add Client",
-    target: self,
-    action: #selector(btnAddClientClicked(_:))
-  )
-  lazy var btnRemoveClient = NSButton(
-    "Remove Selected",
-    target: self,
-    action: #selector(btnRemoveClientClicked(_:))
-  )
-  lazy var tableColumn1Cell = NSButtonCell()
-  lazy var tableColumn1 = NSTableColumn()
-  lazy var tableColumn2Cell = NSTextFieldCell()
-  lazy var tableColumn2 = NSTableColumn()
+    lazy var tblClients: NSTableView = .init()
+    lazy var btnAddClient = NSButton(
+      "Add Client",
+      target: self,
+      action: #selector(btnAddClientClicked(_:))
+    )
+    lazy var btnRemoveClient = NSButton(
+      "Remove Selected",
+      target: self,
+      action: #selector(btnRemoveClientClicked(_:))
+    )
+    lazy var tableColumn1Cell = NSButtonCell()
+    lazy var tableColumn1 = NSTableColumn()
+    lazy var tableColumn2Cell = NSTextFieldCell()
+    lazy var tableColumn2 = NSTableColumn()
 
-  var body: NSView? {
-    NSStackView.build(.vertical, insets: .new(all: 14)) {
-      makeScrollableTable()
-        .makeSimpleConstraint(.height, relation: .equal, value: tableHeight)
-      NSStackView.build(.horizontal) {
-        let descriptionWidth = contentWidth - buttonWidth - 20
+    var windowWidth: CGFloat { SettingsPanesCocoa.windowWidth }
+    var contentWidth: CGFloat { SettingsPanesCocoa.contentWidth }
+    var innerContentWidth: CGFloat { SettingsPanesCocoa.innerContentWidth }
+    var tabContainerWidth: CGFloat { SettingsPanesCocoa.tabContainerWidth }
+    var contentHalfWidth: CGFloat { SettingsPanesCocoa.contentHalfWidth }
+
+    var body: NSView? {
+      NSStackView.build(.vertical, insets: .new(all: 14)) {
         NSStackView.build(.vertical) {
-          let strDescription =
-            "Please manage the list of those clients here which are: 1) IMKTextInput-incompatible; 2) suspected from abusing the contents of the inline composition buffer. A client listed here, if checked, will use popup composition buffer with maximum 20 reading counts holdable."
-          strDescription.makeNSLabel(descriptive: true, fixWidth: descriptionWidth)
-            .makeSimpleConstraint(.width, relation: .greaterThanOrEqual, value: descriptionWidth)
-          NSView()
-        }
-        NSStackView.build(.vertical, spacing: 6) {
-          btnAddClient
-            .makeSimpleConstraint(.width, relation: .equal, value: buttonWidth)
-          btnRemoveClient
-            .makeSimpleConstraint(.width, relation: .equal, value: buttonWidth)
-        }
+          NSStackView.build(.horizontal, spacing: 6) {
+            btnAddClient
+            NSView()
+            btnRemoveClient
+          }
+          makeScrollableTable()
+            .makeSimpleConstraint(.height, relation: .equal, value: tableHeight)
+          NSStackView.build(.horizontal) {
+            let descriptionWidth = contentWidth
+            NSStackView.build(.vertical) {
+              let strDescription =
+                "Please manage the list of those clients here which are: 1) IMKTextInput-incompatible; 2) suspected from abusing the contents of the inline composition buffer. A client listed here, if checked, will use popup composition buffer with maximum 20 reading counts holdable."
+              strDescription.makeNSLabel(descriptive: true, fixWidth: descriptionWidth)
+                .makeSimpleConstraint(.width, relation: .greaterThanOrEqual, value: descriptionWidth)
+              NSView()
+            }
+          }
+        }?.boxed()
+        NSView().makeSimpleConstraint(.height, relation: .equal, value: NSFont.systemFontSize)
       }
     }
-  }
 
-  func makeScrollableTable() -> NSScrollView {
-    let scrollContainer = NSScrollView()
-    scrollContainer.scrollerStyle = .legacy
-    scrollContainer.autohidesScrollers = true
-    scrollContainer.documentView = tblClients
-    scrollContainer.hasVerticalScroller = true
-    scrollContainer.hasHorizontalScroller = true
+    func makeScrollableTable() -> NSScrollView {
+      let scrollContainer = NSScrollView()
+      scrollContainer.scrollerStyle = .legacy
+      scrollContainer.autohidesScrollers = true
+      scrollContainer.documentView = tblClients
+      scrollContainer.hasVerticalScroller = true
+      scrollContainer.hasHorizontalScroller = true
 
-    if #available(macOS 26, *) {
-      scrollContainer.borderType = .lineBorder
+      if #available(macOS 26, *) {
+        scrollContainer.borderType = .lineBorder
+      }
+
+      if #available(macOS 11.0, *) {
+        tblClients.style = .inset
+      }
+      tblClients.addTableColumn(tableColumn1)
+      tblClients.addTableColumn(tableColumn2)
+      tblClients.headerView = nil
+      tblClients.delegate = self
+      tblClients.allowsExpansionToolTips = true
+      tblClients.allowsMultipleSelection = true
+      tblClients.autoresizingMask = [.width, .height]
+      tblClients.autosaveTableColumns = false
+      tblClients.backgroundColor = NSColor.controlBackgroundColor
+      tblClients.columnAutoresizingStyle = .lastColumnOnlyAutoresizingStyle
+      tblClients.frame = CGRect(x: 0, y: 0, width: contentWidth - 20, height: tableHeight)
+      tblClients.gridColor = NSColor.clear
+      tblClients.intercellSpacing = CGSize(width: 17, height: 0)
+      tblClients.rowHeight = 24
+      tblClients.setContentHuggingPriority(.defaultHigh, for: .vertical)
+      tblClients.registerForDraggedTypes([.kUTTypeFileURL])
+      tblClients.dataSource = self
+      tblClients.action = #selector(onItemClicked(_:))
+      tblClients.target = self
+      if #available(macOS 11.0, *) { tblClients.style = .inset }
+
+      tableColumn1.identifier = NSUserInterfaceItemIdentifier("colPCBEnabled")
+      tableColumn1.maxWidth = 20
+      tableColumn1.minWidth = 20
+      tableColumn1.resizingMask = [.autoresizingMask, .userResizingMask]
+      tableColumn1.width = 20
+      tableColumn1.dataCell = tableColumn1Cell
+
+      if #available(macOS 11.0, *) { tableColumn1Cell.controlSize = .large }
+      tableColumn1Cell.font = NSFont.systemFont(ofSize: 13)
+      tableColumn1Cell.setButtonType(.switch)
+      tableColumn1Cell.bezelStyle = .rounded
+
+      tableColumn2.identifier = NSUserInterfaceItemIdentifier("colClient")
+      tableColumn2.maxWidth = 1_000
+      tableColumn2.minWidth = 40
+      tableColumn2.resizingMask = [.autoresizingMask, .userResizingMask]
+      tableColumn2.width = 546
+      tableColumn2.dataCell = tableColumn2Cell
+
+      tableColumn2Cell.backgroundColor = NSColor.controlBackgroundColor
+      tableColumn2Cell.font = NSFont.systemFont(ofSize: 20)
+      tableColumn2Cell.isEditable = true
+      tableColumn2Cell.isSelectable = true
+      tableColumn2Cell.lineBreakMode = .byTruncatingTail
+      tableColumn2Cell.stringValue = "Text Cell"
+      tableColumn2Cell.textColor = NSColor.controlTextColor
+      tableColumn2Cell.isEditable = true
+
+      return scrollContainer
     }
-
-    if #available(macOS 11.0, *) {
-      tblClients.style = .inset
-    }
-    tblClients.addTableColumn(tableColumn1)
-    tblClients.addTableColumn(tableColumn2)
-    tblClients.headerView = nil
-    tblClients.delegate = self
-    tblClients.allowsExpansionToolTips = true
-    tblClients.allowsMultipleSelection = true
-    tblClients.autoresizingMask = [.width, .height]
-    tblClients.autosaveTableColumns = false
-    tblClients.backgroundColor = NSColor.controlBackgroundColor
-    tblClients.columnAutoresizingStyle = .lastColumnOnlyAutoresizingStyle
-    tblClients.frame = CGRect(x: 0, y: 0, width: 728, height: tableHeight)
-    tblClients.gridColor = NSColor.clear
-    tblClients.intercellSpacing = CGSize(width: 17, height: 0)
-    tblClients.rowHeight = 24
-    tblClients.setContentHuggingPriority(.defaultHigh, for: .vertical)
-    tblClients.registerForDraggedTypes([.kUTTypeFileURL])
-    tblClients.dataSource = self
-    tblClients.action = #selector(onItemClicked(_:))
-    tblClients.target = self
-    if #available(macOS 11.0, *) { tblClients.style = .inset }
-
-    tableColumn1.identifier = NSUserInterfaceItemIdentifier("colPCBEnabled")
-    tableColumn1.maxWidth = 20
-    tableColumn1.minWidth = 20
-    tableColumn1.resizingMask = [.autoresizingMask, .userResizingMask]
-    tableColumn1.width = 20
-    tableColumn1.dataCell = tableColumn1Cell
-
-    if #available(macOS 11.0, *) { tableColumn1Cell.controlSize = .large }
-    tableColumn1Cell.font = NSFont.systemFont(ofSize: 13)
-    tableColumn1Cell.setButtonType(.switch)
-    tableColumn1Cell.bezelStyle = .rounded
-
-    tableColumn2.identifier = NSUserInterfaceItemIdentifier("colClient")
-    tableColumn2.maxWidth = 1_000
-    tableColumn2.minWidth = 40
-    tableColumn2.resizingMask = [.autoresizingMask, .userResizingMask]
-    tableColumn2.width = 546
-    tableColumn2.dataCell = tableColumn2Cell
-
-    tableColumn2Cell.backgroundColor = NSColor.controlBackgroundColor
-    tableColumn2Cell.font = NSFont.systemFont(ofSize: 20)
-    tableColumn2Cell.isEditable = true
-    tableColumn2Cell.isSelectable = true
-    tableColumn2Cell.lineBreakMode = .byTruncatingTail
-    tableColumn2Cell.stringValue = "Text Cell"
-    tableColumn2Cell.textColor = NSColor.controlTextColor
-    tableColumn2Cell.isEditable = true
-
-    return scrollContainer
   }
 }
 
 // MARK: - UserDefaults Handlers.
 
-extension VwrClientListMgr {
+extension SettingsPanesCocoa.Clients {
   public static var clientsList: [String] {
     PrefMgr.shared.clientsIMKTextInputIncapable.keys.sorted()
   }
@@ -153,7 +161,7 @@ extension VwrClientListMgr {
 
 // MARK: - Common Operation Methods.
 
-extension VwrClientListMgr {
+extension SettingsPanesCocoa.Clients {
   func applyNewValue(_ newValue: String, highMitigation mitigation: Bool = true) {
     guard !newValue.isEmpty else { return }
     var dict = PrefMgr.shared.clientsIMKTextInputIncapable
@@ -192,7 +200,7 @@ extension VwrClientListMgr {
 
 // MARK: - IBActions.
 
-extension VwrClientListMgr {
+extension SettingsPanesCocoa.Clients {
   @IBAction
   func onItemClicked(_: Any!) {
     guard tblClients.clickedColumn == 0 else { return }
@@ -227,13 +235,13 @@ extension VwrClientListMgr {
 
   @IBAction
   func btnAddClientClicked(_: Any) {
-    guard let window = CtlClientListMgr.shared?.window else { return }
+    guard let window = CtlSettingsCocoa.shared?.window else { return }
     let alert = NSAlert()
     alert.messageText = "Please enter the client app bundle identifier(s) you want to register.".i18n
     alert.informativeText = "One record per line. Use Option+Enter to break lines.\nBlank lines will be dismissed."
       .i18n
     alert.addButton(withTitle: "OK".i18n)
-    alert.addButton(withTitle: "Just Select".i18n + "…")
+    alert.addButton(withTitle: "Just Select".i18n + "\u{2026}")
     alert.addButton(withTitle: "Cancel".i18n)
 
     let maxFloat = Double(Float.greatestFiniteMagnitude)
@@ -312,11 +320,11 @@ extension VwrClientListMgr {
                   .i18n
               let text = url.path + "\n\n" + "Please try again.".i18n
               guard let bundle = Bundle(url: url) else {
-                CtlClientListMgr.shared?.window.callAlert(title: title, text: text)
+                CtlSettingsCocoa.shared?.window.callAlert(title: title, text: text)
                 return
               }
               guard let identifier = bundle.bundleIdentifier else {
-                CtlClientListMgr.shared?.window.callAlert(title: title, text: text)
+                CtlSettingsCocoa.shared?.window.callAlert(title: title, text: text)
                 return
               }
               let isIdentifierAlreadyRegistered = Self.clientsList.contains(identifier)
@@ -346,9 +354,9 @@ extension VwrClientListMgr {
   }
 }
 
-// MARK: NSTableViewDelegate, NSTableViewDataSource
+// MARK: - SettingsPanesCocoa.Clients + NSTableViewDelegate, NSTableViewDataSource
 
-extension VwrClientListMgr: NSTableViewDelegate, NSTableViewDataSource {
+extension SettingsPanesCocoa.Clients: NSTableViewDelegate, NSTableViewDataSource {
   public func numberOfRows(in _: NSTableView) -> Int {
     Self.clientsList.count
   }
@@ -414,6 +422,6 @@ extension VwrClientListMgr: NSTableViewDelegate, NSTableViewDataSource {
 // MARK: - Preview.
 
 @available(macOS 14.0, *)
-#Preview(traits: .fixedLayout(width: 770, height: 335)) {
-  VwrClientListMgr()
+#Preview(traits: .fixedLayout(width: 614, height: 768)) {
+  SettingsPanesCocoa.Clients()
 }
