@@ -17,12 +17,12 @@ import SwiftExtension
   extension NSAlert {
     public func beginSheetModal(
       at window: NSWindow?,
-      completionHandler handler: @escaping (NSApplication.ModalResponse) -> ()
+      completionHandler handler: ((NSApplication.ModalResponse) -> ())? = nil
     ) {
       if let window = window ?? NSApp.keyWindow {
         beginSheetModal(for: window, completionHandler: handler)
       } else {
-        handler(runModal())
+        handler?(runModal())
       }
     }
   }
