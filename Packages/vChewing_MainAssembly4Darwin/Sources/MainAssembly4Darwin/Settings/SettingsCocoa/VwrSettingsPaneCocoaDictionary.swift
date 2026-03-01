@@ -149,9 +149,7 @@ extension SettingsPanesCocoa {
       pathCtl.translatesAutoresizingMaskIntoConstraints = false
       pathCtl.font = NSFont(name: "Arial Narrow", size: NSFont.smallSystemFontSize)
         ?? NSFont.systemFont(ofSize: NSFont.smallSystemFontSize)
-      if #available(macOS 10.10, *) {
-        pathCtl.controlSize = .small
-      }
+      pathCtl.cell?.controlSize = .small
       pathCtl.backgroundColor = .controlBackgroundColor
       pathCtl.target = self
       pathCtl.doubleAction = #selector(pathControlDoubleAction(_:))
@@ -217,10 +215,10 @@ extension SettingsPanesCocoa {
       }
 
       let window = CtlSettingsCocoa.shared?.window
-      dlgOpenFile.beginSheetModal(at: window) { result in
+      dlgOpenFile.beginSheetModal(at: window) { [weak self] result in
         if result == NSApplication.ModalResponse.OK {
           guard let url = dlgOpenFile.url else { return }
-          self.task4ImportingKeyKeyUserDict(url)
+          self?.task4ImportingKeyKeyUserDict(url)
         }
       }
     }
@@ -244,9 +242,7 @@ extension SettingsPanesCocoa {
         )
       } catch {
         let error = NSAlert(error: error)
-        error.beginSheetModal(at: CtlSettingsCocoa.shared?.window) { _ in
-          // DO NOTHING.
-        }
+        error.beginSheetModal(at: CtlSettingsCocoa.shared?.window)
       }
     }
   }
@@ -314,7 +310,7 @@ extension SettingsPanesCocoa.Dictionary: NSPathControlDelegate {
       PrefMgr.shared.userDataFolderSpecified.expandingTildeInPath
     )
     let window = CtlSettingsCocoa.shared?.window
-    dlgOpenPath.beginSheetModal(at: window) { result in
+    dlgOpenPath.beginSheetModal(at: window) { [weak self] result in
       if result == NSApplication.ModalResponse.OK {
         guard let url = dlgOpenPath.url else { return }
         // CommonDialog 讀入的路徑沒有結尾斜槓，這會導致檔案目錄合規性判定失準。
@@ -325,12 +321,12 @@ extension SettingsPanesCocoa.Dictionary: NSPathControlDelegate {
           PrefMgr.shared.userDataFolderSpecified = newPath
           BookmarkManager.shared.saveBookmark(for: url)
           AppDelegate.shared.updateDirectoryMonitorPath()
-          self.pctUserDictionaryFolder.url = url
+          self?.pctUserDictionaryFolder.url = url
         } else {
           IMEApp.buzz()
           if !bolPreviousFolderValidity {
             LMMgr.resetSpecifiedUserDataFolder()
-            self.pctUserDictionaryFolder
+            self?.pctUserDictionaryFolder
               .url = URL(fileURLWithPath: LMMgr.dataFolderPath(isDefaultFolder: true))
           }
           return
@@ -338,7 +334,7 @@ extension SettingsPanesCocoa.Dictionary: NSPathControlDelegate {
       } else {
         if !bolPreviousFolderValidity {
           LMMgr.resetSpecifiedUserDataFolder()
-          self.pctUserDictionaryFolder
+          self?.pctUserDictionaryFolder
             .url = URL(fileURLWithPath: LMMgr.dataFolderPath(isDefaultFolder: true))
         }
         return

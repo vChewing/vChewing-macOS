@@ -73,9 +73,7 @@ extension SettingsPanesCocoa {
       pathCtl.translatesAutoresizingMaskIntoConstraints = false
       pathCtl.font = NSFont(name: "Arial Narrow", size: NSFont.smallSystemFontSize)
         ?? NSFont.systemFont(ofSize: NSFont.smallSystemFontSize)
-      if #available(macOS 10.10, *) {
-        pathCtl.controlSize = .small
-      }
+      pathCtl.cell?.controlSize = .small
       pathCtl.backgroundColor = .controlBackgroundColor
       pathCtl.target = self
       pathCtl.doubleAction = #selector(pathControlDoubleAction(_:))
@@ -160,14 +158,14 @@ extension SettingsPanesCocoa.Cassette: NSPathControlDelegate {
     )
 
     let window = CtlSettingsCocoa.shared?.window
-    dlgOpenFile.beginSheetModal(at: window) { result in
+    dlgOpenFile.beginSheetModal(at: window) { [weak self] result in
       if result == NSApplication.ModalResponse.OK {
         guard let url = dlgOpenFile.url else { return }
         if LMMgr.checkCassettePathValidity(url.path) {
           PrefMgr.shared.cassettePath = url.path
           LMMgr.loadCassetteData()
           BookmarkManager.shared.saveBookmark(for: url)
-          self.pctCassetteFilePath.url = url
+          self?.pctCassetteFilePath.url = url
         } else {
           IMEApp.buzz()
           if !bolPreviousPathValidity {

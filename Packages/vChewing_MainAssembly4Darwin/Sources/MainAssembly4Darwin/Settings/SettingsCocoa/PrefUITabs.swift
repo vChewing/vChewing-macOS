@@ -78,8 +78,6 @@ extension PrefUITabs {
     }
   }
 
-  public var toolbarIdentifier: NSToolbarItem.Identifier { .init(rawValue: rawValue) }
-
   public var i18nTitle: String {
     switch PrefMgr.shared.appleLanguages[0] {
     case "ja": return Self.i18nTable[rawValue]?.Ja ?? rawValue

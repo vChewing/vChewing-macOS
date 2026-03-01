@@ -1,12 +1,11 @@
 {
   "images" : [
     {
-      "filename" : "DevZone.png",
+      "filename" : "DevZone@2x.png",
       "idiom" : "universal",
       "scale" : "1x"
     },
     {
-      "filename" : "DevZone@2x.png",
       "idiom" : "universal",
       "scale" : "2x"
     },
