@@ -274,12 +274,12 @@ extension VwrClientListMgr {
     }()
 
     alert.accessoryView = scrollview
-    alert.beginSheetModal(at: window) { result in
+    alert.beginSheetModal(at: window) { [weak self] result in
       resultCheck: switch result {
       case .alertFirstButtonReturn, .alertSecondButtonReturn:
         theTextView.textContainer?.textView?.string.components(separatedBy: "\n")
           .filter { !$0.isEmpty }.forEach {
-            self.applyNewValue($0, highMitigation: result == .alertFirstButtonReturn)
+            self?.applyNewValue($0, highMitigation: result == .alertFirstButtonReturn)
           }
         if result == .alertFirstButtonReturn { break }
         if #unavailable(macOS 10.13) {
@@ -303,7 +303,7 @@ extension VwrClientListMgr {
         dlgOpenPath.showsHiddenFiles = true
         dlgOpenPath.canChooseFiles = true
         dlgOpenPath.canChooseDirectories = false
-        dlgOpenPath.beginSheetModal(at: window) { result in
+        dlgOpenPath.beginSheetModal(at: window) { [weak self] result in
           switch result {
           case .OK:
             for url in dlgOpenPath.urls {
@@ -329,11 +329,11 @@ extension VwrClientListMgr {
                 .i18n
               alert2.addButton(withTitle: "Yes".i18n)
               alert2.addButton(withTitle: "No".i18n)
-              alert2.beginSheetModal(for: window) { result2 in
+              alert2.beginSheetModal(for: window) { [weak self] result2 in
                 let oldValue = PrefMgr.shared.clientsIMKTextInputIncapable[identifier]
                 let newValue = result2 == .alertFirstButtonReturn
-                if !(isIdentifierAlreadyRegistered && oldValue == newValue) {
-                  self.applyNewValue(identifier, highMitigation: newValue)
+                if !(isIdentifierAlreadyRegistered && oldValue == newValue), let this = self {
+                  this.applyNewValue(identifier, highMitigation: newValue)
                 }
               }
             }

@@ -66,7 +66,7 @@ public final class VwrServiceMenuEditor: NSViewController {
   lazy var tableColumn2Cell = NSTextFieldCell()
   lazy var tableColumn2 = NSTableColumn()
 
-  var windowController: NSWindowController?
+  weak var windowController: NSWindowController?
 
   var body: NSView? {
     NSStackView.build(.vertical, insets: .new(all: 14)) {
@@ -297,14 +297,15 @@ extension VwrServiceMenuEditor {
     theTextView.toolTip = "i18n:CandidateServiceMenuEditor.formatGuide".i18n
 
     alert.accessoryView = scrollview
-    alert.beginSheetModal(at: window) { result in
+    alert.beginSheetModal(at: window) { [weak self] result in
       switch result {
       case .alertFirstButtonReturn:
+        guard let this = self else { return }
         let rawLines = theTextView.textContainer?.textView?.string
           .components(separatedBy: .newlines) ?? []
-        self.tblServices.beginUpdates()
+        this.tblServices.beginUpdates()
         Self.servicesList.append(contentsOf: rawLines.parseIntoCandidateTextServiceStack())
-        self.tblServices.endUpdates()
+        this.tblServices.endUpdates()
       default: return
       }
     }

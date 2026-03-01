@@ -37,9 +37,7 @@ public final class CtlServiceMenuEditor: NSWindowController {
   override public func close() {
     autoreleasepool {
       super.close()
-      if NSApplication.isAppleSilicon {
-        Self.shared = nil
-      }
+      Self.shared = nil
     }
   }
 

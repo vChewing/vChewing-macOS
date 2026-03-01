@@ -13,15 +13,10 @@ import AppKit
 final class CtlRevLookupWindow: NSWindowController, NSWindowDelegate {
   static var shared: CtlRevLookupWindow?
 
-  @objc
-  var observation: NSKeyValueObservation?
-
   override func close() {
     autoreleasepool {
       super.close()
-      if NSApplication.isAppleSilicon {
-        Self.shared = nil
-      }
+      Self.shared = nil
     }
   }
 
@@ -153,9 +148,7 @@ final class FrmRevLookupWindow: NSWindow {
     inputField.isBezeled = true
     inputField.isEditable = true
     inputField.isSelectable = true
-    if #available(macOS 10.10, *) {
-      inputField.lineBreakMode = .byClipping
-    }
+    inputField.cell?.lineBreakMode = .byClipping
     inputField.textColor = NSColor.controlTextColor
     inputField.cell.map { $0 as? NSTextFieldCell }??.isScrollable = true
     inputField.cell.map { $0 as? NSTextFieldCell }??.sendsActionOnEndEditing = true
