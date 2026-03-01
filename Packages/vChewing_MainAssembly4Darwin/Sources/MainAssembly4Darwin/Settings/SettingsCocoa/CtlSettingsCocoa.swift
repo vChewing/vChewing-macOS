@@ -157,6 +157,7 @@ extension CtlSettingsCocoa: NSToolbarDelegate {
   func updateTab(_ target: NSToolbarItem) {
     guard let tab = PrefUITabs.fromInt(target.tag) else { return }
     switch tab {
+    case .tabAbout: use(view: panes.ctlPageAbout.view)
     case .tabGeneral: use(view: panes.ctlPageGeneral.view)
     case .tabCandidates: use(view: panes.ctlPageCandidates.view)
     case .tabBehavior: use(view: panes.ctlPageBehavior.view)

@@ -24,6 +24,22 @@ public final class CtlSettingsUI: NSWindowController, NSWindowDelegate {
     #endif
   }
 
+  public init() {
+    super.init(
+      window: .init(
+        contentRect: CGRect(x: 401, y: 295, width: 590, height: Self.contentMaxHeight),
+        styleMask: [.titled, .closable, .miniaturizable, .fullSizeContentView],
+        backing: .buffered,
+        defer: true
+      )
+    )
+    window?.titlebarAppearsTransparent = false
+  }
+
+  required init?(coder: NSCoder) {
+    super.init(coder: coder)
+  }
+
   // MARK: Public
 
   public static var shared: CtlSettingsUI?
@@ -62,13 +78,7 @@ public final class CtlSettingsUI: NSWindowController, NSWindowDelegate {
     // 中被清空。
     autoreleasepool {
       if shared == nil {
-        let newWindow = NSWindow(
-          contentRect: CGRect(x: 401, y: 295, width: 577, height: contentMaxHeight),
-          styleMask: [.titled, .closable, .miniaturizable, .fullSizeContentView],
-          backing: .buffered, defer: true
-        )
-        newWindow.titlebarAppearsTransparent = false
-        let newInstance = CtlSettingsUI(window: newWindow)
+        let newInstance = CtlSettingsUI()
         shared = newInstance
       }
       guard let shared = shared, let sharedWindow = shared.window else { return }

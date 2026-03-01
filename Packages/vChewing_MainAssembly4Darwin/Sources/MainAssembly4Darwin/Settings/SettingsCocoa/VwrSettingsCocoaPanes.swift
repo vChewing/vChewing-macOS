@@ -18,6 +18,7 @@ public final class SettingsPanesCocoa {
   public static var tabContainerWidth: CGFloat { contentWidth + 20 }
   public static var contentHalfWidth: CGFloat { contentWidth / 2 - 4 }
 
+  public let ctlPageAbout = SettingsPanesCocoa.About()
   public let ctlPageGeneral = SettingsPanesCocoa.General()
   public let ctlPageCandidates = SettingsPanesCocoa.Candidates()
   public let ctlPageBehavior = SettingsPanesCocoa.Behavior()

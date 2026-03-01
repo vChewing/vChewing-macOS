@@ -25,19 +25,33 @@ public struct VwrSettingsUI: View {
     NavigationSplitView(columnVisibility: $columnVisibility) {
       Group {
         List(PrefUITabs.allCases, selection: $selectedTabID) { neta in
-          if neta == PrefUITabs.tabGeneral {
-            if let appIcon = NSImage(named: "IconSansMargin") {
-              Image(nsImage: appIcon).resizable()
-                .frame(width: 64, height: 64)
-                .frame(maxWidth: .infinity, alignment: .leading)
-                .padding([.top, .bottom], 6)
+          if neta == PrefUITabs.tabAbout {
+            Group {
+              if let appIcon = NSImage(named: "PrefBanner") {
+                Image(nsImage: appIcon)
+                  .resizable()
+                  .aspectRatio(contentMode: .fit)
+                  .frame(width: 144, height: 49)
+                  .frame(maxWidth: .infinity, alignment: .leading)
+                  .padding([.top, .bottom], 6)
+                  .id(colorScheme)
+              } else {
+                Color.secondary
+              }
             }
+            .frame(width: 144, height: 49)
+            .frame(maxWidth: .infinity, alignment: .leading)
+            .padding([.top, .bottom], 6)
+            .id(colorScheme)
           }
           NavigationLink(value: neta) {
             Label {
               Text(verbatim: neta.i18nTitle)
             } icon: {
               Image(nsImage: neta.icon)
+                .resizable()
+                .aspectRatio(contentMode: .fit)
+                .frame(width: 16, height: 16)
             }
           }
         }
@@ -48,7 +62,7 @@ public struct VwrSettingsUI: View {
         }
         .settingsDescription().padding()
       }
-      .navigationSplitViewColumnWidth(160)
+      .navigationSplitViewColumnWidth(173)
     } detail: {
       Group {
         if let selectedTab = selectedTabID {
@@ -75,6 +89,9 @@ public struct VwrSettingsUI: View {
 
   @State
   private var columnVisibility: NavigationSplitViewVisibility = .doubleColumn
+
+  @Environment(\.colorScheme)
+  private var colorScheme
 }
 
 // MARK: - VwrSettingsUI_Previews

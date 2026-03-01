@@ -12,6 +12,7 @@ import SwiftUI
 // MARK: - PrefUITabs
 
 public enum PrefUITabs: String, CaseIterable, Identifiable, Hashable {
+  case tabAbout = "About"
   case tabGeneral = "General"
   case tabCandidates = "Candidates"
   case tabBehavior = "Behavior"
@@ -29,19 +30,21 @@ public enum PrefUITabs: String, CaseIterable, Identifiable, Hashable {
 
 extension PrefUITabs {
   private static let i18nTable: [String: (Hans: String, Hant: String, Ja: String)] = [
+    "About": (Hans: "关于唯音", Hant: "關於唯音", Ja: "アプリ情報"),
     "General": (Hans: "一般设定", Hant: "一般設定", Ja: "一般設定"),
     "Candidates": (Hans: "选字设定", Hant: "選字設定", Ja: "候補設定"),
     "Behavior": (Hans: "行为设定", Hant: "行為設定", Ja: "作動設定"),
     "Output": (Hans: "输出设定", Hant: "輸出設定", Ja: "出力設定"),
     "Dictionary": (Hans: "辞典设定", Hant: "辭典設定", Ja: "辞書設定"),
     "Phrases": (Hans: "语汇编辑", Hant: "語彙編輯", Ja: "辞書編集"),
-    "Cassette": (Hans: "磁带设定", Hant: "磁帶設定", Ja: "カセ設定"),
+    "Cassette": (Hans: "磁带设定", Hant: "磁帶設定", Ja: "カセット設定"),
     "Keyboard": (Hans: "键盘设定", Hant: "鍵盤設定", Ja: "配列設定"),
     "DevZone": (Hans: "开发道场", Hant: "開發道場", Ja: "開発道場"),
   ]
 
   public var cocoaTag: Int {
     switch self {
+    case .tabAbout: return 0
     case .tabGeneral: return 10
     case .tabCandidates: return 20
     case .tabBehavior: return 30
@@ -55,24 +58,14 @@ extension PrefUITabs {
   }
 
   public static func fromInt(_ int: Int) -> Self? {
-    switch int {
-    case 10: return .tabGeneral
-    case 20: return .tabCandidates
-    case 30: return .tabBehavior
-    case 40: return .tabOutput
-    case 50: return .tabDictionary
-    case 60: return .tabPhrases
-    case 70: return .tabCassette
-    case 80: return .tabKeyboard
-    case 90: return .tabDevZone
-    default: return nil
-    }
+    Self.allCases.first { $0.cocoaTag == int }
   }
 
   @available(macOS 14, *)
   @ViewBuilder
   public var suiView: some View {
     switch self {
+    case .tabAbout: VwrSettingsPaneAbout()
     case .tabGeneral: VwrSettingsPaneGeneral()
     case .tabCandidates: VwrSettingsPaneCandidates()
     case .tabBehavior: VwrSettingsPaneBehavior()
@@ -102,9 +95,11 @@ extension PrefUITabs {
 
   public var icon: NSImage {
     let note = "\(rawValue) Preferences" + " \(i18nTitle)"
-    if #available(macOS 11.0, *) {
+    if #available(macOS 14.0, *) {
       let name: String = {
         switch self {
+        case .tabAbout:
+          return "info.circle.fill"
         case .tabGeneral:
           return "wrench.and.screwdriver.fill"
         case .tabCandidates:

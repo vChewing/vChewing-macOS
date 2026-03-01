@@ -128,9 +128,6 @@ extension SessionCtl {
       NSMenu.Item("CheatSheet")?
         .act(#selector(showCheatSheet(_:)))
         .nulled(silentMode)
-      NSMenu.Item("About vChewing…")?
-        .act(#selector(showAbout(_:)))
-        .nulled(silentMode)
       NSMenu.Item("Uninstall vChewing…")?
         .act(#selector(selfUninstall(_:)))
         .nulled(silentMode || !optionKeyPressed)
@@ -402,12 +399,6 @@ extension SessionCtl {
   public func clearPOM(_: Any? = nil) {
     LMMgr.clearPerceptionOverrideModelData(IMEApp.currentInputMode)
     LMMgr.clearPerceptionOverrideModelData(IMEApp.currentInputMode.reversed)
-  }
-
-  @objc
-  public func showAbout(_: Any? = nil) {
-    CtlAboutUI.show()
-    NSApp.popup()
   }
 
   // MARK: Internal
