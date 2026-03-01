@@ -30,31 +30,6 @@
     }
   }
 
-  // MARK: - Tooltip
-
-  // Ref: https://stackoverflow.com/a/63217861
-
-  @available(macOS 10.15, *)
-  struct Tooltip: NSViewRepresentable {
-    let tooltip: String
-
-    func makeNSView(context _: NSViewRepresentableContext<Self>) -> NSView {
-      let view = NSView()
-      view.toolTip = tooltip
-
-      return view
-    }
-
-    func updateNSView(_: NSView, context _: NSViewRepresentableContext<Self>) {}
-  }
-
-  @available(macOS 10.15, *)
-  extension View {
-    public func help(_ tooltip: String) -> some View {
-      overlay(Tooltip(tooltip: tooltip))
-    }
-  }
-
   // MARK: - VisualEffectView
 
   // Ref: https://stackoverflow.com/questions/62461957
