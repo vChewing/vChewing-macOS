@@ -17,6 +17,7 @@
 "i18n:installer.DO_APP_UPGRADE" = "承認と更新";
 "i18n:installer.DONATION_MESSAGE" = "ご寄付をご検討ください。関連情報：https://vChewing.github.io";
 "i18n:installer.EULA_PROMPT_NOTICE" = "このアプリを実装するために、上記の条約を承認すべきである。";
+"i18n:installer.HP_AND_DONATION" = "🏠 ＨＰ・お寄付";
 "i18n:installer.INSTALLER_APP_TITLE_FULL" = "唯音入力 実装用アプリ";
 "i18n:installer.INSTALLER_APP_TITLE" = "唯音入力 実装用アプリ";
 "i18n:installer.LICENSE_TITLE" = "ＭＩＴ商標不許可ライセンス (MIT-NTL License):";

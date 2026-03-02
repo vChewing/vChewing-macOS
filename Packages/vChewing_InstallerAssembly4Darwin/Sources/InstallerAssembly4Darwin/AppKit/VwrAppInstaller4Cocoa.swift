@@ -130,6 +130,7 @@ public final class VwrAppInstaller4Cocoa: NSViewController, InstallerVMProtocol 
         NSStackView.build(.vertical, spacing: verticalButtonStackSpacing, width: 114) {
           addKeyEquivalent(installButton)
           cancelButton
+          websiteDonationButton
           NSView()
         }
       }
@@ -249,20 +250,31 @@ public final class VwrAppInstaller4Cocoa: NSViewController, InstallerVMProtocol 
   // MARK: UI Elements
 
   private lazy var installButton: NSButton = {
-    let b = NSButton(
+    NSButton(
       "i18n:installer.ACCEPT_INSTALLATION",
       target: self,
       action: #selector(btnInstallAction(_:))
     )
-    return b
   }()
 
   private lazy var cancelButton: NSButton = {
-    let b = NSButton(
+    NSButton(
       "i18n:installer.CANCEL_INSTALLATION",
       target: self,
       action: #selector(btnCancelAction(_:))
     )
+  }()
+
+  private lazy var websiteDonationButton: NSButton = {
+    let b = NSButton(
+      "i18n:installer.HP_AND_DONATION",
+      target: self, action: #selector(btnWebSiteAction(_:))
+    )
+    // 按鈕寬度有限：優先使用 Arial Narrow Bold，不可用時回退至系統預設字型。
+    let size = b.font?.pointSize ?? NSFont.systemFontSize
+    if let narrowBold = NSFont(name: "ArialNarrow-Bold", size: size) {
+      b.font = narrowBold
+    }
     return b
   }()
 

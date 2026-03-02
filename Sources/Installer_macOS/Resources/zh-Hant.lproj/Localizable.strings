@@ -17,6 +17,7 @@
 "i18n:installer.DO_APP_UPGRADE" = "接受並升級";
 "i18n:installer.DONATION_MESSAGE" = "請考慮對敝專案捐贈。詳情：https://vchewing.github.io";
 "i18n:installer.EULA_PROMPT_NOTICE" = "若要安裝該軟體，請接受上述條款。";
+"i18n:installer.HP_AND_DONATION" = "🏠 主頁・捐款";
 "i18n:installer.INSTALLER_APP_TITLE_FULL" = "唯音輸入法安裝程式";
 "i18n:installer.INSTALLER_APP_TITLE" = "唯音安裝程式";
 "i18n:installer.LICENSE_TITLE" = "麻理去商標授權合約 (MIT-NTL License):";

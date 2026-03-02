@@ -17,6 +17,7 @@
 "i18n:installer.DO_APP_UPGRADE" = "Accept & Upgrade";
 "i18n:installer.DONATION_MESSAGE" = "Please consider donation. Details: https://vchewing.github.io";
 "i18n:installer.EULA_PROMPT_NOTICE" = "By installing the software, you must accept the terms above.";
+"i18n:installer.HP_AND_DONATION" = "🏠 Donation";
 "i18n:installer.INSTALLER_APP_TITLE_FULL" = "vChewing Installer";
 "i18n:installer.INSTALLER_APP_TITLE" = "vChewing Installer";
 "i18n:installer.LICENSE_TITLE" = "MIT-NTL License:";

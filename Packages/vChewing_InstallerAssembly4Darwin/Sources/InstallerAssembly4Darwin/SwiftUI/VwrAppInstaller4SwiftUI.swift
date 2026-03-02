@@ -84,6 +84,20 @@ struct VwrAppInstaller4SwiftUI: View {
             }
             .keyboardShortcut(.cancelAction)
             .disabled(!vm.config.isAgreeButtonEnabled)
+
+            Button {
+              if let url = URL(string: "https://vchewing.github.io/") {
+                NSWorkspace.shared.open(url)
+              }
+            } label: {
+              // 按鈕寬度有限：優先使用 Arial Narrow Bold，不可用時回退至系統預設粗體。
+              Text("i18n:installer.HP_AND_DONATION")
+                .frame(width: 114)
+                .font(Font(
+                  NSFont(name: "ArialNarrow-Bold", size: NSFont.systemFontSize)
+                    ?? NSFont.boldSystemFont(ofSize: NSFont.systemFontSize)
+                ))
+            }
           }.fixedSize(horizontal: true, vertical: true)
         }
         Spacer()
