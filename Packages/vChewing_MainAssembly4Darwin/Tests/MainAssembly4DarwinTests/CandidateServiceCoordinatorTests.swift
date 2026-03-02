@@ -39,11 +39,28 @@ final class CandidateServiceCoordinatorTests {
 
   @Test
   func testSelector_FinalSanityCheck() throws {
+    // 為了觸發 "reading 相關 selector 會被過濾" 的邏輯，我們傳入
+    // candidateText 為佔位符號 "%s"。這樣當 reading 為空時，
+    // defaultFinalSanityCheck 會額外排除有 copyRuby／copyInline 前綴的
+    // selector；而在候選文字不是佔位符號的情況下，
+    // 完整性檢查僅檢查白名單，不會因為缺少 reading 而過濾。
     assertServiceCountReducedAfterFinalSanityCheck(
       services: Self.testDataMap,
-      candidate: "胡桃",
+      candidate: "%s", // 佔位符號以激活 reading 檢查
       reading: [] // 故意使用空 Reading
     )
+  }
+
+  @Test
+  func testSelector_FinalSanityCheck_NoFilteringForRealCandidate() throws {
+    // 當候選文字不是佔位符號時，完整性檢查不會因為缺少 reading 而移除任何
+    // 已在白名單內的 selector。這個測試確保先前的行為保持不變。
+    let services = Self.testDataMap
+    let before = services.parseIntoCandidateTextServiceStack(candidate: "胡桃", reading: [])
+    CandidateTextService.registerAllowedSelectors
+    CandidateTextService.enableFinalSanityCheck()
+    let after = services.parseIntoCandidateTextServiceStack(candidate: "胡桃", reading: [])
+    #expect(before.count == after.count)
   }
 
   @Test
@@ -193,8 +210,11 @@ final class CandidateServiceCoordinatorTests {
     CandidateTextService.enableFinalSanityCheck()
     stacked = services.parseIntoCandidateTextServiceStack(candidate: candidate, reading: reading)
     let count2 = stacked.count
-    // 啟用完整性檢查後，數量應減少但不為零（allowedSelectorSet 已註冊，
-    // 僅 reading 相關的 selector 會因缺少 reading 而被過濾掉）。
+    // 啟用完整性檢查後，數量應減少但不為零。
+    // 由於我們傳入的 candidateText 為 "%s"（佔位符號），
+    // defaultFinalSanityCheck 裡會額外檢查 copyRuby/copyInline
+    // selector 需要非空 reading；其他情況只是對白名單進行過濾。
+    // allowedSelectorSet 已註冊，因此結果不應全被剔除。
     #expect(count1 > count2)
     #expect(count2 > 0, "allowedSelectorSet 應已註冊，不應全部被過濾。")
   }
