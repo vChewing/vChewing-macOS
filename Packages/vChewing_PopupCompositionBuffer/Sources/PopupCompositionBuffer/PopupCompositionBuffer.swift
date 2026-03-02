@@ -34,7 +34,7 @@ public final class PopupCompositionBuffer: NSWindowController, PCBProtocol {
     }
 
     self.visualEffectView = {
-      if #available(macOS 27.0, *), NSApplication.uxLevel == .liquidGlass {
+      if #available(macOS 26, *), NSApplication.uxLevel == .liquidGlass {
         #if compiler(>=6.2) && canImport(AppKit, _version: 26.0)
           let resultView = NSGlassEffectView()
           resultView.cornerRadius = 9

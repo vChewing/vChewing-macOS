@@ -43,7 +43,7 @@
 
 建置用系统需求：
 
-- **Xcode 26.3+ (macOS 15.6+ required)** 或单独安装的 **Swift 6.2 open-source toolchain** + **macOS 26 SDK**。
+- **Xcode 26+ (macOS 15.6+ required)** 或单独安装的 **Swift 6.2 open-source toolchain** + **macOS 26 SDK**。
     - 原因：Swift 6.2 成为必需版本（用于改进 concurrency 安全特性、SPM 6.2.4+ API 支持、CommandPlugin 改进等）。
 - 请使用正式发行版 Xcode，且最小子版本号越高越好（因为 Bug 相对而言最少）。
     - 如果是某个大版本的 Xcode 的 Release Candidate 版本的话，我们可能会对此做相容性测试。
