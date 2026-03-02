@@ -8,8 +8,6 @@
 
 import SwiftUI
 
-private let kWindowTitleHeight: Double = 78
-
 // MARK: - CtlSettingsUI
 
 // InputMethodServerPreferencesWindowControllerClass 非必需。
@@ -123,7 +121,15 @@ extension CtlSettingsUI {
     }
   }()
 
-  public static let contentMaxHeight: Double = 560
+  public static let contentMaxHeight: Double = {
+    var result: Double = 560
+    if #available(macOS 26, *), NSApplication.uxLevel == .liquidGlass {
+      #if compiler(>=6.2) && canImport(AppKit, _version: 26.0)
+        result += 90
+      #endif
+    }
+    return result
+  }()
 
   public static let formWidth: Double = {
     let delta: Double

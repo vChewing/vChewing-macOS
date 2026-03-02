@@ -530,12 +530,12 @@
       case (true, 16...):
         if #available(macOS 26, *) {
           if let infoDict = Bundle.main.infoDictionary {
-              let verStr = (infoDict["DTPlatformVersion"] as? String)?.prefix(4) ?? "_"
-              if let verDouble = Double(verStr) {
-                  if verDouble < 26 { return .material }
-                  let uiCompat = infoDict["UIDesignRequiresCompatibility"] as? Bool
-                  if uiCompat == true { return .material }
-              }
+            let verStr = (infoDict["DTPlatformVersion"] as? String)?.prefix(4) ?? "_"
+            if let verDouble = Double(verStr) {
+              if verDouble < 26 { return .material }
+              let uiCompat = infoDict["UIDesignRequiresCompatibility"] as? Bool
+              if uiCompat == true { return .material }
+            }
           }
           return .liquidGlass
         } else {

@@ -22,8 +22,9 @@ public struct VwrSettingsPaneServices: View {
           Button { isShowingAddSheet = true } label: {
             Image(systemName: "plus")
               .contentShape(.rect)
-              .help("Add Service".i18n)
+              .frame(height: 12)
           }
+          .help("Add Service".i18n)
           .sheet(isPresented: $isShowingAddSheet) {
             AddServiceSheetView { newRawText in
               let newServices = newRawText
@@ -40,8 +41,9 @@ public struct VwrSettingsPaneServices: View {
           Button { removeServiceClicked() } label: {
             Image(systemName: "minus")
               .contentShape(.rect)
-              .help("Remove Selected".i18n)
+              .frame(height: 12)
           }
+          .help("Remove Selected".i18n)
           .disabled(selectedIDs.isEmpty)
           Spacer()
           Button {
@@ -49,6 +51,7 @@ public struct VwrSettingsPaneServices: View {
           } label: {
             Image(systemName: "chevron.up")
               .contentShape(.rect)
+              .frame(height: 12)
           }
           .disabled(!canMoveUp)
           .help("Move Up".i18n)
@@ -57,20 +60,23 @@ public struct VwrSettingsPaneServices: View {
           } label: {
             Image(systemName: "chevron.down")
               .contentShape(.rect)
-              .help("Move Down".i18n)
+              .frame(height: 12)
           }
+          .help("Move Down".i18n)
           .disabled(!canMoveDown)
           Spacer()
           Button { copyAllToClipboard() } label: {
             Image(systemName: "doc.on.clipboard")
               .contentShape(.rect)
-              .help("Copy All to Clipboard".i18n)
+              .frame(height: 12)
           }
+          .help("Copy All to Clipboard".i18n)
           Button { isShowingInstructions = true } label: {
             Image(systemName: "questionmark.circle")
               .contentShape(.rect)
-              .help("How to Fill".i18n)
+              .frame(height: 12)
           }
+          .help("How to Fill".i18n)
           .alert(
             "How to Fill".i18n,
             isPresented: $isShowingInstructions
@@ -82,8 +88,9 @@ public struct VwrSettingsPaneServices: View {
           Button { isShowingResetConfirmation = true } label: {
             Image(systemName: "arrow.counterclockwise")
               .contentShape(.rect)
-              .help("Reset Default".i18n)
+              .frame(height: 12)
           }
+          .help("Reset Default".i18n)
           .confirmationDialog(
             "Reset Default".i18n,
             isPresented: $isShowingResetConfirmation,

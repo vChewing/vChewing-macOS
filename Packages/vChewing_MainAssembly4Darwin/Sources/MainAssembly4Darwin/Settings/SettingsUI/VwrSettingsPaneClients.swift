@@ -27,8 +27,9 @@ public struct VwrSettingsPaneClients: View {
                 .fontWidth(.condensed)
             } icon: {
               Image(systemName: "plus")
+                .contentShape(.rect)
+                .frame(height: 12)
             }
-            .contentShape(.rect)
             .help("Add Client".i18n)
           }
           .sheet(isPresented: $isShowingAddSheet) {
@@ -49,8 +50,9 @@ public struct VwrSettingsPaneClients: View {
                 .fontWidth(.condensed)
             } icon: {
               Image(systemName: "app.badge.checkmark")
+                .contentShape(.rect)
+                .frame(height: 12)
             }
-            .contentShape(.rect)
             .help("Just Select".i18n)
           }
           .fileImporter(
@@ -108,8 +110,9 @@ public struct VwrSettingsPaneClients: View {
           } label: {
             Image(systemName: "minus")
               .contentShape(.rect)
-              .help("Remove Selected".i18n)
+              .frame(height: 12)
           }
+          .help("Remove Selected".i18n)
           .disabled(selectedIDs.isEmpty)
           .alert(
             "The selected item is either not a valid macOS application bundle or not having a valid app bundle identifier."
