@@ -58,9 +58,16 @@ public struct VwrSettingsUI: View {
         Spacer()
         VStack(alignment: .leading) {
           Text("v" + IMEApp.appMainVersionLabel.joined(separator: " Build "))
+            .settingsDescription()
           Text(IMEApp.appSignedDateLabel)
-        }
-        .settingsDescription().padding()
+            .settingsDescription()
+          if let hpURL = URL(string: "https://vchewing.github.io") {
+            Link("i18n:settings.button.hpAndDonation", destination: hpURL)
+              .controlSize(.small)
+              .multilineTextAlignment(.leading)
+              .frame(maxWidth: .infinity, alignment: .leading)
+          }
+        }.padding()
       }
       .navigationSplitViewColumnWidth(173)
     } detail: {

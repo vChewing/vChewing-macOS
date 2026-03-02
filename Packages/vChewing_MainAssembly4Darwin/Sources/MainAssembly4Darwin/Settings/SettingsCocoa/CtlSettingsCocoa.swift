@@ -137,6 +137,13 @@ public final class CtlSettingsCocoa: NSWindowController, NSWindowDelegate {
   let panes = SettingsPanesCocoa()
   var previousView: NSView?
 
+  @objc
+  func openHomepage(_: Any?) {
+    if let url = URL(string: "https://vchewing.github.io") {
+      NSWorkspace.shared.open(url)
+    }
+  }
+
   // MARK: Private
 
   private var selectedTab: PrefUITabs = .tabGeneral
@@ -304,9 +311,24 @@ extension CtlSettingsCocoa {
       versionLabel.textColor = .gray
     }
 
+    // Homepage & Donation link button.
+    let linkButton = NSButton()
+    linkButton.translatesAutoresizingMaskIntoConstraints = false
+    linkButton.title = "i18n:settings.button.hpAndDonation".i18n
+    if #available(macOS 10.14, *) {
+      linkButton.contentTintColor = .linkColor
+      linkButton.bezelStyle = .inline
+      linkButton.isBordered = false
+    }
+    linkButton.cell?.controlSize = .small
+    linkButton.font = NSFont.systemFont(ofSize: NSFont.smallSystemFontSize)
+    linkButton.target = self
+    linkButton.action = #selector(openHomepage(_:))
+
     sidebarContainer.addSubview(iconView)
     sidebarContainer.addSubview(tableScrollView)
     sidebarContainer.addSubview(versionLabel)
+    sidebarContainer.addSubview(linkButton)
 
     sidebarContainer.addConstraints([
       // Icon: top leading, 48×48.
@@ -343,7 +365,7 @@ extension CtlSettingsCocoa {
         item: tableScrollView, attribute: .bottom, relatedBy: .equal,
         toItem: versionLabel, attribute: .top, multiplier: 1, constant: -8
       ),
-      // Version label: bottom, with padding.
+      // Version label: above link button.
       NSLayoutConstraint(
         item: versionLabel, attribute: .leading, relatedBy: .equal,
         toItem: sidebarContainer, attribute: .leading, multiplier: 1, constant: 12
@@ -354,6 +376,19 @@ extension CtlSettingsCocoa {
       ),
       NSLayoutConstraint(
         item: versionLabel, attribute: .bottom, relatedBy: .equal,
+        toItem: linkButton, attribute: .top, multiplier: 1, constant: -4
+      ),
+      // Link button: bottom, with padding.
+      NSLayoutConstraint(
+        item: linkButton, attribute: .leading, relatedBy: .equal,
+        toItem: sidebarContainer, attribute: .leading, multiplier: 1, constant: 10
+      ),
+      NSLayoutConstraint(
+        item: linkButton, attribute: .trailing, relatedBy: .lessThanOrEqual,
+        toItem: sidebarContainer, attribute: .trailing, multiplier: 1, constant: -8
+      ),
+      NSLayoutConstraint(
+        item: linkButton, attribute: .bottom, relatedBy: .equal,
         toItem: sidebarContainer, attribute: .bottom, multiplier: 1, constant: -8
       ),
     ])
