@@ -136,6 +136,7 @@ final class CandidateServiceCoordinatorTests {
   @Test
   func testSelector_BlockedSelectorRejected() throws {
     // 確認一個不在白名單內的 selector 會被 finalSanityCheck 阻擋
+    CandidateTextService.registerAllowedSelectors
     CandidateTextService.enableFinalSanityCheck()
     let raw = ["Evil: %s\t@SEL:executeArbitrary:"]
     let stacked = raw.parseIntoCandidateTextServiceStack(candidate: "A", reading: ["ㄚ"]) // 嘗試使用一個 candidate
@@ -145,6 +146,7 @@ final class CandidateServiceCoordinatorTests {
 
   @Test
   func testURL_JavascriptSchemeIsBlocked() throws {
+    CandidateTextService.registerAllowedSelectors
     CandidateTextService.enableFinalSanityCheck()
     let raw = ["EvilURL: %s\t@URL:javascript:alert('X')"]
     let stacked = raw.parseIntoCandidateTextServiceStack(candidate: "A", reading: ["ㄚ"]) // 嘗試使用一個 candidate
@@ -187,9 +189,13 @@ final class CandidateServiceCoordinatorTests {
       reading: reading
     )
     let count1 = stacked.count
+    CandidateTextService.registerAllowedSelectors
     CandidateTextService.enableFinalSanityCheck()
     stacked = services.parseIntoCandidateTextServiceStack(candidate: candidate, reading: reading)
     let count2 = stacked.count
+    // 啟用完整性檢查後，數量應減少但不為零（allowedSelectorSet 已註冊，
+    // 僅 reading 相關的 selector 會因缺少 reading 而被過濾掉）。
     #expect(count1 > count2)
+    #expect(count2 > 0, "allowedSelectorSet 應已註冊，不應全部被過濾。")
   }
 }

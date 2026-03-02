@@ -168,9 +168,6 @@ extension CandidateTextService {
   }
 }
 
-// 確保模組載入時即註冊允許的 selector 集合。
-private let _ignoredRegisterAllowedSelectors: () = CandidateTextService.registerAllowedSelectors
-
 extension CandidateTextService.Coordinator {
   fileprivate func copyInlineAnnotationCommon(
     _ param: CandidateTextService

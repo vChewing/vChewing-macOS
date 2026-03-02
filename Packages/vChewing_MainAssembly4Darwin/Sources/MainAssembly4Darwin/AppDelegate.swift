@@ -100,6 +100,9 @@ extension AppDelegate {
 
     PrefMgr.shared.fixOddPreferences()
 
+    // 先註冊允許的 selector 白名單，再啟用最終完整性檢查。
+    // （檔案層級的 private let 惰性初始化技巧無法在 Swift 中自動觸發。）
+    CandidateTextService.registerAllowedSelectors
     CandidateTextService.enableFinalSanityCheck()
 
     // 將不需要阻塞啟動流程的初期化工作延後至下一個 RunLoop 迭代。

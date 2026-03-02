@@ -239,10 +239,13 @@ extension MainAssemblyTests {
     var stack = services.parseIntoCandidateTextServiceStack(candidate: candidate, reading: reading)
     let beforeFinalSanityCheck = stack.count
     let previous = CandidateTextService.finalSanityCheck
+    CandidateTextService.registerAllowedSelectors
     CandidateTextService.enableFinalSanityCheck()
     stack = services.parseIntoCandidateTextServiceStack(candidate: candidate, reading: reading)
     let afterFinalSanityCheck = stack.count
+    // 啟用完整性檢查後，數量應減少但不為零（allowedSelectorSet 已註冊）。
     #expect(beforeFinalSanityCheck > afterFinalSanityCheck)
+    #expect(afterFinalSanityCheck > 0, "allowedSelectorSet 應已註冊，不應全部被過濾。")
     CandidateTextService.finalSanityCheck = previous
   }
 
