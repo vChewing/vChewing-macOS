@@ -308,6 +308,14 @@ extension InputHandlerProtocol {
       session.switchState(marking.markedRange.isEmpty ? marking.convertedToInputting : marking)
       return true
     }
+
+    // 波浪符號鍵：以當前標記內容調出服務選單。
+    if input.isSymbolMenuPhysicalKey, !state.markedRange.isEmpty {
+      let kvPair = state.data.userPhraseKVPair
+      let handled = handleServiceMenuInitiation(candidateText: kvPair.value, reading: kvPair.keyArray)
+      if handled { return true }
+    }
+
     return false
   }
 
