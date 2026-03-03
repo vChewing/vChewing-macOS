@@ -86,8 +86,9 @@ extension TDK4AppKit {
     public var visible = false {
       didSet {
         NSObject.cancelPreviousPerformRequests(withTarget: self)
-        if let delegate, oldValue != visible {
-          delegate.candidatePairHighlightChanged(at: visible ? 0 : nil)
+        if oldValue != visible {
+          suppressAnimationOnce = true
+          delegate?.candidatePairHighlightChanged(at: visible ? 0 : nil)
         }
         asyncOnMain { [weak self] in
           guard let this = self else { return }
@@ -202,9 +203,15 @@ extension TDK4AppKit {
         return CGPoint(x: frameRect.minX, y: frameRect.maxY)
       }
       set {
+        let animate = prefs.enableCandidateWindowAnimation
         asyncOnMain { [weak self] in
           guard let this = self else { return }
-          this.set(windowTopLeftPoint: newValue, bottomOutOfScreenAdjustmentHeight: 0, useGCD: true)
+          this.set(
+            windowTopLeftPoint: newValue,
+            bottomOutOfScreenAdjustmentHeight: 0,
+            useGCD: true,
+            animated: animate
+          )
         }
       }
     }
@@ -280,6 +287,20 @@ extension TDK4AppKit {
 
     private let candidateView: VwrCandidateTDK4AppKit
 
+    /// visible 狀態剛發生實質變化時設為 true，在下一次 updateNSWindowModern 執行完畢後歸零。
+    private var suppressAnimationOnce = false
+
+    private var enableAnimation: Bool {
+      guard prefs.enableCandidateWindowAnimation else { return false }
+      // GPU 硬體加速能力不足（虛擬機環境、GPU 驅動缺失等）時停用動畫。
+      guard NSApplication.isVideoHardwareAccelerationSufficient else { return false }
+      // visible 剛發生切換（含視窗從不可見變為可見）時，跳過動畫以避免「從遠處飛入」的效果。
+      if suppressAnimationOnce { return false }
+      // 視窗尚未實際出現在螢幕上時也不做動畫。
+      guard window?.isVisible == true else { return false }
+      return true
+    }
+
     private var candidateViewLegacy4Debug: NSView {
       let textField = NSTextField()
       textField.isSelectable = false
@@ -292,6 +313,31 @@ extension TDK4AppKit {
       textField.sizeToFit()
       textField.backgroundColor = .clear
       return textField
+    }
+
+    /// 針對給定的視窗目標尺寸，計算螢幕邊緣修正後的 top-left 坐標。
+    private func adjustedTopLeft(
+      rawTopLeft: CGPoint, heightDelta: Double, windowSize: CGSize
+    )
+      -> CGPoint {
+      var adjustedPoint = rawTopLeft
+      var delta = heightDelta
+      var screenFrame = NSScreen.main?.visibleFrame ?? .zero
+      for frame in NSScreen.screens.map(\.visibleFrame)
+        .filter({ $0.contains(rawTopLeft) }) {
+        screenFrame = frame
+        break
+      }
+      if delta > screenFrame.size.height / 2.0 { delta = 0.0 }
+      if adjustedPoint.y < screenFrame.minY + windowSize.height {
+        adjustedPoint.y = rawTopLeft.y + windowSize.height + delta
+      }
+      adjustedPoint.y = min(adjustedPoint.y, screenFrame.maxY - 1.0)
+      adjustedPoint.x = min(
+        max(adjustedPoint.x, screenFrame.minX),
+        screenFrame.maxX - windowSize.width - 1.0
+      )
+      return adjustedPoint
     }
 
     private func updateEffectView() {
@@ -327,12 +373,15 @@ extension TDK4AppKit {
       candidateView.invalidateIntrinsicContentSize()
       candidateView.setNeedsDisplay(candidateView.bounds)
 
+      let animateThisRound = enableAnimation
+      // 無論是否啟用動畫，都在本次更新後清除抑制旗標。
+      defer { suppressAnimationOnce = false }
+
       guard !Self.shouldDisableVisualEffectView else {
         window.isOpaque = false
         window.backgroundColor = .clear
         window.contentView = candidateView
-        window.setContentSize(candidateView.fittingSize)
-        delegate?.resetCandidateWindowOrigin()
+        applyTargetFrame(to: window, contentSize: candidateView.fittingSize, animated: animateThisRound)
         return
       }
 
@@ -341,7 +390,7 @@ extension TDK4AppKit {
 
       let viewSize = candidateView.fittingSize
       guard let containerView = window.contentView else { return }
-      containerView.setFrameSize(viewSize)
+
       // 為容器視圖也設置圓角，確保整體一致性
       containerView.wantsLayer = true
       containerView.layer?.cornerRadius = Self.thePool.windowRadius
@@ -356,8 +405,46 @@ extension TDK4AppKit {
       window.isOpaque = false
       window.backgroundColor = .clear
       window.contentView = containerView
-      window.setContentSize(viewSize)
-      delegate?.resetCandidateWindowOrigin()
+
+      applyTargetFrame(to: window, contentSize: viewSize, animated: animateThisRound)
+    }
+
+    /// 依據給定的內容尺寸，向 delegate 查詢游標位置、計算螢幕邊緣修正後的目標 frame，
+    /// 再將結果直接套用至視窗。
+    ///
+    /// NSWindow 在 `setFrame` 時會自動帶動 `contentView` resize（autoresizingMask 預設行為），
+    /// 其下以 `pinEdges` 綁定的 subview（`candidateView`、`visualEffectView` 等）
+    /// 亦會透過 Auto Layout 跟著同步縮放，無需手動介入 containerView。
+    ///
+    /// - Parameters:
+    ///   - window: 目標 `NSWindow`。
+    ///   - contentSize: 視窗內容的目標尺寸（通常為 `candidateView.fittingSize`）。
+    ///   - animated: 是否使用 `NSAnimationContext` 動畫（duration 0.12s）。
+    private func applyTargetFrame(
+      to window: NSWindow,
+      contentSize: CGSize,
+      animated: Bool
+    ) {
+      let newFrameRect = window.frameRect(forContentRect: .init(origin: .zero, size: contentSize))
+      let originInfo = delegate?.candidateWindowOriginInfo()
+        ?? (topLeft: CGPoint(x: window.frame.minX, y: window.frame.maxY), heightDelta: 0)
+      let adjustedPoint = adjustedTopLeft(
+        rawTopLeft: originInfo.topLeft,
+        heightDelta: originInfo.heightDelta,
+        windowSize: newFrameRect.size
+      )
+      let targetFrame = NSRect(
+        x: adjustedPoint.x, y: adjustedPoint.y - newFrameRect.height,
+        width: newFrameRect.width, height: newFrameRect.height
+      )
+      if animated {
+        NSAnimationContext.runAnimationGroup { context in
+          context.duration = 0.12
+          window.animator().setFrame(targetFrame, display: true)
+        }
+      } else {
+        window.setFrame(targetFrame, display: true)
+      }
     }
 
     private func handleMouseScroll(deltaX: CGFloat, deltaY: CGFloat) {

@@ -221,6 +221,9 @@ public final class PrefMgr: PrefMgrProtocol, Sendable {
   @AppProperty(userDef: .kEnableMouseScrollingForTDKCandidatesCocoa)
   public var enableMouseScrollingForTDKCandidatesCocoa: Bool
 
+  @AppProperty(userDef: .kEnableCandidateWindowAnimation)
+  public var enableCandidateWindowAnimation: Bool
+
   @AppProperty(userDef: .kDisableSegmentedThickUnderlineInMarkingModeForManagedClients)
   public var disableSegmentedThickUnderlineInMarkingModeForManagedClients: Bool
 

@@ -103,6 +103,7 @@ nonisolated public enum UserDef: String, CaseIterable, Identifiable {
 
   case kUseSpaceToCommitHighlightedSCPCCandidate = "UseSpaceToCommitHighlightedSCPCCandidate"
   case kEnableMouseScrollingForTDKCandidatesCocoa = "EnableMouseScrollingForTDKCandidatesCocoa"
+  case kEnableCandidateWindowAnimation = "EnableCandidateWindowAnimation"
   case kDisableSegmentedThickUnderlineInMarkingModeForManagedClients
     = "DisableSegmentedThickUnderlineInMarkingModeForManagedClients"
 
@@ -304,6 +305,7 @@ nonisolated extension UserDef {
     case .kReducePOMLifetimeToNoMoreThan12Hours: return .bool(false)
     case .kUseSpaceToCommitHighlightedSCPCCandidate: return .bool(true)
     case .kEnableMouseScrollingForTDKCandidatesCocoa: return .bool(false)
+    case .kEnableCandidateWindowAnimation: return .bool(true)
     case .kDisableSegmentedThickUnderlineInMarkingModeForManagedClients: return .bool(false)
     case .kCandidateTextFontName: return .string("")
     case .kCandidateKeys: return .string(Self.kDefaultCandidateKeys)
@@ -329,6 +331,11 @@ nonisolated extension UserDef {
     switch self {
     case .kIsDebugModeEnabled: return .init(userDef: self, shortTitle: "Debug Mode")
     case .kFailureFlagForPOMObservation: return nil
+    case .kEnableCandidateWindowAnimation: return .init(
+        userDef: self,
+        shortTitle: "i18n:UserDef.kEnableCandidateWindowAnimation.shortTitle",
+        description: "i18n:UserDef.kEnableCandidateWindowAnimation.description"
+      )
     case .kUserPhrasesDatabaseBypassed: return .init(
         userDef: self, shortTitle: "i18n:UserDef.kUserPhrasesDatabaseBypassed.shortTitle",
         description: "i18n:UserDef.kUserPhrasesDatabaseBypassed.description"

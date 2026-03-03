@@ -38,6 +38,7 @@ extension SettingsPanesCocoa {
                 renderable.currentControl?.action = #selector(self.candidateFontSizeDidSet(_:))
               }
               UserDef.kCandidateWindowShowOnlyOneLine.render(fixWidth: innerContentWidth)
+              UserDef.kEnableCandidateWindowAnimation.render(fixWidth: innerContentWidth)
               UserDef.kAlwaysExpandCandidateWindow.render(fixWidth: innerContentWidth)
               UserDef.kMinCellWidthForHorizontalMatrix.render(fixWidth: innerContentWidth)
             }?.boxed()

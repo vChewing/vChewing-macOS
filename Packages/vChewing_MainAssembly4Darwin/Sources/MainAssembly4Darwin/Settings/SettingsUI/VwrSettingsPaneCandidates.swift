@@ -45,6 +45,7 @@ public struct VwrSettingsPaneCandidates: View {
           PrefMgr.shared.candidateListTextSize = max(12, min(val, 196))
         }
         UserDef.kCandidateWindowShowOnlyOneLine.renderUI()
+        UserDef.kEnableCandidateWindowAnimation.renderUI()
         if !candidateWindowShowOnlyOneLine {
           UserDef.kAlwaysExpandCandidateWindow.renderUI()
             .disabled(candidateWindowShowOnlyOneLine)

@@ -82,24 +82,39 @@ extension SessionProtocol {
     guard isCurrentSession, client() != nil else { return }
     updateVerticalTypingStatus()
 
-    /// 先取消既有的選字窗的內容顯示。否則可能會重複生成選字窗的 NSWindow()。
-    ui?.candidateUI?.visible = false
+    let alreadyVisible = ui?.candidateUI?.visible ?? false
+
+    if !alreadyVisible {
+      /// 先取消既有的選字窗的內容顯示。否則可能會重複生成選字窗的 NSWindow()。
+      ui?.candidateUI?.visible = false
+    }
 
     // 會自動觸發田所選字窗的資料重載。這會讓選字窗自動從當前 Session 讀取最新的配置資料。
+    // 設定 delegate 時會觸發 reloadData() → updateDisplay() → updateNSWindowModern()，
+    // 其中 updateNSWindowModern() 的動畫路徑已內建正確的座標計算，不需額外呼叫 resetCandidateWindowOrigin。
     ui?.candidateUI?.delegate = self
-    ui?.candidateUI?.visible = true
 
-    resetCandidateWindowOrigin()
+    if !alreadyVisible {
+      ui?.candidateUI?.visible = true
+      resetCandidateWindowOrigin()
+    }
   }
 
-  public func resetCandidateWindowOrigin() {
+  public func candidateWindowOriginInfo() -> (topLeft: CGPoint, heightDelta: Double) {
     let lhRect = lineHeightRect()
     var tlPoint = CGPoint(x: lhRect.origin.x, y: lhRect.origin.y - 4.0)
     tlPoint.x += isVerticalTyping ? (lhRect.size.width + 4.0) : 0
+    return (topLeft: tlPoint, heightDelta: lhRect.size.height + 4.0)
+  }
+
+  public func resetCandidateWindowOrigin() {
+    let info = candidateWindowOriginInfo()
+    let shouldAnimate = (ui?.candidateUI?.visible ?? false) && prefs.enableCandidateWindowAnimation
     ui?.candidateUI?.set(
-      windowTopLeftPoint: tlPoint,
-      bottomOutOfScreenAdjustmentHeight: lhRect.size.height + 4.0,
-      useGCD: true
+      windowTopLeftPoint: info.topLeft,
+      bottomOutOfScreenAdjustmentHeight: info.heightDelta,
+      useGCD: true,
+      animated: shouldAnimate
     )
   }
 }

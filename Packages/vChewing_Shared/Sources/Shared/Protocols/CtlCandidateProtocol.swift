@@ -23,6 +23,7 @@ public protocol CtlCandidateDelegate: AnyObject {
   func candidatePairManipulated(at index: Int, action: CandidateContextMenuAction)
   func candidateToolTip(shortened: Bool) -> String
   func resetCandidateWindowOrigin()
+  func candidateWindowOriginInfo() -> (topLeft: CGPoint, heightDelta: Double)
   func checkIsMacroTokenResult(_ index: Int) -> Bool
   @discardableResult
   func reverseLookup(for value: String) -> [String]
@@ -54,10 +55,12 @@ public protocol CtlCandidateProtocol: AnyObject {
   func highlightNextCandidate() -> Bool
   func highlightPreviousCandidate() -> Bool
   func candidateIndexAtKeyLabelIndex(_: Int) -> Int?
+  /// reposition the candidate/tooltip window; animation may be requested
   func set(
     windowTopLeftPoint: CGPoint,
     bottomOutOfScreenAdjustmentHeight height: Double,
-    useGCD: Bool
+    useGCD: Bool,
+    animated: Bool
   )
 }
 

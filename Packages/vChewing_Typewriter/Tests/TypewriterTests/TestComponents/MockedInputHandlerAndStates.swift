@@ -427,6 +427,10 @@ public final class MockSession: @MainActor SessionCoreProtocol, CtlCandidateDele
 
   public func resetCandidateWindowOrigin() {}
 
+  public func candidateWindowOriginInfo() -> (topLeft: CGPoint, heightDelta: Double) {
+    (topLeft: .zero, heightDelta: 0)
+  }
+
   public func checkIsMacroTokenResult(_ index: Int) -> Bool { false }
 
   @discardableResult
