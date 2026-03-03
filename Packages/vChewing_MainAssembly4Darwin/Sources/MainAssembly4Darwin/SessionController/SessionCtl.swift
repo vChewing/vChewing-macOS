@@ -38,7 +38,7 @@ nonisolated public final class SessionCtl: IMKInputController, @unchecked Sendab
   ///   - delegate: 客體物件
   ///   - inputClient: 用以接受輸入的客體應用物件
   nonisolated override public init!(server: IMKServer!, delegate: Any!, client inputClient: Any!) {
-    // Note: Seems that this constuctor gets called everytime this IME gets switched to.
+    // Note: this constuctor gets called everytime this IME gets switched to.
     // This happens even if the client() is the same IMKTextInput instance.
     super.init(server: server, delegate: delegate, client: inputClient)
     mainSync {
