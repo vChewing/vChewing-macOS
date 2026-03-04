@@ -10,6 +10,9 @@
 
   import AppKit
   import CoreText
+  #if canImport(Metal)
+    import Metal
+  #endif
   import SwiftExtension
 
   // MARK: - Get Bundle Signature Timestamp
@@ -516,7 +519,7 @@
     public static let kNSFilenamesPboardType = Self(rawValue: "NSFilenamesPboardType")
   }
 
-  // MARK: - UXLevel
+  // MARK: - UXLevel & GPU Detection.
 
   extension NSApplication {
     public enum UXLevel: Int {
@@ -547,6 +550,63 @@
       case (_, _): return .none
       }
     }
+
+    /// 一次性偵測目前環境的 GPU 硬體加速能力是否足以支援視窗動畫。
+    /// 以下情況判定為能力不足，動畫效果將會被自動停用：
+    /// - 系統無可用的 Metal GPU device（GPU 驅動缺失或硬體完全不支援）。
+    /// - 執行於 Hypervisor / 虛擬機環境（`kern.hv_vmm_present` 為 1）。
+    public static let isVideoHardwareAccelerationSufficient: Bool = {
+      if #available(macOS 10.11, *) {
+        // ---------------------------------------------------------
+        // 1️⃣ macOS 10.11+ 使用 Metal
+        // ---------------------------------------------------------
+        #if canImport(Metal)
+          guard MTLCreateSystemDefaultDevice() != nil else {
+            return false
+          }
+        #endif
+      } else {
+        // -------------------------------------------------------
+        // 2️⃣ macOS 10.9–10.10：檢查是否存在 IOAccelerator
+        // -------------------------------------------------------
+        let matching = IOServiceMatching("IOAccelerator")
+        var iterator: io_iterator_t = 0
+        let result = IOServiceGetMatchingServices(kIOMasterPortDefault, matching, &iterator)
+
+        if result != KERN_SUCCESS {
+          return false
+        }
+
+        let service = IOIteratorNext(iterator)
+        IOObjectRelease(iterator)
+
+        if service == 0 {
+          // 沒有 GPU accelerator
+          return false
+        }
+
+        IOObjectRelease(service)
+      }
+
+      // ---------------------------------------------------------
+      // 3️⃣ 虛擬機檢查
+      // ---------------------------------------------------------
+      var vmPresent: UInt32 = 0
+      var vmSize = MemoryLayout<UInt32>.size
+      let sysctlResult = sysctlbyname(
+        "kern.hv_vmm_present",
+        &vmPresent,
+        &vmSize,
+        nil,
+        0
+      )
+
+      if sysctlResult == 0, vmPresent != 0 {
+        return false
+      }
+
+      return true
+    }()
   }
 
   extension NSColor {
