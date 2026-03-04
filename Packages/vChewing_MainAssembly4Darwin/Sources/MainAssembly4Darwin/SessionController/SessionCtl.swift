@@ -41,8 +41,14 @@ nonisolated public final class SessionCtl: IMKInputController, @unchecked Sendab
     // Note: this constuctor gets called everytime this IME gets switched to.
     // This happens even if the client() is the same IMKTextInput instance.
     super.init(server: server, delegate: delegate, client: inputClient)
+    // macOS 10.9 ~ 10.12 的相容性處理：此處得使用傳入的 client 參數，因為 `client()` 沒有就緒、是 nil。
+    // 在這些舊版系統上，IMK 尚未在 super.init 返回時就完成 client 物件的綁定，
+    // 因此 `client()` 在建構子同步執行期間始終回傳 nil，導致 Session 無法登記至快取。
+    // 穩妥的做法是使用當前建構子內傳入的 client 參數，可確保 IMK 已完成 client 綁定。
+    let senderRef = wrap(inputClient)
     mainSync {
-      self.core = callCoreAtLeastOnce() // Force initialization.
+      // Force initialization.
+      self.core = callCoreAtLeastOnce(client: unwrap(senderRef))
     }
   }
 
@@ -59,17 +65,28 @@ nonisolated public final class SessionCtl: IMKInputController, @unchecked Sendab
     }
   }
 
-  nonisolated private func callCoreAtLeastOnce() -> InputSession {
-    mainSync {
+  nonisolated private func callCoreAtLeastOnce(client maybeClient: Any!) -> InputSession {
+    let senderRef = wrap(maybeClient)
+    return mainSync {
       // 嘗試從快取中複用既有的 InputSession，以緩解 CapsLock 頻繁切換場景下的 ARC 壓力。
       // 參見 DevLab/InputMethodKitPhuquingRetarded.txt 內的分析。
-      if let clientObj = self.client() as? NSObject,
-         let cached = InputSession.cachedSession(for: clientObj) {
+      let maybeClientOnMain = unwrap(senderRef) as? NSObject
+      let clientObj = maybeClientOnMain ?? (self.client() as? NSObject)
+      if let clientObj, let cached = InputSession.cachedSession(for: clientObj) {
         cached.reassign(to: self, clientProvider: getClientProvider())
         vCLog("InputSession reused. ID: \(cached.id.uuidString)")
         return cached
       }
-      return InputSession(controller: self, client: getClientProvider())
+      // 先用傳入的參數完成 InputSession 的初期化，其中包括了對這個 Session 的登記過程。
+      let newSession = InputSession(controller: self) {
+        clientObj as? InputSession.ClientObj
+      }
+      // 然後再用脫手操作給這個 Session 重新指派 clientProvider。
+      asyncOnMain { [weak self] in
+        guard let this = self else { return }
+        newSession.reassign(to: this, clientProvider: this.getClientProvider())
+      }
+      return newSession
     }
   }
 }

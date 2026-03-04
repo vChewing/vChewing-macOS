@@ -190,14 +190,14 @@ public final class InputSession: @MainActor SessionProtocol, Sendable {
     sessionsByClient.object(forKey: clientObj)
   }
 
-  /// 將自身註冊至快取。首次建構 InputSession 時呼叫。
+  /// 將自身登記至快取。首次建構 InputSession 時呼叫。
   func registerInCache() {
     guard let clientObj = theClient() else { return }
     Self.sessionsByClient.setObject(self, forKey: clientObj)
   }
 
   /// 重新綁定至新的 SessionCtl（快取命中時使用）。
-  /// 僅更新控制器參照與 client 閉包，不重新建構打字模組。
+  /// 僅更新控制器參照與 clientProvider，不重新建構打字模組。
   func reassign(to controller: SessionCtl, clientProvider: @escaping () -> ClientObj?) {
     inputControllerAssigned = controller
     theClient = clientProvider
