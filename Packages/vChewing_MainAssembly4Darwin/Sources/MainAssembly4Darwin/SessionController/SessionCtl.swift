@@ -55,9 +55,22 @@ nonisolated public final class SessionCtl: IMKInputController, @unchecked Sendab
   // MARK: Public
 
   @MainActor
-  public weak var core: InputSession?
+  public var core: InputSession? {
+    get {
+      if let workingValue = _core { return workingValue }
+      let newValue = callCoreAtLeastOnce(client: nil) // <- 使用 `client()`。
+      self.core = newValue
+      return newValue
+    }
+    set {
+      _core = newValue
+    }
+  }
 
   // MARK: Private
+
+  @MainActor
+  private weak var _core: InputSession?
 
   nonisolated private func getClientProvider() -> (() -> InputSession.ClientObj?) {
     { [weak self] in
