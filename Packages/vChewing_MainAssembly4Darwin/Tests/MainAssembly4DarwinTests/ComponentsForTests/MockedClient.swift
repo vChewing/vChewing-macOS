@@ -6,7 +6,7 @@
 // marks, or product names of Contributor, except as required to fulfill notice
 // requirements defined in MIT License.
 
-import InputMethodKit
+import IMKSwift
 
 nonisolated final class FakeClient: NSObject, IMKTextInput {
   var attributedString: NSMutableAttributedString = .init(string: "")

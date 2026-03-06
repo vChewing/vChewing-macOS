@@ -45,9 +45,9 @@ public enum IMKHelper {
   ]
 }
 
-#if canImport(InputMethodKit)
+#if canImport(IMKSwift)
 
-  import InputMethodKit
+  import IMKSwift
 
   extension IMKHelper {
     public static var allowedAlphanumericalTISInputSources: [TISInputSource.KeyboardLayout] {

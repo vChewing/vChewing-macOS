@@ -7,7 +7,7 @@
 // requirements defined in MIT License.
 
 import Foundation
-import InputMethodKit
+import IMKSwift
 
 // MARK: Auto parameter fix procedures, executed everytime on InputSession.activateServer().
 

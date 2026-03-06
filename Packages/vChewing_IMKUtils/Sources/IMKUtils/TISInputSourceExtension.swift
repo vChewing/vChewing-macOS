@@ -6,10 +6,10 @@
 // marks, or product names of Contributor, except as required to fulfill notice
 // requirements defined in MIT License.
 
-#if canImport(InputMethodKit)
+#if canImport(IMKSwift)
 
   import Foundation
-  import InputMethodKit
+  import IMKSwift
 
   #if canImport(OSLog)
     import OSLog

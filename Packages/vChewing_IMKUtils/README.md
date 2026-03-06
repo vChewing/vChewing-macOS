@@ -2,6 +2,7 @@
 
 該模組套裝使得輸入法的登記啟用過程與鍵盤佈局管理過程更加簡便。分兩部分組成：
 
+- IMKSwift: (c) 2026 and onwards The vChewing Project (MIT License).
 - IMKHelper: (c) 2021 and onwards The vChewing Project (MIT-NTL License).
 - TISInputSourceExtension:
   - (c) 2021 and onwards The vChewing Project (MIT-NTL License).

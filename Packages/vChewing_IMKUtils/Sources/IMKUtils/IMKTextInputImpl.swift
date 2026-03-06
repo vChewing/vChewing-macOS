@@ -6,9 +6,9 @@
 // marks, or product names of Contributor, except as required to fulfill notice
 // requirements defined in MIT License.
 
-#if canImport(InputMethodKit)
+#if canImport(IMKSwift)
 
-  import InputMethodKit
+  import IMKSwift
 
   extension Optional where Wrapped == IMKTextInput {
     /// Constant for IMKTextOrientationName

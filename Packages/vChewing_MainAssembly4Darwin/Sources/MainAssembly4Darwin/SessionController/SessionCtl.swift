@@ -6,7 +6,7 @@
 // marks, or product names of Contributor, except as required to fulfill notice
 // requirements defined in MIT License.
 
-import InputMethodKit
+import IMKSwift
 
 // MARK: - SessionCtl
 
@@ -18,16 +18,10 @@ import InputMethodKit
 /// 檢查委任物件是否實現了方法：若存在的話，就調用委任物件內的版本。
 /// - Remark: 在輸入法的主函式中分配的 IMKServer 型別為客體應用程式創建的每個
 /// 輸入會話創建一個控制器型別。因此，對於每個輸入會話，都有一個對應的 IMKInputController。
-/// - Warning: 該型別處於 MainActor。但不能用 Swift 的手段釘死在 MainActor 上。
-/// 原因在於 IMK 的 Headers 與 Modern Swift 不相容。只能使用傳統手段迂迴處理。
 @objc(SessionCtl) // 必須加上 ObjC，因為 IMK 是用 ObjC 寫的。
-nonisolated public final class SessionCtl: IMKInputController, @unchecked Sendable {
+@MainActor
+public final class SessionCtl: IMKInputSessionController {
   // MARK: Lifecycle
-
-  /// 對用以設定委任物件的控制器型別進行初期化處理。
-  nonisolated override public init() {
-    super.init()
-  }
 
   /// 對用以設定委任物件的控制器型別進行初期化處理。
   ///
@@ -37,7 +31,7 @@ nonisolated public final class SessionCtl: IMKInputController, @unchecked Sendab
   ///   - server: IMKServer
   ///   - delegate: 客體物件
   ///   - inputClient: 用以接受輸入的客體應用物件
-  nonisolated override public init!(server: IMKServer!, delegate: Any!, client inputClient: Any!) {
+  override public init(server: IMKServer, delegate: Any?, client inputClient: IMKTextInput) {
     // Note: this constuctor gets called everytime this IME gets switched to.
     // This happens even if the client() is the same IMKTextInput instance.
     super.init(server: server, delegate: delegate, client: inputClient)
@@ -45,11 +39,8 @@ nonisolated public final class SessionCtl: IMKInputController, @unchecked Sendab
     // 在這些舊版系統上，IMK 尚未在 super.init 返回時就完成 client 物件的綁定，
     // 因此 `client()` 在建構子同步執行期間始終回傳 nil，導致 Session 無法登記至快取。
     // 穩妥的做法是使用當前建構子內傳入的 client 參數，可確保 IMK 已完成 client 綁定。
-    let senderRef = wrap(inputClient)
-    mainSync {
-      // Force initialization.
-      self.core = callCoreAtLeastOnce(client: unwrap(senderRef))
-    }
+    // Force initialization.
+    self.core = callCoreAtLeastOnce(client: inputClient)
   }
 
   // MARK: Public
@@ -72,35 +63,32 @@ nonisolated public final class SessionCtl: IMKInputController, @unchecked Sendab
   @MainActor
   private weak var _core: InputSession?
 
-  nonisolated private func getClientProvider() -> (() -> InputSession.ClientObj?) {
+  private func getClientProvider() -> (() -> InputSession.ClientObj?) {
     { [weak self] in
       self?.client() as? InputSession.ClientObj
     }
   }
 
-  nonisolated private func callCoreAtLeastOnce(client maybeClient: Any!) -> InputSession {
-    let senderRef = wrap(maybeClient)
-    return mainSync {
-      // 嘗試從快取中複用既有的 InputSession，以緩解 CapsLock 頻繁切換場景下的 ARC 壓力。
-      // 參見 DevLab/InputMethodKitPhuquingRetarded.txt 內的分析。
-      let maybeClientOnMain = unwrap(senderRef) as? NSObject
-      let clientObj = maybeClientOnMain ?? (self.client() as? NSObject)
-      if let clientObj, let cached = InputSession.cachedSession(for: clientObj) {
-        cached.reassign(to: self, clientProvider: getClientProvider())
-        vCLog("InputSession reused. ID: \(cached.id.uuidString)")
-        return cached
-      }
-      // 先用傳入的參數完成 InputSession 的初期化，其中包括了對這個 Session 的登記過程。
-      let newSession = InputSession(controller: self) {
-        clientObj as? InputSession.ClientObj
-      }
-      // 然後再用脫手操作給這個 Session 重新指派 clientProvider。
-      asyncOnMain { [weak self] in
-        guard let this = self else { return }
-        newSession.reassign(to: this, clientProvider: this.getClientProvider())
-      }
-      return newSession
+  private func callCoreAtLeastOnce(client maybeClient: Any!) -> InputSession {
+    // 嘗試從快取中複用既有的 InputSession，以緩解 CapsLock 頻繁切換場景下的 ARC 壓力。
+    // 參見 DevLab/InputMethodKitPhuquingRetarded.txt 內的分析。
+    let maybeClientOnMain = maybeClient as? NSObject
+    let clientObj = maybeClientOnMain ?? (client() as? NSObject)
+    if let clientObj, let cached = InputSession.cachedSession(for: clientObj) {
+      cached.reassign(to: self, clientProvider: getClientProvider())
+      vCLog("InputSession reused. ID: \(cached.id.uuidString)")
+      return cached
     }
+    // 先用傳入的參數完成 InputSession 的初期化，其中包括了對這個 Session 的登記過程。
+    let newSession = InputSession(controller: self) {
+      clientObj as? InputSession.ClientObj
+    }
+    // 然後再用脫手操作給這個 Session 重新指派 clientProvider。
+    asyncOnMain { [weak self] in
+      guard let this = self else { return }
+      newSession.reassign(to: this, clientProvider: this.getClientProvider())
+    }
+    return newSession
   }
 }
 
@@ -109,21 +97,15 @@ nonisolated public final class SessionCtl: IMKInputController, @unchecked Sendab
 extension SessionCtl {
   /// 啟用輸入法時，會觸發該函式。
   /// - Parameter sender: 呼叫了該函式的客體。
-  nonisolated override public func activateServer(_ sender: Any!) {
+  override public func activateServer(_ sender: any IMKTextInput) {
     // super.activateServer(sender) <- CONSIDERED_USELESS_WITH_TROUBLES
-    let senderRef = wrap(sender)
-    mainSync {
-      core?.activateServer(unwrap(senderRef))
-    }
+    core?.activateServer(sender)
   }
 
   /// 停用輸入法時，會觸發該函式。
   /// - Parameter sender: 呼叫了該函式的客體（無須使用）。
-  nonisolated override public func deactivateServer(_ sender: Any!) {
-    let senderRef = wrap(sender)
-    mainSync {
-      core?.deactivateServer(unwrap(senderRef))
-    }
+  override public func deactivateServer(_ sender: any IMKTextInput) {
+    core?.deactivateServer(sender)
     // super.deactivateServer(sender) <- CONSIDERED_USELESS_WITH_TROUBLES
   }
 
@@ -134,16 +116,12 @@ extension SessionCtl {
   ///   - value: 輸入法在系統偏好設定當中的副本的 identifier，與 bundle identifier 類似。在輸入法的 info.plist 內定義。
   ///   - tag: 標記（無須使用）。
   ///   - sender: 呼叫了該函式的客體（無須使用）。
-  nonisolated override public func setValue(_ value: Any!, forTag tag: Int, client sender: Any!) {
-    let valueRef = wrap(value)
-    let senderRef = wrap(sender)
-    mainSync {
-      core?.setValue(
-        unwrap(valueRef),
-        forTag: tag,
-        client: unwrap(senderRef)
-      )
-    }
+  override public func setValue(
+    _ value: Any?,
+    forTag tag: Int,
+    client sender: any IMKTextInput
+  ) {
+    core?.setValue(value, forTag: tag, client: sender)
     // super.setValue(value, forTag: tag, client: sender) <- CONSIDERED_USELESS_WITH_TROUBLES
   }
 }
@@ -158,26 +136,17 @@ extension SessionCtl {
   ///   - sender: 呼叫了該函式的客體（無須使用）。
   /// - Returns: 回「`true`」以將該按鍵已攔截處理的訊息傳遞給 IMK；回「`false`」則放行、不作處理。
   @objc(handleEvent:client:)
-  nonisolated override public func handle(
-    _ event: NSEvent?,
-    client sender: Any?
-  )
-    -> Bool {
-    let eventRef = wrap(event)
-    let senderRef = wrap(sender)
-    return mainSync {
-      let event = unwrap(eventRef) as? NSEvent
-      let result = core?.handleNSEvent(event, client: unwrap(senderRef)) ?? false
-      if !result, PrefMgr.shared.isDebugModeEnabled {
-        let stack = Thread.callStackSymbols.prefix(7).joined(separator: "\n")
-        if let newEvent = event?.copyAsKBEvent {
-          vCLog("OmitNSEvent: \(newEvent);\nstack: \(stack)")
-        } else {
-          vCLog("OmitNSEvent: [RAW]\(event.debugDescription);\nstack: \(stack)")
-        }
+  override public func handle(_ event: NSEvent?, client sender: any IMKTextInput) -> Bool {
+    let result = core?.handleNSEvent(event, client: sender) ?? false
+    if !result, PrefMgr.shared.isDebugModeEnabled {
+      let stack = Thread.callStackSymbols.prefix(7).joined(separator: "\n")
+      if let newEvent = event?.copyAsKBEvent {
+        vCLog("OmitNSEvent: \(newEvent);\nstack: \(stack)")
+      } else {
+        vCLog("OmitNSEvent: [RAW]\(event.debugDescription);\nstack: \(stack)")
       }
-      return result
     }
+    return result
   }
 
   /// 該函式的回饋結果決定了輸入法會攔截且捕捉哪些類型的輸入裝置操作事件。
@@ -189,39 +158,29 @@ extension SessionCtl {
   /// 「`commitComposition(_ message)`」遞交給客體。
   /// - Parameter sender: 呼叫了該函式的客體（無須使用）。
   /// - Returns: 返回一個 uint，其中承載了與系統 NSEvent 操作事件有關的掩碼集合（詳見 NSEvent.h）。
-  nonisolated override public func recognizedEvents(_ sender: Any!) -> Int {
-    let senderRef = wrap(sender)
-    return mainSync {
-      core?.recognizedEvents(unwrap(senderRef)) ?? 0
-    }
+  override public func recognizedEvents(_ sender: any IMKTextInput) -> UInt {
+    core?.recognizedEvents(sender) ?? 0
   }
 
   /// 有時會出現某些 App 攔截輸入法的 Ctrl+Enter / Shift+Enter 熱鍵的情況。
   /// 也就是說 handle(event:) 完全抓不到這個 Event。
   /// 這時需要在 commitComposition 這一關做一些收尾處理。
   /// - Parameter sender: 呼叫了該函式的客體（無須使用）。
-  nonisolated override public func commitComposition(_ sender: Any!) {
-    let senderRef = wrap(sender)
-    asyncOnMain { [weak self] in
-      guard let senderRef else { return }
-      self?.core?.commitCompositionByOS(senderRef)
-    }
+  override public func commitComposition(_ sender: IMKTextInput) {
+    core?.commitCompositionByOS(sender)
     // `super.commitComposition(sender)` 這句不要引入，否則每次切出輸入法時都會死當。
   }
 
   /// 指定輸入法要遞交出去的內容（雖然 InputMethodKit 可能並不會真的用到這個函式）。
   /// - Parameter sender: 呼叫了該函式的客體（無須使用）。
   /// - Returns: 字串內容，或者 nil。
-  nonisolated override public func composedString(_ sender: Any!) -> Any! {
-    let senderRef = wrap(sender)
-    return mainSync {
-      core?.composedString(unwrap(senderRef))
-    }
+  override public func composedString(_ sender: IMKTextInput) -> Any? {
+    core?.composedString(sender)
   }
 
   /// 輸入法要被換掉或關掉的時候，要做的事情。
   /// 不過好像因為 IMK 的 Bug 而並不會被執行。
-  nonisolated override public func inputControllerWillClose() {
+  override public func inputControllerWillClose() {
     // 防止尚未完成拼寫的注音內容被遞交出去。
     asyncOnMain { [weak self] in
       self?.core?.inputControllerWillClose()
@@ -229,41 +188,27 @@ extension SessionCtl {
   }
 
   /// 指定標記模式下被高亮的部分。
-  nonisolated override public func selectionRange() -> NSRange {
+  override public func selectionRange() -> NSRange {
     mainSync {
       core?.selectionRange() ?? .notFound
     }
   }
 
   /// 該函式僅用來取消任何輸入法浮動視窗的顯示。
-  nonisolated override public func hidePalettes() {
+  override public func hidePalettes() {
     asyncOnMain { [weak self] in
       self?.core?.hidePalettes()
     }
   }
 
-  nonisolated override public func menu() -> NSMenu {
+  override public func menu() -> NSMenu {
     mainSync {
       makeMenu()
     }
   }
 
   @objc
-  nonisolated override public func showPreferences(_: Any? = nil) {
-    mainSync {
-      core?.showPreferences(nil)
-    }
-  }
-}
-
-extension IMKInputController {
-  nonisolated fileprivate func wrap(_ object: Any?) -> UInt? {
-    guard let object = object as? AnyObject else { return nil }
-    return UInt(bitPattern: Unmanaged.passUnretained(object).toOpaque())
-  }
-
-  nonisolated fileprivate func unwrap(_ addr: UInt?) -> Any? {
-    guard let addr = addr, let ptr = UnsafeMutableRawPointer(bitPattern: addr) else { return nil }
-    return Unmanaged<AnyObject>.fromOpaque(ptr).takeUnretainedValue()
+  override public func showPreferences(_: IMKTextInput? = nil) {
+    core?.showPreferences(nil)
   }
 }

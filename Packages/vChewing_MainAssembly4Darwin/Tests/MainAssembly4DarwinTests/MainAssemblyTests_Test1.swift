@@ -6,7 +6,7 @@
 // marks, or product names of Contributor, except as required to fulfill notice
 // requirements defined in MIT License.
 
-import InputMethodKit
+import IMKSwift
 import LMAssemblyMaterials4Tests
 import Megrez
 import MegrezTestComponents
@@ -32,7 +32,7 @@ extension MainAssemblyTests {
   func test002_ClientTest_TextInsertion() throws {
     testClient.clear()
     let testString = UUID().uuidString
-    testSession.client().insertText(testString, replacementRange: .notFound)
+    testSession.client()?.insertText(testString, replacementRange: .notFound)
     #expect(testClient.attributedString.string == testString)
     testClient.clear()
   }

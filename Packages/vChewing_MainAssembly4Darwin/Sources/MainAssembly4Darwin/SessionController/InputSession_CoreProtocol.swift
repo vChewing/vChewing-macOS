@@ -6,7 +6,7 @@
 // marks, or product names of Contributor, except as required to fulfill notice
 // requirements defined in MIT License.
 
-import InputMethodKit
+import IMKSwift
 
 // MARK: - SessionProtocol
 
@@ -18,7 +18,7 @@ import InputMethodKit
 /// 檢查委任物件是否實現了方法：若存在的話，就調用委任物件內的版本。
 /// - Remark: 在輸入法的主函式中分配的 IMKServer 型別為客體應用程式創建的每個
 /// 輸入會話創建一個控制器型別。因此，對於每個輸入會話，都有一個對應的 IMKInputController。
-public protocol SessionProtocol: AnyObject, IMKInputControllerProtocol, CtlCandidateDelegate,
+public protocol SessionProtocol: AnyObject, IMKInputSessionControllerProtocol, CtlCandidateDelegate,
   SessionCoreProtocol where Handler: InputHandlerProtocol {
   static var current: Self? { get set }
   /// 輸入調度模組的副本。
@@ -186,7 +186,7 @@ extension SessionProtocol {
   }
 
   /// 所有建構子都會執行的共用部分，在 super.init() 之後執行。
-  public func construct(client theClient: (IMKTextInput & NSObjectProtocol)? = nil) {
+  public func construct(client theClient: IMKTextInput? = nil) {
     // AsyncOnMain 自身的 Lambda Expression 可能與 Swift 6.2 的 Concurrency 相性不太好。
     // 於是這裡單獨判斷。
     if UserDefaults.pendingUnitTests {
@@ -198,14 +198,15 @@ extension SessionProtocol {
     }
   }
 
-  public func constructSansAsync(client theClient: (IMKTextInput & NSObjectProtocol)? = nil) {
+  public func constructSansAsync(client theClient: IMKTextInput? = nil) {
     // Self.current?.hidePalettes() <- 該操作由 activateServer() 全權負責。
     Self.current = self
     initInputHandler()
     synchronizer4LMPrefs?()
     // 下述兩行很有必要，否則輸入法會在手動重啟之後無法立刻生效。
-    let maybeClient = theClient ?? client()
-    activateServer(maybeClient)
+    if let resolvedClient = theClient ?? client() {
+      activateServer(resolvedClient)
+    }
     // GCD 會觸發 didSet，所以不用擔心。
     inputMode = .init(rawValue: prefs.mostRecentInputMode) ?? .imeModeNULL
   }

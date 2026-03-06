@@ -6,7 +6,7 @@
 // marks, or product names of Contributor, except as required to fulfill notice
 // requirements defined in MIT License.
 
-import InputMethodKit
+import IMKSwift
 import LangModelAssembly
 import LMAssemblyMaterials4Tests
 import OSFrameworkImpl
@@ -21,7 +21,7 @@ nonisolated var testClient: FakeClient {
 }
 
 extension SessionCtl {
-  nonisolated override public func client() -> (IMKTextInput & NSObjectProtocol)! {
+  nonisolated override public func client() -> (any IMKTextInput)? {
     testClient
   }
 }

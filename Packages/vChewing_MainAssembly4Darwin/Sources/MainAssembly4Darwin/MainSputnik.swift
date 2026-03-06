@@ -7,7 +7,7 @@
 // requirements defined in MIT License.
 
 import AppKit
-import InputMethodKit
+import IMKSwift
 
 /// macOS 10.9 ~ 10.14 不支援 Swift-based MainActor，但這個必須運行在 Main Thread 上。
 public final class MainSputnik4IME {

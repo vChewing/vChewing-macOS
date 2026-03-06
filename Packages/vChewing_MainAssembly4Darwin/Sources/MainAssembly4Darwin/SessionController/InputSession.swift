@@ -6,7 +6,7 @@
 // marks, or product names of Contributor, except as required to fulfill notice
 // requirements defined in MIT License.
 
-import InputMethodKit
+import IMKSwift
 
 // MARK: - InputSession
 
@@ -216,26 +216,27 @@ public final class InputSession: @MainActor SessionProtocol, Sendable {
 }
 
 extension InputSession {
+  // MARK: - IMKStateSetting surface
+
   /// 啟用輸入法時，會觸發該函式。
   /// - Parameter sender: 呼叫了該函式的客體。
-  public func activateServer(_ sender: Any!) {
+  public func activateServer(_ sender: any IMKTextInput) {
     performServerActivation(client: sender as? ClientObj)
   }
 
   /// 停用輸入法時，會觸發該函式。
   /// - Parameter sender: 呼叫了該函式的客體（無須使用）。
-  public func deactivateServer(_ sender: Any!) {
-    _ = sender
+  public func deactivateServer(_ sender: any IMKTextInput) {
     asyncOnMain { [weak self] in
       self?.performServerDeactivation()
     }
   }
 
-  public func value(forTag tag: Int, client sender: Any!) -> Any! {
+  public func value(forTag tag: Int, client sender: any IMKTextInput) -> Any? {
     inputController?.value(forTag: tag, client: sender)
   }
 
-  public func setValue(_ value: Any!, forTag tag: Int, client sender: Any!) {
+  public func setValue(_ value: Any?, forTag tag: Int, client sender: any IMKTextInput) {
     if isCurrentSession {
       hidePalettes()
     }
@@ -247,7 +248,7 @@ extension InputSession {
     }
   }
 
-  public func modes(_ sender: Any!) -> [AnyHashable: Any]! {
+  public func modes(_ sender: any IMKTextInput) -> [AnyHashable: Any]? {
     inputController?.modes(sender)
   }
 
@@ -260,14 +261,12 @@ extension InputSession {
   /// 「`commitComposition(_ message)`」遞交給客體。
   /// - Parameter sender: 呼叫了該函式的客體（無須使用）。
   /// - Returns: 返回一個 uint，其中承載了與系統 NSEvent 操作事件有關的掩碼集合（詳見 NSEvent.h）。
-  public func recognizedEvents(_ sender: Any!) -> Int {
-    _ = sender // 防止格式整理工具毀掉與此對應的參數。
+  public func recognizedEvents(_ sender: any IMKTextInput) -> UInt {
     let events: NSEvent.EventTypeMask = [.keyDown, .flagsChanged, .keyUp]
-    return Int(events.rawValue)
+    return UInt(events.rawValue)
   }
 
-  public func showPreferences(_ sender: Any!) {
-    _ = sender // 防止格式整理工具毀掉與此對應的參數。
+  public func showPreferences(_ sender: (any IMKTextInput)?) {
     osCheck: if #available(macOS 14, *) {
       switch NSEvent.keyModifierFlags {
       case .option: break osCheck
@@ -280,15 +279,7 @@ extension InputSession {
     NSApp.popup()
   }
 
-  /// 有時會出現某些 App 攔截輸入法的 Ctrl+Enter / Shift+Enter 熱鍵的情況。
-  /// 也就是說 handle(event:) 完全抓不到這個 Event。
-  /// 這時需要在 commitComposition 這一關做一些收尾處理。
-  /// - Parameter sender: 呼叫了該函式的客體（無須使用）。
-  public func commitCompositionByOS(_ sender: Any!) {
-    _ = sender // 防止格式整理工具毀掉與此對應的參數。
-    resetInputHandler()
-    clearInlineDisplay()
-  }
+  // MARK: - IMKInputController surface
 
   public func updateComposition() {
     inputController?.updateComposition()
@@ -298,11 +289,104 @@ extension InputSession {
     inputController?.cancelComposition()
   }
 
+  public func compositionAttributes(at range: NSRange) -> NSMutableDictionary {
+    inputController?.compositionAttributes(at: range) ?? .init()
+  }
+
+  public func selectionRange() -> NSRange {
+    attributedStringSecured.range
+  }
+
+  public func replacementRange() -> NSRange {
+    inputController?.replacementRange() ?? .init(location: NSNotFound, length: NSNotFound)
+  }
+
+  public func mark(forStyle style: Int, at range: NSRange) -> [AnyHashable: Any] {
+    inputController?.mark(forStyle: style, at: range) ?? [:]
+  }
+
+  public func doCommand(by aSelector: Selector, command infoDictionary: [AnyHashable: Any]) {
+    inputController?.doCommand(by: aSelector, command: infoDictionary)
+  }
+
+  public func hidePalettes() {
+    Broadcaster.shared.postEventForClosingAllPanels()
+  }
+
+  public func menu() -> NSMenu? { inputController?.menu() }
+
+  public func delegate() -> Any? { inputController?.delegate() }
+
+  public func setDelegate(_ newDelegate: Any?) { inputController?.setDelegate(newDelegate) }
+
+  public func server() -> IMKServer { inputController!.server() }
+
+  public func client() -> (any IMKTextInput)? {
+    inputController?.client() ?? theClient()
+  }
+
+  /// 輸入法要被換掉或關掉的時候，要做的事情。
+  /// 不過好像因為 IMK 的 Bug 而並不會被執行。
+  public func inputControllerWillClose() {
+    // 防止尚未完成拼寫的注音內容被遞交出去。
+    resetInputHandler()
+  }
+
+  public func annotationSelected(
+    _ annotationString: NSAttributedString?,
+    forCandidate candidateString: NSAttributedString?
+  ) { inputController?.annotationSelected(annotationString, forCandidate: candidateString) }
+
+  public func candidateSelectionChanged(_ candidateString: NSAttributedString?) {
+    inputController?.candidateSelectionChanged(candidateString)
+  }
+
+  public func candidateSelected(_ candidateString: NSAttributedString?) {
+    inputController?.candidateSelected(candidateString)
+  }
+
+  // MARK: - IMKMouseHandling surface
+
+  public func mouseDown(
+    onCharacterIndex index: UInt, coordinate point: NSPoint,
+    withModifier flags: UInt,
+    continueTracking keepTracking: UnsafeMutablePointer<ObjCBool>,
+    client sender: any IMKTextInput
+  )
+    -> Bool { false }
+
+  public func mouseUp(
+    onCharacterIndex index: UInt, coordinate point: NSPoint,
+    withModifier flags: UInt, client sender: any IMKTextInput
+  )
+    -> Bool { false }
+
+  public func mouseMoved(
+    onCharacterIndex index: UInt, coordinate point: NSPoint,
+    withModifier flags: UInt, client sender: any IMKTextInput
+  )
+    -> Bool { false }
+
+  // MARK: - IMKServerInput surface
+
+  public func inputText(
+    _ string: String, key keyCode: Int,
+    modifiers flags: UInt, client sender: any IMKTextInput
+  )
+    -> Bool { false }
+
+  public func inputText(_ string: String, client sender: any IMKTextInput) -> Bool { false }
+
+  public func handle(_ event: NSEvent?, client sender: any IMKTextInput) -> Bool {
+    handleNSEvent(event, client: sender)
+  }
+
+  public func didCommand(by aSelector: Selector, client sender: any IMKTextInput) -> Bool { false }
+
   /// 指定輸入法要遞交出去的內容（個別 IMKInputClient 會呼叫這個函式）。
   /// - Parameter sender: 呼叫了該函式的客體（無須使用）。
   /// - Returns: 字串內容，或者 nil。
-  public func composedString(_ sender: Any!) -> Any! {
-    _ = sender // 防止格式整理工具毀掉與此對應的參數。
+  public func composedString(_ sender: any IMKTextInput) -> Any? {
     guard let inputHandler else { return "" }
     var textToCommit = ""
     // 過濾掉尚未完成拼寫的注音。
@@ -315,60 +399,22 @@ extension InputSession {
     return textToCommit
   }
 
-  public func selectionRange() -> NSRange {
-    attributedStringSecured.range
-  }
+  public func originalString(_ sender: any IMKTextInput) -> NSAttributedString? { nil }
 
-  public func replacementRange() -> NSRange {
-    inputController?.replacementRange() ?? .init(location: NSNotFound, length: NSNotFound)
-  }
-
-  public func doCommand(by aSelector: Selector!, command infoDictionary: [AnyHashable: Any]!) {
-    inputController?.doCommand(by: aSelector, command: infoDictionary)
-  }
-
-  public func hidePalettes() {
-    Broadcaster.shared.postEventForClosingAllPanels()
-  }
-
-  public func menu() -> NSMenu! { inputController?.menu() }
-
-  public func delegate() -> Any! { inputController?.delegate() }
-
-  public func setDelegate(_ newDelegate: Any!) { inputController?.setDelegate(newDelegate) }
-
-  public func server() -> IMKServer! { inputController?.server() }
-
-  public func client() -> (any IMKTextInput & NSObjectProtocol)! {
-    /// API 層面的驚嘆號是無法去掉的（否則 IMK 會出錯），那這裡就必須手動 unwrap 確保沒有把 nullptr 丟出去。
-    inputController?.client() ?? theClient()
-  }
-
-  /// 輸入法要被換掉或關掉的時候，要做的事情。
-  /// 不過好像因為 IMK 的 Bug 而並不會被執行。
-  public func inputControllerWillClose() {
-    // 防止尚未完成拼寫的注音內容被遞交出去。
+  /// 有時會出現某些 App 攔截輸入法的 Ctrl+Enter / Shift+Enter 熱鍵的情況。
+  /// 也就是說 handle(event:) 完全抓不到這個 Event。
+  /// 這時需要在 commitComposition 這一關做一些收尾處理。
+  /// - Parameter sender: 呼叫了該函式的客體（無須使用）。
+  public func commitComposition(_ sender: any IMKTextInput) {
     resetInputHandler()
+    clearInlineDisplay()
   }
 
-  public func annotationSelected(
-    _ annotationString: NSAttributedString!,
-    forCandidate candidateString: NSAttributedString!
-  ) { inputController?.annotationSelected(annotationString, forCandidate: candidateString) }
-
-  public func candidateSelectionChanged(_ candidateString: NSAttributedString!) {
-    inputController?.candidateSelectionChanged(candidateString)
+  /// 由 SessionCtl.commitComposition 轉發呼叫，sender 為已解包的原始指標值。
+  public func commitCompositionByOS(_ sender: Any?) {
+    resetInputHandler()
+    clearInlineDisplay()
   }
 
-  public func candidateSelected(_ candidateString: NSAttributedString!) {
-    inputController?.candidateSelected(candidateString)
-  }
-
-  public func compositionAttributes(at range: NSRange) -> NSMutableDictionary! {
-    inputController?.compositionAttributes(at: range)
-  }
-
-  public func mark(forStyle style: Int, at range: NSRange) -> [AnyHashable: Any]! {
-    inputController?.mark(forStyle: style, at: range)
-  }
+  public func candidates(_ sender: any IMKTextInput) -> [Any]? { nil }
 }
