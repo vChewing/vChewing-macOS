@@ -263,7 +263,6 @@
 "i18n:UserDef.kCursorPlacementAfterSelectingCandidate.option.2" = "候補陳列ウィンドウ呼び出し前のカーソル位置に戻す";
 "i18n:UserDef.kCursorPlacementAfterSelectingCandidate.shortTitle:" = "候補確定後のカーソル位置:";
 "i18n:UserDef.kDodgeInvalidEdgeCandidateCursorPosition.shortTitle" = "端末での不合理的な候補選択用カーソル位置を是正";
-"i18n:UserDef.kEnableCandidateWindowAnimation.description" = "仮想マシン環境下、または GPU のハードウェアアクセラレーションが利用できない場合は、アニメーションが自動的に無効になります。";
 "i18n:UserDef.kEnableCandidateWindowAnimation.shortTitle" = "候補ウィンドウの移動/サイズ変更にアニメーションを適用";
 "i18n:UserDef.kEnforceETenDOSCandidateSequence.description" = "このスイッチは、倚天中国語DOSの候補順に慣れたユーザー向けに用意されております。候補の陳列順番を手動で管理したいという需要の多くがこの並びに起因するためです。なお、全候補選択入力モードでは常にこの並び順が適用され、このスイッチの影響は受けません。";
 "i18n:UserDef.kEnforceETenDOSCandidateSequence.shortTitle" = "単漢字候補の陳列順番を倚天中国語DOS順に強制する";

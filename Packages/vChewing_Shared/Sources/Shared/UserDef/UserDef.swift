@@ -528,8 +528,7 @@ nonisolated extension UserDef {
     case .kFailureFlagForPOMObservation: return nil
     case .kEnableCandidateWindowAnimation: return .init(
         userDef: self,
-        shortTitle: "i18n:UserDef.kEnableCandidateWindowAnimation.shortTitle",
-        description: "i18n:UserDef.kEnableCandidateWindowAnimation.description"
+        shortTitle: "i18n:UserDef.kEnableCandidateWindowAnimation.shortTitle"
       )
     case .kUserPhrasesDatabaseBypassed: return .init(
         userDef: self, shortTitle: "i18n:UserDef.kUserPhrasesDatabaseBypassed.shortTitle",

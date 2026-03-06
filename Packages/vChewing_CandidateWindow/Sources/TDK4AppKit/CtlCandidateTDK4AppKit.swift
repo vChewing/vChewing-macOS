@@ -292,8 +292,6 @@ extension TDK4AppKit {
 
     private var enableAnimation: Bool {
       guard prefs.enableCandidateWindowAnimation else { return false }
-      // GPU 硬體加速能力不足（虛擬機環境、GPU 驅動缺失等）時停用動畫。
-      guard NSApplication.isVideoHardwareAccelerationSufficient else { return false }
       // visible 剛發生切換（含視窗從不可見變為可見）時，跳過動畫以避免「從遠處飛入」的效果。
       if suppressAnimationOnce { return false }
       // 視窗尚未實際出現在螢幕上時也不做動畫。

@@ -264,7 +264,6 @@
 "i18n:UserDef.kCursorPlacementAfterSelectingCandidate.option.2" = "Restore Pre-Candidate-Window Cursor Position";
 "i18n:UserDef.kCursorPlacementAfterSelectingCandidate.shortTitle:" = "Post-Candidate Cursor Position:";
 "i18n:UserDef.kDodgeInvalidEdgeCandidateCursorPosition.shortTitle" = "Dodge Invalid Edge Candidate Cursor Position";
-"i18n:UserDef.kEnableCandidateWindowAnimation.description" = "Animation is automatically disabled in virtual machine environments or when GPU hardware acceleration is unavailable.";
 "i18n:UserDef.kEnableCandidateWindowAnimation.shortTitle" = "Enable animation for candidate window movement/resize";
 "i18n:UserDef.kEnforceETenDOSCandidateSequence.description" = "This option is provided for users who prefer the ETen Chinese DOS candidate ordering. Many such users developed their ordering intuition while using the ETen Chinese DOS input method and wish to use the same order here. Note: the select-candidate-per-character mode always follows this ordering and is not affected by this setting.";
 "i18n:UserDef.kEnforceETenDOSCandidateSequence.shortTitle" = "Enforce Eten DOS Sequence on all single-kanji candidates";
