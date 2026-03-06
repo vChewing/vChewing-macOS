@@ -27,9 +27,11 @@ import SwiftExtension
     }
   }
 
-  // MARK: - NSOpenPanel
+  // MARK: - NSSavePanel
 
-  extension NSOpenPanel {
+  extension NSSavePanel {
+    /// NSSavePanel is the superclass of NSOpenPanel, hence that
+    /// this extension also applies to NSOpenPanel.
     public func beginSheetModal(
       at window: NSWindow?,
       completionHandler handler: @escaping (NSApplication.ModalResponse) -> ()

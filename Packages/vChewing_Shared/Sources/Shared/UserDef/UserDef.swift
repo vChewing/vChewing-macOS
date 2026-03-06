@@ -10,7 +10,7 @@ import Foundation
 
 // MARK: - UserDef
 
-nonisolated public enum UserDef: String, CaseIterable, Identifiable {
+nonisolated public enum UserDef: String, CaseIterable, Identifiable, Sendable {
   // MARK: - Cases.
 
   case kIsDebugModeEnabled = "_DebugMode"
@@ -192,6 +192,25 @@ nonisolated public enum UserDef: String, CaseIterable, Identifiable {
     public var data: [String: Any] = [:]
   }
 
+  /// 匯入結果：紀錄成功與失敗的項目。
+  public struct ImportResult {
+    public var successes: [String] = []
+    public var failures: [(key: String, reason: String)] = []
+  }
+
+  // MARK: - JSON Export / Import
+
+  /// 不應匯出 / 匯入的 UserDef 黑名單。
+  /// 包括：Sandbox 相關路徑、介面語言設定、暫態旗標等。
+  public static let jsonExchangeBlacklist: Set<UserDef> = [
+    .kUserDataFolderSpecified,
+    .kCassettePath,
+    .kAppleLanguages,
+    .kFailureFlagForPOMObservation,
+    .kMostRecentInputMode,
+    .kCandidateServiceMenuContents,
+  ]
+
   public var id: String { rawValue }
 
   // MARK: - SnapShot-Related Methods.
@@ -208,6 +227,182 @@ nonisolated public enum UserDef: String, CaseIterable, Identifiable {
     Self.allCases.forEach {
       UserDefaults.current.set(data[$0.rawValue], forKey: $0.rawValue)
     }
+  }
+
+  /// 將所有可匯出的 UserDefaults 偏好設定匯出為 JSON Data。
+  public static func exportAsJSON() -> Data? {
+    var dict = [String: Any]()
+    for userDef in Self.allCases {
+      guard !jsonExchangeBlacklist.contains(userDef) else { continue }
+      guard let value = UserDefaults.current.object(forKey: userDef.rawValue) else { continue }
+      dict[userDef.rawValue] = value
+    }
+    guard JSONSerialization.isValidJSONObject(dict) else { return nil }
+    return try? JSONSerialization.data(withJSONObject: dict, options: [.prettyPrinted, .sortedKeys])
+  }
+
+  /// 從 JSON Data 匯入 UserDefaults 偏好設定，回傳匯入結果。
+  public static func importFromJSON(_ data: Data) -> ImportResult {
+    var result = ImportResult()
+    guard let jsonObj = try? JSONSerialization.jsonObject(with: data),
+          let dict = jsonObj as? [String: Any]
+    else {
+      result.failures.append((key: "(root)", reason: "Invalid JSON format"))
+      return result
+    }
+    for (key, value) in dict {
+      guard let userDef = Self(rawValue: key) else {
+        result.failures.append((key: key, reason: "Unknown key"))
+        continue
+      }
+      guard !jsonExchangeBlacklist.contains(userDef) else {
+        result.failures.append((key: key, reason: "Blacklisted key"))
+        continue
+      }
+      if let failReason = validateAndApply(userDef: userDef, value: value) {
+        result.failures.append((key: key, reason: failReason))
+      } else {
+        result.successes.append(key)
+      }
+    }
+    return result
+  }
+
+  // MARK: Private
+
+  /// 驗證單一偏好值是否合理，合理則寫入 UserDefaults。
+  /// - Returns: 若驗證失敗則回傳失敗原因；成功則回傳 nil。
+  private static func validateAndApply(userDef: Self, value: Any) -> String? {
+    switch userDef.dataType {
+    case .bool:
+      // JSON 數字 0/1 也可視為 Bool。
+      if let v = value as? Bool {
+        UserDefaults.current.set(v, forKey: userDef.rawValue)
+        return nil
+      } else if let v = value as? Int, (0 ... 1).contains(v) {
+        UserDefaults.current.set(v == 1, forKey: userDef.rawValue)
+        return nil
+      }
+      return "Expected Bool"
+
+    case .integer:
+      guard let v = value as? Int else {
+        // 嘗試從 Double 取整數（JSON 數字皆為 Double）。
+        if let d = value as? Double, d == d.rounded() {
+          let intVal = Int(d)
+          if let reason = validateIntRange(userDef: userDef, value: intVal) { return reason }
+          UserDefaults.current.set(intVal, forKey: userDef.rawValue)
+          return nil
+        }
+        return "Expected Int"
+      }
+      if let reason = validateIntRange(userDef: userDef, value: v) { return reason }
+      UserDefaults.current.set(v, forKey: userDef.rawValue)
+      return nil
+
+    case .double:
+      guard let v = value as? Double ?? (value as? Int).map(Double.init) else {
+        return "Expected Double"
+      }
+      if let reason = validateDoubleRange(userDef: userDef, value: v) { return reason }
+      UserDefaults.current.set(v, forKey: userDef.rawValue)
+      return nil
+
+    case .string:
+      guard let v = value as? String else { return "Expected String" }
+      if let reason = validateString(userDef: userDef, value: v) { return reason }
+      UserDefaults.current.set(v, forKey: userDef.rawValue)
+      return nil
+
+    case .arrayOfStrings:
+      guard let v = value as? [String] else {
+        // 也接受 [Any]，但需要每個元素都是 String。
+        if let arr = value as? [Any] {
+          let strings = arr.compactMap { $0 as? String }
+          guard strings.count == arr.count else { return "Expected Array of Strings" }
+          UserDefaults.current.set(strings, forKey: userDef.rawValue)
+          return nil
+        }
+        return "Expected Array of Strings"
+      }
+      UserDefaults.current.set(v, forKey: userDef.rawValue)
+      return nil
+
+    case .dictionary:
+      guard let v = value as? [String: Bool] else {
+        // JSON 解析後可能是 [String: Any]，需要檢查值是否為 Bool。
+        if let rawDict = value as? [String: Any] {
+          var converted = [String: Bool]()
+          for (k, val) in rawDict {
+            if let b = val as? Bool { converted[k] = b } else if let i = val as? Int,
+                                                                 (0 ... 1).contains(i) { converted[k] = i == 1 }
+            else { return "Expected Dictionary<String, Bool>" }
+          }
+          UserDefaults.current.set(converted, forKey: userDef.rawValue)
+          return nil
+        }
+        return "Expected Dictionary<String, Bool>"
+      }
+      UserDefaults.current.set(v, forKey: userDef.rawValue)
+      return nil
+    }
+  }
+
+  // MARK: - 各型別的範圍驗證，對應 PrefMgr.fixOddPreferencesCore() 的邏輯。
+
+  private static func validateIntRange(userDef: Self, value: Int) -> String? {
+    switch userDef {
+    case .kKeyboardParser:
+      // KeyboardParser(rawValue:) 如果 nil 則不合理。
+      if value < 0 || value > 100 { return "Out of range for KeyboardParser" }
+    case .kSpecifyIntonationKeyBehavior:
+      if ![0, 1, 2].contains(value) { return "Must be 0, 1, or 2" }
+    case .kSpecifyShiftBackSpaceKeyBehavior:
+      if ![0, 1, 2].contains(value) { return "Must be 0, 1, or 2" }
+    case .kUpperCaseLetterKeyBehavior:
+      if ![0, 1, 2, 3, 4].contains(value) { return "Must be 0..4" }
+    case .kReadingNarrationCoverage:
+      if ![0, 1, 2].contains(value) { return "Must be 0, 1, or 2" }
+    case .kRomanNumeralOutputFormat:
+      if ![0, 1, 2, 3].contains(value) { return "Must be 0..3" }
+    case .kSpecifyCmdOptCtrlEnterBehavior:
+      if ![0, 1, 2, 3].contains(value) { return "Must be 0..3" }
+    case .kBeepSoundPreference:
+      if ![0, 1, 2].contains(value) { return "Must be 0, 1, or 2" }
+    case .kCursorPlacementAfterSelectingCandidate:
+      if ![0, 1, 2].contains(value) { return "Must be 0, 1, or 2" }
+    case .kCandidateNarrationToggleType:
+      if ![0, 1, 2].contains(value) { return "Must be 0, 1, or 2" }
+    case .kCandidateStateJKHLBehavior:
+      if ![0, 1, 2].contains(value) { return "Must be 0, 1, or 2" }
+    case .kSpecifiedNotifyUIColorScheme:
+      if ![0, 1, 2].contains(value) { return "Must be 0, 1, or 2" }
+    case .kForceCassetteChineseConversion:
+      if ![0, 1, 2].contains(value) { return "Must be 0, 1, or 2" }
+    case .kNumPadCharInputBehavior:
+      if ![0, 1, 2].contains(value) { return "Must be 0, 1, or 2" }
+    default: break
+    }
+    return nil
+  }
+
+  private static func validateDoubleRange(userDef: Self, value: Double) -> String? {
+    switch userDef {
+    case .kCandidateListTextSize:
+      if !(12 ... 196).contains(value) { return "Must be 12..196" }
+    default: break
+    }
+    return nil
+  }
+
+  private static func validateString(userDef: Self, value: String) -> String? {
+    switch userDef {
+    case .kCandidateKeys:
+      let optimized = value.lowercased()
+      if optimized.isEmpty { return "Candidate keys cannot be empty" }
+    default: break
+    }
+    return nil
   }
 }
 

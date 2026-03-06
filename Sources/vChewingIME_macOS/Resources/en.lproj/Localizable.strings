@@ -200,6 +200,15 @@
 "i18n:CandidateServiceMenuEditor.prompt" = "Please input the service metadata you want to register.";
 "i18n:CandidateServiceMenuEditor.table.field.MenuTitle" = "Menu Item Title";
 "i18n:CandidateServiceMenuEditor.table.field.Value" = "Defined Value";
+"i18n:DevZone.JSONPrefsExchange.Description" = "Allows exporting the current preferences to a JSON file, or importing preferences from a JSON file. Path settings involving sandbox security permissions and UI language settings are not within the exchange scope.";
+"i18n:DevZone.JSONPrefsExchange.Export" = "Export";
+"i18n:DevZone.JSONPrefsExchange.ExportError" = "An error occurred while exporting preferences.";
+"i18n:DevZone.JSONPrefsExchange.Import" = "Import";
+"i18n:DevZone.JSONPrefsExchange.ImportError.AccessDenied" = "Unable to access the selected file.";
+"i18n:DevZone.JSONPrefsExchange.ImportError.ReadFailure" = "Unable to read the selected file.";
+"i18n:DevZone.JSONPrefsExchange.ImportResultTitle" = "Import Results";
+"i18n:DevZone.JSONPrefsExchange.ImportSummary" = "Successfully imported %d settings, %d failed.";
+"i18n:DevZone.JSONPrefsExchange.SectionTitle" = "Exchanging settings using JSON";
 "i18n:fileDragImportButton.DragFileToHere" = "DRAG FILE TO HERE";
 "i18n:LMMgr.accessFailure.cassette.description" = "Please reconfigure the cassette path to a valid one before enabling this mode.";
 "i18n:LMMgr.accessFailure.cassette.title" = "Path invalid or file access error.";

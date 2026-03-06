@@ -199,6 +199,15 @@
 "i18n:CandidateServiceMenuEditor.prompt" = "登録したいサービスのメタデータを入力してください。";
 "i18n:CandidateServiceMenuEditor.table.field.MenuTitle" = "メニュー項目タイトル";
 "i18n:CandidateServiceMenuEditor.table.field.Value" = "定義値";
+"i18n:DevZone.JSONPrefsExchange.Description" = "現在の環境設定を JSON ファイルに書き出し、または JSON ファイルから環境設定を読み込むことができます。サンドボックスに関連するパス設定とインターフェース言語の設定は交換対象外です。";
+"i18n:DevZone.JSONPrefsExchange.Export" = "書き出す";
+"i18n:DevZone.JSONPrefsExchange.ExportError" = "環境設定の書き出し中にエラーが発生しました。";
+"i18n:DevZone.JSONPrefsExchange.Import" = "読み込む";
+"i18n:DevZone.JSONPrefsExchange.ImportError.AccessDenied" = "選択されたファイルにアクセスできません。";
+"i18n:DevZone.JSONPrefsExchange.ImportError.ReadFailure" = "選択されたファイルを読み込めません。";
+"i18n:DevZone.JSONPrefsExchange.ImportResultTitle" = "読込結果";
+"i18n:DevZone.JSONPrefsExchange.ImportSummary" = "%d 件の設定を読み込み成功、%d 件失敗。";
+"i18n:DevZone.JSONPrefsExchange.SectionTitle" = "環境設定の JSON 交換";
 "i18n:fileDragImportButton.DragFileToHere" = "ここにドラッグして";
 "i18n:LMMgr.accessFailure.cassette.description" = "カセットファイルを正しくご指定してから、このモードのご使用を。";
 "i18n:LMMgr.accessFailure.cassette.title" = "ファイルアクセス失敗、或いはご指定したファイル位置情報は使えぬ。";
@@ -487,3 +496,4 @@
 "You're currently using vChewing %@ (%@), a new version %@ (%@) is now available. Do you want to visit vChewing's website to download the version?" = "今のご使用していた唯音入力アプリのバージョンは「%1$@ (%2$@)」であり、ネットでもっと新しいバージョン「%3$@ (%4$@)」の下載せはできるらしい。お下載せしますか？";
 "zh-Hans" = "簡體中国語";
 "zh-Hant" = "繁體中国語";
+// MARK: - DevZone JSON Preferences Exchange

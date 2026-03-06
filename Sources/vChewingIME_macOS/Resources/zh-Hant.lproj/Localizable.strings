@@ -200,6 +200,15 @@
 "i18n:CandidateServiceMenuEditor.prompt" = "請鍵入您要登記的服務資料。";
 "i18n:CandidateServiceMenuEditor.table.field.MenuTitle" = "選單條目名稱";
 "i18n:CandidateServiceMenuEditor.table.field.Value" = "定義資料值";
+"i18n:DevZone.JSONPrefsExchange.Description" = "允許將目前的偏好設定匯出為 JSON 檔案、或從 JSON 檔案匯入偏好設定。涉及沙箱安全權限的路徑設定與介面語言設定不在交換範圍內。";
+"i18n:DevZone.JSONPrefsExchange.Export" = "匯出";
+"i18n:DevZone.JSONPrefsExchange.ExportError" = "匯出偏好設定時發生錯誤。";
+"i18n:DevZone.JSONPrefsExchange.Import" = "匯入";
+"i18n:DevZone.JSONPrefsExchange.ImportError.AccessDenied" = "無法存取選取的檔案。";
+"i18n:DevZone.JSONPrefsExchange.ImportError.ReadFailure" = "無法讀取選取的檔案。";
+"i18n:DevZone.JSONPrefsExchange.ImportResultTitle" = "匯入結果";
+"i18n:DevZone.JSONPrefsExchange.ImportSummary" = "成功匯入 %d 筆設定、%d 筆失敗。";
+"i18n:DevZone.JSONPrefsExchange.SectionTitle" = "偏好設定 JSON 交換";
 "i18n:fileDragImportButton.DragFileToHere" = "請將檔案拽到這邊";
 "i18n:LMMgr.accessFailure.cassette.description" = "在啟用該模式之前，請事先正確設定磁帶檔案路徑。";
 "i18n:LMMgr.accessFailure.cassette.title" = "檔案存取失敗，或者路徑不合規。";
