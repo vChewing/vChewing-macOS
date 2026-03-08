@@ -31,28 +31,28 @@ extension SettingsPanesCocoa {
       "How to Fill",
       target: self,
       action: #selector(btnShowInstructionsClicked(_:))
-    )
+    ).controlSize(.small).withNarrowedFont(size: NSFont.smallSystemFontSize)
     lazy var btnAddService = NSFileDragRetrieverButton(
       "Add Service",
       target: self,
       action: #selector(btnAddServiceClicked(_:)),
       postDrag: { [weak self] url in self?.handleDrag(url) }
-    )
+    ).controlSize(.small).withNarrowedFont(size: NSFont.smallSystemFontSize)
     lazy var btnRemoveService = NSButton(
       "Remove Selected",
       target: self,
       action: #selector(btnRemoveServiceClicked(_:))
-    )
+    ).controlSize(.small).withNarrowedFont(size: NSFont.smallSystemFontSize)
     lazy var btnResetService = NSButton(
       "Reset Default",
       target: self,
       action: #selector(btnResetServiceClicked(_:))
-    )
+    ).controlSize(.small).withNarrowedFont(size: NSFont.smallSystemFontSize)
     lazy var btnCopyAllToClipboard = NSButton(
       "Copy All to Clipboard",
       target: self,
       action: #selector(btnCopyAllToClipboardClicked(_:))
-    )
+    ).controlSize(.small).withNarrowedFont(size: NSFont.smallSystemFontSize)
     lazy var tableColumn1Cell = NSTextFieldCell()
     lazy var tableColumn1 = NSTableColumn()
     lazy var tableColumn2Cell = NSTextFieldCell()
@@ -118,22 +118,25 @@ extension SettingsPanesCocoa {
       tblServices.frame = CGRect(x: 0, y: 0, width: contentWidth - 20, height: tableHeight)
       tblServices.gridColor = NSColor.clear
       tblServices.intercellSpacing = CGSize(width: 15, height: 0)
+      tblServices.rowHeight = 17
       tblServices.setContentHuggingPriority(.defaultHigh, for: .vertical)
       tblServices.registerForDraggedTypes([.kUTTypeData, .kUTTypeFileURL])
       tblServices.dataSource = self
       tblServices.target = self
-      if #available(macOS 11.0, *) { tblServices.style = .inset }
+      if #available(macOS 11.0, *) { tblServices.style = .fullWidth }
+
+      let narrowSysFont = NSFont.narrowedFont(size: 15)
 
       tableColumn1.identifier = NSUserInterfaceItemIdentifier("colTitle")
       tableColumn1.headerCell.title = "i18n:CandidateServiceMenuEditor.table.field.MenuTitle"
         .i18n
       tableColumn1.maxWidth = 280
-      tableColumn1.minWidth = 200
+      tableColumn1.minWidth = 160
       tableColumn1.resizingMask = [.autoresizingMask, .userResizingMask]
-      tableColumn1.width = 200
+      tableColumn1.width = 160
       tableColumn1.dataCell = tableColumn1Cell
 
-      tableColumn1Cell.font = NSFont.systemFont(ofSize: 13)
+      tableColumn1Cell.font = narrowSysFont
       tableColumn1Cell.isEditable = true
       tableColumn1Cell.isSelectable = true
       tableColumn1Cell.lineBreakMode = .byTruncatingTail
@@ -149,7 +152,7 @@ extension SettingsPanesCocoa {
       tableColumn2.dataCell = tableColumn2Cell
 
       tableColumn2Cell.backgroundColor = NSColor.controlBackgroundColor
-      tableColumn2Cell.font = NSFont.systemFont(ofSize: 13)
+      tableColumn2Cell.font = narrowSysFont
       tableColumn2Cell.isEditable = true
       tableColumn2Cell.isSelectable = true
       tableColumn2Cell.lineBreakMode = .byTruncatingTail

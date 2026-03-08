@@ -32,12 +32,12 @@ extension SettingsPanesCocoa {
       "Add Client",
       target: self,
       action: #selector(btnAddClientClicked(_:))
-    )
+    ).controlSize(.small).withNarrowedFont(size: NSFont.smallSystemFontSize)
     lazy var btnRemoveClient = NSButton(
       "Remove Selected",
       target: self,
       action: #selector(btnRemoveClientClicked(_:))
-    )
+    ).controlSize(.small).withNarrowedFont(size: NSFont.smallSystemFontSize)
     lazy var tableColumn1Cell = NSButtonCell()
     lazy var tableColumn1 = NSTableColumn()
     lazy var tableColumn2Cell = NSTextFieldCell()
@@ -102,13 +102,15 @@ extension SettingsPanesCocoa {
       tblClients.frame = CGRect(x: 0, y: 0, width: contentWidth - 20, height: tableHeight)
       tblClients.gridColor = NSColor.clear
       tblClients.intercellSpacing = CGSize(width: 17, height: 0)
-      tblClients.rowHeight = 24
+      tblClients.rowHeight = 17
       tblClients.setContentHuggingPriority(.defaultHigh, for: .vertical)
       tblClients.registerForDraggedTypes([.kUTTypeFileURL])
       tblClients.dataSource = self
       tblClients.action = #selector(onItemClicked(_:))
       tblClients.target = self
-      if #available(macOS 11.0, *) { tblClients.style = .inset }
+      if #available(macOS 11.0, *) { tblClients.style = .fullWidth }
+
+      let narrowSysFont = NSFont.narrowedFont(size: 15)
 
       tableColumn1.identifier = NSUserInterfaceItemIdentifier("colPCBEnabled")
       tableColumn1.maxWidth = 20
@@ -117,8 +119,7 @@ extension SettingsPanesCocoa {
       tableColumn1.width = 20
       tableColumn1.dataCell = tableColumn1Cell
 
-      if #available(macOS 11.0, *) { tableColumn1Cell.controlSize = .large }
-      tableColumn1Cell.font = NSFont.systemFont(ofSize: 13)
+      tableColumn1Cell.font = narrowSysFont
       tableColumn1Cell.setButtonType(.switch)
       tableColumn1Cell.bezelStyle = .rounded
 
@@ -130,7 +131,7 @@ extension SettingsPanesCocoa {
       tableColumn2.dataCell = tableColumn2Cell
 
       tableColumn2Cell.backgroundColor = NSColor.controlBackgroundColor
-      tableColumn2Cell.font = NSFont.systemFont(ofSize: 20)
+      tableColumn2Cell.font = narrowSysFont
       tableColumn2Cell.isEditable = true
       tableColumn2Cell.isSelectable = true
       tableColumn2Cell.lineBreakMode = .byTruncatingTail
