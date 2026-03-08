@@ -161,4 +161,68 @@ struct TDK4AppKitTests {
       "七字詞組成的行不該有 6 個項目，但最大行項數為 \(maxItemsPerLine)"
     )
   }
+
+  // MARK: - isExpanded 狀態保留測試
+
+  /// 驗證：reinit 時傳入的 isExpanded 值不該被 cleanDataOnMain 覆寫。
+  /// 此場景模擬「選字窗已展開，使用者移動游標後觸發 reloadData → reinit」的情形。
+  @Test
+  func testIsExpandedPreservedAfterReinit() throws {
+    // 先建一個展開的 pool。
+    let pool = TDK4AppKit.CandidatePool4AppKit(
+      candidates: variableCandidatesINMU,
+      lines: 4,
+      isExpanded: true,
+      selectionKeys: "123456",
+      layout: .horizontal
+    )
+    #expect(pool.isExpanded == true, "初始化後應處於展開狀態")
+    #expect(pool.maxLinesPerPage == 4, "展開時 maxLinesPerPage 應為 4")
+
+    // 模擬 reloadData：用 reinit 重建，保持 isExpanded: true。
+    pool.reinit(
+      candidates: variableCandidatesINMU,
+      lines: 4,
+      isExpanded: true,
+      selectionKeys: "123456",
+      layout: .horizontal
+    )
+    #expect(pool.isExpanded == true, "reinit 後 isExpanded 應被正確保留為 true")
+    #expect(pool.maxLinesPerPage == 4, "reinit 後 maxLinesPerPage 應仍為 4")
+
+    // 再模擬 reloadData：isExpanded: false（使用者未手動展開）。
+    pool.reinit(
+      candidates: variableCandidatesINMU,
+      lines: 4,
+      isExpanded: false,
+      selectionKeys: "123456",
+      layout: .horizontal
+    )
+    #expect(pool.isExpanded == false, "reinit 傳入 false 後 isExpanded 應為 false")
+    #expect(pool.maxLinesPerPage == 1, "未展開時 maxLinesPerPage 應為 1")
+  }
+
+  /// 驗證：init 構造時 isExpanded 也應被正確保留。
+  @Test
+  func testIsExpandedCorrectAfterInit() throws {
+    let poolExpanded = TDK4AppKit.CandidatePool4AppKit(
+      candidates: variableCandidatesINMU,
+      lines: 4,
+      isExpanded: true,
+      selectionKeys: "123456",
+      layout: .horizontal
+    )
+    #expect(poolExpanded.isExpanded == true)
+    #expect(poolExpanded.maxLinesPerPage == 4)
+
+    let poolCollapsed = TDK4AppKit.CandidatePool4AppKit(
+      candidates: variableCandidatesINMU,
+      lines: 4,
+      isExpanded: false,
+      selectionKeys: "123456",
+      layout: .horizontal
+    )
+    #expect(poolCollapsed.isExpanded == false)
+    #expect(poolCollapsed.maxLinesPerPage == 1)
+  }
 }

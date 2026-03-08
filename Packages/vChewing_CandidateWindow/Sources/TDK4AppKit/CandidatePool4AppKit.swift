@@ -38,7 +38,13 @@ extension TDK4AppKit {
       self.selectionKeys = "123456789"
       self.candidateDataAll = []
       // 以上只是為了糊弄 compiler。接下來才是正式的初期化。
-      construct(candidates: candidates, selectionKeys: selectionKeys, layout: layout, locale: locale)
+      construct(
+        candidates: candidates,
+        isExpanded: expanded,
+        selectionKeys: selectionKeys,
+        layout: layout,
+        locale: locale
+      )
     }
 
     // MARK: Internal
@@ -158,7 +164,13 @@ extension TDK4AppKit {
       self.selectionKeys = "123456789"
       candidateDataAll = []
       // 以上只是為了糊弄 compiler。接下來才是正式的初期化。
-      construct(candidates: candidates, selectionKeys: selectionKeys, layout: layout, locale: locale)
+      construct(
+        candidates: candidates,
+        isExpanded: expanded,
+        selectionKeys: selectionKeys,
+        layout: layout,
+        locale: locale
+      )
     }
 
     nonisolated func cleanData() {
@@ -189,13 +201,15 @@ extension TDK4AppKit {
     ///   - direction: 橫向排列還是縱向排列（預設情況下是縱向）。
     ///   - locale: 區域編碼。例：「zh-Hans」或「zh-Hant」。
     private func construct(
-      candidates: [CandidateInState], selectionKeys: String = "123456789",
+      candidates: [CandidateInState], isExpanded expanded: Bool = true,
+      selectionKeys: String = "123456789",
       layout: UILayoutOrientation = .vertical, locale: String = ""
     ) {
       self.layout = layout
       Self.blankCell.locale = locale
       self.selectionKeys = selectionKeys.isEmpty ? "123456789" : selectionKeys
       cleanDataOnMain()
+      isExpanded = expanded
       var allCandidates = candidates.map {
         CandidateCellData4AppKit(key: " ", displayedText: $0.value, segLength: $0.keyArray.count)
       }
