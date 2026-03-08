@@ -7,6 +7,7 @@
 // requirements defined in MIT License.
 
 import AppKit
+import OSFrameworkImpl
 import SwiftExtension
 
 extension VwrAppInstaller4Cocoa {
@@ -192,7 +193,7 @@ public final class VwrAppInstaller4Cocoa: NSViewController, InstallerVMProtocol 
     isBold: Bool = false,
     fixWidth: CGFloat? = nil
   )
-    -> NSTextField {
+    -> NSLabelView {
     let attrStr = NSMutableAttributedString(string: verbatim)
     attrStr.addAttribute(
       .kern,

@@ -108,17 +108,15 @@ extension UserDefRenderableCocoa {
     return result
   }
 
-  public func renderDescription(fixedWidth: CGFloat? = nil) -> NSTextField? {
+  public func renderDescription(fixedWidth: CGFloat? = nil) -> NSLabelView? {
     guard let text = inlineDescriptionLocalized else { return nil }
     let textField = text.makeNSLabel(descriptive: true)
     if #available(macOS 10.10, *), tinySize {
-      textField.controlSize = .small
       textField.font = NSFont.systemFont(ofSize: NSFont.smallSystemFontSize)
     }
     textField.preferredMaxLayoutWidth = fixedWidth ?? 0
     if let fixedWidth = fixedWidth {
       textField.makeSimpleConstraint(.width, relation: .lessThanOrEqual, value: fixedWidth)
-      textField.sizeToFit()
       textField.makeSimpleConstraint(
         .height,
         relation: .lessThanOrEqual,
@@ -134,7 +132,7 @@ extension UserDefRenderableCocoa {
     }
     guard let control: NSView = currentControl ?? renderFunctionControl() else { return nil }
     let controlWidth = control.fittingSize.width
-    let textLabel: NSTextField? = {
+    let textLabel: NSLabelView? = {
       if !hideTitle, let strTitle = def.metaData?.shortTitle {
         return strTitle.makeNSLabel()
       }
@@ -151,14 +149,12 @@ extension UserDefRenderableCocoa {
       let specifiedWidth = fixedWidth - controlWidth - NSFont.systemFontSize
       textLabel.preferredMaxLayoutWidth = specifiedWidth
       textLabel.makeSimpleConstraint(.width, relation: .lessThanOrEqual, value: specifiedWidth)
-      textLabel.sizeToFit()
       textLabel.makeSimpleConstraint(
         .height,
         relation: .lessThanOrEqual,
         value: textLabel.fittingSize.height
       )
     }
-    textLabel?.sizeToFit()
     return result
   }
 

@@ -298,12 +298,9 @@ extension CtlSettingsCocoa {
 
     // Version label at the bottom.
     let versionString = "v\(IMEApp.appMainVersionLabel.joined(separator: " Build "))\n\(IMEApp.appSignedDateLabel)"
-    let versionLabel = NSTextField()
+    let versionLabel = NSLabelView()
     versionLabel.translatesAutoresizingMaskIntoConstraints = false
-    versionLabel.isEditable = false
-    versionLabel.isBordered = false
-    versionLabel.drawsBackground = false
-    versionLabel.stringValue = versionString
+    versionLabel.attributedStringValue = NSAttributedString(string: versionString)
     versionLabel.font = NSFont.systemFont(ofSize: NSFont.smallSystemFontSize)
     if #available(macOS 10.10, *) {
       versionLabel.textColor = .secondaryLabelColor
@@ -529,16 +526,15 @@ extension CtlSettingsCocoa: NSTableViewDelegate, NSTableViewDataSource {
       return s
     }()
 
-    let textField = NSTextField()
+    let textField = NSLabelView()
     textField.translatesAutoresizingMaskIntoConstraints = false
-    textField.stringValue = tab.i18nTitle
-    textField.isEditable = false
-    textField.isBordered = false
-    textField.drawsBackground = false
-    textField.backgroundColor = .clear
+    let paragraphStyle = NSMutableParagraphStyle()
+    paragraphStyle.lineBreakMode = .byTruncatingTail
+    textField.attributedStringValue = NSAttributedString(
+      string: tab.i18nTitle,
+      attributes: [.paragraphStyle: paragraphStyle]
+    )
     textField.font = NSFont.systemFont(ofSize: 13)
-    textField.cell?.lineBreakMode = .byTruncatingTail
-    textField.cell?.truncatesLastVisibleLine = true
 
     rowView.addSubview(imageView)
     rowView.addSubview(textField)
