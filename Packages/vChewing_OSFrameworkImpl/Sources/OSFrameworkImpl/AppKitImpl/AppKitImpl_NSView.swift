@@ -58,6 +58,32 @@ import SwiftExtension
     public convenience init(_ title: String, target: AnyObject?, action: Selector?) {
       self.init(verbatim: title.i18n, target: target, action: action)
     }
+
+    @discardableResult
+    public func controlSize(_ size: NSControl.ControlSize) -> NSButton {
+      cell?.controlSize = size
+      return self
+    }
+
+    @discardableResult
+    public func withNarrowedFont(size fontSize: Double? = nil) -> NSButton {
+      let currentSize = fontSize ?? font?.pointSize ?? NSFont.systemFontSize
+      font = .narrowedFont(size: currentSize)
+      return self
+    }
+  }
+
+  // MARK: - NSFont Narrowed Font
+
+  extension NSFont {
+    public static func narrowedFont(size: CGFloat) -> NSFont {
+      let base = NSFont.systemFont(ofSize: size)
+      let candidate = NSFontManager.shared.convert(base, toHaveTrait: .condensedFontMask)
+      if candidate.fontDescriptor.symbolicTraits.contains(.condensed) {
+        return candidate
+      }
+      return NSFont(name: "ArialNarrow", size: size) ?? base
+    }
   }
 
   // MARK: - Convenient Constructor for NSEdgeInsets.
@@ -364,37 +390,145 @@ import SwiftExtension
     }
   }
 
+  // MARK: - NSLabelView (Lightweight Draw-Based Label)
+
+  /// A lightweight, read-only label view that draws text via
+  /// `NSAttributedString.draw(with:options:)` instead of relying on
+  /// NSTextField's NSCell / field editor infrastructure.
+  /// This significantly reduces per-instance memory overhead while
+  /// retaining full subpixel antialiasing and system font rendering.
+  /// Compatible with macOS 10.9+.
+  public final class NSLabelView: NSView {
+    // MARK: Lifecycle
+
+    override public init(frame frameRect: NSRect) {
+      super.init(frame: frameRect)
+    }
+
+    public required init?(coder: NSCoder) {
+      super.init(coder: coder)
+    }
+
+    // MARK: Public
+
+    override public var isFlipped: Bool { true }
+
+    override public var intrinsicContentSize: NSSize {
+      let resolved = resolvedAttributedString()
+      let maxWidth = preferredMaxLayoutWidth > 0
+        ? preferredMaxLayoutWidth : CGFloat.greatestFiniteMagnitude
+      // Use NSStringDrawing with a layout manager–compatible path
+      // to get precise height that matches what draw(with:options:) will use.
+      let rect = resolved.boundingRect(
+        with: NSSize(width: maxWidth, height: CGFloat.greatestFiniteMagnitude),
+        options: [.usesLineFragmentOrigin, .usesFontLeading]
+      )
+      // Add 1pt vertical slack to avoid clipping from fractional rounding.
+      return NSSize(width: ceil(rect.width), height: ceil(rect.height) + 1)
+    }
+
+    public var attributedStringValue: NSAttributedString = .init() {
+      didSet {
+        invalidateIntrinsicContentSize()
+        needsDisplay = true
+      }
+    }
+
+    /// Semantic text color; injected into attributed string runs that lack
+    /// an explicit `.foregroundColor` attribute. Dynamic colors (e.g.
+    /// `.textColor`) are re-resolved automatically on appearance change.
+    public var textColor: NSColor = {
+      if #available(macOS 10.14, *) {
+        .labelColor
+      } else {
+        .textColor
+      }
+    }() {
+      didSet {
+        invalidateIntrinsicContentSize()
+        needsDisplay = true
+      }
+    }
+
+    /// Default font; injected into attributed string runs that lack
+    /// an explicit `.font` attribute.
+    public var font: NSFont = .systemFont(ofSize: NSFont.systemFontSize) {
+      didSet {
+        invalidateIntrinsicContentSize()
+        needsDisplay = true
+      }
+    }
+
+    public var preferredMaxLayoutWidth: CGFloat = 0 {
+      didSet { invalidateIntrinsicContentSize() }
+    }
+
+    override public func draw(_ dirtyRect: NSRect) {
+      let resolved = resolvedAttributedString()
+      let drawRect = bounds
+      resolved.draw(with: drawRect, options: [.usesLineFragmentOrigin, .usesFontLeading])
+    }
+
+    /// Re-resolve dynamic NSColors when the system appearance changes (dark ↔ light).
+    @available(macOS 10.14, *)
+    override public func viewDidChangeEffectiveAppearance() {
+      super.viewDidChangeEffectiveAppearance()
+      needsDisplay = true
+    }
+
+    // MARK: Private
+
+    /// Build an attributed string with default `.font` and `.foregroundColor`
+    /// filled in for any run that lacks them, so that the draw call renders
+    /// text with the intended appearance.
+    private func resolvedAttributedString() -> NSAttributedString {
+      let source = attributedStringValue
+      guard source.length > 0 else { return source }
+      let mutable = NSMutableAttributedString(attributedString: source)
+      let fullRange = NSRange(location: 0, length: mutable.length)
+      if #available(macOS 10.14, *) {
+        NSAppearance.current = effectiveAppearance
+      }
+      mutable.enumerateAttributes(in: fullRange, options: []) { attrs, range, _ in
+        if attrs[.font] == nil {
+          mutable.addAttribute(.font, value: font, range: range)
+        }
+        if attrs[.foregroundColor] == nil {
+          mutable.addAttribute(.foregroundColor, value: textColor, range: range)
+        }
+      }
+      return mutable
+    }
+  }
+
   // MARK: - Make NSAttributedString into Label
 
   extension NSAttributedString {
     /// Seems that there is no way to persuade the compiler to believe that
-    /// both NSAttributedString and NSLabel are on the MainActor without
+    /// both NSAttributedString and NSLabelView are on the MainActor without
     /// explicit `@MainActor` annotation (which breaks macOS 10.14- compatibility).
     /// Therefore, we have to use NSKeyedArchiver to encode this NSAttributedString
     /// into Plist Data and decode it on the MainActor as a new NSAttributedString
     /// instance to solve this value-assignment issue.
-    nonisolated public func makeNSLabel(fixWidth: CGFloat? = nil) -> NSTextField {
+    nonisolated public func makeNSLabel(fixWidth: CGFloat? = nil) -> NSLabelView {
       let archivedData = (try? NSKeyedArchiver.archivedData(
         withRootObject: self,
         requiringSecureCoding: false
       )) ?? .init([])
-      let textField: NSTextField = mainSync {
-        let textField = NSTextField()
-        textField.isEditable = false
-        textField.isBordered = false
-        textField.backgroundColor = .clear
+      let label: NSLabelView = mainSync {
+        let label = NSLabelView()
         if let fixWidth = fixWidth {
-          textField.preferredMaxLayoutWidth = fixWidth
+          label.preferredMaxLayoutWidth = fixWidth
         }
         if let decodedString = try? NSKeyedUnarchiver.unarchivedObject(
           ofClass: NSAttributedString.self,
           from: archivedData
         ) {
-          textField.attributedStringValue = decodedString
+          label.attributedStringValue = decodedString
         }
-        return textField
+        return label
       }
-      return textField
+      return label
     }
   }
 
@@ -406,24 +540,24 @@ import SwiftExtension
       localized: Bool = true,
       fixWidth: CGFloat? = nil
     )
-      -> NSTextField {
+      -> NSLabelView {
       let rawAttributedString = NSMutableAttributedString(string: localized ? i18n : self)
       rawAttributedString.addAttributes(
         [.kern: 0],
         range: .init(location: 0, length: rawAttributedString.length)
       )
-      let textField = rawAttributedString.makeNSLabel(fixWidth: fixWidth)
+      let label = rawAttributedString.makeNSLabel(fixWidth: fixWidth)
       mainSync {
         if descriptive {
           if #available(macOS 10.10, *) {
-            textField.textColor = .secondaryLabelColor
+            label.textColor = .secondaryLabelColor
           } else {
-            textField.textColor = .textColor.withAlphaComponent(0.55)
+            label.textColor = .textColor.withAlphaComponent(0.55)
           }
-          textField.font = NSFont.systemFont(ofSize: NSFont.smallSystemFontSize)
+          label.font = NSFont.systemFont(ofSize: NSFont.smallSystemFontSize)
         }
       }
-      return textField
+      return label
     }
   }
 
