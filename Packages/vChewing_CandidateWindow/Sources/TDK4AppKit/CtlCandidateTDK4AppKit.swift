@@ -97,6 +97,8 @@ extension TDK4AppKit {
       }
     }
 
+    public var expanded: Bool { Self.thePool.isExpanded }
+
     // Already implemented in CandidatePool.
     public var highlightedIndex: Int {
       get { Self.thePool.highlightedIndex }
