@@ -28,7 +28,7 @@ extension TDK4AppKit {
     ///   - direction: 橫向排列還是縱向排列（預設情況下是縱向）。
     ///   - locale: 區域編碼。例：「zh-Hans」或「zh-Hant」。
     init(
-      candidates: [CandidateInState], lines: Int = 3,
+      candidates: [CandidateInState], lines: Int = 4,
       isExpanded expanded: Bool = true, selectionKeys: String = "123456789",
       layout: UILayoutOrientation = .vertical, locale: String = ""
     ) {
@@ -204,8 +204,7 @@ extension TDK4AppKit {
       candidateLines.removeAll()
       var currentColumn: [CandidateCellData4AppKit] = []
       let minCellWidth = Self.blankCell.cellLength()
-      // 注意：此處使用 _maxLinesPerPage 而非 isMatrix，因為 cleanData() 會重設 isExpanded。
-      let shouldCalculateRowWidth = (layout == .horizontal) && (_maxLinesPerPage > 1)
+      let shouldCalculateRowWidth = (layout == .horizontal)
       for (i, candidate) in candidateDataAll.enumerated() {
         candidate.index = i
         candidate.whichLine = candidateLines.count
