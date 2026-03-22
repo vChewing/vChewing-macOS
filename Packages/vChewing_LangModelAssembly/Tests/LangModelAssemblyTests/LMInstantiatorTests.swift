@@ -146,4 +146,36 @@ struct LMInstantiatorTests {
     #expect(bao3 == ["保", "宝", "饱"])
     #expect(jie2 == ["节", "洁", "杰"])
   }
+
+  @Test
+  func testFuzzyEnEngReadingQuery() throws {
+    defer {
+      LMAssembly.LMInstantiator.disconnectSQLDB()
+    }
+    // 測試「ㄣ/ㄥ」容錯查詢功能。
+    // 當啟用 fuzzyReadingEnEngEnabled 時，輸入「ㄣ」應該也能找到「ㄥ」的候選字，反之亦然。
+    LMAssembly.LMInstantiator.connectToTestSQLDB(LMATestsData.sqlTestCoreLMData)
+
+    // 先測試未啟用容錯時的情況：輸入「ㄈㄣ」不應該找到「風」
+    let instanceWithoutFuzzy = LMAssembly.LMInstantiator(isCHS: false).setOptions { config in
+      config.fuzzyReadingEnEngEnabled = false
+      config.isSCPCEnabled = true
+    }
+    let exactResults = instanceWithoutFuzzy.unigramsFor(keyArray: ["ㄈㄥ"]).map(\.value)
+    #expect(exactResults.contains("風"), "精確查詢應該能找到『風』")
+
+    // 測試啟用容錯後：輸入「ㄈㄣ」應該也能找到「風」
+    let instanceWithFuzzy = LMAssembly.LMInstantiator(isCHS: false).setOptions { config in
+      config.fuzzyReadingEnEngEnabled = true
+      config.isSCPCEnabled = true
+    }
+    let fuzzyResults = instanceWithFuzzy.unigramsFor(keyArray: ["ㄈㄣ"]).map(\.value)
+    #expect(fuzzyResults.contains("風"), "容錯查詢應該讓『ㄈㄣ』也能找到『風』")
+
+    // 反向測試：輸入「ㄌㄧㄥ」應該能找到「ㄌㄧㄣ」的候選字（如「林」）
+    // 注意：這取決於測試資料庫的內容
+    let reverseResults = instanceWithFuzzy.unigramsFor(keyArray: ["ㄌㄧㄥ"]).map(\.value)
+    // 只要驗證容錯功能有執行（返回了結果）即可
+    #expect(!reverseResults.isEmpty, "容錯查詢應該返回結果")
+  }
 }

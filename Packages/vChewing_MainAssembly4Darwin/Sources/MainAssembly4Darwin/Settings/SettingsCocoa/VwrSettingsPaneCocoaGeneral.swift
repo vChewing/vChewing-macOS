@@ -52,6 +52,7 @@ extension SettingsPanesCocoa {
             renderable.currentControl?.action = #selector(self.updateNarratorSettingsAction(_:))
           }
           UserDef.kAutoCorrectReadingCombination.render(fixWidth: contentWidth)
+          UserDef.kFuzzyReadingEnEngEnabled.render(fixWidth: contentWidth)
           UserDef.kShowHanyuPinyinInCompositionBuffer.render(fixWidth: contentWidth)
           UserDef.kKeepReadingUponCompositionError.render(fixWidth: contentWidth)
           UserDef.kClassicHaninKeyboardSymbolModeShortcutEnabled.render(fixWidth: contentWidth)

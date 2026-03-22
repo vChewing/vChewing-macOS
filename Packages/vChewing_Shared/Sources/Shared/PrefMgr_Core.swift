@@ -156,6 +156,9 @@ public final class PrefMgr: PrefMgrProtocol, Sendable {
   @AppProperty(userDef: .kAutoCorrectReadingCombination)
   public var autoCorrectReadingCombination: Bool
 
+  @AppProperty(userDef: .kFuzzyReadingEnEngEnabled)
+  public var fuzzyReadingEnEngEnabled: Bool
+
   @AppProperty(userDef: .kAlsoConfirmAssociatedCandidatesByEnter)
   public var alsoConfirmAssociatedCandidatesByEnter: Bool
 

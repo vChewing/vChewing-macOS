@@ -69,6 +69,7 @@ public struct VwrSettingsPaneGeneral: View {
           SpeechSputnik.shared.refreshStatus()
         }
         UserDef.kAutoCorrectReadingCombination.renderUI()
+        UserDef.kFuzzyReadingEnEngEnabled.renderUI()
         UserDef.kShowHanyuPinyinInCompositionBuffer.renderUI()
         UserDef.kKeepReadingUponCompositionError.renderUI()
         UserDef.kClassicHaninKeyboardSymbolModeShortcutEnabled.renderUI()

@@ -59,6 +59,7 @@ extension LMAssembly {
       public var deltaOfCalendarYears: Int = -2_000
       public var allowRescoringSingleKanjiCandidates = false
       public var bypassUserPhrasesData = false
+      public var fuzzyReadingEnEngEnabled = false
     }
 
     public static var asyncLoadingUserData: Bool = true
@@ -140,6 +141,7 @@ extension LMAssembly {
       config.allowRescoringSingleKanjiCandidates = prefs.allowRescoringSingleKanjiCandidates
       config.alwaysSupplyETenDOSUnigrams = prefs.enforceETenDOSCandidateSequence
       config.bypassUserPhrasesData = prefs.userPhrasesDatabaseBypassed
+      config.fuzzyReadingEnEngEnabled = prefs.fuzzyReadingEnEngEnabled
     }
 
     public func resetFactoryJSONModels() {}
@@ -573,6 +575,11 @@ extension LMAssembly {
         }
       }
 
+      // 若啟用了「ㄣ/ㄥ」容錯查詢，則額外查詢替換讀音的候選字。
+      if config.fuzzyReadingEnEngEnabled {
+        rawAllUnigrams.append(contentsOf: queryFuzzyEnEngUnigrams(keyArray: keyArray))
+      }
+
       // 讓單元圖陣列自我過濾。在此基礎之上，對於相同詞值的多個單元圖，僅保留權重最大者。
       let dataAsFilter: Set<String> = config.bypassUserPhrasesData
         ? []
@@ -714,6 +721,48 @@ extension LMAssembly {
       if inputTokenHashesArray.count > 3_000 {
         inputTokenHashesArray.removeAll(keepingCapacity: true)
       }
+    }
+
+    /// 執行「ㄣ/ㄥ」容錯查詢：將讀音中的「ㄣ」與「ㄥ」互相替換後查詢候選字。
+    /// - Parameter keyArray: 原始讀音陣列。
+    /// - Returns: 容錯查詢得到的單元圖陣列（分數會被降低以區別於精確匹配）。
+    private func queryFuzzyEnEngUnigrams(keyArray: [String]) -> [Megrez.Unigram] {
+      let enEngPairs: [(String, String)] = [("ㄣ", "ㄥ")]
+      var fuzzyUnigrams: [Megrez.Unigram] = []
+
+      // 檢查每個讀音是否包含「ㄣ」或「ㄥ」。
+      for (index, reading) in keyArray.enumerated() {
+        for (en, eng) in enEngPairs {
+          var alternateReading = ""
+          if reading.contains(en) {
+            alternateReading = reading.replacingOccurrences(of: en, with: eng)
+          } else if reading.contains(eng) {
+            alternateReading = reading.replacingOccurrences(of: eng, with: en)
+          } else {
+            continue
+          }
+
+          // 建立替換後的讀音陣列。
+          var alternateKeyArray = keyArray
+          alternateKeyArray[index] = alternateReading
+          let alternateKeyChain = alternateKeyArray.joined(separator: "-")
+
+          // 查詢替換讀音的候選字。
+          let alternateUnigrams = factoryCoreUnigramsFor(key: alternateKeyChain, keyArray: alternateKeyArray)
+
+          // 將容錯結果的分數降低（-3.0 分作為懲罰），並標記為容錯匹配。
+          for unigram in alternateUnigrams {
+            let fuzzyUnigram = Megrez.Unigram(
+              keyArray: keyArray, // 保留原始讀音作為 key
+              value: unigram.value,
+              score: unigram.score - 3.0 // 降低分數以區別於精確匹配
+            )
+            fuzzyUnigrams.append(fuzzyUnigram)
+          }
+        }
+      }
+
+      return fuzzyUnigrams
     }
   }
 }
