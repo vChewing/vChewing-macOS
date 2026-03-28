@@ -648,11 +648,15 @@ extension PhonabetTypewriter {
       // 保存要轉換的按鍵序列
       let keysToConvert = handler.smartSwitchState.keySequence
 
+      // 清空 composer 和 assembler（防止之前的按鍵殘留顯示）
+      handler.composer.clear()
+      handler.assembler.clear()
+
       // 進入臨時英文模式
       handler.smartSwitchState.enterTempEnglishMode()
       handler.smartSwitchState.appendEnglishChar(keysToConvert)
 
-      // 顯示狀態（使用 sansReading: true 避免顯示組音區）
+      // 顯示狀態
       guard let session = handler.session else { return true }
       // 先切換到 Empty 狀態清除畫面上的注音顯示
       session.switchState(State.ofEmpty())
@@ -665,8 +669,8 @@ extension PhonabetTypewriter {
       return true
     }
 
-    // 只有 1 個字母，還沒達到觸發條件，返回 true 攔截該按鍵（不讓 composer 接收）
-    // 這樣可以防止第一個字母被顯示為注音
+    // 只有 1 個字母，還沒達到觸發條件
+    // 返回 true 攔截該按鍵（不讓 composer 接收）
     return true
   }
 }
