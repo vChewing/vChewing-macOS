@@ -6,6 +6,8 @@
 // marks, or product names of Contributor, except as required to fulfill notice
 // requirements defined in MIT License.
 
+import Foundation
+
 // MARK: - PhonabetTypewriter
 
 /// 注音按鍵輸入處理 (Handle BPMF Keys)
@@ -23,12 +25,36 @@ public struct PhonabetTypewriter<Handler: InputHandlerProtocol>: TypewriterProto
 
   public let handler: Handler
 
+  /// Backspace 雙擊的時間門檻（秒）
+  private let backspaceDoubleTapThreshold: TimeInterval = 0.3
+
   /// 用來處理 InputHandler.HandleInput() 當中的與注音输入有關的組字行為。
   /// - Parameter input: 輸入訊號。
   /// - Returns: 告知 IMK「該按鍵是否已經被輸入法攔截處理」。
   public func handle(_ input: some InputSignalProtocol) -> Bool? {
     guard let session = handler.session else { return nil }
     let prefs = handler.prefs
+
+    // MARK: 智慧中英文切換處理
+    if prefs.smartChineseEnglishSwitchEnabled {
+      // 檢查是否處於臨時英文模式
+      if handler.smartSwitchState.isTempEnglishMode {
+        if let result = handleTempEnglishMode(input, session: session) {
+          return result
+        }
+      } else {
+        // 檢查是否應該觸發臨時英文模式
+        if let result = checkAndTriggerSmartSwitch(input, prefs: prefs) {
+          return result
+        }
+      }
+    }
+
+    // 檢查是否需要重置狀態
+    if shouldResetSmartSwitchState(input) {
+      handler.smartSwitchState.reset()
+    }
+
     var inputText = (input.inputTextIgnoringModifiers ?? input.text)
     inputText = inputText.lowercased().applyingTransformFW2HW(reverse: false)
     let existedIntonation = handler.composer.intonation
@@ -447,6 +473,192 @@ extension PhonabetTypewriter {
 
     var skipHandling: Bool {
       self == .alwaysTypeIntonationsToTheCompositionBuffer
+    }
+  }
+
+  // MARK: - Smart Switch Helpers
+
+  /// 檢查是否應該重置智慧切換狀態
+  private func shouldResetSmartSwitchState(_ input: InputSignalProtocol) -> Bool {
+    // 當輸入 Enter、Esc 或其他特殊按鍵時重置
+    return input.isEnter || input.isEsc ||
+      (input.isControlHold || input.isCommandHold)
+  }
+
+  /// 處理臨時英文模式下的按鍵輸入
+  private func handleTempEnglishMode(
+    _ input: some InputSignalProtocol,
+    session: Session
+  ) -> Bool? {
+    // 檢查是否為返回中文模式的觸發鍵
+    if isTriggerToReturnToChinese(input) {
+      return commitEnglishAndReturnToChinese(session: session)
+    }
+
+    // 處理 Backspace
+    if input.isBackSpace {
+      return handleBackspaceInTempEnglishMode(input, session: session)
+    }
+
+    // 處理一般英文字母輸入
+    let char = input.text
+    if char.count == 1, char.first?.isLetter == true {
+      handler.smartSwitchState.appendEnglishChar(char)
+      // 更新狀態顯示
+      var state = handler.generateStateOfInputting()
+      state.tooltip = handler.smartSwitchState.englishBuffer
+      state.tooltipDuration = 0
+      session.switchState(state)
+      return true
+    }
+
+    // 其他按鍵直接提交並處理
+    return commitEnglishAndProcess(input, session: session)
+  }
+
+  /// 檢查是否為返回中文模式的觸發鍵
+  private func isTriggerToReturnToChinese(_ input: InputSignalProtocol) -> Bool {
+    return input.isSpace || input.isTab || isPunctuationKey(input)
+  }
+
+  /// 檢查是否為標點符號鍵
+  private func isPunctuationKey(_ input: InputSignalProtocol) -> Bool {
+    let text = input.text
+    guard text.count == 1 else { return false }
+    let punctuationChars = CharacterSet(charactersIn: ",.?!;:'\"[]{}()+-*/=<>@#$%^&~`|\\")
+    return text.unicodeScalars.allSatisfy { punctuationChars.contains($0) }
+  }
+
+  /// 提交英文緩衝並返回中文模式
+  private func commitEnglishAndReturnToChinese(session: Session) -> Bool {
+    let englishText = handler.smartSwitchState.exitTempEnglishMode()
+
+    if !englishText.isEmpty {
+      // 建立提交狀態
+      var state = handler.generateStateOfInputting()
+      state.textToCommit = englishText
+      session.switchState(state)
+    }
+
+    // 重置後繼續處理當前按鍵（如果是空白或標點，會被正常處理）
+    return false // 讓後續邏輯繼續處理
+  }
+
+  /// 提交英文並處理當前按鍵
+  private func commitEnglishAndProcess(
+    _ input: InputSignalProtocol,
+    session: Session
+  ) -> Bool {
+    let englishText = handler.smartSwitchState.exitTempEnglishMode()
+
+    if !englishText.isEmpty {
+      var state = handler.generateStateOfInputting()
+      state.textToCommit = englishText
+      session.switchState(state)
+    }
+
+    return false // 讓後續邏輯處理當前按鍵
+  }
+
+  /// 在臨時英文模式下處理 Backspace
+  private func handleBackspaceInTempEnglishMode(
+    _ input: InputSignalProtocol,
+    session: Session
+  ) -> Bool {
+    let now = Date()
+    let timeDiff = now.timeIntervalSince(handler.smartSwitchState.lastBackspaceTime ?? Date.distantPast)
+
+    if timeDiff <= backspaceDoubleTapThreshold {
+      // 雙擊 Backspace：刪除所有並返回中文模式
+      handler.smartSwitchState.reset()
+      var state = handler.generateStateOfInputting()
+      state.tooltip = "已返回中文模式"
+      state.tooltipDuration = 1
+      session.switchState(state)
+      return true
+    } else {
+      // 單擊 Backspace：刪除最後一個字母
+      handler.smartSwitchState.deleteLastEnglishChar()
+      handler.smartSwitchState.lastBackspaceTime = now
+      handler.smartSwitchState.backspaceCount = 1
+
+      var state = handler.generateStateOfInputting()
+      if handler.smartSwitchState.englishBuffer.isEmpty {
+        // 如果已經刪完，返回中文模式
+        handler.smartSwitchState.reset()
+        state.tooltip = "已返回中文模式"
+        state.tooltipDuration = 1
+      } else {
+        state.tooltip = handler.smartSwitchState.englishBuffer
+        state.tooltipDuration = 0
+      }
+      session.switchState(state)
+      return true
+    }
+  }
+
+  /// 檢查並觸發智慧中英文切換
+  private func checkAndTriggerSmartSwitch(
+    _ input: some InputSignalProtocol,
+    prefs: some PrefMgrProtocol
+  ) -> Bool? {
+    // 忽略特殊按鍵
+    if input.isReservedKey || input.isNumericPadKey || input.isNonLaptopFunctionKey
+      || input.isControlHold || input.isOptionHold || input.isCommandHold
+    {
+      return nil
+    }
+
+    // 忽略 Shift 組合（除非是單純的 Shift+字母）
+    if input.isShiftHold && !input.isOptionHold && !input.isControlHold && !input.isCommandHold {
+      // Shift+字母可能是大寫輸入，暫時忽略，讓後續邏輯處理
+      return nil
+    }
+
+    // 取得輸入文字
+    let inputText = input.text.lowercased()
+    guard inputText.count == 1 else {
+      // 多字元輸入不處理
+      return nil
+    }
+
+    // 檢查是否為字母
+    guard inputText.first?.isLetter == true else {
+      // 非字母按鍵重置計數器
+      handler.smartSwitchState.resetInvalidCount()
+      return nil
+    }
+
+    // 檢查是否為有效注音輸入
+    let isValidPhonabet = handler.composer.inputValidityCheck(charStr: inputText)
+
+    if isValidPhonabet {
+      // 有效注音：重置計數器
+      handler.smartSwitchState.resetInvalidCount()
+      return nil
+    } else {
+      // 無效按鍵：增加計數
+      handler.smartSwitchState.incrementInvalidCount()
+
+      // 檢查是否達到觸發條件
+      // 條件：連續 2 個無效按鍵且注拼槽為空
+      if handler.smartSwitchState.shouldTriggerTempEnglishMode(threshold: 2) && handler.composer.isEmpty {
+        // 進入臨時英文模式
+        handler.smartSwitchState.enterTempEnglishMode()
+        handler.smartSwitchState.appendEnglishChar(inputText)
+
+        // 顯示狀態
+        guard let session = handler.session else { return true }
+        var state = handler.generateStateOfInputting()
+        state.tooltip = handler.smartSwitchState.englishBuffer
+        state.tooltipDuration = 0
+        session.switchState(state)
+
+        return true
+      }
+
+      // 未達觸發條件，讓後續邏輯決定是否處理
+      return nil
     }
   }
 }

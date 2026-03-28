@@ -8,6 +8,79 @@
 
 import Foundation
 
+// MARK: - SmartSwitchState
+
+/// 智慧中英文切換的狀態追蹤
+public struct SmartSwitchState {
+  /// 連續無效按鍵計數
+  public var invalidKeyCount: Int = 0
+
+  /// 是否處於臨時英文模式
+  public var isTempEnglishMode: Bool = false
+
+  /// 臨時英文模式下的輸入緩衝
+  public var englishBuffer: String = ""
+
+  /// 上一次 Backspace 時間（用於雙擊檢測）
+  public var lastBackspaceTime: Date?
+
+  /// Backspace 連續計數
+  public var backspaceCount: Int = 0
+
+  /// 預設初始化器
+  public init() {}
+
+  /// 重置所有狀態
+  public mutating func reset() {
+    invalidKeyCount = 0
+    isTempEnglishMode = false
+    englishBuffer = ""
+    lastBackspaceTime = nil
+    backspaceCount = 0
+  }
+
+  /// 重置無效計數（當收到有效注音輸入時）
+  public mutating func resetInvalidCount() {
+    invalidKeyCount = 0
+  }
+
+  /// 增加無效計數
+  public mutating func incrementInvalidCount() {
+    invalidKeyCount += 1
+  }
+
+  /// 進入臨時英文模式
+  public mutating func enterTempEnglishMode() {
+    isTempEnglishMode = true
+    englishBuffer = ""
+    invalidKeyCount = 0
+  }
+
+  /// 退出臨時英文模式
+  public mutating func exitTempEnglishMode() -> String {
+    let buffer = englishBuffer
+    reset()
+    return buffer
+  }
+
+  /// 追加英文字母
+  public mutating func appendEnglishChar(_ char: String) {
+    englishBuffer.append(char)
+  }
+
+  /// 刪除最後一個英文字母
+  public mutating func deleteLastEnglishChar() {
+    if !englishBuffer.isEmpty {
+      englishBuffer.removeLast()
+    }
+  }
+
+  /// 檢查是否達到觸發門檻
+  public func shouldTriggerTempEnglishMode(threshold: Int = 2) -> Bool {
+    return invalidKeyCount >= threshold
+  }
+}
+
 // MARK: - InputHandlerProtocol
 
 /// 該檔案乃輸入調度模組的核心部分，主要承接型別初期化內容、協定內容、以及
@@ -49,6 +122,9 @@ public protocol InputHandlerProtocol: AnyObject, InputHandlerCoreProtocol {
   var calligrapher: String { get set } // 磁帶專用組筆區
   var composer: Tekkon.Composer { get set } // 注拼槽
   var assembler: Megrez.Compositor { get set } // 組字器
+
+  /// 智慧中英文切換狀態
+  var smartSwitchState: SmartSwitchState { get set }
 }
 
 // MARK: - KeyDropContext

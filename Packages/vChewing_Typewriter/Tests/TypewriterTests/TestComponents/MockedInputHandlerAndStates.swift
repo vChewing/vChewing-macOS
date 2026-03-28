@@ -6,6 +6,7 @@
 // marks, or product names of Contributor, except as required to fulfill notice
 // requirements defined in MIT License.
 
+import CoreGraphics
 import Foundation
 import LangModelAssembly
 import Megrez
@@ -183,6 +184,7 @@ public final class MockInputHandler: @MainActor InputHandlerProtocol {
   public var calligrapher = ""
   public var composer: Tekkon.Composer = .init()
   public var assembler: Megrez.Compositor
+  public var smartSwitchState = SmartSwitchState()
   public var isJISKeyboard: (() -> Bool)? = { false }
   public var narrator: (any SpeechNarratorProtocol)?
 
