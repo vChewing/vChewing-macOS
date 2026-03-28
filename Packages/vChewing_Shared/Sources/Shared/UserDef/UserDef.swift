@@ -74,6 +74,7 @@ nonisolated public enum UserDef: String, CaseIterable, Identifiable, Sendable {
   case kUseFixedCandidateOrderOnSelection = "UseFixedCandidateOrderOnSelection"
   case kAutoCorrectReadingCombination = "AutoCorrectReadingCombination"
   case kFuzzyReadingEnEngEnabled = "FuzzyReadingEnEngEnabled"
+  case kSmartChineseEnglishSwitchEnabled = "SmartChineseEnglishSwitchEnabled"
   case kReadingNarrationCoverage = "ReadingNarrationCoverage"
   case kAlsoConfirmAssociatedCandidatesByEnter = "AlsoConfirmAssociatedCandidatesByEnter"
   case kKeepReadingUponCompositionError = "KeepReadingUponCompositionError"
@@ -474,6 +475,7 @@ nonisolated extension UserDef {
     case .kUseFixedCandidateOrderOnSelection: return .bool(false)
     case .kAutoCorrectReadingCombination: return .bool(true)
     case .kFuzzyReadingEnEngEnabled: return .bool(false)
+    case .kSmartChineseEnglishSwitchEnabled: return .bool(false)
     case .kReadingNarrationCoverage: return .integer(0)
     case .kAlsoConfirmAssociatedCandidatesByEnter: return .bool(false)
     case .kKeepReadingUponCompositionError: return .bool(false)
@@ -830,6 +832,11 @@ nonisolated extension UserDef {
         userDef: self,
         shortTitle: "i18n:UserDef.kFuzzyReadingEnEngEnabled.shortTitle",
         description: "i18n:UserDef.kFuzzyReadingEnEngEnabled.description"
+      )
+    case .kSmartChineseEnglishSwitchEnabled: return .init(
+        userDef: self,
+        shortTitle: "智慧中英文切換",
+        description: "在中文模式下，當連續輸入無法組成注音的按鍵時，自動切換為臨時英文模式。輸入空白鍵、Tab 鍵、標點符號，或連按兩次 Backspace 鍵即可返回中文模式。"
       )
     case .kReadingNarrationCoverage: return .init(
         userDef: self, shortTitle: "i18n:UserDef.kReadingNarrationCoverage.shortTitle",
