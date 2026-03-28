@@ -74,6 +74,8 @@ final class SmartSwitchTests {
     testHandler?.clear()
     testHandler?.smartSwitchState.reset()
     testSession?.switchState(MockIMEState.ofAbortion())
+    // 確保智慧中英文切換功能被啟用
+    testHandler?.prefs.smartChineseEnglishSwitchEnabled = true
   }
 
   /// 建立按鍵事件
