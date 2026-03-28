@@ -159,6 +159,9 @@ public final class PrefMgr: PrefMgrProtocol, Sendable {
   @AppProperty(userDef: .kFuzzyReadingEnEngEnabled)
   public var fuzzyReadingEnEngEnabled: Bool
 
+  @AppProperty(userDef: .kSmartChineseEnglishSwitchEnabled)
+  public var smartChineseEnglishSwitchEnabled: Bool
+
   @AppProperty(userDef: .kAlsoConfirmAssociatedCandidatesByEnter)
   public var alsoConfirmAssociatedCandidatesByEnter: Bool
 
