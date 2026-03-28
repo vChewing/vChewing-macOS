@@ -598,7 +598,7 @@ extension PhonabetTypewriter {
   }
 
   /// 檢查並觸發智慧中英文切換
-  /// 邏輯：檢查按鍵序列是否能組成詞典中存在的完整注音音節（必須有韻母）
+  /// 邏輯：當 composer 為空且連續輸入 2 個英文字母時，觸發英文模式
   private func checkAndTriggerSmartSwitch(
     _ input: some InputSignalProtocol,
     prefs: some PrefMgrProtocol
@@ -624,50 +624,23 @@ extension PhonabetTypewriter {
       return nil
     }
 
-    // 累積按鍵序列
-    let currentSequence = handler.smartSwitchState.keySequence + inputText
-    
-    // 建立臨時 composer 來測試按鍵序列
-    var testComposer = handler.composer
-    testComposer.clear()
-    
-    // 將按鍵序列輸入臨時 composer
-    for char in currentSequence {
-      testComposer.receiveKey(fromString: String(char))
-    }
-
-    // 檢查是否能形成完整的有效讀音：
-    // 1. 必須有韻母（vowel）
-    // 2. 組合後的讀音必須在詞典中存在
-    let hasVowel = !testComposer.vowel.isEmpty
-    let readingKey = testComposer.phonabetKeyForQuery(pronounceableOnly: false)
-    let hasDictEntry = readingKey != nil && !readingKey!.isEmpty 
-      && handler.currentLM.hasUnigramsFor(keyArray: [readingKey!])
-    
-    // 如果能形成完整的有效讀音（有韻母且在詞典中），正常處理
-    if hasVowel && hasDictEntry {
+    // 如果 composer 不為空，表示正在組合注音，不進行智慧切換
+    if !handler.composer.isEmpty {
       handler.smartSwitchState.resetInvalidCount()
       handler.smartSwitchState.keySequence = ""
       return nil
     }
 
-    // 記錄按鍵序列並增加無效計數
-    handler.smartSwitchState.keySequence = currentSequence
+    // 累積按鍵序列
+    handler.smartSwitchState.keySequence.append(inputText)
     handler.smartSwitchState.incrementInvalidCount()
 
-    // 檢查是否達到觸發條件（連續 2 個按鍵都無法形成有效讀音，且沒有正在組合的注音）
-    // 注意：使用 keySequence.count 來判斷是否有累積的按鍵，而不是檢查 composer
-    if handler.smartSwitchState.shouldTriggerTempEnglishMode(threshold: 2)
-      && handler.smartSwitchState.keySequence.count >= 2
-      && handler.smartSwitchState.keySequence.count == handler.smartSwitchState.invalidKeyCount
-    {
-      // 保存要轉換的按鍵序列（因為 enterTempEnglishMode 會清空它）
+    // 檢查是否達到觸發條件（連續 2 個字母且 composer 為空）
+    if handler.smartSwitchState.keySequence.count >= 2 {
+      // 保存要轉換的按鍵序列
       let keysToConvert = handler.smartSwitchState.keySequence
 
       // 進入臨時英文模式
-      // 清空 composer 和 assembler 中已存在的內容（避免殘留注音顯示）
-      handler.composer.clear()
-      handler.assembler.clear()
       handler.smartSwitchState.enterTempEnglishMode()
       handler.smartSwitchState.appendEnglishChar(keysToConvert)
 
@@ -684,7 +657,8 @@ extension PhonabetTypewriter {
       return true
     }
 
-    // 未達觸發條件，讓後續邏輯處理
-    return nil
+    // 只有 1 個字母，還沒達到觸發條件，返回 true 攔截該按鍵（不讓 composer 接收）
+    // 這樣可以防止第一個字母被顯示為注音
+    return true
   }
 }
