@@ -657,10 +657,13 @@ extension PhonabetTypewriter {
 
     // 檢查是否達到觸發條件（連續 2 個按鍵都無法形成有效讀音，且沒有正在組合的注音）
     // 注意：使用 keySequence.count 來判斷是否有累積的按鍵，而不是檢查 composer
-    if handler.smartSwitchState.shouldTriggerTempEnglishMode(threshold: 2) 
+    if handler.smartSwitchState.shouldTriggerTempEnglishMode(threshold: 2)
       && handler.smartSwitchState.keySequence.count >= 2
-      && handler.smartSwitchState.keySequence.count == handler.smartSwitchState.invalidKeyCount {
+      && handler.smartSwitchState.keySequence.count == handler.smartSwitchState.invalidKeyCount
+    {
       // 進入臨時英文模式
+      // 清空 composer 中已存在的注音（因為之前的按鍵已經被轉換為注音）
+      handler.composer.clear()
       handler.smartSwitchState.enterTempEnglishMode()
       handler.smartSwitchState.appendEnglishChar(inputText)
 
