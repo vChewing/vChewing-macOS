@@ -50,6 +50,7 @@ extension SettingsPanesCocoa {
             NSStackView.buildSection(width: innerContentWidth) {
               UserDef.kSpecifyIntonationKeyBehavior.render(fixWidth: innerContentWidth)
               UserDef.kAcceptLeadingIntonations.render(fixWidth: innerContentWidth)
+              UserDef.kSmartChineseEnglishSwitchEnabled.render(fixWidth: innerContentWidth)
             }?.boxed()
             NSView()
           }
