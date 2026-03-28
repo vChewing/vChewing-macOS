@@ -49,6 +49,7 @@ public protocol PrefMgrProtocol {
   var useFixedCandidateOrderOnSelection: Bool { get set }
   var autoCorrectReadingCombination: Bool { get set }
   var fuzzyReadingEnEngEnabled: Bool { get set }
+  var smartChineseEnglishSwitchEnabled: Bool { get set }
   var readingNarrationCoverage: Int { get set }
   var alsoConfirmAssociatedCandidatesByEnter: Bool { get set }
   var keepReadingUponCompositionError: Bool { get set }
