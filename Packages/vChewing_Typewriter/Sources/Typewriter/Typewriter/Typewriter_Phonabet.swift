@@ -44,9 +44,15 @@ public struct PhonabetTypewriter<Handler: InputHandlerProtocol>: TypewriterProto
         }
       } else {
         // 檢查是否應該觸發臨時英文模式
-        if let result = checkAndTriggerSmartSwitch(input, prefs: prefs) {
-          return result
+        let result = checkAndTriggerSmartSwitch(input, prefs: prefs)
+        if result == true {
+          return true  // 已處理，攔截按鍵
         }
+        // 如果 result 為 false（只有 1 個字母），也應該攔截按鍵，不繼續處理
+        if result == false {
+          return true  // 攔截按鍵，不讓它被當作注音處理
+        }
+        // result == nil 表示不進行智慧切換，繼續正常處理
       }
     }
 
@@ -599,6 +605,7 @@ extension PhonabetTypewriter {
 
   /// 檢查並觸發智慧中英文切換
   /// 邏輯：當 composer 為空且連續輸入 2 個英文字母時，觸發英文模式
+  /// - Returns: true 表示已處理（攔截按鍵），nil 表示不進行智慧切換
   private func checkAndTriggerSmartSwitch(
     _ input: some InputSignalProtocol,
     prefs: some PrefMgrProtocol
@@ -619,23 +626,19 @@ extension PhonabetTypewriter {
     // 檢查是否為字母
     guard inputText.first?.isLetter == true else {
       // 非字母按鍵重置計數器
-      handler.smartSwitchState.resetInvalidCount()
-      handler.smartSwitchState.keySequence = ""
+      handler.smartSwitchState.reset()
       return nil
     }
 
     // 如果 composer 不為空，表示正在組合注音，不進行智慧切換
     if !handler.composer.isEmpty {
-      handler.smartSwitchState.resetInvalidCount()
-      handler.smartSwitchState.keySequence = ""
+      handler.smartSwitchState.reset()
       return nil
     }
 
-    // 累積按鍵序列（需要先讀取、修改、再寫回，因為 SmartSwitchState 是值類型）
-    var currentState = handler.smartSwitchState
-    currentState.keySequence.append(inputText)
-    currentState.incrementInvalidCount()
-    handler.smartSwitchState = currentState
+    // 累積按鍵序列（SmartSwitchState 現在是 class，直接修改）
+    handler.smartSwitchState.keySequence.append(inputText)
+    handler.smartSwitchState.incrementInvalidCount()
 
     // 檢查是否達到觸發條件（連續 2 個字母且 composer 為空）
     if handler.smartSwitchState.keySequence.count >= 2 {
