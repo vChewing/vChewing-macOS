@@ -54,6 +54,9 @@ public struct PhonabetTypewriter<Handler: InputHandlerProtocol>: TypewriterProto
         }
         // result == nil 表示不進行智慧切換，繼續正常處理
       }
+    } else {
+      // 功能未啟用時，確保重置狀態
+      handler.smartSwitchState.reset()
     }
 
     // 檢查是否需要重置狀態
