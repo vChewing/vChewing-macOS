@@ -387,4 +387,80 @@ final class SmartSwitchTests {
     // 這個測試主要驗證 SmartSwitchState 的狀態管理
     #expect(testHandler.smartSwitchState.isTempEnglishMode)
   }
+
+  /// TC-011: 模擬鍵盤輸入序列測試「mail」
+  /// 測試鍵盤序列：fu/3 jp4 ul3 2k4 xj4 u/4 5j/ ul3 , ul4 rmp6 mail z84
+  /// 預期：輸入 "mail" 時應該自動切換為英文模式
+  @Test("TC-011: Simulate key sequence to test 'mail' English switching")
+  func testSimulateKeySequenceForMail() {
+    guard let testHandler else {
+      Issue.record("testHandler is nil.")
+      return
+    }
+
+    resetTestState()
+
+    // 驗證功能已啟用
+    #expect(testHandler.prefs.smartChineseEnglishSwitchEnabled == true)
+
+    // 模擬輸入 "mail" (m-a-i-l)
+    // 在標準大千注音排列中，連續輸入英文字母
+
+    // 輸入 'm' - 這是一個輔助性測試
+    let eventM = createKeyEvent(char: "m")
+    _ = testHandler.triageInput(event: eventM)
+
+    // 輸入 'a' - 應該觸發英文模式
+    let eventA = createKeyEvent(char: "a")
+    _ = testHandler.triageInput(event: eventA)
+
+    // 驗證是否觸發了臨時英文模式
+    #expect(testHandler.smartSwitchState.isTempEnglishMode, "Should be in English mode after 'ma'")
+
+    // 繼續輸入 'i', 'l'
+    let eventI = createKeyEvent(char: "i")
+    _ = testHandler.triageInput(event: eventI)
+
+    let eventL = createKeyEvent(char: "l")
+    _ = testHandler.triageInput(event: eventL)
+
+    // 驗證英文緩衝區內容
+    #expect(testHandler.smartSwitchState.englishBuffer == "mail", "English buffer should contain 'mail'")
+  }
+
+  /// TC-012: 測試「test」輸入序列
+  /// 預期：輸入 "test" 時應該正確顯示為 "test"
+  @Test("TC-012: Input 'test' should display as 'test'")
+  func testInputTestDisplaysAsTest() {
+    guard let testHandler else {
+      Issue.record("testHandler is nil.")
+      return
+    }
+
+    resetTestState()
+
+    // 驗證功能已啟用
+    #expect(testHandler.prefs.smartChineseEnglishSwitchEnabled == true)
+
+    // 輸入 't'
+    let eventT = createKeyEvent(char: "t")
+    _ = testHandler.triageInput(event: eventT)
+
+    // 輸入 'e' - 應該觸發英文模式
+    let eventE = createKeyEvent(char: "e")
+    _ = testHandler.triageInput(event: eventE)
+
+    // 驗證是否觸發了臨時英文模式
+    #expect(testHandler.smartSwitchState.isTempEnglishMode, "Should be in English mode after 'te'")
+
+    // 繼續輸入 's', 't'
+    let eventS = createKeyEvent(char: "s")
+    _ = testHandler.triageInput(event: eventS)
+
+    let eventT2 = createKeyEvent(char: "t")
+    _ = testHandler.triageInput(event: eventT2)
+
+    // 驗證英文緩衝區內容
+    #expect(testHandler.smartSwitchState.englishBuffer == "test", "English buffer should contain 'test'")
+  }
 }
