@@ -504,8 +504,8 @@ extension PhonabetTypewriter {
     let char = input.text
     if char.count == 1, char.first?.isLetter == true {
       handler.smartSwitchState.appendEnglishChar(char)
-      // 更新狀態顯示
-      var state = handler.generateStateOfInputting()
+      // 更新狀態顯示（使用 sansReading: true 避免顯示注音）
+      var state = handler.generateStateOfInputting(sansReading: true)
       state.tooltip = handler.smartSwitchState.englishBuffer
       state.tooltipDuration = 0
       session.switchState(state)
@@ -661,15 +661,19 @@ extension PhonabetTypewriter {
       && handler.smartSwitchState.keySequence.count >= 2
       && handler.smartSwitchState.keySequence.count == handler.smartSwitchState.invalidKeyCount
     {
-      // 進入臨時英文模式
-      // 清空 composer 中已存在的注音（因為之前的按鍵已經被轉換為注音）
-      handler.composer.clear()
-      handler.smartSwitchState.enterTempEnglishMode()
-      handler.smartSwitchState.appendEnglishChar(inputText)
+      // 保存要轉換的按鍵序列（因為 enterTempEnglishMode 會清空它）
+      let keysToConvert = handler.smartSwitchState.keySequence
 
-      // 顯示狀態
+      // 進入臨時英文模式
+      // 清空 composer 和 assembler 中已存在的內容（避免殘留注音顯示）
+      handler.composer.clear()
+      handler.assembler.clear()
+      handler.smartSwitchState.enterTempEnglishMode()
+      handler.smartSwitchState.appendEnglishChar(keysToConvert)
+
+      // 顯示狀態（使用 sansReading: true 避免顯示組音區）
       guard let session = handler.session else { return true }
-      var state = handler.generateStateOfInputting()
+      var state = handler.generateStateOfInputting(sansReading: true)
       state.tooltip = handler.smartSwitchState.englishBuffer
       state.tooltipDuration = 0
       session.switchState(state)
