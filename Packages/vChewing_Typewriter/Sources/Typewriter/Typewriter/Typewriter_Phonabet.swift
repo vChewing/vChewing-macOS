@@ -598,7 +598,7 @@ extension PhonabetTypewriter {
   }
 
   /// 檢查並觸發智慧中英文切換
-  /// 邏輯：追踪按鍵序列，檢查是否能組成詞典中存在的有效讀音
+  /// 邏輯：檢查按鍵序列是否能組成詞典中存在的完整注音音節（必須有韻母）
   private func checkAndTriggerSmartSwitch(
     _ input: some InputSignalProtocol,
     prefs: some PrefMgrProtocol
@@ -620,36 +620,42 @@ extension PhonabetTypewriter {
     guard inputText.first?.isLetter == true else {
       // 非字母按鍵重置計數器
       handler.smartSwitchState.resetInvalidCount()
+      handler.smartSwitchState.keySequence = ""
       return nil
     }
 
+    // 累積按鍵序列
+    let currentSequence = handler.smartSwitchState.keySequence + inputText
+    
     // 建立臨時 composer 來測試按鍵序列
     var testComposer = handler.composer
     testComposer.clear()
-
-    // 累積按鍵序列（包括歷史按鍵）
-    let currentSequence = handler.smartSwitchState.keySequence + inputText
     
     // 將按鍵序列輸入臨時 composer
     for char in currentSequence {
       testComposer.receiveKey(fromString: String(char))
     }
 
-    // 檢查是否能形成有效讀音（可以在詞典中查詢到的）
-    let readingKey = testComposer.phonabetKeyForQuery(pronounceableOnly: true)
-    let hasValidReading = readingKey != nil && handler.currentLM.hasUnigramsFor(keyArray: [readingKey!])
-
-    if hasValidReading {
-      // 能形成詞典中存在的有效讀音：重置計數器，正常處理注音
+    // 檢查是否能形成完整的有效讀音：
+    // 1. 必須有韻母（vowel）
+    // 2. 組合後的讀音必須在詞典中存在
+    let hasVowel = !testComposer.vowel.isEmpty
+    let readingKey = testComposer.phonabetKeyForQuery(pronounceableOnly: false)
+    let hasDictEntry = readingKey != nil && !readingKey!.isEmpty 
+      && handler.currentLM.hasUnigramsFor(keyArray: [readingKey!])
+    
+    // 如果能形成完整的有效讀音（有韻母且在詞典中），正常處理
+    if hasVowel && hasDictEntry {
       handler.smartSwitchState.resetInvalidCount()
+      handler.smartSwitchState.keySequence = ""
       return nil
     }
 
-    // 無法形成有效讀音：增加無效計數並記錄按鍵
+    // 記錄按鍵序列並增加無效計數
     handler.smartSwitchState.keySequence = currentSequence
     handler.smartSwitchState.incrementInvalidCount()
 
-    // 檢查是否達到觸發條件（連續 2 個無法形成有效讀音的按鍵序列）
+    // 檢查是否達到觸發條件（連續 2 個按鍵都無法形成有效讀音）
     if handler.smartSwitchState.shouldTriggerTempEnglishMode(threshold: 2) && handler.composer.isEmpty {
       // 進入臨時英文模式
       handler.smartSwitchState.enterTempEnglishMode()
