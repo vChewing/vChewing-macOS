@@ -85,7 +85,7 @@ final class SmartSwitchTests {
   // MARK: - Tests
 
   /// TC-001: 連續 2 個無效按鍵觸發臨時英文模式
-  /// 使用 'x' 和 'q' 作為無效按鍵，在標準注音佈局中這些是無效輸入
+  /// 測試智慧切換狀態機制的基本行為
   @Test("TC-001: Trigger temp English mode with 2 invalid keys")
   func testTriggerTempEnglishMode() {
     guard let testHandler else {
@@ -102,20 +102,23 @@ final class SmartSwitchTests {
     #expect(testHandler.composer.isEmpty)
     #expect(!testHandler.smartSwitchState.isTempEnglishMode)
 
-    // 使用在標準注音佈局中無效的按鍵
-    // 連續輸入兩個無效按鍵
-    _ = testHandler.triageInput(event: createKeyEvent(char: "x"))
-    _ = testHandler.triageInput(event: createKeyEvent(char: "q"))
+    // 模擬連續 2 個無效按鍵（直接測試狀態機制）
+    // 在標準大千注音排列中所有英文字母都是有效的，
+    // 因此我們直接測試 SmartSwitchState 的內部機制
+    testHandler.smartSwitchState.incrementInvalidCount()
+    testHandler.smartSwitchState.incrementInvalidCount()
 
-    // 驗證是否進入臨時英文模式
-    // 注意：實際結果取決於注音有效性檢查的實作
-    vCTestLog("After 2 invalid keys - isTempEnglishMode: \(testHandler.smartSwitchState.isTempEnglishMode)")
+    // 驗證無效計數
+    #expect(testHandler.smartSwitchState.invalidKeyCount == 2)
+    #expect(testHandler.smartSwitchState.shouldTriggerTempEnglishMode(threshold: 2) == true)
 
-    // 由於智慧切換的具體實作可能因鍵盤佈局而異，
-    // 這裡我們主要驗證狀態機制的基本行為
-    if testHandler.smartSwitchState.isTempEnglishMode {
-      #expect(testHandler.smartSwitchState.englishBuffer == "q")
-    }
+    // 手動進入臨時英文模式（模擬達到觸發條件後的行為）
+    testHandler.smartSwitchState.enterTempEnglishMode()
+    testHandler.smartSwitchState.appendEnglishChar("x")
+
+    // 驗證已進入臨時英文模式
+    #expect(testHandler.smartSwitchState.isTempEnglishMode == true)
+    #expect(testHandler.smartSwitchState.englishBuffer == "x")
   }
 
   /// TC-002: 空白鍵返回中文模式
@@ -169,10 +172,13 @@ final class SmartSwitchTests {
     #expect(testHandler.smartSwitchState.isTempEnglishMode)
     #expect(testHandler.smartSwitchState.englishBuffer == "hi")
 
-    // 驗證退出臨時英文模式會返回正確的緩衝內容
-    let result = testHandler.smartSwitchState.exitTempEnglishMode()
-    #expect(result == "hi")
+    // 發送 Tab 鍵事件，應該觸發退出臨時英文模式
+    let tabEvent = KBEvent.KeyEventData.dataTab.asEvent
+    _ = testHandler.triageInput(event: tabEvent)
+
+    // 驗證已退出臨時英文模式，且緩衝內容被提交
     #expect(!testHandler.smartSwitchState.isTempEnglishMode)
+    #expect(testHandler.smartSwitchState.englishBuffer.isEmpty)
   }
 
   /// TC-004: Backspace 刪除返回中文模式
@@ -229,10 +235,13 @@ final class SmartSwitchTests {
     #expect(testHandler.smartSwitchState.isTempEnglishMode)
     #expect(testHandler.smartSwitchState.englishBuffer == "hi")
 
-    // 驗證退出臨時英文模式
-    let result = testHandler.smartSwitchState.exitTempEnglishMode()
-    #expect(result == "hi")
+    // 發送標點符號事件（逗號），應該觸發退出臨時英文模式
+    let commaEvent = createKeyEvent(char: ",")
+    _ = testHandler.triageInput(event: commaEvent)
+
+    // 驗證已退出臨時英文模式，且緩衝內容被提交
     #expect(!testHandler.smartSwitchState.isTempEnglishMode)
+    #expect(testHandler.smartSwitchState.englishBuffer.isEmpty)
   }
 
   /// TC-006: 有效注音不觸發英文模式
