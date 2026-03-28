@@ -631,9 +631,11 @@ extension PhonabetTypewriter {
       return nil
     }
 
-    // 累積按鍵序列
-    handler.smartSwitchState.keySequence.append(inputText)
-    handler.smartSwitchState.incrementInvalidCount()
+    // 累積按鍵序列（需要先讀取、修改、再寫回，因為 SmartSwitchState 是值類型）
+    var currentState = handler.smartSwitchState
+    currentState.keySequence.append(inputText)
+    currentState.incrementInvalidCount()
+    handler.smartSwitchState = currentState
 
     // 檢查是否達到觸發條件（連續 2 個字母且 composer 為空）
     if handler.smartSwitchState.keySequence.count >= 2 {

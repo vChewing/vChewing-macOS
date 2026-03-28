@@ -11,7 +11,7 @@ import Foundation
 // MARK: - SmartSwitchState
 
 /// 智慧中英文切換的狀態追蹤
-public struct SmartSwitchState {
+public final class SmartSwitchState {
   /// 連續無效按鍵計數
   public var invalidKeyCount: Int = 0
 
@@ -34,7 +34,7 @@ public struct SmartSwitchState {
   public init() {}
 
   /// 重置所有狀態
-  public mutating func reset() {
+  public func reset() {
     invalidKeyCount = 0
     isTempEnglishMode = false
     englishBuffer = ""
@@ -44,17 +44,17 @@ public struct SmartSwitchState {
   }
 
   /// 重置無效計數（當收到有效注音輸入時）
-  public mutating func resetInvalidCount() {
+  public func resetInvalidCount() {
     invalidKeyCount = 0
   }
 
   /// 增加無效計數
-  public mutating func incrementInvalidCount() {
+  public func incrementInvalidCount() {
     invalidKeyCount += 1
   }
 
   /// 進入臨時英文模式
-  public mutating func enterTempEnglishMode() {
+  public func enterTempEnglishMode() {
     isTempEnglishMode = true
     englishBuffer = ""
     invalidKeyCount = 0
@@ -62,19 +62,19 @@ public struct SmartSwitchState {
   }
 
   /// 退出臨時英文模式
-  public mutating func exitTempEnglishMode() -> String {
+  public func exitTempEnglishMode() -> String {
     let buffer = englishBuffer
     reset()
     return buffer
   }
 
   /// 追加英文字母
-  public mutating func appendEnglishChar(_ char: String) {
+  public func appendEnglishChar(_ char: String) {
     englishBuffer.append(char)
   }
 
   /// 刪除最後一個英文字母
-  public mutating func deleteLastEnglishChar() {
+  public func deleteLastEnglishChar() {
     if !englishBuffer.isEmpty {
       englishBuffer.removeLast()
     }
