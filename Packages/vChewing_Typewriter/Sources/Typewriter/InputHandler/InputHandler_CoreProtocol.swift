@@ -27,6 +27,9 @@ public struct SmartSwitchState {
   /// Backspace 連續計數
   public var backspaceCount: Int = 0
 
+  /// 按鍵序列（用於檢查是否能組成有效讀音）
+  public var keySequence: String = ""
+
   /// 預設初始化器
   public init() {}
 
@@ -37,6 +40,7 @@ public struct SmartSwitchState {
     englishBuffer = ""
     lastBackspaceTime = nil
     backspaceCount = 0
+    keySequence = ""
   }
 
   /// 重置無效計數（當收到有效注音輸入時）
@@ -54,6 +58,7 @@ public struct SmartSwitchState {
     isTempEnglishMode = true
     englishBuffer = ""
     invalidKeyCount = 0
+    keySequence = ""
   }
 
   /// 退出臨時英文模式

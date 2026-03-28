@@ -30,6 +30,9 @@ swift test --package-path ./Packages/vChewing_Tekkon --filter TekkonTests_Basic
 
 # Run specific test case
 swift test --package-path ./Packages/vChewing_Typewriter --filter "testCaseName"
+
+# Linux Docker test
+make spmLinuxTest-Typewriter
 ```
 
 ### Lint & Format
@@ -38,8 +41,7 @@ make lint             # SwiftLint with autocorrect
 make format           # SwiftFormat
 make spmLintFormat    # Lint + Format all packages
 
-# Manual package-level formatting
-cd ./Packages && make lint && make format
+cd ./Packages && make lint && make format  # Manual package-level
 ```
 
 ## Project Structure

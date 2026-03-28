@@ -598,6 +598,7 @@ extension PhonabetTypewriter {
   }
 
   /// 檢查並觸發智慧中英文切換
+  /// 邏輯：追踪按鍵序列，檢查是否能組成詞典中存在的有效讀音
   private func checkAndTriggerSmartSwitch(
     _ input: some InputSignalProtocol,
     prefs: some PrefMgrProtocol
@@ -609,16 +610,9 @@ extension PhonabetTypewriter {
       return nil
     }
 
-    // 忽略 Shift 組合（除非是單純的 Shift+字母）
-    if input.isShiftHold && !input.isOptionHold && !input.isControlHold && !input.isCommandHold {
-      // Shift+字母可能是大寫輸入，暫時忽略，讓後續邏輯處理
-      return nil
-    }
-
     // 取得輸入文字
     let inputText = input.text.lowercased()
     guard inputText.count == 1 else {
-      // 多字元輸入不處理
       return nil
     }
 
@@ -629,36 +623,49 @@ extension PhonabetTypewriter {
       return nil
     }
 
-    // 檢查是否為有效注音輸入
-    let isValidPhonabet = handler.composer.inputValidityCheck(charStr: inputText)
+    // 建立臨時 composer 來測試按鍵序列
+    var testComposer = handler.composer
+    testComposer.clear()
 
-    if isValidPhonabet {
-      // 有效注音：重置計數器
+    // 累積按鍵序列（包括歷史按鍵）
+    let currentSequence = handler.smartSwitchState.keySequence + inputText
+    
+    // 將按鍵序列輸入臨時 composer
+    for char in currentSequence {
+      testComposer.receiveKey(fromString: String(char))
+    }
+
+    // 檢查是否能形成有效讀音（可以在詞典中查詢到的）
+    let readingKey = testComposer.phonabetKeyForQuery(pronounceableOnly: true)
+    let hasValidReading = readingKey != nil && handler.currentLM.hasUnigramsFor(keyArray: [readingKey!])
+
+    if hasValidReading {
+      // 能形成詞典中存在的有效讀音：重置計數器，正常處理注音
       handler.smartSwitchState.resetInvalidCount()
       return nil
-    } else {
-      // 無效按鍵：增加計數
-      handler.smartSwitchState.incrementInvalidCount()
-
-      // 檢查是否達到觸發條件
-      // 條件：連續 2 個無效按鍵且注拼槽為空
-      if handler.smartSwitchState.shouldTriggerTempEnglishMode(threshold: 2) && handler.composer.isEmpty {
-        // 進入臨時英文模式
-        handler.smartSwitchState.enterTempEnglishMode()
-        handler.smartSwitchState.appendEnglishChar(inputText)
-
-        // 顯示狀態
-        guard let session = handler.session else { return true }
-        var state = handler.generateStateOfInputting()
-        state.tooltip = handler.smartSwitchState.englishBuffer
-        state.tooltipDuration = 0
-        session.switchState(state)
-
-        return true
-      }
-
-      // 未達觸發條件，讓後續邏輯決定是否處理
-      return nil
     }
+
+    // 無法形成有效讀音：增加無效計數並記錄按鍵
+    handler.smartSwitchState.keySequence = currentSequence
+    handler.smartSwitchState.incrementInvalidCount()
+
+    // 檢查是否達到觸發條件（連續 2 個無法形成有效讀音的按鍵序列）
+    if handler.smartSwitchState.shouldTriggerTempEnglishMode(threshold: 2) && handler.composer.isEmpty {
+      // 進入臨時英文模式
+      handler.smartSwitchState.enterTempEnglishMode()
+      handler.smartSwitchState.appendEnglishChar(inputText)
+
+      // 顯示狀態
+      guard let session = handler.session else { return true }
+      var state = handler.generateStateOfInputting()
+      state.tooltip = handler.smartSwitchState.englishBuffer
+      state.tooltipDuration = 0
+      session.switchState(state)
+
+      return true
+    }
+
+    // 未達觸發條件，讓後續邏輯處理
+    return nil
   }
 }
