@@ -673,6 +673,9 @@ extension PhonabetTypewriter {
 
       // 顯示狀態（使用 sansReading: true 避免顯示組音區）
       guard let session = handler.session else { return true }
+      // 先切換到 Empty 狀態清除畫面上的注音顯示
+      session.switchState(State.ofEmpty())
+      // 再顯示英文模式狀態
       var state = handler.generateStateOfInputting(sansReading: true)
       state.tooltip = handler.smartSwitchState.englishBuffer
       state.tooltipDuration = 0
