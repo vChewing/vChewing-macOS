@@ -34,7 +34,11 @@
 
 使用者在中文模式下直接輸入 "app"，系統自動判斷為英文並輸出。
 
-### 情境 3：誤觸發處理
+### 情境 3：大寫開頭的英文（如 "App"）
+
+使用者先按 `Shift+A`（系統直接輸出大寫 "A"，輸入法不攔截），接著輸入 "pp"，系統偵測到 vowel 覆蓋 vowel（路徑 B'），自動切換為英文模式並輸出 "pp"，最終輸出 "App"。
+
+### 情境 4：誤觸發處理
 
 使用者不小心按錯鍵觸發了英文模式，連按兩次 Backspace 即可返回中文模式並刪除錯誤輸入。
 
@@ -46,23 +50,24 @@
 
 | 需求 ID | 描述 | 優先級 | 狀態 |
 |---------|------|--------|------|
-| REQ-001 | 支援所有注音鍵盤排列（大千、倚天、許氏等） | P0 | 待實作 |
-| REQ-002 | 連續 2 個無效注音按鍵觸發臨時英文模式 | P0 | 待實作 |
-| REQ-003 | 空白鍵返回中文模式 | P0 | 待實作 |
-| REQ-004 | Tab 鍵返回中文模式 | P0 | 待實作 |
-| REQ-005 | Backspace 連按 2 次返回中文模式並刪除輸入 | P0 | 待實作 |
-| REQ-006 | 輸入標點符號自動返回中文模式 | P0 | 待實作 |
-| REQ-007 | 設定開關控制功能啟用/停用 | P0 | 待實作 |
-| REQ-008 | 設定項位於「輸入設定」頁面 | P0 | 待實作 |
+| REQ-001 | 支援標準大千排列（其他排列待後續擴展） | P0 | 已實作 |
+| REQ-002 | 偵測英文輸入意圖（多條觸發路徑 A/B/B'/C/C'/D） | P0 | 已實作 |
+| REQ-003 | 空白鍵返回中文模式 | P0 | 已實作 |
+| REQ-004 | Tab 鍵返回中文模式 | P0 | 已實作 |
+| REQ-005 | Backspace 連按 2 次返回中文模式並刪除輸入 | P0 | 已實作 |
+| REQ-006 | 輸入標點符號自動返回中文模式 | P0 | 已實作 |
+| REQ-007 | 設定開關控制功能啟用/停用 | P0 | 已實作 |
+| REQ-008 | 設定項位於「輸入設定」頁面 | P0 | 已實作 |
 
 ### 3.2 觸發條件
 
-**觸發臨時英文模式（四條觸發路徑）：**
+**觸發臨時英文模式（六條觸發路徑）：**
 
 | 路徑 | 名稱 | 條件 | 行為 |
 |------|------|------|------|
 | A | 無效鍵（排列限定） | 按鍵在當前排列中無對應注音（如倚天的 q/x） | 立即進入英文緩衝模式 |
 | B | Consonant 覆蓋 | consonant slot 非空，且被另一個聲母覆蓋 | 立即進入英文緩衝模式 |
+| B' | Vowel 覆蓋 Vowel | vowel slot 非空，且新按鍵又被解讀為 vowel（consonant slot 未改變） | 立即進入英文緩衝模式 |
 | C | Semivowel 後接 Consonant | semivowel slot 非空且 consonant slot 空，接收後 consonant 變非空 | 立即進入英文緩衝模式 |
 | C' | Vowel 後接 Consonant | vowel slot 非空（韻母在前）且 consonant slot 空，接收後 consonant 變非空 | 立即進入英文緩衝模式 |
 | D | 讀音無效 | 組字時 `hasUnigramsFor` 回傳 false，且 keySequence 非空 | 直接 commit keySequence 為英文（不進入緩衝模式） |
@@ -82,6 +87,18 @@
 - 打 `e`（ㄍ 聲母）→ ㄍ 覆蓋 ㄔ，consonantBefore ≠ consonantAfter → 路徑 B 觸發
 - 進入英文緩衝 "te"
 
+**路徑 B' 範例（app → 英文，有聲母）：**
+- 打 `a`（ㄇ 聲母）→ consonant slot = ㄇ，keySequence = "a"
+- 打 `p`（大千動態：consonant 存在時 → ㄡ 韻母）→ vowel slot = ㄡ，keySequence = "ap"
+- 打第二個 `p`（vowel slot 已有 ㄡ，再次 vowel）→ vowelBefore 非空且 consonant 未改變 → 路徑 B' 觸發
+- 進入英文緩衝 "app"
+
+**路徑 B' 範例（pp → 英文，無聲母；對應 "App" 場景）：**
+- `Shift+A` → 系統直接輸出 `A`，IME 不攔截，composer 保持為空
+- 打 `p`（大千靜態：無聲母時 → ㄣ 韻母）→ vowel slot = ㄣ，keySequence = "p"
+- 打第二個 `p`（vowel slot 已有 ㄣ，再次 vowel）→ 路徑 B' 觸發
+- 進入英文緩衝 "pp"（最終輸出 "App"）
+
 **路徑 C' 範例（is → 英文，非「の」）：**
 - 打 `i`（ㄛ 韻母）→ vowel slot = ㄛ，keySequence = "i"
 - 打 `s`（ㄋ 聲母）→ vowel 後接 consonant → 路徑 C' 觸發
@@ -89,7 +106,7 @@
 
 **路徑 D 範例（to → commit 英文）：**
 - 打 `t`（ㄔ 聲母）→ keySequence = "t"
-- 打 `o`（ㄟ 韻母）→ keySequence = "to"（路徑 B/C/C' 未觸發）
+- 打 `o`（ㄟ 韻母）→ keySequence = "to"（路徑 B/B'/C/C' 未觸發）
 - 打 `space` → ㄔㄟ 在語彙庫無效，路徑 D 觸發，直接 commit "to"
 
 ---
@@ -126,13 +143,14 @@
                     └────────┬─────────┘
                              │
               ┌──────────────┼──────────────────────┐
-              │ Path A/B/C   │ Path D               │ Valid key
-              │ (Immediate)  │ (Space on invalid    │ (normal)
-              ▼              │  reading)            ▼
-      ┌───────────────┐      │             ┌────────────────┐
-      │ TempEnglish   │      ▼             │ Normal phonabet│
-      │ Buffer Mode   │  ┌───────────────┐ │ processing     │
-      └───────┬───────┘  │ Commit keys   │ └────────────────┘
+              │ Path A/B/B'  │ Path D               │ Valid key
+              │ /C/C'        │ (Space on invalid    │ (normal)
+              │ (Immediate)  │  reading)            ▼
+              ▼              │             ┌────────────────┐
+      ┌───────────────┐      │             │ Normal phonabet│
+      │ TempEnglish   │      ▼             │ processing     │
+      │ Buffer Mode   │  ┌───────────────┐ └────────────────┘
+      └───────┬───────┘  │ Commit keys   │
               │          │ as English    │
               │          └───────────────┘
     ┌─────────┼─────────────────┐
@@ -202,7 +220,11 @@ final class SmartSwitchState {
    c. 呼叫 evaluateSmartSwitch()：
       ├─ 路徑 A：按鍵在排列中無效 → triggerTempEnglishMode
       ├─ 路徑 B：consonantBefore 非空 且 consonantAfter ≠ consonantBefore → triggerTempEnglishMode
-      ├─ 路徑 C/C'：(semivowelBefore 或 vowelBefore) 非空 且 consonantBefore 空 且 consonantAfter 非空 → triggerTempEnglishMode
+      ├─ 路徑 B'：vowelBefore 非空 且 consonantAfter == consonantBefore 且 vowelAfter 非空
+      │          → triggerTempEnglishMode
+      │          （涵蓋有聲母如 "app"、及無聲母如 Shift+A 後的 "pp" 兩種情況）
+      ├─ 路徑 C/C'：(semivowelBefore 或 vowelBefore) 非空 且 consonantBefore 空 且 consonantAfter 非空
+      │            → triggerTempEnglishMode
       └─ 否則：追加 keySequence，繼續正常處理
 
 4. 路徑 D（在 composeReadingIfReady 內）：
@@ -274,6 +296,16 @@ private func isReturnToChineseTrigger(_ input: InputSignalProtocol) -> Bool {
 | TC-008 | 在臨時英文模式下繼續輸入字母 | 持續累積英文字母 |
 | TC-009 | 功能停用時輸入 "ab" | 不觸發英文模式，正常處理 |
 | TC-010 | 注拼槽有內容時輸入 "ab" | 不觸發英文模式 |
+| TC-011 | 輸入 "mail" + Enter | 路徑 B（m→a 聲母覆蓋）觸發，commit "mail" |
+| TC-012 | 輸入 "test" + Enter | 路徑 B（t→e 聲母覆蓋）觸發，commit "test" |
+| TC-013 | Backspace 單擊（英文模式） | 刪除最後一個英文字母 |
+| TC-014 | Backspace 雙擊（英文模式） | 清空緩衝，返回中文模式 |
+| TC-015 | 診斷 "test" + Enter 的逐步狀態 | 各步驟 commission 正確 |
+| TC-016 | 組字區有漢字時觸發英文切換 | 漢字先 commit，再進入英文模式 |
+| TC-017 | 路徑 D：打 "to" + Space（ㄔㄟ 無效） | 直接 commit "to" 為英文 |
+| TC-018 | 路徑 C'：打 "is"（ㄛ→ㄋ） | 進入英文模式，緩衝 "is"，不輸出「の」 |
+| TC-019 | 路徑 B'：打 "app"（聲母+韻母+再次韻母） | 進入英文模式，緩衝 "app" |
+| TC-020 | 路徑 B'：打 "pp"（無聲母，Shift+A 後場景） | 進入英文模式，緩衝 "pp" |
 
 ### 6.2 不同鍵盤排列測試
 
@@ -329,6 +361,7 @@ private func isReturnToChineseTrigger(_ input: InputSignalProtocol) -> Bool {
 | 日期 | 版本 | 修訂內容 | 作者 |
 |------|------|---------|------|
 | 2026-03-28 | 1.0 | 初始設計文件 | AI Assistant |
+| 2026-03-29 | 1.1 | 新增路徑 B'（vowel 覆蓋 vowel）、路徑 C'（vowel 後接 consonant）；新增情境 3（App 大寫開頭）；更新需求狀態為已實作；更新測試案例至 TC-020 | AI Assistant |
 
 ---
 
