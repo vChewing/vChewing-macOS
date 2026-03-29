@@ -717,4 +717,54 @@ final class SmartSwitchTests {
       "No text should be committed on smart switch trigger; got: \(testSession.recentCommissions)"
     )
   }
+
+  /// TC-019: 路徑 B' — consonant+vowel 後再接同一 vowel（vowel 覆蓋 vowel），觸發英文切換
+  /// 場景：打 'a'（大千：ㄇ 聲母）再打 'p'（大千：聲母存在時 → ㄡ 韻母），
+  /// 再打第二個 'p'（vowel slot 已有 ㄡ，再次輸入 vowel → vowel 覆蓋 vowel），
+  /// 這是英文 "app" 的輸入模式，應觸發智慧切換進入英文模式（英文緩衝 "app"）。
+  @Test("TC-019: Path B' — vowel overwriting vowel (with consonant present) triggers English mode")
+  func testPathBPrimeVowelOverwritingVowel() {
+    guard let testHandler, let testSession else {
+      Issue.record("testHandler or testSession is nil.")
+      return
+    }
+
+    resetTestState()
+    testSession.recentCommissions.removeAll()
+
+    // 驗證功能已啟用
+    #expect(testHandler.prefs.smartChineseEnglishSwitchEnabled == true)
+
+    // 打 'a'（大千：ㄇ 聲母）→ composer consonant slot 有 ㄇ
+    _ = testHandler.triageInput(event: createKeyEvent(char: "a"))
+    #expect(!testHandler.composer.isEmpty, "Composer should have ㄇ after 'a'")
+    #expect(testHandler.smartSwitchState.keySequence == "a", "keySequence should be 'a'")
+
+    // 打 'p'（大千：consonant 已存在時 → ㄡ 韻母）→ composer vowel slot 有 ㄡ
+    _ = testHandler.triageInput(event: createKeyEvent(char: "p"))
+    #expect(!testHandler.composer.isEmpty, "Composer should have ㄇㄡ after 'ap'")
+    #expect(testHandler.smartSwitchState.keySequence == "ap", "keySequence should be 'ap'")
+    #expect(!testHandler.smartSwitchState.isTempEnglishMode, "Should NOT be in English mode after 'ap'")
+
+    // 打第二個 'p'（vowel 已有 ㄡ，再次輸入 vowel → 路徑 B' 觸發）
+    _ = testHandler.triageInput(event: createKeyEvent(char: "p"))
+
+    // 應已進入英文模式
+    #expect(
+      testHandler.smartSwitchState.isTempEnglishMode,
+      "Should be in temp English mode after vowel overwriting vowel (path B')"
+    )
+
+    // 英文緩衝應包含 'app'
+    #expect(
+      testHandler.smartSwitchState.englishBuffer == "app",
+      "English buffer should be 'app', got: '\(testHandler.smartSwitchState.englishBuffer)'"
+    )
+
+    // 不應有任何 commit
+    #expect(
+      testSession.recentCommissions.isEmpty,
+      "No text should be committed on smart switch trigger; got: \(testSession.recentCommissions)"
+    )
+  }
 }

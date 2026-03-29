@@ -704,6 +704,18 @@ extension PhonabetTypewriter {
         return triggerTempEnglishMode(session: session)
       }
 
+      // 路徑 B'：vowel slot 被再次填入（vowelBefore 非空 + consonantBefore 非空 + consonant 沒有改變）
+      // 在大千排列中，聲母+韻母後繼續打字母，若該字母又被解讀為韻母，是英文輸入的標誌
+      // 例：'a'=ㄇ + 'p'=ㄡ（有聲母時）+ 'p'=ㄡ（再次 vowel）→ "app"
+      let vowelAfter = handler.composer.vowel.value
+      if !vowelBefore.isEmpty, !consonantBefore.isEmpty, consonantAfter == consonantBefore, !vowelAfter.isEmpty {
+        handler.smartSwitchState.keySequence.append(inputText)
+        handler.composer.clear()
+        commitAssemblerContentIfNeeded(session: session)
+        handler.assembler.clear()
+        return triggerTempEnglishMode(session: session)
+      }
+
       // 路徑 C（含 C'）：semivowel 或 vowel 後接 consonant
       // 在大千排列中，正常注音輸入者會先打聲母再打介音/韻母；
       // 介音或韻母後接聲母是英文輸入的標誌（如 'i'=ㄛ 後接 's'=ㄋ → "is" 非「の」）
