@@ -15,8 +15,8 @@
 - **詳情**:
   - Tekkon: 22 tests ✓
   - Megrez: 26 tests ✓
-  - Typewriter: 38 tests ✓ (包含 10 個 SmartSwitchTests)
-  - **總計: 86 tests passed**
+  - Typewriter: 49 tests ✓ (包含 20 個 SmartSwitchTests)
+  - **總計: 97 tests passed**
 - **修復**: 修正 TC-002 測試的狀態重置問題（確保 `resetTestState()` 啟用功能旗標）
 
 ### 步驟 3: Lint
@@ -70,6 +70,17 @@
    - TC-008: 繼續英文輸入
    - TC-009: 功能停用時不觸發
    - TC-010: 注拼槽有內容時不觸發
+   - TC-011: 輸入 "mail" + Enter（路徑 B）
+   - TC-012: 輸入 "test" + Enter（路徑 B）
+   - TC-013: Backspace 單擊刪除最後一個字母
+   - TC-014: Backspace 雙擊清空緩衝返回中文
+   - TC-015: 診斷 "test" + Enter 逐步狀態
+   - TC-016: 組字區有漢字時觸發英文切換（先 commit 漢字）
+   - TC-017: 路徑 D（"to" + Space，ㄔㄟ 無效，直接 commit 英文）
+   - TC-018: 路徑 C'（"is"，ㄛ→ㄋ，不輸出「の」）
+   - TC-019: 路徑 B'（"app"，聲母+韻母+再次韻母）
+   - TC-020: 路徑 B'（"pp"，無聲母，Shift+A 後場景）
+   - TC-021: Enter 鍵在臨時英文模式下提交緩衝且消耗 Enter（不穿透給應用程式）
 
 ## 修改的檔案清單
 
@@ -79,7 +90,7 @@
 
 ## 新增測試數量
 
-- **10 個單元測試** (SmartSwitchTests)
+- **20 個單元測試** (SmartSwitchTests)
 - **0 個整合測試**（功能已整合至現有測試流程）
 
 ## 已知限制
@@ -92,6 +103,7 @@
 
 ```
 db5430da Typewriter // SmartSwitchTests: Fix test state reset to enable feature flag
+TBD       Typewriter // SmartSwitch: Fix Enter key passing through to app in temp English mode
 ```
 
 ## 驗證指令

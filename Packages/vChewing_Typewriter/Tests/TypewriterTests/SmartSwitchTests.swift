@@ -782,4 +782,45 @@ final class SmartSwitchTests {
       "No text should be committed on smart switch trigger; got: \(testSession.recentCommissions)"
     )
   }
+
+  /// TC-021: 臨時英文模式下按 Enter，應提交英文緩衝並消耗 Enter（不穿透給應用程式）
+  /// 重現場景：打 'test' 進入英文模式後按 Enter，
+  /// 預期：'test' 被 commit、Enter 被消耗（triageInput 返回 true）、不再處於英文模式。
+  @Test("TC-021: Enter in temp English mode commits buffer and consumes Enter")
+  func testEnterInTempEnglishModeConsumesEnter() {
+    guard let testHandler, let testSession else {
+      Issue.record("testHandler or testSession is nil.")
+      return
+    }
+
+    resetTestState()
+    testSession.recentCommissions.removeAll()
+
+    // 輸入 't', 'e', 's', 't'（觸發臨時英文模式）
+    _ = testHandler.triageInput(event: createKeyEvent(char: "t"))
+    _ = testHandler.triageInput(event: createKeyEvent(char: "e"))
+    _ = testHandler.triageInput(event: createKeyEvent(char: "s"))
+    _ = testHandler.triageInput(event: createKeyEvent(char: "t"))
+
+    // 確認已進入英文模式且緩衝正確
+    #expect(testHandler.smartSwitchState.isTempEnglishMode, "Should be in temp English mode")
+    #expect(testHandler.smartSwitchState.englishBuffer == "test", "Buffer should be 'test'")
+
+    // 按 Enter
+    let enterEvent = KBEvent.KeyEventData.dataEnterReturn.asEvent
+    let result = testHandler.triageInput(event: enterEvent)
+
+    // Enter 應被消耗（返回 true），不應穿透給應用程式
+    #expect(result == true, "Enter should be consumed (return true), not passed to the app")
+
+    // 'test' 應被 commit 出去
+    #expect(
+      testSession.recentCommissions.contains("test"),
+      "Expected 'test' in commissions, got: \(testSession.recentCommissions)"
+    )
+
+    // 應已退出英文模式
+    #expect(!testHandler.smartSwitchState.isTempEnglishMode, "Should have exited temp English mode")
+    #expect(testHandler.smartSwitchState.englishBuffer.isEmpty, "English buffer should be empty")
+  }
 }

@@ -58,6 +58,7 @@
 | REQ-006 | 輸入標點符號自動返回中文模式 | P0 | 已實作 |
 | REQ-007 | 設定開關控制功能啟用/停用 | P0 | 已實作 |
 | REQ-008 | 設定項位於「輸入設定」頁面 | P0 | 已實作 |
+| REQ-009 | Enter 鍵在臨時英文模式下提交英文緩衝並消耗 Enter（不穿透給應用程式） | P0 | 已實作 |
 
 ### 3.2 觸發條件
 
@@ -77,6 +78,7 @@
 **返回中文模式：**
 - 按下空白鍵（同時送出英文緩衝）
 - 按下 Tab 鍵（同時送出英文緩衝）
+- 按下 Enter 鍵（同時送出英文緩衝；Enter 本身被消耗，不穿透給應用程式）
 - 按下 Backspace 連續兩次（清空緩衝）
 - 輸入標點符號（,.?! 等，同時送出英文緩衝）
 
@@ -208,6 +210,7 @@ final class SmartSwitchState {
 2. 若處於臨時英文模式（isTempEnglishMode）：
    ├─ 英文字母 → 加入 englishBuffer，顯示緩衝
    ├─ Space / Tab → commit englishBuffer，返回中文模式
+   ├─ Enter → commit englishBuffer，返回中文模式（Enter 被消耗，不穿透）
    ├─ 標點符號 → commit englishBuffer，輸出標點，返回中文模式
    └─ Backspace：
       ├─ 距上次 Backspace ≤ 門檻 → 雙擊：清空返回中文模式
@@ -306,6 +309,7 @@ private func isReturnToChineseTrigger(_ input: InputSignalProtocol) -> Bool {
 | TC-018 | 路徑 C'：打 "is"（ㄛ→ㄋ） | 進入英文模式，緩衝 "is"，不輸出「の」 |
 | TC-019 | 路徑 B'：打 "app"（聲母+韻母+再次韻母） | 進入英文模式，緩衝 "app" |
 | TC-020 | 路徑 B'：打 "pp"（無聲母，Shift+A 後場景） | 進入英文模式，緩衝 "pp" |
+| TC-021 | 臨時英文模式下按 Enter | Enter 被消耗（回傳 true）、英文緩衝提交、退出英文模式 |
 
 ### 6.2 不同鍵盤排列測試
 
@@ -362,6 +366,7 @@ private func isReturnToChineseTrigger(_ input: InputSignalProtocol) -> Bool {
 |------|------|---------|------|
 | 2026-03-28 | 1.0 | 初始設計文件 | AI Assistant |
 | 2026-03-29 | 1.1 | 新增路徑 B'（vowel 覆蓋 vowel）、路徑 C'（vowel 後接 consonant）；新增情境 3（App 大寫開頭）；更新需求狀態為已實作；更新測試案例至 TC-020 | AI Assistant |
+| 2026-03-29 | 1.2 | 新增 REQ-009（Enter 鍵在英文模式下消耗不穿透）；補充 Enter 路徑至狀態機流程說明；新增 TC-021 | AI Assistant |
 
 ---
 
