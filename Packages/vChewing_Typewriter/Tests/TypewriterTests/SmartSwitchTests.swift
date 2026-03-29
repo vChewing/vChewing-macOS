@@ -767,4 +767,51 @@ final class SmartSwitchTests {
       "No text should be committed on smart switch trigger; got: \(testSession.recentCommissions)"
     )
   }
+
+  /// TC-020: 路徑 B' — 無聲母時 vowel 覆蓋 vowel 也應觸發英文切換
+  /// 場景：Shift+A 由系統直接輸出 "A"（輸入法不攔截），之後 composer 為空。
+  /// 接著打 'p'（大千：無聲母時 → ㄣ 韻母），再打 'p'（ㄣ 覆蓋 ㄣ）。
+  /// 此時 consonantBefore 為空，但 vowelBefore 非空，應觸發英文切換（英文緩衝 "pp"）。
+  @Test("TC-020: Path B' — vowel overwriting vowel without consonant also triggers English mode")
+  func testPathBPrimeVowelOverwritingVowelNoConsonant() {
+    guard let testHandler, let testSession else {
+      Issue.record("testHandler or testSession is nil.")
+      return
+    }
+
+    resetTestState()
+    testSession.recentCommissions.removeAll()
+
+    // 驗證功能已啟用
+    #expect(testHandler.prefs.smartChineseEnglishSwitchEnabled == true)
+    // composer 為空（模擬 Shift+A 已由系統輸出後的狀態）
+    #expect(testHandler.composer.isEmpty)
+
+    // 打 'p'（大千：無聲母時 → ㄣ 韻母）→ composer vowel slot 有 ㄣ
+    _ = testHandler.triageInput(event: createKeyEvent(char: "p"))
+    #expect(!testHandler.composer.isEmpty, "Composer should have ㄣ after 'p'")
+    #expect(testHandler.smartSwitchState.keySequence == "p", "keySequence should be 'p'")
+    #expect(!testHandler.smartSwitchState.isTempEnglishMode, "Should NOT be in English mode after first 'p'")
+
+    // 打第二個 'p'（vowel slot 已有 ㄣ，再次輸入 vowel → 路徑 B' 應觸發）
+    _ = testHandler.triageInput(event: createKeyEvent(char: "p"))
+
+    // 應已進入英文模式
+    #expect(
+      testHandler.smartSwitchState.isTempEnglishMode,
+      "Should be in temp English mode after vowel overwriting vowel (no consonant, path B')"
+    )
+
+    // 英文緩衝應包含 'pp'
+    #expect(
+      testHandler.smartSwitchState.englishBuffer == "pp",
+      "English buffer should be 'pp', got: '\(testHandler.smartSwitchState.englishBuffer)'"
+    )
+
+    // 不應有任何 commit
+    #expect(
+      testSession.recentCommissions.isEmpty,
+      "No text should be committed on smart switch trigger; got: \(testSession.recentCommissions)"
+    )
+  }
 }

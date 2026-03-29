@@ -704,11 +704,12 @@ extension PhonabetTypewriter {
         return triggerTempEnglishMode(session: session)
       }
 
-      // 路徑 B'：vowel slot 被再次填入（vowelBefore 非空 + consonantBefore 非空 + consonant 沒有改變）
-      // 在大千排列中，聲母+韻母後繼續打字母，若該字母又被解讀為韻母，是英文輸入的標誌
-      // 例：'a'=ㄇ + 'p'=ㄡ（有聲母時）+ 'p'=ㄡ（再次 vowel）→ "app"
+      // 路徑 B'：vowel slot 被再次填入（vowelBefore 非空 + consonant 沒有改變 + vowelAfter 非空）
+      // 在大千排列中，韻母後繼續打字母，若該字母又被解讀為韻母，是英文輸入的標誌
+      // 有聲母：'a'=ㄇ + 'p'=ㄡ（有聲母時）+ 'p'=ㄡ（再次 vowel）→ "app"
+      // 無聲母：（Shift+A 系統輸出後）'p'=ㄣ + 'p'=ㄣ（再次 vowel）→ "pp"（"App" 場景）
       let vowelAfter = handler.composer.vowel.value
-      if !vowelBefore.isEmpty, !consonantBefore.isEmpty, consonantAfter == consonantBefore, !vowelAfter.isEmpty {
+      if !vowelBefore.isEmpty, consonantAfter == consonantBefore, !vowelAfter.isEmpty {
         handler.smartSwitchState.keySequence.append(inputText)
         handler.composer.clear()
         commitAssemblerContentIfNeeded(session: session)
