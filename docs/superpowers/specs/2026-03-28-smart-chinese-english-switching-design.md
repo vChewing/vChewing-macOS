@@ -57,26 +57,40 @@
 
 ### 3.2 觸發條件
 
-**觸發臨時英文模式：**
-- 目前處於中文輸入模式
-- 功能已啟用
-- 連續輸入 2 個或以上無效的注音按鍵
-- 注拼槽（composer）為空（沒有正在組合的注音）
+**觸發臨時英文模式（四條觸發路徑）：**
+
+| 路徑 | 名稱 | 條件 | 行為 |
+|------|------|------|------|
+| A | 無效鍵（排列限定） | 按鍵在當前排列中無對應注音（如倚天的 q/x） | 立即進入英文緩衝模式 |
+| B | Consonant 覆蓋 | consonant slot 非空，且被另一個聲母覆蓋 | 立即進入英文緩衝模式 |
+| C | Semivowel 後接 Consonant | semivowel slot 非空且 consonant slot 空，接收後 consonant 變非空 | 立即進入英文緩衝模式 |
+| C' | Vowel 後接 Consonant | vowel slot 非空（韻母在前）且 consonant slot 空，接收後 consonant 變非空 | 立即進入英文緩衝模式 |
+| D | 讀音無效 | 組字時 `hasUnigramsFor` 回傳 false，且 keySequence 非空 | 直接 commit keySequence 為英文（不進入緩衝模式） |
+
+**注意：** 目前實作**僅支援標準大千排列**。大千排列中所有 26 個字母均有有效映射，故路徑 A 永遠不觸發。
 
 **返回中文模式：**
-- 按下空白鍵
-- 按下 Tab 鍵
-- 按下 Backspace 鍵兩次
-- 輸入標點符號（,.?! 等）
+- 按下空白鍵（同時送出英文緩衝）
+- 按下 Tab 鍵（同時送出英文緩衝）
+- 按下 Backspace 連續兩次（清空緩衝）
+- 輸入標點符號（,.?! 等，同時送出英文緩衝）
 
-### 3.3 無效按鍵定義
+### 3.3 觸發路徑詳述
 
-對於不同鍵盤排列，無效按鍵的定義：
+**路徑 B 範例（test → 英文）：**
+- 打 `t`（ㄔ 聲母）→ consonant slot = ㄔ，keySequence = "t"
+- 打 `e`（ㄍ 聲母）→ ㄍ 覆蓋 ㄔ，consonantBefore ≠ consonantAfter → 路徑 B 觸發
+- 進入英文緩衝 "te"
 
-1. **標準注音排列**：按鍵無法對應到任何注音符號
-2. **動態排列（許氏、倚天26等）**：按鍵無法對應到任何注音符號且無法組合
+**路徑 C' 範例（is → 英文，非「の」）：**
+- 打 `i`（ㄛ 韻母）→ vowel slot = ㄛ，keySequence = "i"
+- 打 `s`（ㄋ 聲母）→ vowel 後接 consonant → 路徑 C' 觸發
+- 進入英文緩衝 "is"（不會誤組為 ㄋㄛ → の）
 
-**注意：** 聲調鍵（3, 4, 6, 7）在注音組字時會被視為有效鍵，因此不會觸發英文模式。
+**路徑 D 範例（to → commit 英文）：**
+- 打 `t`（ㄔ 聲母）→ keySequence = "t"
+- 打 `o`（ㄟ 韻母）→ keySequence = "to"（路徑 B/C/C' 未觸發）
+- 打 `space` → ㄔㄟ 在語彙庫無效，路徑 D 觸發，直接 commit "to"
 
 ---
 
@@ -111,100 +125,88 @@
                     │ (Normal Typing)  │
                     └────────┬─────────┘
                              │
-              ┌──────────────┼──────────────┐
-              │ Invalid Key  │ Invalid Key  │ Valid Key
-              ▼              ▼              ▼
-       ┌────────────┐ ┌────────────┐ ┌────────────┐
-       │ Counter=1  │ │ Counter=2  │ │ Clear      │
-       │ (Wait)     │ │ (Trigger)  │ │ Counter    │
-       └────────────┘ └─────┬──────┘ └────────────┘
-                            │
-                            ▼
-                    ┌──────────────────┐
-                    │ TempEnglishMode  │◄────────────────┐
-                    │ (English Typing) │                 │
-                    └────────┬─────────┘                 │
-                             │                          │
-         ┌───────────────────┼───────────────────┐      │
-         │ Space/Tab         │ Backspace×2       │ Punct│
-         │ Punctuation       │                   │      │
-         ▼                   ▼                   │      │
-┌──────────────────┐ ┌──────────────────┐       │      │
-│ Return to        │ │ Return to        │       │      │
-│ Chinese Mode     │ │ Chinese Mode     │       │      │
-│ (Clear Buffer)   │ │ + Delete Chars   │       │      │
-└──────────────────┘ └──────────────────┘       │      │
-                                                │      │
-         ┌──────────────────────────────────────┘      │
-         │ Invalid Key                                  │
-         ▼                                              │
-┌──────────────────┐                                    │
-│ Continue English │────────────────────────────────────┘
-│ Typing           │
-└──────────────────┘
+              ┌──────────────┼──────────────────────┐
+              │ Path A/B/C   │ Path D               │ Valid key
+              │ (Immediate)  │ (Space on invalid    │ (normal)
+              ▼              │  reading)            ▼
+      ┌───────────────┐      │             ┌────────────────┐
+      │ TempEnglish   │      ▼             │ Normal phonabet│
+      │ Buffer Mode   │  ┌───────────────┐ │ processing     │
+      └───────┬───────┘  │ Commit keys   │ └────────────────┘
+              │          │ as English    │
+              │          └───────────────┘
+    ┌─────────┼─────────────────┐
+    │ Space/  │ Backspace×2     │ Punct/Tab
+    │ Tab     │                 │
+    ▼         ▼                 ▼
+┌─────────┐ ┌─────────┐ ┌─────────────┐
+│ Commit  │ │ Clear   │ │ Commit      │
+│ English │ │ Buffer  │ │ English     │
+│ Return  │ │ Return  │ │ Output Punct│
+│ Chinese │ │ Chinese │ │ Return      │
+└─────────┘ └─────────┘ │ Chinese     │
+                        └─────────────┘
 ```
 
 ### 4.3 核心資料結構
 
 ```swift
-// 在 PhonabetTypewriter 中新增的狀態追蹤
-extension PhonabetTypewriter {
-    /// 智慧切換狀態追蹤
-    struct SmartSwitchState {
-        /// 連續無效按鍵計數
-        var invalidKeyCount: Int = 0
-        
-        /// 是否處於臨時英文模式
-        var isTempEnglishMode: Bool = false
-        
-        /// 臨時英文模式下的輸入緩衝
-        var englishBuffer: String = ""
-        
-        /// 上一次按鍵時間（用於 Backspace 雙擊檢測）
-        var lastBackspaceTime: Date?
-        
-        /// Backspace 連續計數
-        var backspaceCount: Int = 0
-        
-        /// 重置所有狀態
-        mutating func reset() {
-            invalidKeyCount = 0
-            isTempEnglishMode = false
-            englishBuffer = ""
-            lastBackspaceTime = nil
-            backspaceCount = 0
-        }
-    }
+// SmartSwitchState（class，在 InputHandler 中作為 reference type 管理）
+final class SmartSwitchState {
+    /// 連續無效按鍵計數（用於路徑 A 等需要計數的情境）
+    var invalidKeyCount: Int = 0
+
+    /// 是否處於臨時英文模式
+    var isTempEnglishMode: Bool = false
+
+    /// 臨時英文模式下的輸入緩衝
+    var englishBuffer: String = ""
+
+    /// 按鍵序列記錄（從 composer 進入非空狀態的第一個鍵開始累積）
+    var keySequence: String = ""
+
+    /// 上一次按 Backspace 的時間（用於雙擊 Backspace 偵測）
+    var lastBackspaceTime: Date?
+
+    /// Backspace 連續計數
+    var backspaceCount: Int = 0
+
+    func reset() { ... }
+    func enterTempEnglishMode() { ... }
+    func appendEnglishChar(_ char: String) { ... }
+    func deleteLastEnglishChar() { ... }
+    func exitTempEnglishMode() { ... }
 }
 ```
 
 ### 4.4 演算法流程
 
-**主處理流程（handle 方法）：**
+**主處理流程（`handle` 方法中的智慧切換邏輯）：**
 
 ```
 1. 檢查功能是否啟用（prefs.smartChineseEnglishSwitchEnabled）
    └─ 若未啟用，跳過所有智慧切換邏輯
 
-2. 若處於臨時英文模式：
-   ├─ 檢查是否為返回中文模式的觸發鍵
-   │  ├─ 是：提交英文緩衝區內容，返回中文模式
-   │  └─ 否：繼續累積英文輸入
-   └─ 檢查是否為 Backspace
-      ├─ 雙擊：刪除最後一個英文字母並返回中文模式
-      └─ 單擊：刪除最後一個英文字母
+2. 若處於臨時英文模式（isTempEnglishMode）：
+   ├─ 英文字母 → 加入 englishBuffer，顯示緩衝
+   ├─ Space / Tab → commit englishBuffer，返回中文模式
+   ├─ 標點符號 → commit englishBuffer，輸出標點，返回中文模式
+   └─ Backspace：
+      ├─ 距上次 Backspace ≤ 門檻 → 雙擊：清空返回中文模式
+      └─ 否則 → 單擊：刪最後一個字母
 
-3. 若處於中文模式：
-   ├─ 檢查按鍵是否為有效注音
-   │  ├─ 是：重置無效計數器，正常處理
-   │  └─ 否：
-   │     ├─ 無效計數器 + 1
-   │     ├─ 若計數器 >= 2：進入臨時英文模式
-   │     └─ 若計數器 < 2：等待下一個按鍵
-   └─ 處理其他邏輯
+3. 若處於中文模式且是字母輸入：
+   a. 在 composer 接收按鍵「之前」記錄狀態：
+      consonantBefore, semivowelBefore, vowelBefore, composerValueBefore
+   b. 讓 composer 接收按鍵
+   c. 呼叫 evaluateSmartSwitch()：
+      ├─ 路徑 A：按鍵在排列中無效 → triggerTempEnglishMode
+      ├─ 路徑 B：consonantBefore 非空 且 consonantAfter ≠ consonantBefore → triggerTempEnglishMode
+      ├─ 路徑 C/C'：(semivowelBefore 或 vowelBefore) 非空 且 consonantBefore 空 且 consonantAfter 非空 → triggerTempEnglishMode
+      └─ 否則：追加 keySequence，繼續正常處理
 
-4. 定期清理狀態
-   └─ 在合適的時機（如 commit、switchState）重置計數器
+4. 路徑 D（在 composeReadingIfReady 內）：
+   └─ hasUnigramsFor 回傳 false 且 keySequence 非空 → 直接 ofCommitting(keySequence)
 ```
 
 ### 4.5 觸發條件偵測

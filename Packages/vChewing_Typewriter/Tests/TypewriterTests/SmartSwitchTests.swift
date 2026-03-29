@@ -463,4 +463,258 @@ final class SmartSwitchTests {
     // 驗證英文緩衝區內容
     #expect(testHandler.smartSwitchState.englishBuffer == "test", "English buffer should contain 'test'")
   }
+
+  /// TC-014: 輸入 'test' 後按空格，驗證最終 commit 出去的是 'test'
+  @Test("TC-014: Pressing Space after 'test' commits 'test'")
+  func testSpaceAfterTestCommitsTest() {
+    guard let testHandler, let testSession else {
+      Issue.record("testHandler or testSession is nil.")
+      return
+    }
+
+    resetTestState()
+    testSession.recentCommissions.removeAll()
+
+    // 輸入 't', 'e', 's', 't'
+    _ = testHandler.triageInput(event: createKeyEvent(char: "t"))
+    _ = testHandler.triageInput(event: createKeyEvent(char: "e"))
+    _ = testHandler.triageInput(event: createKeyEvent(char: "s"))
+    _ = testHandler.triageInput(event: createKeyEvent(char: "t"))
+
+    // 驗證英文緩衝正確
+    #expect(testHandler.smartSwitchState.englishBuffer == "test", "Buffer should be 'test'")
+
+    // 按空格（觸發 commitEnglishAndReturnToChinese）
+    let spaceEvent = KBEvent.KeyEventData.dataSpace.asEvent
+    _ = testHandler.triageInput(event: spaceEvent)
+
+    // 'test' 應該被 commit 出去
+    #expect(
+      testSession.recentCommissions.contains("test"),
+      "Expected 'test' in commissions, got: \(testSession.recentCommissions)"
+    )
+  }
+
+  /// TC-013: 驗證路徑 B 觸發時不會誤把注音字符 commit 出去
+  /// 重現 ㄍst bug：按 test，結果注音的 ㄍ 被誤 commit，s/t 沒有進英文緩衝
+  @Test("TC-013: Path B trigger must not commit phonabet char")
+  func testPathBDoesNotCommitPhonabet() {
+    guard let testHandler, let testSession else {
+      Issue.record("testHandler or testSession is nil.")
+      return
+    }
+
+    resetTestState()
+    testSession.recentCommissions.removeAll()
+
+    // 驗證功能已啟用
+    #expect(testHandler.prefs.smartChineseEnglishSwitchEnabled == true)
+
+    // 輸入 't'（大千：ㄔ 聲母）
+    _ = testHandler.triageInput(event: createKeyEvent(char: "t"))
+
+    // 輸入 'e'（大千：ㄍ 覆蓋 ㄔ）→ 路徑 B 觸發
+    _ = testHandler.triageInput(event: createKeyEvent(char: "e"))
+
+    // 不應該有任何注音字符被 commit 出去
+    #expect(
+      testSession.recentCommissions.isEmpty,
+      "No phonabet should be committed on smart switch trigger; got: \(testSession.recentCommissions)"
+    )
+
+    // 應該進入英文模式
+    #expect(testHandler.smartSwitchState.isTempEnglishMode, "Should be in temp English mode")
+
+    // 英文緩衝應該包含 'te'
+    #expect(
+      testHandler.smartSwitchState.englishBuffer == "te",
+      "English buffer should be 'te', got: '\(testHandler.smartSwitchState.englishBuffer)'"
+    )
+
+    // 繼續輸入 's', 't'
+    _ = testHandler.triageInput(event: createKeyEvent(char: "s"))
+    _ = testHandler.triageInput(event: createKeyEvent(char: "t"))
+
+    // 仍在英文模式
+    #expect(testHandler.smartSwitchState.isTempEnglishMode, "Should still be in temp English mode")
+
+    // 英文緩衝應該是完整的 'test'
+    #expect(
+      testHandler.smartSwitchState.englishBuffer == "test",
+      "English buffer should be 'test', got: '\(testHandler.smartSwitchState.englishBuffer)'"
+    )
+  }
+
+  /// TC-016: 組字區有漢字時觸發英文切換，漢字應被 commit 出去，不丟失
+  /// 重現場景：打「測試輸入」（漢字已在組字區），再打 'te' 觸發路徑 B，
+  /// 預期「測試輸入」應被先 commit，再進入英文模式
+  @Test("TC-016: Assembled Chinese text should be committed before entering English mode")
+  func testAssembledChineseCommittedBeforeEnglishMode() {
+    guard let testHandler, let testSession else {
+      Issue.record("testHandler or testSession is nil.")
+      return
+    }
+
+    resetTestState()
+    testSession.recentCommissions.removeAll()
+
+    // 先組出一個漢字：輸入「ㄓ」+「ㄨ」+「ˋ」= 注（注音鍵：y + m + 4）
+    // y = ㄗ, / = ㄥ ... 改用更簡單的方式：1 = ㄅ, p = ㄡ, 4 = ˋ → 「簿」不在測試 LM
+    // 用 su3 = ㄋ + ㄨ + ˇ → 「女」（若存在）... 先確認測試 LM 存在的字
+    // 直接用 ji3 = ㄐ + ㄧ + ˇ → 使用 j=ㄖ... 
+    // 大千排列：ru3 = ㄖ+ㄨ+ˇ → 「乳」；g=ㄕ, l=ㄠ... 
+    // 最簡單：直接往 assembler 插入已知存在的 key，繞過注拼槽
+    // 查測試 LM 的 "ㄓㄨˋ"（注）："y"=ㄗ, "m"=ㄩ... 大千 y=ㄗ 不對
+    // 大千排列 t=ㄔ, w=ㄘ, i=ㄛ... 改用直接插入 assembler key 的方式
+    _ = testHandler.assembler.insertKey("ㄅㄧˋ")
+    testHandler.assemble()
+    // 確認 assembler 非空
+    #expect(!testHandler.assembler.isEmpty, "Assembler should have content after insertKey")
+
+    testSession.recentCommissions.removeAll()
+
+    // 現在輸入 't'（大千：ㄔ 聲母）→ composer 有 ㄔ
+    _ = testHandler.triageInput(event: createKeyEvent(char: "t"))
+    // 此時 assembler 仍有漢字，composer 有 ㄔ
+
+    // 輸入 'e'（大千：ㄍ 覆蓋 ㄔ）→ 路徑 B 觸發
+    _ = testHandler.triageInput(event: createKeyEvent(char: "e"))
+
+    // 驗證：已組漢字應被 commit 出去（不丟失）
+    #expect(
+      !testSession.recentCommissions.isEmpty,
+      "Assembled Chinese text should have been committed before English mode"
+    )
+
+    // 驗證：已進入英文模式
+    #expect(testHandler.smartSwitchState.isTempEnglishMode, "Should be in temp English mode")
+
+    // 驗證：英文緩衝包含 'te'
+    #expect(
+      testHandler.smartSwitchState.englishBuffer == "te",
+      "English buffer should be 'te', got: '\(testHandler.smartSwitchState.englishBuffer)'"
+    )
+  }
+
+  /// TC-017: 路徑 D — 讀音無效時直接 commit keySequence 為英文
+  /// 場景：打 't'（ㄔ）+ 'o'（ㄟ）+ space，ㄔㄟ 在語彙庫中無效，
+  /// 預期：直接 commit "to"，不進入英文緩衝模式
+  @Test("TC-017: Path D — invalid reading on Space commits keySequence as English")
+  func testPathDInvalidReadingCommitsKeySequence() {
+    guard let testHandler, let testSession else {
+      Issue.record("testHandler or testSession is nil.")
+      return
+    }
+
+    resetTestState()
+    testSession.recentCommissions.removeAll()
+
+    // 驗證功能已啟用
+    #expect(testHandler.prefs.smartChineseEnglishSwitchEnabled == true)
+
+    // 打 't'（大千：ㄔ 聲母）
+    _ = testHandler.triageInput(event: createKeyEvent(char: "t"))
+    #expect(!testHandler.composer.isEmpty, "Composer should have ㄔ after 't'")
+    #expect(testHandler.smartSwitchState.keySequence == "t", "keySequence should be 't'")
+
+    // 打 'o'（大千：ㄟ 韻母）→ ㄔ + ㄟ = ㄔㄟ（語彙庫中無效讀音）
+    // 路徑 B/C 不觸發（consonant 未被覆蓋、無介音後接聲母），keySequence 追加為 "to"
+    _ = testHandler.triageInput(event: createKeyEvent(char: "o"))
+    // 路徑 B/C 未觸發，應仍在中文模式
+    #expect(!testHandler.smartSwitchState.isTempEnglishMode, "Should NOT be in English mode after 'o'")
+    #expect(testHandler.smartSwitchState.keySequence == "to", "keySequence should be 'to'")
+
+    // 打 space（confirmCombination = true）→ composeReadingIfReady 被呼叫
+    // ㄔㄟ 在語彙庫中找不到 → 路徑 D 觸發，commit "to"
+    let spaceEvent = KBEvent.KeyEventData.dataSpace.asEvent
+    _ = testHandler.triageInput(event: spaceEvent)
+
+    // 驗證 "to" 已被 commit 出去
+    #expect(
+      testSession.recentCommissions.contains("to"),
+      "Expected 'to' in commissions (Path D), got: \(testSession.recentCommissions)"
+    )
+
+    // 路徑 D 直接 commit，不進入英文緩衝模式
+    #expect(!testHandler.smartSwitchState.isTempEnglishMode, "Should NOT be in temp English mode after Path D")
+
+    // composer 應已被清空
+    #expect(testHandler.composer.isEmpty, "Composer should be empty after Path D commit")
+  }
+
+  /// TC-015: 診斷測試——追蹤 'test'+Enter 的每步 commission 與 state 變化
+  @Test("TC-015: Diagnose 'test'+Enter commissions step by step")
+  func testDiagnoseTestEnterCommissions() {
+    guard let testHandler, let testSession else {
+      Issue.record("testHandler or testSession is nil.")
+      return
+    }
+
+    resetTestState()
+    testSession.recentCommissions.removeAll()
+
+    // Step 1: 't'
+    _ = testHandler.triageInput(event: createKeyEvent(char: "t"))
+    print("[DIAG] after 't': commissions=\(testSession.recentCommissions), englishBuffer='\(testHandler.smartSwitchState.englishBuffer)', isTempEng=\(testHandler.smartSwitchState.isTempEnglishMode), stateType=\(testSession.state.type.rawValue), displayedText='\(testSession.state.displayedText)'")
+
+    // Step 2: 'e'（路徑 B 觸發）
+    _ = testHandler.triageInput(event: createKeyEvent(char: "e"))
+    print("[DIAG] after 'e': commissions=\(testSession.recentCommissions), englishBuffer='\(testHandler.smartSwitchState.englishBuffer)', isTempEng=\(testHandler.smartSwitchState.isTempEnglishMode), stateType=\(testSession.state.type.rawValue), displayedText='\(testSession.state.displayedText)'")
+
+    // Step 3: 's'
+    _ = testHandler.triageInput(event: createKeyEvent(char: "s"))
+    print("[DIAG] after 's': commissions=\(testSession.recentCommissions), englishBuffer='\(testHandler.smartSwitchState.englishBuffer)', isTempEng=\(testHandler.smartSwitchState.isTempEnglishMode), stateType=\(testSession.state.type.rawValue), displayedText='\(testSession.state.displayedText)'")
+
+    // Step 4: 't'
+    _ = testHandler.triageInput(event: createKeyEvent(char: "t"))
+    print("[DIAG] after 't2': commissions=\(testSession.recentCommissions), englishBuffer='\(testHandler.smartSwitchState.englishBuffer)', isTempEng=\(testHandler.smartSwitchState.isTempEnglishMode), stateType=\(testSession.state.type.rawValue), displayedText='\(testSession.state.displayedText)'")
+
+    // Step 5: Enter
+    _ = testHandler.triageInput(event: KBEvent.KeyEventData.dataEnterReturn.asEvent)
+    print("[DIAG] after 'Enter': commissions=\(testSession.recentCommissions), englishBuffer='\(testHandler.smartSwitchState.englishBuffer)', isTempEng=\(testHandler.smartSwitchState.isTempEnglishMode), stateType=\(testSession.state.type.rawValue), displayedText='\(testSession.state.displayedText)'")
+  }
+
+  /// TC-018: 路徑 C' — vowel 後接 consonant 觸發英文切換
+  /// 場景：打 'i'（大千：ㄛ 韻母）再打 's'（大千：ㄋ 聲母），
+  /// 正常注音不會 vowel 後接 consonant，應觸發智慧切換進入英文模式（英文緩衝 "is"）。
+  /// Bug 重現：若未修復，ㄛ+ㄋ = ㄋㄛ → commit「の」（日文假名）。
+  @Test("TC-018: Path C' — vowel followed by consonant triggers English mode")
+  func testPathCPrimeVowelFollowedByConsonant() {
+    guard let testHandler, let testSession else {
+      Issue.record("testHandler or testSession is nil.")
+      return
+    }
+
+    resetTestState()
+    testSession.recentCommissions.removeAll()
+
+    // 驗證功能已啟用
+    #expect(testHandler.prefs.smartChineseEnglishSwitchEnabled == true)
+
+    // 打 'i'（大千：ㄛ 韻母）→ composer vowel slot 有 ㄛ
+    _ = testHandler.triageInput(event: createKeyEvent(char: "i"))
+    #expect(!testHandler.composer.isEmpty, "Composer should have ㄛ after 'i'")
+    #expect(testHandler.smartSwitchState.keySequence == "i", "keySequence should be 'i'")
+
+    // 打 's'（大千：ㄋ 聲母）→ vowel 後接 consonant，應觸發路徑 C'
+    _ = testHandler.triageInput(event: createKeyEvent(char: "s"))
+
+    // 應已進入英文模式（不應輸出「の」）
+    #expect(
+      testHandler.smartSwitchState.isTempEnglishMode,
+      "Should be in temp English mode after vowel+consonant (path C')"
+    )
+
+    // 英文緩衝應包含 'is'
+    #expect(
+      testHandler.smartSwitchState.englishBuffer == "is",
+      "English buffer should be 'is', got: '\(testHandler.smartSwitchState.englishBuffer)'"
+    )
+
+    // 不應有任何 commit（特別是不應該有「の」）
+    #expect(
+      testSession.recentCommissions.isEmpty,
+      "No text should be committed on smart switch trigger; got: \(testSession.recentCommissions)"
+    )
+  }
 }

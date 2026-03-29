@@ -52,6 +52,10 @@ extension KBEvent.KeyEventData {
     chars: KBEvent.SpecialKey.deleteForward.unicodeScalar.description,
     keyCode: KeyCode.kWindowsDelete.rawValue
   )
+  static let dataSpace = KBEvent.KeyEventData(
+    chars: " ",
+    keyCode: KeyCode.kSpace.rawValue
+  )
   static let backspace = KBEvent.KeyEventData(
     chars: KBEvent.SpecialKey.backspace.unicodeScalar.description,
     keyCode: KeyCode.kBackSpace.rawValue

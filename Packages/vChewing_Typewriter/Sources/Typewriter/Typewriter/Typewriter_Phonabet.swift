@@ -31,37 +31,15 @@ public struct PhonabetTypewriter<Handler: InputHandlerProtocol>: TypewriterProto
   /// 用來處理 InputHandler.HandleInput() 當中的與注音输入有關的組字行為。
   /// - Parameter input: 輸入訊號。
   /// - Returns: 告知 IMK「該按鍵是否已經被輸入法攔截處理」。
-  public func handle(_ input: some InputSignalProtocol) -> Bool? {
+   public func handle(_ input: some InputSignalProtocol) -> Bool? {
     guard let session = handler.session else { return nil }
     let prefs = handler.prefs
 
-    // MARK: 智慧中英文切換處理
-    if prefs.smartChineseEnglishSwitchEnabled {
-      // 檢查是否處於臨時英文模式
-      if handler.smartSwitchState.isTempEnglishMode {
-        if let result = handleTempEnglishMode(input, session: session) {
-          return result
-        }
-      } else {
-        // 檢查是否應該觸發臨時英文模式
-        let result = checkAndTriggerSmartSwitch(input, prefs: prefs)
-        if result == true {
-          return true  // 已處理，攔截按鍵
-        }
-        // 如果 result 為 false（只有 1 個字母），也應該攔截按鍵，不繼續處理
-        if result == false {
-          return true  // 攔截按鍵，不讓它被當作注音處理
-        }
-        // result == nil 表示不進行智慧切換，繼續正常處理
+    // MARK: 智慧中英文切換 - 臨時英文模式攔截
+    if prefs.smartChineseEnglishSwitchEnabled, handler.smartSwitchState.isTempEnglishMode {
+      if let result = handleTempEnglishMode(input, session: session) {
+        return result
       }
-    } else {
-      // 功能未啟用時，確保重置狀態
-      handler.smartSwitchState.reset()
-    }
-
-    // 檢查是否需要重置狀態
-    if shouldResetSmartSwitchState(input) {
-      handler.smartSwitchState.reset()
     }
 
     var inputText = (input.inputTextIgnoringModifiers ?? input.text)
@@ -72,6 +50,21 @@ public struct PhonabetTypewriter<Handler: InputHandlerProtocol>: TypewriterProto
         || input.isControlHold || input.isOptionHold || input.isShiftHold || input.isCommandHold
     let confirmCombination = input.isSpace || input.isEnter
 
+    // MARK: 智慧中英文切換 - 觸發偵測（在 composer 接收之前記錄狀態）
+    let smartSwitchEnabled = prefs.smartChineseEnglishSwitchEnabled
+    let composerValueBefore = handler.composer.value
+    let consonantBefore = handler.composer.consonant.value
+    let semivowelBefore = handler.composer.semivowel.value
+    let vowelBefore = handler.composer.vowel.value
+    let isLetterInput = !skipPhoneticHandling && !confirmCombination
+      && inputText.count == 1 && inputText.first?.isLetter == true
+    let isValidPhonabetKey = handler.composer.inputValidityCheck(charStr: inputText)
+
+    // 重置智慧切換計數（Enter/Esc/Ctrl/Cmd 時）
+    if smartSwitchEnabled, shouldResetSmartSwitchState(input) {
+      handler.smartSwitchState.reset()
+    }
+
     // 先嘗試讓注拼槽消化當前按鍵（含可能的聲調覆寫），以保留既有行為。
     let consumption = consumeReadingInputIfNeeded(
       input: input,
@@ -81,6 +74,23 @@ public struct PhonabetTypewriter<Handler: InputHandlerProtocol>: TypewriterProto
       prefs: prefs,
       session: session
     )
+
+    // MARK: 智慧中英文切換 - composer 接收後立即判斷（在 handled 提前返回之前）
+    if smartSwitchEnabled, isLetterInput {
+      if let result = evaluateSmartSwitch(
+        inputText: inputText,
+        isValidPhonabetKey: isValidPhonabetKey,
+        composerValueBefore: composerValueBefore,
+        consonantBefore: consonantBefore,
+        semivowelBefore: semivowelBefore,
+        vowelBefore: vowelBefore,
+        keyConsumedByReading: consumption.keyConsumed,
+        session: session
+      ) {
+        return result
+      }
+    }
+
     if let handled = consumption.handled { return handled }
 
     // 若讀音已備妥，嘗試組字並進入候選或直接提交。
@@ -174,6 +184,20 @@ public struct PhonabetTypewriter<Handler: InputHandlerProtocol>: TypewriterProto
       if prefs.keepReadingUponCompositionError {
         if handler.composer.hasIntonation() { handler.composer.doBackSpace() }
         session.switchState(handler.generateStateOfInputting())
+        return true
+      }
+
+      // 路徑 D：讀音無效時，若智慧中英文切換啟用且有按鍵序列記錄，
+      // 則直接將 keySequence 作為英文 commit 出去（如：ㄔㄟ → "to"）。
+      if prefs.smartChineseEnglishSwitchEnabled,
+         !handler.smartSwitchState.isTempEnglishMode,
+         !handler.smartSwitchState.keySequence.isEmpty {
+        let keysToCommit = handler.smartSwitchState.keySequence
+        handler.smartSwitchState.reset()
+        handler.composer.clear()
+        commitAssemblerContentIfNeeded(session: session)
+        handler.assembler.clear()
+        session.switchState(State.ofCommitting(textToCommit: keysToCommit))
         return true
       }
 
@@ -513,10 +537,15 @@ extension PhonabetTypewriter {
     let char = input.text
     if char.count == 1, char.first?.isLetter == true {
       handler.smartSwitchState.appendEnglishChar(char)
-      // 更新狀態顯示（使用 sansReading: true 避免顯示注音）
-      var state = handler.generateStateOfInputting(sansReading: true)
-      state.tooltip = handler.smartSwitchState.englishBuffer
-      state.tooltipDuration = 0
+      // 直接建構 ofInputting 狀態顯示英文緩衝。
+      // 不能用 generateStateOfInputting()，因為 assembler 為空時會返回 ofAbortion，
+      // 而 ofAbortion 的 tooltip 會被 switchState 忽略且清空 inline display。
+      let buffer = handler.smartSwitchState.englishBuffer
+      let state = State.ofInputting(
+        displayTextSegments: [buffer],
+        cursor: buffer.count,
+        highlightAt: nil
+      )
       session.switchState(state)
       return true
     }
@@ -543,10 +572,10 @@ extension PhonabetTypewriter {
     let englishText = handler.smartSwitchState.exitTempEnglishMode()
 
     if !englishText.isEmpty {
-      // 建立提交狀態
-      var state = handler.generateStateOfInputting()
-      state.textToCommit = englishText
-      session.switchState(state)
+      // 使用 ofCommitting 狀態直接提交英文文字。
+      // 不能用 generateStateOfInputting()，因為在英文模式下 composer/assembler 為空，
+      // 該函式會返回 ofAbortion，而 ofAbortion 不處理 textToCommit。
+      session.switchState(State.ofCommitting(textToCommit: englishText))
     }
 
     // 重置後繼續處理當前按鍵（如果是空白或標點，會被正常處理）
@@ -561,9 +590,8 @@ extension PhonabetTypewriter {
     let englishText = handler.smartSwitchState.exitTempEnglishMode()
 
     if !englishText.isEmpty {
-      var state = handler.generateStateOfInputting()
-      state.textToCommit = englishText
-      session.switchState(state)
+      // 使用 ofCommitting 狀態直接提交英文文字。
+      session.switchState(State.ofCommitting(textToCommit: englishText))
     }
 
     return false // 讓後續邏輯處理當前按鍵
@@ -580,10 +608,7 @@ extension PhonabetTypewriter {
     if timeDiff <= backspaceDoubleTapThreshold {
       // 雙擊 Backspace：刪除所有並返回中文模式
       handler.smartSwitchState.reset()
-      var state = handler.generateStateOfInputting()
-      state.tooltip = "已返回中文模式"
-      state.tooltipDuration = 1
-      session.switchState(state)
+      session.switchState(State.ofAbortion())
       return true
     } else {
       // 單擊 Backspace：刪除最後一個字母
@@ -591,86 +616,141 @@ extension PhonabetTypewriter {
       handler.smartSwitchState.lastBackspaceTime = now
       handler.smartSwitchState.backspaceCount = 1
 
-      var state = handler.generateStateOfInputting()
       if handler.smartSwitchState.englishBuffer.isEmpty {
         // 如果已經刪完，返回中文模式
         handler.smartSwitchState.reset()
-        state.tooltip = "已返回中文模式"
-        state.tooltipDuration = 1
+        session.switchState(State.ofAbortion())
       } else {
-        state.tooltip = handler.smartSwitchState.englishBuffer
-        state.tooltipDuration = 0
+        // 顯示剩餘的英文緩衝（直接建構 ofInputting）
+        let buffer = handler.smartSwitchState.englishBuffer
+        let state = State.ofInputting(
+          displayTextSegments: [buffer],
+          cursor: buffer.count,
+          highlightAt: nil
+        )
+        session.switchState(state)
       }
-      session.switchState(state)
       return true
     }
   }
 
-  /// 檢查並觸發智慧中英文切換
-  /// 邏輯：當 composer 為空且連續輸入 2 個英文字母時，觸發英文模式
-  /// - Returns: true 表示已處理（攔截按鍵），nil 表示不進行智慧切換
-  private func checkAndTriggerSmartSwitch(
-    _ input: some InputSignalProtocol,
-    prefs: some PrefMgrProtocol
+  /// 若 assembler 非空，將已組漢字以 ofCommitting 狀態 commit 出去。
+  /// 用於智慧中英文切換觸發前，避免組字區內容被 assembler.clear() 直接丟棄。
+  private func commitAssemblerContentIfNeeded(session: Session) {
+    guard !handler.assembler.isEmpty else { return }
+    let displayedText = handler.generateStateOfInputting(sansReading: true).displayedText
+    guard !displayedText.isEmpty else { return }
+    session.switchState(State.ofCommitting(textToCommit: displayedText))
+  }
+
+  /// 在 composer 接收按鍵後，判斷是否應觸發智慧中英文切換。
+  ///
+  /// 三條觸發路徑：
+  /// - 路徑 A（有無效鍵的排列，如倚天/許氏）：`inputValidityCheck` 返回 false，
+  ///   代表該字母根本不是有效注音按鍵，composer 沒有接收 → 立即觸發
+  /// - 路徑 B（consonant 覆蓋）：composer 接收前 consonant slot 非空，
+  ///   接收後 consonant slot 值改變（被另一個聲母覆蓋）→ 立即觸發
+  /// - 路徑 C（semivowel/vowel 後接 consonant）：composer 接收前 semivowel 或 vowel slot 非空且
+  ///   consonant slot 空，接收後 consonant slot 從空變成非空 → 立即觸發
+  ///   （在大千排列中，正常注音輸入者會先打聲母再打介音/韻母；介音或韻母後接聲母是英文輸入的標誌）
+  ///   典型例子：'i'（ㄛ）後接 's'（ㄋ）→ 英文 "is" 而非日文「の」（ㄋㄛ）
+  ///
+  /// keySequence 從 composer 不為空的第一個按鍵開始累積，包含所有有效的注音按鍵。
+  /// 觸發時把整個 keySequence 轉成英文緩衝輸出。
+  ///
+  /// - Returns: `true` 表示已攔截並觸發英文模式，`nil` 表示繼續正常注音處理
+  private func evaluateSmartSwitch(
+    inputText: String,
+    isValidPhonabetKey: Bool,
+    composerValueBefore: String,
+    consonantBefore: String,
+    semivowelBefore: String,
+    vowelBefore: String,
+    keyConsumedByReading: Bool,
+    session: Session
   ) -> Bool? {
-    // 忽略特殊按鍵
-    if input.isReservedKey || input.isNumericPadKey || input.isNonLaptopFunctionKey
-      || input.isControlHold || input.isOptionHold || input.isCommandHold
-    {
+    // 路徑 A：排列中本來就沒有這個字母（倚天 q/x 等），composer 未接收
+    if !isValidPhonabetKey {
+      handler.smartSwitchState.keySequence.append(inputText)
+      return triggerTempEnglishMode(session: session)
+    }
+
+    guard keyConsumedByReading else { return nil }
+
+    let composerValueAfter = handler.composer.value
+    let consonantAfter = handler.composer.consonant.value
+
+    // composer 從空變成非空（第一個按鍵進入 composer），開始追蹤按鍵序列
+    if composerValueBefore.isEmpty, !composerValueAfter.isEmpty {
+      handler.smartSwitchState.keySequence = inputText
+      handler.smartSwitchState.invalidKeyCount = 0
       return nil
     }
 
-    // 取得輸入文字
-    let inputText = input.text.lowercased()
-    guard inputText.count == 1 else {
-      return nil
+    // composer 非空時繼續追蹤
+    if !composerValueBefore.isEmpty {
+      if composerValueAfter.isEmpty {
+        // composer 被清空（組字成功或被清除）→ 重置狀態，不觸發
+        handler.smartSwitchState.reset()
+        return nil
+      }
+
+      // 路徑 B：consonant slot 被覆蓋（consonant 從某值變成另一個值）
+      if !consonantBefore.isEmpty, consonantAfter != consonantBefore {
+        handler.smartSwitchState.keySequence.append(inputText)
+        handler.composer.clear()
+        commitAssemblerContentIfNeeded(session: session)
+        handler.assembler.clear()
+        return triggerTempEnglishMode(session: session)
+      }
+
+      // 路徑 C（含 C'）：semivowel 或 vowel 後接 consonant
+      // 在大千排列中，正常注音輸入者會先打聲母再打介音/韻母；
+      // 介音或韻母後接聲母是英文輸入的標誌（如 'i'=ㄛ 後接 's'=ㄋ → "is" 非「の」）
+      if (!semivowelBefore.isEmpty || !vowelBefore.isEmpty), consonantBefore.isEmpty, !consonantAfter.isEmpty {
+        handler.smartSwitchState.keySequence.append(inputText)
+        handler.composer.clear()
+        commitAssemblerContentIfNeeded(session: session)
+        handler.assembler.clear()
+        return triggerTempEnglishMode(session: session)
+      }
+
+      // 按鍵讓 composer 有正常進展 → 追加到序列，重置計數
+      handler.smartSwitchState.keySequence.append(inputText)
+      handler.smartSwitchState.invalidKeyCount = 0
     }
 
-    // 檢查是否為字母
-    guard inputText.first?.isLetter == true else {
-      // 非字母按鍵重置計數器
-      handler.smartSwitchState.reset()
-      return nil
-    }
+    return nil
+  }
 
-    // 如果 composer 不為空，表示正在組合注音，不進行智慧切換
-    if !handler.composer.isEmpty {
-      handler.smartSwitchState.reset()
-      return nil
-    }
+  /// 執行進入臨時英文模式的動作，將 `keySequence` 內容放入英文緩衝並更新畫面。
+  private func triggerTempEnglishMode(session: Session) -> Bool {
+    let keysToConvert = handler.smartSwitchState.keySequence
+    handler.smartSwitchState.enterTempEnglishMode()
+    handler.smartSwitchState.appendEnglishChar(keysToConvert)
 
-    // 累積按鍵序列（SmartSwitchState 現在是 class，直接修改）
-    handler.smartSwitchState.keySequence.append(inputText)
-    handler.smartSwitchState.incrementInvalidCount()
-
-    // 檢查是否達到觸發條件（連續 2 個字母且 composer 為空）
-    if handler.smartSwitchState.keySequence.count >= 2 {
-      // 保存要轉換的按鍵序列
-      let keysToConvert = handler.smartSwitchState.keySequence
-
-      // 清空 composer 和 assembler（防止之前的按鍵殘留顯示）
-      handler.composer.clear()
-      handler.assembler.clear()
-
-      // 進入臨時英文模式
-      handler.smartSwitchState.enterTempEnglishMode()
-      handler.smartSwitchState.appendEnglishChar(keysToConvert)
-
-      // 顯示狀態
-      guard let session = handler.session else { return true }
-      // 先切換到 Empty 狀態清除畫面上的注音顯示
-      session.switchState(State.ofEmpty())
-      // 再顯示英文模式狀態
-      var state = handler.generateStateOfInputting(sansReading: true)
-      state.tooltip = handler.smartSwitchState.englishBuffer
-      state.tooltipDuration = 0
+    // 先用 ofAbortion 清除 composer 的注音顯示（不會 commit previous displayedText）。
+    // 再立即建構 ofInputting 顯示英文緩衝，讓用戶看到已輸入的英文字母序列。
+    session.switchState(State.ofAbortion())
+    let buffer = handler.smartSwitchState.englishBuffer
+    if !buffer.isEmpty {
+      let state = State.ofInputting(
+        displayTextSegments: [buffer],
+        cursor: buffer.count,
+        highlightAt: nil
+      )
       session.switchState(state)
-
-      return true
     }
-
-    // 只有 1 個字母，還沒達到觸發條件
-    // 返回 true 攔截該按鍵（不讓 composer 接收）
     return true
+  }
+
+  /// 檢查並觸發智慧中英文切換（僅用於有無效鍵排列的前置偵測，已被 evaluateSmartSwitch 取代）。
+  ///
+  /// 仿 macOS 內建注音行為：當 composer 為空，且輸入的字母不是當前注音排列的有效鍵時，
+  /// 立即切換成臨時英文模式，並將該字母放入英文緩衝。
+  ///
+  /// - Returns: `true` 表示已處理（攔截按鍵），`nil` 表示不進行智慧切換（讓注音正常處理）
+  private func checkAndTriggerSmartSwitch(_ input: some InputSignalProtocol) -> Bool? {
+    nil // 已由 evaluateSmartSwitch 取代，保留此函式避免呼叫點編譯錯誤
   }
 }
