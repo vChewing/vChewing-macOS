@@ -642,38 +642,6 @@ final class SmartSwitchTests {
     #expect(testHandler.composer.isEmpty, "Composer should be empty after Path D commit")
   }
 
-  /// TC-015: 診斷測試——追蹤 'test'+Enter 的每步 commission 與 state 變化
-  @Test("TC-015: Diagnose 'test'+Enter commissions step by step")
-  func testDiagnoseTestEnterCommissions() {
-    guard let testHandler, let testSession else {
-      Issue.record("testHandler or testSession is nil.")
-      return
-    }
-
-    resetTestState()
-    testSession.recentCommissions.removeAll()
-
-    // Step 1: 't'
-    _ = testHandler.triageInput(event: createKeyEvent(char: "t"))
-    print("[DIAG] after 't': commissions=\(testSession.recentCommissions), englishBuffer='\(testHandler.smartSwitchState.englishBuffer)', isTempEng=\(testHandler.smartSwitchState.isTempEnglishMode), stateType=\(testSession.state.type.rawValue), displayedText='\(testSession.state.displayedText)'")
-
-    // Step 2: 'e'（路徑 B 觸發）
-    _ = testHandler.triageInput(event: createKeyEvent(char: "e"))
-    print("[DIAG] after 'e': commissions=\(testSession.recentCommissions), englishBuffer='\(testHandler.smartSwitchState.englishBuffer)', isTempEng=\(testHandler.smartSwitchState.isTempEnglishMode), stateType=\(testSession.state.type.rawValue), displayedText='\(testSession.state.displayedText)'")
-
-    // Step 3: 's'
-    _ = testHandler.triageInput(event: createKeyEvent(char: "s"))
-    print("[DIAG] after 's': commissions=\(testSession.recentCommissions), englishBuffer='\(testHandler.smartSwitchState.englishBuffer)', isTempEng=\(testHandler.smartSwitchState.isTempEnglishMode), stateType=\(testSession.state.type.rawValue), displayedText='\(testSession.state.displayedText)'")
-
-    // Step 4: 't'
-    _ = testHandler.triageInput(event: createKeyEvent(char: "t"))
-    print("[DIAG] after 't2': commissions=\(testSession.recentCommissions), englishBuffer='\(testHandler.smartSwitchState.englishBuffer)', isTempEng=\(testHandler.smartSwitchState.isTempEnglishMode), stateType=\(testSession.state.type.rawValue), displayedText='\(testSession.state.displayedText)'")
-
-    // Step 5: Enter
-    _ = testHandler.triageInput(event: KBEvent.KeyEventData.dataEnterReturn.asEvent)
-    print("[DIAG] after 'Enter': commissions=\(testSession.recentCommissions), englishBuffer='\(testHandler.smartSwitchState.englishBuffer)', isTempEng=\(testHandler.smartSwitchState.isTempEnglishMode), stateType=\(testSession.state.type.rawValue), displayedText='\(testSession.state.displayedText)'")
-  }
-
   /// TC-018: 路徑 C' — vowel 後接 consonant 觸發英文切換
   /// 場景：打 'i'（大千：ㄛ 韻母）再打 's'（大千：ㄋ 聲母），
   /// 正常注音不會 vowel 後接 consonant，應觸發智慧切換進入英文模式（英文緩衝 "is"）。

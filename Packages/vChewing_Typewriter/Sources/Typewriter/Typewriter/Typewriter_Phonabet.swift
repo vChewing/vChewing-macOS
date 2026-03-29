@@ -756,14 +756,4 @@ extension PhonabetTypewriter {
     }
     return true
   }
-
-  /// 檢查並觸發智慧中英文切換（僅用於有無效鍵排列的前置偵測，已被 evaluateSmartSwitch 取代）。
-  ///
-  /// 仿 macOS 內建注音行為：當 composer 為空，且輸入的字母不是當前注音排列的有效鍵時，
-  /// 立即切換成臨時英文模式，並將該字母放入英文緩衝。
-  ///
-  /// - Returns: `true` 表示已處理（攔截按鍵），`nil` 表示不進行智慧切換（讓注音正常處理）
-  private func checkAndTriggerSmartSwitch(_ input: some InputSignalProtocol) -> Bool? {
-    nil // 已由 evaluateSmartSwitch 取代，保留此函式避免呼叫點編譯錯誤
-  }
 }
