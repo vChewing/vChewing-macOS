@@ -11,10 +11,7 @@
 - 下載：https://gitee.com/vchewing/vChewing-macOS/releases
 - 程式碼倉庫：https://gitee.com/vchewing/vChewing-macOS
 
-| 欄 1 | 欄 2 | 欄 3 |
-|:----|:---:|:---:|
-| 項目 1 | 項目 2 | 項目 3 |
-| 項目 4 | 項目 5 | 項目 6 |# vChewing 唯音輸入法
+# vChewing 唯音輸入法
 
 唯音輸入法是一款為 macOS 平台開發的副廠**原生簡體中文、原生繁體中文注音輸入法**：
 
