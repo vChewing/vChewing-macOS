@@ -783,6 +783,39 @@ final class SmartSwitchTests {
     )
   }
 
+  /// TC-022: SmartSwitchState frozenSegments API
+  @Test("TC-022: SmartSwitchState frozenSegments tracks frozen display text")
+  func testFrozenSegmentsAPI() {
+    guard let testHandler else {
+      Issue.record("testHandler is nil.")
+      return
+    }
+    resetTestState()
+
+    // Initially empty
+    #expect(testHandler.smartSwitchState.frozenSegments.isEmpty)
+    #expect(testHandler.smartSwitchState.frozenDisplayText.isEmpty)
+
+    // freezeSegment appends
+    testHandler.smartSwitchState.freezeSegment("中文")
+    #expect(testHandler.smartSwitchState.frozenSegments == ["中文"])
+    #expect(testHandler.smartSwitchState.frozenDisplayText == "中文")
+
+    testHandler.smartSwitchState.freezeSegment("english")
+    #expect(testHandler.smartSwitchState.frozenSegments == ["中文", "english"])
+    #expect(testHandler.smartSwitchState.frozenDisplayText == "中文english")
+
+    // clearFrozenSegments clears
+    testHandler.smartSwitchState.clearFrozenSegments()
+    #expect(testHandler.smartSwitchState.frozenSegments.isEmpty)
+    #expect(testHandler.smartSwitchState.frozenDisplayText.isEmpty)
+
+    // reset() also clears frozenSegments
+    testHandler.smartSwitchState.freezeSegment("測試")
+    testHandler.smartSwitchState.reset()
+    #expect(testHandler.smartSwitchState.frozenSegments.isEmpty)
+  }
+
   /// TC-021: 臨時英文模式下按 Enter，應提交英文緩衝並消耗 Enter（不穿透給應用程式）
   /// 重現場景：打 'test' 進入英文模式後按 Enter，
   /// 預期：'test' 被 commit、Enter 被消耗（triageInput 返回 true）、不再處於英文模式。

@@ -30,10 +30,16 @@ public final class SmartSwitchState {
   /// 按鍵序列（用於檢查是否能組成有效讀音）
   public var keySequence: String = ""
 
+  /// 已凍結的文字段落（保留在組字區不提交）
+  public var frozenSegments: [String] = []
+
+  /// 已凍結文字的合併字串（供顯示用）
+  public var frozenDisplayText: String { frozenSegments.joined() }
+
   /// 預設初始化器
   public init() {}
 
-  /// 重置所有狀態
+  /// 重置所有狀態（含凍結段落）
   public func reset() {
     invalidKeyCount = 0
     isTempEnglishMode = false
@@ -41,6 +47,7 @@ public final class SmartSwitchState {
     lastBackspaceTime = nil
     backspaceCount = 0
     keySequence = ""
+    frozenSegments = []
   }
 
   /// 重置無效計數（當收到有效注音輸入時）
@@ -61,10 +68,15 @@ public final class SmartSwitchState {
     keySequence = ""
   }
 
-  /// 退出臨時英文模式
+  /// 退出臨時英文模式（不清除 frozenSegments，由呼叫方決定）
   public func exitTempEnglishMode() -> String {
     let buffer = englishBuffer
-    reset()
+    isTempEnglishMode = false
+    englishBuffer = ""
+    invalidKeyCount = 0
+    keySequence = ""
+    lastBackspaceTime = nil
+    backspaceCount = 0
     return buffer
   }
 
@@ -83,6 +95,17 @@ public final class SmartSwitchState {
   /// 檢查是否達到觸發門檻
   public func shouldTriggerTempEnglishMode(threshold: Int = 2) -> Bool {
     return invalidKeyCount >= threshold
+  }
+
+  /// 將一段文字凍結至 frozenSegments（不提交給 OS）
+  public func freezeSegment(_ text: String) {
+    guard !text.isEmpty else { return }
+    frozenSegments.append(text)
+  }
+
+  /// 清除凍結段落
+  public func clearFrozenSegments() {
+    frozenSegments = []
   }
 }
 
@@ -496,7 +519,9 @@ extension InputHandlerProtocol {
 
   /// 警告：該參數僅代指組音區/組筆區域與組字區在目前狀態下被視為「空」。
   public var isConsideredEmptyForNow: Bool {
-    assembler.isEmpty && isComposerOrCalligrapherEmpty && currentTypingMethod == .vChewingFactory
+    assembler.isEmpty && isComposerOrCalligrapherEmpty
+      && currentTypingMethod == .vChewingFactory
+      && smartSwitchState.frozenSegments.isEmpty
   }
 
   /// 要拿給 Megrez 使用的特殊游標位址，用於各種與節點判定有關的操作。
