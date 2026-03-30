@@ -31,7 +31,7 @@ public final class SmartSwitchState {
   public var keySequence: String = ""
 
   /// 已凍結的文字段落（保留在組字區不提交）
-  public var frozenSegments: [String] = []
+  public private(set) var frozenSegments: [String] = []
 
   /// 已凍結文字的合併字串（供顯示用）
   public var frozenDisplayText: String { frozenSegments.joined() }
@@ -41,13 +41,25 @@ public final class SmartSwitchState {
 
   /// 重置所有狀態（含凍結段落）
   public func reset() {
+    resetExceptFrozen()
+    frozenSegments = []
+  }
+
+  /// 退出臨時英文模式（不清除 frozenSegments，由呼叫方決定）
+  public func exitTempEnglishMode() -> String {
+    let buffer = englishBuffer
+    resetExceptFrozen()
+    return buffer
+  }
+
+  /// 重置除 frozenSegments 以外的所有狀態
+  private func resetExceptFrozen() {
     invalidKeyCount = 0
     isTempEnglishMode = false
     englishBuffer = ""
     lastBackspaceTime = nil
     backspaceCount = 0
     keySequence = ""
-    frozenSegments = []
   }
 
   /// 重置無效計數（當收到有效注音輸入時）
@@ -66,18 +78,6 @@ public final class SmartSwitchState {
     englishBuffer = ""
     invalidKeyCount = 0
     keySequence = ""
-  }
-
-  /// 退出臨時英文模式（不清除 frozenSegments，由呼叫方決定）
-  public func exitTempEnglishMode() -> String {
-    let buffer = englishBuffer
-    isTempEnglishMode = false
-    englishBuffer = ""
-    invalidKeyCount = 0
-    keySequence = ""
-    lastBackspaceTime = nil
-    backspaceCount = 0
-    return buffer
   }
 
   /// 追加英文字母

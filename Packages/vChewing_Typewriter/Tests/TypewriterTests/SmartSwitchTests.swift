@@ -814,6 +814,16 @@ final class SmartSwitchTests {
     testHandler.smartSwitchState.freezeSegment("測試")
     testHandler.smartSwitchState.reset()
     #expect(testHandler.smartSwitchState.frozenSegments.isEmpty)
+
+    // exitTempEnglishMode 不應清除 frozenSegments
+    testHandler.smartSwitchState.freezeSegment("中文")
+    testHandler.smartSwitchState.enterTempEnglishMode()
+    testHandler.smartSwitchState.appendEnglishChar("a")
+    _ = testHandler.smartSwitchState.exitTempEnglishMode()
+    #expect(
+      testHandler.smartSwitchState.frozenSegments == ["中文"],
+      "exitTempEnglishMode() should NOT clear frozenSegments"
+    )
   }
 
   /// TC-021: 臨時英文模式下按 Enter，應提交英文緩衝並消耗 Enter（不穿透給應用程式）
