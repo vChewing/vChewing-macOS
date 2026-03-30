@@ -826,6 +826,27 @@ final class SmartSwitchTests {
     )
   }
 
+  /// TC-023: generateStateOfInputting prepends frozenDisplayText when frozen segments exist
+  @Test("TC-023: generateStateOfInputting prepends frozenDisplayText")
+  func testGenerateStateOfInputtingPrependsFrozen() {
+    guard let testHandler else {
+      Issue.record("testHandler is nil.")
+      return
+    }
+    resetTestState()
+
+    // Freeze "中文" directly into frozenSegments
+    testHandler.smartSwitchState.freezeSegment("中文")
+
+    // generateStateOfInputting should include frozen text even with empty assembler/composer.
+    // We need the guarded flag to get ofInputting back when assembler is empty.
+    let state = testHandler.generateStateOfInputting(guarded: true)
+    #expect(
+      state.displayedText.hasPrefix("中文"),
+      "displayedText should start with frozen '中文', got: '\(state.displayedText)'"
+    )
+  }
+
   /// TC-021: 臨時英文模式下按 Enter，應提交英文緩衝並消耗 Enter（不穿透給應用程式）
   /// 重現場景：打 'test' 進入英文模式後按 Enter，
   /// 預期：'test' 被 commit、Enter 被消耗（triageInput 返回 true）、不再處於英文模式。

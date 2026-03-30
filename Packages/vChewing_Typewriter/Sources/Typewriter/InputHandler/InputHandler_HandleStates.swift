@@ -35,9 +35,13 @@ extension InputHandlerProtocol {
     var displayTextSegments: [String] = handleAsCodePointInput || handleAsRomanNumeralInput
       ? [strCodePointBuffer]
       : assembler.assembledSentence.values
+    // 若 smartSwitchState 有凍結段落，將其前置於顯示段落。
+    if !smartSwitchState.frozenSegments.isEmpty {
+      displayTextSegments = smartSwitchState.frozenSegments + displayTextSegments
+    }
     var cursor = handleAsCodePointInput || handleAsRomanNumeralInput
       ? displayTextSegments.joined().count
-      : convertCursorForDisplay(assembler.cursor)
+      : convertCursorForDisplay(assembler.cursor) + smartSwitchState.frozenDisplayText.count
     let cursorSansReading = cursor
     // 先提出來讀音資料，減輕運算負擔。
     let noReading = sansReading || [.codePoint, .romanNumerals].contains(currentTypingMethod)
