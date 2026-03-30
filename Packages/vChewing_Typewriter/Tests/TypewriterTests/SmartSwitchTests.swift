@@ -845,6 +845,11 @@ final class SmartSwitchTests {
       state.displayedText.hasPrefix("中文"),
       "displayedText should start with frozen '中文', got: '\(state.displayedText)'"
     )
+    // cursor should be at end of frozen text (assembler is empty, cursor = frozenDisplayText.count)
+    #expect(
+      state.cursor == "中文".count,
+      "cursor should be \("中文".count) (end of frozen text), got: \(state.cursor)"
+    )
   }
 
   /// TC-021: 臨時英文模式下按 Enter，應提交英文緩衝並消耗 Enter（不穿透給應用程式）

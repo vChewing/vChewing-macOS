@@ -40,7 +40,7 @@ extension InputHandlerProtocol {
       displayTextSegments = smartSwitchState.frozenSegments + displayTextSegments
     }
     var cursor = handleAsCodePointInput || handleAsRomanNumeralInput
-      ? displayTextSegments.joined().count
+      ? strCodePointBuffer.count + smartSwitchState.frozenDisplayText.count
       : convertCursorForDisplay(assembler.cursor) + smartSwitchState.frozenDisplayText.count
     let cursorSansReading = cursor
     // 先提出來讀音資料，減輕運算負擔。
