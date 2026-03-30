@@ -549,11 +549,10 @@ extension PhonabetTypewriter {
       // 建構 ofInputting 狀態：凍結段落（若有）+ 英文緩衝。
       let frozen = handler.smartSwitchState.frozenDisplayText
       let buffer = handler.smartSwitchState.englishBuffer
-      let segments = [frozen, buffer].filter { !$0.isEmpty }
-      let combined = frozen + buffer
+      let combinedDisplay = frozen + buffer
       let state = State.ofInputting(
-        displayTextSegments: segments,
-        cursor: combined.count,
+        displayTextSegments: [frozen, buffer].filter { !$0.isEmpty },
+        cursor: combinedDisplay.count,
         highlightAt: nil
       )
       session.switchState(state)
