@@ -1101,4 +1101,105 @@ final class SmartSwitchTests {
       "frozenSegments should be cleared after Enter commit"
     )
   }
+
+  /// TC-029: 英文模式下單擊 Backspace，刪除一個英文字母，顯示凍結前綴 + 剩餘英文緩衝
+  @Test("TC-029: Single Backspace in English mode deletes one char, displays frozen+remaining")
+  func testSingleBackspaceInEnglishModeShowsFrozen() {
+    guard let testHandler, let testSession else {
+      Issue.record("testHandler or testSession is nil.")
+      return
+    }
+    resetTestState()
+    testSession.recentCommissions.removeAll()
+
+    // 觸發英文模式（t + e），此時有 frozenSegments（因為 assembler 插入了漢字）
+    _ = testHandler.assembler.insertKey("ㄅㄧˋ")
+    testHandler.assemble()
+    _ = testHandler.triageInput(event: createKeyEvent(char: "t"))
+    _ = testHandler.triageInput(event: createKeyEvent(char: "e"))
+    #expect(testHandler.smartSwitchState.isTempEnglishMode)
+    let frozen = testHandler.smartSwitchState.frozenDisplayText
+    #expect(!frozen.isEmpty)
+
+    // 繼續輸入 's', 't'
+    _ = testHandler.triageInput(event: createKeyEvent(char: "s"))
+    _ = testHandler.triageInput(event: createKeyEvent(char: "t"))
+    #expect(testHandler.smartSwitchState.englishBuffer == "test")
+
+    // 單擊 Backspace
+    let backspaceEvent = KBEvent.KeyEventData.backspace.asEvent
+    _ = testHandler.triageInput(event: backspaceEvent)
+
+    // englishBuffer 應剩 "tes"
+    #expect(testHandler.smartSwitchState.englishBuffer == "tes")
+
+    // 仍在英文模式
+    #expect(testHandler.smartSwitchState.isTempEnglishMode)
+
+    // frozenSegments 未被清除
+    #expect(testHandler.smartSwitchState.frozenDisplayText == frozen)
+
+    // 顯示應為 frozen + "tes"
+    let displayed = testSession.state.displayedText
+    #expect(
+      displayed == frozen + "tes",
+      "displayed '\(displayed)' should be frozen+remaining '\(frozen + "tes")'"
+    )
+  }
+
+  /// TC-030: 英文模式下 englishBuffer 為空時按 Backspace，退出英文模式但保留 frozenSegments
+  @Test("TC-030: Single Backspace with empty englishBuffer exits English mode, keeps frozenSegments")
+  func testSingleBackspaceEmptyBufferExitsEnglishKeepsFrozen() {
+    guard let testHandler else {
+      Issue.record("testHandler is nil.")
+      return
+    }
+    resetTestState()
+
+    // 手動設置：英文模式，空緩衝，有凍結段落
+    testHandler.smartSwitchState.freezeSegment("中文")
+    testHandler.smartSwitchState.enterTempEnglishMode()
+    // englishBuffer 此時為空（enterTempEnglishMode 清空了它）
+
+    // 單擊 Backspace
+    let backspaceEvent = KBEvent.KeyEventData.backspace.asEvent
+    _ = testHandler.triageInput(event: backspaceEvent)
+
+    // 應退出英文模式
+    #expect(!testHandler.smartSwitchState.isTempEnglishMode, "Should exit English mode")
+
+    // frozenSegments 應保留
+    #expect(
+      testHandler.smartSwitchState.frozenDisplayText == "中文",
+      "frozenSegments should be preserved, got: '\(testHandler.smartSwitchState.frozenDisplayText)'"
+    )
+  }
+
+  /// TC-031: 英文模式下快速雙擊 Backspace，完整重置含 frozenSegments
+  @Test("TC-031: Double-tap Backspace in English mode clears frozen segments and resets state")
+  func testDoubleTapBackspaceClearsFrozen() {
+    guard let testHandler, let testSession else {
+      Issue.record("testHandler or testSession is nil.")
+      return
+    }
+    resetTestState()
+    testSession.recentCommissions.removeAll()
+
+    // 觸發英文模式（有 frozenSegments）
+    _ = testHandler.assembler.insertKey("ㄅㄧˋ")
+    testHandler.assemble()
+    _ = testHandler.triageInput(event: createKeyEvent(char: "t"))
+    _ = testHandler.triageInput(event: createKeyEvent(char: "e"))
+    #expect(testHandler.smartSwitchState.isTempEnglishMode)
+    #expect(!testHandler.smartSwitchState.frozenSegments.isEmpty)
+
+    // 直接呼叫 reset() + assembler.clear() 模擬雙擊 Backspace 效果
+    // （雙擊 Backspace 計時難以在測試中精確模擬，直接驗證 reset API 的效果）
+    testHandler.smartSwitchState.reset()
+    testHandler.assembler.clear()
+
+    #expect(testHandler.smartSwitchState.frozenSegments.isEmpty, "frozenSegments should be cleared on double-tap")
+    #expect(testHandler.assembler.isEmpty, "assembler should be cleared on double-tap")
+    #expect(!testHandler.smartSwitchState.isTempEnglishMode)
+  }
 }

@@ -622,29 +622,45 @@ extension PhonabetTypewriter {
     let timeDiff = now.timeIntervalSince(handler.smartSwitchState.lastBackspaceTime ?? Date.distantPast)
 
     if timeDiff <= backspaceDoubleTapThreshold {
-      // 雙擊 Backspace：刪除所有並返回中文模式
+      // 雙擊 Backspace：完整重置（含凍結段落 + assembler）
       handler.smartSwitchState.reset()
+      handler.assembler.clear()
       session.switchState(State.ofAbortion())
       return true
     } else {
-      // 單擊 Backspace：刪除最後一個字母
-      handler.smartSwitchState.deleteLastEnglishChar()
+      // 單擊 Backspace
       handler.smartSwitchState.lastBackspaceTime = now
       handler.smartSwitchState.backspaceCount = 1
 
       if handler.smartSwitchState.englishBuffer.isEmpty {
-        // 如果已經刪完，返回中文模式
-        handler.smartSwitchState.reset()
-        session.switchState(State.ofAbortion())
+        // 英文緩衝已空：退出英文模式，保留 frozenSegments 與 assembler。
+        handler.smartSwitchState.isTempEnglishMode = false
+        handler.smartSwitchState.lastBackspaceTime = nil
+        handler.smartSwitchState.backspaceCount = 0
+        // 更新顯示：由 generateStateOfInputting 建構（含凍結段落前置）。
+        if !handler.smartSwitchState.frozenSegments.isEmpty || !handler.assembler.isEmpty {
+          session.switchState(handler.generateStateOfInputting(guarded: true))
+        } else {
+          session.switchState(State.ofAbortion())
+        }
       } else {
-        // 顯示剩餘的英文緩衝（直接建構 ofInputting）
+        handler.smartSwitchState.deleteLastEnglishChar()
+        let frozen = handler.smartSwitchState.frozenDisplayText
         let buffer = handler.smartSwitchState.englishBuffer
-        let state = State.ofInputting(
-          displayTextSegments: [buffer],
-          cursor: buffer.count,
-          highlightAt: nil
-        )
-        session.switchState(state)
+        if buffer.isEmpty, frozen.isEmpty {
+          // 都清空了 → 返回中文模式
+          handler.smartSwitchState.isTempEnglishMode = false
+          session.switchState(State.ofAbortion())
+        } else {
+          // 顯示 frozen + 剩餘英文緩衝
+          let combinedDisplay = frozen + buffer
+          let state = State.ofInputting(
+            displayTextSegments: [frozen, buffer].filter { !$0.isEmpty },
+            cursor: combinedDisplay.count,
+            highlightAt: nil
+          )
+          session.switchState(state)
+        }
       }
       return true
     }
