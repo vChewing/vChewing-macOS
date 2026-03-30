@@ -464,9 +464,9 @@ final class SmartSwitchTests {
     #expect(testHandler.smartSwitchState.englishBuffer == "test", "English buffer should contain 'test'")
   }
 
-  /// TC-014: 輸入 'test' 後按空格，驗證最終 commit 出去的是 'test'
-  @Test("TC-014: Pressing Space after 'test' commits 'test'")
-  func testSpaceAfterTestCommitsTest() {
+  /// TC-014: 輸入 'test' 後按空格，'test' 應凍結在組字區（不直接提交）
+  @Test("TC-014: Pressing Space after 'test' freezes 'test' in composition buffer")
+  func testSpaceAfterTestFreezeTest() {
     guard let testHandler, let testSession else {
       Issue.record("testHandler or testSession is nil.")
       return
@@ -481,17 +481,22 @@ final class SmartSwitchTests {
     _ = testHandler.triageInput(event: createKeyEvent(char: "s"))
     _ = testHandler.triageInput(event: createKeyEvent(char: "t"))
 
-    // 驗證英文緩衝正確
     #expect(testHandler.smartSwitchState.englishBuffer == "test", "Buffer should be 'test'")
 
-    // 按空格（觸發 commitEnglishAndReturnToChinese）
+    // 按空格（新行為：凍結，不提交）
     let spaceEvent = KBEvent.KeyEventData.dataSpace.asEvent
     _ = testHandler.triageInput(event: spaceEvent)
 
-    // 'test' 應該被 commit 出去
+    // 'test' 不應被直接 commit
     #expect(
-      testSession.recentCommissions.contains("test"),
-      "Expected 'test' in commissions, got: \(testSession.recentCommissions)"
+      testSession.recentCommissions.isEmpty,
+      "Space should freeze, not commit; got: \(testSession.recentCommissions)"
+    )
+
+    // frozenDisplayText 應包含 'test'
+    #expect(
+      testHandler.smartSwitchState.frozenDisplayText.contains("test"),
+      "frozenDisplayText should contain 'test', got: '\(testHandler.smartSwitchState.frozenDisplayText)'"
     )
   }
 
@@ -886,6 +891,51 @@ final class SmartSwitchTests {
     // 應已退出英文模式
     #expect(!testHandler.smartSwitchState.isTempEnglishMode, "Should have exited temp English mode")
     #expect(testHandler.smartSwitchState.englishBuffer.isEmpty, "English buffer should be empty")
+  }
+
+  /// TC-025: 英文模式下按空格，凍結緩衝（不提交）並返回中文模式
+  @Test("TC-025: Space in English mode freezes buffer, returns to Chinese mode without commit")
+  func testSpaceInEnglishModeFreezeBuffer() {
+    guard let testHandler, let testSession else {
+      Issue.record("testHandler or testSession is nil.")
+      return
+    }
+    resetTestState()
+    testSession.recentCommissions.removeAll()
+
+    // 輸入 't', 'e', 's', 't' 進入英文模式
+    _ = testHandler.triageInput(event: createKeyEvent(char: "t"))
+    _ = testHandler.triageInput(event: createKeyEvent(char: "e"))
+    _ = testHandler.triageInput(event: createKeyEvent(char: "s"))
+    _ = testHandler.triageInput(event: createKeyEvent(char: "t"))
+
+    #expect(testHandler.smartSwitchState.isTempEnglishMode, "Should be in English mode")
+    #expect(testHandler.smartSwitchState.englishBuffer == "test")
+
+    // 按空格（新行為：凍結而非提交）
+    let spaceEvent = KBEvent.KeyEventData.dataSpace.asEvent
+    _ = testHandler.triageInput(event: spaceEvent)
+
+    // 新行為：不應有任何文字被 commit 出去
+    #expect(
+      testSession.recentCommissions.isEmpty,
+      "Space should freeze, not commit; got: \(testSession.recentCommissions)"
+    )
+
+    // 已退出英文模式
+    #expect(!testHandler.smartSwitchState.isTempEnglishMode, "Should have exited English mode")
+
+    // frozenSegments 應包含 "test"
+    #expect(
+      testHandler.smartSwitchState.frozenDisplayText.contains("test"),
+      "frozenDisplayText should contain 'test', got: '\(testHandler.smartSwitchState.frozenDisplayText)'"
+    )
+
+    // session state 仍是 ofInputting（顯示 'test' 在組字區）
+    #expect(
+      testSession.state.type == .ofInputting,
+      "State should be ofInputting after Space freeze"
+    )
   }
 
   /// TC-024: 觸發智慧切換後組字區顯示凍結漢字前綴 + 英文緩衝

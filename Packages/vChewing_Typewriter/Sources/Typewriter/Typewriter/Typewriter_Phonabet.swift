@@ -525,7 +525,7 @@ extension PhonabetTypewriter {
   ) -> Bool? {
     // 檢查是否為返回中文模式的觸發鍵
     if isTriggerToReturnToChinese(input) {
-      return commitEnglishAndReturnToChinese(session: session)
+      return freezeAndReturnToChinese(session: session)
     }
 
     // 處理 Backspace
@@ -576,19 +576,23 @@ extension PhonabetTypewriter {
     return text.unicodeScalars.allSatisfy { punctuationChars.contains($0) }
   }
 
-  /// 提交英文緩衝並返回中文模式
-  private func commitEnglishAndReturnToChinese(session: Session) -> Bool {
+  /// 凍結英文緩衝並返回中文模式（不提交給 OS）
+  private func freezeAndReturnToChinese(session: Session) -> Bool {
     let englishText = handler.smartSwitchState.exitTempEnglishMode()
 
     if !englishText.isEmpty {
-      // 使用 ofCommitting 狀態直接提交英文文字。
-      // 不能用 generateStateOfInputting()，因為在英文模式下 composer/assembler 為空，
-      // 該函式會返回 ofAbortion，而 ofAbortion 不處理 textToCommit。
-      session.switchState(State.ofCommitting(textToCommit: englishText))
+      handler.smartSwitchState.freezeSegment(englishText)
     }
 
-    // 重置後繼續處理當前按鍵（如果是空白或標點，會被正常處理）
-    return false // 讓後續邏輯繼續處理
+    // 更新顯示：以 generateStateOfInputting 產生包含凍結段落的組字區狀態。
+    // 若組字區（含凍結）非空，顯示 ofInputting；否則顯示 ofAbortion。
+    if !handler.smartSwitchState.frozenSegments.isEmpty || !handler.assembler.isEmpty {
+      session.switchState(handler.generateStateOfInputting(guarded: true))
+    } else {
+      session.switchState(State.ofAbortion())
+    }
+
+    return false // 讓後續邏輯繼續處理（如空格觸發選字等）
   }
 
   /// 提交英文並處理當前按鍵
