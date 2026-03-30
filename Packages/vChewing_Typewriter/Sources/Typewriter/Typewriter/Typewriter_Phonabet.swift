@@ -195,7 +195,7 @@ public struct PhonabetTypewriter<Handler: InputHandlerProtocol>: TypewriterProto
         let keysToCommit = handler.smartSwitchState.keySequence
         handler.smartSwitchState.reset()
         handler.composer.clear()
-        freezeAssemblerContentIfNeeded(session: session)
+        freezeAssemblerContentIfNeeded()
         handler.assembler.clear()
         session.switchState(State.ofCommitting(textToCommit: keysToCommit))
         return true
@@ -645,7 +645,7 @@ extension PhonabetTypewriter {
 
   /// 若 assembler 非空，將已組漢字凍結至 frozenSegments（不提交給 OS）。
   /// 用於智慧中英文切換觸發前，保留組字區的漢字內容讓使用者最後一併提交。
-  private func freezeAssemblerContentIfNeeded(session: Session) {
+  private func freezeAssemblerContentIfNeeded() {
     guard !handler.assembler.isEmpty else { return }
     // 使用 sansReading: true 取得純漢字顯示文字（不含注拼槽）。
     // 注意：此時 frozenSegments 可能已有內容（先前被凍結的），
@@ -719,7 +719,7 @@ extension PhonabetTypewriter {
       if !consonantBefore.isEmpty, consonantAfter != consonantBefore {
         handler.smartSwitchState.keySequence.append(inputText)
         handler.composer.clear()
-        freezeAssemblerContentIfNeeded(session: session)
+        freezeAssemblerContentIfNeeded()
         handler.assembler.clear()
         return triggerTempEnglishMode(session: session)
       }
@@ -732,7 +732,7 @@ extension PhonabetTypewriter {
       if !vowelBefore.isEmpty, consonantAfter == consonantBefore, !vowelAfter.isEmpty {
         handler.smartSwitchState.keySequence.append(inputText)
         handler.composer.clear()
-        freezeAssemblerContentIfNeeded(session: session)
+        freezeAssemblerContentIfNeeded()
         handler.assembler.clear()
         return triggerTempEnglishMode(session: session)
       }
@@ -743,7 +743,7 @@ extension PhonabetTypewriter {
       if (!semivowelBefore.isEmpty || !vowelBefore.isEmpty), consonantBefore.isEmpty, !consonantAfter.isEmpty {
         handler.smartSwitchState.keySequence.append(inputText)
         handler.composer.clear()
-        freezeAssemblerContentIfNeeded(session: session)
+        freezeAssemblerContentIfNeeded()
         handler.assembler.clear()
         return triggerTempEnglishMode(session: session)
       }
