@@ -403,6 +403,10 @@ extension InputHandlerProtocol {
 
     var displayedText = state.displayedText
 
+    // 凍結段落的清理：displayedText 已含 frozenDisplayText（由 generateStateOfInputting 前置），
+    // 提交後需清除 frozenSegments，以免下次生成狀態時重複前置。
+    let hadFrozenSegments = !smartSwitchState.frozenSegments.isEmpty
+
     if input.commonKeyModifierFlags == [.option, .shift] {
       displayedText = displayedText.map(\.description).joined(separator: " ")
     } else if readingOnly {
@@ -414,6 +418,10 @@ extension InputHandlerProtocol {
     }
 
     session.switchState(State.ofCommitting(textToCommit: displayedText))
+
+    if hadFrozenSegments {
+      smartSwitchState.clearFrozenSegments()
+    }
 
     associatedPhrases: if !prefs.useSCPCTypingMode, prefs.associatedPhrasesEnabled {
       guard input.commonKeyModifierFlags == .shift else { break associatedPhrases }

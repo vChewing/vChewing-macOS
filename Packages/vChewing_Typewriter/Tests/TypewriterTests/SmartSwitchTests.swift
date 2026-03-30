@@ -1053,4 +1053,52 @@ final class SmartSwitchTests {
     #expect(!testHandler.smartSwitchState.isTempEnglishMode)
     #expect(testHandler.smartSwitchState.frozenSegments.isEmpty)
   }
+
+  /// TC-028: 中文模式下含凍結段落時按 Enter，提交全部內容並清空 frozenSegments
+  @Test("TC-028: Enter in Chinese mode commits frozen+assembler and clears frozenSegments")
+  func testEnterInChineseModeAfterFreezeCommitsAll() {
+    guard let testHandler, let testSession else {
+      Issue.record("testHandler or testSession is nil.")
+      return
+    }
+    resetTestState()
+    testSession.recentCommissions.removeAll()
+
+    // Step 1: 觸發智慧切換，建立 frozenSegments
+    _ = testHandler.assembler.insertKey("ㄅㄧˋ")
+    testHandler.assemble()
+    _ = testHandler.triageInput(event: createKeyEvent(char: "t"))
+    _ = testHandler.triageInput(event: createKeyEvent(char: "e"))
+    _ = testHandler.triageInput(event: createKeyEvent(char: "s"))
+    _ = testHandler.triageInput(event: createKeyEvent(char: "t"))
+    #expect(testHandler.smartSwitchState.isTempEnglishMode)
+
+    // Step 2: 按空格，凍結 "test"，回到中文模式
+    let spaceEvent = KBEvent.KeyEventData.dataSpace.asEvent
+    _ = testHandler.triageInput(event: spaceEvent)
+    #expect(!testHandler.smartSwitchState.isTempEnglishMode, "Should be back in Chinese mode")
+
+    let frozen = testHandler.smartSwitchState.frozenDisplayText
+    #expect(!frozen.isEmpty, "frozenDisplayText should be non-empty after Space")
+
+    testSession.recentCommissions.removeAll()
+
+    // Step 3: 按 Enter，提交全部（frozen + assembler）
+    let enterEvent = KBEvent.KeyEventData.dataEnterReturn.asEvent
+    let result = testHandler.triageInput(event: enterEvent)
+    #expect(result == true, "Enter should be handled")
+
+    // 提交的文字應包含 frozen 內容
+    let committed = testSession.recentCommissions.joined()
+    #expect(
+      committed.contains(frozen),
+      "Committed text '\(committed)' should contain frozen '\(frozen)'"
+    )
+
+    // frozenSegments 應被清空
+    #expect(
+      testHandler.smartSwitchState.frozenSegments.isEmpty,
+      "frozenSegments should be cleared after Enter commit"
+    )
+  }
 }
