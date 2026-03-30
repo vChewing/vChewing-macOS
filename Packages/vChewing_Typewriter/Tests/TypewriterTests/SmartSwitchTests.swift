@@ -545,11 +545,9 @@ final class SmartSwitchTests {
     )
   }
 
-  /// TC-016: 組字區有漢字時觸發英文切換，漢字應被 commit 出去，不丟失
-  /// 重現場景：打「測試輸入」（漢字已在組字區），再打 'te' 觸發路徑 B，
-  /// 預期「測試輸入」應被先 commit，再進入英文模式
-  @Test("TC-016: Assembled Chinese text should be committed before entering English mode")
-  func testAssembledChineseCommittedBeforeEnglishMode() {
+  /// TC-016: 組字區有漢字時觸發英文切換，漢字應留在組字區（凍結），不直接提交
+  @Test("TC-016: Assembled Chinese text should be frozen in buffer, not committed, before entering English mode")
+  func testAssembledChineseFrozenBeforeEnglishMode() {
     guard let testHandler, let testSession else {
       Issue.record("testHandler or testSession is nil.")
       return
@@ -558,38 +556,35 @@ final class SmartSwitchTests {
     resetTestState()
     testSession.recentCommissions.removeAll()
 
-    // 先組出一個漢字：輸入「ㄓ」+「ㄨ」+「ˋ」= 注（注音鍵：y + m + 4）
-    // y = ㄗ, / = ㄥ ... 改用更簡單的方式：1 = ㄅ, p = ㄡ, 4 = ˋ → 「簿」不在測試 LM
-    // 用 su3 = ㄋ + ㄨ + ˇ → 「女」（若存在）... 先確認測試 LM 存在的字
-    // 直接用 ji3 = ㄐ + ㄧ + ˇ → 使用 j=ㄖ... 
-    // 大千排列：ru3 = ㄖ+ㄨ+ˇ → 「乳」；g=ㄕ, l=ㄠ... 
-    // 最簡單：直接往 assembler 插入已知存在的 key，繞過注拼槽
-    // 查測試 LM 的 "ㄓㄨˋ"（注）："y"=ㄗ, "m"=ㄩ... 大千 y=ㄗ 不對
-    // 大千排列 t=ㄔ, w=ㄘ, i=ㄛ... 改用直接插入 assembler key 的方式
+    // 插入已知存在的讀音到 assembler
     _ = testHandler.assembler.insertKey("ㄅㄧˋ")
     testHandler.assemble()
-    // 確認 assembler 非空
     #expect(!testHandler.assembler.isEmpty, "Assembler should have content after insertKey")
 
     testSession.recentCommissions.removeAll()
 
-    // 現在輸入 't'（大千：ㄔ 聲母）→ composer 有 ㄔ
+    // 輸入 't'（大千：ㄔ 聲母）
     _ = testHandler.triageInput(event: createKeyEvent(char: "t"))
-    // 此時 assembler 仍有漢字，composer 有 ㄔ
 
     // 輸入 'e'（大千：ㄍ 覆蓋 ㄔ）→ 路徑 B 觸發
     _ = testHandler.triageInput(event: createKeyEvent(char: "e"))
 
-    // 驗證：已組漢字應被 commit 出去（不丟失）
+    // 新行為：漢字不應被 commit 出去，而是凍結在組字區
     #expect(
-      !testSession.recentCommissions.isEmpty,
-      "Assembled Chinese text should have been committed before English mode"
+      testSession.recentCommissions.isEmpty,
+      "Chinese text should NOT be committed (only frozen); got: \(testSession.recentCommissions)"
     )
 
-    // 驗證：已進入英文模式
+    // frozenSegments 應有內容
+    #expect(
+      !testHandler.smartSwitchState.frozenSegments.isEmpty,
+      "frozenSegments should contain the assembled Chinese text"
+    )
+
+    // 已進入英文模式
     #expect(testHandler.smartSwitchState.isTempEnglishMode, "Should be in temp English mode")
 
-    // 驗證：英文緩衝包含 'te'
+    // 英文緩衝包含 'te'
     #expect(
       testHandler.smartSwitchState.englishBuffer == "te",
       "English buffer should be 'te', got: '\(testHandler.smartSwitchState.englishBuffer)'"

@@ -195,7 +195,7 @@ public struct PhonabetTypewriter<Handler: InputHandlerProtocol>: TypewriterProto
         let keysToCommit = handler.smartSwitchState.keySequence
         handler.smartSwitchState.reset()
         handler.composer.clear()
-        commitAssemblerContentIfNeeded(session: session)
+        freezeAssemblerContentIfNeeded(session: session)
         handler.assembler.clear()
         session.switchState(State.ofCommitting(textToCommit: keysToCommit))
         return true
@@ -643,13 +643,24 @@ extension PhonabetTypewriter {
     }
   }
 
-  /// 若 assembler 非空，將已組漢字以 ofCommitting 狀態 commit 出去。
-  /// 用於智慧中英文切換觸發前，避免組字區內容被 assembler.clear() 直接丟棄。
-  private func commitAssemblerContentIfNeeded(session: Session) {
+  /// 若 assembler 非空，將已組漢字凍結至 frozenSegments（不提交給 OS）。
+  /// 用於智慧中英文切換觸發前，保留組字區的漢字內容讓使用者最後一併提交。
+  private func freezeAssemblerContentIfNeeded(session: Session) {
     guard !handler.assembler.isEmpty else { return }
-    let displayedText = handler.generateStateOfInputting(sansReading: true).displayedText
-    guard !displayedText.isEmpty else { return }
-    session.switchState(State.ofCommitting(textToCommit: displayedText))
+    // 使用 sansReading: true 取得純漢字顯示文字（不含注拼槽）。
+    // 注意：此時 frozenSegments 可能已有內容（先前被凍結的），
+    // generateStateOfInputting 會把它們一起前置——所以這裡用 displayedText
+    // 直接取全文，再減去已有的 frozenDisplayText 前綴，只取 assembler 部分。
+    let fullDisplayed = handler.generateStateOfInputting(sansReading: true).displayedText
+    let alreadyFrozen = handler.smartSwitchState.frozenDisplayText
+    let assemblerPart: String
+    if fullDisplayed.hasPrefix(alreadyFrozen) {
+      assemblerPart = String(fullDisplayed.dropFirst(alreadyFrozen.count))
+    } else {
+      assemblerPart = fullDisplayed
+    }
+    guard !assemblerPart.isEmpty else { return }
+    handler.smartSwitchState.freezeSegment(assemblerPart)
   }
 
   /// 在 composer 接收按鍵後，判斷是否應觸發智慧中英文切換。
@@ -708,7 +719,7 @@ extension PhonabetTypewriter {
       if !consonantBefore.isEmpty, consonantAfter != consonantBefore {
         handler.smartSwitchState.keySequence.append(inputText)
         handler.composer.clear()
-        commitAssemblerContentIfNeeded(session: session)
+        freezeAssemblerContentIfNeeded(session: session)
         handler.assembler.clear()
         return triggerTempEnglishMode(session: session)
       }
@@ -721,7 +732,7 @@ extension PhonabetTypewriter {
       if !vowelBefore.isEmpty, consonantAfter == consonantBefore, !vowelAfter.isEmpty {
         handler.smartSwitchState.keySequence.append(inputText)
         handler.composer.clear()
-        commitAssemblerContentIfNeeded(session: session)
+        freezeAssemblerContentIfNeeded(session: session)
         handler.assembler.clear()
         return triggerTempEnglishMode(session: session)
       }
@@ -732,7 +743,7 @@ extension PhonabetTypewriter {
       if (!semivowelBefore.isEmpty || !vowelBefore.isEmpty), consonantBefore.isEmpty, !consonantAfter.isEmpty {
         handler.smartSwitchState.keySequence.append(inputText)
         handler.composer.clear()
-        commitAssemblerContentIfNeeded(session: session)
+        freezeAssemblerContentIfNeeded(session: session)
         handler.assembler.clear()
         return triggerTempEnglishMode(session: session)
       }
