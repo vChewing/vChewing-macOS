@@ -938,6 +938,43 @@ final class SmartSwitchTests {
     )
   }
 
+  /// TC-026: 英文模式下繼續輸入時，顯示凍結漢字前綴 + 增長的英文緩衝
+  @Test("TC-026: Display shows frozen Chinese + growing english buffer while typing")
+  func testDisplayShowsFrozenAndGrowingEnglishBuffer() {
+    guard let testHandler, let testSession else {
+      Issue.record("testHandler or testSession is nil.")
+      return
+    }
+    resetTestState()
+    testSession.recentCommissions.removeAll()
+
+    // 插入 "ㄅㄧˋ" 組字後觸發英文模式（t + e = 路徑 B）
+    _ = testHandler.assembler.insertKey("ㄅㄧˋ")
+    testHandler.assemble()
+    _ = testHandler.triageInput(event: createKeyEvent(char: "t"))
+    _ = testHandler.triageInput(event: createKeyEvent(char: "e"))
+    #expect(testHandler.smartSwitchState.isTempEnglishMode, "Should be in English mode")
+
+    let frozen = testHandler.smartSwitchState.frozenDisplayText
+    #expect(!frozen.isEmpty, "frozenDisplayText should be non-empty")
+
+    // 繼續輸入 's', 't' 在英文模式下
+    _ = testHandler.triageInput(event: createKeyEvent(char: "s"))
+    _ = testHandler.triageInput(event: createKeyEvent(char: "t"))
+    #expect(testHandler.smartSwitchState.englishBuffer == "test", "englishBuffer should be 'test'")
+
+    // session.state.displayedText 應包含 frozen 前綴 + "test"
+    let displayed = testSession.state.displayedText
+    #expect(
+      displayed.hasPrefix(frozen),
+      "displayedText '\(displayed)' should start with frozen '\(frozen)'"
+    )
+    #expect(
+      displayed.hasSuffix("test"),
+      "displayedText '\(displayed)' should end with 'test'"
+    )
+  }
+
   /// TC-024: 觸發智慧切換後組字區顯示凍結漢字前綴 + 英文緩衝
   @Test("TC-024: Display shows frozen Chinese prefix + english buffer after trigger")
   func testDisplayShowsFrozenPrefixAndEnglishBuffer() {

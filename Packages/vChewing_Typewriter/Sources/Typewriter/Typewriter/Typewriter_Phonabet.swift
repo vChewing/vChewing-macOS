@@ -546,13 +546,14 @@ extension PhonabetTypewriter {
     let char = input.text
     if char.count == 1, char.first?.isLetter == true {
       handler.smartSwitchState.appendEnglishChar(char)
-      // 直接建構 ofInputting 狀態顯示英文緩衝。
-      // 不能用 generateStateOfInputting()，因為 assembler 為空時會返回 ofAbortion，
-      // 而 ofAbortion 的 tooltip 會被 switchState 忽略且清空 inline display。
+      // 建構 ofInputting 狀態：凍結段落（若有）+ 英文緩衝。
+      let frozen = handler.smartSwitchState.frozenDisplayText
       let buffer = handler.smartSwitchState.englishBuffer
+      let segments = [frozen, buffer].filter { !$0.isEmpty }
+      let combined = frozen + buffer
       let state = State.ofInputting(
-        displayTextSegments: [buffer],
-        cursor: buffer.count,
+        displayTextSegments: segments,
+        cursor: combined.count,
         highlightAt: nil
       )
       session.switchState(state)
