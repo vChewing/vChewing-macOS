@@ -628,12 +628,9 @@ extension PhonabetTypewriter {
       session.switchState(State.ofAbortion())
       return true
     } else {
-      // 單擊 Backspace
-      handler.smartSwitchState.lastBackspaceTime = now
-      handler.smartSwitchState.backspaceCount = 1
-
       if handler.smartSwitchState.englishBuffer.isEmpty {
         // 英文緩衝已空：退出英文模式，保留 frozenSegments 與 assembler。
+        // 此情況不記錄雙擊起點（空緩衝不應觸發後續雙擊重置）。
         handler.smartSwitchState.isTempEnglishMode = false
         handler.smartSwitchState.lastBackspaceTime = nil
         handler.smartSwitchState.backspaceCount = 0
@@ -644,11 +641,14 @@ extension PhonabetTypewriter {
           session.switchState(State.ofAbortion())
         }
       } else {
+        // 單擊 Backspace，英文緩衝非空：記錄為雙擊起點。
+        handler.smartSwitchState.lastBackspaceTime = now
+        handler.smartSwitchState.backspaceCount = 1
         handler.smartSwitchState.deleteLastEnglishChar()
         let frozen = handler.smartSwitchState.frozenDisplayText
         let buffer = handler.smartSwitchState.englishBuffer
         if buffer.isEmpty, frozen.isEmpty {
-          // 都清空了 → 返回中文模式
+          // 都清空了 → 返回中文模式（防禦性 fallback，正常情況下 frozen 不應為空）
           handler.smartSwitchState.isTempEnglishMode = false
           session.switchState(State.ofAbortion())
         } else {

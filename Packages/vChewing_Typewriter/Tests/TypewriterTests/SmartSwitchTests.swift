@@ -1176,7 +1176,10 @@ final class SmartSwitchTests {
   }
 
   /// TC-031: 英文模式下快速雙擊 Backspace，完整重置含 frozenSegments
-  @Test("TC-031: Double-tap Backspace in English mode clears frozen segments and resets state")
+  /// 注意：此測試直接驗證 reset() + assembler.clear() 的 API 效果，
+  /// 並非端對端測試雙擊 Backspace 的觸發路徑（計時難以在單元測試中精確模擬）。
+  /// 觸發路徑的行為驗證依賴 SmartSwitchState.reset() 已含 frozenSegments 清除（TC-022 覆蓋）。
+  @Test("TC-031: Double-tap Backspace reset API clears frozenSegments and assembler")
   func testDoubleTapBackspaceClearsFrozen() {
     guard let testHandler, let testSession else {
       Issue.record("testHandler or testSession is nil.")
