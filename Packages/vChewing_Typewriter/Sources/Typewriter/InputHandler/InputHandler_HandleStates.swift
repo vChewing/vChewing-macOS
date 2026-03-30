@@ -403,8 +403,12 @@ extension InputHandlerProtocol {
 
     var displayedText = state.displayedText
 
-    // 凍結段落的清理：displayedText 已含 frozenDisplayText（由 generateStateOfInputting 前置），
-    // 提交後需清除 frozenSegments，以免下次生成狀態時重複前置。
+    // 凍結段落的清理（防禦性）：
+    // - 注音路徑（PhonabetTypewriter）在 Enter 時會透過 shouldResetSmartSwitchState 提前 reset()，
+    //   frozenSegments 到此通常已為空。
+    // - 其他路徑（如 Cassette 特殊 Enter 組合鍵）不一定會提前清理，此處做保底清除。
+    // displayedText 已含 frozenDisplayText（由 generateStateOfInputting 前置），提交後需清除，
+    // 以免下次生成狀態時重複前置。
     let hadFrozenSegments = !smartSwitchState.frozenSegments.isEmpty
 
     if input.commonKeyModifierFlags == [.option, .shift] {
