@@ -847,6 +847,41 @@ final class SmartSwitchTests {
     )
   }
 
+  /// TC-024: After smart switch trigger with Chinese in assembler, display shows frozen+english
+  @Test("TC-024: Display shows frozen Chinese prefix + english buffer after trigger")
+  func testDisplayShowsFrozenPrefixAndEnglishBuffer() {
+    guard let testHandler, let testSession else {
+      Issue.record("testHandler or testSession is nil.")
+      return
+    }
+    resetTestState()
+    testSession.recentCommissions.removeAll()
+
+    // 插入 "ㄅㄧˋ" 組字
+    _ = testHandler.assembler.insertKey("ㄅㄧˋ")
+    testHandler.assemble()
+
+    // 輸入 't', 'e' 觸發路徑 B
+    _ = testHandler.triageInput(event: createKeyEvent(char: "t"))
+    _ = testHandler.triageInput(event: createKeyEvent(char: "e"))
+
+    // 驗證進入英文模式
+    #expect(testHandler.smartSwitchState.isTempEnglishMode)
+
+    // session.state.displayedText 應同時包含凍結漢字和英文緩衝
+    let displayed = testSession.state.displayedText
+    let frozen = testHandler.smartSwitchState.frozenDisplayText
+    #expect(!frozen.isEmpty, "frozenDisplayText should be non-empty")
+    #expect(
+      displayed.hasPrefix(frozen),
+      "displayedText '\(displayed)' should start with frozen '\(frozen)'"
+    )
+    #expect(
+      displayed.hasSuffix("te"),
+      "displayedText '\(displayed)' should end with english buffer 'te'"
+    )
+  }
+
   /// TC-021: 臨時英文模式下按 Enter，應提交英文緩衝並消耗 Enter（不穿透給應用程式）
   /// 重現場景：打 'test' 進入英文模式後按 Enter，
   /// 預期：'test' 被 commit、Enter 被消耗（triageInput 返回 true）、不再處於英文模式。

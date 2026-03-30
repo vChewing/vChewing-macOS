@@ -761,13 +761,16 @@ extension PhonabetTypewriter {
     handler.smartSwitchState.appendEnglishChar(keysToConvert)
 
     // 先用 ofAbortion 清除 composer 的注音顯示（不會 commit previous displayedText）。
-    // 再立即建構 ofInputting 顯示英文緩衝，讓用戶看到已輸入的英文字母序列。
     session.switchState(State.ofAbortion())
+
+    // 建構顯示狀態：凍結漢字（若有）+ 英文緩衝。
+    let frozen = handler.smartSwitchState.frozenDisplayText
     let buffer = handler.smartSwitchState.englishBuffer
-    if !buffer.isEmpty {
+    let combinedDisplay = frozen + buffer
+    if !combinedDisplay.isEmpty {
       let state = State.ofInputting(
-        displayTextSegments: [buffer],
-        cursor: buffer.count,
+        displayTextSegments: [frozen, buffer].filter { !$0.isEmpty },
+        cursor: combinedDisplay.count,
         highlightAt: nil
       )
       session.switchState(state)
