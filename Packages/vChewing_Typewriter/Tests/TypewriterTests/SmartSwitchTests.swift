@@ -1009,4 +1009,48 @@ final class SmartSwitchTests {
       "displayedText '\(displayed)' should end with english buffer 'te'"
     )
   }
+
+  /// TC-027: 英文模式下按 Enter，一併提交凍結漢字 + 英文緩衝
+  @Test("TC-027: Enter in English mode commits frozen Chinese + english buffer together")
+  func testEnterInEnglishModeCommitsFrozenAndEnglish() {
+    guard let testHandler, let testSession else {
+      Issue.record("testHandler or testSession is nil.")
+      return
+    }
+    resetTestState()
+    testSession.recentCommissions.removeAll()
+
+    // 插入 "ㄅㄧˋ" 組字後觸發英文模式 (t + e)
+    _ = testHandler.assembler.insertKey("ㄅㄧˋ")
+    testHandler.assemble()
+    _ = testHandler.triageInput(event: createKeyEvent(char: "t"))
+    _ = testHandler.triageInput(event: createKeyEvent(char: "e"))
+    #expect(testHandler.smartSwitchState.isTempEnglishMode)
+
+    let frozen = testHandler.smartSwitchState.frozenDisplayText
+    #expect(!frozen.isEmpty, "frozenDisplayText should be non-empty")
+
+    // 繼續輸入 's', 't'
+    _ = testHandler.triageInput(event: createKeyEvent(char: "s"))
+    _ = testHandler.triageInput(event: createKeyEvent(char: "t"))
+    #expect(testHandler.smartSwitchState.englishBuffer == "test")
+
+    // 按 Enter
+    let enterEvent = KBEvent.KeyEventData.dataEnterReturn.asEvent
+    let result = testHandler.triageInput(event: enterEvent)
+
+    // Enter 應被消耗
+    #expect(result == true, "Enter should be consumed")
+
+    // 應提交 frozen + "test"
+    let expected = frozen + "test"
+    #expect(
+      testSession.recentCommissions.contains(expected),
+      "Expected '\(expected)' in commissions, got: \(testSession.recentCommissions)"
+    )
+
+    // 應已退出英文模式，frozenSegments 應被清空
+    #expect(!testHandler.smartSwitchState.isTempEnglishMode)
+    #expect(testHandler.smartSwitchState.frozenSegments.isEmpty)
+  }
 }

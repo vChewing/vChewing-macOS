@@ -533,11 +533,14 @@ extension PhonabetTypewriter {
       return handleBackspaceInTempEnglishMode(input, session: session)
     }
 
-    // Enter 鍵：提交英文緩衝後消耗掉 Enter，避免它穿透給應用程式造成多餘的送出動作。
+    // Enter 鍵：提交凍結段落 + 英文緩衝，消耗 Enter 避免穿透給應用程式。
     if input.isEnter {
+      let frozen = handler.smartSwitchState.frozenDisplayText
       let englishText = handler.smartSwitchState.exitTempEnglishMode()
-      if !englishText.isEmpty {
-        session.switchState(State.ofCommitting(textToCommit: englishText))
+      handler.smartSwitchState.clearFrozenSegments()
+      let textToCommit = frozen + englishText
+      if !textToCommit.isEmpty {
+        session.switchState(State.ofCommitting(textToCommit: textToCommit))
       }
       return true
     }
