@@ -25,9 +25,6 @@ public struct PhonabetTypewriter<Handler: InputHandlerProtocol>: TypewriterProto
 
   public let handler: Handler
 
-  /// Backspace 雙擊的時間門檻（秒）
-  private let backspaceDoubleTapThreshold: TimeInterval = 0.3
-
   /// 用來處理 InputHandler.HandleInput() 當中的與注音输入有關的組字行為。
   /// - Parameter input: 輸入訊號。
   /// - Returns: 告知 IMK「該按鍵是否已經被輸入法攔截處理」。
@@ -530,7 +527,7 @@ extension PhonabetTypewriter {
 
     // 處理 Backspace
     if input.isBackSpace {
-      return handleBackspaceInTempEnglishMode(input, session: session)
+      return handleBackspaceInTempEnglishMode(session: session)
     }
 
     // Enter 鍵：提交凍結段落 + 英文緩衝，消耗 Enter 避免穿透給應用程式。
@@ -615,55 +612,38 @@ extension PhonabetTypewriter {
 
   /// 在臨時英文模式下處理 Backspace
   private func handleBackspaceInTempEnglishMode(
-    _ input: InputSignalProtocol,
     session: Session
   ) -> Bool {
-    let now = Date()
-    let timeDiff = now.timeIntervalSince(handler.smartSwitchState.lastBackspaceTime ?? Date.distantPast)
-
-    if timeDiff <= backspaceDoubleTapThreshold {
-      // 雙擊 Backspace：完整重置（含凍結段落 + assembler）
-      handler.smartSwitchState.reset()
-      handler.assembler.clear()
-      session.switchState(State.ofAbortion())
-      return true
-    } else {
-      if handler.smartSwitchState.englishBuffer.isEmpty {
-        // 英文緩衝已空：退出英文模式，保留 frozenSegments 與 assembler。
-        // 此情況不記錄雙擊起點（空緩衝不應觸發後續雙擊重置）。
-        handler.smartSwitchState.isTempEnglishMode = false
-        handler.smartSwitchState.lastBackspaceTime = nil
-        handler.smartSwitchState.backspaceCount = 0
-        // 更新顯示：由 generateStateOfInputting 建構（含凍結段落前置）。
-        if !handler.smartSwitchState.frozenSegments.isEmpty || !handler.assembler.isEmpty {
-          session.switchState(handler.generateStateOfInputting(guarded: true))
-        } else {
-          session.switchState(State.ofAbortion())
-        }
+    if handler.smartSwitchState.englishBuffer.isEmpty {
+      // 英文緩衝已空：退出英文模式，保留 frozenSegments 與 assembler。
+      handler.smartSwitchState.isTempEnglishMode = false
+      // 更新顯示：由 generateStateOfInputting 建構（含凍結段落前置）。
+      if !handler.smartSwitchState.frozenSegments.isEmpty || !handler.assembler.isEmpty {
+        session.switchState(handler.generateStateOfInputting(guarded: true))
       } else {
-        // 單擊 Backspace，英文緩衝非空：記錄為雙擊起點。
-        handler.smartSwitchState.lastBackspaceTime = now
-        handler.smartSwitchState.backspaceCount = 1
-        handler.smartSwitchState.deleteLastEnglishChar()
-        let frozen = handler.smartSwitchState.frozenDisplayText
-        let buffer = handler.smartSwitchState.englishBuffer
-        if buffer.isEmpty, frozen.isEmpty {
-          // 都清空了 → 返回中文模式（防禦性 fallback，正常情況下 frozen 不應為空）
-          handler.smartSwitchState.isTempEnglishMode = false
-          session.switchState(State.ofAbortion())
-        } else {
-          // 顯示 frozen + 剩餘英文緩衝
-          let combinedDisplay = frozen + buffer
-          let state = State.ofInputting(
-            displayTextSegments: [frozen, buffer].filter { !$0.isEmpty },
-            cursor: combinedDisplay.count,
-            highlightAt: nil
-          )
-          session.switchState(state)
-        }
+        session.switchState(State.ofAbortion())
       }
-      return true
+    } else {
+      // 英文緩衝非空：逐字刪除，不觸發雙擊計時（避免連按 Backspace 誤觸完整重置）。
+      handler.smartSwitchState.deleteLastEnglishChar()
+      let frozen = handler.smartSwitchState.frozenDisplayText
+      let buffer = handler.smartSwitchState.englishBuffer
+      if buffer.isEmpty, frozen.isEmpty {
+        // 都清空了 → 返回中文模式（防禦性 fallback，正常情況下 frozen 不應為空）
+        handler.smartSwitchState.isTempEnglishMode = false
+        session.switchState(State.ofAbortion())
+      } else {
+        // 顯示 frozen + 剩餘英文緩衝
+        let combinedDisplay = frozen + buffer
+        let state = State.ofInputting(
+          displayTextSegments: [frozen, buffer].filter { !$0.isEmpty },
+          cursor: combinedDisplay.count,
+          highlightAt: nil
+        )
+        session.switchState(state)
+      }
     }
+    return true
   }
 
   /// 若 assembler 非空，將已組漢字凍結至 frozenSegments（不提交給 OS）。

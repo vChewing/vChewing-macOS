@@ -21,12 +21,6 @@ public final class SmartSwitchState {
   /// 臨時英文模式下的輸入緩衝
   public var englishBuffer: String = ""
 
-  /// 上一次 Backspace 時間（用於雙擊檢測）
-  public var lastBackspaceTime: Date?
-
-  /// Backspace 連續計數
-  public var backspaceCount: Int = 0
-
   /// 按鍵序列（用於檢查是否能組成有效讀音）
   public var keySequence: String = ""
 
@@ -57,8 +51,6 @@ public final class SmartSwitchState {
     invalidKeyCount = 0
     isTempEnglishMode = false
     englishBuffer = ""
-    lastBackspaceTime = nil
-    backspaceCount = 0
     keySequence = ""
   }
 

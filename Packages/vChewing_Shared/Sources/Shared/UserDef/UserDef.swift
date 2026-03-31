@@ -836,7 +836,7 @@ nonisolated extension UserDef {
     case .kSmartChineseEnglishSwitchEnabled: return .init(
         userDef: self,
         shortTitle: "智慧中英文切換",
-        description: "在中文模式下，當連續輸入無法組成注音的按鍵時，自動切換為臨時英文模式。輸入空白鍵、Tab 鍵、標點符號，或連按兩次 Backspace 鍵即可返回中文模式。"
+        description: "在中文模式下，當連續輸入無法組成注音的按鍵時，自動切換為臨時英文模式。輸入空白鍵、Tab 鍵或標點符號即可返回中文模式；按下 Backspace 可逐字刪除英文緩衝內容，清空後返回中文模式。"
       )
     case .kReadingNarrationCoverage: return .init(
         userDef: self, shortTitle: "i18n:UserDef.kReadingNarrationCoverage.shortTitle",

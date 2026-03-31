@@ -1175,11 +1175,10 @@ final class SmartSwitchTests {
     )
   }
 
-  /// TC-031: 英文模式下快速雙擊 Backspace，完整重置含 frozenSegments
-  /// 注意：此測試直接驗證 reset() + assembler.clear() 的 API 效果，
-  /// 並非端對端測試雙擊 Backspace 的觸發路徑（計時難以在單元測試中精確模擬）。
-  /// 觸發路徑的行為驗證依賴 SmartSwitchState.reset() 已含 frozenSegments 清除（TC-022 覆蓋）。
-  @Test("TC-031: Double-tap Backspace reset API clears frozenSegments and assembler")
+  /// TC-031: SmartSwitchState reset API 會清除 frozenSegments 與 assembler
+  /// 注意：此測試直接驗證 reset() + assembler.clear() 的 API 效果。
+  /// 「雙擊 Backspace 完整重置」功能已於修正連按 Backspace 清空 Bug 時一同移除。
+  @Test("TC-031: SmartSwitchState reset API clears frozenSegments and assembler")
   func testDoubleTapBackspaceClearsFrozen() {
     guard let testHandler, let testSession else {
       Issue.record("testHandler or testSession is nil.")
@@ -1204,5 +1203,40 @@ final class SmartSwitchTests {
     #expect(testHandler.smartSwitchState.frozenSegments.isEmpty, "frozenSegments should be cleared on double-tap")
     #expect(testHandler.assembler.isEmpty, "assembler should be cleared on double-tap")
     #expect(!testHandler.smartSwitchState.isTempEnglishMode)
+  }
+
+  /// TC-032: 英文模式下連按 Backspace 應逐字刪除，不得清空組字區（迴歸測試）
+  /// 修復前的 Bug：第一次 Backspace 刪字後設定雙擊計時器，
+  /// 第二次 Backspace 若在 0.3s 內就會誤觸「完整重置」邏輯，清空所有內容。
+  @Test("TC-032: Rapid Backspace in English mode deletes chars one by one, not clearing buffer")
+  func testRapidBackspaceDoesNotClearBuffer() {
+    guard let testHandler, let testSession else {
+      Issue.record("testHandler or testSession is nil.")
+      return
+    }
+    resetTestState()
+    testSession.recentCommissions.removeAll()
+
+    // 手動進入臨時英文模式並輸入 "English"（7 個字母）
+    testHandler.smartSwitchState.enterTempEnglishMode()
+    for char in ["E", "n", "g", "l", "i", "s", "h"] {
+      testHandler.smartSwitchState.appendEnglishChar(char)
+    }
+    #expect(testHandler.smartSwitchState.isTempEnglishMode)
+    #expect(testHandler.smartSwitchState.englishBuffer == "English")
+
+    let backspaceEvent = KBEvent.KeyEventData.backspace.asEvent
+
+    // 連按兩次 Backspace（間隔幾乎為零，模擬快速連按）
+    _ = testHandler.triageInput(event: backspaceEvent)
+    _ = testHandler.triageInput(event: backspaceEvent)
+
+    // 每次 Backspace 應只刪一個字母：English(7) - 2 = Engli(5)
+    #expect(
+      testHandler.smartSwitchState.englishBuffer == "Engli",
+      "After 2 rapid Backspaces on 'English', buffer should be 'Engli', got: '\(testHandler.smartSwitchState.englishBuffer)'"
+    )
+    // 仍應在英文模式
+    #expect(testHandler.smartSwitchState.isTempEnglishMode, "Should still be in English mode")
   }
 }
