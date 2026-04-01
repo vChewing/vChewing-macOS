@@ -271,16 +271,57 @@ if inputHandler.smartSwitchState.isTempEnglishMode {
 
 同樣修正也同步套用至測試用的 `MockedInputHandlerAndStates.swift`。
 
+### 路徑 D 有漢字前綴時的修正（2026.04.01）
+
+#### 問題根源
+
+路徑 D 觸發場景：使用者先以注音輸入漢字（如「中文」，已組入 Megrez 組字器），再鍵入的字母形成無效注音讀音（如大千鍵盤的 `t`=ㄔ、`o`=ㄟ → ㄔㄟ，語彙庫查無此讀音），接著按 Space。
+
+原有的路徑 D 行為：
+1. 呼叫 `smartSwitchState.reset()`（清空 frozenSegments）。
+2. 呼叫 `freezeAssemblerContentIfNeeded()`，將「中文」凍結至 `frozenSegments`。
+3. 清空組字器。
+4. 呼叫 `switchState(ofCommitting("to"))`，將 keySequence 輸出給客體軟體。
+
+問題在於步驟 4 之後沒有後續的 `generateStateOfInputting()` 呼叫，`frozenSegments` 中的「中文」永遠不會再顯示，使用者看到的結果是：`to` 先被輸出，「中文」無聲無息地消失。
+
+#### 修正方案
+
+在 `freezeAssemblerContentIfNeeded()` 執行完畢後，檢查 `frozenSegments` 是否非空：
+
+- **有凍結漢字**：改進入臨時英文模式，將 `keySequence + " "` 放入 `englishBuffer`，並以 `ofInputting` 狀態顯示「中文」(frozen) + `"to "` (英文緩衝)。使用者可繼續輸入字母或按 Enter 一次提交所有內容。
+- **無凍結漢字**（組字器為空）：維持原行為，直接 commit keySequence。
+
+```swift
+if !handler.smartSwitchState.frozenSegments.isEmpty {
+    handler.smartSwitchState.enterTempEnglishMode()
+    handler.smartSwitchState.appendEnglishChar(keysToCommit + " ")
+    let frozen = handler.smartSwitchState.frozenDisplayText
+    let buffer = handler.smartSwitchState.englishBuffer
+    let combinedDisplay = frozen + buffer
+    let newState = State.ofInputting(
+        displayTextSegments: [frozen, buffer].filter { !$0.isEmpty },
+        cursor: combinedDisplay.count,
+        highlightAt: nil
+    )
+    session.switchState(newState)
+} else {
+    session.switchState(State.ofCommitting(textToCommit: keysToCommit))
+}
+```
+
+迴歸測試：TC-038（`SmartSwitchTests.swift`）。
+
 ### 關鍵檔案
 
 | 檔案 | 用途 |
 |------|------|
-| `Packages/vChewing_Typewriter/Sources/Typewriter/Typewriter/Typewriter_Phonabet.swift` | SmartSwitchState、triggerTempEnglishMode、handleTempEnglishMode |
+| `Packages/vChewing_Typewriter/Sources/Typewriter/Typewriter/Typewriter_Phonabet.swift` | SmartSwitchState、triggerTempEnglishMode、handleTempEnglishMode、composeReadingIfReady（路徑 D） |
 | `Packages/vChewing_Typewriter/Sources/Typewriter/InputHandler/InputHandler_CoreProtocol.swift` | `clear()` — 須呼叫 `smartSwitchState.reset()` |
 | `Packages/vChewing_Typewriter/Sources/Typewriter/InputHandler/InputHandler_TriageInput.swift` | `triageInput` — Space/CapsLock/英文字母的分診邏輯 |
 | `Packages/vChewing_MainAssembly4Darwin/Sources/MainAssembly4Darwin/SessionController/InputSession_CoreProtocol.swift` | `resetInputHandler()` — CapsLock 觸發的重置，須納入 englishBuffer |
 | `Packages/vChewing_MainAssembly4Darwin/Sources/MainAssembly4Darwin/SessionController/InputSession_HandleEvent.swift` | capsLockHitChecker → resetInputHandler 的觸發點 |
-| `Packages/vChewing_Typewriter/Tests/TypewriterTests/SmartSwitchTests.swift` | 37 個測試案例（TC-001 ~ TC-037） |
+| `Packages/vChewing_Typewriter/Tests/TypewriterTests/SmartSwitchTests.swift` | 38 個測試案例（TC-001 ~ TC-038） |
 
 ---
 

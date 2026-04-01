@@ -645,6 +645,70 @@ final class SmartSwitchTests {
     #expect(testHandler.composer.isEmpty, "Composer should be empty after Path D commit")
   }
 
+  /// TC-038: 路徑 D 有漢字前綴時，應保留漢字於組字區並進入臨時英文模式（迴歸測試）
+  /// 場景：組字器有漢字（ㄅㄧˋ），打 't'（ㄔ）+ 'o'（ㄟ）+ space，
+  /// ㄔㄟ 在語彙庫中無效（路徑 D），但組字器有漢字前綴，
+  /// 預期：不 commit 任何文字，改進入臨時英文模式，英文緩衝為 "to "，漢字凍結在組字區。
+  @Test("TC-038: Path D with Chinese prefix keeps Chinese in buffer and enters English mode")
+  func testPathDWithChinesePrefixEntersEnglishMode() {
+    guard let testHandler, let testSession else {
+      Issue.record("testHandler or testSession is nil.")
+      return
+    }
+
+    resetTestState()
+    testSession.recentCommissions.removeAll()
+
+    // 先組入一個有效讀音，讓組字器含有漢字
+    _ = testHandler.assembler.insertKey("ㄅㄧˋ")
+    testHandler.assemble()
+    #expect(!testHandler.assembler.isEmpty, "Assembler should have content")
+    testSession.recentCommissions.removeAll()
+
+    // 打 't'（大千：ㄔ 聲母），不觸發智慧切換（composer 從空變非空）
+    _ = testHandler.triageInput(event: createKeyEvent(char: "t"))
+    #expect(testHandler.smartSwitchState.keySequence == "t")
+
+    // 打 'o'（大千：ㄟ 韻母）→ ㄔ + ㄟ，路徑 B/C 不觸發
+    _ = testHandler.triageInput(event: createKeyEvent(char: "o"))
+    #expect(!testHandler.smartSwitchState.isTempEnglishMode, "Should NOT be in English mode after 'o'")
+    #expect(testHandler.smartSwitchState.keySequence == "to")
+
+    // 打 space → 路徑 D 觸發；因有漢字前綴，應進入臨時英文模式而非 commit
+    let spaceEvent = KBEvent.KeyEventData.dataSpace.asEvent
+    _ = testHandler.triageInput(event: spaceEvent)
+
+    // 不應有任何文字被 commit 出去
+    #expect(
+      testSession.recentCommissions.isEmpty,
+      "Nothing should be committed when Chinese prefix exists; got: \(testSession.recentCommissions)"
+    )
+
+    // 應已進入臨時英文模式
+    #expect(
+      testHandler.smartSwitchState.isTempEnglishMode,
+      "Should be in temp English mode after Path D with Chinese prefix"
+    )
+
+    // frozenSegments 應含有漢字
+    #expect(
+      !testHandler.smartSwitchState.frozenSegments.isEmpty,
+      "frozenSegments should contain the Chinese text"
+    )
+
+    // 英文緩衝應為 "to "（keySequence + space）
+    #expect(
+      testHandler.smartSwitchState.englishBuffer == "to ",
+      "englishBuffer should be 'to ', got: '\(testHandler.smartSwitchState.englishBuffer)'"
+    )
+
+    // session 狀態應為 ofInputting（顯示漢字 + 英文緩衝）
+    #expect(
+      testSession.state.type == .ofInputting,
+      "State should be ofInputting, got: \(testSession.state.type)"
+    )
+  }
+
   /// TC-018: 路徑 C' — vowel 後接 consonant 觸發英文切換
   /// 場景：打 'i'（大千：ㄛ 韻母）再打 's'（大千：ㄋ 聲母），
   /// 正常注音不會 vowel 後接 consonant，應觸發智慧切換進入英文模式（英文緩衝 "is"）。

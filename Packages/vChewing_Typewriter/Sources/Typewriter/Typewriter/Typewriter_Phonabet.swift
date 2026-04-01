@@ -185,7 +185,10 @@ public struct PhonabetTypewriter<Handler: InputHandlerProtocol>: TypewriterProto
       }
 
       // 路徑 D：讀音無效時，若智慧中英文切換啟用且有按鍵序列記錄，
-      // 則直接將 keySequence 作為英文 commit 出去（如：ㄔㄟ → "to"）。
+      // 則將 keySequence 作為英文處理。
+      // 若組字器有漢字（freezeAssemblerContentIfNeeded 會凍結至 frozenSegments），
+      // 改為進入臨時英文模式並保留漢字在組字區，讓使用者可繼續輸入；
+      // 否則直接 commit（無漢字前綴時維持原行為，如：ㄔㄟ → "to"）。
       if prefs.smartChineseEnglishSwitchEnabled,
          !handler.smartSwitchState.isTempEnglishMode,
          !handler.smartSwitchState.keySequence.isEmpty {
@@ -194,7 +197,22 @@ public struct PhonabetTypewriter<Handler: InputHandlerProtocol>: TypewriterProto
         handler.composer.clear()
         freezeAssemblerContentIfNeeded()
         handler.assembler.clear()
-        session.switchState(State.ofCommitting(textToCommit: keysToCommit))
+        if !handler.smartSwitchState.frozenSegments.isEmpty {
+          // 有凍結漢字：進入臨時英文模式，把 keySequence + 空格放入英文緩衝。
+          handler.smartSwitchState.enterTempEnglishMode()
+          handler.smartSwitchState.appendEnglishChar(keysToCommit + " ")
+          let frozen = handler.smartSwitchState.frozenDisplayText
+          let buffer = handler.smartSwitchState.englishBuffer
+          let combinedDisplay = frozen + buffer
+          let newState = State.ofInputting(
+            displayTextSegments: [frozen, buffer].filter { !$0.isEmpty },
+            cursor: combinedDisplay.count,
+            highlightAt: nil
+          )
+          session.switchState(newState)
+        } else {
+          session.switchState(State.ofCommitting(textToCommit: keysToCommit))
+        }
         return true
       }
 
