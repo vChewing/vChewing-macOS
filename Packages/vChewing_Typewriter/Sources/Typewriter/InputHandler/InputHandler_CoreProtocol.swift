@@ -296,6 +296,7 @@ extension InputHandlerProtocol {
     currentLM.purgeInputTokenHashMap()
     currentTypingMethod = .vChewingFactory
     backupCursor = nil
+    smartSwitchState.reset()
   }
 
   public func removeBackupCursor() {

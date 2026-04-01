@@ -520,6 +520,14 @@ extension PhonabetTypewriter {
     _ input: some InputSignalProtocol,
     session: Session
   ) -> Bool? {
+    // Escape：丟棄英文緩衝與凍結段落，清空 assembler，返回空白狀態。不提交任何文字，不穿透 OS。
+    // 注意：switchState(.ofAbortion()) 會呼叫 inputHandler?.clear()，
+    // 而 clear() 現在已包含 smartSwitchState.reset()，故無需手動 reset/clear。
+    if input.isEsc {
+      session.switchState(State.ofAbortion())
+      return true
+    }
+
     // 檢查是否為返回中文模式的觸發鍵
     if isTriggerToReturnToChinese(input) {
       return freezeAndReturnToChinese(session: session)
@@ -539,6 +547,21 @@ extension PhonabetTypewriter {
       if !textToCommit.isEmpty {
         session.switchState(State.ofCommitting(textToCommit: textToCommit))
       }
+      return true
+    }
+
+    // 空白鍵：直接插入空格到英文緩衝（支援輸入 "Hello World" 此類含空格的英文）
+    if input.isSpace {
+      handler.smartSwitchState.appendEnglishChar(" ")
+      let frozen = handler.smartSwitchState.frozenDisplayText
+      let buffer = handler.smartSwitchState.englishBuffer
+      let combinedDisplay = frozen + buffer
+      let state = State.ofInputting(
+        displayTextSegments: [frozen, buffer].filter { !$0.isEmpty },
+        cursor: combinedDisplay.count,
+        highlightAt: nil
+      )
+      session.switchState(state)
       return true
     }
 
@@ -564,8 +587,9 @@ extension PhonabetTypewriter {
   }
 
   /// 檢查是否為返回中文模式的觸發鍵
+  /// 注意：空白鍵不在此列，英文模式下空白鍵會直接插入到英文緩衝（以便輸入 "Hello World" 此類含空格的英文）。
   private func isTriggerToReturnToChinese(_ input: InputSignalProtocol) -> Bool {
-    return input.isSpace || input.isTab || isPunctuationKey(input)
+    return input.isTab || isPunctuationKey(input)
   }
 
   /// 檢查是否為標點符號鍵
@@ -759,12 +783,21 @@ extension PhonabetTypewriter {
 
   /// 執行進入臨時英文模式的動作，將 `keySequence` 內容放入英文緩衝並更新畫面。
   private func triggerTempEnglishMode(session: Session) -> Bool {
+    // 先保存觸發前已凍結的段落與按鍵序列（clear() 之前儲存，避免被 ofAbortion 清空）。
     let keysToConvert = handler.smartSwitchState.keySequence
+    let savedFrozenSegments = handler.smartSwitchState.frozenSegments
+
+    // 用 ofAbortion 清除 composer 的注音顯示（不會 commit previous displayedText）。
+    // 注意：switchState(.ofAbortion()) 會呼叫 inputHandler?.clear()，
+    // 而 clear() 包含 smartSwitchState.reset()，所以必須在此之後再設置 smartSwitchState。
+    session.switchState(State.ofAbortion())
+
+    // ofAbortion 之後重新設置 smartSwitchState。
+    for segment in savedFrozenSegments {
+      handler.smartSwitchState.freezeSegment(segment)
+    }
     handler.smartSwitchState.enterTempEnglishMode()
     handler.smartSwitchState.appendEnglishChar(keysToConvert)
-
-    // 先用 ofAbortion 清除 composer 的注音顯示（不會 commit previous displayedText）。
-    session.switchState(State.ofAbortion())
 
     // 建構顯示狀態：凍結漢字（若有）+ 英文緩衝。
     let frozen = handler.smartSwitchState.frozenDisplayText

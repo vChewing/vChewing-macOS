@@ -464,8 +464,8 @@ final class SmartSwitchTests {
     #expect(testHandler.smartSwitchState.englishBuffer == "test", "English buffer should contain 'test'")
   }
 
-  /// TC-014: 輸入 'test' 後按空格，'test' 應凍結在組字區（不直接提交）
-  @Test("TC-014: Pressing Space after 'test' freezes 'test' in composition buffer")
+  /// TC-014: 輸入 'test' 後按空格，空格應直接插入英文緩衝（'test '），不凍結、不離開英文模式
+  @Test("TC-014: Pressing Space after 'test' appends space to english buffer")
   func testSpaceAfterTestFreezeTest() {
     guard let testHandler, let testSession else {
       Issue.record("testHandler or testSession is nil.")
@@ -483,20 +483,23 @@ final class SmartSwitchTests {
 
     #expect(testHandler.smartSwitchState.englishBuffer == "test", "Buffer should be 'test'")
 
-    // 按空格（新行為：凍結，不提交）
+    // 按空格（新行為：插入空格到英文緩衝，不離開英文模式）
     let spaceEvent = KBEvent.KeyEventData.dataSpace.asEvent
     _ = testHandler.triageInput(event: spaceEvent)
 
-    // 'test' 不應被直接 commit
+    // 不應有任何文字被 commit 出去
     #expect(
       testSession.recentCommissions.isEmpty,
-      "Space should freeze, not commit; got: \(testSession.recentCommissions)"
+      "Space should append to buffer, not commit; got: \(testSession.recentCommissions)"
     )
 
-    // frozenDisplayText 應包含 'test'
+    // 仍在英文模式
+    #expect(testHandler.smartSwitchState.isTempEnglishMode, "Should still be in temp English mode")
+
+    // englishBuffer 應為 'test '（含空格）
     #expect(
-      testHandler.smartSwitchState.frozenDisplayText.contains("test"),
-      "frozenDisplayText should contain 'test', got: '\(testHandler.smartSwitchState.frozenDisplayText)'"
+      testHandler.smartSwitchState.englishBuffer == "test ",
+      "englishBuffer should be 'test ', got: '\(testHandler.smartSwitchState.englishBuffer)'"
     )
   }
 
@@ -893,8 +896,8 @@ final class SmartSwitchTests {
     #expect(testHandler.smartSwitchState.englishBuffer.isEmpty, "English buffer should be empty")
   }
 
-  /// TC-025: 英文模式下按空格，凍結緩衝（不提交）並返回中文模式
-  @Test("TC-025: Space in English mode freezes buffer, returns to Chinese mode without commit")
+  /// TC-025: 英文模式下按空格，空格插入緩衝（不離開英文模式、不提交）；按 Tab 才凍結並返回中文
+  @Test("TC-025: Space in English mode appends to buffer; Tab freezes buffer and returns to Chinese")
   func testSpaceInEnglishModeFreezeBuffer() {
     guard let testHandler, let testSession else {
       Issue.record("testHandler or testSession is nil.")
@@ -912,29 +915,42 @@ final class SmartSwitchTests {
     #expect(testHandler.smartSwitchState.isTempEnglishMode, "Should be in English mode")
     #expect(testHandler.smartSwitchState.englishBuffer == "test")
 
-    // 按空格（新行為：凍結而非提交）
+    // 按空格（新行為：插入空格到緩衝，不離開英文模式）
     let spaceEvent = KBEvent.KeyEventData.dataSpace.asEvent
     _ = testHandler.triageInput(event: spaceEvent)
 
-    // 新行為：不應有任何文字被 commit 出去
+    // 不應有任何文字被 commit 出去
     #expect(
       testSession.recentCommissions.isEmpty,
-      "Space should freeze, not commit; got: \(testSession.recentCommissions)"
+      "Space should append to buffer, not commit; got: \(testSession.recentCommissions)"
     )
 
-    // 已退出英文模式
-    #expect(!testHandler.smartSwitchState.isTempEnglishMode, "Should have exited English mode")
+    // 仍在英文模式
+    #expect(testHandler.smartSwitchState.isTempEnglishMode, "Should still be in English mode after Space")
 
-    // frozenSegments 應包含 "test"
+    // 緩衝應為 'test '（含空格）
+    #expect(
+      testHandler.smartSwitchState.englishBuffer == "test ",
+      "englishBuffer should be 'test ', got: '\(testHandler.smartSwitchState.englishBuffer)'"
+    )
+
+    // 按 Tab → 凍結 'test ' 並返回中文
+    let tabEvent = KBEvent.KeyEventData.dataTab.asEvent
+    _ = testHandler.triageInput(event: tabEvent)
+
+    // 已退出英文模式
+    #expect(!testHandler.smartSwitchState.isTempEnglishMode, "Should have exited English mode after Tab")
+
+    // frozenSegments 應包含 "test "（含空格）
     #expect(
       testHandler.smartSwitchState.frozenDisplayText.contains("test"),
       "frozenDisplayText should contain 'test', got: '\(testHandler.smartSwitchState.frozenDisplayText)'"
     )
 
-    // session state 仍是 ofInputting（顯示 'test' 在組字區）
+    // session state 仍是 ofInputting（顯示 'test ' 在組字區）
     #expect(
       testSession.state.type == .ofInputting,
-      "State should be ofInputting after Space freeze"
+      "State should be ofInputting after Tab freeze"
     )
   }
 
@@ -1073,13 +1089,13 @@ final class SmartSwitchTests {
     _ = testHandler.triageInput(event: createKeyEvent(char: "t"))
     #expect(testHandler.smartSwitchState.isTempEnglishMode)
 
-    // Step 2: 按空格，凍結 "test"，回到中文模式
-    let spaceEvent = KBEvent.KeyEventData.dataSpace.asEvent
-    _ = testHandler.triageInput(event: spaceEvent)
-    #expect(!testHandler.smartSwitchState.isTempEnglishMode, "Should be back in Chinese mode")
+    // Step 2: 按 Tab，凍結 "test"，回到中文模式（space 現在改為插入空格到緩衝）
+    let tabEvent = KBEvent.KeyEventData.dataTab.asEvent
+    _ = testHandler.triageInput(event: tabEvent)
+    #expect(!testHandler.smartSwitchState.isTempEnglishMode, "Should be back in Chinese mode after Tab")
 
     let frozen = testHandler.smartSwitchState.frozenDisplayText
-    #expect(!frozen.isEmpty, "frozenDisplayText should be non-empty after Space")
+    #expect(!frozen.isEmpty, "frozenDisplayText should be non-empty after Tab")
 
     testSession.recentCommissions.removeAll()
 
@@ -1238,5 +1254,308 @@ final class SmartSwitchTests {
     )
     // 仍應在英文模式
     #expect(testHandler.smartSwitchState.isTempEnglishMode, "Should still be in English mode")
+  }
+
+  /// TC-033b: Shift+E 在測試 LM 中被 _letter_E 攔截，'E' 進入 assembler 而非 englishBuffer。
+  /// 這是預期的中間狀態：assembler 非空，smart switch 尚未觸發。
+  @Test("TC-033b: Shift+E is intercepted by _letter_E, puts E in assembler (not englishBuffer)")
+  func testCapitalLetterAloneEntersEnglishMode() {
+    guard let testHandler, let testSession else {
+      Issue.record("testHandler or testSession is nil.")
+      return
+    }
+    resetTestState()
+    testSession.recentCommissions.removeAll()
+
+    // 確認前置條件
+    #expect(testHandler.prefs.smartChineseEnglishSwitchEnabled == true)
+    #expect(!testHandler.smartSwitchState.isTempEnglishMode)
+
+    // 輸入 Shift+E
+    let shiftEEvent = KBEvent.KeyEventData(
+      flags: .shift,
+      chars: "E",
+      charsSansModifiers: "e",
+      keyCode: mapKeyCodesANSIForTests["e"]
+    ).asEvent
+
+    // 確認 isUpperCaseASCIILetterKey
+    #expect(shiftEEvent.isUpperCaseASCIILetterKey, "Shift+E should be isUpperCaseASCIILetterKey")
+    #expect(shiftEEvent.isShiftHold, "Shift+E should have isShiftHold")
+
+    let result = testHandler.triageInput(event: shiftEEvent)
+
+    // _letter_E 存在於測試 LM，所以 handlePunctuation 攔截並返回 true
+    #expect(result, "Shift+E should be intercepted by _letter_E (return true)")
+
+    // 'E' 進入 assembler（透過 _letter_E unigram），smart switch 尚未觸發
+    #expect(
+      !testHandler.smartSwitchState.isTempEnglishMode,
+      "Smart switch should NOT be triggered yet — E is in assembler via _letter_E"
+    )
+    #expect(
+      testHandler.smartSwitchState.englishBuffer.isEmpty,
+      "englishBuffer should be empty (E is in assembler, not englishBuffer), got: '\(testHandler.smartSwitchState.englishBuffer)'"
+    )
+    // assembler 應非空（含 _letter_E key）
+    #expect(
+      !testHandler.assembler.isEmpty,
+      "assembler should be non-empty after Shift+E (_letter_E inserted)"
+    )
+  }
+
+  /// TC-033: 中文模式下輸入 Shift+E（由 _letter_E 攔截後進入 assembler）後接小寫字母，
+  /// 應觸發智慧中英文切換。assembler 的 "E" 被凍結到 frozenSegments，後續小寫字母進入 englishBuffer。
+  /// 合併顯示（frozenDisplayText + englishBuffer）= "English"。
+  @Test("TC-033: Shift+E then lowercase: E frozen in segments, nglish in buffer, display = English")
+  func testCapitalLetterTriggersSmartSwitch() {
+    guard let testHandler, let testSession else {
+      Issue.record("testHandler or testSession is nil.")
+      return
+    }
+    resetTestState()
+    testSession.recentCommissions.removeAll()
+
+    // 模擬在中文模式下輸入 "English"：Shift+E 後接小寫 n,g,l,i,s,h
+    let shiftEEvent = KBEvent.KeyEventData(
+      flags: .shift,
+      chars: "E",
+      charsSansModifiers: "e",
+      keyCode: mapKeyCodesANSIForTests["e"]
+    ).asEvent
+
+    // 先輸入 Shift+E（_letter_E → E 進 assembler）
+    _ = testHandler.triageInput(event: shiftEEvent)
+
+    // 再輸入小寫 n,g,l,i,s,h（路徑 A/B/C 觸發智慧切換，freezeAssemblerContentIfNeeded 將 E 凍結）
+    for char in ["n", "g", "l", "i", "s", "h"] {
+      _ = testHandler.triageInput(event: createKeyEvent(char: char))
+    }
+
+    // 應進入臨時英文模式
+    #expect(
+      testHandler.smartSwitchState.isTempEnglishMode,
+      "Should be in temp English mode after typing 'English'"
+    )
+    // frozenDisplayText 應含 "E"（被 freezeAssemblerContentIfNeeded 凍結）
+    #expect(
+      testHandler.smartSwitchState.frozenDisplayText == "E",
+      "frozenDisplayText should be 'E' (frozen from assembler), got: '\(testHandler.smartSwitchState.frozenDisplayText)'"
+    )
+    // englishBuffer 應含 "nglish"（不含大寫 E，因為 E 已被凍結到 frozenSegments）
+    #expect(
+      testHandler.smartSwitchState.englishBuffer == "nglish",
+      "englishBuffer should be 'nglish', got: '\(testHandler.smartSwitchState.englishBuffer)'"
+    )
+    // 合併顯示應為 "English"
+    let combinedDisplay = testHandler.smartSwitchState.frozenDisplayText + testHandler.smartSwitchState.englishBuffer
+    #expect(
+      combinedDisplay == "English",
+      "Combined display (frozen + englishBuffer) should be 'English', got: '\(combinedDisplay)'"
+    )
+  }
+
+  /// TC-034: 臨時英文模式下按 Escape 應清空所有狀態（englishBuffer、frozenSegments、assembler），
+  /// 返回 ofAbortion（不提交任何文字），且 Escape 被消耗不穿透 OS（return true）。
+  @Test("TC-034: Escape in temp English mode discards everything, returns ofAbortion, consumes key")
+  func testEscapeInTempEnglishModeDiscardsAll() {
+    guard let testHandler, let testSession else {
+      Issue.record("testHandler or testSession is nil.")
+      return
+    }
+    resetTestState()
+    testSession.recentCommissions.removeAll()
+
+    // 直接設定臨時英文模式前置狀態
+    testHandler.smartSwitchState.enterTempEnglishMode()
+    testHandler.smartSwitchState.appendEnglishChar("h")
+    testHandler.smartSwitchState.appendEnglishChar("i")
+    testHandler.smartSwitchState.freezeSegment("你好") // 模擬有凍結的漢字
+
+    // 確認前置條件
+    #expect(testHandler.smartSwitchState.isTempEnglishMode, "Prerequisite: should be in temp English mode")
+    #expect(testHandler.smartSwitchState.englishBuffer == "hi", "Prerequisite: englishBuffer should be 'hi'")
+    #expect(testHandler.smartSwitchState.frozenDisplayText == "你好", "Prerequisite: frozenDisplayText should be '你好'")
+
+    // 按 Escape（keyCode = 53）
+    let escapeEvent = KBEvent.KeyEventData(
+      chars: "\u{1B}",
+      keyCode: 53 // kEscape
+    ).asEvent
+    #expect(escapeEvent.isEsc, "Event should be recognized as Escape")
+
+    let result = testHandler.triageInput(event: escapeEvent)
+
+    // Escape 應被消耗（不穿透 OS）
+    #expect(result, "Escape should be consumed (return true), not pass through to OS")
+
+    // 所有智慧切換狀態應清空
+    #expect(
+      !testHandler.smartSwitchState.isTempEnglishMode,
+      "Should NOT be in temp English mode after Escape"
+    )
+    #expect(
+      testHandler.smartSwitchState.englishBuffer.isEmpty,
+      "englishBuffer should be empty after Escape, got: '\(testHandler.smartSwitchState.englishBuffer)'"
+    )
+    #expect(
+      testHandler.smartSwitchState.frozenDisplayText.isEmpty,
+      "frozenDisplayText should be empty after Escape, got: '\(testHandler.smartSwitchState.frozenDisplayText)'"
+    )
+    // assembler 也應清空
+    #expect(testHandler.assembler.isEmpty, "assembler should be empty after Escape")
+
+    // 不應有任何提交
+    #expect(
+      testSession.recentCommissions.isEmpty,
+      "No text should be committed on Escape, got: \(testSession.recentCommissions)"
+    )
+  }
+
+  /// TC-036: 臨時英文模式下（有凍結漢字 + 英文緩衝）啟用 CapsLock，
+  /// 組字區的完整文字（凍結漢字 + 英文緩衝）應被一起提交，不應遺漏 englishBuffer。
+  @Test("TC-036: CapsLock in temp English mode commits full text (frozen + englishBuffer)")
+  func testCapsLockInTempEnglishModeCommitsFullText() {
+    guard let testHandler, let testSession else {
+      Issue.record("testHandler or testSession is nil.")
+      return
+    }
+    resetTestState()
+    testSession.recentCommissions.removeAll()
+
+    // 模擬：組字區有 "中文E"（凍結）+ "nglish"（英文緩衝）
+    // 對應場景：使用者打出 '中文E' 並觸發智慧切換，然後繼續打 'n', 'g', 'l', 'i', 's', 'h'
+    testHandler.smartSwitchState.freezeSegment("中文E")
+    testHandler.smartSwitchState.enterTempEnglishMode()
+    testHandler.smartSwitchState.appendEnglishChar("n")
+    testHandler.smartSwitchState.appendEnglishChar("g")
+    testHandler.smartSwitchState.appendEnglishChar("l")
+    testHandler.smartSwitchState.appendEnglishChar("i")
+    testHandler.smartSwitchState.appendEnglishChar("s")
+    testHandler.smartSwitchState.appendEnglishChar("h")
+
+    // 設定 session.state 為對應的 ofInputting 狀態（反映畫面顯示）
+    // 在真實執行路徑中，handleTempEnglishMode 每次按字母後都會更新 session.state
+    testSession.state = MockIMEState.ofInputting(
+      displayTextSegments: ["中文E", "nglish"],
+      cursor: 10
+    )
+
+    #expect(testHandler.smartSwitchState.isTempEnglishMode, "Prerequisite: should be in temp English mode")
+    #expect(testHandler.smartSwitchState.englishBuffer == "nglish", "Prerequisite: englishBuffer should be 'nglish'")
+    #expect(testHandler.smartSwitchState.frozenDisplayText == "中文E", "Prerequisite: frozenDisplayText should be '中文E'")
+    #expect(testSession.state.displayedText == "中文English", "Prerequisite: session.state.displayedText should be '中文English'")
+
+    // 確認 bypassNonAppleCapsLockHandling 為 false
+    #expect(!testHandler.prefs.bypassNonAppleCapsLockHandling, "Prerequisite: bypassNonAppleCapsLockHandling should be false")
+
+    // 按 CapsLock + 'a'
+    let capsLockAEvent = KBEvent.KeyEventData(
+      flags: .capsLock,
+      chars: "a",
+      charsSansModifiers: "a",
+      keyCode: mapKeyCodesANSIForTests["a"]
+    ).asEvent
+    #expect(capsLockAEvent.isCapsLockOn, "Event should have CapsLock flag set")
+
+    _ = testHandler.triageInput(event: capsLockAEvent)
+
+    // 完整的 "中文English" 應被提交（不應只提交 "中文E"）
+    #expect(
+      testSession.recentCommissions.contains("中文English"),
+      "Full text '中文English' should be committed on CapsLock, got: \(testSession.recentCommissions)"
+    )
+  }
+
+  /// TC-037: resetInputHandler() 在臨時英文模式下（有凍結漢字 + 英文緩衝），
+  /// 應提交完整的文字（凍結漢字 + 英文緩衝），不應遺漏 englishBuffer。
+  /// 這測試的是 CapsLock 鍵物理按下 → capsLockHitChecker → resetInputHandler() 的真實路徑。
+  @Test("TC-037: resetInputHandler() in temp English mode commits full text (frozen + englishBuffer)")
+  func testResetInputHandlerInTempEnglishModeCommitsFullText() {
+    guard let testHandler, let testSession else {
+      Issue.record("testHandler or testSession is nil.")
+      return
+    }
+    resetTestState()
+    testSession.recentCommissions.removeAll()
+
+    // 設定前置狀態：凍結段落 "中文E" + 英文緩衝 "nglish"
+    testHandler.smartSwitchState.freezeSegment("中文E")
+    testHandler.smartSwitchState.enterTempEnglishMode()
+    testHandler.smartSwitchState.appendEnglishChar("n")
+    testHandler.smartSwitchState.appendEnglishChar("g")
+    testHandler.smartSwitchState.appendEnglishChar("l")
+    testHandler.smartSwitchState.appendEnglishChar("i")
+    testHandler.smartSwitchState.appendEnglishChar("s")
+    testHandler.smartSwitchState.appendEnglishChar("h")
+
+    // 同步 session.state（反映真實 app 中 handleTempEnglishMode 每次更新的狀態）
+    testSession.state = MockIMEState.ofInputting(
+      displayTextSegments: ["中文E", "nglish"],
+      cursor: 10
+    )
+
+    #expect(testHandler.smartSwitchState.isTempEnglishMode, "Prerequisite: should be in temp English mode")
+    #expect(testHandler.smartSwitchState.englishBuffer == "nglish", "Prerequisite: englishBuffer should be 'nglish'")
+    #expect(testHandler.smartSwitchState.frozenDisplayText == "中文E", "Prerequisite: frozenDisplayText should be '中文E'")
+
+    // 直接呼叫 resetInputHandler()，模擬 CapsLock 物理按下 → capsLockHitChecker → resetInputHandler() 的路徑
+    testSession.resetInputHandler()
+
+    // 完整的 "中文English" 應被提交（不應只提交 "中文E"）
+    #expect(
+      testSession.recentCommissions.contains("中文English"),
+      "Full text '中文English' should be committed by resetInputHandler(), got: \(testSession.recentCommissions)"
+    )
+  }
+
+  /// TC-035: 臨時英文模式下啟用 CapsLock 並按字母，切換後 smartSwitchState 應被完整重置。
+  /// 若未重置，關掉 CapsLock 後的下一個注音按鍵會被誤認為英文模式的輸入，導致錯誤行為。
+  @Test("TC-035: CapsLock in temp English mode resets smartSwitchState completely")
+  func testCapsLockInTempEnglishModeResetsSwitchState() {
+    guard let testHandler, let testSession else {
+      Issue.record("testHandler or testSession is nil.")
+      return
+    }
+    resetTestState()
+    testSession.recentCommissions.removeAll()
+
+    // 設定臨時英文模式前置狀態（含凍結漢字）
+    testHandler.smartSwitchState.enterTempEnglishMode()
+    testHandler.smartSwitchState.appendEnglishChar("h")
+    testHandler.smartSwitchState.appendEnglishChar("i")
+    testHandler.smartSwitchState.freezeSegment("你好")
+
+    #expect(testHandler.smartSwitchState.isTempEnglishMode, "Prerequisite: should be in temp English mode")
+    #expect(testHandler.smartSwitchState.englishBuffer == "hi", "Prerequisite: englishBuffer should be 'hi'")
+    #expect(testHandler.smartSwitchState.frozenDisplayText == "你好", "Prerequisite: frozenDisplayText should be '你好'")
+
+    // 確認 bypassNonAppleCapsLockHandling 為 false（預設值），確保 CapsLock 會被處理
+    #expect(!testHandler.prefs.bypassNonAppleCapsLockHandling, "Prerequisite: bypassNonAppleCapsLockHandling should be false")
+
+    // 按 CapsLock + 'a'（flags 含 .capsLock）
+    let capsLockAEvent = KBEvent.KeyEventData(
+      flags: .capsLock,
+      chars: "a",
+      charsSansModifiers: "a",
+      keyCode: mapKeyCodesANSIForTests["a"]
+    ).asEvent
+    #expect(capsLockAEvent.isCapsLockOn, "Event should have CapsLock flag set")
+
+    _ = testHandler.triageInput(event: capsLockAEvent)
+
+    // CapsLock 切換後，smartSwitchState 應完整重置
+    #expect(
+      !testHandler.smartSwitchState.isTempEnglishMode,
+      "isTempEnglishMode should be false after CapsLock switch"
+    )
+    #expect(
+      testHandler.smartSwitchState.englishBuffer.isEmpty,
+      "englishBuffer should be empty after CapsLock switch, got: '\(testHandler.smartSwitchState.englishBuffer)'"
+    )
+    #expect(
+      testHandler.smartSwitchState.frozenDisplayText.isEmpty,
+      "frozenDisplayText should be empty after CapsLock switch, got: '\(testHandler.smartSwitchState.frozenDisplayText)'"
+    )
   }
 }
