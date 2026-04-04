@@ -168,6 +168,21 @@ public final class InputSession: @MainActor SessionProtocol, Sendable {
       inputHandler.filterabilityChecker = LMMgr.isStateDataFilterableForMarked
       inputHandler.notificationCallback = Notifier.notify
       inputHandler.pomSaveCallback = { LMMgr.savePerceptionOverrideModelData(false) }
+      inputHandler.autoLearnPhraseCallback = { [weak self] keyArray, value in
+        guard let self else { return }
+        let phrase = UserPhraseInsertable(
+          keyArray: keyArray,
+          value: value,
+          inputMode: inputMode
+        )
+        LMMgr.writeUserPhrasesAtOnce(phrase, areWeFiltering: false) {
+          // 寫入失敗時靜默忽略，下次達到閾值時會再試
+        }
+        self.inputHandler?.currentLM.insertTemporaryData(
+          unigram: .init(keyArray: keyArray, value: value, score: 0),
+          isFiltering: false
+        )
+      }
       inputHandler.assembler.maxSegLength = prefs.maxCandidateLength
       inputHandler.ensureKeyboardParser()
     } else {
@@ -179,6 +194,21 @@ public final class InputSession: @MainActor SessionProtocol, Sendable {
         notificationCallback: Notifier.notify,
         pomSaveCallback: { LMMgr.savePerceptionOverrideModelData(false) }
       )
+      inputHandler?.autoLearnPhraseCallback = { [weak self] keyArray, value in
+        guard let self else { return }
+        let phrase = UserPhraseInsertable(
+          keyArray: keyArray,
+          value: value,
+          inputMode: inputMode
+        )
+        LMMgr.writeUserPhrasesAtOnce(phrase, areWeFiltering: false) {
+          // 寫入失敗時靜默忽略，下次達到閾值時會再試
+        }
+        self.inputHandler?.currentLM.insertTemporaryData(
+          unigram: .init(keyArray: keyArray, value: value, score: 0),
+          isFiltering: false
+        )
+      }
     }
     inputHandler?.session = self
   }
