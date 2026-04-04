@@ -769,6 +769,66 @@ extension InputHandlerTests {
   }
 
   @Test
+  func test_IH311_POMSameLenSwapOverrideWinsOverLM() throws {
+    // 驗證 Task 1 修復（sameLenSwap 使用 withSpecified）：
+    // 注入 sameLenSwap 場景的 POM 建議，確認低 LM 分數候選（愷歌 -9.316）能透過
+    // POM withSpecified 覆寫取勝於高 LM 分數候選（凱歌 -6.45）。
+    guard let testHandler, let testSession else {
+      Issue.record("testHandler and testSession at least one of them is nil.")
+      return
+    }
+    testHandler.prefs.fetchSuggestionsFromPerceptionOverrideModel = true
+    clearTestPOM()
+    testSession.resetInputHandler(forceComposerCleanup: true)
+
+    // 注入「再創世的凱歌」範例資料，使測試 LM 包含 ㄎㄞˇ-ㄍㄜ 的多個候選。
+    let extractedGrams = extractGrams(from: MegrezTestComponents.strLMSampleData_SaisoukiNoGaika)
+    extractedGrams.forEach { testHandler.currentLM.insertTemporaryData(unigram: $0, isFiltering: false) }
+    defer { testHandler.currentLM.clearTemporaryData(isFiltering: false) }
+
+    // 輸入「d93ek 」（大千：ㄎㄞˇ + ㄍㄜ，即「凱/愷歌」的讀音），不帶上下文。
+    let readingKeysForKaige = "d93ek "
+    typeSentence(readingKeysForKaige)
+    let assembledBeforePOM = testHandler.assembler.assembledSentence.map(\.value).joined()
+    // LM 預設應選高分的「凱歌」
+    #expect(assembledBeforePOM == "凱歌", "測試前置條件：LM 預設應選高分的「凱歌」，但得到：\(assembledBeforePOM)")
+
+    // 找出 ㄎㄞˇ-ㄍㄜ 節點的游標位置
+    guard let found = testHandler.assembler.assembledSentence
+      .findGramWithRange(at: testHandler.actualNodeCursorPosition) else {
+      Issue.record("Failed to find gram range for ㄎㄞˇ-ㄍㄜ node")
+      return
+    }
+    let keyCursorRaw = found.range.lowerBound
+
+    // 注入 sameLenSwap 場景建議：以高 POM 機率建議低 LM 分候選「愷歌」。
+    // POM 機率 -0.07 遠高於 LM 分數（-6.45/-9.316），若使用 withSpecified 則應取勝。
+    var suggestion = LMAssembly.OverrideSuggestion()
+    let pomCandidate: (keyArray: [String], value: String, probability: Double, previous: String?) = (
+      keyArray: ["ㄎㄞˇ", "ㄍㄜ"],
+      value: "愷歌",
+      probability: -0.07, // POM 機率遠高於 LM 的 -9.316
+      previous: nil
+    )
+    suggestion.candidates = [pomCandidate]
+    suggestion.scenario = .sameLenSwap
+    suggestion.overrideCursor = keyCursorRaw
+
+    // 先確認 filterPOMAppendables 不會因為機率高於 rawScore 而拒絕（-0.07 > -9.316 應通過）
+    testHandler.currentLM.lmPerceptionOverride.testInjectedSuggestion = suggestion
+    let appended = testHandler.retrievePOMSuggestions(apply: false)
+    #expect(appended.map { $0.1.value }.contains("愷歌"),
+            "sameLenSwap POM 建議應出現在可附加候選清單中。")
+
+    // 套用 POM 建議，驗證 withSpecified 讓「愷歌」取勝
+    testHandler.currentLM.lmPerceptionOverride.testInjectedSuggestion = suggestion
+    _ = testHandler.retrievePOMSuggestions(apply: true)
+    let assembledAfterPOM = testHandler.assembler.assembledSentence.map(\.value).joined()
+    #expect(assembledAfterPOM == "愷歌",
+            "sameLenSwap POM 應透過 withSpecified 讓「愷歌」取勝，但得到：\(assembledAfterPOM)")
+  }
+
+  @Test
   func test_IH310_MultiSegCombination_EndToEnd() throws {
     // 端對端：確保拆分候選（previous+head）會被建議，且在 margin 允許時可套用。
     guard let testHandler, let testSession else {
