@@ -902,4 +902,175 @@ extension InputHandlerTests {
       #expect(testHandler.assembler.assembledSentence.map(\.value).joined().contains("是"))
     }
   }
+
+  // MARK: - 自動詞組學習測試
+
+  // MARK: -- 輔助工具
+
+  /// 輔助函式：在 assembler 中插入 3 個讀音並觸發組字，
+  /// 然後以明確選字方式對最後一個字呼叫 consolidateNode，
+  /// 藉此驅動一次完整的 phraseTracking 計數流程。
+  private func insertAndConsolidateTriple(
+    testHandler: MockInputHandler,
+    readings: [[String]],
+    values: [String]
+  ) {
+    guard readings.count == 3, values.count == 3 else { return }
+    // 注入暫存單字資料到 LM
+    for (reading, value) in zip(readings, values) {
+      testHandler.currentLM.insertTemporaryData(
+        unigram: Megrez.Unigram(keyArray: reading, value: value, score: -1),
+        isFiltering: false
+      )
+    }
+    // 直接向 assembler 插入讀音鍵（需 LM 有對應 unigram）
+    for reading in readings {
+      _ = testHandler.assembler.insertKey(reading.joined())
+    }
+    // 組字（計算 assembledSentence）
+    testHandler.assemble()
+    // 以明確選字方式對最後一字呼叫 consolidateNode，觸發 phraseTracking。
+    // 注意：skipObservation: true 防止 pomProcessing 向 POM 寫入單字觀察，
+    // 避免後續輪次的 pomSuggestion 非空而走 else 分支（跳過 phraseTracking）。
+    testHandler.consolidateNode(
+      candidate: CandidateInState(keyArray: readings[2], value: values[2]),
+      respectCursorPushing: false,
+      preConsolidate: false,
+      skipObservation: true,
+      explicitlyChosen: true
+    )
+  }
+
+  // MARK: -- 測試本體
+
+  /// IH-312: 明確選字 3 次後觸發 autoLearnPhraseCallback
+  @Test
+  func test_IH312_AutoLearnPhrase_TriggersOnThreshold() throws {
+    guard let testHandler, let testSession else {
+      Issue.record("testHandler or testSession is nil.")
+      return
+    }
+    testHandler.prefs.useSCPCTypingMode = false
+    testHandler.prefs.fetchSuggestionsFromPerceptionOverrideModel = true
+    testHandler.prefs.autoLearnPhraseTriggerThreshold = 3
+    clearTestPOM()
+    testSession.resetInputHandler(forceComposerCleanup: true)
+    defer { testHandler.currentLM.clearTemporaryData(isFiltering: false) }
+
+    var learnedPhrases: [(keyArray: [String], value: String)] = []
+    testHandler.autoLearnPhraseCallback = { keyArray, value in
+      learnedPhrases.append((keyArray: keyArray, value: value))
+    }
+    defer { testHandler.autoLearnPhraseCallback = nil }
+
+    let readings: [[String]] = [["ㄒㄧㄝˋ"], ["ㄩˇ"], ["ㄘㄤ"]]
+    let values = ["謝", "雨", "蒼"]
+
+    // 第 1 次：不應觸發
+    insertAndConsolidateTriple(testHandler: testHandler, readings: readings, values: values)
+    #expect(learnedPhrases.isEmpty, "第 1 次選字不應觸發 autoLearn")
+
+    // 第 2 次：不應觸發
+    testSession.resetInputHandler(forceComposerCleanup: true)
+    insertAndConsolidateTriple(testHandler: testHandler, readings: readings, values: values)
+    #expect(learnedPhrases.isEmpty, "第 2 次選字不應觸發 autoLearn")
+
+    // 第 3 次：應觸發
+    testSession.resetInputHandler(forceComposerCleanup: true)
+    insertAndConsolidateTriple(testHandler: testHandler, readings: readings, values: values)
+    #expect(!learnedPhrases.isEmpty, "第 3 次選字應觸發 autoLearn callback")
+    let found = learnedPhrases.first {
+      $0.value.contains("謝") && $0.value.contains("雨") && $0.value.contains("蒼")
+    }
+    #expect(found != nil, "應學到包含「謝雨蒼」的詞組")
+  }
+
+  /// IH-313: 兩個不同詞組（謝宇軒 vs 謝雨蒼）的計數互不干擾
+  @Test
+  func test_IH313_AutoLearnPhrase_DifferentPhrasesDontInterfere() throws {
+    guard let testHandler, let testSession else {
+      Issue.record("testHandler or testSession is nil.")
+      return
+    }
+    testHandler.prefs.useSCPCTypingMode = false
+    testHandler.prefs.fetchSuggestionsFromPerceptionOverrideModel = true
+    testHandler.prefs.autoLearnPhraseTriggerThreshold = 3
+    clearTestPOM()
+    testSession.resetInputHandler(forceComposerCleanup: true)
+    defer { testHandler.currentLM.clearTemporaryData(isFiltering: false) }
+
+    var learnedPhrases: [(keyArray: [String], value: String)] = []
+    testHandler.autoLearnPhraseCallback = { keyArray, value in
+      learnedPhrases.append((keyArray: keyArray, value: value))
+    }
+    defer { testHandler.autoLearnPhraseCallback = nil }
+
+    let readingsXYX: [[String]] = [["ㄒㄧㄝˋ"], ["ㄩˇ"], ["ㄒㄩㄢ"]]
+    let valuesXYX = ["謝", "宇", "軒"]
+    let readingsXYC: [[String]] = [["ㄒㄧㄝˋ"], ["ㄩˇ"], ["ㄘㄤ"]]
+    let valuesXYC = ["謝", "雨", "蒼"]
+
+    // 交替輸入兩個名字各 1 次（共 2 次），均不應觸發
+    insertAndConsolidateTriple(testHandler: testHandler, readings: readingsXYX, values: valuesXYX)
+    testSession.resetInputHandler(forceComposerCleanup: true)
+    insertAndConsolidateTriple(testHandler: testHandler, readings: readingsXYC, values: valuesXYC)
+    testSession.resetInputHandler(forceComposerCleanup: true)
+    #expect(learnedPhrases.isEmpty, "交替輸入後不應觸發任何 autoLearn")
+
+    // 再輸入謝宇軒 2 次（共 3 次），應觸發謝宇軒但不觸發謝雨蒼
+    insertAndConsolidateTriple(testHandler: testHandler, readings: readingsXYX, values: valuesXYX)
+    testSession.resetInputHandler(forceComposerCleanup: true)
+    insertAndConsolidateTriple(testHandler: testHandler, readings: readingsXYX, values: valuesXYX)
+    #expect(
+      learnedPhrases.contains { $0.value.contains("謝") && $0.value.contains("宇") && $0.value.contains("軒") },
+      "謝宇軒輸入 3 次後應被學習"
+    )
+    #expect(
+      !learnedPhrases.contains { $0.value.contains("謝") && $0.value.contains("雨") && $0.value.contains("蒼") },
+      "謝雨蒼只輸入 1 次不應被學習"
+    )
+  }
+
+  /// IH-314: 已在詞庫的詞組不會重複觸發 callback
+  @Test
+  func test_IH314_AutoLearnPhrase_SkipsIfAlreadyInLM() throws {
+    guard let testHandler, let testSession else {
+      Issue.record("testHandler or testSession is nil.")
+      return
+    }
+    testHandler.prefs.useSCPCTypingMode = false
+    testHandler.prefs.fetchSuggestionsFromPerceptionOverrideModel = true
+    testHandler.prefs.autoLearnPhraseTriggerThreshold = 3
+    clearTestPOM()
+    testSession.resetInputHandler(forceComposerCleanup: true)
+    defer { testHandler.currentLM.clearTemporaryData(isFiltering: false) }
+
+    // 預先插入「謝雨蒼」及其所有子詞組到 LM（模擬已在詞庫）
+    // phraseTracking 會對 window 內所有長度 2..N 的 slice 逐一檢查，
+    // 因此必須確保全部子詞組都已在 LM 中，否則短詞組會先觸發 callback。
+    let preloadPairs: [([String], String)] = [
+      (["ㄩˇ", "ㄘㄤ"], "雨蒼"),
+      (["ㄒㄧㄝˋ", "ㄩˇ", "ㄘㄤ"], "謝雨蒼"),
+    ]
+    for (keyArray, value) in preloadPairs {
+      testHandler.currentLM.insertTemporaryData(
+        unigram: .init(keyArray: keyArray, value: value, score: 0),
+        isFiltering: false
+      )
+    }
+
+    var callbackCount = 0
+    testHandler.autoLearnPhraseCallback = { _, _ in callbackCount += 1 }
+    defer { testHandler.autoLearnPhraseCallback = nil }
+
+    let readings: [[String]] = [["ㄒㄧㄝˋ"], ["ㄩˇ"], ["ㄘㄤ"]]
+    let values = ["謝", "雨", "蒼"]
+
+    // 選字 3 次，應不觸發 callback（因為已在詞庫）
+    for _ in 0 ..< 3 {
+      testSession.resetInputHandler(forceComposerCleanup: true)
+      insertAndConsolidateTriple(testHandler: testHandler, readings: readings, values: values)
+    }
+    #expect(callbackCount == 0, "已在詞庫的詞組不應重複觸發 callback")
+  }
 }
