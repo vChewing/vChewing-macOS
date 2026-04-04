@@ -428,6 +428,37 @@ extension InputHandlerProtocol {
         )
         prefs.failureFlagForPOMObservation = false
       }
+      // 自動詞組學習：當使用者明確選字時，追蹤連續選用的詞組，達閾值後自動加入個人詞庫。
+      if explicitlyChosen, prefs.fetchSuggestionsFromPerceptionOverrideModel {
+        phraseTracking: do {
+          let assembled = assembler.assembledSentence
+          guard assembled.count >= 2 else { break phraseTracking }
+          let windowStart = max(0, assembled.count - 5)
+          let window = Array(assembled[windowStart...])
+          guard window.count >= 2 else { break phraseTracking }
+          for length in 2 ... window.count {
+            let slice = Array(window.suffix(length))
+            let readings = slice.flatMap {
+              $0.joinedCurrentKey(by: Megrez.Compositor.theSeparator)
+                .components(separatedBy: Megrez.Compositor.theSeparator)
+                .filter { !$0.isEmpty }
+            }
+            let value = slice.map(\.value).joined()
+            guard readings.count == value.count, readings.count >= 2, readings.count <= 5 else { continue }
+            let countKey = "#PHRASE:\(readings.joined(separator: "-")):\(value)"
+            currentLM.memorizePerception(
+              (countKey, value),
+              timestamp: Date().timeIntervalSince1970,
+              saveCallback: pomSaveCallback
+            )
+            let count = currentLM.pomCountForKey(countKey, candidate: value)
+            let threshold = prefs.autoLearnPhraseTriggerThreshold
+            guard count >= threshold else { continue }
+            guard !currentLM.hasKeyValuePairFor(keyArray: readings, value: value) else { continue }
+            autoLearnPhraseCallback?(readings, value)
+          }
+        }
+      }
     } else {
       assemble()
     }
