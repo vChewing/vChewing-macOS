@@ -57,6 +57,9 @@ public final class PrefMgr: PrefMgrProtocol, Sendable {
   @AppProperty(userDef: .kCheckAbusersOfSecureEventInputAPI)
   public var checkAbusersOfSecureEventInputAPI: Bool
 
+  @AppProperty(userDef: .kAutoLearnPhraseTriggerThreshold)
+  public var autoLearnPhraseTriggerThreshold: Int
+
   @AppProperty(userDef: .kDeltaOfCalendarYears)
   public var deltaOfCalendarYears: Int
 

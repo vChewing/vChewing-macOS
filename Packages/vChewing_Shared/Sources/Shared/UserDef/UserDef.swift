@@ -15,6 +15,7 @@ nonisolated public enum UserDef: String, CaseIterable, Identifiable, Sendable {
 
   case kIsDebugModeEnabled = "_DebugMode"
   case kFailureFlagForPOMObservation = "_FailureFlag_POMObservation"
+  case kAutoLearnPhraseTriggerThreshold = "AutoLearnPhraseTriggerThreshold"
   case kUserPhrasesDatabaseBypassed = "UserPhrasesDatabaseBypassed"
   case kReplaceSymbolMenuNodeWithUserSuppliedData = "ReplaceSymbolMenuNodeWithUserSuppliedData"
   case kCandidateServiceMenuContents = "CandidateServiceMenuContents"
@@ -416,6 +417,7 @@ nonisolated extension UserDef {
     switch self {
     case .kIsDebugModeEnabled: return .bool(false)
     case .kFailureFlagForPOMObservation: return .bool(false)
+    case .kAutoLearnPhraseTriggerThreshold: return .integer(3)
     case .kUserPhrasesDatabaseBypassed: return .bool(false)
     case .kReplaceSymbolMenuNodeWithUserSuppliedData: return .bool(true)
     case .kCandidateServiceMenuContents: return .arrayOfStrings(Self.defaultValue4CandidateServiceMenuContents)
@@ -530,6 +532,7 @@ nonisolated extension UserDef {
     switch self {
     case .kIsDebugModeEnabled: return .init(userDef: self, shortTitle: "Debug Mode")
     case .kFailureFlagForPOMObservation: return nil
+    case .kAutoLearnPhraseTriggerThreshold: return nil
     case .kEnableCandidateWindowAnimation: return .init(
         userDef: self,
         shortTitle: "i18n:UserDef.kEnableCandidateWindowAnimation.shortTitle"
