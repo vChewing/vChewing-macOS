@@ -370,10 +370,22 @@ extension LMAssembly.LMPerceptionOverride {
 
       guard let suggestions else { return .init() }
       let forceFlag = forceHighScoreOverrideFlag(for: activeKey)
+      // 計算場景：比較 POM 建議讀音段數與當前節點讀音段數。
+      // 此資訊供 retrievePOMSuggestions 選擇適當的 override 類型。
+      let currentNodeSegLength = currentNodeResult.node.keyArray.count
+      let suggestedSegLength = suggestions.first?.keyArray.count ?? currentNodeSegLength
+      let scenario: LMAssembly.OverrideSuggestion.Scenario?
+      if suggestedSegLength == currentNodeSegLength {
+        scenario = .sameLenSwap
+      } else if suggestedSegLength > currentNodeSegLength {
+        scenario = .shortToLong
+      } else {
+        scenario = .longToShort
+      }
       return .init(
         candidates: suggestions,
         forceHighScoreOverride: forceFlag,
-        scenario: nil,
+        scenario: scenario,
         overrideCursor: keyCursorRaw
       )
     }
@@ -944,7 +956,25 @@ extension LMAssembly.LMPerceptionOverride {
     for keyCandidate in mutLRUKeySeqList {
       guard let candidateParts = parsePerceptionKey(keyCandidate) else { continue }
       guard !shouldIgnorePerception(candidateParts) else { continue }
-      guard compareContextPart(candidateParts.previous, originalParts.previous) else { continue }
+
+      // 長詞組合擴展匹配（longFormCombined）：
+      // 若候選記憶了一個涵蓋「original.previous + original.head」的整體詞組
+      // （例如：查詢的 original 是 [水,果汁]，而記憶裡存了三字詞 [水果汁]），
+      // 此時候選的 previous 為 nil、head = original.previous.reading + sep + original.head，
+      // 允許此候選作為 shortToLong 的 alternateKey 候選，繞過 previous context 比對。
+      let isLongFormCombinedMatch: Bool = {
+        guard candidateParts.previous == nil else { return false }
+        guard let prevReading = originalParts.previous?.reading else { return false }
+        let combined = separatorString.isEmpty
+          ? prevReading + originalParts.headReading
+          : prevReading + separatorString + originalParts.headReading
+        // 同時確認 anterior context 也匹配
+        guard compareContextPart(candidateParts.anterior, originalParts.anterior) else { return false }
+        return candidateParts.headReading == combined
+      }()
+
+      guard compareContextPart(candidateParts.previous, originalParts.previous)
+        || isLongFormCombinedMatch else { continue }
       guard compareContextPart(candidateParts.anterior, originalParts.anterior) else { continue }
       let candidateHeadSegments =
         separatorString.isEmpty
@@ -975,7 +1005,9 @@ extension LMAssembly.LMPerceptionOverride {
       let candidateSegmentCount = candidateHeadSegments.count
 
       let acceptMatch: Bool = {
-        if matchesFullHead || matchesOriginalHead || matchesCombinedHead { return true }
+        if matchesFullHead || matchesOriginalHead || matchesCombinedHead || isLongFormCombinedMatch {
+          return true
+        }
         if matchesPrimaryHead {
           // 若原始 head 有多個 segment，且候選只有單段，僅靠 primary segment 配對可能會導致
           // 單段候選插斷多段原始頭（例如原始為 B-C，但候選僅為 B）。

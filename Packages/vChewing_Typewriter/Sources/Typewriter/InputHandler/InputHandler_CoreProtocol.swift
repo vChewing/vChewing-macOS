@@ -846,9 +846,20 @@ extension InputHandlerProtocol {
     arrResult.append(contentsOf: appendables)
     if apply {
       if !suggestion.isEmpty, let newestSuggestedCandidate = suggestion.candidates.last {
-        let overrideBehavior: Megrez.Node.OverrideType = suggestion.forceHighScoreOverride
-          ? .withSpecified
-          : .withTopGramScore
+        // 根據 POM 場景選擇適合的 override 類型：
+        // - sameLenSwap（同長度替換，如廨→謝）：使用 withSpecified，
+        //   POM 機率分數（≈ -0.07 至 -1.0）遠高於 LM 分數（-8 至 -12），確保 POM 偏好取勝。
+        // - shortToLong（合詞，如水+果汁→水果汁）：使用 withSpecified，
+        //   POM 分數高於競爭單字/雙字節點，同時 enforceRetokenization 降權（-1.0）足以壓制 LM 詞組。
+        // - longToShort（拆詞）：保守策略，使用 withTopGramScore，避免強制拆解現有詞組。
+        // - nil（場景未知，通常來自測試注入）：預設使用 withSpecified。
+        let overrideBehavior: Megrez.Node.OverrideType
+        switch suggestion.scenario {
+        case .longToShort:
+          overrideBehavior = .withTopGramScore
+        default:
+          overrideBehavior = .withSpecified
+        }
         let suggestedPair: Megrez.KeyValuePaired = .init(
           key: newestSuggestedCandidate.keyArray.joined(separator: assembler.separator),
           value: newestSuggestedCandidate.value,

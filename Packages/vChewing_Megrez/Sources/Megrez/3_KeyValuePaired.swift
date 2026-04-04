@@ -331,8 +331,12 @@ extension Megrez.Compositor {
       let demotionScore = -Swift.max(1.0, Swift.abs(overriddenNodeRef.overridingScore))
       for i in overriddenRange {
         let overlappingNodes = fetchOverlappingNodes(at: i)
+        // 降權所有在覆寫範圍內開始（anchor.location >= overridden.location）的競爭節點。
+        // 原先使用 <= 導致僅降權覆寫節點起始位置相同或更早的節點，漏掉了在覆寫範圍內
+        // 「晚一點」才起始的詞組（例如 shortToLong 場景中的「果汁」在 position 1，
+        // 而覆寫節點「水果汁」從 position 0 開始）。
         for anchor in overlappingNodes where anchor.node !== overriddenNodeRef
-          && anchor.location <= overridden.location {
+          && anchor.location >= overridden.location {
           if shouldResetNode(anchor: anchor.node, overriddenNode: overriddenNodeRef) {
             anchor.node.reset()
           }
