@@ -546,9 +546,17 @@ extension PhonabetTypewriter {
       return true
     }
 
-    // 檢查是否為返回中文模式的觸發鍵
-    if isTriggerToReturnToChinese(input) {
-      return freezeAndReturnToChinese(session: session)
+    // Tab 鍵：提交凍結段落 + 英文緩衝，然後讓 Tab 穿透給應用程式（如移至下一欄位）。
+    // 注意：不能只是「凍結回中文模式」，否則 Tab 會先穿透給 OS，而組字區文字仍留著不提交。
+    if input.isTab {
+      let frozen = handler.smartSwitchState.frozenDisplayText
+      let englishText = handler.smartSwitchState.exitTempEnglishMode()
+      handler.smartSwitchState.clearFrozenSegments()
+      let textToCommit = frozen + englishText
+      if !textToCommit.isEmpty {
+        session.switchState(State.ofCommitting(textToCommit: textToCommit))
+      }
+      return false // Tab 穿透給應用程式
     }
 
     // 處理 Backspace
@@ -583,11 +591,13 @@ extension PhonabetTypewriter {
       return true
     }
 
-    // 處理一般英文字母輸入
+    // 所有可印列 ASCII 字元（字母、數字、標點等，0x21–0x7E）一律加入英文緩衝。
+    // 這讓 "cd .."、"test@example.com"、"v1.2.3" 等路徑、指令與英文標點能正常輸入，
+    // 不再因 '.' ',' 等字元被誤判為「返回中文觸發鍵」而把 '.' 變成注音 ㄡ。
     let char = input.text
-    if char.count == 1, char.first?.isLetter == true {
+    if char.count == 1, let scalar = char.unicodeScalars.first,
+       scalar.value >= 0x21, scalar.value <= 0x7E {
       handler.smartSwitchState.appendEnglishChar(char)
-      // 建構 ofInputting 狀態：凍結段落（若有）+ 英文緩衝。
       let frozen = handler.smartSwitchState.frozenDisplayText
       let buffer = handler.smartSwitchState.englishBuffer
       let combinedDisplay = frozen + buffer
@@ -600,56 +610,28 @@ extension PhonabetTypewriter {
       return true
     }
 
-    // 其他按鍵直接提交並處理
+    // 其他無法處理的按鍵（非 ASCII 可印列字元、功能鍵等）：提交凍結段落 + 英文緩衝後繼續處理。
     return commitEnglishAndProcess(input, session: session)
-  }
-
-  /// 檢查是否為返回中文模式的觸發鍵
-  /// 注意：空白鍵不在此列，英文模式下空白鍵會直接插入到英文緩衝（以便輸入 "Hello World" 此類含空格的英文）。
-  private func isTriggerToReturnToChinese(_ input: InputSignalProtocol) -> Bool {
-    return input.isTab || isPunctuationKey(input)
-  }
-
-  /// 檢查是否為標點符號鍵
-  private func isPunctuationKey(_ input: InputSignalProtocol) -> Bool {
-    let text = input.text
-    guard text.count == 1 else { return false }
-    let punctuationChars = CharacterSet(charactersIn: ",.?!;:'\"[]{}()+-*/=<>@#$%^&~`|\\")
-    return text.unicodeScalars.allSatisfy { punctuationChars.contains($0) }
-  }
-
-  /// 凍結英文緩衝並返回中文模式（不提交給 OS）
-  private func freezeAndReturnToChinese(session: Session) -> Bool {
-    let englishText = handler.smartSwitchState.exitTempEnglishMode()
-
-    if !englishText.isEmpty {
-      handler.smartSwitchState.freezeSegment(englishText)
-    }
-
-    // 更新顯示：以 generateStateOfInputting 產生包含凍結段落的組字區狀態。
-    // 若組字區（含凍結）非空，顯示 ofInputting；否則顯示 ofAbortion。
-    if !handler.smartSwitchState.frozenSegments.isEmpty || !handler.assembler.isEmpty {
-      session.switchState(handler.generateStateOfInputting(guarded: true))
-    } else {
-      session.switchState(State.ofAbortion())
-    }
-
-    return false // 讓後續邏輯繼續處理（如空格觸發選字等）
   }
 
   /// 提交英文並處理當前按鍵
   private func commitEnglishAndProcess(
     _ input: InputSignalProtocol,
     session: Session
-  ) -> Bool {
+  ) -> Bool? {
+    let frozen = handler.smartSwitchState.frozenDisplayText
     let englishText = handler.smartSwitchState.exitTempEnglishMode()
+    handler.smartSwitchState.clearFrozenSegments()
 
-    if !englishText.isEmpty {
-      // 使用 ofCommitting 狀態直接提交英文文字。
-      session.switchState(State.ofCommitting(textToCommit: englishText))
+    let textToCommit = frozen + englishText
+    if !textToCommit.isEmpty {
+      // 使用 ofCommitting 狀態直接提交凍結段落 + 英文文字。
+      session.switchState(State.ofCommitting(textToCommit: textToCommit))
     }
 
-    return false // 讓後續邏輯處理當前按鍵
+    // 傳回 nil（非 false）讓觸發的按鍵回到正常注音處理流程，
+    // 避免按鍵被穿透給 OS 作為字面字元插入（例如 '8' 應繼續當成 ㄚ 處理）。
+    return nil
   }
 
   /// 在臨時英文模式下處理 Backspace

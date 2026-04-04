@@ -216,8 +216,9 @@ final class SmartSwitchTests {
     #expect(testHandler.smartSwitchState.englishBuffer.isEmpty)
   }
 
-  /// TC-005: 標點符號返回中文模式
-  @Test("TC-005: Return to Chinese mode with punctuation")
+  /// TC-005: 臨時英文模式下按標點符號（逗號）應加入英文緩衝，而非退出英文模式。
+  /// 原本測試「標點符號返回中文」，現已改為驗證新行為：ASCII 標點加入緩衝。
+  @Test("TC-005: Punctuation in temp English mode appends to buffer (not return to Chinese)")
   func testReturnToChineseWithPunctuation() {
     guard let testHandler else {
       Issue.record("testHandler is nil.")
@@ -237,13 +238,16 @@ final class SmartSwitchTests {
     #expect(testHandler.smartSwitchState.isTempEnglishMode)
     #expect(testHandler.smartSwitchState.englishBuffer == "hi")
 
-    // 發送標點符號事件（逗號），應該觸發退出臨時英文模式
+    // 發送標點符號事件（逗號），現在應加入英文緩衝，繼續保持英文模式
     let commaEvent = createKeyEvent(char: ",")
     _ = testHandler.triageInput(event: commaEvent)
 
-    // 驗證已退出臨時英文模式，且緩衝內容被提交
-    #expect(!testHandler.smartSwitchState.isTempEnglishMode)
-    #expect(testHandler.smartSwitchState.englishBuffer.isEmpty)
+    // 驗證仍在英文模式，逗號已加入緩衝
+    #expect(testHandler.smartSwitchState.isTempEnglishMode, "Should still be in temp English mode after ','")
+    #expect(
+      testHandler.smartSwitchState.englishBuffer == "hi,",
+      "englishBuffer should be 'hi,', got: '\(testHandler.smartSwitchState.englishBuffer)'"
+    )
   }
 
   /// TC-006: 有效注音不觸發英文模式
@@ -960,8 +964,8 @@ final class SmartSwitchTests {
     #expect(testHandler.smartSwitchState.englishBuffer.isEmpty, "English buffer should be empty")
   }
 
-  /// TC-025: 英文模式下按空格，空格插入緩衝（不離開英文模式、不提交）；按 Tab 才凍結並返回中文
-  @Test("TC-025: Space in English mode appends to buffer; Tab freezes buffer and returns to Chinese")
+  /// TC-025: 英文模式下按空格，空格插入緩衝（不離開英文模式、不提交）；按 Tab 提交緩衝並讓 Tab 穿透。
+  @Test("TC-025: Space in English mode appends to buffer; Tab commits buffer and forwards Tab")
   func testSpaceInEnglishModeFreezeBuffer() {
     guard let testHandler, let testSession else {
       Issue.record("testHandler or testSession is nil.")
@@ -998,24 +1002,27 @@ final class SmartSwitchTests {
       "englishBuffer should be 'test ', got: '\(testHandler.smartSwitchState.englishBuffer)'"
     )
 
-    // 按 Tab → 凍結 'test ' 並返回中文
+    // 按 Tab → 提交 'test '，讓 Tab 穿透給應用程式
     let tabEvent = KBEvent.KeyEventData.dataTab.asEvent
-    _ = testHandler.triageInput(event: tabEvent)
+    let tabConsumed = testHandler.triageInput(event: tabEvent)
 
     // 已退出英文模式
     #expect(!testHandler.smartSwitchState.isTempEnglishMode, "Should have exited English mode after Tab")
 
-    // frozenSegments 應包含 "test "（含空格）
+    // 'test '（含空格）應被提交
     #expect(
-      testHandler.smartSwitchState.frozenDisplayText.contains("test"),
-      "frozenDisplayText should contain 'test', got: '\(testHandler.smartSwitchState.frozenDisplayText)'"
+      testSession.recentCommissions.joined().contains("test"),
+      "Committed text should contain 'test', got: '\(testSession.recentCommissions)'"
     )
 
-    // session state 仍是 ofInputting（顯示 'test ' 在組字區）
+    // frozenSegments 應已清空（已提交）
     #expect(
-      testSession.state.type == .ofInputting,
-      "State should be ofInputting after Tab freeze"
+      testHandler.smartSwitchState.frozenSegments.isEmpty,
+      "frozenSegments should be empty after Tab commit"
     )
+
+    // Tab 應穿透給應用程式
+    #expect(!tabConsumed, "Tab should not be consumed; it should pass through to the app")
   }
 
   /// TC-026: 英文模式下繼續輸入時，顯示凍結漢字前綴 + 增長的英文緩衝
@@ -1134,9 +1141,10 @@ final class SmartSwitchTests {
     #expect(testHandler.smartSwitchState.frozenSegments.isEmpty)
   }
 
-  /// TC-028: 中文模式下含凍結段落時按 Enter，提交全部內容並清空 frozenSegments
-  @Test("TC-028: Enter in Chinese mode commits frozen+assembler and clears frozenSegments")
-  func testEnterInChineseModeAfterFreezeCommitsAll() {
+  /// TC-028: 臨時英文模式下含凍結段落時按 Tab，應提交全部內容（frozen + English）並讓 Tab 穿透。
+  /// 原本測試「Tab 凍結後 Enter 提交」，現已改為驗證新行為：Tab 直接提交而非只凍結。
+  @Test("TC-028: Tab in temp English mode commits frozen+English and forwards Tab")
+  func testTabInTempEnglishModeCommitsAll() {
     guard let testHandler, let testSession else {
       Issue.record("testHandler or testSession is nil.")
       return
@@ -1144,7 +1152,7 @@ final class SmartSwitchTests {
     resetTestState()
     testSession.recentCommissions.removeAll()
 
-    // Step 1: 觸發智慧切換，建立 frozenSegments
+    // Step 1: 觸發智慧切換，建立 frozenSegments + 英文緩衝
     _ = testHandler.assembler.insertKey("ㄅㄧˋ")
     testHandler.assemble()
     _ = testHandler.triageInput(event: createKeyEvent(char: "t"))
@@ -1152,34 +1160,37 @@ final class SmartSwitchTests {
     _ = testHandler.triageInput(event: createKeyEvent(char: "s"))
     _ = testHandler.triageInput(event: createKeyEvent(char: "t"))
     #expect(testHandler.smartSwitchState.isTempEnglishMode)
-
-    // Step 2: 按 Tab，凍結 "test"，回到中文模式（space 現在改為插入空格到緩衝）
-    let tabEvent = KBEvent.KeyEventData.dataTab.asEvent
-    _ = testHandler.triageInput(event: tabEvent)
-    #expect(!testHandler.smartSwitchState.isTempEnglishMode, "Should be back in Chinese mode after Tab")
-
-    let frozen = testHandler.smartSwitchState.frozenDisplayText
-    #expect(!frozen.isEmpty, "frozenDisplayText should be non-empty after Tab")
+    let frozenBefore = testHandler.smartSwitchState.frozenDisplayText
+    #expect(!frozenBefore.isEmpty, "frozenDisplayText should be non-empty after smart switch")
 
     testSession.recentCommissions.removeAll()
 
-    // Step 3: 按 Enter，提交全部（frozen + assembler）
-    let enterEvent = KBEvent.KeyEventData.dataEnterReturn.asEvent
-    let result = testHandler.triageInput(event: enterEvent)
-    #expect(result == true, "Enter should be handled")
+    // Step 2: 按 Tab，應提交 frozen + "test"，然後讓 Tab 穿透給應用程式
+    let tabEvent = KBEvent.KeyEventData.dataTab.asEvent
+    let tabConsumed = testHandler.triageInput(event: tabEvent)
 
-    // 提交的文字應包含 frozen 內容
+    // 已離開臨時英文模式
+    #expect(!testHandler.smartSwitchState.isTempEnglishMode, "Should have exited temp English mode after Tab")
+
+    // 提交的文字應包含原凍結內容 + "test"
     let committed = testSession.recentCommissions.joined()
     #expect(
-      committed.contains(frozen),
-      "Committed text '\(committed)' should contain frozen '\(frozen)'"
+      committed.contains(frozenBefore),
+      "Committed text '\(committed)' should contain frozen '\(frozenBefore)'"
+    )
+    #expect(
+      committed.contains("test"),
+      "Committed text '\(committed)' should contain 'test'"
     )
 
-    // frozenSegments 應被清空
+    // frozenSegments 應被清空（已提交）
     #expect(
       testHandler.smartSwitchState.frozenSegments.isEmpty,
-      "frozenSegments should be cleared after Enter commit"
+      "frozenSegments should be cleared after Tab commit"
     )
+
+    // Tab 應穿透給應用程式
+    #expect(!tabConsumed, "Tab should not be consumed; it should pass through to the app")
   }
 
   /// TC-029: 英文模式下單擊 Backspace，刪除一個英文字母，顯示凍結前綴 + 剩餘英文緩衝
@@ -1570,6 +1581,115 @@ final class SmartSwitchTests {
     #expect(
       testSession.recentCommissions.contains("中文English"),
       "Full text '中文English' should be committed by resetInputHandler(), got: \(testSession.recentCommissions)"
+    )
+  }
+
+  /// TC-039: 臨時英文模式下按 Tab，應先提交凍結段落 + 英文緩衝，再讓 Tab 穿透給應用程式。
+  /// 重現 bug：輸入「測試email」後按 Tab，組字區沒動但 Tab 已先送出。
+  @Test("TC-039: Tab in temp English mode commits frozen+English then forwards Tab to app")
+  func testTabCommitsFrozenAndEnglishThenForwards() {
+    guard let testHandler, let testSession else {
+      Issue.record("testHandler or testSession is nil.")
+      return
+    }
+    resetTestState()
+    testSession.recentCommissions.removeAll()
+
+    // 模擬前置狀態：凍結段落「測試」+ 臨時英文模式下輸入 "email"
+    testHandler.smartSwitchState.freezeSegment("測試")
+    testHandler.smartSwitchState.enterTempEnglishMode()
+    for ch in "email" { testHandler.smartSwitchState.appendEnglishChar(String(ch)) }
+
+    testSession.state = MockIMEState.ofInputting(
+      displayTextSegments: ["測試", "email"],
+      cursor: 7
+    )
+
+    #expect(testHandler.smartSwitchState.isTempEnglishMode, "Prerequisite: should be in temp English mode")
+    #expect(testHandler.smartSwitchState.englishBuffer == "email", "Prerequisite: englishBuffer should be 'email'")
+    #expect(testHandler.smartSwitchState.frozenDisplayText == "測試", "Prerequisite: frozenDisplayText should be '測試'")
+
+    // 按 Tab
+    let tabEvent = KBEvent.KeyEventData.dataTab.asEvent
+    let tabConsumed = testHandler.triageInput(event: tabEvent)
+
+    // 驗證：「測試email」應被一併提交
+    #expect(
+      testSession.recentCommissions.contains("測試email"),
+      "Frozen text + English buffer should be committed together, got: \(testSession.recentCommissions)"
+    )
+
+    // 驗證：Tab 應穿透給應用程式（triageInput 回傳 false）
+    #expect(
+      !tabConsumed,
+      "Tab should not be consumed; it should pass through to the app"
+    )
+
+    // 驗證：已離開臨時英文模式，frozenSegments 已清空
+    #expect(!testHandler.smartSwitchState.isTempEnglishMode, "Should have exited temp English mode")
+    #expect(testHandler.smartSwitchState.frozenSegments.isEmpty, "Frozen segments should be cleared after commit")
+  }
+
+  /// TC-038: 臨時英文模式下，ASCII 可印列字元（數字、標點等）應一律加入英文緩衝，
+  /// 不再以「返回中文觸發」或「提交後重新處理」方式處理。
+  /// 重現 bug："cd .." → "cd ㄡ"（'.' 被誤判為返回中文觸發鍵，第二個 '.' 變成注音 ㄡ）。
+  @Test("TC-038: ASCII printable chars (digits, punctuation) in temp English mode are appended to buffer")
+  func testASCIIPrintableCharsAppendedToEnglishBuffer() {
+    guard let testHandler, let testSession else {
+      Issue.record("testHandler or testSession is nil.")
+      return
+    }
+    resetTestState()
+    testSession.recentCommissions.removeAll()
+
+    // 模擬前置狀態：已在臨時英文模式下輸入 "cd "（空格已在緩衝中）
+    testHandler.smartSwitchState.enterTempEnglishMode()
+    testHandler.smartSwitchState.appendEnglishChar("c")
+    testHandler.smartSwitchState.appendEnglishChar("d")
+    testHandler.smartSwitchState.appendEnglishChar(" ")
+
+    testSession.state = MockIMEState.ofInputting(
+      displayTextSegments: ["cd "],
+      cursor: 3
+    )
+
+    #expect(testHandler.smartSwitchState.isTempEnglishMode, "Prerequisite: should be in temp English mode")
+    #expect(testHandler.smartSwitchState.englishBuffer == "cd ", "Prerequisite: englishBuffer should be 'cd '")
+
+    // 按 '.'（大千排列中 = ㄡ，但在英文模式下應加入緩衝而非變成 ㄡ）
+    let dotEvent = KBEvent.KeyEventData(chars: ".", keyCode: mapKeyCodesANSIForTests["."] ?? 47).asEvent
+    _ = testHandler.triageInput(event: dotEvent)
+
+    // 驗證：'.' 加入緩衝（仍在英文模式）
+    #expect(
+      testHandler.smartSwitchState.isTempEnglishMode,
+      "Should still be in temp English mode after '.'"
+    )
+    #expect(
+      testHandler.smartSwitchState.englishBuffer == "cd .",
+      "englishBuffer should be 'cd .' after pressing '.', got: '\(testHandler.smartSwitchState.englishBuffer)'"
+    )
+
+    // 再按一次 '.'
+    _ = testHandler.triageInput(event: dotEvent)
+    #expect(
+      testHandler.smartSwitchState.englishBuffer == "cd ..",
+      "englishBuffer should be 'cd ..' after pressing '.' twice, got: '\(testHandler.smartSwitchState.englishBuffer)'"
+    )
+
+    // 不應有任何字元被提交
+    #expect(
+      testSession.recentCommissions.isEmpty,
+      "Nothing should be committed yet, got: \(testSession.recentCommissions)"
+    )
+
+    // 按 Enter 提交全部
+    let enterEvent = KBEvent.KeyEventData.dataEnterReturn.asEvent
+    _ = testHandler.triageInput(event: enterEvent)
+
+    #expect(
+      testSession.recentCommissions.contains("cd .."),
+      "Should commit 'cd ..', got: \(testSession.recentCommissions)"
     )
   }
 
