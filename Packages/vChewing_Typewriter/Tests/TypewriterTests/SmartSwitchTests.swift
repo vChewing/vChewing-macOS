@@ -1693,6 +1693,269 @@ final class SmartSwitchTests {
     )
   }
 
+  // MARK: - TC-040 ~ TC-042：'/' 特例（組字器為空時優先作為斜線字元）
+
+  /// TC-040: 智慧切換模式下，composer 為空時按 '/' 應進入臨時英文模式，緩衝為 "/"。
+  /// 場景：使用者想輸入路徑或日期分隔符（/），不是注音 ㄥ。
+  @Test("TC-040: '/' with empty composer in smart mode enters English buffer with '/'")
+  func testSlashWithEmptyComposerEntersEnglishBuffer() {
+    guard let testHandler, let testSession else {
+      Issue.record("testHandler or testSession is nil.")
+      return
+    }
+    resetTestState()
+    testSession.recentCommissions.removeAll()
+
+    #expect(testHandler.prefs.smartChineseEnglishSwitchEnabled == true)
+    #expect(testHandler.composer.isEmpty, "Composer should be empty before test")
+    #expect(!testHandler.smartSwitchState.isTempEnglishMode)
+
+    // 按 '/'（大千排列中對應 ㄥ，但智慧切換模式下應優先作為斜線字元）
+    let slashEvent = KBEvent.KeyEventData(chars: "/", keyCode: mapKeyCodesANSIForTests["/"] ?? 44).asEvent
+    _ = testHandler.triageInput(event: slashEvent)
+
+    // 應進入臨時英文模式
+    #expect(
+      testHandler.smartSwitchState.isTempEnglishMode,
+      "Should be in temp English mode after '/' with empty composer"
+    )
+
+    // 英文緩衝應為 "/"
+    #expect(
+      testHandler.smartSwitchState.englishBuffer == "/",
+      "englishBuffer should be '/', got: '\(testHandler.smartSwitchState.englishBuffer)'"
+    )
+
+    // composer 應仍為空（未收到 ㄥ）
+    #expect(testHandler.composer.isEmpty, "Composer should still be empty (no ㄥ received)")
+
+    // 沒有任何文字被提交出去
+    #expect(
+      testSession.recentCommissions.isEmpty,
+      "Nothing should be committed yet, got: \(testSession.recentCommissions)"
+    )
+  }
+
+  /// TC-041: 智慧切換模式下，assembler 有漢字 + composer 為空時按 '/'，
+  /// 應凍結漢字後進入臨時英文模式，英文緩衝為 "/"，凍結段落非空。
+  @Test("TC-041: '/' with assembled Chinese freezes Chinese and enters English buffer with '/'")
+  func testSlashWithAssembledChineseFreezesThenEnglish() {
+    guard let testHandler, let testSession else {
+      Issue.record("testHandler or testSession is nil.")
+      return
+    }
+    resetTestState()
+    testSession.recentCommissions.removeAll()
+
+    // 先組入已知存在的讀音
+    _ = testHandler.assembler.insertKey("ㄅㄧˋ")
+    testHandler.assemble()
+    #expect(!testHandler.assembler.isEmpty, "Assembler should have content")
+    testSession.recentCommissions.removeAll()
+
+    // 按 '/'
+    let slashEvent = KBEvent.KeyEventData(chars: "/", keyCode: mapKeyCodesANSIForTests["/"] ?? 44).asEvent
+    _ = testHandler.triageInput(event: slashEvent)
+
+    // 漢字不應被 commit 出去，而是凍結
+    #expect(
+      testSession.recentCommissions.isEmpty,
+      "Chinese text should be frozen, not committed; got: \(testSession.recentCommissions)"
+    )
+
+    // frozenSegments 應有內容（漢字被凍結）
+    #expect(
+      !testHandler.smartSwitchState.frozenSegments.isEmpty,
+      "frozenSegments should contain assembled Chinese text"
+    )
+
+    // 應進入臨時英文模式
+    #expect(
+      testHandler.smartSwitchState.isTempEnglishMode,
+      "Should be in temp English mode"
+    )
+
+    // 英文緩衝應為 "/"
+    #expect(
+      testHandler.smartSwitchState.englishBuffer == "/",
+      "englishBuffer should be '/', got: '\(testHandler.smartSwitchState.englishBuffer)'"
+    )
+
+    // session 狀態應為 ofInputting（顯示漢字 + "/"）
+    #expect(
+      testSession.state.type == .ofInputting,
+      "State should be ofInputting, got: \(testSession.state.type)"
+    )
+  }
+
+  /// TC-042: 智慧切換模式下，composer 非空（正在組音中）時按 '/' 應維持注音 ㄥ 行為，
+  /// 不應觸發斜線特例。
+  /// 場景：使用者先輸入 'l'（大千 = ㄌ 聲母），再按 '/'，應組成 ㄌㄥ（composer 有 ㄌㄥ）。
+  @Test("TC-042: '/' with non-empty composer (composing Zhuyin) falls through to ㄥ behavior")
+  func testSlashWithNonEmptyComposerBehavesAsZhuyin() {
+    guard let testHandler else {
+      Issue.record("testHandler is nil.")
+      return
+    }
+    resetTestState()
+
+    #expect(testHandler.prefs.smartChineseEnglishSwitchEnabled == true)
+    #expect(testHandler.composer.isEmpty)
+
+    // 先輸入 'l'（大千排列：ㄌ 聲母）→ composer 有 ㄌ
+    _ = testHandler.triageInput(event: createKeyEvent(char: "l"))
+    #expect(!testHandler.composer.isEmpty, "Composer should have ㄌ after 'l'")
+    #expect(!testHandler.smartSwitchState.isTempEnglishMode, "Should NOT be in English mode after 'l'")
+
+    // 再按 '/' → 因為 composer 非空，不應觸發斜線特例，應繼續作為 ㄥ 處理
+    let slashEvent = KBEvent.KeyEventData(chars: "/", keyCode: mapKeyCodesANSIForTests["/"] ?? 44).asEvent
+    _ = testHandler.triageInput(event: slashEvent)
+
+    // 不應進入臨時英文模式（composer 非空，'/' 被當作 ㄥ）
+    #expect(
+      !testHandler.smartSwitchState.isTempEnglishMode,
+      "Should NOT be in temp English mode — composer was non-empty, '/' treated as ㄥ"
+    )
+
+    // composer 應包含 ㄥ（或 ㄌ+ㄥ 組合），不應為空
+    #expect(!testHandler.composer.isEmpty, "Composer should still have content (ㄌ+ㄥ or ㄥ)")
+  }
+
+  /// TC-043: 智慧切換模式下，組字區為空時按 '/'（進入英文特例）再按 ↓，
+  /// 應取消斜線英文特例並切換到 ㄥ 注音模式。
+  /// - 若語言模型有 ㄥ 記錄：進入選字窗（.ofCandidates）。
+  /// - 若語言模型無 ㄥ 記錄（降級）：ㄥ 放入注拼槽，狀態為 .ofInputting。
+  /// 兩種情境下，臨時英文模式均應退出，英文緩衝應為空。
+  @Test("TC-043: '/' + ↓ with empty assembler exits English mode and switches to ㄥ preedit/candidates")
+  func testSlashDownArrowExitsEnglishModeToZhuyin() {
+    guard let testHandler, let testSession else {
+      Issue.record("testHandler or testSession is nil.")
+      return
+    }
+    resetTestState()
+    testSession.recentCommissions.removeAll()
+
+    #expect(testHandler.prefs.smartChineseEnglishSwitchEnabled == true)
+    #expect(testHandler.composer.isEmpty, "Prerequisite: composer should be empty")
+    #expect(testHandler.assembler.isEmpty, "Prerequisite: assembler should be empty")
+
+    // 按 '/' → 應觸發斜線特例並進入臨時英文模式
+    let slashEvent = KBEvent.KeyEventData(chars: "/", keyCode: mapKeyCodesANSIForTests["/"] ?? 44).asEvent
+    _ = testHandler.triageInput(event: slashEvent)
+    #expect(testHandler.smartSwitchState.isTempEnglishMode, "Prerequisite: should be in temp English mode after '/'")
+    #expect(testHandler.smartSwitchState.englishBuffer == "/", "Prerequisite: englishBuffer should be '/'")
+
+    // 按 ↓ → 應取消臨時英文模式並切換為 ㄥ 注音模式
+    _ = testHandler.triageInput(event: KBEvent.KeyEventData.dataArrowDown.asEvent)
+
+    // 臨時英文模式應已退出
+    #expect(
+      !testHandler.smartSwitchState.isTempEnglishMode,
+      "Should NOT be in temp English mode after ↓"
+    )
+    #expect(
+      testHandler.smartSwitchState.englishBuffer.isEmpty,
+      "englishBuffer should be empty after ↓"
+    )
+
+    // 不應提交任何文字（'/' 被取消，無凍結漢字）
+    #expect(
+      testSession.recentCommissions.isEmpty,
+      "No text should be committed — '/' was cancelled (no frozen Chinese)"
+    )
+
+    // 結果應為 ㄥ 在選字窗（LM 有記錄）或注拼槽（降級）
+    let hasEngReading = testHandler.currentLM.hasUnigramsFor(keyArray: ["ㄥ"])
+    if hasEngReading {
+      #expect(
+        testSession.state.type == .ofCandidates,
+        "LM has ㄥ entries → state should be ofCandidates, got: \(testSession.state.type)"
+      )
+    } else {
+      // 降級：ㄥ 在注拼槽，狀態為 ofInputting
+      #expect(
+        testSession.state.type == .ofInputting,
+        "LM has no ㄥ entry → state should be ofInputting (ㄥ in preedit), got: \(testSession.state.type)"
+      )
+      #expect(
+        !testHandler.composer.isEmpty,
+        "ㄥ should be in the composer (fallback path)"
+      )
+    }
+  }
+
+  /// TC-044: 智慧切換模式下，組字區有漢字時按 '/'（觸發斜線特例＋凍結漢字）再按 ↓，
+  /// 應先提交凍結漢字，再切換到 ㄥ 注音模式。
+  @Test("TC-044: '/' + ↓ with frozen Chinese commits Chinese then switches to ㄥ preedit/candidates")
+  func testSlashDownArrowWithFrozenChineseCommitsThenSwitchesToZhuyin() {
+    guard let testHandler, let testSession else {
+      Issue.record("testHandler or testSession is nil.")
+      return
+    }
+    resetTestState()
+    testSession.recentCommissions.removeAll()
+
+    #expect(testHandler.prefs.smartChineseEnglishSwitchEnabled == true)
+    #expect(testHandler.composer.isEmpty, "Prerequisite: composer should be empty")
+
+    // 先打注音組出一個字放進組字區（使用大千排列，輸入 ㄋㄧㄢˊ = "年"）
+    // 大千：n=ㄋ, i=ㄛ(vowel)... 改用更可靠的方式：直接透過 insertKey 注入測試讀音
+    // 使用 ㄌㄧㄡ（留/流）= 'l'+'u'+'f'（大千：l=ㄌ, u=ㄐ... 改成拼音或直接注入）
+    // 最簡單：直接設定 assembler 有內容，模擬「打了幾個字」的情境
+    // 先用 triageInput 輸入「ㄋㄧㄢˊ」= 大千 n=ㄋ, i=ㄛ 不對
+    // 安全的做法：直接設定 smartSwitchState.frozenSegments，並確保 assembler 非空後再按 '/'
+    // 實際上 '/' 特例的條件是 composer.isEmpty，assembler 可以非空
+    // 故：手動讓 assembler 有讀音（ㄌㄧㄡ = l, u, f 大千... 跳過，用 insertKey）
+    _ = testHandler.assembler.insertKey("ㄋㄧㄢˊ")
+    testHandler.assemble()
+    #expect(!testHandler.assembler.isEmpty, "Prerequisite: assembler should have '年' reading")
+
+    // 按 '/' → 斜線特例觸發：凍結組字區漢字，進入臨時英文模式，englishBuffer = "/"
+    let slashEvent = KBEvent.KeyEventData(chars: "/", keyCode: mapKeyCodesANSIForTests["/"] ?? 44).asEvent
+    _ = testHandler.triageInput(event: slashEvent)
+
+    guard testHandler.smartSwitchState.isTempEnglishMode else {
+      Issue.record("Prerequisite failed: should be in temp English mode after '/'")
+      return
+    }
+    #expect(testHandler.smartSwitchState.englishBuffer == "/", "englishBuffer should be '/'")
+    let frozenText = testHandler.smartSwitchState.frozenDisplayText
+    #expect(!frozenText.isEmpty, "Prerequisite: frozenDisplayText should not be empty")
+
+    // 按 ↓ → 應提交凍結漢字並切換為 ㄥ 注音模式
+    _ = testHandler.triageInput(event: KBEvent.KeyEventData.dataArrowDown.asEvent)
+
+    // 臨時英文模式應已退出
+    #expect(
+      !testHandler.smartSwitchState.isTempEnglishMode,
+      "Should NOT be in temp English mode after ↓"
+    )
+
+    // 凍結漢字應已提交
+    #expect(
+      testSession.recentCommissions.contains(frozenText),
+      "Frozen Chinese '\(frozenText)' should have been committed, got: \(testSession.recentCommissions)"
+    )
+
+    // 結果應為 ㄥ 在選字窗（LM 有記錄）或注拼槽（降級）
+    let hasEngReading = testHandler.currentLM.hasUnigramsFor(keyArray: ["ㄥ"])
+    if hasEngReading {
+      #expect(
+        testSession.state.type == .ofCandidates,
+        "LM has ㄥ entries → state should be ofCandidates, got: \(testSession.state.type)"
+      )
+    } else {
+      #expect(
+        testSession.state.type == .ofInputting,
+        "LM has no ㄥ entry → state should be ofInputting (ㄥ in preedit), got: \(testSession.state.type)"
+      )
+      #expect(
+        !testHandler.composer.isEmpty,
+        "ㄥ should be in the composer (fallback path)"
+      )
+    }
+  }
+
   /// TC-035: 臨時英文模式下啟用 CapsLock 並按字母，切換後 smartSwitchState 應被完整重置。
   /// 若未重置，關掉 CapsLock 後的下一個注音按鍵會被誤認為英文模式的輸入，導致錯誤行為。
   @Test("TC-035: CapsLock in temp English mode resets smartSwitchState completely")

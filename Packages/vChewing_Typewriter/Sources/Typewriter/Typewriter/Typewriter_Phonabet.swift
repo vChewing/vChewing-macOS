@@ -39,6 +39,21 @@ public struct PhonabetTypewriter<Handler: InputHandlerProtocol>: TypewriterProto
       }
     }
 
+    // MARK: 智慧中英文切換 - '/' 特例（組字器為空時優先作為斜線字元）
+    // 在大千等鍵盤排列中，'/' 對應注音 'ㄥ'，但在智慧中英文切換模式下，
+    // '/' 通常是路徑分隔符（/usr/bin）或日期分隔符（2026/04/04），
+    // 因此當組字器為空且使用者未按修飾鍵時，優先將 '/' 作為字面斜線字元處理。
+    // 若組字器非空（使用者正在組音中，例如已輸入聲母），則維持原有 'ㄥ' 行為。
+    if prefs.smartChineseEnglishSwitchEnabled,
+       !handler.smartSwitchState.isTempEnglishMode,
+       input.text == "/",
+       !input.isControlHold, !input.isCommandHold, !input.isOptionHold,
+       handler.composer.isEmpty {
+      freezeAssemblerContentIfNeeded()
+      handler.smartSwitchState.keySequence = "/"
+      return triggerTempEnglishMode(session: session)
+    }
+
     var inputText = (input.inputTextIgnoringModifiers ?? input.text)
     inputText = inputText.lowercased().applyingTransformFW2HW(reverse: false)
     let existedIntonation = handler.composer.intonation
@@ -544,6 +559,45 @@ extension PhonabetTypewriter {
     if input.isEsc {
       session.switchState(State.ofAbortion())
       return true
+    }
+
+    // MARK: 下箭頭特例：只有 '/' 在英文緩衝時，切換為 ㄥ 注音選字模式
+    // 使用者先按 '/'（觸發斜線英文特例），若接著按 ↓，表示其實想輸入 ㄥ 讀音的漢字，
+    // 此時取消斜線英文特例，改為將 ㄥ 讀音送入組字區，並嘗試開啟選字窗。
+    // 若語言模型無 ㄥ 的記錄（降級情境），則將 ㄥ 放入注拼槽供使用者補按聲調鍵。
+    if input.isDown, !input.isControlHold, !input.isCommandHold, !input.isOptionHold, !input.isShiftHold,
+       handler.smartSwitchState.englishBuffer == "/" {
+      // 1. 取消臨時英文模式（不提交 '/'）；若有凍結漢字則提交給 OS。
+      let frozen = handler.smartSwitchState.frozenDisplayText
+      _ = handler.smartSwitchState.exitTempEnglishMode()
+      handler.smartSwitchState.clearFrozenSegments()
+      if !frozen.isEmpty {
+        session.switchState(State.ofCommitting(textToCommit: frozen))
+      }
+      // 2. 以 ㄥ 合成讀音索引鍵（不依賴鍵盤排列，直接從注音符號重建）。
+      var tempComposer = handler.composer
+      tempComposer.clear()
+      for scalar in "ㄥ".unicodeScalars {
+        tempComposer.receiveKey(fromPhonabet: scalar)
+      }
+      // pronounceableOnly: false — ㄥ 為介韻/韻母（isPronounceable = true），取得讀音索引鍵。
+      if let key = tempComposer.phonabetKeyForQuery(pronounceableOnly: false),
+         handler.currentLM.hasUnigramsFor(keyArray: [key]),
+         handler.assembler.insertKey(key) {
+        handler.assemble()
+        handler.retrievePOMSuggestions(apply: true)
+        handler.composer.clear()
+        session.switchState(handler.generateStateOfInputting())
+        // 回傳 nil：讓 triageInput() 繼續 → callCandidateState() 以下箭頭開啟選字窗。
+        return nil
+      }
+      // 降級路徑：語言模型無 ㄥ 讀音記錄，將 ㄥ 放入注拼槽，等使用者補按聲調鍵後再選字。
+      handler.composer.clear()
+      for scalar in "ㄥ".unicodeScalars {
+        handler.composer.receiveKey(fromPhonabet: scalar)
+      }
+      session.switchState(handler.generateStateOfInputting())
+      return true // 消費下箭頭，不穿透給 OS
     }
 
     // Tab 鍵：提交凍結段落 + 英文緩衝，然後讓 Tab 穿透給應用程式（如移至下一欄位）。

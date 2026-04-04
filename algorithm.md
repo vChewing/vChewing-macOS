@@ -312,16 +312,112 @@ if !handler.smartSwitchState.frozenSegments.isEmpty {
 
 迴歸測試：TC-038（`SmartSwitchTests.swift`）。
 
+### '/' 斜線特例（2026.04.04）
+
+#### 問題根源
+
+在大千等鍵盤排列中，`'/'` 對應注音 `ㄥ`（韻母 slot）。使用者在智慧中英文切換模式下輸入路徑（`/usr/bin`）或日期（`2026/04/04`）時，每次按 `'/'` 都會把 `ㄥ` 塞入注拼槽，造成注音符號干擾，無法直接輸入斜線字元。
+
+#### 修正方案
+
+在 `handle()` 函式的「臨時英文模式攔截」之後、正常注音處理之前，加入 `'/'` 特例判斷：
+
+**觸發條件（全部滿足時才攔截）：**
+1. `smartChineseEnglishSwitchEnabled == true`
+2. 當前**未**在臨時英文模式（`!isTempEnglishMode`）
+3. `input.text == "/"`（裸斜線，無 Ctrl/Cmd/Option 修飾）
+4. **組字器為空**（`handler.composer.isEmpty`）
+
+**攔截後行為：**
+1. 呼叫 `freezeAssemblerContentIfNeeded()` 凍結組字區中的漢字（若有）。
+2. 設定 `keySequence = "/"` 後呼叫 `triggerTempEnglishMode()`。
+3. 進入臨時英文模式，`englishBuffer = "/"`，組字區顯示 `frozenDisplayText + "/"`.
+4. 使用者可繼續輸入數字或字母（例如日期），按 Enter 一次提交全部。
+
+**組字器非空時不攔截：**
+使用者若已輸入聲母（如 `ㄌ`），再按 `'/'` 應組成 `ㄌㄥ`，維持正常注音行為。
+
+```swift
+// 攔截點在 Typewriter_Phonabet.swift handle() 函式
+if prefs.smartChineseEnglishSwitchEnabled,
+   !handler.smartSwitchState.isTempEnglishMode,
+   input.text == "/",
+   !input.isControlHold, !input.isCommandHold, !input.isOptionHold,
+   handler.composer.isEmpty {
+    freezeAssemblerContentIfNeeded()
+    handler.smartSwitchState.keySequence = "/"
+    return triggerTempEnglishMode(session: session)
+}
+```
+
+迴歸測試：TC-040（空組字器）、TC-041（有漢字前綴）、TC-042（組字器非空不攔截）。
+
+### '/' + ↓ 後悔鍵：切換為 ㄥ 選字（2026.04.04）
+
+#### 情境描述
+
+使用者按下 `'/'` 後，輸入法因斜線特例進入臨時英文模式（`englishBuffer = "/"`），但使用者其實是要輸入 `ㄥ` 讀音的漢字。此時再按 **↓（下箭頭）** 即可「後悔」，切換回 `ㄥ` 注音選字。
+
+#### 觸發條件
+
+在 `handleTempEnglishMode()` 函式內，滿足以下全部條件時攔截：
+
+1. `input.isDown == true`（無 Ctrl/Cmd/Option/Shift 修飾）
+2. `englishBuffer == "/"`（英文緩衝恰好只有斜線，即尚未繼續打其他字元）
+
+#### 攔截後行為
+
+**主路徑（語言模型有 ㄥ 記錄時）：**
+1. 取消臨時英文模式（捨棄 `"/"`，不提交）。
+2. 若有凍結漢字（`frozenDisplayText`），先以 `ofCommitting` 提交給 OS。
+3. 合成 `ㄥ` 讀音索引鍵（直接從注音符號繞過鍵盤排列轉換），插入組字區。
+4. 呼叫 `assemble()` / `retrievePOMSuggestions()` 重新組句，切換至 `ofInputting` 狀態。
+5. **回傳 `nil`**：讓 `triageInput()` 繼續執行，`callCandidateState()` 偵測到下箭頭而自動開啟選字窗。
+
+**降級路徑（語言模型無 ㄥ 記錄時）：**
+1. 取消臨時英文模式（同上）。
+2. 若有凍結漢字，先提交。
+3. 將 `ㄥ` 直接放入注拼槽（composer），切換至 `ofInputting` 狀態（preedit 顯示 `ㄥ`）。
+4. **回傳 `true`**：消費下箭頭，等使用者補按聲調鍵後再選字。
+
+```swift
+// handleTempEnglishMode() 內，Escape 之後、Tab 之前
+if input.isDown, !input.isControlHold, !input.isCommandHold, !input.isOptionHold, !input.isShiftHold,
+   handler.smartSwitchState.englishBuffer == "/" {
+  let frozen = handler.smartSwitchState.frozenDisplayText
+  _ = handler.smartSwitchState.exitTempEnglishMode()
+  handler.smartSwitchState.clearFrozenSegments()
+  if !frozen.isEmpty { session.switchState(State.ofCommitting(textToCommit: frozen)) }
+  // 合成 ㄥ 讀音
+  var tempComposer = handler.composer; tempComposer.clear()
+  for scalar in "ㄥ".unicodeScalars { tempComposer.receiveKey(fromPhonabet: scalar) }
+  if let key = tempComposer.phonabetKeyForQuery(pronounceableOnly: false),
+     handler.currentLM.hasUnigramsFor(keyArray: [key]),
+     handler.assembler.insertKey(key) {
+    handler.assemble(); handler.retrievePOMSuggestions(apply: true)
+    handler.composer.clear(); session.switchState(handler.generateStateOfInputting())
+    return nil // triageInput() → callCandidateState() 開選字窗
+  }
+  // 降級：ㄥ 放入注拼槽
+  handler.composer.clear()
+  for scalar in "ㄥ".unicodeScalars { handler.composer.receiveKey(fromPhonabet: scalar) }
+  session.switchState(handler.generateStateOfInputting())
+  return true
+}
+```
+
+迴歸測試：TC-043（空組字器）、TC-044（有凍結漢字）。
+
 ### 關鍵檔案
 
 | 檔案 | 用途 |
 |------|------|
-| `Packages/vChewing_Typewriter/Sources/Typewriter/Typewriter/Typewriter_Phonabet.swift` | SmartSwitchState、triggerTempEnglishMode、handleTempEnglishMode、composeReadingIfReady（路徑 D） |
+| `Packages/vChewing_Typewriter/Sources/Typewriter/Typewriter/Typewriter_Phonabet.swift` | SmartSwitchState、triggerTempEnglishMode、handleTempEnglishMode、composeReadingIfReady（路徑 D）、'/' 斜線特例、'/' + ↓ 後悔鍵 |
 | `Packages/vChewing_Typewriter/Sources/Typewriter/InputHandler/InputHandler_CoreProtocol.swift` | `clear()` — 須呼叫 `smartSwitchState.reset()` |
 | `Packages/vChewing_Typewriter/Sources/Typewriter/InputHandler/InputHandler_TriageInput.swift` | `triageInput` — Space/CapsLock/英文字母的分診邏輯 |
 | `Packages/vChewing_MainAssembly4Darwin/Sources/MainAssembly4Darwin/SessionController/InputSession_CoreProtocol.swift` | `resetInputHandler()` — CapsLock 觸發的重置，須納入 englishBuffer |
 | `Packages/vChewing_MainAssembly4Darwin/Sources/MainAssembly4Darwin/SessionController/InputSession_HandleEvent.swift` | capsLockHitChecker → resetInputHandler 的觸發點 |
-| `Packages/vChewing_Typewriter/Tests/TypewriterTests/SmartSwitchTests.swift` | 38 個測試案例（TC-001 ~ TC-038） |
+| `Packages/vChewing_Typewriter/Tests/TypewriterTests/SmartSwitchTests.swift` | 45 個測試案例（TC-001 ~ TC-044） |
 
 ---
 
