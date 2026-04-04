@@ -39,6 +39,13 @@
   - [進入與離開臨時英文模式](#進入與離開臨時英文模式)
   - [displayedText 與 englishBuffer 的組合](#displayedtext-與-englishbuffer-的組合)
   - [resetInputHandler 的 englishBuffer 遺漏修正（2026.04.01）](#resetinputhandler-的-englishbuffer-遺漏修正20260401)
+- [自動語彙學習（Auto Phrase Learning）](#自動語彙學習auto-phrase-learning)
+  - [問題背景：POM 同讀音前綴污染](#問題背景pom-同讀音前綴污染)
+  - [設計原則](#設計原則)
+  - [計數鍵格式](#計數鍵格式)
+  - [字詞追蹤流程（phraseTracking）](#字詞追蹤流程phrasetracking)
+  - [偏好設定](#偏好設定)
+  - [關鍵檔案](#關鍵檔案-1)
 - [關鍵檔案位置](#關鍵檔案位置)
 - [延伸閱讀](#延伸閱讀)
 - [文件版本與更新紀錄](#文件版本與更新紀錄)
@@ -421,6 +428,84 @@ if input.isDown, !input.isControlHold, !input.isCommandHold, !input.isOptionHold
 
 ---
 
+## 自動語彙學習（Auto Phrase Learning）
+
+本功能自 2026.04.04 版引入。當使用者連續顯式選字形成某詞組達到門檻次數（預設 3 次）後，自動將該詞組永久寫入使用者詞庫（個人詞庫），從根本解決 POM 同讀音前綴污染問題。
+
+### 問題背景：POM 同讀音前綴污染
+
+POM（Perception Override Model）會根據使用者選字行為暫時調整候選排序。但當兩個詞組（如「謝宇軒」與「謝雨蒼」）共享相同前綴音（ㄒㄧㄝˋ）時，輪流選字會導致彼此互相干擾。原因在於 POM 計數 key 僅基於讀音序列，缺乏區分不同漢字輸出的能力。
+
+**解法**：不改動 POM 架構，而是在使用者連續選出同一詞組達門檻後，將其直接寫入使用者詞庫，讓它擁有更高優先權、不再依賴 POM 排序。
+
+### 設計原則
+
+- **支援詞組長度**：2 至 5 個字。
+- **計數窗格**：每次 `consolidateNode()` 被呼叫時，對 Megrez 組句結果中的每一個長度 2..N 的滑動窗格（sliding window）評估候選。
+- **閾值**：可設定，預設 3 次。達到閾值後立即呼叫 `autoLearnPhraseCallback`，寫入使用者詞庫。
+- **不污染 POM**：計數鍵使用 `#PHRASE:` 前綴，不符合 POM 的 `parseDelimitedPerceptionKey` 格式（需 `&` 分隔符），故永遠不會被 POM 建議邏輯讀取。
+
+### 計數鍵格式
+
+```
+#PHRASE:<讀音1>-<讀音2>-...-<讀音N>:<漢字詞組>
+```
+
+範例：
+
+```
+#PHRASE:ㄒㄧㄝˋ-ㄩˇ-ㄘㄤ:謝雨蒼
+```
+
+這樣設計確保不同漢字輸出（如「謝宇軒」vs「謝雨蒼」）即使讀音重疊，計數也彼此獨立。
+
+### 字詞追蹤流程（phraseTracking）
+
+位置：`InputHandler_CoreProtocol.swift`，在 `pomProcessing` labeled block 之後（僅在 `!overrideTaskResult` 分支內執行）。
+
+```
+consolidateNode() 被呼叫
+  ↓
+取得 Megrez assembler 目前的節點路徑 (fixedNodes)
+  ↓
+對 fixedNodes 中長度 2..5 的每個滑動窗格 slice:
+  │  讀音序列 = slice.map { $0.key }（以 "-" 連接）
+  │  漢字輸出 = slice.map { $0.currentUnigram.value }（直接串接）
+  │  計數鍵 = "#PHRASE:\(readings):\(phrase)"
+  │  count = lmMgr.pomCountForKey(計數鍵) + 1
+  │  lmMgr.setPOMCountForKey(計數鍵, count: count)
+  └→ 若 count >= autoLearnPhraseTriggerThreshold:
+       autoLearnPhraseCallback?(讀音序列 Array, 漢字詞組)
+         ↓
+       InputSession.initInputHandler() 中設定的 callback:
+         lmMgr.insertPhraseToUserDict(phrase, readings: readings)
+```
+
+**重要細節**：只有當 slice 內每個節點都是「顯式選字（withSpecified）」時才進行計數。這樣可以避免自動組句的詞組被誤學。
+
+### 偏好設定
+
+| 偏好鍵 | 型別 | 預設值 | 說明 |
+|--------|------|--------|------|
+| `autoLearnPhraseTriggerThreshold` | `Int` | `3` | 觸發自動學習的選字次數門檻 |
+
+位置：`Packages/vChewing_Shared/Sources/Shared/UserDef/UserDef.swift`
+
+### 關鍵檔案
+
+| 檔案 | 用途 |
+|------|------|
+| `Packages/vChewing_LangModelAssembly/Sources/LangModelAssembly/SubLMs/lmPerceptionOverride.swift` | `pomCountForKey(_:)` — 執行緒安全的計數讀取（Task 1） |
+| `Packages/vChewing_LangModelAssembly/Sources/LangModelAssembly/LMInstantiator_POMRepresentable.swift` | `pomCountForKey(_:)` — 公開給 InputHandler 的轉接（Task 2） |
+| `Packages/vChewing_Shared/Sources/Shared/UserDef/UserDef.swift` | `kAutoLearnPhraseTriggerThreshold` case（Task 3） |
+| `Packages/vChewing_Shared/Sources/Shared/Protocols/PrefMgrProtocol.swift` | `autoLearnPhraseTriggerThreshold: Int`（Task 3） |
+| `Packages/vChewing_Typewriter/Sources/Typewriter/InputHandler/InputHandler_CoreProtocol.swift` | `autoLearnPhraseCallback` protocol 宣告 + phraseTracking 邏輯（Task 4/5） |
+| `Packages/vChewing_MainAssembly4Darwin/Sources/MainAssembly4Darwin/InputHandler/InputHandler.swift` | `autoLearnPhraseCallback` stored property（Task 4） |
+| `Packages/vChewing_MainAssembly4Darwin/Sources/MainAssembly4Darwin/SessionController/InputSession.swift` | callback wiring — 寫入使用者詞庫（Task 6） |
+| `Packages/vChewing_Typewriter/Tests/TypewriterTests/InputHandlerTests_Cases3.swift` | IH-312、IH-313、IH-314（Task 7） |
+
+---
+
 ## 延伸閱讀
 
 - AGENTS.md（本庫工作流程與規範總覽）
@@ -432,6 +517,6 @@ if input.isDown, !input.isControlHold, !input.isCommandHold, !input.isOptionHold
 
 ## 文件版本與更新紀錄
 
-- 文件版本：1.1
-- 最後更新：2026-04-01T00:00:00+08:00
+- 文件版本：1.2
+- 最後更新：2026-04-04T00:00:00+08:00
 - 適用版本：vChewing 2026.04.01 及以上
