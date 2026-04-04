@@ -413,7 +413,9 @@ extension InputHandlerProtocol {
         pomObservation = adjustedObservation
       }
       guard let pomObservation else { return }
-      pomProcessing: if pomObservation.scoreFromLM > -12,
+      // 當用戶明確從候選窗選字時（explicitlyChosen），無論 LM 分數高低均應記憶偏好。
+      // scoreFromLM > -12 門檻僅用於防止非明確選字時的極低頻詞彙污染。
+      pomProcessing: if (explicitlyChosen || pomObservation.scoreFromLM > -12),
                         prefs.fetchSuggestionsFromPerceptionOverrideModel {
         if skipObservation { break pomProcessing }
         vCLog("POM: Start Observation.")
