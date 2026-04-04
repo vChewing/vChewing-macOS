@@ -12,10 +12,14 @@ make release          # Universal binary (arm64+x86_64), signed, sandboxed
 make debug            # Single-arch debug build (faster iteration)
 make archive          # Release + dSYMs + .xcarchive for distribution
 make update           # Fetch/generate lexicon assets (first-time setup)
+swift build -c debug  # SPM debug build (alternative, no app bundle)
 
 # Test
 swift test                                                    # All tests
-swift test --package-path ./Packages/vChewing_Typewriter      # Single package
+make test                                                     # Same via Makefile
+swift test --package-path ./Packages/vChewing_Typewriter      # Single package (Typewriter)
+swift test --package-path ./Packages/vChewing_Tekkon          # Single package (Tekkon)
+swift test --package-path ./Packages/vChewing_Megrez          # Single package (Megrez)
 swift test --package-path ./Packages/vChewing_Typewriter --filter InputHandlerTests  # Single suite
 swift test --package-path ./Packages/vChewing_Typewriter --filter "testCaseName"     # Single test
 make spmLinuxTest-Typewriter                                  # Linux Docker test
@@ -69,7 +73,7 @@ Lexicon assets are compiled at build-time by the remote SPM plugin `VanguardSQLL
 
 All AppKit windows use the `vChewing_OSFrameworkImpl` Result Builder DSL — no Interface Builder assets (`.xib`, `.storyboard`). SwiftUI is used only for the About window and SettingsUI. `SettingsCocoa` (AppKit DSL) covers macOS 10.9–13.x.
 
-UI must not be dispatched to async threads; use `@MainActor`. Localize strings with `NSLocalizedString`. User preferences go through `UserDef` enum → `PrefMgrProtocol` → `PrefMgr`; direct `UserDefaults` access is discouraged.
+UI must not be dispatched to async threads; use `@MainActor`. Localize strings with `NSLocalizedString`. User preferences go through `UserDef` enum → `PrefMgrProtocol` → `PrefMgr`; direct `UserDefaults` access is discouraged. When extending `UserDef`, also extend `PrefMgrProtocol` and `PrefMgr`.
 
 ## Code Conventions
 
@@ -87,8 +91,16 @@ Examples: `Typewriter // InputHandler: Fix Shift key handling.` · `Tekkon // Co
 ### Imports
 Use `@_exported import` in a dedicated file per module (e.g., `TypewriterSPM.swift`, `_ModuleReexport.swift`). Do not scatter `import XXX` across files when the dependency is already re-exported.
 
+### Naming Conventions
+- Types: PascalCase. Protocols: suffix with `Protocol` (`IMEStateProtocol`, `PrefMgrProtocol`).
+- Use `private` over `fileprivate`. Test files: suffix with `Tests` (e.g. `InputHandlerTests_Cases1.swift`).
+
 ### Formatting (SwiftFormat)
 - 2-space indent, 120-char line width, K&R braces, `before-first` wrapping.
+
+### Objective-C/C++
+- Some SPM dependency targets include Obj-C(++) or C(++) for capabilities not achievable in pure Swift.
+- Use Google Style Format for all Obj-C(++) and C(++) code.
 
 ### Platform Gating
 ```swift
