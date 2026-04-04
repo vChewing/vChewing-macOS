@@ -79,4 +79,9 @@ extension LMAssembly.LMInstantiator {
   public func bleachPOMUnigrams(saveCallback: (() -> ())? = nil) {
     lmPerceptionOverride.bleachUnigrams(saveCallback: saveCallback)
   }
+
+  /// 查詢特定 POM 計數 key 下某候選字的累計次數。
+  public func pomCountForKey(_ key: String, candidate: String) -> Int {
+    lmPerceptionOverride.pomCountForKey(key, candidate: candidate)
+  }
 }
