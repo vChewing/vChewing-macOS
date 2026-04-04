@@ -523,6 +523,15 @@ extension LMAssembly.LMPerceptionOverride {
     saveCallback?() ?? saveData()
   }
 
+  /// 回傳特定 key + candidate 的累計次數（thread-safe）。
+  /// 若 key 或 candidate 不存在則回傳 0。
+  nonisolated public func pomCountForKey(_ key: String, candidate: String) -> Int {
+    lock.withLock {
+      guard let koPair = mutLRUMap[key] else { return 0 }
+      return koPair.perception.overrides[candidate]?.count ?? 0
+    }
+  }
+
   /// 清除指定的建議（基於 context + candidate 對）
   nonisolated func bleachSpecifiedSuggestions(
     targets: [(ngramKey: String, candidate: String)],
