@@ -126,6 +126,7 @@ public protocol InputHandlerProtocol: AnyObject, InputHandlerCoreProtocol {
   var errorCallback: ((String) -> ())? { get set }
   var notificationCallback: ((String) -> ())? { get set }
   var pomSaveCallback: (() -> ())? { get set }
+  var autoLearnPhraseCallback: ((_ keyArray: [String], _ value: String) -> ())? { get set }
   var filterabilityChecker: ((_ state: IMEStateData) -> Bool)? { get set }
   var isJISKeyboard: (() -> Bool)? { get set }
   var narrator: (any SpeechNarratorProtocol)? { get set }

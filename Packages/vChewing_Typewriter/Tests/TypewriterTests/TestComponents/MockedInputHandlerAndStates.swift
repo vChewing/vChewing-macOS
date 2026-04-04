@@ -175,6 +175,7 @@ public final class MockInputHandler: @MainActor InputHandlerProtocol {
   public var errorCallback: ((String) -> ())?
   public var notificationCallback: ((String) -> ())?
   public var pomSaveCallback: (() -> ())?
+  public var autoLearnPhraseCallback: ((_ keyArray: [String], _ value: String) -> ())?
   public var filterabilityChecker: ((_ state: IMEStateData) -> Bool)?
 
   public var backupCursor: Int?
