@@ -147,6 +147,42 @@ extension InputHandlerProtocol {
     return true
   }
 
+  // MARK: - 候選確認觸發自動配對（Candidate Confirmation）
+
+  /// 從候選窗確認一個字元後，若該字元為全形左括號，則自動補入對應右括號，游標留在兩括號之間。
+  ///
+  /// 此方法應在 `consolidateNode(candidate:...)` 成功之後、`generateStateOfInputting()` 之前呼叫。
+  /// 與 `handleAutoBracketPairing(insertedKey:)` 的差異：
+  /// - 此方法直接接受已知的字元 value，不需再透過 LM 查詢 key 對應的輸出字元。
+  ///
+  /// - Parameter value: 剛確認的候選字元（如 `"｛"`）
+  /// - Returns: 是否觸發自動配對
+  @discardableResult
+  public func handleAutoBracketPairingForCandidateValue(_ value: String) -> Bool {
+    guard prefs.autoBracketPairingEnabled else { return false }
+    guard value.count == 1, let leftChar = value.first else { return false }
+    guard BracketPairingRules.fullWidthLeftSet.contains(leftChar) else { return false }
+    guard let rightChar = BracketPairingRules.rightOf[leftChar] else { return false }
+
+    let rightKey = String(rightChar)
+
+    // 暫存右括號字元至 LM，使 assembler.insertKey 可通過 LM 檢查
+    currentLM.ephemeralUnigrams[rightKey] = .init(keyArray: [rightKey], value: rightKey)
+
+    // 插入右括號（此時游標在右括號之後）
+    let inserted = assembler.insertKey(rightKey)
+
+    // 立即清除暫存，避免污染後續 LM 查詢
+    currentLM.ephemeralUnigrams.removeAll()
+
+    guard inserted else { return false }
+
+    // 游標退回兩括號之間（左括號之後、右括號之前）
+    assembler.cursor -= 1
+
+    return true
+  }
+
   // MARK: - 半形括號自動配對（Phase 2 — 英文緩衝區）
 
   /// 半形左括號確認插入英文緩衝區後，自動補入對應右括號，游標留在兩括號之間。

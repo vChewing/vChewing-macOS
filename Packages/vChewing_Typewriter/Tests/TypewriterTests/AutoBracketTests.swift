@@ -142,6 +142,38 @@ struct BracketPairingRulesTests {
 
 extension AutoBracketTests {
 
+  /// TC-AB-041: 候選窗確認左括號候選後，也應自動補入對應右括號
+  @Test("TC-AB-041: Candidate confirmation of left bracket triggers pairing")
+  func testCandidateConfirmationTriggersAutoPairing() {
+    guard let handler = testHandler, let lm = testLM, let session = testSession else {
+      Issue.record("testHandler, testLM or testSession is nil.")
+      return
+    }
+    resetTestState()
+
+    // 先把「｛」插入組字器（模擬使用者輸入後 LM 已有此 key），再進入候選狀態
+    let bracketKey = "_punctuation_braceLeft"
+    lm.ephemeralUnigrams[bracketKey] = .init(keyArray: [bracketKey], value: "｛")
+    _ = handler.assembler.insertKey(bracketKey)
+    lm.ephemeralUnigrams.removeAll()
+    #expect(handler.assembler.length == 1, "Assembler should have 1 key before candidate confirmation")
+
+    // 建立候選狀態：高亮候選為單一左括號「｛」
+    let candidate = CandidateInState(keyArray: [bracketKey], value: "｛")
+    session.switchState(
+      .ofCandidates(candidates: [candidate], displayTextSegments: ["｛"], cursor: 1)
+    )
+
+    // 模擬確認候選
+    session.candidatePairSelectionConfirmed(at: 0)
+
+    // 預期：確認後組字器內為「｛｝」，游標在中間
+    #expect(handler.assembler.length == 2, "Assembler should have paired brackets after candidate confirmation")
+    #expect(handler.assembler.cursor == 1, "Cursor should be between paired brackets")
+    #expect(handler.assembler.keys[0] == bracketKey, "First key should be the bracket key")
+    #expect(handler.assembler.keys[1] == "｝", "Second key should be the right bracket (ephemeral key)")
+  }
+
   /// TC-AB-001: 自動配對功能停用時，不觸發自動配對
   @Test("TC-AB-001: Does not pair when feature is disabled")
   func testNoPairingWhenDisabled() {

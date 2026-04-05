@@ -381,6 +381,8 @@ public final class MockSession: @MainActor SessionCoreProtocol, CtlCandidateDele
         skipObservation: !inputHandler.prefs.fetchSuggestionsFromPerceptionOverrideModel,
         explicitlyChosen: true
       )
+      // 候選確認後，若選中的是單一全形左括號，觸發自動括號配對
+      inputHandler.handleAutoBracketPairingForCandidateValue(selectedValue.value)
       var result: State = inputHandler.generateStateOfInputting()
       defer { switchState(result) } // 這是最終輸出結果。
       if inputHandler.prefs.useSCPCTypingMode {
