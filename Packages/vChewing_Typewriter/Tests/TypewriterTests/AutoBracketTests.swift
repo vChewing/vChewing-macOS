@@ -608,3 +608,180 @@ struct EnglishBufferCursorTests {
     #expect(state.englishBufferCursor == 0)
   }
 }
+
+// MARK: - HalfWidthAutoBracketTests
+
+/// 半形括號自動配對功能的單元測試（Phase 2）。
+/// 直接呼叫 handler 方法，不走完整鍵盤輸入流。
+@Suite("HalfWidthAutoBracketTests", .serialized)
+@MainActor
+final class HalfWidthAutoBracketTests {
+
+  // MARK: Lifecycle
+
+  init() {
+    UserDefaults.unitTests = .init(suiteName: "org.atelierInmu.vChewing.Typewriter.HalfWidthAutoBracketTests")
+    UserDef.resetAll()
+    UserDefaults.pendingUnitTests = true
+    PrefMgr.sharedSansDidSetOps.autoBracketPairingEnabled = true
+    PrefMgr.sharedSansDidSetOps.smartChineseEnglishSwitchEnabled = true
+
+    let lm = LMAssembly.LMInstantiator(isCHS: false)
+    let handler = MockInputHandler(lm: lm, pref: PrefMgr.sharedSansDidSetOps)
+    let session = MockSession()
+    handler.session = session
+    session.inputHandler = handler
+    self.testHandler = handler
+    self.testSession = session
+  }
+
+  deinit {
+    mainSync {
+      self.testHandler?.errorCallback = nil
+      self.testSession?.switchState(MockIMEState.ofAbortion())
+      LMAssembly.resetSharedState()
+    }
+    UserDefaults.unitTests?.removeSuite(named: "org.atelierInmu.vChewing.Typewriter.HalfWidthAutoBracketTests")
+    UserDef.resetAll()
+    mainSync {
+      PrefMgr.sharedSansDidSetOps.autoBracketPairingEnabled = true
+      PrefMgr.sharedSansDidSetOps.smartChineseEnglishSwitchEnabled = true
+    }
+  }
+
+  // MARK: Internal
+
+  var testHandler: MockInputHandler?
+  var testSession: MockSession?
+
+  func resetTestState() {
+    testHandler?.prefs.autoBracketPairingEnabled = true
+    testHandler?.prefs.smartChineseEnglishSwitchEnabled = true
+    testHandler?.smartSwitchState.reset()
+    testHandler?.smartSwitchState.enterTempEnglishMode()
+  }
+
+  // MARK: - handleHalfWidthAutoBracketPairing
+
+  /// TC-AB-030: autoBracketPairingEnabled = false 時不觸發
+  @Test("TC-AB-030: Does not pair when feature is disabled")
+  func testNoPairWhenDisabled() {
+    guard let handler = testHandler else { return }
+    resetTestState()
+    handler.prefs.autoBracketPairingEnabled = false
+    handler.smartSwitchState.appendEnglishChar("(")
+    let result = handler.handleHalfWidthAutoBracketPairing(insertedChar: "(")
+    #expect(result == false)
+    #expect(handler.smartSwitchState.englishBuffer == "(")
+  }
+
+  /// TC-AB-031: smartChineseEnglishSwitchEnabled = false 時不觸發
+  @Test("TC-AB-031: Does not pair when smart switch is disabled")
+  func testNoPairWhenSmartSwitchDisabled() {
+    guard let handler = testHandler else { return }
+    resetTestState()
+    handler.prefs.smartChineseEnglishSwitchEnabled = false
+    handler.smartSwitchState.appendEnglishChar("(")
+    let result = handler.handleHalfWidthAutoBracketPairing(insertedChar: "(")
+    #expect(result == false)
+    #expect(handler.smartSwitchState.englishBuffer == "(")
+  }
+
+  /// TC-AB-032: 輸入 '(' 自動補 ')'，游標在括號中間
+  @Test("TC-AB-032: Auto-pairs ) after ( in English buffer")
+  func testAutoPairParenthesis() {
+    guard let handler = testHandler else { return }
+    resetTestState()
+    handler.smartSwitchState.appendEnglishChar("(")
+    let result = handler.handleHalfWidthAutoBracketPairing(insertedChar: "(")
+    #expect(result == true)
+    #expect(handler.smartSwitchState.englishBuffer == "()")
+    #expect(handler.smartSwitchState.englishBufferCursor == 1)
+  }
+
+  /// TC-AB-033: 輸入 '[' 自動補 ']'，游標在括號中間
+  @Test("TC-AB-033: Auto-pairs ] after [ in English buffer")
+  func testAutoPairBracket() {
+    guard let handler = testHandler else { return }
+    resetTestState()
+    handler.smartSwitchState.appendEnglishChar("[")
+    let result = handler.handleHalfWidthAutoBracketPairing(insertedChar: "[")
+    #expect(result == true)
+    #expect(handler.smartSwitchState.englishBuffer == "[]")
+    #expect(handler.smartSwitchState.englishBufferCursor == 1)
+  }
+
+  /// TC-AB-034: 非括號字元不觸發
+  @Test("TC-AB-034: Non-bracket char does not trigger pairing")
+  func testNoPairForNonBracket() {
+    guard let handler = testHandler else { return }
+    resetTestState()
+    handler.smartSwitchState.appendEnglishChar("a")
+    let result = handler.handleHalfWidthAutoBracketPairing(insertedChar: "a")
+    #expect(result == false)
+    #expect(handler.smartSwitchState.englishBuffer == "a")
+    #expect(handler.smartSwitchState.englishBufferCursor == 1)
+  }
+
+  // MARK: - handleHalfWidthSmartOverwrite
+
+  /// TC-AB-035: 游標前方有 ')' 時，輸入 ')' 跳過（Smart Overwrite）
+  @Test("TC-AB-035: Smart Overwrite skips ) in English buffer")
+  func testSmartOverwrite() {
+    guard let handler = testHandler else { return }
+    resetTestState()
+    // 設定 buffer = "()", cursor = 1
+    handler.smartSwitchState.appendEnglishChar("(")
+    handler.smartSwitchState.insertEnglishAtCursor(")", moveCursor: false)
+    #expect(handler.smartSwitchState.englishBuffer == "()")
+    #expect(handler.smartSwitchState.englishBufferCursor == 1)
+    // Smart Overwrite
+    let result = handler.handleHalfWidthSmartOverwrite(inputChar: ")")
+    #expect(result == true)
+    #expect(handler.smartSwitchState.englishBuffer == "()")
+    #expect(handler.smartSwitchState.englishBufferCursor == 2)
+  }
+
+  /// TC-AB-036: isTempEnglishMode = false 時 Smart Overwrite 不觸發
+  @Test("TC-AB-036: Smart Overwrite does not trigger outside temp English mode")
+  func testSmartOverwriteNotInEnglishMode() {
+    guard let handler = testHandler else { return }
+    resetTestState()
+    handler.smartSwitchState.isTempEnglishMode = false
+    let result = handler.handleHalfWidthSmartOverwrite(inputChar: ")")
+    #expect(result == false)
+  }
+
+  // MARK: - handleHalfWidthBracketBackspace
+
+  /// TC-AB-037: 空括號 "(|)" 按 Backspace 同時刪除兩側括號
+  @Test("TC-AB-037: Paired backspace deletes both brackets when cursor between empty brackets")
+  func testPairedBackspace() {
+    guard let handler = testHandler else { return }
+    resetTestState()
+    // 設定 buffer = "()", cursor = 1
+    handler.smartSwitchState.appendEnglishChar("(")
+    handler.smartSwitchState.insertEnglishAtCursor(")", moveCursor: false)
+    let result = handler.handleHalfWidthBracketBackspace()
+    #expect(result == true)
+    #expect(handler.smartSwitchState.englishBuffer == "")
+    #expect(handler.smartSwitchState.englishBufferCursor == 0)
+  }
+
+  /// TC-AB-038: 非空括號 "(hi|)" 按 Backspace 不觸發配對刪除
+  @Test("TC-AB-038: Backspace does not pair-delete in non-empty brackets")
+  func testNoPairedBackspaceWhenNonEmpty() {
+    guard let handler = testHandler else { return }
+    resetTestState()
+    // 設定 buffer = "(hi)", cursor = 3
+    handler.smartSwitchState.appendEnglishChar("(")
+    handler.smartSwitchState.insertEnglishAtCursor(")", moveCursor: false)
+    handler.smartSwitchState.appendEnglishChar("h")
+    handler.smartSwitchState.appendEnglishChar("i")
+    #expect(handler.smartSwitchState.englishBuffer == "(hi)")
+    #expect(handler.smartSwitchState.englishBufferCursor == 3)
+    // charBefore = "i", charAfter = ")" → "i" 不是左括號，不觸發
+    let result = handler.handleHalfWidthBracketBackspace()
+    #expect(result == false)
+  }
+}

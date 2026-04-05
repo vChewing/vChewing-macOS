@@ -146,4 +146,63 @@ extension InputHandlerProtocol {
     _ = assembler.dropKey(direction: .front)
     return true
   }
+
+  // MARK: - 半形括號自動配對（Phase 2 — 英文緩衝區）
+
+  /// 半形左括號確認插入英文緩衝區後，自動補入對應右括號，游標留在兩括號之間。
+  ///
+  /// 應在 `smartSwitchState.appendEnglishChar(char)` 成功之後呼叫。
+  /// 若回傳 `true`，右括號已插入游標位置（游標未移動）。
+  ///
+  /// 觸發條件：`autoBracketPairingEnabled` + `smartChineseEnglishSwitchEnabled` + `isTempEnglishMode`
+  ///
+  /// - Parameter insertedChar: 剛插入英文緩衝區的字元
+  /// - Returns: 是否觸發自動配對
+  @discardableResult
+  func handleHalfWidthAutoBracketPairing(insertedChar: Character) -> Bool {
+    guard prefs.autoBracketPairingEnabled else { return false }
+    guard prefs.smartChineseEnglishSwitchEnabled else { return false }
+    guard smartSwitchState.isTempEnglishMode else { return false }
+    guard BracketPairingRules.halfWidthLeftSet.contains(insertedChar) else { return false }
+    guard let rightChar = BracketPairingRules.rightOf[insertedChar] else { return false }
+    smartSwitchState.insertEnglishAtCursor(String(rightChar), moveCursor: false)
+    return true
+  }
+
+  /// 輸入半形右括號時，若游標右側已有由自動配對插入的相同右括號，游標跳過（不重複插入）。
+  ///
+  /// 應在 `appendEnglishChar(char)` 之前呼叫；若回傳 `true`，呼叫端應跳過 append，直接更新 State。
+  ///
+  /// - Parameter inputChar: 使用者即將輸入的字元
+  /// - Returns: 是否執行了 Smart Overwrite
+  @discardableResult
+  func handleHalfWidthSmartOverwrite(inputChar: Character) -> Bool {
+    guard prefs.autoBracketPairingEnabled else { return false }
+    guard smartSwitchState.isTempEnglishMode else { return false }
+    guard BracketPairingRules.isRightBracket.contains(inputChar) else { return false }
+    guard smartSwitchState.englishCharAfterCursor == inputChar else { return false }
+    smartSwitchState.moveEnglishCursorRight()
+    return true
+  }
+
+  /// 游標位於空半形括號內時，Backspace 同時刪除兩側括號。
+  ///
+  /// 應在 `handleBackspaceInTempEnglishMode` 最前方呼叫；若回傳 `true`，呼叫端應立即更新 State。
+  ///
+  /// - Returns: 是否執行了配對刪除
+  @discardableResult
+  func handleHalfWidthBracketBackspace() -> Bool {
+    guard prefs.autoBracketPairingEnabled else { return false }
+    guard smartSwitchState.isTempEnglishMode else { return false }
+    guard
+      let charBefore = smartSwitchState.englishCharBeforeCursor,
+      let charAfter = smartSwitchState.englishCharAfterCursor,
+      BracketPairingRules.halfWidthLeftSet.contains(charBefore),
+      let expectedRight = BracketPairingRules.rightOf[charBefore],
+      charAfter == expectedRight
+    else { return false }
+    smartSwitchState.deleteEnglishCharBeforeCursor()
+    smartSwitchState.deleteEnglishCharAfterCursor()
+    return true
+  }
 }
