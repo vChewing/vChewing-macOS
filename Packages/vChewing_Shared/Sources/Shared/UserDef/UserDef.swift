@@ -76,6 +76,7 @@ nonisolated public enum UserDef: String, CaseIterable, Identifiable, Sendable {
   case kAutoCorrectReadingCombination = "AutoCorrectReadingCombination"
   case kFuzzyReadingEnEngEnabled = "FuzzyReadingEnEngEnabled"
   case kSmartChineseEnglishSwitchEnabled = "SmartChineseEnglishSwitchEnabled"
+  case kAutoBracketPairingEnabled = "AutoBracketPairingEnabled"
   case kNumberQuickInputEnabled = "NumberQuickInputEnabled"
   case kReadingNarrationCoverage = "ReadingNarrationCoverage"
   case kAlsoConfirmAssociatedCandidatesByEnter = "AlsoConfirmAssociatedCandidatesByEnter"
@@ -479,6 +480,7 @@ nonisolated extension UserDef {
     case .kAutoCorrectReadingCombination: return .bool(true)
     case .kFuzzyReadingEnEngEnabled: return .bool(false)
     case .kSmartChineseEnglishSwitchEnabled: return .bool(false)
+    case .kAutoBracketPairingEnabled: return .bool(true)
     case .kNumberQuickInputEnabled: return .bool(true)
     case .kReadingNarrationCoverage: return .integer(0)
     case .kAlsoConfirmAssociatedCandidatesByEnter: return .bool(false)
@@ -842,6 +844,11 @@ nonisolated extension UserDef {
         userDef: self,
         shortTitle: "智慧中英文切換",
         description: "在中文模式下，當連續輸入無法組成注音的按鍵時，自動切換為臨時英文模式。字母、數字、標點符號等 ASCII 可印列字元均會加入英文緩衝；輸入空白鍵插入空格、按 Tab 提交英文後讓 Tab 穿透給應用程式、按 Enter 提交英文；按下 Backspace 可逐字刪除英文緩衝內容，清空後返回中文模式。"
+      )
+    case .kAutoBracketPairingEnabled: return .init(
+        userDef: self,
+        shortTitle: "自動括號配對",
+        description: "輸入左括號時，自動在游標後插入對應的右括號，游標停在括號內，方便直接輸入括號內容。適用全形括號（如『』、「」、《》、（）等）。"
       )
     case .kNumberQuickInputEnabled: return .init(
         userDef: self,

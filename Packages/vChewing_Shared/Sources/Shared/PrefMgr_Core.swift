@@ -165,6 +165,9 @@ public final class PrefMgr: PrefMgrProtocol, Sendable {
   @AppProperty(userDef: .kSmartChineseEnglishSwitchEnabled)
   public var smartChineseEnglishSwitchEnabled: Bool
 
+  @AppProperty(userDef: .kAutoBracketPairingEnabled)
+  public var autoBracketPairingEnabled: Bool
+
   @AppProperty(userDef: .kNumberQuickInputEnabled)
   public var numberQuickInputEnabled: Bool
 

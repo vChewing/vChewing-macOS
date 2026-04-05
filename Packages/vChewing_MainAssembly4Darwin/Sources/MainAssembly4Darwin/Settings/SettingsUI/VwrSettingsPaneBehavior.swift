@@ -49,6 +49,7 @@ public struct VwrSettingsPaneBehavior: View {
         UserDef.kSpecifyIntonationKeyBehavior.renderUI()
         UserDef.kAcceptLeadingIntonations.renderUI()
         UserDef.kSmartChineseEnglishSwitchEnabled.renderUI()
+        UserDef.kAutoBracketPairingEnabled.renderUI()
         UserDef.kNumberQuickInputEnabled.renderUI()
       }
 

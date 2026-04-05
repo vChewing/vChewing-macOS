@@ -51,6 +51,7 @@ extension SettingsPanesCocoa {
               UserDef.kSpecifyIntonationKeyBehavior.render(fixWidth: innerContentWidth)
               UserDef.kAcceptLeadingIntonations.render(fixWidth: innerContentWidth)
               UserDef.kSmartChineseEnglishSwitchEnabled.render(fixWidth: innerContentWidth)
+              UserDef.kAutoBracketPairingEnabled.render(fixWidth: innerContentWidth)
               UserDef.kNumberQuickInputEnabled.render(fixWidth: innerContentWidth)
             }?.boxed()
             NSView()

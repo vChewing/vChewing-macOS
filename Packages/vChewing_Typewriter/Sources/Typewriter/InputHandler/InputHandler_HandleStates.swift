@@ -342,10 +342,23 @@ extension InputHandlerProtocol {
       return true
     }
 
+    // Smart Overwrite：輸入右括號時，若游標右側已有自動配對插入的相同右括號，則跳過
+    if handleSmartOverwrite(for: customPunctuation) {
+      assemble()
+      let textToCommit = commitOverflownComposition
+      var inputting = generateStateOfInputting()
+      inputting.textToCommit = textToCommit
+      session.switchState(inputting)
+      return true
+    }
+
     guard assembler.insertKey(customPunctuation) else {
       errorCallback?("C0793A6D: 得檢查對應的語言模組的 hasUnigramsFor() 是否有誤判之情形。")
       return true
     }
+
+    // 自動括號配對：左括號插入後，自動補入對應右括號，游標停在兩括號之間
+    handleAutoBracketPairing(insertedKey: customPunctuation)
 
     assemble()
     // 一邊吃一邊屙（僅對位列黑名單的 App 用這招限制組字區長度）。
@@ -542,6 +555,19 @@ extension InputHandlerProtocol {
         errorCallback?("9D69908D")
         return true
       }
+
+      // Backspace 配對刪除：游標位於空括號內時，同時刪除兩側括號
+      if actualSteps == 1, handleBracketBackspace() {
+        assemble()
+        switch isConsideredEmptyForNow {
+        case false:
+          session.switchState(generateStateOfInputting())
+        case true:
+          session.switchState(State.ofAbortion())
+        }
+        return true
+      }
+
       var isConsolidated = false
       for _ in 0 ..< actualSteps {
         if !isConsolidated {
