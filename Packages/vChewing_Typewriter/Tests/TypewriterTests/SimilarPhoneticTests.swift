@@ -140,3 +140,74 @@ struct SimilarPhoneticRulesTests {
     #expect(SimilarPhoneticRules.nearConsonantBase(for: "ㄅㄛ") == nil)
   }
 }
+
+// MARK: - SimilarPhoneticHandlerTests
+
+import LangModelAssembly
+import LMAssemblyMaterials4Tests
+
+@Suite("SimilarPhoneticHandler")
+struct SimilarPhoneticHandlerTests {
+
+  private func makeLM() -> LMAssembly.LMInstantiator {
+    let lm = LMAssembly.LMInstantiator(isCHS: false)
+    LMAssembly.LMInstantiator.connectToTestSQLDB(LMATestsData.sqlTestCoreLMData)
+    return lm
+  }
+
+  @Test("buildRows(ㄅㄛ): 第一列藍底，無近音聲母/韻母")
+  func testBuildRowsBo() {
+    let lm = makeLM()
+    let rows = SimilarPhoneticHandler.buildRows(for: "ㄅㄛ", lm: lm)
+    // First row = exact phonetic = blue row
+    #expect(rows.first?.phonetic == "ㄅㄛ")
+    // ㄅ has no near-consonant; ㄛ has no valid near-vowel → only exact 5 tones (minus empty ones)
+    let phoneticSet = Set(rows.map(\.phonetic))
+    #expect(!phoneticSet.contains(where: { $0.hasPrefix("ㄆ") || $0.hasPrefix("ㄇ") }))
+    // All rows have at least 1 candidate
+    #expect(rows.allSatisfy { !$0.candidates.isEmpty })
+  }
+
+  @Test("buildRows(ㄇㄡˊ): 第一列 ㄇㄡˊ，包含 ㄇㄛ 系列（ㄡ↔ㄛ 近音韻母）")
+  func testBuildRowsMouSecondTone() {
+    let lm = makeLM()
+    let rows = SimilarPhoneticHandler.buildRows(for: "ㄇㄡˊ", lm: lm)
+    #expect(rows.first?.phonetic == "ㄇㄡˊ")
+    let phoneticSet = Set(rows.map(\.phonetic))
+    // Should contain some ㄇㄛ variant
+    #expect(phoneticSet.contains(where: { $0.hasPrefix("ㄇㄛ") }))
+    // All rows non-empty
+    #expect(rows.allSatisfy { !$0.candidates.isEmpty })
+  }
+
+  @Test("buildRows(ㄘㄢ): 第一列 ㄘㄢ，包含 ㄔㄢ 系列（ㄘ↔ㄔ 近音聲母）")
+  func testBuildRowsCan() {
+    let lm = makeLM()
+    let rows = SimilarPhoneticHandler.buildRows(for: "ㄘㄢ", lm: lm)
+    #expect(rows.first?.phonetic == "ㄘㄢ")
+    let phoneticSet = Set(rows.map(\.phonetic))
+    #expect(phoneticSet.contains(where: { $0.hasPrefix("ㄔㄢ") }))
+    #expect(rows.allSatisfy { !$0.candidates.isEmpty })
+  }
+
+  @Test("buildRows(ㄦˊ): 無近音聲母列（ㄦ 為零聲母，不在白名單）")
+  func testBuildRowsEr() {
+    let lm = makeLM()
+    let rows = SimilarPhoneticHandler.buildRows(for: "ㄦˊ", lm: lm)
+    #expect(rows.first?.phonetic == "ㄦˊ")
+    // No near-consonant rows - all rows must start with ㄦ
+    let phoneticSet = Set(rows.map(\.phonetic))
+    #expect(phoneticSet.allSatisfy { $0.hasPrefix("ㄦ") })
+  }
+
+  @Test("buildRows: 無候選字的讀音不出現在結果中")
+  func testBuildRowsEmptyOmitted() {
+    let lm = makeLM()
+    // 使用 ㄎㄨˇ：只有少數聲調有候選字
+    let rows = SimilarPhoneticHandler.buildRows(for: "ㄎㄨˇ", lm: lm)
+    // All returned rows must have at least 1 candidate
+    #expect(rows.allSatisfy { !$0.candidates.isEmpty })
+    // First row = ㄎㄨˇ
+    #expect(rows.first?.phonetic == "ㄎㄨˇ")
+  }
+}
