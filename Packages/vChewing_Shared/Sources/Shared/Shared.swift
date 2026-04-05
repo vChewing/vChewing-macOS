@@ -66,6 +66,8 @@ nonisolated public enum StateType: String {
   case ofSymbolTable = "SymbolTable"
   /// **數字快打狀態 .ofNumberInput**: 使用者連按兩下漂鍵進入數字快打模式。
   case ofNumberInput = "NumberInput"
+  /// **近音表選字狀態 .ofSimilarPhonetic**: 使用者按下 ↑ 後，針對游標前一字展開近音表進行選字補正。
+  case ofSimilarPhonetic = "SimilarPhonetic"
 }
 
 // MARK: - KeyboardParser

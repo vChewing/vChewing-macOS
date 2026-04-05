@@ -12,6 +12,42 @@ import Foundation
 
 public typealias CandidateInState = (keyArray: [String], value: String)
 
+// MARK: - SimilarPhoneticRow
+
+/// 近音表中的一列資料。
+public struct SimilarPhoneticRow: Equatable {
+  /// 該列的注音讀音（含聲調，如 "ㄘㄢ"、"ㄘㄢˊ"）。
+  public let phonetic: String
+  /// 候選字列表（依詞頻排序）。
+  public let candidates: [String]
+  /// 目前顯示的頁碼（0-indexed）。
+  public var currentPage: Int
+
+  public init(phonetic: String, candidates: [String]) {
+    self.phonetic = phonetic
+    self.candidates = candidates
+    self.currentPage = 0
+  }
+
+  /// 每頁最多 8 個候選字。
+  public static let pageSize = 8
+
+  public var totalPages: Int {
+    max(1, (candidates.count + Self.pageSize - 1) / Self.pageSize)
+  }
+
+  /// 目前頁上的候選字（最多 8 個）。
+  public var candidatesOnCurrentPage: [String] {
+    let start = currentPage * Self.pageSize
+    guard start < candidates.count else { return [] }
+    let end = min(start + Self.pageSize, candidates.count)
+    return Array(candidates[start ..< end])
+  }
+
+  /// 該列是否有更多頁（顯示 `>` 指示符）。
+  public var hasNextPage: Bool { currentPage < totalPages - 1 }
+}
+
 // MARK: - IMEStateProtocol
 
 // 所有 IMEState 均遵守該協定：
@@ -51,6 +87,12 @@ public protocol IMEStateProtocol {
     numberBuffer: String,
     candidates: [CandidateInState],
     displayHint: String?
+  ) -> Self
+  static func ofSimilarPhonetic(
+    rows: [SimilarPhoneticRow],
+    selectedRow: Int,
+    displayTextSegments: [String],
+    cursor: Int
   ) -> Self
 }
 
@@ -112,7 +154,7 @@ extension IMEStateProtocol {
   /// 該參數僅用作輔助判斷。在 InputHandler 內使用的話，必須再檢查 !compositor.isEmpty。
   public var hasComposition: Bool {
     switch type {
-    case .ofCandidates, .ofInputting, .ofMarking, .ofNumberInput: return true
+    case .ofCandidates, .ofInputting, .ofMarking, .ofNumberInput, .ofSimilarPhonetic: return true
     default: return false
     }
   }
@@ -153,6 +195,8 @@ public struct IMEStateData {
   public var highlightAtSegment: Int?
   public var reading: String = ""
   public var numberBuffer: String = ""
+  public var similarPhoneticRows: [SimilarPhoneticRow] = []
+  public var selectedSimilarPhoneticRow: Int = 0
   public var markedReadings = [String]()
   public var candidates = [CandidateInState]()
   public var textToCommit: String = ""
