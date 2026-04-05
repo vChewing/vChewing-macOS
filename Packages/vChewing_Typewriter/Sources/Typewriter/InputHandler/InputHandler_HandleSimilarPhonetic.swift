@@ -52,12 +52,12 @@ extension InputHandlerProtocol {
     guard let session else { return false }
     guard session.state.type == .ofSimilarPhonetic else { return false }
 
-    let rows = session.state.data.similarPhoneticRows
+    var rows = session.state.data.similarPhoneticRows
     let selectedRow = session.state.data.selectedSimilarPhoneticRow
     let displayTextSegments = session.state.data.displayTextSegments
     let cursor = session.state.data.cursor
 
-    /// 更新選中列，重新發送狀態。
+    /// 更新選中列，重新發送狀態（使用當前 rows 快照）。
     func updateSelectedRow(_ newRow: Int) {
       let clamped = max(0, min(newRow, rows.count - 1))
       let newState = State.ofSimilarPhonetic(
@@ -97,6 +97,28 @@ extension InputHandlerProtocol {
         updateSelectedRow(selectedRow + 1)
       } else {
         errorCallback?("SPC_AT_BOTTOM")
+      }
+      return true
+
+    case .kRightArrow:
+      // 選中列往下一頁（若有更多候選字）
+      guard rows.indices.contains(selectedRow) else { return true }
+      if rows[selectedRow].hasNextPage {
+        rows[selectedRow].currentPage += 1
+        updateSelectedRow(selectedRow)
+      } else {
+        errorCallback?("SPC_NO_NEXT_PAGE")
+      }
+      return true
+
+    case .kLeftArrow:
+      // 選中列回到上一頁
+      guard rows.indices.contains(selectedRow) else { return true }
+      if rows[selectedRow].currentPage > 0 {
+        rows[selectedRow].currentPage -= 1
+        updateSelectedRow(selectedRow)
+      } else {
+        errorCallback?("SPC_NO_PREV_PAGE")
       }
       return true
 
