@@ -48,13 +48,9 @@ final class AutoBracketTests {
     mainSync {
       self.testHandler?.errorCallback = nil
       self.testSession?.switchState(MockIMEState.ofAbortion())
-      LMAssembly.resetSharedState()
     }
     UserDefaults.unitTests?.removeSuite(named: "org.atelierInmu.vChewing.Typewriter.AutoBracketTests")
     UserDef.resetAll()
-    mainSync {
-      PrefMgr.sharedSansDidSetOps.autoBracketPairingEnabled = true
-    }
   }
 
   // MARK: Internal
@@ -639,14 +635,9 @@ final class HalfWidthAutoBracketTests {
     mainSync {
       self.testHandler?.errorCallback = nil
       self.testSession?.switchState(MockIMEState.ofAbortion())
-      LMAssembly.resetSharedState()
     }
     UserDefaults.unitTests?.removeSuite(named: "org.atelierInmu.vChewing.Typewriter.HalfWidthAutoBracketTests")
     UserDef.resetAll()
-    mainSync {
-      PrefMgr.sharedSansDidSetOps.autoBracketPairingEnabled = true
-      PrefMgr.sharedSansDidSetOps.smartChineseEnglishSwitchEnabled = true
-    }
   }
 
   // MARK: Internal
@@ -783,5 +774,83 @@ final class HalfWidthAutoBracketTests {
     // charBefore = "i", charAfter = ")" → "i" 不是左括號，不觸發
     let result = handler.handleHalfWidthBracketBackspace()
     #expect(result == false)
+  }
+}
+
+// MARK: - Phase 1 End-to-End Tests (with real punctuation keys from SQL LM)
+
+extension AutoBracketTests {
+
+  /// TC-AB-039: 使用結構化 punctuation key（帶有輸出字元的 ephemeral unigram）觸發全形括號自動配對
+  ///
+  /// 此測試驗證當 `insertedKey` 為結構化格式（非直接字元）時，
+  /// `handleAutoBracketPairing` 能正確透過 LM 查詢取得輸出字元並觸發配對。
+  @Test("TC-AB-039: Structured punctuation key triggers auto-pairing via LM lookup")
+  func testAutoPairing_WithStructuredPunctuationKey() {
+    guard let handler = testHandler, let lm = testLM else {
+      Issue.record("testHandler or testLM is nil.")
+      return
+    }
+    resetTestState()
+
+    // 使用結構化 punctuation key，並透過 ephemeral unigram 注入 LM 查詢結果（模擬 SQL LM 有此 key）
+    let leftPunctKey = "_punctuation_bracketLeft"
+    let leftChar: Character = "「"
+    let rightChar = BracketPairingRules.rightOf[leftChar]!
+    // 注入左括號 key → 讓 assembler.insertKey 通過 LM 檢查
+    lm.ephemeralUnigrams[leftPunctKey] = .init(keyArray: [leftPunctKey], value: String(leftChar))
+    guard handler.assembler.insertKey(leftPunctKey) else {
+      lm.ephemeralUnigrams.removeAll()
+      Issue.record("assembler.insertKey('\(leftPunctKey)') failed.")
+      return
+    }
+    // 注意：此處不清除 ephemeralUnigrams，讓 handleAutoBracketPairing 的 LM 查詢也能成功
+
+    // 呼叫 handleAutoBracketPairing，使用結構化 punctuation key
+    let result = handler.handleAutoBracketPairing(insertedKey: leftPunctKey)
+    // handleAutoBracketPairing 內部呼叫 lm.unigramsFor 後會自動 removeAll()
+
+    #expect(result == true, "handleAutoBracketPairing should return true for structured punctuation key '\(leftPunctKey)'")
+    #expect(handler.assembler.length == 2, "Assembler should have 2 keys: left bracket + right bracket")
+    #expect(handler.assembler.cursor == 1, "Cursor should be between the two brackets")
+
+    // 游標右側應為右括號的單字元 key
+    let keyAfterCursor = handler.assembler.keys[handler.assembler.cursor]
+    #expect(
+      keyAfterCursor == String(rightChar),
+      "Key after cursor should be the right bracket '\(rightChar)', got: '\(keyAfterCursor)'"
+    )
+  }
+
+  /// TC-AB-040: 另一個結構化 punctuation key（｛｝）觸發全形括號自動配對
+  @Test("TC-AB-040: Another structured punctuation key triggers auto-pairing for ｛｝")
+  func testAutoPairing_WithStructuredPunctuationKey_Brace() {
+    guard let handler = testHandler, let lm = testLM else {
+      Issue.record("testHandler or testLM is nil.")
+      return
+    }
+    resetTestState()
+
+    let leftPunctKey = "_punctuation_braceLeft"
+    let leftChar: Character = "｛"
+    guard let rightChar = BracketPairingRules.rightOf[leftChar] else {
+      Issue.record("No right bracket defined for '｛' in BracketPairingRules.")
+      return
+    }
+    // 注入左括號 key → 讓 assembler.insertKey 通過 LM 檢查
+    lm.ephemeralUnigrams[leftPunctKey] = .init(keyArray: [leftPunctKey], value: String(leftChar))
+    guard handler.assembler.insertKey(leftPunctKey) else {
+      lm.ephemeralUnigrams.removeAll()
+      Issue.record("assembler.insertKey('\(leftPunctKey)') failed.")
+      return
+    }
+    // 注意：此處不清除 ephemeralUnigrams，讓 handleAutoBracketPairing 的 LM 查詢也能成功
+
+    let result = handler.handleAutoBracketPairing(insertedKey: leftPunctKey)
+    #expect(result == true)
+    #expect(handler.assembler.length == 2)
+    #expect(handler.assembler.cursor == 1)
+    let keyAfterCursor = handler.assembler.keys[handler.assembler.cursor]
+    #expect(keyAfterCursor == String(rightChar))
   }
 }

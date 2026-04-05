@@ -37,9 +37,11 @@ extension LMAssembly {
     // 這句需要留著，不然無法被 package 外界存取。
     public init(
       isCHS: Bool = false,
-      pomDataURL: URL? = nil
+      pomDataURL: URL? = nil,
+      prefs: PrefMgrProtocol = PrefMgr.sharedSansDidSetOps
     ) {
       self.isCHS = isCHS
+      self.prefs = prefs
       self.mtxPerceptionOverride = .init(.init(dataURL: pomDataURL))
     }
 
@@ -723,7 +725,7 @@ extension LMAssembly {
 
     // MARK: - 工具函式
 
-    private let prefs = PrefMgr.sharedSansDidSetOps
+    private let prefs: PrefMgrProtocol
 
     /// 當 HashMap 過大時自動清理
     private func cleanupInputTokenHashMapIfNeeded() {
