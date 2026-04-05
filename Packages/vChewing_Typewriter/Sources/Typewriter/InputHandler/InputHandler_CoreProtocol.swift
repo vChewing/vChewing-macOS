@@ -24,6 +24,9 @@ public final class SmartSwitchState {
   /// 按鍵序列（用於檢查是否能組成有效讀音）
   public var keySequence: String = ""
 
+  /// 英文緩衝區游標位置（0 = 字串開頭）
+  public var englishBufferCursor: Int = 0
+
   /// 已凍結的文字段落（保留在組字區不提交）
   public private(set) var frozenSegments: [String] = []
 
@@ -51,6 +54,7 @@ public final class SmartSwitchState {
     invalidKeyCount = 0
     isTempEnglishMode = false
     englishBuffer = ""
+    englishBufferCursor = 0
     keySequence = ""
   }
 
@@ -68,20 +72,60 @@ public final class SmartSwitchState {
   public func enterTempEnglishMode() {
     isTempEnglishMode = true
     englishBuffer = ""
+    englishBufferCursor = 0
     invalidKeyCount = 0
     keySequence = ""
   }
 
-  /// 追加英文字母
+  /// 在游標位置插入字元並推進游標（取代原本的 append）
   public func appendEnglishChar(_ char: String) {
-    englishBuffer.append(char)
+    let idx = englishBuffer.index(englishBuffer.startIndex, offsetBy: englishBufferCursor)
+    englishBuffer.insert(contentsOf: char, at: idx)
+    englishBufferCursor += char.count
   }
 
-  /// 刪除最後一個英文字母
-  public func deleteLastEnglishChar() {
-    if !englishBuffer.isEmpty {
-      englishBuffer.removeLast()
+  /// 刪除游標前一字元，游標左移（取代 deleteLastEnglishChar）
+  public func deleteEnglishCharBeforeCursor() {
+    guard englishBufferCursor > 0 else { return }
+    let idx = englishBuffer.index(englishBuffer.startIndex, offsetBy: englishBufferCursor - 1)
+    englishBuffer.remove(at: idx)
+    englishBufferCursor -= 1
+  }
+
+  /// 在游標位置插入字元，可選擇是否推進游標
+  public func insertEnglishAtCursor(_ char: String, moveCursor: Bool) {
+    let idx = englishBuffer.index(englishBuffer.startIndex, offsetBy: englishBufferCursor)
+    englishBuffer.insert(contentsOf: char, at: idx)
+    if moveCursor {
+      englishBufferCursor += char.count
     }
+  }
+
+  /// 游標右移一格（Smart Overwrite 用），不超過字串末端
+  public func moveEnglishCursorRight() {
+    guard englishBufferCursor < englishBuffer.count else { return }
+    englishBufferCursor += 1
+  }
+
+  /// 刪除游標後一字元（配對刪除右括號用），游標不動
+  public func deleteEnglishCharAfterCursor() {
+    guard englishBufferCursor < englishBuffer.count else { return }
+    let idx = englishBuffer.index(englishBuffer.startIndex, offsetBy: englishBufferCursor)
+    englishBuffer.remove(at: idx)
+  }
+
+  /// 游標前一字元（cursor > 0 時有效）
+  public var englishCharBeforeCursor: Character? {
+    guard englishBufferCursor > 0 else { return nil }
+    let idx = englishBuffer.index(englishBuffer.startIndex, offsetBy: englishBufferCursor - 1)
+    return englishBuffer[idx]
+  }
+
+  /// 游標後一字元（cursor < buffer.count 時有效）
+  public var englishCharAfterCursor: Character? {
+    guard englishBufferCursor < englishBuffer.count else { return nil }
+    let idx = englishBuffer.index(englishBuffer.startIndex, offsetBy: englishBufferCursor)
+    return englishBuffer[idx]
   }
 
   /// 檢查是否達到觸發門檻

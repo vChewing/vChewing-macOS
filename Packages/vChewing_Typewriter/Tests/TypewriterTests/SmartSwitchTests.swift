@@ -52,7 +52,6 @@ final class SmartSwitchTests {
     mainSync {
       self.testHandler?.errorCallback = nil
       self.testSession?.switchState(MockIMEState.ofAbortion())
-      LMAssembly.resetSharedState()
     }
     UserDefaults.unitTests?.removeSuite(named: "org.atelierInmu.vChewing.Typewriter.SmartSwitchTests")
     UserDef.resetAll()
