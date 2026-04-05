@@ -189,7 +189,13 @@
           drawText(char, at: CGPoint(x: x, y: y), attrs: textAttrs, in: ctx)
         }
 
-        // `>` indicator
+        // `<` indicator（有上一頁時顯示，置於注音欄右側）
+        if row.currentPage > 0 {
+          let x = pad + phoneticColumnWidth - columnWidth
+          drawText("<", at: CGPoint(x: x, y: y), attrs: dimTextAttrs, in: ctx)
+        }
+
+        // `>` indicator（有下一頁時顯示，置於最後一欄右側）
         if row.hasNextPage {
           let x = pad + phoneticColumnWidth + columnWidth * CGFloat(maxColumns)
           drawText(">", at: CGPoint(x: x, y: y), attrs: dimTextAttrs, in: ctx)
