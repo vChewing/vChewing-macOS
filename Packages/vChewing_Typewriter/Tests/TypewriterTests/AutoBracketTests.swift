@@ -442,3 +442,169 @@ extension AutoBracketTests {
     #expect(result == false, "handleBracketBackspace should return false when cursor is at start")
   }
 }
+
+// MARK: - EnglishBufferCursorTests
+
+/// SmartSwitchState 游標感知方法的單元測試（Task 1 — Phase 2）。
+/// 這些測試直接操作 SmartSwitchState，不需要 MockInputHandler 或 session。
+@Suite("EnglishBufferCursorTests")
+struct EnglishBufferCursorTests {
+
+  // MARK: - appendEnglishChar（游標感知插入）
+
+  @Test("appendEnglishChar 在游標位置插入字元並推進游標")
+  func testAppendInsertAtCursor() {
+    let state = SmartSwitchState()
+    state.enterTempEnglishMode()
+    state.appendEnglishChar("a")
+    state.appendEnglishChar("b")
+    // 游標在末端
+    #expect(state.englishBuffer == "ab")
+    #expect(state.englishBufferCursor == 2)
+    // 手動退回游標後再 append
+    state.englishBufferCursor = 1
+    state.appendEnglishChar("X")
+    // 插入點在 index 1，結果 "aXb"，游標 = 2
+    #expect(state.englishBuffer == "aXb")
+    #expect(state.englishBufferCursor == 2)
+  }
+
+  // MARK: - insertEnglishAtCursor
+
+  @Test("insertEnglishAtCursor(moveCursor: false) 插入但不移動游標")
+  func testInsertAtCursorNoMove() {
+    let state = SmartSwitchState()
+    state.enterTempEnglishMode()
+    state.appendEnglishChar("(")
+    // cursor = 1, buffer = "("
+    state.insertEnglishAtCursor(")", moveCursor: false)
+    // cursor 應仍為 1，buffer = "()"
+    #expect(state.englishBuffer == "()")
+    #expect(state.englishBufferCursor == 1)
+  }
+
+  @Test("insertEnglishAtCursor(moveCursor: true) 插入並移動游標")
+  func testInsertAtCursorWithMove() {
+    let state = SmartSwitchState()
+    state.enterTempEnglishMode()
+    state.appendEnglishChar("(")
+    state.insertEnglishAtCursor(")", moveCursor: true)
+    // cursor = 2, buffer = "()"
+    #expect(state.englishBuffer == "()")
+    #expect(state.englishBufferCursor == 2)
+  }
+
+  // MARK: - moveEnglishCursorRight
+
+  @Test("moveEnglishCursorRight 在範圍內推進游標")
+  func testMoveRight() {
+    let state = SmartSwitchState()
+    state.enterTempEnglishMode()
+    state.appendEnglishChar("(")
+    state.insertEnglishAtCursor(")", moveCursor: false)
+    // cursor = 1, buffer = "()"
+    state.moveEnglishCursorRight()
+    #expect(state.englishBufferCursor == 2)
+  }
+
+  @Test("moveEnglishCursorRight 在末端時不越界")
+  func testMoveRightAtEnd() {
+    let state = SmartSwitchState()
+    state.enterTempEnglishMode()
+    state.appendEnglishChar("a")
+    // cursor = 1 = buffer.count
+    state.moveEnglishCursorRight()
+    #expect(state.englishBufferCursor == 1) // 不越界
+  }
+
+  // MARK: - deleteEnglishCharBeforeCursor
+
+  @Test("deleteEnglishCharBeforeCursor 刪除游標前字元並退游標")
+  func testDeleteBefore() {
+    let state = SmartSwitchState()
+    state.enterTempEnglishMode()
+    state.appendEnglishChar("a")
+    state.appendEnglishChar("b")
+    // cursor = 2, buffer = "ab"
+    state.deleteEnglishCharBeforeCursor()
+    #expect(state.englishBuffer == "a")
+    #expect(state.englishBufferCursor == 1)
+  }
+
+  @Test("deleteEnglishCharBeforeCursor 在游標=0 時無副作用")
+  func testDeleteBeforeAtStart() {
+    let state = SmartSwitchState()
+    state.enterTempEnglishMode()
+    // cursor = 0, buffer = ""
+    state.deleteEnglishCharBeforeCursor()
+    #expect(state.englishBuffer == "")
+    #expect(state.englishBufferCursor == 0)
+  }
+
+  // MARK: - deleteEnglishCharAfterCursor
+
+  @Test("deleteEnglishCharAfterCursor 刪除游標後字元，游標不動")
+  func testDeleteAfter() {
+    let state = SmartSwitchState()
+    state.enterTempEnglishMode()
+    state.appendEnglishChar("(")
+    state.insertEnglishAtCursor(")", moveCursor: false)
+    // cursor = 1, buffer = "()"
+    state.deleteEnglishCharAfterCursor()
+    #expect(state.englishBuffer == "(")
+    #expect(state.englishBufferCursor == 1)
+  }
+
+  // MARK: - englishCharBeforeCursor / englishCharAfterCursor
+
+  @Test("englishCharBeforeCursor 和 englishCharAfterCursor 回傳正確字元")
+  func testCharAccessors() {
+    let state = SmartSwitchState()
+    state.enterTempEnglishMode()
+    state.appendEnglishChar("(")
+    state.insertEnglishAtCursor(")", moveCursor: false)
+    // cursor = 1, buffer = "()"
+    #expect(state.englishCharBeforeCursor == "(")
+    #expect(state.englishCharAfterCursor == ")")
+  }
+
+  @Test("游標在開頭時 englishCharBeforeCursor 為 nil")
+  func testCharBeforeNilAtStart() {
+    let state = SmartSwitchState()
+    state.enterTempEnglishMode()
+    #expect(state.englishCharBeforeCursor == nil)
+  }
+
+  @Test("游標在末端時 englishCharAfterCursor 為 nil")
+  func testCharAfterNilAtEnd() {
+    let state = SmartSwitchState()
+    state.enterTempEnglishMode()
+    state.appendEnglishChar("a")
+    // cursor = 1 = buffer.count
+    #expect(state.englishCharAfterCursor == nil)
+  }
+
+  // MARK: - 重置行為
+
+  @Test("enterTempEnglishMode 重置游標至 0")
+  func testEnterResetscursor() {
+    let state = SmartSwitchState()
+    state.enterTempEnglishMode()
+    state.appendEnglishChar("a")
+    state.appendEnglishChar("b")
+    #expect(state.englishBufferCursor == 2)
+    state.enterTempEnglishMode()
+    #expect(state.englishBufferCursor == 0)
+  }
+
+  @Test("exitTempEnglishMode 重置游標至 0")
+  func testExitResetsursor() {
+    let state = SmartSwitchState()
+    state.enterTempEnglishMode()
+    state.appendEnglishChar("(")
+    state.insertEnglishAtCursor(")", moveCursor: false)
+    #expect(state.englishBufferCursor == 1)
+    _ = state.exitTempEnglishMode()
+    #expect(state.englishBufferCursor == 0)
+  }
+}

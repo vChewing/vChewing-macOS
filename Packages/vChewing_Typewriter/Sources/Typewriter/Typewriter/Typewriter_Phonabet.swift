@@ -703,7 +703,7 @@ extension PhonabetTypewriter {
       }
     } else {
       // 英文緩衝非空：逐字刪除，不觸發雙擊計時（避免連按 Backspace 誤觸完整重置）。
-      handler.smartSwitchState.deleteLastEnglishChar()
+      handler.smartSwitchState.deleteEnglishCharBeforeCursor()
       let frozen = handler.smartSwitchState.frozenDisplayText
       let buffer = handler.smartSwitchState.englishBuffer
       if buffer.isEmpty, frozen.isEmpty {
