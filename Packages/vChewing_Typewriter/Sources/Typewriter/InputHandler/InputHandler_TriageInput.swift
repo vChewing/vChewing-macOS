@@ -62,8 +62,9 @@ extension InputHandlerProtocol {
             session.switchState(newState)
             return true
           }
+          // 第一下漂鍵：啟動計時器，消費事件（等待可能的第二下漂鍵；逾時後由 onBacktickTimeout 處理）
           numberQuickInputHandler.recordFirstBacktick()
-          return handlePunctuationList(alternative: false, isJIS: isJIS)
+          return true
         case []:
           return handlePunctuationList(alternative: false, isJIS: isJIS)
         case [.option, .shift]:

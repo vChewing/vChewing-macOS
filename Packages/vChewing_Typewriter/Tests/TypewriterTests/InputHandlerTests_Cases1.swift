@@ -424,6 +424,7 @@ extension InputHandlerTests {
       return
     }
     testHandler.prefs.enforceETenDOSCandidateSequence = false
+    testHandler.prefs.numberQuickInputEnabled = false
     CandidateNode.load()
     let event4SymbolMenu = KBEvent.KeyEventData.symbolMenuKeyEventIntl.asEvent
     testSession.resetInputHandler(forceComposerCleanup: true)
