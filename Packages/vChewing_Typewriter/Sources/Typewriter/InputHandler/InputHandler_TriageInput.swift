@@ -138,6 +138,8 @@ extension InputHandlerProtocol {
       return triageInput(event: input)
     case .ofNumberInput:
       return handleNumberQuickInput(input: input)
+    case .ofSimilarPhonetic:
+      return false // Task 8: 完整路由於後續 Task 實作。
     case .ofMarking:
       if handleMarkingState(input: input) { return true }
       session.switchState(state.convertedToInputting)

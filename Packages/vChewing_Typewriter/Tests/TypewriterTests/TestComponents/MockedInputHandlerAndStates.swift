@@ -147,6 +147,19 @@ extension MockIMEState {
     result.data.candidates = candidates
     return result
   }
+
+  public static func ofSimilarPhonetic(
+    rows: [SimilarPhoneticRow],
+    selectedRow: Int,
+    displayTextSegments: [String],
+    cursor: Int
+  ) -> MockIMEState {
+    var result = MockIMEState(displayTextSegments: displayTextSegments, cursor: cursor)
+    result.type = .ofSimilarPhonetic
+    result.data.similarPhoneticRows = rows
+    result.data.selectedSimilarPhoneticRow = max(0, min(selectedRow, rows.count - 1))
+    return result
+  }
 }
 
 // MARK: - MockInputHandler
@@ -284,7 +297,7 @@ public final class MockSession: @MainActor SessionCoreProtocol, CtlCandidateDele
     case .ofInputting:
       commit(text: next.textToCommit, clearDisplayBeforeCommit: true)
     case .ofMarking: break // 採統一後置處理。
-    case .ofAssociates, .ofCandidates, .ofSymbolTable, .ofNumberInput:
+    case .ofAssociates, .ofCandidates, .ofSymbolTable, .ofNumberInput, .ofSimilarPhonetic:
       showTooltip(nil)
     }
     // 會在工具提示為空的時候自動消除顯示。
