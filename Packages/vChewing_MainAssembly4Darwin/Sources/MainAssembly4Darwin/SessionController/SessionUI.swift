@@ -35,6 +35,9 @@ public final class SessionUI: SessionUIProtocol {
 
   /// 目前在用的的選字窗副本。Layout 預設值不再重要，因為使用時會就地重新賦值。
   public let candidateUI: (any CtlCandidateProtocol)? = CtlCandidateTDK()
+
+  /// 近音表視窗的副本。
+  public let similarPhoneticUI: (any SimilarPhoneticUIProtocol)? = SimilarPhoneticUI()
 }
 
 extension SessionUI {

@@ -29,6 +29,10 @@ extension SessionProtocol {
       vCLog("StateChanging: \(stateStr), tag: \(callerTag);\nstack: \(stack)")
     }
     // 正式處理。
+    // 離開近音表狀態時，關閉浮動視窗。
+    if state.type == .ofSimilarPhonetic, newState.type != .ofSimilarPhonetic {
+      ui?.similarPhoneticUI?.hide()
+    }
     let previous = state
     let next = getMitigatedState(newState)
     state = next
@@ -51,6 +55,9 @@ extension SessionProtocol {
     case .ofMarking: break // 採統一後置處理。
     case .ofAssociates, .ofCandidates, .ofSymbolTable, .ofNumberInput:
       showTooltip(nil)
+    case .ofSimilarPhonetic:
+      showTooltip(nil)
+      ui?.similarPhoneticUI?.show(state: next, at: lineHeightRect(zeroCursor: true).origin)
     }
     // 會在工具提示為空的時候自動消除顯示。
     showTooltip(
@@ -68,7 +75,7 @@ extension SessionProtocol {
     case .ofAbortion, .ofCommitting, .ofEmpty: false
     case .ofInputting: true
     case .ofMarking: true
-    case .ofAssociates, .ofCandidates, .ofSymbolTable, .ofNumberInput: true
+    case .ofAssociates, .ofCandidates, .ofSymbolTable, .ofNumberInput, .ofSimilarPhonetic: true
     }
     guard let display else { return }
     if display {

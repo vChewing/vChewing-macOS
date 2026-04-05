@@ -19,6 +19,7 @@ public protocol SessionUIProtocol: AnyObject {
   var pcb: (any PCBProtocol)? { get }
   var tooltipUI: (any TooltipUIProtocol)? { get }
   var candidateUI: (any CtlCandidateProtocol)? { get }
+  var similarPhoneticUI: (any SimilarPhoneticUIProtocol)? { get }
 }
 
 // MARK: - HitCheckerProtocol
@@ -65,4 +66,18 @@ public protocol TooltipUIProtocol {
 
   func hide()
   func setColor(state: TooltipColorState)
+}
+
+// MARK: - SimilarPhoneticUIProtocol
+
+public protocol SimilarPhoneticUIProtocol: AnyObject {
+  /// 顯示近音表視窗，依照 state 的 `similarPhoneticRows` 和 `selectedSimilarPhoneticRow` 渲染。
+  /// - Parameters:
+  ///   - state: 含有近音表資料的 `ofSimilarPhonetic` 狀態。
+  ///   - point: 視窗顯示的基準點（組字區頂端左側）。
+  func show(state: some IMEStateProtocol, at point: CGPoint)
+  /// 更新近音表顯示（列選擇變動時呼叫，不需要重定位視窗）。
+  func update(state: some IMEStateProtocol)
+  /// 隱藏視窗。
+  func hide()
 }

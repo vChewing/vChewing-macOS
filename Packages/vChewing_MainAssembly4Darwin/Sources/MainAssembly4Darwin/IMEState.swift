@@ -197,6 +197,25 @@ extension IMEStateProtocol {
     }
     return result
   }
+
+  /// 近音表選字模式的狀態。
+  /// - Parameters:
+  ///   - rows: 近音表各列資料（第一列為藍底列）。
+  ///   - selectedRow: 目前藍底列的索引（預設 0）。
+  ///   - displayTextSegments: 組字區的文字段落（與 ofInputting 相同）。
+  ///   - cursor: 組字區游標位置。
+  public static func ofSimilarPhonetic(
+    rows: [SimilarPhoneticRow],
+    selectedRow: Int,
+    displayTextSegments: [String],
+    cursor: Int
+  ) -> IMEState {
+    var result = IMEState(displayTextSegments: displayTextSegments, cursor: cursor)
+    result.type = .ofSimilarPhonetic
+    result.data.similarPhoneticRows = rows
+    result.data.selectedSimilarPhoneticRow = max(0, min(selectedRow, rows.count - 1))
+    return result
+  }
 }
 
 // MARK: - 規定一個狀態該怎樣返回自己的資料值
