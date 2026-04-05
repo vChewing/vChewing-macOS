@@ -218,10 +218,9 @@ public struct PhonabetTypewriter<Handler: InputHandlerProtocol>: TypewriterProto
           handler.smartSwitchState.appendEnglishChar(keysToCommit + " ")
           let frozen = handler.smartSwitchState.frozenDisplayText
           let buffer = handler.smartSwitchState.englishBuffer
-          let combinedDisplay = frozen + buffer
           let newState = State.ofInputting(
             displayTextSegments: [frozen, buffer].filter { !$0.isEmpty },
-            cursor: combinedDisplay.count,
+            cursor: frozen.count + handler.smartSwitchState.englishBufferCursor,
             highlightAt: nil
           )
           session.switchState(newState)
@@ -635,10 +634,9 @@ extension PhonabetTypewriter {
       handler.smartSwitchState.appendEnglishChar(" ")
       let frozen = handler.smartSwitchState.frozenDisplayText
       let buffer = handler.smartSwitchState.englishBuffer
-      let combinedDisplay = frozen + buffer
       let state = State.ofInputting(
         displayTextSegments: [frozen, buffer].filter { !$0.isEmpty },
-        cursor: combinedDisplay.count,
+        cursor: frozen.count + handler.smartSwitchState.englishBufferCursor,
         highlightAt: nil
       )
       session.switchState(state)
@@ -651,13 +649,29 @@ extension PhonabetTypewriter {
     let char = input.text
     if char.count == 1, let scalar = char.unicodeScalars.first,
        scalar.value >= 0x21, scalar.value <= 0x7E {
+      // 半形右括號：先檢查 Smart Overwrite（游標跳過，不重複插入）
+      if let inputChar = char.first, handler.handleHalfWidthSmartOverwrite(inputChar: inputChar) {
+        let frozen = handler.smartSwitchState.frozenDisplayText
+        let buffer = handler.smartSwitchState.englishBuffer
+        let state = State.ofInputting(
+          displayTextSegments: [frozen, buffer].filter { !$0.isEmpty },
+          cursor: frozen.count + handler.smartSwitchState.englishBufferCursor,
+          highlightAt: nil
+        )
+        session.switchState(state)
+        return true
+      }
+      // 一般字元：插入至游標位置
       handler.smartSwitchState.appendEnglishChar(char)
+      // 半形左括號：自動補入右括號（游標停在兩括號之間）
+      if let inputChar = char.first {
+        handler.handleHalfWidthAutoBracketPairing(insertedChar: inputChar)
+      }
       let frozen = handler.smartSwitchState.frozenDisplayText
       let buffer = handler.smartSwitchState.englishBuffer
-      let combinedDisplay = frozen + buffer
       let state = State.ofInputting(
         displayTextSegments: [frozen, buffer].filter { !$0.isEmpty },
-        cursor: combinedDisplay.count,
+        cursor: frozen.count + handler.smartSwitchState.englishBufferCursor,
         highlightAt: nil
       )
       session.switchState(state)
@@ -692,34 +706,51 @@ extension PhonabetTypewriter {
   private func handleBackspaceInTempEnglishMode(
     session: Session
   ) -> Bool {
-    if handler.smartSwitchState.englishBuffer.isEmpty {
-      // 英文緩衝已空：退出英文模式，保留 frozenSegments 與 assembler。
+    // 1. 半形空括號配對刪除（如 "(|)" → 同時刪除兩側括號）
+    if handler.handleHalfWidthBracketBackspace() {
+      let frozen = handler.smartSwitchState.frozenDisplayText
+      let buffer = handler.smartSwitchState.englishBuffer
+      if buffer.isEmpty, frozen.isEmpty {
+        handler.smartSwitchState.isTempEnglishMode = false
+        session.switchState(State.ofAbortion())
+      } else {
+        let state = State.ofInputting(
+          displayTextSegments: [frozen, buffer].filter { !$0.isEmpty },
+          cursor: frozen.count + handler.smartSwitchState.englishBufferCursor,
+          highlightAt: nil
+        )
+        session.switchState(state)
+      }
+      return true
+    }
+
+    // 2. 游標在最左端（無字元可刪）：退出英文模式，清除緩衝（含游標右側的右括號）
+    if handler.smartSwitchState.englishBufferCursor == 0 {
+      handler.smartSwitchState.englishBuffer = ""
+      handler.smartSwitchState.englishBufferCursor = 0
       handler.smartSwitchState.isTempEnglishMode = false
-      // 更新顯示：由 generateStateOfInputting 建構（含凍結段落前置）。
       if !handler.smartSwitchState.frozenSegments.isEmpty || !handler.assembler.isEmpty {
         session.switchState(handler.generateStateOfInputting(guarded: true))
       } else {
         session.switchState(State.ofAbortion())
       }
+      return true
+    }
+
+    // 3. 一般刪除：刪除游標前一字元
+    handler.smartSwitchState.deleteEnglishCharBeforeCursor()
+    let frozen = handler.smartSwitchState.frozenDisplayText
+    let buffer = handler.smartSwitchState.englishBuffer
+    if buffer.isEmpty, frozen.isEmpty {
+      handler.smartSwitchState.isTempEnglishMode = false
+      session.switchState(State.ofAbortion())
     } else {
-      // 英文緩衝非空：逐字刪除，不觸發雙擊計時（避免連按 Backspace 誤觸完整重置）。
-      handler.smartSwitchState.deleteEnglishCharBeforeCursor()
-      let frozen = handler.smartSwitchState.frozenDisplayText
-      let buffer = handler.smartSwitchState.englishBuffer
-      if buffer.isEmpty, frozen.isEmpty {
-        // 都清空了 → 返回中文模式（防禦性 fallback，正常情況下 frozen 不應為空）
-        handler.smartSwitchState.isTempEnglishMode = false
-        session.switchState(State.ofAbortion())
-      } else {
-        // 顯示 frozen + 剩餘英文緩衝
-        let combinedDisplay = frozen + buffer
-        let state = State.ofInputting(
-          displayTextSegments: [frozen, buffer].filter { !$0.isEmpty },
-          cursor: combinedDisplay.count,
-          highlightAt: nil
-        )
-        session.switchState(state)
-      }
+      let state = State.ofInputting(
+        displayTextSegments: [frozen, buffer].filter { !$0.isEmpty },
+        cursor: frozen.count + handler.smartSwitchState.englishBufferCursor,
+        highlightAt: nil
+      )
+      session.switchState(state)
     }
     return true
   }
@@ -860,7 +891,7 @@ extension PhonabetTypewriter {
     if !combinedDisplay.isEmpty {
       let state = State.ofInputting(
         displayTextSegments: [frozen, buffer].filter { !$0.isEmpty },
-        cursor: combinedDisplay.count,
+        cursor: frozen.count + handler.smartSwitchState.englishBufferCursor,
         highlightAt: nil
       )
       session.switchState(state)
