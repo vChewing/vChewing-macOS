@@ -146,6 +146,9 @@ public protocol InputHandlerProtocol: AnyObject, InputHandlerCoreProtocol {
 
   /// 智慧中英文切換狀態
   var smartSwitchState: SmartSwitchState { get set }
+
+  /// 數字快打模式處理器
+  var numberQuickInputHandler: NumberQuickInputHandler { get set }
 }
 
 // MARK: - KeyDropContext

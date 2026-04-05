@@ -51,6 +51,19 @@ extension InputHandlerProtocol {
       case .kSymbolMenuPhysicalKeyIntl, .kSymbolMenuPhysicalKeyJIS:
         let isJIS = keyCodeType == .kSymbolMenuPhysicalKeyJIS
         switch input.commonKeyModifierFlags {
+        case [] where !isJIS
+          && prefs.numberQuickInputEnabled
+          && [.ofStandard, .ofETen26].contains(currentKeyboardParserType):
+          // 漂鍵雙擊偵測（限大千/零壹排列，數字快打功能已啟用）
+          let currentText = session.state.displayedText
+          if numberQuickInputHandler.tryConfirmDoubleTap(precedingText: currentText) {
+            let newState = State.ofNumberInput(
+              precedingText: currentText, numberBuffer: "", candidates: [], displayHint: nil)
+            session.switchState(newState)
+            return true
+          }
+          numberQuickInputHandler.recordFirstBacktick()
+          return handlePunctuationList(alternative: false, isJIS: isJIS)
         case []:
           return handlePunctuationList(alternative: false, isJIS: isJIS)
         case [.option, .shift]:
@@ -122,6 +135,8 @@ extension InputHandlerProtocol {
       guard !result, state.type == .ofAssociates else { return true }
       session.switchState(State.ofEmpty())
       return triageInput(event: input)
+    case .ofNumberInput:
+      return handleNumberQuickInput(input: input)
     case .ofMarking:
       if handleMarkingState(input: input) { return true }
       session.switchState(state.convertedToInputting)

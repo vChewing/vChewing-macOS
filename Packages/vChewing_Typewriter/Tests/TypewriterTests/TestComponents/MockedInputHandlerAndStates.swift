@@ -136,6 +136,17 @@ extension MockIMEState {
   public static func ofSymbolTable(node: CandidateNode) -> MockIMEState {
     .init(IMEStateData(), type: .ofSymbolTable, node: node)
   }
+
+  public static func ofNumberInput(
+    precedingText: String,
+    numberBuffer: String,
+    candidates: [CandidateInState],
+    displayHint: String?
+  ) -> MockIMEState {
+    var result = MockIMEState(type: .ofNumberInput)
+    result.data.candidates = candidates
+    return result
+  }
 }
 
 // MARK: - MockInputHandler
@@ -188,6 +199,7 @@ public final class MockInputHandler: @MainActor InputHandlerProtocol {
   public var smartSwitchState = SmartSwitchState()
   public var isJISKeyboard: (() -> Bool)? = { false }
   public var narrator: (any SpeechNarratorProtocol)?
+  public var numberQuickInputHandler: NumberQuickInputHandler = .init()
 
   public var currentLM: LMAssembly.LMInstantiator {
     didSet {
@@ -272,7 +284,7 @@ public final class MockSession: @MainActor SessionCoreProtocol, CtlCandidateDele
     case .ofInputting:
       commit(text: next.textToCommit, clearDisplayBeforeCommit: true)
     case .ofMarking: break // 採統一後置處理。
-    case .ofAssociates, .ofCandidates, .ofSymbolTable:
+    case .ofAssociates, .ofCandidates, .ofSymbolTable, .ofNumberInput:
       showTooltip(nil)
     }
     // 會在工具提示為空的時候自動消除顯示。
