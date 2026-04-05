@@ -51,6 +51,11 @@ extension InputHandlerProtocol {
       }
       return true
 
+    case .kDownArrow, .kUpArrow, .kLeftArrow, .kRightArrow:
+      // 有候選時，委派給候選窗導航（Arrow key → handleCandidate → ctlCandidate）
+      guard !session.state.candidates.isEmpty else { return true }
+      return handleCandidate(input: input)
+
     default: break
     }
 
