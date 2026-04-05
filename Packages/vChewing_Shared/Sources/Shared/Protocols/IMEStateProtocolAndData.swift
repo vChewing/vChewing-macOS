@@ -46,6 +46,12 @@ public protocol IMEStateProtocol {
     cursor: Int
   ) -> Self
   static func ofSymbolTable(node: CandidateNode) -> Self
+  static func ofNumberInput(
+    precedingText: String,
+    numberBuffer: String,
+    candidates: [CandidateInState],
+    displayHint: String?
+  ) -> Self
 }
 
 extension IMEStateProtocol {
@@ -106,7 +112,7 @@ extension IMEStateProtocol {
   /// 該參數僅用作輔助判斷。在 InputHandler 內使用的話，必須再檢查 !compositor.isEmpty。
   public var hasComposition: Bool {
     switch type {
-    case .ofCandidates, .ofInputting, .ofMarking: return true
+    case .ofCandidates, .ofInputting, .ofMarking, .ofNumberInput: return true
     default: return false
     }
   }
@@ -114,7 +120,7 @@ extension IMEStateProtocol {
   public var isCandidateContainer: Bool {
     switch type {
     case .ofSymbolTable: return !node.members.isEmpty
-    case .ofAssociates, .ofCandidates, .ofInputting: return !candidates.isEmpty
+    case .ofAssociates, .ofCandidates, .ofInputting, .ofNumberInput: return !candidates.isEmpty
     default: return false
     }
   }
@@ -146,6 +152,7 @@ public struct IMEStateData {
 
   public var highlightAtSegment: Int?
   public var reading: String = ""
+  public var numberBuffer: String = ""
   public var markedReadings = [String]()
   public var candidates = [CandidateInState]()
   public var textToCommit: String = ""

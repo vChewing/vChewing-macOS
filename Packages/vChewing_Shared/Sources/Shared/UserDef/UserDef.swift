@@ -76,6 +76,7 @@ nonisolated public enum UserDef: String, CaseIterable, Identifiable, Sendable {
   case kAutoCorrectReadingCombination = "AutoCorrectReadingCombination"
   case kFuzzyReadingEnEngEnabled = "FuzzyReadingEnEngEnabled"
   case kSmartChineseEnglishSwitchEnabled = "SmartChineseEnglishSwitchEnabled"
+  case kNumberQuickInputEnabled = "NumberQuickInputEnabled"
   case kReadingNarrationCoverage = "ReadingNarrationCoverage"
   case kAlsoConfirmAssociatedCandidatesByEnter = "AlsoConfirmAssociatedCandidatesByEnter"
   case kKeepReadingUponCompositionError = "KeepReadingUponCompositionError"
@@ -478,6 +479,7 @@ nonisolated extension UserDef {
     case .kAutoCorrectReadingCombination: return .bool(true)
     case .kFuzzyReadingEnEngEnabled: return .bool(false)
     case .kSmartChineseEnglishSwitchEnabled: return .bool(false)
+    case .kNumberQuickInputEnabled: return .bool(true)
     case .kReadingNarrationCoverage: return .integer(0)
     case .kAlsoConfirmAssociatedCandidatesByEnter: return .bool(false)
     case .kKeepReadingUponCompositionError: return .bool(false)
@@ -840,6 +842,11 @@ nonisolated extension UserDef {
         userDef: self,
         shortTitle: "智慧中英文切換",
         description: "在中文模式下，當連續輸入無法組成注音的按鍵時，自動切換為臨時英文模式。字母、數字、標點符號等 ASCII 可印列字元均會加入英文緩衝；輸入空白鍵插入空格、按 Tab 提交英文後讓 Tab 穿透給應用程式、按 Enter 提交英文；按下 Backspace 可逐字刪除英文緩衝內容，清空後返回中文模式。"
+      )
+    case .kNumberQuickInputEnabled: return .init(
+        userDef: self,
+        shortTitle: "數字快打",
+        description: "連按兩下漂鍵（`）進入數字快打模式，可輸入數字、算式、日期、時間並轉換格式。僅在大千、微軟、零壹鍵盤排列下有效。"
       )
     case .kReadingNarrationCoverage: return .init(
         userDef: self, shortTitle: "i18n:UserDef.kReadingNarrationCoverage.shortTitle",

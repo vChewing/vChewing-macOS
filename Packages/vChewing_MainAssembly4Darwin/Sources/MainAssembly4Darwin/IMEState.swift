@@ -164,6 +164,39 @@ extension IMEStateProtocol {
   public static func ofSymbolTable(node: CandidateNode) -> IMEState {
     .init(IMEStateData(), type: .ofSymbolTable, node: node)
   }
+
+  /// 數字快打模式的狀態。
+  /// - Parameters:
+  ///   - precedingText: 數字快打前方的已組中文（可為空字串）
+  ///   - numberBuffer: 使用者輸入的數字/算式/日期/時間緩衝（可為空字串）
+  ///   - candidates: 格式化後的候選清單
+  ///   - displayHint: 即時計算結果預覽（如 "= 6000"），nil 表示無
+  public static func ofNumberInput(
+    precedingText: String,
+    numberBuffer: String,
+    candidates: [CandidateInState],
+    displayHint: String?
+  ) -> IMEState {
+    var result = IMEState(type: .ofNumberInput)
+    let hintSuffix = displayHint.map { " \($0)" } ?? ""
+    let displayStr = numberBuffer.isEmpty ? "數字快打" : numberBuffer + hintSuffix
+    var newSegments = precedingText.isEmpty ? [displayStr] : [precedingText, displayStr]
+    Self.hardenVerticalPunctuationsIfNeeded(&newSegments)
+    result.data.displayTextSegments = newSegments
+    result.data.cursor = result.data.displayedText.count
+    result.data.marker = result.data.cursor
+    result.data.candidates = candidates
+    result.data.numberBuffer = numberBuffer
+    if candidates.isEmpty && !numberBuffer.isEmpty {
+      // 正在輸入但尚無有效候選（格式不完整）
+    } else if candidates.isEmpty {
+      // 剛進入模式，顯示操作說明提示（tooltip 永久顯示）
+      result.data.tooltip = "數字 例：123\n日期 例：2020.5.6\n時間 例：13:00\n算數 例：20*300"
+      result.data.tooltipDuration = 0
+      result.data.tooltipColorState = .prompt
+    }
+    return result
+  }
 }
 
 // MARK: - 規定一個狀態該怎樣返回自己的資料值

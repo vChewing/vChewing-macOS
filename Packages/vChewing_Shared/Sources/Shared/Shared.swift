@@ -64,6 +64,8 @@ nonisolated public enum StateType: String {
   case ofCandidates = "Candidates"
   /// **分類分層符號表狀態 .ofSymbolTable**: 分類分層符號表選單專用的狀態，有自身的特殊處理。
   case ofSymbolTable = "SymbolTable"
+  /// **數字快打狀態 .ofNumberInput**: 使用者連按兩下漂鍵進入數字快打模式。
+  case ofNumberInput = "NumberInput"
 }
 
 // MARK: - KeyboardParser
