@@ -118,6 +118,7 @@
 5. **候選字為空的讀音列不顯示**：無候選字則整列省略
 6. **逐列獨立翻頁**：每列有自己的 `currentPage`，翻頁只影響當前選中（藍底）列
 7. **標題列的數字 1–8** 對應**藍底列當前頁**的候選字序號
+8. **螢幕邊界自動翻轉**：視窗預設顯示於游標**下方**；若放置於下方會超出螢幕可見範圍（`visibleFrame.minY`），則自動翻轉至游標**上方**顯示
 
 ### 3.4 列的排列順序規則
 
@@ -275,7 +276,7 @@ static func ofSimilarPhonetic(
 |----------|---------|
 | `Shared.swift` | 新增 `case ofSimilarPhonetic` 至 `StateType` |
 | `IMEStateProtocolAndData.swift` | 新增 `SimilarPhoneticRow`、state fields、factory |
-| `SessionUIProtocol.swift` | 新增 `SimilarPhoneticUIProtocol`、`similarPhoneticUI` property |
+| `SessionUIProtocol.swift` | 新增 `SimilarPhoneticUIProtocol`（`show` 參數為 `CGRect` 以支援邊界翻轉）、`similarPhoneticUI` property |
 | `IMEState.swift` | 實作 `ofSimilarPhonetic` constructor |
 | `SessionUI.swift` | 加入 `similarPhoneticUI` 實例 |
 | `InputSession_HandleStates.swift` | `.ofSimilarPhonetic` 加入 `switchState` 與 display 邏輯 |

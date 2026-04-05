@@ -57,7 +57,7 @@ extension SessionProtocol {
       showTooltip(nil)
     case .ofSimilarPhonetic:
       showTooltip(nil)
-      ui?.similarPhoneticUI?.show(state: next, at: lineHeightRect(zeroCursor: true).origin)
+      ui?.similarPhoneticUI?.show(state: next, at: lineHeightRect(zeroCursor: true))
     }
     // 會在工具提示為空的時候自動消除顯示。
     showTooltip(

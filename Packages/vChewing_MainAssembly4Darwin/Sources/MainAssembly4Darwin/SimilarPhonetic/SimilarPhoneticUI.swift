@@ -60,15 +60,25 @@
 
     // MARK: - SimilarPhoneticUIProtocol
 
-    public func show(state: some IMEStateProtocol, at point: CGPoint) {
+    public func show(state: some IMEStateProtocol, at lineHeightRect: CGRect) {
       guard state.type == .ofSimilarPhonetic else { return }
       contentView.rows = state.data.similarPhoneticRows
       contentView.selectedRow = state.data.selectedSimilarPhoneticRow
       contentView.needsDisplay = true
 
       let size = contentView.intrinsicContentSize
-      let origin = NSPoint(x: point.x, y: point.y - size.height - 4)
-      panel.setFrame(NSRect(origin: origin, size: size), display: true)
+      let cursorBottom = lineHeightRect.origin.y
+      let cursorTop = cursorBottom + lineHeightRect.height
+      let screen = NSScreen.screens.first { $0.frame.contains(lineHeightRect.origin) } ?? NSScreen.main
+      let visibleMinY = screen?.visibleFrame.minY ?? 0
+      // 若放在游標下方會超出螢幕底部，則改放在游標上方。
+      let originY: CGFloat
+      if cursorBottom - size.height - 4 < visibleMinY {
+        originY = cursorTop + 4
+      } else {
+        originY = cursorBottom - size.height - 4
+      }
+      panel.setFrame(NSRect(origin: NSPoint(x: lineHeightRect.origin.x, y: originY), size: size), display: true)
       panel.orderFront(nil)
     }
 
