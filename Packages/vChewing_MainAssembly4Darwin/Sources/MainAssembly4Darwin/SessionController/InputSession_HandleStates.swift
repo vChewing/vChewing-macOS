@@ -49,7 +49,7 @@ extension SessionProtocol {
     case .ofInputting:
       commit(text: next.textToCommit, clearDisplayBeforeCommit: true)
     case .ofMarking: break // 採統一後置處理。
-    case .ofAssociates, .ofCandidates, .ofSymbolTable:
+    case .ofAssociates, .ofCandidates, .ofSymbolTable, .ofNumberInput:
       showTooltip(nil)
     }
     // 會在工具提示為空的時候自動消除顯示。
@@ -68,7 +68,7 @@ extension SessionProtocol {
     case .ofAbortion, .ofCommitting, .ofEmpty: false
     case .ofInputting: true
     case .ofMarking: true
-    case .ofAssociates, .ofCandidates, .ofSymbolTable: true
+    case .ofAssociates, .ofCandidates, .ofSymbolTable, .ofNumberInput: true
     }
     guard let display else { return }
     if display {

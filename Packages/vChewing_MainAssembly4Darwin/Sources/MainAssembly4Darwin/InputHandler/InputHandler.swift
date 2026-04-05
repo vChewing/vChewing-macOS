@@ -35,6 +35,11 @@ public final class InputHandler: @MainActor InputHandlerProtocol {
     assembler.maxSegLength = prefs.maxCandidateLength
     /// 注拼槽初期化。
     ensureKeyboardParser()
+    /// 數字快打逾時回呼。
+    numberQuickInputHandler.onBacktickTimeout = { [weak self] in
+      guard let self else { return }
+      session?.switchState(State.ofCommitting(textToCommit: "`"))
+    }
   }
 
   // MARK: Public
@@ -66,6 +71,7 @@ public final class InputHandler: @MainActor InputHandlerProtocol {
   public var composer: Composer = .init() // 注拼槽
   public var assembler: Assembler // 組字器
   public var smartSwitchState = SmartSwitchState() // 智慧中英文切換狀態
+  public var numberQuickInputHandler = NumberQuickInputHandler() // 數字快打模式處理器
 
   public var currentLM: LMAssembly.LMInstantiator {
     didSet {
