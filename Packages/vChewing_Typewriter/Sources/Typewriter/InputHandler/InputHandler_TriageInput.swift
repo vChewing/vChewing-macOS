@@ -139,7 +139,7 @@ extension InputHandlerProtocol {
     case .ofNumberInput:
       return handleNumberQuickInput(input: input)
     case .ofSimilarPhonetic:
-      return false // Task 8: 完整路由於後續 Task 實作。
+      return handleSimilarPhoneticState(input: input)
     case .ofMarking:
       if handleMarkingState(input: input) { return true }
       session.switchState(state.convertedToInputting)
@@ -174,6 +174,9 @@ extension InputHandlerProtocol {
       if let compositionHandled = handleComposition(input: input) {
         return compositionHandled
       }
+
+      // 偵測 ↑ 鍵觸發近音表（優先於選字窗呼叫）。
+      if triggerSimilarPhonetic(input: input) { return true }
 
       // 手動呼叫選字窗。
       if callCandidateState(input: input) { return true }
