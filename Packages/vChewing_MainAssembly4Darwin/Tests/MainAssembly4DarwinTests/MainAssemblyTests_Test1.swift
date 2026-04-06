@@ -409,6 +409,8 @@ extension MainAssemblyTests {
   @Test
   func test110_InputHandler_SymbolMenuKeyTablePreviewInCompositionBuffer() throws {
     CandidateNode.load()
+    // 停用數字快打，避免漂鍵被數字快打的計時器路徑截走，確保直接叫出符號表。
+    testHandler.prefs.numberQuickInputEnabled = false
     handleKeyEvent(symbolMenuKeyEventIntl)
     #expect(testSession.state.type == .ofSymbolTable)
 

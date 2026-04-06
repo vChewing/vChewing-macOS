@@ -225,9 +225,10 @@ extension MainAssemblyTests {
     #expect(testSession.state.displayedText == ".")
     testSession.switchState(.ofAbortion())
 
-    // 測試普通符號選單。
+    // 測試普通符號選單（停用數字快打，避免漂鍵被計時器路徑截走）。
     resetToEmptyAndClear()
     testHandler.prefs.halfWidthPunctuationEnabled = false
+    testHandler.prefs.numberQuickInputEnabled = false
     var symbolMenuEvent = symbolMenuKeyEventIntlWithOpt
     symbolMenuEvent.flags = []
     _ = press(symbolMenuEvent)
