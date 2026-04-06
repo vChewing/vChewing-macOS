@@ -280,7 +280,7 @@
 "i18n:UserDef.kNumPadCharInputBehavior.option.4" = "入力緩衝列がからっぽの時、半角で直接出力";
 "i18n:UserDef.kNumPadCharInputBehavior.option.5" = "入力緩衝列がからっぽの時、全角で直接出力";
 "i18n:UserDef.kNumPadCharInputBehavior.shortTitle" = "テンキー:";
-"i18n:UserDef.kSymbolTableEnabled.description" = "有効にすると、Ctrl+\` で二次元分類記号表を呼び出せます。";
+"i18n:UserDef.kSymbolTableEnabled.description" = "有効にすると、\` キーを押して記号表を開けます。";
 "i18n:UserDef.kSymbolTableEnabled.shortTitle" = "記号表:";
 "i18n:UserDef.kReadingNarrationCoverage.description" = "音読組立緩衝列の内容の変化を朗読。該功能對磁帶模式無效。";
 "i18n:UserDef.kReadingNarrationCoverage.option.confirmed" = "音調キーで確認するときに";
