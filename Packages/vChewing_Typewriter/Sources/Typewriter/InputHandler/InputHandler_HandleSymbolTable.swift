@@ -18,7 +18,7 @@ extension InputHandlerProtocol {
   /// 由 backtick 逾時回呼觸發（數字快打功能啟用時，單按 ` 逾時即叫出符號表）。
   /// - Returns: 是否已處理（consumed）。
   @discardableResult
-  func triggerSymbolTableGrid() -> Bool {
+  public func triggerSymbolTableGrid() -> Bool {
     guard let session else { return false }
     // 確認功能已啟用
     guard prefs.symbolTableEnabled else { return false }
