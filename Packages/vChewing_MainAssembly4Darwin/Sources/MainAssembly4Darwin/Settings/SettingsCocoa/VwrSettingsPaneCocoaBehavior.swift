@@ -46,6 +46,7 @@ extension SettingsPanesCocoa {
             NSStackView.buildSection(width: innerContentWidth) {
               UserDef.kUpperCaseLetterKeyBehavior.render(fixWidth: innerContentWidth)
               UserDef.kNumPadCharInputBehavior.render(fixWidth: innerContentWidth)
+              UserDef.kSymbolTableEnabled.render(fixWidth: innerContentWidth)
             }?.boxed()
             NSStackView.buildSection(width: innerContentWidth) {
               UserDef.kSpecifyIntonationKeyBehavior.render(fixWidth: innerContentWidth)

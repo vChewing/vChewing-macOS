@@ -216,6 +216,25 @@ extension IMEStateProtocol {
     result.data.selectedSimilarPhoneticRow = max(0, min(selectedRow, rows.count - 1))
     return result
   }
+
+  /// 符號表格選字模式的狀態。
+  /// - Parameters:
+  ///   - categories: 符號表分類列表。
+  ///   - selectedRow: 目前選中列的索引（預設 0）。
+  ///   - displayTextSegments: 組字區的文字段落（與 ofInputting 相同）。
+  ///   - cursor: 組字區游標位置。
+  public static func ofSymbolTableGrid(
+    categories: [SymbolTableCategory],
+    selectedRow: Int,
+    displayTextSegments: [String],
+    cursor: Int
+  ) -> IMEState {
+    var result = IMEState(displayTextSegments: displayTextSegments, cursor: cursor)
+    result.type = .ofSymbolTableGrid
+    result.data.symbolTableCategories = categories
+    result.data.selectedSymbolTableRow = max(0, min(selectedRow, categories.count - 1))
+    return result
+  }
 }
 
 // MARK: - 規定一個狀態該怎樣返回自己的資料值

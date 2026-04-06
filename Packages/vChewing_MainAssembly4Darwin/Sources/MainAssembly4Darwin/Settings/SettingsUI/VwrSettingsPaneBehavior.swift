@@ -43,6 +43,7 @@ public struct VwrSettingsPaneBehavior: View {
       Section {
         UserDef.kUpperCaseLetterKeyBehavior.renderUI()
         UserDef.kNumPadCharInputBehavior.renderUI()
+        UserDef.kSymbolTableEnabled.renderUI()
       }
 
       Section {

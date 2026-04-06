@@ -67,6 +67,9 @@ extension InputHandlerProtocol {
           return true
         case []:
           return handlePunctuationList(alternative: false, isJIS: isJIS)
+        case .control:
+          // Ctrl+`：叫出舊版符號表（ofSymbolTable / tilde 選單）
+          return handlePunctuationList(alternative: false, isJIS: isJIS)
         case [.option, .shift]:
           return handlePunctuationList(alternative: true, isJIS: isJIS)
         case .option:
@@ -140,6 +143,8 @@ extension InputHandlerProtocol {
       return handleNumberQuickInput(input: input)
     case .ofSimilarPhonetic:
       return handleSimilarPhoneticState(input: input)
+    case .ofSymbolTableGrid:
+      return handleSymbolTableGridState(input: input)
     case .ofMarking:
       if handleMarkingState(input: input) { return true }
       session.switchState(state.convertedToInputting)

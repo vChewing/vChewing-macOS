@@ -183,6 +183,9 @@ public final class PrefMgr: PrefMgrProtocol, Sendable {
   @AppProperty(userDef: .kNumPadCharInputBehavior)
   public var numPadCharInputBehavior: Int
 
+  @AppProperty(userDef: .kSymbolTableEnabled)
+  public var symbolTableEnabled: Bool
+
   @AppProperty(userDef: .kShiftEisuToggleOffTogetherWithCapsLock)
   public var shiftEisuToggleOffTogetherWithCapsLock: Bool
 

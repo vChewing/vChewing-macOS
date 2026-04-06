@@ -116,4 +116,5 @@ public protocol PrefMgrProtocol {
   var usingHotKeyCassette: Bool { get set }
   var usingHotKeyRevLookup: Bool { get set }
   var usingHotKeyInputMode: Bool { get set }
+  var symbolTableEnabled: Bool { get set }
 }

@@ -35,12 +35,14 @@ public final class InputHandler: @MainActor InputHandlerProtocol {
     assembler.maxSegLength = prefs.maxCandidateLength
     /// 注拼槽初期化。
     ensureKeyboardParser()
-    /// 數字快打逾時回呼：改叫出符號表，使符號表與數字快打可同時啟用而不互斥。
+    /// 數字快打逾時回呼：先送出組字緩衝，再叫出符號表（`ofSymbolTableGrid`）。
     numberQuickInputHandler.onBacktickTimeout = { [weak self] in
       guard let self else { return }
       let textToCommit = generateStateOfInputting(sansReading: true).displayedText
-      session?.switchState(State.ofCommitting(textToCommit: textToCommit))
-      session?.switchState(State.ofSymbolTable(node: CandidateNode.root))
+      if !textToCommit.isEmpty {
+        session?.switchState(State.ofCommitting(textToCommit: textToCommit))
+      }
+      triggerSymbolTableGrid()
     }
   }
 
