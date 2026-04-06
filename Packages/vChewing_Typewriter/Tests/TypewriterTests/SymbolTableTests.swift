@@ -148,28 +148,26 @@ struct SymbolTableGridStateTests {
     )
   }
 
-  // MARK: - Ctrl+` 觸發
+  // MARK: - 符號表觸發（backtick 逾時）
 
-  @Test("Ctrl+` 觸發符號表狀態（功能啟用時）")
+  @Test("backtick 逾時觸發符號表狀態（功能啟用時）")
   func testTriggerSymbolTableGrid() async throws {
     CandidateNode.load()
     let (handler, session) = makeHandlerAndSession()
 
-    let input = ctrlBacktickEvent()
-    let consumed = handler.triggerSymbolTableGrid(input: input)
+    let consumed = handler.triggerSymbolTableGrid()
     #expect(consumed == true)
     #expect(session.state.type == .ofSymbolTableGrid)
     #expect(!session.state.data.symbolTableCategories.isEmpty)
     #expect(session.state.data.selectedSymbolTableRow == 0)
   }
 
-  @Test("Ctrl+` 觸發符號表：功能停用時不觸發")
+  @Test("backtick 逾時觸發符號表：功能停用時不觸發")
   func testTriggerSymbolTableGridDisabled() async throws {
     let (handler, session) = makeHandlerAndSession()
     (handler.prefs as! MockPrefMgr).symbolTableEnabled = false
 
-    let input = ctrlBacktickEvent()
-    let consumed = handler.triggerSymbolTableGrid(input: input)
+    let consumed = handler.triggerSymbolTableGrid()
     #expect(consumed == false)
     #expect(session.state.type == .ofEmpty)
   }
@@ -181,7 +179,7 @@ struct SymbolTableGridStateTests {
     CandidateNode.load()
     let (handler, session) = makeHandlerAndSession()
 
-    _ = handler.triggerSymbolTableGrid(input: ctrlBacktickEvent())
+    _ = handler.triggerSymbolTableGrid()
     #expect(session.state.type == .ofSymbolTableGrid)
     #expect(session.state.data.selectedSymbolTableRow == 0)
 
@@ -197,7 +195,7 @@ struct SymbolTableGridStateTests {
     handler.errorCallback = { errorMsg = $0 }
     _ = session // suppress unused warning
 
-    _ = handler.triggerSymbolTableGrid(input: ctrlBacktickEvent())
+    _ = handler.triggerSymbolTableGrid()
 
     _ = handler.handleSymbolTableGridState(input: arrowEvent(.kUpArrow))
     #expect(errorMsg == "SYM_AT_TOP")
@@ -210,7 +208,7 @@ struct SymbolTableGridStateTests {
     CandidateNode.load()
     let (handler, session) = makeHandlerAndSession()
 
-    _ = handler.triggerSymbolTableGrid(input: ctrlBacktickEvent())
+    _ = handler.triggerSymbolTableGrid()
     #expect(session.state.type == .ofSymbolTableGrid)
 
     _ = handler.handleSymbolTableGridState(input: escEvent())
@@ -224,7 +222,7 @@ struct SymbolTableGridStateTests {
     CandidateNode.load()
     let (handler, session) = makeHandlerAndSession()
 
-    _ = handler.triggerSymbolTableGrid(input: ctrlBacktickEvent())
+    _ = handler.triggerSymbolTableGrid()
     #expect(session.state.type == .ofSymbolTableGrid)
 
     let cat = session.state.data.symbolTableCategories[0]
@@ -232,6 +230,107 @@ struct SymbolTableGridStateTests {
 
     _ = handler.handleSymbolTableGridState(input: numberKeyEvent(1))
     // 按下數字鍵後，state 變成 ofCommitting 或已提交
+    let committed = session.state.type == .ofCommitting || !session.recentCommissions.isEmpty
+    #expect(committed)
+    if !session.recentCommissions.isEmpty {
+      #expect(session.recentCommissions.last == expectedSymbol)
+    }
+  }
+
+  // MARK: - 邊界導航測試
+
+  @Test("↓ 鍵：在最底列時觸發 errorCallback（SYM_AT_BOTTOM）")
+  func testDownArrowAtBottom() async throws {
+    CandidateNode.load()
+    let (handler, session) = makeHandlerAndSession()
+    var errorMsg: String?
+    handler.errorCallback = { errorMsg = $0 }
+
+    _ = handler.triggerSymbolTableGrid()
+    let totalRows = session.state.data.symbolTableCategories.count
+    // 移到最後一列
+    for _ in 0 ..< totalRows - 1 {
+      _ = handler.handleSymbolTableGridState(input: arrowEvent(.kDownArrow))
+    }
+    #expect(session.state.data.selectedSymbolTableRow == totalRows - 1)
+
+    _ = handler.handleSymbolTableGridState(input: arrowEvent(.kDownArrow))
+    #expect(errorMsg == "SYM_AT_BOTTOM")
+  }
+
+  @Test("→ 鍵：翻至下一頁")
+  func testRightArrowNextPage() async throws {
+    CandidateNode.load()
+    let (handler, session) = makeHandlerAndSession()
+
+    _ = handler.triggerSymbolTableGrid()
+    // 找到有多頁的分類列
+    let cats = session.state.data.symbolTableCategories
+    guard let multiPageIdx = cats.indices.first(where: { cats[$0].totalPages > 1 }) else { return }
+
+    // 移到多頁列
+    for _ in 0 ..< multiPageIdx {
+      _ = handler.handleSymbolTableGridState(input: arrowEvent(.kDownArrow))
+    }
+    #expect(session.state.data.selectedSymbolTableRow == multiPageIdx)
+    #expect(session.state.data.symbolTableCategories[multiPageIdx].currentPage == 0)
+
+    _ = handler.handleSymbolTableGridState(input: arrowEvent(.kRightArrow))
+    #expect(session.state.data.symbolTableCategories[multiPageIdx].currentPage == 1)
+  }
+
+  @Test("← 鍵：翻回上一頁")
+  func testLeftArrowPrevPage() async throws {
+    CandidateNode.load()
+    let (handler, session) = makeHandlerAndSession()
+
+    _ = handler.triggerSymbolTableGrid()
+    let cats = session.state.data.symbolTableCategories
+    guard let multiPageIdx = cats.indices.first(where: { cats[$0].totalPages > 1 }) else { return }
+
+    for _ in 0 ..< multiPageIdx {
+      _ = handler.handleSymbolTableGridState(input: arrowEvent(.kDownArrow))
+    }
+    // 先翻到第 1 頁
+    _ = handler.handleSymbolTableGridState(input: arrowEvent(.kRightArrow))
+    #expect(session.state.data.symbolTableCategories[multiPageIdx].currentPage == 1)
+
+    // 再翻回第 0 頁
+    _ = handler.handleSymbolTableGridState(input: arrowEvent(.kLeftArrow))
+    #expect(session.state.data.symbolTableCategories[multiPageIdx].currentPage == 0)
+  }
+
+  @Test("← 鍵：在第一頁時觸發 errorCallback（SYM_NO_PREV_PAGE）")
+  func testLeftArrowAtFirstPage() async throws {
+    CandidateNode.load()
+    let (handler, session) = makeHandlerAndSession()
+    var errorMsg: String?
+    handler.errorCallback = { errorMsg = $0 }
+    _ = session // 防止 ARC 提早釋放
+
+    _ = handler.triggerSymbolTableGrid()
+    _ = handler.handleSymbolTableGridState(input: arrowEvent(.kLeftArrow))
+    #expect(errorMsg == "SYM_NO_PREV_PAGE")
+  }
+
+  @Test("Enter 鍵：確認選中列第一個符號並提交")
+  func testEnterConfirmsFirstSymbol() async throws {
+    CandidateNode.load()
+    let (handler, session) = makeHandlerAndSession()
+
+    _ = handler.triggerSymbolTableGrid()
+    #expect(session.state.type == .ofSymbolTableGrid)
+
+    let cat = session.state.data.symbolTableCategories[0]
+    let expectedSymbol = cat.symbols[0]
+
+    let enterEvent = KBEvent.keyEventSimple(
+      type: .keyDown,
+      flags: [],
+      chars: "\r",
+      keyCode: KeyCode.kCarriageReturn.rawValue
+    )
+    _ = handler.handleSymbolTableGridState(input: enterEvent)
     let committed = session.state.type == .ofCommitting || !session.recentCommissions.isEmpty
     #expect(committed)
     if !session.recentCommissions.isEmpty {

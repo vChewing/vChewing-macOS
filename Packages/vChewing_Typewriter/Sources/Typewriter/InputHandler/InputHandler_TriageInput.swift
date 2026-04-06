@@ -67,6 +67,9 @@ extension InputHandlerProtocol {
           return true
         case []:
           return handlePunctuationList(alternative: false, isJIS: isJIS)
+        case .control:
+          // Ctrl+`：叫出舊版符號表（ofSymbolTable / tilde 選單）
+          return handlePunctuationList(alternative: false, isJIS: isJIS)
         case [.option, .shift]:
           return handlePunctuationList(alternative: true, isJIS: isJIS)
         case .option:
@@ -179,9 +182,6 @@ extension InputHandlerProtocol {
 
       // 偵測 ↑ 鍵觸發近音表（優先於選字窗呼叫）。
       if triggerSimilarPhonetic(input: input) { return true }
-
-      // 偵測 Ctrl+` 觸發符號表。
-      if triggerSymbolTableGrid(input: input) { return true }
 
       // 手動呼叫選字窗。
       if callCandidateState(input: input) { return true }

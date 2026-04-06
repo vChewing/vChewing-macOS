@@ -189,8 +189,12 @@
           ctx.fill(rowRect)
         }
 
-        // Category name label
-        drawText(cat.name, at: CGPoint(x: pad, y: y), attrs: textAttrs, in: ctx)
+        // Category name label（clip 至分類欄寬度，避免與 `<` 指示符重疊）
+        let catLabelClipWidth = categoryColumnWidth - columnWidth - 4
+        drawText(
+          cat.name, at: CGPoint(x: pad, y: y), attrs: textAttrs,
+          clipWidth: catLabelClipWidth > 0 ? catLabelClipWidth : nil, in: ctx
+        )
 
         // Symbols on current page
         let pageSymbols = cat.symbolsOnCurrentPage
@@ -215,11 +219,17 @@
 
     private func drawText(
       _ text: String, at point: CGPoint,
-      attrs: [NSAttributedString.Key: Any], in ctx: CGContext
+      attrs: [NSAttributedString.Key: Any],
+      clipWidth: CGFloat? = nil,
+      in ctx: CGContext
     ) {
       let attrStr = NSAttributedString(string: text, attributes: attrs)
       let line = CTLineCreateWithAttributedString(attrStr)
       ctx.saveGState()
+      if let clipWidth {
+        let clipRect = CGRect(x: point.x, y: point.y, width: clipWidth, height: rowHeight)
+        ctx.clip(to: clipRect)
+      }
       ctx.translateBy(x: point.x, y: point.y + 4) // +4 for baseline offset
       ctx.textMatrix = .identity
       CTLineDraw(line, ctx)

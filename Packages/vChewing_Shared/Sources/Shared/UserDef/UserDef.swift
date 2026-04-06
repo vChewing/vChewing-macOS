@@ -131,7 +131,6 @@ nonisolated public enum UserDef: String, CaseIterable, Identifiable, Sendable {
   case kUsingHotKeyInputMode = "UsingHotKeyInputMode"
 
   case kSymbolTableEnabled = "SymbolTableEnabled"
-  case kSymbolTableRecentSymbols = "SymbolTableRecentSymbols"
 
   // MARK: Public
 
@@ -531,7 +530,6 @@ nonisolated extension UserDef {
     case .kUsingHotKeyRevLookup: return .bool(true)
     case .kUsingHotKeyInputMode: return .bool(true)
     case .kSymbolTableEnabled: return .bool(true)
-    case .kSymbolTableRecentSymbols: return .arrayOfStrings([])
     }
   }
 }
@@ -1047,9 +1045,8 @@ nonisolated extension UserDef {
     case .kSymbolTableEnabled: return .init(
         userDef: self,
         shortTitle: "i18n:UserDef.kSymbolTableEnabled.shortTitle",
-        description: "i18n:UserDef.kSymbolTableEnabled.description"
+         description: "i18n:UserDef.kSymbolTableEnabled.description"
       )
-    case .kSymbolTableRecentSymbols: return nil
     }
   }
 }

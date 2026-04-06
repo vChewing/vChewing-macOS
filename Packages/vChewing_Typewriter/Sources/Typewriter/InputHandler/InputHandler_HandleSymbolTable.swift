@@ -12,19 +12,16 @@ import Shared
 
 extension InputHandlerProtocol {
 
-  // MARK: - 符號表觸發（Ctrl+`）
+  // MARK: - 符號表觸發（backtick 逾時）
 
-  /// 偵測 Ctrl+` 鍵，若條件符合則建立符號表並切換至 `ofSymbolTableGrid` 狀態。
-  /// - Parameter input: 輸入訊號。
+  /// 建立符號表並切換至 `ofSymbolTableGrid` 狀態。
+  /// 由 backtick 逾時回呼觸發（數字快打功能啟用時，單按 ` 逾時即叫出符號表）。
   /// - Returns: 是否已處理（consumed）。
-  func triggerSymbolTableGrid(input: InputSignalProtocol) -> Bool {
+  @discardableResult
+  func triggerSymbolTableGrid() -> Bool {
     guard let session else { return false }
     // 確認功能已啟用
     guard prefs.symbolTableEnabled else { return false }
-    // 確認 keyCode 50（反引號鍵）+ .control 修飾鍵，無其他修飾鍵
-    guard input.keyCode == 50 else { return false }
-    guard input.isControlHold, !input.isCommandHold,
-          !input.isOptionHold, !input.isShiftHold else { return false }
     // 建立符號表分類資料
     let categories = SymbolTableData.buildCategories()
     guard !categories.isEmpty else { return false }
