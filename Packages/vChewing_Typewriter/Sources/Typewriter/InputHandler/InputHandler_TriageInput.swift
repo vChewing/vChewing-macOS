@@ -140,6 +140,8 @@ extension InputHandlerProtocol {
       return handleNumberQuickInput(input: input)
     case .ofSimilarPhonetic:
       return handleSimilarPhoneticState(input: input)
+    case .ofSymbolTableGrid:
+      return handleSymbolTableGridState(input: input)
     case .ofMarking:
       if handleMarkingState(input: input) { return true }
       session.switchState(state.convertedToInputting)
@@ -177,6 +179,9 @@ extension InputHandlerProtocol {
 
       // 偵測 ↑ 鍵觸發近音表（優先於選字窗呼叫）。
       if triggerSimilarPhonetic(input: input) { return true }
+
+      // 偵測 Ctrl+` 觸發符號表。
+      if triggerSymbolTableGrid(input: input) { return true }
 
       // 手動呼叫選字窗。
       if callCandidateState(input: input) { return true }

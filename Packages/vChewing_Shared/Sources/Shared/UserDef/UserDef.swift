@@ -130,6 +130,9 @@ nonisolated public enum UserDef: String, CaseIterable, Identifiable, Sendable {
   case kUsingHotKeyRevLookup = "UsingHotKeyRevLookup"
   case kUsingHotKeyInputMode = "UsingHotKeyInputMode"
 
+  case kSymbolTableEnabled = "SymbolTableEnabled"
+  case kSymbolTableRecentSymbols = "SymbolTableRecentSymbols"
+
   // MARK: Public
 
   // MARK: - DataType：以關聯值嵌入預設值的資料型別列舉。
@@ -527,6 +530,8 @@ nonisolated extension UserDef {
     case .kUsingHotKeyCassette: return .bool(true)
     case .kUsingHotKeyRevLookup: return .bool(true)
     case .kUsingHotKeyInputMode: return .bool(true)
+    case .kSymbolTableEnabled: return .bool(true)
+    case .kSymbolTableRecentSymbols: return .arrayOfStrings([])
     }
   }
 }
@@ -1039,6 +1044,12 @@ nonisolated extension UserDef {
         userDef: self,
         shortTitle: "CHS / CHT Input Mode Switch"
       )
+    case .kSymbolTableEnabled: return .init(
+        userDef: self,
+        shortTitle: "i18n:UserDef.kSymbolTableEnabled.shortTitle",
+        description: "i18n:UserDef.kSymbolTableEnabled.description"
+      )
+    case .kSymbolTableRecentSymbols: return nil
     }
   }
 }

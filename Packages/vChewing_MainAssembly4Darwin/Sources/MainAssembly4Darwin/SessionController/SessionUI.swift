@@ -38,6 +38,9 @@ public final class SessionUI: SessionUIProtocol {
 
   /// 近音表視窗的副本。
   public let similarPhoneticUI: (any SimilarPhoneticUIProtocol)? = SimilarPhoneticUI()
+
+  /// 符號表格視窗的副本。
+  public let symbolTableUI: (any SymbolTableGridUIProtocol)? = SymbolTableUI()
 }
 
 extension SessionUI {

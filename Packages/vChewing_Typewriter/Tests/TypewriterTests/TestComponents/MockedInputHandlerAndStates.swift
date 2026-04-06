@@ -160,6 +160,19 @@ extension MockIMEState {
     result.data.selectedSimilarPhoneticRow = max(0, min(selectedRow, rows.count - 1))
     return result
   }
+
+  public static func ofSymbolTableGrid(
+    categories: [SymbolTableCategory],
+    selectedRow: Int,
+    displayTextSegments: [String],
+    cursor: Int
+  ) -> MockIMEState {
+    var result = MockIMEState(displayTextSegments: displayTextSegments, cursor: cursor)
+    result.type = .ofSymbolTableGrid
+    result.data.symbolTableCategories = categories
+    result.data.selectedSymbolTableRow = max(0, min(selectedRow, categories.count - 1))
+    return result
+  }
 }
 
 // MARK: - MockInputHandler
@@ -297,7 +310,7 @@ public final class MockSession: @MainActor SessionCoreProtocol, CtlCandidateDele
     case .ofInputting:
       commit(text: next.textToCommit, clearDisplayBeforeCommit: true)
     case .ofMarking: break // 採統一後置處理。
-    case .ofAssociates, .ofCandidates, .ofSymbolTable, .ofNumberInput, .ofSimilarPhonetic:
+    case .ofAssociates, .ofCandidates, .ofSymbolTable, .ofNumberInput, .ofSimilarPhonetic, .ofSymbolTableGrid:
       showTooltip(nil)
     }
     // 會在工具提示為空的時候自動消除顯示。
@@ -618,4 +631,5 @@ public final class MockPrefMgr: PrefMgrProtocol {
   public var usingHotKeyCassette: Bool = true
   public var usingHotKeyRevLookup: Bool = true
   public var usingHotKeyInputMode: Bool = true
+  public var symbolTableEnabled: Bool = true
 }
