@@ -283,7 +283,7 @@
 "i18n:UserDef.kNumPadCharInputBehavior.option.4" = "直接遞交半形文字，除非組字區不為空";
 "i18n:UserDef.kNumPadCharInputBehavior.option.5" = "直接遞交全形文字，除非組字區不為空";
 "i18n:UserDef.kNumPadCharInputBehavior.shortTitle" = "數字小鍵盤:";
-"i18n:UserDef.kSymbolTableEnabled.description" = "啟用後，單擊 \` 鍵可打開新式符號表格；Ctrl+\` 則開啟舊式符號表。";
+"i18n:UserDef.kSymbolTableEnabled.description" = "啟用後，單擊 ` 鍵可打開新式符號表格；Ctrl+` 則開啟舊式符號表。";
 "i18n:UserDef.kSymbolTableEnabled.shortTitle" = "符號表格:";
 "i18n:UserDef.kReadingNarrationCoverage.description" = "這會將您的組音區的內容唸出來。該功能對磁帶模式無效。";
 "i18n:UserDef.kReadingNarrationCoverage.option.confirmed" = "僅在用聲調鍵確認時";
