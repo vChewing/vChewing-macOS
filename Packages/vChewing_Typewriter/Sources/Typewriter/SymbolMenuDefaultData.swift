@@ -50,6 +50,7 @@ extension CandidateNode {
   // MARK: - Static data.
 
   static let catCommonSymbols = "catCommonSymbols".i18n
+  static let catEmoji = "catEmoji".i18n
   static let catHoriBrackets = "catHoriBrackets".i18n
   static let catVertBrackets = "catVertBrackets".i18n
   static let catAlphabets = "catAlphabets".i18n
@@ -85,7 +86,7 @@ extension CandidateNode {
     members: [
       CandidateNode(name: "　"),
       CandidateNode(name: "｀"),
-      .nodeForCommonSymbols, .nodeForHoriBrackets, .nodeForVertBrackets, .nodeForAlphabets,
+      .nodeForCommonSymbols, .nodeForEmoji, .nodeForHoriBrackets, .nodeForVertBrackets, .nodeForAlphabets,
       .nodeForRadicals, .nodeForSpecialNumbers, .nodeForMathSymbols, .nodeForCurrencyUnits,
       .nodeForSpecialSymbols, .nodeForUnicodeSymbols, .nodeForMusicSymbols,
       .nodeForCircledKanjis, .nodeForCircledKataKana, .nodeForBracketKanjis,
@@ -244,10 +245,35 @@ extension CandidateNode {
   private static let nodeForCommonSymbols = CandidateNode(
     name: catCommonSymbols,
     symbols: [
-      "，", "、", "。", "．", "？", "！", "；", "：", "‧", "‥", "﹐", "﹒", "˙", "·", "‘", "’", "“", "”", "〝",
-      "〞", "‵", "′",
+      "，", "、", "。", "．", "？", "！", "；", "：", "‧", "‥", "﹐", "﹒", "˙", "·", "'", "'",
+      "\u{201C}", "\u{201D}", "〝", "〞", "‵", "′",
       "〃", "～", "＄", "％", "﹪", "＠", "＆", "＃", "＊", "・", "…", "—", "〜", "／", "＼", "＿", "―", "‖", "﹫",
       "﹟", "﹠", "﹡",
+    ]
+  )
+  private static let nodeForEmoji = CandidateNode(
+    name: catEmoji,
+    symbols: [
+      "😀", "😁", "😂", "🤣", "😃", "😄", "😅", "😆", "😉", "😊", "😋", "😎", "😍", "😘", "🥰", "😗",
+      "😙", "😚", "🙂", "🤗", "🤩", "🤔", "🤨", "😐", "😑", "😶", "🙄", "😏", "😣", "😥", "😮", "🤐",
+      "😯", "😪", "😫", "🥱", "😴", "😌", "😛", "😜", "😝", "🤤", "😒", "😓", "😔", "😕", "🙃", "🤑",
+      "😲", "☹️", "🙁", "😖", "😞", "😟", "😤", "😢", "😭", "😦", "😧", "😨", "😩", "🤯", "😬", "😰",
+      "😱", "🥵", "🥶", "😳", "🤪", "😵", "🤗", "🤠", "🥳", "😷", "🤒", "🤕", "🤢", "🤮", "🤧", "😇",
+      "🥺", "🤓", "🤡", "👹", "👺", "💀", "☠️", "👻", "👽", "🤖", "💩", "😺", "😸", "😹", "😻", "😼",
+      "😽", "🙀", "😿", "😾", "👋", "🤚", "🖐️", "✋", "🖖", "👌", "🤌", "🤏", "✌️", "🤞", "🤟", "🤘",
+      "🤙", "👈", "👉", "👆", "🖕", "👇", "☝️", "👍", "👎", "✊", "👊", "🤛", "🤜", "👏", "🙌", "👐",
+      "🤲", "🤝", "🙏", "❤️", "🧡", "💛", "💚", "💙", "💜", "🖤", "🤍", "🤎", "💔", "❣️", "💕", "💞",
+      "💓", "💗", "💖", "💘", "💝", "💟", "☮️", "✝️", "☯️", "☸️", "🔴", "🟠", "🟡", "🟢", "🔵", "🟣",
+      "⭐", "🌟", "💫", "✨", "🔥", "💥", "❄️", "🌊", "🌸", "🌺", "🌻", "🌹", "🌷", "🍀", "🌿", "🍃",
+      "🍎", "🍊", "🍋", "🍇", "🍓", "🍒", "🍑", "🍉", "🍌", "🍍", "🥝", "🥑", "🍔", "🍕", "🍜", "🍣",
+      "🎂", "🍰", "🧁", "🍦", "🍩", "🍪", "☕", "🍵", "🥤", "🍺", "🎁", "🎈", "🎉", "🎊", "🎀", "🎵",
+      "🎶", "🎸", "🎹", "🎺", "🎻", "🥁", "🎤", "🎧", "🎮", "🕹️", "🎲", "♟️", "🎯", "🏆", "🥇", "⚽",
+      "🏀", "🏈", "⚾", "🥎", "🎾", "🏐", "🏉", "🎱", "🏓", "🏸", "🥊", "🏋️", "⛷️", "🏊", "🚴", "🧘",
+      "🐶", "🐱", "🐭", "🐹", "🐰", "🦊", "🐻", "🐼", "🐨", "🐯", "🦁", "🐮", "🐷", "🐸", "🐵", "🐔",
+      "🌍", "🌎", "🌏", "🌙", "☀️", "⛅", "🌈", "⛈️", "🌩️", "❄️", "🌬️", "💨", "🌊", "🚀", "✈️", "🚗",
+      "🚢", "🏠", "🏢", "🏰", "🗼", "🗽", "🗻", "🌋", "🏝️", "📱", "💻", "🖥️", "⌨️", "🖱️", "📷", "📸",
+      "📺", "📻", "📞", "📟", "📠", "🔋", "💡", "🔦", "🕯️", "📚", "📖", "📝", "✏️", "🖊️", "🖋️", "🔑",
+      "🗝️", "🔒", "🔓", "🔨", "⛏️", "⚒️", "🛠️", "🔧", "🔩", "⚙️", "🔗", "⛓️", "🧲", "💊", "🩺", "🏥",
     ]
   )
   private static let nodeForHoriBrackets = CandidateNode(

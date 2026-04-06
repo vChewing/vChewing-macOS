@@ -337,4 +337,29 @@ struct SymbolTableGridStateTests {
       #expect(session.recentCommissions.last == expectedSymbol)
     }
   }
+
+  // MARK: - 表情符號分類
+
+  @Test("buildCategories 包含表情符號分類，位於常用分類後")
+  func testEmojiCategoryPresent() async throws {
+    CandidateNode.load()
+    let categories = SymbolTableData.buildCategories()
+    let names = categories.map(\.name)
+    #expect(names.contains(CandidateNode.catEmoji))
+    // 表情符號應緊接在常用之後（index 1）
+    if let commonIdx = names.firstIndex(of: CandidateNode.catCommonSymbols),
+      let emojiIdx = names.firstIndex(of: CandidateNode.catEmoji)
+    {
+      #expect(emojiIdx == commonIdx + 1)
+    }
+  }
+
+  @Test("表情符號分類至少有 8 個符號（可填滿第一頁）")
+  func testEmojiCategoryMinSymbols() async throws {
+    CandidateNode.load()
+    let categories = SymbolTableData.buildCategories()
+    let emojiCat = categories.first { $0.name == CandidateNode.catEmoji }
+    #expect(emojiCat != nil)
+    #expect((emojiCat?.symbols.count ?? 0) >= 8)
+  }
 }
