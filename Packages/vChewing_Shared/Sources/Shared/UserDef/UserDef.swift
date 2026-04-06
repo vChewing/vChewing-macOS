@@ -1044,8 +1044,8 @@ nonisolated extension UserDef {
       )
     case .kSymbolTableEnabled: return .init(
         userDef: self,
-        shortTitle: "i18n:UserDef.kSymbolTableEnabled.shortTitle",
-         description: "i18n:UserDef.kSymbolTableEnabled.description"
+        shortTitle: "符號表格",
+        description: "啟用後，單擊漂鍵（`）可打開新式符號表格；Ctrl+` 則開啟舊式符號表。"
       )
     }
   }
