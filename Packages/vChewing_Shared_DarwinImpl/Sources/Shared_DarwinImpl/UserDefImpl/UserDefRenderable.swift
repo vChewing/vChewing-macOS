@@ -54,7 +54,7 @@
 
         if !descriptionSource.isEmpty {
           ForEach(Array(descriptionSource.enumerated()), id: \.offset) { _, i18nKey in
-            Text(LocalizedStringKey(i18nKey)).settingsDescription()
+            Text(verbatim: NSLocalizedString(i18nKey, comment: "")).settingsDescription()
           }
         }
         if metaData.minimumOS > 10.9 {
