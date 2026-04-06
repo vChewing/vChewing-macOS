@@ -196,7 +196,7 @@ extension IMEStateProtocol {
   public var hasComposition: Bool {
     switch type {
     case .ofCandidates, .ofInputting, .ofMarking, .ofNumberInput,
-         .ofSimilarPhonetic, .ofSymbolTableGrid: return true
+         .ofSimilarPhonetic: return true
     default: return false
     }
   }
