@@ -48,6 +48,41 @@ public struct SimilarPhoneticRow: Equatable {
   public var hasNextPage: Bool { currentPage < totalPages - 1 }
 }
 
+// MARK: - SymbolTableCategory
+
+/// 符號表中的一個分類列。
+public struct SymbolTableCategory: Equatable {
+  /// 分類名稱（如「標點」、「表情」）。
+  public let name: String
+  /// 該分類所有符號（可超過 8 個，以翻頁顯示）。
+  public let symbols: [String]
+  /// 目前頁碼（0-indexed，每頁 8 個）。
+  public var currentPage: Int
+
+  public init(name: String, symbols: [String]) {
+    self.name = name
+    self.symbols = symbols
+    self.currentPage = 0
+  }
+
+  /// 每頁最多 8 個符號。
+  public static let pageSize = 8
+
+  public var totalPages: Int {
+    max(1, (symbols.count + Self.pageSize - 1) / Self.pageSize)
+  }
+
+  /// 目前頁上的符號（最多 8 個）。
+  public var symbolsOnCurrentPage: [String] {
+    let start = currentPage * Self.pageSize
+    guard start < symbols.count else { return [] }
+    return Array(symbols[start ..< min(start + Self.pageSize, symbols.count)])
+  }
+
+  /// 該列是否有更多頁（顯示 `>` 指示符）。
+  public var hasNextPage: Bool { currentPage < totalPages - 1 }
+}
+
 // MARK: - IMEStateProtocol
 
 // 所有 IMEState 均遵守該協定：
@@ -90,6 +125,12 @@ public protocol IMEStateProtocol {
   ) -> Self
   static func ofSimilarPhonetic(
     rows: [SimilarPhoneticRow],
+    selectedRow: Int,
+    displayTextSegments: [String],
+    cursor: Int
+  ) -> Self
+  static func ofSymbolTableGrid(
+    categories: [SymbolTableCategory],
     selectedRow: Int,
     displayTextSegments: [String],
     cursor: Int
@@ -154,7 +195,8 @@ extension IMEStateProtocol {
   /// 該參數僅用作輔助判斷。在 InputHandler 內使用的話，必須再檢查 !compositor.isEmpty。
   public var hasComposition: Bool {
     switch type {
-    case .ofCandidates, .ofInputting, .ofMarking, .ofNumberInput, .ofSimilarPhonetic: return true
+    case .ofCandidates, .ofInputting, .ofMarking, .ofNumberInput,
+         .ofSimilarPhonetic: return true
     default: return false
     }
   }
@@ -197,6 +239,8 @@ public struct IMEStateData {
   public var numberBuffer: String = ""
   public var similarPhoneticRows: [SimilarPhoneticRow] = []
   public var selectedSimilarPhoneticRow: Int = 0
+  public var symbolTableCategories: [SymbolTableCategory] = []
+  public var selectedSymbolTableRow: Int = 0
   public var markedReadings = [String]()
   public var candidates = [CandidateInState]()
   public var textToCommit: String = ""

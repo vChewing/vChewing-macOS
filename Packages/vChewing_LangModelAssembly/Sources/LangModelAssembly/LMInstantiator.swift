@@ -37,9 +37,11 @@ extension LMAssembly {
     // 這句需要留著，不然無法被 package 外界存取。
     public init(
       isCHS: Bool = false,
-      pomDataURL: URL? = nil
+      pomDataURL: URL? = nil,
+      prefs: PrefMgrProtocol = PrefMgr.sharedSansDidSetOps
     ) {
       self.isCHS = isCHS
+      self.prefs = prefs
       self.mtxPerceptionOverride = .init(.init(dataURL: pomDataURL))
     }
 
@@ -75,6 +77,10 @@ extension LMAssembly {
     public private(set) var config = Config()
 
     public internal(set) var inputTokenHashesArray: Set<Int> = []
+
+    /// 暫存單元圖表（用於自動括號配對等需要臨時插入特定字元的情境）。
+    /// 此表在 `handlePunctuation` 的括號配對呼叫期間臨時填入、完成後立即清空。
+    public var ephemeralUnigrams: [String: Megrez.Unigram] = [:]
 
     public var isCassetteDataLoaded: Bool { Self.lmCassette.isLoaded }
 
@@ -435,6 +441,12 @@ extension LMAssembly {
       let keyChain = keyArray.joined(separator: "-")
       let noEmptyKey = !keyArray.isEmpty && keyArray.allSatisfy { !$0.isEmpty }
       guard noEmptyKey else { return [] }
+
+      /// 暫存字元（如自動括號配對插入的右括號）優先回傳。
+      if keyArray.count == 1, let ephemeral = ephemeralUnigrams[keyArray[0]] {
+        return [ephemeral]
+      }
+
       /// 給空格鍵指定輸出值。
       let asciiSpace = " "
       if keyArray == [asciiSpace] { return [.init(keyArray: keyArray, value: asciiSpace)] }
@@ -713,7 +725,7 @@ extension LMAssembly {
 
     // MARK: - 工具函式
 
-    private let prefs = PrefMgr.sharedSansDidSetOps
+    private let prefs: PrefMgrProtocol
 
     /// 當 HashMap 過大時自動清理
     private func cleanupInputTokenHashMapIfNeeded() {

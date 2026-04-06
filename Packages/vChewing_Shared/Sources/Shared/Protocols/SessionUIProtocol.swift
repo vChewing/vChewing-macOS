@@ -20,6 +20,7 @@ public protocol SessionUIProtocol: AnyObject {
   var tooltipUI: (any TooltipUIProtocol)? { get }
   var candidateUI: (any CtlCandidateProtocol)? { get }
   var similarPhoneticUI: (any SimilarPhoneticUIProtocol)? { get }
+  var symbolTableUI: (any SymbolTableGridUIProtocol)? { get }
 }
 
 // MARK: - HitCheckerProtocol
@@ -74,9 +75,23 @@ public protocol SimilarPhoneticUIProtocol: AnyObject {
   /// 顯示近音表視窗，依照 state 的 `similarPhoneticRows` 和 `selectedSimilarPhoneticRow` 渲染。
   /// - Parameters:
   ///   - state: 含有近音表資料的 `ofSimilarPhonetic` 狀態。
-  ///   - point: 視窗顯示的基準點（組字區頂端左側）。
-  func show(state: some IMEStateProtocol, at point: CGPoint)
+  ///   - lineHeightRect: 輸入游標行高矩形（螢幕座標），用於決定視窗顯示位置並作上下翻轉調整。
+  func show(state: some IMEStateProtocol, at lineHeightRect: CGRect)
   /// 更新近音表顯示（列選擇變動時呼叫，不需要重定位視窗）。
+  func update(state: some IMEStateProtocol)
+  /// 隱藏視窗。
+  func hide()
+}
+
+// MARK: - SymbolTableGridUIProtocol
+
+public protocol SymbolTableGridUIProtocol: AnyObject {
+  /// 顯示符號表格視窗，依照 state 的 `symbolTableCategories` 和 `selectedSymbolTableRow` 渲染。
+  /// - Parameters:
+  ///   - state: 含有符號表資料的 `ofSymbolTableGrid` 狀態。
+  ///   - lineHeightRect: 輸入游標行高矩形（螢幕座標），用於決定視窗顯示位置並作上下翻轉調整。
+  func show(state: some IMEStateProtocol, at lineHeightRect: CGRect)
+  /// 更新符號表顯示（列選擇或翻頁變動時呼叫，不需要重定位視窗）。
   func update(state: some IMEStateProtocol)
   /// 隱藏視窗。
   func hide()

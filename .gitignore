@@ -1,3 +1,4 @@
+.worktrees/
 **/Package.resolved
 !**/[Pp]ackages/build/
 **/.index-build/

@@ -51,6 +51,7 @@ public protocol PrefMgrProtocol {
   var autoCorrectReadingCombination: Bool { get set }
   var fuzzyReadingEnEngEnabled: Bool { get set }
   var smartChineseEnglishSwitchEnabled: Bool { get set }
+  var autoBracketPairingEnabled: Bool { get set }
   var numberQuickInputEnabled: Bool { get set }
   var readingNarrationCoverage: Int { get set }
   var alsoConfirmAssociatedCandidatesByEnter: Bool { get set }
@@ -115,4 +116,5 @@ public protocol PrefMgrProtocol {
   var usingHotKeyCassette: Bool { get set }
   var usingHotKeyRevLookup: Bool { get set }
   var usingHotKeyInputMode: Bool { get set }
+  var symbolTableEnabled: Bool { get set }
 }

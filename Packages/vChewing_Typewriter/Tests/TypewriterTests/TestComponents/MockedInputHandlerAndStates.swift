@@ -160,6 +160,19 @@ extension MockIMEState {
     result.data.selectedSimilarPhoneticRow = max(0, min(selectedRow, rows.count - 1))
     return result
   }
+
+  public static func ofSymbolTableGrid(
+    categories: [SymbolTableCategory],
+    selectedRow: Int,
+    displayTextSegments: [String],
+    cursor: Int
+  ) -> MockIMEState {
+    var result = MockIMEState(displayTextSegments: displayTextSegments, cursor: cursor)
+    result.type = .ofSymbolTableGrid
+    result.data.symbolTableCategories = categories
+    result.data.selectedSymbolTableRow = max(0, min(selectedRow, categories.count - 1))
+    return result
+  }
 }
 
 // MARK: - MockInputHandler
@@ -297,7 +310,7 @@ public final class MockSession: @MainActor SessionCoreProtocol, CtlCandidateDele
     case .ofInputting:
       commit(text: next.textToCommit, clearDisplayBeforeCommit: true)
     case .ofMarking: break // 採統一後置處理。
-    case .ofAssociates, .ofCandidates, .ofSymbolTable, .ofNumberInput, .ofSimilarPhonetic:
+    case .ofAssociates, .ofCandidates, .ofSymbolTable, .ofNumberInput, .ofSimilarPhonetic, .ofSymbolTableGrid:
       showTooltip(nil)
     }
     // 會在工具提示為空的時候自動消除顯示。
@@ -381,6 +394,8 @@ public final class MockSession: @MainActor SessionCoreProtocol, CtlCandidateDele
         skipObservation: !inputHandler.prefs.fetchSuggestionsFromPerceptionOverrideModel,
         explicitlyChosen: true
       )
+      // 候選確認後，若選中的是單一全形左括號，觸發自動括號配對
+      inputHandler.handleAutoBracketPairingForCandidateValue(selectedValue.value)
       var result: State = inputHandler.generateStateOfInputting()
       defer { switchState(result) } // 這是最終輸出結果。
       if inputHandler.prefs.useSCPCTypingMode {
@@ -498,4 +513,123 @@ public final class MockSession: @MainActor SessionCoreProtocol, CtlCandidateDele
 
   public func getMitigatedState(_ givenState: State) -> State { givenState }
   public func showTooltip(_: String?, colorState _: TooltipColorState, duration _: Double) {}
+}
+
+// MARK: - MockPrefMgr
+
+/// 專門用於單元測試的純記憶體 PrefMgr 實作。
+/// 與 PrefMgr.sharedSansDidSetOps 完全隔離，避免多 suite 並行執行時的共享全域狀態污染。
+public final class MockPrefMgr: PrefMgrProtocol {
+  public init() {}
+
+  public var isDebugModeEnabled: Bool = false
+  public var failureFlagForPOMObservation: Bool = false
+  public var userPhrasesDatabaseBypassed: Bool = false
+  public var candidateServiceMenuContents: [String] = []
+  public var respectClientAccentColor: Bool = false
+  public var alwaysUsePCBWithElectronBasedClients: Bool = false
+  public var securityHardenedCompositionBuffer: Bool = false
+  public var checkAbusersOfSecureEventInputAPI: Bool = false
+  public var deltaOfCalendarYears: Int = 0
+  public var mostRecentInputMode: String = ""
+  public var useExternalFactoryDict: Bool = false
+  public var checkUpdateAutomatically: Bool = false
+  public var cassettePath: String = ""
+  public var userDataFolderSpecified: String = ""
+  public var appleLanguages: [String] = []
+  public var keyboardParser: Int = 0
+  public var basicKeyboardLayout: String = "com.apple.keylayout.ZhuyinBopomofo"
+  public var alphanumericalKeyboardLayout: String = "com.apple.keylayout.ABC"
+  public var showNotificationsWhenTogglingCapsLock: Bool = true
+  public var showNotificationsWhenTogglingEisu: Bool = true
+  public var showNotificationsWhenTogglingShift: Bool = true
+  public var specifiedNotifyUIColorScheme: Int = 0
+  public var candidateListTextSize: Double = 16
+  public var alwaysExpandCandidateWindow: Bool = false
+  public var candidateWindowShowOnlyOneLine: Bool = false
+  public var shouldAutoReloadUserDataFiles: Bool = true
+  public var useRearCursorMode: Bool = false
+  public var candidateStateJKHLBehavior: Int = 0
+  public var useShiftQuestionToCallServiceMenu: Bool = true
+  public var cursorPlacementAfterSelectingCandidate: Int = 1
+  public var dodgeInvalidEdgeCandidateCursorPosition: Bool = true
+  public var useDynamicCandidateWindowOrigin: Bool = true
+  public var useHorizontalCandidateList: Bool = true
+  public var minCellWidthForHorizontalMatrix: Int = 0
+  public var chooseCandidateUsingSpace: Bool = true
+  public var allowRescoringSingleKanjiCandidates: Bool = false
+  public var enforceETenDOSCandidateSequence: Bool = true
+  public var fetchSuggestionsFromPerceptionOverrideModel: Bool = true
+  public var autoLearnPhraseTriggerThreshold: Int = 0
+  public var reducePOMLifetimeToNoMoreThan12Hours: Bool = false
+  public var useFixedCandidateOrderOnSelection: Bool = false
+  public var autoCorrectReadingCombination: Bool = true
+  public var fuzzyReadingEnEngEnabled: Bool = false
+  public var smartChineseEnglishSwitchEnabled: Bool = false
+  public var autoBracketPairingEnabled: Bool = false
+  public var numberQuickInputEnabled: Bool = true
+  public var readingNarrationCoverage: Int = 0
+  public var alsoConfirmAssociatedCandidatesByEnter: Bool = false
+  public var keepReadingUponCompositionError: Bool = false
+  public var upperCaseLetterKeyBehavior: Int = 0
+  public var numPadCharInputBehavior: Int = 0
+  public var shiftEisuToggleOffTogetherWithCapsLock: Bool = true
+  public var bypassNonAppleCapsLockHandling: Bool = false
+  public var togglingAlphanumericalModeWithLShift: Bool = true
+  public var togglingAlphanumericalModeWithRShift: Bool = true
+  public var consolidateContextOnCandidateSelection: Bool = true
+  public var hardenVerticalPunctuations: Bool = false
+  public var trimUnfinishedReadingsOnCommit: Bool = true
+  public var alwaysShowTooltipTextsHorizontally: Bool = false
+  public var clientsIMKTextInputIncapable: [String: Bool] = [:]
+  public var useSpaceToCommitHighlightedSCPCCandidate: Bool = true
+  public var enableMouseScrollingForTDKCandidatesCocoa: Bool = false
+  public var enableCandidateWindowAnimation: Bool = true
+  public var disableSegmentedThickUnderlineInMarkingModeForManagedClients: Bool = false
+  public var maxCandidateLength: Int = 10
+  public var beepSoundPreference: Int = 2
+  public var shouldNotFartInLieuOfBeep: Bool = true
+  public var showHanyuPinyinInCompositionBuffer: Bool = false
+  public var inlineDumpPinyinInLieuOfZhuyin: Bool = false
+  public var showTranslatedStrokesInCompositionBuffer: Bool = true
+  public var forceCassetteChineseConversion: Int = 0
+  public var showReverseLookupInCandidateUI: Bool = true
+  public var showCodePointInCandidateUI: Bool = true
+  public var autoCompositeWithLongestPossibleCassetteKey: Bool = true
+  public var shareAlphanumericalModeStatusAcrossClients: Bool = false
+  public var phraseEditorAutoReloadExternalModifications: Bool = true
+  public var classicHaninKeyboardSymbolModeShortcutEnabled: Bool = false
+  public var filterNonCNSReadingsForCHTInput: Bool = false
+  public var romanNumeralOutputFormat: Int = 0
+  public var cns11643Enabled: Bool = false
+  public var cassetteEnabled: Bool = false
+  public var symbolInputEnabled: Bool = true
+  public var chineseConversionEnabled: Bool = false
+  public var shiftJISShinjitaiOutputEnabled: Bool = false
+  public var currencyNumeralsEnabled: Bool = false
+  public var halfWidthPunctuationEnabled: Bool = false
+  public var escToCleanInputBuffer: Bool = true
+  public var acceptLeadingIntonations: Bool = true
+  public var specifyIntonationKeyBehavior: Int = 0
+  public var specifyShiftBackSpaceKeyBehavior: Int = 0
+  public var specifyShiftTabKeyBehavior: Bool = false
+  public var specifyShiftSpaceKeyBehavior: Bool = false
+  public var specifyCmdOptCtrlEnterBehavior: Int = 0
+  public var candidateTextFontName: String = ""
+  public var candidateKeys: String = "123456789"
+  public var candidateNarrationToggleType: Int = 0
+  public var useSCPCTypingMode: Bool = false
+  public var phraseReplacementEnabled: Bool = false
+  public var associatedPhrasesEnabled: Bool = false
+  public var usingHotKeySCPC: Bool = true
+  public var usingHotKeyAssociates: Bool = true
+  public var usingHotKeyCNS: Bool = true
+  public var usingHotKeyKangXi: Bool = true
+  public var usingHotKeyJIS: Bool = true
+  public var usingHotKeyHalfWidthASCII: Bool = true
+  public var usingHotKeyCurrencyNumerals: Bool = true
+  public var usingHotKeyCassette: Bool = true
+  public var usingHotKeyRevLookup: Bool = true
+  public var usingHotKeyInputMode: Bool = true
+  public var symbolTableEnabled: Bool = true
 }

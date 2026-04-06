@@ -71,6 +71,7 @@
 "catCircledKataKana" = "圈假";
 "catCombinations" = "组字";
 "catCommonSymbols" = "常用";
+"catEmoji" = "表情";
 "catCurrencyUnits" = "货币";
 "catDoubleTableLines" = "双线";
 "catFillingBlocks" = "填色";
@@ -282,6 +283,8 @@
 "i18n:UserDef.kNumPadCharInputBehavior.option.4" = "直接递交半形文字，除非组字区不为空";
 "i18n:UserDef.kNumPadCharInputBehavior.option.5" = "直接递交全形文字，除非组字区不为空";
 "i18n:UserDef.kNumPadCharInputBehavior.shortTitle" = "数字小键盘:";
+"i18n:UserDef.kSymbolTableEnabled.description" = "启用后，单击 \` 键可打开符号表格。";
+"i18n:UserDef.kSymbolTableEnabled.shortTitle" = "符号表格:";
 "i18n:UserDef.kReadingNarrationCoverage.description" = "这会将您的组音区的内容念出来。该功能对磁带模式无效。";
 "i18n:UserDef.kReadingNarrationCoverage.option.confirmed" = "仅在用声调键确认时";
 "i18n:UserDef.kReadingNarrationCoverage.option.nothing" = "不念读";

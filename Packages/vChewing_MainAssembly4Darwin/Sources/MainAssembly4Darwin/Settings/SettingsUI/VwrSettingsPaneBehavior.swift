@@ -43,12 +43,14 @@ public struct VwrSettingsPaneBehavior: View {
       Section {
         UserDef.kUpperCaseLetterKeyBehavior.renderUI()
         UserDef.kNumPadCharInputBehavior.renderUI()
+        UserDef.kSymbolTableEnabled.renderUI()
       }
 
       Section {
         UserDef.kSpecifyIntonationKeyBehavior.renderUI()
         UserDef.kAcceptLeadingIntonations.renderUI()
         UserDef.kSmartChineseEnglishSwitchEnabled.renderUI()
+        UserDef.kAutoBracketPairingEnabled.renderUI()
         UserDef.kNumberQuickInputEnabled.renderUI()
       }
 

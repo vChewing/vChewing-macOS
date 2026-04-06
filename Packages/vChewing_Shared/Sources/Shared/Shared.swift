@@ -68,6 +68,8 @@ nonisolated public enum StateType: String {
   case ofNumberInput = "NumberInput"
   /// **近音表選字狀態 .ofSimilarPhonetic**: 使用者按下 ↑ 後，針對游標前一字展開近音表進行選字補正。
   case ofSimilarPhonetic = "SimilarPhonetic"
+  /// **二維分類符號表狀態 .ofSymbolTableGrid**: 使用者按下 Ctrl+` 後呼叫的二維分類符號表。
+  case ofSymbolTableGrid = "SymbolTableGrid"
 }
 
 // MARK: - KeyboardParser

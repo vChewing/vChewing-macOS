@@ -33,6 +33,10 @@ extension SessionProtocol {
     if state.type == .ofSimilarPhonetic, newState.type != .ofSimilarPhonetic {
       ui?.similarPhoneticUI?.hide()
     }
+    // 離開符號表格狀態時，關閉浮動視窗。
+    if state.type == .ofSymbolTableGrid, newState.type != .ofSymbolTableGrid {
+      ui?.symbolTableUI?.hide()
+    }
     let previous = state
     let next = getMitigatedState(newState)
     state = next
@@ -57,7 +61,14 @@ extension SessionProtocol {
       showTooltip(nil)
     case .ofSimilarPhonetic:
       showTooltip(nil)
-      ui?.similarPhoneticUI?.show(state: next, at: lineHeightRect(zeroCursor: true).origin)
+      ui?.similarPhoneticUI?.show(state: next, at: lineHeightRect(zeroCursor: true))
+    case .ofSymbolTableGrid:
+      showTooltip(nil)
+      if previous.type == .ofSymbolTableGrid {
+        ui?.symbolTableUI?.update(state: next)
+      } else {
+        ui?.symbolTableUI?.show(state: next, at: lineHeightRect(zeroCursor: true))
+      }
     }
     // 會在工具提示為空的時候自動消除顯示。
     showTooltip(
@@ -75,7 +86,7 @@ extension SessionProtocol {
     case .ofAbortion, .ofCommitting, .ofEmpty: false
     case .ofInputting: true
     case .ofMarking: true
-    case .ofAssociates, .ofCandidates, .ofSymbolTable, .ofNumberInput, .ofSimilarPhonetic: true
+    case .ofAssociates, .ofCandidates, .ofSymbolTable, .ofNumberInput, .ofSimilarPhonetic, .ofSymbolTableGrid: true
     }
     guard let display else { return }
     if display {

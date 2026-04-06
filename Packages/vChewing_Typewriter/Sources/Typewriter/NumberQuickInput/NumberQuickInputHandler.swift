@@ -36,8 +36,7 @@ public final class NumberQuickInputHandler {
   /// 雙擊判定的時間窗口（秒）。
   private let doubleTapInterval: TimeInterval = 0.3
 
-  /// 第一下漂鍵逾時後的回呼。由 InputHandler 設定，執行時應呼叫
-  /// `session?.switchState(State.ofCommitting(textToCommit: "`"))` 並清理狀態。
+  /// 第一下漂鍵逾時後的回呼。由 InputHandler 設定；預設行為應叫出符號表。
   public var onBacktickTimeout: (() -> Void)?
 
   // MARK: - Lifecycle

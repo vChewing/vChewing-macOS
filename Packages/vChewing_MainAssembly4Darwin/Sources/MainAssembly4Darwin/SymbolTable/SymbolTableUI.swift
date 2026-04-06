@@ -10,16 +10,17 @@
   import AppKit
   import Shared
 
-  // MARK: - SimilarPhoneticUI
+  // MARK: - SymbolTableUI
 
-  /// 近音表浮動視窗。顯示二維近音表格，藍底高亮當前選中列。
-  public final class SimilarPhoneticUI: NSObject, SimilarPhoneticUIProtocol {
+  /// 符號表浮動視窗。顯示二維符號表格，藍底高亮當前選中列。
+  public final class SymbolTableUI: NSObject, SymbolTableGridUIProtocol {
 
     // MARK: - Layout constants
 
     private let font = NSFont.monospacedSystemFont(ofSize: 14, weight: .regular)
     private let columnWidth: CGFloat = 22
-    private let phoneticColumnWidth: CGFloat = 64
+    /// 分類名稱欄寬（符號表比近音表寬，需容納較長的分類名稱）。
+    private let categoryColumnWidth: CGFloat = 72
     private let rowHeight: CGFloat = 22
     private let headerHeight: CGFloat = 22
     private let windowPadding: CGFloat = 6
@@ -41,11 +42,11 @@
       return p
     }()
 
-    private lazy var contentView: SimilarPhoneticContentView = {
-      let v = SimilarPhoneticContentView()
+    private lazy var contentView: SymbolTableContentView = {
+      let v = SymbolTableContentView()
       v.font = self.font
       v.columnWidth = self.columnWidth
-      v.phoneticColumnWidth = self.phoneticColumnWidth
+      v.categoryColumnWidth = self.categoryColumnWidth
       v.rowHeight = self.rowHeight
       v.headerHeight = self.headerHeight
       v.windowPadding = self.windowPadding
@@ -58,12 +59,12 @@
       panel.contentView = contentView
     }
 
-    // MARK: - SimilarPhoneticUIProtocol
+    // MARK: - SymbolTableGridUIProtocol
 
     public func show(state: some IMEStateProtocol, at lineHeightRect: CGRect) {
-      guard state.type == .ofSimilarPhonetic else { return }
-      contentView.rows = state.data.similarPhoneticRows
-      contentView.selectedRow = state.data.selectedSimilarPhoneticRow
+      guard state.type == .ofSymbolTableGrid else { return }
+      contentView.categories = state.data.symbolTableCategories
+      contentView.selectedRow = state.data.selectedSymbolTableRow
       contentView.needsDisplay = true
 
       let size = contentView.intrinsicContentSize
@@ -83,11 +84,10 @@
     }
 
     public func update(state: some IMEStateProtocol) {
-      guard state.type == .ofSimilarPhonetic else { return }
-      contentView.rows = state.data.similarPhoneticRows
-      contentView.selectedRow = state.data.selectedSimilarPhoneticRow
+      guard state.type == .ofSymbolTableGrid else { return }
+      contentView.categories = state.data.symbolTableCategories
+      contentView.selectedRow = state.data.selectedSymbolTableRow
       contentView.needsDisplay = true
-      // resize if row count changed (shouldn't happen in normal navigation, but safe)
       let size = contentView.intrinsicContentSize
       var frame = panel.frame
       frame.size = size
@@ -99,16 +99,16 @@
     }
   }
 
-  // MARK: - SimilarPhoneticContentView
+  // MARK: - SymbolTableContentView
 
-  /// 近音表的內容繪製視圖。
-  private final class SimilarPhoneticContentView: NSView {
+  /// 符號表的內容繪製視圖。
+  private final class SymbolTableContentView: NSView {
 
-    var rows: [SimilarPhoneticRow] = []
+    var categories: [SymbolTableCategory] = []
     var selectedRow: Int = 0
     var font: NSFont = .monospacedSystemFont(ofSize: 14, weight: .regular)
     var columnWidth: CGFloat = 22
-    var phoneticColumnWidth: CGFloat = 64
+    var categoryColumnWidth: CGFloat = 72
     var rowHeight: CGFloat = 22
     var headerHeight: CGFloat = 22
     var windowPadding: CGFloat = 6
@@ -117,12 +117,12 @@
     // MARK: - Size
 
     private var totalWidth: CGFloat {
-      windowPadding * 2 + phoneticColumnWidth + columnWidth * CGFloat(maxColumns) + columnWidth
+      windowPadding * 2 + categoryColumnWidth + columnWidth * CGFloat(maxColumns) + columnWidth
       // +columnWidth for the `>` indicator slot
     }
 
     private var totalHeight: CGFloat {
-      windowPadding * 2 + headerHeight + rowHeight * CGFloat(rows.count)
+      windowPadding * 2 + headerHeight + rowHeight * CGFloat(categories.count)
     }
 
     override var intrinsicContentSize: NSSize {
@@ -167,20 +167,20 @@
       ctx.setFillColor(headerBgColor.cgColor)
       ctx.fill(headerRect)
 
-      // Header: "近音表" label on left
+      // Header: "符號表" label on left
       let headerLabelX = pad
       let headerLabelY = bounds.height - pad - headerHeight
-      drawText("近音表", at: CGPoint(x: headerLabelX, y: headerLabelY), attrs: textAttrs, in: ctx)
+      drawText("符號表", at: CGPoint(x: headerLabelX, y: headerLabelY), attrs: textAttrs, in: ctx)
 
-      // Header: 1–8 column numbers aligned with candidate columns
+      // Header: 1–8 column numbers aligned with symbol columns
       for col in 1 ... maxColumns {
-        let x = pad + phoneticColumnWidth + columnWidth * CGFloat(col - 1)
+        let x = pad + categoryColumnWidth + columnWidth * CGFloat(col - 1)
         let y = bounds.height - pad - headerHeight
         drawText("\(col)", at: CGPoint(x: x, y: y), attrs: headerNumberAttrs, in: ctx)
       }
 
       // Data rows
-      for (rowIdx, row) in rows.enumerated() {
+      for (rowIdx, cat) in categories.enumerated() {
         let y = bounds.height - pad - headerHeight - rowHeight * CGFloat(rowIdx + 1)
         let rowRect = CGRect(x: 0, y: y, width: bounds.width, height: rowHeight)
 
@@ -189,25 +189,29 @@
           ctx.fill(rowRect)
         }
 
-        // Phonetic label
-        drawText(row.phonetic, at: CGPoint(x: pad, y: y), attrs: textAttrs, in: ctx)
+        // Category name label（clip 至分類欄寬度，避免與 `<` 指示符重疊）
+        let catLabelClipWidth = categoryColumnWidth - columnWidth - 4
+        drawText(
+          cat.name, at: CGPoint(x: pad, y: y), attrs: textAttrs,
+          clipWidth: catLabelClipWidth > 0 ? catLabelClipWidth : nil, in: ctx
+        )
 
-        // Candidates on current page
-        let pageCandidates = row.candidatesOnCurrentPage
-        for (colIdx, char) in pageCandidates.enumerated() {
-          let x = pad + phoneticColumnWidth + columnWidth * CGFloat(colIdx)
-          drawText(char, at: CGPoint(x: x, y: y), attrs: textAttrs, in: ctx)
+        // Symbols on current page
+        let pageSymbols = cat.symbolsOnCurrentPage
+        for (colIdx, sym) in pageSymbols.enumerated() {
+          let x = pad + categoryColumnWidth + columnWidth * CGFloat(colIdx)
+          drawText(sym, at: CGPoint(x: x, y: y), attrs: textAttrs, in: ctx)
         }
 
-        // `<` indicator（有上一頁時顯示，置於注音欄右側）
-        if row.currentPage > 0 {
-          let x = pad + phoneticColumnWidth - columnWidth
+        // `<` indicator（有上一頁時顯示，置於分類欄右側）
+        if cat.currentPage > 0 {
+          let x = pad + categoryColumnWidth - columnWidth
           drawText("<", at: CGPoint(x: x, y: y), attrs: dimTextAttrs, in: ctx)
         }
 
         // `>` indicator（有下一頁時顯示，置於最後一欄右側）
-        if row.hasNextPage {
-          let x = pad + phoneticColumnWidth + columnWidth * CGFloat(maxColumns)
+        if cat.hasNextPage {
+          let x = pad + categoryColumnWidth + columnWidth * CGFloat(maxColumns)
           drawText(">", at: CGPoint(x: x, y: y), attrs: dimTextAttrs, in: ctx)
         }
       }
@@ -215,11 +219,17 @@
 
     private func drawText(
       _ text: String, at point: CGPoint,
-      attrs: [NSAttributedString.Key: Any], in ctx: CGContext
+      attrs: [NSAttributedString.Key: Any],
+      clipWidth: CGFloat? = nil,
+      in ctx: CGContext
     ) {
       let attrStr = NSAttributedString(string: text, attributes: attrs)
       let line = CTLineCreateWithAttributedString(attrStr)
       ctx.saveGState()
+      if let clipWidth {
+        let clipRect = CGRect(x: point.x, y: point.y, width: clipWidth, height: rowHeight)
+        ctx.clip(to: clipRect)
+      }
       ctx.translateBy(x: point.x, y: point.y + 4) // +4 for baseline offset
       ctx.textMatrix = .identity
       CTLineDraw(line, ctx)

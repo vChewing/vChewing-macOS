@@ -182,18 +182,16 @@ final class InputHandlerTests {
   // MARK: - 測試前後流程
 
   init() throws {
-    // 設定專用於單元測試的 UserDefaults
-    UserDefaults.unitTests = .init(suiteName: "org.atelierInmu.vChewing.Typewriter.UnitTests")
-    UserDef.resetAll()
-    UserDefaults.pendingUnitTests = true
+    let prefs = MockPrefMgr()
+    self.testPrefs = prefs
 
     // 初始化測試 LM
-    let lm = LMAssembly.LMInstantiator(isCHS: false)
+    let lm = LMAssembly.LMInstantiator(isCHS: false, prefs: prefs)
     self.testLM = lm
     LMAssembly.LMInstantiator.connectToTestSQLDB(LMATestsData.sqlTestCoreLMData)
 
     // 初始化測試用的 handler 和 session
-    let handler = MockInputHandler(lm: lm, pref: PrefMgr.sharedSansDidSetOps)
+    let handler = MockInputHandler(lm: lm, pref: prefs)
     let session = MockSession()
     handler.session = session
     session.inputHandler = handler
@@ -205,15 +203,13 @@ final class InputHandlerTests {
     mainSync {
       testHandler?.errorCallback = nil
       testSession?.switchState(MockIMEState.ofAbortion())
-      LMAssembly.resetSharedState()
     }
-    UserDefaults.unitTests?.removeSuite(named: "org.atelierInmu.vChewing.Typewriter.UnitTests")
-    UserDef.resetAll()
   }
 
   // MARK: Internal
 
   var testLM: LMAssembly.LMInstantiator?
+  var testPrefs: MockPrefMgr?
   var testHandler: MockInputHandler?
   var testSession: MockSession?
 

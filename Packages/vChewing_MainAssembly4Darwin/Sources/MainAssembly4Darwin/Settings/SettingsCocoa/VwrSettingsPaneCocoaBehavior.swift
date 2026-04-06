@@ -46,11 +46,13 @@ extension SettingsPanesCocoa {
             NSStackView.buildSection(width: innerContentWidth) {
               UserDef.kUpperCaseLetterKeyBehavior.render(fixWidth: innerContentWidth)
               UserDef.kNumPadCharInputBehavior.render(fixWidth: innerContentWidth)
+              UserDef.kSymbolTableEnabled.render(fixWidth: innerContentWidth)
             }?.boxed()
             NSStackView.buildSection(width: innerContentWidth) {
               UserDef.kSpecifyIntonationKeyBehavior.render(fixWidth: innerContentWidth)
               UserDef.kAcceptLeadingIntonations.render(fixWidth: innerContentWidth)
               UserDef.kSmartChineseEnglishSwitchEnabled.render(fixWidth: innerContentWidth)
+              UserDef.kAutoBracketPairingEnabled.render(fixWidth: innerContentWidth)
               UserDef.kNumberQuickInputEnabled.render(fixWidth: innerContentWidth)
             }?.boxed()
             NSView()
