@@ -45,7 +45,7 @@
     }
 
     @ViewBuilder
-    public func descriptionView() -> some View {
+    public func descriptionView(verbatim: Bool = false) -> some View {
       if let metaData = metaData {
         if hasInlineDescription { Spacer().frame(height: 6) }
         let descText = metaData.description
@@ -54,7 +54,11 @@
 
         if !descriptionSource.isEmpty {
           ForEach(Array(descriptionSource.enumerated()), id: \.offset) { _, i18nKey in
-            Text(LocalizedStringKey(i18nKey)).settingsDescription()
+            if verbatim {
+              Text(verbatim: i18nKey.i18n).settingsDescription()
+            } else {
+              Text(LocalizedStringKey(i18nKey)).settingsDescription()
+            }
           }
         }
         if metaData.minimumOS > 10.9 {
