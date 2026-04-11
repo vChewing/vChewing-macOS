@@ -153,12 +153,12 @@ struct LMInstantiatorTests {
       LMAssembly.LMInstantiator.disconnectSQLDB()
     }
     // 測試「ㄣ/ㄥ」容錯查詢功能。
-    // 當啟用 fuzzyReadingEnEngEnabled 時，輸入「ㄣ」應該也能找到「ㄥ」的候選字，反之亦然。
+    // 當啟用 fuzzyPhoneticEnabled + fuzzyFinalEnEng 時，輸入「ㄣ」應該也能找到「ㄥ」的候選字，反之亦然。
     LMAssembly.LMInstantiator.connectToTestSQLDB(LMATestsData.sqlTestCoreLMData)
 
-    // 先測試未啟用容錯時的情況：輸入「ㄈㄣ」不應該找到「風」
+    // 先測試未啟用容錯時的情況：精確查詢「ㄈㄥ」應該找到「風」
     let instanceWithoutFuzzy = LMAssembly.LMInstantiator(isCHS: false).setOptions { config in
-      config.fuzzyReadingEnEngEnabled = false
+      config.fuzzyPhoneticEnabled = false
       config.isSCPCEnabled = true
     }
     let exactResults = instanceWithoutFuzzy.unigramsFor(keyArray: ["ㄈㄥ"]).map(\.value)
@@ -166,7 +166,8 @@ struct LMInstantiatorTests {
 
     // 測試啟用容錯後：輸入「ㄈㄣ」應該也能找到「風」
     let instanceWithFuzzy = LMAssembly.LMInstantiator(isCHS: false).setOptions { config in
-      config.fuzzyReadingEnEngEnabled = true
+      config.fuzzyPhoneticEnabled = true
+      config.fuzzyFinalEnEng = true
       config.isSCPCEnabled = true
     }
     let fuzzyResults = instanceWithFuzzy.unigramsFor(keyArray: ["ㄈㄣ"]).map(\.value)
@@ -177,5 +178,59 @@ struct LMInstantiatorTests {
     let reverseResults = instanceWithFuzzy.unigramsFor(keyArray: ["ㄌㄧㄥ"]).map(\.value)
     // 只要驗證容錯功能有執行（返回了結果）即可
     #expect(!reverseResults.isEmpty, "容錯查詢應該返回結果")
+  }
+
+  @Test
+  func testFuzzyInitialReadingQuery() throws {
+    defer {
+      LMAssembly.LMInstantiator.disconnectSQLDB()
+    }
+    // 測試聲母近似音（ㄗ↔ㄓ）查詢功能。
+    // 測試資料庫中有 ㄓㄨㄥ（中），但沒有 ㄗㄨㄥ 的精確詞條。
+    // 啟用容錯後，查詢 ㄗㄨㄥ 時應透過 ㄗ↔ㄓ 規則找到 ㄓㄨㄥ 的候選字（如「中」）。
+    LMAssembly.LMInstantiator.connectToTestSQLDB(LMATestsData.sqlTestCoreLMData)
+
+    // 先確認精確查詢 ㄓㄨㄥ 能找到「中」
+    let exactZhInstance = LMAssembly.LMInstantiator(isCHS: false).setOptions { config in
+      config.fuzzyPhoneticEnabled = false
+      config.isSCPCEnabled = true
+    }
+    let exactZhResults = exactZhInstance.unigramsFor(keyArray: ["ㄓㄨㄥ"]).map(\.value)
+    #expect(exactZhResults.contains("中"), "精確查詢「ㄓㄨㄥ」應能找到「中」")
+
+    // 啟用 fuzzyPhoneticEnabled + fuzzyInitialZZh（ㄗ↔ㄓ）
+    let instanceWithFuzzy = LMAssembly.LMInstantiator(isCHS: false).setOptions { config in
+      config.fuzzyPhoneticEnabled = true
+      config.fuzzyInitialZZh = true
+      config.isSCPCEnabled = true
+    }
+    // 查詢 ㄗㄨㄥ 時，容錯應展開到 ㄓㄨㄥ，並找到「中」
+    let fuzzyZResults = instanceWithFuzzy.unigramsFor(keyArray: ["ㄗㄨㄥ"]).map(\.value)
+    #expect(fuzzyZResults.contains("中"), "啟用 ㄗ↔ㄓ 容錯時，查詢「ㄗㄨㄥ」應能透過近似音找到「中」")
+
+    // 未啟用容錯時，ㄗㄨㄥ 查不到 ㄓㄨㄥ 的字
+    let instanceWithoutFuzzy = LMAssembly.LMInstantiator(isCHS: false).setOptions { config in
+      config.fuzzyPhoneticEnabled = false
+      config.isSCPCEnabled = true
+    }
+    let noFuzzyResults = instanceWithoutFuzzy.unigramsFor(keyArray: ["ㄗㄨㄥ"]).map(\.value)
+    #expect(!noFuzzyResults.contains("中"), "未啟用容錯時，查詢「ㄗㄨㄥ」不應找到「中」（ㄓㄨㄥ 的字）")
+  }
+
+  @Test
+  func testFuzzyMasterToggle() throws {
+    defer {
+      LMAssembly.LMInstantiator.disconnectSQLDB()
+    }
+    // 測試總開關：關閉時即使子規則啟用也不展開
+    LMAssembly.LMInstantiator.connectToTestSQLDB(LMATestsData.sqlTestCoreLMData)
+
+    let instanceMasterOff = LMAssembly.LMInstantiator(isCHS: false).setOptions { config in
+      config.fuzzyPhoneticEnabled = false  // 總開關關閉
+      config.fuzzyFinalEnEng = true        // 子規則啟用（但無效）
+      config.isSCPCEnabled = true
+    }
+    let results = instanceMasterOff.unigramsFor(keyArray: ["ㄈㄣ"]).map(\.value)
+    #expect(!results.contains("風"), "總開關關閉時，「ㄈㄣ」不應找到「風」")
   }
 }

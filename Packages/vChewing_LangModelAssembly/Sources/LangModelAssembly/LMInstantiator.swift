@@ -61,7 +61,17 @@ extension LMAssembly {
       public var deltaOfCalendarYears: Int = -2_000
       public var allowRescoringSingleKanjiCandidates = false
       public var bypassUserPhrasesData = false
-      public var fuzzyReadingEnEngEnabled = false
+      public var fuzzyPhoneticEnabled = false
+      public var fuzzyInitialBP = false
+      public var fuzzyInitialFH = false
+      public var fuzzyInitialLN = false
+      public var fuzzyInitialZZh = false
+      public var fuzzyInitialCCh = false
+      public var fuzzyInitialSSh = false
+      public var fuzzyFinalEnEng = false
+      public var fuzzyFinalAnAng = false
+      public var fuzzyFinalInIng = false
+      public var fuzzyFinalUnUng = false
     }
 
     public static var asyncLoadingUserData: Bool = true
@@ -147,7 +157,17 @@ extension LMAssembly {
       config.allowRescoringSingleKanjiCandidates = prefs.allowRescoringSingleKanjiCandidates
       config.alwaysSupplyETenDOSUnigrams = prefs.enforceETenDOSCandidateSequence
       config.bypassUserPhrasesData = prefs.userPhrasesDatabaseBypassed
-      config.fuzzyReadingEnEngEnabled = prefs.fuzzyReadingEnEngEnabled
+      config.fuzzyPhoneticEnabled = prefs.fuzzyPhoneticEnabled
+      config.fuzzyInitialBP = prefs.fuzzyInitialBP
+      config.fuzzyInitialFH = prefs.fuzzyInitialFH
+      config.fuzzyInitialLN = prefs.fuzzyInitialLN
+      config.fuzzyInitialZZh = prefs.fuzzyInitialZZh
+      config.fuzzyInitialCCh = prefs.fuzzyInitialCCh
+      config.fuzzyInitialSSh = prefs.fuzzyInitialSSh
+      config.fuzzyFinalEnEng = prefs.fuzzyFinalEnEng
+      config.fuzzyFinalAnAng = prefs.fuzzyFinalAnAng
+      config.fuzzyFinalInIng = prefs.fuzzyFinalInIng
+      config.fuzzyFinalUnUng = prefs.fuzzyFinalUnUng
     }
 
     public func resetFactoryJSONModels() {}
@@ -587,9 +607,9 @@ extension LMAssembly {
         }
       }
 
-      // 若啟用了「ㄣ/ㄥ」容錯查詢，則額外查詢替換讀音的候選字。
-      if config.fuzzyReadingEnEngEnabled {
-        rawAllUnigrams.append(contentsOf: queryFuzzyEnEngUnigrams(keyArray: keyArray))
+      // 若啟用了近似音查詢，則依各項規則展開讀音並查詢替換讀音的候選字。
+      if config.fuzzyPhoneticEnabled {
+        rawAllUnigrams.append(contentsOf: queryFuzzyReadingsUnigrams(keyArray: keyArray))
       }
 
       // 讓單元圖陣列自我過濾。在此基礎之上，對於相同詞值的多個單元圖，僅保留權重最大者。
@@ -735,41 +755,61 @@ extension LMAssembly {
       }
     }
 
-    /// 執行「ㄣ/ㄥ」容錯查詢：將讀音中的「ㄣ」與「ㄥ」互相替換後查詢候選字。
+    /// 執行全部近似音容錯查詢：根據啟用的規則展開讀音並查詢候選字。
     /// - Parameter keyArray: 原始讀音陣列。
-    /// - Returns: 容錯查詢得到的單元圖陣列（分數會被降低以區別於精確匹配）。
-    private func queryFuzzyEnEngUnigrams(keyArray: [String]) -> [Megrez.Unigram] {
-      let enEngPairs: [(String, String)] = [("ㄣ", "ㄥ")]
+    /// - Returns: 容錯查詢得到的單元圖陣列（分數降低 -3.0 以區別精確匹配）。
+    private func queryFuzzyReadingsUnigrams(keyArray: [String]) -> [Megrez.Unigram] {
+      let initialRules: [(String, String, Bool)] = [
+        ("ㄅ", "ㄆ", config.fuzzyInitialBP),
+        ("ㄈ", "ㄏ", config.fuzzyInitialFH),
+        ("ㄌ", "ㄋ", config.fuzzyInitialLN),
+        ("ㄗ", "ㄓ", config.fuzzyInitialZZh),
+        ("ㄘ", "ㄔ", config.fuzzyInitialCCh),
+        ("ㄙ", "ㄕ", config.fuzzyInitialSSh),
+      ]
+      let finalRules: [(String, String, Bool)] = [
+        ("ㄣ", "ㄥ", config.fuzzyFinalEnEng),
+        ("ㄢ", "ㄤ", config.fuzzyFinalAnAng),
+        ("ㄧㄣ", "ㄧㄥ", config.fuzzyFinalInIng),
+        ("ㄨㄣ", "ㄨㄥ", config.fuzzyFinalUnUng),
+      ]
+
       var fuzzyUnigrams: [Megrez.Unigram] = []
 
-      // 檢查每個讀音是否包含「ㄣ」或「ㄥ」。
       for (index, reading) in keyArray.enumerated() {
-        for (en, eng) in enEngPairs {
-          var alternateReading = ""
-          if reading.contains(en) {
-            alternateReading = reading.replacingOccurrences(of: en, with: eng)
-          } else if reading.contains(eng) {
-            alternateReading = reading.replacingOccurrences(of: eng, with: en)
-          } else {
-            continue
-          }
+        var alternateReadings: Set<String> = []
 
-          // 建立替換後的讀音陣列。
+        for (a, b, enabled) in initialRules where enabled {
+          if reading.hasPrefix(a) {
+            alternateReadings.insert(b + reading.dropFirst(a.count))
+          } else if reading.hasPrefix(b) {
+            alternateReadings.insert(a + reading.dropFirst(b.count))
+          }
+        }
+
+        for (a, b, enabled) in finalRules where enabled {
+          if reading.hasSuffix(a) {
+            alternateReadings.insert(String(reading.dropLast(a.count)) + b)
+          } else if reading.hasSuffix(b) {
+            alternateReadings.insert(String(reading.dropLast(b.count)) + a)
+          }
+        }
+
+        for alternateReading in alternateReadings {
           var alternateKeyArray = keyArray
           alternateKeyArray[index] = alternateReading
           let alternateKeyChain = alternateKeyArray.joined(separator: "-")
-
-          // 查詢替換讀音的候選字。
-          let alternateUnigrams = factoryCoreUnigramsFor(key: alternateKeyChain, keyArray: alternateKeyArray)
-
-          // 將容錯結果的分數降低（-3.0 分作為懲罰），並標記為容錯匹配。
+          let alternateUnigrams = factoryCoreUnigramsFor(
+            key: alternateKeyChain, keyArray: alternateKeyArray
+          )
           for unigram in alternateUnigrams {
-            let fuzzyUnigram = Megrez.Unigram(
-              keyArray: keyArray, // 保留原始讀音作為 key
-              value: unigram.value,
-              score: unigram.score - 3.0 // 降低分數以區別於精確匹配
+            fuzzyUnigrams.append(
+              Megrez.Unigram(
+                keyArray: keyArray,
+                value: unigram.value,
+                score: unigram.score - 3.0
+              )
             )
-            fuzzyUnigrams.append(fuzzyUnigram)
           }
         }
       }

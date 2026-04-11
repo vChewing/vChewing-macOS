@@ -50,6 +50,17 @@ public protocol PrefMgrProtocol {
   var useFixedCandidateOrderOnSelection: Bool { get set }
   var autoCorrectReadingCombination: Bool { get set }
   var fuzzyReadingEnEngEnabled: Bool { get set }
+  var fuzzyPhoneticEnabled: Bool { get set }
+  var fuzzyInitialBP: Bool { get set }
+  var fuzzyInitialFH: Bool { get set }
+  var fuzzyInitialLN: Bool { get set }
+  var fuzzyInitialZZh: Bool { get set }
+  var fuzzyInitialCCh: Bool { get set }
+  var fuzzyInitialSSh: Bool { get set }
+  var fuzzyFinalEnEng: Bool { get set }
+  var fuzzyFinalAnAng: Bool { get set }
+  var fuzzyFinalInIng: Bool { get set }
+  var fuzzyFinalUnUng: Bool { get set }
   var smartChineseEnglishSwitchEnabled: Bool { get set }
   var autoBracketPairingEnabled: Bool { get set }
   var numberQuickInputEnabled: Bool { get set }
