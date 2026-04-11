@@ -534,6 +534,8 @@ extension PrefMgr {
         defaults.removeObject(forKey: "UseHLtoMoveCompositorCursorInCandidateState")
       }
     }
+    // 遷移舊的 ㄣ/ㄥ 容錯開關至新的近似音設定系統。
+    PrefMgr.migrateFromLegacyFuzzyEnEng()
   }
 
   /// 向下相容遷移：首次升級時，若舊 ㄣ/ㄥ 開關曾開啟，遷移到新設定。

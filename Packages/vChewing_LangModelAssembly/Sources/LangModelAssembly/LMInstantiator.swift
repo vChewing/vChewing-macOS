@@ -61,7 +61,6 @@ extension LMAssembly {
       public var deltaOfCalendarYears: Int = -2_000
       public var allowRescoringSingleKanjiCandidates = false
       public var bypassUserPhrasesData = false
-      public var fuzzyReadingEnEngEnabled = false
       public var fuzzyPhoneticEnabled = false
       public var fuzzyInitialBP = false
       public var fuzzyInitialFH = false
@@ -158,7 +157,6 @@ extension LMAssembly {
       config.allowRescoringSingleKanjiCandidates = prefs.allowRescoringSingleKanjiCandidates
       config.alwaysSupplyETenDOSUnigrams = prefs.enforceETenDOSCandidateSequence
       config.bypassUserPhrasesData = prefs.userPhrasesDatabaseBypassed
-      config.fuzzyReadingEnEngEnabled = prefs.fuzzyReadingEnEngEnabled
       config.fuzzyPhoneticEnabled = prefs.fuzzyPhoneticEnabled
       config.fuzzyInitialBP = prefs.fuzzyInitialBP
       config.fuzzyInitialFH = prefs.fuzzyInitialFH
