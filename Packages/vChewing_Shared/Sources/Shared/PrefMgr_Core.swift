@@ -162,6 +162,39 @@ public final class PrefMgr: PrefMgrProtocol, Sendable {
   @AppProperty(userDef: .kFuzzyReadingEnEngEnabled)
   public var fuzzyReadingEnEngEnabled: Bool
 
+  @AppProperty(userDef: .kFuzzyPhoneticEnabled)
+  public var fuzzyPhoneticEnabled: Bool
+
+  @AppProperty(userDef: .kFuzzyInitialBP)
+  public var fuzzyInitialBP: Bool
+
+  @AppProperty(userDef: .kFuzzyInitialFH)
+  public var fuzzyInitialFH: Bool
+
+  @AppProperty(userDef: .kFuzzyInitialLN)
+  public var fuzzyInitialLN: Bool
+
+  @AppProperty(userDef: .kFuzzyInitialZZh)
+  public var fuzzyInitialZZh: Bool
+
+  @AppProperty(userDef: .kFuzzyInitialCCh)
+  public var fuzzyInitialCCh: Bool
+
+  @AppProperty(userDef: .kFuzzyInitialSSh)
+  public var fuzzyInitialSSh: Bool
+
+  @AppProperty(userDef: .kFuzzyFinalEnEng)
+  public var fuzzyFinalEnEng: Bool
+
+  @AppProperty(userDef: .kFuzzyFinalAnAng)
+  public var fuzzyFinalAnAng: Bool
+
+  @AppProperty(userDef: .kFuzzyFinalInIng)
+  public var fuzzyFinalInIng: Bool
+
+  @AppProperty(userDef: .kFuzzyFinalUnUng)
+  public var fuzzyFinalUnUng: Bool
+
   @AppProperty(userDef: .kSmartChineseEnglishSwitchEnabled)
   public var smartChineseEnglishSwitchEnabled: Bool
 
@@ -501,5 +534,17 @@ extension PrefMgr {
         defaults.removeObject(forKey: "UseHLtoMoveCompositorCursorInCandidateState")
       }
     }
+  }
+
+  /// 向下相容遷移：首次升級時，若舊 ㄣ/ㄥ 開關曾開啟，遷移到新設定。
+  public static func migrateFromLegacyFuzzyEnEng() {
+    let newKey = UserDef.kFuzzyFinalEnEng.rawValue
+    guard UserDefaults.standard.object(forKey: newKey) == nil else { return }
+    let legacyValue = UserDefaults.standard.bool(
+      forKey: UserDef.kFuzzyReadingEnEngEnabled.rawValue
+    )
+    guard legacyValue else { return }
+    UserDefaults.standard.set(true, forKey: newKey)
+    UserDefaults.standard.set(true, forKey: UserDef.kFuzzyPhoneticEnabled.rawValue)
   }
 }

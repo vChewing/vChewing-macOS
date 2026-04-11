@@ -565,6 +565,17 @@ public final class MockPrefMgr: PrefMgrProtocol {
   public var useFixedCandidateOrderOnSelection: Bool = false
   public var autoCorrectReadingCombination: Bool = true
   public var fuzzyReadingEnEngEnabled: Bool = false
+  public var fuzzyPhoneticEnabled: Bool = false
+  public var fuzzyInitialBP: Bool = false
+  public var fuzzyInitialFH: Bool = false
+  public var fuzzyInitialLN: Bool = false
+  public var fuzzyInitialZZh: Bool = false
+  public var fuzzyInitialCCh: Bool = false
+  public var fuzzyInitialSSh: Bool = false
+  public var fuzzyFinalEnEng: Bool = false
+  public var fuzzyFinalAnAng: Bool = false
+  public var fuzzyFinalInIng: Bool = false
+  public var fuzzyFinalUnUng: Bool = false
   public var smartChineseEnglishSwitchEnabled: Bool = false
   public var autoBracketPairingEnabled: Bool = false
   public var numberQuickInputEnabled: Bool = true
