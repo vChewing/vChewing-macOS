@@ -138,8 +138,14 @@ extension SessionProtocol {
 
   public var shouldAutoExpandCandidates: Bool {
     guard !prefs.alwaysExpandCandidateWindow else { return true }
-    guard state.type == .ofSymbolTable else { return state.type == .ofAssociates }
-    return state.node.previous != nil
+    switch state.type {
+    case .ofAssociates: return true
+    case .ofCandidates:
+      guard let candidateUI = ui?.candidateUI else { return false }
+      return candidateUI.visible && candidateUI.expanded
+    case .ofSymbolTable: return state.node.previous != nil
+    default: return false
+    }
   }
 
   public var isCandidateContextMenuEnabled: Bool {

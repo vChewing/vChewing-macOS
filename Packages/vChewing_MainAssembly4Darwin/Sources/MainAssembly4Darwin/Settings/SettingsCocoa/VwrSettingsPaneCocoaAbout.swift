@@ -168,7 +168,7 @@ extension SettingsPanesCocoa {
       isBold: Bool = false,
       fixWidth: CGFloat? = nil
     )
-      -> NSTextField {
+      -> NSLabelView {
       let attrStr = NSMutableAttributedString(string: verbatim)
       attrStr.addAttribute(
         .kern,
