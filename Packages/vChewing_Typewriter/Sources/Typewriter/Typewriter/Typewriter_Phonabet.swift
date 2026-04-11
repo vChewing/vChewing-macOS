@@ -629,8 +629,40 @@ extension PhonabetTypewriter {
       return true
     }
 
-    // 空白鍵：直接插入空格到英文緩衝（支援輸入 "Hello World" 此類含空格的英文）
+    // 空白鍵：偵測雙擊以切回中文，或插入空格繼續英文輸入
     if input.isSpace {
+      if handler.smartSwitchState.tryConfirmDoubleSpace() {
+        // 雙擊成立：退出英文模式，將英文緩衝（去除第一下 SPACE 加入的尾部空格）
+        // 保留為凍結前綴，讓組字區繼續顯示這段文字，不送出也不清除。
+        var englishToKeep = handler.smartSwitchState.englishBuffer
+        if englishToKeep.hasSuffix(" ") {
+          englishToKeep = String(englishToKeep.dropLast())
+        }
+        _ = handler.smartSwitchState.exitTempEnglishMode() // 清除英文模式狀態（保留 frozenSegments）
+        if !englishToKeep.isEmpty {
+          handler.smartSwitchState.freezeSegment(englishToKeep)
+        }
+        // 建構組字區狀態（frozenDisplayText 會顯示凍結前綴 + assembler 內容）
+        if !handler.smartSwitchState.frozenSegments.isEmpty || !handler.assembler.isEmpty {
+          var state = handler.generateStateOfInputting(guarded: true)
+          state.tooltip = "中"
+          state.tooltipDuration = 1.5
+          state.data.tooltipColorState = .prompt
+          session.switchState(state)
+        } else {
+          // 組字區與凍結段落均為空：先用 ofAbortion 清除前一個 ofInputting 狀態，
+          // 再切到帶 tooltip 的 ofEmpty，避免 session 誤 commit 前一個 state 的 displayedText。
+          session.switchState(State.ofAbortion())
+          var state = State.ofEmpty()
+          state.tooltip = "中"
+          state.tooltipDuration = 1.5
+          state.data.tooltipColorState = .prompt
+          session.switchState(state)
+        }
+        return true
+      }
+      // 第一下（或窗口已逾期後的新第一下）：記錄時間戳並插入空格
+      handler.smartSwitchState.recordFirstSpace()
       handler.smartSwitchState.appendEnglishChar(" ")
       let frozen = handler.smartSwitchState.frozenDisplayText
       let buffer = handler.smartSwitchState.englishBuffer
@@ -708,6 +740,7 @@ extension PhonabetTypewriter {
   ) -> Bool {
     // 1. 半形空括號配對刪除（如 "(|)" → 同時刪除兩側括號）
     if handler.handleHalfWidthBracketBackspace() {
+      handler.smartSwitchState.firstSpaceTimestamp = nil
       let frozen = handler.smartSwitchState.frozenDisplayText
       let buffer = handler.smartSwitchState.englishBuffer
       if buffer.isEmpty, frozen.isEmpty {
@@ -726,6 +759,7 @@ extension PhonabetTypewriter {
 
     // 2. 游標在最左端（無字元可刪）：退出英文模式，清除緩衝（含游標右側的右括號）
     if handler.smartSwitchState.englishBufferCursor == 0 {
+      handler.smartSwitchState.firstSpaceTimestamp = nil
       handler.smartSwitchState.englishBuffer = ""
       handler.smartSwitchState.englishBufferCursor = 0
       handler.smartSwitchState.isTempEnglishMode = false
@@ -738,6 +772,7 @@ extension PhonabetTypewriter {
     }
 
     // 3. 一般刪除：刪除游標前一字元
+    handler.smartSwitchState.firstSpaceTimestamp = nil
     handler.smartSwitchState.deleteEnglishCharBeforeCursor()
     let frozen = handler.smartSwitchState.frozenDisplayText
     let buffer = handler.smartSwitchState.englishBuffer
