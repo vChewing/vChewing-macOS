@@ -153,12 +153,12 @@ struct LMInstantiatorTests {
       LMAssembly.LMInstantiator.disconnectSQLDB()
     }
     // 測試「ㄣ/ㄥ」容錯查詢功能。
-    // 當啟用 fuzzyReadingEnEngEnabled 時，輸入「ㄣ」應該也能找到「ㄥ」的候選字，反之亦然。
+    // 當啟用 fuzzyPhoneticEnabled + fuzzyFinalEnEng 時，輸入「ㄣ」應該也能找到「ㄥ」的候選字，反之亦然。
     LMAssembly.LMInstantiator.connectToTestSQLDB(LMATestsData.sqlTestCoreLMData)
 
-    // 先測試未啟用容錯時的情況：輸入「ㄈㄣ」不應該找到「風」
+    // 先測試未啟用容錯時的情況：精確查詢「ㄈㄥ」應該找到「風」
     let instanceWithoutFuzzy = LMAssembly.LMInstantiator(isCHS: false).setOptions { config in
-      config.fuzzyReadingEnEngEnabled = false
+      config.fuzzyPhoneticEnabled = false
       config.isSCPCEnabled = true
     }
     let exactResults = instanceWithoutFuzzy.unigramsFor(keyArray: ["ㄈㄥ"]).map(\.value)
@@ -166,7 +166,8 @@ struct LMInstantiatorTests {
 
     // 測試啟用容錯後：輸入「ㄈㄣ」應該也能找到「風」
     let instanceWithFuzzy = LMAssembly.LMInstantiator(isCHS: false).setOptions { config in
-      config.fuzzyReadingEnEngEnabled = true
+      config.fuzzyPhoneticEnabled = true
+      config.fuzzyFinalEnEng = true
       config.isSCPCEnabled = true
     }
     let fuzzyResults = instanceWithFuzzy.unigramsFor(keyArray: ["ㄈㄣ"]).map(\.value)
