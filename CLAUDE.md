@@ -4,6 +4,17 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 vChewing (唯音) is a macOS input method built with AppKit/IMKit in Swift, backed by statistical language models. Main work lives in `Packages/`. The Linux environment only builds `vChewing_Typewriter` and its dependencies.
 
+> **IMPORTANT — Fork Policy**: This repository (`ThomasHsieh/vChewing-macOS`) is a personal fork of the upstream project (`vChewing/vChewing-macOS`). All commits, pushes, and pull requests **must target the fork** (`origin` → `ThomasHsieh/vChewing-macOS`). Never push to or open PRs against the upstream repository (`upstream` → `vChewing/vChewing-macOS`) unless the owner explicitly instructs you to do so.
+
+## Prerequisites
+
+Before running `make` commands, configure Xcode so builds land in the project folder:
+
+1. **Derived Data**: Xcode → Settings → Locations → set "Derived Data" to **Relative to Workspace**
+2. **Project build path**: File → Project Settings → Advanced → Custom → **Relative to Workspace**
+
+Without this, `make` commands will fail to locate build artifacts.
+
 ## Build & Test Commands
 
 ```bash
@@ -13,6 +24,10 @@ make debug            # Single-arch debug build (faster iteration)
 make archive          # Release + dSYMs + .xcarchive for distribution
 make update           # Fetch/generate lexicon assets (first-time setup)
 swift build -c debug  # SPM debug build (alternative, no app bundle)
+
+# Install
+make install-release  # Build release and open installer
+make install-debug    # Build debug and open installer
 
 # Test
 swift test                                                    # All tests
@@ -28,6 +43,11 @@ make spmLinuxTest-Typewriter                                  # Linux Docker tes
 make lint             # SwiftLint with autocorrect
 make format           # SwiftFormat
 make spmLintFormat    # Both, across all packages
+
+# Clean
+make clean            # Clean main build artifacts
+make clean-spm        # Clean SPM cache
+make gitclean         # Remove all untracked files (use with care)
 ```
 
 ## Architecture
@@ -73,7 +93,7 @@ Lexicon assets are compiled at build-time by the remote SPM plugin `VanguardSQLL
 
 All AppKit windows use the `vChewing_OSFrameworkImpl` Result Builder DSL — no Interface Builder assets (`.xib`, `.storyboard`). SwiftUI is used only for the About window and SettingsUI. `SettingsCocoa` (AppKit DSL) covers macOS 10.9–13.x.
 
-UI must not be dispatched to async threads; use `@MainActor`. Localize strings with `NSLocalizedString`. User preferences go through `UserDef` enum → `PrefMgrProtocol` → `PrefMgr`; direct `UserDefaults` access is discouraged. When extending `UserDef`, also extend `PrefMgrProtocol` and `PrefMgr`.
+UI must not be dispatched to async threads; use `@MainActor`. Localize strings with `NSLocalizedString("…", comment: "")` and update the corresponding `.strings` localization files. User preferences go through `UserDef` enum → `PrefMgrProtocol` → `PrefMgr`; direct `UserDefaults` access is discouraged. When extending `UserDef`, also extend `PrefMgrProtocol` and `PrefMgr`.
 
 ## Code Conventions
 

@@ -2,6 +2,8 @@
 
 AI coding assistant handbook for vChewing-macOS (唯音輸入法 macOS 版).
 
+> **IMPORTANT — Fork Policy**: This repository (`ThomasHsieh/vChewing-macOS`) is a personal fork of the upstream project (`vChewing/vChewing-macOS`). All commits, pushes, and pull requests **must target the fork** (`origin` → `ThomasHsieh/vChewing-macOS`). Never push to or open PRs against the upstream repository (`upstream` → `vChewing/vChewing-macOS`) unless the owner explicitly instructs you to do so.
+
 ## Quick Commands
 
 ### Build
