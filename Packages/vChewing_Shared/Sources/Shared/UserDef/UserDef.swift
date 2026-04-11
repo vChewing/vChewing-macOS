@@ -75,6 +75,17 @@ nonisolated public enum UserDef: String, CaseIterable, Identifiable, Sendable {
   case kUseFixedCandidateOrderOnSelection = "UseFixedCandidateOrderOnSelection"
   case kAutoCorrectReadingCombination = "AutoCorrectReadingCombination"
   case kFuzzyReadingEnEngEnabled = "FuzzyReadingEnEngEnabled"
+  case kFuzzyPhoneticEnabled = "FuzzyPhoneticEnabled"
+  case kFuzzyInitialBP = "FuzzyInitialBP"
+  case kFuzzyInitialFH = "FuzzyInitialFH"
+  case kFuzzyInitialLN = "FuzzyInitialLN"
+  case kFuzzyInitialZZh = "FuzzyInitialZZh"
+  case kFuzzyInitialCCh = "FuzzyInitialCCh"
+  case kFuzzyInitialSSh = "FuzzyInitialSSh"
+  case kFuzzyFinalEnEng = "FuzzyFinalEnEng"
+  case kFuzzyFinalAnAng = "FuzzyFinalAnAng"
+  case kFuzzyFinalInIng = "FuzzyFinalInIng"
+  case kFuzzyFinalUnUng = "FuzzyFinalUnUng"
   case kSmartChineseEnglishSwitchEnabled = "SmartChineseEnglishSwitchEnabled"
   case kAutoBracketPairingEnabled = "AutoBracketPairingEnabled"
   case kNumberQuickInputEnabled = "NumberQuickInputEnabled"
@@ -481,6 +492,17 @@ nonisolated extension UserDef {
     case .kUseFixedCandidateOrderOnSelection: return .bool(false)
     case .kAutoCorrectReadingCombination: return .bool(true)
     case .kFuzzyReadingEnEngEnabled: return .bool(false)
+    case .kFuzzyPhoneticEnabled: return .bool(false)
+    case .kFuzzyInitialBP: return .bool(false)
+    case .kFuzzyInitialFH: return .bool(false)
+    case .kFuzzyInitialLN: return .bool(false)
+    case .kFuzzyInitialZZh: return .bool(false)
+    case .kFuzzyInitialCCh: return .bool(false)
+    case .kFuzzyInitialSSh: return .bool(false)
+    case .kFuzzyFinalEnEng: return .bool(false)
+    case .kFuzzyFinalAnAng: return .bool(false)
+    case .kFuzzyFinalInIng: return .bool(false)
+    case .kFuzzyFinalUnUng: return .bool(false)
     case .kSmartChineseEnglishSwitchEnabled: return .bool(false)
     case .kAutoBracketPairingEnabled: return .bool(true)
     case .kNumberQuickInputEnabled: return .bool(true)
@@ -843,6 +865,21 @@ nonisolated extension UserDef {
         shortTitle: "i18n:UserDef.kFuzzyReadingEnEngEnabled.shortTitle",
         description: "i18n:UserDef.kFuzzyReadingEnEngEnabled.description"
       )
+    case .kFuzzyPhoneticEnabled: return .init(
+        userDef: self,
+        shortTitle: "使用近似音",
+        description: "啟用後，可依各項子設定將輸入的讀音展開為近似音，同時查詢候選字。"
+      )
+    case .kFuzzyInitialBP: return .init(userDef: self, shortTitle: "ㄅ ↔ ㄆ")
+    case .kFuzzyInitialFH: return .init(userDef: self, shortTitle: "ㄈ ↔ ㄏ")
+    case .kFuzzyInitialLN: return .init(userDef: self, shortTitle: "ㄌ ↔ ㄋ")
+    case .kFuzzyInitialZZh: return .init(userDef: self, shortTitle: "ㄗ ↔ ㄓ")
+    case .kFuzzyInitialCCh: return .init(userDef: self, shortTitle: "ㄘ ↔ ㄔ")
+    case .kFuzzyInitialSSh: return .init(userDef: self, shortTitle: "ㄙ ↔ ㄕ")
+    case .kFuzzyFinalEnEng: return .init(userDef: self, shortTitle: "ㄣ ↔ ㄥ")
+    case .kFuzzyFinalAnAng: return .init(userDef: self, shortTitle: "ㄢ ↔ ㄤ")
+    case .kFuzzyFinalInIng: return .init(userDef: self, shortTitle: "ㄧㄣ ↔ ㄧㄥ")
+    case .kFuzzyFinalUnUng: return .init(userDef: self, shortTitle: "ㄨㄣ ↔ ㄨㄥ")
     case .kSmartChineseEnglishSwitchEnabled: return .init(
         userDef: self,
         shortTitle: "智慧中英文切換",
