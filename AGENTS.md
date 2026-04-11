@@ -13,7 +13,7 @@ This handbook briefs AI coding assistants on the vChewing (唯音) macOS reposit
   - `vChewing_Tekkon`: Keyboard parsers, Zhuyin/Bopomofo composer, stroke cassette parser, phonabet utilities.
   - `vChewing_LangModelAssembly`: LM instantiation facade, user phrase memory, perception override, associated phrases.
   - Shared dependencies (`vChewing_Shared`, `vChewing_SwiftExtension`, `vChewing_OSFrameworkImpl`, etc.) supply utilities, result-builder UI DSL, notifications, and AppKit wrappers.
-- **Lexicon assets**: Provided by remote Swift Package plugin `VanguardSQLLegacyPlugin` (from `vChewing-VanguardLexicon` repository). Compiled factory lexicons are injected into `vChewing_MainAssembly4Darwin` during build-time.
+- **Lexicon assets**: Provided by remote Swift Package plugin `VanguardTextMapPlugin` (from `vChewing-VanguardLexicon` repository). Compiled factory lexicons (`.txtMap` + `.revlookup` pairs) are injected into `vChewing_MainAssembly4Darwin` during build-time.
 
 ## 2. Environment & Build Paths
 
@@ -46,7 +46,7 @@ This handbook briefs AI coding assistants on the vChewing (唯音) macOS reposit
 2. **FSM triage**: `InputHandler` in Typewriter interprets events, orchestrates Tekkon composer, updates Megrez compositor, and switches `IMEState` instances.
 3. **Composer**: Tekkon manages Zhuyin/phonetic/stroke buffers, auto-correction, cassette mode, and exposes inline display strings.
 4. **Assembler**: Megrez Compositor (sentence assembler) builds DAG segments, snapshotting perception intelligences (will be fed to the perception override module in the `LMAssembly` package), emits `assembledSentence` for UI rendering.
-5. **Language Models**: `LMAssembly` merges factory lexicons, user phrases, exclusion lists, associated phrase suggestions, and perception override data, etc.
+5. **Language Models**: `LMAssembly` merges factory lexicons (via `FactoryTextMapLexicon` backed by Vanguard TextMap format), user phrases, exclusion lists, associated phrase suggestions, and perception override data, etc.
 6. **UI update**: `SessionCtl` refreshes candidate window, composition buffer, tooltips, notifications, symbol menu.
 
 Reference `algorithm.md` for the deep algorithm write-up (zh-Hant).
@@ -62,7 +62,7 @@ Reference `algorithm.md` for the deep algorithm write-up (zh-Hant).
 - **Bundle resources**: SPM `#bundle` macro expands to `Bundle.module` from the auto-generated accessor. For packages with runtime resource lookup (e.g., `LangModelAssembly`), use custom `Bundle.currentSPM` accessor that checks `resourceURL` first, then falls back to `bundleURL`. This avoids codesign sand­box violations from files at `.app/` root.
 - **ObjC(++)/C(+=) style**: Follow Google Style Guide formatting for Objective-C(++) and C(++).
 - **Licensing**: Preserve MIT-NTL banners. Respect LGPL for Megrez and Tekkon; avoid mixing incompatible license assets.
-- **Lexicon tooling**: Factory lexicons are compiled by remote `VanguardSQLLegacyPlugin` (Swift Package plugin from `vChewing-VanguardLexicon` repository) and injected into `vChewing_MainAssembly4Darwin` at build-time via SPM build plugins. Do not modify or commit generated lexicon assets; they are transient build artifacts.
+- **Lexicon tooling**: Factory lexicons are compiled by remote `VanguardTextMapPlugin` (Swift Package plugin from `vChewing-VanguardLexicon` repository) and injected into `vChewing_MainAssembly4Darwin` at build-time via SPM build plugins. The runtime backend is `FactoryTextMapLexicon` (sorted-array key index with binary search, on-demand VALUES parsing, bounded NSCache). Do not modify or commit generated lexicon assets; they are transient build artifacts.
 
 ## 6. Testing Expectations
 

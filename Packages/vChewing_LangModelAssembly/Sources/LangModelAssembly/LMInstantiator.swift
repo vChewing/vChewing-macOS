@@ -64,8 +64,8 @@ extension LMAssembly {
     public static var asyncLoadingUserData: Bool = true
     // 與關聯詞語有關的惰性載入器，可由外部登記。
     public static var associatesLazyLoader: (() -> ())?
-    // SQLite 連線是否已經建立。
-    public internal(set) static var isSQLDBConnected: Bool = false
+
+    public static var isFactoryDictionaryLoaded: Bool { factoryLexicon != nil }
 
     // 簡體中文模型？
     public let isCHS: Bool
@@ -116,7 +116,7 @@ extension LMAssembly {
     // MARK: Shared Resource Lifecycle
 
     public static func resetSharedResources(restoreAsyncLoadingStrategy: Bool = true) {
-      disconnectSQLDB()
+      disconnectFactoryDictionary()
       lmCassette = LMCassette()
       lmPlainBopomofo = LMPlainBopomofo()
       guard restoreAsyncLoadingStrategy else { return }
@@ -387,8 +387,7 @@ extension LMAssembly {
     public func hasUnigramsFor(keyArray: [String]) -> Bool {
       let keyChain = keyArray.joined(separator: "-")
       // 因為涉及到對濾除清單的檢查，所以這裡必須走一遍 .unigramsFor()。
-      // 從 SQL 查詢的角度來看，這樣恐怕不是很經濟，因為 SQLite 要專門準備一次查詢結果。
-      // 但以 2010 年的電腦效能作為基準參考來看的話，這方面的效能壓力可以忽略不計。
+      // 以 2010 年的電腦效能作為基準參考來看的話，這方面的效能壓力可以忽略不計。
       return keyChain == " " || (!unigramsFor(keyArray: keyArray).isEmpty && !keyChain.isEmpty)
     }
 
@@ -451,6 +450,14 @@ extension LMAssembly {
           keyArray: keyArray,
           column: .theDataCHEW
         )
+        // `_` 開頭的特殊 key（標點、半形標點、特殊符號）存放在 MISC 欄位。
+        if keyChain.hasPrefix("_"), keyChain.count > 1 {
+          rawAllUnigrams += factoryUnigramsFor(
+            key: keyChain,
+            keyArray: keyArray,
+            column: .theDataMISC
+          )
+        }
         // 原廠核心辭典內容。
         factoryCoreUnigramsResult = factoryCoreUnigramsFor(
           key: keyChain,
@@ -599,12 +606,12 @@ extension LMAssembly {
     static var lmCassette = LMCassette()
     static var lmPlainBopomofo = LMPlainBopomofo()
 
-    nonisolated static var ptrSQL: OpaquePointer? {
+    nonisolated static var factoryLexicon: FactoryTextMapLexicon? {
       get {
-        mtxSQLPointer.value
+        mtxFactoryLexicon.value
       }
       set {
-        mtxSQLPointer.value = newValue
+        mtxFactoryLexicon.value = newValue
       }
     }
 
@@ -698,9 +705,7 @@ extension LMAssembly {
 
     // MARK: Private
 
-    // SQLite 連線所在的記憶體位置。
-    nonisolated private static let mtxSQLPointer: NSMutex<OpaquePointer?> = .init(nil)
-    nonisolated private static let sqlLock: NSLock = .init()
+    nonisolated private static let mtxFactoryLexicon: NSMutex<FactoryTextMapLexicon?> = .init(nil)
 
     nonisolated private let mtxPerceptionOverride: NSMutex<LMPerceptionOverride>
 

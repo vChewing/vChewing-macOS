@@ -9,7 +9,7 @@ Guidance for Claude-family coding agents working on the vChewing (唯音) macOS 
 - **Scope**：主要工作區位於 `Packages/`。Linux 環境僅構建 `vChewing_Typewriter` 與其依賴。macOS 構建使用 `Package.swift` + `Makefile` + `BundleApps` CommandPlugin。
 - **UI 規範**：所有視窗使用 `vChewing_OSFrameworkImpl` 的 AppKit Result Builder DSL，不得引入 Interface Builder 資產。
 - **FSM 流程**：維持 `SessionCtl → InputSession → InputHandler (→ Megrez) → IMEState` 流程；新增 API 時先更新協定。
-- **Lexicon**：詞庫資源由遠端 Swift Package plugin `VanguardSQLLegacyPlugin`（來自 `vChewing-VanguardLexicon` 倉庫）提供，構建時動態注入至 `vChewing_MainAssembly4Darwin`；編譯後的成品為暫時構建產物，不應簽入版控。
+- **Lexicon**：詞庫資源由遠端 Swift Package plugin `VanguardTextMapPlugin`（來自 `vChewing-VanguardLexicon` 倉庫）提供，構建時以 `.txtMap` / `.revlookup` 格式動態注入至 `vChewing_MainAssembly4Darwin`；編譯後的成品為暫時構建產物，不應簽入版控。
 - **ObjC(++)/C(++) 風格**：Objective-C(++) 與 C(++) 原始碼請遵守 Google Style Guide 的格式規範。
 - **使用者資料路徑**：除非是 Swift Package 的測試目標所需，請勿在程式中寫死使用者資料路徑。
 

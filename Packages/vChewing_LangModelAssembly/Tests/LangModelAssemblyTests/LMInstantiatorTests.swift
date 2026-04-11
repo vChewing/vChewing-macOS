@@ -12,7 +12,7 @@ struct LMInstantiatorTests {
   @Test
   func testReplaceDataSavesToCorrectStore() {
     defer {
-      LMAssembly.LMInstantiator.disconnectSQLDB()
+      LMAssembly.LMInstantiator.disconnectFactoryDictionary()
     }
     let lmi = LMAssembly.LMInstantiator()
     let sample = "foo bar\n"
@@ -36,7 +36,7 @@ struct LMInstantiatorTests {
   @Test
   func testCleanupInputTokenHashMapRemovesToTargetSize() {
     defer {
-      LMAssembly.LMInstantiator.disconnectSQLDB()
+      LMAssembly.LMInstantiator.disconnectFactoryDictionary()
     }
     let instance = LMAssembly.LMInstantiator()
     // Create 3500 dummy hashes
@@ -49,10 +49,10 @@ struct LMInstantiatorTests {
   @Test
   func testQueryUserAddedKanjiByAPI() throws {
     defer {
-      LMAssembly.LMInstantiator.disconnectSQLDB()
+      LMAssembly.LMInstantiator.disconnectFactoryDictionary()
     }
     let instance = LMAssembly.LMInstantiator()
-    LMAssembly.LMInstantiator.connectToTestSQLDB(LMATestsData.sqlTestCoreLMData)
+    LMAssembly.LMInstantiator.connectToTestFactoryDictionary(textMapData: LMATestsData.sqlTestCoreLMData)
     let testSingleCharUnigramSymbol = "・"
     let testReading = "ㄌㄧㄣ"
     let testReadingArray = [testReading]
@@ -89,10 +89,10 @@ struct LMInstantiatorTests {
   @Test
   func testQueryUserAddedKanjiByRawString() throws {
     defer {
-      LMAssembly.LMInstantiator.disconnectSQLDB()
+      LMAssembly.LMInstantiator.disconnectFactoryDictionary()
     }
     let instance = LMAssembly.LMInstantiator()
-    LMAssembly.LMInstantiator.connectToTestSQLDB(LMATestsData.sqlTestCoreLMData)
+    LMAssembly.LMInstantiator.connectToTestFactoryDictionary(textMapData: LMATestsData.sqlTestCoreLMData)
     let testSingleCharUnigramSymbol = "・"
     let testReading = "ㄌㄧㄣ"
     let testReadingArray = [testReading]
@@ -125,7 +125,7 @@ struct LMInstantiatorTests {
   @Test
   func testLMPlainBPMFDataQuery() throws {
     defer {
-      LMAssembly.LMInstantiator.disconnectSQLDB()
+      LMAssembly.LMInstantiator.disconnectFactoryDictionary()
     }
     let instance1 = LMAssembly.LMInstantiator(isCHS: false).setOptions { config in
       config.isSCPCEnabled = true
