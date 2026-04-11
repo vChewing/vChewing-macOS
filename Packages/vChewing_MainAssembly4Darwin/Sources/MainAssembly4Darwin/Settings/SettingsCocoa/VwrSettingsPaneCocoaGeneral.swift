@@ -52,11 +52,99 @@ extension SettingsPanesCocoa {
             renderable.currentControl?.action = #selector(self.updateNarratorSettingsAction(_:))
           }
           UserDef.kAutoCorrectReadingCombination.render(fixWidth: contentWidth)
-          UserDef.kFuzzyReadingEnEngEnabled.render(fixWidth: contentWidth)
+          UserDef.kFuzzyPhoneticEnabled.render(fixWidth: contentWidth)
           UserDef.kShowHanyuPinyinInCompositionBuffer.render(fixWidth: contentWidth)
           UserDef.kKeepReadingUponCompositionError.render(fixWidth: contentWidth)
           UserDef.kClassicHaninKeyboardSymbolModeShortcutEnabled.render(fixWidth: contentWidth)
           UserDef.kUseSCPCTypingMode.render(fixWidth: contentWidth)
+        }?.boxed()
+        NSStackView.buildSection(.horizontal, width: contentWidth) {
+          NSStackView.build(.vertical) {
+            "聲母".makeNSLabel(fixWidth: contentHalfWidth)
+            UserDef.kFuzzyInitialBP.render(fixWidth: contentHalfWidth) { r in
+              r.currentControl?.bind(
+                .enabled,
+                to: NSUserDefaultsController.shared,
+                withKeyPath: "values.\(UserDef.kFuzzyPhoneticEnabled.rawValue)",
+                options: [.continuouslyUpdatesValue: true]
+              )
+            }
+            UserDef.kFuzzyInitialFH.render(fixWidth: contentHalfWidth) { r in
+              r.currentControl?.bind(
+                .enabled,
+                to: NSUserDefaultsController.shared,
+                withKeyPath: "values.\(UserDef.kFuzzyPhoneticEnabled.rawValue)",
+                options: [.continuouslyUpdatesValue: true]
+              )
+            }
+            UserDef.kFuzzyInitialLN.render(fixWidth: contentHalfWidth) { r in
+              r.currentControl?.bind(
+                .enabled,
+                to: NSUserDefaultsController.shared,
+                withKeyPath: "values.\(UserDef.kFuzzyPhoneticEnabled.rawValue)",
+                options: [.continuouslyUpdatesValue: true]
+              )
+            }
+            UserDef.kFuzzyInitialZZh.render(fixWidth: contentHalfWidth) { r in
+              r.currentControl?.bind(
+                .enabled,
+                to: NSUserDefaultsController.shared,
+                withKeyPath: "values.\(UserDef.kFuzzyPhoneticEnabled.rawValue)",
+                options: [.continuouslyUpdatesValue: true]
+              )
+            }
+            UserDef.kFuzzyInitialCCh.render(fixWidth: contentHalfWidth) { r in
+              r.currentControl?.bind(
+                .enabled,
+                to: NSUserDefaultsController.shared,
+                withKeyPath: "values.\(UserDef.kFuzzyPhoneticEnabled.rawValue)",
+                options: [.continuouslyUpdatesValue: true]
+              )
+            }
+            UserDef.kFuzzyInitialSSh.render(fixWidth: contentHalfWidth) { r in
+              r.currentControl?.bind(
+                .enabled,
+                to: NSUserDefaultsController.shared,
+                withKeyPath: "values.\(UserDef.kFuzzyPhoneticEnabled.rawValue)",
+                options: [.continuouslyUpdatesValue: true]
+              )
+            }
+          }
+          NSStackView.build(.vertical) {
+            "韻母".makeNSLabel(fixWidth: contentHalfWidth)
+            UserDef.kFuzzyFinalEnEng.render(fixWidth: contentHalfWidth) { r in
+              r.currentControl?.bind(
+                .enabled,
+                to: NSUserDefaultsController.shared,
+                withKeyPath: "values.\(UserDef.kFuzzyPhoneticEnabled.rawValue)",
+                options: [.continuouslyUpdatesValue: true]
+              )
+            }
+            UserDef.kFuzzyFinalAnAng.render(fixWidth: contentHalfWidth) { r in
+              r.currentControl?.bind(
+                .enabled,
+                to: NSUserDefaultsController.shared,
+                withKeyPath: "values.\(UserDef.kFuzzyPhoneticEnabled.rawValue)",
+                options: [.continuouslyUpdatesValue: true]
+              )
+            }
+            UserDef.kFuzzyFinalInIng.render(fixWidth: contentHalfWidth) { r in
+              r.currentControl?.bind(
+                .enabled,
+                to: NSUserDefaultsController.shared,
+                withKeyPath: "values.\(UserDef.kFuzzyPhoneticEnabled.rawValue)",
+                options: [.continuouslyUpdatesValue: true]
+              )
+            }
+            UserDef.kFuzzyFinalUnUng.render(fixWidth: contentHalfWidth) { r in
+              r.currentControl?.bind(
+                .enabled,
+                to: NSUserDefaultsController.shared,
+                withKeyPath: "values.\(UserDef.kFuzzyPhoneticEnabled.rawValue)",
+                options: [.continuouslyUpdatesValue: true]
+              )
+            }
+          }
         }?.boxed()
         NSStackView.buildSection(.horizontal, width: contentWidth) {
           UserDef.kCheckUpdateAutomatically.render(fixWidth: contentHalfWidth)

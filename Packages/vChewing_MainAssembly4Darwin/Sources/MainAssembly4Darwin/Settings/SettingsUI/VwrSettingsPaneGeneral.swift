@@ -69,7 +69,27 @@ public struct VwrSettingsPaneGeneral: View {
           SpeechSputnik.shared.refreshStatus()
         }
         UserDef.kAutoCorrectReadingCombination.renderUI()
-        UserDef.kFuzzyReadingEnEngEnabled.renderUI()
+        UserDef.kFuzzyPhoneticEnabled.renderUI()
+        HStack(alignment: .top, spacing: 20) {
+          VStack(alignment: .leading, spacing: 4) {
+            Text("聲母").font(.caption).foregroundColor(.secondary)
+            UserDef.kFuzzyInitialBP.renderUI()
+            UserDef.kFuzzyInitialFH.renderUI()
+            UserDef.kFuzzyInitialLN.renderUI()
+            UserDef.kFuzzyInitialZZh.renderUI()
+            UserDef.kFuzzyInitialCCh.renderUI()
+            UserDef.kFuzzyInitialSSh.renderUI()
+          }
+          Divider()
+          VStack(alignment: .leading, spacing: 4) {
+            Text("韻母").font(.caption).foregroundColor(.secondary)
+            UserDef.kFuzzyFinalEnEng.renderUI()
+            UserDef.kFuzzyFinalAnAng.renderUI()
+            UserDef.kFuzzyFinalInIng.renderUI()
+            UserDef.kFuzzyFinalUnUng.renderUI()
+          }
+        }
+        .disabled(!fuzzyPhoneticEnabled)
         UserDef.kShowHanyuPinyinInCompositionBuffer.renderUI()
         UserDef.kKeepReadingUponCompositionError.renderUI()
         UserDef.kClassicHaninKeyboardSymbolModeShortcutEnabled.renderUI()
@@ -121,6 +141,9 @@ public struct VwrSettingsPaneGeneral: View {
   var appleLanguageTag: String
 
   // MARK: Private
+
+  @AppStorage(UserDef.kFuzzyPhoneticEnabled.rawValue)
+  private var fuzzyPhoneticEnabled: Bool = false
 
   @State
   private var isShowingFartWarning = false
