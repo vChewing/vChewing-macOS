@@ -187,35 +187,6 @@
     }
   }
 
-  // MARK: - AttributedLabel
-
-  @available(macOS 10.15, *)
-  public struct AttributedLabel: NSViewRepresentable {
-    // MARK: Lifecycle
-
-    public init(attributedString: NSAttributedString) {
-      self.text = attributedString
-    }
-
-    // MARK: Public
-
-    public func makeNSView(context _: Context) -> NSTextField {
-      let textField = NSTextField(labelWithAttributedString: text)
-      textField.isSelectable = false
-      textField.allowsEditingTextAttributes = false
-      textField.preferredMaxLayoutWidth = textField.frame.width
-      return textField
-    }
-
-    public func updateNSView(_ nsView: NSTextField, context _: Context) {
-      nsView.attributedStringValue = text
-    }
-
-    // MARK: Private
-
-    private let text: NSAttributedString
-  }
-
   // MARK: - PathControl
 
   @available(macOS 10.15, *)

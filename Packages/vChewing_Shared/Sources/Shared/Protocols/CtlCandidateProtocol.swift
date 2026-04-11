@@ -46,6 +46,7 @@ public protocol CtlCandidateProtocol: AnyObject {
   var delegate: CtlCandidateDelegate? { get set }
   var highlightedIndex: Int { get set }
   var visible: Bool { get set }
+  var expanded: Bool { get }
   var currentLayout: UILayoutOrientation { get set }
 
   func showNextPage() -> Bool
