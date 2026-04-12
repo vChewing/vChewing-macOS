@@ -101,11 +101,11 @@ extension LMAssembly {
             vCLMLog("lmCassette: File access failure: \(path)")
             return
           }
-          var newCassette = LMCassette()
-          newCassette.candidateKeysValidator = validator
-          newCassette.open(path)
-          let count = newCassette.count
           asyncOnMain {
+            var newCassette = LMCassette()
+            newCassette.candidateKeysValidator = validator
+            newCassette.open(path)
+            let count = newCassette.count
             Self.lmCassette = newCassette
             vCLMLog("lmCassette: \(count) entries of data loaded from: \(path)")
           }
