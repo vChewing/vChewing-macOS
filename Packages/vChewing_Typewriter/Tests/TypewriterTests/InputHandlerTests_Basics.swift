@@ -180,8 +180,8 @@ final class InputHandlerTests {
   init() throws {
     // 設定專用於單元測試的 UserDefaults
     UserDefaults.unitTests = .init(suiteName: "org.atelierInmu.vChewing.Typewriter.UnitTests")
-    UserDef.resetAll()
     UserDefaults.pendingUnitTests = true
+    UserDef.resetAll()
 
     // 初始化測試 LM
     let lm = LMAssembly.LMInstantiator(isCHS: false)
