@@ -112,12 +112,26 @@ extension LMAssembly {
       var newMap: [String: [Range<String.Index>]] = [:]
       let shouldReverse = shouldReverse // 必需，否則下文的 closure 會出錯。
       strData.parse(splitee: "\n") { theRange in
-        let theCells = rawStrData[theRange].split(separator: " ")
-        if theCells.count >= 2, theCells[0].description.first != "#" {
-          var theKey = shouldReverse ? String(theCells[1]) : String(theCells[0])
-          theKey.convertToPhonabets()
-          newMap[theKey, default: []].append(theRange)
+        var firstCellRange: Range<String.Index>?
+        var secondCellRange: Range<String.Index>?
+        rawStrData.parseCells(in: theRange, splitee: " ") { currentRange, currentIndex in
+          switch currentIndex {
+          case 0:
+            firstCellRange = currentRange
+            return true
+          case 1:
+            secondCellRange = currentRange
+            return false
+          default:
+            return false
+          }
         }
+        guard let firstCellRange, let secondCellRange else { return }
+        guard rawStrData[firstCellRange].first != "#" else { return }
+        let keyRange = shouldReverse ? secondCellRange : firstCellRange
+        var theKey = String(rawStrData[keyRange])
+        theKey.convertToPhonabets()
+        newMap[theKey, default: []].append(theRange)
       }
       rangeMap = newMap
       // 明確釋放 newMap 記憶體
@@ -190,8 +204,27 @@ extension LMAssembly {
       ].reduce(true) { $0 && $1 }
       if let arrRangeRecords: [Range<String.Index>] = rangeMap[key] {
         for netaRange in arrRangeRecords {
-          let neta = strData[netaRange].split(separator: " ")
-          let theValue: String = shouldReverse ? String(neta[0]) : String(neta[1])
+          var firstCellRange: Range<String.Index>?
+          var secondCellRange: Range<String.Index>?
+          var thirdCellRange: Range<String.Index>?
+          strData.parseCells(in: netaRange, splitee: " ") { currentRange, currentIndex in
+            switch currentIndex {
+            case 0:
+              firstCellRange = currentRange
+              return true
+            case 1:
+              secondCellRange = currentRange
+              return true
+            case 2:
+              thirdCellRange = currentRange
+              return false
+            default:
+              return false
+            }
+          }
+          guard let firstCellRange, let secondCellRange else { continue }
+          let valueRange = shouldReverse ? firstCellRange : secondCellRange
+          let theValue = String(strData[valueRange])
           let valueHash = theValue.hashValue
           // 完全排除使用者詞庫中的單漢字結果（除非原廠辭典並未包含這個配對），避免其影響組字結果。
           checkOmission: if omitUserPhrases {
@@ -200,8 +233,8 @@ extension LMAssembly {
             continue
           }
           var theScore: Double
-          if neta.count >= 3, !shouldForceDefaultScore, !neta[2].contains("#") {
-            theScore = .init(String(neta[2])) ?? defaultScore((keyArray, theValue))
+          if let thirdCellRange, !shouldForceDefaultScore, !strData[thirdCellRange].contains("#") {
+            theScore = .init(String(strData[thirdCellRange])) ?? defaultScore((keyArray, theValue))
           } else {
             theScore = defaultScore(nil)
           }
