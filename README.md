@@ -117,6 +117,18 @@ $ EOF.
 
 ## Changelog（個人修改版）
 
+### 2026.04.13
+
+#### 🔄 上游同步（upstream/main @ vChewing/vChewing-macOS）
+
+- **LMAssembly — 詞庫格式升級 SQL → VanguardTextMap**：原廠詞庫後端從 SQLite（`VanguardSQLLegacyPlugin`）全面改為 `.txtMap` 純文字格式（`VanguardTextMapPlugin`）。新後端採用有序陣列索引 + 二分搜尋 + NSCache，並於載入時自動生成反查表（`reverseLookupTable`），不再依賴獨立 `.revlookup` 檔案。
+- **字典資料版本**：`vChewing-VanguardLexicon` 套件版本更新至 `4.3.3`（字典資料日期：20260411）。
+- `.gitignore` 新增忽略 `./tmp` 目錄。
+
+**衝突處理**：版本號維持 fork 日期制（`2026.04.06 / 20260406`）；`AGENTS.md` 保留 fork 擴充版；`CLAUDE.md` 更新詞庫 plugin 命名並保留 Fork Policy。
+
+---
+
 ### 2026.04.11
 
 #### ✨ 新功能

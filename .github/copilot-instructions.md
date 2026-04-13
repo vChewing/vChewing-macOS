@@ -18,7 +18,7 @@ This file provides GitHub Copilot-specific coding instructions. For comprehensiv
 ## Project Context
 - Input method for macOS built with AppKit/IMKit in Swift, backed by statistic-based language models loaded into `./Packages/vChewing_LangModelAssembly` package.
 - If you are on Linux, your only workspace is `./Packages/vChewing_Typewriter` and its dependencies situated in `./Packages`. If you are on Windows, you can also work with `./Packages/vChewing_MainAssembly` and its dependencies situated in `./Packages` folder.
-- Lexicon assets are provided by remote Swift Package plugin `VanguardSQLLegacyPlugin` (from `vChewing-VanguardLexicon` repository) and compiled at build-time, then injected into `vChewing_MainAssembly4Darwin`.
+- Lexicon assets are provided by remote Swift Package plugin `VanguardTextMapPlugin` (from `vChewing-VanguardLexicon` repository) and compiled at build-time as `.txtMap` / `.revlookup` pairs, then injected into `vChewing_MainAssembly4Darwin`.
 - Tests are written among local Swift Packages situated in `./Packages/` folder. Tests are usually implemented on a case-by-case basis when an issue case comes out: Write a new test case to confirm the bug exists. 
 - Preserve the existing MIT-NTL license banner on any new source file, except certain local Swift Packages licensed with things other than MIT-NTL.
 
@@ -39,7 +39,7 @@ This file provides GitHub Copilot-specific coding instructions. For comprehensiv
 
 ## Tests and Tooling
 - GitHub Coding Agent can only access Linux devenv in most times. `./Packages/vChewing_Typewriter/` is the Linux-compilable target that the developer usually ask GitHub Coding Agent to work on. This package is the one to add test files.
-- Dictionary files are managed manually by the developer in another repository and is used as a git submodule here. Regenerate lexicon assets via `make update` when explicitly instructed.
+- Dictionary files are managed manually by the developer in another repository and is used as a git submodule here. Factory lexicons are now in Vanguard TextMap format (`.txtMap` + `.revlookup`); the `CSQLite3` dependency has been removed from `LangModelAssembly`. Regenerate lexicon assets via `make update` when explicitly instructed.
 
 ## Git Commit Convention
 
@@ -63,7 +63,7 @@ This file provides GitHub Copilot-specific coding instructions. For comprehensiv
 - This repo has no dependency of InterfaceBuilder assets. AppKit is used by default with self-crafted result builder DSLs to make the coding experience similar to SwiftUI. SwiftUI in this project is only used for About window and SettingsUI. On macOS 10.9 Mavericks till macOS 13 Ventura, this repo uses SettingsCocoa (AppKit Result Builder DSL).
 - User data is not expected to be referred from hard-coded path, unless it is necessary in Test targets of a Swift package.
 - This repository uses XCTest for unit tests used among Swift packages situated in `./Packages` folder.
-- Do not manually edit or commit generated lexicon assets; they are transient build artifacts produced by the `VanguardSQLLegacyPlugin` build tool plugin at compile-time.
+- Do not manually edit or commit generated lexicon assets; they are transient build artifacts produced by the `VanguardTextMapPlugin` build tool plugin at compile-time.
 - The platforms in Swift package manifest file is ignored on non-Darwin platforms. Swift FOSS Foundation APIs on Darwin can be unavailable on earlier macOS releases due to Apple's deliberate intention of never backporting new Foundation APIs. Your removal of platforms can make some of those components not able to be compiled against macOS releases earlier than macOS 11.
 - Most vChewing-specific packages prefer to use a dedicated file to handle `@_exported import XXX` dependency definitions to avoid insertion of `import XXX` to all files having codes dependent to `XXX`. This makes code-mirroring tasks (to the legacy repository of vChewing) much easier. Try not to break this convention if possible.
 - Always confirm the current type of shell you are using (e.g., `powershell` or `zsh` or `bash`) before executing shell commands / writing shell scripts.

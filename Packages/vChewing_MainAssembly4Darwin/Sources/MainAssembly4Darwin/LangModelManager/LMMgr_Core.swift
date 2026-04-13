@@ -94,7 +94,7 @@ public final class LMMgr {
 
   public static var shared = LMMgr()
 
-  public static var isCoreDBConnected: Bool { LMAssembly.LMInstantiator.isSQLDBConnected }
+  public static var isCoreDBConnected: Bool { LMAssembly.LMInstantiator.isFactoryDictionaryLoaded }
 
   public static func prepareForUnitTests() {
     guard UserDefaults.pendingUnitTests else { return }
@@ -129,12 +129,21 @@ public final class LMMgr {
     }
   }
 
+  // When asyncLoadingUserData is true, connectFactoryDictionary dispatches
+  // the heavy work to a background queue; the assert and notification are only meaningful
+  // on the synchronous path (unit tests). The async path delivers its own log message
+  // upon completion, and the FSM already guards against unloaded factory dictionaries
+  // (InputSession_HandleEvent shows "Factory dictionary not loaded yet." tooltip).
   public static func connectCoreDB(dbPath: String? = nil) {
     guard let path: String = dbPath ?? Self.getCoreDictionaryDBPath() else {
-      preconditionFailure("vChewing factory SQLite data not found.")
+      preconditionFailure("vChewing factory TextMap data not found.")
     }
-    let result = LMAssembly.LMInstantiator.connectSQLDB(dbPath: path)
-    assert(result, "vChewing factory SQLite connection failed.")
+    let result = LMAssembly.LMInstantiator.connectFactoryDictionary(
+      textMapPath: path
+    )
+    if !LMAssembly.LMInstantiator.asyncLoadingUserData {
+      assert(result, "vChewing factory TextMap loading failed.")
+    }
     Notifier.notify(
       message: "Core Dict loading complete.".i18n
     )
