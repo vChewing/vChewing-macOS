@@ -142,6 +142,89 @@ extension InputHandlerTests {
     #expect(result == "咱\(vs1)地\(vs1)")
   }
 
+  @Test
+  func test_IH103B_ButKoBPMFVSDisplayReflection() throws {
+    guard let testHandler, let testSession else {
+      Issue.record("testHandler and testSession at least one of them is nil.")
+      return
+    }
+    let testKanjiData = """
+    ㄗㄚˊ 咱 -1
+    ㄉㄜ˙ 地 -1
+    """
+    let extractedGrams = extractGrams(from: testKanjiData)
+    extractedGrams.forEach {
+      testHandler.currentLM.insertTemporaryData(unigram: $0, isFiltering: false)
+    }
+    defer {
+      testHandler.currentLM.clearTemporaryData(isFiltering: false)
+      testHandler.clear()
+    }
+
+    clearTestPOM()
+    testHandler.clear()
+    testHandler.prefs.fetchSuggestionsFromPerceptionOverrideModel = false
+    testHandler.prefs.specifyCmdOptCtrlEnterBehavior = 4
+    testHandler.prefs.reflectBPMFVSInCompositionBuffer = true
+    testSession.resetInputHandler(forceComposerCleanup: true)
+
+    #expect(testHandler.assembler.insertKey("ㄗㄚˊ"))
+    #expect(testHandler.assembler.insertKey("ㄉㄜ˙"))
+    testHandler.assemble()
+
+    let vs1 = String(UnicodeScalar(0xE01E1)!)
+    let reflectedState = testHandler.generateStateOfInputting()
+    #expect(reflectedState.displayedText == "咱\(vs1)地\(vs1)")
+
+    let rawCommitState = testHandler.generateStateOfInputting(sansReading: true)
+    #expect(rawCommitState.displayedText == "咱地")
+
+    let candidateState = testHandler.generateStateOfCandidates(dodge: false)
+    #expect(candidateState.displayedText == "咱\(vs1)地\(vs1)")
+
+    testHandler.prefs.reflectBPMFVSInCompositionBuffer = false
+    let plainState = testHandler.generateStateOfInputting()
+    #expect(plainState.displayedText == "咱地")
+  }
+
+  @Test
+  func test_IH103C_ButKoBPMFVSPlainEnterCommitsRawText() throws {
+    guard let testHandler, let testSession else {
+      Issue.record("testHandler and testSession at least one of them is nil.")
+      return
+    }
+    let testKanjiData = """
+    ㄗㄚˊ 咱 -1
+    ㄉㄜ˙ 地 -1
+    """
+    let extractedGrams = extractGrams(from: testKanjiData)
+    extractedGrams.forEach {
+      testHandler.currentLM.insertTemporaryData(unigram: $0, isFiltering: false)
+    }
+    defer {
+      testHandler.currentLM.clearTemporaryData(isFiltering: false)
+      testHandler.clear()
+    }
+
+    clearTestPOM()
+    testHandler.clear()
+    testHandler.prefs.fetchSuggestionsFromPerceptionOverrideModel = false
+    testHandler.prefs.specifyCmdOptCtrlEnterBehavior = 4
+    testHandler.prefs.reflectBPMFVSInCompositionBuffer = true
+    testSession.resetInputHandler(forceComposerCleanup: true)
+
+    #expect(testHandler.assembler.insertKey("ㄗㄚˊ"))
+    #expect(testHandler.assembler.insertKey("ㄉㄜ˙"))
+    testHandler.assemble()
+    testSession.switchState(testHandler.generateStateOfInputting())
+
+    let vs1 = String(UnicodeScalar(0xE01E1)!)
+    #expect(testHandler.generateStateOfInputting().displayedText == "咱\(vs1)地\(vs1)")
+
+    #expect(testHandler.triageInput(event: KBEvent.KeyEventData.dataEnterReturn.asEvent))
+    #expect(testSession.recentCommissions.joined() == "咱地")
+  }
+
   /// 測試磁帶模組的快速選字功能（單一結果）。
   @Test
   func test_IH104_CassetteQuickPhraseSelection() throws {

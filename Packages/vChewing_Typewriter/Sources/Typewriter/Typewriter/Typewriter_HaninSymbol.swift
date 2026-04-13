@@ -40,7 +40,7 @@ public struct HaninSymbolTypewriter<Handler: InputHandlerProtocol>: TypewriterPr
     }
     // 得在這裡先 commit buffer，
     // 不然會導致「在摁 ESC 離開符號選單時會重複輸入上一次的組字區的內容」的不當行為。
-    let textToCommit = handler.generateStateOfInputting(sansReading: true).displayedText
+    let textToCommit = handler.committableDisplayText(sansReading: true)
     session.switchState(State.ofCommitting(textToCommit: textToCommit))
     if symbols.members.count == 1 {
       let textToCommit = symbols.members.map(\.name).joined()

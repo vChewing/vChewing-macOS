@@ -258,9 +258,12 @@ public final class MockSession: @MainActor SessionCoreProtocol, CtlCandidateDele
       if next.type == .ofCommitting {
         // `commit()` 會自行完成 JIS / 康熙轉換。
         commit(text: next.textToCommit)
-      } else if next.type == .ofEmpty, previous.hasComposition {
+      } else if next.type == .ofEmpty, previous.hasComposition, let inputHandler {
         // `commit()` 會自行完成 JIS / 康熙轉換。
-        commit(text: previous.displayedTextConverted)
+        let textToCommit = inputHandler.committableDisplayText(
+          sansReading: previous.type != .ofInputting
+        )
+        commit(text: textToCommit)
       }
       inputHandler?.clear()
       if state.type != .ofEmpty {
@@ -356,7 +359,7 @@ public final class MockSession: @MainActor SessionCoreProtocol, CtlCandidateDele
       var result: State = inputHandler.generateStateOfInputting()
       defer { switchState(result) } // 這是最終輸出結果。
       if inputHandler.prefs.useSCPCTypingMode {
-        switchState(.ofCommitting(textToCommit: result.displayedText))
+        switchState(.ofCommitting(textToCommit: inputHandler.committableDisplayText(sansReading: true)))
         // 此時是逐字選字模式，所以「selectedValue.value」是單個字、不用追加處理。
         if inputHandler.prefs.associatedPhrasesEnabled {
           let associates = inputHandler.generateStateOfAssociates(
@@ -386,7 +389,7 @@ public final class MockSession: @MainActor SessionCoreProtocol, CtlCandidateDele
         vCTestLog("TEST SESSION ERROR: 907F9F64")
         return
       }
-      let strToCommitFirst = inputHandler.generateStateOfInputting(sansReading: true).displayedText
+      let strToCommitFirst = inputHandler.committableDisplayText(sansReading: true)
       switchState(.ofCommitting(textToCommit: strToCommitFirst + chosenStr))
     default: return
     }
@@ -445,9 +448,7 @@ public final class MockSession: @MainActor SessionCoreProtocol, CtlCandidateDele
       (state.type == .ofInputting)
         && (inputHandler.prefs.trimUnfinishedReadingsOnCommit || forceCleanup)
     if state.hasComposition {
-      textToCommit = inputHandler.generateStateOfInputting(
-        sansReading: sansReading
-      ).displayedText
+      textToCommit = inputHandler.committableDisplayText(sansReading: sansReading)
     }
     // 唯音不再在這裡對 IMKTextInput 客體黑名單當中的應用做資安措施。
     // 有相關需求者，請在切換掉輸入法或者切換至新的客體應用之前敲一下 Shift+Delete。

@@ -34,7 +34,7 @@ extension InputHandlerProtocol {
     /// 換成由此處重新生成的原始資料在 IMEStateData 當中生成的 NSAttributeString。
     var displayTextSegments: [String] = handleAsCodePointInput || handleAsRomanNumeralInput
       ? [strCodePointBuffer]
-      : assembler.assembledSentence.values
+      : compositionBufferDisplayTextSegments(reflectBPMFVS: !sansReading)
     var cursor = handleAsCodePointInput || handleAsRomanNumeralInput
       ? displayTextSegments.joined().count
       : convertCursorForDisplay(assembler.cursor)
@@ -85,6 +85,37 @@ extension InputHandlerProtocol {
       result.marker = 0
     }
     return result
+  }
+
+  func compositionBufferDisplayTextSegments(reflectBPMFVS: Bool = true) -> [String] {
+    guard reflectBPMFVS,
+          prefs.reflectBPMFVSInCompositionBuffer,
+          prefs.specifyCmdOptCtrlEnterBehavior == 4
+    else {
+      return assembler.assembledSentence.values
+    }
+    return assembler.assembledSentence.map {
+      guard !$0.isReadingMismatched else { return $0.value }
+      return BPMFVS.convert(value: $0.value, readings: Array($0.keyArray))
+    }
+  }
+
+  /// 組字區可以投影成 BPMFVS 顯示，但一般遞交流程只能吃原始內容。
+  public func committableDisplayText(sansReading: Bool = false) -> String {
+    let handleAsCodePointInput = currentTypingMethod == .codePoint && !sansReading
+    let handleAsRomanNumeralInput = currentTypingMethod == .romanNumerals && !sansReading
+    var displayTextSegments: [String] = handleAsCodePointInput || handleAsRomanNumeralInput
+      ? [strCodePointBuffer]
+      : compositionBufferDisplayTextSegments(reflectBPMFVS: false)
+    displayTextSegments = displayTextSegments.map { $0.trimmingCharacters(in: .newlines) }
+    var displayedText = displayTextSegments.joined()
+    let noReading = sansReading || [.codePoint, .romanNumerals].contains(currentTypingMethod)
+    let reading: String = noReading ? "" : readingForDisplay
+    guard !reading.isEmpty else { return displayedText }
+    let cursor = max(min(convertCursorForDisplay(assembler.cursor), displayedText.count), 0)
+    let insertionIndex = displayedText.index(displayedText.startIndex, offsetBy: cursor)
+    displayedText.insert(contentsOf: reading, at: insertionIndex)
+    return displayedText
   }
 
   /// 生成「在有單獨的前置聲調符號輸入時」的工具提示。
@@ -154,7 +185,7 @@ extension InputHandlerProtocol {
     }
     var result = State.ofCandidates(
       candidates: generateArrayOfCandidates(fixOrder: prefs.useFixedCandidateOrderOnSelection),
-      displayTextSegments: assembler.assembledSentence.values,
+      displayTextSegments: compositionBufferDisplayTextSegments(),
       cursor: assembler.cursor
     )
     if !prefs.useRearCursorMode {
@@ -397,7 +428,7 @@ extension InputHandlerProtocol {
 
     guard state.type == .ofInputting else { return false }
 
-    var displayedText = state.displayedText
+    var displayedText = committableDisplayText()
 
     if input.commonKeyModifierFlags == [.option, .shift] {
       displayedText = displayedText.map(\.description).joined(separator: " ")
@@ -695,7 +726,7 @@ extension InputHandlerProtocol {
       session.switchState(State.ofAbortion())
     } else {
       if isComposerOrCalligrapherEmpty {
-        let commitText = generateStateOfInputting(sansReading: true).displayedText
+        let commitText = committableDisplayText(sansReading: true)
         session.switchState(State.ofCommitting(textToCommit: commitText))
         return true
       }
@@ -738,7 +769,7 @@ extension InputHandlerProtocol {
           }
         }
         var marking = State.ofMarking(
-          displayTextSegments: assembler.assembledSentence.values,
+          displayTextSegments: compositionBufferDisplayTextSegments(),
           markedReadings: Array(assembler.keys[currentMarkedRange()]),
           cursor: convertCursorForDisplay(assembler.cursor),
           marker: convertCursorForDisplay(assembler.marker)
@@ -801,7 +832,7 @@ extension InputHandlerProtocol {
           return true
         }
         var marking = State.ofMarking(
-          displayTextSegments: assembler.assembledSentence.values,
+          displayTextSegments: compositionBufferDisplayTextSegments(),
           markedReadings: Array(assembler.keys[currentMarkedRange()]),
           cursor: convertCursorForDisplay(assembler.cursor),
           marker: convertCursorForDisplay(assembler.marker)
@@ -994,14 +1025,14 @@ extension InputHandlerProtocol {
           "Please manually implement the symbols of this menu \nin the user phrase file with “_punctuation_list” key."
             .i18n
         vCLog("8EB3FB1A: " + errorMessage)
-        let textToCommit = generateStateOfInputting(sansReading: true).displayedText
+        let textToCommit = committableDisplayText(sansReading: true)
         session.switchState(State.ofCommitting(textToCommit: textToCommit))
         session.switchState(State.ofCommitting(textToCommit: isJIS ? "_" : "`"))
         return true
       }
     } else {
       // 得在這裡先 commit buffer，不然會導致「在摁 ESC 離開符號選單時會重複輸入上一次的組字區的內容」的不當行為。
-      let textToCommit = generateStateOfInputting(sansReading: true).displayedText
+      let textToCommit = committableDisplayText(sansReading: true)
       session.switchState(State.ofCommitting(textToCommit: textToCommit))
       session.switchState(State.ofSymbolTable(node: CandidateNode.root))
       return true
@@ -1019,7 +1050,7 @@ extension InputHandlerProtocol {
     )
     guard let rootNode = rootNode else { return false }
     // 得在這裡先 commit buffer，不然會導致「在摁 ESC 離開符號選單時會重複輸入上一次的組字區的內容」的不當行為。
-    let textToCommit = generateStateOfInputting(sansReading: true).displayedText
+    let textToCommit = committableDisplayText(sansReading: true)
     session.switchState(State.ofCommitting(textToCommit: textToCommit))
     session.switchState(State.ofSymbolTable(node: rootNode))
     return true
@@ -1120,13 +1151,13 @@ extension InputHandlerProtocol {
         switch prefs.upperCaseLetterKeyBehavior {
         case 1, 3:
           if prefs.upperCaseLetterKeyBehavior == 3, !isConsideredEmptyForNow { break }
-          let commitText = generateStateOfInputting(sansReading: true).displayedText
+          let commitText = committableDisplayText(sansReading: true)
           session
             .switchState(State.ofCommitting(textToCommit: commitText + inputText.lowercased()))
           return true
         case 2, 4:
           if prefs.upperCaseLetterKeyBehavior == 4, !isConsideredEmptyForNow { break }
-          let commitText = generateStateOfInputting(sansReading: true).displayedText
+          let commitText = committableDisplayText(sansReading: true)
           session
             .switchState(State.ofCommitting(textToCommit: commitText + inputText.uppercased()))
           return true
@@ -1233,7 +1264,7 @@ extension InputHandlerProtocol {
     guard let result = maybeResult else { return false }
     let root = CandidateNode(name: queryString, symbols: result)
     // 得在這裡先 commit buffer，不然會導致「在摁 ESC 離開符號選單時會重複輸入上一次的組字區的內容」的不當行為。
-    let textToCommit = generateStateOfInputting(sansReading: true).displayedText
+    let textToCommit = committableDisplayText(sansReading: true)
     session.switchState(State.ofCommitting(textToCommit: textToCommit))
     session.switchState(State.ofSymbolTable(node: root))
     return true

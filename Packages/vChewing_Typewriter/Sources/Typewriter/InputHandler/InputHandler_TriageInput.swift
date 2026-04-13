@@ -94,7 +94,7 @@ extension InputHandlerProtocol {
             inputting.textToCommit = textToCommit
             session.switchState(inputting)
           } else {
-            let displayedText = state.displayedText
+            let displayedText = committableDisplayText()
             if !displayedText.isEmpty, !isConsideredEmptyForNow {
               session.switchState(State.ofCommitting(textToCommit: displayedText))
             }

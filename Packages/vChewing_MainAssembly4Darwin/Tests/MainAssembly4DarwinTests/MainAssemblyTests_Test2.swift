@@ -200,6 +200,79 @@ extension MainAssemblyTests {
   }
 
   @Test
+  func test204A_SwitchStateEmptyCommitsRawTextWithoutBPMFVSLeak() throws {
+    let grams: [Megrez.Unigram] = [
+      .init(keyArray: ["ㄗㄚˊ"], value: "咱", score: -1),
+      .init(keyArray: ["ㄉㄜ˙"], value: "地", score: -1),
+    ]
+    grams.forEach { testHandler.currentLM.insertTemporaryData(unigram: $0, isFiltering: false) }
+    defer {
+      testHandler.currentLM.clearTemporaryData(isFiltering: false)
+      testHandler.clear()
+      testClient.clear()
+    }
+
+    clearTestPOM()
+    testHandler.clear()
+    testHandler.prefs.fetchSuggestionsFromPerceptionOverrideModel = false
+    testHandler.prefs.specifyCmdOptCtrlEnterBehavior = 4
+    testHandler.prefs.reflectBPMFVSInCompositionBuffer = true
+    testSession.resetInputHandler(forceComposerCleanup: true)
+
+    #expect(testHandler.assembler.insertKey("ㄗㄚˊ"))
+    #expect(testHandler.assembler.insertKey("ㄉㄜ˙"))
+    testHandler.assemble()
+    testSession.switchState(testHandler.generateStateOfInputting())
+
+    let vs1 = String(UnicodeScalar(0xE01E1)!)
+    #expect(testSession.state.displayedText == "咱\(vs1)地\(vs1)")
+
+    testClient.clear()
+    testSession.switchState(.ofEmpty())
+
+    #expect(testClient.toString() == "咱地")
+    #expect(testSession.state.type == .ofEmpty)
+    #expect(testHandler.isComposerOrCalligrapherEmpty)
+  }
+
+  @Test
+  func test204B_SCPCSelectionCommitsRawTextWithoutBPMFVSLeak() throws {
+    let grams: [Megrez.Unigram] = [
+      .init(keyArray: ["ㄗㄚˊ"], value: "咱", score: -1),
+    ]
+    grams.forEach { testHandler.currentLM.insertTemporaryData(unigram: $0, isFiltering: false) }
+    defer {
+      testHandler.currentLM.clearTemporaryData(isFiltering: false)
+      testHandler.clear()
+      testClient.clear()
+    }
+
+    clearTestPOM()
+    testHandler.clear()
+    testHandler.prefs.fetchSuggestionsFromPerceptionOverrideModel = false
+    testHandler.prefs.useSCPCTypingMode = true
+    testHandler.prefs.specifyCmdOptCtrlEnterBehavior = 4
+    testHandler.prefs.reflectBPMFVSInCompositionBuffer = true
+    testSession.resetInputHandler(forceComposerCleanup: true)
+
+    #expect(testHandler.assembler.insertKey("ㄗㄚˊ"))
+    testHandler.assemble()
+    testSession.switchState(testHandler.generateStateOfCandidates())
+
+    guard let targetIndex = testSession.state.candidates.firstIndex(where: { $0.value == "咱" }) else {
+      Issue.record("Missing target candidate: 咱")
+      return
+    }
+
+    testClient.clear()
+    testSession.candidatePairSelectionConfirmed(at: targetIndex)
+
+    #expect(testClient.toString() == "咱")
+    #expect(testSession.state.type == .ofEmpty)
+    #expect(testHandler.isComposerOrCalligrapherEmpty)
+  }
+
+  @Test
   func test205_InputHandler_PunctuationFeaturesAndSymbolMenus() throws {
     testHandler.prefs.useSCPCTypingMode = false
 
