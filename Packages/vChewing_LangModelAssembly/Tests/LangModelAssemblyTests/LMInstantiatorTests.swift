@@ -150,11 +150,11 @@ struct LMInstantiatorTests {
   @Test
   func testFuzzyEnEngReadingQuery() throws {
     defer {
-      LMAssembly.LMInstantiator.disconnectSQLDB()
+      LMAssembly.LMInstantiator.disconnectFactoryDictionary()
     }
     // 測試「ㄣ/ㄥ」容錯查詢功能。
     // 當啟用 fuzzyPhoneticEnabled + fuzzyFinalEnEng 時，輸入「ㄣ」應該也能找到「ㄥ」的候選字，反之亦然。
-    LMAssembly.LMInstantiator.connectToTestSQLDB(LMATestsData.sqlTestCoreLMData)
+    LMAssembly.LMInstantiator.connectToTestFactoryDictionary(textMapData: LMATestsData.sqlTestCoreLMData)
 
     // 先測試未啟用容錯時的情況：精確查詢「ㄈㄥ」應該找到「風」
     let instanceWithoutFuzzy = LMAssembly.LMInstantiator(isCHS: false).setOptions { config in
@@ -183,12 +183,12 @@ struct LMInstantiatorTests {
   @Test
   func testFuzzyInitialReadingQuery() throws {
     defer {
-      LMAssembly.LMInstantiator.disconnectSQLDB()
+      LMAssembly.LMInstantiator.disconnectFactoryDictionary()
     }
     // 測試聲母近似音（ㄗ↔ㄓ）查詢功能。
     // 測試資料庫中有 ㄓㄨㄥ（中），但沒有 ㄗㄨㄥ 的精確詞條。
     // 啟用容錯後，查詢 ㄗㄨㄥ 時應透過 ㄗ↔ㄓ 規則找到 ㄓㄨㄥ 的候選字（如「中」）。
-    LMAssembly.LMInstantiator.connectToTestSQLDB(LMATestsData.sqlTestCoreLMData)
+    LMAssembly.LMInstantiator.connectToTestFactoryDictionary(textMapData: LMATestsData.sqlTestCoreLMData)
 
     // 先確認精確查詢 ㄓㄨㄥ 能找到「中」
     let exactZhInstance = LMAssembly.LMInstantiator(isCHS: false).setOptions { config in
@@ -220,10 +220,10 @@ struct LMInstantiatorTests {
   @Test
   func testFuzzyMasterToggle() throws {
     defer {
-      LMAssembly.LMInstantiator.disconnectSQLDB()
+      LMAssembly.LMInstantiator.disconnectFactoryDictionary()
     }
     // 測試總開關：關閉時即使子規則啟用也不展開
-    LMAssembly.LMInstantiator.connectToTestSQLDB(LMATestsData.sqlTestCoreLMData)
+    LMAssembly.LMInstantiator.connectToTestFactoryDictionary(textMapData: LMATestsData.sqlTestCoreLMData)
 
     let instanceMasterOff = LMAssembly.LMInstantiator(isCHS: false).setOptions { config in
       config.fuzzyPhoneticEnabled = false  // 總開關關閉
