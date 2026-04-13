@@ -24,4 +24,15 @@ struct BPMFVSTests {
     let expected = "地" + String(try! #require(UnicodeScalar(0xE01E1)))
     #expect(BPMFVS.convert(value: "地", reading: "ㄉㄜ˙") == expected)
   }
+
+  @Test
+  func testConvertsMultiCharacterDisplaySegment() {
+    let vs1 = String(try! #require(UnicodeScalar(0xE01E1)))
+    #expect(BPMFVS.convert(value: "咱地", readings: ["ㄗㄚˊ", "ㄉㄜ˙"]) == "咱\(vs1)地\(vs1)")
+  }
+
+  @Test
+  func testLeavesMultiCharacterDisplaySegmentUntouchedWhenCountsMismatch() {
+    #expect(BPMFVS.convert(value: "咱地", readings: ["ㄗㄚˊ"]) == "咱地")
+  }
 }

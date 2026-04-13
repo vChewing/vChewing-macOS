@@ -44,6 +44,13 @@ public enum BPMFVS {
     return value + String(selector)
   }
 
+  public static func convert(value: String, readings: [String]) -> String {
+    guard value.count == readings.count else { return value }
+    return zip(value, readings).reduce(into: "") { partialResult, pair in
+      partialResult += convert(value: String(pair.0), reading: pair.1)
+    }
+  }
+
   public static func convertToBPMFVS(smashedPairs: [(key: String, value: String)]) -> String {
     var converted = ""
     smashedPairs.forEach { key, value in

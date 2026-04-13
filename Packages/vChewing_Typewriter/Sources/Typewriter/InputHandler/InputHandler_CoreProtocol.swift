@@ -359,7 +359,7 @@ extension InputHandlerProtocol {
       preConsolidate: prefs.consolidateContextOnCandidateSelection,
       skipObservation: true
     )
-    theState.data.displayTextSegments = assembler.assembledSentence.values
+    theState.data.displayTextSegments = compositionBufferDisplayTextSegments()
     theState.data.cursor = convertCursorForDisplay(assembler.cursor)
     let markerBackup = assembler.marker
     if assembler.isCursorAtEdge(direction: .front) {

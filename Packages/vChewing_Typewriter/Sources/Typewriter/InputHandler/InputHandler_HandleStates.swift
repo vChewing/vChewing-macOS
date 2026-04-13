@@ -34,7 +34,7 @@ extension InputHandlerProtocol {
     /// 換成由此處重新生成的原始資料在 IMEStateData 當中生成的 NSAttributeString。
     var displayTextSegments: [String] = handleAsCodePointInput || handleAsRomanNumeralInput
       ? [strCodePointBuffer]
-      : assembler.assembledSentence.values
+      : compositionBufferDisplayTextSegments(reflectBPMFVS: !sansReading)
     var cursor = handleAsCodePointInput || handleAsRomanNumeralInput
       ? displayTextSegments.joined().count
       : convertCursorForDisplay(assembler.cursor)
@@ -85,6 +85,19 @@ extension InputHandlerProtocol {
       result.marker = 0
     }
     return result
+  }
+
+  func compositionBufferDisplayTextSegments(reflectBPMFVS: Bool = true) -> [String] {
+    guard reflectBPMFVS,
+          prefs.reflectBPMFVSInCompositionBuffer,
+          prefs.specifyCmdOptCtrlEnterBehavior == 4
+    else {
+      return assembler.assembledSentence.values
+    }
+    return assembler.assembledSentence.map {
+      guard !$0.isReadingMismatched else { return $0.value }
+      return BPMFVS.convert(value: $0.value, readings: Array($0.keyArray))
+    }
   }
 
   /// 生成「在有單獨的前置聲調符號輸入時」的工具提示。
@@ -154,7 +167,7 @@ extension InputHandlerProtocol {
     }
     var result = State.ofCandidates(
       candidates: generateArrayOfCandidates(fixOrder: prefs.useFixedCandidateOrderOnSelection),
-      displayTextSegments: assembler.assembledSentence.values,
+      displayTextSegments: compositionBufferDisplayTextSegments(),
       cursor: assembler.cursor
     )
     if !prefs.useRearCursorMode {
@@ -738,7 +751,7 @@ extension InputHandlerProtocol {
           }
         }
         var marking = State.ofMarking(
-          displayTextSegments: assembler.assembledSentence.values,
+          displayTextSegments: compositionBufferDisplayTextSegments(),
           markedReadings: Array(assembler.keys[currentMarkedRange()]),
           cursor: convertCursorForDisplay(assembler.cursor),
           marker: convertCursorForDisplay(assembler.marker)
@@ -801,7 +814,7 @@ extension InputHandlerProtocol {
           return true
         }
         var marking = State.ofMarking(
-          displayTextSegments: assembler.assembledSentence.values,
+          displayTextSegments: compositionBufferDisplayTextSegments(),
           markedReadings: Array(assembler.keys[currentMarkedRange()]),
           cursor: convertCursorForDisplay(assembler.cursor),
           marker: convertCursorForDisplay(assembler.marker)

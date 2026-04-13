@@ -277,6 +277,9 @@ public final class PrefMgr: PrefMgrProtocol, Sendable {
   @AppProperty(userDef: .kSpecifyCmdOptCtrlEnterBehavior)
   public var specifyCmdOptCtrlEnterBehavior: Int
 
+  @AppProperty(userDef: .kReflectBPMFVSInCompositionBuffer)
+  public var reflectBPMFVSInCompositionBuffer: Bool
+
   // MARK: - Optional settings
 
   @AppProperty(userDef: .kCandidateTextFontName)
