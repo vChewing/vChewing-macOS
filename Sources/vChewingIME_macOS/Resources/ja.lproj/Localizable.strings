@@ -308,11 +308,12 @@
 "i18n:UserDef.kSpecifiedNotifyUIColorScheme.option.enforceDark" = "ダーク (暗い)";
 "i18n:UserDef.kSpecifiedNotifyUIColorScheme.option.notSpecified" = "不指定";
 "i18n:UserDef.kSpecifiedNotifyUIColorScheme.title" = "通知ウインドウの外観モード:";
-"i18n:UserDef.kSpecifyCmdOptCtrlEnterBehavior.description" = "カセットモードがONにした場合、このショートカットで点字を送り出すのはできなくて、代わりに「発音表記（丸括弧仕様）」を送り出します。尚、他の点字機能のご希望の場合、他の特別の点字ツールソフトのご使用はお薦めです。";
+"i18n:UserDef.kSpecifyCmdOptCtrlEnterBehavior.description" = "カセットモードがONにした場合、このショートカットで点字を送り出すのはできなくて、代わりに「発音表記（丸括弧仕様）」を送り出します。尚、他の点字機能のご希望の場合、他の特別の点字ツールソフトのご使用はお薦めです。ButKo BPMFVS 機能を利用するには、このコンピュータに規格準拠の専用フォントがインストールされている必要があります。そうでない場合、関連情報が正しく表示されないことがあります。";
 "i18n:UserDef.kSpecifyCmdOptCtrlEnterBehavior.option.0" = "発音表記（丸括弧仕様）を送出";
 "i18n:UserDef.kSpecifyCmdOptCtrlEnterBehavior.option.1" = "発音表記（HTML ルビ仕様）を送出";
 "i18n:UserDef.kSpecifyCmdOptCtrlEnterBehavior.option.2" = "中国語点字 (1947) を送出";
 "i18n:UserDef.kSpecifyCmdOptCtrlEnterBehavior.option.3" = "中国語点字 (GF0019-2018) を送出";
+"i18n:UserDef.kSpecifyCmdOptCtrlEnterBehavior.option.4" = "ButKo BPMFVS 注音表記を送出";
 "i18n:UserDef.kSpecifyCmdOptCtrlEnterBehavior.shortTitle" = "Command+Option+Ctrl+Enter:";
 "i18n:UserDef.kUserPhrasesDatabaseBypassed.description" = "これを有効にすると、ユーザー辞書フォルダ内の（関連文節データ以外の）すべての編集可能なデータが無視されます。開発者が言葉の組み立てに関連する特定の悪質な故障が抑制されるかどうか（すなわち、そのユーザー辞書データに原因があるかどうか）を確認するために、有効化するよう依頼することがあります。";
 "i18n:UserDef.kUserPhrasesDatabaseBypassed.shortTitle" = "ユーザー辞書を無効化";

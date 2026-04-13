@@ -6,6 +6,7 @@
 // marks, or product names of Contributor, except as required to fulfill notice
 // requirements defined in MIT License.
 
+@_exported import BPMFVS
 @_exported import BrailleSputnik
 @_exported import LangModelAssembly
 @_exported import Megrez

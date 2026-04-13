@@ -309,11 +309,12 @@
 "i18n:UserDef.kSpecifiedNotifyUIColorScheme.option.enforceDark" = "深色模式";
 "i18n:UserDef.kSpecifiedNotifyUIColorScheme.option.notSpecified" = "不指定";
 "i18n:UserDef.kSpecifiedNotifyUIColorScheme.title" = "通知飘窗配色外观:";
-"i18n:UserDef.kSpecifyCmdOptCtrlEnterBehavior.description" = "在磁带模式下，该热键组合将不再递交点字阵列（届时会改为递交括弧注解标记）。如另有对点字/盲文功能的更专业的需求的话，请考虑使用专门的点字/盲文工具软体。";
+"i18n:UserDef.kSpecifyCmdOptCtrlEnterBehavior.description" = "在磁带模式下，该热键组合将不再递交点字阵列（届时会改为递交括弧注解标记）。如另有对点字/盲文功能的更专业的需求的话，请考虑使用专门的点字/盲文工具软体。如需使用 ButKo BPMFVS 功能，目前电脑另须安装符合相关标准的专用字型，方可确保相关资讯得以正常显示。";
 "i18n:UserDef.kSpecifyCmdOptCtrlEnterBehavior.option.0" = "递交括弧注解标记";
 "i18n:UserDef.kSpecifyCmdOptCtrlEnterBehavior.option.1" = "递交 HTML Ruby 注解标记";
 "i18n:UserDef.kSpecifyCmdOptCtrlEnterBehavior.option.2" = "递交国语点字 (1947)";
 "i18n:UserDef.kSpecifyCmdOptCtrlEnterBehavior.option.3" = "递交国通盲文 (GF0019-2018)";
+"i18n:UserDef.kSpecifyCmdOptCtrlEnterBehavior.option.4" = "递交 ButKo BPMFVS 注音标记";
 "i18n:UserDef.kSpecifyCmdOptCtrlEnterBehavior.shortTitle" = "Command+Option+Ctrl+Enter:";
 "i18n:UserDef.kUserPhrasesDatabaseBypassed.description" = "启用后，使用者辞典资料夹内所有可编辑的资料将被忽略（但关联词语除外）。开发者可能会请您启用此项，以协助确认与组句有关的某些恶性故障是否与使用者辞典资料内容有关。";
 "i18n:UserDef.kUserPhrasesDatabaseBypassed.shortTitle" = "暂时停用使用者语汇资料库";

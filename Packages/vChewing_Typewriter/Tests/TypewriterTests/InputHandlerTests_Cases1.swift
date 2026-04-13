@@ -103,6 +103,45 @@ extension InputHandlerTests {
     vCTestLog("成功完成測試 inputHandler.commissionByCtrlOptionCommandEnter()。")
   }
 
+  @Test
+  func test_IH103A_MiscCommissionButKoBPMFVS() throws {
+    guard let testHandler, let testSession else {
+      Issue.record("testHandler and testSession at least one of them is nil.")
+      return
+    }
+    let testKanjiData = """
+    ㄗㄚˊ 咱 -1
+    ㄉㄜ˙ 地 -1
+    """
+    let extractedGrams = extractGrams(from: testKanjiData)
+    extractedGrams.forEach {
+      testHandler.currentLM.insertTemporaryData(unigram: $0, isFiltering: false)
+    }
+    defer {
+      testHandler.currentLM.clearTemporaryData(isFiltering: false)
+      testHandler.clear()
+    }
+
+    clearTestPOM()
+    testHandler.clear()
+    testHandler.prefs.fetchSuggestionsFromPerceptionOverrideModel = false
+    testHandler.prefs.specifyCmdOptCtrlEnterBehavior = 4
+    testSession.resetInputHandler(forceComposerCleanup: true)
+
+    #expect(testHandler.assembler.insertKey("ㄗㄚˊ"))
+    #expect(testHandler.assembler.insertKey("ㄉㄜ˙"))
+    testHandler.assemble()
+
+    guard let handler = testSession.inputHandler else {
+      Issue.record("testSession.handler is nil.")
+      return
+    }
+
+    let vs1 = String(UnicodeScalar(0xE01E1)!)
+    let result = handler.commissionByCtrlOptionCommandEnter()
+    #expect(result == "咱\(vs1)地\(vs1)")
+  }
+
   /// 測試磁帶模組的快速選字功能（單一結果）。
   @Test
   func test_IH104_CassetteQuickPhraseSelection() throws {

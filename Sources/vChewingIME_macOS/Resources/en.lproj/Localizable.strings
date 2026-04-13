@@ -309,11 +309,12 @@
 "i18n:UserDef.kSpecifiedNotifyUIColorScheme.option.enforceDark" = "Dark Mode";
 "i18n:UserDef.kSpecifiedNotifyUIColorScheme.option.notSpecified" = "Not Specified";
 "i18n:UserDef.kSpecifiedNotifyUIColorScheme.title" = "Notifier Window Color Scheme:";
-"i18n:UserDef.kSpecifyCmdOptCtrlEnterBehavior.description" = "This hotkey commits bracketed annotation instead of braille sequence if cassette mode is enabled. Also, please consider using those dedicated braille utility softwares if you have more professional necessities.";
+"i18n:UserDef.kSpecifyCmdOptCtrlEnterBehavior.description" = "This hotkey commits bracketed annotation instead of braille sequence if cassette mode is enabled. Also, please consider using those dedicated braille utility softwares if you have more professional necessities. Using ButKo BPMFVS also requires a standards-compliant font to be installed on this computer; otherwise, the related information may not display correctly.";
 "i18n:UserDef.kSpecifyCmdOptCtrlEnterBehavior.option.0" = "Commit Bracketed Annotation";
 "i18n:UserDef.kSpecifyCmdOptCtrlEnterBehavior.option.1" = "Commit HTML Ruby Annotation";
 "i18n:UserDef.kSpecifyCmdOptCtrlEnterBehavior.option.2" = "Commit Mandarin Braille (1947)";
 "i18n:UserDef.kSpecifyCmdOptCtrlEnterBehavior.option.3" = "Commit Mandarin Braille (GF0019-2018)";
+"i18n:UserDef.kSpecifyCmdOptCtrlEnterBehavior.option.4" = "Commit ButKo BPMFVS Annotation";
 "i18n:UserDef.kSpecifyCmdOptCtrlEnterBehavior.shortTitle" = "Command+Option+Ctrl+Enter:";
 "i18n:UserDef.kUserPhrasesDatabaseBypassed.description" = "When enabled, all editable data in your User Phrases folder will be ignored (except Associated Phrases data). The developer may ask you to enable this to help determine whether it suppresses certain pernicious issues related to sentence composition.";
 "i18n:UserDef.kUserPhrasesDatabaseBypassed.shortTitle" = "Bypass the User Phrases database";
