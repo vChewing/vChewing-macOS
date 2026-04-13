@@ -281,4 +281,45 @@ final class InputHandlerTests {
     }
     return extractedGrams
   }
+
+  func makeTypingTextMap(
+    _ entriesByKey: [(String, [(value: String, probability: Double, typeID: Int32)])]
+  )
+    -> String {
+    var valueLines: [String] = []
+    var keyLines: [String] = []
+
+    for (key, entries) in entriesByKey {
+      let startLine = valueLines.count
+      entries.forEach { entry in
+        let probabilityText = entry.probability.description.hasSuffix(".0")
+          ? String(entry.probability.description.dropLast(2))
+          : entry.probability.description
+        valueLines.append("\(entry.value)\t\(probabilityText)\t\(entry.typeID)")
+      }
+      keyLines.append("\(key)\t\(startLine)\t\(entries.count)")
+    }
+
+    var result = ""
+    result += "#PRAGMA:VANGUARD_HOMA_LEXICON_HEADER\n"
+    result += "VERSION\t1\n"
+    result += "TYPE\tTYPING\n"
+    result += "READING_SEPARATOR\t-\n"
+    result += "ENTRY_COUNT\t\(valueLines.count)\n"
+    result += "KEY_COUNT\t\(keyLines.count)\n"
+    result += "#PRAGMA:VANGUARD_HOMA_LEXICON_VALUES\n"
+    valueLines.forEach { result += $0 + "\n" }
+    result += "#PRAGMA:VANGUARD_HOMA_LEXICON_KEY_LINE_MAP\n"
+    keyLines.forEach { result += $0 + "\n" }
+    return result
+  }
+
+  func uniqueSingleIdeographicValues(_ values: [String]) -> [String] {
+    values.reduce(into: [String]()) { partialResult, currentValue in
+      guard currentValue.count == 1 else { return }
+      guard currentValue.unicodeScalars.allSatisfy({ $0.properties.isIdeographic }) else { return }
+      guard !partialResult.contains(currentValue) else { return }
+      partialResult.append(currentValue)
+    }
+  }
 }

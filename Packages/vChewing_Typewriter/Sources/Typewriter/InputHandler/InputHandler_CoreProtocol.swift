@@ -635,42 +635,29 @@ extension InputHandlerProtocol {
     case true: break
     }
 
-    eTenSequenceEnforcement: if prefs.enforceETenDOSCandidateSequence {
-      guard currentTypingMethod == .vChewingFactory else {
-        break eTenSequenceEnforcement
-      }
-      var (arr4SingleSegment, arr4LongerSegments): (
-        [Megrez.KeyValuePaired], [Megrez.KeyValuePaired]
-      ) = ([], [])
-      var singleReadings: [String] = []
-      var singleReadingsInserted: Set<Int> = []
-      arrCandidates.forEach { currentPair in
-        switch currentPair.keyArray.count > 1 {
-        case true: arr4LongerSegments.append(currentPair)
-        case false:
-          if let currentReading = currentPair.keyArray.first {
-            let hash = currentReading.hashValue
-            if !singleReadingsInserted.contains(hash) {
-              singleReadingsInserted.insert(hash)
-              singleReadings.append(currentReading)
-            }
-          }
-          arr4SingleSegment.append(currentPair)
+    if currentTypingMethod == .vChewingFactory,
+       let eTenCandidates = segregateCandidatesForETenDOS(from: arrCandidates) {
+      eTenSequenceEnforcement: if prefs.enforceETenDOSCandidateSequence {
+        let seq4ETen = currentLM.queryETenDOSSequence(reading: eTenCandidates.reading)
+        guard !seq4ETen.isEmpty else { break eTenSequenceEnforcement }
+        let arrSeq4ETen: [Megrez.KeyValuePaired] = seq4ETen.map {
+          .init(key: eTenCandidates.reading, value: $0, score: 0)
+        }
+        arrCandidates = eTenCandidates.longerSegments + deduplicateCandidatesPreservingOrder(
+          arrSeq4ETen + eTenCandidates.singleSegments
+        )
+      } else {
+        let supplementalCandidates = supplementalETenSingleKanjiCandidates(
+          reading: eTenCandidates.reading,
+          existingSingleSegments: eTenCandidates.singleSegments
+        )
+        // 關閉強制排序時，保留既有候選順序，只把倚天獨有的單漢字候選補到尾端。
+        if !supplementalCandidates.isEmpty {
+          arrCandidates.append(contentsOf: supplementalCandidates)
         }
       }
-      // 當且僅當單漢字讀音只有一種時，套用倚天中文 DOS 的候選字排序。
-      guard singleReadings.count == 1, let reading = singleReadings.first else {
-        break eTenSequenceEnforcement
-      }
-      let seq4ETen = currentLM.queryETenDOSSequence(reading: reading)
-      guard !seq4ETen.isEmpty else { break eTenSequenceEnforcement }
-      let arrSeq4ETen: [Megrez.KeyValuePaired] = seq4ETen.map {
-        .init(key: reading, value: $0, score: 0)
-      }
-      arrCandidates = arr4LongerSegments + deduplicateCandidatesPreservingOrder(
-        arrSeq4ETen + arr4SingleSegment
-      )
     }
+
     return arrCandidates.map { ($0.keyArray, $0.value) }
   }
 
@@ -685,6 +672,47 @@ extension InputHandlerProtocol {
       if seen.contains(signature) { return false }
       seen.insert(signature)
       return true
+    }
+  }
+
+  private func segregateCandidatesForETenDOS(
+    from candidates: [Megrez.KeyValuePaired]
+  )
+    -> (singleSegments: [Megrez.KeyValuePaired], longerSegments: [Megrez.KeyValuePaired], reading: String)? {
+    var (singleSegments, longerSegments): ([Megrez.KeyValuePaired], [Megrez.KeyValuePaired]) = ([], [])
+    var singleReadings = Set<String>()
+    candidates.forEach { currentPair in
+      switch currentPair.keyArray.count {
+      case 1:
+        if let currentReading = currentPair.keyArray.first {
+          singleReadings.insert(currentReading)
+          singleSegments.append(currentPair)
+        }
+      case 2...: longerSegments.append(currentPair)
+      default: break // 空 keyArray 候選不合規，直接跳過。
+      }
+    }
+    guard singleReadings.count == 1, let reading = singleReadings.first else { return nil }
+    return (singleSegments, longerSegments, reading)
+  }
+
+  private func supplementalETenSingleKanjiCandidates(
+    reading: String,
+    existingSingleSegments: [Megrez.KeyValuePaired]
+  )
+    -> [Megrez.KeyValuePaired] {
+    let existingValues = Set(existingSingleSegments.map(\.value))
+    var insertedValues = Set<String>()
+    return currentLM.queryETenDOSSequence(reading: reading).compactMap { currentValue in
+      guard currentValue.count == 1 else { return nil }
+      guard currentValue.unicodeScalars.allSatisfy({ $0.properties.isIdeographic }) else {
+        return nil
+      }
+      guard !existingValues.contains(currentValue), !insertedValues.contains(currentValue) else {
+        return nil
+      }
+      insertedValues.insert(currentValue)
+      return .init(key: reading, value: currentValue, score: -9.5)
     }
   }
 
