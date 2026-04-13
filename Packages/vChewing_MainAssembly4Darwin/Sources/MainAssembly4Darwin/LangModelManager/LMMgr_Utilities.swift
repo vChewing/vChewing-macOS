@@ -44,21 +44,10 @@ extension LMMgr {
     return result
   }
 
-  // MARK: - 獲取原廠核心語彙檔案（SQLite）的路徑（優先獲取 Containers 下的資料檔案）。
+  // MARK: - 獲取原廠核心語彙檔案（TextMap）的路徑（優先獲取 Containers 下的資料檔案）。
 
   public static func getCoreDictionaryDBPath(factory: Bool = false) -> String? {
-    guard let factoryResultURL = Bundle.currentSPM.url(
-      forResource: "vChewingFactoryDatabase",
-      withExtension: "sqlite"
-    ) else {
-      return nil
-    }
-    guard !factory, PrefMgr.shared.useExternalFactoryDict else { return factoryResultURL.path }
-    let containerResultURL = Self.appSupportURL
-      .appendingPathComponent("vChewingFactoryData/vChewingFactoryDatabase.sqlite")
-    return FileManager.default
-      .fileExists(atPath: containerResultURL.path, isDirectory: nil) ? containerResultURL
-      .path : factoryResultURL.path
+    getBundleDataPath("VanguardFactoryDict4Typing", factory: factory, ext: "txtMap")
   }
 
   // MARK: - 使用者語彙檔案的具體檔案名稱路徑定義

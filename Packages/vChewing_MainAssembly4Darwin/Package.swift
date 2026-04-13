@@ -30,7 +30,7 @@ let package = Package(
     .package(path: "../vChewing_TooltipUI"),
     .package(path: "../vChewing_Uninstaller"),
     .package(path: "../vChewing_UpdateSputnik"),
-    .package(url: "https://atomgit.com/vChewing/vChewing-VanguardLexicon.git", exact: "4.3.2"),
+    .package(url: "https://atomgit.com/vChewing/vChewing-VanguardLexicon.git", exact: "4.3.3"),
   ],
   targets: [
     .target(
@@ -61,7 +61,7 @@ let package = Package(
       ],
       plugins: [
         .plugin(name: "TextTemplateAssetInjectorPlugin", package: "vChewing-VanguardLexicon"),
-        .plugin(name: "VanguardSQLLegacyPlugin", package: "vChewing-VanguardLexicon"),
+        .plugin(name: "VanguardTextMapPlugin", package: "vChewing-VanguardLexicon"),
       ]
     ),
     .testTarget(

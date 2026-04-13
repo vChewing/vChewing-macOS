@@ -87,7 +87,7 @@ SessionCtl → InputSession → InputHandler → Megrez → IMEState
 
 ### Lexicon
 
-Lexicon assets are compiled at build-time by the remote SPM plugin `VanguardSQLLegacyPlugin` (from `vChewing-VanguardLexicon`) and injected into `vChewing_MainAssembly4Darwin`. Do not manually edit or commit these generated artifacts.
+Lexicon assets are compiled at build-time by the remote SPM plugin `VanguardTextMapPlugin` (from `vChewing-VanguardLexicon`) and injected into `vChewing_MainAssembly4Darwin` as `.txtMap` / `.revlookup` pairs. The runtime backend is `FactoryTextMapLexicon` (sorted-array key index with binary search, on-demand VALUES parsing, bounded NSCache). Do not manually edit or commit these generated artifacts.
 
 ### UI
 

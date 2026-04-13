@@ -4,24 +4,40 @@
 import Foundation
 
 public enum LMATestsData {
+  // MARK: Public
+
+  public static let textMapTestCoreLMData: String = {
+    loadFixture(fileNameStem: "vanguardTextMap_test", ext: "txtMap")
+  }()
+
+  public static let factoryTestBundleData: String = {
+    textMapTestCoreLMData
+  }()
+
   public static let sqlTestCoreLMData: String = {
-    let url: URL?
-    #if canImport(Darwin)
-      if #available(macOS 12, *) {
-        url = #bundle.url(forResource: "vanguardLegacy_test", withExtension: "sql")
-      } else {
-        url = Bundle.module.url(forResource: "vanguardLegacy_test", withExtension: "sql")
-      }
-    #else
-      url = Bundle.module.url(forResource: "vanguardLegacy_test", withExtension: "sql")
-    #endif
-    guard let url else { return "" }
-    return (try? String(contentsOf: url, encoding: .utf8)) ?? ""
+    textMapTestCoreLMData
   }()
 
   public static func getCINPath4Tests(_ fileNameStem: String, ext: String) -> String? {
     let url = Bundle.module.url(forResource: fileNameStem, withExtension: ext)
     guard let url else { return nil }
     return url.path
+  }
+
+  // MARK: Private
+
+  private static func loadFixture(fileNameStem: String, ext: String) -> String {
+    let url: URL?
+    #if canImport(Darwin)
+      if #available(macOS 12, *) {
+        url = #bundle.url(forResource: fileNameStem, withExtension: ext)
+      } else {
+        url = Bundle.module.url(forResource: fileNameStem, withExtension: ext)
+      }
+    #else
+      url = Bundle.module.url(forResource: fileNameStem, withExtension: ext)
+    #endif
+    guard let url else { return "" }
+    return (try? String(contentsOf: url, encoding: .utf8)) ?? ""
   }
 }
