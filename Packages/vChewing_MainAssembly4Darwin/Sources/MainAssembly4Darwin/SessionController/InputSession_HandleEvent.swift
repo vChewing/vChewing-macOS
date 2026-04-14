@@ -37,9 +37,21 @@ extension SessionProtocol {
     // 警告：這裡的 event 必須是原始 event 且不能被 var，否則會影響 Shift 中英模式判定。
     if ui?.shiftKeyUpChecker?.check(event) ?? false {
       vCLog("Shift key tap detected, toggling Alphanumerical Mode if should.")
+      // 若組字區有內容且智慧中英文切換已啟用，在組字區內執行臨時切換（不送出組字區）。
+      if state.hasComposition, inputHandler?.handleShiftToggleForComposition() ?? false {
+        return true
+      }
       toggleAlphanumericalMode(
         popNotification: prefs.showNotificationsWhenTogglingShift
       )
+      // 智慧中英文切換模式下，額外顯示 "中"/"英" tooltip 提示（右上角通知照舊不變）。
+      if prefs.smartChineseEnglishSwitchEnabled {
+        var tooltipState = State.ofEmpty()
+        tooltipState.tooltip = isASCIIMode ? "英" : "中"
+        tooltipState.tooltipDuration = 1.5
+        tooltipState.data.tooltipColorState = .prompt
+        switchState(tooltipState)
+      }
       // Shift 處理完畢之後也有必要立刻返回處理結果。
       return true
     }

@@ -301,6 +301,67 @@ public struct PhonabetTypewriter<Handler: InputHandlerProtocol>: TypewriterProto
 }
 
 extension PhonabetTypewriter {
+  /// 按下 Shift 鍵時，若組字區有內容，做臨時中英文切換（不送出組字區）。
+  /// 切入英文模式顯示 tooltip "英"；切回中文模式顯示 tooltip "中"。
+  /// - Returns: `true` 表示已攔截並處理；`false` 表示組字區無內容，應交由全域切換處理。
+  func handleShiftToggle() -> Bool {
+    guard let session = handler.session else { return false }
+    let prefs = handler.prefs
+    guard prefs.smartChineseEnglishSwitchEnabled else { return false }
+
+    let hasComposition = !handler.smartSwitchState.frozenSegments.isEmpty
+      || !handler.assembler.isEmpty
+      || handler.smartSwitchState.isTempEnglishMode
+    guard hasComposition else { return false }
+
+    if handler.smartSwitchState.isTempEnglishMode {
+      // 目前為臨時英文模式 → 切回中文
+      let englishToKeep = handler.smartSwitchState.englishBuffer
+      _ = handler.smartSwitchState.exitTempEnglishMode()
+      if !englishToKeep.isEmpty {
+        handler.smartSwitchState.freezeSegment(englishToKeep)
+      }
+      if !handler.smartSwitchState.frozenSegments.isEmpty || !handler.assembler.isEmpty {
+        var state = handler.generateStateOfInputting(guarded: true)
+        state.tooltip = "中"
+        state.tooltipDuration = 1.5
+        state.data.tooltipColorState = .prompt
+        session.switchState(state)
+      } else {
+        session.switchState(State.ofAbortion())
+        var state = State.ofEmpty()
+        state.tooltip = "中"
+        state.tooltipDuration = 1.5
+        state.data.tooltipColorState = .prompt
+        session.switchState(state)
+      }
+    } else {
+      // 目前為中文模式 → 切入臨時英文模式
+      // 先凍結 assembler 內容，再儲存凍結段落。
+      // 之後 switchState(ofAbortion) 會呼叫 inputHandler.clear()（含 smartSwitchState.reset()），
+      // 所以必須在 ofAbortion 之後重新設置 frozenSegments，才能避免 assembler 重複顯示的 bug。
+      freezeAssemblerContentIfNeeded()
+      let savedFrozenSegments = handler.smartSwitchState.frozenSegments
+      session.switchState(State.ofAbortion())
+      for segment in savedFrozenSegments {
+        handler.smartSwitchState.freezeSegment(segment)
+      }
+      handler.smartSwitchState.enterTempEnglishMode()
+      let frozen = handler.smartSwitchState.frozenDisplayText
+      let buffer = handler.smartSwitchState.englishBuffer
+      var state = State.ofInputting(
+        displayTextSegments: [frozen, buffer].filter { !$0.isEmpty },
+        cursor: frozen.count + handler.smartSwitchState.englishBufferCursor,
+        highlightAt: nil
+      )
+      state.tooltip = "英"
+      state.tooltipDuration = 1.5
+      state.data.tooltipColorState = .prompt
+      session.switchState(state)
+    }
+    return true
+  }
+
   /// 以結構化形式返回前一個游標位置的讀音與字面資訊。
   /// - Returns: 可用於聲調覆寫的讀音快照。
   func getPreviousRearSyllableSnapshot() -> RearSyllableSnapshot? {

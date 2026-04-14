@@ -36,7 +36,7 @@
 >- ……
 >
 >**此 fork 新增之功能（個人修改版）：**
->- **智慧中英文切換**：注音輸入期間自動偵測英文詞彙，可流暢切換至英文緩衝區輸入；雙擊空白鍵可從英文緩衝區快速切回中文模式。
+>- **智慧中英文切換**：注音輸入期間自動偵測英文詞彙，可流暢切換至英文緩衝區輸入；雙擊空白鍵可從英文緩衝區快速切回中文模式；Shift 鍵可在組字區有內容時就地雙向切換中英輸入（顯示 tooltip「中」/「英」，組字區全程保留不送出）。
 >- **近似音設定**：可獨立啟用多組聲母（ㄅ↔ㄆ、ㄈ↔ㄏ、ㄌ↔ㄋ、ㄗ↔ㄓ、ㄘ↔ㄔ、ㄙ↔ㄕ）與韻母（ㄣ↔ㄥ、ㄢ↔ㄤ、ㄧㄣ↔ㄧㄥ、ㄨㄣ↔ㄨㄥ）容錯規則，取代原先單一的 ㄣ/ㄥ 開關。
 >- **數字快打**（連按兩次 `` ` `` 鍵觸發）：快速插入中文數字、大寫數字、日期、時間等格式。
 >- **近音表選字**（↑ 鍵觸發）：展開二維近音／同音候選表，方便事後修改罕用字。
@@ -116,6 +116,27 @@ $ EOF.
 ---
 
 ## Changelog（個人修改版）
+
+### 2026.04.14
+
+#### ✨ 新功能
+
+- **智慧中英文切換 — Shift 鍵就地切換**：在「智慧中英文切換」啟用時，Shift 鍵依組字區狀態分兩種行為：
+  - **組字區有內容**：就地切換臨時中英文模式。中文 → 英文時，原有注音文字凍結為前綴並進入英文緩衝區；英文 → 中文時，英文緩衝區內容凍結為新前綴並回到中文輸入。切換時顯示 tooltip「英」或「中」（1.5 秒），組字區全程不送出，按 Enter 才整段提交。
+  - **組字區為空**：維持原有全域 `isASCIIMode` 切換（右上角通知照舊），並額外顯示 tooltip「英」或「中」與組字區有內容時的切換視覺一致。
+
+#### 🐛 修復
+
+- 修正 Shift 就地切換（中 → 英 → 中）時，組字區文字重複顯示的 bug。根本原因：`freezeAssemblerContentIfNeeded()` 只複製文字至 `frozenSegments` 但不清除 assembler；切回中文時 `generateStateOfInputting()` 同時展示兩者造成重複。修正方式：參照 `triggerTempEnglishMode` 的流程，於凍結後呼叫 `switchState(ofAbortion)` 完整清除狀態再重設 `frozenSegments`。
+- 修正 Typewriter 套件測試檔案中呼叫已棄用 `connectToTestSQLDB` API 的問題（`AutoBracketTests`、`SimilarPhoneticTests`、`SmartSwitchTests`），更新為 `connectToTestFactoryDictionary(textMapData:)`。
+
+#### 🔧 維護
+
+- 修正所有 `Package.resolved` 中 `vChewing-VanguardLexicon` 版本鎖定不一致（4.3.2 → 4.3.3，revision `83b0f980`）。
+- 修正 Xcode 專案 `project.pbxproj` 缺少 `XCLocalSwiftPackageReference` 造成「Missing package product」的問題，補齊 `vChewing_MainAssembly4Darwin` 與 `vChewing_InstallerAssembly4Darwin` 的本地套件參照。
+- 更新 `CLAUDE.md`：補充 `vChewing_Shared` 模組說明、IMEState 類型對照表、SmartSwitchState fork-specific 說明。
+
+---
 
 ### 2026.04.13
 

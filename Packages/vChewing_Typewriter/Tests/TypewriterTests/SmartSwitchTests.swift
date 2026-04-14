@@ -37,7 +37,7 @@ final class SmartSwitchTests {
     // 初始化測試 LM
     let lm = LMAssembly.LMInstantiator(isCHS: false)
     self.testLM = lm
-    LMAssembly.LMInstantiator.connectToTestSQLDB(LMATestsData.sqlTestCoreLMData)
+    LMAssembly.LMInstantiator.connectToTestFactoryDictionary(textMapData: LMATestsData.textMapTestCoreLMData)
 
     // 初始化測試用的 handler 和 session
     let handler = MockInputHandler(lm: lm, pref: PrefMgr.sharedSansDidSetOps)

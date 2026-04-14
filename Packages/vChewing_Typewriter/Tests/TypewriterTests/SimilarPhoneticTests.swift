@@ -151,7 +151,7 @@ struct SimilarPhoneticHandlerTests {
 
   private func makeLM() -> LMAssembly.LMInstantiator {
     let lm = LMAssembly.LMInstantiator(isCHS: false)
-    LMAssembly.LMInstantiator.connectToTestSQLDB(LMATestsData.sqlTestCoreLMData)
+    LMAssembly.LMInstantiator.connectToTestFactoryDictionary(textMapData: LMATestsData.textMapTestCoreLMData)
     return lm
   }
 
