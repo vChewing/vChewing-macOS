@@ -62,6 +62,7 @@ make gitclean         # Remove all untracked files (use with care)
 | **vChewing_Tekkon** | Zhuyin/Bopomofo composer, keyboard parsers |
 | **vChewing_LangModelAssembly** | LM facade, user phrases, perception override |
 | **vChewing_OSFrameworkImpl** | AppKit Result Builder DSL for UI |
+| **vChewing_Shared** | Shared protocols: `IMEStateProtocol`, `StateType`, `KBEvent`, `PrefMgrProtocol` |
 
 ### State Machine Flow
 
@@ -76,14 +77,46 @@ SessionCtl → InputSession → InputHandler → Megrez → IMEState
 - **InputHandler** triages events and drives state transitions via **IMEState**.
 - When adding new APIs to InputSession/InputHandler, add to the protocol first (`InputHandlerProtocol`, `IMEStateProtocol`), then implement. Do not bypass state transitions using boolean flags.
 
+### IMEState Types
+
+Defined in `vChewing_Shared/Sources/Shared/Shared.swift` (`StateType` enum). Critical distinction:
+
+| State | Behaviour |
+|-------|-----------|
+| `ofDeactivated` | IME is inactive |
+| `ofEmpty` | Idle — if previous state had `hasComposition == true`, `switchState()` will **commit** its `displayedTextConverted` to the OS first |
+| `ofAbortion` | Clears state **without committing** — use this when discarding composition |
+| `ofCommitting` | Explicitly commits `textToCommit` to OS then transitions to `ofEmpty` |
+| `ofInputting` | Active preedit composition visible to user |
+| `ofMarking` | Text range selection mode |
+| `ofCandidates` | Candidate picker open |
+| `ofSymbolTable` / `ofSymbolTableGrid` | Symbol picker open |
+| `ofNumberInput` | Number quick-input mode |
+| `ofSimilarPhonetic` | Similar-phonetic candidate picker |
+| `ofAssociates` | Associated phrase picker |
+
+**Gotcha**: Switching to `ofEmpty` when the current state has `hasComposition == true` commits that state's text. To discard without committing, always switch to `ofAbortion` first.
+
 ### Key Entry Points
 
 - `Packages/vChewing_MainAssembly4Darwin/.../SessionController/SessionCtl.swift` — IMK entry point; event handling, UI updates.
 - `Packages/vChewing_MainAssembly4Darwin/.../LangModelManager/BundleAccessor.swift` — custom `Bundle.currentSPM` for factory lexicon resource lookup.
 - `Packages/vChewing_Typewriter/Sources/Typewriter/InputHandler/` — FSM, Tekkon/Megrez bridge.
+- `Packages/vChewing_Typewriter/Sources/Typewriter/InputHandler/InputHandler_CoreProtocol.swift` — `SmartSwitchState` class (smart Chinese-English switching, `frozenSegments`, double-tap Space); `InputHandlerProtocol`.
+- `Packages/vChewing_Typewriter/Sources/Typewriter/InputHandler/InputHandler_HandleStates.swift` — `generateStateOfInputting()` builds `ofInputting` state, prepending `frozenDisplayText` from `SmartSwitchState`.
 - `Packages/vChewing_Tekkon/Sources/Tekkon/` — Zhuyin/pinyin parsing, stroke composition.
 - `Packages/vChewing_Megrez/Sources/Megrez/` — DAG-DP sentence assembler, POM observation data.
 - `Packages/vChewing_LangModelAssembly/Sources/LangModelAssembly/` — LM facade, user phrases, POM memory.
+
+### SmartSwitchState (Fork-Specific)
+
+`SmartSwitchState` (in `InputHandler_CoreProtocol.swift`) manages smart Chinese-English switching:
+
+- **`isTempEnglishMode`**: When `true`, keystrokes flow to `englishBuffer` instead of the Zhuyin composer.
+- **`frozenSegments: [String]`**: Chinese/English text kept in preedit without committing to OS. Displayed as a prefix via `frozenDisplayText` in `generateStateOfInputting()`.
+- **`freezeSegment(_:)`**: Appends text to `frozenSegments`; `clearFrozenSegments()` wipes them.
+- **`exitTempEnglishMode()`**: Calls `resetExceptFrozen()`, preserving `frozenSegments` across the mode switch.
+- **Double-tap Space**: `recordFirstSpace()` / `tryConfirmDoubleSpace()` detect two SPACE presses within 0.3s to switch back to Chinese while keeping English text as a frozen prefix.
 
 ### Lexicon
 
