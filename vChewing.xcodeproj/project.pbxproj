@@ -299,7 +299,6 @@
 					};
 					6ACA41CA15FC1D7500935EF6 = {
 						LastSwiftMigration = 1320;
-						ProvisioningStyle = Automatic;
 					};
 				};
 			};
@@ -315,6 +314,8 @@
 			);
 			mainGroup = 6A0D4E9215FC0CFA00ABF4B3;
 			packageReferences = (
+				5B60EAC52EF4893900FFB49E /* XCLocalSwiftPackageReference "Packages/vChewing_InstallerAssembly4Darwin" */,
+				5B65FB362A9518DA007EEFB0 /* XCLocalSwiftPackageReference "Packages/vChewing_MainAssembly4Darwin" */,
 				5BC8EB7C2B7E1CC1004F5101 /* XCLocalSwiftPackageReference "Packages/vChewing_OtherIMEDataReader" */,
 			);
 			preferredProjectObjectVersion = 46;
@@ -709,7 +710,8 @@
 				CLANG_ENABLE_OBJC_WEAK = YES;
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
 				CODE_SIGN_ENTITLEMENTS = Sources/Installer_macOS/Resources/vChewingInstaller.entitlements;
-				CODE_SIGN_IDENTITY = "-";
+				CODE_SIGN_IDENTITY = "Apple Development";
+				"CODE_SIGN_IDENTITY[sdk=macosx*]" = "-";
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
 				CURRENT_PROJECT_VERSION = 20260406;
@@ -772,6 +774,14 @@
 /* End XCConfigurationList section */
 
 /* Begin XCLocalSwiftPackageReference section */
+		5B60EAC52EF4893900FFB49E /* XCLocalSwiftPackageReference "Packages/vChewing_InstallerAssembly4Darwin" */ = {
+			isa = XCLocalSwiftPackageReference;
+			relativePath = Packages/vChewing_InstallerAssembly4Darwin;
+		};
+		5B65FB362A9518DA007EEFB0 /* XCLocalSwiftPackageReference "Packages/vChewing_MainAssembly4Darwin" */ = {
+			isa = XCLocalSwiftPackageReference;
+			relativePath = Packages/vChewing_MainAssembly4Darwin;
+		};
 		5BC8EB7C2B7E1CC1004F5101 /* XCLocalSwiftPackageReference "Packages/vChewing_OtherIMEDataReader" */ = {
 			isa = XCLocalSwiftPackageReference;
 			relativePath = Packages/vChewing_OtherIMEDataReader;
@@ -781,10 +791,12 @@
 /* Begin XCSwiftPackageProductDependency section */
 		5B60EAC22EF4893900FFB49E /* InstallerAssembly4Darwin */ = {
 			isa = XCSwiftPackageProductDependency;
+			package = 5B60EAC52EF4893900FFB49E /* XCLocalSwiftPackageReference "Packages/vChewing_InstallerAssembly4Darwin" */;
 			productName = InstallerAssembly4Darwin;
 		};
 		5B65FB332A9518DA007EEFB0 /* MainAssembly4Darwin */ = {
 			isa = XCSwiftPackageProductDependency;
+			package = 5B65FB362A9518DA007EEFB0 /* XCLocalSwiftPackageReference "Packages/vChewing_MainAssembly4Darwin" */;
 			productName = MainAssembly4Darwin;
 		};
 /* End XCSwiftPackageProductDependency section */

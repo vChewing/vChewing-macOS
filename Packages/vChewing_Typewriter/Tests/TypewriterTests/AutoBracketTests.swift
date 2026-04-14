@@ -34,7 +34,7 @@ final class AutoBracketTests {
 
     let lm = LMAssembly.LMInstantiator(isCHS: false)
     self.testLM = lm
-    LMAssembly.LMInstantiator.connectToTestSQLDB(LMATestsData.sqlTestCoreLMData)
+    LMAssembly.LMInstantiator.connectToTestFactoryDictionary(textMapData: LMATestsData.textMapTestCoreLMData)
 
     let handler = MockInputHandler(lm: lm, pref: PrefMgr.sharedSansDidSetOps)
     let session = MockSession()

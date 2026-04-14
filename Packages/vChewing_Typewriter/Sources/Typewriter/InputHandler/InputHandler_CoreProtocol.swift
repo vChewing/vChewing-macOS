@@ -213,6 +213,10 @@ public protocol InputHandlerProtocol: AnyObject, InputHandlerCoreProtocol {
 
   /// 數字快打模式處理器
   var numberQuickInputHandler: NumberQuickInputHandler { get set }
+
+  /// 組字區有內容時，處理 Shift 鍵的臨時中英文切換。
+  /// - Returns: `true` 表示已在組字區內攔截處理；`false` 表示應交由全域切換處理。
+  func handleShiftToggleForComposition() -> Bool
 }
 
 // MARK: - KeyDropContext

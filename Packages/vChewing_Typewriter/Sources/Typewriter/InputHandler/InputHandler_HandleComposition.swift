@@ -32,6 +32,10 @@ extension InputHandlerProtocol {
     }
   }
 
+  public func handleShiftToggleForComposition() -> Bool {
+    PhonabetTypewriter(self).handleShiftToggle()
+  }
+
   func handleTypewriterSCPCTasks() {
     // 僅在啟用逐字選字模式時執行，避免干擾一般組字流程。
     guard prefs.useSCPCTypingMode else { return }
