@@ -59,9 +59,22 @@ extension LMAssembly {
       strData = rawStrData
       var newMap: [String: Range<String.Index>] = [:]
       strData.parse(splitee: "\n") { theRange in
-        let theCells = rawStrData[theRange].split(separator: " ")
-        if theCells.count < 2 { return }
-        let theKey = theCells[0].description
+        var keyRange: Range<String.Index>?
+        var valueRange: Range<String.Index>?
+        rawStrData.parseCells(in: theRange, splitee: " ") { currentRange, currentIndex in
+          switch currentIndex {
+          case 0:
+            keyRange = currentRange
+            return true
+          case 1:
+            valueRange = currentRange
+            return false
+          default:
+            return false
+          }
+        }
+        guard let keyRange, valueRange != nil else { return }
+        let theKey = String(rawStrData[keyRange])
         if theKey.first != "#" { newMap[theKey] = theRange }
       }
       rangeMap = newMap
@@ -97,11 +110,16 @@ extension LMAssembly {
       guard let range = rangeMap[key] else {
         return ""
       }
-      let arrNeta = strData[range].split(separator: " ")
-      guard arrNeta.count >= 2 else {
-        return ""
+      var fetchedValue = ""
+      strData.parseCells(in: range, splitee: " ") { currentRange, currentIndex in
+        guard currentIndex <= 1 else { return false }
+        if currentIndex == 1 {
+          fetchedValue = String(strData[currentRange])
+          return false
+        }
+        return true
       }
-      return String(arrNeta[1])
+      return fetchedValue
     }
 
     func hasValuesFor(key: String) -> Bool {

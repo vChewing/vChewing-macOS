@@ -626,6 +626,7 @@ public final class MockPrefMgr: PrefMgrProtocol {
   public var specifyShiftTabKeyBehavior: Bool = false
   public var specifyShiftSpaceKeyBehavior: Bool = false
   public var specifyCmdOptCtrlEnterBehavior: Int = 0
+  public var reflectBPMFVSInCompositionBuffer: Bool = false
   public var candidateTextFontName: String = ""
   public var candidateKeys: String = "123456789"
   public var candidateNarrationToggleType: Int = 0

@@ -7,6 +7,11 @@
 // marks, or product names of Contributor, except as required to fulfill notice
 // requirements defined in MIT License.
 
+// 以連續記憶體空間（contiguous Data blob）取代大量 Dictionary<String, [String]>，
+// 將 charDef / symbolDef / reverseLookup / octagram 等大型字典改為
+// sorted byte-range index + binary search，按需從 rawData 解析字串，
+// 大幅降低 heap allocation 與 Dictionary 開銷。
+
 import Foundation
 import LineReader
 import Megrez
@@ -15,7 +20,8 @@ import Megrez
 
 extension LMAssembly {
   /// 磁帶模組，用來方便使用者自行擴充字根輸入法。
-  nonisolated struct LMCassette: Sendable {
+  /// 以連續記憶體 Data blob + byte-range 索引取代各大型 Dictionary。
+  struct LMCassette: Sendable {
     // MARK: Internal
 
     private(set) var filePath: String?
@@ -30,18 +36,28 @@ extension LMAssembly {
     private(set) var endKeys: [String] = []
     private(set) var wildcardKey: String = ""
     private(set) var keysToDirectlyCommit: String = ""
+    /// 字根翻譯表（小型，~30 entries），保持 Dictionary。
     private(set) var keyNameMap: [String: String] = [:]
+    /// `%quick` 簡碼資料（中型），保持 Dictionary（值為字元拼接字串）。
     private(set) var quickDefMap: [String: String] = [:]
+    /// `%quickphrases` 詞語資料（極小，<10 entries），保持 Dictionary。
     private(set) var quickPhraseMap: [String: [String]] = [:]
     private(set) var quickPhraseCommissionKey: String = ""
-    private(set) var charDefMap: [String: [String]] = [:]
-    private(set) var charDefWildcardMap: [String: [String]] = [:]
-    private(set) var symbolDefMap: [String: [String]] = [:]
-    private(set) var reverseLookupMap: [String: [String]] = [:]
-    /// 字根輸入法專用八股文：[字詞:頻次]。
-    private(set) var octagramMap: [String: Int] = [:]
-    /// 音韻輸入法專用八股文：[字詞:(頻次, 讀音)]。
-    private(set) var octagramDividedMap: [String: (Int, String)] = [:]
+
+    // 大型資料結構改為 contiguous-memory 索引。
+    /// `%chardef` 字根→字詞對照，sorted by key UTF-8。
+    private(set) var charDefMap: CassetteSortedMap = .init()
+    /// `%chardef` wildcard 前綴對照，sorted by synthetic wildcard key UTF-8。
+    private(set) var charDefWildcardMap: CassetteSortedMap = .init()
+    /// `%symboldef` 符號選單資料，sorted by key UTF-8。
+    private(set) var symbolDefMap: CassetteSortedMap = .init()
+    /// 字→碼反向查詢（chardef + symboldef 合併），sorted by value UTF-8。
+    private(set) var reverseLookupMap: CassetteSortedMap = .init()
+    /// 字根輸入法專用八股文：字詞→頻次，sorted by key UTF-8。
+    private(set) var octagramMap: CassetteOctagramMap = .init()
+    /// 音韻輸入法專用八股文：字詞→(頻次, 讀音)，sorted by key UTF-8。
+    private(set) var octagramDividedMap: CassetteOctagramDividedMap = .init()
+
     private(set) var areCandidateKeysShiftHeld: Bool = false
     private(set) var supplyQuickResults: Bool = false
     private(set) var supplyPartiallyMatchedResults: Bool = false
@@ -54,12 +70,501 @@ extension LMAssembly {
   }
 }
 
-nonisolated extension LMAssembly.LMCassette {
+// MARK: - Contiguous-Memory Index Types
+
+extension LMAssembly {
+  /// 以連續 Data blob 承載的 sorted key→[value] 對照表。
+  /// 所有 key / value 字串皆以 byte range 指向 `rawData`，
+  /// 查詢時二分搜尋 + 按需物化，避免大量 String / Dictionary 開銷。
+  struct CassetteSortedMap: Sendable {
+    // MARK: Internal
+
+    /// 唯一 key 數量。
+    var count: Int { entries.count }
+    /// 是否為空。
+    var isEmpty: Bool { entries.isEmpty }
+
+    // MARK: Fileprivate
+
+    /// 連續記憶體空間，承載所有 key 與 value 的原始 UTF-8。
+    fileprivate var rawData: Data = .init()
+    /// 按 key UTF-8 排序的索引。每個 entry 擁有一段連續 values。
+    fileprivate var entries: [CassetteMapEntry] = []
+    /// 所有 values 的 byte range 平坦陣列，由 entry 的 valuesRange 切片。
+    fileprivate var allValues: [CassetteByteRange] = []
+  }
+
+  /// CassetteSortedMap 的單筆 key entry。
+  struct CassetteMapEntry: Sendable {
+    let keyStart: Int
+    let keyEnd: Int
+    /// 指向 `allValues` 陣列的範圍。
+    let valuesStart: Int
+    let valuesEnd: Int
+  }
+
+  /// Byte range 用以指向 rawData 中的一段 UTF-8 文字。
+  struct CassetteByteRange: Sendable {
+    let start: Int
+    let end: Int
+  }
+
+  /// 八股文 sorted map：字詞→頻次。
+  struct CassetteOctagramMap: Sendable {
+    // MARK: Internal
+
+    var count: Int { entries.count }
+    var isEmpty: Bool { entries.isEmpty }
+
+    // MARK: Fileprivate
+
+    fileprivate var rawData: Data = .init()
+    fileprivate var entries: [CassetteOctagramEntry] = []
+  }
+
+  struct CassetteOctagramEntry: Sendable {
+    let keyStart: Int
+    let keyEnd: Int
+    let count: Int
+  }
+
+  /// 八股文 divided sorted map：字詞→(頻次, 讀音)。
+  struct CassetteOctagramDividedMap: Sendable {
+    // MARK: Internal
+
+    var count: Int { entries.count }
+    var isEmpty: Bool { entries.isEmpty }
+
+    // MARK: Fileprivate
+
+    fileprivate var rawData: Data = .init()
+    fileprivate var entries: [CassetteOctagramDividedEntry] = []
+  }
+
+  struct CassetteOctagramDividedEntry: Sendable {
+    let keyStart: Int
+    let keyEnd: Int
+    let count: Int
+    let readingStart: Int
+    let readingEnd: Int
+  }
+}
+
+// MARK: - CassetteSortedMap: Binary Search & Query API
+
+extension LMAssembly.CassetteSortedMap {
+  /// 二分搜尋精確匹配。
+  fileprivate func binarySearchIndex(for key: String) -> Int? {
+    let keyUTF8 = Array(key.utf8)
+    var lo = 0, hi = entries.count - 1
+    while lo <= hi {
+      let mid = lo + (hi - lo) / 2
+      let e = entries[mid]
+      let cmp = rawData.cassetteCompareUTF8Range(e.keyStart ..< e.keyEnd, with: keyUTF8)
+      if cmp < 0 { lo = mid + 1 } else if cmp > 0 { hi = mid - 1 } else { return mid }
+    }
+    return nil
+  }
+
+  /// 精確查詢 key 對應的 values 字串陣列。
+  func valuesFor(key: String) -> [String]? {
+    guard let idx = binarySearchIndex(for: key) else { return nil }
+    let e = entries[idx]
+    var result = [String]()
+    result.reserveCapacity(e.valuesEnd - e.valuesStart)
+    for i in e.valuesStart ..< e.valuesEnd {
+      let vr = allValues[i]
+      result.append(String(decoding: rawData[vr.start ..< vr.end], as: UTF8.self))
+    }
+    return result
+  }
+
+  /// 下標存取（與舊版 Dictionary 相容）。
+  subscript(key: String) -> [String]? {
+    valuesFor(key: key)
+  }
+
+  /// 檢查是否含有指定 key。
+  func containsKey(_ key: String) -> Bool {
+    binarySearchIndex(for: key) != nil
+  }
+
+  /// 以前綴掃描取得所有 key 以 `prefix` 開頭的 entries 的 (key, values)。
+  /// 利用 sorted 特性做 lower-bound 搜尋 + 線性掃描。
+  func prefixScan(prefix: String) -> [(key: String, values: [String])] {
+    let prefixUTF8 = Array(prefix.utf8)
+    guard !prefixUTF8.isEmpty else { return [] }
+    // Lower bound.
+    var lo = 0, hi = entries.count
+    while lo < hi {
+      let mid = lo + (hi - lo) / 2
+      let e = entries[mid]
+      let cmp = rawData.cassetteCompareUTF8RangePrefix(e.keyStart ..< e.keyEnd, with: prefixUTF8)
+      if cmp < 0 { lo = mid + 1 } else { hi = mid }
+    }
+    var results = [(key: String, values: [String])]()
+    while lo < entries.count {
+      let e = entries[lo]
+      let keyLen = e.keyEnd - e.keyStart
+      guard keyLen >= prefixUTF8.count else { break }
+      var isPrefix = true
+      for i in 0 ..< prefixUTF8.count {
+        if rawData[e.keyStart + i] != prefixUTF8[i] { isPrefix = false; break }
+      }
+      guard isPrefix else { break }
+      let key = String(decoding: rawData[e.keyStart ..< e.keyEnd], as: UTF8.self)
+      var vals = [String]()
+      vals.reserveCapacity(e.valuesEnd - e.valuesStart)
+      for i in e.valuesStart ..< e.valuesEnd {
+        let vr = allValues[i]
+        vals.append(String(decoding: rawData[vr.start ..< vr.end], as: UTF8.self))
+      }
+      results.append((key, vals))
+      lo += 1
+    }
+    return results
+  }
+
+  /// 取得所有 keys（物化後）。測試用。
+  var keys: [String] {
+    entries.map { String(decoding: rawData[$0.keyStart ..< $0.keyEnd], as: UTF8.self) }
+  }
+}
+
+// MARK: - CassetteOctagramMap: Binary Search
+
+extension LMAssembly.CassetteOctagramMap {
+  fileprivate func binarySearchIndex(for key: String) -> Int? {
+    let keyUTF8 = Array(key.utf8)
+    var lo = 0, hi = entries.count - 1
+    while lo <= hi {
+      let mid = lo + (hi - lo) / 2
+      let e = entries[mid]
+      let cmp = rawData.cassetteCompareUTF8Range(e.keyStart ..< e.keyEnd, with: keyUTF8)
+      if cmp < 0 { lo = mid + 1 } else if cmp > 0 { hi = mid - 1 } else { return mid }
+    }
+    return nil
+  }
+
+  /// 查詢頻次。
+  subscript(key: String) -> Int? {
+    guard let idx = binarySearchIndex(for: key) else { return nil }
+    return entries[idx].count
+  }
+}
+
+extension LMAssembly.CassetteOctagramDividedMap {
+  fileprivate func binarySearchIndex(for key: String) -> Int? {
+    let keyUTF8 = Array(key.utf8)
+    var lo = 0, hi = entries.count - 1
+    while lo <= hi {
+      let mid = lo + (hi - lo) / 2
+      let e = entries[mid]
+      let cmp = rawData.cassetteCompareUTF8Range(e.keyStart ..< e.keyEnd, with: keyUTF8)
+      if cmp < 0 { lo = mid + 1 } else if cmp > 0 { hi = mid - 1 } else { return mid }
+    }
+    return nil
+  }
+
+  /// 查詢 (頻次, 讀音)。
+  subscript(key: String) -> (Int, String)? {
+    guard let idx = binarySearchIndex(for: key) else { return nil }
+    let e = entries[idx]
+    let reading = String(decoding: rawData[e.readingStart ..< e.readingEnd], as: UTF8.self)
+    return (e.count, reading)
+  }
+}
+
+// MARK: - Data Extension: UTF-8 Byte-Level Comparison
+
+extension Data {
+  fileprivate func cassetteCompareUTF8Range(_ range: Range<Int>, with rhs: [UInt8]) -> Int {
+    let lhsCount = range.count
+    let rhsCount = rhs.count
+    let minCount = Swift.min(lhsCount, rhsCount)
+    for i in 0 ..< minCount {
+      let lb = self[range.lowerBound + i]
+      let rb = rhs[i]
+      if lb < rb { return -1 }
+      if lb > rb { return 1 }
+    }
+    if lhsCount < rhsCount { return -1 }
+    if lhsCount > rhsCount { return 1 }
+    return 0
+  }
+
+  /// 比較 range 內的 bytes 是否「大於等於」prefix bytes（用於 lower-bound 搜尋）。
+  fileprivate func cassetteCompareUTF8RangePrefix(_ range: Range<Int>, with prefix: [UInt8]) -> Int {
+    let lhsCount = range.count
+    let prefixCount = prefix.count
+    let minCount = Swift.min(lhsCount, prefixCount)
+    for i in 0 ..< minCount {
+      let lb = self[range.lowerBound + i]
+      let rb = prefix[i]
+      if lb < rb { return -1 }
+      if lb > rb { return 1 }
+    }
+    if lhsCount < prefixCount { return -1 }
+    return 0
+  }
+}
+
+// MARK: - CassetteSortedMap Builder
+
+extension LMAssembly.CassetteSortedMap {
+  /// 直接從 grouped Dictionary 建構 sorted map，避免中間 `map {}` 與巢狀暫存陣列。
+  static func build(from dictionary: [String: [String]]) -> Self {
+    guard !dictionary.isEmpty else { return .init() }
+    var totalBytes = 0
+    var totalValueCount = 0
+    for (key, values) in dictionary {
+      totalBytes += key.utf8.count
+      totalValueCount += values.count
+      for value in values { totalBytes += value.utf8.count }
+    }
+    let sortedKeys = dictionary.keys.sorted { lhs, rhs in
+      lhs.utf8.lexicographicallyPrecedes(rhs.utf8)
+    }
+    var rawData = Data(capacity: totalBytes)
+    var entries = [LMAssembly.CassetteMapEntry]()
+    entries.reserveCapacity(sortedKeys.count)
+    var allValues = [LMAssembly.CassetteByteRange]()
+    allValues.reserveCapacity(totalValueCount)
+    for key in sortedKeys {
+      guard let values = dictionary[key] else { continue }
+      let keyStart = rawData.count
+      rawData.append(contentsOf: key.utf8)
+      let keyEnd = rawData.count
+      let valuesStart = allValues.count
+      for value in values {
+        let valueStart = rawData.count
+        rawData.append(contentsOf: value.utf8)
+        allValues.append(.init(start: valueStart, end: rawData.count))
+      }
+      entries.append(.init(
+        keyStart: keyStart,
+        keyEnd: keyEnd,
+        valuesStart: valuesStart,
+        valuesEnd: allValues.count
+      ))
+    }
+    var result = Self()
+    result.rawData = rawData
+    result.entries = entries
+    result.allValues = allValues
+    return result
+  }
+
+  /// 從 charDef grouped Dictionary 直接展開 wildcard map，避免再物化一份大型 wildcard Dictionary。
+  static func buildWildcard(from dictionary: [String: [String]], wildcard: String) -> Self {
+    guard !dictionary.isEmpty else { return .init() }
+    typealias Prototype = (key: String, values: [String])
+    var prototypeCount = 0
+    var totalValueBytes = 0
+    var totalValueCount = 0
+    for (key, values) in dictionary {
+      let wildcardDepth = key.count
+      guard wildcardDepth > 0 else { continue }
+      prototypeCount += wildcardDepth
+      totalValueCount += values.count * wildcardDepth
+      let perValueBytes = values.reduce(into: 0) { partialResult, value in
+        partialResult += value.utf8.count
+      }
+      totalValueBytes += perValueBytes * wildcardDepth
+    }
+    var prototypes = [Prototype]()
+    prototypes.reserveCapacity(prototypeCount)
+    for (key, values) in dictionary {
+      var prefix = key
+      while !prefix.isEmpty {
+        prefix.removeLast()
+        prototypes.append((prefix + wildcard, values))
+      }
+    }
+    guard !prototypes.isEmpty else { return .init() }
+    prototypes.sort { lhs, rhs in
+      lhs.key.utf8.lexicographicallyPrecedes(rhs.key.utf8)
+    }
+    var totalKeyBytes = 0
+    var previousKey: String?
+    for prototype in prototypes where prototype.key != previousKey {
+      totalKeyBytes += prototype.key.utf8.count
+      previousKey = prototype.key
+    }
+    var rawData = Data(capacity: totalKeyBytes + totalValueBytes)
+    var entries = [LMAssembly.CassetteMapEntry]()
+    var allValues = [LMAssembly.CassetteByteRange]()
+    entries.reserveCapacity(prototypes.count)
+    allValues.reserveCapacity(totalValueCount)
+    var index = 0
+    while index < prototypes.count {
+      let currentKey = prototypes[index].key
+      let keyStart = rawData.count
+      rawData.append(contentsOf: currentKey.utf8)
+      let keyEnd = rawData.count
+      let valuesStart = allValues.count
+      while index < prototypes.count, prototypes[index].key == currentKey {
+        for value in prototypes[index].values {
+          let valueStart = rawData.count
+          rawData.append(contentsOf: value.utf8)
+          allValues.append(.init(start: valueStart, end: rawData.count))
+        }
+        index += 1
+      }
+      entries.append(.init(
+        keyStart: keyStart,
+        keyEnd: keyEnd,
+        valuesStart: valuesStart,
+        valuesEnd: allValues.count
+      ))
+    }
+    var result = Self()
+    result.rawData = rawData
+    result.entries = entries
+    result.allValues = allValues
+    return result
+  }
+
+  /// 直接從 charDef / symbolDef 建立 reverse lookup，避免解析期同時持有另一份大型 reverse Dictionary。
+  static func buildReverseLookup(
+    charDefs: [String: [String]],
+    symbolDefs: [String: [String]]
+  )
+    -> Self {
+    typealias Prototype = (lookupKey: String, sourceKey: String)
+
+    func makePrototypes(from dictionary: [String: [String]]) -> [Prototype] {
+      var prototypeCount = 0
+      for values in dictionary.values { prototypeCount += values.count }
+      var prototypes = [Prototype]()
+      prototypes.reserveCapacity(prototypeCount)
+      for (sourceKey, values) in dictionary {
+        for lookupKey in values {
+          prototypes.append((lookupKey, sourceKey))
+        }
+      }
+      return prototypes
+    }
+
+    var prototypes = makePrototypes(from: charDefs)
+    prototypes.append(contentsOf: makePrototypes(from: symbolDefs))
+    guard !prototypes.isEmpty else { return .init() }
+    prototypes.sort { lhs, rhs in
+      lhs.lookupKey.utf8.lexicographicallyPrecedes(rhs.lookupKey.utf8)
+    }
+    var totalKeyBytes = 0
+    var totalValueBytes = 0
+    var previousLookupKey: String?
+    for prototype in prototypes {
+      if prototype.lookupKey != previousLookupKey {
+        totalKeyBytes += prototype.lookupKey.utf8.count
+        previousLookupKey = prototype.lookupKey
+      }
+      totalValueBytes += prototype.sourceKey.utf8.count
+    }
+    var rawData = Data(capacity: totalKeyBytes + totalValueBytes)
+    var entries = [LMAssembly.CassetteMapEntry]()
+    entries.reserveCapacity(prototypes.count)
+    var allValues = [LMAssembly.CassetteByteRange]()
+    allValues.reserveCapacity(prototypes.count)
+    var index = 0
+    while index < prototypes.count {
+      let currentLookupKey = prototypes[index].lookupKey
+      let keyStart = rawData.count
+      rawData.append(contentsOf: currentLookupKey.utf8)
+      let keyEnd = rawData.count
+      let valuesStart = allValues.count
+      while index < prototypes.count, prototypes[index].lookupKey == currentLookupKey {
+        let valueStart = rawData.count
+        rawData.append(contentsOf: prototypes[index].sourceKey.utf8)
+        allValues.append(.init(start: valueStart, end: rawData.count))
+        index += 1
+      }
+      entries.append(.init(
+        keyStart: keyStart,
+        keyEnd: keyEnd,
+        valuesStart: valuesStart,
+        valuesEnd: allValues.count
+      ))
+    }
+    var result = Self()
+    result.rawData = rawData
+    result.entries = entries
+    result.allValues = allValues
+    return result
+  }
+}
+
+// MARK: - CassetteOctagramMap Builder
+
+extension LMAssembly.CassetteOctagramMap {
+  static func build(from dictionary: [String: Int]) -> Self {
+    guard !dictionary.isEmpty else { return .init() }
+    let sortedKeys = dictionary.keys.sorted { lhs, rhs in
+      lhs.utf8.lexicographicallyPrecedes(rhs.utf8)
+    }
+    var totalBytes = 0
+    for key in sortedKeys { totalBytes += key.utf8.count }
+    var rawData = Data(capacity: totalBytes)
+    var entries = [LMAssembly.CassetteOctagramEntry]()
+    entries.reserveCapacity(sortedKeys.count)
+    for key in sortedKeys {
+      guard let count = dictionary[key] else { continue }
+      let keyStart = rawData.count
+      rawData.append(contentsOf: key.utf8)
+      entries.append(.init(keyStart: keyStart, keyEnd: rawData.count, count: count))
+    }
+    var result = Self()
+    result.rawData = rawData
+    result.entries = entries
+    return result
+  }
+}
+
+extension LMAssembly.CassetteOctagramDividedMap {
+  static func build(from dictionary: [String: (Int, String)]) -> Self {
+    guard !dictionary.isEmpty else { return .init() }
+    let sortedKeys = dictionary.keys.sorted { lhs, rhs in
+      lhs.utf8.lexicographicallyPrecedes(rhs.utf8)
+    }
+    var totalBytes = 0
+    for key in sortedKeys {
+      guard let value = dictionary[key] else { continue }
+      totalBytes += key.utf8.count + value.1.utf8.count
+    }
+    var rawData = Data(capacity: totalBytes)
+    var entries = [LMAssembly.CassetteOctagramDividedEntry]()
+    entries.reserveCapacity(sortedKeys.count)
+    for key in sortedKeys {
+      guard let value = dictionary[key] else { continue }
+      let keyStart = rawData.count
+      rawData.append(contentsOf: key.utf8)
+      let keyEnd = rawData.count
+      let readingStart = rawData.count
+      rawData.append(contentsOf: value.1.utf8)
+      entries.append(.init(
+        keyStart: keyStart,
+        keyEnd: keyEnd,
+        count: value.0,
+        readingStart: readingStart,
+        readingEnd: rawData.count
+      ))
+    }
+    var result = Self()
+    result.rawData = rawData
+    result.entries = entries
+    return result
+  }
+}
+
+// MARK: - LMCassette Public API
+
+extension LMAssembly.LMCassette {
   /// 計算頻率時要用到的東西 - fscale
   private static let fscale = 2.7
   /// 萬用花牌字符，哪怕花牌鍵仍不可用。
   var wildcard: String { wildcardKey.isEmpty ? "†" : wildcardKey }
-  /// 資料陣列內承載的核心 charDef 資料筆數。
+  /// 資料陣列內承載的核心 charDef 資料筆數（唯一 key 數量）。
   var count: Int { charDefMap.count }
   /// 是否已有資料載入。
   var isLoaded: Bool { !charDefMap.isEmpty }
@@ -101,6 +606,13 @@ nonisolated extension LMAssembly.LMCassette {
         let lineReader = try LineReader(file: fileHandle)
         var theMaxKeyLength = 1
         var loadingKeys = false
+
+        // 僅保留必要的 grouped Dictionary；reverse / wildcard 改在建構期以輕量 prototype 直接生成。
+        var tmpCharDef = [String: [String]]()
+        var tmpSymbolDef = [String: [String]]()
+        var tmpOctagram = [String: Int]()
+        var tmpOctagramDivided = [String: (Int, String)]()
+
         var loadingQuickSets = false {
           willSet {
             supplyQuickResults = true
@@ -109,12 +621,12 @@ nonisolated extension LMAssembly.LMCassette {
         }
         var loadingCharDefinitions = false {
           willSet {
-            if !newValue, charDefMap.keys.contains(wildcardKey) { wildcardKey = "" }
+            if !newValue, tmpCharDef.keys.contains(wildcardKey) { wildcardKey = "" }
           }
         }
         var loadingSymbolDefinitions = false {
           willSet {
-            if !newValue, symbolDefMap.keys.contains(wildcardKey) { wildcardKey = "" }
+            if !newValue, tmpSymbolDef.keys.contains(wildcardKey) { wildcardKey = "" }
           }
         }
         var loadingOctagramData = false
@@ -219,27 +731,20 @@ nonisolated extension LMAssembly.LMCassette {
             quickPhraseMap[strFirstCell] = phrases
           } else if loadingCharDefinitions, !loadingSymbolDefinitions {
             theMaxKeyLength = max(theMaxKeyLength, cells[0].count)
-            charDefMap[strFirstCell, default: []].append(strSecondCell)
+            tmpCharDef[strFirstCell, default: []].append(strSecondCell)
             if strFirstCell.count > 1 {
               strFirstCell.map(\.description).forEach { keyChar in
                 keysUsedInCharDef.insert(keyChar.description)
               }
             }
-            reverseLookupMap[strSecondCell, default: []].append(strFirstCell)
-            var keyComps = strFirstCell.map(\.description)
-            while !keyComps.isEmpty {
-              keyComps.removeLast()
-              charDefWildcardMap[keyComps.joined() + wildcard, default: []].append(strSecondCell)
-            }
           } else if loadingSymbolDefinitions {
             theMaxKeyLength = max(theMaxKeyLength, cells[0].count)
-            symbolDefMap[strFirstCell, default: []].append(strSecondCell)
-            reverseLookupMap[strSecondCell, default: []].append(strFirstCell)
+            tmpSymbolDef[strFirstCell, default: []].append(strSecondCell)
           } else if loadingOctagramData {
             guard let countValue = Int(strSecondCell) else { continue }
             switch cells.count {
-            case 2: octagramMap[strFirstCell] = countValue
-            case 3: octagramDividedMap[strFirstCell] = (
+            case 2: tmpOctagram[strFirstCell] = countValue
+            case 3: tmpOctagramDivided[strFirstCell] = (
                 countValue,
                 cells[2].trimmingCharacters(in: .newlines)
               )
@@ -250,14 +755,22 @@ nonisolated extension LMAssembly.LMCassette {
           }
         }
         // Post process.
-        // 備註：因為 Package 層級嵌套的現狀，此處不太方便檢查是否需要篩掉 J / K 鍵。
-        // 因此只能在其他地方做篩檢。
         if !candidateKeysValidator(selectionKeys) { selectionKeys = "1234567890" }
         if !keysUsedInCharDef.intersection(selectionKeys.map(\.description)).isEmpty {
           areCandidateKeysShiftHeld = true
         }
         maxKeyLength = theMaxKeyLength
         keyNameMap[wildcardKey] = keyNameMap[wildcardKey] ?? "？"
+
+        // 直接從 grouped Dictionary 建構最終索引，避免 reverse / wildcard 的額外大型暫存結構。
+        let theWildcard = wildcard
+        charDefMap = .build(from: tmpCharDef)
+        charDefWildcardMap = .buildWildcard(from: tmpCharDef, wildcard: theWildcard)
+        symbolDefMap = .build(from: tmpSymbolDef)
+        reverseLookupMap = .buildReverseLookup(charDefs: tmpCharDef, symbolDefs: tmpSymbolDef)
+        octagramMap = .build(from: tmpOctagram)
+        octagramDividedMap = .build(from: tmpOctagramDivided)
+
         filePath = path
         return true
       } catch {
@@ -271,18 +784,17 @@ nonisolated extension LMAssembly.LMCassette {
   }
 
   mutating func clear() {
-    // 明確清理所有字典以釋放記憶體
     keyNameMap.removeAll(keepingCapacity: false)
     quickDefMap.removeAll(keepingCapacity: false)
     quickPhraseMap.removeAll(keepingCapacity: false)
-    charDefMap.removeAll(keepingCapacity: false)
-    charDefWildcardMap.removeAll(keepingCapacity: false)
-    symbolDefMap.removeAll(keepingCapacity: false)
-    reverseLookupMap.removeAll(keepingCapacity: false)
-    octagramMap.removeAll(keepingCapacity: false)
-    octagramDividedMap.removeAll(keepingCapacity: false)
     endKeys.removeAll(keepingCapacity: false)
-
+    // 重置 sorted maps。
+    charDefMap = .init()
+    charDefWildcardMap = .init()
+    symbolDefMap = .init()
+    reverseLookupMap = .init()
+    octagramMap = .init()
+    octagramDividedMap = .init()
     // 重置為初始狀態
     self = .init()
   }
@@ -295,16 +807,14 @@ nonisolated extension LMAssembly.LMCassette {
     }
     if supplyQuickResults, result.isEmpty {
       if supplyPartiallyMatchedResults {
-        let fetched = charDefMap.compactMap {
-          $0.key.starts(with: key) ? $0 : nil
-        }.stableSort {
-          $0.key.count < $1.key.count
-        }.flatMap(\.value).filter {
-          $0.count == 1
-        }
+        // 改用 sorted map 的前綴掃描。
+        let fetched = charDefMap.prefixScan(prefix: key)
+          .sorted { $0.key.count < $1.key.count }
+          .flatMap(\.values)
+          .filter { $0.count == 1 }
         result.append(contentsOf: fetched.deduplicated.prefix(selectionKeys.count * 6))
       } else {
-        let fetched = (charDefMap[key] ?? [String]()).filter { $0.count == 1 }
+        let fetched = (charDefMap.valuesFor(key: key) ?? []).filter { $0.count == 1 }
         result.append(contentsOf: fetched.deduplicated.prefix(selectionKeys.count * 6))
       }
     }
@@ -325,9 +835,9 @@ nonisolated extension LMAssembly.LMCassette {
   ///   - key: 讀音索引鍵。
   func unigramsFor(key: String, keyArray: [String]? = nil) -> [Megrez.Unigram] {
     let keyArray = keyArray ?? key.split(separator: "-").map(\.description)
-    let arrRaw = charDefMap[key]?.deduplicated ?? []
+    let arrRaw = (charDefMap.valuesFor(key: key) ?? []).deduplicated
     var arrRawWildcard: [String] = []
-    if let arrRawWildcardValues = charDefWildcardMap[key]?.deduplicated,
+    if let arrRawWildcardValues = charDefWildcardMap.valuesFor(key: key)?.deduplicated,
        key.contains(wildcard), key.first?.description != wildcard {
       arrRawWildcard.append(contentsOf: arrRawWildcardValues)
     }
@@ -367,8 +877,8 @@ nonisolated extension LMAssembly.LMCassette {
   /// - parameters:
   ///   - key: 讀音索引鍵。
   func hasUnigramsFor(key: String) -> Bool {
-    if charDefMap[key] != nil { return true }
-    guard charDefWildcardMap[key] != nil else { return false }
+    if charDefMap.containsKey(key) { return true }
+    guard charDefWildcardMap.containsKey(key) else { return false }
     guard key.contains(wildcard) else { return false }
     return key.first?.description != wildcard
   }

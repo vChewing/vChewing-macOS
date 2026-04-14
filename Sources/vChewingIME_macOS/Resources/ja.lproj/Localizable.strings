@@ -289,6 +289,8 @@
 "i18n:UserDef.kReadingNarrationCoverage.shortTitle" = "音読組立の朗読";
 "i18n:UserDef.kReducePOMLifetimeToNoMoreThan12Hours.description" = "有効にすると、臨時記憶モジュールの忘却サイクルが約1週間から12時間以内に短縮され、使用頻度の低いメモリレコードがより迅速にクリアされます。";
 "i18n:UserDef.kReducePOMLifetimeToNoMoreThan12Hours.shortTitle" = "急速忘却モードを有効にする";
+"i18n:UserDef.kReflectBPMFVSInCompositionBuffer.description" = "Command+Option+Ctrl+Enter が ButKo BPMFVS 注音表記送出に設定されている場合にのみ有効です。有効にすると、入力緩衝列と候補プレビューも ButKo BPMFVS 投影結果で表示され、画面上の字形を特殊送出結果とできるだけ一致させます。";
+"i18n:UserDef.kReflectBPMFVSInCompositionBuffer.shortTitle" = "入力緩衝列にも ButKo BPMFVS を反映";
 "i18n:UserDef.kReplaceSymbolMenuNodeWithUserSuppliedData.description" = "修飾キーなしで[符号メニューキー]を単打すると階層符号メニューが表示されます。この機能を有効にすると、符号メニューにはユーザー辞書フォルダに任意で配置可能な `symbols.dat`（酷音符号データファイル形式に準拠）の内容のみが表示されます。この機能をオフにすると、ユーザー提供の内容はデフォルトの符号メニューのルートノードの末尾サブノードとして追加されます。";
 "i18n:UserDef.kReplaceSymbolMenuNodeWithUserSuppliedData.shortTitle" = "階層符号メニューの内容全体をユーザー提供の `symbols.dat` データで置き換える";
 "i18n:UserDef.kRespectClientAccentColor.description" = "これで田所候補陳列ウィンドウの「選択中の候補の背景色」を「今が文字入力を受けている客体アプリのアクセントカラー」と一致することになる。もしその客体アプリ自体のアクセントカラーが未指定であり、あるいはシステムのアクセントカラーがデフォルト値ではないのなら、システム設定でのアクセントカラーに準ず。１つ例外状況：JIS / 康熙字体変換モードがONの場合、このチェックは効かぬ。";
@@ -311,11 +313,12 @@
 "i18n:UserDef.kSpecifiedNotifyUIColorScheme.option.enforceDark" = "ダーク (暗い)";
 "i18n:UserDef.kSpecifiedNotifyUIColorScheme.option.notSpecified" = "不指定";
 "i18n:UserDef.kSpecifiedNotifyUIColorScheme.title" = "通知ウインドウの外観モード:";
-"i18n:UserDef.kSpecifyCmdOptCtrlEnterBehavior.description" = "カセットモードがONにした場合、このショートカットで点字を送り出すのはできなくて、代わりに「発音表記（丸括弧仕様）」を送り出します。尚、他の点字機能のご希望の場合、他の特別の点字ツールソフトのご使用はお薦めです。";
+"i18n:UserDef.kSpecifyCmdOptCtrlEnterBehavior.description" = "カセットモードがONにした場合、このショートカットで点字を送り出すのはできなくて、代わりに「発音表記（丸括弧仕様）」を送り出します。尚、他の点字機能のご希望の場合、他の特別の点字ツールソフトのご使用はお薦めです。ButKo BPMFVS 機能を利用するには、このコンピュータに規格準拠の専用フォントがインストールされている必要があります。そうでない場合、関連情報が正しく表示されないことがあります。";
 "i18n:UserDef.kSpecifyCmdOptCtrlEnterBehavior.option.0" = "発音表記（丸括弧仕様）を送出";
 "i18n:UserDef.kSpecifyCmdOptCtrlEnterBehavior.option.1" = "発音表記（HTML ルビ仕様）を送出";
 "i18n:UserDef.kSpecifyCmdOptCtrlEnterBehavior.option.2" = "中国語点字 (1947) を送出";
 "i18n:UserDef.kSpecifyCmdOptCtrlEnterBehavior.option.3" = "中国語点字 (GF0019-2018) を送出";
+"i18n:UserDef.kSpecifyCmdOptCtrlEnterBehavior.option.4" = "ButKo BPMFVS 注音表記を送出";
 "i18n:UserDef.kSpecifyCmdOptCtrlEnterBehavior.shortTitle" = "Command+Option+Ctrl+Enter:";
 "i18n:UserDef.kUserPhrasesDatabaseBypassed.description" = "これを有効にすると、ユーザー辞書フォルダ内の（関連文節データ以外の）すべての編集可能なデータが無視されます。開発者が言葉の組み立てに関連する特定の悪質な故障が抑制されるかどうか（すなわち、そのユーザー辞書データに原因があるかどうか）を確認するために、有効化するよう依頼することがあります。";
 "i18n:UserDef.kUserPhrasesDatabaseBypassed.shortTitle" = "ユーザー辞書を無効化";

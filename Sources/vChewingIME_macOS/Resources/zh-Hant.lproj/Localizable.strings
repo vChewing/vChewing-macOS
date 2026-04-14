@@ -292,6 +292,8 @@
 "i18n:UserDef.kReadingNarrationCoverage.shortTitle" = "要唸讀的組音區內容";
 "i18n:UserDef.kReducePOMLifetimeToNoMoreThan12Hours.description" = "啟用後，漸退記憶模組的遺忘週期將從約一週降低至 12 小時內，更快地清除不常用的記憶記錄。";
 "i18n:UserDef.kReducePOMLifetimeToNoMoreThan12Hours.shortTitle" = "啟用急速遺忘模式";
+"i18n:UserDef.kReflectBPMFVSInCompositionBuffer.description" = "僅在 Command+Option+Ctrl+Enter 被設為遞交 ButKo BPMFVS 注音標記時生效。啟用後，組字區與候選預覽也會直接顯示 ButKo BPMFVS 投影結果，讓畫面字形盡量與特殊遞交結果一致。";
+"i18n:UserDef.kReflectBPMFVSInCompositionBuffer.shortTitle" = "在組字區同步反映 ButKo BPMFVS";
 "i18n:UserDef.kReplaceSymbolMenuNodeWithUserSuppliedData.description" = "在未按住修飾鍵的情況下單擊[符號選單鍵]會觸發層級符號選單。啟用該功能後，該符號選單將僅呈現由 `symbols.dat` 提供的內容（該檔案可自行放置於使用者辭典資料夾中，需遵循酷音符號資料檔案格式）。關閉該功能後，這些使用者提供的內容將改為追加至出廠符號選單根節點的末尾子節點。";
 "i18n:UserDef.kReplaceSymbolMenuNodeWithUserSuppliedData.shortTitle" = "以使用者提供的 `symbols.dat` 資料完全取代層級符號選單內容";
 "i18n:UserDef.kRespectClientAccentColor.description" = "這會使田所選字窗的高亮候選字詞背景色優先改用當前接收文字輸入的客體應用的強調主題色，與 macOS 內建輸入法的行為一致。如果當前接收文字輸入的客體應用沒有專門指定強調主題色（或者系統主題色被設定為非預設值）的話，則會自動改用系統偏好設定內的系統全局強調主題色。注意：該特性在啟用了 JIS / 康熙文字轉換模式時不會生效。";
@@ -314,11 +316,12 @@
 "i18n:UserDef.kSpecifiedNotifyUIColorScheme.option.enforceDark" = "深色模式";
 "i18n:UserDef.kSpecifiedNotifyUIColorScheme.option.notSpecified" = "不指定";
 "i18n:UserDef.kSpecifiedNotifyUIColorScheme.title" = "通知飄窗配色外觀:";
-"i18n:UserDef.kSpecifyCmdOptCtrlEnterBehavior.description" = "在磁帶模式下，該熱鍵組合將不再遞交點字陣列（屆時會改為遞交括弧註解標記）。如另有對點字/盲文功能的更專業的需求的話，請考慮使用專門的點字/盲文工具軟體。";
+"i18n:UserDef.kSpecifyCmdOptCtrlEnterBehavior.description" = "在磁帶模式下，該熱鍵組合將不再遞交點字陣列（屆時會改為遞交括弧註解標記）。如另有對點字/盲文功能的更專業的需求的話，請考慮使用專門的點字/盲文工具軟體。若要使用 ButKo BPMFVS 功能，目前電腦另須安裝符合相關標準的專用字型，方可確保相關資訊得以正常顯示。";
 "i18n:UserDef.kSpecifyCmdOptCtrlEnterBehavior.option.0" = "遞交括弧註解標記";
 "i18n:UserDef.kSpecifyCmdOptCtrlEnterBehavior.option.1" = "遞交 HTML Ruby 註解標記";
 "i18n:UserDef.kSpecifyCmdOptCtrlEnterBehavior.option.2" = "遞交國語點字 (1947)";
 "i18n:UserDef.kSpecifyCmdOptCtrlEnterBehavior.option.3" = "遞交國通盲文 (GF0019-2018)";
+"i18n:UserDef.kSpecifyCmdOptCtrlEnterBehavior.option.4" = "遞交 ButKo BPMFVS 注音標記";
 "i18n:UserDef.kSpecifyCmdOptCtrlEnterBehavior.shortTitle" = "Command+Option+Ctrl+Enter:";
 "i18n:UserDef.kUserPhrasesDatabaseBypassed.description" = "啟用後，使用者辭典資料夾內所有可編輯的資料將被忽略（但關聯詞語除外）。開發者可能會請您啟用此項，以協助確認與組句有關的某些惡性故障是否與使用者辭典資料內容有關。";
 "i18n:UserDef.kUserPhrasesDatabaseBypassed.shortTitle" = "暫時停用使用者語彙資料庫";

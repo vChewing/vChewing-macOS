@@ -52,8 +52,8 @@ final class MainAssemblyTests {
   init() {
     Self.ensureServerInitialized()
     UserDefaults.unitTests = .init(suiteName: "org.atelierInmu.vChewing.MainAssembly.UnitTests")
-    UserDef.resetAll()
     UserDefaults.pendingUnitTests = true
+    UserDef.resetAll()
     LMMgr.prepareForUnitTests()
     testLM = LMAssembly.LMInstantiator.construct { _ in
       LMAssembly.LMInstantiator.connectToTestFactoryDictionary(textMapData: LMATestsData.sqlTestCoreLMData)
@@ -75,6 +75,14 @@ final class MainAssemblyTests {
     // Sync language model preferences
     LMMgr.syncLMPrefs()
     testClient.clear()
+  }
+
+  deinit {
+    mainSync {
+      LMMgr.resetAfterUnitTests()
+    }
+    UserDefaults.unitTests?.removeSuite(named: "org.atelierInmu.vChewing.MainAssembly.UnitTests")
+    UserDefaults.pendingUnitTests = false
   }
 
   // MARK: Internal
