@@ -1,0 +1,35 @@
+注音字型破音字標記資料，衍生自[注音IVS字型規格](https://github.com/ButTaiwan/bpmfvs)
+專案的[國字讀音整理檔](https://github.com/ButTaiwan/bpmfvs/tree/master/phonetic)，
+該專案作者為 But Ko，採 Apache License v2.0 發布。
+https://github.com/ButTaiwan/bpmfvs/raw/refs/heads/master/LICENSE-2.0.txt
+
+---
+
+Bopomofo IVS Font Specification
+注音IVS字型規格
+Copyright 2020 But Ko
+
+    https://github.com/ButTaiwan/bpmfvs
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+    http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+
+---
+
+本專案所有程式碼（.rb）
+與標註用注音字型（GenyoMinBopomofo-Regular.ttf／f_bpmfgen.js）
+均以 Apache 2.0 授權條款釋出。
+
+此專案所參考之資料來源授權方式另外標示
+
+衍生自此專案所製作之各字型檔，可訂定不同授權條款。
+但應依循 Apache 2.0 規範標示原始著作權聲明與修改內容。

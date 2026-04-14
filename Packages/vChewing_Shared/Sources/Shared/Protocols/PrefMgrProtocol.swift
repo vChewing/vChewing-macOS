@@ -111,6 +111,7 @@ public protocol PrefMgrProtocol {
   var specifyShiftTabKeyBehavior: Bool { get set }
   var specifyShiftSpaceKeyBehavior: Bool { get set }
   var specifyCmdOptCtrlEnterBehavior: Int { get set }
+  var reflectBPMFVSInCompositionBuffer: Bool { get set }
   var candidateTextFontName: String { get set }
   var candidateKeys: String { get set }
   var candidateNarrationToggleType: Int { get set }

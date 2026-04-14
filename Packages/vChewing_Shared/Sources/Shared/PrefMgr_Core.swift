@@ -328,6 +328,9 @@ public final class PrefMgr: PrefMgrProtocol, Sendable {
   @AppProperty(userDef: .kSpecifyCmdOptCtrlEnterBehavior)
   public var specifyCmdOptCtrlEnterBehavior: Int
 
+  @AppProperty(userDef: .kReflectBPMFVSInCompositionBuffer)
+  public var reflectBPMFVSInCompositionBuffer: Bool
+
   // MARK: - Optional settings
 
   @AppProperty(userDef: .kCandidateTextFontName)
@@ -497,7 +500,7 @@ extension PrefMgr {
     if ![0, 1, 2, 3].contains(romanNumeralOutputFormat) {
       romanNumeralOutputFormat = 0
     }
-    if ![0, 1, 2, 3].contains(specifyCmdOptCtrlEnterBehavior) {
+    if ![0, 1, 2, 3, 4].contains(specifyCmdOptCtrlEnterBehavior) {
       specifyCmdOptCtrlEnterBehavior = 0
     }
     if ![0, 1, 2].contains(beepSoundPreference) {

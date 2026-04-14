@@ -292,6 +292,8 @@
 "i18n:UserDef.kReadingNarrationCoverage.shortTitle" = "Reading composer contents to narrate";
 "i18n:UserDef.kReducePOMLifetimeToNoMoreThan12Hours.description" = "When enabled, the perception override model's forgetting cycle will be reduced from approximately one week to within 12 hours, clearing infrequently used memory records more quickly.";
 "i18n:UserDef.kReducePOMLifetimeToNoMoreThan12Hours.shortTitle" = "Enable rapid forgetting mode";
+"i18n:UserDef.kReflectBPMFVSInCompositionBuffer.description" = "Only takes effect when Command+Option+Ctrl+Enter is set to commit ButKo BPMFVS annotation. When enabled, the composition buffer and candidate preview show the projected ButKo BPMFVS form so the visible glyphs stay aligned with the special-commit result.";
+"i18n:UserDef.kReflectBPMFVSInCompositionBuffer.shortTitle" = "Reflect ButKo BPMFVS in composition buffer";
 "i18n:UserDef.kReplaceSymbolMenuNodeWithUserSuppliedData.description" = "Single-tapping [Symbol Menu Key] without modifier keys triggers the hierarchical symbol menu. By enabling this feature, this symbol menu will represent only the contents supplied by `symbols.dat` which is optionally suppliable in the user dictionary folder, conforming to LibChewing symbol data file format. If toggling this off, these user-supplied contents will instead become the trailing subnode of the root node of the factory symbol menu contents.";
 "i18n:UserDef.kReplaceSymbolMenuNodeWithUserSuppliedData.shortTitle" = "Replace the entire hierarchical symbol menu contents with user-supplied `symbols.dat` data";
 "i18n:UserDef.kRespectClientAccentColor.description" = "This will force the highlighted candidate background color to follow the accent color of the current client app, behaving like what macOS built-in input methods do. If it doesn't have one (or the system accent color is set with a non-default value), then the system accent color will be used instead. Note that this won't be effective if either JIS or KangXi conversion mode is enabled.";
@@ -314,11 +316,12 @@
 "i18n:UserDef.kSpecifiedNotifyUIColorScheme.option.enforceDark" = "Dark Mode";
 "i18n:UserDef.kSpecifiedNotifyUIColorScheme.option.notSpecified" = "Not Specified";
 "i18n:UserDef.kSpecifiedNotifyUIColorScheme.title" = "Notifier Window Color Scheme:";
-"i18n:UserDef.kSpecifyCmdOptCtrlEnterBehavior.description" = "This hotkey commits bracketed annotation instead of braille sequence if cassette mode is enabled. Also, please consider using those dedicated braille utility softwares if you have more professional necessities.";
+"i18n:UserDef.kSpecifyCmdOptCtrlEnterBehavior.description" = "This hotkey commits bracketed annotation instead of braille sequence if cassette mode is enabled. Also, please consider using those dedicated braille utility softwares if you have more professional necessities. Using ButKo BPMFVS also requires a standards-compliant font to be installed on this computer; otherwise, the related information may not display correctly.";
 "i18n:UserDef.kSpecifyCmdOptCtrlEnterBehavior.option.0" = "Commit Bracketed Annotation";
 "i18n:UserDef.kSpecifyCmdOptCtrlEnterBehavior.option.1" = "Commit HTML Ruby Annotation";
 "i18n:UserDef.kSpecifyCmdOptCtrlEnterBehavior.option.2" = "Commit Mandarin Braille (1947)";
 "i18n:UserDef.kSpecifyCmdOptCtrlEnterBehavior.option.3" = "Commit Mandarin Braille (GF0019-2018)";
+"i18n:UserDef.kSpecifyCmdOptCtrlEnterBehavior.option.4" = "Commit ButKo BPMFVS Annotation";
 "i18n:UserDef.kSpecifyCmdOptCtrlEnterBehavior.shortTitle" = "Command+Option+Ctrl+Enter:";
 "i18n:UserDef.kUserPhrasesDatabaseBypassed.description" = "When enabled, all editable data in your User Phrases folder will be ignored (except Associated Phrases data). The developer may ask you to enable this to help determine whether it suppresses certain pernicious issues related to sentence composition.";
 "i18n:UserDef.kUserPhrasesDatabaseBypassed.shortTitle" = "Bypass the User Phrases database";

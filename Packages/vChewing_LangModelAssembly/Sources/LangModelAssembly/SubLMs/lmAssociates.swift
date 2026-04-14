@@ -72,17 +72,22 @@ extension LMAssembly {
       strData = rawStrData
       var newMap: [String: [(Range<String.Index>, Int)]] = [:]
       strData.parse(splitee: "\n") { theRange in
-        let theCells = rawStrData[theRange].split(separator: " ")
-        if theCells.count >= 2 {
-          let theKey = theCells[0].description
-          if theKey.first != "#" {
-            for (i, _) in theCells.enumerated() {
-              if i == 0 { continue }
-              if theCells[i].first == "#" { continue }
-              let newKey = Self.cnvNGramKeyFromPinyinToPhona(target: theKey)
-              newMap[newKey, default: []].append((theRange, i))
-            }
+        var keyRange: Range<String.Index>?
+        var convertedKey: String?
+        rawStrData.parseCells(in: theRange, splitee: " ") { currentRange, currentIndex in
+          if currentIndex == 0 {
+            keyRange = currentRange
+            return rawStrData[currentRange].first != "#"
           }
+          guard rawStrData[currentRange].first != "#" else { return false }
+          guard let keyRange else { return false }
+          let newKey = convertedKey ?? {
+            let computed = Self.cnvNGramKeyFromPinyinToPhona(target: String(rawStrData[keyRange]))
+            convertedKey = computed
+            return computed
+          }()
+          newMap[newKey, default: []].append((theRange, currentIndex))
+          return true
         }
       }
       rangeMap = newMap
@@ -111,9 +116,14 @@ extension LMAssembly {
       let availableResults = [rangeMap[pair.toNGramKey], rangeMap[pair.value]].compactMap { $0 }
       availableResults.forEach { arrRangeRecords in
         arrRangeRecords.forEach { netaRange, index in
-          let neta = strData[netaRange].split(separator: " ")
-          let theValue: String = .init(neta[index])
-          pairs.append(theValue)
+          strData.parseCells(in: netaRange, splitee: " ") { currentRange, currentIndex in
+            guard currentIndex <= index else { return false }
+            if currentIndex == index {
+              pairs.append(String(strData[currentRange]))
+              return false
+            }
+            return true
+          }
         }
       }
       return pairs.deduplicated
@@ -131,9 +141,14 @@ extension LMAssembly.LMAssociates {
     var result = [String: [String]]()
     rangeMap.forEach { key, arrRangeRecords in
       arrRangeRecords.forEach { netaRange, index in
-        let neta = strData[netaRange].split(separator: " ")
-        let theValue: String = .init(neta[index])
-        result[key, default: []].append(theValue)
+        strData.parseCells(in: netaRange, splitee: " ") { currentRange, currentIndex in
+          guard currentIndex <= index else { return false }
+          if currentIndex == index {
+            result[key, default: []].append(String(strData[currentRange]))
+            return false
+          }
+          return true
+        }
       }
     }
     return result

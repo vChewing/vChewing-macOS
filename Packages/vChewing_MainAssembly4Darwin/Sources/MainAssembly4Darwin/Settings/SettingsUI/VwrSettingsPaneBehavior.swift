@@ -33,10 +33,26 @@ public struct VwrSettingsPaneBehavior: View {
         UserDef.kSpecifyShiftBackSpaceKeyBehavior.renderUI()
         UserDef.kSpecifyShiftTabKeyBehavior.renderUI()
           .pickerStyle(RadioGroupPickerStyle())
+      }
+
+      Section {
+        UserDef.kSpecifyShiftSpaceKeyBehavior.renderUI()
+        UserDef.kUseSpaceToCommitHighlightedSCPCCandidate.renderUI()
+      }
+
+      Section {
         UserDef.kSpecifyCmdOptCtrlEnterBehavior.renderUI()
         VStack(alignment: .leading) {
-          UserDef.kSpecifyShiftSpaceKeyBehavior.renderUI()
-          UserDef.kUseSpaceToCommitHighlightedSCPCCandidate.renderUI()
+          UserDef.kReflectBPMFVSInCompositionBuffer.renderUI()
+          if let urlBPMFVS = URL(string: "https://github.com/ButTaiwan/bpmfvs") {
+            Link(destination: urlBPMFVS) {
+              Text(verbatim: "→ BPMFVS @ GitHub")
+                .controlSize(.small)
+                .multilineTextAlignment(.leading)
+                .frame(maxWidth: .infinity, alignment: .leading)
+                .foregroundStyle(Color.accentColor)
+            }
+          }
         }
       }
 

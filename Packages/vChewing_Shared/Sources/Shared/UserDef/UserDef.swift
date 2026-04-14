@@ -64,6 +64,7 @@ nonisolated public enum UserDef: String, CaseIterable, Identifiable, Sendable {
   case kSpecifyShiftTabKeyBehavior = "SpecifyShiftTabKeyBehavior"
   case kSpecifyShiftSpaceKeyBehavior = "SpecifyShiftSpaceKeyBehavior"
   case kSpecifyCmdOptCtrlEnterBehavior = "SpecifyCmdOptCtrlEnterBehavior"
+  case kReflectBPMFVSInCompositionBuffer = "ReflectBPMFVSInCompositionBuffer"
   case kAllowRescoringSingleKanjiCandidates = "AllowRescoringSingleKanjiCandidates"
   case kUseSCPCTypingMode = "UseSCPCTypingMode"
   case kMaxCandidateLength = "MaxCandidateLength"
@@ -384,7 +385,7 @@ nonisolated public enum UserDef: String, CaseIterable, Identifiable, Sendable {
     case .kRomanNumeralOutputFormat:
       if ![0, 1, 2, 3].contains(value) { return "Must be 0..3" }
     case .kSpecifyCmdOptCtrlEnterBehavior:
-      if ![0, 1, 2, 3].contains(value) { return "Must be 0..3" }
+      if ![0, 1, 2, 3, 4].contains(value) { return "Must be 0..4" }
     case .kBeepSoundPreference:
       if ![0, 1, 2].contains(value) { return "Must be 0, 1, or 2" }
     case .kCursorPlacementAfterSelectingCandidate:
@@ -481,6 +482,7 @@ nonisolated extension UserDef {
     case .kSpecifyShiftTabKeyBehavior: return .bool(false)
     case .kSpecifyShiftSpaceKeyBehavior: return .bool(false)
     case .kSpecifyCmdOptCtrlEnterBehavior: return .integer(0)
+    case .kReflectBPMFVSInCompositionBuffer: return .bool(true)
     case .kAllowRescoringSingleKanjiCandidates: return .bool(false)
     case .kUseSCPCTypingMode: return .bool(false)
     case .kMaxCandidateLength: return .integer(10)
@@ -811,7 +813,13 @@ nonisolated extension UserDef {
           1: "i18n:UserDef.kSpecifyCmdOptCtrlEnterBehavior.option.1",
           2: "i18n:UserDef.kSpecifyCmdOptCtrlEnterBehavior.option.2",
           3: "i18n:UserDef.kSpecifyCmdOptCtrlEnterBehavior.option.3",
+          4: "i18n:UserDef.kSpecifyCmdOptCtrlEnterBehavior.option.4",
         ]
+      )
+    case .kReflectBPMFVSInCompositionBuffer: return .init(
+        userDef: self,
+        shortTitle: "i18n:UserDef.kReflectBPMFVSInCompositionBuffer.shortTitle",
+        description: "i18n:UserDef.kReflectBPMFVSInCompositionBuffer.description"
       )
     case .kAllowRescoringSingleKanjiCandidates: return .init(
         userDef: self,

@@ -16,6 +16,7 @@ private enum CommitableMarkupType: Int {
   case textWithHTMLRubyAnnotations = 1
   case braille1947 = 2
   case braille2018 = 3
+  case bpmfvsAnnotationButKo = 4
 
   // MARK: Internal
 
@@ -74,6 +75,7 @@ extension InputHandlerProtocol {
   /// 2. HTML Ruby 注音標記。
   /// 3. 國語點字 (1947)。
   /// 4. 國通盲文 (GF0019-2018)。
+  /// 5. ButKo BPMFVS 注音標記。
   /// - Parameter isShiftPressed: 有沒有同時摁著 Shift 鍵。摁了的話則只遞交讀音字串。
   /// - Returns: 將按鍵行為「是否有處理掉」藉由 SessionCtl 回報給 IMK。
   func commissionByCtrlOptionCommandEnter(isShiftPressed: Bool = false) -> String {
@@ -93,6 +95,9 @@ extension InputHandlerProtocol {
   }
 
   private func specifyTextMarkupToCommit(behavior: CommitableMarkupType) -> String {
+    if behavior == .bpmfvsAnnotationButKo {
+      return BPMFVS.convertToBPMFVS(smashedPairs: assembler.assembledSentence.smashedPairs)
+    }
     var composed = ""
     assembler.assembledSentence.smashedPairs.forEach { key, value in
       var key = key
@@ -119,6 +124,7 @@ extension InputHandlerProtocol {
           .contains("_") ? value : "<ruby>\(value)<rp>(</rp><rt>\(key)</rt><rp>)</rp></ruby>"
       case .braille1947: break // 另案處理
       case .braille2018: break // 另案處理
+      case .bpmfvsAnnotationButKo: break // 已於進入點另案處理
       }
     }
     return composed
