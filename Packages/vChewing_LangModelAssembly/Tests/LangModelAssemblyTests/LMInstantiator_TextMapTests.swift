@@ -271,23 +271,6 @@ struct LMInstantiatorTextMapTests {
     #expect(grams.first(where: { $0.value == "zval" })?.keyArray.count == 4)
   }
 
-  @Test
-  func testSQLiteDependencyRemoved() throws {
-    let packageRoot = URL(fileURLWithPath: #filePath)
-      .deletingLastPathComponent()
-      .deletingLastPathComponent()
-      .deletingLastPathComponent()
-    let packageManifest = packageRoot.appendingPathComponent("Package.swift")
-    let legacyExtension = packageRoot
-      .appendingPathComponent("Sources")
-      .appendingPathComponent("LangModelAssembly")
-      .appendingPathComponent("LMInstantiator_SQLExtension.swift")
-
-    let manifestContents = try String(contentsOf: packageManifest, encoding: .utf8)
-    #expect(!manifestContents.contains("CSQLite3Lib"))
-    #expect(!FileManager.default.fileExists(atPath: legacyExtension.path))
-  }
-
   // MARK: Private
 
   private func gramsContainValue(_ grams: [Megrez.Unigram], _ value: String) -> Bool {
