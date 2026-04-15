@@ -28,6 +28,7 @@ $tf/
 *.dbmdl
 *.dbproj.schemaview
 *.dmg
+*.zip
 *.dotCover
 *.DotSettings.user
 *.e2e
