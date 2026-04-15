@@ -163,7 +163,7 @@ extension InputHandlerProtocol {
           )
           let associatedCandidates = generateArrayOfAssociates(withPair: pair)
           guard !associatedCandidates.isEmpty else { break associatedPhrases }
-          session.switchState(State.ofCommitting(textToCommit: state.displayedText))
+          session.switchState(State.ofCommitting(textToCommit: committableDisplayText(sansReading: true)))
           session.switchState(State.ofAssociates(candidates: associatedCandidates))
         }
         return true

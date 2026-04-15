@@ -70,7 +70,7 @@ extension InputHandlerProtocol {
       strCodePointBuffer.removeAll()
     }
     var updatedState = generateStateOfInputting(sansReading: true)
-    session.switchState(State.ofCommitting(textToCommit: updatedState.displayedText))
+    session.switchState(State.ofCommitting(textToCommit: committableDisplayText(sansReading: true)))
     updatedState = generateStateOfInputting(guarded: true)
     updatedState.tooltipDuration = 0
     updatedState.tooltip = newMethod.getTooltip(vertical: session.isVerticalTyping)

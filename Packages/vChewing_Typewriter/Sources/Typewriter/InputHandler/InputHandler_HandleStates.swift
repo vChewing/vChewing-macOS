@@ -104,6 +104,38 @@ extension InputHandlerProtocol {
     }
   }
 
+  /// 組字區可以投影成 BPMFVS 顯示，但一般遞交流程只能吃原始內容。
+  /// 此函式同時處理 SmartSwitch 的凍結段落與暫時英文模式，確保遞交內容完整。
+  public func committableDisplayText(sansReading: Bool = false) -> String {
+    // 暫時英文模式：直接回傳凍結段落 + 英文緩衝，不經由組字區。
+    if smartSwitchState.isTempEnglishMode {
+      return smartSwitchState.frozenDisplayText + smartSwitchState.englishBuffer
+    }
+    let handleAsCodePointInput = currentTypingMethod == .codePoint && !sansReading
+    let handleAsRomanNumeralInput = currentTypingMethod == .romanNumerals && !sansReading
+    var displayTextSegments: [String] = handleAsCodePointInput || handleAsRomanNumeralInput
+      ? [strCodePointBuffer]
+      : compositionBufferDisplayTextSegments(reflectBPMFVS: false)
+    // 若 smartSwitchState 有凍結段落，將其前置於遞交內容。
+    if !smartSwitchState.frozenSegments.isEmpty {
+      displayTextSegments = smartSwitchState.frozenSegments + displayTextSegments
+    }
+    displayTextSegments = displayTextSegments.map { $0.trimmingCharacters(in: .newlines) }
+    var displayedText = displayTextSegments.joined()
+    let noReading = sansReading || [.codePoint, .romanNumerals].contains(currentTypingMethod)
+    let reading: String = noReading ? "" : readingForDisplay
+    guard !reading.isEmpty else { return displayedText }
+    let cursor = max(
+      min(
+        convertCursorForDisplay(assembler.cursor) + smartSwitchState.frozenDisplayText.count,
+        displayedText.count
+      ), 0
+    )
+    let insertionIndex = displayedText.index(displayedText.startIndex, offsetBy: cursor)
+    displayedText.insert(contentsOf: reading, at: insertionIndex)
+    return displayedText
+  }
+
   /// 生成「在有單獨的前置聲調符號輸入時」的工具提示。
   var tooltipForStandaloneIntonationMark: String {
     guard !isComposerUsingPinyin else { return "" }
@@ -427,7 +459,7 @@ extension InputHandlerProtocol {
 
     guard state.type == .ofInputting else { return false }
 
-    var displayedText = state.displayedText
+    var displayedText = committableDisplayText()
 
     // 凍結段落的清理（防禦性）：
     // - 注音路徑（PhonabetTypewriter）在 Enter 時會透過 shouldResetSmartSwitchState 提前 reset()，
@@ -750,7 +782,7 @@ extension InputHandlerProtocol {
       session.switchState(State.ofAbortion())
     } else {
       if isComposerOrCalligrapherEmpty {
-        let commitText = generateStateOfInputting(sansReading: true).displayedText
+        let commitText = committableDisplayText(sansReading: true)
         session.switchState(State.ofCommitting(textToCommit: commitText))
         return true
       }
@@ -1049,14 +1081,14 @@ extension InputHandlerProtocol {
           "Please manually implement the symbols of this menu \nin the user phrase file with “_punctuation_list” key."
             .i18n
         vCLog("8EB3FB1A: " + errorMessage)
-        let textToCommit = generateStateOfInputting(sansReading: true).displayedText
+        let textToCommit = committableDisplayText(sansReading: true)
         session.switchState(State.ofCommitting(textToCommit: textToCommit))
         session.switchState(State.ofCommitting(textToCommit: isJIS ? "_" : "`"))
         return true
       }
     } else {
       // 得在這裡先 commit buffer，不然會導致「在摁 ESC 離開符號選單時會重複輸入上一次的組字區的內容」的不當行為。
-      let textToCommit = generateStateOfInputting(sansReading: true).displayedText
+      let textToCommit = committableDisplayText(sansReading: true)
       session.switchState(State.ofCommitting(textToCommit: textToCommit))
       session.switchState(State.ofSymbolTable(node: CandidateNode.root))
       return true
@@ -1074,7 +1106,7 @@ extension InputHandlerProtocol {
     )
     guard let rootNode = rootNode else { return false }
     // 得在這裡先 commit buffer，不然會導致「在摁 ESC 離開符號選單時會重複輸入上一次的組字區的內容」的不當行為。
-    let textToCommit = generateStateOfInputting(sansReading: true).displayedText
+    let textToCommit = committableDisplayText(sansReading: true)
     session.switchState(State.ofCommitting(textToCommit: textToCommit))
     session.switchState(State.ofSymbolTable(node: rootNode))
     return true
@@ -1175,13 +1207,13 @@ extension InputHandlerProtocol {
         switch prefs.upperCaseLetterKeyBehavior {
         case 1, 3:
           if prefs.upperCaseLetterKeyBehavior == 3, !isConsideredEmptyForNow { break }
-          let commitText = generateStateOfInputting(sansReading: true).displayedText
+          let commitText = committableDisplayText(sansReading: true)
           session
             .switchState(State.ofCommitting(textToCommit: commitText + inputText.lowercased()))
           return true
         case 2, 4:
           if prefs.upperCaseLetterKeyBehavior == 4, !isConsideredEmptyForNow { break }
-          let commitText = generateStateOfInputting(sansReading: true).displayedText
+          let commitText = committableDisplayText(sansReading: true)
           session
             .switchState(State.ofCommitting(textToCommit: commitText + inputText.uppercased()))
           return true
@@ -1288,7 +1320,7 @@ extension InputHandlerProtocol {
     guard let result = maybeResult else { return false }
     let root = CandidateNode(name: queryString, symbols: result)
     // 得在這裡先 commit buffer，不然會導致「在摁 ESC 離開符號選單時會重複輸入上一次的組字區的內容」的不當行為。
-    let textToCommit = generateStateOfInputting(sansReading: true).displayedText
+    let textToCommit = committableDisplayText(sansReading: true)
     session.switchState(State.ofCommitting(textToCommit: textToCommit))
     session.switchState(State.ofSymbolTable(node: root))
     return true

@@ -111,14 +111,9 @@ extension InputHandlerProtocol {
             inputting.textToCommit = textToCommit
             session.switchState(inputting)
           } else {
-            let displayedText = state.displayedText
-            let hadFrozenSegments = !smartSwitchState.frozenSegments.isEmpty
+            let displayedText = committableDisplayText()
             if !displayedText.isEmpty, !isConsideredEmptyForNow {
               session.switchState(State.ofCommitting(textToCommit: displayedText))
-              // 凍結段落已隨 displayedText 一同送出，需同步清除，避免下次狀態生成時重複前置。
-              if hadFrozenSegments {
-                smartSwitchState.clearFrozenSegments()
-              }
             }
             session.switchState(State.ofCommitting(textToCommit: " "))
           }
