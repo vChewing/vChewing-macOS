@@ -46,9 +46,12 @@ extension SessionProtocol {
       if next.type == .ofCommitting {
         // `commit()` 會自行完成 JIS / 康熙轉換。
         commit(text: next.textToCommit)
-      } else if next.type == .ofEmpty, previous.hasComposition {
+      } else if next.type == .ofEmpty, previous.hasComposition, let inputHandler {
         // `commit()` 會自行完成 JIS / 康熙轉換。
-        commit(text: previous.displayedText)
+        let textToCommit = inputHandler.committableDisplayText(
+          sansReading: previous.type != .ofInputting
+        )
+        commit(text: textToCommit)
       }
       inputHandler?.clear()
       if state.type != .ofEmpty {

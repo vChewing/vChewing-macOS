@@ -144,17 +144,7 @@ extension SessionProtocol {
       (state.type == .ofInputting)
         && (prefs.trimUnfinishedReadingsOnCommit || forceCleanup)
     if state.hasComposition {
-      // 若處於暫時英文模式，需將凍結段落與英文緩衝一併納入提交內容，
-      // 因為 generateStateOfInputting() 不包含 englishBuffer。
-      if inputHandler.smartSwitchState.isTempEnglishMode {
-        let frozen = inputHandler.smartSwitchState.frozenDisplayText
-        let english = inputHandler.smartSwitchState.englishBuffer
-        textToCommit = ChineseConverter.kanjiConversionIfRequired(frozen + english)
-      } else {
-        textToCommit = inputHandler
-          .generateStateOfInputting(sansReading: sansReading)
-          .displayedTextConverted
-      }
+      textToCommit = inputHandler.committableDisplayText(sansReading: sansReading)
     }
     // 唯音不再在這裡對 IMKTextInput 客體黑名單當中的應用做資安措施。
     // 有相關需求者，請在切換掉輸入法或者切換至新的客體應用之前敲一下 Shift+Delete。

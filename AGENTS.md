@@ -198,6 +198,49 @@ Examples:
 5. **NO Python3 scripts** on macOS (prefer PowerShell, C#, or Swift)
 6. **NO bridging headers** for Xcode builds
 
+## Upstream Merge Policy
+
+This fork (`ThomasHsieh/vChewing-macOS`) tracks `upstream` (`vChewing/vChewing-macOS`). Follow these rules whenever merging upstream changes:
+
+### Core Principle — Fork Features Must Not Break
+
+Fork-specific features take priority over any upstream refactoring. The features that require protection are:
+
+- **SmartSwitch** (`SmartSwitchState` in `InputHandler_CoreProtocol.swift`): `isTempEnglishMode`, `frozenSegments`, `englishBuffer`, double-tap Space.
+- **Date-based versioning** (`YYYY.MM.DD` / `YYYYMMDD`).
+- **`kReflectBPMFVSInCompositionBuffer` default = `true`** (upstream default is `false`).
+
+### Rules
+
+1. **Pause on fork-touching conflicts.** If an upstream diff modifies lines that also contain fork-specific logic, do not silently pick either side. Present the conflict to the user and wait for a decision.
+
+2. **`committableDisplayText()` is fork-extended** (added upstream in 4.3.4). The fork's version must:
+   - When `smartSwitchState.isTempEnglishMode == true` → return `frozenDisplayText + englishBuffer` directly.
+   - Otherwise → prepend `frozenSegments` to `displayTextSegments` and offset cursor by `frozenDisplayText.count`.
+   Any upstream change to this function must preserve both extensions.
+
+3. **Never adopt upstream's semantic version.** Keep the fork's `YYYY.MM.DD` scheme in `Release-Version.plist`, `Update-Info.plist`, `vChewing.pkgproj`, and `vChewing.xcodeproj/project.pbxproj`.
+
+4. **Never change `kReflectBPMFVSInCompositionBuffer` default** from `true` to `false` during a merge.
+
+5. **Verify after merging** by running:
+   ```bash
+   swift test --package-path ./Packages/vChewing_Typewriter
+   ```
+   All SmartSwitch tests (`SmartSwitchTests`, `InputHandlerTests_*`) must pass before the merge commit is finalised.
+
+### Merge Commit Format
+
+```
+Merge: Sync upstream X.Y.Z <brief description>.
+
+- <what upstream added>
+- <fork-specific adaptations made>
+- Version bumped to YYYY.MM.DD (fork scheme).
+
+Co-Authored-By: Claude Sonnet 4.6 <noreply@anthropic.com>
+```
+
 ## License Headers
 
 Preserve MIT-NTL license banner on new source files:

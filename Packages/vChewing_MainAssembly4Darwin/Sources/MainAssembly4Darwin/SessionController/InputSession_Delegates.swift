@@ -302,7 +302,7 @@ extension SessionProtocol {
       var result: State = inputHandler.generateStateOfInputting()
       defer { switchState(result) } // 這是最終輸出結果。
       if prefs.useSCPCTypingMode {
-        switchState(.ofCommitting(textToCommit: result.displayedText))
+        switchState(.ofCommitting(textToCommit: inputHandler.committableDisplayText(sansReading: true)))
         // 此時是逐字選字模式，所以「selectedValue.value」是單個字、不用追加處理。
         if prefs.associatedPhrasesEnabled {
           let associates = inputHandler.generateStateOfAssociates(
@@ -332,7 +332,7 @@ extension SessionProtocol {
         callError("907F9F64")
         return
       }
-      let strToCommitFirst = inputHandler.generateStateOfInputting(sansReading: true).displayedText
+      let strToCommitFirst = inputHandler.committableDisplayText(sansReading: true)
       switchState(.ofCommitting(textToCommit: strToCommitFirst + chosenStr))
     default: return
     }
@@ -404,7 +404,7 @@ extension SessionProtocol {
     var newState: State =
       updateResult
         ? inputHandler.generateStateOfCandidates(dodge: false)
-        : .ofCommitting(textToCommit: state.displayedText)
+        : .ofCommitting(textToCommit: inputHandler.committableDisplayText(sansReading: true))
     newState.tooltipDuration = 1.85
     var tooltipMessage = ""
     switch action {

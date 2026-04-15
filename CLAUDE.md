@@ -183,6 +183,26 @@ Add on new source files (unless the package uses a different license):
 // requirements defined in MIT License.
 ```
 
+## Upstream Merge Policy
+
+When merging commits from `upstream` (`vChewing/vChewing-macOS`) into this fork:
+
+1. **Fork features must be preserved.** The highest priority is ensuring fork-specific behaviours (SmartSwitch / `SmartSwitchState`, date-based versioning, etc.) are not broken or silently overwritten.
+
+2. **Discuss before overriding fork code.** If an upstream change touches the same lines as fork-specific logic — particularly around `committableDisplayText()`, `generateStateOfInputting()`, `frozenSegments`, `isTempEnglishMode`, or `englishBuffer` — pause and present the conflict to the user before resolving it. Do not silently take the upstream version.
+
+3. **`committableDisplayText()` is fork-extended.** This function was added upstream in 4.3.4. The fork extends it to:
+   - Return `frozenDisplayText + englishBuffer` when `smartSwitchState.isTempEnglishMode == true`.
+   - Prepend `frozenSegments` to `displayTextSegments` before joining.
+   - Offset the cursor by `smartSwitchState.frozenDisplayText.count`.
+   Any upstream refactoring of this function must preserve these fork extensions.
+
+4. **`kReflectBPMFVSInCompositionBuffer` default is `true` in this fork** (upstream default is `false`). Never silently change defaults when merging.
+
+5. **Version scheme:** This fork uses date-based versioning (`YYYY.MM.DD` / `YYYYMMDD`). Always keep the fork's version — never adopt upstream's semantic version (`X.Y.Z` / `XYZZ`) during a merge.
+
+6. **After resolving all conflicts**, run `swift test --package-path ./Packages/vChewing_Typewriter` to confirm SmartSwitch tests still pass before committing the merge.
+
 ## Things to Avoid
 
 - Hardcoded user data paths (test targets excepted).
