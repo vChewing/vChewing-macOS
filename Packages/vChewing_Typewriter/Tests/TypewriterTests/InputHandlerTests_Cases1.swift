@@ -225,6 +225,113 @@ extension InputHandlerTests {
     #expect(testSession.recentCommissions.joined() == "咱地")
   }
 
+  /// 確認 BPMFVS 投影不會污染 marking state 的使用者加詞操作。
+  @Test
+  func test_IH103D_ButKoBPMFVSMarkingStateDoesNotPollute() throws {
+    guard let testHandler, let testSession else {
+      Issue.record("testHandler and testSession at least one of them is nil.")
+      return
+    }
+    let testKanjiData = """
+    ㄗㄚˊ 咱 -1
+    ㄉㄜ˙ 地 -1
+    """
+    let extractedGrams = extractGrams(from: testKanjiData)
+    extractedGrams.forEach {
+      testHandler.currentLM.insertTemporaryData(unigram: $0, isFiltering: false)
+    }
+    defer {
+      testHandler.currentLM.clearTemporaryData(isFiltering: false)
+      testHandler.clear()
+    }
+
+    clearTestPOM()
+    testHandler.clear()
+    testHandler.prefs.fetchSuggestionsFromPerceptionOverrideModel = false
+    testHandler.prefs.specifyCmdOptCtrlEnterBehavior = 4
+    testHandler.prefs.reflectBPMFVSInCompositionBuffer = true
+    testSession.resetInputHandler(forceComposerCleanup: true)
+
+    #expect(testHandler.assembler.insertKey("ㄗㄚˊ"))
+    #expect(testHandler.assembler.insertKey("ㄉㄜ˙"))
+    testHandler.assemble()
+    testSession.switchState(testHandler.generateStateOfInputting())
+
+    // 確認 BPMFVS 投影在 display 中已啟用。
+    let vs1 = String(UnicodeScalar(0xE01E1)!)
+    #expect(testHandler.generateStateOfInputting().displayedText == "咱\(vs1)地\(vs1)")
+
+    // 進入 marking state（Shift+Left 兩次，選取全部內容）。
+    var arrLeftEvent = KBEvent.KeyEventData.dataArrowLeft
+    arrLeftEvent.flags.insert(.shift)
+    #expect(testHandler.triageInput(event: arrLeftEvent.asEvent))
+    #expect(testHandler.triageInput(event: arrLeftEvent.asEvent))
+    #expect(testSession.state.type == .ofMarking)
+    #expect(testSession.state.markedRange == 0 ..< 2)
+
+    // 取出 userPhraseKVPair，驗證值為原始文字（不含 Variation Selector）。
+    let kvPair = testSession.state.data.userPhraseKVPair
+    #expect(kvPair.value == "咱地")
+    #expect(!kvPair.value.unicodeScalars.contains(where: {
+      (0xE0100 ... 0xE01EF).contains($0.value)
+    }))
+
+    // 觸發使用者加詞操作（Enter），驗證寫入的是原始文字。
+    #expect(testHandler.triageInput(event: KBEvent.KeyEventData.dataEnterReturn.asEvent))
+    let fetchables = testHandler.currentLM.unigramsFor(keyArray: ["ㄗㄚˊ", "ㄉㄜ˙"])
+    let addedUnigramExists = fetchables.contains(where: { $0.value == "咱地" })
+    #expect(addedUnigramExists)
+    // 確認沒有寫入含 Variation Selector 的髒資料。
+    let taintedUnigramExists = fetchables.contains(where: {
+      $0.value.unicodeScalars.contains(where: { (0xE0100 ... 0xE01EF).contains($0.value) })
+    })
+    #expect(!taintedUnigramExists)
+  }
+
+  /// 確認候選預覽不會讓 raw / display 狀態重新失去同步。
+  @Test
+  func test_IH103E_ButKoBPMFVSCandidatePreviewKeepsRawStateInSync() throws {
+    guard let testHandler, let testSession else {
+      Issue.record("testHandler and testSession at least one of them is nil.")
+      return
+    }
+    let grams: [Megrez.Unigram] = [
+      .init(keyArray: ["ㄗㄚˊ"], value: "咱", score: 10),
+      .init(keyArray: ["ㄗㄚˊ"], value: "雜", score: 9),
+    ]
+    grams.forEach {
+      testHandler.currentLM.insertTemporaryData(unigram: $0, isFiltering: false)
+    }
+    defer {
+      testHandler.currentLM.clearTemporaryData(isFiltering: false)
+      testHandler.clear()
+    }
+
+    clearTestPOM()
+    testHandler.clear()
+    testHandler.prefs.fetchSuggestionsFromPerceptionOverrideModel = false
+    testHandler.prefs.specifyCmdOptCtrlEnterBehavior = 4
+    testHandler.prefs.reflectBPMFVSInCompositionBuffer = true
+    testSession.resetInputHandler(forceComposerCleanup: true)
+
+    #expect(testHandler.assembler.insertKey("ㄗㄚˊ"))
+    testHandler.assemble()
+    testSession.switchState(testHandler.generateStateOfCandidates())
+
+    #expect(testSession.state.type == .ofCandidates)
+    #expect(testSession.state.data.rawDisplayedText == "咱")
+
+    guard let previewIndex = testSession.state.candidates.firstIndex(where: { $0.value == "雜" }) else {
+      Issue.record("Missing preview candidate: 雜")
+      return
+    }
+
+    testSession.candidatePairHighlightChanged(at: previewIndex)
+
+    #expect(testSession.state.highlightedCandidateIndex == previewIndex)
+    #expect(testSession.state.data.rawDisplayedText == "雜")
+  }
+
   /// 測試磁帶模組的快速選字功能（單一結果）。
   @Test
   func test_IH104_CassetteQuickPhraseSelection() throws {

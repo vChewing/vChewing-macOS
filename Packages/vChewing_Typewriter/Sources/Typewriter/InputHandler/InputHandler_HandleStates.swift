@@ -35,6 +35,10 @@ extension InputHandlerProtocol {
     var displayTextSegments: [String] = handleAsCodePointInput || handleAsRomanNumeralInput
       ? [strCodePointBuffer]
       : compositionBufferDisplayTextSegments(reflectBPMFVS: !sansReading)
+    // 原始（未經 BPMFVS 投影）的文字片段。僅在 BPMFVS 投影啟用時才需要額外追蹤。
+    var rawSegments: [String]? = (!handleAsCodePointInput && !handleAsRomanNumeralInput && !sansReading)
+      ? rawDisplayTextSegmentsIfNeeded
+      : nil
     var cursor = handleAsCodePointInput || handleAsRomanNumeralInput
       ? displayTextSegments.joined().count
       : convertCursorForDisplay(assembler.cursor)
@@ -68,9 +72,23 @@ extension InputHandlerProtocol {
       }
       displayTextSegments = newDisplayTextSegments
       cursor += reading.count
+      // 同步將讀音插入到原始文字片段。
+      if let raw = rawSegments {
+        rawSegments = Self.insertReadingIntoSegments(
+          in: raw,
+          reading: reading,
+          at: cursorSansReading
+        )
+      }
     }
     for i in 0 ..< displayTextSegments.count {
       displayTextSegments[i] = displayTextSegments[i].trimmingCharacters(in: .newlines)
+    }
+    if var raw = rawSegments {
+      for i in 0 ..< raw.count {
+        raw[i] = raw[i].trimmingCharacters(in: .newlines)
+      }
+      rawSegments = raw
     }
     /// 這裡生成準備要拿來回呼的「正在輸入」狀態。
     var result = State.ofInputting(
@@ -78,6 +96,7 @@ extension InputHandlerProtocol {
       cursor: cursor, highlightAt: segHighlightedAt
     )
     result.marker = cursorSansReading
+    result.data.rawDisplayTextSegments = rawSegments
     /// 特殊情形，否則方向鍵事件無法正常攔截。
     if guarded, result.displayTextSegments.joined().isEmpty {
       result.data.displayTextSegments = [" "]
@@ -98,6 +117,43 @@ extension InputHandlerProtocol {
       guard !$0.isReadingMismatched else { return $0.value }
       return BPMFVS.convert(value: $0.value, readings: Array($0.keyArray))
     }
+  }
+
+  /// 當 BPMFVS 投影處於啟用狀態時，回傳原始（未投影）的組字區文字片段。否則回傳 nil。
+  var rawDisplayTextSegmentsIfNeeded: [String]? {
+    guard prefs.reflectBPMFVSInCompositionBuffer,
+          prefs.specifyCmdOptCtrlEnterBehavior == 4
+    else { return nil }
+    return assembler.assembledSentence.values
+  }
+
+  /// 將讀音插入到文字片段陣列的指定游標位置。
+  static func insertReadingIntoSegments(
+    in segments: [String],
+    reading: String,
+    at cursor: Int
+  )
+    -> [String] {
+    var newSegments = [String]()
+    var temporaryNode = ""
+    var charCounter = 0
+    for node in segments {
+      for char in node {
+        if charCounter == cursor {
+          newSegments.append(temporaryNode)
+          temporaryNode = ""
+          newSegments.append(reading)
+        }
+        temporaryNode += String(char)
+        charCounter += 1
+      }
+      newSegments.append(temporaryNode)
+      temporaryNode = ""
+    }
+    if newSegments == segments {
+      newSegments.append(reading)
+    }
+    return newSegments
   }
 
   /// 組字區可以投影成 BPMFVS 顯示，但一般遞交流程只能吃原始內容。
@@ -188,6 +244,7 @@ extension InputHandlerProtocol {
       displayTextSegments: compositionBufferDisplayTextSegments(),
       cursor: assembler.cursor
     )
+    result.data.rawDisplayTextSegments = rawDisplayTextSegmentsIfNeeded
     if !prefs.useRearCursorMode {
       let markerBackup = assembler.marker
       assembler.jumpCursorBySegment(to: .rear, isMarker: true)
@@ -311,6 +368,7 @@ extension InputHandlerProtocol {
         cursor: convertCursorForDisplay(assembler.cursor),
         marker: convertCursorForDisplay(assembler.marker)
       )
+      marking.data.rawDisplayTextSegments = state.data.rawDisplayTextSegments
       marking.tooltipBackupForInputting = state.tooltipBackupForInputting
       session.switchState(marking.markedRange.isEmpty ? marking.convertedToInputting : marking)
       return true
@@ -335,6 +393,7 @@ extension InputHandlerProtocol {
         cursor: convertCursorForDisplay(assembler.cursor),
         marker: convertCursorForDisplay(assembler.marker)
       )
+      marking.data.rawDisplayTextSegments = state.data.rawDisplayTextSegments
       marking.tooltipBackupForInputting = state.tooltipBackupForInputting
       session.switchState(marking.markedRange.isEmpty ? marking.convertedToInputting : marking)
       return true
@@ -774,6 +833,7 @@ extension InputHandlerProtocol {
           cursor: convertCursorForDisplay(assembler.cursor),
           marker: convertCursorForDisplay(assembler.marker)
         )
+        marking.data.rawDisplayTextSegments = rawDisplayTextSegmentsIfNeeded
         marking.tooltipBackupForInputting = state.tooltip
         session.switchState(marking)
       } else {
@@ -837,6 +897,7 @@ extension InputHandlerProtocol {
           cursor: convertCursorForDisplay(assembler.cursor),
           marker: convertCursorForDisplay(assembler.marker)
         )
+        marking.data.rawDisplayTextSegments = rawDisplayTextSegmentsIfNeeded
         marking.tooltipBackupForInputting = state.tooltip
         session.switchState(marking)
       } else {
