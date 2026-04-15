@@ -947,7 +947,8 @@ nonisolated extension UserDef {
         userDef: self, shortTitle: "Also use “\\” or “¥” key for Hanin Keyboard Symbol Input"
       )
     case .kFilterNonCNSReadingsForCHTInput: return .init(
-        userDef: self, shortTitle: "i18n:UserDef.kFilterNonCNSReadingsForCHTInput.shortTitle"
+        userDef: self, shortTitle: "i18n:UserDef.kFilterNonCNSReadingsForCHTInput.shortTitle",
+        description: "i18n:UserDef.kFilterNonCNSReadingsForCHTInput.description"
       )
     case .kEnforceETenDOSCandidateSequence: return .init(
         userDef: self,

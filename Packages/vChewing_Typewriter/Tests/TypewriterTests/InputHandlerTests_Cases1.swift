@@ -828,4 +828,64 @@ extension InputHandlerTests {
     let candidateValues = testHandler.generateArrayOfCandidates().map(\.value)
     #expect(candidateValues == eTenSequence)
   }
+
+  @Test
+  func test_IH113_FilterNonCNSReadingsStillAllowsSelectingDemotedSingleKanji() throws {
+    guard let testHandler, let testSession else {
+      Issue.record("testHandler and testSession at least one of them is nil.")
+      return
+    }
+    clearTestPOM()
+
+    let textMap = makeTypingTextMap([
+      (
+        "bo",
+        [
+          (value: "玻", probability: -5, typeID: 6),
+          (value: "播", probability: -4.5, typeID: 6),
+          (value: "玻", probability: -11, typeID: 7),
+        ]
+      ),
+    ])
+
+    defer {
+      testHandler.prefs.filterNonCNSReadingsForCHTInput = false
+      testHandler.prefs.fetchSuggestionsFromPerceptionOverrideModel = true
+      LMAssembly.LMInstantiator.disconnectFactoryDictionary()
+      #expect(LMAssembly.LMInstantiator.connectToTestFactoryDictionary(textMapData: LMATestsData.sqlTestCoreLMData))
+      testHandler.currentLM.syncPrefs()
+      testSession.resetInputHandler(forceComposerCleanup: true)
+    }
+
+    LMAssembly.LMInstantiator.disconnectFactoryDictionary()
+    #expect(LMAssembly.LMInstantiator.connectToTestFactoryDictionary(textMapData: textMap))
+    testSession.resetInputHandler(forceComposerCleanup: true)
+    testHandler.prefs.filterNonCNSReadingsForCHTInput = true
+    testHandler.prefs.enforceETenDOSCandidateSequence = false
+    testHandler.prefs.useSCPCTypingMode = false
+    testHandler.prefs.fetchSuggestionsFromPerceptionOverrideModel = false
+    testHandler.currentLM.syncPrefs()
+
+    #expect(testHandler.assembler.insertKey("ㄅㄛ"))
+    testHandler.assemble()
+
+    let candidateValues = testHandler.generateArrayOfCandidates().map(\.value)
+    guard let conformingIndex = candidateValues.firstIndex(of: "玻") else {
+      Issue.record("Missing conforming candidate: 玻. Candidates: \(candidateValues)")
+      return
+    }
+    guard let demotedIndex = candidateValues.firstIndex(of: "播") else {
+      Issue.record("Missing demoted candidate: 播. Candidates: \(candidateValues)")
+      return
+    }
+    #expect(demotedIndex > conformingIndex)
+
+    testSession.switchState(testHandler.generateStateOfCandidates())
+    guard let selectedIndex = testSession.state.candidates.firstIndex(where: { $0.value == "播" }) else {
+      Issue.record("Candidate state is missing 播. Candidates: \(testSession.state.candidates.map(\.value))")
+      return
+    }
+    testSession.candidatePairSelectionConfirmed(at: selectedIndex)
+    #expect(generateDisplayedText() == "播")
+  }
 }
