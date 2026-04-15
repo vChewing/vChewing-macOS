@@ -140,7 +140,18 @@ $ EOF.
 
 ### 2026.04.13
 
-#### 🔄 上游同步（upstream/main @ vChewing/vChewing-macOS）
+#### 🔄 上游同步 ②（upstream/main @ vChewing/vChewing-macOS — 4.3.4 GM）
+
+- **BPMFVS 組字區即時反映**（`ButKo_BPMFVS`）：在 `CmdOptCtrlEnter = 4` 模式下啟用時，組字區顯示文字會即時替換為帶有 Unicode 異體字選擇子（Variation Selector）的注音符號字形，但實際遞交至客體軟體的文字仍為原始漢字（不含 VS），避免相容性問題。對應新設定項 `kReflectBPMFVSInCompositionBuffer`（本 fork 預設為 `true`；upstream 預設 `false`）。
+- **`committableDisplayText()` API 新增**：分離「顯示用文字」與「遞交用文字」的取得方式，避免 BPMFVS 視覺符號被意外送出。本 fork 對此函式做了擴充，使其同時支援 SmartSwitch 的 `frozenSegments` 前置與 `isTempEnglishMode` 英文緩衝遞交，確保既有 SmartSwitch 功能不受影響。
+- **字典資料更新**：`vChewing-VanguardLexicon` 資料日期升至 `20260415`（套件版本 4.3.4）。
+- 新增測試 `test_IH103C_ButKoBPMFVSPlainEnterCommitsRawText`：驗證 Enter 鍵在 BPMFVS 顯示模式下遞交的是原始漢字而非 VS 字串。
+
+**衝突處理**：`kReflectBPMFVSInCompositionBuffer` 預設值保留 fork 的 `true`；`committableDisplayText()` 加入 SmartSwitch 擴充；版本號維持 fork 日期制（`2026.04.13 / 20260413`）；上游同步原則補充至 `CLAUDE.md` 與 `AGENTS.md`。
+
+---
+
+#### 🔄 上游同步 ①（upstream/main @ vChewing/vChewing-macOS — 4.3.3 GM）
 
 - **LMAssembly — 詞庫格式升級 SQL → VanguardTextMap**：原廠詞庫後端從 SQLite（`VanguardSQLLegacyPlugin`）全面改為 `.txtMap` 純文字格式（`VanguardTextMapPlugin`）。新後端採用有序陣列索引 + 二分搜尋 + NSCache，並於載入時自動生成反查表（`reverseLookupTable`），不再依賴獨立 `.revlookup` 檔案。
 - **字典資料版本**：`vChewing-VanguardLexicon` 套件版本更新至 `4.3.3`（字典資料日期：20260411）。
