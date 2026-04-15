@@ -13,30 +13,19 @@ let package = Package(
       targets: ["Hotenka"]
     ),
   ],
-  dependencies: [
-    .package(path: "../CSQLite3Lib"),
-  ],
+  dependencies: [],
   targets: [
     .target(
       name: "Hotenka",
-      dependencies: [
-        .product(name: "CSQLite3Lib", package: "CSQLite3Lib"),
-      ],
+      dependencies: [],
       swiftSettings: [
         .defaultIsolation(MainActor.self), // set Default Actor Isolation
-      ]
-    ),
-    .target(
-      name: "HotenkaTestDictData",
-      resources: [
-        .process("Resources"),
       ]
     ),
     .testTarget(
       name: "HotenkaTests",
       dependencies: [
         "Hotenka",
-        "HotenkaTestDictData",
       ],
       swiftSettings: [
         .defaultIsolation(MainActor.self), // set Default Actor Isolation

@@ -9,9 +9,10 @@
 extension ChineseConverter {
   // MARK: Public
 
-  private static let hotenkaSingleton = HotenkaChineseConverter(
-    sqliteDir: LMMgr.getBundleDataPath("convdict", ext: "sqlite") ?? ":memory:"
-  )
+  private static let hotenkaSingleton: HotenkaChineseConverter? = {
+    guard let path = LMMgr.getBundleDataPath("convdict", ext: "stringmap") else { return nil }
+    return try? HotenkaChineseConverter(stringMapPath: path)
+  }()
 
   /// CrossConvert.
   ///
@@ -20,9 +21,9 @@ extension ChineseConverter {
   public static func crossConvert(_ string: String) -> String {
     switch IMEApp.currentInputMode {
     case .imeModeCHS:
-      return hotenkaSingleton.convert(string, to: .zhHantTW)
+      return hotenkaSingleton?.convert(string, to: .zhHantTW) ?? string
     case .imeModeCHT:
-      return hotenkaSingleton.convert(string, to: .zhHansCN)
+      return hotenkaSingleton?.convert(string, to: .zhHansCN) ?? string
     default:
       return string
     }
@@ -35,30 +36,28 @@ extension ChineseConverter {
     switch PrefMgr.shared.forceCassetteChineseConversion {
     case 1:
       switch IMEApp.currentInputMode {
-      case .imeModeCHS: string = hotenkaSingleton.convert(string, to: .zhHansCN)
-      case .imeModeCHT: string = hotenkaSingleton.convert(string, to: .zhHantTW)
+      case .imeModeCHS: string = hotenkaSingleton?.convert(string, to: .zhHansCN) ?? string
+      case .imeModeCHT: string = hotenkaSingleton?.convert(string, to: .zhHantTW) ?? string
       case .imeModeNULL: break
       }
-    case 2: if IMEApp.currentInputMode == .imeModeCHS { string = hotenkaSingleton.convert(
-        string,
-        to: .zhHansCN
-      ) }
-    case 3: if IMEApp.currentInputMode == .imeModeCHT { string = hotenkaSingleton.convert(
-        string,
-        to: .zhHantTW
-      ) }
+    case 2: if IMEApp.currentInputMode == .imeModeCHS {
+        string = hotenkaSingleton?.convert(string, to: .zhHansCN) ?? string
+      }
+    case 3: if IMEApp.currentInputMode == .imeModeCHT {
+        string = hotenkaSingleton?.convert(string, to: .zhHantTW) ?? string
+      }
     default: return
     }
   }
 
   public static func cnvTradToKangXi(_ strObj: String) -> String {
-    hotenkaSingleton.convert(strObj, to: .zhHantKX)
+    hotenkaSingleton?.convert(strObj, to: .zhHantKX) ?? strObj
   }
 
   public static func cnvTradToJIS(_ strObj: String) -> String {
     // 該轉換是由康熙繁體轉換至日語當用漢字的，所以需要先跑一遍康熙轉換。
     let strObj = cnvTradToKangXi(strObj)
-    var result = hotenkaSingleton.convert(strObj, to: .zhHansJP)
+    var result = hotenkaSingleton?.convert(strObj, to: .zhHansJP) ?? strObj
     processKanjiRepeatSymbol(target: &result)
     return result
   }
