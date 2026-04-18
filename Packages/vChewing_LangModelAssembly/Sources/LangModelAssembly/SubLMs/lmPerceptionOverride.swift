@@ -49,8 +49,7 @@ extension LMAssembly {
     ) {
       self.mutCapacity = max(capacity, 1) // 該參數得始終大於 0.
       self.thresholdProvider = thresholdProvider
-      self.fileSaveLocationURL = dataURL
-      self.previouslySavedHash = ""
+      self.persistor = .init(baseURL: dataURL)
     }
 
     // MARK: Public
@@ -64,7 +63,7 @@ extension LMAssembly {
     // MARK: Internal
 
     /// 權重最低閾值。
-    static let kDecayThreshold: Double = -9.5
+    static let kDecayThreshold: Double = -13.0
     /// 權重計算乘數
     static let kWeightMultiplier: Double = .getBeastConstantUsingTadokoroFormula()
 
@@ -72,9 +71,13 @@ extension LMAssembly {
     var thresholdProvider: (() -> Double)?
     var mutLRUKeySeqList: [String] = []
     var mutLRUMap: [String: KeyPerceptionPair] = [:]
-    var fileSaveLocationURL: URL?
-    /// 記錄最近一次快照的雜湊值（hex string），以避免重複寫入。
-    var previouslySavedHash: String
+
+    /// 持久化層，負責 WAL 日誌與 JSON 快照。
+    let persistor: LMAssembly.PerceptionPersistor
+
+    /// 是否啟用急速遺忘模式（縮短 POM 壽命至 12 小時以內）。
+    /// 由外部注入，取代 `calculateWeight` 內部直接讀取 `UserDefaults`。
+    var reducedLifetime: Bool = false
 
     /// 僅供測試：注入的建議用於測試中以繞過內部評分邏輯。
     /// 設置後，`fetchSuggestion` 會立即返回此建議並將其清除。
@@ -89,24 +92,6 @@ extension LMAssembly {
 
     // MARK: Private
 
-    /// 純以筆數判斷是否需要壓縮日誌的門檻。
-    private static let journalCompactionEntryThreshold = 120
-    /// 當日誌檔案大小超過此值便會重新輸出快照。
-    private static let journalCompactionSizeThreshold: UInt64 = 64 * 1_024
-
-    /// 每鍵限制的時間窗（秒）。在此時間內相同 key 的日誌不會被重複加入。
-    private static let perKeyThrottleInterval: TimeInterval = 2.0
-
-    /// 下一次刷新時必須寫入日誌的鍵值集合。
-    private var pendingUpsertKeys: Set<String> = []
-    /// 下一次刷新時需要從日誌移除的鍵值集合。
-    private var pendingRemovedKeys: Set<String> = []
-    /// 用來判斷是否需要執行日誌壓縮的計數器。
-    private var journalEntriesSinceLastCompaction: Int = 0
-    /// 指示下一次儲存需要輸出完整快照而非增量日誌。
-    private var needsFullSnapshot = false
-    /// 記錄每個鍵上次被標記（queued）或寫入的時間戳（Unix time interval）。僅存在於記憶體中。
-    private var lastLogTimestampByKey: [String: TimeInterval] = [:]
     /// 用於保護所有可變狀態的鎖，確保執行緒安全。
     private let lock = NSLock()
   }
@@ -286,28 +271,6 @@ extension LMAssembly.LMPerceptionOverride {
       case perception = "p"
     }
   }
-
-  nonisolated private enum JournalOperation: String, Codable {
-    case upsert
-    case removeKey
-    case clear
-  }
-
-  nonisolated private struct JournalRecord: Codable {
-    // MARK: Lifecycle
-
-    init(operation: JournalOperation, key: String? = nil, pair: KeyPerceptionPair? = nil) {
-      self.operation = operation
-      self.key = key
-      self.pair = pair
-    }
-
-    // MARK: Internal
-
-    var operation: JournalOperation
-    var key: String?
-    var pair: KeyPerceptionPair?
-  }
 }
 
 // MARK: - Internal Methods in LMAssembly.
@@ -478,9 +441,7 @@ extension LMAssembly.LMPerceptionOverride {
         // 更新 Map 和 List
         mutLRUMap[key] = theNeta
         mutLRUKeySeqList.insert(key, at: 0)
-        markKeyForUpsert(key)
-
-        print("LMPerceptionOverride: 已更新現有洞察: \(key)")
+        persistor.markKeyForUpsert(key)
       } else {
         // 建立新的 perception
         let perception: Perception = .init()
@@ -500,11 +461,9 @@ extension LMAssembly.LMPerceptionOverride {
         if mutLRUKeySeqList.count > mutCapacity {
           let removedKey = mutLRUKeySeqList.removeLast()
           mutLRUMap.removeValue(forKey: removedKey)
-          markKeyForRemoval(removedKey)
+          persistor.markKeyForRemoval(removedKey)
         }
-        markKeyForUpsert(key)
-
-        print("LMPerceptionOverride: 已完成新洞察: \(key)")
+        persistor.markKeyForUpsert(key)
       }
     }
 
@@ -548,8 +507,8 @@ extension LMAssembly.LMPerceptionOverride {
       if hasChanges {
         resetLRUList()
         keysNeedingUpsert.subtract(keysToRemoveCompletely)
-        keysNeedingUpsert.forEach { markKeyForUpsert($0) }
-        keysToRemoveCompletely.forEach { markKeyForRemoval($0) }
+        keysNeedingUpsert.forEach { persistor.markKeyForUpsert($0) }
+        keysToRemoveCompletely.forEach { persistor.markKeyForRemoval($0) }
       }
 
       return hasChanges
@@ -599,8 +558,8 @@ extension LMAssembly.LMPerceptionOverride {
       if hasChanges {
         resetLRUList()
         keysNeedingUpsert.subtract(keysToRemoveCompletely)
-        keysNeedingUpsert.forEach { markKeyForUpsert($0) }
-        keysToRemoveCompletely.forEach { markKeyForRemoval($0) }
+        keysNeedingUpsert.forEach { persistor.markKeyForUpsert($0) }
+        keysToRemoveCompletely.forEach { persistor.markKeyForRemoval($0) }
       }
 
       return hasChanges
@@ -633,7 +592,7 @@ extension LMAssembly.LMPerceptionOverride {
       }
 
       if hasChanges {
-        keysToRemove.forEach { markKeyForRemoval($0) }
+        keysToRemove.forEach { persistor.markKeyForRemoval($0) }
         resetLRUList()
       }
 
@@ -658,7 +617,7 @@ extension LMAssembly.LMPerceptionOverride {
       if !keysToRemove.isEmpty {
         keysToRemove.forEach { mutLRUMap.removeValue(forKey: $0) }
         resetLRUList()
-        keysToRemove.forEach { markKeyForRemoval($0) }
+        keysToRemove.forEach { persistor.markKeyForRemoval($0) }
         return true
       }
       return false
@@ -685,27 +644,15 @@ extension LMAssembly.LMPerceptionOverride {
     lock.withLock {
       mutLRUMap = [:]
       mutLRUKeySeqList = []
-      pendingUpsertKeys.removeAll()
-      pendingRemovedKeys.removeAll()
-      journalEntriesSinceLastCompaction = 0
-      needsFullSnapshot = true
-      previouslySavedHash = ""
     }
+    persistor.resetPendingState()
   }
 
   /// 同時清除記憶體與磁碟上的快照與日誌。
   /// - Parameter fileURL: 可選的覆寫儲存位置 URL。
   nonisolated func clearData(withURL fileURL: URL? = nil) {
     clearData()
-    guard let fileURL = fileURL ?? fileSaveLocationURL else {
-      vCLMLog("POM Error: Unable to clear data because file URL is nil.")
-      return
-    }
-    do {
-      try writeFullSnapshot(to: fileURL, force: true)
-    } catch {
-      vCLMLog("POM Error: Unable to clear the data in the POM file. Details: \(error)")
-    }
+    persistor.clearDataOnDisk(fileURL: fileURL, dataProvider: { [] })
   }
 
   nonisolated public func getSavableData() -> [KeyPerceptionPair] {
@@ -733,104 +680,30 @@ extension LMAssembly.LMPerceptionOverride {
   ///   - fileURL: 可選的儲存路徑，覆寫預設位置。
   ///   - skipDebounce: 為了 API 相容性而保留，實際的防抖處理由外部負責。
   nonisolated func saveData(toURL fileURL: URL? = nil, skipDebounce _: Bool = false) {
-    guard let fileURL: URL = fileURL ?? fileSaveLocationURL else {
-      vCLMLog("POM saveData() failed. At least the file Save URL is not set for the current POM.")
-      return
-    }
-
-    // 檢查檔案是否存在，且按需設定 needsFullSnapshot
-    let fileManager = FileManager.default
-    lock.withLock {
-      if !fileManager.fileExists(atPath: fileURL.path) {
-        needsFullSnapshot = true
-      }
-    }
-
-    // 檢查是否需要完整快照
-    let shouldDoFullSnapshot = lock.withLock { needsFullSnapshot }
-    if shouldDoFullSnapshot {
-      do {
-        try writeFullSnapshot(to: fileURL, force: true)
-      } catch {
-        vCLMLog("POM Error: Unable to write full snapshot. Details: \(error)")
-      }
-      return
-    }
-
-    // 在 NSLock Closure 內準備記錄
-    let records = lock.withLock { preparePendingJournalRecords() }
-    guard !records.isEmpty else {
-      vCLMLog("POM Skip: No pending journal entries to flush.")
-      return
-    }
-
-    // 在 NSLock Closure 外部執行硬碟 I/O，然後藉由 NSLock Closure 更新狀態
-    do {
-      try appendJournal(records, baseURL: fileURL)
-
-      lock.withLock {
-        pendingUpsertKeys.removeAll()
-        pendingRemovedKeys.removeAll()
-        journalEntriesSinceLastCompaction += records.count
-      }
-
-      if lock.withLock({ shouldCompactJournal(for: fileURL) }) {
-        try writeFullSnapshot(to: fileURL, force: false)
-      }
-    } catch {
-      vCLMLog("POM Error: Unable to append journal. Details: \(error)")
-    }
+    persistor.saveData(
+      dataProvider: { [self] in lock.withLock { getSavableData() } },
+      mapProvider: { [self] in lock.withLock { mutLRUMap } },
+      keyValidator: { [self] in !shouldIgnoreKey($0) },
+      toURL: fileURL
+    )
   }
 
   /// 從磁碟載入覆寫資料並重播未處理的日誌。
   /// - Parameter fileURL: 可選的載入路徑，覆寫預設位置。
   nonisolated func loadData(fromURL fileURL: URL? = nil) {
-    guard let fileURL: URL = fileURL ?? fileSaveLocationURL else {
-      vCLMLog("POM loadData() failed. At least the file Load URL is not set for the current POM.")
-      return
-    }
-    let fileManager = FileManager.default
-    let decoder = JSONDecoder()
-
-    if fileManager.fileExists(atPath: fileURL.path) {
-      do {
-        let data = try Data(contentsOf: fileURL, options: .mappedIfSafe)
-        let dataString = String(data: data, encoding: .utf8) ?? ""
-        vCLMLog("POM: Loading data from snapshot, content: '\(dataString.prefix(100))...'")
-
-        // 檢查是否為空或無效內容。"{}" 是舊版錯誤格式，"[]" 是有效的空陣列
-        let trimmed = dataString.trimmingCharacters(in: .whitespacesAndNewlines)
-        let emptyContents = ["", "{}", "[]"]
-        if !emptyContents.contains(trimmed) {
-          let jsonResult = try decoder.decode([KeyPerceptionPair].self, from: data)
-          vCLMLog("POM: Successfully decoded \(jsonResult.count) items from snapshot")
-          loadData(from: jsonResult)
-        } else {
-          if trimmed == "{}" {
-            // 舊版曾寫入空字典，視為已毀損並重設存檔。
-            vCLMLog("POM: Detected legacy '{}' snapshot, clearing storage")
-            clearData(withURL: fileURL)
-          } else {
-            vCLMLog("POM: Snapshot empty, proceeding to journal replay only")
+    persistor.loadData(
+      loadCallback: { [self] in loadData(from: $0) },
+      replayApplicator: { [self] tempMap, mutated in
+        lock.withLock {
+          for (key, pair) in tempMap {
+            mutLRUMap[key] = pair
+            mutated = true
           }
         }
-      } catch {
-        vCLMLog("POM Error: Unable to decode snapshot JSON. Details: \(error)")
-        if let data = try? String(contentsOf: fileURL, encoding: .utf8),
-           data.trimmingCharacters(in: .whitespacesAndNewlines) == "{}" {
-          vCLMLog("POM: Detected old invalid format '{}', clearing snapshot")
-          clearData(withURL: fileURL)
-        }
-      }
-    }
-
-    replayJournal(from: fileURL)
-    // 設定 previouslySavedHash 為目前快照的雜湊（若存在），以避免重複重寫。
-    if let snapshotData = try? Data(contentsOf: fileURL) {
-      previouslySavedHash = computeHexCRC32(snapshotData)
-    } else {
-      previouslySavedHash = ""
-    }
+      },
+      keyValidator: { [self] in !shouldIgnoreKey($0) },
+      fromURL: fileURL
+    )
   }
 }
 
@@ -1073,10 +946,7 @@ extension LMAssembly.LMPerceptionOverride {
 
     // 調整有效視窗 wT，單字略快、單讀音單漢字再快一些（避免單字長期壓制）
     // 根據偏好設定決定基礎時間窗 wT：如果啟用急速遺忘模式，則從約一週降低至 12 小時內
-    var wT: Double = {
-      let key = UserDef.kReducePOMLifetimeToNoMoreThan12Hours.rawValue
-      return UserDefaults.current.bool(forKey: key) ? 0.5 : 8.0
-    }()
+    var wT: Double = reducedLifetime ? 0.5 : 8.0
     if isUnigram { wT *= 0.85 }
     if isSingleCharUnigram { wT *= 0.8 }
 
@@ -1138,281 +1008,6 @@ extension LMAssembly.LMPerceptionOverride {
     let invalidKeys = mutLRUMap.keys.filter { shouldIgnoreKey($0) }
     guard !invalidKeys.isEmpty else { return }
     invalidKeys.forEach { mutLRUMap.removeValue(forKey: $0) }
-  }
-
-  /// 標記某鍵值需在下一次刷新時寫入日誌。
-  nonisolated private func markKeyForUpsert(_ key: String) {
-    pendingRemovedKeys.remove(key)
-    let now = Date().timeIntervalSince1970
-    if let last = lastLogTimestampByKey[key], now - last < Self.perKeyThrottleInterval {
-      // Throttled: 已在時間窗內記錄過此鍵，跳過再度入列以降低 IO/CPU。
-      return
-    }
-    pendingUpsertKeys.insert(key)
-    lastLogTimestampByKey[key] = now
-  }
-
-  /// 標記某鍵值已刪除，讓變更能寫入磁碟。
-  nonisolated private func markKeyForRemoval(_ key: String) {
-    pendingUpsertKeys.remove(key)
-    let now = Date().timeIntervalSince1970
-    if let last = lastLogTimestampByKey[key], now - last < Self.perKeyThrottleInterval {
-      // Throttled: 已在時間窗內記錄過此鍵，跳過再度入列以降低 IO/CPU。
-      return
-    }
-    pendingRemovedKeys.insert(key)
-    lastLogTimestampByKey[key] = now
-  }
-
-  /// 清理 lastLogTimestampByKey 中過期的條目以防止記憶體洩漏。
-  /// 此方法應定期調用（例如在 saveData 或 writeFullSnapshot 之後）。
-  nonisolated private func cleanupOldTimestamps() {
-    let now = Date().timeIntervalSince1970
-    let threshold = now - (Self.perKeyThrottleInterval * 10) // 保留最近 20 秒的記錄
-    lastLogTimestampByKey = lastLogTimestampByKey.filter { $0.value > threshold }
-  }
-
-  /// 建立待寫入日誌的記錄列表。
-  nonisolated private func preparePendingJournalRecords() -> [JournalRecord] {
-    if needsFullSnapshot { return [] }
-    var results: [JournalRecord] = []
-    let removalKeys = pendingRemovedKeys.sorted()
-    let upsertKeys = pendingUpsertKeys.sorted()
-
-    for key in removalKeys {
-      results.append(.init(operation: .removeKey, key: key, pair: nil))
-    }
-
-    for key in upsertKeys {
-      guard let pair = mutLRUMap[key] else { continue }
-      guard !shouldIgnoreKey(pair.key) else { continue }
-      results.append(.init(operation: .upsert, key: key, pair: pair))
-    }
-
-    return results
-  }
-
-  /// 將編碼後的日誌記錄追加至副檔。
-  nonisolated private func appendJournal(_ records: [JournalRecord], baseURL: URL) throws {
-    guard !records.isEmpty else { return }
-    let journalURL = journalFileURL(for: baseURL)
-    let encoder = JSONEncoder()
-    let fileManager = FileManager.default
-
-    if !fileManager.fileExists(atPath: journalURL.path) {
-      _ = fileManager.createFile(atPath: journalURL.path, contents: nil, attributes: nil)
-    }
-
-    let handle = try FileHandle(forWritingTo: journalURL)
-    defer { handle.closeFile() }
-    handle.seekToEndOfFile()
-
-    for record in records {
-      let data = try encoder.encode(record)
-      handle.write(data)
-      if let newline = "\n".data(using: .utf8) {
-        handle.write(newline)
-      }
-    }
-
-    vCLMLog("POM Journal: Appended \(records.count) entries to \(journalURL.path)")
-    // 更新每個鍵的上次記錄時間
-    let now = Date().timeIntervalSince1970
-    for rec in records {
-      if let k = rec.key {
-        lastLogTimestampByKey[k] = now
-      } else if let p = rec.pair {
-        lastLogTimestampByKey[p.key] = now
-      }
-    }
-  }
-
-  /// 計算資料的 CRC32 雜湊並回傳十六進位字串表示，確保跨平台一致性。
-  nonisolated private func computeHexCRC32(_ data: Data) -> String {
-    let checksum = CRC32.checksum(data: data)
-    return String(format: "%08x", checksum)
-  }
-
-  /// 判斷是否需要以新快照壓縮日誌。
-  nonisolated private func shouldCompactJournal(for baseURL: URL) -> Bool {
-    let journalURL = journalFileURL(for: baseURL)
-    let fileManager = FileManager.default
-    guard fileManager.fileExists(atPath: journalURL.path) else { return false }
-
-    if journalEntriesSinceLastCompaction >= Self.journalCompactionEntryThreshold {
-      return true
-    }
-
-    do {
-      let attributes = try fileManager.attributesOfItem(atPath: journalURL.path)
-      if let fileSize = attributes[.size] as? NSNumber {
-        return fileSize.uint64Value >= Self.journalCompactionSizeThreshold
-      }
-    } catch {
-      vCLMLog("POM Journal: Unable to read attributes, forcing compaction. Details: \(error)")
-      return true
-    }
-
-    return false
-  }
-
-  /// 將現有覆寫資料完整輸出為快照，並重置日誌狀態。
-  nonisolated private func writeFullSnapshot(to baseURL: URL, force: Bool) throws {
-    let encoder = JSONEncoder()
-    let toSave = getSavableData() // Already locked internally
-    // 先編碼再計算 deterministic hex（避免使用 Swift 的 hashValue）
-    let jsonData = try encoder.encode(toSave)
-    let crc = computeHexCRC32(jsonData)
-
-    let shouldWrite = lock.withLock {
-      if !force, previouslySavedHash == crc {
-        return false
-      }
-      return true
-    }
-
-    if shouldWrite {
-      try jsonData.write(to: baseURL, options: .atomic)
-      lock.withLock {
-        previouslySavedHash = crc
-      }
-      vCLMLog("POM Snapshot: Wrote \(toSave.count) items to \(baseURL.path)")
-    } else {
-      vCLMLog("POM Snapshot: Hash unchanged, skipping rewrite.")
-    }
-
-    lock.withLock {
-      pendingUpsertKeys.removeAll()
-      pendingRemovedKeys.removeAll()
-      journalEntriesSinceLastCompaction = 0
-      needsFullSnapshot = false
-      cleanupOldTimestamps() // 清理過期的時間戳記以防止記憶體洩漏
-    }
-    removeJournalFile(for: baseURL)
-  }
-
-  /// 重播日誌操作以同步記憶體狀態。
-  nonisolated private func replayJournal(from baseURL: URL) {
-    let journalURL = journalFileURL(for: baseURL)
-    let fileManager = FileManager.default
-    guard fileManager.fileExists(atPath: journalURL.path) else { return }
-
-    do {
-      let data = try Data(contentsOf: journalURL)
-      guard !data.isEmpty else { return }
-      guard let content = String(data: data, encoding: .utf8) else { return }
-      let decoder = JSONDecoder()
-      let lines = content.split(whereSeparator: { $0.isNewline })
-      guard !lines.isEmpty else { return }
-
-      // 先一次性解析並驗證所有記錄；若任何一條記錄無法解析或驗證失敗，視為日誌受損並刪除整個日誌檔
-      var recordsToApply: [JournalRecord] = []
-      for line in lines {
-        let trimmed = line.trimmingCharacters(in: .whitespacesAndNewlines)
-        guard !trimmed.isEmpty else { continue }
-        guard let recordData = trimmed.data(using: .utf8) else { continue }
-
-        do {
-          let record = try decoder.decode(JournalRecord.self, from: recordData)
-          guard isValidJournalRecord(record) else {
-            vCLMLog(
-              "POM Journal: Detected corrupted journal record during validation, deleting journal: \(trimmed.prefix(200))"
-            )
-            removeJournalFile(for: baseURL)
-            return
-          }
-          recordsToApply.append(record)
-        } catch {
-          vCLMLog(
-            "POM Journal: Failed to decode record during validation. Details: \(error). Removing journal file to avoid replay of corrupted data."
-          )
-          removeJournalFile(for: baseURL)
-          return
-        }
-      }
-
-      // 全部驗證通過後再一次性應用
-      lock.withLock {
-        var mutated = false
-        for record in recordsToApply {
-          switch record.operation {
-          case .clear:
-            mutLRUMap.removeAll()
-            mutated = true
-          case .removeKey:
-            if let key = record.key {
-              mutLRUMap.removeValue(forKey: key)
-              mutated = true
-            }
-          case .upsert:
-            if let pair = record.pair, !shouldIgnoreKey(pair.key) {
-              mutLRUMap[pair.key] = pair
-              mutated = true
-            }
-          }
-        }
-
-        if mutated {
-          resetLRUList()
-        }
-
-        pendingUpsertKeys.removeAll()
-        pendingRemovedKeys.removeAll()
-        journalEntriesSinceLastCompaction = 0
-      }
-    } catch {
-      vCLMLog("POM Journal: Unable to replay log. Details: \(error)")
-    }
-  }
-
-  /// 檢查 journal record 的合理性以避免受損或惡意資料回放。
-  nonisolated private func isValidJournalRecord(_ record: JournalRecord) -> Bool {
-    switch record.operation {
-    case .clear:
-      return true
-    case .removeKey:
-      guard let key = record.key, !key.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty else { return false }
-      // 拒絕 underscore-prefixed keys（標點或特殊鍵）
-      if shouldIgnoreKey(key) { return false }
-      return true
-    case .upsert:
-      guard let pair = record.pair else { return false }
-      let key = pair.key.trimmingCharacters(in: .whitespacesAndNewlines)
-      guard !key.isEmpty else { return false }
-      // 不接受被標記為應忽略的 key
-      if shouldIgnoreKey(key) { return false }
-      // 基本格式檢查
-      guard parsePerceptionKey(key) != nil else { return false }
-      // perception 內必須有 overrides
-      if pair.perception.overrides.isEmpty { return false }
-      // 檢查每個 override 的合理性
-      let now = Date().timeIntervalSince1970
-      for (candidate, override) in pair.perception.overrides {
-        let cand = candidate.trimmingCharacters(in: .whitespacesAndNewlines)
-        if cand.isEmpty || cand.count > 128 { return false }
-        if override.count <= 0 || override.count > 10_000 { return false }
-        if override.timestamp <= 0 || override.timestamp > now + 3_600 { return false }
-      }
-      return true
-    }
-  }
-
-  /// 在成功壓縮後刪除日誌副檔。
-  nonisolated private func removeJournalFile(for baseURL: URL) {
-    let journalURL = journalFileURL(for: baseURL)
-    let fileManager = FileManager.default
-    guard fileManager.fileExists(atPath: journalURL.path) else { return }
-    do {
-      try fileManager.removeItem(at: journalURL)
-      vCLMLog("POM Journal: Cleared journal at \(journalURL.path)")
-    } catch {
-      vCLMLog("POM Journal: Unable to delete journal. Details: \(error)")
-    }
-  }
-
-  /// 依據快照檔案 URL 推導日誌副檔的路徑。
-  nonisolated private func journalFileURL(for baseURL: URL) -> URL {
-    baseURL.appendingPathExtension("journal")
   }
 }
 

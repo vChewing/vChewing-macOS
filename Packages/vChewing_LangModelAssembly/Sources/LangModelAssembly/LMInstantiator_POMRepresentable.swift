@@ -35,6 +35,13 @@ extension LMAssembly.LMInstantiator {
     )
   }
 
+  /// 是否啟用急速遺忘模式（縮短 POM 壽命至 12 小時以內）。
+  /// 由外部（如 `PrefMgr`）注入，轉發至底層 `lmPerceptionOverride.reducedLifetime`。
+  public var pomReducedLifetime: Bool {
+    get { lmPerceptionOverride.reducedLifetime }
+    set { lmPerceptionOverride.reducedLifetime = newValue }
+  }
+
   public func loadPOMData(fromURL fileURL: URL? = nil) {
     lmPerceptionOverride.loadData(fromURL: fileURL)
   }

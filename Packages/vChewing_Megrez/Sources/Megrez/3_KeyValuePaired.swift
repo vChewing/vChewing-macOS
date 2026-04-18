@@ -256,7 +256,7 @@ extension Megrez.Compositor {
     guard !arrOverlappedNodes.isEmpty else { return false }
 
     // 用於觀測：覆寫生效前的 walk 與游標
-    let hasPerceptor = perceptionHandler != nil
+    let hasPerceptor = perceptionHandler != nil || perceptor != nil
     let previouslyAssembled: [Megrez.GramInPath] = hasPerceptor ? assemble() : []
     let beforeCursor = min(keys.count, location)
 
@@ -307,7 +307,8 @@ extension Megrez.Compositor {
     defer {
       // 覆寫後組句與觀測：
       let currentAssembled = assemble()
-      if let perceptionHandler, !previouslyAssembled.isEmpty {
+      let effectivePerceptor = perceptionHandler ?? perceptor
+      if let effectivePerceptor, !previouslyAssembled.isEmpty {
         // 供新版觀測 API（前/後路徑比較 + 三情境分類）
         let perceptedIntel = Megrez.makePerceptionIntel(
           previouslyAssembled: previouslyAssembled,
@@ -315,7 +316,7 @@ extension Megrez.Compositor {
           cursor: beforeCursor
         )
         if let perceptedIntel {
-          perceptionHandler(perceptedIntel)
+          effectivePerceptor(perceptedIntel)
         }
       }
     }

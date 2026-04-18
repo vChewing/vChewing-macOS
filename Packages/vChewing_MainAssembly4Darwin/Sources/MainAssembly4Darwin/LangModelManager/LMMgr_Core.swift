@@ -178,6 +178,7 @@ public final class LMMgr {
           filterPath: userDictDataURL(mode: mode, type: .theFilter).path
         )
         mode.langModel.loadUserSymbolData(path: userDictDataURL(mode: mode, type: .theSymbols).path)
+        mode.langModel.pomReducedLifetime = PrefMgr.shared.reducePOMLifetimeToNoMoreThan12Hours
         mode.langModel.loadPOMData()
       }
 

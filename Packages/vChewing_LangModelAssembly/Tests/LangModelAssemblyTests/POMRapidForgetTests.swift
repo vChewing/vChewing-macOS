@@ -26,30 +26,14 @@ extension POMTestSuite {
 
   @Suite(.serialized)
   final class POMRapidForgetTests {
-    // MARK: Lifecycle
-
-    init() {
-      // 設置 UserDefaults 值
-      UserDefaults.pendingUnitTests = true
-    }
-
-    deinit {
-      UserDefaults.unitTests?.removeObject(forKey: "ReducePOMLifetimeToNoMoreThan12Hours")
-      UserDefaults.pendingUnitTests = false
-    }
-
-    // MARK: Internal
-
     /// 測試急速遺忘模式：當啟用後，記憶在 12 小時（0.5 天）後應該被遺忘
     @Test
     func testPOM_RapidForget_01_EnabledMode() throws {
-      // 設置 UserDefaults 值：啟用急速遺忘模式
-      UserDefaults.unitTests?.set(true, forKey: "ReducePOMLifetimeToNoMoreThan12Hours")
-
       let pom = LMAssembly.LMPerceptionOverride(
         capacity: capacity,
         dataURL: nullURL
       )
+      pom.reducedLifetime = true
 
       let key1 = "(ㄕㄣˊ-ㄌㄧˇ-ㄌㄧㄥˊ-ㄏㄨㄚˊ,神里綾華)&(ㄉㄜ˙,的)&(ㄍㄡˇ,狗)"
       let expectedSuggestion = "狗"
@@ -77,13 +61,11 @@ extension POMTestSuite {
     /// 測試正常模式：當未啟用急速遺忘模式時，記憶在約一週後才會被遺忘
     @Test
     func testPOM_RapidForget_02_DisabledMode() throws {
-      // 確保 UserDefaults 值為 false：關閉急速遺忘模式
-      UserDefaults.unitTests?.set(false, forKey: "ReducePOMLifetimeToNoMoreThan12Hours")
-
       let pom = LMAssembly.LMPerceptionOverride(
         capacity: capacity,
         dataURL: nullURL
       )
+      pom.reducedLifetime = false
 
       let key1 = "(ㄕㄣˊ-ㄌㄧˇ-ㄌㄧㄥˊ-ㄏㄨㄚˊ,神里綾華)&(ㄉㄜ˙,的)&(ㄍㄡˇ,狗)"
       let expectedSuggestion = "狗"
@@ -113,6 +95,20 @@ extension POMTestSuite {
         timestamp: nowTimeStamp + (dayInSeconds * 8) + 10
       )
       #expect(suggested == nil)
+    }
+
+    /// 測試 LMInstantiator 對 POM 的 rapid-forget 注入轉發。
+    @Test
+    func testPOM_RapidForget_03_LMInstantiatorForwardsReducedLifetimeFlag() throws {
+      let instance = LMAssembly.LMInstantiator(pomDataURL: nullURL)
+
+      #expect(instance.lmPerceptionOverride.reducedLifetime == false)
+
+      instance.pomReducedLifetime = true
+      #expect(instance.lmPerceptionOverride.reducedLifetime == true)
+
+      instance.pomReducedLifetime = false
+      #expect(instance.lmPerceptionOverride.reducedLifetime == false)
     }
   }
 }

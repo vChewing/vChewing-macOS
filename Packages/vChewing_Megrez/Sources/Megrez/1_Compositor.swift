@@ -40,6 +40,10 @@ extension Megrez {
 
     public private(set) var config = CompositorConfig()
 
+    /// Assembler 級觀測回呼：當 `overrideCandidate` 成功且呼叫方未提供
+    /// per-call `perceptionHandler` 時，自動以此 closure 送出觀測資料。
+    public var perceptor: ((Megrez.PerceptionIntel) -> ())?
+
     /// 軌格系統允許的最大區段涵蓋長度限制。
     public var maxSegLength: Int {
       get { config.maxSegLength }
