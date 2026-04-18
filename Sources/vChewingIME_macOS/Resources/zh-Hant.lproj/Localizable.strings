@@ -107,8 +107,6 @@
 "Choose the macOS-level basic keyboard layout. Non-QWERTY alphanumerical keyboard layouts are for Pinyin parser only. This option will only affect the appearance of the on-screen-keyboard if the current Mandarin parser is neither (any) pinyin nor dynamically reparsable with different western keyboard layouts (like Eten 26, Hsu, etc.)." = "請選擇 macOS 基礎鍵盤佈局。QWERTY 以外的英數佈局是為了拼音排列的使用者而準備的。如果當前的普通話/國音分析器並未設為拼音、或者並未設定成任何受西文鍵盤佈局影響的注音排列（比如倚天 26 鍵排列、許氏排列，等）的話，則鍵盤佈局選項僅會影響到螢幕鍵盤。";
 "Choose the phonetic layout for Mandarin parser." = "請指定普通話/國音分析器所使用的注音排列。";
 "Choose the target application bundle." = "請選擇要登記的應用程式的封包。";
-"Choose your desired cassette file path. Will be omitted if invalid." = "請在此指定您想指定的 CIN 磁帶檔案。無效值會被忽略。";
-"Choose your desired user data folder path. Will be omitted if invalid." = "請在此指定您想指定的使用者語彙檔案目錄。無效值會被忽略。";
 "Choose your desired user data folder." = "請選擇您想指定的使用者語彙檔案目錄。";
 "Choose your preferred layout of the candidate window." = "選擇您所偏好的候選字窗佈局。";
 "CHS / CHT Input Mode Switch" = "簡體/繁體中文輸入模式切換";
@@ -214,6 +212,7 @@
 "i18n:LMMgr.accessFailure.cassette.title" = "檔案存取失敗，或者路徑不合規。";
 "i18n:LMMgr.pathInvalidityFound.cassette.description" = "請開啟唯音偏好設定以重新確認磁帶檔案路徑的設定。";
 "i18n:LMMgr.pathInvalidityFound.cassette.title" = "偵測到磁帶檔案存取問題";
+"i18n:LMMgr.pathInvalidityFound.iCloudDriveManagedPathAdvice" = "若這個路徑位於 iCloud 代管的「Documents」或「Desktop」內，請先將檔案或資料夾移到本機位置，再重新指定。若您不確定這兩個目錄目前是否由 iCloud Drive 代管，建議直接洽詢 Apple Support 協助確認設定。";
 "i18n:LMMgr.pathInvalidityFound.userDataFolder.description" = "請開啟唯音偏好設定以重新確認使用者語彙資料夾路徑的設定。";
 "i18n:LMMgr.pathInvalidityFound.userDataFolder.title" = "偵測到使用者語彙資料夾存取問題";
 "i18n:OtherIMEDataImportError.dataExtractionFailure.errMsg" = "「直接匯入」功能失敗：原始檔案不存在或損毀。";
@@ -234,6 +233,8 @@
 "i18n:settings.importFromKimoTxt.finishedCount:%@%@" = "已從總共 %@ 筆資料中成功匯入 %@ 筆新資料。";
 "i18n:settings.importFromKimoTxt.label" = "匯入奇摩輸入法自訂詞資料庫";
 "i18n:settings.importFromKimoTxt.postOpsNotice" = "其餘尚未匯入的資料可能是已有的記錄、或記錄本身不合理。若您想把全部資料完整導出為獨立文字檔，建議改用 KeyKeyUserDBKit（GitHub 倉庫: vChewing/KeyKeyUserDBKit）來操作。";
+"i18n:settings.Prompt.ChooseDesiredCassetteFilePath" = "請指定您要使用的 CIN 磁帶檔案。無效值會被忽略。\n\n⚠️💀 請避免使用由 iCloud 代管的「Documents」與「Desktop」目錄。這些位置的 sandbox bookmark 可能會在重新開機或系統更新後失效。必要時請先把檔案移到本機資料夾。";
+"i18n:settings.Prompt.ChooseDesiredUserDataFolderPath" = "請指定您要使用的使用者語彙資料夾。無效值會被忽略。\n\n⚠️💀 請避免使用由 iCloud 代管的「Documents」與「Desktop」目錄。這些位置的 sandbox bookmark 可能會在重新開機或系統更新後失效。必要時請先把資料夾移到本機位置。";
 "i18n:settings.shiftKeyASCIITogle.description" = "該功能只需要對藉由 macOS 內建的輸入法框架傳來的 NSEvent 做上下文分析，自然沒有「向使用者尋求系統全局鍵盤事件監聽權限」之必要。您可自行審視敝輸入法的原始程式碼倉庫、或對敝輸入法逆向工程，以自行證實此處所言之真假。另註：這個 Shift 鍵切換開關在 CapsLock 燈亮時無效。";
 "i18n:Uninstaller.failureGuidance" = "唯音在沙盒輸入法行程內無法自行將自身套件移到垃圾桶。您可以參閱 wiki 頁面的手動卸除說明。";
 "i18n:Uninstaller.openWikiPage" = "開啟卸除說明";

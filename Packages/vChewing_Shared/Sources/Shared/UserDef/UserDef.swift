@@ -561,11 +561,11 @@ nonisolated extension UserDef {
     case .kMostRecentInputMode: return nil
     case .kCassettePath: return .init(
         userDef: self, shortTitle: "Cassette file path",
-        description: "Choose your desired cassette file path. Will be omitted if invalid."
+        description: "i18n:settings.Prompt.ChooseDesiredCassetteFilePath"
       )
     case .kUserDataFolderSpecified: return .init(
         userDef: self, shortTitle: "User data folder path",
-        description: "Choose your desired user data folder path. Will be omitted if invalid."
+        description: "i18n:settings.Prompt.ChooseDesiredUserDataFolderPath"
       )
     case .kCheckUpdateAutomatically: return .init(
         userDef: self, shortTitle: "Check for updates automatically"

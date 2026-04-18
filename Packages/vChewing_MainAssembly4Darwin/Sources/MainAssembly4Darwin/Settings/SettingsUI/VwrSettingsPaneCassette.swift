@@ -21,11 +21,6 @@ public struct VwrSettingsPaneCassette: View {
 
       Section {
         VStack(alignment: .leading) {
-          Text(
-            LocalizedStringKey(
-              "Choose your desired cassette file path. Will be omitted if invalid."
-            )
-          )
           HStack(spacing: 3) {
             PathControl(pathDroppable: $cassettePath) { pathControl in
               pathControl.allowedTypes = ["cin2", "cin", "vcin"]
@@ -70,6 +65,8 @@ public struct VwrSettingsPaneCassette: View {
               Text("×")
             }
           }
+          Text(LocalizedStringKey("i18n:settings.Prompt.ChooseDesiredCassetteFilePath"))
+            .settingsDescription()
         }
         UserDef.kCassetteEnabled.renderUI {
           // Use cassettePath() which includes internal cache fallback.
@@ -103,7 +100,7 @@ public struct VwrSettingsPaneCassette: View {
       ) {
         Button("OK".i18n, role: .cancel) {}
       } message: {
-        Text("i18n:LMMgr.accessFailure.cassette.description".i18n)
+        Text(LMMgr.cassetteAccessFailureDescription(path: cassettePath))
       }
       .fileImporter(
         isPresented: $isShowingFileImporter,

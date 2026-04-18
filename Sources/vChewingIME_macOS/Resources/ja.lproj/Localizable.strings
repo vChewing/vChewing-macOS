@@ -106,8 +106,6 @@
 "Choose the macOS-level basic keyboard layout. Non-QWERTY alphanumerical keyboard layouts are for Pinyin parser only. This option will only affect the appearance of the on-screen-keyboard if the current Mandarin parser is neither (any) pinyin nor dynamically reparsable with different western keyboard layouts (like Eten 26, Hsu, etc.)." = "macOS 基礎キーボード配置をご指定ください。QWERTY 以外の英数キーボードは弁音以外の配列に不適用。弁音配列或いは「英数キーボードー配置と関わる注音配列（例えば許氏など）」を起用していない限り、キーボード配置の設定はキーボードビューアの有りようだけに影響を及ぼす。";
 "Choose the phonetic layout for Mandarin parser." = "共通語分析器の注音配列をご指定ください。";
 "Choose the target application bundle." = "登録したいアプリのバンドルのお選びを。";
-"Choose your desired cassette file path. Will be omitted if invalid." = "欲しがる CIN カセットファイルをご指定ください。無効なる設定は省かれる。";
-"Choose your desired user data folder path. Will be omitted if invalid." = "欲しがるユーザー辞書保存先をご指定ください。無効なる保存先設定は省かれる。";
 "Choose your desired user data folder." = "欲しがるユーザー辞書フォルダをお選びください。";
 "Choose your preferred layout of the candidate window." = "入力候補陳列の仕様をご指定ください。";
 "CHS / CHT Input Mode Switch" = "簡体・繁体中国語入力の切り替え";
@@ -213,6 +211,7 @@
 "i18n:LMMgr.accessFailure.cassette.title" = "ファイルアクセス失敗、或いはご指定したファイル位置情報は使えぬ。";
 "i18n:LMMgr.pathInvalidityFound.cassette.description" = "入力機能設定を開いて、カセットファイルのパス設定を再確認してください。";
 "i18n:LMMgr.pathInvalidityFound.cassette.title" = "カセットファイルのアクセスに問題が検出されました";
+"i18n:LMMgr.pathInvalidityFound.iCloudDriveManagedPathAdvice" = "このパスが iCloud 管理下の「Documents」または「Desktop」にある場合は、ファイルまたはフォルダをローカルの場所へ移してから、もう一度指定してください。これらのフォルダが iCloud Drive に管理されているか分からない場合は、Apple Support に相談すれば設定確認の案内を受けられます。";
 "i18n:LMMgr.pathInvalidityFound.userDataFolder.description" = "入力機能設定を開いて、ユーザー辞書データのパス設定を再確認してください。";
 "i18n:LMMgr.pathInvalidityFound.userDataFolder.title" = "ユーザー辞書フォルダへのアクセスに問題が検出されました";
 "i18n:OtherIMEDataImportError.dataExtractionFailure.errMsg" = "「直接読み込む」作動失敗：データソースファイルが存在しないか、あるいはデータが壊れたと判断しました。";
@@ -233,6 +232,8 @@
 "i18n:settings.importFromKimoTxt.finishedCount:%@%@" = "合計 %@ 件中、%@ 件の新しいデータを読み込みました。";
 "i18n:settings.importFromKimoTxt.label" = "Yahoo! KeyKey ユーザー辞書ファイルを読込";
 "i18n:settings.importFromKimoTxt.postOpsNotice" = "読み込まなかった分は不合理か、あるいは今のデータベースにすでに既存しています。すべてのデータを独立したテキストファイルとして完全にお書き出ししたい場合は、KeyKeyUserDBKit（GitHub 倉庫: vChewing/KeyKeyUserDBKit）をご利用ください。";
+"i18n:settings.Prompt.ChooseDesiredCassetteFilePath" = "使いたい CIN カセットファイルをご指定ください。無効な設定は無視されます。\n\n⚠️💀 iCloud で管理されている「Documents」と「Desktop」は避けてください。これらの sandbox bookmark は、再起動やシステム更新の後で再利用できなくなることがあります。必要なら、先にローカルフォルダへ移動してください。";
+"i18n:settings.Prompt.ChooseDesiredUserDataFolderPath" = "使いたいユーザー辞書保存先をご指定ください。無効な設定は無視されます。\n\n⚠️💀 iCloud で管理されている「Documents」と「Desktop」は避けてください。これらの sandbox bookmark は、再起動やシステム更新の後で再利用できなくなることがあります。必要なら、先にローカルの場所へ移動してください。";
 "i18n:settings.shiftKeyASCIITogle.description" = "この機能の利用する NSEvent は、macOS 内蔵の入力アプリ共用モジュール「InputMethodKit」から提供した NSEvent のみであり、その NSEvent 文脈関係で「Shift キーは１回押したかどうか」と判断することはできる。この事実に疑いを持つ者は、本アプリのソースコードを審査するか、あるいは本アプリを逆向工程（分解工学, いわゆる「Reverse-Engineering」）するがよい。なお、Shiftキーによるこの切り替えは、CapsLockがONの時には効かぬ。";
 "i18n:Uninstaller.failureGuidance" = "唯音はサンドボックス化された入力メソッドプロセスから自身のバンドルをゴミ箱へ移動できません。Wiki ページの手動卸除手順をご参照ください。";
 "i18n:Uninstaller.openWikiPage" = "卸除ガイドを開く";

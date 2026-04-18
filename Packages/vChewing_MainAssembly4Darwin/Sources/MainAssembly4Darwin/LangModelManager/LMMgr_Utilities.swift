@@ -7,6 +7,7 @@
 // requirements defined in MIT License.
 
 import AppKit
+import Darwin
 
 /// 使用者辭典資料預設範例檔案名稱。
 private let kTemplateNameUserPhrases = "template-userphrases"
@@ -284,6 +285,77 @@ extension LMMgr {
     var isFolder = ObjCBool(true)
     let exists = FileManager.default.fileExists(atPath: path, isDirectory: &isFolder)
     return exists && !isFolder.boolValue && FileManager.default.isReadableFile(atPath: path)
+  }
+
+  public static func cassetteAccessFailureDescription(path: String? = nil) -> String {
+    pathGuidanceDescription(baseKey: "i18n:LMMgr.accessFailure.cassette.description", path: path)
+  }
+
+  public static func cassettePathInvalidityDescription(path: String? = nil) -> String {
+    pathGuidanceDescription(baseKey: "i18n:LMMgr.pathInvalidityFound.cassette.description", path: path)
+  }
+
+  public static func userDataFolderInvalidityDescription(path: String? = nil) -> String {
+    pathGuidanceDescription(
+      baseKey: "i18n:LMMgr.pathInvalidityFound.userDataFolder.description",
+      path: path
+    )
+  }
+
+  private static func pathGuidanceDescription(baseKey: String, path: String?) -> String {
+    let base = baseKey.i18n
+    guard let path, iCloudMirroredPathSuspected(path) else { return base }
+    return [
+      base,
+      "→ \(path)",
+      "i18n:LMMgr.pathInvalidityFound.iCloudDriveManagedPathAdvice".i18n,
+    ]
+    .joined(separator: "\n\n")
+  }
+
+  private static func iCloudMirroredPathSuspected(_ path: String) -> Bool {
+    if let override = Self.iCloudPathDetectionOverride {
+      return override(path)
+    }
+
+    let expanded = path.expandingTildeInPath
+    guard !expanded.isEmpty else { return false }
+    let resolved = (expanded as NSString).resolvingSymlinksInPath
+    let normalized = URL(fileURLWithPath: resolved).standardizedFileURL.path
+    let homeURL = URL(fileURLWithPath: NSHomeDirectory(), isDirectory: true)
+    let cloudDocsRoot = homeURL.appendingPathComponent("Library", isDirectory: true)
+      .appendingPathComponent("Mobile Documents", isDirectory: true)
+      .appendingPathComponent("com~apple~CloudDocs", isDirectory: true).path
+    if normalized == cloudDocsRoot || normalized.hasPrefix(cloudDocsRoot + "/") {
+      return true
+    }
+
+    let mirroredRoots = [
+      homeURL.appendingPathComponent("Documents", isDirectory: true).path,
+      homeURL.appendingPathComponent("Desktop", isDirectory: true).path,
+    ]
+    let isMirroredHomeFolder = mirroredRoots.contains { root in
+      normalized == root || normalized.hasPrefix(root + "/")
+    }
+    guard isMirroredHomeFolder else { return false }
+    return isICloudDesktopDocumentsSyncEnabled(homeURL: homeURL)
+  }
+
+  private static func isICloudDesktopDocumentsSyncEnabled(homeURL: URL) -> Bool {
+    let attributeNames = ["com.apple.icloud.desktop", "com.apple.icloud.documents"]
+    let mirrorRoots = [
+      homeURL.appendingPathComponent("Desktop", isDirectory: true).path,
+      homeURL.appendingPathComponent("Documents", isDirectory: true).path,
+    ]
+    return mirrorRoots.contains { rootPath in
+      attributeNames.contains { attributeName in
+        hasExtendedAttribute(named: attributeName, atPath: rootPath)
+      }
+    }
+  }
+
+  private static func hasExtendedAttribute(named name: String, atPath path: String) -> Bool {
+    getxattr(path, name, nil, 0, 0, 0) >= 0
   }
 
   // MARK: - 重設使用者語彙檔案目錄

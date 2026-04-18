@@ -154,6 +154,55 @@ extension MainAssemblyTests {
     #expect(!fileManager.fileExists(atPath: cacheURL.path))
   }
 
+  @Test
+  func test016_LMMgr_CassetteAccessFailureAddsICloudGuidanceForCloudDocsPaths() {
+    let mirroredPath = URL(fileURLWithPath: NSHomeDirectory(), isDirectory: true)
+      .appendingPathComponent("Library", isDirectory: true)
+      .appendingPathComponent("Mobile Documents", isDirectory: true)
+      .appendingPathComponent("com~apple~CloudDocs", isDirectory: true)
+      .appendingPathComponent("phase25-guidance.cin2")
+      .path
+    let advice = "i18n:LMMgr.pathInvalidityFound.iCloudDriveManagedPathAdvice".i18n
+    let description = LMMgr.cassetteAccessFailureDescription(path: mirroredPath)
+
+    #expect(description.contains(advice))
+  }
+
+  @Test
+  func test017_LMMgr_CassetteAccessFailureAddsICloudGuidanceForMirroredFoldersWhenSyncEnabled() {
+    let originalOverride = LMMgr.iCloudPathDetectionOverride
+    LMMgr.iCloudPathDetectionOverride = { candidatePath in
+      candidatePath.contains("/Documents/")
+    }
+    defer { LMMgr.iCloudPathDetectionOverride = originalOverride }
+
+    let mirroredPath = URL(fileURLWithPath: NSHomeDirectory(), isDirectory: true)
+      .appendingPathComponent("Documents", isDirectory: true)
+      .appendingPathComponent("phase25-mirrored-guidance.cin2")
+      .path
+    let advice = "i18n:LMMgr.pathInvalidityFound.iCloudDriveManagedPathAdvice".i18n
+    let description = LMMgr.cassetteAccessFailureDescription(path: mirroredPath)
+
+    #expect(description.contains(advice))
+  }
+
+  @Test
+  func test018_LMMgr_CassetteAccessFailureSkipsICloudGuidanceOutsideMirroredFolders() {
+    let originalOverride = LMMgr.iCloudPathDetectionOverride
+    LMMgr.iCloudPathDetectionOverride = { _ in false }
+    defer { LMMgr.iCloudPathDetectionOverride = originalOverride }
+
+    let localPath = LMMgr.unitTestDataURL(isDefaultFolder: false)
+      .appendingPathComponent("phase25-local-guidance.cin2")
+      .path
+    let base = "i18n:LMMgr.accessFailure.cassette.description".i18n
+    let advice = "i18n:LMMgr.pathInvalidityFound.iCloudDriveManagedPathAdvice".i18n
+    let description = LMMgr.cassetteAccessFailureDescription(path: localPath)
+
+    #expect(description == base)
+    #expect(!description.contains(advice))
+  }
+
   // MARK: - Input Handler Tests.
 
   /// 測試基本的打字組句（不是ㄅ半注音）。

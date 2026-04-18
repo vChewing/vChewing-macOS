@@ -22,11 +22,6 @@ public struct VwrSettingsPaneDictionary: View {
       Section {
         Group {
           VStack(alignment: .leading) {
-            Text(
-              LocalizedStringKey(
-                "Choose your desired user data folder path. Will be omitted if invalid."
-              )
-            )
             HStack(spacing: 3) {
               PathControl(pathDroppable: $userDataFolderSpecified) { pathControl in
                 pathControl.allowedTypes = ["public.folder", "public.directory"]
@@ -73,18 +68,21 @@ public struct VwrSettingsPaneDictionary: View {
                 Text("↻")
               }.frame(minWidth: 25)
             }
-            Spacer()
+            Text(LocalizedStringKey("i18n:settings.Prompt.ChooseDesiredUserDataFolderPath"))
+              .settingsDescription()
+          }
+          VStack(alignment: .leading) {
+            UserDef.kShouldAutoReloadUserDataFiles.renderUI {
+              if PrefMgr.shared.shouldAutoReloadUserDataFiles {
+                LMMgr.initUserLangModels()
+              }
+            }
             Text(
               LocalizedStringKey(
                 "Due to security concerns, we don't consider implementing anything related to shell script execution here. An input method doing this without implementing App Sandbox will definitely have system-wide vulnerabilities, considering that its related UserDefaults are easily tamperable to execute malicious shell scripts. vChewing is designed to be invulnerable from this kind of attack. Also, official releases of vChewing are Sandboxed."
               )
             )
             .settingsDescription()
-            UserDef.kShouldAutoReloadUserDataFiles.renderUI {
-              if PrefMgr.shared.shouldAutoReloadUserDataFiles {
-                LMMgr.initUserLangModels()
-              }
-            }
           }
         }
         .fileImporter(

@@ -98,6 +98,7 @@ public final class LMMgr {
 
   public static func prepareForUnitTests() {
     guard UserDefaults.pendingUnitTests else { return }
+    iCloudPathDetectionOverride = nil
     if #available(macOS 10.15, *) {
       prepareUnitTestSandbox()
     }
@@ -106,6 +107,7 @@ public final class LMMgr {
   }
 
   public static func resetAfterUnitTests() {
+    iCloudPathDetectionOverride = nil
     Shared.InputMode.resetLangModelCache()
     resetUnitTestSandbox()
     LMAssembly.resetSharedState()
@@ -344,6 +346,8 @@ public final class LMMgr {
 
   // MARK: Internal
 
+  static var iCloudPathDetectionOverride: ((String) -> Bool)?
+
   // MARK: Unit Test Sandbox
 
   @available(macOS 10.15, *)
@@ -428,7 +432,7 @@ public final class LMMgr {
         asyncOnMain(bypassAsync: UserDefaults.pendingUnitTests) {
           self.callModalAlert(
             msg: "i18n:LMMgr.pathInvalidityFound.userDataFolder.title".i18n,
-            infoText: "i18n:LMMgr.pathInvalidityFound.userDataFolder.description".i18n
+            infoText: Self.userDataFolderInvalidityDescription(path: path)
           )
         }
       }
@@ -443,7 +447,7 @@ public final class LMMgr {
         asyncOnMain(bypassAsync: UserDefaults.pendingUnitTests) {
           self.callModalAlert(
             msg: "i18n:LMMgr.pathInvalidityFound.cassette.title".i18n,
-            infoText: "i18n:LMMgr.pathInvalidityFound.cassette.description".i18n
+            infoText: Self.cassettePathInvalidityDescription(path: path)
           )
         }
       }

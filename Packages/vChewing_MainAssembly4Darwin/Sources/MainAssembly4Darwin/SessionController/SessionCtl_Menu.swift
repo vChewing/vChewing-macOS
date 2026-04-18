@@ -163,9 +163,7 @@ extension SessionCtl {
       asyncOnMain(bypassAsync: UserDefaults.pendingUnitTests) {
         IMEApp.buzz()
         let alert = NSAlert(error: "i18n:LMMgr.accessFailure.cassette.title".i18n)
-        let informativeText =
-          "i18n:LMMgr.accessFailure.cassette.description"
-        alert.informativeText = informativeText.i18n
+        alert.informativeText = LMMgr.cassetteAccessFailureDescription(path: PrefMgr.shared.cassettePath)
         let result = alert.runModal()
         NSApp.popup()
         if result == NSApplication.ModalResponse.alertFirstButtonReturn {

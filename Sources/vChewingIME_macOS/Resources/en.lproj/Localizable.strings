@@ -107,8 +107,6 @@
 "Choose the macOS-level basic keyboard layout. Non-QWERTY alphanumerical keyboard layouts are for Pinyin parser only. This option will only affect the appearance of the on-screen-keyboard if the current Mandarin parser is neither (any) pinyin nor dynamically reparsable with different western keyboard layouts (like Eten 26, Hsu, etc.)." = "Choose the macOS-level basic keyboard layout. Non-QWERTY alphanumerical keyboard layouts are for Pinyin parser only. This option will only affect the appearance of the on-screen-keyboard if the current Mandarin parser is neither (any) pinyin nor dynamically reparsable with different western keyboard layouts (like Eten 26, Hsu, etc.).";
 "Choose the phonetic layout for Mandarin parser." = "Choose the phonetic layout for Mandarin parser.";
 "Choose the target application bundle." = "Choose the target application bundle.";
-"Choose your desired cassette file path. Will be omitted if invalid." = "Choose your desired cassette file path. Will be omitted if invalid.";
-"Choose your desired user data folder path. Will be omitted if invalid." = "Choose your desired user data folder path. Will be omitted if invalid.";
 "Choose your desired user data folder." = "Choose your desired user data folder.";
 "Choose your preferred layout of the candidate window." = "Choose your preferred layout of the candidate window.";
 "CHS / CHT Input Mode Switch" = "CHS / CHT Input Mode Switch";
@@ -214,6 +212,7 @@
 "i18n:LMMgr.accessFailure.cassette.title" = "Path invalid or file access error.";
 "i18n:LMMgr.pathInvalidityFound.cassette.description" = "Please open vChewing Preferences to reconfirm your cassette file path settings.";
 "i18n:LMMgr.pathInvalidityFound.cassette.title" = "Cassette File Accessibility Issues Detected";
+"i18n:LMMgr.pathInvalidityFound.iCloudDriveManagedPathAdvice" = "If this path is inside an iCloud-hosted “Documents” or “Desktop” folder, move the file or folder to a local location and choose it again. If you are not sure whether iCloud Drive manages these folders on your Mac, Apple Support can guide you through checking that setting.";
 "i18n:LMMgr.pathInvalidityFound.userDataFolder.description" = "Please open vChewing Preferences to reconfirm your user dictionary data path settings.";
 "i18n:LMMgr.pathInvalidityFound.userDataFolder.title" = "User Data Folder Accessibility Issues Detected";
 "i18n:OtherIMEDataImportError.dataExtractionFailure.errMsg" = "Failed from getting importable data. Either the source file is missing or corrupted.";
@@ -234,6 +233,8 @@
 "i18n:settings.importFromKimoTxt.finishedCount:%@%@" = "Found %@ entries. %@ new records imported.";
 "i18n:settings.importFromKimoTxt.label" = "Import Yahoo! KeyKey User Dictionary file";
 "i18n:settings.importFromKimoTxt.postOpsNotice" = "Other entires are either already-in-database or have validity problems. If you want to dump all data to a dedicated text file, you may want to use KeyKeyUserDBKit (GitHub Repository `vChewing/KeyKeyUserDBKit`) instead.";
+"i18n:settings.Prompt.ChooseDesiredCassetteFilePath" = "Choose your desired cassette file path. Invalid paths will be ignored.\n\n⚠️💀 Avoid iCloud-hosted “Documents” and “Desktop” folders. Their sandbox bookmarks may stop working after reboot or system updates. Move the file to a local folder first if needed.";
+"i18n:settings.Prompt.ChooseDesiredUserDataFolderPath" = "Choose your desired user data folder path. Invalid paths will be ignored.\n\n⚠️💀 Avoid iCloud-hosted “Documents” and “Desktop” folders. Their sandbox bookmarks may stop working after reboot or system updates. Move the folder to a local location first if needed.";
 "i18n:settings.shiftKeyASCIITogle.description" = "This feature only needs to parse consecutive NSEvents passed by macOS built-in InputMethodKit framework, hence no necessity of asking end-users for extra privileges of monitoring global keyboard inputs. You are free to investigate our codebase or reverse-engineer this input method to see whether the above statement is trustable. Also, this Shift-key toggle won't work if CapsLock is ON.";
 "i18n:Uninstaller.failureGuidance" = "vChewing cannot move its own bundle to the Trash from a sandboxed input method process. You can follow the manual uninstall instructions on the wiki page.";
 "i18n:Uninstaller.openWikiPage" = "Open Uninstall Guide";
