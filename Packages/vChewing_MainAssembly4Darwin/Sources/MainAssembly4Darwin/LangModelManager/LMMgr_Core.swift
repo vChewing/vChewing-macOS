@@ -155,7 +155,17 @@ public final class LMMgr {
     LMAssembly.LMInstantiator.setCassetCandidateKeyValidator {
       CandidateKey.validate(keys: $0) == nil
     }
-    LMAssembly.LMInstantiator.loadCassetteData(path: cassettePath())
+    let resolvedPath = cassettePath()
+    // If the external path was resolved successfully, refresh the internal cache
+    // so that the cache stays up-to-date for future fallback (e.g. after reboot when
+    // iCloud Drive bookmark becomes stale).
+    if !resolvedPath.isEmpty {
+      let rawPath = PrefMgr.shared.cassettePath.expandingTildeInPath
+      if resolvedPath == rawPath {
+        importCassetteFileToCache(from: URL(fileURLWithPath: rawPath))
+      }
+    }
+    LMAssembly.LMInstantiator.loadCassetteData(path: resolvedPath)
   }
 
   public static func loadUserPhrasesData(type: LMAssembly.ReplacableUserDataType? = nil) {

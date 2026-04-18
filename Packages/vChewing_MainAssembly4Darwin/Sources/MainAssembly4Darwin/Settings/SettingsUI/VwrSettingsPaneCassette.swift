@@ -43,6 +43,7 @@ public struct VwrSettingsPaneCassette: View {
                 pathControl.url = url
                 LMMgr.loadCassetteData()
                 BookmarkManager.shared.saveBookmark(for: url)
+                LMMgr.importCassetteFileToCache(from: url)
                 return true
               }
               // On Error:
@@ -71,7 +72,8 @@ public struct VwrSettingsPaneCassette: View {
           }
         }
         UserDef.kCassetteEnabled.renderUI {
-          if PrefMgr.shared.cassetteEnabled, !LMMgr.checkCassettePathValidity(PrefMgr.shared.cassettePath) {
+          // Use cassettePath() which includes internal cache fallback.
+          if PrefMgr.shared.cassetteEnabled, LMMgr.cassettePath().isEmpty {
             IMEApp.buzz()
             LMMgr.resetCassettePath()
             PrefMgr.shared.cassetteEnabled = false
@@ -123,6 +125,7 @@ public struct VwrSettingsPaneCassette: View {
             cassettePath = url.path
             LMMgr.loadCassetteData()
             BookmarkManager.shared.saveBookmark(for: url)
+            LMMgr.importCassetteFileToCache(from: url)
           } else {
             IMEApp.buzz()
             if !bolPreviousPathValidity {

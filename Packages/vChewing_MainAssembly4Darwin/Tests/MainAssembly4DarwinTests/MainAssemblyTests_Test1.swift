@@ -72,6 +72,88 @@ extension MainAssemblyTests {
     }
   }
 
+  @Test
+  func test012_LMMgr_CassetteCacheUsesUnitTestSandbox() {
+    let expectedURL = LMMgr.unitTestDataURL(isDefaultFolder: true).appendingPathComponent("Cassettes")
+    #expect(LMMgr.cassetteCacheDirectoryURL.path == expectedURL.path)
+  }
+
+  @Test
+  func test013_LMMgr_CassettePathFallsBackToCachedCopy() throws {
+    let fileManager = FileManager.default
+    let externalURL = LMMgr.unitTestDataURL(isDefaultFolder: false)
+      .appendingPathComponent("phase25-fallback-\(UUID().uuidString).cin2")
+    let cacheURL = LMMgr.cassetteCacheDirectoryURL.appendingPathComponent(externalURL.lastPathComponent)
+
+    defer {
+      try? fileManager.removeItem(at: externalURL)
+      try? fileManager.removeItem(at: cacheURL)
+      LMMgr.resetCassettePath()
+    }
+
+    try fileManager.createDirectory(
+      at: LMMgr.cassetteCacheDirectoryURL,
+      withIntermediateDirectories: true
+    )
+    try Data("phase25-fallback".utf8).write(to: externalURL, options: [.atomic])
+    #expect(LMMgr.importCassetteFileToCache(from: externalURL))
+
+    PrefMgr.shared.cassettePath = externalURL.path
+    try fileManager.removeItem(at: externalURL)
+
+    #expect(LMMgr.cassettePath() == cacheURL.path)
+  }
+
+  @Test
+  func test014_LMMgr_ResetCassettePathKeepsDirectCacheSource() throws {
+    let fileManager = FileManager.default
+    let cacheURL = LMMgr.cassetteCacheDirectoryURL
+      .appendingPathComponent("phase25-direct-cache-\(UUID().uuidString).cin2")
+
+    defer {
+      try? fileManager.removeItem(at: cacheURL)
+      LMMgr.resetCassettePath()
+    }
+
+    try fileManager.createDirectory(
+      at: LMMgr.cassetteCacheDirectoryURL,
+      withIntermediateDirectories: true
+    )
+    try Data("phase25-direct-cache".utf8).write(to: cacheURL, options: [.atomic])
+
+    PrefMgr.shared.cassettePath = cacheURL.path
+    LMMgr.resetCassettePath()
+
+    #expect(fileManager.fileExists(atPath: cacheURL.path))
+  }
+
+  @Test
+  func test015_LMMgr_ResetCassettePathRemovesImportedCacheCopy() throws {
+    let fileManager = FileManager.default
+    let externalURL = LMMgr.unitTestDataURL(isDefaultFolder: false)
+      .appendingPathComponent("phase25-reset-\(UUID().uuidString).cin2")
+    let cacheURL = LMMgr.cassetteCacheDirectoryURL.appendingPathComponent(externalURL.lastPathComponent)
+
+    defer {
+      try? fileManager.removeItem(at: externalURL)
+      try? fileManager.removeItem(at: cacheURL)
+      LMMgr.resetCassettePath()
+    }
+
+    try fileManager.createDirectory(
+      at: LMMgr.cassetteCacheDirectoryURL,
+      withIntermediateDirectories: true
+    )
+    try Data("phase25-reset".utf8).write(to: externalURL, options: [.atomic])
+    #expect(LMMgr.importCassetteFileToCache(from: externalURL))
+
+    PrefMgr.shared.cassettePath = externalURL.path
+    LMMgr.resetCassettePath()
+
+    #expect(fileManager.fileExists(atPath: externalURL.path))
+    #expect(!fileManager.fileExists(atPath: cacheURL.path))
+  }
+
   // MARK: - Input Handler Tests.
 
   /// 測試基本的打字組句（不是ㄅ半注音）。

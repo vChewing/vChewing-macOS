@@ -106,6 +106,7 @@ extension SettingsPanesCocoa.Cassette: NSPathControlDelegate {
       PrefMgr.shared.cassettePath = url.path
       LMMgr.loadCassetteData()
       BookmarkManager.shared.saveBookmark(for: url)
+      LMMgr.importCassetteFileToCache(from: url)
       pathControl.url = url
       return true
     }
@@ -165,6 +166,7 @@ extension SettingsPanesCocoa.Cassette: NSPathControlDelegate {
           PrefMgr.shared.cassettePath = url.path
           LMMgr.loadCassetteData()
           BookmarkManager.shared.saveBookmark(for: url)
+          LMMgr.importCassetteFileToCache(from: url)
           self?.pctCassetteFilePath.url = url
         } else {
           IMEApp.buzz()

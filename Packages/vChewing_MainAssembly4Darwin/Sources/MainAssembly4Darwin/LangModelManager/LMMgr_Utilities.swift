@@ -226,9 +226,64 @@ extension LMMgr {
     if UserDefaults.current.object(forKey: UserDef.kCassettePath.rawValue) != nil {
       BookmarkManager.shared.loadBookmarks()
       if Self.checkCassettePathValidity(rawCassettePath) { return rawCassettePath }
+      // External path failed (e.g. iCloud Drive bookmark stale); try internal cache.
+      let cached = Self.cachedCassetteFilePath(for: rawCassettePath)
+      if Self.isFileReadable(cached) {
+        Broadcaster.shared.clearLmMgrCassettePathInvalidity()
+        return cached
+      }
       UserDefaults.current.removeObject(forKey: UserDef.kCassettePath.rawValue)
     }
     return ""
+  }
+
+  // MARK: - Cassette file internal cache (iCloud Drive bookmark workaround)
+
+  /// Directory for cached cassette files inside App Support (no bookmark needed).
+  public static var cassetteCacheDirectoryURL: URL {
+    if #available(macOS 10.15, *), UserDefaults.pendingUnitTests {
+      return unitTestDataURL(isDefaultFolder: true).appendingPathComponent("Cassettes")
+    }
+    return appSupportURL.appendingPathComponent("vChewing/Cassettes")
+  }
+
+  /// Import (copy) a cassette file to the internal cache directory.
+  /// Returns `true` on success. Silently skips if source and destination are the same file.
+  @discardableResult
+  public static func importCassetteFileToCache(from sourceURL: URL) -> Bool {
+    let cacheDir = cassetteCacheDirectoryURL
+    do {
+      try FileManager.default.createDirectory(at: cacheDir, withIntermediateDirectories: true)
+    } catch {
+      return false
+    }
+    let destURL = cacheDir.appendingPathComponent(sourceURL.lastPathComponent)
+    guard sourceURL.path != destURL.path else { return true }
+    do {
+      if FileManager.default.fileExists(atPath: destURL.path) {
+        try FileManager.default.removeItem(at: destURL)
+      }
+      try FileManager.default.copyItem(at: sourceURL, to: destURL)
+      return true
+    } catch {
+      return false
+    }
+  }
+
+  /// Returns the cached cassette file path derived from an external path's filename.
+  private static func cachedCassetteFilePath(for externalPath: String) -> String {
+    guard !externalPath.isEmpty else { return "" }
+    let fileName = URL(fileURLWithPath: externalPath).lastPathComponent
+    guard !fileName.isEmpty else { return "" }
+    return cassetteCacheDirectoryURL.appendingPathComponent(fileName).path
+  }
+
+  /// Check if a file is readable without firing broadcaster side effects.
+  private static func isFileReadable(_ path: String) -> Bool {
+    guard !path.isEmpty else { return false }
+    var isFolder = ObjCBool(true)
+    let exists = FileManager.default.fileExists(atPath: path, isDirectory: &isFolder)
+    return exists && !isFolder.boolValue && FileManager.default.isReadableFile(atPath: path)
   }
 
   // MARK: - 重設使用者語彙檔案目錄
@@ -247,6 +302,14 @@ extension LMMgr {
   public static func resetCassettePath() {
     // 停止先前的 security-scope 存取，以避免權限或資源洩漏
     BookmarkManager.shared.stopAllSecurityScopedAccesses()
+    // Clean up cached cassette file before clearing the path.
+    let rawPath = PrefMgr.shared.cassettePath.expandingTildeInPath
+    if !rawPath.isEmpty {
+      let cached = cachedCassetteFilePath(for: rawPath)
+      if !cached.isEmpty, cached != rawPath {
+        try? FileManager.default.removeItem(atPath: cached)
+      }
+    }
     UserDefaults.current.set("", forKey: UserDef.kCassettePath.rawValue)
     Self.loadCassetteData()
   }
