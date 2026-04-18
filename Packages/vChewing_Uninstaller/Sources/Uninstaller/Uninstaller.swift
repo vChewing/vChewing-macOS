@@ -14,8 +14,7 @@ import OSFrameworkImpl
 public enum Uninstaller {
   // MARK: Public
 
-  /// Shows an NSAlert guiding the user to the manual uninstall wiki page.
-  /// Called when the user cancels the NSOpenPanel or selects a wrong directory.
+  /// Shows an NSAlert explaining that the sandboxed IME cannot trash its own bundle.
   public static func showUninstallFailureGuidance() {
     let alert = NSAlert()
     alert.messageText = "Uninstallation".i18n
@@ -31,17 +30,17 @@ public enum Uninstaller {
     }
   }
 
-  /// Prints CLI guidance when uninstall cannot proceed due to lack of directory access.
+  /// Prints CLI guidance when the sandboxed IME cannot trash its own bundle.
   public static func printUninstallCLIGuidance() {
     var lines = """
-    Failed to obtain access to the Input Methods directory.
-    To uninstall vChewing manually, please visit:
+    vChewing cannot move its own bundle to the Trash from a sandboxed input method process.
+    Please follow the manual uninstall guide:
     \(uninstallWikiURL)
     """
     if let scriptURL = Bundle.main.url(forResource: "uninstall", withExtension: "sh"),
        FileManager.default.fileExists(atPath: scriptURL.path) {
       lines +=
-        "\n\nAlternatively, you may review and run the bundled uninstall script:\n  \(scriptURL.path)\nIt contains the full list of files and directories to be removed."
+        "\n\nIf you are running the installed bundle, you may also review and run:\n  \(scriptURL.path)\nThe script lists the files and folders that need to be removed."
     }
     print(lines)
   }
@@ -118,7 +117,7 @@ public enum Uninstaller {
 
   // MARK: Private
 
-  // MARK: - Directory access request for sandboxed uninstall.
+  // MARK: - Manual uninstall guidance.
 
   private static let uninstallWikiURL = "https://github.com/vChewing/vChewing-macOS/wiki/HOW_TO_UNINSTALL"
 }
