@@ -30,7 +30,7 @@ let package = Package(
     .package(path: "../vChewing_TooltipUI"),
     .package(path: "../vChewing_Uninstaller"),
     .package(path: "../vChewing_UpdateSputnik"),
-    .package(url: "https://atomgit.com/vChewing/vChewing-VanguardLexicon.git", exact: "4.3.5"),
+    .package(url: "https://atomgit.com/vChewing/vChewing-VanguardLexicon.git", exact: "4.3.6"),
   ],
   targets: [
     .target(
