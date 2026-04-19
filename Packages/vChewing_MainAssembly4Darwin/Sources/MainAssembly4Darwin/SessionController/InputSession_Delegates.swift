@@ -299,6 +299,11 @@ extension SessionProtocol {
       )
       // 候選確認後，若選中的是單一全形左括號，觸發自動括號配對
       inputHandler.handleAutoBracketPairingForCandidateValue(selectedValue.value)
+      // 若是凍結候選重選，替換凍結字元並回到凍結游標模式
+      if inputHandler.handleFrozenCandidateConfirmation() {
+        switchState(inputHandler.generateStateOfInputting())
+        return
+      }
       var result: State = inputHandler.generateStateOfInputting()
       defer { switchState(result) } // 這是最終輸出結果。
       if prefs.useSCPCTypingMode {

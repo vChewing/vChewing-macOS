@@ -399,6 +399,11 @@ public final class MockSession: @MainActor SessionCoreProtocol, CtlCandidateDele
       )
       // 候選確認後，若選中的是單一全形左括號，觸發自動括號配對
       inputHandler.handleAutoBracketPairingForCandidateValue(selectedValue.value)
+      // 若是凍結候選重選，執行回凍結邏輯
+      if inputHandler.handleFrozenCandidateConfirmation() {
+        switchState(inputHandler.generateStateOfInputting())
+        return
+      }
       var result: State = inputHandler.generateStateOfInputting()
       defer { switchState(result) } // 這是最終輸出結果。
       if inputHandler.prefs.useSCPCTypingMode {

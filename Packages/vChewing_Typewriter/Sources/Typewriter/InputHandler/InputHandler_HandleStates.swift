@@ -40,13 +40,31 @@ extension InputHandlerProtocol {
     var rawSegments: [String]? = (!handleAsCodePointInput && !handleAsRomanNumeralInput && !sansReading)
       ? rawDisplayTextSegmentsIfNeeded
       : nil
-    // 若 smartSwitchState 有凍結段落，將其前置於顯示段落。
-    if !smartSwitchState.frozenSegments.isEmpty {
-      displayTextSegments = smartSwitchState.frozenSegments + displayTextSegments
+    var cursor: Int
+    if let split = smartSwitchState.frozenTextSplitAroundCandidatePosition() {
+      // 凍結候選重選模式：assembler 內容嵌入凍結文字中間（取代被重選的字元）
+      let assemblerCursor = handleAsCodePointInput || handleAsRomanNumeralInput
+        ? strCodePointBuffer.count
+        : convertCursorForDisplay(assembler.cursor)
+      var merged = [String]()
+      if !split.before.isEmpty { merged.append(split.before) }
+      merged += displayTextSegments
+      if !split.after.isEmpty { merged.append(split.after) }
+      displayTextSegments = merged
+      cursor = split.before.count + assemblerCursor
+    } else {
+      // 若 smartSwitchState 有凍結段落，將其前置於顯示段落。
+      if !smartSwitchState.frozenSegments.isEmpty {
+        displayTextSegments = smartSwitchState.frozenSegments.map(\.value) + displayTextSegments
+      }
+      if let frozenPos = smartSwitchState.frozenCursor {
+        cursor = frozenPos
+      } else if handleAsCodePointInput || handleAsRomanNumeralInput {
+        cursor = strCodePointBuffer.count + smartSwitchState.frozenDisplayText.count
+      } else {
+        cursor = convertCursorForDisplay(assembler.cursor) + smartSwitchState.frozenDisplayText.count
+      }
     }
-    var cursor = handleAsCodePointInput || handleAsRomanNumeralInput
-      ? strCodePointBuffer.count + smartSwitchState.frozenDisplayText.count
-      : convertCursorForDisplay(assembler.cursor) + smartSwitchState.frozenDisplayText.count
     let cursorSansReading = cursor
     // 先提出來讀音資料，減輕運算負擔。
     let noReading = sansReading || [.codePoint, .romanNumerals].contains(currentTypingMethod)
@@ -130,8 +148,16 @@ extension InputHandlerProtocol {
           prefs.specifyCmdOptCtrlEnterBehavior == 4
     else { return nil }
     let raw = assembler.assembledSentence.values
+    // 候選重選模式：raw 嵌入凍結文字中間
+    if let split = smartSwitchState.frozenTextSplitAroundCandidatePosition() {
+      var result = [String]()
+      if !split.before.isEmpty { result.append(split.before) }
+      result += raw
+      if !split.after.isEmpty { result.append(split.after) }
+      return result
+    }
     guard !smartSwitchState.frozenSegments.isEmpty else { return raw }
-    return smartSwitchState.frozenSegments + raw
+    return smartSwitchState.frozenSegments.map(\.value) + raw
   }
 
   /// 將讀音插入到文字片段陣列的指定游標位置。
@@ -177,7 +203,7 @@ extension InputHandlerProtocol {
       : compositionBufferDisplayTextSegments(reflectBPMFVS: false)
     // 若 smartSwitchState 有凍結段落，將其前置於遞交內容。
     if !smartSwitchState.frozenSegments.isEmpty {
-      displayTextSegments = smartSwitchState.frozenSegments + displayTextSegments
+      displayTextSegments = smartSwitchState.frozenSegments.map(\.value) + displayTextSegments
     }
     displayTextSegments = displayTextSegments.map { $0.trimmingCharacters(in: .newlines) }
     var displayedText = displayTextSegments.joined()
@@ -254,19 +280,41 @@ extension InputHandlerProtocol {
   public func generateStateOfCandidates(dodge: Bool = true) -> State {
     guard let session = session else { return State.ofAbortion() }
     let cursorPriorToCandidateSelection = assembler.cursor
-    if dodge, session.state.type == .ofInputting {
+    // 凍結候選重選模式下不執行游標偏移（assembler 只含一個目標節點）
+    let isFrozenCandidateMode = smartSwitchState.frozenCandidateCharPosition != nil
+    if dodge, !isFrozenCandidateMode, session.state.type == .ofInputting {
       dodgeInvalidEdgeCursorForCandidateState()
     }
     if restoreCursorAfterSelectingCandidate, backupCursor == nil {
       backupCursor = cursorPriorToCandidateSelection
     }
+    var candidateDisplaySegments: [String]
+    var candidateCursor: Int
+    if let split = smartSwitchState.frozenTextSplitAroundCandidatePosition() {
+      // 凍結候選重選模式：assembler 內容嵌入凍結文字中間（取代被重選的字元）
+      let assemblerContent = compositionBufferDisplayTextSegments()
+      var merged = [String]()
+      if !split.before.isEmpty { merged.append(split.before) }
+      merged += assemblerContent
+      if !split.after.isEmpty { merged.append(split.after) }
+      candidateDisplaySegments = merged
+      candidateCursor = split.before.count + assembler.cursor
+    } else if !smartSwitchState.frozenSegments.isEmpty {
+      candidateDisplaySegments = smartSwitchState.frozenSegments.map(\.value) + compositionBufferDisplayTextSegments()
+      candidateCursor = assembler.cursor + smartSwitchState.frozenDisplayText.count
+    } else {
+      candidateDisplaySegments = compositionBufferDisplayTextSegments()
+      candidateCursor = assembler.cursor
+    }
     var result = State.ofCandidates(
       candidates: generateArrayOfCandidates(fixOrder: prefs.useFixedCandidateOrderOnSelection),
-      displayTextSegments: compositionBufferDisplayTextSegments(),
-      cursor: assembler.cursor
+      displayTextSegments: candidateDisplaySegments,
+      cursor: candidateCursor
     )
     result.data.rawDisplayTextSegments = rawDisplayTextSegmentsIfNeeded
-    if !prefs.useRearCursorMode {
+    // 凍結候選重選模式下，marker 維持與 cursor 相同（不做 jumpCursorBySegment），
+    // 使選字窗顯示正常的單一下劃線而非標記選取範圍。
+    if !isFrozenCandidateMode, !prefs.useRearCursorMode {
       let markerBackup = assembler.marker
       assembler.jumpCursorBySegment(to: .rear, isMarker: true)
       result.marker = assembler.marker
@@ -658,6 +706,21 @@ extension InputHandlerProtocol {
     }
 
     if isComposerOrCalligrapherEmpty {
+      // 凍結游標模式：刪除凍結段落內游標前字元
+      if smartSwitchState.isInFrozenCursorMode {
+        if smartSwitchState.deleteFrozenCharBeforeCursor() {
+          if smartSwitchState.frozenSegments.isEmpty {
+            smartSwitchState.exitFrozenCursorMode()
+          }
+          switch isConsideredEmptyForNow {
+          case false: session.switchState(generateStateOfInputting())
+          case true: session.switchState(State.ofAbortion())
+          }
+        } else {
+          errorCallback?("9D69908D")
+        }
+        return true
+      }
       if assembler.cursor <= 0 || actualSteps <= 0 {
         errorCallback?("9D69908D")
         return true
@@ -909,7 +972,11 @@ extension InputHandlerProtocol {
       }
       session.switchState(generateStateOfInputting())
     } else {
-      if assembler.moveCursorStepwise(to: .front) {
+      if smartSwitchState.isInFrozenCursorMode {
+        // moveFrozenCursorForward() 回傳 false 時已自動退出凍結模式
+        smartSwitchState.moveFrozenCursorForward()
+        session.switchState(generateStateOfInputting())
+      } else if assembler.moveCursorStepwise(to: .front) {
         session.switchState(generateStateOfInputting())
       } else {
         errorCallback?("A96AAD58")
@@ -971,7 +1038,18 @@ extension InputHandlerProtocol {
       }
       session.switchState(generateStateOfInputting())
     } else {
-      if assembler.moveCursorStepwise(to: .rear) {
+      if smartSwitchState.isInFrozenCursorMode {
+        if !smartSwitchState.moveFrozenCursorBackward() {
+          errorCallback?("7045E6F3")
+        } else {
+          session.switchState(generateStateOfInputting())
+        }
+      } else if assembler.moveCursorStepwise(to: .rear) {
+        session.switchState(generateStateOfInputting())
+      } else if !smartSwitchState.frozenSegments.isEmpty {
+        // assembler 游標到頭且有凍結段落 → 進入凍結模式並向後移一步
+        smartSwitchState.enterFrozenCursorMode()
+        smartSwitchState.moveFrozenCursorBackward()
         session.switchState(generateStateOfInputting())
       } else {
         errorCallback?("7045E6F3")

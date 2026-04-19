@@ -8,6 +8,30 @@
 
 import Foundation
 
+// MARK: - FrozenSegment
+
+/// 凍結段落的資料結構，保存顯示文字與注音讀音（供候選重選用）。
+public struct FrozenSegment: Equatable {
+  /// 顯示用文字（一個或多個字元）
+  public let value: String
+  /// 注音讀音陣列（nil = 英文／無讀音；phonetic 時每個讀音對應 value 內一個字元）
+  public let keyArray: [String]?
+
+  public var isPhonetic: Bool { keyArray != nil && !keyArray!.isEmpty }
+
+  /// 建立英文型（無讀音）的凍結段落
+  public init(value: String) {
+    self.value = value
+    self.keyArray = nil
+  }
+
+  /// 建立中文型（有讀音）的凍結段落
+  public init(value: String, keyArray: [String]) {
+    self.value = value
+    self.keyArray = keyArray.isEmpty ? nil : keyArray
+  }
+}
+
 // MARK: - SmartSwitchState
 
 /// 智慧中英文切換的狀態追蹤
@@ -28,10 +52,23 @@ public final class SmartSwitchState {
   public var englishBufferCursor: Int = 0
 
   /// 已凍結的文字段落（保留在組字區不提交）
-  public private(set) var frozenSegments: [String] = []
+  public private(set) var frozenSegments: [FrozenSegment] = []
 
   /// 已凍結文字的合併字串（供顯示用）
-  public var frozenDisplayText: String { frozenSegments.joined() }
+  public var frozenDisplayText: String { frozenSegments.map(\.value).joined() }
+
+  // MARK: - 凍結游標模式
+
+  /// 凍結段落內游標位置（nil = 游標不在凍結區）
+  /// 0 = 最前端；frozenDisplayText.count = 緊鄰 assembler/英文緩衝的邊界
+  public private(set) var frozenCursor: Int? = nil
+
+  /// 是否處於凍結游標模式
+  public var isInFrozenCursorMode: Bool { frozenCursor != nil }
+
+  /// 凍結候選重選上下文（非 nil 時表示正在對凍結字元進行候選重選）
+  /// charPosition: 被替換字元在 frozenDisplayText 中的 0-based 位置
+  public var frozenCandidateCharPosition: Int? = nil
 
   /// 預設初始化器
   public init() {}
@@ -40,6 +77,8 @@ public final class SmartSwitchState {
   public func reset() {
     resetExceptFrozen()
     frozenSegments = []
+    frozenCursor = nil
+    frozenCandidateCharPosition = nil
   }
 
   /// 退出臨時英文模式（不清除 frozenSegments，由呼叫方決定）
@@ -56,6 +95,8 @@ public final class SmartSwitchState {
     englishBuffer = ""
     englishBufferCursor = 0
     keySequence = ""
+    frozenCursor = nil
+    frozenCandidateCharPosition = nil
   }
 
   /// 重置無效計數（當收到有效注音輸入時）
@@ -133,15 +174,177 @@ public final class SmartSwitchState {
     return invalidKeyCount >= threshold
   }
 
-  /// 將一段文字凍結至 frozenSegments（不提交給 OS）
+  // MARK: - 凍結段落操作
+
+  /// 將英文／無讀音文字凍結至 frozenSegments（不提交給 OS）
   public func freezeSegment(_ text: String) {
     guard !text.isEmpty else { return }
-    frozenSegments.append(text)
+    frozenSegments.append(FrozenSegment(value: text))
+  }
+
+  /// 將中文段落（含讀音）凍結至 frozenSegments
+  public func freezeSegment(_ text: String, keyArray: [String]) {
+    guard !text.isEmpty else { return }
+    frozenSegments.append(FrozenSegment(value: text, keyArray: keyArray))
+  }
+
+  /// 直接凍結一個 FrozenSegment 物件
+  public func freezeSegment(_ segment: FrozenSegment) {
+    guard !segment.value.isEmpty else { return }
+    frozenSegments.append(segment)
   }
 
   /// 清除凍結段落
   public func clearFrozenSegments() {
     frozenSegments = []
+    frozenCursor = nil
+    frozenCandidateCharPosition = nil
+  }
+
+  // MARK: - 凍結游標導航與編輯
+
+  public func enterFrozenCursorMode() {
+    guard !frozenSegments.isEmpty else { return }
+    frozenCursor = frozenDisplayText.count
+  }
+
+  /// 以指定位置進入凍結游標模式（用於候選重選後的游標恢復）
+  public func enterFrozenCursorMode(at pos: Int) {
+    frozenCursor = min(max(pos, 0), frozenDisplayText.count)
+  }
+
+  public func exitFrozenCursorMode() {
+    frozenCursor = nil
+  }
+
+  @discardableResult
+  public func moveFrozenCursorBackward() -> Bool {
+    guard let pos = frozenCursor, pos > 0 else { return false }
+    frozenCursor = pos - 1
+    return true
+  }
+
+  /// 回傳 false 表示已到末端並自動退出凍結模式
+  @discardableResult
+  public func moveFrozenCursorForward() -> Bool {
+    guard let pos = frozenCursor else { return false }
+    if pos < frozenDisplayText.count {
+      frozenCursor = pos + 1
+      return true
+    }
+    frozenCursor = nil
+    return false
+  }
+
+  @discardableResult
+  public func deleteFrozenCharBeforeCursor() -> Bool {
+    guard let pos = frozenCursor, pos > 0 else { return false }
+    var accumulated = 0
+    for i in 0 ..< frozenSegments.count {
+      let seg = frozenSegments[i].value
+      let nextAccumulated = accumulated + seg.count
+      if pos <= nextAccumulated {
+        let segOffset = pos - 1 - accumulated
+        let segIndex = seg.index(seg.startIndex, offsetBy: segOffset)
+        var newValue = frozenSegments[i].value
+        newValue.remove(at: segIndex)
+        var newKeyArray = frozenSegments[i].keyArray
+        newKeyArray?.remove(at: segOffset)
+        if newValue.isEmpty {
+          frozenSegments.remove(at: i)
+        } else {
+          frozenSegments[i] = FrozenSegment(
+            value: newValue,
+            keyArray: newKeyArray ?? []
+          )
+        }
+        frozenCursor = pos - 1
+        return true
+      }
+      accumulated = nextAccumulated
+    }
+    return false
+  }
+
+  /// 在凍結段落游標位置插入一個 ASCII 字元（不含注音讀音）
+  public func insertASCIIAtFrozenCursor(_ char: Character) {
+    guard let pos = frozenCursor else { return }
+    var accumulated = 0
+    for i in 0 ..< frozenSegments.count {
+      let seg = frozenSegments[i].value
+      let nextAccumulated = accumulated + seg.count
+      if pos <= nextAccumulated {
+        let segOffset = pos - accumulated
+        let segIndex = seg.index(seg.startIndex, offsetBy: segOffset)
+        var newValue = frozenSegments[i].value
+        newValue.insert(char, at: segIndex)
+        var newKeyArray = frozenSegments[i].keyArray
+        newKeyArray?.insert("", at: segOffset)
+        if let newKeyArray {
+          frozenSegments[i] = FrozenSegment(value: newValue, keyArray: newKeyArray)
+        } else {
+          frozenSegments[i] = FrozenSegment(value: newValue)
+        }
+        frozenCursor = pos + 1
+        return
+      }
+      accumulated = nextAccumulated
+    }
+    // 游標在所有段落末尾，加入新段落
+    frozenSegments.append(FrozenSegment(value: String(char)))
+    frozenCursor = pos + 1
+  }
+
+  /// 查詢凍結段落中指定位置（0-based）字元的注音讀音
+  /// - Returns: 該字元的讀音，若無則回傳 nil
+  public func readingForFrozenChar(at position: Int) -> String? {
+    var accumulated = 0
+    for seg in frozenSegments {
+      let nextAccumulated = accumulated + seg.value.count
+      if position < nextAccumulated {
+        guard let keys = seg.keyArray else { return nil }
+        let segOffset = position - accumulated
+        guard keys.indices.contains(segOffset) else { return nil }
+        return keys[segOffset]
+      }
+      accumulated = nextAccumulated
+    }
+    return nil
+  }
+
+  /// 替換凍結段落中指定位置的字元（用於候選重選後）
+  public func replaceFrozenChar(at position: Int, newValue: String, newKey: String? = nil) {
+    var accumulated = 0
+    for i in 0 ..< frozenSegments.count {
+      let seg = frozenSegments[i]
+      let nextAccumulated = accumulated + seg.value.count
+      if position < nextAccumulated {
+        let segOffset = position - accumulated
+        var chars = seg.value.map(\.description)
+        chars[segOffset] = newValue
+        var keys = seg.keyArray
+        if let nk = newKey { keys?[segOffset] = nk }
+        if let keys {
+          frozenSegments[i] = FrozenSegment(value: chars.joined(), keyArray: keys)
+        } else {
+          frozenSegments[i] = FrozenSegment(value: chars.joined())
+        }
+        return
+      }
+      accumulated = nextAccumulated
+    }
+  }
+
+  /// 候選重選模式下，將凍結文字以 frozenCandidateCharPosition 為界分割成前後兩段。
+  /// - Returns: (before, after)；before 不含被替換字元，after 從被替換字元後一格開始。
+  ///            若非候選重選模式則回傳 nil。
+  public func frozenTextSplitAroundCandidatePosition() -> (before: String, after: String)? {
+    guard let charPos = frozenCandidateCharPosition else { return nil }
+    let fullText = frozenDisplayText
+    guard charPos < fullText.count else { return (fullText, "") }
+    let beforeIdx = fullText.index(fullText.startIndex, offsetBy: charPos)
+    let afterIdx = fullText.index(beforeIdx, offsetBy: 1)
+    return (String(fullText[..<beforeIdx]), String(fullText[afterIdx...]))
   }
 }
 
@@ -541,9 +744,19 @@ extension InputHandlerProtocol {
       preConsolidate: prefs.consolidateContextOnCandidateSelection,
       skipObservation: true
     )
-    theState.data.displayTextSegments = compositionBufferDisplayTextSegments()
+    if let split = smartSwitchState.frozenTextSplitAroundCandidatePosition() {
+      let assemblerContent = compositionBufferDisplayTextSegments()
+      var merged = [String]()
+      if !split.before.isEmpty { merged.append(split.before) }
+      merged += assemblerContent
+      if !split.after.isEmpty { merged.append(split.after) }
+      theState.data.displayTextSegments = merged
+      theState.data.cursor = split.before.count + convertCursorForDisplay(assembler.cursor)
+    } else {
+      theState.data.displayTextSegments = compositionBufferDisplayTextSegments()
+      theState.data.cursor = convertCursorForDisplay(assembler.cursor)
+    }
     theState.data.rawDisplayTextSegments = rawDisplayTextSegmentsIfNeeded
-    theState.data.cursor = convertCursorForDisplay(assembler.cursor)
     let markerBackup = assembler.marker
     if assembler.isCursorAtEdge(direction: .front) {
       assembler.jumpCursorBySegment(to: .rear, isMarker: true)
@@ -552,7 +765,11 @@ extension InputHandlerProtocol {
     } else {
       assembler.jumpCursorBySegment(to: prefs.useRearCursorMode ? .front : .rear, isMarker: true)
     }
-    theState.data.marker = assembler.marker
+    if let split = smartSwitchState.frozenTextSplitAroundCandidatePosition() {
+      theState.data.marker = split.before.count + assembler.marker
+    } else {
+      theState.data.marker = assembler.marker
+    }
     assembler.marker = markerBackup
     session.state = theState // 直接就地取代，不經過 switchState 處理，免得選字窗被重新載入。
     session.updateCompositionBufferDisplay()

@@ -868,11 +868,11 @@ final class SmartSwitchTests {
 
     // freezeSegment appends
     testHandler.smartSwitchState.freezeSegment("中文")
-    #expect(testHandler.smartSwitchState.frozenSegments == ["中文"])
+    #expect(testHandler.smartSwitchState.frozenSegments.map(\.value) == ["中文"])
     #expect(testHandler.smartSwitchState.frozenDisplayText == "中文")
 
     testHandler.smartSwitchState.freezeSegment("english")
-    #expect(testHandler.smartSwitchState.frozenSegments == ["中文", "english"])
+    #expect(testHandler.smartSwitchState.frozenSegments.map(\.value) == ["中文", "english"])
     #expect(testHandler.smartSwitchState.frozenDisplayText == "中文english")
 
     // clearFrozenSegments clears
@@ -891,7 +891,7 @@ final class SmartSwitchTests {
     testHandler.smartSwitchState.appendEnglishChar("a")
     _ = testHandler.smartSwitchState.exitTempEnglishMode()
     #expect(
-      testHandler.smartSwitchState.frozenSegments == ["中文"],
+      testHandler.smartSwitchState.frozenSegments.map(\.value) == ["中文"],
       "exitTempEnglishMode() should NOT clear frozenSegments"
     )
   }
@@ -2044,5 +2044,261 @@ final class SmartSwitchTests {
       testSession.recentCommissions.joined() == "你hi嗎",
       "Enter should commit all frozen + assembler content, got: '\(testSession.recentCommissions.joined())'"
     )
+  }
+}
+
+// MARK: - 凍結游標基本功能測試（TC-FC-001 ~ TC-FC-010）
+
+@Suite("SmartSwitch FrozenCursor Tests")
+struct SmartSwitchFrozenCursorTests {
+  // MARK: TC-FC-001: 進入凍結游標模式
+
+  @Test("TC-FC-001: enterFrozenCursorMode sets cursor to frozen text end")
+  func testFCEnterMode() {
+    let s = SmartSwitchState()
+    s.freezeSegment("AB", keyArray: [])
+    s.enterFrozenCursorMode()
+    #expect(s.frozenCursor == 2)
+    #expect(s.isInFrozenCursorMode)
+  }
+
+  // MARK: TC-FC-002: 向後移動游標
+
+  @Test("TC-FC-002: moveFrozenCursorBackward navigates to start")
+  func testFCBackwardToStart() {
+    let s = SmartSwitchState()
+    s.freezeSegment("AB", keyArray: [])
+    s.enterFrozenCursorMode()  // 2
+    #expect(s.moveFrozenCursorBackward()); #expect(s.frozenCursor == 1)
+    #expect(s.moveFrozenCursorBackward()); #expect(s.frozenCursor == 0)
+    #expect(!s.moveFrozenCursorBackward())  // 已在前端
+  }
+
+  // MARK: TC-FC-003: 向前移動游標到末端自動退出
+
+  @Test("TC-FC-003: moveFrozenCursorForward exits frozen mode at end")
+  func testFCForwardExitsAtEnd() {
+    let s = SmartSwitchState()
+    s.freezeSegment("AB", keyArray: [])
+    s.enterFrozenCursorMode()  // frozenCursor = 2 (末端)
+    let result = s.moveFrozenCursorForward()
+    #expect(!result)
+    #expect(!s.isInFrozenCursorMode)
+  }
+
+  // MARK: TC-FC-004: 刪除游標前字元
+
+  @Test("TC-FC-004: deleteFrozenCharBeforeCursor removes char and updates cursor")
+  func testFCDelete() {
+    let s = SmartSwitchState()
+    s.freezeSegment("中文", keyArray: ["ㄓㄨㄥ", "ㄨㄣˊ"])
+    s.enterFrozenCursorMode()    // 2
+    s.moveFrozenCursorBackward() // 1
+    #expect(s.deleteFrozenCharBeforeCursor())
+    #expect(s.frozenDisplayText == "文")
+    #expect(s.frozenCursor == 0)
+    #expect(s.frozenSegments[0].keyArray == ["ㄨㄣˊ"])
+  }
+
+  // MARK: TC-FC-005: 在游標位置插入 ASCII 字元
+
+  @Test("TC-FC-005: insertASCIIAtFrozenCursor inserts char and advances cursor")
+  func testFCInsertASCII() {
+    let s = SmartSwitchState()
+    s.freezeSegment("AC", keyArray: [])
+    s.enterFrozenCursorMode()    // 2
+    s.moveFrozenCursorBackward() // 1
+    s.insertASCIIAtFrozenCursor("B")
+    #expect(s.frozenDisplayText == "ABC")
+    #expect(s.frozenCursor == 2)
+  }
+
+  // MARK: TC-FC-006: FrozenSegment 儲存讀音
+
+  @Test("TC-FC-006: FrozenSegment stores keyArray correctly")
+  func testFCSegmentReadings() {
+    let seg = FrozenSegment(value: "你好", keyArray: ["ㄋㄧˇ", "ㄏㄠˋ"])
+    #expect(seg.isPhonetic)
+    #expect(seg.keyArray?.count == 2)
+  }
+
+  // MARK: TC-FC-007: readingForFrozenChar 回傳正確讀音
+
+  @Test("TC-FC-007: readingForFrozenChar returns correct reading by position")
+  func testFCReadingLookup() {
+    let s = SmartSwitchState()
+    s.freezeSegment("你好", keyArray: ["ㄋㄧˇ", "ㄏㄠˋ"])
+    #expect(s.readingForFrozenChar(at: 0) == "ㄋㄧˇ")
+    #expect(s.readingForFrozenChar(at: 1) == "ㄏㄠˋ")
+    #expect(s.readingForFrozenChar(at: 2) == nil)
+  }
+
+  // MARK: TC-FC-008: replaceFrozenChar 替換字元
+
+  @Test("TC-FC-008: replaceFrozenChar replaces value and optionally key")
+  func testFCReplaceChar() {
+    let s = SmartSwitchState()
+    s.freezeSegment("你好", keyArray: ["ㄋㄧˇ", "ㄏㄠˋ"])
+    s.replaceFrozenChar(at: 1, newValue: "号", newKey: "ㄏㄠˋ")
+    #expect(s.frozenDisplayText == "你号")
+    #expect(s.frozenSegments[0].keyArray?[1] == "ㄏㄠˋ")
+  }
+
+  // MARK: TC-FC-009: reset() 清除所有凍結游標狀態
+
+  @Test("TC-FC-009: reset() clears all frozen cursor state")
+  func testFCResetAll() {
+    let s = SmartSwitchState()
+    s.freezeSegment("X", keyArray: [])
+    s.enterFrozenCursorMode()
+    s.frozenCandidateCharPosition = 0
+    s.reset()
+    #expect(s.frozenCursor == nil)
+    #expect(s.frozenSegments.isEmpty)
+    #expect(s.frozenCandidateCharPosition == nil)
+  }
+
+  // MARK: TC-FC-010: clearFrozenSegments 重置游標與候選位置
+
+  @Test("TC-FC-010: clearFrozenSegments resets cursor and candidate position")
+  func testFCClearSegments() {
+    let s = SmartSwitchState()
+    s.freezeSegment("X", keyArray: [])
+    s.enterFrozenCursorMode()
+    s.clearFrozenSegments()
+    #expect(s.frozenCursor == nil)
+    #expect(!s.isInFrozenCursorMode)
+  }
+}
+
+// MARK: - 凍結候選重選整合測試（TC-FC-011 ~ TC-FC-013）
+
+@Suite("SmartSwitch FrozenCandidateConfirmation Integration Tests", .serialized)
+@MainActor
+final class SmartSwitchFrozenCandidateIntegrationTests {
+  var testLM: LMAssembly.LMInstantiator?
+  var testHandler: MockInputHandler?
+  var testSession: MockSession?
+
+  init() {
+    UserDefaults.unitTests = .init(suiteName: "org.atelierInmu.vChewing.Typewriter.FCIntegrationTests")
+    UserDef.resetAll()
+    UserDefaults.pendingUnitTests = true
+    PrefMgr.sharedSansDidSetOps.smartChineseEnglishSwitchEnabled = true
+    let lm = LMAssembly.LMInstantiator(isCHS: false)
+    self.testLM = lm
+    LMAssembly.LMInstantiator.connectToTestFactoryDictionary(textMapData: LMATestsData.textMapTestCoreLMData)
+    let handler = MockInputHandler(lm: lm, pref: PrefMgr.sharedSansDidSetOps)
+    let session = MockSession()
+    handler.session = session
+    session.inputHandler = handler
+    self.testHandler = handler
+    self.testSession = session
+  }
+
+  deinit {
+    mainSync {
+      self.testHandler?.errorCallback = nil
+      self.testSession?.switchState(MockIMEState.ofAbortion())
+    }
+    UserDefaults.unitTests?.removeSuite(named: "org.atelierInmu.vChewing.Typewriter.FCIntegrationTests")
+    UserDef.resetAll()
+    mainSync {
+      PrefMgr.sharedSansDidSetOps.smartChineseEnglishSwitchEnabled = false
+    }
+  }
+
+  func resetTestState() {
+    testHandler?.clear()
+    testHandler?.smartSwitchState.reset()
+    testSession?.switchState(MockIMEState.ofAbortion())
+    testHandler?.prefs.smartChineseEnglishSwitchEnabled = true
+  }
+
+  // MARK: TC-FC-011: handleFrozenCandidateConfirmation 單獨呼叫驗證
+
+  @Test("TC-FC-011: handleFrozenCandidateConfirmation returns false when no frozenCandidateCharPosition")
+  func testFCConfirmationReturnsFalseWhenNoPosition() {
+    guard let testHandler else { Issue.record("testHandler nil"); return }
+    resetTestState()
+    // frozenCandidateCharPosition 為 nil → 應回傳 false
+    #expect(testHandler.handleFrozenCandidateConfirmation() == false)
+  }
+
+  // MARK: TC-FC-012: handleFrozenCandidateConfirmation 替換凍結字元
+
+  @Test("TC-FC-012: handleFrozenCandidateConfirmation replaces frozen char correctly")
+  func testFCConfirmationReplacesFrozenChar() {
+    guard let testHandler else { Issue.record("testHandler nil"); return }
+    resetTestState()
+
+    // 設定凍結段落「你好」，好 = ㄏㄠˋ
+    testHandler.smartSwitchState.freezeSegment("你好", keyArray: ["ㄋㄧˇ", "ㄏㄠˋ"])
+    // 模擬 handleFrozenCandidateRequest 的狀態設定：
+    // 游標在位置 2（好 後方），charPos = 1（好 的位置）
+    testHandler.smartSwitchState.frozenCandidateCharPosition = 1
+    testHandler.smartSwitchState.exitFrozenCursorMode()
+
+    // 模擬 consolidateNode 之後 assembler 的狀態
+    // assembler.assembledSentence.values.joined() 應回傳所選候選字
+    testHandler.assembler.clear()
+    _ = testHandler.assembler.insertKey("ㄏㄠˋ")
+    testHandler.assemble()
+    testHandler.assembler.cursor = testHandler.assembler.length
+    // 選字後 assembledSentence.values 的第一個應是 LM 給 ㄏㄠˋ 的最佳結果
+    let expectedNewValue = testHandler.assembler.assembledSentence.values.joined()
+    #expect(!expectedNewValue.isEmpty, "LM should return some value for ㄏㄠˋ")
+
+    // 呼叫 handleFrozenCandidateConfirmation
+    let result = testHandler.handleFrozenCandidateConfirmation()
+    #expect(result == true)
+
+    // 凍結段落應被更新
+    #expect(testHandler.smartSwitchState.frozenDisplayText == "你\(expectedNewValue)")
+    // frozenCandidateCharPosition 應被清除
+    #expect(testHandler.smartSwitchState.frozenCandidateCharPosition == nil)
+    // 應恢復凍結游標模式，游標在替換字元之後
+    #expect(testHandler.smartSwitchState.isInFrozenCursorMode)
+    #expect(testHandler.smartSwitchState.frozenCursor == 1 + expectedNewValue.count)
+    // assembler 應被清空
+    #expect(testHandler.assembler.isEmpty)
+  }
+
+  // MARK: TC-FC-013: candidatePairSelectionConfirmed 整合流程
+
+  @Test("TC-FC-013: candidatePairSelectionConfirmed triggers frozen char replacement when frozenCandidateCharPosition is set")
+  func testFCCandidateSelectionIntegration() {
+    guard let testHandler, let testSession else { Issue.record("testHandler or testSession nil"); return }
+    resetTestState()
+
+    // 設定凍結段落
+    testHandler.smartSwitchState.freezeSegment("你好", keyArray: ["ㄋㄧˇ", "ㄏㄠˋ"])
+    // 模擬 handleFrozenCandidateRequest 設置的狀態
+    testHandler.smartSwitchState.frozenCandidateCharPosition = 1
+    testHandler.smartSwitchState.exitFrozenCursorMode()
+    testHandler.assembler.clear()
+    _ = testHandler.assembler.insertKey("ㄏㄠˋ")
+    testHandler.assemble()
+    testHandler.assembler.cursor = testHandler.assembler.length
+
+    // 生成候選狀態
+    let candidateState = testHandler.generateStateOfCandidates()
+    testSession.switchState(candidateState)
+    #expect(testSession.state.type == .ofCandidates)
+    #expect(!testSession.state.candidates.isEmpty, "Candidates for ㄏㄠˋ should not be empty")
+
+    // 選擇第一個候選
+    testSession.candidatePairSelectionConfirmed(at: 0)
+
+    // 選擇後應回到 ofInputting 狀態
+    #expect(testSession.state.type == .ofInputting)
+    // frozenCandidateCharPosition 應被清除
+    #expect(testHandler.smartSwitchState.frozenCandidateCharPosition == nil)
+    // 應恢復凍結游標模式
+    #expect(testHandler.smartSwitchState.isInFrozenCursorMode)
+    // 凍結段落應有更新（第一個字元應是 LM 對 ㄏㄠˋ 的最佳結果）
+    let frozenText = testHandler.smartSwitchState.frozenDisplayText
+    #expect(frozenText.count == 2, "Frozen text should still be 2 chars after replacement")
+    #expect(frozenText.hasPrefix("你"), "First char should remain 你")
   }
 }

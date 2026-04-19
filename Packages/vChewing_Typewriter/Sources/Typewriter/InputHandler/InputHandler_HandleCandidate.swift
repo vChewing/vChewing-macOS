@@ -377,3 +377,18 @@ extension InputHandlerProtocol {
     return true
   }
 }
+
+extension InputHandlerProtocol {
+  /// 候選確認後，若是凍結候選重選，執行回凍結邏輯（替換凍結段落中的字元並恢復游標）。
+  /// - Returns: true 表示已處理回凍結；false 表示正常候選確認，呼叫方應繼續正常流程。
+  public func handleFrozenCandidateConfirmation() -> Bool {
+    guard let replacePos = smartSwitchState.frozenCandidateCharPosition else { return false }
+    let newValue = assembler.assembledSentence.values.joined()
+    let newKey = assembler.keys.first
+    smartSwitchState.replaceFrozenChar(at: replacePos, newValue: newValue, newKey: newKey)
+    assembler.clear()
+    smartSwitchState.frozenCandidateCharPosition = nil
+    smartSwitchState.enterFrozenCursorMode(at: replacePos + newValue.count)
+    return true
+  }
+}

@@ -25,6 +25,12 @@ extension InputHandlerProtocol {
       case .kEscape: return handleEsc()
       case .kContextMenu, .kTab: return revolveCandidate(reverseOrder: input.isShiftHold)
       case .kDownArrow, .kLeftArrow, .kRightArrow, .kUpArrow:
+        // 凍結游標模式：↓ 交由 PhonabetTypewriter 處理，觸發候選重選
+        if keyCodeType == .kDownArrow, state.type == .ofInputting,
+           prefs.smartChineseEnglishSwitchEnabled, smartSwitchState.isInFrozenCursorMode,
+           !input.isShiftHold, !input.isControlHold, !input.isCommandHold, !input.isOptionHold {
+          if let result = PhonabetTypewriter(self).handle(input) { return result }
+        }
         let rotation: Bool = (input.isOptionHold || input.isShiftHold) && state.type == .ofInputting
         handleArrowKey: switch (keyCodeType, session.isVerticalTyping) {
         case (.kLeftArrow, false), (.kUpArrow, true): return handleBackward(input: input)
@@ -86,6 +92,10 @@ extension InputHandlerProtocol {
             return true
           }
         case .ofInputting:
+          // 凍結游標模式：Space 交由 PhonabetTypewriter 處理，觸發候選重選
+          if prefs.smartChineseEnglishSwitchEnabled, smartSwitchState.isInFrozenCursorMode {
+            if let result = PhonabetTypewriter(self).handle(input) { return result }
+          }
           // 臉書等網站會攔截 Tab 鍵，所以用 Shift+Command+Space 對候選字詞做正向/反向輪替。
           if input.isShiftHold, !input.isControlHold, !input.isOptionHold {
             return revolveCandidate(reverseOrder: input.isCommandHold)

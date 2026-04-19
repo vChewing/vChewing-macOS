@@ -103,7 +103,8 @@ extension SessionProtocol {
   /// 浮動組字窗的顯示判定
   public func updatePopupDisplayWithCursor() {
     guard isCurrentSession else { return }
-    if state.hasComposition, clientMitigationLevel >= 2 {
+    let willShow = state.hasComposition && clientMitigationLevel >= 2
+    if willShow {
       updateVerticalTypingStatus()
       ui?.pcb?.isTypingDirectionVertical = isVerticalTyping
       ui?.pcb?.sync(
