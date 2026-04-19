@@ -7,7 +7,7 @@
 // requirements defined in MIT License.
 
 import Foundation
-import Megrez
+import Homa
 
 extension LMAssembly.LMInstantiator {
   public func memorizePerception(
@@ -15,7 +15,7 @@ extension LMAssembly.LMInstantiator {
     timestamp: Double,
     saveCallback: (() -> ())? = nil
   ) {
-    lmPerceptionOverride.memorizePerception(
+    lxPerceptor.memorizePerception(
       perception,
       timestamp: timestamp,
       saveCallback: saveCallback
@@ -23,12 +23,12 @@ extension LMAssembly.LMInstantiator {
   }
 
   public func fetchPOMSuggestion(
-    assembledResult: [Megrez.GramInPath],
+    assembledResult: [Homa.GramInPath],
     cursor: Int,
     timestamp: Double
   )
     -> LMAssembly.OverrideSuggestion {
-    lmPerceptionOverride.fetchSuggestion(
+    lxPerceptor.fetchSuggestion(
       assembledResult: assembledResult,
       cursor: cursor,
       timestamp: timestamp
@@ -36,22 +36,22 @@ extension LMAssembly.LMInstantiator {
   }
 
   /// 是否啟用急速遺忘模式（縮短 POM 壽命至 12 小時以內）。
-  /// 由外部（如 `PrefMgr`）注入，轉發至底層 `lmPerceptionOverride.reducedLifetime`。
+  /// 由外部（如 `PrefMgr`）注入，轉發至底層 `lxPerceptor.reducedLifetime`。
   public var pomReducedLifetime: Bool {
-    get { lmPerceptionOverride.reducedLifetime }
-    set { lmPerceptionOverride.reducedLifetime = newValue }
+    get { lxPerceptor.reducedLifetime }
+    set { lxPerceptor.reducedLifetime = newValue }
   }
 
   public func loadPOMData(fromURL fileURL: URL? = nil) {
-    lmPerceptionOverride.loadData(fromURL: fileURL)
+    lxPerceptor.loadData(fromURL: fileURL)
   }
 
   nonisolated public func savePOMData(toURL fileURL: URL? = nil) {
-    lmPerceptionOverride.saveData(toURL: fileURL)
+    lxPerceptor.saveData(toURL: fileURL)
   }
 
   public func clearPOMData(withURL fileURL: URL? = nil) {
-    lmPerceptionOverride.clearData(withURL: fileURL)
+    lxPerceptor.clearData(withURL: fileURL)
   }
 
   /// 清除指定的 POM 建議（基於 context + candidate 對）
@@ -59,7 +59,7 @@ extension LMAssembly.LMInstantiator {
     targets: [(ngramKey: String, candidate: String)],
     saveCallback: (() -> ())? = nil
   ) {
-    lmPerceptionOverride.bleachSpecifiedSuggestions(
+    lxPerceptor.bleachSpecifiedSuggestions(
       targets: targets, saveCallback: saveCallback
     )
   }
@@ -68,7 +68,7 @@ extension LMAssembly.LMInstantiator {
   public func bleachSpecifiedPOMSuggestions(
     targets: [String], saveCallback: (() -> ())? = nil
   ) {
-    lmPerceptionOverride.bleachSpecifiedSuggestions(
+    lxPerceptor.bleachSpecifiedSuggestions(
       candidateTargets: targets, saveCallback: saveCallback
     )
   }
@@ -78,12 +78,12 @@ extension LMAssembly.LMInstantiator {
     headReadings: [String],
     saveCallback: (() -> ())? = nil
   ) {
-    lmPerceptionOverride.bleachSpecifiedSuggestions(
+    lxPerceptor.bleachSpecifiedSuggestions(
       headReadingTargets: headReadings, saveCallback: saveCallback
     )
   }
 
   public func bleachPOMUnigrams(saveCallback: (() -> ())? = nil) {
-    lmPerceptionOverride.bleachUnigrams(saveCallback: saveCallback)
+    lxPerceptor.bleachUnigrams(saveCallback: saveCallback)
   }
 }

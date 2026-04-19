@@ -6,9 +6,9 @@
 // marks, or product names of Contributor, except as required to fulfill notice
 // requirements defined in MIT License.
 
+import Homa
+import HomaSharedTestComponents
 import IMKSwift
-import Megrez
-import MegrezTestComponents
 import OSFrameworkImpl
 import Testing
 
@@ -201,7 +201,7 @@ extension MainAssemblyTests {
 
   @Test
   func test204A_SwitchStateEmptyCommitsRawTextWithoutBPMFVSLeak() throws {
-    let grams: [Megrez.Unigram] = [
+    let grams: [Homa.Gram] = [
       .init(keyArray: ["ㄗㄚˊ"], value: "咱", score: -1),
       .init(keyArray: ["ㄉㄜ˙"], value: "地", score: -1),
     ]
@@ -219,8 +219,8 @@ extension MainAssemblyTests {
     testHandler.prefs.reflectBPMFVSInCompositionBuffer = true
     testSession.resetInputHandler(forceComposerCleanup: true)
 
-    #expect(testHandler.assembler.insertKey("ㄗㄚˊ"))
-    #expect(testHandler.assembler.insertKey("ㄉㄜ˙"))
+    #expect(throws: Never.self) { try testHandler.assembler.insertKey("ㄗㄚˊ") }
+    #expect(throws: Never.self) { try testHandler.assembler.insertKey("ㄉㄜ˙") }
     testHandler.assemble()
     testSession.switchState(testHandler.generateStateOfInputting())
 
@@ -237,7 +237,7 @@ extension MainAssemblyTests {
 
   @Test
   func test204B_SCPCSelectionCommitsRawTextWithoutBPMFVSLeak() throws {
-    let grams: [Megrez.Unigram] = [
+    let grams: [Homa.Gram] = [
       .init(keyArray: ["ㄗㄚˊ"], value: "咱", score: -1),
     ]
     grams.forEach { testHandler.currentLM.insertTemporaryData(unigram: $0, isFiltering: false) }
@@ -255,7 +255,7 @@ extension MainAssemblyTests {
     testHandler.prefs.reflectBPMFVSInCompositionBuffer = true
     testSession.resetInputHandler(forceComposerCleanup: true)
 
-    #expect(testHandler.assembler.insertKey("ㄗㄚˊ"))
+    #expect(throws: Never.self) { try testHandler.assembler.insertKey("ㄗㄚˊ") }
     testHandler.assemble()
     testSession.switchState(testHandler.generateStateOfCandidates())
 
@@ -275,6 +275,15 @@ extension MainAssemblyTests {
   @Test
   func test205_InputHandler_PunctuationFeaturesAndSymbolMenus() throws {
     testHandler.prefs.useSCPCTypingMode = false
+    testHandler.prefs.keyboardParser = KeyboardParser.ofStandard.rawValue
+
+    let shiftCommaEvent = NSEvent.KeyEventData(
+      type: .keyDown,
+      flags: .shift,
+      chars: "<",
+      charsSansModifiers: ",",
+      keyCode: mapKeyCodesANSIForTests[","] ?? 43
+    )
 
     let shiftPeriodEvent = NSEvent.KeyEventData(
       type: .keyDown,
@@ -286,9 +295,26 @@ extension MainAssemblyTests {
 
     resetToEmptyAndClear()
     testHandler.prefs.halfWidthPunctuationEnabled = false
+    _ = press(shiftCommaEvent)
+    #expect(testSession.state.type == .ofInputting)
+    #expect(testSession.state.displayedText == "，")
+    let commaCandidates = testHandler.generateStateOfCandidates()
+    let commaValues = commaCandidates.candidates.map(\.value)
+    let commaIndex = try #require(commaValues.firstIndex(of: "，"))
+    let angleIndex = try #require(commaValues.firstIndex(of: "〈"))
+    #expect(commaIndex < angleIndex)
+    testSession.switchState(.ofAbortion())
+
+    resetToEmptyAndClear()
+    testHandler.prefs.halfWidthPunctuationEnabled = false
     _ = press(shiftPeriodEvent)
     #expect(testSession.state.type == .ofInputting)
     #expect(testSession.state.displayedText == "。")
+    let punctuationCandidates = testHandler.generateStateOfCandidates()
+    let punctuationValues = punctuationCandidates.candidates.map(\.value)
+    let fullWidthIndex = try #require(punctuationValues.firstIndex(of: "。"))
+    let halfWidthIndex = try #require(punctuationValues.firstIndex(of: "."))
+    #expect(fullWidthIndex < halfWidthIndex)
     testSession.switchState(.ofAbortion())
 
     resetToEmptyAndClear()
@@ -643,7 +669,6 @@ extension MainAssemblyTests {
     #expect(testSession.state.candidates[1].value == "芳")
     typeSentenceOrCandidates("2")
     #expect(testClient.toString() == "芳")
-    print(testSession.state.candidates)
     #expect(testSession.state.type == .ofAssociates)
     let shiftPlus3 = NSEvent.KeyEventData(
       flags: .shift,
@@ -671,7 +696,6 @@ extension MainAssemblyTests {
     #expect(testSession.state.displayedText == "芳")
     handleEvents(shiftEnterEvent.asPairedEvents)
     #expect(testClient.toString() == "芳")
-    print(testSession.state.candidates)
     #expect(testSession.state.type == .ofAssociates)
     let shiftPlus3 = NSEvent.KeyEventData(
       flags: .shift,
@@ -681,5 +705,54 @@ extension MainAssemblyTests {
     )
     handleEvents(shiftPlus3.asPairedEvents)
     #expect(testClient.toString() == "芳香")
+  }
+
+  @Test
+  func test216_InputHandler_RevolverRareCase_JiHuQiKeng() throws {
+    let mockLM = TestLM(rawData: HomaTests.strLMSampleData_JiHuQiKeng)
+    let originalQuerier = testHandler.assembler.gramQuerier
+    let originalAvailabilityChecker = testHandler.assembler.gramAvailabilityChecker
+    defer {
+      testHandler.assembler.gramQuerier = originalQuerier
+      testHandler.assembler.gramAvailabilityChecker = originalAvailabilityChecker
+      testHandler.clear()
+      testClient.clear()
+    }
+
+    clearTestPOM()
+    testHandler.clear()
+    testHandler.prefs.fetchSuggestionsFromPerceptionOverrideModel = false
+    testHandler.prefs.useRearCursorMode = false
+    testSession.resetInputHandler(forceComposerCleanup: true)
+    testHandler.assembler.gramQuerier = { mockLM.queryGrams($0) }
+    testHandler.assembler.gramAvailabilityChecker = { mockLM.hasGrams($0) }
+
+    #expect(throws: Never.self) { try testHandler.assembler.insertKey("ji1") }
+    #expect(throws: Never.self) { try testHandler.assembler.insertKey("hu1") }
+    #expect(throws: Never.self) { try testHandler.assembler.insertKey("qi4") }
+    #expect(throws: Never.self) { try testHandler.assembler.insertKey("keng1") }
+    testHandler.assemble()
+    #expect(testHandler.assembler.assembledSentence.map(\ .value) == ["幾乎", "氣", "坑"])
+
+    testSession.switchState(testHandler.generateStateOfInputting())
+    #expect(testSession.state.displayedText == "幾乎氣坑")
+    #expect(press(dataArrowLeft))
+    #expect(testHandler.assembler.cursor == 3)
+    #expect(testSession.state.displayedText == "幾乎氣坑")
+
+    let allCandidates = testHandler.assembler.fetchCandidates(filter: .endAt).map(\ .pair.value)
+    #expect(allCandidates.prefix(4) == ["呼氣", "氣", "迄", "棄"])
+    guard let firstCandidate = allCandidates.first, allCandidates.count > 1 else {
+      Issue.record("JiHuQiKeng rare-case test requires at least two candidates.")
+      return
+    }
+
+    let expectedCycle = allCandidates + [firstCandidate]
+    for expectedValue in expectedCycle {
+      #expect(press(tabEvent))
+      let expectedNodes: [String] = expectedValue == "呼氣" ? ["幾", expectedValue, "坑"] : ["幾", "呼", expectedValue, "坑"]
+      #expect(testHandler.assembler.assembledSentence.map(\ .value) == expectedNodes)
+      #expect(testSession.state.displayedText == expectedNodes.joined())
+    }
   }
 }

@@ -52,7 +52,7 @@ struct LMInstantiatorTests {
       LMAssembly.LMInstantiator.disconnectFactoryDictionary()
     }
     let instance = LMAssembly.LMInstantiator()
-    LMAssembly.LMInstantiator.connectToTestFactoryDictionary(textMapData: LMATestsData.sqlTestCoreLMData)
+    LMAssembly.LMInstantiator.connectToTestFactoryDictionary(textMapData: LMATestsData.textMapTestCoreLMData)
     let testSingleCharUnigramSymbol = "・"
     let testReading = "ㄌㄧㄣ"
     let testReadingArray = [testReading]
@@ -68,7 +68,7 @@ struct LMInstantiatorTests {
         key: testReading,
         keyArray: testReadingArray,
         omitNonTemporarySingleCharNonSymbolUnigrams: false
-      ).map(\.value)
+      ).map(\.current)
       #expect(subQueried1.contains(testSingleCharUnigramSymbol))
     }
     do {
@@ -76,12 +76,12 @@ struct LMInstantiatorTests {
         key: testReading,
         keyArray: testReadingArray,
         omitNonTemporarySingleCharNonSymbolUnigrams: true
-      ).map(\.value)
+      ).map(\.current)
       #expect(subQueried2.contains(testSingleCharUnigramSymbol))
     }
     do {
       let queried = instance.unigramsFor(keyArray: testReadingArray)
-      let queriedValues = queried.map(\.value)
+      let queriedValues = queried.map(\.current)
       #expect(queriedValues.contains(testSingleCharUnigramSymbol))
     }
   }
@@ -92,7 +92,7 @@ struct LMInstantiatorTests {
       LMAssembly.LMInstantiator.disconnectFactoryDictionary()
     }
     let instance = LMAssembly.LMInstantiator()
-    LMAssembly.LMInstantiator.connectToTestFactoryDictionary(textMapData: LMATestsData.sqlTestCoreLMData)
+    LMAssembly.LMInstantiator.connectToTestFactoryDictionary(textMapData: LMATestsData.textMapTestCoreLMData)
     let testSingleCharUnigramSymbol = "・"
     let testReading = "ㄌㄧㄣ"
     let testReadingArray = [testReading]
@@ -104,7 +104,7 @@ struct LMInstantiatorTests {
         key: testReading,
         keyArray: testReadingArray,
         omitNonTemporarySingleCharNonSymbolUnigrams: false
-      ).map(\.value)
+      ).map(\.current)
       #expect(subQueried1.contains(testSingleCharUnigramSymbol))
     }
     do {
@@ -112,12 +112,12 @@ struct LMInstantiatorTests {
         key: testReading,
         keyArray: testReadingArray,
         omitNonTemporarySingleCharNonSymbolUnigrams: true
-      ).map(\.value)
+      ).map(\.current)
       #expect(subQueried2.contains(testSingleCharUnigramSymbol))
     }
     do {
       let queried = instance.unigramsFor(keyArray: testReadingArray)
-      let queriedValues = queried.map(\.value)
+      let queriedValues = queried.map(\.current)
       #expect(queriedValues.contains(testSingleCharUnigramSymbol))
     }
   }
@@ -130,18 +130,18 @@ struct LMInstantiatorTests {
     let instance1 = LMAssembly.LMInstantiator(isCHS: false).setOptions { config in
       config.isSCPCEnabled = true
     }
-    var liu2 = instance1.unigramsFor(keyArray: ["ㄌㄧㄡˊ"]).map(\.value).prefix(3)
-    var bao3 = instance1.unigramsFor(keyArray: ["ㄅㄠˇ"]).map(\.value).prefix(3)
-    var jie2 = instance1.unigramsFor(keyArray: ["ㄐㄧㄝˊ"]).map(\.value).prefix(3)
+    var liu2 = instance1.unigramsFor(keyArray: ["ㄌㄧㄡˊ"]).map(\.current).prefix(3)
+    var bao3 = instance1.unigramsFor(keyArray: ["ㄅㄠˇ"]).map(\.current).prefix(3)
+    var jie2 = instance1.unigramsFor(keyArray: ["ㄐㄧㄝˊ"]).map(\.current).prefix(3)
     #expect(liu2 == ["劉", "流", "留"])
     #expect(bao3 == ["保", "寶", "飽"])
     #expect(jie2 == ["節", "潔", "傑"])
     let instance2 = LMAssembly.LMInstantiator(isCHS: true).setOptions { config in
       config.isSCPCEnabled = true
     }
-    liu2 = instance2.unigramsFor(keyArray: ["ㄌㄧㄡˊ"]).map(\.value).prefix(3)
-    bao3 = instance2.unigramsFor(keyArray: ["ㄅㄠˇ"]).map(\.value).prefix(3)
-    jie2 = instance2.unigramsFor(keyArray: ["ㄐㄧㄝˊ"]).map(\.value).prefix(3)
+    liu2 = instance2.unigramsFor(keyArray: ["ㄌㄧㄡˊ"]).map(\.current).prefix(3)
+    bao3 = instance2.unigramsFor(keyArray: ["ㄅㄠˇ"]).map(\.current).prefix(3)
+    jie2 = instance2.unigramsFor(keyArray: ["ㄐㄧㄝˊ"]).map(\.current).prefix(3)
     #expect(liu2 == ["刘", "流", "留"])
     #expect(bao3 == ["保", "宝", "饱"])
     #expect(jie2 == ["节", "洁", "杰"])

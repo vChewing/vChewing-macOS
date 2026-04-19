@@ -19,6 +19,7 @@ let package = Package(
     .package(path: "../vChewing_ModifierKeyHitChecker"),
     .package(path: "../vChewing_CandidateWindow"),
     .package(path: "../vChewing_Hotenka"),
+    .package(path: "../vChewing_Homa"),
     .package(path: "../vChewing_IMKUtils"),
     .package(path: "../vChewing_OtherIMEDataReader"),
     .package(path: "../vChewing_LangModelAssembly"), // Unit tests material deps.
@@ -68,6 +69,8 @@ let package = Package(
       name: "MainAssembly4DarwinTests",
       dependencies: [
         "MainAssembly4Darwin",
+        .product(name: "Homa", package: "vChewing_Homa"),
+        .product(name: "HomaSharedTestComponents", package: "vChewing_Homa"),
         .product(name: "LMAssemblyMaterials4Tests", package: "vChewing_LangModelAssembly"),
       ],
       swiftSettings: [

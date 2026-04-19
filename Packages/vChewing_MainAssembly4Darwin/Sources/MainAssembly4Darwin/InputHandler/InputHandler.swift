@@ -29,10 +29,24 @@ public final class InputHandler: @MainActor InputHandlerProtocol {
     self.errorCallback = errorCallback
     self.filterabilityChecker = filterabilityChecker
     self.notificationCallback = notificationCallback
-    /// 組字器初期化。
-    self.assembler = Assembler(with: currentLM, separator: "-")
+    /// 組字器初期化（先用空閉包，待 self 完成初始化後再指定真正的閉包）。
+    self.assembler = Assembler(
+      gramQuerier: { _ in [] },
+      gramAvailabilityChecker: { _ in false }
+    )
     /// 同步組字器單個詞的幅節長度上限。
     assembler.maxSegLength = prefs.maxCandidateLength
+    /// 將真正的 LM 查詢閉包綁至組字器。
+    assembler.gramQuerier = { [weak self] keyArray in
+      guard let self else { return [] }
+      return self.currentLM.unigramsFor(keyArray: keyArray).map {
+        (keyArray: $0.keyArray, value: $0.current, probability: $0.probability, previous: nil)
+      }
+    }
+    assembler.gramAvailabilityChecker = { [weak self] keyArray in
+      guard let self else { return false }
+      return self.currentLM.hasUnigramsFor(keyArray: keyArray)
+    }
     /// 注拼槽初期化。
     ensureKeyboardParser()
   }
@@ -67,7 +81,6 @@ public final class InputHandler: @MainActor InputHandlerProtocol {
 
   public var currentLM: LMAssembly.LMInstantiator {
     didSet {
-      assembler.langModel = currentLM
       clear()
     }
   }

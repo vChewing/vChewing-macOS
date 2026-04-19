@@ -50,7 +50,7 @@ extension SessionProtocol {
     let valueCurrent = userPhrase.value
     let valueReversed = ChineseConverter.crossConvert(valueCurrent)
     let separator = inputHandler.keySeparator.isEmpty
-      ? Megrez.Compositor.theSeparator
+      ? Homa.Assembler.theSeparator
       : inputHandler.keySeparator
     let headReading = userPhrase.keyArray.joined(separator: separator)
     var candidateTargets = inputHandler.activePOMCandidateValues()

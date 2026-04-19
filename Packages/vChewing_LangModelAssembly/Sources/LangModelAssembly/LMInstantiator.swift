@@ -7,16 +7,15 @@
 // requirements defined in MIT License.
 
 import Foundation
-import Megrez
+import Homa
 import Shared
 import SwiftExtension
 
 extension LMAssembly {
   typealias ScoreAssigner = (CandidateInState?) -> Double
 
-  /// 語言模組副本化模組（LMInstantiator，下稱「LMI」）自身為符合天權星組字引擎內
-  /// 的 LangModelProtocol 協定的模組、統籌且整理來自其它子模組的資料（包括使
-  /// 用者語彙、繪文字模組、語彙濾除表、原廠語言模組等）。
+  /// 語言模組副本化模組（LMInstantiator，下稱「LMI」）自身統籌且整理來自
+  /// 其它子模組的資料（包括使用者語彙、繪文字模組、語彙濾除表、原廠語言模組等）。
   ///
   /// LMI 型別為與輸入法輸入調度模組直接溝通之唯一語言模組。當組字器開始根據給定的
   /// 讀音鏈構築語句時，LMI 會接收來自組字器的讀音、輪流檢查自身是否有可以匹配到的
@@ -31,7 +30,7 @@ extension LMAssembly {
   ///
   /// LMI 會根據需要分別載入原廠語言模組和其他個別的子語言模組。LMI 本身不會記錄這些
   /// 語言模組的相關資料的存放位置，僅藉由參數來讀取相關訊息。
-  public final class LMInstantiator: LangModelProtocol {
+  public final class LMInstantiator {
     // MARK: Lifecycle
 
     // 這句需要留著，不然無法被 package 外界存取。
@@ -40,7 +39,7 @@ extension LMAssembly {
       pomDataURL: URL? = nil
     ) {
       self.isCHS = isCHS
-      self.mtxPerceptionOverride = .init(.init(dataURL: pomDataURL))
+      self.mtxLXPerceptor = .init(.init(dataURL: pomDataURL))
     }
 
     // MARK: Public
@@ -293,11 +292,11 @@ extension LMAssembly {
 
     // MARK: - 核心函式（對外）
 
-    public func hasAssociatedPhrasesFor(pair: Megrez.KeyValuePaired) -> Bool {
+    public func hasAssociatedPhrasesFor(pair: Homa.CandidatePair) -> Bool {
       lmAssociates.hasValuesFor(pair: pair)
     }
 
-    public func associatedPhrasesFor(pair: Megrez.KeyValuePaired) -> [String] {
+    public func associatedPhrasesFor(pair: Homa.CandidatePair) -> [String] {
       lmAssociates.valuesFor(pair: pair)
     }
 
@@ -306,10 +305,10 @@ extension LMAssembly {
       return result.isEmpty ? nil : result
     }
 
-    public func isPairFiltered(pair: Megrez.KeyValuePaired) -> Bool {
+    public func isPairFiltered(pair: Homa.CandidatePair) -> Bool {
       lmFiltered
         .unigramsFor(key: pair.joinedKey(), keyArray: pair.keyArray)
-        .map(\.value)
+        .map(\.current)
         .contains(pair.value)
     }
 
@@ -319,7 +318,7 @@ extension LMAssembly {
     ///   - unigram: 要插入的單元圖。
     ///   - isFiltering: 是否有在過濾內容。
     public func insertTemporaryData(
-      unigram: Megrez.Unigram,
+      unigram: Homa.Gram,
       isFiltering: Bool
     ) {
       let keyChain = unigram.keyArray.joined(separator: "-")
@@ -408,9 +407,9 @@ extension LMAssembly {
           key: keyArray.joined(separator: "-"),
           keyArray: keyArray
         )
-        .map(\.value)
+        .map(\.current)
         .contains(value)
-        : unigramsFor(keyArray: keyArray).map(\.value).contains(value)
+        : unigramsFor(keyArray: keyArray).map(\.current).contains(value)
     }
 
     /// 根據給定的索引鍵，確認有多少筆資料值在庫。
@@ -427,7 +426,7 @@ extension LMAssembly {
     /// 給定讀音字串，讓 LMI 給出對應的經過處理的單元圖陣列。
     /// - Parameter key: 給定的讀音字串。
     /// - Returns: 對應的經過處理的單元圖陣列。
-    public func unigramsFor(keyArray: [String]) -> [Megrez.Unigram] {
+    public func unigramsFor(keyArray: [String]) -> [Homa.Gram] {
       // `config.bypassUserPhrasesData` 啟用時，除了 Associated Phrases 以外的資料全部忽略。
       let keyChain = keyArray.joined(separator: "-")
       let noEmptyKey = !keyArray.isEmpty && keyArray.allSatisfy { !$0.isEmpty }
@@ -437,8 +436,8 @@ extension LMAssembly {
       if keyArray == [asciiSpace] { return [.init(keyArray: keyArray, value: asciiSpace)] }
 
       /// 準備不同的語言模組容器，開始逐漸往容器陣列內塞入資料。
-      var rawAllUnigrams: [Megrez.Unigram] = []
-      var factoryCoreUnigramsResult: [Megrez.Unigram] = []
+      var rawAllUnigrams: [Homa.Gram] = []
+      var factoryCoreUnigramsResult: [Homa.Gram] = []
 
       if !config.isCassetteEnabled
         || config.isCassetteEnabled && (keyArray.first?.hasPrefix("_") ?? false) {
@@ -469,7 +468,7 @@ extension LMAssembly {
           if keyArray.count == 1 {
             factoryCoreUnigramsResult = factoryCoreUnigramsResult.map { thisUnigram in
               guard !checkCNSConformation(for: thisUnigram, keyArray: keyArray) else { return thisUnigram }
-              return .init(keyArray: thisUnigram.keyArray, value: thisUnigram.value, score: -9.5)
+              return .init(keyArray: thisUnigram.keyArray, value: thisUnigram.current, score: -9.5)
             }
           } else {
             factoryCoreUnigramsResult.removeAll { thisUnigram in
@@ -516,13 +515,13 @@ extension LMAssembly {
             factorySingleReadingValueHashes: factorySingleReadingValueHashes
           ).reversed()
         )
-        if keyArray.count == 1, let topScore = rawAllUnigrams.lazy.map(\.score).max() {
+        if keyArray.count == 1, let topScore = rawAllUnigrams.lazy.map(\.probability).max() {
           // 不再讓使用者自己加入的單漢字讀音權重進入組句體系。
           userPhraseUnigrams = userPhraseUnigrams.map { currentUnigram in
-            Megrez.Unigram(
+            Homa.Gram(
               keyArray: keyArray,
-              value: currentUnigram.value,
-              score: Swift.min(topScore + 0.000114514, currentUnigram.score)
+              value: currentUnigram.current,
+              score: Swift.min(topScore + 0.000114514, currentUnigram.probability)
             )
           }
         }
@@ -533,10 +532,10 @@ extension LMAssembly {
       cleanupInputTokenHashMapIfNeeded()
 
       // 分析且處理可能存在的 InputToken（in-place 展開，避免双重陣列）。
-      var expandedUnigrams: [Megrez.Unigram] = []
+      var expandedUnigrams: [Homa.Gram] = []
       expandedUnigrams.reserveCapacity(rawAllUnigrams.count)
       for unigram in rawAllUnigrams {
-        let convertedValues = unigram.value.parseAsInputToken(isCHS: isCHS)
+        let convertedValues = unigram.current.parseAsInputToken(isCHS: isCHS)
         if convertedValues.isEmpty {
           expandedUnigrams.append(unigram)
         } else {
@@ -558,7 +557,7 @@ extension LMAssembly {
       } else if config.isSCPCEnabled || config.alwaysSupplyETenDOSUnigrams {
         // 追加倚天中文 DOS 候選字排序。
         rawAllUnigrams += Self.lmPlainBopomofo.valuesFor(key: keyChain, isCHS: isCHS).map {
-          Megrez.Unigram(
+          Homa.Gram(
             keyArray: keyArray,
             value: $0,
             score: config.isSCPCEnabled ? 0 : -9.5
@@ -577,12 +576,12 @@ extension LMAssembly {
       if !config.bypassUserPhrasesData, config.isPhraseReplacementEnabled {
         for i in 0 ..< rawAllUnigrams.count {
           let oldUnigram = rawAllUnigrams[i]
-          let newValue = lmReplacements.valuesFor(key: oldUnigram.value)
+          let newValue = lmReplacements.valuesFor(key: oldUnigram.current)
           guard !newValue.isEmpty else { continue }
-          let newUnigram = Megrez.Unigram(
+          let newUnigram = Homa.Gram(
             keyArray: oldUnigram.keyArray,
             value: newValue,
-            score: oldUnigram.score
+            score: oldUnigram.probability
           )
           rawAllUnigrams[i] = newUnigram
         }
@@ -592,7 +591,7 @@ extension LMAssembly {
       let dataAsFilter: Set<String> = config.bypassUserPhrasesData
         ? []
         : .init(
-          lmFiltered.unigramsFor(key: keyChain, keyArray: keyArray).map(\.value)
+          lmFiltered.unigramsFor(key: keyChain, keyArray: keyArray).map(\.current)
         )
       rawAllUnigrams.consolidate(filter: dataAsFilter)
       return rawAllUnigrams
@@ -648,10 +647,10 @@ extension LMAssembly {
     var lmReplacements = LMReplacements()
     var lmAssociates = LMAssociates()
 
-    // 漸退記憶模組（NSMutex 保證執行緒安全，故標記 nonisolated）
-    nonisolated var lmPerceptionOverride: LMPerceptionOverride {
-      get { mtxPerceptionOverride.value }
-      set { mtxPerceptionOverride.value = newValue }
+    // LXPerceptor（NSMutex 保證執行緒安全，故標記 nonisolated）
+    nonisolated var lxPerceptor: LXPerceptor {
+      get { mtxLXPerceptor.value }
+      set { mtxLXPerceptor.value = newValue }
     }
 
     // 確保關聯詞語資料在首次剛需時得以即時載入。
@@ -681,14 +680,14 @@ extension LMAssembly {
       ///   - userSymbols: Mutator for the symbol menu store.
       ///   - replacements: Mutator for the user replacements store.
       ///   - associates: Mutator for the associates store.
-      ///   - perceptionOverride: Mutator for the perception-override memory.
+      ///   - lxPerceptor: Mutator for the LXPerceptor memory.
       func injectTestData(
         userPhrases: ((inout LMCoreEX) -> ())? = nil,
         userFilter: ((inout LMCoreEX) -> ())? = nil,
         userSymbols: ((inout LMCoreEX) -> ())? = nil,
         replacements: ((inout LMReplacements) -> ())? = nil,
         associates: ((inout LMAssociates) -> ())? = nil,
-        perceptionOverride: ((inout LMPerceptionOverride) -> ())? = nil
+        lxPerceptor: ((inout LXPerceptor) -> ())? = nil
       ) {
         if let mutator = userPhrases {
           mutator(&lmUserPhrases)
@@ -705,8 +704,8 @@ extension LMAssembly {
         if let mutator = associates {
           mutator(&lmAssociates)
         }
-        if let mutator = perceptionOverride {
-          mutator(&lmPerceptionOverride)
+        if let mutator = lxPerceptor {
+          mutator(&self.lxPerceptor)
         }
       }
     #endif
@@ -715,7 +714,7 @@ extension LMAssembly {
 
     nonisolated private static let mtxFactoryLexicon: NSMutex<FactoryTextMapLexicon?> = .init(nil)
 
-    nonisolated private let mtxPerceptionOverride: NSMutex<LMPerceptionOverride>
+    nonisolated private let mtxLXPerceptor: NSMutex<LXPerceptor>
 
     // MARK: - 工具函式
 

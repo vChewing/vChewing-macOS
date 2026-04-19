@@ -7,17 +7,15 @@
 // requirements defined in MIT License.
 
 import Foundation
-import Megrez
-import MegrezTestComponents
+import Homa
+
 import Shared
 import Tekkon
 import Testing
 
+import HomaSharedTestComponents
 @testable import LangModelAssembly
 @testable import Typewriter
-
-private typealias SimpleLM = MegrezTestComponents.SimpleLM
-private typealias MockLM = MegrezTestComponents.MockLM
 
 // MARK: - 測試案例 Vol 3 (POM Dedicated)
 
@@ -34,13 +32,13 @@ extension InputHandlerTests {
     clearTestPOM()
     testSession.resetInputHandler(forceComposerCleanup: true)
     var extractedGrams = extractGrams(
-      from: MegrezTestComponents.strLMSampleDataHutao,
+      from: HomaTests.strLMSampleDataHutao,
       readingsToKeep: ["liu2-yi4", "liu2", "yi4"]
     )
     extractedGrams = extractedGrams.filter {
-      $0.segLength > 1 || $0.score > -6
+      $0.segLength > 1 || $0.probability > -6
     }
-    extractedGrams.sort { $0.segLength > $1.segLength && $0.score > $1.score }
+    extractedGrams.sort { $0.segLength > $1.segLength && $0.probability > $1.probability }
     let additionalUnigrams = extractedGrams
     additionalUnigrams.forEach {
       testHandler.currentLM.insertTemporaryData(unigram: $0, isFiltering: false)
@@ -67,7 +65,7 @@ extension InputHandlerTests {
     #expect(testHandler.assembler.assembledSentence.map(\.value).joined() == "流易")
     #expect(testSession.state.displayedText == "流易")
     // 此時應該有生成一些 POM 記憶。
-    let pomData1 = testHandler.currentLM.lmPerceptionOverride.getSavableData()
+    let pomData1 = testHandler.currentLM.lxPerceptor.getSavableData()
     let encodedJSON1 = try jsonEncoder.encode(pomData1)
     let encodedJSONStr1 = String(data: encodedJSON1, encoding: .utf8) ?? "N/A"
     // 每次跑測試時，ts 時間戳都不同。所以不將 ts 的資料值納入 Assertion 對象。
@@ -80,12 +78,12 @@ extension InputHandlerTests {
     // 此時「流易」權重最高，因為是 POM 推薦資料。
     #expect(testHandler.assembler.assembledSentence.map(\.value).joined() == "流易")
     #expect(testSession.state.displayedText == "流易")
-    // 檢查 assembler 內部的 nodes 確保「流易」的 OverridingScore 必須不能是「114_514」。
+    // 檢查 assembler 內部的 nodes 確保 POM 建議使用的是「withTopGramScore」覆寫模式。
     // 不然的話，會出現 POM 記憶劫持使用者片語的情況。
-    // 判斷方法是：任何雙字詞節點都不該有「score == 114_514」。
-    // 測試目的：在套用 POM 建議時，OverridingScore 得是 POM 建議的權重。
-    let allNodes: [Megrez.Node] = testHandler.assembler.segments.compactMap { $0[2] }
-    #expect(allNodes.allSatisfy { $0.score != 114_514 })
+    // 測試目的：在套用 POM 建議時，覆寫類型不得是 withSpecified（強制高分覆寫）。
+    // 備註：Homa 的 overridingScore 預設值即為 114_514，無法以此做判斷。
+    let allNodes: [Homa.Node] = testHandler.assembler.segments.compactMap { $0[2] }
+    #expect(allNodes.allSatisfy { $0.currentOverrideType != .withSpecified })
     // 嘗試觸發就地加詞的 method。這在目前的這個單元測試內不會實際加詞，但會嘗試清空相關的 POM 記憶。
     // 咱們先用 revolveCandidate 的功能將該節點換成別的雙字候選詞。
     let candidateStateTemporary1 = testHandler.generateStateOfCandidates()
@@ -112,11 +110,11 @@ extension InputHandlerTests {
     // 註：真實 Session 會通過 `LMMgr.bleachSpecifiedSuggestions` 間接觸發該 API。
     #expect(testHandler.triageInput(event: KBEvent.KeyEventData.dataEnterReturn.asEvent))
     let fetchablesNow = testHandler.currentLM.unigramsFor(keyArray: ["ㄌㄧㄡˊ", "ㄧˋ"])
-    let assumedNewUnigram = Megrez.Unigram(keyArray: ["ㄌㄧㄡˊ", "ㄧˋ"], value: "流溢", score: 0)
+    let assumedNewUnigram = Homa.Gram(keyArray: ["ㄌㄧㄡˊ", "ㄧˋ"], value: "流溢", score: 0)
     #expect(fetchablesNow.contains(assumedNewUnigram))
     // 現在應該假設 POM 當中任何妨礙 assumedNewUnigram 被選中的內容都被清掉了。
     // 看一下 POM 記憶。
-    let pomData2 = testHandler.currentLM.lmPerceptionOverride.getSavableData()
+    let pomData2 = testHandler.currentLM.lxPerceptor.getSavableData()
     let encodedJSON2 = try jsonEncoder.encode(pomData2)
     let encodedJSONStr2 = String(data: encodedJSON2, encoding: .utf8) ?? "N/A"
     // 到這一步如果 Asserts 都通過的話就證明手動加詞時的 Bleacher 是成功的。
@@ -133,14 +131,22 @@ extension InputHandlerTests {
     }
     testHandler.prefs.enforceETenDOSCandidateSequence = false
     testHandler.prefs.useSCPCTypingMode = false
+    defer {
+      testHandler.currentLM.clearTemporaryData(isFiltering: false)
+    }
+    testHandler.currentLM.clearTemporaryData(isFiltering: false)
+    testHandler.currentLM.insertTemporaryData(
+      unigram: .init(keyArray: ["ㄋㄧㄢˊ", "ㄓㄨㄥ"], current: "年中", probability: -4.329),
+      isFiltering: false
+    )
     clearTestPOM()
     vCTestLog("測試組句：年中")
     testSession.resetInputHandler(forceComposerCleanup: true)
     typeSentence("su065j/ ")
     #expect(testHandler.assembler.assembledSentence.map(\.value) == ["年中"])
-    #expect(testHandler.assembler.moveCursorStepwise(to: .rear))
-    #expect(testHandler.assembler.moveCursorStepwise(to: .rear))
-    #expect(!(testHandler.assembler.moveCursorStepwise(to: .rear)))
+    #expect(throws: Never.self) { try testHandler.assembler.moveCursorStepwise(to: .rear) }
+    #expect(throws: Never.self) { try testHandler.assembler.moveCursorStepwise(to: .rear) }
+    #expect(throws: Homa.Exception.self) { try testHandler.assembler.moveCursorStepwise(to: .rear) }
     #expect(testHandler.assembler.isCursorAtEdge(direction: .rear))
     testSession.switchState(testHandler.generateStateOfCandidates())
     let candidates1 = testSession.state.candidates.map(\.value).prefix(3)
@@ -153,9 +159,6 @@ extension InputHandlerTests {
       unigram: .init(keyArray: ["ㄋㄧㄢˊ", "ㄓㄨㄥ"], value: "年終", score: 0),
       isFiltering: false
     )
-    defer {
-      testHandler.currentLM.clearTemporaryData(isFiltering: false)
-    }
     typeSentence("su065j/ ")
     #expect(testHandler.assembler.assembledSentence.map(\.value) == ["年終"])
   }
@@ -196,11 +199,11 @@ extension InputHandlerTests {
       return
     }
     let keyArray = gramPair.gram.keyArray
-    let candidateFetchFilter: Megrez.Compositor.CandidateFetchFilter =
+    let candidateFetchFilter: Homa.Assembler.CandidateFetchFilter =
       testHandler.prefs.useRearCursorMode ? .beginAt : .endAt
     let rawCandidates = testHandler.assembler.fetchCandidates(filter: candidateFetchFilter)
     guard let rawCandidate = rawCandidates.first(where: {
-      $0.keyArray == keyArray && $0.value == candidateValue
+      $0.pair.keyArray == keyArray && $0.pair.value == candidateValue
     }) else {
       Issue.record("Unable to locate raw candidate for keyArray \(keyArray) and value \(candidateValue).")
       return
@@ -212,10 +215,10 @@ extension InputHandlerTests {
       timestamp: Date().timeIntervalSince1970
     )
     var suggestionPairs = testHandler.retrievePOMSuggestions(apply: false)
-    var suggestions = suggestionPairs.map { $0.1.value }
+    var suggestions = suggestionPairs.map { $0.1.current }
     #expect(suggestions.contains(candidateValue))
-    if let candidateUnigram = suggestionPairs.first(where: { $0.1.value == candidateValue }) {
-      #expect(candidateUnigram.1.score >= rawCandidate.score)
+    if let candidateUnigram = suggestionPairs.first(where: { $0.1.current == candidateValue }) {
+      #expect(candidateUnigram.1.probability >= rawCandidate.weight)
     }
 
     // 清除並插入舊時戳（低權重）POM 記錄；預期該建議會被忽略
@@ -227,7 +230,7 @@ extension InputHandlerTests {
       timestamp: oldTimestamp
     )
     suggestionPairs = testHandler.retrievePOMSuggestions(apply: false)
-    suggestions = suggestionPairs.map { $0.1.value }
+    suggestions = suggestionPairs.map { $0.1.current }
     #expect(suggestions.isEmpty)
     #expect(!(suggestions.contains(candidateValue)))
   }
@@ -246,15 +249,15 @@ extension InputHandlerTests {
       (keyArray: ["ㄅ"], value: "坡", probability: -0.05, previous: nil),
     ]
 
-    let rawCandidates: [Megrez.KeyValuePaired] = [
-      .init(keyArray: ["ㄅ"], value: "波", score: -0.10),
-      .init(keyArray: ["ㄅ"], value: "波", score: -0.25),
-      .init(keyArray: ["ㄅ"], value: "玻", score: -0.30),
+    let rawCandidates: [Homa.CandidatePairWeighted] = [
+      Homa.CandidatePair(keyArray: ["ㄅ"], value: "波").weighted(-0.10),
+      Homa.CandidatePair(keyArray: ["ㄅ"], value: "波").weighted(-0.25),
+      Homa.CandidatePair(keyArray: ["ㄅ"], value: "玻").weighted(-0.30),
     ]
 
     let filtered = testHandler.filterPOMAppendables(from: suggestion, rawCandidates: rawCandidates)
-    #expect(!(filtered.contains(where: { $0.1.value == "波" })))
-    #expect(filtered.map { $0.1.value } == ["玻", "坡"])
+    #expect(!(filtered.contains(where: { $0.1.current == "波" })))
+    #expect(filtered.map { $0.1.current } == ["玻", "坡"])
   }
 
   @Test
@@ -268,13 +271,12 @@ extension InputHandlerTests {
     testHandler.prefs.useSCPCTypingMode = false // Use Dachen.
     testHandler.prefs.fetchSuggestionsFromPerceptionOverrideModel = true
     let assembler = testHandler.assembler
-    let pom = testHandler.currentLM.lmPerceptionOverride
+    let pom = testHandler.currentLM.lxPerceptor
     clearTestPOM()
     testSession.resetInputHandler(forceComposerCleanup: true)
     let extractedGrams = extractGrams(
-      from: MegrezTestComponents.strLMSampleData_SaisoukiNoGaika
+      from: HomaTests.strLMSampleData_SaisoukiNoGaika
     )
-    print(extractedGrams)
     extractedGrams.forEach {
       testHandler.currentLM.insertTemporaryData(unigram: $0, isFiltering: false)
     }
@@ -306,13 +308,14 @@ extension InputHandlerTests {
     #expect(keyForQueryingDataAt3?.headReading == "ㄉㄜ˙")
     // 應能提供『是的』『似的』『凱歌』等候選
     let pairsAtShiDeEnd = assembler.fetchCandidates(at: 4, filter: .endAt)
-    #expect(pairsAtShiDeEnd.map(\.value).contains("是的"))
-    #expect(pairsAtShiDeEnd.map(\.value).contains("似的"))
+    #expect(pairsAtShiDeEnd.map(\.pair.value).contains("是的"))
+    #expect(pairsAtShiDeEnd.map(\.pair.value).contains("似的"))
     // 模擬使用者把『是』改為『世』，再合成：觀測應為 shortToLong
-    var obsCaptured: Megrez.PerceptionIntel?
-    _ = assembler.overrideCandidate(
+    var obsCaptured: Homa.PerceptionIntel?
+    try assembler.overrideCandidate(
       .init(keyArray: ["ㄕˋ"], value: "世"),
       at: cursorShi,
+      type: .withSpecified,
       enforceRetokenization: true
     ) {
       obsCaptured = $0
@@ -359,8 +362,8 @@ extension InputHandlerTests {
         ["再 創 是的 凱歌", "再 創 世 的 凱歌"].contains(assembledNow2),
         "Unexpected baseline assembly: \(assembledNow2)"
       )
-      assembler.dropKey(direction: .rear)
-      assembler.dropKey(direction: .rear)
+      try assembler.dropKey(direction: .rear)
+      try assembler.dropKey(direction: .rear)
       testHandler.assemble()
     }
 
@@ -374,22 +377,20 @@ extension InputHandlerTests {
       Issue.record("POM suggested nothing, or something wrong happen.")
       return
     }
-    print(firstSuggestionRAW)
-    let candidateSuggested = Megrez.KeyValuePaired(
+    let candidateSuggested = Homa.CandidatePair(
       keyArray: firstSuggestionRAW.keyArray,
-      value: firstSuggestionRAW.value,
-      score: firstSuggestionRAW.probability
-    )
+      value: firstSuggestionRAW.value
+    ).weighted(firstSuggestionRAW.probability)
     let cursorForOverride = suggestion.overrideCursor ?? cursorShi
-    let overrideResult = assembler.overrideCandidate(
+    let overrideResult = (try? assembler.overrideCandidate(
       candidateSuggested,
       at: cursorForOverride,
-      overrideType: suggestion.forceHighScoreOverride ? .withSpecified : .withTopGramScore,
+      type: suggestion.forceHighScoreOverride ? .withSpecified : .withTopGramScore,
       enforceRetokenization: true
-    )
+    )) != nil
     if !overrideResult {
-      assembler.overrideCandidateLiteral(
-        candidateSuggested.value,
+      try? assembler.overrideCandidateLiteral(
+        candidateSuggested.pair.value,
         at: cursorForOverride,
         overrideType: suggestion.forceHighScoreOverride ? .withSpecified : .withTopGramScore
       )
@@ -421,13 +422,12 @@ extension InputHandlerTests {
     testHandler.prefs.useSCPCTypingMode = false // Use Dachen.
     testHandler.prefs.fetchSuggestionsFromPerceptionOverrideModel = true
     let assembler = testHandler.assembler
-    let pom = testHandler.currentLM.lmPerceptionOverride
+    let pom = testHandler.currentLM.lxPerceptor
     clearTestPOM()
     testSession.resetInputHandler(forceComposerCleanup: true)
     let extractedGrams = extractGrams(
-      from: MegrezTestComponents.strLMSampleData_SaisoukiNoGaika
+      from: HomaTests.strLMSampleData_SaisoukiNoGaika
     )
-    print(extractedGrams)
     extractedGrams.forEach {
       testHandler.currentLM.insertTemporaryData(unigram: $0, isFiltering: false)
     }
@@ -447,14 +447,15 @@ extension InputHandlerTests {
     #expect("再 創 是" == assembledPriorToOverride)
     // ====================
     let cursorShi = 2
-    var obsCaptured: Megrez.PerceptionIntel?
-    let overrideSucceeded = assembler.overrideCandidate(
+    var obsCaptured: Homa.PerceptionIntel?
+    let overrideSucceeded = (try? assembler.overrideCandidate(
       .init(keyArray: ["ㄕˋ"], value: "世"),
       at: cursorShi,
+      type: .withSpecified,
       enforceRetokenization: true
     ) {
       obsCaptured = $0
-    }
+    }) != nil
     #expect(overrideSucceeded)
     #expect(obsCaptured?.contextualizedGramKey == "(ㄗㄞˋ,再)&(ㄔㄨㄤˋ,創)&(ㄕˋ,世)")
     guard let obsCaptured else {
@@ -494,21 +495,20 @@ extension InputHandlerTests {
       preconditionFailure("POM suggested nothing, or something wrong happen.")
     }
 
-    let candidateSuggested = Megrez.KeyValuePaired(
+    let candidateSuggested = Homa.CandidatePair(
       keyArray: firstSuggestionRAW.keyArray,
-      value: firstSuggestionRAW.value,
-      score: firstSuggestionRAW.probability
-    )
+      value: firstSuggestionRAW.value
+    ).weighted(firstSuggestionRAW.probability)
     let cursorForOverride = suggestion.overrideCursor ?? cursorShi
-    let overrideResult = assembler.overrideCandidate(
+    let overrideResult = (try? assembler.overrideCandidate(
       candidateSuggested,
       at: cursorForOverride,
-      overrideType: suggestion.forceHighScoreOverride ? .withSpecified : .withTopGramScore,
+      type: suggestion.forceHighScoreOverride ? .withSpecified : .withTopGramScore,
       enforceRetokenization: true
-    )
+    )) != nil
     if !overrideResult {
-      assembler.overrideCandidateLiteral(
-        candidateSuggested.value,
+      try? assembler.overrideCandidateLiteral(
+        candidateSuggested.pair.value,
         at: cursorForOverride,
         overrideType: suggestion.forceHighScoreOverride ? .withSpecified : .withTopGramScore
       )
@@ -634,7 +634,7 @@ extension InputHandlerTests {
     )
     s.candidates = [suggestedA]
     s.overrideCursor = keyCursorRaw
-    testHandler.currentLM.lmPerceptionOverride.testInjectedSuggestion = s
+    testHandler.currentLM.lxPerceptor.testInjectedSuggestion = s
 
     _ = testHandler.retrievePOMSuggestions(apply: true)
     // 因為 prepend/override 被拒，組句結果應維持不變
@@ -651,19 +651,18 @@ extension InputHandlerTests {
     t.candidates = [suggestedB]
     t.overrideCursor = keyCursorRaw
     // 先檢查建議是否出現在可附加候選清單
-    testHandler.currentLM.lmPerceptionOverride.testInjectedSuggestion = t
+    testHandler.currentLM.lxPerceptor.testInjectedSuggestion = t
     let appended = testHandler.retrievePOMSuggestions(apply: false)
-    #expect(appended.map { $0.1.value }.contains("SHORT"))
+    #expect(appended.map { $0.1.current }.contains("SHORT"))
     // 再次注入以測試 apply 路徑（fetchSuggestion 會清除注入的建議）
-    testHandler.currentLM.lmPerceptionOverride.testInjectedSuggestion = t
+    testHandler.currentLM.lxPerceptor.testInjectedSuggestion = t
     _ = testHandler.retrievePOMSuggestions(apply: true)
     // 此時短候選應已取代原本的頭部
     // 若 POM 未能替換，嘗試直接覆寫以檢視行為
-    let suggestedPair = Megrez.KeyValuePaired(
+    let suggestedPair = Homa.CandidatePair(
       keyArray: suggestedB.keyArray,
-      value: suggestedB.value,
-      score: suggestedB.probability
-    )
+      value: suggestedB.value
+    ).weighted(suggestedB.probability)
     let overrideSucceeded = testHandler.assembler.overrideCandidate(
       suggestedPair,
       at: keyCursorRaw,
@@ -691,14 +690,14 @@ extension InputHandlerTests {
 
     // 注入「再創世的凱歌」範例的暫存 unigram，使組字結果能穩定包含
     // 具有前文（previous）欄位的多段（multi-seg）頭部。
-    let extractedGrams = extractGrams(from: MegrezTestComponents.strLMSampleData_SaisoukiNoGaika)
+    let extractedGrams = extractGrams(from: HomaTests.strLMSampleData_SaisoukiNoGaika)
     extractedGrams.forEach { testHandler.currentLM.insertTemporaryData(unigram: $0, isFiltering: false) }
     defer { testHandler.currentLM.clearTemporaryData(isFiltering: false) }
     let readingKeys4Sentence = ["y94", "tj;4", "g4", "2k7", "d93", "ek "]
     typeSentence(readingKeys4Sentence.joined())
 
     // 在組字結果中尋找 multi-seg 的頭部，不依賴硬編的游標位置。
-    var maybeFound: (node: Megrez.GramInPath, range: Range<Int>)?
+    var maybeFound: (node: Homa.GramInPath, range: Range<Int>)?
     for i in 0 ..< testHandler.assembler.length {
       if let f = testHandler.assembler.assembledSentence.findGramWithRange(at: i), f.node.gram.keyArray.count > 1 {
         maybeFound = f
@@ -710,7 +709,7 @@ extension InputHandlerTests {
       return
     }
     let keyCursorRaw = found.range.lowerBound
-    let existingScore = found.node.gram.score
+    let existingScore = found.node.gram.probability
     guard let prevValue = testHandler.assembler.assembledSentence.findGram(at: keyCursorRaw - 1)?.gram.value else {
       Issue.record("Unable to determine previous value for test")
       return
@@ -726,10 +725,10 @@ extension InputHandlerTests {
     )
     s.candidates = [suggestedA]
     s.overrideCursor = keyCursorRaw
-    testHandler.currentLM.lmPerceptionOverride.testInjectedSuggestion = s
+    testHandler.currentLM.lxPerceptor.testInjectedSuggestion = s
 
     // apply 路徑應因 short->long margin 而跳過
-    testHandler.currentLM.lmPerceptionOverride.testInjectedSuggestion = s
+    testHandler.currentLM.lxPerceptor.testInjectedSuggestion = s
     _ = testHandler.retrievePOMSuggestions(apply: true)
     #expect(testHandler.assembler.assembledSentence.map(\.value).joined().contains("是"))
 
@@ -743,17 +742,16 @@ extension InputHandlerTests {
     )
     t.candidates = [suggestedB]
     t.overrideCursor = keyCursorRaw
-    testHandler.currentLM.lmPerceptionOverride.testInjectedSuggestion = t
+    testHandler.currentLM.lxPerceptor.testInjectedSuggestion = t
     let appended2 = testHandler.retrievePOMSuggestions(apply: false)
-    #expect(appended2.map { $0.1.value }.contains("PREVSHORT"))
-    testHandler.currentLM.lmPerceptionOverride.testInjectedSuggestion = t
+    #expect(appended2.map { $0.1.current }.contains("PREVSHORT"))
+    testHandler.currentLM.lxPerceptor.testInjectedSuggestion = t
     _ = testHandler.retrievePOMSuggestions(apply: true)
 
-    let suggestedPair = Megrez.KeyValuePaired(
+    let suggestedPair = Homa.CandidatePair(
       keyArray: suggestedB.keyArray,
-      value: suggestedB.value,
-      score: suggestedB.probability
-    )
+      value: suggestedB.value
+    ).weighted(suggestedB.probability)
     let overrideSucceeded = testHandler.assembler.overrideCandidate(
       suggestedPair,
       at: keyCursorRaw,
@@ -780,14 +778,14 @@ extension InputHandlerTests {
     testSession.resetInputHandler(forceComposerCleanup: true)
 
     // 注入「再創世的凱歌」範例的暫存 unigram，以確定性產生 multi-seg 頭部
-    let extractedGrams2 = extractGrams(from: MegrezTestComponents.strLMSampleData_SaisoukiNoGaika)
+    let extractedGrams2 = extractGrams(from: HomaTests.strLMSampleData_SaisoukiNoGaika)
     extractedGrams2.forEach { testHandler.currentLM.insertTemporaryData(unigram: $0, isFiltering: false) }
     defer { testHandler.currentLM.clearTemporaryData(isFiltering: false) }
     let readingKeys4Sentence = ["y94", "tj;4", "g4", "2k7", "d93", "ek "]
     typeSentence(readingKeys4Sentence.joined())
 
     // 動態尋找 multi-seg 的頭部
-    var maybeFound2: (node: Megrez.GramInPath, range: Range<Int>)?
+    var maybeFound2: (node: Homa.GramInPath, range: Range<Int>)?
     for i in 0 ..< testHandler.assembler.length {
       if let f = testHandler.assembler.assembledSentence.findGramWithRange(at: i), f.node.gram.keyArray.count > 1 {
         maybeFound2 = f
@@ -799,7 +797,7 @@ extension InputHandlerTests {
       return
     }
     let keyCursorRaw = found.range.lowerBound
-    let existingScore = found.node.gram.score
+    let existingScore = found.node.gram.probability
     guard let prevValue = testHandler.assembler.assembledSentence.findGram(at: keyCursorRaw - 1)?.gram.value else {
       Issue.record("Unable to determine previous value for test")
       return
@@ -815,20 +813,19 @@ extension InputHandlerTests {
     )
     s.candidates = [suggested]
     s.overrideCursor = keyCursorRaw
-    testHandler.currentLM.lmPerceptionOverride.testInjectedSuggestion = s
+    testHandler.currentLM.lxPerceptor.testInjectedSuggestion = s
 
     let appended = testHandler.retrievePOMSuggestions(apply: false)
-    #expect(appended.map { $0.1.value }.contains("SPLITVAL"))
+    #expect(appended.map { $0.1.current }.contains("SPLITVAL"))
 
     // 套用路徑
-    testHandler.currentLM.lmPerceptionOverride.testInjectedSuggestion = s
+    testHandler.currentLM.lxPerceptor.testInjectedSuggestion = s
     _ = testHandler.retrievePOMSuggestions(apply: true)
 
-    let suggestedPair = Megrez.KeyValuePaired(
+    let suggestedPair = Homa.CandidatePair(
       keyArray: suggested.keyArray,
-      value: suggested.value,
-      score: suggested.probability
-    )
+      value: suggested.value
+    ).weighted(suggested.probability)
     let overrideSucceeded = testHandler.assembler.overrideCandidate(
       suggestedPair,
       at: keyCursorRaw,

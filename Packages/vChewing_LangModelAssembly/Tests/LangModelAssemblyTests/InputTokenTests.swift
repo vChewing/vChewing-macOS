@@ -90,7 +90,7 @@ struct InputTokenTests {
   @Test
   func testGeneratedResultsFromLMInstantiator() throws {
     let instance = LMAssembly.LMInstantiator(isCHS: true)
-    #expect(LMAssembly.LMInstantiator.connectToTestFactoryDictionary(textMapData: LMATestsData.sqlTestCoreLMData))
+    #expect(LMAssembly.LMInstantiator.connectToTestFactoryDictionary(textMapData: LMATestsData.textMapTestCoreLMData))
     instance.setOptions { config in
       config.isCNSEnabled = false
       config.isSymbolEnabled = false

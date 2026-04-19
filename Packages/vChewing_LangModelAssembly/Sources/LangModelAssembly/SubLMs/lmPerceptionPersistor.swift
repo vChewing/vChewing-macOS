@@ -16,7 +16,7 @@ extension LMAssembly {
   /// 負責 POM（Perception Override Model）資料的磁碟持久化：
   /// JSON 快照、追加式 WAL 日誌、CRC32 去重與日誌壓縮。
   ///
-  /// `LMPerceptionOverride` 專注觀測邏輯；本類別專注 I/O。
+  /// `LXPerceptor` 專注觀測邏輯；本類別專注 I/O。
   nonisolated public final class PerceptionPersistor {
     // MARK: Lifecycle
 
@@ -74,7 +74,7 @@ extension LMAssembly.PerceptionPersistor {
     init(
       operation: JournalOperation,
       key: String? = nil,
-      pair: LMAssembly.LMPerceptionOverride.KeyPerceptionPair? = nil
+      pair: LMAssembly.LXPerceptor.KeyPerceptionPair? = nil
     ) {
       self.operation = operation
       self.key = key
@@ -85,11 +85,11 @@ extension LMAssembly.PerceptionPersistor {
 
     var operation: JournalOperation
     var key: String?
-    var pair: LMAssembly.LMPerceptionOverride.KeyPerceptionPair?
+    var pair: LMAssembly.LXPerceptor.KeyPerceptionPair?
   }
 }
 
-// MARK: - Pending Key Tracking (called by LMPerceptionOverride under its lock)
+// MARK: - Pending Key Tracking (called by LXPerceptor under its lock)
 
 extension LMAssembly.PerceptionPersistor {
   /// 標記某鍵值需在下一次刷新時寫入日誌。
@@ -140,8 +140,8 @@ extension LMAssembly.PerceptionPersistor {
   ///   - keyValidator: 回呼判斷某 key 是否應被忽略。
   ///   - fileURL: 可選的儲存路徑，覆寫預設位置。
   nonisolated func saveData(
-    dataProvider: () -> [LMAssembly.LMPerceptionOverride.KeyPerceptionPair],
-    mapProvider: () -> [String: LMAssembly.LMPerceptionOverride.KeyPerceptionPair],
+    dataProvider: () -> [LMAssembly.LXPerceptor.KeyPerceptionPair],
+    mapProvider: () -> [String: LMAssembly.LXPerceptor.KeyPerceptionPair],
     keyValidator: (String) -> Bool,
     toURL fileURL: URL? = nil
   ) {
@@ -198,8 +198,8 @@ extension LMAssembly.PerceptionPersistor {
   ///   - keyValidator: 回呼判斷某 key 是否應被忽略。
   ///   - fileURL: 可選的載入路徑。
   nonisolated func loadData(
-    loadCallback: ([LMAssembly.LMPerceptionOverride.KeyPerceptionPair]) -> (),
-    replayApplicator: (inout [String: LMAssembly.LMPerceptionOverride.KeyPerceptionPair], inout Bool) -> () = { _, _ in
+    loadCallback: ([LMAssembly.LXPerceptor.KeyPerceptionPair]) -> (),
+    replayApplicator: (inout [String: LMAssembly.LXPerceptor.KeyPerceptionPair], inout Bool) -> () = { _, _ in
     },
     keyValidator: @escaping (String) -> Bool,
     fromURL fileURL: URL? = nil
@@ -221,7 +221,7 @@ extension LMAssembly.PerceptionPersistor {
         let emptyContents = ["", "{}", "[]"]
         if !emptyContents.contains(trimmed) {
           let jsonResult = try decoder.decode(
-            [LMAssembly.LMPerceptionOverride.KeyPerceptionPair].self, from: data
+            [LMAssembly.LXPerceptor.KeyPerceptionPair].self, from: data
           )
           vCLMLog("POM: Successfully decoded \(jsonResult.count) items from snapshot")
           loadCallback(jsonResult)
@@ -255,7 +255,7 @@ extension LMAssembly.PerceptionPersistor {
   /// 清除磁碟上的快照與日誌。
   nonisolated func clearDataOnDisk(
     fileURL: URL? = nil,
-    dataProvider: () -> [LMAssembly.LMPerceptionOverride.KeyPerceptionPair]
+    dataProvider: () -> [LMAssembly.LXPerceptor.KeyPerceptionPair]
   ) {
     guard let fileURL = fileURL ?? fileSaveLocationURL else {
       vCLMLog("POM Error: Unable to clear data because file URL is nil.")
@@ -274,7 +274,7 @@ extension LMAssembly.PerceptionPersistor {
 extension LMAssembly.PerceptionPersistor {
   /// 建立待寫入日誌的記錄列表。
   nonisolated private func preparePendingJournalRecords(
-    mapProvider: () -> [String: LMAssembly.LMPerceptionOverride.KeyPerceptionPair],
+    mapProvider: () -> [String: LMAssembly.LXPerceptor.KeyPerceptionPair],
     keyValidator: (String) -> Bool
   )
     -> [JournalRecord] {
@@ -364,7 +364,7 @@ extension LMAssembly.PerceptionPersistor {
 
   /// 將現有覆寫資料完整輸出為快照，並重置日誌狀態。
   nonisolated private func writeFullSnapshot(
-    dataProvider: () -> [LMAssembly.LMPerceptionOverride.KeyPerceptionPair],
+    dataProvider: () -> [LMAssembly.LXPerceptor.KeyPerceptionPair],
     to baseURL: URL,
     force: Bool
   ) throws {
@@ -404,7 +404,7 @@ extension LMAssembly.PerceptionPersistor {
   nonisolated private func replayJournal(
     from baseURL: URL,
     keyValidator: @escaping (String) -> Bool,
-    replayApplicator: (inout [String: LMAssembly.LMPerceptionOverride.KeyPerceptionPair], inout Bool) -> ()
+    replayApplicator: (inout [String: LMAssembly.LXPerceptor.KeyPerceptionPair], inout Bool) -> ()
   ) {
     let journalURL = journalFileURL(for: baseURL)
     let fileManager = FileManager.default
@@ -444,7 +444,7 @@ extension LMAssembly.PerceptionPersistor {
       }
 
       // Apply validated records through the callback.
-      var tempMap = [String: LMAssembly.LMPerceptionOverride.KeyPerceptionPair]()
+      var tempMap = [String: LMAssembly.LXPerceptor.KeyPerceptionPair]()
       var mutated = false
       for record in recordsToApply {
         switch record.operation {

@@ -7,12 +7,15 @@
 // requirements defined in MIT License.
 
 import Foundation
+import Homa
 import Testing
 
 @testable import LangModelAssembly
 
 @Suite(.serialized)
 struct LMInstantiatorNumericPadTests {
+  // MARK: Internal
+
   @Test
   func testNumPad() throws {
     let instance = LMAssembly.LMInstantiator(isCHS: true)
@@ -23,10 +26,44 @@ struct LMInstantiatorNumericPadTests {
     instance.setOptions { config in
       config.numPadFWHWStatus = true
     }
-    #expect(instance.unigramsFor(keyArray: ["_NumPad_0"]).description == "[(_NumPad_0,０,0.0), (_NumPad_0,0,-0.1)]")
+    #expect(gramTriples(of: instance.unigramsFor(keyArray: ["_NumPad_0"])) == [
+      .init(keyArray: ["_NumPad_0"], value: "０", probability: 0.0),
+      .init(keyArray: ["_NumPad_0"], value: "0", probability: -0.1),
+    ])
     instance.setOptions { config in
       config.numPadFWHWStatus = false
     }
-    #expect(instance.unigramsFor(keyArray: ["_NumPad_0"]).description == "[(_NumPad_0,0,0.0), (_NumPad_0,０,-0.1)]")
+    #expect(gramTriples(of: instance.unigramsFor(keyArray: ["_NumPad_0"])) == [
+      .init(keyArray: ["_NumPad_0"], value: "0", probability: 0.0),
+      .init(keyArray: ["_NumPad_0"], value: "０", probability: -0.1),
+    ])
+  }
+
+  // MARK: Private
+
+  private struct GramSnapshot: Equatable {
+    // MARK: Lifecycle
+
+    init(_ gram: Homa.Gram) {
+      self.keyArray = gram.keyArray
+      self.value = gram.current
+      self.probability = gram.probability
+    }
+
+    init(keyArray: [String], value: String, probability: Double) {
+      self.keyArray = keyArray
+      self.value = value
+      self.probability = probability
+    }
+
+    // MARK: Internal
+
+    let keyArray: [String]
+    let value: String
+    let probability: Double
+  }
+
+  private func gramTriples(of grams: [Homa.Gram]) -> [GramSnapshot] {
+    grams.map(GramSnapshot.init)
   }
 }

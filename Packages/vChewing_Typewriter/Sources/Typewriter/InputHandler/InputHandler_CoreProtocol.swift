@@ -11,13 +11,13 @@ import Foundation
 // MARK: - InputHandlerProtocol
 
 /// 該檔案乃輸入調度模組的核心部分，主要承接型別初期化內容、協定內容、以及
-/// 被封裝的「與 Megrez 組字引擎和 Tekkon 注拼引擎對接的」各種工具函式。
+/// 被封裝的「與 Homa 組字引擎和 Tekkon 注拼引擎對接的」各種工具函式。
 /// 注意：不要把 composer 注拼槽與 compositor 組字器這兩個概念搞混。
 @MainActor
 public protocol InputHandlerProtocol: AnyObject, InputHandlerCoreProtocol {
   typealias Composer = Tekkon.Composer
-  typealias Assembler = Megrez.Compositor
-  typealias KeyValuePaired = Megrez.KeyValuePaired
+  typealias Assembler = Homa.Assembler
+  typealias KeyValuePaired = Homa.CandidatePair
   typealias Phonabet = Tekkon.Phonabet
 
   // MARK: - Type Properties
@@ -48,7 +48,7 @@ public protocol InputHandlerProtocol: AnyObject, InputHandlerCoreProtocol {
   var strCodePointBuffer: String { get set } // 內碼輸入專用組碼區
   var calligrapher: String { get set } // 磁帶專用組筆區
   var composer: Tekkon.Composer { get set } // 注拼槽
-  var assembler: Megrez.Compositor { get set } // 組字器
+  var assembler: Homa.Assembler { get set } // 組字器
 }
 
 // MARK: - KeyDropContext
@@ -57,7 +57,7 @@ public protocol InputHandlerProtocol: AnyObject, InputHandlerCoreProtocol {
 /// 的上下文資訊與重覆寫行為。
 ///
 /// 說明：當使用者在候選節點上做手動覆寫（例如在選字窗內選字），之後若使用刪除
-/// 鍵以刪除該節點內的一個子鍵（子讀音），有可能造成剩餘的子鍵被 Megrez 重新
+/// 鍵以刪除該節點內的一個子鍵（子讀音），有可能造成剩餘的子鍵被 Homa 重新
 /// 分詞或依 LM 權重改選，導致原本手動覆寫不再保有。此結構會在 `dropKey` 被呼叫
 /// 時嘗試捕捉目前節點資訊，提供兩種回補策略：
 /// 1) `reapplyCombined`：嘗試將刪除後的新鍵陣列（整合後）以整節覆寫套用回組字引擎，
@@ -67,7 +67,7 @@ public protocol InputHandlerProtocol: AnyObject, InputHandlerCoreProtocol {
 ///    逐一套用單鍵覆寫（single-key override）以重建使用者意圖，避免整節重新分詞
 ///    造成優先候選不同。
 ///
-/// 注意：這個結構為 `InputHandlerProtocol` 的輔助型別，對 Megrez 與 LM 的互動有
+/// 注意：這個結構為 `InputHandlerProtocol` 的輔助型別，對 Homa 與 LM 的互動有
 /// 明確依賴；在產生 context 時若無法取得需要的上下文（如被覆寫節點、節點長度
 /// 與讀音對齊等），則會回傳 `nil` 表示不進行回補處理。
 private struct KeyDropContext {
@@ -170,7 +170,7 @@ private struct KeyDropContext {
 }
 
 extension InputHandlerProtocol {
-  // MARK: - Functions dealing with Megrez.
+  // MARK: - Functions dealing with Homa.
 
   public var isCompositorEmpty: Bool { assembler.isEmpty }
 
@@ -190,7 +190,7 @@ extension InputHandlerProtocol {
     prefs.cursorPlacementAfterSelectingCandidate == 2
   }
 
-  // MARK: - Extracted methods and functions (Megrez).
+  // MARK: - Extracted methods and functions (Homa).
 
   public var keySeparator: String { assembler.separator }
 
@@ -213,9 +213,9 @@ extension InputHandlerProtocol {
     backupCursor = assembler.cursor
     switch prefs.useRearCursorMode {
     case false where !assembler.isCursorAtEdge(direction: .front):
-      _ = assembler.moveCursorStepwise(to: .front)
+      try? assembler.moveCursorStepwise(to: .front)
     case true where !assembler.isCursorAtEdge(direction: .rear):
-      _ = assembler.moveCursorStepwise(to: .rear)
+      try? assembler.moveCursorStepwise(to: .rear)
     default: break
     }
   }
@@ -240,7 +240,7 @@ extension InputHandlerProtocol {
     skipObservation: Bool = false,
     explicitlyChosen: Bool = false
   ) {
-    let theCandidate: Megrez.KeyValuePaired = .init(candidate)
+    let theCandidate: Homa.CandidatePair = .init(candidate)
     let preservedSentenceBeforeConsolidation = assembler.assembledSentence
     let preservedCursorPosition = actualNodeCursorPosition
 
@@ -251,7 +251,7 @@ extension InputHandlerProtocol {
     let pomSuggestion = retrievePOMSuggestions(apply: false)
       .first(where: {
         $0.0 == theCandidate.keyArray.joined(separator: assembler.separator)
-          && $0.1.value == theCandidate.value
+          && $0.1.current == theCandidate.value
       })
     var overrideTaskResult = false
     if pomSuggestion != nil {
@@ -266,15 +266,16 @@ extension InputHandlerProtocol {
     }
     // 若無 POM 建議或覆寫失敗，走原有覆寫流程
     if !overrideTaskResult {
-      var pomObservation: Megrez.PerceptionIntel?
-      var pomObservationPrimary: Megrez.PerceptionIntel?
-      var pomObservation2ndary: Megrez.PerceptionIntel?
+      var pomObservation: Homa.PerceptionIntel?
+      var pomObservationPrimary: Homa.PerceptionIntel?
+      var pomObservation2ndary: Homa.PerceptionIntel?
       var attempt = 0
       while attempt < 4, !overrideTaskResult {
         attempt += 1
         let enforce = attempt % 2 == 0 // 偶數次強制 retokenization
         overrideTaskResult = assembler.overrideCandidate(
           theCandidate, at: actualNodeCursorPosition,
+          overrideType: .withSpecified,
           isExplicitlyOverridden: explicitlyChosen,
           enforceRetokenization: enforce
         ) { perceptionIntel in
@@ -308,7 +309,7 @@ extension InputHandlerProtocol {
       if !overrideTaskResult { return }
       pomObservation = pomObservation2ndary ?? pomObservationPrimary
       assemble()
-      if let adjustedObservation = Megrez.makePerceptionIntel(
+      if let adjustedObservation = Homa.makePerceptionIntel(
         previouslyAssembled: preservedSentenceBeforeConsolidation,
         currentAssembled: assembler.assembledSentence,
         cursor: preservedCursorPosition
@@ -333,7 +334,7 @@ extension InputHandlerProtocol {
     }
 
     if moveCursorAfterSelectingCandidate, respectCursorPushing {
-      assembler.jumpCursorBySegment(to: .front)
+      try? assembler.jumpCursorBySegment(to: .front)
     }
   }
 
@@ -364,11 +365,11 @@ extension InputHandlerProtocol {
     theState.data.cursor = convertCursorForDisplay(assembler.cursor)
     let markerBackup = assembler.marker
     if assembler.isCursorAtEdge(direction: .front) {
-      assembler.jumpCursorBySegment(to: .rear, isMarker: true)
+      try? assembler.jumpCursorBySegment(to: .rear, isMarker: true)
     } else if assembler.isCursorAtEdge(direction: .rear) {
-      assembler.jumpCursorBySegment(to: .front, isMarker: true)
+      try? assembler.jumpCursorBySegment(to: .front, isMarker: true)
     } else {
-      assembler.jumpCursorBySegment(to: prefs.useRearCursorMode ? .front : .rear, isMarker: true)
+      try? assembler.jumpCursorBySegment(to: prefs.useRearCursorMode ? .front : .rear, isMarker: true)
     }
     theState.data.marker = assembler.marker
     assembler.marker = markerBackup
@@ -409,9 +410,8 @@ extension InputHandlerProtocol {
 
   /// 就地增刪詞之後，需要就地更新游標上下文單元圖資料。
   public func updateUnigramData() -> Bool {
-    let result = assembler.assignNodes(updateExisting: true)
     defer { assemble() }
-    return result > 0
+    return (try? assembler.assignNodes(updateExisting: true)) != nil
   }
 
   /// 警告：該參數僅代指組音區/組筆區域與組字區在目前狀態下被視為「空」。
@@ -419,8 +419,8 @@ extension InputHandlerProtocol {
     assembler.isEmpty && isComposerOrCalligrapherEmpty && currentTypingMethod == .vChewingFactory
   }
 
-  /// 要拿給 Megrez 使用的特殊游標位址，用於各種與節點判定有關的操作。
-  /// - Remark: 自 Megrez 引擎 v2.6.2 開始，該參數不得用於獲取候選字詞清單資料。相關函式僅接收原始 cursor 資料。
+  /// 要拿給 Homa 使用的特殊游標位址，用於各種與節點判定有關的操作。
+  /// - Remark: 該參數僅用於節點判定與 POM 查詢，不得直接替代候選字詞清單 API 所需的原始 cursor 資料。
   public var actualNodeCursorPosition: Int {
     // 防止指向虛位；`assembler.length` 表示最前端的虛位（cursor 可達）。
     // `actualNodeCursorPosition` 應回傳對應 `assembler.keys.indices` 的真實索引。
@@ -435,8 +435,17 @@ extension InputHandlerProtocol {
     return Swift.max(pos, 0)
   }
 
+  public var homaCandidateCursorType: Homa.Assembler.CandidateCursor {
+    switch prefs.useRearCursorMode {
+    case false where assembler.isCursorAtEdge(direction: .rear): .placedRear
+    case true where assembler.isCursorAtEdge(direction: .front): .placedFront
+    case false: .placedFront
+    case true: .placedRear
+    }
+  }
+
   public func activePOMCandidateValues() -> [String] {
-    retrievePOMSuggestions(apply: false).map { $0.1.value }
+    retrievePOMSuggestions(apply: false).map { $0.1.current }
   }
 
   // MARK: - Extracted methods and functions (Tekkon).
@@ -520,11 +529,11 @@ extension InputHandlerProtocol {
   ///
   /// 該函式的爬取順序是從頭到尾。
   func assemble() {
-    assembler.assemble()
+    _ = assembler.assemble()
 
     // 在偵錯模式開啟時，將 GraphViz 資料寫入至指定位置。
     if prefs.isDebugModeEnabled {
-      let result = assembler.dumpDOT
+      let result = assembler.dumpDOT()
       let thePath = FileManager.default.urls(for: .cachesDirectory, in: .userDomainMask)[0].path
         .appending(
           "/vChewing-visualization.dot"
@@ -541,7 +550,7 @@ extension InputHandlerProtocol {
   /// - Parameter pairs: 給定的詞音配對陣列。
   /// - Returns: 抓取到的關聯詞語陣列。
   /// 不會是 nil，但那些負責接收結果的函式會對空白陣列結果做出正確的處理。
-  func generateArrayOfAssociates(withPairs pairs: [Megrez.KeyValuePaired]) -> [(
+  func generateArrayOfAssociates(withPairs pairs: [Homa.CandidatePair]) -> [(
     keyArray: [String],
     value: String
   )] {
@@ -564,11 +573,11 @@ extension InputHandlerProtocol {
   /// - Parameter pair: 給定的詞音配對。
   /// - Returns: 抓取到的關聯詞語陣列。
   /// 不會是 nil，但那些負責接收結果的函式會對空白陣列結果做出正確的處理。
-  func generateArrayOfAssociates(withPair pair: Megrez.KeyValuePaired) -> [(
+  func generateArrayOfAssociates(withPair pair: Homa.CandidatePair) -> [(
     keyArray: [String],
     value: String
   )] {
-    var pairs = [Megrez.KeyValuePaired]()
+    var pairs = [Homa.CandidatePair]()
     var keyArray = pair.keyArray
     var value = pair.value
     while !keyArray.isEmpty {
@@ -584,9 +593,9 @@ extension InputHandlerProtocol {
   /// 用來計算離當前游標最近的一個節點邊界的距離的函式。
   /// - Parameter direction: 文字輸入方向意義上的方向。
   /// - Returns: 邊界距離。
-  func getStepsToNearbyNodeBorder(direction: Megrez.Compositor.TypingDirection) -> Int {
+  func getStepsToNearbyNodeBorder(direction: Homa.Assembler.TypingDirection) -> Int {
     let (currentCursor, currentMarker) = (assembler.cursor, assembler.marker)
-    assembler.jumpCursorBySegment(to: direction)
+    try? assembler.jumpCursorBySegment(to: direction)
     let newCursor = assembler.cursor
     let result = abs(newCursor - currentCursor)
     // 還原游標位置。
@@ -599,7 +608,8 @@ extension InputHandlerProtocol {
   func generateArrayOfCandidates(fixOrder: Bool = true) -> [CandidateInState] {
     /// 警告：不要對游標前置風格使用 nodesCrossing，否則會導致游標行為與 macOS 內建注音輸入法不一致。
     /// 微軟新注音輸入法的游標後置風格也是不允許 nodeCrossing 的。
-    var arrCandidates = fetchRawQueriedCandidatesFromAssembler()
+    let rawCandidates = fetchRawQueriedCandidatesFromAssembler()
+    var arrCandidates = rawCandidates.map(\.pair)
 
     /// 原理：nodes 這個回饋結果包含一堆子陣列，分別對應不同詞長的候選字。
     /// 這裡先對陣列排序、讓最長候選字的子陣列的優先權最高。
@@ -612,19 +622,18 @@ extension InputHandlerProtocol {
       || currentTypingMethod != .vChewingFactory
     switch skipPOMHandling {
     case false:
-      let arrSuggestedUnigrams: [(String, Megrez.Unigram)] = retrievePOMSuggestions(
+      let arrSuggestedUnigrams: [(String, Homa.Gram)] = retrievePOMSuggestions(
         apply: false,
-        rawCandidates: arrCandidates
+        rawCandidates: rawCandidates
       )
-      let arrSuggestedCandidates: [Megrez.KeyValuePaired] = arrSuggestedUnigrams.map {
-        Megrez.KeyValuePaired(
+      let arrSuggestedCandidates: [Homa.CandidatePair] = arrSuggestedUnigrams.map {
+        Homa.CandidatePair(
           keyArray: $0.1.keyArray,
-          value: $0.1.value,
-          score: $0.1.score
+          value: $0.1.current
         )
       }
 
-      let rawCandidateSignatures: Set<Megrez.KeyValuePaired> = Set(
+      let rawCandidateSignatures: Set<Homa.CandidatePair> = Set(
         arrCandidates.map(makeCanonicalPair(from:))
       )
       let filteredSuggestedCandidates = arrSuggestedCandidates.filter {
@@ -641,8 +650,8 @@ extension InputHandlerProtocol {
       eTenSequenceEnforcement: if prefs.enforceETenDOSCandidateSequence {
         let seq4ETen = currentLM.queryETenDOSSequence(reading: eTenCandidates.reading)
         guard !seq4ETen.isEmpty else { break eTenSequenceEnforcement }
-        let arrSeq4ETen: [Megrez.KeyValuePaired] = seq4ETen.map {
-          .init(key: eTenCandidates.reading, value: $0, score: 0)
+        let arrSeq4ETen: [Homa.CandidatePair] = seq4ETen.map {
+          .init(key: eTenCandidates.reading, value: $0)
         }
         arrCandidates = eTenCandidates.longerSegments + deduplicateCandidatesPreservingOrder(
           arrSeq4ETen + eTenCandidates.singleSegments
@@ -664,10 +673,10 @@ extension InputHandlerProtocol {
 
   /// 移除重複候選字詞（以讀音 + 詞值做鍵），維持原順序。
   func deduplicateCandidatesPreservingOrder(
-    _ candidates: [Megrez.KeyValuePaired]
+    _ candidates: [Homa.CandidatePair]
   )
-    -> [Megrez.KeyValuePaired] {
-    var seen = Set<Megrez.KeyValuePaired>()
+    -> [Homa.CandidatePair] {
+    var seen = Set<Homa.CandidatePair>()
     return candidates.filter { candidate in
       let signature = makeCanonicalPair(from: candidate)
       if seen.contains(signature) { return false }
@@ -677,10 +686,10 @@ extension InputHandlerProtocol {
   }
 
   private func segregateCandidatesForETenDOS(
-    from candidates: [Megrez.KeyValuePaired]
+    from candidates: [Homa.CandidatePair]
   )
-    -> (singleSegments: [Megrez.KeyValuePaired], longerSegments: [Megrez.KeyValuePaired], reading: String)? {
-    var (singleSegments, longerSegments): ([Megrez.KeyValuePaired], [Megrez.KeyValuePaired]) = ([], [])
+    -> (singleSegments: [Homa.CandidatePair], longerSegments: [Homa.CandidatePair], reading: String)? {
+    var (singleSegments, longerSegments): ([Homa.CandidatePair], [Homa.CandidatePair]) = ([], [])
     var singleReadings = Set<String>()
     candidates.forEach { currentPair in
       switch currentPair.keyArray.count {
@@ -699,9 +708,9 @@ extension InputHandlerProtocol {
 
   private func supplementalETenSingleKanjiCandidates(
     reading: String,
-    existingSingleSegments: [Megrez.KeyValuePaired]
+    existingSingleSegments: [Homa.CandidatePair]
   )
-    -> [Megrez.KeyValuePaired] {
+    -> [Homa.CandidatePair] {
     let existingValues = Set(existingSingleSegments.map(\.value))
     var insertedValues = Set<String>()
     return currentLM.queryETenDOSSequence(reading: reading).compactMap { currentValue in
@@ -713,22 +722,22 @@ extension InputHandlerProtocol {
         return nil
       }
       insertedValues.insert(currentValue)
-      return .init(key: reading, value: currentValue, score: -9.5)
+      return .init(key: reading, value: currentValue)
     }
   }
 
   /// 將 POM 建議過濾成適合覆寫的單元圖，會剔除分數低於當前原始候選的項目。
   func filterPOMAppendables(
     from suggestion: LMAssembly.OverrideSuggestion,
-    rawCandidates: [Megrez.KeyValuePaired]
+    rawCandidates: [Homa.CandidatePairWeighted]
   )
-    -> [(String, Megrez.Unigram)] {
+    -> [(String, Homa.Gram)] {
     guard !suggestion.isEmpty else { return [] }
 
     let separator = assembler.separator
-    let rawLookup = rawCandidates.reduce(into: [Megrez.KeyValuePaired: Double]()) { partialResult, item in
-      let signature = makeCanonicalPair(from: item)
-      let currentScore = item.score
+    let rawLookup = rawCandidates.reduce(into: [Homa.CandidatePair: Double]()) { partialResult, item in
+      let signature = makeCanonicalPair(from: item.pair)
+      let currentScore = item.weight
       if let existingScore = partialResult[signature] {
         partialResult[signature] = max(existingScore, currentScore)
       } else {
@@ -738,13 +747,13 @@ extension InputHandlerProtocol {
 
     return suggestion.candidates.compactMap { candidate in
       let keyString = candidate.keyArray.joined(separator: separator)
-      let suggestedUnigram = Megrez.Unigram(
+      let suggestedUnigram = Homa.Gram(
         keyArray: candidate.keyArray,
         value: candidate.value,
         score: candidate.probability
       )
-      let signature = makeCanonicalPair(keyArray: candidate.keyArray, value: suggestedUnigram.value)
-      if let rawScore = rawLookup[signature], suggestedUnigram.score < rawScore {
+      let signature = makeCanonicalPair(keyArray: candidate.keyArray, value: suggestedUnigram.current)
+      if let rawScore = rawLookup[signature], suggestedUnigram.probability < rawScore {
         return nil
       }
       return (keyString, suggestedUnigram)
@@ -755,10 +764,10 @@ extension InputHandlerProtocol {
   @discardableResult
   func retrievePOMSuggestions(
     apply: Bool,
-    rawCandidates: [Megrez.KeyValuePaired]? = nil
+    rawCandidates: [Homa.CandidatePairWeighted]? = nil
   )
-    -> [(String, Megrez.Unigram)] {
-    var arrResult = [(String, Megrez.Unigram)]()
+    -> [(String, Homa.Gram)] {
+    var arrResult = [(String, Homa.Gram)]()
     /// 如果逐字選字模式有啟用的話，直接放棄執行這個函式。
     if prefs.useSCPCTypingMode { return arrResult }
     /// 如果這個開關沒打開的話，直接放棄執行這個函式。
@@ -776,14 +785,9 @@ extension InputHandlerProtocol {
     arrResult.append(contentsOf: appendables)
     if apply {
       if !suggestion.isEmpty, let newestSuggestedCandidate = suggestion.candidates.last {
-        let overrideBehavior: Megrez.Node.OverrideType = suggestion.forceHighScoreOverride
+        let overrideBehavior: Homa.Node.OverrideType = suggestion.forceHighScoreOverride
           ? .withSpecified
           : .withTopGramScore
-        let suggestedPair: Megrez.KeyValuePaired = .init(
-          key: newestSuggestedCandidate.keyArray.joined(separator: assembler.separator),
-          value: newestSuggestedCandidate.value,
-          score: newestSuggestedCandidate.probability
-        )
         let cursorForOverride = suggestion.overrideCursor ?? actualNodeCursorPosition
         if let gramHit = assembler.assembledSentence.findGram(at: cursorForOverride) {
           if gramHit.gram.keyArray.count > newestSuggestedCandidate.keyArray.count {
@@ -793,19 +797,14 @@ extension InputHandlerProtocol {
             let suggestedScore = newestSuggestedCandidate.probability
             // 預設門檻：需要至少超越既有節點 0.5 分（可視為安全餘量）
             if !pomShortToLongAllowed(existingScore: existingScore, suggestedScore: suggestedScore) {
-              vCLog(
-                "POM: Skip applying suggestion \(suggestedPair.toNGramKey) because it would shorten an existing node without sufficient margin (existing=\(existingScore), suggested=\(suggestedScore))."
-              )
-              return arrResult.stableSort { $0.1.score > $1.1.score }
+              return arrResult.stableSort { $0.1.probability > $1.1.probability }
             }
           }
         }
-        let ngramKey = suggestedPair.toNGramKey
-        vCLog(
-          "POM: Applying suggestion \(ngramKey) at \(cursorForOverride) via \(overrideBehavior)"
-        )
-        _ = assembler.overrideCandidate(
-          suggestedPair,
+        // POM 建議的 keyArray 僅含 head reading（可能與實際候選的完整 keyArray 不符），
+        // 因此一律使用 literal override（不查 keyArray）讓 Homa 按 value 搜尋重疊節點。
+        _ = try? assembler.overrideCandidateLiteral(
+          newestSuggestedCandidate.value,
           at: cursorForOverride,
           overrideType: overrideBehavior,
           enforceRetokenization: true
@@ -813,7 +812,7 @@ extension InputHandlerProtocol {
         assemble()
       }
     }
-    arrResult = arrResult.stableSort { $0.1.score > $1.1.score }
+    arrResult = arrResult.stableSort { $0.1.probability > $1.1.probability }
     return arrResult
   }
 
@@ -878,7 +877,7 @@ extension InputHandlerProtocol {
   private func fetchRawQueriedCandidatesFromAssembler(
     filterOverride givenFilter: Assembler.CandidateFetchFilter? = nil
   )
-    -> [Megrez.KeyValuePaired] {
+    -> [Homa.CandidatePairWeighted] {
     if let givenFilter {
       return assembler.fetchCandidates(filter: givenFilter)
     }
@@ -894,121 +893,17 @@ extension InputHandlerProtocol {
 }
 
 extension InputHandlerProtocol {
-  /// 鞏固當前組字器游標上下文，防止在當前游標位置固化節點時給作業範圍以外的內容帶來不想要的變化。
-  ///
-  /// 打比方說輸入法原廠詞庫內有「章太炎」一詞，你敲「章太炎」，然後想把「太」改成「泰」以使其變成「章泰炎」。
-  /// **macOS 內建的注音輸入法不會在這個過程對這個詞除了「太」以外的部分有任何變動**，
-  /// 但所有 OV 系輸入法都對此有 Bug：會將這些部分全部重設為各自的讀音下的最高原始權重的漢字。
-  /// 也就是說，選字之後的結果可能會變成「張泰言」。
-  ///
-  /// - Remark: 類似的可以拿來測試的詞有「蔡依林」「周杰倫」。
-  ///
-  /// 測試時請務必也測試「敲長句子、且這種詞在句子中間出現時」的情況。
-  ///
-  /// 唯音輸入法截至 v1.9.3 SP2 版為止都受到上游的這個 Bug 的影響，且在 v1.9.4 版利用該函式修正了這個缺陷。
-  /// 該修正必須搭配至少天權星組字引擎 v2.0.2 版方可生效。算法可能比較囉唆，但至少在常用情形下不會再發生該問題。
-  /// - Parameter theCandidate: 要拿來覆寫的詞音配對。
-  func consolidateCursorContext(with theCandidate: Megrez.KeyValuePaired, explicitlyChosen: Bool = false) {
-    // 計算需要鞏固的範圍
-    let result = calculateConsolidationBoundaries(for: theCandidate, explicitlyChosen: explicitlyChosen)
-    let consolidationRange = result.range
-
-    // 記錄調試信息
-    vCLog(result.debugInfo)
-
-    // 接下來獲取這個範圍內的節點位置陣列。
-    var nodeIndices = [Int]() // 僅作統計用。
-
-    let targetCursor = actualNodeCursorPosition
-    let candidateKeyCount = max(theCandidate.keyArray.count, 1)
-    let candidateRangeUpperBound = min(targetCursor + candidateKeyCount, assembler.length)
-    let candidateRange = targetCursor ..< candidateRangeUpperBound
-
-    var position = consolidationRange.lowerBound // 臨時統計用
-    while position < consolidationRange.upperBound {
-      guard let regionIndex = assembler.assembledSentence.cursorRegionMap[position] else {
-        position += 1
-        continue
-      }
-      if !nodeIndices.contains(regionIndex) {
-        nodeIndices.append(regionIndex) // 新增統計
-        guard assembler.assembledSentence.count > regionIndex else { break } // 防呆
-        let currentNode = assembler.assembledSentence[regionIndex]
-        let nodeLength = currentNode.keyArray.count
-        guard nodeLength > 0 else {
-          position += 1
-          continue
-        }
-        let nodeStart = position
-        var nextPosition = nodeStart
-        let nodeRange = nodeStart ..< (nodeStart + nodeLength)
-        let overlapsTarget = nodeRange.overlaps(candidateRange)
-
-        if !overlapsTarget {
-          if overrideNodeAsWhole(currentNode, at: nodeStart, explicitlyChosen: explicitlyChosen) {
-            nextPosition += nodeLength
-            position = nextPosition
-            continue
-          }
-          // 若整節覆寫失敗，退回原邏輯逐字固化以維持穩定性。
-          let values = currentNode.asCandidatePair.value.map { String($0) }
-          guard values.count == currentNode.keyArray.count else {
-            nextPosition += nodeLength
-            position = nextPosition
-            continue
-          }
-          for (subPosition, key) in currentNode.keyArray.enumerated() {
-            guard values.count > subPosition else { break } // 防呆，應該沒有發生的可能性
-            let thePair = Megrez.KeyValuePaired(
-              keyArray: [key],
-              value: values[subPosition]
-            )
-            assembler.overrideCandidate(
-              thePair,
-              at: nextPosition,
-              isExplicitlyOverridden: explicitlyChosen
-            )
-            nextPosition += 1
-          }
-          position = nextPosition
-          continue
-        }
-
-        // 針對目標節點保留原先逐字固化行為，以確保覆寫準確性。
-        let values = currentNode.asCandidatePair.value.map { String($0) }
-        guard values.count == currentNode.keyArray.count else {
-          if overrideNodeAsWhole(currentNode, at: nodeStart, explicitlyChosen: explicitlyChosen) {
-            nextPosition += nodeLength
-            position = nextPosition
-            continue
-          }
-          nextPosition += nodeLength
-          position = nextPosition
-          continue
-        }
-        for (subPosition, key) in currentNode.keyArray.enumerated() {
-          guard values.count > subPosition else { break }
-          let thePair = Megrez.KeyValuePaired(
-            keyArray: [key],
-            value: values[subPosition]
-          )
-          assembler.overrideCandidate(
-            thePair,
-            at: nextPosition,
-            isExplicitlyOverridden: explicitlyChosen
-          )
-          nextPosition += 1
-        }
-        position = nextPosition
-        continue
-      }
-      position += 1
-    }
+  /// Homa 已內建上下文鞏固邏輯；Typewriter 僅負責將當前游標風格轉譯給 Homa。
+  func consolidateCursorContext(with theCandidate: Homa.CandidatePair, explicitlyChosen _: Bool = false) {
+    try? assembler.consolidateCandidateCursorContext(
+      for: theCandidate,
+      cursorType: homaCandidateCursorType
+    )
   }
 
   /// 刪除鍵（dropKey）處理：該函式會在必要時判定「當前游標旁是否存在被手動覆寫的
   /// 節點（overridden node）」。若該情形成立，則會嘗試以兩個步驟回補使用者的手動
-  /// 覆寫意圖，以防止 LM 或 Megrez 重新分詞後導致選字被改變。
+  /// 覆寫意圖，以防止 LM 或 Homa 重新分詞後導致選字被改變。
   ///
   /// 假設游標/候選/刪除方向的範例為：`(0, A1-B1-C1, front)` 與 `(3, X1-Y1-Z1, rear)`。
   /// 在刪除其中一個鍵後，期望的結果分別為 `(0, B1-C1)` 以及 `(2, X1-Y1)`。
@@ -1031,16 +926,16 @@ extension InputHandlerProtocol {
   @discardableResult
   func dropKey(direction: Assembler.TypingDirection) -> Bool {
     // 先嘗試生成手動覆寫的上下文（如果是從選字窗手動覆寫而來），
-    // 若無上下文，直接讓 Megrez 處理 dropKey。
+    // 若無上下文，直接讓 Homa 處理 dropKey。
     let context = KeyDropContext.getManualOverrideKeyDropContext(
       for: direction,
       from: self
     )
     guard let context else {
-      guard assembler.dropKey(direction: direction) else { return false }
+      guard (try? assembler.dropKey(direction: direction)) != nil else { return false }
       return true
     }
-    guard assembler.dropKey(direction: direction) else { return false }
+    guard (try? assembler.dropKey(direction: direction)) != nil else { return false }
     guard !context.remainingKeys.isEmpty else { return true }
 
     if context.reapplyCombined(to: self) {
@@ -1050,105 +945,12 @@ extension InputHandlerProtocol {
     return true
   }
 
-  /// 計算鞏固游標上下文時所需的邊界範圍。
-  /// - Parameter candidate: 要拿來覆寫的詞音配對。
-  /// - Returns: 需要處理的範圍和調試信息。
-  private func calculateConsolidationBoundaries(
-    for candidate: Megrez.KeyValuePaired,
-    explicitlyChosen: Bool = false
-  )
-    -> (range: Range<Int>, debugInfo: String) {
-    let currentAssembledSentence = assembler.assembledSentence
-
-    // 先計算實驗性邊界（如果候選字詞可以被覆蓋的話）
-    var frontBoundaryEX = actualNodeCursorPosition + 1
-    var rearBoundaryEX = actualNodeCursorPosition
-    var debugIntelToPrint = ""
-
-    let gridOverrideStatusMirror = assembler.createNodeOverrideStatusMirror()
-    let (currentCursor, currentMarker) = (assembler.cursor, assembler.marker)
-
-    defer {
-      assembler.restoreFromNodeOverrideStatusMirror(gridOverrideStatusMirror)
-      assembler.assembledSentence = currentAssembledSentence
-      assembler.cursor = currentCursor
-      assembler.marker = currentMarker
-    }
-
-    if assembler.overrideCandidate(
-      candidate,
-      at: actualNodeCursorPosition,
-      isExplicitlyOverridden: false
-    ) {
-      assembler.assemble()
-      let range = assembler.assembledSentence.contextRange(ofGivenCursor: actualNodeCursorPosition)
-      rearBoundaryEX = range.lowerBound
-      frontBoundaryEX = range.upperBound
-      debugIntelToPrint.append("EX: \(rearBoundaryEX)..<\(frontBoundaryEX), ")
-    }
-
-    // 獲取初始範圍
-    let initialRange = currentAssembledSentence.contextRange(
-      ofGivenCursor: actualNodeCursorPosition
-    )
-    var rearBoundary = min(initialRange.lowerBound, rearBoundaryEX)
-    var frontBoundary = max(initialRange.upperBound, frontBoundaryEX)
-
-    debugIntelToPrint.append("INI: \(rearBoundary)..<\(frontBoundary), ")
-
-    // 通過游標移動來精確計算邊界
-    let cursorBackup = assembler.cursor
-    defer { assembler.cursor = cursorBackup }
-
-    // 計算後邊界
-    while assembler.cursor > rearBoundary {
-      assembler.jumpCursorBySegment(to: .rear)
-    }
-    rearBoundary = min(assembler.cursor, rearBoundary)
-
-    // 重置游標位置
-    assembler.cursor = cursorBackup
-
-    // 計算前邊界
-    while assembler.cursor < frontBoundary {
-      assembler.jumpCursorBySegment(to: .front)
-    }
-    frontBoundary = min(max(assembler.cursor, frontBoundary), assembler.length)
-
-    debugIntelToPrint.append("FIN: \(rearBoundary)..<\(frontBoundary)")
-
-    return (range: rearBoundary ..< frontBoundary, debugInfo: debugIntelToPrint)
-  }
-
-  private func overrideNodeAsWhole(
-    _ node: Megrez.GramInPath,
-    at startPosition: Int,
-    explicitlyChosen: Bool = false
-  )
-    -> Bool {
-    let candidate = node.asCandidatePair
-    if assembler.overrideCandidate(candidate, at: startPosition, isExplicitlyOverridden: explicitlyChosen) {
-      return true
-    }
-    if assembler.overrideCandidate(
-      candidate,
-      at: startPosition,
-      overrideType: .withSpecified,
-      isExplicitlyOverridden: explicitlyChosen,
-      enforceRetokenization: true
-    ) {
-      return true
-    }
-    vCLog("Consolidation fallback to per-key override for node: \(candidate.value)")
-    return false
-  }
-
-  private func makeCanonicalPair(from pair: Megrez.KeyValuePaired) -> Megrez.KeyValuePaired {
+  private func makeCanonicalPair(from pair: Homa.CandidatePair) -> Homa.CandidatePair {
     makeCanonicalPair(keyArray: pair.keyArray, value: pair.value)
   }
 
-  private func makeCanonicalPair(keyArray: [String], value: String) -> Megrez.KeyValuePaired {
-    Megrez.KeyValuePaired(keyArray: keyArray, value: value, score: 0)
+  private func makeCanonicalPair(keyArray: [String], value: String) -> Homa.CandidatePair {
+    Homa.CandidatePair(keyArray: keyArray, value: value)
   }
 }
 
@@ -1187,7 +989,7 @@ extension InputHandlerProtocol {
       assembler.cursor = 0
       if !node.isReadingMismatched { consolidateCursorContext(with: node.asCandidatePair) }
       // 唯音不支援 Bigram，所以無須考慮前後節點「是否需要鞏固」。
-      for _ in 0 ..< delta { assembler.dropKey(direction: .front) }
+      for _ in 0 ..< delta { try? assembler.dropKey(direction: .front) }
       assembler.cursor = newCursor
       assemble()
     }

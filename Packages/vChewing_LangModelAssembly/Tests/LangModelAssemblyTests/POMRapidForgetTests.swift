@@ -7,7 +7,7 @@
 // requirements defined in MIT License.
 
 import Foundation
-import Megrez
+import Homa
 import Shared
 import Testing
 
@@ -29,7 +29,7 @@ extension POMTestSuite {
     /// 測試急速遺忘模式：當啟用後，記憶在 12 小時（0.5 天）後應該被遺忘
     @Test
     func testPOM_RapidForget_01_EnabledMode() throws {
-      let pom = LMAssembly.LMPerceptionOverride(
+      let pom = LMAssembly.LXPerceptor(
         capacity: capacity,
         dataURL: nullURL
       )
@@ -61,7 +61,7 @@ extension POMTestSuite {
     /// 測試正常模式：當未啟用急速遺忘模式時，記憶在約一週後才會被遺忘
     @Test
     func testPOM_RapidForget_02_DisabledMode() throws {
-      let pom = LMAssembly.LMPerceptionOverride(
+      let pom = LMAssembly.LXPerceptor(
         capacity: capacity,
         dataURL: nullURL
       )
@@ -102,13 +102,13 @@ extension POMTestSuite {
     func testPOM_RapidForget_03_LMInstantiatorForwardsReducedLifetimeFlag() throws {
       let instance = LMAssembly.LMInstantiator(pomDataURL: nullURL)
 
-      #expect(instance.lmPerceptionOverride.reducedLifetime == false)
+      #expect(instance.lxPerceptor.reducedLifetime == false)
 
       instance.pomReducedLifetime = true
-      #expect(instance.lmPerceptionOverride.reducedLifetime == true)
+      #expect(instance.lxPerceptor.reducedLifetime == true)
 
       instance.pomReducedLifetime = false
-      #expect(instance.lmPerceptionOverride.reducedLifetime == false)
+      #expect(instance.lxPerceptor.reducedLifetime == false)
     }
   }
 }

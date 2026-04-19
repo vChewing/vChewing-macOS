@@ -7,8 +7,8 @@
 // requirements defined in MIT License.
 
 import Foundation
+import Homa
 import LMAssemblyMaterials4Tests
-import Megrez
 import Testing
 
 @testable import LangModelAssembly
@@ -17,7 +17,7 @@ private let strCakeKey: [String] = ["ㄉㄢˋ", "ㄍㄠ"]
 private let strZhongKey: [String] = ["ㄓㄨㄥ"]
 private let strBoobsKey: [String] = ["ㄋㄟ", "ㄋㄟ"]
 private let expectedReverseLookupResults: [String] = [
-  "ㄉㄨㄥ", "ㄏㄢˋ", "ㄏㄜˊ", "ㄏㄜˋ", "ㄏㄨˊ", "ㄏㄨㄛˋ", "ㄏㄨㄛ˙",
+  "ㄉㄨㄥ", "ㄏㄢˋ", "ㄏㄜˊ", "ㄏㄜˋ", "ㄏㄜ˙", "ㄏㄨˊ", "ㄏㄨㄛ", "ㄏㄨㄛˊ", "ㄏㄨㄛˋ", "ㄏㄨㄛ˙",
 ]
 
 // MARK: - LMInstantiatorTextMapTests
@@ -40,17 +40,33 @@ struct LMInstantiatorTextMapTests {
       config.isCNSEnabled = false
       config.isSymbolEnabled = false
     }
-    #expect(instance.unigramsFor(keyArray: strCakeKey).description == "[(ㄉㄢˋ-ㄍㄠ,蛋糕,-4.073)]")
-    #expect(instance.getHaninSymbolMenuUnigrams()[1].description == "(_punctuation_list,，,-9.9)")
-    #expect(instance.unigramsFor(keyArray: strBoobsKey).description == "[(ㄋㄟ-ㄋㄟ,ㄋㄟㄋㄟ,-1.0)]")
+    #expect(gramTriples(of: instance.unigramsFor(keyArray: strCakeKey)) == [
+      .init(keyArray: strCakeKey, value: "蛋糕", probability: -4.072),
+    ])
+    #expect(gramTriple(of: instance.getHaninSymbolMenuUnigrams()[1]) == .init(
+      keyArray: ["_punctuation_list"],
+      value: "，",
+      probability: 0.0
+    ))
+    #expect(gramTriples(of: instance.unigramsFor(keyArray: strBoobsKey)) == [
+      .init(keyArray: strBoobsKey, value: "ㄋㄟㄋㄟ", probability: -1.0),
+    ])
 
     instance.setOptions { config in
       config.isCNSEnabled = true
       config.isSymbolEnabled = true
     }
-    #expect(instance.unigramsFor(keyArray: strCakeKey).last?.description == "(ㄉㄢˋ-ㄍㄠ,🧁,-13.000001)")
-    #expect(instance.unigramsFor(keyArray: strZhongKey).count == 21)
-    #expect(instance.unigramsFor(keyArray: strBoobsKey).last?.description == "(ㄋㄟ-ㄋㄟ,☉☉,-13.0)")
+    #expect(gramTriple(of: instance.unigramsFor(keyArray: strCakeKey).last) == .init(
+      keyArray: strCakeKey,
+      value: "🧁",
+      probability: -13.0
+    ))
+    #expect(instance.unigramsFor(keyArray: strZhongKey).count == 184)
+    #expect(gramTriple(of: instance.unigramsFor(keyArray: strBoobsKey).last) == .init(
+      keyArray: strBoobsKey,
+      value: "☉☉",
+      probability: -13.0
+    ))
     #expect(LMAssembly.LMInstantiator.getFactoryReverseLookupData(with: "和") == expectedReverseLookupResults)
   }
 
@@ -61,9 +77,9 @@ struct LMInstantiatorTextMapTests {
     }
 
     let instance = LMAssembly.LMInstantiator(isCHS: false)
-    #expect(!LMATestsData.sqlTestCoreLMData.isEmpty)
-    #expect(LMAssembly.LMInstantiator.connectToTestFactoryDictionary(textMapData: LMATestsData.sqlTestCoreLMData))
-    #expect(instance.unigramsFor(keyArray: strCakeKey).first?.value == "蛋糕")
+    #expect(!LMATestsData.textMapTestCoreLMData.isEmpty)
+    #expect(LMAssembly.LMInstantiator.connectToTestFactoryDictionary(textMapData: LMATestsData.textMapTestCoreLMData))
+    #expect(instance.unigramsFor(keyArray: strCakeKey).first?.current == "蛋糕")
     #expect(LMAssembly.LMInstantiator.getFactoryReverseLookupData(with: "和") == expectedReverseLookupResults)
   }
 
@@ -82,15 +98,27 @@ struct LMInstantiatorTextMapTests {
       config.filterNonCNSReadings = false
       config.alwaysSupplyETenDOSUnigrams = false
     }
-    #expect(instance.unigramsFor(keyArray: ["ㄨㄟ"]).first(where: { $0.value == "危" })?.description == "(ㄨㄟ,危,-5.287)")
-    #expect(instance.unigramsFor(keyArray: ["ㄨㄟˊ"]).first(where: { $0.value == "危" })?.description == "(ㄨㄟˊ,危,-5.287)")
+    #expect(
+      gramTriple(of: instance.unigramsFor(keyArray: ["ㄨㄟ"]).first(where: { $0.current == "危" })) ==
+        .init(keyArray: ["ㄨㄟ"], value: "危", probability: -5.287)
+    )
+    #expect(
+      gramTriple(of: instance.unigramsFor(keyArray: ["ㄨㄟˊ"]).first(where: { $0.current == "危" })) ==
+        .init(keyArray: ["ㄨㄟˊ"], value: "危", probability: -5.287)
+    )
 
     instance.setOptions { config in
       config.filterNonCNSReadings = true
     }
     // 單一讀音的單漢字不再被濾除，而是 demote score 至 -9.5。
-    #expect(instance.unigramsFor(keyArray: ["ㄨㄟ"]).first(where: { $0.value == "危" })?.description == "(ㄨㄟ,危,-9.5)")
-    #expect(instance.unigramsFor(keyArray: ["ㄨㄟˊ"]).first(where: { $0.value == "危" })?.description == "(ㄨㄟˊ,危,-5.287)")
+    #expect(
+      gramTriple(of: instance.unigramsFor(keyArray: ["ㄨㄟ"]).first(where: { $0.current == "危" })) ==
+        .init(keyArray: ["ㄨㄟ"], value: "危", probability: -9.5)
+    )
+    #expect(
+      gramTriple(of: instance.unigramsFor(keyArray: ["ㄨㄟˊ"]).first(where: { $0.current == "危" })) ==
+        .init(keyArray: ["ㄨㄟˊ"], value: "危", probability: -5.287)
+    )
   }
 
   @Test
@@ -244,6 +272,45 @@ struct LMInstantiatorTextMapTests {
   }
 
   @Test
+  func testGeneratedHalfWidthPunctuationRanksBehindCanonicalFullWidth() throws {
+    defer {
+      LMAssembly.LMInstantiator.disconnectFactoryDictionary()
+    }
+
+    let instance = LMAssembly.LMInstantiator(isCHS: false)
+    let textMap = makeTextMap([
+      ("_punctuation_,", [("，", -9.9, 4)]),
+    ])
+
+    #expect(LMAssembly.LMInstantiator.connectToTestFactoryDictionary(textMapData: textMap))
+
+    let grams = instance.unigramsFor(keyArray: ["_punctuation_,"])
+    let fullWidth = grams.first(where: { $0.current == "，" })
+    let halfWidth = grams.first(where: { $0.current == "," })
+
+    #expect(gramTriple(of: fullWidth) == .init(keyArray: ["_punctuation_,"], value: "，", probability: -9.9))
+    #expect(gramTriple(of: halfWidth) == .init(keyArray: ["_punctuation_,"], value: ",", probability: -9.9001))
+  }
+
+  @Test
+  func testEqualScoreStandardPunctuationPreservesLexiconOrder() throws {
+    defer {
+      LMAssembly.LMInstantiator.disconnectFactoryDictionary()
+    }
+
+    let instance = LMAssembly.LMInstantiator(isCHS: false)
+    let textMap = makeTextMap([
+      ("_punctuation_Standard_<", [("，", -9.9, 4), ("〈", -9.9, 4), ("《", -9.9, 4)]),
+    ])
+
+    #expect(LMAssembly.LMInstantiator.connectToTestFactoryDictionary(textMapData: textMap))
+
+    let grams = instance.unigramsFor(keyArray: ["_punctuation_Standard_<"])
+    #expect(grams.map(\.current).prefix(3).elementsEqual(["，", "〈", "《"]))
+    #expect(grams.prefix(3).allSatisfy { $0.probability == -9.9 })
+  }
+
+  @Test
   func testFactorySupersetUnigramsFor() throws {
     defer {
       LMAssembly.LMInstantiator.disconnectFactoryDictionary()
@@ -268,13 +335,43 @@ struct LMInstantiatorTextMapTests {
     #expect(gramsContainValue(grams, "fval"))
     #expect(gramsContainValue(grams, "mval"))
     #expect(!gramsContainValue(grams, "base"))
-    #expect(grams.first(where: { $0.value == "zval" })?.keyArray.count == 4)
+    #expect(grams.first(where: { $0.current == "zval" })?.keyArray.count == 4)
   }
 
   // MARK: Private
 
-  private func gramsContainValue(_ grams: [Megrez.Unigram], _ value: String) -> Bool {
-    grams.contains(where: { $0.value == value })
+  private struct GramSnapshot: Equatable {
+    // MARK: Lifecycle
+
+    init(_ gram: Homa.Gram) {
+      self.keyArray = gram.keyArray
+      self.value = gram.current
+      self.probability = gram.probability
+    }
+
+    init(keyArray: [String], value: String, probability: Double) {
+      self.keyArray = keyArray
+      self.value = value
+      self.probability = probability
+    }
+
+    // MARK: Internal
+
+    let keyArray: [String]
+    let value: String
+    let probability: Double
+  }
+
+  private func gramsContainValue(_ grams: [Homa.Gram], _ value: String) -> Bool {
+    grams.contains(where: { $0.current == value })
+  }
+
+  private func gramTriple(of gram: Homa.Gram?) -> GramSnapshot? {
+    gram.map(GramSnapshot.init)
+  }
+
+  private func gramTriples(of grams: [Homa.Gram]) -> [GramSnapshot] {
+    grams.map(GramSnapshot.init)
   }
 
   private func makeTextMap(_ entriesByKey: [(String, [(value: String, probability: Double, typeID: Int32)])])

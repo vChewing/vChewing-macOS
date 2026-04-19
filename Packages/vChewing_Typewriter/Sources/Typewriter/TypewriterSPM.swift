@@ -8,8 +8,8 @@
 
 @_exported import BPMFVS
 @_exported import BrailleSputnik
+@_exported import Homa
 @_exported import LangModelAssembly
-@_exported import Megrez
 @_exported import Shared
 @_exported import SwiftExtension
 @_exported import Tekkon

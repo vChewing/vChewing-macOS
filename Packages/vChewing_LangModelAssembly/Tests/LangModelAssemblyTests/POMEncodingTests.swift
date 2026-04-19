@@ -9,7 +9,7 @@
 // Test file to investigate POM JSON encoding issues
 
 import Foundation
-import Megrez
+import Homa
 import Testing
 
 @testable import LangModelAssembly
@@ -23,7 +23,7 @@ extension POMTestSuite {
       let tempURL = URL(fileURLWithPath: NSTemporaryDirectory()).appendingPathComponent("test_pom_data.json")
       vCLMLog("測試文件路徑: \(tempURL.path)")
 
-      let pom = LMAssembly.LMPerceptionOverride(capacity: 10, dataURL: tempURL)
+      let pom = LMAssembly.LXPerceptor(capacity: 10, dataURL: tempURL)
 
       // 測試空數據情況
       vCLMLog("=== 測試空數據情況 ===")
@@ -91,7 +91,7 @@ extension POMTestSuite {
         #expect(jsonString.contains("test1"))
         let data2 = jsonString.data(using: .utf8) ?? .init([])
         let decoded = try JSONDecoder().decode(
-          [LMAssembly.LMPerceptionOverride.KeyPerceptionPair].self, from: data2
+          [LMAssembly.LXPerceptor.KeyPerceptionPair].self, from: data2
         )
         #expect(decoded == savableData)
       } catch {
@@ -123,7 +123,7 @@ extension POMTestSuite {
       // 測試數據完整性 - 確認數據是否真的被正確記憶和檢索
       vCLMLog("=== 測試數據完整性 ===")
 
-      let pom = LMAssembly.LMPerceptionOverride(capacity: 10)
+      let pom = LMAssembly.LXPerceptor(capacity: 10)
 
       let testKey = "(test,測試)&(key,鍵)&(target,target)"
       let testCandidate = "目標"

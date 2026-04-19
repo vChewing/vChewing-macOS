@@ -6,9 +6,9 @@
 // marks, or product names of Contributor, except as required to fulfill notice
 // requirements defined in MIT License.
 
+import Homa
+import HomaSharedTestComponents
 import IMKSwift
-import Megrez
-import MegrezTestComponents
 import OSFrameworkImpl
 import Testing
 
@@ -65,6 +65,10 @@ extension MainAssemblyTests {
           replacements: { $0.replaceData(textData: "") },
           associates: { $0.replaceData(textData: "") }
         )
+      testHandler.currentLM.insertTemporaryData(
+        unigram: .init(keyArray: ["ㄋㄧㄢˊ", "ㄓㄨㄥ"], current: "年中", probability: -4.329),
+        isFiltering: false
+      )
     }
 
     // Initial reset

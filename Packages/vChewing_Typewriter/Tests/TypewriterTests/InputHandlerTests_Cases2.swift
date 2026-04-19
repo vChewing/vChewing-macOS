@@ -7,16 +7,14 @@
 // requirements defined in MIT License.
 
 import Foundation
-import Megrez
-import MegrezTestComponents
+import Homa
+
 import Shared
 import Testing
 
+import HomaSharedTestComponents
 @testable import LangModelAssembly
 @testable import Typewriter
-
-private typealias SimpleLM = MegrezTestComponents.SimpleLM
-private typealias MockLM = MegrezTestComponents.MockLM
 
 // MARK: - 測試案例 Vol 2 (Candidates with POM Interactions)
 
@@ -100,7 +98,7 @@ extension InputHandlerTests {
     testSession.switchState(testHandler.generateStateOfCandidates())
     testSession.candidatePairSelectionConfirmed(at: 1) // 「蝶」
     #expect(testSession.state.displayedText == "幽蝶能留一縷芳")
-    #expect(testHandler.assembler.cursor == 4)
+    #expect(testHandler.assembler.cursor == 3)
 
     // 繼續在目前上下文中測試 POM 相關功能。
 
@@ -379,10 +377,10 @@ extension InputHandlerTests {
     // 案例 D1 (Bksp, POM)：確保在重新打字沒有經過選字窗的確認的情況下的結果不受 POM 影響。
     do {
       clearTestPOM()
-      #expect(testHandler.currentLM.lmPerceptionOverride.getSavableData().isEmpty)
+      #expect(testHandler.currentLM.lxPerceptor.getSavableData().isEmpty)
       testHandler.prefs.fetchSuggestionsFromPerceptionOverrideModel = true
       try restoreTestState(manualCandidateSelection: true) // 生成 POM 記憶
-      let pomDesc = testHandler.currentLM.lmPerceptionOverride.getSavableData()
+      let pomDesc = testHandler.currentLM.lxPerceptor.getSavableData()
       #expect(!(pomDesc.isEmpty))
       #expect(pomDesc.map(\.key).description.contains("ㄕㄨㄟˇ-ㄍㄨㄛˇ-ㄓ"))
       try restoreTestState(manualCandidateSelection: false)

@@ -7,7 +7,6 @@
 // requirements defined in MIT License.
 
 import Foundation
-import Megrez
 import SwiftExtension
 
 extension LMAssembly.LMInstantiator {

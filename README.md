@@ -95,10 +95,12 @@
 
 唯音輸入法 macOS 版以 MIT-NTL License 授權釋出 (與 MIT 相容)：© 2021-2022 vChewing 專案。
 
-- 唯音輸入法 macOS 版程式維護：Shiki Suen。特別感謝 Isaac Xen 與 Hiraku Wong 等人的技術協力。
+- 唯音輸入法 macOS 版程式維護：Shiki Suen。特別感謝 Isaac Xen 與 Hiraku Wong 等人對唯音輸入法 1.x 早期版本的技術協力。
 - 鐵恨注音並擊處理引擎：Shiki Suen (AGPL-3.0-or-later License)。
-- 天權星語彙處理引擎：Shiki Suen (AGPL-3.0-or-later License)。
+- 護摩組句引擎（Homa）：Shiki Suen (LGPL v3.0 or later, with Swift App Development exception)。
 - 唯音詞庫（先鋒語料庫）由 Shiki Suen 維護，以 3-Clause BSD License 授權釋出。其中的詞頻資料[由 NAER 授權用於非商業用途](https://twitter.com/ShikiSuen/status/1479329302713831424)。
+
+> 自 2026 年 04 月下旬，本倉庫的組句引擎已由天權星（Megrez）遷移為敝專案自研先鋒引擎套件 LibVanguard 當中的護摩（Homa）。Homa 元件本身以 LGPL v3.0 or later 授權釋出，且附帶與 Swift App Development 情境的額外許可；詳見 `./Shared/vChewingComponents/Homa/CUSTOM_LGPLv3_EXCEPTION.md` 與 `./Shared/vChewingComponents/Homa/LICENSE`。
 
 使用者可自由使用、散播本軟體，惟散播時必須完整保留版權聲明及軟體授權、且「一旦經過修改便不可以再繼續使用唯音的產品名稱」。換言之，這條相對上游 MIT 而言新增的規定就是：你 Fork 可以，但 Fork 成單獨發行的產品名稱時就必須修改產品名稱。
 

@@ -7,8 +7,8 @@
 // requirements defined in MIT License.
 
 import Foundation
+import Homa
 import LangModelAssembly
-import Megrez
 import Shared
 import Tekkon
 import Testing
@@ -157,8 +157,21 @@ public final class MockInputHandler: @MainActor InputHandlerProtocol {
     self.errorCallback = errorCallback
     self.notificationCallback = notificationCallback
     self.filterabilityChecker = filterabilityChecker
-    self.assembler = Assembler(with: currentLM, separator: "-")
+    self.assembler = Assembler(
+      gramQuerier: { _ in [] },
+      gramAvailabilityChecker: { _ in false }
+    )
     assembler.maxSegLength = prefs.maxCandidateLength
+    assembler.gramQuerier = { [weak self] keyArray in
+      guard let self else { return [] }
+      return self.currentLM.unigramsFor(keyArray: keyArray).map {
+        (keyArray: $0.keyArray, value: $0.current, probability: $0.probability, previous: nil)
+      }
+    }
+    assembler.gramAvailabilityChecker = { [weak self] keyArray in
+      guard let self else { return false }
+      return self.currentLM.hasUnigramsFor(keyArray: keyArray)
+    }
     ensureKeyboardParser()
   }
 
@@ -182,13 +195,12 @@ public final class MockInputHandler: @MainActor InputHandlerProtocol {
   public var strCodePointBuffer = ""
   public var calligrapher = ""
   public var composer: Tekkon.Composer = .init()
-  public var assembler: Megrez.Compositor
+  public var assembler: Homa.Assembler
   public var isJISKeyboard: (() -> Bool)? = { false }
   public var narrator: (any SpeechNarratorProtocol)?
 
   public var currentLM: LMAssembly.LMInstantiator {
     didSet {
-      assembler.langModel = currentLM
       clear()
     }
   }
@@ -311,7 +323,7 @@ public final class MockSession: @MainActor SessionCoreProtocol, CtlCandidateDele
     if !uniqueTargets.isEmpty {
       inputHandler.currentLM.bleachSpecifiedPOMSuggestions(targets: uniqueTargets)
     }
-    let separator = inputHandler.keySeparator.isEmpty ? Megrez.Compositor.theSeparator : inputHandler.keySeparator
+    let separator = inputHandler.keySeparator.isEmpty ? Homa.Assembler.theSeparator : inputHandler.keySeparator
     let headReading = userPhrase.keyArray.joined(separator: separator)
     if !headReading.isEmpty {
       inputHandler.currentLM.bleachSpecifiedPOMSuggestions(headReadings: [headReading])

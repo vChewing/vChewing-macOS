@@ -258,7 +258,7 @@ public struct CassetteTypewriter<Handler: InputHandlerProtocol>: TypewriterProto
       errorCallback("BFE387CC: 不合規的按鍵輸入。")
       return true
     }
-    guard handler.assembler.insertKey(handler.calligrapher) else {
+    guard (try? handler.assembler.insertKey(handler.calligrapher)) != nil else {
       errorCallback("61F6B11F: 得檢查對應的語言模組的 hasUnigramsFor() 是否有誤判之情形。")
       return true
     }

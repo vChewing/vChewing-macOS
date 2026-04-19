@@ -4,10 +4,10 @@
 
 參考路徑（重點模組與測試）：
 - Packages/vChewing_Typewriter/Sources/Typewriter/InputHandler/*
-- Packages/vChewing_MainAssembly4Darwin/Sources/MainAssembly/SessionController/*
+- Packages/vChewing_MainAssembly4Darwin/Sources/MainAssembly4Darwin/SessionController/*
 - 測試：
   - TypewriterTests: Packages/vChewing_Typewriter/Tests/TypewriterTests/*
-  - MainAssemblyTests: Packages/vChewing_MainAssembly4Darwin/Tests/MainAssemblyTests/*
+   - MainAssemblyTests: Packages/vChewing_MainAssembly4Darwin/Tests/MainAssembly4DarwinTests/*
   - CandidateWindowTests、LangModelAssemblyTests 等輔助測試
 
 ---
@@ -46,7 +46,7 @@ D. 選字窗、符號表與服務選單
 - 游標避讓：`generateStateOfCandidates` 於必要時呼叫 `dodgeInvalidEdgeCursorForCandidateState`，確保游標落在有效節點範圍內。
 
 E. 逐字選字與關聯詞語
-- `revolveCandidate`、`consolidateNode` 與 `retrievePOMSuggestions` 協同處理就地固詞與 POM 觀察，並依偏好推進或復原游標。
+- `revolveCandidate`、`consolidateNode`（內部已改以 Homa 覆寫 / 鞏固 API 為底層）與 `retrievePOMSuggestions` 協同處理就地固詞與 POM 觀察，並依偏好推進或復原游標。
 - Shift+Enter（非 SCPC）或自動提交後，`handleEnter` / `generateStateOfAssociates` 會根據候選讀音生成 `.ofAssociates` 狀態；SCPC 模式於候選僅剩一筆時直接提交同步觸發關聯詞。[適合測試]
 
 F. Enter / BackSpace / Delete / Esc

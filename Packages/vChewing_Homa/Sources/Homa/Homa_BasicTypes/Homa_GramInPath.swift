@@ -1,38 +1,35 @@
-// (c) 2022 and onwards The vChewing Project (LGPL v3.0 License or later).
+// (c) 2025 and onwards The vChewing Project (LGPL v3.0 License or later).
 // ====================
 // This code is released under the SPDX-License-Identifier: `LGPL-3.0-or-later`.
 
-// MARK: - Megrez.GramInPath
+// MARK: - Homa.GramInPath
 
-extension Megrez {
+extension Homa {
   /// 輕量化節點封裝，便於將節點內的有效資訊以 Sendable 形式獨立傳遞。
   ///
   /// 該結構體的所有成員均為不可變狀態。
   @frozen
-  public struct GramInPath: Codable, Hashable {
+  public struct GramInPath: Codable, Hashable, Sendable {
     // MARK: Lifecycle
 
-    public init(
-      gram: Unigram,
-      isExplicit: Bool
-    ) {
+    public init(gram: Gram, isExplicit: Bool) {
       self.gram = gram
       self.isExplicit = isExplicit
     }
 
     // MARK: Public
 
-    public let gram: Unigram
+    public let gram: Gram
     public let isExplicit: Bool
 
-    public var keyArray: [String] { gram.keyArray }
-    public var value: String { gram.value }
-    public var score: Double { gram.score }
+    public var value: String { gram.current }
+    public var score: Double { gram.probability }
     public var segLength: Int { gram.segLength }
+    public var keyArray: [String] { gram.keyArray }
     public var isReadingMismatched: Bool { gram.isReadingMismatched }
 
     /// 該節點當前狀態所展示的鍵值配對。
-    public var asCandidatePair: KeyValuePaired {
+    public var asCandidatePair: Homa.CandidatePair {
       .init(keyArray: keyArray, value: value)
     }
 
@@ -45,7 +42,162 @@ extension Megrez {
   }
 }
 
-extension Array where Element == Megrez.GramInPath {
+// MARK: - Perception Observation
+
+extension Homa {
+  /// 觀測上下文類型。
+  public enum POMObservationScenario: String, Codable, Sendable {
+    /// 同長度更換。
+    case sameLenSwap
+    /// 短詞變長詞。
+    case shortToLong
+    /// 長詞變短詞。
+    case longToShort
+  }
+
+  /// 觀測上下文情形。
+  public struct PerceptionIntel: Codable, Hashable, Sendable {
+    /// 觀測情境被序列化後的複元圖簽名。
+    public let contextualizedGramKey: String
+    /// 候選字。
+    public let candidate: String
+    /// 頭部讀音。
+    public let headReading: String
+    /// 觀測場景。
+    public let scenario: POMObservationScenario
+    /// 是否需強制高分覆寫。
+    public let forceHighScoreOverride: Bool
+    /// 語言模型分數。
+    public let scoreFromLM: Double
+  }
+
+  /// 根據候選字覆寫行為前後的組句結果，在指定游標位置得出觀測上下文之情形。
+  /// - Parameters:
+  ///   - previouslyAssembled: 候選字覆寫行為前的組句結果。
+  ///   - currentAssembled: 候選字覆寫行為後的組句結果。
+  ///   - cursor: 游標。
+  /// - Returns: 觀測上下文結果。
+  public static func makePerceptionIntel(
+    previouslyAssembled: [Homa.GramInPath],
+    currentAssembled: [Homa.GramInPath],
+    cursor: Int
+  )
+    -> PerceptionIntel? {
+    guard !previouslyAssembled.isEmpty, !currentAssembled.isEmpty else { return nil }
+
+    // 確認游標落在 currentAssembled 的有效節點
+    guard let afterHit = currentAssembled.findGram(at: cursor) else { return nil }
+    let current = afterHit.gram
+    let currentLen = current.segLength
+    if currentLen > 3 { return nil }
+
+    // 在 previouslyAssembled 中找到對應 head 的節點（使用 after 的節點區間上界 -1 作為內點）
+    let border1 = afterHit.range.upperBound - 1
+    let border2 = previouslyAssembled.totalKeyCount - 1
+    let innerIndex = Swift.max(0, Swift.min(border1, border2))
+    guard let beforeHit = previouslyAssembled.findGram(at: innerIndex) else { return nil }
+    let prevHead = beforeHit.gram
+    let prevLen = prevHead.segLength
+
+    let isBreakingUp = (currentLen == 1 && prevLen > 1)
+    let isShortToLong = (currentLen > prevLen)
+    let scenario: POMObservationScenario = switch (isBreakingUp, isShortToLong) {
+    case (true, _): .longToShort
+    case (false, true): .shortToLong
+    case (false, false): .sameLenSwap
+    }
+    let forceHSO = isShortToLong
+    let keyCursorRaw = Swift.max(
+      afterHit.range.lowerBound,
+      Swift.min(cursor, afterHit.range.upperBound - 1)
+    )
+
+    func clampedCursor(for source: [Homa.GramInPath]) -> Int {
+      Swift.max(0, Swift.min(keyCursorRaw, max(source.totalKeyCount - 1, 0)))
+    }
+
+    func splitKeyParts(_ key: String) -> [String] {
+      let parts = key.split(separator: "&").map(String.init)
+      if parts.isEmpty { return ["()", "()", "()"] }
+      if parts.count >= 3 { return parts }
+      var padded = parts
+      while padded.count < 3 { padded.insert("()", at: 0) }
+      return padded
+    }
+
+    var keyGen: (ngramKey: String, candidate: String, headReading: String)?
+    let headKeyOffset = keyCursorRaw - afterHit.range.lowerBound
+
+    switch scenario {
+    case .shortToLong:
+      let cursorPrev = clampedCursor(for: previouslyAssembled)
+      let cursorCurr = clampedCursor(for: currentAssembled)
+      let keyGenPrev = previouslyAssembled.generateKeyForPerception(cursor: cursorPrev)
+      let keyGenCurr = currentAssembled.generateKeyForPerception(cursor: cursorCurr)
+
+      if let keyGenPrev, let keyGenCurr {
+        let mergedPreview = splitKeyParts(keyGenPrev.ngramKey)
+        let currentParts = splitKeyParts(keyGenCurr.ngramKey)
+        var mergedParts = mergedPreview
+        if let newHead = currentParts.last {
+          let hasPlaceholderContext = currentParts.dropLast().contains("()")
+          if hasPlaceholderContext {
+            mergedParts[mergedParts.count - 1] = newHead
+          } else {
+            let valueSegments = Array(afterHit.gram.value).map(String.init)
+            let headValueSegment = valueSegments.indices.contains(headKeyOffset)
+              ? valueSegments[headKeyOffset] : afterHit.gram.value
+            let refinedHead = "(\(keyGenCurr.headReading),\(headValueSegment))"
+            mergedParts[mergedParts.count - 1] = refinedHead
+          }
+        }
+        keyGen = (
+          ngramKey: mergedParts.joined(separator: "&"),
+          candidate: keyGenCurr.candidate,
+          headReading: keyGenCurr.headReading
+        )
+      } else {
+        keyGen = keyGenCurr ?? keyGenPrev
+      }
+
+    case .longToShort, .sameLenSwap:
+      let primarySource = currentAssembled
+      let fallbackSource = previouslyAssembled
+
+      if primarySource.totalKeyCount > 0 {
+        let cursorPrimary = clampedCursor(for: primarySource)
+        keyGen = primarySource.generateKeyForPerception(cursor: cursorPrimary)
+      }
+
+      if keyGen == nil, fallbackSource.totalKeyCount > 0 {
+        let cursorFallback = clampedCursor(for: fallbackSource)
+        keyGen = fallbackSource.generateKeyForPerception(cursor: cursorFallback)
+      }
+    }
+
+    guard let keyGen else { return nil }
+
+    let normalizedHeadReading: String = {
+      let separator = "-"
+      if scenario == .shortToLong || afterHit.gram.segLength > 1 {
+        let joined = afterHit.gram.joinedCurrentKey(by: separator)
+        return joined.isEmpty ? keyGen.headReading : joined
+      }
+      return keyGen.headReading
+    }()
+
+    return .init(
+      contextualizedGramKey: keyGen.ngramKey,
+      candidate: current.value,
+      headReading: normalizedHeadReading,
+      scenario: scenario,
+      forceHighScoreOverride: forceHSO,
+      scoreFromLM: current.score
+    )
+  }
+}
+
+extension Array where Element == Homa.GramInPath {
   /// 從一個節點陣列當中取出目前的選字字串陣列。
   public var values: [String] { map(\.value) }
 
@@ -105,7 +257,7 @@ extension Array where Element == Megrez.GramInPath {
   /// - Parameters:
   ///   - cursor: 給定游標位置。
   /// - Returns: 查找結果。
-  public func findGram(at cursor: Int) -> (gram: Megrez.GramInPath, range: Range<Int>)? {
+  public func findGram(at cursor: Int) -> (gram: Homa.GramInPath, range: Range<Int>)? {
     guard !isEmpty else { return nil }
     let cursor = Swift.max(0, Swift.min(cursor, totalKeyCount - 1)) // 防呆
     let range = contextRange(ofGivenCursor: cursor)
@@ -168,9 +320,11 @@ extension Array where Element == Megrez.GramInPath {
     -> (ngramKey: String, candidate: String, headReading: String)? {
     guard maxContext > 0 else { return nil }
 
-    let headInfo: (pair: Megrez.GramInPath, range: Range<Int>)?
+    let headInfo: (pair: Homa.GramInPath, range: Range<Int>)?
     let resolvedCursor: Int
-    if let cursor, (0 ..< totalKeyCount).contains(cursor), let hit = findGram(at: cursor) {
+    if let cursor,
+       (0 ..< totalKeyCount).contains(cursor),
+       let hit = findGram(at: cursor) {
       headInfo = (pair: hit.gram, range: hit.range)
       resolvedCursor = Swift.max(
         hit.range.lowerBound,
@@ -192,14 +346,14 @@ extension Array where Element == Megrez.GramInPath {
     guard headPair.keyArray.indices.contains(headKeyOffset) else { return nil }
 
     let placeholder = "()"
-    let readingSeparator = Megrez.Compositor.theSeparator
+    let readingSeparator = "-"
 
-    func isPunctuation(_ pair: Megrez.GramInPath) -> Bool {
+    func isPunctuation(_ pair: Homa.GramInPath) -> Bool {
       guard let firstReading = pair.keyArray.first else { return false }
       return firstReading.first == "_"
     }
 
-    func combinedString(for pair: Megrez.GramInPath) -> String? {
+    func combinedString(for pair: Homa.GramInPath) -> String? {
       guard !pair.value.isEmpty else { return nil }
       guard !pair.keyArray.isEmpty else { return nil }
       let reading = pair.joinedCurrentKey(by: readingSeparator)
@@ -224,6 +378,7 @@ extension Array where Element == Megrez.GramInPath {
         contextSlot -= 1
         continue
       }
+
       let currentPair = self[currentIndex]
       currentIndex -= 1
 

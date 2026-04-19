@@ -153,7 +153,7 @@ public struct BPMFFullMatchTypewriter<Handler: InputHandlerProtocol>: Typewriter
     if input.isInvalid {
       errorCallback("22017F76: 不合規的按鍵輸入。")
       return true
-    } else if !handler.assembler.insertKey(readingKey) {
+    } else if (try? handler.assembler.insertKey(readingKey)) == nil {
       errorCallback(
         "3CF278C9: 得檢查對應的語言模組的 hasUnigramsFor() 是否有誤判之情形。"
       )
@@ -191,7 +191,7 @@ public struct BPMFFullMatchTypewriter<Handler: InputHandlerProtocol>: Typewriter
     guard keyConsumedByReading else { return nil }
     if handler.composer.phonabetKeyForQuery(pronounceableOnly: false) == nil {
       if !handler.composer.isPinyinMode, input.isSpace,
-         handler.assembler.insertKey(existedIntonation.value) {
+         (try? handler.assembler.insertKey(existedIntonation.value)) != nil {
         handler.assemble()
         var theInputting = handler.generateStateOfInputting()
         theInputting.textToCommit = handler.commitOverflownComposition
@@ -341,17 +341,17 @@ extension BPMFFullMatchTypewriter {
     let targetIndex = assembler.cursor - 1
     guard assembler.keys.indices.contains(targetIndex) else { return .stateMismatch }
     guard assembler.keys[targetIndex] == request.originalReading else { return .stateMismatch }
-    guard assembler.langModel.hasUnigramsFor(keyArray: [request.replacementReading]) else {
+    guard handler.currentLM.hasUnigramsFor(keyArray: [request.replacementReading]) else {
       return .noLexiconRecord
     }
-    guard assembler.dropKey(direction: .rear) else { return .cursorAtRearestPosition }
+    guard (try? assembler.dropKey(direction: .rear)) != nil else { return .cursorAtRearestPosition }
     /// 從這個位置開始，assembler 的內容已有所改變，得重新組句。
     defer {
       handler.assemble()
     }
-    guard assembler.insertKey(request.replacementReading) else {
-      _ = assembler.dropKey(direction: .front)
-      _ = assembler.insertKey(request.originalReading)
+    guard (try? assembler.insertKey(request.replacementReading)) != nil else {
+      try? assembler.dropKey(direction: .front)
+      try? assembler.insertKey(request.originalReading)
       return .failedToFinalize
     }
     return .success

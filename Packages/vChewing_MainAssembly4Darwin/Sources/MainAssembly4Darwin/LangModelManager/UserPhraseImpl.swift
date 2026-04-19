@@ -220,9 +220,9 @@ extension UserPhraseInsertable {
     }
     guard !extreme, isSingleCharReadingPair else { return extremeFallbackResult }
     let fetchedUnigrams = inputMode.langModel.unigramsFor(keyArray: keyArray)
-    let currentWeight = weight ?? fetchedUnigrams.first { $0.value == value }?.score
+    let currentWeight = weight ?? fetchedUnigrams.first { $0.current == value }?.probability
     guard let currentWeight = currentWeight else { return extremeFallbackResult }
-    let fetchedScores = fetchedUnigrams.map(\.score)
+    let fetchedScores = fetchedUnigrams.map(\.probability)
     var neighborValue: Double?
     switch action {
     case .toBoost:

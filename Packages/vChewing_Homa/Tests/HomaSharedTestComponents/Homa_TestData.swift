@@ -1,8 +1,8 @@
-// (c) 2022 and onwards The vChewing Project (BSD-3-Clause).
+// (c) 2021 and onwards The vChewing Project (BSD-3-Clause).
 // ====================
 // This code is released under the SPDX-License-Identifier: `BSD-3-Clause`.
 
-public enum MegrezTestComponents {
+public enum HomaTests {
   public static let strLMStressData = """
   sheng1-sheng1 聲聲 -5.506
   sheng1 聲 -5.246
@@ -561,6 +561,69 @@ public enum MegrezTestComponents {
   zhi1 zhi1 -8.941
   """
 
+  public static let strLMSampleDataTrailblazing = """
+  suo3 所 -3.2
+  suo3 索 -6.1
+  wei4 謂 -3.8
+  wei4 為 -4.2
+  wei4 位 -5.3
+  kai1 開 -3.5
+  kai1 凱 -5.9
+  tuo4 拓 -4.1
+  tuo4 托 -5.2
+  jiu4 就 -3.7
+  jiu4 舊 -5.4
+  shi4 是 -3.1
+  shi4 事 -4.8
+  shi4 世 -5.2
+  yan2 沿 -4.3
+  yan2 言 -5.1
+  zhe5 著 -3.9
+  zhe5 者 -4.7
+  qian2 前 -3.6
+  qian2 錢 -5.8
+  ren2 人 -3.4
+  ren2 仁 -6.2
+  wei4 未 -4.1
+  jin4 盡 -4.5
+  jin4 進 -4.9
+  de5 的 -2.8
+  dao4 道 -3.7
+  dao4 到 -4.3
+  lu4 路 -4.2
+  lu4 露 -6.1
+  zou3 走 -3.9
+  zou3 揍 -6.7
+  chu1 出 -3.8
+  chu1 初 -5.4
+  geng1 更 -4.1
+  geng1 耕 -6.3
+  yao2 遙 -4.8
+  yao2 搖 -5.9
+  yuan3 遠 -4.2
+  yuan3 院 -5.6
+  ju4 距 -4.7
+  ju4 巨 -5.3
+  li2 離 -4.1
+  li2 李 -5.8
+  yin1 因 -3.8
+  yin1 音 -5.2
+  wei2 為 -3.5
+  wei2 維 -5.7
+  cong2 從 -4.1
+  cong2 叢 -6.4
+  lai2 來 -3.7
+  lai2 萊 -5.9
+  bu4 不 -3.2
+  bu4 布 -5.1
+  you2 由 -4.3
+  you2 油 -5.4
+  ta1 他 -3.6
+  ta1 她 -4.1
+  pu1 鋪 -4.9
+  pu1 撲 -6.2
+  """
+
   // 再創世的凱歌（再創紀の凱歌）
   public static let strLMSampleData_SaisoukiNoGaika = """
   zai4 再 -5.005
@@ -802,5 +865,95 @@ public enum MegrezTestComponents {
   jiao1 艽 -7.396
   jiao1 燋 -7.956
   jiao1 鵁 -8.558
+  """
+
+  public static let strLMSampleData_JiHuQiKeng = """
+  keng1 坑 -5.251
+  keng1 傾 -5.575
+  keng1 吭 -6.05
+  keng1 鏗 -6.737
+  keng1 娙 -8.557
+  keng1 挳 -9.46
+  hu1 呼 -5.201
+  hu1 忽 -5.238
+  hu1 乎 -5.265
+  hu1 糊 -5.685
+  hu1 猢 -6.79
+  hu1 惚 -7.426
+  hu1 唿 -8.03
+  hu1 戲 -8.256
+  hu1 欻 -8.557
+  hu1 昒 -8.858
+  hu1 膴 -9.46
+  hu1-qi4 呼氣 -5.564
+  ji1 雞 -5.161
+  ji1 幾 -5.175
+  ji1 奇 -5.184
+  ji1 機 -5.188
+  ji1 擊 -5.236
+  ji1 積 -5.284
+  ji1 跡 -5.422
+  ji1 肌 -5.442
+  ji1 基 -5.495
+  ji1 譏 -5.534
+  ji1 激 -5.72
+  ji1 畿 -5.941
+  ji1 饑 -5.97
+  ji1 飢 -5.973
+  ji1 姬 -5.982
+  ji1 稽 -5.989
+  ji1 其 -6.25
+  ji1 期 -6.25
+  ji1 几 -6.183
+  ji1 唧 -6.248
+  ji1 嘰 -6.279
+  ji1 箕 -6.294
+  ji1 乩 -6.373
+  ji1 緝 -6.401
+  ji1 畸 -6.431
+  ji1 績 -6.579
+  ji1 羈 -6.737
+  ji1 磯 -6.853
+  ji1 嵇 -6.867
+  ji1 蹟 -6.933
+  ji1 屐 -6.96
+  ji1 笄 -6.983
+  ji1 癘 -7.025
+  ji1 圾 -7.072
+  ji1 躋 -7.24
+  ji1 居 -7.579
+  ji1 齏 -7.579
+  ji1 璣 -7.744
+  ji1 錤 -7.955
+  ji1 觭 -7.955
+  ji1 勣 -8.03
+  ji1 墼 -8.03
+  ji1 犄 -8.08
+  ji1 隮 -8.256
+  ji1 剞 -8.557
+  ji1 銈 -8.557
+  ji1 芨 -8.858
+  ji1 击 -9.46
+  ji1-hu1 幾乎 -3.352
+  qi4 氣 -5.158
+  qi4 迄 -5.165
+  qi4 棄 -5.208
+  qi4 汽 -5.282
+  qi4 器 -5.291
+  qi4 亟 -5.526
+  qi4 砌 -5.611
+  qi4 契 -6.126
+  qi4 泣 -6.186
+  qi4 訖 -6.231
+  qi4 緝 -6.407
+  qi4 企 -6.499
+  qi4 槭 -6.526
+  qi4 憩 -6.756
+  qi4 妻 -6.806
+  qi4 葺 -7.344
+  qi4 汔 -7.358
+  qi4 磧 -7.501
+  qi4 鍥 -7.96
+  qi4 蚑 -9.46
   """
 }

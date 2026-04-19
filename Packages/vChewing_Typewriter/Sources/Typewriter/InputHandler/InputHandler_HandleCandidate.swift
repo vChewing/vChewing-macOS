@@ -210,14 +210,14 @@ extension InputHandlerProtocol {
       case .kDownArrow, .kLeftArrow, .kRightArrow, .kUpArrow:
         switch input.commonKeyModifierFlags {
         case [.option, .shift] where allowMovingCompositorCursor && input.isCursorForward:
-          if assembler.moveCursorStepwise(to: .front) {
+          if (try? assembler.moveCursorStepwise(to: .front)) != nil {
             session.switchState(generateStateOfCandidates())
           } else {
             errorCallback?("D3006C85")
           }
           return true
         case [.option, .shift] where allowMovingCompositorCursor && input.isCursorBackward:
-          if assembler.moveCursorStepwise(to: .rear) {
+          if (try? assembler.moveCursorStepwise(to: .rear)) != nil {
             session.switchState(generateStateOfCandidates())
           } else {
             errorCallback?("DE9DAF0D")
@@ -225,7 +225,7 @@ extension InputHandlerProtocol {
           return true
         case .option where input.isCursorForward:
           if assembler.cursor < assembler.length {
-            assembler.jumpCursorBySegment(to: .front)
+            try? assembler.jumpCursorBySegment(to: .front)
             session.switchState(generateStateOfCandidates())
           } else {
             errorCallback?("5D9F4819")
@@ -233,7 +233,7 @@ extension InputHandlerProtocol {
           return true
         case .option where input.isCursorBackward:
           if assembler.cursor > 0 {
-            assembler.jumpCursorBySegment(to: .rear)
+            try? assembler.jumpCursorBySegment(to: .rear)
             session.switchState(generateStateOfCandidates())
           } else {
             errorCallback?("34B6322D")

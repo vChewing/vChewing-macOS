@@ -7,21 +7,21 @@
 // requirements defined in MIT License.
 
 import Foundation
-import Megrez
+import Homa
 
 extension LMAssembly.LMInstantiator {
-  public func supplyNumPadUnigrams(key: String, keyArray: [String]) -> [Megrez.Unigram] {
+  public func supplyNumPadUnigrams(key: String, keyArray: [String]) -> [Homa.Gram] {
     guard let status = config.numPadFWHWStatus else { return [] }
     let initials = "_NumPad_"
     guard key.hasPrefix(initials) else { return [] }
     let char = key.replacingOccurrences(of: initials, with: "")
     guard char.count == 1 else { return [] }
-    let gram1 = Megrez.Unigram(
+    let gram1 = Homa.Gram(
       keyArray: keyArray,
       value: char.applyingTransformFW2HW(reverse: status),
       score: 0
     )
-    let gram2 = Megrez.Unigram(
+    let gram2 = Homa.Gram(
       keyArray: keyArray,
       value: char.applyingTransformFW2HW(reverse: !status),
       score: -0.1

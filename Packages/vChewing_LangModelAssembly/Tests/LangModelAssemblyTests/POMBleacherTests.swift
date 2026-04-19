@@ -16,7 +16,7 @@ extension POMTestSuite {
   struct POMBleacherTests {
     @Test
     func testBleachSpecifiedSuggestions() throws {
-      let pom = LMAssembly.LMPerceptionOverride(capacity: 10)
+      let pom = LMAssembly.LXPerceptor(capacity: 10)
       let timestamp = Date.now.timeIntervalSince1970
 
       // 記憶幾個候選詞
@@ -64,7 +64,7 @@ extension POMTestSuite {
 
     @Test
     func testBleachSpecifiedSuggestionsWithMultipleOverrides() throws {
-      let pom = LMAssembly.LMPerceptionOverride(capacity: 10)
+      let pom = LMAssembly.LXPerceptor(capacity: 10)
       let timestamp = Date.now.timeIntervalSince1970
 
       // 為同一個 key 記憶多個候選詞
@@ -98,7 +98,7 @@ extension POMTestSuite {
 
     @Test
     func testBleachSpecifiedSuggestionsRemovesKeyWhenAllOverridesRemoved() throws {
-      let pom = LMAssembly.LMPerceptionOverride(capacity: 10)
+      let pom = LMAssembly.LXPerceptor(capacity: 10)
       let timestamp = Date.now.timeIntervalSince1970
 
       // 為同一個 key 記憶一個候選詞
@@ -124,7 +124,7 @@ extension POMTestSuite {
 
     @Test
     func testBleachSpecifiedSuggestionsWithContextPairs() throws {
-      let pom = LMAssembly.LMPerceptionOverride(capacity: 10)
+      let pom = LMAssembly.LXPerceptor(capacity: 10)
       let timestamp = Date.now.timeIntervalSince1970
 
       // 記憶同一個候選詞在不同上下文中

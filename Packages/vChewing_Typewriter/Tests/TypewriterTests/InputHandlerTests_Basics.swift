@@ -181,7 +181,7 @@ final class InputHandlerTests {
     // 初始化測試 LM
     let lm = LMAssembly.LMInstantiator(isCHS: false)
     self.testLM = lm
-    LMAssembly.LMInstantiator.connectToTestFactoryDictionary(textMapData: LMATestsData.sqlTestCoreLMData)
+    LMAssembly.LMInstantiator.connectToTestFactoryDictionary(textMapData: LMATestsData.textMapTestCoreLMData)
 
     // 初始化測試用的 handler 和 session
     let handler = MockInputHandler(lm: lm, pref: PrefMgr.sharedSansDidSetOps)
@@ -246,8 +246,8 @@ final class InputHandlerTests {
     return testHandler.assembler.assembledSentence.values.joined()
   }
 
-  func extractGrams(from source: String, readingsToKeep: [String]? = nil) -> [Megrez.Unigram] {
-    var extractedGrams: [Megrez.Unigram] = []
+  func extractGrams(from source: String, readingsToKeep: [String]? = nil) -> [Homa.Gram] {
+    var extractedGrams: [Homa.Gram] = []
     source.enumerateLines { currentLine, _ in
       let cells = currentLine.split(separator: " ")
       guard cells.count >= 3 else { return }
@@ -260,7 +260,7 @@ final class InputHandlerTests {
       ).split(separator: "-").map(\.description)
       let cellScoreStr = cells[2].description
       guard let cellScore = Double(cellScoreStr) else { return }
-      let unigram = Megrez.Unigram(
+      let unigram = Homa.Gram(
         keyArray: readingArray, value: cells[1].description, score: cellScore
       )
       if unigram.segLength > 1 {

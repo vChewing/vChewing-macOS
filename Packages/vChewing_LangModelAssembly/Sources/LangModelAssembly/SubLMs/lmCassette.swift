@@ -13,8 +13,8 @@
 // 大幅降低 heap allocation 與 Dictionary 開銷。
 
 import Foundation
+import Homa
 import LineReader
-import Megrez
 
 // MARK: - LMAssembly.LMCassette
 
@@ -833,7 +833,7 @@ nonisolated extension LMAssembly.LMCassette {
   /// 根據給定的字根索引鍵，來獲取資料庫辭典內的對應結果。
   /// - parameters:
   ///   - key: 讀音索引鍵。
-  func unigramsFor(key: String, keyArray: [String]? = nil) -> [Megrez.Unigram] {
+  func unigramsFor(key: String, keyArray: [String]? = nil) -> [Homa.Gram] {
     let keyArray = keyArray ?? key.split(separator: "-").map(\.description)
     let arrRaw = (charDefMap.valuesFor(key: key) ?? []).deduplicated
     var arrRawWildcard: [String] = []
@@ -841,7 +841,7 @@ nonisolated extension LMAssembly.LMCassette {
        key.contains(wildcard), key.first?.description != wildcard {
       arrRawWildcard.append(contentsOf: arrRawWildcardValues)
     }
-    var arrResults = [Megrez.Unigram]()
+    var arrResults = [Homa.Gram]()
     var lowestScore: Double = 0
     for neta in arrRaw {
       let theScore: Double = {

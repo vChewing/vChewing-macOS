@@ -17,7 +17,8 @@ This file provides GitHub Copilot-specific coding instructions. For comprehensiv
 
 ## Project Context
 - Input method for macOS built with AppKit/IMKit in Swift, backed by statistic-based language models loaded into `./Packages/vChewing_LangModelAssembly` package.
-- If you are on Linux, your only workspace is `./Packages/vChewing_Typewriter` and its dependencies situated in `./Packages`. If you are on Windows, you can also work with `./Packages/vChewing_MainAssembly` and its dependencies situated in `./Packages` folder.
+- The current mainline sentence assembler is `./Packages/vChewing_Homa`, which replaced the old Megrez runtime path during a big surgery in late April 2026 while keeping the same DAG-DP design direction.
+- If you are on Linux or Windows NT, your only workspace is `./Packages/vChewing_Typewriter` and its dependencies situated in `./Packages`. If you are on Windows, you can also work with `./Packages/vChewing_MainAssembly4Darwin` and its dependencies situated in `./Packages` folder.
 - Lexicon assets are provided by remote Swift Package plugin `VanguardTextMapPlugin` (from `vChewing-VanguardLexicon` repository) and compiled at build-time as `.txtMap` / `.revlookup` pairs, then injected into `vChewing_MainAssembly4Darwin`.
 - Tests are written among local Swift Packages situated in `./Packages/` folder. Tests are usually implemented on a case-by-case basis when an issue case comes out: Write a new test case to confirm the bug exists. 
 - Preserve the existing MIT-NTL license banner on any new source file, except certain local Swift Packages licensed with things other than MIT-NTL.
@@ -38,7 +39,7 @@ This file provides GitHub Copilot-specific coding instructions. For comprehensiv
 - Always use Google Format of Style for Objective-C(++) & C(++).
 
 ## Tests and Tooling
-- GitHub Coding Agent can only access Linux devenv in most times. `./Packages/vChewing_Typewriter/` is the Linux-compilable target that the developer usually ask GitHub Coding Agent to work on. This package is the one to add test files.
+- GitHub Coding Agent can only access Linux devenv in most times. `./Packages/vChewing_Typewriter/` is the Linux-compilable target that the developer usually ask GitHub Coding Agent to work on. This package and `./Packages/vChewing_Homa/` are the primary places to add migration-related tests.
 - Dictionary files are managed manually by the developer in another repository and is used as a git submodule here. Factory lexicons are now in Vanguard TextMap format (`.txtMap` + `.revlookup`); the `CSQLite3` dependency has been removed from `LangModelAssembly`. Regenerate lexicon assets via `make update` when explicitly instructed.
 
 ## Git Commit Convention
@@ -62,7 +63,7 @@ This file provides GitHub Copilot-specific coding instructions. For comprehensiv
 - Gate new APIs with availability checks (e.g. conditional compilation via `canImport(Darwin)` and Swift `@available` annotations) so shared packages keep compiling on Linux. The shipping Xcode target requires macOS 12+, but legacy macOS releases are maintained in a separate repository.
 - This repo has no dependency of InterfaceBuilder assets. AppKit is used by default with self-crafted result builder DSLs to make the coding experience similar to SwiftUI. SwiftUI in this project is only used for About window and SettingsUI. On macOS 10.9 Mavericks till macOS 13 Ventura, this repo uses SettingsCocoa (AppKit Result Builder DSL).
 - User data is not expected to be referred from hard-coded path, unless it is necessary in Test targets of a Swift package.
-- This repository uses XCTest for unit tests used among Swift packages situated in `./Packages` folder.
+- This repository uses Swift Testing / XCTest for unit tests among Swift packages situated in `./Packages` folder.
 - Do not manually edit or commit generated lexicon assets; they are transient build artifacts produced by the `VanguardTextMapPlugin` build tool plugin at compile-time.
 - The platforms in Swift package manifest file is ignored on non-Darwin platforms. Swift FOSS Foundation APIs on Darwin can be unavailable on earlier macOS releases due to Apple's deliberate intention of never backporting new Foundation APIs. Your removal of platforms can make some of those components not able to be compiled against macOS releases earlier than macOS 11.
 - Most vChewing-specific packages prefer to use a dedicated file to handle `@_exported import XXX` dependency definitions to avoid insertion of `import XXX` to all files having codes dependent to `XXX`. This makes code-mirroring tasks (to the legacy repository of vChewing) much easier. Try not to break this convention if possible.
@@ -70,9 +71,9 @@ This file provides GitHub Copilot-specific coding instructions. For comprehensiv
 - If your current environment is macOS, please hesitate your use of python3 scripts unless being specifically told. Instead, prioritize powershell scripts or csharp scripts while running on macOS. If both powershell and csharp scripts are not available, you can use Swift scripts as the last resort. If Swift can't do it, use `python3` in lieu of `python`.
 
 ## Reference Files and Folders
-- `./Packages/vChewing_MainAssembly/Sources/MainAssembly/SessionController/`: `SessionCtl.swift` is the IMK entry point working with candidate window, IME settings, etc. However, most of its tasks are delegated to `InputSession*.swift` files in this folder.
+- `./Packages/vChewing_MainAssembly4Darwin/Sources/MainAssembly4Darwin/SessionController/`: `SessionCtl.swift` is the IMK entry point working with candidate window, IME settings, etc. However, most of its tasks are delegated to `InputSession*.swift` files in this folder.
 - `./Packages/vChewing_Typewriter/`: The typing module `InputHandler` protocol working with the IMEStateProtocol-based finite state machine.
 - `./Packages/vChewing_LangModelAssembly/`: Language model assembly (factory lexicon, user phrases, perception override, associated phrases).
-- `./Packages/vChewing_Megrez/`: The sentence assembler.
+- `./Packages/vChewing_Homa/`: The current sentence assembler used by Typewriter and MainAssembly.
 - `./Packages/vChewing_Tekkon/`: The phonabet composer designed for Chinese Phonabet (Zhuyin, Bopomofo) pronunciation data.
-- `./Packages/vChewing_MainAssembly/`: The sole module imported to the Xcode project. It integrates everything together. Real-simulation of typing experiences are handled in the unit tests of this package.
+- `./Packages/vChewing_MainAssembly4Darwin/`: The sole module imported to the Xcode project. It integrates everything together. Real-simulation of typing experiences are handled in the unit tests of this package.

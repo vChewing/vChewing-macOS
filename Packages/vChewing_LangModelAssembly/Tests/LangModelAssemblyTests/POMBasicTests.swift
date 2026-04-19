@@ -7,7 +7,7 @@
 // requirements defined in MIT License.
 
 import Foundation
-import Megrez
+import Homa
 import Testing
 
 @testable import LangModelAssembly
@@ -32,7 +32,7 @@ extension POMTestSuite {
   struct POMBasicTests {
     @Test
     func testPOM_BS01_BasicPerceptionOps() throws {
-      let pom = LMAssembly.LMPerceptionOverride(
+      let pom = LMAssembly.LXPerceptor(
         capacity: capacity,
         dataURL: nullURL
       )
@@ -67,15 +67,10 @@ extension POMTestSuite {
 
       // 記憶一個候選詞
       pom.memorizePerception((ngramKey: key2, candidate: candidate), timestamp: timestamp)
-      print("記憶候選詞: \(key2) -> \(candidate)")
 
       // 檢索建議
       let suggestions = pom.getSuggestion(key: key2, timestamp: timestamp + 100)
       if let suggestions = suggestions {
-        print("找到 \(suggestions.count) 個建議")
-        for suggestion in suggestions {
-          print("建議: \(suggestion.value), 權重: \(suggestion.probability)")
-        }
         #expect(!suggestions.isEmpty)
         #expect(suggestions.first?.value == candidate)
         #expect((suggestions.first?.probability ?? 0) < 0)
@@ -87,12 +82,10 @@ extension POMTestSuite {
       pom.clearData()
       let emptySuggestions = pom.getSuggestion(key: key2, timestamp: timestamp + 100)
       #expect(emptySuggestions == nil)
-
-      print("基本 API 測試完成")
     }
 
     func testPOM_BS02_NewestAgainstRepeatedlyUsed() throws {
-      let pom = LMAssembly.LMPerceptionOverride(
+      let pom = LMAssembly.LXPerceptor(
         capacity: capacity,
         dataURL: nullURL
       )
@@ -135,7 +128,7 @@ extension POMTestSuite {
       let d = (key: "(ㄌㄟˊ-ㄉㄧㄢˋ-ㄐㄧㄤ-ㄐㄩㄣ,雷電將軍)&(ㄉㄜ˙,的)&(ㄐㄧㄠˇ-ㄔㄡˋ,腳臭)", value: "腳臭", head: "ㄐㄧㄠˇ-ㄔㄡˋ")
 
       // 容量為2的LRU測試
-      let pom = LMAssembly.LMPerceptionOverride(
+      let pom = LMAssembly.LXPerceptor(
         capacity: 2,
         dataURL: nullURL
       )
@@ -190,7 +183,7 @@ extension POMTestSuite {
 
     // 添加一個專門測試長期記憶衰減的測試
     func testPOM_BS04_LongTermMemoryDecay() throws {
-      let pom = LMAssembly.LMPerceptionOverride(
+      let pom = LMAssembly.LXPerceptor(
         capacity: capacity,
         dataURL: nullURL
       )
@@ -204,7 +197,7 @@ extension POMTestSuite {
       #expect(shortWindowSuggestions != nil)
       #expect(shortWindowSuggestions?.first?.value == unigramCandidate)
       if let score = shortWindowSuggestions?.first?.probability {
-        #expect(score > LMAssembly.LMPerceptionOverride.kDecayThreshold)
+        #expect(score > LMAssembly.LXPerceptor.kDecayThreshold)
       }
 
       let pastShortWindowTimestamp = nowTimeStamp + (dayInSeconds * 7.0)
@@ -264,8 +257,8 @@ extension POMTestSuite {
       """
       let data = Data(json.utf8)
       let decoder = JSONDecoder()
-      let pairs = try decoder.decode([LMAssembly.LMPerceptionOverride.KeyPerceptionPair].self, from: data)
-      let pom = LMAssembly.LMPerceptionOverride(dataURL: nullURL)
+      let pairs = try decoder.decode([LMAssembly.LXPerceptor.KeyPerceptionPair].self, from: data)
+      let pom = LMAssembly.LXPerceptor(dataURL: nullURL)
       pom.loadData(from: pairs)
 
       #expect(pom.mutLRUMap.count == 5)
@@ -279,11 +272,11 @@ extension POMTestSuite {
     }
 
     func testPOM_BS06_PerceptionKeyGeneration() throws {
-      let nonInterruptionSuffix: [Megrez.GramInPath] = [
+      let nonInterruptionSuffix: [Homa.GramInPath] = [
         ("neng2", "能", -5.36),
         ("liu2", "留", -5.245),
         ("yi4-lv3", "一縷", -8.496),
-      ].map(Megrez.GramInPath.fromTuplet)
+      ].map(Homa.GramInPath.fromTuplet)
 
       guard let nonInterruptionResult = nonInterruptionSuffix.generateKeyForPerception() else {
         Issue.record("Failed to generate perception key for non-interruption suffix.")
@@ -294,11 +287,11 @@ extension POMTestSuite {
       #expect(nonInterruptionResult.candidate == "一縷")
       #expect(nonInterruptionResult.headReading == "lv3")
 
-      let interruptionSuffix: [Megrez.GramInPath] = [
+      let interruptionSuffix: [Homa.GramInPath] = [
         ("you1-die2", "幽蝶", -8.496),
         ("neng2", "能", -5.36),
         ("liu2", "留", -5.245),
-      ].map(Megrez.GramInPath.fromTuplet)
+      ].map(Homa.GramInPath.fromTuplet)
 
       guard let interruptionResult = interruptionSuffix.generateKeyForPerception() else {
         Issue.record("Failed to generate perception key for interruption suffix.")
@@ -311,7 +304,7 @@ extension POMTestSuite {
     }
 
     func testPOM_BS07_ParsePerceptionKeyUnigramHasNoContext() throws {
-      let pom = LMAssembly.LMPerceptionOverride(dataURL: nullURL)
+      let pom = LMAssembly.LXPerceptor(dataURL: nullURL)
       guard let parsed = pom.parsePerceptionKey("()&()&(ㄧˋ-ㄧˋ,意譯)") else {
         Issue.record("Failed to parse unigram perception key.")
         return
@@ -323,7 +316,7 @@ extension POMTestSuite {
     }
 
     func testPOM_BS08_ParsePerceptionKeyContextualParts() throws {
-      let pom = LMAssembly.LMPerceptionOverride(dataURL: nullURL)
+      let pom = LMAssembly.LXPerceptor(dataURL: nullURL)
       let key = "(ㄧ,一)&(ㄎㄞ-ㄕˇ,開始)&(ㄓ,隻)"
       guard let parsed = pom.parsePerceptionKey(key) else {
         Issue.record("Failed to parse contextual perception key.")
@@ -338,7 +331,7 @@ extension POMTestSuite {
     }
 
     func testPOM_BS09_IgnoresUnderscorePrefixedReadings() throws {
-      let pom = LMAssembly.LMPerceptionOverride(dataURL: nullURL)
+      let pom = LMAssembly.LXPerceptor(dataURL: nullURL)
       let punctuationKey = "()&()&(_punctuation_|,《》)"
       pom.memorizePerception((punctuationKey, "《》"), timestamp: nowTimeStamp)
       #expect(pom.mutLRUMap.isEmpty)
@@ -351,7 +344,7 @@ extension POMTestSuite {
     }
 
     func testPOM_BS10_AlternateKeysDoesNotMatchShortSegments() throws {
-      let pom = LMAssembly.LMPerceptionOverride(capacity: 10)
+      let pom = LMAssembly.LXPerceptor(capacity: 10)
       let now = Date.now.timeIntervalSince1970
 
       // 多段 head: BC
@@ -369,7 +362,7 @@ extension POMTestSuite {
     }
 
     func testPOM_BS11_AlternateKeysAllowsPrimaryMatchForSingleSegmentOriginal() throws {
-      let pom = LMAssembly.LMPerceptionOverride(capacity: 10)
+      let pom = LMAssembly.LXPerceptor(capacity: 10)
       let now = Date.now.timeIntervalSince1970
 
       // 原始為單段 head: B
@@ -387,7 +380,7 @@ extension POMTestSuite {
     }
 
     func testPOM_BS12_AlternateKeysRejectsSingleSegmentPrimaryMatchForMultiSegmentOriginal() throws {
-      let pom = LMAssembly.LMPerceptionOverride(capacity: 10)
+      let pom = LMAssembly.LXPerceptor(capacity: 10)
       let now = Date.now.timeIntervalSince1970
 
       // 原始為多段 head: B-C（使用 Compositor.theSeparator = "-"）
@@ -403,7 +396,7 @@ extension POMTestSuite {
     }
 
     func testPOM_BS13_AlternateKeysAllowsSingleSegmentPrimaryWhenPreviousMatches() throws {
-      let pom = LMAssembly.LMPerceptionOverride(capacity: 10)
+      let pom = LMAssembly.LXPerceptor(capacity: 10)
       let now = Date.now.timeIntervalSince1970
 
       // 原始為多段 head 且有 previous: A & (B-C)
@@ -421,7 +414,7 @@ extension POMTestSuite {
     }
 
     func testPOM_BS14_GetSuggestionIncludesPreviousField() throws {
-      let pom = LMAssembly.LMPerceptionOverride(capacity: 10)
+      let pom = LMAssembly.LXPerceptor(capacity: 10)
       let now = Date.now.timeIntervalSince1970
 
       // Bigram 候選字詞（帶有 `previous`）
@@ -438,7 +431,7 @@ extension POMTestSuite {
 
     @Test
     func testPOM_BS15_SplitCandidateCombinedHeadAccepted() throws {
-      let pom = LMAssembly.LMPerceptionOverride(capacity: 10)
+      let pom = LMAssembly.LXPerceptor(capacity: 10)
       let now = Date.now.timeIntervalSince1970
 
       // 原始的多段頭部：BC
@@ -459,33 +452,34 @@ extension POMTestSuite {
       let fallbacks = pom.alternateKeysForTesting(originalKey)
       #expect(fallbacks.contains(splitCandidate))
     }
+
+    @Test
+    func testPOM_BS16_AlternateKeysAllowsSuffixMatchForJoinedAnteriorContext() throws {
+      let pom = LMAssembly.LXPerceptor(capacity: 10)
+      let now = Date.now.timeIntervalSince1970
+
+      // 原始查詢上下文把較遠的前文 join 成較長節點：AB | C | D
+      let originalKey = "(A-B,AB)&(C,C)&(D,orig)"
+      // 已記憶的候選只保留靠近 head 的尾段前文：B | C | D
+      let candidate = "(B,B)&(C,C)&(D,cand)"
+
+      pom.memorizePerception((ngramKey: candidate, candidate: "cand"), timestamp: now)
+      pom.memorizePerception((ngramKey: originalKey, candidate: "orig"), timestamp: now)
+
+      let fallbacks = pom.alternateKeysForTesting(originalKey)
+      #expect(fallbacks.contains(candidate))
+    }
   }
 }
 
-extension Megrez.Node {
+extension Homa.GramInPath {
   fileprivate static func fromTuplet(
     _ tuplet4Test: (keyChain: String, value: String, score: Double)
   )
-    -> Megrez.Node {
+    -> Homa.GramInPath {
     let keyCells = tuplet4Test.keyChain.split(separator: "-").map(\.description)
-    return Megrez.Node(
-      keyArray: keyCells,
-      segLength: keyCells.count,
-      unigrams: [
-        .init(value: tuplet4Test.value, score: tuplet4Test.score),
-      ]
-    )
-  }
-}
-
-extension Megrez.GramInPath {
-  fileprivate static func fromTuplet(
-    _ tuplet4Test: (keyChain: String, value: String, score: Double)
-  )
-    -> Megrez.GramInPath {
-    let keyCells = tuplet4Test.keyChain.split(separator: "-").map(\.description)
-    return Megrez.GramInPath(
-      gram: .init(keyArray: keyCells, value: tuplet4Test.value, score: tuplet4Test.score),
+    return Homa.GramInPath(
+      gram: Homa.Gram(keyArray: keyCells, current: tuplet4Test.value, probability: tuplet4Test.score),
       isExplicit: false
     )
   }

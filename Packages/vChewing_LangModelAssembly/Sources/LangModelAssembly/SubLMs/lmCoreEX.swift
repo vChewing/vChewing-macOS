@@ -6,7 +6,7 @@
 // marks, or product names of Contributor, except as required to fulfill notice
 // requirements defined in MIT License.
 
-import Megrez
+import Homa
 
 // MARK: - LMAssembly.LMCoreEX
 
@@ -45,7 +45,7 @@ extension LMAssembly {
     /// 資料庫辭典。索引內容為注音字串，資料內容則為字串首尾範圍、方便自 strData 取資料。
     var rangeMap: [String: [Range<String.Index>]] = [:]
     /// 資料庫追加辭典。
-    var temporaryMap: [String: [Megrez.Unigram]] = [:]
+    var temporaryMap: [String: [Homa.Gram]] = [:]
     /// 資料庫字串陣列。
     var strData: String = ""
     /// 聲明原始檔案內第一、二縱列的內容是否彼此顛倒。
@@ -156,7 +156,7 @@ extension LMAssembly {
           if !temporaryMap.isEmpty {
             temporaryMap.forEach { neta in
               neta.value.forEach { unigram in
-                dataToWrite.append("\(unigram.value) \(neta.key) \(unigram.score.description)\n")
+                dataToWrite.append("\(unigram.current) \(neta.key) \(unigram.probability.description)\n")
               }
             }
           }
@@ -192,11 +192,11 @@ extension LMAssembly {
       omitNonTemporarySingleCharNonSymbolUnigrams: Bool = false,
       factorySingleReadingValueHashes: Set<Int> = []
     )
-      -> [Megrez.Unigram] {
+      -> [Homa.Gram] {
       let keyArray = keyArray ?? key.split(separator: "-").map(\.description)
       let singleSegLength: Bool = keyArray.count == 1
       let noPunctuations = keyArray.allSatisfy { !$0.hasPrefix("_") }
-      var grams: [Megrez.Unigram] = []
+      var grams: [Homa.Gram] = []
       let omitUserPhrases: Bool = [
         omitNonTemporarySingleCharNonSymbolUnigrams,
         singleSegLength,
@@ -241,14 +241,14 @@ extension LMAssembly {
           if theScore > 0 {
             theScore *= -1 // 應對可能忘記寫負號的情形
           }
-          grams.append(Megrez.Unigram(keyArray: keyArray, value: theValue, score: theScore))
+          grams.append(Homa.Gram(keyArray: keyArray, value: theValue, score: theScore))
         }
       }
-      if let arrOtherRecords: [Megrez.Unigram] = temporaryMap[key] {
+      if let arrOtherRecords: [Homa.Gram] = temporaryMap[key] {
         // 完全排除使用者詞庫中的單漢字結果（除非原廠辭典並未包含這個配對），避免其影響組字結果。
         let arrOtherRecordsFiltered = arrOtherRecords.filter {
           guard omitUserPhrases else { return true }
-          return !factorySingleReadingValueHashes.contains($0.value.hashValue)
+          return !factorySingleReadingValueHashes.contains($0.current.hashValue)
         }
         grams.append(contentsOf: arrOtherRecordsFiltered)
       }

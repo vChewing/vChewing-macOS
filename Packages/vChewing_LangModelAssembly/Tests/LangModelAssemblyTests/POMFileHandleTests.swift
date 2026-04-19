@@ -7,7 +7,7 @@
 // requirements defined in MIT License.
 
 import Foundation
-import Megrez
+import Homa
 import Testing
 
 @testable import LangModelAssembly
@@ -20,7 +20,7 @@ extension POMTestSuite {
       // 測試修復後的 clearData 會寫入正確格式
       let tempURL = URL(fileURLWithPath: NSTemporaryDirectory()).appendingPathComponent("test_pom_fix.json")
 
-      let pom = LMAssembly.LMPerceptionOverride(capacity: 10, dataURL: tempURL)
+      let pom = LMAssembly.LXPerceptor(capacity: 10, dataURL: tempURL)
 
       // 先添加一些數據
       pom.memorizePerception(
@@ -38,8 +38,6 @@ extension POMTestSuite {
       // 檢查文件內容
       do {
         let fileContent = try String(contentsOf: tempURL, encoding: .utf8)
-        print("清除後文件內容: '\(fileContent)'")
-
         #expect(fileContent == "[]")
       } catch {
         Issue.record("讀取清除後文件失敗: \(error)")
@@ -62,7 +60,7 @@ extension POMTestSuite {
       // 創建舊格式文件
       try "{}".write(to: tempURL, atomically: false, encoding: .utf8)
 
-      let pom = LMAssembly.LMPerceptionOverride(capacity: 10, dataURL: tempURL)
+      let pom = LMAssembly.LXPerceptor(capacity: 10, dataURL: tempURL)
 
       // 加載舊格式文件（應該被正確處理為空內容）
       pom.loadData(fromURL: tempURL)
@@ -81,24 +79,22 @@ extension POMTestSuite {
       // 檢查文件現在是正確的格式
       do {
         let fileContent = try String(contentsOf: tempURL, encoding: .utf8)
-        print("保存新數據後文件內容: '\(fileContent.prefix(50))...'")
-
         #expect(!(fileContent.trimmingCharacters(in: .whitespacesAndNewlines) == "{}"))
 
         let data = fileContent.data(using: .utf8) ?? .init()
         let decoded = try JSONDecoder().decode(
-          [LMAssembly.LMPerceptionOverride.KeyPerceptionPair].self,
+          [LMAssembly.LXPerceptor.KeyPerceptionPair].self,
           from: data
         )
         #expect(decoded.count <= 1)
       } catch {
-        print("讀取保存後文件失敗: \(error)")
+        Issue.record("讀取保存後文件失敗: \(error)")
       }
 
       // 若快照仍為空，則日誌必須存在並包含變更
       if let snapshot = try? Data(contentsOf: tempURL),
          let decoded = try? JSONDecoder().decode(
-           [LMAssembly.LMPerceptionOverride.KeyPerceptionPair].self,
+           [LMAssembly.LXPerceptor.KeyPerceptionPair].self,
            from: snapshot
          ), decoded.isEmpty {
         #expect(FileManager.default.fileExists(atPath: journalURL.path))
@@ -106,7 +102,7 @@ extension POMTestSuite {
         #expect(!journalContent.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty)
       }
 
-      let reloaded = LMAssembly.LMPerceptionOverride(capacity: 10, dataURL: tempURL)
+      let reloaded = LMAssembly.LXPerceptor(capacity: 10, dataURL: tempURL)
       reloaded.loadData(fromURL: tempURL)
       #expect(reloaded.getSavableData().count == 1)
 
@@ -120,7 +116,7 @@ extension POMTestSuite {
       // 測試新的保存日誌功能
       let tempURL = URL(fileURLWithPath: NSTemporaryDirectory()).appendingPathComponent("test_pom_logging.json")
 
-      let pom = LMAssembly.LMPerceptionOverride(capacity: 10, dataURL: tempURL)
+      let pom = LMAssembly.LXPerceptor(capacity: 10, dataURL: tempURL)
 
       // 添加測試數據
       let testData = [
@@ -142,7 +138,7 @@ extension POMTestSuite {
 
       let data = fileContent.data(using: .utf8) ?? .init()
       let decoder = JSONDecoder()
-      let decoded = try decoder.decode([LMAssembly.LMPerceptionOverride.KeyPerceptionPair].self, from: data)
+      let decoded = try decoder.decode([LMAssembly.LXPerceptor.KeyPerceptionPair].self, from: data)
       let journalURL = tempURL.appendingPathExtension("journal")
       if decoded.count < testData.count {
         #expect(FileManager.default.fileExists(atPath: journalURL.path))
@@ -150,7 +146,7 @@ extension POMTestSuite {
         #expect(!journalContent.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty)
       }
 
-      let pomReloaded = LMAssembly.LMPerceptionOverride(capacity: 10, dataURL: tempURL)
+      let pomReloaded = LMAssembly.LXPerceptor(capacity: 10, dataURL: tempURL)
       pomReloaded.loadData(fromURL: tempURL)
       let reloaded = pomReloaded.getSavableData()
       #expect(reloaded.count == testData.count)
@@ -172,7 +168,7 @@ extension POMTestSuite {
       let timestamp = Date.now.timeIntervalSince1970
 
       // 初次保存會產生完整快照
-      let pom = LMAssembly.LMPerceptionOverride(capacity: 10, dataURL: tempURL)
+      let pom = LMAssembly.LXPerceptor(capacity: 10, dataURL: tempURL)
       pom.memorizePerception(
         (ngramKey: "(k1,k1)&(k2,k2)&(k3,k3)", candidate: "c1"),
         timestamp: timestamp
@@ -181,7 +177,7 @@ extension POMTestSuite {
 
       let baseSnapshotAfterFirstSave = try Data(contentsOf: tempURL)
       let decodedAfterFirstSave = try JSONDecoder().decode(
-        [LMAssembly.LMPerceptionOverride.KeyPerceptionPair].self,
+        [LMAssembly.LXPerceptor.KeyPerceptionPair].self,
         from: baseSnapshotAfterFirstSave
       )
       #expect(decodedAfterFirstSave.count == 1)
@@ -197,7 +193,7 @@ extension POMTestSuite {
       // 基礎快照仍保有舊資料，變更被寫入日誌
       let baseSnapshotAfterSecondSave = try Data(contentsOf: tempURL)
       let decodedAfterSecondSave = try JSONDecoder().decode(
-        [LMAssembly.LMPerceptionOverride.KeyPerceptionPair].self,
+        [LMAssembly.LXPerceptor.KeyPerceptionPair].self,
         from: baseSnapshotAfterSecondSave
       )
       #expect(decodedAfterSecondSave.count == 1)
@@ -207,7 +203,7 @@ extension POMTestSuite {
       #expect(!journalContent.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty)
 
       // 重新載入應能重放日誌並還原到最新狀態
-      let pomReloaded = LMAssembly.LMPerceptionOverride(capacity: 10, dataURL: tempURL)
+      let pomReloaded = LMAssembly.LXPerceptor(capacity: 10, dataURL: tempURL)
       pomReloaded.loadData(fromURL: tempURL)
       let savableAfterReload = pomReloaded.getSavableData()
       #expect(savableAfterReload.count == 2)
@@ -266,7 +262,7 @@ extension POMTestSuite {
       try journalContent.write(to: journalURL, atomically: true, encoding: .utf8)
 
       // 載入並重播日誌
-      let pom = LMAssembly.LMPerceptionOverride(capacity: 10, dataURL: tempURL)
+      let pom = LMAssembly.LXPerceptor(capacity: 10, dataURL: tempURL)
       pom.loadData(fromURL: tempURL)
 
       // 當日誌中含有不合法記錄時，整個日誌應視為受損並被自動刪除
@@ -305,7 +301,7 @@ extension POMTestSuite {
       try journalContent.write(to: journalURL, atomically: true, encoding: .utf8)
 
       // 載入並重播日誌
-      let pom = LMAssembly.LMPerceptionOverride(capacity: 10, dataURL: tempURL)
+      let pom = LMAssembly.LXPerceptor(capacity: 10, dataURL: tempURL)
       pom.loadData(fromURL: tempURL)
 
       // 應該偵測到損毀並刪除日誌

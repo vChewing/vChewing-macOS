@@ -1,21 +1,15 @@
-// (c) 2022 and onwards The vChewing Project (LGPL v3.0 License or later).
+// (c) 2025 and onwards The vChewing Project (LGPL v3.0 License or later).
 // ====================
 // This code is released under the SPDX-License-Identifier: `LGPL-3.0-or-later`.
 
-// This package is trying to deprecate its dependency of Foundation, hence this file.
-
 extension StringProtocol {
-  /// 檢查字串中是否包含指定子字串。
+  /// 檢查字串中是否包含指定子字串（純 Swift 實作，無 Foundation 相依）。
   ///
-  /// - 注意：此方法不仰賴 Foundation API，而是以 Unicode Scalar 為單位執行逐位比對。
-  ///         因此在處理複雜的 Compose 字元（如合字）時結果可能與 Foundation 的 substring
-  ///         搜尋略有差異；但該實作在純 Swift 環境下效能良好且不會引入 Foundation 的相依性。
   /// - Parameters:
-  ///   - target: 要查找的子字串（可接受任何符合 StringProtocol 的型別）。
-  /// - Returns: 如果找到則回傳 true，否則回傳 false。
+  ///   - target: 要查找的子字串。
+  /// - Returns: 如果包含則回傳 true，否則回傳 false。
   ///
-  /// 範例：
-  /// "abcd".has(string: "bc")  => true
+  /// 注意：此方法以 Unicode Scalar 為單位進行比對，對一些複雜合字或合成字情況可能與 Foundation 的 `contains` 行為略有不同。
   func has(string target: any StringProtocol) -> Bool {
     let selfArray = Array(unicodeScalars)
     let targetArray = Array(target.description.unicodeScalars)
@@ -33,15 +27,20 @@ extension StringProtocol {
     /// 以指定分界字元拆分字串，回傳字串陣列；等同於 `split` 的功能，但不使用 Foundation。
     ///
     /// - 注意：該實作會將分隔符視為完整字串進行比對（以 Unicode Scalar 為基準），
-    ///         若分隔符為空字串，則會視為不做分割。
+    ///         若分隔符為空字串，則回傳每個 Unicode Scalar 各自獨立為一個字串的陣列。
     /// - Parameters:
     ///   - separator: 作為斷詞分界的字串，預設為空字串。
-    /// - Returns: 拆分後的字串陣列，若輸入為空回傳空陣列（視實作情況）。
+    /// - Returns: 拆分後的字串陣列。
     ///
     /// 範例：
     /// "a-b-c".sliced(by: "-") => ["a","b","c"]
+    /// "幽蝶".sliced(by: "")  => ["幽","蝶"]
     let selfArray = Array(unicodeScalars)
     let arrSeparator = Array(separator.description.unicodeScalars)
+    // 空分隔符：每個 Unicode Scalar 各自成為一個元素。
+    guard !arrSeparator.isEmpty else {
+      return selfArray.map { String($0) }
+    }
     var result: [String] = []
     var buffer: [Unicode.Scalar] = []
     var sleepCount = 0
@@ -102,6 +101,37 @@ extension StringProtocol {
     result.append(buffer.map { String($0) }.joined())
     buffer.removeAll()
     return result
+  }
+}
+
+// MARK: - Index Revolver (only for Array)
+
+extension Int {
+  /// 將整數作為陣列索引進行循環位移。
+  /// - Parameters:
+  ///   - target: 目標陣列
+  ///   - clockwise: 是否順時針位移（向更大的索引方向）
+  ///   - steps: 位移步數
+  public mutating func revolveAsIndex<T>(with target: [T], clockwise: Bool = true, steps: Int = 1) {
+    guard self >= 0, steps > 0, !target.isEmpty else { return }
+
+    func revolvedIndex(_ id: Int, clockwise: Bool = true, steps: Int = 1) -> Int {
+      guard id >= 0, steps > 0, !target.isEmpty else { return id }
+      let count = target.count
+
+      // 優化：使用取模運算直接計算最終位置，避免循環
+      let effectiveSteps = steps % count
+      if effectiveSteps == 0 { return id }
+
+      let offset = clockwise ? effectiveSteps : -effectiveSteps
+      let rawResult = id + offset
+
+      // 使用取模運算處理邊界情況
+      let result = ((rawResult % count) + count) % count
+      return result
+    }
+
+    self = revolvedIndex(self, clockwise: clockwise, steps: steps)
   }
 }
 
@@ -194,14 +224,7 @@ public struct FIUUID: Hashable, Codable, Sendable {
   public let highBits: UInt64
   public let lowBits: UInt64
 
-  /// 以標準 UUID 格式（xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx）返回識別字串。
-  ///
-  /// - Parameters:
-  ///   - uppercase: 是否回傳大寫字母（預設 true）。
-  /// - Returns: 符合 UUID 標準格式的字串表示。
-  ///
-  /// 範例：
-  /// FIUUID().uuidString() => "AABBCCDD-..."
+  /// 以標準 UUID 字串形式返回識別值（預設為大寫）。
   public func uuidString(uppercase: Bool = true) -> String {
     var bytes = [UInt8](repeating: 0, count: 16)
     Self.write(bigEndian: highBits, to: &bytes, offset: 0)
@@ -247,9 +270,6 @@ public struct FIUUID: Hashable, Codable, Sendable {
     return result
   }
 
-  /// 取得 16 進位字元的數值表示，支援大小寫字母與數字 0~9。
-  /// - Parameter character: 要轉換的 16 進位字元。
-  /// - Returns: 對應的數值（0..15），若非合法 16 進位字元則回傳 nil。
   private static func hexValue(of character: Character) -> UInt8? {
     switch character {
     case "0" ... "9":
@@ -263,3 +283,25 @@ public struct FIUUID: Hashable, Codable, Sendable {
     }
   }
 }
+
+#if canImport(Foundation)
+  import Foundation
+
+  extension FIUUID {
+    /// 以 `UUID` 表示的識別值，僅在可匯入 Foundation 時提供。
+    public var uuid: UUID {
+      guard let result = UUID(uuidString: uuidString()) else {
+        preconditionFailure("Invalid FIUUID state: unable to produce UUID string.")
+      }
+      return result
+    }
+
+    /// 透過 Foundation 的 `UUID` 初始化。
+    public init(uuid: UUID) {
+      guard let value = FIUUID(uuidString: uuid.uuidString) else {
+        preconditionFailure("Unable to convert UUID to FIUUID.")
+      }
+      self = value
+    }
+  }
+#endif

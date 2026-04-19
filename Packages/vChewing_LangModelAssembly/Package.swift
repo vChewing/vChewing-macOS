@@ -15,7 +15,7 @@ let package = Package(
   ],
   dependencies: [
     .package(path: "../RMJay_LineReader"),
-    .package(path: "../vChewing_Megrez"),
+    .package(path: "../vChewing_Homa"),
     .package(path: "../vChewing_Shared"),
     .package(path: "../vChewing_SwiftExtension"),
   ],
@@ -34,9 +34,8 @@ let package = Package(
       dependencies: [
         "LMAssemblyMaterials4Tests",
         .product(name: "LineReader", package: "RMJay_LineReader"),
-        .product(name: "Megrez", package: "vChewing_Megrez"),
+        .product(name: "Homa", package: "vChewing_Homa"),
         .product(name: "Shared", package: "vChewing_Shared"),
-        .product(name: "MegrezTestComponents", package: "vChewing_Megrez"),
         .product(name: "SwiftExtension", package: "vChewing_SwiftExtension"),
       ],
       swiftSettings: [
@@ -47,6 +46,8 @@ let package = Package(
       name: "LangModelAssemblyTests",
       dependencies: [
         "LangModelAssembly",
+        .product(name: "Homa", package: "vChewing_Homa"),
+        .product(name: "HomaSharedTestComponents", package: "vChewing_Homa"),
       ],
       swiftSettings: [
         .defaultIsolation(MainActor.self), // set Default Actor Isolation

@@ -6,10 +6,10 @@
 // marks, or product names of Contributor, except as required to fulfill notice
 // requirements defined in MIT License.
 
+import Homa
+import HomaSharedTestComponents
 import IMKSwift
 import LMAssemblyMaterials4Tests
-import Megrez
-import MegrezTestComponents
 import OSFrameworkImpl
 import Testing
 
@@ -363,7 +363,7 @@ extension MainAssemblyTests {
     testSession.switchState(testHandler.generateStateOfCandidates())
     testSession.candidatePairSelectionConfirmed(at: 1) // 「蝶」
     #expect(testSession.state.displayedText == "幽蝶能留一縷芳")
-    #expect(testHandler.assembler.cursor == 4)
+    #expect(testHandler.assembler.cursor == 3)
 
     // Continuing POM Tests (in the Current Context).
 

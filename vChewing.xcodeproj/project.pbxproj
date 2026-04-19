@@ -78,10 +78,10 @@
 		5BDB7A3028D47587001AC277 /* Jad_BookmarkManager */ = {isa = PBXFileReference; lastKnownFileType = wrapper; name = Jad_BookmarkManager; path = Packages/Jad_BookmarkManager; sourceTree = "<group>"; };
 		5BDB7A3128D47587001AC277 /* vChewing_FolderMonitor */ = {isa = PBXFileReference; lastKnownFileType = wrapper; name = vChewing_FolderMonitor; path = Packages/vChewing_FolderMonitor; sourceTree = "<group>"; };
 		5BDB7A3228D47587001AC277 /* vChewing_Hotenka */ = {isa = PBXFileReference; lastKnownFileType = wrapper; name = vChewing_Hotenka; path = Packages/vChewing_Hotenka; sourceTree = "<group>"; };
-		5BDB7A3328D47587001AC277 /* vChewing_Megrez */ = {isa = PBXFileReference; lastKnownFileType = wrapper; name = vChewing_Megrez; path = Packages/vChewing_Megrez; sourceTree = "<group>"; };
 		5BDB7A3428D47587001AC277 /* vChewing_ModifierKeyHitChecker */ = {isa = PBXFileReference; lastKnownFileType = wrapper; name = vChewing_ModifierKeyHitChecker; path = Packages/vChewing_ModifierKeyHitChecker; sourceTree = "<group>"; };
 		5BDB7A3528D47587001AC277 /* RMJay_LineReader */ = {isa = PBXFileReference; lastKnownFileType = wrapper; name = RMJay_LineReader; path = Packages/RMJay_LineReader; sourceTree = "<group>"; };
 		5BDB7A3628D47587001AC277 /* vChewing_Tekkon */ = {isa = PBXFileReference; lastKnownFileType = wrapper; name = vChewing_Tekkon; path = Packages/vChewing_Tekkon; sourceTree = "<group>"; };
+		5BE2E7652F951AC60072E5DB /* vChewing_Homa */ = {isa = PBXFileReference; lastKnownFileType = wrapper; name = vChewing_Homa; path = Packages/vChewing_Homa; sourceTree = "<group>"; };
 		5BE8A8C4281EE65300197741 /* CONTRIBUTING.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = CONTRIBUTING.md; sourceTree = "<group>"; };
 		5BFC63C728D49511004A77B7 /* vChewing_IMKUtils */ = {isa = PBXFileReference; lastKnownFileType = wrapper; name = vChewing_IMKUtils; path = Packages/vChewing_IMKUtils; sourceTree = "<group>"; };
 		5BFC63CA28D49B2B004A77B7 /* vChewing_UpdateSputnik */ = {isa = PBXFileReference; lastKnownFileType = wrapper; name = vChewing_UpdateSputnik; path = Packages/vChewing_UpdateSputnik; sourceTree = "<group>"; };
@@ -187,12 +187,12 @@
 				5B6CA6272B8A1C9200A85050 /* vChewing_BrailleSputnik */,
 				5BA8C30128DEFE4F004C5CC4 /* vChewing_CandidateWindow */,
 				5BDB7A3128D47587001AC277 /* vChewing_FolderMonitor */,
+				5BE2E7652F951AC60072E5DB /* vChewing_Homa */,
 				5BDB7A3228D47587001AC277 /* vChewing_Hotenka */,
 				5BFC63C728D49511004A77B7 /* vChewing_IMKUtils */,
 				5B60EAC12EF4892C00FFB49E /* vChewing_InstallerAssembly4Darwin */,
 				5BFC63CD28D4AC98004A77B7 /* vChewing_LangModelAssembly */,
 				5B65FB322A9518C9007EEFB0 /* vChewing_MainAssembly4Darwin */,
-				5BDB7A3328D47587001AC277 /* vChewing_Megrez */,
 				5BDB7A3428D47587001AC277 /* vChewing_ModifierKeyHitChecker */,
 				5BC5E01C28DDE4270094E427 /* vChewing_NotifierUI */,
 				5BDA45492B97588B00DFA179 /* vChewing_OSFrameworkImpl */,

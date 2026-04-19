@@ -7,7 +7,7 @@
 // requirements defined in MIT License.
 
 import Foundation
-import Megrez
+import Homa
 import Testing
 
 @testable import LangModelAssembly
@@ -17,7 +17,7 @@ extension POMTestSuite {
   struct POMDataManagementTests {
     @Test
     func testBasicDataOperations() throws {
-      let pom = LMAssembly.LMPerceptionOverride(capacity: 10)
+      let pom = LMAssembly.LXPerceptor(capacity: 10)
 
       // 新增一些測試數據
       let testData = [
@@ -42,13 +42,11 @@ extension POMTestSuite {
       // 測試 getSavableData 基本功能
       let savableData = pom.getSavableData()
       #expect(savableData.count == testData.count)
-
-      print("基本數據操作測試完成")
     }
 
     @Test
     func testTimestampBasedDecay() throws {
-      let pom = LMAssembly.LMPerceptionOverride(capacity: 10)
+      let pom = LMAssembly.LXPerceptor(capacity: 10)
 
       let key = "(test,測試)&(key,鍵)&(target,target)"
       let candidate = "目標"
@@ -75,11 +73,7 @@ extension POMTestSuite {
       let oneWeekLater = baseTimestamp + 604_800
       let weekLaterSuggestions = pom.getSuggestion(key: key, timestamp: oneWeekLater)
       // 一周後可能已經衰減，這是正常的
-      if weekLaterSuggestions == nil {
-        print("一周後建議已衰減，這是預期的行為")
-      }
-
-      print("時間戳衰減測試完成")
+      _ = weekLaterSuggestions
     }
   }
 }

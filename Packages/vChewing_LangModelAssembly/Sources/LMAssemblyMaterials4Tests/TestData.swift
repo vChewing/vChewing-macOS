@@ -10,14 +10,6 @@ public enum LMATestsData {
     loadFixture(fileNameStem: "vanguardTextMap_test", ext: "txtMap")
   }()
 
-  public static let factoryTestBundleData: String = {
-    textMapTestCoreLMData
-  }()
-
-  public static let sqlTestCoreLMData: String = {
-    textMapTestCoreLMData
-  }()
-
   public static func getCINPath4Tests(_ fileNameStem: String, ext: String) -> String? {
     let url = Bundle.module.url(forResource: fileNameStem, withExtension: ext)
     guard let url else { return nil }

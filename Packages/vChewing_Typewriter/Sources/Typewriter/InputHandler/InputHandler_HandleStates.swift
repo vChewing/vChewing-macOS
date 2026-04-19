@@ -247,7 +247,7 @@ extension InputHandlerProtocol {
     result.data.rawDisplayTextSegments = rawDisplayTextSegmentsIfNeeded
     if !prefs.useRearCursorMode {
       let markerBackup = assembler.marker
-      assembler.jumpCursorBySegment(to: .rear, isMarker: true)
+      try? assembler.jumpCursorBySegment(to: .rear, isMarker: true)
       result.marker = assembler.marker
       assembler.marker = markerBackup
     }
@@ -353,9 +353,9 @@ extension InputHandlerProtocol {
     if input.isCursorBackward, input.isShiftHold {
       let moved: Bool = {
         if input.isCommandHold || input.isOptionHold {
-          assembler.jumpCursorBySegment(to: .rear, isMarker: true)
+          return (try? assembler.jumpCursorBySegment(to: .rear, isMarker: true)) != nil
         } else {
-          assembler.moveCursorStepwise(to: .rear, isMarker: true)
+          return (try? assembler.moveCursorStepwise(to: .rear, isMarker: true)) != nil
         }
       }()
       guard moved else {
@@ -378,9 +378,9 @@ extension InputHandlerProtocol {
     if input.isCursorForward, input.isShiftHold {
       let moved: Bool = {
         if input.isCommandHold || input.isOptionHold {
-          assembler.jumpCursorBySegment(to: .front, isMarker: true)
+          return (try? assembler.jumpCursorBySegment(to: .front, isMarker: true)) != nil
         } else {
-          assembler.moveCursorStepwise(to: .front, isMarker: true)
+          return (try? assembler.moveCursorStepwise(to: .front, isMarker: true)) != nil
         }
       }()
       guard moved else {
@@ -428,7 +428,7 @@ extension InputHandlerProtocol {
       return true
     }
 
-    guard assembler.insertKey(customPunctuation) else {
+    guard (try? assembler.insertKey(customPunctuation)) != nil else {
       errorCallback?("C0793A6D: 得檢查對應的語言模組的 hasUnigramsFor() 是否有誤判之情形。")
       return true
     }
@@ -575,7 +575,7 @@ extension InputHandlerProtocol {
           guard let prevReading = previousParsableCalligraph else { break shiftBksp }
           // 此處刻意使用 Assembler 的 API（assembler.dropKey）以避免呼叫
           // InputHandler 的 dropKey 中所包含的 KeyDropContext 回補邏輯。
-          assembler.dropKey(direction: .rear)
+          try? assembler.dropKey(direction: .rear)
           assemble() // 這裡必須 Walk 一次、來更新目前被 walk 的內容。
           calligrapher = prevReading
         } else {
@@ -584,7 +584,7 @@ extension InputHandlerProtocol {
           // prevReading 的內容分別是：「完整讀音」「去掉聲調的讀音」「是否有聲調」。
           // 此處刻意使用 Assembler 的 API（assembler.dropKey）以避免呼叫
           // InputHandler 的 dropKey 中所包含的 KeyDropContext 回補邏輯。
-          assembler.dropKey(direction: .rear)
+          try? assembler.dropKey(direction: .rear)
           assemble() // 這裡必須 Walk 一次、來更新目前被 walk 的內容。
           prevReading.1.map(\.description).forEach {
             composer.receiveKey(fromPhonabet: $0.unicodeScalars.first)
@@ -622,7 +622,7 @@ extension InputHandlerProtocol {
           dropKey(direction: .rear)
           isConsolidated = true
         } else {
-          assembler.dropKey(direction: .rear)
+          try? assembler.dropKey(direction: .rear)
         }
       }
       assemble()
@@ -688,7 +688,7 @@ extension InputHandlerProtocol {
           dropKey(direction: .front)
           isConsolidated = true
         } else {
-          assembler.dropKey(direction: .front)
+          try? assembler.dropKey(direction: .front)
         }
       }
       assemble()
@@ -820,11 +820,11 @@ extension InputHandlerProtocol {
       if assembler.cursor < assembler.length {
         assembler.marker = assembler.cursor
         if input.isCommandHold || input.isOptionHold {
-          assembler.jumpCursorBySegment(to: .front, isMarker: true)
+          try? assembler.jumpCursorBySegment(to: .front, isMarker: true)
         } else {
           assembler.marker += 1
           if isCursorCuttingChar(isMarker: true) {
-            assembler.jumpCursorBySegment(to: .front, isMarker: true)
+            try? assembler.jumpCursorBySegment(to: .front, isMarker: true)
           }
         }
         var marking = State.ofMarking(
@@ -844,13 +844,13 @@ extension InputHandlerProtocol {
         return handleEnd()
       }
       // 游標跳轉動作無論怎樣都會執行，但如果出了執行失敗的結果的話則觸發報錯流程。
-      if !assembler.jumpCursorBySegment(to: .front) {
+      if (try? assembler.jumpCursorBySegment(to: .front)) == nil {
         errorCallback?("33C3B580")
         return true
       }
       session.switchState(generateStateOfInputting())
     } else {
-      if assembler.moveCursorStepwise(to: .front) {
+      if (try? assembler.moveCursorStepwise(to: .front)) != nil {
         session.switchState(generateStateOfInputting())
       } else {
         errorCallback?("A96AAD58")
@@ -882,9 +882,9 @@ extension InputHandlerProtocol {
         assembler.marker = assembler.cursor
         let moved: Bool = {
           if input.isCommandHold || input.isOptionHold {
-            assembler.jumpCursorBySegment(to: .rear, isMarker: true)
+            return (try? assembler.jumpCursorBySegment(to: .rear, isMarker: true)) != nil
           } else {
-            assembler.moveCursorStepwise(to: .rear, isMarker: true)
+            return (try? assembler.moveCursorStepwise(to: .rear, isMarker: true)) != nil
           }
         }()
         guard moved else {
@@ -906,13 +906,13 @@ extension InputHandlerProtocol {
     } else if input.isOptionHold, !input.isShiftHold {
       if input.isControlHold { return handleHome() }
       // 游標跳轉動作無論怎樣都會執行，但如果出了執行失敗的結果的話則觸發報錯流程。
-      if !assembler.jumpCursorBySegment(to: .rear) {
+      if (try? assembler.jumpCursorBySegment(to: .rear)) == nil {
         errorCallback?("8D50DD9E")
         return true
       }
       session.switchState(generateStateOfInputting())
     } else {
-      if assembler.moveCursorStepwise(to: .rear) {
+      if (try? assembler.moveCursorStepwise(to: .rear)) != nil {
         session.switchState(generateStateOfInputting())
       } else {
         errorCallback?("7045E6F3")
@@ -947,86 +947,37 @@ extension InputHandlerProtocol {
       return true
     }
 
-    let candidates = generateArrayOfCandidates(fixOrder: prefs.useFixedCandidateOrderOnSelection)
-    guard !candidates.isEmpty else {
-      errorCallback?("3378A6DF")
-      return true
+    typealias TooltipPayload = (value: String, current: Int, total: Int)
+
+    let previousSentence = assembler.assembledSentence
+    var tooltipPayload: TooltipPayload?
+    var errorCode: String?
+    var debugIntel: String?
+
+    do {
+      let revolvement = try assembler.revolveCandidate(
+        cursorType: homaCandidateCursorType,
+        counterClockwise: reverseOrder
+      ) { debugIntelRetrieved in
+        debugIntel = debugIntelRetrieved
+      }
+      if previousSentence.map(\.value) != assembler.assembledSentence.map(\.value) {
+        tooltipPayload = (revolvement.0.pair.value, revolvement.current, revolvement.total)
+      } else {
+        errorCode = "040CDB2A"
+      }
+    } catch let error as Homa.Exception {
+      errorCode = "AFF90ACB" + " - \(error)"
+    } catch {
+      errorCode = "AFF90ACB"
     }
 
-    guard let region = assembler.assembledSentence.cursorRegionMap[actualNodeCursorPosition],
-          assembler.assembledSentence.count > region
-    else {
-      errorCallback?("1CE6FFBD")
-      return true
+    if let debugIntel, errorCode != nil {
+      errorCode? += "  INTEL:\n\(debugIntel)"
     }
 
-    let currentNode = assembler.assembledSentence[region]
-
-    let currentPaired = (currentNode.keyArray, currentNode.value)
-
-    // 改成一次性計算，省得每次讀取時都被重複計算。
-    let newIndex: Int = {
-      if candidates.count == 1 { return 0 }
-      var result = 0
-      theLoop: for candidate in candidates {
-        if !currentNode.isExplicit {
-          if candidates[0] == currentPaired { result = reverseOrder ? candidates.count - 1 : 1 }
-          break theLoop
-        }
-        result.revolveAsIndex(
-          with: candidates,
-          clockwise: !(candidate == currentPaired && reverseOrder)
-        )
-        if candidate == currentPaired { break }
-      }
-      return (0 ..< candidates.count).contains(result) ? result : 0
-    }()
-
-    if candidates.count > 1 {
-      let previousSentence = assembler.assembledSentence
-      vCLog(
-        "revolveCandidate: attempting to consolidate candidate \(newIndex): \(candidates[newIndex].value)"
-      )
-
-      // 重試機制：如果 consolidateNode 沒有改變組字器狀態，則重試最多 20 次
-      var retryCount = 0
-      let maxRetries = 20
-      var consolidationSucceeded = false
-
-      while retryCount < maxRetries {
-        consolidateNode(
-          candidate: candidates[newIndex], respectCursorPushing: false,
-          preConsolidate: retryCount > 0, skipObservation: true,
-          explicitlyChosen: true
-        )
-
-        let currentSentence = assembler.assembledSentence
-        if previousSentence.map(\.value) != currentSentence.map(\.value) {
-          vCLog("revolveCandidate: consolidateNode succeeded after \(retryCount + 1) attempts")
-          consolidationSucceeded = true
-          break
-        }
-
-        retryCount += 1
-        if retryCount < maxRetries {
-          vCLog("revolveCandidate: consolidateNode failed, retrying (\(retryCount)/\(maxRetries))")
-          // 第一次使用 preConsolidate，後續重試不使用，以避免重複相同的失敗原因
-        }
-      }
-
-      if !consolidationSucceeded {
-        vCLog("revolveCandidate: consolidateNode failed after \(maxRetries) attempts")
-        vCLog("revolveCandidate: previous: \(previousSentence.map(\.value))")
-        vCLog("revolveCandidate: current: \(assembler.assembledSentence.map(\.value))")
-        vCLog("revolveCandidate: candidate that failed: \(candidates[newIndex])")
-        vCLog("revolveCandidate: currentNode.isExplicit: \(currentNode.isExplicit)")
-        vCLog("revolveCandidate: actualNodeCursorPosition: \(actualNodeCursorPosition)")
-        errorCallback?("040CDB2A")
-        // 即使失敗也繼續顯示狀態，而不是直接返回
-      }
-    } else {
-      errorCallback?("F6644C24")
-      // 只有一個候選字的情況下，沒有輪替的必要，直接返回
+    guard let tooltipPayload else {
+      errorCallback?(errorCode ?? "040CDB2A")
       return true
     }
 
@@ -1039,14 +990,18 @@ extension InputHandlerProtocol {
     var newState = generateStateOfInputting()
     let locID = Bundle.main.preferredLocalizations[0]
     var newTooltip = ContiguousArray<String>()
-    newTooltip.insert("　" + candidates[newIndex].value, at: 0)
+    newTooltip.insert("　" + tooltipPayload.value, at: 0)
     if #available(macOS 10.13, *), isContextVertical(), locID != "en" {
       newTooltip.insert(
-        (newIndex + 1).i18n(loc: locID) + "・" + candidates.count.i18n(loc: locID),
+        (tooltipPayload.current + 1).i18n(loc: locID)
+          + "・" + tooltipPayload.total.i18n(loc: locID),
         at: 0
       )
     } else {
-      newTooltip.insert((newIndex + 1).description + " / " + candidates.count.description, at: 0)
+      newTooltip.insert(
+        (tooltipPayload.current + 1).description + " / " + tooltipPayload.total.description,
+        at: 0
+      )
     }
     newState.tooltip = newTooltip.joined()
     vCLog(newState.tooltip)
@@ -1066,7 +1021,7 @@ extension InputHandlerProtocol {
     guard let session = session, session.state.type != .ofDeactivated else { return false }
     if alternative {
       if currentLM.hasUnigramsFor(keyArray: ["_punctuation_list"]) {
-        if isComposerOrCalligrapherEmpty, assembler.insertKey("_punctuation_list") {
+        if isComposerOrCalligrapherEmpty, (try? assembler.insertKey("_punctuation_list")) != nil {
           assemble()
           // 一邊吃一邊屙（僅對位列黑名單的 App 用這招限制組字區長度）。
           let textToCommit = commitOverflownComposition

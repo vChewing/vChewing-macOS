@@ -56,7 +56,8 @@ final class MainAssemblyTests {
     UserDef.resetAll()
     LMMgr.prepareForUnitTests()
     testLM = LMAssembly.LMInstantiator.construct { _ in
-      LMAssembly.LMInstantiator.connectToTestFactoryDictionary(textMapData: LMATestsData.sqlTestCoreLMData)
+      LMAssembly.LMInstantiator
+        .connectToTestFactoryDictionary(textMapData: LMATestsData.textMapTestCoreLMData)
     }
     Self._testHandler = nil
     let session = InputSession(controller: nil, client: { testClient })
@@ -94,7 +95,7 @@ final class MainAssemblyTests {
   static var _testSession: InputSession?
 
   var testLM = LMAssembly.LMInstantiator.construct { _ in
-    LMAssembly.LMInstantiator.connectToTestFactoryDictionary(textMapData: LMATestsData.sqlTestCoreLMData)
+    LMAssembly.LMInstantiator.connectToTestFactoryDictionary(textMapData: LMATestsData.textMapTestCoreLMData)
   }
 
   // MARK: - Utilities

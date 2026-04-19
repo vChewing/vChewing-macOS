@@ -7,17 +7,15 @@
 // requirements defined in MIT License.
 
 import Foundation
+import Homa
 import LMAssemblyMaterials4Tests
-import Megrez
-import MegrezTestComponents
+
 import Shared
 import Testing
 
+import HomaSharedTestComponents
 @testable import LangModelAssembly
 @testable import Typewriter
-
-private typealias SimpleLM = MegrezTestComponents.SimpleLM
-private typealias MockLM = MegrezTestComponents.MockLM
 
 // MARK: - 測試案例 Vol 1 (Basic Functions)
 
@@ -128,8 +126,8 @@ extension InputHandlerTests {
     testHandler.prefs.specifyCmdOptCtrlEnterBehavior = 4
     testSession.resetInputHandler(forceComposerCleanup: true)
 
-    #expect(testHandler.assembler.insertKey("ㄗㄚˊ"))
-    #expect(testHandler.assembler.insertKey("ㄉㄜ˙"))
+    #expect(throws: Never.self) { try testHandler.assembler.insertKey("ㄗㄚˊ") }
+    #expect(throws: Never.self) { try testHandler.assembler.insertKey("ㄉㄜ˙") }
     testHandler.assemble()
 
     guard let handler = testSession.inputHandler else {
@@ -168,8 +166,8 @@ extension InputHandlerTests {
     testHandler.prefs.reflectBPMFVSInCompositionBuffer = true
     testSession.resetInputHandler(forceComposerCleanup: true)
 
-    #expect(testHandler.assembler.insertKey("ㄗㄚˊ"))
-    #expect(testHandler.assembler.insertKey("ㄉㄜ˙"))
+    #expect(throws: Never.self) { try testHandler.assembler.insertKey("ㄗㄚˊ") }
+    #expect(throws: Never.self) { try testHandler.assembler.insertKey("ㄉㄜ˙") }
     testHandler.assemble()
 
     let vs1 = String(UnicodeScalar(0xE01E1)!)
@@ -213,8 +211,8 @@ extension InputHandlerTests {
     testHandler.prefs.reflectBPMFVSInCompositionBuffer = true
     testSession.resetInputHandler(forceComposerCleanup: true)
 
-    #expect(testHandler.assembler.insertKey("ㄗㄚˊ"))
-    #expect(testHandler.assembler.insertKey("ㄉㄜ˙"))
+    #expect(throws: Never.self) { try testHandler.assembler.insertKey("ㄗㄚˊ") }
+    #expect(throws: Never.self) { try testHandler.assembler.insertKey("ㄉㄜ˙") }
     testHandler.assemble()
     testSession.switchState(testHandler.generateStateOfInputting())
 
@@ -252,8 +250,8 @@ extension InputHandlerTests {
     testHandler.prefs.reflectBPMFVSInCompositionBuffer = true
     testSession.resetInputHandler(forceComposerCleanup: true)
 
-    #expect(testHandler.assembler.insertKey("ㄗㄚˊ"))
-    #expect(testHandler.assembler.insertKey("ㄉㄜ˙"))
+    #expect(throws: Never.self) { try testHandler.assembler.insertKey("ㄗㄚˊ") }
+    #expect(throws: Never.self) { try testHandler.assembler.insertKey("ㄉㄜ˙") }
     testHandler.assemble()
     testSession.switchState(testHandler.generateStateOfInputting())
 
@@ -279,11 +277,11 @@ extension InputHandlerTests {
     // 觸發使用者加詞操作（Enter），驗證寫入的是原始文字。
     #expect(testHandler.triageInput(event: KBEvent.KeyEventData.dataEnterReturn.asEvent))
     let fetchables = testHandler.currentLM.unigramsFor(keyArray: ["ㄗㄚˊ", "ㄉㄜ˙"])
-    let addedUnigramExists = fetchables.contains(where: { $0.value == "咱地" })
+    let addedUnigramExists = fetchables.contains(where: { $0.current == "咱地" })
     #expect(addedUnigramExists)
     // 確認沒有寫入含 Variation Selector 的髒資料。
     let taintedUnigramExists = fetchables.contains(where: {
-      $0.value.unicodeScalars.contains(where: { (0xE0100 ... 0xE01EF).contains($0.value) })
+      $0.current.unicodeScalars.contains(where: { (0xE0100 ... 0xE01EF).contains($0.value) })
     })
     #expect(!taintedUnigramExists)
   }
@@ -295,7 +293,7 @@ extension InputHandlerTests {
       Issue.record("testHandler and testSession at least one of them is nil.")
       return
     }
-    let grams: [Megrez.Unigram] = [
+    let grams: [Homa.Gram] = [
       .init(keyArray: ["ㄗㄚˊ"], value: "咱", score: 10),
       .init(keyArray: ["ㄗㄚˊ"], value: "雜", score: 9),
     ]
@@ -314,7 +312,7 @@ extension InputHandlerTests {
     testHandler.prefs.reflectBPMFVSInCompositionBuffer = true
     testSession.resetInputHandler(forceComposerCleanup: true)
 
-    #expect(testHandler.assembler.insertKey("ㄗㄚˊ"))
+    #expect(throws: Never.self) { try testHandler.assembler.insertKey("ㄗㄚˊ") }
     testHandler.assemble()
     testSession.switchState(testHandler.generateStateOfCandidates())
 
@@ -836,7 +834,6 @@ extension InputHandlerTests {
     ㄒㄧㄢˋ 線 -1
     """
     let extractedGrams = extractGrams(from: testKanjiData)
-    print(extractedGrams)
     extractedGrams.forEach {
       testHandler.currentLM.insertTemporaryData(unigram: $0, isFiltering: false)
     }
@@ -905,7 +902,7 @@ extension InputHandlerTests {
 
     defer {
       LMAssembly.LMInstantiator.disconnectFactoryDictionary()
-      #expect(LMAssembly.LMInstantiator.connectToTestFactoryDictionary(textMapData: LMATestsData.sqlTestCoreLMData))
+      #expect(LMAssembly.LMInstantiator.connectToTestFactoryDictionary(textMapData: LMATestsData.textMapTestCoreLMData))
       testHandler.clear()
     }
 
@@ -917,7 +914,7 @@ extension InputHandlerTests {
     testHandler.prefs.fetchSuggestionsFromPerceptionOverrideModel = false
     testHandler.currentLM.syncPrefs()
 
-    #expect(testHandler.assembler.insertKey(reading))
+    #expect(throws: Never.self) { try testHandler.assembler.insertKey(reading) }
     testHandler.assemble()
 
     let candidateValues = testHandler.generateArrayOfCandidates().map(\.value)
@@ -954,7 +951,7 @@ extension InputHandlerTests {
 
     defer {
       LMAssembly.LMInstantiator.disconnectFactoryDictionary()
-      #expect(LMAssembly.LMInstantiator.connectToTestFactoryDictionary(textMapData: LMATestsData.sqlTestCoreLMData))
+      #expect(LMAssembly.LMInstantiator.connectToTestFactoryDictionary(textMapData: LMATestsData.textMapTestCoreLMData))
       testHandler.clear()
     }
 
@@ -966,7 +963,7 @@ extension InputHandlerTests {
     testHandler.prefs.fetchSuggestionsFromPerceptionOverrideModel = false
     testHandler.currentLM.syncPrefs()
 
-    #expect(testHandler.assembler.insertKey(reading))
+    #expect(throws: Never.self) { try testHandler.assembler.insertKey(reading) }
     testHandler.assemble()
 
     let candidateValues = testHandler.generateArrayOfCandidates().map(\.value)
@@ -996,7 +993,7 @@ extension InputHandlerTests {
       testHandler.prefs.filterNonCNSReadingsForCHTInput = false
       testHandler.prefs.fetchSuggestionsFromPerceptionOverrideModel = true
       LMAssembly.LMInstantiator.disconnectFactoryDictionary()
-      #expect(LMAssembly.LMInstantiator.connectToTestFactoryDictionary(textMapData: LMATestsData.sqlTestCoreLMData))
+      #expect(LMAssembly.LMInstantiator.connectToTestFactoryDictionary(textMapData: LMATestsData.textMapTestCoreLMData))
       testHandler.currentLM.syncPrefs()
       testSession.resetInputHandler(forceComposerCleanup: true)
     }
@@ -1010,7 +1007,7 @@ extension InputHandlerTests {
     testHandler.prefs.fetchSuggestionsFromPerceptionOverrideModel = false
     testHandler.currentLM.syncPrefs()
 
-    #expect(testHandler.assembler.insertKey("ㄅㄛ"))
+    #expect(throws: Never.self) { try testHandler.assembler.insertKey("ㄅㄛ") }
     testHandler.assemble()
 
     let candidateValues = testHandler.generateArrayOfCandidates().map(\.value)
