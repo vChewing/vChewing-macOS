@@ -27,12 +27,6 @@ public final class SmartSwitchState {
   /// 英文緩衝區游標位置（0 = 字串開頭）
   public var englishBufferCursor: Int = 0
 
-  /// 第一次按下 SPACE 的時間戳記（nil = 尚無待確認的第一下）
-  public var firstSpaceTimestamp: TimeInterval?
-
-  /// 雙擊 SPACE 判定的時間窗口（秒），與 NumberQuickInputHandler 保持一致
-  public let doubleTapSpaceInterval: TimeInterval = 0.3
-
   /// 已凍結的文字段落（保留在組字區不提交）
   public private(set) var frozenSegments: [String] = []
 
@@ -62,7 +56,6 @@ public final class SmartSwitchState {
     englishBuffer = ""
     englishBufferCursor = 0
     keySequence = ""
-    firstSpaceTimestamp = nil
   }
 
   /// 重置無效計數（當收到有效注音輸入時）
@@ -133,19 +126,6 @@ public final class SmartSwitchState {
     guard englishBufferCursor < englishBuffer.count else { return nil }
     let idx = englishBuffer.index(englishBuffer.startIndex, offsetBy: englishBufferCursor)
     return englishBuffer[idx]
-  }
-
-  /// 記錄第一次 SPACE 按下的時間
-  public func recordFirstSpace() {
-    firstSpaceTimestamp = Date().timeIntervalSince1970
-  }
-
-  /// 嘗試確認雙擊 SPACE。在時間窗口內再次呼叫回傳 true 並重置；否則回傳 false
-  public func tryConfirmDoubleSpace() -> Bool {
-    guard let first = firstSpaceTimestamp else { return false }
-    let elapsed = Date().timeIntervalSince1970 - first
-    firstSpaceTimestamp = nil
-    return elapsed <= doubleTapSpaceInterval
   }
 
   /// 檢查是否達到觸發門檻
