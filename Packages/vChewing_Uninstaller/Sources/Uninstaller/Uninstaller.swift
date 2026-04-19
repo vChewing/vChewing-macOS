@@ -12,6 +12,40 @@ import OSFrameworkImpl
 // MARK: - Uninstaller
 
 public enum Uninstaller {
+  // MARK: Public
+
+  /// Shows an NSAlert guiding the user to the manual uninstall wiki page.
+  /// Called when the user cancels the NSOpenPanel or selects a wrong directory.
+  public static func showUninstallFailureGuidance() {
+    let alert = NSAlert()
+    alert.messageText = "Uninstallation".i18n
+    alert.informativeText = "i18n:Uninstaller.failureGuidance".i18n
+    alert.addButton(withTitle: "i18n:Uninstaller.openWikiPage".i18n)
+    alert.addButton(withTitle: "Not Now".i18n)
+    let result = alert.runModal()
+    NSApp.popup()
+    if result == .alertFirstButtonReturn {
+      if let url = URL(string: uninstallWikiURL) {
+        NSWorkspace.shared.open(url)
+      }
+    }
+  }
+
+  /// Prints CLI guidance when uninstall cannot proceed due to lack of directory access.
+  public static func printUninstallCLIGuidance() {
+    var lines = """
+    Failed to obtain access to the Input Methods directory.
+    To uninstall vChewing manually, please visit:
+    \(uninstallWikiURL)
+    """
+    if let scriptURL = Bundle.main.url(forResource: "uninstall", withExtension: "sh"),
+       FileManager.default.fileExists(atPath: scriptURL.path) {
+      lines +=
+        "\n\nAlternatively, you may review and run the bundled uninstall script:\n  \(scriptURL.path)\nIt contains the full list of files and directories to be removed."
+    }
+    print(lines)
+  }
+
   // MARK: - Uninstall the input method.
 
   @discardableResult
@@ -81,6 +115,12 @@ public enum Uninstaller {
     }
     return 0
   }
+
+  // MARK: Private
+
+  // MARK: - Directory access request for sandboxed uninstall.
+
+  private static let uninstallWikiURL = "https://github.com/vChewing/vChewing-macOS/wiki/HOW_TO_UNINSTALL"
 }
 
 // MARK: - Trash a file if it exists.

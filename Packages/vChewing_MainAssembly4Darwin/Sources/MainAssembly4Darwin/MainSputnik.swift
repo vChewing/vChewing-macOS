@@ -88,22 +88,16 @@ public final class MainSputnik4IME {
         let exitCode = IMKHelper.registerInputMethod()
         exit(exitCode)
       case "uninstall":
-        let exitCode = Uninstaller.uninstall(
-          defaultDataFolderPath: LMMgr.dataFolderPath(isDefaultFolder: true),
-          removeAll: false
-        )
-        exit(exitCode)
+        Uninstaller.printUninstallCLIGuidance()
+        return 1
       default: break
       }
       return 0
     case 2:
       switch cmdParameters.first?.lowercased() {
       case "uninstall" where cmdParameters.last?.lowercased() == "--all":
-        let exitCode = Uninstaller.uninstall(
-          defaultDataFolderPath: LMMgr.dataFolderPath(isDefaultFolder: true),
-          removeAll: true
-        )
-        exit(exitCode)
+        Uninstaller.printUninstallCLIGuidance()
+        return 1
       case "--import-kimo":
         guard let path = cmdParameters.last else {
           return 1

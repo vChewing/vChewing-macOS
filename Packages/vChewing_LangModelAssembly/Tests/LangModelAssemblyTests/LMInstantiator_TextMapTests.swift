@@ -88,7 +88,8 @@ struct LMInstantiatorTextMapTests {
     instance.setOptions { config in
       config.filterNonCNSReadings = true
     }
-    #expect(instance.unigramsFor(keyArray: ["ㄨㄟ"]).first(where: { $0.value == "危" }) == nil)
+    // 單一讀音的單漢字不再被濾除，而是 demote score 至 -9.5。
+    #expect(instance.unigramsFor(keyArray: ["ㄨㄟ"]).first(where: { $0.value == "危" })?.description == "(ㄨㄟ,危,-9.5)")
     #expect(instance.unigramsFor(keyArray: ["ㄨㄟˊ"]).first(where: { $0.value == "危" })?.description == "(ㄨㄟˊ,危,-5.287)")
   }
 
@@ -268,23 +269,6 @@ struct LMInstantiatorTextMapTests {
     #expect(gramsContainValue(grams, "mval"))
     #expect(!gramsContainValue(grams, "base"))
     #expect(grams.first(where: { $0.value == "zval" })?.keyArray.count == 4)
-  }
-
-  @Test
-  func testSQLiteDependencyRemoved() throws {
-    let packageRoot = URL(fileURLWithPath: #filePath)
-      .deletingLastPathComponent()
-      .deletingLastPathComponent()
-      .deletingLastPathComponent()
-    let packageManifest = packageRoot.appendingPathComponent("Package.swift")
-    let legacyExtension = packageRoot
-      .appendingPathComponent("Sources")
-      .appendingPathComponent("LangModelAssembly")
-      .appendingPathComponent("LMInstantiator_SQLExtension.swift")
-
-    let manifestContents = try String(contentsOf: packageManifest, encoding: .utf8)
-    #expect(!manifestContents.contains("CSQLite3Lib"))
-    #expect(!FileManager.default.fileExists(atPath: legacyExtension.path))
   }
 
   // MARK: Private

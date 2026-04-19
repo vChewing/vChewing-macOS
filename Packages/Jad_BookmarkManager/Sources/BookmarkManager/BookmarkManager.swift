@@ -81,6 +81,7 @@
           // 使用原子寫入，並設定嚴格檔案權限（rw-------）。
           try outData.write(to: bookmarkURL, options: [.atomic])
           try FileManager.default.setAttributes([.posixPermissions: 0o600], ofItemAtPath: bookmarkURL.path)
+          lastLoadedBookmarkStoreSignature = nil
         }
         Self.consoleLog("Did save data to url")
       } catch {
@@ -94,29 +95,44 @@
         return
       }
 
-      // 為避免重複的 startAccessing 呼叫，先停止已存在的所有 security-scoped access。
-      stopAllSecurityScopedAccesses()
-
-      if fileExists(url) {
-        do {
-          let fileData = try Data(contentsOf: url)
-          if let fileBookmarks = decodeBookmarksData(fileData) {
-            for bookmark in fileBookmarks {
-              restoreBookmark(key: bookmark.key, value: bookmark.value)
-            }
-          }
-        } catch {
-          Self.consoleLog("Couldn't load bookmarks")
+      let signature = bookmarkStoreSignature(for: url)
+      if signature == lastLoadedBookmarkStoreSignature {
+        switch signature {
+        case .missing:
+          return
+        case .existing where !startedAccessingURLs.isEmpty:
+          return
+        default:
+          break
         }
+      }
+
+      if !startedAccessingURLs.isEmpty {
+        stopAllSecurityScopedAccesses(resetResolvedState: false)
+      }
+
+      guard case .existing = signature else {
+        lastLoadedBookmarkStoreSignature = signature
+        return
+      }
+
+      do {
+        let fileData = try Data(contentsOf: url)
+        if let fileBookmarks = decodeBookmarksData(fileData) {
+          bookmarkReloadGeneration += 1
+          for bookmark in fileBookmarks {
+            restoreBookmark(key: bookmark.key, value: bookmark.value)
+          }
+        }
+        lastLoadedBookmarkStoreSignature = signature
+      } catch {
+        Self.consoleLog("Couldn't load bookmarks")
       }
     }
 
     /// 停止所有已啟動的 security-scoped 資源，並清空內部紀錄。
     public func stopAllSecurityScopedAccesses() {
-      startedAccessingURLs.forEach { url in
-        url.stopAccessingSecurityScopedResource()
-      }
-      startedAccessingURLs.removeAll()
+      stopAllSecurityScopedAccesses(resetResolvedState: true)
     }
 
     /// 如果指定 URL 的 security-scoped 資源已啟動，則停止存取它。
@@ -124,6 +140,7 @@
       if startedAccessingURLs.contains(url) {
         url.stopAccessingSecurityScopedResource()
         startedAccessingURLs.remove(url)
+        lastLoadedBookmarkStoreSignature = nil
       }
     }
 
@@ -131,9 +148,12 @@
     /// 這比起使用環境變數更明確，也可讓測試穩定地使用每個測試個別的暫存檔案。
     public func setBookmarksURLOverride(_ url: URL?) {
       Self.bookmarksURLOverride = url
+      lastLoadedBookmarkStoreSignature = nil
     }
 
     // MARK: Internal
+
+    internal private(set) var bookmarkReloadGeneration: Int = 0
 
     static func consoleLog<S: StringProtocol>(_ msg: S) {
       let msgStr = msg.description
@@ -153,12 +173,28 @@
 
     // MARK: Private
 
+    private enum BookmarkStoreSignature: Equatable {
+      case missing(path: String)
+      case existing(path: String, fileSize: UInt64, modificationTime: TimeInterval)
+    }
+
     // MARK: - 測試 hook：允許覆寫 Bookmark 所使用的路徑
 
     private static var bookmarksURLOverride: URL?
 
     /// 追蹤曾呼叫 startAccessingSecurityScopedResource() 的 URL，以便日後停止呼叫（釋放權限）。
     private var startedAccessingURLs: Set<URL> = []
+    private var lastLoadedBookmarkStoreSignature: BookmarkStoreSignature?
+
+    private func stopAllSecurityScopedAccesses(resetResolvedState: Bool) {
+      startedAccessingURLs.forEach { url in
+        url.stopAccessingSecurityScopedResource()
+      }
+      startedAccessingURLs.removeAll()
+      if resetResolvedState {
+        lastLoadedBookmarkStoreSignature = nil
+      }
+    }
 
     private func restoreBookmark(key: URL, value: Data) {
       let restoredUrl: URL?
@@ -245,6 +281,16 @@
       let exists = FileManager.default.fileExists(atPath: url.path, isDirectory: &isDir)
 
       return exists
+    }
+
+    private func bookmarkStoreSignature(for url: URL) -> BookmarkStoreSignature {
+      guard fileExists(url) else {
+        return .missing(path: url.path)
+      }
+      let attrs = (try? FileManager.default.attributesOfItem(atPath: url.path)) ?? [:]
+      let fileSize = attrs[.size] as? UInt64 ?? 0
+      let modificationTime = (attrs[.modificationDate] as? Date)?.timeIntervalSinceReferenceDate ?? 0
+      return .existing(path: url.path, fileSize: fileSize, modificationTime: modificationTime)
     }
 
     // MARK: - 解序列化輔助函式

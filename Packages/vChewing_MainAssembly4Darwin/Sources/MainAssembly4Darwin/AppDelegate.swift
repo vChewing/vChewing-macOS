@@ -198,11 +198,11 @@ extension AppDelegate {
     let result = alert.runModal()
     NSApp.popup()
     guard result == NSApplication.ModalResponse.alertFirstButtonReturn else { return }
-    let url = URL(fileURLWithPath: LMMgr.dataFolderPath(isDefaultFolder: true))
-    FileOpenMethod.finder.open(url: url)
-    Uninstaller.uninstall(
-      selfKill: true, defaultDataFolderPath: LMMgr.dataFolderPath(isDefaultFolder: true)
-    )
+    Uninstaller.showUninstallFailureGuidance()
+    // Open Finder to reveal the three relevant locations so the user can remove them manually.
+    FileOpenMethod.finder.open(url: URL(fileURLWithPath: LMMgr.dataFolderPath(isDefaultFolder: false)))
+    FileOpenMethod.finder.open(url: LMMgr.appSupportURL)
+    FileOpenMethod.finder.open(url: Bundle.main.bundleURL)
   }
 
   /// 檢查該程式本身的記憶體佔用量。
