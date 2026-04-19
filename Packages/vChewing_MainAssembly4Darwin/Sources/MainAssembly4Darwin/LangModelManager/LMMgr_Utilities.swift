@@ -309,13 +309,16 @@ extension LMMgr {
 
   private static func pathGuidanceDescription(baseKey: String, path: String?) -> String {
     let base = baseKey.i18n
-    guard let path, iCloudMirroredPathSuspected(path) else { return base }
-    return [
+    guard let path else { return base }
+    var resultStack: [String] = [
       base,
       "→ \(path)",
-      "i18n:LMMgr.pathInvalidityFound.iCloudDriveManagedPathAdvice".i18n,
     ]
-    .joined(separator: "\n\n")
+    if iCloudMirroredPathSuspected(path) {
+      resultStack.append("i18n:LMMgr.pathInvalidityFound.iCloudDriveManagedPathAdvice".i18n)
+    }
+    resultStack.append("i18n:LMMgr.pathInvalidityFound.suggestVerifyingSystemPrivacySettings".i18n)
+    return resultStack.joined(separator: "\n\n")
   }
 
   private static func iCloudMirroredPathSuspected(_ path: String) -> Bool {

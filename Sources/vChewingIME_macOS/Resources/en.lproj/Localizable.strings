@@ -213,6 +213,7 @@
 "i18n:LMMgr.pathInvalidityFound.cassette.description" = "Please open vChewing Preferences to reconfirm your cassette file path settings.";
 "i18n:LMMgr.pathInvalidityFound.cassette.title" = "Cassette File Accessibility Issues Detected";
 "i18n:LMMgr.pathInvalidityFound.iCloudDriveManagedPathAdvice" = "If this path is inside an iCloud-hosted “Documents” or “Desktop” folder, move the file or folder to a local location and choose it again. If you are not sure whether iCloud Drive manages these folders on your Mac, Apple Support can guide you through checking that setting.";
+"i18n:LMMgr.pathInvalidityFound.suggestVerifyingSystemPrivacySettings" = "You may want to check the permission settings under “System Settings -> Privacy & Security -> Files and Folders -> vChewing” on your Mac.";
 "i18n:LMMgr.pathInvalidityFound.userDataFolder.description" = "Please open vChewing Preferences to reconfirm your user dictionary data path settings.";
 "i18n:LMMgr.pathInvalidityFound.userDataFolder.title" = "User Data Folder Accessibility Issues Detected";
 "i18n:OtherIMEDataImportError.dataExtractionFailure.errMsg" = "Failed from getting importable data. Either the source file is missing or corrupted.";

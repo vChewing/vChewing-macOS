@@ -212,6 +212,7 @@
 "i18n:LMMgr.pathInvalidityFound.cassette.description" = "入力機能設定を開いて、カセットファイルのパス設定を再確認してください。";
 "i18n:LMMgr.pathInvalidityFound.cassette.title" = "カセットファイルのアクセスに問題が検出されました";
 "i18n:LMMgr.pathInvalidityFound.iCloudDriveManagedPathAdvice" = "このパスが iCloud 管理下の「Documents」または「Desktop」にある場合は、ファイルまたはフォルダをローカルの場所へ移してから、もう一度指定してください。これらのフォルダが iCloud Drive に管理されているか分からない場合は、Apple Support に相談すれば設定確認の案内を受けられます。";
+"i18n:LMMgr.pathInvalidityFound.suggestVerifyingSystemPrivacySettings" = "「システム設定 -> プライバシーとセキュリティ -> ファイルとフォルダ -> 唯音 (vChewing)」にある権限設定も確認してみてください。";
 "i18n:LMMgr.pathInvalidityFound.userDataFolder.description" = "入力機能設定を開いて、ユーザー辞書データのパス設定を再確認してください。";
 "i18n:LMMgr.pathInvalidityFound.userDataFolder.title" = "ユーザー辞書フォルダへのアクセスに問題が検出されました";
 "i18n:OtherIMEDataImportError.dataExtractionFailure.errMsg" = "「直接読み込む」作動失敗：データソースファイルが存在しないか、あるいはデータが壊れたと判断しました。";

@@ -163,9 +163,11 @@ extension MainAssemblyTests {
       .appendingPathComponent("phase25-guidance.cin2")
       .path
     let advice = "i18n:LMMgr.pathInvalidityFound.iCloudDriveManagedPathAdvice".i18n
+    let privacySuggestion = "i18n:LMMgr.pathInvalidityFound.suggestVerifyingSystemPrivacySettings".i18n
     let description = LMMgr.cassetteAccessFailureDescription(path: mirroredPath)
 
     #expect(description.contains(advice))
+    #expect(description.contains(privacySuggestion))
   }
 
   @Test
@@ -181,9 +183,11 @@ extension MainAssemblyTests {
       .appendingPathComponent("phase25-mirrored-guidance.cin2")
       .path
     let advice = "i18n:LMMgr.pathInvalidityFound.iCloudDriveManagedPathAdvice".i18n
+    let privacySuggestion = "i18n:LMMgr.pathInvalidityFound.suggestVerifyingSystemPrivacySettings".i18n
     let description = LMMgr.cassetteAccessFailureDescription(path: mirroredPath)
 
     #expect(description.contains(advice))
+    #expect(description.contains(privacySuggestion))
   }
 
   @Test
@@ -197,10 +201,12 @@ extension MainAssemblyTests {
       .path
     let base = "i18n:LMMgr.accessFailure.cassette.description".i18n
     let advice = "i18n:LMMgr.pathInvalidityFound.iCloudDriveManagedPathAdvice".i18n
+    let privacySuggestion = "i18n:LMMgr.pathInvalidityFound.suggestVerifyingSystemPrivacySettings".i18n
     let description = LMMgr.cassetteAccessFailureDescription(path: localPath)
 
-    #expect(description == base)
+    #expect(description.contains(base))
     #expect(!description.contains(advice))
+    #expect(description.contains(privacySuggestion))
   }
 
   @Test

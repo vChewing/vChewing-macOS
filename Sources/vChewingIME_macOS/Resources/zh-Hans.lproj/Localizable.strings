@@ -213,6 +213,7 @@
 "i18n:LMMgr.pathInvalidityFound.cassette.description" = "请开启唯音偏好设定以重新确认磁带档案路径的设定。";
 "i18n:LMMgr.pathInvalidityFound.cassette.title" = "侦测到磁带档案存取问题";
 "i18n:LMMgr.pathInvalidityFound.iCloudDriveManagedPathAdvice" = "若这个路径位于 iCloud 代管的“Documents”或“Desktop”内，请先将档案或资料夹移到本机位置，再重新指定。若您不确定这两个目录目前是否由 iCloud Drive 代管，建议直接联系 Apple Support 协助确认设定。";
+"i18n:LMMgr.pathInvalidityFound.suggestVerifyingSystemPrivacySettings" = "您或许想检查位于「系统设定 -> 隐私权与安全性 -> 档案和档案夹 -> 唯音 (vChewing)」下的权限设定。";
 "i18n:LMMgr.pathInvalidityFound.userDataFolder.description" = "请开启唯音偏好设定以重新确认使用者语汇资料夹路径的设定。";
 "i18n:LMMgr.pathInvalidityFound.userDataFolder.title" = "侦测到使用者语汇资料夹存取问题";
 "i18n:OtherIMEDataImportError.dataExtractionFailure.errMsg" = "「直接汇入」功能失败：原始档案不存在或损毁。";
