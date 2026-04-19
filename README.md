@@ -119,6 +119,14 @@ $ EOF.
 
 ### 2026.04.19
 
+#### ✨ 功能調整
+
+- **智慧中英文切換 — 移除雙擊空白鍵切回中文**：Shift 鍵已能完整覆蓋所有中英文切換場景，雙擊空白鍵的熱鍵因此取消，避免在英文緩衝區輸入含空格的詞語時意外觸發。英文模式下的空白鍵現在直接插入空格至英文緩衝，行為與其他可列印字元一致。
+
+#### 🐛 修復
+
+- **智慧中英文切換 — ENTER 鍵丟失凍結段落**：修正按下 ENTER 時，中英混合組字內容（如「你有收到我寄出的Email嗎？」）只提交最後一段中文、前置凍結段落全部消失的問題。根本原因：`shouldResetSmartSwitchState()` 錯誤地將 ENTER 列入重置條件，導致 `frozenSegments` 在 `committableDisplayText()` 執行前就被清空。修正方式：將 ENTER 移出重置條件，由 `handleEnter()` → `committableDisplayText()` 完整取得所有凍結段落再提交。新增 TC-055 重現並驗證此修正。
+
 #### 🔄 上游同步（upstream/main @ vChewing/vChewing-macOS — 4.3.5 + 4.3.6 GM）
 
 - **IMEStateData — BPMFVS 標記模式污染修復**：新增 `rawDisplayTextSegments` / `rawDisplayedText` 機制。在啟用 BPMFVS 組字區即時反映時，標記模式（`ofMarking`）的使用者加詞操作（`userPhraseKVPair`）現在保證寫入原始漢字，不再含有 Unicode Variation Selector（`U+E0100–U+E01EF`）。新增 `rawDisplayTextSegmentsIfNeeded`、`insertReadingIntoSegments()` 輔助函式，並傳播至所有生成標記狀態的呼叫點。新增測試 `test_IH103D_ButKoBPMFVSMarkingStateDoesNotPollute` 與 `test_IH103E_ButKoBPMFVSCandidatePreviewKeepsRawStateInSync` 驗證此行為。

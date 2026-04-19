@@ -116,7 +116,8 @@ Defined in `vChewing_Shared/Sources/Shared/Shared.swift` (`StateType` enum). Cri
 - **`frozenSegments: [String]`**: Chinese/English text kept in preedit without committing to OS. Displayed as a prefix via `frozenDisplayText` in `generateStateOfInputting()`.
 - **`freezeSegment(_:)`**: Appends text to `frozenSegments`; `clearFrozenSegments()` wipes them.
 - **`exitTempEnglishMode()`**: Calls `resetExceptFrozen()`, preserving `frozenSegments` across the mode switch.
-- **Double-tap Space**: `recordFirstSpace()` / `tryConfirmDoubleSpace()` detect two SPACE presses within 0.3s to switch back to Chinese while keeping English text as a frozen prefix.
+- **Shift toggle** (`handleShiftToggle()` in `Typewriter_Phonabet.swift`): The sole mechanism for switching between Chinese and English modes mid-composition. Chinese→English freezes assembler content into `frozenSegments` then calls `enterTempEnglishMode()`; English→Chinese freezes `englishBuffer` into `frozenSegments` then exits English mode.
+- **ENTER commit pitfall**: `shouldResetSmartSwitchState()` must NOT include `input.isEnter`. ENTER is handled by `handleEnter()` → `committableDisplayText()`, which reads `frozenSegments` before committing. A premature `reset()` on ENTER would clear `frozenSegments` and lose all frozen prefix content.
 
 ### Lexicon
 
