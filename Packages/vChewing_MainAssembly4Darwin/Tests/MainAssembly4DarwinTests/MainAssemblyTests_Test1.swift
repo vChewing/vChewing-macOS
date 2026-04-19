@@ -203,6 +203,46 @@ extension MainAssemblyTests {
     #expect(!description.contains(advice))
   }
 
+  @Test
+  func test019_LMMgr_ResolveUserSpecifiedURLResolvesCassetteSymlink() throws {
+    let fileManager = FileManager.default
+    let baseURL = LMMgr.unitTestDataURL(isDefaultFolder: false)
+    let targetURL = baseURL.appendingPathComponent("phase25-real-\(UUID().uuidString).cin2")
+    let symlinkURL = baseURL.appendingPathComponent("phase25-link-\(UUID().uuidString).cin2")
+
+    defer {
+      try? fileManager.removeItem(at: symlinkURL)
+      try? fileManager.removeItem(at: targetURL)
+    }
+
+    try Data("phase25-symlink-target".utf8).write(to: targetURL, options: [.atomic])
+    try fileManager.createSymbolicLink(atPath: symlinkURL.path, withDestinationPath: targetURL.path)
+
+    let resolvedURL = LMMgr.resolveUserSpecifiedURL(symlinkURL)
+
+    #expect(resolvedURL.path == targetURL.standardizedFileURL.path)
+  }
+
+  @Test
+  func test020_LMMgr_ResolveUserSpecifiedURLResolvesUserDataFolderSymlink() throws {
+    let fileManager = FileManager.default
+    let baseURL = LMMgr.unitTestDataURL(isDefaultFolder: false)
+    let targetURL = baseURL.appendingPathComponent("phase25-real-folder-\(UUID().uuidString)", isDirectory: true)
+    let symlinkURL = baseURL.appendingPathComponent("phase25-link-folder-\(UUID().uuidString)", isDirectory: true)
+
+    defer {
+      try? fileManager.removeItem(at: symlinkURL)
+      try? fileManager.removeItem(at: targetURL)
+    }
+
+    try fileManager.createDirectory(at: targetURL, withIntermediateDirectories: true)
+    try fileManager.createSymbolicLink(atPath: symlinkURL.path, withDestinationPath: targetURL.path)
+
+    let resolvedURL = LMMgr.resolveUserSpecifiedURL(symlinkURL)
+
+    #expect(resolvedURL.path == targetURL.standardizedFileURL.path)
+  }
+
   // MARK: - Input Handler Tests.
 
   /// 測試基本的打字組句（不是ㄅ半注音）。

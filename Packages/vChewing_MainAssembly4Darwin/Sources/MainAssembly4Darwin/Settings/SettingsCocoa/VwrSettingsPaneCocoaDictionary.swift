@@ -253,8 +253,9 @@ extension SettingsPanesCocoa {
 extension SettingsPanesCocoa.Dictionary: NSPathControlDelegate {
   public func pathControl(_ pathControl: NSPathControl, acceptDrop info: NSDraggingInfo) -> Bool {
     let urls = info.draggingPasteboard.readObjects(forClasses: [NSURL.self])
-    guard let url = urls?.first as? URL else { return false }
+    guard let droppedURL = urls?.first as? URL else { return false }
     guard pathControl === pctUserDictionaryFolder else { return false }
+    let url = LMMgr.resolveUserSpecifiedURL(droppedURL)
     let bolPreviousFolderValidity = LMMgr.checkIfSpecifiedUserDataFolderValid(
       PrefMgr.shared.userDataFolderSpecified.expandingTildeInPath
     )
@@ -312,7 +313,8 @@ extension SettingsPanesCocoa.Dictionary: NSPathControlDelegate {
     let window = CtlSettingsCocoa.shared?.window
     dlgOpenPath.beginSheetModal(at: window) { [weak self] result in
       if result == NSApplication.ModalResponse.OK {
-        guard let url = dlgOpenPath.url else { return }
+        guard let selectedURL = dlgOpenPath.url else { return }
+        let url = LMMgr.resolveUserSpecifiedURL(selectedURL)
         // CommonDialog 讀入的路徑沒有結尾斜槓，這會導致檔案目錄合規性判定失準。
         // 所以要手動補回來。
         var newPath = url.path

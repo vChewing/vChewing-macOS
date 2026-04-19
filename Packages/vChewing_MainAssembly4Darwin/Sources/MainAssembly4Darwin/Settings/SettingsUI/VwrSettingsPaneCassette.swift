@@ -29,7 +29,8 @@ public struct VwrSettingsPaneCassette: View {
                 .i18n
             } acceptDrop: { pathControl, info in
               let urls = info.draggingPasteboard.readObjects(forClasses: [NSURL.self])
-              guard let url = urls?.first as? URL else { return false }
+              guard let droppedURL = urls?.first as? URL else { return false }
+              let url = LMMgr.resolveUserSpecifiedURL(droppedURL)
               let bolPreviousPathValidity = LMMgr.checkCassettePathValidity(
                 PrefMgr.shared.cassettePath.expandingTildeInPath
               )
@@ -117,7 +118,8 @@ public struct VwrSettingsPaneCassette: View {
 
         switch result {
         case let .success(urls):
-          guard let url = urls.first else { return }
+          guard let selectedURL = urls.first else { return }
+          let url = LMMgr.resolveUserSpecifiedURL(selectedURL)
           if LMMgr.checkCassettePathValidity(url.path) {
             cassettePath = url.path
             LMMgr.loadCassetteData()

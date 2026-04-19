@@ -97,8 +97,9 @@ extension SettingsPanesCocoa {
 extension SettingsPanesCocoa.Cassette: NSPathControlDelegate {
   public func pathControl(_ pathControl: NSPathControl, acceptDrop info: NSDraggingInfo) -> Bool {
     let urls = info.draggingPasteboard.readObjects(forClasses: [NSURL.self])
-    guard let url = urls?.first as? URL else { return false }
+    guard let droppedURL = urls?.first as? URL else { return false }
     guard pathControl === pctCassetteFilePath else { return false }
+    let url = LMMgr.resolveUserSpecifiedURL(droppedURL)
     let bolPreviousPathValidity = LMMgr.checkCassettePathValidity(
       PrefMgr.shared.cassettePath.expandingTildeInPath
     )
@@ -161,7 +162,8 @@ extension SettingsPanesCocoa.Cassette: NSPathControlDelegate {
     let window = CtlSettingsCocoa.shared?.window
     dlgOpenFile.beginSheetModal(at: window) { [weak self] result in
       if result == NSApplication.ModalResponse.OK {
-        guard let url = dlgOpenFile.url else { return }
+        guard let selectedURL = dlgOpenFile.url else { return }
+        let url = LMMgr.resolveUserSpecifiedURL(selectedURL)
         if LMMgr.checkCassettePathValidity(url.path) {
           PrefMgr.shared.cassettePath = url.path
           LMMgr.loadCassetteData()

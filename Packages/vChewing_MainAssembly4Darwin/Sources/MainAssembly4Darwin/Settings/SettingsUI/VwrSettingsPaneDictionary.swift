@@ -30,7 +30,8 @@ public struct VwrSettingsPaneDictionary: View {
                   .i18n
               } acceptDrop: { pathControl, info in
                 let urls = info.draggingPasteboard.readObjects(forClasses: [NSURL.self])
-                guard let url = urls?.first as? URL else { return false }
+                guard let droppedURL = urls?.first as? URL else { return false }
+                let url = LMMgr.resolveUserSpecifiedURL(droppedURL)
                 let bolPreviousFolderValidity = LMMgr.checkIfSpecifiedUserDataFolderValid(
                   PrefMgr.shared.userDataFolderSpecified.expandingTildeInPath
                 )
@@ -96,7 +97,8 @@ public struct VwrSettingsPaneDictionary: View {
 
           switch result {
           case let .success(urls):
-            guard let url = urls.first else { return }
+            guard let selectedURL = urls.first else { return }
+            let url = LMMgr.resolveUserSpecifiedURL(selectedURL)
             var newPath = url.path
             newPath.ensureTrailingSlash()
             if LMMgr.checkIfSpecifiedUserDataFolderValid(newPath) {
