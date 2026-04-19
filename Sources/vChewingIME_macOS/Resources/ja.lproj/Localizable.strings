@@ -235,6 +235,8 @@
 "i18n:settings.importFromKimoTxt.label" = "Yahoo! KeyKey ユーザー辞書ファイルを読込";
 "i18n:settings.importFromKimoTxt.postOpsNotice" = "読み込まなかった分は不合理か、あるいは今のデータベースにすでに既存しています。すべてのデータを独立したテキストファイルとして完全にお書き出ししたい場合は、KeyKeyUserDBKit（GitHub 倉庫: vChewing/KeyKeyUserDBKit）をご利用ください。";
 "i18n:settings.shiftKeyASCIITogle.description" = "この機能の利用する NSEvent は、macOS 内蔵の入力アプリ共用モジュール「InputMethodKit」から提供した NSEvent のみであり、その NSEvent 文脈関係で「Shift キーは１回押したかどうか」と判断することはできる。この事実に疑いを持つ者は、本アプリのソースコードを審査するか、あるいは本アプリを逆向工程（分解工学, いわゆる「Reverse-Engineering」）するがよい。なお、Shiftキーによるこの切り替えは、CapsLockがONの時には効かぬ。";
+"i18n:Uninstaller.failureGuidance" = "唯音は自身の卸除に必要なフォルダアクセス権を取得できませんでした。Wiki ページの手動卸除手順をご参照ください。";
+"i18n:Uninstaller.openWikiPage" = "卸除ガイドを開く";
 "i18n:UserDef.kAllowRescoringSingleKanjiCandidates.description" = "⚠️💀 センテンス構築算法に差し支えてしまい、正しくない結果が出る恐れがあります。ご自分は何かをしようとしているのかを弁えていない限り、このスィッチを常にOFFすることだと開発者からの是正勧告です。";
 "i18n:UserDef.kAllowRescoringSingleKanjiCandidates.shortTitle" = "排除/最優先にできる候補の文字数の最低限は１字とする";
 "i18n:UserDef.kAlwaysUsePCBWithElectronBasedClients.description" = "ほとんどの「Electron で構築したアプリ」は IMKTextInput API の実作についての支障があり、その実作した API の挙動は予測できなくて、バグ退治もとても困難だと考えられています。このようなアプリの開発者たちにもそれぞれの原因でこのような支障を解決する策も動力も極めて少ないと認識されております。故に、このスイッチの最初値はONにしました。";
@@ -257,7 +259,7 @@
 "i18n:UserDef.kCandidateStateJKHLBehavior.shortTitle" = "候補陳列ウィンドウでのJKHLキーの動作:";
 "i18n:UserDef.kCheckAbusersOfSecureEventInputAPI.description" = "このような不正利用は「システム内蔵入力以外の全ての入力アプリがメニューで灰色状態で選べなくて使えない」の元凶である。センシティブな資料の記入どころでSecureEventInputをEnableSecureEventInput()で使うのは当然であるが、「入力中」状態が終わった後必ずDisableSecureEventInput()で状態解消すべきだと義務である。いくつかヘルパーアプリも、あるいはSecureEventInputを呼び起こしてからすぐ固まったアプリも、この状態になりやすい。特に、他のアプリの画面へ切り替えたとしても、固まったアプリのSecureEventInput状態は自動的に解消できぬ。";
 "i18n:UserDef.kCheckAbusersOfSecureEventInputAPI.shortTitle" = "SecureEventInput API を不正利用しているバクグラウンド・プロセスを自動検知";
-"i18n:UserDef.kCNS11643Enabled.shortTitle" = "全字庫モード // 入力可能な漢字数を倍増す (2026-01-11)";
+"i18n:UserDef.kCNS11643Enabled.shortTitle" = "全字庫モード // 入力可能な漢字数を倍増す (2026-03-18)";
 "i18n:UserDef.kCursorPlacementAfterSelectingCandidate.description" = "候補陳列ウィンドウで候補を確定した後のカーソル位置を指定します。なお、「候補陳列ウィンドウ呼び出し前のカーソル位置」とは、候補陳列ウィンドウが表示される直前に記録されたカーソル位置を意味します。前方へ一歩進める設定を選んだ場合、その歩幅はお好みのカーソル候補呼出操作スタイルによって変わる場合がございます。";
 "i18n:UserDef.kCursorPlacementAfterSelectingCandidate.option.0" = "調整しない";
 "i18n:UserDef.kCursorPlacementAfterSelectingCandidate.option.1" = "前へ一歩進める";
@@ -267,6 +269,7 @@
 "i18n:UserDef.kEnableCandidateWindowAnimation.shortTitle" = "候補ウィンドウの移動/サイズ変更にアニメーションを適用";
 "i18n:UserDef.kEnforceETenDOSCandidateSequence.description" = "このスイッチは、倚天中国語DOSの候補順に慣れたユーザー向けに用意されております。候補の陳列順番を手動で管理したいという需要の多くがこの並びに起因するためです。なお、全候補選択入力モードでは常にこの並び順が適用され、このスイッチの影響は受けません。";
 "i18n:UserDef.kEnforceETenDOSCandidateSequence.shortTitle" = "単漢字候補の陳列順番を倚天中国語DOS順に強制する";
+"i18n:UserDef.kFilterNonCNSReadingsForCHTInput.description" = "単漢字候補については、全字庫の読みに合致しない結果は完全に削除されず、候補リストの末尾に降格されます。";
 "i18n:UserDef.kFilterNonCNSReadingsForCHTInput.shortTitle" = "全字庫以外の音読みを内蔵辞書繁体中国語検索結果から除く";
 "i18n:UserDef.kInlineDumpPinyinInLieuOfZhuyin.description" = "Command+Option+Ctrl+Enter で送り出したものは、それに関する作動設定次第です。";
 "i18n:UserDef.kMinCellWidthForHorizontalMatrix.option.0" = "２つの漢字（幅の狭い）";

@@ -236,6 +236,8 @@
 "i18n:settings.importFromKimoTxt.label" = "Import Yahoo! KeyKey User Dictionary file";
 "i18n:settings.importFromKimoTxt.postOpsNotice" = "Other entires are either already-in-database or have validity problems. If you want to dump all data to a dedicated text file, you may want to use KeyKeyUserDBKit (GitHub Repository `vChewing/KeyKeyUserDBKit`) instead.";
 "i18n:settings.shiftKeyASCIITogle.description" = "This feature only needs to parse consecutive NSEvents passed by macOS built-in InputMethodKit framework, hence no necessity of asking end-users for extra privileges of monitoring global keyboard inputs. You are free to investigate our codebase or reverse-engineer this input method to see whether the above statement is trustable. Also, this Shift-key toggle won't work if CapsLock is ON.";
+"i18n:Uninstaller.failureGuidance" = "vChewing could not obtain the necessary folder access to uninstall itself. You can follow the manual uninstall instructions on the wiki page.";
+"i18n:Uninstaller.openWikiPage" = "Open Uninstall Guide";
 "i18n:UserDef.kAllowRescoringSingleKanjiCandidates.description" = "⚠️💀 This may hinder the sentence-composition algorithm from giving appropriate results. You are urged to turn this switch off at all costs, unless you really know what you are doing.";
 "i18n:UserDef.kAllowRescoringSingleKanjiCandidates.shortTitle" = "Allow boosting / excluding a candidate of single kanji";
 "i18n:UserDef.kAlwaysUsePCBWithElectronBasedClients.description" = "Electron-based apps are notorious in unpredictable (buggy) IMKTextInput API interactive behaviors. Most of such apps are unlikely to have their individual issues of such solved correctly on-time due to various out-of-control reasons, hence why this toggle is enabled by default.";
@@ -258,7 +260,7 @@
 "i18n:UserDef.kCandidateStateJKHLBehavior.shortTitle" = "JKHL key behavior in candidate window:";
 "i18n:UserDef.kCheckAbusersOfSecureEventInputAPI.description" = "Such abuse of SecureEventInput API in the background can hinder all 3rd-party input methods from being able to switch to. It is fine to use SecureEventInput for sensitive input fields. However, an app calling EnableSecureEventInput() is responsible to call DisableSecureEventInput() immediately right after the input field loses focus. This situation may also happen if an app is hanging in the background (or working as a helper application in the background) with its SecureEventInput left enabled.";
 "i18n:UserDef.kCheckAbusersOfSecureEventInputAPI.shortTitle" = "Actively check those processes abusing the SecureEventInput API";
-"i18n:UserDef.kCNS11643Enabled.shortTitle" = "Enable CNS11643 Support (2026-01-11)";
+"i18n:UserDef.kCNS11643Enabled.shortTitle" = "Enable CNS11643 Support (2026-03-18)";
 "i18n:UserDef.kCursorPlacementAfterSelectingCandidate.description" = "This defines the cursor position after a candidate is confirmed through the candidate window. Note that the Pre-Candidate-Window Cursor Position is the cursor position snapshotted right before the candidate window shows up. If you choose to let it move a step front, the step length may vary, depending on your preferred candidate cursor selection style.";
 "i18n:UserDef.kCursorPlacementAfterSelectingCandidate.option.0" = "No Adjustments";
 "i18n:UserDef.kCursorPlacementAfterSelectingCandidate.option.1" = "A Step Front";
@@ -268,6 +270,7 @@
 "i18n:UserDef.kEnableCandidateWindowAnimation.shortTitle" = "Enable animation for candidate window movement/resize";
 "i18n:UserDef.kEnforceETenDOSCandidateSequence.description" = "This option is provided for users who prefer the ETen Chinese DOS candidate ordering. Many such users developed their ordering intuition while using the ETen Chinese DOS input method and wish to use the same order here. Note: the select-candidate-per-character mode always follows this ordering and is not affected by this setting.";
 "i18n:UserDef.kEnforceETenDOSCandidateSequence.shortTitle" = "Enforce Eten DOS Sequence on all single-kanji candidates";
+"i18n:UserDef.kFilterNonCNSReadingsForCHTInput.description" = "For single-kanji candidates, non-conforming results will be demoted to the end of the candidate list instead of being completely removed.";
 "i18n:UserDef.kFilterNonCNSReadingsForCHTInput.shortTitle" = "Filter Non-CNS11643 factory readings (CHT input only)";
 "i18n:UserDef.kFuzzyReadingEnEngEnabled.description" = "When enabled, typing 'ㄣ' will also find candidates for 'ㄥ' and vice versa. This helps users who confuse front and back nasal sounds. Fuzzy match results are shown with lower priority.";
 "i18n:UserDef.kFuzzyReadingEnEngEnabled.shortTitle" = "Enable fuzzy matching for En/Eng (ㄣ/ㄥ)";

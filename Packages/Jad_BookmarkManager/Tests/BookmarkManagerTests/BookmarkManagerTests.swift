@@ -86,6 +86,27 @@
     }
 
     @Test
+    func testLoadBookmarksSkipsRestoreWhenBookmarkStoreUnchanged() throws {
+      let tempDir = FileManager.default.temporaryDirectory.appendingPathComponent(UUID().uuidString)
+      try FileManager.default.createDirectory(at: tempDir, withIntermediateDirectories: true)
+      BookmarkManager.shared.saveBookmark(for: tempDir)
+
+      BookmarkManager.shared.loadBookmarks()
+      let generationAfterFirstLoad = BookmarkManager.shared.bookmarkReloadGeneration
+      BookmarkManager.shared.loadBookmarks()
+      let generationAfterSecondLoad = BookmarkManager.shared.bookmarkReloadGeneration
+
+      #expect(generationAfterFirstLoad > 0)
+      #expect(generationAfterSecondLoad == generationAfterFirstLoad)
+
+      BookmarkManager.shared.stopAllSecurityScopedAccesses()
+      BookmarkManager.shared.loadBookmarks()
+      #expect(BookmarkManager.shared.bookmarkReloadGeneration == generationAfterFirstLoad + 1)
+
+      try? FileManager.default.removeItem(at: tempDir)
+    }
+
+    @Test
     func testSaveMultipleMergesBookmarks() throws {
       let tempDir1 = FileManager.default.temporaryDirectory.appendingPathComponent(UUID().uuidString)
       let tempDir2 = FileManager.default.temporaryDirectory.appendingPathComponent(UUID().uuidString)

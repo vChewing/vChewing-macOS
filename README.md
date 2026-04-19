@@ -117,6 +117,22 @@ $ EOF.
 
 ## Changelog（個人修改版）
 
+### 2026.04.19
+
+#### 🔄 上游同步（upstream/main @ vChewing/vChewing-macOS — 4.3.5 + 4.3.6 GM）
+
+- **IMEStateData — BPMFVS 標記模式污染修復**：新增 `rawDisplayTextSegments` / `rawDisplayedText` 機制。在啟用 BPMFVS 組字區即時反映時，標記模式（`ofMarking`）的使用者加詞操作（`userPhraseKVPair`）現在保證寫入原始漢字，不再含有 Unicode Variation Selector（`U+E0100–U+E01EF`）。新增 `rawDisplayTextSegmentsIfNeeded`、`insertReadingIntoSegments()` 輔助函式，並傳播至所有生成標記狀態的呼叫點。新增測試 `test_IH103D_ButKoBPMFVSMarkingStateDoesNotPollute` 與 `test_IH103E_ButKoBPMFVSCandidatePreviewKeepsRawStateInSync` 驗證此行為。
+- **LMAssembly — 全字庫單字過濾策略調整**：在繁體中文模式下啟用 CNS11643 讀音過濾時，單個漢字（`keyArray.count == 1`）的不合規 Unigram 改為將分數降至 `-9.5`（降權），而非直接濾除，避免罕用字完全消失。新增 CNS 過濾選項的 i18n 描述字串。
+- **Hotenka v2.0.0 — 轉換字典後端升級**：將簡繁轉換字典後端從 SQLite / JSON / Plist 全面改為 `.stringmap` 純文字格式，大幅改善載入速度與套件體積。測試檔案同步重寫為 `HotenkaTests_StringMap.swift`。
+- **BookmarkMgr — iCloud Drive 沙盒掛起修復**：修正在沙盒環境下開啟 iCloud Drive 資料夾時造成 App 掛起的問題，新增對應測試案例。
+- **Uninstaller — 卸載流程 UX 改善**：新增卸載確認對話框流程，更新多語系字串（en / ja / zh-Hans / zh-Hant）。
+- **字典資料更新**：`vChewing-VanguardLexicon` 資料日期升至 `20260416`；CNS11643 時間戳更新至 `2026-03-18`。
+- `Scripts/vchewing-update.swift` 更新腳本修補。
+
+**衝突處理**：`rawDisplayTextSegmentsIfNeeded` 加入 `frozenSegments` 前綴支援（SmartSwitch 相容）；`committableDisplayText()` 完整保留；`test_IH103C`（fork）與上游 `test_IH103D`、`test_IH103E` 全數保留。版本號維持 fork 日期制（`2026.04.19 / 20260419`）。
+
+---
+
 ### 2026.04.14
 
 #### ✨ 新功能

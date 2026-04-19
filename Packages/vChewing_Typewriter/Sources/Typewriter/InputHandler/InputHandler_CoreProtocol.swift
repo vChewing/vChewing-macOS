@@ -562,6 +562,7 @@ extension InputHandlerProtocol {
       skipObservation: true
     )
     theState.data.displayTextSegments = compositionBufferDisplayTextSegments()
+    theState.data.rawDisplayTextSegments = rawDisplayTextSegmentsIfNeeded
     theState.data.cursor = convertCursorForDisplay(assembler.cursor)
     let markerBackup = assembler.marker
     if assembler.isCursorAtEdge(direction: .front) {

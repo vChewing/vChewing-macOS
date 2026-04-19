@@ -236,6 +236,8 @@
 "i18n:settings.importFromKimoTxt.label" = "汇入奇摩输入法自订词资料库";
 "i18n:settings.importFromKimoTxt.postOpsNotice" = "其余尚未汇入的资料可能是已有的记录、或记录本身不合理。若您想把全部资料完整导出为独立文字档，建议改用 KeyKeyUserDBKit（GitHub 仓库: vChewing/KeyKeyUserDBKit）来操作。";
 "i18n:settings.shiftKeyASCIITogle.description" = "该功能只需要对借由 macOS 内建的输入法框架传来的 NSEvent 做上下文分析，自然没有「向使用者寻求系统全局键盘事件监听权限」之必要。您可自行审视敝输入法的原始程式码仓库、或对敝输入法逆向工程，以自行证实此处所言之真假。另注：这个 Shift 键切换开关在 CapsLock 灯亮时无效。";
+"i18n:Uninstaller.failureGuidance" = "唯音未能取得卸除自身所需的目录访问权限。您可以参阅 wiki 页面的手动卸除说明。";
+"i18n:Uninstaller.openWikiPage" = "开启卸除说明";
 "i18n:UserDef.kAllowRescoringSingleKanjiCandidates.description" = "⚠️💀 这可能会妨碍组句函式，使其无法给出正确的结果。开发者极力劝阻您启用该功能，除非您真的知道您在做什么。";
 "i18n:UserDef.kAllowRescoringSingleKanjiCandidates.shortTitle" = "允许对单个汉字进行升权或排除";
 "i18n:UserDef.kAlwaysUsePCBWithElectronBasedClients.description" = "基于 Electron 技术构建的客体往往臭名昭彰于各自的对 IMKTextInput API 的「行为难以预测、难以保证」的实作上。更糟糕的是，这类 App 的开发者们均有着各自的不可控的原因、而难以保证他们的 App 的这种问题能被及时地、妥当地解决。这也是为什么这个开关在预设情况下处于开启状态。";
@@ -258,7 +260,7 @@
 "i18n:UserDef.kCandidateStateJKHLBehavior.shortTitle" = "选字窗内的 JKHL 键行为:";
 "i18n:UserDef.kCheckAbusersOfSecureEventInputAPI.description" = "这种滥用会导致系统内的所有第三方输入法全都无法正常使用（在输入法选单内会变成灰色）。针对需要填写敏感资料的场合，使用 SecureEventInput 无可厚非。但是，用 EnableSecureEventInput() 开启该模式之后，就有义务在输入窗格失焦的那一刻呼叫 DisableSecureEventInput() 来结束这种状态。这种状态还常见于后台辅助 App 当中、或者某个 App 在叫出该模式之后失去回应（这样的话，哪怕被切换到后台，SecureEventInput 也不会自动解除）。";
 "i18n:UserDef.kCheckAbusersOfSecureEventInputAPI.shortTitle" = "主动侦测正在滥用 SecureEventInput API 的后台执行绪";
-"i18n:UserDef.kCNS11643Enabled.shortTitle" = "启用 CNS11643 全字库支援 (2026-01-11)";
+"i18n:UserDef.kCNS11643Enabled.shortTitle" = "启用 CNS11643 全字库支援 (2026-03-18)";
 "i18n:UserDef.kCursorPlacementAfterSelectingCandidate.description" = "此设定用来指定候选字在选字窗内被确认后，游标应该位于何处。请注意，「呼出选字窗之前的游标位置」指的是选字窗出现前所记录的游标位置。如果选择向前推进一格，实际推进的距离会因您偏好的选字游标操作样式而有所不同。";
 "i18n:UserDef.kCursorPlacementAfterSelectingCandidate.option.0" = "不调整";
 "i18n:UserDef.kCursorPlacementAfterSelectingCandidate.option.1" = "向前推进一格";
@@ -268,6 +270,7 @@
 "i18n:UserDef.kEnableCandidateWindowAnimation.shortTitle" = "启用候选字窗移动/变更大小时的动画";
 "i18n:UserDef.kEnforceETenDOSCandidateSequence.description" = "对敝输入法的候选字的顺序有着强烈的手动调整之需求的使用者们往往都是从倚天中文 DOS 开始积累了对候选字的直觉记忆、希望能使用这种候选字排序，故提供该选项。逐字选字模式会始终遵循该排序特性，不受该开关所影响。";
 "i18n:UserDef.kEnforceETenDOSCandidateSequence.shortTitle" = "对所有单汉字候选字强制施加倚天中文DOS系统排序";
+"i18n:UserDef.kFilterNonCNSReadingsForCHTInput.description" = "对于单汉字候选字，不符合全字库读音的结果将被降权至候选字列表尾端，而非完全移除。";
 "i18n:UserDef.kFilterNonCNSReadingsForCHTInput.shortTitle" = "仅繁体中文: 原厂辞典仅返回符合全字库读音的结果";
 "i18n:UserDef.kFuzzyReadingEnEngEnabled.description" = "启用后，输入「ㄣ」时也会找到「ㄥ」的候选字，反之亦然。这对于容易混淆前后鼻音的使用者很有帮助。容错结果会以较低优先顺序显示。";
 "i18n:UserDef.kFuzzyReadingEnEngEnabled.shortTitle" = "启用ㄣ/ㄥ容错输入（前后鼻音不分）";

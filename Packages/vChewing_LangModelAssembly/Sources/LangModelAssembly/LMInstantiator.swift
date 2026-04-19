@@ -499,8 +499,16 @@ extension LMAssembly {
         )
         // 如果是繁體中文、且有開啟 CNS11643 全字庫讀音過濾開關的話，對原廠核心辭典內容追加過濾處理：
         if config.filterNonCNSReadings, !isCHS {
-          factoryCoreUnigramsResult.removeAll { thisUnigram in
-            !checkCNSConformation(for: thisUnigram, keyArray: keyArray)
+          // 對單個漢字（keyArray.count == 1）的不合規 Unigram 僅 demote score 至 -9.5，而非濾除。
+          if keyArray.count == 1 {
+            factoryCoreUnigramsResult = factoryCoreUnigramsResult.map { thisUnigram in
+              guard !checkCNSConformation(for: thisUnigram, keyArray: keyArray) else { return thisUnigram }
+              return .init(keyArray: thisUnigram.keyArray, value: thisUnigram.value, score: -9.5)
+            }
+          } else {
+            factoryCoreUnigramsResult.removeAll { thisUnigram in
+              !checkCNSConformation(for: thisUnigram, keyArray: keyArray)
+            }
           }
         }
         // 正式追加原廠核心辭典檢索結果。

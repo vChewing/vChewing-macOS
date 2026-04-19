@@ -169,6 +169,7 @@ extension IMEStateProtocol {
       cursor: data.cursor,
       highlightAt: nil
     )
+    result.data.rawDisplayTextSegments = data.rawDisplayTextSegments
     result.tooltip = data.tooltipBackupForInputting
     return result
   }
@@ -250,6 +251,10 @@ public struct IMEStateData {
   public var tooltipBackupForInputting: String = ""
   public var tooltipColorState: TooltipColorState = .normal
 
+  /// 永遠儲存原始（未經 BPMFVS 投影）的文字資料。
+  /// 當為 nil 時，退回至 displayTextSegments（即後者亦為原始資料）。
+  public var rawDisplayTextSegments: [String]?
+
   public var highlightedCandidateIndex: Int? {
     didSet {
       guard let newValue = highlightedCandidateIndex else { return }
@@ -292,6 +297,11 @@ public struct IMEStateData {
       }
     }
   }
+
+  /// 保證回傳未經 BPMFVS 投影的原始文字。
+  public var rawDisplayedText: String {
+    rawDisplayTextSegments?.joined() ?? displayedText
+  }
 }
 
 extension IMEStateData {
@@ -326,7 +336,7 @@ extension IMEStateData {
 
   public var userPhraseKVPair: CandidateInState {
     let key = markedReadings
-    let value = displayedText.map(\.description)[markedRange].joined()
+    let value = rawDisplayedText.map(\.description)[markedRange].joined()
     return (key, value)
   }
 

@@ -241,18 +241,24 @@ print("Highest tag: \(highestTag)")
 // --- 新增: 從 Xcode 專案讀取目前的 MARKETING_VERSION 與 CURRENT_PROJECT_VERSION
 func locatePbxproj(at repo: String) -> String? {
   let fm = FileManager.default
-  if let files = try? fm.contentsOfDirectory(atPath: repo) {
-    if let proj = files.first(where: { $0.hasSuffix(".xcodeproj") }) {
-      return repo + "/" + proj + "/project.pbxproj"
-    }
+  let preferred = repo + "/vChewing.xcodeproj/project.pbxproj"
+  if fm.fileExists(atPath: preferred) {
+    return preferred
   }
-  return nil
+  guard let files = try? fm.contentsOfDirectory(atPath: repo) else {
+    return nil
+  }
+  return files
+    .filter { $0.hasSuffix(".xcodeproj") }
+    .sorted()
+    .map { repo + "/" + $0 + "/project.pbxproj" }
+    .first(where: { fm.fileExists(atPath: $0) })
 }
 
-func parsePbxProjectVersionAndBuild(_ pbxPath: String) -> (String, String) {
+func parsePbxProjectVersionAndBuild(_ pbxPath: String) -> (String, String)? {
   var content = ""
   do { content = try String(contentsOfFile: pbxPath, encoding: .utf8) } catch {
-    return ("0.0.0", "0")
+    return nil
   }
   // 尋找 MARKETING_VERSION 與 CURRENT_PROJECT_VERSION
   let marketingRegex = try? NSRegularExpression(
@@ -263,25 +269,24 @@ func parsePbxProjectVersionAndBuild(_ pbxPath: String) -> (String, String) {
     pattern: "CURRENT_PROJECT_VERSION = ([0-9]+);",
     options: []
   )
-  var market = "0.0.0"
-  var build = "0"
-  if let mrx = marketingRegex,
-     let match = mrx.firstMatch(
-       in: content,
-       options: [],
-       range: NSRange(content.startIndex..., in: content)
-     ) {
-    if let range = Range(match.range(at: 1), in: content) { market = String(content[range]) }
+  guard let mrx = marketingRegex,
+        let marketingMatch = mrx.firstMatch(
+          in: content,
+          options: [],
+          range: NSRange(content.startIndex..., in: content)
+        ),
+        let marketRange = Range(marketingMatch.range(at: 1), in: content),
+        let brx = buildRegex,
+        let buildMatch = brx.firstMatch(
+          in: content,
+          options: [],
+          range: NSRange(content.startIndex..., in: content)
+        ),
+        let buildRange = Range(buildMatch.range(at: 1), in: content)
+  else {
+    return nil
   }
-  if let brx = buildRegex,
-     let match = brx.firstMatch(
-       in: content,
-       options: [],
-       range: NSRange(content.startIndex..., in: content)
-     ) {
-    if let range = Range(match.range(at: 1), in: content) { build = String(content[range]) }
-  }
-  return (market, build)
+  return (String(content[marketRange]), String(content[buildRange]))
 }
 
 func isLegacyByMacOSDeployment(_ pbxPath: String) -> Bool {
@@ -320,13 +325,18 @@ var currentVer = highestTag
 var currentBuild = "0"
 var projectIsLegacy = false
 if let pbx = locatePbxproj(at: repoPath) {
-  useProjectVersion = true
-  let (market, build) = parsePbxProjectVersionAndBuild(pbx)
-  currentVer = market
-  currentBuild = build
-  print("Using project MARKETING_VERSION=\(market), CURRENT_PROJECT_VERSION=\(build) from \(pbx)")
-  projectIsLegacy = isLegacyByMacOSDeployment(pbx)
-  if projectIsLegacy { print("Detected legacy project (macOS deployment < 10.15)") }
+  if let (market, build) = parsePbxProjectVersionAndBuild(pbx) {
+    useProjectVersion = true
+    currentVer = market
+    currentBuild = build
+    print("Using project MARKETING_VERSION=\(market), CURRENT_PROJECT_VERSION=\(build) from \(pbx)")
+    projectIsLegacy = isLegacyByMacOSDeployment(pbx)
+    if projectIsLegacy { print("Detected legacy project (macOS deployment < 10.15)") }
+  } else {
+    print("Warning: Failed to parse project version from \(pbx). Falling back to highest tag.")
+  }
+} else {
+  print("Warning: No usable project.pbxproj found. Falling back to highest tag.")
 }
 
 func bumpTagFromProject(version: String, useLegacySuffix: Bool) -> (String, Bool) {
