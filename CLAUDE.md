@@ -102,8 +102,8 @@ Defined in `vChewing_Shared/Sources/Shared/Shared.swift` (`StateType` enum). Cri
 - `Packages/vChewing_MainAssembly4Darwin/.../SessionController/SessionCtl.swift` — IMK entry point; event handling, UI updates.
 - `Packages/vChewing_MainAssembly4Darwin/.../LangModelManager/BundleAccessor.swift` — custom `Bundle.currentSPM` for factory lexicon resource lookup.
 - `Packages/vChewing_Typewriter/Sources/Typewriter/InputHandler/` — FSM, Tekkon/Megrez bridge.
-- `Packages/vChewing_Typewriter/Sources/Typewriter/InputHandler/InputHandler_CoreProtocol.swift` — `SmartSwitchState` class (smart Chinese-English switching, `frozenSegments`, double-tap Space); `InputHandlerProtocol`.
-- `Packages/vChewing_Typewriter/Sources/Typewriter/InputHandler/InputHandler_HandleStates.swift` — `generateStateOfInputting()` builds `ofInputting` state, prepending `frozenDisplayText` from `SmartSwitchState`.
+- `Packages/vChewing_Typewriter/Sources/Typewriter/InputHandler/InputHandler_CoreProtocol.swift` — `SmartSwitchState` class (smart Chinese-English switching, `FrozenSegment` struct, `frozenSegments`, `frozenCursor`, `frozenCandidateCharPosition`); `InputHandlerProtocol`.
+- `Packages/vChewing_Typewriter/Sources/Typewriter/InputHandler/InputHandler_HandleStates.swift` — `generateStateOfInputting()` builds `ofInputting` state, prepending `frozenDisplayText` from `SmartSwitchState`; `generateStateOfCandidates()` embeds assembler content within frozen text split in frozen candidate mode.
 - `Packages/vChewing_Tekkon/Sources/Tekkon/` — Zhuyin/pinyin parsing, stroke composition.
 - `Packages/vChewing_Megrez/Sources/Megrez/` — DAG-DP sentence assembler, POM observation data.
 - `Packages/vChewing_LangModelAssembly/Sources/LangModelAssembly/` — LM facade, user phrases, POM memory.
@@ -113,10 +113,14 @@ Defined in `vChewing_Shared/Sources/Shared/Shared.swift` (`StateType` enum). Cri
 `SmartSwitchState` (in `InputHandler_CoreProtocol.swift`) manages smart Chinese-English switching:
 
 - **`isTempEnglishMode`**: When `true`, keystrokes flow to `englishBuffer` instead of the Zhuyin composer.
-- **`frozenSegments: [String]`**: Chinese/English text kept in preedit without committing to OS. Displayed as a prefix via `frozenDisplayText` in `generateStateOfInputting()`.
-- **`freezeSegment(_:)`**: Appends text to `frozenSegments`; `clearFrozenSegments()` wipes them.
+- **`FrozenSegment`**: Struct holding `value: String` (display text) and `keyArray: [String]?` (Zhuyin readings, `nil` for English). Phonetic segments allow candidate re-selection; English segments do not. `isPhonetic` is `true` when `keyArray` is non-nil and non-empty.
+- **`frozenSegments: [FrozenSegment]`**: Segments kept in preedit without committing to OS. Displayed as a prefix via `frozenDisplayText` in `generateStateOfInputting()`. Each phonetic segment stores per-character readings to support candidate re-selection.
+- **`freezeSegment(_:)`**: Appends a `FrozenSegment` (or convenience overloads with `String` / `String + keyArray`); `clearFrozenSegments()` wipes all segments and resets frozen cursor state.
+- **`frozenCursor: Int?`**: When non-nil, the cursor is inside the frozen segment area. `0` = before all frozen text; `frozenDisplayText.count` = immediately before the assembler. `enterFrozenCursorMode()` / `exitFrozenCursorMode()` / `moveFrozenCursorBackward()` / `moveFrozenCursorForward()` manage this. `moveFrozenCursorForward()` returns `false` and sets `frozenCursor = nil` when crossing the boundary back to the assembler.
+- **`frozenCandidateCharPosition: Int?`**: Set to the 0-based character position in `frozenDisplayText` when candidate re-selection is triggered for a frozen Chinese character. After the candidate is confirmed, `handleFrozenCandidateConfirmation()` replaces the character in-place, clears this field, and re-enters frozen cursor mode.
+- **`frozenTextSplitAroundCandidatePosition()`**: Returns `(before: String, after: String)` split of `frozenDisplayText` around `frozenCandidateCharPosition`. Used by `generateStateOfCandidates()` and `previewCurrentCandidateAtCompositionBuffer()` to embed assembler content within the frozen text context so that the PCB (floating composition window) always shows the full sentence during candidate navigation. **Both `cursor` and `marker` must be offset by `before.count`** to avoid erroneous highlights spanning the frozen prefix.
 - **`exitTempEnglishMode()`**: Calls `resetExceptFrozen()`, preserving `frozenSegments` across the mode switch.
-- **Shift toggle** (`handleShiftToggle()` in `Typewriter_Phonabet.swift`): The sole mechanism for switching between Chinese and English modes mid-composition. Chinese→English freezes assembler content into `frozenSegments` then calls `enterTempEnglishMode()`; English→Chinese freezes `englishBuffer` into `frozenSegments` then exits English mode.
+- **Shift toggle** (`handleShiftToggle()` in `Typewriter_Phonabet.swift`): The sole mechanism for switching between Chinese and English modes mid-composition. Chinese→English calls `freezeAssemblerContentIfNeeded()` (which freezes each assembler node as a `FrozenSegment` with its `keyArray`) then enters English mode; English→Chinese freezes `englishBuffer` into `frozenSegments` then exits English mode.
 - **ENTER commit pitfall**: `shouldResetSmartSwitchState()` must NOT include `input.isEnter`. ENTER is handled by `handleEnter()` → `committableDisplayText()`, which reads `frozenSegments` before committing. A premature `reset()` on ENTER would clear `frozenSegments` and lose all frozen prefix content.
 
 ### Lexicon
