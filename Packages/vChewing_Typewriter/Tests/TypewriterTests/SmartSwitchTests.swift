@@ -2004,4 +2004,45 @@ final class SmartSwitchTests {
       "frozenDisplayText should be empty after CapsLock switch, got: '\(testHandler.smartSwitchState.frozenDisplayText)'"
     )
   }
+
+  // MARK: - TC-055：ENTER 鍵提交含凍結段落的完整組字區
+
+  /// TC-055: 中文 → SHIFT英文 → SHIFT回中文 → 再打字 → ENTER 應提交所有內容（含凍結段落），
+  /// 不能因為 shouldResetSmartSwitchState(Enter) 提前清空 frozenSegments。
+  @Test("TC-055: Enter commits full composition including frozen segments from SmartSwitch")
+  func testEnterCommitsFrozenSegmentsPlusAssemblerContent() throws {
+    guard let testHandler, let testSession else {
+      Issue.record("testHandler or testSession is nil.")
+      return
+    }
+    let grams: [Megrez.Unigram] = [
+      .init(keyArray: ["ㄇㄚ˙"], value: "嗎", score: -1),
+    ]
+    grams.forEach { testHandler.currentLM.insertTemporaryData(unigram: $0, isFiltering: false) }
+    defer {
+      testHandler.currentLM.clearTemporaryData(isFiltering: false)
+      testHandler.clear()
+    }
+
+    resetTestState()
+    testSession.recentCommissions.removeAll()
+
+    // 1. 手動凍結「你hi」（模擬先打中文 → SHIFT英文 → SHIFT回中文後的凍結狀態）
+    testHandler.smartSwitchState.freezeSegment("你hi")
+    #expect(testHandler.smartSwitchState.frozenDisplayText == "你hi")
+    #expect(!testHandler.smartSwitchState.isTempEnglishMode)
+
+    // 2. 組字：打嗎（直接插入 key，模擬組字區有內容）
+    #expect(testHandler.assembler.insertKey("ㄇㄚ˙"))
+    testHandler.assemble()
+    testSession.switchState(testHandler.generateStateOfInputting())
+    #expect(testSession.state.displayedText == "你hi嗎")
+
+    // 3. 按 ENTER → 應提交「你hi嗎」，不能因為 reset() 清空 frozenSegments 而只剩「嗎」
+    #expect(testHandler.triageInput(event: KBEvent.KeyEventData.dataEnterReturn.asEvent))
+    #expect(
+      testSession.recentCommissions.joined() == "你hi嗎",
+      "Enter should commit all frozen + assembler content, got: '\(testSession.recentCommissions.joined())'"
+    )
+  }
 }

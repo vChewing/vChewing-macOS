@@ -603,9 +603,10 @@ extension PhonabetTypewriter {
 
   /// 檢查是否應該重置智慧切換狀態
   private func shouldResetSmartSwitchState(_ input: InputSignalProtocol) -> Bool {
-    // 當輸入 Enter、Esc 或其他特殊按鍵時重置
-    return input.isEnter || input.isEsc ||
-      (input.isControlHold || input.isCommandHold)
+    // Esc 與修飾鍵組合時重置智慧切換狀態。
+    // 注意：Enter 不在此列——handleEnter() 透過 committableDisplayText() 取得完整提交內容
+    // （含凍結段落），若在此處提前 reset() 會清空 frozenSegments，導致凍結段落丟失。
+    return input.isEsc || input.isControlHold || input.isCommandHold
   }
 
   /// 處理臨時英文模式下的按鍵輸入
