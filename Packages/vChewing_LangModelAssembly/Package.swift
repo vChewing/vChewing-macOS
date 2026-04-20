@@ -18,25 +18,37 @@ let package = Package(
     .package(path: "../vChewing_Homa"),
     .package(path: "../vChewing_Shared"),
     .package(path: "../vChewing_SwiftExtension"),
+    .package(path: "../vChewing_Tekkon"),
   ],
   targets: [
+    .target(name: "TrieKit"),
     .target(
       name: "LMAssemblyMaterials4Tests",
       resources: [
         .process("Resources"),
-      ],
-      swiftSettings: [
-        .defaultIsolation(MainActor.self), // set Default Actor Isolation
       ]
     ),
     .target(
       name: "LangModelAssembly",
       dependencies: [
         "LMAssemblyMaterials4Tests",
+        "TrieKit",
         .product(name: "LineReader", package: "RMJay_LineReader"),
         .product(name: "Homa", package: "vChewing_Homa"),
         .product(name: "Shared", package: "vChewing_Shared"),
         .product(name: "SwiftExtension", package: "vChewing_SwiftExtension"),
+      ],
+      swiftSettings: [
+        .defaultIsolation(MainActor.self), // set Default Actor Isolation
+      ]
+    ),
+    .testTarget(
+      name: "TrieKitTests",
+      dependencies: [
+        "TrieKit",
+        "LMAssemblyMaterials4Tests",
+        .product(name: "Homa", package: "vChewing_Homa"),
+        .product(name: "Tekkon", package: "vChewing_Tekkon"),
       ],
       swiftSettings: [
         .defaultIsolation(MainActor.self), // set Default Actor Isolation
@@ -48,6 +60,7 @@ let package = Package(
         "LangModelAssembly",
         .product(name: "Homa", package: "vChewing_Homa"),
         .product(name: "HomaSharedTestComponents", package: "vChewing_Homa"),
+        .product(name: "Tekkon", package: "vChewing_Tekkon"),
       ],
       swiftSettings: [
         .defaultIsolation(MainActor.self), // set Default Actor Isolation

@@ -319,9 +319,9 @@ struct LMInstantiatorTextMapTests {
     let instance = LMAssembly.LMInstantiator(isCHS: true)
     let textMap = makeTextMap([
       ("A-B-C", [("base", -9, 5)]),
-      ("Z-A-B-C", [("zval", -1, 5)]),
+      ("A-B-C-Z", [("zval", -1, 5)]),
       ("A-B-C-F", [("fval", -2, 5)]),
-      ("M-A-B-C-Q", [("mval", -3, 5)]),
+      ("A-B-C-M-Q", [("mval", -3, 5)]),
     ])
 
     #expect(LMAssembly.LMInstantiator.connectToTestFactoryDictionary(textMapData: textMap))

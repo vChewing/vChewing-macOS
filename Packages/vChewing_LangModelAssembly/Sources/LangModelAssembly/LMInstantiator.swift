@@ -10,6 +10,7 @@ import Foundation
 import Homa
 import Shared
 import SwiftExtension
+import TrieKit
 
 extension LMAssembly {
   typealias ScoreAssigner = (CandidateInState?) -> Double
@@ -64,7 +65,7 @@ extension LMAssembly {
     // 與關聯詞語有關的惰性載入器，可由外部登記。
     public static var associatesLazyLoader: (() -> ())?
 
-    public static var isFactoryDictionaryLoaded: Bool { factoryLexicon != nil }
+    public static var isFactoryDictionaryLoaded: Bool { factoryTrie != nil }
 
     // 簡體中文模型？
     public let isCHS: Bool
@@ -613,12 +614,12 @@ extension LMAssembly {
     static var lmCassette = LMCassette()
     static var lmPlainBopomofo = LMPlainBopomofo()
 
-    nonisolated static var factoryLexicon: FactoryTextMapLexicon? {
+    nonisolated static var factoryTrie: VanguardTrie.TextMapTrie? {
       get {
-        mtxFactoryLexicon.value
+        mtxFactoryTrie.value
       }
       set {
-        mtxFactoryLexicon.value = newValue
+        mtxFactoryTrie.value = newValue
       }
     }
 
@@ -712,7 +713,7 @@ extension LMAssembly {
 
     // MARK: Private
 
-    nonisolated private static let mtxFactoryLexicon: NSMutex<FactoryTextMapLexicon?> = .init(nil)
+    nonisolated private static let mtxFactoryTrie: NSMutex<VanguardTrie.TextMapTrie?> = .init(nil)
 
     nonisolated private let mtxLXPerceptor: NSMutex<LXPerceptor>
 
