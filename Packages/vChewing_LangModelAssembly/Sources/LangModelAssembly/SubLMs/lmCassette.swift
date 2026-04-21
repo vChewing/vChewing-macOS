@@ -21,7 +21,7 @@ import Megrez
 extension LMAssembly {
   /// 磁帶模組，用來方便使用者自行擴充字根輸入法。
   /// 以連續記憶體 Data blob + byte-range 索引取代各大型 Dictionary。
-  struct LMCassette: Sendable {
+  nonisolated struct LMCassette: Sendable {
     // MARK: Internal
 
     private(set) var filePath: String?
@@ -76,7 +76,7 @@ extension LMAssembly {
   /// 以連續 Data blob 承載的 sorted key→[value] 對照表。
   /// 所有 key / value 字串皆以 byte range 指向 `rawData`，
   /// 查詢時二分搜尋 + 按需物化，避免大量 String / Dictionary 開銷。
-  struct CassetteSortedMap: Sendable {
+  nonisolated struct CassetteSortedMap: Sendable {
     // MARK: Internal
 
     /// 唯一 key 數量。
@@ -95,7 +95,7 @@ extension LMAssembly {
   }
 
   /// CassetteSortedMap 的單筆 key entry。
-  struct CassetteMapEntry: Sendable {
+  nonisolated struct CassetteMapEntry: Sendable {
     let keyStart: Int
     let keyEnd: Int
     /// 指向 `allValues` 陣列的範圍。
@@ -104,13 +104,13 @@ extension LMAssembly {
   }
 
   /// Byte range 用以指向 rawData 中的一段 UTF-8 文字。
-  struct CassetteByteRange: Sendable {
+  nonisolated struct CassetteByteRange: Sendable {
     let start: Int
     let end: Int
   }
 
   /// 八股文 sorted map：字詞→頻次。
-  struct CassetteOctagramMap: Sendable {
+  nonisolated struct CassetteOctagramMap: Sendable {
     // MARK: Internal
 
     var count: Int { entries.count }
@@ -122,14 +122,14 @@ extension LMAssembly {
     fileprivate var entries: [CassetteOctagramEntry] = []
   }
 
-  struct CassetteOctagramEntry: Sendable {
+  nonisolated struct CassetteOctagramEntry: Sendable {
     let keyStart: Int
     let keyEnd: Int
     let count: Int
   }
 
   /// 八股文 divided sorted map：字詞→(頻次, 讀音)。
-  struct CassetteOctagramDividedMap: Sendable {
+  nonisolated struct CassetteOctagramDividedMap: Sendable {
     // MARK: Internal
 
     var count: Int { entries.count }
@@ -141,7 +141,7 @@ extension LMAssembly {
     fileprivate var entries: [CassetteOctagramDividedEntry] = []
   }
 
-  struct CassetteOctagramDividedEntry: Sendable {
+  nonisolated struct CassetteOctagramDividedEntry: Sendable {
     let keyStart: Int
     let keyEnd: Int
     let count: Int
@@ -152,7 +152,7 @@ extension LMAssembly {
 
 // MARK: - CassetteSortedMap: Binary Search & Query API
 
-extension LMAssembly.CassetteSortedMap {
+nonisolated extension LMAssembly.CassetteSortedMap {
   /// 二分搜尋精確匹配。
   fileprivate func binarySearchIndex(for key: String) -> Int? {
     let keyUTF8 = Array(key.utf8)
@@ -233,7 +233,7 @@ extension LMAssembly.CassetteSortedMap {
 
 // MARK: - CassetteOctagramMap: Binary Search
 
-extension LMAssembly.CassetteOctagramMap {
+nonisolated extension LMAssembly.CassetteOctagramMap {
   fileprivate func binarySearchIndex(for key: String) -> Int? {
     let keyUTF8 = Array(key.utf8)
     var lo = 0, hi = entries.count - 1
@@ -253,7 +253,7 @@ extension LMAssembly.CassetteOctagramMap {
   }
 }
 
-extension LMAssembly.CassetteOctagramDividedMap {
+nonisolated extension LMAssembly.CassetteOctagramDividedMap {
   fileprivate func binarySearchIndex(for key: String) -> Int? {
     let keyUTF8 = Array(key.utf8)
     var lo = 0, hi = entries.count - 1
@@ -277,7 +277,7 @@ extension LMAssembly.CassetteOctagramDividedMap {
 
 // MARK: - Data Extension: UTF-8 Byte-Level Comparison
 
-extension Data {
+nonisolated extension Data {
   fileprivate func cassetteCompareUTF8Range(_ range: Range<Int>, with rhs: [UInt8]) -> Int {
     let lhsCount = range.count
     let rhsCount = rhs.count
@@ -311,7 +311,7 @@ extension Data {
 
 // MARK: - CassetteSortedMap Builder
 
-extension LMAssembly.CassetteSortedMap {
+nonisolated extension LMAssembly.CassetteSortedMap {
   /// 直接從 grouped Dictionary 建構 sorted map，避免中間 `map {}` 與巢狀暫存陣列。
   static func build(from dictionary: [String: [String]]) -> Self {
     guard !dictionary.isEmpty else { return .init() }
@@ -497,7 +497,7 @@ extension LMAssembly.CassetteSortedMap {
 
 // MARK: - CassetteOctagramMap Builder
 
-extension LMAssembly.CassetteOctagramMap {
+nonisolated extension LMAssembly.CassetteOctagramMap {
   static func build(from dictionary: [String: Int]) -> Self {
     guard !dictionary.isEmpty else { return .init() }
     let sortedKeys = dictionary.keys.sorted { lhs, rhs in
@@ -521,7 +521,7 @@ extension LMAssembly.CassetteOctagramMap {
   }
 }
 
-extension LMAssembly.CassetteOctagramDividedMap {
+nonisolated extension LMAssembly.CassetteOctagramDividedMap {
   static func build(from dictionary: [String: (Int, String)]) -> Self {
     guard !dictionary.isEmpty else { return .init() }
     let sortedKeys = dictionary.keys.sorted { lhs, rhs in
@@ -559,7 +559,7 @@ extension LMAssembly.CassetteOctagramDividedMap {
 
 // MARK: - LMCassette Public API
 
-extension LMAssembly.LMCassette {
+nonisolated extension LMAssembly.LMCassette {
   /// 計算頻率時要用到的東西 - fscale
   private static let fscale = 2.7
   /// 萬用花牌字符，哪怕花牌鍵仍不可用。
