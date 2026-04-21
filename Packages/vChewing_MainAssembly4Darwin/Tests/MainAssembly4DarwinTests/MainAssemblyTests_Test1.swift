@@ -556,6 +556,83 @@ extension MainAssemblyTests {
   }
 
   @Test
+  func test108A_InputHandler_CassetteBackspaceShrinksCalligrapher() throws {
+    let dataPath = LMATestsData.getCINPath4Tests("array30", ext: "cin2")
+    guard let dataPath else {
+      Issue.record("無法存取用以測試的資料。當前嘗試存取：array30.cin2")
+      return
+    }
+    withSynchronousLMUserData {
+      testHandler.prefs.cassetteEnabled = true
+      LMMgr.syncLMPrefs()
+      LMAssembly.LMInstantiator.loadCassetteData(path: dataPath)
+      testSession.resetInputHandler(forceComposerCleanup: true)
+    }
+
+    typeSentenceOrCandidates(",,,")
+    #expect(testHandler.calligrapher == ",,,")
+    #expect(testSession.state.isCandidateContainer)
+
+    press(backspaceEvent)
+
+    #expect(testHandler.calligrapher == ",,")
+    #expect(testSession.state.type == .ofInputting)
+    #expect(testSession.state.displayedText.count < 6)
+  }
+
+  @Test
+  func test108B_InputHandler_CassetteBackspaceWorksAtFullCalligrapherLength() throws {
+    let dataPath = LMATestsData.getCINPath4Tests("wubi", ext: "cin")
+    guard let dataPath else {
+      Issue.record("無法存取用以測試的資料。當前嘗試存取：wubi.cin")
+      return
+    }
+    withSynchronousLMUserData {
+      testHandler.prefs.cassetteEnabled = true
+      testHandler.prefs.autoCompositeWithLongestPossibleCassetteKey = false
+      LMMgr.syncLMPrefs()
+      LMAssembly.LMInstantiator.loadCassetteData(path: dataPath)
+      testSession.resetInputHandler(forceComposerCleanup: true)
+    }
+
+    typeSentenceOrCandidates("qqqq")
+    #expect(testHandler.calligrapher == "qqqq")
+    #expect(testSession.state.type == .ofInputting)
+
+    press(backspaceEvent)
+
+    #expect(testHandler.calligrapher == "qqq")
+    #expect(testSession.state.type == .ofInputting)
+  }
+
+  @Test
+  func test108C_InputHandler_CassetteShiftBackspaceDisassemblesPreviousCalligraph() throws {
+    let dataPath = LMATestsData.getCINPath4Tests("wubi", ext: "cin")
+    guard let dataPath else {
+      Issue.record("無法存取用以測試的資料。當前嘗試存取：wubi.cin")
+      return
+    }
+    withSynchronousLMUserData {
+      testHandler.prefs.cassetteEnabled = true
+      testHandler.prefs.autoCompositeWithLongestPossibleCassetteKey = true
+      LMMgr.syncLMPrefs()
+      LMAssembly.LMInstantiator.loadCassetteData(path: dataPath)
+      testSession.resetInputHandler(forceComposerCleanup: true)
+    }
+
+    typeSentenceOrCandidates("qqqq")
+    #expect(testHandler.calligrapher.isEmpty)
+    #expect(testHandler.assembler.length == 1)
+    #expect(testSession.state.type == .ofInputting)
+
+    press(shiftBackspaceEvent)
+
+    #expect(testHandler.calligrapher == "qqqq")
+    #expect(testHandler.assembler.length == 0)
+    #expect(testSession.state.type == .ofInputting)
+  }
+
+  @Test
   func test109_InputHandler_CodePointInputCheck() throws {
     let testCodes: [(Shared.InputMode, String)] = [
       (.imeModeCHS, "C8D0"),

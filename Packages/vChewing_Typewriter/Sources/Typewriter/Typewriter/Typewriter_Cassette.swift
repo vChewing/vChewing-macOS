@@ -45,20 +45,17 @@ public struct CassetteTypewriter<Handler: InputHandlerProtocol>: TypewriterProto
     let skipStrokeHandling =
       input.isReservedKey || input.isNumericPadKey || input.isNonLaptopFunctionKey
         || input.isControlHold || input.isOptionHold || input.isCommandHold
-
-    let isLongestPossibleKeyFormed = shouldFormLongestCassetteKey(
-      isWildcardKeyInput: isWildcardKeyInput
-    )
-    let isStrokesFull = handler.calligrapher.count >= currentLM.maxCassetteKeyLength
-      || isLongestPossibleKeyFormed
+    let isCalligrapherFull = handler.calligrapher.count >= currentLM.maxCassetteKeyLength
+    var didAppendStroke = false
 
     // 進行筆畫預處理：阻擋非法按鍵、處理花牌開頭、更新組筆狀態與快選清單。
     if let handled = handleStrokePreprocessing(
       inputText: inputText,
       isWildcardKeyInput: isWildcardKeyInput,
-      isStrokesFull: isStrokesFull,
+      isCalligrapherFull: isCalligrapherFull,
       skipStrokeHandling: skipStrokeHandling,
       beganWithLetter: input.beganWithLetter,
+      didAppendStroke: &didAppendStroke,
       session: session
     ) {
       return handled
@@ -77,6 +74,12 @@ public struct CassetteTypewriter<Handler: InputHandlerProtocol>: TypewriterProto
       confirmCombination = confirmCombination || input.isEnter
     }
 
+    let isLongestPossibleKeyFormed = shouldFormLongestCassetteKey(
+      isWildcardKeyInput: isWildcardKeyInput
+    )
+    let isStrokesFull = handler.calligrapher.count >= currentLM.maxCassetteKeyLength
+      || isLongestPossibleKeyFormed
+
     // 決定是否要進行組字：滿筆長自動組字、花牌搭配筆畫、或空白/Enter 強制組字。
     var combineStrokes =
       (isStrokesFull && prefs.autoCompositeWithLongestPossibleCassetteKey)
@@ -90,6 +93,10 @@ public struct CassetteTypewriter<Handler: InputHandlerProtocol>: TypewriterProto
         session: session,
         prefs: prefs
       )
+    }
+
+    if didAppendStroke, !isWildcardKeyInput, !handler.calligrapher.isEmpty {
+      return renderQuickSetsIfNeeded(session: session, isStrokesFull: false)
     }
     return nil
   }
@@ -135,9 +142,10 @@ public struct CassetteTypewriter<Handler: InputHandlerProtocol>: TypewriterProto
   private func handleStrokePreprocessing(
     inputText: String,
     isWildcardKeyInput: Bool,
-    isStrokesFull: Bool,
+    isCalligrapherFull: Bool,
     skipStrokeHandling: Bool,
     beganWithLetter: Bool,
+    didAppendStroke: inout Bool,
     session: Session
   )
     -> Bool? {
@@ -148,14 +156,12 @@ public struct CassetteTypewriter<Handler: InputHandlerProtocol>: TypewriterProto
     if handler.calligrapher.isEmpty, isWildcardKeyInput {
       return handleLeadingWildcard(session: session, beganWithLetter: beganWithLetter)
     }
-    if isStrokesFull {
-      errorCallback("2268DD51: calligrapher is full, clearing calligrapher.")
-      handler.calligrapher.removeAll()
-    } else {
-      handler.calligrapher.append(inputText)
+    if isCalligrapherFull {
+      return handleFullCalligrapherInput(session: session)
     }
-    if isWildcardKeyInput { return nil }
-    return renderQuickSetsIfNeeded(session: session, isStrokesFull: isStrokesFull)
+    handler.calligrapher.append(inputText)
+    didAppendStroke = true
+    return nil
   }
 
   private func handleLeadingWildcard(session: Session, beganWithLetter: Bool) -> Bool? {
@@ -170,6 +176,16 @@ public struct CassetteTypewriter<Handler: InputHandlerProtocol>: TypewriterProto
     }
     handler.notificationCallback?("Wildcard key cannot be the initial key.".i18n)
     return nil
+  }
+
+  private func handleFullCalligrapherInput(session: Session) -> Bool {
+    errorCallback("2268DD51: calligrapher is full, clearing calligrapher.")
+    handler.calligrapher.removeAll()
+    switch handler.assembler.isEmpty {
+    case false: session.switchState(handler.generateStateOfInputting())
+    case true: session.switchState(State.ofAbortion())
+    }
+    return true
   }
 
   private func renderQuickSetsIfNeeded(session: Session, isStrokesFull: Bool) -> Bool? {

@@ -158,15 +158,10 @@ let mapKeyCodesANSIForTests: [String: UInt16] = [
   ".": 47, "/": 44, " ": 49,
 ]
 
-let cassetteURL4Array30CIN2 = URL(fileURLWithPath: #file)
-  .deletingLastPathComponent() // TypewriterTests 資料夾
-  .deletingLastPathComponent() // Tests 資料夾
-  .deletingLastPathComponent() // vChewing_Typewriter 專案資料夾
-  .deletingLastPathComponent() // Packages 根目錄
-  .appendingPathComponent("vChewing_LangModelAssembly")
-  .appendingPathComponent("Tests")
-  .appendingPathComponent("TestCINData")
-  .appendingPathComponent("array30.cin2")
+func cassetteURLForTests(_ fileNameStem: String, ext: String) -> URL? {
+  guard let path = LMATestsData.getCINPath4Tests(fileNameStem, ext: ext) else { return nil }
+  return URL(fileURLWithPath: path)
+}
 
 // MARK: - InputHandlerTests
 

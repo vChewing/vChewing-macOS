@@ -347,10 +347,8 @@ extension InputHandlerTests {
     testHandler.prefs.cassetteEnabled = true
     testHandler.currentTypingMethod = .vChewingFactory
 
-    let cassetteURL = cassetteURL4Array30CIN2
-
-    guard FileManager.default.fileExists(atPath: cassetteURL.path) else {
-      vCTestLog("測試檔案不存在，跳過測試：\(cassetteURL.path)")
+    guard let cassetteURL = cassetteURLForTests("array30", ext: "cin2") else {
+      Issue.record("無法存取用以測試的資料。當前嘗試存取的檔案：array30.cin2")
       return
     }
 
@@ -401,10 +399,8 @@ extension InputHandlerTests {
 
     testHandler.prefs.cassetteEnabled = true
 
-    let cassetteURL = cassetteURL4Array30CIN2
-
-    guard FileManager.default.fileExists(atPath: cassetteURL.path) else {
-      vCTestLog("測試檔案不存在，跳過測試：\(cassetteURL.path)")
+    guard let cassetteURL = cassetteURLForTests("array30", ext: "cin2") else {
+      Issue.record("無法存取用以測試的資料。當前嘗試存取的檔案：array30.cin2")
       return
     }
 
@@ -439,6 +435,154 @@ extension InputHandlerTests {
     // Typewriter 測試不會去測試選字窗的行為，這類行為的測試由 MainAssembly 測試負責。
     testSession.candidatePairSelectionConfirmed(at: 1)
     #expect(testSession.recentCommissions.last == "迷迷糊糊")
+  }
+
+  @Test
+  func test_IH105A_CassetteAutoCompositeWithLongestPossibleKey() throws {
+    guard let testHandler, let testSession else {
+      Issue.record("testHandler and testSession at least one of them is nil.")
+      return
+    }
+
+    let originalAsyncLoading = LMAssembly.LMInstantiator.asyncLoadingUserData
+    LMAssembly.LMInstantiator.asyncLoadingUserData = false
+    defer { LMAssembly.LMInstantiator.asyncLoadingUserData = originalAsyncLoading }
+
+    guard let cassetteURL = cassetteURLForTests("wubi", ext: "cin") else {
+      Issue.record("無法存取用以測試的資料。當前嘗試存取的檔案：wubi.cin")
+      return
+    }
+
+    LMAssembly.LMInstantiator.loadCassetteData(path: cassetteURL.path)
+
+    testHandler.clear()
+    testHandler.prefs.cassetteEnabled = true
+    testHandler.prefs.autoCompositeWithLongestPossibleCassetteKey = true
+
+    var reportedErrors = [String]()
+    testHandler.errorCallback = { reportedErrors.append($0) }
+    defer { testHandler.errorCallback = nil }
+
+    typeSentence("qqqq")
+
+    #expect(testHandler.calligrapher.isEmpty)
+    #expect(generateDisplayedText() == "金")
+    #expect(testSession.state.type == .ofInputting)
+    #expect(testSession.recentCommissions.last == nil)
+    #expect(reportedErrors.isEmpty)
+  }
+
+  @Test
+  func test_IH105B_CassetteOverflowDoesNotLeakToBlockedDataTrap() throws {
+    guard let testHandler, let testSession else {
+      Issue.record("testHandler and testSession at least one of them is nil.")
+      return
+    }
+
+    let originalAsyncLoading = LMAssembly.LMInstantiator.asyncLoadingUserData
+    LMAssembly.LMInstantiator.asyncLoadingUserData = false
+    defer { LMAssembly.LMInstantiator.asyncLoadingUserData = originalAsyncLoading }
+
+    guard let cassetteURL = cassetteURLForTests("wubi", ext: "cin") else {
+      Issue.record("無法存取用以測試的資料。當前嘗試存取的檔案：wubi.cin")
+      return
+    }
+
+    LMAssembly.LMInstantiator.loadCassetteData(path: cassetteURL.path)
+
+    testHandler.clear()
+    testHandler.prefs.cassetteEnabled = true
+    testHandler.prefs.autoCompositeWithLongestPossibleCassetteKey = false
+
+    var reportedErrors = [String]()
+    testHandler.errorCallback = { reportedErrors.append($0) }
+    defer { testHandler.errorCallback = nil }
+
+    typeSentence("qqqq")
+    #expect(testHandler.calligrapher == "qqqq")
+    #expect(testSession.state.type == .ofInputting)
+
+    let overflowHandled = testHandler.triageInput(event: KBEvent.KeyEventData(chars: "q").asEvent)
+
+    #expect(overflowHandled)
+    #expect(testHandler.calligrapher.isEmpty)
+    #expect(generateDisplayedText().isEmpty)
+    #expect(testSession.state.type == .ofEmpty)
+    #expect(reportedErrors.contains(where: { $0.contains("2268DD51") }))
+    #expect(!reportedErrors.contains(where: { $0.contains("A9BFF20E") }))
+  }
+
+  @Test
+  func test_IH105C_CassetteBackspaceWorksAtFullCalligrapherLength() throws {
+    guard let testHandler, let testSession else {
+      Issue.record("testHandler and testSession at least one of them is nil.")
+      return
+    }
+
+    let originalAsyncLoading = LMAssembly.LMInstantiator.asyncLoadingUserData
+    LMAssembly.LMInstantiator.asyncLoadingUserData = false
+    defer { LMAssembly.LMInstantiator.asyncLoadingUserData = originalAsyncLoading }
+
+    guard let cassetteURL = cassetteURLForTests("wubi", ext: "cin") else {
+      Issue.record("無法存取用以測試的資料。當前嘗試存取的檔案：wubi.cin")
+      return
+    }
+
+    LMAssembly.LMInstantiator.loadCassetteData(path: cassetteURL.path)
+
+    testHandler.clear()
+    testHandler.prefs.cassetteEnabled = true
+    testHandler.prefs.autoCompositeWithLongestPossibleCassetteKey = false
+
+    typeSentence("qqqq")
+    #expect(testHandler.calligrapher == "qqqq")
+    #expect(testSession.state.type == .ofInputting)
+
+    let backspaceHandled = testHandler.triageInput(event: KBEvent.KeyEventData.backspace.asEvent)
+
+    #expect(backspaceHandled)
+    #expect(testHandler.calligrapher == "qqq")
+    #expect(testSession.state.type == .ofInputting)
+  }
+
+  @Test
+  func test_IH105D_CassetteShiftBackspaceDisassemblesPreviousCalligraph() throws {
+    guard let testHandler, let testSession else {
+      Issue.record("testHandler and testSession at least one of them is nil.")
+      return
+    }
+
+    let originalAsyncLoading = LMAssembly.LMInstantiator.asyncLoadingUserData
+    LMAssembly.LMInstantiator.asyncLoadingUserData = false
+    defer { LMAssembly.LMInstantiator.asyncLoadingUserData = originalAsyncLoading }
+
+    guard let cassetteURL = cassetteURLForTests("wubi", ext: "cin") else {
+      Issue.record("無法存取用以測試的資料。當前嘗試存取的檔案：wubi.cin")
+      return
+    }
+
+    LMAssembly.LMInstantiator.loadCassetteData(path: cassetteURL.path)
+
+    testHandler.clear()
+    testHandler.prefs.cassetteEnabled = true
+    testHandler.prefs.autoCompositeWithLongestPossibleCassetteKey = true
+
+    typeSentence("qqqq")
+    #expect(testHandler.calligrapher.isEmpty)
+    #expect(testHandler.assembler.length == 1)
+    #expect(testSession.state.type == .ofInputting)
+
+    let shiftBackspace = KBEvent.KeyEventData(
+      flags: .shift,
+      chars: KBEvent.SpecialKey.backspace.unicodeScalar.description,
+      keyCode: KeyCode.kBackSpace.rawValue
+    ).asEvent
+    let shiftBackspaceHandled = testHandler.triageInput(event: shiftBackspace)
+
+    #expect(shiftBackspaceHandled)
+    #expect(testHandler.calligrapher == "qqqq")
+    #expect(testHandler.assembler.length == 0)
+    #expect(testSession.state.type == .ofInputting)
   }
 
   @Test
