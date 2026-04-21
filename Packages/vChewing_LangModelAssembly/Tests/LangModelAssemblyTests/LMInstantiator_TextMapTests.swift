@@ -311,7 +311,7 @@ struct LMInstantiatorTextMapTests {
   }
 
   @Test
-  func testFactorySupersetUnigramsFor() throws {
+  func testFactoryStrictSupersetUnigramsFor() throws {
     defer {
       LMAssembly.LMInstantiator.disconnectFactoryDictionary()
     }
@@ -325,7 +325,7 @@ struct LMInstantiatorTextMapTests {
     ])
 
     #expect(LMAssembly.LMInstantiator.connectToTestFactoryDictionary(textMapData: textMap))
-    let grams = instance.factorySupersetUnigramsFor(
+    let grams = instance.factoryStrictSupersetUnigramsFor(
       subsetKey: "A-B-C",
       subsetKeyArray: ["A", "B", "C"],
       column: .theDataCHS
@@ -336,6 +336,92 @@ struct LMInstantiatorTextMapTests {
     #expect(gramsContainValue(grams, "mval"))
     #expect(!gramsContainValue(grams, "base"))
     #expect(grams.first(where: { $0.current == "zval" })?.keyArray.count == 4)
+  }
+
+  @Test
+  func testFactoryPartialMatchIsControlledByConfigFlag() throws {
+    defer {
+      LMAssembly.LMInstantiator.disconnectFactoryDictionary()
+    }
+
+    let instance = LMAssembly.LMInstantiator(isCHS: true)
+    let textMap = makeTextMap([
+      ("A1-B2", [("partial", -9.9, 5)]),
+    ])
+
+    #expect(LMAssembly.LMInstantiator.connectToTestFactoryDictionary(textMapData: textMap))
+
+    instance.setOptions { config in
+      config.alwaysSupplyETenDOSUnigrams = false
+      config.partialMatchEnabled = false
+    }
+    #expect(instance.unigramsFor(keyArray: ["A&X", "B"]).isEmpty)
+    #expect(!instance.hasFactoryCoreUnigramsFor(keyArray: ["A&X", "B"]))
+
+    instance.setOptions { config in
+      config.partialMatchEnabled = true
+    }
+    #expect(gramsContainValue(instance.unigramsFor(keyArray: ["A&X", "B"]), "partial"))
+    #expect(instance.hasFactoryCoreUnigramsFor(keyArray: ["A&X", "B"]))
+  }
+
+  @Test
+  func testStrictSupersetStrategyRemainsDistinctFromConfiguredPartialLookup() throws {
+    defer {
+      LMAssembly.LMInstantiator.disconnectFactoryDictionary()
+    }
+
+    let instance = LMAssembly.LMInstantiator(isCHS: true)
+    let textMap = makeTextMap([
+      ("A1-B2", [("exact", -9.9, 5)]),
+      ("A1-B2-C3", [("superset", -8.8, 5)]),
+    ])
+
+    #expect(LMAssembly.LMInstantiator.connectToTestFactoryDictionary(textMapData: textMap))
+
+    instance.setOptions { config in
+      config.partialMatchEnabled = true
+    }
+
+    let configuredLookup = instance.factoryCoreUnigramsFor(
+      key: "A1-B2",
+      keyArray: ["A1", "B2"],
+      strategy: .configuredLookup
+    )
+    let strictSupersets = instance.factoryCoreUnigramsFor(
+      key: "A1-B2",
+      keyArray: ["A1", "B2"],
+      strategy: .strictSuperset
+    )
+
+    #expect(gramsContainValue(configuredLookup, "exact"))
+    #expect(!gramsContainValue(configuredLookup, "superset"))
+    #expect(gramsContainValue(strictSupersets, "superset"))
+    #expect(!gramsContainValue(strictSupersets, "exact"))
+  }
+
+  @Test
+  func testAssemblerFacadeMatchesLegacyUnigramSurface() throws {
+    defer {
+      LMAssembly.LMInstantiator.disconnectFactoryDictionary()
+    }
+
+    let instance = LMAssembly.LMInstantiator(isCHS: true)
+    #expect(LMAssembly.LMInstantiator.connectToTestFactoryDictionary(textMapData: LMATestsData.textMapTestCoreLMData))
+
+    instance.setOptions { config in
+      config.isCNSEnabled = true
+      config.isSymbolEnabled = true
+    }
+
+    let legacySurface = gramTriples(of: instance.unigramsFor(keyArray: strCakeKey))
+    let assemblerSurface = instance.lookupHub.grams(for: strCakeKey).map {
+      GramSnapshot(keyArray: $0.keyArray, value: $0.value, probability: $0.probability)
+    }
+
+    #expect(assemblerSurface == legacySurface)
+    #expect(instance.lookupHub.grams(for: strCakeKey).allSatisfy { $0.previous == nil })
+    #expect(instance.lookupHub.hasGrams(for: strCakeKey) == instance.hasUnigramsFor(keyArray: strCakeKey))
   }
 
   // MARK: Private

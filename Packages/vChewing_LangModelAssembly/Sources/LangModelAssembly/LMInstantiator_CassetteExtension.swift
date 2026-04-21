@@ -32,13 +32,6 @@ extension LMAssembly.LMInstantiator {
     return key.isEmpty ? nil : key
   }
 
-  /// 磁帶模式專用函式：調取 `%quick` 快速候選結果。
-  /// - Parameter key: 按鍵字元。
-  /// - Returns: 結果。
-  public func cassetteQuickSetsFor(key: String) -> String? {
-    Self.lmCassette.quickSetsFor(key: key)
-  }
-
   /// 磁帶模式專用函式：調取 `%quickphrases` 詞彙候選結果。
   /// - Parameter key: 按鍵字元。
   /// - Returns: 結果。
@@ -86,6 +79,37 @@ extension LMAssembly.LMInstantiator {
     return lookupResult.stableSort(by: { $0.count < $1.count }).stableSort {
       Self.lmCassette.unigramsFor(key: $0, keyArray: [$0]).count
         < Self.lmCassette.unigramsFor(key: $1, keyArray: [$1]).count
+    }
+  }
+}
+
+extension LMAssembly.LMInstantiator.LookupHub {
+  /// 磁帶模式專用函式：調取 `%quick` 快速候選結果。
+  /// - Parameter key: 按鍵字元。
+  /// - Returns: 結果。
+  public func cassetteQuickSets(
+    for key: String,
+    strategy: LMAssembly.LMInstantiator.SupplementalLookupStrategy
+  )
+    -> String? {
+    guard !key.isEmpty else { return nil }
+    switch strategy {
+    case .configuredLookup:
+      return LMAssembly.LMInstantiator.lmCassette.quickSetsFor(key: key)
+    case .exactMatch:
+      let exactMatches = (LMAssembly.LMInstantiator.lmCassette.charDefMap.valuesFor(key: key) ?? [])
+        .filter { $0.count == 1 }
+        .deduplicated
+        .prefix(LMAssembly.LMInstantiator.lmCassette.selectionKeys.count * 6)
+      return exactMatches.isEmpty ? nil : exactMatches.joined(separator: "\t")
+    case .partialMatch:
+      let partialMatches = LMAssembly.LMInstantiator.lmCassette.charDefMap.prefixScan(prefix: key)
+        .sorted { $0.key.count < $1.key.count }
+        .flatMap(\.values)
+        .filter { $0.count == 1 }
+        .deduplicated
+        .prefix(LMAssembly.LMInstantiator.lmCassette.selectionKeys.count * 6)
+      return partialMatches.isEmpty ? nil : partialMatches.joined(separator: "\t")
     }
   }
 }

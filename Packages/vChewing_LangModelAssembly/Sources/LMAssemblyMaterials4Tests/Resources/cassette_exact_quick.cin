@@ -1,0 +1,12 @@
+%ename ExactQuickFixture
+%cname 精確匹配測試
+%sname ETEST
+%selkey 1234567890
+%quick begin
+x 預設
+%quick end
+%chardef begin
+a 工
+aa 式
+ab 芯
+%chardef end

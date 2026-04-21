@@ -192,9 +192,10 @@ public struct CassetteTypewriter<Handler: InputHandlerProtocol>: TypewriterProto
     guard !isStrokesFull else { return nil }
     var result = handler.generateStateOfInputting()
     if !handler.calligrapher.isEmpty,
-       let fetched = handler.currentLM.cassetteQuickSetsFor(key: handler.calligrapher)?.split(
-         separator: "\t"
-       ) {
+       let fetched = handler.currentLM.lookupHub.cassetteQuickSets(
+         for: handler.calligrapher,
+         strategy: .configuredLookup
+       )?.split(separator: "\t") {
       result.candidates = fetched.enumerated().map {
         (keyArray: [($0.offset + 1).description], value: $0.element.description)
       }

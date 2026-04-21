@@ -39,13 +39,11 @@ public final class InputHandler: @MainActor InputHandlerProtocol {
     /// 將真正的 LM 查詢閉包綁至組字器。
     assembler.gramQuerier = { [weak self] keyArray in
       guard let self else { return [] }
-      return self.currentLM.unigramsFor(keyArray: keyArray).map {
-        (keyArray: $0.keyArray, value: $0.current, probability: $0.probability, previous: nil)
-      }
+      return self.currentLM.lookupHub.grams(for: keyArray)
     }
     assembler.gramAvailabilityChecker = { [weak self] keyArray in
       guard let self else { return false }
-      return self.currentLM.hasUnigramsFor(keyArray: keyArray)
+      return self.currentLM.lookupHub.hasGrams(for: keyArray)
     }
     /// 注拼槽初期化。
     ensureKeyboardParser()

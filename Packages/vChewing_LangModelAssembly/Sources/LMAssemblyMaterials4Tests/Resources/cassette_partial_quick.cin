@@ -1,0 +1,10 @@
+%ename PartialQuickFixture
+%cname 部分匹配測試
+%sname PTEST
+%selkey 1234567890
+%flag_disp_partial_match
+%chardef begin
+a 工
+aa 式
+ab 芯
+%chardef end

@@ -55,10 +55,89 @@ extension LMAssembly {
       public var isSymbolEnabled = false
       public var isSCPCEnabled = false
       public var alwaysSupplyETenDOSUnigrams = true
+      public var partialMatchEnabled = false
       public var filterNonCNSReadings = false
       public var deltaOfCalendarYears: Int = -2_000
       public var allowRescoringSingleKanjiCandidates = false
       public var bypassUserPhrasesData = false
+    }
+
+    public enum SupplementalLookupStrategy {
+      /// Route through the backend's current default lookup path.
+      case configuredLookup
+      /// Force exact-key lookup only.
+      case exactMatch
+      /// Force prefix-based partial lookup.
+      case partialMatch
+    }
+
+    /// 將收斂後的 lookup facade 集中到單一掛點。
+    /// 這讓下游呼叫端可比照 TrieHub 風格使用同一個 hub，而不是直接散落在 LMI 根型別上。
+    public struct LookupHub {
+      // MARK: Lifecycle
+
+      init(lmi: LMInstantiator) {
+        self.lmi = lmi
+      }
+
+      // MARK: Public
+
+      public func associatedCandidates(forPairs pairs: [Homa.CandidatePair]) -> [Homa.CandidatePairRAW] {
+        var inserted = Set<String>()
+        var result: [Homa.CandidatePairRAW] = []
+        pairs.forEach { pair in
+          lmi.associatedPhrasesFor(pair: pair).forEach { current in
+            guard inserted.insert(current).inserted else { return }
+            result.append((keyArray: [""], value: current))
+          }
+        }
+        return result
+      }
+
+      public func associatedCandidates(forPair pair: Homa.CandidatePair) -> [Homa.CandidatePairRAW] {
+        var pairs = [Homa.CandidatePair]()
+        var keyArray = pair.keyArray
+        var value = pair.value
+        while !keyArray.isEmpty {
+          if keyArray.count == value.count { pairs.append(.init(keyArray: keyArray, value: value)) }
+          pairs.append(.init(keyArray: [], value: value))
+          keyArray = Array(keyArray.dropFirst())
+          value = value.dropFirst().description
+        }
+        return associatedCandidates(forPairs: pairs)
+      }
+
+      public func supplementalValues(
+        for reading: String,
+        strategy: SupplementalLookupStrategy
+      )
+        -> [String] {
+        switch strategy {
+        case .configuredLookup:
+          if lmi.config.partialMatchEnabled {
+            return LMInstantiator.lmPlainBopomofo.partiallyMatchedValuesFor(prefix: reading, isCHS: lmi.isCHS)
+          }
+          return LMInstantiator.lmPlainBopomofo.valuesFor(key: reading, isCHS: lmi.isCHS)
+        case .exactMatch:
+          return LMInstantiator.lmPlainBopomofo.valuesFor(key: reading, isCHS: lmi.isCHS)
+        case .partialMatch:
+          return LMInstantiator.lmPlainBopomofo.partiallyMatchedValuesFor(prefix: reading, isCHS: lmi.isCHS)
+        }
+      }
+
+      public func grams(for keyArray: [String]) -> [Homa.GramRAW] {
+        lmi.unigramsFor(keyArray: keyArray).map {
+          (keyArray: $0.keyArray, value: $0.current, probability: $0.probability, previous: nil)
+        }
+      }
+
+      public func hasGrams(for keyArray: [String]) -> Bool {
+        lmi.hasUnigramsFor(keyArray: keyArray)
+      }
+
+      // MARK: Fileprivate
+
+      fileprivate let lmi: LMInstantiator
     }
 
     public static var asyncLoadingUserData: Bool = true
@@ -74,6 +153,8 @@ extension LMAssembly {
     public private(set) var config = Config()
 
     public internal(set) var inputTokenHashesArray: Set<Int> = []
+
+    public var lookupHub: LookupHub { .init(lmi: self) }
 
     public var isCassetteDataLoaded: Bool { Self.lmCassette.isLoaded }
 
@@ -375,10 +456,6 @@ extension LMAssembly {
         lmUserSymbols.replaceData(textData: rawText)
         if save { lmUserSymbols.saveData() }
       }
-    }
-
-    public func queryETenDOSSequence(reading: String) -> [String] {
-      Self.lmPlainBopomofo.valuesFor(key: reading, isCHS: isCHS)
     }
 
     /// 根據給定的索引鍵來確認各個資料庫陣列內是否存在對應的資料。

@@ -46,12 +46,24 @@ extension LMAssembly.LMInstantiator {
       case .theDataCHEW: return [10]
       }
     }
+
+    fileprivate var trieEntryType: VanguardTrie.Trie.EntryType {
+      .init(rawValue: textMapTypeIDs.reduce(into: Int32(0)) { $0 |= $1 })
+    }
   }
 }
 
 // MARK: - Factory Dictionary Lifecycle
 
 extension LMAssembly.LMInstantiator {
+  public enum FactoryCoreLookupStrategy {
+    /// Route through the normal factory lookup path, respecting current config switches
+    /// such as `partialMatchEnabled`.
+    case configuredLookup
+    /// Return only longer complete-key matches. This is independent from partial match.
+    case strictSuperset
+  }
+
   @discardableResult
   public static func connectFactoryDictionary(
     textMapPath: String,
@@ -145,20 +157,36 @@ extension LMAssembly.LMInstantiator {
   public func factoryCoreUnigramsFor(
     key: String,
     keyArray: [String],
-    onlyFindSupersets: Bool = false
+    strategy: FactoryCoreLookupStrategy = .configuredLookup
   )
     -> [Homa.Gram] {
-    if onlyFindSupersets {
-      return factorySupersetUnigramsFor(
+    switch strategy {
+    case .configuredLookup:
+      return factoryUnigramsFor(
+        key: key,
+        keyArray: keyArray,
+        column: isCHS ? .theDataCHS : .theDataCHT
+      )
+    case .strictSuperset:
+      return factoryStrictSupersetUnigramsFor(
         subsetKey: key,
         subsetKeyArray: keyArray,
         column: isCHS ? .theDataCHS : .theDataCHT
       )
     }
-    return factoryUnigramsFor(
+  }
+
+  @available(*, deprecated, message: "Use strategy: .strictSuperset or .configuredLookup instead of onlyFindSupersets.")
+  public func factoryCoreUnigramsFor(
+    key: String,
+    keyArray: [String],
+    onlyFindSupersets: Bool
+  )
+    -> [Homa.Gram] {
+    factoryCoreUnigramsFor(
       key: key,
       keyArray: keyArray,
-      column: isCHS ? .theDataCHS : .theDataCHT
+      strategy: onlyFindSupersets ? .strictSuperset : .configuredLookup
     )
   }
 
@@ -170,6 +198,13 @@ extension LMAssembly.LMInstantiator {
     -> [Homa.Gram] {
     if key == "_punctuation_list" { return [] }
     guard let trie = Self.factoryTrie else { return [] }
+    if config.partialMatchEnabled {
+      return factoryPartiallyMatchedUnigramsFor(
+        queryKeyArray: keyArray,
+        column: column,
+        trie: trie
+      )
+    }
     let encryptedKeyArray = keyArray.map { Self.convertPhonabetToASCII($0) }
     let nodes = trie.getNodes(
       keyArray: encryptedKeyArray,
@@ -188,7 +223,7 @@ extension LMAssembly.LMInstantiator {
     )
   }
 
-  func factorySupersetUnigramsFor(
+  func factoryStrictSupersetUnigramsFor(
     subsetKey: String,
     subsetKeyArray: [String],
     column: LMAssembly.LMInstantiator.CoreColumn
@@ -217,6 +252,24 @@ extension LMAssembly.LMInstantiator {
     }
   }
 
+  func factoryPartiallyMatchedUnigramsFor(
+    queryKeyArray: [String],
+    column: LMAssembly.LMInstantiator.CoreColumn,
+    trie: VanguardTrie.TextMapTrie
+  )
+    -> [Homa.Gram] {
+    let encryptedKeyArray = queryKeyArray.map { Self.convertPhonabetToASCII($0) }
+    let queriedGrams = trie.queryGrams(
+      encryptedKeyArray,
+      filterType: column.trieEntryType,
+      partiallyMatch: true
+    )
+    return makeFactoryUnigrams(
+      queriedGrams: queriedGrams,
+      includeHalfWidthVariants: true
+    )
+  }
+
   internal func factoryCNSFilterThreadFor(key: String) -> String? {
     if key == "_punctuation_list" { return nil }
     guard let trie = Self.factoryTrie else { return nil }
@@ -237,7 +290,15 @@ extension LMAssembly.LMInstantiator {
   func hasFactoryCoreUnigramsFor(keyArray: [String]) -> Bool {
     guard let trie = Self.factoryTrie else { return false }
     let encryptedKeyArray = keyArray.map { Self.convertPhonabetToASCII($0) }
-    let typeIDs = (isCHS ? CoreColumn.theDataCHS : CoreColumn.theDataCHT).textMapTypeIDs
+    let column = isCHS ? CoreColumn.theDataCHS : CoreColumn.theDataCHT
+    if config.partialMatchEnabled {
+      return trie.hasGrams(
+        encryptedKeyArray,
+        filterType: column.trieEntryType,
+        partiallyMatch: true
+      )
+    }
+    let typeIDs = column.textMapTypeIDs
     let nodes = trie.getNodes(
       keyArray: encryptedKeyArray,
       filterType: [],
@@ -296,6 +357,40 @@ extension LMAssembly.LMInstantiator {
         extraHalfWidthGrams.append(
           .init(
             keyArray: keyArray,
+            value: halfWidthValue,
+            score: score - Self.generatedHalfWidthPunctuationPenalty
+          )
+        )
+      }
+    }
+
+    grams.append(contentsOf: extraHalfWidthGrams)
+    return grams
+  }
+
+  private func makeFactoryUnigrams(
+    queriedGrams: [(keyArray: [String], value: String, probability: Double, previous: String?)],
+    includeHalfWidthVariants: Bool
+  )
+    -> [Homa.Gram] {
+    var grams: [Homa.Gram] = []
+    var extraHalfWidthGrams: [Homa.Gram] = []
+    for queriedGram in queriedGrams {
+      var score = queriedGram.probability
+      if score > 0 {
+        score *= -1
+      }
+
+      let restoredKeyArray = queriedGram.keyArray.map { Self.restorePhonabetFromASCII($0) }
+      grams.append(.init(keyArray: restoredKeyArray, value: queriedGram.value, score: score))
+
+      let sourceKey = queriedGram.keyArray.joined(separator: "-")
+      guard includeHalfWidthVariants, sourceKey.contains("_punctuation") else { continue }
+      let halfWidthValue = queriedGram.value.applyingTransformFW2HW(reverse: false)
+      if halfWidthValue != queriedGram.value {
+        extraHalfWidthGrams.append(
+          .init(
+            keyArray: restoredKeyArray,
             value: halfWidthValue,
             score: score - Self.generatedHalfWidthPunctuationPenalty
           )

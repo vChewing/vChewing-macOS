@@ -554,19 +554,7 @@ extension InputHandlerProtocol {
     keyArray: [String],
     value: String
   )] {
-    var arrResult: [CandidateInState] = []
-    pairs.forEach { pair in
-      if currentLM.hasAssociatedPhrasesFor(pair: pair) {
-        let arrFetched: [String] = currentLM.associatedPhrasesFor(pair: pair)
-        arrFetched.forEach { thingToAdd in
-          // keyArray 對關聯詞語候選字詞而言（現階段）毫無意義。這裡只判斷 value。
-          if !arrResult.map(\.value).contains(thingToAdd) {
-            arrResult.append((keyArray: [""], value: thingToAdd))
-          }
-        }
-      }
-    }
-    return arrResult
+    currentLM.lookupHub.associatedCandidates(forPairs: pairs)
   }
 
   /// 用以組建關聯詞語陣列的函式，生成的內容不包含重複的結果。
@@ -577,17 +565,7 @@ extension InputHandlerProtocol {
     keyArray: [String],
     value: String
   )] {
-    var pairs = [Homa.CandidatePair]()
-    var keyArray = pair.keyArray
-    var value = pair.value
-    while !keyArray.isEmpty {
-      // 關聯詞語處理用不到組字引擎，故不需要 score。
-      if keyArray.count == value.count { pairs.append(.init(keyArray: keyArray, value: value)) }
-      pairs.append(.init(key: "", value: value)) // 保底。
-      keyArray = Array(keyArray.dropFirst())
-      value = value.dropFirst().description
-    }
-    return generateArrayOfAssociates(withPairs: pairs)
+    currentLM.lookupHub.associatedCandidates(forPair: pair)
   }
 
   /// 用來計算離當前游標最近的一個節點邊界的距離的函式。
@@ -648,7 +626,10 @@ extension InputHandlerProtocol {
     if currentTypingMethod == .vChewingFactory,
        let eTenCandidates = segregateCandidatesForETenDOS(from: arrCandidates) {
       eTenSequenceEnforcement: if prefs.enforceETenDOSCandidateSequence {
-        let seq4ETen = currentLM.queryETenDOSSequence(reading: eTenCandidates.reading)
+        let seq4ETen = currentLM.lookupHub.supplementalValues(
+          for: eTenCandidates.reading,
+          strategy: .configuredLookup
+        )
         guard !seq4ETen.isEmpty else { break eTenSequenceEnforcement }
         let arrSeq4ETen: [Homa.CandidatePair] = seq4ETen.map {
           .init(key: eTenCandidates.reading, value: $0)
@@ -713,7 +694,10 @@ extension InputHandlerProtocol {
     -> [Homa.CandidatePair] {
     let existingValues = Set(existingSingleSegments.map(\.value))
     var insertedValues = Set<String>()
-    return currentLM.queryETenDOSSequence(reading: reading).compactMap { currentValue in
+    return currentLM.lookupHub.supplementalValues(
+      for: reading,
+      strategy: .configuredLookup
+    ).compactMap { currentValue in
       guard currentValue.count == 1 else { return nil }
       guard currentValue.unicodeScalars.allSatisfy({ $0.properties.isIdeographic }) else {
         return nil

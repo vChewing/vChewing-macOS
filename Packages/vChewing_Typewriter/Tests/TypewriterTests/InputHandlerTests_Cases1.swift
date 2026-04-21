@@ -881,7 +881,7 @@ extension InputHandlerTests {
 
     let reading = "ㄅㄛ"
     let eTenSequence = uniqueSingleIdeographicValues(
-      testHandler.currentLM.queryETenDOSSequence(reading: reading)
+      testHandler.currentLM.lookupHub.supplementalValues(for: reading, strategy: .configuredLookup)
     )
     guard eTenSequence.count >= 4 else {
       Issue.record("倚天中文 DOS 序列表測試資料不足：\(reading)")
@@ -931,7 +931,7 @@ extension InputHandlerTests {
 
     let reading = "ㄅㄛ"
     let eTenSequence = uniqueSingleIdeographicValues(
-      testHandler.currentLM.queryETenDOSSequence(reading: reading)
+      testHandler.currentLM.lookupHub.supplementalValues(for: reading, strategy: .configuredLookup)
     )
     guard eTenSequence.count >= 4 else {
       Issue.record("倚天中文 DOS 序列表測試資料不足：\(reading)")
