@@ -106,6 +106,23 @@ struct TekkonTestsPinyin {
     #expect(toneMarkerIndicator)
   }
 
+  @Test("[Tekkon] Composer_PinyinAutoChopResult")
+  func testPinyinAutoChopResult() async throws {
+    var composer = Tekkon.Composer(arrange: .ofHanyuPinyin)
+
+    composer.receiveKey(fromString: "s")
+    composer.receiveKey(fromString: "h")
+    composer.receiveKey(fromString: "i")
+
+    let autoChop = try #require(composer.pinyinAutoChopResult(appending: "j"))
+    #expect(autoChop.committedReadings == ["ㄕ"])
+    #expect(autoChop.remainingRomaji == "j")
+
+    composer.replacePinyinBuffer(with: autoChop.remainingRomaji)
+    #expect(composer.getInlineCompositionForDisplay(isHanyuPinyin: true) == "j")
+    #expect(!composer.isPronounceable)
+  }
+
   @Test("[Tekkon] Composer_InputAndComposition_YalePinyin")
   func testYalePinyinKeyReceivingAndCompositions() async throws {
     var composer = Tekkon.Composer(arrange: .ofYalePinyin)

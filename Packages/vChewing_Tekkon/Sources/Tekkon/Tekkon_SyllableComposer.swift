@@ -37,6 +37,24 @@ extension Tekkon {
 
     // MARK: Public
 
+    /// 描述連續拼音輸入在當前拍次應如何自動 chop 的結果。
+    public struct PinyinAutoChopResult: Codable, Hashable, Sendable {
+      // MARK: Lifecycle
+
+      public init(committedReadings: [String], remainingRomaji: String) {
+        self.committedReadings = committedReadings
+        self.remainingRomaji = remainingRomaji
+      }
+
+      // MARK: Public
+
+      /// 已確認可先行送交組字器的前段注音讀音鍵。
+      public let committedReadings: [String]
+
+      /// 保留在拼音組音區內、等待後續輸入的尾段羅馬字串。
+      public let remainingRomaji: String
+    }
+
     /// 聲母。
     public internal(set) var consonant: Phonabet = .init()
 
@@ -221,6 +239,50 @@ extension Tekkon {
         receiveSequence(romajiBufferBackup, isRomaji: true)
         romajiBuffer = romajiBufferBackup
       }
+    }
+
+    /// 在拼音模式下試算「當前 buffer 加上新字元」是否應自動 chop 前段有效讀音。
+    ///
+    /// 僅當整體延伸後已不再是單一可唸讀音、但 chop 後除最後一段以外都能對應成完整拼音時，
+    /// 才會回傳可提交的前段注音讀音與應保留的尾段拼音 buffer。
+    /// - Parameter input: 本拍欲追加的單一拼音字元。
+    /// - Returns: 自動 chop 的結果；若本拍不應觸發自動 chop 則回傳 nil。
+    public func pinyinAutoChopResult(appending input: String) -> PinyinAutoChopResult? {
+      guard isPinyinMode, intonation.isEmpty else { return nil }
+      guard let scalar = input.unicodeScalars.first else { return nil }
+      guard inputValidityCheck(charStr: input) else { return nil }
+      guard Tekkon.mapArayuruPinyinIntonation[scalar] == nil else { return nil }
+      guard let readingMap = parser.mapZhuyinPinyin else { return nil }
+
+      let appended = romajiBuffer + scalar.description
+      var validationComposer = self
+      validationComposer.clear()
+      validationComposer.receiveSequence(appended, isRomaji: true)
+      guard !validationComposer.isPronounceable else { return nil }
+
+      let chopped = Tekkon.PinyinTrie(parser: parser).chop(appended)
+      guard chopped.count >= 2, let remainingRomaji = chopped.last else { return nil }
+
+      let leadingSlices = Array(chopped.dropLast())
+      guard !leadingSlices.isEmpty else { return nil }
+
+      let committedReadings = leadingSlices.compactMap { readingMap[$0] }
+      guard committedReadings.count == leadingSlices.count else { return nil }
+
+      return .init(
+        committedReadings: committedReadings,
+        remainingRomaji: remainingRomaji
+      )
+    }
+
+    /// 以指定的拼音字串重建拼音組音區內容。
+    /// - Parameter romaji: 欲保留在拼音組音區內的羅馬字串。
+    public mutating func replacePinyinBuffer(with romaji: String) {
+      guard isPinyinMode else { return }
+      clear()
+      guard !romaji.isEmpty else { return }
+      receiveSequence(romaji, isRomaji: true)
+      romajiBuffer = romaji
     }
 
     /// 接受傳入的按鍵訊號時的處理，處理對象為 UniChar。
