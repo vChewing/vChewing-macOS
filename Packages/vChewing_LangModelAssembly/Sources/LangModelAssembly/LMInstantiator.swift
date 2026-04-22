@@ -501,8 +501,8 @@ extension LMAssembly {
         : unigramsFor(keyArray: keyArray).count
     }
 
-    /// 給定讀音字串，讓 LMI 給出對應的經過處理的單元圖陣列。
-    /// - Parameter key: 給定的讀音字串。
+    /// 給定讀音索引鍵陣列，讓 LMI 給出對應的經過處理的單元圖陣列。
+    /// - Parameter keyArray: 給定的讀音索引鍵陣列。
     /// - Returns: 對應的經過處理的單元圖陣列。
     public func unigramsFor(keyArray: [String]) -> [Homa.Gram] {
       // `config.bypassUserPhrasesData` 啟用時，除了 Associated Phrases 以外的資料全部忽略。
@@ -512,6 +512,9 @@ extension LMAssembly {
       /// 給空格鍵指定輸出值。
       let asciiSpace = " "
       if keyArray == [asciiSpace] { return [.init(keyArray: keyArray, value: asciiSpace)] }
+      if keyArray.joined().contains("&") {
+        return mergedAlternativeBucketUnigrams(for: keyArray)
+      }
 
       /// 準備不同的語言模組容器，開始逐漸往容器陣列內塞入資料。
       var rawAllUnigrams: [Homa.Gram] = []
@@ -797,6 +800,49 @@ extension LMAssembly {
     // MARK: - 工具函式
 
     private let prefs = PrefMgr.sharedSansDidSetOps
+
+    /// 合併單一位置含有多個讀音候選時的 full-match 檢索結果。
+    ///
+    /// 這裡不走 generic partial-match，而是先將 `&` alternatives 展開成所有可能的
+    /// keyArray 組合，再逐一做 full-match 查詢，最後合併去重。
+    /// - Parameter keyArray: 可能包含 `&` alternatives 的讀音索引鍵陣列。
+    /// - Returns: 合併並去重後的單元圖陣列。
+    private func mergedAlternativeBucketUnigrams(for keyArray: [String]) -> [Homa.Gram] {
+      var merged = [Homa.Gram]()
+      var handled = Set<Homa.Gram>()
+      expandAlternativeKeyArrays(from: keyArray).forEach { expandedKeyArray in
+        unigramsFor(keyArray: expandedKeyArray).forEach { currentGram in
+          guard handled.insert(currentGram).inserted else { return }
+          merged.append(currentGram)
+        }
+      }
+      merged.consolidate()
+      return merged
+    }
+
+    /// 將帶有 `&` alternatives 的讀音索引鍵陣列展開為所有可能的 full-match 組合。
+    /// - Parameter keyArray: 可能包含 `&` alternatives 的讀音索引鍵陣列。
+    /// - Returns: 展開後的所有 keyArray 組合；若原始輸入不含 `&`，則回傳自身作為唯一結果。
+    private func expandAlternativeKeyArrays(from keyArray: [String]) -> [[String]] {
+      guard keyArray.joined().contains("&") else { return [keyArray] }
+      var combinations = [[String]]()
+
+      func visit(index: Int, current: [String]) {
+        if index >= keyArray.count {
+          combinations.append(current)
+          return
+        }
+
+        for candidate in keyArray[index].split(separator: "&") {
+          var next = current
+          next.append(candidate.description)
+          visit(index: index + 1, current: next)
+        }
+      }
+
+      visit(index: 0, current: [])
+      return combinations
+    }
 
     /// 當 HashMap 過大時自動清理
     private func cleanupInputTokenHashMapIfNeeded() {

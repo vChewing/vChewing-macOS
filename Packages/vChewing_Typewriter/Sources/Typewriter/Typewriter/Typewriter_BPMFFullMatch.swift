@@ -28,16 +28,9 @@ public struct BPMFFullMatchTypewriter<Handler: InputHandlerProtocol>: Typewriter
   /// - Returns: 告知 IMK「該按鍵是否已經被輸入法攔截處理」。
   public func handle(_ input: some InputSignalProtocol) -> Bool? {
     guard let session = handler.session else { return nil }
-    let prefs = handler.prefs
-    // 注音模式目前採完整讀音配對。
-    if handler.currentLM.config.partialMatchEnabled {
-      handler.currentLM.setOptions { config in
-        config.partialMatchEnabled = false
-      }
-    }
-
     var inputText = (input.inputTextIgnoringModifiers ?? input.text)
     inputText = inputText.lowercased().applyingTransformFW2HW(reverse: false)
+    let prefs = handler.prefs
     let existedIntonation = handler.composer.intonation
     let skipPhoneticHandling =
       input.isReservedKey || input.isNumericPadKey || input.isNonLaptopFunctionKey
@@ -60,6 +53,7 @@ public struct BPMFFullMatchTypewriter<Handler: InputHandlerProtocol>: Typewriter
       input: input,
       inputText: inputText,
       confirmCombination: confirmCombination,
+      existedIntonation: existedIntonation,
       prefs: prefs,
       session: session
     ) {
@@ -82,6 +76,67 @@ public struct BPMFFullMatchTypewriter<Handler: InputHandlerProtocol>: Typewriter
 
   private var intonationKeyBehavior: IntonationKeyBehavior {
     .init(pref: handler.prefs)
+  }
+
+  /// 生成本次組字查詢要使用的讀音索引鍵。
+  ///
+  /// 若本次是拼音無調的確認組字，則會將單一讀音擴成同音節的聲調候選桶；
+  /// 否則維持既有的單一 full-match 索引鍵。
+  /// - Parameters:
+  ///   - confirmCombination: 是否為用來確認組字的按鍵。
+  ///   - existedIntonation: 接收本拍按鍵之前，composer 內既有的聲調狀態。
+  ///   - prefs: 與讀音查詢相關的偏好設定。
+  /// - Returns: 可供語言模組檢索的讀音索引鍵；若目前讀音尚不可查詢則回傳 nil。
+  private func readingKeyForQuery(
+    confirmCombination: Bool,
+    existedIntonation: Tekkon.Phonabet,
+    prefs: some PrefMgrProtocol
+  )
+    -> String? {
+    guard let readingKey = handler.composer.phonabetKeyForQuery(
+      pronounceableOnly: prefs.acceptLeadingIntonations
+    ) else {
+      return nil
+    }
+    guard shouldUseToneInsensitivePinyinLookup(
+      confirmCombination: confirmCombination,
+      existedIntonation: existedIntonation
+    ) else {
+      return readingKey
+    }
+    return makeToneInsensitivePinyinQueryKey(from: readingKey)
+  }
+
+  /// 判斷本次是否應將無調拼音改以聲調候選桶查詢。
+  /// - Parameters:
+  ///   - confirmCombination: 是否為用來確認組字的按鍵。
+  ///   - existedIntonation: 接收本拍按鍵之前，composer 內既有的聲調狀態。
+  /// - Returns: 僅當本次為拼音模式下的無調確認組字時回傳 true。
+  private func shouldUseToneInsensitivePinyinLookup(
+    confirmCombination: Bool,
+    existedIntonation: Tekkon.Phonabet
+  )
+    -> Bool {
+    let composer = handler.composer
+    return confirmCombination
+      && composer.isPinyinMode
+      && composer.isPronounceable
+      && existedIntonation.isEmpty
+  }
+
+  /// 將單一無調拼音讀音展開成同音節的聲調候選桶。
+  /// - Parameter readingKey: 不帶顯式聲調的單一讀音索引鍵。
+  /// - Returns: 以 `&` 串接的多讀音索引鍵，用來限定在同音節的不同聲調變體內查詢。
+  private func makeToneInsensitivePinyinQueryKey(from readingKey: String) -> String {
+    var toneVariants = [String]()
+    Tekkon.allowedIntonations.forEach { tone in
+      let intonationNow = (tone != " ") ? String(tone) : ""
+      let candidate = "\(readingKey)\(intonationNow)"
+      if !toneVariants.contains(candidate) {
+        toneVariants.append(candidate)
+      }
+    }
+    return toneVariants.joined(separator: "&")
   }
 
   private func consumeReadingInputIfNeeded(
@@ -122,6 +177,7 @@ public struct BPMFFullMatchTypewriter<Handler: InputHandlerProtocol>: Typewriter
     input: some InputSignalProtocol,
     inputText: String,
     confirmCombination: Bool,
+    existedIntonation: Tekkon.Phonabet,
     prefs: some PrefMgrProtocol,
     session: Session
   )
@@ -137,8 +193,11 @@ public struct BPMFFullMatchTypewriter<Handler: InputHandlerProtocol>: Typewriter
       return handler.handleEnter(input: input, readingOnly: true)
     }
 
-    let maybeKey = handler.composer.phonabetKeyForQuery(pronounceableOnly: prefs.acceptLeadingIntonations)
-    guard let readingKey = maybeKey else { return nil }
+    guard let readingKey = readingKeyForQuery(
+      confirmCombination: confirmCombination,
+      existedIntonation: existedIntonation,
+      prefs: prefs
+    ) else { return nil }
 
     if !handler.currentLM.hasUnigramsFor(keyArray: [readingKey]) {
       errorCallback("B49C0979：語彙庫內無「\(readingKey)」的匹配記錄。")

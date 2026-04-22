@@ -1029,4 +1029,165 @@ extension InputHandlerTests {
     testSession.candidatePairSelectionConfirmed(at: selectedIndex)
     #expect(generateDisplayedText() == "播")
   }
+
+  @Test
+  func test_IH114_PinyinTonelessQueryUsesStemPartialMatch() throws {
+    guard let testHandler, let testSession else {
+      Issue.record("testHandler and testSession at least one of them is nil.")
+      return
+    }
+    clearTestPOM()
+
+    let factoryTypeID: Int32 = testHandler.currentLM.isCHS ? 5 : 6
+    let customTone2Value = "伯測"
+    let customTone4Value = "播測"
+    let textMap = makeTypingTextMap([
+      ("bo2", [(value: customTone2Value, probability: -5, typeID: factoryTypeID)]),
+      ("bo4", [(value: customTone4Value, probability: -4.5, typeID: factoryTypeID)]),
+    ])
+
+    defer {
+      testHandler.prefs.keyboardParser = KeyboardParser.ofStandard.rawValue
+      testHandler.ensureKeyboardParser()
+      testHandler.prefs.useSCPCTypingMode = false
+      testHandler.prefs.fetchSuggestionsFromPerceptionOverrideModel = true
+      testHandler.currentLM.setOptions { config in
+        config.partialMatchEnabled = false
+      }
+      LMAssembly.LMInstantiator.disconnectFactoryDictionary()
+      #expect(LMAssembly.LMInstantiator.connectToTestFactoryDictionary(textMapData: LMATestsData.textMapTestCoreLMData))
+      testSession.resetInputHandler(forceComposerCleanup: true)
+    }
+
+    LMAssembly.LMInstantiator.disconnectFactoryDictionary()
+    #expect(LMAssembly.LMInstantiator.connectToTestFactoryDictionary(textMapData: textMap))
+    testSession.resetInputHandler(forceComposerCleanup: true)
+    testHandler.prefs.keyboardParser = KeyboardParser.ofHanyuPinyin.rawValue
+    testHandler.ensureKeyboardParser()
+    testHandler.prefs.useSCPCTypingMode = false
+    testHandler.prefs.fetchSuggestionsFromPerceptionOverrideModel = false
+    testHandler.currentLM.syncPrefs()
+
+    typeSentence("bo ")
+
+    let candidateValues = Set(testHandler.generateArrayOfCandidates().map(\.value))
+    #expect(candidateValues.contains(customTone2Value))
+    #expect(candidateValues.contains(customTone4Value))
+    #expect(!testHandler.currentLM.config.partialMatchEnabled)
+  }
+
+  @Test
+  func test_IH115_PinyinExplicitToneKeepsFullMatch() throws {
+    guard let testHandler, let testSession else {
+      Issue.record("testHandler and testSession at least one of them is nil.")
+      return
+    }
+    clearTestPOM()
+
+    let factoryTypeID: Int32 = testHandler.currentLM.isCHS ? 5 : 6
+    let customTone2Value = "伯測"
+    let customTone4Value = "播測"
+    let textMap = makeTypingTextMap([
+      ("bo2", [(value: customTone2Value, probability: -5, typeID: factoryTypeID)]),
+      ("bo4", [(value: customTone4Value, probability: -4.5, typeID: factoryTypeID)]),
+    ])
+
+    defer {
+      testHandler.prefs.keyboardParser = KeyboardParser.ofStandard.rawValue
+      testHandler.ensureKeyboardParser()
+      testHandler.prefs.useSCPCTypingMode = false
+      testHandler.prefs.fetchSuggestionsFromPerceptionOverrideModel = true
+      testHandler.currentLM.setOptions { config in
+        config.partialMatchEnabled = false
+      }
+      LMAssembly.LMInstantiator.disconnectFactoryDictionary()
+      #expect(LMAssembly.LMInstantiator.connectToTestFactoryDictionary(textMapData: LMATestsData.textMapTestCoreLMData))
+      testSession.resetInputHandler(forceComposerCleanup: true)
+    }
+
+    LMAssembly.LMInstantiator.disconnectFactoryDictionary()
+    #expect(LMAssembly.LMInstantiator.connectToTestFactoryDictionary(textMapData: textMap))
+    testSession.resetInputHandler(forceComposerCleanup: true)
+    testHandler.prefs.keyboardParser = KeyboardParser.ofHanyuPinyin.rawValue
+    testHandler.ensureKeyboardParser()
+    testHandler.prefs.useSCPCTypingMode = false
+    testHandler.prefs.fetchSuggestionsFromPerceptionOverrideModel = false
+    testHandler.currentLM.syncPrefs()
+
+    typeSentence("bo4")
+
+    let candidateValues = testHandler.generateArrayOfCandidates().map(\.value)
+    #expect(candidateValues.contains(customTone4Value))
+    #expect(!candidateValues.contains(customTone2Value))
+    #expect(!testHandler.currentLM.config.partialMatchEnabled)
+  }
+
+  @Test
+  func test_IH116_PinyinTonelessQueryDoesNotMatchLongerSyllableStem() throws {
+    guard let testHandler, let testSession else {
+      Issue.record("testHandler and testSession at least one of them is nil.")
+      return
+    }
+    clearTestPOM()
+
+    let customTone2Value = "時測"
+    let customTone4Value = "世測"
+    let customLongerStemValue = "衰測"
+    let customGrams: [Homa.Gram] = [
+      .init(keyArray: ["ㄕˊ"], value: customTone2Value, score: -5),
+      .init(keyArray: ["ㄕˋ"], value: customTone4Value, score: -4.5),
+      .init(keyArray: ["ㄕㄨㄞ"], value: customLongerStemValue, score: -4.2),
+    ]
+
+    defer {
+      testHandler.currentLM.clearTemporaryData(isFiltering: false)
+      testHandler.prefs.keyboardParser = KeyboardParser.ofStandard.rawValue
+      testHandler.ensureKeyboardParser()
+      testHandler.prefs.useSCPCTypingMode = false
+      testHandler.prefs.fetchSuggestionsFromPerceptionOverrideModel = true
+      testSession.resetInputHandler(forceComposerCleanup: true)
+    }
+
+    customGrams.forEach {
+      testHandler.currentLM.insertTemporaryData(unigram: $0, isFiltering: false)
+    }
+    testSession.resetInputHandler(forceComposerCleanup: true)
+    testHandler.prefs.keyboardParser = KeyboardParser.ofHanyuPinyin.rawValue
+    testHandler.ensureKeyboardParser()
+    testHandler.prefs.useSCPCTypingMode = false
+    testHandler.prefs.fetchSuggestionsFromPerceptionOverrideModel = false
+    testHandler.currentLM.syncPrefs()
+
+    typeSentence("shi ")
+
+    let candidateValues = Set(testHandler.generateArrayOfCandidates().map(\.value))
+    #expect(candidateValues.contains(customTone2Value))
+    #expect(candidateValues.contains(customTone4Value))
+    #expect(!candidateValues.contains(customLongerStemValue))
+    #expect(!testHandler.currentLM.config.partialMatchEnabled)
+  }
+
+  @Test
+  func test_IH117_PinyinComposerStillCapsRomajiBufferLength() throws {
+    guard let testHandler, let testSession else {
+      Issue.record("testHandler and testSession at least one of them is nil.")
+      return
+    }
+    clearTestPOM()
+
+    defer {
+      testHandler.prefs.keyboardParser = KeyboardParser.ofStandard.rawValue
+      testHandler.ensureKeyboardParser()
+      testSession.resetInputHandler(forceComposerCleanup: true)
+    }
+
+    testSession.resetInputHandler(forceComposerCleanup: true)
+    testHandler.prefs.keyboardParser = KeyboardParser.ofHanyuPinyin.rawValue
+    testHandler.ensureKeyboardParser()
+
+    typeSentence("shijiea")
+
+    #expect(testHandler.composer.getInlineCompositionForDisplay().count == 6)
+    #expect(!testHandler.currentLM.config.partialMatchEnabled)
+  }
 }
