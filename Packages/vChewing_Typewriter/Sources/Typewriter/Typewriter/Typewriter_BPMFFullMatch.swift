@@ -6,11 +6,11 @@
 // marks, or product names of Contributor, except as required to fulfill notice
 // requirements defined in MIT License.
 
-// MARK: - PhonabetTypewriter
+// MARK: - BPMFFullMatchTypewriter
 
 /// 注音按鍵輸入處理 (Handle BPMF Keys)
 @frozen
-public struct PhonabetTypewriter<Handler: InputHandlerProtocol>: TypewriterProtocol {
+public struct BPMFFullMatchTypewriter<Handler: InputHandlerProtocol>: TypewriterProtocol {
   // MARK: Lifecycle
 
   public init(_ handler: Handler) {
@@ -212,7 +212,7 @@ public struct PhonabetTypewriter<Handler: InputHandlerProtocol>: TypewriterProto
   }
 }
 
-extension PhonabetTypewriter {
+extension BPMFFullMatchTypewriter {
   /// 以結構化形式返回前一個游標位置的讀音與字面資訊。
   /// - Returns: 可用於聲調覆寫的讀音快照。
   func getPreviousRearSyllableSnapshot() -> RearSyllableSnapshot? {

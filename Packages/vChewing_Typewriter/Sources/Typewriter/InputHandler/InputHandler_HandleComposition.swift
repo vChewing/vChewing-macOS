@@ -27,7 +27,7 @@ extension InputHandlerProtocol {
     case .vChewingFactory where hardRequirementMet && prefs.cassetteEnabled:
       return CassetteTypewriter(self).handle(input)
     case .vChewingFactory where hardRequirementMet && !prefs.cassetteEnabled:
-      return PhonabetTypewriter(self).handle(input)
+      return BPMFFullMatchTypewriter(self).handle(input)
     default: return nil
     }
   }
