@@ -33,11 +33,15 @@ extension TrieJoinedTestSuite {
         textMapData: LMATestsData.textMapTestCoreLMData
       )
     )
-    let trie = try #require(LMAssembly.LMInstantiator.factoryTrie)
+    let instance = LMAssembly.LMInstantiator(isCHS: false)
+    instance.setOptions { config in
+      config.partialMatchEnabled = false
+      config.alwaysSupplyETenDOSUnigrams = false
+    }
     let readings: [Substring] = "ㄧㄡ ㄉㄧㄝˊ ㄋㄥˊ ㄌㄧㄡˊ ㄧˋ ㄌㄩˇ ㄈㄤ".split(separator: " ")
     let assembler = Homa.Assembler(
-      gramQuerier: Self.makeFactoryGramQuerier(trie: trie, partiallyMatch: false),
-      gramAvailabilityChecker: Self.makeFactoryGramAvailabilityChecker(trie: trie, partiallyMatch: false)
+      gramQuerier: instance.lookupHub.grams(for:),
+      gramAvailabilityChecker: instance.lookupHub.hasGrams(for:)
     )
     try Self.measureTime("Key insertion time cost total", tag: "(FullMatch)") {
       try readings.forEach { try assembler.insertKey($0.description) }
@@ -73,10 +77,14 @@ extension TrieJoinedTestSuite {
     #expect(rawPinyinChopped == ["yo", "die", "n", "li", "y", "lv", "f"])
     let keys2Add = pinyinTrie.deductChoppedPinyinToZhuyin(rawPinyinChopped)
     #expect(keys2Add == ["ㄧㄛ&ㄧㄡ&ㄩㄥ", "ㄉㄧㄝ", "ㄋ", "ㄌㄧ", "ㄧ&ㄩ", "ㄌㄩ&ㄌㄩㄝ&ㄌㄩㄢ", "ㄈ"])
-    let trie = try #require(LMAssembly.LMInstantiator.factoryTrie)
+    let instance = LMAssembly.LMInstantiator(isCHS: false)
+    instance.setOptions { config in
+      config.partialMatchEnabled = true
+      config.alwaysSupplyETenDOSUnigrams = false
+    }
     let assembler = Homa.Assembler(
-      gramQuerier: Self.makeFactoryGramQuerier(trie: trie, partiallyMatch: true),
-      gramAvailabilityChecker: Self.makeFactoryGramAvailabilityChecker(trie: trie, partiallyMatch: true)
+      gramQuerier: instance.lookupHub.grams(for:),
+      gramAvailabilityChecker: instance.lookupHub.hasGrams(for:)
     )
     try Self.measureTime("Key insertion time cost total", tag: "(Partial Match)") {
       try keys2Add.forEach { try assembler.insertKey($0.description) }
