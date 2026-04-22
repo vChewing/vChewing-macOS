@@ -15,6 +15,7 @@
 		5BBC2D9F28F51C0400C986F6 /* LICENSE-CHT.txt in Resources */ = {isa = PBXBuildFile; fileRef = 5B18BA7427C7BD8C0056EB19 /* LICENSE-CHT.txt */; };
 		5BBC2DA028F51C0400C986F6 /* LICENSE-JPN.txt in Resources */ = {isa = PBXBuildFile; fileRef = 5B18BA7327C7BD8C0056EB19 /* LICENSE-JPN.txt */; };
 		5BBC2DA128F51C0400C986F6 /* LICENSE-CHS.txt in Resources */ = {isa = PBXBuildFile; fileRef = 5B18BA6F27C7BD8B0056EB19 /* LICENSE-CHS.txt */; };
+		5BC0A1012FA1000100D0AA01 /* MainAssembly4Darwin in Frameworks */ = {isa = PBXBuildFile; productRef = 5BC0A10B2FA1000100D0AA01 /* MainAssembly4Darwin */; };
 		5BC2652227E04B7E00700291 /* uninstall.sh in Resources */ = {isa = PBXBuildFile; fileRef = 5BC2652127E04B7B00700291 /* uninstall.sh */; };
 /* End PBXBuildFile section */
 
@@ -69,6 +70,7 @@
 		5BAD67E12ADAB62D005A4842 /* HangarRash_SwiftyCapsLockToggler */ = {isa = PBXFileReference; lastKnownFileType = wrapper; name = HangarRash_SwiftyCapsLockToggler; path = Packages/HangarRash_SwiftyCapsLockToggler; sourceTree = "<group>"; };
 		5BBB42A42EA3E55A0097FA88 /* vChewing_Shared_DarwinImpl */ = {isa = PBXFileReference; lastKnownFileType = folder; name = vChewing_Shared_DarwinImpl; path = "/Users/shikisuen/Repos/!vChewing/vChewing-macOS/Packages/vChewing_Shared_DarwinImpl"; sourceTree = "<absolute>"; };
 		5BBD627827B6C4D900271480 /* Update-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = "Update-Info.plist"; sourceTree = "<group>"; };
+		5BC0A1022FA1000100D0AA01 /* vChewingDebuggable.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = vChewingDebuggable.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		5BC2652127E04B7B00700291 /* uninstall.sh */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.script.sh; lineEnding = 0; path = uninstall.sh; sourceTree = "<group>"; };
 		5BC447AB2865BEF500EDC323 /* AUTHORS */ = {isa = PBXFileReference; lastKnownFileType = text; path = AUTHORS; sourceTree = "<group>"; };
 		5BC5E01C28DDE4270094E427 /* vChewing_NotifierUI */ = {isa = PBXFileReference; lastKnownFileType = wrapper; name = vChewing_NotifierUI; path = Packages/vChewing_NotifierUI; sourceTree = "<group>"; };
@@ -127,6 +129,13 @@
 			);
 			target = 6A0D4EA115FC0D2D00ABF4B3 /* vChewing */;
 		};
+		5BC0A10C2FA1000100D0AA01 /* PBXFileSystemSynchronizedBuildFileExceptionSet */ = {
+			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
+			membershipExceptions = (
+				Resources/Info.plist,
+			);
+			target = 5BC0A1052FA1000100D0AA01 /* vChewingDebuggable */;
+		};
 /* End PBXFileSystemSynchronizedBuildFileExceptionSet section */
 
 /* Begin PBXFileSystemSynchronizedRootGroup section */
@@ -134,9 +143,18 @@
 		5B9184802F3B01A1006B48E8 /* vChewingIME_macOS */ = {isa = PBXFileSystemSynchronizedRootGroup; exceptions = (5B9184D52F3B03D1006B48E8 /* PBXFileSystemSynchronizedBuildFileExceptionSet */, ); explicitFileTypes = {}; explicitFolders = (); path = vChewingIME_macOS; sourceTree = "<group>"; };
 		5B9184C12F3B023A006B48E8 /* ValueAdd */ = {isa = PBXFileSystemSynchronizedRootGroup; exceptions = (5B9184C22F3B0244006B48E8 /* PBXFileSystemSynchronizedBuildFileExceptionSet */, ); explicitFileTypes = {}; explicitFolders = (); path = ValueAdd; sourceTree = "<group>"; };
 		5B9184C32F3B028C006B48E8 /* Installer_macOS */ = {isa = PBXFileSystemSynchronizedRootGroup; exceptions = (5B9184D12F3B0296006B48E8 /* PBXFileSystemSynchronizedBuildFileExceptionSet */, 5B9184D22F3B0296006B48E8 /* PBXFileSystemSynchronizedBuildFileExceptionSet */, ); explicitFileTypes = {}; explicitFolders = (); path = Installer_macOS; sourceTree = "<group>"; };
+		5BC0A1032FA1000100D0AA01 /* vChewingDebuggable */ = {isa = PBXFileSystemSynchronizedRootGroup; exceptions = (5BC0A10C2FA1000100D0AA01 /* PBXFileSystemSynchronizedBuildFileExceptionSet */, ); explicitFileTypes = {}; explicitFolders = (); path = vChewingDebuggable; sourceTree = "<group>"; };
 /* End PBXFileSystemSynchronizedRootGroup section */
 
 /* Begin PBXFrameworksBuildPhase section */
+		5BC0A1042FA1000100D0AA01 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				5BC0A1012FA1000100D0AA01 /* MainAssembly4Darwin in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		6A0D4E9F15FC0D2D00ABF4B3 /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
@@ -221,6 +239,7 @@
 				6A0D4EC215FC0D3C00ABF4B3 /* Sources */,
 				5B18BA7527C7BF6D0056EB19 /* MiscRootFiles */,
 				5B9184D62F3B04DD006B48E8 /* vChewing.app */,
+				5BC0A1022FA1000100D0AA01 /* vChewingDebuggable.app */,
 				5B9184D72F3B04DD006B48E8 /* vChewingInstaller.app */,
 			);
 			sourceTree = "<group>";
@@ -229,6 +248,7 @@
 			isa = PBXGroup;
 			children = (
 				5B9184C32F3B028C006B48E8 /* Installer_macOS */,
+				5BC0A1032FA1000100D0AA01 /* vChewingDebuggable */,
 				5B9184802F3B01A1006B48E8 /* vChewingIME_macOS */,
 			);
 			path = Sources;
@@ -237,6 +257,29 @@
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
+		5BC0A1052FA1000100D0AA01 /* vChewingDebuggable */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 5BC0A10A2FA1000100D0AA01 /* Build configuration list for PBXNativeTarget "vChewingDebuggable" */;
+			buildPhases = (
+				5BC0A1072FA1000100D0AA01 /* Sources */,
+				5BC0A1042FA1000100D0AA01 /* Frameworks */,
+				5BC0A1062FA1000100D0AA01 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			fileSystemSynchronizedGroups = (
+				5BC0A1032FA1000100D0AA01 /* vChewingDebuggable */,
+			);
+			name = vChewingDebuggable;
+			packageProductDependencies = (
+				5BC0A10B2FA1000100D0AA01 /* MainAssembly4Darwin */,
+			);
+			productName = vChewingDebuggable;
+			productReference = 5BC0A1022FA1000100D0AA01 /* vChewingDebuggable.app */;
+			productType = "com.apple.product-type.application";
+		};
 		6A0D4EA115FC0D2D00ABF4B3 /* vChewing */ = {
 			isa = PBXNativeTarget;
 			buildConfigurationList = 6A0D4EC015FC0D2E00ABF4B3 /* Build configuration list for PBXNativeTarget "vChewing" */;
@@ -293,8 +336,12 @@
 			attributes = {
 				BuildIndependentTargetsInParallel = YES;
 				LastSwiftUpdateCheck = 1510;
-				LastUpgradeCheck = 2630;
+				LastUpgradeCheck = 2640;
 				TargetAttributes = {
+					5BC0A1052FA1000100D0AA01 = {
+						LastSwiftMigration = 1400;
+						ProvisioningStyle = Automatic;
+					};
 					6A0D4EA115FC0D2D00ABF4B3 = {
 						LastSwiftMigration = 1400;
 						ProvisioningStyle = Automatic;
@@ -325,12 +372,20 @@
 			projectRoot = "";
 			targets = (
 				6A0D4EA115FC0D2D00ABF4B3 /* vChewing */,
+				5BC0A1052FA1000100D0AA01 /* vChewingDebuggable */,
 				6ACA41CA15FC1D7500935EF6 /* vChewingInstaller */,
 			);
 		};
 /* End PBXProject section */
 
 /* Begin PBXResourcesBuildPhase section */
+		5BC0A1062FA1000100D0AA01 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		6A0D4EA015FC0D2D00ABF4B3 /* Resources */ = {
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
@@ -395,6 +450,13 @@
 /* End PBXShellScriptBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
+		5BC0A1072FA1000100D0AA01 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		6A0D4E9E15FC0D2D00ABF4B3 /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
@@ -420,6 +482,89 @@
 /* End PBXTargetDependency section */
 
 /* Begin XCBuildConfiguration section */
+		5BC0A1082FA1000100D0AA01 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CLANG_CXX_LANGUAGE_STANDARD = "c++17";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CODE_SIGN_IDENTITY = "-";
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 4370;
+				DEAD_CODE_STRIPPING = YES;
+				DEVELOPMENT_ASSET_PATHS = "";
+				DEVELOPMENT_TEAM = "";
+				ENABLE_HARDENED_RUNTIME = NO;
+				GCC_C_LANGUAGE_STANDARD = gnu99;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_ENABLE_OBJC_EXCEPTIONS = YES;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"DEBUG=1",
+					"$(inherited)",
+				);
+				GCC_SYMBOLS_PRIVATE_EXTERN = NO;
+				GCC_TREAT_WARNINGS_AS_ERRORS = YES;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES;
+				INFOPLIST_FILE = Sources/vChewingDebuggable/Resources/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/../Frameworks",
+					/usr/lib/swift,
+				);
+				MACOSX_DEPLOYMENT_TARGET = 15.6;
+				MARKETING_VERSION = 4.3.7;
+				ONLY_ACTIVE_ARCH = YES;
+				PRODUCT_BUNDLE_IDENTIFIER = org.atelierInmu.vChewing.vChewingDebuggable;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				PROVISIONING_PROFILE_SPECIFIER = "";
+				SKIP_INSTALL = YES;
+				SWIFT_VERSION = 5.0;
+				WRAPPER_EXTENSION = app;
+			};
+			name = Debug;
+		};
+		5BC0A1092FA1000100D0AA01 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CLANG_CXX_LANGUAGE_STANDARD = "c++17";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CODE_SIGN_IDENTITY = "-";
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 4370;
+				DEAD_CODE_STRIPPING = YES;
+				DEVELOPMENT_ASSET_PATHS = "";
+				DEVELOPMENT_TEAM = "";
+				ENABLE_HARDENED_RUNTIME = NO;
+				GCC_C_LANGUAGE_STANDARD = gnu99;
+				GCC_ENABLE_OBJC_EXCEPTIONS = YES;
+				GCC_TREAT_WARNINGS_AS_ERRORS = YES;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES;
+				INFOPLIST_FILE = Sources/vChewingDebuggable/Resources/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/../Frameworks",
+					/usr/lib/swift,
+				);
+				MACOSX_DEPLOYMENT_TARGET = 15.6;
+				MARKETING_VERSION = 4.3.7;
+				PRODUCT_BUNDLE_IDENTIFIER = org.atelierInmu.vChewing.vChewingDebuggable;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				PROVISIONING_PROFILE_SPECIFIER = "";
+				SKIP_INSTALL = YES;
+				SWIFT_VERSION = 5.0;
+				WRAPPER_EXTENSION = app;
+			};
+			name = Release;
+		};
 		6A0D4E9915FC0CFA00ABF4B3 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
@@ -744,6 +889,15 @@
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
+		5BC0A10A2FA1000100D0AA01 /* Build configuration list for PBXNativeTarget "vChewingDebuggable" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				5BC0A1082FA1000100D0AA01 /* Debug */,
+				5BC0A1092FA1000100D0AA01 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
 		6A0D4E9715FC0CFA00ABF4B3 /* Build configuration list for PBXProject "vChewing" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
@@ -786,6 +940,10 @@
 			productName = InstallerAssembly4Darwin;
 		};
 		5B65FB332A9518DA007EEFB0 /* MainAssembly4Darwin */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = MainAssembly4Darwin;
+		};
+		5BC0A10B2FA1000100D0AA01 /* MainAssembly4Darwin */ = {
 			isa = XCSwiftPackageProductDependency;
 			productName = MainAssembly4Darwin;
 		};
