@@ -1168,26 +1168,41 @@ extension InputHandlerTests {
   }
 
   @Test
-  func test_IH117_PinyinComposerStillCapsRomajiBufferLength() throws {
+  func test_IH117_PinyinContinuousStemAutoChopsLeadingReadings() throws {
     guard let testHandler, let testSession else {
       Issue.record("testHandler and testSession at least one of them is nil.")
       return
     }
     clearTestPOM()
 
+    let customShiValue = "世測"
+    let customJieValue = "界測"
+    let customDaValue = "大測"
+    let customGrams: [Homa.Gram] = [
+      .init(keyArray: ["ㄕˋ"], value: customShiValue, score: 9),
+      .init(keyArray: ["ㄐㄧㄝˋ"], value: customJieValue, score: 8.5),
+      .init(keyArray: ["ㄉㄚˋ"], value: customDaValue, score: 8),
+    ]
+
     defer {
+      testHandler.currentLM.clearTemporaryData(isFiltering: false)
       testHandler.prefs.keyboardParser = KeyboardParser.ofStandard.rawValue
       testHandler.ensureKeyboardParser()
       testSession.resetInputHandler(forceComposerCleanup: true)
     }
 
+    customGrams.forEach {
+      testHandler.currentLM.insertTemporaryData(unigram: $0, isFiltering: false)
+    }
     testSession.resetInputHandler(forceComposerCleanup: true)
     testHandler.prefs.keyboardParser = KeyboardParser.ofHanyuPinyin.rawValue
     testHandler.ensureKeyboardParser()
 
-    typeSentence("shijiea")
+    typeSentence("shijiedaz")
 
-    #expect(testHandler.composer.getInlineCompositionForDisplay().count == 6)
+    #expect(generateDisplayedText() == customShiValue + customJieValue + customDaValue)
+    #expect(testHandler.assembler.keys.count == 3)
+    #expect(testHandler.composer.getInlineCompositionForDisplay(isHanyuPinyin: true) == "z")
     #expect(!testHandler.currentLM.config.partialMatchEnabled)
   }
 }

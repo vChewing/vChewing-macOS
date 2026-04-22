@@ -158,6 +158,13 @@ public struct BPMFFullMatchTypewriter<Handler: InputHandlerProtocol>: Typewriter
       ) {
         return (overrideHandled, keyConsumedByReading)
       }
+      if let autoChopHandled = performPinyinAutoChopIfNeeded(
+        inputText: inputText,
+        prefs: prefs,
+        session: session
+      ) {
+        return (autoChopHandled, true)
+      }
       handler.composer.receiveKey(fromString: confirmCombination ? " " : inputText)
       keyConsumedByReading = true
       narrateTheComposer(
@@ -171,6 +178,49 @@ public struct BPMFFullMatchTypewriter<Handler: InputHandlerProtocol>: Typewriter
       }
     }
     return (nil, keyConsumedByReading)
+  }
+
+  private func performPinyinAutoChopIfNeeded(
+    inputText: String,
+    prefs: some PrefMgrProtocol,
+    session: Session
+  )
+    -> Bool? {
+    guard let autoChop = handler.composer.pinyinAutoChopResult(appending: inputText) else {
+      return nil
+    }
+
+    let choppedReadingKeys = autoChop.committedReadings.map {
+      makeToneInsensitivePinyinQueryKey(from: $0)
+    }
+    guard choppedReadingKeys.allSatisfy({ handler.currentLM.hasUnigramsFor(keyArray: [$0]) }) else {
+      return nil
+    }
+
+    for readingKey in choppedReadingKeys {
+      guard (try? handler.assembler.insertKey(readingKey)) != nil else {
+        errorCallback(
+          "6C2CBEE8: Pinyin auto-chop generated an insertion key rejected by the assembler."
+        )
+        return true
+      }
+    }
+
+    handler.assemble()
+    let textToCommit = handler.commitOverflownComposition
+    handler.retrievePOMSuggestions(apply: true)
+    handler.composer.replacePinyinBuffer(with: autoChop.remainingRomaji)
+    narrateTheComposer(
+      narrator: handler.narrator,
+      when: prefs.readingNarrationCoverage >= 2,
+      allowDuplicates: false
+    )
+
+    var inputting = handler.generateStateOfInputting()
+    inputting.textToCommit = textToCommit
+    session.switchState(inputting)
+    handler.handleTypewriterSCPCTasks()
+    return true
   }
 
   private func composeReadingIfReady(
