@@ -29,6 +29,13 @@ public struct BPMFFullMatchTypewriter<Handler: InputHandlerProtocol>: Typewriter
   public func handle(_ input: some InputSignalProtocol) -> Bool? {
     guard let session = handler.session else { return nil }
     let prefs = handler.prefs
+    // 注音模式目前採完整讀音配對。
+    if handler.currentLM.config.partialMatchEnabled {
+      handler.currentLM.setOptions { config in
+        config.partialMatchEnabled = false
+      }
+    }
+
     var inputText = (input.inputTextIgnoringModifiers ?? input.text)
     inputText = inputText.lowercased().applyingTransformFW2HW(reverse: false)
     let existedIntonation = handler.composer.intonation

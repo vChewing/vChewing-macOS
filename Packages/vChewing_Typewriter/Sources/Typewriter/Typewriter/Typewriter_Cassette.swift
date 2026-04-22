@@ -29,6 +29,13 @@ public struct CassetteTypewriter<Handler: InputHandlerProtocol>: TypewriterProto
     let state = session.state
     let currentLM = handler.currentLM
     let prefs = handler.prefs
+    // 磁帶模式當初開發時是以 Assembler 完整讀音配對模式為前提的，故停用 partial match。
+    if currentLM.config.partialMatchEnabled {
+      currentLM.setOptions { config in
+        config.partialMatchEnabled = false
+      }
+    }
+
     let wildcardKey = currentLM.cassetteWildcardKey
     let quickPhraseCommissionKey = currentLM.cassetteQuickPhraseCommissionKey
 
