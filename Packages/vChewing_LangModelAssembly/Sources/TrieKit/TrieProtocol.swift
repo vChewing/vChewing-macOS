@@ -101,7 +101,7 @@ extension VanguardTrieProtocol {
     return result
   }
 
-  private func getEntryGroups(
+  public func getEntryGroups(
     keysChopped: [String],
     filterType: EntryType,
     partiallyMatch: Bool
