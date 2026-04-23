@@ -126,19 +126,11 @@ extension TrieJoinedTestSuite {
   )
     -> Homa.GramQuerier {
     { keyArray in
-      let encodedKeys = keyArray.map(PhonabetCipher.convertPhonabetToASCII)
-      return trie.queryGrams(
-        encodedKeys,
+      trie.queryGrams(
+        keyArray,
         filterType: .cht,
         partiallyMatch: partiallyMatch
-      ).map {
-        (
-          keyArray: $0.keyArray.map(PhonabetCipher.restorePhonabetFromASCII),
-          value: $0.value,
-          probability: $0.probability,
-          previous: $0.previous
-        )
-      }
+      )
     }
   }
 
@@ -148,9 +140,8 @@ extension TrieJoinedTestSuite {
   )
     -> Homa.GramAvailabilityChecker {
     { keyArray in
-      let encodedKeys = keyArray.map(PhonabetCipher.convertPhonabetToASCII)
-      return trie.hasGrams(
-        encodedKeys,
+      trie.hasGrams(
+        keyArray,
         filterType: .cht,
         partiallyMatch: partiallyMatch
       )

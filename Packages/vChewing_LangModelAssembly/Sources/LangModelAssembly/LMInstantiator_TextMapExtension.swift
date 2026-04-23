@@ -133,7 +133,7 @@ extension LMAssembly.LMInstantiator {
 
   public static func getFactoryReverseLookupData(with kanji: String) -> [String]? {
     guard let readings = factoryTrie?.reverseLookup(for: kanji) else { return nil }
-    return readings.map { restorePhonabetFromASCII($0) }
+    return readings
   }
 
   func getHaninSymbolMenuUnigrams() -> [Homa.Gram] {
@@ -205,19 +205,17 @@ extension LMAssembly.LMInstantiator {
         trie: trie
       )
     }
-    let encryptedKeyArray = keyArray.map { Self.convertPhonabetToASCII($0) }
     let nodes = trie.getNodes(
-      keyArray: encryptedKeyArray,
+      keyArray: keyArray,
       filterType: [],
       partiallyMatch: false,
       longerSegment: false
     )
     let entries = nodes.flatMap(\.entries)
-    let encryptedKey = Self.convertPhonabetToASCII(key)
     return makeFactoryUnigrams(
       entries: entries,
       keyArray: keyArray,
-      sourceKey: encryptedKey,
+      sourceKey: key,
       column: column,
       includeHalfWidthVariants: true
     )
@@ -231,17 +229,15 @@ extension LMAssembly.LMInstantiator {
     -> [Homa.Gram] {
     if subsetKey == "_punctuation_list" { return [] }
     guard let trie = Self.factoryTrie else { return [] }
-    let encryptedKeyArray = subsetKeyArray.map { Self.convertPhonabetToASCII($0) }
     let nodes = trie.getNodes(
-      keyArray: encryptedKeyArray,
+      keyArray: subsetKeyArray,
       filterType: [],
       partiallyMatch: false,
       longerSegment: true
     )
 
     return nodes.flatMap { node in
-      let nodeKeyArray = Self.restorePhonabetFromASCII(node.readingKey)
-        .split(separator: "-").map(String.init)
+      let nodeKeyArray = node.readingKey.split(separator: "-").map(String.init)
       return makeFactoryUnigrams(
         entries: node.entries,
         keyArray: nodeKeyArray,
@@ -258,9 +254,8 @@ extension LMAssembly.LMInstantiator {
     trie: VanguardTrie.TextMapTrie
   )
     -> [Homa.Gram] {
-    let encryptedKeyArray = queryKeyArray.map { Self.convertPhonabetToASCII($0) }
     let queriedGrams = trie.queryGrams(
-      encryptedKeyArray,
+      queryKeyArray,
       filterType: column.trieEntryType,
       partiallyMatch: true
     )
@@ -273,9 +268,8 @@ extension LMAssembly.LMInstantiator {
   internal func factoryCNSFilterThreadFor(key: String) -> String? {
     if key == "_punctuation_list" { return nil }
     guard let trie = Self.factoryTrie else { return nil }
-    let encryptedKeyArray = [Self.convertPhonabetToASCII(key)]
     let nodes = trie.getNodes(
-      keyArray: encryptedKeyArray,
+      keyArray: [key],
       filterType: [],
       partiallyMatch: false,
       longerSegment: false
@@ -289,18 +283,17 @@ extension LMAssembly.LMInstantiator {
 
   func hasFactoryCoreUnigramsFor(keyArray: [String]) -> Bool {
     guard let trie = Self.factoryTrie else { return false }
-    let encryptedKeyArray = keyArray.map { Self.convertPhonabetToASCII($0) }
     let column = isCHS ? CoreColumn.theDataCHS : CoreColumn.theDataCHT
     if config.partialMatchEnabled {
       return trie.hasGrams(
-        encryptedKeyArray,
+        keyArray,
         filterType: column.trieEntryType,
         partiallyMatch: true
       )
     }
     let typeIDs = column.textMapTypeIDs
     let nodes = trie.getNodes(
-      keyArray: encryptedKeyArray,
+      keyArray: keyArray,
       filterType: [],
       partiallyMatch: false,
       longerSegment: false
@@ -317,16 +310,6 @@ extension LMAssembly.LMInstantiator {
       guard matchedResult.contains(chars[index]) else { return false }
     }
     return true
-  }
-
-  // MARK: - Phonabet ↔ ASCII Encryption
-
-  fileprivate static func convertPhonabetToASCII(_ incoming: String) -> String {
-    PhonabetCipher.convertPhonabetToASCII(incoming)
-  }
-
-  fileprivate static func restorePhonabetFromASCII(_ incoming: String) -> String {
-    PhonabetCipher.restorePhonabetFromASCII(incoming)
   }
 
   /// Automatically generated half-width punctuation aliases should stay selectable,
@@ -381,8 +364,7 @@ extension LMAssembly.LMInstantiator {
         score *= -1
       }
 
-      let restoredKeyArray = queriedGram.keyArray.map { Self.restorePhonabetFromASCII($0) }
-      grams.append(.init(keyArray: restoredKeyArray, value: queriedGram.value, score: score))
+      grams.append(.init(keyArray: queriedGram.keyArray, value: queriedGram.value, score: score))
 
       let sourceKey = queriedGram.keyArray.joined(separator: "-")
       guard includeHalfWidthVariants, sourceKey.contains("_punctuation") else { continue }
@@ -390,7 +372,7 @@ extension LMAssembly.LMInstantiator {
       if halfWidthValue != queriedGram.value {
         extraHalfWidthGrams.append(
           .init(
-            keyArray: restoredKeyArray,
+            keyArray: queriedGram.keyArray,
             value: halfWidthValue,
             score: score - Self.generatedHalfWidthPunctuationPenalty
           )

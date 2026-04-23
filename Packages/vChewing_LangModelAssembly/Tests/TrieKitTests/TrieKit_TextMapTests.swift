@@ -12,7 +12,7 @@ struct TrieKitTextMapTests {
   func testTypingTextMapThreeColumnNumericValueDisambiguation() throws {
     let textMap = """
     #PRAGMA:VANGUARD_HOMA_LEXICON_HEADER
-    VERSION\t1
+    VERSION\t1.1
     TYPE\tTYPING
     READING_SEPARATOR\t-
     ENTRY_COUNT\t1
@@ -137,19 +137,19 @@ struct TrieKitTextMapTests {
     >4\t，|。
     _NORM\t0\t2
     #PRAGMA:VANGUARD_HOMA_LEXICON_KEY_LINE_MAP
-    Su4\t0\t3
+    ㄕㄨˋ\t0\t3
     _norm\t3\t2
     """
 
     let fullTrie = try VanguardTrie.TrieIO.deserializeFromTextMap(textMap)
     let lazyTrie = try VanguardTrie.TextMapTrie(data: Data(textMap.utf8))
 
-    // 比對 Su4 的查詢結果。
+    // 比對 ㄕㄨˋ 的查詢結果。
     let fullResults = fullTrie.queryGrams(
-      ["Su4"], filterType: .init(rawValue: 5), partiallyMatch: false
+      ["ㄕㄨˋ"], filterType: .init(rawValue: 5), partiallyMatch: false
     ).sorted { $0.value < $1.value }
     let lazyResults = lazyTrie.queryGrams(
-      ["Su4"], filterType: .init(rawValue: 5), partiallyMatch: false
+      ["ㄕㄨˋ"], filterType: .init(rawValue: 5), partiallyMatch: false
     ).sorted { $0.value < $1.value }
 
     #expect(fullResults.count == lazyResults.count)
@@ -160,10 +160,10 @@ struct TrieKitTextMapTests {
 
     // 比對 type 4（標點）的查詢結果。
     let fullType4 = fullTrie.queryGrams(
-      ["Su4"], filterType: .init(rawValue: 4), partiallyMatch: false
+      ["ㄕㄨˋ"], filterType: .init(rawValue: 4), partiallyMatch: false
     ).map(\.value).sorted()
     let lazyType4 = lazyTrie.queryGrams(
-      ["Su4"], filterType: .init(rawValue: 4), partiallyMatch: false
+      ["ㄕㄨˋ"], filterType: .init(rawValue: 4), partiallyMatch: false
     ).map(\.value).sorted()
 
     #expect(fullType4 == lazyType4)

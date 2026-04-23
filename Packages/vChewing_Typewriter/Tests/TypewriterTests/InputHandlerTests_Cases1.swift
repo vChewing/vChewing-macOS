@@ -890,7 +890,7 @@ extension InputHandlerTests {
     let factoryTypeID: Int32 = testHandler.currentLM.isCHS ? 5 : 6
     let factoryValues = [eTenSequence[1], eTenSequence[0]]
     let expectedValues = factoryValues + eTenSequence.filter { !factoryValues.contains($0) }
-    let textMapKey = "bo" // `ㄅㄛ` 在 factory TextMap 當中的 ASCII phonabet key。
+    let textMapKey = "ㄅㄛ"
     let textMap = makeTypingTextMap([
       (
         textMapKey,
@@ -939,7 +939,7 @@ extension InputHandlerTests {
     }
     let factoryTypeID: Int32 = testHandler.currentLM.isCHS ? 5 : 6
     let factoryValues = [eTenSequence[1], eTenSequence[0]]
-    let textMapKey = "bo" // `ㄅㄛ` 在 factory TextMap 當中的 ASCII phonabet key。
+    let textMapKey = "ㄅㄛ"
     let textMap = makeTypingTextMap([
       (
         textMapKey,
@@ -980,7 +980,7 @@ extension InputHandlerTests {
 
     let textMap = makeTypingTextMap([
       (
-        "bo",
+        "ㄅㄛ",
         [
           (value: "玻", probability: -5, typeID: 6),
           (value: "播", probability: -4.5, typeID: 6),
@@ -1042,8 +1042,8 @@ extension InputHandlerTests {
     let customTone2Value = "伯測"
     let customTone4Value = "播測"
     let textMap = makeTypingTextMap([
-      ("bo2", [(value: customTone2Value, probability: -5, typeID: factoryTypeID)]),
-      ("bo4", [(value: customTone4Value, probability: -4.5, typeID: factoryTypeID)]),
+      ("ㄅㄛˊ", [(value: customTone2Value, probability: -5, typeID: factoryTypeID)]),
+      ("ㄅㄛˋ", [(value: customTone4Value, probability: -4.5, typeID: factoryTypeID)]),
     ])
 
     defer {
@@ -1088,8 +1088,8 @@ extension InputHandlerTests {
     let customTone2Value = "伯測"
     let customTone4Value = "播測"
     let textMap = makeTypingTextMap([
-      ("bo2", [(value: customTone2Value, probability: -5, typeID: factoryTypeID)]),
-      ("bo4", [(value: customTone4Value, probability: -4.5, typeID: factoryTypeID)]),
+      ("ㄅㄛˊ", [(value: customTone2Value, probability: -5, typeID: factoryTypeID)]),
+      ("ㄅㄛˋ", [(value: customTone4Value, probability: -4.5, typeID: factoryTypeID)]),
     ])
 
     defer {

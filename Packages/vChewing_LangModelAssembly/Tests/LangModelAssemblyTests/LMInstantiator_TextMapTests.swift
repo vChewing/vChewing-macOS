@@ -144,7 +144,7 @@ struct LMInstantiatorTextMapTests {
 
     let textMap = """
     #PRAGMA:VANGUARD_HOMA_LEXICON_HEADER
-    VERSION\t1
+    VERSION\t1.1
     TYPE\tTYPING
     READING_SEPARATOR\t-
     ENTRY_COUNT\t2
@@ -153,8 +153,8 @@ struct LMInstantiatorTextMapTests {
     @-9.9\t和\t和
     @-9.9\t和\t和
     #PRAGMA:VANGUARD_HOMA_LEXICON_KEY_LINE_MAP
-    he4\t0\t1
-    huo4\t1\t1
+    ㄏㄜˋ\t0\t1
+    ㄏㄨㄛˋ\t1\t1
     """
 
     #expect(LMAssembly.LMInstantiator.connectToTestFactoryDictionary(textMapData: textMap))
@@ -168,7 +168,7 @@ struct LMInstantiatorTextMapTests {
     }
 
     let textMap =
-      "#PRAGMA:VANGUARD_HOMA_LEXICON_HEADER\r\nVERSION\t1\r\nTYPE\tTYPING\r\nREADING_SEPARATOR\t-\r\nENTRY_COUNT\t1\r\nKEY_COUNT\t1\r\n#PRAGMA:VANGUARD_HOMA_LEXICON_VALUES\r\n@-9.9\t和\t和\r\n#PRAGMA:VANGUARD_HOMA_LEXICON_KEY_LINE_MAP\r\nhe4\t0\t1\r\n"
+      "#PRAGMA:VANGUARD_HOMA_LEXICON_HEADER\r\nVERSION\t1.1\r\nTYPE\tTYPING\r\nREADING_SEPARATOR\t-\r\nENTRY_COUNT\t1\r\nKEY_COUNT\t1\r\n#PRAGMA:VANGUARD_HOMA_LEXICON_VALUES\r\n@-9.9\t和\t和\r\n#PRAGMA:VANGUARD_HOMA_LEXICON_KEY_LINE_MAP\r\nㄏㄜˋ\t0\t1\r\n"
 
     #expect(LMAssembly.LMInstantiator.connectToTestFactoryDictionary(textMapData: textMap))
     #expect(LMAssembly.LMInstantiator.getFactoryReverseLookupData(with: "和") == ["ㄏㄜˋ"])
@@ -182,7 +182,7 @@ struct LMInstantiatorTextMapTests {
 
     let textMap = """
     #PRAGMA:VANGUARD_HOMA_LEXICON_HEADER
-    VERSION\t1
+    VERSION\t1.1
     TYPE\tTYPING
     READING_SEPARATOR\t-
     ENTRY_COUNT\t3
@@ -192,9 +192,9 @@ struct LMInstantiatorTextMapTests {
     @-8.8\t便宜\t便宜
     𡜅	-11	7
     #PRAGMA:VANGUARD_HOMA_LEXICON_KEY_LINE_MAP
-    i2\t0\t1
-    bi4-i2\t1\t1
-    lv3\t2\t1
+    ㄧˊ\t0\t1
+    ㄅㄧˋ-ㄧˊ\t1\t1
+    ㄌㄩˇ\t2\t1
     """
 
     #expect(LMAssembly.LMInstantiator.connectToTestFactoryDictionary(textMapData: textMap))
