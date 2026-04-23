@@ -424,6 +424,70 @@ struct LMInstantiatorTextMapTests {
     #expect(instance.lookupHub.hasGrams(for: strCakeKey) == instance.hasUnigramsFor(keyArray: strCakeKey))
   }
 
+  // MARK: - Tone-bucket regression tests
+
+  @Test
+  func testToneBucketSinglePositionMatchesUnionOfIndividualQueries() throws {
+    defer { LMAssembly.LMInstantiator.disconnectFactoryDictionary() }
+
+    // Two single-syllable readings with distinct CHT values (typeID=6).
+    let textMap = makeTextMap([
+      ("ㄕㄨˋ", [("樹", -5.0, 6), ("數", -5.1, 6)]),
+      ("ㄓ", [("之", -4.9, 6), ("知", -5.2, 6)]),
+    ])
+    #expect(LMAssembly.LMInstantiator.connectToTestFactoryDictionary(textMapData: textMap))
+    let instance = LMAssembly.LMInstantiator(isCHS: false)
+    instance.setOptions { config in
+      config.isCNSEnabled = false
+      config.isSymbolEnabled = false
+    }
+
+    let shuValues = Set(instance.unigramsFor(keyArray: ["ㄕㄨˋ"]).map(\.current))
+    let zhiValues = Set(instance.unigramsFor(keyArray: ["ㄓ"]).map(\.current))
+
+    // Tone-bucket single-position query: one slot, two tone alternatives.
+    let bucketGrams = instance.unigramsFor(keyArray: ["ㄕㄨˋ&ㄓ"])
+    let bucketValues = Set(bucketGrams.map(\.current))
+
+    // Must be the union of both individual reading sets.
+    #expect(bucketValues == shuValues.union(zhiValues))
+
+    // keyArray attribution must be preserved per originating reading.
+    #expect(bucketGrams.filter { $0.current == "樹" || $0.current == "數" }.allSatisfy { $0.keyArray == ["ㄕㄨˋ"] })
+    #expect(bucketGrams.filter { $0.current == "之" || $0.current == "知" }.allSatisfy { $0.keyArray == ["ㄓ"] })
+  }
+
+  @Test
+  func testToneBucketMultiPositionMatchesCartesianUnion() throws {
+    defer { LMAssembly.LMInstantiator.disconnectFactoryDictionary() }
+
+    // Single-syllable and two-syllable readings for a 2-slot tone-bucket query.
+    let textMap = makeTextMap([
+      ("ㄕㄨˋ", [("樹", -5.0, 6)]),
+      ("ㄓ", [("之", -4.9, 6)]),
+      ("ㄕㄨˋ-ㄓ", [("樹之", -4.0, 6)]),
+      ("ㄓ-ㄓ", [("之之", -6.0, 6)]),
+    ])
+    #expect(LMAssembly.LMInstantiator.connectToTestFactoryDictionary(textMapData: textMap))
+    let instance = LMAssembly.LMInstantiator(isCHS: false)
+    instance.setOptions { config in
+      config.isCNSEnabled = false
+      config.isSymbolEnabled = false
+    }
+
+    // 2-slot tone-bucket: each position has two alternatives.
+    let bucketGrams = instance.unigramsFor(keyArray: ["ㄕㄨˋ&ㄓ", "ㄓ"])
+
+    // Cartesian expansion gives ["ㄕㄨˋ","ㄓ"] and ["ㄓ","ㄓ"]; both should appear.
+    let bucketValues = Set(bucketGrams.map(\.current))
+    #expect(bucketValues.contains("樹之"))
+    #expect(bucketValues.contains("之之"))
+
+    // Single-char results at this 2-slot query should NOT appear (no partial match).
+    #expect(!bucketValues.contains("樹"))
+    #expect(!bucketValues.contains("之"))
+  }
+
   // MARK: Private
 
   private struct GramSnapshot: Equatable {
@@ -478,7 +542,7 @@ struct LMInstantiatorTextMapTests {
 
     var result = ""
     result += "#PRAGMA:VANGUARD_HOMA_LEXICON_HEADER\n"
-    result += "VERSION\t1\n"
+    result += "VERSION\t1.1\n"
     result += "TYPE\tTYPING\n"
     result += "READING_SEPARATOR\t-\n"
     result += "ENTRY_COUNT\t\(valueLines.count)\n"

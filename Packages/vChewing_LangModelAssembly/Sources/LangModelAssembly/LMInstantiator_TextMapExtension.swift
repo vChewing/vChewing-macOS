@@ -265,6 +265,58 @@ extension LMAssembly.LMInstantiator {
     )
   }
 
+  func factoryChoppedUnigramsFor(
+    keyArray: [String],
+    column: LMAssembly.LMInstantiator.CoreColumn
+  )
+    -> [Homa.Gram] {
+    guard let trie = Self.factoryTrie else { return [] }
+    let entryGroups = trie.getEntryGroups(
+      keysChopped: keyArray,
+      filterType: column.trieEntryType,
+      partiallyMatch: config.partialMatchEnabled
+    )
+    guard !entryGroups.isEmpty else { return [] }
+    return entryGroups.flatMap { group in
+      makeFactoryUnigrams(
+        entries: group.entries,
+        keyArray: group.keyArray,
+        sourceKey: group.keyArray.joined(separator: "-"),
+        column: column,
+        includeHalfWidthVariants: true
+      )
+    }
+  }
+
+  func factoryChoppedCoreUnigramsFor(
+    keyArray: [String],
+    strategy: LMAssembly.LMInstantiator.FactoryCoreLookupStrategy
+  )
+    -> [Homa.Gram] {
+    let column = isCHS ? CoreColumn.theDataCHS : CoreColumn.theDataCHT
+    switch strategy {
+    case .configuredLookup:
+      return factoryChoppedUnigramsFor(keyArray: keyArray, column: column)
+    case .strictSuperset:
+      guard let trie = Self.factoryTrie else { return [] }
+      let entryGroups = trie.getEntryGroups(
+        keysChopped: keyArray,
+        filterType: [],
+        partiallyMatch: false
+      )
+      return entryGroups.flatMap { group in
+        guard group.keyArray.count > keyArray.count else { return [] as [Homa.Gram] }
+        return makeFactoryUnigrams(
+          entries: group.entries,
+          keyArray: group.keyArray,
+          sourceKey: group.keyArray.joined(separator: "-"),
+          column: column,
+          includeHalfWidthVariants: true
+        )
+      }
+    }
+  }
+
   internal func factoryCNSFilterThreadFor(key: String) -> String? {
     if key == "_punctuation_list" { return nil }
     guard let trie = Self.factoryTrie else { return nil }

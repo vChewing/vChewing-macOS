@@ -801,21 +801,136 @@ extension LMAssembly {
 
     /// 合併單一位置含有多個讀音候選時的 full-match 檢索結果。
     ///
-    /// 這裡不走 generic partial-match，而是先將 `&` alternatives 展開成所有可能的
-    /// keyArray 組合，再逐一做 full-match 查詢，最後合併去重。
+    /// 與舊版不同：原廠辭典 trie 查詢走 `keysChopped` 路徑，只做一次 trie 查詢（內部展開去重），
+    /// 而非對每個笛卡爾積組合分別做完整原廠辭典查詢。非原廠辭典來源（使用者語彙、符號等）
+    /// 仍需按展開後的 keyArray 逐一查詢，但這些是輕量級 hash table lookup。
     /// - Parameter keyArray: 可能包含 `&` alternatives 的讀音索引鍵陣列。
     /// - Returns: 合併並去重後的單元圖陣列。
     private func mergedAlternativeBucketUnigrams(for keyArray: [String]) -> [Homa.Gram] {
-      var merged = [Homa.Gram]()
-      var handled = Set<Homa.Gram>()
-      expandAlternativeKeyArrays(from: keyArray).forEach { expandedKeyArray in
-        unigramsFor(keyArray: expandedKeyArray).forEach { currentGram in
-          guard handled.insert(currentGram).inserted else { return }
-          merged.append(currentGram)
+      var rawAllUnigrams: [Homa.Gram] = []
+      var factoryCoreUnigramsResult: [Homa.Gram] = []
+
+      if !config.isCassetteEnabled
+        || config.isCassetteEnabled && (keyArray.first?.hasPrefix("_") ?? false) {
+        rawAllUnigrams += factoryChoppedUnigramsFor(keyArray: keyArray, column: .theDataCHEW)
+        let keyChain = keyArray.joined(separator: "-")
+        if keyChain.hasPrefix("_"), keyChain.count > 1 {
+          rawAllUnigrams += factoryChoppedUnigramsFor(keyArray: keyArray, column: .theDataMISC)
+        }
+        factoryCoreUnigramsResult = factoryChoppedCoreUnigramsFor(
+          keyArray: keyArray,
+          strategy: .configuredLookup
+        )
+        if config.filterNonCNSReadings, !isCHS {
+          factoryCoreUnigramsResult = factoryCoreUnigramsResult.filter { thisUnigram in
+            checkCNSConformation(for: thisUnigram, keyArray: thisUnigram.keyArray)
+          }
+        }
+        rawAllUnigrams += factoryCoreUnigramsResult
+
+        if config.isCNSEnabled {
+          rawAllUnigrams += factoryChoppedUnigramsFor(keyArray: keyArray, column: .theDataCNS)
         }
       }
-      merged.consolidate()
-      return merged
+
+      let expandedKeyArrays = expandAlternativeKeyArrays(from: keyArray)
+      for expandedKeyArray in expandedKeyArrays {
+        let keyChain = expandedKeyArray.joined(separator: "-")
+
+        if !config.bypassUserPhrasesData, config.isSymbolEnabled {
+          rawAllUnigrams += lmUserSymbols.unigramsFor(key: keyChain, keyArray: expandedKeyArray)
+          if !config.isCassetteEnabled {
+            rawAllUnigrams += factoryUnigramsFor(
+              key: keyChain,
+              keyArray: expandedKeyArray,
+              column: .theDataSYMB
+            )
+          }
+        }
+
+        if !config.bypassUserPhrasesData {
+          let allowBoostingSingleKanji = config.allowRescoringSingleKanjiCandidates
+          let factorySingleReadingValueHashes: Set<Int> = factoryCoreUnigramsResult.reduce(into: []) {
+            if $1.keyArray.count == 1 { $0.insert($1.hashValue) }
+          }
+          var userPhraseUnigrams = Array(
+            lmUserPhrases.unigramsFor(
+              key: keyChain,
+              keyArray: expandedKeyArray,
+              omitNonTemporarySingleCharNonSymbolUnigrams: !allowBoostingSingleKanji,
+              factorySingleReadingValueHashes: factorySingleReadingValueHashes
+            ).reversed()
+          )
+          if expandedKeyArray.count == 1, let topScore = rawAllUnigrams.lazy.map(\.probability).max() {
+            userPhraseUnigrams = userPhraseUnigrams.map { currentUnigram in
+              Homa.Gram(
+                keyArray: expandedKeyArray,
+                value: currentUnigram.current,
+                score: Swift.min(topScore + 0.000114514, currentUnigram.probability)
+              )
+            }
+          }
+          rawAllUnigrams = userPhraseUnigrams + rawAllUnigrams
+        }
+
+        if config.isCassetteEnabled {
+          rawAllUnigrams.insert(
+            contentsOf: Self.lmCassette.unigramsFor(key: keyChain, keyArray: expandedKeyArray),
+            at: 0
+          )
+        } else if config.isSCPCEnabled || config.alwaysSupplyETenDOSUnigrams {
+          rawAllUnigrams += Self.lmPlainBopomofo.valuesFor(key: keyChain, isCHS: isCHS).map {
+            Homa.Gram(keyArray: expandedKeyArray, value: $0, score: config.isSCPCEnabled ? 0 : -9.5)
+          }
+        }
+
+        rawAllUnigrams.append(contentsOf: queryDateTimeUnigrams(with: keyChain, keyArray: expandedKeyArray))
+
+        if !config.bypassUserPhrasesData {
+          let dataAsFilter = Set(
+            lmFiltered.unigramsFor(key: keyChain, keyArray: expandedKeyArray).map(\.current)
+          )
+          rawAllUnigrams.removeAll { gram in
+            guard gram.keyArray == expandedKeyArray else { return false }
+            return dataAsFilter.contains(gram.current)
+          }
+        }
+      }
+
+      cleanupInputTokenHashMapIfNeeded()
+      var expandedUnigrams: [Homa.Gram] = []
+      expandedUnigrams.reserveCapacity(rawAllUnigrams.count)
+      for unigram in rawAllUnigrams {
+        let convertedValues = unigram.current.parseAsInputToken(isCHS: isCHS)
+        if convertedValues.isEmpty {
+          expandedUnigrams.append(unigram)
+        } else {
+          let keyChain = unigram.keyArray.joined(separator: "-")
+          for (absDelta, value) in convertedValues.enumerated() {
+            let newScore: Double = -80 - Double(absDelta) * 0.01
+            expandedUnigrams.append(.init(keyArray: unigram.keyArray, value: value, score: newScore))
+            let hashKey = "\(keyChain)\t\(value)".hashValue
+            inputTokenHashesArray.insert(hashKey)
+          }
+        }
+      }
+      rawAllUnigrams = expandedUnigrams
+
+      if !config.bypassUserPhrasesData, config.isPhraseReplacementEnabled {
+        for i in 0 ..< rawAllUnigrams.count {
+          let oldUnigram = rawAllUnigrams[i]
+          let newValue = lmReplacements.valuesFor(key: oldUnigram.current)
+          guard !newValue.isEmpty else { continue }
+          rawAllUnigrams[i] = Homa.Gram(
+            keyArray: oldUnigram.keyArray,
+            value: newValue,
+            score: oldUnigram.probability
+          )
+        }
+      }
+
+      rawAllUnigrams.consolidate()
+      return rawAllUnigrams
     }
 
     /// 將帶有 `&` alternatives 的讀音索引鍵陣列展開為所有可能的 full-match 組合。
