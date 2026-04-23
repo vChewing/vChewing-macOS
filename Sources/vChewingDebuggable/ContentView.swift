@@ -55,8 +55,39 @@ struct ContentView: View {
 @Observable
 @MainActor
 final class ProfilingViewModel {
+  // MARK: Lifecycle
+
+  init() {
+    startupWork()
+  }
+
+  // MARK: Internal
+
+  static let harness = PinyinProfilingHarness()
+  static var isDataLoaded = false
+
   var isRunning = false
   var statusText = "Press the button to run the SHI control case and the YI hotspot case."
+
+  func startupWork() {
+    guard !isRunning, !Self.isDataLoaded else { return }
+    isRunning = true
+    statusText = "Loading data..."
+
+    Task { @MainActor in
+      defer {
+        isRunning = false
+        Self.isDataLoaded = true
+        NSSound.beep()
+      }
+      do {
+        try Self.harness.loadData()
+        statusText = "Data loaded."
+      } catch {
+        statusText = error.localizedDescription
+      }
+    }
+  }
 
   func runProfilingCases() {
     guard !isRunning else { return }
@@ -70,8 +101,7 @@ final class ProfilingViewModel {
       }
 
       do {
-        let harness = PinyinProfilingHarness()
-        let results = try harness.runAllScenarios()
+        let results = try Self.harness.runAllScenarios()
         statusText = results.map(\.reportLine).joined(separator: "\n")
       } catch {
         statusText = error.localizedDescription

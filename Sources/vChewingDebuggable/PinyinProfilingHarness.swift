@@ -35,6 +35,13 @@ struct PinyinProfilingHarness {
     }
   }
 
+  func loadData() throws {
+    guard let bundledFactoryPath = LMMgr.getCoreDictionaryDBPath(factory: true) else {
+      throw ProfilingHarnessError.factoryDictionaryNotFound
+    }
+    LMMgr.connectCoreDB(dbPath: bundledFactoryPath)
+  }
+
   func runAllScenarios() throws -> [ScenarioResult] {
     let previousPendingUnitTests = UserDefaults.pendingUnitTests
     let previousUnitTests = UserDefaults.unitTests
@@ -48,7 +55,6 @@ struct PinyinProfilingHarness {
 
     defer {
       LMAssembly.LMInstantiator.asyncLoadingUserData = previousAsyncLoading
-      LMAssembly.LMInstantiator.disconnectFactoryDictionary()
       Shared.InputMode.resetLangModelCache(forUnitTests: true)
       LMMgr.resetAfterUnitTests()
       UserDefaults.unitTests?.removeSuite(named: suiteName)
@@ -57,12 +63,6 @@ struct PinyinProfilingHarness {
     }
 
     Shared.InputMode.resetLangModelCache(forUnitTests: true)
-    LMAssembly.LMInstantiator.disconnectFactoryDictionary()
-
-    guard let bundledFactoryPath = LMMgr.getCoreDictionaryDBPath(factory: true) else {
-      throw ProfilingHarnessError.factoryDictionaryNotFound
-    }
-    LMMgr.connectCoreDB(dbPath: bundledFactoryPath)
 
     let session = InputSession(controller: nil) { nil }
     session.ui = nil
@@ -76,10 +76,16 @@ struct PinyinProfilingHarness {
       throw ProfilingHarnessError.inputHandlerUnavailable
     }
 
-    return try [
-      runScenario(stem: "shi", repeats: 8, expectedRemainingBuffer: "shi", session: session, handler: handler),
-      runScenario(stem: "yi", repeats: 8, expectedRemainingBuffer: "yi", session: session, handler: handler),
-    ]
+    let cases = ["wei", "zhong", "hua", "jue", "qi", "er", "du", "shu"]
+    return try [cases + cases].reduce([], +).map { currentCase in
+      try runScenario(
+        stem: currentCase,
+        repeats: 1,
+        expectedRemainingBuffer: currentCase,
+        session: session,
+        handler: handler
+      )
+    }
   }
 
   // MARK: Private
