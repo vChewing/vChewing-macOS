@@ -46,6 +46,10 @@ struct TrieKitTextMapTests {
     )
 
     let textMap = VanguardTrie.TrieIO.serializeToTextMap(trie)
+    if textMap.hasPrefix("VERSION\t1") {
+      #expect(!textMap.contains("VERSION\t1\n"))
+      #expect(!textMap.contains("VERSION\t1\r\n"))
+    }
     let roundTripped = try VanguardTrie.TrieIO.deserializeFromTextMap(textMap)
     let values = roundTripped.nodes.values.first(where: { $0.readingKey == "foo" })?
       .entries.map(\.value).sorted() ?? []
@@ -56,7 +60,7 @@ struct TrieKitTextMapTests {
   @Test("[TrieKit] TextMap parsing tolerates CRLF line endings")
   func testTextMapParsingToleratesCRLFLineEndings() throws {
     let textMap =
-      "#PRAGMA:VANGUARD_HOMA_LEXICON_HEADER\r\nVERSION\t1\r\nTYPE\tTYPING\r\nREADING_SEPARATOR\t-\r\nENTRY_COUNT\t1\r\nKEY_COUNT\t1\r\n#PRAGMA:VANGUARD_HOMA_LEXICON_VALUES\r\n@-9.9\t和\t和\r\n#PRAGMA:VANGUARD_HOMA_LEXICON_KEY_LINE_MAP\r\nhe4\t0\t1\r\n"
+      "#PRAGMA:VANGUARD_HOMA_LEXICON_HEADER\r\nVERSION\t1.1\r\nTYPE\tTYPING\r\nREADING_SEPARATOR\t-\r\nENTRY_COUNT\t1\r\nKEY_COUNT\t1\r\n#PRAGMA:VANGUARD_HOMA_LEXICON_VALUES\r\n@-9.9\t和\t和\r\n#PRAGMA:VANGUARD_HOMA_LEXICON_KEY_LINE_MAP\r\nhe4\t0\t1\r\n"
 
     let trie = try VanguardTrie.TrieIO.deserializeFromTextMap(textMap)
     let entries = trie.nodes.values.first(where: { $0.readingKey == "he4" })?.entries ?? []
@@ -74,7 +78,7 @@ struct TrieKitTextMapTests {
     let emptyGroupedCellPlaceholder = String(UnicodeScalar(7)!)
     let textMap = """
     #PRAGMA:VANGUARD_HOMA_LEXICON_HEADER
-    VERSION\t1
+    VERSION\t1.1
     TYPE\tTYPING
     READING_SEPARATOR\t-
     ENTRY_COUNT\t1
@@ -95,11 +99,34 @@ struct TrieKitTextMapTests {
     #expect(entries.allSatisfy { $0.probability == -5.307 })
   }
 
+  @Test("[TrieKit] Legacy bare VERSION 1 TextMap is rejected")
+  func testLegacyBareVersionOneTextMapIsRejected() {
+    let textMap = """
+    #PRAGMA:VANGUARD_HOMA_LEXICON_HEADER
+    VERSION\t1
+    TYPE\tTYPING
+    READING_SEPARATOR\t-
+    ENTRY_COUNT\t1
+    KEY_COUNT\t1
+    #PRAGMA:VANGUARD_HOMA_LEXICON_VALUES
+    @-9.9\t和\t和
+    #PRAGMA:VANGUARD_HOMA_LEXICON_KEY_LINE_MAP
+    he4\t0\t1
+    """
+
+    #expect(throws: (any Error).self) {
+      try VanguardTrie.TrieIO.deserializeFromTextMap(textMap)
+    }
+    #expect(throws: (any Error).self) {
+      try VanguardTrie.TextMapTrie(data: Data(textMap.utf8))
+    }
+  }
+
   @Test("[TrieKit] Legacy TYPING grouped line remains readable")
   func testLegacyTypingGroupedLineStillParses() throws {
     let textMap = """
     #PRAGMA:VANGUARD_HOMA_LEXICON_HEADER
-    VERSION\t1
+    VERSION\t1.1
     TYPE\tTYPING
     READING_SEPARATOR\t-
     ENTRY_COUNT\t1
@@ -125,7 +152,7 @@ struct TrieKitTextMapTests {
   func testTextMapTrieEquivalence() throws {
     let textMap = """
     #PRAGMA:VANGUARD_HOMA_LEXICON_HEADER
-    VERSION\t1
+    VERSION\t1.1
     TYPE\tTYPING
     READING_SEPARATOR\t-
     ENTRY_COUNT\t5
@@ -205,7 +232,7 @@ struct TrieKitTextMapTests {
   func testTextMapTriePartialAndLongerSegment() throws {
     let textMap = """
     #PRAGMA:VANGUARD_HOMA_LEXICON_HEADER
-    VERSION\t1
+    VERSION\t1.1
     TYPE\tTRIE_TEXTMAP
     READING_SEPARATOR\t-
     ENTRY_COUNT\t3
@@ -250,7 +277,7 @@ struct TrieKitTextMapTests {
     let revLookupType = VanguardTrie.Trie.EntryType(rawValue: 3)
     let textMap = """
     #PRAGMA:VANGUARD_HOMA_LEXICON_HEADER
-    VERSION\t1
+    VERSION\t1.1
     TYPE\tTYPING
     READING_SEPARATOR\t-
     ENTRY_COUNT\t3
@@ -282,7 +309,7 @@ struct TrieKitTextMapTests {
   func testTextMapTrieExistentialQueryAPIs() throws {
     let textMap = """
     #PRAGMA:VANGUARD_HOMA_LEXICON_HEADER
-    VERSION	1
+    VERSION	1.1
     TYPE	TRIE_TEXTMAP
     READING_SEPARATOR	-
     ENTRY_COUNT	4

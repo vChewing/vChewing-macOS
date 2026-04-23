@@ -28,6 +28,7 @@ extension VanguardTrie {
         start: bounds.headerContentStart,
         end: bounds.valuesLineStart
       )
+      try Self.validateMinimumSupportedTextMapVersion(in: headerContent)
       let header = Self.parseHeaderContent(headerContent)
 
       self.readingSeparator = header.separator
@@ -215,6 +216,28 @@ extension VanguardTrie.TextMapTrie {
       return false
     }
     return true
+  }
+
+  private static func validateMinimumSupportedTextMapVersion(in headerContent: String) throws {
+    let versionLine = headerContent.split(
+      omittingEmptySubsequences: false,
+      whereSeparator: \.isNewline
+    ).first.map(String.init) ?? ""
+    guard !isUnsupportedLegacyTextMapVersionLine(versionLine) else {
+      throw makeUnsupportedTextMapVersionError()
+    }
+  }
+
+  private static func isUnsupportedLegacyTextMapVersionLine(_ versionLine: String) -> Bool {
+    versionLine.hasPrefix("VERSION\t1") && !versionLine.contains(".")
+  }
+
+  private static func makeUnsupportedTextMapVersionError() -> VanguardTrie.TrieIO.Exception {
+    VanguardTrie.TrieIO.Exception.deserializationFailed(
+      NSError(domain: "VanguardTrie.TextMapTrie", code: -1, userInfo: [
+        NSLocalizedDescriptionKey: "TextMap format versions below 1.1 are no longer supported.",
+      ])
+    )
   }
 
   private static func parseHeaderContent(_ content: String) -> HeaderInfo {
