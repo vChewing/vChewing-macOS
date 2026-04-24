@@ -28,6 +28,7 @@ extension Homa {
       self.config = config
       self.perceptor = perceptor
       self.gramQueryCache = [:]
+      self.gramQueryCacheOrder = []
     }
 
     /// 複製指定的組字引擎處理器。
@@ -40,6 +41,7 @@ extension Homa {
       self.gramAvailabilityChecker = target.gramAvailabilityChecker
       self.perceptor = target.perceptor
       self.gramQueryCache = target.gramQueryCache
+      self.gramQueryCacheOrder = target.gramQueryCacheOrder
     }
 
     // MARK: Public
@@ -146,6 +148,7 @@ extension Homa {
     public func clear() {
       config.clear()
       gramQueryCache.removeAll(keepingCapacity: true)
+      gramQueryCacheOrder.removeAll(keepingCapacity: true)
     }
 
     /// 在游標位置插入給定的索引鍵。
@@ -162,7 +165,7 @@ extension Homa {
       }
       let gridBackup = segments
       var keyExistenceChecked = [String: Bool]()
-      var warmupQueryBuffer = [[String]: [Homa.Gram]]()
+      var warmupQueryBuffer = [Int: [Homa.Gram]]()
       for (cursorAdvancedPosition, key) in givenKeys.enumerated() {
         if !(keyExistenceChecked[key] ?? false) {
           guard !queryGrams(using: [key], cache: &warmupQueryBuffer).isEmpty else {
@@ -307,6 +310,7 @@ extension Homa {
     public func assignNodes(updateExisting: Bool = false) throws {
       if updateExisting {
         gramQueryCache.removeAll(keepingCapacity: true)
+        gramQueryCacheOrder.removeAll(keepingCapacity: true)
       }
       let maxSegLength = maxSegLength
       let rangeOfPositions: Range<Int>
@@ -318,7 +322,7 @@ extension Homa {
         rangeOfPositions = lowerbound ..< upperbound
       }
       var nodesChangedCounter = 0
-      var queryBuffer: [[String]: [Homa.Gram]] = [:]
+      var queryBuffer: [Int: [Homa.Gram]] = [:]
       rangeOfPositions.forEach { position in
         let rangeOfLengths = 1 ... min(maxSegLength, rangeOfPositions.upperBound - position)
         rangeOfLengths.forEach { theLength in
@@ -367,7 +371,10 @@ extension Homa {
     private static let maxCachedGramQueries = 512
 
     // 針對連續 insertKey() 的 query 結果快取，避免完整 lexicon partial match 重複查詢。
-    private var gramQueryCache: [[String]: [Homa.Gram]]
+    // Phase D 最佳化：改用 Int 雜湊鍵取代 [String]，搭配插入順序陣列實現 LRU 半量淘汰。
+    private var gramQueryCache: [Int: [Homa.Gram]]
+    // 記錄插入順序，供淘汰使用（最舊的鍵在最前面）。
+    private var gramQueryCacheOrder: [Int]
 
     private static func sortGramRAW(_ lhs: Homa.GramRAW, _ rhs: Homa.GramRAW) -> Bool {
       if lhs.keyArray.count != rhs.keyArray.count {
@@ -398,16 +405,23 @@ extension Homa {
     ///   - keyArray: 讀音陣列。
     ///   - cache: 快取。
     /// - Returns: 元圖陣列。
+    private static func hashForKeyArray(_ keyArray: [String]) -> Int {
+      var hasher = Hasher()
+      hasher.combine(keyArray)
+      return hasher.finalize()
+    }
+
     private func queryGrams(
       using keyArray: [String],
-      cache: inout [[String]: [Homa.Gram]]
+      cache: inout [Int: [Homa.Gram]]
     )
       -> [Homa.Gram] {
-      if let cached = cache[keyArray] {
+      let cacheKey = Self.hashForKeyArray(keyArray)
+      if let cached = cache[cacheKey] {
         return cached
       }
-      if let cached = gramQueryCache[keyArray] {
-        cache[keyArray] = cached
+      if let cached = gramQueryCache[cacheKey] {
+        cache[cacheKey] = cached
         return cached
       }
       var insertedIntel = Set<Int>()
@@ -416,11 +430,15 @@ extension Homa {
         guard insertedIntel.insert(intel).inserted else { return nil }
         return Homa.Gram($0)
       }
-      cache[keyArray] = newResult
+      cache[cacheKey] = newResult
       if gramQueryCache.count >= Self.maxCachedGramQueries {
-        gramQueryCache.removeAll(keepingCapacity: true)
+        // 淘汰最舊的一半，而非全量清空，以保留最近常用的快取項目。
+        let halfCount = gramQueryCacheOrder.count / 2
+        gramQueryCacheOrder.prefix(halfCount).forEach { gramQueryCache.removeValue(forKey: $0) }
+        gramQueryCacheOrder.removeFirst(halfCount)
       }
-      gramQueryCache[keyArray] = newResult
+      gramQueryCache[cacheKey] = newResult
+      gramQueryCacheOrder.append(cacheKey)
       return newResult
     }
   }
