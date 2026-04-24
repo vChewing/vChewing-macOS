@@ -132,7 +132,7 @@ extension LMAssembly {
       }
 
       public func hasGrams(for keyArray: [String]) -> Bool {
-        lmi.hasUnigramsFor(keyArray: keyArray)
+        lmi.hasUnigramsForFast(keyArray: keyArray)
       }
 
       // MARK: Fileprivate
@@ -466,6 +466,73 @@ extension LMAssembly {
       // 因為涉及到對濾除清單的檢查，所以這裡必須走一遍 .unigramsFor()。
       // 以 2010 年的電腦效能作為基準參考來看的話，這方面的效能壓力可以忽略不計。
       return keyChain == " " || (!unigramsFor(keyArray: keyArray).isEmpty && !keyChain.isEmpty)
+    }
+
+    /// 輕量版 `hasUnigramsFor`，專供 `gramAvailabilityChecker` 與 Typewriter 層快速判定讀音是否存在。
+    ///
+    /// 與完整版 `hasUnigramsFor` 的差異：
+    /// - 跳過濾除表、語彙置換、InputToken 展開、DateTime、倚天排序等「後處理」步驟。
+    /// - 對含 `&` 的 tone bucket 原廠查詢改走 `factoryChoppedCoreUnigramsFor`（O(1) per keyArray）。
+    /// - user phrases / symbols / cassette 僅做 `hasUnigramsFor(key:)` hash lookup。
+    ///
+    /// 語義保證：若 `hasUnigramsForFast` 回傳 `false`，則 `hasUnigramsFor` / `unigramsFor` 必定也回傳空陣列；
+    /// 若回傳 `true`，則 `unigramsFor` 至少會有一筆結果（可能在後處理階段被濾除，但 availability 意義上「存在」）。
+    public func hasUnigramsForFast(keyArray: [String]) -> Bool {
+      let keyChain = keyArray.joined(separator: "-")
+      guard keyChain != " ", !keyChain.isEmpty else { return keyChain == " " }
+      let noEmptyKey = !keyArray.isEmpty && keyArray.allSatisfy { !$0.isEmpty }
+      guard noEmptyKey else { return false }
+
+      let containsAlternatives = keyArray.joined().contains("&")
+
+      // MARK: 原廠辭典快速檢查
+
+      if !config.isCassetteEnabled
+        || (config.isCassetteEnabled && (keyArray.first?.hasPrefix("_") ?? false)) {
+        if containsAlternatives {
+          if !factoryChoppedCoreUnigramsFor(keyArray: keyArray, strategy: .configuredLookup).isEmpty {
+            return true
+          }
+        } else {
+          if hasFactoryCoreUnigramsFor(keyArray: keyArray) { return true }
+        }
+
+        if keyChain.hasPrefix("_"), keyChain.count > 1,
+           !factoryChoppedUnigramsFor(keyArray: keyArray, column: .theDataMISC).isEmpty {
+          return true
+        }
+
+        if config.isCNSEnabled,
+           !factoryChoppedUnigramsFor(keyArray: keyArray, column: .theDataCNS).isEmpty {
+          return true
+        }
+
+        if !config.bypassUserPhrasesData, config.isSymbolEnabled,
+           !config.isCassetteEnabled,
+           !factoryChoppedUnigramsFor(keyArray: keyArray, column: .theDataSYMB).isEmpty {
+          return true
+        }
+      }
+
+      // MARK: User data / cassette 檢查（tone bucket 需展開 alternatives）
+
+      let keyArraysToCheck: [[String]]
+      if containsAlternatives {
+        keyArraysToCheck = expandAlternativeKeyArrays(from: keyArray)
+      } else {
+        keyArraysToCheck = [keyArray]
+      }
+
+      for expandedKeyArray in keyArraysToCheck {
+        let expandedKeyChain = expandedKeyArray.joined(separator: "-")
+        if !config.bypassUserPhrasesData {
+          if lmUserPhrases.hasUnigramsFor(key: expandedKeyChain) { return true }
+          if config.isSymbolEnabled, lmUserSymbols.hasUnigramsFor(key: expandedKeyChain) { return true }
+        }
+        if config.isCassetteEnabled, Self.lmCassette.hasUnigramsFor(key: expandedKeyChain) { return true }
+      }
+
+      return false
     }
 
     /// 根據給定的索引鍵和資料值，確認是否有該具體的資料值在庫。

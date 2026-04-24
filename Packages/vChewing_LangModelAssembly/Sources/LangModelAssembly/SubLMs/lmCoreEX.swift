@@ -259,7 +259,7 @@ extension LMAssembly {
     /// - parameters:
     ///   - key: 讀音索引鍵。
     func hasUnigramsFor(key: String) -> Bool {
-      rangeMap[key] != nil
+      rangeMap[key] != nil || temporaryMap[key] != nil
     }
   }
 }

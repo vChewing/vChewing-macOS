@@ -193,7 +193,7 @@ public struct BPMFFullMatchTypewriter<Handler: InputHandlerProtocol>: Typewriter
     let choppedReadingKeys = autoChop.committedReadings.map {
       makeToneInsensitivePinyinQueryKey(from: $0)
     }
-    guard choppedReadingKeys.allSatisfy({ handler.currentLM.hasUnigramsFor(keyArray: [$0]) }) else {
+    guard choppedReadingKeys.allSatisfy({ handler.currentLM.hasUnigramsForFast(keyArray: [$0]) }) else {
       return nil
     }
 
@@ -249,7 +249,7 @@ public struct BPMFFullMatchTypewriter<Handler: InputHandlerProtocol>: Typewriter
       prefs: prefs
     ) else { return nil }
 
-    if !handler.currentLM.hasUnigramsFor(keyArray: [readingKey]) {
+    if !handler.currentLM.hasUnigramsForFast(keyArray: [readingKey]) {
       errorCallback("B49C0979：語彙庫內無「\(readingKey)」的匹配記錄。")
 
       if prefs.keepReadingUponCompositionError {
