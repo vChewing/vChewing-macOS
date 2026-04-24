@@ -516,20 +516,22 @@ extension LMAssembly {
 
       // MARK: User data / cassette 檢查（tone bucket 需展開 alternatives）
 
-      let keyArraysToCheck: [[String]]
       if containsAlternatives {
-        keyArraysToCheck = expandAlternativeKeyArrays(from: keyArray)
-      } else {
-        keyArraysToCheck = [keyArray]
-      }
-
-      for expandedKeyArray in keyArraysToCheck {
-        let expandedKeyChain = expandedKeyArray.joined(separator: "-")
-        if !config.bypassUserPhrasesData {
-          if lmUserPhrases.hasUnigramsFor(key: expandedKeyChain) { return true }
-          if config.isSymbolEnabled, lmUserSymbols.hasUnigramsFor(key: expandedKeyChain) { return true }
+        for expandedKeyArray in expandAlternativeKeyArrays(from: keyArray) {
+          let expandedKeyChain = expandedKeyArray.joined(separator: "-")
+          if !config.bypassUserPhrasesData {
+            if lmUserPhrases.hasUnigramsFor(key: expandedKeyChain) { return true }
+            if config.isSymbolEnabled, lmUserSymbols.hasUnigramsFor(key: expandedKeyChain) { return true }
+          }
+          if config.isCassetteEnabled, Self.lmCassette.hasUnigramsFor(key: expandedKeyChain) { return true }
         }
-        if config.isCassetteEnabled, Self.lmCassette.hasUnigramsFor(key: expandedKeyChain) { return true }
+      } else {
+        let keyChain = keyArray.joined(separator: "-")
+        if !config.bypassUserPhrasesData {
+          if lmUserPhrases.hasUnigramsFor(key: keyChain) { return true }
+          if config.isSymbolEnabled, lmUserSymbols.hasUnigramsFor(key: keyChain) { return true }
+        }
+        if config.isCassetteEnabled, Self.lmCassette.hasUnigramsFor(key: keyChain) { return true }
       }
 
       return false
@@ -916,7 +918,7 @@ extension LMAssembly {
         }
       }
 
-      let expandedKeyArrays = expandAlternativeKeyArrays(from: keyArray)
+      let expandedKeyArrays = Array(expandAlternativeKeyArrays(from: keyArray))
 
       struct FactoryLookupMemoKey: Hashable {
         let keyArray: [String]
@@ -1086,35 +1088,60 @@ extension LMAssembly {
       return rawAllUnigrams
     }
 
+    private struct AlternativeKeyArrayIterator: IteratorProtocol {
+      private let alternativeColumns: [[String]]
+      private var indices: [Int]
+      private var isDone: Bool
+      private var seen: Set<String>
+
+      init(alternativeColumns: [[String]]) {
+        self.alternativeColumns = alternativeColumns
+        self.indices = Array(repeating: 0, count: alternativeColumns.count)
+        self.isDone = alternativeColumns.isEmpty || alternativeColumns.contains(where: \.isEmpty)
+        self.seen = Set()
+      }
+
+      mutating func next() -> [String]? {
+        while !isDone {
+          let result = alternativeColumns.indices.map { alternativeColumns[$0][indices[$0]] }
+          let joined = result.joined(separator: "-")
+
+          // 推進到下一個組合
+          var carry = true
+          for i in (0..<indices.count).reversed() {
+            if carry {
+              indices[i] += 1
+              if indices[i] >= alternativeColumns[i].count {
+                indices[i] = 0
+              } else {
+                carry = false
+              }
+            }
+          }
+          if carry { isDone = true }
+
+          if seen.insert(joined).inserted {
+            return result
+          }
+        }
+        return nil
+      }
+    }
+
     /// 將帶有 `&` alternatives 的讀音索引鍵陣列展開為所有可能的 full-match 組合。
     /// - Parameter keyArray: 可能包含 `&` alternatives 的讀音索引鍵陣列。
     /// - Returns: 展開後的所有 keyArray 組合；若原始輸入不含 `&`，則回傳自身作為唯一結果。
-    private func expandAlternativeKeyArrays(from keyArray: [String]) -> [[String]] {
-      guard keyArray.contains(where: { $0.contains("&") }) else { return [keyArray] }
-      var combinations = [[String]]()
-      var dedup = Set<[String]>()
+    private func expandAlternativeKeyArrays(from keyArray: [String]) -> AnySequence<[String]> {
+      guard keyArray.contains(where: { $0.contains("&") }) else {
+        return AnySequence([keyArray])
+      }
       let alternativeColumns: [[String]] = keyArray.map { current in
         let split = current.split(separator: "&").map(\.description)
         return split.isEmpty ? [current] : split
       }
-
-      func visit(index: Int, current: [String]) {
-        if index >= alternativeColumns.count {
-          if dedup.insert(current).inserted {
-            combinations.append(current)
-          }
-          return
-        }
-
-        for candidate in alternativeColumns[index] {
-          var next = current
-          next.append(candidate)
-          visit(index: index + 1, current: next)
-        }
+      return AnySequence {
+        AlternativeKeyArrayIterator(alternativeColumns: alternativeColumns)
       }
-
-      visit(index: 0, current: [])
-      return combinations
     }
 
     /// 當 HashMap 過大時自動清理
