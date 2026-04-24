@@ -46,6 +46,8 @@ extension LMAssembly {
     var rangeMap: [String: [Range<String.Index>]] = [:]
     /// 資料庫追加辭典。
     var temporaryMap: [String: [Homa.Gram]] = [:]
+    /// `rangeMap` 索引鍵的快取集合，避免每次查詢都重建 `Set`。
+    var keySet: Set<String> = []
     /// 資料庫字串陣列。
     var strData: String = ""
     /// 聲明原始檔案內第一、二縱列的內容是否彼此顛倒。
@@ -134,6 +136,7 @@ extension LMAssembly {
         newMap[theKey, default: []].append(theRange)
       }
       rangeMap = newMap
+      keySet = Set(rangeMap.keys)
       // 明確釋放 newMap 記憶體
       newMap.removeAll(keepingCapacity: false)
     }
@@ -144,6 +147,7 @@ extension LMAssembly {
       strData.removeAll(keepingCapacity: false)
       rangeMap.removeAll(keepingCapacity: false)
       temporaryMap.removeAll(keepingCapacity: false)
+      keySet.removeAll(keepingCapacity: false)
     }
 
     // MARK: - Advanced features
@@ -259,7 +263,7 @@ extension LMAssembly {
     /// - parameters:
     ///   - key: 讀音索引鍵。
     func hasUnigramsFor(key: String) -> Bool {
-      rangeMap[key] != nil || temporaryMap[key] != nil
+      keySet.contains(key) || temporaryMap[key] != nil
     }
   }
 }

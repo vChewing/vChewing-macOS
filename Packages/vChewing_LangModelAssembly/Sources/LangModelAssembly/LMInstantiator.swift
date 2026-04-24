@@ -1011,13 +1011,13 @@ extension LMAssembly {
       let matchingUserSymbolKeys: Set<String>
       let matchingFilteredKeys: Set<String>
       if !config.bypassUserPhrasesData {
-        let userPhraseKeySet = Set(lmUserPhrases.rangeMap.keys)
+        let userPhraseKeySet = lmUserPhrases.keySet
           .union(lmUserPhrases.temporaryMap.keys)
         matchingUserPhraseKeys = expandedKeyChains.intersection(userPhraseKeySet)
-        let userSymbolKeySet = Set(lmUserSymbols.rangeMap.keys)
+        let userSymbolKeySet = lmUserSymbols.keySet
           .union(lmUserSymbols.temporaryMap.keys)
         matchingUserSymbolKeys = expandedKeyChains.intersection(userSymbolKeySet)
-        let filteredKeySet = Set(lmFiltered.rangeMap.keys)
+        let filteredKeySet = lmFiltered.keySet
           .union(lmFiltered.temporaryMap.keys)
         matchingFilteredKeys = expandedKeyChains.intersection(filteredKeySet)
       } else {
