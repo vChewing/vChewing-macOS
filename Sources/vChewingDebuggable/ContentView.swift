@@ -20,12 +20,19 @@ struct ContentView: View {
         .font(.title2)
         .fontWeight(.semibold)
 
-      Text("Runs the former pinyin profiling cases against the packaged factory lexicon without IMK client simulation.")
+      Text("Runs pinyin profiling cases against the bundled factory lexicon without IMK client simulation.")
         .foregroundStyle(.secondary)
 
-      Button(action: viewModel.runProfilingCases) {
-        Text(viewModel.isRunning ? "Running..." : "Run Pinyin Profiling Cases")
-          .frame(minWidth: 220)
+      HStack(spacing: 12) {
+        Button(action: viewModel.runProfilingCases) {
+          Text(viewModel.isRunning ? "Running..." : "Run Baseline Profiling Cases")
+            .frame(minWidth: 220)
+        }
+
+        Button(action: viewModel.runWorstCaseProfilingCases) {
+          Text(viewModel.isRunning ? "Running..." : "Run Worst-Case Profiling Cases")
+            .frame(minWidth: 260)
+        }
       }
       .disabled(viewModel.isRunning)
 
@@ -67,7 +74,7 @@ final class ProfilingViewModel {
   static var isDataLoaded = false
 
   var isRunning = false
-  var statusText = "Press the button to run the SHI control case and the YI hotspot case."
+  var statusText = "Press one of the buttons to run baseline or worst-case pinyin profiling cases."
 
   func startupWork() {
     guard !isRunning, !Self.isDataLoaded else { return }
@@ -102,6 +109,26 @@ final class ProfilingViewModel {
 
       do {
         let results = try Self.harness.runAllScenarios()
+        statusText = results.map(\.reportLine).joined(separator: "\n")
+      } catch {
+        statusText = error.localizedDescription
+      }
+    }
+  }
+
+  func runWorstCaseProfilingCases() {
+    guard !isRunning else { return }
+    isRunning = true
+    statusText = "Preparing worst-case profiling environment..."
+
+    Task { @MainActor in
+      defer {
+        isRunning = false
+        NSSound.beep()
+      }
+
+      do {
+        let results = try Self.harness.runWorstCaseScenarios()
         statusText = results.map(\.reportLine).joined(separator: "\n")
       } catch {
         statusText = error.localizedDescription

@@ -37,7 +37,7 @@ struct PinyinProfilingHarness {
 
   func loadData() throws {
     guard let bundledFactoryPath = LMMgr.getCoreDictionaryDBPath(factory: true) else {
-      throw ProfilingHarnessError.factoryDictionaryNotFound
+      throw ProfilingHarnessError.factoryLexiconNotFound
     }
     LMMgr.connectCoreDB(dbPath: bundledFactoryPath)
   }
@@ -82,6 +82,59 @@ struct PinyinProfilingHarness {
         stem: currentCase,
         repeats: 1,
         expectedRemainingBuffer: currentCase,
+        session: session,
+        handler: handler
+      )
+    }
+  }
+
+  func runWorstCaseScenarios() throws -> [ScenarioResult] {
+    let previousPendingUnitTests = UserDefaults.pendingUnitTests
+    let previousUnitTests = UserDefaults.unitTests
+    let previousAsyncLoading = LMAssembly.LMInstantiator.asyncLoadingUserData
+
+    UserDefaults.unitTests = UserDefaults(suiteName: suiteName)
+    UserDefaults.pendingUnitTests = true
+    UserDef.resetAll()
+    LMMgr.prepareForUnitTests()
+    LMAssembly.LMInstantiator.asyncLoadingUserData = false
+
+    defer {
+      LMAssembly.LMInstantiator.asyncLoadingUserData = previousAsyncLoading
+      Shared.InputMode.resetLangModelCache(forUnitTests: true)
+      LMMgr.resetAfterUnitTests()
+      UserDefaults.unitTests?.removeSuite(named: suiteName)
+      UserDefaults.unitTests = previousUnitTests
+      UserDefaults.pendingUnitTests = previousPendingUnitTests
+    }
+
+    Shared.InputMode.resetLangModelCache(forUnitTests: true)
+
+    let session = InputSession(controller: nil) { nil }
+    session.ui = nil
+    session.buzzer = nil
+    session.clientBundleIdentifier = "org.atelierInmu.vChewing.vChewingDebuggable"
+    session.syncCurrentSessionID()
+    session.isActivated = true
+    session.inputMode = .imeModeCHT
+
+    guard let handler = session.inputHandler else {
+      throw ProfilingHarnessError.inputHandlerUnavailable
+    }
+
+    let worstCases: [(stem: String, repeats: Int)] = [
+      ("shi", 8),
+      ("yi", 8),
+      ("de", 10),
+      ("zhong", 6),
+      ("hua", 7),
+    ]
+
+    return try worstCases.map { currentCase in
+      try runScenario(
+        stem: currentCase.stem,
+        repeats: currentCase.repeats,
+        expectedRemainingBuffer: currentCase.stem,
         session: session,
         handler: handler
       )
@@ -162,7 +215,7 @@ struct PinyinProfilingHarness {
 // MARK: - ProfilingHarnessError
 
 private enum ProfilingHarnessError: LocalizedError {
-  case factoryDictionaryNotFound
+  case factoryLexiconNotFound
   case inputHandlerUnavailable
   case unhandledKey(String)
   case unexpectedState(expected: String, actual: String)
@@ -173,8 +226,8 @@ private enum ProfilingHarnessError: LocalizedError {
 
   var errorDescription: String? {
     switch self {
-    case .factoryDictionaryNotFound:
-      return "Bundled factory dictionary was not found in MainAssembly4Darwin resources."
+    case .factoryLexiconNotFound:
+      return "Bundled factory lexicon was not found in MainAssembly4Darwin resources."
     case .inputHandlerUnavailable:
       return "InputSession did not initialize its InputHandler."
     case let .unhandledKey(key):
