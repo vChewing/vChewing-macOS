@@ -850,9 +850,14 @@ extension LMAssembly {
       }
 
       let expandedKeyArrays = expandAlternativeKeyArrays(from: keyArray)
+      var joinedKeyCache: [[String]: String] = [:]
+      joinedKeyCache.reserveCapacity(expandedKeyArrays.count)
+      for expandedKeyArray in expandedKeyArrays {
+        joinedKeyCache[expandedKeyArray] = expandedKeyArray.joined(separator: "-")
+      }
       var deferredFilterByKeyArray: [[String]: Set<String>] = [:]
       for expandedKeyArray in expandedKeyArrays {
-        let keyChain = expandedKeyArray.joined(separator: "-")
+        let keyChain = joinedKeyCache[expandedKeyArray] ?? expandedKeyArray.joined(separator: "-")
         let factoryCoreUnigramsForExpandedKey = factoryCoreUnigramsByKeyArray[expandedKeyArray] ?? []
 
         if !config.bypassUserPhrasesData, config.isSymbolEnabled {
@@ -929,7 +934,7 @@ extension LMAssembly {
         if convertedValues.isEmpty {
           expandedUnigrams.append(unigram)
         } else {
-          let keyChain = unigram.keyArray.joined(separator: "-")
+          let keyChain = joinedKeyCache[unigram.keyArray] ?? unigram.keyArray.joined(separator: "-")
           for (absDelta, value) in convertedValues.enumerated() {
             let newScore: Double = -80 - Double(absDelta) * 0.01
             expandedUnigrams.append(.init(keyArray: unigram.keyArray, value: value, score: newScore))
@@ -961,18 +966,25 @@ extension LMAssembly {
     /// - Parameter keyArray: 可能包含 `&` alternatives 的讀音索引鍵陣列。
     /// - Returns: 展開後的所有 keyArray 組合；若原始輸入不含 `&`，則回傳自身作為唯一結果。
     private func expandAlternativeKeyArrays(from keyArray: [String]) -> [[String]] {
-      guard keyArray.joined().contains("&") else { return [keyArray] }
+      guard keyArray.contains(where: { $0.contains("&") }) else { return [keyArray] }
       var combinations = [[String]]()
+      var dedup = Set<[String]>()
+      let alternativeColumns: [[String]] = keyArray.map { current in
+        let split = current.split(separator: "&").map(\.description)
+        return split.isEmpty ? [current] : split
+      }
 
       func visit(index: Int, current: [String]) {
-        if index >= keyArray.count {
-          combinations.append(current)
+        if index >= alternativeColumns.count {
+          if dedup.insert(current).inserted {
+            combinations.append(current)
+          }
           return
         }
 
-        for candidate in keyArray[index].split(separator: "&") {
+        for candidate in alternativeColumns[index] {
           var next = current
-          next.append(candidate.description)
+          next.append(candidate)
           visit(index: index + 1, current: next)
         }
       }
