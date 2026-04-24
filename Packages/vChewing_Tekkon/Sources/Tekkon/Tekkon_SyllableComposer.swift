@@ -260,7 +260,7 @@ extension Tekkon {
       validationComposer.receiveSequence(appended, isRomaji: true)
       guard !validationComposer.isPronounceable else { return nil }
 
-      let chopped = Tekkon.PinyinTrie(parser: parser).chop(appended)
+      let chopped = Tekkon.PinyinTrie.shared(parser: parser).chop(appended)
       guard chopped.count >= 2, let remainingRomaji = chopped.last else { return nil }
 
       let leadingSlices = Array(chopped.dropLast())

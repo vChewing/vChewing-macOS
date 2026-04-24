@@ -2,6 +2,8 @@
 // ====================
 // This code is released under the SPDX-License-Identifier: `LGPL-3.0-or-later`.
 
+import Foundation
+
 // MARK: - Tekkon.PinyinTrie
 
 extension Tekkon {
@@ -78,11 +80,32 @@ extension Tekkon {
     public var nodes: [Int: TNode] // 新增：節點辭典，以id為索引
     public internal(set) var allPossibleReadings: [String]
 
+    public static func shared(parser: MandarinParser) -> PinyinTrie {
+      let cacheKey = parser.rawValue
+      sharedCacheLock.lock()
+      defer { sharedCacheLock.unlock() }
+      if let cached = sharedCache[cacheKey] {
+        return cached
+      }
+      let created = PinyinTrie(parser: parser)
+      sharedCache[cacheKey] = created
+      return created
+    }
+
+    public static func clearSharedCache() {
+      sharedCacheLock.lock()
+      sharedCache.removeAll(keepingCapacity: true)
+      sharedCacheLock.unlock()
+    }
+
     // MARK: Private
 
     private enum CodingKeys: CodingKey {
       case nodes
     }
+
+    private static let sharedCacheLock = NSLock()
+    nonisolated(unsafe) private static var sharedCache: [Int: PinyinTrie] = [:]
   }
 }
 
