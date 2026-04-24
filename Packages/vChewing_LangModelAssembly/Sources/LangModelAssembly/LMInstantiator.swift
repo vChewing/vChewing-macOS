@@ -822,8 +822,16 @@ extension LMAssembly {
           strategy: .configuredLookup
         )
         if config.filterNonCNSReadings, !isCHS {
-          factoryCoreUnigramsResult = factoryCoreUnigramsResult.filter { thisUnigram in
-            checkCNSConformation(for: thisUnigram, keyArray: thisUnigram.keyArray)
+          factoryCoreUnigramsResult = factoryCoreUnigramsResult.compactMap { thisUnigram in
+            guard !checkCNSConformation(for: thisUnigram, keyArray: thisUnigram.keyArray) else {
+              return thisUnigram
+            }
+            guard thisUnigram.keyArray.count == 1 else { return nil }
+            return .init(
+              keyArray: thisUnigram.keyArray,
+              value: thisUnigram.current,
+              score: -9.5
+            )
           }
         }
         rawAllUnigrams += factoryCoreUnigramsResult
@@ -836,6 +844,9 @@ extension LMAssembly {
       let expandedKeyArrays = expandAlternativeKeyArrays(from: keyArray)
       for expandedKeyArray in expandedKeyArrays {
         let keyChain = expandedKeyArray.joined(separator: "-")
+        let factoryCoreUnigramsForExpandedKey = factoryCoreUnigramsResult.filter {
+          $0.keyArray == expandedKeyArray
+        }
 
         if !config.bypassUserPhrasesData, config.isSymbolEnabled {
           rawAllUnigrams += lmUserSymbols.unigramsFor(key: keyChain, keyArray: expandedKeyArray)
@@ -850,7 +861,7 @@ extension LMAssembly {
 
         if !config.bypassUserPhrasesData {
           let allowBoostingSingleKanji = config.allowRescoringSingleKanjiCandidates
-          let factorySingleReadingValueHashes: Set<Int> = factoryCoreUnigramsResult.reduce(into: []) {
+          let factorySingleReadingValueHashes: Set<Int> = factoryCoreUnigramsForExpandedKey.reduce(into: []) {
             if $1.keyArray.count == 1 { $0.insert($1.hashValue) }
           }
           var userPhraseUnigrams = Array(
@@ -861,7 +872,8 @@ extension LMAssembly {
               factorySingleReadingValueHashes: factorySingleReadingValueHashes
             ).reversed()
           )
-          if expandedKeyArray.count == 1, let topScore = rawAllUnigrams.lazy.map(\.probability).max() {
+          let existingUnigramsForExpandedKey = rawAllUnigrams.lazy.filter { $0.keyArray == expandedKeyArray }
+          if expandedKeyArray.count == 1, let topScore = existingUnigramsForExpandedKey.map(\.probability).max() {
             userPhraseUnigrams = userPhraseUnigrams.map { currentUnigram in
               Homa.Gram(
                 keyArray: expandedKeyArray,

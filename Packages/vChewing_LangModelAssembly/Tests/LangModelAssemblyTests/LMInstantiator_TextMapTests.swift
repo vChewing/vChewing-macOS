@@ -488,9 +488,98 @@ struct LMInstantiatorTextMapTests {
     #expect(!bucketValues.contains("之"))
   }
 
+  @Test
+  func testToneBucketSinglePositionPreservesSingleKanjiBoostingSemantics() throws {
+    defer { LMAssembly.LMInstantiator.disconnectFactoryDictionary() }
+
+    let preferredReading = "ㄅㄛ"
+    let alternateReading = "ㄅㄛˊ"
+    let boostedValue = "補"
+    let textMap = makeTextMap([
+      (preferredReading, [("波", -9.0, 6)]),
+      (alternateReading, [("伯", -1.0, 6)]),
+    ])
+
+    #expect(LMAssembly.LMInstantiator.connectToTestFactoryDictionary(textMapData: textMap))
+    let instance = LMAssembly.LMInstantiator(isCHS: false)
+    instance.setOptions { config in
+      config.isCNSEnabled = false
+      config.isSymbolEnabled = false
+      config.allowRescoringSingleKanjiCandidates = true
+      config.alwaysSupplyETenDOSUnigrams = false
+    }
+    instance.insertTemporaryData(
+      unigram: .init(keyArray: [preferredReading], value: boostedValue, score: 0),
+      isFiltering: false
+    )
+
+    let exactBoosted = instance.unigramsFor(keyArray: [preferredReading]).first(where: { $0.current == boostedValue })
+    let bucketBoosted = instance.unigramsFor(keyArray: ["\(preferredReading)&\(alternateReading)"])
+      .first(where: { $0.current == boostedValue })
+
+    #expect(gramTriple(of: bucketBoosted) == gramTriple(of: exactBoosted))
+  }
+
+  @Test
+  func testToneBucketSinglePositionPreservesReplacementFilterOrdering() throws {
+    defer { LMAssembly.LMInstantiator.disconnectFactoryDictionary() }
+
+    let preferredReading = "ㄅㄛ"
+    let alternateReading = "ㄅㄛˊ"
+    let replacedValue = "禁"
+    let textMap = makeTextMap([
+      (preferredReading, [("波", -9.0, 6)]),
+      (alternateReading, [("伯", -1.0, 6)]),
+    ])
+
+    #expect(LMAssembly.LMInstantiator.connectToTestFactoryDictionary(textMapData: textMap))
+    let instance = LMAssembly.LMInstantiator(isCHS: false)
+    instance.setOptions { config in
+      config.isCNSEnabled = false
+      config.isSymbolEnabled = false
+      config.alwaysSupplyETenDOSUnigrams = false
+    }
+    instance.replaceData(textData: "波 \(replacedValue)\n", for: .theReplacements, save: false)
+    instance.insertTemporaryData(
+      unigram: .init(keyArray: [preferredReading], value: replacedValue, score: 0),
+      isFiltering: true
+    )
+
+    let exactValues = Set(instance.unigramsFor(keyArray: [preferredReading]).map(GramSnapshot.init))
+    let alternateValues = Set(instance.unigramsFor(keyArray: [alternateReading]).map(GramSnapshot.init))
+    let bucketValues = Set(
+      instance.unigramsFor(keyArray: ["\(preferredReading)&\(alternateReading)"])
+        .map(GramSnapshot.init)
+    )
+
+    #expect(bucketValues == exactValues.union(alternateValues))
+    #expect(!bucketValues.contains(.init(keyArray: [preferredReading], value: replacedValue, probability: -9.0)))
+  }
+
+  @Test
+  func testToneBucketSinglePositionPreservesSingleKanjiCNSDemotion() throws {
+    defer { LMAssembly.LMInstantiator.disconnectFactoryDictionary() }
+
+    let instance = LMAssembly.LMInstantiator(isCHS: false)
+    #expect(LMAssembly.LMInstantiator.connectToTestFactoryDictionary(textMapData: LMATestsData.textMapTestCoreLMData))
+
+    instance.setOptions { config in
+      config.isCNSEnabled = false
+      config.isSymbolEnabled = false
+      config.filterNonCNSReadings = true
+      config.alwaysSupplyETenDOSUnigrams = false
+    }
+
+    let exactDemoted = instance.unigramsFor(keyArray: ["ㄨㄟ"]).first(where: { $0.current == "危" })
+    let bucketDemoted = instance.unigramsFor(keyArray: ["ㄨㄟ&ㄨㄟˊ"]).first(where: { $0.current == "危" })
+
+    #expect(gramTriple(of: exactDemoted) == .init(keyArray: ["ㄨㄟ"], value: "危", probability: -9.5))
+    #expect(gramTriple(of: bucketDemoted) == gramTriple(of: exactDemoted))
+  }
+
   // MARK: Private
 
-  private struct GramSnapshot: Equatable {
+  private struct GramSnapshot: Equatable, Hashable {
     // MARK: Lifecycle
 
     init(_ gram: Homa.Gram) {
