@@ -955,23 +955,47 @@ extension LMAssembly {
         return resolved
       }
 
+      // MARK: 非原廠迴路批量預篩選
+
+      let expandedKeyChains = Set(expandedKeyArrays.map { joinedKey(for: $0) })
+
+      let matchingUserPhraseKeys: Set<String>
+      let matchingUserSymbolKeys: Set<String>
+      let matchingFilteredKeys: Set<String>
+      if !config.bypassUserPhrasesData {
+        let userPhraseKeySet = Set(lmUserPhrases.rangeMap.keys)
+          .union(lmUserPhrases.temporaryMap.keys)
+        matchingUserPhraseKeys = expandedKeyChains.intersection(userPhraseKeySet)
+        let userSymbolKeySet = Set(lmUserSymbols.rangeMap.keys)
+          .union(lmUserSymbols.temporaryMap.keys)
+        matchingUserSymbolKeys = expandedKeyChains.intersection(userSymbolKeySet)
+        let filteredKeySet = Set(lmFiltered.rangeMap.keys)
+          .union(lmFiltered.temporaryMap.keys)
+        matchingFilteredKeys = expandedKeyChains.intersection(filteredKeySet)
+      } else {
+        matchingUserPhraseKeys = []
+        matchingUserSymbolKeys = []
+        matchingFilteredKeys = []
+      }
+
       var deferredFilterByKeyArray: [[String]: Set<String>] = [:]
       for expandedKeyArray in expandedKeyArrays {
         let keyChain = joinedKey(for: expandedKeyArray)
         let factoryCoreUnigramsForExpandedKey = factoryCoreUnigramsByKeyArray[expandedKeyArray] ?? []
 
-        if !config.bypassUserPhrasesData, config.isSymbolEnabled {
+        if !config.bypassUserPhrasesData, config.isSymbolEnabled,
+           matchingUserSymbolKeys.contains(keyChain) {
           rawAllUnigrams += lmUserSymbols.unigramsFor(key: keyChain, keyArray: expandedKeyArray)
-          if !config.isCassetteEnabled {
-            rawAllUnigrams += memoizedFactoryUnigrams(
-              keyArray: expandedKeyArray,
-              keyChain: keyChain,
-              column: .theDataSYMB
-            )
-          }
+        }
+        if !config.bypassUserPhrasesData, config.isSymbolEnabled, !config.isCassetteEnabled {
+          rawAllUnigrams += memoizedFactoryUnigrams(
+            keyArray: expandedKeyArray,
+            keyChain: keyChain,
+            column: .theDataSYMB
+          )
         }
 
-        if !config.bypassUserPhrasesData {
+        if !config.bypassUserPhrasesData, matchingUserPhraseKeys.contains(keyChain) {
           let allowBoostingSingleKanji = config.allowRescoringSingleKanjiCandidates
           let factorySingleReadingValueHashes: Set<Int> = factoryCoreUnigramsForExpandedKey.reduce(into: []) {
             if $1.keyArray.count == 1 { $0.insert($1.hashValue) }
@@ -1009,7 +1033,7 @@ extension LMAssembly {
 
         rawAllUnigrams.append(contentsOf: queryDateTimeUnigrams(with: keyChain, keyArray: expandedKeyArray))
 
-        if !config.bypassUserPhrasesData {
+        if !config.bypassUserPhrasesData, matchingFilteredKeys.contains(keyChain) {
           let dataAsFilter = Set(
             lmFiltered.unigramsFor(key: keyChain, keyArray: expandedKeyArray).map(\.current)
           )
