@@ -132,23 +132,27 @@ public final class LMMgr {
   }
 
   // When asyncLoadingUserData is true, connectFactoryDictionary dispatches
-  // the heavy work to a background queue; the assert and notification are only meaningful
-  // on the synchronous path (unit tests). The async path delivers its own log message
-  // upon completion, and the FSM already guards against unloaded factory dictionaries
+  // the heavy work to a background queue; callers must treat the load state as pending
+  // until the completion handler reports the final result. The FSM already guards against
+  // unloaded factory dictionaries
   // (InputSession_HandleEvent shows "Factory dictionary not loaded yet." tooltip).
   public static func connectCoreDB(dbPath: String? = nil) {
     guard let path: String = dbPath ?? Self.getCoreDictionaryDBPath() else {
       preconditionFailure("vChewing factory TextMap data not found.")
     }
-    let result = LMAssembly.LMInstantiator.connectFactoryDictionary(
-      textMapPath: path
-    )
-    if !LMAssembly.LMInstantiator.asyncLoadingUserData {
-      assert(result, "vChewing factory TextMap loading failed.")
-    }
     Notifier.notify(
-      message: "Core Dict loading complete.".i18n
+      message: "i18n:LMMgr.notification.FactoryLexiconLoadingStarted".i18n
     )
+    LMAssembly.LMInstantiator.connectFactoryDictionary(
+      textMapPath: path
+    ) { resultBool in
+      precondition(resultBool, "vChewing factory TextMap loading failed.")
+      asyncOnMain {
+        Notifier.notify(
+          message: "i18n:LMMgr.notification.FactoryLexiconLoadingComplete".i18n
+        )
+      }
+    }
   }
 
   /// 載入磁帶資料。

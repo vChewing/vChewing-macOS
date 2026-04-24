@@ -203,7 +203,7 @@ struct LMInstantiatorTextMapTests {
   }
 
   @Test
-  func testFactoryDictionaryDoesNotAutoLoadRevLookupFile() throws {
+  func testFactoryDictionaryDoesNotAutoLoadRevLookupFile() async throws {
     let tempDir = FileManager.default.temporaryDirectory
       .appendingPathComponent(UUID().uuidString)
     try FileManager.default.createDirectory(at: tempDir, withIntermediateDirectories: true)
@@ -222,7 +222,19 @@ struct LMInstantiatorTextMapTests {
     try textMap.write(to: textMapPath, atomically: true, encoding: .utf8)
     try revLookup.write(to: revLookupPath, atomically: true, encoding: .utf8)
 
-    #expect(LMAssembly.LMInstantiator.connectFactoryDictionary(textMapPath: textMapPath.path))
+    let originalAsyncLoading = LMAssembly.LMInstantiator.asyncLoadingUserData
+    LMAssembly.LMInstantiator.asyncLoadingUserData = false
+    defer {
+      LMAssembly.LMInstantiator.asyncLoadingUserData = originalAsyncLoading
+    }
+
+    let callbackResult: Bool? = await withCheckedContinuation { continuation in
+      LMAssembly.LMInstantiator.connectFactoryDictionary(textMapPath: textMapPath.path) {
+        continuation.resume(returning: $0)
+      }
+    }
+
+    #expect(callbackResult == true)
     #expect(LMAssembly.LMInstantiator.getFactoryReverseLookupData(with: "B") == nil)
   }
 

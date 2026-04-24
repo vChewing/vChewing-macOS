@@ -121,7 +121,6 @@
 "Consolidate the context on confirming candidate selection" = "候補陳列ウィンドウで候補を選ぶ時に文脈を強固する";
 "Consolidate" = "整理";
 "Copy All to Clipboard" = "全てをクリップボードにコピー";
-"Core Dict loading complete." = "核心辞書読込完了";
 "Currency Numeral Output" = "数字大字変換";
 "Cursor Selection:" = "カーソル候補呼出:";
 "Dachen (Microsoft Standard / Wang / 01, etc.)" = "大千配列 (Microsoft 標準・王安・零壹など)";
@@ -209,6 +208,8 @@
 "i18n:fileDragImportButton.DragFileToHere" = "ここにドラッグして";
 "i18n:LMMgr.accessFailure.cassette.description" = "カセットファイルを正しくご指定してから、このモードのご使用を。";
 "i18n:LMMgr.accessFailure.cassette.title" = "ファイルアクセス失敗、或いはご指定したファイル位置情報は使えぬ。";
+"i18n:LMMgr.notification.FactoryLexiconLoadingComplete" = "内蔵辞書読込完了。";
+"i18n:LMMgr.notification.FactoryLexiconLoadingStarted" = "内蔵辞書読込中。";
 "i18n:LMMgr.pathInvalidityFound.cassette.description" = "入力機能設定を開いて、カセットファイルのパス設定を再確認してください。";
 "i18n:LMMgr.pathInvalidityFound.cassette.title" = "カセットファイルのアクセスに問題が検出されました";
 "i18n:LMMgr.pathInvalidityFound.iCloudDriveManagedPathAdvice" = "このパスが iCloud 管理下の「Documents」または「Desktop」にある場合は、ファイルまたはフォルダをローカルの場所へ移してから、もう一度指定してください。これらのフォルダが iCloud Drive に管理されているか分からない場合は、Apple Support に相談すれば設定確認の案内を受けられます。";
