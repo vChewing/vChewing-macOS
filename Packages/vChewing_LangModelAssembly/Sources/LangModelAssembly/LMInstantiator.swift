@@ -850,22 +850,55 @@ extension LMAssembly {
       }
 
       let expandedKeyArrays = expandAlternativeKeyArrays(from: keyArray)
+
+      struct FactoryLookupMemoKey: Hashable {
+        let keyArray: [String]
+        let column: LMAssembly.LMInstantiator.CoreColumn
+      }
+
       var joinedKeyCache: [[String]: String] = [:]
       joinedKeyCache.reserveCapacity(expandedKeyArrays.count)
       for expandedKeyArray in expandedKeyArrays {
         joinedKeyCache[expandedKeyArray] = expandedKeyArray.joined(separator: "-")
       }
+      var factoryLookupMemo: [FactoryLookupMemoKey: [Homa.Gram]] = [:]
+      factoryLookupMemo.reserveCapacity(expandedKeyArrays.count)
+
+      func joinedKey(for keyArray: [String]) -> String {
+        if let cachedJoinedKey = joinedKeyCache[keyArray] {
+          return cachedJoinedKey
+        }
+        let joined = keyArray.joined(separator: "-")
+        joinedKeyCache[keyArray] = joined
+        return joined
+      }
+
+      func memoizedFactoryUnigrams(
+        keyArray: [String],
+        keyChain: String,
+        column: LMAssembly.LMInstantiator.CoreColumn
+      )
+        -> [Homa.Gram] {
+        let memoKey = FactoryLookupMemoKey(keyArray: keyArray, column: column)
+        if let cached = factoryLookupMemo[memoKey] {
+          return cached
+        }
+        let resolved = factoryUnigramsFor(key: keyChain, keyArray: keyArray, column: column)
+        factoryLookupMemo[memoKey] = resolved
+        return resolved
+      }
+
       var deferredFilterByKeyArray: [[String]: Set<String>] = [:]
       for expandedKeyArray in expandedKeyArrays {
-        let keyChain = joinedKeyCache[expandedKeyArray] ?? expandedKeyArray.joined(separator: "-")
+        let keyChain = joinedKey(for: expandedKeyArray)
         let factoryCoreUnigramsForExpandedKey = factoryCoreUnigramsByKeyArray[expandedKeyArray] ?? []
 
         if !config.bypassUserPhrasesData, config.isSymbolEnabled {
           rawAllUnigrams += lmUserSymbols.unigramsFor(key: keyChain, keyArray: expandedKeyArray)
           if !config.isCassetteEnabled {
-            rawAllUnigrams += factoryUnigramsFor(
-              key: keyChain,
+            rawAllUnigrams += memoizedFactoryUnigrams(
               keyArray: expandedKeyArray,
+              keyChain: keyChain,
               column: .theDataSYMB
             )
           }
@@ -934,7 +967,7 @@ extension LMAssembly {
         if convertedValues.isEmpty {
           expandedUnigrams.append(unigram)
         } else {
-          let keyChain = joinedKeyCache[unigram.keyArray] ?? unigram.keyArray.joined(separator: "-")
+          let keyChain = joinedKey(for: unigram.keyArray)
           for (absDelta, value) in convertedValues.enumerated() {
             let newScore: Double = -80 - Double(absDelta) * 0.01
             expandedUnigrams.append(.init(keyArray: unigram.keyArray, value: value, score: newScore))
