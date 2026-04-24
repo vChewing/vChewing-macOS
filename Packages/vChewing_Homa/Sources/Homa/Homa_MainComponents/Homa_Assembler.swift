@@ -165,7 +165,7 @@ extension Homa {
       }
       let gridBackup = segments
       var keyExistenceChecked = [String: Bool]()
-      var warmupQueryBuffer = [Int: [Homa.Gram]]()
+      var warmupQueryBuffer = [GramQueryCacheKey: [Homa.Gram]]()
       for (cursorAdvancedPosition, key) in givenKeys.enumerated() {
         if !(keyExistenceChecked[key] ?? false) {
           guard !queryGrams(using: [key], cache: &warmupQueryBuffer).isEmpty else {
@@ -322,7 +322,7 @@ extension Homa {
         rangeOfPositions = lowerbound ..< upperbound
       }
       var nodesChangedCounter = 0
-      var queryBuffer: [Int: [Homa.Gram]] = [:]
+      var queryBuffer: [GramQueryCacheKey: [Homa.Gram]] = [:]
       rangeOfPositions.forEach { position in
         let rangeOfLengths = 1 ... min(maxSegLength, rangeOfPositions.upperBound - position)
         rangeOfLengths.forEach { theLength in
@@ -368,13 +368,40 @@ extension Homa {
 
     // MARK: Private
 
+    private struct GramQueryCacheKey: Hashable {
+      // MARK: Lifecycle
+
+      init(_ keyArray: [String]) {
+        self.keyArray = keyArray
+        var hasher = Hasher()
+        hasher.combine(keyArray)
+        self.precomputedHash = hasher.finalize()
+      }
+
+      // MARK: Internal
+
+      let keyArray: [String]
+
+      static func == (lhs: Self, rhs: Self) -> Bool {
+        lhs.keyArray == rhs.keyArray
+      }
+
+      func hash(into hasher: inout Hasher) {
+        hasher.combine(precomputedHash)
+      }
+
+      // MARK: Private
+
+      private let precomputedHash: Int
+    }
+
     private static let maxCachedGramQueries = 512
 
     // 針對連續 insertKey() 的 query 結果快取，避免完整 lexicon partial match 重複查詢。
-    // Phase D 最佳化：改用 Int 雜湊鍵取代 [String]，搭配插入順序陣列實現 LRU 半量淘汰。
-    private var gramQueryCache: [Int: [Homa.Gram]]
+    // 保留預先計算的雜湊值，但仍以完整 keyArray 判等，避免 Int 雜湊碰撞誤命中。
+    private var gramQueryCache: [GramQueryCacheKey: [Homa.Gram]]
     // 記錄插入順序，供淘汰使用（最舊的鍵在最前面）。
-    private var gramQueryCacheOrder: [Int]
+    private var gramQueryCacheOrder: [GramQueryCacheKey]
 
     private static func sortGramRAW(_ lhs: Homa.GramRAW, _ rhs: Homa.GramRAW) -> Bool {
       if lhs.keyArray.count != rhs.keyArray.count {
@@ -405,18 +432,12 @@ extension Homa {
     ///   - keyArray: 讀音陣列。
     ///   - cache: 快取。
     /// - Returns: 元圖陣列。
-    private static func hashForKeyArray(_ keyArray: [String]) -> Int {
-      var hasher = Hasher()
-      hasher.combine(keyArray)
-      return hasher.finalize()
-    }
-
     private func queryGrams(
       using keyArray: [String],
-      cache: inout [Int: [Homa.Gram]]
+      cache: inout [GramQueryCacheKey: [Homa.Gram]]
     )
       -> [Homa.Gram] {
-      let cacheKey = Self.hashForKeyArray(keyArray)
+      let cacheKey = GramQueryCacheKey(keyArray)
       if let cached = cache[cacheKey] {
         return cached
       }
