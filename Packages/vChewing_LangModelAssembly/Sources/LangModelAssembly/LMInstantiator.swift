@@ -956,37 +956,19 @@ extension LMAssembly {
         }
       }
 
-      let factoryCoreUnigramsByKeyArray = Dictionary(grouping: factoryCoreUnigramsResult, by: \.keyArray)
-      let topScoreByKeyArray: [[String]: Double] = rawAllUnigrams.reduce(into: [:]) { partialResult, current in
-        let existingTopScore = partialResult[current.keyArray] ?? -.infinity
+      let factoryCoreUnigramsByKeyArray: [String: [Homa.Gram]] = Dictionary(
+        grouping: factoryCoreUnigramsResult,
+        by: { $0.keyArray.joined(separator: "-") }
+      )
+      let topScoreByKeyArray: [String: Double] = rawAllUnigrams.reduce(into: [:]) { partialResult, current in
+        let keyChain = current.keyArray.joined(separator: "-")
+        let existingTopScore = partialResult[keyChain] ?? -.infinity
         if current.probability > existingTopScore {
-          partialResult[current.keyArray] = current.probability
+          partialResult[keyChain] = current.probability
         }
       }
 
-      let expandedKeyArrays = Array(expandAlternativeKeyArrays(from: keyArray))
-
-      struct FactoryLookupMemoKey: Hashable {
-        let keyArray: [String]
-        let column: LMAssembly.LMInstantiator.CoreColumn
-      }
-
-      var joinedKeyCache: [[String]: String] = [:]
-      joinedKeyCache.reserveCapacity(expandedKeyArrays.count)
-      for expandedKeyArray in expandedKeyArrays {
-        joinedKeyCache[expandedKeyArray] = expandedKeyArray.joined(separator: "-")
-      }
-      var factoryLookupMemo: [FactoryLookupMemoKey: [Homa.Gram]] = [:]
-      factoryLookupMemo.reserveCapacity(expandedKeyArrays.count)
-
-      func joinedKey(for keyArray: [String]) -> String {
-        if let cachedJoinedKey = joinedKeyCache[keyArray] {
-          return cachedJoinedKey
-        }
-        let joined = keyArray.joined(separator: "-")
-        joinedKeyCache[keyArray] = joined
-        return joined
-      }
+      var factoryLookupMemo: [String: [Homa.Gram]] = [:]
 
       func memoizedFactoryUnigrams(
         keyArray: [String],
@@ -994,7 +976,7 @@ extension LMAssembly {
         column: LMAssembly.LMInstantiator.CoreColumn
       )
         -> [Homa.Gram] {
-        let memoKey = FactoryLookupMemoKey(keyArray: keyArray, column: column)
+        let memoKey = "\(keyChain)|\(column.rawValue)"
         if let cached = factoryLookupMemo[memoKey] {
           return cached
         }
@@ -1003,36 +985,13 @@ extension LMAssembly {
         return resolved
       }
 
-      // MARK: 非原廠迴路批量預篩選
-
-      let expandedKeyChains = Set(expandedKeyArrays.map { joinedKey(for: $0) })
-
-      let matchingUserPhraseKeys: Set<String>
-      let matchingUserSymbolKeys: Set<String>
-      let matchingFilteredKeys: Set<String>
-      if !config.bypassUserPhrasesData {
-        let userPhraseKeySet = lmUserPhrases.keySet
-          .union(lmUserPhrases.temporaryMap.keys)
-        matchingUserPhraseKeys = expandedKeyChains.intersection(userPhraseKeySet)
-        let userSymbolKeySet = lmUserSymbols.keySet
-          .union(lmUserSymbols.temporaryMap.keys)
-        matchingUserSymbolKeys = expandedKeyChains.intersection(userSymbolKeySet)
-        let filteredKeySet = lmFiltered.keySet
-          .union(lmFiltered.temporaryMap.keys)
-        matchingFilteredKeys = expandedKeyChains.intersection(filteredKeySet)
-      } else {
-        matchingUserPhraseKeys = []
-        matchingUserSymbolKeys = []
-        matchingFilteredKeys = []
-      }
-
-      var deferredFilterByKeyArray: [[String]: Set<String>] = [:]
-      for expandedKeyArray in expandedKeyArrays {
-        let keyChain = joinedKey(for: expandedKeyArray)
-        let factoryCoreUnigramsForExpandedKey = factoryCoreUnigramsByKeyArray[expandedKeyArray] ?? []
+      var deferredFilterByKeyArray: [String: Set<String>] = [:]
+      for expandedKeyArray in expandAlternativeKeyArrays(from: keyArray) {
+        let keyChain = expandedKeyArray.joined(separator: "-")
+        let factoryCoreUnigramsForExpandedKey = factoryCoreUnigramsByKeyArray[keyChain] ?? []
 
         if !config.bypassUserPhrasesData, config.isSymbolEnabled,
-           matchingUserSymbolKeys.contains(keyChain) {
+           lmUserSymbols.hasUnigramsFor(key: keyChain) {
           rawAllUnigrams += lmUserSymbols.unigramsFor(key: keyChain, keyArray: expandedKeyArray)
         }
         if !config.bypassUserPhrasesData, config.isSymbolEnabled, !config.isCassetteEnabled {
@@ -1043,7 +1002,7 @@ extension LMAssembly {
           )
         }
 
-        if !config.bypassUserPhrasesData, matchingUserPhraseKeys.contains(keyChain) {
+        if !config.bypassUserPhrasesData, lmUserPhrases.hasUnigramsFor(key: keyChain) {
           let allowBoostingSingleKanji = config.allowRescoringSingleKanjiCandidates
           let factorySingleReadingValueHashes: Set<Int> = factoryCoreUnigramsForExpandedKey.reduce(into: []) {
             if $1.keyArray.count == 1 { $0.insert($1.hashValue) }
@@ -1056,7 +1015,7 @@ extension LMAssembly {
               factorySingleReadingValueHashes: factorySingleReadingValueHashes
             ).reversed()
           )
-          if expandedKeyArray.count == 1, let topScore = topScoreByKeyArray[expandedKeyArray] {
+          if expandedKeyArray.count == 1, let topScore = topScoreByKeyArray[keyChain] {
             userPhraseUnigrams = userPhraseUnigrams.map { currentUnigram in
               Homa.Gram(
                 keyArray: expandedKeyArray,
@@ -1083,19 +1042,20 @@ extension LMAssembly {
           rawAllUnigrams.append(contentsOf: queryDateTimeUnigrams(with: keyChain, keyArray: expandedKeyArray))
         }
 
-        if !config.bypassUserPhrasesData, matchingFilteredKeys.contains(keyChain) {
+        if !config.bypassUserPhrasesData, lmFiltered.hasUnigramsFor(key: keyChain) {
           let dataAsFilter = Set(
             lmFiltered.unigramsFor(key: keyChain, keyArray: expandedKeyArray).map(\.current)
           )
           if !dataAsFilter.isEmpty {
-            deferredFilterByKeyArray[expandedKeyArray, default: []].formUnion(dataAsFilter)
+            deferredFilterByKeyArray[keyChain, default: []].formUnion(dataAsFilter)
           }
         }
       }
 
       if !config.bypassUserPhrasesData, !deferredFilterByKeyArray.isEmpty {
         rawAllUnigrams.removeAll { gram in
-          guard let dataAsFilter = deferredFilterByKeyArray[gram.keyArray] else { return false }
+          let keyChain = gram.keyArray.joined(separator: "-")
+          guard let dataAsFilter = deferredFilterByKeyArray[keyChain] else { return false }
           return dataAsFilter.contains(gram.current)
         }
       }
@@ -1108,7 +1068,7 @@ extension LMAssembly {
         if convertedValues.isEmpty {
           expandedUnigrams.append(unigram)
         } else {
-          let keyChain = joinedKey(for: unigram.keyArray)
+          let keyChain = unigram.keyArray.joined(separator: "-")
           for (absDelta, value) in convertedValues.enumerated() {
             let newScore: Double = -80 - Double(absDelta) * 0.01
             expandedUnigrams.append(.init(keyArray: unigram.keyArray, value: value, score: newScore))
