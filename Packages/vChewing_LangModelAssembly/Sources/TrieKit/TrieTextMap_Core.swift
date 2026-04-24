@@ -727,6 +727,87 @@ extension VanguardTrie.TextMapTrie {
 // MARK: - VanguardTrie.TextMapTrie + VanguardTrieProtocol
 
 extension VanguardTrie.TextMapTrie: VanguardTrieProtocol {
+  public func getNodes(
+    keysChopped: [String],
+    filterType: EntryType,
+    partiallyMatch: Bool
+  )
+    -> [VanguardTrie.Trie.TNode] {
+    getEntryGroups(
+      keysChopped: keysChopped,
+      filterType: filterType,
+      partiallyMatch: partiallyMatch
+    ).compactMap { group in
+      let keyChain = group.keyArray.joined(separator: String(readingSeparator))
+      return exactNodeByReadingKey(keyChain)
+    }
+  }
+
+  public func getEntryGroups(
+    keysChopped: [String],
+    filterType: EntryType,
+    partiallyMatch: Bool
+  )
+    -> [(keyArray: [String], entries: [VanguardTrie.Trie.Entry])] {
+    guard keysChopped.joined().contains(chopCaseSeparator) else {
+      return getEntryGroups(
+        keyArray: keysChopped,
+        filterType: filterType,
+        partiallyMatch: partiallyMatch,
+        longerSegment: false
+      )
+    }
+
+    let cacheKey: Int = {
+      var hasher = Hasher()
+      hasher.combine(keysChopped)
+      hasher.combine(filterType)
+      hasher.combine(partiallyMatch)
+      hasher.combine("CHOPPED")
+      return hasher.finalize()
+    }()
+    if let cached = queryBuffer4EntryGroups.get(hashKey: cacheKey) {
+      return cached
+    }
+
+    let choppedColumns = parseChoppedColumns(keysChopped)
+    guard !choppedColumns.isEmpty else {
+      queryBuffer4EntryGroups.set(hashKey: cacheKey, value: [])
+      return []
+    }
+
+    let candidateNodeIDs = candidateNodeIDsForChoppedColumns(choppedColumns)
+    guard !candidateNodeIDs.isEmpty else {
+      queryBuffer4EntryGroups.set(hashKey: cacheKey, value: [])
+      return []
+    }
+
+    var handledNodeIDs = Set<Int>()
+    var results: [EntryGroup] = []
+    results.reserveCapacity(candidateNodeIDs.count)
+
+    for nodeID in candidateNodeIDs {
+      guard let node = getNode(nodeID) else { continue }
+      guard handledNodeIDs.insert(node.id).inserted else { continue }
+      let nodeKeyArray = TrieStringOperationCache.shared.getCachedSplit(
+        node.readingKey,
+        separator: readingSeparator
+      )
+      guard nodeKeyArray.count == choppedColumns.count else { continue }
+      guard nodeMatchesChoppedColumns(nodeKeyArray, choppedColumns: choppedColumns, partiallyMatch: partiallyMatch)
+      else { continue }
+
+      let filteredEntries = filterType.isEmpty
+        ? node.entries
+        : node.entries.filter { filterType.contains($0.typeID) }
+      guard !filteredEntries.isEmpty else { continue }
+      results.append((nodeKeyArray, filteredEntries))
+    }
+
+    queryBuffer4EntryGroups.set(hashKey: cacheKey, value: results)
+    return results
+  }
+
   public func getNodeIDsForKeyArray(
     _ keyArray: [String],
     longerSegment: Bool
@@ -875,6 +956,90 @@ extension VanguardTrie.TextMapTrie: VanguardTrieProtocol {
 
     queryBuffer4EntryGroups.set(hashKey: cacheKey, value: result)
     return result
+  }
+
+  private func parseChoppedColumns(_ keysChopped: [String]) -> [[String]] {
+    keysChopped.compactMap { currentCell in
+      let cells = currentCell.split(separator: chopCaseSeparator).map(\.description)
+      return cells.isEmpty ? nil : cells
+    }
+  }
+
+  private func candidateNodeIDsForChoppedColumns(_ choppedColumns: [[String]]) -> [Int] {
+    let initialSets: [Set<String>] = choppedColumns.map { candidates in
+      Set(candidates.compactMap { $0.first?.description })
+    }
+    guard initialSets.allSatisfy({ !$0.isEmpty }) else { return [] }
+
+    var matchedNodeIDs = [Int]()
+    for (currentInitials, nodeIDs) in keyInitialsIDMap {
+      let initialsArray = currentInitials.map(\.description)
+      guard initialsArray.count == initialSets.count else { continue }
+      var allMatched = true
+      for index in initialsArray.indices where !initialSets[index].contains(initialsArray[index]) {
+        allMatched = false
+        break
+      }
+      if allMatched {
+        matchedNodeIDs.append(contentsOf: nodeIDs)
+      }
+    }
+    matchedNodeIDs.sort()
+    return matchedNodeIDs
+  }
+
+  private func nodeMatchesChoppedColumns(
+    _ nodeKeyArray: [String],
+    choppedColumns: [[String]],
+    partiallyMatch: Bool
+  )
+    -> Bool {
+    for index in nodeKeyArray.indices {
+      let nodeCell = nodeKeyArray[index]
+      let candidates = choppedColumns[index]
+      let matched: Bool = switch partiallyMatch {
+      case true:
+        candidates.contains { nodeCell.hasPrefix($0) }
+      case false:
+        candidates.contains(nodeCell)
+      }
+      if !matched { return false }
+    }
+    return true
+  }
+
+  private func exactNodeByReadingKey(_ readingKey: String) -> VanguardTrie.Trie.TNode? {
+    let keyBytes = Array(readingKey.utf8)
+    let totalCount = keyEntries.count
+    var lower = 0
+    var upper = totalCount
+
+    while lower < upper {
+      let mid = (lower + upper) / 2
+      let keyEntry = keyEntries[mid]
+      let compared: Int = rawData.withUnsafeBytes { rawBuffer in
+        let buffer = rawBuffer.bindMemory(to: UInt8.self)
+        let range = keyEntry.keyStart ..< keyEntry.keyEnd
+        let slice = UnsafeBufferPointer(rebasing: buffer[range])
+        return compareUTF8(slice, keyBytes)
+      }
+      if compared < 0 {
+        lower = mid + 1
+      } else {
+        upper = mid
+      }
+    }
+
+    guard lower < totalCount else { return nil }
+    let keyEntry = keyEntries[lower]
+    let isExactMatch: Bool = rawData.withUnsafeBytes { rawBuffer in
+      let buffer = rawBuffer.bindMemory(to: UInt8.self)
+      let range = keyEntry.keyStart ..< keyEntry.keyEnd
+      let slice = UnsafeBufferPointer(rebasing: buffer[range])
+      return compareUTF8(slice, keyBytes) == 0
+    }
+    guard isExactMatch else { return nil }
+    return parseNodeEntries(lower + 1)
   }
 }
 
