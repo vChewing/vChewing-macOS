@@ -12,8 +12,10 @@ import Homa
 // MARK: - 日期時間便捷輸入功能
 
 extension LMAssembly.LMInstantiator {
+  static let dateTimeKnownTriggers: Set<String> = TokenTrigger.knownTriggers
+
   func queryDateTimeUnigrams(with key: String = "", keyArray: [String]) -> [Homa.Gram] {
-    guard let tokenTrigger = TokenTrigger(rawValue: key) else { return [] }
+    guard TokenTrigger.knownTriggers.contains(key), let tokenTrigger = TokenTrigger(rawValue: key) else { return [] }
     var results = [Homa.Gram]()
     var tokens: [String] = []
 
@@ -71,7 +73,7 @@ extension LMAssembly.LMInstantiator {
 
 // MARK: - TokenTrigger
 
-private enum TokenTrigger: String {
+private enum TokenTrigger: String, CaseIterable {
   case shi2jian1 = "ㄕˊ-ㄐㄧㄢ"
   case xing1qi1 = "ㄒㄧㄥ-ㄑㄧ"
   case xing1qi2 = "ㄒㄧㄥ-ㄑㄧˊ"
@@ -93,4 +95,8 @@ private enum TokenTrigger: String {
   case dang1qian2shi2qu1 = "ㄉㄤ-ㄑㄧㄢˊ-ㄕˊ-ㄑㄩ"
   case mu4qian2shi2qu1 = "ㄇㄨˋ-ㄑㄧㄢˊ-ㄕˊ-ㄑㄩ"
   case suo3zai4shi2qu1 = "ㄙㄨㄛˇ-ㄗㄞˋ-ㄕˊ-ㄑㄩ"
+
+  // MARK: Internal
+
+  static let knownTriggers: Set<String> = { Set(allCases.map(\.rawValue)) }()
 }
