@@ -107,6 +107,16 @@ extension VanguardTrie {
       let defaultProbs: [Int32: Double]
     }
 
+    private struct ChoppedColumnCandidate {
+      let text: String
+      let bytes: [UInt8]
+    }
+
+    private struct ChoppedColumn {
+      let candidates: [ChoppedColumnCandidate]
+      let firstBytes: Set<UInt8>
+    }
+
     private final class CachedEntriesBox: NSObject {
       // MARK: Lifecycle
 
@@ -958,27 +968,50 @@ extension VanguardTrie.TextMapTrie: VanguardTrieProtocol {
     return result
   }
 
-  private func parseChoppedColumns(_ keysChopped: [String]) -> [[String]] {
+  private func parseChoppedColumns(_ keysChopped: [String]) -> [ChoppedColumn] {
     keysChopped.compactMap { currentCell in
       let cells = currentCell.split(separator: chopCaseSeparator).map(\.description)
-      return cells.isEmpty ? nil : cells
+      guard !cells.isEmpty else { return nil }
+      let candidates = cells.map { current in
+        ChoppedColumnCandidate(text: current, bytes: Array(current.utf8))
+      }
+      let firstBytes = Set(candidates.compactMap { $0.bytes.first })
+      guard !firstBytes.isEmpty else { return nil }
+      return ChoppedColumn(candidates: candidates, firstBytes: firstBytes)
     }
   }
 
-  private func candidateNodeIDsForChoppedColumns(_ choppedColumns: [[String]]) -> [Int] {
-    let initialSets: [Set<String>] = choppedColumns.map { candidates in
-      Set(candidates.compactMap { $0.first?.description })
-    }
+  private func candidateNodeIDsForChoppedColumns(_ choppedColumns: [ChoppedColumn]) -> [Int] {
+    let initialSets: [Set<UInt8>] = choppedColumns.map(\.firstBytes)
     guard initialSets.allSatisfy({ !$0.isEmpty }) else { return [] }
+    let canUseByteInitials = initialSets.allSatisfy { current in
+      current.allSatisfy { $0 < 0x80 }
+    }
+
+    let initialStringSets: [Set<String>] = canUseByteInitials ? [] : choppedColumns.map { column in
+      Set(column.candidates.compactMap { $0.text.first?.description })
+    }
+    if !canUseByteInitials, initialStringSets.contains(where: \ .isEmpty) {
+      return []
+    }
 
     var matchedNodeIDs = [Int]()
     for (currentInitials, nodeIDs) in keyInitialsIDMap {
-      let initialsArray = currentInitials.map(\.description)
-      guard initialsArray.count == initialSets.count else { continue }
       var allMatched = true
-      for index in initialsArray.indices where !initialSets[index].contains(initialsArray[index]) {
-        allMatched = false
-        break
+      if canUseByteInitials {
+        let initialsBytes = Array(currentInitials.utf8)
+        guard initialsBytes.count == initialSets.count else { continue }
+        for index in initialsBytes.indices where !initialSets[index].contains(initialsBytes[index]) {
+          allMatched = false
+          break
+        }
+      } else {
+        let initialsArray = currentInitials.map(\.description)
+        guard initialsArray.count == initialStringSets.count else { continue }
+        for index in initialsArray.indices where !initialStringSets[index].contains(initialsArray[index]) {
+          allMatched = false
+          break
+        }
       }
       if allMatched {
         matchedNodeIDs.append(contentsOf: nodeIDs)
@@ -990,18 +1023,29 @@ extension VanguardTrie.TextMapTrie: VanguardTrieProtocol {
 
   private func nodeMatchesChoppedColumns(
     _ nodeKeyArray: [String],
-    choppedColumns: [[String]],
+    choppedColumns: [ChoppedColumn],
     partiallyMatch: Bool
   )
     -> Bool {
+    var nodeCellBytesCache: [String: [UInt8]] = [:]
     for index in nodeKeyArray.indices {
       let nodeCell = nodeKeyArray[index]
-      let candidates = choppedColumns[index]
-      let matched: Bool = switch partiallyMatch {
-      case true:
-        candidates.contains { nodeCell.hasPrefix($0) }
-      case false:
-        candidates.contains(nodeCell)
+      let nodeBytes = nodeCellBytesCache[nodeCell] ?? {
+        let bytes = Array(nodeCell.utf8)
+        nodeCellBytesCache[nodeCell] = bytes
+        return bytes
+      }()
+
+      var matched = false
+      for candidate in choppedColumns[index].candidates {
+        if candidate.bytes.isEmpty {
+          matched = partiallyMatch ? nodeCell.hasPrefix(candidate.text) : (nodeCell == candidate.text)
+        } else if partiallyMatch {
+          matched = hasUTF8Prefix(nodeBytes, prefix: candidate.bytes)
+        } else {
+          matched = nodeBytes == candidate.bytes
+        }
+        if matched { break }
       }
       if !matched { return false }
     }
@@ -1039,7 +1083,7 @@ extension VanguardTrie.TextMapTrie: VanguardTrieProtocol {
       return compareUTF8(slice, keyBytes) == 0
     }
     guard isExactMatch else { return nil }
-    return parseNodeEntries(lower + 1)
+    return getNode(lower + 1)
   }
 }
 
@@ -1054,6 +1098,14 @@ private func compareUTF8(_ lhs: UnsafeBufferPointer<UInt8>, _ rhs: [UInt8]) -> I
   if lhs.count < rhs.count { return -1 }
   if lhs.count > rhs.count { return 1 }
   return 0
+}
+
+private func hasUTF8Prefix(_ source: [UInt8], prefix: [UInt8]) -> Bool {
+  guard source.count >= prefix.count else { return false }
+  for index in 0 ..< prefix.count where source[index] != prefix[index] {
+    return false
+  }
+  return true
 }
 
 private func compareUTF8Buffers(
