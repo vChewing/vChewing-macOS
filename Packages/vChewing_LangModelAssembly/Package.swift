@@ -21,7 +21,12 @@ let package = Package(
     .package(path: "../vChewing_Tekkon"),
   ],
   targets: [
-    .target(name: "TrieKit"),
+    .target(
+      name: "TrieKit",
+      dependencies: [
+        .product(name: "SwiftExtension", package: "vChewing_SwiftExtension"),
+      ]
+    ),
     .target(
       name: "LMAssemblyMaterials4Tests",
       resources: [
