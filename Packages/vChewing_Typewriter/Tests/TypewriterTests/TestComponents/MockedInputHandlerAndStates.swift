@@ -158,8 +158,7 @@ public final class MockInputHandler: @MainActor InputHandlerProtocol {
     self.notificationCallback = notificationCallback
     self.filterabilityChecker = filterabilityChecker
     self.assembler = Assembler(
-      gramQuerier: { _ in [] },
-      gramAvailabilityChecker: { _ in false }
+      gramQuerier: { _ in [] }
     )
     assembler.maxSegLength = prefs.maxCandidateLength
     assembler.gramQuerier = { [weak self] keyArray in
@@ -167,10 +166,6 @@ public final class MockInputHandler: @MainActor InputHandlerProtocol {
       return self.currentLM.unigramsFor(keyArray: keyArray).map {
         (keyArray: $0.keyArray, value: $0.current, probability: $0.probability, previous: nil)
       }
-    }
-    assembler.gramAvailabilityChecker = { [weak self] keyArray in
-      guard let self else { return false }
-      return self.currentLM.hasUnigramsFor(keyArray: keyArray)
     }
     ensureKeyboardParser()
   }

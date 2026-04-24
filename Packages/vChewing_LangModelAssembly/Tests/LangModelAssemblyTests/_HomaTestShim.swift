@@ -16,13 +16,4 @@ nonisolated extension TestLM {
       self.queryGrams(queryKeys, partiallyMatch: partiallyMatch)
     }
   }
-
-  func asGramAvailabilityChecker(
-    partiallyMatch: Bool = false
-  )
-    -> Homa.GramAvailabilityChecker {
-    { querykeys in
-      self.hasGrams(querykeys, partiallyMatch: partiallyMatch)
-    }
-  }
 }

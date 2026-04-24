@@ -45,7 +45,6 @@ public struct TrieKitTests: TrieKitTestSuite {
     let readings: [Substring] = "ㄧㄡ ㄉㄧㄝˊ ㄋㄥˊ ㄌㄧㄡˊ ㄧˋ ㄌㄩˇ ㄈㄤ".split(separator: " ")
     let assembler = Homa.Assembler(
       gramQuerier: { mockLM.queryGrams($0) }, // 會回傳包含 Bigram 的結果。
-      gramAvailabilityChecker: { mockLM.hasGrams($0) }
     )
     try readings.forEach {
       try assembler.insertKey($0.description)
@@ -98,7 +97,6 @@ public struct TrieKitTests: TrieKitTestSuite {
     let readings: [String] = "ㄧㄉㄋㄌㄧㄌㄈ".map(\.description)
     let assembler = Homa.Assembler(
       gramQuerier: { mockLM.queryGrams($0, partiallyMatch: true) }, // 會回傳包含 Bigram 的結果。
-      gramAvailabilityChecker: { mockLM.hasGrams($0, partiallyMatch: true) }
     )
     try readings.forEach {
       try assembler.insertKey($0.description)
@@ -139,7 +137,6 @@ public struct TrieKitTests: TrieKitTestSuite {
     #expect(!queried.isEmpty)
     let assembler = Homa.Assembler(
       gramQuerier: { mockLM.queryGrams($0, partiallyMatch: true) }, // 會回傳包含 Bigram 的結果。
-      gramAvailabilityChecker: { mockLM.hasGrams($0, partiallyMatch: true) }
     )
     try keys2Add.forEach {
       try assembler.insertKey($0.description)

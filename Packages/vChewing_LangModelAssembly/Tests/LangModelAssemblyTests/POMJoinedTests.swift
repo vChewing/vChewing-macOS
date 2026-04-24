@@ -34,8 +34,7 @@ extension POMTestSuite {
         dataURL: URL(fileURLWithPath: "/dev/null")
       )
       let compositor = Homa.Assembler(
-        gramQuerier: lm.asGramQuerier(),
-        gramAvailabilityChecker: lm.asGramAvailabilityChecker()
+        gramQuerier: lm.asGramQuerier()
       )
       // 測試用句「再創世的凱歌」。
       let readingKeys = ["zai4", "chuang4", "shi4", "de5", "kai3", "ge1"]
@@ -88,8 +87,7 @@ extension POMTestSuite {
       // 然後是記憶效力測試：
       let validationLM = TestLM(rawData: HomaTests.strLMSampleData_SaisoukiNoGaika)
       let validationCompositor = Homa.Assembler(
-        gramQuerier: validationLM.asGramQuerier(),
-        gramAvailabilityChecker: validationLM.asGramAvailabilityChecker()
+        gramQuerier: validationLM.asGramQuerier()
       )
       for key in readingKeys.prefix(4) { try validationCompositor.insertKey(key) }
       validationCompositor.assemble()
@@ -140,8 +138,7 @@ extension POMTestSuite {
         dataURL: URL(fileURLWithPath: "/dev/null")
       )
       let compositor = Homa.Assembler(
-        gramQuerier: lm.asGramQuerier(),
-        gramAvailabilityChecker: lm.asGramAvailabilityChecker()
+        gramQuerier: lm.asGramQuerier()
       )
       let readingKeys = ["zai4", "chuang4", "shi4"]
       for key in readingKeys { try compositor.insertKey(key) }
@@ -226,8 +223,7 @@ extension POMTestSuite {
         dataURL: URL(fileURLWithPath: "/dev/null")
       )
       let compositor = Homa.Assembler(
-        gramQuerier: lm.asGramQuerier(),
-        gramAvailabilityChecker: lm.asGramAvailabilityChecker()
+        gramQuerier: lm.asGramQuerier()
       )
       // 測試用句「再創世的凱歌」。
       let readingKeys = ["shang1", "wu4", "ying1", "yu3", "hui4", "hua4"]
@@ -274,8 +270,7 @@ extension POMTestSuite {
       #expect(firstObservationKey == obsCaptured.contextualizedGramKey) // 然後是記憶效力測試：
       let validationLM = TestLM(rawData: HomaTests.strLMSampleData_BusinessEnglishSession)
       let validationCompositor = Homa.Assembler(
-        gramQuerier: validationLM.asGramQuerier(),
-        gramAvailabilityChecker: validationLM.asGramAvailabilityChecker()
+        gramQuerier: validationLM.asGramQuerier()
       )
       for key in readingKeys { try validationCompositor.insertKey(key) }
       validationCompositor.assemble()
@@ -324,8 +319,7 @@ extension POMTestSuite {
       let lm = TestLM(rawData: HomaTests.strLMSampleData_DiJiaoSubmission)
       let pom = LMAssembly.LXPerceptor(dataURL: URL(fileURLWithPath: "/dev/null"))
       let compositor = Homa.Assembler(
-        gramQuerier: lm.asGramQuerier(),
-        gramAvailabilityChecker: lm.asGramAvailabilityChecker()
+        gramQuerier: lm.asGramQuerier()
       )
       let readingKeys = ["di4", "jiao1"]
       for key in readingKeys { try compositor.insertKey(key) }
@@ -382,8 +376,7 @@ extension POMTestSuite {
 
       let validationLM = TestLM(rawData: HomaTests.strLMSampleData_DiJiaoSubmission)
       let validationCompositor = Homa.Assembler(
-        gramQuerier: validationLM.asGramQuerier(),
-        gramAvailabilityChecker: validationLM.asGramAvailabilityChecker()
+        gramQuerier: validationLM.asGramQuerier()
       )
       for key in readingKeys { try validationCompositor.insertKey(key) }
       validationCompositor.assemble()

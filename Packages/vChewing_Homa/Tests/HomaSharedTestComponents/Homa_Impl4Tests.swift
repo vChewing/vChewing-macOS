@@ -21,9 +21,6 @@ extension HomaTestSuite {
             probability: -1
           ).asTuple,
         ]
-      },
-      gramAvailabilityChecker: {
-        $0.reduce(0) { $1.isEmpty ? $0 : $0 + $1.count } != 0
       }
     )
   }

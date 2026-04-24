@@ -40,8 +40,7 @@ extension TrieJoinedTestSuite {
     }
     let readings: [Substring] = "ㄧㄡ ㄉㄧㄝˊ ㄋㄥˊ ㄌㄧㄡˊ ㄧˋ ㄌㄩˇ ㄈㄤ".split(separator: " ")
     let assembler = Homa.Assembler(
-      gramQuerier: instance.lookupHub.grams(for:),
-      gramAvailabilityChecker: instance.lookupHub.hasGrams(for:)
+      gramQuerier: instance.lookupHub.grams(for:)
     )
     try Self.measureTime("Key insertion time cost total", tag: "(FullMatch)") {
       try readings.forEach { try assembler.insertKey($0.description) }
@@ -83,8 +82,7 @@ extension TrieJoinedTestSuite {
       config.alwaysSupplyETenDOSUnigrams = false
     }
     let assembler = Homa.Assembler(
-      gramQuerier: instance.lookupHub.grams(for:),
-      gramAvailabilityChecker: instance.lookupHub.hasGrams(for:)
+      gramQuerier: instance.lookupHub.grams(for:)
     )
     try Self.measureTime("Key insertion time cost total", tag: "(Partial Match)") {
       try keys2Add.forEach { try assembler.insertKey($0.description) }
@@ -127,20 +125,6 @@ extension TrieJoinedTestSuite {
     -> Homa.GramQuerier {
     { keyArray in
       trie.queryGrams(
-        keyArray,
-        filterType: .cht,
-        partiallyMatch: partiallyMatch
-      )
-    }
-  }
-
-  private static func makeFactoryGramAvailabilityChecker(
-    trie: VanguardTrie.TextMapTrie,
-    partiallyMatch: Bool
-  )
-    -> Homa.GramAvailabilityChecker {
-    { keyArray in
-      trie.hasGrams(
         keyArray,
         filterType: .cht,
         partiallyMatch: partiallyMatch

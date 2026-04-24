@@ -468,7 +468,7 @@ extension LMAssembly {
       return keyChain == " " || (!unigramsFor(keyArray: keyArray).isEmpty && !keyChain.isEmpty)
     }
 
-    /// 輕量版 `hasUnigramsFor`，專供 `gramAvailabilityChecker` 與 Typewriter 層快速判定讀音是否存在。
+    /// 輕量版 `hasUnigramsFor`，專供 Homa.Assembler 與 Typewriter 層快速判定讀音是否存在。
     ///
     /// 與完整版 `hasUnigramsFor` 的差異：
     /// - 跳過濾除表、語彙置換、InputToken 展開、DateTime、倚天排序等「後處理」步驟。
@@ -860,6 +860,52 @@ extension LMAssembly {
 
     // MARK: Private
 
+    private struct AlternativeKeyArrayIterator: IteratorProtocol {
+      // MARK: Lifecycle
+
+      init(alternativeColumns: [[String]]) {
+        self.alternativeColumns = alternativeColumns
+        self.indices = Array(repeating: 0, count: alternativeColumns.count)
+        self.isDone = alternativeColumns.isEmpty || alternativeColumns.contains(where: \.isEmpty)
+        self.seen = Set()
+      }
+
+      // MARK: Internal
+
+      mutating func next() -> [String]? {
+        while !isDone {
+          let result = alternativeColumns.indices.map { alternativeColumns[$0][indices[$0]] }
+          let joined = result.joined(separator: "-")
+
+          // 推進到下一個組合
+          var carry = true
+          for i in (0 ..< indices.count).reversed() {
+            if carry {
+              indices[i] += 1
+              if indices[i] >= alternativeColumns[i].count {
+                indices[i] = 0
+              } else {
+                carry = false
+              }
+            }
+          }
+          if carry { isDone = true }
+
+          if seen.insert(joined).inserted {
+            return result
+          }
+        }
+        return nil
+      }
+
+      // MARK: Private
+
+      private let alternativeColumns: [[String]]
+      private var indices: [Int]
+      private var isDone: Bool
+      private var seen: Set<String>
+    }
+
     nonisolated private static let mtxFactoryTrie: NSMutex<VanguardTrie.TextMapTrie?> = .init(nil)
 
     nonisolated private let mtxLXPerceptor: NSMutex<LXPerceptor>
@@ -1086,46 +1132,6 @@ extension LMAssembly {
 
       rawAllUnigrams.consolidate()
       return rawAllUnigrams
-    }
-
-    private struct AlternativeKeyArrayIterator: IteratorProtocol {
-      private let alternativeColumns: [[String]]
-      private var indices: [Int]
-      private var isDone: Bool
-      private var seen: Set<String>
-
-      init(alternativeColumns: [[String]]) {
-        self.alternativeColumns = alternativeColumns
-        self.indices = Array(repeating: 0, count: alternativeColumns.count)
-        self.isDone = alternativeColumns.isEmpty || alternativeColumns.contains(where: \.isEmpty)
-        self.seen = Set()
-      }
-
-      mutating func next() -> [String]? {
-        while !isDone {
-          let result = alternativeColumns.indices.map { alternativeColumns[$0][indices[$0]] }
-          let joined = result.joined(separator: "-")
-
-          // 推進到下一個組合
-          var carry = true
-          for i in (0..<indices.count).reversed() {
-            if carry {
-              indices[i] += 1
-              if indices[i] >= alternativeColumns[i].count {
-                indices[i] = 0
-              } else {
-                carry = false
-              }
-            }
-          }
-          if carry { isDone = true }
-
-          if seen.insert(joined).inserted {
-            return result
-          }
-        }
-        return nil
-      }
     }
 
     /// 將帶有 `&` alternatives 的讀音索引鍵陣列展開為所有可能的 full-match 組合。

@@ -21,8 +21,7 @@ public struct HomaTestsAdvanced: HomaTestSuite {
       valueSegmentationOnly: true
     )
     let assembler = Homa.Assembler(
-      gramQuerier: { mockLM.queryGrams($0) },
-      gramAvailabilityChecker: { mockLM.hasGrams($0) }
+      gramQuerier: { mockLM.queryGrams($0) }
     )
     try "幽蝶能留一縷芳".forEach { i in
       try assembler.insertKey(i.description)
@@ -39,8 +38,7 @@ public struct HomaTestsAdvanced: HomaTestSuite {
     print("// Stress test preparation begins.")
     let mockLM = TestLM(rawData: HomaTests.strLMStressData)
     let assembler = Homa.Assembler(
-      gramQuerier: { mockLM.queryGrams($0) },
-      gramAvailabilityChecker: { mockLM.hasGrams($0) }
+      gramQuerier: { mockLM.queryGrams($0) }
     )
     try (0 ..< 512).forEach { _ in
       try assembler.insertKey("sheng1")
@@ -65,7 +63,6 @@ public struct HomaTestsAdvanced: HomaTestSuite {
     )
     let assembler = Homa.Assembler(
       gramQuerier: { mockLMWithFilter.queryGrams($0) }, // 會回傳包含 Bigram 的結果。
-      gramAvailabilityChecker: { mockLMWithFilter.hasGrams($0) }
     )
     try readings.forEach {
       try assembler.insertKey($0.description)
@@ -74,7 +71,6 @@ public struct HomaTestsAdvanced: HomaTestSuite {
     #expect(assembledSentence == ["樹心", "封"])
     // 先置換語言模型 API 再更新所有節點的 Unigram 資料。
     assembler.gramQuerier = { mockLM.queryGrams($0) }
-    assembler.gramAvailabilityChecker = { mockLM.hasGrams($0) }
     try assembler.assignNodes(updateExisting: true)
     assembledSentence = assembler.assemble().compactMap(\.value)
     #expect(assembledSentence == ["樹新風"])
@@ -89,8 +85,7 @@ public struct HomaTestsAdvanced: HomaTestSuite {
       rawData: HomaTests.strLMSampleDataTechGuarden + "\n" + HomaTests.strLMSampleDataLitch
     )
     let assembler = Homa.Assembler(
-      gramQuerier: { mockLM.queryGrams($0) },
-      gramAvailabilityChecker: { mockLM.hasGrams($0) }
+      gramQuerier: { mockLM.queryGrams($0) }
     )
     try readings.split(separator: " ").forEach {
       try assembler.insertKey($0.description)
@@ -141,8 +136,7 @@ public struct HomaTestsAdvanced: HomaTestSuite {
       let readings: [Substring] = "ke1 ji4 gong1 yuan2".split(separator: " ")
       let mockLM = TestLM(rawData: HomaTests.strLMSampleDataTechGuarden)
       let assembler = Homa.Assembler(
-        gramQuerier: { mockLM.queryGrams($0) },
-        gramAvailabilityChecker: { mockLM.hasGrams($0) }
+        gramQuerier: { mockLM.queryGrams($0) }
       )
       try readings.forEach {
         try assembler.insertKey($0.description)
@@ -167,8 +161,7 @@ public struct HomaTestsAdvanced: HomaTestSuite {
           .strLMSampleDataHutao
       )
       let assembler = Homa.Assembler(
-        gramQuerier: { mockLM.queryGrams($0) },
-        gramAvailabilityChecker: { mockLM.hasGrams($0) }
+        gramQuerier: { mockLM.queryGrams($0) }
       )
       try readings.forEach {
         try assembler.insertKey($0.description)
@@ -212,7 +205,6 @@ public struct HomaTestsAdvanced: HomaTestSuite {
     var perceptions = [Homa.PerceptionIntel]()
     let assembler = Homa.Assembler(
       gramQuerier: { mockLM.queryGrams($0) },
-      gramAvailabilityChecker: { mockLM.hasGrams($0) },
       perceptor: { intel in
         perceptions.append(intel)
       }
@@ -299,7 +291,6 @@ public struct HomaTestsAdvanced: HomaTestSuite {
     let mockLM = TestLM(rawData: HomaTests.strLMSampleDataHutao)
     let assembler = Homa.Assembler(
       gramQuerier: { mockLM.queryGrams($0) }, // 會回傳包含 Bigram 的結果。
-      gramAvailabilityChecker: { mockLM.hasGrams($0) }
     )
     try readings.forEach {
       try assembler.insertKey($0.description)
@@ -361,7 +352,6 @@ public struct HomaTestsAdvanced: HomaTestSuite {
     let mockLM = TestLM(rawData: HomaTests.strLMSampleDataHutao)
     let assembler = Homa.Assembler(
       gramQuerier: { mockLM.queryGrams($0, partiallyMatch: true) }, // 會回傳包含 Bigram 的結果。
-      gramAvailabilityChecker: { mockLM.hasGrams($0, partiallyMatch: true) }
     )
     try readings.forEach {
       try assembler.insertKey($0.description)
@@ -394,7 +384,6 @@ public struct HomaTestsAdvanced: HomaTestSuite {
     let mockLM = TestLM(rawData: HomaTests.strLMSampleDataFruitJuice)
     let assembler = Homa.Assembler(
       gramQuerier: { mockLM.queryGrams($0) }, // 會回傳包含 Bigram 的結果。
-      gramAvailabilityChecker: { mockLM.hasGrams($0) }
     )
     try readings.forEach {
       try assembler.insertKey($0.description)
@@ -480,7 +469,6 @@ public struct HomaTestsAdvanced: HomaTestSuite {
     let mockLM = TestLM(rawData: HomaTests.strLMSampleDataTechGuarden + "\ngong1-yuan2 公猿 -9")
     let assembler = Homa.Assembler(
       gramQuerier: { mockLM.queryGrams($0) }, // 會回傳包含 Bigram 的結果。
-      gramAvailabilityChecker: { mockLM.hasGrams($0) }
     )
     try readings.forEach {
       try assembler.insertKey($0.description)
@@ -534,7 +522,6 @@ public struct HomaTestsAdvanced: HomaTestSuite {
     )
     let assembler = Homa.Assembler(
       gramQuerier: { mockLM.queryGrams($0) }, // 會回傳包含 Bigram 的結果。
-      gramAvailabilityChecker: { mockLM.hasGrams($0) }
     )
     try readings.forEach {
       try assembler.insertKey($0.description)
@@ -656,8 +643,7 @@ public struct HomaTestsAdvanced: HomaTestSuite {
     let cases: [Homa.Assembler.CandidateCursor] = [.placedFront, .placedRear]
     try cases.forEach { candidateCursorType in
       let assembler = Homa.Assembler(
-        gramQuerier: { mockLM.queryGrams($0, partiallyMatch: partialMatch) },
-        gramAvailabilityChecker: { mockLM.hasGrams($0, partiallyMatch: partialMatch) }
+        gramQuerier: { mockLM.queryGrams($0, partiallyMatch: partialMatch) }
       )
       try readings.split(separator: " ").forEach {
         try assembler.insertKey($0.description)
@@ -820,8 +806,7 @@ public struct HomaTestsAdvanced: HomaTestSuite {
   func testCandidateRevolvementRareCase1() async throws {
     let mockLM = TestLM(rawData: HomaTests.strLMSampleData_JiHuQiKeng)
     let assembler = Homa.Assembler(
-      gramQuerier: { mockLM.queryGrams($0) },
-      gramAvailabilityChecker: { mockLM.hasGrams($0) }
+      gramQuerier: { mockLM.queryGrams($0) }
     )
     let readingKeys = ["ji1", "hu1", "qi4", "keng1"]
     try readingKeys.forEach { try assembler.insertKey($0) }
@@ -856,8 +841,7 @@ public struct HomaTestsAdvanced: HomaTestSuite {
   func testConsolidationUsesTrueNodeAnchorsOnOverlap() async throws {
     let mockLM = TestLM(rawData: HomaTests.strLMSampleData_JiHuQiKeng)
     let assembler = Homa.Assembler(
-      gramQuerier: { mockLM.queryGrams($0) },
-      gramAvailabilityChecker: { mockLM.hasGrams($0) }
+      gramQuerier: { mockLM.queryGrams($0) }
     )
     let readingKeys = ["ji1", "hu1", "qi4", "keng1"]
     try readingKeys.forEach { try assembler.insertKey($0) }
@@ -892,8 +876,7 @@ public struct HomaTestsAdvanced: HomaTestSuite {
   func testPerceptionIntel_SaisoukiNoGaika() async throws {
     let mockLM = TestLM(rawData: HomaTests.strLMSampleData_SaisoukiNoGaika)
     let assembler = Homa.Assembler(
-      gramQuerier: { mockLM.queryGrams($0) },
-      gramAvailabilityChecker: { mockLM.hasGrams($0) }
+      gramQuerier: { mockLM.queryGrams($0) }
     )
     let readingKeys = ["zai4", "chuang4", "shi4", "de5", "kai3", "ge1"]
     try readingKeys.forEach { try assembler.insertKey($0) }
@@ -989,8 +972,7 @@ public struct HomaTestsAdvanced: HomaTestSuite {
   func testPerceptionIntel_BusinessEnglishSession() async throws {
     let mockLM = TestLM(rawData: HomaTests.strLMSampleData_BusinessEnglishSession)
     let assembler = Homa.Assembler(
-      gramQuerier: { mockLM.queryGrams($0) },
-      gramAvailabilityChecker: { mockLM.hasGrams($0) }
+      gramQuerier: { mockLM.queryGrams($0) }
     )
     let readingKeys = ["shang1", "wu4", "ying1", "yu3", "hui4", "hua4"]
     try readingKeys.forEach { try assembler.insertKey($0) }
@@ -1056,8 +1038,7 @@ public struct HomaTestsAdvanced: HomaTestSuite {
     let readingKeys = ["di4", "jiao1"]
     let mockLM = TestLM(rawData: HomaTests.strLMSampleData_DiJiaoSubmission)
     let assembler = Homa.Assembler(
-      gramQuerier: { mockLM.queryGrams($0) },
-      gramAvailabilityChecker: { mockLM.hasGrams($0) }
+      gramQuerier: { mockLM.queryGrams($0) }
     )
     try readingKeys.forEach { try assembler.insertKey($0) }
     assembler.assemble()
@@ -1112,8 +1093,7 @@ public struct HomaTestsAdvanced: HomaTestSuite {
     #expect(assembledAfterSecond == "遞交")
 
     let validationAssembler = Homa.Assembler(
-      gramQuerier: { mockLM.queryGrams($0) },
-      gramAvailabilityChecker: { mockLM.hasGrams($0) }
+      gramQuerier: { mockLM.queryGrams($0) }
     )
     try readingKeys.forEach { try validationAssembler.insertKey($0) }
     validationAssembler.assemble()

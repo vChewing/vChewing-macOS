@@ -71,8 +71,7 @@ public struct HomaTestsBasic: HomaTestSuite {
   func testDefendingInvalidOps() async throws {
     let mockLM = TestLM(rawData: "ping2 ping2 -1")
     let assembler = Homa.Assembler(
-      gramQuerier: { mockLM.queryGrams($0) },
-      gramAvailabilityChecker: { mockLM.hasGrams($0) }
+      gramQuerier: { mockLM.queryGrams($0) }
     )
     #expect(Self.mustFail { try assembler.insertKey("guo3") })
     #expect(Self.mustFail { try assembler.insertKey("") })
@@ -116,8 +115,7 @@ public struct HomaTestsBasic: HomaTestSuite {
           Homa.GramRAW(keyArray: keyArray, value: "〈", probability: -9.9, previous: nil),
           Homa.GramRAW(keyArray: keyArray, value: "《", probability: -9.9, previous: nil),
         ]
-      },
-      gramAvailabilityChecker: { !$0.isEmpty }
+      }
     )
 
     try assembler.insertKey("_punctuation_Standard_<")
@@ -134,8 +132,7 @@ public struct HomaTestsBasic: HomaTestSuite {
           Homa.GramRAW(keyArray: ["shi4"], value: "世", probability: -4, previous: nil),
           Homa.GramRAW(keyArray: ["shuai1"], value: "衰", probability: -8, previous: nil),
         ]
-      },
-      gramAvailabilityChecker: { !$0.isEmpty }
+      }
     )
 
     try assembler.insertKey("sh")

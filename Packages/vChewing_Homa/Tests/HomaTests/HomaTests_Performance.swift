@@ -29,8 +29,7 @@ public struct HomaPerformanceTests: HomaTestSuite {
 
     let mockLM = TestLM(rawData: HomaTests.strLMSampleDataTrailblazing)
     let assembler = Homa.Assembler(
-      gramQuerier: { mockLM.queryGrams($0) },
-      gramAvailabilityChecker: { mockLM.hasGrams($0) }
+      gramQuerier: { mockLM.queryGrams($0) }
     )
 
     var totalTime: Double = 0
@@ -108,8 +107,7 @@ public struct HomaPerformanceTests: HomaTestSuite {
 
     let mockLM = TestLM(rawData: HomaTests.strLMSampleDataTrailblazing)
     let assembler = Homa.Assembler(
-      gramQuerier: { mockLM.queryGrams($0) },
-      gramAvailabilityChecker: { mockLM.hasGrams($0) }
+      gramQuerier: { mockLM.queryGrams($0) }
     )
 
     // 模擬重度使用情形模式
@@ -118,8 +116,7 @@ public struct HomaPerformanceTests: HomaTestSuite {
         // 創建暨摧毀組字器副本，測試 ARC 效能
         for _ in 0 ..< 20 {
           let tempAssembler = Homa.Assembler(
-            gramQuerier: { mockLM.queryGrams($0) },
-            gramAvailabilityChecker: { mockLM.hasGrams($0) }
+            gramQuerier: { mockLM.queryGrams($0) }
           )
 
           try? tempAssembler.insertKey("test\(batch)")
@@ -157,8 +154,7 @@ public struct HomaPerformanceTests: HomaTestSuite {
     // 預熱快取
     for _ in 0 ..< 10 {
       let assembler = Homa.Assembler(
-        gramQuerier: { mockLM.queryGrams($0) },
-        gramAvailabilityChecker: { mockLM.hasGrams($0) }
+        gramQuerier: { mockLM.queryGrams($0) }
       )
 
       for key in testData.keys.prefix(5) {
@@ -173,8 +169,7 @@ public struct HomaPerformanceTests: HomaTestSuite {
 
       let iterationTime = try Self.measureTime {
         let assembler = Homa.Assembler(
-          gramQuerier: { mockLM.queryGrams($0) },
-          gramAvailabilityChecker: { mockLM.hasGrams($0) }
+          gramQuerier: { mockLM.queryGrams($0) }
         )
 
         for key in keys {

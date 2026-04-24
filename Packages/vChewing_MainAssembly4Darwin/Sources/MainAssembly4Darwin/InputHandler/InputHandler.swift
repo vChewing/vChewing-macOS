@@ -31,8 +31,7 @@ public final class InputHandler: @MainActor InputHandlerProtocol {
     self.notificationCallback = notificationCallback
     /// 組字器初期化（先用空閉包，待 self 完成初始化後再指定真正的閉包）。
     self.assembler = Assembler(
-      gramQuerier: { _ in [] },
-      gramAvailabilityChecker: { _ in false }
+      gramQuerier: { _ in [] }
     )
     /// 同步組字器單個詞的幅節長度上限。
     assembler.maxSegLength = prefs.maxCandidateLength
@@ -40,10 +39,6 @@ public final class InputHandler: @MainActor InputHandlerProtocol {
     assembler.gramQuerier = { [weak self] keyArray in
       guard let self else { return [] }
       return self.currentLM.lookupHub.grams(for: keyArray)
-    }
-    assembler.gramAvailabilityChecker = { [weak self] keyArray in
-      guard let self else { return false }
-      return self.currentLM.lookupHub.hasGrams(for: keyArray)
     }
     /// 注拼槽初期化。
     ensureKeyboardParser()

@@ -15,16 +15,13 @@ extension Homa {
     /// 建立組字引擎處理器副本。
     /// - Parameters:
     ///   - gramQuerier: 單元圖資料存取專用介面。
-    ///   - gramAvailabilityChecker: 單元圖資料可用性偵測介面。
     ///   - config: 引擎配置參數。
     public init(
       gramQuerier: @escaping Homa.GramQuerier,
-      gramAvailabilityChecker: @escaping Homa.GramAvailabilityChecker,
       perceptor: Homa.BehaviorPerceptor? = nil,
       config: Config = Config()
     ) {
       self.gramQuerier = gramQuerier
-      self.gramAvailabilityChecker = gramAvailabilityChecker
       self.config = config
       self.perceptor = perceptor
       self.gramQueryCache = [:]
@@ -38,7 +35,6 @@ extension Homa {
     public init(from target: Assembler) {
       self.config = target.config.hardCopy
       self.gramQuerier = target.gramQuerier
-      self.gramAvailabilityChecker = target.gramAvailabilityChecker
       self.perceptor = target.perceptor
       self.gramQueryCache = target.gramQueryCache
       self.gramQueryCacheOrder = target.gramQueryCacheOrder
@@ -53,8 +49,6 @@ extension Homa {
 
     /// 單元圖資料存取專用介面。
     public var gramQuerier: Homa.GramQuerier
-    /// 元圖在庫檢查器。
-    public var gramAvailabilityChecker: Homa.GramAvailabilityChecker
     /// 用以洞察使用者字詞節點覆寫行為的 API。
     public var perceptor: BehaviorPerceptor?
     /// 組態設定。
@@ -179,7 +173,7 @@ extension Homa {
       do {
         try assignNodes()
       } catch {
-        // 用來在 gramAvailabilityChecker() 結果不準確的時候防呆、恢復被搞壞的 segments。
+        // 防呆：若 assignNodes() 失敗，恢復被搞壞的 segments。
         segments = gridBackup
         throw error
       }

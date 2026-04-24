@@ -711,10 +711,8 @@ extension MainAssemblyTests {
   func test216_InputHandler_RevolverRareCase_JiHuQiKeng() throws {
     let mockLM = TestLM(rawData: HomaTests.strLMSampleData_JiHuQiKeng)
     let originalQuerier = testHandler.assembler.gramQuerier
-    let originalAvailabilityChecker = testHandler.assembler.gramAvailabilityChecker
     defer {
       testHandler.assembler.gramQuerier = originalQuerier
-      testHandler.assembler.gramAvailabilityChecker = originalAvailabilityChecker
       testHandler.clear()
       testClient.clear()
     }
@@ -725,7 +723,6 @@ extension MainAssemblyTests {
     testHandler.prefs.useRearCursorMode = false
     testSession.resetInputHandler(forceComposerCleanup: true)
     testHandler.assembler.gramQuerier = { mockLM.queryGrams($0) }
-    testHandler.assembler.gramAvailabilityChecker = { mockLM.hasGrams($0) }
 
     #expect(throws: Never.self) { try testHandler.assembler.insertKey("ji1") }
     #expect(throws: Never.self) { try testHandler.assembler.insertKey("hu1") }
