@@ -733,9 +733,7 @@ extension VanguardTrie.TextMapTrie: VanguardTrieProtocol {
   )
     -> [Int] {
     guard !keyArray.isEmpty, keyArray.allSatisfy({ !$0.isEmpty }) else { return [] }
-    let keyInitials = keyArray.compactMap {
-      TrieStringPool.shared.internKey(TrieStringOperationCache.shared.getCachedFirstChar($0))
-    }.joined()
+    let keyInitials = keyArray.compactMap { $0.first?.description }.joined()
 
     let cacheKey: Int = {
       var hasher = Hasher()
