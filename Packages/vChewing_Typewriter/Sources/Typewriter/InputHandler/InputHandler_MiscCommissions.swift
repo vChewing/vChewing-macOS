@@ -40,7 +40,7 @@ extension InputHandlerProtocol {
   /// - Parameter isShiftPressed: 有沒有同時摁著 Shift 鍵。
   /// - Returns: 將按鍵行為「是否有處理掉」藉由 SessionCtl 回報給 IMK。
   func commissionByCtrlCommandEnter(isShiftPressed: Bool = false) -> String {
-    var displayedText = assembler.keys.joined(separator: "\t")
+    var displayedText = assembler.actualKeys.joined(separator: "\t")
     if assembler.isEmpty {
       displayedText = readingForDisplay
     }
@@ -48,7 +48,7 @@ extension InputHandlerProtocol {
       if prefs.inlineDumpPinyinInLieuOfZhuyin {
         if !assembler.isEmpty {
           var arrDisplayedTextElements = [String]()
-          assembler.keys.forEach { key in
+          assembler.actualKeys.forEach { key in
             arrDisplayedTextElements.append(Tekkon.restoreToneOneInPhona(target: key)) // 恢復陰平標記
           }
           displayedText = arrDisplayedTextElements.joined(separator: "\t")

@@ -364,7 +364,7 @@ extension InputHandlerProtocol {
       }
       var marking = State.ofMarking(
         displayTextSegments: state.displayTextSegments,
-        markedReadings: Array(assembler.keys[currentMarkedRange()]),
+        markedReadings: Array(assembler.actualKeys[currentMarkedRange()]),
         cursor: convertCursorForDisplay(assembler.cursor),
         marker: convertCursorForDisplay(assembler.marker)
       )
@@ -389,7 +389,7 @@ extension InputHandlerProtocol {
       }
       var marking = State.ofMarking(
         displayTextSegments: state.displayTextSegments,
-        markedReadings: Array(assembler.keys[currentMarkedRange()]),
+        markedReadings: Array(assembler.actualKeys[currentMarkedRange()]),
         cursor: convertCursorForDisplay(assembler.cursor),
         marker: convertCursorForDisplay(assembler.marker)
       )
@@ -832,7 +832,7 @@ extension InputHandlerProtocol {
         }
         var marking = State.ofMarking(
           displayTextSegments: compositionBufferDisplayTextSegments(),
-          markedReadings: Array(assembler.keys[currentMarkedRange()]),
+          markedReadings: Array(assembler.actualKeys[currentMarkedRange()]),
           cursor: convertCursorForDisplay(assembler.cursor),
           marker: convertCursorForDisplay(assembler.marker)
         )
@@ -896,7 +896,7 @@ extension InputHandlerProtocol {
         }
         var marking = State.ofMarking(
           displayTextSegments: compositionBufferDisplayTextSegments(),
-          markedReadings: Array(assembler.keys[currentMarkedRange()]),
+          markedReadings: Array(assembler.actualKeys[currentMarkedRange()]),
           cursor: convertCursorForDisplay(assembler.cursor),
           marker: convertCursorForDisplay(assembler.marker)
         )

@@ -466,7 +466,7 @@ extension InputHandlerProtocol {
   var previousParsableCalligraph: String? {
     if assembler.cursor == 0 { return nil }
     let cursorPrevious = max(assembler.cursor - 1, 0)
-    return assembler.keys[cursorPrevious]
+    return assembler.actualKeys[cursorPrevious]
   }
 
   /// 返回前一個游標位置的可解析的漢字讀音。
@@ -474,7 +474,7 @@ extension InputHandlerProtocol {
   var previousParsableReading: (String, String, Bool)? {
     if assembler.cursor == 0 { return nil }
     let cursorPrevious = max(assembler.cursor - 1, 0)
-    let rawData = assembler.keys[cursorPrevious]
+    let rawData = assembler.actualKeys[cursorPrevious]
     let components = rawData.map(\.description)
     var hasIntonation = false
     for neta in components {

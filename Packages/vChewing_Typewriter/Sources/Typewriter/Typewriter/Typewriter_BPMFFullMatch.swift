@@ -92,7 +92,7 @@ public struct BPMFFullMatchTypewriter<Handler: InputHandlerProtocol>: Typewriter
     existedIntonation: Tekkon.Phonabet,
     prefs: some PrefMgrProtocol
   )
-    -> String? {
+    -> [String]? {
     guard let readingKey = handler.composer.phonabetKeyForQuery(
       pronounceableOnly: prefs.acceptLeadingIntonations
     ) else {
@@ -102,7 +102,7 @@ public struct BPMFFullMatchTypewriter<Handler: InputHandlerProtocol>: Typewriter
       confirmCombination: confirmCombination,
       existedIntonation: existedIntonation
     ) else {
-      return readingKey
+      return [readingKey]
     }
     return makeToneInsensitivePinyinQueryKey(from: readingKey)
   }
@@ -126,8 +126,8 @@ public struct BPMFFullMatchTypewriter<Handler: InputHandlerProtocol>: Typewriter
 
   /// 將單一無調拼音讀音展開成同音節的聲調候選桶。
   /// - Parameter readingKey: 不帶顯式聲調的單一讀音索引鍵。
-  /// - Returns: 以 `&` 串接的多讀音索引鍵，用來限定在同音節的不同聲調變體內查詢。
-  private func makeToneInsensitivePinyinQueryKey(from readingKey: String) -> String {
+  /// - Returns: 該讀音的所有聲調變體陣列。
+  private func makeToneInsensitivePinyinQueryKey(from readingKey: String) -> [String] {
     var toneVariants = [String]()
     Tekkon.allowedIntonations.forEach { tone in
       let intonationNow = (tone != " ") ? String(tone) : ""
@@ -136,7 +136,7 @@ public struct BPMFFullMatchTypewriter<Handler: InputHandlerProtocol>: Typewriter
         toneVariants.append(candidate)
       }
     }
-    return toneVariants.joined(separator: "&")
+    return toneVariants
   }
 
   private func consumeReadingInputIfNeeded(
@@ -193,7 +193,9 @@ public struct BPMFFullMatchTypewriter<Handler: InputHandlerProtocol>: Typewriter
     let choppedReadingKeys = autoChop.committedReadings.map {
       makeToneInsensitivePinyinQueryKey(from: $0)
     }
-    guard choppedReadingKeys.allSatisfy({ handler.currentLM.hasUnigramsForFast(keyArray: [$0]) }) else {
+    guard choppedReadingKeys.allSatisfy({ key in
+      key.contains(where: { handler.currentLM.hasUnigramsForFast(keyArray: [$0]) })
+    }) else {
       return nil
     }
 
@@ -249,8 +251,11 @@ public struct BPMFFullMatchTypewriter<Handler: InputHandlerProtocol>: Typewriter
       prefs: prefs
     ) else { return nil }
 
-    if !handler.currentLM.hasUnigramsForFast(keyArray: [readingKey]) {
-      errorCallback("B49C0979：語彙庫內無「\(readingKey)」的匹配記錄。")
+    let hasAnyResult = readingKey.contains { alt in
+      handler.currentLM.hasUnigramsForFast(keyArray: [alt])
+    }
+    if !hasAnyResult {
+      errorCallback("B49C0979：語彙庫內無「\(readingKey.joined(separator: "/"))」的匹配記錄。")
 
       if prefs.keepReadingUponCompositionError {
         if handler.composer.hasIntonation() { handler.composer.doBackSpace() }
@@ -278,7 +283,7 @@ public struct BPMFFullMatchTypewriter<Handler: InputHandlerProtocol>: Typewriter
 
     narrateTheComposer(
       narrator: handler.narrator,
-      with: readingKey,
+      with: readingKey.first, // 暫時沒別的好辦法可以改良體驗。
       when: prefs.readingNarrationCoverage == 1
     )
 
@@ -336,7 +341,7 @@ extension BPMFFullMatchTypewriter {
     if assembler.cursor == 0 { return nil }
     let cursorPrevious = max(assembler.cursor - 1, 0)
     guard assembler.keys.indices.contains(cursorPrevious) else { return nil }
-    let readingKey = assembler.keys[cursorPrevious]
+    let readingKey = assembler.actualKeys[cursorPrevious]
     guard !readingKey.isEmpty else { return nil }
     var playbackComposer = handler.composer
     playbackComposer.clear()
@@ -456,7 +461,7 @@ extension BPMFFullMatchTypewriter {
     guard assembler.cursor > 0 else { return .stateMismatch }
     let targetIndex = assembler.cursor - 1
     guard assembler.keys.indices.contains(targetIndex) else { return .stateMismatch }
-    guard assembler.keys[targetIndex] == request.originalReading else { return .stateMismatch }
+    guard assembler.actualKeys[targetIndex] == request.originalReading else { return .stateMismatch }
     guard handler.currentLM.hasUnigramsFor(keyArray: [request.replacementReading]) else {
       return .noLexiconRecord
     }
