@@ -334,7 +334,7 @@ extension Homa {
         gramQueryCache.removeAll(keepingCapacity: true)
         gramQueryCacheOrder.removeAll(keepingCapacity: true)
       }
-      let maxSegLength = maxSegLength
+      var maxSegLength = maxSegLength
       let rangeOfPositions: Range<Int>
       if updateExisting {
         rangeOfPositions = segments.indices
@@ -342,6 +342,16 @@ extension Homa {
         let lowerbound = Swift.max(0, cursor - maxSegLength)
         let upperbound = Swift.min(cursor + maxSegLength, keys.count)
         rangeOfPositions = lowerbound ..< upperbound
+      }
+      // 若掃描半徑 > 4 且範圍內有複合讀音鍵，動態縮減 maxSegLength 以避免笛卡爾積爆炸。
+      if maxSegLength > 4 {
+        let hasMultipleKeysInRange = rangeOfPositions.contains { position in
+          guard keys.indices.contains(position) else { return false }
+          return keys[position].isMultiple
+        }
+        if hasMultipleKeysInRange {
+          maxSegLength = 4
+        }
       }
       var nodesChangedCounter = 0
       var queryBuffer: [GramQueryCacheKey: [Homa.Gram]] = [:]

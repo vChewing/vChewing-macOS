@@ -53,6 +53,22 @@ extension Homa {
       }
     }
 
+    /// 回傳該鍵包含的可能讀音數量。
+    ///
+    /// 對 `singleKey` 回傳 1；
+    /// 對 `multipleKeys` 回傳其內容數量。
+    public var count: Int {
+      switch self {
+      case .singleKey: return 1
+      case let .multipleKeys(possibleKeys): return possibleKeys.count
+      }
+    }
+
+    /// 該鍵是否包含多個可能讀音（即為 `multipleKeys` 且數量大於 1）。
+    public var isMultiple: Bool {
+      count > 1
+    }
+
     // MARK: Private
 
     private static let pokayokeChar = "🛇"
