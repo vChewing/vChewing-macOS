@@ -312,4 +312,55 @@ public struct HomaTestsBasic: HomaTestSuite {
       #expect(assembler.segments[8][6]?.keyArray.joined() == "蝶能留一縷芳")
     }
   }
+
+  @Test("[Homa] Assembler_MultipleKeysCartesianProductMergesResults")
+  func testMultipleKeysCartesianProductMergesResults() async throws {
+    let assembler = Homa.Assembler(
+      gramQuerier: { keyArray in
+        // Simulate a language model with tone-variant entries.
+        // Position 0: "shu4" → "樹", "zhi" → "之"
+        // Position 1: "zhi" → "之"
+        // Combined: "shu4-zhi" → "樹之", "zhi-zhi" → "之之"
+        switch keyArray {
+        case ["shu4"]:
+          return [Homa.GramRAW(keyArray: keyArray, value: "樹", probability: -5.0, previous: nil)]
+        case ["zhi"]:
+          return [Homa.GramRAW(keyArray: keyArray, value: "之", probability: -4.9, previous: nil)]
+        case ["shu4", "zhi"]:
+          return [Homa.GramRAW(keyArray: keyArray, value: "樹之", probability: -4.0, previous: nil)]
+        case ["zhi", "zhi"]:
+          return [Homa.GramRAW(keyArray: keyArray, value: "之之", probability: -6.0, previous: nil)]
+        default:
+          return []
+        }
+      }
+    )
+
+    // Insert two positions: first has two alternatives (shu4 / zhi), second has one (zhi).
+    try assembler.insertKeys([.multipleKeys(["shu4", "zhi"]), .singleKey("zhi")])
+
+    // Position 0 should have nodes of length 1 and 2.
+    #expect(assembler.segments[0].maxLength == 2)
+
+    // Length-1 node at position 0: should contain grams from BOTH alternatives (merged).
+    let pos0_len1 = assembler.segments[0][1]
+    #expect(pos0_len1 != nil)
+    let pos0_len1_values = pos0_len1!.grams.map(\.current)
+    #expect(Set(pos0_len1_values) == ["樹", "之"])
+    // keyArray attribution must be preserved per originating reading.
+    #expect(pos0_len1!.grams.filter { $0.current == "樹" }.allSatisfy { $0.keyArray == ["shu4"] })
+    #expect(pos0_len1!.grams.filter { $0.current == "之" }.allSatisfy { $0.keyArray == ["zhi"] })
+
+    // Length-2 node at position 0: should contain Cartesian combinations.
+    let pos0_len2 = assembler.segments[0][2]
+    #expect(pos0_len2 != nil)
+    let pos0_len2_values = pos0_len2!.grams.map(\.current)
+    #expect(Set(pos0_len2_values) == ["樹之", "之之"])
+
+    // Position 1 should only have length-1 node (single key).
+    #expect(assembler.segments[1].maxLength == 1)
+    let pos1_len1 = assembler.segments[1][1]
+    #expect(pos1_len1 != nil)
+    #expect(pos1_len1!.grams.map(\.current) == ["之"])
+  }
 }

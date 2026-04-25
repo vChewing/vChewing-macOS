@@ -174,7 +174,7 @@ struct HomaTests_NodeOverrideStatus: HomaTestSuite {
   func testAssemblerNodeOverrideStatusMirroring() throws {
     let assembler = Self.makeAssemblerUsingMockLM()
 
-    try assembler.insertKeys(["a", "b", "c"])
+    try assembler.insertKeys(["a", "b", "c"].map { .singleKey($0) })
 
     // Generate mirror before any changes
     let originalMirror = assembler.createNodeOverrideStatusMirror()
@@ -229,7 +229,7 @@ struct HomaTests_NodeOverrideStatus: HomaTestSuite {
   func testAssemblerNodeOverrideStatusMirrorVsCopy() throws {
     let assembler = Self.makeAssemblerUsingMockLM()
 
-    try assembler.insertKeys(["hello", "world", "test"])
+    try assembler.insertKeys(["hello", "world", "test"].map { .singleKey($0) })
 
     var modifiedNodes = 0
     for segment in assembler.segments {

@@ -61,7 +61,7 @@ extension Homa {
     }
 
     /// 該組字器已經插入的的索引鍵，以陣列的形式存放。
-    public private(set) var keys: [String] {
+    public private(set) var keys: [PossibleKey] {
       get { config.keys }
       set { config.keys = newValue }
     }
@@ -145,29 +145,41 @@ extension Homa {
       gramQueryCacheOrder.removeAll(keepingCapacity: true)
     }
 
-    /// 在游標位置插入給定的索引鍵。
+    /// 在游標位置插入給定的索引鍵（單一讀音，無聲調替代）。
     /// - Parameter key: 要插入的索引鍵。
     public func insertKey(_ key: String) throws {
-      try insertKeys([key])
+      try insertKeys([.singleKey(key)])
+    }
+
+    /// 在游標位置插入給定的索引鍵（含聲調替代）。
+    /// - Parameter key: 要插入的索引鍵（一個位置的所有可能讀音）。
+    public func insertKey(_ key: [String]) throws {
+      let possibleKey: PossibleKey = key.count == 1 ? .singleKey(key[0]) : .multipleKeys(key)
+      try insertKeys([possibleKey])
     }
 
     /// 在游標位置插入給定的多個索引鍵。
     /// - Parameter keys: 要插入的多個索引鍵。
-    public func insertKeys(_ givenKeys: [String]) throws {
-      guard !givenKeys.isEmpty, givenKeys.allSatisfy({ !$0.isEmpty }) else {
+    public func insertKeys(_ givenKeys: [PossibleKey]) throws {
+      guard !givenKeys.isEmpty, givenKeys.allSatisfy(\.isValid) else {
         throw Homa.Exception.givenKeyIsEmpty
       }
       let gridBackup = segments
-      var keyExistenceChecked = [String: Bool]()
+      var keyExistenceChecked = [GramQueryCacheKey: Bool]()
       var warmupQueryBuffer = [GramQueryCacheKey: [Homa.Gram]]()
-      for (cursorAdvancedPosition, key) in givenKeys.enumerated() {
-        if !(keyExistenceChecked[key] ?? false) {
-          guard !queryGrams(using: [key], cache: &warmupQueryBuffer).isEmpty else {
+      for (cursorAdvancedPosition, possibleKey) in givenKeys.enumerated() {
+        let altValues = possibleKey.allValues
+        let cacheKey = GramQueryCacheKey(altValues)
+        if !(keyExistenceChecked[cacheKey] ?? false) {
+          let hasAnyResult = altValues.contains { alt in
+            !queryGrams(using: [alt], cache: &warmupQueryBuffer).isEmpty
+          }
+          guard hasAnyResult else {
             throw Homa.Exception.givenKeyHasNoResults
           }
-          keyExistenceChecked[key] = true
+          keyExistenceChecked[cacheKey] = true
         }
-        keys.insert(key, at: cursor + cursorAdvancedPosition)
+        keys.insert(possibleKey, at: cursor + cursorAdvancedPosition)
         resizeGrid(at: cursor + cursorAdvancedPosition, do: .expand)
       }
       do {
@@ -178,6 +190,22 @@ extension Homa {
         throw error
       }
       cursor += givenKeys.count // 游標必須得在執行 assignNodes() 之後才可以變動。
+    }
+
+    /// 在游標位置插入給定的多個索引鍵（由外部傳入的 [[String]] 陣列）。
+    /// - Parameter keys: 要插入的多個索引鍵。
+    public func insertKeys(_ givenKeys: [[String]]) throws {
+      let possibleKeys = givenKeys.map { key -> PossibleKey in
+        key.count == 1 ? .singleKey(key[0]) : .multipleKeys(key)
+      }
+      try insertKeys(possibleKeys)
+    }
+
+    /// 在游標位置插入給定的多個索引鍵（相容舊版 [String] 介面）。
+    /// - Parameter keys: 要插入的多個索引鍵。
+    @available(*, deprecated, message: "Use insertKeys(_: [PossibleKey]) instead")
+    public func insertKeys(_ givenKeys: [String]) throws {
+      try insertKeys(givenKeys.map { .singleKey($0) })
     }
 
     /// 朝著指定方向砍掉一個與游標相鄰的讀音。
@@ -321,11 +349,11 @@ extension Homa {
         let rangeOfLengths = 1 ... min(maxSegLength, rangeOfPositions.upperBound - position)
         rangeOfLengths.forEach { theLength in
           guard position + theLength <= keys.count, position >= 0 else { return }
-          let keyArraySliced = keys[position ..< (position + theLength)].map(\.description)
+          let alternativesSlice = keys[position ..< (position + theLength)]
+          let queriedGrams = queryGramsForAlternatives(alternativesSlice, cache: &queryBuffer)
           if (0 ..< segments.count).contains(position),
              let theNode = segments[position][theLength] {
             if !updateExisting { return }
-            let queriedGrams = queryGrams(using: keyArraySliced, cache: &queryBuffer)
             // 自動銷毀無效的節點。
             if queriedGrams.isEmpty {
               if theNode.keyArray.count == 1 { return }
@@ -336,10 +364,10 @@ extension Homa {
             nodesChangedCounter += 1
             return
           }
-          let queriedGrams = queryGrams(using: keyArraySliced, cache: &queryBuffer)
           guard !queriedGrams.isEmpty else { return }
           // 這裡原本用 SegmentUnit.addNode 來完成的，但直接當作字典來互動的話也沒差。
-          segments[position][theLength] = .init(keyArray: keyArraySliced, grams: queriedGrams)
+          let representativeKeyArray = alternativesSlice.map(\.first)
+          segments[position][theLength] = .init(keyArray: representativeKeyArray, grams: queriedGrams)
           nodesChangedCounter += 1
         }
       }
@@ -416,6 +444,62 @@ extension Homa {
       hasher.combine(raw.value)
       hasher.combine(raw.previous)
       return hasher.finalize()
+    }
+
+    /// 計算給定陣列陣列的笛卡爾積。
+    private static func cartesianProduct<T>(_ arrays: [[T]]) -> [[T]] {
+      guard !arrays.isEmpty else { return [[]] }
+      guard !arrays.contains(where: \.isEmpty) else { return [] }
+      var result: [[T]] = [[]]
+      for array in arrays {
+        var newResult: [[T]] = []
+        newResult.reserveCapacity(result.count * array.count)
+        for prefix in result {
+          for element in array {
+            newResult.append(prefix + [element])
+          }
+        }
+        result = newResult
+      }
+      return result
+    }
+
+    /// 對給定替代讀音陣列展開笛卡爾積、逐一查詢、並合併結果。
+    private func queryGramsForAlternatives(
+      _ alternativesSlice: ArraySlice<PossibleKey>,
+      cache: inout [GramQueryCacheKey: [Homa.Gram]]
+    )
+      -> [Homa.Gram] {
+      let combinations = Self.cartesianProduct(alternativesSlice.map(\.allValues))
+      var insertedIntel = Set<Int>()
+      var mergedGrams: [Homa.Gram] = []
+      mergedGrams.reserveCapacity(combinations.count * 4)
+      for combination in combinations {
+        let grams = queryGrams(using: combination, cache: &cache)
+        for gram in grams {
+          let intel = Self.makeGramIdentityHash((
+            keyArray: gram.keyArray,
+            value: gram.current,
+            probability: gram.probability,
+            previous: gram.previous
+          ))
+          if insertedIntel.insert(intel).inserted {
+            mergedGrams.append(gram)
+          }
+        }
+      }
+      return mergedGrams.sorted {
+        if $0.keyArray.count != $1.keyArray.count {
+          return $0.keyArray.count > $1.keyArray.count
+        }
+        if $0.probability != $1.probability {
+          return $0.probability > $1.probability
+        }
+        if $0.keyArray != $1.keyArray {
+          return $0.keyArray.lexicographicallyPrecedes($1.keyArray)
+        }
+        return ($0.previous ?? "") < ($1.previous ?? "")
+      }
     }
 
     /// 從元圖存取專用 API 將獲取的結果轉為元圖、以供 Nodes 使用。

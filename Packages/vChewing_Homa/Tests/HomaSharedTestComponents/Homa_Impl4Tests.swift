@@ -67,16 +67,18 @@ extension Homa.Assembler {
     let location = max(min(location, keys.count - 1), 0) // 防呆
     let anchors: [(location: Int, node: Homa.Node)] = fetchOverlappingNodes(at: location)
     let keyAtCursor = keys[location]
-    anchors.map(\.node).forEach { theNode in
+    let cursorAlternatives = keyAtCursor.allValues
+    anchors.forEach { anchor in
+      let theNode = anchor.node
       theNode.grams.forEach { gram in
         switch filter {
         case .all:
           // 得加上這道篩選，不然會出現很多無效結果。
-          if !theNode.keyArray.contains(keyAtCursor) { return }
+          if !theNode.keyArray.contains(where: { cursorAlternatives.contains($0) }) { return }
         case .beginAt:
-          if theNode.keyArray[0] != keyAtCursor { return }
+          guard let firstKey = theNode.keyArray.first, cursorAlternatives.contains(firstKey) else { return }
         case .endAt:
-          if theNode.keyArray.reversed()[0] != keyAtCursor { return }
+          guard let lastKey = theNode.keyArray.last, cursorAlternatives.contains(lastKey) else { return }
         }
         result.append(.init(
           pair: .init(keyArray: theNode.keyArray, value: gram.current),

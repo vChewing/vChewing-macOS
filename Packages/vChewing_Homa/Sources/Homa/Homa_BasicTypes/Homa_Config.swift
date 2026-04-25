@@ -11,7 +11,7 @@ extension Homa {
 
     public init(
       assembledSentence: [GramInPath] = [],
-      keys: [String] = [],
+      keys: [PossibleKey] = [],
       segments: [Segment] = [],
       cursor: Int = 0,
       maxSegLength: Int = 10,
@@ -30,7 +30,7 @@ extension Homa {
     /// 最近一次組句結果。
     public var assembledSentence: [GramInPath] = []
     /// 該組字器已經插入的的索引鍵，以陣列的形式存放。
-    public var keys = [String]()
+    public var keys = [PossibleKey]()
     /// 該組字器的幅節單元陣列。
     public var segments = [Segment]()
 

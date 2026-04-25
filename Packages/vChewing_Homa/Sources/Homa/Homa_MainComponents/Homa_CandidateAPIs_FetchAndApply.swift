@@ -32,6 +32,7 @@ extension Homa.Assembler {
     location = max(min(location, keys.count - 1), 0)
     let anchors: [(location: Int, node: Homa.Node)] = fetchOverlappingNodes(at: location)
     let keyAtCursor = keys[location]
+    let cursorAlternatives = keyAtCursor.allValues
     var seen = Set<Homa.CandidatePair>()
     anchors.forEach { theAnchor in
       let theNode = theAnchor.node
@@ -40,15 +41,13 @@ extension Homa.Assembler {
         switch filter {
         case .all:
           // 得加上這道篩選，不然會出現很多無效結果。
-          if !theNode.keyArray4Query.contains(keyAtCursor) { return }
+          // keyArray4Query 為該節點的第一組替代讀音組合，用於快速篩選。
+          if !theNode.keyArray4Query.contains(where: { cursorAlternatives.contains($0) }) { return }
         case .beginAt:
           guard theAnchor.location == location else { return }
         case .endAt:
-          guard theNode.keyArray4Query.last == keyAtCursor else { return }
-          switch theNode.segLength {
-          case 2... where theAnchor.location + theAnchor.node.segLength - 1 != location: return
-          default: break
-          }
+          guard theAnchor.location + theNode.segLength - 1 == location else { return }
+          guard let lastKey = theNode.keyArray4Query.last, cursorAlternatives.contains(lastKey) else { return }
         }
         let newCandidate = Homa.CandidatePair(
           keyArray: gram.keyArray,
