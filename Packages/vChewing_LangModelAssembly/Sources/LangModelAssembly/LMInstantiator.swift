@@ -254,6 +254,8 @@ extension LMAssembly {
           vCLMLog("lmUserPhrases: \(self.lmUserPhrases.count) entries of data loaded from: \(path)")
         }
       }
+      // sub-LM 資料已變更，必須使 LRU cache 失效。
+      unigramLRUCache.removeAll(keepingCapacity: true)
       guard let filterPath = filterPath else { return }
       func loadFilter() {
         if FileManager.default.isReadableFile(atPath: filterPath) {
@@ -288,6 +290,8 @@ extension LMAssembly {
       } else {
         vCLMLog("lmFiltered: File access failure: \(path)")
       }
+      // sub-LM 資料已變更，必須使 LRU cache 失效。
+      unigramLRUCache.removeAll(keepingCapacity: true)
     }
 
     public func loadUserSymbolData(path: String) {
@@ -408,11 +412,15 @@ extension LMAssembly {
         isFiltering
           ? lmFiltered.temporaryMap[keyChain, default: []].append(unigram)
           : lmUserPhrases.temporaryMap[keyChain, default: []].append(unigram)
+      // LRU cache 必須在暫時資料變更時失效，否則後續查詢會返回過時結果。
+      unigramLRUCache.removeValue(forKey: keyChain)
     }
 
     /// 該函式主要供單元測試所用。
     public func clearTemporaryData(isFiltering: Bool) {
       _ = isFiltering ? lmFiltered.clear() : lmUserPhrases.clear()
+      // LRU cache 必須在暫時資料變更時失效，否則後續查詢會返回過時結果。
+      unigramLRUCache.removeAll(keepingCapacity: true)
     }
 
     /// 自當前記憶體取得指定使用者子語言模組內的原始資料體。
@@ -847,6 +855,8 @@ extension LMAssembly {
       if let mutator = lxPerceptor {
         mutator(&self.lxPerceptor)
       }
+      // injectTestData 直接修改 sub-LM，必須使 LRU cache 失效。
+      unigramLRUCache.removeAll(keepingCapacity: true)
     }
 
     // MARK: Private
