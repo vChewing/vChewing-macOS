@@ -12,8 +12,8 @@ private let kSidebarWidth: CGFloat = 170
 
 // MARK: - FlippedClipContainerView
 
-/// A flipped NSView for use as NSScrollView.documentView,
-/// ensuring content starts from the top.
+/// 一個座標翻轉的 NSView，作為 NSScrollView.documentView 使用，
+/// 確保內容從頂端開始排列。
 private final class FlippedClipContainerView: NSView {
   override var isFlipped: Bool { true }
 }
@@ -264,7 +264,7 @@ extension CtlSettingsCocoa {
   }
 
   fileprivate func makeSidebar() -> NSView {
-    // Use NSVisualEffectView for sidebar background on supported macOS versions.
+    // 在支援的 macOS 版本上使用 NSVisualEffectView 作為側邊欄背景。
     let sidebarContainer: NSView
     if #available(macOS 10.14, *) {
       let effectView = NSVisualEffectView()
@@ -415,7 +415,7 @@ extension CtlSettingsCocoa {
     paneView.layoutSubtreeIfNeeded()
 
     if #available(macOS 10.13, *) {
-      // Use NSScrollView for scrollable content on macOS 10.13+.
+      // macOS 10.13 以上使用 NSScrollView 包覆可捲動內容。
       let scrollView = NSScrollView()
       scrollView.translatesAutoresizingMaskIntoConstraints = false
       scrollView.hasVerticalScroller = true
@@ -426,17 +426,12 @@ extension CtlSettingsCocoa {
       scrollView.scrollerStyle = .legacy
 
       let docView = FlippedClipContainerView()
-      let fittingSize = paneView.fittingSize
-      docView.frame = NSRect(
-        origin: .zero,
-        size: CGSize(
-          width: max(fittingSize.width, SettingsPanesCocoa.windowWidth),
-          height: fittingSize.height
-        )
-      )
+      docView.translatesAutoresizingMaskIntoConstraints = false
       docView.addSubview(paneView)
 
-      // Pin pane to document view's top-leading corner.
+      // 將 paneView 四邊釘齊 documentView，使分頁切換時
+      // intrinsicContentSize 的變化能自動傳播至 docView，
+      // 讓 NSScrollView 在 macOS 10.13–15.x 上正確更新可捲動範圍。
       paneView.translatesAutoresizingMaskIntoConstraints = false
       docView.addConstraints([
         NSLayoutConstraint(
@@ -446,6 +441,14 @@ extension CtlSettingsCocoa {
         NSLayoutConstraint(
           item: paneView, attribute: .leading, relatedBy: .equal,
           toItem: docView, attribute: .leading, multiplier: 1, constant: 0
+        ),
+        NSLayoutConstraint(
+          item: paneView, attribute: .trailing, relatedBy: .equal,
+          toItem: docView, attribute: .trailing, multiplier: 1, constant: 0
+        ),
+        NSLayoutConstraint(
+          item: paneView, attribute: .bottom, relatedBy: .equal,
+          toItem: docView, attribute: .bottom, multiplier: 1, constant: 0
         ),
       ])
 
@@ -457,8 +460,8 @@ extension CtlSettingsCocoa {
       scrollView.contentView.scroll(to: .zero)
       scrollView.reflectScrolledClipView(scrollView.contentView)
     } else {
-      // On macOS < 10.13, place pane directly without scroll view
-      // to avoid potential system freeze in input method processes.
+      // macOS 10.13 以下直接將 paneView 放入容器，不使用捲動視圖，
+      // 以避免在輸入法程序中觸發系統凍結。
       contentContainerView.addSubview(paneView)
       paneView.translatesAutoresizingMaskIntoConstraints = false
       contentContainerView.addConstraints([
