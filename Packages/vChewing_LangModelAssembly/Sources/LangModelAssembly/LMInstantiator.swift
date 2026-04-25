@@ -45,7 +45,7 @@ extension LMAssembly {
 
     // MARK: Public
 
-    public struct Config {
+    public struct Config: Hashable {
       /// 如果設定為 nil 的話，則不產生任何詞頻資料。
       /// true = 全形，false = 半形。
       public var numPadFWHWStatus: Bool?
@@ -553,13 +553,26 @@ extension LMAssembly {
     /// - Parameter keyArray: 給定的讀音索引鍵陣列。
     /// - Returns: 對應的經過處理的單元圖陣列。
     public func unigramsFor(keyArray: [String]) -> [Homa.Gram] {
-      // `config.bypassUserPhrasesData` 啟用時，除了 Associated Phrases 以外的資料全部忽略。
       let keyChain = keyArray.joined(separator: "-")
       let noEmptyKey = !keyArray.isEmpty && keyArray.allSatisfy { !$0.isEmpty }
       guard noEmptyKey else { return [] }
       /// 給空格鍵指定輸出值。
       let asciiSpace = " "
       if keyArray == [asciiSpace] { return [.init(keyArray: keyArray, value: asciiSpace)] }
+      // 若 keyArray 內含 `&` alternatives，走專用的合併查詢路徑（不進 LRU cache）。
+      if keyArray.joined().contains("&") {
+        return mergedAlternativeBucketUnigrams(for: keyArray)
+      }
+      // 檢查 LRU 快取
+      let fingerprint = config.hashValue
+      if fingerprint != unigramCacheFingerprint {
+        unigramLRUCache.removeAll(keepingCapacity: true)
+        unigramCacheFingerprint = fingerprint
+      }
+      if let cached = unigramLRUCache[keyChain] {
+        return cached
+      }
+      // `config.bypassUserPhrasesData` 啟用時，除了 Associated Phrases 以外的資料全部忽略。
       /// 準備不同的語言模組容器，開始逐漸往容器陣列內塞入資料。
       var rawAllUnigrams: [Homa.Gram] = []
       var factoryCoreUnigramsResult: [Homa.Gram] = []
@@ -719,6 +732,13 @@ extension LMAssembly {
           lmFiltered.unigramsFor(key: keyChain, keyArray: keyArray).map(\.current)
         )
       rawAllUnigrams.consolidate(filter: dataAsFilter)
+      // Store in LRU cache with size limit
+      unigramLRUCache[keyChain] = rawAllUnigrams
+      if unigramLRUCache.count > 1_024 {
+        let half = unigramLRUCache.count / 2
+        let keysToRemove = Array(unigramLRUCache.keys.prefix(half))
+        keysToRemove.forEach { unigramLRUCache.removeValue(forKey: $0) }
+      }
       return rawAllUnigrams
     }
 
@@ -835,7 +855,57 @@ extension LMAssembly {
 
     // MARK: Private
 
+    private struct AlternativeKeyArrayIterator: IteratorProtocol {
+      // MARK: Lifecycle
+
+      init(alternativeColumns: [[String]]) {
+        self.alternativeColumns = alternativeColumns
+        self.indices = Array(repeating: 0, count: alternativeColumns.count)
+        self.isDone = alternativeColumns.isEmpty || alternativeColumns.contains(where: \.isEmpty)
+        self.seen = Set()
+      }
+
+      // MARK: Internal
+
+      mutating func next() -> [String]? {
+        while !isDone {
+          let result = alternativeColumns.indices.map { alternativeColumns[$0][indices[$0]] }
+          let joined = result.joined(separator: "-")
+
+          // 推進到下一個組合
+          var carry = true
+          for i in (0 ..< indices.count).reversed() {
+            if carry {
+              indices[i] += 1
+              if indices[i] >= alternativeColumns[i].count {
+                indices[i] = 0
+              } else {
+                carry = false
+              }
+            }
+          }
+          if carry { isDone = true }
+
+          if seen.insert(joined).inserted {
+            return result
+          }
+        }
+        return nil
+      }
+
+      // MARK: Private
+
+      private let alternativeColumns: [[String]]
+      private var indices: [Int]
+      private var isDone: Bool
+      private var seen: Set<String>
+    }
+
     nonisolated private static let mtxFactoryTrie: NSMutex<VanguardTrie.TextMapTrie?> = .init(nil)
+
+    // LRU cache for unigramsFor
+    private var unigramCacheFingerprint: Int = 0
+    private var unigramLRUCache: [String: [Homa.Gram]] = [:]
 
     nonisolated private let mtxLXPerceptor: NSMutex<LXPerceptor>
 
@@ -848,6 +918,204 @@ extension LMAssembly {
       // 超過 3000 條目就直接清空（Set 無法保留插入順序，故不做部分截斷）。
       if inputTokenHashesArray.count > 3_000 {
         inputTokenHashesArray.removeAll(keepingCapacity: true)
+      }
+    }
+
+    /// 合併單一位置含有多個讀音候選時的 full-match 檢索結果。
+    ///
+    /// 與舊版不同：原廠辭典 trie 查詢走 `keysChopped` 路徑，只做一次 trie 查詢（內部展開去重），
+    /// 而非對每個笛卡爾積組合分別做完整原廠辭典查詢。非原廠辭典來源（使用者語彙、符號等）
+    /// 仍逐個展開查詢後合併，以便正確套用各語言模組的過濾與排序規則。
+    /// - Parameter keyArray: 可能包含 `&` alternatives 的讀音索引鍵陣列。
+    /// - Returns: 合併並去重後的單元圖陣列。
+    private func mergedAlternativeBucketUnigrams(for keyArray: [String]) -> [Homa.Gram] {
+      var rawAllUnigrams: [Homa.Gram] = []
+      var factoryCoreUnigramsResult: [Homa.Gram] = []
+
+      if !config.isCassetteEnabled
+        || config.isCassetteEnabled && (keyArray.first?.hasPrefix("_") ?? false) {
+        rawAllUnigrams += factoryChoppedUnigramsFor(keyArray: keyArray, column: .theDataCHEW)
+        let keyChain = keyArray.joined(separator: "-")
+        if keyChain.hasPrefix("_"), keyChain.count > 1 {
+          rawAllUnigrams += factoryChoppedUnigramsFor(keyArray: keyArray, column: .theDataMISC)
+        }
+        factoryCoreUnigramsResult = factoryChoppedCoreUnigramsFor(
+          keyArray: keyArray,
+          strategy: .configuredLookup
+        )
+        if config.filterNonCNSReadings, !isCHS {
+          factoryCoreUnigramsResult = factoryCoreUnigramsResult.compactMap { thisUnigram in
+            guard !checkCNSConformation(for: thisUnigram, keyArray: thisUnigram.keyArray) else {
+              return thisUnigram
+            }
+            guard thisUnigram.keyArray.count == 1 else { return nil }
+            return .init(
+              keyArray: thisUnigram.keyArray,
+              value: thisUnigram.current,
+              score: -9.5
+            )
+          }
+        }
+        rawAllUnigrams += factoryCoreUnigramsResult
+
+        if config.isCNSEnabled {
+          rawAllUnigrams += factoryChoppedUnigramsFor(keyArray: keyArray, column: .theDataCNS)
+        }
+      }
+
+      let factoryCoreUnigramsByKeyArray: [String: [Homa.Gram]] = Dictionary(
+        grouping: factoryCoreUnigramsResult,
+        by: { $0.keyArray.joined(separator: "-") }
+      )
+      let topScoreByKeyArray: [String: Double] = rawAllUnigrams.reduce(into: [:]) { partialResult, current in
+        let keyChain = current.keyArray.joined(separator: "-")
+        let existingTopScore = partialResult[keyChain] ?? -.infinity
+        if current.probability > existingTopScore {
+          partialResult[keyChain] = current.probability
+        }
+      }
+
+      var factoryLookupMemo: [String: [Homa.Gram]] = [:]
+
+      func memoizedFactoryUnigrams(
+        keyArray: [String],
+        keyChain: String,
+        column: LMAssembly.LMInstantiator.CoreColumn
+      )
+        -> [Homa.Gram] {
+        let memoKey = "\(keyChain)|\(column.rawValue)"
+        if let cached = factoryLookupMemo[memoKey] {
+          return cached
+        }
+        let resolved = factoryUnigramsFor(key: keyChain, keyArray: keyArray, column: column)
+        factoryLookupMemo[memoKey] = resolved
+        return resolved
+      }
+
+      var deferredFilterByKeyArray: [String: Set<String>] = [:]
+      for expandedKeyArray in expandAlternativeKeyArrays(from: keyArray) {
+        let keyChain = expandedKeyArray.joined(separator: "-")
+        let factoryCoreUnigramsForExpandedKey = factoryCoreUnigramsByKeyArray[keyChain] ?? []
+
+        if !config.bypassUserPhrasesData, config.isSymbolEnabled,
+           lmUserSymbols.hasUnigramsFor(key: keyChain) {
+          rawAllUnigrams += lmUserSymbols.unigramsFor(key: keyChain, keyArray: expandedKeyArray)
+        }
+        if !config.bypassUserPhrasesData, config.isSymbolEnabled, !config.isCassetteEnabled {
+          rawAllUnigrams += memoizedFactoryUnigrams(
+            keyArray: expandedKeyArray,
+            keyChain: keyChain,
+            column: .theDataSYMB
+          )
+        }
+
+        if !config.bypassUserPhrasesData, lmUserPhrases.hasUnigramsFor(key: keyChain) {
+          let allowBoostingSingleKanji = config.allowRescoringSingleKanjiCandidates
+          let factorySingleReadingValueHashes: Set<Int> = factoryCoreUnigramsForExpandedKey.reduce(into: []) {
+            if $1.keyArray.count == 1 { $0.insert($1.hashValue) }
+          }
+          var userPhraseUnigrams = Array(
+            lmUserPhrases.unigramsFor(
+              key: keyChain,
+              keyArray: expandedKeyArray,
+              omitNonTemporarySingleCharNonSymbolUnigrams: !allowBoostingSingleKanji,
+              factorySingleReadingValueHashes: factorySingleReadingValueHashes
+            ).reversed()
+          )
+          if expandedKeyArray.count == 1, let topScore = topScoreByKeyArray[keyChain] {
+            userPhraseUnigrams = userPhraseUnigrams.map { currentUnigram in
+              Homa.Gram(
+                keyArray: expandedKeyArray,
+                value: currentUnigram.current,
+                score: Swift.min(topScore + 0.000114514, currentUnigram.probability)
+              )
+            }
+          }
+          rawAllUnigrams = userPhraseUnigrams + rawAllUnigrams
+        }
+
+        if config.isCassetteEnabled {
+          rawAllUnigrams.insert(
+            contentsOf: Self.lmCassette.unigramsFor(key: keyChain, keyArray: expandedKeyArray),
+            at: 0
+          )
+        } else if config.isSCPCEnabled || config.alwaysSupplyETenDOSUnigrams {
+          rawAllUnigrams += Self.lmPlainBopomofo.valuesFor(key: keyChain, isCHS: isCHS).map {
+            Homa.Gram(keyArray: expandedKeyArray, value: $0, score: config.isSCPCEnabled ? 0 : -9.5)
+          }
+        }
+
+        if Self.dateTimeKnownTriggers.contains(keyChain) {
+          rawAllUnigrams.append(contentsOf: queryDateTimeUnigrams(with: keyChain, keyArray: expandedKeyArray))
+        }
+
+        if !config.bypassUserPhrasesData, lmFiltered.hasUnigramsFor(key: keyChain) {
+          let dataAsFilter = Set(
+            lmFiltered.unigramsFor(key: keyChain, keyArray: expandedKeyArray).map(\.current)
+          )
+          if !dataAsFilter.isEmpty {
+            deferredFilterByKeyArray[keyChain, default: []].formUnion(dataAsFilter)
+          }
+        }
+      }
+
+      if !config.bypassUserPhrasesData, !deferredFilterByKeyArray.isEmpty {
+        rawAllUnigrams.removeAll { gram in
+          let keyChain = gram.keyArray.joined(separator: "-")
+          guard let dataAsFilter = deferredFilterByKeyArray[keyChain] else { return false }
+          return dataAsFilter.contains(gram.current)
+        }
+      }
+
+      cleanupInputTokenHashMapIfNeeded()
+      var expandedUnigrams: [Homa.Gram] = []
+      expandedUnigrams.reserveCapacity(rawAllUnigrams.count)
+      for unigram in rawAllUnigrams {
+        let convertedValues = unigram.current.parseAsInputToken(isCHS: isCHS)
+        if convertedValues.isEmpty {
+          expandedUnigrams.append(unigram)
+        } else {
+          let keyChain = unigram.keyArray.joined(separator: "-")
+          for (absDelta, value) in convertedValues.enumerated() {
+            let newScore: Double = -80 - Double(absDelta) * 0.01
+            expandedUnigrams.append(.init(keyArray: unigram.keyArray, value: value, score: newScore))
+            let hashKey = "\(keyChain)\t\(value)".hashValue
+            inputTokenHashesArray.insert(hashKey)
+          }
+        }
+      }
+      rawAllUnigrams = expandedUnigrams
+
+      if !config.bypassUserPhrasesData, config.isPhraseReplacementEnabled {
+        for i in 0 ..< rawAllUnigrams.count {
+          let oldUnigram = rawAllUnigrams[i]
+          let newValue = lmReplacements.valuesFor(key: oldUnigram.current)
+          guard !newValue.isEmpty else { continue }
+          rawAllUnigrams[i] = Homa.Gram(
+            keyArray: oldUnigram.keyArray,
+            value: newValue,
+            score: oldUnigram.probability
+          )
+        }
+      }
+
+      rawAllUnigrams.consolidate()
+      return rawAllUnigrams
+    }
+
+    /// 將帶有 `&` alternatives 的讀音索引鍵陣列展開為所有可能的 full-match 組合。
+    /// - Parameter keyArray: 可能包含 `&` alternatives 的讀音索引鍵陣列。
+    /// - Returns: 展開後的所有 keyArray 組合；若原始輸入不含 `&`，則回傳自身作為唯一結果。
+    private func expandAlternativeKeyArrays(from keyArray: [String]) -> AnySequence<[String]> {
+      guard keyArray.contains(where: { $0.contains("&") }) else {
+        return AnySequence([keyArray])
+      }
+      let alternativeColumns: [[String]] = keyArray.map { current in
+        let split = current.split(separator: "&").map(\.description)
+        return split.isEmpty ? [current] : split
+      }
+      return AnySequence {
+        AlternativeKeyArrayIterator(alternativeColumns: alternativeColumns)
       }
     }
   }
