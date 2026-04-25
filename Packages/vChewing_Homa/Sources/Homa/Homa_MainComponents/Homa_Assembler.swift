@@ -470,23 +470,19 @@ extension Homa {
       cache: inout [GramQueryCacheKey: [Homa.Gram]]
     )
       -> [Homa.Gram] {
+      // 快速路徑——無替代讀音時直接查詢，無需笛卡爾積展開
+      if alternativesSlice.allSatisfy({
+        if case .singleKey = $0 { return true } else { return false }
+      }) {
+        let keyArray = alternativesSlice.map(\.first)
+        return queryGrams(using: keyArray, cache: &cache)
+      }
       let combinations = Self.cartesianProduct(alternativesSlice.map(\.allValues))
-      var insertedIntel = Set<Int>()
       var mergedGrams: [Homa.Gram] = []
       mergedGrams.reserveCapacity(combinations.count * 4)
       for combination in combinations {
         let grams = queryGrams(using: combination, cache: &cache)
-        for gram in grams {
-          let intel = Self.makeGramIdentityHash((
-            keyArray: gram.keyArray,
-            value: gram.current,
-            probability: gram.probability,
-            previous: gram.previous
-          ))
-          if insertedIntel.insert(intel).inserted {
-            mergedGrams.append(gram)
-          }
-        }
+        mergedGrams.append(contentsOf: grams)
       }
       return mergedGrams.sorted {
         if $0.keyArray.count != $1.keyArray.count {
