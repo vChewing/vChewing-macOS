@@ -236,7 +236,7 @@
 "i18n:settings.importFromKimoTxt.label" = "汇入奇摩输入法自订词资料库";
 "i18n:settings.importFromKimoTxt.postOpsNotice" = "其余尚未汇入的资料可能是已有的记录、或记录本身不合理。若您想把全部资料完整导出为独立文字档，建议改用 KeyKeyUserDBKit（GitHub 仓库: vChewing/KeyKeyUserDBKit）来操作。";
 "i18n:settings.Prompt.ChooseDesiredCassetteFilePath" = "请指定您要使用的 CIN 磁带档案。无效值会被忽略。\n\n⚠️💀 请避免使用由 iCloud 代管的“Documents”与“Desktop”目录。这些位置的 sandbox bookmark 可能会在重新开机或系统更新后失效。必要时请先把档案移到本机资料夹。";
-"i18n:settings.Prompt.ChooseDesiredUserDataFolderPath" = "请指定您要使用的使用者语汇资料夹。无效值会被忽略。\n\n⚠️💀 请避免使用由 iCloud 代管的“Documents”与“Desktop”目录。这些位置的 sandbox bookmark 可能会在重新开机或系统更新后失效。必要时请先把资料夹移到本机位置。";
+"i18n:settings.Prompt.ChooseDesiredUserDataFolderPath" = "请指定您要使用的使用者语汇资料夹。无效值会被忽略。\n\n⚠️💀 请避免使用由 iCloud 代管的“Documents”与“Desktop”目录。这些位置的 sandbox bookmark 可能会在重新开机或系统更新后失效。如有疑惑者，请洽 Apple Support。";
 "i18n:settings.shiftKeyASCIITogle.description" = "该功能只需要对借由 macOS 内建的输入法框架传来的 NSEvent 做上下文分析，自然没有「向使用者寻求系统全局键盘事件监听权限」之必要。您可自行审视敝输入法的原始程式码仓库、或对敝输入法逆向工程，以自行证实此处所言之真假。另注：这个 Shift 键切换开关在 CapsLock 灯亮时无效。";
 "i18n:Uninstaller.failureGuidance" = "唯音在沙盒输入法行程内无法自行将自身套件移到垃圾桶。您可以参阅 wiki 页面的手动卸除说明。";
 "i18n:Uninstaller.openWikiPage" = "开启卸除说明";
