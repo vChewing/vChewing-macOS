@@ -1,6 +1,6 @@
 $ Main contributors and volunteers of this repository (vChewing for macOS):
 
-- Shiki Suen // Main developer of vChewing for macOS, Megrez language engine, Hotenka Chinese Converter, Tadokoro Candidate Window, and Tekkon syllable composer engine.
+- Shiki Suen // Main developer of vChewing for macOS, Megrez assembler & Homa assembler, Hotenka Chinese Converter, Tadokoro Candidate Window, and Tekkon syllable composer engine.
 - Hiraku Wang // Technical reinforcement in Cocoa during the Object-Cpp dev period of this project.
 - Isaac Xen // Technical reinforcement in Swift: SFX Module (NSSound ver.) and StringView Ranges Extension.
 
