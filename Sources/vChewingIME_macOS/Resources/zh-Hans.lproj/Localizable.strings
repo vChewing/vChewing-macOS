@@ -275,7 +275,7 @@
 "i18n:UserDef.kFilterNonCNSReadingsForCHTInput.description" = "对于单汉字候选字，不符合全字库读音的结果将被降权至候选字列表尾端，而非完全移除。";
 "i18n:UserDef.kFilterNonCNSReadingsForCHTInput.shortTitle" = "仅繁体中文: 原厂辞典仅返回符合全字库读音的结果";
 "i18n:UserDef.kInlineDumpPinyinInLieuOfZhuyin.description" = "借由 Command+Option+Ctrl+Enter 输出的内容受对应的行为设定所影响。";
-"i18n:UserDef.kKeyboardParser.description" = "请指定普通话/国音分析器所使用的注音排列。";
+"i18n:UserDef.kKeyboardParser.description" = "请指定普通话/国音分析器所使用的注音排列。此处亦提供各式拼音选项。请注意：在拼音输入模式下，若当前前后半径 ±10 的扫描范围内存在不完全拼写（比如声调缺失）的读音单位，组字引擎可能会套用“最长 4 个读音”的候选组字上限。当且仅当该 ±10 范围内所有读音均为完整且带声调的拼写时，才不会套用此上限。";
 "i18n:UserDef.kKeyboardParser.shortTitle" = "注音排列:";
 "i18n:UserDef.kMinCellWidthForHorizontalMatrix.option.0" = "两个汉字";
 "i18n:UserDef.kMinCellWidthForHorizontalMatrix.option.1" = "两个绘文字（更宽）";

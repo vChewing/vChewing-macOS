@@ -275,7 +275,7 @@
 "i18n:UserDef.kFilterNonCNSReadingsForCHTInput.description" = "For single-kanji candidates, non-conforming results will be demoted to the end of the candidate list instead of being completely removed.";
 "i18n:UserDef.kFilterNonCNSReadingsForCHTInput.shortTitle" = "Filter Non-CNS11643 factory readings (CHT input only)";
 "i18n:UserDef.kInlineDumpPinyinInLieuOfZhuyin.description" = "Contents committed by Command+Option+Ctrl+Enter may vary depending on related behavior settings.";
-"i18n:UserDef.kKeyboardParser.description" = "Choose the phonetic layout for Mandarin parser.";
+"i18n:UserDef.kKeyboardParser.description" = "Choose the phonetic layout for the Mandarin parser. Pinyin options are also available here. In Pinyin input mode, the compositor engine may cap candidate assembly to 4 readings when there are incompletely specified reading units (for example, missing tone marks) within the current +/-10 scan range. This cap is not applied when every reading within that +/-10 range is a fully specified, tone-marked spelling.";
 "i18n:UserDef.kKeyboardParser.shortTitle" = "Phonetic Parser:";
 "i18n:UserDef.kMinCellWidthForHorizontalMatrix.option.0" = "2 Kanjis";
 "i18n:UserDef.kMinCellWidthForHorizontalMatrix.option.1" = "2 Emojis (Wider)";

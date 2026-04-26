@@ -274,7 +274,7 @@
 "i18n:UserDef.kFilterNonCNSReadingsForCHTInput.description" = "単漢字候補については、全字庫の読みに合致しない結果は完全に削除されず、候補リストの末尾に降格されます。";
 "i18n:UserDef.kFilterNonCNSReadingsForCHTInput.shortTitle" = "全字庫以外の音読みを内蔵辞書繁体中国語検索結果から除く";
 "i18n:UserDef.kInlineDumpPinyinInLieuOfZhuyin.description" = "Command+Option+Ctrl+Enter で送り出したものは、それに関する作動設定次第です。";
-"i18n:UserDef.kKeyboardParser.description" = "共通語分析器の注音配列をご指定ください。";
+"i18n:UserDef.kKeyboardParser.description" = "共通語分析器で使う注音配列を指定してください。ここでは各種弁音配列も選択できます。なお、弁音入力モードでは、現在位置の前後 ±10 の走査範囲内に不完全表記（たとえば声調欠落）の音読み単位がある場合、組字エンジンに「最大 4 読み」の候補組字上限が適用されることがあります。逆に、その ±10 範囲内のすべての読みが声調付きの完全表記である場合に限り、この上限は適用されません。";
 "i18n:UserDef.kKeyboardParser.shortTitle" = "注音配列:";
 "i18n:UserDef.kMinCellWidthForHorizontalMatrix.option.0" = "２つの漢字（幅の狭い）";
 "i18n:UserDef.kMinCellWidthForHorizontalMatrix.option.1" = "２つの絵文字（幅の広い）";
