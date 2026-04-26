@@ -575,8 +575,8 @@ nonisolated extension UserDef {
         description: "This will use the SQLite database deployed by the “make install” command from libvChewing-Data if possible."
       )
     case .kKeyboardParser: return .init(
-        userDef: self, shortTitle: "Phonetic Parser:",
-        description: "Choose the phonetic layout for Mandarin parser."
+        userDef: self, shortTitle: "i18n:UserDef.kKeyboardParser.shortTitle",
+        description: "i18n:UserDef.kKeyboardParser.description"
       )
     case .kBasicKeyboardLayout: return .init(
         userDef: self, shortTitle: "Basic Keyboard Layout:",

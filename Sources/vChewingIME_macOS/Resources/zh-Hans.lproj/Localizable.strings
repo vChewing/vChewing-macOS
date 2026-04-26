@@ -275,6 +275,8 @@
 "i18n:UserDef.kFilterNonCNSReadingsForCHTInput.description" = "对于单汉字候选字，不符合全字库读音的结果将被降权至候选字列表尾端，而非完全移除。";
 "i18n:UserDef.kFilterNonCNSReadingsForCHTInput.shortTitle" = "仅繁体中文: 原厂辞典仅返回符合全字库读音的结果";
 "i18n:UserDef.kInlineDumpPinyinInLieuOfZhuyin.description" = "借由 Command+Option+Ctrl+Enter 输出的内容受对应的行为设定所影响。";
+"i18n:UserDef.kKeyboardParser.description" = "请指定普通话/国音分析器所使用的注音排列。";
+"i18n:UserDef.kKeyboardParser.shortTitle" = "注音排列:";
 "i18n:UserDef.kMinCellWidthForHorizontalMatrix.option.0" = "两个汉字";
 "i18n:UserDef.kMinCellWidthForHorizontalMatrix.option.1" = "两个绘文字（更宽）";
 "i18n:UserDef.kMinCellWidthForHorizontalMatrix.shortTitle" = "横向多列选字窗最低单元宽度:";
