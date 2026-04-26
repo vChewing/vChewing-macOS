@@ -221,7 +221,6 @@ extension MainAssemblyTests {
 
     #expect(throws: Never.self) { try testHandler.assembler.insertKey("ㄗㄚˊ") }
     #expect(throws: Never.self) { try testHandler.assembler.insertKey("ㄉㄜ˙") }
-    testHandler.assemble()
     testSession.switchState(testHandler.generateStateOfInputting())
 
     let vs1 = String(UnicodeScalar(0xE01E1)!)
@@ -256,7 +255,6 @@ extension MainAssemblyTests {
     testSession.resetInputHandler(forceComposerCleanup: true)
 
     #expect(throws: Never.self) { try testHandler.assembler.insertKey("ㄗㄚˊ") }
-    testHandler.assemble()
     testSession.switchState(testHandler.generateStateOfCandidates())
 
     guard let targetIndex = testSession.state.candidates.firstIndex(where: { $0.value == "咱" }) else {
@@ -728,7 +726,6 @@ extension MainAssemblyTests {
     #expect(throws: Never.self) { try testHandler.assembler.insertKey("hu1") }
     #expect(throws: Never.self) { try testHandler.assembler.insertKey("qi4") }
     #expect(throws: Never.self) { try testHandler.assembler.insertKey("keng1") }
-    testHandler.assemble()
     #expect(testHandler.assembler.assembledSentence.map(\ .value) == ["幾乎", "氣", "坑"])
 
     testSession.switchState(testHandler.generateStateOfInputting())

@@ -271,7 +271,6 @@ public struct CassetteTypewriter<Handler: InputHandlerProtocol>: TypewriterProto
       return true
     }
 
-    handler.assemble()
     let textToCommit = handler.commitOverflownComposition
     handler.retrievePOMSuggestions(apply: true)
     handler.calligrapher.removeAll()

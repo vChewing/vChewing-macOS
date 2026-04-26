@@ -87,7 +87,6 @@ extension InputHandlerProtocol {
             return commitRomanNumeral(session: session)
           }
           if assembler.cursor < assembler.length, (try? assembler.insertKey(" ")) != nil {
-            assemble()
             // 一邊吃一邊屙（僅對位列黑名單的 App 用這招限制組字區長度）。
             let textToCommit = commitOverflownComposition
             var inputting = generateStateOfInputting()

@@ -308,7 +308,6 @@ extension InputHandlerProtocol {
       }
       if !overrideTaskResult { return }
       pomObservation = pomObservation2ndary ?? pomObservationPrimary
-      assemble()
       if let adjustedObservation = Homa.makePerceptionIntel(
         previouslyAssembled: preservedSentenceBeforeConsolidation,
         currentAssembled: assembler.assembledSentence,
@@ -329,8 +328,6 @@ extension InputHandlerProtocol {
         )
         prefs.failureFlagForPOMObservation = false
       }
-    } else {
-      assemble()
     }
 
     if moveCursorAfterSelectingCandidate, respectCursorPushing {
@@ -410,8 +407,7 @@ extension InputHandlerProtocol {
 
   /// 就地增刪詞之後，需要就地更新游標上下文單元圖資料。
   public func updateUnigramData() -> Bool {
-    defer { assemble() }
-    return (try? assembler.assignNodes(updateExisting: true)) != nil
+    (try? assembler.assignNodes(updateExisting: true)) != nil
   }
 
   /// 警告：該參數僅代指組音區/組筆區域與組字區在目前狀態下被視為「空」。
@@ -521,29 +517,6 @@ extension InputHandlerProtocol {
   /// 偵測是否出現游標切斷組字區內字符的情況
   func isCursorCuttingChar(isMarker: Bool = false) -> Bool {
     assembler.isCursorCuttingChar(isMarker: isMarker)
-  }
-
-  /// 利用給定的讀音鏈來試圖爬取最接近的組字結果（最大相似度估算）。
-  ///
-  /// 該過程讀取的權重資料是經過 Viterbi 演算法計算得到的結果。
-  ///
-  /// 該函式的爬取順序是從頭到尾。
-  func assemble() {
-    _ = assembler.assemble()
-
-    // 在偵錯模式開啟時，將 GraphViz 資料寫入至指定位置。
-    if prefs.isDebugModeEnabled {
-      let result = assembler.dumpDOT()
-      let thePath = FileManager.default.urls(for: .cachesDirectory, in: .userDomainMask)[0].path
-        .appending(
-          "/vChewing-visualization.dot"
-        )
-      do {
-        try result.write(toFile: thePath, atomically: true, encoding: .utf8)
-      } catch {
-        vCLog("Failed from writing dumpDOT results.")
-      }
-    }
   }
 
   /// 用以組建關聯詞語陣列的函式，生成的內容不包含重複的結果。
@@ -793,7 +766,6 @@ extension InputHandlerProtocol {
           overrideType: overrideBehavior,
           enforceRetokenization: true
         )
-        assemble()
       }
     }
     arrResult = arrResult.stableSort { $0.1.probability > $1.1.probability }
@@ -975,7 +947,6 @@ extension InputHandlerProtocol {
       // 唯音不支援 Bigram，所以無須考慮前後節點「是否需要鞏固」。
       for _ in 0 ..< delta { try? assembler.dropKey(direction: .front) }
       assembler.cursor = newCursor
-      assemble()
     }
     return textToCommit
   }

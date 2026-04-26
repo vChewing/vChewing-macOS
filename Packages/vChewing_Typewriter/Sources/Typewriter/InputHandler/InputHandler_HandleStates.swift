@@ -433,7 +433,6 @@ extension InputHandlerProtocol {
       return true
     }
 
-    assemble()
     // 一邊吃一邊屙（僅對位列黑名單的 App 用這招限制組字區長度）。
     let textToCommit = commitOverflownComposition
     var inputting = generateStateOfInputting()
@@ -576,7 +575,6 @@ extension InputHandlerProtocol {
           // 此處刻意使用 Assembler 的 API（assembler.dropKey）以避免呼叫
           // InputHandler 的 dropKey 中所包含的 KeyDropContext 回補邏輯。
           try? assembler.dropKey(direction: .rear)
-          assemble() // 這裡必須 Walk 一次、來更新目前被 walk 的內容。
           calligrapher = prevReading
         } else {
           guard input.isShiftHold, isComposerOrCalligrapherEmpty else { break shiftBksp }
@@ -585,7 +583,6 @@ extension InputHandlerProtocol {
           // 此處刻意使用 Assembler 的 API（assembler.dropKey）以避免呼叫
           // InputHandler 的 dropKey 中所包含的 KeyDropContext 回補邏輯。
           try? assembler.dropKey(direction: .rear)
-          assemble() // 這裡必須 Walk 一次、來更新目前被 walk 的內容。
           prevReading.1.map(\.description).forEach {
             composer.receiveKey(fromPhonabet: $0.unicodeScalars.first)
           }
@@ -625,7 +622,6 @@ extension InputHandlerProtocol {
           try? assembler.dropKey(direction: .rear)
         }
       }
-      assemble()
     } else {
       _ = input.commonKeyModifierFlags == .option
         ? clearComposerAndCalligrapher()
@@ -694,7 +690,6 @@ extension InputHandlerProtocol {
           try? assembler.dropKey(direction: .front)
         }
       }
-      assemble()
     } else {
       clearComposerAndCalligrapher()
     }
@@ -1025,7 +1020,6 @@ extension InputHandlerProtocol {
     if alternative {
       if currentLM.hasUnigramsFor(keyArray: ["_punctuation_list"]) {
         if isComposerOrCalligrapherEmpty, (try? assembler.insertKey("_punctuation_list")) != nil {
-          assemble()
           // 一邊吃一邊屙（僅對位列黑名單的 App 用這招限制組字區長度）。
           let textToCommit = commitOverflownComposition
           var inputting = generateStateOfInputting()

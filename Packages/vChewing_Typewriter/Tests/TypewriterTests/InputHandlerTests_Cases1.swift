@@ -128,7 +128,6 @@ extension InputHandlerTests {
 
     #expect(throws: Never.self) { try testHandler.assembler.insertKey("ㄗㄚˊ") }
     #expect(throws: Never.self) { try testHandler.assembler.insertKey("ㄉㄜ˙") }
-    testHandler.assemble()
 
     guard let handler = testSession.inputHandler else {
       Issue.record("testSession.handler is nil.")
@@ -168,7 +167,6 @@ extension InputHandlerTests {
 
     #expect(throws: Never.self) { try testHandler.assembler.insertKey("ㄗㄚˊ") }
     #expect(throws: Never.self) { try testHandler.assembler.insertKey("ㄉㄜ˙") }
-    testHandler.assemble()
 
     let vs1 = String(UnicodeScalar(0xE01E1)!)
     let reflectedState = testHandler.generateStateOfInputting()
@@ -213,7 +211,6 @@ extension InputHandlerTests {
 
     #expect(throws: Never.self) { try testHandler.assembler.insertKey("ㄗㄚˊ") }
     #expect(throws: Never.self) { try testHandler.assembler.insertKey("ㄉㄜ˙") }
-    testHandler.assemble()
     testSession.switchState(testHandler.generateStateOfInputting())
 
     let vs1 = String(UnicodeScalar(0xE01E1)!)
@@ -252,7 +249,6 @@ extension InputHandlerTests {
 
     #expect(throws: Never.self) { try testHandler.assembler.insertKey("ㄗㄚˊ") }
     #expect(throws: Never.self) { try testHandler.assembler.insertKey("ㄉㄜ˙") }
-    testHandler.assemble()
     testSession.switchState(testHandler.generateStateOfInputting())
 
     // 確認 BPMFVS 投影在 display 中已啟用。
@@ -313,7 +309,6 @@ extension InputHandlerTests {
     testSession.resetInputHandler(forceComposerCleanup: true)
 
     #expect(throws: Never.self) { try testHandler.assembler.insertKey("ㄗㄚˊ") }
-    testHandler.assemble()
     testSession.switchState(testHandler.generateStateOfCandidates())
 
     #expect(testSession.state.type == .ofCandidates)
@@ -915,7 +910,6 @@ extension InputHandlerTests {
     testHandler.currentLM.syncPrefs()
 
     #expect(throws: Never.self) { try testHandler.assembler.insertKey(reading) }
-    testHandler.assemble()
 
     let candidateValues = testHandler.generateArrayOfCandidates().map(\.value)
     #expect(candidateValues == expectedValues)
@@ -964,7 +958,6 @@ extension InputHandlerTests {
     testHandler.currentLM.syncPrefs()
 
     #expect(throws: Never.self) { try testHandler.assembler.insertKey(reading) }
-    testHandler.assemble()
 
     let candidateValues = testHandler.generateArrayOfCandidates().map(\.value)
     #expect(candidateValues == eTenSequence)
@@ -1008,7 +1001,6 @@ extension InputHandlerTests {
     testHandler.currentLM.syncPrefs()
 
     #expect(throws: Never.self) { try testHandler.assembler.insertKey("ㄅㄛ") }
-    testHandler.assemble()
 
     let candidateValues = testHandler.generateArrayOfCandidates().map(\.value)
     guard let conformingIndex = candidateValues.firstIndex(of: "玻") else {

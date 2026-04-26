@@ -324,7 +324,6 @@ extension InputHandlerTests {
     guard let obsCaptured else {
       preconditionFailure("Should have a capture.")
     }
-    // assembler.assemble() <- 已經組句了。
     let assembledFollowingOverride = assembler.assembledSentence
       .map(\.value)
       .joined(separator: " ")
@@ -364,7 +363,6 @@ extension InputHandlerTests {
       )
       try assembler.dropKey(direction: .rear)
       try assembler.dropKey(direction: .rear)
-      testHandler.assemble()
     }
 
     let suggestion = pom.fetchSuggestion(
@@ -395,7 +393,6 @@ extension InputHandlerTests {
         overrideType: suggestion.forceHighScoreOverride ? .withSpecified : .withTopGramScore
       )
     }
-    assembler.assemble()
     let assembledByPOM = assembler.assembledSentence
       .map(\.value)
       .joined(separator: " ")
@@ -513,7 +510,6 @@ extension InputHandlerTests {
         overrideType: suggestion.forceHighScoreOverride ? .withSpecified : .withTopGramScore
       )
     }
-    testHandler.assemble()
     let assembledByPOM = assembler.assembledSentence.map(\.value).joined(separator: " ")
     #expect("再 創 世" == assembledByPOM)
     // 追加真實場景測試。此時 prefs.fetchSuggestionsFromPerceptionOverrideModel 是 true。

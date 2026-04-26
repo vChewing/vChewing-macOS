@@ -208,7 +208,6 @@ public struct BPMFFullMatchTypewriter<Handler: InputHandlerProtocol>: Typewriter
       }
     }
 
-    handler.assemble()
     let textToCommit = handler.commitOverflownComposition
     handler.retrievePOMSuggestions(apply: true)
     handler.composer.replacePinyinBuffer(with: autoChop.remainingRomaji)
@@ -281,8 +280,6 @@ public struct BPMFFullMatchTypewriter<Handler: InputHandlerProtocol>: Typewriter
       return true
     }
 
-    handler.assemble()
-
     let targetIndex = handler.assembler.cursor - 1
     narrateTheComposer(
       narrator: handler.narrator,
@@ -315,7 +312,6 @@ public struct BPMFFullMatchTypewriter<Handler: InputHandlerProtocol>: Typewriter
     if handler.composer.phonabetKeyForQuery(pronounceableOnly: false) == nil {
       if !handler.composer.isPinyinMode, input.isSpace,
          (try? handler.assembler.insertKey(existedIntonation.value)) != nil {
-        handler.assemble()
         var theInputting = handler.generateStateOfInputting()
         theInputting.textToCommit = handler.commitOverflownComposition
         handler.composer.clear()
@@ -494,10 +490,6 @@ extension BPMFFullMatchTypewriter {
       return .noLexiconRecord
     }
     guard (try? assembler.dropKey(direction: .rear)) != nil else { return .cursorAtRearestPosition }
-    /// 從這個位置開始，assembler 的內容已有所改變，得重新組句。
-    defer {
-      handler.assemble()
-    }
     guard (try? assembler.insertKey(request.replacementReading)) != nil else {
       try? assembler.dropKey(direction: .front)
       try? assembler.insertKey(request.originalReading)
