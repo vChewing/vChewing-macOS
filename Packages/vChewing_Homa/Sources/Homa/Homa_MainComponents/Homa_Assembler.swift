@@ -222,7 +222,13 @@ extension Homa {
       keys.remove(at: cursor - (isBackSpace ? 1 : 0))
       cursor -= isBackSpace ? 1 : 0 // 在縮節之前。
       resizeGrid(at: cursor, do: .shrink)
-      try? assignNodes() // 此處拋出的異常已無利用之意義，放行即可。
+      do {
+        try assignNodes()
+      } catch {
+        // 此處拋出的異常已無利用之意義，放行即可。
+        // 然而，assignNodes 可能因範圍內已有現成節點而拋出 noNodesAssigned，此時仍須重新組句。
+        assemble()
+      }
     }
 
     /// 獲取當前標記得範圍。這個函式只能是函式、而非只讀變數。
