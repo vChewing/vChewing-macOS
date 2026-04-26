@@ -52,6 +52,8 @@ jobs:
             './Packages/vChewing_Shared'
             './Packages/vChewing_MainAssembly4Darwin'
             './Packages/vChewing_LangModelAssembly'
+            './Packages/vChewing_Homa'
+            './Packages/vChewing_Typewriter'
             './Packages/vChewing_Hotenka'
             './Packages/vChewing_OSFrameworkImpl'
             './Packages/vChewing_UpdateSputnik'
