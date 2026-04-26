@@ -73,7 +73,7 @@ This file provides GitHub Copilot-specific coding instructions. For comprehensiv
 ## Reference Files and Folders
 - `./Packages/vChewing_MainAssembly4Darwin/Sources/MainAssembly4Darwin/SessionController/`: `SessionCtl.swift` is the IMK entry point working with candidate window, IME settings, etc. However, most of its tasks are delegated to `InputSession*.swift` files in this folder.
 - `./Packages/vChewing_Typewriter/`: The typing module `InputHandler` protocol working with the IMEStateProtocol-based finite state machine.
-- `./Packages/vChewing_LangModelAssembly/`: Language model assembly (factory lexicon, user phrases, perception override, associated phrases).
+- `./Packages/vChewing_LangModelAssembly/`: Language model assembly (factory lexicon, user phrases, perceptor (LX_Perceptor), associated phrases).
 - `./Packages/vChewing_Homa/`: The current sentence assembler used by Typewriter and MainAssembly.
 - `./Packages/vChewing_Tekkon/`: The phonabet composer designed for Chinese Phonabet (Zhuyin, Bopomofo) pronunciation data.
 - `./Packages/vChewing_MainAssembly4Darwin/`: The sole module imported to the Xcode project. It integrates everything together. Real-simulation of typing experiences are handled in the unit tests of this package.
