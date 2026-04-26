@@ -346,12 +346,9 @@ extension BPMFFullMatchTypewriter {
     var playbackComposer = handler.composer
     playbackComposer.clear()
     // 直接使用注音符號重建 composer 狀態，繞過鍵盤佈局轉換。
-    if playbackComposer.isPinyinMode {
-      playbackComposer.receiveSequence(readingKey, isRomaji: true)
-    } else {
-      for scalar in readingKey.unicodeScalars {
-        playbackComposer.receiveKey(fromPhonabet: scalar)
-      }
+    // 注意：actualKeys 永遠是注音符號，與 parser 模式無關。
+    for scalar in readingKey.unicodeScalars {
+      playbackComposer.receiveKey(fromPhonabet: scalar)
     }
     let cachedIntonation = playbackComposer.intonation.isValid ? playbackComposer.intonation : nil
     if playbackComposer.hasIntonation() { playbackComposer.doBackSpace() }
