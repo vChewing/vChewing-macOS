@@ -21,7 +21,7 @@ extension InputHandlerTests {
 
   @Test
   func testNarrationDefensivePinyinToBopomofo() throws {
-    guard let testHandler, let testSession else {
+    guard let testHandler else {
       Issue.record("Test handler or session is nil.")
       return
     }
@@ -62,7 +62,7 @@ extension InputHandlerTests {
 
   @Test
   func testNarrationUsesActualKeysOnComposition() throws {
-    guard let testHandler, let testSession else {
+    guard let testHandler else {
       Issue.record("Test handler or session is nil.")
       return
     }
@@ -100,7 +100,7 @@ extension InputHandlerTests {
 
   @Test
   func testRearIntonationOverrideTriggersNarration() throws {
-    guard let testHandler, let testSession else {
+    guard let testHandler else {
       Issue.record("Test handler or session is nil.")
       return
     }
