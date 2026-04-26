@@ -837,6 +837,26 @@ public struct HomaTestsAdvanced: HomaTestSuite {
     }
   }
 
+  /// 迴歸測試：輪替「旅 -> 一縷」時，不應把前一讀音「留」過度鞏固。
+  @Test("[Homa] Assembler_RevolveCandidateAvoidsOverConsolidatingLeadingOverlap")
+  func testRevolveCandidateAvoidsOverConsolidatingLeadingOverlap() async throws {
+    let mockLM = TestLM(rawData: HomaTests.strLMSampleDataHutao + "\nliu2 流 -4")
+    let assembler = Homa.Assembler(
+      gramQuerier: { mockLM.queryGrams($0) }
+    )
+    try ["liu2", "yi4", "lv3"].forEach { try assembler.insertKey($0) }
+    #expect(assembler.assemble().values == ["留意", "旅"])
+
+    assembler.cursor = assembler.length
+    let revolved = try assembler.revolveCandidate(
+      cursorType: .placedFront,
+      counterClockwise: false,
+      skipInitialConsolidation: true
+    )
+    #expect(revolved.0.pair == .init(keyArray: ["yi4", "lv3"], value: "一縷"))
+    #expect(assembler.assembledSentence.map(\ .value) == ["流", "一縷"])
+  }
+
   @Test("[Homa] Assembler_ConsolidationUsesTrueNodeAnchorsOnOverlap")
   func testConsolidationUsesTrueNodeAnchorsOnOverlap() async throws {
     let mockLM = TestLM(rawData: HomaTests.strLMSampleData_JiHuQiKeng)

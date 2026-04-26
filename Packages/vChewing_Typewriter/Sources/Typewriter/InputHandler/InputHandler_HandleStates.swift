@@ -948,6 +948,10 @@ extension InputHandlerProtocol {
     typealias TooltipPayload = (value: String, current: Int, total: Int)
 
     let previousSentence = assembler.assembledSentence
+    let shouldSkipInitialConsolidation: Bool = switch homaCandidateCursorType {
+    case .placedFront: assembler.isCursorAtEdge(direction: .front)
+    case .placedRear: assembler.isCursorAtEdge(direction: .rear)
+    }
     var tooltipPayload: TooltipPayload?
     var errorCode: String?
     var debugIntel: String?
@@ -955,7 +959,8 @@ extension InputHandlerProtocol {
     do {
       let revolvement = try assembler.revolveCandidate(
         cursorType: homaCandidateCursorType,
-        counterClockwise: reverseOrder
+        counterClockwise: reverseOrder,
+        skipInitialConsolidation: shouldSkipInitialConsolidation
       ) { debugIntelRetrieved in
         debugIntel = debugIntelRetrieved
       }

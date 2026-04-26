@@ -45,6 +45,7 @@ extension Homa.Assembler {
   public func revolveCandidate(
     cursorType: CandidateCursor,
     counterClockwise: Bool,
+    skipInitialConsolidation: Bool = false,
     debugIntelHandler: ((String) -> ())? = nil,
     candidateArrayHandler: (([Homa.CandidatePairWeighted]) -> ())? = nil
   ) throws
@@ -118,7 +119,7 @@ extension Homa.Assembler {
     var debugIntel: [String] = []
 
     while retryCount < maxRetries {
-      if retryCount > 0 || needsInitialConsolidation {
+      if retryCount > 0 || (needsInitialConsolidation && !skipInitialConsolidation) {
         try? consolidateCandidateCursorContext(
           for: theCandidateNow.pair,
           cursorType: cursorType
@@ -127,6 +128,11 @@ extension Homa.Assembler {
             debugIntel.append(intel)
           }
         }
+      }
+
+      if retryCount == 0, needsInitialConsolidation, skipInitialConsolidation {
+        debugIntel
+          .append("revolveCandidate: initial attempt skips pre-consolidation to avoid over-locking overlap edges")
       }
 
       do {
