@@ -74,6 +74,10 @@ extension SettingsPanesCocoa {
       }
     }
 
+    static func clientTableRowHeight(for font: NSFont) -> CGFloat {
+      max(20, ceil(font.ascender - font.descender + font.leading) + 4)
+    }
+
     func makeScrollableTable() -> NSScrollView {
       let scrollContainer = NSScrollView()
       scrollContainer.scrollerStyle = .legacy
@@ -85,6 +89,8 @@ extension SettingsPanesCocoa {
       if #available(macOS 26, *) {
         scrollContainer.borderType = .lineBorder
       }
+
+      let narrowSysFont = NSFont.narrowedFont(size: 15)
 
       if #available(macOS 11.0, *) {
         tblClients.style = .inset
@@ -102,15 +108,13 @@ extension SettingsPanesCocoa {
       tblClients.frame = CGRect(x: 0, y: 0, width: contentWidth - 20, height: tableHeight)
       tblClients.gridColor = NSColor.clear
       tblClients.intercellSpacing = CGSize(width: 17, height: 0)
-      tblClients.rowHeight = 17
+      tblClients.rowHeight = Self.clientTableRowHeight(for: narrowSysFont)
       tblClients.setContentHuggingPriority(.defaultHigh, for: .vertical)
       tblClients.registerForDraggedTypes([.kUTTypeFileURL])
       tblClients.dataSource = self
       tblClients.action = #selector(onItemClicked(_:))
       tblClients.target = self
       if #available(macOS 11.0, *) { tblClients.style = .fullWidth }
-
-      let narrowSysFont = NSFont.narrowedFont(size: 15)
 
       tableColumn1.identifier = NSUserInterfaceItemIdentifier("colPCBEnabled")
       tableColumn1.maxWidth = 20

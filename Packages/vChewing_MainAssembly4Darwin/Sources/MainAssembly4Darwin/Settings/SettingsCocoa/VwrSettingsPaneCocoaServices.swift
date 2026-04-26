@@ -91,6 +91,10 @@ extension SettingsPanesCocoa {
       }
     }
 
+    static func serviceTableRowHeight(for font: NSFont) -> CGFloat {
+      max(20, ceil(font.ascender - font.descender + font.leading) + 4)
+    }
+
     func makeScrollableTable() -> NSScrollView {
       let scrollContainer = NSScrollView()
       scrollContainer.scrollerStyle = .legacy
@@ -102,6 +106,8 @@ extension SettingsPanesCocoa {
       if #available(macOS 26, *) {
         scrollContainer.borderType = .lineBorder
       }
+
+      let narrowSysFont = NSFont.narrowedFont(size: 15)
 
       if #available(macOS 11.0, *) {
         tblServices.style = .inset
@@ -118,14 +124,12 @@ extension SettingsPanesCocoa {
       tblServices.frame = CGRect(x: 0, y: 0, width: contentWidth - 20, height: tableHeight)
       tblServices.gridColor = NSColor.clear
       tblServices.intercellSpacing = CGSize(width: 15, height: 0)
-      tblServices.rowHeight = 17
+      tblServices.rowHeight = Self.serviceTableRowHeight(for: narrowSysFont)
       tblServices.setContentHuggingPriority(.defaultHigh, for: .vertical)
       tblServices.registerForDraggedTypes([.kUTTypeData, .kUTTypeFileURL])
       tblServices.dataSource = self
       tblServices.target = self
       if #available(macOS 11.0, *) { tblServices.style = .fullWidth }
-
-      let narrowSysFont = NSFont.narrowedFont(size: 15)
 
       tableColumn1.identifier = NSUserInterfaceItemIdentifier("colTitle")
       tableColumn1.headerCell.title = "i18n:CandidateServiceMenuEditor.table.field.MenuTitle"
