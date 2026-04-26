@@ -244,4 +244,86 @@ struct LMInstantiatorTests {
     #expect(partialFixtureConfigured == partialFixturePartial)
     #expect(partialFixturePartial == ["工", "式", "芯"])
   }
+
+  @Test
+  func testUserPhrasePartialMatchViaLookupHub() throws {
+    defer {
+      LMAssembly.LMInstantiator.disconnectFactoryDictionary()
+    }
+    let instance = LMAssembly.LMInstantiator()
+    instance.lmUserPhrases.replaceData(textData: """
+    年終 ㄋㄧㄢˊ-ㄓㄨㄥ -3.0
+    年糕 ㄋㄧㄢˊ-ㄍㄠ -4.0
+    年 ㄋㄧㄢˊ -5.0
+    """)
+
+    // Exact match without partialMatchEnabled
+    let exact = instance.lookupHub.grams(for: ["ㄋㄧㄢˊ"])
+    #expect(exact.map(\.value).contains("年"))
+    #expect(!exact.map(\.value).contains("年終"))
+    #expect(!exact.map(\.value).contains("年糕"))
+
+    // Enable partial match
+    _ = instance.setOptions { config in
+      config.partialMatchEnabled = true
+    }
+
+    let partial = instance.lookupHub.grams(for: ["ㄋㄧㄢˊ"])
+    let partialValues = partial.map(\.value)
+    #expect(partialValues.contains("年"))
+    #expect(partialValues.contains("年終"))
+    #expect(partialValues.contains("年糕"))
+
+    // Verify keyArray is correct for partial match results
+    let nianZhong = partial.first { $0.value == "年終" }
+    #expect(nianZhong?.keyArray == ["ㄋㄧㄢˊ", "ㄓㄨㄥ"])
+  }
+
+  @Test
+  func testUserPhrasePartialMatchRespectsSingleCharCap() throws {
+    defer {
+      LMAssembly.LMInstantiator.disconnectFactoryDictionary()
+    }
+    let instance = LMAssembly.LMInstantiator()
+    LMAssembly.LMInstantiator.connectToTestFactoryDictionary(textMapData: LMATestsData.textMapTestCoreLMData)
+
+    instance.lmUserPhrases.replaceData(textData: """
+    年終 ㄋㄧㄢˊ-ㄓㄨㄥ -3.0
+    年 ㄋㄧㄢˊ -1.0
+    """)
+
+    _ = instance.setOptions { config in
+      config.partialMatchEnabled = true
+    }
+
+    let partial = instance.unigramsFor(keyArray: ["ㄋㄧㄢˊ"], partiallyMatch: true)
+    let nian = partial.first { $0.current == "年" }
+    let nianZhong = partial.first { $0.current == "年終" }
+
+    // Single-char user phrase should be capped near factory top score
+    #expect(nian != nil)
+    // Multi-char partial match should retain original score
+    #expect(nianZhong != nil)
+    #expect(nianZhong?.probability == -3.0)
+  }
+
+  @Test
+  func testPartialAndExactQueriesDoNotShareCacheEntry() throws {
+    defer {
+      LMAssembly.LMInstantiator.disconnectFactoryDictionary()
+    }
+    let instance = LMAssembly.LMInstantiator()
+    instance.lmUserPhrases.replaceData(textData: """
+    年終 ㄋㄧㄢˊ-ㄓㄨㄥ -3.0
+    年 ㄋㄧㄢˊ -5.0
+    """)
+
+    _ = instance.unigramsFor(keyArray: ["ㄋㄧㄢˊ"], partiallyMatch: false)
+    let partialAfterExact = instance.unigramsFor(keyArray: ["ㄋㄧㄢˊ"], partiallyMatch: true)
+    #expect(partialAfterExact.map(\.current).contains("年終"))
+
+    _ = instance.unigramsFor(keyArray: ["ㄋㄧㄢˊ"], partiallyMatch: true)
+    let exactAfterPartial = instance.unigramsFor(keyArray: ["ㄋㄧㄢˊ"], partiallyMatch: false)
+    #expect(!exactAfterPartial.map(\.current).contains("年終"))
+  }
 }

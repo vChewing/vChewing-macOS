@@ -126,7 +126,7 @@ extension LMAssembly {
       }
 
       public func grams(for keyArray: [String]) -> [Homa.GramRAW] {
-        lmi.unigramsFor(keyArray: keyArray).map {
+        lmi.unigramsFor(keyArray: keyArray, partiallyMatch: lmi.config.partialMatchEnabled).map {
           (keyArray: $0.keyArray, value: $0.current, probability: $0.probability, previous: nil)
         }
       }
@@ -413,7 +413,9 @@ extension LMAssembly {
           ? lmFiltered.temporaryMap[keyChain, default: []].append(unigram)
           : lmUserPhrases.temporaryMap[keyChain, default: []].append(unigram)
       // LRU cache 必須在暫時資料變更時失效，否則後續查詢會返回過時結果。
-      unigramLRUCache.removeValue(forKey: keyChain)
+      // 注意：cache key 已包含 partiallyMatch 標記，需同時清除兩種變體。
+      unigramLRUCache.removeValue(forKey: "\(keyChain)\tPM0")
+      unigramLRUCache.removeValue(forKey: "\(keyChain)\tPM1")
     }
 
     /// 該函式主要供單元測試所用。
@@ -561,7 +563,17 @@ extension LMAssembly {
     /// - Parameter keyArray: 給定的讀音索引鍵陣列。
     /// - Returns: 對應的經過處理的單元圖陣列。
     public func unigramsFor(keyArray: [String]) -> [Homa.Gram] {
+      unigramsFor(keyArray: keyArray, partiallyMatch: false)
+    }
+
+    /// 給定讀音索引鍵陣列，讓 LMI 給出對應的經過處理的單元圖陣列。
+    /// - Parameters:
+    ///   - keyArray: 給定的讀音索引鍵陣列。
+    ///   - partiallyMatch: 是否對使用者語彙啟用前綴部分匹配。
+    /// - Returns: 對應的經過處理的單元圖陣列。
+    public func unigramsFor(keyArray: [String], partiallyMatch: Bool) -> [Homa.Gram] {
       let keyChain = keyArray.joined(separator: "-")
+      let cacheKey = partiallyMatch ? "\(keyChain)\tPM1" : "\(keyChain)\tPM0"
       let noEmptyKey = !keyArray.isEmpty && keyArray.allSatisfy { !$0.isEmpty }
       guard noEmptyKey else { return [] }
       /// 給空格鍵指定輸出值。
@@ -573,7 +585,7 @@ extension LMAssembly {
         unigramLRUCache.removeAll(keepingCapacity: true)
         unigramCacheFingerprint = fingerprint
       }
-      if let cached = unigramLRUCache[keyChain] {
+      if let cached = unigramLRUCache[cacheKey] {
         return cached
       }
       // `config.bypassUserPhrasesData` 啟用時，除了 Associated Phrases 以外的資料全部忽略。
@@ -649,19 +661,32 @@ extension LMAssembly {
         let factorySingleReadingValueHashes: Set<Int> = factoryCoreUnigramsResult.reduce(into: []) {
           if $1.keyArray.count == 1 { $0.insert($1.hashValue) }
         }
-        var userPhraseUnigrams = Array(
-          lmUserPhrases.unigramsFor(
-            key: keyChain,
-            keyArray: keyArray,
-            omitNonTemporarySingleCharNonSymbolUnigrams: !allowBoostingSingleKanji,
-            factorySingleReadingValueHashes: factorySingleReadingValueHashes
-          ).reversed()
-        )
+        var userPhraseUnigrams: [Homa.Gram]
+        if partiallyMatch {
+          userPhraseUnigrams = Array(
+            lmUserPhrases.unigramsFor(
+              keyPrefix: keyChain,
+              omitNonTemporarySingleCharNonSymbolUnigrams: !allowBoostingSingleKanji,
+              factorySingleReadingValueHashes: factorySingleReadingValueHashes
+            ).reversed()
+          )
+        } else {
+          userPhraseUnigrams = Array(
+            lmUserPhrases.unigramsFor(
+              key: keyChain,
+              keyArray: keyArray,
+              omitNonTemporarySingleCharNonSymbolUnigrams: !allowBoostingSingleKanji,
+              factorySingleReadingValueHashes: factorySingleReadingValueHashes
+            ).reversed()
+          )
+        }
         if keyArray.count == 1, let topScore = rawAllUnigrams.lazy.map(\.probability).max() {
           // 不再讓使用者自己加入的單漢字讀音權重進入組句體系。
+          // 對於前綴部分匹配結果，僅對單音節結果施加權重上限。
           userPhraseUnigrams = userPhraseUnigrams.map { currentUnigram in
-            Homa.Gram(
-              keyArray: keyArray,
+            guard currentUnigram.keyArray.count == 1 else { return currentUnigram }
+            return Homa.Gram(
+              keyArray: currentUnigram.keyArray,
               value: currentUnigram.current,
               score: Swift.min(topScore + 0.000114514, currentUnigram.probability)
             )
@@ -737,7 +762,7 @@ extension LMAssembly {
         )
       rawAllUnigrams.consolidate(filter: dataAsFilter)
       // Store in LRU cache with size limit
-      unigramLRUCache[keyChain] = rawAllUnigrams
+      unigramLRUCache[cacheKey] = rawAllUnigrams
       if unigramLRUCache.count > 1_024 {
         let half = unigramLRUCache.count / 2
         let keysToRemove = Array(unigramLRUCache.keys.prefix(half))

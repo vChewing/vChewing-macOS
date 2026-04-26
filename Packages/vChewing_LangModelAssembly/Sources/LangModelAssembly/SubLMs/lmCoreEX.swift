@@ -48,6 +48,8 @@ extension LMAssembly {
     var temporaryMap: [String: [Homa.Gram]] = [:]
     /// `rangeMap` 索引鍵的快取集合，避免每次查詢都重建 `Set`。
     var keySet: Set<String> = []
+    /// `rangeMap` 與 `temporaryMap` 索引鍵的排序陣列，供前綴搜尋二分搜尋之用。
+    var sortedKeys: [String] = []
     /// 資料庫字串陣列。
     var strData: String = ""
     /// 聲明原始檔案內第一、二縱列的內容是否彼此顛倒。
@@ -137,6 +139,7 @@ extension LMAssembly {
       }
       rangeMap = newMap
       keySet = Set(rangeMap.keys)
+      sortedKeys = rangeMap.keys.sorted()
       // 明確釋放 newMap 記憶體
       newMap.removeAll(keepingCapacity: false)
     }
@@ -148,6 +151,7 @@ extension LMAssembly {
       rangeMap.removeAll(keepingCapacity: false)
       temporaryMap.removeAll(keepingCapacity: false)
       keySet.removeAll(keepingCapacity: false)
+      sortedKeys.removeAll(keepingCapacity: false)
     }
 
     // MARK: - Advanced features
@@ -264,6 +268,70 @@ extension LMAssembly {
     ///   - key: 讀音索引鍵。
     func hasUnigramsFor(key: String) -> Bool {
       keySet.contains(key) || temporaryMap[key] != nil
+    }
+
+    /// 根據給定的前綴，返回所有以該前綴開頭的索引鍵。
+    /// 同時搜尋 `sortedKeys`（二分搜尋）與 `temporaryMap.keys`（線性掃描）。
+    /// - Parameter prefix: 前綴字串。
+    /// - Returns: 匹配的索引鍵陣列。
+    func keys(matchingPrefix prefix: String) -> [String] {
+      guard !prefix.isEmpty else { return [] }
+      var result: [String] = []
+      var seen: Set<String> = []
+      // 二分搜尋 sortedKeys：找到第一個不小於 prefix 的位置
+      var low = 0
+      var high = sortedKeys.count
+      while low < high {
+        let mid = (low + high) / 2
+        if sortedKeys[mid] < prefix {
+          low = mid + 1
+        } else {
+          high = mid
+        }
+      }
+      var i = low
+      while i < sortedKeys.count, sortedKeys[i].hasPrefix(prefix) {
+        let key = sortedKeys[i]
+        if seen.insert(key).inserted {
+          result.append(key)
+        }
+        i += 1
+      }
+      // 線性掃描 temporaryMap（資料量通常很小）
+      for key in temporaryMap.keys.sorted() where key.hasPrefix(prefix) {
+        if seen.insert(key).inserted {
+          result.append(key)
+        }
+      }
+      return result
+    }
+
+    /// 根據給定的讀音索引鍵前綴，來獲取資料庫辭典內所有匹配的資料陣列。
+    /// 對每個匹配到的 key，會自動推導其正確的 `keyArray` 並傳入 exact-match 查詢。
+    /// - parameters:
+    ///   - prefix: 讀音索引鍵前綴。
+    ///   - keyArray: 可選，若提供則用於所有匹配結果（通常應留 nil 讓方法自行推導）。
+    ///   - omitNonTemporarySingleCharNonSymbolUnigrams: 是否省略非暫存的單字符非符號單元圖。
+    ///   - factorySingleReadingValueHashes: 原廠單讀音值雜湊集合，用於過濾。
+    func unigramsFor(
+      keyPrefix prefix: String,
+      keyArray: [String]? = nil,
+      omitNonTemporarySingleCharNonSymbolUnigrams: Bool = false,
+      factorySingleReadingValueHashes: Set<Int> = []
+    )
+      -> [Homa.Gram] {
+      let matchingKeys = keys(matchingPrefix: prefix)
+      var grams: [Homa.Gram] = []
+      for key in matchingKeys {
+        let inferredKeyArray = keyArray ?? key.split(separator: "-").map(\.description)
+        grams.append(contentsOf: unigramsFor(
+          key: key,
+          keyArray: inferredKeyArray,
+          omitNonTemporarySingleCharNonSymbolUnigrams: omitNonTemporarySingleCharNonSymbolUnigrams,
+          factorySingleReadingValueHashes: factorySingleReadingValueHashes
+        ))
+      }
+      return grams
     }
   }
 }

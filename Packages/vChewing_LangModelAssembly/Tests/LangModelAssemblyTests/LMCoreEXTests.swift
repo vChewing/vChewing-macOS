@@ -57,4 +57,74 @@ struct LMCoreEXTests {
     #expect(ke1 == ["刻", "柯", "棵", "科", "顆"])
     #expect(si1 == ["司", "嘶", "思", "撕", "斯", "絲", "私"])
   }
+
+  @Test
+  func testKeysMatchingPrefix() throws {
+    var lmTest = LMAssembly.LMCoreEX(
+      reverse: false,
+      consolidate: false,
+      defaultScore: { _ in 0 },
+      forceDefaultScore: false
+    )
+    lmTest.replaceData(textData: sampleData)
+    #expect(lmTest.keys(matchingPrefix: "ㄍ").sorted() == ["ㄍㄠ"])
+    #expect(lmTest.keys(matchingPrefix: "ㄎ").sorted() == ["ㄎㄜ"])
+    #expect(lmTest.keys(matchingPrefix: "ㄙ").sorted() == ["ㄙ"])
+    #expect(lmTest.keys(matchingPrefix: "ㄋ").isEmpty)
+    #expect(lmTest.keys(matchingPrefix: "").isEmpty)
+  }
+
+  @Test
+  func testUnigramsForKeyPrefix() throws {
+    var lmTest = LMAssembly.LMCoreEX(
+      reverse: false,
+      consolidate: false,
+      defaultScore: { _ in 0 },
+      forceDefaultScore: false
+    )
+    lmTest.replaceData(textData: sampleData)
+    let gaoPrefix = lmTest.unigramsFor(keyPrefix: "ㄍ").map(\.current)
+    #expect(gaoPrefix == ["篙", "糕", "膏", "高"])
+    let emptyPrefix = lmTest.unigramsFor(keyPrefix: "ㄋ")
+    #expect(emptyPrefix.isEmpty)
+  }
+
+  @Test
+  func testPartialMatchIncludesTemporaryMap() throws {
+    var lmTest = LMAssembly.LMCoreEX(
+      reverse: false,
+      consolidate: false,
+      defaultScore: { _ in 0 },
+      forceDefaultScore: false
+    )
+    lmTest.replaceData(textData: sampleData)
+    lmTest.temporaryMap["ㄍㄠ-ㄒㄧㄥ"] = [
+      .init(keyArray: ["ㄍㄠ", "ㄒㄧㄥ"], value: "高興", score: -5.0),
+    ]
+    let keys = lmTest.keys(matchingPrefix: "ㄍㄠ").sorted()
+    #expect(keys == ["ㄍㄠ", "ㄍㄠ-ㄒㄧㄥ"])
+    let grams = lmTest.unigramsFor(keyPrefix: "ㄍㄠ").map(\.current)
+    #expect(grams == ["篙", "糕", "膏", "高", "高興"])
+  }
+
+  @Test
+  func testPrefixMatchingDeduplicatesOverlappingMainAndTemporaryKeys() throws {
+    var lmTest = LMAssembly.LMCoreEX(
+      reverse: false,
+      consolidate: false,
+      defaultScore: { _ in 0 },
+      forceDefaultScore: false
+    )
+    lmTest.replaceData(textData: sampleData)
+    lmTest.temporaryMap["ㄍㄠ"] = [
+      .init(keyArray: ["ㄍㄠ"], value: "暫時高", score: -5.0),
+    ]
+
+    let keys = lmTest.keys(matchingPrefix: "ㄍㄠ")
+    #expect(keys == ["ㄍㄠ"])
+
+    let grams = lmTest.unigramsFor(keyPrefix: "ㄍㄠ").map(\.current)
+    #expect(grams.filter { $0 == "高" }.count == 1)
+    #expect(grams.filter { $0 == "暫時高" }.count == 1)
+  }
 }
