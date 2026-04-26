@@ -29,6 +29,7 @@ extension InputHandlerTests {
     testHandler.prefs.enforceETenDOSCandidateSequence = false
     testHandler.prefs.useSCPCTypingMode = false
     testHandler.prefs.useRearCursorMode = false
+    testHandler.prefs.fetchSuggestionsFromPerceptionOverrideModel = false
     clearTestPOM()
     testSession.resetInputHandler(forceComposerCleanup: true)
     typeSentence("u. 2u,6s/6xu.6u4xm3z; ")
@@ -45,6 +46,22 @@ extension InputHandlerTests {
     let resultText2 = testSession.state.displayedText
     vCTestLog("- // 組字結果：\(resultText2)")
     #expect(resultText2 == "幽蝶能留一縷芳")
+
+    // 測試一個特例。
+    do {
+      testHandler.clear()
+      clearTestPOM()
+      testHandler.currentLM.insertTemporaryData(
+        unigram: .init(keyArray: ["ㄌㄧㄡˊ"], value: "流", score: -4, id: .init()),
+        isFiltering: false
+      )
+      typeSentence("xu.6u4")
+      #expect(testSession.state.displayedText == "留意")
+      typeSentence("xm3")
+      #expect(testSession.state.displayedText == "留意旅")
+      #expect(testHandler.triageInput(event: KBEvent.KeyEventData.dataTab.asEvent))
+      #expect(testSession.state.displayedText == "流一縷")
+    }
   }
 
   /// 測試漸退記憶模組的記憶資料生成與適用。
