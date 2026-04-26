@@ -471,3 +471,25 @@ public final class MockSession: @MainActor SessionCoreProtocol, CtlCandidateDele
   public func getMitigatedState(_ givenState: State) -> State { givenState }
   public func showTooltip(_: String?, colorState _: TooltipColorState, duration _: Double) {}
 }
+
+// MARK: - MockSpeechNarrator
+
+/// 專門用於單元測試的模擬語音朗讀器，可記錄最後一次朗讀的文本。
+public final class MockSpeechNarrator: SpeechNarratorProtocol {
+  public static var shared: MockSpeechNarrator = .init()
+
+  public private(set) var lastNarratedText: String?
+  public private(set) var narrateCallCount: Int = 0
+
+  public func refreshStatus() {}
+
+  public func narrate(_ text: String, allowDuplicates: Bool = true) {
+    narrateCallCount += 1
+    lastNarratedText = text
+  }
+
+  public func reset() {
+    lastNarratedText = nil
+    narrateCallCount = 0
+  }
+}

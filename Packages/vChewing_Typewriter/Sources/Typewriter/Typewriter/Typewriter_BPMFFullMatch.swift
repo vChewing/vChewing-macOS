@@ -281,13 +281,15 @@ public struct BPMFFullMatchTypewriter<Handler: InputHandlerProtocol>: Typewriter
       return true
     }
 
+    handler.assemble()
+
+    let targetIndex = handler.assembler.cursor - 1
     narrateTheComposer(
       narrator: handler.narrator,
-      with: readingKey.first, // 暫時沒別的好辦法可以改良體驗。
+      with: handler.assembler.actualKeys.indices.contains(targetIndex)
+        ? handler.assembler.actualKeys[targetIndex] : nil,
       when: prefs.readingNarrationCoverage == 1
     )
-
-    handler.assemble()
     let textToCommit = handler.commitOverflownComposition
     handler.retrievePOMSuggestions(apply: true)
     handler.composer.clear()
@@ -378,10 +380,30 @@ extension BPMFFullMatchTypewriter {
     guard condition, let narrator else { return }
     let composer = handler.composer
     let prefs = handler.prefs
-    let maybeKey = maybeKey ?? composer
+    guard var keyToNarrate = maybeKey ?? composer
       .phonabetKeyForQuery(pronounceableOnly: prefs.acceptLeadingIntonations)
-    guard var keyToNarrate = maybeKey else { return }
-    if composer.intonation == Phonabet(" ") { keyToNarrate.append("ˉ") }
+    else { return }
+
+    // 防禦性轉換：若內容含 ASCII 字母（可能是拼音殘留），嘗試轉為注音
+    if keyToNarrate.contains(where: { $0.isASCII && $0.isLetter }) {
+      let converted = Tekkon.cnvHanyuPinyinToPhona(targetJoined: keyToNarrate, newToneOne: "")
+      if !converted.contains(where: { $0.isASCII && $0.isLetter }) {
+        keyToNarrate = converted
+      } else {
+        let fallback = composer.value.replacingOccurrences(of: " ", with: "")
+        guard !fallback.isEmpty else { return }
+        keyToNarrate = fallback
+      }
+    }
+
+    // 若 key 本身無明確聲調記號，補上 ˉ（陰平）以便 TTS 正確朗讀
+    let hasExplicitTone = keyToNarrate.unicodeScalars.last.map {
+      ["ˊ", "ˇ", "ˋ", "˙"].contains($0.description)
+    } ?? false
+    if !hasExplicitTone {
+      keyToNarrate.append("ˉ")
+    }
+
     narrator.narrate(keyToNarrate, allowDuplicates: allowDuplicates)
   }
 
@@ -429,6 +451,15 @@ extension BPMFFullMatchTypewriter {
     case .success:
       handler.retrievePOMSuggestions(apply: true)
       let textToCommit = handler.commitOverflownComposition
+      let targetIndex = handler.assembler.cursor - 1
+      if handler.assembler.actualKeys.indices.contains(targetIndex) {
+        narrateTheComposer(
+          narrator: handler.narrator,
+          with: handler.assembler.actualKeys[targetIndex],
+          when: handler.prefs.readingNarrationCoverage >= 1,
+          allowDuplicates: true
+        )
+      }
       var refreshedState = handler.generateStateOfInputting()
       refreshedState.textToCommit = textToCommit
       refreshedState.tooltip = "Previous intonation has been overridden.".i18n
