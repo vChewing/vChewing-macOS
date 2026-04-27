@@ -1023,7 +1023,7 @@ extension InputHandlerTests {
   }
 
   @Test
-  func test_IH114_PinyinTonelessQueryUsesStemPartialMatch() throws {
+  func test_IH114A_PinyinTonelessQueryUsesStemPartialMatch() throws {
     guard let testHandler, let testSession else {
       Issue.record("testHandler and testSession at least one of them is nil.")
       return
@@ -1069,7 +1069,7 @@ extension InputHandlerTests {
   }
 
   @Test
-  func test_IH115_PinyinExplicitToneKeepsFullMatch() throws {
+  func test_IH114B_PinyinExplicitToneKeepsFullMatch() throws {
     guard let testHandler, let testSession else {
       Issue.record("testHandler and testSession at least one of them is nil.")
       return
@@ -1115,7 +1115,7 @@ extension InputHandlerTests {
   }
 
   @Test
-  func test_IH116_PinyinTonelessQueryDoesNotMatchLongerSyllableStem() throws {
+  func test_IH114C_PinyinTonelessQueryDoesNotMatchLongerSyllableStem() throws {
     guard let testHandler, let testSession else {
       Issue.record("testHandler and testSession at least one of them is nil.")
       return
@@ -1160,7 +1160,7 @@ extension InputHandlerTests {
   }
 
   @Test
-  func test_IH117_PinyinContinuousStemAutoChopsLeadingReadings() throws {
+  func test_IH114D_PinyinContinuousStemAutoChopsLeadingReadings() throws {
     guard let testHandler, let testSession else {
       Issue.record("testHandler and testSession at least one of them is nil.")
       return
