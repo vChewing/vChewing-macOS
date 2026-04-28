@@ -436,6 +436,70 @@ struct LMInstantiatorTextMapTests {
     #expect(instance.lookupHub.hasGrams(for: strCakeKey) == instance.hasUnigramsFor(keyArray: strCakeKey))
   }
 
+  @Test
+  func testNonKanjiHiraganaAndFWZeroAreQueryableViaNormalReading() throws {
+    defer {
+      LMAssembly.LMInstantiator.disconnectFactoryDictionary()
+    }
+
+    let textMap = makeTextMap([
+      ("ㄚ", [
+        (value: "阿", probability: -5.0, typeID: 5),
+        (value: "あ", probability: -13.0, typeID: 8),
+        (value: "ぁ", probability: -13.0, typeID: 8),
+      ]),
+      ("ㄌㄧㄥˊ", [
+        (value: "零", probability: -5.0, typeID: 5),
+        (value: "〇", probability: -5.261, typeID: 8),
+      ]),
+    ])
+
+    let instance = LMAssembly.LMInstantiator(isCHS: true)
+    #expect(LMAssembly.LMInstantiator.connectToTestFactoryDictionary(textMapData: textMap))
+
+    let grams4A = instance.unigramsFor(keyArray: ["ㄚ"])
+    #expect(gramsContainValue(grams4A, "阿"))
+    #expect(gramsContainValue(grams4A, "あ"))
+    #expect(gramsContainValue(grams4A, "ぁ"))
+
+    let grams4Ling = instance.unigramsFor(keyArray: ["ㄌㄧㄥˊ"])
+    #expect(gramsContainValue(grams4Ling, "零"))
+    #expect(gramsContainValue(grams4Ling, "〇"))
+
+    #expect(instance.hasUnigramsForFast(keyArray: ["ㄚ"]))
+    #expect(instance.hasUnigramsForFast(keyArray: ["ㄌㄧㄥˊ"]))
+  }
+
+  @Test
+  func testLetterPunctuationRemainsUnderscoreKeyed() throws {
+    defer {
+      LMAssembly.LMInstantiator.disconnectFactoryDictionary()
+    }
+
+    let textMap = makeTextMap([
+      ("ㄚ", [
+        (value: "阿", probability: -5.0, typeID: 5),
+        (value: "あ", probability: -13.0, typeID: 8),
+      ]),
+      ("_punctuation_comma", [
+        (value: "，", probability: 0.0, typeID: 4),
+      ]),
+    ])
+
+    let instance = LMAssembly.LMInstantiator(isCHS: true)
+    #expect(LMAssembly.LMInstantiator.connectToTestFactoryDictionary(textMapData: textMap))
+
+    // Normal reading key should return nonKanji but NOT letterPunctuations.
+    let grams4A = instance.unigramsFor(keyArray: ["ㄚ"])
+    #expect(gramsContainValue(grams4A, "阿"))
+    #expect(gramsContainValue(grams4A, "あ"))
+    #expect(!gramsContainValue(grams4A, "，"))
+
+    // Underscore key should return letterPunctuations.
+    let grams4Punct = instance.unigramsFor(keyArray: ["_punctuation_comma"])
+    #expect(gramsContainValue(grams4Punct, "，"))
+  }
+
   // MARK: Private
 
   private struct GramSnapshot: Equatable, Hashable {
