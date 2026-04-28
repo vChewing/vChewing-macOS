@@ -210,7 +210,7 @@
 "i18n:LMMgr.accessFailure.cassette.description" = "Please reconfigure the cassette path to a valid one before enabling this mode.";
 "i18n:LMMgr.accessFailure.cassette.title" = "Path invalid or file access error.";
 "i18n:LMMgr.notification.FactoryLexiconLoadingComplete" = "Factory dictionary loading complete.";
-"i18n:LMMgr.notification.FactoryLexiconLoadingStarted" = "Factory dictionary loading in progress.";
+"i18n:LMMgr.notification.FactoryLexiconLoadingStarted" = "Loading Factory Dictionary ...";
 "i18n:LMMgr.pathInvalidityFound.cassette.description" = "Please open vChewing Preferences to reconfirm your cassette file path settings.";
 "i18n:LMMgr.pathInvalidityFound.cassette.title" = "Cassette File Accessibility Issues Detected";
 "i18n:LMMgr.pathInvalidityFound.iCloudDriveManagedPathAdvice" = "If this path is inside an iCloud-hosted “Documents” or “Desktop” folder, move the file or folder to a local location and choose it again. If you are not sure whether iCloud Drive manages these folders on your Mac, Apple Support can guide you through checking that setting.";
