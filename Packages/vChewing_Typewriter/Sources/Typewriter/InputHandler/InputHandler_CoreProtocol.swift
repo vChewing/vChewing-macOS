@@ -412,7 +412,15 @@ extension InputHandlerProtocol {
 
   /// 警告：該參數僅代指組音區/組筆區域與組字區在目前狀態下被視為「空」。
   public var isConsideredEmptyForNow: Bool {
-    assembler.isEmpty && isComposerOrCalligrapherEmpty && currentTypingMethod == .vChewingFactory
+    switch currentTypingMethod {
+    case .haninKeyboardSymbol:
+      true
+    case .codePoint, .romanNumerals:
+      strCodePointBuffer.isEmpty
+    case .vChewingFactory:
+      assembler.isEmpty
+        && isComposerOrCalligrapherEmpty
+    }
   }
 
   /// 要拿給 Homa 使用的特殊游標位址，用於各種與節點判定有關的操作。
