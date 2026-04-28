@@ -22,6 +22,7 @@ public struct BPMFFullMatchTypewriter<Handler: InputHandlerProtocol>: Typewriter
   public typealias Phonabet = Tekkon.Phonabet
 
   public let handler: Handler
+  public var onLexiconMatchFailure: ((Handler, [String], Session) -> Bool?)?
 
   /// 用來處理 InputHandler.HandleInput() 當中的與注音输入有關的組字行為。
   /// - Parameter input: 輸入訊號。
@@ -254,6 +255,9 @@ public struct BPMFFullMatchTypewriter<Handler: InputHandlerProtocol>: Typewriter
       handler.currentLM.hasUnigramsForFast(keyArray: [alt])
     }
     if !hasAnyResult {
+      if let injectedResult = onLexiconMatchFailure?(handler, readingKey, session) {
+        return injectedResult
+      }
       errorCallback("B49C0979：語彙庫內無「\(readingKey.joined(separator: "/"))」的匹配記錄。")
 
       if prefs.keepReadingUponCompositionError {
@@ -275,7 +279,7 @@ public struct BPMFFullMatchTypewriter<Handler: InputHandlerProtocol>: Typewriter
       return true
     } else if (try? handler.assembler.insertKey(readingKey)) == nil {
       errorCallback(
-        "3CF278C9: 得檢查對應的語言模組的 hasUnigramsFor() 是否有誤判之情形。"
+        "3CF278C9-A: 得檢查對應的語言模組的 hasUnigramsFor() 是否有誤判之情形。"
       )
       return true
     }
