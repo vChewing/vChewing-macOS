@@ -103,4 +103,25 @@ extension MainAssemblyTests {
     #expect(testSession.isActivated)
     #expect(testSession.state.type == .ofEmpty)
   }
+
+  /// 回歸：CapsLock 切換中英文時會走 resetInputHandler。
+  /// reset 時提交內容必須包含尚未遞交的 mixed ASCII buffer。
+  @Test
+  func test504_CapsLockResetCommitsPendingMixedASCIIBuffer() throws {
+    testSession.resetInputHandler(forceComposerCleanup: true)
+    testClient.clear()
+    testHandler.prefs.mixedAlphanumericalEnabled = true
+
+    typeSentenceOrCandidates("abc")
+
+    #expect(testSession.state.type == .ofInputting)
+    #expect(testSession.state.displayedText == "abc")
+    #expect(testClient.toString().isEmpty)
+
+    // 模擬 CapsLock 切換路徑中的 resetInputHandler() 行為。
+    testSession.resetInputHandler()
+
+    #expect(testClient.toString() == "abc")
+    #expect(testSession.state.type == .ofEmpty)
+  }
 }

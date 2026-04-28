@@ -48,6 +48,7 @@ nonisolated public enum UserDef: String, CaseIterable, Identifiable, Sendable {
   case kMinCellWidthForHorizontalMatrix = "MinCellWidthForHorizontalMatrix"
   case kChooseCandidateUsingSpace = "ChooseCandidateUsingSpace"
   case kCassetteEnabled = "CassetteEnabled"
+  case kMixedAlphanumericalEnabled = "MixedAlphanumericalEnabled"
   case kCNS11643Enabled = "CNS11643Enabled"
   case kSymbolInputEnabled = "SymbolInputEnabled"
   case kChineseConversionEnabled = "ChineseConversionEnabled"
@@ -449,6 +450,7 @@ nonisolated extension UserDef {
     case .kMinCellWidthForHorizontalMatrix: return .integer(0)
     case .kChooseCandidateUsingSpace: return .bool(true)
     case .kCassetteEnabled: return .bool(false)
+    case .kMixedAlphanumericalEnabled: return .bool(false)
     case .kCNS11643Enabled: return .bool(false)
     case .kSymbolInputEnabled: return .bool(true)
     case .kChineseConversionEnabled: return .bool(false)
@@ -693,6 +695,11 @@ nonisolated extension UserDef {
     case .kCassetteEnabled: return .init(
         userDef: self, shortTitle: "Enable cassette mode, suppressing phonabet input",
         description: "Cassette mode is similar to the CIN support of the Yahoo! KeyKey IME, allowing users to use their own CIN tables to implement their stroked-based input schema (e.g. Wubi, Cangjie, Boshiamy, etc.) as a plan-B in vChewing IME. However, since vChewing won't compromise its phonabet input mode experience for this cassette mode, users might not feel comfortable enough comparing to their experiences with RIME (recommended) or OpenVanilla (deprecated)."
+      )
+    case .kMixedAlphanumericalEnabled: return .init(
+        userDef: self,
+        shortTitle: "i18n:UserDef.kMixedAlphanumericalEnabled.shortTitle",
+        description: "i18n:UserDef.kMixedAlphanumericalEnabled.description"
       )
     case .kCNS11643Enabled: return .init(
         userDef: self,

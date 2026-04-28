@@ -47,6 +47,7 @@ public protocol InputHandlerProtocol: AnyObject, InputHandlerCoreProtocol {
 
   var strCodePointBuffer: String { get set } // 內碼輸入專用組碼區
   var calligrapher: String { get set } // 磁帶專用組筆區
+  var mixedAlphanumericalBuffer: String { get set } // 混輸暫存 ASCII 緩衝區
   var composer: Tekkon.Composer { get set } // 注拼槽
   var assembler: Homa.Assembler { get set } // 組字器
 }
@@ -402,7 +403,29 @@ extension InputHandlerProtocol {
   public func clearComposerAndCalligrapher() {
     calligrapher.removeAll()
     composer.clear()
+    mixedAlphanumericalBuffer.removeAll()
     strCodePointBuffer.removeAll()
+  }
+
+  func syncComposerWithMixedAlphanumericalBuffer() {
+    var rebuiltComposer = composer
+    rebuiltComposer.clear()
+    guard !mixedAlphanumericalBuffer.isEmpty else {
+      composer = rebuiltComposer
+      return
+    }
+    let isFullyParserCovered = mixedAlphanumericalBuffer.allSatisfy {
+      rebuiltComposer.inputValidityCheck(charStr: $0.description)
+    }
+    guard isFullyParserCovered else {
+      composer = rebuiltComposer
+      return
+    }
+    rebuiltComposer.receiveSequence(mixedAlphanumericalBuffer, isRomaji: false)
+    if !rebuiltComposer.isPronounceable {
+      rebuiltComposer.clear()
+    }
+    composer = rebuiltComposer
   }
 
   /// 就地增刪詞之後，需要就地更新游標上下文單元圖資料。
@@ -456,6 +479,7 @@ extension InputHandlerProtocol {
 
   var isComposerOrCalligrapherEmpty: Bool {
     if !strCodePointBuffer.isEmpty { return false }
+    if !mixedAlphanumericalBuffer.isEmpty { return false }
     return prefs.cassetteEnabled ? calligrapher.isEmpty : composer.isEmpty
   }
 
@@ -494,9 +518,10 @@ extension InputHandlerProtocol {
 
   var readingForDisplay: String {
     if !prefs.cassetteEnabled {
-      return composer.getInlineCompositionForDisplay(
+      let currentReading = composer.getInlineCompositionForDisplay(
         isHanyuPinyin: prefs.showHanyuPinyinInCompositionBuffer
       )
+      return currentReading.isEmpty ? mixedAlphanumericalBuffer : currentReading
     }
     if !prefs.showTranslatedStrokesInCompositionBuffer { return calligrapher }
     return calligrapher.map(\.description).map {

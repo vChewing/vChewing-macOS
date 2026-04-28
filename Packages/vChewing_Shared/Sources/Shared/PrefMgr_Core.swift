@@ -320,6 +320,9 @@ public final class PrefMgr: PrefMgrProtocol, Sendable {
   @AppProperty(userDef: .kUsingHotKeyInputMode)
   public var usingHotKeyInputMode: Bool
 
+  @AppProperty(userDef: .kMixedAlphanumericalEnabled)
+  public var mixedAlphanumericalEnabled: Bool
+
   @AppProperty(userDef: .kUserPhrasesDatabaseBypassed)
   public var userPhrasesDatabaseBypassed: Bool {
     didSet { didAskForSyncingLMPrefs?() }

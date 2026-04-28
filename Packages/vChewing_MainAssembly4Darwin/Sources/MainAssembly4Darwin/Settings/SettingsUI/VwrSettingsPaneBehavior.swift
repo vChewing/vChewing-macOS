@@ -27,6 +27,10 @@ public struct VwrSettingsPaneBehavior: View {
       }
 
       Section {
+        UserDef.kMixedAlphanumericalEnabled.renderUI()
+      }
+
+      Section {
         UserDef.kChooseCandidateUsingSpace.renderUI()
         UserDef.kEscToCleanInputBuffer.renderUI()
         UserDef.kAlsoConfirmAssociatedCandidatesByEnter.renderUI()

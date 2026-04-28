@@ -189,6 +189,7 @@ public final class MockInputHandler: @MainActor InputHandlerProtocol {
 
   public var strCodePointBuffer = ""
   public var calligrapher = ""
+  public var mixedAlphanumericalBuffer = ""
   public var composer: Tekkon.Composer = .init()
   public var assembler: Homa.Assembler
   public var isJISKeyboard: (() -> Bool)? = { false }

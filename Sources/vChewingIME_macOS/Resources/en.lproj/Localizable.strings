@@ -280,6 +280,8 @@
 "i18n:UserDef.kMinCellWidthForHorizontalMatrix.option.0" = "2 Kanjis";
 "i18n:UserDef.kMinCellWidthForHorizontalMatrix.option.1" = "2 Emojis (Wider)";
 "i18n:UserDef.kMinCellWidthForHorizontalMatrix.shortTitle" = "Minimum cell width for horizontal matrix:";
+"i18n:UserDef.kMixedAlphanumericalEnabled.description" = "This feature is designed for users who are already accustomed to the typing experience offered by a certain Smart Input software from a PC vendor. It treats parser-covered ASCII keys as provisional phonetic input first, then falls back to raw ASCII when the sequence is no longer a pronounceable reading. This feature is unavailable in pinyin typing mode (that is, when the phonabet parser uses any pinyin layout) and in cassette mode. If this typing fallback is enabled, you may also want to check the Dictionary settings page to decide whether to filter out certain factory dictionary query results that could affect your typing experience. If you need half-width punctuation input, please toggle the Half-Width Phuctuation Mode to ON.";
+"i18n:UserDef.kMixedAlphanumericalEnabled.shortTitle" = "Enable mixed Chinese-English typing fallback";
 "i18n:UserDef.kNumPadCharInputBehavior.description" = "Choose the behavior of numeric pad inputs.";
 "i18n:UserDef.kNumPadCharInputBehavior.option.0" = "Always directly commit half-width chars";
 "i18n:UserDef.kNumPadCharInputBehavior.option.1" = "Always directly commit full-width chars";

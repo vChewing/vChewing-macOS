@@ -146,6 +146,9 @@ extension SessionProtocol {
     if state.hasComposition {
       textToCommit = inputHandler.committableDisplayText(sansReading: sansReading)
     }
+    if !inputHandler.mixedAlphanumericalBuffer.isEmpty {
+      textToCommit += inputHandler.mixedAlphanumericalBuffer
+    }
     // 唯音不再在這裡對 IMKTextInput 客體黑名單當中的應用做資安措施。
     // 有相關需求者，請在切換掉輸入法或者切換至新的客體應用之前敲一下 Shift+Delete。
     switchState(.ofCommitting(textToCommit: textToCommit))

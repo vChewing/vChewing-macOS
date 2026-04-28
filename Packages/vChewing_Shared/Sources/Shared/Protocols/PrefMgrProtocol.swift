@@ -83,6 +83,7 @@ public protocol PrefMgrProtocol {
   var romanNumeralOutputFormat: Int { get set }
   var cns11643Enabled: Bool { get set }
   var cassetteEnabled: Bool { get set }
+  var mixedAlphanumericalEnabled: Bool { get set }
   var symbolInputEnabled: Bool { get set }
   var chineseConversionEnabled: Bool { get set }
   var shiftJISShinjitaiOutputEnabled: Bool { get set }

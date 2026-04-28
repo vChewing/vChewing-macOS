@@ -279,6 +279,8 @@
 "i18n:UserDef.kMinCellWidthForHorizontalMatrix.option.0" = "２つの漢字（幅の狭い）";
 "i18n:UserDef.kMinCellWidthForHorizontalMatrix.option.1" = "２つの絵文字（幅の広い）";
 "i18n:UserDef.kMinCellWidthForHorizontalMatrix.shortTitle" = "多行横型陳列ウィンドウの候補の最小幅:";
+"i18n:UserDef.kMixedAlphanumericalEnabled.description" = "この機能は、『とあるパソコン会社のインテリ入力』の入力体験に既に慣れているユーザーに向けて設計されています。この機能は現在の注音解析器で扱える ASCII キーは、まず暫定的な注音入力として扱います。入力列が発音可能な読みとして成立しなくなった時点で、raw ASCII にフォールバックします。弁音入力（つまり注音解析器を任意の弁音配列に設定した場合）とカセットモードでは、この機能は利用できません。この機能を有効にしている場合は、辞書設定ページで、入力体験に影響しうる一部の純正辞書の検索結果を除外するかどうかを確認しておくとよいでしょう。半角約物の入力が必要な場合は、半角句読モードをオンにしてください。";
+"i18n:UserDef.kMixedAlphanumericalEnabled.shortTitle" = "中英混在入力のフォールバックを有効化";
 "i18n:UserDef.kNumPadCharInputBehavior.description" = "テンキー文字の入力行為をご指定ください。";
 "i18n:UserDef.kNumPadCharInputBehavior.option.0" = "いつでも半角で直接出力";
 "i18n:UserDef.kNumPadCharInputBehavior.option.1" = "いつでも全角で直接出力";

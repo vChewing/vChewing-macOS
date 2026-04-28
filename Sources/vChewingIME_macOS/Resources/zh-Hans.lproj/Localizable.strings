@@ -280,6 +280,8 @@
 "i18n:UserDef.kMinCellWidthForHorizontalMatrix.option.0" = "两个汉字";
 "i18n:UserDef.kMinCellWidthForHorizontalMatrix.option.1" = "两个绘文字（更宽）";
 "i18n:UserDef.kMinCellWidthForHorizontalMatrix.shortTitle" = "横向多列选字窗最低单元宽度:";
+"i18n:UserDef.kMixedAlphanumericalEnabled.description" = "该功能专为已适应某电脑厂牌输入法打字体验的使用者设计。该功能会优先将当前注音排列可覆盖的 ASCII 按键暂时视为注音输入；当整段序列不再构成可发音读音时，再回退为原始 ASCII。若使用拼音输入（也就是注音排列设为任一拼音排列）或磁带模式，则该功能不可用。若已启用该功能，您可能需要到辞典设定页确认是否要筛除某些可能影响打字体验的原厂辞典查询结果。若有半形标点输入需求，请开启半形标点模式。";
+"i18n:UserDef.kMixedAlphanumericalEnabled.shortTitle" = "启用中英混合输入回退";
 "i18n:UserDef.kNumPadCharInputBehavior.description" = "指定数字小键盘的输入行为。";
 "i18n:UserDef.kNumPadCharInputBehavior.option.0" = "始终以半形文字直接递交";
 "i18n:UserDef.kNumPadCharInputBehavior.option.1" = "始终以全形文字直接递交";

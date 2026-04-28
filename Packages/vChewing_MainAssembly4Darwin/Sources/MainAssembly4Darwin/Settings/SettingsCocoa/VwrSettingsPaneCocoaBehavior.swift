@@ -56,6 +56,9 @@ extension SettingsPanesCocoa {
           }
           NSTabView.TabPage(title: "Ｃ") {
             NSStackView.buildSection(width: innerContentWidth) {
+              UserDef.kMixedAlphanumericalEnabled.render(fixWidth: innerContentWidth)
+            }?.boxed()
+            NSStackView.buildSection(width: innerContentWidth) {
               UserDef.kChooseCandidateUsingSpace.render(fixWidth: innerContentWidth)
               UserDef.kEscToCleanInputBuffer.render(fixWidth: innerContentWidth)
               UserDef.kAlsoConfirmAssociatedCandidatesByEnter.render(fixWidth: innerContentWidth)

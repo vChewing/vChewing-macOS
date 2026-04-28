@@ -103,6 +103,11 @@ extension InputHandlerProtocol {
       result.cursor = 0
       result.marker = 0
     }
+    /// 中英混打模式：以 Tooltip 顯示目前 ASCII buffer 的原始內容，方便使用者識別輸入狀態。
+    if prefs.mixedAlphanumericalEnabled, !mixedAlphanumericalBuffer.isEmpty {
+      result.tooltip = mixedAlphanumericalBuffer
+      result.tooltipDuration = 0 // 設為 0 使 Tooltip 恆久顯示，直到混打模式結束。
+    }
     return result
   }
 
@@ -486,6 +491,16 @@ extension InputHandlerProtocol {
 
     guard state.type == .ofInputting else { return false }
 
+    if prefs.mixedAlphanumericalEnabled, !mixedAlphanumericalBuffer.isEmpty {
+      composer.clear()
+      let asciiText = mixedAlphanumericalBuffer
+      mixedAlphanumericalBuffer.removeAll()
+      // 一併 commit 組字區中已組好的中文（若有）。
+      let chineseText = committableDisplayText(sansReading: true)
+      session.switchState(State.ofCommitting(textToCommit: chineseText + asciiText))
+      return true
+    }
+
     var displayedText = committableDisplayText()
 
     if input.commonKeyModifierFlags == [.option, .shift] {
@@ -523,6 +538,16 @@ extension InputHandlerProtocol {
     guard state.type == .ofInputting else {
       currentTypingMethod = .vChewingFactory
       return false
+    }
+
+    if currentTypingMethod == .vChewingFactory, !mixedAlphanumericalBuffer.isEmpty {
+      mixedAlphanumericalBuffer = mixedAlphanumericalBuffer.dropLast().description
+      syncComposerWithMixedAlphanumericalBuffer()
+      switch isConsideredEmptyForNow {
+      case false: session.switchState(generateStateOfInputting())
+      case true: session.switchState(State.ofAbortion())
+      }
+      return true
     }
 
     if currentTypingMethod == .codePoint {
@@ -776,6 +801,19 @@ extension InputHandlerProtocol {
     }
 
     guard state.type == .ofInputting else { return false }
+
+    if !mixedAlphanumericalBuffer.isEmpty {
+      clearComposerAndCalligrapher()
+      if prefs.escToCleanInputBuffer {
+        session.switchState(State.ofAbortion())
+      } else {
+        switch assembler.isEmpty {
+        case false: session.switchState(generateStateOfInputting())
+        case true: session.switchState(State.ofAbortion())
+        }
+      }
+      return true
+    }
 
     if prefs.escToCleanInputBuffer {
       /// 若啟用了該選項，則清空組字器的內容與注拼槽的內容。

@@ -69,6 +69,7 @@ public final class InputHandler: @MainActor InputHandlerProtocol {
 
   public var strCodePointBuffer = "" // 內碼輸入專用組碼區
   public var calligrapher = "" // 磁帶專用組筆區
+  public var mixedAlphanumericalBuffer = "" // 混輸暫存 ASCII 緩衝區
   public var composer: Composer = .init() // 注拼槽
   public var assembler: Assembler // 組字器
 
