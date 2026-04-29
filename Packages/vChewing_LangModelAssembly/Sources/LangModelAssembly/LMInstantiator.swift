@@ -223,8 +223,6 @@ extension LMAssembly {
       config.bypassUserPhrasesData = prefs.userPhrasesDatabaseBypassed
     }
 
-    public func resetFactoryJSONModels() {}
-
     /// 清除 InputToken HashMap。
     /// 注意：此 HashMap 僅記錄由 InputToken（以 "MACRO@" 開頭的特殊標記）生成的 Unigram。
     public func purgeInputTokenHashMap() {
