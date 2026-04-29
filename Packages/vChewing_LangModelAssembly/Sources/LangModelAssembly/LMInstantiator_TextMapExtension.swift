@@ -11,46 +11,16 @@ import Homa
 import SwiftExtension
 import TrieKit
 
-// MARK: - LMAssembly.LMInstantiator.CoreColumn
+// MARK: - VanguardTrie.Trie.EntryType
 
-extension LMAssembly.LMInstantiator {
-  enum CoreColumn: Int32 {
-    case theDataCHS = 1
-    case theDataCHT = 2
-    case theDataCNS = 3
-    case theDataMISC = 4
-    case theDataSYMB = 5
-    case theDataCHEW = 6
-    case theDataNonKanji = 7
-
-    // MARK: Internal
-
-    var defaultScore: Double {
-      switch self {
-      case .theDataCHEW: return -1
-      case .theDataCNS: return -11
-      case .theDataSYMB: return -13
-      case .theDataMISC: return -10
-      default: return -9.9
-      }
-    }
-
-    // MARK: Fileprivate
-
-    fileprivate var textMapTypeIDs: Set<Int32> {
-      switch self {
-      case .theDataCHS: return [5]
-      case .theDataCHT: return [6]
-      case .theDataCNS: return [7]
-      case .theDataMISC: return [4]
-      case .theDataSYMB: return [9]
-      case .theDataCHEW: return [10]
-      case .theDataNonKanji: return [8]
-      }
-    }
-
-    fileprivate var trieEntryType: VanguardTrie.Trie.EntryType {
-      .init(rawValue: textMapTypeIDs.reduce(into: Int32(0)) { $0 |= $1 })
+extension VanguardTrie.Trie.EntryType {
+  fileprivate var defaultScore: Double {
+    switch self {
+    case .zhuyinwen: return -1
+    case .cns: return -11
+    case .symbolPhrases: return -13
+    case .letterPunctuations: return -10
+    default: return -9.9
     }
   }
 }
@@ -155,7 +125,7 @@ extension LMAssembly.LMInstantiator {
       entries: entries,
       keyArray: ["_punctuation_list"],
       sourceKey: "_punctuation_list",
-      column: .theDataMISC,
+      entryType: .letterPunctuations,
       includeHalfWidthVariants: false
     )
   }
@@ -171,13 +141,13 @@ extension LMAssembly.LMInstantiator {
       return factoryUnigramsFor(
         key: key,
         keyArray: keyArray,
-        column: isCHS ? .theDataCHS : .theDataCHT
+        entryType: isCHS ? .chs : .cht
       )
     case .strictSuperset:
       return factoryStrictSupersetUnigramsFor(
         subsetKey: key,
         subsetKeyArray: keyArray,
-        column: isCHS ? .theDataCHS : .theDataCHT
+        entryType: isCHS ? .chs : .cht
       )
     }
   }
@@ -199,7 +169,7 @@ extension LMAssembly.LMInstantiator {
   func factoryUnigramsFor(
     key: String,
     keyArray: [String],
-    column: LMAssembly.LMInstantiator.CoreColumn
+    entryType: VanguardTrie.Trie.EntryType
   )
     -> [Homa.Gram] {
     if key == "_punctuation_list" { return [] }
@@ -207,7 +177,7 @@ extension LMAssembly.LMInstantiator {
     if config.partialMatchEnabled {
       return factoryPartiallyMatchedUnigramsFor(
         queryKeyArray: keyArray,
-        column: column,
+        entryType: entryType,
         trie: trie
       )
     }
@@ -222,7 +192,7 @@ extension LMAssembly.LMInstantiator {
       entries: entries,
       keyArray: keyArray,
       sourceKey: key,
-      column: column,
+      entryType: entryType,
       includeHalfWidthVariants: true
     )
   }
@@ -230,7 +200,7 @@ extension LMAssembly.LMInstantiator {
   func factoryStrictSupersetUnigramsFor(
     subsetKey: String,
     subsetKeyArray: [String],
-    column: LMAssembly.LMInstantiator.CoreColumn
+    entryType: VanguardTrie.Trie.EntryType
   )
     -> [Homa.Gram] {
     if subsetKey == "_punctuation_list" { return [] }
@@ -248,7 +218,7 @@ extension LMAssembly.LMInstantiator {
         entries: node.entries,
         keyArray: nodeKeyArray,
         sourceKey: node.readingKey,
-        column: column,
+        entryType: entryType,
         includeHalfWidthVariants: true
       )
     }
@@ -256,30 +226,31 @@ extension LMAssembly.LMInstantiator {
 
   func factoryPartiallyMatchedUnigramsFor(
     queryKeyArray: [String],
-    column: LMAssembly.LMInstantiator.CoreColumn,
+    entryType: VanguardTrie.Trie.EntryType,
     trie: VanguardTrie.TextMapTrie
   )
     -> [Homa.Gram] {
     let queriedGrams = trie.queryGrams(
       queryKeyArray,
-      filterType: column.trieEntryType,
+      filterType: entryType,
       partiallyMatch: true
     )
     return makeFactoryUnigrams(
       queriedGrams: queriedGrams,
+      entryType: entryType,
       includeHalfWidthVariants: true
     )
   }
 
   func factoryChoppedUnigramsFor(
     keyArray: [String],
-    column: LMAssembly.LMInstantiator.CoreColumn
+    entryType: VanguardTrie.Trie.EntryType
   )
     -> [Homa.Gram] {
     guard let trie = Self.factoryTrie else { return [] }
     let entryGroups = trie.getEntryGroups(
       keysChopped: keyArray,
-      filterType: column.trieEntryType,
+      filterType: entryType,
       partiallyMatch: config.partialMatchEnabled
     )
     guard !entryGroups.isEmpty else { return [] }
@@ -288,7 +259,7 @@ extension LMAssembly.LMInstantiator {
         entries: group.entries,
         keyArray: group.keyArray,
         sourceKey: group.keyArray.joined(separator: "-"),
-        column: column,
+        entryType: entryType,
         includeHalfWidthVariants: true
       )
     }
@@ -299,10 +270,10 @@ extension LMAssembly.LMInstantiator {
     strategy: LMAssembly.LMInstantiator.FactoryCoreLookupStrategy
   )
     -> [Homa.Gram] {
-    let column = isCHS ? CoreColumn.theDataCHS : CoreColumn.theDataCHT
+    let entryType: VanguardTrie.Trie.EntryType = isCHS ? .chs : .cht
     switch strategy {
     case .configuredLookup:
-      return factoryChoppedUnigramsFor(keyArray: keyArray, column: column)
+      return factoryChoppedUnigramsFor(keyArray: keyArray, entryType: entryType)
     case .strictSuperset:
       guard let trie = Self.factoryTrie else { return [] }
       let entryGroups = trie.getEntryGroups(
@@ -316,7 +287,7 @@ extension LMAssembly.LMInstantiator {
           entries: group.entries,
           keyArray: group.keyArray,
           sourceKey: group.keyArray.joined(separator: "-"),
-          column: column,
+          entryType: entryType,
           includeHalfWidthVariants: true
         )
       }
@@ -332,31 +303,29 @@ extension LMAssembly.LMInstantiator {
       partiallyMatch: false,
       longerSegment: false
     )
-    let cnsTypeIDs = CoreColumn.theDataCNS.textMapTypeIDs
     let result = nodes.flatMap(\.entries)
-      .filter { cnsTypeIDs.contains($0.typeID.rawValue) }
+      .filter { $0.typeID == .cns }
       .map(\.value)
     return result.isEmpty ? nil : result.joined(separator: "\t")
   }
 
   func hasFactoryCoreUnigramsFor(keyArray: [String]) -> Bool {
     guard let trie = Self.factoryTrie else { return false }
-    let column = isCHS ? CoreColumn.theDataCHS : CoreColumn.theDataCHT
+    let entryType: VanguardTrie.Trie.EntryType = isCHS ? .chs : .cht
     if config.partialMatchEnabled {
       return trie.hasGrams(
         keyArray,
-        filterType: column.trieEntryType,
+        filterType: entryType,
         partiallyMatch: true
       )
     }
-    let typeIDs = column.textMapTypeIDs
     let nodes = trie.getNodes(
       keyArray: keyArray,
       filterType: [],
       partiallyMatch: false,
       longerSegment: false
     )
-    return nodes.flatMap(\.entries).contains(where: { typeIDs.contains($0.typeID.rawValue) })
+    return nodes.flatMap(\ .entries).contains(where: { $0.typeID == entryType })
   }
 
   func checkCNSConformation(for unigram: Homa.Gram, keyArray: [String]) -> Bool {
@@ -373,22 +342,41 @@ extension LMAssembly.LMInstantiator {
   /// Automatically generated half-width punctuation aliases should stay selectable,
   /// but must rank behind the lexicon's canonical full-width entry.
   private static let generatedHalfWidthPunctuationPenalty = 0.0001
-  private static let nonKanjiKanaProbabilities: Set<Double> = [-1, -2]
+
+  /// TextMap build output normalizes raw kana weights, so suppression must key off
+  /// the entry value's script rather than a hard-coded probability bucket.
+  private static func isKanaSyllableValue(_ value: String) -> Bool {
+    guard !value.isEmpty else { return false }
+    return value.unicodeScalars.allSatisfy { scalar in
+      switch scalar.value {
+      case 0x3031 ... 0x3035, // 假名迭代符號 (Kana Iteration Marks: ゝゞヽヾ〵)
+           0x3040 ... 0x309F, // 平假名 (Hiragana)
+           0x30A0 ... 0x30FF, // 片假名 (Katakana)
+           0x31F0 ... 0x31FF, // 片假名拼音擴展 (Katakana Phonetic Extensions)
+           0xFF66 ... 0xFF9F, // 半形片假名 (Half-width Katakana)
+           0x1AFF0 ... 0x1AFFF, // 假名擴展-B (Kana Extended-B, 含閩南語假名等)
+           0x1B000 ... 0x1B16F: // 假名補充 & 擴展-A (Hentaigana / Historic)
+        return true
+      default:
+        return false
+      }
+    }
+  }
 
   private func makeFactoryUnigrams(
     entries: [VanguardTrie.Trie.Entry],
     keyArray: [String],
     sourceKey: String,
-    column: CoreColumn,
+    entryType: VanguardTrie.Trie.EntryType,
     includeHalfWidthVariants: Bool
   )
     -> [Homa.Gram] {
     var grams: [Homa.Gram] = []
     var extraHalfWidthGrams: [Homa.Gram] = []
-    for entry in entries where column.textMapTypeIDs.contains(entry.typeID.rawValue) {
-      if column == .theDataNonKanji,
+    for entry in entries where entry.typeID == entryType {
+      if entryType == .nonKanji,
          config.suppressFactoryUnigramsOfKanaSyllables,
-         Self.nonKanjiKanaProbabilities.contains(entry.probability) {
+         Self.isKanaSyllableValue(entry.value) {
         continue
       }
 
@@ -418,12 +406,19 @@ extension LMAssembly.LMInstantiator {
 
   private func makeFactoryUnigrams(
     queriedGrams: [(keyArray: [String], value: String, probability: Double, previous: String?)],
+    entryType: VanguardTrie.Trie.EntryType,
     includeHalfWidthVariants: Bool
   )
     -> [Homa.Gram] {
     var grams: [Homa.Gram] = []
     var extraHalfWidthGrams: [Homa.Gram] = []
     for queriedGram in queriedGrams {
+      if entryType == .nonKanji,
+         config.suppressFactoryUnigramsOfKanaSyllables,
+         Self.isKanaSyllableValue(queriedGram.value) {
+        continue
+      }
+
       var score = queriedGram.probability
       if score > 0 {
         score *= -1

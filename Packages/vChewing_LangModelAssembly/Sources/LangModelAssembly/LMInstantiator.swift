@@ -498,23 +498,23 @@ extension LMAssembly {
         || (config.isCassetteEnabled && (keyArray.first?.hasPrefix("_") ?? false)) {
         if hasFactoryCoreUnigramsFor(keyArray: keyArray) { return true }
 
-        if !factoryUnigramsFor(key: keyChain, keyArray: keyArray, column: .theDataNonKanji).isEmpty {
+        if !factoryUnigramsFor(key: keyChain, keyArray: keyArray, entryType: .nonKanji).isEmpty {
           return true
         }
 
         if keyChain.hasPrefix("_"), keyChain.count > 1,
-           !factoryChoppedUnigramsFor(keyArray: keyArray, column: .theDataMISC).isEmpty {
+           !factoryChoppedUnigramsFor(keyArray: keyArray, entryType: .letterPunctuations).isEmpty {
           return true
         }
 
         if config.isCNSEnabled,
-           !factoryChoppedUnigramsFor(keyArray: keyArray, column: .theDataCNS).isEmpty {
+           !factoryChoppedUnigramsFor(keyArray: keyArray, entryType: .cns).isEmpty {
           return true
         }
 
         if !config.bypassUserPhrasesData, config.isSymbolEnabled,
            !config.isCassetteEnabled,
-           !factoryChoppedUnigramsFor(keyArray: keyArray, column: .theDataSYMB).isEmpty {
+           !factoryChoppedUnigramsFor(keyArray: keyArray, entryType: .symbolPhrases).isEmpty {
           return true
         }
       }
@@ -605,20 +605,20 @@ extension LMAssembly {
         rawAllUnigrams += factoryUnigramsFor(
           key: keyChain,
           keyArray: keyArray,
-          column: .theDataCHEW
+          entryType: .zhuyinwen
         )
         // nonKanji 內容（假名、鴨蛋零等）對應普通讀音。
         rawAllUnigrams += factoryUnigramsFor(
           key: keyChain,
           keyArray: keyArray,
-          column: .theDataNonKanji
+          entryType: .nonKanji
         )
         // `_` 開頭的特殊 key（標點、半形標點、特殊符號）存放在 MISC 欄位。
         if keyChain.hasPrefix("_"), keyChain.count > 1 {
           rawAllUnigrams += factoryUnigramsFor(
             key: keyChain,
             keyArray: keyArray,
-            column: .theDataMISC
+            entryType: .letterPunctuations
           )
         }
         // 原廠核心辭典內容。
@@ -647,7 +647,7 @@ extension LMAssembly {
           rawAllUnigrams += factoryUnigramsFor(
             key: keyChain,
             keyArray: keyArray,
-            column: .theDataCNS
+            entryType: .cns
           )
         }
       }
@@ -658,7 +658,7 @@ extension LMAssembly {
           rawAllUnigrams += factoryUnigramsFor(
             key: keyChain,
             keyArray: keyArray,
-            column: .theDataSYMB
+            entryType: .symbolPhrases
           )
         }
       }

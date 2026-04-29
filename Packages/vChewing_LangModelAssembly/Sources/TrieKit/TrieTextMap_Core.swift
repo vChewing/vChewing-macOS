@@ -542,7 +542,9 @@ extension VanguardTrie.TextMapTrie {
     guard keyEntryIndex >= 0, keyEntryIndex < keyEntries.count else { return nil }
     let filteredEntries = switch filterType.isEmpty {
     case true: parsedEntries(for: keyEntryIndex)
-    case false: parsedEntries(for: keyEntryIndex).filter { filterType.contains($0.typeID) }
+    case false: parsedEntries(for: keyEntryIndex).filter {
+        filterMatches(entryType: $0.typeID, filter: filterType)
+      }
     }
     guard !filteredEntries.isEmpty else { return nil }
     return (resolveKeyArray(for: keyEntries[keyEntryIndex]), filteredEntries)
@@ -809,7 +811,7 @@ extension VanguardTrie.TextMapTrie: VanguardTrieProtocol {
 
       let filteredEntries = filterType.isEmpty
         ? node.entries
-        : node.entries.filter { filterType.contains($0.typeID) }
+        : node.entries.filter { filterMatches(entryType: $0.typeID, filter: filterType) }
       guard !filteredEntries.isEmpty else { continue }
       results.append((nodeKeyArray, filteredEntries))
     }

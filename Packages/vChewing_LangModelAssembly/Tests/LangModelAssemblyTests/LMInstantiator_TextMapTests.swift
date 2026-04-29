@@ -340,7 +340,7 @@ struct LMInstantiatorTextMapTests {
     let grams = instance.factoryStrictSupersetUnigramsFor(
       subsetKey: "A-B-C",
       subsetKeyArray: ["A", "B", "C"],
-      column: .theDataCHS
+      entryType: .chs
     )
 
     #expect(gramsContainValue(grams, "zval"))
@@ -375,6 +375,28 @@ struct LMInstantiatorTextMapTests {
     }
     #expect(gramsContainValue(instance.unigramsFor(keyArray: ["A&X", "B"]), "partial"))
     #expect(instance.hasFactoryCoreUnigramsFor(keyArray: ["A&X", "B"]))
+  }
+
+  @Test
+  func testFactoryPartialMatchDoesNotCrossMatchMiscIntoCore() throws {
+    defer {
+      LMAssembly.LMInstantiator.disconnectFactoryDictionary()
+    }
+
+    let instance = LMAssembly.LMInstantiator(isCHS: true)
+    let textMap = makeTextMap([
+      ("A1-B2", [("miscOnly", -9.9, 4)]),
+    ])
+
+    #expect(LMAssembly.LMInstantiator.connectToTestFactoryDictionary(textMapData: textMap))
+
+    instance.setOptions { config in
+      config.alwaysSupplyETenDOSUnigrams = false
+      config.partialMatchEnabled = true
+    }
+
+    #expect(instance.unigramsFor(keyArray: ["A", "B"]).isEmpty)
+    #expect(!instance.hasFactoryCoreUnigramsFor(keyArray: ["A", "B"]))
   }
 
   @Test
@@ -479,14 +501,14 @@ struct LMInstantiatorTextMapTests {
     let textMap = makeTextMap([
       ("ㄚ", [
         (value: "阿", probability: -5.0, typeID: 5),
-        (value: "あ", probability: -1.0, typeID: 8),
+        (value: "あ", probability: -13.0, typeID: 8),
       ]),
       ("kana_only_i", [
-        (value: "い", probability: -1.0, typeID: 8),
+        (value: "い", probability: -13.0, typeID: 8),
       ]),
       ("ㄎㄧㄚ", [
         (value: "家", probability: -5.0, typeID: 5),
-        (value: "きゃ", probability: -2.0, typeID: 8),
+        (value: "きゃ", probability: -13.0, typeID: 8),
       ]),
       ("ㄌㄧㄥˊ", [
         (value: "零", probability: -5.0, typeID: 5),
@@ -523,6 +545,47 @@ struct LMInstantiatorTextMapTests {
     let grams4Ling = instance.unigramsFor(keyArray: ["ㄌㄧㄥˊ"])
     #expect(gramsContainValue(grams4Ling, "零"))
     #expect(gramsContainValue(grams4Ling, "〇"))
+
+    #expect(!instance.hasUnigramsForFast(keyArray: ["kana_only_i"]))
+  }
+
+  @Test
+  func testSuppressFactoryKanaSyllablesStillWorksWithPartialMatchEnabled() throws {
+    defer {
+      LMAssembly.LMInstantiator.disconnectFactoryDictionary()
+    }
+
+    let textMap = makeTextMap([
+      ("kana_only_i", [
+        (value: "い", probability: -13.0, typeID: 8),
+      ]),
+      ("ㄎㄧㄚ", [
+        (value: "家", probability: -5.0, typeID: 5),
+        (value: "きゃ", probability: -13.0, typeID: 8),
+      ]),
+    ])
+
+    let instance = LMAssembly.LMInstantiator(isCHS: true)
+    #expect(LMAssembly.LMInstantiator.connectToTestFactoryDictionary(textMapData: textMap))
+
+    instance.setOptions { config in
+      config.partialMatchEnabled = true
+      config.suppressFactoryUnigramsOfKanaSyllables = false
+    }
+    #expect(gramsContainValue(instance.unigramsFor(keyArray: ["kana_only_i"]), "い"))
+    #expect(gramsContainValue(instance.unigramsFor(keyArray: ["ㄎㄧㄚ"]), "きゃ"))
+    #expect(instance.hasUnigramsForFast(keyArray: ["kana_only_i"]))
+
+    instance.setOptions { config in
+      config.partialMatchEnabled = true
+      config.suppressFactoryUnigramsOfKanaSyllables = true
+    }
+
+    #expect(instance.unigramsFor(keyArray: ["kana_only_i"]).isEmpty)
+
+    let grams4Kia = instance.unigramsFor(keyArray: ["ㄎㄧㄚ"])
+    #expect(gramsContainValue(grams4Kia, "家"))
+    #expect(!gramsContainValue(grams4Kia, "きゃ"))
 
     #expect(!instance.hasUnigramsForFast(keyArray: ["kana_only_i"]))
   }

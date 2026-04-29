@@ -36,6 +36,15 @@ public protocol VanguardTrieProtocol {
 extension VanguardTrieProtocol {
   public var chopCaseSeparator: Character { "&" }
 
+  internal func filterMatches(entryType: EntryType, filter: EntryType) -> Bool {
+    if filter.isEmpty { return true }
+    let rawTypeIDs: Set<Int32> = [2, 3, 4, 5, 6, 7, 8, 9, 10, 100]
+    if rawTypeIDs.contains(filter.rawValue) || rawTypeIDs.contains(entryType.rawValue) {
+      return filter.rawValue == entryType.rawValue
+    }
+    return filter.contains(entryType)
+  }
+
   /// 特殊函式，專門用來處理那種單個讀音位置有兩個讀音的情況。
   ///
   /// 這只可能是前端打拼音串之後被 Tekkon.PinyinTrie 分析出了多個結果。
@@ -153,7 +162,7 @@ extension VanguardTrieProtocol {
   }
 
   internal func nodeMeetsFilter(_ theNode: TNode, filter: EntryType) -> Bool {
-    filter.isEmpty || theNode.entries.contains(where: { filter.contains($0.typeID) })
+    filter.isEmpty || theNode.entries.contains(where: { filterMatches(entryType: $0.typeID, filter: filter) })
   }
 
   internal func lazyMatch(keyArray: [String], matchAgainst targetKeyChain: String) -> Bool {
@@ -194,7 +203,7 @@ extension VanguardTrieProtocol {
     return fetchedNodes.compactMap { currentNode in
       let filteredEntries = switch filterType.isEmpty {
       case true: currentNode.entries
-      case false: currentNode.entries.filter { filterType.contains($0.typeID) }
+      case false: currentNode.entries.filter { filterMatches(entryType: $0.typeID, filter: filterType) }
       }
       guard !filteredEntries.isEmpty else { return nil }
       let keyArrayActual = TrieStringOperationCache.shared.getCachedSplit(
