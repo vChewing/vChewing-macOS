@@ -142,6 +142,7 @@ public struct VwrSettingsPaneDictionary: View {
             LMMgr.loadUserPhraseReplacement()
           }
         }
+        UserDef.kSuppressFactoryUnigramsOfKanaSyllables.renderUI()
       }
 
       Section {

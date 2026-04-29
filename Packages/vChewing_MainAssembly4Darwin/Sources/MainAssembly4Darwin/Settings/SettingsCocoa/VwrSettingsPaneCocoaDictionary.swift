@@ -93,6 +93,7 @@ extension SettingsPanesCocoa {
                 renderable.currentControl?
                   .action = #selector(self.lmmgrSyncLMPrefsWithReplacementTable(_:))
               }
+              UserDef.kSuppressFactoryUnigramsOfKanaSyllables.render(fixWidth: innerContentWidth)
             }?.boxed()
             NSView()
           }

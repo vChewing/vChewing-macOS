@@ -326,6 +326,8 @@
 "i18n:UserDef.kSpecifyCmdOptCtrlEnterBehavior.option.3" = "Commit Mandarin Braille (GF0019-2018)";
 "i18n:UserDef.kSpecifyCmdOptCtrlEnterBehavior.option.4" = "Commit ButKo BPMFVS Annotation";
 "i18n:UserDef.kSpecifyCmdOptCtrlEnterBehavior.shortTitle" = "Command+Option+Ctrl+Enter:";
+"i18n:UserDef.kSuppressFactoryUnigramsOfKanaSyllables.description" = "By turning this toggle ON, the factory lexicon will stop supplying the data of Kana Syllables. Some people may want to turn this on to avoid disruptive experiences while using mixed Chinese-English typing fallback.";
+"i18n:UserDef.kSuppressFactoryUnigramsOfKanaSyllables.shortTitle" = "Suppress factory kana syllable data";
 "i18n:UserDef.kUserPhrasesDatabaseBypassed.description" = "When enabled, all editable data in your User Phrases folder will be ignored (except Associated Phrases data). The developer may ask you to enable this to help determine whether it suppresses certain pernicious issues related to sentence composition.";
 "i18n:UserDef.kUserPhrasesDatabaseBypassed.shortTitle" = "Bypass the User Phrases database";
 "i18n:UserDef.kUseShiftQuestionToCallServiceMenu.shortTitle" = "Also use Shift+? to call Service Menu in Candidate Window";

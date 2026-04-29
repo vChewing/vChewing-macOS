@@ -373,6 +373,7 @@ extension LMAssembly.LMInstantiator {
   /// Automatically generated half-width punctuation aliases should stay selectable,
   /// but must rank behind the lexicon's canonical full-width entry.
   private static let generatedHalfWidthPunctuationPenalty = 0.0001
+  private static let nonKanjiKanaProbabilities: Set<Double> = [-1, -2]
 
   private func makeFactoryUnigrams(
     entries: [VanguardTrie.Trie.Entry],
@@ -385,6 +386,12 @@ extension LMAssembly.LMInstantiator {
     var grams: [Homa.Gram] = []
     var extraHalfWidthGrams: [Homa.Gram] = []
     for entry in entries where column.textMapTypeIDs.contains(entry.typeID.rawValue) {
+      if column == .theDataNonKanji,
+         config.suppressFactoryUnigramsOfKanaSyllables,
+         Self.nonKanjiKanaProbabilities.contains(entry.probability) {
+        continue
+      }
+
       var score = entry.probability
       if score > 0 {
         score *= -1

@@ -326,6 +326,8 @@
 "i18n:UserDef.kSpecifyCmdOptCtrlEnterBehavior.option.3" = "递交国通盲文 (GF0019-2018)";
 "i18n:UserDef.kSpecifyCmdOptCtrlEnterBehavior.option.4" = "递交 ButKo BPMFVS 注音标记";
 "i18n:UserDef.kSpecifyCmdOptCtrlEnterBehavior.shortTitle" = "Command+Option+Ctrl+Enter:";
+"i18n:UserDef.kSuppressFactoryUnigramsOfKanaSyllables.description" = "启用后，原厂辞典将不再供应假名音节资料。若您在使用中英混输回退时觉得假名候选干扰体验，可考虑开启这个选项。";
+"i18n:UserDef.kSuppressFactoryUnigramsOfKanaSyllables.shortTitle" = "停用原厂假名音节资料";
 "i18n:UserDef.kUserPhrasesDatabaseBypassed.description" = "启用后，使用者辞典资料夹内所有可编辑的资料将被忽略（但关联词语除外）。开发者可能会请您启用此项，以协助确认与组句有关的某些恶性故障是否与使用者辞典资料内容有关。";
 "i18n:UserDef.kUserPhrasesDatabaseBypassed.shortTitle" = "暂时停用使用者语汇资料库";
 "i18n:UserDef.kUseShiftQuestionToCallServiceMenu.shortTitle" = "允许在选字窗内也使用「Shift+?」叫出服务选单";

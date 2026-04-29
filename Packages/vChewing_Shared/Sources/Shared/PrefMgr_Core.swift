@@ -397,6 +397,11 @@ public final class PrefMgr: PrefMgrProtocol, Sendable {
     }
   }
 
+  @AppProperty(userDef: .kSuppressFactoryUnigramsOfKanaSyllables)
+  public var suppressFactoryUnigramsOfKanaSyllables: Bool {
+    didSet { didAskForSyncingLMPrefs?() }
+  }
+
   @AppProperty(userDef: .kCandidateKeys)
   public var candidateKeys: String {
     didSet {

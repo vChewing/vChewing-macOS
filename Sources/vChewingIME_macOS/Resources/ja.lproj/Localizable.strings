@@ -325,6 +325,8 @@
 "i18n:UserDef.kSpecifyCmdOptCtrlEnterBehavior.option.3" = "中国語点字 (GF0019-2018) を送出";
 "i18n:UserDef.kSpecifyCmdOptCtrlEnterBehavior.option.4" = "ButKo BPMFVS 注音表記を送出";
 "i18n:UserDef.kSpecifyCmdOptCtrlEnterBehavior.shortTitle" = "Command+Option+Ctrl+Enter:";
+"i18n:UserDef.kSuppressFactoryUnigramsOfKanaSyllables.description" = "このスイッチをオンにすると、内蔵辞書は仮名音節データを供給しなくなります。中英混在入力フォールバック中に仮名候補が邪魔だと感じる場合は、この設定を有効にしてください。";
+"i18n:UserDef.kSuppressFactoryUnigramsOfKanaSyllables.shortTitle" = "内蔵辞書の仮名音節データを無効化";
 "i18n:UserDef.kUserPhrasesDatabaseBypassed.description" = "これを有効にすると、ユーザー辞書フォルダ内の（関連文節データ以外の）すべての編集可能なデータが無視されます。開発者が言葉の組み立てに関連する特定の悪質な故障が抑制されるかどうか（すなわち、そのユーザー辞書データに原因があるかどうか）を確認するために、有効化するよう依頼することがあります。";
 "i18n:UserDef.kUserPhrasesDatabaseBypassed.shortTitle" = "ユーザー辞書を無効化";
 "i18n:UserDef.kUseShiftQuestionToCallServiceMenu.shortTitle" = "候補陳列ウィンドウで「Shift+?」でもサービスメニューを呼出";

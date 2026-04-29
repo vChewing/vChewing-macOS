@@ -86,6 +86,7 @@ public protocol PrefMgrProtocol {
   var symbolInputEnabled: Bool { get set }
   var chineseConversionEnabled: Bool { get set }
   var shiftJISShinjitaiOutputEnabled: Bool { get set }
+  var suppressFactoryUnigramsOfKanaSyllables: Bool { get set }
   var currencyNumeralsEnabled: Bool { get set }
   var halfWidthPunctuationEnabled: Bool { get set }
   var escToCleanInputBuffer: Bool { get set }
