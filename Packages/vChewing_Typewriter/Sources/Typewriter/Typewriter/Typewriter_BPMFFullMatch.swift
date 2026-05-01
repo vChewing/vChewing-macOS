@@ -23,6 +23,12 @@ public struct BPMFFullMatchTypewriter<Handler: InputHandlerProtocol>: Typewriter
 
   public let handler: Handler
   public var onLexiconMatchFailure: ((Handler, [String], Session) -> Bool?)?
+  /// Optional closure to override the tone-override feature enablement.
+  /// When set and returning `false`, tone-override is force-disabled.
+  public var isToneOverrideEnabled: (() -> Bool)?
+  /// Optional closure to override the leading-intonation acceptance.
+  /// When set and returning `false`, leading-intonation is force-disabled.
+  public var isLeadingIntonationAccepted: (() -> Bool)?
 
   /// 用來處理 InputHandler.HandleInput() 當中的與注音输入有關的組字行為。
   /// - Parameter input: 輸入訊號。
@@ -76,7 +82,14 @@ public struct BPMFFullMatchTypewriter<Handler: InputHandlerProtocol>: Typewriter
   // MARK: Private
 
   private var intonationKeyBehavior: IntonationKeyBehavior {
-    .init(pref: handler.prefs)
+    if let closure = isToneOverrideEnabled, !closure() {
+      return .alwaysTypeIntonationsToTheCompositionBuffer
+    }
+    return .init(pref: handler.prefs)
+  }
+
+  private var effectiveAcceptLeadingIntonations: Bool {
+    isLeadingIntonationAccepted?() ?? handler.prefs.acceptLeadingIntonations
   }
 
   /// 生成本次組字查詢要使用的讀音索引鍵。
@@ -95,7 +108,7 @@ public struct BPMFFullMatchTypewriter<Handler: InputHandlerProtocol>: Typewriter
   )
     -> [String]? {
     guard let readingKey = handler.composer.phonabetKeyForQuery(
-      pronounceableOnly: prefs.acceptLeadingIntonations
+      pronounceableOnly: effectiveAcceptLeadingIntonations
     ) else {
       return nil
     }
@@ -379,9 +392,8 @@ extension BPMFFullMatchTypewriter {
   ) {
     guard condition, let narrator else { return }
     let composer = handler.composer
-    let prefs = handler.prefs
     guard var keyToNarrate = maybeKey ?? composer
-      .phonabetKeyForQuery(pronounceableOnly: prefs.acceptLeadingIntonations)
+      .phonabetKeyForQuery(pronounceableOnly: effectiveAcceptLeadingIntonations)
     else { return }
 
     // 防禦性轉換：若內容含 ASCII 字母（可能是拼音殘留），嘗試轉為注音
