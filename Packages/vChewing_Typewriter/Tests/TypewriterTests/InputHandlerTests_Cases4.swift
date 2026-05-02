@@ -381,7 +381,7 @@ extension InputHandlerTests {
   /// 大千排列下 `3su` = ˇ（前置）+ ㄋ + ㄧ = ㄋㄧˇ（你）；
   /// 啟用時應進入注音路徑（整段可發音），停用時應作為 ASCII 留在 buffer。
   @Test
-  func test_IH410_MixedLeadingIntonationPrefDisabledBlocksToneFirstPhoneticPath() throws {
+  func test_IH410_MixedLeadingIntonationAlwaysBlockedRegardlessOfPref() throws {
     guard let testHandler, let testSession else {
       Issue.record("testHandler and testSession at least one of them is nil.")
       return
@@ -911,6 +911,101 @@ extension InputHandlerTests {
     let commissioned = testSession.recentCommissions.joined()
     #expect(!commissioned.contains("What/"))
     #expect(commissioned.contains("What?") || commissioned.contains("What？"))
+  }
+
+  // MARK: Group F — Phase 55 Leading Digit / Shift ASCII Block
+
+  /// 純數字鍵在 mixed mode 下不得被 composer 吸收為注音聲調。
+  @Test
+  func test_IH425A_MixedLeadingDigitBlockedFromComposer() throws {
+    let (testHandler, _) = try prepareMixedModeHandler()
+
+    let digit4 = KBEvent.KeyEventData(chars: "4", keyCode: 21).asEvent
+    #expect(testHandler.triageInput(event: digit4))
+    #expect(testHandler.mixedAlphanumericalBuffer == "4")
+    #expect(testHandler.composer.isEmpty, "數字 4 不得被 composer 吸收")
+
+    let g = KBEvent.KeyEventData(chars: "g", keyCode: 5).asEvent
+    #expect(testHandler.triageInput(event: g))
+    #expect(testHandler.mixedAlphanumericalBuffer == "4g")
+    #expect(testHandler.composer.isEmpty)
+  }
+
+  /// Shift+數字鍵在 mixed mode 下不得被 composer 吸收。
+  @Test
+  func test_IH425B_MixedShiftDigitBlockedFromComposer() throws {
+    let (testHandler, _) = try prepareMixedModeHandler()
+
+    let shift4 = KBEvent.KeyEventData(
+      flags: .shift, chars: "4", charsSansModifiers: "4", keyCode: 21
+    ).asEvent
+    #expect(testHandler.triageInput(event: shift4))
+    #expect(!testHandler.composer.isEmpty == false, "Shift+數字不得被 composer 吸收")
+    #expect(testHandler.mixedAlphanumericalBuffer == "$" || testHandler.mixedAlphanumericalBuffer == "4")
+  }
+
+  /// 大寫字母在 mixed mode 下不得被 composer 吸收。
+  @Test
+  func test_IH425C_MixedUppercaseBlockedFromComposer() throws {
+    let (testHandler, _) = try prepareMixedModeHandler()
+
+    let shiftG = KBEvent.KeyEventData(
+      flags: .shift, chars: "G", charsSansModifiers: "g", keyCode: 5
+    ).asEvent
+    #expect(testHandler.triageInput(event: shiftG))
+    #expect(testHandler.mixedAlphanumericalBuffer == "G")
+    #expect(testHandler.composer.isEmpty, "大寫 G 不得被 composer 吸收")
+  }
+
+  /// leading digit 阻斷後，auto-split 應可正確切分「數字前綴 + 注音後綴」。
+  /// 4 + gj;3 → 4 + 爽
+  @Test
+  func test_IH426_MixedLeadingDigitAutoSplitWithTone() throws {
+    let (testHandler, testSession) = try prepareMixedModeHandler()
+    let cleanup = injectTemporaryGrams(testHandler, "ㄕㄨㄤˇ 爽 -1")
+    defer { cleanup(); testHandler.clear() }
+
+    typeSentence("4gj;3")
+
+    #expect(testSession.recentCommissions.joined() == "4")
+    #expect(testHandler.committableDisplayText(sansReading: true) == "爽")
+  }
+
+  /// leading digit + 大寫字母阻斷後，auto-split 應可正確切分。
+  /// 4G + j;3 → 4G + 往
+  @Test
+  func test_IH427_MixedLeadingDigitAndUppercaseAutoSplitWithTone() throws {
+    let (testHandler, testSession) = try prepareMixedModeHandler()
+    let cleanup = injectTemporaryGrams(testHandler, "ㄨㄤˇ 往 -1")
+    defer { cleanup(); testHandler.clear() }
+
+    // 手動建立事件，模擬 4 → Shift+G → j → ; → 3
+    let events = [
+      KBEvent.KeyEventData(chars: "4", keyCode: 21).asEvent,
+      KBEvent.KeyEventData(flags: .shift, chars: "G", charsSansModifiers: "g", keyCode: 5).asEvent,
+      KBEvent.KeyEventData(chars: "j", keyCode: 38).asEvent,
+      KBEvent.KeyEventData(chars: ";", keyCode: 41).asEvent,
+      KBEvent.KeyEventData(chars: "3", keyCode: 20).asEvent,
+    ]
+    events.forEach { _ = testHandler.triageInput(event: $0) }
+
+    #expect(testSession.recentCommissions.joined() == "4G")
+    #expect(testHandler.committableDisplayText(sansReading: true) == "往")
+  }
+
+  /// 非聲調數字鍵（如大千鍵盤的 5=ㄓ）在 mixed mode 下應被 composer 吸收為注音，
+  /// 不得被誤當 ASCII 前綴阻斷。
+  @Test
+  func test_IH428_MixedNonToneDigitAllowedAsPhoneticPrefix() throws {
+    let (testHandler, testSession) = try prepareMixedModeHandler()
+    let cleanup = injectTemporaryGrams(testHandler, "ㄓㄜˋ 這 -1")
+    defer { cleanup(); testHandler.clear() }
+
+    typeSentence("5k4")
+
+    #expect(testSession.recentCommissions.isEmpty, "非聲調數字鍵不應被誤當 ASCII 前綴提交")
+    #expect(testHandler.mixedAlphanumericalBuffer.isEmpty, "純注音輸入不應殘留 mixed buffer")
+    #expect(testHandler.committableDisplayText(sansReading: true) == "這", "5k4 應為 ㄓㄜˋ=這")
   }
 
   // MARK: - Fileprivate Helpers.
