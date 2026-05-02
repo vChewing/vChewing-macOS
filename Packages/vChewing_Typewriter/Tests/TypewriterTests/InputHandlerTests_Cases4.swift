@@ -15,11 +15,163 @@ import Testing
 
 import HomaSharedTestComponents
 @testable import LangModelAssembly
+@testable import Tekkon
 @testable import Typewriter
 
 // MARK: - 測試案例 Vol 4 (Mixed Alphanumerical Mode)
 
 extension InputHandlerTests {
+  // MARK: - Izanami Tests
+
+  /// Izanami tests for MixedAlnum Typewriter to make sure all applausable kanji readings are inputtable.
+  ///
+  /// Empty prefix covers basic phonetic typing sanity.
+  /// Non-empty prefixes expose known auto-split bugs (e.g. aijo6 -> aij欸 instead of ai為).
+  ///
+  /// - Parameters:
+  ///   - thePrefix: 要測試的前綴。
+  ///   - givenReadings: 要測試的 Readings，必須是注音（且所有聲調都是最後書寫，包括輕聲；陰平不寫）。
+  ///     填寫空陣列的話，會自動測試倚天中文系統打字所支援的全部注音（ㄈㄨㄥˋ）除外。
+  /// - Warning: This unit test case is not designed for dynamic phonabet layouts.
+  @Test(arguments: ["", "ai", "AI"], [String]())
+  func test_IH400_MixedAlnumKanjiInputTest_Izanami(
+    _ thePrefix: String, givenReadings: [String] = []
+  ) throws {
+    guard let testHandler, let testSession else {
+      Issue.record("testHandler and testSession at least one of them is nil.")
+      return
+    }
+    defer { testHandler.clear() }
+
+    let pfTag = thePrefix.isEmpty ? "NoPF" : "PF `\(thePrefix)`"
+
+    testHandler.currentLM.setOptions { cfg in
+      cfg.alwaysSupplyETenDOSUnigrams = true
+    }
+
+    testHandler.prefs.mixedAlphanumericalEnabled = true
+    // Disable Perceptor for performance concerns.
+    testHandler.prefs.fetchSuggestionsFromPerceptionOverrideModel = false
+
+    let keyMap: [Unicode.Scalar: Unicode.Scalar] = Dictionary(
+      uniqueKeysWithValues: Tekkon.mapQwertyDachen.map { ($1, $0) }
+    )
+
+    var failureReport: [String: String] = [:]
+
+    let readingsToTest: [String]
+    if givenReadings.isEmpty {
+      readingsToTest = LMAssembly.LMInstantiator.lmPlainBopomofo.sortedKeys
+    } else {
+      readingsToTest = givenReadings
+    }
+
+    try readingsToTest.forEach { reading in
+      // 唯一一例不需要測試的讀音「ㄈㄨㄥˋ」，因為這是老國音、不屬於「普通話/新國音」。
+      guard !reading.hasPrefix("ㄈㄨㄥ") else { return }
+      let hasIntonation = reading.unicodeScalars.last.map {
+        Tekkon.allowedIntonations.contains($0)
+      } ?? false
+
+      let readingWithIntonation: String
+      if !hasIntonation {
+        readingWithIntonation = "\(reading) "
+      } else {
+        readingWithIntonation = reading
+      }
+      let dachenSequenceAsScalars = try readingWithIntonation.unicodeScalars.map {
+        try #require(keyMap[$0], "keyMap[\($0)] Failed for reading: `\(reading)`.")
+      }
+      let dachenSequence = String(String.UnicodeScalarView(dachenSequenceAsScalars))
+
+      testHandler.clear()
+      testSession.resetInputHandler(forceComposerCleanup: true)
+
+      typeSentence(thePrefix)
+      typeSentence(dachenSequence)
+
+      var failureNotes: [String] = []
+
+      if thePrefix.isEmpty {
+        // This step should have nothing committed but the only in-assembler reading intact.
+        // If not, this case should be asserted as a failure.
+        if testHandler.assembler.length > 1 {
+          failureNotes.append(
+            "  Early composition is tearing `\(reading)` apart,"
+              + " leaving \(testHandler.assembler.actualKeys) in Assembler."
+          )
+        }
+        if let actualKeysFirst = testHandler.assembler.actualKeys.first, actualKeysFirst != reading {
+          failureNotes.append(
+            "  Early commission is tearing `\(reading)` apart,"
+              + " leaving \(actualKeysFirst) in Assembler."
+          )
+        }
+      } else {
+        // 此處不用 Enter 完成 commit，因為要檢查此時 Assembler 的狀況。
+        let allCommissions = testSession.recentCommissions.joined()
+        // ASCII prefix + 注音後綴：commissions 必須包含 prefix。
+        // 若 prefix 本身是合法注音（如 `ai` = ㄇㄛ），會被 composer 吸收而消失，
+        // 此斷言即為 Izanami 的核心曝光機制——強制揭露所有 affected readings。
+        if !allCommissions.contains(thePrefix) {
+          failureNotes.append("  Commissions `\(allCommissions)` missing prefix `\(thePrefix)`")
+        }
+        // This step should have nothing committed but the prefix, plus keeping in-assembler reading intact.
+        // If not, this case should be asserted as a failure.
+        if testHandler.assembler.length == 1 {
+          if let frontestReading = testHandler.assembler.actualKeys.last, frontestReading != reading {
+            failureNotes.append(
+              "  Early commission is tearing `\(reading)` apart,"
+                + " leaving \(frontestReading) in Assembler."
+            )
+          }
+        } else if testHandler.assembler.length > 1 {
+          failureNotes.append(
+            "  Early composition is tearing `\(reading)` apart,"
+              + " leaving \(testHandler.assembler.actualKeys) in Assembler."
+          )
+        } else if testHandler.assembler.isEmpty {
+          failureNotes
+            .append(
+              "  Assembler is empty. Prefix: `\(thePrefix)`"
+            )
+        } else if testHandler.assembler.isEmpty {
+          failureNotes
+            .append(
+              "  Assembler length larger than 1."
+                + " Assembler Keys: \(testHandler.assembler.actualKeys). Prefix: `\(thePrefix)`"
+            )
+        }
+      }
+
+      testSession.recentCommissions.removeAll()
+
+      func makeFailureComment() -> String {
+        let typedSeqStr = "\(thePrefix)\(dachenSequence)"
+        return "- [\(pfTag)] Reading \(reading) failed on typing `\(typedSeqStr)`:\n"
+          + "\(failureNotes.joined(separator: "\n"))"
+      }
+
+      if !failureNotes.isEmpty {
+        failureReport[reading] = makeFailureComment()
+      }
+    }
+
+    func makeFinalFailureReport() -> String {
+      var resultBuffer = """
+      Found \(failureReport.count) failure(s) on testing [\(pfTag)]:\n
+      """
+      LMAssembly.LMInstantiator.lmPlainBopomofo.sortedKeys.forEach { reading in
+        guard let matchedReport = failureReport[reading] else { return }
+        resultBuffer.append("\(matchedReport)\n")
+      }
+      resultBuffer += "Print complete. Total \(failureReport.count) failure(s) on testing [\(pfTag)]\n"
+      return resultBuffer
+    }
+
+    #expect(failureReport.isEmpty, "\(makeFinalFailureReport())")
+  }
+
   // MARK: Group A — Mixed Buffer Exit Paths
 
   fileprivate struct MixedBufferExitScenario: Sendable {
