@@ -23,7 +23,6 @@
 "⚠︎ Unhandlable: Chars and Readings in buffer doesn't match." = "⚠︎ 対処不可：緩衝列の字数は読みの数と不同等。";
 "1) Only macOS has IMKCandidates. Since it relies on a dedicated ObjC Bridging Header to expose necessary internal APIs to work, it hinders vChewing from completely modularized for multi-platform support.\n\n2) IMKCandidates is buggy. It is not likely to be completely fixed by Apple, and its devs are not allowed to talk about it to non-Apple individuals. That's why we have had enough with IMKCandidates. It is likely the reason why Apple had never used IMKCandidates in their official InputMethodKit sample projects (as of August 2023)." = "1) IMKCandidates は macOS だけで利用可能のシステム構成部品であり、ObjC Bridging Header にて特殊の内部 API を使う必要があるため、本アプリの「他のシステムへの移植計画」に妨げています。\n\n2) IMKCandidates には数多くのバグがあり、そして Apple 社に修復される可能性はほぼゼロだと見込めます。さらに、Apple 社の IMKCandidates 開発参与者たちはそれについての一切内容を Apple 社以外の人と話すのは、会社の規則によって禁則事項です。従って、IMKCandidates をこのまま使い続くのは、本当にうんざりです。況してや、これからも、Apple 社が IMKCandidates に何か内部変化を導入して、新たなる互換性支障が生ずる恐れがあると見込めます。Apple の公式の InputMethodKit サンプルプロジェクトに、IMKCandidates が使われていなかった理由はこれこそだと推測できます（2023年8月までの話）。";
 "About vChewing…" = "唯音について…";
-"Accept leading intonations in rare cases" = "まれな場合には、音調記号の優先入力を許容する";
 "Add Client" = "入れる";
 "Add Service" = "サービスを追加";
 "Adjust candidate window location according to current node length" = "カーソル所在位置の単語の長さによって候補陳列ウィンドウの位置を調整";
@@ -39,7 +38,6 @@
 "Always drop the previous reading" = "カーソルの後部の音読みを常に削除する";
 "Always expand candidate window panel" = "文字候補陳列ウィンドウを折り畳みせずに";
 "Always show tooltip texts horizontally" = "ヒントを常に横書きにする";
-"Always type intonations to the inline composition buffer" = "常に入力緩衝列に音調を入力する";
 "Always use fixed listing order in candidate window" = "候補文字を固定順番で陳列する";
 "An accommodation for elder computer users." = "年配なるユーザーのために提供した機能である。";
 "Apple ABC (equivalent to English US)" = "Apple ABC (Apple U.S. キーボードと同じ)";
@@ -238,6 +236,8 @@
 "i18n:settings.shiftKeyASCIITogle.description" = "この機能の利用する NSEvent は、macOS 内蔵の入力アプリ共用モジュール「InputMethodKit」から提供した NSEvent のみであり、その NSEvent 文脈関係で「Shift キーは１回押したかどうか」と判断することはできる。この事実に疑いを持つ者は、本アプリのソースコードを審査するか、あるいは本アプリを逆向工程（分解工学, いわゆる「Reverse-Engineering」）するがよい。なお、Shiftキーによるこの切り替えは、CapsLockがONの時には効かぬ。";
 "i18n:Uninstaller.failureGuidance" = "唯音はサンドボックス化された入力メソッドプロセスから自身のバンドルをゴミ箱へ移動できません。Wiki ページの手動卸除手順をご参照ください。";
 "i18n:Uninstaller.openWikiPage" = "卸除ガイドを開く";
+"i18n:UserDef.kAcceptLeadingIntonations.description" = "音調記号は常に「漢字の音読組合を確認するキー」として最後で入力することだと常識ですが、間違くてそれを最初に入力してしまった場合もございます。このボカ避け機能は（ほんの一部の）このような間違いを対策できますが、注音入力だけに使えます。更に、（音調の上書き機能がオンを前提として）音調の上書きができる場合には、このボカ避け機能は作動しません。中英混在入力のフォール バックが有効な場合、この設定は無視されます——中英混在入力のフォール バックは常に音調前置入力を受け付けません。";
+"i18n:UserDef.kAcceptLeadingIntonations.shortTitle" = "まれな場合には、音調記号の優先入力を許容する";
 "i18n:UserDef.kAllowRescoringSingleKanjiCandidates.description" = "⚠️💀 センテンス構築算法に差し支えてしまい、正しくない結果が出る恐れがあります。ご自分は何かをしようとしているのかを弁えていない限り、このスィッチを常にOFFすることだと開発者からの是正勧告です。";
 "i18n:UserDef.kAllowRescoringSingleKanjiCandidates.shortTitle" = "排除/最優先にできる候補の文字数の最低限は１字とする";
 "i18n:UserDef.kAlwaysUsePCBWithElectronBasedClients.description" = "ほとんどの「Electron で構築したアプリ」は IMKTextInput API の実作についての支障があり、その実作した API の挙動は予測できなくて、バグ退治もとても困難だと考えられています。このようなアプリの開発者たちにもそれぞれの原因でこのような支障を解決する策も動力も極めて少ないと認識されております。故に、このスイッチの最初値はONにしました。";
@@ -328,6 +328,11 @@
 "i18n:UserDef.kSpecifyCmdOptCtrlEnterBehavior.option.3" = "中国語点字 (GF0019-2018) を送出";
 "i18n:UserDef.kSpecifyCmdOptCtrlEnterBehavior.option.4" = "ButKo BPMFVS 注音表記を送出";
 "i18n:UserDef.kSpecifyCmdOptCtrlEnterBehavior.shortTitle" = "Command+Option+Ctrl+Enter:";
+"i18n:UserDef.kSpecifyIntonationKeyBehavior.description" = "音読組立緩衝列が空かされた時の音調キーの行為をご指定ください。中英混在入力のフォール バックが有効な場合、この設定は無視されます——中英混在入力のフォール バックは常に前置数字を音調キーとして扱いません。";
+"i18n:UserDef.kSpecifyIntonationKeyBehavior.option.0" = "カーソルの後部の音読みの音調を上書きし、候補選択状態を戻す";
+"i18n:UserDef.kSpecifyIntonationKeyBehavior.option.1" = "カーソルの後部の音読みの異なる音調だけを上書きする";
+"i18n:UserDef.kSpecifyIntonationKeyBehavior.option.2" = "常に入力緩衝列に音調を入力する";
+"i18n:UserDef.kSpecifyIntonationKeyBehavior.shortTitle" = "音調キー:";
 "i18n:UserDef.kSuppressFactoryUnigramsOfKanaSyllables.description" = "このスイッチをオンにすると、内蔵辞書は仮名音節データを供給しなくなります。中英混在入力フォールバック中に仮名候補が邪魔だと感じる場合は、この設定を有効にしてください。";
 "i18n:UserDef.kSuppressFactoryUnigramsOfKanaSyllables.shortTitle" = "内蔵辞書の仮名音節データを無効化";
 "i18n:UserDef.kUserPhrasesDatabaseBypassed.description" = "これを有効にすると、ユーザー辞書フォルダ内の（関連文節データ以外の）すべての編集可能なデータが無視されます。開発者が言葉の組み立てに関連する特定の悪質な故障が抑制されるかどうか（すなわち、そのユーザー辞書データに原因があるかどうか）を確認するために、有効化するよう依頼することがあります。";
@@ -341,7 +346,6 @@
 "in front of the phrase (like macOS built-in Zhuyin IME)" = "単語の前で // macOS 内蔵注音入力のやり方";
 "Initial" = "頭文字";
 "Inline comments are not supported in associated phrases." = "インラインメモは連想文節辞書で使えません。";
-"Intonation Key:" = "音調キー:";
 "Intonation mark. ENTER to commit.\nSPACE to insert into composition buffer." = "音調記号。ENTER で送り出す。\nSPACE で入力緩衝列に挿入。";
 "Invalid Code Point." = "コードポイントは正しくない。";
 "Invalid Selection Keys." = "候補用キーによる不具合。";
@@ -374,13 +378,11 @@
 "Only enforce conversion in Simplified Chinese mode" = "簡体モードだけの場合、カセットモードの漢字出力転換を";
 "Only enforce conversion in Traditional Chinese mode" = "繁体モードだけの場合、カセットモードの漢字出力転換を";
 "Only load factory language models if needed" = "必要性を判断してから内蔵辞書を読み込む";
-"Only override the intonation of the previous reading if different" = "カーソルの後部の音読みの異なる音調だけを上書きする";
 "Open App Support Folder" = "App Support フォルダーを開く";
 "Open User Dictionary Folder" = "ユーザー辞書フォルダを開く";
 "Optimize Memorized Phrases" = "臨時記憶資料を整う";
 "Otherwise, only the candidate keys are allowed to confirm associates." = "未チェックの場合、連想候補を選べられるのは言選りキーのみ。";
 "Output Settings:" = "出力設定:";
-"Override the previous reading's intonation with candidate-reset" = "カーソルの後部の音読みの音調を上書きし、候補選択状態を戻す";
 "Per-Char Select Mode" = "全候補入力モード";
 "Phonetic Parser:" = "注音配列:";
 "Phrase Editor" = "辞書編集";
@@ -433,7 +435,6 @@
 "Space to +revolve candidates, Shift+Space to +revolve pages" = "Shift+Space で次のページ、Space で次の候補文字を";
 "Space to +revolve pages, Shift+Space to +revolve candidates" = "Space で次のページ、Shift+Space で次の候補文字を";
 "Space:" = "Space:";
-"Specify the behavior of intonation key when syllable composer is empty." = "音読組立緩衝列が空かされた時の音調キーの行為をご指定ください。";
 "Starlight" = "星光配列";
 "Stop farting (when typed phonetic combination is invalid, etc.)" = "マナーモード // 外すと入力間違った時に変な声が出る";
 "Switch to %@ Input Mode" = "%@入力モードに切り替え";
@@ -454,7 +455,6 @@
 "theSymbols" = "絵文字＆符号";
 "This conversion only affects the cassette module, converting typed contents to either Simplified Chinese or Traditional Chinese in accordance with this setting and your current input mode." = "この転換はカセットモードだけに使える転換であり、転換結果はこの設定と入力モード次第である。";
 "This editor only: Auto-reload modifications happened outside of this editor" = "このエディターの外部からの編集結果をこのエディターに自動的に読み込む";
-"This feature accommodates certain typing mistakes that the intonation mark might be typed at first (which is sequentially wrong from a common sense that intonation marks are supposed to be used for confirming combinations). It won't work if the current parser is of (any) pinyin. Also, this feature won't work when an intonation override is possible (and enabled)." = "音調記号は常に「漢字の音読組合を確認するキー」として最後で入力することだと常識ですが、間違くてそれを最初に入力してしまった場合もございます。このボカ避け機能は（ほんの一部の）このような間違いを対策できますが、注音入力だけに使えます。更に、（音調の上書き機能がオンを前提として）音調の上書きができる場合には、このボカ避け機能は作動しません。";
 "This feature requires macOS %@ and above." = "この機能の稼働には macOS %@ 以降のシステムが必要である。";
 "This hinders all client apps from unwelcomely accessing your uncommitted contents in the composition buffer. A popup composition buffer will be shown instead." = "これで、どの客体アプリも、入力緩衝列の送り出さなかった内容を（勝手に）読み用いることは不可能になる。すなわち「吹き出し入力緩衝列ウィンドウ」の「常に出番」である。";
 "This only works when being toggled by Shift key and JIS Eisu key." = "Shift キーとJIS 英数キーだけでの英数入力モード状態切替の話。";

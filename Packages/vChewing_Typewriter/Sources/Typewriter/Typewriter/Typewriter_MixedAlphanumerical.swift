@@ -25,7 +25,10 @@ public struct MixedAlphanumericalTypewriter<Handler: InputHandlerProtocol>: Type
   public func handle(_ input: some InputSignalProtocol) -> Bool? {
     guard let session = handler.session else { return nil }
     guard !handler.composer.isPinyinMode else {
-      return BPMFFullMatchTypewriter(handler).handle(input)
+      var typewriter = BPMFFullMatchTypewriter(handler)
+      typewriter.isToneOverrideEnabled = { false }
+      typewriter.isLeadingIntonationAccepted = { false }
+      return typewriter.handle(input)
     }
     // 波浪符號鍵（symbol menu physical key）應交還上層分診流程處理。
     // mixed mode 若此時已有可提交內容，先提交全部內容，再放行按鍵事件。
@@ -58,6 +61,8 @@ public struct MixedAlphanumericalTypewriter<Handler: InputHandlerProtocol>: Type
       if !handler.composer.isEmpty, !shouldPreferASCIIWordOnSpace {
         let originalMixedBuffer = handler.mixedAlphanumericalBuffer
         var typewriter = BPMFFullMatchTypewriter(handler)
+        typewriter.isToneOverrideEnabled = { false }
+        typewriter.isLeadingIntonationAccepted = { false }
         typewriter.onLexiconMatchFailure = { injectedHandler, _, injectedSession in
           // 辭典查詢無結果時，回退為直接提交中文段 + ASCII buffer + 空白。
           guard !originalMixedBuffer.isEmpty else { return nil }
@@ -189,10 +194,10 @@ public struct MixedAlphanumericalTypewriter<Handler: InputHandlerProtocol>: Type
       trialComposer.clear()
       trialComposer.receiveSequence(fullInput, isRomaji: false)
 
-      // 若「允許聲調前置鍵入」已關閉，且 fullInput 以獨立聲調鍵起頭，
-      // 跳過整段注音路徑，避免 mixed mode 隱性啟用聲調前置。
+      // Mixed mode 永遠不接受聲調前置鍵入。
+      // 若 fullInput 以獨立聲調鍵起頭，跳過整段注音路徑。
       let isLeadingToneBlocked: Bool = {
-        guard !handler.prefs.acceptLeadingIntonations, fullInput.count > 1,
+        guard fullInput.count > 1,
               let firstChar = fullInput.first?.description else { return false }
         var test = handler.composer
         test.clear()
@@ -203,7 +208,7 @@ public struct MixedAlphanumericalTypewriter<Handler: InputHandlerProtocol>: Type
       if !isLeadingToneBlocked, trialComposer.isPronounceable {
         if trialComposer.hasIntonation() {
           if let readingKey = trialComposer.phonabetKeyForQuery(
-            pronounceableOnly: handler.prefs.acceptLeadingIntonations
+            pronounceableOnly: true
           ), handler.currentLM.hasUnigramsForFast(keyArray: [readingKey]) {
             handler.composer = trialComposer
             guard !input.isInvalid, (try? handler.assembler.insertKey(readingKey)) != nil else {
@@ -354,8 +359,9 @@ public struct MixedAlphanumericalTypewriter<Handler: InputHandlerProtocol>: Type
     trialComposer.clear()
     trialComposer.receiveSequence(suffixText, isRomaji: false)
 
-    // 若「允許聲調前置鍵入」已關閉，後綴不能以獨立聲調鍵作為首鍵。
-    if !handler.prefs.acceptLeadingIntonations, let firstChar = suffixText.first?.description {
+    // Mixed mode 永遠不接受聲調前置鍵入。
+    // 後綴不能以獨立聲調鍵作為首鍵。
+    if let firstChar = suffixText.first?.description {
       var firstKeyTest = handler.composer
       firstKeyTest.clear()
       firstKeyTest.receiveKey(fromString: firstChar)
@@ -367,7 +373,7 @@ public struct MixedAlphanumericalTypewriter<Handler: InputHandlerProtocol>: Type
     }
 
     guard let readingKey = trialComposer.phonabetKeyForQuery(
-      pronounceableOnly: handler.prefs.acceptLeadingIntonations
+      pronounceableOnly: true
     ) else {
       return nil
     }

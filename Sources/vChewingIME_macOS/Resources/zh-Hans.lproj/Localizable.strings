@@ -23,7 +23,6 @@
 "⚠︎ Unhandlable: Chars and Readings in buffer doesn't match." = "⚠︎ 无法处理：组字区字数与读音数不对应。";
 "1) Only macOS has IMKCandidates. Since it relies on a dedicated ObjC Bridging Header to expose necessary internal APIs to work, it hinders vChewing from completely modularized for multi-platform support.\n\n2) IMKCandidates is buggy. It is not likely to be completely fixed by Apple, and its devs are not allowed to talk about it to non-Apple individuals. That's why we have had enough with IMKCandidates. It is likely the reason why Apple had never used IMKCandidates in their official InputMethodKit sample projects (as of August 2023)." = "1) 只有 macOS 才有 IMKCandidates 可用。该元件依赖特制的 ObjC Bridging Header 才能工作，这妨碍了唯音输入法的跨平台模组化。\n\n2) IMKCandidates 浑身是 Bug，且 Apple 不太可能修复之。甚至 InputMethodKit 的开发人员们都不被允许与任何非 Apple 员工讨论这些内容。于是 IMKCandidates 基本上用不下去了，更遑论 IMKCandidates 未来可能发生的会导致相容性问题的内部改动。这很可能也是 Apple 官方 InputMethodKit 示范专案当中没有用到 IMKCandidates 的原因之一（截至 2023 年 8 月）。";
 "About vChewing…" = "关于唯音…";
-"Accept leading intonations in rare cases" = "在个别情况下，允许声调前置键入";
 "Add Client" = "登记新客体";
 "Add Service" = "新增服务";
 "Adjust candidate window location according to current node length" = "根据当前位置的字词长度，自动调整选字窗的位置";
@@ -39,7 +38,6 @@
 "Always drop the previous reading" = "始终剔除游标正后方的字音";
 "Always expand candidate window panel" = "始终自动展开多行选字窗";
 "Always show tooltip texts horizontally" = "始终使用横排来显示工具提示视窗";
-"Always type intonations to the inline composition buffer" = "始终在内文组字区内键入声调符号";
 "Always use fixed listing order in candidate window" = "以固定顺序来陈列选字窗内的候选字";
 "An accommodation for elder computer users." = "针对年长使用者的习惯而提供。";
 "Apple ABC (equivalent to English US)" = "Apple ABC (与 Apple 美规键盘等价)";
@@ -239,6 +237,8 @@
 "i18n:settings.shiftKeyASCIITogle.description" = "该功能只需要对借由 macOS 内建的输入法框架传来的 NSEvent 做上下文分析，自然没有「向使用者寻求系统全局键盘事件监听权限」之必要。您可自行审视敝输入法的原始程式码仓库、或对敝输入法逆向工程，以自行证实此处所言之真假。另注：这个 Shift 键切换开关在 CapsLock 灯亮时无效。";
 "i18n:Uninstaller.failureGuidance" = "唯音在沙盒输入法行程内无法自行将自身套件移到垃圾桶。您可以参阅 wiki 页面的手动卸除说明。";
 "i18n:Uninstaller.openWikiPage" = "开启卸除说明";
+"i18n:UserDef.kAcceptLeadingIntonations.description" = "声调键是专门用来确认注音组合输入的，从常理上来讲只能在最后键入。然而，总是有人会失手将声调键前置键入。该防呆功能专门应对这种情形，但无法用于拼音输入模式，且其优先权比「以声调键覆写游标身后的汉字的声调」更低（除非后者被停用）。在启用中英混合输入回退时，该设定会被无视——中英混合输入回退永远不会接受声调前置键入。";
+"i18n:UserDef.kAcceptLeadingIntonations.shortTitle" = "在个别情况下，允许声调前置键入";
 "i18n:UserDef.kAllowRescoringSingleKanjiCandidates.description" = "⚠️💀 这可能会妨碍组句函式，使其无法给出正确的结果。开发者极力劝阻您启用该功能，除非您真的知道您在做什么。";
 "i18n:UserDef.kAllowRescoringSingleKanjiCandidates.shortTitle" = "允许对单个汉字进行升权或排除";
 "i18n:UserDef.kAlwaysUsePCBWithElectronBasedClients.description" = "基于 Electron 技术构建的客体往往臭名昭彰于各自的对 IMKTextInput API 的「行为难以预测、难以保证」的实作上。更糟糕的是，这类 App 的开发者们均有着各自的不可控的原因、而难以保证他们的 App 的这种问题能被及时地、妥当地解决。这也是为什么这个开关在预设情况下处于开启状态。";
@@ -329,6 +329,11 @@
 "i18n:UserDef.kSpecifyCmdOptCtrlEnterBehavior.option.3" = "递交国通盲文 (GF0019-2018)";
 "i18n:UserDef.kSpecifyCmdOptCtrlEnterBehavior.option.4" = "递交 ButKo BPMFVS 注音标记";
 "i18n:UserDef.kSpecifyCmdOptCtrlEnterBehavior.shortTitle" = "Command+Option+Ctrl+Enter:";
+"i18n:UserDef.kSpecifyIntonationKeyBehavior.description" = "指定声调键（在注拼槽为「空」状态时）的行为。在启用中英混合输入回退时，该设定会被无视——中英混合输入回退永远不会将前置数字视为声调键。";
+"i18n:UserDef.kSpecifyIntonationKeyBehavior.option.0" = "尝试对游标正后方的字音覆写声调，且重设其选字状态";
+"i18n:UserDef.kSpecifyIntonationKeyBehavior.option.1" = "仅在键入的声调与游标正后方的字音不同时，尝试覆写";
+"i18n:UserDef.kSpecifyIntonationKeyBehavior.option.2" = "始终在内文组字区内键入声调符号";
+"i18n:UserDef.kSpecifyIntonationKeyBehavior.shortTitle" = "声调键:";
 "i18n:UserDef.kSuppressFactoryUnigramsOfKanaSyllables.description" = "启用后，原厂辞典将不再供应假名音节资料。若您在使用中英混输回退时觉得假名候选干扰体验，可考虑开启这个选项。";
 "i18n:UserDef.kSuppressFactoryUnigramsOfKanaSyllables.shortTitle" = "停用原厂假名音节资料";
 "i18n:UserDef.kUserPhrasesDatabaseBypassed.description" = "启用后，使用者辞典资料夹内所有可编辑的资料将被忽略（但关联词语除外）。开发者可能会请您启用此项，以协助确认与组句有关的某些恶性故障是否与使用者辞典资料内容有关。";
@@ -342,7 +347,6 @@
 "in front of the phrase (like macOS built-in Zhuyin IME)" = "将游标置于词语前方 // macOS 内建注音风格";
 "Initial" = "首字";
 "Inline comments are not supported in associated phrases." = "关联词语不支援行内注解。";
-"Intonation Key:" = "声调键:";
 "Intonation mark. ENTER to commit.\nSPACE to insert into composition buffer." = "声调符号。敲 Enter 以递交。\n敲空格键以插入组字区。";
 "Invalid Code Point." = "内码不正确。";
 "Invalid Selection Keys." = "选字键参数资料值不规范。";
@@ -375,13 +379,11 @@
 "Only enforce conversion in Simplified Chinese mode" = "仅在简体模式转换至简体";
 "Only enforce conversion in Traditional Chinese mode" = "仅在繁体模式转换至繁体";
 "Only load factory language models if needed" = "按需载入简繁体模式的原厂辞典资料";
-"Only override the intonation of the previous reading if different" = "仅在键入的声调与游标正后方的字音不同时，尝试覆写";
 "Open App Support Folder" = "开启 App Support 目录";
 "Open User Dictionary Folder" = "开启使用者辞典资料夹";
 "Optimize Memorized Phrases" = "精简临时记忆语汇资料";
 "Otherwise, only the candidate keys are allowed to confirm associates." = "不勾选这一项的话，就只能用选字键来选取关联词语。";
 "Output Settings:" = "输出设定:";
-"Override the previous reading's intonation with candidate-reset" = "尝试对游标正后方的字音覆写声调，且重设其选字状态";
 "Per-Char Select Mode" = "模拟逐字选字输入";
 "Phonetic Parser:" = "注音排列:";
 "Phrase Editor" = "语汇编辑器";
@@ -434,7 +436,6 @@
 "Space to +revolve candidates, Shift+Space to +revolve pages" = "Shift+空格键 换下一页，空格键 换选下一个候选字";
 "Space to +revolve pages, Shift+Space to +revolve candidates" = "空格键 换下一页，Shift+空格键 换选下一个候选字";
 "Space:" = "空格键:";
-"Specify the behavior of intonation key when syllable composer is empty." = "指定声调键（在注拼槽为「空」状态时）的行为。";
 "Starlight" = "星光排列";
 "Stop farting (when typed phonetic combination is invalid, etc.)" = "廉耻模式 // 取消勾选的话，敲错字时会有异音";
 "Switch to %@ Input Mode" = "切换至%@输入模式";
@@ -455,7 +456,6 @@
 "theSymbols" = "绘文字符号";
 "This conversion only affects the cassette module, converting typed contents to either Simplified Chinese or Traditional Chinese in accordance with this setting and your current input mode." = "该转换仅对磁带模式有影响，会将键入的内容根据该选项与当前的简繁体模式来转换。";
 "This editor only: Auto-reload modifications happened outside of this editor" = "仅限该编辑器：自动读入来自该编辑器外部的档案内容修改";
-"This feature accommodates certain typing mistakes that the intonation mark might be typed at first (which is sequentially wrong from a common sense that intonation marks are supposed to be used for confirming combinations). It won't work if the current parser is of (any) pinyin. Also, this feature won't work when an intonation override is possible (and enabled)." = "声调键是专门用来确认注音组合输入的，从常理上来讲只能在最后键入。然而，总是有人会失手将声调键前置键入。该防呆功能专门应对这种情形，但无法用于拼音输入模式，且其优先权比「以声调键覆写游标身后的汉字的声调」更低（除非后者被停用）。";
 "This feature requires macOS %@ and above." = "该功能要求系统版本至少 macOS %@。";
 "This hinders all client apps from unwelcomely accessing your uncommitted contents in the composition buffer. A popup composition buffer will be shown instead." = "这会阻止任何客体擅自存取尚未递交的组字区内容。此举也会全局启用浮动组字窗。";
 "This only works when being toggled by Shift key and JIS Eisu key." = "仅用于以 Shift 键或 JIS 英数键切换中英文输入模式的场合。";

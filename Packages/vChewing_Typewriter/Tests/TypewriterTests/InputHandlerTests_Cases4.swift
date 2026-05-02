@@ -409,7 +409,8 @@ extension InputHandlerTests {
       testHandler.prefs.acceptLeadingIntonations = true
     }
 
-    // 案例 A：acceptLeadingIntonations = true（預設），3su 應觸發注音路徑，你 進組字器
+    // MixedAlnum 永遠不接受聲調前置鍵入，無論 acceptLeadingIntonations 偏好設定為何。
+    // 案例 A：acceptLeadingIntonations = true，3su 仍應留在 ASCII buffer。
     testHandler.clear()
     testSession.resetInputHandler(forceComposerCleanup: true)
     testHandler.prefs.mixedAlphanumericalEnabled = true
@@ -417,10 +418,10 @@ extension InputHandlerTests {
 
     typeSentence("3su")
 
-    #expect(testHandler.committableDisplayText(sansReading: true) == "你")
-    #expect(testHandler.mixedAlphanumericalBuffer.isEmpty)
+    #expect(testHandler.mixedAlphanumericalBuffer == "3su")
+    #expect(testHandler.committableDisplayText(sansReading: true).isEmpty)
 
-    // 案例 B：acceptLeadingIntonations = false，3su 不得觸發注音路徑，應留在 ASCII buffer
+    // 案例 B：acceptLeadingIntonations = false，3su 同樣留在 ASCII buffer。
     testHandler.clear()
     testSession.resetInputHandler(forceComposerCleanup: true)
     testHandler.prefs.mixedAlphanumericalEnabled = true
@@ -433,7 +434,7 @@ extension InputHandlerTests {
 
     // Enter 後應提交原始 ASCII
     _ = testHandler.triageInput(event: KBEvent.KeyEventData.dataEnterReturn.asEvent)
-    #expect(testSession.recentCommissions.contains("3su"))
+    #expect(testSession.recentCommissions.joined().contains("3su"))
   }
 
   // MARK: Group B2 — Space Finalize: Pure ASCII Word

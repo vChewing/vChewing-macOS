@@ -23,7 +23,6 @@
 "⚠︎ Unhandlable: Chars and Readings in buffer doesn't match." = "⚠︎ Unhandlable: Chars and Readings in buffer doesn't match.";
 "1) Only macOS has IMKCandidates. Since it relies on a dedicated ObjC Bridging Header to expose necessary internal APIs to work, it hinders vChewing from completely modularized for multi-platform support.\n\n2) IMKCandidates is buggy. It is not likely to be completely fixed by Apple, and its devs are not allowed to talk about it to non-Apple individuals. That's why we have had enough with IMKCandidates. It is likely the reason why Apple had never used IMKCandidates in their official InputMethodKit sample projects (as of August 2023)." = "1) Only macOS has IMKCandidates. Since it relies on a dedicated ObjC Bridging Header to expose necessary internal APIs to work, it hinders vChewing from completely modularized for multi-platform support.\n\n2) IMKCandidates is buggy. It is not likely to be completely fixed by Apple, and its devs are not allowed to talk about it to non-Apple individuals. That's why we have had enough with IMKCandidates. It is likely the reason why Apple had never used IMKCandidates in their official InputMethodKit sample projects (as of August 2023).";
 "About vChewing…" = "About vChewing…";
-"Accept leading intonations in rare cases" = "Accept leading intonations in rare cases";
 "Add Client" = "Add Client";
 "Add Service" = "Add Service";
 "Adjust candidate window location according to current node length" = "Adjust candidate window location according to current node length";
@@ -39,7 +38,6 @@
 "Always drop the previous reading" = "Always drop the previous reading";
 "Always expand candidate window panel" = "Always expand candidate window panel";
 "Always show tooltip texts horizontally" = "Always show tooltip texts horizontally";
-"Always type intonations to the inline composition buffer" = "Always type intonations to the inline composition buffer";
 "Always use fixed listing order in candidate window" = "Always use fixed listing order in candidate window";
 "An accommodation for elder computer users." = "An accommodation for elder computer users.";
 "Apple ABC (equivalent to English US)" = "Apple ABC (equivalent to English US)";
@@ -239,6 +237,8 @@
 "i18n:settings.shiftKeyASCIITogle.description" = "This feature only needs to parse consecutive NSEvents passed by macOS built-in InputMethodKit framework, hence no necessity of asking end-users for extra privileges of monitoring global keyboard inputs. You are free to investigate our codebase or reverse-engineer this input method to see whether the above statement is trustable. Also, this Shift-key toggle won't work if CapsLock is ON.";
 "i18n:Uninstaller.failureGuidance" = "vChewing cannot move its own bundle to the Trash from a sandboxed input method process. You can follow the manual uninstall instructions on the wiki page.";
 "i18n:Uninstaller.openWikiPage" = "Open Uninstall Guide";
+"i18n:UserDef.kAcceptLeadingIntonations.description" = "i18n:UserDef.kAcceptLeadingIntonations.description";
+"i18n:UserDef.kAcceptLeadingIntonations.shortTitle" = "i18n:UserDef.kAcceptLeadingIntonations.shortTitle";
 "i18n:UserDef.kAllowRescoringSingleKanjiCandidates.description" = "⚠️💀 This may hinder the sentence-composition algorithm from giving appropriate results. You are urged to turn this switch off at all costs, unless you really know what you are doing.";
 "i18n:UserDef.kAllowRescoringSingleKanjiCandidates.shortTitle" = "Allow boosting / excluding a candidate of single kanji";
 "i18n:UserDef.kAlwaysUsePCBWithElectronBasedClients.description" = "Electron-based apps are notorious in unpredictable (buggy) IMKTextInput API interactive behaviors. Most of such apps are unlikely to have their individual issues of such solved correctly on-time due to various out-of-control reasons, hence why this toggle is enabled by default.";
@@ -329,6 +329,11 @@
 "i18n:UserDef.kSpecifyCmdOptCtrlEnterBehavior.option.3" = "Commit Mandarin Braille (GF0019-2018)";
 "i18n:UserDef.kSpecifyCmdOptCtrlEnterBehavior.option.4" = "Commit ButKo BPMFVS Annotation";
 "i18n:UserDef.kSpecifyCmdOptCtrlEnterBehavior.shortTitle" = "Command+Option+Ctrl+Enter:";
+"i18n:UserDef.kSpecifyIntonationKeyBehavior.description" = "i18n:UserDef.kSpecifyIntonationKeyBehavior.description";
+"i18n:UserDef.kSpecifyIntonationKeyBehavior.option.0" = "i18n:UserDef.kSpecifyIntonationKeyBehavior.option.0";
+"i18n:UserDef.kSpecifyIntonationKeyBehavior.option.1" = "i18n:UserDef.kSpecifyIntonationKeyBehavior.option.1";
+"i18n:UserDef.kSpecifyIntonationKeyBehavior.option.2" = "i18n:UserDef.kSpecifyIntonationKeyBehavior.option.2";
+"i18n:UserDef.kSpecifyIntonationKeyBehavior.shortTitle" = "i18n:UserDef.kSpecifyIntonationKeyBehavior.shortTitle";
 "i18n:UserDef.kSuppressFactoryUnigramsOfKanaSyllables.description" = "By turning this toggle ON, the factory lexicon will stop supplying the data of Kana Syllables. Some people may want to turn this on to avoid disruptive experiences while using mixed Chinese-English typing fallback.";
 "i18n:UserDef.kSuppressFactoryUnigramsOfKanaSyllables.shortTitle" = "Suppress factory kana syllable data";
 "i18n:UserDef.kUserPhrasesDatabaseBypassed.description" = "When enabled, all editable data in your User Phrases folder will be ignored (except Associated Phrases data). The developer may ask you to enable this to help determine whether it suppresses certain pernicious issues related to sentence composition.";
@@ -342,7 +347,6 @@
 "in front of the phrase (like macOS built-in Zhuyin IME)" = "in front of the phrase (like macOS built-in Zhuyin IME)";
 "Initial" = "Initial";
 "Inline comments are not supported in associated phrases." = "Inline comments are not supported in associated phrases.";
-"Intonation Key:" = "Intonation Key:";
 "Intonation mark. ENTER to commit.\nSPACE to insert into composition buffer." = "Intonation mark. ENTER to commit.\nSPACE to insert into composition buffer.";
 "Invalid Code Point." = "Invalid Code Point.";
 "Invalid Selection Keys." = "Invalid Selection Keys.";
@@ -375,13 +379,11 @@
 "Only enforce conversion in Simplified Chinese mode" = "Only enforce conversion in Simplified Chinese mode";
 "Only enforce conversion in Traditional Chinese mode" = "Only enforce conversion in Traditional Chinese mode";
 "Only load factory language models if needed" = "Only load factory language models if needed";
-"Only override the intonation of the previous reading if different" = "Only override the intonation of the previous reading if different";
 "Open App Support Folder" = "Open App Support Folder";
 "Open User Dictionary Folder" = "Open User Dictionary Folder";
 "Optimize Memorized Phrases" = "Optimize Memorized Phrases";
 "Otherwise, only the candidate keys are allowed to confirm associates." = "Otherwise, only the candidate keys are allowed to confirm associates.";
 "Output Settings:" = "Output Settings:";
-"Override the previous reading's intonation with candidate-reset" = "Override the previous reading's intonation with candidate-reset";
 "Per-Char Select Mode" = "Per-Char Select Mode";
 "Phonetic Parser:" = "Phonetic Parser:";
 "Phrase Editor" = "Phrase Editor";
@@ -434,7 +436,6 @@
 "Space to +revolve candidates, Shift+Space to +revolve pages" = "Space to +revolve candidates, Shift+Space to +revolve pages";
 "Space to +revolve pages, Shift+Space to +revolve candidates" = "Space to +revolve pages, Shift+Space to +revolve candidates";
 "Space:" = "Space:";
-"Specify the behavior of intonation key when syllable composer is empty." = "Specify the behavior of intonation key when syllable composer is empty.";
 "Starlight" = "Starlight";
 "Stop farting (when typed phonetic combination is invalid, etc.)" = "Stop farting (when typed phonetic combination is invalid, etc.)";
 "Switch to %@ Input Mode" = "Switch to %@ Input Mode";
@@ -455,7 +456,6 @@
 "theSymbols" = "Symbols";
 "This conversion only affects the cassette module, converting typed contents to either Simplified Chinese or Traditional Chinese in accordance with this setting and your current input mode." = "This conversion only affects the cassette module, converting typed contents to either Simplified Chinese or Traditional Chinese in accordance with this setting and your current input mode.";
 "This editor only: Auto-reload modifications happened outside of this editor" = "This editor only: Auto-reload modifications happened outside of this editor";
-"This feature accommodates certain typing mistakes that the intonation mark might be typed at first (which is sequentially wrong from a common sense that intonation marks are supposed to be used for confirming combinations). It won't work if the current parser is of (any) pinyin. Also, this feature won't work when an intonation override is possible (and enabled)." = "This feature accommodates certain typing mistakes that the intonation mark might be typed at first (which is sequentially wrong from a common sense that intonation marks are supposed to be used for confirming combinations). It won't work if the current parser is of (any) pinyin. Also, this feature won't work when an intonation override is possible (and enabled).";
 "This feature requires macOS %@ and above." = "This feature requires macOS %@ and above.";
 "This hinders all client apps from unwelcomely accessing your uncommitted contents in the composition buffer. A popup composition buffer will be shown instead." = "This hinders all client apps from unwelcomely accessing your uncommitted contents in the composition buffer. A popup composition buffer will be shown instead.";
 "This only works when being toggled by Shift key and JIS Eisu key." = "This only works when being toggled by Shift key and JIS Eisu key.";
