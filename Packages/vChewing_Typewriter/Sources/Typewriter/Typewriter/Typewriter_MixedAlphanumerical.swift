@@ -134,6 +134,9 @@ public struct MixedAlphanumericalTypewriter<Handler: InputHandlerProtocol>: Type
       inputText = inputText.lowercased().applyingTransformFW2HW(reverse: false)
     }
     let isPhoneticKeyRaw = handler.composer.inputValidityCheck(charStr: inputText)
+    // 摁 Shift 敲入的 ASCII 不得被記入注音輸入。
+    // 當 Shift 被按住且輸出為 ASCII 可列印字元時，強制視為 ASCII 路徑。
+    let isShiftASCII = input.isShiftHold && visibleInputText.range(of: "^[ -~]$", options: .regularExpression) != nil
 
     // 若當前鍵（含修飾鍵）在標點詞庫有可用項，
     // 視為 CJK 標點輸入，優先回到既有標點管線處理。
@@ -159,12 +162,24 @@ public struct MixedAlphanumericalTypewriter<Handler: InputHandlerProtocol>: Type
 
     guard !input.isControlHold, !input.isOptionHold, !input.isCommandHold else { return nil }
     // 移除對空 buffer 的 Shift+大寫字母提前返回，改由下方統一處理（保留大寫）。
-    let isPhoneticKey = forceASCIIPunctuationPath ? false : isPhoneticKeyRaw
+    let isPhoneticKey = (forceASCIIPunctuationPath || isShiftASCII) ? false : isPhoneticKeyRaw
     let isASCIIPrintable = inputText.range(of: "^[ -~]$", options: .regularExpression) != nil
     guard isPhoneticKey || isASCIIPrintable else { return nil }
 
+    // leading digit / uppercase 阻斷。
+    // ASCII 數字與大寫字母不得被 composer 吸收，確保後續 auto-split 有機會正確切分。
+    let isASCIIDigit = inputText.range(of: "^[0-9]$", options: .regularExpression) != nil
+    let isToneDigit: Bool = {
+      guard isASCIIDigit else { return false }
+      var testComposer = handler.composer
+      testComposer.clear()
+      testComposer.receiveKey(fromString: inputText)
+      return testComposer.hasIntonation(withNothingElse: true)
+    }()
+    let shouldBlockPhoneticAbsorption = (isASCIIDigit && isToneDigit) || isUppercaseLetter
+
     if handler.mixedAlphanumericalBuffer.isEmpty {
-      if isPhoneticKey {
+      if isPhoneticKey, !shouldBlockPhoneticAbsorption {
         handler.composer.receiveKey(fromString: inputText)
       } else {
         handler.composer.clear()
@@ -184,9 +199,12 @@ public struct MixedAlphanumericalTypewriter<Handler: InputHandlerProtocol>: Type
       return true
     }
 
+    // 若 fullInput 包含 ASCII 數字或大寫字母，視為非 fully-parser-covered，
+    // 讓 auto-split 有機會拆出 ASCII 前綴與注音後綴。
+    let fullInputHasUppercase = fullInput.range(of: "[A-Z]", options: .regularExpression) != nil
     let isFullyParserCovered = fullInput.allSatisfy {
       handler.composer.inputValidityCheck(charStr: $0.description)
-    }
+    } && !fullInputHasUppercase
     let shouldPreferASCIIWordPath = shouldPreferASCIIWordPath(fullInput: fullInput)
 
     if isFullyParserCovered, !forceASCIIPunctuationPath, !shouldPreferASCIIWordPath {
