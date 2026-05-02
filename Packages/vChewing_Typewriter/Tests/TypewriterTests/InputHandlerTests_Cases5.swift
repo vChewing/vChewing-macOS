@@ -20,7 +20,7 @@ extension InputHandlerTests {
   // MARK: A) 防禦性注音轉換
 
   @Test
-  func testNarrationDefensivePinyinToBopomofo() throws {
+  func test_IH501_NarrationDefensivePinyinToBopomofo() throws {
     guard let testHandler else {
       Issue.record("Test handler or session is nil.")
       return
@@ -61,7 +61,7 @@ extension InputHandlerTests {
   // MARK: B) 正常組字路徑改以 actualKeys
 
   @Test
-  func testNarrationUsesActualKeysOnComposition() throws {
+  func test_IH502_NarrationUsesActualKeysOnComposition() throws {
     guard let testHandler else {
       Issue.record("Test handler or session is nil.")
       return
@@ -99,7 +99,7 @@ extension InputHandlerTests {
   // MARK: C) 後置聲調覆寫補朗讀
 
   @Test
-  func testRearIntonationOverrideTriggersNarration() throws {
+  func test_IH503_RearIntonationOverrideTriggersNarration() throws {
     guard let testHandler else {
       Issue.record("Test handler or session is nil.")
       return
