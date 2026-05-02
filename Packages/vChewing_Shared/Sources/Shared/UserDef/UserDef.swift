@@ -746,16 +746,16 @@ nonisolated extension UserDef {
         description: "If unchecked, the ESC key will try cleaning the unfinished readings / strokes first, and will commit the current composition buffer if there's no unfinished readings / strokes."
       )
     case .kAcceptLeadingIntonations: return .init(
-        userDef: self, shortTitle: "Accept leading intonations in rare cases",
-        description: "This feature accommodates certain typing mistakes that the intonation mark might be typed at first (which is sequentially wrong from a common sense that intonation marks are supposed to be used for confirming combinations). It won't work if the current parser is of (any) pinyin. Also, this feature won't work when an intonation override is possible (and enabled)."
+        userDef: self, shortTitle: "i18n:UserDef.kAcceptLeadingIntonations.shortTitle",
+        description: "i18n:UserDef.kAcceptLeadingIntonations.description"
       )
     case .kSpecifyIntonationKeyBehavior: return .init(
-        userDef: self, shortTitle: "Intonation Key:",
-        description: "Specify the behavior of intonation key when syllable composer is empty.",
+        userDef: self, shortTitle: "i18n:UserDef.kSpecifyIntonationKeyBehavior.shortTitle",
+        description: "i18n:UserDef.kSpecifyIntonationKeyBehavior.description",
         options: [
-          0: "Override the previous reading's intonation with candidate-reset",
-          1: "Only override the intonation of the previous reading if different",
-          2: "Always type intonations to the inline composition buffer",
+          0: "i18n:UserDef.kSpecifyIntonationKeyBehavior.option.0",
+          1: "i18n:UserDef.kSpecifyIntonationKeyBehavior.option.1",
+          2: "i18n:UserDef.kSpecifyIntonationKeyBehavior.option.2",
         ]
       )
     case .kSpecifyShiftBackSpaceKeyBehavior: return .init(
