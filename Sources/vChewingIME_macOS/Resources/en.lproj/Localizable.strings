@@ -54,7 +54,6 @@
 "Auto-convert traditional Chinese glyphs to JIS Shinjitai characters" = "Auto-convert traditional Chinese glyphs to JIS Shinjitai characters";
 "Auto-convert traditional Chinese glyphs to KangXi characters" = "Auto-convert traditional Chinese glyphs to KangXi characters";
 "auto" = "Follow System Settings";
-"Automatically correct reading combinations when typing" = "Automatically correct reading combinations when typing";
 "Automatically reload user data files if changes detected" = "Automatically reload user data files if changes detected";
 "Basic Keyboard Layout:" = "Basic Keyboard Layout:";
 "Cancel" = "Cancel";
@@ -244,6 +243,8 @@
 "i18n:UserDef.kAllowRescoringSingleKanjiCandidates.shortTitle" = "Allow boosting / excluding a candidate of single kanji";
 "i18n:UserDef.kAlwaysUsePCBWithElectronBasedClients.description" = "Electron-based apps are notorious in unpredictable (buggy) IMKTextInput API interactive behaviors. Most of such apps are unlikely to have their individual issues of such solved correctly on-time due to various out-of-control reasons, hence why this toggle is enabled by default.";
 "i18n:UserDef.kAlwaysUsePCBWithElectronBasedClients.shortTitle" = "Always use popup composition buffer for Electron-based client apps";
+"i18n:UserDef.kAutoCorrectReadingCombination.description" = "This feature is disabled with mixed Chinese-English typing fallback due to compatibility concerns.";
+"i18n:UserDef.kAutoCorrectReadingCombination.shortTitle" = "Automatically correct reading combinations when typing";
 "i18n:UserDef.kBeepSoundPreference.option.0" = "Muted";
 "i18n:UserDef.kBeepSoundPreference.option.1" = "Use OS Settings";
 "i18n:UserDef.kBeepSoundPreference.option.2" = "Use vChewing SFX";
