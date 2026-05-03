@@ -16,7 +16,15 @@ extension LMAssembly {
       do {
         let rawData = jsnEtenDosSequence.data(using: .utf8) ?? .init([])
         let rawJSON = try JSONDecoder().decode([String: [String: String]].self, from: rawData)
-        self.dataMap = rawJSON
+        var dataMapNew = rawJSON
+        if let fung4 = dataMapNew["ㄈㄨㄥˋ"] {
+          fung4.forEach { fKey, fValue in
+            if let existingValue = dataMapNew["ㄈㄥˋ"]?[fKey] {
+              dataMapNew["ㄈㄥˋ", default: [:]][fKey] = existingValue + fValue
+            }
+          }
+        }
+        self.dataMap = dataMapNew
         self.sortedKeys = rawJSON.keys.sorted {
           if $0.count == $1.count { return $0 < $1 }
           return $0.count < $1.count
