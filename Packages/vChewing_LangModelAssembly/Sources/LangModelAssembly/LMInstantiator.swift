@@ -496,6 +496,13 @@ extension LMAssembly {
 
       if !config.isCassetteEnabled
         || (config.isCassetteEnabled && (keyArray.first?.hasPrefix("_") ?? false)) {
+        if config.isSCPCEnabled || config.alwaysSupplyETenDOSUnigrams,
+           keyArray.count == 1,
+           let firstKey = keyArray.first,
+           Self.lmPlainBopomofo.hasValuesFor(key: firstKey) {
+          return true
+        }
+
         if hasFactoryCoreUnigramsFor(keyArray: keyArray) { return true }
 
         if !factoryUnigramsFor(key: keyChain, keyArray: keyArray, entryType: .nonKanji).isEmpty {
