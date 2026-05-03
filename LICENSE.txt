@@ -3,7 +3,8 @@ NOTE: 1) Homa Compositor uses LGPLv3 license with exceptions for static linking 
 vChewing macOS: MIT-NTL License
 
 © 2021 and onwards The vChewing Project.
-vChewing macOS Development: Shiki Suen, Isaac Xen, Hiraku Wang, etc.
+vChewing macOS Development: Shiki Suen.
+Previous development reinforcers (v1.x): Isaac Xen and Hiraku Wang.
 vChewing Phrase Database Maintained by Shiki Suen.
 
 Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software"), to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:
