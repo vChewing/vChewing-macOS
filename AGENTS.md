@@ -61,7 +61,7 @@ Reference `algorithm.md` for the deep algorithm write-up (zh-Hant).
 - **Conditional APIs**: Guard platform-specific code (`#if canImport(Darwin)`) as needed; keep Linux compatibility in `Typewriter` package and its local dependnecies.
 - **Bundle resources**: SPM `#bundle` macro expands to `Bundle.module` from the auto-generated accessor. For packages with runtime resource lookup (e.g., `LangModelAssembly`), use custom `Bundle.currentSPM` accessor that checks `resourceURL` first, then falls back to `bundleURL`. This avoids codesign sand­box violations from files at `.app/` root.
 - **ObjC(++)/C(+=) style**: Follow Google Style Guide formatting for Objective-C(++) and C(++).
-- **Licensing**: Preserve MIT-NTL banners. Respect LGPL for Homa, Megrez legacy sources, and Tekkon; avoid mixing incompatible license assets.
+- **Licensing**: Preserve MIT-NTL banners. Respect LGPL for Homa, Megrez legacy sources (if exists), and Tekkon; avoid mixing incompatible license assets.
 - **Lexicon tooling**: Factory lexicons are compiled by remote `VanguardTextMapPlugin` (Swift Package plugin from `vChewing-VanguardLexicon` repository) and injected into `vChewing_MainAssembly4Darwin` at build-time via SPM build plugins. The runtime backend is `VanguardTrie.TextMapTrie` (sorted-array key index with binary search, on-demand VALUES parsing, bounded parsed-entry cache). Do not modify or commit generated lexicon assets; they are transient build artifacts.
 
 ## 6. Testing Expectations
