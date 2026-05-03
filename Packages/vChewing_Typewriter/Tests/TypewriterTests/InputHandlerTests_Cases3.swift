@@ -60,7 +60,7 @@ extension InputHandlerTests {
     testSession.switchState(testHandler.generateStateOfCandidates())
     let candidates1 = testSession.state.candidates.map(\.value).prefix(4)
     #expect(Array(candidates1) == ["留意", "流溢", "流易", "流議"])
-    // 觸發選字窗選擇「流易」，該字詞在 Megrez 內的的頻分權重由常規區間（ -9.5 <= x <= 0）升至 114_514。
+    // 觸發選字窗選擇「流易」，該字詞在 Homa 內的的頻分權重由常規區間（ -9.5 <= x <= 0）升至 114_514。
     testSession.candidatePairSelectionConfirmed(at: 2) // 「流易」
     #expect(testHandler.assembler.assembledSentence.map(\.value).joined() == "流易")
     #expect(testSession.state.displayedText == "流易")

@@ -1,4 +1,4 @@
-补记：1) Megrez Compositor (天权星组字引擎) 自 v4 起使用 LGPLv3 授权，但对于 Swift 专案中的静态链接有例外。2) 唯音输入法使用了《先锋语料库 (Vanguard Corpus)》，该语料库由多个外部资源数据组成，这些数据的来源在其 GitHub 储存库 (`vChewing/libvchewing-data`) 中有列出。先锋语料库的资料建置程式借由 3-Clause BSD 授权释出。
+补记：1) Homa Compositor (护摩组字引擎) 使用 LGPLv3 授权，但对于 Swift 专案中的静态链接有例外。2) 唯音输入法使用了《先锋语料库 (Vanguard Corpus)》，该语料库由多个外部资源数据组成，这些数据的来源在其 GitHub 储存库 (`vChewing/libvchewing-data`) 中有列出。先锋语料库的资料建置程式借由 3-Clause BSD 授权释出。
 
 vChewing macOS: MIT-NTL License 麻理（去商标）授权合约
 
