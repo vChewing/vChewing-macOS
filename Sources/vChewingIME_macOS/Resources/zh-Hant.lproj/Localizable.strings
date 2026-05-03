@@ -54,7 +54,6 @@
 "Auto-convert traditional Chinese glyphs to JIS Shinjitai characters" = "自動將繁體中文字轉為日文 JIS 新字體";
 "Auto-convert traditional Chinese glyphs to KangXi characters" = "自動將繁體中文字轉為康熙正體字";
 "auto" = "與系統設定一致";
-"Automatically correct reading combinations when typing" = "敲字時自動糾正讀音組合";
 "Automatically reload user data files if changes detected" = "自動偵測並載入使用者語彙檔案變更";
 "Basic Keyboard Layout:" = "基礎鍵盤佈局:";
 "Cancel" = "取消";
@@ -244,6 +243,8 @@
 "i18n:UserDef.kAllowRescoringSingleKanjiCandidates.shortTitle" = "允許對單個漢字進行升權或排除";
 "i18n:UserDef.kAlwaysUsePCBWithElectronBasedClients.description" = "基於 Electron 技術構建的客體往往臭名昭彰於各自的對 IMKTextInput API 的「行為難以預測、難以保證」的實作上。更糟糕的是，這類 App 的開發者們均有著各自的不可控的原因、而難以保證他們的 App 的這種問題能被及時地、妥當地解決。這也是為什麼這個開關在預設情況下處於開啟狀態。";
 "i18n:UserDef.kAlwaysUsePCBWithElectronBasedClients.shortTitle" = "對基於 Electron 技術構建的客體軟體一律強制啟用浮動組字窗";
+"i18n:UserDef.kAutoCorrectReadingCombination.description" = "該功能在中英混合輸入回退時不起作用，以確保相容性。";
+"i18n:UserDef.kAutoCorrectReadingCombination.shortTitle" = "敲字時自動糾正讀音組合";
 "i18n:UserDef.kBeepSoundPreference.option.0" = "靜音";
 "i18n:UserDef.kBeepSoundPreference.option.1" = "使用系統音效";
 "i18n:UserDef.kBeepSoundPreference.option.2" = "使用唯音音效";

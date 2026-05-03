@@ -54,7 +54,6 @@
 "Auto-convert traditional Chinese glyphs to JIS Shinjitai characters" = "入力した繁体字を日文 JIS 新字体と自動変換";
 "Auto-convert traditional Chinese glyphs to KangXi characters" = "入力した繁体字を康熙字体と自動変換";
 "auto" = "システム設定に準ず";
-"Automatically correct reading combinations when typing" = "入力中で打ち間違った発音組み合わせを自動的に訂正する";
 "Automatically reload user data files if changes detected" = "ユーザー辞書データの変更を自動検出し、自動的に再読込";
 "Basic Keyboard Layout:" = "基礎キーボード:";
 "Cancel" = "取り消す";
@@ -243,6 +242,8 @@
 "i18n:UserDef.kAllowRescoringSingleKanjiCandidates.shortTitle" = "排除/最優先にできる候補の文字数の最低限は１字とする";
 "i18n:UserDef.kAlwaysUsePCBWithElectronBasedClients.description" = "ほとんどの「Electron で構築したアプリ」は IMKTextInput API の実作についての支障があり、その実作した API の挙動は予測できなくて、バグ退治もとても困難だと考えられています。このようなアプリの開発者たちにもそれぞれの原因でこのような支障を解決する策も動力も極めて少ないと認識されております。故に、このスイッチの最初値はONにしました。";
 "i18n:UserDef.kAlwaysUsePCBWithElectronBasedClients.shortTitle" = "Electron で構築した全ての客体アプリに「吹き出し入力緩衝列ウィンドウ」を強制的に起用";
+"i18n:UserDef.kAutoCorrectReadingCombination.description" = "互換性のため、中英混在入力のフォールバックがONの場合、この機能は不作動。";
+"i18n:UserDef.kAutoCorrectReadingCombination.shortTitle" = "入力中で打ち間違った発音組み合わせを自動的に訂正する";
 "i18n:UserDef.kBeepSoundPreference.option.0" = "鳴らず";
 "i18n:UserDef.kBeepSoundPreference.option.1" = "システムSFXを使用";
 "i18n:UserDef.kBeepSoundPreference.option.2" = "唯音SFXを使用";
