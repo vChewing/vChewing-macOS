@@ -3,7 +3,8 @@
 vChewing macOS: ＭＩＴ商標不許可ライセンス (MIT-NTL License)
 
 © 2021 and onwards The vChewing Project.
-macOS 版唯音の開発：Shiki Suen, Isaac Xen, Hiraku Wang, など。
+macOS 版唯音の開発：Shiki Suen。
+先代開発協力者 (v1.x)：Isaac Xen と Hiraku Wang。
 唯音語彙データの維持：Shiki Suen。
 
 以下に定める条件に従い、本ソフトウェアおよび関連文書のファイル（以下「ソフトウェア」）の複製を取得するすべての人に対し、ソフトウェアを無制限に扱うことを無償で許可します。これには、ソフトウェアの複製を使用、複写、変更、結合、掲載、頒布、サブライセンス、および/または販売する権利、およびソフトウェアを提供する相手に同じことを許可する権利も無制限に含まれます。
