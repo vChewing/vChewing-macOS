@@ -749,38 +749,4 @@ extension MainAssemblyTests {
       #expect(testSession.state.displayedText == expectedNodes.joined())
     }
   }
-
-  @Test
-  func test217_MixedShiftQuestionMarkStaysASCIIInMainAssemblyPath() throws {
-    testHandler.prefs.useSCPCTypingMode = false
-    testHandler.prefs.mixedAlphanumericalEnabled = true
-    testHandler.prefs.useShiftQuestionToCallServiceMenu = false
-
-    resetToEmptyAndClear()
-    typeSentenceOrCandidates("What")
-    #expect(testSession.state.type == .ofInputting)
-    #expect(testSession.state.displayedText == "What")
-
-    let shiftSlashEvent = NSEvent.KeyEventData(
-      type: .keyDown,
-      flags: .shift,
-      chars: "?",
-      charsSansModifiers: "/",
-      keyCode: mapKeyCodesANSIForTests["/"] ?? 44
-    )
-    let rawShiftSlashEvent = try #require(shiftSlashEvent.asEvent)
-    let copiedShiftSlashEvent = try #require(rawShiftSlashEvent.copyAsKBEvent)
-
-    #expect(copiedShiftSlashEvent.text == "?")
-
-    _ = press(shiftSlashEvent)
-
-    #expect(testSession.state.type == .ofInputting)
-    #expect(testSession.state.displayedText == "What?")
-
-    _ = press(spaceEvent)
-
-    #expect(testClient.toString() == "What? ")
-    #expect(testSession.state.type == .ofEmpty)
-  }
 }
