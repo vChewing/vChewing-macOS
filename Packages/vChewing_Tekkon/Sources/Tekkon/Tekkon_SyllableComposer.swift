@@ -131,7 +131,8 @@ extension Tekkon {
     // 該函式僅用來獲取給 macOS InputMethod Kit 的內文組字區使用的顯示字串。
     /// - Parameters:
     ///   - isHanyuPinyin: 是否將輸出結果轉成漢語拼音。
-    public func getInlineCompositionForDisplay(isHanyuPinyin: Bool = false) -> String {
+    public mutating func getInlineCompositionForDisplay(isHanyuPinyin: Bool = false) -> String {
+      _refreshRomajiBufferIfNeeded()
       guard isPinyinMode else { return getComposition(isHanyuPinyin: isHanyuPinyin) }
       var toneReturned = ""
       switch intonation.value {
@@ -153,6 +154,7 @@ extension Tekkon {
       vowel.clear()
       intonation.clear()
       romajiBuffer = ""
+      _needsRomajiUpdate = false
     }
 
     // MARK: - Public Functions
@@ -231,6 +233,7 @@ extension Tekkon {
         intonation = Phonabet(theTone)
       } else {
         // 為了防止 romajiBuffer 越敲越長帶來算力負擔，這裡讓它在要溢出時自動丟掉最早輸入的音頭。
+        _refreshRomajiBufferIfNeeded()
         let maxCount: Int = (parser == .ofWadeGilesPinyin) ? 7 : 6
         if romajiBuffer.count > maxCount - 1 {
           romajiBuffer = String(romajiBuffer.dropFirst())
@@ -238,6 +241,7 @@ extension Tekkon {
         let romajiBufferBackup = romajiBuffer + String(Character(input))
         receiveSequence(romajiBufferBackup, isRomaji: true)
         romajiBuffer = romajiBufferBackup
+        _needsRomajiUpdate = false
       }
     }
 
@@ -283,6 +287,7 @@ extension Tekkon {
       guard !romaji.isEmpty else { return }
       receiveSequence(romaji, isRomaji: true)
       romajiBuffer = romaji
+      _needsRomajiUpdate = false
     }
 
     /// 接受傳入的按鍵訊號時的處理，處理對象為 UniChar。
@@ -389,11 +394,13 @@ extension Tekkon {
     ///
     /// 基本上就是按順序從游標前方開始往後刪。
     public mutating func doBackSpace() {
+      _refreshRomajiBufferIfNeeded()
       if isPinyinMode, !romajiBuffer.isEmpty {
         if !intonation.isEmpty {
           intonation.clear()
         } else {
           romajiBuffer = String(romajiBuffer.dropLast())
+          _needsRomajiUpdate = false
         }
       } else if !intonation.isEmpty {
         intonation.clear()
@@ -799,10 +806,9 @@ extension Tekkon {
       return strReturn
     }
 
-    /// 按需更新拼音組音區的內容顯示。
+    /// 按需更新拼音組音區的內容顯示（延遲計算）。
     internal mutating func updateRomajiBuffer() {
-      romajiBuffer = Tekkon
-        .cnvPhonaToHanyuPinyin(targetJoined: consonant.value + semivowel.value + vowel.value)
+      _needsRomajiUpdate = true
     }
 
     /// 自我變換單個注音資料值。
@@ -820,6 +826,22 @@ extension Tekkon {
       default: return
       }
       receiveKey(fromPhonabet: strWith)
+    }
+
+    // MARK: Private
+
+    // Lazy romaji buffer.
+    /// 追蹤 romajiBuffer 是否需要從聲介韻重建。
+    /// 當 phonabet 槽位變更時設為 true，讀取 romajiBuffer 前若為 true 則先重建。
+    private var _needsRomajiUpdate = true
+
+    /// 若 romajiBuffer 需要重建（phonabet 槽位已變更但尚未反映到 romajiBuffer），
+    /// 則從當前的聲介韻重新計算並寫入 romajiBuffer。
+    private mutating func _refreshRomajiBufferIfNeeded() {
+      guard _needsRomajiUpdate else { return }
+      romajiBuffer = Tekkon
+        .cnvPhonaToHanyuPinyin(targetJoined: consonant.value + semivowel.value + vowel.value)
+      _needsRomajiUpdate = false
     }
   }
 }
