@@ -50,15 +50,103 @@ public struct MixedAlphanumericalTypewriter<Handler: InputHandlerProtocol>: Type
         fullInput: handler.mixedAlphanumericalBuffer,
         minimumOverwriteCount: 1
       )
-      if !shouldPreferASCIIWordOnSpace, tryAutoSplitASCIIAndPhoneticSuffix(
-        fullInput: handler.mixedAlphanumericalBuffer + " ",
-        inputInvalid: false,
-        session: session,
-        requiresWordLikePrefix: true
-      ) {
-        return true
+      // shouldPreferASCIIWordPath 會阻斷 auto-split，以防止 tod / film 等英文詞被誤拆為注音。
+      // 但該啟發式也會誤傷 mixed 輸入（如 aiq / aijo6）。
+      // 若前兩個字元本身即可組成佔用 >= 2 個注拼槽且詞庫有命中的讀音，
+      // 則更可能是 mixed 輸入（如 ai=ㄇㄛ），此時仍應嘗試 auto-split。
+      // 反之若前兩字僅佔 1 槽（如 he=ㄍ）或無詞庫命中（如 to=ㄔㄟ），
+      // 則維持 ASCII 提交（保護 tod / film / hell 等）。
+      let twoCharPrefixIsPhonetic: Bool = {
+        let buffer = handler.mixedAlphanumericalBuffer
+        guard buffer.count >= 3 else { return false }
+        let prefix = String(buffer.prefix(2))
+        guard prefix.range(of: "[A-Za-z]", options: .regularExpression) != nil else { return false }
+        var trialComposer = handler.composer
+        trialComposer.clear()
+        trialComposer.receiveSequence(prefix, isRomaji: false)
+        guard let readingKey = trialComposer.phonabetKeyForQuery(pronounceableOnly: true) else {
+          return false
+        }
+        let occupiedSlots = [
+          trialComposer.consonant.value,
+          trialComposer.semivowel.value,
+          trialComposer.vowel.value,
+        ].filter { !$0.isEmpty }.count
+        let hasUnigrams = !handler.currentLM.unigramsFor(keyArray: [readingKey]).isEmpty
+        return occupiedSlots >= 2 && hasUnigrams
+      }()
+      // 當 buffer 完全是合法注音按鍵且無大寫字母，且整段長度不超過單一音節鍵位上限，
+      // 且 composer 內容可發音，則整段視為單一注音，優先走 BPMF 全匹配路徑。
+      // 這防止 auto-split 將純注音序列（如 "1u," = ㄅㄧㄝ）誤拆為
+      // ASCII 前綴 + 注音後綴（如 "1u" + ㄝ），導致音節被撕裂。
+      let bufferIsSingleSyllablePhonetic: Bool = {
+        let buffer = handler.mixedAlphanumericalBuffer
+        guard buffer.count >= 1, buffer.count <= maxSingleSyllableKeyCount else { return false }
+        let hasUppercase = buffer.range(of: "[A-Z]", options: .regularExpression) != nil
+        guard !hasUppercase else { return false }
+        let isFullyParserCovered = buffer.allSatisfy {
+          handler.composer.inputValidityCheck(charStr: $0.description)
+        }
+        guard isFullyParserCovered else { return false }
+        // dachen26 碼長不定（4 或 5），暫時不啟用此檢查。
+        guard handler.composer.parser != .ofDachen26 else { return false }
+        var trialComposer = handler.composer
+        trialComposer.clear()
+        trialComposer.receiveSequence(buffer, isRomaji: false)
+        guard trialComposer.isPronounceable else { return false }
+        // 對於非 dachen26 排列，檢查鍵位數量與 composer 內有效 slot 數量是否一致。
+        // 若一致，表示無 destructive overwrite，整段為單一音節。
+        let occupiedSlotCount = [
+          trialComposer.consonant.value,
+          trialComposer.semivowel.value,
+          trialComposer.vowel.value,
+          trialComposer.intonation.value,
+        ].filter { !$0.isEmpty }.count
+        return buffer.count == occupiedSlotCount
+      }()
+      // 優先嘗試 BPMF 全匹配：當 buffer 可視為單一注音時，
+      // 避免 auto-split 將音節撕裂。若 BPMF 失敗，仍回退到 auto-split。
+      if !shouldPreferASCIIWordOnSpace, bufferIsSingleSyllablePhonetic {
+        let originalMixedBuffer = handler.mixedAlphanumericalBuffer
+        var typewriter = BPMFFullMatchTypewriter(handler)
+        typewriter.isToneOverrideEnabled = { false }
+        typewriter.isLeadingIntonationAccepted = { false }
+        typewriter.onLexiconMatchFailure = { injectedHandler, _, injectedSession in
+          // 辭典查詢無結果時，回退為直接提交中文段 + ASCII buffer + 空白。
+          guard !originalMixedBuffer.isEmpty else { return nil }
+          let chineseText = injectedHandler.committableDisplayText(sansReading: true)
+          let asciiText = originalMixedBuffer + " "
+          injectedHandler.composer.clear()
+          injectedHandler.mixedAlphanumericalBuffer.removeAll()
+          injectedSession.switchState(State.ofCommitting(textToCommit: chineseText + asciiText))
+          return true
+        }
+        handler.mixedAlphanumericalBuffer.removeAll()
+        let handled = typewriter.handle(input)
+        if handled == true { return true }
+        // BPMF 失敗，恢復 buffer 並繼續嘗試 auto-split
+        handler.mixedAlphanumericalBuffer = originalMixedBuffer
       }
-      if !handler.composer.isEmpty, !shouldPreferASCIIWordOnSpace {
+      if !shouldPreferASCIIWordOnSpace || twoCharPrefixIsPhonetic {
+        // 先嘗試無 word-like 限制的 auto-split（fallback），以正確保留常見雙字母前綴（如 ai）。
+        // 若 fallback 失敗，再嘗試 word-like 限制，以支援 hello你好 類型混輸。
+        if tryAutoSplitASCIIAndPhoneticSuffix(
+          fullInput: handler.mixedAlphanumericalBuffer + " ",
+          inputInvalid: false,
+          session: session
+        ) {
+          return true
+        }
+        if tryAutoSplitASCIIAndPhoneticSuffix(
+          fullInput: handler.mixedAlphanumericalBuffer + " ",
+          inputInvalid: false,
+          session: session,
+          requiresWordLikePrefix: true
+        ) {
+          return true
+        }
+      }
+      if !handler.composer.isEmpty, !shouldPreferASCIIWordOnSpace, !twoCharPrefixIsPhonetic {
         let originalMixedBuffer = handler.mixedAlphanumericalBuffer
         var typewriter = BPMFFullMatchTypewriter(handler)
         typewriter.isToneOverrideEnabled = { false }
@@ -190,13 +278,31 @@ public struct MixedAlphanumericalTypewriter<Handler: InputHandlerProtocol>: Type
     }
 
     let fullInput = handler.mixedAlphanumericalBuffer + inputText
-    if !forceASCIIPunctuationPath, tryAutoSplitASCIIAndPhoneticSuffix(
-      fullInput: fullInput,
-      inputInvalid: input.isInvalid,
-      session: session,
-      requiresWordLikePrefix: true
-    ) {
-      return true
+
+    // 決定處理順序：長後綴優先 auto-split，短後綴優先整段注音。
+    // 這可正確區分 aijo6（ai + jo6，後綴 3 碼）與 xu.6（整段 ㄌㄧㄡˊ，後綴 2 碼）。
+    let longSuffixCandidate = bestAutoSplitCandidate(
+      fullInputChars: Array(fullInput),
+      requiresWordLikePrefix: false
+    )
+    let hasLongSuffix = (longSuffixCandidate?.suffixLength ?? 0) >= 3
+
+    if hasLongSuffix {
+      if !forceASCIIPunctuationPath, tryAutoSplitASCIIAndPhoneticSuffix(
+        fullInput: fullInput,
+        inputInvalid: input.isInvalid,
+        session: session
+      ) {
+        return true
+      }
+      if !forceASCIIPunctuationPath, tryAutoSplitASCIIAndPhoneticSuffix(
+        fullInput: fullInput,
+        inputInvalid: input.isInvalid,
+        session: session,
+        requiresWordLikePrefix: true
+      ) {
+        return true
+      }
     }
 
     // 若 fullInput 包含 ASCII 數字或大寫字母，視為非 fully-parser-covered，
@@ -224,30 +330,60 @@ public struct MixedAlphanumericalTypewriter<Handler: InputHandlerProtocol>: Type
       }()
 
       if !isLeadingToneBlocked, trialComposer.isPronounceable {
+        let occupiedSlotCount = [
+          trialComposer.consonant.value,
+          trialComposer.semivowel.value,
+          trialComposer.vowel.value,
+          trialComposer.intonation.value,
+        ].filter { !$0.isEmpty }.count
+        let hasNoDestructiveOverwrite = fullInput.count == occupiedSlotCount
+
         if trialComposer.hasIntonation() {
           if let readingKey = trialComposer.phonabetKeyForQuery(
             pronounceableOnly: true
           ), handler.currentLM.hasUnigramsForFast(keyArray: [readingKey]) {
-            handler.composer = trialComposer
-            guard !input.isInvalid, (try? handler.assembler.insertKey(readingKey)) != nil else {
-              errorCallback("3CF278C9-B: 得檢查對應的語言模組的 hasUnigramsFor() 是否有誤判之情形。")
+            // 當 fullInput 超過單一注音音節的最大鍵位數時，trialComposer 只能保留
+            // 最後一個音節，前面的鍵位會被無聲覆寫。此時應優先讓 auto-split 處理，
+            // 避免將「ASCII 前綴 + 注音後綴」的 mixed 輸入誤吞為單一音節。
+            // 同樣地，若鍵位數與實際佔用槽數不一致（destructive overwrite），
+            // 也表示前面的 ASCII 前綴被 composer 誤吸收了，應交給 auto-split 處理。
+            if fullInput.count <= maxSingleSyllableKeyCount,
+               hasNoDestructiveOverwrite {
+              handler.composer = trialComposer
+              guard !input.isInvalid, (try? handler.assembler.insertKey(readingKey)) != nil else {
+                errorCallback("3CF278C9-B: 得檢查對應的語言模組的 hasUnigramsFor() 是否有誤判之情形。")
+                return true
+              }
+
+              let textToCommit = handler.commitOverflownComposition
+              handler.retrievePOMSuggestions(apply: true)
+              handler.composer.clear()
+              handler.mixedAlphanumericalBuffer.removeAll()
+
+              var inputting = handler.generateStateOfInputting()
+              inputting.textToCommit = textToCommit
+              session.switchState(inputting)
+              handler.handleTypewriterSCPCTasks()
               return true
             }
-
-            let textToCommit = handler.commitOverflownComposition
-            handler.retrievePOMSuggestions(apply: true)
-            handler.composer.clear()
-            handler.mixedAlphanumericalBuffer.removeAll()
-
-            var inputting = handler.generateStateOfInputting()
-            inputting.textToCommit = textToCommit
-            session.switchState(inputting)
-            handler.handleTypewriterSCPCTasks()
+          }
+          // 整段可發音但詞庫查無結果時，若整段為單一音節（無 destructive overwrite），
+          // 保留 composer 狀態、不嘗試 auto-split，避免純注音序列被誤拆。
+          // 反之則讓 auto-split 有機會拆出「ASCII 前綴 + 注音後綴」以支援 hello你好 類型混輸。
+          // 修正：即使無 destructive overwrite，若詞庫查無結果，仍應讓 auto-split 嘗試拆分，
+          // 以避免 mixed 輸入中的假合法組合（如 aiu3 → ㄇㄧㄛˇ）被誤保留。
+          if hasNoDestructiveOverwrite,
+             handler.composer.parser != .ofDachen26,
+             let readingKey = trialComposer.phonabetKeyForQuery(pronounceableOnly: true),
+             handler.currentLM.hasUnigramsForFast(keyArray: [readingKey]) {
+            handler.composer = trialComposer
+            handler.mixedAlphanumericalBuffer = fullInput
+            session.switchState(handler.generateStateOfInputting())
             return true
           }
-          // 整段可發音但詞庫查無結果時，不提早返回，讓 auto-split 有機會拆出
-          // 「ASCII 前綴 + 注音後綴」以支援 hello你好 這類 mixed 輸入。
-        } else {
+        } else if hasNoDestructiveOverwrite,
+                  let readingKey = trialComposer.phonabetKeyForQuery(pronounceableOnly: false),
+                  handler.currentLM.hasUnigramsForFast(keyArray: [readingKey]) {
           handler.composer = trialComposer
           handler.mixedAlphanumericalBuffer = fullInput
           session.switchState(handler.generateStateOfInputting())
@@ -283,6 +419,15 @@ public struct MixedAlphanumericalTypewriter<Handler: InputHandlerProtocol>: Type
     let prefersLongerPureAlnumSuffix: Bool
   }
 
+  // Tekkon 的單一注音音節最多只會佔用 4 個鍵位（聲、介、韻、調）。
+  private var maxSingleSyllableKeyCount: Int {
+    switch handler.composer.parser {
+    case .ofDachen26: 6 // 這是酷音大千26鍵的顯著缺點。
+    case .ofETen26: 5 // 僅一例：`ㄍㄧㄠˊ → vezf`。
+    default: 4 // 其餘所有注音排列，無論動態還是靜態排列，最大碼長均為 4。
+    }
+  }
+
   @inline(__always)
   private func isPunctCharOrSymbol(_ scalar: String.UnicodeScalarView.Element) -> Bool {
     CharacterSet.punctuationCharacters.contains(scalar) || CharacterSet.symbols.contains(scalar)
@@ -313,8 +458,29 @@ public struct MixedAlphanumericalTypewriter<Handler: InputHandlerProtocol>: Type
     // 若多個 raw suffix 最終對應到同一個 reading key，
     // 代表較長者只是用多餘鍵位覆寫出同一個結果，應保留最短 raw suffix。
     // 額外保守排除含 separator / 空白的怪異 query key，避免把多段 key 當成單筆讀音。
-    let maxSingleSyllableKeyCount = 4
     let maxSuffixLength = min(maxSingleSyllableKeyCount, fullInputChars.count - 1)
+    // 重用單一 trial composer 以減少 struct 複製與 heap 分配。
+    var sharedComposer = handler.composer
+    // 計算開頭的「被阻斷 ASCII 前綴」長度（大寫字母與聲調數字鍵）。
+    // 這些鍵位在 buffer 為空時不會被 composer 吸收，理應視為固定 ASCII 前綴。
+    let blockedPrefixLength: Int = {
+      var length = 0
+      for char in fullInputChars {
+        let charStr = char.description
+        let isUppercase = charStr.range(of: "^[A-Z]$", options: .regularExpression) != nil
+        let isToneDigit: Bool = {
+          sharedComposer.clear()
+          sharedComposer.receiveKey(fromString: charStr)
+          return sharedComposer.hasIntonation(withNothingElse: true)
+        }()
+        if isUppercase || isToneDigit {
+          length += 1
+        } else {
+          break
+        }
+      }
+      return length
+    }()
     var candidateByReadingKey: [String: AutoSplitCandidate] = [:]
 
     for suffixLength in 1 ... maxSuffixLength {
@@ -326,7 +492,8 @@ public struct MixedAlphanumericalTypewriter<Handler: InputHandlerProtocol>: Type
         suffixLength: suffixLength,
         prefixText: prefixText,
         suffixText: suffixText,
-        requiresWordLikePrefix: requiresWordLikePrefix
+        requiresWordLikePrefix: requiresWordLikePrefix,
+        trialComposer: &sharedComposer
       ) else { continue }
 
       if let existing = candidateByReadingKey[candidate.readingKey] {
@@ -338,26 +505,72 @@ public struct MixedAlphanumericalTypewriter<Handler: InputHandlerProtocol>: Type
       }
     }
 
-    return candidateByReadingKey.values.max(by: {
-      if $0.prefersDigitLeadingSuffix != $1.prefersDigitLeadingSuffix {
-        return !$0.prefersDigitLeadingSuffix && $1.prefersDigitLeadingSuffix
+    // 選擇最長的有效後綴，但前綴長度必須滿足最小限制：
+    // - 若開頭有被阻斷鍵（大寫/聲調數字），最小前綴長度 = 被阻斷段落長度。
+    // - 若前綴含有英文字母，最小前綴長度 = 2。這避免單一字母（如 a=ㄇ）被誤認為
+    //   ASCII 前綴，同時保留常見雙字母前綴（如 ai）於 mixed 輸入中的 ASCII 語義。
+    // - 若前綴僅含數字與符號（皆為大千鍵盤下的合法注音鍵），最小前綴長度 = 1，
+    //   使「5k4」等純注音輸入仍可正確以整段注音路徑處理。
+    let validCandidates = candidateByReadingKey.values.filter { candidate in
+      if blockedPrefixLength > 0 {
+        return candidate.prefixText.count >= blockedPrefixLength
+      }
+      let hasASCIILetter = candidate.prefixText.range(
+        of: "[A-Za-z]", options: .regularExpression
+      ) != nil
+      let hasOnlyDigits = !hasASCIILetter
+        && candidate.prefixText.range(of: "[0-9]", options: .regularExpression) != nil
+      let requiredMinLength = hasASCIILetter || hasOnlyDigits ? 2 : 1
+      return candidate.prefixText.count >= requiredMinLength
+    }
+
+    return validCandidates.max(by: {
+      let lhsDigitLeading = $0.prefersDigitLeadingSuffix
+      let rhsDigitLeading = $1.prefersDigitLeadingSuffix
+      if lhsDigitLeading != rhsDigitLeading {
+        let digitLeadingCandidate = lhsDigitLeading ? $0 : $1
+        let nonDigitLeadingCandidate = lhsDigitLeading ? $1 : $0
+        // 僅當 digit-leading 後綴長度 >= 非 digit-leading 後綴時，
+        // 才優先 digit-leading（保留 This5jp3 行為）。
+        // 否則優先非 digit-leading（避免 ainj03 被誤拆為 ai + ㄢˇ）。
+        if digitLeadingCandidate.suffixLength >= nonDigitLeadingCandidate.suffixLength {
+          return !lhsDigitLeading && rhsDigitLeading
+        } else {
+          return lhsDigitLeading && !rhsDigitLeading
+        }
       }
       if $0.prefersLongerPureAlnumSuffix, $1.prefersLongerPureAlnumSuffix,
          $0.suffixLength != $1.suffixLength {
         return $0.suffixLength < $1.suffixLength
       }
-      if $0.bestProbability != $1.bestProbability {
-        return $0.bestProbability < $1.bestProbability
+      let lhsPrefixWordLike = isWordLikeASCIIPrefix($0.prefixText)
+      let rhsPrefixWordLike = isWordLikeASCIIPrefix($1.prefixText)
+      let bothWordLike = lhsPrefixWordLike && rhsPrefixWordLike
+      // 若雙方前綴皆為 word-like，優先以概率排序（保留 Twinsu.4 行為）。
+      // 否則優先以後綴長度排序（保留 aizj/4 與 aijo6 行為）。
+      if bothWordLike {
+        if $0.bestProbability != $1.bestProbability {
+          return $0.bestProbability < $1.bestProbability
+        }
+      } else {
+        if $0.suffixLength != $1.suffixLength {
+          return $0.suffixLength < $1.suffixLength
+        }
+        if $0.bestProbability != $1.bestProbability {
+          return $0.bestProbability < $1.bestProbability
+        }
       }
       return $0.suffixLength < $1.suffixLength
     })
   }
 
+  // 接受 inout trialComposer 以在 bestAutoSplitCandidate 的迴圈中重用。
   private func buildAutoSplitCandidate(
     suffixLength: Int,
     prefixText: String,
     suffixText: String,
-    requiresWordLikePrefix: Bool
+    requiresWordLikePrefix: Bool,
+    trialComposer: inout Tekkon.Composer
   )
     -> AutoSplitCandidate? {
     let prefixHasASCIIAlnum = prefixText.range(of: "[A-Za-z0-9]", options: .regularExpression) != nil
@@ -373,20 +586,29 @@ public struct MixedAlphanumericalTypewriter<Handler: InputHandlerProtocol>: Type
       return nil
     }
 
-    var trialComposer = handler.composer
-    trialComposer.clear()
-    trialComposer.receiveSequence(suffixText, isRomaji: false)
+    let suffixEndsWithSpace = suffixText.hasSuffix(" ")
+    let effectiveSuffixText = suffixEndsWithSpace ? String(suffixText.dropLast()) : suffixText
 
     // Mixed mode 永遠不接受聲調前置鍵入。
-    // 後綴不能以獨立聲調鍵作為首鍵。
-    if let firstChar = suffixText.first?.description {
-      var firstKeyTest = handler.composer
-      firstKeyTest.clear()
-      firstKeyTest.receiveKey(fromString: firstChar)
-      if firstKeyTest.hasIntonation(withNothingElse: true) { return nil }
+    // 後綴不能以獨立聲調鍵作為首鍵（在 receiveSequence 前先檢查，避免破壞 composer 狀態）。
+    if let firstChar = effectiveSuffixText.first?.description {
+      trialComposer.clear()
+      trialComposer.receiveKey(fromString: firstChar)
+      if trialComposer.hasIntonation(withNothingElse: true) { return nil }
     }
 
-    guard trialComposer.isPronounceable, trialComposer.hasIntonation() else {
+    trialComposer.clear()
+    // 在評估 mixed 輸入時，暫時停用自動糾正。否則 auto-correct 會讓不同的 suffix
+    // 坍縮到同一個 reading key（例如「zj/4」被糾正為「ㄈㄥˋ」而與「z/4」相同），
+    // 導致 dedup 誤刪較長的合法 suffix，使 ASCII prefix 被錯誤拉長。
+    trialComposer.phonabetCombinationCorrectionEnabled = false
+    trialComposer.receiveSequence(effectiveSuffixText, isRomaji: false)
+
+    // Space handler 會以「buffer + " "」呼叫 auto-split，此時 space 本身即為無聲調確認。
+    // 因此 suffix 若以 space 結尾，允許無調音但可發音的後綴（如 "u " → ㄧ）。
+    guard trialComposer.isPronounceable,
+          trialComposer.hasIntonation() || suffixEndsWithSpace
+    else {
       return nil
     }
 
@@ -402,13 +624,13 @@ public struct MixedAlphanumericalTypewriter<Handler: InputHandlerProtocol>: Type
       return nil
     }
 
-    guard handler.currentLM.hasUnigramsForFast(keyArray: [readingKey]) else {
-      return nil
-    }
-
-    guard let bestProbability = handler.currentLM.unigramsFor(keyArray: [readingKey])
-      .map(\.probability).max()
-    else {
+    let hasFast = handler.currentLM.hasUnigramsForFast(keyArray: [readingKey])
+    let unigrams = handler.currentLM.unigramsFor(keyArray: [readingKey])
+    // Word-like 情境維持 fast-path 限制，避免 digit-leading 後綴意外勝出；
+    // 非 word-like fallback 則放寬為接受 ETenDOS 條目，以支援合法注音前綴的保留。
+    let hasUnigrams = hasFast || (!requiresWordLikePrefix && !unigrams.isEmpty)
+    guard hasUnigrams else { return nil }
+    guard let bestProbability = unigrams.map(\.probability).max() else {
       return nil
     }
 
