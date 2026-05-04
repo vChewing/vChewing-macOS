@@ -5,15 +5,53 @@
 extension Tekkon {
   // MARK: - Phonabet to Hanyu-Pinyin Conversion Processing
 
+  // MARK: - Pre-built lookup for O(N) single-pass conversion.
+
+  /// 從 `arrPhonaToHanyuPinyin` 預建的字串→拼音對照表。
+  /// 因為原陣列已按長度降冪排列（多字元在前），建表後 longest-match-first 的語意由查表順序保證。
+  private static let _phonaToPinyinLUT: [String: String] = {
+    var lut: [String: String] = [:]
+    for (phona, pinyin) in arrPhonaToHanyuPinyin {
+      lut[phona] = pinyin
+    }
+    return lut
+  }()
+
+  /// 已知最長的注音符號組合的字元長度（以 Unicode scalar 計）。
+  private static let _maxPhonaPatternLength: Int = {
+    arrPhonaToHanyuPinyin.map(\.0.unicodeScalars.count).max() ?? 3
+  }()
+
   /// 注音轉拼音，要求陰平必須是空格。
   /// - Parameters:
   ///   - targetJoined: 傳入的 String 對象物件。
   public static func cnvPhonaToHanyuPinyin(targetJoined: String) -> String {
-    var targetConverted = targetJoined
-    for pair in arrPhonaToHanyuPinyin {
-      targetConverted = targetConverted.swapping(pair.0, with: pair.1)
+    let scalars = targetJoined.unicodeScalars
+    var result = ""
+    result.reserveCapacity(targetJoined.count * 2) // pinyin output typically longer than zhuyin
+    var i = scalars.startIndex
+    let endIndex = scalars.endIndex
+    let maxLen = _maxPhonaPatternLength
+    while i < endIndex {
+      var matched = false
+      let remaining = scalars.distance(from: i, to: endIndex)
+      // Greedy longest-match first: try from max possible length down to 1.
+      for len in stride(from: min(maxLen, remaining), through: 1, by: -1) {
+        guard let targetIdx = scalars.index(i, offsetBy: len, limitedBy: endIndex) else { continue }
+        let key = String(scalars[i ..< targetIdx])
+        if let replacement = _phonaToPinyinLUT[key] {
+          result.append(replacement)
+          i = targetIdx
+          matched = true
+          break
+        }
+      }
+      if !matched {
+        result.append(String(scalars[i]))
+        i = scalars.index(after: i)
+      }
     }
-    return targetConverted
+    return result
   }
 
   /// 漢語拼音數字標調式轉漢語拼音教科書格式，要求陰平必須是數字 1。
