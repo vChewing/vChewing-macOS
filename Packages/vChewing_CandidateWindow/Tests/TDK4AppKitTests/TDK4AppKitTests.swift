@@ -176,7 +176,7 @@ struct TDK4AppKitTests {
       selectionKeys: "123456",
       layout: .horizontal
     )
-    #expect(pool.isExpanded == true, "初始化後應處於展開狀態")
+    #expect(pool.isExpanded == true, "初期化後應處於展開狀態")
     #expect(pool.maxLinesPerPage == 4, "展開時 maxLinesPerPage 應為 4")
 
     // 模擬 reloadData：用 reinit 重建，保持 isExpanded: true。

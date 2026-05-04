@@ -1108,12 +1108,12 @@ nonisolated extension UserDef {
   }()
 }
 
-// MARK: - AppProperty 便利初始化器
+// MARK: - AppProperty 便利初期化器
 
 extension AppProperty {
-  /// 以 `UserDef` 為來源的便利初始化器：自動從 `DataType` 關聯值取得預設值。
+  /// 以 `UserDef` 為來源的便利初期化器：自動從 `DataType` 關聯值取得預設值。
   ///
-  /// 此初始化器使 `UserDef.dataType` 成為預設值的唯一事實來源（Single Source of Truth），
+  /// 此初期化器使 `UserDef.dataType` 成為預設值的唯一事實來源（Single Source of Truth），
   /// 無需在 `PrefMgr` 中重複指定預設值。
   public init(userDef: UserDef) {
     guard let typedDefault = userDef.dataType.defaultValue as? Value else {

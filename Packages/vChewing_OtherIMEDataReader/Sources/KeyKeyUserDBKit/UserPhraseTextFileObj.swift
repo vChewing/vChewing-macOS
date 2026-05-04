@@ -25,7 +25,7 @@ extension KeyKeyUserDBKit {
   public final class UserPhraseTextFileObj: UserPhraseDataSource {
     // MARK: Lifecycle
 
-    /// 從檔案路徑初始化
+    /// 從檔案路徑初期化
     /// - Parameter path: MJSR 匯出檔案路徑
     /// - Throws: 檔案讀取或解析錯誤
     public convenience init(path: String) throws {
@@ -33,7 +33,7 @@ extension KeyKeyUserDBKit {
       try self.init(content: content)
     }
 
-    /// 從 URL 初始化
+    /// 從 URL 初期化
     /// - Parameter url: MJSR 匯出檔案 URL
     /// - Throws: 檔案讀取或解析錯誤
     public convenience init(url: URL) throws {
@@ -41,7 +41,7 @@ extension KeyKeyUserDBKit {
       try self.init(content: content)
     }
 
-    /// 從文字內容初始化
+    /// 從文字內容初期化
     /// - Parameter content: MJSR 匯出檔案的文字內容
     /// - Throws: 解析錯誤
     public init(content: String) throws {
@@ -420,7 +420,7 @@ extension KeyKeyUserDBKit.UserPhraseTextFileObj {
 // MARK: - Data Extension for Hex String
 
 extension Data {
-  /// 從十六進位字串初始化 Data
+  /// 從十六進位字串初期化 Data
   fileprivate init?(hexString: String) {
     let len = hexString.count / 2
     var data = Data(capacity: len)

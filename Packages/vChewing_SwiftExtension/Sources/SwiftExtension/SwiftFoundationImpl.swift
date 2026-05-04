@@ -568,7 +568,7 @@ nonisolated public enum CRC32 {
 nonisolated public struct HSBA: Sendable {
   // MARK: Lifecycle
 
-  /// 初始化 HSBA 顏色。
+  /// 初期化 HSBA 顏色。
   public init(hue: Double, saturation: Double, brightness: Double, alpha: Double = 1.0) {
     self.hue = max(0.0, min(1.0, hue))
     self.saturation = max(0.0, min(1.0, saturation))

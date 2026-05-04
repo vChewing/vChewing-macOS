@@ -630,7 +630,7 @@
       return NSColor(hue: h, saturation: s, brightness: b, alpha: a)
     }
 
-    /// 從 NSColor 初始化（僅 macOS）。
+    /// 從 NSColor 初期化（僅 macOS）。
     public init(_ nsColor: NSColor) {
       self.init(
         hue: nsColor.hueComponent,

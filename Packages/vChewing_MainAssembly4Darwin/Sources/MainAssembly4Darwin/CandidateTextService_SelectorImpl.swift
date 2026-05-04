@@ -27,7 +27,7 @@ extension CandidateTextService {
   // MARK: - Final Sanity Check Registration.
 
   // 將預設允許的 selector 集合註冊到共享的 CandidateTextService 模組中。
-  // 此操作在模組初始化時執行，確保 Shared 模組的最終完整性檢查擁有具體的白名單供驗證之用。
+  // 此操作在模組初期化時執行，確保 Shared 模組的最終完整性檢查擁有具體的白名單供驗證之用。
   public static let registerAllowedSelectors: () = {
     CandidateTextService.allowedSelectorSet = Set(Self.AllowedSelector.allCases.map { $0.rawValue })
   }()

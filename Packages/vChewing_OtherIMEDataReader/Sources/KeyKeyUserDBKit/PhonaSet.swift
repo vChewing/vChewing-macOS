@@ -13,7 +13,7 @@ extension KeyKeyUserDBKit {
 
     // MARK: - Initializers
 
-    /// 以原始音節值初始化 PhonaSet
+    /// 以原始音節值初期化 PhonaSet
     /// - Parameter syllable: 16 位元原始音節值
     public init(syllable: UInt16 = 0) {
       self.syllable = syllable

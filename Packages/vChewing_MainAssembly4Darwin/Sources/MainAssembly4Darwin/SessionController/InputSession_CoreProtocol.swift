@@ -274,7 +274,7 @@ extension SessionProtocol {
     // 當目前的副本已處於活動狀態、仍為當前副本、且輸入調度模組仍存在時，
     // 僅執行輕量更新即可，省去 initInputHandler()、asyncOnMain 任務排程等高成本操作。
     // 原理：performServerDeactivation() 對當前副本是 no-op（因 guard 提前返回），
-    // 故 isActivated 仍為 true、inputHandler 仍然存在，無需重新初始化。
+    // 故 isActivated 仍為 true、inputHandler 仍然存在，無需重新初期化。
     if isActivated, Self.current?.id == id, inputHandler != nil {
       syncCurrentSessionID()
       let resolvedInputMode = IMEApp.currentInputMode

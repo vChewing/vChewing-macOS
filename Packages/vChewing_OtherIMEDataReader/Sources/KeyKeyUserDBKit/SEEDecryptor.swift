@@ -28,14 +28,14 @@ extension KeyKeyUserDBKit {
 
     // MARK: - Initializers
 
-    /// 使用自訂密鑰初始化解密器
+    /// 使用自訂密鑰初期化解密器
     /// - Parameter key: 16 bytes AES-128 密鑰
     public init(key: [UInt8]) {
       precondition(key.count == Self.keySize, "Key must be 16 bytes for AES-128")
       self.key = key
     }
 
-    /// 使用預設密鑰初始化解密器
+    /// 使用預設密鑰初期化解密器
     public init() {
       self.key = Self.defaultKey
     }

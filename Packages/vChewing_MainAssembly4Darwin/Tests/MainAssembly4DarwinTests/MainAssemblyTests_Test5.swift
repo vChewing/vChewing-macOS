@@ -18,7 +18,7 @@ extension MainAssemblyTests {
   /// 重複呼叫 performServerActivation 不應重新建構 inputHandler。
   @Test
   func test501_ActivationFastPath_SkipsInitInputHandler() throws {
-    // 確保 testSession 已初始化且處於活動狀態。
+    // 確保 testSession 已初期化且處於活動狀態。
     #expect(testSession.isActivated)
     #expect(testSession.inputHandler != nil)
 

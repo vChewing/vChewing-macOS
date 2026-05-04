@@ -101,7 +101,7 @@ extension AppDelegate {
     PrefMgr.shared.fixOddPreferences()
 
     // 先註冊允許的 selector 白名單，再啟用最終完整性檢查。
-    // （檔案層級的 private let 惰性初始化技巧無法在 Swift 中自動觸發。）
+    // （檔案層級的 private let 惰性初期化技巧無法在 Swift 中自動觸發。）
     CandidateTextService.registerAllowedSelectors
     CandidateTextService.enableFinalSanityCheck()
 
@@ -144,7 +144,7 @@ extension AppDelegate {
       }
     }
 
-    // 核心辭典連線、磁帶載入、使用者語模初始化：
+    // 核心辭典連線、磁帶載入、使用者語模初期化：
     // 延後至下一個 RunLoop 迭代以避免阻塞 applicationWillFinishLaunching。
     asyncOnMain { [weak self] in
       LMMgr.connectCoreDB()

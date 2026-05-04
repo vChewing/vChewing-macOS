@@ -178,12 +178,12 @@ final class InputHandlerTests {
     UserDefaults.pendingUnitTests = true
     UserDef.resetAll()
 
-    // 初始化測試 LM
+    // 初期化測試 LM
     let lm = LMAssembly.LMInstantiator(isCHS: false)
     self.testLM = lm
     LMAssembly.LMInstantiator.connectToTestFactoryDictionary(textMapData: LMATestsData.textMapTestCoreLMData)
 
-    // 初始化測試用的 handler 和 session
+    // 初期化測試用的 handler 和 session
     let handler = MockInputHandler(lm: lm, pref: PrefMgr.sharedSansDidSetOps)
     let session = MockSession()
     handler.session = session

@@ -29,7 +29,7 @@ public final class InputHandler: @MainActor InputHandlerProtocol {
     self.errorCallback = errorCallback
     self.filterabilityChecker = filterabilityChecker
     self.notificationCallback = notificationCallback
-    /// 組字器初期化（先用空閉包，待 self 完成初始化後再指定真正的閉包）。
+    /// 組字器初期化（先用空閉包，待 self 完成初期化後再指定真正的閉包）。
     self.assembler = Assembler(
       gramQuerier: { _ in [] }
     )

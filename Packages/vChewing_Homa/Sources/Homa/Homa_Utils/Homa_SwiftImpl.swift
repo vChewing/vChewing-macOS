@@ -188,7 +188,7 @@ public struct FIUUID: Hashable, Codable, Sendable {
     )
   }
 
-  /// 依照 UUID 字串初始化識別值，支援大小寫。
+  /// 依照 UUID 字串初期化識別值，支援大小寫。
   public init?(uuidString: String) {
     let filtered = uuidString.filter { $0 != "-" }
     guard filtered.count == 32 else { return nil }
@@ -296,7 +296,7 @@ public struct FIUUID: Hashable, Codable, Sendable {
       return result
     }
 
-    /// 透過 Foundation 的 `UUID` 初始化。
+    /// 透過 Foundation 的 `UUID` 初期化。
     public init(uuid: UUID) {
       guard let value = FIUUID(uuidString: uuid.uuidString) else {
         preconditionFailure("Unable to convert UUID to FIUUID.")

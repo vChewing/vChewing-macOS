@@ -9,7 +9,7 @@ extension KeyKeyUserDBKit {
   public struct KeyKeyGram: Codable, CustomStringConvertible, Equatable, Sendable, Hashable {
     // MARK: Lifecycle
 
-    /// 從原始元組初始化 Gram
+    /// 從原始元組初期化 Gram
     /// - Parameters:
     ///   - rawTuple: 原始資料元組
     ///   - isCandidateOverride: 是否為候選字覆蓋記錄
@@ -25,7 +25,7 @@ extension KeyKeyUserDBKit {
       self.isCandidateOverride = isCandidateOverride
     }
 
-    /// 使用完整參數初始化 Gram
+    /// 使用完整參數初期化 Gram
     /// - Parameters:
     ///   - keyArray: 讀音陣列（注音符號）
     ///   - current: 當前漢字
