@@ -433,11 +433,11 @@ extension InputHandlerTests {
   @Test(arguments: [
     AutoSplitBoundaryScenario(
       id: "IH408A", input: "Twinsu.4",
-      expectedCommissions: ["Twins"], expectedComposedText: "又",
+      expectedCommissions: ["Twin"], expectedComposedText: "拗",
       expectedDisplayMustNotContain: .none,
       gramSpecs: [
-        GramSpec(rawSequence: "u.4", value: "又", score: 999),
         GramSpec(rawSequence: "su.4", value: "拗", score: 100),
+        GramSpec(rawSequence: "u.4", value: "又", score: 999),
       ]
     ),
     AutoSplitBoundaryScenario(
