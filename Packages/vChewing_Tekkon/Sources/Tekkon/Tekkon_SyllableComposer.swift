@@ -76,6 +76,12 @@ extension Tekkon {
     /// 是否對錯誤的注音讀音組合做出自動糾正處理。
     public var phonabetCombinationCorrectionEnabled = false
 
+    // 是否嚴格要求按照聲介韻調（consonant→semivowel→vowel→intonation）順序輸入。
+    /// 啟用後，若 phonabet 要填入的 slot 比目前已填的最大 slot 更早（例如 vowel 已填而 semivowel 後到），
+    /// 則該 phonabet 會被拒絕。聲調（intonation）永遠允許。
+    /// 此特性僅供部分特殊場合使用，等同於停用並擊特性。
+    public var enforceCSVTOrdering = false
+
     /// 內容值，會直接按照正確的順序拼裝自己的聲介韻調內容、再回傳。
     /// 注意：直接取這個參數的內容的話，陰平聲調會成為一個空格。
     /// 如果是要取不帶空格的注音的話，請使用「.getComposition()」而非「.value」。
@@ -212,9 +218,10 @@ extension Tekkon {
     /// 如果是諸如複合型注音排列的話，翻譯結果有可能為空，但翻譯過程已經處理好聲介韻調分配了。
     /// - Parameters:
     ///   - fromString: 傳入的 String 內容。
-    public mutating func receiveKey(fromString inputStr: String = "") {
-      guard let input = inputStr.unicodeScalars.first else { return }
-      receiveKey(fromScalar: input)
+    @discardableResult
+    public mutating func receiveKey(fromString inputStr: String = "") -> Bool {
+      guard let input = inputStr.unicodeScalars.first else { return false }
+      return receiveKey(fromScalar: input)
     }
 
     /// 接受傳入的按鍵訊號時的處理，處理對象為 Unicode Scalar。
@@ -223,11 +230,11 @@ extension Tekkon {
     /// 如果是諸如複合型注音排列的話，翻譯結果有可能為空，但翻譯過程已經處理好聲介韻調分配了。
     /// - Parameters:
     ///   - fromString: 傳入的 String 內容。
-    public mutating func receiveKey(fromScalar input: Unicode.Scalar?) {
-      guard let input else { return }
+    @discardableResult
+    public mutating func receiveKey(fromScalar input: Unicode.Scalar?) -> Bool {
+      guard let input else { return false }
       guard isPinyinMode else {
-        receiveKey(fromPhonabet: translate(key: input))
-        return
+        return receiveKey(fromPhonabet: translate(key: input))
       }
       if let theTone = mapArayuruPinyinIntonation[input] {
         intonation = Phonabet(theTone)
@@ -243,6 +250,7 @@ extension Tekkon {
         romajiBuffer = romajiBufferBackup
         _needsRomajiUpdate = false
       }
+      return true
     }
 
     /// 在拼音模式下試算「當前 buffer 加上新字元」是否應自動 chop 前段有效讀音。
@@ -296,18 +304,21 @@ extension Tekkon {
     /// 如果是諸如複合型注音排列的話，翻譯結果有可能為空，但翻譯過程已經處理好聲介韻調分配了。
     /// - Parameters:
     ///   - fromCharCode: 傳入的 UniChar 內容。
-    public mutating func receiveKey(fromCharCode inputCharCode: UInt16 = 0) {
+    @discardableResult
+    public mutating func receiveKey(fromCharCode inputCharCode: UInt16 = 0) -> Bool {
       if let scalar = UnicodeScalar(inputCharCode) {
-        receiveKey(fromScalar: scalar)
+        return receiveKey(fromScalar: scalar)
       }
+      return false
     }
 
     /// 接受傳入的按鍵訊號時的處理，處理對象為單個注音符號。
     /// 主要就是將注音符號拆分辨識且分配到正確的貯存位置而已。
     /// - Parameters:
     ///   - fromPhonabet: 傳入的單個注音符號字串。
-    public mutating func receiveKey(fromPhonabet phonabet: Unicode.Scalar?) {
-      guard let phonabet else { return }
+    @discardableResult
+    public mutating func receiveKey(fromPhonabet phonabet: Unicode.Scalar?) -> Bool {
+      guard let phonabet else { return false }
       var thePhone: Phonabet = .init(phonabet)
       if phonabetCombinationCorrectionEnabled {
         switch phonabet {
@@ -342,6 +353,18 @@ extension Tekkon {
           }
         }
       }
+      // 個別情形需強制聲介韻調的輸入順序。
+      if enforceCSVTOrdering {
+        let newSlot = thePhone.type.rawValue // 1=consonant, 2=semivowel, 3=vowel, 4=intonation
+        let maxFilledSlot = [
+          intonation.isEmpty ? 0 : PhoneType.intonation.rawValue,
+          vowel.isEmpty ? 0 : PhoneType.vowel.rawValue,
+          semivowel.isEmpty ? 0 : PhoneType.semivowel.rawValue,
+          consonant.isEmpty ? 0 : PhoneType.consonant.rawValue,
+        ].max() ?? 0
+        if newSlot != PhoneType.intonation.rawValue, newSlot < maxFilledSlot { return false }
+      }
+
       switch thePhone.type {
       case .consonant: consonant = thePhone
       case .semivowel: semivowel = thePhone
@@ -350,6 +373,7 @@ extension Tekkon {
       default: break
       }
       updateRomajiBuffer()
+      return true
     }
 
     /// 處理一連串的按鍵輸入。
@@ -366,7 +390,10 @@ extension Tekkon {
       -> String {
       clear()
       guard isRomaji else {
-        givenSequence.forEach { receiveKey(fromString: $0.description) }
+        // 使用 for 迴圈而非 forEach，以利 enforceCSVTOrdering 拒絕時提前終止。
+        for char in givenSequence {
+          if !receiveKey(fromString: char.description) { break }
+        }
         return value
       }
       var dictResult: String?
