@@ -318,7 +318,7 @@ extension Tekkon {
     ///   - fromPhonabet: 傳入的單個注音符號字串。
     @discardableResult
     public mutating func receiveKey(fromPhonabet phonabet: Unicode.Scalar?) -> Bool {
-      guard let phonabet else { return false }
+      guard let phonabet else { return true }
       var thePhone: Phonabet = .init(phonabet)
       if phonabetCombinationCorrectionEnabled {
         switch phonabet {
