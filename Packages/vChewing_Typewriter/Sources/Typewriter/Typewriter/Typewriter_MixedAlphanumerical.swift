@@ -44,6 +44,17 @@ public struct MixedAlphanumericalTypewriter<Handler: InputHandlerProtocol>: Type
     }
     // Space 必須先於 isReservedKey guard 處理：Space 的 keyCode 屬於 reserved key，
     // 若不提前攔截，Space 將返回 nil，無法走到注音確認路徑。
+    // Shift+Space 在 non-empty 狀態下放棄注音處理，
+    // 直接遞交 mixed buffer 內容 + ASCII 空格。
+    if input.isSpace, input.isShiftHold {
+      guard !handler.isConsideredEmptyForNow else { return nil }
+      let chineseText = handler.committableDisplayText(sansReading: true)
+      let asciiText = handler.mixedAlphanumericalBuffer + " "
+      handler.composer.clear()
+      handler.mixedAlphanumericalBuffer.removeAll()
+      session.switchState(State.ofCommitting(textToCommit: chineseText + asciiText))
+      return true
+    }
     if input.isSpace {
       guard !handler.mixedAlphanumericalBuffer.isEmpty else { return nil }
       let shouldPreferASCIIWordOnSpace = shouldPreferASCIIWordPath(
@@ -698,13 +709,19 @@ public struct MixedAlphanumericalTypewriter<Handler: InputHandlerProtocol>: Type
       return true
     }
 
-    let textToCommit = selectedCandidate.prefixText + handler.commitOverflownComposition
+    let prefixText = selectedCandidate.prefixText
+    let overflowText = handler.commitOverflownComposition
     handler.retrievePOMSuggestions(apply: true)
     handler.composer.clear()
     handler.mixedAlphanumericalBuffer.removeAll()
 
+    // 先同步遞交 ASCII prefix text，確保 IMK cursor 在
+    // updateCompositionBufferDisplay() 被呼叫前已前移至正確位置，
+    // 避免浮動組字窗遮住已遞交的西文內容。
+    session.commit(text: prefixText, clearDisplayBeforeCommit: false, bypassAsync: true)
+
     var inputting = handler.generateStateOfInputting()
-    inputting.textToCommit = textToCommit
+    inputting.textToCommit = overflowText
     session.switchState(inputting)
     handler.handleTypewriterSCPCTasks()
     return true
