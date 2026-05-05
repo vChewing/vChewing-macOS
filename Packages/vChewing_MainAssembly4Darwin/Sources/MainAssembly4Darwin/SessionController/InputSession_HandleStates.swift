@@ -154,6 +154,39 @@ extension SessionProtocol {
     }
   }
 
+  /// 遞交組字區內容（可控非同步）。
+  /// - Parameters:
+  ///   - bypassAsync: 設為 `true` 時直接在主執行緒同步遞交，確保 `insertText` 在
+  ///     `updateCompositionBufferDisplay()` 之前完成，避免浮動組字窗定位在舊游標位置。
+  public func commit(text: String, clearDisplayBeforeCommit: Bool, bypassAsync: Bool) {
+    guard !text.isEmpty else { return }
+    if clearDisplayBeforeCommit {
+      clearInlineDisplay()
+    }
+    let phE = prefs.phraseReplacementEnabled && text.count > 1
+    var text = text.trimmingCharacters(in: .newlines)
+    var replaced = false
+    if phE, let queried = inputHandler?.currentLM.queryReplacementValue(key: text) {
+      replaced = true
+      text = queried
+    }
+    var buffer = ChineseConverter.kanjiConversionIfRequired(text)
+    if phE, !replaced, let queried = inputHandler?.currentLM.queryReplacementValue(key: buffer) {
+      buffer = ChineseConverter.kanjiConversionIfRequired(queried)
+    }
+
+    func doCommit(_ theBuffer: String) {
+      guard let client = client() else { return }
+      client.insertText(
+        theBuffer, replacementRange: replacementRange()
+      )
+    }
+
+    asyncOnMain(bypassAsync: bypassAsync || !isServingIMEItself || UserDefaults.pendingUnitTests) {
+      doCommit(buffer)
+    }
+  }
+
   /// IMK 有如下限制：
   /// 1. 內文組字區要想顯示游標的話，所有下劃線的粗細必須相等。
   /// 2. 如果所有線段粗細相等的話，給 client().setMarkedText() 塞入的 selectionRange 的長度必須得是 0。
