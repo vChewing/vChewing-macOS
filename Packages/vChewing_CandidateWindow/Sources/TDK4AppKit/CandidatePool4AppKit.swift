@@ -57,7 +57,8 @@ extension TDK4AppKit {
           fittingSize: .zero,
           highlightedLine: .zero,
           highlightedCandidate: .zero,
-          peripherals: .zero
+          peripherals: .zero,
+          readingDisambiguation: .zero
         )
       }
 
@@ -65,6 +66,7 @@ extension TDK4AppKit {
       let highlightedLine: CGRect
       let highlightedCandidate: CGRect
       let peripherals: CGRect
+      let readingDisambiguation: CGRect
     }
 
     // 只用來測量單漢字候選字 cell 的最大可能寬度。
@@ -82,6 +84,8 @@ extension TDK4AppKit {
     var metrics: UIMetrics = .allZeroed
     var tooltip: String = ""
     var reverseLookupResult: [String] = []
+    /// 當前高亮候選字詞的讀音 disambiguation 顯示內容。nil 表示無需顯示。
+    var readingDisambiguationResult: String?
 
     // MARK: - 動態變數
 
@@ -187,6 +191,7 @@ extension TDK4AppKit {
       isExpanded = false
       tooltip = ""
       reverseLookupResult = []
+      readingDisambiguationResult = nil
     }
 
     // MARK: Private
@@ -211,7 +216,7 @@ extension TDK4AppKit {
       cleanDataOnMain()
       isExpanded = expanded
       var allCandidates = candidates.map {
-        CandidateCellData4AppKit(key: " ", displayedText: $0.value, segLength: $0.keyArray.count)
+        CandidateCellData4AppKit(key: " ", displayedText: $0.value, keyArray: $0.keyArray, segLength: $0.keyArray.count)
       }
       if allCandidates.isEmpty { allCandidates.append(Self.blankCell) }
       candidateDataAll = allCandidates
@@ -841,13 +846,38 @@ extension TDK4AppKit.CandidatePool4AppKit {
       totalAccuSize.width = max(totalAccuSize.width, dimensionPeripherals.width)
     }
     let rectPeripherals = CGRect(origin: currentOrigin, size: dimensionPeripherals)
+    // 計算讀音 disambiguation 行的位置（永遠在視窗最底部，獨立於 peripherals）
+    let strReadingDisambiguation = attributedDescriptionReadingDisambiguation
+    var rectReadingDisambiguation: CGRect = .zero
+    if !strReadingDisambiguation.string.isEmpty {
+      var dimReading = strReadingDisambiguation.getBoundingDimension(forceFallback: true)
+      dimReading.width = ceil(dimReading.width)
+      dimReading.height = ceil(dimReading.height)
+      let readingOrigin: CGPoint
+      if finalContainerOrientation == .horizontal {
+        // Horizontal 單行模式：peripherals 在右側，disambiguation 行置於底部
+        // 需確保在 peripherals 和候選字行二者的下方
+        let bottomOfCandidates = originDelta + totalAccuSize.height
+        let bottomOfPeripherals = rectPeripherals.maxY
+        let contentBottom = max(bottomOfCandidates, bottomOfPeripherals)
+        readingOrigin = .init(x: originDelta, y: contentBottom + padding)
+      } else {
+        // Vertical / Expanded 模式：peripherals 已在下方，disambiguation 置於其下方
+        readingOrigin = .init(x: originDelta, y: rectPeripherals.maxY + padding)
+      }
+      rectReadingDisambiguation = .init(origin: readingOrigin, size: dimReading)
+      // 更新 totalAccuSize 以容納新行
+      totalAccuSize.width = max(totalAccuSize.width, dimReading.width + originDelta)
+      totalAccuSize.height = readingOrigin.y + dimReading.height - originDelta
+    }
     totalAccuSize.width += originDelta * 2
     totalAccuSize.height += originDelta * 2
     metrics = .init(
       fittingSize: totalAccuSize,
       highlightedLine: highlightedLineRect,
       highlightedCandidate: highlightedCellRect,
-      peripherals: rectPeripherals
+      peripherals: rectPeripherals,
+      readingDisambiguation: rectReadingDisambiguation
     )
   }
 
@@ -1054,6 +1084,81 @@ extension TDK4AppKit.CandidatePool4AppKit {
     )
     attachment.attachmentCell = badgeCell
     return .init(attachment: attachment)
+  }
+
+  // MARK: Reading Disambiguation
+
+  /// 讀音 disambiguation 顯示用的 NSAttributedString。
+  /// 樣式繼承 reverse lookup 區域，但文字透明度降為 80%。
+  /// 當 readingDisambiguationResult 為 nil 時返回空字串。
+  var attributedDescriptionReadingDisambiguation: NSAttributedString {
+    guard let readingText = readingDisambiguationResult, !readingText.isEmpty else {
+      return NSAttributedString(string: "")
+    }
+    let readingTextSize = max(ceil(CandidateCellData4AppKit.unifiedSize * 0.6), 9)
+    let badgeFont = Self.blankCell.phraseFont(size: readingTextSize)
+    let attrReading: [NSAttributedString.Key: Any] = [
+      .kern: 0,
+      .font: badgeFont,
+      // 繼承 reverse lookup 區域的文字顏色，但透明度降為 80%
+      .foregroundColor: CandidateCellData4AppKit.absoluteTextColor.withAlphaComponent(0.8),
+    ]
+    let label = " \(readingText) "
+    let fontSize = CGFloat(readingTextSize)
+    let referenceHeight = positionCounterBadgeHeight()
+    let contentHeight = badgeContentHeight(label: label, attributes: attrReading)
+    let verticalInset = max((referenceHeight - contentHeight) / 2, 1)
+    let horizontalInset = max((fontSize * 0.45).rounded(.up), 4)
+    let attachment = NSTextAttachment()
+    let badgeCell = RoundedBadgeTextAttachmentCell(
+      label: label,
+      attributes: attrReading,
+      backgroundColor: .clear,
+      padding: .init(
+        top: verticalInset,
+        left: horizontalInset,
+        bottom: verticalInset,
+        right: horizontalInset
+      )
+    )
+    attachment.attachmentCell = badgeCell
+    return .init(attachment: attachment)
+  }
+
+  // MARK: Reading Disambiguation Logic
+
+  /// 計算當前高亮候選字詞的讀音 disambiguation 顯示。
+  /// 規則：
+  /// - 若任一讀音 cell 以 `_` 開頭：不顯示（標點／特殊鍵）。
+  /// - 若 segLength == 1：始終顯示（拼音免聲調模式下單字皆有潛在歧義）。
+  /// - 若 segLength > 1：僅在候選池內存在同字不同音／不同幅節長度的其他 cell 時顯示。
+  func updateReadingDisambiguation() {
+    readingDisambiguationResult = nil
+    guard let currentCandidate = currentCandidate else { return }
+    let currentKeyArray = currentCandidate.keyArray
+    // 讀音 cell 以 "_" 開頭者不處理（標點、特殊鍵等）
+    guard !currentKeyArray.contains(where: { $0.hasPrefix("_") }) else { return }
+    let displayedText = currentCandidate.displayedText
+    let currentSegLength = currentCandidate.segLength
+
+    // Rule 1: 同字但 readingArray 不全等 → 顯示
+    let sameTextCells = candidateDataAll.filter { $0.displayedText == displayedText }
+    let rule1 = !sameTextCells.allSatisfy { $0.keyArray == currentKeyArray }
+
+    // Rule 2: segLength == 1 且池內單字 reading 種類 > 1 → 全部單字顯示
+    var rule2 = false
+    if currentSegLength == 1 {
+      let singleSegCells = candidateDataAll.filter { $0.segLength == 1 }
+      let distinctReadings = Set(singleSegCells.map { $0.keyArray })
+      rule2 = distinctReadings.count > 1
+    }
+
+    if rule1 || rule2 {
+      let readingString = currentKeyArray.map { key in
+        key.hasPrefix("_") ? "??" : key
+      }.joined(separator: "-")
+      readingDisambiguationResult = readingString
+    }
   }
 }
 

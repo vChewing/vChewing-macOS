@@ -20,11 +20,13 @@ extension TDK4AppKit {
 
     init(
       key: String, displayedText: String,
-      segLength: Int? = nil, isSelected: Bool = false
+      keyArray: [String] = [], segLength: Int? = nil,
+      isSelected: Bool = false
     ) {
       self.selectionKey = key
       self.displayedText = displayedText
-      self.segLength = max(segLength ?? displayedText.count, 1)
+      self.keyArray = keyArray
+      self.segLength = max(segLength ?? keyArray.count, 1)
       self.isHighlighted = isSelected
       self.textDimension = .init(
         width: ceil(Self.unifiedCharDimension * 1.4),
@@ -81,6 +83,8 @@ extension TDK4AppKit {
     let displayedText: String
     private(set) var textDimension: CGSize
     var segLength: Int
+    /// 該候選字詞的原始讀音鍵陣列，用於讀音 disambiguation 顯示。
+    let keyArray: [String]
     var isHighlighted: Bool = false
     var whichLine: Int = 0
     // 該候選字詞在資料池內的總索引編號
@@ -108,6 +112,7 @@ extension TDK4AppKit {
       let result = CandidateCellData4AppKit(
         key: selectionKey,
         displayedText: displayedText,
+        keyArray: keyArray,
         segLength: segLength,
         isSelected: isHighlighted
       )

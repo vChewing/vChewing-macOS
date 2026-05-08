@@ -251,6 +251,8 @@ extension TDK4AppKit {
           }
         }
       }
+      // 更新讀音 disambiguation 顯示（邏輯在 CandidatePool 內）
+      Self.thePool.updateReadingDisambiguation()
       Self.thePool.reverseLookupResult = reverseLookupResult
       Self.thePool.tooltip = delegate?.candidateToolTip(shortened: !Self.thePool.isMatrix) ?? ""
       delegate?.candidatePairHighlightChanged(at: highlightedIndex)

@@ -143,6 +143,11 @@ extension TDK4AppKit.VwrCandidateTDK4AppKit {
     // 繪製附加內容
     let strPeripherals = thePool.attributedDescriptionBottomPanes
     strPeripherals.draw(at: sizesCalculated.peripherals.origin)
+    // 繪製讀音 disambiguation 行（獨立於 peripherals，永遠在底部）
+    let strReadingDisambig = thePool.attributedDescriptionReadingDisambiguation
+    if !strReadingDisambig.string.isEmpty {
+      strReadingDisambig.draw(at: sizesCalculated.readingDisambiguation.origin)
+    }
   }
 }
 
