@@ -10,14 +10,14 @@ import Foundation
 
 // MARK: - SessionCoreProtocol
 
-public protocol SessionCoreProtocol: AnyObject {
-  associatedtype State: IMEStateProtocol
+public protocol SessionCoreProtocol: AnyObject & CtlCandidateDelegate {
   associatedtype Handler: InputHandlerCoreProtocol
-    where Handler.State == Handler.Session.State, Handler.State == State
+    where Handler.Session == Self
+  typealias State = IMEState
   /// 僅用來決定 UI 面板先照顧哪個 Session 用，不宜用來判斷 isActivated。
   var id: UUID { get }
   /// 用以記錄當前輸入法狀態的變數。(有 DidSet)
-  var state: State { get set }
+  var state: IMEState { get set }
   var isASCIIMode: Bool { get }
   var clientMitigationLevel: Int { get }
   var ui: SessionUIProtocol? { get }
@@ -34,7 +34,7 @@ public protocol SessionCoreProtocol: AnyObject {
     colorState: TooltipColorState,
     duration: Double
   )
-  func getMitigatedState(_ givenState: State) -> State
+  func getMitigatedState(_ givenState: IMEState) -> IMEState
 
   /// 針對傳入的新狀態進行調度、且將當前會話控制器的狀態切換至新狀態。
   ///
@@ -46,11 +46,11 @@ public protocol SessionCoreProtocol: AnyObject {
   /// 不必要的互相干涉、打斷彼此的工作。
   /// - Note: 本來不用這麼複雜的，奈何 Swift Protocol 不允許給參數指定預設值。
   /// - Parameter newState: 新狀態。
-  func switchState(_ newState: State, caller: StaticString, line: Int)
+  func switchState(_ newState: IMEState, caller: StaticString, line: Int)
 }
 
 extension SessionCoreProtocol {
-  public func switchState(_ newState: State, caller: StaticString = #function, line: Int = #line) {
+  public func switchState(_ newState: IMEState, caller: StaticString = #function, line: Int = #line) {
     switchState(newState, caller: caller, line: line)
   }
 
@@ -86,7 +86,7 @@ extension SessionCoreProtocol {
 // MARK: - InputHandlerCoreProtocol
 
 public protocol InputHandlerCoreProtocol: AnyObject {
-  associatedtype State: IMEStateProtocol
   associatedtype Session: SessionCoreProtocol & CtlCandidateDelegate
-    where Session.State == Session.Handler.State, Session.State == State
+    where Session.Handler == Self
+  typealias State = IMEState
 }

@@ -15,13 +15,13 @@ import Testing
 extension MainAssemblyTests {
   @Test
   func test401_Session_AttrStrAPITests() throws {
-    let segments: [IMEStateData.AttrStrULStyle.StyledPair] = [
+    let segments: [IMEStateParsed4Darwin.AttrStrULStyle.StyledPair] = [
       ("", .single),
       ("甲", .single),
       ("", .thick),
       ("乙", .thick),
     ]
-    let attributed = IMEStateData.AttrStrULStyle.pack(segments)
+    let attributed = IMEStateParsed4Darwin.AttrStrULStyle.pack(segments)
     #expect(attributed.string == "甲乙")
 
     var effectiveRange = NSRange(location: NSNotFound, length: 0)

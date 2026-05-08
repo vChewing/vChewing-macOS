@@ -668,23 +668,23 @@ extension MainAssemblyTests {
 
     testSession.candidatePairHighlightChanged(at: 0)
     #expect(testSession.state.highlightedCandidateIndex == 0)
-    #expect(testSession.state.displayedTextConverted == "　")
+    #expect(IMEStateParsed4Darwin(testSession.state).displayedTextConverted == "　")
     #expect(testSession.state.displayTextSegments == ["　"])
-    #expect(testSession.state.attributedString.string == "　")
+    #expect(IMEStateParsed4Darwin(testSession.state).attributedString.string == "　")
 
     testSession.candidatePairHighlightChanged(at: 1)
     #expect(testSession.state.highlightedCandidateIndex == 1)
-    #expect(testSession.state.displayedTextConverted == "｀")
+    #expect(IMEStateParsed4Darwin(testSession.state).displayedTextConverted == "｀")
     #expect(testSession.state.displayTextSegments == ["｀"])
-    #expect(testSession.state.attributedString.string == "｀")
+    #expect(IMEStateParsed4Darwin(testSession.state).attributedString.string == "｀")
 
     testSession.candidatePairHighlightChanged(at: 2)
     #expect(testSession.state.highlightedCandidateIndex == 2)
-    #expect(testSession.state.displayedTextConverted == "")
+    #expect(IMEStateParsed4Darwin(testSession.state).displayedTextConverted == "")
     #expect(testSession.state.displayTextSegments == [])
     #expect(
-      testSession.state.attributedString.string ==
-        testSession.state.data.attributedStringPlaceholder.string
+      IMEStateParsed4Darwin(testSession.state).attributedString.string ==
+        IMEStateParsed4Darwin(testSession.state).attributedStringPlaceholder.string
     )
   }
 

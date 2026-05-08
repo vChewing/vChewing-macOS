@@ -392,9 +392,10 @@ extension InputSession {
     // 過濾掉尚未完成拼寫的注音。
     let sansReading: Bool = state.type == .ofInputting
     if state.hasComposition {
-      textToCommit = inputHandler
-        .generateStateOfInputting(sansReading: sansReading)
-        .displayedTextConverted
+      textToCommit = IMEStateParsed4Darwin(
+        inputHandler
+          .generateStateOfInputting(sansReading: sansReading)
+      ).displayedTextConverted
     }
     return textToCommit
   }

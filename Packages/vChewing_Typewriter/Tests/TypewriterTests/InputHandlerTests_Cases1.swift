@@ -605,7 +605,7 @@ extension InputHandlerTests {
     for (langMode, codePointHexStr) in testCodes {
       defer {
         // 切換至 Abortion 狀態會自動清理 Handler，此時會連帶重設 typingMethod。
-        testSession.switchState(MockIMEState.ofAbortion())
+        testSession.switchState(IMEState.ofAbortion())
       }
       PrefMgr.sharedSansDidSetOps.mostRecentInputMode = langMode.rawValue
       #expect(testHandler.currentTypingMethod == .vChewingFactory)

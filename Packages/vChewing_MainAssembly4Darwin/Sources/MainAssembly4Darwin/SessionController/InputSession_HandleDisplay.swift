@@ -18,11 +18,11 @@ extension SessionProtocol {
     // 這個針對 Discord 的 特殊相容策略對 Discord 網頁端無效。
     let isDiscordClient = client()?.bundleIdentifier()?.hasSuffix(".Discord") ?? false
     let securedPlaceholder = isDiscordClient
-      ? state.data.getAttributedStringPlaceholder("_")
-      : state.data.attributedStringPlaceholder
+      ? IMEStateParsed4Darwin(state).getAttributedStringPlaceholder("_")
+      : IMEStateParsed4Darwin(state).attributedStringPlaceholder
     return clientMitigationLevel >= 2
       ? (securedPlaceholder, NSRange(location: 0, length: 0))
-      : (state.attributedString, NSRange(state.u16MarkedRange))
+      : (IMEStateParsed4Darwin(state).attributedString, NSRange(state.u16MarkedRange))
   }
 
   public var u16Cursor: Int {
@@ -30,7 +30,7 @@ extension SessionProtocol {
     if !prefs.useDynamicCandidateWindowOrigin, state.isCandidateContainer {
       u16Cursor = state.u16Cursor
     }
-    return max(min(state.displayedTextConverted.utf16.count, u16Cursor), 0)
+    return max(min(IMEStateParsed4Darwin(state).displayedTextConverted.utf16.count, u16Cursor), 0)
   }
 
   public func lineHeightRect(zeroCursor: Bool = false) -> CGRect {

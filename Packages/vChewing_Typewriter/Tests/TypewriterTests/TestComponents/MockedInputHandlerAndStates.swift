@@ -14,129 +14,6 @@ import Tekkon
 import Testing
 @testable import Typewriter
 
-// MARK: - MockIMEState
-
-/// 專門用於單元測試的模擬 IMEState 類型。
-public struct MockIMEState: IMEStateProtocol {
-  // MARK: Lifecycle
-
-  public init(
-    _ data: IMEStateData = IMEStateData(),
-    type: StateType = .ofEmpty
-  ) {
-    self.data = data
-    self.type = type
-  }
-
-  public init(
-    _ data: IMEStateData,
-    type: StateType = .ofEmpty,
-    node: CandidateNode
-  ) {
-    self.data = data
-    self.type = type
-    self.node = node
-    self.data.candidates = node.members.map { ([""], $0.name) }
-    if node.members.isEmpty {
-      self.data.displayTextSegments = [node.name]
-      self.data.cursor = node.name.count
-      self.data.marker = self.data.cursor
-    } else {
-      self.data.displayTextSegments.removeAll()
-      self.data.displayedText.removeAll()
-      self.data.cursor = 0
-      self.data.marker = 0
-    }
-  }
-
-  // MARK: Public
-
-  public var type: StateType = .ofEmpty
-  public var data: IMEStateData = .init()
-  public var node: CandidateNode = .init(name: "")
-
-  // Additional properties required by protocol
-  public var displayedTextConverted: String {
-    data.displayedText
-  }
-
-  public var markedTargetIsCurrentlyFiltered: Bool {
-    false
-  }
-}
-
-// MARK: - Extension to provide static constructors
-
-extension MockIMEState {
-  /// 內部專用初期化函式，僅用於生成「有輸入內容」的狀態。
-  fileprivate init(displayTextSegments: [String], cursor: Int) {
-    self.init(.init(), type: .ofEmpty)
-    data.displayTextSegments = displayTextSegments
-    data.cursor = cursor
-    data.marker = cursor
-  }
-
-  public static func ofDeactivated() -> MockIMEState { .init(type: .ofDeactivated) }
-  public static func ofEmpty() -> MockIMEState { .init(type: .ofEmpty) }
-  public static func ofAbortion() -> MockIMEState { .init(type: .ofAbortion) }
-
-  public static func ofCommitting(textToCommit: String) -> MockIMEState {
-    var result = MockIMEState(type: .ofCommitting)
-    result.textToCommit = textToCommit
-    return result
-  }
-
-  public static func ofAssociates(candidates: [CandidateInState]) -> MockIMEState {
-    var result = MockIMEState(type: .ofAssociates)
-    result.candidates = candidates
-    return result
-  }
-
-  public static func ofInputting(
-    displayTextSegments: [String],
-    cursor: Int,
-    highlightAt highlightAtSegment: Int? = nil
-  )
-    -> MockIMEState {
-    var result = MockIMEState(displayTextSegments: displayTextSegments, cursor: cursor)
-    result.type = .ofInputting
-    if let readingAtSegment = highlightAtSegment {
-      result.data.highlightAtSegment = readingAtSegment
-    }
-    return result
-  }
-
-  public static func ofMarking(
-    displayTextSegments: [String],
-    markedReadings: [String],
-    cursor: Int,
-    marker: Int
-  )
-    -> MockIMEState {
-    var result = MockIMEState(displayTextSegments: displayTextSegments, cursor: cursor)
-    result.type = .ofMarking
-    result.data.marker = marker
-    result.data.markedReadings = markedReadings
-    return result
-  }
-
-  public static func ofCandidates(
-    candidates: [CandidateInState],
-    displayTextSegments: [String],
-    cursor: Int
-  )
-    -> MockIMEState {
-    var result = MockIMEState(displayTextSegments: displayTextSegments, cursor: cursor)
-    result.type = .ofCandidates
-    result.data.candidates = candidates
-    return result
-  }
-
-  public static func ofSymbolTable(node: CandidateNode) -> MockIMEState {
-    .init(IMEStateData(), type: .ofSymbolTable, node: node)
-  }
-}
-
 // MARK: - MockInputHandler
 
 /// 專門用於單元測試的模擬 InputHandler 類型。
@@ -172,7 +49,7 @@ public final class MockInputHandler: @MainActor InputHandlerProtocol {
 
   // MARK: Public
 
-  public typealias State = MockIMEState
+  // typealias State removed (inherited from InputHandlerCoreProtocol: State = IMEState)
   public typealias Session = MockSession
 
   public static var keySeparator: String { Assembler.theSeparator }
@@ -209,16 +86,16 @@ public final class MockSession: @MainActor SessionCoreProtocol, CtlCandidateDele
   // MARK: Lifecycle
 
   public init() {
-    self.state = MockIMEState()
+    self.state = IMEState()
   }
 
   // MARK: Public
 
-  public typealias State = MockIMEState
+  // typealias State removed (inherited from SessionCoreProtocol: State = IMEState)
   public typealias Handler = MockInputHandler
 
   public let id: UUID = .init()
-  public var state: MockIMEState = .init()
+  public var state: IMEState = .init()
   public var inputHandler: MockInputHandler?
   public var isASCIIMode: Bool = false
   public var clientMitigationLevel: Int = 0
@@ -249,7 +126,7 @@ public final class MockSession: @MainActor SessionCoreProtocol, CtlCandidateDele
     return state.candidates[index]
   }
 
-  public func switchState(_ newState: MockIMEState, caller: StaticString, line: Int) {
+  public func switchState(_ newState: State, caller: StaticString, line: Int) {
     if PrefMgr.sharedSansDidSetOps.isDebugModeEnabled || UserDefaults.pendingUnitTests {
       let stateStr = "\(state.type.rawValue) -> \(newState.type.rawValue)"
       let callerTag = "\(caller)@[L\(line)]"

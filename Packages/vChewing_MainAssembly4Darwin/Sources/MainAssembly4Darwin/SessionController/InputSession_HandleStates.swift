@@ -111,7 +111,7 @@ extension SessionProtocol {
       let neo = NSMutableAttributedString(attributedString: attributedStringSecured.value)
       let rangeNeo = NSRange(location: 0, length: neo.string.utf16.count)
       // 不能用 .thick，否則會看不到游標；setAttributes 會替換掉既有的 attributes。
-      neo.setAttributes(IMEStateData.AttrStrULStyle.single.getDict(), range: rangeNeo)
+      neo.setAttributes(IMEStateParsed4Darwin.AttrStrULStyle.single.getDict(), range: rangeNeo)
       attrStr = neo
     }
     doSetMarkedText(attrStr)

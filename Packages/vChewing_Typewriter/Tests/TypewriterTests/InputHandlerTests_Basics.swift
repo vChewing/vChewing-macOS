@@ -195,7 +195,7 @@ final class InputHandlerTests {
   deinit {
     mainSync {
       testHandler?.errorCallback = nil
-      testSession?.switchState(MockIMEState.ofAbortion())
+      testSession?.switchState(IMEState.ofAbortion())
       LMAssembly.resetSharedState()
     }
     UserDefaults.unitTests?.removeSuite(named: "org.atelierInmu.vChewing.Typewriter.UnitTests")

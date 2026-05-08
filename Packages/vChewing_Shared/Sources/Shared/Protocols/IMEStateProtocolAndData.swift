@@ -24,28 +24,77 @@ public protocol IMEStateProtocol {
   var markedTargetIsCurrentlyFiltered: Bool { get }
   var node: CandidateNode { get set }
 
-  static func ofDeactivated() -> Self
-  static func ofEmpty() -> Self
-  static func ofAbortion() -> Self
-  static func ofCommitting(textToCommit: String) -> Self
-  static func ofAssociates(candidates: [CandidateInState]) -> Self
-  static func ofInputting(
+  // Factory methods are no longer protocol requirements.
+  // They are provided as protocol extension methods so that Darwin-specific
+  // implementations (MainAssembly) can override the baseline (Shared) versions
+  // without being shadowed by concrete struct implementations.
+}
+
+// MARK: - Factory Methods (protocol extension, baseline implementations)
+
+extension IMEStateProtocol {
+  public static func ofDeactivated() -> Self { .init(type: .ofDeactivated) }
+  public static func ofEmpty() -> Self { .init(type: .ofEmpty) }
+  public static func ofAbortion() -> Self { .init(type: .ofAbortion) }
+
+  public static func ofCommitting(textToCommit: String) -> Self {
+    var result = Self(type: .ofCommitting)
+    result.textToCommit = textToCommit
+    return result
+  }
+
+  public static func ofAssociates(candidates: [CandidateInState]) -> Self {
+    var result = Self(type: .ofAssociates)
+    result.candidates = candidates
+    return result
+  }
+
+  public static func ofInputting(
     displayTextSegments: [String],
     cursor: Int,
-    highlightAt highlightAtSegment: Int?
-  ) -> Self
-  static func ofMarking(
+    highlightAt highlightAtSegment: Int? = nil
+  )
+    -> Self {
+    var result = Self(.init(), type: .ofInputting)
+    result.data.displayTextSegments = displayTextSegments
+    result.data.cursor = cursor
+    result.data.marker = cursor
+    if let seg = highlightAtSegment { result.data.highlightAtSegment = seg }
+    return result
+  }
+
+  public static func ofMarking(
     displayTextSegments: [String],
     markedReadings: [String],
     cursor: Int,
     marker: Int
-  ) -> Self
-  static func ofCandidates(
+  )
+    -> Self {
+    var result = Self(.init(), type: .ofMarking)
+    result.data.displayTextSegments = displayTextSegments
+    result.data.cursor = cursor
+    result.data.marker = marker
+    result.data.markedReadings = markedReadings
+    return result
+  }
+
+  public static func ofCandidates(
     candidates: [CandidateInState],
     displayTextSegments: [String],
     cursor: Int
-  ) -> Self
-  static func ofSymbolTable(node: CandidateNode) -> Self
+  )
+    -> Self {
+    var result = Self(.init(), type: .ofCandidates)
+    result.data.displayTextSegments = displayTextSegments
+    result.data.cursor = cursor
+    result.data.marker = cursor
+    result.data.candidates = candidates
+    return result
+  }
+
+  public static func ofSymbolTable(node: CandidateNode) -> Self {
+    .init(IMEStateData(), type: .ofSymbolTable, node: node)
+  }
 }
 
 extension IMEStateProtocol {
@@ -134,6 +183,78 @@ extension IMEStateProtocol {
     get { type == .ofMarking ? 0 : data.tooltipDuration }
     set { data.tooltipDuration = newValue }
   }
+}
+
+// MARK: - IMEState
+
+/// 用以呈現輸入法控制器（SessionCtl）的各種狀態。
+///
+/// 從實際角度來看，輸入法屬於有限態械（Finite State Machine）。其藉由滑鼠/鍵盤
+/// 等輸入裝置接收輸入訊號，據此切換至對應的狀態，再根據狀態更新使用者介面內容，
+/// 最終生成文字輸出、遞交給接收文字輸入行為的客體應用。此乃單向資訊流序，且使用
+/// 者介面內容與文字輸出均無條件地遵循某一個指定的資料來源。
+///
+/// IMEState 型別用以呈現輸入法控制器正在做的事情，且分狀態儲存各種狀態限定的
+/// 常數與變數。
+///
+/// 對 IMEState 型別下的諸多狀態的切換，應以生成新副本來取代舊有副本的形式來完
+/// 成。唯一例外是 IMEState.ofMarking、擁有可以將自身轉變為 IMEState.ofInputting
+/// 的成員函式，但也只是生成副本、來交給輸入法控制器來處理而已。每個狀態都有
+/// 各自的構造器 (Constructor)。
+///
+/// 輸入法控制器持下述狀態請洽 StateType Enum 的 Documentation。
+public struct IMEState: IMEStateProtocol {
+  // MARK: Lifecycle
+
+  public init(
+    _ data: IMEStateData = IMEStateData(),
+    type: StateType = .ofEmpty
+  ) {
+    self.data = data
+    self.type = type
+  }
+
+  /// 泛用初期化函式。
+  /// - Parameters:
+  ///   - data: 資料載體。
+  ///   - type: 狀態類型。
+  ///   - node: 節點。
+  public init(
+    _ data: IMEStateData,
+    type: StateType = .ofSymbolTable,
+    node: CandidateNode
+  ) {
+    self.data = data
+    self.type = type
+    self.node = node
+    self.data.candidates = node.members.map { ([""], $0.name) }
+    if node.members.isEmpty {
+      let newDisplayTextSegments = [node.name]
+      // hardenVerticalPunctuationsIfNeeded 已移至 IMEStateParsed4Darwin
+      // factory method 的 call site 會在構造 state 之後手動呼叫
+      self.data.displayTextSegments = newDisplayTextSegments
+      self.data.cursor = self.data.displayTextSegments.first?.count ?? node.name.count
+      self.data.marker = self.data.cursor
+    } else {
+      self.data.displayTextSegments.removeAll()
+      self.data.cursor = 0
+      self.data.marker = 0
+    }
+  }
+
+  // MARK: Public
+
+  public var type: StateType = .ofEmpty
+  public var data: IMEStateData = .init()
+  public var node: CandidateNode = .init(name: "")
+
+  // MARK: - Protocol conformance (Shared baseline; Darwin overrides in IMEState.swift)
+
+  /// 預設實作：回傳原始顯示文字。Darwin 端可覆蓋為經 ChineseConverter 轉換後的文字。
+  public var displayedTextConverted: String { data.displayedText }
+
+  /// 預設實作：Darwin 端可覆蓋為實際的 LMMgr 查詢結果。
+  public var markedTargetIsCurrentlyFiltered: Bool { false }
 }
 
 // MARK: - IMEStateData
@@ -251,95 +372,5 @@ extension IMEStateData {
 
   public static var minCandidateLength: Int {
     PrefMgr.sharedSansDidSetOps.allowRescoringSingleKanjiCandidates ? 1 : 2
-  }
-}
-
-// MARK: - AttributedString 樣式組裝 API
-
-extension IMEStateData {
-  /// IMKInputController 的 `mark(forStyle:)` 只可能會標出這些值。
-  /// 該值乃使用 hopper disassembler 分析 IMK 而得出。
-  public enum AttrStrULStyle: Int {
-    case none = 0
-    /// #1, kTSMHiliteConvertedText & kTSMHiliteSelectedRawText
-    case single = 1
-    /// #2, kTSMHiliteSelectedConvertedText
-    case thick = 2
-    /// #3, 尚未被 TSM 使用。或可用給 kTSMHiliteSelectedRawText 與 1 區分。
-    case double = 3
-
-    // MARK: Public
-
-    public typealias StyledPair = (string: String, style: Self)
-
-    public static func pack(_ pairs: [StyledPair]) -> NSAttributedString {
-      let result = NSMutableAttributedString(string: "")
-      var clauseSegment = 0
-      for (string, style) in pairs {
-        guard !string.isEmpty else { continue }
-        result.append(style.getMarkedAttrStr(string, clauseSegment: clauseSegment))
-        clauseSegment += 1
-      }
-      return result
-    }
-
-    public func getDict(clauseSegment: Int? = nil) -> [NSAttributedString.Key: Any] {
-      var result: [NSAttributedString.Key: Any] = [Self.keyName4UL: rawValue]
-      result[Self.keyName4CS] = clauseSegment
-      return result
-    }
-
-    public func getMarkedAttrStr(_ rawStr: String, clauseSegment: Int? = nil) -> NSAttributedString {
-      let result = NSMutableAttributedString(string: rawStr)
-      let rangeNow = NSRange(location: 0, length: rawStr.utf16.count)
-      result.setAttributes(getDict(clauseSegment: clauseSegment), range: rangeNow)
-      return result
-    }
-
-    // MARK: Private
-
-    private static let keyName4UL = NSAttributedString.Key(
-      rawValue: "NSUnderline"
-    )
-
-    private static let keyName4CS = NSAttributedString.Key(
-      rawValue: "NSMarkedClauseSegment"
-    )
-  }
-
-  public func getAttributedStringPlaceholder(_ char: Unicode.Scalar = " ") -> NSAttributedString {
-    AttrStrULStyle.single.getMarkedAttrStr(
-      char.description,
-      clauseSegment: 0
-    )
-  }
-
-  /// - Remark: Converter 為 nil 時不做追加漢字轉換。
-  public func getAttributedStringNormal(
-    _ converter: ((String) -> String)?
-  )
-    -> NSAttributedString {
-    AttrStrULStyle.pack(
-      displayTextSegments.map {
-        (converter?($0) ?? $0, .single)
-      }
-    )
-  }
-
-  /// - Remark: Converter 為 nil 時不做追加漢字轉換。
-  public func getAttributedStringMarking(
-    _ converter: ((String) -> String)?
-  )
-    -> NSAttributedString {
-    let converted = (converter?(displayedText) ?? displayedText).map(\.description)
-    let range2 = markedRange
-    let range1 = 0 ..< markedRange.lowerBound
-    let range3 = markedRange.upperBound ..< converted.count
-    let pairs: [AttrStrULStyle.StyledPair] = [
-      (converted[range1].joined(), .single),
-      (converted[range2].joined(), .thick),
-      (converted[range3].joined(), .single),
-    ]
-    return AttrStrULStyle.pack(pairs)
   }
 }
