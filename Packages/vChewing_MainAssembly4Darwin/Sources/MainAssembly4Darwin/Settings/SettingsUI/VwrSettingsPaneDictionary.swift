@@ -129,6 +129,9 @@ public struct VwrSettingsPaneDictionary: View {
         UserDef.kFilterNonCNSReadingsForCHTInput.renderUI {
           LMMgr.connectCoreDB()
         }
+        UserDef.kFilterFactoryKanjisOfNonCurrentInputMode.renderUI {
+          LMMgr.syncLMPrefs()
+        }
         UserDef.kCNS11643Enabled.renderUI {
           LMMgr.syncLMPrefs()
         }

@@ -80,6 +80,7 @@ public protocol PrefMgrProtocol {
   var phraseEditorAutoReloadExternalModifications: Bool { get set }
   var classicHaninKeyboardSymbolModeShortcutEnabled: Bool { get set }
   var filterNonCNSReadingsForCHTInput: Bool { get set }
+  var filterFactoryKanjisOfNonCurrentInputMode: Bool { get set }
   var romanNumeralOutputFormat: Int { get set }
   var cns11643Enabled: Bool { get set }
   var cassetteEnabled: Bool { get set }

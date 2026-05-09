@@ -57,6 +57,7 @@ extension LMAssembly {
       public var alwaysSupplyETenDOSUnigrams = true
       public var partialMatchEnabled = false
       public var filterNonCNSReadings = false
+      public var filterFactoryKanjisOfNonCurrentInputMode = false
       public var deltaOfCalendarYears: Int = -2_000
       public var allowRescoringSingleKanjiCandidates = false
       public var bypassUserPhrasesData = false
@@ -218,6 +219,7 @@ extension LMAssembly {
       config.isSCPCEnabled = prefs.useSCPCTypingMode
       config.isCassetteEnabled = prefs.cassetteEnabled
       config.filterNonCNSReadings = prefs.filterNonCNSReadingsForCHTInput
+      config.filterFactoryKanjisOfNonCurrentInputMode = prefs.filterFactoryKanjisOfNonCurrentInputMode
       config.deltaOfCalendarYears = prefs.deltaOfCalendarYears
       config.allowRescoringSingleKanjiCandidates = prefs.allowRescoringSingleKanjiCandidates
       config.alwaysSupplyETenDOSUnigrams = prefs.enforceETenDOSCandidateSequence
@@ -645,6 +647,20 @@ extension LMAssembly {
             factoryCoreUnigramsResult.removeAll { thisUnigram in
               !checkCNSConformation(for: thisUnigram, keyArray: keyArray)
             }
+          }
+        }
+        // 若啟用「濾除掉與輸入模式不相符的漢字候選」，移除「非當前輸入模式」的特有字。
+        if config.filterFactoryKanjisOfNonCurrentInputMode, keyArray.count == 1 {
+          factoryCoreUnigramsResult.removeAll { thisUnigram in
+            guard let firstChar = thisUnigram.current.first else { return false }
+            // 查 contradictory mode（與當前模式相反）的特有字：
+            //   CHT 模式 (isCHS=false) → 查簡體特有 (isCHS: true)
+            //   CHS 模式 (isCHS=true)  → 查繁體特有 (isCHS: false)
+            return Self.lmPlainBopomofo.isExclusive(
+              isCHS: !isCHS,
+              reading: keyChain,
+              target: firstChar
+            ) == true
           }
         }
         // 正式追加原廠核心辭典檢索結果。

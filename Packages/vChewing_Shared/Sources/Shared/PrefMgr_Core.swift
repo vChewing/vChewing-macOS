@@ -247,6 +247,9 @@ public final class PrefMgr: PrefMgrProtocol, Sendable {
   @AppProperty(userDef: .kFilterNonCNSReadingsForCHTInput)
   public var filterNonCNSReadingsForCHTInput: Bool
 
+  @AppProperty(userDef: .kFilterFactoryKanjisOfNonCurrentInputMode)
+  public var filterFactoryKanjisOfNonCurrentInputMode: Bool
+
   @AppProperty(userDef: .kRomanNumeralOutputFormat)
   public var romanNumeralOutputFormat: Int
 

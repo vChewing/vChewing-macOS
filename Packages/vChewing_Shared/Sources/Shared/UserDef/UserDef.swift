@@ -127,6 +127,7 @@ nonisolated public enum UserDef: String, CaseIterable, Identifiable, Sendable {
   case kUsingHotKeyCassette = "UsingHotKeyCassette"
   case kUsingHotKeyRevLookup = "UsingHotKeyRevLookup"
   case kUsingHotKeyInputMode = "UsingHotKeyInputMode"
+  case kFilterFactoryKanjisOfNonCurrentInputMode = "FilterFactoryKanjisOfNonCurrentInputMode"
 
   // MARK: Public
 
@@ -523,6 +524,7 @@ nonisolated extension UserDef {
     case .kUsingHotKeyCassette: return .bool(true)
     case .kUsingHotKeyRevLookup: return .bool(true)
     case .kUsingHotKeyInputMode: return .bool(true)
+    case .kFilterFactoryKanjisOfNonCurrentInputMode: return .bool(false)
     }
   }
 }
@@ -1031,6 +1033,11 @@ nonisolated extension UserDef {
     case .kUsingHotKeyInputMode: return .init(
         userDef: self,
         shortTitle: "CHS / CHT Input Mode Switch"
+      )
+    case .kFilterFactoryKanjisOfNonCurrentInputMode: return .init(
+        userDef: self,
+        shortTitle: "i18n:UserDef.kFilterFactoryKanjisOfNonCurrentInputMode.shortTitle",
+        description: "i18n:UserDef.kFilterFactoryKanjisOfNonCurrentInputMode.description"
       )
     }
   }

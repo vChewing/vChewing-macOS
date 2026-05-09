@@ -69,6 +69,11 @@ extension SettingsPanesCocoa {
                   renderable.currentControl?.target = self
                   renderable.currentControl?.action = #selector(self.lmmgrSyncLMPrefs(_:))
                 }
+              UserDef.kFilterFactoryKanjisOfNonCurrentInputMode
+                .render(fixWidth: innerContentWidth) { renderable in
+                  renderable.currentControl?.target = self
+                  renderable.currentControl?.action = #selector(self.lmmgrSyncLMPrefs(_:))
+                }
               UserDef.kCNS11643Enabled.render(fixWidth: innerContentWidth) { renderable in
                 renderable.currentControl?.target = self
                 renderable.currentControl?.action = #selector(self.lmmgrSyncLMPrefs(_:))

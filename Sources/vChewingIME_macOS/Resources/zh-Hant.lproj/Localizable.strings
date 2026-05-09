@@ -273,6 +273,8 @@
 "i18n:UserDef.kEnableCandidateWindowAnimation.shortTitle" = "啟用候選字窗移動/變更大小時的動畫";
 "i18n:UserDef.kEnforceETenDOSCandidateSequence.description" = "對敝輸入法的候選字的順序有著強烈的手動調整之需求的使用者們往往都是從倚天中文 DOS 開始積累了對候選字的直覺記憶、希望能使用這種候選字排序，故提供該選項。逐字選字模式會始終遵循該排序特性，不受該開關所影響。";
 "i18n:UserDef.kEnforceETenDOSCandidateSequence.shortTitle" = "對所有單漢字候選字強制施加倚天中文DOS系統排序";
+"i18n:UserDef.kFilterFactoryKanjisOfNonCurrentInputMode.description" = "啟用時，僅存在於相反輸入模式（如在繁體模式下出現的簡體特有字）的單一漢字候選將從選字窗中移除。倚天中文系統支援的漢字與 CNS 全字庫漢字不受影響。注意：過濾範圍僅限萬國碼 1.0.1 所支援的漢字（即倚天中文系統收字範圍）；較新版本萬國碼才引入的字元不在覆蓋範圍內。";
+"i18n:UserDef.kFilterFactoryKanjisOfNonCurrentInputMode.shortTitle" = "濾除掉與輸入模式不相符的漢字候選";
 "i18n:UserDef.kFilterNonCNSReadingsForCHTInput.description" = "對於單漢字候選字，不符合全字庫讀音的結果將被降權至候選字列表尾端，而非完全移除。";
 "i18n:UserDef.kFilterNonCNSReadingsForCHTInput.shortTitle" = "僅繁體中文: 原廠辭典僅返回符合全字庫讀音的結果";
 "i18n:UserDef.kInlineDumpPinyinInLieuOfZhuyin.description" = "藉由 Command+Option+Ctrl+Enter 輸出的內容受對應的行為設定所影響。";
