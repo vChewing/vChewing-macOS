@@ -103,6 +103,13 @@ extension SessionProtocol {
   /// 如果當前狀態含有「組字結果內容」、或者有選字窗內容、或者存在正在輸入的字根/讀音，則在組字區內顯示游標。
   public func setInlineDisplayWithCursor() {
     var attrStr: NSAttributedString = attributedStringSecured.value
+    // 防禦：當狀態處於組字中（hasComposition）但內文組字區內容為空時，
+    // 使用 guarded placeholder 填補，避免 inline display 為空導致
+    // IMK 誤判 composition 已結束、將 keyboard event 洩漏給客體應用。
+    // doSetMarkedText 的快取機制會確保相同 placeholder 不會觸發重複的 setMarkedText 呼叫。
+    if attrStr.string.isEmpty, state.hasComposition {
+      attrStr = IMEStateParsed4Darwin(state).attributedStringPlaceholder
+    }
     // 包括早期版本的騰訊 QQNT 在內，有些客體的 client.setMarkedText() 無法正常處理 .thick 下劃線。
     mitigation: if clientMitigationLevel == 1 {
       guard state.type == .ofMarking || state.isCandidateContainer else { break mitigation }
