@@ -28,7 +28,6 @@ public protocol SessionCoreProtocol: AnyObject & CtlCandidateDelegate {
 
   func toggleCandidateUIVisibility(_ newValue: Bool, refresh: Bool)
   func commit(text: String, clearDisplayBeforeCommit: Bool)
-  func commit(text: String, clearDisplayBeforeCommit: Bool, bypassAsync: Bool)
   func showTooltip(
     _ string: String?,
     colorState: TooltipColorState,
@@ -67,10 +66,6 @@ extension SessionCoreProtocol {
   }
 
   public func commit(text: String, clearDisplayBeforeCommit: Bool = false) {
-    commit(text: text, clearDisplayBeforeCommit: clearDisplayBeforeCommit)
-  }
-
-  public func commit(text: String, clearDisplayBeforeCommit: Bool = false, bypassAsync: Bool) {
     commit(text: text, clearDisplayBeforeCommit: clearDisplayBeforeCommit)
   }
 

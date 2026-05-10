@@ -715,13 +715,8 @@ public struct MixedAlphanumericalTypewriter<Handler: InputHandlerProtocol>: Type
     handler.composer.clear()
     handler.mixedAlphanumericalBuffer.removeAll()
 
-    // 先同步遞交 ASCII prefix text，確保 IMK cursor 在
-    // updateCompositionBufferDisplay() 被呼叫前已前移至正確位置，
-    // 避免浮動組字窗遮住已遞交的西文內容。
-    session.commit(text: prefixText, clearDisplayBeforeCommit: false, bypassAsync: true)
-
     var inputting = handler.generateStateOfInputting()
-    inputting.textToCommit = overflowText
+    inputting.textToCommit = prefixText + overflowText
     session.switchState(inputting)
     handler.handleTypewriterSCPCTasks()
     return true
