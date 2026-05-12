@@ -12,7 +12,7 @@ import Testing
 @Suite(.serialized)
 public struct HomaTestsAdvanced: HomaTestSuite {
   /// 組字器的分詞功能測試，同時測試組字器的硬拷貝功能。
-  @Test("[Homa] Assember_HardCopyAndWordSegmentation")
+  @Test("[Homa] Assembler_HardCopyAndWordSegmentation")
   func testHardCopyAndWordSegmentation() async throws {
     let regexToFilter = try Regex(".* 能留 .*\n")
     let mockLM = TestLM(
@@ -33,7 +33,7 @@ public struct HomaTestsAdvanced: HomaTestSuite {
   }
 
   /// 組字器的組字壓力測試。
-  @Test("[Homa] Assember_StressBench")
+  @Test("[Homa] Assembler_StressBench")
   func testStressBenchOnAssemblingSentences() async throws {
     print("// Stress test preparation begins.")
     let mockLM = TestLM(rawData: HomaTests.strLMStressData)
@@ -129,7 +129,7 @@ public struct HomaTestsAdvanced: HomaTestSuite {
   ///
   /// 「選字窗內出現橫跨游標的候選字」的故障會破壞使用體驗，得防止發生。
   /// （微軟新注音沒有這個故障，macOS 內建的注音也沒有。）
-  @Test("[Homa] Assember_FilteringOutCandidatesAcrossingTheCursor")
+  @Test("[Homa] Assembler_FilteringOutCandidatesAcrossingTheCursor")
   func testFilteringOutCandidatesAcrossingTheCursor() async throws {
     // 一號測試。
     do {
@@ -198,7 +198,7 @@ public struct HomaTestsAdvanced: HomaTestSuite {
   }
 
   /// 組字器的組字功能測試（單元圖，完整輸入讀音與聲調，完全比對）。
-  @Test("[Homa] Assember_AssembleAndOverride_WithUnigramAndCursorJump")
+  @Test("[Homa] Assembler_AssembleAndOverride_WithUnigramAndCursorJump")
   func testAssembleAndOverrideWithUnigramAndCursorJump() async throws {
     let readings = "chao1 shang1 da4 qian2 tian1 wei2 zhi3 hai2 zai5 mai4 nai3 ji1"
     let mockLM = TestLM(rawData: HomaTests.strLMSampleDataLitch)
@@ -285,7 +285,7 @@ public struct HomaTestsAdvanced: HomaTestSuite {
   /// - 組字器的基本組句功能。
   /// - 候選字詞覆寫功能。
   /// - 在有雙元圖（Bigram）與僅有單元圖（Unigram）的情況下的組句結果對比測試。
-  @Test("[Homa] Assember_AssembleAndOverride_FullMatch_WithBigram")
+  @Test("[Homa] Assembler_AssembleAndOverride_FullMatch_WithBigram")
   func testAssembleWithBigramAndOverrideWithFullMatch() async throws {
     let readings: [Substring] = "you1 die2 neng2 liu2 yi4 lv3 fang1".split(separator: " ")
     let mockLM = TestLM(rawData: HomaTests.strLMSampleDataHutao)
@@ -346,7 +346,7 @@ public struct HomaTestsAdvanced: HomaTestSuite {
   /// - 讀音輸入處理。
   /// - 組字器的基本組句功能。
   /// - 候選字詞覆寫功能。
-  @Test("[Homa] Assember_AssembleAndOverride_PartialMatch_WithBigram")
+  @Test("[Homa] Assembler_AssembleAndOverride_PartialMatch_WithBigram")
   func testAssembleWithBigramAndOverrideWithPartialMatch() async throws {
     let readings: [String] = "ydnlylf".map(\.description)
     let mockLM = TestLM(rawData: HomaTests.strLMSampleDataHutao)
@@ -378,7 +378,7 @@ public struct HomaTestsAdvanced: HomaTestSuite {
   }
 
   /// 針對完全覆蓋的節點的專項覆寫測試。
-  @Test("[Homa] Assember_ResetFullyOverlappedNodesOnOverride")
+  @Test("[Homa] Assembler_ResetFullyOverlappedNodesOnOverride")
   func testResettingFullyOverlappedNodesOnOverride() async throws {
     let readings: [Substring] = "shui3 guo3 zhi1".split(separator: " ")
     let mockLM = TestLM(rawData: HomaTests.strLMSampleDataFruitJuice)
@@ -463,7 +463,7 @@ public struct HomaTestsAdvanced: HomaTestSuite {
   }
 
   /// 針對不完全覆蓋的節點的專項覆寫測試。
-  @Test("[Homa] Assember_ResetPartiallyOverlappedNodesOnOverride")
+  @Test("[Homa] Assembler_ResetPartiallyOverlappedNodesOnOverride")
   func testResettingPartiallyOverlappedNodesOnOverride() async throws {
     let readings: [Substring] = "ke1 ji4 gong1 yuan2".split(separator: " ")
     let mockLM = TestLM(rawData: HomaTests.strLMSampleDataTechGuarden + "\ngong1-yuan2 公猿 -9")
@@ -604,7 +604,7 @@ public struct HomaTestsAdvanced: HomaTestSuite {
   }
 
   /// 組字器的候選字輪替測試。
-  @Test("[Homa] Assember_TestCandidateRevolvementWithConsolidation", arguments: [false, true])
+  @Test("[Homa] Assembler_TestCandidateRevolvementWithConsolidation", arguments: [false, true])
   func testCandidateRevolvementWithConsolidation(partialMatch: Bool) async throws {
     let rdSimp = "k j g y c s m n j"
     let rdFull = "ke1 ji4 gong1 yuan2 chao1 shang1 mai4 nai3 ji1"
@@ -802,7 +802,7 @@ public struct HomaTestsAdvanced: HomaTestSuite {
   }
 
   /// 組字器的候選字輪替測試——某個罕見情形。
-  @Test("[Homa] Assember_TestCandidateRevolvementRareCase1")
+  @Test("[Homa] Assembler_TestCandidateRevolvementRareCase1")
   func testCandidateRevolvementRareCase1() async throws {
     let mockLM = TestLM(rawData: HomaTests.strLMSampleData_JiHuQiKeng)
     let assembler = Homa.Assembler(
