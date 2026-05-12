@@ -296,7 +296,7 @@ public struct MixedAlphanumericalTypewriter<Handler: InputHandlerProtocol>: Type
     // 決定處理順序：長後綴優先 auto-split，短後綴優先整段注音。
     // 這可正確區分 aijo6（ai + jo6，後綴 3 碼）與 xu.6（整段 ㄌㄧㄡˊ，後綴 2 碼）。
     let longSuffixCandidate = bestAutoSplitCandidate(
-      fullInputChars: Array(fullInput),
+      fullInput: fullInput,
       requiresWordLikePrefix: false
     )
     let hasLongSuffix = (longSuffixCandidate?.suffixLength ?? 0) >= 3
@@ -457,17 +457,16 @@ public struct MixedAlphanumericalTypewriter<Handler: InputHandlerProtocol>: Type
     requiresWordLikePrefix: Bool = false
   )
     -> Bool {
-    let fullInputChars = Array(fullInput)
-    guard fullInputChars.count > 1 else { return false }
+    guard fullInput.count > 1 else { return false }
     guard let selectedCandidate = bestAutoSplitCandidate(
-      fullInputChars: fullInputChars,
+      fullInput: fullInput,
       requiresWordLikePrefix: requiresWordLikePrefix
     ) else { return false }
     return applyAutoSplitCandidate(selectedCandidate, inputInvalid: inputInvalid, session: session)
   }
 
   private func bestAutoSplitCandidate(
-    fullInputChars: [Character],
+    fullInput: String,
     requiresWordLikePrefix: Bool
   )
     -> AutoSplitCandidate? {
@@ -475,14 +474,14 @@ public struct MixedAlphanumericalTypewriter<Handler: InputHandlerProtocol>: Type
     // 若多個 raw suffix 最終對應到同一個 reading key，
     // 代表較長者只是用多餘鍵位覆寫出同一個結果，應保留最短 raw suffix。
     // 額外保守排除含 separator / 空白的怪異 query key，避免把多段 key 當成單筆讀音。
-    let maxSuffixLength = min(maxSingleSyllableKeyCount, fullInputChars.count - 1)
+    let maxSuffixLength = min(maxSingleSyllableKeyCount, fullInput.count - 1)
     // 重用單一 trial composer 以減少 struct 複製與 heap 分配。
     var sharedComposer = handler.composer
     // 計算開頭的「被阻斷 ASCII 前綴」長度（大寫字母與聲調數字鍵）。
     // 這些鍵位在 buffer 為空時不會被 composer 吸收，理應視為固定 ASCII 前綴。
     let blockedPrefixLength: Int = {
       var length = 0
-      for char in fullInputChars {
+      for char in fullInput {
         let charStr = char.description
         let isUppercase = charStr.range(of: "^[A-Z]$", options: .regularExpression) != nil
         let isToneDigit: Bool = {
@@ -501,9 +500,9 @@ public struct MixedAlphanumericalTypewriter<Handler: InputHandlerProtocol>: Type
     var candidateByReadingKey: [String: AutoSplitCandidate] = [:]
 
     for suffixLength in 1 ... maxSuffixLength {
-      let prefixLength = fullInputChars.count - suffixLength
-      let prefixText = String(fullInputChars.prefix(prefixLength))
-      let suffixText = String(fullInputChars.suffix(suffixLength))
+      let prefixLength = fullInput.count - suffixLength
+      let prefixText = String(fullInput.prefix(prefixLength))
+      let suffixText = String(fullInput.suffix(suffixLength))
       guard !requiresWordLikePrefix || isWordLikeASCIIPrefix(prefixText) else { continue }
       guard let candidate = buildAutoSplitCandidate(
         suffixLength: suffixLength,
@@ -527,11 +526,11 @@ public struct MixedAlphanumericalTypewriter<Handler: InputHandlerProtocol>: Type
     // 這解決 helloqu4 中 u4（ㄧˋ）擊敗 qu4（ㄆㄧˋ）的問題。
     let suffixTextsByKey: [String: String] = Dictionary(
       uniqueKeysWithValues: candidateByReadingKey.map { key, candidate in
-        (key, String(fullInputChars.suffix(candidate.suffixLength)))
+        (key, String(fullInput.suffix(candidate.suffixLength)))
       }
     )
     let keysToRemove = candidateByReadingKey.compactMap { key, candidate -> String? in
-      let mySuffix = String(fullInputChars.suffix(candidate.suffixLength))
+      let mySuffix = String(fullInput.suffix(candidate.suffixLength))
       for (otherKey, otherSuffix) in suffixTextsByKey where otherKey != key {
         if otherSuffix.hasSuffix(mySuffix), otherSuffix.count > mySuffix.count {
           return key
@@ -622,14 +621,15 @@ public struct MixedAlphanumericalTypewriter<Handler: InputHandlerProtocol>: Type
       return nil
     }
 
-    let suffixEndsWithSpace = suffixText.hasSuffix(" ")
-    let effectiveSuffixText = suffixEndsWithSpace ? String(suffixText.dropLast()) : suffixText
+    let suffixEndsWithSpace = suffixText.last == " "
 
     // Mixed mode 永遠不接受聲調前置鍵入。
     // 後綴不能以獨立聲調鍵作為首鍵（在 receiveSequence 前先檢查，避免破壞 composer 狀態）。
-    if let firstChar = effectiveSuffixText.first?.description {
+    let suffixScalars = suffixText.unicodeScalars
+    let scalarCount = suffixEndsWithSpace ? suffixScalars.count - 1 : suffixScalars.count
+    if scalarCount > 0, let firstScalar = suffixScalars.first {
       trialComposer.clear()
-      trialComposer.receiveKey(fromString: firstChar)
+      trialComposer.receiveKey(fromScalar: firstScalar)
       if trialComposer.hasIntonation(withNothingElse: true) { return nil }
     }
 
@@ -642,8 +642,12 @@ public struct MixedAlphanumericalTypewriter<Handler: InputHandlerProtocol>: Type
     // 若任何字元被 CSVT 拒絕，整個 suffix 候選直接作廢（return nil），
     // 避免半成品 composer（如僅有 vowel）被 trailing space 誤判為合法。
     trialComposer.enforceCSVTOrdering = true
-    for char in effectiveSuffixText {
-      if !trialComposer.receiveKey(fromString: char.description) { return nil }
+    // 使用 UnicodeScalar iteration + receiveKey(fromScalar:) 繞過 Character/String 的 CFString 橋接。
+    var scalarIndex = 0
+    for scalar in suffixScalars {
+      if scalarIndex >= scalarCount { break }
+      if !trialComposer.receiveKey(fromScalar: scalar) { return nil }
+      scalarIndex += 1
     }
 
     // Space handler 會以「buffer + " "」呼叫 auto-split，此時 space 本身即為無聲調確認。
