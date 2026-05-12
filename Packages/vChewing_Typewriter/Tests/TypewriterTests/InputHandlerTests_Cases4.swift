@@ -40,7 +40,7 @@ extension InputHandlerTests {
       return
     }
     defer { testHandler.clear() }
-
+    let testStartTS = Date()
     let pfTag = thePrefix.isEmpty ? "NoPF" : "PF `\(thePrefix)`"
 
     testHandler.currentLM.setOptions { cfg in
@@ -170,6 +170,8 @@ extension InputHandlerTests {
       return resultBuffer
     }
 
+    let secondsPassed = Swift.abs(testStartTS.timeIntervalSinceNow).rounded(toPlaces: 3)
+    print("\(secondsPassed)s passed on finishing the izanami test for param [\(pfTag)].")
     #expect(failureReport.isEmpty, "\(makeFinalFailureReport())")
   }
 
