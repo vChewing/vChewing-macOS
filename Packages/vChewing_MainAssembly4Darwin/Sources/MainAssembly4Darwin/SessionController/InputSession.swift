@@ -185,19 +185,40 @@ public final class InputSession: @MainActor SessionProtocol, Sendable {
 
   // MARK: Internal
 
-  /// 從快取中查詢既有的 InputSession（以 client NSObject 的記憶體位址為鍵）。
-  static func cachedSession(for clientObj: NSObject) -> InputSession? {
-    sessionsByClient.object(forKey: clientObj)
+  // LRU 記數器，用於 sessionsByClient 的 LRU 淘汰。
+  var lruTick: UInt = 0
+
+  /// 從快取中查詢既有的 InputSession（以 client NSObject 的記憶體位址整數值為鍵）。
+  static func cachedSession(for memAddr: Int) -> InputSession? {
+    sessionsLock.withLock {
+      guard let session = sessionsByClient[memAddr] else {
+        return nil
+      }
+      // 孤本清理：若快取中的 session 已無任何 SessionCtl 參照，立即移除。
+      if session.inputControllerAssigned == nil,
+         Self.current?.id != session.id {
+        sessionsByClient[memAddr] = nil
+        return nil
+      }
+      // 命中時更新 LRU 記數器（用於 count > 5 時的批量淘汰）。
+      session.lruTick = Self.globalLRUTick
+      Self.globalLRUTick &+= 1
+      return session
+    }
   }
 
   /// 將自身登記至快取。首次建構 InputSession 時呼叫。
   func registerInCache() {
     guard let clientObj = theClient() else { return }
-    Self.sessionsByClient.setObject(self, forKey: clientObj)
+    let key = Int(bitPattern: Unmanaged.passUnretained(clientObj).toOpaque())
+    Self.sessionsLock.withLock {
+      Self.sessionsByClient[key] = self
+    }
+    // 登記後觸發 LRU 檢查（僅在 count > 5 時實際淘汰）。
+    Self.evictLRUIfNeeded()
   }
 
   /// 重新綁定至新的 SessionCtl（快取命中時使用）。
-  /// 僅更新控制器參照與 clientProvider，不重新建構打字模組。
   func reassign(to controller: SessionCtl, clientProvider: @escaping () -> ClientObj?) {
     inputControllerAssigned = controller
     theClient = clientProvider
@@ -209,10 +230,38 @@ public final class InputSession: @MainActor SessionProtocol, Sendable {
 
   // MARK: - Session 快取 (緩解 CapsLock 高頻切換場景下的 ARC 壓力)
 
-  /// 弱鍵快取：將 client NSObject（弱引用）映射至 InputSession（強引用）。
-  /// 當 client 被 ARC 回收後，對應條目會在下次存取時自動清除。
+  /// 以 client NSObject 的記憶體位址整數值為鍵的快取字典。
+  /// 取代舊版 NSMapTable——NSMapTable 自身的內部設計在 Chrome/Electron
+  /// 等頻繁變更 client proxy 物件的場景下會導致 hang。
   /// - Remark: 參見 DevLab/InputMethodKitPhuquingRetarded.txt 內的分析。
-  private static var sessionsByClient = NSMapTable<NSObject, InputSession>.weakToStrongObjects()
+  private static var sessionsByClient = [Int: InputSession]()
+  /// 併行存取保護鎖。
+  private static let sessionsLock = NSLock()
+  /// 靜態全域 LRU 記數器（單調遞增，&+= 溢位迴繞）。
+  private static var globalLRUTick: UInt = 0
+
+  /// 惰性 LRU 淘汰：僅在快取容量超過閾值 (5) 時執行。
+  /// 某些使用者會利用 macOS 12+ 的 CpLk 特性瘋狂切換中英輸入法，
+  /// 快取條目可能快速累積。LRU 確保只保留最近使用的 session。
+  private static func evictLRUIfNeeded() {
+    sessionsLock.withLock {
+      guard sessionsByClient.count > 5 else { return }
+      var oldestKey: Int?
+      var oldestTick: UInt = .max
+      for (key, session) in sessionsByClient {
+        guard session.inputControllerAssigned == nil,
+              Self.current?.id != session.id
+        else { continue }
+        if session.lruTick < oldestTick {
+          oldestTick = session.lruTick
+          oldestKey = key
+        }
+      }
+      if let oldestKey {
+        sessionsByClient[oldestKey] = nil
+      }
+    }
+  }
 }
 
 extension InputSession {

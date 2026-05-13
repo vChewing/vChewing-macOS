@@ -74,10 +74,15 @@ public final class SessionCtl: IMKInputSessionController {
     // 參見 DevLab/InputMethodKitPhuquingRetarded.txt 內的分析。
     let maybeClientOnMain = maybeClient as? NSObject
     let clientObj = maybeClientOnMain ?? (client() as? NSObject)
-    if let clientObj, let cached = InputSession.cachedSession(for: clientObj) {
-      cached.reassign(to: self, clientProvider: getClientProvider())
-      vCLog("InputSession reused. ID: \(cached.id.uuidString)")
-      return cached
+    // 改用 uniqueClientIdentifierString 作為快取鍵。
+    // 此舉解決 Chrome/Electron 的 client object memAddr 不穩定問題。
+    if let clientObj {
+      let key = Int(bitPattern: Unmanaged.passUnretained(clientObj).toOpaque())
+      if let cached = InputSession.cachedSession(for: key) {
+        cached.reassign(to: self, clientProvider: getClientProvider())
+        vCLog("InputSession reused. ID: \(cached.id.uuidString)")
+        return cached
+      }
     }
     // 先用傳入的參數完成 InputSession 的初期化，其中包括了對這個 Session 的登記過程。
     let newSession = InputSession(controller: self) {
