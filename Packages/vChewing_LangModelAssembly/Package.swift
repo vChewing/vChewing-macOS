@@ -36,7 +36,6 @@ let package = Package(
     .target(
       name: "LangModelAssembly",
       dependencies: [
-        "LMAssemblyMaterials4Tests",
         "TrieKit",
         .product(name: "LineReader", package: "RMJay_LineReader"),
         .product(name: "Homa", package: "vChewing_Homa"),
@@ -63,6 +62,7 @@ let package = Package(
       name: "LangModelAssemblyTests",
       dependencies: [
         "LangModelAssembly",
+        "LMAssemblyMaterials4Tests",
         .product(name: "Homa", package: "vChewing_Homa"),
         .product(name: "HomaSharedTestComponents", package: "vChewing_Homa"),
         .product(name: "Tekkon", package: "vChewing_Tekkon"),
