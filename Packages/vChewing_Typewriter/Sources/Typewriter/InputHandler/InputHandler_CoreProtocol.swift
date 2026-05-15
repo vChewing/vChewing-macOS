@@ -246,7 +246,7 @@ extension InputHandlerProtocol {
     let preservedCursorPosition = actualNodeCursorPosition
 
     /// 必須先鞏固當前組字器游標上下文、以消滅意料之外的影響，但在內文組字區內就地輪替候選字詞時除外。
-    if preConsolidate { consolidateCursorContext(with: theCandidate, explicitlyChosen: explicitlyChosen) }
+    if preConsolidate { consolidateCursorContext(with: theCandidate) }
 
     // 先嘗試用 POM 建議覆寫（如果有完全匹配的記憶）。
     let pomSuggestion = retrievePOMSuggestions(apply: false)
@@ -291,7 +291,7 @@ extension InputHandlerProtocol {
         // 無法直接匹配「奇」的 unigram keyArray）。此時先鞏固上下文以拆分 bigram，
         // 後續重試才能成功匹配 keyArray 並觸發 POM 記憶。
         if !overrideTaskResult, attempt == 1, !preConsolidate {
-          consolidateCursorContext(with: theCandidate, explicitlyChosen: explicitlyChosen)
+          consolidateCursorContext(with: theCandidate)
         }
         if !overrideTaskResult, attempt == 2 {
           let contextualTargets = [
@@ -909,7 +909,7 @@ extension InputHandlerProtocol {
 
 extension InputHandlerProtocol {
   /// Homa 已內建上下文鞏固邏輯；Typewriter 僅負責將當前游標風格轉譯給 Homa。
-  func consolidateCursorContext(with theCandidate: Homa.CandidatePair, explicitlyChosen _: Bool = false) {
+  func consolidateCursorContext(with theCandidate: Homa.CandidatePair) {
     try? assembler.consolidateCandidateCursorContext(
       for: theCandidate,
       cursorType: homaCandidateCursorType
