@@ -108,6 +108,23 @@ struct LMCoreEXTests {
   }
 
   @Test
+  func testReplaceDataHandlesTabDelimitedInput() throws {
+    var lmTest = LMAssembly.LMCoreEX(
+      reverse: false,
+      consolidate: false,
+      defaultScore: { _ in 0 },
+      forceDefaultScore: false
+    )
+    let tabbedData = "ㄍㄠ\t高\t-7.171551\nㄎㄜ\t顆\t-10.574273"
+    lmTest.replaceData(textData: tabbedData)
+    #expect(lmTest.count == 2)
+    let gao = lmTest.unigramsFor(key: "ㄍㄠ").map(\.current)
+    let ke = lmTest.unigramsFor(key: "ㄎㄜ").map(\.current)
+    #expect(gao == ["高"])
+    #expect(ke == ["顆"])
+  }
+
+  @Test
   func testPrefixMatchingDeduplicatesOverlappingMainAndTemporaryKeys() throws {
     var lmTest = LMAssembly.LMCoreEX(
       reverse: false,

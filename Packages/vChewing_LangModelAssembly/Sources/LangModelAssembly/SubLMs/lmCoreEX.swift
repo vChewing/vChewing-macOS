@@ -104,6 +104,7 @@ extension LMAssembly {
     /// - parameters:
     ///   - path: 給定路徑。
     mutating func replaceData(textData rawStrData: String) {
+      let rawStrData = rawStrData.replacingOccurrences(of: "\t", with: " ")
       if strData == rawStrData { return }
 
       // 清理之前的資料以釋放記憶體
