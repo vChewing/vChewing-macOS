@@ -138,10 +138,21 @@ public struct MixedAlphanumericalTypewriter<Handler: InputHandlerProtocol>: Type
         // BPMF 失敗，恢復 buffer 並繼續嘗試 auto-split
         handler.mixedAlphanumericalBuffer = originalMixedBuffer
       }
+      // 若 buffer 含多個大寫字母且有小寫字母（camelCase/縮寫，如 cOS、macOS），
+      // 即使 shouldPreferASCIIWordOnSpace 為 true，仍應嘗試 auto-split，
+      // 以支援「cOS + 注音」這類混輸。
+      // 條件：≥2 個大寫 + ≥1 個小寫，可區分於簡單首字大寫詞（Hello、Mac）或全大寫詞（HELLO）。
+      let bufferHasMultipleUppercaseAndLowercase: Bool = {
+        let buffer = handler.mixedAlphanumericalBuffer
+        let hasLower = buffer.range(of: "[a-z]", options: .regularExpression) != nil
+        let ucCount = buffer.unicodeScalars.filter { "A" ... "Z" ~= $0 }.count
+        return hasLower && ucCount >= 2
+      }()
       // 當 buffer 較長（>= 5 字元）時，即使 shouldPreferASCIIWordOnSpace 為 true
       // 也嘗試 auto-split，以支援 hello你好 等長 ASCII prefix 的混輸情境。
       if !shouldPreferASCIIWordOnSpace || twoCharPrefixIsPhonetic
-        || handler.mixedAlphanumericalBuffer.count >= 5 {
+        || handler.mixedAlphanumericalBuffer.count >= 5
+        || bufferHasMultipleUppercaseAndLowercase {
         // 先嘗試無 word-like 限制的 auto-split（fallback），以正確保留常見雙字母前綴（如 ai）。
         // 若 fallback 失敗，再嘗試 word-like 限制，以支援 hello你好 類型混輸。
         if tryAutoSplitASCIIAndPhoneticSuffix(
@@ -632,6 +643,13 @@ public struct MixedAlphanumericalTypewriter<Handler: InputHandlerProtocol>: Type
       trialComposer.receiveKey(fromScalar: firstScalar)
       if trialComposer.hasIntonation(withNothingElse: true) { return nil }
     }
+
+    // 後綴若包含大寫字母，不得被視為注音後綴。
+    // 大寫字母只能透過 Shift 鍵入，在 mixed mode 下明確代表 ASCII 意圖。
+    // 若允許大寫字母進入注音 composer（因 receiveKey 對大小寫不敏感），
+    // 則「macOS 」這類 camelCase 輸入會被誤拆為 ASCII 前綴 + 注音後綴。
+    let suffixHasUppercase = suffixText.range(of: "[A-Z]", options: .regularExpression) != nil
+    guard !suffixHasUppercase else { return nil }
 
     trialComposer.clear()
     // 在評估 mixed 輸入時，暫時停用自動糾正。否則 auto-correct 會讓不同的 suffix

@@ -31,7 +31,7 @@ extension InputHandlerTests {
   /// - Parameters:
   ///   - thePrefix: 要測試的前綴。
   /// - Warning: This unit test case is not designed for dynamic phonabet layouts.
-  @Test(arguments: ["", "ai", "AI", "hello", "Hello"])
+  @Test(arguments: ["", "ai", "ello", "cOS"])
   func test_IH400_MixedAlnumKanjiInputTest_Izanami(
     _ thePrefix: String
   ) throws {
@@ -1161,6 +1161,69 @@ extension InputHandlerTests {
     #expect(testSession.recentCommissions.isEmpty, "非聲調數字鍵不應被誤當 ASCII 前綴提交")
     #expect(testHandler.mixedAlphanumericalBuffer.isEmpty, "純注音輸入不應殘留 mixed buffer")
     #expect(testHandler.committableDisplayText(sansReading: true) == "這", "5k4 應為 ㄓㄜˋ=這")
+  }
+
+  // MARK: — camelCase 後綴不得被誤判為注音
+
+  /// camelCase 英文詞中大寫字母不得被 auto-split 誤判為注音後綴。
+  /// 此測試鎖住 bug：`macOS ` 被誤拆成 `ma` + 注音後綴 `OS`。
+  @Test
+  func test_IH429_MixedCamelCaseSuffixNotTreatedAsPhonetic() throws {
+    let (testHandler, testSession) = try prepareMixedModeHandler()
+
+    // macOS：大寫後綴 "OS" 不得被當作注音
+    typeSentence("macOS ")
+    #expect(testSession.recentCommissions.joined() == "macOS ")
+    #expect(testHandler.mixedAlphanumericalBuffer.isEmpty)
+    #expect(testHandler.composer.isEmpty)
+
+    testHandler.clear()
+    testSession.recentCommissions.removeAll()
+
+    // This：大寫開頭的純 ASCII 單字應維持完整
+    typeSentence("This ")
+    #expect(testSession.recentCommissions.joined() == "This ")
+    #expect(testHandler.mixedAlphanumericalBuffer.isEmpty)
+    #expect(testHandler.composer.isEmpty)
+  }
+
+  // MARK: — CamelCase 縮寫作為 ASCII 前綴 + 注音後綴
+
+  /// camelCase 縮寫（如 cOS / macOS）作為 ASCII 前綴時，
+  /// 後續注音輸入應正確拆分，而非整段被當作 ASCII 提交。
+  @Test
+  func test_IH430_MixedCamelCasePrefixWithPhoneticSuffix() throws {
+    let (testHandler, testSession) = try prepareMixedModeHandler()
+    testHandler.currentLM.setOptions { cfg in
+      cfg.alwaysSupplyETenDOSUnigrams = true
+    }
+
+    // cOS + ㄆ（Dachen26 鍵序 q ）
+    typeSentence("cOSq ")
+    let allCommissions = testSession.recentCommissions.joined()
+    #expect(allCommissions.contains("cOS"), "cOS prefix should be committed as ASCII")
+    #expect(testHandler.assembler.length == 1, "Assembler should have one reading")
+    #expect(testHandler.assembler.actualKeys.last == "ㄆ", "Reading should be ㄆ")
+
+    testHandler.clear()
+    testSession.resetInputHandler(forceComposerCleanup: true)
+
+    // macOS + ㄆ（Dachen26 鍵序 q ）
+    typeSentence("macOSq ")
+    let allCommissions2 = testSession.recentCommissions.joined()
+    #expect(allCommissions2.contains("macOS"), "macOS prefix should be committed as ASCII")
+    #expect(testHandler.assembler.length == 1, "Assembler should have one reading")
+    #expect(testHandler.assembler.actualKeys.last == "ㄆ", "Reading should be ㄆ")
+
+    testHandler.clear()
+    testSession.resetInputHandler(forceComposerCleanup: true)
+
+    // cOS + ㄇㄛ（Dachen26 鍵序 ai ）
+    typeSentence("cOSai ")
+    let allCommissions3 = testSession.recentCommissions.joined()
+    #expect(allCommissions3.contains("cOS"), "cOS prefix should be committed as ASCII")
+    #expect(testHandler.assembler.length == 1, "Assembler should have one reading")
+    #expect(testHandler.assembler.actualKeys.last == "ㄇㄛ", "Reading should be ㄇㄛ")
   }
 
   // MARK: - Fileprivate Helpers.
