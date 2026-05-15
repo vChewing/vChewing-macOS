@@ -9,6 +9,7 @@
 import Foundation
 import Homa
 import HomaSharedTestComponents
+import LMAssemblyMaterials4Tests
 
 import Testing
 
@@ -427,6 +428,156 @@ extension POMTestSuite {
 
       let assembledByPOM = validationCompositor.assembledSentence.values.joined(separator: " ")
       #expect(assembledByPOM == "遞交")
+    }
+
+    @Test
+    func testPOM_AC04_DuoQiMemorization() throws {
+      // 測試 POM 記憶使用者對「多期」→「多奇」的覆寫行為。
+      // ---- Part A: 以不含 bigram 的 LM 驗證 POM 完整 round-trip ----
+      let unigramOnlyData = """
+      ㄉㄨㄛ 多 -5.053
+      ㄉㄨㄛ 哆 -5.248
+      ㄉㄨㄛ 朵 -6.212
+      ㄑㄧˊ 期 -5.124
+      ㄑㄧˊ 其 -5.125
+      ㄑㄧˊ 騎 -5.14
+      ㄑㄧˊ 奇 -5.184
+      ㄑㄧˊ 旗 -5.2
+      """
+      let unigramLM = TestLM(rawData: unigramOnlyData)
+      let pom = LMAssembly.LXPerceptor(dataURL: URL(fileURLWithPath: "/dev/null"))
+      let compositor = Homa.Assembler(
+        gramQuerier: unigramLM.asGramQuerier()
+      )
+      let readingKeys = ["ㄉㄨㄛ", "ㄑㄧˊ"]
+      for key in readingKeys { try compositor.insertKey(key) }
+      compositor.assemble()
+
+      // 確認初始組句結果為兩個獨立 Gram
+      let assembledBefore = compositor.assembledSentence.values.joined(separator: " ")
+      #expect(assembledBefore == "多 期")
+
+      // 獲取覆寫前的感知 Key
+      let keyBeforeOverride = compositor.assembledSentence
+        .generateKeyForPerception(cursor: 1)
+      #expect(keyBeforeOverride?.ngramKey == "()&(ㄉㄨㄛ,多)&(ㄑㄧˊ,期)")
+
+      // 模擬使用者將 pos 1 改為「奇」
+      var obsCaptured: Homa.PerceptionIntel?
+      try compositor.overrideCandidate(
+        Homa.CandidatePair(keyArray: ["ㄑㄧˊ"], value: "奇"),
+        at: 1,
+        enforceRetokenization: true
+      ) {
+        obsCaptured = $0
+      }
+
+      // 驗證覆寫後的組句結果
+      let assembledAfterOverride = compositor.assembledSentence.values.joined(separator: " ")
+      #expect(assembledAfterOverride == "多 奇")
+
+      guard let obsCaptured else {
+        preconditionFailure("Should have captured the perception intel.")
+      }
+      // sameLenSwap 場景，key 反映覆寫後的結果。
+      #expect(obsCaptured.contextualizedGramKey == "()&(ㄉㄨㄛ,多)&(ㄑㄧˊ,奇)")
+      #expect(obsCaptured.candidate == "奇")
+
+      // 記憶到 POM
+      pom.memorizePerception(
+        (obsCaptured.contextualizedGramKey, obsCaptured.candidate),
+        timestamp: nowTimeStamp
+      )
+
+      // ====== 檢查 POM 記憶內容 ======
+      let currentMemory = pom.getSavableData()
+      let firstObservationKey = currentMemory.first?.key
+      guard let firstObservationKey else {
+        preconditionFailure("POM memorized nothing.")
+      }
+      #expect(firstObservationKey == obsCaptured.contextualizedGramKey)
+
+      // ====== 記憶效力測試 ======
+      let validationLM = TestLM(rawData: unigramOnlyData)
+      let validationCompositor = Homa.Assembler(
+        gramQuerier: validationLM.asGramQuerier()
+      )
+      for key in readingKeys { try validationCompositor.insertKey(key) }
+      validationCompositor.assemble()
+
+      let assembledNow = validationCompositor.assembledSentence.values.joined(separator: " ")
+      #expect(assembledNow == "多 期")
+
+      let suggestion = pom.fetchSuggestion(
+        assembledResult: validationCompositor.assembledSentence,
+        cursor: validationCompositor.cursor,
+        timestamp: nowTimeStamp
+      )
+      #expect(!suggestion.isEmpty, "POM should suggest the memorized override.")
+      guard let firstSuggestionRAW = suggestion.candidates.first else {
+        preconditionFailure("POM suggested nothing.")
+      }
+
+      let candidateSuggested = Homa.CandidatePair(
+        keyArray: firstSuggestionRAW.keyArray,
+        value: firstSuggestionRAW.value
+      ).weighted(firstSuggestionRAW.probability)
+      let cursorForOverride = suggestion.overrideCursor ?? 1
+
+      // 套用 POM 建議
+      if (try? validationCompositor.overrideCandidate(
+        candidateSuggested,
+        at: cursorForOverride,
+        type: suggestion.suggestedOverrideType,
+        enforceRetokenization: true
+      )) == nil {
+        try validationCompositor.overrideCandidateLiteral(
+          candidateSuggested.pair.value,
+          at: cursorForOverride,
+          overrideType: suggestion.suggestedOverrideType
+        )
+      }
+      validationCompositor.assemble()
+
+      let assembledByPOM = validationCompositor.assembledSentence.values.joined(separator: " ")
+      #expect(assembledByPOM == "多 奇", "POM suggestion should correct to 多 奇.")
+
+      // ---- Part B: 驗證 alternateKeys 的 bigram to split 匹配 ----
+      let bigramLM = TestLM(rawData: LMATestsData.strDataCase4DuoQi)
+      let bigramPOM = LMAssembly.LXPerceptor(dataURL: URL(fileURLWithPath: "/dev/null"))
+
+      // 直接記憶拆分後的 key（模擬 bigram 被拆分覆寫後記錄的 key）
+      let splitMemoryKey = "()&(ㄉㄨㄛ,多)&(ㄑㄧˊ,奇)"
+      bigramPOM.memorizePerception(
+        (splitMemoryKey, "奇"),
+        timestamp: nowTimeStamp
+      )
+      #expect(bigramPOM.getSavableData().first?.key == splitMemoryKey)
+
+      // 用 bigram 格式的查詢鍵查詢
+      let bigramQueryKey = "()&()&(ㄉㄨㄛ-ㄑㄧˊ,多期)"
+      let alternateKeys = bigramPOM.alternateKeysForTesting(bigramQueryKey)
+      #expect(
+        alternateKeys.contains(splitMemoryKey),
+        "AlternateKeys must find split key from bigram query."
+      )
+
+      // 驗證 fetchSuggestion 也能正確找回
+      let bigramCompositor = Homa.Assembler(
+        gramQuerier: bigramLM.asGramQuerier()
+      )
+      for key in readingKeys { try bigramCompositor.insertKey(key) }
+      bigramCompositor.assemble()
+
+      let bigramSuggestion = bigramPOM.fetchSuggestion(
+        assembledResult: bigramCompositor.assembledSentence,
+        cursor: bigramCompositor.cursor,
+        timestamp: nowTimeStamp
+      )
+      #expect(!bigramSuggestion.isEmpty, "FetchSuggestion must find memory from bigram query.")
+      if let bigramCandidate = bigramSuggestion.candidates.first {
+        #expect(bigramCandidate.value == "奇")
+      }
     }
   }
 }
