@@ -787,8 +787,26 @@ extension InputHandlerProtocol {
           ? .withSpecified
           : .withTopGramScore
         let cursorForOverride = suggestion.overrideCursor ?? actualNodeCursorPosition
+        var effectiveCursorForOverride = cursorForOverride
         if let gramHit = assembler.assembledSentence.findGram(at: cursorForOverride) {
           if gramHit.gram.keyArray.count > newestSuggestedCandidate.keyArray.count {
+            // 當現有節點比 POM 建議長時（例：bigram「多期」vs unigram「奇」），
+            // 先將 bigram 拆分為獨立 unigram，後續 literal override 才能正確匹配。
+            let grams = gramHit.gram
+            let values = grams.value.map(String.init)
+            var pos = gramHit.range.lowerBound
+            for (i, key) in grams.keyArray.enumerated() where i < values.count {
+              _ = assembler.overrideCandidate(
+                .init(keyArray: [key], value: values[i]),
+                at: pos,
+                overrideType: overrideBehavior,
+                enforceRetokenization: false
+              )
+              // 記錄與 POM 建議 keyArray 一致的子位置，供後續 override 使用。
+              if [key] == newestSuggestedCandidate.keyArray { effectiveCursorForOverride = pos }
+              pos += 1
+            }
+
             // 若建議會將現有節點縮短（short->long 替換），要求建議的分數
             // 必須明顯高於既有節點分數才允許套用（避免微小差異導致惡性覆寫）。
             let existingScore = gramHit.gram.score
@@ -803,7 +821,7 @@ extension InputHandlerProtocol {
         // 因此一律使用 literal override（不查 keyArray）讓 Homa 按 value 搜尋重疊節點。
         _ = try? assembler.overrideCandidateLiteral(
           newestSuggestedCandidate.value,
-          at: cursorForOverride,
+          at: effectiveCursorForOverride,
           overrideType: overrideBehavior,
           enforceRetokenization: true
         )
