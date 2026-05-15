@@ -286,6 +286,13 @@ extension InputHandlerProtocol {
             pomObservation2ndary = perceptionIntel
           }
         }
+        // 若首輪覆寫失敗且尚未鞏固上下文（preConsolidate==false），
+        // 可能是因為 bigram 節點不含單一 unigram keyArray（例：「多期」bigram
+        // 無法直接匹配「奇」的 unigram keyArray）。此時先鞏固上下文以拆分 bigram，
+        // 後續重試才能成功匹配 keyArray 並觸發 POM 記憶。
+        if !overrideTaskResult, attempt == 1, !preConsolidate {
+          consolidateCursorContext(with: theCandidate, explicitlyChosen: explicitlyChosen)
+        }
         if !overrideTaskResult, attempt == 2 {
           let contextualTargets = [
             pomObservationPrimary
