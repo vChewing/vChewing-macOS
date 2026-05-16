@@ -48,6 +48,34 @@ public final class SecurityAgentHelper {
     vCLog("SecurityAgentHelper scanned SecureEventInput abusers. \(results.count) targets found.")
     guard !results.isEmpty else { return }
     _ = DisableSecureEventInput()
+    // WARNING: It is not necessary, but extremely troublesome,
+    // to call EnableSecureEventInput manually here
+    // (whether deferred or not).
+    //
+    // EnableSecureEventInput is automatically invoked by the system
+    // whenever a password field regains focus. The SecureEventInput
+    // API is only designed for protecting password fields. When
+    // vChewing issues a warning about abuse of the SecureEventInput
+    // API, all password fields in other applications lose focus.
+    //
+    // Modern AI-powered security vulnerability scanners apparently
+    // are never aware that leaving SecureEventInput enabled
+    // (i.e. failing to restore the previous state) completely
+    // prevents users from switching to any 3rd-party input method
+    // — regardless of whether the current app has text input focus.
+    //
+    // This long-standing issue has severely degraded the UX for all
+    // 3rd-party input method users ever since SecureEventInput (or
+    // InputMethodKit, whichever came later) was introduced.
+    //
+    // The built-in Zhuyin input method on macOS is quite poor,
+    // yet Apple’s Chinese Input Method Team (as of May 2026)
+    // refuses to improve it. They are even unwilling to provide
+    // a Zhuyin IME for typing Simplified Chinese. Apple’s bug report
+    // and feedback channels have remained largely unresponsive for
+    // decades unless the issue is a critical security vulnerability.
+    // This is why users “vote with their feet” and choose
+    // third-party solutions.
     Self.reportedPIDs.forEach { reportedPID in
       results[reportedPID] = nil
     }
