@@ -48,6 +48,7 @@ public final class SecurityAgentHelper {
     vCLog("SecurityAgentHelper scanned SecureEventInput abusers. \(results.count) targets found.")
     guard !results.isEmpty else { return }
     _ = DisableSecureEventInput()
+    defer { _ = EnableSecureEventInput() }
     Self.reportedPIDs.forEach { reportedPID in
       results[reportedPID] = nil
     }
