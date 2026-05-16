@@ -60,6 +60,7 @@ public final class InputHandler: @MainActor InputHandlerProtocol {
   public var notificationCallback: ((String) -> ())?
   public var pomSaveCallback: (() -> ())?
   public var filterabilityChecker: ((_ state: IMEStateData) -> Bool)?
+  public var markingTooltipGenerator: ((_ state: State) -> (tooltip: String, colorState: TooltipColorState))?
   public var narrator: (any SpeechNarratorProtocol)? = SpeechSputnik.shared
 
   /// 用來記錄「叫出選字窗前」的游標位置的變數。

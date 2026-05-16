@@ -180,6 +180,16 @@ public final class InputSession: @MainActor SessionProtocol, Sendable {
         pomSaveCallback: { LMMgr.savePerceptionOverrideModelData(false) }
       )
     }
+    inputHandler?.markingTooltipGenerator = { state in
+      let result = IMEStateParsed4Darwin(state).generateTooltipForMarking()
+      var colorState = result.colorState
+      var tooltip = result.tooltip
+      if PrefMgr.shared.phraseReplacementEnabled {
+        colorState = .warning
+        tooltip += "\n" + "⚠︎ Phrase replacement mode enabled, interfering user phrase entry.".i18n
+      }
+      return (tooltip, colorState)
+    }
     inputHandler?.session = self
   }
 

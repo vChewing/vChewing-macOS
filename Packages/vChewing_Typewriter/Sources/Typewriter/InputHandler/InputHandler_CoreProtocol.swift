@@ -34,6 +34,7 @@ public protocol InputHandlerProtocol: AnyObject, InputHandlerCoreProtocol {
   var notificationCallback: ((String) -> ())? { get set }
   var pomSaveCallback: (() -> ())? { get set }
   var filterabilityChecker: ((_ state: IMEStateData) -> Bool)? { get set }
+  var markingTooltipGenerator: ((_ state: State) -> (tooltip: String, colorState: TooltipColorState))? { get set }
   var isJISKeyboard: (() -> Bool)? { get set }
   var narrator: (any SpeechNarratorProtocol)? { get set }
 

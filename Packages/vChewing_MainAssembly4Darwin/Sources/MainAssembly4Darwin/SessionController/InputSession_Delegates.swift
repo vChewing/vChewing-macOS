@@ -74,21 +74,21 @@ extension SessionProtocol {
       ),
       isFiltering: addToFilter
     )
-    // 開始針對使用者漸退模組的清詞處理
-    if !uniqueCandidateTargets.isEmpty {
-      LMMgr.bleachSpecifiedSuggestions(
-        targets: uniqueCandidateTargets,
-        mode: IMEApp.currentInputMode
-      )
+    // 將清詞（bleach）延遲至 asyncOnMain 執行，避免同步 JSON encode + disk write 阻塞 main thread。
+    let bleachTargets = uniqueCandidateTargets
+    let bleachHeadReadings = headReading
+    let bleachReversedValue = valueReversed
+    if !bleachTargets.isEmpty || !bleachHeadReadings.isEmpty {
+      asyncOnMain {
+        if !bleachTargets.isEmpty {
+          LMMgr.bleachSpecifiedSuggestions(targets: bleachTargets, mode: IMEApp.currentInputMode)
+        }
+        if !bleachHeadReadings.isEmpty {
+          LMMgr.bleachSpecifiedSuggestions(headReadings: [bleachHeadReadings], mode: IMEApp.currentInputMode)
+        }
+        LMMgr.bleachSpecifiedSuggestions(targets: [bleachReversedValue], mode: IMEApp.currentInputMode.reversed)
+      }
     }
-    if !headReading.isEmpty {
-      LMMgr.bleachSpecifiedSuggestions(headReadings: [headReading], mode: IMEApp.currentInputMode)
-    }
-    LMMgr.bleachSpecifiedSuggestions(
-      targets: [valueReversed],
-      mode: IMEApp.currentInputMode.reversed
-    )
-    // 清詞完畢
     return true
   }
 }

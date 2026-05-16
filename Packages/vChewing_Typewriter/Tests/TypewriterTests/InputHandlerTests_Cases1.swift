@@ -263,6 +263,14 @@ extension InputHandlerTests {
     #expect(testSession.state.type == .ofMarking)
     #expect(testSession.state.markedRange == 0 ..< 2)
 
+    // 確認 rawDisplayTextSegments 已正確傳入 ofMarking()，
+    // 使 marking state 內的 userPhraseKVPair 能使用原始文字。
+    // （tooltip 內容在 MainAssembly 層產生，Typewriter 測試環境不連結 MainAssembly 故不檢查 tooltip 字串）
+    #expect(
+      testSession.state.data.rawDisplayTextSegments?.joined() == "咱地",
+      "rawDisplayTextSegments should be correctly passed to ofMarking()"
+    )
+
     // 取出 userPhraseKVPair，驗證值為原始文字（不含 Variation Selector）。
     let kvPair = testSession.state.data.userPhraseKVPair
     #expect(kvPair.value == "咱地")
@@ -323,6 +331,54 @@ extension InputHandlerTests {
 
     #expect(testSession.state.highlightedCandidateIndex == previewIndex)
     #expect(testSession.state.data.rawDisplayedText == "雜")
+  }
+
+  /// 確認 marking state 的 rawDisplayTextSegments 參數正確傳遞至 ofMarking()。
+  /// Typewriter 測試層級驗證 raw text 傳遞正確性；tooltip 內容驗證由 MainAssembly 層測試負責。
+  @Test
+  func test_IH103F_MarkingStateRawTextPassing() throws {
+    guard let testHandler, let testSession else {
+      Issue.record("testHandler and testSession at least one of them is nil.")
+      return
+    }
+    let testKanjiData = """
+    ㄗㄚˊ 咱 -1
+    ㄉㄜ˙ 地 -1
+    """
+    let extractedGrams = extractGrams(from: testKanjiData)
+    extractedGrams.forEach {
+      testHandler.currentLM.insertTemporaryData(unigram: $0, isFiltering: false)
+    }
+    defer {
+      testHandler.currentLM.clearTemporaryData(isFiltering: false)
+      testHandler.clear()
+    }
+
+    clearTestPOM()
+    testHandler.clear()
+    testHandler.prefs.fetchSuggestionsFromPerceptionOverrideModel = false
+    testHandler.prefs.specifyCmdOptCtrlEnterBehavior = 4
+    testSession.resetInputHandler(forceComposerCleanup: true)
+
+    // 不啟用 BPMFVS：raw text 應與 display text 相同。
+    testHandler.prefs.reflectBPMFVSInCompositionBuffer = false
+
+    #expect(throws: Never.self) { try testHandler.assembler.insertKey("ㄗㄚˊ") }
+    #expect(throws: Never.self) { try testHandler.assembler.insertKey("ㄉㄜ˙") }
+    testSession.switchState(testHandler.generateStateOfInputting())
+
+    // 進入 marking state（Shift+Left 兩次）。
+    var arrLeftEvent = KBEvent.KeyEventData.dataArrowLeft
+    arrLeftEvent.flags.insert(.shift)
+    #expect(testHandler.triageInput(event: arrLeftEvent.asEvent))
+    #expect(testHandler.triageInput(event: arrLeftEvent.asEvent))
+    #expect(testSession.state.type == .ofMarking)
+    #expect(testSession.state.markedRange == 0 ..< 2)
+
+    // 核心驗證：userPhraseKVPair.value 正確（透過 rawDisplayTextSegments 或 fallback displayedText）。
+    // BPMFVS 關閉時 rawDisplayTextSegments 為 nil，value 取自 displayedText（此時兩者相同）。
+    let kvPair = testSession.state.data.userPhraseKVPair
+    #expect(kvPair.value == "咱地", "userPhraseKVPair.value should be '咱地', but got: \(kvPair.value)")
   }
 
   /// 測試磁帶模組的快速選字功能（單一結果）。

@@ -749,4 +749,32 @@ extension MainAssemblyTests {
       #expect(testSession.state.displayedText == expectedNodes.joined())
     }
   }
+
+  /// 驗證 marking state 的 tooltip 在 switchState 中正確生成。
+  /// 此測試防禦：ofMarking() 的 call site 在 Typewriter 層（不連結 MainAssembly），
+  /// 無法看到 generateTooltipForMarking()，因此 tooltip 須在 switchState 中產生。
+  @Test
+  func test214_MarkingStateTooltipGeneratedInSwitchState() throws {
+    _ = prepareBasicComposition(sequence: "dk ru4204el ")
+    testSession.switchState(.ofAbortion())
+    testClient.clear()
+
+    // 使用雙字詞來測試 marking state（確保 markedRange 至少有 2 個字）。
+    _ = prepareBasicComposition(sequence: "wu40j4qi4 ")
+    // 確認有 composition 後，按 Shift+Left 進入 marking state。
+    #expect(testSession.state.hasComposition)
+    press(shiftLeftEvent)
+    press(shiftLeftEvent)
+    #expect(testSession.state.type == .ofMarking)
+    #expect(!testSession.state.markedRange.isEmpty, "Marked range must be non-empty for tooltip to appear")
+
+    // 核心驗證：tooltip 非空（若為空，showTooltip 會改為 hide）。
+    let tooltip = testSession.state.tooltip
+    #expect(!tooltip.isEmpty, "Tooltip should be non-empty after entering marking state, but was empty")
+    // 驗證 tooltip 顏色狀態為正常（非 denial / error）。
+    #expect(
+      testSession.state.data.tooltipColorState == .normal || testSession.state.data.tooltipColorState == .prompt,
+      "Tooltip color state should be normal or prompt for a new phrase"
+    )
+  }
 }

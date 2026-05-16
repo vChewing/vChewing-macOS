@@ -371,10 +371,15 @@ extension InputHandlerProtocol {
         displayTextSegments: state.displayTextSegments,
         markedReadings: Array(assembler.actualKeys[currentMarkedRange()]),
         cursor: convertCursorForDisplay(assembler.cursor),
-        marker: convertCursorForDisplay(assembler.marker)
+        marker: convertCursorForDisplay(assembler.marker),
+        rawDisplayTextSegments: state.data.rawDisplayTextSegments
       )
-      marking.data.rawDisplayTextSegments = state.data.rawDisplayTextSegments
       marking.tooltipBackupForInputting = state.tooltipBackupForInputting
+      if let generator = markingTooltipGenerator {
+        let result = generator(marking)
+        marking.data.tooltip = result.tooltip
+        marking.data.tooltipColorState = result.colorState
+      }
       session.switchState(marking.markedRange.isEmpty ? marking.convertedToInputting : marking)
       return true
     }
@@ -396,10 +401,15 @@ extension InputHandlerProtocol {
         displayTextSegments: state.displayTextSegments,
         markedReadings: Array(assembler.actualKeys[currentMarkedRange()]),
         cursor: convertCursorForDisplay(assembler.cursor),
-        marker: convertCursorForDisplay(assembler.marker)
+        marker: convertCursorForDisplay(assembler.marker),
+        rawDisplayTextSegments: state.data.rawDisplayTextSegments
       )
-      marking.data.rawDisplayTextSegments = state.data.rawDisplayTextSegments
       marking.tooltipBackupForInputting = state.tooltipBackupForInputting
+      if let generator = markingTooltipGenerator {
+        let result = generator(marking)
+        marking.data.tooltip = result.tooltip
+        marking.data.tooltipColorState = result.colorState
+      }
       session.switchState(marking.markedRange.isEmpty ? marking.convertedToInputting : marking)
       return true
     }
@@ -867,10 +877,15 @@ extension InputHandlerProtocol {
           displayTextSegments: compositionBufferDisplayTextSegments(),
           markedReadings: Array(assembler.actualKeys[currentMarkedRange()]),
           cursor: convertCursorForDisplay(assembler.cursor),
-          marker: convertCursorForDisplay(assembler.marker)
+          marker: convertCursorForDisplay(assembler.marker),
+          rawDisplayTextSegments: rawDisplayTextSegmentsIfNeeded
         )
-        marking.data.rawDisplayTextSegments = rawDisplayTextSegmentsIfNeeded
         marking.tooltipBackupForInputting = state.tooltip
+        if let generator = markingTooltipGenerator {
+          let result = generator(marking)
+          marking.data.tooltip = result.tooltip
+          marking.data.tooltipColorState = result.colorState
+        }
         session.switchState(marking)
       } else {
         errorCallback?("BB7F6DB9")
@@ -931,10 +946,15 @@ extension InputHandlerProtocol {
           displayTextSegments: compositionBufferDisplayTextSegments(),
           markedReadings: Array(assembler.actualKeys[currentMarkedRange()]),
           cursor: convertCursorForDisplay(assembler.cursor),
-          marker: convertCursorForDisplay(assembler.marker)
+          marker: convertCursorForDisplay(assembler.marker),
+          rawDisplayTextSegments: rawDisplayTextSegmentsIfNeeded
         )
-        marking.data.rawDisplayTextSegments = rawDisplayTextSegmentsIfNeeded
         marking.tooltipBackupForInputting = state.tooltip
+        if let generator = markingTooltipGenerator {
+          let result = generator(marking)
+          marking.data.tooltip = result.tooltip
+          marking.data.tooltipColorState = result.colorState
+        }
         session.switchState(marking)
       } else {
         errorCallback?("D326DEA3")

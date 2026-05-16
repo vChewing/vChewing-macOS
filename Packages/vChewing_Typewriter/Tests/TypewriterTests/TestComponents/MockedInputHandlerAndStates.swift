@@ -60,6 +60,7 @@ public final class MockInputHandler: @MainActor InputHandlerProtocol {
   public var notificationCallback: ((String) -> ())?
   public var pomSaveCallback: (() -> ())?
   public var filterabilityChecker: ((_ state: IMEStateData) -> Bool)?
+  public var markingTooltipGenerator: ((_ state: State) -> (tooltip: String, colorState: TooltipColorState))?
 
   public var backupCursor: Int?
   public var currentTypingMethod: TypingMethod = .vChewingFactory

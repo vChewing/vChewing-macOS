@@ -67,7 +67,8 @@ extension IMEStateProtocol {
     displayTextSegments: [String],
     markedReadings: [String],
     cursor: Int,
-    marker: Int
+    marker: Int,
+    rawDisplayTextSegments: [String]? = nil
   )
     -> Self {
     var result = Self(.init(), type: .ofMarking)
@@ -75,6 +76,7 @@ extension IMEStateProtocol {
     result.data.cursor = cursor
     result.data.marker = marker
     result.data.markedReadings = markedReadings
+    result.data.rawDisplayTextSegments = rawDisplayTextSegments
     return result
   }
 

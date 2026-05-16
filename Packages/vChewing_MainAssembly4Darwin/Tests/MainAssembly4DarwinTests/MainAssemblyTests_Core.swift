@@ -70,6 +70,16 @@ final class MainAssemblyTests {
     // Initialize input handler properly
     session.inputHandler = testHandler
     testHandler.session = session
+    testHandler.markingTooltipGenerator = { state in
+      let result = IMEStateParsed4Darwin(state).generateTooltipForMarking()
+      var colorState = result.colorState
+      var tooltip = result.tooltip
+      if PrefMgr.shared.phraseReplacementEnabled {
+        colorState = .warning
+        tooltip += "\n" + "⚠︎ Phrase replacement mode enabled, interfering user phrase entry.".i18n
+      }
+      return (tooltip, colorState)
+    }
     // Set the initial state
     session.state = .ofEmpty()
     session.isActivated = true

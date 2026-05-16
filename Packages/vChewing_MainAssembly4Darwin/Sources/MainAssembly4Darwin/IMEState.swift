@@ -70,7 +70,8 @@ extension IMEState {
     displayTextSegments: [String],
     markedReadings: [String],
     cursor: Int,
-    marker: Int
+    marker: Int,
+    rawDisplayTextSegments: [String]? = nil
   )
     -> IMEState {
     var newDisplayTextSegments = displayTextSegments
@@ -79,13 +80,8 @@ extension IMEState {
     result.type = .ofMarking
     result.data.marker = marker
     result.data.markedReadings = markedReadings
-    let tooltipResult = IMEStateParsed4Darwin(result).generateTooltipForMarking()
-    result.data.tooltip = tooltipResult.tooltip
-    result.data.tooltipColorState = tooltipResult.colorState
-    if PrefMgr.shared.phraseReplacementEnabled {
-      result.data.tooltipColorState = .warning
-      result.data.tooltip += "\n" + "⚠︎ Phrase replacement mode enabled, interfering user phrase entry.".i18n
-    }
+    result.data.rawDisplayTextSegments = rawDisplayTextSegments
+    // tooltip 由 switchState() 的 .ofMarking 分支產生（確保 IMEStateParsed4Darwin 可見）。
     return result
   }
 
