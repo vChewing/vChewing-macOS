@@ -251,7 +251,9 @@ extension LMAssembly {
         ) { [weak self] content in
           guard let self else { return }
           self.lmUserPhrases.clear()
-          self.lmUserPhrases.replaceData(textData: content)
+          LMAssembly.withFileHandleQueueSync {
+            self.lmUserPhrases.replaceData(textData: content)
+          }
           self.lmUserPhrases.filePath = path
           vCLMLog("lmUserPhrases: \(self.lmUserPhrases.count) entries of data loaded from: \(path)")
         }
@@ -276,7 +278,9 @@ extension LMAssembly {
         ) { [weak self] content in
           guard let self else { return }
           self.lmFiltered.clear()
-          self.lmFiltered.replaceData(textData: content)
+          LMAssembly.withFileHandleQueueSync {
+            self.lmFiltered.replaceData(textData: content)
+          }
           self.lmFiltered.filePath = filterPath
           vCLMLog("lmFiltered: \(self.lmFiltered.count) entries of data loaded from: \(filterPath)")
         }
@@ -314,7 +318,9 @@ extension LMAssembly {
         ) { [weak self] content in
           guard let self else { return }
           self.lmUserSymbols.clear()
-          self.lmUserSymbols.replaceData(textData: content)
+          LMAssembly.withFileHandleQueueSync {
+            self.lmUserSymbols.replaceData(textData: content)
+          }
           self.lmUserSymbols.filePath = path
           vCLMLog("lmUserSymbol: \(self.lmUserSymbols.count) entries of data loaded from: \(path)")
         }
@@ -346,7 +352,9 @@ extension LMAssembly {
       ) { [weak self] content in
         guard let self else { return }
         self.lmAssociates.clear()
-        self.lmAssociates.replaceData(textData: content)
+        LMAssembly.withFileHandleQueueSync {
+          self.lmAssociates.replaceData(textData: content)
+        }
         self.lmAssociates.filePath = path
         vCLMLog("lmAssociates: \(self.lmAssociates.count) entries of data loaded from: \(path)")
       }
@@ -371,7 +379,9 @@ extension LMAssembly {
         ) { [weak self] content in
           guard let self else { return }
           self.lmReplacements.clear()
-          self.lmReplacements.replaceData(textData: content)
+          LMAssembly.withFileHandleQueueSync {
+            self.lmReplacements.replaceData(textData: content)
+          }
           self.lmReplacements.filePath = path
           vCLMLog("lmReplacements: \(self.lmReplacements.count) entries of data loaded from: \(path)")
         }
