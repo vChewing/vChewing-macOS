@@ -116,7 +116,10 @@ public final class LMMgr {
   // MARK: - Functions reacting directly with language models.
 
   public static func initUserLangModels() {
+    // 先無條件清除所有 mode 的舊使用者資料，再載入新目錄的資料，
+    // 防止舊目錄內容在切換目錄後殘留。
     Shared.InputMode.validCases.forEach { mode in
+      mode.langModel.purgeUserData()
       Self.chkUserLMFilesExist(mode)
     }
     // LMMgr 的 loadUserPhrases 等函式在自動讀取 dataFolderPath 時，
@@ -129,6 +132,7 @@ public final class LMMgr {
         Self.loadUserAssociatesData()
       }
     }
+    Self.loadUserPhraseReplacement()
   }
 
   // When asyncLoadingUserData is true, connectFactoryDictionary dispatches
