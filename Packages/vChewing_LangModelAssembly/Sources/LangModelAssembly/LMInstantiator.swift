@@ -233,10 +233,27 @@ extension LMAssembly {
       inputTokenHashesArray.removeAll()
     }
 
+    /// 清除所有使用者來源的資料（片語、濾除表、符號、關聯詞、置換表、LRU 快取、InputToken 雜湊）。
+    /// 不影響原廠辭典（factoryTrie）與半衰記憶模組（lxPerceptor）。
+    /// 在切換使用者辭典目錄時必須呼叫此方法，以確保舊目錄的資料不會殘留。
+    public func purgeUserData() {
+      lmUserPhrases.clear()
+      lmFiltered.clear()
+      lmUserSymbols.clear()
+      lmAssociates.clear()
+      lmReplacements.clear()
+      unigramLRUCache.removeAll(keepingCapacity: true)
+      inputTokenHashesArray.removeAll(keepingCapacity: true)
+    }
+
     public func loadUserPhrasesData(path: String, filterPath: String?) {
+      // 無論新檔案是否可讀，都必須先清除舊資料，防止舊目錄內容殘留。
+      lmUserPhrases.clear()
+      lmFiltered.clear()
+      unigramLRUCache.removeAll(keepingCapacity: true)
+
       func loadMain() {
         if FileManager.default.isReadableFile(atPath: path) {
-          lmUserPhrases.clear()
           lmUserPhrases.open(path)
           vCLMLog("lmUserPhrases: \(lmUserPhrases.count) entries of data loaded from: \(path)")
         } else {
@@ -250,7 +267,6 @@ extension LMAssembly {
           path: path, shouldConsolidate: lmUserPhrases.allowConsolidation
         ) { [weak self] content in
           guard let self else { return }
-          self.lmUserPhrases.clear()
           LMAssembly.withFileHandleQueueSync {
             self.lmUserPhrases.replaceData(textData: content)
           }
@@ -258,12 +274,9 @@ extension LMAssembly {
           vCLMLog("lmUserPhrases: \(self.lmUserPhrases.count) entries of data loaded from: \(path)")
         }
       }
-      // sub-LM 資料已變更，必須使 LRU cache 失效。
-      unigramLRUCache.removeAll(keepingCapacity: true)
       guard let filterPath = filterPath else { return }
       func loadFilter() {
         if FileManager.default.isReadableFile(atPath: filterPath) {
-          lmFiltered.clear()
           lmFiltered.open(filterPath)
           vCLMLog("lmFiltered: \(lmFiltered.count) entries of data loaded from: \(path)")
         } else {
@@ -277,7 +290,6 @@ extension LMAssembly {
           path: filterPath, shouldConsolidate: lmFiltered.allowConsolidation
         ) { [weak self] content in
           guard let self else { return }
-          self.lmFiltered.clear()
           LMAssembly.withFileHandleQueueSync {
             self.lmFiltered.replaceData(textData: content)
           }
@@ -289,21 +301,24 @@ extension LMAssembly {
 
     /// 這個函式不用 GCD。
     public func reloadUserFilterDirectly(path: String) {
+      // 無論新檔案是否可讀，都必須先清除舊資料。
+      lmFiltered.clear()
+      unigramLRUCache.removeAll(keepingCapacity: true)
+
       if FileManager.default.isReadableFile(atPath: path) {
-        lmFiltered.clear()
         lmFiltered.open(path)
         vCLMLog("lmFiltered: \(lmFiltered.count) entries of data loaded from: \(path)")
       } else {
         vCLMLog("lmFiltered: File access failure: \(path)")
       }
-      // sub-LM 資料已變更，必須使 LRU cache 失效。
-      unigramLRUCache.removeAll(keepingCapacity: true)
     }
 
     public func loadUserSymbolData(path: String) {
+      // 無論新檔案是否可讀，都必須先清除舊資料。
+      lmUserSymbols.clear()
+
       func load() {
         if FileManager.default.isReadableFile(atPath: path) {
-          lmUserSymbols.clear()
           lmUserSymbols.open(path)
           vCLMLog("lmUserSymbol: \(lmUserSymbols.count) entries of data loaded from: \(path)")
         } else {
@@ -317,7 +332,6 @@ extension LMAssembly {
           path: path, shouldConsolidate: lmUserSymbols.allowConsolidation
         ) { [weak self] content in
           guard let self else { return }
-          self.lmUserSymbols.clear()
           LMAssembly.withFileHandleQueueSync {
             self.lmUserSymbols.replaceData(textData: content)
           }
@@ -328,9 +342,11 @@ extension LMAssembly {
     }
 
     public func loadUserAssociatesData(path: String) {
+      // 無論新檔案是否可讀，都必須先清除舊資料。
+      lmAssociates.clear()
+
       func load() {
         if FileManager.default.isReadableFile(atPath: path) {
-          lmAssociates.clear()
           lmAssociates.open(path)
           vCLMLog("lmAssociates: \(lmAssociates.count) entries of data loaded from: \(path)")
         } else {
@@ -351,7 +367,6 @@ extension LMAssembly {
         path: path, shouldConsolidate: true
       ) { [weak self] content in
         guard let self else { return }
-        self.lmAssociates.clear()
         LMAssembly.withFileHandleQueueSync {
           self.lmAssociates.replaceData(textData: content)
         }
@@ -361,9 +376,11 @@ extension LMAssembly {
     }
 
     public func loadReplacementsData(path: String) {
+      // 無論新檔案是否可讀，都必須先清除舊資料。
+      lmReplacements.clear()
+
       func load() {
         if FileManager.default.isReadableFile(atPath: path) {
-          lmReplacements.clear()
           lmReplacements.open(path)
           vCLMLog("lmReplacements: \(lmReplacements.count) entries of data loaded from: \(path)")
         } else {
@@ -378,7 +395,6 @@ extension LMAssembly {
           path: path, shouldConsolidate: true
         ) { [weak self] content in
           guard let self else { return }
-          self.lmReplacements.clear()
           LMAssembly.withFileHandleQueueSync {
             self.lmReplacements.replaceData(textData: content)
           }

@@ -69,7 +69,8 @@ extension LMAssembly {
     ///   - path: 給定路徑。
     @discardableResult
     mutating func open(_ path: String) -> Bool {
-      if isLoaded { return false }
+      // 若先前已載入資料，先清除再載入新資料，避免呼叫方忘記 clear() 造成舊資料殘留。
+      if isLoaded { clear() }
 
       let oldPath = filePath
       filePath = nil
