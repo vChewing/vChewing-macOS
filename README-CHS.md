@@ -28,7 +28,7 @@
     - 有「强化型组字区安全防护」模式，防止「接收打字的软体」提前存取您的组字区的内容。
 
 >唯音有很多特色功能。在此仅列举部分：
->- 支援 macOS 萤幕模拟键盘（仅传统大千与传统倚天布局）。
+>- 支援 macOS 荧幕模拟键盘（仅传统大千与传统倚天布局）。
 >- 可以将自己打的繁体中文自动转成日本 JIS 新字体来输出（包括基础的字词转换）、也可以转成康熙繁体来输出。
 >- 简繁体中文语料库彼此分离，彻底杜绝任何繁简转换过程可能造成的失误。
 >- 支援近年的全字库汉字输入。
@@ -44,7 +44,7 @@
 建置用系统需求：
 
 - **Xcode 26+ (macOS 15.6+ required)** 或单独安装的 **Swift 6.2 open-source toolchain** + **macOS 26 SDK**。
-    - 原因：Swift 6.2 成为必需版本（用于改进 concurrency 安全特性、SPM 6.2.4+ API 支持、CommandPlugin 改进等）。
+    - 原因：Swift 6.2 成为必需版本（用于改进 concurrency 安全特性、SPM 6.2.4+ API 支援、CommandPlugin 改进等）。
 - 请使用正式发行版 Xcode，且最小子版本号越高越好（因为 Bug 相对而言最少）。
     - 如果是某个大版本的 Xcode 的 Release Candidate 版本的话，我们可能会对此做相容性测试。
 
@@ -83,7 +83,7 @@
 
 或者直接开启 Xcode 专案，Product -> Scheme 选「vChewingInstaller」，编译即可。
 
-第一次安装完之后，如有修改原厂辞典与程式码的话，只要重复上述流程重新安装输入法即可。
+第一次安装完之后，如有修改原厂辞典与程式码的话，只要重覆上述流程重新安装输入法即可。
 
 如果安装若干次后，发现程式修改的结果并没有出现、或甚至输入法已无法再选用的话，请重新登入系统。
 
@@ -95,10 +95,12 @@
 
 唯音输入法 macOS 版以 MIT-NTL License 授权释出 (与 MIT 相容)：© 2021-2022 vChewing 专案。
 
-- 唯音输入法 macOS 版程式维护：Shiki Suen。特别感谢 Isaac Xen 与 Hiraku Wong 等人的技术协力。
+- 唯音输入法 macOS 版程式维护：Shiki Suen。特别感谢 Isaac Xen 与 Hiraku Wong 等人对唯音输入法 1.x 早期版本的技术协力。
 - 铁恨注音并击处理引擎：Shiki Suen (AGPL-3.0-or-later License)。
-- 天权星语汇处理引擎：Shiki Suen (AGPL-3.0-or-later License)。
+- 护摩组句引擎（Homa）：Shiki Suen (LGPL v3.0 or later, with Swift App Development exception)。
 - 唯音词库（先锋语料库）由 Shiki Suen 维护，以 3-Clause BSD License 授权释出。其中的词频资料[由 NAER 授权用于非商业用途](https://twitter.com/ShikiSuen/status/1479329302713831424)。
+
+> 自 2026 年 04 月下旬，本仓库的组句引擎已由天权星（Megrez）迁移为敝专案自研先锋引擎套件 LibVanguard 当中的护摩（Homa）。Homa 元件本身以 LGPL v3.0 or later 授权释出，且附带与 Swift App Development 情境的额外许可；详见 `./Packages/vChewing_Homa/CUSTOM_LGPLv3_EXCEPTION.md` 与 `./Packages/vChewing_Homa/LICENSE`。
 
 使用者可自由使用、散播本软体，惟散播时必须完整保留版权声明及软体授权、且「一旦经过修改便不可以再继续使用唯音的产品名称」。换言之，这条相对上游 MIT 而言新增的规定就是：你 Fork 可以，但 Fork 成单独发行的产品名称时就必须修改产品名称。
 
