@@ -274,10 +274,12 @@ extension SettingsPanesCocoa.Dictionary: NSPathControlDelegate {
     var newPath = url.path
     newPath.ensureTrailingSlash()
     if LMMgr.checkIfSpecifiedUserDataFolderValid(newPath) {
+      let oldPath = LMMgr.dataFolderPath(isDefaultFolder: false)
       PrefMgr.shared.userDataFolderSpecified = newPath
       BookmarkManager.shared.saveBookmark(for: url)
       AppDelegate.shared.updateDirectoryMonitorPath()
       pathControl.url = url
+      maybePromptToMergeUserData(oldPath: oldPath)
       return true
     }
     // On Error:
@@ -291,8 +293,11 @@ extension SettingsPanesCocoa.Dictionary: NSPathControlDelegate {
 
   @IBAction
   func resetSpecifiedUserDataFolder(_: Any) {
+    let oldPath = LMMgr.dataFolderPath(isDefaultFolder: false)
     LMMgr.resetSpecifiedUserDataFolder()
     pctUserDictionaryFolder.url = URL(fileURLWithPath: LMMgr.dataFolderPath(isDefaultFolder: true))
+    AppDelegate.shared.updateDirectoryMonitorPath()
+    maybePromptToMergeUserData(oldPath: oldPath)
   }
 
   @IBAction
@@ -332,10 +337,12 @@ extension SettingsPanesCocoa.Dictionary: NSPathControlDelegate {
         var newPath = url.path
         newPath.ensureTrailingSlash()
         if LMMgr.checkIfSpecifiedUserDataFolderValid(newPath) {
+          let oldPath = LMMgr.dataFolderPath(isDefaultFolder: false)
           PrefMgr.shared.userDataFolderSpecified = newPath
           BookmarkManager.shared.saveBookmark(for: url)
           AppDelegate.shared.updateDirectoryMonitorPath()
           self?.pctUserDictionaryFolder.url = url
+          self?.maybePromptToMergeUserData(oldPath: oldPath)
         } else {
           IMEApp.buzz()
           if !bolPreviousFolderValidity {
@@ -352,6 +359,40 @@ extension SettingsPanesCocoa.Dictionary: NSPathControlDelegate {
             .url = URL(fileURLWithPath: LMMgr.dataFolderPath(isDefaultFolder: true))
         }
         return
+      }
+    }
+  }
+
+  // MARK: - Merge prompt
+
+  /// 在目錄變更後提示使用者是否合併舊目錄資料至新目錄。
+  /// 以 sheet 形式吸附在設定視窗上。
+  private func maybePromptToMergeUserData(oldPath: String) {
+    let newPath = LMMgr.dataFolderPath(isDefaultFolder: false)
+    guard oldPath != newPath,
+          FileManager.default.fileExists(atPath: oldPath) else { return }
+    // 先確保新目錄的 template 檔案已存在，避免 migrateUserDataFrom 因檔案缺失而靜默跳過。
+    for mode in Shared.InputMode.validCases {
+      LMMgr.chkUserLMFilesExist(mode)
+    }
+    let alert = NSAlert()
+    alert.messageText = "i18n:settings.dictionary.mergeUserDataToNewTarget.prompt.title".i18n
+    alert.informativeText = "i18n:settings.dictionary.mergeUserDataToNewTarget.prompt.body".i18n
+    alert.addButton(withTitle: "i18n:settings.dictionary.mergeUserDataToNewTarget.button.merge".i18n)
+    alert.addButton(withTitle: "i18n:settings.dictionary.mergeUserDataToNewTarget.button.skip".i18n)
+    alert.beginSheetModal(at: CtlSettingsCocoa.shared?.window) { response in
+      guard response == .alertFirstButtonReturn else { return }
+      let count = LMMgr.migrateUserDataFrom(oldPath: oldPath, to: newPath)
+      if count > 0 {
+        LMMgr.initUserLangModels()
+        Notifier.notify(message: String(
+          format: "i18n:settings.dictionary.mergeUserDataToNewTarget.notification.filesMerged".i18n,
+          count
+        ))
+      } else {
+        Notifier.notify(
+          message: "i18n:settings.dictionary.mergeUserDataToNewTarget.notification.noFilesMigrated".i18n
+        )
       }
     }
   }

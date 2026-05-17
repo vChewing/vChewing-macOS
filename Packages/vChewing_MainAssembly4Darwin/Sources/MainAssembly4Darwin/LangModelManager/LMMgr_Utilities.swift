@@ -59,10 +59,12 @@ extension LMMgr {
   /// - Parameters:
   ///   - mode: 繁簡模式。
   ///   - type: 辭典資料類型
+  ///   - basePath: 基礎目錄路徑（預設為當前使用者資料目錄）。
   /// - Returns: 資料路徑（URL）。
   public static func userDictDataURL(
     mode: Shared.InputMode,
-    type: LMAssembly.ReplacableUserDataType
+    type: LMAssembly.ReplacableUserDataType,
+    basePath: String? = nil
   )
     -> URL {
     var fileName: String = {
@@ -75,7 +77,8 @@ extension LMMgr {
       }
     }()
     fileName.append((mode == .imeModeCHT) ? "-cht.txt" : "-chs.txt")
-    return URL(fileURLWithPath: dataFolderPath(isDefaultFolder: false))
+    let folderPath = basePath ?? dataFolderPath(isDefaultFolder: false)
+    return URL(fileURLWithPath: folderPath)
       .appendingPathComponent(fileName)
   }
 
@@ -367,6 +370,37 @@ extension LMMgr {
   }
 
   // MARK: - 重設使用者語彙檔案目錄
+
+  /// 將舊目錄的使用者語彙檔案內容合併至新目錄的對應檔案。
+  /// 合併策略為 append 模式（新目錄檔案內容在前，舊目錄內容追加在後）。
+  /// - Parameters:
+  ///   - oldPath: 舊的使用者資料目錄路徑。
+  ///   - newPath: 新的使用者資料目錄路徑。
+  /// - Returns: 成功合併的檔案數量。
+  @discardableResult
+  public static func migrateUserDataFrom(oldPath: String, to newPath: String) -> Int {
+    var migratedCount = 0
+    for type in LMAssembly.ReplacableUserDataType.allCases {
+      for mode in Shared.InputMode.validCases {
+        let oldURL = userDictDataURL(mode: mode, type: type, basePath: oldPath)
+        let newURL = userDictDataURL(mode: mode, type: type, basePath: newPath)
+        guard FileManager.default.isReadableFile(atPath: oldURL.path),
+              FileManager.default.isReadableFile(atPath: newURL.path) else { continue }
+        do {
+          let oldData = try String(contentsOf: oldURL, encoding: .utf8)
+          let newData = try String(contentsOf: newURL, encoding: .utf8)
+          // 跳過空檔案
+          guard !oldData.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty else { continue }
+          let merged = newData + "\n" + oldData
+          try merged.write(to: newURL, atomically: true, encoding: .utf8)
+          migratedCount += 1
+        } catch {
+          vCLog("Failed to migrate \(type) for \(mode): \(error)")
+        }
+      }
+    }
+    return migratedCount
+  }
 
   public static func resetSpecifiedUserDataFolder() {
     // 在重設前，請確保先停止所有先前啟動的 security-scoped 存取（避免殘留權限）

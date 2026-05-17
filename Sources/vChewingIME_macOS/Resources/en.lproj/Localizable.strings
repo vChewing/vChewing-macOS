@@ -227,6 +227,12 @@
 "i18n:securityAgentHelper.warningMessage.header" = "vChewing has detected that the following background processes are abusing the SecureEventInput, hindering all 3rd-party input methods from being able to switch to.\n\nIt is fine to use SecureEventInput for sensitive input fields. However, an app calling EnableSecureEventInput() is responsible to call DisableSecureEventInput() immediately right after the input field loses focus. This situation may also happen if an app is hanging in the background (or working as a helper application in the background) with its SecureEventInput left enabled.\n\nThe found processes are:";
 "i18n:securityAgentHelper.warningMessage.title" = "SecureEventInput Abuse Detected";
 "i18n:settings.button.hpAndDonation" = "Homepage & Donation";
+"i18n:settings.dictionary.mergeUserDataToNewTarget.button.merge" = "Merge";
+"i18n:settings.dictionary.mergeUserDataToNewTarget.button.skip" = "Skip";
+"i18n:settings.dictionary.mergeUserDataToNewTarget.notification.filesMerged" = "%d file(s) merged.";
+"i18n:settings.dictionary.mergeUserDataToNewTarget.notification.noFilesMigrated" = "No files were migrated. The new location may not be writable.";
+"i18n:settings.dictionary.mergeUserDataToNewTarget.prompt.body" = "Would you like to merge user data from the previous location into the new one?";
+"i18n:settings.dictionary.mergeUserDataToNewTarget.prompt.title" = "Migrate User Phrases?";
 "i18n:settings.importFromKimoTxt.description" = "ℹ️ Clicking \"Directly Import\" will attempt to read user phrases directly from the SmartMandarinUserData.db database of Yahoo! KeyKey IME if installed on your system. You can also manually read from Yahoo! KeyKey's SmartMandarinUserData.db database or Manjusri (Sanskrit-named) text format files exported from Yahoo! KeyKey's dictionary editor. Regardless of which import option you choose, vChewing only imports Unigrams, and only imports information from the \"Reading String\" and \"Phrase\" fields. Phrase-reading pairs that already exist in vChewing's factory or user dictionaries will not be re-imported.";
 "i18n:settings.importFromKimoTxt.DirectlyImport" = "Directly Import";
 "i18n:settings.importFromKimoTxt.finishedCount:%@%@" = "Found %@ entries. %@ new records imported.";

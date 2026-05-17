@@ -38,10 +38,12 @@ public struct VwrSettingsPaneDictionary: View {
                 var newPath = url.path
                 newPath.ensureTrailingSlash()
                 if LMMgr.checkIfSpecifiedUserDataFolderValid(newPath) {
+                  let oldPath = LMMgr.dataFolderPath(isDefaultFolder: false)
                   userDataFolderSpecified = newPath
                   pathControl.url = url
                   BookmarkManager.shared.saveBookmark(for: url)
                   AppDelegate.shared.updateDirectoryMonitorPath()
+                  maybePromptMergeInSwiftUI(oldPath: oldPath)
                   return true
                 }
                 // On Error:
@@ -64,7 +66,10 @@ public struct VwrSettingsPaneDictionary: View {
                 Text("...")
               }.frame(minWidth: 25)
               Button {
+                let oldPath = LMMgr.dataFolderPath(isDefaultFolder: false)
                 userDataFolderSpecified = fdrUserDataDefault
+                AppDelegate.shared.updateDirectoryMonitorPath()
+                maybePromptMergeInSwiftUI(oldPath: oldPath)
               } label: {
                 Text("↻")
               }.frame(minWidth: 25)
@@ -102,9 +107,11 @@ public struct VwrSettingsPaneDictionary: View {
             var newPath = url.path
             newPath.ensureTrailingSlash()
             if LMMgr.checkIfSpecifiedUserDataFolderValid(newPath) {
+              let oldPath = LMMgr.dataFolderPath(isDefaultFolder: false)
               userDataFolderSpecified = newPath
               BookmarkManager.shared.saveBookmark(for: url)
               AppDelegate.shared.updateDirectoryMonitorPath()
+              maybePromptMergeInSwiftUI(oldPath: oldPath)
             } else {
               IMEApp.buzz()
               if !bolPreviousFolderValidity {
@@ -202,6 +209,29 @@ public struct VwrSettingsPaneDictionary: View {
           Text(msg)
         }
       }
+      .alert(
+        "i18n:settings.dictionary.mergeUserDataToNewTarget.prompt.title".i18n,
+        isPresented: $isShowingMergeAlert
+      ) {
+        Button("i18n:settings.dictionary.mergeUserDataToNewTarget.button.merge".i18n) {
+          let newPath = LMMgr.dataFolderPath(isDefaultFolder: false)
+          let count = LMMgr.migrateUserDataFrom(oldPath: pendingMergeOldPath, to: newPath)
+          if count > 0 {
+            LMMgr.initUserLangModels()
+            Notifier.notify(message: String(
+              format: "i18n:settings.dictionary.mergeUserDataToNewTarget.notification.filesMerged".i18n,
+              count
+            ))
+          } else {
+            Notifier.notify(
+              message: "i18n:settings.dictionary.mergeUserDataToNewTarget.notification.noFilesMigrated".i18n
+            )
+          }
+        }
+        Button("i18n:settings.dictionary.mergeUserDataToNewTarget.button.skip".i18n, role: .cancel) {}
+      } message: {
+        Text("i18n:settings.dictionary.mergeUserDataToNewTarget.prompt.body".i18n)
+      }
   }
 
   // MARK: Private
@@ -219,6 +249,13 @@ public struct VwrSettingsPaneDictionary: View {
   @State
   private var importAlertMessage: String?
 
+  // MARK: - Merge prompt state
+
+  @State
+  private var isShowingMergeAlert = false
+  @State
+  private var pendingMergeOldPath: String = ""
+
   // MARK: - AppStorage Variables（僅保留需經 PathControl 繫結的屬性）
 
   @AppStorage(wrappedValue: "", UserDef.kUserDataFolderSpecified.rawValue)
@@ -230,6 +267,19 @@ public struct VwrSettingsPaneDictionary: View {
   private var keykeyImportButtonDisabled = false
 
   private var fdrUserDataDefault: String { LMMgr.dataFolderPath(isDefaultFolder: true) }
+
+  /// 檢查是否需要顯示合併提示，若是則觸發 SwiftUI alert。
+  private func maybePromptMergeInSwiftUI(oldPath: String) {
+    let newPath = LMMgr.dataFolderPath(isDefaultFolder: false)
+    guard oldPath != newPath,
+          FileManager.default.fileExists(atPath: oldPath) else { return }
+    // 先確保新目錄的 template 檔案已存在，避免 migrateUserDataFrom 因檔案缺失而靜默跳過。
+    for mode in Shared.InputMode.validCases {
+      LMMgr.chkUserLMFilesExist(mode)
+    }
+    pendingMergeOldPath = oldPath
+    isShowingMergeAlert = true
+  }
 
   private func task4ImportingKeyKeyUserDict(_ url: URL? = nil) {
     do {

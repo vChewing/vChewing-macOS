@@ -227,6 +227,12 @@
 "i18n:securityAgentHelper.warningMessage.header" = "唯音有偵測到下述後檯執行緒有在濫用 SecureEventInput。這種濫用會導致系統內的所有第三方輸入法全都無法正常使用（在輸入法選單內會變成灰色）。\n\n針對需要填寫敏感資料的場合，使用 SecureEventInput 無可厚非。但是，用 EnableSecureEventInput() 開啟該模式之後，就有義務在輸入窗格失焦的那一刻呼叫 DisableSecureEventInput() 來結束這種狀態。這種狀態還常見於後檯輔助 App 當中、或者某個 App 在叫出該模式之後失去回應（這樣的話，哪怕被切換到後檯，SecureEventInput 也不會自動解除）。\n\n被偵測到的執行緒如下:";
 "i18n:securityAgentHelper.warningMessage.title" = "偵測到對 SecureEventInput 的濫用行為";
 "i18n:settings.button.hpAndDonation" = "主頁 & 捐款";
+"i18n:settings.dictionary.mergeUserDataToNewTarget.button.merge" = "合併";
+"i18n:settings.dictionary.mergeUserDataToNewTarget.button.skip" = "跳過";
+"i18n:settings.dictionary.mergeUserDataToNewTarget.notification.filesMerged" = "已合併 %d 個檔案。";
+"i18n:settings.dictionary.mergeUserDataToNewTarget.notification.noFilesMigrated" = "沒有檔案被移轉。新位置可能無法寫入。";
+"i18n:settings.dictionary.mergeUserDataToNewTarget.prompt.body" = "是否要將舊位置的資料併入到新位置的同名檔案內？";
+"i18n:settings.dictionary.mergeUserDataToNewTarget.prompt.title" = "移轉使用者語彙？";
 "i18n:settings.importFromKimoTxt.description" = "ℹ️ 點按「直接匯入」會嘗試從您的系統內已經安裝的奇摩輸入法的 SmartMandarinUserData.db 資料庫直接讀入使用者片語。您也可以手動讀入奇摩輸入法的 SmartMandarinUserData.db 資料庫、或者由奇摩輸入法辭典編輯器匯出的文殊（Manjusri）文字格式檔。無論您選擇哪一個匯入選項，敝輸入法均僅讀入 Unigram、且僅匯入「讀音串」與「詞語」這兩個欄位的資訊。敝輸入法的原廠辭典或使用者辭典裡面已經包含了的詞音配對記錄不會被再次匯入。";
 "i18n:settings.importFromKimoTxt.DirectlyImport" = "直接匯入";
 "i18n:settings.importFromKimoTxt.finishedCount:%@%@" = "已從總共 %@ 筆資料中成功匯入 %@ 筆新資料。";

@@ -167,9 +167,10 @@ extension AppDelegate {
   }
 
   public func updateDirectoryMonitorPath() {
+    let newPath = LMMgr.dataFolderPath(isDefaultFolder: false)
     folderMonitor.stopMonitoring()
     folderMonitor = FolderMonitor(
-      url: URL(fileURLWithPath: LMMgr.dataFolderPath(isDefaultFolder: false))
+      url: URL(fileURLWithPath: newPath)
     )
     folderMonitor.folderDidChange = { [weak self] in
       guard let this = self else { return }
