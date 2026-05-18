@@ -367,7 +367,7 @@
 "i18n:UserDef.kChooseCandidateUsingSpace.description" = "未チェックの場合、スペースを挿入。";
 "i18n:UserDef.kChooseCandidateUsingSpace.shortTitle" = "Space キーで入力候補を呼び出す";
 "i18n:UserDef.kClassicHaninKeyboardSymbolModeShortcutEnabled.shortTitle" = "「\\」・「¥」キーでも漢音キーボード符号入力";
-"i18n:UserDef.kCNS11643Enabled.shortTitle" = "全字庫モード // 入力可能な漢字数を倍増す (2026-03-18)";
+"i18n:UserDef.kCNS11643Enabled.shortTitle" = "全字庫モード // 入力可能な漢字数を倍増す (2026-05-06)";
 "i18n:UserDef.kConsolidateContextOnCandidateSelection.description" = "例えば、入力緩衝列には「章太炎」という節点があり、その範囲は [0,3) である。もし、「太」を「泰」にしたいのなら、今回の作業範囲は [1,2) で、「章太炎」の範囲と重ねてしまう。この場合、もし、事前強固措置がなければ、今回の作業でこの単語は「張泰言」のような望ましくない変換結果になってしまう。事前強固措置があるからこそ、「章泰炎」のような正確な作業結果の保証である。";
 "i18n:UserDef.kConsolidateContextOnCandidateSelection.shortTitle" = "候補陳列ウィンドウで候補を選ぶ時に文脈を強固する";
 "i18n:UserDef.kCurrencyNumeralsEnabled.shortTitle" = "Enable currency numerals output";
