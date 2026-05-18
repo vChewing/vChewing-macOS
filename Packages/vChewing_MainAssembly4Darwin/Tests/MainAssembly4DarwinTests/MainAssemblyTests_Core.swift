@@ -76,7 +76,7 @@ final class MainAssemblyTests {
       var tooltip = result.tooltip
       if PrefMgr.shared.phraseReplacementEnabled {
         colorState = .warning
-        tooltip += "\n" + "⚠︎ Phrase replacement mode enabled, interfering user phrase entry.".i18n
+        tooltip += "\n" + "i18n:PhraseOperation.PhraseReplacementInterfering".i18n
       }
       return (tooltip, colorState)
     }

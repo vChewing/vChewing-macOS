@@ -57,11 +57,11 @@ extension SessionProtocol {
         self?.resetInputHandler()
         guard this.prefs.showNotificationsWhenTogglingCapsLock else { return }
         guard !this.prefs.bypassNonAppleCapsLockHandling else { return }
-        let status = "NotificationSwitchRevolver".i18n
+        let status = "i18n:NotificationSwitch.Revolver".i18n
         Notifier.notify(
           message: isCapsLockTurnedOn
-            ? "[Caps Lock ON] " + "Alphanumerical Input Mode".i18n + "\n" + status
-            : "[Caps Lock OFF] " + "Chinese Input Mode".i18n + "\n" + status
+            ? "[Caps Lock ON] " + "i18n:Menu.AlphanumericalInputMode".i18n + "\n" + status
+            : "[Caps Lock OFF] " + "i18n:Menu.ChineseInputMode".i18n + "\n" + status
         )
       }
     }
@@ -126,7 +126,7 @@ extension SessionProtocol {
     if !LMMgr.isCoreDBConnected {
       if (event as InputSignalProtocol).isReservedKey { return false }
       var newState: State = .ofEmpty()
-      newState.tooltip = "Factory dictionary not loaded yet.".i18n
+      newState.tooltip = "i18n:DictionaryStatus.FactoryDictNotLoaded".i18n
       newState.tooltipDuration = 1.85
       newState.data.tooltipColorState = .redAlert
       switchState(newState)
@@ -210,11 +210,11 @@ extension SessionProtocol {
       }
 
       if popNotification {
-        let status = "NotificationSwitchRevolver".i18n
+        let status = "i18n:NotificationSwitch.Revolver".i18n
         Notifier.notify(
           message: newValue
-            ? "Alphanumerical Input Mode".i18n + "\n" + status
-            : "Chinese Input Mode".i18n + "\n" + status
+            ? "i18n:Menu.AlphanumericalInputMode".i18n + "\n" + status
+            : "i18n:Menu.ChineseInputMode".i18n + "\n" + status
         )
       }
     }

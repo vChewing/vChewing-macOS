@@ -65,8 +65,9 @@
           Group {
             Text(" ") +
               Text(
-                LocalizedStringKey(
-                  "This feature requires macOS \(metaData.minimumOS.description) and above."
+                String(
+                  format: "i18n:InfoMessage.FeatureRequiresMacOS:%@".i18n,
+                  metaData.minimumOS.description
                 )
               )
           }.settingsDescription()

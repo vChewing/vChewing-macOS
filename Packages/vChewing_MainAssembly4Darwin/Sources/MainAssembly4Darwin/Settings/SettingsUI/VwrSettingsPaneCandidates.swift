@@ -67,7 +67,7 @@ public struct VwrSettingsPaneCandidates: View {
 
       // MARK: (header: Text("Experimental:"))
 
-      let imkEOSNoticeButton = Button("Where's IMK Candidate Window?") {
+      let imkEOSNoticeButton = Button("i18n:Menu.WhereIsIMKCandidateWindow") {
         isShowingIMKEOSNotice = true
       }
 
@@ -80,15 +80,12 @@ public struct VwrSettingsPaneCandidates: View {
         maxHeight: CtlSettingsUI.contentMaxHeight
       )
       .alert(
-        "The End of Support for IMK Candidate Window".i18n,
+        "i18n:Menu.EndOfIMKCandidateWindow".i18n,
         isPresented: $isShowingIMKEOSNotice
       ) {
-        Button("OK".i18n, role: .cancel) {}
+        Button("i18n:Common.OK".i18n, role: .cancel) {}
       } message: {
-        Text(
-          "1) Only macOS has IMKCandidates. Since it relies on a dedicated ObjC Bridging Header to expose necessary internal APIs to work, it hinders vChewing from completely modularized for multi-platform support.\n\n2) IMKCandidates is buggy. It is not likely to be completely fixed by Apple, and its devs are not allowed to talk about it to non-Apple individuals. That\u{2019}s why we have had enough with IMKCandidates. It is likely the reason why Apple had never used IMKCandidates in their official InputMethodKit sample projects (as of August 2023)."
-            .i18n
-        )
+        Text("i18n:InfoMessage.EndOfIMKCandidatesExplanation".i18n)
       }
   }
 
@@ -140,10 +137,10 @@ private struct VwrSettingsPaneCandidates_SelectionKeys: View {
       }
     }
     .alert(
-      "Invalid Selection Keys.".i18n,
+      "i18n:ErrorMessage.InvalidSelectionKeys".i18n,
       isPresented: $isShowingSelectionKeyError
     ) {
-      Button("OK".i18n, role: .cancel) {
+      Button("i18n:Common.OK".i18n, role: .cancel) {
         candidateKeys = UserDef.kCandidateKeys.stringDefaultValue
       }
     } message: {

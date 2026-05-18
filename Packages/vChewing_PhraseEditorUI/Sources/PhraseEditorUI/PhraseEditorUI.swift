@@ -113,13 +113,13 @@ public struct VwrPhraseEditorUI: View {
         }
         .labelsHidden()
         Spacer()
-        Button("Reload") {
+        Button("i18n:Common.Reload".i18n) {
           asyncOnMain { update() }
         }.disabled(selInputMode == .imeModeNULL || isLoading)
-        Button("Consolidate") {
+        Button("i18n:Common.Consolidate".i18n) {
           consolidate()
         }.disabled(selInputMode == .imeModeNULL || isLoading)
-        Button("Save") {
+        Button("i18n:Common.Save".i18n) {
           asyncOnMain { saveAndReload() }
         }.keyboardShortcut("s", modifiers: [.command])
           .disabled(delegate == nil)
@@ -168,7 +168,7 @@ public struct VwrPhraseEditorUI: View {
           Button("?") {
             guard let window = window else { return }
             window.callAlert(
-              title: "You may follow:".i18n,
+              title: "i18n:InfoMessage.YouMayFollow".i18n,
               text: PETerms.TooltipTexts.sampleDictionaryContent(for: selUserDataType)
             )
           }.disabled(window == nil)
@@ -180,7 +180,7 @@ public struct VwrPhraseEditorUI: View {
       HStack {
         Toggle(
           LocalizedStringKey(
-            "This editor only: Auto-reload modifications happened outside of this editor"
+            "i18n:UserDef.kPhraseEditorAutoReloadExternalModifications.shortTitle"
           ),
           isOn: $selAutoReloadExternalModifications.didChange {
             autoReloadExternalModifications = selAutoReloadExternalModifications
@@ -192,7 +192,7 @@ public struct VwrPhraseEditorUI: View {
     }.onDisappear {
       selInputMode = .imeModeNULL
       selUserDataType = .thePhrases
-      txtContent = "Please select Simplified / Traditional Chinese mode above.".i18n
+      txtContent = "i18n:PhraseEditor.SelectModeFirst".i18n
       isLoading = true
       Self.txtContentStorage = ""
     }.onAppear {
@@ -206,7 +206,7 @@ public struct VwrPhraseEditorUI: View {
     guard let delegate = delegate else { return }
     updateLabels()
     clearAllFields()
-    txtContent = "Loading…".i18n
+    txtContent = "i18n:DictionaryStatus.Loading".i18n
     isLoading = true
     asyncOnMain {
       txtContent = delegate.retrieveData(mode: selInputMode, type: selUserDataType)
@@ -217,7 +217,7 @@ public struct VwrPhraseEditorUI: View {
 
   // MARK: Internal
 
-  static var txtContentStorage: String = "Please select Simplified / Traditional Chinese mode above.".i18n
+  static var txtContentStorage: String = "i18n:PhraseEditor.SelectModeFirst".i18n
 
   @State
   var lblAddPhraseTag1 = PETerms.AddPhrases.locPhrase.localized.0
@@ -323,7 +323,7 @@ public struct VwrPhraseEditorUI: View {
   private func saveAndReload() {
     guard let delegate = delegate, selInputMode != .imeModeNULL else { return }
     let toSave = txtContent
-    txtContent = "Loading…".i18n
+    txtContent = "i18n:DictionaryStatus.Loading".i18n
     isLoading = true
     let newResult = delegate.saveData(mode: selInputMode, type: selUserDataType, data: toSave)
     txtContent = newResult
@@ -361,20 +361,17 @@ struct ContentView_Previews: PreviewProvider {
 
 public enum PETerms {
   public enum AddPhrases: String {
-    case locPhrase = "Phrase"
-    case locReadingOrStroke = "Reading/Stroke"
-    case locWeight = "Weight"
-    case locComment = "Comment"
-    case locReplaceTo = "Replace to"
-    case locAdd = "Add"
-    case locInitial = "Initial"
+    case locPhrase = "i18n:Common.Phrase"
+    case locReadingOrStroke = "i18n:Common.ReadingStroke"
+    case locWeight = "i18n:Common.Weight"
+    case locComment = "i18n:Common.Comment"
+    case locReplaceTo = "i18n:Common.ReplaceTo"
+    case locAdd = "i18n:Common.Add"
+    case locInitial = "i18n:Common.Initial"
 
     // MARK: Public
 
     public var localized: (String, String) {
-      if self == .locAdd {
-        return loc.prefix(2) == "zh" ? ("添入", "") : loc.prefix(2) == "ja" ? ("記入", "") : ("Add", "")
-      }
       let rawArray = rawValue.i18n.components(separatedBy: " ")
       if rawArray.isEmpty { return ("N/A", "N/A") }
       let val1: String = rawArray[0]
@@ -384,8 +381,7 @@ public enum PETerms {
   }
 
   public enum TooltipTexts: String {
-    case weightInputBox =
-      "If not filling the weight, it will be 0.0, the maximum one. An ideal weight situates in [-9.5, 0], making itself can be captured by the sentence-composition algorithm. The exception is -114.514, the disciplinary weight. The sentence-composition algorithm will ignore it unless it is the unique result."
+    case weightInputBox = "i18n:PhraseEditor.WeightExplanation"
 
     // MARK: Public
 
@@ -400,15 +396,13 @@ public enum PETerms {
       switch type {
       case .thePhrases:
         result =
-          "Example:\nCandidate Reading-Reading Weight #Comment\nCandidate Reading-Reading #Comment"
-            .i18n + "\n\n"
+          "i18n:PhraseEditor.ExamplePhraseWithWeight".i18n + "\n\n"
             + weightInputBox.localized
-      case .theFilter: result = "Example:\nCandidate Reading-Reading #Comment".i18n
-      case .theReplacements: result = "Example:\nOldPhrase NewPhrase #Comment".i18n
+      case .theFilter: result = "i18n:PhraseEditor.ExamplePhrase".i18n
+      case .theReplacements: result = "i18n:PhraseEditor.ExampleReplacement".i18n
       case .theAssociates:
-        result = "Example:\nInitial RestPhrase\nInitial RestPhrase1 RestPhrase2 RestPhrase3..."
-          .i18n
-      case .theSymbols: result = "Example:\nCandidate Reading-Reading #Comment".i18n
+        result = "i18n:PhraseEditor.ExampleAssociates".i18n
+      case .theSymbols: result = "i18n:PhraseEditor.ExamplePhrase".i18n
       }
       return result
     }

@@ -25,7 +25,7 @@ public struct VwrSettingsPaneDevZone: View {
         UserDef.kDisableSegmentedThickUnderlineInMarkingModeForManagedClients.renderUI()
       } header: {
         Text(
-          "Warning: This page is for testing future features. \nFeatures listed here may not work as expected."
+          "i18n:Settings.DevZoneWarning"
         )
       }
       Section {
@@ -33,7 +33,7 @@ public struct VwrSettingsPaneDevZone: View {
         UserDef.kUserPhrasesDatabaseBypassed.renderUI()
         UserDef.kAllowRescoringSingleKanjiCandidates.renderUI()
       } footer: {
-        Text("Some previous options are moved to other tabs.".i18n)
+        Text("i18n:Settings.OptionsMovedToOtherTabs".i18n)
           .settingsDescription()
       }
       Section("i18n:DevZone.JSONPrefsExchange.SectionTitle".i18n) {
@@ -91,7 +91,7 @@ public struct VwrSettingsPaneDevZone: View {
         "i18n:DevZone.JSONPrefsExchange.ImportResultTitle".i18n,
         isPresented: $isShowingImportResult
       ) {
-        Button("OK".i18n, role: .cancel) {}
+        Button("i18n:Common.OK".i18n, role: .cancel) {}
       } message: {
         Text(importResultMessage)
       }
@@ -105,7 +105,7 @@ public struct VwrSettingsPaneDevZone: View {
     let failureCount = result.failures.count
     lines.append(
       String(
-        format: "i18n:DevZone.JSONPrefsExchange.ImportSummary".i18n,
+        format: "i18n:DevZone.JSONPrefsExchange.ImportSummary:%d%d".i18n,
         successCount, failureCount
       )
     )

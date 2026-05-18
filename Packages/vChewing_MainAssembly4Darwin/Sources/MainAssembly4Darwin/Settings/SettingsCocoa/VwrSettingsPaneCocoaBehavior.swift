@@ -94,7 +94,7 @@ extension SettingsPanesCocoa {
                     }
                   var strOSReq = " "
                   strOSReq += String(
-                    format: "This feature requires macOS %@ and above.".i18n,
+                    format: "i18n:InfoMessage.FeatureRequiresMacOS:%@".i18n,
                     arguments: ["10.15"]
                   )
                   strOSReq += "\n"
@@ -137,19 +137,16 @@ extension SettingsPanesCocoa {
 
     @IBAction
     func onFartControlChange(_: NSControl) {
-      let content = String(
-        format: "You are about to uncheck this fart suppressor. You are responsible for all consequences lead by letting people nearby hear the fart sound come from your computer. We strongly advise against unchecking this in any public circumstance that prohibits NSFW netas."
-          .i18n
-      )
-      let alert = NSAlert(error: "Warning".i18n)
+      let content = "i18n:UserDef.kShouldNotFartInLieuOfBeep.description".i18n
+      let alert = NSAlert(error: "i18n:Common.Warning".i18n)
       alert.informativeText = content
-      alert.addButton(withTitle: "Uncheck".i18n)
+      alert.addButton(withTitle: "i18n:Common.Uncheck".i18n)
       if #available(macOS 11, *) {
         alert.buttons.forEach { button in
           button.hasDestructiveAction = true
         }
       }
-      alert.addButton(withTitle: "Leave it checked".i18n)
+      alert.addButton(withTitle: "i18n:Common.LeaveItChecked".i18n)
       let window = CtlSettingsCocoa.shared?.window
       if !PrefMgr.shared.shouldNotFartInLieuOfBeep {
         PrefMgr.shared.shouldNotFartInLieuOfBeep = true

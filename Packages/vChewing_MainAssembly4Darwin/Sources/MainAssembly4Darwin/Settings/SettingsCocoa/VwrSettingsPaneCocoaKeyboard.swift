@@ -30,15 +30,15 @@ extension SettingsPanesCocoa {
       NSStackView.build(.vertical, insets: .new(all: 14)) {
         NSStackView.buildSection(width: contentWidth) {
           NSStackView.build(.horizontal) {
-            "Quick Setup:".makeNSLabel(fixWidth: contentWidth)
+            "i18n:Settings.SectionQuickSetup".i18n.makeNSLabel(fixWidth: contentWidth)
             NSView()
             NSButton(
-              verbatim: "↻ㄅ" + " " + "Dachen Trad.".i18n,
+              verbatim: "↻ㄅ" + " " + "i18n:KeyboardLayout.DachenTraditional".i18n,
               target: self,
               action: #selector(quickSetupButtonDachen(_:))
             )
             NSButton(
-              verbatim: "↻ㄅ" + " " + "Eten Trad.".i18n,
+              verbatim: "↻ㄅ" + " " + "i18n:KeyboardLayout.EtenTraditionalShort".i18n,
               target: self,
               action: #selector(quickSetupButtonEtenTraditional(_:))
             )
@@ -52,7 +52,7 @@ extension SettingsPanesCocoa {
           UserDef.kAlphanumericalKeyboardLayout.render(fixWidth: contentWidth)
         }?.boxed()
         NSStackView.build(.horizontal, insets: .new(all: 4, left: 16, right: 16)) {
-          "Keyboard Shortcuts:".makeNSLabel(fixWidth: contentWidth)
+          "i18n:Settings.SectionKeyboardShortcuts".i18n.makeNSLabel(fixWidth: contentWidth)
           NSView()
         }
         NSStackView.buildSection(.horizontal, width: contentWidth) {

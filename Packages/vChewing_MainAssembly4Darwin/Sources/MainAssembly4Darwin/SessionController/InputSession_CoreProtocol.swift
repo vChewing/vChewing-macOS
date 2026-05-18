@@ -177,7 +177,7 @@ extension SessionProtocol {
       }
       return
     }
-    let status = "NotificationSwitchRevolver".i18n
+    let status = "i18n:NotificationSwitch.Revolver".i18n
     asyncOnMain(bypassAsync: UserDefaults.pendingUnitTests) {
       Notifier.notify(
         message: nowMode.reversed.localizedDescription + "\n" + status

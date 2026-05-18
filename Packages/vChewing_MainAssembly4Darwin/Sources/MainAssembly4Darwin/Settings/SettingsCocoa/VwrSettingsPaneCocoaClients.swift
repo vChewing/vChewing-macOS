@@ -29,12 +29,12 @@ extension SettingsPanesCocoa {
 
     lazy var tblClients: NSTableView = .init()
     lazy var btnAddClient = NSButton(
-      "Add Client",
+      "i18n:ClientManager.AddClient",
       target: self,
       action: #selector(btnAddClientClicked(_:))
     ).controlSize(.small).withNarrowedFont(size: NSFont.smallSystemFontSize)
     lazy var btnRemoveClient = NSButton(
-      "Remove Selected",
+      "i18n:Common.RemoveSelected",
       target: self,
       action: #selector(btnRemoveClientClicked(_:))
     ).controlSize(.small).withNarrowedFont(size: NSFont.smallSystemFontSize)
@@ -63,7 +63,7 @@ extension SettingsPanesCocoa {
             let descriptionWidth = contentWidth
             NSStackView.build(.vertical) {
               let strDescription =
-                "Please manage the list of those clients here which are: 1) IMKTextInput-incompatible; 2) suspected from abusing the contents of the inline composition buffer. A client listed here, if checked, will use popup composition buffer with maximum 20 reading counts holdable."
+                "i18n:ClientManager.ManageClientsDescription"
               strDescription.makeNSLabel(descriptive: true, fixWidth: descriptionWidth)
                 .makeSimpleConstraint(.width, relation: .greaterThanOrEqual, value: descriptionWidth)
               NSView()
@@ -242,12 +242,11 @@ extension SettingsPanesCocoa.Clients {
   func btnAddClientClicked(_: Any) {
     guard let window = CtlSettingsCocoa.shared?.window else { return }
     let alert = NSAlert()
-    alert.messageText = "Please enter the client app bundle identifier(s) you want to register.".i18n
-    alert.informativeText = "One record per line. Use Option+Enter to break lines.\nBlank lines will be dismissed."
-      .i18n
-    alert.addButton(withTitle: "OK".i18n)
-    alert.addButton(withTitle: "Just Select".i18n + "\u{2026}")
-    alert.addButton(withTitle: "Cancel".i18n)
+    alert.messageText = "i18n:ClientManager.EnterBundleIdentifier".i18n
+    alert.informativeText = "i18n:PhraseEditor.OneRecordPerLine".i18n
+    alert.addButton(withTitle: "i18n:Common.OK".i18n)
+    alert.addButton(withTitle: "i18n:Common.JustSelect".i18n + "\u{2026}")
+    alert.addButton(withTitle: "i18n:Common.Cancel".i18n)
 
     let maxFloat = Double(Float.greatestFiniteMagnitude)
     let scrollview = NSScrollView(frame: CGRect(x: 0, y: 0, width: 370, height: 200))
@@ -298,13 +297,12 @@ extension SettingsPanesCocoa.Clients {
         if #unavailable(macOS 10.13) {
           window
             .callAlert(
-              title: "Please drag the apps into the Client Manager window from Finder."
-                .i18n
+              title: "i18n:ClientManager.DragAppsInstruction".i18n
             )
           break resultCheck
         }
         let dlgOpenPath = NSOpenPanel()
-        dlgOpenPath.title = "Choose the target application bundle.".i18n
+        dlgOpenPath.title = "i18n:Settings.ChooseTargetAppBundle".i18n
         dlgOpenPath.showsResizeIndicator = true
         dlgOpenPath.allowsMultipleSelection = true
         if #available(macOS 11.0, *) {
@@ -321,9 +319,8 @@ extension SettingsPanesCocoa.Clients {
           case .OK:
             for url in dlgOpenPath.urls {
               let title =
-                "The selected item is either not a valid macOS application bundle or not having a valid app bundle identifier."
-                  .i18n
-              let text = url.path + "\n\n" + "Please try again.".i18n
+                "i18n:ErrorMessage.InvalidAppBundle".i18n
+              let text = url.path + "\n\n" + "i18n:Common.PleaseTryAgain".i18n
               guard let bundle = Bundle(url: url) else {
                 CtlSettingsCocoa.shared?.window.callAlert(title: title, text: text)
                 return
@@ -335,13 +332,11 @@ extension SettingsPanesCocoa.Clients {
               let isIdentifierAlreadyRegistered = Self.clientsList.contains(identifier)
               let alert2 = NSAlert()
               alert2.messageText =
-                "Do you want to enable the popup composition buffer for this client?".i18n
+                "i18n:ClientManager.EnablePopupCompositionBuffer".i18n
               alert2.informativeText = "\(identifier)\n\n"
-                +
-                "Some client apps may have different compatibility issues in IMKTextInput implementation."
-                .i18n
-              alert2.addButton(withTitle: "Yes".i18n)
-              alert2.addButton(withTitle: "No".i18n)
+                + "i18n:ClientManager.CompatibilityNote".i18n
+              alert2.addButton(withTitle: "i18n:Common.Yes".i18n)
+              alert2.addButton(withTitle: "i18n:Common.No".i18n)
               alert2.beginSheetModal(for: window) { [weak self] result2 in
                 let oldValue = PrefMgr.shared.clientsIMKTextInputIncapable[identifier]
                 let newValue = result2 == .alertFirstButtonReturn

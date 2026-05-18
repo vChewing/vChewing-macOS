@@ -175,13 +175,13 @@ public struct CassetteTypewriter<Handler: InputHandlerProtocol>: TypewriterProto
     errorCallback("3606B9C0")
     if beganWithLetter {
       var newEmptyState = handler.assembler.isEmpty ? State.ofEmpty() : handler.generateStateOfInputting()
-      newEmptyState.tooltip = "Wildcard key cannot be the initial key.".i18n
+      newEmptyState.tooltip = "i18n:ErrorMessage.WildcardKeyNotInitial".i18n
       newEmptyState.data.tooltipColorState = .redAlert
       newEmptyState.tooltipDuration = 1.0
       session.switchState(newEmptyState)
       return true
     }
-    handler.notificationCallback?("Wildcard key cannot be the initial key.".i18n)
+    handler.notificationCallback?("i18n:ErrorMessage.WildcardKeyNotInitial".i18n)
     return nil
   }
 

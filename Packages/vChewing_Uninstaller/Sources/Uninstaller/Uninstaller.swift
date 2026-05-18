@@ -17,10 +17,10 @@ public enum Uninstaller {
   /// Shows an NSAlert explaining that the sandboxed IME cannot trash its own bundle.
   public static func showUninstallFailureGuidance() {
     let alert = NSAlert()
-    alert.messageText = "Uninstallation".i18n
+    alert.messageText = "i18n:Uninstaller.Title".i18n
     alert.informativeText = "i18n:Uninstaller.failureGuidance".i18n
     alert.addButton(withTitle: "i18n:Uninstaller.openWikiPage".i18n)
-    alert.addButton(withTitle: "Not Now".i18n)
+    alert.addButton(withTitle: "i18n:Common.NotNow".i18n)
     let result = alert.runModal()
     NSApp.popup()
     if result == .alertFirstButtonReturn {

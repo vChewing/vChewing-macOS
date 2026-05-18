@@ -316,7 +316,7 @@ extension IMEStateParsed4Darwin {
     if state.markedRange.count < IMEStateData.allowedMarkLengthRange.lowerBound {
       return (
         String(
-          format: "\"%@\" length must ≥ 2 for a user phrase.".i18n + "\n◆  " + readingDisplay,
+          format: "i18n:StateOfMarking.Tooltip.PhraseLengthTooShort:%@".i18n + "\n◆  " + readingDisplay,
           text
         ),
         .denialInsufficiency
@@ -324,7 +324,7 @@ extension IMEStateParsed4Darwin {
     } else if state.markedRange.count > IMEStateData.allowedMarkLengthRange.upperBound {
       return (
         String(
-          format: "\"%@\" length should ≤ %d for a user phrase.".i18n + "\n◆  " + readingDisplay,
+          format: "i18n:StateOfMarking.Tooltip.PhraseLengthTooLong:%@%d".i18n + "\n◆  " + readingDisplay,
           text,
           IMEStateData.allowedMarkLengthRange.upperBound
         ),
@@ -337,8 +337,8 @@ extension IMEStateParsed4Darwin {
       case false:
         return (
           String(
-            format: "\"%@\" already exists:\n ENTER to boost, SHIFT+COMMAND+ENTER to nerf."
-              .i18n + "\n◆  " + readingDisplay,
+            format: "i18n:StateOfMarking.Tooltip.PhraseExistsBoostNerf:%@".i18n
+              + "\n◆  " + readingDisplay,
             text
           ),
           .prompt
@@ -346,8 +346,8 @@ extension IMEStateParsed4Darwin {
       case true:
         return (
           String(
-            format: "\"%@\" already exists:\n ENTER to boost, SHIFT+COMMAND+ENTER to nerf, \n BackSpace or Delete key to exclude."
-              .i18n + "\n◆  " + readingDisplay,
+            format: "i18n:StateOfMarking.Tooltip.PhraseExistsBoostNerfExclude:%@".i18n
+              + "\n◆  " + readingDisplay,
             text
           ),
           .prompt
@@ -358,7 +358,7 @@ extension IMEStateParsed4Darwin {
     if markedTargetIsCurrentlyFiltered {
       return (
         String(
-          format: "\"%@\" selected. ENTER to unfilter this phrase.".i18n + "\n◆  "
+          format: "i18n:StateOfMarking.Tooltip.SelectedEnterToUnfilter:%@".i18n + "\n◆  "
             + readingDisplay,
           text
         ),
@@ -368,7 +368,7 @@ extension IMEStateParsed4Darwin {
 
     return (
       String(
-        format: "\"%@\" selected. ENTER to add user phrase.".i18n
+        format: "i18n:StateOfMarking.Tooltip.SelectedEnterToAdd:%@".i18n
           + "\n◆  "
           + readingDisplay,
         text

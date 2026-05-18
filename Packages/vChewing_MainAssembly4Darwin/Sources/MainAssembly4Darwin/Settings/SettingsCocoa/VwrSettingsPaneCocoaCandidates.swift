@@ -93,7 +93,7 @@ extension SettingsPanesCocoa {
             }?.boxed()
             NSStackView.buildSection(width: innerContentWidth) {
               NSStackView.build(.horizontal) {
-                "Where's IMK Candidate Window?".makeNSLabel(fixWidth: innerContentWidth)
+                "i18n:Menu.WhereIsIMKCandidateWindow".makeNSLabel(fixWidth: innerContentWidth)
                 NSView()
                 NSButton(
                   verbatim: "...",
@@ -134,7 +134,7 @@ extension SettingsPanesCocoa {
         PrefMgr.shared.candidateKeys = keys
         return
       }
-      let alert = NSAlert(error: "Invalid Selection Keys.".i18n)
+      let alert = NSAlert(error: "i18n:ErrorMessage.InvalidSelectionKeys".i18n)
       alert.informativeText = errorResult
       IMEApp.buzz()
       if let window = CtlSettingsCocoa.shared?.window {

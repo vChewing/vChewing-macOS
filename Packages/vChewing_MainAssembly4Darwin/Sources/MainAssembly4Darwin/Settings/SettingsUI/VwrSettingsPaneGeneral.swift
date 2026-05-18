@@ -50,13 +50,8 @@ public struct VwrSettingsPaneGeneral: View {
     Form {
       VStack(alignment: .leading) {
         Text(
-          "\u{2022} " +
-            "Please use mouse wheel to scroll each page if needed. The CheatSheet is available in the IME menu."
-            .i18n
-            + "\n\u{2022} "
-            +
-            "Note: The “Delete ⌫” key on Mac keyboard is named as “BackSpace ⌫” here in order to distinguish the real “Delete ⌦” key from full-sized desktop keyboards. If you want to use the real “Delete ⌦” key on a Mac keyboard with no numpad equipped, you have to press “Fn+⌫” instead."
-            .i18n
+          "\u{2022} " + "i18n:InfoMessage.MouseWheelScrollWithCheatSheet".i18n
+            + "\n\u{2022} " + "i18n:InfoMessage.DeleteKeyNote".i18n
         )
         .settingsDescription()
         UserDef.kAppleLanguages.bind($appleLanguageTag).render()
@@ -95,21 +90,20 @@ public struct VwrSettingsPaneGeneral: View {
         maxHeight: CtlSettingsUI.contentMaxHeight
       )
       .alert(
-        "Warning".i18n,
+        "i18n:Common.Warning".i18n,
         isPresented: $isShowingFartWarning
       ) {
-        Button("Uncheck".i18n, role: .destructive) {
+        Button("i18n:Common.Uncheck".i18n, role: .destructive) {
           PrefMgr.shared.shouldNotFartInLieuOfBeep = false
           IMEApp.buzz()
         }
-        Button("Leave it checked".i18n, role: .cancel) {
+        Button("i18n:Common.LeaveItChecked".i18n, role: .cancel) {
           PrefMgr.shared.shouldNotFartInLieuOfBeep = true
           IMEApp.buzz()
         }
       } message: {
         Text(
-          "You are about to uncheck this fart suppressor. You are responsible for all consequences lead by letting people nearby hear the fart sound come from your computer. We strongly advise against unchecking this in any public circumstance that prohibits NSFW netas."
-            .i18n
+          "i18n:UserDef.kShouldNotFartInLieuOfBeep.description".i18n
         )
       }
   }

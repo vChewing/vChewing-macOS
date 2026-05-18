@@ -92,23 +92,23 @@ nonisolated public enum KeyboardParser: Int, CaseIterable {
   public var localizedMenuName: String {
     let rawString: String = {
       switch self {
-      case .ofStandard: return "Dachen (Microsoft Standard / Wang / 01, etc.)"
-      case .ofETen: return "Eten Traditional"
-      case .ofIBM: return "IBM"
-      case .ofMiTAC: return "MiTAC"
-      case .ofSeigyou: return "Seigyou"
-      case .ofFakeSeigyou: return "Fake Seigyou"
-      case .ofDachen26: return "Dachen 26 (libChewing)"
-      case .ofETen26: return "Eten 26"
-      case .ofHsu: return "Hsu"
-      case .ofStarlight: return "Starlight"
-      case .ofAlvinLiu: return "Alvin Liu (Imitative)"
-      case .ofHanyuPinyin: return "Hanyu Pinyin with Numeral Intonation"
-      case .ofSecondaryPinyin: return "Secondary Pinyin with Numeral Intonation"
-      case .ofYalePinyin: return "Yale Pinyin with Numeral Intonation"
-      case .ofHualuoPinyin: return "Hualuo Pinyin with Numeral Intonation"
-      case .ofUniversalPinyin: return "Universal Pinyin with Numeral Intonation"
-      case .ofWadeGilesPinyin: return "Wade-Giles Pinyin with Numeral Intonation"
+      case .ofStandard: return "i18n:KeyboardLayout.DachenMicrosoftStandard"
+      case .ofETen: return "i18n:KeyboardLayout.EtenTraditional"
+      case .ofIBM: return "i18n:KeyboardLayout.IBM"
+      case .ofMiTAC: return "i18n:KeyboardLayout.MiTAC"
+      case .ofSeigyou: return "i18n:KeyboardLayout.Seigyou"
+      case .ofFakeSeigyou: return "i18n:KeyboardLayout.FakeSeigyou"
+      case .ofDachen26: return "i18n:KeyboardLayout.Dachen26"
+      case .ofETen26: return "i18n:KeyboardLayout.Eten26"
+      case .ofHsu: return "i18n:KeyboardLayout.Hsu"
+      case .ofStarlight: return "i18n:KeyboardLayout.Starlight"
+      case .ofAlvinLiu: return "i18n:KeyboardLayout.AlvinLiuImitative"
+      case .ofHanyuPinyin: return "i18n:TypingMethod.HanyuPinyinNumeral"
+      case .ofSecondaryPinyin: return "i18n:TypingMethod.SecondaryPinyinNumeral"
+      case .ofYalePinyin: return "i18n:TypingMethod.YalePinyinNumeral"
+      case .ofHualuoPinyin: return "i18n:TypingMethod.HualuoPinyinNumeral"
+      case .ofUniversalPinyin: return "i18n:TypingMethod.UniversalPinyinNumeral"
+      case .ofWadeGilesPinyin: return "i18n:TypingMethod.WadeGilesPinyinNumeral"
       }
     }()
     return rawString.i18n
@@ -169,12 +169,12 @@ nonisolated public enum CandidateKey {
       switch self {
       case .invalidCharacters:
         return "- "
-          + "Candidate keys can only contain printable ASCII characters like alphanumericals.".i18n
+          + "i18n:ErrorMessage.CandidateKeysASCIIOnly".i18n
           + "\n" + "- " + "i18n:CandidateKey.ValidationError.AssignedForOtherPurposes".i18n
-          + "\n" + "- " + "Candidate keys cannot contain space.".i18n
+          + "\n" + "- " + "i18n:ErrorMessage.CandidateKeysNoSpace".i18n
       case .countMismatch:
-        return "- " + "Minimum 6 candidate keys allowed.".i18n
-          + "\n" + "- " + "Maximum 10 candidate keys allowed.".i18n
+        return "- " + "i18n:ErrorMessage.MinCandidateKeys".i18n
+          + "\n" + "- " + "i18n:ErrorMessage.MaxCandidateKeys".i18n
       case .noError:
         return ""
       }
@@ -255,11 +255,11 @@ nonisolated public enum Shared {
     public var description: String {
       switch self {
       case .imeModeCHS:
-        return "Simplified Chinese"
+        return "i18n:LanguageName.LocaleCodeZHHans"
       case .imeModeCHT:
-        return "Traditional Chinese"
+        return "i18n:LanguageName.LocaleCodeZHHant"
       case .imeModeNULL:
-        return "Please select…"
+        return "i18n:Common.PleaseSelect"
       }
     }
 

@@ -474,7 +474,7 @@ extension BPMFFullMatchTypewriter {
       }
       var refreshedState = handler.generateStateOfInputting()
       refreshedState.textToCommit = textToCommit
-      refreshedState.tooltip = "Previous intonation has been overridden.".i18n
+      refreshedState.tooltip = "i18n:StateOfInputting.Tooltip.PreviousIntonationOverridden".i18n
       refreshedState.tooltipDuration = 2
       refreshedState.data.tooltipColorState = .normal
       session.switchState(refreshedState)

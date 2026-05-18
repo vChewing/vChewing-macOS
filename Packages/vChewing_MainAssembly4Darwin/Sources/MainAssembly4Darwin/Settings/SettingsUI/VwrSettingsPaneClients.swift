@@ -23,14 +23,14 @@ public struct VwrSettingsPaneClients: View {
             isShowingAddSheet = true
           } label: {
             Label {
-              Text("Add Client".i18n)
+              Text("i18n:ClientManager.AddClient".i18n)
                 .fontWidth(.condensed)
             } icon: {
               Image(systemName: "plus")
                 .contentShape(.rect)
                 .frame(height: 12)
             }
-            .help("Add Client".i18n)
+            .help("i18n:ClientManager.AddClient".i18n)
           }
           .sheet(isPresented: $isShowingAddSheet) {
             AddClientSheetView { bundleIDs, enableMitigation in
@@ -46,14 +46,14 @@ public struct VwrSettingsPaneClients: View {
             isShowingAppPicker = true
           } label: {
             Label {
-              Text("Just Select".i18n + "…")
+              Text("i18n:Common.JustSelect".i18n + "…")
                 .fontWidth(.condensed)
             } icon: {
               Image(systemName: "app.badge.checkmark")
                 .contentShape(.rect)
                 .frame(height: 12)
             }
-            .help("Just Select".i18n)
+            .help("i18n:Common.JustSelect".i18n)
           }
           .fileImporter(
             isPresented: $isShowingAppPicker,
@@ -76,10 +76,10 @@ public struct VwrSettingsPaneClients: View {
             }
           }
           .alert(
-            "Do you want to enable the popup composition buffer for this client?".i18n,
+            "i18n:ClientManager.EnablePopupCompositionBuffer".i18n,
             isPresented: $isShowingMitigationPrompt
           ) {
-            Button("Yes".i18n) {
+            Button("i18n:Common.Yes".i18n) {
               if let id = pendingBundleIdentifier {
                 var dict = PrefMgr.shared.clientsIMKTextInputIncapable
                 dict[id] = true
@@ -88,7 +88,7 @@ public struct VwrSettingsPaneClients: View {
                 pendingBundleIdentifier = nil
               }
             }
-            Button("No".i18n) {
+            Button("i18n:Common.No".i18n) {
               if let id = pendingBundleIdentifier {
                 var dict = PrefMgr.shared.clientsIMKTextInputIncapable
                 dict[id] = false
@@ -100,8 +100,7 @@ public struct VwrSettingsPaneClients: View {
           } message: {
             Text(
               (pendingBundleIdentifier ?? "") + "\n\n"
-                + "Some client apps may have different compatibility issues in IMKTextInput implementation."
-                .i18n
+                + "i18n:ClientManager.CompatibilityNote".i18n
             )
           }
           Spacer()
@@ -112,16 +111,15 @@ public struct VwrSettingsPaneClients: View {
               .contentShape(.rect)
               .frame(height: 12)
           }
-          .help("Remove Selected".i18n)
+          .help("i18n:Common.RemoveSelected".i18n)
           .disabled(selectedIDs.isEmpty)
           .alert(
-            "The selected item is either not a valid macOS application bundle or not having a valid app bundle identifier."
-              .i18n,
+            "i18n:ErrorMessage.InvalidAppBundle".i18n,
             isPresented: $isShowingInvalidBundleAlert
           ) {
-            Button("OK".i18n, role: .cancel) {}
+            Button("i18n:Common.OK".i18n, role: .cancel) {}
           } message: {
-            Text((invalidBundleAlertPath ?? "") + "\n\n" + "Please try again.".i18n)
+            Text((invalidBundleAlertPath ?? "") + "\n\n" + "i18n:Common.PleaseTryAgain".i18n)
           }
         }
         .controlSize(.small)
@@ -144,7 +142,7 @@ public struct VwrSettingsPaneClients: View {
         HStack(alignment: .top) {
           VStack(alignment: .leading) {
             Text(
-              "Please manage the list of those clients here which are: 1) IMKTextInput-incompatible; 2) suspected from abusing the contents of the inline composition buffer. A client listed here, if checked, will use popup composition buffer with maximum 20 reading counts holdable."
+              "i18n:ClientManager.ManageClientsDescription"
                 .i18n
             ).settingsDescription()
           }
@@ -280,25 +278,22 @@ private struct AddClientSheetView: View {
 
   var body: some View {
     VStack(spacing: 12) {
-      Text("Please enter the client app bundle identifier(s) you want to register.".i18n)
+      Text("i18n:ClientManager.EnterBundleIdentifier".i18n)
         .font(.headline)
-      Text(
-        "One record per line. Use Option+Enter to break lines.\nBlank lines will be dismissed."
-          .i18n
-      )
-      .font(.subheadline)
-      .foregroundStyle(.secondary)
-      .multilineTextAlignment(.leading)
-      .frame(maxWidth: .infinity, alignment: .leading)
+      Text("i18n:PhraseEditor.OneRecordPerLine".i18n)
+        .font(.subheadline)
+        .foregroundStyle(.secondary)
+        .multilineTextAlignment(.leading)
+        .frame(maxWidth: .infinity, alignment: .leading)
       TextEditor(text: $inputText)
         .font(.system(.body, design: .monospaced))
         .frame(minWidth: 350, minHeight: 180)
         .border(Color.secondary.opacity(0.3))
       HStack {
         Spacer()
-        Button("Cancel".i18n, role: .cancel) { dismiss() }
+        Button("i18n:Common.Cancel".i18n, role: .cancel) { dismiss() }
           .keyboardShortcut(.cancelAction)
-        Button("OK".i18n) {
+        Button("i18n:Common.OK".i18n) {
           let ids = inputText.components(separatedBy: "\n").filter { !$0.isEmpty }
           onCommit(ids, true)
           dismiss()

@@ -26,8 +26,7 @@ public struct VwrSettingsPaneDictionary: View {
               PathControl(pathDroppable: $userDataFolderSpecified) { pathControl in
                 pathControl.allowedTypes = ["public.folder", "public.directory"]
                 pathControl
-                  .placeholderString = "Please drag the desired target from Finder to this place."
-                  .i18n
+                  .placeholderString = "i18n:ClientManager.DragTargetInstruction".i18n
               } acceptDrop: { pathControl, info in
                 let urls = info.draggingPasteboard.readObjects(forClasses: [NSURL.self])
                 guard let droppedURL = urls?.first as? URL else { return false }
@@ -74,7 +73,7 @@ public struct VwrSettingsPaneDictionary: View {
                 Text("↻")
               }.frame(minWidth: 25)
             }
-            Text(LocalizedStringKey("i18n:settings.Prompt.ChooseDesiredUserDataFolderPath"))
+            Text(LocalizedStringKey("i18n:UserDef.kUserDataFolderSpecified.description"))
               .settingsDescription()
           }
           VStack(alignment: .leading) {
@@ -83,12 +82,8 @@ public struct VwrSettingsPaneDictionary: View {
                 LMMgr.initUserLangModels()
               }
             }
-            Text(
-              LocalizedStringKey(
-                "Due to security concerns, we don't consider implementing anything related to shell script execution here. An input method doing this without implementing App Sandbox will definitely have system-wide vulnerabilities, considering that its related UserDefaults are easily tamperable to execute malicious shell scripts. vChewing is designed to be invulnerable from this kind of attack. Also, official releases of vChewing are Sandboxed."
-              )
-            )
-            .settingsDescription()
+            Text("i18n:InfoMessage.SecurityConcernsNoShellScript".i18n)
+              .settingsDescription()
           }
         }
         .fileImporter(
@@ -203,7 +198,7 @@ public struct VwrSettingsPaneDictionary: View {
         importAlertTitle,
         isPresented: $isShowingImportAlert
       ) {
-        Button("OK".i18n, role: .cancel) {}
+        Button("i18n:Common.OK".i18n, role: .cancel) {}
       } message: {
         if let msg = importAlertMessage {
           Text(msg)
@@ -219,7 +214,7 @@ public struct VwrSettingsPaneDictionary: View {
           if count > 0 {
             LMMgr.initUserLangModels()
             Notifier.notify(message: String(
-              format: "i18n:settings.dictionary.mergeUserDataToNewTarget.notification.filesMerged".i18n,
+              format: "i18n:settings.dictionary.mergeUserDataToNewTarget.notification.filesMerged:%d".i18n,
               count
             ))
           } else {

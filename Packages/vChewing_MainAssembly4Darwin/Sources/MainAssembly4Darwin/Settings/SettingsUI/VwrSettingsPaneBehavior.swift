@@ -83,7 +83,7 @@ public struct VwrSettingsPaneBehavior: View {
           Spacer()
           Group {
             Text(" ") +
-              Text(LocalizedStringKey("This feature requires macOS \("10.15") and above."))
+              Text(String(format: "i18n:InfoMessage.FeatureRequiresMacOS:%@".i18n, "10.15"))
               + Text(CtlSettingsUI.sentenceSeparator)
               + Text("i18n:settings.shiftKeyASCIITogle.description".i18n)
           }.settingsDescription()

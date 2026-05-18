@@ -49,7 +49,7 @@ public final class CtlSettingsUI: NSWindowController, NSWindowDelegate {
       rootView: VwrSettingsUI()
         .ignoresSafeArea()
     )
-    var preferencesTitleName = "vChewing Preferences…".i18n
+    var preferencesTitleName = "i18n:Menu.VChewingPreferences".i18n
     preferencesTitleName.removeLast()
     window?.title = preferencesTitleName
   }

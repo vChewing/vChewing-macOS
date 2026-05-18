@@ -471,7 +471,7 @@ public final class LMMgr {
       let alert = NSAlert()
       alert.messageText = msg
       alert.informativeText = infoText
-      alert.addButton(withTitle: "OK".i18n)
+      alert.addButton(withTitle: "i18n:Common.OK".i18n)
       _ = alert.runModal()
       NSApp.popup()
     }

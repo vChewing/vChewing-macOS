@@ -131,11 +131,11 @@ extension InstallerUIConfig {
     var titleLocalized: String {
       switch self {
       case .nothing: return ""
-      case .installationFailed: return "Install Failed".i18n
-      case .missingAfterRegistration: return "Fatal Error".i18n
-      case .postInstallAttention: return "Attention".i18n
-      case .postInstallWarning: return "Warning".i18n
-      case .postInstallOK: return "Installation Successful".i18n
+      case .installationFailed: return "i18n:Installer.InstallFailed".i18n
+      case .missingAfterRegistration: return "i18n:Installer.FatalError".i18n
+      case .postInstallAttention: return "i18n:Installer.Attention".i18n
+      case .postInstallWarning: return "i18n:Common.Warning".i18n
+      case .postInstallOK: return "i18n:Installer.InstallationSuccessful".i18n
       }
     }
 
@@ -143,21 +143,18 @@ extension InstallerUIConfig {
       switch self {
       case .nothing: return ""
       case .installationFailed:
-        return "Cannot copy the file to the destination.".i18n
+        return "i18n:Installer.CannotCopyFileToDestination".i18n
       case .missingAfterRegistration:
         return String(
-          format: "Cannot find input source %@ after registration.".i18n,
+          format: "i18n:Installer.CannotFindInputSourceAfterRegistration:%@".i18n,
           kTISInputSourceID
         )
       case .postInstallAttention:
-        return "vChewing is upgraded, but please log out or reboot for the new version to be fully functional."
-          .i18n
+        return "i18n:Installer.UpgradedPleaseRelogin".i18n
       case .postInstallWarning:
-        return "Input method may not be fully enabled. Please enable it through System Preferences > Keyboard > Input Sources."
-          .i18n
+        return "i18n:Installer.InputMethodMayNotBeFullyEnabled".i18n
       case .postInstallOK:
-        return "vChewing is ready to use. \n\nPlease relogin if this is the first time you install it in this user account."
-          .i18n
+        return "i18n:Installer.ReadyToUse".i18n
       }
     }
   }

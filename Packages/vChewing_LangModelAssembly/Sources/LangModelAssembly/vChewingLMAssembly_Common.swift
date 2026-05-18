@@ -25,7 +25,15 @@ nonisolated public enum LMAssembly {
 
     public var id: String { rawValue }
 
-    public var localizedDescription: String { rawValue.i18n }
+    public var localizedDescription: String {
+      switch self {
+      case .thePhrases: return "i18n:PhraseEditor.TabPhrases".i18n
+      case .theFilter: return "i18n:PhraseEditor.TabFilter".i18n
+      case .theReplacements: return "i18n:PhraseEditor.TabReplacements".i18n
+      case .theAssociates: return "i18n:PhraseEditor.TabAssociates".i18n
+      case .theSymbols: return "i18n:PhraseEditor.TabSymbols".i18n
+      }
+    }
   }
 
   nonisolated public static let fileHandleQueue: DispatchQueue = {

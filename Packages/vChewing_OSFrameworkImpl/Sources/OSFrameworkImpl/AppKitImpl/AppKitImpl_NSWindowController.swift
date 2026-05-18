@@ -85,7 +85,7 @@ import SwiftExtension
         let alert = NSAlert()
         alert.messageText = title
         if let text = text { alert.informativeText = text }
-        alert.addButton(withTitle: "OK".i18n)
+        alert.addButton(withTitle: "i18n:Common.OK".i18n)
         var result: NSApplication.ModalResponse = .alertFirstButtonReturn
         guard let this = self else { return alert.runModal() }
         alert.beginSheetModal(for: this) { theResponce in

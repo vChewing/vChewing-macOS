@@ -16,7 +16,7 @@ struct InstallerApp4SwiftUI: App {
     WindowGroup {
       VwrAppInstaller4SwiftUI()
         .modifier(
-          GradientViewWrapper(titleText: "vChewing Input Method")
+          GradientViewWrapper(titleText: LocalizedStringKey("i18n:Installer.VChewingInputMethod"))
         )
         .frame(minWidth: 1_000, idealWidth: 1_000, minHeight: 630, idealHeight: 630)
         .onAppear {

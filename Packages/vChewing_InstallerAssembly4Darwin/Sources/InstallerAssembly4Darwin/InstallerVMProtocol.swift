@@ -200,7 +200,7 @@ extension InstallerVMProtocol {
       if allRegisteredInstancesOfThisInputMethod.isEmpty {
         let message = String(
           format: NSLocalizedString(
-            "Cannot find input source %@ after registration.", comment: ""
+            "i18n:Installer.CannotFindInputSourceAfterRegistration:%@", comment: ""
           ) + "(#D41J0U8U)",
           imeIdentifier
         )

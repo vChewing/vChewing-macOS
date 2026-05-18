@@ -17,20 +17,20 @@ extension SessionCtl {
       NSMenu.Item(verbatim: currentRAMUsageDescription)
       NSMenu.Item(
         verbatim: String(
-          format: "Switch to %@ Input Mode".i18n,
+          format: "i18n:InputMode.SwitchToInputMode:%@".i18n,
           currentInputMode.reversed.localizedDescription
         )
       )?.act(#selector(switchInputMode(_:)))
         .hotkey(PrefMgr.shared.usingHotKeyInputMode ? "D" : "", mask: [.command, .control])
-      NSMenu.Item("Per-Char Select Mode")?
+      NSMenu.Item("i18n:UserDef.kUsingHotKeySCPC.shortTitle")?
         .act(#selector(toggleSCPCTypingMode(_:)))
         .state(PrefMgr.shared.useSCPCTypingMode)
         .hotkey(PrefMgr.shared.usingHotKeySCPC ? "P" : "", mask: [.command, .control])
-      NSMenu.Item("Associated Phrases")?
+      NSMenu.Item("i18n:UserDef.kUsingHotKeyAssociates.shortTitle")?
         .act(#selector(toggleAssociatedPhrasesEnabled(_:)))
         .state(PrefMgr.shared.associatedPhrasesEnabled)
         .hotkey(PrefMgr.shared.usingHotKeyAssociates ? "O" : "", mask: [.command, .control])
-      NSMenu.Item("Edit Associated Phrases…")?
+      NSMenu.Item("i18n:Menu.EditAssociatedPhrases")?
         .act(#selector(openAssociatedPhrases(_:)))
         .alternated()
         .hotkey(
@@ -38,91 +38,91 @@ extension SessionCtl {
           mask: [.command, .option, .control]
         )
         .nulled(silentMode)
-      NSMenu.Item("CIN Cassette Mode")?
+      NSMenu.Item("i18n:UserDef.kUsingHotKeyRevLookup.shortTitle")?
         .act(#selector(toggleCassetteMode(_:)))
         .state(PrefMgr.shared.cassetteEnabled)
         .hotkey(PrefMgr.shared.usingHotKeyCassette ? "I" : "", mask: [.command, .control])
-      NSMenu.Item("CNS11643 Mode")?
+      NSMenu.Item("i18n:UserDef.kUsingHotKeyCNS.shortTitle")?
         .act(#selector(toggleCNS11643Enabled(_:)))
         .state(PrefMgr.shared.cns11643Enabled)
         .hotkey(PrefMgr.shared.usingHotKeyCNS ? "L" : "", mask: [.command, .control])
-      NSMenu.Item("Force KangXi Writing")?
+      NSMenu.Item("i18n:UserDef.kUsingHotKeyKangXi.shortTitle")?
         .act(#selector(toggleChineseConverter(_:)))
         .state(PrefMgr.shared.chineseConversionEnabled)
         .hotkey(PrefMgr.shared.usingHotKeyKangXi ? "K" : "", mask: [.command, .control])
         .nulled(currentInputMode != .imeModeCHT)
-      NSMenu.Item("JIS Shinjitai Output")?
+      NSMenu.Item("i18n:UserDef.kUsingHotKeyHalfWidthASCII.shortTitle")?
         .act(#selector(toggleShiftJISShinjitaiOutput(_:)))
         .state(PrefMgr.shared.shiftJISShinjitaiOutputEnabled)
         .hotkey(PrefMgr.shared.usingHotKeyJIS ? "J" : "", mask: [.command, .control])
         .nulled(currentInputMode != .imeModeCHT)
-      NSMenu.Item("Currency Numeral Output")?
+      NSMenu.Item("i18n:UserDef.kUsingHotKeyCassette.shortTitle")?
         .act(#selector(toggleCurrencyNumerals(_:)))
         .state(PrefMgr.shared.currencyNumeralsEnabled)
         .hotkey(PrefMgr.shared.usingHotKeyCurrencyNumerals ? "M" : "", mask: [.command, .control])
-      NSMenu.Item("Half-Width Punctuation Mode")?
+      NSMenu.Item("i18n:UserDef.kUsingHotKeyCurrencyNumerals.shortTitle")?
         .act(#selector(toggleHalfWidthPunctuation(_:)))
         .state(PrefMgr.shared.halfWidthPunctuationEnabled)
         .hotkey(PrefMgr.shared.usingHotKeyHalfWidthASCII ? "H" : "", mask: [.command, .control])
-      NSMenu.Item("Use Phrase Replacement")?
+      NSMenu.Item("i18n:UserDef.kPhraseReplacementEnabled.shortTitle")?
         .act(#selector(togglePhraseReplacement(_:)))
         .state(PrefMgr.shared.phraseReplacementEnabled)
-      NSMenu.Item("Edit Phrase Replacement Table…")?
+      NSMenu.Item("i18n:Menu.EditPhraseReplacementTable")?
         .act(#selector(openPhraseReplacement(_:)))
         .alternated().nulled(silentMode)
-      NSMenu.Item("Symbol & Emoji Input")?
+      NSMenu.Item("i18n:Menu.SymbolEmojiInput")?
         .act(#selector(toggleSymbolEnabled(_:)))
         .state(PrefMgr.shared.symbolInputEnabled)
-      NSMenu.Item("Edit User Symbol & Emoji Data…")?
+      NSMenu.Item("i18n:Menu.EditUserSymbolEmojiData")?
         .act(#selector(openUserSymbols(_:)))
         .alternated().nulled(silentMode)
 
       NSMenu.Item.separator() // ---------------------
-      NSMenu.Item("Open User Dictionary Folder")?
+      NSMenu.Item("i18n:Menu.OpenUserDictionaryFolder")?
         .act(#selector(openUserDataFolder(_:)))
         .nulled(silentMode)
-      NSMenu.Item("Open App Support Folder")?
+      NSMenu.Item("i18n:Menu.OpenAppSupportFolder")?
         .act(#selector(openAppSupportFolderFromContainer(_:)))
         .alternated().nulled(silentMode)
-      NSMenu.Item("Edit vChewing User Phrases…")?
+      NSMenu.Item("i18n:Menu.EditVChewingUserPhrases")?
         .act(#selector(openUserPhrases(_:)))
         .nulled(silentMode)
-      NSMenu.Item("Reload User Phrases")?
+      NSMenu.Item("i18n:Menu.ReloadUserPhrases")?
         .act(#selector(reloadUserPhrasesData(_:)))
-      NSMenu.Item("Edit Excluded Phrases…")?
+      NSMenu.Item("i18n:Menu.EditExcludedPhrases")?
         .act(#selector(openExcludedPhrases(_:)))
         .alternated().nulled(silentMode)
-      NSMenu.Item(verbatim: "Reverse Lookup (Phonabets)".i18n.withEllipsis)?
+      NSMenu.Item(verbatim: "i18n:UserDef.kUsingHotKeyJIS.shortTitle".i18n.withEllipsis)?
         .act(#selector(callReverseLookupWindow(_:)))
         .hotkey(PrefMgr.shared.usingHotKeyRevLookup ? "/" : "", mask: [.command, .control])
-      NSMenu.Item("Optimize Memorized Phrases")?
+      NSMenu.Item("i18n:Menu.OptimizeMemorizedPhrases")?
         .act(#selector(removeUnigramsFromPOM(_:)))
-      NSMenu.Item("Clear Memorized Phrases")?
+      NSMenu.Item("i18n:Menu.ClearMemorizedPhrases")?
         .act(#selector(clearPOM(_:)))
         .alternated()
 
       NSMenu.Item.separator() // ---------------------
       if #unavailable(macOS 14) {
-        NSMenu.Item("vChewing Preferences…")?
+        NSMenu.Item("i18n:Menu.VChewingPreferences")?
           .act(#selector(showPreferences(_:)))
           .nulled(silentMode)
       } else {
-        NSMenu.Item(verbatim: "vChewing Preferences…".i18n + " (SwiftUI)")?
+        NSMenu.Item(verbatim: "i18n:Menu.VChewingPreferences".i18n + " (SwiftUI)")?
           .act(#selector(showSettingsSwiftUI(_:)))
           .nulled(silentMode)
-        NSMenu.Item(verbatim: "vChewing Preferences…".i18n + " (AppKit)")?
+        NSMenu.Item(verbatim: "i18n:Menu.VChewingPreferences".i18n + " (AppKit)")?
           .act(#selector(showSettingsAppKit(_:)))
           .alternated().nulled(silentMode)
       }
-      NSMenu.Item("Check for Updates…")?
+      NSMenu.Item("i18n:Menu.CheckForUpdates")?
         .act(#selector(checkForUpdate(_:)))
         .nulled(silentMode)
-      NSMenu.Item("Reboot vChewing…")?
+      NSMenu.Item("i18n:Menu.RebootVChewing")?
         .act(#selector(selfTerminate(_:)))
-      NSMenu.Item("CheatSheet")?
+      NSMenu.Item("i18n:Menu.CheatSheet")?
         .act(#selector(showCheatSheet(_:)))
         .nulled(silentMode)
-      NSMenu.Item("Uninstall vChewing…")?
+      NSMenu.Item("i18n:Menu.UninstallVChewing")?
         .act(#selector(selfUninstall(_:)))
         .nulled(silentMode || !optionKeyPressed)
     }
@@ -174,11 +174,11 @@ extension SessionCtl {
       return
     }
     Notifier.notify(
-      message: "CIN Cassette Mode".i18n + "\n"
+      message: "i18n:UserDef.kUsingHotKeyRevLookup.shortTitle".i18n + "\n"
         + (
           PrefMgr.shared.cassetteEnabled.toggled()
-            ? "NotificationSwitchON".i18n
-            : "NotificationSwitchOFF".i18n
+            ? "i18n:NotificationSwitch.On".i18n
+            : "i18n:NotificationSwitch.Off".i18n
         )
     )
     let cassetteDataLoaded = core?.inputMode.langModel.isCassetteDataLoaded
@@ -191,11 +191,11 @@ extension SessionCtl {
   public func toggleSCPCTypingMode(_: Any? = nil) {
     core?.resetInputHandler(forceComposerCleanup: true)
     Notifier.notify(
-      message: "Per-Char Select Mode".i18n + "\n"
+      message: "i18n:UserDef.kUsingHotKeySCPC.shortTitle".i18n + "\n"
         + (
           PrefMgr.shared.useSCPCTypingMode.toggled()
-            ? "NotificationSwitchON".i18n
-            : "NotificationSwitchOFF".i18n
+            ? "i18n:NotificationSwitch.On".i18n
+            : "i18n:NotificationSwitch.Off".i18n
         )
     )
   }
@@ -204,11 +204,11 @@ extension SessionCtl {
   public func toggleChineseConverter(_: Any? = nil) {
     core?.resetInputHandler(forceComposerCleanup: true)
     Notifier.notify(
-      message: "Force KangXi Writing".i18n + "\n"
+      message: "i18n:UserDef.kUsingHotKeyKangXi.shortTitle".i18n + "\n"
         + (
           PrefMgr.shared.chineseConversionEnabled.toggled()
-            ? "NotificationSwitchON".i18n
-            : "NotificationSwitchOFF".i18n
+            ? "i18n:NotificationSwitch.On".i18n
+            : "i18n:NotificationSwitch.Off".i18n
         )
     )
   }
@@ -217,11 +217,11 @@ extension SessionCtl {
   public func toggleShiftJISShinjitaiOutput(_: Any? = nil) {
     core?.resetInputHandler(forceComposerCleanup: true)
     Notifier.notify(
-      message: "JIS Shinjitai Output".i18n + "\n"
+      message: "i18n:UserDef.kUsingHotKeyHalfWidthASCII.shortTitle".i18n + "\n"
         + (
           PrefMgr.shared.shiftJISShinjitaiOutputEnabled.toggled()
-            ? "NotificationSwitchON".i18n
-            : "NotificationSwitchOFF".i18n
+            ? "i18n:NotificationSwitch.On".i18n
+            : "i18n:NotificationSwitch.Off".i18n
         )
     )
   }
@@ -230,11 +230,11 @@ extension SessionCtl {
   public func toggleCurrencyNumerals(_: Any? = nil) {
     core?.resetInputHandler(forceComposerCleanup: true)
     Notifier.notify(
-      message: "Currency Numeral Output".i18n + "\n"
+      message: "i18n:UserDef.kUsingHotKeyCassette.shortTitle".i18n + "\n"
         + (
           PrefMgr.shared.currencyNumeralsEnabled.toggled()
-            ? "NotificationSwitchON".i18n
-            : "NotificationSwitchOFF".i18n
+            ? "i18n:NotificationSwitch.On".i18n
+            : "i18n:NotificationSwitch.Off".i18n
         )
     )
   }
@@ -243,11 +243,11 @@ extension SessionCtl {
   public func toggleHalfWidthPunctuation(_: Any? = nil) {
     core?.resetInputHandler(forceComposerCleanup: true)
     Notifier.notify(
-      message: "Half-Width Punctuation Mode".i18n + "\n"
+      message: "i18n:UserDef.kUsingHotKeyCurrencyNumerals.shortTitle".i18n + "\n"
         + (
           PrefMgr.shared.halfWidthPunctuationEnabled.toggled()
-            ? "NotificationSwitchON".i18n
-            : "NotificationSwitchOFF".i18n
+            ? "i18n:NotificationSwitch.On".i18n
+            : "i18n:NotificationSwitch.Off".i18n
         )
     )
   }
@@ -256,11 +256,11 @@ extension SessionCtl {
   public func toggleCNS11643Enabled(_: Any? = nil) {
     core?.resetInputHandler(forceComposerCleanup: true)
     Notifier.notify(
-      message: "CNS11643 Mode".i18n + "\n"
+      message: "i18n:UserDef.kUsingHotKeyCNS.shortTitle".i18n + "\n"
         + (
           PrefMgr.shared.cns11643Enabled.toggled()
-            ? "NotificationSwitchON".i18n
-            : "NotificationSwitchOFF".i18n
+            ? "i18n:NotificationSwitch.On".i18n
+            : "i18n:NotificationSwitch.Off".i18n
         )
     )
   }
@@ -269,11 +269,11 @@ extension SessionCtl {
   public func toggleSymbolEnabled(_: Any? = nil) {
     core?.resetInputHandler(forceComposerCleanup: true)
     Notifier.notify(
-      message: "Symbol & Emoji Input".i18n + "\n"
+      message: "i18n:Menu.SymbolEmojiInput".i18n + "\n"
         + (
           PrefMgr.shared.symbolInputEnabled.toggled()
-            ? "NotificationSwitchON".i18n
-            : "NotificationSwitchOFF".i18n
+            ? "i18n:NotificationSwitch.On".i18n
+            : "i18n:NotificationSwitch.Off".i18n
         )
     )
   }
@@ -282,11 +282,11 @@ extension SessionCtl {
   public func toggleAssociatedPhrasesEnabled(_: Any? = nil) {
     core?.resetInputHandler(forceComposerCleanup: true)
     Notifier.notify(
-      message: "Associated Phrases".i18n + "\n"
+      message: "i18n:UserDef.kUsingHotKeyAssociates.shortTitle".i18n + "\n"
         + (
           PrefMgr.shared.associatedPhrasesEnabled.toggled()
-            ? "NotificationSwitchON".i18n
-            : "NotificationSwitchOFF".i18n
+            ? "i18n:NotificationSwitch.On".i18n
+            : "i18n:NotificationSwitch.Off".i18n
         )
     )
   }
@@ -295,11 +295,11 @@ extension SessionCtl {
   public func togglePhraseReplacement(_: Any? = nil) {
     core?.resetInputHandler(forceComposerCleanup: true)
     Notifier.notify(
-      message: "Use Phrase Replacement".i18n + "\n"
+      message: "i18n:UserDef.kPhraseReplacementEnabled.shortTitle".i18n + "\n"
         + (
           PrefMgr.shared.phraseReplacementEnabled.toggled()
-            ? "NotificationSwitchON".i18n
-            : "NotificationSwitchOFF".i18n
+            ? "i18n:NotificationSwitch.On".i18n
+            : "i18n:NotificationSwitch.Off".i18n
         )
     )
   }
@@ -394,6 +394,6 @@ extension SessionCtl {
     guard let currentMemorySizeInBytes = NSApplication.memoryFootprint else { return nil }
     let currentMemorySize: Double = (Double(currentMemorySizeInBytes) / 1_024 / 1_024)
       .rounded(toPlaces: 1)
-    return "imeMenu.totalRAMUsed.labelHeader".i18n + " \(currentMemorySize)MB"
+    return "i18n:IME.RAMUsedLabelHeader".i18n + " \(currentMemorySize)MB"
   }
 }

@@ -24,6 +24,13 @@ extension SettingsPanesCocoa {
     var currentLanguageSelectItem: NSMenuItem?
     let btnLangSelector = NSPopUpButton()
     let languages = ["auto", "en", "zh-Hans", "zh-Hant", "ja"]
+    let languageDisplayMap: [String: String] = [
+      "auto": "i18n:Settings.OptionAuto",
+      "en": "i18n:LanguageName.LocaleCodeEN",
+      "zh-Hans": "i18n:LanguageName.LocaleCodeZHHans",
+      "zh-Hant": "i18n:LanguageName.LocaleCodeZHHant",
+      "ja": "i18n:LanguageName.LocaleCodeJA",
+    ]
 
     var windowWidth: CGFloat { SettingsPanesCocoa.windowWidth }
     var contentWidth: CGFloat { SettingsPanesCocoa.contentWidth }
@@ -34,13 +41,9 @@ extension SettingsPanesCocoa {
       NSStackView.build(.vertical, insets: .new(all: 14)) {
         NSStackView.buildSection(width: contentWidth, withDividers: false) {
           var strNotice = "\u{2022} "
-          strNotice +=
-            "Please use mouse wheel to scroll each page if needed. The CheatSheet is available in the IME menu."
-            .i18n
+          strNotice += "i18n:InfoMessage.MouseWheelScrollWithCheatSheet".i18n
           strNotice += "\n\u{2022} "
-          strNotice +=
-            "Note: The “Delete ⌫” key on Mac keyboard is named as “BackSpace ⌫” here in order to distinguish the real “Delete ⌦” key from full-sized desktop keyboards. If you want to use the real “Delete ⌦” key on a Mac keyboard with no numpad equipped, you have to press “Fn+⌫” instead."
-            .i18n
+          strNotice += "i18n:InfoMessage.DeleteKeyNote".i18n
           strNotice.makeNSLabel(descriptive: true, fixWidth: contentWidth)
           UserDef.kAppleLanguages.render(fixWidth: contentWidth) { renderable in
             renderable.currentControl = self.btnLangSelector
@@ -73,7 +76,7 @@ extension SettingsPanesCocoa {
       // 往這個 property 裡面直接寫東西會導致整個視窗叫不出來！！！
       btnLangSelector.menu?.appendItems {
         for language in languages {
-          NSMenuItem(language.i18n)?.represent(language)
+          NSMenuItem(languageDisplayMap[language, default: language].i18n)?.represent(language)
         }
       }
       currentLanguageSelectItem = btnLangSelector.menu?.items.first {

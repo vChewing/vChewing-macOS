@@ -48,7 +48,7 @@ extension SettingsPanesCocoa {
                   renderable.currentControl?.target = self
                   renderable.currentControl?.action = #selector(self.lmmgrInitUserLMsWhenShould(_:))
                 }
-                "Due to security concerns, we don't consider implementing anything related to shell script execution here. An input method doing this without implementing App Sandbox will definitely have system-wide vulnerabilities, considering that its related UserDefaults are easily tamperable to execute malicious shell scripts. vChewing is designed to be invulnerable from this kind of attack. Also, official releases of vChewing are Sandboxed."
+                "i18n:InfoMessage.SecurityConcernsNoShellScript".i18n
                   .makeNSLabel(descriptive: true, fixWidth: innerContentWidth)
               }
               UserDef.kUseExternalFactoryDict.render(fixWidth: innerContentWidth) { renderable in
@@ -171,7 +171,7 @@ extension SettingsPanesCocoa {
       pathCtl.makeSimpleConstraint(.height, relation: .equal, value: NSFont.smallSystemFontSize * 2)
       pathCtl.makeSimpleConstraint(.width, relation: .equal, value: windowWidth - 145)
       pathCtl.url = URL(fileURLWithPath: LMMgr.dataFolderPath(isDefaultFolder: false))
-      pathCtl.toolTip = "Please drag the desired target from Finder to this place.".i18n
+      pathCtl.toolTip = "i18n:ClientManager.DragTargetInstruction".i18n
     }
 
     @IBAction
@@ -317,7 +317,7 @@ extension SettingsPanesCocoa.Dictionary: NSPathControlDelegate {
       return
     }
     let dlgOpenPath = NSOpenPanel()
-    dlgOpenPath.title = "Choose your desired user data folder.".i18n
+    dlgOpenPath.title = "i18n:Settings.ChooseUserDataFolder".i18n
     dlgOpenPath.showsResizeIndicator = true
     dlgOpenPath.showsHiddenFiles = true
     dlgOpenPath.canChooseFiles = false
@@ -386,7 +386,7 @@ extension SettingsPanesCocoa.Dictionary: NSPathControlDelegate {
       if count > 0 {
         LMMgr.initUserLangModels()
         Notifier.notify(message: String(
-          format: "i18n:settings.dictionary.mergeUserDataToNewTarget.notification.filesMerged".i18n,
+          format: "i18n:settings.dictionary.mergeUserDataToNewTarget.notification.filesMerged:%d".i18n,
           count
         ))
       } else {

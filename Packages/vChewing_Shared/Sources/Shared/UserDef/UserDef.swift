@@ -532,7 +532,7 @@ nonisolated extension UserDef {
 nonisolated extension UserDef {
   public var metaData: MetaData? {
     switch self {
-    case .kIsDebugModeEnabled: return .init(userDef: self, shortTitle: "Debug Mode")
+    case .kIsDebugModeEnabled: return .init(userDef: self, shortTitle: "i18n:UserDef.kIsDebugModeEnabled.shortTitle")
     case .kFailureFlagForPOMObservation: return nil
     case .kEnableCandidateWindowAnimation: return .init(
         userDef: self,
@@ -556,8 +556,8 @@ nonisolated extension UserDef {
         description: "i18n:UserDef.kAlwaysUsePCBWithElectronBasedClients.description"
       )
     case .kSecurityHardenedCompositionBuffer: return .init(
-        userDef: self, shortTitle: "Security-harden the composition buffer for all clients",
-        description: "This hinders all client apps from unwelcomely accessing your uncommitted contents in the composition buffer. A popup composition buffer will be shown instead."
+        userDef: self, shortTitle: "i18n:UserDef.kSecurityHardenedCompositionBuffer.shortTitle",
+        description: "i18n:UserDef.kSecurityHardenedCompositionBuffer.description"
       )
     case .kCheckAbusersOfSecureEventInputAPI: return .init(
         userDef: self, shortTitle: "i18n:UserDef.kCheckAbusersOfSecureEventInputAPI.shortTitle",
@@ -566,99 +566,99 @@ nonisolated extension UserDef {
     case .kDeltaOfCalendarYears: return nil
     case .kMostRecentInputMode: return nil
     case .kCassettePath: return .init(
-        userDef: self, shortTitle: "Cassette file path",
-        description: "i18n:settings.Prompt.ChooseDesiredCassetteFilePath"
+        userDef: self, shortTitle: "i18n:UserDef.kCassettePath.shortTitle",
+        description: "i18n:UserDef.kCassettePath.description"
       )
     case .kUserDataFolderSpecified: return .init(
-        userDef: self, shortTitle: "User data folder path",
-        description: "i18n:settings.Prompt.ChooseDesiredUserDataFolderPath"
+        userDef: self, shortTitle: "i18n:UserDef.kUserDataFolderSpecified.shortTitle",
+        description: "i18n:UserDef.kUserDataFolderSpecified.description"
       )
     case .kCheckUpdateAutomatically: return .init(
-        userDef: self, shortTitle: "Check for updates automatically"
+        userDef: self, shortTitle: "i18n:UserDef.kCheckUpdateAutomatically.shortTitle"
       )
     case .kUseExternalFactoryDict: return .init(
-        userDef: self, shortTitle: "Read external factory dictionary files if possible",
-        description: "This will use the SQLite database deployed by the “make install” command from libvChewing-Data if possible."
+        userDef: self, shortTitle: "i18n:UserDef.kUseExternalFactoryDict.shortTitle",
+        description: "i18n:UserDef.kUseExternalFactoryDict.description"
       )
     case .kKeyboardParser: return .init(
         userDef: self, shortTitle: "i18n:UserDef.kKeyboardParser.shortTitle",
         description: "i18n:UserDef.kKeyboardParser.description"
       )
     case .kBasicKeyboardLayout: return .init(
-        userDef: self, shortTitle: "Basic Keyboard Layout:",
-        description: "Choose the macOS-level basic keyboard layout. Non-QWERTY alphanumerical keyboard layouts are for Pinyin parser only. This option will only affect the appearance of the on-screen-keyboard if the current Mandarin parser is neither (any) pinyin nor dynamically reparsable with different western keyboard layouts (like Eten 26, Hsu, etc.)."
+        userDef: self, shortTitle: "i18n:UserDef.kBasicKeyboardLayout.shortTitle",
+        description: "i18n:UserDef.kBasicKeyboardLayout.description"
       )
     case .kAlphanumericalKeyboardLayout: return .init(
-        userDef: self, shortTitle: "Alphanumerical Layout:",
-        description: "Choose the macOS-level alphanumerical keyboard layout. This setting is for Shift-toggled alphanumerical mode only."
+        userDef: self, shortTitle: "i18n:UserDef.kAlphanumericalKeyboardLayout.shortTitle",
+        description: "i18n:UserDef.kAlphanumericalKeyboardLayout.description"
       )
     case .kShowNotificationsWhenTogglingCapsLock: return .init(
         userDef: self,
-        shortTitle: "i18n:UserDef.kShowNotificationsWhenTogglingCapsLock.title",
+        shortTitle: "i18n:UserDef.kShowNotificationsWhenTogglingCapsLock.shortTitle",
         minimumOS: 12
       )
     case .kShowNotificationsWhenTogglingEisu: return .init(
         userDef: self,
-        shortTitle: "i18n:UserDef.kShowNotificationsWhenTogglingEisu.title",
+        shortTitle: "i18n:UserDef.kShowNotificationsWhenTogglingEisu.shortTitle",
         description: "i18n:UserDef.kShowNotificationsWhenTogglingEisu.description"
       )
     case .kShowNotificationsWhenTogglingShift: return .init(
         userDef: self,
-        shortTitle: "i18n:UserDef.kShowNotificationsWhenTogglingShift.title",
+        shortTitle: "i18n:UserDef.kShowNotificationsWhenTogglingShift.shortTitle",
         description: "i18n:UserDef.kShowNotificationsWhenTogglingShift.description",
         minimumOS: 10.15
       )
     case .kSpecifiedNotifyUIColorScheme: return .init(
         userDef: self,
-        shortTitle: "i18n:UserDef.kSpecifiedNotifyUIColorScheme.title",
+        shortTitle: "i18n:UserDef.kSpecifiedNotifyUIColorScheme.shortTitle",
         minimumOS: 10.14,
         options: [
-          -1: "i18n:UserDef.kSpecifiedNotifyUIColorScheme.option.enforceBright",
-          0: "i18n:UserDef.kSpecifiedNotifyUIColorScheme.option.notSpecified",
-          1: "i18n:UserDef.kSpecifiedNotifyUIColorScheme.option.enforceDark",
+          -1: "i18n:UserDef.kSpecifiedNotifyUIColorScheme.option.-1",
+          0: "i18n:UserDef.kSpecifiedNotifyUIColorScheme.option.0",
+          1: "i18n:UserDef.kSpecifiedNotifyUIColorScheme.option.1",
         ]
       )
     case .kCandidateListTextSize: return .init(
         userDef: self,
-        shortTitle: "Candidate Size:",
-        description: "Choose candidate font size for better visual clarity.",
+        shortTitle: "i18n:UserDef.kCandidateListTextSize.shortTitle",
+        description: "i18n:UserDef.kCandidateListTextSize.description",
         options: [
-          12: "12",
-          14: "14",
-          16: "16",
-          17: "17",
-          18: "18",
-          20: "20",
-          22: "22",
-          24: "24",
-          32: "32",
-          64: "64",
-          96: "96",
+          12: "i18n:UserDef.kCandidateListTextSize.option.12",
+          14: "i18n:UserDef.kCandidateListTextSize.option.14",
+          16: "i18n:UserDef.kCandidateListTextSize.option.16",
+          17: "i18n:UserDef.kCandidateListTextSize.option.17",
+          18: "i18n:UserDef.kCandidateListTextSize.option.18",
+          20: "i18n:UserDef.kCandidateListTextSize.option.20",
+          22: "i18n:UserDef.kCandidateListTextSize.option.22",
+          24: "i18n:UserDef.kCandidateListTextSize.option.24",
+          32: "i18n:UserDef.kCandidateListTextSize.option.32",
+          64: "i18n:UserDef.kCandidateListTextSize.option.64",
+          96: "i18n:UserDef.kCandidateListTextSize.option.96",
         ]
       )
     case .kAlwaysExpandCandidateWindow: return .init(
         userDef: self,
-        shortTitle: "Always expand candidate window panel"
+        shortTitle: "i18n:UserDef.kAlwaysExpandCandidateWindow.shortTitle"
       )
     case .kCandidateWindowShowOnlyOneLine: return .init(
         userDef: self,
-        shortTitle: "Use only one row / column in candidate window",
-        description: "Tadokoro candidate window shows 4 rows / columns by default, providing similar experiences from Microsoft New Phonetic IME and macOS bult-in Chinese IME (since macOS 10.9). However, for some users who have presbyopia, they prefer giant candidate font sizes, resulting a concern that multiple rows / columns of candidates can make the candidate window looks too big, hence this option. Note that this option will be dismissed if the typing context is vertical, forcing the candidates to be shown in only one row / column. Only one reverse-lookup result can be made available in single row / column mode due to reduced candidate window size."
+        shortTitle: "i18n:UserDef.kCandidateWindowShowOnlyOneLine.shortTitle",
+        description: "i18n:UserDef.kCandidateWindowShowOnlyOneLine.description"
       )
     case .kAppleLanguages: return .init(
-        userDef: self, shortTitle: "UI Language:",
-        description: "Change user interface language (will reboot the IME)."
+        userDef: self, shortTitle: "i18n:UserDef.kAppleLanguages.shortTitle",
+        description: "i18n:UserDef.kAppleLanguages.description"
       )
     case .kShouldAutoReloadUserDataFiles: return .init(
         userDef: self,
-        shortTitle: "Automatically reload user data files if changes detected"
+        shortTitle: "i18n:UserDef.kShouldAutoReloadUserDataFiles.shortTitle"
       )
     case .kUseRearCursorMode: return .init(
-        userDef: self, shortTitle: "Cursor Selection:",
-        description: "Choose the cursor position where you want to list possible candidates.",
+        userDef: self, shortTitle: "i18n:UserDef.kUseRearCursorMode.shortTitle",
+        description: "i18n:UserDef.kUseRearCursorMode.description",
         options: [
-          0: "in front of the phrase (like macOS built-in Zhuyin IME)",
-          1: "at the rear of the phrase (like Microsoft New Phonetic)",
+          0: "i18n:UserDef.kUseRearCursorMode.option.0",
+          1: "i18n:UserDef.kUseRearCursorMode.option.1",
         ]
       )
     case .kCandidateStateJKHLBehavior: return .init(
@@ -676,12 +676,15 @@ nonisolated extension UserDef {
       )
     case .kUseDynamicCandidateWindowOrigin: return .init(
         userDef: self,
-        shortTitle: "Adjust candidate window location according to current node length"
+        shortTitle: "i18n:UserDef.kUseDynamicCandidateWindowOrigin.shortTitle"
       )
     case .kUseHorizontalCandidateList: return .init(
-        userDef: self, shortTitle: "Candidate Layout:",
-        description: "Choose your preferred layout of the candidate window.",
-        options: [0: "Vertical", 1: "Horizontal"]
+        userDef: self, shortTitle: "i18n:UserDef.kUseHorizontalCandidateList.shortTitle",
+        description: "i18n:UserDef.kUseHorizontalCandidateList.description",
+        options: [
+          0: "i18n:UserDef.kUseHorizontalCandidateList.option.0",
+          1: "i18n:UserDef.kUseHorizontalCandidateList.option.1",
+        ]
       )
     case .kMinCellWidthForHorizontalMatrix: return .init(
         userDef: self, shortTitle: "i18n:UserDef.kMinCellWidthForHorizontalMatrix.shortTitle",
@@ -691,12 +694,12 @@ nonisolated extension UserDef {
         ]
       )
     case .kChooseCandidateUsingSpace: return .init(
-        userDef: self, shortTitle: "Enable Space key for calling candidate window",
-        description: "If disabled, this will insert space instead."
+        userDef: self, shortTitle: "i18n:UserDef.kChooseCandidateUsingSpace.shortTitle",
+        description: "i18n:UserDef.kChooseCandidateUsingSpace.description"
       )
     case .kCassetteEnabled: return .init(
-        userDef: self, shortTitle: "Enable cassette mode, suppressing phonabet input",
-        description: "Cassette mode is similar to the CIN support of the Yahoo! KeyKey IME, allowing users to use their own CIN tables to implement their stroked-based input schema (e.g. Wubi, Cangjie, Boshiamy, etc.) as a plan-B in vChewing IME. However, since vChewing won't compromise its phonabet input mode experience for this cassette mode, users might not feel comfortable enough comparing to their experiences with RIME (recommended) or OpenVanilla (deprecated)."
+        userDef: self, shortTitle: "i18n:UserDef.kCassetteEnabled.shortTitle",
+        description: "i18n:UserDef.kCassetteEnabled.description"
       )
     case .kMixedAlphanumericalEnabled: return .init(
         userDef: self,
@@ -708,14 +711,14 @@ nonisolated extension UserDef {
         shortTitle: "i18n:UserDef.kCNS11643Enabled.shortTitle"
       )
     case .kSymbolInputEnabled: return .init(
-        userDef: self, shortTitle: "Enable symbol input support (incl. certain emoji symbols)"
+        userDef: self, shortTitle: "i18n:UserDef.kSymbolInputEnabled.shortTitle"
       )
     case .kChineseConversionEnabled: return .init(
-        userDef: self, shortTitle: "Auto-convert traditional Chinese glyphs to KangXi characters"
+        userDef: self, shortTitle: "i18n:UserDef.kChineseConversionEnabled.shortTitle"
       )
     case .kShiftJISShinjitaiOutputEnabled: return .init(
         userDef: self,
-        shortTitle: "Auto-convert traditional Chinese glyphs to JIS Shinjitai characters"
+        shortTitle: "i18n:UserDef.kShiftJISShinjitaiOutputEnabled.shortTitle"
       )
     case .kSuppressFactoryUnigramsOfKanaSyllables: return .init(
         userDef: self,
@@ -724,14 +727,14 @@ nonisolated extension UserDef {
       )
     case .kCurrencyNumeralsEnabled: return .init(
         userDef: self,
-        shortTitle: "Enable currency numerals output"
+        shortTitle: "i18n:UserDef.kCurrencyNumeralsEnabled.shortTitle"
       )
     case .kHalfWidthPunctuationEnabled: return .init(
         userDef: self,
-        shortTitle: "Enable half-width punctuations"
+        shortTitle: "i18n:UserDef.kHalfWidthPunctuationEnabled.shortTitle"
       )
     case .kCursorPlacementAfterSelectingCandidate: return .init(
-        userDef: self, shortTitle: "i18n:UserDef.kCursorPlacementAfterSelectingCandidate.shortTitle:",
+        userDef: self, shortTitle: "i18n:UserDef.kCursorPlacementAfterSelectingCandidate.shortTitle",
         description: "i18n:UserDef.kCursorPlacementAfterSelectingCandidate.description",
         options: [
           0: "i18n:UserDef.kCursorPlacementAfterSelectingCandidate.option.0",
@@ -744,8 +747,8 @@ nonisolated extension UserDef {
         shortTitle: "i18n:UserDef.kDodgeInvalidEdgeCandidateCursorPosition.shortTitle"
       )
     case .kEscToCleanInputBuffer: return .init(
-        userDef: self, shortTitle: "Use ESC key to clear the entire input buffer",
-        description: "If unchecked, the ESC key will try cleaning the unfinished readings / strokes first, and will commit the current composition buffer if there's no unfinished readings / strokes."
+        userDef: self, shortTitle: "i18n:UserDef.kEscToCleanInputBuffer.shortTitle",
+        description: "i18n:UserDef.kEscToCleanInputBuffer.description"
       )
     case .kAcceptLeadingIntonations: return .init(
         userDef: self, shortTitle: "i18n:UserDef.kAcceptLeadingIntonations.shortTitle",
@@ -761,28 +764,28 @@ nonisolated extension UserDef {
         ]
       )
     case .kSpecifyShiftBackSpaceKeyBehavior: return .init(
-        userDef: self, shortTitle: "Shift+BackSpace:",
-        description: "Disassembling process does not work with non-phonetic reading keys.",
+        userDef: self, shortTitle: "i18n:UserDef.kSpecifyShiftBackSpaceKeyBehavior.shortTitle",
+        description: "i18n:UserDef.kSpecifyShiftBackSpaceKeyBehavior.description",
         options: [
-          0: "Disassemble the previous reading, dropping its intonation",
-          1: "Clear the entire inline composition buffer like Shift+Delete",
-          2: "Always drop the previous reading",
+          0: "i18n:UserDef.kSpecifyShiftBackSpaceKeyBehavior.option.0",
+          1: "i18n:UserDef.kSpecifyShiftBackSpaceKeyBehavior.option.1",
+          2: "i18n:UserDef.kSpecifyShiftBackSpaceKeyBehavior.option.2",
         ]
       )
     case .kSpecifyShiftTabKeyBehavior: return .init(
-        userDef: self, shortTitle: "(Shift+)Tab:",
-        description: "Choose the behavior of (Shift+)Tab key in the candidate window.",
+        userDef: self, shortTitle: "i18n:UserDef.kSpecifyShiftTabKeyBehavior.shortTitle",
+        description: "i18n:UserDef.kSpecifyShiftTabKeyBehavior.description",
         options: [
-          0: "for revolving candidates",
-          1: "for revolving pages",
+          0: "i18n:UserDef.kSpecifyShiftTabKeyBehavior.option.0",
+          1: "i18n:UserDef.kSpecifyShiftTabKeyBehavior.option.1",
         ]
       )
     case .kSpecifyShiftSpaceKeyBehavior: return .init(
-        userDef: self, shortTitle: "(Shift+)Space:",
-        description: "Choose the behavior of (Shift+)Space key with candidates.",
+        userDef: self, shortTitle: "i18n:UserDef.kSpecifyShiftSpaceKeyBehavior.shortTitle",
+        description: "i18n:UserDef.kSpecifyShiftSpaceKeyBehavior.description",
         options: [
-          0: "Space to +revolve candidates, Shift+Space to +revolve pages",
-          1: "Space to +revolve pages, Shift+Space to +revolve candidates",
+          0: "i18n:UserDef.kSpecifyShiftSpaceKeyBehavior.option.0",
+          1: "i18n:UserDef.kSpecifyShiftSpaceKeyBehavior.option.1",
         ]
       )
     case .kSpecifyCmdOptCtrlEnterBehavior: return .init(
@@ -807,8 +810,8 @@ nonisolated extension UserDef {
         description: "i18n:UserDef.kAllowRescoringSingleKanjiCandidates.description"
       )
     case .kUseSCPCTypingMode: return .init(
-        userDef: self, shortTitle: "Emulating select-candidate-per-character mode",
-        description: "An accommodation for elder computer users."
+        userDef: self, shortTitle: "i18n:UserDef.kUseSCPCTypingMode.shortTitle",
+        description: "i18n:UserDef.kUseSCPCTypingMode.description"
       )
     case .kMaxCandidateLength: return nil
     case .kBeepSoundPreference: return .init(
@@ -822,27 +825,27 @@ nonisolated extension UserDef {
       )
     case .kShouldNotFartInLieuOfBeep: return .init(
         userDef: self,
-        shortTitle: "Stop farting (when typed phonetic combination is invalid, etc.)",
-        description: "You are about to uncheck this fart suppressor. You are responsible for all consequences lead by letting people nearby hear the fart sound come from your computer. We strongly advise against unchecking this in any public circumstance that prohibits NSFW netas."
+        shortTitle: "i18n:UserDef.kShouldNotFartInLieuOfBeep.shortTitle",
+        description: "i18n:UserDef.kShouldNotFartInLieuOfBeep.description"
       )
     case .kShowHanyuPinyinInCompositionBuffer: return .init(
-        userDef: self, shortTitle: "Show Hanyu-Pinyin in the inline composition buffer"
+        userDef: self, shortTitle: "i18n:UserDef.kShowHanyuPinyinInCompositionBuffer.shortTitle"
       )
     case .kInlineDumpPinyinInLieuOfZhuyin: return .init(
-        userDef: self, shortTitle: "Commit Hanyu-Pinyin instead on Ctrl(+Option)+Command+Enter",
+        userDef: self, shortTitle: "i18n:UserDef.kInlineDumpPinyinInLieuOfZhuyin.shortTitle",
         description: "i18n:UserDef.kInlineDumpPinyinInLieuOfZhuyin.description"
       )
     case .kFetchSuggestionsFromPerceptionOverrideModel: return .init(
-        userDef: self, shortTitle: "Applying typing suggestions from perception override model",
-        description: "The user override model only possesses memories temporarily. Each memory record gradually becomes ineffective within approximately less than 6 days. You can erase all memory records through the input method menu."
+        userDef: self, shortTitle: "i18n:UserDef.kFetchSuggestionsFromPerceptionOverrideModel.shortTitle",
+        description: "i18n:UserDef.kFetchSuggestionsFromPerceptionOverrideModel.description"
       )
     case .kReducePOMLifetimeToNoMoreThan12Hours: return .init(
         userDef: self, shortTitle: "i18n:UserDef.kReducePOMLifetimeToNoMoreThan12Hours.shortTitle",
         description: "i18n:UserDef.kReducePOMLifetimeToNoMoreThan12Hours.description"
       )
     case .kUseFixedCandidateOrderOnSelection: return .init(
-        userDef: self, shortTitle: "Always use fixed listing order in candidate window",
-        description: "This will stop user override model from affecting how candidates get sorted."
+        userDef: self, shortTitle: "i18n:UserDef.kUseFixedCandidateOrderOnSelection.shortTitle",
+        description: "i18n:UserDef.kUseFixedCandidateOrderOnSelection.description"
       )
     case .kAutoCorrectReadingCombination: return .init(
         userDef: self,
@@ -853,19 +856,19 @@ nonisolated extension UserDef {
         userDef: self, shortTitle: "i18n:UserDef.kReadingNarrationCoverage.shortTitle",
         description: "i18n:UserDef.kReadingNarrationCoverage.description",
         options: [
-          0: "i18n:UserDef.kReadingNarrationCoverage.option.nothing",
-          1: "i18n:UserDef.kReadingNarrationCoverage.option.confirmed",
-          2: "i18n:UserDef.kReadingNarrationCoverage.option.realtime",
+          0: "i18n:UserDef.kReadingNarrationCoverage.option.0",
+          1: "i18n:UserDef.kReadingNarrationCoverage.option.1",
+          2: "i18n:UserDef.kReadingNarrationCoverage.option.2",
         ]
       )
     case .kAlsoConfirmAssociatedCandidatesByEnter: return .init(
         userDef: self,
-        shortTitle: "Allow using Enter key to confirm associated candidate selection",
-        description: "Otherwise, only the candidate keys are allowed to confirm associates."
+        shortTitle: "i18n:UserDef.kAlsoConfirmAssociatedCandidatesByEnter.shortTitle",
+        description: "i18n:UserDef.kAlsoConfirmAssociatedCandidatesByEnter.description"
       )
     case .kKeepReadingUponCompositionError: return .init(
         userDef: self,
-        shortTitle: "Allow backspace-editing miscomposed readings"
+        shortTitle: "i18n:UserDef.kKeepReadingUponCompositionError.shortTitle"
       )
     case .kBypassNonAppleCapsLockHandling: return .init(
         userDef: self, shortTitle: "i18n:UserDef.kBypassNonAppleCapsLockHandling.shortTitle",
@@ -879,20 +882,20 @@ nonisolated extension UserDef {
         minimumOS: 10.15
       )
     case .kTogglingAlphanumericalModeWithLShift: return .init(
-        userDef: self, shortTitle: "Toggle alphanumerical mode with Left-Shift", minimumOS: 10.15
+        userDef: self, shortTitle: "i18n:UserDef.kTogglingAlphanumericalModeWithLShift.shortTitle", minimumOS: 10.15
       )
     case .kTogglingAlphanumericalModeWithRShift: return .init(
-        userDef: self, shortTitle: "Toggle alphanumerical mode with Right-Shift", minimumOS: 10.15
+        userDef: self, shortTitle: "i18n:UserDef.kTogglingAlphanumericalModeWithRShift.shortTitle", minimumOS: 10.15
       )
     case .kUpperCaseLetterKeyBehavior: return .init(
-        userDef: self, shortTitle: "Shift+Letter:",
-        description: "Choose the behavior of Shift+Letter key with letter inputs.",
+        userDef: self, shortTitle: "i18n:UserDef.kUpperCaseLetterKeyBehavior.shortTitle",
+        description: "i18n:UserDef.kUpperCaseLetterKeyBehavior.description",
         options: [
-          0: "Type them into inline composition buffer",
-          1: "Always directly commit lowercased letters",
-          2: "Always directly commit uppercased letters",
-          3: "Directly commit lowercased letters only if the compositor is empty",
-          4: "Directly commit uppercased letters only if the compositor is empty",
+          0: "i18n:UserDef.kUpperCaseLetterKeyBehavior.option.0",
+          1: "i18n:UserDef.kUpperCaseLetterKeyBehavior.option.1",
+          2: "i18n:UserDef.kUpperCaseLetterKeyBehavior.option.2",
+          3: "i18n:UserDef.kUpperCaseLetterKeyBehavior.option.3",
+          4: "i18n:UserDef.kUpperCaseLetterKeyBehavior.option.4",
         ]
       )
     case .kNumPadCharInputBehavior: return .init(
@@ -908,60 +911,60 @@ nonisolated extension UserDef {
         ]
       )
     case .kConsolidateContextOnCandidateSelection: return .init(
-        userDef: self, shortTitle: "Consolidate the context on confirming candidate selection",
-        description: "For example: When typing “章太炎” and you want to override the “太” with “泰”, and the raw operation index range [1,2) which bounds are cutting the current node “章太炎” in range [0,3). If having lack of the pre-consolidation process, this word will become something like “張泰言” after the candidate selection. Only if we enable this consolidation, this word will become “章泰炎” which is the expected result that the context is kept as-is."
+        userDef: self, shortTitle: "i18n:UserDef.kConsolidateContextOnCandidateSelection.shortTitle",
+        description: "i18n:UserDef.kConsolidateContextOnCandidateSelection.description"
       )
     case .kHardenVerticalPunctuations: return .init(
         userDef: self,
-        shortTitle: "Harden vertical punctuations during vertical typing (not recommended)",
-        description: "⚠︎ This feature is useful ONLY WHEN the font you are using doesn't support dynamic vertical punctuations. However, typed vertical punctuations will always shown as vertical punctuations EVEN IF your editor has changed the typing direction to horizontal."
+        shortTitle: "i18n:UserDef.kHardenVerticalPunctuations.shortTitle",
+        description: "i18n:UserDef.kHardenVerticalPunctuations.description"
       )
     case .kTrimUnfinishedReadingsOnCommit: return .init(
         userDef: self,
-        shortTitle: "Trim unfinished readings / strokes on commit"
+        shortTitle: "i18n:UserDef.kTrimUnfinishedReadingsOnCommit.shortTitle"
       )
     case .kAlwaysShowTooltipTextsHorizontally: return .init(
         userDef: self,
-        shortTitle: "Always show tooltip texts horizontally",
-        description: "Key names in tooltip will be shown as symbols when the tooltip is vertical. However, this option will be ignored since tooltip will always be horizontal if the UI language is English."
+        shortTitle: "i18n:UserDef.kAlwaysShowTooltipTextsHorizontally.shortTitle",
+        description: "i18n:UserDef.kAlwaysShowTooltipTextsHorizontally.description"
       )
     case .kClientsIMKTextInputIncapable: return .init(userDef: self)
     case .kShowTranslatedStrokesInCompositionBuffer: return .init(
         userDef: self,
-        shortTitle: "Show translated strokes in composition buffer",
-        description: "All strokes in the composition buffer will be shown as ASCII keyboard characters unless this option is enabled. Stroke is definable in the “%keyname” section of the CIN file."
+        shortTitle: "i18n:UserDef.kShowTranslatedStrokesInCompositionBuffer.shortTitle",
+        description: "i18n:UserDef.kShowTranslatedStrokesInCompositionBuffer.description"
       )
     case .kForceCassetteChineseConversion: return .init(
         userDef: self,
-        shortTitle: "Chinese Conversion:",
-        description: "This conversion only affects the cassette module, converting typed contents to either Simplified Chinese or Traditional Chinese in accordance with this setting and your current input mode.",
+        shortTitle: "i18n:UserDef.kForceCassetteChineseConversion.shortTitle",
+        description: "i18n:UserDef.kForceCassetteChineseConversion.description",
         options: [
-          0: "Disable forced conversion for cassette outputs",
-          1: "Enforce conversion in both input modes",
-          2: "Only enforce conversion in Simplified Chinese mode",
-          3: "Only enforce conversion in Traditional Chinese mode",
+          0: "i18n:UserDef.kForceCassetteChineseConversion.option.0",
+          1: "i18n:UserDef.kForceCassetteChineseConversion.option.1",
+          2: "i18n:UserDef.kForceCassetteChineseConversion.option.2",
+          3: "i18n:UserDef.kForceCassetteChineseConversion.option.3",
         ]
       )
     case .kShowReverseLookupInCandidateUI: return .init(
-        userDef: self, shortTitle: "Show available reverse-lookup results in candidate window",
-        description: "The lookup results are supplied by the CIN cassette module."
+        userDef: self, shortTitle: "i18n:UserDef.kShowReverseLookupInCandidateUI.shortTitle",
+        description: "i18n:UserDef.kShowReverseLookupInCandidateUI.description"
       )
     case .kShowCodePointInCandidateUI: return .init(
         userDef: self, shortTitle: "i18n:UserDef.kShowCodePointInCandidateUI.shortTitle"
       )
     case .kAutoCompositeWithLongestPossibleCassetteKey: return .init(
-        userDef: self, shortTitle: "Auto-composite when the longest possible key is formed"
+        userDef: self, shortTitle: "i18n:UserDef.kAutoCompositeWithLongestPossibleCassetteKey.shortTitle"
       )
     case .kShareAlphanumericalModeStatusAcrossClients: return .init(
-        userDef: self, shortTitle: "Share alphanumerical mode status across all clients",
-        description: "This only works when being toggled by Shift key and JIS Eisu key."
+        userDef: self, shortTitle: "i18n:UserDef.kShareAlphanumericalModeStatusAcrossClients.shortTitle",
+        description: "i18n:UserDef.kShareAlphanumericalModeStatusAcrossClients.description"
       )
     case .kPhraseEditorAutoReloadExternalModifications: return .init(
         userDef: self,
-        shortTitle: "This editor only: Auto-reload modifications happened outside of this editor"
+        shortTitle: "i18n:UserDef.kPhraseEditorAutoReloadExternalModifications.shortTitle"
       )
     case .kClassicHaninKeyboardSymbolModeShortcutEnabled: return .init(
-        userDef: self, shortTitle: "Also use “\\” or “¥” key for Hanin Keyboard Symbol Input"
+        userDef: self, shortTitle: "i18n:UserDef.kClassicHaninKeyboardSymbolModeShortcutEnabled.shortTitle"
       )
     case .kFilterNonCNSReadingsForCHTInput: return .init(
         userDef: self, shortTitle: "i18n:UserDef.kFilterNonCNSReadingsForCHTInput.shortTitle",
@@ -985,54 +988,60 @@ nonisolated extension UserDef {
       )
     case .kUseSpaceToCommitHighlightedSCPCCandidate: return .init(
         userDef: self,
-        shortTitle: "Use Space to confirm highlighted candidate in Per-Char Select Mode"
+        shortTitle: "i18n:UserDef.kUseSpaceToCommitHighlightedSCPCCandidate.shortTitle"
       )
     case .kEnableMouseScrollingForTDKCandidatesCocoa: return .init(
-        userDef: self, shortTitle: "Enable mouse wheel support for Tadokoro Candidate Window"
+        userDef: self, shortTitle: "i18n:UserDef.kEnableMouseScrollingForTDKCandidatesCocoa.shortTitle"
       )
     case .kDisableSegmentedThickUnderlineInMarkingModeForManagedClients: return .init(
         userDef: self,
-        shortTitle: "Disable segmented thick underline in marking mode for managed clients",
-        description: "Some clients with web-based front UI may have issues rendering segmented thick underlines drawn by their implemented “setMarkedText()”. This option stops the input method from delivering segmented thick underlines to “client().setMarkedText()”. Note that segmented thick underlines are only used in marking mode, unless the client itself misimplements the IMKTextInput method “setMarkedText()”. This option only affects the inline composition buffer."
+        shortTitle: "i18n:UserDef.kDisableSegmentedThickUnderlineInMarkingModeForManagedClients.shortTitle",
+        description: "i18n:UserDef.kDisableSegmentedThickUnderlineInMarkingModeForManagedClients.description"
       )
     case .kCandidateTextFontName: return nil
     case .kCandidateKeys: return .init(
-        userDef: self, shortTitle: "Selection Keys:",
-        inlinePrompt: "Choose or hit Enter to confim your prefered keys for selecting candidates.",
-        description: "This will also affect the row / column capacity of the candidate window."
+        userDef: self, shortTitle: "i18n:UserDef.kCandidateKeys.shortTitle",
+        inlinePrompt: "i18n:UserDef.kCandidateKeys.inlinePrompt",
+        description: "i18n:UserDef.kCandidateKeys.description"
       )
     case .kCandidateNarrationToggleType: return .init(
         userDef: self, shortTitle: "i18n:UserDef.kCandidateNarrationToggleType.shortTitle",
         description: "i18n:UserDef.kCandidateNarrationToggleType.description",
         options: [
-          0: "i18n:UserDef.kCandidateNarrationToggleType.option.alwaysOff",
-          1: "i18n:UserDef.kCandidateNarrationToggleType.option.alwaysOn",
-          2: "i18n:UserDef.kCandidateNarrationToggleType.option.onlyWhenVoiceOverIsOn",
+          0: "i18n:UserDef.kCandidateNarrationToggleType.option.0",
+          1: "i18n:UserDef.kCandidateNarrationToggleType.option.1",
+          2: "i18n:UserDef.kCandidateNarrationToggleType.option.2",
         ]
       )
     case .kAssociatedPhrasesEnabled: return nil
     case .kPhraseReplacementEnabled: return .init(
-        userDef: self, shortTitle: "Enable phrase replacement table",
-        description: "This will batch-replace specified candidates."
+        userDef: self, shortTitle: "i18n:UserDef.kPhraseReplacementEnabled.shortTitle",
+        description: "i18n:UserDef.kPhraseReplacementEnabled.description"
       )
-    case .kUsingHotKeySCPC: return .init(userDef: self, shortTitle: "Per-Char Select Mode")
-    case .kUsingHotKeyAssociates: return .init(userDef: self, shortTitle: "Associated Phrases")
-    case .kUsingHotKeyCNS: return .init(userDef: self, shortTitle: "CNS11643 Mode")
-    case .kUsingHotKeyKangXi: return .init(userDef: self, shortTitle: "Force KangXi Writing")
-    case .kUsingHotKeyJIS: return .init(userDef: self, shortTitle: "Reverse Lookup (Phonabets)")
+    case .kUsingHotKeySCPC: return .init(userDef: self, shortTitle: "i18n:UserDef.kUsingHotKeySCPC.shortTitle")
+    case .kUsingHotKeyAssociates: return .init(
+        userDef: self,
+        shortTitle: "i18n:UserDef.kUsingHotKeyAssociates.shortTitle"
+      )
+    case .kUsingHotKeyCNS: return .init(userDef: self, shortTitle: "i18n:UserDef.kUsingHotKeyCNS.shortTitle")
+    case .kUsingHotKeyKangXi: return .init(userDef: self, shortTitle: "i18n:UserDef.kUsingHotKeyKangXi.shortTitle")
+    case .kUsingHotKeyJIS: return .init(userDef: self, shortTitle: "i18n:UserDef.kUsingHotKeyJIS.shortTitle")
     case .kUsingHotKeyHalfWidthASCII: return .init(
         userDef: self,
-        shortTitle: "JIS Shinjitai Output"
+        shortTitle: "i18n:UserDef.kUsingHotKeyHalfWidthASCII.shortTitle"
       )
     case .kUsingHotKeyCurrencyNumerals: return .init(
         userDef: self,
-        shortTitle: "Half-Width Punctuation Mode"
+        shortTitle: "i18n:UserDef.kUsingHotKeyCurrencyNumerals.shortTitle"
       )
-    case .kUsingHotKeyCassette: return .init(userDef: self, shortTitle: "Currency Numeral Output")
-    case .kUsingHotKeyRevLookup: return .init(userDef: self, shortTitle: "CIN Cassette Mode")
+    case .kUsingHotKeyCassette: return .init(userDef: self, shortTitle: "i18n:UserDef.kUsingHotKeyCassette.shortTitle")
+    case .kUsingHotKeyRevLookup: return .init(
+        userDef: self,
+        shortTitle: "i18n:UserDef.kUsingHotKeyRevLookup.shortTitle"
+      )
     case .kUsingHotKeyInputMode: return .init(
         userDef: self,
-        shortTitle: "CHS / CHT Input Mode Switch"
+        shortTitle: "i18n:UserDef.kUsingHotKeyInputMode.shortTitle"
       )
     case .kFilterFactoryKanjisOfNonCurrentInputMode: return .init(
         userDef: self,

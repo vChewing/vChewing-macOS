@@ -1062,7 +1062,7 @@ nonisolated struct POMError: LocalizedError {
   nonisolated var rawValue: String
 
   nonisolated var errorDescription: String? {
-    "rawValue".i18n
+    rawValue.i18n
   }
 }
 

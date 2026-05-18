@@ -49,35 +49,35 @@ extension CandidateNode {
 
   // MARK: - Static data.
 
-  static let catCommonSymbols = "catCommonSymbols".i18n
-  static let catHoriBrackets = "catHoriBrackets".i18n
-  static let catVertBrackets = "catVertBrackets".i18n
-  static let catAlphabets = "catAlphabets".i18n
-  static let catRadicals = "catRadicals".i18n
-  static let catSpecialNumbers = "catSpecialNumbers".i18n
-  static let catMathSymbols = "catMathSymbols".i18n
-  static let catCurrencyUnits = "catCurrencyUnits".i18n
-  static let catSpecialSymbols = "catSpecialSymbols".i18n
-  static let catUnicodeSymbols = "catUnicodeSymbols".i18n
-  static let catCircledKanjis = "catCircledKanjis".i18n
-  static let catCircledKataKana = "catCircledKataKana".i18n
-  static let catBracketKanjis = "catBracketKanjis".i18n
-  static let catSingleTableLines = "catSingleTableLines".i18n
-  static let catDoubleTableLines = "catDoubleTableLines".i18n
-  static let catFillingBlocks = "catFillingBlocks".i18n
-  static let catLineSegments = "catLineSegments".i18n
-  static let catKana = "catKana".i18n
-  static let catCombinations = "catCombinations".i18n
-  static let catPhonabets = "catPhonabets".i18n
-  static let catCircledASCII = "catCircledASCII".i18n
-  static let catBracketedASCII = "catBracketedASCII".i18n
-  static let catMusicSymbols = "catMusicSymbols".i18n
-  static let catThai = "catThai".i18n
-  static let catYi = "catYi".i18n
+  static let catCommonSymbols = "i18n:SymbolCategory.CommonSymbols".i18n
+  static let catHoriBrackets = "i18n:SymbolCategory.HorizontalBrackets".i18n
+  static let catVertBrackets = "i18n:SymbolCategory.VerticalBrackets".i18n
+  static let catAlphabets = "i18n:SymbolCategory.Alphabets".i18n
+  static let catRadicals = "i18n:SymbolCategory.Radicals".i18n
+  static let catSpecialNumbers = "i18n:SymbolCategory.SpecialNumbers".i18n
+  static let catMathSymbols = "i18n:SymbolCategory.MathSymbols".i18n
+  static let catCurrencyUnits = "i18n:SymbolCategory.CurrencyUnits".i18n
+  static let catSpecialSymbols = "i18n:SymbolCategory.SpecialSymbols".i18n
+  static let catUnicodeSymbols = "i18n:SymbolCategory.UnicodeSymbols".i18n
+  static let catCircledKanjis = "i18n:SymbolCategory.CircledKanjis".i18n
+  static let catCircledKataKana = "i18n:SymbolCategory.CircledKataKana".i18n
+  static let catBracketKanjis = "i18n:SymbolCategory.BracketKanjis".i18n
+  static let catSingleTableLines = "i18n:SymbolCategory.SingleTableLines".i18n
+  static let catDoubleTableLines = "i18n:SymbolCategory.DoubleTableLines".i18n
+  static let catFillingBlocks = "i18n:SymbolCategory.FillingBlocks".i18n
+  static let catLineSegments = "i18n:SymbolCategory.LineSegments".i18n
+  static let catKana = "i18n:SymbolCategory.Kana".i18n
+  static let catCombinations = "i18n:SymbolCategory.Combinations".i18n
+  static let catPhonabets = "i18n:SymbolCategory.Phonabets".i18n
+  static let catCircledASCII = "i18n:SymbolCategory.CircledASCII".i18n
+  static let catBracketedASCII = "i18n:SymbolCategory.BracketedASCII".i18n
+  static let catMusicSymbols = "i18n:SymbolCategory.MusicSymbols".i18n
+  static let catThai = "i18n:SymbolCategory.Thai".i18n
+  static let catYi = "i18n:SymbolCategory.Yi".i18n
   static let catUserSymbols = "……" // 暫時不做本地化。
 
   static func strCountStrokes(_ count: Int) -> String {
-    String(format: "%@-Stroke".i18n, count.kanji)
+    String(format: "i18n:StateOfInputting.Tooltip.StrokeFormat:%@".i18n, count.kanji)
   }
 
   private static let defaultSymbolRoot: CandidateNode = .init(

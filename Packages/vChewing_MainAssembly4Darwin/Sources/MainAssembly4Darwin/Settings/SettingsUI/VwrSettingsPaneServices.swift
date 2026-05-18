@@ -24,7 +24,7 @@ public struct VwrSettingsPaneServices: View {
               .contentShape(.rect)
               .frame(height: 12)
           }
-          .help("Add Service".i18n)
+          .help("i18n:ClientManager.AddService".i18n)
           .sheet(isPresented: $isShowingAddSheet) {
             AddServiceSheetView { newRawText in
               let newServices = newRawText
@@ -43,7 +43,7 @@ public struct VwrSettingsPaneServices: View {
               .contentShape(.rect)
               .frame(height: 12)
           }
-          .help("Remove Selected".i18n)
+          .help("i18n:Common.RemoveSelected".i18n)
           .disabled(selectedIDs.isEmpty)
           Spacer()
           Button {
@@ -54,7 +54,7 @@ public struct VwrSettingsPaneServices: View {
               .frame(height: 12)
           }
           .disabled(!canMoveUp)
-          .help("Move Up".i18n)
+          .help("i18n:Common.MoveUp".i18n)
           Button {
             moveSelectedServices(direction: .down)
           } label: {
@@ -62,7 +62,7 @@ public struct VwrSettingsPaneServices: View {
               .contentShape(.rect)
               .frame(height: 12)
           }
-          .help("Move Down".i18n)
+          .help("i18n:Common.MoveDown".i18n)
           .disabled(!canMoveDown)
           Spacer()
           Button { copyAllToClipboard() } label: {
@@ -70,18 +70,18 @@ public struct VwrSettingsPaneServices: View {
               .contentShape(.rect)
               .frame(height: 12)
           }
-          .help("Copy All to Clipboard".i18n)
+          .help("i18n:Menu.CopyAllToClipboard".i18n)
           Button { isShowingInstructions = true } label: {
             Image(systemName: "questionmark.circle")
               .contentShape(.rect)
               .frame(height: 12)
           }
-          .help("How to Fill".i18n)
+          .help("i18n:PhraseEditor.HowToFill".i18n)
           .alert(
-            "How to Fill".i18n,
+            "i18n:PhraseEditor.HowToFill".i18n,
             isPresented: $isShowingInstructions
           ) {
-            Button("OK".i18n, role: .cancel) {}
+            Button("i18n:Common.OK".i18n, role: .cancel) {}
           } message: {
             Text("i18n:CandidateServiceMenuEditor.formatGuide".i18n)
           }
@@ -90,17 +90,17 @@ public struct VwrSettingsPaneServices: View {
               .contentShape(.rect)
               .frame(height: 12)
           }
-          .help("Reset Default".i18n)
+          .help("i18n:Common.ResetDefault".i18n)
           .confirmationDialog(
-            "Reset Default".i18n,
+            "i18n:Common.ResetDefault".i18n,
             isPresented: $isShowingResetConfirmation,
             titleVisibility: .visible
           ) {
-            Button("Reset Default".i18n, role: .destructive) {
+            Button("i18n:Common.ResetDefault".i18n, role: .destructive) {
               PrefMgr.shared.candidateServiceMenuContents = UserDef.defaultValue4CandidateServiceMenuContents
               reloadList()
             }
-            Button("Cancel".i18n, role: .cancel) {}
+            Button("i18n:Common.Cancel".i18n, role: .cancel) {}
           }
         }
         .controlSize(.small)
@@ -314,9 +314,9 @@ private struct AddServiceSheetView: View {
         .foregroundStyle(.secondary)
       HStack {
         Spacer()
-        Button("Cancel".i18n, role: .cancel) { dismiss() }
+        Button("i18n:Common.Cancel".i18n, role: .cancel) { dismiss() }
           .keyboardShortcut(.cancelAction)
-        Button("OK".i18n) {
+        Button("i18n:Common.OK".i18n) {
           onCommit(inputText)
           dismiss()
         }

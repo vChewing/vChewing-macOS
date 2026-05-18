@@ -63,7 +63,7 @@ extension SettingsPanesCocoa {
     func prepareCassetteFolderPathControl(_ pathCtl: NSPathControl) {
       pathCtl.delegate = self
       (pathCtl.cell as? NSTextFieldCell)?
-        .placeholderString = "Please drag the desired target from Finder to this place.".i18n
+        .placeholderString = "i18n:ClientManager.DragTargetInstruction".i18n
       if let cell = pathCtl.cell as? NSPathCell {
         cell.lineBreakMode = .byTruncatingTail
         cell.truncatesLastVisibleLine = true
@@ -84,7 +84,7 @@ extension SettingsPanesCocoa {
       pathCtl.makeSimpleConstraint(.width, relation: .equal, value: windowWidth - 145)
       let currentPath = LMMgr.cassettePath()
       pathCtl.url = currentPath.isEmpty ? nil : URL(fileURLWithPath: LMMgr.cassettePath())
-      pathCtl.toolTip = "Please drag the desired target from Finder to this place.".i18n
+      pathCtl.toolTip = "i18n:ClientManager.DragTargetInstruction".i18n
     }
 
     @IBAction

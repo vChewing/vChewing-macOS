@@ -121,11 +121,10 @@ extension AppDelegate {
         LMMgr.relocateWreckedPOMData()
         if #available(macOS 10.14, *) {
           let msgPackage = UNMutableNotificationContent()
-          msgPackage.title = "vChewing".i18n
+          msgPackage.title = "i18n:Common.VChewing".i18n
           msgPackage
             .body =
-            "vChewing crashed while handling previously loaded POM observation data. These data files are cleaned now to ensure the usability."
-              .i18n
+            "i18n:InfoMessage.POMDataCleaned".i18n
           msgPackage.sound = .defaultCritical
           UNUserNotificationCenter.current().add(
             .init(identifier: "vChewing.notification.pomCrash", content: msgPackage, trigger: nil),
@@ -133,11 +132,10 @@ extension AppDelegate {
           )
         } else {
           let userNotification = NSUserNotification()
-          userNotification.title = "vChewing".i18n
+          userNotification.title = "i18n:Common.VChewing".i18n
           userNotification
             .informativeText =
-            "vChewing crashed while handling previously loaded POM observation data. These data files are cleaned now to ensure the usability."
-              .i18n
+            "i18n:InfoMessage.POMDataCleaned".i18n
           userNotification.soundName = NSUserNotificationDefaultSoundName
           NSUserNotificationCenter.default.deliver(userNotification)
         }
@@ -184,18 +182,18 @@ extension AppDelegate {
 
   public func selfUninstall() {
     let content = String(
-      format: "This will remove vChewing Input Method from this user account, requiring your confirmation.".i18n
+      format: "i18n:InfoMessage.UninstallConfirmation".i18n
     )
     let alert = NSAlert()
-    alert.messageText = "Uninstallation".i18n
+    alert.messageText = "i18n:Uninstaller.Title".i18n
     alert.informativeText = content
-    alert.addButton(withTitle: "OK".i18n)
+    alert.addButton(withTitle: "i18n:Common.OK".i18n)
     if #available(macOS 11, *) {
       alert.buttons.forEach { button in
         button.hasDestructiveAction = true
       }
     }
-    alert.addButton(withTitle: "Not Now".i18n)
+    alert.addButton(withTitle: "i18n:Common.NotNow".i18n)
     let result = alert.runModal()
     NSApp.popup()
     guard result == NSApplication.ModalResponse.alertFirstButtonReturn else { return }
@@ -238,10 +236,9 @@ extension AppDelegate {
 
   private func memoryExceededNotification(size: Double) {
     vCLog("WARNING: EXCESSIVE MEMORY FOOTPRINT (\(size)MB).")
-    let title = "vChewing".i18n
+    let title = "i18n:Common.VChewing".i18n
     let body =
-      "vChewing is rebooted due to a memory-excessive-usage problem. If convenient, please inform the developer that you are having this issue, stating whether you are using an Intel Mac or Apple Silicon Mac. An NSLog is generated with the current memory footprint size."
-        .i18n
+      "i18n:InfoMessage.MemoryExcessiveReboot".i18n
     if #available(macOS 10.14, *) {
       let msgPackage = UNMutableNotificationContent()
       msgPackage.title = title

@@ -180,15 +180,15 @@ extension SessionProtocol {
 
   public func candidateToolTip(shortened: Bool) -> String {
     if state.type == .ofAssociates {
-      return shortened ? "⇧" : "Hold ⇧ to choose associates.".i18n
+      return shortened ? "⇧" : "i18n:StateOfInputting.Tooltip.HoldShiftChooseAssociates".i18n
     } else if state.type == .ofInputting, state.isCandidateContainer {
       let useShift = inputMode.langModel.areCassetteCandidateKeysShiftHeld
       let theEmoji = useShift ? "⬆️" : "⚡️"
-      return shortened ? theEmoji : "\(theEmoji) " + "Quick Candidates".i18n
+      return shortened ? theEmoji : "\(theEmoji) " + "i18n:StateOfInputting.Tooltip.QuickCandidates".i18n
     } else if prefs.cassetteEnabled {
-      return shortened ? "📼" : "📼 " + "CIN Cassette Mode".i18n
+      return shortened ? "📼" : "📼 " + "i18n:UserDef.kUsingHotKeyRevLookup.shortTitle".i18n
     } else if state.type == .ofSymbolTable, state.node.containsCandidateServices {
-      return shortened ? "🌎" : "🌎 " + "Service Menu".i18n
+      return shortened ? "🌎" : "🌎 " + "i18n:Menu.ServiceMenu".i18n
     }
     return ""
   }

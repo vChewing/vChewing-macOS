@@ -25,8 +25,7 @@ public struct VwrSettingsPaneCassette: View {
             PathControl(pathDroppable: $cassettePath) { pathControl in
               pathControl.allowedTypes = ["cin2", "cin", "vcin"]
               pathControl
-                .placeholderString = "Please drag the desired target from Finder to this place."
-                .i18n
+                .placeholderString = "i18n:ClientManager.DragTargetInstruction".i18n
             } acceptDrop: { pathControl, info in
               let urls = info.draggingPasteboard.readObjects(forClasses: [NSURL.self])
               guard let droppedURL = urls?.first as? URL else { return false }
@@ -66,7 +65,7 @@ public struct VwrSettingsPaneCassette: View {
               Text("×")
             }
           }
-          Text(LocalizedStringKey("i18n:settings.Prompt.ChooseDesiredCassetteFilePath"))
+          Text(LocalizedStringKey("i18n:UserDef.kCassettePath.description"))
             .settingsDescription()
         }
         UserDef.kCassetteEnabled.renderUI {
@@ -99,7 +98,7 @@ public struct VwrSettingsPaneCassette: View {
         "i18n:LMMgr.accessFailure.cassette.title".i18n,
         isPresented: $isShowingCassetteError
       ) {
-        Button("OK".i18n, role: .cancel) {}
+        Button("i18n:Common.OK".i18n, role: .cancel) {}
       } message: {
         Text(LMMgr.cassetteAccessFailureDescription(path: cassettePath))
       }

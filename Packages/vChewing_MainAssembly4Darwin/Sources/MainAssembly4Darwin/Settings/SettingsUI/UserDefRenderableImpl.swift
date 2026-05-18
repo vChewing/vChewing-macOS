@@ -195,11 +195,11 @@ extension UserDefRenderable<String> {
           switch (def.dataType, def) {
           case (.arrayOfStrings, .kAppleLanguages):
             Picker(LocalizedStringKey(metaData.shortTitle ?? ""), selection: binding) {
-              Text(LocalizedStringKey("Follow OS settings")).tag("auto")
-              Text(LocalizedStringKey("Simplified Chinese")).tag("zh-Hans")
-              Text(LocalizedStringKey("Traditional Chinese")).tag("zh-Hant")
-              Text(LocalizedStringKey("Japanese")).tag("ja")
-              Text(LocalizedStringKey("English")).tag("en")
+              Text(LocalizedStringKey("i18n:Settings.FollowOSSettings")).tag("auto")
+              Text(LocalizedStringKey("i18n:LanguageName.LocaleCodeZHHans")).tag("zh-Hans")
+              Text(LocalizedStringKey("i18n:LanguageName.LocaleCodeZHHant")).tag("zh-Hant")
+              Text(LocalizedStringKey("i18n:LanguageName.LocaleCodeJA")).tag("ja")
+              Text(LocalizedStringKey("i18n:LanguageName.LocaleCodeEN")).tag("en")
             }
           case (.string, .kCandidateKeys):
             HStack {

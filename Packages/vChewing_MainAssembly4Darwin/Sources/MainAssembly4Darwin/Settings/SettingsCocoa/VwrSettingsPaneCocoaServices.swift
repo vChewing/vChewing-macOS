@@ -28,28 +28,28 @@ extension SettingsPanesCocoa {
 
     lazy var tblServices: NSTableView = .init()
     lazy var btnShowInstructions = NSButton(
-      "How to Fill",
+      "i18n:PhraseEditor.HowToFill".i18n,
       target: self,
       action: #selector(btnShowInstructionsClicked(_:))
     ).controlSize(.small).withNarrowedFont(size: NSFont.smallSystemFontSize)
     lazy var btnAddService = NSFileDragRetrieverButton(
-      "Add Service",
+      "i18n:ClientManager.AddService".i18n,
       target: self,
       action: #selector(btnAddServiceClicked(_:)),
       postDrag: { [weak self] url in self?.handleDrag(url) }
     ).controlSize(.small).withNarrowedFont(size: NSFont.smallSystemFontSize)
     lazy var btnRemoveService = NSButton(
-      "Remove Selected",
+      "i18n:Common.RemoveSelected".i18n,
       target: self,
       action: #selector(btnRemoveServiceClicked(_:))
     ).controlSize(.small).withNarrowedFont(size: NSFont.smallSystemFontSize)
     lazy var btnResetService = NSButton(
-      "Reset Default",
+      "i18n:Common.ResetDefault".i18n,
       target: self,
       action: #selector(btnResetServiceClicked(_:))
     ).controlSize(.small).withNarrowedFont(size: NSFont.smallSystemFontSize)
     lazy var btnCopyAllToClipboard = NSButton(
-      "Copy All to Clipboard",
+      "i18n:Menu.CopyAllToClipboard".i18n,
       target: self,
       action: #selector(btnCopyAllToClipboardClicked(_:))
     ).controlSize(.small).withNarrowedFont(size: NSFont.smallSystemFontSize)
@@ -216,7 +216,7 @@ extension SettingsPanesCocoa.Services {
 extension SettingsPanesCocoa.Services {
   @IBAction
   func btnShowInstructionsClicked(_: Any) {
-    let strTitle = "How to Fill".i18n
+    let strTitle = "i18n:PhraseEditor.HowToFill".i18n
     let strFillGuide = "i18n:CandidateServiceMenuEditor.formatGuide".i18n
     CtlSettingsCocoa.shared?.window.callAlert(title: strTitle, text: strFillGuide)
   }
@@ -269,8 +269,8 @@ extension SettingsPanesCocoa.Services {
     let alert = NSAlert()
     alert.messageText = "i18n:CandidateServiceMenuEditor.prompt".i18n
     alert.informativeText = "i18n:CandidateServiceMenuEditor.howToGetGuide".i18n
-    alert.addButton(withTitle: "OK".i18n)
-    alert.addButton(withTitle: "Cancel".i18n)
+    alert.addButton(withTitle: "i18n:Common.OK".i18n)
+    alert.addButton(withTitle: "i18n:Common.Cancel".i18n)
 
     let maxFloat = Double(Float.greatestFiniteMagnitude)
     let scrollview = NSScrollView(frame: CGRect(x: 0, y: 0, width: 512, height: 200))

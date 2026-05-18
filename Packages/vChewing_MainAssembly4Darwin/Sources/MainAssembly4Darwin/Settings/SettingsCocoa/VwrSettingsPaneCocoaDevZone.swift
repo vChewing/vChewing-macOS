@@ -30,7 +30,7 @@ extension SettingsPanesCocoa {
     var body: NSView? {
       NSStackView.build(.vertical, insets: .new(all: 14)) {
         NSStackView.build(.horizontal, insets: .new(all: 0, left: 16, right: 16)) {
-          "Warning: This page is for testing future features. \nFeatures listed here may not work as expected."
+          "i18n:Settings.DevZoneWarning"
             .makeNSLabel(fixWidth: contentWidth)
           NSView()
         }
@@ -82,7 +82,7 @@ extension SettingsPanesCocoa {
           }
         }?.makeSimpleConstraint(.width, relation: .equal, value: tabContainerWidth)
         NSStackView.build(.horizontal, insets: .new(all: 0, left: 16, right: 16)) {
-          "Some previous options are moved to other tabs."
+          "i18n:Settings.OptionsMovedToOtherTabs"
             .makeNSLabel(descriptive: true, fixWidth: contentWidth)
           NSView()
         }
@@ -96,7 +96,7 @@ extension SettingsPanesCocoa {
       let failureCount = result.failures.count
       lines.append(
         String(
-          format: "i18n:DevZone.JSONPrefsExchange.ImportSummary".i18n,
+          format: "i18n:DevZone.JSONPrefsExchange.ImportSummary:%d%d".i18n,
           successCount, failureCount
         )
       )
@@ -119,7 +119,7 @@ extension SettingsPanesCocoa {
         let alert = NSAlert()
         alert.messageText = "i18n:DevZone.JSONPrefsExchange.ExportError".i18n
         alert.alertStyle = .warning
-        alert.addButton(withTitle: "OK".i18n)
+        alert.addButton(withTitle: "i18n:Common.OK".i18n)
         alert.beginSheetModal(at: CtlSettingsCocoa.shared?.window)
         return
       }
@@ -141,7 +141,7 @@ extension SettingsPanesCocoa {
           alert.messageText = "i18n:DevZone.JSONPrefsExchange.ExportError".i18n
           alert.informativeText = error.localizedDescription
           alert.alertStyle = .warning
-          alert.addButton(withTitle: "OK".i18n)
+          alert.addButton(withTitle: "i18n:Common.OK".i18n)
           alert.beginSheetModal(at: window)
         }
       }
@@ -169,7 +169,7 @@ extension SettingsPanesCocoa {
           alert.messageText = "i18n:DevZone.JSONPrefsExchange.ImportResultTitle".i18n
           alert.informativeText = "i18n:DevZone.JSONPrefsExchange.ImportError.ReadFailure".i18n
           alert.alertStyle = .warning
-          alert.addButton(withTitle: "OK".i18n)
+          alert.addButton(withTitle: "i18n:Common.OK".i18n)
           alert.beginSheetModal(at: window)
           return
         }
@@ -180,7 +180,7 @@ extension SettingsPanesCocoa {
         alert.messageText = "i18n:DevZone.JSONPrefsExchange.ImportResultTitle".i18n
         alert.informativeText = message
         alert.alertStyle = importResult.failures.isEmpty ? .informational : .warning
-        alert.addButton(withTitle: "OK".i18n)
+        alert.addButton(withTitle: "i18n:Common.OK".i18n)
         alert.beginSheetModal(at: window)
       }
     }

@@ -62,7 +62,7 @@ final class FrmRevLookupWindow: NSWindow {
   @objc
   func keyboardConfirmed(_: Any?) {
     if inputField.stringValue.isEmpty { return }
-    resultView.string = "\n" + "Loading…".i18n
+    resultView.string = "\n" + "i18n:DictionaryStatus.Loading".i18n
     asyncOnMain { [weak self] in
       guard let this = self else { return }
       this.updateResult(with: this.inputField.stringValue)
@@ -82,7 +82,7 @@ final class FrmRevLookupWindow: NSWindow {
     allowsToolTipsWhenApplicationIsInactive = false
     autorecalculatesKeyViewLoop = false
     isReleasedWhenClosed = false
-    title = "Reverse Lookup (Phonabets)".i18n
+    title = "i18n:UserDef.kUsingHotKeyJIS.shortTitle".i18n
 
     view.addSubview(inputField)
     view.addSubview(scrollView)
@@ -135,7 +135,7 @@ final class FrmRevLookupWindow: NSWindow {
     resultView.textColor = NSColor.textColor
     resultView.wantsLayer = true
     resultView.font = NSFont.systemFont(ofSize: 13)
-    resultView.string = "Maximum 15 results returnable.".i18n
+    resultView.string = "i18n:ErrorMessage.MaxResultsReturnable".i18n
 
     scrollView.contentView = clipView
 
@@ -155,7 +155,7 @@ final class FrmRevLookupWindow: NSWindow {
     inputField.cell.map { $0 as? NSTextFieldCell }??.usesSingleLineMode = true
     inputField.action = #selector(keyboardConfirmed(_:))
     inputField.toolTip =
-      "Maximum 15 results returnable.".i18n
+      "i18n:ErrorMessage.MaxResultsReturnable".i18n
   }
 
   private func updateResult(with input: String) {
@@ -164,12 +164,12 @@ final class FrmRevLookupWindow: NSWindow {
     inputField.isEnabled = false
     var strBuilder = ContiguousArray<String>()
     strBuilder.append("\n")
-    strBuilder.append("Char\tReading(s)\n".i18n)
+    strBuilder.append("i18n:PhraseEditor.CharReadingHeader".i18n)
     strBuilder.append("==\t====\n")
     var i = 0
     theLoop: for char in input.map(\.description) {
       if i == 15 {
-        strBuilder.append("Maximum 15 results returnable.".i18n + "\n")
+        strBuilder.append("i18n:ErrorMessage.MaxResultsReturnable".i18n + "\n")
         break theLoop
       }
       let arrResult = LMAssembly.LMInstantiator.getFactoryReverseLookupData(with: char)?

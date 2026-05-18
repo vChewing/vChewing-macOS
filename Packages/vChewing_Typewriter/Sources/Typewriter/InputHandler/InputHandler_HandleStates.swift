@@ -187,12 +187,11 @@ extension InputHandlerProtocol {
     var result = ContiguousArray<String>()
     result
       .append(
-        "Intonation mark. ENTER to commit.\nSPACE to insert into composition buffer."
-          .i18n
+        "i18n:StateOfInputting.Tooltip.IntonationMarkInstruction".i18n
       )
     if prefs.acceptLeadingIntonations {
       result.append("\n")
-      result.append("It will attempt to combine with the incoming phonabet input.".i18n)
+      result.append("i18n:StateOfInputting.Tooltip.AttemptCombinePhonabet".i18n)
     }
     return result.joined()
   }
@@ -1098,8 +1097,7 @@ extension InputHandlerProtocol {
         return true
       } else {
         let errorMessage =
-          "Please manually implement the symbols of this menu \nin the user phrase file with “_punctuation_list” key."
-            .i18n
+          "i18n:InfoMessage.ManuallyImplementSymbols".i18n
         vCLog("8EB3FB1A: " + errorMessage)
         let textToCommit = committableDisplayText(sansReading: true)
         session.switchState(State.ofCommitting(textToCommit: textToCommit))
@@ -1268,7 +1266,7 @@ extension InputHandlerProtocol {
 
     // 將輸入解析為整數
     guard let number = parseRomanNumeralInput(inputStr) else {
-      handleErrorState(msg: "typingMethod.romanNumerals.error.invalidInput".i18n)
+      handleErrorState(msg: "i18n:TypingMethod.RomanNumerals.ErrorInvalidInput".i18n)
       errorCallback?("A3D5B7F9")
       return true
     }
@@ -1279,7 +1277,7 @@ extension InputHandlerProtocol {
 
     // 轉換為羅馬數字
     guard let romanNumeral = RomanNumeralConverter.convert(number, format: format) else {
-      handleErrorState(msg: "typingMethod.romanNumerals.error.valueOutOfRange".i18n)
+      handleErrorState(msg: "i18n:TypingMethod.RomanNumerals.ErrorValueOutOfRange".i18n)
       errorCallback?("2E8C4D61")
       return true
     }

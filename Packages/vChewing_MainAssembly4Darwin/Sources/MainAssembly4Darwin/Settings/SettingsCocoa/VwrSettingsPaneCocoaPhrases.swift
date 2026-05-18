@@ -177,7 +177,7 @@ extension SettingsPanesCocoa.Phrases: NSTextViewDelegate, NSTextFieldDelegate {
     updateLabels()
     clearAllFields()
     isLoading = true
-    tfdPETextEditor.string = "Loading…".i18n
+    tfdPETextEditor.string = "i18n:DictionaryStatus.Loading".i18n
     asyncOnMain { [weak self] in
       mainSync { [weak self] in
         guard let this = self else { return }
@@ -244,7 +244,7 @@ extension SettingsPanesCocoa.Phrases: NSTextViewDelegate, NSTextFieldDelegate {
       }()
       (txtPEField3.cell as? NSTextFieldCell)?.placeholderString = ""
       (txtPECommentField.cell as? NSTextFieldCell)?
-        .placeholderString = "Inline comments are not supported in associated phrases.".i18n
+        .placeholderString = "i18n:PhraseEditor.InlineCommentsNotSupported".i18n
     case .theSymbols:
       (txtPEField1.cell as? NSTextFieldCell)?.placeholderString = PETerminology.AddPhrases.locPhrase
         .localized.0
@@ -267,8 +267,8 @@ extension SettingsPanesCocoa.Phrases: NSTextViewDelegate, NSTextFieldDelegate {
     // InputMode combobox.
     cmbPEInputModeMenu.menu?.removeAllItems()
     cmbPEInputModeMenu.menu?.appendItems {
-      NSMenu.Item("Simplified Chinese")?.tag(0).represent(Shared.InputMode.imeModeCHS)
-      NSMenu.Item("Traditional Chinese")?.tag(1).represent(Shared.InputMode.imeModeCHT)
+      NSMenu.Item("i18n:LanguageName.LocaleCodeZHHans".i18n)?.tag(0).represent(Shared.InputMode.imeModeCHS)
+      NSMenu.Item("i18n:LanguageName.LocaleCodeZHHant".i18n)?.tag(1).represent(Shared.InputMode.imeModeCHT)
     }
     let toSelect = cmbPEInputModeMenu.menu?.items.first {
       $0.representedObject as? Shared.InputMode == IMEApp.currentInputMode
@@ -288,9 +288,9 @@ extension SettingsPanesCocoa.Phrases: NSTextViewDelegate, NSTextFieldDelegate {
 
     // Buttons.
     btnPEReload.title = "↻"
-    btnPEReload.toolTip = "Reload".i18n
-    btnPEConsolidate.title = "Consolidate".i18n
-    btnPESave.title = "Save".i18n
+    btnPEReload.toolTip = "i18n:Common.Reload".i18n
+    btnPEConsolidate.title = "i18n:Common.Consolidate".i18n
+    btnPESave.title = "i18n:Common.Save".i18n
     btnPEAdd.title = PETerminology.AddPhrases.locAdd.localized.0
     btnPEOpenExternally.title = "…"
 
@@ -386,7 +386,7 @@ extension SettingsPanesCocoa.Phrases: NSTextViewDelegate, NSTextFieldDelegate {
   func savePEButtonClicked(_: NSButton) {
     let toSave = tfdPETextEditor.string
     isLoading = true
-    tfdPETextEditor.string = "Loading…".i18n
+    tfdPETextEditor.string = "i18n:DictionaryStatus.Loading".i18n
     let newResult = LMMgr.saveData(mode: selInputMode, type: selUserDataType, data: toSave)
     tfdPETextEditor.string = newResult
     isLoading = false
@@ -437,21 +437,17 @@ extension SettingsPanesCocoa.Phrases: NSTextViewDelegate, NSTextFieldDelegate {
 
 private enum PETerminology {
   public enum AddPhrases: String {
-    case locPhrase = "Phrase"
-    case locReadingOrStroke = "Reading/Stroke"
-    case locWeight = "Weight"
-    case locComment = "Comment"
-    case locReplaceTo = "Replace to"
-    case locAdd = "Add"
-    case locInitial = "Initial"
+    case locPhrase = "i18n:Common.Phrase"
+    case locReadingOrStroke = "i18n:Common.ReadingStroke"
+    case locWeight = "i18n:Common.Weight"
+    case locComment = "i18n:Common.Comment"
+    case locReplaceTo = "i18n:Common.ReplaceTo"
+    case locAdd = "i18n:Common.Add"
+    case locInitial = "i18n:Common.Initial"
 
     // MARK: Public
 
     public var localized: (String, String) {
-      if self == .locAdd {
-        let loc = PrefMgr.shared.appleLanguages[0]
-        return loc.prefix(2) == "zh" ? ("添入", "") : loc.prefix(2) == "ja" ? ("記入", "") : ("Add", "")
-      }
       let rawArray = rawValue.i18n.components(separatedBy: " ")
       if rawArray.isEmpty { return ("N/A", "N/A") }
       let val1: String = rawArray[0]
@@ -461,8 +457,7 @@ private enum PETerminology {
   }
 
   public enum TooltipTexts: String {
-    case weightInputBox =
-      "If not filling the weight, it will be 0.0, the maximum one. An ideal weight situates in [-9.5, 0], making itself can be captured by the sentence-composition algorithm. The exception is -114.514, the disciplinary weight. The sentence-composition algorithm will ignore it unless it is the unique result."
+    case weightInputBox = "i18n:PhraseEditor.WeightExplanation"
 
     // MARK: Public
 
@@ -477,15 +472,13 @@ private enum PETerminology {
       switch type {
       case .thePhrases:
         result =
-          "Example:\nCandidate Reading-Reading Weight #Comment\nCandidate Reading-Reading #Comment"
-            .i18n + "\n\n"
+          "i18n:PhraseEditor.ExamplePhraseWithWeight".i18n + "\n\n"
             + weightInputBox.localized
-      case .theFilter: result = "Example:\nCandidate Reading-Reading #Comment".i18n
-      case .theReplacements: result = "Example:\nOldPhrase NewPhrase #Comment".i18n
+      case .theFilter: result = "i18n:PhraseEditor.ExamplePhrase".i18n
+      case .theReplacements: result = "i18n:PhraseEditor.ExampleReplacement".i18n
       case .theAssociates:
-        result = "Example:\nInitial RestPhrase\nInitial RestPhrase1 RestPhrase2 RestPhrase3..."
-          .i18n
-      case .theSymbols: result = "Example:\nCandidate Reading-Reading #Comment".i18n
+        result = "i18n:PhraseEditor.ExampleAssociates".i18n
+      case .theSymbols: result = "i18n:PhraseEditor.ExamplePhrase".i18n
       }
       return result
     }

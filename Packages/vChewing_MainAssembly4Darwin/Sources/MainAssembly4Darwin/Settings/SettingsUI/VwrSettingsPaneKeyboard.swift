@@ -20,19 +20,19 @@ public struct VwrSettingsPaneKeyboard: View {
     Form {
       Section {
         HStack(alignment: .top) {
-          Text("Quick Setup:")
+          Text("i18n:Settings.SectionQuickSetup".i18n)
           Spacer()
           Button {
             keyboardParser = 0
             basicKeyboardLayout = "com.apple.keylayout.ZhuyinBopomofo"
           } label: {
-            Text("↻ㄅ" + " " + "Dachen Trad.".i18n)
+            Text("↻ㄅ" + " " + "i18n:KeyboardLayout.DachenTraditional".i18n)
           }
           Button {
             keyboardParser = 1
             basicKeyboardLayout = "com.apple.keylayout.ZhuyinEten"
           } label: {
-            Text("↻ㄅ" + " " + "Eten Trad.".i18n)
+            Text("↻ㄅ" + " " + "i18n:KeyboardLayout.EtenTraditionalShort".i18n)
           }
           Button {
             keyboardParser = 100
@@ -45,7 +45,7 @@ public struct VwrSettingsPaneKeyboard: View {
         UserDef.kBasicKeyboardLayout.renderUI()
         UserDef.kAlphanumericalKeyboardLayout.renderUI()
       }
-      Section(header: Text("Keyboard Shortcuts:")) {
+      Section(header: Text("i18n:Settings.SectionKeyboardShortcuts".i18n)) {
         VwrSettingsPaneKeyboard_KeyboardShortcuts()
       }
     }.formStyled()
