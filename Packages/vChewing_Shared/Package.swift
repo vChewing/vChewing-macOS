@@ -8,6 +8,10 @@ let package = Package(
       name: "Shared",
       targets: ["Shared"]
     ),
+    .executable(
+      name: "vChewingSharedCLI",
+      targets: ["vChewingSharedCLI"]
+    ),
   ],
   dependencies: [
     .package(path: "../vChewing_SwiftExtension"),
@@ -24,6 +28,13 @@ let package = Package(
     ),
     .testTarget(
       name: "SharedTests",
+      dependencies: ["Shared"],
+      swiftSettings: [
+        .defaultIsolation(MainActor.self), // set Default Actor Isolation
+      ]
+    ),
+    .executableTarget(
+      name: "vChewingSharedCLI",
       dependencies: ["Shared"],
       swiftSettings: [
         .defaultIsolation(MainActor.self), // set Default Actor Isolation
