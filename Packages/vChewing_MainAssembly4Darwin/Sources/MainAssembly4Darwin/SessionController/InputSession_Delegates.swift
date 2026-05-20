@@ -408,16 +408,19 @@ extension SessionProtocol {
     switch action {
     case .toBoost:
       newState.data.tooltipColorState = .normal
-      tooltipMessage =
-        succeeded ? "+ Succeeded in boosting a candidate." : "⚠︎ Failed from boosting a candidate."
+      tooltipMessage = succeeded
+        ? "i18n:PhraseOperation.BoostCandidateSucceeded"
+        : "i18n:PhraseOperation.BoostCandidateFailed"
     case .toNerf:
       newState.data.tooltipColorState = .succeeded
-      tooltipMessage =
-        succeeded ? "- Succeeded in nerfing a candidate." : "⚠︎ Failed from nerfing a candidate."
+      tooltipMessage = succeeded
+        ? "i18n:PhraseOperation.NerfCandidateSucceeded"
+        : "i18n:PhraseOperation.NerfCandidateFailed"
     case .toFilter:
       newState.data.tooltipColorState = .warning
-      tooltipMessage =
-        succeeded ? "! Succeeded in filtering a candidate." : "⚠︎ Failed from filtering a candidate."
+      tooltipMessage = succeeded
+        ? "i18n:PhraseOperation.FilterCandidateSucceeded"
+        : "i18n:PhraseOperation.FilterCandidateFailed"
     }
     if !succeeded { newState.data.tooltipColorState = .redAlert }
     newState.tooltip = tooltipMessage.i18n

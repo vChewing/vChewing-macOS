@@ -301,11 +301,11 @@ extension InputHandlerProtocol {
 
     // Enter
     if input.isEnter {
-      var tooltipMessage = "+ Succeeded in adding / boosting a user phrase."
+      var tooltipMessage = "i18n:PhraseOperation.AddBoostUserPhraseSucceeded"
       var tooltipColorState: TooltipColorState = .normal
       // 先判斷是否是在摁了降權組合鍵的時候目標不在庫。
       if input.isShiftHold, input.isCommandHold {
-        tooltipMessage = "- Succeeded in nerfing a user phrase."
+        tooltipMessage = "i18n:PhraseOperation.NerfUserPhraseSucceeded"
         tooltipColorState = .succeeded
       }
       if !state.isMarkedLengthValid {
@@ -318,7 +318,7 @@ extension InputHandlerProtocol {
         return true
       }
       if areWeUnfiltering {
-        tooltipMessage = "- Succeeded in unfiltering a phrase."
+        tooltipMessage = "i18n:PhraseOperation.UnfilterPhraseSucceeded"
         tooltipColorState = .succeeded
       }
       var newState = generateStateOfInputting()
@@ -331,7 +331,7 @@ extension InputHandlerProtocol {
 
     // BackSpace & Delete
     if input.isBackSpace || input.isDelete {
-      let tooltipMessage = "! Succeeded in filtering a user phrase."
+      let tooltipMessage = "i18n:PhraseOperation.FilterUserPhraseSucceeded"
       guard let filterabilityChecker else {
         errorCallback?("FF333223")
         return true
