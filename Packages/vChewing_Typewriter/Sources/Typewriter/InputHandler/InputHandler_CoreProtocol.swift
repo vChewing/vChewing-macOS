@@ -288,8 +288,8 @@ extension InputHandlerProtocol {
           }
         }
         // 若首輪覆寫失敗且尚未鞏固上下文（preConsolidate==false），
-        // 可能是因為 bigram 節點不含單一 unigram keyArray（例：「多期」bigram
-        // 無法直接匹配「奇」的 unigram keyArray）。此時先鞏固上下文以拆分 bigram，
+        // 可能是因為多段詞節點不含單段詞 keyArray（例：「多期」多段詞
+        // 無法直接匹配「奇」的單段詞 keyArray）。此時先鞏固上下文以拆分多段詞，
         // 後續重試才能成功匹配 keyArray 並觸發 POM 記憶。
         if !overrideTaskResult, attempt == 1, !preConsolidate {
           consolidateCursorContext(with: theCandidate)
@@ -791,8 +791,8 @@ extension InputHandlerProtocol {
         var effectiveCursorForOverride = cursorForOverride
         if let gramHit = assembler.assembledSentence.findGram(at: cursorForOverride) {
           if gramHit.gram.keyArray.count > newestSuggestedCandidate.keyArray.count {
-            // 當現有節點比 POM 建議長時（例：bigram「多期」vs unigram「奇」），
-            // 先將 bigram 拆分為獨立 unigram，後續 literal override 才能正確匹配。
+            // 當現有節點比 POM 建議長時（例：多段詞「多期」vs 單段詞「奇」），
+            // 先將多段詞拆分為獨立單段詞，後續 literal override 才能正確匹配。
             let grams = gramHit.gram
             let values = grams.value.map(String.init)
             var pos = gramHit.range.lowerBound

@@ -433,7 +433,7 @@ extension POMTestSuite {
     @Test
     func testPOM_AC04_DuoQiMemorization() throws {
       // 測試 POM 記憶使用者對「多期」→「多奇」的覆寫行為。
-      // ---- Part A: 以不含 bigram 的 LM 驗證 POM 完整 round-trip ----
+      // ---- Part A: 以不含多段詞的 LM 驗證 POM 完整 round-trip ----
       let unigramOnlyData = """
       ㄉㄨㄛ 多 -5.053
       ㄉㄨㄛ 哆 -5.248
@@ -542,41 +542,41 @@ extension POMTestSuite {
       let assembledByPOM = validationCompositor.assembledSentence.values.joined(separator: " ")
       #expect(assembledByPOM == "多 奇", "POM suggestion should correct to 多 奇.")
 
-      // ---- Part B: 驗證 alternateKeys 的 bigram to split 匹配 ----
-      let bigramLM = TestLM(rawData: LMATestsData.strDataCase4DuoQi)
-      let bigramPOM = LMAssembly.LXPerceptor(dataURL: URL(fileURLWithPath: "/dev/null"))
+      // ---- Part B: 驗證 alternateKeys 的多段詞 to split 匹配 ----
+      let multiSegmentLM = TestLM(rawData: LMATestsData.strDataCase4DuoQi)
+      let multiSegmentPOM = LMAssembly.LXPerceptor(dataURL: URL(fileURLWithPath: "/dev/null"))
 
-      // 直接記憶拆分後的 key（模擬 bigram 被拆分覆寫後記錄的 key）
+      // 直接記憶拆分後的 key（模擬多段詞被拆分覆寫後記錄的 key）
       let splitMemoryKey = "()&(ㄉㄨㄛ,多)&(ㄑㄧˊ,奇)"
-      bigramPOM.memorizePerception(
+      multiSegmentPOM.memorizePerception(
         (splitMemoryKey, "奇"),
         timestamp: nowTimeStamp
       )
-      #expect(bigramPOM.getSavableData().first?.key == splitMemoryKey)
+      #expect(multiSegmentPOM.getSavableData().first?.key == splitMemoryKey)
 
-      // 用 bigram 格式的查詢鍵查詢
-      let bigramQueryKey = "()&()&(ㄉㄨㄛ-ㄑㄧˊ,多期)"
-      let alternateKeys = bigramPOM.alternateKeysForTesting(bigramQueryKey)
+      // 用多段詞格式的查詢鍵查詢
+      let multiSegmentQueryKey = "()&()&(ㄉㄨㄛ-ㄑㄧˊ,多期)"
+      let alternateKeys = multiSegmentPOM.alternateKeysForTesting(multiSegmentQueryKey)
       #expect(
         alternateKeys.contains(splitMemoryKey),
-        "AlternateKeys must find split key from bigram query."
+        "AlternateKeys must find split key from multi-segment query."
       )
 
       // 驗證 fetchSuggestion 也能正確找回
-      let bigramCompositor = Homa.Assembler(
-        gramQuerier: bigramLM.asGramQuerier()
+      let multiSegmentCompositor = Homa.Assembler(
+        gramQuerier: multiSegmentLM.asGramQuerier()
       )
-      for key in readingKeys { try bigramCompositor.insertKey(key) }
-      bigramCompositor.assemble()
+      for key in readingKeys { try multiSegmentCompositor.insertKey(key) }
+      multiSegmentCompositor.assemble()
 
-      let bigramSuggestion = bigramPOM.fetchSuggestion(
-        assembledResult: bigramCompositor.assembledSentence,
-        cursor: bigramCompositor.cursor,
+      let multiSegmentSuggestion = multiSegmentPOM.fetchSuggestion(
+        assembledResult: multiSegmentCompositor.assembledSentence,
+        cursor: multiSegmentCompositor.cursor,
         timestamp: nowTimeStamp
       )
-      #expect(!bigramSuggestion.isEmpty, "FetchSuggestion must find memory from bigram query.")
-      if let bigramCandidate = bigramSuggestion.candidates.first {
-        #expect(bigramCandidate.value == "奇")
+      #expect(!multiSegmentSuggestion.isEmpty, "FetchSuggestion must find memory from multi-segment query.")
+      if let multiSegmentCandidate = multiSegmentSuggestion.candidates.first {
+        #expect(multiSegmentCandidate.value == "奇")
       }
     }
   }

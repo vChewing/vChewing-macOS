@@ -896,7 +896,7 @@ extension LMAssembly.LXPerceptor {
             // 若原始查詢鍵沒有 previous context（其 head 為多段詞，
             // 前文已融入 head 內部），則允許候選的 previous reading 與原始 head
             // 的首段 reading 比對：若一致則接受該候選（解決「多期→多奇」情境下
-            // bigram 被拆分後 POM 無法透過 alternateKeys 找回記憶的問題）。
+            // 多段詞被拆分後 POM 無法透過 alternateKeys 找回記憶的問題）。
             if originalParts.previous == nil,
                let cPrev = candidateParts.previous,
                let firstHeadSegment = headSegments.first,
