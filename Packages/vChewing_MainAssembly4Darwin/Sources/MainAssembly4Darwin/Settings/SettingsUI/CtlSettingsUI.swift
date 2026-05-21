@@ -45,8 +45,10 @@ public final class CtlSettingsUI: NSWindowController, NSWindowDelegate {
   override public func windowDidLoad() {
     super.windowDidLoad()
     window?.setPosition(vertical: .top, horizontal: .right, padding: 20)
+    let viewModel = SettingsUIViewModel()
     window?.contentView = NSHostingView(
       rootView: VwrSettingsUI()
+        .environment(viewModel)
         .ignoresSafeArea()
     )
     var preferencesTitleName = "i18n:Menu.VChewingPreferences".i18n

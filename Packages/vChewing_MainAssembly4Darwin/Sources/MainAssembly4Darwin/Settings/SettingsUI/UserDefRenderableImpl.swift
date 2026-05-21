@@ -37,21 +37,38 @@ struct UserDefRendered: View {
   // MARK: Internal
 
   var body: some View {
-    switch userDef.dataType {
-    case .bool:
-      _UDAutoViewBool(def: userDef, onChange: onChange)
-    case .integer:
-      _UDAutoViewInt(def: userDef, onChange: onChange)
-    case .double:
-      _UDAutoViewDouble(def: userDef, onChange: onChange)
-    case .string:
-      _UDAutoViewString(def: userDef, onChange: onChange)
-    default:
-      EmptyView()
+    Group {
+      // 若有搜尋文字則過濾，不匹配者佔位但不顯示。
+      if viewModel?.matchesSearchable(userDef) ?? true {
+        switch userDef.dataType {
+        case .bool:
+          _UDAutoViewBool(def: userDef, onChange: onChange)
+        case .integer:
+          _UDAutoViewInt(def: userDef, onChange: onChange)
+        case .double:
+          _UDAutoViewDouble(def: userDef, onChange: onChange)
+        case .string:
+          _UDAutoViewString(def: userDef, onChange: onChange)
+        default:
+          EmptyView()
+        }
+      }
+    }
+    // 向 ViewModel 登記此 UserDef 出現在當前 Tab。
+    .onAppear {
+      if let tab = currentTab {
+        viewModel?.register(userDef, in: tab)
+      }
     }
   }
 
   // MARK: Private
+
+  @Environment(SettingsUIViewModel.self)
+  private var viewModel: SettingsUIViewModel?
+
+  @Environment(\.currentSettingsTab)
+  private var currentTab
 
   private let userDef: UserDef
   private let onChange: (() -> ())?

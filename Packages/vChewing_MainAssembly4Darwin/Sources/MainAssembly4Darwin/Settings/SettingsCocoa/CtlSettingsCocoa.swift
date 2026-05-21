@@ -91,6 +91,8 @@ public final class CtlSettingsCocoa: NSWindowController, NSWindowDelegate {
 
       previousView = nil
       setupSplitLayout()
+      sidebarTableView.delegate = self
+      sidebarTableView.dataSource = self
       sidebarTableView.reloadData()
       selectTab(.tabGeneral)
     }
@@ -137,6 +139,28 @@ public final class CtlSettingsCocoa: NSWindowController, NSWindowDelegate {
   let panes = SettingsPanesCocoa()
   var previousView: NSView?
 
+  // per-tab UserDef collection map.
+  var userDefMap: [PrefUITabs: Set<UserDef>] = [:]
+
+  // Sidebar search field.
+  private(set) lazy var searchField: NSSearchField = {
+    let sf = NSSearchField()
+    sf.translatesAutoresizingMaskIntoConstraints = false
+    sf.placeholderString = "i18n:Menu.SearchPreferences".i18n
+    sf.sendsWholeSearchString = false
+    sf.sendsSearchStringImmediately = true
+    if #available(macOS 10.10, *) {
+      sf.maximumRecents = 0
+    }
+    sf.target = self
+    sf.action = #selector(searchFieldDidChange(_:))
+    return sf
+  }()
+
+  func registerUserDef(_ userDef: UserDef, in tab: PrefUITabs) {
+    userDefMap[tab, default: []].insert(userDef)
+  }
+
   @objc
   func openHomepage(_: Any?) {
     if let url = URL(string: "https://vchewing.github.io") {
@@ -144,9 +168,40 @@ public final class CtlSettingsCocoa: NSWindowController, NSWindowDelegate {
     }
   }
 
+  @objc
+  func focusSearchField() {
+    Self.show()
+    window?.makeFirstResponder(searchField)
+  }
+
   // MARK: Private
 
   private var selectedTab: PrefUITabs = .tabGeneral
+
+  private lazy var searchPopover: NSPopover = {
+    let p = NSPopover()
+    p.behavior = .transient
+    p.animates = false
+    return p
+  }()
+
+  private lazy var searchResultsTableView: NSTableView = {
+    let tv = NSTableView()
+    let col = NSTableColumn()
+    col.resizingMask = .autoresizingMask
+    tv.addTableColumn(col)
+    tv.headerView = nil
+    tv.focusRingType = .none
+    tv.intercellSpacing = NSSize(width: 0, height: 2)
+    tv.rowHeight = 24
+    tv.delegate = self
+    tv.dataSource = self
+    tv.target = self
+    tv.doubleAction = #selector(searchResultDoubleClicked(_:))
+    return tv
+  }()
+
+  private var currentSearchResults: [(title: String, tab: PrefUITabs)] = []
 
   private lazy var sidebarTableView: NSTableView = {
     let tv = NSTableView()
@@ -166,8 +221,6 @@ public final class CtlSettingsCocoa: NSWindowController, NSWindowDelegate {
     tv.intercellSpacing = NSSize(width: 0, height: 2)
     tv.backgroundColor = .clear
     tv.rowHeight = 28
-    tv.delegate = self
-    tv.dataSource = self
     return tv
   }()
 
@@ -177,6 +230,65 @@ public final class CtlSettingsCocoa: NSWindowController, NSWindowDelegate {
     v.layer?.masksToBounds = true
     return v
   }()
+
+  @objc
+  private func searchFieldDidChange(_ sender: NSSearchField) {
+    let query = sender.stringValue
+    guard !query.isEmpty else {
+      searchPopover.close()
+      return
+    }
+    performSearch(query)
+  }
+
+  private func performSearch(_ query: String) {
+    currentSearchResults.removeAll()
+    for (tab, userDefs) in userDefMap {
+      for userDef in userDefs {
+        guard let meta = userDef.metaData else { continue }
+        let title = meta.shortTitle?.i18n ?? ""
+        let desc = meta.description?.i18n ?? ""
+        guard title.localizedStandardContains(query) || desc.localizedStandardContains(query)
+        else { continue }
+        currentSearchResults.append((title: title.isEmpty ? userDef.rawValue : title, tab: tab))
+      }
+    }
+    currentSearchResults.sort { $0.title.localizedCaseInsensitiveCompare($1.title) == .orderedAscending }
+    searchResultsTableView.reloadData()
+    if !currentSearchResults.isEmpty {
+      showSearchPopover()
+    } else {
+      searchPopover.close()
+    }
+  }
+
+  private func showSearchPopover() {
+    let rowCount = min(currentSearchResults.count, 10)
+    let tableHeight = CGFloat(rowCount) * searchResultsTableView.rowHeight
+      + searchResultsTableView.intercellSpacing.height * CGFloat(max(rowCount - 1, 0)) + 12
+    let height = max(tableHeight, 60)
+    let controller = NSViewController()
+    let scrollView = NSScrollView()
+    scrollView.hasVerticalScroller = true
+    scrollView.hasHorizontalScroller = false
+    scrollView.borderType = .noBorder
+    scrollView.documentView = searchResultsTableView
+    scrollView.frame.size = NSSize(width: 280, height: height)
+    controller.view = scrollView
+    searchPopover.contentViewController = controller
+    searchPopover.contentSize = NSSize(width: 280, height: height)
+    searchPopover.show(relativeTo: searchField.bounds, of: searchField, preferredEdge: .maxY)
+  }
+
+  @objc
+  private func searchResultDoubleClicked(_ sender: NSTableView) {
+    let row = sender.clickedRow
+    guard row >= 0, row < currentSearchResults.count else { return }
+    let tab = currentSearchResults[row].tab
+    searchPopover.close()
+    searchField.stringValue = ""
+    selectTab(tab)
+  }
 }
 
 // MARK: - Split Layout Setup
@@ -286,6 +398,19 @@ extension CtlSettingsCocoa {
       iconView.image = appIcon
     }
 
+    // Search field below icon.
+    sidebarContainer.addSubview(searchField)
+
+    // Hidden button for ⌘F keyboard shortcut.
+    let searchShortcutButton = NSButton()
+    searchShortcutButton.title = ""
+    searchShortcutButton.isTransparent = true
+    searchShortcutButton.keyEquivalent = "f"
+    searchShortcutButton.keyEquivalentModifierMask = .command
+    searchShortcutButton.target = self
+    searchShortcutButton.action = #selector(focusSearchField)
+    sidebarContainer.addSubview(searchShortcutButton)
+
     // Table view wrapped in scroll view.
     let tableScrollView = NSScrollView()
     tableScrollView.translatesAutoresizingMaskIntoConstraints = false
@@ -345,10 +470,23 @@ extension CtlSettingsCocoa {
         item: iconView, attribute: .height, relatedBy: .equal,
         toItem: nil, attribute: .notAnAttribute, multiplier: 1, constant: 49
       ),
+      // Search field below icon.
+      NSLayoutConstraint(
+        item: searchField, attribute: .top, relatedBy: .equal,
+        toItem: iconView, attribute: .bottom, multiplier: 1, constant: 6
+      ),
+      NSLayoutConstraint(
+        item: searchField, attribute: .leading, relatedBy: .equal,
+        toItem: sidebarContainer, attribute: .leading, multiplier: 1, constant: 12
+      ),
+      NSLayoutConstraint(
+        item: searchField, attribute: .trailing, relatedBy: .equal,
+        toItem: sidebarContainer, attribute: .trailing, multiplier: 1, constant: -12
+      ),
       // Table: between icon and version label, full width.
       NSLayoutConstraint(
         item: tableScrollView, attribute: .top, relatedBy: .equal,
-        toItem: iconView, attribute: .bottom, multiplier: 1, constant: 8
+        toItem: searchField, attribute: .bottom, multiplier: 1, constant: 6
       ),
       NSLayoutConstraint(
         item: tableScrollView, attribute: .leading, relatedBy: .equal,
@@ -502,8 +640,11 @@ extension CtlSettingsCocoa {
 // MARK: NSTableViewDelegate, NSTableViewDataSource
 
 extension CtlSettingsCocoa: NSTableViewDelegate, NSTableViewDataSource {
-  public func numberOfRows(in _: NSTableView) -> Int {
-    PrefUITabs.allCases.count
+  public func numberOfRows(in tableView: NSTableView) -> Int {
+    if tableView === sidebarTableView {
+      return PrefUITabs.allCases.count
+    }
+    return currentSearchResults.count
   }
 
   public func tableView(
@@ -512,6 +653,82 @@ extension CtlSettingsCocoa: NSTableViewDelegate, NSTableViewDataSource {
     row: Int
   )
     -> NSView? {
+    // search results rows.
+    if tableView === sidebarTableView {
+      return sidebarRowView(for: row)
+    }
+    return searchResultRowView(for: row)
+  }
+
+  public func tableViewSelectionDidChange(_ notification: Notification) {
+    guard let tableView = notification.object as? NSTableView, tableView === sidebarTableView else { return }
+    let row = tableView.selectedRow
+    guard row >= 0, row < PrefUITabs.allCases.count else { return }
+    let tab = PrefUITabs.allCases[row]
+    guard tab != selectedTab else { return }
+    selectedTab = tab
+    showContentForTab(tab)
+  }
+
+  // MARK: Search result row
+
+  private func searchResultRowView(for row: Int) -> NSView? {
+    guard row >= 0, row < currentSearchResults.count else { return nil }
+    let result = currentSearchResults[row]
+    let rowView = NSView()
+    let textField = NSLabelView()
+    textField.translatesAutoresizingMaskIntoConstraints = false
+    let paragraphStyle = NSMutableParagraphStyle()
+    paragraphStyle.lineBreakMode = .byTruncatingTail
+    let attrStr = NSMutableAttributedString(
+      string: result.title,
+      attributes: [.paragraphStyle: paragraphStyle, .font: NSFont.systemFont(ofSize: 12)]
+    )
+    attrStr.append(NSAttributedString(
+      string: "  → \(result.tab.i18nTitle)",
+      attributes: [
+        .paragraphStyle: paragraphStyle,
+        .font: NSFont.systemFont(ofSize: 11),
+        .foregroundColor: NSColor.secondaryLabelColor,
+      ]
+    ))
+    textField.attributedStringValue = attrStr
+    rowView.addSubview(textField)
+    rowView.addConstraints([
+      NSLayoutConstraint(
+        item: textField,
+        attribute: .leading,
+        relatedBy: .equal,
+        toItem: rowView,
+        attribute: .leading,
+        multiplier: 1,
+        constant: 8
+      ),
+      NSLayoutConstraint(
+        item: textField,
+        attribute: .centerY,
+        relatedBy: .equal,
+        toItem: rowView,
+        attribute: .centerY,
+        multiplier: 1,
+        constant: 0
+      ),
+      NSLayoutConstraint(
+        item: textField,
+        attribute: .trailing,
+        relatedBy: .equal,
+        toItem: rowView,
+        attribute: .trailing,
+        multiplier: 1,
+        constant: -8
+      ),
+    ])
+    return rowView
+  }
+
+  // MARK: Sidebar row
+
+  private func sidebarRowView(for row: Int) -> NSView? {
     guard row >= 0, row < PrefUITabs.allCases.count else { return nil }
     let tab = PrefUITabs.allCases[row]
 
@@ -575,13 +792,25 @@ extension CtlSettingsCocoa: NSTableViewDelegate, NSTableViewDataSource {
 
     return rowView
   }
+}
 
-  public func tableViewSelectionDidChange(_: Notification) {
-    let row = sidebarTableView.selectedRow
-    guard row >= 0, row < PrefUITabs.allCases.count else { return }
-    let tab = PrefUITabs.allCases[row]
-    guard tab != selectedTab else { return }
-    selectedTab = tab
-    showContentForTab(tab)
+// MARK: - UserDef renderCocoa with per-tab collection
+
+extension UserDef {
+  /// 帶 prefUITab 的 renderCocoa 在渲染同時將 UserDef 登記至 CtlSettingsCocoa.userDefMap。
+  func renderCocoa(
+    fixWidth: CGFloat? = nil,
+    prefUITab: PrefUITabs?,
+    extraOps: ((inout UserDefRenderableCocoa) -> ())? = nil
+  )
+    -> NSView? {
+    var renderable = toCocoaRenderable()
+    extraOps?(&renderable)
+    if let tab = prefUITab {
+      asyncOnMain {
+        CtlSettingsCocoa.shared?.registerUserDef(self, in: tab)
+      }
+    }
+    return renderable.render(fixWidth: fixWidth)
   }
 }

@@ -164,6 +164,7 @@
 "i18n:Menu.PushCursorAfterSelection" = "候補選択の直後、すぐカーソルを単語の向こうに推し進める";
 "i18n:Menu.RebootVChewing" = "入力アプリ再起動…";
 "i18n:Menu.ReloadUserPhrases" = "ユーザー辞書を再び読込む";
+"i18n:Menu.SearchPreferences" = "設定を検索…";
 "i18n:Menu.ServiceMenu" = "サービスメニュー";
 "i18n:Menu.ServiceMenuEditor" = "サービスメニューエディター";
 "i18n:Menu.SymbolEmojiInput" = "符号＆絵文字入力";
@@ -233,9 +234,12 @@
 "i18n:settings.importFromKimoTxt.finishedCount:%@%@" = "合計 %@ 件中、%@ 件の新しいデータを読み込みました。";
 "i18n:settings.importFromKimoTxt.label" = "Yahoo! KeyKey ユーザー辞書ファイルを読込";
 "i18n:settings.importFromKimoTxt.postOpsNotice" = "読み込まなかった分は不合理か、あるいは今のデータベースにすでに既存しています。すべてのデータを独立したテキストファイルとして完全にお書き出ししたい場合は、KeyKeyUserDBKit（GitHub 倉庫: vChewing/KeyKeyUserDBKit）をご利用ください。";
+"i18n:Settings.NoSearchResults" = "一致する設定が見つかりません。";
 "i18n:Settings.OnlyLoadFactoryLanguageModels" = "必要性を判断してから内蔵辞書を読み込む";
 "i18n:Settings.OptionAuto" = "システム設定に準ず";
 "i18n:Settings.OptionsMovedToOtherTabs" = "かつてこのページに載った一部のオプションは、今は他のページへ移動しました。";
+"i18n:Settings.SearchCurrentPage" = "現在のページを検索";
+"i18n:Settings.SearchPrompt" = "キーワードで設定を検索…";
 "i18n:Settings.SectionExperimental" = "まだ試験段階:";
 "i18n:Settings.SectionKeyboardShortcuts" = "ショートカット:";
 "i18n:Settings.SectionMiscSettings" = "他の設定:";

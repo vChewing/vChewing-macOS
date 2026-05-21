@@ -29,20 +29,39 @@ extension SettingsPanesCocoa {
     var body: NSView? {
       NSStackView.build(.vertical, insets: .new(all: 14)) {
         NSStackView.buildSection(width: contentWidth) {
-          UserDef.kChineseConversionEnabled.renderCocoa(fixWidth: contentWidth) { renderable in
+          UserDef.kChineseConversionEnabled.renderCocoa(
+            fixWidth: contentWidth,
+            prefUITab: .tabOutput
+          ) { renderable in
             renderable.currentControl?.target = self
             renderable.currentControl?.action = #selector(self.sanityCheckKangXi(_:))
           }
-          UserDef.kShiftJISShinjitaiOutputEnabled.renderCocoa(fixWidth: contentWidth) { renderable in
-            renderable.currentControl?.target = self
-            renderable.currentControl?.action = #selector(self.sanityCheckJIS(_:))
-          }
-          UserDef.kInlineDumpPinyinInLieuOfZhuyin.renderCocoa(fixWidth: contentWidth)
-          UserDef.kTrimUnfinishedReadingsOnCommit.renderCocoa(fixWidth: contentWidth)
-          UserDef.kRomanNumeralOutputFormat.renderCocoa(fixWidth: contentWidth)
+          UserDef.kShiftJISShinjitaiOutputEnabled
+            .renderCocoa(
+              fixWidth: contentWidth,
+              prefUITab: .tabOutput
+            ) { renderable in
+              renderable.currentControl?.target = self
+              renderable.currentControl?.action = #selector(self.sanityCheckJIS(_:))
+            }
+          UserDef.kInlineDumpPinyinInLieuOfZhuyin.renderCocoa(
+            fixWidth: contentWidth,
+            prefUITab: .tabOutput
+          )
+          UserDef.kTrimUnfinishedReadingsOnCommit.renderCocoa(
+            fixWidth: contentWidth,
+            prefUITab: .tabOutput
+          )
+          UserDef.kRomanNumeralOutputFormat.renderCocoa(
+            fixWidth: contentWidth,
+            prefUITab: .tabOutput
+          )
         }?.boxed()
         NSStackView.buildSection(width: contentWidth) {
-          UserDef.kHardenVerticalPunctuations.renderCocoa(fixWidth: contentWidth)
+          UserDef.kHardenVerticalPunctuations.renderCocoa(
+            fixWidth: contentWidth,
+            prefUITab: .tabOutput
+          )
         }?.boxed()
         NSView().makeSimpleConstraint(.height, relation: .equal, value: NSFont.systemFontSize)
       }

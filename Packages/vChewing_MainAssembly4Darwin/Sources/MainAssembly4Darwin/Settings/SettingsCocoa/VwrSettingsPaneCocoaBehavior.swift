@@ -32,42 +32,90 @@ extension SettingsPanesCocoa {
         NSTabView.build {
           NSTabView.TabPage(title: "Ａ") {
             NSStackView.buildSection(width: innerContentWidth) {
-              UserDef.kSpecifyShiftBackSpaceKeyBehavior.renderCocoa(fixWidth: innerContentWidth)
-              UserDef.kSpecifyShiftTabKeyBehavior.renderCocoa(fixWidth: innerContentWidth)
-              UserDef.kSpecifyShiftSpaceKeyBehavior.renderCocoa(fixWidth: innerContentWidth)
-              UserDef.kSpecifyCmdOptCtrlEnterBehavior.renderCocoa(fixWidth: innerContentWidth)
-              UserDef.kReflectBPMFVSInCompositionBuffer.renderCocoa(fixWidth: innerContentWidth)
+              UserDef.kSpecifyShiftBackSpaceKeyBehavior.renderCocoa(
+                fixWidth: innerContentWidth,
+                prefUITab: .tabBehavior
+              )
+              UserDef.kSpecifyShiftTabKeyBehavior.renderCocoa(
+                fixWidth: innerContentWidth,
+                prefUITab: .tabBehavior
+              )
+              UserDef.kSpecifyShiftSpaceKeyBehavior.renderCocoa(
+                fixWidth: innerContentWidth,
+                prefUITab: .tabBehavior
+              )
+              UserDef.kSpecifyCmdOptCtrlEnterBehavior.renderCocoa(
+                fixWidth: innerContentWidth,
+                prefUITab: .tabBehavior
+              )
+              UserDef.kReflectBPMFVSInCompositionBuffer.renderCocoa(
+                fixWidth: innerContentWidth,
+                prefUITab: .tabBehavior
+              )
             }?.boxed()
             NSStackView.buildSection(width: innerContentWidth) {
-              UserDef.kBeepSoundPreference.renderCocoa(fixWidth: contentWidth)
+              UserDef.kBeepSoundPreference.renderCocoa(
+                fixWidth: contentWidth,
+                prefUITab: .tabBehavior
+              )
             }?.boxed()
             NSView()
           }
           NSTabView.TabPage(title: "Ｂ") {
             NSStackView.buildSection(width: innerContentWidth) {
-              UserDef.kUpperCaseLetterKeyBehavior.renderCocoa(fixWidth: innerContentWidth)
-              UserDef.kNumPadCharInputBehavior.renderCocoa(fixWidth: innerContentWidth)
+              UserDef.kUpperCaseLetterKeyBehavior.renderCocoa(
+                fixWidth: innerContentWidth,
+                prefUITab: .tabBehavior
+              )
+              UserDef.kNumPadCharInputBehavior.renderCocoa(
+                fixWidth: innerContentWidth,
+                prefUITab: .tabBehavior
+              )
             }?.boxed()
             NSStackView.buildSection(width: innerContentWidth) {
-              UserDef.kSpecifyIntonationKeyBehavior.renderCocoa(fixWidth: innerContentWidth)
-              UserDef.kAcceptLeadingIntonations.renderCocoa(fixWidth: innerContentWidth)
+              UserDef.kSpecifyIntonationKeyBehavior.renderCocoa(
+                fixWidth: innerContentWidth,
+                prefUITab: .tabBehavior
+              )
+              UserDef.kAcceptLeadingIntonations.renderCocoa(
+                fixWidth: innerContentWidth,
+                prefUITab: .tabBehavior
+              )
             }?.boxed()
             NSView()
           }
           NSTabView.TabPage(title: "Ｃ") {
             NSStackView.buildSection(width: innerContentWidth) {
-              UserDef.kMixedAlphanumericalEnabled.renderCocoa(fixWidth: innerContentWidth)
+              UserDef.kMixedAlphanumericalEnabled.renderCocoa(
+                fixWidth: innerContentWidth,
+                prefUITab: .tabBehavior
+              )
             }?.boxed()
             NSStackView.buildSection(width: innerContentWidth) {
-              UserDef.kChooseCandidateUsingSpace.renderCocoa(fixWidth: innerContentWidth)
-              UserDef.kEscToCleanInputBuffer.renderCocoa(fixWidth: innerContentWidth)
-              UserDef.kAlsoConfirmAssociatedCandidatesByEnter.renderCocoa(fixWidth: innerContentWidth)
-              UserDef.kUseSpaceToCommitHighlightedSCPCCandidate.renderCocoa(fixWidth: innerContentWidth)
+              UserDef.kChooseCandidateUsingSpace.renderCocoa(
+                fixWidth: innerContentWidth,
+                prefUITab: .tabBehavior
+              )
+              UserDef.kEscToCleanInputBuffer.renderCocoa(
+                fixWidth: innerContentWidth,
+                prefUITab: .tabBehavior
+              )
+              UserDef.kAlsoConfirmAssociatedCandidatesByEnter.renderCocoa(
+                fixWidth: innerContentWidth,
+                prefUITab: .tabBehavior
+              )
+              UserDef.kUseSpaceToCommitHighlightedSCPCCandidate.renderCocoa(
+                fixWidth: innerContentWidth,
+                prefUITab: .tabBehavior
+              )
             }?.boxed()
             if Date.isTodayTheDate(from: 0_401) {
               NSStackView.buildSection(width: innerContentWidth) {
                 UserDef.kShouldNotFartInLieuOfBeep
-                  .renderCocoa(fixWidth: innerContentWidth) { renderable in
+                  .renderCocoa(
+                    fixWidth: innerContentWidth,
+                    prefUITab: .tabBehavior
+                  ) { renderable in
                     renderable.currentControl?.target = self
                     renderable.currentControl?.action = #selector(self.onFartControlChange(_:))
                   }
@@ -77,18 +125,30 @@ extension SettingsPanesCocoa {
           }
           NSTabView.TabPage(title: "Ｄ") {
             NSStackView.buildSection(width: innerContentWidth) {
-              UserDef.kBypassNonAppleCapsLockHandling.renderCocoa(fixWidth: innerContentWidth)
+              UserDef.kBypassNonAppleCapsLockHandling.renderCocoa(
+                fixWidth: innerContentWidth,
+                prefUITab: .tabBehavior
+              )
               UserDef.kShareAlphanumericalModeStatusAcrossClients
-                .renderCocoa(fixWidth: innerContentWidth)
+                .renderCocoa(
+                  fixWidth: innerContentWidth,
+                  prefUITab: .tabBehavior
+                )
               if #available(macOS 10.15, *) {
                 NSStackView.build(.vertical) {
                   UserDef.kTogglingAlphanumericalModeWithLShift
-                    .renderCocoa(fixWidth: innerContentWidth) { renderable in
+                    .renderCocoa(
+                      fixWidth: innerContentWidth,
+                      prefUITab: .tabBehavior
+                    ) { renderable in
                       renderable.currentControl?.target = self
                       renderable.currentControl?.action = #selector(self.syncShiftKeyUpChecker(_:))
                     }
                   UserDef.kTogglingAlphanumericalModeWithRShift
-                    .renderCocoa(fixWidth: innerContentWidth) { renderable in
+                    .renderCocoa(
+                      fixWidth: innerContentWidth,
+                      prefUITab: .tabBehavior
+                    ) { renderable in
                       renderable.currentControl?.target = self
                       renderable.currentControl?.action = #selector(self.syncShiftKeyUpChecker(_:))
                     }
@@ -102,24 +162,42 @@ extension SettingsPanesCocoa {
                   strOSReq.makeNSLabel(descriptive: true, fixWidth: innerContentWidth)
                 }
               }
-              UserDef.kShiftEisuToggleOffTogetherWithCapsLock.renderCocoa(fixWidth: innerContentWidth)
+              UserDef.kShiftEisuToggleOffTogetherWithCapsLock.renderCocoa(
+                fixWidth: innerContentWidth,
+                prefUITab: .tabBehavior
+              )
             }?.boxed()
             NSView()
           }
           NSTabView.TabPage(title: "Ｅ") {
             NSStackView.buildSection(width: innerContentWidth) {
               if #available(macOS 10.14, *) {
-                UserDef.kSpecifiedNotifyUIColorScheme.renderCocoa(fixWidth: innerContentWidth)
+                UserDef.kSpecifiedNotifyUIColorScheme.renderCocoa(
+                  fixWidth: innerContentWidth,
+                  prefUITab: .tabBehavior
+                )
               }
               if #available(macOS 12, *) {
-                UserDef.kShowNotificationsWhenTogglingCapsLock.renderCocoa(fixWidth: innerContentWidth)
+                UserDef.kShowNotificationsWhenTogglingCapsLock.renderCocoa(
+                  fixWidth: innerContentWidth,
+                  prefUITab: .tabBehavior
+                )
               }
               if #available(macOS 10.15, *) {
-                UserDef.kShowNotificationsWhenTogglingShift.renderCocoa(fixWidth: innerContentWidth)
+                UserDef.kShowNotificationsWhenTogglingShift.renderCocoa(
+                  fixWidth: innerContentWidth,
+                  prefUITab: .tabBehavior
+                )
               }
-              UserDef.kShowNotificationsWhenTogglingEisu.renderCocoa(fixWidth: innerContentWidth)
+              UserDef.kShowNotificationsWhenTogglingEisu.renderCocoa(
+                fixWidth: innerContentWidth,
+                prefUITab: .tabBehavior
+              )
               if #available(macOS 10.13, *) {
-                UserDef.kAlwaysShowTooltipTextsHorizontally.renderCocoa(fixWidth: innerContentWidth)
+                UserDef.kAlwaysShowTooltipTextsHorizontally.renderCocoa(
+                  fixWidth: innerContentWidth,
+                  prefUITab: .tabBehavior
+                )
               }
             }?.boxed()
             NSView()

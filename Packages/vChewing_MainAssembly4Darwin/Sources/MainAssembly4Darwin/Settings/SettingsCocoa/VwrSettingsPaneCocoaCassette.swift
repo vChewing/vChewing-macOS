@@ -34,19 +34,34 @@ extension SettingsPanesCocoa {
     var body: NSView? {
       NSStackView.build(.vertical, insets: .new(all: 14)) {
         NSStackView.buildSection(width: contentWidth) {
-          UserDef.kCassettePath.renderCocoa(fixWidth: contentWidth) { renderable in
+          UserDef.kCassettePath.renderCocoa(
+            fixWidth: contentWidth,
+            prefUITab: .tabCassette
+          ) { renderable in
             renderable.currentControl = self.pctCassetteFilePath
             renderable.mainViewOverride = self.pathControlMainView
           }
-          UserDef.kCassetteEnabled.renderCocoa(fixWidth: contentWidth) { renderable in
+          UserDef.kCassetteEnabled.renderCocoa(
+            fixWidth: contentWidth,
+            prefUITab: .tabCassette
+          ) { renderable in
             renderable.currentControl?.target = self
             renderable.currentControl?.action = #selector(self.cassetteEnabledToggled(_:))
           }
         }?.boxed()
         NSStackView.buildSection(width: contentWidth) {
-          UserDef.kAutoCompositeWithLongestPossibleCassetteKey.renderCocoa(fixWidth: contentWidth)
-          UserDef.kShowTranslatedStrokesInCompositionBuffer.renderCocoa(fixWidth: contentWidth)
-          UserDef.kForceCassetteChineseConversion.renderCocoa(fixWidth: contentWidth)
+          UserDef.kAutoCompositeWithLongestPossibleCassetteKey.renderCocoa(
+            fixWidth: contentWidth,
+            prefUITab: .tabCassette
+          )
+          UserDef.kShowTranslatedStrokesInCompositionBuffer.renderCocoa(
+            fixWidth: contentWidth,
+            prefUITab: .tabCassette
+          )
+          UserDef.kForceCassetteChineseConversion.renderCocoa(
+            fixWidth: contentWidth,
+            prefUITab: .tabCassette
+          )
         }?.boxed()
         NSView().makeSimpleConstraint(.height, relation: .equal, value: NSFont.systemFontSize)
       }

@@ -37,22 +37,40 @@ extension SettingsPanesCocoa {
         NSTabView.build {
           NSTabView.TabPage(title: "Ａ") {
             NSStackView.buildSection(width: innerContentWidth) {
-              UserDef.kSecurityHardenedCompositionBuffer.renderCocoa(fixWidth: innerContentWidth)
-              UserDef.kAlwaysUsePCBWithElectronBasedClients.renderCocoa(fixWidth: innerContentWidth)
+              UserDef.kSecurityHardenedCompositionBuffer.renderCocoa(
+                fixWidth: innerContentWidth,
+                prefUITab: .tabDevZone
+              )
+              UserDef.kAlwaysUsePCBWithElectronBasedClients.renderCocoa(
+                fixWidth: innerContentWidth,
+                prefUITab: .tabDevZone
+              )
               UserDef.kDisableSegmentedThickUnderlineInMarkingModeForManagedClients
-                .renderCocoa(fixWidth: innerContentWidth)
+                .renderCocoa(
+                  fixWidth: innerContentWidth,
+                  prefUITab: .tabDevZone
+                )
             }?.boxed()
             NSView()
           }
           NSTabView.TabPage(title: "Ｂ") {
             NSStackView.buildSection(width: innerContentWidth) {
-              UserDef.kCheckAbusersOfSecureEventInputAPI.renderCocoa(fixWidth: innerContentWidth)
+              UserDef.kCheckAbusersOfSecureEventInputAPI.renderCocoa(
+                fixWidth: innerContentWidth,
+                prefUITab: .tabDevZone
+              )
             }?.boxed()
             NSStackView.buildSection(width: innerContentWidth) {
-              UserDef.kUserPhrasesDatabaseBypassed.renderCocoa(fixWidth: innerContentWidth)
+              UserDef.kUserPhrasesDatabaseBypassed.renderCocoa(
+                fixWidth: innerContentWidth,
+                prefUITab: .tabDevZone
+              )
             }?.boxed()
             NSStackView.buildSection(width: innerContentWidth) {
-              UserDef.kAllowRescoringSingleKanjiCandidates.renderCocoa(fixWidth: innerContentWidth)
+              UserDef.kAllowRescoringSingleKanjiCandidates.renderCocoa(
+                fixWidth: innerContentWidth,
+                prefUITab: .tabDevZone
+              )
             }?.boxed()
             NSView()
           }

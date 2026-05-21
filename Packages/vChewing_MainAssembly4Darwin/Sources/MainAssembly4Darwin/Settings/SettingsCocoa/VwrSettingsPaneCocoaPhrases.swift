@@ -137,7 +137,10 @@ extension SettingsPanesCocoa {
               btnPEAdd
             }
             UserDef.kPhraseEditorAutoReloadExternalModifications
-              .renderCocoa(fixWidth: contentWidth) { renderable in
+              .renderCocoa(
+                fixWidth: contentWidth,
+                prefUITab: .tabPhrases
+              ) { renderable in
                 renderable.tinySize = true
               }
           }

@@ -164,6 +164,7 @@
 "i18n:Menu.PushCursorAfterSelection" = "在選字後將游標置於該字詞的前方";
 "i18n:Menu.RebootVChewing" = "重新啟動輸入法…";
 "i18n:Menu.ReloadUserPhrases" = "重載自訂語彙";
+"i18n:Menu.SearchPreferences" = "搜尋偏好設定…";
 "i18n:Menu.ServiceMenu" = "服務選單";
 "i18n:Menu.ServiceMenuEditor" = "服務選單編輯器";
 "i18n:Menu.SymbolEmojiInput" = "符號＆繪文字輸入";
@@ -233,9 +234,12 @@
 "i18n:settings.importFromKimoTxt.finishedCount:%@%@" = "已從總共 %@ 筆資料中成功匯入 %@ 筆新資料。";
 "i18n:settings.importFromKimoTxt.label" = "匯入奇摩輸入法自訂詞資料庫";
 "i18n:settings.importFromKimoTxt.postOpsNotice" = "其餘尚未匯入的資料可能是已有的記錄、或記錄本身不合理。若您想把全部資料完整導出為獨立文字檔，建議改用 KeyKeyUserDBKit（GitHub 倉庫: vChewing/KeyKeyUserDBKit）來操作。";
+"i18n:Settings.NoSearchResults" = "找不到符合的設定項目。";
 "i18n:Settings.OnlyLoadFactoryLanguageModels" = "按需載入簡繁體模式的原廠辭典資料";
 "i18n:Settings.OptionAuto" = "與系統設定一致";
 "i18n:Settings.OptionsMovedToOtherTabs" = "該頁面某些先前曾經有過的選項已被移往其它頁籤。";
+"i18n:Settings.SearchCurrentPage" = "搜尋當前頁面";
+"i18n:Settings.SearchPrompt" = "輸入關鍵字以搜尋偏好設定…";
 "i18n:Settings.SectionExperimental" = "實驗性:";
 "i18n:Settings.SectionKeyboardShortcuts" = "鍵盤熱鍵:";
 "i18n:Settings.SectionMiscSettings" = "雜項:";

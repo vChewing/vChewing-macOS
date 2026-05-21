@@ -164,6 +164,7 @@
 "i18n:Menu.PushCursorAfterSelection" = "Push the cursor in front of the phrase after selection";
 "i18n:Menu.RebootVChewing" = "Reboot vChewing…";
 "i18n:Menu.ReloadUserPhrases" = "Reload User Phrases";
+"i18n:Menu.SearchPreferences" = "Search Preferences…";
 "i18n:Menu.ServiceMenu" = "Service Menu";
 "i18n:Menu.ServiceMenuEditor" = "Service Menu Editor";
 "i18n:Menu.SymbolEmojiInput" = "Symbol & Emoji Input";
@@ -233,9 +234,12 @@
 "i18n:settings.importFromKimoTxt.finishedCount:%@%@" = "Found %@ entries. %@ new records imported.";
 "i18n:settings.importFromKimoTxt.label" = "Import Yahoo! KeyKey User Dictionary file";
 "i18n:settings.importFromKimoTxt.postOpsNotice" = "Other entires are either already-in-database or have validity problems. If you want to dump all data to a dedicated text file, you may want to use KeyKeyUserDBKit (GitHub Repository `vChewing/KeyKeyUserDBKit`) instead.";
+"i18n:Settings.NoSearchResults" = "No matching settings found.";
 "i18n:Settings.OnlyLoadFactoryLanguageModels" = "Only load factory language models if needed";
 "i18n:Settings.OptionAuto" = "Follow System Settings";
 "i18n:Settings.OptionsMovedToOtherTabs" = "Some previous options are moved to other tabs.";
+"i18n:Settings.SearchCurrentPage" = "Search Current Page";
+"i18n:Settings.SearchPrompt" = "Type to search preferences…";
 "i18n:Settings.SectionExperimental" = "Experimental:";
 "i18n:Settings.SectionKeyboardShortcuts" = "Keyboard Shortcuts:";
 "i18n:Settings.SectionMiscSettings" = "Misc Settings:";

@@ -45,24 +45,51 @@ extension SettingsPanesCocoa {
           strNotice += "\n\u{2022} "
           strNotice += "i18n:InfoMessage.DeleteKeyNote".i18n
           strNotice.makeNSLabel(descriptive: true, fixWidth: contentWidth)
-          UserDef.kAppleLanguages.renderCocoa(fixWidth: contentWidth) { renderable in
+          UserDef.kAppleLanguages.renderCocoa(
+            fixWidth: contentWidth,
+            prefUITab: .tabGeneral
+          ) { renderable in
             renderable.currentControl = self.btnLangSelector
           }
         }?.boxed()
         NSStackView.buildSection(width: contentWidth) {
-          UserDef.kReadingNarrationCoverage.renderCocoa(fixWidth: contentWidth) { renderable in
+          UserDef.kReadingNarrationCoverage.renderCocoa(
+            fixWidth: contentWidth,
+            prefUITab: .tabGeneral
+          ) { renderable in
             renderable.currentControl?.target = self
             renderable.currentControl?.action = #selector(self.updateNarratorSettingsAction(_:))
           }
-          UserDef.kAutoCorrectReadingCombination.renderCocoa(fixWidth: contentWidth)
-          UserDef.kShowHanyuPinyinInCompositionBuffer.renderCocoa(fixWidth: contentWidth)
-          UserDef.kKeepReadingUponCompositionError.renderCocoa(fixWidth: contentWidth)
-          UserDef.kClassicHaninKeyboardSymbolModeShortcutEnabled.renderCocoa(fixWidth: contentWidth)
-          UserDef.kUseSCPCTypingMode.renderCocoa(fixWidth: contentWidth)
+          UserDef.kAutoCorrectReadingCombination.renderCocoa(
+            fixWidth: contentWidth,
+            prefUITab: .tabGeneral
+          )
+          UserDef.kShowHanyuPinyinInCompositionBuffer.renderCocoa(
+            fixWidth: contentWidth,
+            prefUITab: .tabGeneral
+          )
+          UserDef.kKeepReadingUponCompositionError.renderCocoa(
+            fixWidth: contentWidth,
+            prefUITab: .tabGeneral
+          )
+          UserDef.kClassicHaninKeyboardSymbolModeShortcutEnabled.renderCocoa(
+            fixWidth: contentWidth,
+            prefUITab: .tabGeneral
+          )
+          UserDef.kUseSCPCTypingMode.renderCocoa(
+            fixWidth: contentWidth,
+            prefUITab: .tabGeneral
+          )
         }?.boxed()
         NSStackView.buildSection(.horizontal, width: contentWidth) {
-          UserDef.kCheckUpdateAutomatically.renderCocoa(fixWidth: contentHalfWidth)
-          UserDef.kIsDebugModeEnabled.renderCocoa(fixWidth: contentHalfWidth)
+          UserDef.kCheckUpdateAutomatically.renderCocoa(
+            fixWidth: contentHalfWidth,
+            prefUITab: .tabGeneral
+          )
+          UserDef.kIsDebugModeEnabled.renderCocoa(
+            fixWidth: contentHalfWidth,
+            prefUITab: .tabGeneral
+          )
         }?.boxed()
         NSView().makeSimpleConstraint(.height, relation: .equal, value: NSFont.systemFontSize)
       }

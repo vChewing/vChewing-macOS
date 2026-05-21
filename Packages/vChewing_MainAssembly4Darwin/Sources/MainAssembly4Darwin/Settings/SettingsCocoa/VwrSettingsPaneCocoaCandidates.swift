@@ -32,64 +32,125 @@ extension SettingsPanesCocoa {
         NSTabView.build {
           NSTabView.TabPage(title: "Ａ") {
             NSStackView.buildSection(width: innerContentWidth) {
-              UserDef.kUseHorizontalCandidateList.renderCocoa(fixWidth: innerContentWidth)
-              UserDef.kCandidateListTextSize.renderCocoa(fixWidth: innerContentWidth) { renderable in
-                renderable.currentControl?.target = self
-                renderable.currentControl?.action = #selector(self.candidateFontSizeDidSet(_:))
-              }
-              UserDef.kCandidateWindowShowOnlyOneLine.renderCocoa(fixWidth: innerContentWidth)
-              UserDef.kEnableCandidateWindowAnimation.renderCocoa(fixWidth: innerContentWidth)
-              UserDef.kAlwaysExpandCandidateWindow.renderCocoa(fixWidth: innerContentWidth)
-              UserDef.kMinCellWidthForHorizontalMatrix.renderCocoa(fixWidth: innerContentWidth)
+              UserDef.kUseHorizontalCandidateList.renderCocoa(
+                fixWidth: innerContentWidth,
+                prefUITab: .tabCandidates
+              )
+              UserDef.kCandidateListTextSize
+                .renderCocoa(
+                  fixWidth: innerContentWidth,
+                  prefUITab: .tabCandidates
+                ) { renderable in
+                  renderable.currentControl?.target = self
+                  renderable.currentControl?.action = #selector(self.candidateFontSizeDidSet(_:))
+                }
+              UserDef.kCandidateWindowShowOnlyOneLine.renderCocoa(
+                fixWidth: innerContentWidth,
+                prefUITab: .tabCandidates
+              )
+              UserDef.kEnableCandidateWindowAnimation.renderCocoa(
+                fixWidth: innerContentWidth,
+                prefUITab: .tabCandidates
+              )
+              UserDef.kAlwaysExpandCandidateWindow.renderCocoa(
+                fixWidth: innerContentWidth,
+                prefUITab: .tabCandidates
+              )
+              UserDef.kMinCellWidthForHorizontalMatrix.renderCocoa(
+                fixWidth: innerContentWidth,
+                prefUITab: .tabCandidates
+              )
             }?.boxed()
             NSView()
           }
           NSTabView.TabPage(title: "Ｂ") {
             NSStackView.buildSection(width: innerContentWidth) {
-              UserDef.kCandidateKeys.renderCocoa(fixWidth: innerContentWidth) { renderable in
+              UserDef.kCandidateKeys.renderCocoa(
+                fixWidth: innerContentWidth,
+                prefUITab: .tabCandidates
+              ) { renderable in
                 renderable.currentControl?.target = self
                 renderable.currentControl?.action = #selector(self.candidateKeysDidSet(_:))
                 renderable.currentControl?.alignment = .right
               }
-              UserDef.kUseRearCursorMode.renderCocoa(fixWidth: innerContentWidth)
-              UserDef.kCursorPlacementAfterSelectingCandidate.renderCocoa(fixWidth: innerContentWidth)
+              UserDef.kUseRearCursorMode.renderCocoa(
+                fixWidth: innerContentWidth,
+                prefUITab: .tabCandidates
+              )
+              UserDef.kCursorPlacementAfterSelectingCandidate.renderCocoa(
+                fixWidth: innerContentWidth,
+                prefUITab: .tabCandidates
+              )
             }?.boxed()
             NSStackView.buildSection(width: innerContentWidth) {
-              UserDef.kShowCodePointInCandidateUI.renderCocoa(fixWidth: innerContentWidth)
-              UserDef.kShowReverseLookupInCandidateUI.renderCocoa(fixWidth: innerContentWidth)
-              UserDef.kUseFixedCandidateOrderOnSelection.renderCocoa(fixWidth: innerContentWidth)
+              UserDef.kShowCodePointInCandidateUI.renderCocoa(
+                fixWidth: innerContentWidth,
+                prefUITab: .tabCandidates
+              )
+              UserDef.kShowReverseLookupInCandidateUI.renderCocoa(
+                fixWidth: innerContentWidth,
+                prefUITab: .tabCandidates
+              )
+              UserDef.kUseFixedCandidateOrderOnSelection.renderCocoa(
+                fixWidth: innerContentWidth,
+                prefUITab: .tabCandidates
+              )
             }?.boxed()
             NSView()
           }
           NSTabView.TabPage(title: "Ｃ") {
             NSStackView.buildSection(width: innerContentWidth) {
-              UserDef.kUseDynamicCandidateWindowOrigin.renderCocoa(fixWidth: innerContentWidth)
-              UserDef.kDodgeInvalidEdgeCandidateCursorPosition.renderCocoa(fixWidth: innerContentWidth)
+              UserDef.kUseDynamicCandidateWindowOrigin.renderCocoa(
+                fixWidth: innerContentWidth,
+                prefUITab: .tabCandidates
+              )
+              UserDef.kDodgeInvalidEdgeCandidateCursorPosition.renderCocoa(
+                fixWidth: innerContentWidth,
+                prefUITab: .tabCandidates
+              )
               UserDef.kCandidateStateJKHLBehavior
-                .renderCocoa(fixWidth: innerContentWidth) { renderable in
+                .renderCocoa(
+                  fixWidth: innerContentWidth,
+                  prefUITab: .tabCandidates
+                ) { renderable in
                   renderable.currentControl?.target = self
                   renderable.currentControl?
                     .action = #selector(self.performCandidateKeysSanityCheck(_:))
                 }
               UserDef.kUseShiftQuestionToCallServiceMenu
-                .renderCocoa(fixWidth: innerContentWidth) { renderable in
+                .renderCocoa(
+                  fixWidth: innerContentWidth,
+                  prefUITab: .tabCandidates
+                ) { renderable in
                   renderable.currentControl?.target = self
                   renderable.currentControl?
                     .action = #selector(self.performCandidateKeysSanityCheck(_:))
                 }
             }?.boxed()
             NSStackView.buildSection(width: innerContentWidth) {
-              UserDef.kCandidateNarrationToggleType.renderCocoa(fixWidth: innerContentWidth)
+              UserDef.kCandidateNarrationToggleType.renderCocoa(
+                fixWidth: innerContentWidth,
+                prefUITab: .tabCandidates
+              )
             }?.boxed()
             NSView()
           }
           NSTabView.TabPage(title: "Ｄ") {
             NSStackView.buildSection(width: innerContentWidth) {
-              UserDef.kConsolidateContextOnCandidateSelection.renderCocoa(fixWidth: innerContentWidth)
+              UserDef.kConsolidateContextOnCandidateSelection.renderCocoa(
+                fixWidth: innerContentWidth,
+                prefUITab: .tabCandidates
+              )
             }?.boxed()
             NSStackView.buildSection(width: innerContentWidth) {
-              UserDef.kEnableMouseScrollingForTDKCandidatesCocoa.renderCocoa(fixWidth: innerContentWidth)
-              UserDef.kRespectClientAccentColor.renderCocoa(fixWidth: innerContentWidth)
+              UserDef.kEnableMouseScrollingForTDKCandidatesCocoa.renderCocoa(
+                fixWidth: innerContentWidth,
+                prefUITab: .tabCandidates
+              )
+              UserDef.kRespectClientAccentColor.renderCocoa(
+                fixWidth: innerContentWidth,
+                prefUITab: .tabCandidates
+              )
             }?.boxed()
             NSStackView.buildSection(width: innerContentWidth) {
               NSStackView.build(.horizontal) {

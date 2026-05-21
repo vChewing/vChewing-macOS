@@ -47,9 +47,18 @@ extension SettingsPanesCocoa {
               action: #selector(quickSetupButtonHanyuPinyin(_:))
             )
           }
-          UserDef.kKeyboardParser.renderCocoa(fixWidth: contentWidth)
-          UserDef.kBasicKeyboardLayout.renderCocoa(fixWidth: contentWidth)
-          UserDef.kAlphanumericalKeyboardLayout.renderCocoa(fixWidth: contentWidth)
+          UserDef.kKeyboardParser.renderCocoa(
+            fixWidth: contentWidth,
+            prefUITab: .tabKeyboard
+          )
+          UserDef.kBasicKeyboardLayout.renderCocoa(
+            fixWidth: contentWidth,
+            prefUITab: .tabKeyboard
+          )
+          UserDef.kAlphanumericalKeyboardLayout.renderCocoa(
+            fixWidth: contentWidth,
+            prefUITab: .tabKeyboard
+          )
         }?.boxed()
         NSStackView.build(.horizontal, insets: .new(all: 4, left: 16, right: 16)) {
           "i18n:Settings.SectionKeyboardShortcuts".i18n.makeNSLabel(fixWidth: contentWidth)
@@ -57,18 +66,48 @@ extension SettingsPanesCocoa {
         }
         NSStackView.buildSection(.horizontal, width: contentWidth) {
           NSStackView.build(.vertical) {
-            UserDef.kUsingHotKeySCPC.renderCocoa(fixWidth: contentHalfWidth)
-            UserDef.kUsingHotKeyAssociates.renderCocoa(fixWidth: contentHalfWidth)
-            UserDef.kUsingHotKeyCNS.renderCocoa(fixWidth: contentHalfWidth)
-            UserDef.kUsingHotKeyKangXi.renderCocoa(fixWidth: contentHalfWidth)
-            UserDef.kUsingHotKeyRevLookup.renderCocoa(fixWidth: contentHalfWidth)
+            UserDef.kUsingHotKeySCPC.renderCocoa(
+              fixWidth: contentHalfWidth,
+              prefUITab: .tabKeyboard
+            )
+            UserDef.kUsingHotKeyAssociates.renderCocoa(
+              fixWidth: contentHalfWidth,
+              prefUITab: .tabKeyboard
+            )
+            UserDef.kUsingHotKeyCNS.renderCocoa(
+              fixWidth: contentHalfWidth,
+              prefUITab: .tabKeyboard
+            )
+            UserDef.kUsingHotKeyKangXi.renderCocoa(
+              fixWidth: contentHalfWidth,
+              prefUITab: .tabKeyboard
+            )
+            UserDef.kUsingHotKeyRevLookup.renderCocoa(
+              fixWidth: contentHalfWidth,
+              prefUITab: .tabKeyboard
+            )
           }
           NSStackView.build(.vertical) {
-            UserDef.kUsingHotKeyJIS.renderCocoa(fixWidth: contentHalfWidth)
-            UserDef.kUsingHotKeyHalfWidthASCII.renderCocoa(fixWidth: contentHalfWidth)
-            UserDef.kUsingHotKeyCurrencyNumerals.renderCocoa(fixWidth: contentHalfWidth)
-            UserDef.kUsingHotKeyCassette.renderCocoa(fixWidth: contentHalfWidth)
-            UserDef.kUsingHotKeyInputMode.renderCocoa(fixWidth: contentHalfWidth)
+            UserDef.kUsingHotKeyJIS.renderCocoa(
+              fixWidth: contentHalfWidth,
+              prefUITab: .tabKeyboard
+            )
+            UserDef.kUsingHotKeyHalfWidthASCII.renderCocoa(
+              fixWidth: contentHalfWidth,
+              prefUITab: .tabKeyboard
+            )
+            UserDef.kUsingHotKeyCurrencyNumerals.renderCocoa(
+              fixWidth: contentHalfWidth,
+              prefUITab: .tabKeyboard
+            )
+            UserDef.kUsingHotKeyCassette.renderCocoa(
+              fixWidth: contentHalfWidth,
+              prefUITab: .tabKeyboard
+            )
+            UserDef.kUsingHotKeyInputMode.renderCocoa(
+              fixWidth: contentHalfWidth,
+              prefUITab: .tabKeyboard
+            )
           }
         }?.boxed()
         NSView().makeSimpleConstraint(.height, relation: .equal, value: NSFont.systemFontSize)
