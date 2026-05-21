@@ -320,6 +320,7 @@
 "i18n:UserDef.kAlwaysShowTooltipTextsHorizontally.shortTitle" = "ヒントを常に横書きにする";
 "i18n:UserDef.kAlwaysUsePCBWithElectronBasedClients.description" = "ほとんどの「Electron で構築したアプリ」は IMKTextInput API の実作についての支障があり、その実作した API の挙動は予測できなくて、バグ退治もとても困難だと考えられています。このようなアプリの開発者たちにもそれぞれの原因でこのような支障を解決する策も動力も極めて少ないと認識されております。故に、このスイッチの最初値はONにしました。";
 "i18n:UserDef.kAlwaysUsePCBWithElectronBasedClients.shortTitle" = "Electron で構築した全ての客体アプリに「吹き出し入力緩衝列ウィンドウ」を強制的に起用";
+"i18n:UserDef.kAppleLanguages.description" = "アプリ表示用言語をご指定下さい、そして入力アプリは自動的に再起動。";
 "i18n:UserDef.kAppleLanguages.shortTitle" = "表示用言語:";
 "i18n:UserDef.kAutoCompositeWithLongestPossibleCassetteKey.shortTitle" = "最長可能キーができた場合、文字を組み立つ";
 "i18n:UserDef.kAutoCorrectReadingCombination.description" = "互換性のため、中英混在入力のフォールバックがONの場合、この機能は不作動。";
@@ -400,7 +401,7 @@
 "i18n:UserDef.kForceCassetteChineseConversion.option.1" = "カセットモードによる漢字出力の簡体繁体転換を常に行う";
 "i18n:UserDef.kForceCassetteChineseConversion.option.2" = "簡体モードだけの場合、カセットモードの漢字出力転換を";
 "i18n:UserDef.kForceCassetteChineseConversion.option.3" = "繁体モードだけの場合、カセットモードの漢字出力転換を";
-"i18n:UserDef.kForceCassetteChineseConversion.shortTitle" = "繁体字・簡体字変換:";"i18n:UserDef.kAppleLanguages.description" = "アプリ表示用言語をご指定下さい、そして入力アプリは自動的に再起動。";
+"i18n:UserDef.kForceCassetteChineseConversion.shortTitle" = "繁体字・簡体字変換:";
 "i18n:UserDef.kHalfWidthPunctuationEnabled.shortTitle" = "半角句読点を起用する";
 "i18n:UserDef.kHardenVerticalPunctuations.description" = "⚠︎ 該当の組版用フォントには縦書き（引用符・括弧）変換機能が備えていない限り、この機能を使う甲斐がある。一旦使うと、入力した全ての引用符・括弧は永遠的に縦書きの様式になる。例え入力を受けているアプリ（例えばワープロソフとなど）の書写方向は横書きと変えたとしても、これらの入力済みの引用符・括弧は全て縦書きの見た目であり、削除してから入力し直す必要になる。";
 "i18n:UserDef.kHardenVerticalPunctuations.shortTitle" = "縦書きの時に、引用符・括弧などを強制的に縦書き文字と変換する（不推奨）";
@@ -539,4 +540,3 @@
 "i18n:UserDef.kUsingHotKeyKangXi.shortTitle" = "康熙文字変換モード";
 "i18n:UserDef.kUsingHotKeyRevLookup.shortTitle" = "CIN カセットモード";
 "i18n:UserDef.kUsingHotKeySCPC.shortTitle" = "全候補入力モード";
-// MARK: - DevZone JSON Preferences Exchange
