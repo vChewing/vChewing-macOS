@@ -267,8 +267,8 @@ extension SettingsPanesCocoa.Phrases: NSTextViewDelegate, NSTextFieldDelegate {
     // InputMode combobox.
     cmbPEInputModeMenu.menu?.removeAllItems()
     cmbPEInputModeMenu.menu?.appendItems {
-      NSMenu.Item("i18n:LanguageName.LocaleCodeZHHans".i18n)?.tag(0).represent(Shared.InputMode.imeModeCHS)
-      NSMenu.Item("i18n:LanguageName.LocaleCodeZHHant".i18n)?.tag(1).represent(Shared.InputMode.imeModeCHT)
+      NSMenu.Item("i18n:LanguageName.LocaleCodeZHHans")?.tag(0).represent(Shared.InputMode.imeModeCHS)
+      NSMenu.Item("i18n:LanguageName.LocaleCodeZHHant")?.tag(1).represent(Shared.InputMode.imeModeCHT)
     }
     let toSelect = cmbPEInputModeMenu.menu?.items.first {
       $0.representedObject as? Shared.InputMode == IMEApp.currentInputMode
