@@ -360,7 +360,7 @@
 "i18n:UserDef.kCassetteEnabled.description" = "磁带模式类似于雅虎奇摩输入法的 CIN 支援模式，允许使用者借由 CIN 表格档案扩充自己想要的笔画输入法（比如五笔、仓颉、呒虾米，等）。然而，因为唯音不打算为了这个功能而牺牲注音输入的体验，所以这个磁带模式的体验对于已经习惯 RIME 或者 OpenVanilla 的人群而言可能会稍微麻烦一些。";
 "i18n:UserDef.kCassetteEnabled.shortTitle" = "启用磁带模式，会停用注音输入";
 "i18n:UserDef.kCassettePath.description" = "请指定您要使用的 CIN 磁带档案。无效值会被忽略。\n\n⚠️💀 请避免使用由 iCloud 代管的“Documents”与“Desktop”目录。这些位置的 sandbox bookmark 可能会在重新开机或系统更新后失效。必要时请先把档案移到本机资料夹。";
-"i18n:UserDef.kCassettePath.shortTitle" = "Cassette file path";
+"i18n:UserDef.kCassettePath.shortTitle" = "磁带档案路径";
 "i18n:UserDef.kCheckAbusersOfSecureEventInputAPI.description" = "这种滥用会导致系统内的所有第三方输入法全都无法正常使用（在输入法选单内会变成灰色）。针对需要填写敏感资料的场合，使用 SecureEventInput 无可厚非。但是，用 EnableSecureEventInput() 开启该模式之后，就有义务在输入窗格失焦的那一刻呼叫 DisableSecureEventInput() 来结束这种状态。这种状态还常见于后台辅助 App 当中、或者某个 App 在叫出该模式之后失去回应（这样的话，哪怕被切换到后台，SecureEventInput 也不会自动解除）。";
 "i18n:UserDef.kCheckAbusersOfSecureEventInputAPI.shortTitle" = "主动侦测正在滥用 SecureEventInput API 的后台执行绪";
 "i18n:UserDef.kCheckUpdateAutomatically.shortTitle" = "自动检查软体更新";
@@ -371,7 +371,7 @@
 "i18n:UserDef.kCNS11643Enabled.shortTitle" = "启用 CNS11643 全字库支援 (2026-05-06)";
 "i18n:UserDef.kConsolidateContextOnCandidateSelection.description" = "打比方说，你敲了「章太炎」，你想将「太」改成「泰」。这个操作的作业索引范围是开闭区间 [1,2)，会切到「章太炎」这个节点的所在索引范围 [0,3)。如果没有事前巩固处理的话，这个词会在你选字之后变成诸如「张泰言」这种你不想要的自动选字结果。当且仅当你启用了这个巩固功能的前提下，你选字之后的结果才会是「章泰炎」这种你想要的结果。";
 "i18n:UserDef.kConsolidateContextOnCandidateSelection.shortTitle" = "在使用选字窗选字时，自动巩固上下文";
-"i18n:UserDef.kCurrencyNumeralsEnabled.shortTitle" = "Enable currency numerals output";
+"i18n:UserDef.kCurrencyNumeralsEnabled.shortTitle" = "启用货币数字输出";
 "i18n:UserDef.kCursorPlacementAfterSelectingCandidate.description" = "此设定用来指定候选字在选字窗内被确认后，游标应该位于何处。请注意，「呼出选字窗之前的游标位置」指的是选字窗出现前所记录的游标位置。如果选择向前推进一格，实际推进的距离会因您偏好的选字游标操作样式而有所不同。";
 "i18n:UserDef.kCursorPlacementAfterSelectingCandidate.option.0" = "不调整";
 "i18n:UserDef.kCursorPlacementAfterSelectingCandidate.option.1" = "向前推进一格";
@@ -398,7 +398,7 @@
 "i18n:UserDef.kForceCassetteChineseConversion.option.2" = "仅在简体模式转换至简体";
 "i18n:UserDef.kForceCassetteChineseConversion.option.3" = "仅在繁体模式转换至繁体";
 "i18n:UserDef.kForceCassetteChineseConversion.shortTitle" = "繁简转换:";
-"i18n:UserDef.kHalfWidthPunctuationEnabled.shortTitle" = "Enable half-width punctuations";
+"i18n:UserDef.kHalfWidthPunctuationEnabled.shortTitle" = "启用半形标点";
 "i18n:UserDef.kHardenVerticalPunctuations.description" = "⚠︎ 该功能当且仅当目前的排版字型不支援纵排标点动态显示转义的情况下才有用。一旦使用了，所有敲出去的标点都会被永久转换为静态纵排标点：哪怕当前编辑器的排版模式已经改成横排，这些已经输入的标点也都还是纵排标点字元。";
 "i18n:UserDef.kHardenVerticalPunctuations.shortTitle" = "在纵排书写时，强制转换标点为纵排形式（不推荐）";
 "i18n:UserDef.kInlineDumpPinyinInLieuOfZhuyin.description" = "借由 Command+Option+Ctrl+Enter 输出的内容受对应的行为设定所影响。";
@@ -515,7 +515,7 @@
 "i18n:UserDef.kUseHorizontalCandidateList.option.1" = "横向布局";
 "i18n:UserDef.kUseHorizontalCandidateList.shortTitle" = "候选字窗布局:";
 "i18n:UserDef.kUserDataFolderSpecified.description" = "请指定您要使用的使用者语汇资料夹。无效值会被忽略。\n\n⚠️💀 请避免使用由 iCloud 代管的“Documents”与“Desktop”目录。这些位置的 sandbox bookmark 可能会在重新开机或系统更新后失效。如有疑惑者，请洽 Apple Support。";
-"i18n:UserDef.kUserDataFolderSpecified.shortTitle" = "User data folder path";
+"i18n:UserDef.kUserDataFolderSpecified.shortTitle" = "使用者资料夹路径";
 "i18n:UserDef.kUseRearCursorMode.description" = "请选择用以触发选字的游标相对位置。";
 "i18n:UserDef.kUseRearCursorMode.option.0" = "将游标置于词语前方 // macOS 内建注音风格";
 "i18n:UserDef.kUseRearCursorMode.option.1" = "将游标置于词语后方 // Windows 微软新注音风格";

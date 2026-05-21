@@ -359,7 +359,7 @@
 "i18n:UserDef.kCassetteEnabled.description" = "カセットモードは、CIN ファイルを用いて、（五筆や倉頡や嘸蝦米などのような）筆画入力を機能拡張できるモードである。ですが、単なる予備機能として提供したもののため、使いやすいかどうか、RIME や OpenVanilla などに比べられないかもしれん。";
 "i18n:UserDef.kCassetteEnabled.shortTitle" = "カセットモードを起用（注音入力はこのモードで使えぬ）";
 "i18n:UserDef.kCassettePath.description" = "使いたい CIN カセットファイルをご指定ください。無効な設定は無視されます。\n\n⚠️💀 iCloud で管理されている「Documents」と「Desktop」は避けてください。これらの sandbox bookmark は、再起動やシステム更新の後で再利用できなくなることがあります。必要なら、先にローカルフォルダへ移動してください。";
-"i18n:UserDef.kCassettePath.shortTitle" = "Cassette file path";
+"i18n:UserDef.kCassettePath.shortTitle" = "カセットファイルの指定";
 "i18n:UserDef.kCheckAbusersOfSecureEventInputAPI.description" = "このような不正利用は「システム内蔵入力以外の全ての入力アプリがメニューで灰色状態で選べなくて使えない」の元凶である。センシティブな資料の記入どころでSecureEventInputをEnableSecureEventInput()で使うのは当然であるが、「入力中」状態が終わった後必ずDisableSecureEventInput()で状態解消すべきだと義務である。いくつかヘルパーアプリも、あるいはSecureEventInputを呼び起こしてからすぐ固まったアプリも、この状態になりやすい。特に、他のアプリの画面へ切り替えたとしても、固まったアプリのSecureEventInput状態は自動的に解消できぬ。";
 "i18n:UserDef.kCheckAbusersOfSecureEventInputAPI.shortTitle" = "SecureEventInput API を不正利用しているバクグラウンド・プロセスを自動検知";
 "i18n:UserDef.kCheckUpdateAutomatically.shortTitle" = "アプリの更新通知を受く";
@@ -370,7 +370,7 @@
 "i18n:UserDef.kCNS11643Enabled.shortTitle" = "全字庫モード // 入力可能な漢字数を倍増す (2026-05-06)";
 "i18n:UserDef.kConsolidateContextOnCandidateSelection.description" = "例えば、入力緩衝列には「章太炎」という節点があり、その範囲は [0,3) である。もし、「太」を「泰」にしたいのなら、今回の作業範囲は [1,2) で、「章太炎」の範囲と重ねてしまう。この場合、もし、事前強固措置がなければ、今回の作業でこの単語は「張泰言」のような望ましくない変換結果になってしまう。事前強固措置があるからこそ、「章泰炎」のような正確な作業結果の保証である。";
 "i18n:UserDef.kConsolidateContextOnCandidateSelection.shortTitle" = "候補陳列ウィンドウで候補を選ぶ時に文脈を強固する";
-"i18n:UserDef.kCurrencyNumeralsEnabled.shortTitle" = "Enable currency numerals output";
+"i18n:UserDef.kCurrencyNumeralsEnabled.shortTitle" = "貨幣数字の出力を起用する";
 "i18n:UserDef.kCursorPlacementAfterSelectingCandidate.description" = "候補陳列ウィンドウで候補を確定した後のカーソル位置を指定します。なお、「候補陳列ウィンドウ呼び出し前のカーソル位置」とは、候補陳列ウィンドウが表示される直前に記録されたカーソル位置を意味します。前方へ一歩進める設定を選んだ場合、その歩幅はお好みのカーソル候補呼出操作スタイルによって変わる場合がございます。";
 "i18n:UserDef.kCursorPlacementAfterSelectingCandidate.option.0" = "調整しない";
 "i18n:UserDef.kCursorPlacementAfterSelectingCandidate.option.1" = "前へ一歩進める";
@@ -397,7 +397,7 @@
 "i18n:UserDef.kForceCassetteChineseConversion.option.2" = "簡体モードだけの場合、カセットモードの漢字出力転換を";
 "i18n:UserDef.kForceCassetteChineseConversion.option.3" = "繁体モードだけの場合、カセットモードの漢字出力転換を";
 "i18n:UserDef.kForceCassetteChineseConversion.shortTitle" = "繁体字・簡体字変換:";"i18n:UserDef.kAppleLanguages.description" = "アプリ表示用言語をご指定下さい、そして入力アプリは自動的に再起動。";
-"i18n:UserDef.kHalfWidthPunctuationEnabled.shortTitle" = "Enable half-width punctuations";
+"i18n:UserDef.kHalfWidthPunctuationEnabled.shortTitle" = "半角句読点を起用する";
 "i18n:UserDef.kHardenVerticalPunctuations.description" = "⚠︎ 該当の組版用フォントには縦書き（引用符・括弧）変換機能が備えていない限り、この機能を使う甲斐がある。一旦使うと、入力した全ての引用符・括弧は永遠的に縦書きの様式になる。例え入力を受けているアプリ（例えばワープロソフとなど）の書写方向は横書きと変えたとしても、これらの入力済みの引用符・括弧は全て縦書きの見た目であり、削除してから入力し直す必要になる。";
 "i18n:UserDef.kHardenVerticalPunctuations.shortTitle" = "縦書きの時に、引用符・括弧などを強制的に縦書き文字と変換する（不推奨）";
 "i18n:UserDef.kInlineDumpPinyinInLieuOfZhuyin.description" = "Command+Option+Ctrl+Enter で送り出したものは、それに関する作動設定次第です。";
@@ -514,7 +514,7 @@
 "i18n:UserDef.kUseHorizontalCandidateList.option.1" = "横型陳列";
 "i18n:UserDef.kUseHorizontalCandidateList.shortTitle" = "入力候補陳列の仕様";
 "i18n:UserDef.kUserDataFolderSpecified.description" = "使いたいユーザー辞書保存先をご指定ください。無効な設定は無視されます。\n\n⚠️💀 iCloud で管理されている「Documents」と「Desktop」は避けてください。これらの sandbox bookmark は、再起動やシステム更新の後で再利用できなくなることがあります。不明な点があれば、Apple Support にお問い合わせください。";
-"i18n:UserDef.kUserDataFolderSpecified.shortTitle" = "User data folder path";
+"i18n:UserDef.kUserDataFolderSpecified.shortTitle" = "ユーザーデータフォルダの指定";
 "i18n:UserDef.kUseRearCursorMode.description" = "カーソルはどこで入力候補を呼び出すかとご指定ださい。";
 "i18n:UserDef.kUseRearCursorMode.option.0" = "単語の前で // macOS 内蔵注音入力のやり方";
 "i18n:UserDef.kUseRearCursorMode.option.1" = "単語の後で // Microsoft 新注音入力のやり方";
