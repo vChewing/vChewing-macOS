@@ -261,7 +261,7 @@ struct VCSharedCLI {
     }
   }
 
-  // MARK: - Phase 75: convert-bare-keys (Non-UserDef .strings key migration)
+  // MARK: - convert-bare-keys (Non-UserDef .strings key migration)
 
   static func convertBareKeys(paths: [String]) {
     let map = NonUserDefI18nMap.keyMap
@@ -326,7 +326,7 @@ struct VCSharedCLI {
     }
   }
 
-  // MARK: - Phase 75: convert-bare-keys-in-source (Non-UserDef Swift source migration)
+  // MARK: - convert-bare-keys-in-source (Non-UserDef Swift source migration)
 
   static func convertBareKeysInSource(paths: [String]) {
     let map = NonUserDefI18nMap.keyMap

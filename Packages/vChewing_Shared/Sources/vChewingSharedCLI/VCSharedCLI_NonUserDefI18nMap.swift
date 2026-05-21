@@ -8,7 +8,7 @@
 
 import Foundation
 
-// MARK: - Phase 75: Non-UserDef bare English → i18n: key mapping
+// MARK: - Non-UserDef bare English → i18n: key mapping
 
 /// Explicit mapping table for i18n keys that are **not** part of the `UserDef` system.
 ///
