@@ -45,24 +45,24 @@ extension SettingsPanesCocoa {
           strNotice += "\n\u{2022} "
           strNotice += "i18n:InfoMessage.DeleteKeyNote".i18n
           strNotice.makeNSLabel(descriptive: true, fixWidth: contentWidth)
-          UserDef.kAppleLanguages.render(fixWidth: contentWidth) { renderable in
+          UserDef.kAppleLanguages.renderCocoa(fixWidth: contentWidth) { renderable in
             renderable.currentControl = self.btnLangSelector
           }
         }?.boxed()
         NSStackView.buildSection(width: contentWidth) {
-          UserDef.kReadingNarrationCoverage.render(fixWidth: contentWidth) { renderable in
+          UserDef.kReadingNarrationCoverage.renderCocoa(fixWidth: contentWidth) { renderable in
             renderable.currentControl?.target = self
             renderable.currentControl?.action = #selector(self.updateNarratorSettingsAction(_:))
           }
-          UserDef.kAutoCorrectReadingCombination.render(fixWidth: contentWidth)
-          UserDef.kShowHanyuPinyinInCompositionBuffer.render(fixWidth: contentWidth)
-          UserDef.kKeepReadingUponCompositionError.render(fixWidth: contentWidth)
-          UserDef.kClassicHaninKeyboardSymbolModeShortcutEnabled.render(fixWidth: contentWidth)
-          UserDef.kUseSCPCTypingMode.render(fixWidth: contentWidth)
+          UserDef.kAutoCorrectReadingCombination.renderCocoa(fixWidth: contentWidth)
+          UserDef.kShowHanyuPinyinInCompositionBuffer.renderCocoa(fixWidth: contentWidth)
+          UserDef.kKeepReadingUponCompositionError.renderCocoa(fixWidth: contentWidth)
+          UserDef.kClassicHaninKeyboardSymbolModeShortcutEnabled.renderCocoa(fixWidth: contentWidth)
+          UserDef.kUseSCPCTypingMode.renderCocoa(fixWidth: contentWidth)
         }?.boxed()
         NSStackView.buildSection(.horizontal, width: contentWidth) {
-          UserDef.kCheckUpdateAutomatically.render(fixWidth: contentHalfWidth)
-          UserDef.kIsDebugModeEnabled.render(fixWidth: contentHalfWidth)
+          UserDef.kCheckUpdateAutomatically.renderCocoa(fixWidth: contentHalfWidth)
+          UserDef.kIsDebugModeEnabled.renderCocoa(fixWidth: contentHalfWidth)
         }?.boxed()
         NSView().makeSimpleConstraint(.height, relation: .equal, value: NSFont.systemFontSize)
       }

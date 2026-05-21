@@ -37,22 +37,22 @@ extension SettingsPanesCocoa {
         NSTabView.build {
           NSTabView.TabPage(title: "Ａ") {
             NSStackView.buildSection(width: innerContentWidth) {
-              UserDef.kSecurityHardenedCompositionBuffer.render(fixWidth: innerContentWidth)
-              UserDef.kAlwaysUsePCBWithElectronBasedClients.render(fixWidth: innerContentWidth)
+              UserDef.kSecurityHardenedCompositionBuffer.renderCocoa(fixWidth: innerContentWidth)
+              UserDef.kAlwaysUsePCBWithElectronBasedClients.renderCocoa(fixWidth: innerContentWidth)
               UserDef.kDisableSegmentedThickUnderlineInMarkingModeForManagedClients
-                .render(fixWidth: innerContentWidth)
+                .renderCocoa(fixWidth: innerContentWidth)
             }?.boxed()
             NSView()
           }
           NSTabView.TabPage(title: "Ｂ") {
             NSStackView.buildSection(width: innerContentWidth) {
-              UserDef.kCheckAbusersOfSecureEventInputAPI.render(fixWidth: innerContentWidth)
+              UserDef.kCheckAbusersOfSecureEventInputAPI.renderCocoa(fixWidth: innerContentWidth)
             }?.boxed()
             NSStackView.buildSection(width: innerContentWidth) {
-              UserDef.kUserPhrasesDatabaseBypassed.render(fixWidth: innerContentWidth)
+              UserDef.kUserPhrasesDatabaseBypassed.renderCocoa(fixWidth: innerContentWidth)
             }?.boxed()
             NSStackView.buildSection(width: innerContentWidth) {
-              UserDef.kAllowRescoringSingleKanjiCandidates.render(fixWidth: innerContentWidth)
+              UserDef.kAllowRescoringSingleKanjiCandidates.renderCocoa(fixWidth: innerContentWidth)
             }?.boxed()
             NSView()
           }

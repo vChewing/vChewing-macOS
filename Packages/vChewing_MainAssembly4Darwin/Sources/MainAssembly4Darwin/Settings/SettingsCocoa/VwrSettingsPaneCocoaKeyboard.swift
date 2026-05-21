@@ -47,9 +47,9 @@ extension SettingsPanesCocoa {
               action: #selector(quickSetupButtonHanyuPinyin(_:))
             )
           }
-          UserDef.kKeyboardParser.render(fixWidth: contentWidth)
-          UserDef.kBasicKeyboardLayout.render(fixWidth: contentWidth)
-          UserDef.kAlphanumericalKeyboardLayout.render(fixWidth: contentWidth)
+          UserDef.kKeyboardParser.renderCocoa(fixWidth: contentWidth)
+          UserDef.kBasicKeyboardLayout.renderCocoa(fixWidth: contentWidth)
+          UserDef.kAlphanumericalKeyboardLayout.renderCocoa(fixWidth: contentWidth)
         }?.boxed()
         NSStackView.build(.horizontal, insets: .new(all: 4, left: 16, right: 16)) {
           "i18n:Settings.SectionKeyboardShortcuts".i18n.makeNSLabel(fixWidth: contentWidth)
@@ -57,18 +57,18 @@ extension SettingsPanesCocoa {
         }
         NSStackView.buildSection(.horizontal, width: contentWidth) {
           NSStackView.build(.vertical) {
-            UserDef.kUsingHotKeySCPC.render(fixWidth: contentHalfWidth)
-            UserDef.kUsingHotKeyAssociates.render(fixWidth: contentHalfWidth)
-            UserDef.kUsingHotKeyCNS.render(fixWidth: contentHalfWidth)
-            UserDef.kUsingHotKeyKangXi.render(fixWidth: contentHalfWidth)
-            UserDef.kUsingHotKeyRevLookup.render(fixWidth: contentHalfWidth)
+            UserDef.kUsingHotKeySCPC.renderCocoa(fixWidth: contentHalfWidth)
+            UserDef.kUsingHotKeyAssociates.renderCocoa(fixWidth: contentHalfWidth)
+            UserDef.kUsingHotKeyCNS.renderCocoa(fixWidth: contentHalfWidth)
+            UserDef.kUsingHotKeyKangXi.renderCocoa(fixWidth: contentHalfWidth)
+            UserDef.kUsingHotKeyRevLookup.renderCocoa(fixWidth: contentHalfWidth)
           }
           NSStackView.build(.vertical) {
-            UserDef.kUsingHotKeyJIS.render(fixWidth: contentHalfWidth)
-            UserDef.kUsingHotKeyHalfWidthASCII.render(fixWidth: contentHalfWidth)
-            UserDef.kUsingHotKeyCurrencyNumerals.render(fixWidth: contentHalfWidth)
-            UserDef.kUsingHotKeyCassette.render(fixWidth: contentHalfWidth)
-            UserDef.kUsingHotKeyInputMode.render(fixWidth: contentHalfWidth)
+            UserDef.kUsingHotKeyJIS.renderCocoa(fixWidth: contentHalfWidth)
+            UserDef.kUsingHotKeyHalfWidthASCII.renderCocoa(fixWidth: contentHalfWidth)
+            UserDef.kUsingHotKeyCurrencyNumerals.renderCocoa(fixWidth: contentHalfWidth)
+            UserDef.kUsingHotKeyCassette.renderCocoa(fixWidth: contentHalfWidth)
+            UserDef.kUsingHotKeyInputMode.renderCocoa(fixWidth: contentHalfWidth)
           }
         }?.boxed()
         NSView().makeSimpleConstraint(.height, relation: .equal, value: NSFont.systemFontSize)

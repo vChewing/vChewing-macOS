@@ -29,20 +29,20 @@ extension SettingsPanesCocoa {
     var body: NSView? {
       NSStackView.build(.vertical, insets: .new(all: 14)) {
         NSStackView.buildSection(width: contentWidth) {
-          UserDef.kChineseConversionEnabled.render(fixWidth: contentWidth) { renderable in
+          UserDef.kChineseConversionEnabled.renderCocoa(fixWidth: contentWidth) { renderable in
             renderable.currentControl?.target = self
             renderable.currentControl?.action = #selector(self.sanityCheckKangXi(_:))
           }
-          UserDef.kShiftJISShinjitaiOutputEnabled.render(fixWidth: contentWidth) { renderable in
+          UserDef.kShiftJISShinjitaiOutputEnabled.renderCocoa(fixWidth: contentWidth) { renderable in
             renderable.currentControl?.target = self
             renderable.currentControl?.action = #selector(self.sanityCheckJIS(_:))
           }
-          UserDef.kInlineDumpPinyinInLieuOfZhuyin.render(fixWidth: contentWidth)
-          UserDef.kTrimUnfinishedReadingsOnCommit.render(fixWidth: contentWidth)
-          UserDef.kRomanNumeralOutputFormat.render(fixWidth: contentWidth)
+          UserDef.kInlineDumpPinyinInLieuOfZhuyin.renderCocoa(fixWidth: contentWidth)
+          UserDef.kTrimUnfinishedReadingsOnCommit.renderCocoa(fixWidth: contentWidth)
+          UserDef.kRomanNumeralOutputFormat.renderCocoa(fixWidth: contentWidth)
         }?.boxed()
         NSStackView.buildSection(width: contentWidth) {
-          UserDef.kHardenVerticalPunctuations.render(fixWidth: contentWidth)
+          UserDef.kHardenVerticalPunctuations.renderCocoa(fixWidth: contentWidth)
         }?.boxed()
         NSView().makeSimpleConstraint(.height, relation: .equal, value: NSFont.systemFontSize)
       }

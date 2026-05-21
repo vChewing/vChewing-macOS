@@ -292,7 +292,7 @@ extension UserDefRenderableCocoa {
 // MARK: - External Extensions.
 
 extension UserDef {
-  public func render(
+  public func renderCocoa(
     fixWidth: CGFloat? = nil,
     extraOps: ((inout UserDefRenderableCocoa) -> ())? = nil
   )

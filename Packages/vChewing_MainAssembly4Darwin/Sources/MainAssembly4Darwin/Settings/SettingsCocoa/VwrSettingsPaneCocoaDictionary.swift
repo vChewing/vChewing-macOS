@@ -35,7 +35,7 @@ extension SettingsPanesCocoa {
     var body: NSView? {
       NSStackView.build(.vertical, insets: .new(all: 14)) {
         NSStackView.buildSection(width: contentWidth) {
-          UserDef.kUserDataFolderSpecified.render(fixWidth: contentWidth) { renderable in
+          UserDef.kUserDataFolderSpecified.renderCocoa(fixWidth: contentWidth) { renderable in
             renderable.currentControl = self.pctUserDictionaryFolder
             renderable.mainViewOverride = self.pathControlMainView
           }
@@ -44,41 +44,41 @@ extension SettingsPanesCocoa {
           NSTabView.TabPage(title: "Ａ") {
             NSStackView.buildSection(width: innerContentWidth) {
               NSStackView.build(.vertical) {
-                UserDef.kShouldAutoReloadUserDataFiles.render(fixWidth: innerContentWidth) { renderable in
+                UserDef.kShouldAutoReloadUserDataFiles.renderCocoa(fixWidth: innerContentWidth) { renderable in
                   renderable.currentControl?.target = self
                   renderable.currentControl?.action = #selector(self.lmmgrInitUserLMsWhenShould(_:))
                 }
                 "i18n:InfoMessage.SecurityConcernsNoShellScript".i18n
                   .makeNSLabel(descriptive: true, fixWidth: innerContentWidth)
               }
-              UserDef.kUseExternalFactoryDict.render(fixWidth: innerContentWidth) { renderable in
+              UserDef.kUseExternalFactoryDict.renderCocoa(fixWidth: innerContentWidth) { renderable in
                 renderable.currentControl?.target = self
                 renderable.currentControl?.action = #selector(self.lmmgrConnectCoreDB(_:))
               }
             }?.boxed()
             NSStackView.buildSection(width: innerContentWidth) {
-              UserDef.kFetchSuggestionsFromPerceptionOverrideModel.render(fixWidth: innerContentWidth)
-              UserDef.kReducePOMLifetimeToNoMoreThan12Hours.render(fixWidth: innerContentWidth)
+              UserDef.kFetchSuggestionsFromPerceptionOverrideModel.renderCocoa(fixWidth: innerContentWidth)
+              UserDef.kReducePOMLifetimeToNoMoreThan12Hours.renderCocoa(fixWidth: innerContentWidth)
             }?.boxed()
             NSView()
           }
           NSTabView.TabPage(title: "Ｂ") {
             NSStackView.buildSection(width: innerContentWidth) {
               UserDef.kFilterNonCNSReadingsForCHTInput
-                .render(fixWidth: innerContentWidth) { renderable in
+                .renderCocoa(fixWidth: innerContentWidth) { renderable in
                   renderable.currentControl?.target = self
                   renderable.currentControl?.action = #selector(self.lmmgrSyncLMPrefs(_:))
                 }
               UserDef.kFilterFactoryKanjisOfNonCurrentInputMode
-                .render(fixWidth: innerContentWidth) { renderable in
+                .renderCocoa(fixWidth: innerContentWidth) { renderable in
                   renderable.currentControl?.target = self
                   renderable.currentControl?.action = #selector(self.lmmgrSyncLMPrefs(_:))
                 }
-              UserDef.kCNS11643Enabled.render(fixWidth: innerContentWidth) { renderable in
+              UserDef.kCNS11643Enabled.renderCocoa(fixWidth: innerContentWidth) { renderable in
                 renderable.currentControl?.target = self
                 renderable.currentControl?.action = #selector(self.lmmgrSyncLMPrefs(_:))
               }
-              UserDef.kSymbolInputEnabled.render(fixWidth: innerContentWidth) { renderable in
+              UserDef.kSymbolInputEnabled.renderCocoa(fixWidth: innerContentWidth) { renderable in
                 renderable.currentControl?.target = self
                 renderable.currentControl?.action = #selector(self.lmmgrSyncLMPrefs(_:))
               }
@@ -88,17 +88,17 @@ extension SettingsPanesCocoa {
           NSTabView.TabPage(title: "Ｃ") {
             NSStackView.buildSection(width: innerContentWidth) {
               UserDef.kEnforceETenDOSCandidateSequence
-                .render(fixWidth: innerContentWidth) { renderable in
+                .renderCocoa(fixWidth: innerContentWidth) { renderable in
                   renderable.currentControl?.target = self
                   renderable.currentControl?.action = #selector(self.lmmgrSyncLMPrefs(_:))
                 }
-              UserDef.kReplaceSymbolMenuNodeWithUserSuppliedData.render(fixWidth: innerContentWidth)
-              UserDef.kPhraseReplacementEnabled.render(fixWidth: innerContentWidth) { renderable in
+              UserDef.kReplaceSymbolMenuNodeWithUserSuppliedData.renderCocoa(fixWidth: innerContentWidth)
+              UserDef.kPhraseReplacementEnabled.renderCocoa(fixWidth: innerContentWidth) { renderable in
                 renderable.currentControl?.target = self
                 renderable.currentControl?
                   .action = #selector(self.lmmgrSyncLMPrefsWithReplacementTable(_:))
               }
-              UserDef.kSuppressFactoryUnigramsOfKanaSyllables.render(fixWidth: innerContentWidth)
+              UserDef.kSuppressFactoryUnigramsOfKanaSyllables.renderCocoa(fixWidth: innerContentWidth)
             }?.boxed()
             NSView()
           }

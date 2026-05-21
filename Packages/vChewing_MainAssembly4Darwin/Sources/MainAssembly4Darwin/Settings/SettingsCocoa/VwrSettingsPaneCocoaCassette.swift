@@ -34,19 +34,19 @@ extension SettingsPanesCocoa {
     var body: NSView? {
       NSStackView.build(.vertical, insets: .new(all: 14)) {
         NSStackView.buildSection(width: contentWidth) {
-          UserDef.kCassettePath.render(fixWidth: contentWidth) { renderable in
+          UserDef.kCassettePath.renderCocoa(fixWidth: contentWidth) { renderable in
             renderable.currentControl = self.pctCassetteFilePath
             renderable.mainViewOverride = self.pathControlMainView
           }
-          UserDef.kCassetteEnabled.render(fixWidth: contentWidth) { renderable in
+          UserDef.kCassetteEnabled.renderCocoa(fixWidth: contentWidth) { renderable in
             renderable.currentControl?.target = self
             renderable.currentControl?.action = #selector(self.cassetteEnabledToggled(_:))
           }
         }?.boxed()
         NSStackView.buildSection(width: contentWidth) {
-          UserDef.kAutoCompositeWithLongestPossibleCassetteKey.render(fixWidth: contentWidth)
-          UserDef.kShowTranslatedStrokesInCompositionBuffer.render(fixWidth: contentWidth)
-          UserDef.kForceCassetteChineseConversion.render(fixWidth: contentWidth)
+          UserDef.kAutoCompositeWithLongestPossibleCassetteKey.renderCocoa(fixWidth: contentWidth)
+          UserDef.kShowTranslatedStrokesInCompositionBuffer.renderCocoa(fixWidth: contentWidth)
+          UserDef.kForceCassetteChineseConversion.renderCocoa(fixWidth: contentWidth)
         }?.boxed()
         NSView().makeSimpleConstraint(.height, relation: .equal, value: NSFont.systemFontSize)
       }
