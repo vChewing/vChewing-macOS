@@ -168,7 +168,7 @@ public struct VwrSettingsUI: View {
           currentTabView
             .searchable(
               text: Bindable(viewModel).searchableText,
-              prompt: "i18n:Settings.SearchCurrentPage".i18n
+              prompt: Text(verbatim: "i18n:Settings.SearchCurrentPage".i18n)
             )
         }
       }
