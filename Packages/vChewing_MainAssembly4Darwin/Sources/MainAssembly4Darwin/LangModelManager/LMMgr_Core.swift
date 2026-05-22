@@ -92,9 +92,25 @@ public final class LMMgr {
 
   // MARK: Public
 
+  /// Captured path-invalidity alerts during unit tests (modal suppressed).
+  public struct PathInvalidityAlert: Sendable, Equatable {
+    public let msg: String
+    public let infoText: String
+  }
+
   public static var shared = LMMgr()
 
+  /// Accumulates path-invalidity alerts when ``UserDefaults/pendingUnitTests`` is true.
+  /// Call ``resetRecordedPathInvalidityAlerts()`` between tests.
+  /// Non-isolated so it can be written from KVO observer callbacks.
+  public nonisolated(unsafe) static var recordedPathInvalidityAlerts = [PathInvalidityAlert]()
+
   public static var isCoreDBConnected: Bool { LMAssembly.LMInstantiator.isFactoryDictionaryLoaded }
+
+  /// Clear the accumulated invalidity-alert buffer (call in test `init` / `deinit`).
+  public static func resetRecordedPathInvalidityAlerts() {
+    recordedPathInvalidityAlerts.removeAll()
+  }
 
   public static func prepareForUnitTests() {
     guard UserDefaults.pendingUnitTests else { return }
@@ -463,6 +479,12 @@ public final class LMMgr {
   }
 
   nonisolated private func callModalAlert(msg: String, infoText: String) {
+    // During unit tests suppress the modal dialog and capture the alert
+    // so the test can assert on it.
+    guard !UserDefaults.pendingUnitTests else {
+      Self.recordedPathInvalidityAlerts.append(.init(msg: msg, infoText: infoText))
+      return
+    }
     mainSync {
       // 若當前已存在 modal 視窗，避免再開啟重複的 modal。
       if NSApp.modalWindow != nil { return }

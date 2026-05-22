@@ -55,6 +55,7 @@ final class MainAssemblyTests {
     UserDefaults.pendingUnitTests = true
     UserDef.resetAll()
     LMMgr.prepareForUnitTests()
+    LMMgr.resetRecordedPathInvalidityAlerts()
     testLM = LMAssembly.LMInstantiator.construct { _ in
       LMAssembly.LMInstantiator
         .connectToTestFactoryDictionary(textMapData: LMATestsData.textMapTestCoreLMData)
@@ -91,6 +92,7 @@ final class MainAssemblyTests {
   deinit {
     mainSync {
       LMMgr.resetAfterUnitTests()
+      LMMgr.resetRecordedPathInvalidityAlerts()
     }
     UserDefaults.unitTests?.removeSuite(named: "org.atelierInmu.vChewing.MainAssembly.UnitTests")
     UserDefaults.pendingUnitTests = false

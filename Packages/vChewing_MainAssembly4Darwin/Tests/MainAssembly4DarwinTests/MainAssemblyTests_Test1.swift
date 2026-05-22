@@ -102,6 +102,15 @@ extension MainAssemblyTests {
     try fileManager.removeItem(at: externalURL)
 
     #expect(LMMgr.cassettePath() == cacheURL.path)
+
+    // Verify that a path-invalidity alert was captured (instead of a blocking modal).
+    let cassetteAlerts = LMMgr.recordedPathInvalidityAlerts.filter {
+      $0.infoText.contains(externalURL.lastPathComponent)
+    }
+    #expect(
+      !cassetteAlerts.isEmpty,
+      "Expected a cassette-path-invalidity alert for \(externalURL.lastPathComponent)."
+    )
   }
 
   @Test
