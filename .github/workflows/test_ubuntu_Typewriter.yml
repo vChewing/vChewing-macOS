@@ -1,16 +1,17 @@
 name: unit-test-typewriter-linux
 on:
+  workflow_dispatch: {}
   push:
-    branches: [ "main" ]
+    branches: ["main"]
   pull_request:
-    branches: [ "main" ]
+    branches: ["main"]
 
 jobs:
   build:
     name: test-linux-typewriter
     runs-on: ubuntu-latest
     env:
-        GIT_SSL_NO_VERIFY: true
+      GIT_SSL_NO_VERIFY: true
     steps:
       - uses: SwiftyLab/setup-swift@latest
       - uses: actions/checkout@v1

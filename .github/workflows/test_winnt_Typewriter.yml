@@ -1,9 +1,10 @@
 name: unit-test-typewriter-WinNT
 on:
+  workflow_dispatch: {}
   push:
-    branches: [ "main", "dev/WinNT" ]
+    branches: ["main", "dev/WinNT"]
   pull_request:
-    branches: [ "main" ]
+    branches: ["main"]
 
 jobs:
   build:
@@ -16,7 +17,7 @@ jobs:
 
       # Windows Swift toolchain install
       - name: Setup Swift toolchain (Windows)
-      # 建议固定到 tag/sha；这里先按官方示例用 main
+        # 建议固定到 tag/sha；这里先按官方示例用 main
         uses: compnerd/gha-setup-swift@main
         with:
           source: swift.org

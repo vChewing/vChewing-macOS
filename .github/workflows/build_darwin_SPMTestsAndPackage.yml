@@ -1,9 +1,10 @@
 name: debug-macOS-SPMTestsAndPackage
 on:
+  workflow_dispatch: {}
   push:
-    branches: [ "main" ]
+    branches: ["main"]
   pull_request:
-    branches: [ "main" ]
+    branches: ["main"]
 
 jobs:
   build:
@@ -17,7 +18,7 @@ jobs:
     steps:
       - uses: maxim-lobanov/setup-xcode@v1.6.0
         with:
-          xcode-version: '26.2.0'
+          xcode-version: "26.4.1"
       - uses: actions/checkout@v4
         env:
           # Limit TLS verification override to this step only. Do NOT enable this
@@ -46,6 +47,7 @@ jobs:
           make archive
         shell: bash
       - name: Run Package Tests (Selected)
+        timeout-minutes: 15
         run: |
           # Run tests sequentially to avoid parallel pressure. Use zsh syntax.
           packages=(
