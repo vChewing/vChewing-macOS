@@ -1020,6 +1020,52 @@ extension InputHandlerTests {
   }
 
   @Test
+  func test_IH112B_ETenSequenceEnforcementWithZai4PreservesZai4ZaiOrder() throws {
+    guard let testHandler else {
+      Issue.record("testHandler is nil.")
+      return
+    }
+    clearTestPOM()
+
+    let reading = "ㄗㄞˋ"
+    let factoryTypeID: Int32 = testHandler.currentLM.isCHS ? 5 : 6
+    let textMap = makeTypingTextMap([
+      (
+        reading,
+        [
+          (value: "在", probability: -5.004, typeID: factoryTypeID),
+          (value: "再", probability: -5.007, typeID: factoryTypeID),
+        ]
+      ),
+    ])
+
+    defer {
+      LMAssembly.LMInstantiator.disconnectFactoryDictionary()
+      #expect(LMAssembly.LMInstantiator.connectToTestFactoryDictionary(textMapData: LMATestsData.textMapTestCoreLMData))
+      testHandler.clear()
+    }
+
+    LMAssembly.LMInstantiator.disconnectFactoryDictionary()
+    #expect(LMAssembly.LMInstantiator.connectToTestFactoryDictionary(textMapData: textMap))
+    testHandler.clear()
+    testHandler.prefs.enforceETenDOSCandidateSequence = true
+    testHandler.prefs.useSCPCTypingMode = false
+    testHandler.prefs.fetchSuggestionsFromPerceptionOverrideModel = false
+    testHandler.currentLM.syncPrefs()
+
+    #expect(throws: Never.self) { try testHandler.assembler.insertKey(reading) }
+
+    let candidateValues = testHandler.generateArrayOfCandidates().map(\.value)
+    let zaiIndex = candidateValues.firstIndex(of: "在")
+    let zai4Index = candidateValues.firstIndex(of: "再")
+    guard let zaiIndex, let zai4Index else {
+      Issue.record("Missing expected candidates. Got: \(candidateValues)")
+      return
+    }
+    #expect(zaiIndex < zai4Index, "Expected 在 to precede 再, but got: \(candidateValues)")
+  }
+
+  @Test
   func test_IH113_FilterNonCNSReadingsStillAllowsSelectingDemotedSingleKanji() throws {
     guard let testHandler, let testSession else {
       Issue.record("testHandler and testSession at least one of them is nil.")

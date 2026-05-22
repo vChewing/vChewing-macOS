@@ -820,6 +820,7 @@ extension LMAssembly {
           lmFiltered.unigramsFor(key: keyChain, keyArray: keyArray).map(\.current)
         )
       rawAllUnigrams.consolidate(filter: dataAsFilter)
+      rawAllUnigrams.sort { $0.probability > $1.probability }
       // Store in LRU cache with size limit
       unigramLRUCache[cacheKey] = rawAllUnigrams
       if unigramLRUCache.count > 1_024 {

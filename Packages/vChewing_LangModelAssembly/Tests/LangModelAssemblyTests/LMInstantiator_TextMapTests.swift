@@ -620,6 +620,43 @@ struct LMInstantiatorTextMapTests {
     #expect(gramsContainValue(grams4Punct, "，"))
   }
 
+  @Test
+  func testETenDOSUnigramsDoNotReorderFactoryCoreResults() throws {
+    defer {
+      LMAssembly.LMInstantiator.disconnectFactoryDictionary()
+    }
+
+    let textMap = makeTextMap([
+      ("ㄗㄞˋ", [
+        (value: "在", probability: -5.004, typeID: 6),
+        (value: "再", probability: -5.007, typeID: 6),
+      ]),
+    ])
+
+    let instance = LMAssembly.LMInstantiator(isCHS: false)
+    #expect(LMAssembly.LMInstantiator.connectToTestFactoryDictionary(textMapData: textMap))
+
+    // Case 1: alwaysSupplyETenDOSUnigrams = false
+    instance.setOptions { config in
+      config.alwaysSupplyETenDOSUnigrams = false
+    }
+    let gramsWithoutETen = instance.unigramsFor(keyArray: ["ㄗㄞˋ"])
+    let valuesWithoutETen = gramsWithoutETen.map(\.current)
+    #expect(valuesWithoutETen.firstIndex(of: "在")! < valuesWithoutETen.firstIndex(of: "再")!)
+
+    // Case 2: alwaysSupplyETenDOSUnigrams = true
+    instance.setOptions { config in
+      config.alwaysSupplyETenDOSUnigrams = true
+    }
+    let gramsWithETen = instance.unigramsFor(keyArray: ["ㄗㄞˋ"])
+    let valuesWithETen = gramsWithETen.map(\.current)
+    #expect(valuesWithETen.firstIndex(of: "在")! < valuesWithETen.firstIndex(of: "再")!)
+
+    // Case 3: supplementalValues must return ETenDOS order (在 before 再)
+    let supplemental = instance.lookupHub.supplementalValues(for: "ㄗㄞˋ", strategy: .exactMatch)
+    #expect(supplemental.firstIndex(of: "在")! < supplemental.firstIndex(of: "再")!)
+  }
+
   // MARK: Private
 
   private struct GramSnapshot: Equatable, Hashable {
