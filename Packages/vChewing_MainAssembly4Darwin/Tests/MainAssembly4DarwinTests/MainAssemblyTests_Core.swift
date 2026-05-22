@@ -307,6 +307,10 @@ final class MainAssemblyTests {
 
   static func ensureServerInitialized() {
     guard testServer == nil else { return }
+    // Skip IMKServer initialization on CI: headless runners lack a full
+    // IMK daemon session, and IMKServer() will hang indefinitely waiting
+    // for an XPC connection that never completes.
+    guard ProcessInfo.processInfo.environment["CI"] != "true" else { return }
     testServer = IMKServer(
       name: "org.atelierInmu.vChewing.MainAssembly.UnitTests_Connection",
       bundleIdentifier: "org.atelierInmu.vChewing.MainAssembly.UnitTests"
