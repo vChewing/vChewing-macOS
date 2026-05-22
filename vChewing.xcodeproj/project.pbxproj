@@ -50,7 +50,6 @@
 		5B18BA7227C7BD8B0056EB19 /* LICENSE.txt */ = {isa = PBXFileReference; lastKnownFileType = text; path = LICENSE.txt; sourceTree = "<group>"; };
 		5B18BA7327C7BD8C0056EB19 /* LICENSE-JPN.txt */ = {isa = PBXFileReference; lastKnownFileType = text; path = "LICENSE-JPN.txt"; sourceTree = "<group>"; };
 		5B18BA7427C7BD8C0056EB19 /* LICENSE-CHT.txt */ = {isa = PBXFileReference; lastKnownFileType = text; path = "LICENSE-CHT.txt"; sourceTree = "<group>"; };
-		5B312684287800DE001AA720 /* FAQ.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = FAQ.md; sourceTree = "<group>"; };
 		5B40113A28D71B8700A9D4CB /* vChewing_Uninstaller */ = {isa = PBXFileReference; lastKnownFileType = wrapper; name = vChewing_Uninstaller; path = Packages/vChewing_Uninstaller; sourceTree = "<group>"; };
 		5B5CE5FF2F8D539700E767A0 /* ButKo_BPMFVS */ = {isa = PBXFileReference; lastKnownFileType = wrapper; name = ButKo_BPMFVS; path = Packages/ButKo_BPMFVS; sourceTree = "<group>"; };
 		5B60EAC12EF4892C00FFB49E /* vChewing_InstallerAssembly4Darwin */ = {isa = PBXFileReference; lastKnownFileType = wrapper; name = vChewing_InstallerAssembly4Darwin; path = Packages/vChewing_InstallerAssembly4Darwin; sourceTree = "<group>"; };
@@ -184,7 +183,6 @@
 				5BC2652127E04B7B00700291 /* uninstall.sh */,
 				5BC447AB2865BEF500EDC323 /* AUTHORS */,
 				5BE8A8C4281EE65300197741 /* CONTRIBUTING.md */,
-				5B312684287800DE001AA720 /* FAQ.md */,
 				5B18BA6F27C7BD8B0056EB19 /* LICENSE-CHS.txt */,
 				5B18BA7427C7BD8C0056EB19 /* LICENSE-CHT.txt */,
 				5B18BA7327C7BD8C0056EB19 /* LICENSE-JPN.txt */,
