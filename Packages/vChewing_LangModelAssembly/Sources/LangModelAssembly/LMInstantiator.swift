@@ -619,7 +619,10 @@ extension LMAssembly {
       let asciiSpace = " "
       if keyArray == [asciiSpace] { return [.init(keyArray: keyArray, value: asciiSpace)] }
       // 檢查 LRU 快取
-      let fingerprint = config.hashValue
+      var hasher = Hasher()
+      hasher.combine(config)
+      hasher.combine(Self.mtxFactoryGeneration.value)
+      let fingerprint = hasher.finalize()
       if fingerprint != unigramCacheFingerprint {
         unigramLRUCache.removeAll(keepingCapacity: true)
         unigramCacheFingerprint = fingerprint
@@ -847,12 +850,17 @@ extension LMAssembly {
     static var lmCassette = LMCassette()
     static var lmPlainBopomofo = LMPlainBopomofo()
 
+    /// 原廠辭典世代計數器：每次原廠辭典被重新載入或解除安裝時遞增。
+    /// 供 `unigramsFor` 的 LRU cache fingerprint 使用，確保切換原廠辭典後舊快取自動失效。
+    nonisolated static let mtxFactoryGeneration: NSMutex<Int> = .init(0)
+
     nonisolated static var factoryTrie: VanguardTrie.TextMapTrie? {
       get {
         mtxFactoryTrie.value
       }
       set {
         mtxFactoryTrie.value = newValue
+        mtxFactoryGeneration.value &+= 1
       }
     }
 
