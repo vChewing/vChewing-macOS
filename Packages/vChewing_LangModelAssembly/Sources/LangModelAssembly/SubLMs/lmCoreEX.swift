@@ -44,10 +44,6 @@ extension LMAssembly {
     var rangeMap: [String: [Range<String.Index>]] = [:]
     /// 資料庫追加辭典。
     var temporaryMap: [String: [Homa.Gram]] = [:]
-    /// `rangeMap` 索引鍵的快取集合，避免每次查詢都重建 `Set`。
-    var keySet: Set<String> = []
-    /// `rangeMap` 與 `temporaryMap` 索引鍵的排序陣列，供前綴搜尋二分搜尋之用。
-    var sortedKeys: [String] = []
     /// 資料庫字串陣列。
     var strData: String = ""
     /// 聲明原始檔案內第一、二縱列的內容是否彼此顛倒。
@@ -86,7 +82,6 @@ extension LMAssembly {
         }
         var processed = rawStrData
         if !consolidated {
-          processed = processed.replacingOccurrences(of: "\t", with: " ")
           processed = processed.replacingOccurrences(of: "\r", with: "\n")
         }
         replaceData(textData: processed)
@@ -138,8 +133,7 @@ extension LMAssembly {
         newMap[theKey, default: []].append(theRange)
       }
       rangeMap = newMap
-      keySet = Set(rangeMap.keys)
-      sortedKeys = rangeMap.keys.sorted()
+      _sortedKeysBox.isDirty = true
       // 明確釋放 newMap 記憶體
       newMap.removeAll(keepingCapacity: false)
     }
@@ -150,8 +144,8 @@ extension LMAssembly {
       strData.removeAll(keepingCapacity: false)
       rangeMap.removeAll(keepingCapacity: false)
       temporaryMap.removeAll(keepingCapacity: false)
-      keySet.removeAll(keepingCapacity: false)
-      sortedKeys.removeAll(keepingCapacity: false)
+      _sortedKeysBox.value.removeAll(keepingCapacity: false)
+      _sortedKeysBox.isDirty = true
     }
 
     // MARK: - Advanced features
@@ -267,7 +261,7 @@ extension LMAssembly {
     /// - parameters:
     ///   - key: 讀音索引鍵。
     func hasUnigramsFor(key: String) -> Bool {
-      keySet.contains(key) || temporaryMap[key] != nil
+      rangeMap.keys.contains(key) || temporaryMap[key] != nil
     }
 
     /// 根據給定的前綴，返回所有以該前綴開頭的索引鍵。
@@ -276,22 +270,28 @@ extension LMAssembly {
     /// - Returns: 匹配的索引鍵陣列。
     func keys(matchingPrefix prefix: String) -> [String] {
       guard !prefix.isEmpty else { return [] }
+      // 惰性排序：僅在首次查詢（或 replaceData 後標記 dirty）時才排序。
+      if _sortedKeysBox.isDirty {
+        _sortedKeysBox.value = rangeMap.keys.sorted()
+        _sortedKeysBox.isDirty = false
+      }
       var result: [String] = []
       var seen: Set<String> = []
+      let sorted = _sortedKeysBox.value
       // 二分搜尋 sortedKeys：找到第一個不小於 prefix 的位置
       var low = 0
-      var high = sortedKeys.count
+      var high = sorted.count
       while low < high {
         let mid = (low + high) / 2
-        if sortedKeys[mid] < prefix {
+        if sorted[mid] < prefix {
           low = mid + 1
         } else {
           high = mid
         }
       }
       var i = low
-      while i < sortedKeys.count, sortedKeys[i].hasPrefix(prefix) {
-        let key = sortedKeys[i]
+      while i < sorted.count, sorted[i].hasPrefix(prefix) {
+        let key = sorted[i]
         if seen.insert(key).inserted {
           result.append(key)
         }
@@ -333,6 +333,18 @@ extension LMAssembly {
       }
       return grams
     }
+
+    // MARK: Private
+
+    /// 惰性排序快取容器。
+    private final class SortedKeysBox {
+      var value: [String] = []
+      var isDirty = true
+    }
+
+    /// `rangeMap` 與 `temporaryMap` 索引鍵的排序陣列，供前綴搜尋二分搜尋之用。
+    /// 以 reference-type box 實現惰性排序：僅在 `keys(matchingPrefix:)` 首次查詢時計算。
+    private let _sortedKeysBox = SortedKeysBox()
   }
 }
 
