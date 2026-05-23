@@ -215,7 +215,7 @@ public final class PrefMgr: PrefMgrProtocol, Sendable {
 
   // MARK: - Settings (Tier 2)
 
-  @AppProperty(userDef: .kUseSpaceToCommitHighlightedSCPCCandidate)
+  @AppProperty(userDef: .kUseSpaceToCommitHighlightedCandidate4SCPC)
   public var useSpaceToCommitHighlightedSCPCCandidate: Bool
 
   @AppProperty(userDef: .kEnableMouseScrollingForTDKCandidatesCocoa)

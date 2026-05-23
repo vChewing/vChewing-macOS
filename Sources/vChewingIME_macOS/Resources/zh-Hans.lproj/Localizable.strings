@@ -488,7 +488,7 @@
 "i18n:UserDef.kSpecifyShiftBackSpaceKeyBehavior.option.1" = "像 Shift+Delete 那样清空当前组字区内容";
 "i18n:UserDef.kSpecifyShiftBackSpaceKeyBehavior.option.2" = "始终剔除游标正后方的字音";
 "i18n:UserDef.kSpecifyShiftBackSpaceKeyBehavior.shortTitle" = "Shift+退格键:";
-"i18n:UserDef.kSpecifyShiftSpaceKeyBehavior.description" = "指定 (Shift+)空格键 对候选字词而言的轮替操作对象。";
+"i18n:UserDef.kSpecifyShiftSpaceKeyBehavior.description" = "指定 (Shift+)空格键 对候选字词而言的轮替操作对象。\n※在逐字选字模式（SCPC）下，无论此设定如何，不带 Shift 的空格键始终用于翻页。\n※若启用了「在逐字选字模式当中使用空格键确认当前高亮候选字」，则该设定优先于此项。";
 "i18n:UserDef.kSpecifyShiftSpaceKeyBehavior.option.0" = "Shift+空格键 换下一页，空格键 换选下一个候选字";
 "i18n:UserDef.kSpecifyShiftSpaceKeyBehavior.option.1" = "空格键 换下一页，Shift+空格键 换选下一个候选字";
 "i18n:UserDef.kSpecifyShiftSpaceKeyBehavior.shortTitle" = "(Shift+)空格键:";
@@ -529,7 +529,8 @@
 "i18n:UserDef.kUseSCPCTypingMode.description" = "针对年长使用者的习惯而提供。";
 "i18n:UserDef.kUseSCPCTypingMode.shortTitle" = "模拟 90 年代前期注音逐字选字输入风格";
 "i18n:UserDef.kUseShiftQuestionToCallServiceMenu.shortTitle" = "允许在选字窗内也使用「Shift+?」叫出服务选单";
-"i18n:UserDef.kUseSpaceToCommitHighlightedSCPCCandidate.shortTitle" = "在逐字选字模式当中使用空格键确认当前高亮候选字";
+"i18n:UserDef.kUseSpaceToCommitHighlightedCandidate4SCPC.description" = "启用后，在选字窗可见时按空格键将确认高亮候选字。仅逐字选字模式（SCPC）下生效。";
+"i18n:UserDef.kUseSpaceToCommitHighlightedCandidate4SCPC.shortTitle" = "在逐字选字模式当中使用空格键确认当前高亮候选字";
 "i18n:UserDef.kUsingHotKeyAssociates.shortTitle" = "关联词语模式";
 "i18n:UserDef.kUsingHotKeyCassette.shortTitle" = "大写汉字数字输出";
 "i18n:UserDef.kUsingHotKeyCNS.shortTitle" = "全字库模式";

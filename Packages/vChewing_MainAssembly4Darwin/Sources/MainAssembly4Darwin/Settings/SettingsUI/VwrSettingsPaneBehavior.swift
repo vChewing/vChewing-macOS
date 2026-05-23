@@ -41,7 +41,7 @@ public struct VwrSettingsPaneBehavior: View {
 
       Section {
         UserDef.kSpecifyShiftSpaceKeyBehavior.renderUI()
-        UserDef.kUseSpaceToCommitHighlightedSCPCCandidate.renderUI()
+        UserDef.kUseSpaceToCommitHighlightedCandidate4SCPC.renderUI()
       }
 
       Section {

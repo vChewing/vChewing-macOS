@@ -488,7 +488,7 @@
 "i18n:UserDef.kSpecifyShiftBackSpaceKeyBehavior.option.1" = "Shift+Delete のように入力緩衝列を消す";
 "i18n:UserDef.kSpecifyShiftBackSpaceKeyBehavior.option.2" = "カーソルの後部の音読みを常に削除する";
 "i18n:UserDef.kSpecifyShiftBackSpaceKeyBehavior.shortTitle" = "Shift+BackSpace:";
-"i18n:UserDef.kSpecifyShiftSpaceKeyBehavior.description" = "入力候補についての (Shift+)Space キーの輪番切替対象をご指定ください。";
+"i18n:UserDef.kSpecifyShiftSpaceKeyBehavior.description" = "入力候補についての (Shift+)Space キーの輪番切替対象をご指定ください。\n※逐字選択モード（SCPC）では、この設定に関わらず Shift なしのスペースキーは常にページ切替になります。\n※「全候補入力の場合、ハイライト候補を Space キーで確認」が有効な場合、そちらが優先されます。";
 "i18n:UserDef.kSpecifyShiftSpaceKeyBehavior.option.0" = "Shift+Space で次のページ、Space で次の候補文字を";
 "i18n:UserDef.kSpecifyShiftSpaceKeyBehavior.option.1" = "Space で次のページ、Shift+Space で次の候補文字を";
 "i18n:UserDef.kSpecifyShiftSpaceKeyBehavior.shortTitle" = "(Shift+)Space:";
@@ -529,7 +529,8 @@
 "i18n:UserDef.kUseSCPCTypingMode.description" = "年配なるユーザーのために提供した機能である。";
 "i18n:UserDef.kUseSCPCTypingMode.shortTitle" = "漢字１つづつ全候補選択入力モード";
 "i18n:UserDef.kUseShiftQuestionToCallServiceMenu.shortTitle" = "候補陳列ウィンドウで「Shift+?」でもサービスメニューを呼出";
-"i18n:UserDef.kUseSpaceToCommitHighlightedSCPCCandidate.shortTitle" = "全候補入力の場合、ハイライト候補を Space キーで確認";
+"i18n:UserDef.kUseSpaceToCommitHighlightedCandidate4SCPC.description" = "有効にすると、候補ウィンドウ表示中にスペースキーを押すとハイライトされた候補を確定します。この設定は逐字選択モード（SCPC）でのみ有効です。";
+"i18n:UserDef.kUseSpaceToCommitHighlightedCandidate4SCPC.shortTitle" = "全候補入力の場合、ハイライト候補を Space キーで確認";
 "i18n:UserDef.kUsingHotKeyAssociates.shortTitle" = "関連文節モード";
 "i18n:UserDef.kUsingHotKeyCassette.shortTitle" = "数字大字変換";
 "i18n:UserDef.kUsingHotKeyCNS.shortTitle" = "全字庫モード";

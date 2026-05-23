@@ -187,8 +187,11 @@ extension InputHandlerProtocol {
           confirmHighlightedCandidate()
           return true
         }
+        // In SCPC mode, space without Shift always flips pages / switches columns.
+        let effectiveSpecifyShift: Bool = prefs.useSCPCTypingMode
+          || prefs.specifyShiftSpaceKeyBehavior
         let updated: Bool =
-          prefs.specifyShiftSpaceKeyBehavior
+          effectiveSpecifyShift
             ? (
               input.isShiftHold
                 ? ctlCandidate.highlightNextCandidate()
