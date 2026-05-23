@@ -31,7 +31,7 @@ public struct VwrSettingsPaneOutput: View {
         UserDef.kTrimUnfinishedReadingsOnCommit.renderUI()
         UserDef.kRomanNumeralOutputFormat.renderUI()
       }
-      Section(header: Text("Experimental:")) {
+      Section(header: Text("i18n:Settings.SectionExperimental")) {
         UserDef.kHardenVerticalPunctuations.renderUI()
       }
     }.formStyled()
