@@ -307,8 +307,8 @@
 "i18n:UpdateNotification.NewVersionAvailable" = "New Version Available";
 "i18n:UpdateNotification.UpdateCheckCompleted" = "Update Check Completed";
 "i18n:UpdateNotification.UpdateCheckFailed" = "Update Check Failed";
-"i18n:UserDef.kAcceptLeadingIntonations.description" = "i18n:UserDef.kAcceptLeadingIntonations.description";
-"i18n:UserDef.kAcceptLeadingIntonations.shortTitle" = "i18n:UserDef.kAcceptLeadingIntonations.shortTitle";
+"i18n:UserDef.kAcceptLeadingIntonations.description" = "This feature accommodates certain typing mistakes that the intonation mark might be typed at first (which is sequentially wrong from a common sense that intonation marks are supposed to be used for confirming combinations). It won't work if the current parser is of (any) pinyin. Also, this feature won't work when an intonation override is possible (and enabled).";
+"i18n:UserDef.kAcceptLeadingIntonations.shortTitle" = "Accept leading intonations in rare cases";
 "i18n:UserDef.kAllowRescoringSingleKanjiCandidates.description" = "⚠️💀 This may hinder the sentence-composition algorithm from giving appropriate results. You are urged to turn this switch off at all costs, unless you really know what you are doing.";
 "i18n:UserDef.kAllowRescoringSingleKanjiCandidates.shortTitle" = "Allow boosting / excluding a candidate of single kanji";
 "i18n:UserDef.kAlphanumericalKeyboardLayout.description" = "Choose the macOS-level alphanumerical keyboard layout. This setting is for Shift-toggled alphanumerical mode only.";
@@ -478,11 +478,11 @@
 "i18n:UserDef.kSpecifyCmdOptCtrlEnterBehavior.option.3" = "Commit Mandarin Braille (GF0019-2018)";
 "i18n:UserDef.kSpecifyCmdOptCtrlEnterBehavior.option.4" = "Commit ButKo BPMFVS Annotation";
 "i18n:UserDef.kSpecifyCmdOptCtrlEnterBehavior.shortTitle" = "Command+Option+Ctrl+Enter:";
-"i18n:UserDef.kSpecifyIntonationKeyBehavior.description" = "i18n:UserDef.kSpecifyIntonationKeyBehavior.description";
-"i18n:UserDef.kSpecifyIntonationKeyBehavior.option.0" = "i18n:UserDef.kSpecifyIntonationKeyBehavior.option.0";
-"i18n:UserDef.kSpecifyIntonationKeyBehavior.option.1" = "i18n:UserDef.kSpecifyIntonationKeyBehavior.option.1";
-"i18n:UserDef.kSpecifyIntonationKeyBehavior.option.2" = "i18n:UserDef.kSpecifyIntonationKeyBehavior.option.2";
-"i18n:UserDef.kSpecifyIntonationKeyBehavior.shortTitle" = "i18n:UserDef.kSpecifyIntonationKeyBehavior.shortTitle";
+"i18n:UserDef.kSpecifyIntonationKeyBehavior.description" = "Specify the behavior of intonation key when syllable composer is empty.";
+"i18n:UserDef.kSpecifyIntonationKeyBehavior.option.0" = "Override the previous reading's intonation with candidate-reset";
+"i18n:UserDef.kSpecifyIntonationKeyBehavior.option.1" = "Only override the intonation of the previous reading if different";
+"i18n:UserDef.kSpecifyIntonationKeyBehavior.option.2" = "Always type intonations to the inline composition buffer";
+"i18n:UserDef.kSpecifyIntonationKeyBehavior.shortTitle" = "Intonation Key:";
 "i18n:UserDef.kSpecifyShiftBackSpaceKeyBehavior.description" = "Disassembling process does not work with non-phonetic reading keys.";
 "i18n:UserDef.kSpecifyShiftBackSpaceKeyBehavior.option.0" = "Disassemble the previous reading, dropping its intonation";
 "i18n:UserDef.kSpecifyShiftBackSpaceKeyBehavior.option.1" = "Clear the entire inline composition buffer like Shift+Delete";

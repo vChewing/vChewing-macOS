@@ -10,7 +10,7 @@
 "i18n:CandidateKey.ValidationError.AssignedForOtherPurposes" = "無法將已挪作他用的按鍵設為選字鍵。";
 "i18n:candidateServiceMenu.selectorResponse.failed" = "請求失敗\nSelector 指令匹配失敗、或無結果可用。";
 "i18n:candidateServiceMenu.selectorResponse.succeeded" = "成功取得結果\n已將結果寫入剪貼簿。";
-"i18n:CandidateServiceMenuEditor.description" = "服務選單可以在選字窗內藉由「(Shift+)符號選單鍵」呼出。在您呼出該選單的那一刻，原先的選字窗內的高亮選中的候選字詞將成為該服務選單內各個功能的處理參數。根據當前視窗（服務選單管理器）內所陳列的服務的不同，有些服務是會叫出瀏覽器前往指定網頁檢索指定內容，而有些服務則可能會將本地計算的某些結果自動拷貝到您的剪貼簿內。\n\n註：如果當前視窗內沒有任何可用的服務選單資料的話，上述熱鍵在選字窗內的對應的行為會是輔助翻頁。";
+"i18n:CandidateServiceMenuEditor.description" = "服務選單可以在選字窗內藉由「(Shift+)符號選單鍵」呼出。在您呼出該選單的那一刻，原先的選字窗內的高亮選中的候選字詞將成為該服務選單內各個功能的處理參數。根據當前視窗（服務選單管理器）內所陳列的服務的不同，有些服務是會叫出瀏覽器前往指定網頁檢索指定內容，而有些服務則可能會將本機計算的某些結果自動拷貝到您的剪貼簿內。\n\n註：如果當前視窗內沒有任何可用的服務選單資料的話，上述熱鍵在選字窗內的對應的行為會是輔助翻頁。";
 "i18n:CandidateServiceMenuEditor.formatGuide" = "填寫規則大致如下：\n\n1. 每行一筆定義，選單條目名稱與定義資料值以 Tab 字元分割。選單名稱當中的「%s」會在使用服務時被置換成傳入的參數。如果參數只有一個字元的話，則程式會自動在選單名稱結尾用括弧追加顯示其統一碼碼位。\n\n2. 定義資料值的開頭是「@SEL:」或「@WEB:」或「@URL:」，其中：\n\n- 「@SEL:」對應 Objective-C Selector 名稱，可以呼叫唯音輸入法內部預先定義的某些資料生成功能。直接在此之後緊接著填寫 Selector 名稱即可（須以西文半形冒號結尾）。\n\n- 「@WEB:」與「@URL:」等價，用來緊接著填寫網址。網址當中的「%s」會在使用服務時被置換成傳入的參數。";
 "i18n:CandidateServiceMenuEditor.howToGetGuide" = "可將滑鼠懸停於編輯區內、以檢視資料填寫指引。";
 "i18n:CandidateServiceMenuEditor.prompt" = "請鍵入您要登記的服務資料。";
@@ -249,7 +249,7 @@
 "i18n:Settings.SectionSpace" = "空格鍵:";
 "i18n:Settings.SectionTypingSettings" = "敲字設定:";
 "i18n:Settings.SectionTypingStyle" = "輸入風格:";
-"i18n:settings.shiftKeyASCIITogle.description" = "該功能只需要對藉由 macOS 內建的輸入法框架傳來的 NSEvent 做上下文分析，自然沒有「向使用者尋求系統全局鍵盤事件監聽權限」之必要。您可自行審視敝輸入法的原始程式碼倉庫、或對敝輸入法逆向工程，以自行證實此處所言之真假。另註：這個 Shift 鍵切換開關在 CapsLock 燈亮時無效。";
+"i18n:settings.shiftKeyASCIITogle.description" = "該功能只需要對藉由 macOS 內建的輸入法框架傳來的 NSEvent 做上下文分析，自然沒有「向使用者尋求系統全域鍵盤事件監聽權限」之必要。您可自行審視敝輸入法的原始程式碼倉庫、或對敝輸入法逆向工程，以自行證實此處所言之真假。另註：這個 Shift 鍵切換開關在 CapsLock 燈亮時無效。";
 "i18n:Settings.TabExperience" = "體驗設定";
 "i18n:StateOfInputting.Tooltip.AttemptCombinePhonabet" = "該聲調亦會嘗試與接下來輸入的注音相組合。";
 "i18n:StateOfInputting.Tooltip.CharsReadingsMismatch" = "⚠︎ 無法處理：組字區字數與讀音數不對應。";
@@ -395,7 +395,7 @@
 "i18n:UserDef.kFilterFactoryKanjisOfNonCurrentInputMode.description" = "啟用時，僅存在於相反輸入模式（如在繁體模式下出現的簡體特有字）的單一漢字候選將從選字窗中移除。倚天中文系統支援的漢字與 CNS 全字庫漢字不受影響。注意：過濾範圍僅限萬國碼 1.0.1 所支援的漢字（即倚天中文系統收字範圍）；較新版本萬國碼才引入的字元不在覆蓋範圍內。";
 "i18n:UserDef.kFilterFactoryKanjisOfNonCurrentInputMode.shortTitle" = "濾除掉與輸入模式不相符的漢字候選";
 "i18n:UserDef.kFilterNonCNSReadingsForCHTInput.description" = "對於單漢字候選字，不符合全字庫讀音的結果將被降權至候選字列表尾端，而非完全移除。";
-"i18n:UserDef.kFilterNonCNSReadingsForCHTInput.shortTitle" = "僅繁體中文: 原廠辭典僅返回符合全字庫讀音的結果";
+"i18n:UserDef.kFilterNonCNSReadingsForCHTInput.shortTitle" = "僅繁體中文: 原廠辭典僅傳回符合全字庫讀音的結果";
 "i18n:UserDef.kForceCassetteChineseConversion.description" = "該轉換僅對磁帶模式有影響，會將鍵入的內容根據該選項與當前的簡繁體模式來轉換。";
 "i18n:UserDef.kForceCassetteChineseConversion.option.0" = "對磁帶模式禁用繁簡轉換";
 "i18n:UserDef.kForceCassetteChineseConversion.option.1" = "依當前簡繁模式強制轉換";
@@ -438,15 +438,15 @@
 "i18n:UserDef.kReflectBPMFVSInCompositionBuffer.shortTitle" = "在組字區同步反映 ButKo BPMFVS";
 "i18n:UserDef.kReplaceSymbolMenuNodeWithUserSuppliedData.description" = "在未按住修飾鍵的情況下單擊[符號選單鍵]會觸發層級符號選單。啟用該功能後，該符號選單將僅呈現由 `symbols.dat` 提供的內容（該檔案可自行放置於使用者辭典資料夾中，需遵循酷音符號資料檔案格式）。關閉該功能後，這些使用者提供的內容將改為追加至出廠符號選單根節點的末尾子節點。";
 "i18n:UserDef.kReplaceSymbolMenuNodeWithUserSuppliedData.shortTitle" = "以使用者提供的 `symbols.dat` 資料完全取代層級符號選單內容";
-"i18n:UserDef.kRespectClientAccentColor.description" = "這會使田所選字窗的高亮候選字詞背景色優先改用當前接收文字輸入的客體應用的強調主題色，與 macOS 內建輸入法的行為一致。如果當前接收文字輸入的客體應用沒有專門指定強調主題色（或者系統主題色被設定為非預設值）的話，則會自動改用系統偏好設定內的系統全局強調主題色。注意：該特性在啟用了 JIS / 康熙文字轉換模式時不會生效。";
-"i18n:UserDef.kRespectClientAccentColor.shortTitle" = "遵循客體應用或系統全局的強調色偏好設定";
+"i18n:UserDef.kRespectClientAccentColor.description" = "這會使田所選字窗的高亮候選字詞背景色優先改用當前接收文字輸入的客體應用的強調主題色，與 macOS 內建輸入法的行為一致。如果當前接收文字輸入的客體應用沒有專門指定強調主題色（或者系統主題色被設定為非預設值）的話，則會自動改用系統偏好設定內的系統全域強調主題色。注意：該特性在啟用了 JIS / 康熙文字轉換模式時不會生效。";
+"i18n:UserDef.kRespectClientAccentColor.shortTitle" = "遵循客體應用或系統全域的強調色偏好設定";
 "i18n:UserDef.kRomanNumeralOutputFormat.description" = "羅馬數字輸入模式可以在敲 [Opt]+[符號選單鍵] 切換輸入方式時啟用，支援 [1, 3999] 閉區間內的整數。輸入成功或失敗後，該模式會自動關閉。";
 "i18n:UserDef.kRomanNumeralOutputFormat.option.0" = "ASCII 大寫";
 "i18n:UserDef.kRomanNumeralOutputFormat.option.1" = "ASCII 小寫";
 "i18n:UserDef.kRomanNumeralOutputFormat.option.2" = "萬國碼羅馬數字(大寫)";
 "i18n:UserDef.kRomanNumeralOutputFormat.option.3" = "萬國碼羅馬數字(小寫)";
 "i18n:UserDef.kRomanNumeralOutputFormat.shortTitle" = "羅馬數字輸出格式";
-"i18n:UserDef.kSecurityHardenedCompositionBuffer.description" = "這會阻止任何客體擅自存取尚未遞交的組字區內容。此舉也會全局啟用浮動組字窗。";
+"i18n:UserDef.kSecurityHardenedCompositionBuffer.description" = "這會阻止任何客體擅自存取尚未遞交的組字區內容。此舉也會全域啟用浮動組字窗。";
 "i18n:UserDef.kSecurityHardenedCompositionBuffer.shortTitle" = "針對所有客體軟體啟用強化型組字區安全防護";
 "i18n:UserDef.kShareAlphanumericalModeStatusAcrossClients.description" = "僅用於以 Shift 鍵或 JIS 英數鍵切換中英文輸入模式的場合。";
 "i18n:UserDef.kShareAlphanumericalModeStatusAcrossClients.shortTitle" = "對所有客體應用共用中英文輸入切換狀態";
