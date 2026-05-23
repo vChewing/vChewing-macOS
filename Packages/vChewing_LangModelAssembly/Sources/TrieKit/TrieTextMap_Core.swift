@@ -192,6 +192,10 @@ extension VanguardTrie.TextMapTrie {
             keyMapContentStart = nextLineStart
           }
         }
+        // Early exit once all three pragmas are found.
+        if headerContentStart != nil, valuesLineStart != nil, keyMapLineStart != nil {
+          break
+        }
         cursor = nextLineStart
       }
     }
@@ -365,27 +369,61 @@ extension VanguardTrie.TextMapTrie {
       }
     }
 
-    entries.sort { lhs, rhs in
-      data.compareUTF8Ranges(lhs.keyStart ..< lhs.keyEnd, rhs.keyStart ..< rhs.keyEnd) < 0
+    // Pointer-based comparisons via direct buffer access instead of Data subscript.
+    data.withUnsafeBytes { rawBuffer in
+      let sortBuf = rawBuffer.bindMemory(to: UInt8.self)
+      entries.sort { lhs, rhs in
+        let lhsLen = lhs.keyEnd - lhs.keyStart
+        let rhsLen = rhs.keyEnd - rhs.keyStart
+        let minLen = lhsLen < rhsLen ? lhsLen : rhsLen
+        for i in 0 ..< minLen {
+          let lb = sortBuf[lhs.keyStart + i]
+          let rb = sortBuf[rhs.keyStart + i]
+          if lb < rb { return true }
+          if lb > rb { return false }
+        }
+        return lhsLen < rhsLen
+      }
     }
 
+    // Byte-level key initials extraction avoids String/split allocations.
     var keyInitialsIDMap: [String: [Int]] = [:]
-    for (nodeID, idx) in entries.indices.enumerated() {
-      let keyEntry = entries[idx]
-      let readingKey = extractString(from: data, start: keyEntry.keyStart, end: keyEntry.keyEnd)
-      let keyInitials = readingKey.split(separator: separator).compactMap {
-        $0.first?.description
-      }.joined()
-      keyInitialsIDMap[keyInitials, default: []].append(nodeID)
-      // Precompute segment count for reverse-lookup fast path.
-      let segCount = readingKey.split(separator: separator).count
-      entries[idx] = .init(
-        keyStart: keyEntry.keyStart,
-        keyEnd: keyEntry.keyEnd,
-        startLine: keyEntry.startLine,
-        count: keyEntry.count,
-        segmentCount: UInt8(clamping: segCount)
-      )
+    let sepByte = separator.asciiValue!
+    data.withUnsafeBytes { rawBuffer in
+      let initBuf = rawBuffer.bindMemory(to: UInt8.self)
+      for (nodeID, idx) in entries.indices.enumerated() {
+        let ks = entries[idx].keyStart
+        let ke = entries[idx].keyEnd
+        var segCount: UInt8 = 1
+        var initialsBytes = [UInt8]()
+        // Collect full first character (not first byte) of the initial segment.
+        if ks < ke {
+          let firstLen = utf8SequenceLength(initBuf[ks])
+          let copyLen = Swift.min(firstLen, ke - ks)
+          if copyLen > 0 { initialsBytes.append(contentsOf: initBuf[ks ..< ks + copyLen]) }
+        }
+        for pos in ks ..< ke {
+          if initBuf[pos] == sepByte {
+            segCount += 1
+            let nextPos = pos + 1
+            if nextPos < ke {
+              let firstLen = utf8SequenceLength(initBuf[nextPos])
+              let copyLen = Swift.min(firstLen, ke - nextPos)
+              if copyLen >
+                0 { initialsBytes.append(contentsOf: initBuf[nextPos ..< nextPos + copyLen]) }
+            }
+          }
+        }
+        let initials = String(decoding: initialsBytes, as: UTF8.self)
+        keyInitialsIDMap[initials, default: []].append(nodeID)
+        entries[idx] = .init(
+          keyStart: ks,
+          keyEnd: ke,
+          startLine: entries[idx].startLine,
+          count: entries[idx].count,
+          segmentCount: segCount
+        )
+      }
     }
 
     return (entries, keyInitialsIDMap)
@@ -425,7 +463,8 @@ extension VanguardTrie.TextMapTrie {
     separator: Character
   )
     -> [RevLookupEntry] {
-    var charToLineIndices: [String: [Int]] = [:]
+    // UInt32 scalar values as dictionary keys to avoid per-character String allocations.
+    var charToLineIndices: [UInt32: [Int]] = [:]
 
     for lineIndex in 0 ..< valueLineOffsets.count {
       let keyEntryIndex = Int(valueLineToKeyEntryIndex[lineIndex])
@@ -449,14 +488,14 @@ extension VanguardTrie.TextMapTrie {
         isTyping: isTyping,
         includeGroupedTypingLine: isSingleSegment
       )
-      for char in chars {
-        charToLineIndices[char, default: []].append(lineIndex)
+      for sv in chars {
+        charToLineIndices[sv, default: []].append(lineIndex)
       }
     }
 
     var result: [RevLookupEntry] = []
     result.reserveCapacity(charToLineIndices.count)
-    for (character, lineIndices) in charToLineIndices {
+    for (scalarValue, lineIndices) in charToLineIndices {
       let sortedLineIndices = lineIndices.sorted()
       var deduplicatedLineIndices: [Int] = []
       deduplicatedLineIndices.reserveCapacity(sortedLineIndices.count)
@@ -464,9 +503,10 @@ extension VanguardTrie.TextMapTrie {
         where deduplicatedLineIndices.last != currentLineIndex {
         deduplicatedLineIndices.append(currentLineIndex)
       }
+      guard let scalar = Unicode.Scalar(scalarValue) else { continue }
       result.append(
         .init(
-          key: ContiguousArray(character.utf8),
+          key: ContiguousArray(String(scalar).utf8),
           lineIndices: deduplicatedLineIndices
         )
       )
@@ -497,7 +537,7 @@ extension VanguardTrie.TextMapTrie {
     isTyping: Bool,
     includeGroupedTypingLine: Bool
   )
-    -> [String] {
+    -> [UInt32] {
     guard end > start else { return [] }
     let tab: UInt8 = 0x09
 
@@ -540,7 +580,7 @@ extension VanguardTrie.TextMapTrie {
     if firstByte == 0x40, tabPositions.count >= 2, isTyping { // '@' = Format B
       // `@prob\tchsCell\tchtCell`
       guard includeGroupedTypingLine else { return [] }
-      var chars: [String] = []
+      var chars: [UInt32] = []
       let chsStart = tabPositions[0] + 1
       let chsEnd = tabPositions[1]
       chars.append(contentsOf: collectCharsFromGroupedCellBytes(
@@ -560,7 +600,7 @@ extension VanguardTrie.TextMapTrie {
     // Legacy bare numeric grouped: `prob\tchsCell\tchtCell` (TYPING, first cell parses as Double)
     if isTyping, includeGroupedTypingLine, tabPositions.count >= 2,
        data[start] >= 0x30, data[start] <= 0x39 || data[start] == 0x2D {
-      var chars: [String] = []
+      var chars: [UInt32] = []
       let chsStart = tabPositions[0] + 1
       let chsEnd = tabPositions[1]
       chars.append(contentsOf: collectCharsFromGroupedCellBytes(
@@ -576,7 +616,7 @@ extension VanguardTrie.TextMapTrie {
 
     // Legacy 4-column: `chsValue\tchsProb\tchtValue\tchtProb` (TYPING only)
     if isTyping, includeGroupedTypingLine, tabPositions.count >= 3 {
-      var chars: [String] = []
+      var chars: [UInt32] = []
       let chsValEnd = tabPositions[0]
       chars.append(contentsOf: collectCharsFromPlainCellBytes(
         in: data, start: start, end: chsValEnd, ideographicOnly: true
@@ -616,15 +656,16 @@ extension VanguardTrie.TextMapTrie {
   /// Extract characters from a **plain** cell (no pipe-escaping).
   /// - Parameter ideographicOnly: if `true`, only ideographic scalars are kept;
   ///   if `false`, every scalar is returned.
+  /// - Returns: Array of UInt32 scalar values (avoids per-character String allocation).
   private static func collectCharsFromPlainCellBytes(
     in data: Data,
     start: Int,
     end: Int,
     ideographicOnly: Bool
   )
-    -> [String] {
+    -> [UInt32] {
     guard end > start else { return [] }
-    var result: [String] = []
+    var result: [UInt32] = []
     data.withUnsafeBytes { rawBuffer in
       let buffer = rawBuffer.bindMemory(to: UInt8.self)
       var i = start
@@ -633,9 +674,10 @@ extension VanguardTrie.TextMapTrie {
         let len = utf8SequenceLength(byte)
         guard len > 0, i + len <= end else { i += 1; continue }
         if len == 1 { i += 1; continue } // ASCII, skip
-        let scalar = decodeUTF8Scalar(from: buffer, at: i, length: len)
-        if !ideographicOnly || scalar.properties.isIdeographic {
-          result.append(String(scalar))
+        // Decode raw UInt32 + fast CJK range check instead of Unicode.Scalar + isIdeographic.
+        let sv = decodeUTF8ScalarValue(from: buffer, at: i, length: len)
+        if !ideographicOnly || isFastCJKIdeographic(sv) {
+          result.append(sv)
         }
         i += len
       }
@@ -646,36 +688,23 @@ extension VanguardTrie.TextMapTrie {
   /// Extract characters from a **grouped** cell (pipe-separated, backslash-escaped).
   /// - Parameter ideographicOnly: if `true`, only ideographic scalars are kept;
   ///   if `false`, every decoded scalar is returned.
+  /// - Returns: Array of UInt32 scalar values (single-pass scan, no pre-scan, no String allocation).
   private static func collectCharsFromGroupedCellBytes(
     in data: Data,
     start: Int,
     end: Int,
     ideographicOnly: Bool
   )
-    -> [String] {
+    -> [UInt32] {
     guard end > start else { return [] }
-    var result: [String] = []
-    // Fast path: no escape or pipe characters → plain cell.
-    let hasSpecial = data.withUnsafeBytes { rawBuffer in
-      let buffer = rawBuffer.bindMemory(to: UInt8.self)
-      for i in start ..< end {
-        let b = buffer[i]
-        if b == 0x7C || b == 0x5C { return true } // '|' or '\'
-      }
-      return false
-    }
-    if !hasSpecial {
-      return collectCharsFromPlainCellBytes(
-        in: data, start: start, end: end, ideographicOnly: ideographicOnly
-      )
-    }
-
+    var result: [UInt32] = []
+    // Single-pass scan handles escape/separator inline; no pre-scan needed.
     data.withUnsafeBytes { rawBuffer in
       let buffer = rawBuffer.bindMemory(to: UInt8.self)
       var i = start
       while i < end {
         let byte = buffer[i]
-        if byte == 0x5C { // '\' escape: skip this and the next byte
+        if byte == 0x5C { // '\\' escape: skip this and the next byte
           i += 2
           continue
         }
@@ -686,9 +715,10 @@ extension VanguardTrie.TextMapTrie {
         let len = utf8SequenceLength(byte)
         guard len > 0, i + len <= end else { i += 1; continue }
         if len == 1 { i += 1; continue }
-        let scalar = decodeUTF8Scalar(from: buffer, at: i, length: len)
-        if !ideographicOnly || scalar.properties.isIdeographic {
-          result.append(String(scalar))
+        // Decode raw UInt32 + fast CJK range check.
+        let sv = decodeUTF8ScalarValue(from: buffer, at: i, length: len)
+        if !ideographicOnly || isFastCJKIdeographic(sv) {
+          result.append(sv)
         }
         i += len
       }
@@ -740,6 +770,52 @@ extension VanguardTrie.TextMapTrie {
     default:
       return fallback
     }
+  }
+
+  // Decodes raw UInt32 scalar value without Unicode.Scalar allocation.
+  @inline(__always)
+  private static func decodeUTF8ScalarValue(
+    from buffer: UnsafeBufferPointer<UInt8>,
+    at offset: Int,
+    length: Int
+  )
+    -> UInt32 {
+    switch length {
+    case 2:
+      return (UInt32(buffer[offset] & 0x1F) << 6) |
+        UInt32(buffer[offset + 1] & 0x3F)
+    case 3:
+      return (UInt32(buffer[offset] & 0x0F) << 12) |
+        (UInt32(buffer[offset + 1] & 0x3F) << 6) |
+        UInt32(buffer[offset + 2] & 0x3F)
+    case 4:
+      return (UInt32(buffer[offset] & 0x07) << 18) |
+        (UInt32(buffer[offset + 1] & 0x3F) << 12) |
+        (UInt32(buffer[offset + 2] & 0x3F) << 6) |
+        UInt32(buffer[offset + 3] & 0x3F)
+    default:
+      return 0xFFFD
+    }
+  }
+
+  /// Fast CJK ideographic range check.
+  /// Covers all CJK Unified Ideographs blocks (Extensions A–I) and compatibility blocks.
+  /// CNS-only entries bypass this check entirely via `ideographicOnly: false`,
+  /// so PUA / surrogate-pair CNS characters are always captured.
+  @inline(__always)
+  private static func isFastCJKIdeographic(_ scalarValue: UInt32) -> Bool {
+    (scalarValue >= 0x3400 && scalarValue <= 0x4DBF) // Extension A
+      || (scalarValue >= 0x4E00 && scalarValue <= 0x9FFF) // Unified
+      || (scalarValue >= 0xF900 && scalarValue <= 0xFAFF) // Compatibility
+      || (scalarValue >= 0x20000 && scalarValue <= 0x2A6DF) // Extension B
+      || (scalarValue >= 0x2A700 && scalarValue <= 0x2B73F) // Extension C
+      || (scalarValue >= 0x2B740 && scalarValue <= 0x2B81F) // Extension D
+      || (scalarValue >= 0x2B820 && scalarValue <= 0x2CEAF) // Extension E
+      || (scalarValue >= 0x2CEB0 && scalarValue <= 0x2EBEF) // Extension F
+      || (scalarValue >= 0x30000 && scalarValue <= 0x3134F) // Extension G
+      || (scalarValue >= 0x31350 && scalarValue <= 0x323AF) // Extension H
+      || (scalarValue >= 0x2EBF0 && scalarValue <= 0x2EE5F) // Extension I
+      || (scalarValue >= 0x2F800 && scalarValue <= 0x2FA1F) // Compatibility Supplement
   }
 
   /// Parses a positive Int32 from a byte range without String allocation.
