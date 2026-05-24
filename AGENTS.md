@@ -8,7 +8,7 @@ This handbook briefs AI coding assistants on the vChewing (唯音) macOS reposit
 - **Implementation**: Pure Swift modules layered on AppKit/IMK. C(++)/ObjC(++) bridges exist only where Swift cannot interface directly with legacy assets.
 - **Primary packages**:
   - `vChewing_MainAssembly4Darwin`: IMK front-end (SessionCtl, InputSession, UI bridges, sandbox glue).
-  - `vChewing_Typewriter`: Typing FSM, Tekkon integration, user preference wiring, cassette/stroke handling.
+  - `vChewing_Typewriter`: Typing FSM, session core protocol (`SessionCoreProtocol`), Tekkon integration, user preference wiring, cassette/stroke handling.
   - `vChewing_Homa`: DAG-DP assembler (sentence assembler) with candidate override, consolidation, revolver, and perception hooks.
   - `vChewing_Tekkon`: Keyboard parsers, Zhuyin/Bopomofo composer, stroke cassette parser, phonabet utilities.
   - `vChewing_LangModelAssembly`: LM instantiation facade, user phrase memory, perception override, associated phrases.
@@ -31,6 +31,7 @@ This handbook briefs AI coding assistants on the vChewing (唯音) macOS reposit
 
 - `Packages/vChewing_MainAssembly4Darwin/.../SessionController/SessionCtl.swift`: IMK entry point. All NSEvent handling funnels through `InputSession*` files.
 - `Packages/vChewing_Typewriter/Sources/Typewriter/InputHandler/`: FSM split across triage, composition, candidate handling, and commissions.
+- `Packages/vChewing_Typewriter/Sources/Typewriter/Session/`: `SessionCoreProtocol` — shared session base protocol with `switchState()`/`resetInputHandler()` default implementations.
 - `Packages/vChewing_Homa/Sources/Homa/`: Assembler core (`Homa_Assembler.swift`, `Homa_PathFinder.swift`, candidate/consolidation APIs, etc.).
 - `Packages/vChewing_Tekkon/Sources/Tekkon/`: Keyboard parsers, composer, Zhuyin constants.
 - `Packages/vChewing_LangModelAssembly/Sources/LangModelAssembly/`: LM instantiators, perception override, associated phrase derivation.
@@ -57,8 +58,8 @@ Reference `algorithm.md` for the deep algorithm write-up (zh-Hant).
 - **UI**: AppKit only. No Interface Builder nibs/storyboards. Keep UI work on the main actor. Most AppKit Window views are implemented using AppKit Result Builder DSL.
 - **Preferences**: Extend `UserDef`, `PrefMgrProtocol`, and `PrefMgr` together. Avoid naked `UserDefaults.standard` access except in constrained scenarios.
 - **User data paths**: Avoid hard-coded user data paths except where necessary in package test targets.
-- **State machine**: Prefer new `IMEState` enum cases and explicit transition APIs over boolean shortcuts. Follow existing `InputSession`/`InputHandler` protocol surfaces.
-- **Conditional APIs**: Guard platform-specific code (`#if canImport(Darwin)`) as needed; keep Linux compatibility in `Typewriter` package and its local dependnecies.
+- **State machine**: Prefer new `IMEState` enum cases and explicit transition APIs over boolean shortcuts. `SessionCoreProtocol` (Typewriter) provides `switchState()`/`resetInputHandler()` default implementations shared by mock tests and production; extend `InputHandlerProtocol` for per-event triage logic.
+- **Conditional APIs**: Guard platform-specific code (`#if canImport(Darwin)`) as needed; keep Linux compatibility in `Typewriter` package and its local dependencies.
 - **Bundle resources**: SPM `#bundle` macro expands to `Bundle.module` from the auto-generated accessor. For packages with runtime resource lookup (e.g., `LangModelAssembly`), use custom `Bundle.currentSPM` accessor that checks `resourceURL` first, then falls back to `bundleURL`. This avoids codesign sand­box violations from files at `.app/` root.
 - **ObjC(++)/C(+=) style**: Follow Google Style Guide formatting for Objective-C(++) and C(++).
 - **Licensing**: Preserve MIT-NTL banners. Respect LGPL for Homa, Megrez legacy sources (if exists), and Tekkon; avoid mixing incompatible license assets.

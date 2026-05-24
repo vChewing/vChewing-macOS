@@ -59,7 +59,7 @@ This file provides GitHub Copilot-specific coding instructions. For comprehensiv
 - **Resource lookup**: `MainAssembly4Darwin` uses custom `Bundle.currentSPM` accessor (`BundleAccessor.swift`) to locate factory lexicons from `.app/Contents/Resources/` (not `.app/` root) to avoid codesign sandbox violations.
 
 ## Things to Beware / Avoid
-- When implementing new APIs for InputSession and InputHandler, please put them onto the protocols if possible.
+- When implementing new APIs for InputSession and InputHandler, please put them onto the protocols if possible. For shared session-management logic (state transitions, handler reset), prefer `SessionCoreProtocol` (defined in Typewriter, `Session/SessionCoreProtocol.swift`) which provides default implementations of `switchState()` and `resetInputHandler()` shared between mock tests and production code.
 - Gate new APIs with availability checks (e.g. conditional compilation via `canImport(Darwin)` and Swift `@available` annotations) so shared packages keep compiling on Linux. The shipping Xcode target requires macOS 12+, but legacy macOS releases are maintained in a separate repository.
 - This repo has no dependency of InterfaceBuilder assets. AppKit is used by default with self-crafted result builder DSLs to make the coding experience similar to SwiftUI. SwiftUI in this project is only used for About window and SettingsUI. On macOS 10.9 Mavericks till macOS 13 Ventura, this repo uses SettingsCocoa (AppKit Result Builder DSL).
 - User data is not expected to be referred from hard-coded path, unless it is necessary in Test targets of a Swift package.
@@ -72,7 +72,7 @@ This file provides GitHub Copilot-specific coding instructions. For comprehensiv
 
 ## Reference Files and Folders
 - `./Packages/vChewing_MainAssembly4Darwin/Sources/MainAssembly4Darwin/SessionController/`: `SessionCtl.swift` is the IMK entry point working with candidate window, IME settings, etc. However, most of its tasks are delegated to `InputSession*.swift` files in this folder.
-- `./Packages/vChewing_Typewriter/`: The typing module `InputHandler` protocol working with the IMEStateProtocol-based finite state machine.
+- `./Packages/vChewing_Typewriter/`: The typing module `InputHandler` protocol working with the IMEStateProtocol-based finite state machine. Also hosts `SessionCoreProtocol` (in `Session/` subdirectory) which provides shared session state-transition logic (`switchState()`, `resetInputHandler()`) with default implementations.
 - `./Packages/vChewing_LangModelAssembly/`: Language model assembly (factory lexicon, user phrases, perceptor (LX_Perceptor), associated phrases).
 - `./Packages/vChewing_Homa/`: The current sentence assembler used by Typewriter and MainAssembly.
 - `./Packages/vChewing_Tekkon/`: The phonabet composer designed for Chinese Phonabet (Zhuyin, Bopomofo) pronunciation data.
