@@ -49,7 +49,7 @@ public final class MockInputHandler: @MainActor InputHandlerProtocol {
 
   // MARK: Public
 
-  // typealias State removed (inherited from InputHandlerCoreProtocol: State = IMEState)
+  // typealias State removed (inherited from InputHandlerProtocol: State = IMEState)
   public typealias Session = MockSession
 
   public static var keySeparator: String { Assembler.theSeparator }
@@ -83,7 +83,7 @@ public final class MockInputHandler: @MainActor InputHandlerProtocol {
 // MARK: - MockSession
 
 /// 專門用於單元測試的模擬會話類型。
-public final class MockSession: @MainActor SessionCoreProtocol, CtlCandidateDelegate {
+public final class MockSession: @MainActor SessionCoreProtocol {
   // MARK: Lifecycle
 
   public init() {
@@ -125,50 +125,6 @@ public final class MockSession: @MainActor SessionCoreProtocol, CtlCandidateDele
   public func getCandidate(at index: Int) -> CandidateInState? {
     guard state.candidates.indices.contains(index) else { return nil }
     return state.candidates[index]
-  }
-
-  public func switchState(_ newState: State, caller: StaticString, line: Int) {
-    if PrefMgr.sharedSansDidSetOps.isDebugModeEnabled || UserDefaults.pendingUnitTests {
-      let stateStr = "\(state.type.rawValue) -> \(newState.type.rawValue)"
-      let callerTag = "\(caller)@[L\(line)]"
-      let stack = Thread.callStackSymbols.prefix(7).joined(separator: "\n")
-      vCLog("StateChanging: \(stateStr), tag: \(callerTag);\nstack: \(stack)")
-    }
-    // 正式處理。
-    let previous = state
-    let next = getMitigatedState(newState)
-    state = next
-    switch next.type {
-    case .ofDeactivated: break // macOS 不再處理 deactivated 狀態。
-    case .ofAbortion, .ofCommitting, .ofEmpty:
-      if next.type == .ofCommitting {
-        // `commit()` 會自行完成 JIS / 康熙轉換。
-        commit(text: next.textToCommit)
-      } else if next.type == .ofEmpty, previous.hasComposition, let inputHandler {
-        // `commit()` 會自行完成 JIS / 康熙轉換。
-        let textToCommit = inputHandler.committableDisplayText(
-          sansReading: previous.type != .ofInputting
-        )
-        commit(text: textToCommit)
-      }
-      inputHandler?.clear()
-      if state.type != .ofEmpty {
-        state = .ofEmpty()
-      }
-    case .ofInputting:
-      commit(text: next.textToCommit, clearDisplayBeforeCommit: true)
-    case .ofMarking: break // 採統一後置處理。
-    case .ofAssociates, .ofCandidates, .ofSymbolTable:
-      showTooltip(nil)
-    }
-    // 會在工具提示為空的時候自動消除顯示。
-    showTooltip(
-      state.tooltip,
-      colorState: state.data.tooltipColorState,
-      duration: state.tooltipDuration
-    )
-    toggleCandidateUIVisibility(state.isCandidateContainer)
-    updateCompositionBufferDisplay()
   }
 
   public func updateCompositionBufferDisplay() {}
@@ -325,22 +281,6 @@ public final class MockSession: @MainActor SessionCoreProtocol, CtlCandidateDele
   @discardableResult
   public func reverseLookup(for value: String) -> [String] { [] }
 
-  /// 重設輸入調度模組，會將當前尚未遞交的內容遞交出去。
-  public func resetInputHandler(forceComposerCleanup forceCleanup: Bool = false) {
-    guard let inputHandler = inputHandler else { return }
-    var textToCommit = ""
-    // 過濾掉尚未完成拼寫的注音。
-    let sansReading: Bool =
-      (state.type == .ofInputting)
-        && (inputHandler.prefs.trimUnfinishedReadingsOnCommit || forceCleanup)
-    if state.hasComposition {
-      textToCommit = inputHandler.committableDisplayText(sansReading: sansReading)
-    }
-    // 唯音不再在這裡對 IMKTextInput 客體黑名單當中的應用做資安措施。
-    // 有相關需求者，請在切換掉輸入法或者切換至新的客體應用之前敲一下 Shift+Delete。
-    switchState(.ofCommitting(textToCommit: textToCommit))
-  }
-
   public func toggleCandidateUIVisibility(_: Bool, refresh _: Bool) {}
   public func commit(text: String, clearDisplayBeforeCommit _: Bool) {
     guard !text.isEmpty else { return }
@@ -349,6 +289,14 @@ public final class MockSession: @MainActor SessionCoreProtocol, CtlCandidateDele
 
   public func getMitigatedState(_ givenState: State) -> State { givenState }
   public func showTooltip(_: String?, colorState _: TooltipColorState, duration _: Double) {}
+
+  // MARK: Internal
+
+  /// 覆寫 SessionCoreProtocol 的 debugLogCondition，
+  /// 維持單元測試既有的 log 輸出行為。
+  var debugLogCondition: Bool {
+    PrefMgr.sharedSansDidSetOps.isDebugModeEnabled
+  }
 }
 
 // MARK: - MockSpeechNarrator

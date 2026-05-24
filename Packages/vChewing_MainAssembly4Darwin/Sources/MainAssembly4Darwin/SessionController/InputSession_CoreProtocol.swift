@@ -7,6 +7,7 @@
 // requirements defined in MIT License.
 
 import IMKSwift
+import Typewriter
 
 // MARK: - SessionProtocol
 
@@ -19,10 +20,8 @@ import IMKSwift
 /// - Remark: 在輸入法的主函式中分配的 IMKServer 型別為客體應用程式創建的每個
 /// 輸入會話創建一個控制器型別。因此，對於每個輸入會話，都有一個對應的 IMKInputController。
 public protocol SessionProtocol: AnyObject, IMKInputSessionControllerProtocol, CtlCandidateDelegate,
-  SessionCoreProtocol where Handler: InputHandlerProtocol {
+  SessionCoreProtocol {
   static var current: Self? { get set }
-  /// 輸入調度模組的副本。
-  var inputHandler: Handler? { get set }
   /// 當前副本的客體是否是輸入法本體？
   var isServingIMEItself: Bool { get set }
   /// 用以存儲客體的 bundleIdentifier。
@@ -126,32 +125,6 @@ extension SessionProtocol {
 
   public func syncCurrentSessionID() {
     ui?.currentSessionID = id
-  }
-
-  /// 重設輸入調度模組，會將當前尚未遞交的內容遞交出去。
-  public func resetInputHandler(
-    forceComposerCleanup forceCleanup: Bool = false,
-    commitExisting: Bool = true
-  ) {
-    guard let inputHandler = inputHandler else { return }
-    guard commitExisting else {
-      switchState(.ofEmpty())
-      return
-    }
-    var textToCommit = ""
-    // 過濾掉尚未完成拼寫的注音。
-    let sansReading: Bool =
-      (state.type == .ofInputting)
-        && (prefs.trimUnfinishedReadingsOnCommit || forceCleanup)
-    if state.hasComposition {
-      textToCommit = inputHandler.committableDisplayText(sansReading: sansReading)
-    }
-    if !inputHandler.mixedAlphanumericalBuffer.isEmpty {
-      textToCommit += inputHandler.mixedAlphanumericalBuffer
-    }
-    // 唯音不再在這裡對 IMKTextInput 客體黑名單當中的應用做資安措施。
-    // 有相關需求者，請在切換掉輸入法或者切換至新的客體應用之前敲一下 Shift+Delete。
-    switchState(.ofCommitting(textToCommit: textToCommit))
   }
 
   /// 專門用來就地切換繁簡模式的函式。

@@ -14,7 +14,10 @@ import Foundation
 /// 被封裝的「與 Homa 組字引擎和 Tekkon 注拼引擎對接的」各種工具函式。
 /// 注意：不要把 composer 注拼槽與 compositor 組字器這兩個概念搞混。
 @MainActor
-public protocol InputHandlerProtocol: AnyObject, InputHandlerCoreProtocol {
+public protocol InputHandlerProtocol: AnyObject {
+  associatedtype Session: SessionCoreProtocol & CtlCandidateDelegate
+    where Session.Handler == Self
+  typealias State = IMEState
   typealias Composer = Tekkon.Composer
   typealias Assembler = Homa.Assembler
   typealias KeyValuePaired = Homa.CandidatePair
