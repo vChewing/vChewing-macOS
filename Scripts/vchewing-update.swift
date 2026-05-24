@@ -57,12 +57,13 @@ enum Shell {
 func usage() {
   let name =
     (CommandLine.arguments.first as NSString?)?.lastPathComponent ?? "vchewing-update.swift"
-  print("Usage: \(name) [--dry-run] [--path PATH] [--push]")
+  print("Usage: \(name) [--dry-run] [--path PATH] [--push] [--target-version VERSION]")
 }
 
 var dryRun = false
 var repoPath = FileManager.default.currentDirectoryPath
 var autoPush = false
+var targetVersion: String?
 
 var idx = 1
 while idx < CommandLine.arguments.count {
@@ -77,6 +78,15 @@ while idx < CommandLine.arguments.count {
     idx += 1
     if idx < CommandLine.arguments.count {
       repoPath = CommandLine.arguments[idx]
+      idx += 1
+    } else {
+      usage()
+      exit(1)
+    }
+  case "--target-version":
+    idx += 1
+    if idx < CommandLine.arguments.count {
+      targetVersion = CommandLine.arguments[idx]
       idx += 1
     } else {
       usage()
@@ -357,8 +367,20 @@ func bumpTagFromProject(version: String, useLegacySuffix: Bool) -> (String, Bool
   return (newTag, isLegacy)
 }
 
-let (newTag, isLegacy) = bumpTagFromProject(version: currentVer, useLegacySuffix: projectIsLegacy)
-print("New tag: \(newTag) (legacy? \(isLegacy))")
+let newTag: String
+let isLegacy: Bool
+
+if let userVersion = targetVersion {
+  // Use the manually specified version; detect legacy suffix from the user input
+  newTag = userVersion
+  isLegacy = userVersion.hasSuffix("-legacy")
+  print("Using manually specified version: \(newTag) (legacy? \(isLegacy))")
+} else {
+  let (bumpedTag, bumpedLegacy) = bumpTagFromProject(version: currentVer, useLegacySuffix: projectIsLegacy)
+  newTag = bumpedTag
+  isLegacy = bumpedLegacy
+  print("New tag: \(newTag) (legacy? \(isLegacy))")
+}
 
 // 4) 計算 build number: major*1000 + minor*100 + patch*10
 let base = newTag.components(separatedBy: "-").first ?? newTag
