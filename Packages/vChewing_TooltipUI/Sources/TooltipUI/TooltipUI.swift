@@ -89,6 +89,8 @@ public final class TooltipUI: NSWindowController, TooltipUIProtocol {
     bottomOutOfScreenAdjustmentHeight heightDelta: Double,
     direction: UILayoutOrientation = .horizontal, duration: Double
   ) {
+    showGeneration += 1
+    let currentGeneration = showGeneration
     self.direction = direction
     self.tooltip = tooltip
     window?.setIsVisible(false)
@@ -97,6 +99,7 @@ public final class TooltipUI: NSWindowController, TooltipUIProtocol {
     window?.setIsVisible(true)
     if duration > 0 {
       asyncOnMain(after: duration) {
+        guard self.showGeneration == currentGeneration else { return }
         self.window?.orderOut(nil)
       }
     }
@@ -188,6 +191,9 @@ public final class TooltipUI: NSWindowController, TooltipUIProtocol {
       currentWindow?.orderOut(nil)
     }
   }
+
+  /// 用於取消已被覆寫的延遲消失任務。
+  private var showGeneration: Int = 0
 
   private let tooltipView: TooltipContentView
 
