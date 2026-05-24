@@ -643,7 +643,7 @@ extension InputHandlerProtocol {
 
     if currentTypingMethod == .vChewingFactory,
        let eTenCandidates = segregateCandidatesForETenDOS(from: arrCandidates) {
-      eTenSequenceEnforcement: if prefs.enforceETenDOSCandidateSequence {
+      eTenSequenceEnforcement: if prefs.enforceETenDOSCandidateSequence || prefs.useSCPCTypingMode {
         let seq4ETen = currentLM.lookupHub.supplementalValues(
           for: eTenCandidates.reading,
           strategy: .configuredLookup

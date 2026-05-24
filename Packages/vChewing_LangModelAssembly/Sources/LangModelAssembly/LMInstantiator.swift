@@ -222,7 +222,7 @@ extension LMAssembly {
       config.filterFactoryKanjisOfNonCurrentInputMode = prefs.filterFactoryKanjisOfNonCurrentInputMode
       config.deltaOfCalendarYears = prefs.deltaOfCalendarYears
       config.allowRescoringSingleKanjiCandidates = prefs.allowRescoringSingleKanjiCandidates
-      config.alwaysSupplyETenDOSUnigrams = prefs.enforceETenDOSCandidateSequence
+      config.alwaysSupplyETenDOSUnigrams = prefs.enforceETenDOSCandidateSequence || prefs.useSCPCTypingMode
       config.bypassUserPhrasesData = prefs.userPhrasesDatabaseBypassed
       config.suppressFactoryUnigramsOfKanaSyllables = prefs.suppressFactoryUnigramsOfKanaSyllables
     }
