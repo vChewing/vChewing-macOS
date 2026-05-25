@@ -225,4 +225,96 @@ struct TDK4AppKitTests {
     #expect(poolCollapsed.isExpanded == false)
     #expect(poolCollapsed.maxLinesPerPage == 1)
   }
+
+  // MARK: - GSI 捲動模型測試
+
+  /// 驗證：computeCandidateOnlySize 能正確計算全部候選行的完整尺寸。
+  @Test
+  func testGSIComputeCandidateOnlySize() throws {
+    let pool = TDK4AppKit.CandidatePool4AppKit(
+      candidates: variableCandidatesINMU, lines: 4, isExpanded: true,
+      selectionKeys: "123456", layout: .horizontal
+    )
+    pool.computeCandidateOnlySize()
+    #expect(pool.candidateOnlySize.width > 0, "完整候選區寬度應大於零")
+    #expect(pool.candidateOnlySize.height > 0, "完整候選區高度應大於零")
+    #expect(pool.candidateOnlySize.height >= pool.pageCandidateSize.height, "完整高度應不小於頁面高度")
+  }
+
+  /// 驗證：scrollOffset 邊界箝制正確（不可負值、不可超過 maxScrollOffset）。
+  @Test
+  func testGSIScrollOffsetClamping() throws {
+    let pool = TDK4AppKit.CandidatePool4AppKit(
+      candidates: variableCandidatesINMU, lines: 4, isExpanded: true,
+      selectionKeys: "123456", layout: .horizontal
+    )
+    pool.computeCandidateOnlySize()
+    #expect(pool.scrollOffset == 0, "初始 scrollOffset 應為零")
+    pool.scrollByPixels(-100)
+    #expect(pool.scrollOffset == 0, "負向捲動不應使 scrollOffset 變為負值")
+    pool.scrollByPixels(pool.maxScrollOffset + 1_000)
+    #expect(pool.scrollOffset == pool.maxScrollOffset, "正向捲動不應超過 maxScrollOffset")
+  }
+
+  /// 驗證：snapScrollOffset 能精確吸附至最近的行邊界。
+  @Test
+  func testGSISnapScrollOffsetPrecision() throws {
+    let pool = TDK4AppKit.CandidatePool4AppKit(
+      candidates: variableCandidatesINMU, lines: 4, isExpanded: true,
+      selectionKeys: "123456", layout: .horizontal
+    )
+    pool.computeCandidateOnlySize()
+    let step = pool.lineStep
+    #expect(step > 0, "行步進值應大於零")
+    pool.scrollOffset = step * 1.4
+    pool.snapScrollOffset()
+    #expect(pool.scrollOffset == step, "1.4 倍步進應吸附至 1 倍步進")
+    pool.scrollOffset = step * 1.6
+    pool.snapScrollOffset()
+    #expect(pool.scrollOffset == step * 2, "1.6 倍步進應吸附至 2 倍步進")
+  }
+
+  /// 驗證：scrollToMakeLineVisible 能將目標行保持於 viewport 內。
+  @Test
+  func testGSIScrollToMakeLineVisible() throws {
+    let pool = TDK4AppKit.CandidatePool4AppKit(
+      candidates: variableCandidatesINMU, lines: 4, isExpanded: true,
+      selectionKeys: "123456", layout: .horizontal
+    )
+    pool.computeCandidateOnlySize()
+    let totalLines = pool.candidateLines.count
+    #expect(totalLines > pool.maxLinesPerPage, "總行數應大於每頁最大行數")
+    pool.scrollToMakeLineVisible(6)
+    #expect(pool.scrollOffset <= pool.maxScrollOffset, "捲動至第 6 行後 scrollOffset 不應超限")
+    pool.scrollToMakeLineVisible(totalLines - 1)
+    #expect(pool.scrollOffset <= pool.maxScrollOffset, "捲動至末行後 scrollOffset 不應超限")
+  }
+
+  /// 驗證：scrollerThumbRatio 與 scrollerThumbPosition 計算正確。
+  @Test
+  func testGSIScrollerCalculations() throws {
+    let pool = TDK4AppKit.CandidatePool4AppKit(
+      candidates: variableCandidatesINMU, lines: 4, isExpanded: true,
+      selectionKeys: "123456", layout: .horizontal
+    )
+    pool.computeCandidateOnlySize()
+    #expect(pool.scrollerThumbRatio > 0 && pool.scrollerThumbRatio <= 1, "thumb 比例應在 (0, 1] 範圍內")
+    #expect(pool.scrollerThumbPosition == 0, "初始 thumb 位置應為零")
+    pool.scrollOffset = pool.maxScrollOffset
+    #expect(pool.scrollerThumbPosition == 1, "捲至末尾時 thumb 位置應為 1")
+  }
+
+  /// 驗證：resetScrollOffset 能正確重置捲動偏移量至零。
+  @Test
+  func testGSIResetScrollOffset() throws {
+    let pool = TDK4AppKit.CandidatePool4AppKit(
+      candidates: variableCandidatesINMU, lines: 4, isExpanded: true,
+      selectionKeys: "123456", layout: .horizontal
+    )
+    pool.computeCandidateOnlySize()
+    pool.scrollByLines(3)
+    #expect(pool.scrollOffset > 0, "捲動後 scrollOffset 應大於零")
+    pool.resetScrollOffset()
+    #expect(pool.scrollOffset == 0, "重置後 scrollOffset 應歸零")
+  }
 }

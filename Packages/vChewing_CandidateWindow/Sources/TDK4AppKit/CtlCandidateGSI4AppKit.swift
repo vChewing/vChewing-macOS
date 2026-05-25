@@ -7,16 +7,20 @@
 // requirements defined in MIT License.
 
 import AppKit
+import Shared
 import Shared_DarwinImpl
 import SwiftExtension
 
-extension TDK4AppKit {
-  // MARK: - CtlCandidateTDK4AppKit
+// MARK: - GSI4AppKit.CtlCandidateGSI4AppKit
 
-  public final class CtlCandidateTDK4AppKit: NSWindowController, CtlCandidateProtocol, NSWindowDelegate {
+extension GSI4AppKit {
+  // MARK: - CtlCandidateGSI4AppKit
+
+  /// 我修院選字窗的 NSWindowController — 極簡 facade。
+  /// 不使用 NSScrollView，所有內容（候選字 + 底部欄位 + scroller）由 view 自行繪製。
+
+  public final class CtlCandidateGSI4AppKit: NSWindowController, CtlCandidateProtocol, NSWindowDelegate {
     // MARK: Lifecycle
-
-    // MARK: - Constructors
 
     public required init(_ layout: UILayoutOrientation = .horizontal) {
       let contentRect = CGRect(x: 128.0, y: 128.0, width: 0.0, height: 0.0)
@@ -34,7 +38,7 @@ extension TDK4AppKit {
       self.window = panel
       window?.delegate = self
       self.currentLayout = layout
-      // 設置背景視覺效果視圖
+
       if !Self.shouldDisableVisualEffectView {
         if window?.contentView == nil {
           window?.contentView = NSView()
@@ -99,7 +103,6 @@ extension TDK4AppKit {
 
     public var expanded: Bool { Self.thePool.isExpanded }
 
-    // Already implemented in CandidatePool.
     public var highlightedIndex: Int {
       get { Self.thePool.highlightedIndex }
       set {
@@ -115,7 +118,16 @@ extension TDK4AppKit {
     }
 
     override public func scrollWheel(with event: NSEvent) {
-      guard useMouseScrolling else { return }
+      guard !isInScrollMode else { return }
+      // Option (without Shift): always flip lines, using dominant scroll axis.
+      if event.modifierFlags.contains(.option), !event.modifierFlags.contains(.shift),
+         let dir = CandidatePool4AppKit.dominantScrollLineDirection(event) {
+        switch dir {
+        case .next: showNextLine()
+        case .previous: showPreviousLine()
+        }
+        return
+      }
       handleMouseScroll(deltaX: event.deltaX, deltaY: event.deltaY)
     }
 
@@ -141,49 +153,80 @@ extension TDK4AppKit {
       updateDisplay()
     }
 
-    // Already implemented in CandidatePool.
+    // MARK: - Keyboard Navigation
+
     @discardableResult
     public func showNextPage() -> Bool {
       defer { updateDisplay() }
+      if isInScrollMode {
+        let result = Self.thePool.consecutivelyFlipLines(isBackward: false, count: Self.thePool.maxLinesPerPage)
+        Self.thePool.computeCandidateOnlySize()
+        Self.thePool.scrollToMakeLineVisible(Self.thePool.currentLineNumber)
+        return result
+      }
       return Self.thePool.flipPage(isBackward: false)
     }
 
-    // Already implemented in CandidatePool.
     @discardableResult
     public func showPreviousPage() -> Bool {
       defer { updateDisplay() }
+      if isInScrollMode {
+        let result = Self.thePool.consecutivelyFlipLines(isBackward: true, count: Self.thePool.maxLinesPerPage)
+        Self.thePool.computeCandidateOnlySize()
+        Self.thePool.scrollToMakeLineVisible(Self.thePool.currentLineNumber)
+        return result
+      }
       return Self.thePool.flipPage(isBackward: true)
     }
 
-    // Already implemented in CandidatePool.
     @discardableResult
     public func showPreviousLine() -> Bool {
       defer { updateDisplay() }
+      if isInScrollMode {
+        let result = Self.thePool.consecutivelyFlipLines(isBackward: true, count: 1)
+        Self.thePool.computeCandidateOnlySize()
+        Self.thePool.scrollToMakeLineVisible(Self.thePool.currentLineNumber)
+        return result
+      }
       return Self.thePool.consecutivelyFlipLines(isBackward: true, count: 1)
     }
 
-    // Already implemented in CandidatePool.
     @discardableResult
     public func showNextLine() -> Bool {
       defer { updateDisplay() }
+      if isInScrollMode {
+        let result = Self.thePool.consecutivelyFlipLines(isBackward: false, count: 1)
+        Self.thePool.computeCandidateOnlySize()
+        Self.thePool.scrollToMakeLineVisible(Self.thePool.currentLineNumber)
+        return result
+      }
       return Self.thePool.consecutivelyFlipLines(isBackward: false, count: 1)
     }
 
-    // Already implemented in CandidatePool.
     @discardableResult
     public func highlightNextCandidate() -> Bool {
-      defer { updateDisplay() }
+      defer {
+        if isInScrollMode {
+          Self.thePool.computeCandidateOnlySize()
+          Self.thePool.scrollToMakeLineVisible(Self.thePool.currentLineNumber)
+        }
+        updateDisplay()
+      }
       return Self.thePool.highlightNeighborCandidate(isBackward: false)
     }
 
-    // Already implemented in CandidatePool.
     @discardableResult
     public func highlightPreviousCandidate() -> Bool {
-      defer { updateDisplay() }
+      defer {
+        if isInScrollMode {
+          Self.thePool.computeCandidateOnlySize()
+          Self.thePool.scrollToMakeLineVisible(Self.thePool.currentLineNumber)
+        }
+        updateDisplay()
+      }
       return Self.thePool.highlightNeighborCandidate(isBackward: true)
     }
 
-    // Already implemented in CandidatePool.
     public func candidateIndexAtKeyLabelIndex(_ id: Int) -> Int? {
       Self.thePool.calculateCandidateIndex(subIndex: id)
     }
@@ -193,11 +236,12 @@ extension TDK4AppKit {
     typealias CandidatePool4AppKit = TDK4AppKit.CandidatePool4AppKit
 
     var tooltip: String = ""
-
-    var useMouseScrolling: Bool = true
-
     var reverseLookupResult: [String] = []
     var maxLinesPerPage: Int = 1
+
+    var isInScrollMode: Bool {
+      Self.thePool.isMatrix && Self.thePool.candidateLines.count > Self.thePool.maxLinesPerPage
+    }
 
     var windowTopLeftPoint: CGPoint {
       get {
@@ -205,15 +249,25 @@ extension TDK4AppKit {
         return CGPoint(x: frameRect.minX, y: frameRect.maxY)
       }
       set {
-        let animate = prefs.enableCandidateWindowAnimation
         asyncOnMain { [weak self] in
-          guard let this = self else { return }
-          this.set(
-            windowTopLeftPoint: newValue,
-            bottomOutOfScreenAdjustmentHeight: 0,
-            useGCD: true,
-            animated: animate
+          guard let this = self, let window = this.window else { return }
+          let windowSize = window.frame.size
+          let adjustedPoint = this.adjustedTopLeft(
+            rawTopLeft: newValue, heightDelta: 0, windowSize: windowSize
           )
+          let targetFrame = NSRect(
+            x: adjustedPoint.x, y: adjustedPoint.y - windowSize.height,
+            width: windowSize.width, height: windowSize.height
+          )
+          let animate = this.prefs.enableCandidateWindowAnimation
+          if animate {
+            NSAnimationContext.runAnimationGroup { context in
+              context.duration = 0.12
+              window.animator().setFrame(targetFrame, display: true)
+            }
+          } else {
+            window.setFrame(targetFrame, display: true)
+          }
         }
       }
     }
@@ -225,10 +279,7 @@ extension TDK4AppKit {
           this.updateNSWindowModern(window)
         }
       }
-      useMouseScrolling = prefs.enableMouseScrollingForTDKCandidatesCocoa
-      // 先擦除之前的反查结果。
       reverseLookupResult = []
-      // 再更新新的反查结果。
       if let currentCandidate = Self.thePool.currentCandidate {
         let displayedText = currentCandidate.displayedText
         var lookupResult: [String?] = delegate?.reverseLookup(for: displayedText) ?? []
@@ -245,13 +296,11 @@ extension TDK4AppKit {
           reverseLookupResult = lookupResult.compactMap { $0 }
         } else {
           reverseLookupResult = lookupResult.compactMap { $0 }
-          // 如果不提供 UNICODE 碼位資料顯示的話，則在非多行多列模式下僅顯示一筆反查資料。
           if !Self.thePool.isMatrix {
             reverseLookupResult = [reverseLookupResult.first].compactMap { $0 }
           }
         }
       }
-      // 更新讀音 disambiguation 顯示（邏輯在 CandidatePool 內）
       Self.thePool.updateReadingDisambiguation()
       Self.thePool.reverseLookupResult = reverseLookupResult
       Self.thePool.tooltip = delegate?.candidateToolTip(shortened: !Self.thePool.isMatrix) ?? ""
@@ -261,20 +310,18 @@ extension TDK4AppKit {
     // MARK: Private
 
     private static let shouldDisableVisualEffectView: Bool = {
-      if #available(macOS 10.13, *) {
-        return false
-      }
+      if #available(macOS 10.13, *) { return false }
       return true
     }()
 
     private static let thePool: CandidatePool4AppKit = .init(candidates: [])
-    private static let currentView: VwrCandidateTDK4AppKit = .init(thePool: thePool)
+    private static let currentView: VwrCandidateGSI4AppKit = .init(thePool: thePool)
 
     private let prefs = PrefMgr.sharedSansDidSetOps
 
     @objc
     private var observation: NSKeyValueObservation?
-    // 創建背景視覺效果視圖
+
     private let visualEffectView: NSView? = {
       if #available(macOS 26, *), NSApplication.uxLevel == .liquidGlass {
         #if compiler(>=6.2) && canImport(AppKit, _version: 26.0)
@@ -289,58 +336,89 @@ extension TDK4AppKit {
       return nil
     }()
 
-    private let candidateView: VwrCandidateTDK4AppKit
+    private let candidateView: VwrCandidateGSI4AppKit
 
-    /// visible 狀態剛發生實質變化時設為 true，在下一次 updateNSWindowModern 執行完畢後歸零。
     private var suppressAnimationOnce = false
+
+    // MARK: - Scroll Mode Configuration
+
+    /// Tracks the previous scroll-mode state so we only reset on mode entry.
+    private var wasInScrollMode = false
 
     private var enableAnimation: Bool {
       guard prefs.enableCandidateWindowAnimation else { return false }
-      // visible 剛發生切換（含視窗從不可見變為可見）時，跳過動畫以避免「從遠處飛入」的效果。
       if suppressAnimationOnce { return false }
-      // 視窗尚未實際出現在螢幕上時也不做動畫。
       guard window?.isVisible == true else { return false }
       return true
     }
 
-    private var candidateViewLegacy4Debug: NSView {
-      let textField = NSTextField()
-      textField.isSelectable = false
-      textField.isEditable = false
-      textField.isBordered = false
-      textField.backgroundColor = .clear
-      textField.allowsEditingTextAttributes = false
-      textField.preferredMaxLayoutWidth = textField.frame.width
-      textField.attributedStringValue = Self.thePool.attributedDescription
-      textField.sizeToFit()
-      textField.backgroundColor = .clear
-      return textField
+    private func configureScrollMode() {
+      candidateView.rendersInScrollMode = true
+      Self.thePool.computeCandidateOnlySize()
+      // Only reset scroll on first entry, not on every updateDisplay().
+      if !wasInScrollMode {
+        Self.thePool.resetScrollOffset()
+      }
+      wasInScrollMode = true
     }
 
-    /// 針對給定的視窗目標尺寸，計算螢幕邊緣修正後的 top-left 坐標。
-    private func adjustedTopLeft(
-      rawTopLeft: CGPoint, heightDelta: Double, windowSize: CGSize
-    )
-      -> CGPoint {
-      var adjustedPoint = rawTopLeft
-      var delta = heightDelta
-      var screenFrame = NSScreen.main?.visibleFrame ?? .zero
-      for frame in NSScreen.screens.map(\.visibleFrame)
-        .filter({ $0.contains(rawTopLeft) }) {
-        screenFrame = frame
-        break
-      }
-      if delta > screenFrame.size.height / 2.0 { delta = 0.0 }
-      if adjustedPoint.y < screenFrame.minY + windowSize.height {
-        adjustedPoint.y = rawTopLeft.y + windowSize.height + delta
-      }
-      adjustedPoint.y = min(adjustedPoint.y, screenFrame.maxY - 1.0)
-      adjustedPoint.x = min(
-        max(adjustedPoint.x, screenFrame.minX),
-        screenFrame.maxX - windowSize.width - 1.0
-      )
-      return adjustedPoint
+    private func configureNormalMode() {
+      candidateView.rendersInScrollMode = false
+      Self.thePool.scrollOffset = 0
+      Self.thePool.updateMetrics()
+      wasInScrollMode = false
     }
+
+    // MARK: - Window Update
+
+    private func updateNSWindowModern(_ window: NSWindow) {
+      if isInScrollMode {
+        configureScrollMode()
+      } else {
+        configureNormalMode()
+      }
+
+      candidateView.invalidateIntrinsicContentSize()
+
+      let animateThisRound = enableAnimation
+      defer { suppressAnimationOnce = false }
+
+      guard !Self.shouldDisableVisualEffectView else {
+        window.isOpaque = false
+        window.backgroundColor = .clear
+        window.contentView = candidateView
+        applyTargetFrame(to: window, contentSize: candidateView.fittingSize, animated: animateThisRound)
+        return
+      }
+
+      updateEffectView()
+
+      guard let containerView = window.contentView else { return }
+
+      containerView.wantsLayer = true
+      containerView.layer?.cornerRadius = Self.thePool.windowRadius
+      containerView.layer?.masksToBounds = true
+
+      if containerView.subviews.allSatisfy({ !($0 is VwrCandidateGSI4AppKit) }) {
+        containerView.addSubview(candidateView)
+      }
+      // Remove old constraints referencing candidateView before re-pinning.
+      containerView.removeConstraints(
+        containerView.constraints.filter {
+          $0.firstItem as? NSView === candidateView || $0.secondItem as? NSView === candidateView
+        }
+      )
+      candidateView.pinEdges(to: containerView)
+
+      window.isOpaque = false
+      window.backgroundColor = .clear
+      window.contentView = containerView
+
+      applyTargetFrame(to: window, contentSize: candidateView.fittingSize, animated: animateThisRound)
+      candidateView.setNeedsDisplay(candidateView.bounds)
+    }
+
+    // MARK: - Visual Effect View
 
     private func updateEffectView() {
       if #available(macOS 26, *), NSApplication.uxLevel == .liquidGlass {
@@ -360,78 +438,16 @@ extension TDK4AppKit {
         resultView.material = .titlebar
         resultView.blendingMode = .behindWindow
         resultView.state = .active
-        // 設置圓角以保持原有的視覺特性
         resultView.wantsLayer = true
         resultView.layer?.cornerRadius = Self.thePool.windowRadius
         resultView.layer?.masksToBounds = true
       }
     }
 
-    private func updateNSWindowModern(_ window: NSWindow) {
-      // 同步 Metrics
-      Self.thePool.updateMetrics()
+    // MARK: - Window Frame
 
-      // fittingSize 跟随新的 metrics
-      candidateView.invalidateIntrinsicContentSize()
-      candidateView.setNeedsDisplay(candidateView.bounds)
-
-      let animateThisRound = enableAnimation
-      // 無論是否啟用動畫，都在本次更新後清除抑制旗標。
-      defer { suppressAnimationOnce = false }
-
-      guard !Self.shouldDisableVisualEffectView else {
-        window.isOpaque = false
-        window.backgroundColor = .clear
-        window.contentView = candidateView
-        applyTargetFrame(to: window, contentSize: candidateView.fittingSize, animated: animateThisRound)
-        return
-      }
-
-      // 更新背景視覺效果視圖
-      updateEffectView()
-
-      let viewSize = candidateView.fittingSize
-      guard let containerView = window.contentView else { return }
-
-      // 為容器視圖也設置圓角，確保整體一致性
-      containerView.wantsLayer = true
-      containerView.layer?.cornerRadius = Self.thePool.windowRadius
-      containerView.layer?.masksToBounds = true
-
-      // 添加候選窗口內容視圖
-      if containerView.subviews.allSatisfy({ !($0 is VwrCandidateTDK4AppKit) }) {
-        containerView.addSubview(candidateView)
-      }
-      // Remove old constraints referencing candidateView before re-pinning.
-      containerView.removeConstraints(
-        containerView.constraints.filter {
-          $0.firstItem as? NSView === candidateView || $0.secondItem as? NSView === candidateView
-        }
-      )
-      candidateView.pinEdges(to: containerView)
-
-      window.isOpaque = false
-      window.backgroundColor = .clear
-      window.contentView = containerView
-
-      applyTargetFrame(to: window, contentSize: viewSize, animated: animateThisRound)
-    }
-
-    /// 依據給定的內容尺寸，向 delegate 查詢游標位置、計算螢幕邊緣修正後的目標 frame，
-    /// 再將結果直接套用至視窗。
-    ///
-    /// NSWindow 在 `setFrame` 時會自動帶動 `contentView` resize（autoresizingMask 預設行為），
-    /// 其下以 `pinEdges` 綁定的 subview（`candidateView`、`visualEffectView` 等）
-    /// 亦會透過 Auto Layout 跟著同步縮放，無需手動介入 containerView。
-    ///
-    /// - Parameters:
-    ///   - window: 目標 `NSWindow`。
-    ///   - contentSize: 視窗內容的目標尺寸（通常為 `candidateView.fittingSize`）。
-    ///   - animated: 是否使用 `NSAnimationContext` 動畫（duration 0.12s）。
     private func applyTargetFrame(
-      to window: NSWindow,
-      contentSize: CGSize,
-      animated: Bool
+      to window: NSWindow, contentSize: CGSize, animated: Bool
     ) {
       let newFrameRect = window.frameRect(forContentRect: .init(origin: .zero, size: contentSize))
       let originInfo = delegate?.candidateWindowOriginInfo()
@@ -455,6 +471,29 @@ extension TDK4AppKit {
       }
     }
 
+    private func adjustedTopLeft(
+      rawTopLeft: CGPoint, heightDelta: Double, windowSize: CGSize
+    )
+      -> CGPoint {
+      var adjustedPoint = rawTopLeft
+      var delta = heightDelta
+      var screenFrame = NSScreen.main?.visibleFrame ?? .zero
+      for frame in NSScreen.screens.map(\.visibleFrame).filter({ $0.contains(rawTopLeft) }) {
+        screenFrame = frame
+        break
+      }
+      if delta > screenFrame.size.height / 2.0 { delta = 0.0 }
+      if adjustedPoint.y < screenFrame.minY + windowSize.height {
+        adjustedPoint.y = rawTopLeft.y + windowSize.height + delta
+      }
+      adjustedPoint.y = min(adjustedPoint.y, screenFrame.maxY - 1.0)
+      adjustedPoint.x = min(
+        max(adjustedPoint.x, screenFrame.minX),
+        screenFrame.maxX - windowSize.width - 1.0
+      )
+      return adjustedPoint
+    }
+
     private func handleMouseScroll(deltaX: CGFloat, deltaY: CGFloat) {
       switch (deltaX, deltaY, Self.thePool.layout) {
       case (0, 1..., .vertical), (1..., 0, .horizontal): highlightNextCandidate()
@@ -472,4 +511,4 @@ extension TDK4AppKit {
       }
     }
   }
-} // extension TDK4AppKit
+} // extension GSI4AppKit

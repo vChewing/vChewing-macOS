@@ -289,11 +289,11 @@ extension TDK4AppKit.VwrCandidateTDK4AppKit {
 
 import SwiftUI
 
-// MARK: - TDK4AppKit.VwrCandidateTDK4AppKitForSwiftUI
+// MARK: - TDK4AppKit.VwrCandidateTDK4SwiftUI
 
 extension TDK4AppKit {
   @available(macOS 10.15, *)
-  struct VwrCandidateTDK4AppKitForSwiftUI: NSViewRepresentable {
+  struct VwrCandidateTDK4SwiftUI: NSViewRepresentable {
     weak var controller: CtlCandidateTDK4AppKit?
     var thePool: CandidatePool4AppKit
 

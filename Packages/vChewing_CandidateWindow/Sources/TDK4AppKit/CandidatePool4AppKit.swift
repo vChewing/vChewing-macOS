@@ -87,11 +87,79 @@ extension TDK4AppKit {
     /// 當前高亮候選字詞的讀音 disambiguation 顯示內容。nil 表示無需顯示。
     var readingDisambiguationResult: String?
 
+    // MARK: - GSI Scroll Model
+
+    /// 捲動偏移量（pixel）。0 = 第一行對齊 viewport 頂端。
+    var scrollOffset: CGFloat = 0
+
+    /// 全部候選行（不含底部欄位）的完整尺寸。
+    var candidateOnlySize: CGSize = .zero
+
     // MARK: - 動態變數
 
     let padding: CGFloat = 2
     let originDelta: CGFloat = 5
     let cellTextHeight = CandidatePool4AppKit.shitCell.textDimension.height
+
+    /// 橫向還是縱向排列。
+    var isHorizontal: Bool { layout == .horizontal }
+
+    /// 單行高度（horizontal matrix）或單列寬度（vertical matrix）。
+    var lineStep: CGFloat { cellTextHeight + 2 * padding }
+
+    /// 頁面候選區尺寸（= pure cell area，不含 padding，column matrix 依 scrollOffset 動態調整）。
+    var pageCandidateSize: CGSize {
+      guard isMatrix else { return candidateOnlySize }
+      if isHorizontal {
+        let range = lineRangeForCurrentPage
+        let clamped = max(range.lowerBound, 0) ..< min(range.upperBound, candidateLines.count)
+        let width: CGFloat = {
+          let pageLines = candidateLines[clamped]
+          let maxW = pageLines.map { line in
+            line.reduce(0) { $0 + $1.visualDimension.width }
+          }.max() ?? candidateOnlySize.width
+          return max(candidateOnlySize.width, maxW)
+        }()
+        return CGSize(width: width, height: lineStep * CGFloat(maxLinesPerPage))
+      } else {
+        let range = lineRangeForCurrentPage
+        let clamped = max(range.lowerBound, 0) ..< min(range.upperBound, candidateLines.count)
+        let pageWidth = candidateLines[clamped].reduce(0) { $0 + ($1.first?.visualDimension.width ?? 0) }
+        let height: CGFloat = {
+          let maxH = candidateLines[clamped].map { col in
+            col.reduce(0) { $0 + $1.visualDimension.height }
+          }.max() ?? candidateOnlySize.height
+          return max(candidateOnlySize.height, maxH)
+        }()
+        return CGSize(width: pageWidth, height: height)
+      }
+    }
+
+    /// 最大捲動偏移量。0 表示內容未超出 viewport，無需捲動。
+    var maxScrollOffset: CGFloat {
+      guard isMatrix else { return 0 }
+      if isHorizontal {
+        return max(0, candidateOnlySize.height - lineStep * CGFloat(maxLinesPerPage))
+      } else {
+        return max(0, candidateOnlySize.width - pageCandidateSize.width)
+      }
+    }
+
+    /// Thumb 長度佔軌道的比例 (0…1)。
+    var scrollerThumbRatio: CGFloat {
+      guard maxScrollOffset > 0 else { return 1 }
+      if isHorizontal {
+        return (lineStep * CGFloat(maxLinesPerPage)) / candidateOnlySize.height
+      } else {
+        return pageCandidateSize.width / candidateOnlySize.width
+      }
+    }
+
+    /// Thumb 在軌道中的位置比例 (0…1)。
+    var scrollerThumbPosition: CGFloat {
+      guard maxScrollOffset > 0 else { return 0 }
+      return scrollOffset / maxScrollOffset
+    }
 
     var cellRadius: CGFloat {
       if #unavailable(macOS 11.0) { return 4 }
@@ -151,6 +219,72 @@ extension TDK4AppKit {
       currentLineNumber ..< min(candidateLines.count, currentLineNumber + maxLinesPerPage)
     }
 
+    // MARK: - GSI Scroll Operations
+
+    /// 以 pixel 為單位捲動（touchpad 慣性）。
+    func scrollByPixels(_ delta: CGFloat) {
+      scrollOffset += delta
+      clampScrollOffset()
+    }
+
+    /// 以行數為單位捲動（滾輪 / 鍵盤翻頁）。
+    func scrollByLines(_ delta: Int) {
+      if isHorizontal {
+        scrollOffset += CGFloat(delta) * lineStep
+      } else {
+        guard !candidateLines.isEmpty else { return }
+        var cur = 0, bestDist = CGFloat.greatestFiniteMagnitude
+        for (i, col) in candidateLines.enumerated() {
+          let d = abs(scrollOffset - (col.first?.visualOrigin.x ?? 0))
+          if d < bestDist { bestDist = d; cur = i }
+        }
+        let target = max(0, min(candidateLines.count - 1, cur + delta))
+        scrollOffset = candidateLines[target].first?.visualOrigin.x ?? 0
+      }
+      clampScrollOffset()
+    }
+
+    /// 吸附到最近行/列邊界（touchpad release）。
+    func snapScrollOffset() {
+      if isHorizontal {
+        scrollOffset = round(scrollOffset / lineStep) * lineStep
+      } else {
+        guard !candidateLines.isEmpty else { return }
+        var bestX: CGFloat = 0, bestDist = CGFloat.greatestFiniteMagnitude
+        for col in candidateLines {
+          let d = abs(scrollOffset - (col.first?.visualOrigin.x ?? 0))
+          if d < bestDist { bestDist = d; bestX = col.first?.visualOrigin.x ?? 0 }
+        }
+        scrollOffset = bestX
+      }
+      clampScrollOffset()
+    }
+
+    /// 讓指定行/列進入可見範圍。
+    func scrollToMakeLineVisible(_ lineIndex: Int) {
+      guard isMatrix else { return }
+      if isHorizontal {
+        let lineTop = CGFloat(lineIndex) * lineStep
+        let lineBottom = lineTop + lineStep
+        let viewportSize = pageCandidateSize.height
+        if lineTop < scrollOffset {
+          scrollOffset = lineTop
+        } else if lineBottom > scrollOffset + viewportSize {
+          scrollOffset = lineBottom - viewportSize
+        }
+      } else {
+        let firstCol = lineRangeForCurrentPage.lowerBound
+        guard firstCol < candidateLines.count else { return }
+        scrollOffset = candidateLines[firstCol].first?.visualOrigin.x ?? 0
+      }
+      clampScrollOffset()
+    }
+
+    /// 重置捲動偏移量到頂端。
+    func resetScrollOffset() {
+      scrollOffset = 0
+    }
+
     /// 初期化一個候選字窗專用資料池。
     /// - Parameters:
     ///   - candidates: 要塞入的候選字詞陣列。
@@ -198,6 +332,10 @@ extension TDK4AppKit {
 
     private var recordedLineRangeForCurrentPage: Range<Int>?
     private var previouslyRecordedLineRangeForPreviousPage: Range<Int>?
+
+    private func clampScrollOffset() {
+      scrollOffset = max(0, min(scrollOffset, maxScrollOffset))
+    }
 
     /// 初期化（或者自我重新初期化）一個候選字窗專用資料池。
     /// - Parameters:
@@ -700,15 +838,81 @@ private final class RoundedBadgeTextAttachmentCell: NSTextAttachmentCell {
 // MARK: - UI Metrics.
 
 extension TDK4AppKit.CandidatePool4AppKit {
+  /// 排版給定的行陣列：計算每顆 cell 的 visualOrigin / visualDimension 並返回總累積尺寸。
+  /// - Parameters:
+  ///   - lines: 要排版的行陣列。
+  ///   - initialOrigin: 排版起點。
+  /// - Returns: 排版後的總累積尺寸（不含 originDelta 外圍 padding）。
+  @discardableResult
+  private func layoutCells(
+    in lines: [[CandidateCellData4AppKit]],
+    initialOrigin: CGPoint
+  )
+    -> CGSize {
+    var totalAccuSize = CGSize.zero
+    var currentOrigin = initialOrigin
+
+    Self.shitCell.isHighlighted = false
+    Self.shitCell.updateMetrics(pool: self, origin: currentOrigin)
+    let minimumCellDimension = Self.shitCell.visualDimension
+    let minCellWidth = Self.blankCell.cellLength()
+
+    for currentLine in lines {
+      var accumulatedLineSize = CGSize.zero
+
+      for currentCell in currentLine {
+        currentCell.updateMetrics(pool: self, origin: currentOrigin)
+        var cellDimension = currentCell.visualDimension
+
+        if layout == .horizontal, isMatrix {
+          cellDimension.width = currentCell.cellWidthMultiplied(minCellWidth: minCellWidth)
+        } else if layout == .vertical || currentCell.displayedText.count <= 2 {
+          cellDimension.width = max(minimumCellDimension.width, cellDimension.width)
+        }
+        cellDimension.height = max(minimumCellDimension.height, cellDimension.height)
+        currentCell.visualDimension.width = cellDimension.width
+
+        switch layout {
+        case .horizontal:
+          accumulatedLineSize.width += cellDimension.width
+          accumulatedLineSize.height = max(accumulatedLineSize.height, cellDimension.height)
+        case .vertical:
+          accumulatedLineSize.height += cellDimension.height
+          accumulatedLineSize.width = max(accumulatedLineSize.width, cellDimension.width)
+        }
+
+        switch layout {
+        case .horizontal: currentOrigin.x += cellDimension.width
+        case .vertical: currentOrigin.y += cellDimension.height
+        }
+      }
+
+      if layout == .vertical {
+        currentLine.forEach { $0.visualDimension.width = accumulatedLineSize.width }
+      }
+
+      switch layout {
+      case .horizontal:
+        currentOrigin.x = initialOrigin.x
+        currentOrigin.y += accumulatedLineSize.height
+        totalAccuSize.width = max(totalAccuSize.width, accumulatedLineSize.width)
+        totalAccuSize.height += accumulatedLineSize.height
+      case .vertical:
+        currentOrigin.y = initialOrigin.y
+        currentOrigin.x += accumulatedLineSize.width
+        totalAccuSize.height = max(totalAccuSize.height, accumulatedLineSize.height)
+        totalAccuSize.width += accumulatedLineSize.width
+      }
+    }
+
+    return totalAccuSize
+  }
+
   func updateMetrics() {
-    // 開工
-    let initialOrigin: CGPoint = .init(x: originDelta, y: originDelta)
-    var totalAccuSize: CGSize = .zero
-    // Origin is at the top-left corner.
-    var currentOrigin: CGPoint = initialOrigin
-    var highlightedCellRect: CGRect = .zero
-    var highlightedLineRect: CGRect = .zero
-    var currentPageLines = candidateLines[lineRangeForCurrentPage]
+    let initialOrigin = CGPoint(x: originDelta, y: originDelta)
+
+    // 準備當前頁的行陣列（含空白行填充）。
+    var currentPageLines = Array(candidateLines[lineRangeForCurrentPage])
     var blankLines = maxLinesPerPage - currentPageLines.count
     var fillBlankCells = true
     switch (layout, isMatrix) {
@@ -722,114 +926,50 @@ extension TDK4AppKit.CandidatePool4AppKit {
       currentPageLines.append(.init(repeating: Self.shitCell, count: maxLineCapacity))
       blankLines -= 1
     }
-    Self.shitCell.updateMetrics(pool: self, origin: currentOrigin)
-    Self.shitCell.isHighlighted = false
-    let minimumCellDimension = Self.shitCell.visualDimension
-    let minCellWidth = Self.blankCell.cellLength()
-    currentPageLines.forEach { currentLine in
-      let currentLineOrigin = currentOrigin
-      var accumulatedLineSize: CGSize = .zero
-      var currentLineRect: CGRect { .init(origin: currentLineOrigin, size: accumulatedLineSize) }
-      let lineHasHighlightedCell = currentLine.hasHighlightedCell
 
-      currentLine.forEach { currentCell in
-        currentCell.updateMetrics(pool: self, origin: currentOrigin)
-        var cellDimension = currentCell.visualDimension
-        // Horizontal matrix 模式：使用倍數化寬度。
-        if layout == .horizontal, isMatrix {
-          cellDimension.width = currentCell.cellWidthMultiplied(minCellWidth: minCellWidth)
-        } else if layout == .vertical || currentCell.displayedText.count <= 2 {
-          cellDimension.width = max(minimumCellDimension.width, cellDimension.width)
-        }
-        cellDimension.height = max(minimumCellDimension.height, cellDimension.height)
-        // 更新 visualDimension 供後續使用。
-        currentCell.visualDimension.width = cellDimension.width
+    // 第一趟：排版 cell，取得總尺寸。
+    var totalAccuSize = layoutCells(in: currentPageLines, initialOrigin: initialOrigin)
 
-        switch self.layout {
-        case .horizontal:
-          accumulatedLineSize.width += cellDimension.width
-          accumulatedLineSize.height = max(accumulatedLineSize.height, cellDimension.height)
-        case .vertical:
-          accumulatedLineSize.height += cellDimension.height
-          accumulatedLineSize.width = max(accumulatedLineSize.width, cellDimension.width)
-        }
-
-        if lineHasHighlightedCell {
-          switch self.layout {
-          case .horizontal where currentCell.isHighlighted:
-            highlightedCellRect.size.width = cellDimension.width
-          case .vertical:
-            highlightedCellRect.size.width = max(
-              highlightedCellRect.size.width,
-              cellDimension.width
-            )
-          default: break
-          }
-          if currentCell.isHighlighted {
-            highlightedCellRect.origin = currentOrigin
-            highlightedCellRect.size.height = cellDimension.height
-          }
-        }
-
-        switch self.layout {
-        case .horizontal: currentOrigin.x += cellDimension.width
-        case .vertical: currentOrigin.y += cellDimension.height
-        }
-      }
-
-      if lineHasHighlightedCell {
-        highlightedLineRect.origin = currentLineRect.origin
-        switch self.layout {
-        case .horizontal:
-          highlightedLineRect.size.height = currentLineRect.size.height
-        case .vertical:
-          highlightedLineRect.size.width = currentLineRect.size.width
-        }
-      }
-
-      switch self.layout {
-      case .horizontal:
-        highlightedLineRect.size.width = max(currentLineRect.size.width, highlightedLineRect.width)
-      case .vertical:
-        highlightedLineRect.size.height = max(
-          currentLineRect.size.height,
-          highlightedLineRect.height
-        )
-        currentLine.forEach { theCell in
-          theCell.visualDimension.width = accumulatedLineSize.width
-        }
-      }
-
-      switch self.layout {
-      case .horizontal:
-        currentOrigin.x = originDelta
-        currentOrigin.y += accumulatedLineSize.height
-        totalAccuSize.width = max(totalAccuSize.width, accumulatedLineSize.width)
-        totalAccuSize.height += accumulatedLineSize.height
-      case .vertical:
-        currentOrigin.y = originDelta
-        currentOrigin.x += accumulatedLineSize.width
-        totalAccuSize.height = max(totalAccuSize.height, accumulatedLineSize.height)
-        totalAccuSize.width += accumulatedLineSize.width
-      }
-    }
-    if fillBlankCells {
+    // 第二趟：從已排好的 cell 中反推 highlighted rects。
+    var highlightedCellRect: CGRect = .zero
+    var highlightedLineRect: CGRect = .zero
+    let allCells = currentPageLines.flatMap { $0 }
+    if let hCell = allCells.first(where: { $0.isHighlighted }),
+       let hLine = currentPageLines.first(where: { $0.contains(where: { $0.isHighlighted }) }),
+       let first = hLine.first, let last = hLine.last {
+      highlightedCellRect = CGRect(origin: hCell.visualOrigin, size: hCell.visualDimension)
+      let minX = first.visualOrigin.x
+      let minY = first.visualOrigin.y
       switch layout {
       case .horizontal:
-        totalAccuSize.width = max(
-          totalAccuSize.width,
-          CGFloat(maxLineCapacity) * minimumCellDimension.width
-        )
-        highlightedLineRect.size.width = totalAccuSize.width
+        let width = (last.visualOrigin.x + last.visualDimension.width) - minX
+        let height = hLine.map(\.visualDimension.height).max() ?? highlightedCellRect.height
+        highlightedLineRect = CGRect(x: minX, y: minY, width: width, height: height)
       case .vertical:
-        totalAccuSize.height = CGFloat(maxLineCapacity) * minimumCellDimension.height
+        let height = (last.visualOrigin.y + last.visualDimension.height) - minY
+        let width = hLine.map(\.visualDimension.width).max() ?? highlightedCellRect.width
+        highlightedLineRect = CGRect(x: minX, y: minY, width: width, height: height)
       }
     }
-    // 繪製附加內容
+
+    // 空白 cell 尺寸補償。
+    if fillBlankCells {
+      let minDim = Self.shitCell.visualDimension
+      switch layout {
+      case .horizontal:
+        totalAccuSize.width = max(totalAccuSize.width, CGFloat(maxLineCapacity) * minDim.width)
+        highlightedLineRect.size.width = totalAccuSize.width
+      case .vertical:
+        totalAccuSize.height = CGFloat(maxLineCapacity) * minDim.height
+      }
+    }
+
+    // 繪製附加內容（peripherals + reading disambiguation）。
     let strPeripherals = attributedDescriptionBottomPanes
     var dimensionPeripherals = strPeripherals.getBoundingDimension(forceFallback: true)
     dimensionPeripherals.width = ceil(dimensionPeripherals.width)
     dimensionPeripherals.height = ceil(dimensionPeripherals.height)
+    var currentOrigin: CGPoint
     if finalContainerOrientation == .horizontal {
       totalAccuSize.width += 5
       dimensionPeripherals.width += 5
@@ -846,7 +986,7 @@ extension TDK4AppKit.CandidatePool4AppKit {
       totalAccuSize.width = max(totalAccuSize.width, dimensionPeripherals.width)
     }
     let rectPeripherals = CGRect(origin: currentOrigin, size: dimensionPeripherals)
-    // 計算讀音 disambiguation 行的位置（永遠在視窗最底部，獨立於 peripherals）
+
     let strReadingDisambiguation = attributedDescriptionReadingDisambiguation
     var rectReadingDisambiguation: CGRect = .zero
     if !strReadingDisambiguation.string.isEmpty {
@@ -855,23 +995,20 @@ extension TDK4AppKit.CandidatePool4AppKit {
       dimReading.height = ceil(dimReading.height)
       let readingOrigin: CGPoint
       if finalContainerOrientation == .horizontal {
-        // Horizontal 單行模式：peripherals 在右側，disambiguation 行置於底部
-        // 需確保在 peripherals 和候選字行二者的下方
         let bottomOfCandidates = originDelta + totalAccuSize.height
         let bottomOfPeripherals = rectPeripherals.maxY
         let contentBottom = max(bottomOfCandidates, bottomOfPeripherals)
         readingOrigin = .init(x: originDelta, y: contentBottom + padding)
       } else {
-        // Vertical / Expanded 模式：peripherals 已在下方，disambiguation 置於其下方
         readingOrigin = .init(x: originDelta, y: rectPeripherals.maxY + padding)
       }
       rectReadingDisambiguation = .init(origin: readingOrigin, size: dimReading)
-      // 更新 totalAccuSize 以容納新行
       totalAccuSize.width = max(totalAccuSize.width, dimReading.width + originDelta)
       totalAccuSize.height = readingOrigin.y + dimReading.height - originDelta
     }
     totalAccuSize.width += originDelta * 2
     totalAccuSize.height += originDelta * 2
+
     metrics = .init(
       fittingSize: totalAccuSize,
       highlightedLine: highlightedLineRect,
@@ -884,6 +1021,12 @@ extension TDK4AppKit.CandidatePool4AppKit {
   private var finalContainerOrientation: NSUserInterfaceLayoutOrientation {
     if maxLinesPerPage == 1, layout == .horizontal { return .horizontal }
     return .vertical
+  }
+
+  /// 計算全部候選行（不含底部欄位）的完整尺寸，並一併更新所有 cell 的 visualOrigin。
+  /// 供 GSI scroll mode 使用，以便 draw(_:) 可以繪製全部候選行。
+  func computeCandidateOnlySize() {
+    candidateOnlySize = layoutCells(in: candidateLines, initialOrigin: .zero)
   }
 }
 
@@ -1220,5 +1363,27 @@ extension TDK4AppKit.CandidatePool4AppKit {
       contentHeight = max(contentHeight, lineHeight)
     }
     return contentHeight
+  }
+}
+
+extension TDK4AppKit.CandidatePool4AppKit {
+  enum ScrollLineDirection {
+    case next
+    case previous
+  }
+
+  /// Returns the dominant scroll-axis direction for flip-line operations.
+  /// Uses the axis with larger absolute delta; threshold is ±1.
+  static func dominantScrollLineDirection(_ event: NSEvent) -> ScrollLineDirection? {
+    let deltaX = event.deltaX
+    let deltaY = event.deltaY
+    if abs(deltaY) >= abs(deltaX) {
+      if deltaY > 1 { return .next }
+      if deltaY < -1 { return .previous }
+    } else {
+      if deltaX > 1 { return .next }
+      if deltaX < -1 { return .previous }
+    }
+    return nil
   }
 }

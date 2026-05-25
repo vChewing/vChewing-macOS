@@ -119,7 +119,7 @@ import SwiftUI
 
     VStack(alignment: .leading) {
       HStack {
-        Text(verbatim: "TDKCandidates specimen")
+        Text(verbatim: "GSICandidates specimen")
           .bold()
           .frame(maxWidth: .infinity, alignment: .leading)
         Text(verbatim: "bgColor: #114514")
@@ -130,7 +130,7 @@ import SwiftUI
       .shadow(radius: 5)
       VStack(alignment: .leading) {
         ForEach(Array(poolsHorizontal.enumerated()), id: \.offset) { _, pool in
-          TDK4AppKit.VwrCandidateTDK4SwiftUI(thePool: pool)
+          GSI4AppKit.VwrCandidateGSI4SwiftUI(thePool: pool)
             .clipShape(RoundedRectangle(cornerRadius: 16))
             .background {
               Color(NSColor.controlBackgroundColor)
@@ -143,7 +143,7 @@ import SwiftUI
 
       HStack {
         ForEach(Array(poolsVertical.enumerated()), id: \.offset) { _, pool in
-          TDK4AppKit.VwrCandidateTDK4SwiftUI(thePool: pool)
+          GSI4AppKit.VwrCandidateGSI4SwiftUI(thePool: pool)
             .clipShape(RoundedRectangle(cornerRadius: 16))
             .background {
               Color(NSColor.controlBackgroundColor)
