@@ -487,10 +487,10 @@
 "i18n:UserDef.kSpecifyShiftBackSpaceKeyBehavior.option.1" = "像 Shift+Delete 那樣清空當前組字區內容";
 "i18n:UserDef.kSpecifyShiftBackSpaceKeyBehavior.option.2" = "始終剔除游標正後方的字音";
 "i18n:UserDef.kSpecifyShiftBackSpaceKeyBehavior.shortTitle" = "Shift+退格鍵:";
-"i18n:UserDef.kSpecifyShiftSpaceKeyBehavior.description" = "指定 (Shift+)空格鍵 對候選字詞而言的輪替操作對象。\n※在逐字選字模式（SCPC）下，無論此設定如何，不帶 Shift 的空格鍵始終用於翻頁。\n※若啟用了「在逐字選字模式當中使用空格鍵確認當前高亮候選字」，則該設定優先於此項。";
-"i18n:UserDef.kSpecifyShiftSpaceKeyBehavior.option.0" = "Shift+空格鍵 換下一頁，空格鍵 換選下一個候選字";
-"i18n:UserDef.kSpecifyShiftSpaceKeyBehavior.option.1" = "空格鍵 換下一頁，Shift+空格鍵 換選下一個候選字";
-"i18n:UserDef.kSpecifyShiftSpaceKeyBehavior.shortTitle" = "(Shift+)空格鍵:";
+"i18n:UserDef.kSpecifyShiftSpaceKeyBehavior4CandidateWindow.description" = "指定 (Shift+)空格鍵 對候選字詞而言的輪替操作對象。\n※在逐字選字模式（SCPC）下，無論此設定如何，不帶 Shift 的空格鍵始終用於翻頁。\n※若啟用了「在逐字選字模式當中使用空格鍵確認當前高亮候選字」，則該設定優先於此項。";
+"i18n:UserDef.kSpecifyShiftSpaceKeyBehavior4CandidateWindow.option.0" = "Shift+空格鍵 換下一頁，空格鍵 換選下一個候選字";
+"i18n:UserDef.kSpecifyShiftSpaceKeyBehavior4CandidateWindow.option.1" = "空格鍵 換下一頁，Shift+空格鍵 換選下一個候選字";
+"i18n:UserDef.kSpecifyShiftSpaceKeyBehavior4CandidateWindow.shortTitle" = "(Shift+)空格鍵 (選字窗):";
 "i18n:UserDef.kSpecifyShiftTabKeyBehavior.description" = "指定 (Shift+)Tab 在選字窗內的輪替操作對象。";
 "i18n:UserDef.kSpecifyShiftTabKeyBehavior.option.0" = "輪替候選字";
 "i18n:UserDef.kSpecifyShiftTabKeyBehavior.option.1" = "輪替頁面";

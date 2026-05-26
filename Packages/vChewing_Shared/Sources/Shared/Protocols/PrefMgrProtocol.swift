@@ -95,7 +95,7 @@ public protocol PrefMgrProtocol {
   var specifyIntonationKeyBehavior: Int { get set }
   var specifyShiftBackSpaceKeyBehavior: Int { get set }
   var specifyShiftTabKeyBehavior: Bool { get set }
-  var specifyShiftSpaceKeyBehavior: Bool { get set }
+  var specifyShiftSpaceKeyBehavior4CandidateWindow: Bool { get set }
   var specifyCmdOptCtrlEnterBehavior: Int { get set }
   var reflectBPMFVSInCompositionBuffer: Bool { get set }
   var candidateTextFontName: String { get set }

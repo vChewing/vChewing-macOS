@@ -189,7 +189,7 @@ extension InputHandlerProtocol {
         }
         // In SCPC mode, space without Shift always flips pages / switches columns.
         let effectiveSpecifyShift: Bool = prefs.useSCPCTypingMode
-          || prefs.specifyShiftSpaceKeyBehavior
+          || prefs.specifyShiftSpaceKeyBehavior4CandidateWindow
         let updated: Bool =
           effectiveSpecifyShift
             ? (

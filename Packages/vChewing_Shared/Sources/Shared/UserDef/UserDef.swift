@@ -63,7 +63,7 @@ nonisolated public enum UserDef: String, CaseIterable, Identifiable, Sendable {
   case kSpecifyIntonationKeyBehavior = "SpecifyIntonationKeyBehavior"
   case kSpecifyShiftBackSpaceKeyBehavior = "SpecifyShiftBackSpaceKeyBehavior"
   case kSpecifyShiftTabKeyBehavior = "SpecifyShiftTabKeyBehavior"
-  case kSpecifyShiftSpaceKeyBehavior = "SpecifyShiftSpaceKeyBehavior"
+  case kSpecifyShiftSpaceKeyBehavior4CandidateWindow = "SpecifyShiftSpaceKeyBehavior4CandidateWindow"
   case kSpecifyCmdOptCtrlEnterBehavior = "SpecifyCmdOptCtrlEnterBehavior"
   case kReflectBPMFVSInCompositionBuffer = "ReflectBPMFVSInCompositionBuffer"
   case kAllowRescoringSingleKanjiCandidates = "AllowRescoringSingleKanjiCandidates"
@@ -465,7 +465,7 @@ nonisolated extension UserDef {
     case .kSpecifyIntonationKeyBehavior: return .integer(0)
     case .kSpecifyShiftBackSpaceKeyBehavior: return .integer(0)
     case .kSpecifyShiftTabKeyBehavior: return .bool(false)
-    case .kSpecifyShiftSpaceKeyBehavior: return .bool(false)
+    case .kSpecifyShiftSpaceKeyBehavior4CandidateWindow: return .bool(false)
     case .kSpecifyCmdOptCtrlEnterBehavior: return .integer(0)
     case .kReflectBPMFVSInCompositionBuffer: return .bool(false)
     case .kAllowRescoringSingleKanjiCandidates: return .bool(false)
@@ -778,12 +778,12 @@ nonisolated extension UserDef {
           1: "i18n:UserDef.kSpecifyShiftTabKeyBehavior.option.1",
         ]
       )
-    case .kSpecifyShiftSpaceKeyBehavior: return .init(
-        userDef: self, shortTitle: "i18n:UserDef.kSpecifyShiftSpaceKeyBehavior.shortTitle",
-        description: "i18n:UserDef.kSpecifyShiftSpaceKeyBehavior.description",
+    case .kSpecifyShiftSpaceKeyBehavior4CandidateWindow: return .init(
+        userDef: self, shortTitle: "i18n:UserDef.kSpecifyShiftSpaceKeyBehavior4CandidateWindow.shortTitle",
+        description: "i18n:UserDef.kSpecifyShiftSpaceKeyBehavior4CandidateWindow.description",
         options: [
-          0: "i18n:UserDef.kSpecifyShiftSpaceKeyBehavior.option.0",
-          1: "i18n:UserDef.kSpecifyShiftSpaceKeyBehavior.option.1",
+          0: "i18n:UserDef.kSpecifyShiftSpaceKeyBehavior4CandidateWindow.option.0",
+          1: "i18n:UserDef.kSpecifyShiftSpaceKeyBehavior4CandidateWindow.option.1",
         ]
       )
     case .kSpecifyCmdOptCtrlEnterBehavior: return .init(

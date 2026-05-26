@@ -493,7 +493,7 @@ extension MainAssemblyTests {
     testHandler.prefs.useSCPCTypingMode = false
     testHandler.prefs.chooseCandidateUsingSpace = false
     testHandler.prefs.specifyShiftTabKeyBehavior = false
-    testHandler.prefs.specifyShiftSpaceKeyBehavior = false
+    testHandler.prefs.specifyShiftSpaceKeyBehavior4CandidateWindow = false
     testHandler.prefs.dodgeInvalidEdgeCandidateCursorPosition = false
 
     testSession.clientBundleIdentifier = "org.atelierInmu.vChewing.MainAssembly.UnitTests"

@@ -487,10 +487,10 @@
 "i18n:UserDef.kSpecifyShiftBackSpaceKeyBehavior.option.1" = "Shift+Delete のように入力緩衝列を消す";
 "i18n:UserDef.kSpecifyShiftBackSpaceKeyBehavior.option.2" = "カーソルの後部の音読みを常に削除する";
 "i18n:UserDef.kSpecifyShiftBackSpaceKeyBehavior.shortTitle" = "Shift+BackSpace:";
-"i18n:UserDef.kSpecifyShiftSpaceKeyBehavior.description" = "入力候補についての (Shift+)Space キーの輪番切替対象をご指定ください。\n※逐字選択モード（SCPC）では、この設定に関わらず Shift なしのスペースキーは常にページ切替になります。\n※「全候補入力の場合、ハイライト候補を Space キーで確認」が有効な場合、そちらが優先されます。";
-"i18n:UserDef.kSpecifyShiftSpaceKeyBehavior.option.0" = "Shift+Space で次のページ、Space で次の候補文字を";
-"i18n:UserDef.kSpecifyShiftSpaceKeyBehavior.option.1" = "Space で次のページ、Shift+Space で次の候補文字を";
-"i18n:UserDef.kSpecifyShiftSpaceKeyBehavior.shortTitle" = "(Shift+)Space:";
+"i18n:UserDef.kSpecifyShiftSpaceKeyBehavior4CandidateWindow.description" = "入力候補についての (Shift+)Space キーの輪番切替対象をご指定ください。\n※逐字選択モード（SCPC）では、この設定に関わらず Shift なしのスペースキーは常にページ切替になります。\n※「全候補入力の場合、ハイライト候補を Space キーで確認」が有効な場合、そちらが優先されます。";
+"i18n:UserDef.kSpecifyShiftSpaceKeyBehavior4CandidateWindow.option.0" = "Shift+Space で次のページ、Space で次の候補文字を";
+"i18n:UserDef.kSpecifyShiftSpaceKeyBehavior4CandidateWindow.option.1" = "Space で次のページ、Shift+Space で次の候補文字を";
+"i18n:UserDef.kSpecifyShiftSpaceKeyBehavior4CandidateWindow.shortTitle" = "(Shift+)Space (入力候補):";
 "i18n:UserDef.kSpecifyShiftTabKeyBehavior.description" = "入力候補陳列での (Shift+)Tab キーの輪番切替対象をご指定ください。";
 "i18n:UserDef.kSpecifyShiftTabKeyBehavior.option.0" = "候補文字そのもの";
 "i18n:UserDef.kSpecifyShiftTabKeyBehavior.option.1" = "候補陳列ページ";
