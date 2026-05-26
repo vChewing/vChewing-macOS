@@ -104,7 +104,7 @@ nonisolated public enum UserDef: String, CaseIterable, Identifiable, Sendable {
   case kRomanNumeralOutputFormat = "RomanNumeralOutputFormat"
   case kReducePOMLifetimeToNoMoreThan12Hours = "ReducePOMLifetimeToNoMoreThan12Hours"
 
-  case kUseSpaceToCommitHighlightedCandidate4SCPC = "UseSpaceToCommitHighlightedSCPCCandidate"
+  case kUseSpaceToCommitHighlightedCandidate4SCPC = "UseSpaceToCommitHighlightedCandidate4SCPC"
   case kEnableCandidateWindowAnimation = "EnableCandidateWindowAnimation"
   case kDisableSegmentedThickUnderlineInMarkingModeForManagedClients
     = "DisableSegmentedThickUnderlineInMarkingModeForManagedClients"

@@ -183,7 +183,7 @@ extension InputHandlerProtocol {
         _ = updated ? {}() : errorCallback?("9B691919")
         return true
       case .kSpace where state.type != .ofInputting:
-        guard !(prefs.useSpaceToCommitHighlightedSCPCCandidate && prefs.useSCPCTypingMode) else {
+        guard !(prefs.useSpaceToCommitHighlightedCandidate4SCPC && prefs.useSCPCTypingMode) else {
           confirmHighlightedCandidate()
           return true
         }

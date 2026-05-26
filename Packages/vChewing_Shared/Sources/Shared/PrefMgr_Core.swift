@@ -216,7 +216,7 @@ public final class PrefMgr: PrefMgrProtocol, Sendable {
   // MARK: - Settings (Tier 2)
 
   @AppProperty(userDef: .kUseSpaceToCommitHighlightedCandidate4SCPC)
-  public var useSpaceToCommitHighlightedSCPCCandidate: Bool
+  public var useSpaceToCommitHighlightedCandidate4SCPC: Bool
 
   @AppProperty(userDef: .kEnableCandidateWindowAnimation)
   public var enableCandidateWindowAnimation: Bool

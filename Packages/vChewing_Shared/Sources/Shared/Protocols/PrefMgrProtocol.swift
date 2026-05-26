@@ -62,7 +62,7 @@ public protocol PrefMgrProtocol {
   var trimUnfinishedReadingsOnCommit: Bool { get set }
   var alwaysShowTooltipTextsHorizontally: Bool { get set }
   var clientsIMKTextInputIncapable: [String: Bool] { get set }
-  var useSpaceToCommitHighlightedSCPCCandidate: Bool { get set }
+  var useSpaceToCommitHighlightedCandidate4SCPC: Bool { get set }
   var enableCandidateWindowAnimation: Bool { get set }
   var disableSegmentedThickUnderlineInMarkingModeForManagedClients: Bool { get set }
   var maxCandidateLength: Int { get set }
