@@ -221,12 +221,12 @@ extension AppDelegate {
     let currentMemorySize = sample()
     // 若第一次看起來超標，延遲短暫再測一次，避免因瞬間峰值就發起
     // 自殺。第二次的數值將決定是否發動。
-    if currentMemorySize >= 1_024 {
+    if currentMemorySize >= 1_536 {
       asyncOnMain(after: 0.25) { [weak self] in
         guard let self = self else { return }
-        let second = sample()
-        if second >= 1_024 {
-          self.memoryExceededNotification(size: second)
+        let secondSample = sample()
+        if secondSample >= 1_536 {
+          self.memoryExceededNotification(size: secondSample)
         }
       }
     }
