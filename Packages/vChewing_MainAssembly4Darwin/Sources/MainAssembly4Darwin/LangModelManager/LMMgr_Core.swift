@@ -194,12 +194,16 @@ public final class LMMgr {
     LMAssembly.LMInstantiator.loadCassetteData(path: resolvedPath)
   }
 
-  public static func loadUserPhrasesData(type: LMAssembly.ReplacableUserDataType? = nil) {
+  public static func loadUserPhrasesData(
+    type: LMAssembly.ReplacableUserDataType? = nil,
+    async: Bool? = nil
+  ) {
     guard let type = type else {
       Shared.InputMode.validCases.forEach { mode in
         mode.langModel.loadUserPhrasesData(
           path: userDictDataURL(mode: mode, type: .thePhrases).path,
-          filterPath: userDictDataURL(mode: mode, type: .theFilter).path
+          filterPath: userDictDataURL(mode: mode, type: .theFilter).path,
+          async: async
         )
         mode.langModel.loadUserSymbolData(path: userDictDataURL(mode: mode, type: .theSymbols).path)
         mode.langModel.pomReducedLifetime = PrefMgr.shared.reducePOMLifetimeToNoMoreThan12Hours
@@ -217,7 +221,8 @@ public final class LMMgr {
       case .thePhrases:
         mode.langModel.loadUserPhrasesData(
           path: userDictDataURL(mode: mode, type: .thePhrases).path,
-          filterPath: nil
+          filterPath: nil,
+          async: async
         )
       case .theFilter:
         // We have to enforce the toggle of async loading here for this case:

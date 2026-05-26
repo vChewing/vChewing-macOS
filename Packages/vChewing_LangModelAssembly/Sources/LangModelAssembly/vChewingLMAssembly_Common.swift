@@ -52,6 +52,11 @@ nonisolated public enum LMAssembly {
     return try fileHandleQueue.sync(execute: execute)
   }
 
+  /// 在 fileHandleQueue 上非同步執行閉包，不阻塞呼叫方。
+  nonisolated public static func withFileHandleQueueAsync(_ execute: @escaping @Sendable () -> ()) {
+    fileHandleQueue.async(execute: execute)
+  }
+
   /// 在 fileHandleQueue 上非同步讀取檔案內容（含可選的 consolidation），
   /// 完成後在 MainActor 上回呼結果。不阻塞呼叫方（通常是 MainActor）。
   nonisolated public static func readFileContentAsync(

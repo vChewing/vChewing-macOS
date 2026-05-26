@@ -246,11 +246,13 @@ extension LMAssembly {
       inputTokenHashesArray.removeAll(keepingCapacity: true)
     }
 
-    public func loadUserPhrasesData(path: String, filterPath: String?) {
+    public func loadUserPhrasesData(path: String, filterPath: String?, async: Bool? = nil) {
       // 無論新檔案是否可讀，都必須先清除舊資料，防止舊目錄內容殘留。
       lmUserPhrases.clear()
       lmFiltered.clear()
       unigramLRUCache.removeAll(keepingCapacity: true)
+
+      let shouldAsync = async ?? Self.asyncLoadingUserData
 
       func loadMain() {
         if FileManager.default.isReadableFile(atPath: path) {
@@ -260,7 +262,7 @@ extension LMAssembly {
           vCLMLog("lmUserPhrases: File access failure: \(path)")
         }
       }
-      if !Self.asyncLoadingUserData {
+      if !shouldAsync {
         loadMain()
       } else {
         LMAssembly.readFileContentAsync(
@@ -283,7 +285,7 @@ extension LMAssembly {
           vCLMLog("lmFiltered: File access failure: \(path)")
         }
       }
-      if !Self.asyncLoadingUserData {
+      if !shouldAsync {
         loadFilter()
       } else {
         LMAssembly.readFileContentAsync(

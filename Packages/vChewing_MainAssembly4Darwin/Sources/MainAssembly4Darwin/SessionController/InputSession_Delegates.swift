@@ -29,7 +29,6 @@ extension SessionProtocol {
 
   public func performUserPhraseOperation(addToFilter: Bool) -> Bool {
     guard let inputHandler = inputHandler, state.type == .ofMarking else { return false }
-    var succeeded = true
 
     let kvPair = state.data.userPhraseKVPair
     var userPhrase = UserPhraseInsertable(
@@ -41,10 +40,7 @@ extension SessionProtocol {
     if Self.areWeNerfing { action = .toNerf }
     if addToFilter { action = .toFilter }
     userPhrase.updateWeight(basedOn: action)
-    LMMgr.writeUserPhrasesAtOnce(userPhrase, areWeFiltering: action == .toFilter) {
-      succeeded = false
-    }
-    if !succeeded { return false }
+    guard LMMgr.writeUserPhrasesAtOnce(userPhrase, areWeFiltering: action == .toFilter) else { return false }
 
     // 後續操作。
     let valueCurrent = userPhrase.value
@@ -348,7 +344,6 @@ extension SessionProtocol {
     action: CandidateContextMenuAction
   ) {
     guard let inputHandler = inputHandler else { return }
-    var succeeded = true
 
     let rawPair = state.candidates[index]
     var userPhrase = UserPhraseInsertable(
@@ -358,12 +353,10 @@ extension SessionProtocol {
     )
     userPhrase.updateWeight(basedOn: action)
 
-    LMMgr.writeUserPhrasesAtOnce(userPhrase, areWeFiltering: action == .toFilter) {
-      succeeded = false
-    }
+    let succeeded = LMMgr.writeUserPhrasesAtOnce(userPhrase, areWeFiltering: action == .toFilter)
 
     // 直接同步重載目前使用中的語言模組，以避免單元測試時不同 LM 實例之間資料不同步。
-    if succeeded, UserDefaults.pendingUnitTests {
+    if UserDefaults.pendingUnitTests {
       let phrasesPath = LMMgr.userDictDataURL(mode: inputMode, type: .thePhrases).path
       if action == .toFilter {
         inputHandler.currentLM.reloadUserFilterDirectly(

@@ -8,7 +8,7 @@
 
 // MARK: - UserPhraseInsertable
 
-public struct UserPhraseInsertable: Hashable {
+nonisolated public struct UserPhraseInsertable: Hashable {
   // MARK: Lifecycle
 
   public init(

@@ -430,25 +430,26 @@ extension LMMgr {
 
   // MARK: - 寫入使用者檔案
 
+  @discardableResult
   public static func writeUserPhrasesAtOnce(
-    _ userPhrase: UserPhraseInsertable, areWeFiltering: Bool,
-    errorHandler: (() -> ())? = nil
-  ) {
+    _ userPhrase: UserPhraseInsertable, areWeFiltering: Bool
+  )
+    -> Bool {
     LMAssembly.withFileHandleQueueSync {
       let resultA = userPhrase.write(toFilter: areWeFiltering)
       let resultB = userPhrase.crossConverted.write(toFilter: areWeFiltering)
       guard resultA, resultB else {
-        if let errorHandler = errorHandler {
-          errorHandler()
-        }
-        return
+        vCLog("UserPhrasesAtOnce: Failed to write phrase data.")
+        return false
       }
-      // The new FolderMonitor module does NOT monitor cases that files are modified
-      // by the current application itself, requiring additional manual loading process here.
       if PrefMgr.shared.phraseEditorAutoReloadExternalModifications {
         Broadcaster.shared.postEventForReloadingPhraseEditor()
       }
-      loadUserPhrasesData(type: areWeFiltering ? .theFilter : .thePhrases)
+      // Use async: true — the reload's readFileContentAsync will be enqueued
+      // on fileHandleQueue, executed after this sync block returns. This way
+      // MainActor only blocks briefly during replaceData (asynchronously later).
+      Self.loadUserPhrasesData(type: areWeFiltering ? .theFilter : .thePhrases, async: true)
+      return true
     }
   }
 
