@@ -215,6 +215,11 @@
 "i18n:securityAgentHelper.warningMessage.footer" = "このメッセージが出た時に、唯音がすでに「DisableSecureEventInput()」を実行してみました。これで入力ソースメニューで唯音は利用できる状態になったかもしれませんが、下記のステップはおすすめです：\n\nイ）今のこのメッセージの画面のスクリーンショットを撮って置いてください。後ほど使えます。\n\nロ）もし、今でも入力ソースメニューで唯音は利用できぬ状態でしたら、上記のプロセスを（強制）中止してください。そうすれば、それぞれのSecureEventInput状態は解消できて、入力ソースメニューで唯音はすぐ利用できることになります。\n\nハ）もし、該当プロセスは Mac App Store のアプリからのものでしたら、該当アプリを Apple 社にご通報ください。状況と必要性次第、該当アプリは Mac App Store からしばらく取り下がて、支障解決まで Mac App Store 提供中止になるかもしれません。\n\nニ）該当プロセスは Mac App Store からダウンロードしたものか否か、それぞれの開発元にこの支障をご通報ください。今のこのメッセージの画面のスクリーンショットを該当開発元に送れば、必要なる情報は該当開発元に全部お知らせすることができます。\n\nホ）一部のユーザーから、関連する実行中のアプリやサービス（特にパスワードマネージャー、macCatalyst ベースのパスワードログイン作業、またはシェル経由のパスワードログイン作業）を終了し、その後に画面／現在のユーザーセッションをロックして再度解除すると、今回の問題が緩和されたとの報告があります。";
 "i18n:securityAgentHelper.warningMessage.header" = "唯音入力アプリ（略称「唯音」）は「他のバックグラウンド・プロセスがSecureEventInputを正しく利用していない」と検出しました。このような不正利用は「システム内蔵入力以外の全ての入力アプリがメニューで灰色状態で選べなくて使えない」の元凶です。\n\nセンシティブな資料の記入どころでSecureEventInputをEnableSecureEventInput()で使うのは当然ですが、「入力中」状態が終わった後必ずDisableSecureEventInput()で状態解消すべきだと義務です。いくつかヘルパーアプリも、あるいはSecureEventInputを呼び起こしてからすぐ固まったアプリも、この状態になりやすいです。特に、他のアプリの画面へ切り替えたとしても、固まったアプリのSecureEventInput状態は自動的に解消できません。\n\n検出した該当プロセスは:";
 "i18n:securityAgentHelper.warningMessage.title" = "SecureEventInput の不正利用が検出";
+"i18n:Settings.ApplySCPCPreset.ButtonTitle" = "ㄅ半入力関連オプションの一括設定";
+"i18n:Settings.ApplySCPCPreset.Confirm.AlertMessage" = "ㄅ半入力方式は ETen 中国語 DOS システムに由来し、Windows NT 3.51 から Windows XP まで標準搭載されていました。少なくとも一、二世代のユーザーがこの入力方式に生涯消えない筋肉記憶を形成しています。\n\n続行すると、vChewing の動作をㄅ半に合わせるため、以下の設定が自動的に適用されます：\n• 全候補入力モード（SCPC）を有効にする\n• 連想語句を有効にする\n• スペースキーでハイライトされた候補を確定する機能を無効にする";
+"i18n:Settings.ApplySCPCPreset.Confirm.AlertTitle" = "ㄅ半入力関連オプションの一括設定";
+"i18n:Settings.ApplySCPCPreset.Succeeded.AlertMessage" = "「全候補入力モード」と「連想語句」が有効になり、「スペースキーでハイライトされた候補を確定する」が無効になりました。";
+"i18n:Settings.ApplySCPCPreset.Succeeded.AlertTitle" = "ㄅ半入力設定を適用しました";
 "i18n:settings.button.hpAndDonation" = "ＨＰ & お寄付";
 "i18n:Settings.ChoosePhoneticLayoutPrompt" = "共通語分析器の注音配列をご指定ください。";
 "i18n:Settings.ChooseTargetAppBundle" = "登録したいアプリのバンドルのお選びを。";

@@ -215,6 +215,11 @@
 "i18n:securityAgentHelper.warningMessage.footer" = "當這則訊息呈現出來的時候，唯音已經嘗試呼叫 `DisableSecureEventInput()` 來試圖解除這個狀態。以下是唯音建議您採取的行動：\n\n0. 將這則訊息視窗留一份螢幕擷圖、以備接下來的需要。\n\n1. 如果輸入法選單內的唯音仍舊處於無法選取的狀態（下文簡稱「灰色不可用狀態」），則請考慮結束上述執行緒、以迫使其釋放各自的 SecureEventInput 狀態。這將立刻解除唯音的灰色不可用狀態。\n\n2. 如果該執行緒所屬的 App 來自於 Mac App Store 的話，請向 Apple 檢舉其對 SecureEventInput 的濫用。Apple 會在必要的情況下對這類 App 採取措施，比如：臨時下架，直至軟體研發方解決相關故障。\n\n3. 無論該執行緒是否來自於 Mac App Store，也都請您向相關的研發方/提供方提報該故障。您可以將這則訊息的螢幕擷圖給他們看，因為裡面已經包含了用以偵測該故障的必要資訊。\n\n4. 有使用者回報，先關閉相關的執行中應用與服務（尤其是密碼管理工具、基於 macCatalyst 的密碼登入作業、或任何以 Shell 執行的密碼登入作業），再鎖定並解鎖螢幕／目前使用者的桌面工作階段，能夠在一定程度上舒緩目前的狀況。";
 "i18n:securityAgentHelper.warningMessage.header" = "唯音有偵測到下述後檯執行緒有在濫用 SecureEventInput。這種濫用會導致系統內的所有第三方輸入法全都無法正常使用（在輸入法選單內會變成灰色）。\n\n針對需要填寫敏感資料的場合，使用 SecureEventInput 無可厚非。但是，用 EnableSecureEventInput() 開啟該模式之後，就有義務在輸入窗格失焦的那一刻呼叫 DisableSecureEventInput() 來結束這種狀態。這種狀態還常見於後檯輔助 App 當中、或者某個 App 在叫出該模式之後失去回應（這樣的話，哪怕被切換到後檯，SecureEventInput 也不會自動解除）。\n\n被偵測到的執行緒如下:";
 "i18n:securityAgentHelper.warningMessage.title" = "偵測到對 SecureEventInput 的濫用行為";
+"i18n:Settings.ApplySCPCPreset.ButtonTitle" = "我姓ㄅ，ㄅㄛㄅ，愛打ㄅ半的傳說，要打ㄅ半就點我";
+"i18n:Settings.ApplySCPCPreset.Confirm.AlertMessage" = "ㄅ半輸入法源自倚天中文 DOS 系統、且在 Windows NT 3.51 至 Windows XP 系統內隨附。有至少一兩代人對這種打字方式形成了終生無法扭轉的肌肉記憶。\n\n如果繼續，該輸入法會自動套用下述設定、以使自身的行為與ㄅ半輸入法對齊：\n• 啟用「模擬逐字選字輸入」(SCPC)\n• 啟用「聯想詞」\n• 停用「使用空格鍵確認高亮候選字」";
+"i18n:Settings.ApplySCPCPreset.Confirm.AlertTitle" = "一次性配置所有與ㄅ半輸入有關的選項";
+"i18n:Settings.ApplySCPCPreset.Succeeded.AlertMessage" = "已啟用「模擬逐字選字輸入」與「聯想詞」功能，且已停用「使用空格鍵確認高亮候選字」。";
+"i18n:Settings.ApplySCPCPreset.Succeeded.AlertTitle" = "ㄅ半懶人設定已套用";
 "i18n:settings.button.hpAndDonation" = "主頁 & 捐款";
 "i18n:Settings.ChoosePhoneticLayoutPrompt" = "請指定普通話/國音分析器所使用的注音排列。";
 "i18n:Settings.ChooseTargetAppBundle" = "請選擇要登記的應用程式的封包。";

@@ -84,27 +84,29 @@ public struct VwrSettingsPaneGeneral: View {
           UserDef.kIsDebugModeEnabled.renderUI()
         }
       }
+
+      // MARK: (header: Text("Quick Setup:"))
+
+      Section {
+        HStack {
+          Button("i18n:Settings.ApplySCPCPreset.ButtonTitle".i18n) {
+            activeAlert = .confirmApplyingSCPCBatchSettings
+          }
+          Spacer()
+        }
+      }
     }.formStyled()
       .frame(
         minWidth: CtlSettingsUI.formWidth,
         maxHeight: CtlSettingsUI.contentMaxHeight
       )
       .alert(
-        "i18n:Common.Warning".i18n,
-        isPresented: $isShowingFartWarning
+        activeAlertTitle,
+        isPresented: isShowingAlert
       ) {
-        Button("i18n:Common.Uncheck".i18n, role: .destructive) {
-          PrefMgr.shared.shouldNotFartInLieuOfBeep = false
-          IMEApp.buzz()
-        }
-        Button("i18n:Common.LeaveItChecked".i18n, role: .cancel) {
-          PrefMgr.shared.shouldNotFartInLieuOfBeep = true
-          IMEApp.buzz()
-        }
+        activeAlertButtons
       } message: {
-        Text(
-          "i18n:UserDef.kShouldNotFartInLieuOfBeep.description".i18n
-        )
+        activeAlertMessage
       }
   }
 
@@ -115,13 +117,100 @@ public struct VwrSettingsPaneGeneral: View {
 
   // MARK: Private
 
+  private enum ActiveAlert {
+    case fartWarning
+    case confirmApplyingSCPCBatchSettings
+    case succeededInApplyingSCPCBatchSettings
+  }
+
   @State
-  private var isShowingFartWarning = false
+  private var activeAlert: ActiveAlert?
+
+  private var isShowingAlert: Binding<Bool> {
+    .init(
+      get: { activeAlert != nil },
+      set: { if !$0 { activeAlert = nil } }
+    )
+  }
+
+  private var activeAlertTitle: String {
+    switch activeAlert {
+    case .fartWarning: return "i18n:Common.Warning".i18n
+    case .confirmApplyingSCPCBatchSettings: return "i18n:Settings.ApplySCPCPreset.Confirm.AlertTitle".i18n
+    case .succeededInApplyingSCPCBatchSettings: return "i18n:Settings.ApplySCPCPreset.Succeeded.AlertTitle".i18n
+    case .none: return ""
+    }
+  }
+
+  private var activeAlertMessage: Text {
+    switch activeAlert {
+    case .fartWarning:
+      return Text("i18n:UserDef.kShouldNotFartInLieuOfBeep.description".i18n)
+    case .confirmApplyingSCPCBatchSettings:
+      return Text("i18n:Settings.ApplySCPCPreset.Confirm.AlertMessage".i18n)
+    case .succeededInApplyingSCPCBatchSettings:
+      return Text("i18n:Settings.ApplySCPCPreset.Succeeded.AlertMessage".i18n)
+    case .none:
+      return Text(verbatim: "")
+    }
+  }
+
+  @ViewBuilder
+  private var activeAlertButtons: some View {
+    switch activeAlert {
+    case .fartWarning:
+      Button("i18n:Common.Uncheck".i18n, role: .destructive) {
+        PrefMgr.shared.shouldNotFartInLieuOfBeep = false
+        IMEApp.buzz()
+      }
+      Button("i18n:Common.LeaveItChecked".i18n, role: .cancel) {
+        PrefMgr.shared.shouldNotFartInLieuOfBeep = true
+        IMEApp.buzz()
+      }
+    case .confirmApplyingSCPCBatchSettings:
+      Button("i18n:Common.Yes".i18n) {
+        applySCPCPreset()
+      }
+      Button("i18n:Common.No".i18n, role: .cancel) {}
+    case .succeededInApplyingSCPCBatchSettings:
+      Button("i18n:Common.OK".i18n) {}
+    case .none:
+      EmptyView()
+    }
+  }
+
+  private func applySCPCPreset() {
+    PrefMgr.shared.useSpaceToCommitHighlightedCandidate4SCPC = false
+    if !PrefMgr.shared.useSCPCTypingMode {
+      Notifier.notify(
+        message: "i18n:UserDef.kUsingHotKeySCPC.shortTitle".i18n + "\n"
+          + (
+            PrefMgr.shared.useSCPCTypingMode.toggled()
+              ? "i18n:NotificationSwitch.On".i18n
+              : "i18n:NotificationSwitch.Off".i18n
+          )
+      )
+    }
+    // 錯開兩條通知，防止兩條通知重疊到一起。
+    asyncOnMain {
+      if !PrefMgr.shared.associatedPhrasesEnabled {
+        Notifier.notify(
+          message: "i18n:UserDef.kUsingHotKeyAssociates.shortTitle".i18n + "\n"
+            + (
+              PrefMgr.shared.associatedPhrasesEnabled.toggled()
+                ? "i18n:NotificationSwitch.On".i18n
+                : "i18n:NotificationSwitch.Off".i18n
+            )
+        )
+      }
+    }
+    activeAlert = .succeededInApplyingSCPCBatchSettings
+  }
 
   private func onFartControlChange() {
     if !PrefMgr.shared.shouldNotFartInLieuOfBeep {
       PrefMgr.shared.shouldNotFartInLieuOfBeep = true
-      isShowingFartWarning = true
+      activeAlert = .fartWarning
       return
     }
     IMEApp.buzz()
