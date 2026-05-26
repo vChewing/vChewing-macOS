@@ -25,7 +25,7 @@ public final class CtlSettingsUI: NSWindowController, NSWindowDelegate {
   public init() {
     super.init(
       window: .init(
-        contentRect: CGRect(x: 401, y: 295, width: 590, height: Self.contentMaxHeight),
+        contentRect: CGRect(x: 401, y: 295, width: 758, height: Self.contentMaxHeight),
         styleMask: [.titled, .closable, .miniaturizable, .fullSizeContentView],
         backing: .buffered,
         defer: true
@@ -44,7 +44,6 @@ public final class CtlSettingsUI: NSWindowController, NSWindowDelegate {
 
   override public func windowDidLoad() {
     super.windowDidLoad()
-    window?.setPosition(vertical: .top, horizontal: .right, padding: 20)
     let viewModel = SettingsUIViewModel()
     window?.contentView = NSHostingView(
       rootView: VwrSettingsUI()
@@ -54,6 +53,9 @@ public final class CtlSettingsUI: NSWindowController, NSWindowDelegate {
     var preferencesTitleName = "i18n:Menu.VChewingPreferences".i18n
     preferencesTitleName.removeLast()
     window?.title = preferencesTitleName
+    asyncOnMain { [weak self] in
+      self?.window?.setPosition(vertical: .top, horizontal: .right, padding: 20)
+    }
   }
 
   override public func close() {
@@ -123,34 +125,9 @@ extension CtlSettingsUI {
     }
   }()
 
-  public static let contentMaxHeight: Double = {
-    var result: Double = 560
-    if #available(macOS 26, *), NSApplication.uxLevel == .liquidGlass {
-      #if compiler(>=6.2) && canImport(AppKit, _version: 26.0)
-        result += 90
-      #endif
-    }
-    return result
-  }()
+  public static let contentMaxHeight: Double = 650
 
-  public static let formWidth: Double = {
-    let delta: Double
-    if #available(macOS 26, *) {
-      delta = 20
-    } else {
-      delta = 0
-    }
-    switch PrefMgr.shared.appleLanguages[0] {
-    case "ja":
-      return 520 + delta
-    default:
-      if PrefMgr.shared.appleLanguages[0].contains("zh-Han") {
-        return 500 + delta
-      } else {
-        return 580 + delta
-      }
-    }
-  }()
+  public static let formWidth: Double = 614
 
   public static var isCJKInterface: Bool {
     PrefMgr.shared.appleLanguages[0].contains("zh-Han") || PrefMgr.shared.appleLanguages[0] == "ja"
