@@ -1181,7 +1181,7 @@ extension InputHandlerProtocol {
     let bannedModifiers: KBEvent.ModifierFlags = [.option, .shift, .command, .control]
     let noBannedModifiers = bannedModifiers.intersection(input.keyModifierFlags).isEmpty
     var triggered = input.isCursorClockLeft || input.isCursorClockRight
-    triggered = triggered || (input.isSpace && prefs.chooseCandidateUsingSpace)
+    triggered = triggered || (input.isSpace && prefs.spaceKeyBehaviorAgainstICB == 1)
     triggered = triggered || input.isPageDown || input.isPageUp
     triggered = triggered || (input.isTab && prefs.specifyShiftTabKeyBehavior)
     guard notEmpty, noBannedModifiers, triggered else { return false }

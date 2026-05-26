@@ -135,8 +135,8 @@ public final class PrefMgr: PrefMgrProtocol, Sendable {
   @AppProperty(userDef: .kMinCellWidthForHorizontalMatrix)
   public var minCellWidthForHorizontalMatrix: Int
 
-  @AppProperty(userDef: .kChooseCandidateUsingSpace)
-  public var chooseCandidateUsingSpace: Bool
+  @AppProperty(userDef: .kSpaceKeyBehaviorAgainstICB)
+  public var spaceKeyBehaviorAgainstICB: Int
 
   @AppProperty(userDef: .kAllowRescoringSingleKanjiCandidates)
   public var allowRescoringSingleKanjiCandidates: Bool
@@ -472,6 +472,9 @@ extension PrefMgr {
     if ![0, 1, 2].contains(candidateStateJKHLBehavior) {
       candidateStateJKHLBehavior = 0
     }
+    if ![0, 1, 2].contains(spaceKeyBehaviorAgainstICB) {
+      spaceKeyBehaviorAgainstICB = 1
+    }
     migrateDeprecatedSettings()
   }
 
@@ -479,7 +482,7 @@ extension PrefMgr {
     let defaults = UserDefaults.standard
     // 移除被刻意作廢的設定。
     defaults.removeObject(forKey: "AllowBoostingSingleKanjiAsUserPhrase")
-    // 遷移舊設定。
+    // 遷移舊設定：JK/HL 選字窗行為。
     if candidateStateJKHLBehavior == 0 {
       let legacyJK = defaults.bool(forKey: "UseJKtoMoveCompositorCursorInCandidateState")
       let legacyHL = defaults.bool(forKey: "UseHLtoMoveCompositorCursorInCandidateState")
@@ -493,6 +496,17 @@ extension PrefMgr {
         defaults.removeObject(forKey: "UseJKtoMoveCompositorCursorInCandidateState")
         defaults.removeObject(forKey: "UseHLtoMoveCompositorCursorInCandidateState")
       }
+    }
+    // 遷移舊設定：Space 鍵對內文組字區的行為（舊版 Bool → 新版 Int）。
+    let oldKey = "ChooseCandidateUsingSpace"
+    if let oldValue = defaults.object(forKey: oldKey) {
+      // oldValue 非 Bool 則忽略，避免舊版 Int 值被意外覆蓋。
+      if let oldBool = oldValue as? Bool {
+        if spaceKeyBehaviorAgainstICB == 1 { // 僅在仍為預設值時遷移。
+          spaceKeyBehaviorAgainstICB = oldBool ? 1 : 0
+        }
+      }
+      defaults.removeObject(forKey: oldKey)
     }
   }
 }

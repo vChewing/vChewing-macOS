@@ -369,8 +369,6 @@
 "i18n:UserDef.kCheckAbusersOfSecureEventInputAPI.shortTitle" = "主动侦测正在滥用 SecureEventInput API 的后台执行绪";
 "i18n:UserDef.kCheckUpdateAutomatically.shortTitle" = "自动检查软体更新";
 "i18n:UserDef.kChineseConversionEnabled.shortTitle" = "自动将繁体中文字转为康熙正体字";
-"i18n:UserDef.kChooseCandidateUsingSpace.description" = "取消勾选的话，该按键会插入空格。";
-"i18n:UserDef.kChooseCandidateUsingSpace.shortTitle" = "敲空格键以呼出候选字窗";
 "i18n:UserDef.kClassicHaninKeyboardSymbolModeShortcutEnabled.shortTitle" = "亦使用「\\」或「¥」键启用汉音键盘符号模式";
 "i18n:UserDef.kCNS11643Enabled.shortTitle" = "启用 CNS11643 全字库支援 (2026-05-06)";
 "i18n:UserDef.kConsolidateContextOnCandidateSelection.description" = "打比方说，你敲了「章太炎」，你想将「太」改成「泰」。这个操作的作业索引范围是开闭区间 [1,2)，会切到「章太炎」这个节点的所在索引范围 [0,3)。如果没有事前巩固处理的话，这个词会在你选字之后变成诸如「张泰言」这种你不想要的自动选字结果。当且仅当你启用了这个巩固功能的前提下，你选字之后的结果才会是「章泰炎」这种你想要的结果。";
@@ -466,6 +464,11 @@
 "i18n:UserDef.kShowReverseLookupInCandidateUI.shortTitle" = "在选字窗内显示可用的字根反查结果";
 "i18n:UserDef.kShowTranslatedStrokesInCompositionBuffer.description" = "不启用该选项的话，在组字区内的字根将会以原始键盘按键名称来显示。所有关于字根的定义，均请洽 CIN 磁带档案内的「%keyname」章节。";
 "i18n:UserDef.kShowTranslatedStrokesInCompositionBuffer.shortTitle" = "在组字区内显示字根、而非原始键盘码";
+"i18n:UserDef.kSpaceKeyBehaviorAgainstICB.description" = "指定空格键是呼出候选字窗、插入空格、还是轮替候选字。\n选择「轮替候选字」时，Shift+Space 会反向轮替。";
+"i18n:UserDef.kSpaceKeyBehaviorAgainstICB.option.0" = "插入空格";
+"i18n:UserDef.kSpaceKeyBehaviorAgainstICB.option.1" = "呼出选字窗";
+"i18n:UserDef.kSpaceKeyBehaviorAgainstICB.option.2" = "轮替候选字（正向顺延）";
+"i18n:UserDef.kSpaceKeyBehaviorAgainstICB.shortTitle" = "空格键对内文组字区的行为:";
 "i18n:UserDef.kSpecifiedNotifyUIColorScheme.option.-1" = "浅色模式";
 "i18n:UserDef.kSpecifiedNotifyUIColorScheme.option.0" = "不指定";
 "i18n:UserDef.kSpecifiedNotifyUIColorScheme.option.1" = "深色模式";

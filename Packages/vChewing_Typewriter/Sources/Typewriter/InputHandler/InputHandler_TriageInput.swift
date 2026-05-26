@@ -70,6 +70,12 @@ extension InputHandlerProtocol {
           }
         case .ofInputting:
           // 臉書等網站會攔截 Tab 鍵，所以用 Shift+Command+Space 對候選字詞做正向/反向輪替。
+          // Space 鍵就地輪替候選字（對應 spaceKeyBehaviorAgainstICB == 2）。
+          if prefs.spaceKeyBehaviorAgainstICB == 2,
+             input.keyModifierFlags.intersection([.control, .command, .option]).isEmpty {
+            // 此時 Shift+Space 反向輪替，仿 Shift+Tab 行為。
+            return revolveCandidate(reverseOrder: input.isShiftHold)
+          }
           if input.isShiftHold, !input.isControlHold, !input.isOptionHold {
             return revolveCandidate(reverseOrder: input.isCommandHold)
           }

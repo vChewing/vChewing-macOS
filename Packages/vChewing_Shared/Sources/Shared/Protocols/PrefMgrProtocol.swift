@@ -41,7 +41,7 @@ public protocol PrefMgrProtocol {
   var useDynamicCandidateWindowOrigin: Bool { get set }
   var useHorizontalCandidateList: Bool { get set }
   var minCellWidthForHorizontalMatrix: Int { get set }
-  var chooseCandidateUsingSpace: Bool { get set }
+  var spaceKeyBehaviorAgainstICB: Int { get set }
   var allowRescoringSingleKanjiCandidates: Bool { get set }
   var enforceETenDOSCandidateSequence: Bool { get set }
   var fetchSuggestionsFromPerceptionOverrideModel: Bool { get set }

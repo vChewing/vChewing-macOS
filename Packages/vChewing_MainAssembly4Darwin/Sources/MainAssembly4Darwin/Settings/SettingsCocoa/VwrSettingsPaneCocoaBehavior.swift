@@ -94,7 +94,7 @@ extension SettingsPanesCocoa {
               )
             }?.boxed()
             NSStackView.buildSection(width: innerContentWidth) {
-              UserDef.kChooseCandidateUsingSpace.renderCocoa(
+              UserDef.kSpaceKeyBehaviorAgainstICB.renderCocoa(
                 fixWidth: innerContentWidth,
                 prefUITab: .tabBehavior
               )

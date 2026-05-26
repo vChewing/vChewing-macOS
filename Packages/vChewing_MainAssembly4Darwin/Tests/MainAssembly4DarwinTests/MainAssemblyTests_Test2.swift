@@ -491,7 +491,7 @@ extension MainAssemblyTests {
   @Test
   func test209_InputHandler_CandidateWindowExtendedOperations() throws {
     testHandler.prefs.useSCPCTypingMode = false
-    testHandler.prefs.chooseCandidateUsingSpace = false
+    testHandler.prefs.spaceKeyBehaviorAgainstICB = 0
     testHandler.prefs.specifyShiftTabKeyBehavior = false
     testHandler.prefs.specifyShiftSpaceKeyBehavior4CandidateWindow = false
     testHandler.prefs.dodgeInvalidEdgeCandidateCursorPosition = false
@@ -608,7 +608,7 @@ extension MainAssemblyTests {
 
   @Test
   func test211_InputHandler_CallCandidateStateTriggers() throws {
-    testHandler.prefs.chooseCandidateUsingSpace = true
+    testHandler.prefs.spaceKeyBehaviorAgainstICB = 1
     testHandler.prefs.specifyShiftTabKeyBehavior = true
 
     func verifyCandidateCall(with eventData: NSEvent.KeyEventData) {

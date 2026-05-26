@@ -31,7 +31,7 @@ public struct VwrSettingsPaneBehavior: View {
       }
 
       Section {
-        UserDef.kChooseCandidateUsingSpace.renderUI()
+        UserDef.kSpaceKeyBehaviorAgainstICB.renderUI()
         UserDef.kEscToCleanInputBuffer.renderUI()
         UserDef.kAlsoConfirmAssociatedCandidatesByEnter.renderUI()
         UserDef.kSpecifyShiftBackSpaceKeyBehavior.renderUI()
