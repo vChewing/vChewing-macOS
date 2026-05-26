@@ -71,8 +71,8 @@ public struct VwrSettingsPaneCandidates: View {
         isShowingIMKEOSNotice = true
       }
 
-      Section(footer: imkEOSNoticeButton) {
-        UserDef.kEnableMouseScrollingForTDKCandidatesCocoa.renderUI()
+      Section {
+        imkEOSNoticeButton
       }
     }.formStyled()
       .frame(

@@ -63,7 +63,6 @@ public protocol PrefMgrProtocol {
   var alwaysShowTooltipTextsHorizontally: Bool { get set }
   var clientsIMKTextInputIncapable: [String: Bool] { get set }
   var useSpaceToCommitHighlightedSCPCCandidate: Bool { get set }
-  var enableMouseScrollingForTDKCandidatesCocoa: Bool { get set }
   var enableCandidateWindowAnimation: Bool { get set }
   var disableSegmentedThickUnderlineInMarkingModeForManagedClients: Bool { get set }
   var maxCandidateLength: Int { get set }

@@ -143,10 +143,6 @@ extension SettingsPanesCocoa {
               )
             }?.boxed()
             NSStackView.buildSection(width: innerContentWidth) {
-              UserDef.kEnableMouseScrollingForTDKCandidatesCocoa.renderCocoa(
-                fixWidth: innerContentWidth,
-                prefUITab: .tabCandidates
-              )
               UserDef.kRespectClientAccentColor.renderCocoa(
                 fixWidth: innerContentWidth,
                 prefUITab: .tabCandidates

@@ -105,7 +105,6 @@ nonisolated public enum UserDef: String, CaseIterable, Identifiable, Sendable {
   case kReducePOMLifetimeToNoMoreThan12Hours = "ReducePOMLifetimeToNoMoreThan12Hours"
 
   case kUseSpaceToCommitHighlightedCandidate4SCPC = "UseSpaceToCommitHighlightedSCPCCandidate"
-  case kEnableMouseScrollingForTDKCandidatesCocoa = "EnableMouseScrollingForTDKCandidatesCocoa"
   case kEnableCandidateWindowAnimation = "EnableCandidateWindowAnimation"
   case kDisableSegmentedThickUnderlineInMarkingModeForManagedClients
     = "DisableSegmentedThickUnderlineInMarkingModeForManagedClients"
@@ -506,7 +505,6 @@ nonisolated extension UserDef {
     case .kRomanNumeralOutputFormat: return .integer(0)
     case .kReducePOMLifetimeToNoMoreThan12Hours: return .bool(false)
     case .kUseSpaceToCommitHighlightedCandidate4SCPC: return .bool(false)
-    case .kEnableMouseScrollingForTDKCandidatesCocoa: return .bool(false)
     case .kEnableCandidateWindowAnimation: return .bool(true)
     case .kDisableSegmentedThickUnderlineInMarkingModeForManagedClients: return .bool(false)
     case .kCandidateTextFontName: return .string("")
@@ -990,9 +988,6 @@ nonisolated extension UserDef {
         userDef: self,
         shortTitle: "i18n:UserDef.kUseSpaceToCommitHighlightedCandidate4SCPC.shortTitle",
         description: "i18n:UserDef.kUseSpaceToCommitHighlightedCandidate4SCPC.description"
-      )
-    case .kEnableMouseScrollingForTDKCandidatesCocoa: return .init(
-        userDef: self, shortTitle: "i18n:UserDef.kEnableMouseScrollingForTDKCandidatesCocoa.shortTitle"
       )
     case .kDisableSegmentedThickUnderlineInMarkingModeForManagedClients: return .init(
         userDef: self,
