@@ -11,7 +11,7 @@
 "i18n:candidateServiceMenu.selectorResponse.failed" = "请求失败\nSelector 指令匹配失败、或无结果可用。";
 "i18n:candidateServiceMenu.selectorResponse.succeeded" = "成功取得结果\n已将结果写入剪贴簿。";
 "i18n:CandidateServiceMenuEditor.description" = "服务选单可以在选字窗内借由「(Shift+)符号选单键」呼出。在您呼出该选单的那一刻，原先的选字窗内的高亮选中的候选字词将成为该服务选单内各个功能的处理参数。根据当前视窗（服务选单管理器）内所陈列的服务的不同，有些服务是会叫出浏览器前往指定网页检索指定内容，而有些服务则可能会将本机计算的某些结果自动拷贝到您的剪贴簿内。\n\n注：如果当前视窗内没有任何可用的服务选单资料的话，上述热键在选字窗内的对应的行为会是辅助翻页。";
-"i18n:CandidateServiceMenuEditor.formatGuide" = "填写规则大致如下：\n\n1. 每行一笔定义，选单条目名称与定义资料值以 Tab 字元分割。选单名称当中的「%s」会在使用服务时被置换成传入的参数。如果参数只有一个字元的话，则程式会自动在选单名称结尾用括弧追加显示其统一码码位。\n\n2. 定义资料值的开头是「@SEL:」或「@WEB:」或「@URL:」，其中：\n\n- 「@SEL:」对应 Objective-C Selector 名称，可以呼叫唯音输入法内部预先定义的某些资料生成功能。直接在此之后紧接着填写 Selector 名称即可（须以西文半形冒号结尾）。\n\n- 「@WEB:」与「@URL:」等价，用来紧接着填写网址。网址当中的「%s」会在使用服务时被置换成传入的参数。";
+"i18n:CandidateServiceMenuEditor.formatGuide" = "填写规则大致如下：\n\n1. 每行一笔定义，选单条目名称与定义资料值以 Tab 字元分割。选单名称当中的「%s」会在使用服务时被置换成传入的参数。如果参数只有一个字元的话，则程式会自动在选单名称结尾用括弧追加显示其万国码码位。\n\n2. 定义资料值的开头是「@SEL:」或「@WEB:」或「@URL:」，其中：\n\n- 「@SEL:」对应 Objective-C Selector 名称，可以呼叫唯音输入法内部预先定义的某些资料生成功能。直接在此之后紧接着填写 Selector 名称即可（须以西文半形冒号结尾）。\n\n- 「@WEB:」与「@URL:」等价，用来紧接着填写网址。网址当中的「%s」会在使用服务时被置换成传入的参数。";
 "i18n:CandidateServiceMenuEditor.howToGetGuide" = "可将滑鼠悬停于编辑区内、以检视资料填写指引。";
 "i18n:CandidateServiceMenuEditor.prompt" = "请键入您要登记的服务资料。";
 "i18n:CandidateServiceMenuEditor.table.field.MenuTitle" = "选单条目名称";
@@ -218,7 +218,7 @@
 "i18n:Settings.ApplySCPCPreset.ButtonTitle" = "我姓ㄅ，ㄅㄛㄅ，爱打ㄅ半的传说，要打ㄅ半就点我";
 "i18n:Settings.ApplySCPCPreset.Confirm.AlertMessage" = "ㄅ半输入法源自倚天中文 DOS 系统、且在 Windows NT 3.51 至 Windows XP 系统内随附。有至少一两代人对这种打字方式形成了终生无法扭转的肌肉记忆。\n\n如果继续，该输入法会自动套用下述设定、以使自身的行为与ㄅ半输入法对齐：\n• 启用「模拟逐字选字输入」(SCPC)\n• 启用「联想词」\n• 停用「使用空格键确认高亮候选字」";
 "i18n:Settings.ApplySCPCPreset.Confirm.AlertTitle" = "一次性配置所有与ㄅ半输入有关的选项";
-"i18n:Settings.ApplySCPCPreset.Succeeded.AlertMessage" = "已启用「模拟逐字选字输入」与「联想词」功能，且已停用「使用空格键确认高亮候选字」。";
+"i18n:Settings.ApplySCPCPreset.Succeeded.AlertMessage" = "已启用「模拟逐字选字输入」与「关联词语」功能，且已停用「使用空格键确认高亮候选字」。";
 "i18n:Settings.ApplySCPCPreset.Succeeded.AlertTitle" = "ㄅ半懒人设定已套用";
 "i18n:settings.button.hpAndDonation" = "主页 & 捐款";
 "i18n:Settings.ChoosePhoneticLayoutPrompt" = "请指定普通话/国音分析器所使用的注音排列。";
@@ -458,7 +458,7 @@
 "i18n:UserDef.kShouldAutoReloadUserDataFiles.shortTitle" = "自动侦测并载入使用者语汇档案变更";
 "i18n:UserDef.kShouldNotFartInLieuOfBeep.description" = "您即将取消对廉耻模式的勾选。周围的人会听到您的电脑传出放屁的声音，且您对此负全部责任。我们强烈建议您不要在任何公共场合取消对该模式的勾选。";
 "i18n:UserDef.kShouldNotFartInLieuOfBeep.shortTitle" = "廉耻模式 // 取消勾选的话，敲错字时会有异音";
-"i18n:UserDef.kShowCodePointInCandidateUI.shortTitle" = "在选字窗内显示当前候选字的统一码码位";
+"i18n:UserDef.kShowCodePointInCandidateUI.shortTitle" = "在选字窗内显示当前候选字的万国码码位";
 "i18n:UserDef.kShowHanyuPinyinInCompositionBuffer.shortTitle" = "拼音并击（组字区内显示汉语拼音）";
 "i18n:UserDef.kShowNotificationsWhenTogglingCapsLock.shortTitle" = "以 Caps Lock 切换输入法/中英模式时显示通知";
 "i18n:UserDef.kShowNotificationsWhenTogglingEisu.description" = "☠️ 这可能会让您难以快速识别目前的 ASCII 模式开/关状态。";

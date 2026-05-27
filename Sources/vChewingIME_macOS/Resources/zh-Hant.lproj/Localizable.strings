@@ -11,7 +11,7 @@
 "i18n:candidateServiceMenu.selectorResponse.failed" = "請求失敗\nSelector 指令匹配失敗、或無結果可用。";
 "i18n:candidateServiceMenu.selectorResponse.succeeded" = "成功取得結果\n已將結果寫入剪貼簿。";
 "i18n:CandidateServiceMenuEditor.description" = "服務選單可以在選字窗內藉由「(Shift+)符號選單鍵」呼出。在您呼出該選單的那一刻，原先的選字窗內的高亮選中的候選字詞將成為該服務選單內各個功能的處理參數。根據當前視窗（服務選單管理器）內所陳列的服務的不同，有些服務是會叫出瀏覽器前往指定網頁檢索指定內容，而有些服務則可能會將本機計算的某些結果自動拷貝到您的剪貼簿內。\n\n註：如果當前視窗內沒有任何可用的服務選單資料的話，上述熱鍵在選字窗內的對應的行為會是輔助翻頁。";
-"i18n:CandidateServiceMenuEditor.formatGuide" = "填寫規則大致如下：\n\n1. 每行一筆定義，選單條目名稱與定義資料值以 Tab 字元分割。選單名稱當中的「%s」會在使用服務時被置換成傳入的參數。如果參數只有一個字元的話，則程式會自動在選單名稱結尾用括弧追加顯示其統一碼碼位。\n\n2. 定義資料值的開頭是「@SEL:」或「@WEB:」或「@URL:」，其中：\n\n- 「@SEL:」對應 Objective-C Selector 名稱，可以呼叫唯音輸入法內部預先定義的某些資料生成功能。直接在此之後緊接著填寫 Selector 名稱即可（須以西文半形冒號結尾）。\n\n- 「@WEB:」與「@URL:」等價，用來緊接著填寫網址。網址當中的「%s」會在使用服務時被置換成傳入的參數。";
+"i18n:CandidateServiceMenuEditor.formatGuide" = "填寫規則大致如下：\n\n1. 每行一筆定義，選單條目名稱與定義資料值以 Tab 字元分割。選單名稱當中的「%s」會在使用服務時被置換成傳入的參數。如果參數只有一個字元的話，則程式會自動在選單名稱結尾用括弧追加顯示其萬國碼碼位。\n\n2. 定義資料值的開頭是「@SEL:」或「@WEB:」或「@URL:」，其中：\n\n- 「@SEL:」對應 Objective-C Selector 名稱，可以呼叫唯音輸入法內部預先定義的某些資料生成功能。直接在此之後緊接著填寫 Selector 名稱即可（須以西文半形冒號結尾）。\n\n- 「@WEB:」與「@URL:」等價，用來緊接著填寫網址。網址當中的「%s」會在使用服務時被置換成傳入的參數。";
 "i18n:CandidateServiceMenuEditor.howToGetGuide" = "可將滑鼠懸停於編輯區內、以檢視資料填寫指引。";
 "i18n:CandidateServiceMenuEditor.prompt" = "請鍵入您要登記的服務資料。";
 "i18n:CandidateServiceMenuEditor.table.field.MenuTitle" = "選單條目名稱";
@@ -216,9 +216,9 @@
 "i18n:securityAgentHelper.warningMessage.header" = "唯音有偵測到下述後檯執行緒有在濫用 SecureEventInput。這種濫用會導致系統內的所有第三方輸入法全都無法正常使用（在輸入法選單內會變成灰色）。\n\n針對需要填寫敏感資料的場合，使用 SecureEventInput 無可厚非。但是，用 EnableSecureEventInput() 開啟該模式之後，就有義務在輸入窗格失焦的那一刻呼叫 DisableSecureEventInput() 來結束這種狀態。這種狀態還常見於後檯輔助 App 當中、或者某個 App 在叫出該模式之後失去回應（這樣的話，哪怕被切換到後檯，SecureEventInput 也不會自動解除）。\n\n被偵測到的執行緒如下:";
 "i18n:securityAgentHelper.warningMessage.title" = "偵測到對 SecureEventInput 的濫用行為";
 "i18n:Settings.ApplySCPCPreset.ButtonTitle" = "我姓ㄅ，ㄅㄛㄅ，愛打ㄅ半的傳說，要打ㄅ半就點我";
-"i18n:Settings.ApplySCPCPreset.Confirm.AlertMessage" = "ㄅ半輸入法源自倚天中文 DOS 系統、且在 Windows NT 3.51 至 Windows XP 系統內隨附。有至少一兩代人對這種打字方式形成了終生無法扭轉的肌肉記憶。\n\n如果繼續，該輸入法會自動套用下述設定、以使自身的行為與ㄅ半輸入法對齊：\n• 啟用「模擬逐字選字輸入」(SCPC)\n• 啟用「聯想詞」\n• 停用「使用空格鍵確認高亮候選字」";
+"i18n:Settings.ApplySCPCPreset.Confirm.AlertMessage" = "ㄅ半輸入法源自倚天中文 DOS 系統、且在 Windows NT 3.51 至 Windows XP 系統內隨附。有至少一兩代人對這種打字方式形成了終生無法扭轉的肌肉記憶。\n\n如果繼續，該輸入法會自動套用下述設定、以使自身的行為與ㄅ半輸入法對齊：\n• 啟用「模擬逐字選字輸入」(SCPC)\n• 啟用「關聯詞語」\n• 停用「使用空格鍵確認高亮候選字」";
 "i18n:Settings.ApplySCPCPreset.Confirm.AlertTitle" = "一次性配置所有與ㄅ半輸入有關的選項";
-"i18n:Settings.ApplySCPCPreset.Succeeded.AlertMessage" = "已啟用「模擬逐字選字輸入」與「聯想詞」功能，且已停用「使用空格鍵確認高亮候選字」。";
+"i18n:Settings.ApplySCPCPreset.Succeeded.AlertMessage" = "已啟用「模擬逐字選字輸入」與「關聯詞語」功能，且已停用「使用空格鍵確認高亮候選字」。";
 "i18n:Settings.ApplySCPCPreset.Succeeded.AlertTitle" = "ㄅ半懶人設定已套用";
 "i18n:settings.button.hpAndDonation" = "主頁 & 捐款";
 "i18n:Settings.ChoosePhoneticLayoutPrompt" = "請指定普通話/國音分析器所使用的注音排列。";
@@ -458,7 +458,7 @@
 "i18n:UserDef.kShouldAutoReloadUserDataFiles.shortTitle" = "自動偵測並載入使用者語彙檔案變更";
 "i18n:UserDef.kShouldNotFartInLieuOfBeep.description" = "您即將取消對廉恥模式的勾選。周圍的人會聽到您的電腦傳出放屁的聲音，且您對此負全部責任。我們強烈建議您不要在任何公共場合取消對該模式的勾選。";
 "i18n:UserDef.kShouldNotFartInLieuOfBeep.shortTitle" = "廉恥模式 // 取消勾選的話，敲錯字時會有異音";
-"i18n:UserDef.kShowCodePointInCandidateUI.shortTitle" = "在選字窗內顯示當前候選字的統一碼碼位";
+"i18n:UserDef.kShowCodePointInCandidateUI.shortTitle" = "在選字窗內顯示當前候選字的萬國碼碼位";
 "i18n:UserDef.kShowHanyuPinyinInCompositionBuffer.shortTitle" = "拼音並擊（組字區內顯示漢語拼音）";
 "i18n:UserDef.kShowNotificationsWhenTogglingCapsLock.shortTitle" = "以 Caps Lock 切換輸入法/中英模式時顯示通知";
 "i18n:UserDef.kShowNotificationsWhenTogglingEisu.description" = "☠️ 這可能會讓您難以快速識別目前的 ASCII 模式開/關狀態。";

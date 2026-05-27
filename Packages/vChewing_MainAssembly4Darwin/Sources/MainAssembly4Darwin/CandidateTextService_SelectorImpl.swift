@@ -109,7 +109,7 @@ extension CandidateTextService {
 
     // MARK: Internal
 
-    /// 生成 Unicode 統一碼碼位中繼資料。
+    /// 生成 Unicode 萬國碼碼位中繼資料。
     /// - Parameter param: 要處理的詞音配對物件。
     @objc
     func copyUnicodeMetadata(_ param: CandidatePairServicable) {
