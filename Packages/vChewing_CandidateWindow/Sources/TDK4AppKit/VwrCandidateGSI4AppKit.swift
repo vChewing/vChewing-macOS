@@ -92,11 +92,6 @@ extension GSI4AppKit {
     private lazy var cachedHighlightedLineBgColor: NSColor =
       CandidateCellData4AppKit.plainTextColor.withAlphaComponent(0.05)
 
-    // MARK: - Pool-level Cell-Text Image Cache
-
-    private var cachedCellsImage: NSImage?
-    private var cellsImageContentHash: Int = 0
-
     private let prefs = PrefMgr.sharedSansDidSetOps
   }
 } // extension GSI4AppKit
@@ -197,34 +192,14 @@ extension GSI4AppKit.VwrCandidateGSI4AppKit {
       lastClipPageSize = pageSize
     }
     cachedClipPath?.setClip()
-    // --- Cached cell-text image (pool-level) ---
-    let currentHash = computeCellsContentHash()
-    if cachedCellsImage == nil || cellsImageContentHash != currentHash
-      || cachedCellsImage?.size != thePool.candidateOnlySize {
-      cachedCellsImage = renderCellsImage()
-      cellsImageContentHash = currentHash
-    }
-    if let cached = cachedCellsImage {
-      let imageRect = NSRect(
-        x: drawOffsetX, y: drawOffsetY,
-        width: cached.size.width, height: cached.size.height
-      )
-      cached.draw(
-        in: imageRect, from: .zero,
-        operation: .sourceOver, fraction: 1.0,
-        respectFlipped: true, hints: nil
-      )
-    }
 
-    // --- Highlighted line: backgrounds + fresh text (entire line) ---
+    // --- Highlighted line: backgrounds ---
     let highlightedLine: [CandidateCellData4AppKit]? = thePool.candidateLines
       .first(where: { $0.contains(where: { $0.isHighlighted }) })
 
     if let line = highlightedLine,
        let (highlightedLineRect, highlightedCellRect, highlightedCell) = computeHighlightRects(forLine: line) {
       var highlightedLineRect = highlightedLineRect
-      // Stretch line background to fill page width / height (mirrors the previous TDKCandidate's
-      // `highlightedLineRect.size.width = totalAccuSize.width` in updateMetrics).
       if thePool.isHorizontal {
         highlightedLineRect.size.width = max(highlightedLineRect.size.width, pageSize.width)
       } else {
@@ -246,23 +221,55 @@ extension GSI4AppKit.VwrCandidateGSI4AppKit {
         xRadius: thePool.cellRadius,
         yRadius: thePool.cellRadius
       ).fill()
+    }
 
-      // Redraw the entire highlighted line fresh with correct highlight colors.
-      let padding = thePool.padding
-      for cell in line {
-        cell.invalidateCache()
-        cell.attributedStringHeader.draw(
-          at: CGPoint(
-            x: cell.visualOrigin.x + 2 * padding + drawOffsetX,
-            y: cell.visualOrigin.y + cell.headerDrawYOffset + drawOffsetY
+    // Draw candidate cells with visibility culling (skip lines outside clip rect).
+    let padding = thePool.padding
+    if thePool.isHorizontal {
+      let clipMinY = clipOrigin.y
+      let clipMaxY = clipOrigin.y + pageSize.height
+      for line in thePool.candidateLines {
+        guard let firstCell = line.first else { continue }
+        let lineTop = firstCell.visualOrigin.y + drawOffsetY
+        let lineHeight = line.map(\.visualDimension.height).max() ?? 0
+        guard lineTop + lineHeight > clipMinY, lineTop < clipMaxY else { continue }
+        for cell in line {
+          cell.attributedStringHeader.draw(
+            at: CGPoint(
+              x: cell.visualOrigin.x + 2 * padding + drawOffsetX,
+              y: cell.visualOrigin.y + cell.headerDrawYOffset + drawOffsetY
+            )
           )
-        )
-        cell.attributedStringPhrase(isMatrix: false).draw(
-          at: CGPoint(
-            x: cell.visualOrigin.x + 2 * padding + cell.phraseDrawXOffset + drawOffsetX,
-            y: cell.visualOrigin.y + padding + drawOffsetY
+          cell.attributedStringPhrase(isMatrix: false).draw(
+            at: CGPoint(
+              x: cell.visualOrigin.x + 2 * padding + cell.phraseDrawXOffset + drawOffsetX,
+              y: cell.visualOrigin.y + padding + drawOffsetY
+            )
           )
-        )
+        }
+      }
+    } else {
+      let clipMinX = clipOrigin.x
+      let clipMaxX = clipOrigin.x + pageSize.width
+      for line in thePool.candidateLines {
+        guard let firstCell = line.first else { continue }
+        let lineLeft = firstCell.visualOrigin.x + drawOffsetX
+        let lineWidth = line.map(\.visualDimension.width).max() ?? 0
+        guard lineLeft + lineWidth > clipMinX, lineLeft < clipMaxX else { continue }
+        for cell in line {
+          cell.attributedStringHeader.draw(
+            at: CGPoint(
+              x: cell.visualOrigin.x + 2 * padding + drawOffsetX,
+              y: cell.visualOrigin.y + cell.headerDrawYOffset + drawOffsetY
+            )
+          )
+          cell.attributedStringPhrase(isMatrix: false).draw(
+            at: CGPoint(
+              x: cell.visualOrigin.x + 2 * padding + cell.phraseDrawXOffset + drawOffsetX,
+              y: cell.visualOrigin.y + padding + drawOffsetY
+            )
+          )
+        }
       }
     }
     ctx.restoreGraphicsState()
@@ -452,62 +459,6 @@ extension GSI4AppKit.VwrCandidateGSI4AppKit {
   private func lineBackground(isCurrentLine: Bool, isMatrix: Bool) -> NSColor {
     guard isCurrentLine, isMatrix else { return .clear }
     return cachedHighlightedLineBgColor
-  }
-
-  // MARK: - Cell-Text Image Caching
-
-  /// Content hash for the entire pool — determines if the cached image is stale.
-  private func computeCellsContentHash() -> Int {
-    var hasher = Hasher()
-    for line in thePool.candidateLines {
-      for cell in line {
-        hasher.combine(cell.displayedText)
-        hasher.combine(cell.visualOrigin.x)
-        hasher.combine(cell.visualOrigin.y)
-        hasher.combine(cell.visualDimension.width)
-        hasher.combine(cell.visualDimension.height)
-      }
-    }
-    return hasher.finalize()
-  }
-
-  /// Render all cell text (plain, no highlight) into a single cached NSImage.
-  /// The highlighted line is drawn fresh on top each frame.
-  private func renderCellsImage() -> NSImage {
-    let size = thePool.candidateOnlySize
-    guard size.width > 0, size.height > 0 else {
-      return NSImage(size: NSSize(width: 1, height: 1))
-    }
-    let allCells = thePool.candidateLines.flatMap { $0 }
-
-    // Save & clear highlights for plain-text rendering.
-    let savedHighlighted = allCells.map { $0.isHighlighted }
-    allCells.forEach { $0.isHighlighted = false; $0.invalidateCache() }
-
-    let image = NSImage(size: size, flipped: true) { [self] _ in
-      let padding = thePool.padding
-      for cell in allCells {
-        cell.attributedStringHeader.draw(at: CGPoint(
-          x: cell.visualOrigin.x + 2 * padding,
-          y: cell.visualOrigin.y + cell.headerDrawYOffset
-        ))
-        cell.attributedStringPhrase(isMatrix: false).draw(at: CGPoint(
-          x: cell.visualOrigin.x + 2 * padding + cell.phraseDrawXOffset,
-          y: cell.visualOrigin.y + padding
-        ))
-      }
-      return true
-    }
-
-    // Restore highlight states; only invalidate cells whose state changed.
-    for (i, cell) in allCells.enumerated() {
-      guard i < savedHighlighted.count else { continue }
-      let changed = cell.isHighlighted != savedHighlighted[i]
-      cell.isHighlighted = savedHighlighted[i]
-      if changed { cell.invalidateCache() }
-    }
-
-    return image
   }
 }
 
