@@ -167,6 +167,7 @@
 "i18n:Menu.SearchPreferences" = "設定を検索…";
 "i18n:Menu.ServiceMenu" = "サービスメニュー";
 "i18n:Menu.ServiceMenuEditor" = "サービスメニューエディター";
+"i18n:Menu.SponsorTheDevelopment" = "開発者にお寄り付けを…";
 "i18n:Menu.SymbolEmojiInput" = "符号＆絵文字入力";
 "i18n:Menu.UninstallVChewing" = "入力アプリを卸除く…";
 "i18n:Menu.UsePhraseReplacement" = "言葉置換機能";
