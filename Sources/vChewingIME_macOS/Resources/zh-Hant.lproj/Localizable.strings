@@ -170,7 +170,7 @@
 "i18n:Menu.SymbolEmojiInput" = "符號＆繪文字輸入";
 "i18n:Menu.UninstallVChewing" = "卸除唯音…";
 "i18n:Menu.UsePhraseReplacement" = "使用語彙置換";
-"i18n:Menu.VChewingPreferences" = "唯音偏好設定…";
+"i18n:Menu.vChewingSettings" = "唯音輸入法偏好設定…";
 "i18n:Menu.VisitWebsite" = "前往網站";
 "i18n:Menu.WhereIsIMKCandidateWindow" = "IMK 選字窗去哪裡了？";
 "i18n:NotificationSwitch.Off" = "✘ 已停用";

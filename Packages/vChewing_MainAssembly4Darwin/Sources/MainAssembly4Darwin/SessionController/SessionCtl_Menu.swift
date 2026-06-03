@@ -14,7 +14,20 @@ extension SessionCtl {
   public func makeMenu() -> NSMenu {
     let currentInputMode = IMEApp.currentInputMode
     return NSMenu().appendItems(self) {
+      if #unavailable(macOS 14) {
+        NSMenu.Item("i18n:Menu.vChewingSettings")?
+          .act(#selector(showPreferences(_:)))
+          .nulled(silentMode)
+      } else {
+        NSMenu.Item(verbatim: "i18n:Menu.vChewingSettings".i18n + " (SwiftUI)")?
+          .act(#selector(showSettingsSwiftUI(_:)))
+          .nulled(silentMode)
+        NSMenu.Item(verbatim: "i18n:Menu.vChewingSettings".i18n + " (AppKit)")?
+          .act(#selector(showSettingsAppKit(_:)))
+          .alternated().nulled(silentMode)
+      }
       NSMenu.Item(verbatim: currentRAMUsageDescription)
+      NSMenu.Item.separator() // ---------------------
       NSMenu.Item(
         verbatim: String(
           format: "i18n:InputMode.SwitchToInputMode:%@".i18n,
@@ -102,18 +115,6 @@ extension SessionCtl {
         .alternated()
 
       NSMenu.Item.separator() // ---------------------
-      if #unavailable(macOS 14) {
-        NSMenu.Item("i18n:Menu.VChewingPreferences")?
-          .act(#selector(showPreferences(_:)))
-          .nulled(silentMode)
-      } else {
-        NSMenu.Item(verbatim: "i18n:Menu.VChewingPreferences".i18n + " (SwiftUI)")?
-          .act(#selector(showSettingsSwiftUI(_:)))
-          .nulled(silentMode)
-        NSMenu.Item(verbatim: "i18n:Menu.VChewingPreferences".i18n + " (AppKit)")?
-          .act(#selector(showSettingsAppKit(_:)))
-          .alternated().nulled(silentMode)
-      }
       NSMenu.Item("i18n:Menu.CheckForUpdates")?
         .act(#selector(checkForUpdate(_:)))
         .nulled(silentMode)

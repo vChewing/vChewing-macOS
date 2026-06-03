@@ -50,7 +50,7 @@ public final class CtlSettingsUI: NSWindowController, NSWindowDelegate {
         .environment(viewModel)
         .ignoresSafeArea()
     )
-    var preferencesTitleName = "i18n:Menu.VChewingPreferences".i18n
+    var preferencesTitleName = "i18n:Menu.vChewingSettings".i18n
     preferencesTitleName.removeLast()
     window?.title = preferencesTitleName
     asyncOnMain { [weak self] in

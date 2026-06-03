@@ -77,7 +77,7 @@ public final class CtlSettingsCocoa: NSWindowController, NSWindowDelegate {
       super.windowDidLoad()
       window?.setPosition(vertical: .top, horizontal: .right, padding: 20)
 
-      var preferencesTitleName = "i18n:Menu.VChewingPreferences".i18n
+      var preferencesTitleName = "i18n:Menu.vChewingSettings".i18n
       preferencesTitleName.removeLast()
       window?.title = preferencesTitleName
       if #available(macOS 10.10, *) {

@@ -170,7 +170,7 @@
 "i18n:Menu.SymbolEmojiInput" = "符号＆絵文字入力";
 "i18n:Menu.UninstallVChewing" = "入力アプリを卸除く…";
 "i18n:Menu.UsePhraseReplacement" = "言葉置換機能";
-"i18n:Menu.VChewingPreferences" = "入力機能設定…";
+"i18n:Menu.vChewingSettings" = "唯音入力機能設定…";
 "i18n:Menu.VisitWebsite" = "公式サイト";
 "i18n:Menu.WhereIsIMKCandidateWindow" = "IMK 文字候補陳列ウィンドウはどこに？";
 "i18n:NotificationSwitch.Off" = "✘ 機能停止";
