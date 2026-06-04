@@ -119,9 +119,15 @@ extension GSI4AppKit {
 
     override public func scrollWheel(with event: NSEvent) {
       guard !isInScrollMode else { return }
+      // When expandable & unexpanded, mouse wheel only expands, doesn't flip lines.
       // Option (without Shift): always flip lines, using dominant scroll axis.
       if event.modifierFlags.contains(.option), !event.modifierFlags.contains(.shift),
          let dir = CandidatePool4AppKit.dominantScrollLineDirection(event) {
+        if Self.thePool.isExpandable, !Self.thePool.isExpanded {
+          Self.thePool.expandIfNeeded(isBackward: dir == .previous)
+          updateDisplay()
+          return
+        }
         switch dir {
         case .next: showNextLine()
         case .previous: showPreviousLine()
@@ -498,8 +504,22 @@ extension GSI4AppKit {
       switch (deltaX, deltaY, Self.thePool.layout) {
       case (0, 1..., .vertical), (1..., 0, .horizontal): highlightNextCandidate()
       case (..<0, 0, .horizontal), (0, ..<0, .vertical): highlightPreviousCandidate()
-      case (0, 1..., .horizontal), (1..., 0, .vertical): showNextLine()
-      case (0, ..<0, .horizontal), (..<0, 0, .vertical): showPreviousLine()
+      case (0, 1..., .horizontal), (1..., 0, .vertical):
+        // When expandable & unexpanded, just expand, no line flip.
+        if Self.thePool.isExpandable, !Self.thePool.isExpanded {
+          Self.thePool.expandIfNeeded(isBackward: false)
+          updateDisplay()
+          return
+        }
+        showNextLine()
+      case (0, ..<0, .horizontal), (..<0, 0, .vertical):
+        // When expandable & unexpanded, just expand, no line flip.
+        if Self.thePool.isExpandable, !Self.thePool.isExpanded {
+          Self.thePool.expandIfNeeded(isBackward: true)
+          updateDisplay()
+          return
+        }
+        showPreviousLine()
       case (_, _, _): break
       }
     }
