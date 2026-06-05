@@ -48,6 +48,10 @@ extension SettingsPanesCocoa {
                 fixWidth: innerContentWidth,
                 prefUITab: .tabCandidates
               )
+              UserDef.kEnforceSingleLineCandidateWindowLayout4SCPC.renderCocoa(
+                fixWidth: innerContentWidth,
+                prefUITab: .tabCandidates
+              )
               UserDef.kEnableCandidateWindowAnimation.renderCocoa(
                 fixWidth: innerContentWidth,
                 prefUITab: .tabCandidates

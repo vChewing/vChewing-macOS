@@ -391,6 +391,8 @@
 "i18n:UserDef.kEnableCandidateWindowAnimation.shortTitle" = "Enable animation for candidate window movement/resize";
 "i18n:UserDef.kEnforceETenDOSCandidateSequence.description" = "This option is provided for users who prefer the ETen Chinese DOS candidate ordering. Many such users developed their ordering intuition while using the ETen Chinese DOS input method and wish to use the same order here. Note: the select-candidate-per-character mode always follows this ordering and is not affected by this setting.";
 "i18n:UserDef.kEnforceETenDOSCandidateSequence.shortTitle" = "Enforce Eten DOS Sequence on all single-kanji candidates";
+"i18n:UserDef.kEnforceSingleLineCandidateWindowLayout4SCPC.description" = "When enabled, the Single Character Per Commit (SCPC) mode will always use the single-line candidate window layout.";
+"i18n:UserDef.kEnforceSingleLineCandidateWindowLayout4SCPC.shortTitle" = "Enforce single-line candidate window layout for SCPC mode";
 "i18n:UserDef.kEscToCleanInputBuffer.description" = "If unchecked, the ESC key will try cleaning the unfinished readings / strokes first, and will commit the current composition buffer if there's no unfinished readings / strokes.";
 "i18n:UserDef.kEscToCleanInputBuffer.shortTitle" = "Use ESC key to clear the entire input buffer";
 "i18n:UserDef.kFetchSuggestionsFromPerceptionOverrideModel.description" = "The user override model only possesses memories temporarily. Each memory record gradually becomes ineffective within approximately less than 6 days. You can erase all memory records through the input method menu.";

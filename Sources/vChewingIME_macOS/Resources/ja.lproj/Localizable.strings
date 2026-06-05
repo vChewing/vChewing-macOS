@@ -391,6 +391,8 @@
 "i18n:UserDef.kEnableCandidateWindowAnimation.shortTitle" = "候補ウィンドウの移動/サイズ変更にアニメーションを適用";
 "i18n:UserDef.kEnforceETenDOSCandidateSequence.description" = "このスイッチは、倚天中国語DOSの候補順に慣れたユーザー向けに用意されております。候補の陳列順番を手動で管理したいという需要の多くがこの並びに起因するためです。なお、全候補選択入力モードでは常にこの並び順が適用され、このスイッチの影響は受けません。";
 "i18n:UserDef.kEnforceETenDOSCandidateSequence.shortTitle" = "単漢字候補の陳列順番を倚天中国語DOS順に強制する";
+"i18n:UserDef.kEnforceSingleLineCandidateWindowLayout4SCPC.description" = "有効にすると、全候補入力モード（SCPC）では常に候補陳列ウィンドウが１つ行で表示されます。";
+"i18n:UserDef.kEnforceSingleLineCandidateWindowLayout4SCPC.shortTitle" = "全候補入力モードで候補陳列ウィンドウを常に１つ行で表示";
 "i18n:UserDef.kEscToCleanInputBuffer.description" = "未チェックの場合、ESC キーはまず未完成の音読/筆画を消す。\n未完成の音読/筆画がない場合、全緩衝列をそのまま送り出す。";
 "i18n:UserDef.kEscToCleanInputBuffer.shortTitle" = "ESC キーで入力緩衝列を消す";
 "i18n:UserDef.kFetchSuggestionsFromPerceptionOverrideModel.description" = "臨時記憶モジュールは文字の通り「臨時的」の記憶をします。記録は六日間どんどん忘れてしまいます。入力アプリのメニューから全ての記録を消すことはできます。";
@@ -496,7 +498,7 @@
 "i18n:UserDef.kSpecifyShiftBackSpaceKeyBehavior.option.1" = "Shift+Delete のように入力緩衝列を消す";
 "i18n:UserDef.kSpecifyShiftBackSpaceKeyBehavior.option.2" = "カーソルの後部の音読みを常に削除する";
 "i18n:UserDef.kSpecifyShiftBackSpaceKeyBehavior.shortTitle" = "Shift+BackSpace:";
-"i18n:UserDef.kSpecifyShiftSpaceKeyBehavior4CandidateWindow.description" = "入力候補についての (Shift+)Space キーの輪番切替対象をご指定ください。\n※逐字選択モード（SCPC）では、この設定に関わらず Shift なしのスペースキーは常にページ切替になります。\n※「全候補入力の場合、ハイライト候補を Space キーで確認」が有効な場合、そちらが優先されます。";
+"i18n:UserDef.kSpecifyShiftSpaceKeyBehavior4CandidateWindow.description" = "入力候補についての (Shift+)Space キーの輪番切替対象をご指定ください。\n※全候補入力モード（SCPC）では、この設定に関わらず Shift なしのスペースキーは常にページ切替になります。\n※「全候補入力の場合、ハイライト候補を Space キーで確認」が有効な場合、そちらが優先されます。";
 "i18n:UserDef.kSpecifyShiftSpaceKeyBehavior4CandidateWindow.option.0" = "Shift+Space で次のページ、Space で次の候補文字を";
 "i18n:UserDef.kSpecifyShiftSpaceKeyBehavior4CandidateWindow.option.1" = "Space で次のページ、Shift+Space で次の候補文字を";
 "i18n:UserDef.kSpecifyShiftSpaceKeyBehavior4CandidateWindow.shortTitle" = "(Shift+)Space (入力候補):";
@@ -537,7 +539,7 @@
 "i18n:UserDef.kUseSCPCTypingMode.description" = "年配なるユーザーのために提供した機能である。";
 "i18n:UserDef.kUseSCPCTypingMode.shortTitle" = "漢字１つづつ全候補選択入力モード";
 "i18n:UserDef.kUseShiftQuestionToCallServiceMenu.shortTitle" = "候補陳列ウィンドウで「Shift+?」でもサービスメニューを呼出";
-"i18n:UserDef.kUseSpaceToCommitHighlightedCandidate4SCPC.description" = "有効にすると、候補ウィンドウ表示中にスペースキーを押すとハイライトされた候補を確定します。この設定は逐字選択モード（SCPC）でのみ有効です。";
+"i18n:UserDef.kUseSpaceToCommitHighlightedCandidate4SCPC.description" = "有効にすると、候補ウィンドウ表示中にスペースキーを押すとハイライトされた候補を確定します。この設定は全候補入力モード（SCPC）でのみ有効です。";
 "i18n:UserDef.kUseSpaceToCommitHighlightedCandidate4SCPC.shortTitle" = "全候補入力の場合、ハイライト候補を Space キーで確認";
 "i18n:UserDef.kUsingHotKeyAssociates.shortTitle" = "関連文節モード";
 "i18n:UserDef.kUsingHotKeyCassette.shortTitle" = "数字大字変換";

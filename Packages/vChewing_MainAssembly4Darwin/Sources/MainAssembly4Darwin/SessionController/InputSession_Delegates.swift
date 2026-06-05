@@ -105,6 +105,7 @@ extension SessionProtocol {
   public var isCandidateWindowSingleLine: Bool {
     isVerticalTyping
       || prefs.candidateWindowShowOnlyOneLine
+      || (prefs.enforceSingleLineCandidateWindowLayout4SCPC && prefs.useSCPCTypingMode)
       || state.type == .ofInputting && state.isCandidateContainer
       || isServiceMenuState
   }
