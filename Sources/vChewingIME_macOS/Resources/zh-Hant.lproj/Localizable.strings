@@ -342,7 +342,7 @@
 "i18n:UserDef.kCandidateKeys.description" = "該選項也會影響到選字窗每行/每列最多顯示的候選字數量。";
 "i18n:UserDef.kCandidateKeys.inlinePrompt" = "請選擇您所偏好的用來選字的按鍵組合。自訂組合需敲 Enter 鍵生效。";
 "i18n:UserDef.kCandidateKeys.shortTitle" = "選字鍵:";
-"i18n:UserDef.kCandidateListTextSize.description" = "變更候選字窗的字型大小。";
+"i18n:UserDef.kCandidateListTextSize.description" = "變更選字窗的字型大小。";
 "i18n:UserDef.kCandidateListTextSize.option.12" = "12";
 "i18n:UserDef.kCandidateListTextSize.option.14" = "14";
 "i18n:UserDef.kCandidateListTextSize.option.16" = "16";
@@ -354,7 +354,7 @@
 "i18n:UserDef.kCandidateListTextSize.option.32" = "32";
 "i18n:UserDef.kCandidateListTextSize.option.64" = "64";
 "i18n:UserDef.kCandidateListTextSize.option.96" = "96";
-"i18n:UserDef.kCandidateListTextSize.shortTitle" = "候選字窗字號:";
+"i18n:UserDef.kCandidateListTextSize.shortTitle" = "選字窗字號:";
 "i18n:UserDef.kCandidateNarrationToggleType.description" = "設定何時以文字轉語音朗讀候選字詞，便於透過聽覺確認當前高亮顯示的候選字詞。若有同音候選，系統會查詢可由使用者自訂的關聯詞語資料庫，嘗試說明各字；準確度取決於該資料庫的品質。";
 "i18n:UserDef.kCandidateNarrationToggleType.option.0" = "總是關閉";
 "i18n:UserDef.kCandidateNarrationToggleType.option.1" = "總是開啟";
@@ -388,7 +388,7 @@
 "i18n:UserDef.kDisableSegmentedThickUnderlineInMarkingModeForManagedClients.description" = "部分採用 Web 前端介面設計的客體應用可能會無法正常繪製用於輸入法標記模式的分段式粗型下劃線。這個選項將會阻止輸入法藉由 client().setMarkedText() 函式向客體應用傳達對粗型下劃線的分段繪製請求。分段式粗型下劃線僅用於輸入法的標記模式，除非客體應用對 setMarkedText() 這個 IMKTextInput 協定方法的實作有問題。該選項僅影響內文組字區。";
 "i18n:UserDef.kDisableSegmentedThickUnderlineInMarkingModeForManagedClients.shortTitle" = "針對被管理的客體，在標記模式下禁用分段式粗型下劃線";
 "i18n:UserDef.kDodgeInvalidEdgeCandidateCursorPosition.shortTitle" = "糾正不合理的端點選字游標位置";
-"i18n:UserDef.kEnableCandidateWindowAnimation.shortTitle" = "啟用候選字窗移動/變更大小時的動畫";
+"i18n:UserDef.kEnableCandidateWindowAnimation.shortTitle" = "選字窗移動/變更大小時啟用動畫效果";
 "i18n:UserDef.kEnforceETenDOSCandidateSequence.description" = "對敝輸入法的候選字的順序有著強烈的手動調整之需求的使用者們往往都是從倚天中文 DOS 開始積累了對候選字的直覺記憶、希望能使用這種候選字排序，故提供該選項。逐字選字模式會始終遵循該排序特性，不受該開關所影響。";
 "i18n:UserDef.kEnforceETenDOSCandidateSequence.shortTitle" = "對所有單漢字候選字強制施加倚天中文DOS系統排序";
 "i18n:UserDef.kEscToCleanInputBuffer.description" = "若取消勾選，則 ESC 鍵會先嘗試清除未組成的讀音/字根；\n如果沒有未組成的讀音/字根的話，則會遞交當前組字區的內容。";
@@ -470,7 +470,7 @@
 "i18n:UserDef.kShowReverseLookupInCandidateUI.shortTitle" = "在選字窗內顯示可用的字根反查結果";
 "i18n:UserDef.kShowTranslatedStrokesInCompositionBuffer.description" = "不啟用該選項的話，在組字區內的字根將會以原始鍵盤按鍵名稱來顯示。所有關於字根的定義，均請洽 CIN 磁帶檔案內的「%keyname」章節。";
 "i18n:UserDef.kShowTranslatedStrokesInCompositionBuffer.shortTitle" = "在組字區內顯示字根、而非原始鍵盤碼";
-"i18n:UserDef.kSpaceKeyBehaviorAgainstICB.description" = "指定空格鍵是呼出候選字窗、插入空格、還是輪替候選字。\n選擇「輪替候選字」時，Shift+Space 會反向輪替。";
+"i18n:UserDef.kSpaceKeyBehaviorAgainstICB.description" = "指定空格鍵是呼出選字窗、插入空格、還是輪替候選字。\n選擇「輪替候選字」時，Shift+Space 會反向輪替。";
 "i18n:UserDef.kSpaceKeyBehaviorAgainstICB.option.0" = "插入空格";
 "i18n:UserDef.kSpaceKeyBehaviorAgainstICB.option.1" = "呼出選字窗";
 "i18n:UserDef.kSpaceKeyBehaviorAgainstICB.option.2" = "輪替候選字（正向順延）";
@@ -522,10 +522,10 @@
 "i18n:UserDef.kUseExternalFactoryDict.shortTitle" = "盡量使用外置原廠辭典檔案";
 "i18n:UserDef.kUseFixedCandidateOrderOnSelection.description" = "這將阻止漸退記憶模組影響候選字詞的陳列順序。";
 "i18n:UserDef.kUseFixedCandidateOrderOnSelection.shortTitle" = "以固定順序來陳列選字窗內的候選字";
-"i18n:UserDef.kUseHorizontalCandidateList.description" = "選擇您所偏好的候選字窗佈局。";
+"i18n:UserDef.kUseHorizontalCandidateList.description" = "選擇您所偏好的選字窗佈局。";
 "i18n:UserDef.kUseHorizontalCandidateList.option.0" = "縱向佈局";
 "i18n:UserDef.kUseHorizontalCandidateList.option.1" = "橫向佈局";
-"i18n:UserDef.kUseHorizontalCandidateList.shortTitle" = "候選字窗佈局:";
+"i18n:UserDef.kUseHorizontalCandidateList.shortTitle" = "選字窗佈局:";
 "i18n:UserDef.kUserDataFolderSpecified.description" = "請指定您要使用的使用者語彙資料夾。無效值會被忽略。\n\n⚠️💀 請避免使用由 iCloud 代管的「Documents」與「Desktop」目錄。這些位置的 sandbox bookmark 可能會在重新開機或系統更新後失效。如有疑惑者，請洽 Apple Support。";
 "i18n:UserDef.kUserDataFolderSpecified.shortTitle" = "使用者資料夾路徑";
 "i18n:UserDef.kUseRearCursorMode.description" = "請選擇用以觸發選字的游標相對位置。";

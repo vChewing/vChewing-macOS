@@ -15,13 +15,13 @@ import SwiftExtension
 extension TDK4AppKit {
   // MARK: - CandidatePool
 
-  /// 候選字窗會用到的資料池單位，即用即拋。
+  /// 選字窗會用到的資料池單位，即用即拋。
   final class CandidatePool4AppKit: Sendable {
     // MARK: Lifecycle
 
     // MARK: - Constructors
 
-    /// 初期化一個候選字窗專用資料池。
+    /// 初期化一個選字窗專用資料池。
     /// - Parameters:
     ///   - candidates: 要塞入的候選字詞陣列。
     ///   - selectionKeys: 選字鍵。
@@ -285,7 +285,7 @@ extension TDK4AppKit {
       scrollOffset = 0
     }
 
-    /// 初期化一個候選字窗專用資料池。
+    /// 初期化一個選字窗專用資料池。
     /// - Parameters:
     ///   - candidates: 要塞入的候選字詞陣列。
     ///   - selectionKeys: 選字鍵。
@@ -337,7 +337,7 @@ extension TDK4AppKit {
       scrollOffset = max(0, min(scrollOffset, maxScrollOffset))
     }
 
-    /// 初期化（或者自我重新初期化）一個候選字窗專用資料池。
+    /// 初期化（或者自我重新初期化）一個選字窗專用資料池。
     /// - Parameters:
     ///   - candidates: 要塞入的候選字詞陣列。
     ///   - selectionKeys: 選字鍵。
