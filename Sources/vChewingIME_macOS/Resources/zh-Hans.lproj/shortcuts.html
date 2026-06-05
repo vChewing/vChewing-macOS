@@ -1,19 +1,36 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="zh-Hans">
   <head>
-    <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
-      <title>New Page</title>
-      <style>
-        body { font: 15px / 1.4 Tahoma; }
-        @media (prefers-color-scheme: dark) {
-          body { background: #333; color: white; }
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>New Page</title>
+    <style>
+      body {
+        font: 15px / 1.4 Tahoma;
+      }
+      @media (prefers-color-scheme: dark) {
+        body {
+          background: #333;
+          color: white;
         }
-        td { padding-left: 10px; padding-right: 10px; min-width: auto; }
-        td:first-child { text-align: right; }
-        tr:nth-child(odd) { background-color: #88888820 }
-        tr:nth-child(even) { background-color: #88888830; }
-        tr:hover { background-color: #88888810; }
-      </style>
+      }
+      td {
+        padding-left: 10px;
+        padding-right: 10px;
+        min-width: auto;
+      }
+      td:first-child {
+        text-align: right;
+      }
+      tr:nth-child(odd) {
+        background-color: #88888820;
+      }
+      tr:nth-child(even) {
+        background-color: #88888830;
+      }
+      tr:hover {
+        background-color: #88888810;
+      }
+    </style>
   </head>
   <body>
     <h1><strong>键盘热键使用手册（macOS）</strong></h1>
@@ -23,11 +40,24 @@
       <li>BackSpace 与 Delete 采 Windows 称谓。</li>
       <li>下表内的四个方向键的称谓，均为根据文字书写顺序方向而言的相对方向称谓。</li>
       <li>简体中文使用者请注意本文「递交」一词的意义与「上屏」相同，英文都是「Commit」。</li>
-      <li>唯音不会对数字小键盘拦截响应（小键盘 Enter 键除外），除非有选字窗出现、且有数字小键盘内能输入的字符被设为选字键。</li>
+      <li>
+        唯音不会对数字小键盘拦截响应（小键盘 Enter
+        键除外），除非有选字窗出现、且有数字小键盘内能输入的字符被设为选字键。
+      </li>
       <li>本文下文出现的所有「数字键」均指主键盘区域的数字键。</li>
-      <li>本文用语「（内文）组字区」代指「inline composition buffer」，在微软术语体系当中也被称作「pre-edit area」。</li>
-      <li>本文用语「组音区」是指由铁恨注拼引擎操纵的注音组音区。组音区会在使用者敲注音时出现在内文组字区内。输入法自组音区取得读音，在验证其具有对应的辞典记录之后，将其插入至Homa 组字引擎。整个内文组字区相当于组字引擎与注拼引擎的统合外在表现。</li>
-      <li>为了保证表达与讨论的有效性、减少歧义，本文在讨论前后关系时，只用「往前/往后」「前方/后方」，且仅以文字书写方向为这些用语的方向参照。这与 Zonble 的「Before-After」前后术语逻辑体系不同：唯音在使用英文术语的情况下只用「Front / Rear (Back, Tail)」、「Forward / Backward」。</li>
+      <li>
+        本文用语「（内文）组字区」代指「inline composition
+        buffer」，在微软术语体系当中也被称作「pre-edit area」。
+      </li>
+      <li>
+        本文用语「组音区」是指由铁恨注拼引擎操纵的注音组音区。组音区会在使用者敲注音时出现在内文组字区内。输入法自组音区取得读音，在验证其具有对应的辞典记录之后，将其插入至Homa
+        组字引擎。整个内文组字区相当于组字引擎与注拼引擎的统合外在表现。
+      </li>
+      <li>
+        为了保证表达与讨论的有效性、减少歧义，本文在讨论前后关系时，只用「往前/往后」「前方/后方」，且仅以文字书写方向为这些用语的方向参照。这与
+        Zonble 的「Before-After」前后术语逻辑体系不同：唯音在使用英文术语的情况下只用「Front / Rear
+        (Back, Tail)」、「Forward / Backward」。
+      </li>
       <li>所谓「符号选单状态」仅代指分类波浪符号选单。</li>
     </ol>
     <div>&nbsp;</div>
@@ -316,7 +346,10 @@
           <div>⇧⏎</div>
         </td>
         <td>
-          <div>‧ 将当前组字区内容递交出去之后、以文字输入方向最前端的已递交的节点内容作为索引资料、来试图叫出关联词语选字窗。</div>
+          <div>
+            ‧
+            将当前组字区内容递交出去之后、以文字输入方向最前端的已递交的节点内容作为索引资料、来试图叫出关联词语选字窗。
+          </div>
         </td>
         <td>
           <div>对逐字选字模式无效，因为组字选字模式另有安排。</div>
@@ -482,7 +515,7 @@
           <div>⏎</div>
         </td>
         <td>
-          <div>将当前高亮标记了的词音配对新增至使用者辞典。</div>
+          <div>将当前高亮标记了的词音配对新增至使用者片语辞典。</div>
           <div>如果已经是既有词音配对的话，则会提升其权重。</div>
         </td>
         <td>
@@ -499,7 +532,7 @@
         </td>
         <td>
           <div>输入法处于标记模式时才会生效；</div>
-          <div>相关记录存于使用者语汇档案当中；</div>
+          <div>相关记录存于使用者片语档案当中；</div>
           <div>对使用者关联词语无法生效。</div>
         </td>
       </tr>
@@ -634,8 +667,7 @@
         <td>
           <div>输入半形阿拉伯数字</div>
         </td>
-        <td>
-        </td>
+        <td></td>
       </tr>
       <tr>
         <td>
@@ -643,7 +675,7 @@
         </td>
         <td>
           <div>分类波浪符号选单（类似新酷音），</div>
-          <div>可在使用者辞典目录内写 symbols.dat 自订内容。</div>
+          <div>可在使用者片语辞典目录内写 symbols.dat 自订内容。</div>
         </td>
         <td>
           <div>JIS 键盘注意：</div>
@@ -735,7 +767,9 @@
       </tr>
     </table>
     <div>&nbsp;</div>
-    <div>下述热键则为<strong>预设田所选字窗正在显示（也就是你正在选字）时</strong>可以用的功能：</div>
+    <div>
+      下述热键则为<strong>预设田所选字窗正在显示（也就是你正在选字）时</strong>可以用的功能：
+    </div>
     <table>
       <tr>
         <td>
@@ -764,7 +798,9 @@
           <div>⇧⏎</div>
         </td>
         <td>
-          <div>‧ 以文字输入方向最前端的已递交的节点内容作为索引资料、来试图叫出关联词语选字窗。</div>
+          <div>
+            ‧ 以文字输入方向最前端的已递交的节点内容作为索引资料、来试图叫出关联词语选字窗。
+          </div>
           <div>‧ 如果能成功叫出关联词语的话，会先递交当前组字区的内容。</div>
         </td>
         <td>
@@ -781,8 +817,7 @@
           <div>‧ 选字窗内选中下一个候选字（正向轮替）</div>
           <div>‧ 选字窗内选中上一个候选字（反向轮替）</div>
         </td>
-        <td>
-        </td>
+        <td></td>
       </tr>
       <tr>
         <td>
@@ -885,7 +920,9 @@
           <div>在选字窗显示时移动组字区内的游标（以单个幅长（读音）为单位，逐幅移动）。</div>
         </td>
         <td>
-          <div>如果发现移动后的游标出现了切割字元的情况的话，则会自动将游标继续移动至当前节点的边界。</div>
+          <div>
+            如果发现移动后的游标出现了切割字元的情况的话，则会自动将游标继续移动至当前节点的边界。
+          </div>
         </td>
       </tr>
     </table>
