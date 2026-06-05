@@ -108,6 +108,9 @@ public final class PrefMgr: PrefMgrProtocol, Sendable {
   @AppProperty(userDef: .kCandidateWindowShowOnlyOneLine)
   public var candidateWindowShowOnlyOneLine: Bool
 
+  @AppProperty(userDef: .kEnforceSingleLineCandidateWindowLayout4SCPC)
+  public var enforceSingleLineCandidateWindowLayout4SCPC: Bool
+
   @AppProperty(userDef: .kShouldAutoReloadUserDataFiles)
   public var shouldAutoReloadUserDataFiles: Bool
 

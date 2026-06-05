@@ -32,6 +32,7 @@ public protocol PrefMgrProtocol {
   var candidateListTextSize: Double { get set }
   var alwaysExpandCandidateWindow: Bool { get set }
   var candidateWindowShowOnlyOneLine: Bool { get set }
+  var enforceSingleLineCandidateWindowLayout4SCPC: Bool { get set }
   var shouldAutoReloadUserDataFiles: Bool { get set }
   var useRearCursorMode: Bool { get set }
   var candidateStateJKHLBehavior: Int { get set }

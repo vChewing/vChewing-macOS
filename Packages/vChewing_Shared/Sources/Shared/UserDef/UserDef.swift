@@ -38,6 +38,7 @@ nonisolated public enum UserDef: String, CaseIterable, Identifiable, Sendable {
   case kCandidateListTextSize = "CandidateListTextSize"
   case kAlwaysExpandCandidateWindow = "AlwaysExpandCandidateWindow"
   case kCandidateWindowShowOnlyOneLine = "CandidateWindowShowOnlyOneLine"
+  case kEnforceSingleLineCandidateWindowLayout4SCPC = "EnforceSingleLineCandidateWindowLayout4SCPC"
   case kAppleLanguages = "AppleLanguages"
   case kShouldAutoReloadUserDataFiles = "ShouldAutoReloadUserDataFiles"
   case kUseRearCursorMode = "UseRearCursorMode"
@@ -442,6 +443,7 @@ nonisolated extension UserDef {
     case .kCandidateListTextSize: return .double(16)
     case .kAlwaysExpandCandidateWindow: return .bool(false)
     case .kCandidateWindowShowOnlyOneLine: return .bool(false)
+    case .kEnforceSingleLineCandidateWindowLayout4SCPC: return .bool(true)
     case .kAppleLanguages: return .arrayOfStrings([])
     case .kShouldAutoReloadUserDataFiles: return .bool(true)
     case .kUseRearCursorMode: return .bool(false)
@@ -644,6 +646,11 @@ nonisolated extension UserDef {
         userDef: self,
         shortTitle: "i18n:UserDef.kCandidateWindowShowOnlyOneLine.shortTitle",
         description: "i18n:UserDef.kCandidateWindowShowOnlyOneLine.description"
+      )
+    case .kEnforceSingleLineCandidateWindowLayout4SCPC: return .init(
+        userDef: self,
+        shortTitle: "i18n:UserDef.kEnforceSingleLineCandidateWindowLayout4SCPC.shortTitle",
+        description: "i18n:UserDef.kEnforceSingleLineCandidateWindowLayout4SCPC.description"
       )
     case .kAppleLanguages: return .init(
         userDef: self, shortTitle: "i18n:UserDef.kAppleLanguages.shortTitle",

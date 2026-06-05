@@ -391,6 +391,8 @@
 "i18n:UserDef.kEnableCandidateWindowAnimation.shortTitle" = "選字窗移動/變更大小時啟用動畫效果";
 "i18n:UserDef.kEnforceETenDOSCandidateSequence.description" = "對敝輸入法的候選字的順序有著強烈的手動調整之需求的使用者們往往都是從倚天中文 DOS 開始積累了對候選字的直覺記憶、希望能使用這種候選字排序，故提供該選項。逐字選字模式會始終遵循該排序特性，不受該開關所影響。";
 "i18n:UserDef.kEnforceETenDOSCandidateSequence.shortTitle" = "對所有單漢字候選字強制施加倚天中文DOS系統排序";
+"i18n:UserDef.kEnforceSingleLineCandidateWindowLayout4SCPC.description" = "啟用後，逐字選字模式（SCPC）將始終使用單行選字窗佈局。";
+"i18n:UserDef.kEnforceSingleLineCandidateWindowLayout4SCPC.shortTitle" = "對逐字選字模式強制單行選字窗佈局";
 "i18n:UserDef.kEscToCleanInputBuffer.description" = "若取消勾選，則 ESC 鍵會先嘗試清除未組成的讀音/字根；\n如果沒有未組成的讀音/字根的話，則會遞交當前組字區的內容。";
 "i18n:UserDef.kEscToCleanInputBuffer.shortTitle" = "敲 ESC 鍵以清空整個組字緩衝區";
 "i18n:UserDef.kFetchSuggestionsFromPerceptionOverrideModel.description" = "漸退記憶模組僅持有臨時記憶之功能。每一筆記錄都會在六天之內逐漸變得徹底失效。您可以藉由輸入法選單清除全部的記憶記錄。";
