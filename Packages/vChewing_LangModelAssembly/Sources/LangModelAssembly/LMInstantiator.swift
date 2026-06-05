@@ -16,7 +16,7 @@ extension LMAssembly {
   typealias ScoreAssigner = (CandidateInState?) -> Double
 
   /// 語言模組副本化模組（LMInstantiator，下稱「LMI」）自身統籌且整理來自
-  /// 其它子模組的資料（包括使用者語彙、繪文字模組、語彙濾除表、原廠語言模組等）。
+  /// 其它子模組的資料（包括使用者片語、繪文字模組、語彙濾除表、原廠語言模組等）。
   ///
   /// LMI 型別為與輸入法輸入調度模組直接溝通之唯一語言模組。當組字器開始根據給定的
   /// 讀音鏈構築語句時，LMI 會接收來自組字器的讀音、輪流檢查自身是否有可以匹配到的
@@ -235,7 +235,7 @@ extension LMAssembly {
 
     /// 清除所有使用者來源的資料（片語、濾除表、符號、關聯詞、置換表、LRU 快取、InputToken 雜湊）。
     /// 不影響原廠辭典（factoryTrie）與半衰記憶模組（lxPerceptor）。
-    /// 在切換使用者辭典目錄時必須呼叫此方法，以確保舊目錄的資料不會殘留。
+    /// 在切換使用者片語辭典目錄時必須呼叫此方法，以確保舊目錄的資料不會殘留。
     public func purgeUserData() {
       lmUserPhrases.clear()
       lmFiltered.clear()
@@ -610,7 +610,7 @@ extension LMAssembly {
     /// 給定讀音索引鍵陣列，讓 LMI 給出對應的經過處理的單元圖陣列。
     /// - Parameters:
     ///   - keyArray: 給定的讀音索引鍵陣列。
-    ///   - partiallyMatch: 是否對使用者語彙啟用前綴部分匹配。
+    ///   - partiallyMatch: 是否對使用者片語啟用前綴部分匹配。
     /// - Returns: 對應的經過處理的單元圖陣列。
     public func unigramsFor(keyArray: [String], partiallyMatch: Bool) -> [Homa.Gram] {
       let keyChain = keyArray.joined(separator: "-")
@@ -717,7 +717,7 @@ extension LMAssembly {
         }
       }
 
-      // 用 reversed 指令讓使用者語彙檔案內的詞條優先順序隨著行數增加而逐漸增高。
+      // 用 reversed 指令讓使用者片語檔案內的詞條優先順序隨著行數增加而逐漸增高。
       // 這樣一來就可以在就地新增語彙時徹底複寫優先權。
       // 將兩句差分也是為了讓 rawUserUnigrams 的類型不受可能的影響。
       if !config.bypassUserPhrasesData {

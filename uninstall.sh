@@ -17,7 +17,7 @@ rm ~/Library/Receipts/org.atelierInmu.vChewing.bom
 rm ~/Library/Receipts/org.atelierInmu.vChewing.plist
 
 # Also user phrase folder:
-# 原廠預設的使用者辭典目錄不自動刪除了，讓使用者自己刪：
+# 原廠預設的使用者片語辭典目錄不自動刪除了，讓使用者自己刪：
 # rm -rf ~/Library/Application\ Support/vChewing/
 # rm -rf ~/Library/Containers/org.atelierInmu.inputmethod.vChewing/Data/Library/Application\ Support/vChewing/
 

@@ -9,7 +9,7 @@
 import AppKit
 import Darwin
 
-/// 使用者辭典資料預設範例檔案名稱。
+/// 使用者片語辭典資料預設範例檔案名稱。
 private let kTemplateNameUserPhrases = "template-userphrases"
 private let kTemplateNameUserReplacements = "template-replacements"
 private let kTemplateNameUserFilterList = "template-exclusions"
@@ -51,11 +51,11 @@ extension LMMgr {
     getBundleDataPath("VanguardFactoryDict4Typing", factory: factory, ext: "txtMap")
   }
 
-  // MARK: - 使用者語彙檔案的具體檔案名稱路徑定義
+  // MARK: - 使用者片語檔案的具體檔案名稱路徑定義
 
   // Swift 的 appendingPathComponent 需要藉由 URL 完成。
 
-  /// 指定的使用者辭典資料路徑。
+  /// 指定的使用者片語辭典資料路徑。
   /// - Parameters:
   ///   - mode: 繁簡模式。
   ///   - type: 辭典資料類型
@@ -91,7 +91,7 @@ extension LMMgr {
   }
 
   /// 使用者漸退記憶模組資料的存取頻次特別高，且資料新陳代謝速度快，所以只適合放在預設的使用者資料目錄下。
-  /// 也就是「~/Library/Application Support/vChewing/」目錄下，且不會隨著使用者辭典目錄的改變而改變。
+  /// 也就是「~/Library/Application Support/vChewing/」目錄下，且不會隨著使用者片語辭典目錄的改變而改變。
   /// - Parameter mode: 簡繁體輸入模式。
   /// - Returns: 資料路徑（URL）。
   public static func perceptionOverrideModelDataURL(_ mode: Shared.InputMode) -> URL {
@@ -108,7 +108,7 @@ extension LMMgr {
     ).deletingLastPathComponent().appendingPathComponent(fileName)
   }
 
-  // MARK: - 使用者語彙檔案專用目錄的合規性檢查
+  // MARK: - 使用者片語檔案專用目錄的合規性檢查
 
   // 一次性檢查給定的目錄是否存在寫入合規性（僅用於偏好設定檢查等初步檢查場合，不做任何糾偏行為）
   public static func checkIfSpecifiedUserDataFolderValid(_ folderPath: String?) -> Bool {
@@ -191,7 +191,7 @@ extension LMMgr {
     return true
   }
 
-  // MARK: - 用以讀取使用者語彙檔案目錄的函式，會自動對 PrefMgr 當中的參數糾偏。
+  // MARK: - 用以讀取使用者片語檔案目錄的函式，會自動對 PrefMgr 當中的參數糾偏。
 
   // 當且僅當 PrefMgr 當中的參數不合規（比如非實在路徑、或者無權限寫入）時，才會糾偏。
 
@@ -369,9 +369,9 @@ extension LMMgr {
     getxattr(path, name, nil, 0, 0, 0) >= 0
   }
 
-  // MARK: - 重設使用者語彙檔案目錄
+  // MARK: - 重設使用者片語檔案目錄
 
-  /// 將舊目錄的使用者語彙檔案內容合併至新目錄的對應檔案。
+  /// 將舊目錄的使用者片語檔案內容合併至新目錄的對應檔案。
   /// 合併策略為 append 模式（新目錄檔案內容在前，舊目錄內容追加在後）。
   /// - Parameters:
   ///   - oldPath: 舊的使用者資料目錄路徑。
@@ -500,7 +500,7 @@ extension LMMgr {
     }
   }
 
-  // MARK: - 檢查具體的使用者語彙檔案是否存在
+  // MARK: - 檢查具體的使用者片語檔案是否存在
 
   private static func ensureFileExists(
     _ fileURL: URL, deployTemplate templateBasename: String = "1145141919810",
@@ -565,7 +565,7 @@ extension LMMgr {
   }
 }
 
-// MARK: - 將當前輸入法的所有使用者辭典資料傾印成 JSON
+// MARK: - 將當前輸入法的所有使用者片語辭典資料傾印成 JSON
 
 // 唯音輸入法並非可永續的專案。用單個 JSON 檔案遷移資料的話，可方便其他程式開發者們實作相關功能。
 
