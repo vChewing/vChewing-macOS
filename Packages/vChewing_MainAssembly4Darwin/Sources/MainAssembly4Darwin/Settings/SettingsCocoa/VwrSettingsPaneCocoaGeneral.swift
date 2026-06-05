@@ -137,6 +137,9 @@ extension SettingsPanesCocoa {
         alert.beginSheetModal(at: window) { response in
           if response == .alertFirstButtonReturn {
             PrefMgr.shared.useSpaceToCommitHighlightedCandidate4SCPC = false
+            PrefMgr.shared.candidateKeys = "123456789"
+            PrefMgr.shared.useHorizontalCandidateList = false
+            PrefMgr.shared.enforceSingleLineCandidateWindowLayout4SCPC = true
             if !PrefMgr.shared.useSCPCTypingMode {
               Notifier.notify(
                 message: "i18n:UserDef.kUsingHotKeySCPC.shortTitle".i18n + "\n"

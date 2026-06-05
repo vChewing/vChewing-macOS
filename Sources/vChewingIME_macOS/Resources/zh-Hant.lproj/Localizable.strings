@@ -217,9 +217,9 @@
 "i18n:securityAgentHelper.warningMessage.header" = "唯音有偵測到下述後檯執行緒有在濫用 SecureEventInput。這種濫用會導致系統內的所有第三方輸入法全都無法正常使用（在輸入法選單內會變成灰色）。\n\n針對需要填寫敏感資料的場合，使用 SecureEventInput 無可厚非。但是，用 EnableSecureEventInput() 開啟該模式之後，就有義務在輸入窗格失焦的那一刻呼叫 DisableSecureEventInput() 來結束這種狀態。這種狀態還常見於後檯輔助 App 當中、或者某個 App 在叫出該模式之後失去回應（這樣的話，哪怕被切換到後檯，SecureEventInput 也不會自動解除）。\n\n被偵測到的執行緒如下:";
 "i18n:securityAgentHelper.warningMessage.title" = "偵測到對 SecureEventInput 的濫用行為";
 "i18n:Settings.ApplySCPCPreset.ButtonTitle" = "我姓ㄅ，ㄅㄛㄅ，愛打ㄅ半的傳說，要打ㄅ半就點我";
-"i18n:Settings.ApplySCPCPreset.Confirm.AlertMessage" = "ㄅ半輸入法源自倚天中文 DOS 系統、且在 Windows NT 3.51 至 Windows XP 系統內隨附。有至少一兩代人對這種打字方式形成了終生無法扭轉的肌肉記憶。\n\n如果繼續，該輸入法會自動套用下述設定、以使自身的行為與ㄅ半輸入法對齊：\n• 啟用「模擬逐字選字輸入」(SCPC)\n• 啟用「關聯詞語」\n• 停用「使用空格鍵確認高亮候選字」";
+"i18n:Settings.ApplySCPCPreset.Confirm.AlertMessage" = "ㄅ半輸入法源自倚天中文 DOS 系統、且在 Windows NT 3.51 至 Windows XP 系統內隨附。有至少一兩代人對這種打字方式形成了終生無法扭轉的肌肉記憶。\n\n如果繼續，該輸入法會自動套用下述設定、以使自身的行為與ㄅ半輸入法對齊：\n• 啟用「模擬逐字選字輸入」(SCPC)\n• 啟用「關聯詞語」\n• 停用「使用空格鍵確認高亮候選字」\n• 選字鍵設為「123456789」\n• 選字窗佈局改為「縱向佈局」\n• 啟用「對逐字選字模式強制單行選字窗佈局」";
 "i18n:Settings.ApplySCPCPreset.Confirm.AlertTitle" = "一次性配置所有與ㄅ半輸入有關的選項";
-"i18n:Settings.ApplySCPCPreset.Succeeded.AlertMessage" = "已啟用「模擬逐字選字輸入」與「關聯詞語」功能，且已停用「使用空格鍵確認高亮候選字」。";
+"i18n:Settings.ApplySCPCPreset.Succeeded.AlertMessage" = "已啟用「模擬逐字選字輸入」與「關聯詞語」功能、已停用「使用空格鍵確認高亮候選字」、已將選字鍵設為 123456789、已將選字窗設為縱向佈局、且已啟用「對逐字選字模式強制單行選字窗佈局」。";
 "i18n:Settings.ApplySCPCPreset.Succeeded.AlertTitle" = "ㄅ半懶人設定已套用";
 "i18n:settings.button.hpAndDonation" = "主頁 & 捐款";
 "i18n:Settings.ChoosePhoneticLayoutPrompt" = "請指定普通話/國音分析器所使用的注音排列。";
