@@ -71,7 +71,14 @@ final class TrieStringOperationCache: @unchecked Sendable {
         return cached
       }
 
-      let result = string.split(separator: separator).map(String.init)
+      let result: [String]
+      if let asciiValue = separator.asciiValue {
+        result = string.utf8.split(separator: asciiValue).map {
+          String(decoding: $0, as: UTF8.self)
+        }
+      } else {
+        result = string.split(separator: separator).map(String.init)
+      }
 
       // 防止快取無限制增長
       if splitCache.count < maxCacheSize {
@@ -89,7 +96,10 @@ final class TrieStringOperationCache: @unchecked Sendable {
         return cached
       }
 
-      let result = string.first?.description ?? ""
+      let result: String = {
+        guard !string.isEmpty, let firstScalar = string.unicodeScalars.first else { return "" }
+        return String(firstScalar)
+      }()
 
       // 防止快取無限制增長
       if firstCharCache.count < maxCacheSize {
