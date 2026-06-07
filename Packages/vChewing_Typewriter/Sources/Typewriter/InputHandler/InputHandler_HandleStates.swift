@@ -671,7 +671,7 @@ extension InputHandlerProtocol {
            strategy: .configuredLookup
          )?.split(separator: "\t") {
         result.candidates = fetched.enumerated().map {
-          (keyArray: [($0.offset + 1).description], value: $0.element.description)
+          (keyArray: ["_"], value: $0.element.description)
         }
       }
       session.switchState(result)
