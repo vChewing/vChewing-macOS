@@ -40,9 +40,7 @@ public final class MockInputHandler: @MainActor InputHandlerProtocol {
     assembler.maxSegLength = prefs.maxCandidateLength
     assembler.gramQuerier = { [weak self] keyArray in
       guard let self else { return [] }
-      return self.currentLM.unigramsFor(keyArray: keyArray).map {
-        (keyArray: $0.keyArray, value: $0.current, probability: $0.probability, previous: nil)
-      }
+      return self.currentLM.lookupHub.grams(for: keyArray)
     }
     ensureKeyboardParser()
   }

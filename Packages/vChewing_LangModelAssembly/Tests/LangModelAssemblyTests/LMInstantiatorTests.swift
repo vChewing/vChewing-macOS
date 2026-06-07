@@ -258,24 +258,24 @@ struct LMInstantiatorTests {
     """)
 
     // Exact match without partialMatchEnabled
-    let exact = instance.lookupHub.grams(for: ["ㄋㄧㄢˊ"])
-    #expect(exact.map(\.value).contains("年"))
-    #expect(!exact.map(\.value).contains("年終"))
-    #expect(!exact.map(\.value).contains("年糕"))
+    let exact = instance.lookupHub.grams(for: [.singleKey("ㄋㄧㄢˊ")])
+    #expect(exact.map(\.current).contains("年"))
+    #expect(!exact.map(\.current).contains("年終"))
+    #expect(!exact.map(\.current).contains("年糕"))
 
     // Enable partial match
     _ = instance.setOptions { config in
       config.partialMatchEnabled = true
     }
 
-    let partial = instance.lookupHub.grams(for: ["ㄋㄧㄢˊ"])
-    let partialValues = partial.map(\.value)
+    let partial = instance.lookupHub.grams(for: [.singleKey("ㄋㄧㄢˊ")])
+    let partialValues = partial.map(\.current)
     #expect(partialValues.contains("年"))
     #expect(partialValues.contains("年終"))
     #expect(partialValues.contains("年糕"))
 
     // Verify keyArray is correct for partial match results
-    let nianZhong = partial.first { $0.value == "年終" }
+    let nianZhong = partial.first { $0.current == "年終" }
     #expect(nianZhong?.keyArray == ["ㄋㄧㄢˊ", "ㄓㄨㄥ"])
   }
 

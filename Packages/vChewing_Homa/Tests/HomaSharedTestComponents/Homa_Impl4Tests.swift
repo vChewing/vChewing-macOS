@@ -13,13 +13,14 @@ extension HomaTestSuite {
   public static func makeAssemblerUsingMockLM() -> Homa.Assembler {
     .init(
       gramQuerier: { keyArray in
-        [
+        let flatKeys = keyArray.map(\.first)
+        return [
           Homa.Gram(
-            keyArray: keyArray,
-            current: keyArray.joined(separator: "-"),
+            keyArray: flatKeys,
+            current: flatKeys.joined(separator: "-"),
             previous: nil,
             probability: -1
-          ).asTuple,
+          ),
         ]
       }
     )
@@ -162,12 +163,44 @@ public final class TestLM {
     _ keys: [String],
     partiallyMatch: Bool = false
   )
-    -> [(keyArray: [String], value: String, probability: Double, previous: String?)] {
+    -> [Homa.Gram] {
     guard !keys.isEmpty else { return [] }
     return trie.queryGrams(
       keys,
       partiallyMatch: partiallyMatch
-    )
+    ).map {
+      Homa.Gram(
+        keyArray: $0.keyArray, current: $0.value, previous: $0.previous, probability: $0.probability
+      )
+    }
+  }
+
+  public func queryGrams(
+    _ keys: [Homa.PossibleKey],
+    partiallyMatch: Bool = false
+  )
+    -> [Homa.Gram] {
+    let hasAlternatives = keys.contains { $0.count > 1 }
+    guard hasAlternatives else {
+      return queryGrams(keys.map(\.first), partiallyMatch: partiallyMatch)
+    }
+    var result: [[String]] = [[]]
+    for pk in keys {
+      let alts = pk.allValues
+      var newResult: [[String]] = []
+      newResult.reserveCapacity(result.count * alts.count)
+      for prefix in result {
+        for alt in alts {
+          newResult.append(prefix + [alt])
+        }
+      }
+      result = newResult
+    }
+    var merged: [Homa.Gram] = []
+    for combination in result {
+      merged.append(contentsOf: queryGrams(combination, partiallyMatch: partiallyMatch))
+    }
+    return merged
   }
 
   // MARK: Private
