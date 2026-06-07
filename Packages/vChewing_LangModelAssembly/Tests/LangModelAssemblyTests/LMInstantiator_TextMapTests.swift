@@ -449,12 +449,13 @@ struct LMInstantiatorTextMapTests {
     }
 
     let legacySurface = gramTriples(of: instance.unigramsFor(keyArray: strCakeKey))
-    let assemblerSurface = instance.lookupHub.grams(for: strCakeKey).map {
-      GramSnapshot(keyArray: $0.keyArray, value: $0.value, probability: $0.probability)
+    let cakePossibleKeys = strCakeKey.map { Homa.PossibleKey.singleKey($0) }
+    let assemblerSurface = instance.lookupHub.grams(for: cakePossibleKeys).map {
+      GramSnapshot(keyArray: $0.keyArray, value: $0.current, probability: $0.probability)
     }
 
     #expect(assemblerSurface == legacySurface)
-    #expect(instance.lookupHub.grams(for: strCakeKey).allSatisfy { $0.previous == nil })
+    #expect(instance.lookupHub.grams(for: cakePossibleKeys).allSatisfy { $0.previous == nil })
     #expect(instance.lookupHub.hasGrams(for: strCakeKey) == instance.hasUnigramsFor(keyArray: strCakeKey))
   }
 

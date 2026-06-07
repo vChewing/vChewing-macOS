@@ -125,10 +125,17 @@ extension TrieJoinedTestSuite {
     -> Homa.GramQuerier {
     { keyArray in
       trie.queryGrams(
-        keyArray,
+        keyArray.map(\.first),
         filterType: .cht,
         partiallyMatch: partiallyMatch
-      )
+      ).map {
+        Homa.Gram(
+          keyArray: $0.keyArray,
+          current: $0.value,
+          previous: $0.previous,
+          probability: $0.probability
+        )
+      }
     }
   }
 }

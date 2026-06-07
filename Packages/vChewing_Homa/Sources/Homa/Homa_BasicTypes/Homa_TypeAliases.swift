@@ -5,7 +5,8 @@
 extension Homa {
   public typealias CandidatePairRAW = (keyArray: [String], value: String)
   public typealias CandidatePairWeightedRAW = (pair: CandidatePairRAW, weight: Double)
-  public typealias GramQuerier = ([String]) -> [GramRAW]
+  public typealias GramQuerier = ([PossibleKey]) -> [Gram]
+  public typealias GramAvailabilityChecker = ([String]) -> Bool
   public typealias BehaviorPerceptor = (Homa.PerceptionIntel) -> ()
 
   public typealias GramRAW = (

@@ -15,13 +15,14 @@ extension TrieKitTestSuite {
   static func makeAssemblerUsingMockLM() -> Homa.Assembler {
     .init(
       gramQuerier: { keyArray in
-        [
+        let flatKeys = keyArray.map(\.first)
+        return [
           Homa.Gram(
-            keyArray: keyArray,
-            current: keyArray.joined(separator: "-"),
+            keyArray: flatKeys,
+            current: flatKeys.joined(separator: "-"),
             previous: nil,
             probability: -1
-          ).asTuple,
+          ),
         ]
       }
     )
@@ -85,11 +86,31 @@ final class TestLM4Trie {
     partiallyMatch: Bool = false,
     partiallyMatchedKeysPostHandler: ((Set<[String]>) -> ())? = nil
   )
-    -> [(keyArray: [String], value: String, probability: Double, previous: String?)] {
+    -> [Homa.Gram] {
     guard !keys.isEmpty else { return [] }
     return trie.queryGrams(
       keys,
       filterType: .langNeutral,
+      partiallyMatch: partiallyMatch,
+      partiallyMatchedKeysPostHandler: partiallyMatchedKeysPostHandler
+    ).map {
+      Homa.Gram(
+        keyArray: $0.keyArray,
+        current: $0.value,
+        previous: $0.previous,
+        probability: $0.probability
+      )
+    }
+  }
+
+  func queryGrams(
+    _ keys: [Homa.PossibleKey],
+    partiallyMatch: Bool = false,
+    partiallyMatchedKeysPostHandler: ((Set<[String]>) -> ())? = nil
+  )
+    -> [Homa.Gram] {
+    queryGrams(
+      keys.map(\.first),
       partiallyMatch: partiallyMatch,
       partiallyMatchedKeysPostHandler: partiallyMatchedKeysPostHandler
     )

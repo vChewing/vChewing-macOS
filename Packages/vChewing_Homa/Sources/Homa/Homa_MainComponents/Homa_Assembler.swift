@@ -18,10 +18,12 @@ extension Homa {
     ///   - config: 引擎配置參數。
     public init(
       gramQuerier: @escaping Homa.GramQuerier,
+      gramAvailabilityChecker: Homa.GramAvailabilityChecker? = nil,
       perceptor: Homa.BehaviorPerceptor? = nil,
       config: Config = Config()
     ) {
       self.gramQuerier = gramQuerier
+      self.gramAvailabilityChecker = gramAvailabilityChecker
       self.config = config
       self.perceptor = perceptor
       self.gramQueryCache = [:]
@@ -35,6 +37,7 @@ extension Homa {
     public init(from target: Assembler) {
       self.config = target.config.hardCopy
       self.gramQuerier = target.gramQuerier
+      self.gramAvailabilityChecker = target.gramAvailabilityChecker
       self.perceptor = target.perceptor
       self.gramQueryCache = target.gramQueryCache
       self.gramQueryCacheOrder = target.gramQueryCacheOrder
@@ -49,6 +52,9 @@ extension Homa {
 
     /// 單元圖資料存取專用介面。
     public var gramQuerier: Homa.GramQuerier
+    /// 輕量級的在庫檢查 API，供 insertKeys() 快速確認讀音是否存在，
+    /// 而不觸發完整的 unigramsFor() 查詢。若為 nil 則 fallback 到 queryGrams()。
+    public var gramAvailabilityChecker: Homa.GramAvailabilityChecker?
     /// 用以洞察使用者字詞節點覆寫行為的 API。
     public var perceptor: BehaviorPerceptor?
     /// 組態設定。
@@ -169,10 +175,15 @@ extension Homa {
       var warmupQueryBuffer = [GramQueryCacheKey: [Homa.Gram]]()
       for (cursorAdvancedPosition, possibleKey) in givenKeys.enumerated() {
         let altValues = possibleKey.allValues
-        let cacheKey = GramQueryCacheKey(altValues)
+        let cacheKey = GramQueryCacheKey(altValues.map { PossibleKey.singleKey($0) })
         if !(keyExistenceChecked[cacheKey] ?? false) {
-          let hasAnyResult = altValues.contains { alt in
-            !queryGrams(using: [alt], cache: &warmupQueryBuffer).isEmpty
+          let hasAnyResult: Bool
+          if let checker = gramAvailabilityChecker {
+            hasAnyResult = altValues.contains { checker([$0]) }
+          } else {
+            hasAnyResult = altValues.contains { alt in
+              !queryGrams(using: [PossibleKey.singleKey(alt)], cache: &warmupQueryBuffer).isEmpty
+            }
           }
           guard hasAnyResult else {
             throw Homa.Exception.givenKeyHasNoResults
@@ -409,28 +420,13 @@ extension Homa {
     private struct GramQueryCacheKey: Hashable {
       // MARK: Lifecycle
 
-      init(_ keyArray: [String]) {
+      init(_ keyArray: [PossibleKey]) {
         self.keyArray = keyArray
-        var hasher = Hasher()
-        hasher.combine(keyArray)
-        self.precomputedHash = hasher.finalize()
       }
 
       // MARK: Internal
 
-      let keyArray: [String]
-
-      static func == (lhs: Self, rhs: Self) -> Bool {
-        lhs.keyArray == rhs.keyArray
-      }
-
-      func hash(into hasher: inout Hasher) {
-        hasher.combine(precomputedHash)
-      }
-
-      // MARK: Private
-
-      private let precomputedHash: Int
+      let keyArray: [PossibleKey]
     }
 
     private static let maxCachedGramQueries = 512
@@ -441,7 +437,7 @@ extension Homa {
     // 記錄插入順序，供淘汰使用（最舊的鍵在最前面）。
     private var gramQueryCacheOrder: [GramQueryCacheKey]
 
-    private static func sortGramRAW(_ lhs: Homa.GramRAW, _ rhs: Homa.GramRAW) -> Bool {
+    private static func sortGram(_ lhs: Homa.Gram, _ rhs: Homa.Gram) -> Bool {
       if lhs.keyArray.count != rhs.keyArray.count {
         return lhs.keyArray.count > rhs.keyArray.count
       }
@@ -454,64 +450,22 @@ extension Homa {
       return (lhs.previous ?? "") < (rhs.previous ?? "")
     }
 
-    private static func makeGramIdentityHash(_ raw: Homa.GramRAW) -> Int {
+    private static func makeGramIdentityHash(_ gram: Homa.Gram) -> Int {
       var hasher = Hasher()
-      hasher.combine(raw.keyArray)
-      hasher.combine(raw.value)
-      hasher.combine(raw.previous)
+      hasher.combine(gram.keyArray)
+      hasher.combine(gram.current)
+      hasher.combine(gram.previous)
       return hasher.finalize()
     }
 
-    /// 計算給定陣列陣列的笛卡爾積。
-    private static func cartesianProduct<T>(_ arrays: [[T]]) -> [[T]] {
-      guard !arrays.isEmpty else { return [[]] }
-      guard !arrays.contains(where: \.isEmpty) else { return [] }
-      var result: [[T]] = [[]]
-      for array in arrays {
-        var newResult: [[T]] = []
-        newResult.reserveCapacity(result.count * array.count)
-        for prefix in result {
-          for element in array {
-            newResult.append(prefix + [element])
-          }
-        }
-        result = newResult
-      }
-      return result
-    }
-
-    /// 對給定替代讀音陣列展開笛卡爾積、逐一查詢、並合併結果。
+    /// 對給定替代讀音陣列查詢並合併結果。
     private func queryGramsForAlternatives(
       _ alternativesSlice: ArraySlice<PossibleKey>,
       cache: inout [GramQueryCacheKey: [Homa.Gram]]
     )
       -> [Homa.Gram] {
-      // 快速路徑——無替代讀音時直接查詢，無需笛卡爾積展開
-      if alternativesSlice.allSatisfy({
-        if case .singleKey = $0 { return true } else { return false }
-      }) {
-        let keyArray = alternativesSlice.map(\.first)
-        return queryGrams(using: keyArray, cache: &cache)
-      }
-      let combinations = Self.cartesianProduct(alternativesSlice.map(\.allValues))
-      var mergedGrams: [Homa.Gram] = []
-      mergedGrams.reserveCapacity(combinations.count * 4)
-      for combination in combinations {
-        let grams = queryGrams(using: combination, cache: &cache)
-        mergedGrams.append(contentsOf: grams)
-      }
-      return mergedGrams.sorted {
-        if $0.keyArray.count != $1.keyArray.count {
-          return $0.keyArray.count > $1.keyArray.count
-        }
-        if $0.probability != $1.probability {
-          return $0.probability > $1.probability
-        }
-        if $0.keyArray != $1.keyArray {
-          return $0.keyArray.lexicographicallyPrecedes($1.keyArray)
-        }
-        return ($0.previous ?? "") < ($1.previous ?? "")
-      }
+      let keyArray = Array(alternativesSlice)
+      return queryGrams(using: keyArray, cache: &cache)
     }
 
     /// 從元圖存取專用 API 將獲取的結果轉為元圖、以供 Nodes 使用。
@@ -523,7 +477,7 @@ extension Homa {
     ///   - cache: 快取。
     /// - Returns: 元圖陣列。
     private func queryGrams(
-      using keyArray: [String],
+      using keyArray: [PossibleKey],
       cache: inout [GramQueryCacheKey: [Homa.Gram]]
     )
       -> [Homa.Gram] {
@@ -536,10 +490,10 @@ extension Homa {
         return cached
       }
       var insertedIntel = Set<Int>()
-      let newResult: [Homa.Gram] = gramQuerier(keyArray).sorted(by: Self.sortGramRAW).compactMap {
+      let newResult: [Homa.Gram] = gramQuerier(keyArray).sorted(by: Self.sortGram).compactMap {
         let intel = Self.makeGramIdentityHash($0)
         guard insertedIntel.insert(intel).inserted else { return nil }
-        return Homa.Gram($0)
+        return $0
       }
       cache[cacheKey] = newResult
       if gramQueryCache.count >= Self.maxCachedGramQueries {

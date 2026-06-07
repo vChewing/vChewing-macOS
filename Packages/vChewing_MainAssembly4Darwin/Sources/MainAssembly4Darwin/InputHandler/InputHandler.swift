@@ -40,6 +40,11 @@ public final class InputHandler: @MainActor InputHandlerProtocol {
       guard let self else { return [] }
       return self.currentLM.lookupHub.grams(for: keyArray)
     }
+    /// 將輕量級在庫檢查閉包綁至組字器，避免 insertKeys() 用完整查詢做 existence check。
+    assembler.gramAvailabilityChecker = { [weak self] keyArray in
+      guard let self else { return false }
+      return self.currentLM.lookupHub.hasGrams(for: keyArray)
+    }
     /// 注拼槽初期化。
     ensureKeyboardParser()
   }

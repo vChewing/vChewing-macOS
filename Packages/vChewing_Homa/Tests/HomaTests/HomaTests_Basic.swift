@@ -32,11 +32,11 @@ public struct HomaTestsBasic: HomaTestSuite {
     let queriedRawGramsDaqiantian = langModel.queryGrams(["da4-qian2-tian1"])
     let n1 = Homa.Node(
       keyArray: ["da4"],
-      grams: queriedRawGramsDa.map { Homa.Gram($0) }
+      grams: queriedRawGramsDa
     )
     let n3 = Homa.Node(
       keyArray: ["da4", "qian2", "tian1"],
-      grams: queriedRawGramsDaqiantian.map { Homa.Gram($0) }
+      grams: queriedRawGramsDaqiantian
     )
     #expect(segment.maxLength == 0)
     segment.addNode(node: n1)
@@ -110,10 +110,11 @@ public struct HomaTestsBasic: HomaTestSuite {
   func testAssemblerQueryGramsPreservesSourceOrderForEqualScorePeers() async throws {
     let assembler = Homa.Assembler(
       gramQuerier: { keyArray in
-        [
-          Homa.GramRAW(keyArray: keyArray, value: "，", probability: -9.9, previous: nil),
-          Homa.GramRAW(keyArray: keyArray, value: "〈", probability: -9.9, previous: nil),
-          Homa.GramRAW(keyArray: keyArray, value: "《", probability: -9.9, previous: nil),
+        let flatKeys = keyArray.map(\.first)
+        return [
+          Homa.Gram(keyArray: flatKeys, current: "，", probability: -9.9),
+          Homa.Gram(keyArray: flatKeys, current: "〈", probability: -9.9),
+          Homa.Gram(keyArray: flatKeys, current: "《", probability: -9.9),
         ]
       }
     )
@@ -128,9 +129,9 @@ public struct HomaTestsBasic: HomaTestSuite {
     let assembler = Homa.Assembler(
       gramQuerier: { _ in
         [
-          Homa.GramRAW(keyArray: ["shi2"], value: "時", probability: -6, previous: nil),
-          Homa.GramRAW(keyArray: ["shi4"], value: "世", probability: -4, previous: nil),
-          Homa.GramRAW(keyArray: ["shuai1"], value: "衰", probability: -8, previous: nil),
+          Homa.Gram(keyArray: ["shi2"], current: "時", probability: -6),
+          Homa.Gram(keyArray: ["shi4"], current: "世", probability: -4),
+          Homa.Gram(keyArray: ["shuai1"], current: "衰", probability: -8),
         ]
       }
     )
@@ -322,22 +323,36 @@ public struct HomaTestsBasic: HomaTestSuite {
         // Position 1: "zhi" → "之"
         // Combined: "shu4-zhi" → "樹之", "zhi-zhi" → "之之"
         switch keyArray {
-        case ["shu4"]:
-          return [Homa.GramRAW(keyArray: keyArray, value: "樹", probability: -5.0, previous: nil)]
-        case ["zhi"]:
-          return [Homa.GramRAW(keyArray: keyArray, value: "之", probability: -4.9, previous: nil)]
-        case ["shu4", "zhi"]:
-          return [Homa.GramRAW(keyArray: keyArray, value: "樹之", probability: -4.0, previous: nil)]
-        case ["zhi", "zhi"]:
-          return [Homa.GramRAW(keyArray: keyArray, value: "之之", probability: -6.0, previous: nil)]
+        case [.singleKey("shu4")]:
+          return [Homa.Gram(keyArray: ["shu4"], current: "樹", probability: -5.0)]
+        case [.singleKey("zhi")]:
+          return [Homa.Gram(keyArray: ["zhi"], current: "之", probability: -4.9)]
+        case [.singleKey("shu4"), .singleKey("zhi")]:
+          return [Homa.Gram(keyArray: ["shu4", "zhi"], current: "樹之", probability: -4.0)]
+        case [.singleKey("zhi"), .singleKey("zhi")]:
+          return [Homa.Gram(keyArray: ["zhi", "zhi"], current: "之之", probability: -6.0)]
+        // 替代讀音路徑：直接傳入 PossibleKey，展開後回傳各個組合的 grams。
         default:
+          if keyArray.count == 1, case let .multipleKeys(keys) = keyArray[0], Set(keys) == ["shu4", "zhi"] {
+            return [
+              Homa.Gram(keyArray: ["shu4"], current: "樹", probability: -5.0),
+              Homa.Gram(keyArray: ["zhi"], current: "之", probability: -4.9),
+            ]
+          }
+          if keyArray.count == 2, case let .multipleKeys(keys) = keyArray[0], Set(keys) == ["shu4", "zhi"],
+             keyArray[1] == .singleKey("zhi") {
+            return [
+              Homa.Gram(keyArray: ["shu4", "zhi"], current: "樹之", probability: -4.0),
+              Homa.Gram(keyArray: ["zhi", "zhi"], current: "之之", probability: -6.0),
+            ]
+          }
           return []
         }
       }
     )
 
     // Insert two positions: first has two alternatives (shu4 / zhi), second has one (zhi).
-    try assembler.insertKeys([.multipleKeys(["shu4", "zhi"]), .singleKey("zhi")])
+    try assembler.insertKeys([.multipleKeys(["shu4", "zhi"]), Homa.PossibleKey.singleKey("zhi")])
 
     // Position 0 should have nodes of length 1 and 2.
     #expect(assembler.segments[0].maxLength == 2)

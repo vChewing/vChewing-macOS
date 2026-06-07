@@ -325,7 +325,19 @@ extension LMAssembly.LMInstantiator {
       partiallyMatch: false,
       longerSegment: false
     )
-    return nodes.flatMap(\ .entries).contains(where: { $0.typeID == entryType })
+    return nodes.flatMap(\.entries).contains(where: { $0.typeID == entryType })
+  }
+
+  /// 輕量版 factoryUnigramsFor：僅檢查 trie 層級是否存在，不建構 Gram 陣列。
+  func hasFactoryUnigramsFor(keyArray: [String], entryType: VanguardTrie.Trie.EntryType) -> Bool {
+    guard let trie = Self.factoryTrie else { return false }
+    return trie.hasGrams(keyArray, filterType: entryType, partiallyMatch: config.partialMatchEnabled)
+  }
+
+  /// 輕量版 factoryChoppedUnigramsFor：僅檢查 trie 層級是否存在，不建構 Gram 陣列。
+  func hasFactoryChoppedUnigramsFor(keyArray: [String], entryType: VanguardTrie.Trie.EntryType) -> Bool {
+    guard let trie = Self.factoryTrie else { return false }
+    return trie.hasGrams(keyArray, filterType: entryType, partiallyMatch: config.partialMatchEnabled)
   }
 
   func checkCNSConformation(for unigram: Homa.Gram, keyArray: [String]) -> Bool {
