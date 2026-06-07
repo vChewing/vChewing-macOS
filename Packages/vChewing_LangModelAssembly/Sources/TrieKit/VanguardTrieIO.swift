@@ -288,7 +288,7 @@ extension VanguardTrie {
     )
       -> [(value: String, typeID: Trie.EntryType, probability: Double, previous: String?)] {
       guard !line.isEmpty else { return [] }
-      let parts = line.split(separator: "\t", omittingEmptySubsequences: false).map(String.init)
+      let parts = line.split(separator: "\t", omittingEmptySubsequences: false)
 
       // 型別 A：`>typeID\tencodedCell`（預設機率由 HEADER 提供）。
       if let first = parts.first, first.hasPrefix(">"), parts.count >= 2 {
@@ -296,18 +296,18 @@ extension VanguardTrie {
         guard let typeIDRaw = Int32(typeIDStr),
               let probability = defaultProbs[typeIDRaw] else { return [] }
         let typeID = Trie.EntryType(rawValue: typeIDRaw)
-        return decodeGroupedValues(parts[1]).map { value in
+        return decodeGroupedValues(String(parts[1])).map { value in
           (value, typeID, probability, nil)
         }
       }
 
       // 型別 B：`@probability\tchsCell\tchtCell`（TYPING 專用）。
-      if isTyping, parts.count >= 3, let prob = parseTypingGroupedProbability(parts[0]) {
+      if isTyping, parts.count >= 3, let prob = parseTypingGroupedProbability(String(parts[0])) {
         var results: [(String, Trie.EntryType, Double, String?)] = []
-        for val in decodeGroupedValues(parts[1]) where !val.isEmpty {
+        for val in decodeGroupedValues(String(parts[1])) where !val.isEmpty {
           results.append((val, .init(rawValue: 5), prob, nil))
         }
-        for val in decodeGroupedValues(parts[2]) where !val.isEmpty {
+        for val in decodeGroupedValues(String(parts[2])) where !val.isEmpty {
           results.append((val, .init(rawValue: 6), prob, nil))
         }
         return results
@@ -317,8 +317,8 @@ extension VanguardTrie {
       if parts.count >= 3,
          let probability = Double(parts[1]),
          let typeIDRaw = Int32(parts[2]) {
-        let value = parts[0]
-        let previous: String? = parts.count >= 4 && !parts[3].isEmpty ? parts[3] : nil
+        let value = String(parts[0])
+        let previous: String? = parts.count >= 4 && !parts[3].isEmpty ? String(parts[3]) : nil
         return [(value, Trie.EntryType(rawValue: typeIDRaw), probability, previous)]
       }
 
@@ -326,10 +326,10 @@ extension VanguardTrie {
       if isTyping, parts.count >= 4 {
         var results: [(String, Trie.EntryType, Double, String?)] = []
         if !parts[0].isEmpty, let prob = Double(parts[1]) {
-          results.append((parts[0], .init(rawValue: 5), prob, nil))
+          results.append((String(parts[0]), .init(rawValue: 5), prob, nil))
         }
         if !parts[2].isEmpty, let prob = Double(parts[3]) {
-          results.append((parts[2], .init(rawValue: 6), prob, nil))
+          results.append((String(parts[2]), .init(rawValue: 6), prob, nil))
         }
         return results
       }
@@ -338,10 +338,10 @@ extension VanguardTrie {
       if isTyping, parts.count >= 3, isLegacyTypingGroupedLine(parts),
          let prob = Double(parts[0]) {
         var results: [(String, Trie.EntryType, Double, String?)] = []
-        for val in decodeGroupedValues(parts[1]) where !val.isEmpty {
+        for val in decodeGroupedValues(String(parts[1])) where !val.isEmpty {
           results.append((val, .init(rawValue: 5), prob, nil))
         }
-        for val in decodeGroupedValues(parts[2]) where !val.isEmpty {
+        for val in decodeGroupedValues(String(parts[2])) where !val.isEmpty {
           results.append((val, .init(rawValue: 6), prob, nil))
         }
         return results
@@ -398,10 +398,13 @@ extension VanguardTrie {
 
     private static func decodeGroupedValues(_ rawCell: String) -> [String] {
       guard !rawCell.isEmpty, rawCell != String(emptyGroupedCellPlaceholder) else { return [] }
-      if rawCell.contains(groupedValueSeparator) || rawCell.contains(groupedValueEscape) {
+      let utf8 = rawCell.utf8
+      let separatorByte = UInt8(ascii: "|")
+      let escapeByte = UInt8(ascii: "\\")
+      if utf8.contains(separatorByte) || utf8.contains(escapeByte) {
         return splitEscapedGroupedValues(rawCell).map(unescapeGroupedValue)
       }
-      if rawCell.contains(" ") {
+      if utf8.contains(UInt8(ascii: " ")) {
         return rawCell.split(separator: " ").map(String.init)
       }
       return [rawCell]
@@ -409,66 +412,74 @@ extension VanguardTrie {
 
     private static func splitEscapedGroupedValues(_ rawCell: String) -> [String] {
       var result: [String] = []
-      var current = ""
-      current.reserveCapacity(rawCell.count)
+      var currentBytes: [UInt8] = []
+      let utf8 = rawCell.utf8
+      currentBytes.reserveCapacity(utf8.count)
+      let escapeByte = UInt8(ascii: "\\")
+      let separatorByte = UInt8(ascii: "|")
       var isEscaping = false
-      for char in rawCell {
+      for byte in utf8 {
         if isEscaping {
-          current.append(groupedValueEscape)
-          current.append(char)
+          currentBytes.append(escapeByte)
+          currentBytes.append(byte)
           isEscaping = false
           continue
         }
-        if char == groupedValueEscape {
+        if byte == escapeByte {
           isEscaping = true
           continue
         }
-        if char == groupedValueSeparator {
-          result.append(current)
-          current.removeAll(keepingCapacity: true)
+        if byte == separatorByte {
+          result.append(String(decoding: currentBytes, as: UTF8.self))
+          currentBytes.removeAll(keepingCapacity: true)
           continue
         }
-        current.append(char)
+        currentBytes.append(byte)
       }
       if isEscaping {
-        current.append(groupedValueEscape)
+        currentBytes.append(escapeByte)
       }
-      result.append(current)
+      result.append(String(decoding: currentBytes, as: UTF8.self))
       return result
     }
 
     private static func unescapeGroupedValue(_ rawValue: String) -> String {
-      var result = ""
-      result.reserveCapacity(rawValue.count)
+      var resultBytes: [UInt8] = []
+      let utf8 = rawValue.utf8
+      resultBytes.reserveCapacity(utf8.count)
+      let escapeByte = UInt8(ascii: "\\")
+      let separatorByte = UInt8(ascii: "|")
+      let spaceEscapedByte = UInt8(ascii: "s")
+      let placeholderEscapedByte = UInt8(ascii: "a")
       var isEscaping = false
-      for char in rawValue {
+      for byte in utf8 {
         if isEscaping {
-          switch char {
-          case groupedValueEscape:
-            result.append(groupedValueEscape)
-          case groupedValueSeparator:
-            result.append(groupedValueSeparator)
-          case "s":
-            result.append(" ")
-          case "a":
-            result.append(emptyGroupedCellPlaceholder)
+          switch byte {
+          case escapeByte:
+            resultBytes.append(escapeByte)
+          case separatorByte:
+            resultBytes.append(separatorByte)
+          case spaceEscapedByte:
+            resultBytes.append(UInt8(ascii: " "))
+          case placeholderEscapedByte:
+            resultBytes.append(0x07) // \u{7} BEL
           default:
-            result.append(groupedValueEscape)
-            result.append(char)
+            resultBytes.append(escapeByte)
+            resultBytes.append(byte)
           }
           isEscaping = false
           continue
         }
-        if char == groupedValueEscape {
+        if byte == escapeByte {
           isEscaping = true
           continue
         }
-        result.append(char)
+        resultBytes.append(byte)
       }
       if isEscaping {
-        result.append(groupedValueEscape)
+        resultBytes.append(escapeByte)
       }
-      return result
+      return String(decoding: resultBytes, as: UTF8.self)
     }
 
     private static func parseTypingGroupedProbability(_ rawValue: String) -> Double? {
@@ -476,7 +487,7 @@ extension VanguardTrie {
       return Double(String(rawValue.dropFirst()))
     }
 
-    private static func isLegacyTypingGroupedLine(_ parts: [String]) -> Bool {
+    private static func isLegacyTypingGroupedLine(_ parts: [Substring]) -> Bool {
       guard parts.count >= 3, Double(parts[0]) != nil else { return false }
       if parts[1].isEmpty || parts[2].isEmpty { return true }
       if parts[1] == String(emptyGroupedCellPlaceholder) || parts[2] ==

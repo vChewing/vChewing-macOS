@@ -1358,11 +1358,28 @@ extension VanguardTrie.TextMapTrie: VanguardTrieProtocol {
   }
 
   private func parseChoppedColumns(_ keysChopped: [String]) -> [ChoppedColumn] {
-    keysChopped.compactMap { currentCell in
-      let cells = currentCell.split(separator: chopCaseSeparator).map(\.description)
-      guard !cells.isEmpty else { return nil }
-      let candidates = cells.map { current in
-        ChoppedColumnCandidate(text: current, bytes: Array(current.utf8))
+    let sep = UInt8(ascii: "&")
+    return keysChopped.compactMap { currentCell in
+      let utf8 = currentCell.utf8
+      var substrings: [Substring] = []
+      var byteStart = utf8.startIndex
+      var idx = utf8.startIndex
+      while idx < utf8.endIndex {
+        if utf8[idx] == sep {
+          let charStart = byteStart.samePosition(in: currentCell) ?? currentCell.startIndex
+          let charEnd = idx.samePosition(in: currentCell) ?? currentCell.endIndex
+          substrings.append(currentCell[charStart ..< charEnd])
+          utf8.formIndex(after: &idx)
+          byteStart = idx
+        } else {
+          utf8.formIndex(after: &idx)
+        }
+      }
+      let charStart = byteStart.samePosition(in: currentCell) ?? currentCell.startIndex
+      substrings.append(currentCell[charStart...])
+      guard !substrings.isEmpty else { return nil }
+      let candidates = substrings.map { current in
+        ChoppedColumnCandidate(text: String(current), bytes: Array(current.utf8))
       }
       let firstBytes = Set(candidates.compactMap { $0.bytes.first })
       guard !firstBytes.isEmpty else { return nil }
@@ -1371,40 +1388,25 @@ extension VanguardTrie.TextMapTrie: VanguardTrieProtocol {
   }
 
   private func candidateNodeIDsForChoppedColumns(_ choppedColumns: [ChoppedColumn]) -> [Int] {
-    let initialSets: [Set<UInt8>] = choppedColumns.map(\.firstBytes)
-    guard initialSets.allSatisfy({ !$0.isEmpty }) else { return [] }
-    let canUseByteInitials = initialSets.allSatisfy { current in
-      current.allSatisfy { $0 < 0x80 }
+    let initialScalarSets: [Set<UnicodeScalar>] = choppedColumns.map { column in
+      Set(column.candidates.compactMap { $0.text.unicodeScalars.first })
     }
-
-    let initialStringSets: [Set<String>] = canUseByteInitials ? [] : choppedColumns.map { column in
-      Set(column.candidates.compactMap { $0.text.first?.description })
-    }
-    if !canUseByteInitials, initialStringSets.contains(where: \ .isEmpty) {
-      return []
-    }
+    guard initialScalarSets.allSatisfy({ !$0.isEmpty }) else { return [] }
 
     var matchedNodeIDs = [Int]()
     for (currentInitials, nodeIDs) in keyInitialsIDMap {
+      let scalars = currentInitials.unicodeScalars
+      var index = 0
       var allMatched = true
-      if canUseByteInitials {
-        let initialsBytes = Array(currentInitials.utf8)
-        guard initialsBytes.count == initialSets.count else { continue }
-        for index in initialsBytes.indices
-          where !initialSets[index].contains(initialsBytes[index]) {
+      for scalar in scalars {
+        guard index < initialScalarSets.count else { allMatched = false; break }
+        if !initialScalarSets[index].contains(scalar) {
           allMatched = false
           break
         }
-      } else {
-        let initialsArray = currentInitials.map(\.description)
-        guard initialsArray.count == initialStringSets.count else { continue }
-        for index in initialsArray.indices
-          where !initialStringSets[index].contains(initialsArray[index]) {
-          allMatched = false
-          break
-        }
+        index += 1
       }
-      if allMatched {
+      if allMatched, index == initialScalarSets.count {
         matchedNodeIDs.append(contentsOf: nodeIDs)
       }
     }
