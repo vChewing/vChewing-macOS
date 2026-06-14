@@ -402,7 +402,13 @@ extension GSI4AppKit.VwrCandidateGSI4AppKit {
   private func scrollerTrackRect(candidateAreaSize: CGSize) -> CGRect {
     if isVerticalScroller {
       let x = thePool.originDelta + candidateAreaSize.width + scrollerPadding
-      return CGRect(x: x, y: thePool.originDelta, width: scrollerThickness, height: candidateAreaSize.height)
+      let topPadding = thePool.windowRadius
+      return CGRect(
+        x: x,
+        y: topPadding,
+        width: scrollerThickness,
+        height: candidateAreaSize.height - (topPadding - thePool.originDelta)
+      )
     } else {
       let y = thePool.originDelta + candidateAreaSize.height
       return CGRect(x: thePool.originDelta, y: y, width: candidateAreaSize.width, height: scrollerThickness)

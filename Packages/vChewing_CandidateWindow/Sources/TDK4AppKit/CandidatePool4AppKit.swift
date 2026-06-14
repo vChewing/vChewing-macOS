@@ -98,8 +98,12 @@ extension TDK4AppKit {
     // MARK: - 動態變數
 
     let padding: CGFloat = 2
-    let originDelta: CGFloat = 5
     let cellTextHeight = CandidatePool4AppKit.shitCell.textDimension.height
+
+    let originDelta: CGFloat = {
+      if #unavailable(macOS 26.0) { return 5 }
+      return 2
+    }()
 
     /// 橫向還是縱向排列。
     var isHorizontal: Bool { layout == .horizontal }
