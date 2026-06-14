@@ -317,14 +317,19 @@
         }
       }
 
-      // 在 macOS 10.11+ 的情況下，使用 TopLevel 解序列化再轉換
-      if #available(macOS 10.11, *) {
-        if let obj = try? NSKeyedUnarchiver.unarchiveTopLevelObjectWithData(data) {
+      // 備援：從最新 API 往舊版逐級降級
+      if #available(macOS 10.14, *) {
+        if let obj = try? NSKeyedUnarchiver.unarchivedObject(
+          ofClass: NSDictionary.self, from: data
+        ) {
+          return extractURLDataMap(from: obj)
+        }
+      } else if #unavailable(macOS 10.11) {
+        if let obj = NSKeyedUnarchiver.unarchiveObject(with: data) {
           return extractURLDataMap(from: obj)
         }
       } else {
-        // 舊版 fallback
-        if let obj = NSKeyedUnarchiver.unarchiveObject(with: data) {
+        if let obj = try? NSKeyedUnarchiver.unarchiveTopLevelObjectWithData(data) {
           return extractURLDataMap(from: obj)
         }
       }
