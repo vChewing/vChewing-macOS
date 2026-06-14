@@ -29,7 +29,7 @@ public protocol PrefMgrProtocol {
   var showNotificationsWhenTogglingEisu: Bool { get set }
   var showNotificationsWhenTogglingShift: Bool { get set }
   var specifiedNotifyUIColorScheme: Int { get set }
-  var candidateListTextSize: Double { get set }
+  var candidateListTextSize: Int { get set }
   var alwaysExpandCandidateWindow: Bool { get set }
   var candidateWindowShowOnlyOneLine: Bool { get set }
   var enforceSingleLineCandidateWindowLayout4SCPC: Bool { get set }

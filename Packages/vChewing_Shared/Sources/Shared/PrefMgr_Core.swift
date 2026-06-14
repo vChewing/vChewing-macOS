@@ -332,7 +332,7 @@ public final class PrefMgr: PrefMgrProtocol, Sendable {
   }
 
   @AppProperty(userDef: .kCandidateListTextSize)
-  public var candidateListTextSize: Double {
+  public var candidateListTextSize: Int {
     didSet {
       // 必須確立條件，否則就會是無限迴圈。
       if !(12 ... 196).contains(candidateListTextSize) {

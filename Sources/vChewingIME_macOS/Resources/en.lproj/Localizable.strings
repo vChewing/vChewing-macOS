@@ -343,17 +343,6 @@
 "i18n:UserDef.kCandidateKeys.inlinePrompt" = "Choose or hit Enter to confim your prefered keys for selecting candidates.";
 "i18n:UserDef.kCandidateKeys.shortTitle" = "Selection Keys:";
 "i18n:UserDef.kCandidateListTextSize.description" = "Choose candidate font size for better visual clarity.";
-"i18n:UserDef.kCandidateListTextSize.option.12" = "12";
-"i18n:UserDef.kCandidateListTextSize.option.14" = "14";
-"i18n:UserDef.kCandidateListTextSize.option.16" = "16";
-"i18n:UserDef.kCandidateListTextSize.option.17" = "17";
-"i18n:UserDef.kCandidateListTextSize.option.18" = "18";
-"i18n:UserDef.kCandidateListTextSize.option.20" = "20";
-"i18n:UserDef.kCandidateListTextSize.option.22" = "22";
-"i18n:UserDef.kCandidateListTextSize.option.24" = "24";
-"i18n:UserDef.kCandidateListTextSize.option.32" = "32";
-"i18n:UserDef.kCandidateListTextSize.option.64" = "64";
-"i18n:UserDef.kCandidateListTextSize.option.96" = "96";
 "i18n:UserDef.kCandidateListTextSize.shortTitle" = "Candidate Size:";
 "i18n:UserDef.kCandidateNarrationToggleType.description" = "Controls when candidate selections are read aloud (text-to-speech). This allows you highlight selections by ear. If multiple candidates share a pronunciation, the system consults the user-customizable Associated Phrases database to explain each character; the accuracy of the explanation depends on the quality of that database.";
 "i18n:UserDef.kCandidateNarrationToggleType.option.0" = "Always Off";

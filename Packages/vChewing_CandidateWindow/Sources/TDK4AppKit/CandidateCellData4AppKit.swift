@@ -51,7 +51,7 @@ extension TDK4AppKit {
 
     static var internalPrefs = PrefMgr.sharedSansDidSetOps
 
-    static var unifiedSize: Double { internalPrefs.candidateListTextSize }
+    static var unifiedSize: Double { .init(internalPrefs.candidateListTextSize) }
 
     static var unifiedCharDimension: Double { ceil(unifiedSize * 1.0125 + 7) }
     static var unifiedTextHeight: Double { ceil(unifiedSize * 19 / 16) }

@@ -351,52 +351,55 @@ nonisolated public enum UserDef: String, CaseIterable, Identifiable, Sendable {
       return nil
     }
   }
+}
 
-  // MARK: - 各型別的範圍驗證，對應 PrefMgr.fixOddPreferencesCore() 的邏輯。
+// MARK: - 各型別的範圍驗證，對應 PrefMgr.fixOddPreferencesCore() 的邏輯。
 
-  private static func validateIntRange(userDef: Self, value: Int) -> String? {
-    switch userDef {
+nonisolated extension UserDef {
+  public var validNumeralValueRange: ClosedRange<Int>? {
+    switch self {
     case .kKeyboardParser:
       // KeyboardParser(rawValue:) 如果 nil 則不合理。
-      if value < 0 || value > 100 { return "Out of range for KeyboardParser" }
-    case .kSpecifyIntonationKeyBehavior:
-      if ![0, 1, 2].contains(value) { return "Must be 0, 1, or 2" }
-    case .kSpecifyShiftBackSpaceKeyBehavior:
-      if ![0, 1, 2].contains(value) { return "Must be 0, 1, or 2" }
-    case .kUpperCaseLetterKeyBehavior:
-      if ![0, 1, 2, 3, 4].contains(value) { return "Must be 0..4" }
-    case .kReadingNarrationCoverage:
-      if ![0, 1, 2].contains(value) { return "Must be 0, 1, or 2" }
-    case .kRomanNumeralOutputFormat:
-      if ![0, 1, 2, 3].contains(value) { return "Must be 0..3" }
-    case .kSpecifyCmdOptCtrlEnterBehavior:
-      if ![0, 1, 2, 3, 4].contains(value) { return "Must be 0..4" }
-    case .kBeepSoundPreference:
-      if ![0, 1, 2].contains(value) { return "Must be 0, 1, or 2" }
-    case .kCursorPlacementAfterSelectingCandidate:
-      if ![0, 1, 2].contains(value) { return "Must be 0, 1, or 2" }
-    case .kCandidateNarrationToggleType:
-      if ![0, 1, 2].contains(value) { return "Must be 0, 1, or 2" }
-    case .kCandidateStateJKHLBehavior:
-      if ![0, 1, 2].contains(value) { return "Must be 0, 1, or 2" }
-    case .kSpecifiedNotifyUIColorScheme:
-      if ![0, 1, 2].contains(value) { return "Must be 0, 1, or 2" }
-    case .kForceCassetteChineseConversion:
-      if ![0, 1, 2].contains(value) { return "Must be 0, 1, or 2" }
-    case .kNumPadCharInputBehavior:
-      if ![0, 1, 2].contains(value) { return "Must be 0, 1, or 2" }
-    case .kSpaceKeyBehaviorAgainstICB:
-      if ![0, 1, 2].contains(value) { return "Must be 0, 1, or 2" }
-    default: break
+      0 ... 100
+    case .kSpecifyIntonationKeyBehavior: 0 ... 2
+    case .kSpecifyShiftBackSpaceKeyBehavior: 0 ... 2
+    case .kUpperCaseLetterKeyBehavior: 0 ... 4
+    case .kReadingNarrationCoverage: 0 ... 2
+    case .kRomanNumeralOutputFormat: 0 ... 3
+    case .kSpecifyCmdOptCtrlEnterBehavior: 0 ... 4
+    case .kBeepSoundPreference: 0 ... 2
+    case .kCursorPlacementAfterSelectingCandidate: 0 ... 2
+    case .kCandidateNarrationToggleType: 0 ... 2
+    case .kCandidateStateJKHLBehavior: 0 ... 2
+    case .kSpecifiedNotifyUIColorScheme: 0 ... 2
+    case .kForceCassetteChineseConversion: 0 ... 2
+    case .kNumPadCharInputBehavior: 0 ... 2
+    case .kSpaceKeyBehaviorAgainstICB: 0 ... 2
+    case .kCandidateListTextSize: 12 ... 196
+    default: nil
+    }
+  }
+
+  private static func validateIntRange(userDef: Self, value: Int) -> String? {
+    let validNumeralValueRange = userDef.validNumeralValueRange
+    if let validNumeralValueRange, !validNumeralValueRange.contains(value) {
+      let rangeDescribed = String(describing: validNumeralValueRange)
+      switch userDef {
+      case .kKeyboardParser: return "Out of range for KeyboardParser"
+      default: return "Must be any Integer within this closed range: [\(rangeDescribed)]."
+      }
     }
     return nil
   }
 
   private static func validateDoubleRange(userDef: Self, value: Double) -> String? {
-    switch userDef {
-    case .kCandidateListTextSize:
-      if !(12 ... 196).contains(value) { return "Must be 12..196" }
-    default: break
+    // This API is no-op for now but we keep it for possible future purposes.
+    let vNVR = userDef.validNumeralValueRange
+    if let vNVR, !(Double(vNVR.lowerBound) ... Double(vNVR.upperBound)).contains(value) {
+      let rangeDescribed = String(describing: vNVR)
+      switch userDef {
+      default: return "Must be any Double within this closed range: [\(rangeDescribed)]."
+      }
     }
     return nil
   }
@@ -440,7 +443,7 @@ nonisolated extension UserDef {
     case .kShowNotificationsWhenTogglingEisu: return .bool(true)
     case .kShowNotificationsWhenTogglingShift: return .bool(true)
     case .kSpecifiedNotifyUIColorScheme: return .integer(0)
-    case .kCandidateListTextSize: return .double(16)
+    case .kCandidateListTextSize: return .integer(16)
     case .kAlwaysExpandCandidateWindow: return .bool(false)
     case .kCandidateWindowShowOnlyOneLine: return .bool(false)
     case .kEnforceSingleLineCandidateWindowLayout4SCPC: return .bool(true)
@@ -624,19 +627,12 @@ nonisolated extension UserDef {
         userDef: self,
         shortTitle: "i18n:UserDef.kCandidateListTextSize.shortTitle",
         description: "i18n:UserDef.kCandidateListTextSize.description",
-        options: [
-          12: "i18n:UserDef.kCandidateListTextSize.option.12",
-          14: "i18n:UserDef.kCandidateListTextSize.option.14",
-          16: "i18n:UserDef.kCandidateListTextSize.option.16",
-          17: "i18n:UserDef.kCandidateListTextSize.option.17",
-          18: "i18n:UserDef.kCandidateListTextSize.option.18",
-          20: "i18n:UserDef.kCandidateListTextSize.option.20",
-          22: "i18n:UserDef.kCandidateListTextSize.option.22",
-          24: "i18n:UserDef.kCandidateListTextSize.option.24",
-          32: "i18n:UserDef.kCandidateListTextSize.option.32",
-          64: "i18n:UserDef.kCandidateListTextSize.option.64",
-          96: "i18n:UserDef.kCandidateListTextSize.option.96",
-        ]
+        options: {
+          var result = [Int: String]()
+          guard let validNumeralValueRange else { return nil }
+          validNumeralValueRange.forEach { result[$0] = $0.description }
+          return result.isEmpty ? nil : result
+        }()
       )
     case .kAlwaysExpandCandidateWindow: return .init(
         userDef: self,

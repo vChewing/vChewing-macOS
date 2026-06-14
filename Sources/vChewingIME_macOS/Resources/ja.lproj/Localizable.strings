@@ -343,17 +343,6 @@
 "i18n:UserDef.kCandidateKeys.inlinePrompt" = "お好きなる言選り用キー陣列をご指定ください。新しい組み合わせは Enter で効かす。";
 "i18n:UserDef.kCandidateKeys.shortTitle" = "言選り用キー:";
 "i18n:UserDef.kCandidateListTextSize.description" = "入力候補陳列の候補文字の字号をご指定ください。";
-"i18n:UserDef.kCandidateListTextSize.option.12" = "12";
-"i18n:UserDef.kCandidateListTextSize.option.14" = "14";
-"i18n:UserDef.kCandidateListTextSize.option.16" = "16";
-"i18n:UserDef.kCandidateListTextSize.option.17" = "17";
-"i18n:UserDef.kCandidateListTextSize.option.18" = "18";
-"i18n:UserDef.kCandidateListTextSize.option.20" = "20";
-"i18n:UserDef.kCandidateListTextSize.option.22" = "22";
-"i18n:UserDef.kCandidateListTextSize.option.24" = "24";
-"i18n:UserDef.kCandidateListTextSize.option.32" = "32";
-"i18n:UserDef.kCandidateListTextSize.option.64" = "64";
-"i18n:UserDef.kCandidateListTextSize.option.96" = "96";
 "i18n:UserDef.kCandidateListTextSize.shortTitle" = "候補文字の字号:";
 "i18n:UserDef.kCandidateNarrationToggleType.description" = "テキスト読み上げで候補を読み上げるタイミングを設定します。ハイライト済みの候補を耳で確認できます。同じ発音の候補が複数ある場合は、ユーザー関連文節データベースを参照して各漢字の説明を試みます。精度はそのデータベースの品質に依存します。";
 "i18n:UserDef.kCandidateNarrationToggleType.option.0" = "常にオフ";
