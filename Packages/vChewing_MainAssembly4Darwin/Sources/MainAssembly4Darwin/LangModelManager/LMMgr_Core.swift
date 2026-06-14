@@ -545,7 +545,8 @@ extension LMMgr {
       // Coordinator mutable state is accessed on the main actor (satisfying isolation).
       // Disk I/O runs on pomDebounceQueue to avoid blocking MainActor.
       let interval = max(c.pomDebounceInterval, 0)
-      c.pomDebounceQueue.async {
+      c.pomDebounceQueue.async { [weak c] in
+        guard let c else { return }
         let scheduledToken: UInt64 = mainSync {
           c.mergeIntent4PendingSaveAllModes(saveAllModes)
           c.pomDebounceToken &+= 1
