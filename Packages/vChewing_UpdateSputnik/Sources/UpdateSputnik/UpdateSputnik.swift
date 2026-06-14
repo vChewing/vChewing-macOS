@@ -57,7 +57,8 @@ public final class UpdateSputnik {
       url: url, cachePolicy: .reloadIgnoringLocalCacheData, timeoutInterval: 5
     )
 
-    let task = URLSession.shared.dataTask(with: request) { data, _, error in
+    let task = URLSession.shared.dataTask(with: request) { [weak self] data, _, error in
+      guard let this = self else { return }
       if let error = error {
         asyncOnMain { [weak self] in
           guard let this = self else { return }
@@ -71,7 +72,7 @@ public final class UpdateSputnik {
         return
       }
       mainSync {
-        self.data = data
+        this.data = data
       }
     }
     task.resume()
