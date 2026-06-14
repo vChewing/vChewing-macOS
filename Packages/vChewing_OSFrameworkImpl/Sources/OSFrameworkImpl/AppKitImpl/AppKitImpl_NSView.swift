@@ -486,16 +486,20 @@ import SwiftExtension
       guard source.length > 0 else { return source }
       let mutable = NSMutableAttributedString(attributedString: source)
       let fullRange = NSRange(location: 0, length: mutable.length)
-      if #available(macOS 10.14, *) {
-        NSAppearance.current = effectiveAppearance
+      let work = {
+        mutable.enumerateAttributes(in: fullRange, options: []) { attrs, range, _ in
+          if attrs[.font] == nil {
+            mutable.addAttribute(.font, value: font, range: range)
+          }
+          if attrs[.foregroundColor] == nil {
+            mutable.addAttribute(.foregroundColor, value: textColor, range: range)
+          }
+        }
       }
-      mutable.enumerateAttributes(in: fullRange, options: []) { attrs, range, _ in
-        if attrs[.font] == nil {
-          mutable.addAttribute(.font, value: font, range: range)
-        }
-        if attrs[.foregroundColor] == nil {
-          mutable.addAttribute(.foregroundColor, value: textColor, range: range)
-        }
+      if #available(macOS 10.14, *) {
+        effectiveAppearance.performAsCurrentDrawingAppearance(execute: work)
+      } else {
+        work()
       }
       return mutable
     }
