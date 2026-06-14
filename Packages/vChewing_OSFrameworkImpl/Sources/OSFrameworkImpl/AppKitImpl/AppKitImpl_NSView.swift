@@ -510,7 +510,7 @@ import SwiftExtension
     /// Therefore, we have to use NSKeyedArchiver to encode this NSAttributedString
     /// into Plist Data and decode it on the MainActor as a new NSAttributedString
     /// instance to solve this value-assignment issue.
-    nonisolated public func makeNSLabel(fixWidth: CGFloat? = nil) -> NSLabelView {
+    public func makeNSLabel(fixWidth: CGFloat? = nil) -> NSLabelView {
       let archivedData = (try? NSKeyedArchiver.archivedData(
         withRootObject: self,
         requiringSecureCoding: false

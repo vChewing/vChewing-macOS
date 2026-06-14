@@ -305,7 +305,7 @@
 
   // MARK: - Typed 解序列化相容性輔助
 
-  extension NSKeyedUnarchiver {
+  nonisolated extension NSKeyedUnarchiver {
     /// 相容性 wrapper：在 macOS 11+ 優先使用 typed API 取得 [URL: Data]，舊平台則使用備援解序列化流程並做類型轉換。
     static func unarchivedURLDataDictionaryCompat(from data: Data) -> [URL: Data]? {
       // 優先採用 macOS 11 的 typed API

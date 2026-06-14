@@ -22,7 +22,7 @@ import Foundation
   import OSLog
 #endif
 
-extension Process {
+nonisolated extension Process {
   public static func consoleLog<S: StringProtocol>(_ msg: S) {
     let msgStr = msg.description
     #if canImport(Darwin)
@@ -44,7 +44,7 @@ extension Process {
 
 // MARK: - File Handle API Compatibility for macOS 10.15.3 and Earlier.
 
-extension FileHandle {
+nonisolated extension FileHandle {
   public func readData(upToCount count: Int) throws -> Data? {
     #if canImport(Darwin)
       if #available(macOS 10.15.4, *) {
@@ -72,7 +72,7 @@ extension FileHandle {
 
 // MARK: - Real Home Dir for Sandboxed Apps
 
-extension FileManager {
+nonisolated extension FileManager {
   public static let realHomeDir: URL = {
     // Avoid relativeTo: parameter (10.11+) to stay compatible with 10.9.
     #if canImport(Darwin) || canImport(Glibc) || canImport(Musl)
@@ -94,7 +94,7 @@ extension FileManager {
 
 // MARK: - Check whether current date is the given date.
 
-extension Date {
+nonisolated extension Date {
   /// Check whether current date is the given date.
   /// - Parameter dateDigits: `yyyyMMdd`, 8-digit integer. If only `MMdd`, then the year will be the current year.
   /// - Returns: The result. Will return false if the given dateDigits is invalid.
@@ -136,14 +136,14 @@ extension Date {
 
 // MARK: - NSRange Extension
 
-extension NSRange {
+nonisolated extension NSRange {
   public static let zero = NSRange(location: 0, length: 0)
   public static let notFound = NSRange(location: NSNotFound, length: NSNotFound)
 }
 
 // MARK: - CGRect Extension
 
-extension CGRect {
+nonisolated extension CGRect {
   public static let seniorTheBeast: CGRect = {
     var result = CGRect()
     result.origin = .init(x: 0, y: 0)
@@ -159,7 +159,7 @@ extension CGRect {
 
 // MARK: - String.i18n extension
 
-extension StringLiteralType {
+nonisolated extension StringLiteralType {
   public var i18n: String { NSLocalizedString(description, comment: "") }
 }
 
@@ -167,7 +167,7 @@ extension StringLiteralType {
 
 // Extend the RangeReplaceableCollection to allow it clean duplicated characters.
 // Ref: https://stackoverflow.com/questions/25738817/
-extension RangeReplaceableCollection where Element: Hashable {
+nonisolated extension RangeReplaceableCollection where Element: Hashable {
   /// 使用 NSOrderedSet 處理 class 陣列的「去重複化」。
   public var classDeduplicated: Self {
     NSOrderedSet(array: Array(self)).compactMap { $0 as? Element.Type } as? Self ?? self
@@ -179,7 +179,7 @@ extension RangeReplaceableCollection where Element: Hashable {
 
 // MARK: - String Tildes Expansion Extension
 
-extension String {
+nonisolated extension String {
   public var expandingTildeInPath: String {
     (self as NSString).expandingTildeInPath
   }
@@ -193,7 +193,7 @@ extension String {
   extension String: LocalizedError {}
 #endif
 
-extension String {
+nonisolated extension String {
   nonisolated public var errorDescription: String? {
     self
   }
@@ -201,7 +201,7 @@ extension String {
 
 // MARK: - CharCode printability check for UniChar (CoreFoundation)
 
-extension UInt16 {
+nonisolated extension UInt16 {
   public var isPrintableUniChar: Bool {
     Unicode.Scalar(UInt32(self)) != nil
   }
@@ -213,18 +213,18 @@ extension UInt16 {
 
 // MARK: - User Defaults Storage
 
-extension UserDefaults {
-  public static var pendingUnitTests: Bool {
+nonisolated extension UserDefaults {
+  nonisolated public static var pendingUnitTests: Bool {
     get { _pendingUnitTests.value }
     set { _pendingUnitTests.value = newValue }
   }
 
-  public static var unitTests: UserDefaults? {
+  nonisolated public static var unitTests: UserDefaults? {
     get { _unitTests.value }
     set { _unitTests.value = newValue }
   }
 
-  public static var current: UserDefaults {
+  nonisolated public static var current: UserDefaults {
     pendingUnitTests ? (unitTests ?? .standard) : .standard
   }
 
@@ -271,7 +271,7 @@ public struct AppProperty<Value: Sendable>: Sendable {
 // MARK: - String RegReplace Extension
 
 // Ref: https://stackoverflow.com/a/40993403/4162914 && https://stackoverflow.com/a/71291137/4162914
-extension String {
+nonisolated extension String {
   nonisolated public mutating func regReplace(pattern: String, replaceWith: String = "") {
     do {
       let regex = try Self.cachedRegex(for: pattern)
@@ -305,7 +305,7 @@ extension String {
 
 // MARK: - Localized String Extension for Integers and Floats
 
-extension BinaryFloatingPoint {
+nonisolated extension BinaryFloatingPoint {
   public func i18n(loc: String) -> String {
     let formatter = NumberFormatter()
     formatter.locale = Locale(identifier: loc)
@@ -314,7 +314,7 @@ extension BinaryFloatingPoint {
   }
 }
 
-extension BinaryInteger {
+nonisolated extension BinaryInteger {
   public func i18n(loc: String) -> String {
     let formatter = NumberFormatter()
     formatter.locale = Locale(identifier: loc)
@@ -325,7 +325,7 @@ extension BinaryInteger {
 
 // MARK: - Version Comparer.
 
-extension String {
+nonisolated extension String {
   /// ref: https://sarunw.com/posts/how-to-compare-two-app-version-strings-in-swift/
   public func versionCompare(_ otherVersion: String) -> ComparisonResult {
     let versionDelimiter = "."
@@ -351,12 +351,12 @@ extension String {
 
 // MARK: - Async Task
 
-public func asyncOnMain(
+nonisolated public func asyncOnMain(
   bypassAsync: Bool = false,
   execute work: @MainActor @escaping @Sendable @convention(block) () -> ()
 ) {
   guard !bypassAsync else {
-    work()
+    MainActor.assumeIsolated { work() }
     return
   }
   if #available(macOS 12, *) {
@@ -368,13 +368,13 @@ public func asyncOnMain(
   }
 }
 
-public func asyncOnMain(
+nonisolated public func asyncOnMain(
   after delayInterval: TimeInterval,
   bypassAsync: Bool = false,
   execute work: @MainActor @escaping @Sendable @convention(block) () -> ()
 ) {
   guard !bypassAsync else {
-    work()
+    MainActor.assumeIsolated { work() }
     return
   }
   let delayInterval = Swift.max(0, delayInterval)
@@ -382,7 +382,7 @@ public func asyncOnMain(
     Task { @MainActor in
       if delayInterval > 0 {
         let delay = UInt64(delayInterval * 1_000_000_000)
-        try await Task<Never, Never>.sleep(nanoseconds: delay)
+        try? await Task<Never, Never>.sleep(nanoseconds: delay)
       }
       work()
     }
@@ -394,16 +394,20 @@ public func asyncOnMain(
 }
 
 @discardableResult
-public func mainSync<T>(execute work: @MainActor () throws -> T) rethrows -> T {
+nonisolated public func mainSync<T>(execute work: @MainActor () throws -> T) rethrows -> T {
   if Thread.isMainThread {
-    return try work()
+    // safe: we are on the main thread, which is the MainActor executor
+    return try withoutActuallyEscaping(work) { fn in
+      typealias Erased = () throws -> T
+      return try (unsafeBitCast(fn, to: Erased.self))()
+    }
   }
   return try DispatchQueue.main.sync(execute: work)
 }
 
 // MARK: - Total RAM Size.
 
-extension Process {
+nonisolated extension Process {
   public static let totalMemoryGiB: Int = {
     let rawBytes = Double(ProcessInfo.processInfo.physicalMemory)
     return Int((rawBytes / pow(1_024.0, 3)).rounded(.down))

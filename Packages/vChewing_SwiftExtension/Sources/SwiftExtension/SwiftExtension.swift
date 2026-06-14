@@ -24,7 +24,7 @@ public func ^= (lhs: inout Bool, rhs: Bool) {
 
 // Extend the RangeReplaceableCollection to allow it clean duplicated characters.
 // Ref: https://stackoverflow.com/questions/25738817/
-extension RangeReplaceableCollection where Element: Hashable {
+nonisolated extension RangeReplaceableCollection where Element: Hashable {
   /// 去重複化。
   /// - Remark: 該方法不適合用來處理 class，除非該 class 遵循 Identifiable 協定。
   public var deduplicated: Self {
@@ -42,7 +42,7 @@ public enum UILayoutOrientation: Int, Codable, Hashable, Sendable {
 
 // MARK: - Ensuring trailing slash of a string
 
-extension String {
+nonisolated extension String {
   public mutating func ensureTrailingSlash() {
     if !hasSuffix("/") {
       self += "/"
@@ -52,7 +52,7 @@ extension String {
 
 // MARK: - CharCode printability check
 
-extension Unicode.Scalar {
+nonisolated extension Unicode.Scalar {
   public var isPrintableASCII: Bool {
     (32 ... 126).contains(value)
   }
@@ -61,7 +61,7 @@ extension Unicode.Scalar {
 // MARK: - Stable Sort Extension
 
 // Ref: https://stackoverflow.com/a/50545761/4162914
-extension Sequence {
+nonisolated extension Sequence {
   /// Return a stable-sorted collection.
   ///
   /// - Parameter areInIncreasingOrder: Return nil when two element are equal.
@@ -81,7 +81,7 @@ extension Sequence {
 
 // MARK: - Return toggled value.
 
-extension Bool {
+nonisolated extension Bool {
   public mutating func toggled() -> Bool {
     toggle()
     return self
@@ -95,14 +95,14 @@ extension Bool {
 // MARK: - 引入小數點位數控制函式
 
 // Ref: https://stackoverflow.com/a/32581409/4162914
-extension Double {
+nonisolated extension Double {
   public func rounded(toPlaces places: Int) -> Double {
     let divisor = 10.0.mathPowered(by: places)
     return (self * divisor).rounded() / divisor
   }
 }
 
-extension Double {
+nonisolated extension Double {
   public func mathPowered(by operand: Int) -> Double {
     var target = self
     for _ in 0 ..< operand {
@@ -114,7 +114,7 @@ extension Double {
 
 // MARK: - String CharName and CodePoint Extension
 
-extension String {
+nonisolated extension String {
   public var charDescriptions: [String] {
     flatMap(\.unicodeScalars).compactMap {
       let theName: String = $0.properties.name ?? ""
@@ -135,7 +135,7 @@ extension String {
 
 // MARK: - Character Codepoint
 
-extension Character {
+nonisolated extension Character {
   public var codePoint: String {
     guard let value = unicodeScalars.first?.value else { return "U+NULL" }
     return String(format: "U+%02X", value)
@@ -144,7 +144,7 @@ extension Character {
 
 // MARK: - String Ellipsis Extension
 
-extension String {
+nonisolated extension String {
   public var withEllipsis: String { self + "…" }
 }
 
@@ -152,7 +152,7 @@ extension String {
 
 // Further discussion: https://forums.swift.org/t/62847
 
-extension Array {
+nonisolated extension Array {
   public func revolvedIndex(_ id: Int, clockwise: Bool = true, steps: Int = 1) -> Int {
     if id < 0 || steps < 1 { return id }
     var result = id
@@ -168,7 +168,7 @@ extension Array {
   }
 }
 
-extension Int {
+nonisolated extension Int {
   public mutating func revolveAsIndex(with target: [Any], clockwise: Bool = true, steps: Int = 1) {
     if self < 0 || steps < 1 { return }
     self = target.revolvedIndex(self, clockwise: clockwise, steps: steps)
@@ -177,7 +177,7 @@ extension Int {
 
 // MARK: - Overlap Checker (for two sets)
 
-extension Set where Element: Hashable {
+nonisolated extension Set where Element: Hashable {
   public func isOverlapped(with target: Set<Element>) -> Bool {
     guard !target.isEmpty, !isEmpty else { return false }
     var container: (Set<Element>, Set<Element>)
@@ -197,7 +197,7 @@ extension Set where Element: Hashable {
   }
 }
 
-extension Array where Element: Hashable {
+nonisolated extension Array where Element: Hashable {
   public func isOverlapped(with target: [Element]) -> Bool {
     Set(self).isOverlapped(with: Set(target))
   }
@@ -242,7 +242,7 @@ public enum ArrayBuilder<OutputModel> {
 
 // MARK: - Extending Comparable to let it able to find its neighbor values in any collection.
 
-extension Comparable {
+nonisolated extension Comparable {
   public func findNeighborValue(
     from givenSeq: any Collection<Self>,
     greater isGreater: Bool
@@ -271,7 +271,7 @@ extension Comparable {
 
 // MARK: - String.applyingTransform
 
-extension String {
+nonisolated extension String {
   /// This only works with ASCII chars for now.
   public func applyingTransformFW2HW(reverse: Bool) -> String {
     var arr: [Character] = map { $0 }

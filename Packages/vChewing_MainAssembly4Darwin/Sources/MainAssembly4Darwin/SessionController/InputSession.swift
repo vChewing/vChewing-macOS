@@ -61,7 +61,7 @@ public final class InputSession: @MainActor SessionProtocol, Sendable {
 
   public var clientObjectIdentifier: ObjectIdentifier?
 
-  public var buzzer: (() -> ())? = IMEApp.buzz
+  public var buzzer: (() -> ())? = { mainSync { IMEApp.buzz() } }
 
   public var synchronizer4LMPrefs: (() -> ())? = { LMMgr.syncLMPrefs() }
 
