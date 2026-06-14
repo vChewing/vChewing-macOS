@@ -271,15 +271,17 @@ public struct VwrSettingsPaneServices: View {
         item, _ in
         guard let droppedURL = Self.parseFileURL(from: item) else { return }
         guard let string = try? String(contentsOf: droppedURL) else { return }
-        let importedServices = string.components(separatedBy: .newlines)
-          .parseIntoCandidateTextServiceStack()
-        guard !importedServices.isEmpty else { return }
-        DispatchQueue.main.async {
-          var current = PrefMgr.shared.candidateServiceMenuContents
+        mainSync {
+          let importedServices = string.components(separatedBy: .newlines)
             .parseIntoCandidateTextServiceStack()
-          current.append(contentsOf: importedServices)
-          PrefMgr.shared.candidateServiceMenuContents = current.rawRepresentation
-          reloadList()
+          guard !importedServices.isEmpty else { return }
+          asyncOnMain {
+            var current = PrefMgr.shared.candidateServiceMenuContents
+              .parseIntoCandidateTextServiceStack()
+            current.append(contentsOf: importedServices)
+            PrefMgr.shared.candidateServiceMenuContents = current.rawRepresentation
+            reloadList()
+          }
         }
       }
     }
