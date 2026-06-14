@@ -214,17 +214,17 @@ extension UInt16 {
 // MARK: - User Defaults Storage
 
 extension UserDefaults {
-  public static var pendingUnitTests: Bool {
+  nonisolated public static var pendingUnitTests: Bool {
     get { _pendingUnitTests.value }
     set { _pendingUnitTests.value = newValue }
   }
 
-  public static var unitTests: UserDefaults? {
+  nonisolated public static var unitTests: UserDefaults? {
     get { _unitTests.value }
     set { _unitTests.value = newValue }
   }
 
-  public static var current: UserDefaults {
+  nonisolated public static var current: UserDefaults {
     pendingUnitTests ? (unitTests ?? .standard) : .standard
   }
 
@@ -382,7 +382,7 @@ public func asyncOnMain(
     Task { @MainActor in
       if delayInterval > 0 {
         let delay = UInt64(delayInterval * 1_000_000_000)
-        try await Task<Never, Never>.sleep(nanoseconds: delay)
+        try? await Task<Never, Never>.sleep(nanoseconds: delay)
       }
       work()
     }
