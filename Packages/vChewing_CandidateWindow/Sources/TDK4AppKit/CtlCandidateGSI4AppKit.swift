@@ -329,7 +329,7 @@ extension GSI4AppKit {
     private var observation: NSKeyValueObservation?
 
     private let visualEffectView: NSView? = {
-      if #available(macOS 26, *), NSApplication.uxLevel == .liquidGlass {
+      if #available(macOS 27, *), NSApplication.uxLevel == .liquidGlass {
         #if compiler(>=6.2) && canImport(AppKit, _version: 26.0)
           let resultView = NSGlassEffectView()
           return resultView
@@ -427,7 +427,7 @@ extension GSI4AppKit {
     // MARK: - Visual Effect View
 
     private func updateEffectView() {
-      if #available(macOS 26, *), NSApplication.uxLevel == .liquidGlass {
+      if #available(macOS 27, *), NSApplication.uxLevel == .liquidGlass {
         #if compiler(>=6.2) && canImport(AppKit, _version: 26.0)
           guard let resultView = visualEffectView as? NSGlassEffectView else { return }
           resultView.cornerRadius = Self.thePool.windowRadius

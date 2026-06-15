@@ -272,7 +272,7 @@ extension TDK4AppKit {
     private var observation: NSKeyValueObservation?
     // 創建背景視覺效果視圖
     private let visualEffectView: NSView? = {
-      if #available(macOS 26, *), NSApplication.uxLevel == .liquidGlass {
+      if #available(macOS 27, *), NSApplication.uxLevel == .liquidGlass {
         #if compiler(>=6.2) && canImport(AppKit, _version: 26.0)
           let resultView = NSGlassEffectView()
           return resultView
@@ -339,7 +339,7 @@ extension TDK4AppKit {
     }
 
     private func updateEffectView() {
-      if #available(macOS 26, *), NSApplication.uxLevel == .liquidGlass {
+      if #available(macOS 27, *), NSApplication.uxLevel == .liquidGlass {
         #if compiler(>=6.2) && canImport(AppKit, _version: 26.0)
           guard let resultView = visualEffectView as? NSGlassEffectView else { return }
           resultView.cornerRadius = Self.thePool.windowRadius
