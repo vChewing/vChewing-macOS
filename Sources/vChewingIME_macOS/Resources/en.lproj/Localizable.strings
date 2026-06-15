@@ -421,6 +421,8 @@
 "i18n:UserDef.kPhraseEditorAutoReloadExternalModifications.shortTitle" = "This editor only: Auto-reload modifications happened outside of this editor";
 "i18n:UserDef.kPhraseReplacementEnabled.description" = "This will batch-replace specified candidates.";
 "i18n:UserDef.kPhraseReplacementEnabled.shortTitle" = "Enable phrase replacement table";
+"i18n:UserDef.kPopupCompositionBufferTextSize.description" = "Adjust the font size of the popup composition buffer.";
+"i18n:UserDef.kPopupCompositionBufferTextSize.shortTitle" = "Popup Composition Buffer Font Size:";
 "i18n:UserDef.kReadingNarrationCoverage.description" = "This reads your typed phonabets aloud. Only works with non-cassette Mode.";
 "i18n:UserDef.kReadingNarrationCoverage.option.0" = "Do not narrate";
 "i18n:UserDef.kReadingNarrationCoverage.option.1" = "Only when combined by intonation";

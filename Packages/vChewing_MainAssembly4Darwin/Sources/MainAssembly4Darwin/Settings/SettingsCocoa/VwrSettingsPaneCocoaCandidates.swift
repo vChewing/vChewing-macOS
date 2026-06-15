@@ -137,6 +137,12 @@ extension SettingsPanesCocoa {
                 prefUITab: .tabCandidates
               )
             }?.boxed()
+            NSStackView.buildSection(width: innerContentWidth) {
+              UserDef.kPopupCompositionBufferTextSize.renderCocoa(
+                fixWidth: innerContentWidth,
+                prefUITab: .tabCandidates
+              )
+            }?.boxed()
             NSView()
           }
           NSTabView.TabPage(title: "Ｄ") {

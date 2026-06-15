@@ -341,6 +341,16 @@ public final class PrefMgr: PrefMgrProtocol, Sendable {
     }
   }
 
+  @AppProperty(userDef: .kPopupCompositionBufferTextSize)
+  public var popupCompositionBufferTextSize: Int {
+    didSet {
+      // 必須確立條件，否則就會是無限迴圈。
+      if !(18 ... 40).contains(popupCompositionBufferTextSize) {
+        popupCompositionBufferTextSize = max(18, min(popupCompositionBufferTextSize, 40))
+      }
+    }
+  }
+
   @AppProperty(userDef: .kReadingNarrationCoverage)
   public var readingNarrationCoverage: Int {
     didSet { didAskForRefreshingSpeechSputnik?() }

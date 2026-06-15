@@ -66,6 +66,10 @@ public struct VwrSettingsPaneCandidates: View {
         UserDef.kCandidateNarrationToggleType.renderUI()
       }
 
+      Section {
+        UserDef.kPopupCompositionBufferTextSize.renderUI()
+      }
+
       // MARK: (header: Text("Experimental:"))
 
       let imkEOSNoticeButton = Button("i18n:Menu.WhereIsIMKCandidateWindow") {

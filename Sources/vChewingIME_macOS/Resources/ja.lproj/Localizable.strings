@@ -421,6 +421,8 @@
 "i18n:UserDef.kPhraseEditorAutoReloadExternalModifications.shortTitle" = "このエディターの外部からの編集結果をこのエディターに自動的に読み込む";
 "i18n:UserDef.kPhraseReplacementEnabled.description" = "指定された候補そのものを置き換える";
 "i18n:UserDef.kPhraseReplacementEnabled.shortTitle" = "言葉置換表を起用";
+"i18n:UserDef.kPopupCompositionBufferTextSize.description" = "吹き出し入力緩衝列のフォントサイズを指定します。";
+"i18n:UserDef.kPopupCompositionBufferTextSize.shortTitle" = "吹き出し入力緩衝列の字号:";
 "i18n:UserDef.kReadingNarrationCoverage.description" = "音読組立緩衝列の内容の変化を朗読。該功能對磁帶模式無效。";
 "i18n:UserDef.kReadingNarrationCoverage.option.0" = "朗読せずに";
 "i18n:UserDef.kReadingNarrationCoverage.option.1" = "音調キーで確認するときに";

@@ -30,6 +30,7 @@ public protocol PrefMgrProtocol {
   var showNotificationsWhenTogglingShift: Bool { get set }
   var specifiedNotifyUIColorScheme: Int { get set }
   var candidateListTextSize: Int { get set }
+  var popupCompositionBufferTextSize: Int { get set }
   var alwaysExpandCandidateWindow: Bool { get set }
   var candidateWindowShowOnlyOneLine: Bool { get set }
   var enforceSingleLineCandidateWindowLayout4SCPC: Bool { get set }

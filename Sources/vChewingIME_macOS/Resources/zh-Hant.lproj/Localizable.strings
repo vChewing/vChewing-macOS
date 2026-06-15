@@ -421,6 +421,8 @@
 "i18n:UserDef.kPhraseEditorAutoReloadExternalModifications.shortTitle" = "僅限該編輯器：自動讀入來自該編輯器外部的檔案內容修改";
 "i18n:UserDef.kPhraseReplacementEnabled.description" = "這將會對指定的候選字詞進行整詞取代。";
 "i18n:UserDef.kPhraseReplacementEnabled.shortTitle" = "啟用語彙置換表";
+"i18n:UserDef.kPopupCompositionBufferTextSize.description" = "調整浮動組字窗的字型大小。";
+"i18n:UserDef.kPopupCompositionBufferTextSize.shortTitle" = "浮動組字窗字號:";
 "i18n:UserDef.kReadingNarrationCoverage.description" = "這會將您的組音區的內容唸出來。該功能對磁帶模式無效。";
 "i18n:UserDef.kReadingNarrationCoverage.option.0" = "不唸讀";
 "i18n:UserDef.kReadingNarrationCoverage.option.1" = "僅在用聲調鍵確認時";

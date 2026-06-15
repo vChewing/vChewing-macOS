@@ -639,7 +639,9 @@ private class PopupCompositionView: NSView {
   private func prepareAttributedString(from state: IMEStateProtocol) -> NSAttributedString {
     let attrString = NSMutableAttributedString(string: state.displayedTextConverted)
 
-    let baseFont = bufferFont()
+    let baseFont = bufferFont(
+      size: CGFloat(PrefMgr.sharedSansDidSetOps.popupCompositionBufferTextSize)
+    )
     let paragraphStyle: NSParagraphStyle = {
       let style = NSMutableParagraphStyle()
       style.lineBreakMode = .byClipping

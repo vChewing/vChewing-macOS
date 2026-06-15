@@ -36,6 +36,7 @@ nonisolated public enum UserDef: String, CaseIterable, Identifiable, Sendable {
   case kShowNotificationsWhenTogglingShift = "ShowNotificationsWhenTogglingShift"
   case kSpecifiedNotifyUIColorScheme = "OverrideNotifyUIColorScheme"
   case kCandidateListTextSize = "CandidateListTextSize"
+  case kPopupCompositionBufferTextSize = "PopupCompositionBufferTextSize"
   case kAlwaysExpandCandidateWindow = "AlwaysExpandCandidateWindow"
   case kCandidateWindowShowOnlyOneLine = "CandidateWindowShowOnlyOneLine"
   case kEnforceSingleLineCandidateWindowLayout4SCPC = "EnforceSingleLineCandidateWindowLayout4SCPC"
@@ -376,6 +377,7 @@ nonisolated extension UserDef {
     case .kNumPadCharInputBehavior: 0 ... 2
     case .kSpaceKeyBehaviorAgainstICB: 0 ... 2
     case .kCandidateListTextSize: 12 ... 196
+    case .kPopupCompositionBufferTextSize: 18 ... 40
     default: nil
     }
   }
@@ -444,6 +446,7 @@ nonisolated extension UserDef {
     case .kShowNotificationsWhenTogglingShift: return .bool(true)
     case .kSpecifiedNotifyUIColorScheme: return .integer(0)
     case .kCandidateListTextSize: return .integer(16)
+    case .kPopupCompositionBufferTextSize: return .integer(18)
     case .kAlwaysExpandCandidateWindow: return .bool(false)
     case .kCandidateWindowShowOnlyOneLine: return .bool(false)
     case .kEnforceSingleLineCandidateWindowLayout4SCPC: return .bool(true)
@@ -627,6 +630,17 @@ nonisolated extension UserDef {
         userDef: self,
         shortTitle: "i18n:UserDef.kCandidateListTextSize.shortTitle",
         description: "i18n:UserDef.kCandidateListTextSize.description",
+        options: {
+          var result = [Int: String]()
+          guard let validNumeralValueRange else { return nil }
+          validNumeralValueRange.forEach { result[$0] = $0.description }
+          return result.isEmpty ? nil : result
+        }()
+      )
+    case .kPopupCompositionBufferTextSize: return .init(
+        userDef: self,
+        shortTitle: "i18n:UserDef.kPopupCompositionBufferTextSize.shortTitle",
+        description: "i18n:UserDef.kPopupCompositionBufferTextSize.description",
         options: {
           var result = [Int: String]()
           guard let validNumeralValueRange else { return nil }
