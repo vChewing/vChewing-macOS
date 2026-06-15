@@ -241,14 +241,14 @@ public final class UpdateSputnik {
 
 extension NSApplication {
   fileprivate func popup() {
-    #if compiler(>=5.9) && canImport(AppKit, _version: 14.0)
-      if #available(macOS 14.0, *) {
-        NSApp.activate()
-      } else {
-        NSApp.activate(ignoringOtherApps: true)
-      }
-    #else
-      NSApp.activate(ignoringOtherApps: true)
-    #endif
+    // 此處使用與 macOS 13 SDK 相容的方法來呼叫 macOS 14+ 的 API。
+    let sel = NSSelectorFromString("activate")
+    if let method = class_getInstanceMethod(Self.self, sel) {
+      typealias Fn = @convention(c) (AnyObject, Selector) -> ()
+      let imp = method_getImplementation(method)
+      unsafeBitCast(imp, to: Fn.self)(self, sel)
+    } else {
+      activate(ignoringOtherApps: true)
+    }
   }
 }
