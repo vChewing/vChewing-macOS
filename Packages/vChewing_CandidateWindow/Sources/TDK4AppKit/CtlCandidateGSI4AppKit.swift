@@ -329,11 +329,10 @@ extension GSI4AppKit {
     private var observation: NSKeyValueObservation?
 
     private let visualEffectView: NSView? = {
-      if #available(macOS 27, *), NSApplication.uxLevel == .liquidGlass {
-        #if compiler(>=6.2) && canImport(AppKit, _version: 26.0)
-          let resultView = NSGlassEffectView()
-          return resultView
-        #endif
+      if NSApplication.uxLevel == .liquidGlass,
+         let glassClass = NSClassFromString("NSGlassEffectView") as? NSView.Type {
+        let resultView = glassClass.init()
+        return resultView
       }
       if #available(macOS 10.10, *), NSApplication.uxLevel != .none {
         let resultView = NSVisualEffectView()
@@ -427,17 +426,18 @@ extension GSI4AppKit {
     // MARK: - Visual Effect View
 
     private func updateEffectView() {
-      if #available(macOS 27, *), NSApplication.uxLevel == .liquidGlass {
-        #if compiler(>=6.2) && canImport(AppKit, _version: 26.0)
-          guard let resultView = visualEffectView as? NSGlassEffectView else { return }
-          resultView.cornerRadius = Self.thePool.windowRadius
-          resultView.style = .clear
-          let bgTintColor: NSColor = !NSApplication.isDarkMode ? .white : .black
-          resultView.wantsLayer = true
-          resultView.layer?.cornerRadius = Self.thePool.windowRadius
-          resultView.layer?.masksToBounds = true
-          resultView.layer?.backgroundColor = bgTintColor.withAlphaComponent(0.1).cgColor
-        #endif
+      if NSApplication.uxLevel == .liquidGlass,
+         NSClassFromString("NSGlassEffectView") != nil,
+         let resultView = visualEffectView {
+        resultView.setValue(Self.thePool.windowRadius, forKey: "cornerRadius")
+        // macOS 27 的玻璃無需額外的底層 tint，因為文字顏色不再隨底部的內容而變化。
+        // resultView.setValue(0, forKey: "style")  // .clear
+        // let bgTintColor: NSColor = !NSApplication.isDarkMode ? .white : .black
+        // resultView.wantsLayer = true
+        // resultView.layer?.cornerRadius = Self.thePool.windowRadius
+        // resultView.layer?.masksToBounds = true
+        // resultView.layer?.backgroundColor = bgTintColor.withAlphaComponent(0.1).cgColor
+        return
       }
       if #available(macOS 10.10, *), NSApplication.uxLevel != .none {
         guard let resultView = visualEffectView as? NSVisualEffectView else { return }

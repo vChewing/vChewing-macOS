@@ -34,18 +34,18 @@ public final class PopupCompositionBuffer: NSWindowController, PCBProtocol {
     }
 
     self.visualEffectView = {
-      if #available(macOS 27, *), NSApplication.uxLevel == .liquidGlass {
-        #if compiler(>=6.2) && canImport(AppKit, _version: 26.0)
-          let resultView = NSGlassEffectView()
-          resultView.cornerRadius = 9
-          resultView.style = .clear
-          let bgTintColor: NSColor = !NSApplication.isDarkMode ? .white : .black
-          resultView.wantsLayer = true
-          resultView.layer?.cornerRadius = 9
-          resultView.layer?.masksToBounds = true
-          resultView.layer?.backgroundColor = bgTintColor.withAlphaComponent(0.1).cgColor
-          return resultView
-        #endif
+      if NSApplication.uxLevel == .liquidGlass,
+         let glassClass = NSClassFromString("NSGlassEffectView") as? NSView.Type {
+        let resultView = glassClass.init()
+        resultView.setValue(9.0, forKey: "cornerRadius")
+        // macOS 27 的玻璃無需額外的底層 tint，因為文字顏色不再隨底部的內容而變化。
+        // resultView.setValue(0, forKey: "style")  // .clear
+        // let bgTintColor: NSColor = !NSApplication.isDarkMode ? .white : .black
+        // resultView.wantsLayer = true
+        // resultView.layer?.cornerRadius = Self.thePool.windowRadius
+        // resultView.layer?.masksToBounds = true
+        // resultView.layer?.backgroundColor = bgTintColor.withAlphaComponent(0.1).cgColor
+        return resultView
       }
       if #available(macOS 10.13, *), NSApplication.uxLevel != .none {
         let resultView = NSVisualEffectView()
