@@ -359,12 +359,12 @@ nonisolated public func asyncOnMain(
     MainActor.assumeIsolated { work() }
     return
   }
-  if #available(macOS 12, *) {
+  if #unavailable(macOS 12) {
+    DispatchQueue.main.async { work() }
+  } else {
     Task { @MainActor in
       work()
     }
-  } else {
-    DispatchQueue.main.async { work() }
   }
 }
 
@@ -378,16 +378,16 @@ nonisolated public func asyncOnMain(
     return
   }
   let delayInterval = Swift.max(0, delayInterval)
-  if #available(macOS 12, *) {
+  if #unavailable(macOS 12) {
+    DispatchQueue.main.asyncAfter(deadline: DispatchTime.now() + delayInterval) {
+      work()
+    }
+  } else {
     Task { @MainActor in
       if delayInterval > 0 {
         let delay = UInt64(delayInterval * 1_000_000_000)
         try? await Task<Never, Never>.sleep(nanoseconds: delay)
       }
-      work()
-    }
-  } else {
-    DispatchQueue.main.asyncAfter(deadline: DispatchTime.now() + delayInterval) {
       work()
     }
   }

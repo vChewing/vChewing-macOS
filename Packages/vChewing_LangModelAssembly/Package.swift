@@ -3,6 +3,9 @@ import PackageDescription
 
 let package = Package(
   name: "LangModelAssembly",
+  platforms: [
+    .macOS(.v12),
+  ],
   products: [
     .library(
       name: "LangModelAssembly",

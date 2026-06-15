@@ -3,6 +3,9 @@ import PackageDescription
 
 let package = Package(
   name: "LineReader",
+  platforms: [
+    .macOS(.v12),
+  ],
   products: [
     .library(
       name: "LineReader",

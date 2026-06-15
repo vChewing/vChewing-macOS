@@ -4,7 +4,7 @@ import PackageDescription
 let package = Package(
   name: "PopupCompositionBuffer",
   platforms: [
-    .macOS(.v11),
+    .macOS(.v12),
   ],
   products: [
     .library(
