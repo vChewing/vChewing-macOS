@@ -86,6 +86,32 @@ extension LMAssembly.LMInstantiator {
     factoryTrie = nil
   }
 
+  /// 驗證外部 TextMap 工廠辭典檔案的 schema 正確性。
+  /// 僅解析並校驗，不修改全域 factoryTrie 狀態。
+  /// - Parameter path: TextMap 檔案路徑
+  /// - Returns: (isValid: Bool, errorDescription: String?)
+  public static func validateFactoryTextMapFile(at path: String) -> (isValid: Bool, errorDescription: String?) {
+    let url = URL(fileURLWithPath: path)
+    let data: Data
+    do {
+      data = try Data(contentsOf: url, options: [.mappedIfSafe])
+    } catch {
+      return (false, "Cannot read file: \(error.localizedDescription)")
+    }
+    guard let content = String(data: data, encoding: .utf8), !content.isEmpty else {
+      return (false, "File is empty or not valid UTF-8.")
+    }
+    guard !content.contains("#PRAGMA:VANGUARD_REVLOOKUP_TSV") else {
+      return (false, "External revlookup fixtures are no longer supported.")
+    }
+    do {
+      _ = try VanguardTrie.TextMapTrie(data: data)
+      return (true, nil)
+    } catch {
+      return (false, "TextMap schema validation failed: \(error.localizedDescription)")
+    }
+  }
+
   @discardableResult
   public static func connectToTestFactoryDictionary(
     textMapData: String
