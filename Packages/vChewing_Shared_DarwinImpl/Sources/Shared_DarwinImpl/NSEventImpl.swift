@@ -141,9 +141,6 @@ extension NSEvent {
   public var isControlHold: Bool { keyModifierFlagsNS.contains(.control) }
   public var beganWithLetter: Bool { text.first?.isLetter ?? false }
   public var isOptionHold: Bool { keyModifierFlagsNS.contains(.option) }
-  public var isOptionHotKey: Bool {
-    keyModifierFlagsNS.contains(.option) && text.first?.isLetter ?? false
-  }
 
   public var isCapsLockOn: Bool {
     modifierFlags.intersection(.deviceIndependentFlagsMask).contains(.capsLock)

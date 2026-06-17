@@ -31,7 +31,6 @@ public protocol InputSignalProtocol {
   var isControlHold: Bool { get }
   var beganWithLetter: Bool { get }
   var isOptionHold: Bool { get }
-  var isOptionHotKey: Bool { get }
   var isCapsLockOn: Bool { get }
   var isFunctionKeyHold: Bool { get }
   var isNonLaptopFunctionKey: Bool { get }
@@ -61,5 +60,9 @@ public protocol InputSignalProtocol {
 extension InputSignalProtocol {
   public var commonKeyModifierFlags: KBEvent.ModifierFlags {
     keyModifierFlags.subtracting([.function, .numericPad, .help])
+  }
+
+  public func isHotKeyOfAnyFlag(_ flags: KBEvent.ModifierFlags) -> Bool {
+    !keyModifierFlags.isDisjoint(with: flags) && text.first?.isLetter ?? false
   }
 }

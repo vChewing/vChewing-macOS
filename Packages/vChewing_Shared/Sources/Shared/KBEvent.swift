@@ -208,9 +208,6 @@ extension KBEvent {
   public var isControlHold: Bool { keyModifierFlags.contains(.control) }
   public var beganWithLetter: Bool { text.first?.isLetter ?? false }
   public var isOptionHold: Bool { keyModifierFlags.contains(.option) }
-  public var isOptionHotKey: Bool {
-    keyModifierFlags.contains(.option) && text.first?.isLetter ?? false
-  }
 
   public var isCapsLockOn: Bool {
     modifierFlags.intersection(.deviceIndependentFlagsMask).contains(.capsLock)

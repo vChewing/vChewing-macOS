@@ -139,8 +139,8 @@ extension InputHandlerProtocol {
       guard !(input.isInvalid && state.type == .ofEmpty) else { return false }
 
       // 如果當前組字器為空的話，就不再攔截某些修飾鍵，畢竟這些鍵可能會會用來觸發某些功能。
-      let isFunctional: Bool = (input.isControlHold && input.beganWithLetter)
-        || (input.isCommandHold || input.isOptionHotKey || input.isNonLaptopFunctionKey)
+      let isFunctional = input.isCommandHold || input.isNonLaptopFunctionKey
+        || input.isHotKeyOfAnyFlag([.control, .option])
       if !state.hasComposition, isFunctional { return false }
 
       // 若 Caps Lock 被啟用的話，則暫停對注音輸入的處理。
