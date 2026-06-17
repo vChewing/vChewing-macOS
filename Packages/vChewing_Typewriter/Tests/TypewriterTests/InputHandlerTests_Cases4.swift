@@ -860,7 +860,10 @@ extension InputHandlerTests {
     ).asEvent
 
     if s.needsDynamicLexiconInjection {
-      let dynamicKeys = testHandler.punctuationQueryStrings(input: event)
+      guard let dynamicKeys = testHandler.punctuationQueryStrings(input: event) else {
+        Issue.record("punctuationQueryStrings returned nil unexpectedly for \(s.id)")
+        return
+      }
       #expect(!dynamicKeys.isEmpty)
       let target = "〔Alt等號標點測試〕"
       let customGrams: [Homa.Gram] = dynamicKeys.map {
@@ -904,7 +907,10 @@ extension InputHandlerTests {
     }
     let target = "〔等號標點測試〕"
     let plainEqual = KBEvent.KeyEventData(chars: "=", keyCode: 24).asEvent
-    let dynamicKeys = testHandler.punctuationQueryStrings(input: plainEqual)
+    guard let dynamicKeys = testHandler.punctuationQueryStrings(input: plainEqual) else {
+      Issue.record("punctuationQueryStrings returned nil unexpectedly for plain equal key")
+      return
+    }
     #expect(!dynamicKeys.isEmpty)
     let customGrams: [Homa.Gram] = dynamicKeys.map {
       .init(keyArray: [$0], value: target, score: 999)
@@ -971,7 +977,10 @@ extension InputHandlerTests {
       _ = injectTemporaryGrams(testHandler, "ㄈㄤ 芳 -1")
     } else if let target = s.target, let keyCode = s.keyCode, let chars = s.chars {
       let event = KBEvent.KeyEventData(chars: chars, keyCode: keyCode).asEvent
-      let dynamicKeys = testHandler.punctuationQueryStrings(input: event)
+      guard let dynamicKeys = testHandler.punctuationQueryStrings(input: event) else {
+        Issue.record("punctuationQueryStrings returned nil unexpectedly for \(s.id)")
+        return
+      }
       #expect(!dynamicKeys.isEmpty)
       let customGrams: [Homa.Gram] = dynamicKeys.map {
         .init(keyArray: [$0], value: target, score: 999)

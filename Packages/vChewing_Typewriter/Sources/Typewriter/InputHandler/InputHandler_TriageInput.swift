@@ -200,9 +200,10 @@ extension InputHandlerProtocol {
       if handleArabicNumeralInputs(input: input) { return true }
 
       // 標點符號。
-      let queryStrings: [String] = punctuationQueryStrings(input: input)
-      for queryString in queryStrings {
-        guard !handlePunctuation(queryString) else { return true }
+      if let queryStrings = punctuationQueryStrings(input: input) {
+        for queryString in queryStrings {
+          guard !handlePunctuation(queryString) else { return true }
+        }
       }
 
       // 摁住 Shift+字母鍵 的處理
