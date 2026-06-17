@@ -259,9 +259,9 @@ public struct MixedAlphanumericalTypewriter<Handler: InputHandlerProtocol>: Type
     let punctuationQueryStrings = handler.punctuationQueryStrings(input: input)
     let isShiftQuestionMark = input.isShiftHold && ["?", "？"].contains(visibleInputText)
     let matchesCJKPunctuation = !isShiftQuestionMark && isPunctuationChar
-      && !isPhoneticKeyRaw && punctuationQueryStrings.contains {
+      && !isPhoneticKeyRaw && (punctuationQueryStrings?.contains {
         handler.currentLM.hasUnigramsFor(keyArray: [$0])
-      }
+      } ?? false)
     if matchesCJKPunctuation {
       if !handler.mixedAlphanumericalBuffer.isEmpty {
         let chineseText = handler.committableDisplayText(sansReading: true)

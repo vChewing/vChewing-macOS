@@ -854,34 +854,37 @@ extension InputHandlerProtocol {
   /// 生成標點符號索引鍵頭。
   /// - Parameter input: 輸入的按鍵訊號。
   /// - Returns: 生成的標點符號索引鍵頭。
-  func generatePunctuationNamePrefix(withKeyCondition input: InputSignalProtocol) -> String {
-    if prefs.halfWidthPunctuationEnabled { return "_half_punctuation_" }
+  func generatePunctuationNamePrefix(withKeyCondition input: InputSignalProtocol) -> String? {
+    if prefs.halfWidthPunctuationEnabled {
+      let hasCtrlOrOption = !input.keyModifierFlags.isDisjoint(with: [.control, .option])
+      return hasCtrlOrOption ? nil : "_half_punctuation_"
+    }
     // 注意：這一行為 SHIFT+ALT+主鍵盤數字鍵專用，強制無視不同地區的鍵盤在這個按鍵組合下的符號輸入差異。
     // 但如果去掉「input.isMainAreaNumKey」這個限定條件的話，可能會影響其他依賴 Shift 鍵輸入的符號。
     if input.isMainAreaNumKey,
        input.commonKeyModifierFlags == [.option, .shift] {
       return "_shift_alt_punctuation_"
     }
-    var result = ""
     switch (input.isControlHold, input.isOptionHold) {
-    case (true, true): result.append("_alt_ctrl_punctuation_")
-    case (true, false): result.append("_ctrl_punctuation_")
-    case (false, true): result.append("_alt_punctuation_")
-    case (false, false): result.append("_punctuation_")
+    case (true, true): return "_alt_ctrl_punctuation_"
+    case (true, false): return "_ctrl_punctuation_"
+    case (false, true): return "_alt_punctuation_"
+    case (false, false): return "_punctuation_"
     }
-    return result
   }
 
   /// 生成用以在詞庫內檢索標點符號按鍵資料的檢索字串陣列。
   /// - Parameter input: 輸入的按鍵訊號。
   /// - Returns: 生成的標點符號索引字串。
-  func punctuationQueryStrings(input: InputSignalProtocol) -> [String] {
+  func punctuationQueryStrings(input: InputSignalProtocol) -> [String]? {
     /// 如果仍無匹配結果的話，先看一下：
     /// - 是否是針對當前注音排列/拼音輸入種類專門提供的標點符號。
     /// - 是否是需要摁修飾鍵才可以輸入的那種標點符號。
+    guard let punctuationNamePrefix = generatePunctuationNamePrefix(withKeyCondition: input) else {
+      return nil
+    }
     var result: [String] = []
     let inputText = input.text
-    let punctuationNamePrefix: String = generatePunctuationNamePrefix(withKeyCondition: input)
     let parser = currentKeyboardParser
     let arrCustomPunctuations: [String] = [punctuationNamePrefix, parser, inputText]
     let customPunctuation: String = arrCustomPunctuations.joined()

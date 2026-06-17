@@ -321,28 +321,20 @@ extension InputHandlerProtocol {
       /// - 是否是針對當前注音排列/拼音輸入種類專門提供的標點符號。
       /// - 是否是需要摁修飾鍵才可以輸入的那種標點符號。
 
-      let punctuationNamePrefix: String = generatePunctuationNamePrefix(withKeyCondition: input)
-      let parser = currentKeyboardParser
-      let arrCustomPunctuations: [String] = [
-        punctuationNamePrefix, parser, inputText,
-      ]
-      let customPunctuation: String = arrCustomPunctuations.joined()
-
-      /// 看看這個輸入是否是不需要修飾鍵的那種標點鍵輸入。
-
-      let arrPunctuations: [String] = [
-        punctuationNamePrefix, inputText,
-      ]
-      let punctuation: String = arrPunctuations.joined()
-
       let isInputValid: Bool =
         prefs.cassetteEnabled
           ? currentLM.isThisCassetteKeyAllowed(key: inputText) : composer
           .inputValidityCheck(key: input.charCode)
 
-      var shouldAutoSelectCandidate: Bool =
-        isInputValid || currentLM.hasUnigramsFor(keyArray: [customPunctuation])
+      var shouldAutoSelectCandidate = isInputValid
+      if let punctuationNamePrefix = generatePunctuationNamePrefix(withKeyCondition: input) {
+        let parser = currentKeyboardParser
+        let customPunctuation = punctuationNamePrefix + parser + inputText
+        let punctuation = punctuationNamePrefix + inputText
+        shouldAutoSelectCandidate = shouldAutoSelectCandidate
+          || currentLM.hasUnigramsFor(keyArray: [customPunctuation])
           || currentLM.hasUnigramsFor(keyArray: [punctuation])
+      }
 
       if !shouldAutoSelectCandidate, input.isUpperCaseASCIILetterKey {
         let letter = "_letter_\(inputText)"
