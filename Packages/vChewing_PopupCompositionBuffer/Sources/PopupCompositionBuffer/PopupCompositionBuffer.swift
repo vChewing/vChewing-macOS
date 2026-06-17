@@ -32,12 +32,18 @@ public final class PopupCompositionBuffer: NSWindowController, PCBProtocol {
       panel.backgroundColor = NSColor.windowBackgroundColor
       panel.isOpaque = true
     }
+    if #available(macOS 10.14, *) {
+      panel.appearance = NSAppearance(named: .darkAqua)
+    }
 
     self.visualEffectView = {
       if NSApplication.uxLevel == .liquidGlass,
          let glassClass = NSClassFromString("NSGlassEffectView") as? NSView.Type {
         let resultView = glassClass.init()
         resultView.setValue(9.0, forKey: "cornerRadius")
+        if #available(macOS 10.14, *) {
+          resultView.appearance = NSAppearance(named: .darkAqua)
+        }
         // macOS 27 的玻璃無需額外的底層 tint，因為文字顏色不再隨底部的內容而變化。
         // resultView.setValue(0, forKey: "style")  // .clear
         // let bgTintColor: NSColor = !NSApplication.isDarkMode ? .white : .black
@@ -52,6 +58,9 @@ public final class PopupCompositionBuffer: NSWindowController, PCBProtocol {
         resultView.material = .titlebar
         resultView.blendingMode = .behindWindow
         resultView.state = .active
+        if #available(macOS 10.14, *) {
+          resultView.appearance = NSAppearance(named: .darkAqua)
+        }
         // 設置圓角以保持原有的視覺特性
         resultView.wantsLayer = true
         resultView.layer?.cornerRadius = 9
