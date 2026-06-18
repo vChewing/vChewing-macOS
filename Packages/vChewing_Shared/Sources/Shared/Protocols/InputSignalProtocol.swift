@@ -57,12 +57,121 @@ public protocol InputSignalProtocol {
   var isSymbolMenuPhysicalKey: Bool { get }
 }
 
+// MARK: - Default Implementations
+
 extension InputSignalProtocol {
+  // MARK: Composite helpers
+
   public var commonKeyModifierFlags: KBEvent.ModifierFlags {
     keyModifierFlags.subtracting([.function, .numericPad, .help])
   }
 
   public func isHotKeyOfAnyFlag(_ flags: KBEvent.ModifierFlags) -> Bool {
     !keyModifierFlags.isDisjoint(with: flags) && text.first?.isLetter ?? false
+  }
+
+  // MARK: Modifier key queries
+
+  public var isShiftHold: Bool { keyModifierFlags.contains(.shift) }
+  public var isCommandHold: Bool { keyModifierFlags.contains(.command) }
+  public var isControlHold: Bool { keyModifierFlags.contains(.control) }
+  public var isOptionHold: Bool { keyModifierFlags.contains(.option) }
+  public var isFunctionKeyHold: Bool { keyModifierFlags.contains(.function) }
+  public var beganWithLetter: Bool { text.first?.isLetter ?? false }
+
+  public var isNonLaptopFunctionKey: Bool {
+    keyModifierFlags.contains(.numericPad) && !isNumericPadKey
+  }
+
+  // MARK: KeyCode queries
+
+  public var isJISAlphanumericalKey: Bool {
+    KeyCode(rawValue: keyCode) == KeyCode.kJISAlphanumericalKey
+  }
+
+  public var isJISKanaSwappingKey: Bool {
+    KeyCode(rawValue: keyCode) == KeyCode.kJISKanaSwappingKey
+  }
+
+  public var isNumericPadKey: Bool { arrNumpadKeyCodes.contains(keyCode) }
+
+  public var isMainAreaNumKey: Bool { mapMainAreaNumKey.keys.contains(keyCode) }
+
+  public var mainAreaNumKeyChar: String? { mapMainAreaNumKey[keyCode] }
+
+  public var isEnter: Bool {
+    [KeyCode.kCarriageReturn, KeyCode.kLineFeed].contains(KeyCode(rawValue: keyCode))
+  }
+
+  public var isTab: Bool { KeyCode(rawValue: keyCode) == KeyCode.kTab }
+  public var isUp: Bool { KeyCode(rawValue: keyCode) == KeyCode.kUpArrow }
+  public var isDown: Bool { KeyCode(rawValue: keyCode) == KeyCode.kDownArrow }
+  public var isLeft: Bool { KeyCode(rawValue: keyCode) == KeyCode.kLeftArrow }
+  public var isRight: Bool { KeyCode(rawValue: keyCode) == KeyCode.kRightArrow }
+  public var isPageUp: Bool { KeyCode(rawValue: keyCode) == KeyCode.kPageUp }
+  public var isPageDown: Bool { KeyCode(rawValue: keyCode) == KeyCode.kPageDown }
+  public var isSpace: Bool { KeyCode(rawValue: keyCode) == KeyCode.kSpace }
+  public var isBackSpace: Bool { KeyCode(rawValue: keyCode) == KeyCode.kBackSpace }
+  public var isEsc: Bool { KeyCode(rawValue: keyCode) == KeyCode.kEscape }
+  public var isHome: Bool { KeyCode(rawValue: keyCode) == KeyCode.kHome }
+  public var isEnd: Bool { KeyCode(rawValue: keyCode) == KeyCode.kEnd }
+  public var isDelete: Bool { KeyCode(rawValue: keyCode) == KeyCode.kWindowsDelete }
+
+  public var isCursorBackward: Bool {
+    isTypingVertical
+      ? KeyCode(rawValue: keyCode) == .kUpArrow
+      : KeyCode(rawValue: keyCode) == .kLeftArrow
+  }
+
+  public var isCursorForward: Bool {
+    isTypingVertical
+      ? KeyCode(rawValue: keyCode) == .kDownArrow
+      : KeyCode(rawValue: keyCode) == .kRightArrow
+  }
+
+  public var isCursorClockRight: Bool {
+    isTypingVertical
+      ? KeyCode(rawValue: keyCode) == .kRightArrow
+      : KeyCode(rawValue: keyCode) == .kUpArrow
+  }
+
+  public var isCursorClockLeft: Bool {
+    isTypingVertical
+      ? KeyCode(rawValue: keyCode) == .kLeftArrow
+      : KeyCode(rawValue: keyCode) == .kDownArrow
+  }
+
+  public var isSymbolMenuPhysicalKey: Bool {
+    [KeyCode.kSymbolMenuPhysicalKeyIntl, KeyCode.kSymbolMenuPhysicalKeyJIS]
+      .contains(KeyCode(rawValue: keyCode))
+  }
+
+  // MARK: Character queries
+
+  public var isASCII: Bool { charCode < 0x80 }
+
+  public var isUpperCaseASCIILetterKey: Bool {
+    (65 ... 90).contains(charCode) && keyModifierFlags == .shift
+  }
+
+  public var isSingleCommandBasedLetterHotKey: Bool {
+    ((65 ... 90).contains(charCode) && keyModifierFlags == [.shift, .command])
+      || ((97 ... 122).contains(charCode) && keyModifierFlags == .command)
+  }
+
+  // MARK: Validation
+
+  public var isInvalid: Bool {
+    (0x20 ... 0xFF).contains(charCode) ? false : !(isReservedKey && !isKeyCodeBlacklisted)
+  }
+
+  public var isKeyCodeBlacklisted: Bool {
+    guard let code = KeyCodeBlackListed(rawValue: keyCode) else { return false }
+    return code.rawValue != KeyCode.kNone.rawValue
+  }
+
+  public var isReservedKey: Bool {
+    guard let code = KeyCode(rawValue: keyCode) else { return false }
+    return code.rawValue != KeyCode.kNone.rawValue
   }
 }
