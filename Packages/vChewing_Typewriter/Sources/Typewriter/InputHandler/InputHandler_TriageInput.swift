@@ -138,14 +138,10 @@ extension InputHandlerProtocol {
       // 提前放行一些用不到的特殊按鍵輸入情形。
       guard !(input.isInvalid && state.type == .ofEmpty) else { return false }
 
-      // 如果當前組字器為空的話，就不再攔截某些修飾鍵，畢竟這些鍵可能會會用來觸發某些功能。
-      // 排除符號選單按鍵，因為該鍵有 Opt 修飾時用於輪替打字模式，不能放行給 app。
-      let isFunctional = !input.isSymbolMenuPhysicalKey
-        && (
-          input.isCommandHold || input.isNonLaptopFunctionKey
-            || input.isHotKeyOfAnyFlag([.control, .option])
-        )
-      if !state.hasComposition, isFunctional { return false }
+      // 如果當前組字器為空的話，就不再攔截 Cmd / 非筆電功能鍵，
+      // 畢竟這些鍵可能會用來觸發系統功能。
+      if !state.hasComposition,
+         input.isCommandHold || input.isNonLaptopFunctionKey { return false }
 
       // 若 Caps Lock 被啟用的話，則暫停對注音輸入的處理。
       // 這裡的處理仍舊有用，不然 Caps Lock 英文模式無法直接鍵入小寫字母。
@@ -212,6 +208,9 @@ extension InputHandlerProtocol {
 
       // 摁住 Shift+字母鍵 的處理
       if handleLettersWithShiftHold(input: input) { return true }
+
+      // 如果標點鏈路沒攔截到，且當前無組字內容，Ctrl/Option + 可列印 ASCII 視為熱鍵放行。
+      if !state.hasComposition, input.isHotKeyOfAnyFlag([.control, .option]) { return false }
     }
 
     // 終末處理（Still Nothing）：

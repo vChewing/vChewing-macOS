@@ -1318,12 +1318,49 @@ extension InputHandlerTests {
     )
     testSession.switchState(.ofEmpty())
 
-    // 全形模式（非半形）下，Ctrl+Punctuation 在無組字時也應放行。
+    // 全形模式（非半形）下，Ctrl+Punctuation 應被標點鏈路命中、予以攔截。
     testHandler.prefs.halfWidthPunctuationEnabled = false
     let ctrlPeriodFW = KBEvent.KeyEventData(flags: .control, chars: ".").asEvent
     #expect(
-      !testHandler.triageInput(event: ctrlPeriodFW),
-      "Ctrl+. in full-width mode with no composition should still pass through"
+      testHandler.triageInput(event: ctrlPeriodFW),
+      "Ctrl+. in full-width mode should be consumed by punctuation handler"
+    )
+  }
+
+  // MARK: - Option-based punctuation in full-width mode
+
+  /// 全形模式下，Option+標點應正常命中 _alt_punctuation_ 條目。
+  @Test
+  func test_IH432_OptionPunctuationWorksInFullWidthMode() throws {
+    guard let testHandler, let testSession else {
+      Issue.record("testHandler and testSession at least one of them is nil.")
+      return
+    }
+    testSession.switchState(.ofEmpty())
+    testHandler.prefs.halfWidthPunctuationEnabled = false
+
+    // Option+;
+    let optSemicolon = KBEvent.KeyEventData(flags: .option, chars: ";").asEvent
+    #expect(
+      testHandler.triageInput(event: optSemicolon),
+      "Option+; should be consumed by punctuation handler in full-width mode"
+    )
+
+    // Option+'
+    testSession.switchState(.ofEmpty())
+    let optQuote = KBEvent.KeyEventData(flags: .option, chars: "'").asEvent
+    #expect(
+      testHandler.triageInput(event: optQuote),
+      "Option+' should be consumed by punctuation handler in full-width mode"
+    )
+
+    // 半形模式下 Option+; 應放行（無對應 lexicon 條目）。
+    testSession.switchState(.ofEmpty())
+    testHandler.prefs.halfWidthPunctuationEnabled = true
+    let optSemicolonHW = KBEvent.KeyEventData(flags: .option, chars: ";").asEvent
+    #expect(
+      !testHandler.triageInput(event: optSemicolonHW),
+      "Option+; in half-width mode should pass through (no _half_alt_punctuation_ entry)"
     )
   }
 }
