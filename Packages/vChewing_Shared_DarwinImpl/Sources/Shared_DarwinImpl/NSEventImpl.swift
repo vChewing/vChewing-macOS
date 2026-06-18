@@ -109,108 +109,12 @@ extension NSEvent {
   // 摁 Alt+Shift+主鍵盤區域數字鍵 的話，根據不同的 macOS 鍵盤佈局種類，會出現不同的符號結果。
   // 然而呢，KeyCode 卻是一致的。於是這裡直接準備一個換算表來用。
   // 這句用來返回換算結果。
-  public var mainAreaNumKeyChar: String? { mapMainAreaNumKey[keyCode] }
+  // `mainAreaNumKeyChar` is supplied by InputSignalProtocol default implementation.
 
-  // 除了 ANSI charCode 以外，其餘一律過濾掉，免得 InputHandler 被餵屎。
-  public var isInvalid: Bool {
-    (0x20 ... 0xFF).contains(charCode) ? false : !(isReservedKey && !isKeyCodeBlacklisted)
-  }
-
-  public var isKeyCodeBlacklisted: Bool {
-    guard let code = KeyCodeBlackListed(rawValue: keyCode) else { return false }
-    return code.rawValue != KeyCode.kNone.rawValue
-  }
-
-  public var isReservedKey: Bool {
-    guard let code = KeyCode(rawValue: keyCode) else { return false }
-    return code.rawValue != KeyCode.kNone.rawValue
-  }
-
-  /// 單獨用 flags 來判定數字小鍵盤輸入的方法已經失效了，所以必須再增補用 KeyCode 判定的方法。
-  public var isJISAlphanumericalKey: Bool {
-    KeyCode(rawValue: keyCode) == KeyCode.kJISAlphanumericalKey
-  }
-
-  public var isJISKanaSwappingKey: Bool { KeyCode(rawValue: keyCode) == KeyCode.kJISKanaSwappingKey
-  }
-
-  public var isNumericPadKey: Bool { arrNumpadKeyCodes.contains(keyCode) }
-  public var isMainAreaNumKey: Bool { mapMainAreaNumKey.keys.contains(keyCode) }
-  public var isShiftHold: Bool { keyModifierFlagsNS.contains(.shift) }
-  public var isCommandHold: Bool { keyModifierFlagsNS.contains(.command) }
-  public var isControlHold: Bool { keyModifierFlagsNS.contains(.control) }
-  public var beganWithLetter: Bool { text.first?.isLetter ?? false }
-  public var isOptionHold: Bool { keyModifierFlagsNS.contains(.option) }
-
+  // `isCapsLockOn` stays on concrete types because it needs `modifierFlags`
+  // (which includes .capsLock), while the protocol's `keyModifierFlags` strips capsLock.
   public var isCapsLockOn: Bool {
     modifierFlags.intersection(.deviceIndependentFlagsMask).contains(.capsLock)
-  }
-
-  public var isFunctionKeyHold: Bool { keyModifierFlagsNS.contains(.function) }
-  public var isNonLaptopFunctionKey: Bool {
-    keyModifierFlagsNS.contains(.numericPad) && !isNumericPadKey
-  }
-
-  public var isEnter: Bool {
-    [KeyCode.kCarriageReturn, KeyCode.kLineFeed].contains(KeyCode(rawValue: keyCode))
-  }
-
-  public var isTab: Bool { KeyCode(rawValue: keyCode) == KeyCode.kTab }
-  public var isUp: Bool { KeyCode(rawValue: keyCode) == KeyCode.kUpArrow }
-  public var isDown: Bool { KeyCode(rawValue: keyCode) == KeyCode.kDownArrow }
-  public var isLeft: Bool { KeyCode(rawValue: keyCode) == KeyCode.kLeftArrow }
-  public var isRight: Bool { KeyCode(rawValue: keyCode) == KeyCode.kRightArrow }
-  public var isPageUp: Bool { KeyCode(rawValue: keyCode) == KeyCode.kPageUp }
-  public var isPageDown: Bool { KeyCode(rawValue: keyCode) == KeyCode.kPageDown }
-  public var isSpace: Bool { KeyCode(rawValue: keyCode) == KeyCode.kSpace }
-  public var isBackSpace: Bool { KeyCode(rawValue: keyCode) == KeyCode.kBackSpace }
-  public var isEsc: Bool { KeyCode(rawValue: keyCode) == KeyCode.kEscape }
-  public var isHome: Bool { KeyCode(rawValue: keyCode) == KeyCode.kHome }
-  public var isEnd: Bool { KeyCode(rawValue: keyCode) == KeyCode.kEnd }
-  public var isDelete: Bool { KeyCode(rawValue: keyCode) == KeyCode.kWindowsDelete }
-
-  public var isCursorBackward: Bool {
-    isTypingVertical
-      ? KeyCode(rawValue: keyCode) == .kUpArrow
-      : KeyCode(rawValue: keyCode) == .kLeftArrow
-  }
-
-  public var isCursorForward: Bool {
-    isTypingVertical
-      ? KeyCode(rawValue: keyCode) == .kDownArrow
-      : KeyCode(rawValue: keyCode) == .kRightArrow
-  }
-
-  public var isCursorClockRight: Bool {
-    isTypingVertical
-      ? KeyCode(rawValue: keyCode) == .kRightArrow
-      : KeyCode(rawValue: keyCode) == .kUpArrow
-  }
-
-  public var isCursorClockLeft: Bool {
-    isTypingVertical
-      ? KeyCode(rawValue: keyCode) == .kLeftArrow
-      : KeyCode(rawValue: keyCode) == .kDownArrow
-  }
-
-  public var isASCII: Bool { charCode < 0x80 }
-
-  // 這裡必須加上「flags == .shift」，否則會出現某些情況下輸入法「誤判當前鍵入的非 Shift 字符為大寫」的問題
-  public var isUpperCaseASCIILetterKey: Bool {
-    (65 ... 90).contains(charCode) && keyModifierFlagsNS == .shift
-  }
-
-  // 以 .command 觸發的熱鍵（包括剪貼簿熱鍵）。
-  public var isSingleCommandBasedLetterHotKey: Bool {
-    ((65 ... 90).contains(charCode) && keyModifierFlagsNS == [.shift, .command])
-      || ((97 ... 122).contains(charCode) && keyModifierFlagsNS == .command)
-  }
-
-  // 這裡必須用 KeyCode，這樣才不會受隨 macOS 版本更動的 Apple 動態注音鍵盤排列內容的影響。
-  // 只是必須得與 ![input isShiftHold] 搭配使用才可以（也就是僅判定 Shift 沒被摁下的情形）。
-  public var isSymbolMenuPhysicalKey: Bool {
-    [KeyCode.kSymbolMenuPhysicalKeyIntl, KeyCode.kSymbolMenuPhysicalKeyJIS]
-      .contains(KeyCode(rawValue: keyCode))
   }
 }
 
