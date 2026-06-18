@@ -67,7 +67,8 @@ extension InputSignalProtocol {
   }
 
   public func isHotKeyOfAnyFlag(_ flags: KBEvent.ModifierFlags) -> Bool {
-    !keyModifierFlags.isDisjoint(with: flags) && text.first?.isLetter ?? false
+    guard let first = text.first, let asciiVal = first.asciiValue else { return false }
+    return !keyModifierFlags.isDisjoint(with: flags) && asciiVal >= 0x21 && asciiVal <= 0x7E
   }
 
   // MARK: Modifier key queries

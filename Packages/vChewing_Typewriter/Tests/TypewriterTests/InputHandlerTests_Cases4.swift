@@ -1271,4 +1271,59 @@ extension InputHandlerTests {
     ) else { return nil }
     return .init(keyArray: [key], value: value, score: score)
   }
+
+  // MARK: - Ctrl + ASCII pass-through in half-width punctuation mode
+
+  /// 半形標點模式開啓時，Ctrl+ASCII 組合鍵不得被 Typewriter 攔截。
+  @Test
+  func test_IH431_CtrlASCIIPassesThroughInHalfWidthMode() throws {
+    guard let testHandler, let testSession else {
+      Issue.record("testHandler and testSession at least one of them is nil.")
+      return
+    }
+    testSession.switchState(.ofEmpty())
+    testHandler.prefs.halfWidthPunctuationEnabled = true
+
+    // 測試用鍵位：字母、數字、標點、符號各一個
+    let testKeys: [(label: String, chars: String, flags: KBEvent.ModifierFlags)] = [
+      ("Ctrl+A", "A", .control),
+      ("Ctrl+1", "1", .control),
+      ("Ctrl+,", ",", .control),
+      ("Ctrl+.", ".", .control),
+      ("Ctrl+@", "@", .control),
+    ]
+
+    for tc in testKeys {
+      let event = KBEvent.KeyEventData(
+        flags: tc.flags,
+        chars: tc.chars
+      ).asEvent
+      let didConsume = testHandler.triageInput(event: event)
+      #expect(!didConsume, "\(tc.label): Ctrl+ASCII must not be consumed in half-width mode")
+      testSession.switchState(.ofEmpty())
+    }
+
+    // 確保無修飾鍵的普通標點在同樣環境下仍會被處理。
+    let plainComma = KBEvent.KeyEventData(flags: [], chars: ",").asEvent
+    #expect(testHandler.triageInput(event: plainComma), "Plain comma should still be handled")
+    testSession.switchState(.ofEmpty())
+
+    // 半形模式 + 組字進行中時，Ctrl+ASCII 仍必須被攔截（防干擾組字區）。
+    testHandler.prefs.halfWidthPunctuationEnabled = true
+    testSession.switchState(.ofInputting(displayTextSegments: ["a"], cursor: 1))
+    let ctrlCommaDuringComposing = KBEvent.KeyEventData(flags: .control, chars: ",").asEvent
+    #expect(
+      testHandler.triageInput(event: ctrlCommaDuringComposing),
+      "Ctrl+, during composition must be trapped to protect composing buffer"
+    )
+    testSession.switchState(.ofEmpty())
+
+    // 全形模式（非半形）下，Ctrl+Punctuation 在無組字時也應放行。
+    testHandler.prefs.halfWidthPunctuationEnabled = false
+    let ctrlPeriodFW = KBEvent.KeyEventData(flags: .control, chars: ".").asEvent
+    #expect(
+      !testHandler.triageInput(event: ctrlPeriodFW),
+      "Ctrl+. in full-width mode with no composition should still pass through"
+    )
+  }
 }
