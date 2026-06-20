@@ -399,8 +399,11 @@ extension SessionCtl {
   var currentRAMUsageDescription: String? {
     // 關閉 malloc zone 的空閒頁面，讓選單顯示的數值儘可能真實
     // 而不是因為 allocator cache 還沒退回導致的人為偏高。
+    // 使用匿名私有記憶體（`task_vm_info.internal`）而非
+    // `phys_footprint`，避免被 Liquid Glass / GPU / neural
+    // engine 的共享記憶體帳目欺騙。
     NSApplication.purgeMallocZones()
-    guard let currentMemorySizeInBytes = NSApplication.memoryFootprint else { return nil }
+    guard let currentMemorySizeInBytes = NSApplication.memoryFootprintAnonymous else { return nil }
     let currentMemorySize: Double = (Double(currentMemorySizeInBytes) / 1_024 / 1_024)
       .rounded(toPlaces: 1)
     return "i18n:IME.RAMUsedLabelHeader".i18n + " \(currentMemorySize)MB"

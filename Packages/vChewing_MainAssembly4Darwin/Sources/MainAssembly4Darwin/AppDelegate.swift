@@ -206,6 +206,13 @@ extension AppDelegate {
 
   /// 檢查該程式本身的記憶體佔用量。
   /// - Returns: 記憶體佔用量（MiB）。
+  ///
+  /// 自 macOS 26（Liquid Glass）起，Activity Monitor 显示的「記憶體」
+  /// （`phys_footprint`）在 Apple Silicon 上會納入 WindowServer / GPU
+  /// 共享表面等系統渲染開銷，容易在液態玻璃啟用時出現假性偏高。
+  /// 因此自盡閥值改以「匿名私有記憶體」（`task_vm_info.internal`）為
+  /// 主要指標——該值只含 heap / stack / SQLite private cache 等真正
+  /// 由本程序獨佔的記憶體，不會被 graphics / neural engine RAM 欺騙。
   @discardableResult
   public func checkMemoryUsage() -> Double {
     // 先釋放 malloc zone 中未使用的頁面，讓後續讀到的值更貼近
@@ -214,7 +221,7 @@ extension AppDelegate {
     NSApplication.purgeMallocZones()
 
     func sample() -> Double {
-      guard let bytes = NSApplication.memoryFootprint else { return 0 }
+      guard let bytes = NSApplication.memoryFootprintAnonymous else { return 0 }
       return (Double(bytes) / 1_024 / 1_024).rounded(toPlaces: 1)
     }
 
@@ -235,7 +242,7 @@ extension AppDelegate {
   }
 
   private func memoryExceededNotification(size: Double) {
-    vCLog("WARNING: EXCESSIVE MEMORY FOOTPRINT (\(size)MB).")
+    vCLog("WARNING: EXCESSIVE PRIVATE MEMORY (\(size)MB).")
     let title = "i18n:Common.VChewing".i18n
     let body =
       "i18n:InfoMessage.MemoryExcessiveReboot".i18n

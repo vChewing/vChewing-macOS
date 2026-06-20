@@ -82,7 +82,7 @@
 "i18n:ErrorMessage.UnableToCreateUserPhraseFile" = "無法創建自訂語彙檔案。";
 "i18n:ErrorMessage.WildcardKeyNotInitial" = "花牌鍵不得作為起始碼。";
 "i18n:fileDragImportButton.DragFileToHere" = "請將檔案拽到這邊";
-"i18n:IME.RAMUsedLabelHeader" = "[記憶體佔用量]";
+"i18n:IME.RAMUsedLabelHeader" = "[私有記憶體佔用量]";
 "i18n:InfoMessage.AlreadyLatestVersion" = "您正在使用目前最新的發行版。";
 "i18n:InfoMessage.AlreadyLatestVersionVChewing" = "目前使用的已經是最新版本。";
 "i18n:InfoMessage.DefaultsWriteCassettePath" = "defaults write org.atelierInmu.inputmethod.vChewing CassettePath -string \"~/不帶尾部斜槓的檔案路徑\"";
@@ -93,7 +93,7 @@
 "i18n:InfoMessage.FeaturesUnavailableForOlderMacOS" = "因系統 API 限制，個別功能無法對 macOS 10.15 和 macOS 11 提供。";
 "i18n:InfoMessage.MacOS10_9Bug" = "已知 macOS 10.9 有此故障：當一個輸入法嘗試存取自身的檔案操作視窗的時候，不只輸入法，而且連其接下來所嘗試掛接的所有的客體應用，都會陷入無限僵死狀態，只能用 SSH 連到這台電腦上執行「killall vChewing」才可以解除僵死。因為我們懷疑 macOS 10.10 至 10.12 也在受影響的範圍內，所以唯音對這些版本的系統禁用了自身的檔案操作視窗存取。";
 "i18n:InfoMessage.ManuallyImplementSymbols" = "請自行以「_punctuation_list」索引鍵\n在使用者自訂語彙檔案內擴充該符號選單的內容。";
-"i18n:InfoMessage.MemoryExcessiveReboot" = "唯音輸入法因記憶體用量過大的問題而重新啟動。如果您方便的話，請就這個問題知會該輸入法的主程式師、且請務必說明自己在用的是 Intel 機種還是 Apple Silicon 機種。當前輸入法記憶體用量已藉由 NSLog 記錄輸出。";
+"i18n:InfoMessage.MemoryExcessiveReboot" = "唯音輸入法因記憶體用量過大的問題而重新啟動。如果您方便的話，請就這個問題知會該輸入法的主程式師、且請務必說明自己在用的是 Intel 機種還是 Apple Silicon 機種。當前輸入法私有記憶體佔用量已藉由 NSLog 記錄輸出。";
 "i18n:InfoMessage.MouseWheelScrollThisPage" = "請利用滑鼠滾輪檢視該頁面。也請洽輸入法選單內的熱鍵指南。";
 "i18n:InfoMessage.MouseWheelScrollWithCheatSheet" = "請利用滑鼠滾輪檢視頁面。也請洽輸入法選單內的熱鍵指南。";
 "i18n:InfoMessage.NetworkError:%@" = "網路連線失敗，或是伺服器沒有回應。\n\n錯誤說明：%@";

@@ -82,7 +82,7 @@
 "i18n:ErrorMessage.UnableToCreateUserPhraseFile" = "ユーザー辞書ファイルの作成は失敗しました。";
 "i18n:ErrorMessage.WildcardKeyNotInitial" = "骨牌キーは最初のキーとしてはならぬ。";
 "i18n:fileDragImportButton.DragFileToHere" = "ここにドラッグして";
-"i18n:IME.RAMUsedLabelHeader" = "[RAM使用量]";
+"i18n:IME.RAMUsedLabelHeader" = "[プライベートメモリ使用量]";
 "i18n:InfoMessage.AlreadyLatestVersion" = "現在稼働中のは最新バージョンである。";
 "i18n:InfoMessage.AlreadyLatestVersionVChewing" = "今の唯音はすでに最新版だと報告します。";
 "i18n:InfoMessage.DefaultsWriteCassettePath" = "defaults write org.atelierInmu.inputmethod.vChewing CassettePath -string \"~/FilePathEndedWithoutTrailingSlash\"";
@@ -93,7 +93,7 @@
 "i18n:InfoMessage.FeaturesUnavailableForOlderMacOS" = "システム API 制限のため、一部の機能は macOS 10.15 と macOS 11 で提供できません。";
 "i18n:InfoMessage.MacOS10_9Bug" = "システムの支障の話ですが、macOS 10.9 (恐らく 10.10 - 10.12 も) には下記のバグはございます：入力アプリは自分のファイル操作パネルをアクセススロと、その入力アプリだけでなく、あれから入力アプリの触り合おうとした全ての客体アプリも「無限のカタマリ」その無反応な状態になってしまいます。その場合、SSH でこのパソコンで「killall vChewing」そのターミナルコマンドを実行すれば、及ぼされた客体アプリの反応は戻ります。そのため、開発側は上記のシステムバージョンに応じて、自身のファイルパネルアクセスを全て禁止としました。";
 "i18n:InfoMessage.ManuallyImplementSymbols" = "このメニューのお用いには、ご自分でユーザー辞書で\n「_punctuation_list」キーの符号記録のご補充が必要でござる。";
-"i18n:InfoMessage.MemoryExcessiveReboot" = "唯音入力アプリはメモリー使用量多すぎたため、再起動しました。もし、よろしければ、この問題について、開発元にご連絡をし、そしてこのパソコンの CPU 種類情報（Intel か、Apple Silicon か）も一緒に教えてください。今のメモリー使用量は NSLog にて記録済みである。";
+"i18n:InfoMessage.MemoryExcessiveReboot" = "唯音入力アプリはメモリー使用量多すぎたため、再起動しました。もし、よろしければ、この問題について、開発元にご連絡をし、そしてこのパソコンの CPU 種類情報（Intel か、Apple Silicon か）も一緒に教えてください。今のプライベートメモリ使用量は NSLog にて記録済みである。";
 "i18n:InfoMessage.MouseWheelScrollThisPage" = "マウスホイールでこのページをご覧ください。キーに関する取扱説明のアクセスはメニューに。";
 "i18n:InfoMessage.MouseWheelScrollWithCheatSheet" = "マウスホイールでページをご覧ください。キーに関する取扱説明のアクセスはメニューに。";
 "i18n:InfoMessage.NetworkError:%@" = "ネットの接続の有無の問題か、サーバー側の反応の問題か。\n\nいずれにせよ、エラーメッセージ：「%@」";
