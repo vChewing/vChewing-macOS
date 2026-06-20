@@ -82,7 +82,7 @@
 "i18n:ErrorMessage.UnableToCreateUserPhraseFile" = "Unable to create the user phrase file.";
 "i18n:ErrorMessage.WildcardKeyNotInitial" = "Wildcard key cannot be the initial key.";
 "i18n:fileDragImportButton.DragFileToHere" = "DRAG FILE TO HERE";
-"i18n:IME.RAMUsedLabelHeader" = "[RAM USED]";
+"i18n:IME.RAMUsedLabelHeader" = "[PRIVATE MEMORY USAGE]";
 "i18n:InfoMessage.AlreadyLatestVersion" = "You are already using the latest version.";
 "i18n:InfoMessage.AlreadyLatestVersionVChewing" = "You are already using the latest version of vChewing.";
 "i18n:InfoMessage.DefaultsWriteCassettePath" = "defaults write org.atelierInmu.inputmethod.vChewing CassettePath -string \"~/FilePathEndedWithoutTrailingSlash\"";
@@ -93,7 +93,7 @@
 "i18n:InfoMessage.FeaturesUnavailableForOlderMacOS" = "Some features are unavailable for macOS 10.15 and macOS 11 due to API limitations.";
 "i18n:InfoMessage.MacOS10_9Bug" = "There is a bug in macOS 10.9, preventing an input method from accessing its own file panels. Doing so will result in eternal hang-crash of not only the input method but all client apps it tries attached to, requiring SSH connection to this computer to terminate the input method process by executing “killall vChewing”. Due to possible concerns of the same possible issue in macOS 10.10 and 10.11, we completely disabled this feature.";
 "i18n:InfoMessage.ManuallyImplementSymbols" = "Please manually implement the symbols of this menu \nin the user phrase file with “_punctuation_list” key.";
-"i18n:InfoMessage.MemoryExcessiveReboot" = "vChewing is rebooted due to a memory-excessive-usage problem. If convenient, please inform the developer that you are having this issue, stating whether you are using an Intel Mac or Apple Silicon Mac. An NSLog is generated with the current memory footprint size.";
+"i18n:InfoMessage.MemoryExcessiveReboot" = "vChewing is rebooted due to a memory-excessive-usage problem. If convenient, please inform the developer that you are having this issue, stating whether you are using an Intel Mac or Apple Silicon Mac. An NSLog is generated with the current private memory usage size.";
 "i18n:InfoMessage.MouseWheelScrollThisPage" = "Please use mouse wheel to scroll this page. The CheatSheet is available in the IME menu.";
 "i18n:InfoMessage.MouseWheelScrollWithCheatSheet" = "Please use mouse wheel to scroll each page if needed. The CheatSheet is available in the IME menu.";
 "i18n:InfoMessage.NetworkError:%@" = "There may be no internet connection or the server failed to respond.\n\nError message: %@";
