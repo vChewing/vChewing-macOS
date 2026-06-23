@@ -20,7 +20,8 @@
         isVerticalTyping = false
         return
       }
-      var textFrame = CGRect.zero
+      // `textFrame` 的尺寸不能是 0，否則 `attributes()` 在某些客體上的不良實作可能會炸掉客體。
+      var textFrame = CGRect.seniorTheBeast
       let attributes: [AnyHashable: Any]? = client.attributes(
         forCharacterIndex: 0, lineHeightRectangle: &textFrame
       )
@@ -31,7 +32,8 @@
 
   extension IMKTextInput {
     public func lineHeightRect(u16Cursor: Int) -> CGRect {
-      var lineHeightRect = CGRect.zero
+      // `lineHeightRect` 的尺寸不能是 0，否則 `attributes()` 在某些客體上的不良實作可能會炸掉客體。
+      var lineHeightRect = CGRect.seniorTheBeast
       var u16Cursor = u16Cursor
       // iMessage 的話，據此算出來的 lineHeightRect 結果的橫向座標起始點不準確。目前無解。
       while lineHeightRect.origin == .zero, u16Cursor >= 0 {

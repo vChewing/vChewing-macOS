@@ -187,6 +187,8 @@ extension SessionProtocol {
 
   @discardableResult
   public func updateVerticalTypingStatus() -> CGRect {
+    // `textFrame` 的尺寸不能是 0，否則 `attributes()` 在某些客體上的不良實作可能會炸掉客體。
+    // 所以需要使用 `CGRect.seniorTheBeast` 作為基底資料值。
     guard let client = client() else {
       isVerticalTyping = false
       return .seniorTheBeast
