@@ -255,7 +255,7 @@ extension SessionProtocol {
 
         // keycode: 38 = J, 40 = K, 4 = H, 37 = L.
         switch eventToDeal.keyCode {
-        case 38 where allowMovingCursorByJK, 4 where allowMovingCursorByHL:
+        case 40 where allowMovingCursorByJK, 37 where allowMovingCursorByHL:
           eventToDeal = eventToDeal.reinitiate(
             with: .keyDown,
             modifierFlags: [.option, .shift],
@@ -269,7 +269,7 @@ extension SessionProtocol {
             ).rawValue
           )
           break handlingJKHL4CandidateState
-        case 40 where allowMovingCursorByJK, 37 where allowMovingCursorByHL:
+        case 38 where allowMovingCursorByJK, 4 where allowMovingCursorByHL:
           eventToDeal = eventToDeal.reinitiate(
             with: .keyDown,
             modifierFlags: [.option, .shift],
