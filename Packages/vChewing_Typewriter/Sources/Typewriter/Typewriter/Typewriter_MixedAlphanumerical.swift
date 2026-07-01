@@ -591,20 +591,28 @@ public struct MixedAlphanumericalTypewriter<Handler: InputHandlerProtocol>: Type
       }
       let lhsPrefixWordLike = isWordLikeASCIIPrefix($0.prefixText)
       let rhsPrefixWordLike = isWordLikeASCIIPrefix($1.prefixText)
-      let bothWordLike = lhsPrefixWordLike && rhsPrefixWordLike
       // 若雙方前綴皆為 word-like，優先以概率排序（保留 Twinsu.4 行為）。
-      // 否則優先以後綴長度排序（保留 aizj/4 與 aijo6 行為）。
-      if bothWordLike {
+      // 若僅一方為 word-like，優先保留 word-like 前綴（避免 ello→el 等誤拆）。
+      // 若雙方皆非 word-like，優先以後綴長度排序（保留 aizj/4 與 aijo6 行為）。
+      switch (lhsPrefixWordLike, rhsPrefixWordLike) {
+      case (true, true):
         if $0.bestProbability != $1.bestProbability {
           return $0.bestProbability < $1.bestProbability
         }
-      } else {
+        // 同為 word-like 且概率相同時，偏好較長的前綴（較短的後綴），
+        // 避免 ello→el 或 hello→hel 等誤拆。
+        if $0.prefixText.count != $1.prefixText.count {
+          return $0.prefixText.count < $1.prefixText.count
+        }
+      case (false, false):
         if $0.suffixLength != $1.suffixLength {
           return $0.suffixLength < $1.suffixLength
         }
         if $0.bestProbability != $1.bestProbability {
           return $0.bestProbability < $1.bestProbability
         }
+      case (true, false): return false
+      case (false, true): return true
       }
       return $0.suffixLength < $1.suffixLength
     })

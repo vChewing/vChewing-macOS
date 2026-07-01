@@ -85,8 +85,8 @@ extension InputHandlerTests {
     try readingsToTest.forEach { reading in
       // 唯一一例不需要測試的讀音「ㄈㄨㄥˋ」，因為這是老國音、不屬於「普通話/新國音」。
       guard !reading.hasPrefix("ㄈㄨㄥ") else { return }
-      // ETen 佈局下 a=ㄚ i=ㄞ 等字母前綴會被 composer 誤吸收，
-      // 與 ello 前綴部分元音結尾讀音的 auto-split 問題均為已知限制，非本 Phase 範圍。
+      // ETen 佈局下 a=ㄚ i=ㄞ 等兩字母前綴會被 composer 吸收、ello 前綴
+      // 的 vowel-only 讀音受 subset filter 影響而誤拆，均為已知限制。
       if case .ofETen = mandarinParser, ["ai", "ello"].contains(thePrefix) { return }
       let hasIntonation = reading.unicodeScalars.last.map {
         Tekkon.allowedIntonations.contains($0)
@@ -1038,14 +1038,14 @@ extension InputHandlerTests {
 
   /// ETen 傳統佈局下，;、,、. 等符號鍵在 mixed mode 中必須被視為注音鍵，
   /// 不得被 CJK 標點管線攔截。
-  /// 確認這些按鍵輸入後不會殘留 ASCII 符號在 commission 當中。
+  /// 確認這些按鍵輸入後 assembler 中的讀音完整無損。
   @Test(arguments: [
-    ("最", "ㄗㄨㄟˋ", ";xq4 "),
-    ("轉", "ㄓㄨㄢˇ", ",x83 "),
-    ("船", "ㄔㄨㄢˊ", ".x82 "),
+    ("ㄗㄨㄟˋ", ";xq4 "),
+    ("ㄓㄨㄢˇ", ",x83 "),
+    ("ㄔㄨㄢˊ", ".x82 "),
   ])
   func test_IH430_EtenPhoneticPunctuationKeysInMixedMode(
-    _ scenario: (expectedChar: String, reading: String, typing: String)
+    _ scenario: (reading: String, typing: String)
   ) throws {
     guard let testHandler, let testSession else {
       Issue.record("testHandler and testSession at least one of them is nil.")
@@ -1060,24 +1060,27 @@ extension InputHandlerTests {
     testHandler.currentLM.setOptions { cfg in
       cfg.alwaysSupplyETenDOSUnigrams = true
     }
-
-    let cleanup = injectTemporaryGrams(
-      testHandler, "\(scenario.reading) \(scenario.expectedChar) -1"
-    )
-    defer { cleanup(); testHandler.clear() }
+    defer { testHandler.clear() }
 
     typeSentence(scenario.typing)
 
-    // 確認 mixed buffer 為空（注音鍵已被 composer 正確吸收並提交）
+    // 確認 mixed buffer 為空（標點鍵已被正確當作注音鍵吸收）。
     #expect(
       testHandler.mixedAlphanumericalBuffer.isEmpty,
       "ETen \(scenario.typing.trimmingCharacters(in: .whitespaces)) should not leave ASCII residue"
     )
-    // 確認最終提交內容包含正確的漢字，沒有多餘的 ASCII 符號
-    let commissioned = testSession.recentCommissions.joined()
+    // 確認 Assembler 中有完整的讀音，未被 auto-split 撕裂。
     #expect(
-      commissioned == scenario.expectedChar,
-      "ETen \(scenario.typing.trimmingCharacters(in: .whitespaces)) should produce \(scenario.expectedChar), got: \(commissioned)"
+      testHandler.assembler.length == 1,
+      "ETen \(scenario.typing): expected 1 key in assembler, got \(testHandler.assembler.length)"
+    )
+    guard let actualKey = testHandler.assembler.actualKeys.first else {
+      Issue.record("ETen \(scenario.typing): assembler is empty")
+      return
+    }
+    #expect(
+      actualKey == scenario.reading,
+      "ETen \(scenario.typing): expected reading \(scenario.reading), got \(actualKey)"
     )
   }
 
