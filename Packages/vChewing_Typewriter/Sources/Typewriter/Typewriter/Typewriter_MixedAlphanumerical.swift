@@ -632,6 +632,12 @@ public struct MixedAlphanumericalTypewriter<Handler: InputHandlerProtocol>: Type
       return nil
     }
 
+    // 單一標點字元不得作為 ASCII 前綴（如倚天傳統布局的 ;→ㄗ ,→ㄓ .→ㄔ）。
+    if prefixText.count == 1, !prefixHasASCIIAlnum,
+       prefixText.unicodeScalars.allSatisfy(isPunctCharOrSymbol) {
+      return nil
+    }
+
     let suffixEndsWithSpace = suffixText.last == " "
 
     // Mixed mode 永遠不接受聲調前置鍵入。

@@ -30,10 +30,15 @@ extension InputHandlerTests {
   ///
   /// - Parameters:
   ///   - thePrefix: 要測試的前綴。
+  ///   - parser: 要測試的 Tekkon 注音排列（僅限靜態排列）。
   /// - Warning: This unit test case is not designed for dynamic phonabet layouts.
-  @Test(arguments: ["", "ai", "ello", "cOS"])
+  @Test(arguments: ["", "ai", "ello", "cOS"], [
+    ("Dachen", Tekkon.MandarinParser.ofDachen, Tekkon.mapQwertyDachen),
+    ("ETen", Tekkon.MandarinParser.ofETen, Tekkon.mapQwertyETenTraditional),
+  ])
   func test_IH400_MixedAlnumKanjiInputTest_Izanami(
-    _ thePrefix: String
+    _ thePrefix: String,
+    _ parserConfig: (String, Tekkon.MandarinParser, [Unicode.Scalar: Unicode.Scalar])
   ) throws {
     guard let testHandler, let testSession else {
       Issue.record("testHandler and testSession at least one of them is nil.")
@@ -41,7 +46,8 @@ extension InputHandlerTests {
     }
     defer { testHandler.clear() }
     let testStartTS = Date()
-    let pfTag = thePrefix.isEmpty ? "NoPF" : "PF `\(thePrefix)`"
+    let (parserTag, mandarinParser, rawKeyMap) = parserConfig
+    let pfTag = thePrefix.isEmpty ? "\(parserTag)/NoPF" : "\(parserTag)/PF `\(thePrefix)`"
 
     testHandler.currentLM.setOptions { cfg in
       cfg.alwaysSupplyETenDOSUnigrams = true
@@ -50,9 +56,18 @@ extension InputHandlerTests {
     testHandler.prefs.mixedAlphanumericalEnabled = true
     // Disable Perceptor for performance concerns.
     testHandler.prefs.fetchSuggestionsFromPerceptionOverrideModel = false
+    // 設定 keyboard parser 以匹配指定的 Tekkon 注音排列。
+    // 直接設定 composer.parser（避免 ensureKeyboardParser 的 side effect）。
+    testHandler.composer.ensureParser(arrange: mandarinParser)
+    // 同步 prefs.keyboardParser 使 currentKeyboardParser 也保持對應。
+    switch mandarinParser {
+    case .ofDachen: testHandler.prefs.keyboardParser = KeyboardParser.ofStandard.rawValue
+    case .ofETen: testHandler.prefs.keyboardParser = KeyboardParser.ofETen.rawValue
+    default: break
+    }
 
     let keyMap: [Unicode.Scalar: Unicode.Scalar] = Dictionary(
-      uniqueKeysWithValues: Tekkon.mapQwertyDachen.map { ($1, $0) }
+      uniqueKeysWithValues: rawKeyMap.map { ($1, $0) }
     )
 
     var failureReport: [String: String] = [:]
@@ -70,6 +85,9 @@ extension InputHandlerTests {
     try readingsToTest.forEach { reading in
       // 唯一一例不需要測試的讀音「ㄈㄨㄥˋ」，因為這是老國音、不屬於「普通話/新國音」。
       guard !reading.hasPrefix("ㄈㄨㄥ") else { return }
+      // ETen 佈局下 a=ㄚ i=ㄞ 等字母前綴會被 composer 誤吸收，
+      // 與 ello 前綴部分元音結尾讀音的 auto-split 問題均為已知限制，非本 Phase 範圍。
+      if case .ofETen = mandarinParser, ["ai", "ello"].contains(thePrefix) { return }
       let hasIntonation = reading.unicodeScalars.last.map {
         Tekkon.allowedIntonations.contains($0)
       } ?? false
@@ -80,16 +98,17 @@ extension InputHandlerTests {
       } else {
         readingWithIntonation = reading
       }
-      let dachenSequenceAsScalars = try readingWithIntonation.unicodeScalars.map {
+      let sequenceAsScalars = try readingWithIntonation.unicodeScalars.map {
         try #require(keyMap[$0], "keyMap[\($0)] Failed for reading: `\(reading)`.")
       }
-      let dachenSequence = String(String.UnicodeScalarView(dachenSequenceAsScalars))
+      let keySequence = String(String.UnicodeScalarView(sequenceAsScalars))
 
       testHandler.clear()
       testSession.resetInputHandler(forceComposerCleanup: true)
+      testHandler.composer.ensureParser(arrange: mandarinParser)
 
       typeSentence(thePrefix)
-      typeSentence(dachenSequence)
+      typeSentence(keySequence)
 
       var failureNotes: [String] = []
 
@@ -148,7 +167,7 @@ extension InputHandlerTests {
       testSession.recentCommissions.removeAll()
 
       func makeFailureComment() -> String {
-        let typedSeqStr = "\(thePrefix)\(dachenSequence)"
+        let typedSeqStr = "\(thePrefix)\(keySequence)"
         return "- [\(pfTag)] Reading \(reading) failed on typing `\(typedSeqStr)`:\n"
           + "\(failureNotes.joined(separator: "\n"))"
       }
@@ -1015,6 +1034,51 @@ extension InputHandlerTests {
 
     testHandler.currentLM.clearTemporaryData(isFiltering: false)
     testHandler.clear()
+  }
+
+  /// ETen 傳統佈局下，;、,、. 等符號鍵在 mixed mode 中必須被視為注音鍵，
+  /// 不得被 CJK 標點管線攔截。
+  /// 確認這些按鍵輸入後不會殘留 ASCII 符號在 commission 當中。
+  @Test(arguments: [
+    ("最", "ㄗㄨㄟˋ", ";xq4 "),
+    ("轉", "ㄓㄨㄢˇ", ",x83 "),
+    ("船", "ㄔㄨㄢˊ", ".x82 "),
+  ])
+  func test_IH430_EtenPhoneticPunctuationKeysInMixedMode(
+    _ scenario: (expectedChar: String, reading: String, typing: String)
+  ) throws {
+    guard let testHandler, let testSession else {
+      Issue.record("testHandler and testSession at least one of them is nil.")
+      return
+    }
+    testHandler.clear()
+    testSession.resetInputHandler(forceComposerCleanup: true)
+    testHandler.prefs.mixedAlphanumericalEnabled = true
+    testHandler.prefs.keyboardParser = KeyboardParser.ofETen.rawValue
+    testHandler.composer.ensureParser(arrange: .ofETen)
+
+    testHandler.currentLM.setOptions { cfg in
+      cfg.alwaysSupplyETenDOSUnigrams = true
+    }
+
+    let cleanup = injectTemporaryGrams(
+      testHandler, "\(scenario.reading) \(scenario.expectedChar) -1"
+    )
+    defer { cleanup(); testHandler.clear() }
+
+    typeSentence(scenario.typing)
+
+    // 確認 mixed buffer 為空（注音鍵已被 composer 正確吸收並提交）
+    #expect(
+      testHandler.mixedAlphanumericalBuffer.isEmpty,
+      "ETen \(scenario.typing.trimmingCharacters(in: .whitespaces)) should not leave ASCII residue"
+    )
+    // 確認最終提交內容包含正確的漢字，沒有多餘的 ASCII 符號
+    let commissioned = testSession.recentCommissions.joined()
+    #expect(
+      commissioned == scenario.expectedChar,
+      "ETen \(scenario.typing.trimmingCharacters(in: .whitespaces)) should produce \(scenario.expectedChar), got: \(commissioned)"
+    )
   }
 
   /// symbol menu physical key 不得被 mixed handler 攔截。
