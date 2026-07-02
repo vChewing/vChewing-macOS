@@ -103,7 +103,23 @@ extension SettingsPanesCocoa {
     }
 
     @IBAction
-    func cassetteEnabledToggled(_: NSControl) {}
+    func cassetteEnabledToggled(_: NSControl) {
+      // 與 SwiftUI 偏好設定頁面保持行為一致：路徑為空時拒絕啟用磁帶模式。
+      if PrefMgr.shared.cassetteEnabled, LMMgr.cassettePath().isEmpty {
+        IMEApp.buzz()
+        LMMgr.resetCassettePath()
+        PrefMgr.shared.cassetteEnabled = false
+        asyncOnMain {
+          let window = CtlSettingsCocoa.shared?.window
+          let alert = NSAlert(error: "i18n:LMMgr.accessFailure.cassette.title".i18n)
+          alert.informativeText = LMMgr.cassetteAccessFailureDescription(path: PrefMgr.shared.cassettePath)
+          alert.beginSheetModal(at: window) { _ in }
+        }
+      } else {
+        LMMgr.loadCassetteData()
+      }
+      LMMgr.syncLMPrefs()
+    }
   }
 }
 
