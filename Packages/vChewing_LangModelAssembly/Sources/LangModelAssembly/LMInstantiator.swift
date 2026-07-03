@@ -524,8 +524,9 @@ extension LMAssembly {
 
       if !config.isCassetteEnabled
         || (config.isCassetteEnabled && (keyArray.first?.hasPrefix("_") ?? false)) {
-        if config.isSCPCEnabled || config.alwaysSupplyETenDOSUnigrams,
-           keyArray.count == 1,
+        // lmPlainBopomofo 包含所有合法 BPMF 讀音，此檢查與 alwaysSupplyETenDOSUnigrams 無關：
+        // 該旗標控制的是候選字排序，而非讀音有效性。
+        if keyArray.count == 1,
            let firstKey = keyArray.first,
            Self.lmPlainBopomofo.hasValuesFor(key: firstKey) {
           return true
@@ -801,6 +802,14 @@ extension LMAssembly {
             value: $0,
             score: config.isSCPCEnabled ? 0 : -9.5
           )
+        }
+      } else if rawAllUnigrams.isEmpty,
+                keyArray.count == 1,
+                Self.lmPlainBopomofo.hasValuesFor(key: keyChain) {
+        // 原廠辭典查無此讀音、但 lmPlainBopomofo 確認為合法 BPMF 讀音時，
+        // 附加低權重候選以履行 hasUnigramsForFast 的語義保證。
+        rawAllUnigrams += Self.lmPlainBopomofo.valuesFor(key: keyChain, isCHS: isCHS).map {
+          Homa.Gram(keyArray: flatKeyArray, value: $0, score: -9.5)
         }
       }
 
@@ -1152,6 +1161,15 @@ extension LMAssembly {
               value: $0,
               score: config.isSCPCEnabled ? 0 : -9.5
             )
+          }
+        }
+      } else if rawAllUnigrams.isEmpty {
+        for subKeyArray in expandedKeyArrays {
+          let subKeyChain = subKeyArray.joined(separator: "-")
+          if Self.lmPlainBopomofo.hasValuesFor(key: subKeyChain) {
+            rawAllUnigrams += Self.lmPlainBopomofo.valuesFor(key: subKeyChain, isCHS: isCHS).map {
+              Homa.Gram(keyArray: flatKeyArray, value: $0, score: -9.5)
+            }
           }
         }
       }
