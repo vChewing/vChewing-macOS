@@ -49,12 +49,19 @@ extension LMAssembly {
       /// 如果設定為 nil 的話，則不產生任何詞頻資料。
       /// true = 全形，false = 半形。
       public var numPadFWHWStatus: Bool?
+
       public var isCassetteEnabled = false
       public var isPhraseReplacementEnabled = false
       public var isCNSEnabled = false
       public var isSymbolEnabled = false
       public var isSCPCEnabled = false
+
+      /// 消歧義：
+      /// - 「倚天中文系統 Unigrams」特指倚天中文系統的輸入法所能敲的漢字、以及其特有的候選字排序。
+      /// 台澎金馬有固定的一兩代人對這些順序都有終生無法扭轉的肌肉記憶。這也就是為什麼唯音輸入法單獨提供了這種 lexicon 的支援。
+      /// - 「倚天傳統注音鍵盤佈局」是電腦鍵盤上的按鍵與注音符號的映射。「倚天26」也是這種映射。這些都是與 Tekkon Composer 有關的內容。
       public var alwaysSupplyETenDOSUnigrams = true
+
       public var partialMatchEnabled = false
       public var filterNonCNSReadings = false
       public var filterFactoryKanjisOfNonCurrentInputMode = false
