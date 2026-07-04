@@ -54,6 +54,11 @@ struct BundleAppsPlugin: CommandPlugin {
     )
     let deploymentTarget = "12.0"
 
+    // Xcode stamps a block of `DT*` build-environment metadata into Info.plist;
+    // replicate it so SPM-assembled bundles are indistinguishable from Xcode-built
+    // products (relevant to macOS Tahoe appearance / Liquid Glass eligibility).
+    let buildMetadata = try buildEnvironmentMetadata()
+
     // ── Step 1: Build (or locate) executables ──────────────────────────
     let spmBuildDir: URL
     if let externalBuildDir {
@@ -116,7 +121,8 @@ struct BundleAppsPlugin: CommandPlugin {
       spmBundles: spmBundles,
       marketingVersion: marketingVersion,
       buildVersion: buildVersion,
-      deploymentTarget: deploymentTarget
+      deploymentTarget: deploymentTarget,
+      buildMetadata: buildMetadata
     )
     print("  ✓ vChewing.app assembled.")
 
@@ -130,7 +136,8 @@ struct BundleAppsPlugin: CommandPlugin {
       embeddedMainIMEApp: vChewingApp,
       marketingVersion: marketingVersion,
       buildVersion: buildVersion,
-      deploymentTarget: deploymentTarget
+      deploymentTarget: deploymentTarget,
+      buildMetadata: buildMetadata
     )
     print("  ✓ vChewingInstaller.app assembled.")
 
@@ -162,7 +169,8 @@ extension BundleAppsPlugin {
     spmBundles: [URL],
     marketingVersion: String,
     buildVersion: String,
-    deploymentTarget: String
+    deploymentTarget: String,
+    buildMetadata: [String: Any]
   ) throws {
     let fm = FileManager.default
     let contents = appDir.appending(path: "Contents")
@@ -195,7 +203,7 @@ extension BundleAppsPlugin {
         "CFBundleIconFile": "AppIcon",
         "CFBundleIconName": "AppIcon",
         "CFBundleSupportedPlatforms": ["MacOSX"],
-      ]
+      ].merging(buildMetadata) { _, new in new }
     )
 
     // ── Compile xcassets → Assets.car + AppIcon.icns ──
@@ -299,7 +307,8 @@ extension BundleAppsPlugin {
     embeddedMainIMEApp: URL,
     marketingVersion: String,
     buildVersion: String,
-    deploymentTarget: String
+    deploymentTarget: String,
+    buildMetadata: [String: Any]
   ) throws {
     let fm = FileManager.default
     let contents = appDir.appending(path: "Contents")
@@ -332,7 +341,7 @@ extension BundleAppsPlugin {
         "CFBundleIconFile": "AppIcon",
         "CFBundleIconName": "AppIcon",
         "CFBundleSupportedPlatforms": ["MacOSX"],
-      ]
+      ].merging(buildMetadata) { _, new in new }
     )
 
     // ── Compile xcassets ──
@@ -585,6 +594,65 @@ extension BundleAppsPlugin {
       "--force", "--deep",
       appDir.path,
     ])
+  }
+
+  /// Captures the stdout of an external process, trimmed of trailing whitespace.
+  private func capture(_ executable: String, arguments: [String]) throws -> String {
+    let process = Process()
+    process.executableURL = URL(fileURLWithPath: executable)
+    process.arguments = arguments
+    let pipe = Pipe()
+    process.standardOutput = pipe
+    try process.run()
+    process.waitUntilExit()
+    guard process.terminationStatus == 0 else {
+      throw PluginError(
+        "\(URL(fileURLWithPath: executable).lastPathComponent) exited with code "
+          + "\(process.terminationStatus)."
+      )
+    }
+    let data = pipe.fileHandleForReading.readDataToEndOfFile()
+    return String(data: data, encoding: .utf8)?
+      .trimmingCharacters(in: .whitespacesAndNewlines) ?? ""
+  }
+
+  /// Computes the `DT*` build-environment metadata that Xcode normally stamps into
+  /// Info.plist (`DTSDKName`, `DTPlatformVersion`, `DTXcode`, …), sourced live from the
+  /// active toolchain so SPM-assembled bundles align with Xcode-built products.
+  private func buildEnvironmentMetadata() throws -> [String: Any] {
+    let sdkVersion = try capture("/usr/bin/xcrun", arguments: ["--sdk", "macosx", "--show-sdk-version"])
+    let sdkBuild = try capture("/usr/bin/xcrun", arguments: ["--sdk", "macosx", "--show-sdk-build-version"])
+    let osBuild = try capture("/usr/bin/sw_vers", arguments: ["-buildVersion"])
+    // `xcodebuild -version` prints two lines: "Xcode <ver>" and "Build version <build>".
+    let xcodeRaw = try capture("/usr/bin/xcodebuild", arguments: ["-version"])
+    var xcodeVersion = ""
+    var xcodeBuild = ""
+    for line in xcodeRaw.split(separator: "\n") {
+      let s = String(line)
+      if s.hasPrefix("Xcode ") {
+        xcodeVersion = String(s.dropFirst("Xcode ".count))
+      } else if s.hasPrefix("Build version ") {
+        xcodeBuild = String(s.dropFirst("Build version ".count))
+      }
+    }
+    // DTXcode encodes the version as major*100 + minor*10 (e.g. 27.0 -> 2700, 15.3 -> 1530).
+    let dtXcode: String = {
+      let parts = xcodeVersion.split(separator: ".")
+      let major = Int(parts.first ?? "") ?? 0
+      let minor = parts.count > 1 ? (Int(parts[1]) ?? 0) : 0
+      return String(major * 100 + minor * 10)
+    }()
+    return [
+      "BuildMachineOSBuild": osBuild,
+      "DTCompiler": "com.apple.compilers.llvm.clang.1_0",
+      "DTPlatformBuild": sdkBuild,
+      "DTPlatformName": "macosx",
+      "DTPlatformVersion": sdkVersion,
+      "DTSDKBuild": sdkBuild,
+      "DTSDKName": "macosx\(sdkVersion)",
+      "DTXcode": dtXcode,
+      "DTXcodeBuild": xcodeBuild,
+    ]
   }
 
   /// Runs an external process synchronously. Throws on non-zero exit.
