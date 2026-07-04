@@ -45,12 +45,49 @@ spmLinuxTest-Typewriter:
 UNIVERSAL_DIR := .build/universal-release
 ARM64_DIR     := .build/arm64-apple-macosx/release
 X86_64_DIR    := .build/x86_64-apple-macosx/release
+NEXUS_DIR     := .build/out/Products/release
+# Active macOS SDK version, used to re-stamp LC_BUILD_VERSION.sdk on the universal executables.
+# SwiftPM otherwise records the deployment target as the sdk, which makes macOS Tahoe treat the
+# IME as a legacy app and disables the Liquid Glass appearance; bundle-apps re-signs afterward.
+MACOS_SDK_VER := $(shell xcrun --sdk macosx --show-sdk-version 2>/dev/null)
 
 universal-build:
+	@# Remove previously-built binary artifacts from ARM64_DIR, X86_64_DIR, and NEXUS_DIR.
+	@rm -f $(ARM64_DIR)/vChewing $(ARM64_DIR)/vChewingInstaller
+	@rm -f $(X86_64_DIR)/vChewing $(X86_64_DIR)/vChewingInstaller
+	@rm -f $(NEXUS_DIR)/vChewing $(NEXUS_DIR)/vChewingInstaller
 	@echo "Building arm64 (Release)..."
+	@mkdir -p $(NEXUS_DIR)
+	@touch $(NEXUS_DIR)/.pre-build-marker
 	swift build -c release --arch arm64
+	@# Check whether the built binary is at the Nexus path and its modified time is fresh. If these conditions are met, copy it to ARM64_DIR.
+	@if [ -f $(NEXUS_DIR)/vChewing ] && [ $(NEXUS_DIR)/vChewing -nt $(NEXUS_DIR)/.pre-build-marker ]; then \
+		mkdir -p $(ARM64_DIR); \
+		cp -f $(NEXUS_DIR)/vChewing $(ARM64_DIR)/vChewing; \
+	fi
+	@if [ -f $(NEXUS_DIR)/vChewingInstaller ] && [ $(NEXUS_DIR)/vChewingInstaller -nt $(NEXUS_DIR)/.pre-build-marker ]; then \
+		mkdir -p $(ARM64_DIR); \
+		cp -f $(NEXUS_DIR)/vChewingInstaller $(ARM64_DIR)/vChewingInstaller; \
+	fi
+	@# Resource bundles are arch-independent but in Swift 6.4 also land only in the Nexus path; copy them to ARM64_DIR so the later bundle loop finds them.
+	@for bundle in $(NEXUS_DIR)/*.bundle; do \
+		if [ -d "$$bundle" ]; then \
+			mkdir -p $(ARM64_DIR); \
+			cp -R "$$bundle" $(ARM64_DIR)/; \
+		fi; \
+	done
 	@echo "Building x86_64 (Release)..."
+	@touch $(NEXUS_DIR)/.pre-build-marker
 	swift build -c release --arch x86_64
+	@# Check whether the built binary is at the Nexus path and its modified time is fresh. If these conditions are met, copy it to X86_64_DIR.
+	@if [ -f $(NEXUS_DIR)/vChewing ] && [ $(NEXUS_DIR)/vChewing -nt $(NEXUS_DIR)/.pre-build-marker ]; then \
+		mkdir -p $(X86_64_DIR); \
+		cp -f $(NEXUS_DIR)/vChewing $(X86_64_DIR)/vChewing; \
+	fi
+	@if [ -f $(NEXUS_DIR)/vChewingInstaller ] && [ $(NEXUS_DIR)/vChewingInstaller -nt $(NEXUS_DIR)/.pre-build-marker ]; then \
+		mkdir -p $(X86_64_DIR); \
+		cp -f $(NEXUS_DIR)/vChewingInstaller $(X86_64_DIR)/vChewingInstaller; \
+	fi
 	@echo "Creating universal binaries..."
 	@mkdir -p $(UNIVERSAL_DIR)
 	@lipo -create $(ARM64_DIR)/vChewing $(X86_64_DIR)/vChewing \
@@ -62,6 +99,15 @@ universal-build:
 			rm -rf "$(UNIVERSAL_DIR)/$$(basename $$bundle)"; \
 			cp -R "$$bundle" $(UNIVERSAL_DIR)/; \
 		fi; \
+	done
+	@# Re-stamp LC_BUILD_VERSION so the sdk field reflects the real macOS SDK (e.g. 27.0) while
+	@# preserving the deployment target as minos. SwiftPM writes the deployment target into sdk,
+	@# which disables Liquid Glass on macOS Tahoe; bundle-apps re-signs the assembled apps afterward.
+	@for bin in vChewing vChewingInstaller; do \
+		minos=$$(otool -l -arch arm64 $(UNIVERSAL_DIR)/$$bin 2>/dev/null | awk '/LC_BUILD_VERSION/{f=1} f && /minos/{print $$2; exit}'); \
+		vtool -set-build-version macos $$minos $(MACOS_SDK_VER) \
+			-output $(UNIVERSAL_DIR)/$$bin.tmp $(UNIVERSAL_DIR)/$$bin && \
+		mv $(UNIVERSAL_DIR)/$$bin.tmp $(UNIVERSAL_DIR)/$$bin; \
 	done
 	@echo "  ✓ Universal binaries ready."
 
