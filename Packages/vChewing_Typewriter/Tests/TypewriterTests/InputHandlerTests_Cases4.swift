@@ -1430,4 +1430,51 @@ extension InputHandlerTests {
       "Option+; in half-width mode should pass through (no _half_alt_punctuation_ entry)"
     )
   }
+
+  // MARK: - ETen Pure-Digit Sequence Stays ASCII
+
+  /// 倚天傳統佈局下，1-4 為聲調鍵、7-9/0 為韻母鍵，
+  /// 導致純數字序列（如 IP 位址 192.168.100.1）被 auto-split 誤拆為
+  /// 「聲調數字前綴 + 純數字注音後綴」（如 1 + 92=ㄣˊ=嗯）。
+  /// 修復後，開頭有被阻斷鍵且後綴全為 ASCII 數字時不拆分。
+  @Test(arguments: [
+    ("Dachen", Tekkon.MandarinParser.ofDachen, KeyboardParser.ofStandard.rawValue),
+    ("ETen", Tekkon.MandarinParser.ofETen, KeyboardParser.ofETen.rawValue),
+  ])
+  func test_IH433_PureDigitSequenceStaysASCII(
+    _ label: String,
+    _ mandarinParser: Tekkon.MandarinParser,
+    _ keyboardParserRaw: Int
+  ) throws {
+    let (testHandler, testSession) = try prepareMixedModeHandler()
+    testHandler.prefs.keyboardParser = keyboardParserRaw
+    testHandler.composer.ensureParser(arrange: mandarinParser)
+    defer { testHandler.clear() }
+
+    // 不注入任何臨時辭典條目，模擬真實使用環境。
+    // 輸入 IP 位址，期望整段保持為 ASCII，不被拆分為注音。
+    typeSentence("192.168.100.1")
+
+    // mixed buffer 應保留完整 ASCII 序列。
+    #expect(
+      testHandler.mixedAlphanumericalBuffer == "192.168.100.1",
+      "\(label): expected buffer to stay ASCII '192.168.100.1', got '\(testHandler.mixedAlphanumericalBuffer)'"
+    )
+    // 不應有任何中文被提交或殘留在 assembler。
+    #expect(
+      testSession.recentCommissions.isEmpty,
+      "\(label): should not commit any Chinese text, got \(testSession.recentCommissions)"
+    )
+    #expect(
+      testHandler.assembler.isEmpty,
+      "\(label): assembler should be empty, got \(testHandler.assembler.actualKeys)"
+    )
+
+    // 按 Enter 提交 ASCII 序列。
+    #expect(testHandler.triageInput(event: KBEvent.KeyEventData.dataEnterReturn.asEvent))
+    #expect(
+      testSession.recentCommissions.joined() == "192.168.100.1",
+      "\(label): Enter should commit ASCII '192.168.100.1', got \(testSession.recentCommissions.joined())"
+    )
+  }
 }

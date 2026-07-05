@@ -559,6 +559,17 @@ public struct MixedAlphanumericalTypewriter<Handler: InputHandlerProtocol>: Type
     //   使「5k4」等純注音輸入仍可正確以整段注音路徑處理。
     let validCandidates = candidateByReadingKey.values.filter { candidate in
       if blockedPrefixLength > 0 {
+        // 當開頭有被阻斷鍵（聲調數字或大寫字母）且後綴全為 ASCII 數字時，
+        // 整段輸入極可能為純數字序列（如 IP 位址 192.168.100.1），不應拆分。
+        // 此狀況特別影響倚天傳統佈局：1-4 為聲調鍵、7-9/0 為韻母鍵，
+        // 導致如 192 被拆為 1(˙) + 92(ㄣˊ=嗯)。
+        let suffixStr = String(fullInput.suffix(candidate.suffixLength))
+        let suffixIsPureDigits = suffixStr.unicodeScalars.allSatisfy {
+          $0.isASCII && CharacterSet.decimalDigits.contains($0)
+        }
+        if suffixIsPureDigits {
+          return false
+        }
         return candidate.prefixText.count >= blockedPrefixLength
       }
       let hasASCIILetter = candidate.prefixText.range(
