@@ -29,7 +29,6 @@ var verMarket: String = "1.0.0"
 var verBuild: String = "1000"
 var strXcodeProjContent: String = ""
 var dirXcodeProjectFile = "./vChewing.xcodeproj/project.pbxproj"
-var dirPackageProjectFile = "./vChewing.pkgproj"
 var dirUpdateInfoPlist = "./Update-Info.plist"
 var dirUpdateInfoPlist4SPM = "./Release-Version.plist"
 var theDictionary: NSDictionary?
@@ -62,12 +61,6 @@ if CommandLine.arguments.count == 3 {
     NSLog(" -: Error on writing strings to file: \(error)")
   }
   NSLog(" - Xcode 專案版本資訊更新完成：\(verMarket) \(verBuild)。")
-
-  // Packages project file version update.
-  theDictionary = NSDictionary(contentsOfFile: dirPackageProjectFile)
-  theDictionary?.setValue(verMarket, forKeyPath: "PACKAGES.PACKAGE_SETTINGS.VERSION")
-  theDictionary?.write(toFile: dirPackageProjectFile, atomically: true)
-  NSLog(" - Packages 專案版本資訊更新完成：\(verMarket) \(verBuild)。")
 
   // Update notification project file version update.
   theDictionary = NSDictionary(contentsOfFile: dirUpdateInfoPlist)

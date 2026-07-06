@@ -1,6 +1,6 @@
 #!/bin/sh
 # BuildPKG.sh
-# Reproduces the vChewing.pkgproj workflow using pkgbuild + productbuild.
+# Builds the vChewing PKG installer using pkgbuild + productbuild.
 # The resulting installer always targets the current user's home directory and
 # never requests administrator credentials unless a suspicious vChewing bundle
 # is detected in /Library/Input Methods that needs to be renamed.
