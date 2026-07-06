@@ -91,8 +91,6 @@ extension SessionProtocol {
   }
 
   private func handleKeyDown(event: KBEvent) -> Bool {
-    // MARK: 前置處理
-
     // 先放過一些以 .command 觸發的熱鍵（包括剪貼簿熱鍵）。
     if state.type == .ofEmpty, event.isSingleCommandBasedLetterHotKey { return false }
 
@@ -111,7 +109,6 @@ extension SessionProtocol {
       return true // Adobe Photoshop 相容：對 JIS 英數切換鍵傳入事件一律立刻返回 true。
     }
 
-    // MARK: 針對客體的具體處理
 
     /// 這裡仍舊需要判斷 flags。之前使輸入法狀態卡住無法敲漢字的問題已在 InputHandler 內修復。
     /// 這裡不判斷 flags 的話，用方向鍵前後定位光標之後，再次試圖觸發組字區時、反而會在首次按鍵時失敗。
