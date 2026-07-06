@@ -102,7 +102,7 @@ extension NSEvent {
   public var isFlagChanged: Bool { type == .flagsChanged }
 
   public var isEmacsKey: Bool {
-    // 這裡不能只用 isControlHold，因為這裡對修飾鍵的要求有排他性。
+    // 這裡不能只用 isControlHeld，因為這裡對修飾鍵的要求有排他性。
     [6, 2, 1, 5, 4, 22, 14, 16].contains(charCode) && keyModifierFlagsNS == .control
   }
 
@@ -128,7 +128,7 @@ extension NSEvent {
     if !mapTable.keys.contains(keyCode) { return self }
     guard let dataTuplet = mapTable[keyCode] else { return self }
     let result: NSEvent? = reinitiate(
-      characters: isShiftHold ? dataTuplet.1 : dataTuplet.0,
+      characters: isShiftHeld ? dataTuplet.1 : dataTuplet.0,
       charactersIgnoringModifiers: dataTuplet.0
     )
     return result ?? self

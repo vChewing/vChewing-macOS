@@ -26,13 +26,13 @@ public protocol InputSignalProtocol {
   var isJISKanaSwappingKey: Bool { get }
   var isNumericPadKey: Bool { get }
   var isMainAreaNumKey: Bool { get }
-  var isShiftHold: Bool { get }
-  var isCommandHold: Bool { get }
-  var isControlHold: Bool { get }
+  var isShiftHeld: Bool { get }
+  var isCommandHeld: Bool { get }
+  var isControlHeld: Bool { get }
   var beganWithLetter: Bool { get }
-  var isOptionHold: Bool { get }
+  var isOptionHeld: Bool { get }
   var isCapsLockOn: Bool { get }
-  var isFunctionKeyHold: Bool { get }
+  var isFunctionKeyHeld: Bool { get }
   var isNonLaptopFunctionKey: Bool { get }
   var isEnter: Bool { get }
   var isTab: Bool { get }
@@ -89,11 +89,11 @@ extension InputSignalProtocol {
 
   // MARK: Modifier key queries
 
-  public var isShiftHold: Bool { keyModifierFlags.contains(.shift) }
-  public var isCommandHold: Bool { keyModifierFlags.contains(.command) }
-  public var isControlHold: Bool { keyModifierFlags.contains(.control) }
-  public var isOptionHold: Bool { keyModifierFlags.contains(.option) }
-  public var isFunctionKeyHold: Bool { keyModifierFlags.contains(.function) }
+  public var isShiftHeld: Bool { keyModifierFlags.contains(.shift) }
+  public var isCommandHeld: Bool { keyModifierFlags.contains(.command) }
+  public var isControlHeld: Bool { keyModifierFlags.contains(.control) }
+  public var isOptionHeld: Bool { keyModifierFlags.contains(.option) }
+  public var isFunctionKeyHeld: Bool { keyModifierFlags.contains(.function) }
   public var beganWithLetter: Bool { text.first?.isLetter ?? false }
 
   public var isNonLaptopFunctionKey: Bool {

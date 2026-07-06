@@ -41,7 +41,7 @@ public struct BPMFFullMatchTypewriter<Handler: InputHandlerProtocol>: Typewriter
     let existedIntonation = handler.composer.intonation
     let skipPhoneticHandling =
       input.isReservedKey || input.isNumericPadKey || input.isNonLaptopFunctionKey
-        || input.isControlHold || input.isOptionHold || input.isShiftHold || input.isCommandHold
+        || input.isControlHeld || input.isOptionHeld || input.isShiftHeld || input.isCommandHeld
     let confirmCombination = input.isSpace || input.isEnter
 
     // 先嘗試讓注拼槽消化當前按鍵（含可能的聲調覆寫），以保留既有行為。
@@ -253,8 +253,8 @@ public struct BPMFFullMatchTypewriter<Handler: InputHandlerProtocol>: Typewriter
     composeReading = composeReading || (!handler.composer.isEmpty && confirmCombination)
     guard composeReading else { return nil }
 
-    if input.isControlHold, input.isCommandHold, input.isEnter,
-       !input.isOptionHold, !input.isShiftHold, handler.assembler.isEmpty {
+    if input.isControlHeld, input.isCommandHeld, input.isEnter,
+       !input.isOptionHeld, !input.isShiftHeld, handler.assembler.isEmpty {
       return handler.handleEnter(input: input, readingOnly: true)
     }
 

@@ -51,7 +51,7 @@ public struct CassetteTypewriter<Handler: InputHandlerProtocol>: TypewriterProto
 
     let skipStrokeHandling =
       input.isReservedKey || input.isNumericPadKey || input.isNonLaptopFunctionKey
-        || input.isControlHold || input.isOptionHold || input.isCommandHold
+        || input.isControlHeld || input.isOptionHeld || input.isCommandHeld
     let isCalligrapherFull = handler.calligrapher.count >= currentLM.maxCassetteKeyLength
     var didAppendStroke = false
 
@@ -119,7 +119,7 @@ public struct CassetteTypewriter<Handler: InputHandlerProtocol>: TypewriterProto
     let currentLM = handler.currentLM
     let hasQuickCandidates = state.type == .ofInputting && state.isCandidateContainer
     var handleQuickCandidate = true
-    if currentLM.areCassetteCandidateKeysShiftHeld { handleQuickCandidate = input.isShiftHold }
+    if currentLM.areCassetteCandidateKeysShiftHeld { handleQuickCandidate = input.isShiftHeld }
 
     if handler.handleCassetteSymbolTable(input: input) { return true }
 
@@ -249,8 +249,8 @@ public struct CassetteTypewriter<Handler: InputHandlerProtocol>: TypewriterProto
     // 執行真正的組字：插入讀音、呼叫組句、處理溢出、刷新狀態並考慮逐字選字模式。
     let currentLM = handler.currentLM
     guard !handler.calligrapher.isEmpty else { return nil }
-    if input.isControlHold, input.isCommandHold, input.isEnter,
-       !input.isOptionHold, !input.isShiftHold, handler.composer.isEmpty {
+    if input.isControlHeld, input.isCommandHeld, input.isEnter,
+       !input.isOptionHeld, !input.isShiftHeld, handler.composer.isEmpty {
       return handler.handleEnter(input: input, readingOnly: true)
     }
     if !currentLM.hasUnigramsFor(keyArray: [handler.calligrapher]) {

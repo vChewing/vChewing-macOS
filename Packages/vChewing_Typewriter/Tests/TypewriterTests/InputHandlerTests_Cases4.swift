@@ -896,9 +896,9 @@ extension InputHandlerTests {
 
     typeSentence("abc")
 
-    #expect(event.isOptionHold)
+    #expect(event.isOptionHeld)
     if s.isOptionShift {
-      #expect(event.isShiftHold)
+      #expect(event.isShiftHeld)
     }
     if s.id == "IH420B" {
       #expect(event.isMainAreaNumKey)
@@ -1127,7 +1127,7 @@ extension InputHandlerTests {
       charsSansModifiers: "/",
       keyCode: 44
     ).asEvent
-    #expect(shiftSlash.isShiftHold)
+    #expect(shiftSlash.isShiftHeld)
     #expect(shiftSlash.text == "/")
     #expect(shiftSlash.inputTextIgnoringModifiers == "/")
 

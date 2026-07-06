@@ -354,7 +354,7 @@ extension InputHandlerProtocol {
     }
 
     // Shift + Left
-    if input.isCursorBackward, input.isShiftHold {
+    if input.isCursorBackward, input.isShiftHeld {
       let moved: Bool = {
         if input.isHoldingAny([.command, .option]) {
           return (try? assembler.jumpCursorBySegment(to: .rear, isMarker: true)) != nil
@@ -384,7 +384,7 @@ extension InputHandlerProtocol {
     }
 
     // Shift + Right
-    if input.isCursorForward, input.isShiftHold {
+    if input.isCursorForward, input.isShiftHeld {
       let moved: Bool = {
         if input.isHoldingAny([.command, .option]) {
           return (try? assembler.jumpCursorBySegment(to: .front, isMarker: true)) != nil
@@ -517,9 +517,9 @@ extension InputHandlerProtocol {
     } else if readingOnly {
       displayedText = commissionByCtrlCommandEnter()
     } else if input.isHoldingAll([.command, .control]) {
-      displayedText = input.isOptionHold
-        ? commissionByCtrlOptionCommandEnter(isShiftPressed: input.isShiftHold)
-        : commissionByCtrlCommandEnter(isShiftPressed: input.isShiftHold)
+      displayedText = input.isOptionHeld
+        ? commissionByCtrlOptionCommandEnter(isShiftPressed: input.isShiftHeld)
+        : commissionByCtrlCommandEnter(isShiftPressed: input.isShiftHeld)
     }
 
     session.switchState(State.ofCommitting(textToCommit: displayedText))
@@ -604,14 +604,14 @@ extension InputHandlerProtocol {
       switch prefs.specifyShiftBackSpaceKeyBehavior {
       case 0:
         if prefs.cassetteEnabled {
-          guard input.isShiftHold, calligrapher.isEmpty else { break shiftBksp }
+          guard input.isShiftHeld, calligrapher.isEmpty else { break shiftBksp }
           guard let prevReading = previousParsableCalligraph else { break shiftBksp }
           // 此處刻意使用 Assembler 的 API（assembler.dropKey）以避免呼叫
           // InputHandler 的 dropKey 中所包含的 KeyDropContext 回補邏輯。
           try? assembler.dropKey(direction: .rear)
           calligrapher = prevReading
         } else {
-          guard input.isShiftHold, isComposerOrCalligrapherEmpty else { break shiftBksp }
+          guard input.isShiftHeld, isComposerOrCalligrapherEmpty else { break shiftBksp }
           guard let prevReading = previousParsableReading else { break shiftBksp }
           // prevReading 的內容分別是：「完整讀音」「去掉聲調的讀音」「是否有聲調」。
           // 此處刻意使用 Assembler 的 API（assembler.dropKey）以避免呼叫
@@ -860,7 +860,7 @@ extension InputHandlerProtocol {
       return true
     }
 
-    if input.isShiftHold {
+    if input.isShiftHeld {
       // Shift + Right
       if assembler.cursor < assembler.length {
         assembler.marker = assembler.cursor
@@ -889,8 +889,8 @@ extension InputHandlerProtocol {
       } else {
         errorCallback?("BB7F6DB9")
       }
-    } else if input.isOptionHold, !input.isShiftHold {
-      if input.isControlHold {
+    } else if input.isOptionHeld, !input.isShiftHeld {
+      if input.isControlHeld {
         return handleEnd()
       }
       // 游標跳轉動作無論怎樣都會執行，但如果出了執行失敗的結果的話則觸發報錯流程。
@@ -926,7 +926,7 @@ extension InputHandlerProtocol {
       return true
     }
 
-    if input.isShiftHold {
+    if input.isShiftHeld {
       // Shift + left
       if assembler.cursor > 0 {
         assembler.marker = assembler.cursor
@@ -958,8 +958,8 @@ extension InputHandlerProtocol {
       } else {
         errorCallback?("D326DEA3")
       }
-    } else if input.isOptionHold, !input.isShiftHold {
-      if input.isControlHold { return handleHome() }
+    } else if input.isOptionHeld, !input.isShiftHeld {
+      if input.isControlHeld { return handleHome() }
       // 游標跳轉動作無論怎樣都會執行，但如果出了執行失敗的結果的話則觸發報錯流程。
       if (try? assembler.jumpCursorBySegment(to: .rear)) == nil {
         errorCallback?("8D50DD9E")
@@ -1150,7 +1150,7 @@ extension InputHandlerProtocol {
 
     // 字母鍵摁 Shift 的話，無須額外處理，因為直接就會敲出大寫字母。
     var shiftCapsLockHandling = input.isUpperCaseASCIILetterKey && session.isASCIIMode
-    shiftCapsLockHandling = shiftCapsLockHandling || handleCapsLock && input.isShiftHold
+    shiftCapsLockHandling = shiftCapsLockHandling || handleCapsLock && input.isShiftHeld
     guard !shiftCapsLockHandling else { return false }
 
     // 不再讓唯音處理由 Shift 切換到的英文模式的按鍵輸入。
@@ -1177,7 +1177,7 @@ extension InputHandlerProtocol {
     var state: State { session.state }
     // 用上下左右鍵呼叫選字窗。
     // 僅憑藉 state.hasComposition 的話，並不能真實把握組字器的狀況。
-    // 另外，這裡不要用「!input.isFunctionKeyHold」，
+    // 另外，這裡不要用「!input.isFunctionKeyHeld」，
     // 否則會導致對上下左右鍵與翻頁鍵的判斷失效。
     let notEmpty = state.hasComposition && !assembler.isEmpty && isComposerOrCalligrapherEmpty
     let bannedModifiers: KBEvent.ModifierFlags = [.option, .shift, .command, .control]
@@ -1202,10 +1202,10 @@ extension InputHandlerProtocol {
   func handleArabicNumeralInputs(input: InputSignalProtocol) -> Bool {
     guard let session = session else { return false }
     guard session.state.type == .ofEmpty, input.isMainAreaNumKey else { return false }
-    guard input.isOptionHold, !input.isHoldingAny([.command, .control]) else { return false }
+    guard input.isOptionHeld, !input.isHoldingAny([.command, .control]) else { return false }
     guard let strRAW = input.mainAreaNumKeyChar else { return false }
     let newString: String = {
-      if input.isShiftHold {
+      if input.isShiftHeld {
         return strRAW.applyingTransformFW2HW(reverse: !prefs.halfWidthPunctuationEnabled)
       }
       return strRAW.applyingTransformFW2HW(reverse: false)
@@ -1223,7 +1223,7 @@ extension InputHandlerProtocol {
     guard let session = session else { return false }
     let inputText = input.text
     if input.isUpperCaseASCIILetterKey, !input.isHoldingAny([.command, .control]) {
-      if input.isShiftHold { // 這裡先不要判斷 isOptionHold。
+      if input.isShiftHeld { // 這裡先不要判斷 isOptionHeld。
         switch prefs.upperCaseLetterKeyBehavior {
         case 1, 3:
           if prefs.upperCaseLetterKeyBehavior == 3, !isConsideredEmptyForNow { break }

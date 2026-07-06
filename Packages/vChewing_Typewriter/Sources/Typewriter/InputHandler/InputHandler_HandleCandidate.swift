@@ -143,7 +143,7 @@ extension InputHandlerProtocol {
       switch keyCodeType {
       case .kCarriageReturn, .kLineFeed:
         if state.type == .ofAssociates,
-           !(input.isShiftHold || prefs.alsoConfirmAssociatedCandidatesByEnter) {
+           !(input.isShiftHeld || prefs.alsoConfirmAssociatedCandidatesByEnter) {
           session.switchState(State.ofAbortion())
           return true
         }
@@ -171,12 +171,12 @@ extension InputHandlerProtocol {
         let updated: Bool =
           prefs.specifyShiftTabKeyBehavior
             ? (
-              input.isShiftHold
+              input.isShiftHeld
                 ? ctlCandidate.showPreviousLine()
                 : ctlCandidate.showNextLine()
             )
             : (
-              input.isShiftHold
+              input.isShiftHeld
                 ? ctlCandidate.highlightPreviousCandidate()
                 : ctlCandidate.highlightNextCandidate()
             )
@@ -193,12 +193,12 @@ extension InputHandlerProtocol {
         let updated: Bool =
           effectiveSpecifyShift
             ? (
-              input.isShiftHold
+              input.isShiftHeld
                 ? ctlCandidate.highlightNextCandidate()
                 : ctlCandidate.showNextLine()
             )
             : (
-              input.isShiftHold
+              input.isShiftHeld
                 ? ctlCandidate.showNextLine()
                 : ctlCandidate.highlightNextCandidate()
             )
@@ -286,7 +286,7 @@ extension InputHandlerProtocol {
 
     // MARK: 關聯詞語處理 (Associated Phrases) 以及標準選字處理
 
-    if state.type == .ofAssociates, !input.isShiftHold { return false }
+    if state.type == .ofAssociates, !input.isShiftHeld { return false }
 
     var index: Int?
     var shaltShiftHold = [.ofAssociates].contains(state.type)

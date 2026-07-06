@@ -46,7 +46,7 @@ public struct MixedAlphanumericalTypewriter<Handler: InputHandlerProtocol>: Type
     // 若不提前攔截，Space 將返回 nil，無法走到注音確認路徑。
     // Shift+Space 在 non-empty 狀態下放棄注音處理，
     // 直接遞交 mixed buffer 內容 + ASCII 空格。
-    if input.isSpace, input.isShiftHold {
+    if input.isSpace, input.isShiftHeld {
       guard !handler.isConsideredEmptyForNow else { return nil }
       let chineseText = handler.committableDisplayText(sansReading: true)
       let asciiText = handler.mixedAlphanumericalBuffer + " "
@@ -236,7 +236,7 @@ public struct MixedAlphanumericalTypewriter<Handler: InputHandlerProtocol>: Type
     let shouldForceByBufferContext =
       (bufferHasASCIIAlnum || bufferContainsNonPhoneticKey) && !isBaseInputPhoneticKey
     let forceASCIIPunctuationPath =
-      isASCIIPunctuation && (input.isShiftHold || shouldForceByBufferContext)
+      isASCIIPunctuation && (input.isShiftHeld || shouldForceByBufferContext)
 
     var inputText: String
     switch (isUppercaseLetter, forceASCIIPunctuationPath) {
@@ -249,7 +249,7 @@ public struct MixedAlphanumericalTypewriter<Handler: InputHandlerProtocol>: Type
     let isPhoneticKeyRaw = handler.composer.inputValidityCheck(charStr: inputText)
     // 摁 Shift 敲入的 ASCII 不得被記入注音輸入。
     // 當 Shift 被按住且輸出為 ASCII 可列印字元時，強制視為 ASCII 路徑。
-    let isShiftASCII = input.isShiftHold && visibleInputText.range(of: "^[ -~]$", options: .regularExpression) != nil
+    let isShiftASCII = input.isShiftHeld && visibleInputText.range(of: "^[ -~]$", options: .regularExpression) != nil
 
     // 若當前鍵（含修飾鍵）在標點詞庫有可用項，
     // 視為 CJK 標點輸入，優先回到既有標點管線處理。
@@ -257,7 +257,7 @@ public struct MixedAlphanumericalTypewriter<Handler: InputHandlerProtocol>: Type
     // 僅 Shift+? 需強制保留 ASCII 語義，不回到 CJK 標點管線。
     // 其餘 Shift 標點（例如 Shift+` 的 ~）仍需維持既有 CJK 標點查詢能力。
     let punctuationQueryStrings = handler.punctuationQueryStrings(input: input)
-    let isShiftQuestionMark = input.isShiftHold && ["?", "？"].contains(visibleInputText)
+    let isShiftQuestionMark = input.isShiftHeld && ["?", "？"].contains(visibleInputText)
     let matchesCJKPunctuation = !isShiftQuestionMark && isPunctuationChar
       && !isPhoneticKeyRaw && (punctuationQueryStrings?.contains {
         handler.currentLM.hasUnigramsFor(keyArray: [$0])
@@ -273,7 +273,7 @@ public struct MixedAlphanumericalTypewriter<Handler: InputHandlerProtocol>: Type
       return nil
     }
 
-    guard !input.isControlHold, !input.isOptionHold, !input.isCommandHold else { return nil }
+    guard !input.isControlHeld, !input.isOptionHeld, !input.isCommandHeld else { return nil }
     // 移除對空 buffer 的 Shift+大寫字母提前返回，改由下方統一處理（保留大寫）。
     let isPhoneticKey = (forceASCIIPunctuationPath || isShiftASCII) ? false : isPhoneticKeyRaw
     let isASCIIPrintable = inputText.range(of: "^[ -~]$", options: .regularExpression) != nil
@@ -810,7 +810,7 @@ public struct MixedAlphanumericalTypewriter<Handler: InputHandlerProtocol>: Type
 
   private func resolveVisibleInputText(_ input: some InputSignalProtocol) -> String {
     let transformedInputText = input.text.applyingTransformFW2HW(reverse: false)
-    guard input.isShiftHold else { return transformedInputText }
+    guard input.isShiftHeld else { return transformedInputText }
 
     let transformedInputTextIgnoringModifiers = (input.inputTextIgnoringModifiers ?? input.text)
       .applyingTransformFW2HW(reverse: false)
@@ -828,9 +828,9 @@ public struct MixedAlphanumericalTypewriter<Handler: InputHandlerProtocol>: Type
   }
 
   private func resolveLiteralASCIIMainAreaText(_ input: some InputSignalProtocol) -> String? {
-    guard input.isOptionHold,
-          !input.isControlHold,
-          !input.isCommandHold,
+    guard input.isOptionHeld,
+          !input.isControlHeld,
+          !input.isCommandHeld,
           !input.isSymbolMenuPhysicalKey
     else {
       return nil
@@ -840,7 +840,7 @@ public struct MixedAlphanumericalTypewriter<Handler: InputHandlerProtocol>: Type
       return nil
     }
 
-    let literalASCII = (input.isShiftHold ? mappedTuple.1 : mappedTuple.0)
+    let literalASCII = (input.isShiftHeld ? mappedTuple.1 : mappedTuple.0)
       .applyingTransformFW2HW(reverse: false)
     guard literalASCII.range(of: "^[ -~]$", options: .regularExpression) != nil else {
       return nil

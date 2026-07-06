@@ -24,7 +24,7 @@ extension InputHandlerProtocol {
       switch keyCodeType {
       case .kEscape: return handleEsc()
       case .kContextMenu, .kTab: return revolveCandidate(
-          reverseOrder: input.isShiftHold,
+          reverseOrder: input.isShiftHeld,
           softRevolve: prefs.preferredRevolverForceLevel == 2
         )
       case .kDownArrow, .kLeftArrow, .kRightArrow, .kUpArrow:
@@ -78,7 +78,7 @@ extension InputHandlerProtocol {
         switch state.type {
         case .ofEmpty:
           if !input.isHoldingAny([.option, .control, .command]) {
-            session.switchState(State.ofCommitting(textToCommit: input.isShiftHold ? "　" : " "))
+            session.switchState(State.ofCommitting(textToCommit: input.isShiftHeld ? "　" : " "))
             return true
           }
         case .ofInputting:
@@ -89,13 +89,13 @@ extension InputHandlerProtocol {
             // 此時 Shift+Space 反向輪替，仿 Shift+Tab 行為。
             // SPACE 啟動的輪替一律套用 soft revolve，避免毀掉鄰近已覆寫節點。
             return revolveCandidate(
-              reverseOrder: input.isShiftHold,
+              reverseOrder: input.isShiftHeld,
               softRevolve: prefs.preferredRevolverForceLevel != 0
             )
           }
-          if input.isShiftHold, !input.isHoldingAny([.control, .option]) {
+          if input.isShiftHeld, !input.isHoldingAny([.control, .option]) {
             return revolveCandidate(
-              reverseOrder: input.isCommandHold,
+              reverseOrder: input.isCommandHeld,
               softRevolve: prefs.preferredRevolverForceLevel != 0
             )
           }
@@ -161,7 +161,7 @@ extension InputHandlerProtocol {
       // 如果當前組字器為空的話，就不再攔截 Cmd / 非筆電功能鍵，
       // 畢竟這些鍵可能會用來觸發系統功能。
       if !state.hasComposition,
-         input.isCommandHold || input.isNonLaptopFunctionKey { return false }
+         input.isCommandHeld || input.isNonLaptopFunctionKey { return false }
 
       // 若 Caps Lock 被啟用的話，則暫停對注音輸入的處理。
       // 這裡的處理仍舊有用，不然 Caps Lock 英文模式無法直接鍵入小寫字母。
