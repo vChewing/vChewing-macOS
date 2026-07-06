@@ -41,7 +41,7 @@ public enum TypingMethod: Int, CaseIterable {
   }
 }
 
-// MARK: - Handle Rotation Toggles
+// MARK: - Handle Revolution Toggles
 
 extension InputHandlerProtocol {
   @discardableResult

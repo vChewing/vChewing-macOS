@@ -28,19 +28,19 @@ extension InputHandlerProtocol {
           softRevolve: prefs.preferredRevolverForceLevel == 2
         )
       case .kDownArrow, .kLeftArrow, .kRightArrow, .kUpArrow:
-        let rotation: Bool = (input.isOptionHold || input.isShiftHold) && state.type == .ofInputting
+        let revolution: Bool = (input.isOptionHold || input.isShiftHold) && state.type == .ofInputting
         handleArrowKey: switch (keyCodeType, session.isVerticalTyping) {
         case (.kLeftArrow, false), (.kUpArrow, true): return handleBackward(input: input)
         case (.kDownArrow, true), (.kRightArrow, false): return handleForward(input: input)
         case (.kLeftArrow, true), (.kUpArrow, false):
-          return rotation
+          return revolution
             ? revolveCandidate(
               reverseOrder: true,
               softRevolve: prefs.preferredRevolverForceLevel == 2
             )
             : handleClockKey()
         case (.kDownArrow, false), (.kRightArrow, true):
-          return rotation
+          return revolution
             ? revolveCandidate(
               reverseOrder: false,
               softRevolve: prefs.preferredRevolverForceLevel == 2
