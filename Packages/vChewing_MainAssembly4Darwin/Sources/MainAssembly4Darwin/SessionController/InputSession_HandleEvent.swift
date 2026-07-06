@@ -109,6 +109,20 @@ extension SessionProtocol {
       return true // Adobe Photoshop 相容：對 JIS 英數切換鍵傳入事件一律立刻返回 true。
     }
 
+    fnKeyCheck: if event.isHoldingAny(.function) {
+      // 這裡需要做額外的檢查。某些按鍵可能自帶 fn flag，哪怕使用者用的是沒有 Fn 的 104 keyboard。
+      let keyCode = KeyCode(rawValue: event.keyCode)
+      guard let keyCode else { return false }
+      let innocentKeyCodes: Set<KeyCode> = [
+        .kPageUp, .kPageDown, .kHome, .kEnd,
+        .kUpArrow, .kDownArrow, .kLeftArrow, .kRightArrow,
+        .kBackSpace, .kWindowsDelete,
+      ]
+      if innocentKeyCodes.contains(keyCode) {
+        break fnKeyCheck
+      }
+      return false
+    }
 
     /// 這裡仍舊需要判斷 flags。之前使輸入法狀態卡住無法敲漢字的問題已在 InputHandler 內修復。
     /// 這裡不判斷 flags 的話，用方向鍵前後定位光標之後，再次試圖觸發組字區時、反而會在首次按鍵時失敗。
