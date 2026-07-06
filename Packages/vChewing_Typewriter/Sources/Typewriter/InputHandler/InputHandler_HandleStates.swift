@@ -982,8 +982,9 @@ extension InputHandlerProtocol {
   /// 以給定之參數來處理上下文候選字詞之輪替。
   /// - Parameters:
   ///   - reverseOrder: 是否有控制輪替方向的修飾鍵輸入。
+  ///   - softRevolve: 是否啟用 soft revolve（避免跨越鄰近已覆寫節點）。預設 false。
   /// - Returns: 將按鍵行為「是否有處理掉」藉由 SessionCtl 回報給 IMK。
-  func revolveCandidate(reverseOrder: Bool) -> Bool {
+  func revolveCandidate(reverseOrder: Bool, softRevolve: Bool = false) -> Bool {
     guard let session = session else { return false }
     let state = session.state
     if isComposerOrCalligrapherEmpty,
@@ -1017,6 +1018,7 @@ extension InputHandlerProtocol {
       let revolvement = try assembler.revolveCandidate(
         cursorType: homaCandidateCursorType,
         counterClockwise: reverseOrder,
+        softRevolve: softRevolve,
         skipInitialConsolidation: shouldSkipInitialConsolidation
       ) { debugIntelRetrieved in
         debugIntel = debugIntelRetrieved

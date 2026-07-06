@@ -23,16 +23,29 @@ extension InputHandlerProtocol {
       guard let keyCodeType = KeyCode(rawValue: input.keyCode) else { return nil }
       switch keyCodeType {
       case .kEscape: return handleEsc()
-      case .kContextMenu, .kTab: return revolveCandidate(reverseOrder: input.isShiftHold)
+      case .kContextMenu, .kTab: return revolveCandidate(
+          reverseOrder: input.isShiftHold,
+          softRevolve: prefs.preferredRevolverForceLevel == 2
+        )
       case .kDownArrow, .kLeftArrow, .kRightArrow, .kUpArrow:
         let rotation: Bool = (input.isOptionHold || input.isShiftHold) && state.type == .ofInputting
         handleArrowKey: switch (keyCodeType, session.isVerticalTyping) {
         case (.kLeftArrow, false), (.kUpArrow, true): return handleBackward(input: input)
         case (.kDownArrow, true), (.kRightArrow, false): return handleForward(input: input)
         case (.kLeftArrow, true), (.kUpArrow, false):
-          return rotation ? revolveCandidate(reverseOrder: true) : handleClockKey()
+          return rotation
+            ? revolveCandidate(
+              reverseOrder: true,
+              softRevolve: prefs.preferredRevolverForceLevel == 2
+            )
+            : handleClockKey()
         case (.kDownArrow, false), (.kRightArrow, true):
-          return rotation ? revolveCandidate(reverseOrder: false) : handleClockKey()
+          return rotation
+            ? revolveCandidate(
+              reverseOrder: false,
+              softRevolve: prefs.preferredRevolverForceLevel == 2
+            )
+            : handleClockKey()
         default: break handleArrowKey // 該情況應該不會發生，因為上面都有處理過。
         }
       case .kHome: return handleHome()
@@ -74,10 +87,17 @@ extension InputHandlerProtocol {
           if prefs.spaceKeyBehaviorAgainstICB == 2,
              input.keyModifierFlags.intersection([.control, .command, .option]).isEmpty {
             // 此時 Shift+Space 反向輪替，仿 Shift+Tab 行為。
-            return revolveCandidate(reverseOrder: input.isShiftHold)
+            // SPACE 啟動的輪替一律套用 soft revolve，避免毀掉鄰近已覆寫節點。
+            return revolveCandidate(
+              reverseOrder: input.isShiftHold,
+              softRevolve: prefs.preferredRevolverForceLevel != 0
+            )
           }
           if input.isShiftHold, !input.isControlHold, !input.isOptionHold {
-            return revolveCandidate(reverseOrder: input.isCommandHold)
+            return revolveCandidate(
+              reverseOrder: input.isCommandHold,
+              softRevolve: prefs.preferredRevolverForceLevel != 0
+            )
           }
           if currentTypingMethod == .codePoint {
             errorCallback?("FDD88EDB")
@@ -176,8 +196,14 @@ extension InputHandlerProtocol {
         if state.type != .ofInputting { break revolveCandidateWithBrackets }
         // 此處 JIS 鍵盤判定無法用於螢幕鍵盤。所以，螢幕鍵盤的場合，系統會依照 US 鍵盤的判定方案。
         switch (input.keyCode, isJISKeyboard?() ?? false) {
-        case (30, true), (33, false): return revolveCandidate(reverseOrder: true)
-        case (30, false), (42, true): return revolveCandidate(reverseOrder: false)
+        case (30, true), (33, false): return revolveCandidate(
+            reverseOrder: true,
+            softRevolve: prefs.preferredRevolverForceLevel == 2
+          )
+        case (30, false), (42, true): return revolveCandidate(
+            reverseOrder: false,
+            softRevolve: prefs.preferredRevolverForceLevel == 2
+          )
         default: break
         }
       }
