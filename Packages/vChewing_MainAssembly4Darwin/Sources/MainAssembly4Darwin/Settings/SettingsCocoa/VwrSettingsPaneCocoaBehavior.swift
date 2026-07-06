@@ -104,6 +104,10 @@ extension SettingsPanesCocoa {
                 fixWidth: innerContentWidth,
                 prefUITab: .tabBehavior
               )
+              UserDef.kPreferredRevolverForceLevel.renderCocoa(
+                fixWidth: innerContentWidth,
+                prefUITab: .tabBehavior
+              )
               UserDef.kEscToCleanInputBuffer.renderCocoa(
                 fixWidth: innerContentWidth,
                 prefUITab: .tabBehavior

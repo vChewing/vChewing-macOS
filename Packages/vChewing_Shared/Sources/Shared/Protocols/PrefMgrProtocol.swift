@@ -60,6 +60,7 @@ public protocol PrefMgrProtocol {
   var togglingAlphanumericalModeWithLShift: Bool { get set }
   var togglingAlphanumericalModeWithRShift: Bool { get set }
   var consolidateContextOnCandidateSelection: Bool { get set }
+  var preferredRevolverForceLevel: Int { get set }
   var hardenVerticalPunctuations: Bool { get set }
   var trimUnfinishedReadingsOnCommit: Bool { get set }
   var alwaysShowTooltipTextsHorizontally: Bool { get set }

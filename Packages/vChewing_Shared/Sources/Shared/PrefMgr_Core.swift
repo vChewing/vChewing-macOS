@@ -180,6 +180,9 @@ public final class PrefMgr: PrefMgrProtocol, Sendable {
   @AppProperty(userDef: .kConsolidateContextOnCandidateSelection)
   public var consolidateContextOnCandidateSelection: Bool
 
+  @AppProperty(userDef: .kPreferredRevolverForceLevel)
+  public var preferredRevolverForceLevel: Int
+
   @AppProperty(userDef: .kHardenVerticalPunctuations)
   public var hardenVerticalPunctuations: Bool
 
@@ -484,6 +487,9 @@ extension PrefMgr {
     }
     if ![0, 1, 2].contains(candidateStateJKHLBehavior) {
       candidateStateJKHLBehavior = 0
+    }
+    if ![0, 1, 2].contains(preferredRevolverForceLevel) {
+      preferredRevolverForceLevel = 2
     }
     if ![0, 1, 2].contains(spaceKeyBehaviorAgainstICB) {
       spaceKeyBehaviorAgainstICB = 1

@@ -423,6 +423,11 @@
 "i18n:UserDef.kPhraseReplacementEnabled.shortTitle" = "啟用語彙置換表";
 "i18n:UserDef.kPopupCompositionBufferTextSize.description" = "調整浮動組字窗的字型大小。";
 "i18n:UserDef.kPopupCompositionBufferTextSize.shortTitle" = "浮動組字窗字號:";
+"i18n:UserDef.kPreferredRevolverForceLevel.description" = "自 v4.5.4 版起引入「弱輪替」保護機制：當您使用鍵盤熱鍵（如 Space/Tab）進行就地輪替時，若目標為多音節候選、且其範圍會覆蓋到「非當前游標位置」且「已被您手動選定」的字詞時，系統將跳過該候選，以防止已選定的內容受到意外影響。此功能特別適合習慣「一個字一個字地選字」的使用者，能確保您在修正後方字詞時，前方已選定的內容依然穩固。此設定不影響選字窗的選字行為。";
+"i18n:UserDef.kPreferredRevolverForceLevel.option.0" = "一律使用強輪替 (優先候選結果)";
+"i18n:UserDef.kPreferredRevolverForceLevel.option.1" = "僅在 (Shift+)Space 輪替時啟用弱輪替";
+"i18n:UserDef.kPreferredRevolverForceLevel.option.2" = "一律使用弱輪替 (優先保護已選內容)";
+"i18n:UserDef.kPreferredRevolverForceLevel.shortTitle" = "就地輪替強度偏好";
 "i18n:UserDef.kReadingNarrationCoverage.description" = "這會將您的組音區的內容唸出來。該功能對磁帶模式無效。";
 "i18n:UserDef.kReadingNarrationCoverage.option.0" = "不唸讀";
 "i18n:UserDef.kReadingNarrationCoverage.option.1" = "僅在用聲調鍵確認時";

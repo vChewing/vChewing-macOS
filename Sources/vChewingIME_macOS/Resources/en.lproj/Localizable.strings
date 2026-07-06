@@ -423,6 +423,11 @@
 "i18n:UserDef.kPhraseReplacementEnabled.shortTitle" = "Enable phrase replacement table";
 "i18n:UserDef.kPopupCompositionBufferTextSize.description" = "Adjust the font size of the popup composition buffer.";
 "i18n:UserDef.kPopupCompositionBufferTextSize.shortTitle" = "Popup Composition Buffer Font Size:";
+"i18n:UserDef.kPreferredRevolverForceLevel.description" = "Introduced in v4.5.4, \"Weak-Revolve\" is a protection mechanism for in-place revolving via keyboard shortcuts (e.g., Space/Tab). If a multi-syllable candidate would overwrite manually selected characters outside the current cursor position, it is skipped to prevent previous selections from being unexpectedly affected. This is especially useful for users who prefer \"character-by-character\" selection, ensuring that prior overrides remain intact while revolving subsequent text. This does not affect selections made via the candidate window.";
+"i18n:UserDef.kPreferredRevolverForceLevel.option.0" = "Always use Strong Revolve (Prioritize Result)";
+"i18n:UserDef.kPreferredRevolverForceLevel.option.1" = "Use Weak-Revolve only for (Shift+)Space";
+"i18n:UserDef.kPreferredRevolverForceLevel.option.2" = "Always use Weak-Revolve (Prioritize Protection)";
+"i18n:UserDef.kPreferredRevolverForceLevel.shortTitle" = "In-place Revolve Strength";
 "i18n:UserDef.kReadingNarrationCoverage.description" = "This reads your typed phonabets aloud. Only works with non-cassette Mode.";
 "i18n:UserDef.kReadingNarrationCoverage.option.0" = "Do not narrate";
 "i18n:UserDef.kReadingNarrationCoverage.option.1" = "Only when combined by intonation";

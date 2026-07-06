@@ -88,6 +88,7 @@ nonisolated public enum UserDef: String, CaseIterable, Identifiable, Sendable {
   case kUpperCaseLetterKeyBehavior = "UpperCaseLetterKeyBehavior"
   case kNumPadCharInputBehavior = "NumPadCharInputBehavior"
   case kConsolidateContextOnCandidateSelection = "ConsolidateContextOnCandidateSelection"
+  case kPreferredRevolverForceLevel = "PreferredRevolverForceLevel"
   case kHardenVerticalPunctuations = "HardenVerticalPunctuations"
   case kTrimUnfinishedReadingsOnCommit = "TrimUnfinishedReadingsOnCommit"
   case kAlwaysShowTooltipTextsHorizontally = "AlwaysShowTooltipTextsHorizontally"
@@ -372,6 +373,7 @@ nonisolated extension UserDef {
     case .kCursorPlacementAfterSelectingCandidate: 0 ... 2
     case .kCandidateNarrationToggleType: 0 ... 2
     case .kCandidateStateJKHLBehavior: 0 ... 2
+    case .kPreferredRevolverForceLevel: 0 ... 2
     case .kSpecifiedNotifyUIColorScheme: 0 ... 2
     case .kForceCassetteChineseConversion: 0 ... 2
     case .kNumPadCharInputBehavior: 0 ... 2
@@ -498,6 +500,7 @@ nonisolated extension UserDef {
     case .kUpperCaseLetterKeyBehavior: return .integer(0)
     case .kNumPadCharInputBehavior: return .integer(0)
     case .kConsolidateContextOnCandidateSelection: return .bool(true)
+    case .kPreferredRevolverForceLevel: return .integer(2)
     case .kHardenVerticalPunctuations: return .bool(false)
     case .kTrimUnfinishedReadingsOnCommit: return .bool(true)
     case .kAlwaysShowTooltipTextsHorizontally: return .bool(false)
@@ -935,6 +938,15 @@ nonisolated extension UserDef {
     case .kConsolidateContextOnCandidateSelection: return .init(
         userDef: self, shortTitle: "i18n:UserDef.kConsolidateContextOnCandidateSelection.shortTitle",
         description: "i18n:UserDef.kConsolidateContextOnCandidateSelection.description"
+      )
+    case .kPreferredRevolverForceLevel: return .init(
+        userDef: self, shortTitle: "i18n:UserDef.kPreferredRevolverForceLevel.shortTitle",
+        description: "i18n:UserDef.kPreferredRevolverForceLevel.description",
+        options: [
+          0: "i18n:UserDef.kPreferredRevolverForceLevel.option.0",
+          1: "i18n:UserDef.kPreferredRevolverForceLevel.option.1",
+          2: "i18n:UserDef.kPreferredRevolverForceLevel.option.2",
+        ]
       )
     case .kHardenVerticalPunctuations: return .init(
         userDef: self,
