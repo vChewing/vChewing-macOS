@@ -857,6 +857,196 @@ public struct HomaTestsAdvanced: HomaTestSuite {
     #expect(assembler.assembledSentence.map(\ .value) == ["流", "一縷"])
   }
 
+  /// 重現「soft revolve」需求報告的情境一（ji4-gong1）。
+  ///
+  /// 流程：敲 ji4-gong1 → 預設組字「技工」；使用者採「一個字一個字選」習慣，
+  /// 先將 ji4 手動覆寫成「濟」（explicit），再將游標移到 gong1 正前方對 gong1 輪替。
+  ///
+  /// 預期（使用者期望）：輪替只動 gong1，已覆寫的「濟」不應被影響。
+  /// 實際（現行 hard revolve 行為）：首輪輪替即把「濟」回退成「技工」，需再輪替一次才得「濟公」。
+  ///
+  /// 根因（由程式碼追蹤確認）：
+  /// 1. 覆寫 ji4→濟後，組句結果為 [濟(explicit), 供(auto)]（TechGuarden 內 gong1 最高單元圖為「供」）。
+  /// 2. 游標在 length=2（front edge），`.placedFront`，`skipInitialConsolidation` 為 true，
+  ///    故首輪鞏固被跳過——傷害並非來自鞏固。
+  /// 3. `fetchCandidates` 回傳候選按 (segLength, keyArray, weight) 降序排列：
+  ///    [技工, 濟公, 記功, 供, 公, 攻, ...]，雙音節候選排在前面。
+  /// 4. 當前節點「供」非 explicit，`calculateNextCandidateIndex` 走 non-explicit 分支：
+  ///    首候選「技工」≠「供」→ 回傳索引 0（技工）。
+  /// 5. `overrideCandidate(技工, ...)` 的 targetRange = [0,2)，跨越 position 0，
+  ///    把已覆寫的「濟」覆蓋掉，結果變回 [技工]。
+  @Test("[Homa] Revolver_OverridesNeighboringExplicitNode_Scenario1")
+  func testRevolverOverridesNeighboringExplicitNode_Scenario1() async throws {
+    let mockLM = TestLM(rawData: HomaTests.strLMSampleDataTechGuarden)
+    let assembler = Homa.Assembler(gramQuerier: { mockLM.queryGrams($0) })
+    try ["ji4", "gong1"].forEach { try assembler.insertKey($0) }
+    #expect(assembler.assemble().values == ["技工"])
+
+    // Step 1：使用者將 ji4 手動選成「濟」（explicit）。
+    assembler.cursor = 0
+    try assembler.overrideCandidate(
+      .init(keyArray: ["ji4"], value: "濟"),
+      at: 0,
+      isExplicitlyOverridden: true
+    )
+    #expect(assembler.assembledSentence.map(\.value) == ["濟", "供"])
+
+    // Step 2：游標移到 gong1 正前方（front-cursor 風格，操作 gong1 區域）。
+    assembler.cursor = assembler.length
+    let candidatesAtGong = assembler.fetchCandidates(filter: .endAt).map(\.pair.value)
+    print("[Scenario1] candidates at gong1: \(candidatesAtGong)")
+
+    // Step 3：首輪輪替（現行 hard revolve）。
+    var debugIntel: [String] = []
+    let revolved1 = try assembler.revolveCandidate(
+      cursorType: .placedFront,
+      counterClockwise: false,
+      debugIntelHandler: { debugIntel.append($0) }
+    )
+    print("[Scenario1] first revolve -> \(revolved1.0.pair.value)")
+    print("[Scenario1] assembled after first revolve: \(assembler.assembledSentence.map(\.value))")
+    print("[Scenario1] debugIntel:\n\(debugIntel.joined(separator: "\n"))")
+
+    // Actual（現行 bug）：濟被回退，結果變回 [技工]。
+    #expect(revolved1.0.pair.value == "技工")
+    #expect(assembler.assembledSentence.map(\.value) == ["技工"])
+    // Desired（soft revolve）：濟應保留，僅 gong1 被輪替，結果應為 ["濟", "公"]。
+
+    // Step 4：再輪替一次 → 濟公（與報告所述一致）。
+    let revolved2 = try assembler.revolveCandidate(
+      cursorType: .placedFront,
+      counterClockwise: false
+    )
+    print("[Scenario1] second revolve -> \(revolved2.0.pair.value)")
+    print("[Scenario1] assembled after second revolve: \(assembler.assembledSentence.map(\.value))")
+    #expect(revolved2.0.pair.value == "濟公")
+    #expect(assembler.assembledSentence.map(\.value) == ["濟公"])
+  }
+
+  /// Soft revolve 驗收（情境一）：`softRevolve: true` 時，輪替 gong1 不應毀掉已覆寫的「濟」。
+  @Test("[Homa] Revolver_SoftRevolvePreservesExplicitNeighbor_Scenario1")
+  func testRevolverSoftRevolvePreservesExplicitNeighbor_Scenario1() async throws {
+    let mockLM = TestLM(rawData: HomaTests.strLMSampleDataTechGuarden)
+    let assembler = Homa.Assembler(gramQuerier: { mockLM.queryGrams($0) })
+    try ["ji4", "gong1"].forEach { try assembler.insertKey($0) }
+    _ = assembler.assemble()
+
+    // 先將 ji4 手動選成「濟」（explicit）。
+    assembler.cursor = 0
+    try assembler.overrideCandidate(
+      .init(keyArray: ["ji4"], value: "濟"),
+      at: 0,
+      isExplicitlyOverridden: true
+    )
+    #expect(assembler.assembledSentence.map(\.value) == ["濟", "供"])
+
+    // 游標移到 gong1 正前方，以 soft revolve 輪替。
+    assembler.cursor = assembler.length
+    let revolved = try assembler.revolveCandidate(
+      cursorType: .placedFront,
+      counterClockwise: false,
+      softRevolve: true
+    )
+    print("[Scenario1-Soft] revolve -> \(revolved.0.pair.value)")
+    print("[Scenario1-Soft] assembled: \(assembler.assembledSentence.map(\.value))")
+
+    // 期望：濟存活，僅 gong1 被輪替（供 -> 公，安全子集內的下一個單音節候選）。
+    #expect(assembler.assembledSentence.contains { $0.value == "濟" })
+    #expect(assembler.assembledSentence.map(\.value) == ["濟", "公"])
+  }
+
+  /// Soft revolve 驗收（情境二）：`softRevolve: true` 時，中段輪替 yi4 不應毀掉已覆寫的「流」。
+  @Test("[Homa] Revolver_SoftRevolvePreservesExplicitNeighbor_Scenario2")
+  func testRevolverSoftRevolvePreservesExplicitNeighbor_Scenario2() async throws {
+    let mockLM = TestLM(rawData: HomaTests.strLMSampleDataHutao)
+    let assembler = Homa.Assembler(gramQuerier: { mockLM.queryGrams($0) })
+    try ["neng2", "liu2", "yi4", "lv3"].forEach { try assembler.insertKey($0) }
+    _ = assembler.assemble()
+
+    // 先將中段的 liu2 覆寫成「流」（explicit）。
+    assembler.cursor = 1
+    try assembler.overrideCandidate(
+      .init(keyArray: ["liu2"], value: "流"),
+      at: 1,
+      isExplicitlyOverridden: true
+    )
+    #expect(assembler.assembledSentence.contains { $0.value == "流" })
+
+    // 游標移到 yi4 正前方（中段，鞏固活躍），以 soft revolve 輪替。
+    assembler.cursor = 3
+    let revolved = try assembler.revolveCandidate(
+      cursorType: .placedFront,
+      counterClockwise: false,
+      softRevolve: true
+    )
+    print("[Scenario2-Soft] revolve -> \(revolved.0.pair.value)")
+    print("[Scenario2-Soft] assembled: \(assembler.assembledSentence.map(\.value))")
+
+    // 期望：流存活，僅 yi4 被輪替。
+    #expect(assembler.assembledSentence.contains { $0.value == "流" })
+  }
+
+  /// 情境二類比：中段游標、鞏固活躍、多音節候選跨越鄰近 explicit 節點。
+  ///
+  /// 利用 `strLMSampleDataHutao` 最強的雙音節單元圖 `liu2-yi4 留意`(-4.407) 構築：
+  /// - 敲 `neng2 liu2 yi4 lv3` → 預設組字 `能 留意 旅`（留意為中段雙音節節點）。
+  /// - 使用者將 `liu2`（留意的首音節，中段）覆寫成「流」（explicit，類比情境二的「要」）
+  ///   → `能 流 亦 旅`（流存活，yi4 自動殘餘取最高權重）。
+  /// - 再把游標移到 `yi4` 正前方（position 3，非 edge）輪替 `yi4`。
+  ///   此時 `isCursorAtAssemblerEdge(.front) == false` → `skipInitialConsolidation = false`，
+  ///   首輪鞏固**會執行**——這是與情境一的關鍵差異。
+  /// - 觀察：候選列表含 `留意`（segLength 2，跨越 [1,3)），`calculateNextCandidateIndex`
+  ///   在 non-explicit 分支回傳索引 0（留意），`overrideCandidate` 覆蓋 position 1 的 explicit「流」。
+  @Test("[Homa] Revolver_MidBufferConsolidationActive_Scenario2Analogue")
+  func testRevolverMidBufferConsolidationActive_Scenario2Analogue() async throws {
+    let mockLM = TestLM(rawData: HomaTests.strLMSampleDataHutao)
+    let assembler = Homa.Assembler(gramQuerier: { mockLM.queryGrams($0) })
+    try ["neng2", "liu2", "yi4", "lv3"].forEach { try assembler.insertKey($0) }
+    let defaultAssembly = assembler.assemble().values
+    print("[Scenario2] default assembly: \(defaultAssembly)")
+    #expect(defaultAssembly == ["能", "留意", "旅"])
+
+    // Step 1：使用者將中段的 liu2（留意首音節）覆寫成「流」（explicit）。
+    assembler.cursor = 1
+    try assembler.overrideCandidate(
+      .init(keyArray: ["liu2"], value: "流"),
+      at: 1,
+      isExplicitlyOverridden: true
+    )
+    let afterOverride = assembler.assembledSentence.map(\.value)
+    print("[Scenario2] after overriding liu2 -> 流: \(afterOverride)")
+    #expect(afterOverride.contains("流")) // 流存活（explicit）。
+
+    // Step 2：游標移到 yi4 正前方（position 3，中段，非 edge）。
+    assembler.cursor = 3
+    let atFrontEdge = assembler.isCursorAtAssemblerEdge(direction: .front)
+    print("[Scenario2] cursor=3, length=\(assembler.length), atFrontEdge=\(atFrontEdge)")
+    #expect(!atFrontEdge) // 鞏固應為活躍。
+
+    let candidatesAtYi = assembler.fetchCandidates(filter: .endAt).map(\.pair.value)
+    print("[Scenario2] candidates at yi4: \(candidatesAtYi)")
+
+    // Step 3：輪替 yi4（現行 hard revolve，鞏固活躍）。
+    var debugIntel: [String] = []
+    let revolved = try assembler.revolveCandidate(
+      cursorType: .placedFront,
+      counterClockwise: false,
+      debugIntelHandler: { debugIntel.append($0) }
+    )
+    let afterRevolve = assembler.assembledSentence.map(\.value)
+    print("[Scenario2] first revolve -> \(revolved.0.pair.value)")
+    print("[Scenario2] assembled after first revolve: \(afterRevolve)")
+    print("[Scenario2] debugIntel:\n\(debugIntel.joined(separator: "\n"))")
+
+    // Actual（現行 bug）：流被「留意」跨越覆寫，結果變回 [能, 留意, 縷]。
+    let liuSurvived = afterRevolve.contains("流")
+    print("[Scenario2] 流 survived: \(liuSurvived)")
+    #expect(revolved.0.pair.value == "留意")
+    #expect(afterRevolve == ["能", "留意", "縷"])
+    #expect(!liuSurvived)
+    // Desired（soft revolve）：流應保留，僅 yi4 被輪替，結果應保留「流」。
+  }
+
   @Test("[Homa] Assembler_ConsolidationUsesTrueNodeAnchorsOnOverlap")
   func testConsolidationUsesTrueNodeAnchorsOnOverlap() async throws {
     let mockLM = TestLM(rawData: HomaTests.strLMSampleData_JiHuQiKeng)

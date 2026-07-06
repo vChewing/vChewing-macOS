@@ -45,6 +45,7 @@ extension Homa.Assembler {
   public func revolveCandidate(
     cursorType: CandidateCursor,
     counterClockwise: Bool,
+    softRevolve: Bool = false,
     skipInitialConsolidation: Bool = false,
     debugIntelHandler: ((String) -> ())? = nil,
     candidateArrayHandler: (([Homa.CandidatePairWeighted]) -> ())? = nil
@@ -64,15 +65,6 @@ extension Homa.Assembler {
 
     candidateArrayHandler?(candidates)
 
-    // 驗證候選字是否存在
-    guard let firstCandidate = candidates.first else {
-      throw Homa.Exception.noCandidatesAvailableToRevolve
-    }
-    guard candidates.count > 1 else {
-      print(firstCandidate)
-      throw Homa.Exception.onlyOneCandidateAvailableToRevolve
-    }
-
     // 確保有組裝好的節點串資料
     var currentSentence: [Homa.GramInPath] = assembledSentence
     if currentSentence.isEmpty { currentSentence = assemble() }
@@ -90,18 +82,37 @@ extension Homa.Assembler {
       keyArray: currentGramInPath.keyArray,
       value: currentGramInPath.value
     )
+    let currentRange = currentSentence.contextRange(ofGivenCursor: candidateCursorPos)
+
+    // Soft revolve：過濾掉會跨越鄰近 explicit 節點的候選，僅在安全子集內輪替。
+    // 一個候選為「不安全」若其 segLength > 1 且覆寫範圍涵蓋任何「非當前節點」的 explicit 節點。
+    let effectiveCandidates: [Homa.CandidatePairWeighted] = softRevolve
+      ? candidates.filter {
+        isCandidateSafeToSoftRevolve(
+          $0, cursorType: cursorType, cursorPosition: candidateCursorPos, currentRange: currentRange
+        )
+      }
+      : candidates
+
+    // 驗證候選字是否存在
+    guard let firstCandidate = effectiveCandidates.first else {
+      throw Homa.Exception.noCandidatesAvailableToRevolve
+    }
+    guard effectiveCandidates.count > 1 else {
+      print(firstCandidate)
+      throw Homa.Exception.onlyOneCandidateAvailableToRevolve
+    }
 
     // 計算新的候選字索引
     let newIndex = calculateNextCandidateIndex(
-      candidates: candidates,
+      candidates: effectiveCandidates,
       currentPair: currentPair,
       isExplicitOverride: currentGramInPath.isExplicit,
       counterClockwise: counterClockwise
     )
 
     // 獲取新的候選字
-    let theCandidateNow = candidates[newIndex]
-    let currentRange = currentSentence.contextRange(ofGivenCursor: candidateCursorPos)
+    let theCandidateNow = effectiveCandidates[newIndex]
     let targetRange = calculateTargetCandidateRange(
       for: theCandidateNow.pair,
       cursorType: cursorType,
@@ -207,7 +218,10 @@ extension Homa.Assembler {
       debugIntelHandler(debugIntel.joined(separator: " | "))
     }
 
-    return (theCandidateNow, newIndex, candidates.count)
+    // Soft revolve 可能縮小 effectiveCandidates；對外回報的 current 應對應原始候選列表索引，
+    // 以保留完整總數語義（current / total 與原始候選列表一致）。
+    let currentInOriginalCandidates = candidates.firstIndex { $0.pair == theCandidateNow.pair } ?? newIndex
+    return (theCandidateNow, currentInOriginalCandidates, candidates.count)
   }
 
   /// 計算下一個候選字索引
@@ -250,6 +264,42 @@ extension Homa.Assembler {
     }
     // 保底處理：確保索引仍在合法範圍內。
     return (0 ..< candidatePairs.count).contains(result) ? result : 0
+  }
+
+  /// 判斷給定候選字在 soft revolve 模式下是否「安全」：
+  /// 若其覆寫範圍涵蓋任何「非當前節點」的 explicit 節點，則為不安全。
+  /// - Parameters:
+  ///   - candidate: 待檢測的候選字。
+  ///   - cursorType: 選字時是前置游標還是後置游標。
+  ///   - cursorPosition: 邏輯候選游標位置。
+  ///   - currentRange: 當前被輪替節點的索引範圍。
+  /// - Returns: 是否安全（不會破壞鄰近 explicit 節點）。
+  private func isCandidateSafeToSoftRevolve(
+    _ candidate: Homa.CandidatePairWeighted,
+    cursorType: CandidateCursor,
+    cursorPosition: Int,
+    currentRange: Range<Int>
+  )
+    -> Bool {
+    let candidateLength = Swift.max(candidate.pair.keyArray.count, 1)
+    // 單音節候選不跨越鄰近節點，直接放行（短路門檻）。
+    guard candidateLength > 1 else { return true }
+    let targetRange = calculateTargetCandidateRange(
+      for: candidate.pair,
+      cursorType: cursorType,
+      cursorPosition: cursorPosition,
+      totalLength: length
+    )
+    var pos = 0
+    for gram in assembledSentence {
+      let len = Swift.max(gram.keyArray.count, 1)
+      let range = pos ..< (pos + len)
+      if gram.isExplicit, range != currentRange, range.overlaps(targetRange) {
+        return false
+      }
+      pos += len
+    }
+    return true
   }
 
   private func calculateTargetCandidateRange(
