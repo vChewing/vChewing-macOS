@@ -84,6 +84,12 @@ extension SettingsPanesCocoa {
                 prefUITab: .tabBehavior
               )
             }?.boxed()
+            NSStackView.buildSection(width: innerContentWidth) {
+              UserDef.kReflectBPMFVSInCompositionBuffer.renderCocoa(
+                fixWidth: innerContentWidth,
+                prefUITab: .tabBehavior
+              )
+            }
             NSView()
           }
           NSTabView.TabPage(title: "Ｃ") {
@@ -103,10 +109,6 @@ extension SettingsPanesCocoa {
                 prefUITab: .tabBehavior
               )
               UserDef.kAlsoConfirmAssociatedCandidatesByEnter.renderCocoa(
-                fixWidth: innerContentWidth,
-                prefUITab: .tabBehavior
-              )
-              UserDef.kReflectBPMFVSInCompositionBuffer.renderCocoa(
                 fixWidth: innerContentWidth,
                 prefUITab: .tabBehavior
               )
