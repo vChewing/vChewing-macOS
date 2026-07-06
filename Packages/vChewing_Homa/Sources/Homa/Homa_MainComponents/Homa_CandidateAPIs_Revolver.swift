@@ -188,7 +188,7 @@ extension Homa.Assembler {
         debugIntel.append("\(cursorType)")
         debugIntel.append("ENC: \(cursor)")
         debugIntel.append("LCC: \(candidateCursorPos)")
-        debugIntel.append(assembledSentence.compactMap(\ .value).joined())
+        debugIntel.append(assembledSentence.map(\.value).joined())
         debugIntel.append("<- Revolve Failed")
         debugIntelHandler(debugIntel.joined(separator: " | "))
       }
@@ -202,7 +202,7 @@ extension Homa.Assembler {
       debugIntel.append("\(cursorType)")
       debugIntel.append("ENC: \(cursor)") // Encoded Cursor
       debugIntel.append("LCC: \(candidateCursorPos)") // Logical Candidate Cursor
-      debugIntel.append(assembledSentence.compactMap(\.value).joined())
+      debugIntel.append(assembledSentence.map(\.value).joined())
       debugIntel.append(successfullyRevolved ? "<- Revolve Succeeded" : "<- Revolve Failed")
       debugIntelHandler(debugIntel.joined(separator: " | "))
     }
