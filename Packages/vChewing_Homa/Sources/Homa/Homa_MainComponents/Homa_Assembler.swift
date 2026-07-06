@@ -226,7 +226,7 @@ extension Homa {
     /// - Parameter direction: 指定方向（相對於文字輸入方向而言）。
     public func dropKey(direction: TypingDirection) throws {
       guard !keys.isEmpty else { throw Homa.Exception.assemblerIsEmpty }
-      guard !isCursorAtEdge(direction: direction) else {
+      guard !isCursorAtAssemblerEdge(direction: direction) else {
         throw Homa.Exception.deleteKeyAgainstBorder
       }
       let isBackSpace: Bool = direction == .rear ? true : false
@@ -259,7 +259,7 @@ extension Homa {
     /// - Parameters:
     ///   - direction: 指定方向（相對於文字輸入方向而言）。
     ///   - isMarker: 是否為標記游標。
-    public func isCursorAtEdge(direction: TypingDirection, isMarker: Bool = false) -> Bool {
+    public func isCursorAtAssemblerEdge(direction: TypingDirection, isMarker: Bool = false) -> Bool {
       let pos = isMarker ? marker : cursor
       switch direction {
       case .front: return pos == length
@@ -283,7 +283,7 @@ extension Homa {
         get { isMarker ? marker : cursor }
         set { isMarker ? { marker = newValue }() : { cursor = newValue }() }
       }
-      guard !isCursorAtEdge(direction: direction, isMarker: isMarker) else {
+      guard !isCursorAtAssemblerEdge(direction: direction, isMarker: isMarker) else {
         throw Exception.cursorAlreadyAtBorder
       }
       pos += delta

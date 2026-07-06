@@ -596,7 +596,7 @@ extension MainAssemblyTests {
     prepareBasicComposition(sequence: "dk ru4204el ") // 科技蛋糕
     #expect(testSession.state.type == .ofInputting)
     #expect(testSession.state.displayedText == "科技蛋糕")
-    #expect(testHandler.assembler.isCursorAtEdge(direction: .front))
+    #expect(testHandler.assembler.isCursorAtAssemblerEdge(direction: .front))
     press(dataArrowDown) // 叫出選字窗。
     #expect(testSession.state.type == .ofCandidates)
     #expect(testSession.state.candidates.first?.value == "蛋糕")
@@ -628,7 +628,7 @@ extension MainAssemblyTests {
     prepareBasicComposition(sequence: "dk ru4") // 科技
     #expect(testSession.state.type == .ofInputting)
     #expect(testSession.state.displayedText == "科技")
-    #expect(testHandler.assembler.isCursorAtEdge(direction: .front))
+    #expect(testHandler.assembler.isCursorAtAssemblerEdge(direction: .front))
     press(dataArrowDown) // 叫出選字窗。
     #expect(testSession.state.type == .ofCandidates)
     #expect(testSession.state.displayedText == "科技")
@@ -643,7 +643,7 @@ extension MainAssemblyTests {
     prepareBasicComposition(sequence: "dk ru4") // 科技
     #expect(testSession.state.type == .ofInputting)
     #expect(testSession.state.displayedText == "科技")
-    #expect(testHandler.assembler.isCursorAtEdge(direction: .front))
+    #expect(testHandler.assembler.isCursorAtAssemblerEdge(direction: .front))
     let cursorPriorToCandidateWindowCall = testSession.state.cursor
     press(dataArrowDown) // 叫出選字窗。
     #expect(testSession.state.type == .ofCandidates)

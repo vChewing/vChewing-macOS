@@ -567,7 +567,7 @@ public struct HomaTestsAdvanced: HomaTestSuite {
       )
       #expect(assembler.cursor == 6)
       #expect(!assembler.isCursorCuttingChar(isMarker: false))
-      #expect(assembler.isCursorAtEdge(direction: .front))
+      #expect(assembler.isCursorAtAssemblerEdge(direction: .front))
       #expect(
         Self.mustFail {
           try assembler.moveCursorStepwise(to: .front)
@@ -594,7 +594,7 @@ public struct HomaTestsAdvanced: HomaTestSuite {
       )
       #expect(assembler.cursor == 0)
       #expect(!assembler.isCursorCuttingChar(isMarker: false))
-      #expect(assembler.isCursorAtEdge(direction: .rear))
+      #expect(assembler.isCursorAtAssemblerEdge(direction: .rear))
       #expect(
         Self.mustFail {
           try assembler.moveCursorStepwise(to: .rear)

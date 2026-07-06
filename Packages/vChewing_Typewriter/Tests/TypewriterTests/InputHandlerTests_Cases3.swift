@@ -97,12 +97,12 @@ extension InputHandlerTests {
     #expect(testSession.state.displayedText == "流溢")
     #expect(testSession.state.type == .ofInputting)
     // 然後呼叫 .ofMarking 狀態、以便接下來的對就地加詞 API 的觸發。
-    #expect(testHandler.assembler.isCursorAtEdge(direction: .front))
+    #expect(testHandler.assembler.isCursorAtAssemblerEdge(direction: .front))
     var arrLeftEvent = KBEvent.KeyEventData.dataArrowLeft
     arrLeftEvent.flags.insert(.shift)
     #expect(testHandler.triageInput(event: arrLeftEvent.asEvent))
     #expect(testHandler.triageInput(event: arrLeftEvent.asEvent))
-    #expect(testHandler.assembler.isCursorAtEdge(direction: .rear, isMarker: true))
+    #expect(testHandler.assembler.isCursorAtAssemblerEdge(direction: .rear, isMarker: true))
     #expect(testSession.state.type == .ofMarking)
     #expect(testSession.state.markedRange == 0 ..< 2)
     // 這一行會觸發 handleMarkingState(input: Enter) 所排定觸發的 `performUserPhraseOperation`。
@@ -147,7 +147,7 @@ extension InputHandlerTests {
     #expect(throws: Never.self) { try testHandler.assembler.moveCursorStepwise(to: .rear) }
     #expect(throws: Never.self) { try testHandler.assembler.moveCursorStepwise(to: .rear) }
     #expect(throws: Homa.Exception.self) { try testHandler.assembler.moveCursorStepwise(to: .rear) }
-    #expect(testHandler.assembler.isCursorAtEdge(direction: .rear))
+    #expect(testHandler.assembler.isCursorAtAssemblerEdge(direction: .rear))
     testSession.switchState(testHandler.generateStateOfCandidates())
     let candidates1 = testSession.state.candidates.map(\.value).prefix(3)
     #expect(Array(candidates1) == ["年", "黏", "粘"])

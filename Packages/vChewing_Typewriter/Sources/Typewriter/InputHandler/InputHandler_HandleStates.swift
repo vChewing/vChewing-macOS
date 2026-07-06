@@ -1006,8 +1006,8 @@ extension InputHandlerProtocol {
 
     let previousSentence = assembler.assembledSentence
     let shouldSkipInitialConsolidation: Bool = switch homaCandidateCursorType {
-    case .placedFront: assembler.isCursorAtEdge(direction: .front)
-    case .placedRear: assembler.isCursorAtEdge(direction: .rear)
+    case .placedFront: assembler.isCursorAtAssemblerEdge(direction: .front)
+    case .placedRear: assembler.isCursorAtAssemblerEdge(direction: .rear)
     }
     var tooltipPayload: TooltipPayload?
     var errorCode: String?

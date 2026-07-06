@@ -151,7 +151,7 @@ extension InputHandlerProtocol {
         let handleAssociates: Bool = [
           !prefs.useSCPCTypingMode,
           prefs.associatedPhrasesEnabled,
-          assembler.isCursorAtEdge(direction: .front),
+          assembler.isCursorAtAssemblerEdge(direction: .front),
         ].reduce(true) { $0 && $1 }
         confirmHighlightedCandidate()
         // 關聯詞語。

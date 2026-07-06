@@ -107,7 +107,7 @@ private struct KeyDropContext {
   )
     -> Self? {
     guard inputHandler.assembler.keys.count > 1 else { return nil }
-    guard !inputHandler.assembler.isCursorAtEdge(direction: direction) else { return nil }
+    guard !inputHandler.assembler.isCursorAtAssemblerEdge(direction: direction) else { return nil }
     let currentAssembly = inputHandler.assembler.assembledSentence
     let cursorAfterTask = switch direction {
     case .front: inputHandler.assembler.cursor + 1
@@ -217,9 +217,9 @@ extension InputHandlerProtocol {
     guard isInvalidEdgeCursorSituation() else { return }
     backupCursor = assembler.cursor
     switch prefs.useRearCursorMode {
-    case false where !assembler.isCursorAtEdge(direction: .front):
+    case false where !assembler.isCursorAtAssemblerEdge(direction: .front):
       try? assembler.moveCursorStepwise(to: .front)
-    case true where !assembler.isCursorAtEdge(direction: .rear):
+    case true where !assembler.isCursorAtAssemblerEdge(direction: .rear):
       try? assembler.moveCursorStepwise(to: .rear)
     default: break
     }
@@ -373,9 +373,9 @@ extension InputHandlerProtocol {
     theState.data.rawDisplayTextSegments = rawDisplayTextSegmentsIfNeeded
     theState.data.cursor = convertCursorForDisplay(assembler.cursor)
     let markerBackup = assembler.marker
-    if assembler.isCursorAtEdge(direction: .front) {
+    if assembler.isCursorAtAssemblerEdge(direction: .front) {
       try? assembler.jumpCursorBySegment(to: .rear, isMarker: true)
-    } else if assembler.isCursorAtEdge(direction: .rear) {
+    } else if assembler.isCursorAtAssemblerEdge(direction: .rear) {
       try? assembler.jumpCursorBySegment(to: .front, isMarker: true)
     } else {
       try? assembler.jumpCursorBySegment(to: prefs.useRearCursorMode ? .front : .rear, isMarker: true)
@@ -464,8 +464,8 @@ extension InputHandlerProtocol {
     // 防止指向虛位；`assembler.length` 表示最前端的虛位（cursor 可達）。
     // `actualNodeCursorPosition` 應回傳對應 `assembler.keys.indices` 的真實索引。
     let validIndices = assembler.keys.indices
-    let atFrontEdge = assembler.isCursorAtEdge(direction: .front)
-    let atRearEdge = assembler.isCursorAtEdge(direction: .rear)
+    let atFrontEdge = assembler.isCursorAtAssemblerEdge(direction: .front)
+    let atRearEdge = assembler.isCursorAtAssemblerEdge(direction: .rear)
     let delta = ((atFrontEdge || !prefs.useRearCursorMode) && !atRearEdge ? 1 : 0)
     let pos = Swift.min(
       assembler.cursor - delta,
@@ -476,8 +476,8 @@ extension InputHandlerProtocol {
 
   public var homaCandidateCursorType: Homa.Assembler.CandidateCursor {
     switch prefs.useRearCursorMode {
-    case false where assembler.isCursorAtEdge(direction: .rear): .placedRear
-    case true where assembler.isCursorAtEdge(direction: .front): .placedFront
+    case false where assembler.isCursorAtAssemblerEdge(direction: .rear): .placedRear
+    case true where assembler.isCursorAtAssemblerEdge(direction: .front): .placedFront
     case false: .placedFront
     case true: .placedRear
     }
@@ -545,7 +545,7 @@ extension InputHandlerProtocol {
     let cursorToCheck = givenCursor ?? assembler.cursor
     // prefs.useRearCursorMode 為 0 (false) 時（macOS 注音選字），最後方的游標位置不合邏輯。
     // prefs.useRearCursorMode 為 1 (true) 時（微軟新注音選字），最前方的游標位置不合邏輯。
-    // 註：cursor == 0 的時候為最後方。方法遵循 `assembler.isCursorAtEdge(` 的實作。
+    // 註：cursor == 0 的時候為最後方。方法遵循 `assembler.isCursorAtAssemblerEdge(` 的實作。
     switch prefs.useRearCursorMode {
     case false where cursorToCheck == 0: return true
     case true where cursorToCheck == assembler.length: return true
@@ -905,10 +905,10 @@ extension InputHandlerProtocol {
     }
     switch prefs.useRearCursorMode {
     case false,
-         true where assembler.isCursorAtEdge(direction: .front):
+         true where assembler.isCursorAtAssemblerEdge(direction: .front):
       return assembler.fetchCandidates(filter: .endAt)
     case true,
-         false where assembler.isCursorAtEdge(direction: .rear):
+         false where assembler.isCursorAtAssemblerEdge(direction: .rear):
       return assembler.fetchCandidates(filter: .beginAt)
     }
   }

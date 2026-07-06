@@ -279,7 +279,7 @@ extension InputHandlerTests {
       #expect(testHandler.assembler.assembledSentence.values.joined() == "水果之")
       // 取消強制手動候選字選擇。
       try restoreTestState(manualCandidateSelection: false)
-      #expect(testHandler.assembler.isCursorAtEdge(direction: .front))
+      #expect(testHandler.assembler.isCursorAtAssemblerEdge(direction: .front))
       #expect(testHandler.triageInput(event: backspace))
       #expect(testHandler.assembler.assembledSentence.values.joined() == "水果")
       typeSentence("5 ") // 大千鍵序對應「汁」，尾端有空白鍵
@@ -401,7 +401,7 @@ extension InputHandlerTests {
       #expect(!(pomDesc.isEmpty))
       #expect(pomDesc.map(\.key).description.contains("ㄕㄨㄟˇ-ㄍㄨㄛˇ-ㄓ"))
       try restoreTestState(manualCandidateSelection: false)
-      #expect(testHandler.assembler.isCursorAtEdge(direction: .front))
+      #expect(testHandler.assembler.isCursorAtAssemblerEdge(direction: .front))
       #expect(testHandler.triageInput(event: backspace))
       typeSentence("5 ") // 「ㄓ」+ 陰平聲調
       #expect(testHandler.assembler.assembledSentence.allSatisfy { !$0.isExplicit })
