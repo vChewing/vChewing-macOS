@@ -28,7 +28,7 @@ extension InputHandlerProtocol {
           softRevolve: prefs.preferredRevolverForceLevel == 2
         )
       case .kDownArrow, .kLeftArrow, .kRightArrow, .kUpArrow:
-        let revolution: Bool = (input.isOptionHold || input.isShiftHold) && state.type == .ofInputting
+        let revolution: Bool = input.isHoldingAny([.option, .shift]) && state.type == .ofInputting
         handleArrowKey: switch (keyCodeType, session.isVerticalTyping) {
         case (.kLeftArrow, false), (.kUpArrow, true): return handleBackward(input: input)
         case (.kDownArrow, true), (.kRightArrow, false): return handleForward(input: input)
@@ -77,7 +77,7 @@ extension InputHandlerProtocol {
         // 空格字符輸入行為處理。
         switch state.type {
         case .ofEmpty:
-          if !input.isOptionHold, !input.isControlHold, !input.isCommandHold {
+          if !input.isHoldingAny([.option, .control, .command]) {
             session.switchState(State.ofCommitting(textToCommit: input.isShiftHold ? "　" : " "))
             return true
           }
@@ -93,7 +93,7 @@ extension InputHandlerProtocol {
               softRevolve: prefs.preferredRevolverForceLevel != 0
             )
           }
-          if input.isShiftHold, !input.isControlHold, !input.isOptionHold {
+          if input.isShiftHold, !input.isHoldingAny([.control, .option]) {
             return revolveCandidate(
               reverseOrder: input.isCommandHold,
               softRevolve: prefs.preferredRevolverForceLevel != 0

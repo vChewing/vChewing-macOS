@@ -71,6 +71,22 @@ extension InputSignalProtocol {
     return !keyModifierFlags.isDisjoint(with: flags) && asciiVal >= 0x21 && asciiVal <= 0x7E
   }
 
+  /// Check whether any given flag is being held.
+  /// - Parameter flags: Given flags. If empty, this API will return false.
+  /// - Returns: Bool result.
+  public func isHoldingAny(_ flags: KBEvent.ModifierFlags) -> Bool {
+    guard !flags.isEmpty else { return false }
+    return !keyModifierFlags.isDisjoint(with: flags)
+  }
+
+  /// Check whether all given flags are being held.
+  /// - Parameter flags: Given flags. If empty, this API will return false.
+  /// - Returns: Bool result.
+  public func isHoldingAll(_ flags: KBEvent.ModifierFlags) -> Bool {
+    guard !flags.isEmpty else { return false }
+    return keyModifierFlags.contains(flags)
+  }
+
   // MARK: Modifier key queries
 
   public var isShiftHold: Bool { keyModifierFlags.contains(.shift) }

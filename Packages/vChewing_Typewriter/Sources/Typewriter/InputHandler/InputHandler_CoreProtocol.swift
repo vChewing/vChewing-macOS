@@ -856,7 +856,7 @@ extension InputHandlerProtocol {
   /// - Returns: 生成的標點符號索引鍵頭。
   func generatePunctuationNamePrefix(withKeyCondition input: InputSignalProtocol) -> String? {
     if prefs.halfWidthPunctuationEnabled {
-      let hasCtrlOrOption = !input.keyModifierFlags.isDisjoint(with: [.control, .option])
+      let hasCtrlOrOption = input.isHoldingAny([.control, .option])
       return hasCtrlOrOption ? nil : "_half_punctuation_"
     }
     // 注意：這一行為 SHIFT+ALT+主鍵盤數字鍵專用，強制無視不同地區的鍵盤在這個按鍵組合下的符號輸入差異。

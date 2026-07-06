@@ -294,7 +294,7 @@ extension InputHandlerProtocol {
     }
 
     // 阻止用於行內注音輸出的熱鍵。
-    if input.isControlHold, input.isCommandHold, input.isEnter {
+    if input.isHoldingAll([.control, .command]), input.isEnter {
       errorCallback?("1198E3E5")
       return true
     }
@@ -304,7 +304,7 @@ extension InputHandlerProtocol {
       var tooltipMessage = "i18n:PhraseOperation.AddBoostUserPhraseSucceeded"
       var tooltipColorState: TooltipColorState = .normal
       // 先判斷是否是在摁了降權組合鍵的時候目標不在庫。
-      if input.isShiftHold, input.isCommandHold {
+      if input.isHoldingAll([.shift, .command]) {
         tooltipMessage = "i18n:PhraseOperation.NerfUserPhraseSucceeded"
         tooltipColorState = .succeeded
       }
@@ -356,7 +356,7 @@ extension InputHandlerProtocol {
     // Shift + Left
     if input.isCursorBackward, input.isShiftHold {
       let moved: Bool = {
-        if input.isCommandHold || input.isOptionHold {
+        if input.isHoldingAny([.command, .option]) {
           return (try? assembler.jumpCursorBySegment(to: .rear, isMarker: true)) != nil
         } else {
           return (try? assembler.moveCursorStepwise(to: .rear, isMarker: true)) != nil
@@ -386,7 +386,7 @@ extension InputHandlerProtocol {
     // Shift + Right
     if input.isCursorForward, input.isShiftHold {
       let moved: Bool = {
-        if input.isCommandHold || input.isOptionHold {
+        if input.isHoldingAny([.command, .option]) {
           return (try? assembler.jumpCursorBySegment(to: .front, isMarker: true)) != nil
         } else {
           return (try? assembler.moveCursorStepwise(to: .front, isMarker: true)) != nil
@@ -516,7 +516,7 @@ extension InputHandlerProtocol {
       displayedText = displayedText.map(\.description).joined(separator: " ")
     } else if readingOnly {
       displayedText = commissionByCtrlCommandEnter()
-    } else if input.isCommandHold, input.isControlHold {
+    } else if input.isHoldingAll([.command, .control]) {
       displayedText = input.isOptionHold
         ? commissionByCtrlOptionCommandEnter(isShiftPressed: input.isShiftHold)
         : commissionByCtrlCommandEnter(isShiftPressed: input.isShiftHold)
@@ -864,7 +864,7 @@ extension InputHandlerProtocol {
       // Shift + Right
       if assembler.cursor < assembler.length {
         assembler.marker = assembler.cursor
-        if input.isCommandHold || input.isOptionHold {
+        if input.isHoldingAny([.command, .option]) {
           try? assembler.jumpCursorBySegment(to: .front, isMarker: true)
         } else {
           assembler.marker += 1
@@ -931,7 +931,7 @@ extension InputHandlerProtocol {
       if assembler.cursor > 0 {
         assembler.marker = assembler.cursor
         let moved: Bool = {
-          if input.isCommandHold || input.isOptionHold {
+          if input.isHoldingAny([.command, .option]) {
             return (try? assembler.jumpCursorBySegment(to: .rear, isMarker: true)) != nil
           } else {
             return (try? assembler.moveCursorStepwise(to: .rear, isMarker: true)) != nil
@@ -1181,7 +1181,7 @@ extension InputHandlerProtocol {
     // 否則會導致對上下左右鍵與翻頁鍵的判斷失效。
     let notEmpty = state.hasComposition && !assembler.isEmpty && isComposerOrCalligrapherEmpty
     let bannedModifiers: KBEvent.ModifierFlags = [.option, .shift, .command, .control]
-    let noBannedModifiers = bannedModifiers.intersection(input.keyModifierFlags).isEmpty
+    let noBannedModifiers = !input.isHoldingAny(bannedModifiers)
     var triggered = input.isCursorClockLeft || input.isCursorClockRight
     triggered = triggered || (input.isSpace && prefs.spaceKeyBehaviorAgainstICB == 1)
     triggered = triggered || input.isPageDown || input.isPageUp
@@ -1202,7 +1202,7 @@ extension InputHandlerProtocol {
   func handleArabicNumeralInputs(input: InputSignalProtocol) -> Bool {
     guard let session = session else { return false }
     guard session.state.type == .ofEmpty, input.isMainAreaNumKey else { return false }
-    guard input.isOptionHold, !input.isCommandHold, !input.isControlHold else { return false }
+    guard input.isOptionHold, !input.isHoldingAny([.command, .control]) else { return false }
     guard let strRAW = input.mainAreaNumKeyChar else { return false }
     let newString: String = {
       if input.isShiftHold {
@@ -1222,7 +1222,7 @@ extension InputHandlerProtocol {
   func handleLettersWithShiftHold(input: InputSignalProtocol) -> Bool {
     guard let session = session else { return false }
     let inputText = input.text
-    if input.isUpperCaseASCIILetterKey, !input.isCommandHold, !input.isControlHold {
+    if input.isUpperCaseASCIILetterKey, !input.isHoldingAny([.command, .control]) {
       if input.isShiftHold { // 這裡先不要判斷 isOptionHold。
         switch prefs.upperCaseLetterKeyBehavior {
         case 1, 3:

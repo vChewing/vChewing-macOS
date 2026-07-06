@@ -59,7 +59,7 @@ extension InputHandlerProtocol {
           if handled { return true }
         }
         var updated = true
-        let reverseTrigger = input.isShiftHold || input.isOptionHold
+        let reverseTrigger = input.isHoldingAny([.shift, .option])
         updated = reverseTrigger ? ctlCandidate.showPreviousLine() : ctlCandidate.showNextLine()
         if !updated { errorCallback?("66F3477B") }
         return true
@@ -86,8 +86,8 @@ extension InputHandlerProtocol {
       let action: CandidateContextMenuAction? = switch input.commonKeyModifierFlags {
       case [.option, .command] where input.keyCode == 27: .toNerf // 減號鍵
       case [.option, .command] where input.keyCode == 24: .toBoost // 英數鍵盤的等號加號鍵；JIS 鍵盤的 ^ 號鍵。
-      case _ where input.isOptionHold && input.isCommandHold && input.isDelete: .toFilter
-      case _ where input.isOptionHold && input.isCommandHold && input.isBackSpace: .toFilter
+      case _ where input.isHoldingAll([.option, .command]) && input.isDelete: .toFilter
+      case _ where input.isHoldingAll([.option, .command]) && input.isBackSpace: .toFilter
       default: nil
       }
       guard let action else { break manipulator }
