@@ -19,7 +19,7 @@
 A. 輸入模式與狀態切換
 - Caps Lock 與 ASCII 模式的橋接：`handleCapsLockAndAlphanumericalMode` 會在 Caps Lock 亮起或處於 ASCII 模式時，依偏好清空組字區或遞交內容後回到 `.ofEmpty()`，再放行後續輸入。[適合測試][錄放]
 - Symbol Menu 實體鍵（Intl/JIS）：`handlePunctuationList` 在無修飾與 Shift 下分別開啟主、副符號表；按住 Option 時呼叫 `revolveTypingMethod()`，在 `.vChewingFactory → .codePoint → .haninKeyboardSymbol` 三種模式間輪換。[適合測試]
-- 漢音符號模式快捷鍵：當偏好 `classicHaninKeyboardSymbolModeShortcutEnabled` 為真且輸入 `¥` 或 `\`（無修飾），`revolveTypingMethod(to: .haninKeyboardSymbol)` 立即切換。[適合測試]
+- 漢音符號模式熱鍵：當偏好 `classicHaninKeyboardSymbolModeShortcutEnabled` 為真且輸入 `¥` 或 `\`（無修飾），`revolveTypingMethod(to: .haninKeyboardSymbol)` 立即切換。[適合測試]
 - TypingMethod 變換後，`revolveTypingMethod` 會提交既有組字內容並以受保護的 `.ofInputting` 狀態顯示提示，用以維持後續游標與工具提示一致性。
 
 B. 組字流程
