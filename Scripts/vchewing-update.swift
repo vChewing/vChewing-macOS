@@ -4,8 +4,16 @@ import Foundation
 // MARK: - Shell
 
 enum Shell {
+  // MARK: Internal
+
   @discardableResult
-  static func run(_ cmd: String, cwd: String? = nil, captureOutput: Bool = true, trim: Bool = true)
+  static func run(
+    _ cmd: String,
+    cwd: String? = nil,
+    captureOutput: Bool = true,
+    trim: Bool = true,
+    timeout: TimeInterval? = nil
+  )
     -> (status: Int32, output: String) {
     let task = Process()
     task.launchPath = "/bin/bash"
@@ -19,8 +27,10 @@ enum Shell {
     do { try task.run() } catch {
       return (-1, "Error: \(error)")
     }
+    let timer = startTimeout(task: task, timeout: timeout)
     let data = pipe.fileHandleForReading.readDataToEndOfFile()
     task.waitUntilExit()
+    timer?.cancel()
     let str = String(data: data, encoding: .utf8) ?? ""
     if trim {
       return (task.terminationStatus, str.trimmingCharacters(in: .whitespacesAndNewlines))
@@ -35,7 +45,8 @@ enum Shell {
     args: [String] = [],
     cwd: String? = nil,
     captureOutput: Bool = true,
-    trim: Bool = true
+    trim: Bool = true,
+    timeout: TimeInterval? = nil
   )
     -> (status: Int32, output: String) {
     let task = Process()
@@ -46,11 +57,26 @@ enum Shell {
     task.standardOutput = pipe
     task.standardError = pipe
     do { try task.run() } catch { return (-1, "Error: \(error)") }
+    let timer = startTimeout(task: task, timeout: timeout)
     let data = pipe.fileHandleForReading.readDataToEndOfFile()
     task.waitUntilExit()
+    timer?.cancel()
     let str = String(data: data, encoding: .utf8) ?? ""
     if !trim { return (task.terminationStatus, str) }
     return (task.terminationStatus, str.trimmingCharacters(in: .whitespacesAndNewlines))
+  }
+
+  // MARK: Private
+
+  private static func startTimeout(task: Process, timeout: TimeInterval?) -> DispatchSourceTimer? {
+    guard let timeout = timeout else { return nil }
+    let timer = DispatchSource.makeTimerSource(queue: DispatchQueue.global())
+    timer.schedule(deadline: .now() + timeout)
+    timer.setEventHandler {
+      if task.isRunning { task.terminate() }
+    }
+    timer.resume()
+    return timer
   }
 }
 
@@ -145,12 +171,16 @@ func performDictionaryUpdate() {
     }
   }
 
-  // 取得 Remote tags
+  // 取得 Remote tags，設定 15 秒 timeout 避免 atomgit.com 無回應時無限掛住。
   var remoteVer = currentVer
   let lsRemote = Shell.runExec(
     "/usr/bin/git",
-    args: ["ls-remote", "--tags", "--sort=-v:refname", vanguardURL],
-    trim: true
+    args: [
+      "-c", "http.lowSpeedLimit=1000", "-c", "http.lowSpeedTime=15",
+      "ls-remote", "--tags", "--sort=-v:refname", vanguardURL,
+    ],
+    trim: true,
+    timeout: 15
   )
   if lsRemote.status == 0 {
     // output line format: <hash>\trefs/tags/<tag>
@@ -162,7 +192,7 @@ func performDictionaryUpdate() {
       }
     }
   } else {
-    print("Warning: Failed to query remote tags: \(lsRemote.output)")
+    print("Warning: Failed to query remote tags (status \(lsRemote.status)): \(lsRemote.output)")
   }
 
   var newContent = content
@@ -241,11 +271,22 @@ func performDictionaryUpdate() {
 performDictionaryUpdate()
 
 // 3) 找出最高版本標籤 (highest tag)
-let tagOut = Shell.run(
-  "git fetch --tags && git tag --list --sort=-v:refname | head -n 1",
+let fetchRes = Shell.runExec(
+  "/usr/bin/git",
+  args: ["-c", "http.lowSpeedLimit=1000", "-c", "http.lowSpeedTime=60", "fetch", "--tags"],
+  cwd: repoPath,
+  timeout: 60
+)
+if fetchRes.status != 0 {
+  print("Warning: git fetch --tags timed out or failed (status \(fetchRes.status)): \(fetchRes.output)")
+}
+
+let tagOut = Shell.runExec(
+  "/usr/bin/git",
+  args: ["tag", "--list", "--sort=-v:refname"],
   cwd: repoPath
 )
-let highestTag = tagOut.output.trimmingCharacters(in: .whitespacesAndNewlines)
+let highestTag = tagOut.output.split(separator: "\n").first.map(String.init) ?? ""
 print("Highest tag: \(highestTag)")
 
 // --- 新增: 從 Xcode 專案讀取目前的 MARKETING_VERSION 與 CURRENT_PROJECT_VERSION

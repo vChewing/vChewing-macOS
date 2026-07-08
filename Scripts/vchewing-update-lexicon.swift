@@ -35,7 +35,8 @@ enum Shell {
     args: [String] = [],
     cwd: String? = nil,
     captureOutput: Bool = true,
-    trim: Bool = true
+    trim: Bool = true,
+    timeout: TimeInterval? = nil
   )
     -> (status: Int32, output: String) {
     let task = Process()
@@ -46,8 +47,17 @@ enum Shell {
     task.standardOutput = pipe
     task.standardError = pipe
     do { try task.run() } catch { return (-1, "Error: \(error)") }
+    let timer = DispatchSource.makeTimerSource(queue: DispatchQueue.global())
+    if let timeout = timeout {
+      timer.schedule(deadline: .now() + timeout)
+      timer.setEventHandler {
+        if task.isRunning { task.terminate() }
+      }
+      timer.resume()
+    }
     let data = pipe.fileHandleForReading.readDataToEndOfFile()
     task.waitUntilExit()
+    if timeout != nil { timer.cancel() }
     let str = String(data: data, encoding: .utf8) ?? ""
     if !trim { return (task.terminationStatus, str) }
     return (task.terminationStatus, str.trimmingCharacters(in: .whitespacesAndNewlines))
@@ -109,12 +119,16 @@ func performDictionaryUpdate() {
     }
   }
 
-  // 取得 Remote tags
+  // 取得 Remote tags，設定 15 秒 timeout 避免 atomgit.com 無回應時無限掛住。
   var remoteVer = currentVer
   let lsRemote = Shell.runExec(
     "/usr/bin/git",
-    args: ["ls-remote", "--tags", "--sort=-v:refname", vanguardURL],
-    trim: true
+    args: [
+      "-c", "http.lowSpeedLimit=1000", "-c", "http.lowSpeedTime=15",
+      "ls-remote", "--tags", "--sort=-v:refname", vanguardURL,
+    ],
+    trim: true,
+    timeout: 15
   )
   if lsRemote.status == 0 {
     // output line format: <hash>\trefs/tags/<tag>
@@ -126,7 +140,7 @@ func performDictionaryUpdate() {
       }
     }
   } else {
-    print("Warning: Failed to query remote tags: \(lsRemote.output)")
+    print("Warning: Failed to query remote tags (status \(lsRemote.status)): \(lsRemote.output)")
   }
 
   var newContent = content
