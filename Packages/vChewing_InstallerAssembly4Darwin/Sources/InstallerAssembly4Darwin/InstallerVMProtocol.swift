@@ -172,7 +172,7 @@ extension InstallerVMProtocol {
     if cpTask.terminationStatus != 0 {
       DispatchQueue.main.async {
         // 讓使用者自己藉由 UI 結束安裝程式。
-        self.config.isShowingAlertForFailedInstallation = true
+        self.config.alertItem = InstallerUIConfig.AlertType.installationFailed.makeAlertItem()
       }
       return
     }
@@ -192,7 +192,7 @@ extension InstallerVMProtocol {
     else {
       DispatchQueue.main.async {
         // Bundled IME 缺失時，給出失敗告示。讓使用者自己藉由 UI 結束安裝程式。
-        self.config.isShowingAlertForMissingPostInstall = true
+        self.config.alertItem = InstallerUIConfig.AlertType.missingAfterRegistration.makeAlertItem()
       }
       return
     }
@@ -207,7 +207,7 @@ extension InstallerVMProtocol {
       if !status {
         DispatchQueue.main.async {
           // 讓使用者自己藉由 UI 結束安裝程式。
-          self.config.isShowingAlertForMissingPostInstall = true
+          self.config.alertItem = InstallerUIConfig.AlertType.missingAfterRegistration.makeAlertItem()
         }
       }
 
@@ -243,15 +243,17 @@ extension InstallerVMProtocol {
     // 提示面板
     DispatchQueue.main.async { [weak self] in
       guard let self = self else { return }
-      if warning {
-        self.config.currentAlertContent = .postInstallAttention
+      let type: InstallerUIConfig.AlertType
+      if !self.config.adminRenameFailureAlertPaths.isEmpty {
+        type = .adminRenameFailure
+      } else if warning {
+        type = .postInstallAttention
       } else if !mainInputSourceEnabled {
-        self.config.currentAlertContent = .postInstallWarning
+        type = .postInstallWarning
       } else {
-        self.config.currentAlertContent = .postInstallOK
+        type = .postInstallOK
       }
-      // 讓使用者自己藉由 UI 結束安裝程式。
-      self.config.isShowingPostInstallNotification = true
+      self.config.currentAlertContent = type
     }
   }
 }

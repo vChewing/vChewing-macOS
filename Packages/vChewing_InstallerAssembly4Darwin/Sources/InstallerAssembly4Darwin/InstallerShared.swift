@@ -111,10 +111,6 @@ extension NSApplication {
 struct InstallerUIConfig: Hashable {
   var pendingSheetPresenting: Bool = false
   var isLegacyPackageNoticeEverShown: Bool = false
-  var isShowingAlertForFailedInstallation: Bool = false
-  var isShowingAlertForMissingPostInstall: Bool = false
-  var isShowingPostInstallNotification: Bool = false
-  var currentAlertContent: AlertType = .nothing
   var isCancelButtonEnabled: Bool = true
   var isAgreeButtonEnabled: Bool = true
   var isPreviousVersionNotFullyDeactivated: Bool = false
@@ -122,9 +118,43 @@ struct InstallerUIConfig: Hashable {
   var isUpgrading: Bool = false
   var timeRemaining: Int = .init(kTranslocationRemovalDeadline)
   var adminRenameFailureAlertPaths: [String] = []
+  /// 安裝結果面板所顯示的 AlertType（Cocoa / AppKit 前端仍使用此標記觸發 alert）。
+  var currentAlertContent: AlertType = .nothing
+
+  /// 當前應該顯示的警示面板內容（SwiftUI 使用）。
+  /// 因 SwiftUI 不允許在同一個 view 上串接多個 `.alert()`，
+  /// 所以統一由單一 `alert(item:)` 驅動。
+  var alertItem: InstallerAlertItem?
 }
 
-// MARK: InstallerUIConfig.AlertType
+// MARK: - InstallerAlertItem
+
+struct InstallerAlertItem: Identifiable, Hashable {
+  // MARK: Lifecycle
+
+  init(title: String, message: String, buttonTitle: String) {
+    self.title = title
+    self.message = message
+    self.buttonTitle = buttonTitle
+  }
+
+  // MARK: Internal
+
+  let id = UUID()
+  let title: String
+  let message: String
+  let buttonTitle: String
+
+  static func == (lhs: Self, rhs: Self) -> Bool {
+    lhs.id == rhs.id
+  }
+
+  func hash(into hasher: inout Hasher) {
+    hasher.combine(id)
+  }
+}
+
+// MARK: - InstallerUIConfig.AlertType
 
 extension InstallerUIConfig {
   public enum AlertType: String, Identifiable, Hashable, Sendable {
@@ -168,6 +198,36 @@ extension InstallerUIConfig {
       case .adminRenameFailure:
         return "i18n:Installer.AdminRenameFailureNotice".i18n
       }
+    }
+
+    func alertContent(paths: [String] = []) -> (title: String, message: String, buttonTitle: String) {
+      let title = titleLocalized
+      let msg: String
+      switch self {
+      case .adminRenameFailure:
+        msg = message + "\n\n" + paths.joined(separator: "\n")
+      default:
+        msg = message
+      }
+      let button: String
+      switch self {
+      case .installationFailed: button = "Cancel"
+      case .missingAfterRegistration: button = "Abort"
+      case .postInstallWarning: button = "Continue"
+      default: button = "OK"
+      }
+      return (title, msg, button)
+    }
+
+    func makeAlertItem(paths: [String] = []) -> InstallerAlertItem {
+      let content = alertContent(paths: paths)
+      return InstallerAlertItem(title: content.title, message: content.message, buttonTitle: content.buttonTitle)
+    }
+
+    /// 若 AlertType 不是 `.nothing`，則產生對應的 `InstallerAlertItem`，供 Cocoa 前端顯示。
+    func makeAlertItemIfNeeded(paths: [String] = []) -> InstallerAlertItem? {
+      guard self != .nothing else { return nil }
+      return makeAlertItem(paths: paths)
     }
   }
 }

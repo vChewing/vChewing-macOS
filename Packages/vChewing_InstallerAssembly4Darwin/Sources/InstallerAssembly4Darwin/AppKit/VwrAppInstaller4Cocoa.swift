@@ -340,56 +340,27 @@ public final class VwrAppInstaller4Cocoa: NSViewController, InstallerVMProtocol 
         return
       }
 
-      // Alerts
-      if self.config.isShowingAlertForFailedInstallation {
-        self.showSimpleAlert(
-          title: self.alertTitle(for: .installationFailed),
-          message: InstallerUIConfig.AlertType.installationFailed.message,
-          buttonTitle: "Cancel"
-        ) {
-          self.config.isShowingAlertForFailedInstallation = false
-          NSApp.terminateWithDelay()
-        }
+      // Alerts：統一由 alertItem 驅動，避免多個 alert 互相覆蓋。
+      // 若安裝過程中已直接設定 alertItem（安裝失敗 / 註冊失敗），則直接顯示；
+      // 否則將 currentAlertContent 與 adminRenameFailureAlertPaths 轉換成 alertItem。
+      if self.config.alertItem == nil,
+         let postInstallAlertItem = self.config.currentAlertContent.makeAlertItemIfNeeded(
+           paths: self.config.adminRenameFailureAlertPaths
+         ) {
+        self.config.alertItem = postInstallAlertItem
       }
 
-      if self.config.isShowingAlertForMissingPostInstall {
+      if let alertItem = self.config.alertItem {
         self.showSimpleAlert(
-          title: self.alertTitle(for: .missingAfterRegistration),
-          message: InstallerUIConfig.AlertType.missingAfterRegistration.message,
-          buttonTitle: "Abort"
+          title: alertItem.title,
+          message: alertItem.message,
+          buttonTitle: alertItem.buttonTitle
         ) {
-          self.config.isShowingAlertForMissingPostInstall = false
-          NSApp.terminateWithDelay()
-        }
-      }
-
-      if !self.config.adminRenameFailureAlertPaths.isEmpty {
-        let message = InstallerUIConfig.AlertType.adminRenameFailure.message
-          + "\n\n"
-          + self.config.adminRenameFailureAlertPaths.joined(separator: "\n")
-        self.showSimpleAlert(
-          title: self.alertTitle(for: .adminRenameFailure),
-          message: message,
-          buttonTitle: "OK"
-        ) {
-          self.config.adminRenameFailureAlertPaths = []
-          NSApp.terminateWithDelay()
-        }
-      }
-
-      if self.config.isShowingPostInstallNotification {
-        let type = self.config.currentAlertContent
-        let btnTitle = (type == .postInstallWarning) ? "Continue" : "OK"
-        self.showSimpleAlert(title: self.alertTitle(for: type), message: type.message, buttonTitle: btnTitle) {
-          self.config.isShowingPostInstallNotification = false
+          self.config.alertItem = nil
           NSApp.terminateWithDelay()
         }
       }
     }
-  }
-
-  private func alertTitle(for type: InstallerUIConfig.AlertType) -> String {
-    type.titleLocalized
   }
 
   private func showSimpleAlert(title: String, message: String, buttonTitle: String, completion: @escaping () -> ()) {

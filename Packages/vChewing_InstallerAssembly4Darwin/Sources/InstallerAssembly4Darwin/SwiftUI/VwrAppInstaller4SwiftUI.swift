@@ -105,40 +105,22 @@ struct VwrAppInstaller4SwiftUI: View {
       .font(.custom("Tahoma", size: 12))
       .padding(4)
     }
-    // 警示
-    .alert(AlertType.installationFailed.titleLocalized, isPresented: $vm.config.isShowingAlertForFailedInstallation) {
-      Button(role: .cancel) { NSApp.terminateWithDelay() } label: { Text("Cancel") }
-    } message: {
-      Text(AlertType.installationFailed.message)
+    // 警示：SwiftUI 將多個 alert 串接在同一個 view 上時只會有最後一個生效，
+    // 因此使用單一 alert 並透過 alertItem 驅動內容切換。
+    .onChange(of: vm.config.currentAlertContent) { _ in
+      vm.updateAlertItemFromConfig()
     }
-    .alert(
-      AlertType.missingAfterRegistration.titleLocalized,
-      isPresented: $vm.config.isShowingAlertForMissingPostInstall
-    ) {
-      Button(role: .cancel) { NSApp.terminateWithDelay() } label: { Text("Abort") }
-    } message: {
-      Text(AlertType.missingAfterRegistration.message)
+    .onChange(of: vm.config.adminRenameFailureAlertPaths) { _ in
+      vm.updateAlertItemFromConfig()
     }
-    .alert(
-      AlertType.adminRenameFailure.titleLocalized,
-      isPresented: .init(
-        get: { !vm.config.adminRenameFailureAlertPaths.isEmpty },
-        set: { _ in vm.config.adminRenameFailureAlertPaths = [] }
+    .alert(item: $vm.config.alertItem) { item in
+      Alert(
+        title: Text(item.title),
+        message: Text(item.message),
+        dismissButton: .cancel(Text(item.buttonTitle), action: {
+          NSApp.terminateWithDelay()
+        })
       )
-    ) {
-      Button(role: .cancel) { NSApp.terminateWithDelay() } label: { Text("OK") }
-    } message: {
-      Text(
-        AlertType.adminRenameFailure.message + "\n\n" + vm.config.adminRenameFailureAlertPaths
-          .joined(separator: "\n")
-      )
-    }
-    .alert(vm.config.currentAlertContent.titleLocalized, isPresented: $vm.config.isShowingPostInstallNotification) {
-      Button(role: .cancel) { NSApp.terminateWithDelay() } label: {
-        Text(vm.config.currentAlertContent == .postInstallWarning ? "Continue" : "OK")
-      }
-    } message: {
-      Text(vm.config.currentAlertContent.message)
     }
     // 停止舊版本的 sheet
     .sheet(isPresented: $vm.config.pendingSheetPresenting) {
@@ -172,8 +154,6 @@ struct VwrAppInstaller4SwiftUI: View {
 
   // MARK: Private
 
-  private typealias AlertType = InstallerUIConfig.AlertType
-
   @StateObject
   private var vm = InstallerMainViewModel()
 }
@@ -200,6 +180,13 @@ private final class InstallerMainViewModel: ObservableObject, InstallerVMProtoco
   var config: InstallerUIConfig = .init()
   let taskQueue: DispatchQueue = .init(label: "vChewingInstaller.Queue.\(UUID().uuidString)")
   var translocationTimer: DispatchSourceTimer?
+
+  /// 將 `currentAlertContent` 與 `adminRenameFailureAlertPaths` 同步成單一 `alertItem`，
+  /// 供 SwiftUI 的 `alert(item:)` 使用。
+  func updateAlertItemFromConfig() {
+    guard config.currentAlertContent != .nothing else { return }
+    config.alertItem = config.currentAlertContent.makeAlertItem(paths: config.adminRenameFailureAlertPaths)
+  }
 }
 
 // MARK: - GradientViewWrapper
