@@ -119,6 +119,20 @@ struct VwrAppInstaller4SwiftUI: View {
     } message: {
       Text(AlertType.missingAfterRegistration.message)
     }
+    .alert(
+      AlertType.adminRenameFailure.titleLocalized,
+      isPresented: .init(
+        get: { !vm.config.adminRenameFailureAlertPaths.isEmpty },
+        set: { _ in vm.config.adminRenameFailureAlertPaths = [] }
+      )
+    ) {
+      Button(role: .cancel) { NSApp.terminateWithDelay() } label: { Text("OK") }
+    } message: {
+      Text(
+        AlertType.adminRenameFailure.message + "\n\n" + vm.config.adminRenameFailureAlertPaths
+          .joined(separator: "\n")
+      )
+    }
     .alert(vm.config.currentAlertContent.titleLocalized, isPresented: $vm.config.isShowingPostInstallNotification) {
       Button(role: .cancel) { NSApp.terminateWithDelay() } label: {
         Text(vm.config.currentAlertContent == .postInstallWarning ? "Continue" : "OK")

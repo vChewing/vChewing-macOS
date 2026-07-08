@@ -363,6 +363,20 @@ public final class VwrAppInstaller4Cocoa: NSViewController, InstallerVMProtocol 
         }
       }
 
+      if !self.config.adminRenameFailureAlertPaths.isEmpty {
+        let message = InstallerUIConfig.AlertType.adminRenameFailure.message
+          + "\n\n"
+          + self.config.adminRenameFailureAlertPaths.joined(separator: "\n")
+        self.showSimpleAlert(
+          title: self.alertTitle(for: .adminRenameFailure),
+          message: message,
+          buttonTitle: "OK"
+        ) {
+          self.config.adminRenameFailureAlertPaths = []
+          NSApp.terminateWithDelay()
+        }
+      }
+
       if self.config.isShowingPostInstallNotification {
         let type = self.config.currentAlertContent
         let btnTitle = (type == .postInstallWarning) ? "Continue" : "OK"
