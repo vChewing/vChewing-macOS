@@ -119,6 +119,10 @@ pkg: release
 	@echo "Building PKG installer..."
 	./BuildPKG.sh
 
+pkg-signed: release
+	@echo "Building signed and notarized PKG installer..."
+	./BuildPKG.sh --sign
+
 archive: universal-build
 	@echo "Assembling and archiving app bundles..."
 	swift package --allow-writing-to-package-directory bundle-apps -- --build-dir $(UNIVERSAL_DIR) --archive

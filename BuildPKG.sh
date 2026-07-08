@@ -39,21 +39,65 @@ if [ -z "${MARKETING_VERSION}" ] || [ -z "${BUILD_VERSION}" ]; then
     exit 1
 fi
 
-# Allow command-line overrides: BuildPKG.sh [marketing-version] [build-version]
-if [ -n "$1" ]; then
-    MARKETING_VERSION="$1"
-fi
-if [ -n "$2" ]; then
-    BUILD_VERSION="$2"
-fi
-
 TARGET='vChewing'
 IME_APP="Build/Products/Release/${TARGET}.app"
 KEYLAYOUT_BUNDLE="Sources/vChewingIME_macOS/Resources/vChewingKeyLayout.bundle"
 KEYLAYOUT_RESOURCES="${KEYLAYOUT_BUNDLE}/Contents/Resources"
 ASSETS_DIR="ValueAdd/PKGInstallerAssets"
 OUTPUT_DIR="Build"
-PKG_NAME="${TARGET}-macOS-${MARKETING_VERSION}-unsigned.pkg"
+
+# Allow command-line overrides: BuildPKG.sh [--sign [TEAM_ID]]
+# Version information is always read from Release-Version.plist.
+SIGN_PRODUCT=0
+# Default Team ID for vChewing release builds. Override with --sign <TEAM_ID>
+# or by setting the VCHEWING_TEAM_ID environment variable.
+DEFAULT_TEAM_ID="WEY3MS268C"
+TEAM_ID="${VCHEWING_TEAM_ID:-${DEFAULT_TEAM_ID}}"
+
+while [ $# -gt 0 ]; do
+    case "$1" in
+        --sign)
+            SIGN_PRODUCT=1
+            if [ -n "$2" ] && [ "${2#--}" = "$2" ]; then
+                TEAM_ID="$2"
+                shift
+            fi
+            ;;
+        --help|-h)
+            cat <<EOF
+Usage: $0 [--sign [TEAM_ID]]
+
+Options:
+  --sign [TEAM_ID]  Sign the app bundle and product archive, submit the
+                    package for notarization, and staple the ticket.
+                    TEAM_ID defaults to WEY3MS268C (or the
+                    VCHEWING_TEAM_ID environment variable if set).
+  --help, -h        Show this help message.
+
+Notarization uses the notarytool keychain profile named AC_PASSWORD.
+EOF
+            exit 0
+            ;;
+        *)
+            echo "Error: Unknown option $1" >&2
+            echo "Run '$0 --help' for usage." >&2
+            exit 1
+            ;;
+    esac
+    shift
+done
+
+if [ "${SIGN_PRODUCT}" -eq 1 ] && [ -z "${TEAM_ID}" ]; then
+    echo "Error: --sign requires a Team ID." >&2
+    echo "Provide it as an argument or set the VCHEWING_TEAM_ID environment variable." >&2
+    exit 1
+fi
+
+if [ "${SIGN_PRODUCT}" -eq 1 ]; then
+    PKG_NAME="${TARGET}-macOS-${MARKETING_VERSION}-signed.pkg"
+else
+    PKG_NAME="${TARGET}-macOS-${MARKETING_VERSION}-unsigned.pkg"
+fi
 
 if [ ! -d "${IME_APP}" ]; then
     echo "Error: ${IME_APP} not found." >&2
@@ -72,6 +116,7 @@ STAGING_ROOT="${SCRIPT_DIR}/.build/pkg-staging/root"
 RESOURCES_STAGING="${SCRIPT_DIR}/.build/pkg-staging/resources"
 SCRIPTS_STAGING="${SCRIPT_DIR}/.build/pkg-staging/scripts"
 DISTRIBUTION_XML="${SCRIPT_DIR}/.build/pkg-staging/distribution.xml"
+ENTITLEMENTS_STAGING="${SCRIPT_DIR}/.build/pkg-staging/vChewing.entitlements"
 rm -rf "${SCRIPT_DIR}/.build/pkg-staging"
 mkdir -p "${STAGING_ROOT}/Library/Input Methods"
 mkdir -p "${STAGING_ROOT}/Library/Keyboard Layouts"
@@ -94,6 +139,62 @@ for keylayout in "${KEYLAYOUT_RESOURCES}"/vChewing*.keylayout; do
     [ -e "${keylayout}" ] || continue
     cp "${keylayout}" "${STAGING_ROOT}/Library/Keyboard Layouts/"
 done
+
+# Inspect the signature on a bundle. Returns 0 if the bundle is signed by the
+# given Team ID and spctl accepts it, 1 otherwise.
+bundle_is_signed_by_team() {
+    bundle_path="$1"
+    team_id="$2"
+    [ -d "${bundle_path}" ] || return 1
+    bundle_id=$(codesign -dv "${bundle_path}" 2>&1 | awk -F= '/TeamIdentifier/{print $2}')
+    if [ "${bundle_id}" != "${team_id}" ]; then
+        return 1
+    fi
+    spctl -a -vv "${bundle_path}" >/dev/null 2>&1
+}
+
+# When requested, sign the staged app bundle and keyboard layout bundle with the
+# Developer ID Application identity associated with the given Team ID. The
+# entitlements file used by the Xcode/SPM build is copied into staging with
+# bundle-identifier placeholders resolved so codesign can apply it.
+# Bundles already signed by the same Team ID and accepted by spctl are left
+# untouched, because re-signing would invalidate an existing notarization ticket.
+if [ "${SIGN_PRODUCT}" -eq 1 ]; then
+    ENTITLEMENTS_SRC="Sources/vChewingIME_macOS/Resources/vChewing.entitlements"
+    if bundle_is_signed_by_team "${STAGING_ROOT}/Library/Input Methods/${TARGET}.app" "${TEAM_ID}"; then
+        echo "App bundle is already signed by Team ID ${TEAM_ID}; skipping re-sign."
+    else
+        echo "Signing app bundle with Team ID ${TEAM_ID}..."
+        if [ -f "${ENTITLEMENTS_SRC}" ]; then
+            sed -e 's/\$(PRODUCT_BUNDLE_IDENTIFIER)/org.atelierInmu.inputmethod.vChewing/g' \
+                "${ENTITLEMENTS_SRC}" > "${ENTITLEMENTS_STAGING}"
+            codesign --force --deep --sign "${TEAM_ID}" \
+                --entitlements "${ENTITLEMENTS_STAGING}" \
+                --options runtime \
+                --timestamp \
+                "${STAGING_ROOT}/Library/Input Methods/${TARGET}.app"
+        else
+            codesign --force --deep --sign "${TEAM_ID}" \
+                --options runtime \
+                --timestamp \
+                "${STAGING_ROOT}/Library/Input Methods/${TARGET}.app"
+        fi
+        codesign --verify --verbose=1 \
+            "${STAGING_ROOT}/Library/Input Methods/${TARGET}.app" || true
+    fi
+
+    if [ -d "${STAGING_ROOT}/Library/Keyboard Layouts/vChewingKeyLayout.bundle" ]; then
+        if bundle_is_signed_by_team "${STAGING_ROOT}/Library/Keyboard Layouts/vChewingKeyLayout.bundle" "${TEAM_ID}"; then
+            echo "Keyboard layout bundle is already signed by Team ID ${TEAM_ID}; skipping re-sign."
+        else
+            echo "Signing keyboard layout bundle with Team ID ${TEAM_ID}..."
+            codesign --force --sign "${TEAM_ID}" \
+                --options runtime \
+                --timestamp \
+                "${STAGING_ROOT}/Library/Keyboard Layouts/vChewingKeyLayout.bundle"
+        fi
+    fi
+fi
 
 # Stage installer scripts with the canonical names expected by pkgbuild.
 cp "${ASSETS_DIR}/pkgPreInstall.sh" "${SCRIPTS_STAGING}/preinstall"
@@ -197,14 +298,35 @@ cat > "${DISTRIBUTION_XML}" <<EOF
 EOF
 
 # Wrap the component package into the final product archive.
-run_with_filtered_stderr productbuild \
-    --distribution "${DISTRIBUTION_XML}" \
-    --resources "${RESOURCES_STAGING}" \
-    --package-path "${OUTPUT_DIR}" \
-    "${OUTPUT_DIR}/${PKG_NAME}"
+if [ "${SIGN_PRODUCT}" -eq 1 ]; then
+    echo "Signing product archive with Team ID ${TEAM_ID}..."
+    run_with_filtered_stderr productbuild \
+        --distribution "${DISTRIBUTION_XML}" \
+        --resources "${RESOURCES_STAGING}" \
+        --package-path "${OUTPUT_DIR}" \
+        --sign "${TEAM_ID}" \
+        --timestamp \
+        "${OUTPUT_DIR}/${PKG_NAME}"
+else
+    run_with_filtered_stderr productbuild \
+        --distribution "${DISTRIBUTION_XML}" \
+        --resources "${RESOURCES_STAGING}" \
+        --package-path "${OUTPUT_DIR}" \
+        "${OUTPUT_DIR}/${PKG_NAME}"
+fi
 
 # Remove the intermediate component package; only the final product remains.
 rm -f "${OUTPUT_DIR}/vChewing-component.pkg"
+
+# Submit the signed package for notarization and staple the returned ticket.
+if [ "${SIGN_PRODUCT}" -eq 1 ]; then
+    echo "Submitting package for notarization..."
+    xcrun notarytool submit "${OUTPUT_DIR}/${PKG_NAME}" \
+        --keychain-profile "AC_PASSWORD" \
+        --wait
+    echo "Stapling notarization ticket..."
+    xcrun stapler staple "${OUTPUT_DIR}/${PKG_NAME}"
+fi
 
 echo "Built: ${OUTPUT_DIR}/${PKG_NAME}"
 echo "Marketing version: ${MARKETING_VERSION}"
