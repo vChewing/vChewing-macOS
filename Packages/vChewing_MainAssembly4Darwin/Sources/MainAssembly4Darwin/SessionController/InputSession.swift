@@ -15,9 +15,9 @@ public final class InputSession: @MainActor SessionProtocol, Sendable {
 
   public init(
     controller inputController: SessionCtl?,
-    client inputClient: @escaping (() -> ClientObj?)
+    clientAddr inputClientAddr: @escaping (() -> UInt?)
   ) {
-    self.theClient = inputClient
+    self.theClientAddr = inputClientAddr
     self.inputControllerAssigned = inputController
     construct(client: theClient())
     registerInCache()
@@ -97,7 +97,7 @@ public final class InputSession: @MainActor SessionProtocol, Sendable {
 
   public var isVerticalTyping: Bool = false
 
-  public var theClient: () -> ClientObj?
+  public var theClientAddr: () -> UInt?
 
   /// 用來標記當前副本是否已處於活動狀態。
   public var isActivated: Bool = false
@@ -157,6 +157,13 @@ public final class InputSession: @MainActor SessionProtocol, Sendable {
         synchronizer4LMPrefs?()
       }
     }
+  }
+
+  public func theClient() -> ClientObj? {
+    if let addr = theClientAddr(), let opaque = UnsafeRawPointer(bitPattern: addr) {
+      return Unmanaged<ClientObj>.fromOpaque(opaque).takeUnretainedValue()
+    }
+    return nil
   }
 
   public func initInputHandler() {
@@ -228,9 +235,9 @@ public final class InputSession: @MainActor SessionProtocol, Sendable {
   }
 
   /// 重新綁定至新的 SessionCtl（快取命中時使用）。
-  func reassign(to controller: SessionCtl, clientProvider: @escaping () -> ClientObj?) {
+  func reassign(to controller: SessionCtl, clientAddrProvider: @escaping () -> UInt?) {
     inputControllerAssigned = controller
-    theClient = clientProvider
+    theClientAddr = clientAddrProvider
   }
 
   // MARK: Private

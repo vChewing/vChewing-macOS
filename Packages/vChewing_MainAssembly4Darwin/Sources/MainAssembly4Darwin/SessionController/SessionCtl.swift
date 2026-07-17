@@ -63,9 +63,12 @@ public final class SessionCtl: IMKInputSessionController {
   @MainActor
   private weak var _core: InputSession?
 
-  private func getClientProvider() -> (() -> InputSession.ClientObj?) {
+  private func getClientAddrProvider() -> (() -> UInt?) {
     { [weak self] in
-      self?.client() as? InputSession.ClientObj
+      if let clientObj = self?.client() as? InputSession.ClientObj {
+        return UInt(bitPattern: Unmanaged.passUnretained(clientObj).toOpaque())
+      }
+      return nil
     }
   }
 
@@ -79,19 +82,22 @@ public final class SessionCtl: IMKInputSessionController {
     if let clientObj {
       let key = Int(bitPattern: Unmanaged.passUnretained(clientObj).toOpaque())
       if let cached = InputSession.cachedSession(for: key) {
-        cached.reassign(to: self, clientProvider: getClientProvider())
+        cached.reassign(to: self, clientAddrProvider: getClientAddrProvider())
         vCLog("InputSession reused. ID: \(cached.id.uuidString)")
         return cached
       }
     }
     // 先用傳入的參數完成 InputSession 的初期化，其中包括了對這個 Session 的登記過程。
     let newSession = InputSession(controller: self) {
-      clientObj as? InputSession.ClientObj
+      if let clientObj {
+        return UInt(bitPattern: Unmanaged.passUnretained(clientObj).toOpaque())
+      }
+      return nil
     }
-    // 然後再用脫手操作給這個 Session 重新指派 clientProvider。
+    // 然後再用脫手操作給這個 Session 重新指派 clientAddrProvider。
     asyncOnMain { [weak self] in
       guard let this = self else { return }
-      newSession.reassign(to: this, clientProvider: this.getClientProvider())
+      newSession.reassign(to: this, clientAddrProvider: this.getClientAddrProvider())
     }
     return newSession
   }

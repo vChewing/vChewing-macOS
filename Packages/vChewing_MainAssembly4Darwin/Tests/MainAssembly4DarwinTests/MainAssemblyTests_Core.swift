@@ -61,7 +61,12 @@ final class MainAssemblyTests {
         .connectToTestFactoryDictionary(textMapData: LMATestsData.textMapTestCoreLMData)
     }
     Self._testHandler = nil
-    let session = InputSession(controller: nil, client: { testClient })
+    let session = InputSession(
+      controller: nil,
+      clientAddr: {
+        UInt(bitPattern: Unmanaged.passUnretained(testClient).toOpaque())
+      }
+    )
     Self._testSession = session
 
     // Manually perform essential initialization steps from performServerActivation
