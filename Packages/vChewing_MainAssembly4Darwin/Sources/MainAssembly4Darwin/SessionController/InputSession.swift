@@ -199,14 +199,14 @@ public final class InputSession: @MainActor SessionProtocol, Sendable {
 
   /// 從快取中查詢既有的 InputSession（以 client NSObject 的記憶體位址整數值為鍵）。
   static func cachedSession(for memAddr: Int) -> InputSession? {
-    sessionsLock.withLock {
-      guard let session = sessionsByClient[memAddr] else {
+    Self.sessionsByClient.withLock { sessionClientMap in
+      guard let session = sessionClientMap[memAddr] else {
         return nil
       }
       // 孤本清理：若快取中的 session 已無任何 SessionCtl 參照，立即移除。
       if session.inputControllerAssigned == nil,
          Self.current?.id != session.id {
-        sessionsByClient[memAddr] = nil
+        sessionClientMap[memAddr] = nil
         return nil
       }
       // 命中時更新 LRU 記數器（用於 count > 5 時的批量淘汰）。
@@ -220,8 +220,8 @@ public final class InputSession: @MainActor SessionProtocol, Sendable {
   func registerInCache() {
     guard let clientObj = theClient() else { return }
     let key = Int(bitPattern: Unmanaged.passUnretained(clientObj).toOpaque())
-    Self.sessionsLock.withLock {
-      Self.sessionsByClient[key] = self
+    Self.sessionsByClient.withLock { sessionClientMap in
+      sessionClientMap[key] = self
     }
     // 登記後觸發 LRU 檢查（僅在 count > 5 時實際淘汰）。
     Self.evictLRUIfNeeded()
@@ -243,9 +243,7 @@ public final class InputSession: @MainActor SessionProtocol, Sendable {
   /// 取代舊版 NSMapTable——NSMapTable 自身的內部設計在 Chrome/Electron
   /// 等頻繁變更 client proxy 物件的場景下會導致 hang。
   /// - Remark: 參見 DevLab/InputMethodKitPhuquingRetarded.txt 內的分析。
-  private static var sessionsByClient = [Int: InputSession]()
-  /// 併行存取保護鎖。
-  private static let sessionsLock = NSLock()
+  private static var sessionsByClient = NSMutex([Int: InputSession]())
   /// 靜態全域 LRU 記數器（單調遞增，&+= 溢位迴繞）。
   private static var globalLRUTick: UInt = 0
 
@@ -253,11 +251,11 @@ public final class InputSession: @MainActor SessionProtocol, Sendable {
   /// 某些使用者會利用 macOS 12+ 的 CpLk 特性瘋狂切換中英輸入法，
   /// 快取條目可能快速累積。LRU 確保只保留最近使用的 session。
   private static func evictLRUIfNeeded() {
-    sessionsLock.withLock {
-      guard sessionsByClient.count > 5 else { return }
+    sessionsByClient.withLock { sessionClientMap in
+      guard sessionClientMap.count > 5 else { return }
       var oldestKey: Int?
       var oldestTick: UInt = .max
-      for (key, session) in sessionsByClient {
+      for (key, session) in sessionClientMap {
         guard session.inputControllerAssigned == nil,
               Self.current?.id != session.id
         else { continue }
@@ -267,7 +265,7 @@ public final class InputSession: @MainActor SessionProtocol, Sendable {
         }
       }
       if let oldestKey {
-        sessionsByClient[oldestKey] = nil
+        sessionClientMap[oldestKey] = nil
       }
     }
   }
