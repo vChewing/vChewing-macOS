@@ -18,7 +18,10 @@ public final class InputSession: @MainActor SessionProtocol, Sendable {
     clientAddr inputClientAddr: @escaping (() -> UInt?)
   ) {
     self.theClientAddr = inputClientAddr
-    self.inputControllerAssigned = inputController
+    self.inputControllerAssignedAddr = inputController.map {
+      // Swift 的 optional map 語法糖，會在目標物件為 nil 時回傳 nil。
+      UInt(bitPattern: Unmanaged.passUnretained($0).toOpaque())
+    }
     if let inputController {
       Self.registerSessionAddr(self, for: inputController)
     }
@@ -108,11 +111,14 @@ public final class InputSession: @MainActor SessionProtocol, Sendable {
   /// 上次實際套用至 client 的鍵盤佈局名稱，用以跳過重複的 overrideKeyboard() 呼叫。
   public var lastAppliedKeyboardLayout: String?
 
-  /// IMKInputController 副本。
-  public weak var inputControllerAssigned: SessionCtl?
+  /// IMKInputController 副本（記憶體位址）。
+  public nonisolated(unsafe) var inputControllerAssignedAddr: UInt?
 
   public var inputController: SessionCtl? {
-    inputControllerAssigned
+    guard let addr = inputControllerAssignedAddr,
+          let opaque = UnsafeRawPointer(bitPattern: addr)
+    else { return nil }
+    return Unmanaged<SessionCtl>.fromOpaque(opaque).takeUnretainedValue()
   }
 
   /// 用以存儲客體的 bundleIdentifier。
@@ -214,7 +220,7 @@ public final class InputSession: @MainActor SessionProtocol, Sendable {
         return nil
       }
       // 孤本清理：若快取中的 session 已無任何 SessionCtl 參照，立即移除。
-      if session.inputControllerAssigned == nil,
+      if session.inputControllerAssignedAddr == nil,
          Self.current?.id != session.id {
         sessionClientMap[memAddr] = nil
         return nil
@@ -245,7 +251,14 @@ public final class InputSession: @MainActor SessionProtocol, Sendable {
   /// 移除 controller 對照關係（由 SessionCtl.deinit 呼叫）。
   nonisolated static func unregisterSessionAddr(for controller: SessionCtl) {
     let ctlKey = Int(bitPattern: Unmanaged.passUnretained(controller).toOpaque())
-    sessionAddrByControllerAddr.withLock { $0[ctlKey] = nil }
+    sessionAddrByControllerAddr.withLock { map in
+      if let ssnKey = map[ctlKey],
+         let opaque = UnsafeRawPointer(bitPattern: ssnKey) {
+        let session = Unmanaged<InputSession>.fromOpaque(opaque).takeUnretainedValue()
+        session.inputControllerAssignedAddr = nil
+      }
+      map[ctlKey] = nil
+    }
   }
 
   /// 將自身登記至快取。首次建構 InputSession 時呼叫。
@@ -261,7 +274,7 @@ public final class InputSession: @MainActor SessionProtocol, Sendable {
 
   /// 重新綁定至新的 SessionCtl（快取命中時使用）。
   func reassign(to controller: SessionCtl, clientAddrProvider: @escaping () -> UInt?) {
-    inputControllerAssigned = controller
+    inputControllerAssignedAddr = UInt(bitPattern: Unmanaged.passUnretained(controller).toOpaque())
     theClientAddr = clientAddrProvider
     Self.registerSessionAddr(self, for: controller)
   }
@@ -295,7 +308,7 @@ public final class InputSession: @MainActor SessionProtocol, Sendable {
       var oldestKey: Int?
       var oldestTick: UInt = .max
       for (key, session) in sessionClientMap {
-        guard session.inputControllerAssigned == nil,
+        guard session.inputControllerAssignedAddr == nil,
               Self.current?.id != session.id
         else { continue }
         if session.lruTick < oldestTick {
