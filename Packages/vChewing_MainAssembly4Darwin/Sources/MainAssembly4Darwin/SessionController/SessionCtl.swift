@@ -43,25 +43,28 @@ public final class SessionCtl: IMKInputSessionController {
     self.core = callCoreAtLeastOnce(client: inputClient)
   }
 
+  deinit {
+    InputSession.unregisterSessionAddr(for: self)
+  }
+
   // MARK: Public
 
   @MainActor
   public var core: InputSession? {
     get {
-      if let workingValue = _core { return workingValue }
+      if let workingValue = InputSession.session(for: self) { return workingValue }
       let newValue = callCoreAtLeastOnce(client: nil) // <- 使用 `client()`。
       self.core = newValue
       return newValue
     }
     set {
-      _core = newValue
+      if let session = newValue {
+        InputSession.registerSessionAddr(session, for: self)
+      }
     }
   }
 
   // MARK: Private
-
-  @MainActor
-  private weak var _core: InputSession?
 
   private func getClientAddrProvider() -> (() -> UInt?) {
     { [weak self] in

@@ -19,6 +19,9 @@ public final class InputSession: @MainActor SessionProtocol, Sendable {
   ) {
     self.theClientAddr = inputClientAddr
     self.inputControllerAssigned = inputController
+    if let inputController {
+      Self.registerSessionAddr(self, for: inputController)
+    }
     construct(client: theClient())
     registerInCache()
     vCLog("InputSession constructed. ID: \(id.uuidString)")
@@ -223,6 +226,28 @@ public final class InputSession: @MainActor SessionProtocol, Sendable {
     }
   }
 
+  /// 依據 SessionCtl 記憶體位址查詢對應的 InputSession。
+  nonisolated static func session(for controller: SessionCtl) -> InputSession? {
+    let ctlKey = Int(bitPattern: Unmanaged.passUnretained(controller).toOpaque())
+    guard let ssnAddr = sessionAddrByControllerAddr.withLockRead({ $0[ctlKey] }),
+          let opaque = UnsafeRawPointer(bitPattern: ssnAddr)
+    else { return nil }
+    return Unmanaged<InputSession>.fromOpaque(opaque).takeUnretainedValue()
+  }
+
+  /// 登記 controller → session 對照關係。
+  nonisolated static func registerSessionAddr(_ session: InputSession, for controller: SessionCtl) {
+    let ctlKey = Int(bitPattern: Unmanaged.passUnretained(controller).toOpaque())
+    let ssnKey = Int(bitPattern: Unmanaged.passUnretained(session).toOpaque())
+    sessionAddrByControllerAddr.withLock { $0[ctlKey] = ssnKey }
+  }
+
+  /// 移除 controller 對照關係（由 SessionCtl.deinit 呼叫）。
+  nonisolated static func unregisterSessionAddr(for controller: SessionCtl) {
+    let ctlKey = Int(bitPattern: Unmanaged.passUnretained(controller).toOpaque())
+    sessionAddrByControllerAddr.withLock { $0[ctlKey] = nil }
+  }
+
   /// 將自身登記至快取。首次建構 InputSession 時呼叫。
   func registerInCache() {
     guard let clientObj = theClient() else { return }
@@ -238,6 +263,7 @@ public final class InputSession: @MainActor SessionProtocol, Sendable {
   func reassign(to controller: SessionCtl, clientAddrProvider: @escaping () -> UInt?) {
     inputControllerAssigned = controller
     theClientAddr = clientAddrProvider
+    Self.registerSessionAddr(self, for: controller)
   }
 
   // MARK: Private
@@ -251,6 +277,12 @@ public final class InputSession: @MainActor SessionProtocol, Sendable {
   /// 等頻繁變更 client proxy 物件的場景下會導致 hang。
   /// - Remark: 參見 DevLab/InputMethodKitPhuquingRetarded.txt 內的分析。
   private static var sessionsByClient = NSMutex([Int: InputSession]())
+  /// 以 controller NSObject 的記憶體位址整數值為鍵的快取字典。
+  /// 資料值是 Session 的記憶體位址。
+  /// - Note: Session 的記憶體位址必須在其生命週期有效期間內確保有效。
+  ///   此處不保留強引用，避免靜態字典參與 ARC。
+  private nonisolated(unsafe) static var sessionAddrByControllerAddr = NSMutex([Int: Int]())
+
   /// 靜態全域 LRU 記數器（單調遞增，&+= 溢位迴繞）。
   private static var globalLRUTick: UInt = 0
 
