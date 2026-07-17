@@ -1,6 +1,12 @@
 // swift-tools-version: 6.2
 import PackageDescription
 
+#if compiler(>=6.4)
+  let noObjCArcSetting: [CSetting] = [.unsafeFlags(["-fno-objc-arc"])]
+#else
+  let noObjCArcSetting: [CSetting] = []
+#endif
+
 let package = Package(
   name: "MainAssembly4Darwin",
   platforms: [
@@ -57,6 +63,7 @@ let package = Package(
       resources: [
         .process("Resources"),
       ],
+      cSettings: noObjCArcSetting,
       swiftSettings: [
         .defaultIsolation(MainActor.self), // set Default Actor Isolation
       ],

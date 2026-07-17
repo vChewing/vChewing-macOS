@@ -2,6 +2,12 @@
 import PackageDescription
 
 #if os(macOS)
+  #if compiler(>=6.4)
+    let noObjCArcSetting: [CSetting] = [.unsafeFlags(["-fno-objc-arc"])]
+  #else
+    let noObjCArcSetting: [CSetting] = []
+  #endif
+
   let package = Package(
     name: "vChewingIME",
     platforms: [
@@ -32,6 +38,7 @@ import PackageDescription
         path: "./Sources/vChewingIME_macOS",
         exclude: ["Resources"],
         sources: ["Modules"],
+        cSettings: noObjCArcSetting,
         swiftSettings: [
           .defaultIsolation(MainActor.self),
         ]
