@@ -365,7 +365,7 @@
 "i18n:UserDef.kCheckUpdateAutomatically.shortTitle" = "Check for updates automatically";
 "i18n:UserDef.kChineseConversionEnabled.shortTitle" = "Auto-convert traditional Chinese glyphs to KangXi characters";
 "i18n:UserDef.kClassicHaninKeyboardSymbolModeShortcutEnabled.shortTitle" = "Also use “\\” or “¥” key for Hanin Keyboard Symbol Input";
-"i18n:UserDef.kCNS11643Enabled.shortTitle" = "Enable CNS11643 Support (2026-05-06)";
+"i18n:UserDef.kCNS11643Enabled.shortTitle" = "Enable CNS11643 Support (2026-07-14)";
 "i18n:UserDef.kConsolidateContextOnCandidateSelection.description" = "For example: When typing “章太炎” and you want to override the “太” with “泰”, and the raw operation index range [1,2) which bounds are cutting the current node “章太炎” in range [0,3). If having lack of the pre-consolidation process, this word will become something like “張泰言” after the candidate selection. Only if we enable this consolidation, this word will become “章泰炎” which is the expected result that the context is kept as-is.";
 "i18n:UserDef.kConsolidateContextOnCandidateSelection.shortTitle" = "Consolidate the context on confirming candidate selection";
 "i18n:UserDef.kCurrencyNumeralsEnabled.shortTitle" = "Enable currency numerals output";

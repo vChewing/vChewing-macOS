@@ -365,7 +365,7 @@
 "i18n:UserDef.kCheckUpdateAutomatically.shortTitle" = "自動檢查軟體更新";
 "i18n:UserDef.kChineseConversionEnabled.shortTitle" = "自動將繁體中文字轉為康熙正體字";
 "i18n:UserDef.kClassicHaninKeyboardSymbolModeShortcutEnabled.shortTitle" = "亦使用「\\」或「¥」鍵啟用漢音鍵盤符號模式";
-"i18n:UserDef.kCNS11643Enabled.shortTitle" = "啟用 CNS11643 全字庫支援 (2026-05-06)";
+"i18n:UserDef.kCNS11643Enabled.shortTitle" = "啟用 CNS11643 全字庫支援 (2026-07-14)";
 "i18n:UserDef.kConsolidateContextOnCandidateSelection.description" = "打比方說，你敲了「章太炎」，你想將「太」改成「泰」。這個操作的作業索引範圍是開閉區間 [1,2)，會切到「章太炎」這個節點的所在索引範圍 [0,3)。如果沒有事前鞏固處理的話，這個詞會在你選字之後變成諸如「張泰言」這種你不想要的自動選字結果。當且僅當你啟用了這個鞏固功能的前提下，你選字之後的結果才會是「章泰炎」這種你想要的結果。";
 "i18n:UserDef.kConsolidateContextOnCandidateSelection.shortTitle" = "在使用選字窗選字時，自動鞏固上下文";
 "i18n:UserDef.kCurrencyNumeralsEnabled.shortTitle" = "啟用貨幣數字輸出";
