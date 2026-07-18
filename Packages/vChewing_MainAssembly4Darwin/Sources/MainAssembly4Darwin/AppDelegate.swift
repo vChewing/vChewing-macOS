@@ -55,15 +55,17 @@ public final class AppDelegate: NSObject, NSApplicationDelegate {
 
   // MARK: Private
 
-  private var folderMonitor = FolderMonitor(
-    url: URL(fileURLWithPath: LMMgr.dataFolderPath(isDefaultFolder: false))
+  private static var folderMonitor = NSMutex<FolderMonitor>(
+    FolderMonitor(
+      url: URL(fileURLWithPath: LMMgr.dataFolderPath(isDefaultFolder: false))
+    )
   )
 }
 
 // MARK: - Private Functions
 
 extension AppDelegate {
-  private func reloadOnFolderChangeHappens(forced: Bool = true) {
+  private static func reloadOnFolderChangeHappens(forced: Bool = true) {
     // 拖 100ms 再重載，畢竟有些有特殊需求的使用者可能會想使用巨型自訂語彙檔案。
     asyncOnMain(after: 0.1) {
       // forced 用於剛剛切換了辭典檔案目錄的場合。
@@ -80,7 +82,7 @@ extension AppDelegate {
 
   /// 在指定時間內暫時忽略使用者資料夾的檔案事件。
   func suppressUserDataMonitor(for interval: TimeInterval) {
-    folderMonitor.suppressEvents(for: interval)
+    Self.folderMonitor.value.suppressEvents(for: interval)
   }
 }
 
@@ -144,16 +146,14 @@ extension AppDelegate {
 
     // 核心辭典連線、磁帶載入、使用者語模初期化：
     // 延後至下一個 RunLoop 迭代以避免阻塞 applicationWillFinishLaunching。
-    asyncOnMain { [weak self] in
+    asyncOnMain {
       LMMgr.connectCoreDB()
       LMMgr.loadCassetteData()
       LMMgr.initUserLangModels()
-      guard let this = self else { return }
-      this.folderMonitor.folderDidChange = { [weak this] in
-        guard let this = this else { return }
-        this.reloadOnFolderChangeHappens()
+      Self.folderMonitor.withLock { lockedMonitor in
+        lockedMonitor.folderDidChange = { Self.reloadOnFolderChangeHappens() }
+        if LMMgr.userDataFolderExists { lockedMonitor.startMonitoring() }
       }
-      if LMMgr.userDataFolderExists { this.folderMonitor.startMonitoring() }
     }
 
     PrefMgr.shared.fixOddPreferences()
@@ -166,17 +166,16 @@ extension AppDelegate {
 
   public func updateDirectoryMonitorPath() {
     let newPath = LMMgr.dataFolderPath(isDefaultFolder: false)
-    folderMonitor.stopMonitoring()
-    folderMonitor = FolderMonitor(
-      url: URL(fileURLWithPath: newPath)
-    )
-    folderMonitor.folderDidChange = { [weak self] in
-      guard let this = self else { return }
-      this.reloadOnFolderChangeHappens()
-    }
-    if LMMgr.userDataFolderExists { // 沒有資料夾的話，FolderMonitor 會崩潰。
-      folderMonitor.startMonitoring()
-      reloadOnFolderChangeHappens(forced: true)
+    Self.folderMonitor.withLock { lockedMonitor in
+      lockedMonitor.stopMonitoring()
+      lockedMonitor = FolderMonitor(
+        url: URL(fileURLWithPath: newPath)
+      )
+      lockedMonitor.folderDidChange = { Self.reloadOnFolderChangeHappens() }
+      if LMMgr.userDataFolderExists { // 沒有資料夾的話，FolderMonitor 會崩潰。
+        lockedMonitor.startMonitoring()
+        Self.reloadOnFolderChangeHappens(forced: true)
+      }
     }
   }
 
