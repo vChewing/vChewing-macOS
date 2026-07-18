@@ -16,9 +16,9 @@ jobs:
     # to the entire job) to avoid broader security impact while keeping the CI
     # resilient. See the checkout step for the override.
     steps:
-      - uses: maxim-lobanov/setup-xcode@v1.6.0
+      - uses: maxim-lobanov/setup-xcode@v1.7.0
         with:
-          xcode-version: "26.4.1"
+          xcode-version: "26.6"
       - uses: actions/checkout@v4
         env:
           # Limit TLS verification override to this step only. Do NOT enable this
