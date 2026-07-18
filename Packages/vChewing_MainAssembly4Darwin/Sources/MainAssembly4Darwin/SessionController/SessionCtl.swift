@@ -67,11 +67,12 @@ public final class SessionCtl: IMKInputSessionController {
   // MARK: Private
 
   private func getClientAddrProvider() -> (() -> UInt?) {
-    { [weak self] in
-      if let clientObj = self?.client() as? InputSession.ClientObj {
-        return UInt(bitPattern: Unmanaged.passUnretained(clientObj).toOpaque())
-      }
-      return nil
+    let thisAddr = UInt(bitPattern: Unmanaged.passUnretained(self).toOpaque())
+    return {
+      guard let opaque = UnsafeRawPointer(bitPattern: thisAddr) else { return nil }
+      let this = Unmanaged<SessionCtl>.fromOpaque(opaque).takeUnretainedValue()
+      guard let clientObj = this.client() as? InputSession.ClientObj else { return nil }
+      return UInt(bitPattern: Unmanaged.passUnretained(clientObj).toOpaque())
     }
   }
 
@@ -98,8 +99,10 @@ public final class SessionCtl: IMKInputSessionController {
       return nil
     }
     // 然後再用脫手操作給這個 Session 重新指派 clientAddrProvider。
-    asyncOnMain { [weak self] in
-      guard let this = self else { return }
+    let thisAddr = UInt(bitPattern: Unmanaged.passUnretained(self).toOpaque())
+    asyncOnMain {
+      guard let opaque = UnsafeRawPointer(bitPattern: thisAddr) else { return }
+      let this = Unmanaged<SessionCtl>.fromOpaque(opaque).takeUnretainedValue()
       newSession.reassign(to: this, clientAddrProvider: this.getClientAddrProvider())
     }
     return newSession
@@ -196,29 +199,21 @@ extension SessionCtl {
   /// 不過好像因為 IMK 的 Bug 而並不會被執行。
   override public func inputControllerWillClose() {
     // 防止尚未完成拼寫的注音內容被遞交出去。
-    asyncOnMain { [weak self] in
-      self?.core?.inputControllerWillClose()
-    }
+    core?.inputControllerWillClose()
   }
 
   /// 指定標記模式下被高亮的部分。
   override public func selectionRange() -> NSRange {
-    mainSync {
-      core?.selectionRange() ?? .notFound
-    }
+    core?.selectionRange() ?? .notFound
   }
 
   /// 該函式僅用來取消任何輸入法浮動視窗的顯示。
   override public func hidePalettes() {
-    asyncOnMain { [weak self] in
-      self?.core?.hidePalettes()
-    }
+    core?.hidePalettes()
   }
 
   override public func menu() -> NSMenu {
-    mainSync {
-      makeMenu()
-    }
+    makeMenu()
   }
 
   @objc
