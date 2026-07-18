@@ -165,20 +165,32 @@ if [ "${SIGN_PRODUCT}" -eq 1 ]; then
         echo "App bundle is already signed by Team ID ${TEAM_ID}; skipping re-sign."
     else
         echo "Signing app bundle with Team ID ${TEAM_ID}..."
+
+        # Resolve the entitlements file used by the SPM bundle-apps plugin.
+        # The plugin (Plugins/BundleApps/plugin.swift ← assembleMainIMEApp) injects
+        # three Xcode build-setting-derived entitlements on top of vChewing.entitlements:
+        #   com.apple.security.app-sandbox              = true
+        #   com.apple.security.network.client           = true
+        #   com.apple.security.files.user-selected.read-write = true
+        # We must include them here as well, otherwise re-signing with a different
+        # set of entitlements strips the app sandbox and breaks runtime behaviour.
+        ENTITLEMENTS_STAGING="${SCRIPT_DIR}/.build/pkg-staging/vChewing.entitlements"
         if [ -f "${ENTITLEMENTS_SRC}" ]; then
             sed -e 's/\$(PRODUCT_BUNDLE_IDENTIFIER)/org.atelierInmu.inputmethod.vChewing/g' \
                 "${ENTITLEMENTS_SRC}" > "${ENTITLEMENTS_STAGING}"
-            codesign --force --deep --sign "${TEAM_ID}" \
-                --entitlements "${ENTITLEMENTS_STAGING}" \
-                --options runtime \
-                --timestamp \
-                "${STAGING_ROOT}/Library/Input Methods/${TARGET}.app"
-        else
-            codesign --force --deep --sign "${TEAM_ID}" \
-                --options runtime \
-                --timestamp \
-                "${STAGING_ROOT}/Library/Input Methods/${TARGET}.app"
+            /usr/libexec/PlistBuddy -c 'Add :com.apple.security.app-sandbox bool true' \
+                "${ENTITLEMENTS_STAGING}" 2>/dev/null || true
+            /usr/libexec/PlistBuddy -c 'Add :com.apple.security.network.client bool true' \
+                "${ENTITLEMENTS_STAGING}" 2>/dev/null || true
+            /usr/libexec/PlistBuddy -c 'Add :com.apple.security.files.user-selected.read-write bool true' \
+                "${ENTITLEMENTS_STAGING}" 2>/dev/null || true
         fi
+
+        codesign --force --deep --sign "${TEAM_ID}" \
+            --entitlements "${ENTITLEMENTS_STAGING}" \
+            --options runtime \
+            --timestamp \
+            "${STAGING_ROOT}/Library/Input Methods/${TARGET}.app"
         codesign --verify --verbose=1 \
             "${STAGING_ROOT}/Library/Input Methods/${TARGET}.app" || true
     fi
