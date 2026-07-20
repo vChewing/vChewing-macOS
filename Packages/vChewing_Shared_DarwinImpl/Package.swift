@@ -19,8 +19,15 @@ let package = Package(
   ],
   targets: [
     .target(
+      name: "ObjCUtils",
+      cSettings: [
+        .unsafeFlags(["-fno-objc-arc"]),
+      ]
+    ),
+    .target(
       name: "Shared_DarwinImpl",
       dependencies: [
+        "ObjCUtils",
         .product(name: "OSFrameworkImpl", package: "vChewing_OSFrameworkImpl"),
         .product(name: "Shared", package: "vChewing_Shared"),
         .product(name: "IMKUtils", package: "vChewing_IMKUtils"),

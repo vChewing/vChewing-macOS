@@ -7,6 +7,7 @@
 // requirements defined in MIT License.
 
 @_exported import IMKUtils
+@_exported import ObjCUtils
 @_exported import OSFrameworkImpl
 @_exported import Shared
 @_exported import SwiftExtension
