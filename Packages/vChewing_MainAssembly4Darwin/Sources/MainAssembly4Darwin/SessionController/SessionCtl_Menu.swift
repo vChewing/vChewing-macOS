@@ -406,6 +406,9 @@ extension SessionCtl {
     guard let currentMemorySizeInBytes = NSApplication.memoryFootprintAnonymous else { return nil }
     let currentMemorySize: Double = (Double(currentMemorySizeInBytes) / 1_024 / 1_024)
       .rounded(toPlaces: 1)
-    return "i18n:IME.RAMUsedLabelHeader".i18n + " \(currentMemorySize)MB"
+    let ramMsg = "i18n:IME.RAMUsedLabelHeader".i18n + " \(currentMemorySize)MB"
+    let count4Controllers = "i18n:IME.RAMControllerCountLabel"
+      .i18n + " \(ObjCMemoryLeakTracker.shared.trackedCountByType["SessionCtl"] ?? 0)"
+    return [ramMsg, count4Controllers].joined(separator: "; ")
   }
 }

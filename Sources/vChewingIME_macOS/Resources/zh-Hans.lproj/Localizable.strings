@@ -82,6 +82,8 @@
 "i18n:ErrorMessage.UnableToCreateUserPhraseFile" = "无法创建自订语汇档案。";
 "i18n:ErrorMessage.WildcardKeyNotInitial" = "花牌键不得作为起始码。";
 "i18n:fileDragImportButton.DragFileToHere" = "请将档案拽到这边";
+
+"i18n:IME.RAMControllerCountLabel" = "控制器副本数:";
 "i18n:IME.RAMUsedLabelHeader" = "[私有记忆体占用量]";
 "i18n:InfoMessage.AlreadyLatestVersion" = "您正在使用目前最新的发行版。";
 "i18n:InfoMessage.AlreadyLatestVersionVChewing" = "目前使用的已经是最新版本。";

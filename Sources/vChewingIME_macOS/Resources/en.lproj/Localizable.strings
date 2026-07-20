@@ -82,6 +82,8 @@
 "i18n:ErrorMessage.UnableToCreateUserPhraseFile" = "Unable to create the user phrase file.";
 "i18n:ErrorMessage.WildcardKeyNotInitial" = "Wildcard key cannot be the initial key.";
 "i18n:fileDragImportButton.DragFileToHere" = "DRAG FILE TO HERE";
+
+"i18n:IME.RAMControllerCountLabel" = "Controllers:";
 "i18n:IME.RAMUsedLabelHeader" = "[PRIVATE MEMORY USAGE]";
 "i18n:InfoMessage.AlreadyLatestVersion" = "You are already using the latest version.";
 "i18n:InfoMessage.AlreadyLatestVersionVChewing" = "You are already using the latest version of vChewing.";

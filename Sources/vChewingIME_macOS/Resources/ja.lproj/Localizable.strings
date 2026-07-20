@@ -82,6 +82,8 @@
 "i18n:ErrorMessage.UnableToCreateUserPhraseFile" = "ユーザー辞書ファイルの作成は失敗しました。";
 "i18n:ErrorMessage.WildcardKeyNotInitial" = "骨牌キーは最初のキーとしてはならぬ。";
 "i18n:fileDragImportButton.DragFileToHere" = "ここにドラッグして";
+
+"i18n:IME.RAMControllerCountLabel" = "コントローラー数:";
 "i18n:IME.RAMUsedLabelHeader" = "[プライベートメモリ使用量]";
 "i18n:InfoMessage.AlreadyLatestVersion" = "現在稼働中のは最新バージョンである。";
 "i18n:InfoMessage.AlreadyLatestVersionVChewing" = "今の唯音はすでに最新版だと報告します。";
