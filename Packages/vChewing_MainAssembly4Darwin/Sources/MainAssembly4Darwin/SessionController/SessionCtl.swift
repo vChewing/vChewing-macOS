@@ -79,8 +79,8 @@ public final class SessionCtl: IMKInputSessionController {
   private func callCoreAtLeastOnce(client maybeClient: Any!) -> InputSession {
     // 嘗試從快取中複用既有的 InputSession，以緩解 CapsLock 頻繁切換場景下的 ARC 壓力。
     // 參見 DevLab/InputMethodKitPhuquingRetarded.txt 內的分析。
-    let maybeClientOnMain = maybeClient as? NSObject
-    let clientObj = maybeClientOnMain ?? (client() as? NSObject)
+    let maybeClientOnMain = maybeClient as? NSObjectProtocol
+    let clientObj: NSObjectProtocol? = maybeClientOnMain ?? (client() as? NSObjectProtocol)
     // 改用 uniqueClientIdentifierString 作為快取鍵。
     // 此舉解決 Chrome/Electron 的 client object memAddr 不穩定問題。
     if let clientObj {

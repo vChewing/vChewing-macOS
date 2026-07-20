@@ -67,7 +67,7 @@ public protocol SessionProtocol: AnyObject, IMKInputSessionControllerProtocol, C
 }
 
 nonisolated extension SessionProtocol {
-  public typealias ClientObj = IMKTextInput & NSObjectProtocol & NSObject
+  public typealias ClientObj = IMKTextInput & NSObjectProtocol
 }
 
 extension SessionProtocol {
