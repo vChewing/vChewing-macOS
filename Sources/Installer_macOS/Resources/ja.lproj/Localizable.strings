@@ -2,8 +2,8 @@
 "i18n:Common.OK" = "うむ";
 "i18n:Common.Warning" = "お知らせ";
 "i18n:Installer.Abort" = "中止";
-"i18n:Installer.AdminRenameFailureNotice" = "The following system-level input method bundles could not be renamed automatically. Please remove them manually:";
 "i18n:installer.ACCEPT_INSTALLATION" = "承認する";
+"i18n:Installer.AdminRenameFailureNotice" = "The following system-level input method bundles could not be renamed automatically. Please remove them manually:";
 "i18n:installer.APP_NAME" = "vChewing for macOS";
 "i18n:Installer.Attention" = "ご注意";
 "i18n:installer.CANCEL_INSTALLATION" = "取消";

@@ -2,8 +2,8 @@
 "i18n:Common.OK" = "确定";
 "i18n:Common.Warning" = "安装不完整";
 "i18n:Installer.Abort" = "放弃安装";
-"i18n:Installer.AdminRenameFailureNotice" = "下列系统层级的输入法套件无法自动重新命名，请手动移除：";
 "i18n:installer.ACCEPT_INSTALLATION" = "我接受";
+"i18n:Installer.AdminRenameFailureNotice" = "下列系统层级的输入法套件无法自动重新命名，请手动移除：";
 "i18n:installer.APP_NAME" = "vChewing for macOS";
 "i18n:Installer.Attention" = "请注意";
 "i18n:installer.CANCEL_INSTALLATION" = "取消安装";
