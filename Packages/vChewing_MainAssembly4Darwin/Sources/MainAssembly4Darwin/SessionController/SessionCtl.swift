@@ -35,6 +35,7 @@ public final class SessionCtl: IMKInputSessionController {
     // Note: this constuctor gets called everytime this IME gets switched to.
     // This happens even if the client() is the same IMKTextInput instance.
     super.init(server: server, delegate: delegate, client: inputClient)
+    ObjCMemoryLeakTracker.shared.track(self, type: "SessionCtl")
     // macOS 10.9 ~ 10.12 的相容性處理：此處得使用傳入的 client 參數，因為 `client()` 沒有就緒、是 nil。
     // 在這些舊版系統上，IMK 尚未在 super.init 返回時就完成 client 物件的綁定，
     // 因此 `client()` 在建構子同步執行期間始終回傳 nil，導致 Session 無法登記至快取。
