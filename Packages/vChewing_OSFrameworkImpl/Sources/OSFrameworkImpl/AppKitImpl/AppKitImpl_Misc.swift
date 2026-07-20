@@ -419,7 +419,7 @@
     /// are active on Apple Silicon they inflate ``phys_footprint`` via
     /// ``ledger_tag_graphics_footprint``; subtracting them keeps the
     /// measurement honest for leak self-diagnosis.
-    public static var memoryFootprintAnonymous: UInt64? {
+    nonisolated public static var memoryFootprintAnonymous: UInt64? {
       guard let info = Self._vmInfo() else { return nil }
       var footprint = info.phys_footprint
       if footprint > info.ledger_tag_graphics_footprint {
@@ -436,7 +436,7 @@
 
     // MARK: Internal
 
-    private static func _vmInfo() -> task_vm_info_data_t? {
+    nonisolated private static func _vmInfo() -> task_vm_info_data_t? {
       let count = mach_msg_type_number_t(
         MemoryLayout<task_vm_info_data_t>.size / MemoryLayout<integer_t>.size
       )
