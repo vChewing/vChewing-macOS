@@ -70,6 +70,10 @@ public final class SessionCtl: IMKInputSessionController {
   private func getClientAddrProvider() -> (() -> UInt?) {
     let thisAddr = UInt(bitPattern: Unmanaged.passUnretained(self).toOpaque())
     return {
+      // Client 在 Controller 建構完畢之後才可用，
+      // 但 Controller 被析構之後 Client Addr 必定是 dangling pointer。
+      // 所以在此複查 Controller 的生命週期。
+      guard ObjCMemoryLeakTracker.shared.isTracked(addr: thisAddr) else { return nil }
       guard let opaque = UnsafeRawPointer(bitPattern: thisAddr) else { return nil }
       let this = Unmanaged<SessionCtl>.fromOpaque(opaque).takeUnretainedValue()
       guard let clientObj = this.client() as? InputSession.ClientObj else { return nil }
