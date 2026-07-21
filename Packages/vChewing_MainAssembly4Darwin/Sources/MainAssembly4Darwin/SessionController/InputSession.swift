@@ -449,9 +449,7 @@ extension InputSession {
   /// 不過好像因為 IMK 的 Bug 而並不會被執行。
   public func inputControllerWillClose() {
     // 防止尚未完成拼寫的注音內容被遞交出去。
-    asyncOnMain { [weak self] in
-      self?.resetInputHandler()
-    }
+    resetInputHandler()
   }
 
   public func annotationSelected(
