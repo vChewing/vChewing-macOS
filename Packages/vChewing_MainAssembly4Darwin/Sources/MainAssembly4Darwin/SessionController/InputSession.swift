@@ -333,12 +333,13 @@ public final class InputSession: @MainActor SessionProtocol, Sendable {
   /// 靜態全域 LRU 記數器（單調遞增，&+= 溢位迴繞）。
   private static var globalLRUTick: UInt = 0
 
-  /// 惰性 LRU 淘汰：僅在快取容量超過閾值 (5) 時執行。
+  /// 惰性 LRU 淘汰：快取容量超過「當前存活 SessionCtl 數量（最少 2）」時執行。
   /// 某些使用者會利用 macOS 12+ 的 CpLk 特性瘋狂切換中英輸入法，
   /// 快取條目可能快速累積。LRU 確保只保留最近使用的 session。
   private static func evictLRUIfNeeded() {
     sessionsByClient.withLock { sessionClientMap in
-      guard sessionClientMap.count > 5 else { return }
+      let threshold = ObjCMemoryLeakTracker.shared.trackedCountByType["SessionCtl"] ?? 0
+      guard sessionClientMap.count > Swift.max(2, threshold) else { return }
       var oldestKey: UInt?
       var oldestTick: UInt = .max
       for (key, session) in sessionClientMap {
