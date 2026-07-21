@@ -116,6 +116,7 @@ public final class InputSession: @MainActor SessionProtocol, Sendable {
 
   public var inputController: SessionCtl? {
     guard let addr = inputControllerAssignedAddr,
+          ObjCMemoryLeakTracker.shared.isTracked(addr: addr),
           let opaque = UnsafeRawPointer(bitPattern: addr)
     else { return nil }
     return Unmanaged<SessionCtl>.fromOpaque(opaque).takeUnretainedValue()
