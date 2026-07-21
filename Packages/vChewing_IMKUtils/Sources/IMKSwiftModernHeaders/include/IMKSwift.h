@@ -900,6 +900,18 @@
 /// @return An array of candidate objects, or `nil` if there are no candidates.
 - (nullable NSArray *)candidates:(nonnull id<IMKTextInput>)sender;
 
+// MARK: Deferred Dealloc Callbacks
+
+/// Block invoked from `-activateServer:` after cancelling any pending delayed
+/// dealloc.  Receives raw memory addresses (`uintptr_t`) of both the
+/// `IMKTextInput` client and `self` — no retain/release is performed.
+@property (copy, nullable) void (^onActivateServer)(uintptr_t givenClientAddr, uintptr_t selfAddr);
+
+/// Block invoked from `-deactivateServer:` before scheduling a delayed dealloc.
+/// Receives raw memory addresses (`uintptr_t`) of both the `IMKTextInput`
+/// client and `self` — no retain/release is performed.
+@property (copy, nullable) void (^onDeactivateServer)(uintptr_t givenClientAddr, uintptr_t selfAddr);
+
 @end
 
 #pragma clang attribute pop

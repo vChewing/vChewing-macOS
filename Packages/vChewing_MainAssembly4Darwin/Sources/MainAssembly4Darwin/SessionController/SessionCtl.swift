@@ -36,10 +36,31 @@ public final class SessionCtl: IMKInputSessionController {
     // This happens even if the client() is the same IMKTextInput instance.
     super.init(server: server, delegate: delegate, client: inputClient)
     ObjCMemoryLeakTracker.shared.track(self, type: "SessionCtl")
+
+    self.onActivateServer = { givenClientAddr, thisAddr in
+      let pair = ClientControllerAddrPair(clientAddr: givenClientAddr, controllerAddr: thisAddr)
+      guard let (clientAddr, _) = pair.unwrapped,
+            let selfOpaque = UnsafeRawPointer(bitPattern: thisAddr),
+            let clientOpaque = UnsafeRawPointer(bitPattern: clientAddr) else { return }
+      let myself = Unmanaged<SessionCtl>.fromOpaque(selfOpaque).takeUnretainedValue()
+      let sender = Unmanaged<AnyObject>.fromOpaque(clientOpaque).takeUnretainedValue()
+      myself.core?.activateServer(sender as! (any IMKTextInput))
+    }
+    self.onDeactivateServer = { givenClientAddr, thisAddr in
+      let pair = ClientControllerAddrPair(clientAddr: givenClientAddr, controllerAddr: thisAddr)
+      guard let (clientAddr, _) = pair.unwrapped,
+            let selfOpaque = UnsafeRawPointer(bitPattern: thisAddr),
+            let clientOpaque = UnsafeRawPointer(bitPattern: clientAddr) else { return }
+      let myself = Unmanaged<SessionCtl>.fromOpaque(selfOpaque).takeUnretainedValue()
+      let sender = Unmanaged<AnyObject>.fromOpaque(clientOpaque).takeUnretainedValue()
+      myself.core?.deactivateServer(sender as! (any IMKTextInput))
+    }
+
     // macOS 10.9 ~ 10.12 的相容性處理：此處得使用傳入的 client 參數，因為 `client()` 沒有就緒、是 nil。
     // 在這些舊版系統上，IMK 尚未在 super.init 返回時就完成 client 物件的綁定，
     // 因此 `client()` 在建構子同步執行期間始終回傳 nil，導致 Session 無法登記至快取。
     // 穩妥的做法是使用當前建構子內傳入的 client 參數，可確保 IMK 已完成 client 綁定。
+
     // Force initialization.
     self.core = callCoreAtLeastOnce(client: inputClient)
   }
@@ -122,20 +143,6 @@ public final class SessionCtl: IMKInputSessionController {
 // MARK: - IMKStateSetting 協定規定的方法
 
 extension SessionCtl {
-  /// 啟用輸入法時，會觸發該函式。
-  /// - Parameter sender: 呼叫了該函式的客體。
-  override public func activateServer(_ sender: any IMKTextInput) {
-    // super.activateServer(sender) <- CONSIDERED_USELESS_WITH_TROUBLES
-    core?.activateServer(sender)
-  }
-
-  /// 停用輸入法時，會觸發該函式。
-  /// - Parameter sender: 呼叫了該函式的客體（無須使用）。
-  override public func deactivateServer(_ sender: any IMKTextInput) {
-    core?.deactivateServer(sender)
-    // super.deactivateServer(sender) <- CONSIDERED_USELESS_WITH_TROUBLES
-  }
-
   /// 切換至某一個輸入法的某個副本時（比如唯音的簡體輸入法副本與繁體輸入法副本），會觸發該函式。
   /// - Remark: 當系統呼叫 activateServer() 的時候，setValue() 會被自動呼叫。
   /// 但是，手動呼叫 activateServer() 的時候，setValue() 不會被自動呼叫。

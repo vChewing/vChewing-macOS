@@ -35,7 +35,9 @@ let package = Package(
     ),
     .target(
       name: "IMKSwiftModernHeaders",
-      resources: []
+      cSettings: [
+        .unsafeFlags(["-fno-objc-arc"]),
+      ]
     ),
     .target(
       name: "IMKUtils",
