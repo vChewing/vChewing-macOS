@@ -62,20 +62,53 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)dealloc {
     [_onActivateServer release];
     [_onDeactivateServer release];
+    [self IMKSwift_cancelDelayedDealloc];
     [super dealloc];
 }
 
 // MARK: - IMKInputController Overrides
 
 - (void)activateServer:(id)sender {
+    [self IMKSwift_cancelDelayedDealloc];
     if (_onActivateServer) _onActivateServer((uintptr_t)sender, (uintptr_t)self);
 }
 
 - (void)deactivateServer:(id)sender {
     if (_onDeactivateServer) _onDeactivateServer((uintptr_t)sender, (uintptr_t)self);
+    [self IMKSwift_scheduleDelayedDeallocAfterDelay:3.0];
 }
 
+// MARK: - Private: Deferred Dealloc
+
+/// Schedules a delayed dealloc of this controller after `delay` seconds.
+/// The `performSelector:withObject:afterDelay:` API retains `self` for the
+/// duration of the delay.  When the timer fires, the timer releases its retain.
+/// If no other objects hold a reference, `-dealloc` is triggered by the system.
+- (void)IMKSwift_scheduleDelayedDeallocAfterDelay:(NSTimeInterval)delay {
+    [NSObject cancelPreviousPerformRequestsWithTarget:self
+                                             selector:@selector(IMKSwift_delayedDealloc)
+                                               object:nil];
+    [self performSelector:@selector(IMKSwift_delayedDealloc)
+               withObject:nil
+               afterDelay:delay];
+}
+
+/// Cancels any pending delayed dealloc.
+- (void)IMKSwift_cancelDelayedDealloc {
+    [NSObject cancelPreviousPerformRequestsWithTarget:self
+                                             selector:@selector(IMKSwift_delayedDealloc)
+                                               object:nil];
+}
+
+/// Intentionally empty — serves only as the target for the delayed
+/// `-performSelector:withObject:afterDelay:` timer.
 ///
+/// The timer retains `self` for the duration of the delay; when it fires
+/// and this method returns, the timer releases its retain.  If no other
+/// references exist at that point, `-dealloc` is triggered by the system.
+/// The method body itself does not need to do anything.
+- (void)IMKSwift_delayedDealloc {}
+
 @end
 
 #pragma clang diagnostic pop
