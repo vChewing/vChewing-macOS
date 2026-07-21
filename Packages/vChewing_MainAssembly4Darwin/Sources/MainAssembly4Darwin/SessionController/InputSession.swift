@@ -347,9 +347,7 @@ extension InputSession {
   /// 停用輸入法時，會觸發該函式。
   /// - Parameter sender: 呼叫了該函式的客體（無須使用）。
   public func deactivateServer(_ sender: any IMKTextInput) {
-    asyncOnMain { [weak self] in
-      self?.performServerDeactivation()
-    }
+    performServerDeactivation()
   }
 
   public func value(forTag tag: Int, client sender: any IMKTextInput) -> Any? {
