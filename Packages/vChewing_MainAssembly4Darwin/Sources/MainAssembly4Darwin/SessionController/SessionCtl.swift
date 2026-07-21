@@ -100,6 +100,8 @@ public final class SessionCtl: IMKInputSessionController {
       return nil
     }
     // 然後再用脫手操作給這個 Session 重新指派 clientAddrProvider。
+    // 這個 async 反而是有必要的，因為 SessionCtl 的 initializer 在
+    // 徹底執行完畢之前能拿到的 client() 反而在早期版本 macOS 系統下會是 nil。
     let thisAddr = UInt(bitPattern: Unmanaged.passUnretained(self).toOpaque())
     asyncOnMain {
       guard let opaque = UnsafeRawPointer(bitPattern: thisAddr) else { return }
