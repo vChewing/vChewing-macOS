@@ -8,6 +8,41 @@
 
 import IMKSwift
 
+// MARK: - ClientControllerAddrPair
+
+public struct ClientControllerAddrPair: Sendable {
+  // MARK: Lifecycle
+
+  init(clientAddr: UInt, controllerAddr: UInt) {
+    self._clientAddr = clientAddr
+    self._controllerAddr = controllerAddr
+  }
+
+  init(_ pair: TupleExpr) {
+    self._clientAddr = pair.clientAddr
+    self._controllerAddr = pair.controllerAddr
+  }
+
+  // MARK: Internal
+
+  typealias TupleExpr = (clientAddr: UInt, controllerAddr: UInt)
+
+  let _clientAddr: UInt
+  let _controllerAddr: UInt
+
+  var unwrapped: TupleExpr? {
+    if UserDefaults.pendingUnitTests {
+      guard _controllerAddr == 0 else { return nil }
+    } else {
+      // Client 在 Controller 建構完畢之後才可用，
+      // 但 Controller 被析構之後 Client Addr 必定是 dangling pointer。
+      // 所以在此複查 Controller 的生命週期。
+      guard ObjCMemoryLeakTracker.shared.isTracked(addr: _controllerAddr) else { return nil }
+    }
+    return (_clientAddr, _controllerAddr)
+  }
+}
+
 // MARK: - InputSession
 
 public final class InputSession: @MainActor SessionProtocol, Sendable {
@@ -15,15 +50,12 @@ public final class InputSession: @MainActor SessionProtocol, Sendable {
 
   public init(
     controller inputController: SessionCtl?,
-    clientAddr inputClientAddr: @escaping (() -> UInt?)
+    clientAddr inputClientAddr: @escaping (() -> ClientControllerAddrPair?)
   ) {
     self.theClientAddr = inputClientAddr
-    self.inputControllerAssignedAddr = inputController.map {
-      // Swift 的 optional map 語法糖，會在目標物件為 nil 時回傳 nil。
-      UInt(bitPattern: Unmanaged.passUnretained($0).toOpaque())
-    }
-    if let inputController {
-      Self.registerSessionAddr(self, for: inputController)
+    self.inputControllerAssignedAddr = theClientAddr()?.unwrapped?.controllerAddr
+    if let controllerAddr = inputControllerAssignedAddr {
+      Self.registerSessionAddr(self, for: controllerAddr)
     }
     construct(client: theClient())
     registerInCache()
@@ -103,7 +135,7 @@ public final class InputSession: @MainActor SessionProtocol, Sendable {
 
   public var isVerticalTyping: Bool = false
 
-  public var theClientAddr: () -> UInt?
+  public var theClientAddr: () -> ClientControllerAddrPair?
 
   /// 用來標記當前副本是否已處於活動狀態。
   public var isActivated: Bool = false
@@ -170,7 +202,8 @@ public final class InputSession: @MainActor SessionProtocol, Sendable {
   }
 
   public func theClient() -> ClientObj? {
-    if let addr = theClientAddr(), let opaque = UnsafeRawPointer(bitPattern: addr) {
+    guard let addrPair = theClientAddr()?.unwrapped else { return nil }
+    if let opaque = UnsafeRawPointer(bitPattern: addrPair.clientAddr) {
       return Unmanaged<ClientObj>.fromOpaque(opaque).takeUnretainedValue()
     }
     return nil
@@ -215,7 +248,7 @@ public final class InputSession: @MainActor SessionProtocol, Sendable {
   var lruTick: UInt = 0
 
   /// 從快取中查詢既有的 InputSession（以 client NSObject 的記憶體位址整數值為鍵）。
-  static func cachedSession(for memAddr: Int) -> InputSession? {
+  static func cachedSession(for memAddr: UInt) -> InputSession? {
     Self.sessionsByClient.withLock { sessionClientMap in
       guard let session = sessionClientMap[memAddr] else {
         return nil
@@ -235,7 +268,7 @@ public final class InputSession: @MainActor SessionProtocol, Sendable {
 
   /// 依據 SessionCtl 記憶體位址查詢對應的 InputSession。
   nonisolated static func session(for controller: SessionCtl) -> InputSession? {
-    let ctlKey = Int(bitPattern: Unmanaged.passUnretained(controller).toOpaque())
+    let ctlKey = UInt(bitPattern: Unmanaged.passUnretained(controller).toOpaque())
     guard let ssnAddr = sessionAddrByControllerAddr.withLockRead({ $0[ctlKey] }),
           let opaque = UnsafeRawPointer(bitPattern: ssnAddr)
     else { return nil }
@@ -243,15 +276,14 @@ public final class InputSession: @MainActor SessionProtocol, Sendable {
   }
 
   /// 登記 controller → session 對照關係。
-  nonisolated static func registerSessionAddr(_ session: InputSession, for controller: SessionCtl) {
-    let ctlKey = Int(bitPattern: Unmanaged.passUnretained(controller).toOpaque())
-    let ssnKey = Int(bitPattern: Unmanaged.passUnretained(session).toOpaque())
-    sessionAddrByControllerAddr.withLock { $0[ctlKey] = ssnKey }
+  nonisolated static func registerSessionAddr(_ session: InputSession, for controllerAddr: UInt) {
+    let ssnKey = UInt(bitPattern: Unmanaged.passUnretained(session).toOpaque())
+    sessionAddrByControllerAddr.withLock { $0[controllerAddr] = ssnKey }
   }
 
   /// 移除 controller 對照關係（由 SessionCtl.deinit 呼叫）。
   nonisolated static func unregisterSessionAddr(for controller: SessionCtl) {
-    let ctlKey = Int(bitPattern: Unmanaged.passUnretained(controller).toOpaque())
+    let ctlKey = UInt(bitPattern: Unmanaged.passUnretained(controller).toOpaque())
     sessionAddrByControllerAddr.withLock { map in
       if let ssnKey = map[ctlKey],
          let opaque = UnsafeRawPointer(bitPattern: ssnKey) {
@@ -265,7 +297,7 @@ public final class InputSession: @MainActor SessionProtocol, Sendable {
   /// 將自身登記至快取。首次建構 InputSession 時呼叫。
   func registerInCache() {
     guard let clientObj = theClient() else { return }
-    let key = Int(bitPattern: Unmanaged.passUnretained(clientObj).toOpaque())
+    let key = UInt(bitPattern: Unmanaged.passUnretained(clientObj).toOpaque())
     Self.sessionsByClient.withLock { sessionClientMap in
       sessionClientMap[key] = self
     }
@@ -274,10 +306,11 @@ public final class InputSession: @MainActor SessionProtocol, Sendable {
   }
 
   /// 重新綁定至新的 SessionCtl（快取命中時使用）。
-  func reassign(to controller: SessionCtl, clientAddrProvider: @escaping () -> UInt?) {
-    inputControllerAssignedAddr = UInt(bitPattern: Unmanaged.passUnretained(controller).toOpaque())
+  func reassign(to controller: SessionCtl, clientAddrProvider: @escaping () -> ClientControllerAddrPair?) {
+    let controllerAddr = UInt(bitPattern: Unmanaged.passUnretained(controller).toOpaque())
+    inputControllerAssignedAddr = controllerAddr
     theClientAddr = clientAddrProvider
-    Self.registerSessionAddr(self, for: controller)
+    Self.registerSessionAddr(self, for: controllerAddr)
   }
 
   // MARK: Private
@@ -290,12 +323,12 @@ public final class InputSession: @MainActor SessionProtocol, Sendable {
   /// 取代舊版 NSMapTable——NSMapTable 自身的內部設計在 Chrome/Electron
   /// 等頻繁變更 client proxy 物件的場景下會導致 hang。
   /// - Remark: 參見 DevLab/InputMethodKitPhuquingRetarded.txt 內的分析。
-  private static var sessionsByClient = NSMutex([Int: InputSession]())
+  private static var sessionsByClient = NSMutex([UInt: InputSession]())
   /// 以 controller NSObject 的記憶體位址整數值為鍵的快取字典。
   /// 資料值是 Session 的記憶體位址。
   /// - Note: Session 的記憶體位址必須在其生命週期有效期間內確保有效。
   ///   此處不保留強引用，避免靜態字典參與 ARC。
-  private nonisolated(unsafe) static var sessionAddrByControllerAddr = NSMutex([Int: Int]())
+  private nonisolated(unsafe) static var sessionAddrByControllerAddr = NSMutex([UInt: UInt]())
 
   /// 靜態全域 LRU 記數器（單調遞增，&+= 溢位迴繞）。
   private static var globalLRUTick: UInt = 0
@@ -306,7 +339,7 @@ public final class InputSession: @MainActor SessionProtocol, Sendable {
   private static func evictLRUIfNeeded() {
     sessionsByClient.withLock { sessionClientMap in
       guard sessionClientMap.count > 5 else { return }
-      var oldestKey: Int?
+      var oldestKey: UInt?
       var oldestTick: UInt = .max
       for (key, session) in sessionClientMap {
         guard session.inputControllerAssignedAddr == nil,

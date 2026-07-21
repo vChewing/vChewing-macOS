@@ -64,7 +64,8 @@ final class MainAssemblyTests {
     let session = InputSession(
       controller: nil,
       clientAddr: {
-        UInt(bitPattern: Unmanaged.passUnretained(testClient).toOpaque())
+        let clientAddr = UInt(bitPattern: Unmanaged.passUnretained(testClient).toOpaque())
+        return ClientControllerAddrPair(clientAddr: clientAddr, controllerAddr: 0)
       }
     )
     Self._testSession = session
