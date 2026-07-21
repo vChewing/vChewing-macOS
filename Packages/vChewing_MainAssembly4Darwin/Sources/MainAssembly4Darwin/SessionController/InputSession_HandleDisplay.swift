@@ -51,11 +51,11 @@ extension SessionProtocol {
     colorState: TooltipColorState,
     duration: Double
   ) {
-    guard isCurrentSession, client() != nil else { return }
-    guard let tooltip, !tooltip.isEmpty else {
+    guard isCurrentSession, let tooltip, !tooltip.isEmpty else {
       ui?.tooltipUI?.hide()
       return
     }
+    guard client() != nil else { return }
     let lineHeightRect = updateVerticalTypingStatus()
     var finalOrigin: CGPoint = lineHeightRect.origin
     let delta: Double = lineHeightRect.size.height + 4.0 // bottomOutOfScreenAdjustmentHeight
