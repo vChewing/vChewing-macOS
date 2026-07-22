@@ -58,7 +58,7 @@ public final class InputHandler: @MainActor InputHandlerProtocol {
 
   public var isJISKeyboard: (() -> Bool)? = { IMEApp.isKeyboardJIS }
 
-  /// 委任物件 (SessionCtl)，以便呼叫其中的函式。
+  /// 委任物件 (InputSession)，以便呼叫其中的函式。
   public weak var session: Session?
   public var prefs: PrefMgrProtocol
   public var errorCallback: ((String) -> ())?

@@ -27,8 +27,8 @@ NS_ASSUME_NONNULL_BEGIN
 #pragma clang diagnostic ignored "-Wincomplete-implementation"
 
 @implementation IMKInputSessionController {
-    void (^_onActivateServer)(uintptr_t, uintptr_t);
-    void (^_onDeactivateServer)(uintptr_t, uintptr_t);
+    void (^_onActivatingServer)(uintptr_t, uintptr_t);
+    void (^_onDeactivatingServer)(uintptr_t, uintptr_t);
     void (^_onDealloc)(uintptr_t);
     void (^_onShowingPreferences)(uintptr_t, uintptr_t);
     void (^_onHidingPallettes)(uintptr_t);
@@ -55,8 +55,8 @@ NS_ASSUME_NONNULL_BEGIN
         return [[_##_name retain] autorelease]; \
     }
 
-MRC_BLOCK_PROPERTY(onActivateServer, void (^)(uintptr_t, uintptr_t))
-MRC_BLOCK_PROPERTY(onDeactivateServer, void (^)(uintptr_t, uintptr_t))
+MRC_BLOCK_PROPERTY(onActivatingServer, void (^)(uintptr_t, uintptr_t))
+MRC_BLOCK_PROPERTY(onDeactivatingServer, void (^)(uintptr_t, uintptr_t))
 MRC_BLOCK_PROPERTY(onDealloc, void (^)(uintptr_t))
 MRC_BLOCK_PROPERTY(onShowingPreferences, void (^)(uintptr_t, uintptr_t))
 MRC_BLOCK_PROPERTY(onHidingPallettes, void (^)(uintptr_t))
@@ -76,8 +76,8 @@ MRC_BLOCK_PROPERTY(onSettingObjCValue, void (^)(uintptr_t, intptr_t, uintptr_t, 
 - (void)dealloc {
     if (_onDealloc) _onDealloc((uintptr_t)self);
     [_onDealloc release];
-    [_onActivateServer release];
-    [_onDeactivateServer release];
+    [_onActivatingServer release];
+    [_onDeactivatingServer release];
     [_onShowingPreferences release];
     [_onHidingPallettes release];
     [_onInputControllerWillClose release];
@@ -92,15 +92,35 @@ MRC_BLOCK_PROPERTY(onSettingObjCValue, void (^)(uintptr_t, intptr_t, uintptr_t, 
     [super dealloc];
 }
 
+// MARK: - Initializer
+
+- (instancetype)initWithServer:(IMKServer *)server delegate:(nullable id)delegate client:(id)inputClient {
+    self = [super initWithServer:server delegate:delegate client:inputClient];
+    if (self) {
+        SEL hookSel = @selector(onSuperConstructionSucceeded:delegate:client:);
+        if ([self respondsToSelector:hookSel]) {
+            NSMethodSignature *sig = [self methodSignatureForSelector:hookSel];
+            NSInvocation *inv = [NSInvocation invocationWithMethodSignature:sig];
+            [inv setSelector:hookSel];
+            [inv setTarget:self];
+            [inv setArgument:&server atIndex:2];
+            [inv setArgument:&delegate atIndex:3];
+            [inv setArgument:&inputClient atIndex:4];
+            [inv invoke];
+        }
+    }
+    return self;
+}
+
 // MARK: - IMKInputController Overrides
 
 - (void)activateServer:(id)sender {
     [self IMKSwift_cancelDelayedDealloc];
-    if (_onActivateServer) _onActivateServer((uintptr_t)sender, (uintptr_t)self);
+    if (_onActivatingServer) _onActivatingServer((uintptr_t)sender, (uintptr_t)self);
 }
 
 - (void)deactivateServer:(id)sender {
-    if (_onDeactivateServer) _onDeactivateServer((uintptr_t)sender, (uintptr_t)self);
+    if (_onDeactivatingServer) _onDeactivatingServer((uintptr_t)sender, (uintptr_t)self);
     [self IMKSwift_scheduleDelayedDeallocAfterDelay:3.0];
 }
 

@@ -29,7 +29,7 @@ public protocol InputHandlerProtocol: AnyObject {
 
   // MARK: - Properties
 
-  /// 委任物件 (SessionCtl)，以便呼叫其中的函式。
+  /// 委任物件 (InputSession)，以便呼叫其中的函式。
   var session: Session? { get set }
 
   var prefs: PrefMgrProtocol { get set }

@@ -27,14 +27,8 @@ struct IMEMenuSputnik {
 
   private let addrPair: ClientControllerAddrPair
 
-  private var controller: SessionCtl? {
-    guard let controllerAddr = addrPair.unwrapped?.controllerAddr else { return nil }
-    guard let controllerOpaque = UnsafeRawPointer(bitPattern: controllerAddr) else { return nil }
-    return Unmanaged<SessionCtl>.fromOpaque(controllerOpaque).takeUnretainedValue()
-  }
-
   private var core: InputSession? {
-    controller?.core
+    SessionControllerSputnik(controllerAddr: addrPair.unwrapped?.controllerAddr)?.core
   }
 }
 
@@ -48,10 +42,10 @@ extension IMEMenuSputnik {
       let sel = NSSelectorFromString(name)
       let impBlock: @convention(block) (AnyObject, Selector, Any?) -> () = { _, _, _ in block() }
       let imp = imp_implementationWithBlock(impBlock)
-      if class_addMethod(SessionCtl.self, sel, imp, "v@:@") {
+      if class_addMethod(IMKInputSessionController.self, sel, imp, "v@:@") {
         return sel
       }
-      method_setImplementation(class_getInstanceMethod(SessionCtl.self, sel)!, imp)
+      method_setImplementation(class_getInstanceMethod(IMKInputSessionController.self, sel)!, imp)
       return sel
     }
     // -------------
@@ -455,7 +449,7 @@ extension IMEMenuSputnik {
     let ramMsg = "i18n:IME.RAMUsedLabelHeader".i18n + " \(currentMemorySize)MB"
     let count4Controllers =
       "i18n:IME.RAMControllerCountLabel".i18n
-        + " \(ObjCMemoryLeakTracker.shared.trackedCountByType["SessionCtl"] ?? 0)"
+        + " \(ObjCMemoryLeakTracker.shared.trackedCountByType["IMKInputSessionController"] ?? 0)"
     return [ramMsg, count4Controllers].joined(separator: "; ")
   }
 }

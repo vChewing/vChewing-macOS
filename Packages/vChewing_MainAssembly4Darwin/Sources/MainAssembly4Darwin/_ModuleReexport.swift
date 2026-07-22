@@ -11,6 +11,7 @@
 @_exported import CandidateWindow
 @_exported import FolderMonitor
 @_exported import Hotenka
+@_exported import IMKSwift
 @_exported import IMKUtils
 @_exported import LangModelAssembly
 @_exported import ModifierKeyHitChecker

@@ -189,7 +189,7 @@ extension IMEStateProtocol {
 
 // MARK: - IMEState
 
-/// 用以呈現輸入法控制器（SessionCtl）的各種狀態。
+/// 用以呈現輸入法控制器（IMKInputSessionController）的各種狀態。
 ///
 /// 從實際角度來看，輸入法屬於有限態械（Finite State Machine）。其藉由滑鼠/鍵盤
 /// 等輸入裝置接收輸入訊號，據此切換至對應的狀態，再根據狀態更新使用者介面內容，

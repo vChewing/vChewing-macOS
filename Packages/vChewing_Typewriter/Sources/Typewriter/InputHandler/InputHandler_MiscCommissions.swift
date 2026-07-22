@@ -38,7 +38,7 @@ extension InputHandlerProtocol {
 
   /// Command+Enter 鍵的處理（注音文）。
   /// - Parameter isShiftPressed: 有沒有同時摁著 Shift 鍵。
-  /// - Returns: 將按鍵行為「是否有處理掉」藉由 SessionCtl 回報給 IMK。
+  /// - Returns: 將按鍵行為「是否有處理掉」藉由 IMKInputSessionController 回報給 IMK。
   func commissionByCtrlCommandEnter(isShiftPressed: Bool = false) -> String {
     var displayedText = assembler.actualKeys.joined(separator: "\t")
     if assembler.isEmpty {
@@ -77,7 +77,7 @@ extension InputHandlerProtocol {
   /// 4. 國通盲文 (GF0019-2018)。
   /// 5. ButKo BPMFVS 注音標記。
   /// - Parameter isShiftPressed: 有沒有同時摁著 Shift 鍵。摁了的話則只遞交讀音字串。
-  /// - Returns: 將按鍵行為「是否有處理掉」藉由 SessionCtl 回報給 IMK。
+  /// - Returns: 將按鍵行為「是否有處理掉」藉由 IMKInputSessionController 回報給 IMK。
   func commissionByCtrlOptionCommandEnter(isShiftPressed: Bool = false) -> String {
     var behavior = CommitableMarkupType.match(rawValue: prefs.specifyCmdOptCtrlEnterBehavior)
     if prefs.cassetteEnabled, behavior.brailleStandard != nil {

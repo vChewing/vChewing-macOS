@@ -905,12 +905,12 @@
 /// Block invoked from `-activateServer:` after cancelling any pending delayed
 /// dealloc.  Receives raw memory addresses (`uintptr_t`) of both the
 /// `IMKTextInput` client and `self` — no retain/release is performed.
-@property (nonatomic, copy, nullable) void (^onActivateServer)(uintptr_t givenClientAddr, uintptr_t selfAddr);
+@property (nonatomic, copy, nullable) void (^onActivatingServer)(uintptr_t givenClientAddr, uintptr_t selfAddr);
 
 /// Block invoked from `-deactivateServer:` before scheduling a delayed dealloc.
 /// Receives raw memory addresses (`uintptr_t`) of both the `IMKTextInput`
 /// client and `self` — no retain/release is performed.
-@property (nonatomic, copy, nullable) void (^onDeactivateServer)(uintptr_t givenClientAddr, uintptr_t selfAddr);
+@property (nonatomic, copy, nullable) void (^onDeactivatingServer)(uintptr_t givenClientAddr, uintptr_t selfAddr);
 
 /// Block invoked from `-dealloc` before `[super dealloc]`.  Use for cleanup
 /// that must run even if the Swift subclass's `deinit` is skipped.

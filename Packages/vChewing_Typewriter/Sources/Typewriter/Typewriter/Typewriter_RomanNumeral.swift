@@ -26,7 +26,7 @@ public struct RomanNumeralTypewriter<Handler: InputHandlerProtocol>: TypewriterP
   /// 處理羅馬數字輸入。
   /// - Parameters:
   ///   - input: 輸入按鍵訊號。
-  /// - Returns: 將按鍵行為「是否有處理掉」藉由 SessionCtl 回報給 IMK。
+  /// - Returns: 將按鍵行為「是否有處理掉」藉由 IMKInputSessionController 回報給 IMK。
   public func handle(_ input: some InputSignalProtocol) -> Bool? {
     guard !input.isReservedKey else { return nil }
     guard let session = handler.session, input.text.count == 1 else { return nil }

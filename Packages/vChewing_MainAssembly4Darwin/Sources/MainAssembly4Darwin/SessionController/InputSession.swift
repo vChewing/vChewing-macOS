@@ -6,8 +6,6 @@
 // marks, or product names of Contributor, except as required to fulfill notice
 // requirements defined in MIT License.
 
-import IMKSwift
-
 // MARK: - ClientControllerAddrPair
 
 public struct ClientControllerAddrPair: Sendable {
@@ -49,7 +47,7 @@ public final class InputSession: @MainActor SessionProtocol, Sendable {
   // MARK: Lifecycle
 
   public init(
-    controller inputController: SessionCtl?,
+    controller inputController: IMKInputSessionController?,
     clientAddr inputClientAddr: @escaping (() -> ClientControllerAddrPair?)
   ) {
     self.theClientAddr = inputClientAddr
@@ -146,12 +144,12 @@ public final class InputSession: @MainActor SessionProtocol, Sendable {
   /// IMKInputController 副本（記憶體位址）。
   public nonisolated(unsafe) var inputControllerAssignedAddr: UInt?
 
-  public var inputController: SessionCtl? {
+  public var inputController: IMKInputSessionController? {
     guard let addr = inputControllerAssignedAddr,
           ObjCMemoryLeakTracker.shared.isTracked(addr: addr),
           let opaque = UnsafeRawPointer(bitPattern: addr)
     else { return nil }
-    return Unmanaged<SessionCtl>.fromOpaque(opaque).takeUnretainedValue()
+    return Unmanaged<IMKInputSessionController>.fromOpaque(opaque).takeUnretainedValue()
   }
 
   /// 用以存儲客體的 bundleIdentifier。
@@ -253,7 +251,7 @@ public final class InputSession: @MainActor SessionProtocol, Sendable {
       guard let session = sessionClientMap[memAddr] else {
         return nil
       }
-      // 孤本清理：若快取中的 session 已無任何 SessionCtl 參照，立即移除。
+      // 孤本清理：若快取中的 session 已無任何 IMKInputSessionController 參照，立即移除。
       if session.inputControllerAssignedAddr == nil,
          Self.current?.id != session.id {
         sessionClientMap[memAddr] = nil
@@ -266,9 +264,10 @@ public final class InputSession: @MainActor SessionProtocol, Sendable {
     }
   }
 
-  /// 依據 SessionCtl 記憶體位址查詢對應的 InputSession。
-  nonisolated static func session(for controller: SessionCtl) -> InputSession? {
-    let ctlKey = UInt(bitPattern: Unmanaged.passUnretained(controller).toOpaque())
+  /// 依據 IMKInputSessionController 記憶體位址查詢對應的 InputSession。
+  static func session(for controllerAddr: UInt) -> InputSession? {
+    let testPair = ClientControllerAddrPair(clientAddr: 0, controllerAddr: controllerAddr)
+    guard let ctlKey = testPair.unwrapped?.controllerAddr else { return nil }
     guard let ssnAddr = sessionAddrByControllerAddr.withLockRead({ $0[ctlKey] }),
           let opaque = UnsafeRawPointer(bitPattern: ssnAddr)
     else { return nil }
@@ -276,19 +275,13 @@ public final class InputSession: @MainActor SessionProtocol, Sendable {
   }
 
   /// 登記 controller → session 對照關係。
-  nonisolated static func registerSessionAddr(_ session: InputSession, for controllerAddr: UInt) {
+  static func registerSessionAddr(_ session: InputSession, for controllerAddr: UInt) {
     let ssnKey = UInt(bitPattern: Unmanaged.passUnretained(session).toOpaque())
     sessionAddrByControllerAddr.withLock { $0[controllerAddr] = ssnKey }
   }
 
-  /// 移除 controller 對照關係（由 SessionCtl.deinit 呼叫）。
-  nonisolated static func unregisterSessionAddr(for controller: SessionCtl) {
-    let ctlKey = UInt(bitPattern: Unmanaged.passUnretained(controller).toOpaque())
-    unregisterSessionAddr(forControllerAddr: ctlKey)
-  }
-
   /// 以純記憶體位址移除 controller 對照關係（供 `onDealloc` block 使用，避免捕獲 self）。
-  nonisolated static func unregisterSessionAddr(forControllerAddr ctlKey: UInt) {
+  static func unregisterSessionAddr(forControllerAddr ctlKey: UInt) {
     sessionAddrByControllerAddr.withLock { map in
       if let ssnKey = map[ctlKey],
          let opaque = UnsafeRawPointer(bitPattern: ssnKey) {
@@ -310,8 +303,11 @@ public final class InputSession: @MainActor SessionProtocol, Sendable {
     Self.evictLRUIfNeeded()
   }
 
-  /// 重新綁定至新的 SessionCtl（快取命中時使用）。
-  func reassign(to controller: SessionCtl, clientAddrProvider: @escaping () -> ClientControllerAddrPair?) {
+  /// 重新綁定至新的 IMKInputSessionController（快取命中時使用）。
+  func reassign(
+    to controller: IMKInputSessionController,
+    clientAddrProvider: @escaping () -> ClientControllerAddrPair?
+  ) {
     let controllerAddr = UInt(bitPattern: Unmanaged.passUnretained(controller).toOpaque())
     inputControllerAssignedAddr = controllerAddr
     theClientAddr = clientAddrProvider
@@ -338,12 +334,12 @@ public final class InputSession: @MainActor SessionProtocol, Sendable {
   /// 靜態全域 LRU 記數器（單調遞增，&+= 溢位迴繞）。
   private static var globalLRUTick: UInt = 0
 
-  /// 惰性 LRU 淘汰：快取容量超過「當前存活 SessionCtl 數量（最少 2）」時執行。
+  /// 惰性 LRU 淘汰：快取容量超過「當前存活 IMKInputSessionController 數量（最少 2）」時執行。
   /// 某些使用者會利用 macOS 12+ 的 CpLk 特性瘋狂切換中英輸入法，
   /// 快取條目可能快速累積。LRU 確保只保留最近使用的 session。
   private static func evictLRUIfNeeded() {
     sessionsByClient.withLock { sessionClientMap in
-      let threshold = ObjCMemoryLeakTracker.shared.trackedCountByType["SessionCtl"] ?? 0
+      let threshold = ObjCMemoryLeakTracker.shared.trackedCountByType["IMKInputSessionController"] ?? 0
       guard sessionClientMap.count > Swift.max(2, threshold) else { return }
       var oldestKey: UInt?
       var oldestTick: UInt = .max
@@ -571,7 +567,7 @@ extension InputSession {
     clearInlineDisplay()
   }
 
-  /// 由 SessionCtl.commitComposition 轉發呼叫，sender 為已解包的原始指標值。
+  /// 由 IMKInputSessionController.commitComposition 轉發呼叫，sender 為已解包的原始指標值。
   public func commitCompositionByOS(_ sender: Any?) {
     resetInputHandler()
     clearInlineDisplay()

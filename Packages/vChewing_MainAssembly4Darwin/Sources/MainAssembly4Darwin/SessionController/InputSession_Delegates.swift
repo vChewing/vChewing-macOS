@@ -8,7 +8,7 @@
 
 import AppKit
 
-// MARK: - SessionCtl + SessionProtocol
+// MARK: - Session + SessionProtocol
 
 extension SessionProtocol {
   public var clientMitigationLevel: Int {
@@ -89,7 +89,7 @@ extension SessionProtocol {
   }
 }
 
-// MARK: - SessionCtl + CtlCandidateDelegate
+// MARK: - Session + CtlCandidateDelegate
 
 extension SessionProtocol {
   public var isCandidateState: Bool { state.isCandidateContainer }

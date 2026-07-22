@@ -20,12 +20,6 @@ nonisolated var testClient: FakeClient {
   testClientMutex.value
 }
 
-extension SessionCtl {
-  nonisolated override public func client() -> (any IMKTextInput)? {
-    testClient
-  }
-}
-
 func vCTestLog(_ str: String) {
   print("[VCLOG] \(str)")
 }
@@ -317,6 +311,7 @@ final class MainAssemblyTests {
     // IMK daemon session, and IMKServer() will hang indefinitely waiting
     // for an XPC connection that never completes.
     guard ProcessInfo.processInfo.environment["CI"] != "true" else { return }
+    SessionControllerSputnik.injectPostConstructionHandler()
     testServer = IMKServer(
       name: "org.atelierInmu.vChewing.MainAssembly.UnitTests_Connection",
       bundleIdentifier: "org.atelierInmu.vChewing.MainAssembly.UnitTests"

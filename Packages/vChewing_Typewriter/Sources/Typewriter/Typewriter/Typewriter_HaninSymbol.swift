@@ -24,7 +24,7 @@ public struct HaninSymbolTypewriter<Handler: InputHandlerProtocol>: TypewriterPr
   /// 處理漢音鍵盤符號輸入。
   /// - Parameters:
   ///   - input: 輸入按鍵訊號。
-  /// - Returns: 將按鍵行為「是否有處理掉」藉由 SessionCtl 回報給 IMK。
+  /// - Returns: 將按鍵行為「是否有處理掉」藉由 IMKInputSessionController 回報給 IMK。
   public func handle(_ input: some InputSignalProtocol) -> Bool? {
     // 這個函式的結果是 non-null，但此處遵從協定。
     guard let session = handler.session else { return false }

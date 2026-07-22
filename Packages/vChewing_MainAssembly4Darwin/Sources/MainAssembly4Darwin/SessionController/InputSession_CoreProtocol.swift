@@ -6,9 +6,6 @@
 // marks, or product names of Contributor, except as required to fulfill notice
 // requirements defined in MIT License.
 
-import IMKSwift
-import Typewriter
-
 // MARK: - SessionProtocol
 
 /// 輸入法控制模組，乃在輸入法端用以控制輸入行為的基礎型別。
@@ -106,7 +103,7 @@ extension SessionProtocol {
     }
   }
 
-  /// 當前這個 SessionCtl 副本是否處於英數輸入模式。
+  /// 當前這個 Session 副本是否處於英數輸入模式。
   public var isASCIIMode: Bool {
     get {
       prefs.shareAlphanumericalModeStatusAcrossClients

@@ -6,34 +6,6 @@
 // marks, or product names of Contributor, except as required to fulfill notice
 // requirements defined in MIT License.
 
-import IMKSwift
-
-// MARK: - ClientAddrUnwrapper
-
-/// 泛型輔助結構：將 `(givenClientAddr, thisAddr)` 的安全解讀模式封裝為 block 工廠。
-///
-/// 解讀失敗時回傳 `fallback`；成功時將 unwrap 後的 `(SessionCtl, any IMKTextInput)` 傳入 `block`。
-/// 所有 block 內均以純記憶體位址操作（`Unmanaged` / `takeUnretainedValue`），
-/// 不捕獲 `self`，避免 ARC 摻入生命週期。
-enum ClientAddrUnwrapper {
-  // 回傳型別只能寫成 `(UInt, UInt) -> T`，不然 ObjC 的 Block 無法解讀。
-  static func make<T>(
-    fallback: T,
-    _ block: @escaping (SessionCtl, any IMKTextInput) -> T
-  )
-    -> ((UInt, UInt) -> T) {
-    { givenClientAddr, thisAddr in
-      let pair = ClientControllerAddrPair(clientAddr: givenClientAddr, controllerAddr: thisAddr)
-      guard let (clientAddr, _) = pair.unwrapped,
-            let selfOpaque = UnsafeRawPointer(bitPattern: thisAddr),
-            let clientOpaque = UnsafeRawPointer(bitPattern: clientAddr) else { return fallback }
-      let myself = Unmanaged<SessionCtl>.fromOpaque(selfOpaque).takeUnretainedValue()
-      let sender = Unmanaged<AnyObject>.fromOpaque(clientOpaque).takeUnretainedValue()
-      return block(myself, sender as! (any IMKTextInput))
-    }
-  }
-}
-
 // MARK: - SessionCtl
 
 /// 輸入法控制模組，乃在輸入法端用以控制輸入行為的基礎型別。
@@ -46,79 +18,246 @@ enum ClientAddrUnwrapper {
 /// 輸入會話創建一個控制器型別。因此，對於每個輸入會話，都有一個對應的 IMKInputController。
 @objc(SessionCtl) // 必須加上 ObjC，因為 IMK 是用 ObjC 寫的。
 @MainActor
-public final class SessionCtl: IMKInputSessionController {
+public final class SessionCtl: IMKInputSessionController {}
+// MARK: - SessionControllerSputnik
+
+public struct SessionControllerSputnik {
   // MARK: Lifecycle
 
-  /// 對用以設定委任物件的控制器型別進行初期化處理。
-  ///
-  /// inputClient 參數是客體應用側存在的用以藉由 IMKServer 伺服器向輸入法傳訊的物件。該物件始終遵守 IMKTextInput 協定。
-  /// - Remark: 所有由委任物件實裝的「被協定要求實裝的方法」都會有一個用來接受客體物件的參數。在 IMKInputController 內部的型別不需要接受這個參數，因為已經有「client()」這個參數存在了。
-  /// - Parameters:
-  ///   - server: IMKServer
-  ///   - delegate: 客體物件
-  ///   - inputClient: 用以接受輸入的客體應用物件
-  override public init(server: IMKServer, delegate: Any?, client inputClient: IMKTextInput) {
-    // Note: this constuctor gets called everytime this IME gets switched to.
-    // This happens even if the client() is the same IMKTextInput instance.
-    super.init(server: server, delegate: delegate, client: inputClient)
-    ObjCMemoryLeakTracker.shared.track(self, type: "SessionCtl")
-
-    assignBlocks()
-
-    // macOS 10.9 ~ 10.12 的相容性處理：此處得使用傳入的 client 參數，因為 `client()` 沒有就緒、是 nil。
-    // 在這些舊版系統上，IMK 尚未在 super.init 返回時就完成 client 物件的綁定，
-    // 因此 `client()` 在建構子同步執行期間始終回傳 nil，導致 Session 無法登記至快取。
-    // 穩妥的做法是使用當前建構子內傳入的 client 參數，可確保 IMK 已完成 client 綁定。
-
-    // Force initialization.
-    self.core = callCoreAtLeastOnce(client: inputClient)
+  public init?(controllerAddr: UInt?) {
+    guard let controllerAddr else { return nil }
+    guard let addrPair = Self.getGuardableAddrPair(controllerAddr)() else { return nil }
+    self.addrPair = addrPair
   }
 
   // MARK: Public
 
-  @MainActor
   public var core: InputSession? {
-    get {
-      if let workingValue = InputSession.session(for: self) { return workingValue }
-      let newValue = callCoreAtLeastOnce(client: nil) // <- 使用 `client()`。
-      self.core = newValue
-      return newValue
+    let controllerAddr = addrPair.unwrapped?.controllerAddr
+    guard let controllerAddr else { return nil }
+    if let workingValue = InputSession.session(for: controllerAddr) {
+      return workingValue
     }
-    set {
-      if let session = newValue {
-        let thisAddr = UInt(bitPattern: Unmanaged.passUnretained(self).toOpaque())
-        InputSession.registerSessionAddr(session, for: thisAddr)
+    guard let opaque = UnsafeRawPointer(bitPattern: controllerAddr) else { return nil }
+    let controller = Unmanaged<IMKInputSessionController>.fromOpaque(opaque).takeUnretainedValue()
+    let newValue = Self.callCoreAtLeastOnce(controller, client: nil) // <- 使用 `client()`。
+    replaceCore(newValue)
+    return newValue
+  }
+
+  public static func injectPostConstructionHandler() {
+    _ = _installConstructorHook
+  }
+
+  public static func callCoreAtLeastOnce(
+    _ controller: IMKInputSessionController,
+    client maybeClient: Any!
+  )
+    -> InputSession {
+    // 嘗試從快取中複用既有的 InputSession，以緩解 CapsLock 頻繁切換場景下的 ARC 壓力。
+    // 參見 DevLab/InputMethodKitPhuquingRetarded.txt 內的分析。
+    let controllerAddr = UInt(bitPattern: Unmanaged.passUnretained(controller).toOpaque())
+    let maybeClientOnMain = maybeClient as? NSObjectProtocol
+    let clientObj: NSObjectProtocol? = maybeClientOnMain ?? (controller.client() as? NSObjectProtocol)
+    // 改用 uniqueClientIdentifierString 作為快取鍵。
+    // 此舉解決 Chrome/Electron 的 client object memAddr 不穩定問題。
+    if let clientObj {
+      let key = UInt(bitPattern: Unmanaged.passUnretained(clientObj).toOpaque())
+      if let cached = InputSession.cachedSession(for: key) {
+        cached.reassign(to: controller, clientAddrProvider: Self.getGuardableAddrPair(controllerAddr))
+        vCLog("InputSession reused. ID: \(cached.id.uuidString)")
+        return cached
       }
+    }
+    // 先用傳入的參數完成 InputSession 的初期化，其中包括了對這個 Session 的登記過程。
+    let newSession = InputSession(controller: controller) {
+      if let clientObj {
+        let clientAddr = UInt(bitPattern: Unmanaged.passUnretained(clientObj).toOpaque())
+        return ClientControllerAddrPair(clientAddr: clientAddr, controllerAddr: controllerAddr)
+      }
+      return nil
+    }
+    // 然後再用脫手操作給這個 Session 重新指派 clientAddrProvider。
+    // 這個 async 反而是有必要的，因為 IMKInputSessionController 的 initializer 在
+    // 徹底執行完畢之前能拿到的 client() 反而在早期版本 macOS 系統下會是 nil。
+    asyncOnMain {
+      // 防止 async dispatch 期間 controller 已被 dealloc 導致的 dangling pointer crash。
+      // DeallocSentinel 在 controller dealloc 時會自動 untrack，故此 guard 可安全過濾。
+      guard ObjCMemoryLeakTracker.shared.isTracked(addr: controllerAddr),
+            let opaque = UnsafeRawPointer(bitPattern: controllerAddr)
+      else { return }
+      let controllerUnwrapped = Unmanaged<IMKInputSessionController>.fromOpaque(opaque).takeUnretainedValue()
+      newSession.reassign(to: controllerUnwrapped, clientAddrProvider: Self.getGuardableAddrPair(controllerAddr))
+    }
+    return newSession
+  }
+
+  public static func getGuardableAddrPair(_ controllerAddr: UInt) -> (() -> ClientControllerAddrPair?) {
+    {
+      // Client 在 Controller 建構完畢之後才可用，
+      // 但 Controller 被析構之後 Client Addr 必定是 dangling pointer。
+      // 所以在此複查 Controller 的生命週期。
+      guard ObjCMemoryLeakTracker.shared.isTracked(addr: controllerAddr) else { return nil }
+      guard let opaque = UnsafeRawPointer(bitPattern: controllerAddr) else { return nil }
+      let controller = Unmanaged<IMKInputSessionController>.fromOpaque(opaque).takeUnretainedValue()
+      guard let clientObj = controller.client() as? InputSession.ClientObj else { return nil }
+      let clientAddr = UInt(bitPattern: Unmanaged.passUnretained(clientObj).toOpaque())
+      return ClientControllerAddrPair(clientAddr: clientAddr, controllerAddr: controllerAddr)
+    }
+  }
+
+  public func replaceCore(_ newCore: InputSession?) {
+    if let session = newCore, let controllerAddr = addrPair.unwrapped?.controllerAddr {
+      InputSession.registerSessionAddr(session, for: controllerAddr)
     }
   }
 
   // MARK: Private
 
-  /// 為所有 `IMKInputSessionController` 的 assignable block 賦值。
-  /// 每個 block 內均以純記憶體位址操作（`Unmanaged` / `takeUnretainedValue`），
+  /// 在 `-[IMKInputSessionController initWithServer:delegate:client:]` 中，
+  /// `super.init` 之後會檢測本 selector 是否存在，存在的話即呼叫。
+  /// 此處預先以 `class_addMethod` 確保 selector 對 `respondsToSelector:` 回應 YES。
+  ///
+  /// block 參數對應（`v@:@@@`）：
+  /// | 位置 | 型別 | 含義 |
+  /// |------|------|------|
+  /// | 0 | `AnyObject` | `self`（剛完成 super.init 的 IMKInputSessionController 實例） |
+  /// | 1 | `Selector` | `_cmd`（本 selector 自身，無需使用） |
+  /// | 2 | `Any?` | `server`（IMKServer *） |
+  /// | 3 | `Any?` | `delegate`（nullable id，通常為 nil） |
+  /// | 4 | `Any?` | `client`（id<IMKTextInput>，輸入客體 proxy） |
+  private static let _installConstructorHook: () = {
+    let sel = Selector(("onSuperConstructionSucceeded:delegate:client:"))
+    /// 對用以設定委任物件的控制器型別進行初期化處理。
+    ///
+    /// inputClient 參數是客體應用側存在的用以藉由 IMKServer 伺服器向輸入法傳訊的物件。該物件始終遵守 IMKTextInput 協定。
+    /// - Remark: 所有由委任物件實裝的「被協定要求實裝的方法」都會有一個用來接受客體物件的參數。在 IMKInputController 內部的型別不需要接受這個參數，因為已經有「client()」這個參數存在了。
+    /// - Parameters:
+    ///   - server: IMKServer
+    ///   - delegate: 客體物件
+    ///   - inputClient: 用以接受輸入的客體應用物件
+    let block: @convention(block) (AnyObject, Selector, Any?, Any?, Any?) -> () = {
+      // Instance, Selector, IMKServer, Delegate, Client
+      instance, _, _, _, givenClient in
+      let ctl = instance as? IMKInputSessionController
+      guard let ctl else { return }
+      ObjCMemoryLeakTracker.shared.track(ctl, type: "IMKInputSessionController")
+      let controllerAddr = UInt(bitPattern: Unmanaged.passUnretained(ctl).toOpaque())
+      if let sputnik = Self(controllerAddr: controllerAddr) {
+        sputnik.assignBlocks()
+
+        // macOS 10.9 ~ 10.12 的相容性處理：此處得使用傳入的 client 參數，因為 `client()` 沒有就緒、是 nil。
+        // 在這些舊版系統上，IMK 尚未在 super.init 返回時就完成 client 物件的綁定，
+        // 因此 `client()` 在建構子同步執行期間始終回傳 nil，導致 Session 無法登記至快取。
+        // 穩妥的做法是使用當前建構子內傳入的 client 參數，可確保 IMK 已完成 client 綁定。
+
+        // Force initialization.
+        sputnik.replaceCore(Self.callCoreAtLeastOnce(ctl, client: givenClient))
+      }
+    }
+    class_addMethod(IMKInputSessionController.self, sel, imp_implementationWithBlock(block), "v@:@@@")
+  }()
+
+  private let addrPair: ClientControllerAddrPair
+
+  private var controller: IMKInputSessionController? {
+    guard let controllerAddr = addrPair.unwrapped?.controllerAddr else { return nil }
+    guard let controllerOpaque = UnsafeRawPointer(bitPattern: controllerAddr) else { return nil }
+    return Unmanaged<IMKInputSessionController>.fromOpaque(controllerOpaque).takeUnretainedValue()
+  }
+
+  private var client: IMKTextInput? {
+    guard let clientAddr = addrPair.unwrapped?.clientAddr else { return nil }
+    guard let clientOpaque = UnsafeRawPointer(bitPattern: clientAddr) else { return nil }
+    return Unmanaged<IMKTextInput>.fromOpaque(clientOpaque).takeUnretainedValue()
+  }
+
+  /// 泛型輔助結構：將 `(givenClientAddr, thisAddr)` 的安全解讀模式封裝為 block 工廠。
+  ///
+  /// 解讀失敗時回傳 `fallback`；成功時將 unwrap 後的 `(IMKInputSessionController, any IMKTextInput)` 傳入 `block`。
+  /// 所有 block 內均以純記憶體位址操作（`Unmanaged` / `takeUnretainedValue`），
   /// 不捕獲 `self`，避免 ARC 摻入生命週期。
-  private func assignBlocks() {
-    // -- 需要 client 的 blocks（走 ClientControllerAddrPair.unwrapped 安全檢查） --
-
-    onActivateServer = ClientAddrUnwrapper.make(fallback: ()) { $0.core?.activateServer($1) }
-    onDeactivateServer = ClientAddrUnwrapper.make(fallback: ()) { $0.core?.deactivateServer($1) }
-    onShowingPreferences = ClientAddrUnwrapper.make(fallback: ()) { $0.core?.showPreferences($1) }
-    onAutoCommittingComposition = ClientAddrUnwrapper.make(fallback: ()) { $0.core?.commitCompositionByOS($1) }
-
-    onProvidingComposedString = ClientAddrUnwrapper.make(fallback: nil) { $0.core?.composedString($1) }
-    onProvidingRecognizedEvents = ClientAddrUnwrapper.make(fallback: 0) { $0.core?.recognizedEvents($1) ?? 0 }
-
-    onHandlingGivenNullableEvent = { nsEventPtr, givenClientAddr, thisAddr in
+  private static func clientServerPairAction<T>(
+    fallback: T,
+    _ block: @escaping (IMKInputSessionController, any IMKTextInput) -> T
+  )
+    -> ((UInt, UInt) -> T) {
+    { givenClientAddr, thisAddr in
       let pair = ClientControllerAddrPair(clientAddr: givenClientAddr, controllerAddr: thisAddr)
       guard let (clientAddr, _) = pair.unwrapped,
             let selfOpaque = UnsafeRawPointer(bitPattern: thisAddr),
+            let clientOpaque = UnsafeRawPointer(bitPattern: clientAddr) else { return fallback }
+      let myself = Unmanaged<IMKInputSessionController>.fromOpaque(selfOpaque).takeUnretainedValue()
+      let sender = Unmanaged<AnyObject>.fromOpaque(clientOpaque).takeUnretainedValue()
+      return block(myself, sender as! (any IMKTextInput))
+    }
+  }
+}
+
+extension SessionControllerSputnik {
+  /// 為所有 `IMKInputSessionController` 的 assignable block 賦值。
+  /// 每個 block 內均以純記憶體位址操作（`Unmanaged` / `takeUnretainedValue`），
+  /// 不捕獲 `self`，避免 ARC 摻入生命週期。
+  func assignBlocks() {
+    // MARK: - -- 需要 client 的 blocks（走 ClientControllerAddrPair.unwrapped 安全檢查） --
+
+    /// 啟用輸入法時，會觸發該函式。
+    /// - Parameter sender: 呼叫了該函式的客體。
+    controller?.onActivatingServer = Self.clientServerPairAction(fallback: ()) {
+      core?.activateServer($1)
+    }
+
+    /// 停用輸入法時，會觸發該函式。
+    /// - Parameter sender: 呼叫了該函式的客體（無須使用）。
+    controller?.onDeactivatingServer = Self.clientServerPairAction(fallback: ()) {
+      core?.deactivateServer($1)
+    }
+
+    controller?.onShowingPreferences = Self.clientServerPairAction(fallback: ()) {
+      core?.showPreferences($1)
+    }
+
+    /// 有時會出現某些 App 攔截輸入法的 Ctrl+Enter / Shift+Enter 熱鍵的情況。
+    /// 也就是說 handle(event:) 完全抓不到這個 Event。
+    /// 這時需要在 commitComposition 這一關做一些收尾處理。
+    /// - Parameter sender: 呼叫了該函式的客體（無須使用）。
+    controller?.onAutoCommittingComposition = Self.clientServerPairAction(fallback: ()) {
+      core?.commitCompositionByOS($1)
+    }
+
+    /// 指定輸入法要遞交出去的內容（雖然 InputMethodKit 可能並不會真的用到這個函式）。
+    /// - Parameter sender: 呼叫了該函式的客體（無須使用）。
+    /// - Returns: 字串內容，或者 nil。
+    controller?.onProvidingComposedString = Self.clientServerPairAction(fallback: nil) { core?.composedString($1) }
+
+    /// 該函式的回饋結果決定了輸入法會攔截且捕捉哪些類型的輸入裝置操作事件。
+    ///
+    /// 一個客體應用會與輸入法共同確認某個輸入裝置操作事件是否可以觸發輸入法內的某個方法。預設情況下，
+    /// 該函式僅響應 Swift 的「`NSEvent.EventTypeMask = [.keyDown]`」，也就是 ObjC 當中的「`NSKeyDownMask`」。
+    /// 如果您的輸入法「僅攔截」鍵盤按鍵事件處理的話，IMK 會預設啟用這些對滑鼠的操作：當組字區存在時，
+    /// 如果使用者用滑鼠點擊了該文字輸入區內的組字區以外的區域的話，則該組字區的顯示內容會被直接藉由
+    /// 「`commitComposition(_ message)`」遞交給客體。
+    /// - Parameter sender: 呼叫了該函式的客體（無須使用）。
+    /// - Returns: 返回一個 uint，其中承載了與系統 NSEvent 操作事件有關的掩碼集合（詳見 NSEvent.h）。
+    controller?.onProvidingRecognizedEvents = Self.clientServerPairAction(fallback: 0) {
+      core?.recognizedEvents($1) ?? 0
+    }
+
+    /// 接受所有鍵鼠事件為 NSEvent，讓輸入法判斷是否要處理、該怎樣處理。
+    /// 然後再交給 InputHandler.handleEvent() 分診。
+    /// - Parameters:
+    ///   - event: 裝置操作輸入事件，可能會是 nil。
+    ///   - sender: 呼叫了該函式的客體（無須使用）。
+    /// - Returns: 回「`true`」以將該按鍵已攔截處理的訊息傳遞給 IMK；回「`false`」則放行、不作處理。
+    controller?.onHandlingGivenNullableEvent = { nsEventPtr, givenClientAddr, controllerAddr in
+      let pair = ClientControllerAddrPair(clientAddr: givenClientAddr, controllerAddr: controllerAddr)
+      guard let (clientAddr, _) = pair.unwrapped,
             let clientOpaque = UnsafeRawPointer(bitPattern: clientAddr) else { return false }
-      let myself = Unmanaged<SessionCtl>.fromOpaque(selfOpaque).takeUnretainedValue()
       let sender = Unmanaged<AnyObject>.fromOpaque(clientOpaque).takeUnretainedValue()
       let event: NSEvent? = nsEventPtr != 0
         ? Unmanaged<NSEvent>.fromOpaque(UnsafeRawPointer(bitPattern: nsEventPtr)!).takeUnretainedValue()
         : nil
-      let result = myself.core?.handleNSEvent(event, client: sender as! (any IMKTextInput)) ?? false
+      let result = core?.handleNSEvent(event, client: sender as! (any IMKTextInput)) ?? false
       if !result, PrefMgr.shared.isDebugModeEnabled {
         let stack = Thread.callStackSymbols.prefix(7).joined(separator: "\n")
         if let newEvent = event?.copyAsKBEvent {
@@ -130,96 +269,52 @@ public final class SessionCtl: IMKInputSessionController {
       return result
     }
 
-    onSettingObjCValue = { valuePtr, intTag, givenClientAddr, thisAddr in
-      let pair = ClientControllerAddrPair(clientAddr: givenClientAddr, controllerAddr: thisAddr)
+    /// 切換至某一個輸入法的某個副本時（比如唯音的簡體輸入法副本與繁體輸入法副本），會觸發該函式。
+    /// - Remark: 當系統呼叫 activateServer() 的時候，setValue() 會被自動呼叫。
+    /// 但是，手動呼叫 activateServer() 的時候，setValue() 不會被自動呼叫。
+    /// - Parameters:
+    ///   - value: 輸入法在系統偏好設定當中的副本的 identifier，與 bundle identifier 類似。在輸入法的 info.plist 內定義。
+    ///   - tag: 標記（無須使用）。
+    ///   - sender: 呼叫了該函式的客體（無須使用）。
+    controller?.onSettingObjCValue = { valuePtr, intTag, givenClientAddr, controllerAddr in
+      let pair = ClientControllerAddrPair(clientAddr: givenClientAddr, controllerAddr: controllerAddr)
       guard let (clientAddr, _) = pair.unwrapped,
-            let selfOpaque = UnsafeRawPointer(bitPattern: thisAddr),
             let clientOpaque = UnsafeRawPointer(bitPattern: clientAddr) else { return }
-      let myself = Unmanaged<SessionCtl>.fromOpaque(selfOpaque).takeUnretainedValue()
       let sender = Unmanaged<AnyObject>.fromOpaque(clientOpaque).takeUnretainedValue()
       let value: Any? = valuePtr != 0
         ? Unmanaged<AnyObject>.fromOpaque(UnsafeRawPointer(bitPattern: valuePtr)!).takeUnretainedValue()
         : nil
-      myself.core?.setValue(value, forTag: Int(intTag), client: sender as! (any IMKTextInput))
+      core?.setValue(value, forTag: Int(intTag), client: sender as! (any IMKTextInput))
     }
 
-    // -- 僅需 self 的 blocks（直接解讀 thisAddr） --
+    // MARK: - -- 僅需 self 的 blocks（直接解讀 controllerAddr） --
 
-    onHidingPallettes = { thisAddr in
-      guard let opaque = UnsafeRawPointer(bitPattern: thisAddr) else { return }
-      Unmanaged<SessionCtl>.fromOpaque(opaque).takeUnretainedValue().core?.hidePalettes()
+    /// 該函式僅用來取消任何輸入法浮動視窗的顯示。
+    controller?.onHidingPallettes = { _ in
+      core?.hidePalettes()
     }
 
-    onInputControllerWillClose = { thisAddr in
-      guard let opaque = UnsafeRawPointer(bitPattern: thisAddr) else { return }
-      Unmanaged<SessionCtl>.fromOpaque(opaque).takeUnretainedValue().core?.inputControllerWillClose()
+    /// 輸入法要被換掉或關掉的時候，要做的事情。
+    /// 不過好像因為 IMK 的 Bug 而並不會被執行。
+    controller?.onInputControllerWillClose = { _ in
+      core?.inputControllerWillClose()
     }
 
-    onProvidingSelectionRange = { thisAddr in
-      guard let opaque = UnsafeRawPointer(bitPattern: thisAddr) else { return .notFound }
-      return Unmanaged<SessionCtl>.fromOpaque(opaque).takeUnretainedValue().core?.selectionRange() ?? .notFound
+    /// 指定標記模式下被高亮的部分。
+    controller?.onProvidingSelectionRange = { _ in
+      core?.selectionRange() ?? .notFound
     }
 
-    onProvidingIMEMenu = { thisAddr in
-      guard let menuSputnik = IMEMenuSputnik(controllerAddr: thisAddr) else { return NSMenu() }
+    controller?.onProvidingIMEMenu = { controllerAddr in
+      guard let menuSputnik = IMEMenuSputnik(controllerAddr: controllerAddr) else { return NSMenu() }
       return menuSputnik.build()
     }
 
     // 藉由 ObjC 端的 `onDealloc` block 確保清理動作必定觸發：
     // `-[IMKInputSessionController dealloc]` 由 ObjC runtime 直接管理，
-    // 不依賴 Swift `deinit`，亦不應該實作 Swift `deinit`：不得讓 SessionCtl 的生命週期被摻入 ARC 行為。
-    onDealloc = { thisAddr in
-      InputSession.unregisterSessionAddr(forControllerAddr: thisAddr)
+    // 不依賴 Swift `deinit`，亦不應該實作 Swift `deinit`：不得讓 IMKInputSessionController 的生命週期被摻入 ARC 行為。
+    controller?.onDealloc = { controllerAddr in
+      InputSession.unregisterSessionAddr(forControllerAddr: controllerAddr)
     }
-  }
-
-  private func getClientAddrProvider() -> (() -> ClientControllerAddrPair?) {
-    let thisAddr = UInt(bitPattern: Unmanaged.passUnretained(self).toOpaque())
-    return {
-      // Client 在 Controller 建構完畢之後才可用，
-      // 但 Controller 被析構之後 Client Addr 必定是 dangling pointer。
-      // 所以在此複查 Controller 的生命週期。
-      guard ObjCMemoryLeakTracker.shared.isTracked(addr: thisAddr) else { return nil }
-      guard let opaque = UnsafeRawPointer(bitPattern: thisAddr) else { return nil }
-      let this = Unmanaged<SessionCtl>.fromOpaque(opaque).takeUnretainedValue()
-      guard let clientObj = this.client() as? InputSession.ClientObj else { return nil }
-      let clientAddr = UInt(bitPattern: Unmanaged.passUnretained(clientObj).toOpaque())
-      return ClientControllerAddrPair(clientAddr: clientAddr, controllerAddr: thisAddr)
-    }
-  }
-
-  private func callCoreAtLeastOnce(client maybeClient: Any!) -> InputSession {
-    // 嘗試從快取中複用既有的 InputSession，以緩解 CapsLock 頻繁切換場景下的 ARC 壓力。
-    // 參見 DevLab/InputMethodKitPhuquingRetarded.txt 內的分析。
-    let maybeClientOnMain = maybeClient as? NSObjectProtocol
-    let clientObj: NSObjectProtocol? = maybeClientOnMain ?? (client() as? NSObjectProtocol)
-    // 改用 uniqueClientIdentifierString 作為快取鍵。
-    // 此舉解決 Chrome/Electron 的 client object memAddr 不穩定問題。
-    if let clientObj {
-      let key = UInt(bitPattern: Unmanaged.passUnretained(clientObj).toOpaque())
-      if let cached = InputSession.cachedSession(for: key) {
-        cached.reassign(to: self, clientAddrProvider: getClientAddrProvider())
-        vCLog("InputSession reused. ID: \(cached.id.uuidString)")
-        return cached
-      }
-    }
-    let thisAddr = UInt(bitPattern: Unmanaged.passUnretained(self).toOpaque())
-    // 先用傳入的參數完成 InputSession 的初期化，其中包括了對這個 Session 的登記過程。
-    let newSession = InputSession(controller: self) {
-      if let clientObj {
-        let clientAddr = UInt(bitPattern: Unmanaged.passUnretained(clientObj).toOpaque())
-        return ClientControllerAddrPair(clientAddr: clientAddr, controllerAddr: thisAddr)
-      }
-      return nil
-    }
-    // 然後再用脫手操作給這個 Session 重新指派 clientAddrProvider。
-    // 這個 async 反而是有必要的，因為 SessionCtl 的 initializer 在
-    // 徹底執行完畢之前能拿到的 client() 反而在早期版本 macOS 系統下會是 nil。
-    asyncOnMain {
-      guard let opaque = UnsafeRawPointer(bitPattern: thisAddr) else { return }
-      let this = Unmanaged<SessionCtl>.fromOpaque(opaque).takeUnretainedValue()
-      newSession.reassign(to: this, clientAddrProvider: this.getClientAddrProvider())
-    }
-    return newSession
   }
 }

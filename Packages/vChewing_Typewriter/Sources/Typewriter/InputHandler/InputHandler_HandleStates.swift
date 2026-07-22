@@ -270,7 +270,7 @@ extension InputHandlerProtocol {
   /// 回傳結果類型判斷作為合法性判斷依據的函式，全都將依據改為檢查傳回的陣列
   /// 是否為空：如果陣列為空的話，直接回呼一個空狀態。
   ///
-  /// 該函式僅用於 SessionCtl，因為 InputHandler 內部可以直接存取 generateArrayOfAssociates().
+  /// 該函式僅用於 InputSession，因為 InputHandler 內部可以直接存取 generateArrayOfAssociates().
   /// - Parameters:
   ///   - key: 給定的索引鍵（也就是給定的關聯詞語的開頭字）。
   /// - Returns: 回呼一個新的關聯詞語狀態，來就給定的關聯詞語陣列資料內容顯示選字窗。
@@ -283,7 +283,7 @@ extension InputHandlerProtocol {
   /// 用以處理就地新增自訂語彙時的行為。
   /// - Parameters:
   ///   - input: 輸入按鍵訊號。
-  /// - Returns: 將按鍵行為「是否有處理掉」藉由 SessionCtl 回報給 IMK。
+  /// - Returns: 將按鍵行為「是否有處理掉」藉由 IMKInputSessionController 回報給 IMK。
   func handleMarkingState(input: InputSignalProtocol) -> Bool {
     guard let session = session else { return false }
     let state = session.state
@@ -428,7 +428,7 @@ extension InputHandlerProtocol {
   /// 標點輸入的處理。
   /// - Parameters:
   ///   - customPunctuation: 自訂標點索引鍵頭。
-  /// - Returns: 將按鍵行為「是否有處理掉」藉由 SessionCtl 回報給 IMK。
+  /// - Returns: 將按鍵行為「是否有處理掉」藉由 IMKInputSessionController 回報給 IMK。
   func handlePunctuation(_ customPunctuation: String) -> Bool {
     guard let session = session else { return false }
 
@@ -479,7 +479,7 @@ extension InputHandlerProtocol {
   ///   - readingOnly: 是否僅遞交讀音。
   ///   - associatesData: 給定的關聯詞語資料陣列。
   ///   該部分僅對 .ofInputting() 狀態有效、且不能是漢音符號模式與內碼輸入模式。
-  /// - Returns: 將按鍵行為「是否有處理掉」藉由 SessionCtl 回報給 IMK。
+  /// - Returns: 將按鍵行為「是否有處理掉」藉由 IMKInputSessionController 回報給 IMK。
   @discardableResult
   func handleEnter(
     input: InputSignalProtocol, readingOnly: Bool = false,
@@ -540,7 +540,7 @@ extension InputHandlerProtocol {
   /// 處理 BackSpace (macOS Delete) 按鍵行為。
   /// - Parameters:
   ///   - input: 輸入按鍵訊號。
-  /// - Returns: 將按鍵行為「是否有處理掉」藉由 SessionCtl 回報給 IMK。
+  /// - Returns: 將按鍵行為「是否有處理掉」藉由 IMKInputSessionController 回報給 IMK。
   func handleBackSpace(input: InputSignalProtocol) -> Bool {
     guard let session = session else { return false }
     let state = session.state
@@ -685,7 +685,7 @@ extension InputHandlerProtocol {
   /// 處理 PC Delete (macOS Fn+BackSpace) 按鍵行為。
   /// - Parameters:
   ///   - input: 輸入按鍵訊號。
-  /// - Returns: 將按鍵行為「是否有處理掉」藉由 SessionCtl 回報給 IMK。
+  /// - Returns: 將按鍵行為「是否有處理掉」藉由 IMKInputSessionController 回報給 IMK。
   func handleDelete(input: InputSignalProtocol) -> Bool {
     guard let session = session else { return false }
     let state = session.state
@@ -740,7 +740,7 @@ extension InputHandlerProtocol {
   // MARK: - 處理與當前文字輸入排版前後方向呈 90 度的那兩個方向鍵的按鍵行為
 
   /// 處理與當前文字輸入排版前後方向呈 90 度的那兩個方向鍵的按鍵行為。
-  /// - Returns: 將按鍵行為「是否有處理掉」藉由 SessionCtl 回報給 IMK。
+  /// - Returns: 將按鍵行為「是否有處理掉」藉由 IMKInputSessionController 回報給 IMK。
   func handleClockKey() -> Bool {
     guard let session = session else { return false }
     let state = session.state
@@ -752,7 +752,7 @@ extension InputHandlerProtocol {
   // MARK: - 處理 Home 鍵的行為
 
   /// 處理 Home 鍵的行為。
-  /// - Returns: 將按鍵行為「是否有處理掉」藉由 SessionCtl 回報給 IMK。
+  /// - Returns: 將按鍵行為「是否有處理掉」藉由 IMKInputSessionController 回報給 IMK。
   func handleHome() -> Bool {
     guard let session = session else { return false }
     let state = session.state
@@ -776,7 +776,7 @@ extension InputHandlerProtocol {
   // MARK: - 處理 End 鍵的行為
 
   /// 處理 End 鍵的行為。
-  /// - Returns: 將按鍵行為「是否有處理掉」藉由 SessionCtl 回報給 IMK。
+  /// - Returns: 將按鍵行為「是否有處理掉」藉由 IMKInputSessionController 回報給 IMK。
   func handleEnd() -> Bool {
     guard let session = session else { return false }
     let state = session.state
@@ -800,7 +800,7 @@ extension InputHandlerProtocol {
   // MARK: - 處理 Esc 鍵的行為
 
   /// 處理 Esc 鍵的行為。
-  /// - Returns: 將按鍵行為「是否有處理掉」藉由 SessionCtl 回報給 IMK。
+  /// - Returns: 將按鍵行為「是否有處理掉」藉由 IMKInputSessionController 回報給 IMK。
   func handleEsc() -> Bool {
     guard let session = session else { return false }
     let state = session.state
@@ -849,7 +849,7 @@ extension InputHandlerProtocol {
   /// 處理向前方向鍵的行為。
   /// - Parameters:
   ///   - input: 輸入按鍵訊號。
-  /// - Returns: 將按鍵行為「是否有處理掉」藉由 SessionCtl 回報給 IMK。
+  /// - Returns: 將按鍵行為「是否有處理掉」藉由 IMKInputSessionController 回報給 IMK。
   func handleForward(input: InputSignalProtocol) -> Bool {
     guard let session = session else { return false }
     let state = session.state
@@ -915,7 +915,7 @@ extension InputHandlerProtocol {
   /// 處理向後方向鍵的行為。
   /// - Parameters:
   ///   - input: 輸入按鍵訊號。
-  /// - Returns: 將按鍵行為「是否有處理掉」藉由 SessionCtl 回報給 IMK。
+  /// - Returns: 將按鍵行為「是否有處理掉」藉由 IMKInputSessionController 回報給 IMK。
   func handleBackward(input: InputSignalProtocol) -> Bool {
     guard let session = session else { return false }
     let state = session.state
@@ -983,7 +983,7 @@ extension InputHandlerProtocol {
   /// - Parameters:
   ///   - reverseOrder: 是否有控制輪替方向的修飾鍵輸入。
   ///   - softRevolve: 是否啟用 soft revolve（避免跨越鄰近已覆寫節點）。預設 false。
-  /// - Returns: 將按鍵行為「是否有處理掉」藉由 SessionCtl 回報給 IMK。
+  /// - Returns: 將按鍵行為「是否有處理掉」藉由 IMKInputSessionController 回報給 IMK。
   func revolveCandidate(reverseOrder: Bool, softRevolve: Bool = false) -> Bool {
     guard let session = session else { return false }
     let state = session.state
@@ -1078,7 +1078,7 @@ extension InputHandlerProtocol {
   /// - Parameters:
   ///   - alternative: 使用另一個模式。
   ///   - JIS: 是否為 JIS 鍵盤。
-  /// - Returns: 將按鍵行為「是否有處理掉」藉由 SessionCtl 回報給 IMK。
+  /// - Returns: 將按鍵行為「是否有處理掉」藉由 IMKInputSessionController 回報給 IMK。
   func handlePunctuationList(alternative: Bool, isJIS: Bool = false) -> Bool {
     guard let session = session, session.state.type != .ofDeactivated else { return false }
     if alternative {
