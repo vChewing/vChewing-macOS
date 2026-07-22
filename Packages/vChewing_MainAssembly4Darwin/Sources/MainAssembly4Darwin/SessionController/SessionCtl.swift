@@ -161,8 +161,8 @@ public final class SessionCtl: IMKInputSessionController {
     }
 
     onProvidingIMEMenu = { thisAddr in
-      guard let opaque = UnsafeRawPointer(bitPattern: thisAddr) else { return NSMenu() }
-      return Unmanaged<SessionCtl>.fromOpaque(opaque).takeUnretainedValue().makeMenu()
+      guard let menuSputnik = IMEMenuSputnik(controllerAddr: thisAddr) else { return NSMenu() }
+      return menuSputnik.build()
     }
 
     // 藉由 ObjC 端的 `onDealloc` block 確保清理動作必定觸發：
