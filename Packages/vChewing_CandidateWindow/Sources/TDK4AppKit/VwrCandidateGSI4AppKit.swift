@@ -711,35 +711,26 @@ extension GSI4AppKit.VwrCandidateGSI4AppKit {
 extension GSI4AppKit.VwrCandidateGSI4AppKit {
   private func prepareMenu() {
     let newMenu = NSMenu()
-    newMenu.appendItems(self) {
+    newMenu.appendItems {
       NSMenu.Item(
         verbatim: "↑ \(clickedCell.displayedText)"
-      )?.act(#selector(menuActionOfBoosting(_:)))
+      )?.act { [weak self] _ in
+        self?.didTriggerCandidatePairContextMenuActionAt(self?.clickedCell.index ?? 0, action: .toBoost)
+      }
       NSMenu.Item(
         verbatim: "↓ \(clickedCell.displayedText)"
-      )?.act(#selector(menuActionOfNerfing(_:)))
+      )?.act { [weak self] _ in
+        self?.didTriggerCandidatePairContextMenuActionAt(self?.clickedCell.index ?? 0, action: .toNerf)
+      }
       NSMenu.Item(
         verbatim: "✖︎ \(clickedCell.displayedText)"
-      )?.act(#selector(menuActionOfFiltering(_:)))
-        .nulled(!thePool.isFilterable(target: clickedCell.index))
+      )?.act { [weak self] _ in
+        self?.didTriggerCandidatePairContextMenuActionAt(self?.clickedCell.index ?? 0, action: .toFilter)
+      }
+      .nulled(!thePool.isFilterable(target: clickedCell.index))
     }
     theMenu = newMenu
     controller?.currentMenu = newMenu
-  }
-
-  @objc
-  fileprivate func menuActionOfBoosting(_: Any? = nil) {
-    didTriggerCandidatePairContextMenuActionAt(clickedCell.index, action: .toBoost)
-  }
-
-  @objc
-  fileprivate func menuActionOfNerfing(_: Any? = nil) {
-    didTriggerCandidatePairContextMenuActionAt(clickedCell.index, action: .toNerf)
-  }
-
-  @objc
-  fileprivate func menuActionOfFiltering(_: Any? = nil) {
-    didTriggerCandidatePairContextMenuActionAt(clickedCell.index, action: .toFilter)
   }
 }
 
