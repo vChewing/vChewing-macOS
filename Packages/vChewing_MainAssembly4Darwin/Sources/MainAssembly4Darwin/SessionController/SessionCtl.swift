@@ -63,10 +63,11 @@ public final class SessionCtl: IMKInputSessionController {
 
     // Force initialization.
     self.core = callCoreAtLeastOnce(client: inputClient)
-  }
 
-  deinit {
-    InputSession.unregisterSessionAddr(for: self)
+    // 藉由 ObjC 端的 `onDealloc` block 確保清理動作必定觸發：
+    // `-[IMKInputSessionController dealloc]` 由 ObjC runtime 直接管理，
+    // 不依賴 Swift `deinit`，亦不應該實作 Swift `deinit` 讓 SessionCtl 的生命週期被摻入 ARC 行為。
+    self.onDealloc = { thisAddr in InputSession.unregisterSessionAddr(forControllerAddr: thisAddr) }
   }
 
   // MARK: Public

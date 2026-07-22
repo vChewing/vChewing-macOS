@@ -284,6 +284,11 @@ public final class InputSession: @MainActor SessionProtocol, Sendable {
   /// 移除 controller 對照關係（由 SessionCtl.deinit 呼叫）。
   nonisolated static func unregisterSessionAddr(for controller: SessionCtl) {
     let ctlKey = UInt(bitPattern: Unmanaged.passUnretained(controller).toOpaque())
+    unregisterSessionAddr(forControllerAddr: ctlKey)
+  }
+
+  /// 以純記憶體位址移除 controller 對照關係（供 `onDealloc` block 使用，避免捕獲 self）。
+  nonisolated static func unregisterSessionAddr(forControllerAddr ctlKey: UInt) {
     sessionAddrByControllerAddr.withLock { map in
       if let ssnKey = map[ctlKey],
          let opaque = UnsafeRawPointer(bitPattern: ssnKey) {

@@ -31,6 +31,7 @@ NS_ASSUME_NONNULL_BEGIN
 @implementation IMKInputSessionController {
     void (^_onActivateServer)(uintptr_t, uintptr_t);
     void (^_onDeactivateServer)(uintptr_t, uintptr_t);
+    void (^_onDealloc)(uintptr_t);
 }
 
 // MARK: - Block Properties (MRC)
@@ -57,9 +58,22 @@ NS_ASSUME_NONNULL_BEGIN
     return [[_onDeactivateServer retain] autorelease];
 }
 
+- (void)setOnDealloc:(nullable void (^)(uintptr_t))block {
+    if (_onDealloc != block) {
+        [_onDealloc release];
+        _onDealloc = [block copy];
+    }
+}
+
+- (nullable void (^)(uintptr_t))onDealloc {
+    return [[_onDealloc retain] autorelease];
+}
+
 // MARK: - Lifecycle
 
 - (void)dealloc {
+    if (_onDealloc) _onDealloc((uintptr_t)self);
+    [_onDealloc release];
     [_onActivateServer release];
     [_onDeactivateServer release];
     [self IMKSwift_cancelDelayedDealloc];

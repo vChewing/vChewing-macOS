@@ -912,6 +912,10 @@
 /// client and `self` — no retain/release is performed.
 @property (copy, nullable) void (^onDeactivateServer)(uintptr_t givenClientAddr, uintptr_t selfAddr);
 
+/// Block invoked from `-dealloc` before `[super dealloc]`.  Use for cleanup
+/// that must run even if the Swift subclass's `deinit` is skipped.
+@property (copy, nullable) void (^onDealloc)(uintptr_t selfAddr);
+
 @end
 
 #pragma clang attribute pop
