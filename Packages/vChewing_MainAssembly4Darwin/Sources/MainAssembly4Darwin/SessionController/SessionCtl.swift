@@ -24,10 +24,19 @@ public final class SessionCtl: IMKInputSessionController {}
 public struct SessionControllerSputnik {
   // MARK: Lifecycle
 
-  public init?(controllerAddr: UInt?) {
+  /// 用於建構階段：不要求 client() 可用，僅做 track + assignBlocks。
+  /// `activateServer:` 觸發時 `sputnik.core` 會 lazy-init InputSession。
+  public init?(controllerAddr: UInt?, requireClient: Bool = true) {
     guard let controllerAddr else { return nil }
-    guard let addrPair = Self.getGuardableAddrPair(controllerAddr)() else { return nil }
-    self.addrPair = addrPair
+    if requireClient {
+      guard let addrPair = Self.getGuardableAddrPair(controllerAddr)() else { return nil }
+      self.addrPair = addrPair
+    } else {
+      // 建構階段 client() 尚未就緒（macOS 10.9），使用 dummy clientAddr。
+      // blocks 內會透過 `addrPair.unwrapped` 做 tracker 安全核驗，
+      // 屆時 client() 已可用、paired 即可正確 unwrap。
+      self.addrPair = ClientControllerAddrPair(clientAddr: 0, controllerAddr: controllerAddr)
+    }
   }
 
   // MARK: Public
@@ -143,15 +152,11 @@ public struct SessionControllerSputnik {
       guard let ctl else { return }
       ObjCMemoryLeakTracker.shared.track(ctl, type: "IMKInputSessionController")
       let controllerAddr = UInt(bitPattern: Unmanaged.passUnretained(ctl).toOpaque())
-      if let sputnik = Self(controllerAddr: controllerAddr) {
+      // 建構階段同步完成 track + assignBlocks + InputSession 建立。
+      // 使用 constructor 傳入的 givenClient（非 `client()`）：
+      // macOS 10.9 下 `client()` 在 init 期間為 nil，但 givenClient 有效。
+      if let sputnik = Self(controllerAddr: controllerAddr, requireClient: false) {
         sputnik.assignBlocks()
-
-        // macOS 10.9 ~ 10.12 的相容性處理：此處得使用傳入的 client 參數，因為 `client()` 沒有就緒、是 nil。
-        // 在這些舊版系統上，IMK 尚未在 super.init 返回時就完成 client 物件的綁定，
-        // 因此 `client()` 在建構子同步執行期間始終回傳 nil，導致 Session 無法登記至快取。
-        // 穩妥的做法是使用當前建構子內傳入的 client 參數，可確保 IMK 已完成 client 綁定。
-
-        // Force initialization.
         sputnik.replaceCore(Self.callCoreAtLeastOnce(ctl, client: givenClient))
       }
     }
