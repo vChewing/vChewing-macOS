@@ -900,7 +900,7 @@
 /// @return An array of candidate objects, or `nil` if there are no candidates.
 - (nullable NSArray *)candidates:(nonnull id<IMKTextInput>)sender;
 
-// MARK: Deferred Dealloc Callbacks
+// MARK: Deferred Dealloc & IME Lifecycle Callbacks
 
 /// Block invoked from `-activateServer:` after cancelling any pending delayed
 /// dealloc.  Receives raw memory addresses (`uintptr_t`) of both the
@@ -915,6 +915,36 @@
 /// Block invoked from `-dealloc` before `[super dealloc]`.  Use for cleanup
 /// that must run even if the Swift subclass's `deinit` is skipped.
 @property (copy, nullable) void (^onDealloc)(uintptr_t selfAddr);
+
+/// Block invoked from `-showPreferences:`.
+@property (copy, nullable) void (^onShowingPreferences)(uintptr_t givenClientAddr, uintptr_t selfAddr);
+
+/// Block invoked from `-hidePalettes`.
+@property (copy, nullable) void (^onHidingPallettes)(uintptr_t selfAddr);
+
+/// Block invoked from `-inputControllerWillClose`.
+@property (copy, nullable) void (^onInputControllerWillClose)(uintptr_t selfAddr);
+
+/// Block invoked from `-selectionRange`.
+@property (copy, nullable) NSRange (^onProvidingSelectionRange)(uintptr_t selfAddr);
+
+/// Block invoked from `-menu`.
+@property (copy, nullable) NSMenu * _Nullable (^onProvidingIMEMenu)(uintptr_t selfAddr);
+
+/// Block invoked from `-composedString:`.
+@property (copy, nullable) id _Nullable (^onProvidingComposedString)(uintptr_t givenClientAddr, uintptr_t selfAddr);
+
+/// Block invoked from `-commitComposition:`.
+@property (copy, nullable) void (^onAutoCommittingComposition)(uintptr_t givenClientAddr, uintptr_t selfAddr);
+
+/// Block invoked from `-recognizedEvents:`.
+@property (copy, nullable) NSUInteger (^onProvidingRecognizedEvents)(uintptr_t givenClientAddr, uintptr_t selfAddr);
+
+/// Block invoked from `-handleEvent:client:`.  `nsEventPtr` may be 0 (nil event).
+@property (copy, nullable) BOOL (^onHandlingGivenNullableEvent)(uintptr_t nsEventPtr, uintptr_t givenClientAddr, uintptr_t selfAddr);
+
+/// Block invoked from `-setValue:forTag:client:`.  `valuePtr` may be 0 (nil value).
+@property (copy, nullable) void (^onSettingObjCValue)(uintptr_t valuePtr, intptr_t intTag, uintptr_t givenClientAddr, uintptr_t selfAddr);
 
 @end
 
