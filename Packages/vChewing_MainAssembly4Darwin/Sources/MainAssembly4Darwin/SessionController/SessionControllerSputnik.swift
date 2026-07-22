@@ -6,19 +6,6 @@
 // marks, or product names of Contributor, except as required to fulfill notice
 // requirements defined in MIT License.
 
-// MARK: - SessionCtl
-
-/// 輸入法控制模組，乃在輸入法端用以控制輸入行為的基礎型別。
-///
-/// IMKInputController 完全實現了相關協定所定義的內容。
-/// 一般情況下，研發者不會複寫此型別，而是提供一個委任物件、
-/// 藉此實現研發者想製作的方法/函式。協定方法的 IMKInputController 版本
-/// 檢查委任物件是否實現了方法：若存在的話，就調用委任物件內的版本。
-/// - Remark: 在輸入法的主函式中分配的 IMKServer 型別為客體應用程式創建的每個
-/// 輸入會話創建一個控制器型別。因此，對於每個輸入會話，都有一個對應的 IMKInputController。
-@objc(SessionCtl) // 必須加上 ObjC，因為 IMK 是用 ObjC 寫的。
-@MainActor
-public final class SessionCtl: IMKInputSessionController {}
 // MARK: - SessionControllerSputnik
 
 public struct SessionControllerSputnik {

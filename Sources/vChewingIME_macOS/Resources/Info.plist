@@ -100,15 +100,15 @@
 	<key>InputMethodConnectionName</key>
 	<string>$(PRODUCT_BUNDLE_IDENTIFIER)_Connection</string>
 	<key>InputMethodServerControllerClass</key>
-	<string>SessionCtl</string>
+	<string>IMKInputSessionController</string>
 	<key>InputMethodServerDataSourceClass</key>
-	<string>SessionCtl</string>
+	<string>IMKInputSessionController</string>
 	<key>InputMethodServerDelegateClass</key>
-	<string>SessionCtl</string>
+	<string>IMKInputSessionController</string>
 	<key>InputMethodServerPreferencesWindowControllerClass</key>
 	<string>Preferences</string>
 	<key>InputMethodSessionController</key>
-	<string>SessionCtl</string>
+	<string>IMKInputSessionController</string>
 	<key>LSApplicationCategoryType</key>
 	<string>public.app-category.utilities</string>
 	<key>LSHasLocalizedDisplayName</key>
