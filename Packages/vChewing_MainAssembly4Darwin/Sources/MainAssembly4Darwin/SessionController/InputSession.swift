@@ -317,7 +317,19 @@ public final class InputSession: @MainActor SessionProtocol, Sendable {
         }
       }
       if let oldestKey {
+        let evicted = sessionClientMap[oldestKey]
+        let ssnAddr = evicted.map { UInt(bitPattern: Unmanaged.passUnretained($0).toOpaque()) }
         sessionClientMap[oldestKey] = nil
+        if let ssnAddr {
+          // 同步清理 controller→session 對照表，避免留下 dangling addr。
+          // 未清理的話，下一個 activateServer: 會從 sessionAddrByControllerAddr
+          // 取出已釋放的位址，takeUnretainedValue() 拿到已死的 InputSession → crash。
+          sessionAddrByControllerAddr.withLock { map in
+            for (ctlAddr, addr) in map where addr == ssnAddr {
+              map[ctlAddr] = nil
+            }
+          }
+        }
       }
     }
   }
