@@ -26,9 +26,6 @@ let package = Package(
         "IMKSwiftModernHeaders",
       ],
       resources: [],
-      cSettings: [
-        .unsafeFlags(["-fno-objc-arc"]),
-      ],
       swiftSettings: [
         .defaultIsolation(MainActor.self), // set Default Actor Isolation
       ]
