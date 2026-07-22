@@ -17,8 +17,15 @@ let package = Package(
   ],
   targets: [
     .target(
+      name: "OSFrameworkImplViaObjC",
+      cSettings: [
+        .unsafeFlags(["-fno-objc-arc"]),
+      ]
+    ),
+    .target(
       name: "OSFrameworkImpl",
       dependencies: [
+        "OSFrameworkImplViaObjC",
         .product(name: "SwiftExtension", package: "vChewing_SwiftExtension"),
       ],
       swiftSettings: [
