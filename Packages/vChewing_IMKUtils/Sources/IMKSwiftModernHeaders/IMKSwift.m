@@ -19,9 +19,19 @@
 
 #import <Foundation/Foundation.h>
 #import <InputMethodKit/InputMethodKit.h>
+#import <objc/runtime.h>
 #import "include/IMKSwift.h"
 
 NS_ASSUME_NONNULL_BEGIN
+
+// Forward-declare private IMK class methods used by the dealloc path.
+// +respondsToSelector: guards call sites at runtime, but the compiler still
+// needs to know the selector signatures to avoid -Wundeclared-selector warnings.
+@interface NSObject (IPMDServerClientWrapperTermination)
++ (void)terminateForClientXPCConn:(id)client;
++ (void)terminateForClientDOProxy:(id)client;
++ (void)terminateForClient:(id)client;
+@end
 
 #pragma clang diagnostic push
 #pragma clang diagnostic ignored "-Wincomplete-implementation"
@@ -92,11 +102,87 @@ MRC_BLOCK_PROPERTY(onSettingObjCValue, void (^)(uintptr_t, intptr_t, uintptr_t, 
     [super dealloc];
 }
 
+// MARK: - Stale Controller Pruning (Class Method)
+
+/// Monotonically increasing generation counter used to identify the oldest
+/// controller in `_controllers`.  Each `IMKInputSessionController` receives
+/// a generation stamp via `objc_setAssociatedObject` during `-initWithServer:…`.
+static uint64_t _IMKSwift_controllerGeneration = 0;
+
+/// Key for the associated-object generation stamp.
+static char kIMKSwiftGenerationKey;
+
+/// Removes the oldest stale controller from `IMKServer._private._controllers`
+/// when the dictionary has grown beyond a healthy threshold.
+///
+/// CpLk toggling causes IMKServer to create a new DO/XPC proxy on every
+/// activation.  Because `_controllers` is keyed by proxy memory address,
+/// each toggle creates a new orphan entry — the old proxy is gone and its
+/// `-sessionFinished:` will never fire.  This method evicts the oldest
+/// non-current controller, keeping the dictionary bounded.
+///
+/// @param server         The `IMKServer` whose `_controllers` dictionary to prune.
+/// @param selfController The controller currently being initialised (excluded from eviction).
++ (void)IMKSwift_pruneStaleControllersOnServer:(IMKServer *)server
+                                  excludingSelf:(id)selfController {
+    id serverPvt = [server valueForKey:@"_private"];
+    NSMutableDictionary *ctls = [serverPvt valueForKey:@"_controllers"];
+    if (!ctls || [ctls count] <= 3) return;
+
+    id currentCtl = [serverPvt valueForKey:@"_currentController"];
+
+    // Find the oldest controller (lowest generation) that is safe to evict.
+    id oldest = nil;
+    uint64_t oldestGen = UINT64_MAX;
+    for (id ctl in [ctls allValues]) {
+        if (ctl == currentCtl || ctl == selfController) continue;
+        NSNumber *genNum = objc_getAssociatedObject(ctl, &kIMKSwiftGenerationKey);
+        uint64_t gen = genNum ? [genNum unsignedLongLongValue] : 0;
+        if (gen < oldestGen) {
+            oldestGen = gen;
+            oldest = ctl;
+        }
+    }
+    if (!oldest) return;
+
+    // Terminate the client wrapper associated with the stale controller
+    // so that IMK's global wrapper cache and the underlying XPC connection
+    // are released promptly. Otherwise the XPC connection outlives the
+    // controller and accumulates as a leak.
+    id clientProxy = [oldest client];
+    if (clientProxy) {
+        Class wrapperClass = NSClassFromString(@"IPMDServerClientWrapper");
+        if (wrapperClass) {
+            if ([wrapperClass respondsToSelector:@selector(terminateForClientXPCConn:)]) {
+                [wrapperClass terminateForClientXPCConn:clientProxy];
+            } else if ([wrapperClass respondsToSelector:@selector(terminateForClientDOProxy:)]) {
+                [wrapperClass terminateForClientDOProxy:clientProxy];
+            } else if ([wrapperClass respondsToSelector:@selector(terminateForClient:)]) {
+                [wrapperClass terminateForClient:clientProxy];
+            }
+        }
+    }
+
+    // Find the dictionary key for the oldest controller and remove it.
+    for (id key in [ctls allKeys]) {
+        if ([ctls objectForKey:key] == oldest) {
+            [ctls removeObjectForKey:key];
+            break;
+        }
+    }
+}
+
 // MARK: - Initializer
 
 - (instancetype)initWithServer:(IMKServer *)server delegate:(nullable id)delegate client:(id)inputClient {
     self = [super initWithServer:server delegate:delegate client:inputClient];
     if (self) {
+        // Stamp this controller with a generation number for LRU tracking,
+        // then prune stale controllers from IMKServer._controllers.
+        NSNumber *gen = [NSNumber numberWithUnsignedLongLong:++_IMKSwift_controllerGeneration];
+        objc_setAssociatedObject(self, &kIMKSwiftGenerationKey, gen, OBJC_ASSOCIATION_RETAIN_NONATOMIC);
+        [IMKInputSessionController IMKSwift_pruneStaleControllersOnServer:server excludingSelf:self];
+
         SEL hookSel = @selector(onSuperConstructionSucceeded:delegate:client:);
         if ([self respondsToSelector:hookSel]) {
             NSMethodSignature *sig = [self methodSignatureForSelector:hookSel];
