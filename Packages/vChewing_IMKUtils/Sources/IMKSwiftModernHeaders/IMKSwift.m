@@ -116,6 +116,25 @@ MRC_BLOCK_PROPERTY(onSettingObjCValue, void (^)(uintptr_t, intptr_t, uintptr_t, 
 
 - (void)activateServer:(id)sender {
     [self IMKSwift_cancelDelayedDealloc];
+    // If blocks were released by a previous delayed-dealloc, re-inject the
+    // init hook so that the controller becomes fully functional again.
+    // IMKServer reuses controller instances from its internal _controllers
+    // dictionary across activate/deactivate cycles.
+    if (!_onActivatingServer) {
+        SEL hookSel = @selector(onSuperConstructionSucceeded:delegate:client:);
+        if ([self respondsToSelector:hookSel]) {
+            NSMethodSignature *sig = [self methodSignatureForSelector:hookSel];
+            NSInvocation *inv = [NSInvocation invocationWithMethodSignature:sig];
+            [inv setSelector:hookSel];
+            [inv setTarget:self];
+            id serverObj = self.server;
+            id delegateObj = self.delegate;
+            [inv setArgument:&serverObj atIndex:2];
+            [inv setArgument:&delegateObj atIndex:3];
+            [inv setArgument:&sender atIndex:4];
+            [inv invoke];
+        }
+    }
     if (_onActivatingServer) _onActivatingServer((uintptr_t)sender, (uintptr_t)self);
 }
 
@@ -191,14 +210,30 @@ MRC_BLOCK_PROPERTY(onSettingObjCValue, void (^)(uintptr_t, intptr_t, uintptr_t, 
                                                object:nil];
 }
 
-/// Intentionally empty — serves only as the target for the delayed
-/// `-performSelector:withObject:afterDelay:` timer.
+/// Releases all block ivars and triggers the dealloc callback to unregister
+/// from the leak tracker and clean up the associated InputSession.
 ///
-/// The timer retains `self` for the duration of the delay; when it fires
-/// and this method returns, the timer releases its retain.  If no other
-/// references exist at that point, `-dealloc` is triggered by the system.
-/// The method body itself does not need to do anything.
-- (void)IMKSwift_delayedDealloc {}
+/// The Objective-C object itself cannot be force-deallocated — IMKServer's
+/// internal `_controllers` dictionary retains every controller indefinitely.
+/// However, by releasing the blocks we give back the memory they occupy, and
+/// `_onDealloc` ensures the Swift-side session and tracker entries are
+/// cleaned up.  The remaining ObjC shell (~dozen ivar pointers) is negligible.
+- (void)IMKSwift_delayedDealloc {
+    if (_onDealloc) _onDealloc((uintptr_t)self);
+    [_onDealloc release]; _onDealloc = nil;
+    [_onActivatingServer release]; _onActivatingServer = nil;
+    [_onDeactivatingServer release]; _onDeactivatingServer = nil;
+    [_onShowingPreferences release]; _onShowingPreferences = nil;
+    [_onHidingPallettes release]; _onHidingPallettes = nil;
+    [_onInputControllerWillClose release]; _onInputControllerWillClose = nil;
+    [_onProvidingSelectionRange release]; _onProvidingSelectionRange = nil;
+    [_onProvidingIMEMenu release]; _onProvidingIMEMenu = nil;
+    [_onProvidingComposedString release]; _onProvidingComposedString = nil;
+    [_onAutoCommittingComposition release]; _onAutoCommittingComposition = nil;
+    [_onProvidingRecognizedEvents release]; _onProvidingRecognizedEvents = nil;
+    [_onHandlingGivenNullableEvent release]; _onHandlingGivenNullableEvent = nil;
+    [_onSettingObjCValue release]; _onSettingObjCValue = nil;
+}
 
 @end
 
