@@ -923,6 +923,10 @@
 + (void)IMKSwift_configureWithHandlingGivenNullableEvent:(nullable BOOL (^)(uintptr_t nsEventPtr, uintptr_t givenClientAddr, uintptr_t selfAddr))block NS_SWIFT_NAME(configureHandlingGivenNullableEvent(_:));
 + (void)IMKSwift_configureWithSettingObjCValue:(nullable void (^)(uintptr_t valuePtr, intptr_t intTag, uintptr_t givenClientAddr, uintptr_t selfAddr))block NS_SWIFT_NAME(configureSettingObjCValue(_:));
 
+/// Returns the current controller generation counter (monotonically increasing),
+/// used by the parity-based double-buffered session pool.
++ (uint64_t)IMKSwift_currentGeneration NS_SWIFT_NAME(currentGeneration());
+
 @end
 
 #pragma clang attribute pop

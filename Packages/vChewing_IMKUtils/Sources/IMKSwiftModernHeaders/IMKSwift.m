@@ -194,6 +194,12 @@ static char kIMKSwiftGenerationKey;
     }
 }
 
+// MARK: - Parity / Generation
+
++ (uint64_t)IMKSwift_currentGeneration {
+    return _IMKSwift_controllerGeneration;
+}
+
 // MARK: - Initializer
 
 - (instancetype)initWithServer:(IMKServer *)server delegate:(nullable id)delegate client:(id)inputClient {

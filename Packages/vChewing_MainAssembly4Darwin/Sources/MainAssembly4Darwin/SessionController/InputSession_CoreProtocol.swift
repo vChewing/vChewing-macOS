@@ -247,7 +247,8 @@ extension SessionProtocol {
     // 僅執行輕量更新即可，省去 initInputHandler()、asyncOnMain 任務排程等高成本操作。
     // 原理：performServerDeactivation() 對當前副本是 no-op（因 guard 提前返回），
     // 故 isActivated 仍為 true、inputHandler 仍然存在，無需重新初期化。
-    if isActivated, Self.current?.id == id, inputHandler != nil {
+    if isActivated, Self.current?.id == id, inputHandler != nil,
+       let client, isStillTheSameClientObj(client as? NSObject) {
       syncCurrentSessionID()
       let resolvedInputMode = IMEApp.currentInputMode
       if inputMode != resolvedInputMode {

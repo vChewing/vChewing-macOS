@@ -59,47 +59,26 @@ public struct SessionControllerSputnik {
     _ = _configureClassLevelBlocks
   }
 
+  /// 以 generation parity 從雙緩衝池中選取 InputSession singleton 並完成 reassign。
+  /// - Parameters:
+  ///   - controller: 剛完成 init 的 IMKInputSessionController。
+  ///   - maybeClient: 建構子傳入的 client（macOS 10.9 下 client() 尚不可用）。
+  /// - Returns: 已 reassign 並重置狀態的 InputSession。
   public static func callCoreAtLeastOnce(
     _ controller: IMKInputSessionController,
     client maybeClient: Any!
   )
     -> InputSession {
-    // 嘗試從快取中複用既有的 InputSession，以緩解 CapsLock 頻繁切換場景下的 ARC 壓力。
-    // 參見 DevLab/InputMethodKitPhuquingRetarded.txt 內的分析。
-    let controllerAddr = UInt(bitPattern: Unmanaged.passUnretained(controller).toOpaque())
-    let maybeClientOnMain = maybeClient as? NSObjectProtocol
-    let clientObj: NSObjectProtocol? = maybeClientOnMain ?? (controller.client() as? NSObjectProtocol)
-    // 改用 uniqueClientIdentifierString 作為快取鍵。
-    // 此舉解決 Chrome/Electron 的 client object memAddr 不穩定問題。
-    if let clientObj {
-      let key = UInt(bitPattern: Unmanaged.passUnretained(clientObj).toOpaque())
-      if let cached = InputSession.cachedSession(for: key) {
-        cached.reassign(to: controller, clientAddrProvider: Self.getGuardableAddrPair(controllerAddr))
-        vCLog("InputSession reused. ID: \(cached.id.uuidString)")
-        return cached
-      }
-    }
-    // 先用傳入的參數完成 InputSession 的初期化，其中包括了對這個 Session 的登記過程。
-    let newSession = InputSession(controller: controller) {
-      if let clientObj {
-        let clientAddr = UInt(bitPattern: Unmanaged.passUnretained(clientObj).toOpaque())
-        return ClientControllerAddrPair(clientAddr: clientAddr, controllerAddr: controllerAddr)
-      }
-      return nil
-    }
-    // 然後再用脫手操作給這個 Session 重新指派 clientAddrProvider。
-    // 這個 async 反而是有必要的，因為 IMKInputSessionController 的 initializer 在
-    // 徹底執行完畢之前能拿到的 client() 反而在早期版本 macOS 系統下會是 nil。
-    asyncOnMain {
-      // 防止 async dispatch 期間 controller 已被 dealloc 導致的 dangling pointer crash。
-      // DeallocSentinel 在 controller dealloc 時會自動 untrack，故此 guard 可安全過濾。
-      guard ObjCMemoryLeakTracker.shared.isTracked(addr: controllerAddr),
-            let opaque = UnsafeRawPointer(bitPattern: controllerAddr)
-      else { return }
-      let controllerUnwrapped = Unmanaged<IMKInputSessionController>.fromOpaque(opaque).takeUnretainedValue()
-      newSession.reassign(to: controllerUnwrapped, clientAddrProvider: Self.getGuardableAddrPair(controllerAddr))
-    }
-    return newSession
+    let parity = Int(IMKInputSessionController.currentGeneration() & 1)
+    let session = InputSession.session(forParity: parity)
+    // 同步完成 reassign：更新 controller→session 對照、重置組字狀態。
+    session.reassign(to: controller, clientAddrProvider: Self.getGuardableAddrPair(
+      UInt(bitPattern: Unmanaged.passUnretained(controller).toOpaque())
+    ))
+    session.state = IMEState.ofEmpty()
+    session.resetInputHandler()
+    InputSession.current = session
+    return session
   }
 
   public static func getGuardableAddrPair(_ controllerAddr: UInt) -> (() -> ClientControllerAddrPair?) {

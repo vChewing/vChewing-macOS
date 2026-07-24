@@ -56,8 +56,17 @@ public final class InputSession: @MainActor SessionProtocol, Sendable {
       Self.registerSessionAddr(self, for: controllerAddr)
     }
     construct(client: theClient())
-    registerInCache()
     vCLog("InputSession constructed. ID: \(id.uuidString)")
+  }
+
+  /// 預配置 session（極性雙緩衝用）：不繫結任何 controller/client，僅初始化內部引擎。
+  /// 後續經由 `reassign(to:clientAddrProvider:)` 與具體 controller 綁定。
+  public init(preallocated: ()) {
+    self.theClientAddr = { nil }
+    initInputHandler()
+    synchronizer4LMPrefs?()
+    self.inputMode = .init(rawValue: prefs.mostRecentInputMode) ?? .imeModeNULL
+    vCLog("InputSession preallocated. ID: \(id.uuidString)")
   }
 
   nonisolated deinit {
@@ -242,29 +251,16 @@ public final class InputSession: @MainActor SessionProtocol, Sendable {
 
   // MARK: Internal
 
-  // LRU 記數器，用於 sessionsByClient 的 LRU 淘汰。
-  var lruTick: UInt = 0
+  // MARK: - 極性雙緩衝 Session 池
 
-  /// 從快取中查詢既有的 InputSession（以 client NSObject 的記憶體位址整數值為鍵）。
-  static func cachedSession(for memAddr: UInt) -> InputSession? {
-    Self.sessionsByClient.withLock { sessionClientMap in
-      guard let session = sessionClientMap[memAddr] else {
-        return nil
-      }
-      // 孤本清理：若快取中的 session 已無任何 IMKInputSessionController 參照，立即移除。
-      if session.inputControllerAssignedAddr == nil,
-         Self.current?.id != session.id {
-        sessionClientMap[memAddr] = nil
-        return nil
-      }
-      // 命中時更新 LRU 記數器（用於 count > 5 時的批量淘汰）。
-      session.lruTick = Self.globalLRUTick
-      Self.globalLRUTick &+= 1
-      return session
-    }
-  }
+  /// 偶數 generation controller 專用 session。
+  @MainActor
+  static let sessionEven = InputSession(preallocated: ())
+  /// 奇數 generation controller 專用 session。
+  @MainActor
+  static let sessionOdd = InputSession(preallocated: ())
 
-  /// 依據 IMKInputSessionController 記憶體位址查詢對應的 InputSession。
+  /// 從 controller 位址查詢對應的 InputSession。
   static func session(for controllerAddr: UInt) -> InputSession? {
     let testPair = ClientControllerAddrPair(clientAddr: 0, controllerAddr: controllerAddr)
     guard let ctlKey = testPair.unwrapped?.controllerAddr else { return nil }
@@ -283,96 +279,50 @@ public final class InputSession: @MainActor SessionProtocol, Sendable {
   /// 以純記憶體位址移除 controller 對照關係（供 `onDealloc` block 使用，避免捕獲 self）。
   static func unregisterSessionAddr(forControllerAddr ctlKey: UInt) {
     sessionAddrByControllerAddr.withLock { map in
-      if let ssnKey = map[ctlKey],
-         let opaque = UnsafeRawPointer(bitPattern: ssnKey) {
-        let session = Unmanaged<InputSession>.fromOpaque(opaque).takeUnretainedValue()
+      guard let ssnKey = map[ctlKey],
+            let opaque = UnsafeRawPointer(bitPattern: ssnKey) else { return }
+      map[ctlKey] = nil
+      let session = Unmanaged<InputSession>.fromOpaque(opaque).takeUnretainedValue()
+      // 僅在 session 仍屬於該 controller 時才清空 inputControllerAssignedAddr。
+      // reassign 後 session 已歸新 controller 所有，舊 controller 的 dealloc 不應干擾。
+      if session.inputControllerAssignedAddr == ctlKey {
         session.inputControllerAssignedAddr = nil
       }
-      map[ctlKey] = nil
     }
   }
 
-  /// 將自身登記至快取。首次建構 InputSession 時呼叫。
-  func registerInCache() {
-    guard let clientObj = theClient() else { return }
-    let key = UInt(bitPattern: Unmanaged.passUnretained(clientObj).toOpaque())
-    Self.sessionsByClient.withLock { sessionClientMap in
-      sessionClientMap[key] = self
-    }
-    // 登記後觸發 LRU 檢查（僅在 count > 5 時實際淘汰）。
-    Self.evictLRUIfNeeded()
+  /// 以 generation parity 查詢對應的 InputSession singleton。
+  static func session(forParity parity: Int) -> InputSession {
+    (parity & 1) == 0 ? sessionEven : sessionOdd
   }
 
-  /// 重新綁定至新的 IMKInputSessionController（快取命中時使用）。
+  /// 重新綁定至新的 IMKInputSessionController。
+  /// 更新 controller→session 對照表並清理舊 controller 的殘留 mapping。
   func reassign(
     to controller: IMKInputSessionController,
     clientAddrProvider: @escaping () -> ClientControllerAddrPair?
   ) {
-    let controllerAddr = UInt(bitPattern: Unmanaged.passUnretained(controller).toOpaque())
-    inputControllerAssignedAddr = controllerAddr
+    let oldAddr = inputControllerAssignedAddr
+    let newAddr = UInt(bitPattern: Unmanaged.passUnretained(controller).toOpaque())
+    inputControllerAssignedAddr = newAddr
     theClientAddr = clientAddrProvider
-    Self.registerSessionAddr(self, for: controllerAddr)
+    if let oldAddr {
+      Self.sessionAddrByControllerAddr.withLock { $0[oldAddr] = nil }
+    }
+    Self.registerSessionAddr(self, for: newAddr)
   }
 
   // MARK: Private
 
   private static var _current: InputSession?
 
-  // MARK: - Session 快取 (緩解 CapsLock 高頻切換場景下的 ARC 壓力)
+  // MARK: - Controller ↔ Session 對照表
 
-  /// 以 client NSObject 的記憶體位址整數值為鍵的快取字典。
-  /// 取代舊版 NSMapTable——NSMapTable 自身的內部設計在 Chrome/Electron
-  /// 等頻繁變更 client proxy 物件的場景下會導致 hang。
-  /// - Remark: 參見 DevLab/InputMethodKitPhuquingRetarded.txt 內的分析。
-  private static var sessionsByClient = NSMutex([UInt: InputSession]())
-  /// 以 controller NSObject 的記憶體位址整數值為鍵的快取字典。
+  /// 以 controller NSObject 的記憶體位址整數值為鍵的對照字典。
   /// 資料值是 Session 的記憶體位址。
   /// - Note: Session 的記憶體位址必須在其生命週期有效期間內確保有效。
   ///   此處不保留強引用，避免靜態字典參與 ARC。
   private nonisolated(unsafe) static var sessionAddrByControllerAddr = NSMutex([UInt: UInt]())
-
-  /// 靜態全域 LRU 記數器（單調遞增，&+= 溢位迴繞）。
-  private static var globalLRUTick: UInt = 0
-
-  /// 惰性 LRU 淘汰：快取容量超過「當前存活 IMKInputSessionController 數量（最少 2）」時執行。
-  /// 某些使用者會利用 macOS 12+ 的 CpLk 特性瘋狂切換中英輸入法，
-  /// 快取條目可能快速累積。LRU 確保只保留最近使用的 session。
-  private static func evictLRUIfNeeded() {
-    sessionsByClient.withLock { sessionClientMap in
-      // 上限 2：涵蓋「當前打字中的 session」+「上一個正在冷卻（deactivateServer 3s timer 尚未觸發）的 session」。
-      // 超過 2 的第三個 session 必然是孤兒。另單獨處理 ≤2 時的孤兒殘留（所有 controller 都已析構的情況）。
-      let hasOrphan = sessionClientMap.contains {
-        $0.value.inputControllerAssignedAddr == nil && Self.current?.id != $0.value.id
-      }
-      guard sessionClientMap.count > 2 || hasOrphan else { return }
-      var oldestKey: UInt?
-      var oldestTick: UInt = .max
-      for (key, session) in sessionClientMap {
-        guard session.inputControllerAssignedAddr == nil,
-              Self.current?.id != session.id
-        else { continue }
-        if session.lruTick < oldestTick {
-          oldestTick = session.lruTick
-          oldestKey = key
-        }
-      }
-      if let oldestKey {
-        let evicted = sessionClientMap[oldestKey]
-        let ssnAddr = evicted.map { UInt(bitPattern: Unmanaged.passUnretained($0).toOpaque()) }
-        sessionClientMap[oldestKey] = nil
-        if let ssnAddr {
-          // 同步清理 controller→session 對照表，避免留下 dangling addr。
-          // 未清理的話，下一個 activateServer: 會從 sessionAddrByControllerAddr
-          // 取出已釋放的位址，takeUnretainedValue() 拿到已死的 InputSession → crash。
-          sessionAddrByControllerAddr.withLock { map in
-            for (ctlAddr, addr) in map where addr == ssnAddr {
-              map[ctlAddr] = nil
-            }
-          }
-        }
-      }
-    }
-  }
 }
 
 extension InputSession {
