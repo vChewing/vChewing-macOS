@@ -308,7 +308,17 @@ static char kIMKSwiftGenerationKey;
     // heavy XPC resources (~440 bytes per connection) are freed now.
     id clientProxy = [self client];
     if (clientProxy) {
-        Class wrapperClass = NSClassFromString(@"IPMDServerClientWrapper");
+        // macOS 15 Sequoia split IPMDServerClientWrapper into Modern / Legacy subclasses.
+        // Try both variants, then fall back to the undecorated name for ≤10.15.
+        Class wrapperClass = nil;
+        for (NSString *name in @[
+            @"_IPMDServerClientWrapperModern",
+            @"_IPMDServerClientWrapperLegacy",
+            @"IPMDServerClientWrapper"
+        ]) {
+            wrapperClass = NSClassFromString(name);
+            if (wrapperClass) break;
+        }
         if (wrapperClass) {
             if ([wrapperClass respondsToSelector:@selector(terminateForClientXPCConn:)]) {
                 [wrapperClass terminateForClientXPCConn:clientProxy];
