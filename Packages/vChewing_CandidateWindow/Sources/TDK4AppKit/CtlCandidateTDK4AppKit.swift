@@ -76,7 +76,7 @@ extension TDK4AppKit {
 
     public var currentLayout: UILayoutOrientation = .horizontal
 
-    public var delegate: CtlCandidateDelegate? {
+    public weak var delegate: CtlCandidateDelegate? {
       didSet {
         guard let delegate = delegate else { return }
         if delegate.isCandidateState { reloadData() }
