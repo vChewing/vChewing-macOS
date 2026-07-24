@@ -86,7 +86,7 @@ public struct SessionControllerSputnik {
       // Client 在 Controller 建構完畢之後才可用，
       // 但 Controller 被析構之後 Client Addr 必定是 dangling pointer。
       // 所以在此複查 Controller 的生命週期。
-      guard ObjCMemoryLeakTracker.shared.isTracked(addr: controllerAddr) else { return nil }
+      guard IMKControllerLifetimeTracker.shared().isAddressAlive(controllerAddr) else { return nil }
       guard let opaque = UnsafeRawPointer(bitPattern: controllerAddr) else { return nil }
       let controller = Unmanaged<IMKInputSessionController>.fromOpaque(opaque).takeUnretainedValue()
       guard let clientObj = controller.client() as? InputSession.ClientObj else { return nil }
@@ -130,7 +130,8 @@ public struct SessionControllerSputnik {
       instance, _, _, _, givenClient in
       let ctl = instance as? IMKInputSessionController
       guard let ctl else { return }
-      ObjCMemoryLeakTracker.shared.track(ctl, type: "IMKInputSessionController")
+      // IMKInputSessionController.initWithServer: 已自動透過 IMKControllerLifetimeTracker
+      // 完成追蹤登記與 generation 分配，無需手動呼叫 track。
       let controllerAddr = UInt(bitPattern: Unmanaged.passUnretained(ctl).toOpaque())
       // 建構階段同步完成 tracker 登記 + 極性雙緩衝 session reassign。
       // 使用 constructor 傳入的 givenClient（非 `client()`）：
@@ -255,10 +256,10 @@ extension SessionControllerSputnik {
   }
 
   /// 由 raw uintptr_t 位址解析 controller 與 client，傳回 (InputSession, IMKTextInput) 配對。
-  /// 在解析前會透過 ObjCMemoryLeakTracker 複查 controller 是否仍存活，
+  /// 在解析前會透過 IMKControllerLifetimeTracker 複查 controller 是否仍存活，
   /// 防止 dangling pointer 被 takeUnretainedValue() 解讀導致 EXC_BAD_ACCESS。
   private static func controllerAndClient(_ ca: UInt, _ sa: UInt) -> (InputSession, any IMKTextInput)? {
-    guard ObjCMemoryLeakTracker.shared.isTracked(addr: sa),
+    guard IMKControllerLifetimeTracker.shared().isAddressAlive(sa),
           let clientOpaque = UnsafeRawPointer(bitPattern: ca),
           let session = session(forAddr: sa) else { return nil }
     let sender = Unmanaged<AnyObject>.fromOpaque(clientOpaque).takeUnretainedValue()

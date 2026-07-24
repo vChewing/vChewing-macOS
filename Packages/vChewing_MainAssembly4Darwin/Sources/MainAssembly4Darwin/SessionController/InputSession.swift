@@ -35,7 +35,7 @@ public struct ClientControllerAddrPair: Sendable {
       // Client 在 Controller 建構完畢之後才可用，
       // 但 Controller 被析構之後 Client Addr 必定是 dangling pointer。
       // 所以在此複查 Controller 的生命週期。
-      guard ObjCMemoryLeakTracker.shared.isTracked(addr: _controllerAddr) else { return nil }
+      guard IMKControllerLifetimeTracker.shared().isAddressAlive(_controllerAddr) else { return nil }
     }
     return (_clientAddr, _controllerAddr)
   }
@@ -155,7 +155,7 @@ public final class InputSession: @MainActor SessionProtocol, Sendable {
 
   public var inputController: IMKInputSessionController? {
     guard let addr = inputControllerAssignedAddr,
-          ObjCMemoryLeakTracker.shared.isTracked(addr: addr),
+          IMKControllerLifetimeTracker.shared().isAddressAlive(addr),
           let opaque = UnsafeRawPointer(bitPattern: addr)
     else { return nil }
     return Unmanaged<IMKInputSessionController>.fromOpaque(opaque).takeUnretainedValue()

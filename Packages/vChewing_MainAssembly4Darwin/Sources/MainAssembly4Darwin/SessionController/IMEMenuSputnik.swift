@@ -449,7 +449,7 @@ extension IMEMenuSputnik {
     let ramMsg = "i18n:IME.RAMUsedLabelHeader".i18n + " \(currentMemorySize)MB"
     let count4Controllers =
       "i18n:IME.RAMControllerCountLabel".i18n
-        + " \(ObjCMemoryLeakTracker.shared.trackedCountByType["IMKInputSessionController"] ?? 0)"
+        + " \(IMKControllerLifetimeTracker.shared().trackedControllerCount)"
     return [ramMsg, count4Controllers].joined(separator: "; ")
   }
 }

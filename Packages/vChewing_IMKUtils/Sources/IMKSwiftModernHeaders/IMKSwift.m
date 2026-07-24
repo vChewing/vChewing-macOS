@@ -20,6 +20,7 @@
 #import <InputMethodKit/InputMethodKit.h>
 #import <objc/runtime.h>
 #import "include/IMKSwift.h"
+#import "include/IMKControllerLifetimeTracker.h"
 
 NS_ASSUME_NONNULL_BEGIN
 
@@ -142,15 +143,7 @@ static void (^_IMKSwift_onSettingObjCValue)(uintptr_t, intptr_t, uintptr_t, uint
     [super dealloc];
 }
 
-// MARK: - Stale Controller Pruning (Class Method)
-
-/// Monotonically increasing generation counter used to identify the oldest
-/// controller in `_controllers`.  Each `IMKInputSessionController` receives
-/// a generation stamp via `objc_setAssociatedObject` during `-initWithServer:…`.
-static uint64_t _IMKSwift_controllerGeneration = 0;
-
-/// Key for the associated-object generation stamp.
-static char kIMKSwiftGenerationKey;
+// MARK: - Stale Controller Pruning & Generation Tracking
 
 /// Removes the oldest stale controller from `IMKServer._private._controllers`
 /// when the dictionary has grown beyond a healthy threshold.
@@ -170,14 +163,14 @@ static char kIMKSwiftGenerationKey;
     if (!ctls || [ctls count] <= 2) return;
 
     id currentCtl = [serverPvt valueForKey:@"_currentController"];
+    IMKControllerLifetimeTracker *tracker = [IMKControllerLifetimeTracker shared];
 
     // Find the oldest controller (lowest generation) that is safe to evict.
     id oldest = nil;
     uint64_t oldestGen = UINT64_MAX;
     for (id ctl in [ctls allValues]) {
         if (ctl == currentCtl || ctl == selfController) continue;
-        NSNumber *genNum = objc_getAssociatedObject(ctl, &kIMKSwiftGenerationKey);
-        uint64_t gen = genNum ? [genNum unsignedLongLongValue] : 0;
+        uint64_t gen = [tracker generationForAddress:(uintptr_t)ctl];
         if (gen < oldestGen) {
             oldestGen = gen;
             oldest = ctl;
@@ -197,7 +190,7 @@ static char kIMKSwiftGenerationKey;
 // MARK: - Parity / Generation
 
 + (uint64_t)IMKSwift_currentGeneration {
-    return _IMKSwift_controllerGeneration;
+    return [[IMKControllerLifetimeTracker shared] currentGeneration];
 }
 
 // MARK: - Initializer
@@ -205,8 +198,7 @@ static char kIMKSwiftGenerationKey;
 - (instancetype)initWithServer:(IMKServer *)server delegate:(nullable id)delegate client:(id)inputClient {
     self = [super initWithServer:server delegate:delegate client:inputClient];
     if (self) {
-        NSNumber *gen = [NSNumber numberWithUnsignedLongLong:++_IMKSwift_controllerGeneration];
-        objc_setAssociatedObject(self, &kIMKSwiftGenerationKey, gen, OBJC_ASSOCIATION_RETAIN_NONATOMIC);
+        [[IMKControllerLifetimeTracker shared] trackController:self];
         [IMKInputSessionController IMKSwift_pruneStaleControllersOnServer:server excludingSelf:self];
 
         SEL hookSel = @selector(onSuperConstructionSucceeded:delegate:client:);
