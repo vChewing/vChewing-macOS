@@ -339,8 +339,12 @@ public final class InputSession: @MainActor SessionProtocol, Sendable {
   /// 快取條目可能快速累積。LRU 確保只保留最近使用的 session。
   private static func evictLRUIfNeeded() {
     sessionsByClient.withLock { sessionClientMap in
-      let threshold = ObjCMemoryLeakTracker.shared.trackedCountByType["IMKInputSessionController"] ?? 0
-      guard sessionClientMap.count > Swift.max(2, threshold) else { return }
+      // 上限 2：涵蓋「當前打字中的 session」+「上一個正在冷卻（deactivateServer 3s timer 尚未觸發）的 session」。
+      // 超過 2 的第三個 session 必然是孤兒。另單獨處理 ≤2 時的孤兒殘留（所有 controller 都已析構的情況）。
+      let hasOrphan = sessionClientMap.contains {
+        $0.value.inputControllerAssignedAddr == nil && Self.current?.id != $0.value.id
+      }
+      guard sessionClientMap.count > 2 || hasOrphan else { return }
       var oldestKey: UInt?
       var oldestTick: UInt = .max
       for (key, session) in sessionClientMap {

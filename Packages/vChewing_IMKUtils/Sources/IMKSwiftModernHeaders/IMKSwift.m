@@ -127,7 +127,7 @@ static char kIMKSwiftGenerationKey;
                                   excludingSelf:(id)selfController {
     id serverPvt = [server valueForKey:@"_private"];
     NSMutableDictionary *ctls = [serverPvt valueForKey:@"_controllers"];
-    if (!ctls || [ctls count] <= 3) return;
+    if (!ctls || [ctls count] <= 2) return;
 
     id currentCtl = [serverPvt valueForKey:@"_currentController"];
 
