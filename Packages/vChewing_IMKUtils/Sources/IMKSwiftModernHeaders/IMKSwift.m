@@ -8,14 +8,13 @@
 /// This file provides the `@implementation` block for `IMKInputSessionController`,
 /// which is declared in `IMKSwift.h` as a subclass of `IMKInputController`.
 ///
-/// **All** `IMKInputController` overrides are implemented here; each invokes the
-/// corresponding block property set by the Swift subclass.  The blocks receive
-/// raw memory addresses (`uintptr_t`) instead of object references — no
-/// retain/release is performed on the client or the controller itself.
-///
-/// The `-Wincomplete-implementation` pragma is still needed for the remaining
-/// methods that are inherited from `IMKInputController` at runtime without
-/// explicit bodies (e.g. `candidates:`, `doCommandBy:`).
+/// All IMK dispatch is handled via **class-level static blocks** — set once from
+/// Swift at startup via `+IMKSwift_configureWithActivatingServer:...`, shared by
+/// all controller instances.  Each block receives raw `uintptr_t` memory addresses
+/// instead of object references — no retain/release is performed on the client
+/// or the controller itself.  This eliminates per-instance block ivars, MRC
+/// life‑cycle management, delayed‑dealloc block release, and `-activateServer:`
+/// re‑injection complexity.
 
 #import <Foundation/Foundation.h>
 #import <InputMethodKit/InputMethodKit.h>
@@ -36,68 +35,109 @@ NS_ASSUME_NONNULL_BEGIN
 #pragma clang diagnostic push
 #pragma clang diagnostic ignored "-Wincomplete-implementation"
 
-@implementation IMKInputSessionController {
-    void (^_onActivatingServer)(uintptr_t, uintptr_t);
-    void (^_onDeactivatingServer)(uintptr_t, uintptr_t);
-    void (^_onDealloc)(uintptr_t);
-    void (^_onShowingPreferences)(uintptr_t, uintptr_t);
-    void (^_onHidingPallettes)(uintptr_t);
-    void (^_onInputControllerWillClose)(uintptr_t);
-    NSRange (^_onProvidingSelectionRange)(uintptr_t);
-    NSMenu * _Nullable (^_onProvidingIMEMenu)(uintptr_t);
-    id _Nullable (^_onProvidingComposedString)(uintptr_t, uintptr_t);
-    void (^_onAutoCommittingComposition)(uintptr_t, uintptr_t);
-    NSUInteger (^_onProvidingRecognizedEvents)(uintptr_t, uintptr_t);
-    BOOL (^_onHandlingGivenNullableEvent)(uintptr_t, uintptr_t, uintptr_t);
-    void (^_onSettingObjCValue)(uintptr_t, intptr_t, uintptr_t, uintptr_t);
-}
+// MARK: - Class-level Static Blocks (shared by all controller instances)
 
-// MARK: - Block Properties (MRC)
+static void (^_IMKSwift_onActivatingServer)(uintptr_t, uintptr_t);
+static void (^_IMKSwift_onDeactivatingServer)(uintptr_t, uintptr_t);
+static void (^_IMKSwift_onDealloc)(uintptr_t);
+static void (^_IMKSwift_onShowingPreferences)(uintptr_t, uintptr_t);
+static void (^_IMKSwift_onHidingPallettes)(uintptr_t);
+static void (^_IMKSwift_onInputControllerWillClose)(uintptr_t);
+static NSRange (^_IMKSwift_onProvidingSelectionRange)(uintptr_t);
+static NSMenu * _Nullable (^_IMKSwift_onProvidingIMEMenu)(uintptr_t);
+static id _Nullable (^_IMKSwift_onProvidingComposedString)(uintptr_t, uintptr_t);
+static void (^_IMKSwift_onAutoCommittingComposition)(uintptr_t, uintptr_t);
+static NSUInteger (^_IMKSwift_onProvidingRecognizedEvents)(uintptr_t, uintptr_t);
+static BOOL (^_IMKSwift_onHandlingGivenNullableEvent)(uintptr_t, uintptr_t, uintptr_t);
+static void (^_IMKSwift_onSettingObjCValue)(uintptr_t, intptr_t, uintptr_t, uintptr_t);
 
-#define MRC_BLOCK_PROPERTY(_name, _sig) \
-    - (void)set##_name:(nullable _sig)block { \
-        if (_##_name != block) { \
-            [_##_name release]; \
-            _##_name = [block copy]; \
-        } \
-    } \
-    - (nullable _sig)_name { \
-        return [[_##_name retain] autorelease]; \
+@implementation IMKInputSessionController
+
+// MARK: - Class Method: One-time Block Configuration (called from Swift at startup)
+
++ (void)IMKSwift_configureWithActivatingServer:(nullable void (^)(uintptr_t, uintptr_t))blk {
+    if (_IMKSwift_onActivatingServer != blk) {
+        [_IMKSwift_onActivatingServer release];
+        _IMKSwift_onActivatingServer = [blk copy];
     }
-
-MRC_BLOCK_PROPERTY(onActivatingServer, void (^)(uintptr_t, uintptr_t))
-MRC_BLOCK_PROPERTY(onDeactivatingServer, void (^)(uintptr_t, uintptr_t))
-MRC_BLOCK_PROPERTY(onDealloc, void (^)(uintptr_t))
-MRC_BLOCK_PROPERTY(onShowingPreferences, void (^)(uintptr_t, uintptr_t))
-MRC_BLOCK_PROPERTY(onHidingPallettes, void (^)(uintptr_t))
-MRC_BLOCK_PROPERTY(onInputControllerWillClose, void (^)(uintptr_t))
-MRC_BLOCK_PROPERTY(onProvidingSelectionRange, NSRange (^)(uintptr_t))
-MRC_BLOCK_PROPERTY(onProvidingIMEMenu, NSMenu * _Nullable (^)(uintptr_t))
-MRC_BLOCK_PROPERTY(onProvidingComposedString, id _Nullable (^)(uintptr_t, uintptr_t))
-MRC_BLOCK_PROPERTY(onAutoCommittingComposition, void (^)(uintptr_t, uintptr_t))
-MRC_BLOCK_PROPERTY(onProvidingRecognizedEvents, NSUInteger (^)(uintptr_t, uintptr_t))
-MRC_BLOCK_PROPERTY(onHandlingGivenNullableEvent, BOOL (^)(uintptr_t, uintptr_t, uintptr_t))
-MRC_BLOCK_PROPERTY(onSettingObjCValue, void (^)(uintptr_t, intptr_t, uintptr_t, uintptr_t))
-
-#undef MRC_BLOCK_PROPERTY
+}
++ (void)IMKSwift_configureWithDeactivatingServer:(nullable void (^)(uintptr_t, uintptr_t))blk {
+    if (_IMKSwift_onDeactivatingServer != blk) {
+        [_IMKSwift_onDeactivatingServer release];
+        _IMKSwift_onDeactivatingServer = [blk copy];
+    }
+}
++ (void)IMKSwift_configureWithDealloc:(nullable void (^)(uintptr_t))blk {
+    if (_IMKSwift_onDealloc != blk) {
+        [_IMKSwift_onDealloc release];
+        _IMKSwift_onDealloc = [blk copy];
+    }
+}
++ (void)IMKSwift_configureWithShowingPreferences:(nullable void (^)(uintptr_t, uintptr_t))blk {
+    if (_IMKSwift_onShowingPreferences != blk) {
+        [_IMKSwift_onShowingPreferences release];
+        _IMKSwift_onShowingPreferences = [blk copy];
+    }
+}
++ (void)IMKSwift_configureWithHidingPallettes:(nullable void (^)(uintptr_t))blk {
+    if (_IMKSwift_onHidingPallettes != blk) {
+        [_IMKSwift_onHidingPallettes release];
+        _IMKSwift_onHidingPallettes = [blk copy];
+    }
+}
++ (void)IMKSwift_configureWithInputControllerWillClose:(nullable void (^)(uintptr_t))blk {
+    if (_IMKSwift_onInputControllerWillClose != blk) {
+        [_IMKSwift_onInputControllerWillClose release];
+        _IMKSwift_onInputControllerWillClose = [blk copy];
+    }
+}
++ (void)IMKSwift_configureWithProvidingSelectionRange:(nullable NSRange (^)(uintptr_t))blk {
+    if (_IMKSwift_onProvidingSelectionRange != blk) {
+        [_IMKSwift_onProvidingSelectionRange release];
+        _IMKSwift_onProvidingSelectionRange = [blk copy];
+    }
+}
++ (void)IMKSwift_configureWithProvidingIMEMenu:(nullable NSMenu * _Nullable (^)(uintptr_t))blk {
+    if (_IMKSwift_onProvidingIMEMenu != blk) {
+        [_IMKSwift_onProvidingIMEMenu release];
+        _IMKSwift_onProvidingIMEMenu = [blk copy];
+    }
+}
++ (void)IMKSwift_configureWithProvidingComposedString:(nullable id _Nullable (^)(uintptr_t, uintptr_t))blk {
+    if (_IMKSwift_onProvidingComposedString != blk) {
+        [_IMKSwift_onProvidingComposedString release];
+        _IMKSwift_onProvidingComposedString = [blk copy];
+    }
+}
++ (void)IMKSwift_configureWithAutoCommittingComposition:(nullable void (^)(uintptr_t, uintptr_t))blk {
+    if (_IMKSwift_onAutoCommittingComposition != blk) {
+        [_IMKSwift_onAutoCommittingComposition release];
+        _IMKSwift_onAutoCommittingComposition = [blk copy];
+    }
+}
++ (void)IMKSwift_configureWithProvidingRecognizedEvents:(nullable NSUInteger (^)(uintptr_t, uintptr_t))blk {
+    if (_IMKSwift_onProvidingRecognizedEvents != blk) {
+        [_IMKSwift_onProvidingRecognizedEvents release];
+        _IMKSwift_onProvidingRecognizedEvents = [blk copy];
+    }
+}
++ (void)IMKSwift_configureWithHandlingGivenNullableEvent:(nullable BOOL (^)(uintptr_t, uintptr_t, uintptr_t))blk {
+    if (_IMKSwift_onHandlingGivenNullableEvent != blk) {
+        [_IMKSwift_onHandlingGivenNullableEvent release];
+        _IMKSwift_onHandlingGivenNullableEvent = [blk copy];
+    }
+}
++ (void)IMKSwift_configureWithSettingObjCValue:(nullable void (^)(uintptr_t, intptr_t, uintptr_t, uintptr_t))blk {
+    if (_IMKSwift_onSettingObjCValue != blk) {
+        [_IMKSwift_onSettingObjCValue release];
+        _IMKSwift_onSettingObjCValue = [blk copy];
+    }
+}
 
 // MARK: - Lifecycle
 
 - (void)dealloc {
-    if (_onDealloc) _onDealloc((uintptr_t)self);
-    [_onDealloc release];
-    [_onActivatingServer release];
-    [_onDeactivatingServer release];
-    [_onShowingPreferences release];
-    [_onHidingPallettes release];
-    [_onInputControllerWillClose release];
-    [_onProvidingSelectionRange release];
-    [_onProvidingIMEMenu release];
-    [_onProvidingComposedString release];
-    [_onAutoCommittingComposition release];
-    [_onProvidingRecognizedEvents release];
-    [_onHandlingGivenNullableEvent release];
-    [_onSettingObjCValue release];
+    if (_IMKSwift_onDealloc) _IMKSwift_onDealloc((uintptr_t)self);
     [self IMKSwift_cancelDelayedDealloc];
     [super dealloc];
 }
@@ -177,8 +217,6 @@ static char kIMKSwiftGenerationKey;
 - (instancetype)initWithServer:(IMKServer *)server delegate:(nullable id)delegate client:(id)inputClient {
     self = [super initWithServer:server delegate:delegate client:inputClient];
     if (self) {
-        // Stamp this controller with a generation number for LRU tracking,
-        // then prune stale controllers from IMKServer._controllers.
         NSNumber *gen = [NSNumber numberWithUnsignedLongLong:++_IMKSwift_controllerGeneration];
         objc_setAssociatedObject(self, &kIMKSwiftGenerationKey, gen, OBJC_ASSOCIATION_RETAIN_NONATOMIC);
         [IMKInputSessionController IMKSwift_pruneStaleControllersOnServer:server excludingSelf:self];
@@ -198,80 +236,61 @@ static char kIMKSwiftGenerationKey;
     return self;
 }
 
-// MARK: - IMKInputController Overrides
+// MARK: - IMKInputController Overrides (dispatch via class-level static blocks)
 
 - (void)activateServer:(id)sender {
     [self IMKSwift_cancelDelayedDealloc];
-    // If blocks were released by a previous delayed-dealloc, re-inject the
-    // init hook so that the controller becomes fully functional again.
-    // IMKServer reuses controller instances from its internal _controllers
-    // dictionary across activate/deactivate cycles.
-    if (!_onActivatingServer) {
-        SEL hookSel = @selector(onSuperConstructionSucceeded:delegate:client:);
-        if ([self respondsToSelector:hookSel]) {
-            NSMethodSignature *sig = [self methodSignatureForSelector:hookSel];
-            NSInvocation *inv = [NSInvocation invocationWithMethodSignature:sig];
-            [inv setSelector:hookSel];
-            [inv setTarget:self];
-            id serverObj = self.server;
-            id delegateObj = self.delegate;
-            [inv setArgument:&serverObj atIndex:2];
-            [inv setArgument:&delegateObj atIndex:3];
-            [inv setArgument:&sender atIndex:4];
-            [inv invoke];
-        }
-    }
-    if (_onActivatingServer) _onActivatingServer((uintptr_t)sender, (uintptr_t)self);
+    if (_IMKSwift_onActivatingServer) _IMKSwift_onActivatingServer((uintptr_t)sender, (uintptr_t)self);
 }
 
 - (void)deactivateServer:(id)sender {
-    if (_onDeactivatingServer) _onDeactivatingServer((uintptr_t)sender, (uintptr_t)self);
+    if (_IMKSwift_onDeactivatingServer) _IMKSwift_onDeactivatingServer((uintptr_t)sender, (uintptr_t)self);
     [self IMKSwift_scheduleDelayedDeallocAfterDelay:3.0];
 }
 
 - (void)showPreferences:(nullable id)sender {
-    if (_onShowingPreferences) _onShowingPreferences((uintptr_t)sender, (uintptr_t)self);
+    if (_IMKSwift_onShowingPreferences) _IMKSwift_onShowingPreferences((uintptr_t)sender, (uintptr_t)self);
 }
 
 - (void)hidePalettes {
-    if (_onHidingPallettes) _onHidingPallettes((uintptr_t)self);
+    if (_IMKSwift_onHidingPallettes) _IMKSwift_onHidingPallettes((uintptr_t)self);
 }
 
 - (void)inputControllerWillClose {
-    if (_onInputControllerWillClose) _onInputControllerWillClose((uintptr_t)self);
+    if (_IMKSwift_onInputControllerWillClose) _IMKSwift_onInputControllerWillClose((uintptr_t)self);
 }
 
 - (NSRange)selectionRange {
-    if (_onProvidingSelectionRange) return _onProvidingSelectionRange((uintptr_t)self);
+    if (_IMKSwift_onProvidingSelectionRange) return _IMKSwift_onProvidingSelectionRange((uintptr_t)self);
     return NSMakeRange(NSNotFound, 0);
 }
 
 - (nullable NSMenu *)menu {
-    if (_onProvidingIMEMenu) return _onProvidingIMEMenu((uintptr_t)self);
+    if (_IMKSwift_onProvidingIMEMenu) return _IMKSwift_onProvidingIMEMenu((uintptr_t)self);
     return [[NSMenu new] autorelease];
 }
 
 - (nullable id)composedString:(id)sender {
-    if (_onProvidingComposedString) return _onProvidingComposedString((uintptr_t)sender, (uintptr_t)self);
+    if (_IMKSwift_onProvidingComposedString) return _IMKSwift_onProvidingComposedString((uintptr_t)sender, (uintptr_t)self);
     return nil;
 }
 
 - (void)commitComposition:(id)sender {
-    if (_onAutoCommittingComposition) _onAutoCommittingComposition((uintptr_t)sender, (uintptr_t)self);
+    if (_IMKSwift_onAutoCommittingComposition) _IMKSwift_onAutoCommittingComposition((uintptr_t)sender, (uintptr_t)self);
 }
 
 - (NSUInteger)recognizedEvents:(id)sender {
-    if (_onProvidingRecognizedEvents) return _onProvidingRecognizedEvents((uintptr_t)sender, (uintptr_t)self);
+    if (_IMKSwift_onProvidingRecognizedEvents) return _IMKSwift_onProvidingRecognizedEvents((uintptr_t)sender, (uintptr_t)self);
     return 0;
 }
 
 - (BOOL)handleEvent:(nullable NSEvent *)event client:(id)sender {
-    if (_onHandlingGivenNullableEvent) return _onHandlingGivenNullableEvent((uintptr_t)event, (uintptr_t)sender, (uintptr_t)self);
+    if (_IMKSwift_onHandlingGivenNullableEvent) return _IMKSwift_onHandlingGivenNullableEvent((uintptr_t)event, (uintptr_t)sender, (uintptr_t)self);
     return NO;
 }
 
 - (void)setValue:(nullable id)value forTag:(NSInteger)tag client:(id)sender {
-    if (_onSettingObjCValue) _onSettingObjCValue((uintptr_t)value, (intptr_t)tag, (uintptr_t)sender, (uintptr_t)self);
+    if (_IMKSwift_onSettingObjCValue) _IMKSwift_onSettingObjCValue((uintptr_t)value, (intptr_t)tag, (uintptr_t)sender, (uintptr_t)self);
 }
 
 // MARK: - Private: Deferred Dealloc
@@ -296,29 +315,10 @@ static char kIMKSwiftGenerationKey;
                                                object:nil];
 }
 
-/// Releases all block ivars and triggers the dealloc callback to unregister
-/// from the leak tracker and clean up the associated InputSession.
-///
-/// The Objective-C object itself cannot be force-deallocated — IMKServer's
-/// internal `_controllers` dictionary retains every controller indefinitely.
-/// However, by releasing the blocks we give back the memory they occupy, and
-/// `_onDealloc` ensures the Swift-side session and tracker entries are
-/// cleaned up.  The remaining ObjC shell (~dozen ivar pointers) is negligible.
+/// Triggers the dealloc callback to unregister from the session map.
+/// Block ivars are class-level static — no per-instance release needed.
 - (void)IMKSwift_delayedDealloc {
-    if (_onDealloc) _onDealloc((uintptr_t)self);
-    [_onDealloc release]; _onDealloc = nil;
-    [_onActivatingServer release]; _onActivatingServer = nil;
-    [_onDeactivatingServer release]; _onDeactivatingServer = nil;
-    [_onShowingPreferences release]; _onShowingPreferences = nil;
-    [_onHidingPallettes release]; _onHidingPallettes = nil;
-    [_onInputControllerWillClose release]; _onInputControllerWillClose = nil;
-    [_onProvidingSelectionRange release]; _onProvidingSelectionRange = nil;
-    [_onProvidingIMEMenu release]; _onProvidingIMEMenu = nil;
-    [_onProvidingComposedString release]; _onProvidingComposedString = nil;
-    [_onAutoCommittingComposition release]; _onAutoCommittingComposition = nil;
-    [_onProvidingRecognizedEvents release]; _onProvidingRecognizedEvents = nil;
-    [_onHandlingGivenNullableEvent release]; _onHandlingGivenNullableEvent = nil;
-    [_onSettingObjCValue release]; _onSettingObjCValue = nil;
+    if (_IMKSwift_onDealloc) _IMKSwift_onDealloc((uintptr_t)self);
 }
 
 @end

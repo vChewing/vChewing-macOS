@@ -902,49 +902,26 @@
 
 // MARK: Deferred Dealloc & IME Lifecycle Callbacks
 
-/// Block invoked from `-activateServer:` after cancelling any pending delayed
-/// dealloc.  Receives raw memory addresses (`uintptr_t`) of both the
-/// `IMKTextInput` client and `self` — no retain/release is performed.
-@property (nonatomic, copy, nullable) void (^onActivatingServer)(uintptr_t givenClientAddr, uintptr_t selfAddr);
+// MARK: Class-Level Block Configuration (call once at startup)
 
-/// Block invoked from `-deactivateServer:` before scheduling a delayed dealloc.
-/// Receives raw memory addresses (`uintptr_t`) of both the `IMKTextInput`
-/// client and `self` — no retain/release is performed.
-@property (nonatomic, copy, nullable) void (^onDeactivatingServer)(uintptr_t givenClientAddr, uintptr_t selfAddr);
+/// All `IMKInputController` overrides dispatch via **class-level static blocks**
+/// — set once from Swift at startup, shared by all controller instances.
+/// Each block receives raw `uintptr_t` memory addresses instead of object
+/// references — no retain/release is performed on the client or the controller.
 
-/// Block invoked from `-dealloc` before `[super dealloc]`.  Use for cleanup
-/// that must run even if the Swift subclass's `deinit` is skipped.
-@property (nonatomic, copy, nullable) void (^onDealloc)(uintptr_t selfAddr);
-
-/// Block invoked from `-showPreferences:`.
-@property (nonatomic, copy, nullable) void (^onShowingPreferences)(uintptr_t givenClientAddr, uintptr_t selfAddr);
-
-/// Block invoked from `-hidePalettes`.
-@property (nonatomic, copy, nullable) void (^onHidingPallettes)(uintptr_t selfAddr);
-
-/// Block invoked from `-inputControllerWillClose`.
-@property (nonatomic, copy, nullable) void (^onInputControllerWillClose)(uintptr_t selfAddr);
-
-/// Block invoked from `-selectionRange`.
-@property (nonatomic, copy, nullable) NSRange (^onProvidingSelectionRange)(uintptr_t selfAddr);
-
-/// Block invoked from `-menu`.
-@property (nonatomic, copy, nullable) NSMenu * _Nullable (^onProvidingIMEMenu)(uintptr_t selfAddr);
-
-/// Block invoked from `-composedString:`.
-@property (nonatomic, copy, nullable) id _Nullable (^onProvidingComposedString)(uintptr_t givenClientAddr, uintptr_t selfAddr);
-
-/// Block invoked from `-commitComposition:`.
-@property (nonatomic, copy, nullable) void (^onAutoCommittingComposition)(uintptr_t givenClientAddr, uintptr_t selfAddr);
-
-/// Block invoked from `-recognizedEvents:`.
-@property (nonatomic, copy, nullable) NSUInteger (^onProvidingRecognizedEvents)(uintptr_t givenClientAddr, uintptr_t selfAddr);
-
-/// Block invoked from `-handleEvent:client:`.  `nsEventPtr` may be 0 (nil event).
-@property (nonatomic, copy, nullable) BOOL (^onHandlingGivenNullableEvent)(uintptr_t nsEventPtr, uintptr_t givenClientAddr, uintptr_t selfAddr);
-
-/// Block invoked from `-setValue:forTag:client:`.  `valuePtr` may be 0 (nil value).
-@property (nonatomic, copy, nullable) void (^onSettingObjCValue)(uintptr_t valuePtr, intptr_t intTag, uintptr_t givenClientAddr, uintptr_t selfAddr);
++ (void)IMKSwift_configureWithActivatingServer:(nullable void (^)(uintptr_t givenClientAddr, uintptr_t selfAddr))block NS_SWIFT_NAME(configureActivatingServer(_:));
++ (void)IMKSwift_configureWithDeactivatingServer:(nullable void (^)(uintptr_t givenClientAddr, uintptr_t selfAddr))block NS_SWIFT_NAME(configureDeactivatingServer(_:));
++ (void)IMKSwift_configureWithDealloc:(nullable void (^)(uintptr_t selfAddr))block NS_SWIFT_NAME(configureDealloc(_:));
++ (void)IMKSwift_configureWithShowingPreferences:(nullable void (^)(uintptr_t givenClientAddr, uintptr_t selfAddr))block NS_SWIFT_NAME(configureShowingPreferences(_:));
++ (void)IMKSwift_configureWithHidingPallettes:(nullable void (^)(uintptr_t selfAddr))block NS_SWIFT_NAME(configureHidingPallettes(_:));
++ (void)IMKSwift_configureWithInputControllerWillClose:(nullable void (^)(uintptr_t selfAddr))block NS_SWIFT_NAME(configureInputControllerWillClose(_:));
++ (void)IMKSwift_configureWithProvidingSelectionRange:(nullable NSRange (^)(uintptr_t selfAddr))block NS_SWIFT_NAME(configureProvidingSelectionRange(_:));
++ (void)IMKSwift_configureWithProvidingIMEMenu:(nullable NSMenu * _Nullable (^)(uintptr_t selfAddr))block NS_SWIFT_NAME(configureProvidingIMEMenu(_:));
++ (void)IMKSwift_configureWithProvidingComposedString:(nullable id _Nullable (^)(uintptr_t givenClientAddr, uintptr_t selfAddr))block NS_SWIFT_NAME(configureProvidingComposedString(_:));
++ (void)IMKSwift_configureWithAutoCommittingComposition:(nullable void (^)(uintptr_t givenClientAddr, uintptr_t selfAddr))block NS_SWIFT_NAME(configureAutoCommittingComposition(_:));
++ (void)IMKSwift_configureWithProvidingRecognizedEvents:(nullable NSUInteger (^)(uintptr_t givenClientAddr, uintptr_t selfAddr))block NS_SWIFT_NAME(configureProvidingRecognizedEvents(_:));
++ (void)IMKSwift_configureWithHandlingGivenNullableEvent:(nullable BOOL (^)(uintptr_t nsEventPtr, uintptr_t givenClientAddr, uintptr_t selfAddr))block NS_SWIFT_NAME(configureHandlingGivenNullableEvent(_:));
++ (void)IMKSwift_configureWithSettingObjCValue:(nullable void (^)(uintptr_t valuePtr, intptr_t intTag, uintptr_t givenClientAddr, uintptr_t selfAddr))block NS_SWIFT_NAME(configureSettingObjCValue(_:));
 
 @end
 

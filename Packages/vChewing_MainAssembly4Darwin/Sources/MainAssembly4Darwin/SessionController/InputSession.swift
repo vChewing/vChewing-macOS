@@ -571,11 +571,5 @@ extension InputSession {
     clearInlineDisplay()
   }
 
-  /// 由 IMKInputSessionController.commitComposition 轉發呼叫，sender 為已解包的原始指標值。
-  public func commitCompositionByOS(_ sender: Any?) {
-    resetInputHandler()
-    clearInlineDisplay()
-  }
-
   public func candidates(_ sender: any IMKTextInput) -> [Any]? { nil }
 }
