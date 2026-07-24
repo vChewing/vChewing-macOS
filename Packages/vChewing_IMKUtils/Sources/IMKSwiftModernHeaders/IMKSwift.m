@@ -185,24 +185,6 @@ static char kIMKSwiftGenerationKey;
     }
     if (!oldest) return;
 
-    // Terminate the client wrapper associated with the stale controller
-    // so that IMK's global wrapper cache and the underlying XPC connection
-    // are released promptly. Otherwise the XPC connection outlives the
-    // controller and accumulates as a leak.
-    id clientProxy = [oldest client];
-    if (clientProxy) {
-        Class wrapperClass = NSClassFromString(@"IPMDServerClientWrapper");
-        if (wrapperClass) {
-            if ([wrapperClass respondsToSelector:@selector(terminateForClientXPCConn:)]) {
-                [wrapperClass terminateForClientXPCConn:clientProxy];
-            } else if ([wrapperClass respondsToSelector:@selector(terminateForClientDOProxy:)]) {
-                [wrapperClass terminateForClientDOProxy:clientProxy];
-            } else if ([wrapperClass respondsToSelector:@selector(terminateForClient:)]) {
-                [wrapperClass terminateForClient:clientProxy];
-            }
-        }
-    }
-
     // Find the dictionary key for the oldest controller and remove it.
     for (id key in [ctls allKeys]) {
         if ([ctls objectForKey:key] == oldest) {
@@ -315,10 +297,28 @@ static char kIMKSwiftGenerationKey;
                                                object:nil];
 }
 
-/// Triggers the dealloc callback to unregister from the session map.
-/// Block ivars are class-level static — no per-instance release needed.
+/// Triggers the dealloc callback, then terminates the client wrapper to release
+/// the underlying XPC connection.  Block ivars are class-level static — no
+/// per-instance release needed.
 - (void)IMKSwift_delayedDealloc {
     if (_IMKSwift_onDealloc) _IMKSwift_onDealloc((uintptr_t)self);
+    // Terminate the client wrapper so that IMK's global wrapper cache
+    // and the underlying XPC connection are released promptly.  The controller
+    // shell may persist in _controllers until the next prune cycle, but the
+    // heavy XPC resources (~440 bytes per connection) are freed now.
+    id clientProxy = [self client];
+    if (clientProxy) {
+        Class wrapperClass = NSClassFromString(@"IPMDServerClientWrapper");
+        if (wrapperClass) {
+            if ([wrapperClass respondsToSelector:@selector(terminateForClientXPCConn:)]) {
+                [wrapperClass terminateForClientXPCConn:clientProxy];
+            } else if ([wrapperClass respondsToSelector:@selector(terminateForClientDOProxy:)]) {
+                [wrapperClass terminateForClientDOProxy:clientProxy];
+            } else if ([wrapperClass respondsToSelector:@selector(terminateForClient:)]) {
+                [wrapperClass terminateForClient:clientProxy];
+            }
+        }
+    }
 }
 
 @end
