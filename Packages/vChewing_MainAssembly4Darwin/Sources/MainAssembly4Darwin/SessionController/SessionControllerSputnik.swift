@@ -31,14 +31,17 @@ public struct SessionControllerSputnik {
   public var core: InputSession? {
     let controllerAddr = addrPair.unwrapped?.controllerAddr
     guard let controllerAddr else { return nil }
-    if let workingValue = InputSession.session(for: controllerAddr) {
-      return workingValue
+    let parity = Int(IMKControllerLifetimeTracker.shared().generation(forAddress: controllerAddr) & 1)
+    let session = InputSession.session(forParity: parity)
+    // 若 session 尚未被任何 controller 佔用（preallocated 狀態），走完整初始化。
+    guard session.inputControllerAssignedAddr != nil else {
+      guard let opaque = UnsafeRawPointer(bitPattern: controllerAddr) else { return nil }
+      let controller = Unmanaged<IMKInputSessionController>.fromOpaque(opaque).takeUnretainedValue()
+      let newValue = Self.callCoreAtLeastOnce(controller, client: nil)
+      replaceCore(newValue)
+      return newValue
     }
-    guard let opaque = UnsafeRawPointer(bitPattern: controllerAddr) else { return nil }
-    let controller = Unmanaged<IMKInputSessionController>.fromOpaque(opaque).takeUnretainedValue()
-    let newValue = Self.callCoreAtLeastOnce(controller, client: nil) // <- 使用 `client()`。
-    replaceCore(newValue)
-    return newValue
+    return session
   }
 
   public static func injectPostConstructionHandler() {
@@ -236,10 +239,13 @@ extension SessionControllerSputnik {
     }
   }()
 
-  /// 由 controller 記憶體位址查詢對應的 InputSession。
+  /// 由 controller 記憶體位址查詢對應的 InputSession（以 parity routing 決定）。
+  /// Class-level blocks 統一走 parity 路徑，避免與 `sessionAddrByControllerAddr`
+  /// 產生 split-brain：同一枚 parity session 被新 controller reassign 後，
+  /// 舊 controller 的事件應仍路由至同一枚 session（而非因 address mapping 被清空而掉事件）。
   private static func session(forAddr ctlAddr: UInt) -> InputSession? {
-    guard let session = InputSession.session(for: ctlAddr) else { return nil }
-    return session
+    let parity = Int(IMKControllerLifetimeTracker.shared().generation(forAddress: ctlAddr) & 1)
+    return InputSession.session(forParity: parity)
   }
 
   /// 由 raw uintptr_t 位址解析 controller 與 client，傳回 (InputSession, IMKTextInput) 配對。
