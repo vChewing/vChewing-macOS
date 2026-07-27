@@ -22,7 +22,7 @@ extension IMKInputSessionController: IMKInputSessionControllerProtocol {}
 /// - Warning: Do not redefine this kind of protocols in Objective-C. Doing such
 /// will let you face issues of naming conflicts against certain ObjC methods.
 @objc
-public protocol IMKInputSessionControllerProtocol: AnyObject {
+public protocol IMKInputSessionControllerProtocol: AnyObject, NSObjectProtocol {
   // -- IMKStateSetting surface --
 
   func activateServer(_ sender: any IMKTextInput)

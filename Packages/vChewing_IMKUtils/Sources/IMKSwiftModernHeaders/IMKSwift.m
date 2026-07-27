@@ -329,6 +329,67 @@ static void (^_IMKSwift_onSettingObjCValue)(uintptr_t, intptr_t, uintptr_t, uint
     }
 }
 
+// MARK: - Client Proxy Methods (safe forwarding, no Swift ARC on IMKTextInput)
+///
+/// Each proxy resolves the client from `[self client]`.
+/// No-ops (or returns `nil`/`CGRectNull`) when `[self client]` is `NULL`.
+
+- (uintptr_t)clientAddress {
+    return (uintptr_t)[self client];
+}
+
+- (BOOL)hasClient {
+    return [self client] != nil;
+}
+
+- (void)clientTextInsertionWith:(NSString *)text replacementRange:(NSRange)range {
+    id client = [self client];
+    if (!client) return;
+    [client insertText:text replacementRange:range];
+}
+
+- (void)clientMarkedTextSetupWith:(NSAttributedString *)text selectionRange:(NSRange)selRange replacementRange:(NSRange)repRange {
+    id client = [self client];
+    if (!client) return;
+    [client setMarkedText:text selectionRange:selRange replacementRange:repRange];
+}
+
+- (nullable NSString *)clientBundleIdentifier {
+    id client = [self client];
+    if (!client) return nil;
+    return [client bundleIdentifier];
+}
+
+- (void)clientSelectModeWithModeIdentifier:(NSString *)mode {
+    id client = [self client];
+    if (!client) return;
+    [client selectInputMode:mode];
+}
+
+- (void)clientOverrideKeyboardWithName:(NSString *)name {
+    id client = [self client];
+    if (!client) return;
+    [client overrideKeyboardWithKeyboardNamed:name];
+}
+
+- (nullable NSDictionary *)clientAttributesForCharacterIndexAtU16Pos:(NSUInteger)idx lineHeightRectangle:(NSRect *)rect {
+    id client = [self client];
+    if (!client) return nil;
+    return [client attributesForCharacterIndex:idx lineHeightRectangle:rect];
+}
+
+- (CGRect)clientLineHeightRectForU16CursorPos:(NSUInteger)u16Cursor {
+    id client = [self client];
+    if (!client) return CGRectNull;
+    CGRect result = CGRectMake(0, 0, 0.114, 0.514);
+    NSInteger cursor = (NSInteger)u16Cursor;
+    while (result.origin.x == 0 && result.origin.y == 0 && cursor >= 0) {
+        [client attributesForCharacterIndex:(NSUInteger)cursor lineHeightRectangle:&result];
+        cursor--;
+    }
+    return result;
+}
+
 @end
 
 #pragma clang diagnostic pop

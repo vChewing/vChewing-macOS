@@ -927,6 +927,43 @@
 /// used by the parity-based double-buffered session pool.
 + (uint64_t)IMKSwift_currentGeneration NS_SWIFT_NAME(currentGeneration());
 
+// MARK: Client Proxy Methods — Safe IMKTextInput forwarding (no Swift ARC on client)
+
+/// These instance methods proxy `IMKTextInput` protocol calls through the
+/// ObjC (MRC) controller so that the `IMKTextInput` client object **never**
+/// crosses the ObjC→Swift language boundary.  Each method:
+/// - Resolves `[self client]` internally (pure ObjC MRC — no retain).
+/// - No-ops (or returns `nil`/`CGRectNull`) when `[self client]` is `NULL`.
+
+/// Returns the raw memory address of the current client, or `0` if none.
+- (uintptr_t)clientAddress;
+
+/// Returns `YES` if this controller currently has a connected client.
+- (BOOL)hasClient;
+
+/// Inserts text at the given replacement range. No-op if client is `NULL`.
+- (void)clientTextInsertionWith:(nonnull NSString *)text replacementRange:(NSRange)range;
+
+/// Sets marked text with selection and replacement ranges. No-op if client is `NULL`.
+- (void)clientMarkedTextSetupWith:(nonnull NSAttributedString *)text selectionRange:(NSRange)selRange replacementRange:(NSRange)repRange;
+
+/// Returns the bundle identifier of the client, or `nil`.
+- (nullable NSString *)clientBundleIdentifier;
+
+/// Selects an input mode. No-op if client is `NULL`.
+- (void)clientSelectModeWithModeIdentifier:(nonnull NSString *)mode;
+
+/// Overrides the keyboard layout. No-op if client is `NULL`.
+- (void)clientOverrideKeyboardWithName:(nonnull NSString *)name;
+
+/// Returns text attributes at a character index, or `nil` if client is `NULL`.
+/// `rect` is an in/out parameter for the line-height rectangle.
+- (nullable NSDictionary *)clientAttributesForCharacterIndexAtU16Pos:(NSUInteger)idx lineHeightRectangle:(nonnull NSRect *)rect;
+
+/// Returns the line-height rectangle for the given cursor position.
+/// Returns `CGRectNull` if client is `NULL`.
+- (CGRect)clientLineHeightRectForU16CursorPos:(NSUInteger)u16Cursor;
+
 @end
 
 #pragma clang attribute pop
