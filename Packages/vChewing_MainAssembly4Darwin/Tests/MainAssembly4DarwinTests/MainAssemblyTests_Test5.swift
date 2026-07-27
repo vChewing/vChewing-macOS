@@ -32,7 +32,7 @@ extension MainAssemblyTests {
     // 模擬 CapsLock 切換回來：呼叫 performServerActivation。
     // 由於 isActivated == true、Self.current?.id == id、inputHandler != nil，
     // 應命中快速路徑，不會呼叫 initInputHandler()。
-    testSession.performServerActivation(client: testClient)
+    testSession.performServerActivation()
 
     // 驗證 inputHandler 未被重新建構。
     let handlerAfter = testSession.inputHandler
@@ -92,7 +92,7 @@ extension MainAssemblyTests {
     // 模擬 20 次快速切換（每次 deactivate + activate）。
     for _ in 0 ..< 20 {
       testSession.performServerDeactivation() // no-op（current session）
-      testSession.performServerActivation(client: testClient) // 快速路徑
+      testSession.performServerActivation() // 快速路徑
     }
 
     let identityAfter = ObjectIdentifier(testSession.inputHandler!)

@@ -18,15 +18,11 @@ extension SessionProtocol {
   ///   - sender: 呼叫了該函式的客體（無須使用）。
   /// - Returns: 回「`true`」以將該按鍵已攔截處理的訊息傳遞給 IMK；回「`false`」則放行、不作處理。
   public func handleNSEvent(
-    _ event: NSEvent?,
-    client sender: Any?
+    _ event: NSEvent?
   )
     -> Bool {
-    _ = sender // 防止格式整理工具毀掉與此對應的參數。
-
     // 就這傳入的 NSEvent 都還有可能是 nil，Apple InputMethodKit 團隊到底在搞三小。
-    // 只針對特定類型的 client() 進行處理。
-    guard let event = event, sender is ClientObj else {
+    guard let event else {
       resetInputHandler(forceComposerCleanup: true)
       return false
     }
@@ -131,7 +127,12 @@ extension SessionProtocol {
     if event.isFlagChanged { return true }
 
     /// 沒有文字輸入客體的話，就不要再往下處理了。
-    guard let inputHandler = inputHandler, client() != nil else { return false }
+    guard let inputHandler = inputHandler, clientProxy?.hasClient() == true else {
+      vCLog(
+        "[Event] guard fail: hasHandler=\(inputHandler != nil) hasClient=\(clientProxy?.hasClient() ?? false) proxyNil=\(clientProxy == nil)"
+      )
+      return false
+    }
 
     /// 除非核心辭典有載入，否則一律蜂鳴。
     if !LMMgr.isCoreDBConnected {

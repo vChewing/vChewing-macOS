@@ -129,8 +129,8 @@ extension SessionProtocol {
     guard !nullResponse else { return nil }
     guard !NSApp.isAccentColorCustomized else { return nil }
     if #unavailable(macOS 10.14) { return nil }
-    // 此處因為沒有對 client() 的強引用，所以不會耽誤很多時間。
-    return NSRunningApplication.findAccentColor(with: client()?.bundleIdentifier())
+    // 使用現成的 clientBundleIdentifier（已在 performServerActivation 期間記載）。
+    return NSRunningApplication.findAccentColor(with: clientBundleIdentifier)
   }
 
   public var shouldAutoExpandCandidates: Bool {

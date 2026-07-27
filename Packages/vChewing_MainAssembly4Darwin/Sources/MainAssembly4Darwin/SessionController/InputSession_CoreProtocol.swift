@@ -16,7 +16,7 @@
 /// 檢查委任物件是否實現了方法：若存在的話，就調用委任物件內的版本。
 /// - Remark: 在輸入法的主函式中分配的 IMKServer 型別為客體應用程式創建的每個
 /// 輸入會話創建一個控制器型別。因此，對於每個輸入會話，都有一個對應的 IMKInputController。
-public protocol SessionProtocol: AnyObject, IMKInputSessionControllerProtocol, CtlCandidateDelegate,
+public protocol SessionProtocol: AnyObject, CtlCandidateDelegate,
   SessionCoreProtocol {
   static var current: Self? { get set }
   /// 當前副本的客體是否是輸入法本體？
@@ -25,7 +25,7 @@ public protocol SessionProtocol: AnyObject, IMKInputSessionControllerProtocol, C
   /// 由於每次動態獲取都會耗時，所以這裡直接靜態記載之。
   var clientBundleIdentifier: String { get set }
   /// 最近的 Client 的 ObjectID，以記憶體位址來辨識。
-  var clientObjectIdentifier: ObjectIdentifier? { get set }
+  var clientProxyObjectIdentifier: ObjectIdentifier? { get set }
   /// 當前客體應用是否採用 Web 技術構築（例：Electron）。
   var isClientElectronBased: Bool { get set }
   /// 共用的 NSAlert 副本、用於在輸入法切換失敗時提示使用者修改系統偏好設定。
@@ -59,12 +59,16 @@ public protocol SessionProtocol: AnyObject, IMKInputSessionControllerProtocol, C
   var buzzer: (() -> ())? { get set }
   /// 上次實際套用至 client 的鍵盤佈局名稱，用以跳過重複的 overrideKeyboard() 呼叫。
   var lastAppliedKeyboardLayout: String? { get set }
+  /// 取得當前 controller，用於透過 ObjC proxy 安全存取 IMKClientProxyProtocol（避免 Swift ARC 干擾）。
+  var clientProxy: IMKClientProxyProtocol? { get }
 
   func initInputHandler()
+  func hidePalettes()
+  func replacementRange() -> NSRange
 }
 
 nonisolated extension SessionProtocol {
-  public typealias ClientObj = IMKTextInput & NSObjectProtocol
+  public typealias ClientObj = IMKClientProxyProtocol
 }
 
 extension SessionProtocol {
@@ -127,7 +131,6 @@ extension SessionProtocol {
   /// 專門用來就地切換繁簡模式的函式。
   /// This method is non-ObjC, requiring an ObjC wrapper.
   public func toggleInputMode() {
-    guard let client: IMKTextInput = client() else { return }
     defer { isASCIIMode = false }
     let nowMode = IMEApp.currentInputMode
     guard nowMode != .imeModeNULL else { return }
@@ -153,30 +156,30 @@ extension SessionProtocol {
         message: nowMode.reversed.localizedDescription + "\n" + status
       )
     }
-    client.selectMode(nowMode.reversed.rawValue)
+    clientProxy?.clientSelectMode(withModeIdentifier: nowMode.reversed.rawValue)
   }
 
   /// 所有建構子都會執行的共用部分，在 super.init() 之後執行。
-  public func construct(client theClient: IMKTextInput? = nil) {
+  public func construct(clientProxy theClientProxy: IMKClientProxyProtocol? = nil) {
     // AsyncOnMain 自身的 Lambda Expression 可能與 Swift 6.2 的 Concurrency 相性不太好。
     // 於是這裡單獨判斷。
     if UserDefaults.pendingUnitTests {
-      constructSansAsync(client: theClient)
+      constructSansAsync(clientProxy: theClientProxy)
     } else {
       asyncOnMain { [weak self] in
-        self?.constructSansAsync(client: theClient)
+        self?.constructSansAsync(clientProxy: theClientProxy)
       }
     }
   }
 
-  public func constructSansAsync(client theClient: IMKTextInput? = nil) {
+  public func constructSansAsync(clientProxy theClientProxy: IMKClientProxyProtocol? = nil) {
     // Self.current?.hidePalettes() <- 該操作由 activateServer() 全權負責。
     Self.current = self
     initInputHandler()
     synchronizer4LMPrefs?()
     // 下述兩行很有必要，否則輸入法會在手動重啟之後無法立刻生效。
-    if let resolvedClient = theClient ?? client() {
-      activateServer(resolvedClient)
+    if (theClientProxy ?? clientProxy) != nil {
+      performServerActivation()
     }
     // GCD 會觸發 didSet，所以不用擔心。
     inputMode = .init(rawValue: prefs.mostRecentInputMode) ?? .imeModeNULL
@@ -186,18 +189,15 @@ extension SessionProtocol {
   public func updateVerticalTypingStatus() -> CGRect {
     // `textFrame` 的尺寸不能是 0，否則 `attributes()` 在某些客體上的不良實作可能會炸掉客體。
     // 所以需要使用 `CGRect.seniorTheBeast` 作為基底資料值。
-    guard let client = client() else {
-      isVerticalTyping = false
-      return .seniorTheBeast
+    if let clientProxy {
+      var textFrame = CGRect.seniorTheBeast
+      let attributes = clientProxy.clientAttributesForCharacterIndex(atU16Pos: 0, lineHeightRectangle: &textFrame)
+      let imkTO = (attributes?[IMKTextOrientationName] as? NSNumber)?.intValue
+      isVerticalTyping = imkTO == 0
+      return textFrame
     }
-    var textFrame = CGRect.seniorTheBeast
-    let attributes: [AnyHashable: Any]? = client.attributes(
-      forCharacterIndex: 0,
-      lineHeightRectangle: &textFrame
-    )
-    let imkTO = (attributes?[IMKTextOrientationName] as? NSNumber)?.intValue
-    isVerticalTyping = imkTO == 0
-    return textFrame
+    isVerticalTyping = false
+    return .seniorTheBeast
   }
 
   /// 強制重設當前鍵盤佈局、使其與偏好設定同步。
@@ -211,8 +211,9 @@ extension SessionProtocol {
     lastAppliedKeyboardLayout = targetLayout
     asyncOnMain(bypassAsync: UserDefaults.pendingUnitTests) { [weak self] in
       guard let this = self else { return }
-      guard let client = this.client(), !this.isServingIMEItself else { return }
-      client.overrideKeyboard(withKeyboardNamed: targetLayout)
+      if let clientProxy = this.clientProxy, !this.isServingIMEItself {
+        clientProxy.clientOverrideKeyboard(withName: targetLayout)
+      }
     }
   }
 
@@ -230,25 +231,21 @@ extension SessionProtocol {
     // 選字窗不用管，交給新的 Session 的 ActivateServer 來管理。
   }
 
-  public func isStillTheSameClientObj(_ client: NSObject?) -> Bool {
-    guard let client else { return false }
-    return clientObjectIdentifier == .init(client)
+  public func isStillTheSameClientProxyObj(_ clientProxy: NSObject?) -> Bool {
+    guard let clientProxy else { return false }
+    return clientProxyObjectIdentifier == .init(clientProxy)
   }
 
-  public func updateClientObjectIdentifier(_ client: ClientObj?) {
-    guard let client else { return }
-    clientObjectIdentifier = .init(client)
+  public func updateClientProxyObjectIdentifier(_ clientProxy: ClientObj?) {
+    guard let clientProxy else { return }
+    clientProxyObjectIdentifier = .init(clientProxy)
   }
 
-  public func performServerActivation(client: ClientObj?) {
+  public func performServerActivation() {
     // MARK: 快速路徑 — 最佳化 CapsLock 中英頻繁切換的場景。
 
-    // 當目前的副本已處於活動狀態、仍為當前副本、且輸入調度模組仍存在時，
-    // 僅執行輕量更新即可，省去 initInputHandler()、asyncOnMain 任務排程等高成本操作。
-    // 原理：performServerDeactivation() 對當前副本是 no-op（因 guard 提前返回），
-    // 故 isActivated 仍為 true、inputHandler 仍然存在，無需重新初期化。
     if isActivated, Self.current?.id == id, inputHandler != nil,
-       let client, isStillTheSameClientObj(client as? NSObject) {
+       let proxy = clientProxy, isStillTheSameClientProxyObj(proxy as? NSObject) {
       syncCurrentSessionID()
       let resolvedInputMode = IMEApp.currentInputMode
       if inputMode != resolvedInputMode {
@@ -259,13 +256,14 @@ extension SessionProtocol {
       return
     }
 
-    // MARK: 完整路徑 — 首次啟用或由其他副本接管後的重新啟用。
+    // MARK: 完整路徑
 
     hidePalettes()
     syncCurrentSessionID()
     Self.current = self
     let this = self
-    if let senderBundleID: String = client?.bundleIdentifier() {
+    let senderBundleID: String? = clientProxy?.clientBundleIdentifier()
+    if let senderBundleID {
       vCLog("activateServer(\(senderBundleID))")
       this.isServingIMEItself = Bundle.main.bundleIdentifier == senderBundleID
       this.clientBundleIdentifier = senderBundleID
@@ -287,7 +285,7 @@ extension SessionProtocol {
             .isElectronBasedApp(identifier: senderBundleID)
       }
     }
-    this.updateClientObjectIdentifier(client)
+    this.updateClientProxyObjectIdentifier(clientProxy)
     // 自動啟用肛塞（廉恥模式），除非這一天是愚人節。
     // Date.isTodayTheDate 會建立 DateFormatter，延遲處理以避免阻塞。
     asyncOnMain(bypassAsync: UserDefaults.pendingUnitTests) { [weak self] in

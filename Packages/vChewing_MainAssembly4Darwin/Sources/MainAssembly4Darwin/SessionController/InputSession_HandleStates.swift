@@ -102,10 +102,9 @@ extension SessionProtocol {
     }
 
     func doCommit(_ theBuffer: String) {
-      guard let client = client() else { return }
-      client.insertText(
-        theBuffer, replacementRange: replacementRange()
-      )
+      if let ctl = clientProxy {
+        ctl.clientTextInsertion(with: theBuffer, replacementRange: replacementRange())
+      }
     }
 
     asyncOnMain(bypassAsync: !isServingIMEItself || UserDefaults.pendingUnitTests) {
@@ -151,12 +150,14 @@ extension SessionProtocol {
     var async = allowAsync && !UserDefaults.pendingUnitTests
     async = async && (isServingIMEItself || !isActivated)
     asyncOnMain(bypassAsync: !async) { [weak self] in
-      guard let this = self, let client = this.client() else { return }
-      client.setMarkedText(
-        newString,
-        selectionRange: range,
-        replacementRange: this.replacementRange()
-      )
+      guard let this = self else { return }
+      if let clientProxy = this.clientProxy {
+        clientProxy.clientMarkedTextSetup(
+          with: newString,
+          selectionRange: range,
+          replacementRange: this.replacementRange()
+        )
+      }
     }
   }
 }

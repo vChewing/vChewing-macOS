@@ -8,6 +8,8 @@
 
 import IMKSwift
 
+// MARK: - FakeClient
+
 nonisolated final class FakeClient: NSObject, IMKTextInput {
   var attributedString: NSMutableAttributedString = .init(string: "")
   var selectedRangeStored: NSRange = .notFound
@@ -130,5 +132,69 @@ nonisolated final class FakeClient: NSObject, IMKTextInput {
 
   func firstRect(forCharacterRange _: NSRange, actualRange _: NSRangePointer!) -> CGRect {
     .zero
+  }
+}
+
+// MARK: IMKClientProxyProtocol
+
+extension FakeClient: IMKClientProxyProtocol {
+  func clientAddress() -> UInt {
+    UInt(bitPattern: Unmanaged.passUnretained(self).toOpaque())
+  }
+
+  func hasClient() -> Bool {
+    true
+  }
+
+  func clientTextInsertion(with text: String, replacementRange: NSRange) {
+    insertText(text, replacementRange: replacementRange)
+  }
+
+  func clientMarkedTextSetup(
+    with text: NSAttributedString,
+    selectionRange: NSRange,
+    replacementRange: NSRange
+  ) {
+    setMarkedText(text, selectionRange: selectionRange, replacementRange: replacementRange)
+  }
+
+  func clientBundleIdentifier() -> String? {
+    bundleIdentifier()
+  }
+
+  func clientSelectMode(withModeIdentifier modeIdentifier: String) {
+    selectMode(modeIdentifier)
+  }
+
+  func clientOverrideKeyboard(withName keyboardName: String) {
+    overrideKeyboard(withKeyboardNamed: keyboardName)
+  }
+
+  func clientAttributesForCharacterIndex(
+    atU16Pos charIdx: UInt,
+    lineHeightRectangle: UnsafeMutablePointer<NSRect>
+  )
+    -> [AnyHashable: Any]? {
+    attributes(forCharacterIndex: Int(charIdx), lineHeightRectangle: lineHeightRectangle)
+  }
+
+  func clientLineHeightRect(forU16CursorPos cursorPos: UInt) -> CGRect {
+    lineHeightRect(u16Cursor: Int(cursorPos))
+  }
+}
+
+extension IMKTextInput {
+  public func lineHeightRect(u16Cursor: Int) -> CGRect {
+    // `lineHeightRect` 的尺寸不能是 0，否則 `attributes()` 在某些客體上的不良實作可能會炸掉客體。
+    var lineHeightRect = CGRect.seniorTheBeast
+    var u16Cursor = u16Cursor
+    // iMessage 的話，據此算出來的 lineHeightRect 結果的橫向座標起始點不準確。目前無解。
+    while lineHeightRect.origin == .zero, u16Cursor >= 0 {
+      _ = attributes(
+        forCharacterIndex: u16Cursor, lineHeightRectangle: &lineHeightRect
+      )
+      u16Cursor -= 1
+    }
+    return lineHeightRect
   }
 }

@@ -16,7 +16,7 @@ extension SessionProtocol {
   // 這樣，不但強制使用（限制讀音 20 個的）浮動組字窗，而且內文組字區只會顯示一個空格。
   public var attributedStringSecured: (value: NSAttributedString, range: NSRange) {
     // 這個針對 Discord 的 特殊相容策略對 Discord 網頁端無效。
-    let isDiscordClient = client()?.bundleIdentifier()?.hasSuffix(".Discord") ?? false
+    let isDiscordClient = clientBundleIdentifier.hasSuffix(".Discord")
     let securedPlaceholder = isDiscordClient
       ? IMEStateParsed4Darwin(state).getAttributedStringPlaceholder("_")
       : IMEStateParsed4Darwin(state).attributedStringPlaceholder
@@ -34,8 +34,10 @@ extension SessionProtocol {
   }
 
   public func lineHeightRect(zeroCursor: Bool = false) -> CGRect {
-    guard let client = client() else { return .seniorTheBeast }
-    return client.lineHeightRect(u16Cursor: zeroCursor ? 0 : u16Cursor)
+    if let ctl = clientProxy {
+      return ctl.clientLineHeightRect(forU16CursorPos: zeroCursor ? 0 : UInt(u16Cursor))
+    }
+    return .seniorTheBeast
   }
 
   public func toggleCandidateUIVisibility(_ newValue: Bool, refresh: Bool) {
@@ -55,7 +57,7 @@ extension SessionProtocol {
       ui?.tooltipUI?.hide()
       return
     }
-    guard client() != nil else { return }
+    guard clientProxy?.hasClient() == true else { return }
     let lineHeightRect = updateVerticalTypingStatus()
     var finalOrigin: CGPoint = lineHeightRect.origin
     let delta: Double = lineHeightRect.size.height + 4.0 // bottomOutOfScreenAdjustmentHeight
@@ -79,7 +81,7 @@ extension SessionProtocol {
   }
 
   private func showCandidates() {
-    guard isCurrentSession, client() != nil else { return }
+    guard isCurrentSession, clientProxy?.hasClient() == true else { return }
     updateVerticalTypingStatus()
 
     let alreadyVisible = ui?.candidateUI?.visible ?? false

@@ -55,13 +55,7 @@ final class MainAssemblyTests {
         .connectToTestFactoryDictionary(textMapData: LMATestsData.textMapTestCoreLMData)
     }
     Self._testHandler = nil
-    let session = InputSession(
-      controller: nil,
-      clientAddr: {
-        let clientAddr = UInt(bitPattern: Unmanaged.passUnretained(testClient).toOpaque())
-        return ClientControllerAddrPair(clientAddr: clientAddr, controllerAddr: 0)
-      }
-    )
+    let session = InputSession(preallocated: (), manuallyAssignedClientProxy: testClient)
     Self._testSession = session
 
     // Manually perform essential initialization steps from performServerActivation
@@ -334,7 +328,7 @@ final class MainAssemblyTests {
       return finalArray
     }.flatMap { $0 }
     typingSequence.forEach { theEvent in
-      let dismissed = !testSession.handleNSEvent(theEvent, client: testClient)
+      let dismissed = !testSession.handleNSEvent(theEvent)
       if theEvent.type == .keyDown { #expect(!dismissed) }
     }
   }
@@ -347,7 +341,7 @@ final class MainAssemblyTests {
     -> Bool {
     var handled = false
     data.asPairedEvents.forEach { event in
-      let result = testSession.handleNSEvent(event, client: testClient)
+      let result = testSession.handleNSEvent(event)
       if event.type == .keyDown {
         if shouldHandle {
           #expect(result, "Expected keyDown to be handled for keyCode \(data.keyCode).")
@@ -365,7 +359,7 @@ final class MainAssemblyTests {
     shouldHandle: Bool = true
   ) {
     events.forEach { event in
-      let result = testSession.handleNSEvent(event, client: testClient)
+      let result = testSession.handleNSEvent(event)
       if event.type == .keyDown {
         if shouldHandle {
           #expect(result, "Expected keyDown to be handled for keyCode \(event.keyCode).")
