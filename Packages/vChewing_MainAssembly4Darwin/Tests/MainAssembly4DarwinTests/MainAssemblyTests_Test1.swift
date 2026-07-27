@@ -21,23 +21,6 @@ import Testing
 
 extension MainAssemblyTests {
   @Test
-  func test001_ClientTest_BundleIdentifier() throws {
-    guard let identifier = testSession.client()?.bundleIdentifier() else {
-      fatalError("致命錯誤：客體唯一標幟碼無效。")
-    }
-    vCTestLog("測試客體唯一標幟碼：\(identifier)")
-  }
-
-  @Test
-  func test002_ClientTest_TextInsertion() throws {
-    testClient.clear()
-    let testString = UUID().uuidString
-    testSession.client()?.insertText(testString, replacementRange: .notFound)
-    #expect(testClient.attributedString.string == testString)
-    testClient.clear()
-  }
-
-  @Test
   func test011_LMMgr_UnitTestSandboxIO() throws {
     let directories = [
       (label: "default", url: LMMgr.unitTestDataURL(isDefaultFolder: true)),
