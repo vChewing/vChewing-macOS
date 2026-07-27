@@ -6,38 +6,28 @@
 // marks, or product names of Contributor, except as required to fulfill notice
 // requirements defined in MIT License.
 
-// MARK: - ClientControllerAddrPair
+// MARK: - ControllerAddrSentinel
 
-public struct ClientControllerAddrPair: Sendable {
+/// 對 controller 記憶體位址做生命週期核驗的輕量包裝。
+/// 僅在 controller 存活時允許解讀其位址。
+public struct ControllerAddrSentinel: Sendable {
   // MARK: Lifecycle
 
-  init(clientAddr: UInt, controllerAddr: UInt) {
-    self._clientAddr = clientAddr
-    self._controllerAddr = controllerAddr
-  }
-
-  init(_ pair: TupleExpr) {
-    self._clientAddr = pair.clientAddr
-    self._controllerAddr = pair.controllerAddr
+  init(addr: UInt) {
+    self.addr = addr
   }
 
   // MARK: Internal
 
-  typealias TupleExpr = (clientAddr: UInt, controllerAddr: UInt)
+  let addr: UInt
 
-  let _clientAddr: UInt
-  let _controllerAddr: UInt
-
-  var unwrapped: TupleExpr? {
+  var unwrapped: UInt? {
     if UserDefaults.pendingUnitTests {
-      guard _controllerAddr == 0 else { return nil }
+      guard addr == 0 else { return nil }
     } else {
-      // Client 在 Controller 建構完畢之後才可用，
-      // 但 Controller 被析構之後 Client Addr 必定是 dangling pointer。
-      // 所以在此複查 Controller 的生命週期。
-      guard IMKControllerLifetimeTracker.shared().isAddressAlive(_controllerAddr) else { return nil }
+      guard IMKControllerLifetimeTracker.shared().isAddressAlive(addr) else { return nil }
     }
-    return (_clientAddr, _controllerAddr)
+    return addr
   }
 }
 
@@ -59,7 +49,7 @@ public final class InputSession: @MainActor SessionProtocol, Sendable {
   }
 
   /// 預配置 session（極性雙緩衝用）：不繫結任何 controller/client，僅初始化內部引擎。
-  /// 後續經由 `reassign(to:clientAddrProvider:)` 與具體 controller 綁定。
+  /// 後續經由 `reassign(to:)` 與具體 controller 綁定。
   public init(preallocated: (), manuallyAssignedClientProxy: IMKClientProxyProtocol? = nil) {
     if let manuallyAssignedClientProxy {
       let controllerAddr = UInt(bitPattern: Unmanaged.passUnretained(manuallyAssignedClientProxy).toOpaque())
@@ -269,9 +259,8 @@ public final class InputSession: @MainActor SessionProtocol, Sendable {
 
   /// 從 controller 位址查詢對應的 InputSession。
   static func session(for controllerAddr: UInt) -> InputSession? {
-    let testPair = ClientControllerAddrPair(clientAddr: 0, controllerAddr: controllerAddr)
-    guard let ctlKey = testPair.unwrapped?.controllerAddr else { return nil }
-    guard let ssnAddr = sessionAddrByControllerAddr.withLockRead({ $0[ctlKey] }),
+    guard let sentinel = ControllerAddrSentinel(addr: controllerAddr).unwrapped else { return nil }
+    guard let ssnAddr = sessionAddrByControllerAddr.withLockRead({ $0[sentinel] }),
           let opaque = UnsafeRawPointer(bitPattern: ssnAddr)
     else { return nil }
     return Unmanaged<InputSession>.fromOpaque(opaque).takeUnretainedValue()
@@ -305,10 +294,7 @@ public final class InputSession: @MainActor SessionProtocol, Sendable {
 
   /// 重新綁定至新的 IMKInputSessionController。
   /// 更新 controller→session 對照表並清理舊 controller 的殘留 mapping。
-  func reassign(
-    to controller: IMKInputSessionController,
-    clientAddrProvider: @escaping () -> ClientControllerAddrPair?
-  ) {
+  func reassign(to controller: IMKInputSessionController) {
     let oldAddr = inputControllerAssignedAddr
     let newAddr = UInt(bitPattern: Unmanaged.passUnretained(controller).toOpaque())
     inputControllerAssignedAddr = newAddr

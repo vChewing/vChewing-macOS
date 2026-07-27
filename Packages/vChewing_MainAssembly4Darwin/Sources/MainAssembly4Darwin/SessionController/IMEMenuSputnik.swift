@@ -19,16 +19,15 @@ struct IMEMenuSputnik {
 
   init?(controllerAddr: UInt?) {
     guard let controllerAddr else { return nil }
-    // ClientAddr 在此處無意義，因為無須使用。
-    self.addrPair = ClientControllerAddrPair(clientAddr: 0, controllerAddr: controllerAddr)
+    self.controllerSentinel = ControllerAddrSentinel(addr: controllerAddr)
   }
 
   // MARK: Private
 
-  private let addrPair: ClientControllerAddrPair
+  private let controllerSentinel: ControllerAddrSentinel
 
   private var core: InputSession? {
-    guard let controllerAddr = addrPair.unwrapped?.controllerAddr else { return nil }
+    guard let controllerAddr = controllerSentinel.unwrapped else { return nil }
     let parity = Int(IMKControllerLifetimeTracker.shared().generation(forAddress: controllerAddr) & 1)
     let session = InputSession.session(forParity: parity)
     guard session.inputControllerAssignedAddr != nil else { return nil }

@@ -38,31 +38,31 @@ NS_ASSUME_NONNULL_BEGIN
 
 // MARK: - Class-level Static Blocks (shared by all controller instances)
 
-static void (^_IMKSwift_onActivatingServer)(uintptr_t, uintptr_t);
-static void (^_IMKSwift_onDeactivatingServer)(uintptr_t, uintptr_t);
+static void (^_IMKSwift_onActivatingServer)(uintptr_t);
+static void (^_IMKSwift_onDeactivatingServer)(uintptr_t);
 static void (^_IMKSwift_onDealloc)(uintptr_t);
-static void (^_IMKSwift_onShowingPreferences)(uintptr_t, uintptr_t);
+static void (^_IMKSwift_onShowingPreferences)(uintptr_t);
 static void (^_IMKSwift_onHidingPallettes)(uintptr_t);
 static void (^_IMKSwift_onInputControllerWillClose)(uintptr_t);
 static NSRange (^_IMKSwift_onProvidingSelectionRange)(uintptr_t);
 static NSMenu * _Nullable (^_IMKSwift_onProvidingIMEMenu)(uintptr_t);
-static id _Nullable (^_IMKSwift_onProvidingComposedString)(uintptr_t, uintptr_t);
-static void (^_IMKSwift_onAutoCommittingComposition)(uintptr_t, uintptr_t);
-static NSUInteger (^_IMKSwift_onProvidingRecognizedEvents)(uintptr_t, uintptr_t);
-static BOOL (^_IMKSwift_onHandlingGivenNullableEvent)(uintptr_t, uintptr_t, uintptr_t);
-static void (^_IMKSwift_onSettingObjCValue)(uintptr_t, intptr_t, uintptr_t, uintptr_t);
+static id _Nullable (^_IMKSwift_onProvidingComposedString)(uintptr_t);
+static void (^_IMKSwift_onAutoCommittingComposition)(uintptr_t);
+static NSUInteger (^_IMKSwift_onProvidingRecognizedEvents)(uintptr_t);
+static BOOL (^_IMKSwift_onHandlingGivenNullableEvent)(uintptr_t, uintptr_t);
+static void (^_IMKSwift_onSettingObjCValue)(uintptr_t, intptr_t, uintptr_t);
 
 @implementation IMKInputSessionController
 
 // MARK: - Class Method: One-time Block Configuration (called from Swift at startup)
 
-+ (void)IMKSwift_configureWithActivatingServer:(nullable void (^)(uintptr_t, uintptr_t))blk {
++ (void)IMKSwift_configureWithActivatingServer:(nullable void (^)(uintptr_t))blk {
     if (_IMKSwift_onActivatingServer != blk) {
         [_IMKSwift_onActivatingServer release];
         _IMKSwift_onActivatingServer = [blk copy];
     }
 }
-+ (void)IMKSwift_configureWithDeactivatingServer:(nullable void (^)(uintptr_t, uintptr_t))blk {
++ (void)IMKSwift_configureWithDeactivatingServer:(nullable void (^)(uintptr_t))blk {
     if (_IMKSwift_onDeactivatingServer != blk) {
         [_IMKSwift_onDeactivatingServer release];
         _IMKSwift_onDeactivatingServer = [blk copy];
@@ -74,7 +74,7 @@ static void (^_IMKSwift_onSettingObjCValue)(uintptr_t, intptr_t, uintptr_t, uint
         _IMKSwift_onDealloc = [blk copy];
     }
 }
-+ (void)IMKSwift_configureWithShowingPreferences:(nullable void (^)(uintptr_t, uintptr_t))blk {
++ (void)IMKSwift_configureWithShowingPreferences:(nullable void (^)(uintptr_t))blk {
     if (_IMKSwift_onShowingPreferences != blk) {
         [_IMKSwift_onShowingPreferences release];
         _IMKSwift_onShowingPreferences = [blk copy];
@@ -104,31 +104,31 @@ static void (^_IMKSwift_onSettingObjCValue)(uintptr_t, intptr_t, uintptr_t, uint
         _IMKSwift_onProvidingIMEMenu = [blk copy];
     }
 }
-+ (void)IMKSwift_configureWithProvidingComposedString:(nullable id _Nullable (^)(uintptr_t, uintptr_t))blk {
++ (void)IMKSwift_configureWithProvidingComposedString:(nullable id _Nullable (^)(uintptr_t))blk {
     if (_IMKSwift_onProvidingComposedString != blk) {
         [_IMKSwift_onProvidingComposedString release];
         _IMKSwift_onProvidingComposedString = [blk copy];
     }
 }
-+ (void)IMKSwift_configureWithAutoCommittingComposition:(nullable void (^)(uintptr_t, uintptr_t))blk {
++ (void)IMKSwift_configureWithAutoCommittingComposition:(nullable void (^)(uintptr_t))blk {
     if (_IMKSwift_onAutoCommittingComposition != blk) {
         [_IMKSwift_onAutoCommittingComposition release];
         _IMKSwift_onAutoCommittingComposition = [blk copy];
     }
 }
-+ (void)IMKSwift_configureWithProvidingRecognizedEvents:(nullable NSUInteger (^)(uintptr_t, uintptr_t))blk {
++ (void)IMKSwift_configureWithProvidingRecognizedEvents:(nullable NSUInteger (^)(uintptr_t))blk {
     if (_IMKSwift_onProvidingRecognizedEvents != blk) {
         [_IMKSwift_onProvidingRecognizedEvents release];
         _IMKSwift_onProvidingRecognizedEvents = [blk copy];
     }
 }
-+ (void)IMKSwift_configureWithHandlingGivenNullableEvent:(nullable BOOL (^)(uintptr_t, uintptr_t, uintptr_t))blk {
++ (void)IMKSwift_configureWithHandlingGivenNullableEvent:(nullable BOOL (^)(uintptr_t, uintptr_t))blk {
     if (_IMKSwift_onHandlingGivenNullableEvent != blk) {
         [_IMKSwift_onHandlingGivenNullableEvent release];
         _IMKSwift_onHandlingGivenNullableEvent = [blk copy];
     }
 }
-+ (void)IMKSwift_configureWithSettingObjCValue:(nullable void (^)(uintptr_t, intptr_t, uintptr_t, uintptr_t))blk {
++ (void)IMKSwift_configureWithSettingObjCValue:(nullable void (^)(uintptr_t, intptr_t, uintptr_t))blk {
     if (_IMKSwift_onSettingObjCValue != blk) {
         [_IMKSwift_onSettingObjCValue release];
         _IMKSwift_onSettingObjCValue = [blk copy];
@@ -220,16 +220,16 @@ static void (^_IMKSwift_onSettingObjCValue)(uintptr_t, intptr_t, uintptr_t, uint
 
 - (void)activateServer:(id)sender {
     [self IMKSwift_cancelDelayedDealloc];
-    if (_IMKSwift_onActivatingServer) _IMKSwift_onActivatingServer((uintptr_t)sender, (uintptr_t)self);
+    if (_IMKSwift_onActivatingServer) _IMKSwift_onActivatingServer((uintptr_t)self);
 }
 
 - (void)deactivateServer:(id)sender {
-    if (_IMKSwift_onDeactivatingServer) _IMKSwift_onDeactivatingServer((uintptr_t)sender, (uintptr_t)self);
+    if (_IMKSwift_onDeactivatingServer) _IMKSwift_onDeactivatingServer((uintptr_t)self);
     [self IMKSwift_scheduleDelayedDeallocAfterDelay:3.0];
 }
 
 - (void)showPreferences:(nullable id)sender {
-    if (_IMKSwift_onShowingPreferences) _IMKSwift_onShowingPreferences((uintptr_t)sender, (uintptr_t)self);
+    if (_IMKSwift_onShowingPreferences) _IMKSwift_onShowingPreferences((uintptr_t)self);
 }
 
 - (void)hidePalettes {
@@ -251,26 +251,26 @@ static void (^_IMKSwift_onSettingObjCValue)(uintptr_t, intptr_t, uintptr_t, uint
 }
 
 - (nullable id)composedString:(id)sender {
-    if (_IMKSwift_onProvidingComposedString) return _IMKSwift_onProvidingComposedString((uintptr_t)sender, (uintptr_t)self);
+    if (_IMKSwift_onProvidingComposedString) return _IMKSwift_onProvidingComposedString((uintptr_t)self);
     return nil;
 }
 
 - (void)commitComposition:(id)sender {
-    if (_IMKSwift_onAutoCommittingComposition) _IMKSwift_onAutoCommittingComposition((uintptr_t)sender, (uintptr_t)self);
+    if (_IMKSwift_onAutoCommittingComposition) _IMKSwift_onAutoCommittingComposition((uintptr_t)self);
 }
 
 - (NSUInteger)recognizedEvents:(id)sender {
-    if (_IMKSwift_onProvidingRecognizedEvents) return _IMKSwift_onProvidingRecognizedEvents((uintptr_t)sender, (uintptr_t)self);
+    if (_IMKSwift_onProvidingRecognizedEvents) return _IMKSwift_onProvidingRecognizedEvents((uintptr_t)self);
     return 0;
 }
 
 - (BOOL)handleEvent:(nullable NSEvent *)event client:(id)sender {
-    if (_IMKSwift_onHandlingGivenNullableEvent) return _IMKSwift_onHandlingGivenNullableEvent((uintptr_t)event, (uintptr_t)sender, (uintptr_t)self);
+    if (_IMKSwift_onHandlingGivenNullableEvent) return _IMKSwift_onHandlingGivenNullableEvent((uintptr_t)event, (uintptr_t)self);
     return NO;
 }
 
 - (void)setValue:(nullable id)value forTag:(NSInteger)tag client:(id)sender {
-    if (_IMKSwift_onSettingObjCValue) _IMKSwift_onSettingObjCValue((uintptr_t)value, (intptr_t)tag, (uintptr_t)sender, (uintptr_t)self);
+    if (_IMKSwift_onSettingObjCValue) _IMKSwift_onSettingObjCValue((uintptr_t)value, (intptr_t)tag, (uintptr_t)self);
 }
 
 // MARK: - Private: Deferred Dealloc
@@ -333,10 +333,6 @@ static void (^_IMKSwift_onSettingObjCValue)(uintptr_t, intptr_t, uintptr_t, uint
 ///
 /// Each proxy resolves the client from `[self client]`.
 /// No-ops (or returns `nil`/`CGRectNull`) when `[self client]` is `NULL`.
-
-- (uintptr_t)clientAddress {
-    return (uintptr_t)[self client];
-}
 
 - (BOOL)hasClient {
     return [self client] != nil;

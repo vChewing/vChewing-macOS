@@ -11,33 +11,22 @@
 public struct SessionControllerSputnik {
   // MARK: Lifecycle
 
-  /// 用於建構階段：不要求 client() 可用，僅記錄 controller 位址。
-  /// `activateServer:` 觸發時 `sputnik.core` 會透過 sessionAddrByControllerAddr 查詢 InputSession。
-  public init?(controllerAddr: UInt?, requireClient: Bool = true) {
+  public init?(controllerAddr: UInt?) {
     guard let controllerAddr else { return nil }
-    if requireClient {
-      guard let addrPair = Self.getGuardableAddrPair(controllerAddr)() else { return nil }
-      self.addrPair = addrPair
-    } else {
-      // 建構階段 client() 尚未就緒（macOS 10.9），使用 dummy clientAddr。
-      // blocks 內會透過 `addrPair.unwrapped` 做 tracker 安全核驗，
-      // 屆時 client() 已可用、paired 即可正確 unwrap。
-      self.addrPair = ClientControllerAddrPair(clientAddr: 0, controllerAddr: controllerAddr)
-    }
+    self.controllerSentinel = ControllerAddrSentinel(addr: controllerAddr)
   }
 
   // MARK: Public
 
   public var core: InputSession? {
-    let controllerAddr = addrPair.unwrapped?.controllerAddr
-    guard let controllerAddr else { return nil }
+    guard let controllerAddr = controllerSentinel.unwrapped else { return nil }
     let parity = Int(IMKControllerLifetimeTracker.shared().generation(forAddress: controllerAddr) & 1)
     let session = InputSession.session(forParity: parity)
     // 若 session 尚未被任何 controller 佔用（preallocated 狀態），走完整初始化。
     guard session.inputControllerAssignedAddr != nil else {
       guard let opaque = UnsafeRawPointer(bitPattern: controllerAddr) else { return nil }
       let controller = Unmanaged<IMKInputSessionController>.fromOpaque(opaque).takeUnretainedValue()
-      let newValue = Self.callCoreAtLeastOnce(controller, clientProxy: nil)
+      let newValue = Self.callCoreAtLeastOnce(controller)
       replaceCore(newValue)
       return newValue
     }
@@ -50,40 +39,18 @@ public struct SessionControllerSputnik {
   }
 
   /// 以 generation parity 從雙緩衝池中選取 InputSession singleton 並完成 reassign。
-  /// - Parameters:
-  ///   - controller: 剛完成 init 的 IMKInputSessionController。
-  ///   - maybeClient: 建構子傳入的 client（macOS 10.9 下 client() 尚不可用）。
-  /// - Returns: 已 reassign 並重置狀態的 InputSession。
-  public static func callCoreAtLeastOnce(
-    _ controller: IMKInputSessionController,
-    clientProxy maybeClient: Any!
-  )
-    -> InputSession {
+  public static func callCoreAtLeastOnce(_ controller: IMKInputSessionController) -> InputSession {
     let parity = Int(IMKInputSessionController.currentGeneration() & 1)
     let session = InputSession.session(forParity: parity)
-    // 同步完成 reassign：更新 controller→session 對照、重置組字狀態。
-    session.reassign(to: controller, clientAddrProvider: Self.getGuardableAddrPair(
-      UInt(bitPattern: Unmanaged.passUnretained(controller).toOpaque())
-    ))
+    session.reassign(to: controller)
     session.state = IMEState.ofEmpty()
     session.resetInputHandler()
     InputSession.current = session
     return session
   }
 
-  public static func getGuardableAddrPair(_ controllerAddr: UInt) -> (() -> ClientControllerAddrPair?) {
-    {
-      guard IMKControllerLifetimeTracker.shared().isAddressAlive(controllerAddr) else { return nil }
-      guard let opaque = UnsafeRawPointer(bitPattern: controllerAddr) else { return nil }
-      let controller = Unmanaged<IMKInputSessionController>.fromOpaque(opaque).takeUnretainedValue()
-      let clientAddr = UInt(controller.clientAddress())
-      guard clientAddr != 0 else { return nil }
-      return ClientControllerAddrPair(clientAddr: clientAddr, controllerAddr: controllerAddr)
-    }
-  }
-
   public func replaceCore(_ newCore: InputSession?) {
-    if let session = newCore, let controllerAddr = addrPair.unwrapped?.controllerAddr {
+    if let session = newCore, let controllerAddr = controllerSentinel.unwrapped {
       InputSession.registerSessionAddr(session, for: controllerAddr)
     }
   }
@@ -114,23 +81,20 @@ public struct SessionControllerSputnik {
     ///   - inputClient: 用以接受輸入的客體應用物件
     let block: @convention(block) (AnyObject, Selector, Any?, Any?, Any?) -> () = {
       // Instance, Selector, IMKServer, Delegate, Client
-      instance, _, _, _, givenClient in
+      instance, _, _, _, _ in
       let ctl = instance as? IMKInputSessionController
       guard let ctl else { return }
       // IMKInputSessionController.initWithServer: 已自動透過 IMKControllerLifetimeTracker
       // 完成追蹤登記與 generation 分配，無需手動呼叫 track。
       let controllerAddr = UInt(bitPattern: Unmanaged.passUnretained(ctl).toOpaque())
-      // 建構階段同步完成 tracker 登記 + 極性雙緩衝 session reassign。
-      // 使用 constructor 傳入的 givenClient（非 `client()`）：
-      // macOS 10.9 下 `client()` 在 init 期間為 nil，但 givenClient 有效。
-      if let sputnik = Self(controllerAddr: controllerAddr, requireClient: false) {
-        sputnik.replaceCore(Self.callCoreAtLeastOnce(ctl, clientProxy: givenClient))
+      if let sputnik = Self(controllerAddr: controllerAddr) {
+        sputnik.replaceCore(Self.callCoreAtLeastOnce(ctl))
       }
     }
     class_addMethod(IMKInputSessionController.self, sel, imp_implementationWithBlock(block), "v@:@@@")
   }()
 
-  private let addrPair: ClientControllerAddrPair
+  private let controllerSentinel: ControllerAddrSentinel
 }
 
 // MARK: - 一次性類別層級 Block 配置（於輸入法啟動時執行）
@@ -144,56 +108,56 @@ extension SessionControllerSputnik {
     // ---- 伺服器生命週期 ----
 
     /// 啟用輸入法時，IMK 呼叫此方法。對應 `-[IMKInputController activateServer:]`。
-    /// - Warning: 必須在呼叫 controllerAndSession 之前，將 session 的
+    /// - Warning: 必須在 resolve session 之前，將 session 的
     ///   inputControllerAssignedAddr 設為實際觸發 activateServer 的 controller 位址。
     ///   極性雙緩衝模式下，同一奇偶性的 session 可能已被其他 controller 的
     ///   callCoreAtLeastOnce reassign，導致 client() 解讀透過舊 controller 回傳 nil，
     ///   使 doCommit / doSetMarkedText 靜默失效。
-    IMKInputSessionController.configureActivatingServer { _, sa in
-      guard let session = SessionControllerSputnik.session(forAddr: sa) else { return }
-      session.inputControllerAssignedAddr = sa
+    IMKInputSessionController.configureActivatingServer { ctlAddr in
+      guard let session = SessionControllerSputnik.session(forAddr: ctlAddr) else { return }
+      session.inputControllerAssignedAddr = ctlAddr
       session.performServerActivation()
     }
     /// 停用輸入法時，IMK 呼叫此方法。對應 `-[IMKInputController deactivateServer:]`。
-    IMKInputSessionController.configureDeactivatingServer { ca, sa in
-      SessionControllerSputnik.controllerAndSession(ca, sa).map { $1.performServerDeactivation() }
+    IMKInputSessionController.configureDeactivatingServer { ctlAddr in
+      SessionControllerSputnik.session(forAddr: ctlAddr)?.performServerDeactivation()
     }
     /// Controller 被釋放時的最終清理。對應 `-[IMKInputController dealloc]`。
-    IMKInputSessionController.configureDealloc { sa in
-      InputSession.unregisterSessionAddr(forControllerAddr: sa)
+    IMKInputSessionController.configureDealloc { ctlAddr in
+      InputSession.unregisterSessionAddr(forControllerAddr: ctlAddr)
     }
 
     // ---- 偏好設定 ----
 
     /// 顯示輸入法偏好設定視窗。對應 `-[IMKInputController showPreferences:]`。
-    IMKInputSessionController.configureShowingPreferences { ca, sa in
-      SessionControllerSputnik.controllerAndSession(ca, sa).map { $1.showPreferences() }
+    IMKInputSessionController.configureShowingPreferences { ctlAddr in
+      SessionControllerSputnik.session(forAddr: ctlAddr)?.showPreferences()
     }
 
     // ---- 組字內容 ----
 
     /// 自動提交當前組字內容（例如使用者在組字中途切換焦點時）。
     /// 對應 `-[IMKInputController commitComposition:]`。
-    IMKInputSessionController.configureAutoCommittingComposition { ca, sa in
-      SessionControllerSputnik.controllerAndSession(ca, sa).map { $1.commitComposition() }
+    IMKInputSessionController.configureAutoCommittingComposition { ctlAddr in
+      SessionControllerSputnik.session(forAddr: ctlAddr)?.commitComposition()
     }
     /// 向 IMK 提供當前組字緩衝區的 NSAttributedString。
     /// 對應 `-[IMKInputController composedString:]`。
-    IMKInputSessionController.configureProvidingComposedString { ca, sa in
-      SessionControllerSputnik.controllerAndSession(ca, sa).flatMap { $1.composedString() }
+    IMKInputSessionController.configureProvidingComposedString { ctlAddr in
+      SessionControllerSputnik.session(forAddr: ctlAddr)?.composedString()
     }
 
     // ---- 鍵盤事件處理 ----
 
     /// 登記此輸入法能處理的 NSEventType 遮罩。
     /// 對應 `-[IMKInputController recognizedEvents:]`。
-    IMKInputSessionController.configureProvidingRecognizedEvents { ca, sa in
-      SessionControllerSputnik.controllerAndSession(ca, sa).map { $1.recognizedEvents() } ?? 0
+    IMKInputSessionController.configureProvidingRecognizedEvents { ctlAddr in
+      SessionControllerSputnik.session(forAddr: ctlAddr)?.recognizedEvents() ?? 0
     }
     /// 處理來自 IMK 的鍵盤／滑鼠事件。此為輸入法最核心的 dispatch 路徑。
     /// 對應 `-[IMKInputController handleEvent:client:]`。
-    IMKInputSessionController.configureHandlingGivenNullableEvent { evPtr, ca, sa in
-      guard let (_, session) = SessionControllerSputnik.controllerAndSession(ca, sa) else { return false }
+    IMKInputSessionController.configureHandlingGivenNullableEvent { evPtr, ctlAddr in
+      guard let session = SessionControllerSputnik.session(forAddr: ctlAddr) else { return false }
       let event: NSEvent? = evPtr != 0
         ? Unmanaged<NSEvent>.fromOpaque(UnsafeRawPointer(bitPattern: evPtr)!).takeUnretainedValue()
         : nil
@@ -210,8 +174,8 @@ extension SessionControllerSputnik {
 
     /// 設定 IMK 狀態值（例如標記文字屬性）。
     /// 對應 `-[IMKInputController setValue:forTag:client:]`。
-    IMKInputSessionController.configureSettingObjCValue { vp, tag, ca, sa in
-      guard let (_, session) = SessionControllerSputnik.controllerAndSession(ca, sa) else { return }
+    IMKInputSessionController.configureSettingObjCValue { vp, tag, ctlAddr in
+      guard let session = SessionControllerSputnik.session(forAddr: ctlAddr) else { return }
       let value: Any? = vp != 0
         ? Unmanaged<AnyObject>.fromOpaque(UnsafeRawPointer(bitPattern: vp)!).takeUnretainedValue()
         : nil
@@ -221,24 +185,24 @@ extension SessionControllerSputnik {
     // ---- 視窗管理 ----
 
     /// 隱藏所有浮動視窗（候選窗、tooltip 等）。對應 `-[IMKInputController hidePalettes]`。
-    IMKInputSessionController.configureHidingPallettes { sa in
-      SessionControllerSputnik.session(forAddr: sa)?.hidePalettes()
+    IMKInputSessionController.configureHidingPallettes { ctlAddr in
+      SessionControllerSputnik.session(forAddr: ctlAddr)?.hidePalettes()
     }
     /// 輸入控制器即將關閉時的清理。
     /// 對應 `-[IMKInputController inputControllerWillClose]`。
-    IMKInputSessionController.configureInputControllerWillClose { sa in
-      SessionControllerSputnik.session(forAddr: sa)?.inputControllerWillClose()
+    IMKInputSessionController.configureInputControllerWillClose { ctlAddr in
+      SessionControllerSputnik.session(forAddr: ctlAddr)?.inputControllerWillClose()
     }
 
     // ---- 選取範圍與選單 ----
 
     /// 向 IMK 提供當前選取範圍。對應 `-[IMKInputController selectionRange]`。
-    IMKInputSessionController.configureProvidingSelectionRange { sa in
-      SessionControllerSputnik.session(forAddr: sa)?.selectionRange() ?? .notFound
+    IMKInputSessionController.configureProvidingSelectionRange { ctlAddr in
+      SessionControllerSputnik.session(forAddr: ctlAddr)?.selectionRange() ?? .notFound
     }
     /// 向 IMK 提供輸入法選單。對應 `-[IMKInputController menu]`。
-    IMKInputSessionController.configureProvidingIMEMenu { sa in
-      guard let menuSputnik = IMEMenuSputnik(controllerAddr: sa) else { return NSMenu() }
+    IMKInputSessionController.configureProvidingIMEMenu { ctlAddr in
+      guard let menuSputnik = IMEMenuSputnik(controllerAddr: ctlAddr) else { return NSMenu() }
       return menuSputnik.build()
     }
   }()
@@ -253,17 +217,5 @@ extension SessionControllerSputnik {
     guard IMKControllerLifetimeTracker.shared().isAddressAlive(ctlAddr) else { return nil }
     let parity = Int(IMKControllerLifetimeTracker.shared().generation(forAddress: ctlAddr) & 1)
     return InputSession.session(forParity: parity)
-  }
-
-  /// 由 raw uintptr_t 位址解析 controller 與 client，傳回 (InputSession, IMKTextInput) 配對。
-  /// 僅用於 IMK 回呼中的 sender 解析（sender 在回呼期間保證存活，`takeUnretainedValue()` 安全）。
-  /// - Warning: 禁止在任何非 IMK 回呼路徑中使用此方法解析 client。
-  private static func controllerAndSession(_ ca: UInt, _ sa: UInt) -> (IMKInputSessionController, InputSession)? {
-    guard IMKControllerLifetimeTracker.shared().isAddressAlive(sa),
-          let session = session(forAddr: sa),
-          let controllerOpaque = UnsafeRawPointer(bitPattern: ca)
-    else { return nil }
-    let controllerObj = Unmanaged<IMKInputSessionController>.fromOpaque(controllerOpaque).takeUnretainedValue()
-    return (controllerObj, session)
   }
 }

@@ -138,10 +138,6 @@ nonisolated final class FakeClient: NSObject, IMKTextInput {
 // MARK: IMKClientProxyProtocol
 
 extension FakeClient: IMKClientProxyProtocol {
-  func clientAddress() -> UInt {
-    UInt(bitPattern: Unmanaged.passUnretained(self).toOpaque())
-  }
-
   func hasClient() -> Bool {
     true
   }

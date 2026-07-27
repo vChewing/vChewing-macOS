@@ -909,19 +909,19 @@
 /// Each block receives raw `uintptr_t` memory addresses instead of object
 /// references — no retain/release is performed on the client or the controller.
 
-+ (void)IMKSwift_configureWithActivatingServer:(nullable void (^)(uintptr_t givenClientAddr, uintptr_t selfAddr))block NS_SWIFT_NAME(configureActivatingServer(_:));
-+ (void)IMKSwift_configureWithDeactivatingServer:(nullable void (^)(uintptr_t givenClientAddr, uintptr_t selfAddr))block NS_SWIFT_NAME(configureDeactivatingServer(_:));
-+ (void)IMKSwift_configureWithDealloc:(nullable void (^)(uintptr_t selfAddr))block NS_SWIFT_NAME(configureDealloc(_:));
-+ (void)IMKSwift_configureWithShowingPreferences:(nullable void (^)(uintptr_t givenClientAddr, uintptr_t selfAddr))block NS_SWIFT_NAME(configureShowingPreferences(_:));
-+ (void)IMKSwift_configureWithHidingPallettes:(nullable void (^)(uintptr_t selfAddr))block NS_SWIFT_NAME(configureHidingPallettes(_:));
-+ (void)IMKSwift_configureWithInputControllerWillClose:(nullable void (^)(uintptr_t selfAddr))block NS_SWIFT_NAME(configureInputControllerWillClose(_:));
-+ (void)IMKSwift_configureWithProvidingSelectionRange:(nullable NSRange (^)(uintptr_t selfAddr))block NS_SWIFT_NAME(configureProvidingSelectionRange(_:));
-+ (void)IMKSwift_configureWithProvidingIMEMenu:(nullable NSMenu * _Nullable (^)(uintptr_t selfAddr))block NS_SWIFT_NAME(configureProvidingIMEMenu(_:));
-+ (void)IMKSwift_configureWithProvidingComposedString:(nullable id _Nullable (^)(uintptr_t givenClientAddr, uintptr_t selfAddr))block NS_SWIFT_NAME(configureProvidingComposedString(_:));
-+ (void)IMKSwift_configureWithAutoCommittingComposition:(nullable void (^)(uintptr_t givenClientAddr, uintptr_t selfAddr))block NS_SWIFT_NAME(configureAutoCommittingComposition(_:));
-+ (void)IMKSwift_configureWithProvidingRecognizedEvents:(nullable NSUInteger (^)(uintptr_t givenClientAddr, uintptr_t selfAddr))block NS_SWIFT_NAME(configureProvidingRecognizedEvents(_:));
-+ (void)IMKSwift_configureWithHandlingGivenNullableEvent:(nullable BOOL (^)(uintptr_t nsEventPtr, uintptr_t givenClientAddr, uintptr_t selfAddr))block NS_SWIFT_NAME(configureHandlingGivenNullableEvent(_:));
-+ (void)IMKSwift_configureWithSettingObjCValue:(nullable void (^)(uintptr_t valuePtr, intptr_t intTag, uintptr_t givenClientAddr, uintptr_t selfAddr))block NS_SWIFT_NAME(configureSettingObjCValue(_:));
++ (void)IMKSwift_configureWithActivatingServer:(nullable void (^)(uintptr_t ctlAddr))block NS_SWIFT_NAME(configureActivatingServer(_:));
++ (void)IMKSwift_configureWithDeactivatingServer:(nullable void (^)(uintptr_t ctlAddr))block NS_SWIFT_NAME(configureDeactivatingServer(_:));
++ (void)IMKSwift_configureWithDealloc:(nullable void (^)(uintptr_t ctlAddr))block NS_SWIFT_NAME(configureDealloc(_:));
++ (void)IMKSwift_configureWithShowingPreferences:(nullable void (^)(uintptr_t ctlAddr))block NS_SWIFT_NAME(configureShowingPreferences(_:));
++ (void)IMKSwift_configureWithHidingPallettes:(nullable void (^)(uintptr_t ctlAddr))block NS_SWIFT_NAME(configureHidingPallettes(_:));
++ (void)IMKSwift_configureWithInputControllerWillClose:(nullable void (^)(uintptr_t ctlAddr))block NS_SWIFT_NAME(configureInputControllerWillClose(_:));
++ (void)IMKSwift_configureWithProvidingSelectionRange:(nullable NSRange (^)(uintptr_t ctlAddr))block NS_SWIFT_NAME(configureProvidingSelectionRange(_:));
++ (void)IMKSwift_configureWithProvidingIMEMenu:(nullable NSMenu * _Nullable (^)(uintptr_t ctlAddr))block NS_SWIFT_NAME(configureProvidingIMEMenu(_:));
++ (void)IMKSwift_configureWithProvidingComposedString:(nullable id _Nullable (^)(uintptr_t ctlAddr))block NS_SWIFT_NAME(configureProvidingComposedString(_:));
++ (void)IMKSwift_configureWithAutoCommittingComposition:(nullable void (^)(uintptr_t ctlAddr))block NS_SWIFT_NAME(configureAutoCommittingComposition(_:));
++ (void)IMKSwift_configureWithProvidingRecognizedEvents:(nullable NSUInteger (^)(uintptr_t ctlAddr))block NS_SWIFT_NAME(configureProvidingRecognizedEvents(_:));
++ (void)IMKSwift_configureWithHandlingGivenNullableEvent:(nullable BOOL (^)(uintptr_t nsEventPtr, uintptr_t ctlAddr))block NS_SWIFT_NAME(configureHandlingGivenNullableEvent(_:));
++ (void)IMKSwift_configureWithSettingObjCValue:(nullable void (^)(uintptr_t valuePtr, intptr_t intTag, uintptr_t ctlAddr))block NS_SWIFT_NAME(configureSettingObjCValue(_:));
 
 /// Returns the current controller generation counter (monotonically increasing),
 /// used by the parity-based double-buffered session pool.
@@ -934,9 +934,6 @@
 /// crosses the ObjC→Swift language boundary.  Each method:
 /// - Resolves `[self client]` internally (pure ObjC MRC — no retain).
 /// - No-ops (or returns `nil`/`CGRectNull`) when `[self client]` is `NULL`.
-
-/// Returns the raw memory address of the current client, or `0` if none.
-- (uintptr_t)clientAddress;
 
 /// Returns `YES` if this controller currently has a connected client.
 - (BOOL)hasClient;
