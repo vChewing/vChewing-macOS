@@ -202,17 +202,19 @@ extension SessionProtocol {
 
   /// 強制重設當前鍵盤佈局、使其與偏好設定同步。
   /// 內部會比對目標佈局與上次實際套用的佈局，若相同則跳過 `overrideKeyboard()` 阻塞操作。
+  /// - Note: `lastAppliedKeyboardLayout` 在 async block 內部寫入（而非同步寫入），
+  ///   避免 async task 靜默失敗（例：clientProxy 為 nil）時緩存變成「已套用但未實際發生」的髒狀態。
   public func setKeyLayout() {
     let targetLayout: String =
       (isASCIIMode && IMKHelper.isDynamicBasicKeyboardLayoutEnabled)
         ? prefs.alphanumericalKeyboardLayout
         : prefs.basicKeyboardLayout
     guard targetLayout != lastAppliedKeyboardLayout else { return }
-    lastAppliedKeyboardLayout = targetLayout
     asyncOnMain(bypassAsync: UserDefaults.pendingUnitTests) { [weak self] in
       guard let this = self else { return }
       if let clientProxy = this.clientProxy, !this.isServingIMEItself {
         clientProxy.clientOverrideKeyboard(withName: targetLayout)
+        this.lastAppliedKeyboardLayout = targetLayout
       }
     }
   }
@@ -244,6 +246,11 @@ extension SessionProtocol {
   public func performServerActivation() {
     // MARK: 快速路徑 — 最佳化 CapsLock 中英頻繁切換的場景。
 
+    /// 每次 activateServer 都是一次全新的啟用事件，
+    /// 必須重置 `lastAppliedKeyboardLayout` 使其強制重新套用鍵盤佈局——
+    /// 因為 parity 雙緩衝下同一 Session 實例可能被不同 client 跨生命週期復用，
+    /// 前次 cache 對新 client 無效。
+
     if isActivated, Self.current?.id == id, inputHandler != nil,
        let proxy = clientProxy, isStillTheSameClientProxyObj(proxy as? NSObject) {
       syncCurrentSessionID()
@@ -252,6 +259,7 @@ extension SessionProtocol {
         inputMode = resolvedInputMode
       }
       state = .ofEmpty()
+      lastAppliedKeyboardLayout = nil
       setKeyLayout()
       return
     }
@@ -262,6 +270,7 @@ extension SessionProtocol {
     syncCurrentSessionID()
     Self.current = self
     let this = self
+    this.lastAppliedKeyboardLayout = nil
     let senderBundleID: String? = clientProxy?.clientBundleIdentifier()
     if let senderBundleID {
       vCLog("activateServer(\(senderBundleID))")
