@@ -147,7 +147,14 @@ extension SessionControllerSputnik {
     // ---- 伺服器生命週期 ----
 
     /// 啟用輸入法時，IMK 呼叫此方法。對應 `-[IMKInputController activateServer:]`。
+    /// - Warning: 必須在呼叫 controllerAndClient 之前，將 session 的
+    ///   inputControllerAssignedAddr 設為實際觸發 activateServer 的 controller 位址。
+    ///   極性雙緩衝模式下，同一奇偶性的 session 可能已被其他 controller 的
+    ///   callCoreAtLeastOnce reassign，導致 client() 解讀透過舊 controller 回傳 nil，
+    ///   使 doCommit / doSetMarkedText 靜默失效。
     IMKInputSessionController.configureActivatingServer { ca, sa in
+      guard let session = SessionControllerSputnik.session(forAddr: sa) else { return }
+      session.inputControllerAssignedAddr = sa
       SessionControllerSputnik.controllerAndClient(ca, sa).map { $0.activateServer($1) }
     }
     /// 停用輸入法時，IMK 呼叫此方法。對應 `-[IMKInputController deactivateServer:]`。
@@ -243,7 +250,10 @@ extension SessionControllerSputnik {
   /// Class-level blocks 統一走 parity 路徑，避免與 `sessionAddrByControllerAddr`
   /// 產生 split-brain：同一枚 parity session 被新 controller reassign 後，
   /// 舊 controller 的事件應仍路由至同一枚 session（而非因 address mapping 被清空而掉事件）。
+  ///
+  /// 若 controller 未被 tracker 登記（例如已 dealloc 後仍收到 IMK callback），回傳 nil。
   private static func session(forAddr ctlAddr: UInt) -> InputSession? {
+    guard IMKControllerLifetimeTracker.shared().isAddressAlive(ctlAddr) else { return nil }
     let parity = Int(IMKControllerLifetimeTracker.shared().generation(forAddress: ctlAddr) & 1)
     return InputSession.session(forParity: parity)
   }
