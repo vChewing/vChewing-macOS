@@ -165,7 +165,7 @@ static void (^_IMKSwift_onSettingObjCValue)(uintptr_t, intptr_t, uintptr_t);
     @autoreleasepool {
         id serverPvt = [server valueForKey:@"_private"];
         NSMutableDictionary *ctls = [serverPvt valueForKey:@"_controllers"];
-        if (!ctls || [ctls count] <= 2) return;
+        if (!ctls) return;
 
         id currentCtl = [serverPvt valueForKey:@"_currentController"];
         IMKControllerLifetimeTracker *tracker = [IMKControllerLifetimeTracker shared];
