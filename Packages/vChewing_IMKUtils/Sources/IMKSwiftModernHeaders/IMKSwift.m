@@ -138,7 +138,11 @@ static void (^_IMKSwift_onSettingObjCValue)(uintptr_t, intptr_t, uintptr_t);
 // MARK: - Lifecycle
 
 - (void)dealloc {
-    if (_IMKSwift_onDealloc) _IMKSwift_onDealloc((uintptr_t)self);
+    if (_IMKSwift_onDealloc) {
+        @autoreleasepool {
+            _IMKSwift_onDealloc((uintptr_t)self);
+        }
+    }
     [self IMKSwift_cancelDelayedDealloc];
     [super dealloc];
 }
@@ -158,31 +162,33 @@ static void (^_IMKSwift_onSettingObjCValue)(uintptr_t, intptr_t, uintptr_t);
 /// @param selfController The controller currently being initialised (excluded from eviction).
 + (void)IMKSwift_pruneStaleControllersOnServer:(IMKServer *)server
                                   excludingSelf:(id)selfController {
-    id serverPvt = [server valueForKey:@"_private"];
-    NSMutableDictionary *ctls = [serverPvt valueForKey:@"_controllers"];
-    if (!ctls || [ctls count] <= 2) return;
+    @autoreleasepool {
+        id serverPvt = [server valueForKey:@"_private"];
+        NSMutableDictionary *ctls = [serverPvt valueForKey:@"_controllers"];
+        if (!ctls || [ctls count] <= 2) return;
 
-    id currentCtl = [serverPvt valueForKey:@"_currentController"];
-    IMKControllerLifetimeTracker *tracker = [IMKControllerLifetimeTracker shared];
+        id currentCtl = [serverPvt valueForKey:@"_currentController"];
+        IMKControllerLifetimeTracker *tracker = [IMKControllerLifetimeTracker shared];
 
-    // Find the oldest controller (lowest generation) that is safe to evict.
-    id oldest = nil;
-    uint64_t oldestGen = UINT64_MAX;
-    for (id ctl in [ctls allValues]) {
-        if (ctl == currentCtl || ctl == selfController) continue;
-        uint64_t gen = [tracker generationForAddress:(uintptr_t)ctl];
-        if (gen < oldestGen) {
-            oldestGen = gen;
-            oldest = ctl;
+        // Find the oldest controller (lowest generation) that is safe to evict.
+        id oldest = nil;
+        uint64_t oldestGen = UINT64_MAX;
+        for (id ctl in [ctls allValues]) {
+            if (ctl == currentCtl || ctl == selfController) continue;
+            uint64_t gen = [tracker generationForAddress:(uintptr_t)ctl];
+            if (gen < oldestGen) {
+                oldestGen = gen;
+                oldest = ctl;
+            }
         }
-    }
-    if (!oldest) return;
+        if (!oldest) return;
 
-    // Find the dictionary key for the oldest controller and remove it.
-    for (id key in [ctls allKeys]) {
-        if ([ctls objectForKey:key] == oldest) {
-            [ctls removeObjectForKey:key];
-            break;
+        // Find the dictionary key for the oldest controller and remove it.
+        for (id key in [ctls allKeys]) {
+            if ([ctls objectForKey:key] == oldest) {
+                [ctls removeObjectForKey:key];
+                break;
+            }
         }
     }
 }
@@ -203,14 +209,16 @@ static void (^_IMKSwift_onSettingObjCValue)(uintptr_t, intptr_t, uintptr_t);
 
         SEL hookSel = @selector(onSuperConstructionSucceeded:delegate:client:);
         if ([self respondsToSelector:hookSel]) {
-            NSMethodSignature *sig = [self methodSignatureForSelector:hookSel];
-            NSInvocation *inv = [NSInvocation invocationWithMethodSignature:sig];
-            [inv setSelector:hookSel];
-            [inv setTarget:self];
-            [inv setArgument:&server atIndex:2];
-            [inv setArgument:&delegate atIndex:3];
-            [inv setArgument:&inputClient atIndex:4];
-            [inv invoke];
+            @autoreleasepool {
+                NSMethodSignature *sig = [self methodSignatureForSelector:hookSel];
+                NSInvocation *inv = [NSInvocation invocationWithMethodSignature:sig];
+                [inv setSelector:hookSel];
+                [inv setTarget:self];
+                [inv setArgument:&server atIndex:2];
+                [inv setArgument:&delegate atIndex:3];
+                [inv setArgument:&inputClient atIndex:4];
+                [inv invoke];
+            }
         }
     }
     return self;
@@ -220,24 +228,44 @@ static void (^_IMKSwift_onSettingObjCValue)(uintptr_t, intptr_t, uintptr_t);
 
 - (void)activateServer:(id)sender {
     [self IMKSwift_cancelDelayedDealloc];
-    if (_IMKSwift_onActivatingServer) _IMKSwift_onActivatingServer((uintptr_t)self);
+    if (_IMKSwift_onActivatingServer) {
+        @autoreleasepool {
+            _IMKSwift_onActivatingServer((uintptr_t)self);
+        }
+    }
 }
 
 - (void)deactivateServer:(id)sender {
-    if (_IMKSwift_onDeactivatingServer) _IMKSwift_onDeactivatingServer((uintptr_t)self);
+    if (_IMKSwift_onDeactivatingServer) {
+        @autoreleasepool {
+            _IMKSwift_onDeactivatingServer((uintptr_t)self);
+        }
+    }
     [self IMKSwift_scheduleDelayedDeallocAfterDelay:3.0];
 }
 
 - (void)showPreferences:(nullable id)sender {
-    if (_IMKSwift_onShowingPreferences) _IMKSwift_onShowingPreferences((uintptr_t)self);
+    if (_IMKSwift_onShowingPreferences) {
+        @autoreleasepool {
+            _IMKSwift_onShowingPreferences((uintptr_t)self);
+        }
+    }
 }
 
 - (void)hidePalettes {
-    if (_IMKSwift_onHidingPallettes) _IMKSwift_onHidingPallettes((uintptr_t)self);
+    if (_IMKSwift_onHidingPallettes) {
+        @autoreleasepool {
+            _IMKSwift_onHidingPallettes((uintptr_t)self);
+        }
+    }
 }
 
 - (void)inputControllerWillClose {
-    if (_IMKSwift_onInputControllerWillClose) _IMKSwift_onInputControllerWillClose((uintptr_t)self);
+    if (_IMKSwift_onInputControllerWillClose) {
+        @autoreleasepool {
+            _IMKSwift_onInputControllerWillClose((uintptr_t)self);
+        }
+    }
 }
 
 - (NSRange)selectionRange {
@@ -268,7 +296,11 @@ static void (^_IMKSwift_onSettingObjCValue)(uintptr_t, intptr_t, uintptr_t);
 }
 
 - (void)commitComposition:(id)sender {
-    if (_IMKSwift_onAutoCommittingComposition) _IMKSwift_onAutoCommittingComposition((uintptr_t)self);
+    if (_IMKSwift_onAutoCommittingComposition) {
+        @autoreleasepool {
+            _IMKSwift_onAutoCommittingComposition((uintptr_t)self);
+        }
+    }
 }
 
 - (NSUInteger)recognizedEvents:(id)sender {
@@ -282,7 +314,11 @@ static void (^_IMKSwift_onSettingObjCValue)(uintptr_t, intptr_t, uintptr_t);
 }
 
 - (void)setValue:(nullable id)value forTag:(NSInteger)tag client:(id)sender {
-    if (_IMKSwift_onSettingObjCValue) _IMKSwift_onSettingObjCValue((uintptr_t)value, (intptr_t)tag, (uintptr_t)self);
+    if (_IMKSwift_onSettingObjCValue) {
+        @autoreleasepool {
+            _IMKSwift_onSettingObjCValue((uintptr_t)value, (intptr_t)tag, (uintptr_t)self);
+        }
+    }
 }
 
 // MARK: - Private: Deferred Dealloc
@@ -311,31 +347,33 @@ static void (^_IMKSwift_onSettingObjCValue)(uintptr_t, intptr_t, uintptr_t);
 /// the underlying XPC connection.  Block ivars are class-level static — no
 /// per-instance release needed.
 - (void)IMKSwift_delayedDealloc {
-    if (_IMKSwift_onDealloc) _IMKSwift_onDealloc((uintptr_t)self);
-    // Terminate the client wrapper so that IMK's global wrapper cache
-    // and the underlying XPC connection are released promptly.  The controller
-    // shell may persist in _controllers until the next prune cycle, but the
-    // heavy XPC resources (~440 bytes per connection) are freed now.
-    id clientProxy = [self client];
-    if (clientProxy) {
-        // macOS 15 Sequoia split IPMDServerClientWrapper into Modern / Legacy subclasses.
-        // Try both variants, then fall back to the undecorated name for ≤10.15.
-        Class wrapperClass = nil;
-        for (NSString *name in @[
-            @"_IPMDServerClientWrapperModern",
-            @"_IPMDServerClientWrapperLegacy",
-            @"IPMDServerClientWrapper"
-        ]) {
-            wrapperClass = NSClassFromString(name);
-            if (wrapperClass) break;
-        }
-        if (wrapperClass) {
-            if ([wrapperClass respondsToSelector:@selector(terminateForClientXPCConn:)]) {
-                [wrapperClass terminateForClientXPCConn:clientProxy];
-            } else if ([wrapperClass respondsToSelector:@selector(terminateForClientDOProxy:)]) {
-                [wrapperClass terminateForClientDOProxy:clientProxy];
-            } else if ([wrapperClass respondsToSelector:@selector(terminateForClient:)]) {
-                [wrapperClass terminateForClient:clientProxy];
+    @autoreleasepool {
+        if (_IMKSwift_onDealloc) _IMKSwift_onDealloc((uintptr_t)self);
+        // Terminate the client wrapper so that IMK's global wrapper cache
+        // and the underlying XPC connection are released promptly.  The controller
+        // shell may persist in _controllers until the next prune cycle, but the
+        // heavy XPC resources (~440 bytes per connection) are freed now.
+        id clientProxy = [self client];
+        if (clientProxy) {
+            // macOS 15 Sequoia split IPMDServerClientWrapper into Modern / Legacy subclasses.
+            // Try both variants, then fall back to the undecorated name for ≤10.15.
+            Class wrapperClass = nil;
+            for (NSString *name in @[
+                @"_IPMDServerClientWrapperModern",
+                @"_IPMDServerClientWrapperLegacy",
+                @"IPMDServerClientWrapper"
+            ]) {
+                wrapperClass = NSClassFromString(name);
+                if (wrapperClass) break;
+            }
+            if (wrapperClass) {
+                if ([wrapperClass respondsToSelector:@selector(terminateForClientXPCConn:)]) {
+                    [wrapperClass terminateForClientXPCConn:clientProxy];
+                } else if ([wrapperClass respondsToSelector:@selector(terminateForClientDOProxy:)]) {
+                    [wrapperClass terminateForClientDOProxy:clientProxy];
+                } else if ([wrapperClass respondsToSelector:@selector(terminateForClient:)]) {
+                    [wrapperClass terminateForClient:clientProxy];
+                }
             }
         }
     }
