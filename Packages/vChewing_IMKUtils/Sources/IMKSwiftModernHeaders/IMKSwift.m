@@ -257,7 +257,13 @@ static void (^_IMKSwift_onSettingObjCValue)(uintptr_t, intptr_t, uintptr_t);
 }
 
 - (nullable id)composedString:(id)sender {
-    if (_IMKSwift_onProvidingComposedString) return _IMKSwift_onProvidingComposedString((uintptr_t)self);
+    if (_IMKSwift_onProvidingComposedString) {
+        id result = nil;
+        @autoreleasepool {
+            result = [_IMKSwift_onProvidingComposedString((uintptr_t)self) retain];
+        }
+        return [result autorelease];
+    }
     return nil;
 }
 
