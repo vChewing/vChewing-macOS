@@ -48,7 +48,10 @@ extension IMEMenuSputnik {
       if class_addMethod(IMKInputSessionController.self, sel, imp, "v@:@") {
         return sel
       }
-      method_setImplementation(class_getInstanceMethod(IMKInputSessionController.self, sel)!, imp)
+      let method = class_getInstanceMethod(IMKInputSessionController.self, sel)!
+      let oldIMP = method_getImplementation(method)
+      method_setImplementation(method, imp)
+      imp_removeBlock(oldIMP)
       return sel
     }
     // -------------
