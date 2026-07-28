@@ -187,6 +187,9 @@ static void (^_IMKSwift_onSettingObjCValue)(uintptr_t, intptr_t, uintptr_t);
         for (id key in [ctls allKeys]) {
             if ([ctls objectForKey:key] == oldest) {
                 [ctls removeObjectForKey:key];
+                if ([key respondsToSelector:@selector(invalidate)]) {
+                    [(id)key invalidate];
+                }
                 break;
             }
         }
