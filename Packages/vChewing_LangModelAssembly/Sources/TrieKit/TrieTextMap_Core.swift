@@ -64,7 +64,6 @@ extension VanguardTrie {
         defaultProbs: header.defaultProbs,
         separator: header.separator
       )
-      cachedEntries.countLimit = 8_192
     }
 
     // MARK: Public
@@ -121,20 +120,10 @@ extension VanguardTrie {
       let firstBytes: Set<UInt8>
     }
 
-    private final class CachedEntriesBox: NSObject {
-      // MARK: Lifecycle
-
-      init(_ value: [Entry]) {
-        self.value = value
-      }
-
-      // MARK: Internal
-
-      let value: [Entry]
-    }
-
     private static let revLookupEntryType = VanguardTrie.Trie.EntryType(rawValue: 3)
     private static let cnsEntryType = VanguardTrie.Trie.EntryType(rawValue: 7)
+
+    private static let cacheLimit = 256
 
     private let rawData: Data
     private let isTyping: Bool
@@ -146,7 +135,8 @@ extension VanguardTrie {
     private let valueLineToKeyEntryIndex: [Int32]
     private let reverseLookupTable: [RevLookupEntry]
 
-    private let cachedEntries = NSCache<NSNumber, CachedEntriesBox>()
+    private var cachedEntries: [Int: [Entry]] = [:]
+    private var cachedEntriesLRUOrder: [Int] = []
     private let queryBuffer4Node: QueryBuffer<VanguardTrie.Trie.TNode?> = .init()
     private let queryBuffer4Nodes: QueryBuffer<[VanguardTrie.Trie.TNode]> = .init()
     private let queryBuffer4NodeIDs: QueryBuffer<[Int]> = .init()
@@ -876,9 +866,14 @@ extension VanguardTrie.TextMapTrie {
   private func parsedEntries(for keyEntryIndex: Int) -> [Entry] {
     guard keyEntryIndex >= 0, keyEntryIndex < keyEntries.count else { return [] }
     let keyEntry = keyEntries[keyEntryIndex]
-    let cacheKey = NSNumber(value: keyEntry.keyStart)
-    if let cached = cachedEntries.object(forKey: cacheKey) {
-      return cached.value
+    let cacheKey = keyEntry.keyStart
+    if let cached = cachedEntries[cacheKey] {
+      // Promote to MRU position.
+      if let idx = cachedEntriesLRUOrder.firstIndex(of: cacheKey) {
+        cachedEntriesLRUOrder.remove(at: idx)
+        cachedEntriesLRUOrder.append(cacheKey)
+      }
+      return cached
     }
 
     let endLine = Swift.min(keyEntry.startLine + keyEntry.count, valuesLineOffsets.count)
@@ -899,7 +894,13 @@ extension VanguardTrie.TextMapTrie {
       })
     }
 
-    cachedEntries.setObject(CachedEntriesBox(result), forKey: cacheKey)
+    // Evict LRU entry when at capacity.
+    if cachedEntriesLRUOrder.count >= Self.cacheLimit {
+      let lruKey = cachedEntriesLRUOrder.removeFirst()
+      cachedEntries.removeValue(forKey: lruKey)
+    }
+    cachedEntries[cacheKey] = result
+    cachedEntriesLRUOrder.append(cacheKey)
     return result
   }
 
