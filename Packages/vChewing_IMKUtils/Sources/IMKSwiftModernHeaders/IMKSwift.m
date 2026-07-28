@@ -246,7 +246,13 @@ static void (^_IMKSwift_onSettingObjCValue)(uintptr_t, intptr_t, uintptr_t);
 }
 
 - (nullable NSMenu *)menu {
-    if (_IMKSwift_onProvidingIMEMenu) return _IMKSwift_onProvidingIMEMenu((uintptr_t)self);
+    if (_IMKSwift_onProvidingIMEMenu) {
+        NSMenu *menu = nil;
+        @autoreleasepool {
+            menu = [_IMKSwift_onProvidingIMEMenu((uintptr_t)self) retain];
+        }
+        return [menu autorelease];
+    }
     return [[NSMenu new] autorelease];
 }
 
