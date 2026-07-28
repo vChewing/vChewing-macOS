@@ -1299,4 +1299,34 @@ extension InputHandlerTests {
     #expect(testHandler.composer.getInlineCompositionForDisplay(isHanyuPinyin: true) == "z")
     #expect(!testHandler.currentLM.config.partialMatchEnabled)
   }
+
+  /// 測試單獨輸入聲調後敲 Enter 鍵能正確遞交聲調符號。
+  ///
+  /// 當唯音輸入法處於「允許單獨輸入聲調」模式時，使用者若先敲聲調鍵（如 ˊ）
+  /// 再敲 Enter，則應將該聲調符號直接遞交，如同工具提示所述「敲 Enter 以遞交」。
+  @Test
+  func test_IH115_StandaloneIntonationEnterCommitsToneMark() throws {
+    guard let testHandler, let testSession else {
+      Issue.record("testHandler and testSession at least one of them is nil.")
+      return
+    }
+    testHandler.prefs.acceptLeadingIntonations = true
+    testHandler.prefs.specifyIntonationKeyBehavior = 0
+    testHandler.prefs.fetchSuggestionsFromPerceptionOverrideModel = false
+    clearTestPOM()
+    defer { testHandler.clear() }
+
+    // 先重置狀態。
+    testSession.resetInputHandler(forceComposerCleanup: true)
+
+    // 模擬敲聲調鍵「6」（Dachen 佈局下映射到「ˊ」）。
+    // 此時 composer 僅有聲調、無讀音，應觸發 standalone intonation 工具提示狀態。
+    #expect(testHandler.triageInput(event: KBEvent.KeyEventData(chars: "6").asEvent))
+    #expect(testHandler.composer.hasIntonation(withNothingElse: true))
+    #expect(!testHandler.tooltipForStandaloneIntonationMark.isEmpty)
+
+    // 敲 Enter：應將聲調符號「ˊ」直接遞交。
+    #expect(testHandler.triageInput(event: KBEvent.KeyEventData.dataEnterReturn.asEvent))
+    #expect(testSession.recentCommissions.joined() == "ˊ")
+  }
 }

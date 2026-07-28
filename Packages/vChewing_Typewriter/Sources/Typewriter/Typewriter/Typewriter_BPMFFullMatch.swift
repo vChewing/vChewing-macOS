@@ -335,6 +335,11 @@ public struct BPMFFullMatchTypewriter<Handler: InputHandlerProtocol>: Typewriter
         session.switchState(theInputting)
         return true
       }
+      if !handler.composer.isPinyinMode, input.isEnter, existedIntonation.isValid {
+        handler.composer.clear()
+        session.switchState(State.ofCommitting(textToCommit: existedIntonation.value))
+        return true
+      }
       handler.composer.clear()
       return nil
     }
