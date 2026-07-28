@@ -353,47 +353,65 @@ static void (^_IMKSwift_onSettingObjCValue)(uintptr_t, intptr_t, uintptr_t);
 - (void)clientTextInsertionWith:(NSString *)text replacementRange:(NSRange)range {
     id client = [self client];
     if (!client) return;
-    [client insertText:text replacementRange:range];
+    @autoreleasepool {
+        [client insertText:text replacementRange:range];
+    }
 }
 
 - (void)clientMarkedTextSetupWith:(NSAttributedString *)text selectionRange:(NSRange)selRange replacementRange:(NSRange)repRange {
     id client = [self client];
     if (!client) return;
-    [client setMarkedText:text selectionRange:selRange replacementRange:repRange];
+    @autoreleasepool {
+        [client setMarkedText:text selectionRange:selRange replacementRange:repRange];
+    }
 }
 
 - (nullable NSString *)clientBundleIdentifier {
     id client = [self client];
     if (!client) return nil;
-    return [client bundleIdentifier];
+    NSString *result = nil;
+    @autoreleasepool {
+        result = [[client bundleIdentifier] retain];
+    }
+    return [result autorelease];
 }
 
 - (void)clientSelectModeWithModeIdentifier:(NSString *)mode {
     id client = [self client];
     if (!client) return;
-    [client selectInputMode:mode];
+    @autoreleasepool {
+        [client selectInputMode:mode];
+    }
 }
 
 - (void)clientOverrideKeyboardWithName:(NSString *)name {
     id client = [self client];
     if (!client) return;
-    [client overrideKeyboardWithKeyboardNamed:name];
+    @autoreleasepool {
+        [client overrideKeyboardWithKeyboardNamed:name];
+    }
 }
 
 - (nullable NSDictionary *)clientAttributesForCharacterIndexAtU16Pos:(NSUInteger)idx lineHeightRectangle:(NSRect *)rect {
     id client = [self client];
     if (!client) return nil;
-    return [client attributesForCharacterIndex:idx lineHeightRectangle:rect];
+    NSDictionary *result = nil;
+    @autoreleasepool {
+        result = [[client attributesForCharacterIndex:idx lineHeightRectangle:rect] retain];
+    }
+    return [result autorelease];
 }
 
 - (CGRect)clientLineHeightRectForU16CursorPos:(NSUInteger)u16Cursor {
     id client = [self client];
     if (!client) return CGRectNull;
     CGRect result = CGRectMake(0, 0, 0.114, 0.514);
-    NSInteger cursor = (NSInteger)u16Cursor;
-    while (result.origin.x == 0 && result.origin.y == 0 && cursor >= 0) {
-        [client attributesForCharacterIndex:(NSUInteger)cursor lineHeightRectangle:&result];
-        cursor--;
+    @autoreleasepool {
+        NSInteger cursor = (NSInteger)u16Cursor;
+        while (result.origin.x == 0 && result.origin.y == 0 && cursor >= 0) {
+            [client attributesForCharacterIndex:(NSUInteger)cursor lineHeightRectangle:&result];
+            cursor--;
+        }
     }
     return result;
 }
