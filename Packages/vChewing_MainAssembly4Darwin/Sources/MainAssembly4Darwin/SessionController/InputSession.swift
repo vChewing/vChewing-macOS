@@ -192,13 +192,18 @@ public final class InputSession: @MainActor SessionProtocol, Sendable {
 
   /// InputMode 需要在每次出現內容變更的時候都連帶重設組字器與各項語言模組，
   /// 順帶更新 IME 模組及 UserPrefs 當中對於當前語言模式的記載。
+  ///
+  /// 在 parity 雙緩衝 singleton pair 體制下，兩個 Session 實例共用同一個 `prefs` 引用。
+  /// `willSet` 將新模式寫入 `prefs.mostRecentInputMode`（全局唯一），另一方在
+  /// `performServerActivation()` 啟動時自動從 `IMEApp.currentInputMode` 同步，
+  /// 確保簡繁模式在雙極性 Session 之間一致。
   public var inputMode: Shared.InputMode = .imeModeNULL {
     willSet {
       /// 將新的簡繁輸入模式提報給 Prefs 模組。IMEApp 模組會據此計算正確的資料值。
       prefs.mostRecentInputMode = newValue.rawValue
     }
     didSet {
-      /// SQLite 資料庫是在 AppDelegate 階段就載入的，所以這裡不需要再 Lazy-Load。
+      /// 原廠辭典（TextMap）在 AppDelegate 階段就已初始化，此處無需 lazy-load。
       if oldValue != inputMode, inputMode != .imeModeNULL {
         /// 先重置輸入調度模組，不然會因為之後的命令而導致該命令無法正常執行。
         resetInputHandler()
