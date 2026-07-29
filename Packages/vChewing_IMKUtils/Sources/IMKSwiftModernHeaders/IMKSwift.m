@@ -356,7 +356,7 @@ static void (^_IMKSwift_onSettingObjCValue)(uintptr_t, intptr_t, uintptr_t);
         // and the underlying XPC connection are released promptly.  The controller
         // shell may persist in _controllers until the next prune cycle, but the
         // heavy XPC resources (~440 bytes per connection) are freed now.
-        id clientProxy = [self client];
+        id<IMKTextInput> clientProxy = [self client];
         if (clientProxy) {
             // macOS 15 Sequoia split IPMDServerClientWrapper into Modern / Legacy subclasses.
             // Try both variants, then fall back to the undecorated name for ≤10.15.
@@ -388,11 +388,12 @@ static void (^_IMKSwift_onSettingObjCValue)(uintptr_t, intptr_t, uintptr_t);
 /// No-ops (or returns `nil`/`CGRectNull`) when `[self client]` is `NULL`.
 
 - (BOOL)hasClient {
-    return [self client] != nil;
+    id<IMKTextInput> client = [self client];
+    return client != nil;
 }
 
 - (void)clientTextInsertionWith:(NSString *)text replacementRange:(NSRange)range {
-    id client = [self client];
+    id<IMKTextInput> client = [self client];
     if (!client) return;
     @autoreleasepool {
         [client insertText:text replacementRange:range];
@@ -400,7 +401,7 @@ static void (^_IMKSwift_onSettingObjCValue)(uintptr_t, intptr_t, uintptr_t);
 }
 
 - (void)clientMarkedTextSetupWith:(NSAttributedString *)text selectionRange:(NSRange)selRange replacementRange:(NSRange)repRange {
-    id client = [self client];
+    id<IMKTextInput> client = [self client];
     if (!client) return;
     @autoreleasepool {
         [client setMarkedText:text selectionRange:selRange replacementRange:repRange];
@@ -408,7 +409,7 @@ static void (^_IMKSwift_onSettingObjCValue)(uintptr_t, intptr_t, uintptr_t);
 }
 
 - (nullable NSString *)clientBundleIdentifier {
-    id client = [self client];
+    id<IMKTextInput> client = [self client];
     if (!client) return nil;
     NSString *result = nil;
     @autoreleasepool {
@@ -418,7 +419,7 @@ static void (^_IMKSwift_onSettingObjCValue)(uintptr_t, intptr_t, uintptr_t);
 }
 
 - (void)clientSelectModeWithModeIdentifier:(NSString *)mode {
-    id client = [self client];
+    id<IMKTextInput> client = [self client];
     if (!client) return;
     @autoreleasepool {
         [client selectInputMode:mode];
@@ -426,7 +427,7 @@ static void (^_IMKSwift_onSettingObjCValue)(uintptr_t, intptr_t, uintptr_t);
 }
 
 - (void)clientOverrideKeyboardWithName:(NSString *)name {
-    id client = [self client];
+    id<IMKTextInput> client = [self client];
     if (!client) return;
     @autoreleasepool {
         [client overrideKeyboardWithKeyboardNamed:name];
@@ -434,7 +435,7 @@ static void (^_IMKSwift_onSettingObjCValue)(uintptr_t, intptr_t, uintptr_t);
 }
 
 - (nullable NSDictionary *)clientAttributesForCharacterIndexAtU16Pos:(NSUInteger)idx lineHeightRectangle:(NSRect *)rect {
-    id client = [self client];
+    id<IMKTextInput> client = [self client];
     if (!client) return nil;
     NSDictionary *result = nil;
     @autoreleasepool {
@@ -444,7 +445,7 @@ static void (^_IMKSwift_onSettingObjCValue)(uintptr_t, intptr_t, uintptr_t);
 }
 
 - (CGRect)clientLineHeightRectForU16CursorPos:(NSUInteger)u16Cursor {
-    id client = [self client];
+    id<IMKTextInput> client = [self client];
     if (!client) return CGRectNull;
     CGRect result = CGRectMake(0, 0, 0.114, 0.514);
     @autoreleasepool {
@@ -455,6 +456,107 @@ static void (^_IMKSwift_onSettingObjCValue)(uintptr_t, intptr_t, uintptr_t);
         }
     }
     return result;
+}
+
+// MARK: - Core IMKTextInput (remainder)
+
+- (CGRect)clientFirstRectForCharacterRange:(NSRange)range actualRange:(nullable NSRange *)actualRangeOut {
+    id<IMKTextInput> client = [self client];
+    if (!client) return CGRectNull;
+    return [client firstRectForCharacterRange:range actualRange:actualRangeOut];
+}
+
+- (nullable NSString *)clientStringFromRange:(NSRange)range actualRange:(nullable NSRange *)actualRangeOut {
+    id<IMKTextInput> client = [self client];
+    if (!client) return nil;
+    NSString *result = nil;
+    @autoreleasepool {
+        result = [[client stringFromRange:range actualRange:actualRangeOut] retain];
+    }
+    return [result autorelease];
+}
+
+- (nullable NSString *)clientUniqueIdentifierString {
+    id<IMKTextInput> client = [self client];
+    if (!client) return nil;
+    NSString *result = nil;
+    @autoreleasepool {
+        result = [[client uniqueClientIdentifierString] retain];
+    }
+    return [result autorelease];
+}
+
+- (BOOL)clientSupportsUnicode {
+    id<IMKTextInput> client = [self client];
+    if (!client) return NO;
+    return [client supportsUnicode];
+}
+
+- (nullable NSArray *)clientValidAttributesForMarkedText {
+    id<IMKTextInput> client = [self client];
+    if (!client) return nil;
+    NSArray *result = nil;
+    @autoreleasepool {
+        result = [[client validAttributesForMarkedText] retain];
+    }
+    return [result autorelease];
+}
+
+- (NSInteger)clientCharacterIndexForPoint:(CGPoint)point tracking:(NSInteger)tracking inMarkedRange:(nullable BOOL *)inMarkedRange {
+    id<IMKTextInput> client = [self client];
+    if (!client) return NSNotFound;
+    return [client characterIndexForPoint:point tracking:tracking inMarkedRange:inMarkedRange];
+}
+
+- (NSInteger)clientLength {
+    id<IMKTextInput> client = [self client];
+    if (!client) return 0;
+    return [client length];
+}
+
+- (nullable NSAttributedString *)clientAttributedSubstringFromRange:(NSRange)range {
+    id<IMKTextInput> client = [self client];
+    if (!client) return nil;
+    NSAttributedString *result = nil;
+    @autoreleasepool {
+        result = [[client attributedSubstringFromRange:range] retain];
+    }
+    return [result autorelease];
+}
+
+- (NSRange)clientMarkedRange {
+    id<IMKTextInput> client = [self client];
+    if (!client) return NSMakeRange(NSNotFound, 0);
+    return [client markedRange];
+}
+
+- (NSRange)clientSelectedRange {
+    id<IMKTextInput> client = [self client];
+    if (!client) return NSMakeRange(NSNotFound, 0);
+    return [client selectedRange];
+}
+
+- (int32_t)clientWindowLevel {
+    id<IMKTextInput> client = [self client];
+    if (!client) return MAX(CGShieldingWindowLevel() - 3, 0);
+    return (int32_t)[client windowLevel];
+}
+
+- (BOOL)clientSupportsProperty:(unsigned int)property {
+    id<IMKTextInput> client = [self client];
+    if (!client) return NO;
+    return [client supportsProperty:property];
+}
+
+// MARK: - IMKTextInput_NSAppearance
+
+- (BOOL)clientIsDarkMode {
+    id client = [self client];
+    if (!client) return NO;
+    if (![client respondsToSelector:@selector(windowEffectiveAppearance)]) return NO;
+    id appearance = [client performSelector:@selector(windowEffectiveAppearance)];
+    if (!appearance) return NO;
+    return [[appearance valueForKey:@"name"] containsString:@"Dark"];
 }
 
 @end

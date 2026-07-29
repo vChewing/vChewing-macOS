@@ -177,6 +177,71 @@ extension FakeClient: IMKClientProxyProtocol {
   func clientLineHeightRect(forU16CursorPos cursorPos: UInt) -> CGRect {
     lineHeightRect(u16Cursor: Int(cursorPos))
   }
+
+  func clientFirstRect(
+    forCharacterRange range: NSRange,
+    actualRange: UnsafeMutablePointer<NSRange>?
+  )
+    -> CGRect {
+    firstRect(forCharacterRange: range, actualRange: actualRange)
+  }
+
+  func clientString(
+    fromRange range: NSRange,
+    actualRange: UnsafeMutablePointer<NSRange>?
+  )
+    -> String? {
+    string(from: range, actualRange: actualRange) as String?
+  }
+
+  func clientUniqueIdentifierString() -> String? {
+    uniqueClientIdentifierString()
+  }
+
+  func clientSupportsUnicode() -> Bool {
+    supportsUnicode()
+  }
+
+  func clientValidAttributesForMarkedText() -> [Any]? {
+    validAttributesForMarkedText() as [Any]?
+  }
+
+  func clientCharacterIndex(
+    forPoint point: CGPoint,
+    tracking: Int,
+    inMarkedRange: UnsafeMutablePointer<ObjCBool>?
+  )
+    -> Int {
+    characterIndex(for: point, tracking: tracking, inMarkedRange: inMarkedRange)
+  }
+
+  func clientLength() -> Int {
+    length()
+  }
+
+  func clientAttributedSubstring(fromRange range: NSRange) -> NSAttributedString? {
+    attributedSubstring(from: range) as NSAttributedString?
+  }
+
+  func clientMarkedRange() -> NSRange {
+    markedRange()
+  }
+
+  func clientSelectedRange() -> NSRange {
+    selectedRange()
+  }
+
+  func clientWindowLevel() -> Int32 {
+    windowLevel()
+  }
+
+  func clientSupportsProperty(_ property: UInt32) -> Bool {
+    supportsProperty(TSMDocumentPropertyTag(property))
+  }
+
+  func clientIsDarkMode() -> Bool {
+    false
+  }
 }
 
 extension IMKTextInput {

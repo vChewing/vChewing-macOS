@@ -29,4 +29,34 @@ public protocol IMKClientProxyProtocol: AnyObject {
   ) -> [AnyHashable: Any]?
 
   func clientLineHeightRect(forU16CursorPos: UInt) -> CGRect
+  func clientFirstRect(
+    forCharacterRange: NSRange,
+    actualRange: UnsafeMutablePointer<NSRange>?
+  ) -> CGRect
+
+  func clientString(
+    fromRange range: NSRange,
+    actualRange: UnsafeMutablePointer<NSRange>?
+  ) -> String?
+
+  func clientUniqueIdentifierString() -> String?
+  func clientSupportsUnicode() -> Bool
+  func clientValidAttributesForMarkedText() -> [Any]?
+
+  func clientCharacterIndex(
+    forPoint point: CGPoint,
+    tracking: Int,
+    inMarkedRange: UnsafeMutablePointer<ObjCBool>?
+  ) -> Int
+
+  func clientLength() -> Int
+  func clientAttributedSubstring(fromRange range: NSRange) -> NSAttributedString?
+  func clientMarkedRange() -> NSRange
+  func clientSelectedRange() -> NSRange
+  func clientWindowLevel() -> Int32
+  func clientSupportsProperty(_ property: UInt32) -> Bool
+
+  // MARK: - IMKTextInput_NSAppearance
+
+  func clientIsDarkMode() -> Bool
 }

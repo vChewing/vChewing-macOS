@@ -961,6 +961,27 @@
 /// Returns `CGRectNull` if client is `NULL`.
 - (CGRect)clientLineHeightRectForU16CursorPos:(NSUInteger)u16Cursor;
 
+- (CGRect)clientFirstRectForCharacterRange:(NSRange)range actualRange:(nullable NSRange *)actualRangeOut
+    NS_SWIFT_NAME(clientFirstRect(forCharacterRange:actualRange:));
+- (nullable NSString *)clientStringFromRange:(NSRange)range actualRange:(nullable NSRange *)actualRangeOut
+    NS_SWIFT_NAME(clientString(fromRange:actualRange:));
+- (nullable NSString *)clientUniqueIdentifierString;
+- (BOOL)clientSupportsUnicode;
+- (nullable NSArray *)clientValidAttributesForMarkedText;
+- (NSInteger)clientCharacterIndexForPoint:(CGPoint)point tracking:(NSInteger)tracking inMarkedRange:(nullable BOOL *)inMarkedRange
+    NS_SWIFT_NAME(clientCharacterIndex(forPoint:tracking:inMarkedRange:));
+- (NSInteger)clientLength;
+- (nullable NSAttributedString *)clientAttributedSubstringFromRange:(NSRange)range
+    NS_SWIFT_NAME(clientAttributedSubstring(fromRange:));
+- (NSRange)clientMarkedRange;
+- (NSRange)clientSelectedRange;
+- (int32_t)clientWindowLevel;
+- (BOOL)clientSupportsProperty:(unsigned int)property;
+
+// MARK: - IMKTextInput_NSAppearance
+
+- (BOOL)clientIsDarkMode;
+
 @end
 
 #pragma clang attribute pop
