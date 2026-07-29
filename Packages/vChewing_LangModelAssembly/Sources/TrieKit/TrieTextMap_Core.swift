@@ -137,10 +137,13 @@ extension VanguardTrie {
 
     private var cachedEntries: [Int: [Entry]] = [:]
     private var cachedEntriesLRUOrder: [Int] = []
-    private let queryBuffer4Node: QueryBuffer<VanguardTrie.Trie.TNode?> = .init()
-    private let queryBuffer4Nodes: QueryBuffer<[VanguardTrie.Trie.TNode]> = .init()
-    private let queryBuffer4NodeIDs: QueryBuffer<[Int]> = .init()
-    private let queryBuffer4EntryGroups: QueryBuffer<[EntryGroup]> = .init()
+    private let queryBuffer4Node: QueryBuffer<VanguardTrie.Trie.TNode?> = .init(maxCount: 2_048)
+    private let queryBuffer4Nodes: QueryBuffer<[VanguardTrie.Trie.TNode]> = .init(maxCount: 2_048)
+    private let queryBuffer4NodeIDs: QueryBuffer<[Int]> = .init(maxCount: 2_048)
+    private let queryBuffer4EntryGroups: QueryBuffer<[EntryGroup]> = .init(maxCount: 512)
+    /// 供 `getNodeIDsForKeyArray` 複用的臨時緩衝區，避免每次 cache miss 時分配新陣列。
+    /// 僅在呼叫者確保單一執行緒存取 Trie 時安全（TextMap 查詢在主執行緒或序列佇列上進行）。
+    private var scratchNodeIDs: [Int] = []
   }
 }
 
@@ -1221,19 +1224,22 @@ extension VanguardTrie.TextMapTrie: VanguardTrieProtocol {
       return cached
     }
 
-    var matchedNodeIDs = [Int]()
+    scratchNodeIDs.removeAll(keepingCapacity: true)
     if longerSegment {
       for (currentInitials, nodeIDs) in keyInitialsIDMap
         where currentInitials.hasPrefix(keyInitials) {
-        matchedNodeIDs.append(contentsOf: nodeIDs)
+        scratchNodeIDs.append(contentsOf: nodeIDs)
       }
-      matchedNodeIDs.sort()
+      scratchNodeIDs.sort()
     } else {
-      matchedNodeIDs = keyInitialsIDMap[keyInitials] ?? []
+      if let nodeIDs = keyInitialsIDMap[keyInitials] {
+        scratchNodeIDs.append(contentsOf: nodeIDs)
+      }
     }
 
-    queryBuffer4NodeIDs.set(hashKey: cacheKey, value: matchedNodeIDs)
-    return matchedNodeIDs
+    let result = Array(scratchNodeIDs)
+    queryBuffer4NodeIDs.set(hashKey: cacheKey, value: result)
+    return result
   }
 
   public func getNode(_ nodeID: Int) -> VanguardTrie.Trie.TNode? {

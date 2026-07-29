@@ -16,13 +16,16 @@ public final class QueryBuffer<T> {
   // MARK: Lifecycle
 
   /// 以特定的過期時間間隔初期化 QueryBuffer
-  /// - Parameter expirationInterval: 條目過期的秒數（預設值：7）
-  public init(expirationInterval: TimeInterval = 7.0) {
+  /// - Parameters:
+  ///   - expirationInterval: 條目過期的秒數（預設值：7）
+  ///   - maxCount: 最大快取條目數，超過時淘汰最舊條目（nil = 無上限）
+  public init(expirationInterval: TimeInterval = 7.0, maxCount: Int? = nil) {
     self.expirationNanoseconds = UInt64(expirationInterval * 1_000_000_000)
     self.cleanupThrottleNanoseconds = Swift.max(
       Self.minimumCleanupThrottleNanoseconds,
       Swift.min(expirationNanoseconds, Self.maximumCleanupThrottleNanoseconds)
     )
+    self.maxCount = maxCount
   }
 
   // MARK: Public
@@ -55,6 +58,7 @@ public final class QueryBuffer<T> {
     if shouldCheckCleanup, shouldRunCleanupLocked(now: now) {
       removeExpiredEntriesLocked(now: now)
     }
+    evictOldestIfOverMaxCountLocked(now: now)
   }
 
   /// 如果值存在且未過期，則從緩衝區擷取該值
@@ -138,6 +142,27 @@ public final class QueryBuffer<T> {
   private let mtxLastCleanupTimestampNs = NSMutex<UInt64>(0)
 
   private let mtxCleanupInProgress = NSMutex<Bool>(false)
+
+  private let maxCount: Int?
+
+  private func evictOldestIfOverMaxCountLocked(now: UInt64) {
+    guard let maxCount else { return }
+    let currentCount = count
+    guard currentCount > maxCount else { return }
+    // 掃描快取尋找最舊條目（timestampNs 最小），逐出之。
+    // 每次 set() 最多逐出 1 條，避免單次操作過長時間。
+    var oldestKey: Int?
+    var oldestTime: UInt64 = .max
+    mtxCache.withLockRead { cache in
+      for (key, entry) in cache where entry.timestampNs < oldestTime {
+        oldestTime = entry.timestampNs
+        oldestKey = key
+      }
+    }
+    if let oldestKey {
+      _ = mtxCache.withLock { $0.removeValue(forKey: oldestKey) }
+    }
+  }
 
   private func shouldRunCleanupLocked(now: UInt64) -> Bool {
     let lastCleanupTimestampNs = mtxLastCleanupTimestampNs.value
