@@ -323,6 +323,12 @@ public final class LMMgr {
     }
   }
 
+  /// 清除原廠辭典的所有 QueryBuffer 快取。
+  /// 應在適當的時機呼叫，避免舊查詢結果污染新的查詢。
+  public static func flushTrieCaches() {
+    LMAssembly.LMInstantiator.flushTrieCaches()
+  }
+
   // MARK: POM
 
   public static func savePerceptionOverrideModelData(_ saveAllModes: Bool = true) {

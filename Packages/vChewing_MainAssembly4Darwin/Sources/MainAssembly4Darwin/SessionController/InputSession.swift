@@ -104,6 +104,8 @@ public final class InputSession: @MainActor SessionProtocol, Sendable {
 
   public var synchronizer4LMPrefs: (() -> ())? = { LMMgr.syncLMPrefs() }
 
+  public var trieCacheFlushHandler: (() -> ())? = { LMMgr.flushTrieCaches() }
+
   public var ui: (any SessionUIProtocol)? = SessionUI.shared
 
   public var prefs: any PrefMgrProtocol = PrefMgr.shared

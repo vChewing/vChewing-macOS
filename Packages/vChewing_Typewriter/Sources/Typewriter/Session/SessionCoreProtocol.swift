@@ -60,6 +60,10 @@ public protocol SessionCoreProtocol: AnyObject & CtlCandidateDelegate {
   // MARK: State Transition
 
   func switchState(_ newState: IMEState, caller: StaticString, line: Int)
+
+  /// 跨模組注入：清除 Trie 查詢快取的回呼閉包。
+  /// 由 MainAssembly 注入，Typewriter 層不直接依賴 LMMgr。
+  var trieCacheFlushHandler: (() -> ())? { get set }
 }
 
 // MARK: - Default Implementations
@@ -127,8 +131,10 @@ extension SessionCoreProtocol {
   ///   - commitExisting: 設為 `false` 時僅切換至 Empty 狀態、不提交既有內容。
   public func resetInputHandler(
     forceComposerCleanup: Bool = false,
-    commitExisting: Bool = true
+    commitExisting: Bool = true,
+    flushCaches: Bool = false
   ) {
+    if flushCaches { trieCacheFlushHandler?() }
     guard let inputHandler else { return }
     guard commitExisting else {
       switchState(.ofEmpty())

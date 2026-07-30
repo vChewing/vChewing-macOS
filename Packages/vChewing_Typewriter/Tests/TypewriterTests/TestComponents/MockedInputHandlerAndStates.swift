@@ -107,6 +107,7 @@ public final class MockSession: @MainActor SessionCoreProtocol {
   public var selectionKeys: String = "123456789"
   public var recentCommissions = [String]()
   public var clientAccentColor: HSBA?
+  public var trieCacheFlushHandler: (() -> ())?
 
   public var isCandidateState: Bool { state.type == .ofCandidates }
 
