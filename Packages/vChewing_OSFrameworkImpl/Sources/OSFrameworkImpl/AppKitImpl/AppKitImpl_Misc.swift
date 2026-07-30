@@ -412,26 +412,17 @@
 
   // Ref: https://developer.apple.com/forums/thread/105088?answerId=357415022#357415022
   extension NSApplication {
-    /// The private memory footprint in bytes.
+    /// 該進程的私有匿名記憶體佔用量（bytes）。
     ///
-    /// Computed as ``phys_footprint`` minus graphics / neural engine /
-    /// purgeable ledger overhead.  When Liquid Glass compositor surfaces
-    /// are active on Apple Silicon they inflate ``phys_footprint`` via
-    /// ``ledger_tag_graphics_footprint``; subtracting them keeps the
-    /// measurement honest for leak self-diagnosis.
+    /// 使用 `task_vm_info.internal` 而非手動從 `phys_footprint` 扣除 ledger
+    /// tags——兩者在實測中給出幾乎相同的數值（Phase 99 的 ledger subtraction
+    /// 已正確排除 GPU surface），但 `internal` 是單次讀取、不依賴 ledger tag
+    /// 的枚舉完整性（未來 macOS 可能新增 ledger category），語義更清晰。
+    /// 只計入匿名私有頁面（malloc zone、stack、VM_ALLOCATE），自然排除 dyld
+    /// 檔案映射與 GPU 共享記憶體。IMK 物件分配仍在 DefaultMallocZone 內。
     nonisolated public static var memoryFootprintAnonymous: UInt64? {
       guard let info = Self._vmInfo() else { return nil }
-      var footprint = info.phys_footprint
-      if footprint > info.ledger_tag_graphics_footprint {
-        footprint -= UInt64(bitPattern: info.ledger_tag_graphics_footprint)
-      }
-      if footprint > info.ledger_tag_neural_footprint {
-        footprint -= UInt64(bitPattern: info.ledger_tag_neural_footprint)
-      }
-      if footprint > info.ledger_purgeable_nonvolatile {
-        footprint -= UInt64(bitPattern: info.ledger_purgeable_nonvolatile)
-      }
-      return footprint
+      return info.internal
     }
 
     // MARK: Internal
