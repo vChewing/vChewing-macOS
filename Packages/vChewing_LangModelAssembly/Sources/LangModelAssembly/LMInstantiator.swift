@@ -211,6 +211,12 @@ extension LMAssembly {
       asyncLoadingUserData = !UserDefaults.pendingUnitTests
     }
 
+    /// 清除原廠辭典的所有 QueryBuffer 快取。
+    /// 應在適當的時機呼叫，避免舊查詢結果污染新的查詢。
+    public static func flushTrieCaches() {
+      factoryTrie?.flushCaches()
+    }
+
     @discardableResult
     public func setOptions(handler: (inout Config) -> ()) -> LMInstantiator {
       handler(&config)

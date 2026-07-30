@@ -76,6 +76,15 @@ extension VanguardTrie {
       return readings.isEmpty ? nil : readings
     }
 
+    /// 清除所有 QueryBuffer 快取（node、nodeIDs、nodes、entryGroups）。
+    /// 應在適當的時機呼叫，避免舊查詢結果污染新的查詢。
+    public func flushCaches() {
+      queryBuffer4Node.clear()
+      queryBuffer4Nodes.clear()
+      queryBuffer4NodeIDs.clear()
+      queryBuffer4EntryGroups.clear()
+    }
+
     // MARK: Private
 
     private typealias Entry = VanguardTrie.Trie.Entry
