@@ -5,6 +5,7 @@
 %sname WUBI
 %intlname Haifeng_Wubi:en;海峰五笔:zh-Hans;海峰五筆:zh-Hant
 %selkey 1234567890
+%anysinglecharkey Z
 %wildcardkey z
 %keyname begin
 a 工

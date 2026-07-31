@@ -13,6 +13,7 @@
 %intlname Array_30:en;行列30:zh-Hans;行列30:zh-Hant
 %selkey 1234567890
 %endkey 1234567890
+%anysinglecharkey ?
 %wildcardkey *
 %nullcandidate 💩
 %keys_to_directly_commit `~!@#$%^&*()-_=+[{]}\|:'"<>?
