@@ -13,13 +13,18 @@ import AppKit
 final class CtlRevLookupWindow: NSWindowController, NSWindowDelegate {
   static var shared: CtlRevLookupWindow?
 
+  /// 關閉反查視窗時釋放反查索引，把約 10 MB 記憶體還給系統。
+  /// 所有載入/卸除操作均經由 UI 行為在 MainActor 上完成，無需額外同步佇列。
   override func close() {
     autoreleasepool {
+      LMMgr.flushFactoryReverseLookupIndex()
       super.close()
       Self.shared = nil
     }
   }
 
+  /// 顯示反查視窗；載入時即預先建立反查索引，避免首次查詢時的 lazy build 延遲。
+  /// 所有載入/卸除操作均經由 UI 行為在 MainActor 上完成，無需額外同步佇列。
   static func show() {
     autoreleasepool {
       if shared == nil { Self.shared = .init(window: FrmRevLookupWindow()) }
@@ -30,6 +35,7 @@ final class CtlRevLookupWindow: NSWindowController, NSWindowDelegate {
       window.setPosition(vertical: .bottom, horizontal: .right, padding: 20)
       window.orderFrontRegardless() // 逼著視窗往最前方顯示
       window.level = .statusBar
+      LMMgr.preloadFactoryReverseLookupIndex()
       shared.showWindow(shared)
       NSApp.popup()
     }
