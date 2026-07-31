@@ -217,6 +217,18 @@ extension LMAssembly {
       factoryTrie?.flushCaches()
     }
 
+    /// 釋放原廠辭典反查索引佔用的記憶體。
+    /// 關閉獨立 RevLookup 視窗後可呼叫；下次反查會自動重新建立。
+    public static func flushFactoryReverseLookupIndex() {
+      factoryTrie?.flushReverseLookupIndex()
+    }
+
+    /// 預先建立原廠辭典反查索引。
+    /// 在 RevLookup 視窗顯示時呼叫，使首次查詢無需等待 lazy build。
+    public static func preloadFactoryReverseLookupIndex() {
+      factoryTrie?.ensureReverseLookupIndex()
+    }
+
     @discardableResult
     public func setOptions(handler: (inout Config) -> ()) -> LMInstantiator {
       handler(&config)

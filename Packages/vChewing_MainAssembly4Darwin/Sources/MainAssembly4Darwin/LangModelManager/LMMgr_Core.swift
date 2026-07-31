@@ -329,6 +329,19 @@ public final class LMMgr {
     LMAssembly.LMInstantiator.flushTrieCaches()
   }
 
+  /// 釋放原廠辭典反查索引佔用的記憶體。
+  /// 關閉獨立 RevLookup 視窗後可呼叫；下次反查會自動重新建立。
+  /// 所有載入/卸除操作均經由 UI 行為在 MainActor 上完成，無需額外同步佇列。
+  public static func flushFactoryReverseLookupIndex() {
+    LMAssembly.LMInstantiator.flushFactoryReverseLookupIndex()
+  }
+
+  /// 預先建立原廠辭典反查索引。
+  /// 在 RevLookup 視窗顯示時呼叫，使首次查詢無需等待 lazy build。
+  public static func preloadFactoryReverseLookupIndex() {
+    LMAssembly.LMInstantiator.preloadFactoryReverseLookupIndex()
+  }
+
   // MARK: POM
 
   public static func savePerceptionOverrideModelData(_ saveAllModes: Bool = true) {

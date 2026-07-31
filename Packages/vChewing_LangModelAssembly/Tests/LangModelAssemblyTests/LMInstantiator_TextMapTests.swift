@@ -203,6 +203,37 @@ struct LMInstantiatorTextMapTests {
   }
 
   @Test
+  func testFactoryReverseLookupIndexCanBeFlushedAndRebuilt() throws {
+    defer {
+      LMAssembly.LMInstantiator.disconnectFactoryDictionary()
+    }
+
+    let textMap = """
+    #PRAGMA:VANGUARD_HOMA_LEXICON_HEADER
+    VERSION\t1.1
+    TYPE\tTYPING
+    READING_SEPARATOR\t-
+    ENTRY_COUNT\t3
+    KEY_COUNT\t3
+    #PRAGMA:VANGUARD_HOMA_LEXICON_VALUES
+    @-9.9\t宜\t宜
+    @-8.8\t便宜\t便宜
+    𡜅\t-11\t7
+    #PRAGMA:VANGUARD_HOMA_LEXICON_KEY_LINE_MAP
+    ㄧˊ\t0\t1
+    ㄅㄧˋ-ㄧˊ\t1\t1
+    ㄌㄩˇ\t2\t1
+    """
+
+    #expect(LMAssembly.LMInstantiator.connectToTestFactoryDictionary(textMapData: textMap))
+    #expect(LMAssembly.LMInstantiator.getFactoryReverseLookupData(with: "宜") == ["ㄧˊ"])
+    #expect(LMAssembly.LMInstantiator.getFactoryReverseLookupData(with: "𡜅") == ["ㄌㄩˇ"])
+    LMAssembly.LMInstantiator.flushFactoryReverseLookupIndex()
+    #expect(LMAssembly.LMInstantiator.getFactoryReverseLookupData(with: "宜") == ["ㄧˊ"])
+    #expect(LMAssembly.LMInstantiator.getFactoryReverseLookupData(with: "𡜅") == ["ㄌㄩˇ"])
+  }
+
+  @Test
   func testFactoryDictionaryDoesNotAutoLoadRevLookupFile() async throws {
     let tempDir = FileManager.default.temporaryDirectory
       .appendingPathComponent(UUID().uuidString)
