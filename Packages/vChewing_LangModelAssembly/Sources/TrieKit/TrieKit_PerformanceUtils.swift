@@ -6,7 +6,10 @@ import Foundation
 
 // MARK: - TrieStringPool
 
-/// 專為樹狀索引操作最佳化的字串拘留池
+/// 專為樹狀索引操作最佳化的字串拘留池。
+///
+/// 為避免常駐記憶體隨查詢範圍無限成長，key/value 兩個 pool 都設有 LRU 上限；
+/// 被淘汰的字串只會失去未來 deduplication 的機會，不會影響已回傳的 String reference。
 @usableFromInline
 final class TrieStringPool: @unchecked Sendable {
   // MARK: Internal
@@ -18,10 +21,13 @@ final class TrieStringPool: @unchecked Sendable {
   func internKey(_ string: String) -> String {
     lock.withLock {
       if let interned = keyPool[string] {
+        touchKey(interned)
         return interned
       }
 
+      evictKeyIfNeeded()
       keyPool[string] = string
+      keyPoolOrder.append(string)
       return string
     }
   }
@@ -30,10 +36,13 @@ final class TrieStringPool: @unchecked Sendable {
   func internValue(_ string: String) -> String {
     lock.withLock {
       if let interned = valuePool[string] {
+        touchValue(interned)
         return interned
       }
 
+      evictValueIfNeeded()
       valuePool[string] = string
+      valuePoolOrder.append(string)
       return string
     }
   }
@@ -43,14 +52,45 @@ final class TrieStringPool: @unchecked Sendable {
     lock.withLock {
       keyPool.removeAll(keepingCapacity: true)
       valuePool.removeAll(keepingCapacity: true)
+      keyPoolOrder.removeAll(keepingCapacity: true)
+      valuePoolOrder.removeAll(keepingCapacity: true)
     }
   }
 
   // MARK: Private
 
+  private let maxPoolSize = 10_000
   private var keyPool: [String: String] = [:]
   private var valuePool: [String: String] = [:]
+  private var keyPoolOrder: [String] = []
+  private var valuePoolOrder: [String] = []
   private let lock = NSLock()
+
+  private func touchKey(_ string: String) {
+    if let idx = keyPoolOrder.firstIndex(of: string) {
+      keyPoolOrder.remove(at: idx)
+      keyPoolOrder.append(string)
+    }
+  }
+
+  private func touchValue(_ string: String) {
+    if let idx = valuePoolOrder.firstIndex(of: string) {
+      valuePoolOrder.remove(at: idx)
+      valuePoolOrder.append(string)
+    }
+  }
+
+  private func evictKeyIfNeeded() {
+    guard keyPool.count >= maxPoolSize, let oldest = keyPoolOrder.first else { return }
+    keyPool.removeValue(forKey: oldest)
+    keyPoolOrder.removeFirst()
+  }
+
+  private func evictValueIfNeeded() {
+    guard valuePool.count >= maxPoolSize, let oldest = valuePoolOrder.first else { return }
+    valuePool.removeValue(forKey: oldest)
+    valuePoolOrder.removeFirst()
+  }
 }
 
 // MARK: - TrieStringOperationCache

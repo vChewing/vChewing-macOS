@@ -14,7 +14,7 @@ extension VanguardTrie {
   /// - raw `Data` 常駐
   /// - sorted key index + binary search
   /// - prefix-range scan for longer-segment queries
-  /// - eager reverse lookup table
+  /// - lazy reverse lookup index（第一次反查時才建立）
   /// - key initials prefilter for partial match
   public final class TextMapTrie {
     // MARK: Lifecycle
@@ -42,28 +42,17 @@ extension VanguardTrie {
       )
       self.valuesEndOffset = bounds.keyMapLineStart
 
-      let (parsedEntries, initialsMap) = Self.parseKeyLineMapContent(
+      let (parsedEntries, initialsBuckets) = Self.parseKeyLineMapContent(
         in: data,
         from: bounds.keyMapContentStart,
         to: data.count,
         separator: header.separator
       )
       self.keyEntries = parsedEntries
-      self.keyInitialsIDMap = initialsMap
-      self.valueLineToKeyEntryIndex = Self.buildLineOwnerIndex(
-        keyEntries: parsedEntries,
-        valueLineCount: valuesLineOffsets.count
-      )
-      self.reverseLookupTable = Self.buildReverseLookupTable(
-        in: data,
-        keyEntries: parsedEntries,
-        valueLineOffsets: valuesLineOffsets,
-        valuesEndOffset: valuesEndOffset,
-        valueLineToKeyEntryIndex: valueLineToKeyEntryIndex,
-        isTyping: header.isTyping,
-        defaultProbs: header.defaultProbs,
-        separator: header.separator
-      )
+      self.keyInitialsBuckets = initialsBuckets
+      self.valueLineToKeyEntryIndex = []
+      self.reverseLookupTable = .empty
+      self.reverseLookupReady = false
     }
 
     // MARK: Public
@@ -71,8 +60,11 @@ extension VanguardTrie {
     public let readingSeparator: Character
 
     public func reverseLookup(for kanji: String) -> [String]? {
+      ensureReverseLookupIndex()
       guard let index = reverseLookupIndex(for: kanji) else { return nil }
-      let readings = parsedReadings(from: reverseLookupTable[index].lineIndices)
+      let start = Int(reverseLookupTable.lineIndexOffsets[index])
+      let end = Int(reverseLookupTable.lineIndexOffsets[index + 1])
+      let readings = parsedReadings(from: reverseLookupTable.lineIndexValues[start ..< end])
       return readings.isEmpty ? nil : readings
     }
 
@@ -91,18 +83,30 @@ extension VanguardTrie {
     private typealias EntryGroup = (keyArray: [String], entries: [Entry])
 
     private struct KeyEntry {
-      let keyStart: Int
-      let keyEnd: Int
-      let startLine: Int
-      let count: Int
+      let keyStart: UInt32
+      let keyEnd: UInt32
+      let startLine: UInt32
+      let count: UInt32
       /// Precomputed reading-key segment count (number of `-`-separated sub-keys).
       /// A segment count of 1 means the key represents a single syllable.
       let segmentCount: UInt8
     }
 
-    private struct RevLookupEntry {
-      let key: ContiguousArray<UInt8>
-      let lineIndices: [Int]
+    private struct ReverseLookupIndex {
+      static let empty = Self(
+        keys: [],
+        lineIndexOffsets: [0],
+        lineIndexValues: []
+      )
+
+      let keys: [UInt32]
+      let lineIndexOffsets: [UInt32]
+      let lineIndexValues: [UInt32]
+    }
+
+    private struct InitialsBucket {
+      let initialsUTF8: ContiguousArray<UInt8>
+      let nodeIDs: [UInt32]
     }
 
     private struct PragmaBounds {
@@ -137,12 +141,13 @@ extension VanguardTrie {
     private let rawData: Data
     private let isTyping: Bool
     private let defaultProbs: [Int32: Double]
-    private let valuesLineOffsets: [Int]
+    private let valuesLineOffsets: [UInt32]
     private let valuesEndOffset: Int
     private let keyEntries: [KeyEntry]
-    private let keyInitialsIDMap: [String: [Int]]
-    private let valueLineToKeyEntryIndex: [Int32]
-    private let reverseLookupTable: [RevLookupEntry]
+    private let keyInitialsBuckets: [InitialsBucket]
+    private var valueLineToKeyEntryIndex: [Int32] = []
+    private var reverseLookupTable: ReverseLookupIndex = .empty
+    private var reverseLookupReady: Bool = false
 
     private var cachedEntries: [Int: [Entry]] = [:]
     private var cachedEntriesLRUOrder: [Int] = []
@@ -291,15 +296,15 @@ extension VanguardTrie.TextMapTrie {
     from start: Int,
     to end: Int
   )
-    -> [Int] {
+    -> [UInt32] {
     guard end > start else { return [] }
-    var offsets: [Int] = [start]
+    var offsets: [UInt32] = [UInt32(start)]
     data.withUnsafeBytes { rawBuffer in
       let buffer = rawBuffer.bindMemory(to: UInt8.self)
       for index in start ..< end where buffer[index] == 0x0A {
         let nextLineStart = index + 1
         if nextLineStart < end {
-          offsets.append(nextLineStart)
+          offsets.append(UInt32(nextLineStart))
         }
       }
     }
@@ -312,8 +317,8 @@ extension VanguardTrie.TextMapTrie {
     to end: Int,
     separator: Character
   )
-    -> ([KeyEntry], [String: [Int]]) {
-    guard end >= start else { return ([], [:]) }
+    -> ([KeyEntry], [InitialsBucket]) {
+    guard end >= start else { return ([], []) }
 
     var entries: [KeyEntry] = []
     let tab: UInt8 = 0x09
@@ -353,10 +358,10 @@ extension VanguardTrie.TextMapTrie {
 
         entries.append(
           .init(
-            keyStart: lowerBound,
-            keyEnd: firstTab,
-            startLine: startLine,
-            count: count,
+            keyStart: UInt32(lowerBound),
+            keyEnd: UInt32(firstTab),
+            startLine: UInt32(startLine),
+            count: UInt32(count),
             segmentCount: 0 // filled below
           )
         )
@@ -375,12 +380,14 @@ extension VanguardTrie.TextMapTrie {
     data.withUnsafeBytes { rawBuffer in
       let sortBuf = rawBuffer.bindMemory(to: UInt8.self)
       entries.sort { lhs, rhs in
-        let lhsLen = lhs.keyEnd - lhs.keyStart
-        let rhsLen = rhs.keyEnd - rhs.keyStart
+        let lhsStart = Int(lhs.keyStart)
+        let rhsStart = Int(rhs.keyStart)
+        let lhsLen = Int(lhs.keyEnd - lhs.keyStart)
+        let rhsLen = Int(rhs.keyEnd - rhs.keyStart)
         let minLen = lhsLen < rhsLen ? lhsLen : rhsLen
         for i in 0 ..< minLen {
-          let lb = sortBuf[lhs.keyStart + i]
-          let rb = sortBuf[rhs.keyStart + i]
+          let lb = sortBuf[lhsStart + i]
+          let rb = sortBuf[rhsStart + i]
           if lb < rb { return true }
           if lb > rb { return false }
         }
@@ -389,13 +396,13 @@ extension VanguardTrie.TextMapTrie {
     }
 
     // Byte-level key initials extraction avoids String/split allocations.
-    var keyInitialsIDMap: [String: [Int]] = [:]
+    var tempGroups: [String: [UInt32]] = [:]
     let sepByte = separator.asciiValue!
     data.withUnsafeBytes { rawBuffer in
       let initBuf = rawBuffer.bindMemory(to: UInt8.self)
       for (nodeID, idx) in entries.indices.enumerated() {
-        let ks = entries[idx].keyStart
-        let ke = entries[idx].keyEnd
+        let ks = Int(entries[idx].keyStart)
+        let ke = Int(entries[idx].keyEnd)
         var segCount: UInt8 = 1
         var initialsBytes = [UInt8]()
         // Collect full first character (not first byte) of the initial segment.
@@ -417,10 +424,10 @@ extension VanguardTrie.TextMapTrie {
           }
         }
         let initials = String(decoding: initialsBytes, as: UTF8.self)
-        keyInitialsIDMap[initials, default: []].append(nodeID)
+        tempGroups[initials, default: []].append(UInt32(nodeID))
         entries[idx] = .init(
-          keyStart: ks,
-          keyEnd: ke,
+          keyStart: UInt32(ks),
+          keyEnd: UInt32(ke),
           startLine: entries[idx].startLine,
           count: entries[idx].count,
           segmentCount: segCount
@@ -428,7 +435,17 @@ extension VanguardTrie.TextMapTrie {
       }
     }
 
-    return (entries, keyInitialsIDMap)
+    let buckets = tempGroups.map { initials, nodeIDs in
+      InitialsBucket(initialsUTF8: ContiguousArray(initials.utf8), nodeIDs: nodeIDs)
+    }.sorted { lhs, rhs in
+      lhs.initialsUTF8.withUnsafeBufferPointer { lhsBuffer in
+        rhs.initialsUTF8.withUnsafeBufferPointer { rhsBuffer in
+          compareUTF8Buffers(lhsBuffer, rhsBuffer) < 0
+        }
+      }
+    }
+
+    return (entries, buckets)
   }
 
   private static func buildLineOwnerIndex(
@@ -439,8 +456,9 @@ extension VanguardTrie.TextMapTrie {
     guard valueLineCount > 0 else { return [] }
     var lineOwners = Array(repeating: Int32(-1), count: valueLineCount)
     for (keyEntryIndex, keyEntry) in keyEntries.enumerated() {
-      let end = Swift.min(keyEntry.startLine + keyEntry.count, valueLineCount)
-      for lineIndex in keyEntry.startLine ..< end {
+      let start = Int(keyEntry.startLine)
+      let end = Swift.min(start + Int(keyEntry.count), valueLineCount)
+      for lineIndex in start ..< end {
         lineOwners[lineIndex] = Int32(keyEntryIndex)
       }
     }
@@ -457,16 +475,16 @@ extension VanguardTrie.TextMapTrie {
   private static func buildReverseLookupTable(
     in data: Data,
     keyEntries: [KeyEntry],
-    valueLineOffsets: [Int],
+    valueLineOffsets: [UInt32],
     valuesEndOffset: Int,
     valueLineToKeyEntryIndex: [Int32],
     isTyping: Bool,
     defaultProbs: [Int32: Double],
     separator: Character
   )
-    -> [RevLookupEntry] {
+    -> ReverseLookupIndex {
     // UInt32 scalar values as dictionary keys to avoid per-character String allocations.
-    var charToLineIndices: [UInt32: [Int]] = [:]
+    var charToLineIndices: [UInt32: [UInt32]] = [:]
 
     for lineIndex in 0 ..< valueLineOffsets.count {
       let keyEntryIndex = Int(valueLineToKeyEntryIndex[lineIndex])
@@ -474,9 +492,9 @@ extension VanguardTrie.TextMapTrie {
       let keyEntry = keyEntries[keyEntryIndex]
       let isSingleSegment = keyEntry.segmentCount == 1
 
-      let start = valueLineOffsets[lineIndex]
+      let start = Int(valueLineOffsets[lineIndex])
       var end = lineIndex + 1 < valueLineOffsets.count
-        ? valueLineOffsets[lineIndex + 1]
+        ? Int(valueLineOffsets[lineIndex + 1])
         : valuesEndOffset
       while end > start, data[end - 1] == 0x0A || data[end - 1] == 0x0D {
         end -= 1
@@ -491,37 +509,38 @@ extension VanguardTrie.TextMapTrie {
         includeGroupedTypingLine: isSingleSegment
       )
       for sv in chars {
-        charToLineIndices[sv, default: []].append(lineIndex)
+        charToLineIndices[sv, default: []].append(UInt32(lineIndex))
       }
     }
 
-    var result: [RevLookupEntry] = []
-    result.reserveCapacity(charToLineIndices.count)
-    for (scalarValue, lineIndices) in charToLineIndices {
-      let sortedLineIndices = lineIndices.sorted()
-      var deduplicatedLineIndices: [Int] = []
+    let sortedScalars = charToLineIndices.keys.sorted()
+    let totalLineIndices = charToLineIndices.values.reduce(0) { $0 + $1.count }
+
+    var keys: [UInt32] = []
+    keys.reserveCapacity(sortedScalars.count)
+    var lineIndexOffsets: [UInt32] = [0]
+    var lineIndexValues: [UInt32] = []
+    lineIndexValues.reserveCapacity(totalLineIndices)
+
+    for scalarValue in sortedScalars {
+      let sortedLineIndices = charToLineIndices[scalarValue]!.sorted()
+      var deduplicatedLineIndices: [UInt32] = []
       deduplicatedLineIndices.reserveCapacity(sortedLineIndices.count)
       for currentLineIndex in sortedLineIndices
         where deduplicatedLineIndices.last != currentLineIndex {
         deduplicatedLineIndices.append(currentLineIndex)
       }
-      guard let scalar = Unicode.Scalar(scalarValue) else { continue }
-      result.append(
-        .init(
-          key: ContiguousArray(String(scalar).utf8),
-          lineIndices: deduplicatedLineIndices
-        )
-      )
+
+      keys.append(scalarValue)
+      lineIndexValues.append(contentsOf: deduplicatedLineIndices)
+      lineIndexOffsets.append(UInt32(lineIndexValues.count))
     }
 
-    result.sort { lhs, rhs in
-      lhs.key.withUnsafeBufferPointer { lhsBuffer in
-        rhs.key.withUnsafeBufferPointer { rhsBuffer in
-          compareUTF8Buffers(lhsBuffer, rhsBuffer) < 0
-        }
-      }
-    }
-    return result
+    return ReverseLookupIndex(
+      keys: keys,
+      lineIndexOffsets: lineIndexOffsets,
+      lineIndexValues: lineIndexValues
+    )
   }
 
   // MARK: - Byte-Level Reverse-Lookup Char Extraction
@@ -849,9 +868,29 @@ extension VanguardTrie.TextMapTrie {
 extension VanguardTrie.TextMapTrie {
   private var reverseLookupNodeIDOffset: Int { keyEntries.count + 1 }
 
+  private func ensureReverseLookupIndex() {
+    guard !reverseLookupReady else { return }
+    let owners = Self.buildLineOwnerIndex(
+      keyEntries: keyEntries,
+      valueLineCount: valuesLineOffsets.count
+    )
+    valueLineToKeyEntryIndex = owners
+    reverseLookupTable = Self.buildReverseLookupTable(
+      in: rawData,
+      keyEntries: keyEntries,
+      valueLineOffsets: valuesLineOffsets,
+      valuesEndOffset: valuesEndOffset,
+      valueLineToKeyEntryIndex: owners,
+      isTyping: isTyping,
+      defaultProbs: defaultProbs,
+      separator: readingSeparator
+    )
+    reverseLookupReady = true
+  }
+
   private func resolveKey(for keyEntry: KeyEntry) -> String {
     TrieStringPool.shared.internKey(
-      Self.extractString(from: rawData, start: keyEntry.keyStart, end: keyEntry.keyEnd)
+      Self.extractString(from: rawData, start: Int(keyEntry.keyStart), end: Int(keyEntry.keyEnd))
     )
   }
 
@@ -864,9 +903,9 @@ extension VanguardTrie.TextMapTrie {
 
   private func extractValueLine(at lineIndex: Int) -> String {
     guard lineIndex >= 0, lineIndex < valuesLineOffsets.count else { return "" }
-    let start = valuesLineOffsets[lineIndex]
+    let start = Int(valuesLineOffsets[lineIndex])
     var end = lineIndex + 1 < valuesLineOffsets.count
-      ? valuesLineOffsets[lineIndex + 1]
+      ? Int(valuesLineOffsets[lineIndex + 1])
       : valuesEndOffset
     while end > start, rawData[end - 1] == 0x0A || rawData[end - 1] == 0x0D {
       end -= 1
@@ -878,7 +917,7 @@ extension VanguardTrie.TextMapTrie {
   private func parsedEntries(for keyEntryIndex: Int) -> [Entry] {
     guard keyEntryIndex >= 0, keyEntryIndex < keyEntries.count else { return [] }
     let keyEntry = keyEntries[keyEntryIndex]
-    let cacheKey = keyEntry.keyStart
+    let cacheKey = Int(keyEntry.keyStart)
     if let cached = cachedEntries[cacheKey] {
       // Promote to MRU position.
       if let idx = cachedEntriesLRUOrder.firstIndex(of: cacheKey) {
@@ -888,10 +927,10 @@ extension VanguardTrie.TextMapTrie {
       return cached
     }
 
-    let endLine = Swift.min(keyEntry.startLine + keyEntry.count, valuesLineOffsets.count)
+    let endLine = Swift.min(Int(keyEntry.startLine) + Int(keyEntry.count), valuesLineOffsets.count)
     var result: [Entry] = []
-    result.reserveCapacity(keyEntry.count)
-    for lineIndex in keyEntry.startLine ..< endLine {
+    result.reserveCapacity(Int(keyEntry.count))
+    for lineIndex in Int(keyEntry.startLine) ..< endLine {
       result.append(contentsOf: VanguardTrie.TrieIO.parseValueLine(
         extractValueLine(at: lineIndex),
         isTyping: isTyping,
@@ -943,7 +982,7 @@ extension VanguardTrie.TextMapTrie {
       let middle = lowerBound + (upperBound - lowerBound) / 2
       let middleEntry = keyEntries[middle]
       let comparison = rawData.compareUTF8Range(
-        middleEntry.keyStart ..< middleEntry.keyEnd,
+        Int(middleEntry.keyStart) ..< Int(middleEntry.keyEnd),
         with: keyUTF8
       )
       if comparison < 0 {
@@ -964,7 +1003,7 @@ extension VanguardTrie.TextMapTrie {
       let middle = lowerBound + (upperBound - lowerBound) / 2
       let middleEntry = keyEntries[middle]
       let comparison = rawData.compareUTF8Range(
-        middleEntry.keyStart ..< middleEntry.keyEnd,
+        Int(middleEntry.keyStart) ..< Int(middleEntry.keyEnd),
         with: keyPrefix
       )
       if comparison < 0 {
@@ -977,18 +1016,18 @@ extension VanguardTrie.TextMapTrie {
   }
 
   private func reverseLookupIndex(for key: String) -> Int? {
-    let keyUTF8 = Array(key.utf8)
+    guard let scalar = key.unicodeScalars.first, key.unicodeScalars.count == 1 else { return nil }
+    ensureReverseLookupIndex()
+    let scalarValue = scalar.value
+    let keys = reverseLookupTable.keys
     var lowerBound = 0
-    var upperBound = reverseLookupTable.count - 1
+    var upperBound = keys.count - 1
     while lowerBound <= upperBound {
       let middle = lowerBound + (upperBound - lowerBound) / 2
-      let currentEntry = reverseLookupTable[middle]
-      let comparison = currentEntry.key.withUnsafeBufferPointer { currentBuffer in
-        compareUTF8(currentBuffer, keyUTF8)
-      }
-      if comparison < 0 {
+      let current = keys[middle]
+      if current < scalarValue {
         lowerBound = middle + 1
-      } else if comparison > 0 {
+      } else if current > scalarValue {
         upperBound = middle - 1
       } else {
         return middle
@@ -997,12 +1036,14 @@ extension VanguardTrie.TextMapTrie {
     return nil
   }
 
-  private func parsedReadings(from lineIndices: [Int]) -> [String] {
+  private func parsedReadings<S: Sequence>(from lineIndices: S) -> [String]
+    where S.Element == UInt32 {
     var readings: [String] = []
     var handledReadings = Set<String>()
     for lineIndex in lineIndices {
-      guard lineIndex >= 0, lineIndex < valueLineToKeyEntryIndex.count else { continue }
-      let keyEntryIndex = Int(valueLineToKeyEntryIndex[lineIndex])
+      let li = Int(lineIndex)
+      guard li >= 0, li < valueLineToKeyEntryIndex.count else { continue }
+      let keyEntryIndex = Int(valueLineToKeyEntryIndex[li])
       guard keyEntryIndex >= 0, keyEntryIndex < keyEntries.count else { continue }
       let reading = resolveKey(for: keyEntries[keyEntryIndex])
       if handledReadings.insert(reading).inserted {
@@ -1056,7 +1097,10 @@ extension VanguardTrie.TextMapTrie {
     var result: [EntryGroup] = []
     for currentIndex in startIndex ..< keyEntries.count {
       let keyEntry = keyEntries[currentIndex]
-      guard rawData.hasUTF8Prefix(keyEntry.keyStart ..< keyEntry.keyEnd, prefixBytes) else { break }
+      guard rawData.hasUTF8Prefix(
+        Int(keyEntry.keyStart) ..< Int(keyEntry.keyEnd),
+        prefixBytes
+      ) else { break }
       if let group = filteredEntryGroup(for: currentIndex, filterType: filterType) {
         result.append(group)
       }
@@ -1104,16 +1148,19 @@ extension VanguardTrie.TextMapTrie {
   }
 
   private func parseReverseLookupNode(_ reverseLookupIndex: Int) -> VanguardTrie.Trie.TNode? {
-    guard reverseLookupIndex >= 0, reverseLookupIndex < reverseLookupTable.count else { return nil }
-    let reverseLookupEntry = reverseLookupTable[reverseLookupIndex]
-    let readingValues = parsedReadings(from: reverseLookupEntry.lineIndices)
+    guard reverseLookupIndex >= 0 else { return nil }
+    ensureReverseLookupIndex()
+    let table = reverseLookupTable
+    guard reverseLookupIndex < table.keys.count else { return nil }
+    let start = Int(table.lineIndexOffsets[reverseLookupIndex])
+    let end = Int(table.lineIndexOffsets[reverseLookupIndex + 1])
+    let readingValues = parsedReadings(from: table.lineIndexValues[start ..< end])
     guard !readingValues.isEmpty else { return nil }
 
+    guard let scalar = Unicode.Scalar(table.keys[reverseLookupIndex]) else { return nil }
     let node = VanguardTrie.Trie.TNode(
       id: reverseLookupNodeIDOffset + reverseLookupIndex,
-      readingKey: TrieStringPool.shared.internKey(
-        String(decoding: reverseLookupEntry.key, as: UTF8.self)
-      )
+      readingKey: TrieStringPool.shared.internKey(String(scalar))
     )
     node.entries.append(
       Entry(
@@ -1124,6 +1171,91 @@ extension VanguardTrie.TextMapTrie {
       )
     )
     return node
+  }
+}
+
+// MARK: - Initials Bucket Helpers
+
+extension VanguardTrie.TextMapTrie {
+  private func exactBucketIndex(for initialsUTF8: [UInt8]) -> Int? {
+    var lower = 0
+    var upper = keyInitialsBuckets.count - 1
+    while lower <= upper {
+      let middle = lower + (upper - lower) / 2
+      let comparison = Self.compareInitialsUTF8(
+        keyInitialsBuckets[middle].initialsUTF8,
+        initialsUTF8
+      )
+      if comparison < 0 {
+        lower = middle + 1
+      } else if comparison > 0 {
+        upper = middle - 1
+      } else {
+        return middle
+      }
+    }
+    return nil
+  }
+
+  private func lowerBoundBucketIndex(for initialsUTF8: [UInt8]) -> Int {
+    var lower = 0
+    var upper = keyInitialsBuckets.count
+    while lower < upper {
+      let middle = lower + (upper - lower) / 2
+      let comparison = Self.compareInitialsUTF8(
+        keyInitialsBuckets[middle].initialsUTF8,
+        initialsUTF8
+      )
+      if comparison < 0 {
+        lower = middle + 1
+      } else {
+        upper = middle
+      }
+    }
+    return lower
+  }
+
+  private static func compareInitialsUTF8(
+    _ lhs: ContiguousArray<UInt8>,
+    _ rhs: [UInt8]
+  )
+    -> Int {
+    lhs.withUnsafeBufferPointer { lhsBuffer in
+      compareUTF8(lhsBuffer, rhs)
+    }
+  }
+
+  private func hasBucketUTF8Prefix(_ source: ContiguousArray<UInt8>, _ prefix: [UInt8]) -> Bool {
+    source.withUnsafeBufferPointer { buffer in
+      guard buffer.count >= prefix.count else { return false }
+      for index in 0 ..< prefix.count where buffer[index] != prefix[index] {
+        return false
+      }
+      return true
+    }
+  }
+
+  private func initialsMatch(
+    _ bucket: InitialsBucket,
+    scalarSets: [Set<UnicodeScalar>]
+  )
+    -> Bool {
+    bucket.initialsUTF8.withUnsafeBufferPointer { buffer in
+      var byteIndex = 0
+      var setIndex = 0
+      while byteIndex < buffer.count {
+        guard setIndex < scalarSets.count else { return false }
+        let len = Self.utf8SequenceLength(buffer[byteIndex])
+        guard len > 0, byteIndex + len <= buffer.count else { return false }
+        let scalarValue = Self.decodeUTF8ScalarValue(from: buffer, at: byteIndex, length: len)
+        guard let scalar = Unicode.Scalar(scalarValue), scalarSets[setIndex].contains(scalar) else {
+          return false
+        }
+        byteIndex += len
+        setIndex += 1
+      }
+      return setIndex == scalarSets.count
+    }
   }
 }
 
@@ -1234,15 +1366,18 @@ extension VanguardTrie.TextMapTrie: VanguardTrieProtocol {
     }
 
     scratchNodeIDs.removeAll(keepingCapacity: true)
+    let prefixBytes = Array(keyInitials.utf8)
     if longerSegment {
-      for (currentInitials, nodeIDs) in keyInitialsIDMap
-        where currentInitials.hasPrefix(keyInitials) {
-        scratchNodeIDs.append(contentsOf: nodeIDs)
+      let startIndex = lowerBoundBucketIndex(for: prefixBytes)
+      for index in startIndex ..< keyInitialsBuckets.count {
+        guard hasBucketUTF8Prefix(keyInitialsBuckets[index].initialsUTF8, prefixBytes)
+        else { break }
+        scratchNodeIDs.append(contentsOf: keyInitialsBuckets[index].nodeIDs.map(Int.init))
       }
       scratchNodeIDs.sort()
     } else {
-      if let nodeIDs = keyInitialsIDMap[keyInitials] {
-        scratchNodeIDs.append(contentsOf: nodeIDs)
+      if let index = exactBucketIndex(for: prefixBytes) {
+        scratchNodeIDs.append(contentsOf: keyInitialsBuckets[index].nodeIDs.map(Int.init))
       }
     }
 
@@ -1410,20 +1545,9 @@ extension VanguardTrie.TextMapTrie: VanguardTrieProtocol {
     guard initialScalarSets.allSatisfy({ !$0.isEmpty }) else { return [] }
 
     var matchedNodeIDs = [Int]()
-    for (currentInitials, nodeIDs) in keyInitialsIDMap {
-      let scalars = currentInitials.unicodeScalars
-      var index = 0
-      var allMatched = true
-      for scalar in scalars {
-        guard index < initialScalarSets.count else { allMatched = false; break }
-        if !initialScalarSets[index].contains(scalar) {
-          allMatched = false
-          break
-        }
-        index += 1
-      }
-      if allMatched, index == initialScalarSets.count {
-        matchedNodeIDs.append(contentsOf: nodeIDs)
+    for bucket in keyInitialsBuckets {
+      if initialsMatch(bucket, scalarSets: initialScalarSets) {
+        matchedNodeIDs.append(contentsOf: bucket.nodeIDs.map(Int.init))
       }
     }
     matchedNodeIDs.sort()
@@ -1473,7 +1597,7 @@ extension VanguardTrie.TextMapTrie: VanguardTrieProtocol {
       let keyEntry = keyEntries[mid]
       let compared: Int = rawData.withUnsafeBytes { rawBuffer in
         let buffer = rawBuffer.bindMemory(to: UInt8.self)
-        let range = keyEntry.keyStart ..< keyEntry.keyEnd
+        let range = Int(keyEntry.keyStart) ..< Int(keyEntry.keyEnd)
         let slice = UnsafeBufferPointer(rebasing: buffer[range])
         return compareUTF8(slice, keyBytes)
       }
@@ -1488,7 +1612,7 @@ extension VanguardTrie.TextMapTrie: VanguardTrieProtocol {
     let keyEntry = keyEntries[lower]
     let isExactMatch: Bool = rawData.withUnsafeBytes { rawBuffer in
       let buffer = rawBuffer.bindMemory(to: UInt8.self)
-      let range = keyEntry.keyStart ..< keyEntry.keyEnd
+      let range = Int(keyEntry.keyStart) ..< Int(keyEntry.keyEnd)
       let slice = UnsafeBufferPointer(rebasing: buffer[range])
       return compareUTF8(slice, keyBytes) == 0
     }
