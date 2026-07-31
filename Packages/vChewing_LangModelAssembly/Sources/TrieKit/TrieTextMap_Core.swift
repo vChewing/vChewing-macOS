@@ -77,6 +77,14 @@ extension VanguardTrie {
       queryBuffer4EntryGroups.clear()
     }
 
+    /// 釋放反查索引佔用的記憶體。
+    /// 關閉獨立 RevLookup 視窗後可呼叫；下次反查會自動重新建立。
+    public func flushReverseLookupIndex() {
+      reverseLookupReady = false
+      valueLineToKeyEntryIndex.removeAll(keepingCapacity: false)
+      reverseLookupTable = .empty
+    }
+
     // MARK: Private
 
     private typealias Entry = VanguardTrie.Trie.Entry
@@ -868,7 +876,9 @@ extension VanguardTrie.TextMapTrie {
 extension VanguardTrie.TextMapTrie {
   private var reverseLookupNodeIDOffset: Int { keyEntries.count + 1 }
 
-  private func ensureReverseLookupIndex() {
+  /// 確保反查索引已建立；若尚未建立，則從 rawData 重建 `valueLineToKeyEntryIndex` 與 `reverseLookupTable`。
+  /// 此函式為 public，讓上層（如 RevLookup 視窗）可在使用者開啟視窗前預先載入索引。
+  public func ensureReverseLookupIndex() {
     guard !reverseLookupReady else { return }
     let owners = Self.buildLineOwnerIndex(
       keyEntries: keyEntries,

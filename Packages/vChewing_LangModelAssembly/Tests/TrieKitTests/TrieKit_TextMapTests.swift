@@ -344,4 +344,31 @@ struct TrieKitTextMapTests {
     )
     #expect(associatedFiltered?.map(\.value) == ["XZ"])
   }
+
+  @Test("[TrieKit] TextMapTrie flushReverseLookupIndex releases index and rebuilds on demand")
+  func testTextMapTrieFlushReverseLookupIndexRebuildsOnDemand() throws {
+    let textMap = """
+    #PRAGMA:VANGUARD_HOMA_LEXICON_HEADER
+    VERSION\t1.1
+    TYPE\tTYPING
+    READING_SEPARATOR\t-
+    ENTRY_COUNT\t3
+    KEY_COUNT\t3
+    #PRAGMA:VANGUARD_HOMA_LEXICON_VALUES
+    @-9.9\t宜\t宜
+    @-8.8\t便宜\t便宜
+    𡜅\t-11\t7
+    #PRAGMA:VANGUARD_HOMA_LEXICON_KEY_LINE_MAP
+    i2\t0\t1
+    bi4-i2\t1\t1
+    lv3\t2\t1
+    """
+
+    let trie = try VanguardTrie.TextMapTrie(data: Data(textMap.utf8))
+    #expect(trie.reverseLookup(for: "宜") == ["i2"])
+    #expect(trie.reverseLookup(for: "𡜅") == ["lv3"])
+    trie.flushReverseLookupIndex()
+    #expect(trie.reverseLookup(for: "宜") == ["i2"])
+    #expect(trie.reverseLookup(for: "𡜅") == ["lv3"])
+  }
 }
