@@ -12,6 +12,8 @@ import SwiftExtension
 extension LMAssembly.LMInstantiator {
   /// 磁帶模式專用：當前磁帶所規定的花牌鍵。
   public var cassetteWildcardKey: String { Self.lmCassette.wildcardKey }
+  /// 磁帶模式專用：當前磁帶所規定的任意單字元鍵。
+  public var cassetteAnySingleCharKey: String { Self.lmCassette.anySingleCharKey }
   /// 磁帶模式專用：當前磁帶規定的最大碼長。
   public var maxCassetteKeyLength: Int { Self.lmCassette.maxKeyLength }
   /// 磁帶模式專用：指定 `%quick` 快速候選結果當中要過濾掉的無效候選字符號。

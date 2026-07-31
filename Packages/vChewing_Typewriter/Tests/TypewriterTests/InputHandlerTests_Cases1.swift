@@ -634,6 +634,62 @@ extension InputHandlerTests {
     #expect(testSession.state.type == .ofInputting)
   }
 
+  /// 磁帶 quick-candidate 狀態下，敲任意單字元鍵（Shift+?）應錄入組筆區、而非叫出服務選單。
+  @Test
+  func test_IH105E_CassetteShiftQuestionTypesAnySingleCharKey() throws {
+    guard let testHandler, let testSession else {
+      Issue.record("testHandler and testSession at least one of them is nil.")
+      return
+    }
+
+    let originalAsyncLoading = LMAssembly.LMInstantiator.asyncLoadingUserData
+    LMAssembly.LMInstantiator.asyncLoadingUserData = false
+    defer { LMAssembly.LMInstantiator.asyncLoadingUserData = originalAsyncLoading }
+
+    guard let cassetteURL = cassetteURLForTests("array30", ext: "cin2") else {
+      Issue.record("無法存取用以測試的資料。當前嘗試存取的檔案：array30.cin2")
+      return
+    }
+
+    LMAssembly.LMInstantiator.loadCassetteData(path: cassetteURL.path)
+    #expect(LMAssembly.LMInstantiator.lmCassette.anySingleCharKey == "?")
+
+    testHandler.clear()
+    testHandler.prefs.cassetteEnabled = true
+    testHandler.prefs.useShiftQuestionToCallServiceMenu = true
+
+    // 裝上可見的模擬候選窗控制器，重現 quick candidate 已顯示的狀態。
+    testSession.mockCandidateController = MockCandidateController(visible: true)
+    defer { testSession.mockCandidateController = nil }
+
+    // 敲「y」之後，array30 的 %quick 候選（立言裡新記該認說話就）應顯示。
+    typeSentence("y")
+    #expect(testHandler.calligrapher == "y")
+    #expect(testSession.state.type == .ofInputting)
+    #expect(testSession.state.isCandidateContainer)
+
+    // 以 Shift+/（輸出「?」）敲入任意單字元鍵。
+    let shiftQuestion = KBEvent.KeyEventData(
+      flags: .shift,
+      chars: "?",
+      charsSansModifiers: "/",
+      keyCode: 44
+    ).asEvent
+    _ = testHandler.triageInput(event: shiftQuestion)
+
+    // 任意單字元鍵應進入組筆區，且不應叫出服務選單（符號表）。
+    #expect(testHandler.calligrapher == "y?")
+    #expect(testSession.state.type != .ofSymbolTable)
+
+    // 組字後組字區應直接顯示「熟」（`y,` 經任意單字元鍵匹配）。
+    typeSentence(" ")
+    #expect(testSession.state.displayedText == "熟")
+
+    // 叫出選字窗，確認「熟」在候選清單內。
+    #expect(testHandler.triageInput(event: KBEvent.KeyEventData.dataArrowDown.asEvent))
+    #expect(testSession.state.candidates.map(\.value).contains("熟"))
+  }
+
   @Test
   func test_IH106_CodePointInputCheck() throws {
     guard let testHandler, let testSession else {

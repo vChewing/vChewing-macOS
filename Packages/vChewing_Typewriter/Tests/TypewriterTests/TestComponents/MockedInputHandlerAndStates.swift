@@ -10,6 +10,7 @@ import Foundation
 import Homa
 import LangModelAssembly
 import Shared
+import SwiftExtension
 import Tekkon
 import Testing
 @testable import Typewriter
@@ -98,6 +99,8 @@ public final class MockSession: @MainActor SessionCoreProtocol {
   public var inputHandler: MockInputHandler?
   public var isASCIIMode: Bool = false
   public var clientMitigationLevel: Int = 0
+  /// 預設為 nil（候選窗不存在）；測試需要模擬候選窗已顯示時才指派。
+  public var mockCandidateController: MockCandidateController?
   public var isVerticalTyping: Bool = false
   public var showCodePointForCurrentCandidate: Bool = false
   public var shouldAutoExpandCandidates: Bool = false
@@ -170,7 +173,7 @@ public final class MockSession: @MainActor SessionCoreProtocol {
 
   // MARK: - CtlCandidateDelegate conformance
 
-  public func candidateController() -> CtlCandidateProtocol? { nil }
+  public func candidateController() -> CtlCandidateProtocol? { mockCandidateController }
 
   public func candidatePairs(conv _: Bool) -> [CandidateInState] {
     if !state.isCandidateContainer || state.candidates.isEmpty { return [] }
@@ -300,6 +303,40 @@ public final class MockSession: @MainActor SessionCoreProtocol {
   var debugLogCondition: Bool {
     PrefMgr.sharedSansDidSetOps.isDebugModeEnabled
   }
+}
+
+// MARK: - MockCandidateController
+
+/// 專門用於單元測試的模擬候選窗控制器。
+/// 僅用來讓 `handleCandidate` 認定候選窗處於可見狀態，不實際處理任何翻頁或移動高亮操作。
+public final class MockCandidateController: CtlCandidateProtocol {
+  // MARK: Lifecycle
+
+  public init(visible: Bool = true) {
+    self.visible = visible
+  }
+
+  // MARK: Public
+
+  public weak var delegate: (any CtlCandidateDelegate)?
+  public var highlightedIndex: Int = 0
+  public var visible: Bool
+  public var expanded: Bool = false
+  public var currentLayout: UILayoutOrientation = .horizontal
+
+  public func showNextPage() -> Bool { false }
+  public func showPreviousPage() -> Bool { false }
+  public func showNextLine() -> Bool { false }
+  public func showPreviousLine() -> Bool { false }
+  public func highlightNextCandidate() -> Bool { false }
+  public func highlightPreviousCandidate() -> Bool { false }
+  public func candidateIndexAtKeyLabelIndex(_ index: Int) -> Int? { index }
+  public func set(
+    windowTopLeftPoint _: CGPoint,
+    bottomOutOfScreenAdjustmentHeight _: Double,
+    useGCD _: Bool,
+    animated _: Bool
+  ) {}
 }
 
 // MARK: - MockSpeechNarrator

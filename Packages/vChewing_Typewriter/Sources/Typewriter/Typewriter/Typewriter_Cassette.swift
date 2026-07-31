@@ -37,10 +37,16 @@ public struct CassetteTypewriter<Handler: InputHandlerProtocol>: TypewriterProto
     }
 
     let wildcardKey = currentLM.cassetteWildcardKey
+    let anySingleCharKey = currentLM.cassetteAnySingleCharKey
     let quickPhraseCommissionKey = currentLM.cassetteQuickPhraseCommissionKey
 
     // 先處理快選（%quick 與 %symboldef），避免後續流程誤吞按鍵。
-    if processCassetteQuickSelection(input: input, state: state, wildcardKey: wildcardKey) {
+    if processCassetteQuickSelection(
+      input: input,
+      state: state,
+      wildcardKey: wildcardKey,
+      anySingleCharKey: anySingleCharKey
+    ) {
       return true
     }
 
@@ -53,15 +59,14 @@ public struct CassetteTypewriter<Handler: InputHandlerProtocol>: TypewriterProto
       input.isReservedKey || input.isNumericPadKey || input.isNonLaptopFunctionKey
         || input.isControlHeld || input.isOptionHeld || input.isCommandHeld
     let isCalligrapherFull = handler.calligrapher.count >= currentLM.maxCassetteKeyLength
+    let calligrapherWasEmpty = handler.calligrapher.isEmpty
     var didAppendStroke = false
 
-    // 進行筆畫預處理：阻擋非法按鍵、處理花牌開頭、更新組筆狀態與快選清單。
+    // 進行筆畫預處理：阻擋非法按鍵、更新組筆狀態與快選清單。
     if let handled = handleStrokePreprocessing(
       inputText: inputText,
-      isWildcardKeyInput: isWildcardKeyInput,
       isCalligrapherFull: isCalligrapherFull,
       skipStrokeHandling: skipStrokeHandling,
-      beganWithLetter: input.beganWithLetter,
       didAppendStroke: &didAppendStroke,
       session: session
     ) {
@@ -88,9 +93,10 @@ public struct CassetteTypewriter<Handler: InputHandlerProtocol>: TypewriterProto
       || isLongestPossibleKeyFormed
 
     // 決定是否要進行組字：滿筆長自動組字、花牌搭配筆畫、或空白/Enter 強制組字。
+    // 花牌鍵在組筆區為空時僅作為普通筆畫錄入（開頭花牌為任意字根序查詢）。
     var combineStrokes =
       (isStrokesFull && prefs.autoCompositeWithLongestPossibleCassetteKey)
-        || (isWildcardKeyInput && !handler.calligrapher.isEmpty)
+        || (isWildcardKeyInput && !calligrapherWasEmpty)
     combineStrokes = combineStrokes || (!handler.calligrapher.isEmpty && confirmCombination)
 
     if combineStrokes {
@@ -102,7 +108,7 @@ public struct CassetteTypewriter<Handler: InputHandlerProtocol>: TypewriterProto
       )
     }
 
-    if didAppendStroke, !isWildcardKeyInput, !handler.calligrapher.isEmpty {
+    if didAppendStroke, !handler.calligrapher.isEmpty {
       return renderQuickSetsIfNeeded(session: session, isStrokesFull: false)
     }
     return nil
@@ -113,21 +119,41 @@ public struct CassetteTypewriter<Handler: InputHandlerProtocol>: TypewriterProto
   private func processCassetteQuickSelection(
     input: some InputSignalProtocol,
     state: State,
-    wildcardKey: String
+    wildcardKey: String,
+    anySingleCharKey: String
   )
     -> Bool {
     let currentLM = handler.currentLM
     let hasQuickCandidates = state.type == .ofInputting && state.isCandidateContainer
+    // 對當前磁帶而言的 functional key（花牌鍵、任意單字元鍵、或其它允許的字根鍵）
+    // 應讓位給組筆流程，避免被快選流程（含 Shift+? 的選字窗服務選單鍵）誤吞。
+    if hasQuickCandidates,
+       isCassetteFunctionalKey(input.text, wildcardKey: wildcardKey, anySingleCharKey: anySingleCharKey) {
+      return false
+    }
     var handleQuickCandidate = true
     if currentLM.areCassetteCandidateKeysShiftHeld { handleQuickCandidate = input.isShiftHeld }
 
     if handler.handleCassetteSymbolTable(input: input) { return true }
 
     let candidateHandled = handler.handleCandidate(input: input, ignoringModifiers: true)
-    if hasQuickCandidates, input.text != wildcardKey {
+    if hasQuickCandidates {
       return handleQuickCandidate && candidateHandled
     }
-    return hasQuickCandidates && candidateHandled
+    return false
+  }
+
+  /// 判定給定的按鍵對當前磁帶而言是否為 functional key（應直接進入組筆區的按鍵）。
+  private func isCassetteFunctionalKey(
+    _ text: String,
+    wildcardKey: String,
+    anySingleCharKey: String
+  )
+    -> Bool {
+    guard !text.isEmpty else { return false }
+    if !wildcardKey.isEmpty, text == wildcardKey { return true }
+    if !anySingleCharKey.isEmpty, text == anySingleCharKey { return true }
+    return handler.currentLM.isThisCassetteKeyAllowed(key: text)
   }
 
   private func matchesQuickPhraseKey(_ inputText: String, key: String?) -> Bool {
@@ -148,10 +174,8 @@ public struct CassetteTypewriter<Handler: InputHandlerProtocol>: TypewriterProto
 
   private func handleStrokePreprocessing(
     inputText: String,
-    isWildcardKeyInput: Bool,
     isCalligrapherFull: Bool,
     skipStrokeHandling: Bool,
-    beganWithLetter: Bool,
     didAppendStroke: inout Bool,
     session: Session
   )
@@ -160,28 +184,11 @@ public struct CassetteTypewriter<Handler: InputHandlerProtocol>: TypewriterProto
     guard !skipStrokeHandling, currentLM.isThisCassetteKeyAllowed(key: inputText) else {
       return nil
     }
-    if handler.calligrapher.isEmpty, isWildcardKeyInput {
-      return handleLeadingWildcard(session: session, beganWithLetter: beganWithLetter)
-    }
     if isCalligrapherFull {
       return handleFullCalligrapherInput(session: session)
     }
     handler.calligrapher.append(inputText)
     didAppendStroke = true
-    return nil
-  }
-
-  private func handleLeadingWildcard(session: Session, beganWithLetter: Bool) -> Bool? {
-    errorCallback("3606B9C0")
-    if beganWithLetter {
-      var newEmptyState = handler.assembler.isEmpty ? State.ofEmpty() : handler.generateStateOfInputting()
-      newEmptyState.tooltip = "i18n:ErrorMessage.WildcardKeyNotInitial".i18n
-      newEmptyState.data.tooltipColorState = .redAlert
-      newEmptyState.tooltipDuration = 1.0
-      session.switchState(newEmptyState)
-      return true
-    }
-    handler.notificationCallback?("i18n:ErrorMessage.WildcardKeyNotInitial".i18n)
     return nil
   }
 

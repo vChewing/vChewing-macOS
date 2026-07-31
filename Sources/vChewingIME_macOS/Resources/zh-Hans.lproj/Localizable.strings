@@ -80,9 +80,7 @@
 "i18n:ErrorMessage.PlistNil" = "下载来的更新资讯并非 Plist 档案。";
 "i18n:ErrorMessage.PlistParseError" = "下载来的更新资讯 Plist 档案无法正常解析。";
 "i18n:ErrorMessage.UnableToCreateUserPhraseFile" = "无法创建自订语汇档案。";
-"i18n:ErrorMessage.WildcardKeyNotInitial" = "花牌键不得作为起始码。";
 "i18n:fileDragImportButton.DragFileToHere" = "请将档案拽到这边";
-
 "i18n:IME.RAMControllerCountLabel" = "控制器副本数:";
 "i18n:IME.RAMUsedLabelHeader" = "[私有记忆体占用量]";
 "i18n:InfoMessage.AlreadyLatestVersion" = "您正在使用目前最新的发行版。";

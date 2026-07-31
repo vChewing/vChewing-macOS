@@ -624,6 +624,48 @@ extension MainAssemblyTests {
     #expect(testSession.state.type == .ofInputting)
   }
 
+  /// 磁帶 quick-candidate 狀態下，敲任意單字元鍵（Shift+?）應錄入組筆區、而非叫出服務選單。
+  @Test
+  func test108D_InputHandler_CassetteShiftQuestionTypesAnySingleCharKey() throws {
+    let dataPath = LMATestsData.getCINPath4Tests("array30", ext: "cin2")
+    guard let dataPath else {
+      Issue.record("無法存取用以測試的資料。當前嘗試存取：array30.cin2")
+      return
+    }
+    withSynchronousLMUserData {
+      testHandler.prefs.cassetteEnabled = true
+      testHandler.prefs.useShiftQuestionToCallServiceMenu = true
+      LMMgr.syncLMPrefs()
+      LMAssembly.LMInstantiator.loadCassetteData(path: dataPath)
+      testSession.resetInputHandler(forceComposerCleanup: true)
+    }
+    #expect(LMAssembly.LMInstantiator.lmCassette.anySingleCharKey == "?")
+
+    // 敲「y」之後，array30 的 %quick 候選應顯示（quick-candidate 狀態）。
+    typeSentenceOrCandidates("y")
+    #expect(testHandler.calligrapher == "y")
+    #expect(testSession.state.type == .ofInputting)
+    #expect(testSession.state.isCandidateContainer)
+
+    // 以 Shift+/（輸出「?」）敲入任意單字元鍵。
+    let shiftQuestion = NSEvent.KeyEventData(
+      type: .keyDown,
+      flags: .shift,
+      chars: "?",
+      charsSansModifiers: "/",
+      keyCode: mapKeyCodesANSIForTests["/"] ?? 44
+    )
+    press(shiftQuestion)
+
+    // 任意單字元鍵應進入組筆區，且不應叫出服務選單（符號表）。
+    #expect(testHandler.calligrapher == "y?")
+    #expect(testSession.state.type != .ofSymbolTable)
+
+    // 組字後組字區應顯示「熟」（`y,` 經任意單字元鍵匹配）。
+    press(spaceEvent)
+    #expect(testSession.state.displayedText == "熟")
+  }
+
   @Test
   func test109_InputHandler_CodePointInputCheck() throws {
     let testCodes: [(Shared.InputMode, String)] = [

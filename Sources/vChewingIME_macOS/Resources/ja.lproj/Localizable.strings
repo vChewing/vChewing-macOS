@@ -80,9 +80,7 @@
 "i18n:ErrorMessage.PlistNil" = "受けた新バージョンお知らせ情報データは Plist ではないため、失敗とみなす。";
 "i18n:ErrorMessage.PlistParseError" = "受けた新バージョンお知らせ情報 Plist データは解読できないため、失敗とみなす。";
 "i18n:ErrorMessage.UnableToCreateUserPhraseFile" = "ユーザー辞書ファイルの作成は失敗しました。";
-"i18n:ErrorMessage.WildcardKeyNotInitial" = "骨牌キーは最初のキーとしてはならぬ。";
 "i18n:fileDragImportButton.DragFileToHere" = "ここにドラッグして";
-
 "i18n:IME.RAMControllerCountLabel" = "コントローラー数:";
 "i18n:IME.RAMUsedLabelHeader" = "[プライベートメモリ使用量]";
 "i18n:InfoMessage.AlreadyLatestVersion" = "現在稼働中のは最新バージョンである。";

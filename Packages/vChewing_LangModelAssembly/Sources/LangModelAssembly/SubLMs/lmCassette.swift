@@ -7,16 +7,16 @@
 // marks, or product names of Contributor, except as required to fulfill notice
 // requirements defined in MIT License.
 
-// 以連續記憶體空間（contiguous [UInt8] blob）取代大量 Dictionary<String, [String]>，
-// 將 charDef / symbolDef / reverseLookup / octagram / quickDef / quickPhrase 等大型字典改為
-// sorted byte-range index + binary search，按需從 rawData 解析字串，
-// 大幅降低 heap allocation 與 Dictionary 開銷。
-
 import Foundation
 import Homa
 import LineReader
 
 // MARK: - LMAssembly.LMCassette
+
+// 以連續記憶體空間（contiguous [UInt8] blob）取代大量 Dictionary<String, [String]>，
+// 將 charDef / symbolDef / reverseLookup / octagram / quickDef / quickPhrase 等大型字典改為
+// sorted byte-range index + binary search，按需從 rawData 解析字串，
+// 大幅降低 heap allocation 與 Dictionary 開銷。
 
 extension LMAssembly {
   /// 磁帶模組，用來方便使用者自行擴充字根輸入法。
@@ -35,6 +35,7 @@ extension LMAssembly {
     private(set) var selectionKeys: String = ""
     private(set) var endKeys: [String] = []
     private(set) var wildcardKey: String = ""
+    private(set) var anySingleCharKey: String = ""
     private(set) var keysToDirectlyCommit: String = ""
     /// 字根翻譯表（小型，~30 entries），保持 Dictionary。
     private(set) var keyNameMap: [String: String] = [:]
@@ -284,52 +285,214 @@ nonisolated extension LMAssembly.CassetteSortedMap {
     return results
   }
 
-  /// 以萬用字元查詢：key 必須以 `wildcard` 結尾，且結尾萬用字元前的前綴
-  /// 必須能對應到至少一個長度嚴格大於前綴的 key；回傳所有匹配 value。
-  /// 透過對 `charDefMap` 做前綴掃描，避免額外維護一份 wildcard map。
-  func wildcardValuesFor(key: String, wildcard: String) -> [String]? {
-    guard !wildcard.isEmpty, key.hasSuffix(wildcard), key.count > wildcard.count else { return nil }
-    let prefix = String(key.dropLast(wildcard.count))
-    let prefixUTF8 = Array(prefix.utf8)
-    guard !prefixUTF8.isEmpty else { return nil }
-
-    // Lower bound for prefix.
-    var lo = 0, hi = entries.count
-    while lo < hi {
-      let mid = lo + (hi - lo) / 2
-      let e = entries[mid]
-      let cmp = rawData.cassetteCompareUTF8RangePrefix(
-        Int(e.keyStart) ..< Int(e.keyEnd),
-        with: prefixUTF8
-      )
-      if cmp < 0 { lo = mid + 1 } else { hi = mid }
-    }
-
+  /// 以萬用字元（wildcard，1+ 任意字元）與任意單字元鍵（anySingleChar，恰好 1 字元）
+  /// 組成的 pattern 查詢所有匹配 key 的 value。開頭的 wildcard 且後方全為 literal 時，
+  /// 視為 anagram（任意字根序）查詢。透過對 sorted entries 做前綴 lower-bound 縮小掃描範圍。
+  func patternValuesFor(key: String, wildcard: String, anySingleChar: String) -> [String]? {
+    let tokens = Self.tokenizePattern(key, wildcard: wildcard, anySingleChar: anySingleChar)
+    guard Self.hasPatternTokens(tokens) else { return nil }
     var results = [String]()
-    while lo < entries.count {
-      let e = entries[lo]
-      let keyStart = Int(e.keyStart)
-      let keyEnd = Int(e.keyEnd)
-      guard keyEnd - keyStart >= prefixUTF8.count else { break }
-      var isPrefix = true
-      for i in 0 ..< prefixUTF8.count {
-        if rawData[keyStart + i] != prefixUTF8[i] { isPrefix = false; break }
-      }
-      guard isPrefix else { break }
-      // CIN 字根鍵皆為 ASCII，byte count 等同 char count；以 byte 長度判斷避免 loop 內解碼字串。
-      guard keyEnd - keyStart > prefixUTF8.count else { lo += 1; continue }
-      for slot in stride(from: Int(e.valuesStart), to: Int(e.valuesEnd), by: 2) {
-        results.append(valueString(at: slot))
-      }
-      lo += 1
+    scanPatternMatches(tokens: tokens) { entryIndex in
+      results.append(contentsOf: entryValues(at: entryIndex))
+      return true
     }
     return results.isEmpty ? nil : results
   }
 
-  /// 檢查是否有任何萬用字元匹配。
-  func containsWildcardMatch(key: String, wildcard: String) -> Bool {
-    guard key.contains(wildcard), key.first?.description != wildcard else { return false }
-    return wildcardValuesFor(key: key, wildcard: wildcard) != nil
+  /// 檢查是否有任何萬用字元 / 任意單字元 pattern 匹配。
+  func containsPatternMatch(key: String, wildcard: String, anySingleChar: String) -> Bool {
+    let tokens = Self.tokenizePattern(key, wildcard: wildcard, anySingleChar: anySingleChar)
+    guard Self.hasPatternTokens(tokens) else { return false }
+    var found = false
+    scanPatternMatches(tokens: tokens) { _ in
+      found = true
+      return false
+    }
+    return found
+  }
+
+  // MARK: Fileprivate
+
+  /// Pattern 解析後的單筆 token。
+  fileprivate enum CassettePatternToken {
+    /// literal byte 序列。
+    case literal([UInt8])
+    /// 萬用字元：一個或多個連續的任意 key char。
+    case wildcard
+    /// 任意單字元鍵：恰好一個任意 key char。
+    case anySingleChar
+  }
+
+  /// 將 pattern 解析為 token 序列。wildcard 與 anySingleChar 均為單字元。
+  fileprivate static func tokenizePattern(
+    _ key: String,
+    wildcard: String,
+    anySingleChar: String
+  )
+    -> [CassettePatternToken] {
+    var tokens = [CassettePatternToken]()
+    var literalBuffer = [UInt8]()
+    for char in key {
+      let charString = String(char)
+      if !wildcard.isEmpty, charString == wildcard {
+        if !literalBuffer.isEmpty {
+          tokens.append(.literal(literalBuffer))
+          literalBuffer.removeAll(keepingCapacity: true)
+        }
+        tokens.append(.wildcard)
+      } else if !anySingleChar.isEmpty, charString == anySingleChar {
+        if !literalBuffer.isEmpty {
+          tokens.append(.literal(literalBuffer))
+          literalBuffer.removeAll(keepingCapacity: true)
+        }
+        tokens.append(.anySingleChar)
+      } else {
+        literalBuffer.append(contentsOf: char.utf8)
+      }
+    }
+    if !literalBuffer.isEmpty { tokens.append(.literal(literalBuffer)) }
+    return tokens
+  }
+
+  /// 是否含有萬用字元 / 任意單字元 token（純 literal 的 pattern 不屬於 pattern 查詢）。
+  fileprivate static func hasPatternTokens(_ tokens: [CassettePatternToken]) -> Bool {
+    tokens.contains {
+      switch $0 {
+      case .anySingleChar, .wildcard: true
+      case .literal: false
+      }
+    }
+  }
+
+  /// 由 UTF-8 leading byte 推算單個字元佔用的 byte 數。
+  fileprivate static func utf8CharByteLength(_ leadingByte: UInt8) -> Int {
+    switch leadingByte {
+    case 0x00 ... 0x7F: 1
+    case 0xC0 ... 0xDF: 2
+    case 0xE0 ... 0xEF: 3
+    default: 4
+    }
+  }
+
+  /// 以回溯法判定候選 key bytes 是否匹配 token 序列。
+  fileprivate static func matchPattern(
+    tokens: [CassettePatternToken],
+    tokenIndex: Int,
+    key: [UInt8],
+    position: Int
+  )
+    -> Bool {
+    if tokenIndex == tokens.count { return position == key.count }
+    switch tokens[tokenIndex] {
+    case let .literal(bytes):
+      guard position + bytes.count <= key.count else { return false }
+      for (offset, byte) in bytes.enumerated() where key[position + offset] != byte {
+        return false
+      }
+      return matchPattern(
+        tokens: tokens,
+        tokenIndex: tokenIndex + 1,
+        key: key,
+        position: position + bytes.count
+      )
+    case .anySingleChar:
+      guard position < key.count else { return false }
+      let nextPosition = position + utf8CharByteLength(key[position])
+      guard nextPosition <= key.count else { return false }
+      return matchPattern(
+        tokens: tokens,
+        tokenIndex: tokenIndex + 1,
+        key: key,
+        position: nextPosition
+      )
+    case .wildcard:
+      // 萬用字元至少消秏一個字元。
+      var nextPosition = position
+      while nextPosition < key.count {
+        nextPosition += utf8CharByteLength(key[nextPosition])
+        guard nextPosition <= key.count else { return false }
+        if matchPattern(
+          tokens: tokens,
+          tokenIndex: tokenIndex + 1,
+          key: key,
+          position: nextPosition
+        ) { return true }
+      }
+      return false
+    }
+  }
+
+  /// 掃描所有匹配 pattern 的 entries，對每筆匹配 entry 執行 `visit`；
+  /// `visit` 回傳 false 時提前終止掃描。
+  private func scanPatternMatches(
+    tokens: [CassettePatternToken],
+    visit: (Int) -> Bool
+  ) {
+    // 開頭 wildcard 且後方全為 literal：anagram（任意字根序）查詢。
+    var isAnagramQuery = false
+    if case .wildcard = tokens.first {
+      isAnagramQuery = tokens.dropFirst().allSatisfy {
+        if case .literal = $0 { return true }
+        return false
+      }
+    }
+    if isAnagramQuery {
+      let anagramBytes = tokens.dropFirst().flatMap {
+        if case let .literal(bytes) = $0 { return bytes }
+        return [UInt8]()
+      }.sorted()
+      guard !anagramBytes.isEmpty else { return }
+      for entryIndex in entries.indices {
+        let e = entries[entryIndex]
+        let keyStart = Int(e.keyStart)
+        let keyEnd = Int(e.keyEnd)
+        guard keyEnd - keyStart == anagramBytes.count else { continue }
+        guard rawData[keyStart ..< keyEnd].sorted() == anagramBytes else { continue }
+        guard visit(entryIndex) else { return }
+      }
+      return
+    }
+
+    // 取出開頭的 literal 前綴，用 lower-bound 縮小掃描範圍。
+    var literalPrefix = [UInt8]()
+    for token in tokens {
+      guard case let .literal(bytes) = token else { break }
+      literalPrefix.append(contentsOf: bytes)
+    }
+
+    var lo = 0
+    if !literalPrefix.isEmpty {
+      var hi = entries.count
+      while lo < hi {
+        let mid = lo + (hi - lo) / 2
+        let e = entries[mid]
+        let cmp = rawData.cassetteCompareUTF8RangePrefix(
+          Int(e.keyStart) ..< Int(e.keyEnd),
+          with: literalPrefix
+        )
+        if cmp < 0 { lo = mid + 1 } else { hi = mid }
+      }
+    }
+
+    var keyBuffer = [UInt8]()
+    for entryIndex in lo ..< entries.count {
+      let e = entries[entryIndex]
+      let keyStart = Int(e.keyStart)
+      let keyEnd = Int(e.keyEnd)
+      if !literalPrefix.isEmpty {
+        guard keyEnd - keyStart >= literalPrefix.count else { break }
+        var isPrefix = true
+        for i in 0 ..< literalPrefix.count {
+          if rawData[keyStart + i] != literalPrefix[i] { isPrefix = false; break }
+        }
+        guard isPrefix else { break }
+      }
+      keyBuffer.removeAll(keepingCapacity: true)
+      keyBuffer.append(contentsOf: rawData[keyStart ..< keyEnd])
+      guard Self.matchPattern(tokens: tokens, tokenIndex: 0, key: keyBuffer, position: 0)
+      else { continue }
+      guard visit(entryIndex) else { return }
+    }
   }
 
   /// 取得所有 keys（物化後）。測試用。
@@ -649,6 +812,8 @@ nonisolated extension LMAssembly.LMCassette {
   private static let fscale = 2.7
   /// 萬用花牌字符，哪怕花牌鍵仍不可用。
   var wildcard: String { wildcardKey.isEmpty ? "†" : wildcardKey }
+  /// 任意單字元鍵，哪怕其仍不可用。
+  var anySingleChar: String { anySingleCharKey.isEmpty ? "†" : anySingleCharKey }
   /// 資料陣列內承載的核心 charDef 資料筆數（唯一 key 數量）。
   var count: Int { charDefMap.count }
   /// 是否已有資料載入。
@@ -669,6 +834,7 @@ nonisolated extension LMAssembly.LMCassette {
   /// - `%selkey` 不處理，因為唯音輸入法有自己的選字鍵體系。
   /// - `%endkey` 是會觸發組字事件的按鍵。
   /// - `%wildcardkey` 決定磁帶的萬能鍵名稱，只有第一個字元會生效。
+  /// - `%anysinglecharkey` 決定磁帶的任意單字元鍵名稱，只有第一個字元會生效，且不得與 `%wildcardkey` 相同。
   /// - `%nullcandidate` 用來指明 `%quick` 字段給出的候選字當中有哪一種是無效的。
   /// - `%keyname begin` 至 `%keyname end` 之間是字根翻譯表，先讀取為 Swift 辭典以備用。
   /// - `%quick begin` 至 `%quick end` 之間則是簡碼資料，對應的 value 得拆成單個漢字。
@@ -705,16 +871,19 @@ nonisolated extension LMAssembly.LMCassette {
           willSet {
             supplyQuickResults = true
             if !newValue, tmpQuickDef.keys.contains(wildcardKey) { wildcardKey = "" }
+            if !newValue, tmpQuickDef.keys.contains(anySingleCharKey) { anySingleCharKey = "" }
           }
         }
         var loadingCharDefinitions = false {
           willSet {
             if !newValue, tmpCharDef.keys.contains(wildcardKey) { wildcardKey = "" }
+            if !newValue, tmpCharDef.keys.contains(anySingleCharKey) { anySingleCharKey = "" }
           }
         }
         var loadingSymbolDefinitions = false {
           willSet {
             if !newValue, tmpSymbolDef.keys.contains(wildcardKey) { wildcardKey = "" }
+            if !newValue, tmpSymbolDef.keys.contains(anySingleCharKey) { anySingleCharKey = "" }
           }
         }
         var loadingOctagramData = false
@@ -774,7 +943,11 @@ nonisolated extension LMAssembly.LMCassette {
             case "%endkey"
               where endKeys.isEmpty: endKeys = strSecondCell.map(\.description).deduplicated
             case "%wildcardkey"
-              where wildcardKey.isEmpty: wildcardKey = strSecondCell.first?.description ?? ""
+              where wildcardKey.isEmpty && strSecondCell.first?.description != anySingleCharKey:
+              wildcardKey = strSecondCell.first?.description ?? ""
+            case "%anysinglecharkey"
+              where anySingleCharKey.isEmpty && strSecondCell.first?.description != wildcardKey:
+              anySingleCharKey = strSecondCell.first?.description ?? ""
             case "%keys_to_directly_commit"
               where keysToDirectlyCommit.isEmpty: keysToDirectlyCommit = strSecondCell
             case "%quickphrases_commission_key"
@@ -854,7 +1027,10 @@ nonisolated extension LMAssembly.LMCassette {
           areCandidateKeysShiftHeld = true
         }
         maxKeyLength = theMaxKeyLength
-        keyNameMap[wildcardKey] = keyNameMap[wildcardKey] ?? "？"
+        keyNameMap[wildcardKey] = keyNameMap[wildcardKey] ?? "♧"
+        if !anySingleCharKey.isEmpty {
+          keyNameMap[anySingleCharKey] = keyNameMap[anySingleCharKey] ?? "⍰"
+        }
 
         // 直接從 grouped Dictionary 建構最終索引，含 quickDef / quickPhrase。
         charDefMap = .build(from: tmpCharDef)
@@ -930,8 +1106,12 @@ nonisolated extension LMAssembly.LMCassette {
     let keyArray = keyArray ?? key.split(separator: "-").map(\.description)
     let arrRaw = (charDefMap.valuesFor(key: key) ?? []).deduplicated
     var arrRawWildcard: [String] = []
-    if key.contains(wildcard), key.first?.description != wildcard {
-      if let arrRawWildcardValues = charDefMap.wildcardValuesFor(key: key, wildcard: wildcard)?.deduplicated {
+    if key.contains(wildcard) || key.contains(anySingleChar) {
+      if let arrRawWildcardValues = charDefMap.patternValuesFor(
+        key: key,
+        wildcard: wildcard,
+        anySingleChar: anySingleChar
+      )?.deduplicated {
         arrRawWildcard.append(contentsOf: arrRawWildcardValues)
       }
     }
@@ -972,7 +1152,12 @@ nonisolated extension LMAssembly.LMCassette {
   ///   - key: 讀音索引鍵。
   func hasUnigramsFor(key: String) -> Bool {
     if charDefMap.containsKey(key) { return true }
-    return charDefMap.containsWildcardMatch(key: key, wildcard: wildcard)
+    guard key.contains(wildcard) || key.contains(anySingleChar) else { return false }
+    return charDefMap.containsPatternMatch(
+      key: key,
+      wildcard: wildcard,
+      anySingleChar: anySingleChar
+    )
   }
 
   // MARK: - Private Functions.
