@@ -75,7 +75,7 @@ extension LMAssembly.LMInstantiator {
   /// - Parameter value: 要拿來反查的字詞。
   /// - Returns: 反查結果字串陣列。
   public func cassetteReverseLookup(for value: String) -> [String] {
-    var lookupResult = Self.lmCassette.reverseLookupMap[value] ?? []
+    var lookupResult = Self.lmCassette.reverseCodes(for: value) ?? []
     guard !lookupResult.isEmpty else { return [] }
     lookupResult = lookupResult.map { $0.trimmingCharacters(in: .newlines) }
     return lookupResult.stableSort(by: { $0.count < $1.count }).stableSort {

@@ -50,8 +50,8 @@ extension LMAssembly {
     private(set) var charDefMap: CassetteSortedMap = .init()
     /// `%symboldef` 符號選單資料，sorted by key UTF-8。
     private(set) var symbolDefMap: CassetteSortedMap = .init()
-    /// 字→碼反向查詢（chardef + symboldef 合併），sorted by value UTF-8。
-    private(set) var reverseLookupMap: CassetteSortedMap = .init()
+    /// 字→碼反向查詢零複製索引（chardef + symboldef 合併）。
+    private(set) var reverseIndex: CassetteReverseIndex = .init()
     /// 字根輸入法專用八股文：字詞→頻次，sorted by key UTF-8。
     private(set) var octagramMap: CassetteOctagramMap = .init()
     /// 音韻輸入法專用八股文：字詞→(頻次, 讀音)，sorted by key UTF-8。
@@ -100,6 +100,36 @@ extension LMAssembly {
     /// 指向 `valueOffsets` 的範圍（每個 value 佔兩個 slot）。
     let valuesStart: UInt32
     let valuesEnd: UInt32
+  }
+
+  /// CassetteReverseIndex 的單筆反查 entry（反查字詞 → 碼 refs 範圍）。
+  nonisolated struct CassetteReverseEntry: Sendable {
+    /// 反查字詞在 `revChars` 內的範圍。
+    let charStart: UInt32
+    let charEnd: UInt32
+    /// 指向 `revCodeRefs` 的範圍。
+    let refsStart: UInt32
+    let refsEnd: UInt32
+  }
+
+  /// 字→碼反向查詢索引：僅複製去重後的反查字詞 bytes，
+  /// 碼字串以 entry 索引引用 charDefMap / symbolDefMap 的既有 rawData，不做全量複製。
+  nonisolated struct CassetteReverseIndex: Sendable {
+    // MARK: Internal
+
+    var isEmpty: Bool { revEntries.isEmpty }
+
+    // MARK: Fileprivate
+
+    /// 去重後的唯一反查字詞 UTF-8 bytes。
+    fileprivate var revChars: [UInt8] = []
+    /// 按反查字詞 bytes 排序的索引。
+    fileprivate var revEntries: [CassetteReverseEntry] = []
+    /// 合併 namespace 的 entry 索引：小於 `charDefEntryCount` 者指向 charDefMap，
+    /// 否則減去 `charDefEntryCount` 後指向 symbolDefMap。
+    fileprivate var revCodeRefs: [UInt32] = []
+    /// 合併 namespace 中 charDefMap 的 entry 數量。
+    fileprivate var charDefEntryCount: UInt32 = 0
   }
 
   /// key→single value 的 contiguous-memory 對照表（取代 quickDef Dictionary）。
@@ -167,22 +197,10 @@ extension LMAssembly {
 
 // MARK: - [UInt8] Extension: UTF-8 Byte-Level Comparison
 
-nonisolated extension Array where Element == UInt8 {
-  fileprivate func cassetteCompareUTF8Range(_ range: Range<Int>, with rhs: [UInt8]) -> Int {
-    let lhsCount = range.count
-    let rhsCount = rhs.count
-    let minCount = Swift.min(lhsCount, rhsCount)
-    for i in 0 ..< minCount {
-      let lb = self[range.lowerBound + i]
-      let rb = rhs[i]
-      if lb < rb { return -1 }
-      if lb > rb { return 1 }
-    }
-    if lhsCount < rhsCount { return -1 }
-    if lhsCount > rhsCount { return 1 }
-    return 0
-  }
+// 字典序比較統一使用 `RangeParserAPI.swift` 的 `compareByteRange` / `compareByteSlices`；
+// 此處僅保留磁帶模組專用的 prefix 比較。
 
+nonisolated extension Array where Element == UInt8 {
   /// 比較 range 內的 bytes 是否「大於等於」prefix bytes（用於 lower-bound 搜尋）。
   fileprivate func cassetteCompareUTF8RangePrefix(_ range: Range<Int>, with prefix: [UInt8]) -> Int {
     let lhsCount = range.count
@@ -209,7 +227,7 @@ nonisolated extension LMAssembly.CassetteSortedMap {
     while lo <= hi {
       let mid = lo + (hi - lo) / 2
       let e = entries[mid]
-      let cmp = rawData.cassetteCompareUTF8Range(Int(e.keyStart) ..< Int(e.keyEnd), with: keyUTF8)
+      let cmp = rawData.compareByteRange(Int(e.keyStart) ..< Int(e.keyEnd), with: keyUTF8)
       if cmp < 0 { lo = mid + 1 } else if cmp > 0 { hi = mid - 1 } else { return mid }
     }
     return nil
@@ -510,7 +528,7 @@ nonisolated extension LMAssembly.CassetteQuickMap {
     while lo <= hi {
       let mid = lo + (hi - lo) / 2
       let e = entries[mid]
-      let cmp = rawData.cassetteCompareUTF8Range(Int(e.keyStart) ..< Int(e.keyEnd), with: keyUTF8)
+      let cmp = rawData.compareByteRange(Int(e.keyStart) ..< Int(e.keyEnd), with: keyUTF8)
       if cmp < 0 { lo = mid + 1 } else if cmp > 0 { hi = mid - 1 } else { return mid }
     }
     return nil
@@ -543,7 +561,7 @@ nonisolated extension LMAssembly.CassetteOctagramMap {
     while lo <= hi {
       let mid = lo + (hi - lo) / 2
       let e = entries[mid]
-      let cmp = rawData.cassetteCompareUTF8Range(Int(e.keyStart) ..< Int(e.keyEnd), with: keyUTF8)
+      let cmp = rawData.compareByteRange(Int(e.keyStart) ..< Int(e.keyEnd), with: keyUTF8)
       if cmp < 0 { lo = mid + 1 } else if cmp > 0 { hi = mid - 1 } else { return mid }
     }
     return nil
@@ -563,7 +581,7 @@ nonisolated extension LMAssembly.CassetteOctagramDividedMap {
     while lo <= hi {
       let mid = lo + (hi - lo) / 2
       let e = entries[mid]
-      let cmp = rawData.cassetteCompareUTF8Range(Int(e.keyStart) ..< Int(e.keyEnd), with: keyUTF8)
+      let cmp = rawData.compareByteRange(Int(e.keyStart) ..< Int(e.keyEnd), with: keyUTF8)
       if cmp < 0 { lo = mid + 1 } else if cmp > 0 { hi = mid - 1 } else { return mid }
     }
     return nil
@@ -629,77 +647,117 @@ nonisolated extension LMAssembly.CassetteSortedMap {
     result.valueOffsets = valueOffsets
     return result
   }
+}
 
-  /// 直接從 charDef / symbolDef 建立 reverse lookup，避免解析期同時持有另一份大型 reverse Dictionary。
-  static func buildReverseLookup(
-    charDefs: [String: [String]],
-    symbolDefs: [String: [String]]
+// MARK: - CassetteReverseIndex Builder & Query
+
+nonisolated extension LMAssembly.CassetteReverseIndex {
+  /// 反查記錄原型：value bytes 留在來源 map 的 rawData 內，僅記範圍與來源 entry 索引。
+  private struct RevPrototype {
+    let valueStart: UInt32
+    let valueEnd: UInt32
+    /// 合併 namespace 的來源 entry 索引（charDef 在前、symbolDef 接續）。
+    let ref: UInt32
+    let isSymbol: Bool
+  }
+
+  /// 直接自既有的 charDefMap / symbolDefMap 建置零複製反查索引。
+  /// 涵蓋兩張 map 的全部 entries（含花牌 pattern keys），與舊版自暫存辭典建置的語義等價。
+  static func build(
+    charDefMap: LMAssembly.CassetteSortedMap,
+    symbolDefMap: LMAssembly.CassetteSortedMap
   )
     -> Self {
-    typealias Prototype = (lookupKey: String, sourceKey: String)
-
-    func makePrototypes(from dictionary: [String: [String]]) -> [Prototype] {
-      var prototypeCount = 0
-      for values in dictionary.values { prototypeCount += values.count }
-      var prototypes = [Prototype]()
-      prototypes.reserveCapacity(prototypeCount)
-      for (sourceKey, values) in dictionary {
-        for lookupKey in values {
-          prototypes.append((lookupKey, sourceKey))
-        }
+    var prototypes: [RevPrototype] = []
+    var totalValueCount = 0
+    for e in charDefMap.entries { totalValueCount += (Int(e.valuesEnd) - Int(e.valuesStart)) / 2 }
+    for e in symbolDefMap.entries { totalValueCount += (Int(e.valuesEnd) - Int(e.valuesStart)) / 2 }
+    prototypes.reserveCapacity(totalValueCount)
+    for (entryIndex, e) in charDefMap.entries.enumerated() {
+      for slot in stride(from: Int(e.valuesStart), to: Int(e.valuesEnd), by: 2) {
+        prototypes.append(.init(
+          valueStart: charDefMap.valueOffsets[slot],
+          valueEnd: charDefMap.valueOffsets[slot + 1],
+          ref: UInt32(entryIndex),
+          isSymbol: false
+        ))
       }
-      return prototypes
     }
-
-    var prototypes = makePrototypes(from: charDefs)
-    prototypes.append(contentsOf: makePrototypes(from: symbolDefs))
+    let charDefEntryCount = UInt32(charDefMap.entries.count)
+    for (entryIndex, e) in symbolDefMap.entries.enumerated() {
+      for slot in stride(from: Int(e.valuesStart), to: Int(e.valuesEnd), by: 2) {
+        prototypes.append(.init(
+          valueStart: symbolDefMap.valueOffsets[slot],
+          valueEnd: symbolDefMap.valueOffsets[slot + 1],
+          ref: charDefEntryCount + UInt32(entryIndex),
+          isSymbol: true
+        ))
+      }
+    }
     guard !prototypes.isEmpty else { return .init() }
+    // 依 value bytes 字典序排序；同 value 時依 ref 升冪（確定性順序：charDef 先、各依碼 bytes 序）。
     prototypes.sort { lhs, rhs in
-      lhs.lookupKey.utf8.lexicographicallyPrecedes(rhs.lookupKey.utf8)
+      let lhsData = lhs.isSymbol ? symbolDefMap.rawData : charDefMap.rawData
+      let rhsData = rhs.isSymbol ? symbolDefMap.rawData : charDefMap.rawData
+      let cmp = lhsData.compareByteRange(
+        Int(lhs.valueStart) ..< Int(lhs.valueEnd),
+        with: rhsData,
+        in: Int(rhs.valueStart) ..< Int(rhs.valueEnd)
+      )
+      return cmp != 0 ? cmp < 0 : lhs.ref < rhs.ref
     }
-    var totalKeyBytes = 0
-    var totalValueBytes = 0
-    var previousLookupKey: String?
-    for prototype in prototypes {
-      if prototype.lookupKey != previousLookupKey {
-        totalKeyBytes += prototype.lookupKey.utf8.count
-        previousLookupKey = prototype.lookupKey
-      }
-      totalValueBytes += prototype.sourceKey.utf8.count
-    }
-    var rawData = [UInt8]()
-    rawData.reserveCapacity(totalKeyBytes + totalValueBytes)
-    var entries = [LMAssembly.CassetteMapEntry]()
-    entries.reserveCapacity(prototypes.count)
-    var valueOffsets = [UInt32]()
-    valueOffsets.reserveCapacity(prototypes.count * 2)
+    var revChars = [UInt8]()
+    var revEntries = [LMAssembly.CassetteReverseEntry]()
+    var revCodeRefs = [UInt32]()
+    revCodeRefs.reserveCapacity(prototypes.count)
     var index = 0
     while index < prototypes.count {
-      let currentLookupKey = prototypes[index].lookupKey
-      let keyStart = UInt32(rawData.count)
-      rawData.append(contentsOf: currentLookupKey.utf8)
-      let keyEnd = UInt32(rawData.count)
-      let valuesStart = UInt32(valueOffsets.count)
-      while index < prototypes.count, prototypes[index].lookupKey == currentLookupKey {
-        let valueStart = UInt32(rawData.count)
-        rawData.append(contentsOf: prototypes[index].sourceKey.utf8)
-        valueOffsets.append(valueStart)
-        valueOffsets.append(UInt32(rawData.count))
+      let current = prototypes[index]
+      let currentData = current.isSymbol ? symbolDefMap.rawData : charDefMap.rawData
+      let charStart = UInt32(revChars.count)
+      revChars.append(contentsOf: currentData[Int(current.valueStart) ..< Int(current.valueEnd)])
+      let charEnd = UInt32(revChars.count)
+      let refsStart = UInt32(revCodeRefs.count)
+      while index < prototypes.count {
+        let next = prototypes[index]
+        let nextData = next.isSymbol ? symbolDefMap.rawData : charDefMap.rawData
+        let isSameValue = currentData.compareByteRange(
+          Int(current.valueStart) ..< Int(current.valueEnd),
+          with: nextData,
+          in: Int(next.valueStart) ..< Int(next.valueEnd)
+        ) == 0
+        guard isSameValue else { break }
+        revCodeRefs.append(next.ref)
         index += 1
       }
-      let valuesEnd = UInt32(valueOffsets.count)
-      entries.append(.init(
-        keyStart: keyStart,
-        keyEnd: keyEnd,
-        valuesStart: valuesStart,
-        valuesEnd: valuesEnd
+      revEntries.append(.init(
+        charStart: charStart,
+        charEnd: charEnd,
+        refsStart: refsStart,
+        refsEnd: UInt32(revCodeRefs.count)
       ))
     }
     var result = Self()
-    result.rawData = rawData
-    result.entries = entries
-    result.valueOffsets = valueOffsets
+    result.revChars = revChars
+    result.revEntries = revEntries
+    result.revCodeRefs = revCodeRefs
+    result.charDefEntryCount = charDefEntryCount
     return result
+  }
+
+  /// 二分搜尋反查字詞，回傳對應的碼 refs 範圍。
+  fileprivate func refsRange(for value: String) -> Range<Int>? {
+    let valueUTF8 = Array(value.utf8)
+    var lo = 0, hi = revEntries.count - 1
+    while lo <= hi {
+      let mid = lo + (hi - lo) / 2
+      let e = revEntries[mid]
+      let cmp = revChars.compareByteRange(Int(e.charStart) ..< Int(e.charEnd), with: valueUTF8)
+      if cmp < 0 { lo = mid + 1 } else if cmp > 0 { hi = mid - 1 } else {
+        return Int(e.refsStart) ..< Int(e.refsEnd)
+      }
+    }
+    return nil
   }
 }
 
@@ -823,6 +881,34 @@ nonisolated extension LMAssembly.LMCassette {
   /// 將給定的按鍵字母轉換成要顯示的形態。
   func convertKeyToDisplay(char: String) -> String {
     keyNameMap[char] ?? char
+  }
+
+  /// 字→碼反向查詢（chardef + symboldef 合併 namespace）。
+  /// 碼字串自來源 map 的既有 rawData 按需物化，順序為確定性（charDef 先、各依碼 bytes 序）。
+  /// - Parameter value: 要拿來反查的字詞。
+  /// - Returns: 對應的碼字串陣列；無結果時回傳 nil。
+  func reverseCodes(for value: String) -> [String]? {
+    guard let refsRange = reverseIndex.refsRange(for: value) else { return nil }
+    let charDefEntryCount = Int(reverseIndex.charDefEntryCount)
+    var codes = [String]()
+    codes.reserveCapacity(refsRange.count)
+    for i in refsRange {
+      let ref = Int(reverseIndex.revCodeRefs[i])
+      if ref < charDefEntryCount {
+        let e = charDefMap.entries[ref]
+        codes.append(String(
+          decoding: charDefMap.rawData[Int(e.keyStart) ..< Int(e.keyEnd)],
+          as: UTF8.self
+        ))
+      } else {
+        let e = symbolDefMap.entries[ref - charDefEntryCount]
+        codes.append(String(
+          decoding: symbolDefMap.rawData[Int(e.keyStart) ..< Int(e.keyEnd)],
+          as: UTF8.self
+        ))
+      }
+    }
+    return codes.isEmpty ? nil : codes
   }
 
   /// 載入給定的 CIN 檔案內容。
@@ -1035,11 +1121,19 @@ nonisolated extension LMAssembly.LMCassette {
         // 直接從 grouped Dictionary 建構最終索引，含 quickDef / quickPhrase。
         charDefMap = .build(from: tmpCharDef)
         symbolDefMap = .build(from: tmpSymbolDef)
-        reverseLookupMap = .buildReverseLookup(charDefs: tmpCharDef, symbolDefs: tmpSymbolDef)
+        reverseIndex = .build(charDefMap: charDefMap, symbolDefMap: symbolDefMap)
         octagramMap = .build(from: tmpOctagram)
         octagramDividedMap = .build(from: tmpOctagramDivided)
         quickDefMap = .build(from: tmpQuickDef)
         quickPhraseMap = .build(from: tmpQuickPhraseMap)
+
+        // 暫存辭典的階段性任務已結束，即刻釋放以降低載入期峰值。
+        tmpCharDef.removeAll(keepingCapacity: false)
+        tmpSymbolDef.removeAll(keepingCapacity: false)
+        tmpOctagram.removeAll(keepingCapacity: false)
+        tmpOctagramDivided.removeAll(keepingCapacity: false)
+        tmpQuickDef.removeAll(keepingCapacity: false)
+        tmpQuickPhraseMap.removeAll(keepingCapacity: false)
 
         filePath = path
         return true
@@ -1061,7 +1155,7 @@ nonisolated extension LMAssembly.LMCassette {
     // 重置 sorted maps。
     charDefMap = .init()
     symbolDefMap = .init()
-    reverseLookupMap = .init()
+    reverseIndex = .init()
     octagramMap = .init()
     octagramDividedMap = .init()
     // 重置為初始狀態

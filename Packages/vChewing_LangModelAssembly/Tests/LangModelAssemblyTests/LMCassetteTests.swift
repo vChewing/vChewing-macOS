@@ -134,6 +134,27 @@ struct LMCassetteTests {
     #expect(!lmCassette.hasUnigramsFor(key: "??????"))
   }
 
+  /// 磁帶反查（字→碼）：chardef 與 symboldef 合併 namespace、零複製索引查詢。
+  @Test
+  func testCassetteReverseLookup() throws {
+    let pathCINFile = LMATestsData.getCINPath4Tests("array30", ext: "cin2")
+    guard let pathCINFile else {
+      Issue.record("無法存取用以測試的資料。當前嘗試存取的檔案：array30.cin2")
+      return
+    }
+    var lmCassette = LMAssembly.LMCassette()
+    let opened = lmCassette.open(pathCINFile)
+    #expect(opened)
+    // chardef：「培」的字根為 `ry;`；「埻」的字根為 `ry;f`。
+    #expect(lmCassette.reverseCodes(for: "培")?.contains("ry;") == true)
+    #expect(lmCassette.reverseCodes(for: "埻") == ["ry;f"])
+    // symboldef 合併語義：「ㄅ」來自 %symboldef 章節（w0）。
+    #expect(lmCassette.reverseCodes(for: "ㄅ")?.contains("w0") == true)
+    // 無結果回傳 nil。
+    #expect(lmCassette.reverseCodes(for: "不存在的字詞") == nil)
+    #expect(lmCassette.reverseCodes(for: "") == nil)
+  }
+
   @Test
   func testCassetteQuickPhraseParsingVariants() throws {
     let pathCINFile = LMATestsData.getCINPath4Tests("quickphrases_multi", ext: "cin")
