@@ -691,6 +691,50 @@ extension InputHandlerTests {
   }
 
   @Test
+  func test_IH105F_CassetteWildcardSandwichStaysInCalligrapher() throws {
+    guard let testHandler, let testSession else {
+      Issue.record("testHandler and testSession at least one of them is nil.")
+      return
+    }
+
+    let originalAsyncLoading = LMAssembly.LMInstantiator.asyncLoadingUserData
+    LMAssembly.LMInstantiator.asyncLoadingUserData = false
+    defer { LMAssembly.LMInstantiator.asyncLoadingUserData = originalAsyncLoading }
+
+    guard let cassetteURL = cassetteURLForTests("array30", ext: "cin2") else {
+      Issue.record("無法存取用以測試的資料。當前嘗試存取的檔案：array30.cin2")
+      return
+    }
+
+    LMAssembly.LMInstantiator.loadCassetteData(path: cassetteURL.path)
+    #expect(LMAssembly.LMInstantiator.lmCassette.wildcardKey == "*")
+
+    testHandler.clear()
+    testHandler.prefs.cassetteEnabled = true
+    testHandler.prefs.autoCompositeWithLongestPossibleCassetteKey = true
+
+    // 敲到 `*` 時不得觸發立即組字，否則 `y*y` 這類三明治 pattern 永遠敲不出來。
+    typeSentence("y*")
+    #expect(testHandler.calligrapher == "y*")
+    #expect(testHandler.assembler.isEmpty)
+    #expect(testSession.state.type == .ofInputting)
+
+    // 繼續敲 `y`，組筆區應保留完整的三明治 pattern（array30 的 `y*y*` 仍有匹配，故不自動組字）。
+    typeSentence("y")
+    #expect(testHandler.calligrapher == "y*y")
+    #expect(testHandler.assembler.isEmpty)
+
+    // 空白鍵組字：`y*y` 應能組出內容（匹配 yky 誰、yyy 譶 等）。
+    typeSentence(" ")
+    #expect(testHandler.calligrapher.isEmpty)
+    #expect(!testHandler.assembler.isEmpty)
+    #expect(testHandler.triageInput(event: KBEvent.KeyEventData.dataArrowDown.asEvent))
+    let candidateValues = testSession.state.candidates.map(\.value)
+    #expect(candidateValues.contains("誰"))
+    #expect(candidateValues.contains("譶"))
+  }
+
+  @Test
   func test_IH106_CodePointInputCheck() throws {
     guard let testHandler, let testSession else {
       Issue.record("testHandler and testSession at least one of them is nil.")

@@ -51,7 +51,6 @@ public struct CassetteTypewriter<Handler: InputHandlerProtocol>: TypewriterProto
     }
 
     let inputText = input.text
-    let isWildcardKeyInput = inputText == wildcardKey && !wildcardKey.isEmpty
     let isQuickPhraseKeyInput = matchesQuickPhraseKey(inputText, key: quickPhraseCommissionKey)
     var confirmCombination = input.isSpace
 
@@ -59,7 +58,6 @@ public struct CassetteTypewriter<Handler: InputHandlerProtocol>: TypewriterProto
       input.isReservedKey || input.isNumericPadKey || input.isNonLaptopFunctionKey
         || input.isControlHeld || input.isOptionHeld || input.isCommandHeld
     let isCalligrapherFull = handler.calligrapher.count >= currentLM.maxCassetteKeyLength
-    let calligrapherWasEmpty = handler.calligrapher.isEmpty
     var didAppendStroke = false
 
     // 進行筆畫預處理：阻擋非法按鍵、更新組筆狀態與快選清單。
@@ -86,23 +84,19 @@ public struct CassetteTypewriter<Handler: InputHandlerProtocol>: TypewriterProto
       confirmCombination = confirmCombination || input.isEnter
     }
 
-    let isLongestPossibleKeyFormed = shouldFormLongestCassetteKey(
-      isWildcardKeyInput: isWildcardKeyInput
-    )
     let isStrokesFull = handler.calligrapher.count >= currentLM.maxCassetteKeyLength
-      || isLongestPossibleKeyFormed
+      || shouldFormLongestCassetteKey()
 
-    // 決定是否要進行組字：滿筆長自動組字、花牌搭配筆畫、或空白/Enter 強制組字。
-    // 花牌鍵在組筆區為空時僅作為普通筆畫錄入（開頭花牌為任意字根序查詢）。
+    // 決定是否要進行組字：滿筆長自動組字、或空白/Enter 強制組字。
+    // 花牌鍵與任意單字元鍵一律僅作為普通筆畫錄入：
+    // 若敲花牌鍵就立即組字，會導致 `y*y` 這類三明治 pattern 永遠敲不出來。
     var combineStrokes =
-      (isStrokesFull && prefs.autoCompositeWithLongestPossibleCassetteKey)
-        || (isWildcardKeyInput && !calligrapherWasEmpty)
+      isStrokesFull && prefs.autoCompositeWithLongestPossibleCassetteKey
     combineStrokes = combineStrokes || (!handler.calligrapher.isEmpty && confirmCombination)
 
     if combineStrokes {
       return handleCassetteCombination(
         input: input,
-        isWildcardKeyInput,
         session: session,
         prefs: prefs
       )
@@ -161,11 +155,8 @@ public struct CassetteTypewriter<Handler: InputHandlerProtocol>: TypewriterProto
     return inputText == key
   }
 
-  private func shouldFormLongestCassetteKey(
-    isWildcardKeyInput: Bool
-  )
-    -> Bool {
-    guard !isWildcardKeyInput, handler.prefs.autoCompositeWithLongestPossibleCassetteKey else {
+  private func shouldFormLongestCassetteKey() -> Bool {
+    guard handler.prefs.autoCompositeWithLongestPossibleCassetteKey else {
       return false
     }
     return !handler.currentLM.hasCassetteWildcardResultsFor(key: handler.calligrapher)
@@ -248,7 +239,6 @@ public struct CassetteTypewriter<Handler: InputHandlerProtocol>: TypewriterProto
 
   private func handleCassetteCombination(
     input: some InputSignalProtocol,
-    _ isWildcardKeyInput: Bool,
     session: Session,
     prefs: some PrefMgrProtocol
   )
