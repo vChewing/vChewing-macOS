@@ -97,6 +97,89 @@ extension String {
   }
 }
 
+// MARK: - [UInt8] Byte-Level Range Parsing
+
+extension Array where Element == UInt8 {
+  /// 以 byte 級掃描複刻 `String.parseRanges` 的語義：
+  /// 跳過空片段（連續或首尾的分隔符不產生片段）、片段索引 dense、
+  /// 回傳 false 可提早停止、尾端無分隔符的最後片段照常給出。
+  /// - Parameters:
+  ///   - sourceRange: 要處理的位元組範圍。
+  ///   - separator: 分隔符位元組（限 ASCII）。
+  ///   - task: 對每個片段範圍執行的任務；回傳 false 可提早結束掃描。
+  nonisolated func parseByteRanges(
+    in sourceRange: Range<Int>,
+    splitee separator: UInt8,
+    task: (_ theRange: Range<Int>, _ itemIndex: Int) -> Bool
+  ) {
+    guard !sourceRange.isEmpty else { return }
+    var itemStart = sourceRange.lowerBound
+    var i = sourceRange.lowerBound
+    var itemIndex = 0
+    while i < sourceRange.upperBound {
+      if self[i] == separator {
+        if itemStart < i {
+          guard task(itemStart ..< i, itemIndex) else { return }
+          itemIndex += 1
+        }
+        i += 1
+        itemStart = i
+        continue
+      }
+      i += 1
+    }
+    if itemStart < sourceRange.upperBound {
+      _ = task(itemStart ..< sourceRange.upperBound, itemIndex)
+    }
+  }
+
+  /// 以換行位元組逐行掃描整個位元組陣列。
+  /// - Parameter task: 對每個行範圍執行的任務。
+  nonisolated func parseByteLines(task: (_ theRange: Range<Int>) -> ()) {
+    parseByteRanges(in: startIndex ..< endIndex, splitee: 0x0A) { theRange, _ in
+      task(theRange)
+      return true
+    }
+  }
+
+  /// 以空白位元組逐格掃描指定的位元組範圍。
+  /// - Parameters:
+  ///   - sourceRange: 要處理的位元組範圍。
+  ///   - task: 對每個 cell 範圍執行的任務；回傳 false 可提早結束掃描。
+  nonisolated func parseByteCells(
+    in sourceRange: Range<Int>,
+    task: (_ theRange: Range<Int>, _ itemIndex: Int) -> Bool
+  ) {
+    parseByteRanges(in: sourceRange, splitee: 0x20, task: task)
+  }
+
+  /// 比較指定位元組範圍與另一個位元組陣列中指定範圍的字典序。
+  nonisolated func compareByteRange(_ range: Range<Int>, with rhs: [UInt8], in rhsRange: Range<Int>) -> Int {
+    let lhsCount = range.count
+    let rhsCount = rhsRange.count
+    let minCount = Swift.min(lhsCount, rhsCount)
+    for i in 0 ..< minCount {
+      let lb = self[range.lowerBound + i]
+      let rb = rhs[rhsRange.lowerBound + i]
+      if lb < rb { return -1 }
+      if lb > rb { return 1 }
+    }
+    if lhsCount < rhsCount { return -1 }
+    if lhsCount > rhsCount { return 1 }
+    return 0
+  }
+
+  /// 比較指定位元組範圍與另一個位元組陣列的字典序。
+  nonisolated func compareByteRange(_ range: Range<Int>, with rhs: [UInt8]) -> Int {
+    compareByteRange(range, with: rhs, in: rhs.startIndex ..< rhs.endIndex)
+  }
+
+  /// 比較同一陣列內兩個位元組範圍的字典序。
+  nonisolated func compareByteSlices(_ lhs: Range<Int>, _ rhs: Range<Int>) -> Int {
+    compareByteRange(lhs, with: self, in: rhs)
+  }
+}
+
 // MARK: - StringView Ranges Extension MK1 Backup (by Isaac Xen)
 
 // This is only for reference and is not used in this assembly.
