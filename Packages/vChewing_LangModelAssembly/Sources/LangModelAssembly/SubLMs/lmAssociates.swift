@@ -14,20 +14,40 @@ extension LMAssembly {
   struct LMAssociates {
     // MARK: Lifecycle
 
-    init() {
-      self.rangeMap = [:]
-    }
+    init() {}
 
     // MARK: Internal
 
+    /// 單筆關聯詞語 key entry（轉換後的 key → line refs 範圍）。
+    struct AssociatesEntry: Sendable {
+      /// 轉換後 key 在 `keyData` 內的範圍。
+      let keyStart: UInt32
+      let keyEnd: UInt32
+      /// 指向 `lineRefs` 的範圍。
+      let refsStart: UInt32
+      let refsEnd: UInt32
+    }
+
+    /// 單筆行引用：同行的 value 是 dense 索引 1...valueCellCount 的連續 cells。
+    struct AssociatesLineRef: Sendable {
+      /// 整行在 `rawData` 內的範圍。
+      let lineStart: UInt32
+      let lineEnd: UInt32
+      /// 該行被記錄的 value cell 數量（遇 `#` 開頭的 cell 即停止計數）。
+      let valueCellCount: UInt32
+    }
+
     var filePath: String?
-    /// Range 只可能是一整行，所以必須得有 index。
-    var rangeMap: [String: [(Range<String.Index>, Int)]] = [:]
-    var strData: String = ""
 
-    var count: Int { rangeMap.count }
+    /// 原始資料的 UTF-8 位元組（取代舊版 `strData: String` 的實體儲存）。
+    private(set) var rawData: [UInt8] = []
 
-    var isLoaded: Bool { !rangeMap.isEmpty }
+    /// 資料庫字串陣列（自 `rawData` 即時物化，供外部唯讀消費）。
+    var strData: String { String(decoding: rawData, as: UTF8.self) }
+
+    var count: Int { entries.count }
+
+    var isLoaded: Bool { !entries.isEmpty }
 
     internal static func cnvNGramKeyFromPinyinToPhona(target: String) -> String {
       guard target.contains("("), target.contains(","), target.contains(")") else {
@@ -68,36 +88,77 @@ extension LMAssembly {
     /// - parameters:
     ///   - path: 給定路徑。
     mutating func replaceData(textData rawStrData: String) {
-      if strData == rawStrData { return }
-      strData = rawStrData
-      var newMap: [String: [(Range<String.Index>, Int)]] = [:]
-      strData.parse(splitee: "\n") { theRange in
-        var keyRange: Range<String.Index>?
-        var convertedKey: String?
-        rawStrData.parseCells(in: theRange, splitee: " ") { currentRange, currentIndex in
+      let newBytes = Array(rawStrData.utf8)
+      if rawData == newBytes { return }
+      rawData = newBytes
+      // 載入期暫存：每個唯一轉換 key 對應的行引用（依行位置排列）。
+      var protoKeys: [String] = []
+      var protoKeyIndex: [String: Int] = [:]
+      var protoRefs: [[AssociatesLineRef]] = []
+      rawData.parseByteLines { lineRange in
+        var keyRange: Range<Int>?
+        var valueCellCount = 0
+        rawData.parseByteCells(in: lineRange) { currentRange, currentIndex in
           if currentIndex == 0 {
+            // "#" 開頭的 key cell 視為註解行，整行跳過。
+            guard rawData[currentRange.lowerBound] != 0x23 else { return false }
             keyRange = currentRange
-            return rawStrData[currentRange].first != "#"
+            return true
           }
-          guard rawStrData[currentRange].first != "#" else { return false }
-          guard let keyRange else { return false }
-          let newKey = convertedKey ?? {
-            let computed = Self.cnvNGramKeyFromPinyinToPhona(target: String(rawStrData[keyRange]))
-            convertedKey = computed
-            return computed
-          }()
-          newMap[newKey, default: []].append((theRange, currentIndex))
+          // "#" 開頭的 value cell：該行後續 cells 全部不錄。
+          guard rawData[currentRange.lowerBound] != 0x23 else { return false }
+          valueCellCount = currentIndex
           return true
         }
+        guard let keyRange, valueCellCount > 0 else { return }
+        let convertedKey = Self.cnvNGramKeyFromPinyinToPhona(
+          target: String(decoding: rawData[keyRange], as: UTF8.self)
+        )
+        let lineRef = AssociatesLineRef(
+          lineStart: UInt32(lineRange.lowerBound),
+          lineEnd: UInt32(lineRange.upperBound),
+          valueCellCount: UInt32(valueCellCount)
+        )
+        if let existing = protoKeyIndex[convertedKey] {
+          protoRefs[existing].append(lineRef)
+        } else {
+          protoKeyIndex[convertedKey] = protoKeys.count
+          protoKeys.append(convertedKey)
+          protoRefs.append([lineRef])
+        }
       }
-      rangeMap = newMap
-      newMap.removeAll(keepingCapacity: false)
+      // 依 key bytes 排序（同 key 的行引用已在暫存階段依行位置排列）。
+      let sortedOrder = protoKeys.indices.sorted {
+        protoKeys[$0].utf8.lexicographicallyPrecedes(protoKeys[$1].utf8)
+      }
+      var newKeyData = [UInt8]()
+      var newEntries: [AssociatesEntry] = []
+      newEntries.reserveCapacity(sortedOrder.count)
+      var newLineRefs: [AssociatesLineRef] = []
+      for sourceIndex in sortedOrder {
+        let keyStart = UInt32(newKeyData.count)
+        newKeyData.append(contentsOf: protoKeys[sourceIndex].utf8)
+        let keyEnd = UInt32(newKeyData.count)
+        let refsStart = UInt32(newLineRefs.count)
+        newLineRefs.append(contentsOf: protoRefs[sourceIndex])
+        newEntries.append(.init(
+          keyStart: keyStart,
+          keyEnd: keyEnd,
+          refsStart: refsStart,
+          refsEnd: UInt32(newLineRefs.count)
+        ))
+      }
+      keyData = newKeyData
+      entries = newEntries
+      lineRefs = newLineRefs
     }
 
     mutating func clear() {
       filePath = nil
-      strData.removeAll()
-      rangeMap.removeAll()
+      rawData.removeAll(keepingCapacity: false)
+      keyData.removeAll(keepingCapacity: false)
+      entries.removeAll(keepingCapacity: false)
+      lineRefs.removeAll(keepingCapacity: false)
     }
 
     func saveData() {
@@ -113,25 +174,57 @@ extension LMAssembly {
 
     func valuesFor(pair: Homa.CandidatePair) -> [String] {
       var pairs: [String] = []
-      let availableResults = [rangeMap[pair.toNGramKey], rangeMap[pair.value]].compactMap { $0 }
-      availableResults.forEach { arrRangeRecords in
-        arrRangeRecords.forEach { netaRange, index in
-          strData.parseCells(in: netaRange, splitee: " ") { currentRange, currentIndex in
-            guard currentIndex <= index else { return false }
-            if currentIndex == index {
-              pairs.append(String(strData[currentRange]))
-              return false
-            }
-            return true
-          }
-        }
+      if let index = entryIndex(for: pair.toNGramKey) {
+        pairs.append(contentsOf: valuesAt(entryIndex: index))
+      }
+      if let index = entryIndex(for: pair.value) {
+        pairs.append(contentsOf: valuesAt(entryIndex: index))
       }
       return pairs.deduplicated
     }
 
     func hasValuesFor(pair: Homa.CandidatePair) -> Bool {
-      if rangeMap[pair.toNGramKey] != nil { return true }
-      return rangeMap[pair.value] != nil
+      if entryIndex(for: pair.toNGramKey) != nil { return true }
+      return entryIndex(for: pair.value) != nil
+    }
+
+    // MARK: Private
+
+    /// 轉換後 keys 的 UTF-8 位元組 blob（key 經 `cnvNGramKeyFromPinyinToPhona` 轉換，非原文子字串）。
+    private var keyData: [UInt8] = []
+    /// 按 key bytes 排序的索引；同 key 多行時 refs 依行位置排列。
+    private var entries: [AssociatesEntry] = []
+    /// 全部行引用的平坦陣列。
+    private var lineRefs: [AssociatesLineRef] = []
+
+    /// 二分搜尋轉換後的 key，回傳對應的 entry 索引。
+    private func entryIndex(for key: String) -> Int? {
+      let keyUTF8 = Array(key.utf8)
+      var lo = 0, hi = entries.count - 1
+      while lo <= hi {
+        let mid = lo + (hi - lo) / 2
+        let e = entries[mid]
+        let cmp = keyData.compareByteRange(Int(e.keyStart) ..< Int(e.keyEnd), with: keyUTF8)
+        if cmp < 0 { lo = mid + 1 } else if cmp > 0 { hi = mid - 1 } else { return mid }
+      }
+      return nil
+    }
+
+    /// 取出指定 entry 的全部關聯詞語（依行位置、再行內 cell 順序，不去重）。
+    private func valuesAt(entryIndex index: Int) -> [String] {
+      let e = entries[index]
+      var pairs: [String] = []
+      for i in Int(e.refsStart) ..< Int(e.refsEnd) {
+        let ref = lineRefs[i]
+        let lastValueIndex = Int(ref.valueCellCount)
+        rawData.parseByteCells(in: Int(ref.lineStart) ..< Int(ref.lineEnd)) { currentRange, currentIndex in
+          if currentIndex >= 1 {
+            pairs.append(String(decoding: rawData[currentRange], as: UTF8.self))
+          }
+          return currentIndex < lastValueIndex
+        }
+      }
+      return pairs
     }
   }
 }
@@ -139,17 +232,10 @@ extension LMAssembly {
 extension LMAssembly.LMAssociates {
   var dictRepresented: [String: [String]] {
     var result = [String: [String]]()
-    rangeMap.forEach { key, arrRangeRecords in
-      arrRangeRecords.forEach { netaRange, index in
-        strData.parseCells(in: netaRange, splitee: " ") { currentRange, currentIndex in
-          guard currentIndex <= index else { return false }
-          if currentIndex == index {
-            result[key, default: []].append(String(strData[currentRange]))
-            return false
-          }
-          return true
-        }
-      }
+    entries.indices.forEach { index in
+      let e = entries[index]
+      let key = String(decoding: keyData[Int(e.keyStart) ..< Int(e.keyEnd)], as: UTF8.self)
+      result[key] = valuesAt(entryIndex: index)
     }
     return result
   }

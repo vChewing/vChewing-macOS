@@ -144,4 +144,43 @@ struct LMCoreEXTests {
     #expect(grams.filter { $0 == "高" }.count == 1)
     #expect(grams.filter { $0 == "暫時高" }.count == 1)
   }
+
+  @Test
+  func testStrDataReflectsProcessedSource() throws {
+    var lmTest = LMAssembly.LMCoreEX(
+      reverse: false,
+      consolidate: false,
+      defaultScore: { _ in 0 },
+      forceDefaultScore: false
+    )
+    lmTest.replaceData(textData: sampleData)
+    // strData computed 屬性與載入原文一致（保護外部唯讀消費端）。
+    #expect(lmTest.strData == sampleData)
+    // tab 會在載入時正規化為空格，strData 反映的是正規化後的內容。
+    lmTest.replaceData(textData: "ㄍㄠ\t高\t-7.171551")
+    #expect(lmTest.strData == "ㄍㄠ 高 -7.171551")
+  }
+
+  @Test
+  func testSaveDataRoundTripWithTemporaryMap() throws {
+    var lmTest = LMAssembly.LMCoreEX(
+      reverse: false,
+      consolidate: false,
+      defaultScore: { _ in 0 },
+      forceDefaultScore: false
+    )
+    lmTest.replaceData(textData: sampleData)
+    lmTest.temporaryMap["ㄍㄠ-ㄒㄧㄥ"] = [
+      .init(keyArray: ["ㄍㄠ", "ㄒㄧㄥ"], value: "高興", score: -5.0),
+    ]
+    let tempURL = FileManager.default.temporaryDirectory
+      .appendingPathComponent("vChewingTest_coreex_\(UUID().uuidString).txt")
+    lmTest.filePath = tempURL.path
+    lmTest.saveData()
+    let saved = try String(contentsOf: tempURL, encoding: .utf8)
+    // 先寫原文、再把 temporaryMap 逐筆以「值 鍵 權重」格式附加。
+    #expect(saved.hasPrefix(sampleData))
+    #expect(saved.contains("高興 ㄍㄠ-ㄒㄧㄥ -5.0\n"))
+    try? FileManager.default.removeItem(at: tempURL)
+  }
 }

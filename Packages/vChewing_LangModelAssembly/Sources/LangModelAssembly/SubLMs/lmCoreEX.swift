@@ -11,8 +11,8 @@ import Homa
 // MARK: - LMAssembly.LMCoreEX
 
 extension LMAssembly {
-  /// 與之前的 LMCore 不同，LMCoreEX 不在辭典內記錄實體，而是記錄 range 範圍。
-  /// 需要資料的時候，直接拿 range 去 strData 取資料。
+  /// 與之前的 LMCore 不同，LMCoreEX 不在辭典內記錄實體，而是記錄位元組範圍。
+  /// 需要資料的時候，直接拿範圍去 rawData 取資料。
   struct LMCoreEX {
     // MARK: Lifecycle
 
@@ -29,7 +29,6 @@ extension LMAssembly {
       defaultScore scoreDefault: ScoreAssigner? = nil,
       forceDefaultScore: Bool = false
     ) {
-      self.rangeMap = [:]
       self.allowConsolidation = consolidate
       self.shouldReverse = reverse
       self.defaultScore = scoreDefault ?? defaultScore
@@ -38,14 +37,20 @@ extension LMAssembly {
 
     // MARK: Internal
 
+    /// 單筆行 entry：轉換後的 key（於 keyData）與整行（於 rawData）的位元組範圍。
+    struct CoreEXEntry: Sendable {
+      let keyStart: UInt32
+      let keyEnd: UInt32
+      let lineStart: UInt32
+      let lineEnd: UInt32
+    }
+
     var filePath: String?
 
-    /// 資料庫辭典。索引內容為注音字串，資料內容則為字串首尾範圍、方便自 strData 取資料。
-    var rangeMap: [String: [Range<String.Index>]] = [:]
+    /// 原始資料的 UTF-8 位元組（取代舊版 `strData: String` 的實體儲存）。
+    private(set) var rawData: [UInt8] = []
     /// 資料庫追加辭典。
     var temporaryMap: [String: [Homa.Gram]] = [:]
-    /// 資料庫字串陣列。
-    var strData: String = ""
     /// 聲明原始檔案內第一、二縱列的內容是否彼此顛倒。
     var shouldReverse = false
     var allowConsolidation = false
@@ -54,11 +59,14 @@ extension LMAssembly {
     /// 啟用該選項的話，會強制施加預設權重、而無視原始權重資料。
     var shouldForceDefaultScore = false
 
-    /// 資料陣列內承載的資料筆數。
-    var count: Int { rangeMap.count }
+    /// 資料庫字串陣列（自 `rawData` 即時物化，供外部唯讀消費）。
+    var strData: String { String(decoding: rawData, as: UTF8.self) }
+
+    /// 資料陣列內承載的資料筆數（唯一 key 數量）。
+    var count: Int { uniqueKeyCount }
 
     /// 偵測資料庫辭典內是否已經有載入的資料。
-    var isLoaded: Bool { !rangeMap.isEmpty }
+    var isLoaded: Bool { !entries.isEmpty }
 
     /// 將資料從檔案讀入至資料庫辭典內。
     /// - parameters:
@@ -100,20 +108,24 @@ extension LMAssembly {
     /// - parameters:
     ///   - path: 給定路徑。
     mutating func replaceData(textData rawStrData: String) {
-      let rawStrData = rawStrData.replacingOccurrences(of: "\t", with: " ")
-      if strData == rawStrData { return }
+      let processed = rawStrData.replacingOccurrences(of: "\t", with: " ")
+      let newBytes = Array(processed.utf8)
+      if rawData == newBytes { return }
 
       // 清理之前的資料以釋放記憶體
-      rangeMap.removeAll(keepingCapacity: false)
+      rawData = newBytes
+      keyData.removeAll(keepingCapacity: false)
+      entries.removeAll(keepingCapacity: false)
+      uniqueKeyCount = 0
       temporaryMap.removeAll(keepingCapacity: false)
 
-      strData = rawStrData
-      var newMap: [String: [Range<String.Index>]] = [:]
+      // 載入期暫存：轉換後 key → 行範圍（依檔案行序）。
       let shouldReverse = shouldReverse // 必需，否則下文的 closure 會出錯。
-      strData.parse(splitee: "\n") { theRange in
-        var firstCellRange: Range<String.Index>?
-        var secondCellRange: Range<String.Index>?
-        rawStrData.parseCells(in: theRange, splitee: " ") { currentRange, currentIndex in
+      var protoLineMap: [String: [Range<Int>]] = [:]
+      rawData.parseByteLines { lineRange in
+        var firstCellRange: Range<Int>?
+        var secondCellRange: Range<Int>?
+        rawData.parseByteCells(in: lineRange) { currentRange, currentIndex in
           switch currentIndex {
           case 0:
             firstCellRange = currentRange
@@ -126,26 +138,46 @@ extension LMAssembly {
           }
         }
         guard let firstCellRange, let secondCellRange else { return }
-        guard rawStrData[firstCellRange].first != "#" else { return }
+        guard rawData[firstCellRange.lowerBound] != 0x23 else { return } // "#" 開頭的行跳過。
         let keyRange = shouldReverse ? secondCellRange : firstCellRange
-        var theKey = String(rawStrData[keyRange])
+        var theKey = String(decoding: rawData[keyRange], as: UTF8.self)
         theKey.convertToPhonabets()
-        newMap[theKey, default: []].append(theRange)
+        protoLineMap[theKey, default: []].append(lineRange)
       }
-      rangeMap = newMap
-      _sortedKeysBox.isDirty = true
-      // 明確釋放 newMap 記憶體
-      newMap.removeAll(keepingCapacity: false)
+      // 依 key bytes 排序建置最終索引；同 key 的行已在暫存階段依檔案行序排列。
+      let sortedKeys = protoLineMap.keys.sorted {
+        $0.utf8.lexicographicallyPrecedes($1.utf8)
+      }
+      uniqueKeyCount = sortedKeys.count
+      var newKeyData = [UInt8]()
+      var newEntries: [CoreEXEntry] = []
+      for key in sortedKeys {
+        let keyStart = UInt32(newKeyData.count)
+        newKeyData.append(contentsOf: key.utf8)
+        let keyEnd = UInt32(newKeyData.count)
+        for lineRange in protoLineMap[key] ?? [] {
+          newEntries.append(.init(
+            keyStart: keyStart,
+            keyEnd: keyEnd,
+            lineStart: UInt32(lineRange.lowerBound),
+            lineEnd: UInt32(lineRange.upperBound)
+          ))
+        }
+      }
+      keyData = newKeyData
+      entries = newEntries
+      // 明確釋放暫存辭典記憶體
+      protoLineMap.removeAll(keepingCapacity: false)
     }
 
     /// 將當前語言模組的資料庫辭典自記憶體內卸除。
     mutating func clear() {
       filePath = nil
-      strData.removeAll(keepingCapacity: false)
-      rangeMap.removeAll(keepingCapacity: false)
+      rawData.removeAll(keepingCapacity: false)
+      keyData.removeAll(keepingCapacity: false)
+      entries.removeAll(keepingCapacity: false)
+      uniqueKeyCount = 0
       temporaryMap.removeAll(keepingCapacity: false)
-      _sortedKeysBox.value.removeAll(keepingCapacity: false)
-      _sortedKeysBox.isDirty = true
     }
 
     // MARK: - Advanced features
@@ -174,18 +206,18 @@ extension LMAssembly {
     /// 該功能僅作偵錯之用途。
     func dump() {
       var strDump = ""
-      for entry in rangeMap {
-        let netaRanges: [Range<String.Index>] = entry.value
-        for netaRange in netaRanges {
-          let neta = strData[netaRange]
-          let addline = neta + "\n"
-          strDump += addline
-        }
+      for entry in entries {
+        let neta = String(
+          decoding: rawData[Int(entry.lineStart) ..< Int(entry.lineEnd)],
+          as: UTF8.self
+        )
+        let addline = neta + "\n"
+        strDump += addline
       }
       vCLMLog(strDump)
     }
 
-    /// 根據給定的讀音索引鍵，來獲取資料庫辭典內的對應資料陣列的字串首尾範圍資料、據此自 strData 取得字串形式的資料、生成單元圖陣列。
+    /// 根據給定的讀音索引鍵，來獲取資料庫辭典內的對應資料陣列的字串首尾範圍資料、據此自 rawData 取得字串形式的資料、生成單元圖陣列。
     /// - parameters:
     ///   - key: 讀音索引鍵。
     func unigramsFor(
@@ -204,12 +236,14 @@ extension LMAssembly {
         singleSegLength,
         noPunctuations,
       ].reduce(true) { $0 && $1 }
-      if let arrRangeRecords: [Range<String.Index>] = rangeMap[key] {
-        for netaRange in arrRangeRecords {
-          var firstCellRange: Range<String.Index>?
-          var secondCellRange: Range<String.Index>?
-          var thirdCellRange: Range<String.Index>?
-          strData.parseCells(in: netaRange, splitee: " ") { currentRange, currentIndex in
+      if let matchedRange = entryRange(forKey: key) {
+        for entryIndex in matchedRange {
+          let entry = entries[entryIndex]
+          let lineRange = Int(entry.lineStart) ..< Int(entry.lineEnd)
+          var firstCellRange: Range<Int>?
+          var secondCellRange: Range<Int>?
+          var thirdCellRange: Range<Int>?
+          rawData.parseByteCells(in: lineRange) { currentRange, currentIndex in
             switch currentIndex {
             case 0:
               firstCellRange = currentRange
@@ -226,7 +260,7 @@ extension LMAssembly {
           }
           guard let firstCellRange, let secondCellRange else { continue }
           let valueRange = shouldReverse ? firstCellRange : secondCellRange
-          let theValue = String(strData[valueRange])
+          let theValue = String(decoding: rawData[valueRange], as: UTF8.self)
           let valueHash = theValue.hashValue
           // 完全排除使用者詞庫中的單漢字結果（除非原廠辭典並未包含這個配對），避免其影響組字結果。
           checkOmission: if omitUserPhrases {
@@ -235,8 +269,9 @@ extension LMAssembly {
             continue
           }
           var theScore: Double
-          if let thirdCellRange, !shouldForceDefaultScore, !strData[thirdCellRange].contains("#") {
-            theScore = .init(String(strData[thirdCellRange])) ?? defaultScore((keyArray, theValue))
+          if let thirdCellRange, !shouldForceDefaultScore, !rawData[thirdCellRange].contains(0x23) {
+            theScore = .init(String(decoding: rawData[thirdCellRange], as: UTF8.self))
+              ?? defaultScore((keyArray, theValue))
           } else {
             theScore = defaultScore(nil)
           }
@@ -261,37 +296,44 @@ extension LMAssembly {
     /// - parameters:
     ///   - key: 讀音索引鍵。
     func hasUnigramsFor(key: String) -> Bool {
-      rangeMap.keys.contains(key) || temporaryMap[key] != nil
+      entryRange(forKey: key) != nil || temporaryMap[key] != nil
     }
 
     /// 根據給定的前綴，返回所有以該前綴開頭的索引鍵。
-    /// 同時搜尋 `sortedKeys`（二分搜尋）與 `temporaryMap.keys`（線性掃描）。
+    /// 同時搜尋主表（二分搜尋 lower-bound + 前綴掃描）與 `temporaryMap.keys`（線性掃描）。
     /// - Parameter prefix: 前綴字串。
     /// - Returns: 匹配的索引鍵陣列。
     func keys(matchingPrefix prefix: String) -> [String] {
       guard !prefix.isEmpty else { return [] }
-      // 惰性排序：僅在首次查詢（或 replaceData 後標記 dirty）時才排序。
-      if _sortedKeysBox.isDirty {
-        _sortedKeysBox.value = rangeMap.keys.sorted()
-        _sortedKeysBox.isDirty = false
-      }
+      let prefixUTF8 = Array(prefix.utf8)
       var result: [String] = []
       var seen: Set<String> = []
-      let sorted = _sortedKeysBox.value
-      // 二分搜尋 sortedKeys：找到第一個不小於 prefix 的位置
+      // 二分搜尋 entries：找到第一個不小於 prefix 的位置
       var low = 0
-      var high = sorted.count
+      var high = entries.count
       while low < high {
         let mid = (low + high) / 2
-        if sorted[mid] < prefix {
+        let e = entries[mid]
+        let keyRange = Int(e.keyStart) ..< Int(e.keyEnd)
+        // 與 prefix 比較：entry key 以 prefix 開頭（且更長）時視為不小於 prefix，
+        // 因此一般的字典序比較即可充當前綴搜尋的 lower-bound。
+        if keyData.compareByteRange(keyRange, with: prefixUTF8) < 0 {
           low = mid + 1
         } else {
           high = mid
         }
       }
       var i = low
-      while i < sorted.count, sorted[i].hasPrefix(prefix) {
-        let key = sorted[i]
+      while i < entries.count {
+        let e = entries[i]
+        let keyRange = Int(e.keyStart) ..< Int(e.keyEnd)
+        guard keyRange.count >= prefixUTF8.count else { break }
+        var isPrefix = true
+        for j in 0 ..< prefixUTF8.count {
+          if keyData[keyRange.lowerBound + j] != prefixUTF8[j] { isPrefix = false; break }
+        }
+        guard isPrefix else { break }
+        let key = String(decoding: keyData[keyRange], as: UTF8.self)
         if seen.insert(key).inserted {
           result.append(key)
         }
@@ -336,25 +378,47 @@ extension LMAssembly {
 
     // MARK: Private
 
-    /// 惰性排序快取容器。
-    private final class SortedKeysBox {
-      var value: [String] = []
-      var isDirty = true
-    }
+    /// 轉換後注音 keys 的 UTF-8 位元組 blob（key 經 `convertToPhonabets` 轉換，非原文子字串）。
+    private var keyData: [UInt8] = []
+    /// 按 key bytes 排序的行索引；同 key 的行依檔案行序排列。
+    private var entries: [CoreEXEntry] = []
+    /// 唯一 key 數量（entries 以行為單位，同 key 可能多行）。
+    private var uniqueKeyCount = 0
 
-    /// `rangeMap` 與 `temporaryMap` 索引鍵的排序陣列，供前綴搜尋二分搜尋之用。
-    /// 以 reference-type box 實現惰性排序：僅在 `keys(matchingPrefix:)` 首次查詢時計算。
-    private let _sortedKeysBox = SortedKeysBox()
+    /// 二分搜尋 key，回傳對應 entries 的範圍（同 key 的行連續排列）。
+    private func entryRange(forKey key: String) -> Range<Int>? {
+      let keyUTF8 = Array(key.utf8)
+      // Lower bound.
+      var lo = 0, hi = entries.count
+      while lo < hi {
+        let mid = lo + (hi - lo) / 2
+        let e = entries[mid]
+        let cmp = keyData.compareByteRange(Int(e.keyStart) ..< Int(e.keyEnd), with: keyUTF8)
+        if cmp < 0 { lo = mid + 1 } else { hi = mid }
+      }
+      guard lo < entries.count else { return nil }
+      let first = entries[lo]
+      guard keyData.compareByteRange(Int(first.keyStart) ..< Int(first.keyEnd), with: keyUTF8) == 0
+      else { return nil }
+      var upper = lo
+      while upper < entries.count {
+        let e = entries[upper]
+        guard keyData.compareByteRange(Int(e.keyStart) ..< Int(e.keyEnd), with: keyUTF8) == 0
+        else { break }
+        upper += 1
+      }
+      return lo ..< upper
+    }
   }
 }
 
 extension LMAssembly.LMCoreEX {
   var dictRepresented: [String: [String]] {
     var result = [String: [String]]()
-    rangeMap.forEach { key, arrValueRanges in
-      result[key, default: []] = arrValueRanges.map { currentRange in
-        strData[currentRange].description
-      }
+    entries.forEach { entry in
+      let key = String(decoding: keyData[Int(entry.keyStart) ..< Int(entry.keyEnd)], as: UTF8.self)
+      let line = String(decoding: rawData[Int(entry.lineStart) ..< Int(entry.lineEnd)], as: UTF8.self)
+      result[key, default: []].append(line)
     }
     return result
   }
