@@ -311,6 +311,7 @@
 "i18n:Uninstaller.Title" = "卸除輸入法";
 "i18n:UpdateNotification.CheckForUpdateCompleted" = "新版檢查完畢";
 "i18n:UpdateNotification.NewVersionAvailable" = "有新版可下載";
+"i18n:UpdateNotification.SkipThisVersion" = "略過此版本";
 "i18n:UpdateNotification.UpdateCheckCompleted" = "更新檢查完畢";
 "i18n:UpdateNotification.UpdateCheckFailed" = "無法檢查新版";
 "i18n:UserDef.kAcceptLeadingIntonations.description" = "聲調鍵是專門用來確認注音組合輸入的，從常理上來講只能在最後鍵入。然而，總是有人會失手將聲調鍵前置鍵入。該防呆功能專門應對這種情形，但無法用於拼音輸入模式，且其優先權比「以聲調鍵覆寫游標身後的漢字的聲調」更低（除非後者被停用）。在啟用中英混合輸入回退時，該設定會被無視——中英混合輸入回退永遠不會接受聲調前置鍵入。";

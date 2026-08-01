@@ -311,6 +311,7 @@
 "i18n:Uninstaller.Title" = "Uninstallation";
 "i18n:UpdateNotification.CheckForUpdateCompleted" = "Check for Update Completed";
 "i18n:UpdateNotification.NewVersionAvailable" = "New Version Available";
+"i18n:UpdateNotification.SkipThisVersion" = "Skip This Version";
 "i18n:UpdateNotification.UpdateCheckCompleted" = "Update Check Completed";
 "i18n:UpdateNotification.UpdateCheckFailed" = "Update Check Failed";
 "i18n:UserDef.kAcceptLeadingIntonations.description" = "This feature accommodates certain typing mistakes that the intonation mark might be typed at first (which is sequentially wrong from a common sense that intonation marks are supposed to be used for confirming combinations). It won't work if the current parser is of (any) pinyin. Also, this feature won't work when an intonation override is possible (and enabled).";

@@ -311,6 +311,7 @@
 "i18n:Uninstaller.Title" = "入力アプリの卸除（おろしのぞき）";
 "i18n:UpdateNotification.CheckForUpdateCompleted" = "更新通知受信完了";
 "i18n:UpdateNotification.NewVersionAvailable" = "最新版利用可能";
+"i18n:UpdateNotification.SkipThisVersion" = "このバージョンをスキップ";
 "i18n:UpdateNotification.UpdateCheckCompleted" = "新バージョンチェック完了";
 "i18n:UpdateNotification.UpdateCheckFailed" = "更新通知受信失敗";
 "i18n:UserDef.kAcceptLeadingIntonations.description" = "音調記号は常に「漢字の音読組合を確認するキー」として最後で入力することだと常識ですが、間違くてそれを最初に入力してしまった場合もございます。このボカ避け機能は（ほんの一部の）このような間違いを対策できますが、注音入力だけに使えます。更に、（音調の上書き機能がオンを前提として）音調の上書きができる場合には、このボカ避け機能は作動しません。中英混在入力のフォール バックが有効な場合、この設定は無視されます——中英混在入力のフォール バックは常に音調前置入力を受け付けません。";
