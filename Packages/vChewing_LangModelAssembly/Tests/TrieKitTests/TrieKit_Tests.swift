@@ -66,7 +66,7 @@ public struct TrieKitTests: TrieKitTestSuite {
     #expect(assembledSentence == ["幽蝶", "能", "留", "一縷", "芳"])
     // 剛才測試 Bigram 生效了。現在禁用 Bigram 試試看。先攔截掉 Bigram 結果。
     assembler.gramQuerier = { mockLM.queryGrams($0).filter { $0.previous == nil } }
-    try assembler.assignNodes(updateExisting: true) // 置換掉所有節點裡面的資料。
+    try assembler.assignNodes(updateBehavior: .refreshExisting) // 置換掉所有節點裡面的資料。
     assembledSentence = assembler.assemble().compactMap(\.value)
     #expect(assembledSentence == ["幽蝶", "能", "留", "一縷", "方"])
     // 對位置 7 這個最前方的座標位置使用節點覆寫。會在此過程中自動糾正成對位置 6 的覆寫。

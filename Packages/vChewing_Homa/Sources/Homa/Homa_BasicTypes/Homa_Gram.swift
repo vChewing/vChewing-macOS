@@ -103,6 +103,21 @@ extension Homa {
         lhs.backoff == rhs.backoff
     }
 
+    /// 生成內容雷同、但識別碼（FIUUID）全新的一份拷貝。
+    ///
+    /// 組字器的查詢快取以讀音陣列為索引鍵，內容相同的讀音序列在不同位置上
+    /// 會共享同批查詢結果。各節點收治這些結果時必須重新賦予識別碼，
+    /// 才能確保每個元圖在組句結果當中的位置唯一性。
+    public func withNewIdentity() -> Self {
+      .init(
+        keyArray: keyArray,
+        current: current,
+        previous: previous,
+        probability: probability,
+        backoff: backoff
+      )
+    }
+
     public func describe(keySeparator: String) -> String {
       let header = "[\(isUnigram ? "Unigram" : "Bigram")]"
       let body = "'\(keyArray.joined(separator: keySeparator))', \(descriptionSansReading)"
