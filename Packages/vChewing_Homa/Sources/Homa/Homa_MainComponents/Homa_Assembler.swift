@@ -49,6 +49,14 @@ extension Homa {
     public enum TypingDirection { case front, rear }
     /// 軌格調整操作模式。
     public enum ResizeBehavior { case expand, shrink }
+    /// 節點資料更新模式。
+    public enum NodeUpdateBehavior {
+      /// 僅為目前沒有節點的幅節位置建立新節點（敲字與刪字時的預設增量行為）。
+      case fillVacancies
+      /// 根據語言模型目前的資料狀態重新整理所有既有節點的元圖資料。
+      /// 該模式可以用於「在選字窗內屏蔽了某個詞之後，立刻生效」這樣的軟體功能需求的實現。
+      case refreshExisting
+    }
 
     /// 單元圖資料存取專用介面。
     public var gramQuerier: Homa.GramQuerier
@@ -172,7 +180,6 @@ extension Homa {
       }
       let gridBackup = segments
       var keyExistenceChecked = [GramQueryCacheKey: Bool]()
-      var warmupQueryBuffer = [GramQueryCacheKey: [Homa.Gram]]()
       for (cursorAdvancedPosition, possibleKey) in givenKeys.enumerated() {
         let altValues = possibleKey.allValues
         let cacheKey = GramQueryCacheKey(altValues.map { PossibleKey.singleKey($0) })
@@ -182,7 +189,7 @@ extension Homa {
             hasAnyResult = altValues.contains { checker([$0]) }
           } else {
             hasAnyResult = altValues.contains { alt in
-              !queryGrams(using: [PossibleKey.singleKey(alt)], cache: &warmupQueryBuffer).isEmpty
+              !queryGrams(using: [PossibleKey.singleKey(alt)]).isEmpty
             }
           }
           guard hasAnyResult else {
@@ -344,16 +351,16 @@ extension Homa {
     }
 
     /// 根據當前狀況更新整個組字器的節點文脈。
-    /// - Parameter updateExisting: 是否根據目前的語言模型的資料狀態來對既有節點更新其內部的單元圖陣列資料。
-    /// 該特性可以用於「在選字窗內屏蔽了某個詞之後，立刻生效」這樣的軟體功能需求的實現。
-    public func assignNodes(updateExisting: Bool = false) throws {
-      if updateExisting {
+    /// - Parameter updateBehavior: 節點資料更新模式，預設僅為空缺幅節建立新節點。
+    public func assignNodes(updateBehavior: NodeUpdateBehavior = .fillVacancies) throws {
+      let refreshingExisting = updateBehavior == .refreshExisting
+      if refreshingExisting {
         gramQueryCache.removeAll(keepingCapacity: true)
         gramQueryCacheOrder.removeAll(keepingCapacity: true)
       }
       var maxSegLength = maxSegLength
       let rangeOfPositions: Range<Int>
-      if updateExisting {
+      if refreshingExisting {
         rangeOfPositions = segments.indices
       } else {
         let lowerbound = Swift.max(0, cursor - maxSegLength)
@@ -371,34 +378,36 @@ extension Homa {
         }
       }
       var nodesChangedCounter = 0
-      var queryBuffer: [GramQueryCacheKey: [Homa.Gram]] = [:]
       rangeOfPositions.forEach { position in
         let rangeOfLengths = 1 ... min(maxSegLength, rangeOfPositions.upperBound - position)
         rangeOfLengths.forEach { theLength in
           guard position + theLength <= keys.count, position >= 0 else { return }
           let alternativesSlice = keys[position ..< (position + theLength)]
-          let queriedGrams = queryGramsForAlternatives(alternativesSlice, cache: &queryBuffer)
+          let queriedGrams = queryGramsForAlternatives(alternativesSlice)
           if (0 ..< segments.count).contains(position),
              let theNode = segments[position][theLength] {
-            if !updateExisting { return }
+            if !refreshingExisting { return }
             // 自動銷毀無效的節點。
             if queriedGrams.isEmpty {
               if theNode.keyArray.count == 1 { return }
               segments[position][theLength] = nil
             } else {
-              theNode.syncingGrams(from: queriedGrams)
+              theNode.syncingGrams(from: queriedGrams.map { $0.withNewIdentity() })
             }
             nodesChangedCounter += 1
             return
           }
           guard !queriedGrams.isEmpty else { return }
           // 這裡原本用 SegmentUnit.addNode 來完成的，但直接當作字典來互動的話也沒差。
+          // 快取命中的查詢結果會被不同節點共享，收治時須重新賦予元圖識別碼以確保位置唯一性。
           let representativeKeyArray = alternativesSlice.map(\.first)
-          segments[position][theLength] = .init(keyArray: representativeKeyArray, grams: queriedGrams)
+          segments[position][theLength] = .init(
+            keyArray: representativeKeyArray,
+            grams: queriedGrams.map { $0.withNewIdentity() }
+          )
           nodesChangedCounter += 1
         }
       }
-      queryBuffer.removeAll() // 手動清理，免得 ARC 拖時間。
       guard nodesChangedCounter != 0 else { throw Homa.Exception.noNodesAssigned }
       assemble()
     }
@@ -460,33 +469,25 @@ extension Homa {
 
     /// 對給定替代讀音陣列查詢並合併結果。
     private func queryGramsForAlternatives(
-      _ alternativesSlice: ArraySlice<PossibleKey>,
-      cache: inout [GramQueryCacheKey: [Homa.Gram]]
+      _ alternativesSlice: ArraySlice<PossibleKey>
     )
       -> [Homa.Gram] {
       let keyArray = Array(alternativesSlice)
-      return queryGrams(using: keyArray, cache: &cache)
+      return queryGrams(using: keyArray)
     }
 
     /// 從元圖存取專用 API 將獲取的結果轉為元圖、以供 Nodes 使用。
     ///
-    /// 此處故意針對不同的 Nodes 單獨建立 Gram 副本，是為了確保它們的記憶體位置不同。
-    /// 便於其他函式直接比對記憶體位置（也就是用「===」與「!==」來比對）。
-    /// - Parameters:
-    ///   - keyArray: 讀音陣列。
-    ///   - cache: 快取。
+    /// 查詢結果以讀音陣列為索引鍵快取，相同內容的後續查詢直接重用、不再重複查詢。
+    /// 節點收治查詢結果時會重新賦予元圖識別碼，以確保其在組句結果當中的位置唯一性。
+    /// - Parameter keyArray: 讀音陣列。
     /// - Returns: 元圖陣列。
     private func queryGrams(
-      using keyArray: [PossibleKey],
-      cache: inout [GramQueryCacheKey: [Homa.Gram]]
+      using keyArray: [PossibleKey]
     )
       -> [Homa.Gram] {
       let cacheKey = GramQueryCacheKey(keyArray)
-      if let cached = cache[cacheKey] {
-        return cached
-      }
       if let cached = gramQueryCache[cacheKey] {
-        cache[cacheKey] = cached
         return cached
       }
       var insertedIntel = Set<Int>()
@@ -495,7 +496,6 @@ extension Homa {
         guard insertedIntel.insert(intel).inserted else { return nil }
         return $0
       }
-      cache[cacheKey] = newResult
       if gramQueryCache.count >= Self.maxCachedGramQueries {
         // 淘汰最舊的一半，而非全量清空，以保留最近常用的快取項目。
         let halfCount = gramQueryCacheOrder.count / 2

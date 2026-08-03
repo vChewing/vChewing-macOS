@@ -71,9 +71,60 @@ public struct HomaTestsAdvanced: HomaTestSuite {
     #expect(assembledSentence == ["樹心", "封"])
     // 先置換語言模型 API 再更新所有節點的 Unigram 資料。
     assembler.gramQuerier = { mockLM.queryGrams($0) }
-    try assembler.assignNodes(updateExisting: true)
+    try assembler.assignNodes(updateBehavior: .refreshExisting)
     assembledSentence = assembler.assemble().compactMap(\.value)
     #expect(assembledSentence == ["樹新風"])
+  }
+
+  /// 確認相同讀音序列出現在不同位置時，各節點收治的元圖識別碼（FIUUID）互不相同，
+  /// 且重新整理既有節點之後依然保持位置唯一性。
+  @Test("[Homa] Assembler_GramIdentitiesArePositionallyUnique")
+  func testGramIdentitiesArePositionallyUnique() async throws {
+    let mockLM = TestLM(rawData: "de5 的 -5.0")
+    let assembler = Homa.Assembler(
+      gramQuerier: { mockLM.queryGrams($0) }
+    )
+    try assembler.insertKey("de5")
+    try assembler.insertKey("de5")
+    func assertPositionalUniqueness() throws {
+      let nodeA = try #require(assembler.segments[0][1])
+      let nodeB = try #require(assembler.segments[1][1])
+      #expect(!nodeA.grams.isEmpty)
+      #expect(!nodeB.grams.isEmpty)
+      // 兩個節點的元圖內容雷同，但識別碼不得重複。
+      #expect(nodeA.grams == nodeB.grams)
+      let idSetA = Set(nodeA.grams.map(\.id))
+      let idSetB = Set(nodeB.grams.map(\.id))
+      #expect(idSetA.isDisjoint(with: idSetB))
+      let pathIDs = assembler.assembledSentence.map(\.gram.id)
+      #expect(Set(pathIDs).count == pathIDs.count)
+    }
+    try assertPositionalUniqueness()
+    // 重新整理既有節點之後，位置唯一性仍須成立。
+    try assembler.assignNodes(updateBehavior: .refreshExisting)
+    try assertPositionalUniqueness()
+  }
+
+  /// 確認感知索引鍵生成時能以元圖識別碼正確定位 head 的所在位置：
+  /// 相同內容的元圖出現多次時，游標指向第一次出現的位置不得誤判為最後一次。
+  @Test("[Homa] Assembler_PerceptionKeyGenerationRespectsPositionalIdentity")
+  func testPerceptionKeyGenerationRespectsPositionalIdentity() async throws {
+    let mockLM = TestLM(rawData: "de5 的 -5.0")
+    let assembler = Homa.Assembler(
+      gramQuerier: { mockLM.queryGrams($0) }
+    )
+    try assembler.insertKey("de5")
+    try assembler.insertKey("de5")
+    let sentence = assembler.assembledSentence
+    #expect(sentence.map(\.value) == ["的", "的"])
+    let headAtFirst = try #require(sentence.generateKeyForPerception(cursor: 0))
+    let headAtSecond = try #require(sentence.generateKeyForPerception(cursor: 1))
+    #expect(headAtFirst.ngramKey == "()&()&(de5,的)")
+    #expect(headAtSecond.ngramKey == "()&(de5,的)&(de5,的)")
+    #expect(headAtFirst.candidate == "的")
+    #expect(headAtSecond.candidate == "的")
+    #expect(headAtFirst.headReading == "de5")
+    #expect(headAtSecond.headReading == "de5")
   }
 
   /// `fetchCandidatesDeprecated` 這個方法在極端情況下（比如兩個連續讀音，等）會有故障，現已棄用。
@@ -316,7 +367,7 @@ public struct HomaTestsAdvanced: HomaTestSuite {
     #expect(assembledSentence == ["幽蝶", "能", "留", "一縷", "芳"])
     // 剛才測試 Bigram 生效了。現在禁用 Bigram 試試看。先攔截掉 Bigram 結果。
     assembler.gramQuerier = { mockLM.queryGrams($0).filter { $0.previous == nil } }
-    try assembler.assignNodes(updateExisting: true) // 置換掉所有節點裡面的資料。
+    try assembler.assignNodes(updateBehavior: .refreshExisting) // 置換掉所有節點裡面的資料。
     assembledSentence = assembler.assemble().values
     #expect(assembledSentence == ["幽蝶", "能", "留", "一縷", "方"])
     // 對位置 7 這個最前方的座標位置使用節點覆寫。會在此過程中自動糾正成對位置 6 的覆寫。

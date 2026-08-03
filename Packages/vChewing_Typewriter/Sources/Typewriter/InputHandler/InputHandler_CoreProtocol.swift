@@ -442,7 +442,7 @@ extension InputHandlerProtocol {
 
   /// 就地增刪詞之後，需要就地更新游標上下文單元圖資料。
   public func updateUnigramData() -> Bool {
-    (try? assembler.assignNodes(updateExisting: true)) != nil
+    (try? assembler.assignNodes(updateBehavior: .refreshExisting)) != nil
   }
 
   /// 警告：該參數僅代指組音區/組筆區域與組字區在目前狀態下被視為「空」。
