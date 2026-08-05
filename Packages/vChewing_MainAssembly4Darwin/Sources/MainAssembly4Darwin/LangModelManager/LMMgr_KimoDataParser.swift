@@ -161,27 +161,27 @@ extension LMMgr {
       guard let fileHandlerCHS = fileHandlerCHS,
             let fileHandlerCHT = fileHandlerCHT else { return false }
       defer {
-        fileHandlerCHS.closeFile()
-        fileHandlerCHT.closeFile()
+        try? fileHandlerCHS.close()
+        try? fileHandlerCHT.close()
       }
 
       if let sizeCHS = fileSize(for: urlCHS), sizeCHS > 0 {
-        fileHandlerCHS.seek(toFileOffset: sizeCHS)
-        if fileHandlerCHS.readDataToEndOfFile().first != 0x0A {
+        try? fileHandlerCHS.seek(toOffset: sizeCHS)
+        if (try? fileHandlerCHS.readToEnd())?.first != 0x0A {
           outputDataCHS.insert(0x0A, at: 0)
         }
       }
-      fileHandlerCHS.seekToEndOfFile()
-      fileHandlerCHS.write(outputDataCHS)
+      _ = try? fileHandlerCHS.seekToEnd()
+      try? fileHandlerCHS.write(contentsOf: outputDataCHS)
 
       if let sizeCHT = fileSize(for: urlCHT), sizeCHT > 0 {
-        fileHandlerCHT.seek(toFileOffset: sizeCHT)
-        if fileHandlerCHT.readDataToEndOfFile().first != 0x0A {
+        try? fileHandlerCHT.seek(toOffset: sizeCHT)
+        if (try? fileHandlerCHT.readToEnd())?.first != 0x0A {
           outputDataCHT.insert(0x0A, at: 0)
         }
       }
-      fileHandlerCHT.seekToEndOfFile()
-      fileHandlerCHT.write(outputDataCHT)
+      _ = try? fileHandlerCHT.seekToEnd()
+      try? fileHandlerCHT.write(contentsOf: outputDataCHT)
       return true
     }
   }

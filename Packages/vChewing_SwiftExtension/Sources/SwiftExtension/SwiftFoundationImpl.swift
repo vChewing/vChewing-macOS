@@ -42,34 +42,6 @@ nonisolated extension Process {
   }
 }
 
-// MARK: - File Handle API Compatibility for macOS 10.15.3 and Earlier.
-
-nonisolated extension FileHandle {
-  public func readData(upToCount count: Int) throws -> Data? {
-    #if canImport(Darwin)
-      if #available(macOS 10.15.4, *) {
-        try read(upToCount: count)
-      } else {
-        readData(ofLength: count)
-      }
-    #else
-      try read(upToCount: count)
-    #endif
-  }
-
-  public func readDataToEnd() throws -> Data? {
-    #if canImport(Darwin)
-      if #available(macOS 10.15.4, *) {
-        try readToEnd()
-      } else {
-        readDataToEndOfFile()
-      }
-    #else
-      try readToEnd()
-    #endif
-  }
-}
-
 // MARK: - Real Home Dir for Sandboxed Apps
 
 nonisolated extension FileManager {

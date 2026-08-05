@@ -15,6 +15,16 @@
   #endif
   import SwiftExtension
 
+  // Apple artificially gated `readToEnd()` behind macOS 10.15.4;
+  // @backDeployed provides the fallback on older Darwin.
+  extension FileHandle {
+    @backDeployed(before: macOS 10.15)
+    public nonisolated final func readToEnd() throws -> Data? {
+      let data = readDataToEndOfFile()
+      return data.isEmpty ? nil : data
+    }
+  }
+
   // MARK: - Get Bundle Signature Timestamp
 
   extension Bundle {
@@ -362,7 +372,7 @@
 
       var output = ""
       do {
-        let data = try pipe.fileHandleForReading.readDataToEnd()
+        let data = try pipe.fileHandleForReading.readToEnd()
         if let data = data, let str = String(data: data, encoding: .utf8) {
           output.append(str)
         }

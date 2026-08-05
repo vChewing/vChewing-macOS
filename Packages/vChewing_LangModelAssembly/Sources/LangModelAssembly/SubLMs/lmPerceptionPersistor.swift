@@ -309,14 +309,14 @@ extension LMAssembly.PerceptionPersistor {
     }
 
     let handle = try FileHandle(forWritingTo: journalURL)
-    defer { handle.closeFile() }
-    handle.seekToEndOfFile()
+    defer { try? handle.close() }
+    _ = try? handle.seekToEnd()
 
     for record in records {
       let data = try encoder.encode(record)
-      handle.write(data)
+      try? handle.write(contentsOf: data)
       if let newline = "\n".data(using: .utf8) {
-        handle.write(newline)
+        try? handle.write(contentsOf: newline)
       }
     }
 
