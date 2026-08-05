@@ -58,9 +58,7 @@ extension Homa {
     public var length: Int { keys.count }
 
     /// 該組字器的硬拷貝。
-    /// - Remark: 因為 Node 不是 Struct，所以會在 Assembler 被拷貝的時候無法被真實複製。
-    /// 這樣一來，Assembler 複製品當中的 Node 的變化會被反應到原先的 Assembler 身上。
-    /// 這在某些情況下會造成意料之外的混亂情況，所以需要引入一個拷貝用的建構子。
+    /// - Remark: 節點以值語義深拷貝（識別碼全新），確保拷貝與原組字器的節點狀態互不干擾。
     public var hardCopy: Self {
       var newCopy = self
       newCopy.assembledSentence = assembledSentence
@@ -105,12 +103,18 @@ extension Homa {
 
     /// 從鏡照資料恢復所有節點的覆寫狀態。
     /// - Parameter mirror: 節點 ID 與覆寫狀態的對應字典。
-    public func restoreFromNodeOverrideStatusMirror(_ mirror: [FIUUID: Homa.NodeOverrideStatus]) {
-      for segment in segments {
-        for (_, node) in segment {
-          if let status = mirror[node.id] {
-            node.overrideStatus = status
-          }
+    public mutating func restoreFromNodeOverrideStatusMirror(_ mirror: [
+      FIUUID: Homa
+        .NodeOverrideStatus
+    ]) {
+      for segmentIndex in segments.indices {
+        for segLength in segments[segmentIndex].keys {
+          guard let node = segments[segmentIndex][segLength],
+                let status = mirror[node.id]
+          else { continue }
+          var nodeCopy = node
+          nodeCopy.overrideStatus = status
+          segments[segmentIndex][segLength] = nodeCopy
         }
       }
     }

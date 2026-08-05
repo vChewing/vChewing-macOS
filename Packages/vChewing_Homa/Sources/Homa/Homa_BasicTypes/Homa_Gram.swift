@@ -165,11 +165,4 @@ extension Array where Element == Homa.Gram {
       }
     }
   }
-
-  var allBigramsMap: [String: [Element]] {
-    var theMap = [String: [Element]]()
-    filter { $0.previous != nil }
-      .forEach { theMap[$0.previous!, default: []].append($0) }
-    return theMap
-  }
 }
