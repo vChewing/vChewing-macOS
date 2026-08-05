@@ -47,7 +47,8 @@ extension Homa.Assembler {
           guard theAnchor.location == location else { return }
         case .endAt:
           guard theAnchor.location + theNode.segLength - 1 == location else { return }
-          guard let lastKey = theNode.keyArray4Query.last, cursorAlternatives.contains(lastKey) else { return }
+          guard let lastKey = theNode.keyArray4Query.last,
+                cursorAlternatives.contains(lastKey) else { return }
         }
         let newCandidate = Homa.CandidatePair(
           keyArray: gram.keyArray,
@@ -194,7 +195,8 @@ extension Homa.Assembler {
       }
 
       do {
-        _ = try anchor.node.selectOverrideGram(
+        guard var nodeCopy = segments[anchor.location][anchor.node.segLength] else { continue }
+        _ = try nodeCopy.selectOverrideGram(
           keyArray: keyArray,
           value: value,
           type: type
@@ -202,17 +204,19 @@ extension Homa.Assembler {
         if type == .withSpecified {
           let baselineOverrideScore = 114_514.0
           let desiredScore = specifiedScore ?? Swift.max(
-            anchor.node.overridingScore,
+            nodeCopy.overridingScore,
             baselineOverrideScore
           )
-          anchor.node.overrideStatus = .init(
+          nodeCopy.overrideStatus = .init(
             overridingScore: desiredScore,
             currentOverrideType: .withSpecified,
             isExplicitlyOverridden: isExplicitlyOverridden,
-            currentUnigramIndex: anchor.node.currentGramIndex
+            currentUnigramIndex: nodeCopy.currentGramIndex
           )
         }
-        overridden = anchor
+        segments[anchor.location][anchor.node.segLength] = nodeCopy
+        // 保存修改後的節點拷貝（含覆寫狀態），供後續重疊節點處理讀取。
+        overridden = (location: anchor.location, node: nodeCopy)
         break
       } catch let error as Homa.Exception {
         lastError = error
@@ -255,18 +259,23 @@ extension Homa.Assembler {
       if enforceRetokenization {
         let overriddenNodeRef = overridden.node
         let demotionScore = -Swift.max(1.0, Swift.abs(overriddenNodeRef.overridingScore))
-        for anchor in overlappingNodes
-          where anchor.node !== overriddenNodeRef
-          && anchor.location <= overridden.location {
-          if shouldResetNode(anchor: anchor.node, overriddenNode: overriddenNodeRef) {
-            anchor.node.reset()
+        for anchor in overlappingNodes {
+          // 原語義為「跳過與已覆寫節點同一物件者」的引用比較；
+          // Struct 化之後同一節點以「座標（位置 + 幅節長度）」判同。
+          let isSameNode = anchor.location == overridden.location
+            && anchor.node.segLength == overridden.node.segLength
+          guard !isSameNode, anchor.location <= overridden.location else { continue }
+          var nodeCopy = anchor.node
+          if shouldResetNode(anchor: nodeCopy, overriddenNode: overriddenNodeRef) {
+            nodeCopy.reset()
           }
-          anchor.node.overrideStatus = .init(
+          nodeCopy.overrideStatus = .init(
             overridingScore: demotionScore,
             currentOverrideType: .withSpecified,
-            isExplicitlyOverridden: anchor.node.isExplicitlyOverridden,
-            currentUnigramIndex: anchor.node.currentGramIndex
+            isExplicitlyOverridden: nodeCopy.isExplicitlyOverridden,
+            currentUnigramIndex: nodeCopy.currentGramIndex
           )
+          segments[anchor.location][anchor.node.segLength] = nodeCopy
         }
         continue
       }
@@ -277,12 +286,13 @@ extension Homa.Assembler {
           anchor: anchor.node,
           overriddenNode: overridden.node
         )
-
+        var nodeCopy = anchor.node
         if shouldReset {
-          anchor.node.reset()
+          nodeCopy.reset()
         } else {
-          anchor.node.overridingScore /= 4
+          nodeCopy.overridingScore /= 4
         }
+        segments[anchor.location][anchor.node.segLength] = nodeCopy
       }
     }
   }

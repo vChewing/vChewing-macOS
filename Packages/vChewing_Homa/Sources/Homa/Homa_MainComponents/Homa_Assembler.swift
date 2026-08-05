@@ -31,9 +31,8 @@ extension Homa {
     }
 
     /// 複製指定的組字引擎處理器。
-    /// - Remark: 由於 Node 採用類別設計而非結構體，因此在 Assembler 複製過程中無法自動執行深層複製。
-    /// 這會導致複製後的 Assembler 副本中的 Node 變更會影響到原始的 Assembler 副本。
-    /// 為了避免此類非預期的互動影響，特別提供此複製建構函數。
+    /// - Remark: 節點以值語義深拷貝（識別碼全新），因此複製後的 Assembler 副本與
+    /// 原始的 Assembler 之間的節點狀態互不干擾。
     public init(from target: Assembler) {
       self.config = target.config.hardCopy
       self.gramQuerier = target.gramQuerier
@@ -66,7 +65,9 @@ extension Homa {
     /// 用以洞察使用者字詞節點覆寫行為的 API。
     public var perceptor: BehaviorPerceptor?
     /// 組態設定。
-    public private(set) var config = Config()
+    /// - Remark: setter 為 `internal`：組字器在模組內部需要就地改寫節點狀態（節點為
+    /// Struct、無法再靠引用穿透值拷貝），但對模組外部維持唯讀。
+    public internal(set) var config = Config()
 
     /// 最近一次組句結果。
     public var assembledSentence: [GramInPath] {
@@ -88,7 +89,9 @@ extension Homa {
     }
 
     /// 該組字器的幅節單元陣列。
-    public private(set) var segments: [Segment] {
+    /// - Remark: setter 為 `internal`：組字器在模組內部需要就地改寫節點狀態（節點為
+    /// Struct、無法再靠引用穿透值拷貝），但對模組外部維持唯讀。
+    public internal(set) var segments: [Segment] {
       get { config.segments }
       set { config.segments = newValue }
     }
@@ -120,9 +123,7 @@ extension Homa {
     public var isEmpty: Bool { segments.isEmpty && keys.isEmpty }
 
     /// 該組字器的硬拷貝。
-    /// - Remark: 因為 Node 不是 Struct，所以會在 Assembler 被拷貝的時候無法被真實複製。
-    /// 這樣一來，Assembler 複製品當中的 Node 的變化會被反應到原先的 Assembler 身上。
-    /// 這在某些情況下會造成意料之外的混亂情況，所以需要引入一個拷貝用的建構子。
+    /// - Remark: 節點以值語義深拷貝（識別碼全新），因此拷貝與原組字器的節點狀態互不干擾。
     public var copy: Assembler { .init(from: self) }
 
     /// 生成用以交給 GraphViz 診斷的資料檔案內容，純文字。
@@ -266,7 +267,11 @@ extension Homa {
     /// - Parameters:
     ///   - direction: 指定方向（相對於文字輸入方向而言）。
     ///   - isMarker: 是否為標記游標。
-    public func isCursorAtAssemblerEdge(direction: TypingDirection, isMarker: Bool = false) -> Bool {
+    public func isCursorAtAssemblerEdge(
+      direction: TypingDirection,
+      isMarker: Bool = false
+    )
+      -> Bool {
       let pos = isMarker ? marker : cursor
       switch direction {
       case .front: return pos == length
@@ -392,7 +397,9 @@ extension Homa {
               if theNode.keyArray.count == 1 { return }
               segments[position][theLength] = nil
             } else {
-              theNode.syncingGrams(from: queriedGrams.map { $0.withNewIdentity() })
+              segments[position][theLength]?.syncingGrams(
+                from: queriedGrams.map { $0.withNewIdentity() }
+              )
             }
             nodesChangedCounter += 1
             return
@@ -527,6 +534,26 @@ extension Homa.Assembler {
       segments.remove(at: location)
     }
     dropWreckedNodes(at: location)
+  }
+
+  /// 對指定座標的節點執行原地修改（內部與測試輔助用）。
+  ///
+  /// 節點為 Struct，對外取得的節點值都是拷貝；需要改動節點狀態時，
+  /// 一律透過此函式以「讀取 → 修改 → 寫回」的方式經由座標定址修改。
+  /// - Parameters:
+  ///   - location: 幅節座標（起始位置）。
+  ///   - segLength: 節點幅節長度。
+  ///   - body: 對節點進行的原地修改閉包。
+  internal func withNode(
+    at location: Int,
+    segLength: Int,
+    _ body: (inout Homa.Node) -> ()
+  ) {
+    guard segments.indices.contains(location),
+          var node = segments[location][segLength]
+    else { return }
+    body(&node)
+    segments[location][segLength] = node
   }
 
   /// 扔掉所有被 resizeGrid() 損毀的節點。

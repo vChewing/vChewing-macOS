@@ -11,9 +11,7 @@ extension Homa {
 
 extension Homa.Segment {
   /// 幅節乃指一組共享起點的節點。其實是個字典：[幅節長度: 節點]。
-  /// - Remark: 因為 Node 不是 Struct，所以會在 Assembler 被拷貝的時候無法被真實複製。
-  /// 這樣一來，Assembler 複製品當中的 Node 的變化會被反應到原先的 Assembler 身上。
-  /// 這在某些情況下會造成意料之外的混亂情況，所以需要引入一個拷貝用的建構子。
+  /// - Remark: 節點以值語義深拷貝（識別碼全新），確保拷貝與原幅節的節點狀態互不干擾。
   public init(segment target: Homa.Segment) {
     self.init()
     target.forEach { theKey, theValue in

@@ -20,7 +20,7 @@ extension Homa.Node {
 // MARK: - Homa.Node
 
 extension Homa {
-  public final class Node: Codable {
+  public struct Node: Codable {
     // MARK: Lifecycle
 
     /// 生成一個字詞節點。
@@ -42,21 +42,16 @@ extension Homa {
       self.keyArray4Query = keyArray
       self.grams = grams
       self.allActualKeyArraysCached = Set(grams.map(\.keyArray))
-      self.bigramMap = grams.allBigramsMap
       self.currentOverrideType = nil
     }
 
-    /// 以指定字詞節點生成拷貝。
-    /// - Remark: 因為 Node 不是 Struct，所以會在 Assembler 被拷貝的時候無法被真實複製。
-    /// 這樣一來，Assembler 複製品當中的 Node 的變化會被反應到原先的 Assembler 身上。
-    /// 這在某些情況下會造成意料之外的混亂情況，所以需要引入一個拷貝用的建構子。
-    internal init(node: Node) {
+    /// 以指定字詞節點生成拷貝（識別碼全新）。
+    internal init(node: Self) {
       self.id = FIUUID()
       self.overridingScore = node.overridingScore
       self.keyArray4Query = node.keyArray4Query
       self.allActualKeyArraysCached = node.allActualKeyArraysCached
       self.grams = node.grams
-      self.bigramMap = node.bigramMap
       self.currentOverrideType = node.currentOverrideType
       self.isExplicitlyOverridden = node.isExplicitlyOverridden
       self.currentGramIndex = node.currentGramIndex
@@ -80,8 +75,6 @@ extension Homa {
     public private(set) var keyArray4Query: [String]
     /// 所有真實索引鍵陣列的快取。
     public private(set) var allActualKeyArraysCached: Set<[String]>
-    /// 雙元圖快取。
-    public private(set) var bigramMap: [String: [Homa.Gram]]
     /// 該節點目前的覆寫狀態種類。
     public private(set) var currentOverrideType: OverrideType?
     /// 是否為使用者明確覆寫（explicit override）、而非出於自動機制進行的複寫。
@@ -116,7 +109,6 @@ extension Homa {
     /// 元圖陣列。
     public private(set) var grams: [Homa.Gram] {
       didSet {
-        bigramMap = grams.allBigramsMap
         allActualKeyArraysCached = Set(grams.map(\.keyArray))
       }
     }
@@ -134,11 +126,12 @@ extension Homa.Node: Hashable {
   /// 預設雜湊函式。
   /// - Parameter hasher: 目前物件的雜湊碼。
   public func hash(into hasher: inout Hasher) {
-    hasher.combine(id)
+    // 與 `==` 的「內容等值、排除 ID」語義保持一致：ID 僅作為節點的身分標記
+    // （新建節點 / copy 生成全新 ID、值拷貝共享 ID），不參與等值與雜湊，
+    // 以免違反 Hashable 契約（相等物件必須具有相同雜湊值）。
     hasher.combine(overridingScore)
     hasher.combine(keyArray4Query)
     hasher.combine(grams)
-    hasher.combine(bigramMap)
     hasher.combine(currentOverrideType)
     hasher.combine(isExplicitlyOverridden)
     hasher.combine(currentGramIndex)
@@ -154,7 +147,6 @@ extension Homa.Node: Equatable {
     lhs.overridingScore == rhs.overridingScore &&
       lhs.keyArray4Query == rhs.keyArray4Query &&
       lhs.grams == rhs.grams &&
-      lhs.bigramMap == rhs.bigramMap &&
       lhs.currentOverrideType == rhs.currentOverrideType &&
       lhs.currentGramIndex == rhs.currentGramIndex &&
       lhs.isExplicitlyOverridden == rhs.isExplicitlyOverridden &&
@@ -172,10 +164,7 @@ extension Homa.Node {
     return .init(keyArray: currentGram.keyArray, value: currentGram.current)
   }
 
-  /// 生成自身的拷貝。
-  /// - Remark: 因為 Node 不是 Struct，所以會在 Assembler 被拷貝的時候無法被真實複製。
-  /// 這樣一來，Assembler 複製品當中的 Node 的變化會被反應到原先的 Assembler 身上。
-  /// 這在某些情況下會造成意料之外的混亂情況，所以需要引入一個拷貝用的建構子。
+  /// 生成自身的拷貝（識別碼全新）。
   public var copy: Homa.Node { .init(node: self) }
 
   /// 檢查當前節點是否「讀音字長與候選字字長不一致」。
@@ -212,14 +201,16 @@ extension Homa.Node {
   /// 權重較高的那個、然後**據此視情況自動修改這個節點的覆寫狀態種類**。
   /// - Parameter previous: 前述節點內容，用以查詢可能的雙元圖資料。
   /// - Returns: 權重。
-  internal func getScore(previous: String?) -> Double {
+  internal mutating func getScore(previous: String?) -> Double {
     guard !grams.isEmpty else { return 0 }
     guard let previous, !previous.isEmpty else { return unigramScore }
-    let bigram = bigramMap[previous]?.sorted {
-      $0.probability > $1.probability
-    }.first {
-      $0.current == currentGram?.current
-    }
+    // 直接線性掃描元圖陣列、挑出「前述內容與當前值均相符」的最高權重雙元圖。
+    // 取代舊版的按前驅分組字典（bigramMap）+ 每次查詢排序，避免每個節點常駐一個
+    // 派生字典、且組句熱路徑上反覆排序。
+    let currentValue = currentGram?.current
+    let bigram = grams
+      .filter { $0.previous == previous && $0.current == currentValue }
+      .max { $0.probability < $1.probability }
     let currentScore = unigramScore
     let bigramScore = bigram?.probability
     guard let bigram, let bigramScore else { return currentScore }
@@ -238,7 +229,7 @@ extension Homa.Node {
   }
 
   /// 重設該節點的覆寫狀態、及其內部的元圖索引位置指向。
-  internal func reset() {
+  internal mutating func reset() {
     currentGramIndex = 0
     currentOverrideType = nil
     isExplicitlyOverridden = false
@@ -247,7 +238,7 @@ extension Homa.Node {
   /// 置換掉該節點內的元圖陣列資料。
   /// 如果此時影響到了 currentUnigramIndex 所指的內容的話，則將其重設為 0。
   /// - Parameter source: 新的元圖陣列資料，必須不能為空（否則必定崩潰）。
-  internal func syncingGrams(from source: [Homa.Gram]) {
+  internal mutating func syncingGrams(from source: [Homa.Gram]) {
     let oldCurrentValue = grams[currentGramIndex].current
     grams = source
     // 保險，請按需啟用。
@@ -265,7 +256,7 @@ extension Homa.Node {
   ///   - type: 覆寫行為種類。
   /// - Returns: 複寫成功的 Gram。
   @discardableResult
-  internal func selectOverrideGram(
+  internal mutating func selectOverrideGram(
     keyArray: [String]?,
     value: String,
     previous: String? = nil,

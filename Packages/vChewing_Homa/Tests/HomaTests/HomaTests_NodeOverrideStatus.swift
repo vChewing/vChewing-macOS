@@ -84,7 +84,7 @@ struct HomaTests_NodeOverrideStatus: HomaTestSuite {
     ]
 
     let grams = testData.map { Homa.Gram($0) }
-    let node = Homa.Node(keyArray: keyArray, grams: grams)
+    var node = Homa.Node(keyArray: keyArray, grams: grams)
 
     // Test getting override status
     let initialStatus = node.overrideStatus
@@ -135,7 +135,7 @@ struct HomaTests_NodeOverrideStatus: HomaTestSuite {
     let grams = [
       Homa.GramRAW(keyArray: keyArray, value: "逼", probability: -5.0, previous: nil),
     ].map { Homa.Gram($0) }
-    let node = Homa.Node(keyArray: keyArray, grams: grams)
+    var node = Homa.Node(keyArray: keyArray, grams: grams)
 
     let overflowStatus = Homa.NodeOverrideStatus(
       overridingScore: 100.0,
@@ -168,6 +168,15 @@ struct HomaTests_NodeOverrideStatus: HomaTestSuite {
     // Copy should have a different ID
     let node3 = node1.copy
     #expect(node1.id != node3.id)
+
+    // 值拷貝（Struct 賦值）共享身分：同一邏輯節點的多份視圖，ID 保持不變。
+    let snapshot = node1
+    #expect(snapshot.id == node1.id)
+
+    // Hashable 契約：copy 的內容與原節點等值（`==` 排除 ID），
+    // 雜湊值也必須一致——ID 是身分標記、不參與等值與雜湊比較。
+    #expect(node3 == node1)
+    #expect(node3.hashValue == node1.hashValue)
   }
 
   @Test("Assembler Node Override Status Mirroring")
@@ -182,15 +191,17 @@ struct HomaTests_NodeOverrideStatus: HomaTestSuite {
 
     // Modify some node states (we'll modify the first available node we find)
     var modifiedNodeId: FIUUID?
-    outerLoop: for segment in assembler.segments {
-      for (_, node) in segment {
-        node.overrideStatus = Homa.NodeOverrideStatus(
-          overridingScore: 777.0,
-          currentOverrideType: .withSpecified,
-          isExplicitlyOverridden: true,
-          currentUnigramIndex: 0
-        )
-        modifiedNodeId = node.id
+    outerLoop: for segmentIndex in assembler.segments.indices {
+      for segLength in assembler.segments[segmentIndex].keys {
+        assembler.withNode(at: segmentIndex, segLength: segLength) { node in
+          node.overrideStatus = Homa.NodeOverrideStatus(
+            overridingScore: 777.0,
+            currentOverrideType: .withSpecified,
+            isExplicitlyOverridden: true,
+            currentUnigramIndex: 0
+          )
+          modifiedNodeId = node.id
+        }
         break outerLoop
       }
     }
@@ -232,18 +243,20 @@ struct HomaTests_NodeOverrideStatus: HomaTestSuite {
     try assembler.insertKeys(["hello", "world", "test"].map { .singleKey($0) })
 
     var modifiedNodes = 0
-    for segment in assembler.segments {
-      for (_, node) in segment {
-        guard let targetGram = node.grams.first else { continue }
-        node.overridingScore = .random(in: 100 ... 1_000)
-        let selected = try? node.selectOverrideGram(
-          keyArray: targetGram.keyArray,
-          value: targetGram.current,
-          previous: targetGram.previous,
-          type: .withSpecified
-        )
-        #expect(selected != nil)
-        modifiedNodes += 1
+    for segmentIndex in assembler.segments.indices {
+      for segLength in assembler.segments[segmentIndex].keys {
+        assembler.withNode(at: segmentIndex, segLength: segLength) { node in
+          guard let targetGram = node.grams.first else { return }
+          node.overridingScore = .random(in: 100 ... 1_000)
+          let selected = try? node.selectOverrideGram(
+            keyArray: targetGram.keyArray,
+            value: targetGram.current,
+            previous: targetGram.previous,
+            type: .withSpecified
+          )
+          #expect(selected != nil)
+          modifiedNodes += 1
+        }
       }
     }
 
@@ -260,9 +273,11 @@ struct HomaTests_NodeOverrideStatus: HomaTestSuite {
       #expect(status.overridingScore == baselineOverrideScore)
     }
 
-    assembler.segments.forEach { segment in
-      segment.values.forEach { node in
-        node.reset()
+    for segmentIndex in assembler.segments.indices {
+      for segLength in assembler.segments[segmentIndex].keys {
+        assembler.withNode(at: segmentIndex, segLength: segLength) { node in
+          node.reset()
+        }
       }
     }
 

@@ -11,7 +11,8 @@ extension Homa.Assembler {
   /// - Returns: 組句結果（已選字詞陣列）。
   @discardableResult
   public func assemble() -> [Homa.GramInPath] {
-    Homa.PathFinder(config: config, assembledSentence: &assembledSentence)
+    let result = Homa.PathFinder.run(config: &config)
+    assembledSentence = result
     return assembledSentence
   }
 }
@@ -19,18 +20,20 @@ extension Homa.Assembler {
 // MARK: - Homa.PathFinder
 
 extension Homa {
-  final class PathFinder {
-    // MARK: Lifecycle
+  enum PathFinder {
+    // MARK: Internal
 
     /// 組句工具，會以 DAG 動態規劃演算法更新當前組字器的 assembledSentence。
     ///
     /// 該演算法使用動態規劃在有向無環圖中尋找具有最高分數的路徑，即最可能的字詞組合。
     /// DAG 演算法相對簡潔，記憶體使用量較少。
+    /// - Parameter config: 組字器組態（inout，因為 DP 遍歷時 `getScore(previous:)` 的自動覆寫
+    ///   副作用需要就地寫回節點狀態——節點為 Struct，無法再靠引用穿透值拷貝）。
+    /// - Returns: 組句結果（已選字詞陣列）。
     @discardableResult
-    init(config: Homa.Config, assembledSentence: inout [Homa.GramInPath]) {
+    static func run(config: inout Homa.Config) -> [Homa.GramInPath] {
       var newAssembledSentence = [Homa.GramInPath]()
-      defer { assembledSentence = newAssembledSentence }
-      guard !config.segments.isEmpty else { return }
+      guard !config.segments.isEmpty else { return newAssembledSentence }
 
       let keyCount = config.keys.count
 
@@ -41,6 +44,11 @@ extension Homa {
 
       // 起始狀態
       dp[0] = 0
+
+      // 收集 DP 遍歷期間被 getScore() 就地修改的節點，於遍歷結束後統一寫回。
+      // 這樣可以避免「for-in 遍歷段字典的同時、透過下標寫回同一字典」所觸發的
+      // 寫時複製（COW），讓寫回發生在字典為唯一引用的時點、直接原地更新。
+      var visitedNodes = [(position: Int, segLength: Int, node: Homa.Node)]()
 
       // DAG 動態規劃主循環
       for i in 0 ..< keyCount {
@@ -55,14 +63,21 @@ extension Homa {
 
           // 計算新的權重分數，考慮前一個字詞的影響
           let previousCurrent = parent[i]?.gram?.current ?? ""
-          let newScore = dp[i] + nextNode.getScore(previous: previousCurrent)
+          var nodeCopy = nextNode
+          let newScore = dp[i] + nodeCopy.getScore(previous: previousCurrent)
+          visitedNodes.append((i, length, nodeCopy))
 
           // 如果找到更好的路徑，更新 dp 和 parent
           if newScore > dp[nextPos] {
             dp[nextPos] = newScore
-            parent[nextPos] = (nextGram, nextNode.isExplicitlyOverridden)
+            parent[nextPos] = (nextGram, nodeCopy.isExplicitlyOverridden)
           }
         }
+      }
+
+      // 統一寫回節點狀態（此時遍歷已結束，段字典為唯一引用，不觸發 COW 複製）。
+      for entry in visitedNodes {
+        config.segments[entry.position][entry.segLength] = entry.node
       }
 
       // 回溯構建最佳路徑
@@ -83,6 +98,7 @@ extension Homa {
       if !resultReversed.isEmpty {
         newAssembledSentence = resultReversed.reversed()
       }
+      return newAssembledSentence
     }
 
     // MARK: Private
