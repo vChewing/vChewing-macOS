@@ -3,6 +3,21 @@
 import Foundation
 import SwiftExtension
 
+#if canImport(Darwin)
+  extension FileHandle {
+    @backDeployed(before: macOS 10.15)
+    public nonisolated final func read(upToCount count: Int) throws -> Data? {
+      let data = readData(ofLength: count)
+      return data.isEmpty ? nil : data
+    }
+
+    @backDeployed(before: macOS 10.15)
+    public nonisolated final func seek(toOffset offset: UInt64) throws {
+      seek(toFileOffset: offset)
+    }
+  }
+#endif
+
 // MARK: - LineReader
 
 nonisolated public final class LineReader {
@@ -37,7 +52,7 @@ nonisolated public final class LineReader {
       }
 
       fileRead: do {
-        let nextData = try fileHandle.readData(upToCount: chunkSize)
+        let nextData = try fileHandle.read(upToCount: chunkSize)
         if let nextData = nextData, !nextData.isEmpty {
           buffer.append(nextData)
           continue
@@ -59,7 +74,7 @@ nonisolated public final class LineReader {
 
   /// Start reading from the beginning of file.
   public func rewind() {
-    fileHandle.seek(toFileOffset: 0)
+    try? fileHandle.seek(toOffset: 0)
     buffer.count = 0
     atEof = false
   }

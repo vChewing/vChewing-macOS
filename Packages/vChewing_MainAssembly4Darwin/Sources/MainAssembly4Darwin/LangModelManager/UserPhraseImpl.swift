@@ -8,6 +8,46 @@
 
 import Foundation
 
+// Apple artificially gated the modern FileHandle API names behind macOS 10.15 / 10.15.4,
+// even though these APIs have no version restriction on Linux/Windows.
+// Use @backDeployed to provide fallbacks on older Darwin via the legacy names.
+#if canImport(Darwin)
+  nonisolated extension FileHandle {
+    @backDeployed(before: macOS 10.15)
+    public final func close() throws {
+      closeFile()
+    }
+
+    @backDeployed(before: macOS 10.15)
+    public final func seek(toOffset offset: UInt64) throws {
+      seek(toFileOffset: offset)
+    }
+
+    @backDeployed(before: macOS 10.15)
+    @discardableResult
+    public final func seekToEnd() throws -> UInt64 {
+      seekToEndOfFile()
+    }
+
+    @backDeployed(before: macOS 10.15)
+    public final func readToEnd() throws -> Data? {
+      let data = readDataToEndOfFile()
+      return data.isEmpty ? nil : data
+    }
+
+    @backDeployed(before: macOS 10.15)
+    public final func read(upToCount count: Int) throws -> Data? {
+      let data = readData(ofLength: count)
+      return data.isEmpty ? nil : data
+    }
+
+    @backDeployed(before: macOS 10.15)
+    public final func write(contentsOf data: Data) throws {
+      write(data)
+    }
+  }
+#endif
+
 // MARK: - UserPhraseInsertable Extensions.
 
 extension UserPhraseInsertable {
@@ -103,15 +143,15 @@ extension UserPhraseInsertable {
         )
         return false
       }
-      defer { writeFile.closeFile() }
+      defer { try? writeFile.close() }
       if fileSize > 0 {
-        writeFile.seek(toFileOffset: fileSize - 1)
-        if writeFile.readDataToEndOfFile().first != 0x0A {
+        try? writeFile.seek(toOffset: fileSize - 1)
+        if (try? writeFile.readToEnd())?.first != 0x0A {
           dataToInsert.insert(0x0A, at: 0)
         }
       }
-      writeFile.seekToEndOfFile()
-      writeFile.write(dataToInsert)
+      _ = try? writeFile.seekToEnd()
+      try? writeFile.write(contentsOf: dataToInsert)
       return true
     }
   }
@@ -165,7 +205,7 @@ extension UserPhraseInsertable {
         debugOutput.append("removeFromFilter(): Failed from handling the filter list file.")
         return false
       }
-      defer { fileHandle.closeFile() }
+      defer { try? fileHandle.close() }
       // Get bytes for matching.
       let usefulCells = descriptionCells.prefix(2)
       guard usefulCells.count == 2 else { return false }
@@ -176,22 +216,22 @@ extension UserPhraseInsertable {
       let blankData = Data([UInt8](repeating: 0x0, count: bufferLength)) // 用來搞填充的垃圾資料
       let sharpData = Data([0x23]) // Sharp Sign (#)
       let lfData = Data([0x0A]) // Line Feed '\n'
-      fileHandle.seek(toFileOffset: 0) // 從頭開始讀取處理。
+      try? fileHandle.seek(toOffset: 0) // 從頭開始讀取處理。
       for currentWorkingOffset in 0 ... (Int(fileSize) - bufferLength) {
         /// !! 注意：FileHandle 的 seek 位置會在每次 readData() / write() 之後都有變動。
         // 只在「行首或換行（LF）之後」嘗試匹配；此外，若前一位元組是 # 則略過。
         if currentWorkingOffset > 0 {
-          fileHandle.seek(toFileOffset: UInt64(currentWorkingOffset - 1))
-          let previousByte = fileHandle.readData(ofLength: 1)
+          try? fileHandle.seek(toOffset: UInt64(currentWorkingOffset - 1))
+          let previousByte = (try? fileHandle.read(upToCount: 1)) ?? Data()
           if previousByte == sharpData { continue }
           guard previousByte == lfData else { continue }
         }
         // 開始手術
-        fileHandle.seek(toFileOffset: UInt64(currentWorkingOffset))
-        let dataScoped = fileHandle.readData(ofLength: bufferLength)
+        try? fileHandle.seek(toOffset: UInt64(currentWorkingOffset))
+        let dataScoped = (try? fileHandle.read(upToCount: bufferLength)) ?? Data()
         guard [data1, data2].contains(dataScoped) else { continue }
-        fileHandle.seek(toFileOffset: UInt64(currentWorkingOffset))
-        fileHandle.write(blankData)
+        try? fileHandle.seek(toOffset: UInt64(currentWorkingOffset))
+        try? fileHandle.write(contentsOf: blankData)
       }
       LMMgr.reloadUserFilterDirectly(mode: inputMode)
       return true
