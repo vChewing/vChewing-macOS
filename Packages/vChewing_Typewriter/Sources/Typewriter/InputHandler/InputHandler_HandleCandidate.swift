@@ -18,7 +18,7 @@ extension InputHandlerProtocol {
   /// - Returns: 告知 IMK「該按鍵是否已經被輸入法攔截處理」。
   func handleCandidate(input: InputSignalProtocol, ignoringModifiers: Bool = false) -> Bool {
     guard let session = session else { return false }
-    guard var ctlCandidate = session.candidateController() else {
+    guard let ctlCandidate = session.candidateController() else {
       return false
     }
     let state = session.state
@@ -243,30 +243,19 @@ extension InputHandlerProtocol {
           }
           return true
         default:
-          #if canImport(AppKit)
-            handleArrowKey: switch (keyCodeType, ctlCandidate.currentLayout) {
-            case (.kLeftArrow, .horizontal), (.kUpArrow, .vertical): // Previous Candidate
-              _ = ctlCandidate.highlightPreviousCandidate()
-            case (.kDownArrow, .vertical), // Next Candidate
-                 (.kRightArrow, .horizontal): // Next Candidate
-              _ = ctlCandidate.highlightNextCandidate()
-            case (.kLeftArrow, .vertical), // Previous Line
-                 (.kUpArrow, .horizontal): // Previous Line
-              _ = ctlCandidate.showPreviousLine()
-            case (.kDownArrow, .horizontal), (.kRightArrow, .vertical): // Next Line
-              _ = ctlCandidate.showNextLine()
-            default: break handleArrowKey
-            }
-          #else
-            // 非 macOS 平台暫時僅支援橫書模式。
-            switch keyCodeType {
-            case .kLeftArrow, .kUpArrow:
-              _ = ctlCandidate.highlightPreviousCandidate()
-            case .kDownArrow, .kRightArrow:
-              _ = ctlCandidate.highlightNextCandidate()
-            default: break
-            }
-          #endif
+          handleArrowKey: switch (keyCodeType, ctlCandidate.currentLayout) {
+          case (.kLeftArrow, .horizontal), (.kUpArrow, .vertical): // Previous Candidate
+            _ = ctlCandidate.highlightPreviousCandidate()
+          case (.kDownArrow, .vertical), // Next Candidate
+               (.kRightArrow, .horizontal): // Next Candidate
+            _ = ctlCandidate.highlightNextCandidate()
+          case (.kLeftArrow, .vertical), // Previous Line
+               (.kUpArrow, .horizontal): // Previous Line
+            _ = ctlCandidate.showPreviousLine()
+          case (.kDownArrow, .horizontal), (.kRightArrow, .vertical): // Next Line
+            _ = ctlCandidate.showNextLine()
+          default: break handleArrowKey
+          }
           return true
         }
       case .kHome:
