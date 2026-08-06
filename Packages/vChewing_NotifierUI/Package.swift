@@ -25,5 +25,15 @@ let package = Package(
         .defaultIsolation(MainActor.self), // set Default Actor Isolation
       ]
     ),
+    .testTarget(
+      name: "NotifierUITests",
+      dependencies: [
+        .target(name: "NotifierUI"),
+        .product(name: "Shared_DarwinImpl", package: "vChewing_Shared_DarwinImpl"),
+      ],
+      swiftSettings: [
+        .defaultIsolation(MainActor.self), // set Default Actor Isolation
+      ]
+    ),
   ]
 )
