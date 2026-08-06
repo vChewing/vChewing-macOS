@@ -134,7 +134,7 @@
 "i18n:LanguageName.LocaleCodeZHHant" = "繁体中文";
 "i18n:LMMgr.accessFailure.cassette.description" = "在启用该模式之前，请事先正确设定磁带档案路径。";
 "i18n:LMMgr.accessFailure.cassette.title" = "档案存取失败，或者路径不合规。";
-"i18n:LMMgr.notification.FactoryLexiconLoadingComplete" = "原厂辞典载入完毕。";
+"i18n:LMMgr.notification.FactoryLexiconLoadingComplete" = "原厂辞典载入完毕";
 "i18n:LMMgr.notification.FactoryLexiconLoadingStarted" = "原厂辞典载入中…";
 "i18n:LMMgr.pathInvalidityFound.cassette.description" = "请开启唯音偏好设定以重新确认磁带档案路径的设定。";
 "i18n:LMMgr.pathInvalidityFound.cassette.title" = "侦测到磁带档案存取问题";
