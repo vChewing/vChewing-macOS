@@ -8,7 +8,7 @@ import Foundation
 
 /// 專為樹狀索引操作最佳化的字串拘留池。
 ///
-/// 為避免常駐記憶體隨查詢範圍無限成長，key/value 兩個 pool 都設有 LRU 上限；
+/// 為避免常駐記憶體隨查詢範圍無限成長，key/value 兩個 pool 都設有 FIFO（先入先出）上限；
 /// 被淘汰的字串只會失去未來 deduplication 的機會，不會影響已回傳的 String reference。
 @usableFromInline
 final class TrieStringPool: @unchecked Sendable {
@@ -21,7 +21,6 @@ final class TrieStringPool: @unchecked Sendable {
   func internKey(_ string: String) -> String {
     lock.withLock {
       if let interned = keyPool[string] {
-        touchKey(interned)
         return interned
       }
 
@@ -36,7 +35,6 @@ final class TrieStringPool: @unchecked Sendable {
   func internValue(_ string: String) -> String {
     lock.withLock {
       if let interned = valuePool[string] {
-        touchValue(interned)
         return interned
       }
 
@@ -66,20 +64,6 @@ final class TrieStringPool: @unchecked Sendable {
   private var valuePoolOrder: [String] = []
   private let lock = NSLock()
 
-  private func touchKey(_ string: String) {
-    if let idx = keyPoolOrder.firstIndex(of: string) {
-      keyPoolOrder.remove(at: idx)
-      keyPoolOrder.append(string)
-    }
-  }
-
-  private func touchValue(_ string: String) {
-    if let idx = valuePoolOrder.firstIndex(of: string) {
-      valuePoolOrder.remove(at: idx)
-      valuePoolOrder.append(string)
-    }
-  }
-
   private func evictKeyIfNeeded() {
     guard keyPool.count >= maxPoolSize, let oldest = keyPoolOrder.first else { return }
     keyPool.removeValue(forKey: oldest)
@@ -105,7 +89,7 @@ final class TrieStringOperationCache: @unchecked Sendable {
 
   @usableFromInline
   func getCachedSplit(_ string: String, separator: Character) -> [String] {
-    let key = "\(string)|\(separator)"
+    let key = SplitCacheKey(string: string, separator: separator)
     return lock.withLock {
       if let cached = splitCache[key] {
         return cached
@@ -160,7 +144,13 @@ final class TrieStringOperationCache: @unchecked Sendable {
 
   // MARK: Private
 
-  private var splitCache: [String: [String]] = [:]
+  /// 複合快取鍵：以結構體取代字串插值，避免每次查詢都配置新 String。
+  private struct SplitCacheKey: Hashable {
+    let string: String
+    let separator: Character
+  }
+
+  private var splitCache: [SplitCacheKey: [String]] = [:]
   private var firstCharCache: [String: String] = [:]
   private let lock = NSLock()
   private let maxCacheSize = 2_000 // 樹狀索引操作使用較大的快取
