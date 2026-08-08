@@ -80,6 +80,8 @@ extension TDK4AppKit {
     }
 
     // 只用來測量單漢字候選字 cell 的最大可能寬度。
+    // 注意：範本 cell 的 index 恆為 0，絕不得流入池級屬性字串快取
+    // （headerCache / phraseCache 以 cell.index 為鍵），否則會與真實 cell 0 碰撞。
     static var shitCell = CandidateCellData4AppKit(key: " ", displayedText: "💩", isSelected: false)
     static var blankCell = CandidateCellData4AppKit(key: " ", displayedText: "　", isSelected: false)
 
@@ -1138,30 +1140,13 @@ extension TDK4AppKit.CandidatePool4AppKit {
     noSpacePadding: Bool = true, withHighlight: Bool = false, isMatrix: Bool = false
   )
     -> NSAttributedString {
-    let attrSpace: [NSAttributedString.Key: Any] = [
-      .kern: 0,
-      .font: cell.phraseFont(size: cell.size),
-      .paragraphStyle: CandidateCellData4AppKit.sharedParagraphStyle,
-    ]
-    let result: NSMutableAttributedString = {
-      if noSpacePadding {
-        let resultNeo = NSMutableAttributedString(string: " ", attributes: attrSpace)
-        resultNeo.insert(attributedStringPhrase(for: cell, isMatrix: isMatrix), at: 1)
-        resultNeo.insert(attributedStringHeader(for: cell), at: 0)
-        return resultNeo
-      }
-      let resultNeo = NSMutableAttributedString(string: "   ", attributes: attrSpace)
-      resultNeo.insert(attributedStringPhrase(for: cell, isMatrix: isMatrix), at: 2)
-      resultNeo.insert(attributedStringHeader(for: cell), at: 1)
-      return resultNeo
-    }()
-    if withHighlight, cell.isHighlighted {
-      result.addAttribute(
-        .backgroundColor, value: cell.themeColorCocoa,
-        range: NSRange(location: 0, length: result.string.utf16.count)
-      )
-    }
-    return result
+    CandidateCellData4AppKit.assembleAttributedString(
+      for: cell,
+      header: attributedStringHeader(for: cell),
+      phrase: attributedStringPhrase(for: cell, isMatrix: isMatrix),
+      noSpacePadding: noSpacePadding,
+      withHighlight: withHighlight
+    )
   }
 }
 

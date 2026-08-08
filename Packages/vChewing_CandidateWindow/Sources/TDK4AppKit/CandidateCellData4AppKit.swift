@@ -113,31 +113,6 @@ extension TDK4AppKit {
         : Self.plainTextColor.withAlphaComponent(0.5)
     }
 
-    var hardCopy: Self {
-      var result = Self(
-        key: selectionKey,
-        displayedText: displayedText,
-        keyArray: keyArray,
-        segLength: segLength,
-        isSelected: isHighlighted
-      )
-      result.visualDimension = visualDimension
-      result.headerDrawYOffset = headerDrawYOffset
-      result.phraseDrawXOffset = phraseDrawXOffset
-      result.locale = locale
-      result.whichLine = whichLine
-      result.index = index
-      result.subIndex = subIndex
-      return result
-    }
-
-    var cleanCopy: Self {
-      var result = hardCopy
-      result.isHighlighted = false
-      result.selectionKey = " "
-      return result
-    }
-
     var themeColorCocoa: NSColor {
       switch locale {
       case "zh-Hans": return .init(red: 255 / 255, green: 64 / 255, blue: 53 / 255, alpha: 0.85)
@@ -149,6 +124,42 @@ extension TDK4AppKit {
 
     static func == (lhs: Self, rhs: Self) -> Bool {
       lhs.selectionKey == rhs.selectionKey && lhs.displayedText == rhs.displayedText
+    }
+
+    /// 組合「選字鍵 + 候選字詞」屬性字串（含留白與高亮背景）。
+    /// 組件由呼叫端提供：cell 自身傳未快取版本，資料池傳池級快取版本。
+    static func assembleAttributedString(
+      for cell: Self,
+      header: NSAttributedString,
+      phrase: NSAttributedString,
+      noSpacePadding: Bool = true,
+      withHighlight: Bool = false
+    )
+      -> NSAttributedString {
+      let attrSpace: [NSAttributedString.Key: Any] = [
+        .kern: 0,
+        .font: cell.phraseFont(size: cell.size),
+        .paragraphStyle: Self.sharedParagraphStyle,
+      ]
+      let result: NSMutableAttributedString = {
+        if noSpacePadding {
+          let resultNeo = NSMutableAttributedString(string: " ", attributes: attrSpace)
+          resultNeo.insert(phrase, at: 1)
+          resultNeo.insert(header, at: 0)
+          return resultNeo
+        }
+        let resultNeo = NSMutableAttributedString(string: "   ", attributes: attrSpace)
+        resultNeo.insert(phrase, at: 2)
+        resultNeo.insert(header, at: 1)
+        return resultNeo
+      }()
+      if withHighlight, cell.isHighlighted {
+        result.addAttribute(
+          .backgroundColor, value: cell.themeColorCocoa,
+          range: NSRange(location: 0, length: result.string.utf16.count)
+        )
+      }
+      return result
     }
 
     /// 生成「選字鍵」的屬性字串。不帶快取；快取統一由資料池管理。
@@ -191,30 +202,13 @@ extension TDK4AppKit {
       noSpacePadding: Bool = true, withHighlight: Bool = false, isMatrix: Bool = false
     )
       -> NSAttributedString {
-      let attrSpace: [NSAttributedString.Key: Any] = [
-        .kern: 0,
-        .font: phraseFont(size: size),
-        .paragraphStyle: Self.sharedParagraphStyle,
-      ]
-      let result: NSMutableAttributedString = {
-        if noSpacePadding {
-          let resultNeo = NSMutableAttributedString(string: " ", attributes: attrSpace)
-          resultNeo.insert(makeAttributedStringPhrase(isMatrix: isMatrix), at: 1)
-          resultNeo.insert(makeAttributedStringHeader(), at: 0)
-          return resultNeo
-        }
-        let resultNeo = NSMutableAttributedString(string: "   ", attributes: attrSpace)
-        resultNeo.insert(makeAttributedStringPhrase(isMatrix: isMatrix), at: 2)
-        resultNeo.insert(makeAttributedStringHeader(), at: 1)
-        return resultNeo
-      }()
-      if withHighlight, isHighlighted {
-        result.addAttribute(
-          .backgroundColor, value: themeColorCocoa,
-          range: NSRange(location: 0, length: result.string.utf16.count)
-        )
-      }
-      return result
+      Self.assembleAttributedString(
+        for: self,
+        header: makeAttributedStringHeader(),
+        phrase: makeAttributedStringPhrase(isMatrix: isMatrix),
+        noSpacePadding: noSpacePadding,
+        withHighlight: withHighlight
+      )
     }
 
     /// 生成「候選字詞」的屬性字串。不帶快取；快取統一由資料池管理。
