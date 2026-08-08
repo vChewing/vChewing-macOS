@@ -275,7 +275,7 @@ extension Tekkon {
       let chopped = Tekkon.PinyinTrie.shared(parser: parser).chop(appended)
       guard chopped.count >= 2, let remainingRomaji = chopped.last else { return nil }
 
-      let leadingSlices = Array(chopped.dropLast())
+      let leadingSlices = chopped.dropLast()
       guard !leadingSlices.isEmpty else { return nil }
 
       let committedReadings = leadingSlices.compactMap { readingMap[$0] }
