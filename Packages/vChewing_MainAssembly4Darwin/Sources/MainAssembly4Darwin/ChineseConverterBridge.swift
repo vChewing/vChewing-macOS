@@ -6,6 +6,8 @@
 // marks, or product names of Contributor, except as required to fulfill notice
 // requirements defined in MIT License.
 
+import Foundation
+
 extension ChineseConverter {
   // MARK: Public
 
@@ -62,7 +64,44 @@ extension ChineseConverter {
     return result
   }
 
+  /// 影響繁簡轉換結果的 config 快照；任一項變動都會使對應快取條目失效。
+  private struct KanjiConversionConfig: Equatable {
+    static var current: Self {
+      .init(
+        cassetteEnabled: PrefMgr.shared.cassetteEnabled,
+        forceCassetteChineseConversion: PrefMgr.shared.forceCassetteChineseConversion,
+        inputMode: IMEApp.currentInputMode,
+        chineseConversionEnabled: PrefMgr.shared.chineseConversionEnabled,
+        shiftJISShinjitaiOutputEnabled: PrefMgr.shared.shiftJISShinjitaiOutputEnabled
+      )
+    }
+
+    var cassetteEnabled: Bool
+    var forceCassetteChineseConversion: Int
+    var inputMode: Shared.InputMode
+    var chineseConversionEnabled: Bool
+    var shiftJISShinjitaiOutputEnabled: Bool
+  }
+
+  /// 繁簡轉換結果的快取（keyed by 原始字串），僅供 kanjiConversionIfRequired 使用。
+  /// 每個條目帶 config 快照；快照一變即視為 miss 並覆寫。容量封頂 4096 筆，滿時整池清空。
+  private static var kanjiConversionCache: [String: (result: String, config: KanjiConversionConfig)] = [:]
+  private static let kanjiConversionCacheLock = NSLock()
+
   public static func kanjiConversionIfRequired(_ text: String) -> String {
+    kanjiConversionCacheLock.withLock {
+      let config = KanjiConversionConfig.current
+      if let cached = kanjiConversionCache[text], cached.config == config {
+        return cached.result
+      }
+      let result = performKanjiConversionIfRequired(text)
+      if kanjiConversionCache.count >= 4_096 { kanjiConversionCache.removeAll() }
+      kanjiConversionCache[text] = (result: result, config: config)
+      return result
+    }
+  }
+
+  private static func performKanjiConversionIfRequired(_ text: String) -> String {
     var text = text
     if PrefMgr.shared.cassetteEnabled { cassetteConvert(&text) }
     guard IMEApp.currentInputMode == .imeModeCHT else { return text }
