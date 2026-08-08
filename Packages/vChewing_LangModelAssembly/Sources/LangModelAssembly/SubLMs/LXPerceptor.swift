@@ -380,6 +380,8 @@ extension LMAssembly.LXPerceptor {
         : frontEdgeReading.components(separatedBy: separatorString).filter { !$0.isEmpty }
     let isUnigramKey = parts.previous == nil && parts.anterior == nil
     let isSingleCharUnigram = isUnigramKey && keyArrayForCandidate.count == 1
+    // 避免在每輪疊代中重複建立候選鍵陣列。
+    let effectiveKeyArray = keyArrayForCandidate.isEmpty ? [frontEdgeReading] : keyArrayForCandidate
 
     for (candidate, override) in perception.overrides {
       let overrideScore = calculateWeight(
@@ -399,7 +401,7 @@ extension LMAssembly.LXPerceptor {
       if overrideScore > currentHighScore {
         candidates = [
           (
-            keyArray: keyArrayForCandidate.isEmpty ? [frontEdgeReading] : keyArrayForCandidate,
+            keyArray: effectiveKeyArray,
             value: candidate,
             probability: overrideScore,
             previous: previousStr
@@ -409,7 +411,7 @@ extension LMAssembly.LXPerceptor {
       } else if overrideScore == currentHighScore {
         candidates.append(
           (
-            keyArray: keyArrayForCandidate.isEmpty ? [frontEdgeReading] : keyArrayForCandidate,
+            keyArray: effectiveKeyArray,
             value: candidate,
             probability: overrideScore,
             previous: previousStr

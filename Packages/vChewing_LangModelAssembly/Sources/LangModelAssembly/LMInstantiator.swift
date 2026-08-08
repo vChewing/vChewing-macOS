@@ -675,6 +675,7 @@ extension LMAssembly {
       // `config.bypassUserPhrasesData` 啟用時，除了 Associated Phrases 以外的資料全部忽略。
       /// 準備不同的語言模組容器，開始逐漸往容器陣列內塞入資料。
       var rawAllUnigrams: [Homa.Gram] = []
+      rawAllUnigrams.reserveCapacity(Swift.max(16, flatKeyArray.count * 8))
       var factoryCoreUnigramsResult: [Homa.Gram] = []
 
       if !config.isCassetteEnabled
@@ -862,7 +863,7 @@ extension LMAssembly {
       let dataAsFilter: Set<String> = config.bypassUserPhrasesData
         ? []
         : .init(
-          lmFiltered.unigramsFor(key: keyChain, keyArray: flatKeyArray).map(\.current)
+          lmFiltered.unigramsFor(key: keyChain, keyArray: flatKeyArray).lazy.map(\.current)
         )
       rawAllUnigrams.consolidate(filter: dataAsFilter)
       rawAllUnigrams.sort { $0.probability > $1.probability }
