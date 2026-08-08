@@ -42,6 +42,20 @@ extension Homa {
   }
 }
 
+// MARK: - Homa.GramBorderPointMap
+
+extension Homa {
+  /// 預先計算的「座標 ↔ 幅節索引」對照表載體。
+  /// 供陣列擴充函式以單次掃描同時建構兩張對照字典、再於多次查詢間重複使用，
+  /// 避免 `[GramInPath]` 的每個查詢 API 各自重建字典。
+  internal struct GramBorderPointMap {
+    /// 以幅節索引查座標（Region → Cursor）。
+    internal let regionCursorMap: [Int: Int]
+    /// 以座標查幅節索引（Cursor → Region）。
+    internal let cursorRegionMap: [Int: Int]
+  }
+}
+
 // MARK: - Perception Observation
 
 extension Homa {
@@ -211,7 +225,7 @@ extension Array where Element == Homa.GramInPath {
 
   /// 返回一連串的節點起點。結果為 (Result A, Result B) 字典陣列。
   /// Result A 以索引查座標，Result B 以座標查索引。
-  private var gramBorderPointDictPair: (regionCursorMap: [Int: Int], cursorRegionMap: [Int: Int]) {
+  private func makeGramBorderPointMap() -> Homa.GramBorderPointMap {
     // Result A 以索引查座標，Result B 以座標查索引。
     var resultA = [Int: Int]()
     var resultB: [Int: Int] = [-1: 0] // 防呆
@@ -225,18 +239,30 @@ extension Array where Element == Homa.GramInPath {
     }
     resultA[count] = cursorCounter
     resultB[cursorCounter] = count
-    return (resultA, resultB)
+    return .init(regionCursorMap: resultA, cursorRegionMap: resultB)
   }
 
   /// 返回一個字典，以座標查索引。允許以游標位置查詢其屬於第幾個幅節座標（從 0 開始算）。
-  public var cursorRegionMap: [Int: Int] { gramBorderPointDictPair.cursorRegionMap }
+  public var cursorRegionMap: [Int: Int] { makeGramBorderPointMap().cursorRegionMap }
 
   /// 總讀音單元數量。在絕大多數情況下，可視為總幅節長度。
-  public var totalKeyCount: Int { map(\.keyArray.count).reduce(0, +) }
+  public var totalKeyCount: Int { reduce(0) { $0 + $1.keyArray.count } }
 
   /// 根據給定的游標，返回其前後最近的節點邊界。
   /// - Parameter cursor: 給定的游標。
   public func contextRange(ofGivenCursor cursor: Int) -> Range<Int> {
+    contextRange(ofGivenCursor: cursor, using: makeGramBorderPointMap())
+  }
+
+  /// 根據給定的游標，返回其前後最近的節點邊界（使用預先建構的對照表）。
+  /// - Parameters:
+  ///   - cursor: 給定的游標。
+  ///   - map: 預先建構的「座標 ↔ 幅節索引」對照表。
+  internal func contextRange(
+    ofGivenCursor cursor: Int,
+    using map: Homa.GramBorderPointMap
+  )
+    -> Range<Int> {
     guard !isEmpty else { return 0 ..< 0 }
     let frontestSegLength = reversed()[0].keyArray.count
     var nilReturn = (totalKeyCount - frontestSegLength) ..< totalKeyCount
@@ -244,11 +270,10 @@ extension Array where Element == Homa.GramInPath {
     let cursor = Swift.max(0, cursor) // 防呆
     nilReturn = cursor ..< cursor
     // 下文按道理來講不應該會出現 nilReturn。
-    let mapPair = gramBorderPointDictPair
-    guard let rearNodeID = mapPair.cursorRegionMap[cursor] else { return nilReturn }
-    guard let rearIndex = mapPair.regionCursorMap[rearNodeID]
+    guard let rearNodeID = map.cursorRegionMap[cursor] else { return nilReturn }
+    guard let rearIndex = map.regionCursorMap[rearNodeID]
     else { return nilReturn }
-    guard let frontIndex = mapPair.regionCursorMap[rearNodeID + 1]
+    guard let frontIndex = map.regionCursorMap[rearNodeID + 1]
     else { return nilReturn }
     return rearIndex ..< frontIndex
   }
@@ -258,10 +283,23 @@ extension Array where Element == Homa.GramInPath {
   ///   - cursor: 給定游標位置。
   /// - Returns: 查找結果。
   public func findGram(at cursor: Int) -> (gram: Homa.GramInPath, range: Range<Int>)? {
+    findGram(at: cursor, using: makeGramBorderPointMap())
+  }
+
+  /// 在陣列內以給定游標位置找出對應的節點（使用預先建構的對照表）。
+  /// - Parameters:
+  ///   - cursor: 給定游標位置。
+  ///   - map: 預先建構的「座標 ↔ 幅節索引」對照表。
+  /// - Returns: 查找結果。
+  internal func findGram(
+    at cursor: Int,
+    using map: Homa.GramBorderPointMap
+  )
+    -> (gram: Homa.GramInPath, range: Range<Int>)? {
     guard !isEmpty else { return nil }
     let cursor = Swift.max(0, Swift.min(cursor, totalKeyCount - 1)) // 防呆
-    let range = contextRange(ofGivenCursor: cursor)
-    guard let rearNodeID = cursorRegionMap[cursor] else { return nil }
+    let range = contextRange(ofGivenCursor: cursor, using: map)
+    guard let rearNodeID = map.cursorRegionMap[cursor] else { return nil }
     guard count - 1 >= rearNodeID else { return nil }
     return (self[rearNodeID], range)
   }
@@ -270,10 +308,17 @@ extension Array where Element == Homa.GramInPath {
   ///
   /// 此處不需要針對 cursor 做邊界檢查。
   public func isCursorCuttingChar(cursor: Int) -> Bool {
+    isCursorCuttingChar(cursor: cursor, using: makeGramBorderPointMap())
+  }
+
+  /// 偵測是否出現游標切斷組字區內字元的情況（使用預先建構的對照表）。
+  ///
+  /// 此處不需要針對 cursor 做邊界檢查。
+  internal func isCursorCuttingChar(cursor: Int, using map: Homa.GramBorderPointMap) -> Bool {
     let index = cursor
-    var isBound = (index == contextRange(ofGivenCursor: index).lowerBound)
+    var isBound = (index == contextRange(ofGivenCursor: index, using: map).lowerBound)
     if index == totalKeyCount { isBound = true }
-    let rawResult = findGram(at: index)?.gram.isReadingMismatched ?? false
+    let rawResult = findGram(at: index, using: map)?.gram.isReadingMismatched ?? false
     return !isBound && rawResult
   }
 
@@ -281,8 +326,15 @@ extension Array where Element == Homa.GramInPath {
   ///
   /// 此處不需要針對 cursor 做邊界檢查。
   public func isCursorCuttingRegion(cursor: Int) -> Bool {
+    isCursorCuttingRegion(cursor: cursor, using: makeGramBorderPointMap())
+  }
+
+  /// 偵測游標是否切斷區域（使用預先建構的對照表）。
+  ///
+  /// 此處不需要針對 cursor 做邊界檢查。
+  internal func isCursorCuttingRegion(cursor: Int, using map: Homa.GramBorderPointMap) -> Bool {
     let index = cursor
-    var isBound = (index == contextRange(ofGivenCursor: index).lowerBound)
+    var isBound = (index == contextRange(ofGivenCursor: index, using: map).lowerBound)
     if index == totalKeyCount { isBound = true }
     return !isBound
   }

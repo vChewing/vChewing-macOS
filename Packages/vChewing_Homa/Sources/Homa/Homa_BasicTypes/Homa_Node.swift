@@ -186,12 +186,19 @@ extension Homa.Node {
 
   /// 給出目前的最高權重單元圖當中的權重值。該結果可能會受節點覆寫狀態所影響。
   private var unigramScore: Double {
-    let unigrams = grams.filter { ($0.previous ?? "").isEmpty }
-    guard let firstUnigram = unigrams.first else { return 0 }
+    guard !grams.isEmpty else { return 0 }
+    // 單次線性掃描、只取陣列順序上的第一個單元圖機率，不建立任何一次性 filter 陣列。
+    var firstUnigramProbability: Double?
+    for gram in grams {
+      guard (gram.previous ?? "").isEmpty else { continue }
+      firstUnigramProbability = gram.probability
+      break
+    }
+    guard let firstUnigramProbability else { return 0 }
     switch currentOverrideType {
     case .withSpecified: return overridingScore
-    case .withTopGramScore: return firstUnigram.probability
-    default: return currentGram?.probability ?? firstUnigram.probability
+    case .withTopGramScore: return firstUnigramProbability
+    default: return currentGram?.probability ?? firstUnigramProbability
     }
   }
 
@@ -204,22 +211,41 @@ extension Homa.Node {
   internal mutating func getScore(previous: String?) -> Double {
     guard !grams.isEmpty else { return 0 }
     guard let previous, !previous.isEmpty else { return unigramScore }
-    // 直接線性掃描元圖陣列、挑出「前述內容與當前值均相符」的最高權重雙元圖。
-    // 取代舊版的按前驅分組字典（bigramMap）+ 每次查詢排序，避免每個節點常駐一個
-    // 派生字典、且組句熱路徑上反覆排序。
+    // 單次線性掃描元圖陣列：同步捕捉「陣列順序上的首個單元圖機率」與「前述內容及當前值
+    // 均相符的最高權重雙元圖」，完全不建立任何一次性 filter 陣列。
     let currentValue = currentGram?.current
-    let bigram = grams
-      .filter { $0.previous == previous && $0.current == currentValue }
-      .max { $0.probability < $1.probability }
-    let currentScore = unigramScore
-    let bigramScore = bigram?.probability
-    guard let bigram, let bigramScore else { return currentScore }
+    var firstUnigramProbability: Double?
+    var bestBigram: Homa.Gram?
+    for gram in grams {
+      if (gram.previous ?? "").isEmpty, firstUnigramProbability == nil {
+        firstUnigramProbability = gram.probability
+      }
+      guard gram.previous == previous, gram.current == currentValue else { continue }
+      guard let currentBest = bestBigram else {
+        bestBigram = gram
+        continue
+      }
+      if gram.probability > currentBest.probability { bestBigram = gram }
+    }
+    // 套用與先前完全一致的覆寫邏輯。
+    let currentScore: Double
+    if let firstUnigramProbability {
+      switch currentOverrideType {
+      case .withSpecified: currentScore = overridingScore
+      case .withTopGramScore: currentScore = firstUnigramProbability
+      default: currentScore = currentGram?.probability ?? firstUnigramProbability
+      }
+    } else {
+      currentScore = 0
+    }
+    guard let bestBigram else { return currentScore }
+    let bigramScore = bestBigram.probability
     guard bigramScore > currentScore else { return currentScore }
     do {
       try selectOverrideGram(
-        keyArray: bigram.keyArray,
-        value: bigram.current,
-        previous: bigram.previous,
+        keyArray: bestBigram.keyArray,
+        value: bestBigram.current,
+        previous: bestBigram.previous,
         type: .withTopGramScore
       )
       return bigramScore

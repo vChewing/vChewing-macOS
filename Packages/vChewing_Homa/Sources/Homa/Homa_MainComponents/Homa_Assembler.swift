@@ -497,11 +497,13 @@ extension Homa {
       if let cached = gramQueryCache[cacheKey] {
         return cached
       }
+      var newResult = gramQuerier(keyArray)
+      newResult.sort(by: Self.sortGram)
+      // 就地去重（依身份雜湊），與舊版「sorted + compactMap」的語義完全一致：
+      // 依排序後的順序保留每個身份的第一個出現，且不額外建立一次性陣列。
       var insertedIntel = Set<Int>()
-      let newResult: [Homa.Gram] = gramQuerier(keyArray).sorted(by: Self.sortGram).compactMap {
-        let intel = Self.makeGramIdentityHash($0)
-        guard insertedIntel.insert(intel).inserted else { return nil }
-        return $0
+      newResult.removeAll { gram in
+        !insertedIntel.insert(Self.makeGramIdentityHash(gram)).inserted
       }
       if gramQueryCache.count >= Self.maxCachedGramQueries {
         // 淘汰最舊的一半，而非全量清空，以保留最近常用的快取項目。
