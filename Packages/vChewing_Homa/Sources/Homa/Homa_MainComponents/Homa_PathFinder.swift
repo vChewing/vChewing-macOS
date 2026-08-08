@@ -49,6 +49,8 @@ extension Homa {
       // 這樣可以避免「for-in 遍歷段字典的同時、透過下標寫回同一字典」所觸發的
       // 寫時複製（COW），讓寫回發生在字典為唯一引用的時點、直接原地更新。
       var visitedNodes = [(position: Int, segLength: Int, node: Homa.Node)]()
+      // 預估容量，減少 DP 遍歷過程中 visitedNodes 反覆搬移緩衝區的次數。
+      visitedNodes.reserveCapacity(keyCount * config.maxSegLength)
 
       // DAG 動態規劃主循環
       for i in 0 ..< keyCount {

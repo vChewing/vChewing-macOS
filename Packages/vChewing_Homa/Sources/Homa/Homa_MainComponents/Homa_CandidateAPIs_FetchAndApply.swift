@@ -59,17 +59,19 @@ extension Homa.Assembler {
         seen.insert(newCandidate.pair)
       }
     }
-    return result.sorted {
+    // 預先為每個候選字算好排序鍵值，避免 comparator 在每次比較時重新 joined() 出字串
+    // （原先每次候選窗開啟都會產生 O(n·log n) 個一次性字串）。
+    let keyed = result.map { candidate in
       (
-        $0.pair.segLength,
-        $0.pair.keyArray.joined(separator: "-"),
-        $0.weight
-      ) > (
-        $1.pair.segLength,
-        $1.pair.keyArray.joined(separator: "-"),
-        $1.weight
+        segLength: candidate.pair.segLength,
+        joinedKey: candidate.pair.keyArray.joined(separator: "-"),
+        weight: candidate.weight,
+        candidate: candidate
       )
     }
+    return keyed.sorted {
+      ($0.segLength, $0.joinedKey, $0.weight) > ($1.segLength, $1.joinedKey, $1.weight)
+    }.map(\.candidate)
   }
 
   /// 使用給定的候選字（詞音配對），將給定位置的節點的候選字詞改為與之一致的候選字詞。

@@ -11,14 +11,19 @@ extension StringProtocol {
   ///
   /// 注意：此方法以 Unicode Scalar 為單位進行比對，對一些複雜合字或合成字情況可能與 Foundation 的 `contains` 行為略有不同。
   func has(string target: any StringProtocol) -> Bool {
-    let selfArray = Array(unicodeScalars)
-    let targetArray = Array(target.description.unicodeScalars)
-    guard !target.isEmpty else { return isEmpty }
-    guard count >= target.count else { return false }
-    for index in selfArray.indices {
-      let range = index ..< (Swift.min(index + targetArray.count, selfArray.count))
-      let ripped = Array(selfArray[range])
-      if ripped == targetArray { return true }
+    let scalars = unicodeScalars
+    let targetScalars = target.description.unicodeScalars
+    guard !target.isEmpty else { return scalars.isEmpty }
+    let targetCount = targetScalars.count
+    guard scalars.count >= targetCount else { return false }
+    // 純檢視（view）滑窗掃描：不建立任何一次性陣列，每個滑窗以 elementsEqual 逐個比對。
+    var offset = 0
+    let lastOffset = scalars.count - targetCount
+    while offset <= lastOffset {
+      if scalars.dropFirst(offset).prefix(targetCount).elementsEqual(targetScalars) {
+        return true
+      }
+      offset += 1
     }
     return false
   }
