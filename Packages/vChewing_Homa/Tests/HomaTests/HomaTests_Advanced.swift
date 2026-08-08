@@ -1395,4 +1395,30 @@ public struct HomaTestsAdvanced: HomaTestSuite {
       .joined(separator: " ")
     #expect(assembledBySuggested == "遞交")
   }
+
+  /// 迴歸鎖定：節點的 currentGram 其 keyArray 長於幅節格位時（partial-match 前綴匹配
+  /// 會回傳比查詢幅節更長的 gram），覆寫仍須命中該節點所在的權威座標，而非以衍生的
+  /// `Node.segLength` 重新尋址——否則 lookup 落空、覆寫靜默失敗，或寫回至錯誤座標。
+  @Test("[Homa] Assembler_OverrideNodeWhoseGramKeyArrayExceedsGridSpan")
+  func testOverrideNodeWhoseGramKeyArrayExceedsGridSpan() async throws {
+    let assembler = Homa.Assembler(
+      gramQuerier: { keyArray in
+        guard keyArray.count == 1 else { return [] }
+        // 對 span-1 查詢回傳一個 keyArray 更長的 gram（排序後居首、成為 currentGram）。
+        return [
+          Homa.Gram(keyArray: ["a", "b"], current: "AB", probability: -1),
+          Homa.Gram(keyArray: ["a"], current: "A", probability: -2),
+        ]
+      }
+    )
+    try assembler.insertKey("a")
+    // 前置條件：節點位於權威座標 (0, 1)，但其衍生 segLength 為 2。
+    #expect(assembler.segments[0][1]?.segLength == 2)
+    // 覆寫不得靜默失敗（未修復時此處會拋出 nothingOverriddenAtNode）。
+    try assembler.overrideCandidateLiteral("AB", at: 0)
+    // 覆寫須落回權威座標，且不得在錯誤座標滋生節點。
+    #expect(assembler.segments[0][1]?.value == "AB")
+    #expect(assembler.segments[0][1]?.currentOverrideType == .withSpecified)
+    #expect(assembler.segments[0][2] == nil)
+  }
 }

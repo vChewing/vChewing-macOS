@@ -30,7 +30,7 @@ extension Homa.Assembler {
       location -= 1
     }
     location = max(min(location, keys.count - 1), 0)
-    let anchors: [(location: Int, node: Homa.Node)] = fetchOverlappingNodes(at: location)
+    let anchors: [(location: Int, segLength: Int, node: Homa.Node)] = fetchOverlappingNodes(at: location)
     let keyAtCursor = keys[location]
     let cursorAlternatives = keyAtCursor.allValues
     var seen = Set<Homa.CandidatePair>()
@@ -46,7 +46,7 @@ extension Homa.Assembler {
         case .beginAt:
           guard theAnchor.location == location else { return }
         case .endAt:
-          guard theAnchor.location + theNode.segLength - 1 == location else { return }
+          guard theAnchor.location + theAnchor.segLength - 1 == location else { return }
           guard let lastKey = theNode.keyArray4Query.last,
                 cursorAlternatives.contains(lastKey) else { return }
         }
@@ -185,7 +185,7 @@ extension Homa.Assembler {
     let cursorBeforeOverride = min(keys.count, location)
 
     // 尋找相符的節點
-    var overridden: (location: Int, node: Homa.Node)?
+    var overridden: (location: Int, segLength: Int, node: Homa.Node)?
     var lastError: Homa.Exception?
 
     for anchor in arrOverlappedNodes {
@@ -195,7 +195,10 @@ extension Homa.Assembler {
       }
 
       do {
-        guard var nodeCopy = segments[anchor.location][anchor.node.segLength] else { continue }
+        // 以錨點攜帶的權威幅節長度（段字典鍵）尋址：節點的衍生 segLength
+        // 取自 currentGram.keyArray，可能與格位幅節長度不一致（如前綴匹配
+        // 回傳的更長 gram），不得用於重新尋址。
+        guard var nodeCopy = segments[anchor.location][anchor.segLength] else { continue }
         _ = try nodeCopy.selectOverrideGram(
           keyArray: keyArray,
           value: value,
@@ -214,9 +217,9 @@ extension Homa.Assembler {
             currentUnigramIndex: nodeCopy.currentGramIndex
           )
         }
-        segments[anchor.location][anchor.node.segLength] = nodeCopy
+        segments[anchor.location][anchor.segLength] = nodeCopy
         // 保存修改後的節點拷貝（含覆寫狀態），供後續重疊節點處理讀取。
-        overridden = (location: anchor.location, node: nodeCopy)
+        overridden = (location: anchor.location, segLength: anchor.segLength, node: nodeCopy)
         break
       } catch let error as Homa.Exception {
         lastError = error
@@ -250,7 +253,7 @@ extension Homa.Assembler {
       overridden
         .location ..< min(
           segments.count,
-          overridden.location + overridden.node.segLength
+          overridden.location + overridden.segLength
         )
 
     for i in overriddenRange {
@@ -260,13 +263,15 @@ extension Homa.Assembler {
         let overriddenNodeRef = overridden.node
         let demotionScore = -Swift.max(1.0, Swift.abs(overriddenNodeRef.overridingScore))
         for anchor in overlappingNodes {
-          // 原語義為「跳過與已覆寫節點同一物件者」的引用比較；
-          // Struct 化之後同一節點以「座標（位置 + 幅節長度）」判同。
+          // Struct 化之後同一節點以「座標（位置 + 權威幅節長度）」判同。
           let isSameNode = anchor.location == overridden.location
-            && anchor.node.segLength == overridden.node.segLength
+            && anchor.segLength == overridden.segLength
           guard !isSameNode, anchor.location <= overridden.location else { continue }
           var nodeCopy = anchor.node
-          if shouldResetNode(anchor: nodeCopy, overriddenNode: overriddenNodeRef) {
+          if shouldResetNode(
+            anchor: nodeCopy, anchorSegLength: anchor.segLength,
+            overriddenNode: overriddenNodeRef, overriddenSegLength: overridden.segLength
+          ) {
             nodeCopy.reset()
           }
           nodeCopy.overrideStatus = .init(
@@ -275,16 +280,21 @@ extension Homa.Assembler {
             isExplicitlyOverridden: nodeCopy.isExplicitlyOverridden,
             currentUnigramIndex: nodeCopy.currentGramIndex
           )
-          segments[anchor.location][anchor.node.segLength] = nodeCopy
+          segments[anchor.location][anchor.segLength] = nodeCopy
         }
         continue
       }
 
-      for anchor in overlappingNodes where anchor.node != overridden.node {
+      for anchor in overlappingNodes {
+        // 與重設分支一致：以座標判同，僅跳過已覆寫節點本身；
+        // 內容等值的不同節點（同讀音重複出現）仍須照常降權。
+        let isSameNode = anchor.location == overridden.location
+          && anchor.segLength == overridden.segLength
+        guard !isSameNode else { continue }
         // 檢查是否需要重設節點
         let shouldReset = shouldResetNode(
-          anchor: anchor.node,
-          overriddenNode: overridden.node
+          anchor: anchor.node, anchorSegLength: anchor.segLength,
+          overriddenNode: overridden.node, overriddenSegLength: overridden.segLength
         )
         var nodeCopy = anchor.node
         if shouldReset {
@@ -292,7 +302,7 @@ extension Homa.Assembler {
         } else {
           nodeCopy.overridingScore /= 4
         }
-        segments[anchor.location][anchor.node.segLength] = nodeCopy
+        segments[anchor.location][anchor.segLength] = nodeCopy
       }
     }
   }
@@ -300,10 +310,16 @@ extension Homa.Assembler {
   /// 判斷一個節點是否需要被重設
   /// - Parameters:
   ///   - anchor: 待檢查的節點
+  ///   - anchorSegLength: 待檢查節點的權威幅節長度（段字典鍵）。
   ///   - overriddenNode: 已覆寫的節點
+  ///   - overriddenSegLength: 已覆寫節點的權威幅節長度（段字典鍵）。
   /// - Returns: 是否需要重設
-  private func shouldResetNode(anchor: Homa.Node, overriddenNode: Homa.Node) -> Bool {
-    guard overriddenNode.segLength <= anchor.segLength else {
+  private func shouldResetNode(
+    anchor: Homa.Node, anchorSegLength: Int,
+    overriddenNode: Homa.Node, overriddenSegLength: Int
+  )
+    -> Bool {
+    guard overriddenSegLength <= anchorSegLength else {
       return true
     }
     guard let anchorValue = anchor.value,
@@ -325,18 +341,20 @@ extension Homa.Assembler {
 // MARK: - Extending Assembler for Segment.
 
 extension Homa.Assembler {
-  /// 找出所有與該位置重疊的節點。其返回值為一個節錨陣列（包含節點、以及其起始位置）。
+  /// 找出所有與該位置重疊的節點。其返回值為一個節錨陣列（包含節點、其起始位置、
+  /// 以及其權威幅節長度——段字典鍵；節點衍生的 `segLength` 可能與之不同，不得用於尋址）。
   /// - Parameter location: 游標位置。
   /// - Returns: 一個包含所有與該位置重疊的節點的陣列。
-  internal func fetchOverlappingNodes(at givenLocation: Int) -> [(location: Int, node: Homa.Node)] {
-    var results = [(location: Int, node: Homa.Node)]()
+  internal func fetchOverlappingNodes(at givenLocation: Int)
+    -> [(location: Int, segLength: Int, node: Homa.Node)] {
+    var results = [(location: Int, segLength: Int, node: Homa.Node)]()
     let givenLocation = max(0, min(givenLocation, keys.count - 1))
     guard segments.indices.contains(givenLocation) else { return results }
 
     // 先獲取詀位置的所有單字節點
     segments[givenLocation].keys.sorted().forEach { theSegLength in
       guard let node = segments[givenLocation][theSegLength] else { return }
-      Self.insertAnchor(segmentIndex: givenLocation, node: node, to: &results)
+      Self.insertAnchor(segmentIndex: givenLocation, segLength: theSegLength, node: node, to: &results)
     }
 
     // 再獲取以當前位置結尾的節點
@@ -348,7 +366,7 @@ extension Homa.Assembler {
       guard neededLength <= maxAvailableLength else { return }
       (neededLength ... maxAvailableLength).forEach { theLength in
         guard let node = segments[theLocation][theLength] else { return }
-        Self.insertAnchor(segmentIndex: theLocation, node: node, to: &results)
+        Self.insertAnchor(segmentIndex: theLocation, segLength: theLength, node: node, to: &results)
       }
     }
 
@@ -359,15 +377,17 @@ extension Homa.Assembler {
   /// 按照節點幅節長度排序插入節點錨點。
   /// - Parameters:
   ///   - location: 節點起始位置。
+  ///   - segLength: 節點的權威幅節長度（段字典鍵）。
   ///   - node: 要插入的節點。
   ///   - targetContainer: 目標容器。
   private static func insertAnchor(
     segmentIndex location: Int,
+    segLength: Int,
     node: Homa.Node,
-    to targetContainer: inout [(location: Int, node: Homa.Node)]
+    to targetContainer: inout [(location: Int, segLength: Int, node: Homa.Node)]
   ) {
     guard !node.keyArray.joined().isEmpty else { return }
-    let anchor = (location: location, node: node)
+    let anchor = (location: location, segLength: segLength, node: node)
 
     // 若容器為空，直接添加
     if targetContainer.isEmpty {
@@ -379,7 +399,7 @@ extension Homa.Assembler {
     var inserted = false
     targetContainer.indices.forEach { i in
       guard !inserted else { return }
-      if targetContainer[i].node.segLength <= anchor.node.segLength {
+      if targetContainer[i].segLength <= anchor.segLength {
         targetContainer.insert(anchor, at: i)
         inserted = true
       }

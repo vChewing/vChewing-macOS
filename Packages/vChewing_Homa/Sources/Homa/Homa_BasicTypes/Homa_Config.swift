@@ -90,6 +90,9 @@ extension Homa {
     }
 
     /// 生成所有節點的覆寫狀態鏡照。
+    ///
+    /// 注意：鏡照以節點 ID 為鍵，僅對「同一個未被 copy 的組字器」有效——
+    /// `copy`／`hardCopy` 會為所有節點重新生成 ID，對拷貝體還原鏡照會全部落空（靜默無效）。
     /// - Returns: 節點 ID 與覆寫狀態的對應字典。
     public func createNodeOverrideStatusMirror() -> [FIUUID: Homa.NodeOverrideStatus] {
       var result: [FIUUID: Homa.NodeOverrideStatus] = [:]

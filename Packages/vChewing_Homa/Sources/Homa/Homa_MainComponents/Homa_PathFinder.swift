@@ -70,7 +70,9 @@ extension Homa {
           // 如果找到更好的路徑，更新 dp 和 parent
           if newScore > dp[nextPos] {
             dp[nextPos] = newScore
-            parent[nextPos] = (nextGram, nodeCopy.isExplicitlyOverridden)
+            // 幅節長度以段字典鍵為準：gram.keyArray 的長度可能與格位幅節長度
+            // 不一致（如前綴匹配回傳的更長 gram），回溯時不得依賴後者。
+            parent[nextPos] = (nextGram, nodeCopy.isExplicitlyOverridden, length)
           }
         }
       }
@@ -92,7 +94,7 @@ extension Homa {
         resultReversed.append(
           .init(gram: gram, isExplicit: parentInfo.isExplicit)
         )
-        currentPos -= gram.keyArray.count
+        currentPos -= parentInfo.segLength
       }
 
       if !resultReversed.isEmpty {
@@ -103,6 +105,6 @@ extension Homa {
 
     // MARK: Private
 
-    private typealias GramState = (gram: Homa.Gram?, isExplicit: Bool)
+    private typealias GramState = (gram: Homa.Gram?, isExplicit: Bool, segLength: Int)
   }
 }

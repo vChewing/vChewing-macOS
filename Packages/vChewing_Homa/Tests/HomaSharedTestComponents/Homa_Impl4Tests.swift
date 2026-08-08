@@ -66,7 +66,7 @@ extension Homa.Assembler {
     var result = [Homa.CandidatePairWeighted]()
     guard !keys.isEmpty else { return result }
     let location = max(min(location, keys.count - 1), 0) // 防呆
-    let anchors: [(location: Int, node: Homa.Node)] = fetchOverlappingNodes(at: location)
+    let anchors: [(location: Int, segLength: Int, node: Homa.Node)] = fetchOverlappingNodes(at: location)
     let keyAtCursor = keys[location]
     let cursorAlternatives = keyAtCursor.allValues
     anchors.forEach { anchor in
