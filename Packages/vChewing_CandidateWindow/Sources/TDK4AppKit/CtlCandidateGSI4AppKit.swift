@@ -94,7 +94,10 @@ extension GSI4AppKit {
           suppressAnimationOnce = true
           delegate?.candidatePairHighlightChanged(at: visible ? 0 : nil)
           // 關閉選字窗時清除上次的候選字詞內容，確保下一次開啟必定重建資料池。
-          if !visible { lastCandidates = [] }
+          if !visible {
+            lastCandidates = []
+            lastDisplayConfig = nil
+          }
         }
         asyncOnMain { [weak self] in
           guard let this = self else { return }
@@ -147,10 +150,18 @@ extension GSI4AppKit {
       currentLayout = candidateLayout
       maxLinesPerPage = delegate.isCandidateWindowSingleLine ? 1 : 4
 
-      // 內容去重：候選字詞未變時跳過資料池重建（僅刷新顯示），
+      // 內容去重：候選字詞與顯示組態皆未變時跳過資料池重建（僅刷新顯示），
       // 以節省游標移動、重開選字窗等場合下不必要的重建開銷。
       let candidates = delegate.candidatePairs(conv: true)
-      if !candidatesEqual(candidates, lastCandidates) {
+      let displayConfig = TDK4AppKit.CandidateDisplayConfig(
+        maxLinesPerPage: maxLinesPerPage,
+        isExpanded: delegate.shouldAutoExpandCandidates,
+        selectionKeys: delegate.selectionKeys,
+        layout: currentLayout,
+        locale: delegate.localeForFontFallbacks
+      )
+      if candidates.isEmpty || !candidatesEqual(candidates, lastCandidates)
+        || displayConfig != lastDisplayConfig {
         Self.thePool.reinit(
           candidates: candidates,
           lines: maxLinesPerPage,
@@ -161,6 +172,7 @@ extension GSI4AppKit {
         )
         Self.thePool.highlight(at: 0)
         lastCandidates = candidates
+        lastDisplayConfig = displayConfig
       }
       Self.thePool.tooltip = tooltip
       Self.thePool.reverseLookupResult = reverseLookupResult
@@ -333,6 +345,9 @@ extension GSI4AppKit {
 
     /// 上次 reloadData 時取得的候選字詞內容，用於跳過內容未變的重建。
     private var lastCandidates: [CandidateInState] = []
+
+    /// 上次建池時的顯示組態快照；與現行組態不符時必須重建資料池。
+    private var lastDisplayConfig: TDK4AppKit.CandidateDisplayConfig?
 
     private let prefs = PrefMgr.sharedSansDidSetOps
 

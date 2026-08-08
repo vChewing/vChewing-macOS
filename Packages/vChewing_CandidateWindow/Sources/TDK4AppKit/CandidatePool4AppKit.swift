@@ -13,6 +13,16 @@ import SwiftExtension
 // MARK: - TDK4AppKit.CandidatePool4AppKit
 
 extension TDK4AppKit {
+  /// reloadData 去重用的顯示組態快照：任一項變動都必須重建資料池，
+  /// 否則會沿用前次建池時的版面、選字鍵、展頁狀態或字型區域設定。
+  struct CandidateDisplayConfig: Equatable {
+    var maxLinesPerPage: Int
+    var isExpanded: Bool
+    var selectionKeys: String
+    var layout: UILayoutOrientation
+    var locale: String
+  }
+
   // MARK: - CandidatePool
 
   /// 選字窗會用到的資料池單位，即用即拋。
@@ -878,12 +888,16 @@ extension TDK4AppKit.CandidatePool4AppKit {
   ///   - lines: 要排版的行陣列。
   ///   - initialOrigin: 排版起點。
   ///   - startingLineIndex: 第一行對應的 candidateLines 行序；nil 表示不寫回。
+  ///   - realLineCount: 傳入行陣列中真實行的數量；僅前 realLineCount 行會被寫回。
+  ///     nil 表示全部視為真實行。末頁不足 maxLinesPerPage 時，翻頁可能讓行範圍落在
+  ///     資料池中段，此時填充行的寫回目標仍在 candidateLines 範圍內，必須靠此參數攔截。
   /// - Returns: 排版後的總累積尺寸（不含 originDelta 外圍 padding）與排版後的行陣列。
   @discardableResult
   private func layoutCells(
     in lines: [[CandidateCellData4AppKit]],
     initialOrigin: CGPoint,
-    startingLineIndex: Int? = nil
+    startingLineIndex: Int? = nil,
+    realLineCount: Int? = nil
   )
     -> (size: CGSize, lines: [[CandidateCellData4AppKit]]) {
     // 屬性字串快取僅存活於一次排版→繪製循環內，排版前一律清空。
@@ -940,8 +954,8 @@ extension TDK4AppKit.CandidatePool4AppKit {
         }
       }
 
-      // 寫回資料池（僅限真實行；throwaway 行超出資料池行數範圍，自然被跳過）。
-      if let startingLineIndex {
+      // 寫回資料池（僅限真實行；填充行藉 realLineCount 攔截，避免覆寫資料池中段的真實行）。
+      if let startingLineIndex, lineOffset < (realLineCount ?? candidateLines.count) {
         let targetLineIndex = startingLineIndex + lineOffset
         if (0 ..< candidateLines.count).contains(targetLineIndex) {
           candidateLines[targetLineIndex] = resultLines[lineOffset]
@@ -987,7 +1001,8 @@ extension TDK4AppKit.CandidatePool4AppKit {
     // 第一趟：排版 cell，取得總尺寸與排版後的行陣列。
     let layoutResult = layoutCells(
       in: currentPageLines, initialOrigin: initialOrigin,
-      startingLineIndex: lineRangeForCurrentPage.lowerBound
+      startingLineIndex: lineRangeForCurrentPage.lowerBound,
+      realLineCount: lineRangeForCurrentPage.count
     )
     var totalAccuSize = layoutResult.size
     currentPageLines = layoutResult.lines
