@@ -52,6 +52,8 @@ final class TrieStringPool: @unchecked Sendable {
       valuePool.removeAll(keepingCapacity: true)
       keyPoolOrder.removeAll(keepingCapacity: true)
       valuePoolOrder.removeAll(keepingCapacity: true)
+      keyPoolOrderHead = 0
+      valuePoolOrderHead = 0
     }
   }
 
@@ -62,18 +64,29 @@ final class TrieStringPool: @unchecked Sendable {
   private var valuePool: [String: String] = [:]
   private var keyPoolOrder: [String] = []
   private var valuePoolOrder: [String] = []
+  /// 佇列頭偏移：逐出時僅前移偏移量（O(1)），累積到一定量再一次壓實陣列（攤還 O(1)）。
+  private var keyPoolOrderHead = 0
+  private var valuePoolOrderHead = 0
   private let lock = NSLock()
 
   private func evictKeyIfNeeded() {
-    guard keyPool.count >= maxPoolSize, let oldest = keyPoolOrder.first else { return }
-    keyPool.removeValue(forKey: oldest)
-    keyPoolOrder.removeFirst()
+    guard keyPool.count >= maxPoolSize, keyPoolOrderHead < keyPoolOrder.count else { return }
+    keyPool.removeValue(forKey: keyPoolOrder[keyPoolOrderHead])
+    keyPoolOrderHead += 1
+    if keyPoolOrderHead >= maxPoolSize {
+      keyPoolOrder.removeFirst(keyPoolOrderHead)
+      keyPoolOrderHead = 0
+    }
   }
 
   private func evictValueIfNeeded() {
-    guard valuePool.count >= maxPoolSize, let oldest = valuePoolOrder.first else { return }
-    valuePool.removeValue(forKey: oldest)
-    valuePoolOrder.removeFirst()
+    guard valuePool.count >= maxPoolSize, valuePoolOrderHead < valuePoolOrder.count else { return }
+    valuePool.removeValue(forKey: valuePoolOrder[valuePoolOrderHead])
+    valuePoolOrderHead += 1
+    if valuePoolOrderHead >= maxPoolSize {
+      valuePoolOrder.removeFirst(valuePoolOrderHead)
+      valuePoolOrderHead = 0
+    }
   }
 }
 
