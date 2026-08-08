@@ -126,14 +126,14 @@ extension TDK4AppKit.VwrCandidateTDK4AppKit {
         ).fill()
         cellHighlightedDrawn = true
       }
-      currentCell.attributedStringHeader.draw(
+      thePool.attributedStringHeader(for: currentCell).draw(
         at:
         .init(
           x: currentCell.visualOrigin.x + 2 * padding,
           y: currentCell.visualOrigin.y + ceil(currentCell.visualDimension.height * 0.2)
         )
       )
-      currentCell.attributedStringPhrase(isMatrix: false).draw(
+      thePool.attributedStringPhrase(for: currentCell, isMatrix: false).draw(
         at: .init(
           x: currentCell.visualOrigin.x + 2 * padding + ceil(currentCell.size * 0.6),
           y: currentCell.visualOrigin.y + padding

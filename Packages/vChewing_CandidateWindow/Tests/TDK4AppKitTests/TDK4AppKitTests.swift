@@ -317,4 +317,39 @@ struct TDK4AppKitTests {
     pool.resetScrollOffset()
     #expect(pool.scrollOffset == 0, "重置後 scrollOffset 應歸零")
   }
+
+  /// 迴歸鎖定：struct 值語義下 candidateLines 與 candidateDataAll 各自持獨立副本，
+  /// 高亮狀態必須同步寫入兩份陣列——視圖繪製、展頁判定（expandIfNeeded 的
+  /// 「目前頁內含高亮 cell」guard）與高亮排版矩形（圓角半徑的輸入）都讀 candidateLines。
+  @Test
+  func testHighlightSyncsCandidateLinesAndMetrics() throws {
+    let pool = TDK4AppKit.CandidatePool4AppKit(
+      candidates: variableCandidatesINMU, lines: 4, isExpanded: true,
+      selectionKeys: "123456", layout: .horizontal
+    )
+    // 初始：索引 0 高亮，candidateLines 內的對應 cell 必須同步。
+    var highlightedInLines = pool.candidateLines.flatMap { $0 }.filter(\.isHighlighted)
+    #expect(highlightedInLines.count == 1)
+    #expect(highlightedInLines.first?.index == 0)
+
+    // 移動高亮後：candidateLines 內的高亮 cell 需同步移動（方向鍵高亮移動的繪製來源）。
+    pool.highlight(at: 3)
+    highlightedInLines = pool.candidateLines.flatMap { $0 }.filter(\.isHighlighted)
+    #expect(highlightedInLines.count == 1)
+    #expect(highlightedInLines.first?.index == 3)
+
+    // 展頁判定所依賴的「目前頁內含高亮 cell」必須成立。
+    let shown = pool.candidateLines[pool.lineRangeForCurrentPage].flatMap { $0 }
+    #expect(!shown.filter(\.isHighlighted).isEmpty, "目前頁內應含高亮 cell（展頁 guard 依賴）")
+
+    // 高亮排版矩形（cellRadius / windowRadius 的輸入）不得為零，否則視窗圓角塌縮成方型。
+    pool.updateMetrics()
+    #expect(pool.metrics.highlightedCandidate.height > 0, "高亮排版矩形不得為零（圓角半徑輸入）")
+
+    // 選字鍵需同步寫入 candidateDataAll（兩陣列保持一致）：
+    // 鍵值 = selectionKeys 的第 subIndex 個字元（subIndex 為 cell 在其行內的欄位）。
+    let cell = pool.candidateDataAll[3]
+    let expectedKey = pool.selectionKeys.map(\.description)[cell.subIndex]
+    #expect(cell.selectionKey == expectedKey, "高亮 cell 的選字鍵應為其 subIndex 對應鍵")
+  }
 }
