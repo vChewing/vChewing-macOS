@@ -436,13 +436,18 @@ extension Homa {
     private struct GramQueryCacheKey: Hashable {
       // MARK: Lifecycle
 
-      init(_ keyArray: [PossibleKey]) {
+      init(_ keyArray: ArraySlice<PossibleKey>) {
         self.keyArray = keyArray
+      }
+
+      init(_ keyArray: [PossibleKey]) {
+        self.keyArray = keyArray[...]
       }
 
       // MARK: Internal
 
-      let keyArray: [PossibleKey]
+      // 直接存放切片（內容比對），避免每次查詢都配置一次性 Array。
+      let keyArray: ArraySlice<PossibleKey>
     }
 
     private static let maxCachedGramQueries = 512
@@ -479,8 +484,7 @@ extension Homa {
       _ alternativesSlice: ArraySlice<PossibleKey>
     )
       -> [Homa.Gram] {
-      let keyArray = Array(alternativesSlice)
-      return queryGrams(using: keyArray)
+      queryGrams(using: alternativesSlice)
     }
 
     /// 從元圖存取專用 API 將獲取的結果轉為元圖、以供 Nodes 使用。
@@ -493,11 +497,19 @@ extension Homa {
       using keyArray: [PossibleKey]
     )
       -> [Homa.Gram] {
-      let cacheKey = GramQueryCacheKey(keyArray)
+      queryGrams(using: keyArray[...])
+    }
+
+    /// 以讀音陣列切片查詢：快取命中時零配置，未命中時才為 gramQuerier 具體化 Array。
+    private func queryGrams(
+      using keyArraySlice: ArraySlice<PossibleKey>
+    )
+      -> [Homa.Gram] {
+      let cacheKey = GramQueryCacheKey(keyArraySlice)
       if let cached = gramQueryCache[cacheKey] {
         return cached
       }
-      var newResult = gramQuerier(keyArray)
+      var newResult = gramQuerier(Array(keyArraySlice))
       newResult.sort(by: Self.sortGram)
       // 就地去重（依身份雜湊），與舊版「sorted + compactMap」的語義完全一致：
       // 依排序後的順序保留每個身份的第一個出現，且不額外建立一次性陣列。
