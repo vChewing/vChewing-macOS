@@ -64,26 +64,34 @@ extension ChineseConverter {
     return result
   }
 
-  /// 繁簡轉換結果的快取（keyed by 原始字串），僅供 kanjiConversionIfRequired 使用。
-  /// 每個條目帶 config 指紋；指紋一變即視為 miss 並覆寫。容量封頂 4096 筆，滿時整池清空。
-  private static var kanjiConversionCache: [String: (result: String, fingerprint: Int)] = [:]
-  private static let kanjiConversionCacheLock = NSLock()
+  /// 影響繁簡轉換結果的 config 快照；任一項變動都會使對應快取條目失效。
+  private struct KanjiConversionConfig: Equatable {
+    static var current: Self {
+      .init(
+        cassetteEnabled: PrefMgr.shared.cassetteEnabled,
+        forceCassetteChineseConversion: PrefMgr.shared.forceCassetteChineseConversion,
+        inputMode: IMEApp.currentInputMode,
+        chineseConversionEnabled: PrefMgr.shared.chineseConversionEnabled,
+        shiftJISShinjitaiOutputEnabled: PrefMgr.shared.shiftJISShinjitaiOutputEnabled
+      )
+    }
 
-  /// 當前影響繁簡轉換結果的 config 指紋。
-  private static var kanjiConversionFingerprint: Int {
-    var hasher = Hasher()
-    hasher.combine(PrefMgr.shared.cassetteEnabled)
-    hasher.combine(PrefMgr.shared.forceCassetteChineseConversion)
-    hasher.combine(IMEApp.currentInputMode)
-    hasher.combine(PrefMgr.shared.chineseConversionEnabled)
-    hasher.combine(PrefMgr.shared.shiftJISShinjitaiOutputEnabled)
-    return hasher.finalize()
+    var cassetteEnabled: Bool
+    var forceCassetteChineseConversion: Int
+    var inputMode: Shared.InputMode
+    var chineseConversionEnabled: Bool
+    var shiftJISShinjitaiOutputEnabled: Bool
   }
 
+  /// 繁簡轉換結果的快取（keyed by 原始字串），僅供 kanjiConversionIfRequired 使用。
+  /// 每個條目帶 config 快照；快照一變即視為 miss 並覆寫。容量封頂 4096 筆，滿時整池清空。
+  private static var kanjiConversionCache: [String: (result: String, config: KanjiConversionConfig)] = [:]
+  private static let kanjiConversionCacheLock = NSLock()
+
   public static func kanjiConversionIfRequired(_ text: String) -> String {
-    let fingerprint = kanjiConversionFingerprint
+    let config = KanjiConversionConfig.current
     kanjiConversionCacheLock.lock()
-    if let cached = kanjiConversionCache[text], cached.fingerprint == fingerprint {
+    if let cached = kanjiConversionCache[text], cached.config == config {
       kanjiConversionCacheLock.unlock()
       return cached.result
     }
@@ -91,7 +99,7 @@ extension ChineseConverter {
     let result = performKanjiConversionIfRequired(text)
     kanjiConversionCacheLock.lock()
     if kanjiConversionCache.count >= 4_096 { kanjiConversionCache.removeAll() }
-    kanjiConversionCache[text] = (result: result, fingerprint: fingerprint)
+    kanjiConversionCache[text] = (result: result, config: config)
     kanjiConversionCacheLock.unlock()
     return result
   }
