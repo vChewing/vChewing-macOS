@@ -352,4 +352,56 @@ struct TDK4AppKitTests {
     let expectedKey = pool.selectionKeys.map(\.description)[cell.subIndex]
     #expect(cell.selectionKey == expectedKey, "高亮 cell 的選字鍵應為其 subIndex 對應鍵")
   }
+
+  /// 迴歸鎖定：任何翻頁／翻行／跳轉操作序列之後，updateMetrics 附加的空白填充行
+  /// 皆不得寫回 candidateLines——真實候選行的內容與索引必須始終保持建池時的原樣，
+  /// 否則填充範本（💩 cell）會覆寫真實候選行、污染後續繪製與點擊判定。
+  @Test
+  func testNavigationNeverCorruptsCandidateLines() throws {
+    for layout in [UILayoutOrientation.horizontal, .vertical] {
+      let pool = TDK4AppKit.CandidatePool4AppKit(
+        candidates: variableCandidatesINMU, lines: 4, isExpanded: true,
+        selectionKeys: "1234", layout: layout
+      )
+      let expectedLines = pool.candidateLines.map { $0.map(\.displayedText) }
+      let expectedIndices = pool.candidateLines.map { $0.map(\.index) }
+      let totalLines = pool.candidateLines.count
+      #expect(totalLines > 4, "前置條件：總行數應大於每頁行數")
+
+      // 涵蓋頁面往返、行往返、邊界回繞與跳轉的操作序列。
+      let operations: [(String, () -> ())] = [
+        ("翻至末頁", { while pool.flipPage(isBackward: false) {} }),
+        ("逐行至末行", { while pool.consecutivelyFlipLines(isBackward: false, count: 1) {} }),
+        ("回繞高亮", { pool.highlightNeighborCandidate(isBackward: false) }),
+        ("翻回首頁", { while pool.flipPage(isBackward: true) {} }),
+        ("逐行回首行", { while pool.consecutivelyFlipLines(isBackward: true, count: 1) {} }),
+        ("跳轉至末位", { pool.highlight(at: pool.candidateDataAll.count - 1) }),
+        ("跳轉回首位", { pool.highlight(at: 0) }),
+        ("末頁附近往返", {
+          pool.highlight(at: pool.candidateDataAll.count - 1)
+          pool.flipPage(isBackward: true)
+          pool.flipPage(isBackward: false)
+          pool.consecutivelyFlipLines(isBackward: true, count: 1)
+        }),
+      ]
+      for (name, operation) in operations {
+        operation()
+        pool.updateMetrics()
+        let actualLines = pool.candidateLines.map { $0.map(\.displayedText) }
+        let actualIndices = pool.candidateLines.map { $0.map(\.index) }
+        #expect(
+          actualLines == expectedLines,
+          "\(layout) \(name)後：候選行內容不得被填充行覆寫"
+        )
+        #expect(
+          actualIndices == expectedIndices,
+          "\(layout) \(name)後：候選行索引不得被填充行覆寫"
+        )
+        #expect(
+          !actualLines.flatMap(\.self).contains("💩"),
+          "\(layout) \(name)後：資料池內不得出現填充範本 cell"
+        )
+      }
+    }
+  }
 }
