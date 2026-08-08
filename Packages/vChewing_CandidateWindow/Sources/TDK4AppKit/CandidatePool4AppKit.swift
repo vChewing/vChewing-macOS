@@ -70,8 +70,8 @@ extension TDK4AppKit {
     }
 
     // 只用來測量單漢字候選字 cell 的最大可能寬度。
-    static let shitCell = CandidateCellData4AppKit(key: " ", displayedText: "💩", isSelected: false)
-    static let blankCell = CandidateCellData4AppKit(key: " ", displayedText: "　", isSelected: false)
+    static var shitCell = CandidateCellData4AppKit(key: " ", displayedText: "💩", isSelected: false)
+    static var blankCell = CandidateCellData4AppKit(key: " ", displayedText: "　", isSelected: false)
 
     private(set) var _maxLinesPerPage: Int
     private(set) var layout: UILayoutOrientation
@@ -330,9 +330,16 @@ extension TDK4AppKit {
       tooltip = ""
       reverseLookupResult = []
       readingDisambiguationResult = nil
+      headerCache.removeAll()
+      phraseCache.removeAll()
     }
 
     // MARK: Private
+
+    /// 選字鍵屬性字串快取（keyed by cell.index），僅存活於一次排版→繪製循環內。
+    private var headerCache: [Int: NSAttributedString] = [:]
+    /// 候選字詞屬性字串快取（keyed by cell.index，再依 isMatrix 分層）。
+    private var phraseCache: [Int: [Bool: NSAttributedString]] = [:]
 
     private var recordedLineRangeForCurrentPage: Range<Int>?
     private var previouslyRecordedLineRangeForPreviousPage: Range<Int>?
@@ -366,7 +373,8 @@ extension TDK4AppKit {
       var currentColumn: [CandidateCellData4AppKit] = []
       let minCellWidth = Self.blankCell.cellLength()
       let shouldCalculateRowWidth = (layout == .horizontal)
-      for (i, candidate) in candidateDataAll.enumerated() {
+      for i in candidateDataAll.indices {
+        var candidate = candidateDataAll[i]
         candidate.index = i
         candidate.whichLine = candidateLines.count
         var isOverflown: Bool = (currentColumn.count == maxLineCapacity) && !currentColumn.isEmpty
@@ -387,6 +395,8 @@ extension TDK4AppKit {
         candidate.subIndex = currentColumn.count
         candidate.locale = locale
         currentColumn.append(candidate)
+        // 寫回資料池（struct 值語義：candidateDataAll 與 candidateLines 各自持有副本）。
+        candidateDataAll[i] = candidate
       }
       candidateLines.append(currentColumn)
       recordedLineRangeForCurrentPage = fallbackedLineRangeForCurrentPage
@@ -514,19 +524,38 @@ extension TDK4AppKit.CandidatePool4AppKit {
       default: break
       }
     }
-    for (i, candidate) in candidateDataAll.enumerated() {
-      candidate.isHighlighted = (indexSpecified == i)
-      if candidate.isHighlighted { currentLineNumber = candidate.whichLine }
+    // 高亮狀態需同步寫入 candidateDataAll 與 candidateLines 兩份陣列（struct 值語義下
+    // 兩者各持獨立副本）：candidateDataAll 是索引查詢的真源，candidateLines 是視圖繪製、
+    // 展頁判定與高亮排版矩形的讀取源。以 cell.index 對映兩陣列的同一邏輯 cell。
+    for i in candidateDataAll.indices {
+      let isHighlighted = (indexSpecified == i)
+      candidateDataAll[i].isHighlighted = isHighlighted
+      if isHighlighted { currentLineNumber = candidateDataAll[i].whichLine }
+      let lineIndex = candidateDataAll[i].whichLine
+      let subIndex = candidateDataAll[i].subIndex
+      if candidateLines.indices.contains(lineIndex),
+         candidateLines[lineIndex].indices.contains(subIndex) {
+        candidateLines[lineIndex][subIndex].isHighlighted = isHighlighted
+      }
     }
     for (i, candidateColumn) in candidateLines.enumerated() {
       if i != currentLineNumber {
-        candidateColumn.forEach {
-          $0.selectionKey = " "
+        for j in candidateLines[i].indices {
+          candidateLines[i][j].selectionKey = " "
+          let flatIndex = candidateLines[i][j].index
+          if candidateDataAll.indices.contains(flatIndex) {
+            candidateDataAll[flatIndex].selectionKey = " "
+          }
         }
       } else {
-        for (i, neta) in candidateColumn.enumerated() {
+        for (j, neta) in candidateColumn.enumerated() {
           if neta.selectionKey.isEmpty { continue }
-          neta.selectionKey = selectionKeys.map(\.description)[i]
+          let key = selectionKeys.map(\.description)[j]
+          candidateLines[i][j].selectionKey = key
+          let flatIndex = candidateLines[i][j].index
+          if candidateDataAll.indices.contains(flatIndex) {
+            candidateDataAll[flatIndex].selectionKey = key
+          }
         }
       }
     }
@@ -843,38 +872,52 @@ private final class RoundedBadgeTextAttachmentCell: NSTextAttachmentCell {
 
 extension TDK4AppKit.CandidatePool4AppKit {
   /// 排版給定的行陣列：計算每顆 cell 的 visualOrigin / visualDimension 並返回總累積尺寸。
+  /// 幾何資料會按 startingLineIndex 對應的行序寫回資料池的 candidateLines（struct 值語義）。
+  /// 傳入的 throwaway 行（如 updateMetrics 內的空白填充行）若超出資料池行數範圍，則不會被寫回。
   /// - Parameters:
   ///   - lines: 要排版的行陣列。
   ///   - initialOrigin: 排版起點。
-  /// - Returns: 排版後的總累積尺寸（不含 originDelta 外圍 padding）。
+  ///   - startingLineIndex: 第一行對應的 candidateLines 行序；nil 表示不寫回。
+  /// - Returns: 排版後的總累積尺寸（不含 originDelta 外圍 padding）與排版後的行陣列。
   @discardableResult
   private func layoutCells(
     in lines: [[CandidateCellData4AppKit]],
-    initialOrigin: CGPoint
+    initialOrigin: CGPoint,
+    startingLineIndex: Int? = nil
   )
-    -> CGSize {
+    -> (size: CGSize, lines: [[CandidateCellData4AppKit]]) {
+    // 屬性字串快取僅存活於一次排版→繪製循環內，排版前一律清空。
+    headerCache.removeAll()
+    phraseCache.removeAll()
     var totalAccuSize = CGSize.zero
     var currentOrigin = initialOrigin
+    var resultLines = lines
 
-    Self.shitCell.isHighlighted = false
-    Self.shitCell.updateMetrics(pool: self, origin: currentOrigin)
+    // 先拷貝出模板 cell 再就地變更，避免對 static var 的 mutating 存取與
+    // 內部 cellWidth(_:) 對同一 static var 的重疊讀取造成 exclusivity 衝突。
+    var templateCell = Self.shitCell
+    templateCell.isHighlighted = false
+    templateCell.updateMetrics(pool: self, origin: currentOrigin)
+    Self.shitCell = templateCell
     let minimumCellDimension = Self.shitCell.visualDimension
     let minCellWidth = Self.blankCell.cellLength()
 
-    for currentLine in lines {
+    for (lineOffset, currentLine) in resultLines.enumerated() {
       var accumulatedLineSize = CGSize.zero
 
-      for currentCell in currentLine {
-        currentCell.updateMetrics(pool: self, origin: currentOrigin)
-        var cellDimension = currentCell.visualDimension
+      for (cellID, currentCell) in currentLine.enumerated() {
+        var updatedCell = currentCell
+        updatedCell.updateMetrics(pool: self, origin: currentOrigin)
+        var cellDimension = updatedCell.visualDimension
 
         if layout == .horizontal, isMatrix {
-          cellDimension.width = currentCell.cellWidthMultiplied(minCellWidth: minCellWidth)
-        } else if layout == .vertical || currentCell.displayedText.count <= 2 {
+          cellDimension.width = updatedCell.cellWidthMultiplied(minCellWidth: minCellWidth)
+        } else if layout == .vertical || updatedCell.displayedText.count <= 2 {
           cellDimension.width = max(minimumCellDimension.width, cellDimension.width)
         }
         cellDimension.height = max(minimumCellDimension.height, cellDimension.height)
-        currentCell.visualDimension.width = cellDimension.width
+        updatedCell.visualDimension.width = cellDimension.width
+        resultLines[lineOffset][cellID] = updatedCell
 
         switch layout {
         case .horizontal:
@@ -892,7 +935,17 @@ extension TDK4AppKit.CandidatePool4AppKit {
       }
 
       if layout == .vertical {
-        currentLine.forEach { $0.visualDimension.width = accumulatedLineSize.width }
+        for cellID in resultLines[lineOffset].indices {
+          resultLines[lineOffset][cellID].visualDimension.width = accumulatedLineSize.width
+        }
+      }
+
+      // 寫回資料池（僅限真實行；throwaway 行超出資料池行數範圍，自然被跳過）。
+      if let startingLineIndex {
+        let targetLineIndex = startingLineIndex + lineOffset
+        if (0 ..< candidateLines.count).contains(targetLineIndex) {
+          candidateLines[targetLineIndex] = resultLines[lineOffset]
+        }
       }
 
       switch layout {
@@ -909,7 +962,7 @@ extension TDK4AppKit.CandidatePool4AppKit {
       }
     }
 
-    return totalAccuSize
+    return (totalAccuSize, resultLines)
   }
 
   func updateMetrics() {
@@ -931,8 +984,13 @@ extension TDK4AppKit.CandidatePool4AppKit {
       blankLines -= 1
     }
 
-    // 第一趟：排版 cell，取得總尺寸。
-    var totalAccuSize = layoutCells(in: currentPageLines, initialOrigin: initialOrigin)
+    // 第一趟：排版 cell，取得總尺寸與排版後的行陣列。
+    let layoutResult = layoutCells(
+      in: currentPageLines, initialOrigin: initialOrigin,
+      startingLineIndex: lineRangeForCurrentPage.lowerBound
+    )
+    var totalAccuSize = layoutResult.size
+    currentPageLines = layoutResult.lines
 
     // 第二趟：從已排好的 cell 中反推 highlighted rects。
     var highlightedCellRect: CGRect = .zero
@@ -1030,7 +1088,65 @@ extension TDK4AppKit.CandidatePool4AppKit {
   /// 計算全部候選行（不含底部欄位）的完整尺寸，並一併更新所有 cell 的 visualOrigin。
   /// 供 GSI scroll mode 使用，以便 draw(_:) 可以繪製全部候選行。
   func computeCandidateOnlySize() {
-    candidateOnlySize = layoutCells(in: candidateLines, initialOrigin: .zero)
+    candidateOnlySize = layoutCells(
+      in: candidateLines, initialOrigin: .zero, startingLineIndex: 0
+    ).size
+  }
+}
+
+// MARK: - Attributed String Accessors (with pool-level caching).
+
+extension TDK4AppKit.CandidatePool4AppKit {
+  /// 取得指定 cell 的「選字鍵」屬性字串（以 cell.index 為鍵的池級快取）。
+  func attributedStringHeader(for cell: CandidateCellData4AppKit) -> NSAttributedString {
+    if let cached = headerCache[cell.index] { return cached }
+    let result = cell.makeAttributedStringHeader()
+    headerCache[cell.index] = result
+    return result
+  }
+
+  /// 取得指定 cell 的「候選字詞」屬性字串（以 cell.index 為鍵的池級快取）。
+  func attributedStringPhrase(
+    for cell: CandidateCellData4AppKit, isMatrix: Bool
+  )
+    -> NSAttributedString {
+    if let cached = phraseCache[cell.index]?[isMatrix] { return cached }
+    let result = cell.makeAttributedStringPhrase(isMatrix: isMatrix)
+    if phraseCache[cell.index] == nil { phraseCache[cell.index] = [:] }
+    phraseCache[cell.index]?[isMatrix] = result
+    return result
+  }
+
+  /// 取得指定 cell 的組合屬性字串（選字鍵 + 候選字詞），組件走池級快取。
+  func attributedString(
+    for cell: CandidateCellData4AppKit,
+    noSpacePadding: Bool = true, withHighlight: Bool = false, isMatrix: Bool = false
+  )
+    -> NSAttributedString {
+    let attrSpace: [NSAttributedString.Key: Any] = [
+      .kern: 0,
+      .font: cell.phraseFont(size: cell.size),
+      .paragraphStyle: CandidateCellData4AppKit.sharedParagraphStyle,
+    ]
+    let result: NSMutableAttributedString = {
+      if noSpacePadding {
+        let resultNeo = NSMutableAttributedString(string: " ", attributes: attrSpace)
+        resultNeo.insert(attributedStringPhrase(for: cell, isMatrix: isMatrix), at: 1)
+        resultNeo.insert(attributedStringHeader(for: cell), at: 0)
+        return resultNeo
+      }
+      let resultNeo = NSMutableAttributedString(string: "   ", attributes: attrSpace)
+      resultNeo.insert(attributedStringPhrase(for: cell, isMatrix: isMatrix), at: 2)
+      resultNeo.insert(attributedStringHeader(for: cell), at: 1)
+      return resultNeo
+    }()
+    if withHighlight, cell.isHighlighted {
+      result.addAttribute(
+        .backgroundColor, value: cell.themeColorCocoa,
+        range: NSRange(location: 0, length: result.string.utf16.count)
+      )
+    }
+    return result
   }
 }
 
@@ -1062,7 +1178,8 @@ extension TDK4AppKit.CandidatePool4AppKit {
       let arrLine = candidateLines[lineID]
       arrLine.enumerated().forEach { cellID, currentCell in
         let cellString = NSMutableAttributedString(
-          attributedString: currentCell.attributedString(
+          attributedString: attributedString(
+            for: currentCell,
             noSpacePadding: false,
             withHighlight: true,
             isMatrix: isMatrix
@@ -1107,7 +1224,8 @@ extension TDK4AppKit.CandidatePool4AppKit {
         if !(0 ..< lineData.count).contains(inlineIndex) { continue }
         let currentCell = lineData[inlineIndex]
         let cellString = NSMutableAttributedString(
-          attributedString: currentCell.attributedString(
+          attributedString: attributedString(
+            for: currentCell,
             noSpacePadding: false,
             withHighlight: true,
             isMatrix: isMatrix

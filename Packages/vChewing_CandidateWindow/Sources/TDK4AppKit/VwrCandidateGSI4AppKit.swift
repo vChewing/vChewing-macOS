@@ -234,13 +234,13 @@ extension GSI4AppKit.VwrCandidateGSI4AppKit {
         let lineHeight = line.map(\.visualDimension.height).max() ?? 0
         guard lineTop + lineHeight > clipMinY, lineTop < clipMaxY else { continue }
         for cell in line {
-          cell.attributedStringHeader.draw(
+          thePool.attributedStringHeader(for: cell).draw(
             at: CGPoint(
               x: cell.visualOrigin.x + 2 * padding + drawOffsetX,
               y: cell.visualOrigin.y + cell.headerDrawYOffset + drawOffsetY
             )
           )
-          cell.attributedStringPhrase(isMatrix: false).draw(
+          thePool.attributedStringPhrase(for: cell, isMatrix: false).draw(
             at: CGPoint(
               x: cell.visualOrigin.x + 2 * padding + cell.phraseDrawXOffset + drawOffsetX,
               y: cell.visualOrigin.y + padding + drawOffsetY
@@ -257,13 +257,13 @@ extension GSI4AppKit.VwrCandidateGSI4AppKit {
         let lineWidth = line.map(\.visualDimension.width).max() ?? 0
         guard lineLeft + lineWidth > clipMinX, lineLeft < clipMaxX else { continue }
         for cell in line {
-          cell.attributedStringHeader.draw(
+          thePool.attributedStringHeader(for: cell).draw(
             at: CGPoint(
               x: cell.visualOrigin.x + 2 * padding + drawOffsetX,
               y: cell.visualOrigin.y + cell.headerDrawYOffset + drawOffsetY
             )
           )
-          cell.attributedStringPhrase(isMatrix: false).draw(
+          thePool.attributedStringPhrase(for: cell, isMatrix: false).draw(
             at: CGPoint(
               x: cell.visualOrigin.x + 2 * padding + cell.phraseDrawXOffset + drawOffsetX,
               y: cell.visualOrigin.y + padding + drawOffsetY
@@ -308,13 +308,13 @@ extension GSI4AppKit.VwrCandidateGSI4AppKit {
         ).fill()
         cellHighlightedDrawn = true
       }
-      currentCell.attributedStringHeader.draw(
+      thePool.attributedStringHeader(for: currentCell).draw(
         at: .init(
           x: currentCell.visualOrigin.x + 2 * padding,
           y: currentCell.visualOrigin.y + currentCell.headerDrawYOffset
         )
       )
-      currentCell.attributedStringPhrase(isMatrix: false).draw(
+      thePool.attributedStringPhrase(for: currentCell, isMatrix: false).draw(
         at: .init(
           x: currentCell.visualOrigin.x + 2 * padding + currentCell.phraseDrawXOffset,
           y: currentCell.visualOrigin.y + padding

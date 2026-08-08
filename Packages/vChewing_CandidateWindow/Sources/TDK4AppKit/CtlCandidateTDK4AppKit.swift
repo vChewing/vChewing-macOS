@@ -89,6 +89,8 @@ extension TDK4AppKit {
         if oldValue != visible {
           suppressAnimationOnce = true
           delegate?.candidatePairHighlightChanged(at: visible ? 0 : nil)
+          // 關閉選字窗時清除上次的候選字詞內容，確保下一次開啟必定重建資料池。
+          if !visible { lastCandidates = [] }
         }
         asyncOnMain { [weak self] in
           guard let this = self else { return }
@@ -126,17 +128,23 @@ extension TDK4AppKit {
       currentLayout = candidateLayout
       maxLinesPerPage = delegate.isCandidateWindowSingleLine ? 1 : 4
 
-      Self.thePool.reinit(
-        candidates: delegate.candidatePairs(conv: true),
-        lines: maxLinesPerPage,
-        isExpanded: delegate.shouldAutoExpandCandidates,
-        selectionKeys: delegate.selectionKeys,
-        layout: currentLayout,
-        locale: delegate.localeForFontFallbacks
-      )
+      // 內容去重：候選字詞未變時跳過資料池重建（僅刷新顯示），
+      // 以節省游標移動、重開選字窗等場合下不必要的重建開銷。
+      let candidates = delegate.candidatePairs(conv: true)
+      if !candidatesEqual(candidates, lastCandidates) {
+        Self.thePool.reinit(
+          candidates: candidates,
+          lines: maxLinesPerPage,
+          isExpanded: delegate.shouldAutoExpandCandidates,
+          selectionKeys: delegate.selectionKeys,
+          layout: currentLayout,
+          locale: delegate.localeForFontFallbacks
+        )
+        Self.thePool.highlight(at: 0)
+        lastCandidates = candidates
+      }
       Self.thePool.tooltip = tooltip
       Self.thePool.reverseLookupResult = reverseLookupResult
-      Self.thePool.highlight(at: 0)
       updateDisplay()
     }
 
@@ -266,6 +274,9 @@ extension TDK4AppKit {
     private static let thePool: CandidatePool4AppKit = .init(candidates: [])
     private static let currentView: VwrCandidateTDK4AppKit = .init(thePool: thePool)
 
+    /// 上次 reloadData 時取得的候選字詞內容，用於跳過內容未變的重建。
+    private var lastCandidates: [CandidateInState] = []
+
     private let prefs = PrefMgr.sharedSansDidSetOps
 
     @objc
@@ -310,6 +321,11 @@ extension TDK4AppKit {
       textField.sizeToFit()
       textField.backgroundColor = .clear
       return textField
+    }
+
+    /// 比較兩組候選字詞內容是否一致（tuple 型別無法直接取得 Equatable conformance）。
+    private func candidatesEqual(_ lhs: [CandidateInState], _ rhs: [CandidateInState]) -> Bool {
+      lhs.count == rhs.count && zip(lhs, rhs).allSatisfy { $0 == $1 }
     }
 
     /// 針對給定的視窗目標尺寸，計算螢幕邊緣修正後的 top-left 坐標。
