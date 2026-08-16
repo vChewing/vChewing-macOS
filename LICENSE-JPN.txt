@@ -17,7 +17,6 @@ macOS 版唯音の開発：Shiki Suen。
 
 $ 他の用いた一部のモジュール:
 
-- SwiftUI VDKComboBox: (c) 2022 and onwards Bryan Jones (CC BY-SA 4.0)
 - Note that Hotenka Chinese Converter is rewritten by Shiki Suen (using Swift) from Nick Chen's Objective-C library "NCChineseConverter" (MIT License).
 
 [The previous upstream EULA contents have been removed since this project is not including program contents from McBopomofo anymore. You may refer to their EULA contents hosted in their repository (GitHub://OpenVanilla/McBopomofo/). OpenVanilla is both "the name of a FOSS software developer group" and the name of a software developed by them (GitHub://OpenVanilla/OpenVanilla/). The OpenVanilla software (and SpaceChewing, commonly referred as "香草注音") is totally different from McBopomofo and is out-of-topic.]

@@ -203,6 +203,7 @@ extension UserDefRendered {
 
 // MARK: - UserDefRenderable Extension
 
+@available(macOS 14, *)
 extension UserDefRenderable<String> {
   @ViewBuilder
   public func render() -> some View {
@@ -224,8 +225,9 @@ extension UserDefRenderable<String> {
               Spacer()
               ComboBox(
                 items: CandidateKey.suggestions,
-                text: binding
-              ).frame(width: 180)
+                text: binding,
+                width: 180
+              )
             }
           case (.string, .kAlphanumericalKeyboardLayout):
             Picker(LocalizedStringKey(metaData.shortTitle ?? ""), selection: binding) {
@@ -377,71 +379,36 @@ extension UserDefRenderable<Double> {
 
 // MARK: - ComboBox
 
-// Ref: https://stackoverflow.com/a/71058587/4162914
-// License: https://creativecommons.org/licenses/by-sa/4.0/
-
-@available(macOS 10.15, *)
-public struct ComboBox: NSViewRepresentable {
-  public final class Coordinator: NSObject, NSComboBoxDelegate {
-    // MARK: Lifecycle
-
-    public init(_ parent: ComboBox) {
-      self.parent = parent
-    }
-
-    // MARK: Public
-
-    public var parent: ComboBox
-    public var ignoreSelectionChanges = false
-
-    public func comboBoxSelectionDidChange(_ notification: Notification) {
-      if !ignoreSelectionChanges,
-         let box: NSComboBox = notification.object as? NSComboBox,
-         let newStringValue: String = box.objectValueOfSelectedItem as? String {
-        parent.text = newStringValue
-      }
-    }
-
-    public func controlTextDidEndEditing(_ obj: Notification) {
-      if let textField = obj.object as? NSTextField {
-        parent.text = textField.stringValue
-      }
-    }
-  }
-
+/// SwiftUI 原生下拉建議文字框：左側為可自由輸入的文字框，
+/// 右側為建議值選單按鈕，選取後將該值寫回文字框繫結。
+@available(macOS 14, *)
+public struct ComboBox: View {
   // The items that will show up in the pop-up menu:
   public var items: [String] = []
 
   // The property on our parent view that gets synced to the current
-  // stringValue of the NSComboBox, whether the user typed it in or
-  // selected it from the list:
+  // text content, whether the user typed it in or selected it from the list:
   @Binding
   public var text: String
 
-  public func makeCoordinator() -> Coordinator {
-    Coordinator(self)
-  }
+  // The overall width of the control, text field and menu button combined:
+  public var width: CGFloat = 128
 
-  public func makeNSView(context: Context) -> NSComboBox {
-    let comboBox = NSComboBox()
-    comboBox.usesDataSource = false
-    comboBox.completes = false
-    comboBox.delegate = context.coordinator
-    comboBox.intercellSpacing = CGSize(width: 0.0, height: 10.0)
-    return comboBox
-  }
-
-  public func updateNSView(_ nsView: NSComboBox, context: Context) {
-    nsView.removeAllItems()
-    nsView.addItems(withObjectValues: items)
-
-    // ComboBox doesn't automatically select the item matching its text;
-    // we must do that manually. But we need the delegate to ignore that
-    // selection-change or we'll get a "state modified during view update;
-    // will cause undefined behavior" warning.
-    context.coordinator.ignoreSelectionChanges = true
-    nsView.stringValue = text
-    nsView.selectItem(withObjectValue: text)
-    context.coordinator.ignoreSelectionChanges = false
+  public var body: some View {
+    HStack(spacing: 0) {
+      TextField("", text: $text)
+        .textFieldStyle(.roundedBorder)
+      Menu {
+        ForEach(items, id: \.self) { item in
+          Button(item) { text = item }
+        }
+      } label: {
+        Text("▾")
+      }
+      .menuStyle(.button)
+      .menuIndicator(.hidden)
+      .frame(width: 24)
+    }
+    .frame(width: width)
   }
 }

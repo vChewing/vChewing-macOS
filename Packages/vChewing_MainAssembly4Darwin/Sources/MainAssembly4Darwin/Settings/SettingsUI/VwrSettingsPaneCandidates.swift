@@ -128,16 +128,19 @@ private struct VwrSettingsPaneCandidates_SelectionKeys: View {
 
   var body: some View {
     UserDef.kCandidateKeys.renderUI {
-      let value = candidateKeys
-      let keys = value.trimmingCharacters(
-        in: .whitespacesAndNewlines
-      ).lowercased().deduplicated
-      // Start Error Handling.
-      if let errorResult = PrefMgr.shared.validate(candidateKeys: keys) {
-        if !keys.isEmpty {
-          IMEApp.buzz()
-          selectionKeyErrorMessage = errorResult
-          isShowingSelectionKeyError = true
+      // 文字框逐鍵即時寫回，故校驗需去抖動、待輸入停頓後再執行。
+      debouncer.schedule {
+        let value = candidateKeys
+        let keys = value.trimmingCharacters(
+          in: .whitespacesAndNewlines
+        ).lowercased().deduplicated
+        // Start Error Handling.
+        if let errorResult = PrefMgr.shared.validate(candidateKeys: keys) {
+          if !keys.isEmpty {
+            IMEApp.buzz()
+            selectionKeyErrorMessage = errorResult
+            isShowingSelectionKeyError = true
+          }
         }
       }
     }
@@ -156,6 +159,10 @@ private struct VwrSettingsPaneCandidates_SelectionKeys: View {
   }
 
   // MARK: Private
+
+  // 以 @State 持有實例、確保跨 body 重算仍為同一枚 Debouncer。
+  @State
+  private var debouncer = Debouncer(delay: 0.5, queue: .main)
 
   @State
   private var isShowingSelectionKeyError = false
