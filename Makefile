@@ -1,4 +1,4 @@
-+.PHONY: all
+.PHONY: all
 
 all: release
 install: install-release
@@ -31,9 +31,9 @@ spmLintFormat:
 spmClean:
 	swift package clean
 	@for currentDir in $$(ls ./Packages/); do \
-		if [ -d $$a ]; then \
+		if [ -d "./Packages/$$currentDir" ]; then \
 			echo "processing folder $$currentDir"; \
-			swift package clean --package-path ./Packages/$$currentDir || true; \
+			swift package clean --package-path "./Packages/$$currentDir" || true; \
 		fi; \
 	done;
 
@@ -198,11 +198,10 @@ install-release: release
 .PHONY: clean
 
 clean:
-	make clean --file=./Packages/Makefile || true
+	cd ./Packages/ && make clean --file=./Makefile || true
 	swift package clean || true
 	rm -rf Build/Products || true
 	rm -rf .build-universal || true
-	make clean --file=./DictionaryData/Makefile || true
 
 clean-spm:
 	find . -name ".build" -exec rm -rf {} \;

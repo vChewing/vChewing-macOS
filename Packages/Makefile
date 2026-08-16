@@ -1,4 +1,4 @@
-+.PHONY: all
+.PHONY: all
 
 all: debug
 
@@ -10,9 +10,9 @@ release:
 
 clean:
 	@for currentDir in $$(ls ./); do \
-		if [ -d $$a ]; then \
+		if [ -d "./$$currentDir" ]; then \
 			echo "processing folder $$currentDir"; \
-			swift package clean --package-path ./$$currentDir || true; \
+			swift package clean --package-path "./$$currentDir" || true; \
 		fi; \
 	done;
 
