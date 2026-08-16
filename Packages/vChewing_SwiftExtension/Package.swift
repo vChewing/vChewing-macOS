@@ -21,5 +21,14 @@ let package = Package(
         .defaultIsolation(MainActor.self), // set Default Actor Isolation
       ],
     ),
+    .testTarget(
+      name: "SwiftExtensionTests",
+      dependencies: [
+        "SwiftExtension",
+      ],
+      swiftSettings: [
+        .defaultIsolation(MainActor.self), // set Default Actor Isolation
+      ],
+    ),
   ]
 )

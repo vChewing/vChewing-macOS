@@ -9,7 +9,7 @@
 
 import Foundation
 import Homa
-import LineReader
+import SwiftExtension
 
 // MARK: - LMAssembly.LMCassette
 
@@ -940,7 +940,7 @@ nonisolated extension LMAssembly.LMCassette {
         guard let fileHandle = FileHandle(forReadingAtPath: path) else {
           throw LMAssembly.FileErrors.fileHandleError("")
         }
-        let lineReader = try LineReader(file: fileHandle)
+        let lineIterator = ByteLineIterator(file: fileHandle)
         var theMaxKeyLength = 1
         var loadingKeys = false
 
@@ -976,7 +976,8 @@ nonisolated extension LMAssembly.LMCassette {
         var loadingQuickPhrases = false
         var keysUsedInCharDef: Set<String> = .init()
 
-        for strLine in lineReader {
+        while let lineSlice = lineIterator.nextLine() {
+          let strLine = String(decoding: lineSlice, as: UTF8.self)
           let isTabDelimiting = strLine.contains("\t")
           let cells = isTabDelimiting
             ? strLine.split(separator: "\t")

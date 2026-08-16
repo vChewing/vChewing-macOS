@@ -17,7 +17,6 @@ let package = Package(
     ),
   ],
   dependencies: [
-    .package(path: "../RMJay_LineReader"),
     .package(path: "../vChewing_Homa"),
     .package(path: "../vChewing_Shared"),
     .package(path: "../vChewing_SwiftExtension"),
@@ -40,7 +39,6 @@ let package = Package(
       name: "LangModelAssembly",
       dependencies: [
         "TrieKit",
-        .product(name: "LineReader", package: "RMJay_LineReader"),
         .product(name: "Homa", package: "vChewing_Homa"),
         .product(name: "Shared", package: "vChewing_Shared"),
         .product(name: "SwiftExtension", package: "vChewing_SwiftExtension"),

@@ -559,3 +559,127 @@ nonisolated public struct HSBA: Sendable {
   public var brightness: Double
   public var alpha: Double
 }
+
+// MARK: - ByteLineIterator
+
+// Apple artificially gated the modern FileHandle API names behind macOS 10.15 / 10.15.4.
+// The macOS repo targets macOS 12+, where these modern names are directly available
+// from Foundation, so the shims below are unnecessary here and are kept only as a
+// commented-out stub for reference. Enabling them would redeclare the same API as
+// Foundation inside the SwiftExtension module, which makes cross-module call sites
+// (e.g. LangModelAssembly's LMConsolidator.checkPragma calling read(upToCount:)) hit
+// an overload ambiguity and fail to compile. The legacy repo (older deployment
+// targets) keeps these shims active.
+// #if canImport(Darwin)
+//   nonisolated extension FileHandle {
+//     @backDeployed(before: macOS 10.15)
+//     public final func read(upToCount count: Int) throws -> Data? {
+//       let data = readData(ofLength: count)
+//       return data.isEmpty ? nil : data
+//     }
+//
+//     @backDeployed(before: macOS 10.15)
+//     public final func seek(toOffset offset: UInt64) throws {
+//       seek(toFileOffset: offset)
+//     }
+//   }
+// #endif
+
+/// 以位元組為單位對檔案內容逐行迭代的迭代器。
+/// 以所有 Unicode 換行字元斷行（對齊 `CharacterSet.newlines`：U+000A–U+000D、U+0085、U+2028、U+2029；
+/// CRLF 視為單一斷行）；每行以 `ArraySlice<UInt8>` 零拷貝切片的形式回傳，不含斷行符號。
+nonisolated public final class ByteLineIterator {
+  // MARK: Lifecycle
+
+  public init(file: FileHandle, chunkSize: Int = 4_096) {
+    self.fileHandle = file
+    self.chunkSize = chunkSize
+  }
+
+  // MARK: Public
+
+  /// 取出下一行（不含斷行符號）；EOF 時回傳 nil。
+  public func nextLine() -> ArraySlice<UInt8>? {
+    var scan = consumed
+    while true {
+      scanLoop: while scan < buffer.count {
+        switch buffer[scan] {
+        case 0x0A, 0x0B, 0x0C:
+          return harvestLine(upTo: scan, consuming: 1)
+        case 0x0D:
+          if scan + 1 < buffer.count {
+            // CRLF 視為單一斷行。
+            return harvestLine(upTo: scan, consuming: buffer[scan + 1] == 0x0A ? 2 : 1)
+          }
+          if atEof { return harvestLine(upTo: scan, consuming: 1) }
+          break scanLoop // CR 位於緩衝末端，需更多資料以確認是否為 CRLF。
+        case 0xC2:
+          // NEL（U+0085，UTF-8：C2 85）。
+          if scan + 2 <= buffer.count {
+            if buffer[scan + 1] == 0x85 { return harvestLine(upTo: scan, consuming: 2) }
+            scan += 1
+          } else if atEof {
+            scan += 1
+          } else {
+            break scanLoop // 前導位元組位於緩衝末端，需更多資料以確認。
+          }
+        case 0xE2:
+          // LS（U+2028，UTF-8：E2 80 A8）與 PS（U+2029，UTF-8：E2 80 A9）。
+          if scan + 3 <= buffer.count {
+            if buffer[scan + 1] == 0x80, buffer[scan + 2] == 0xA8 || buffer[scan + 2] == 0xA9 {
+              return harvestLine(upTo: scan, consuming: 3)
+            }
+            scan += 1
+          } else if atEof {
+            scan += 1
+          } else {
+            break scanLoop // 前導位元組位於緩衝末端，需更多資料以確認。
+          }
+        default:
+          scan += 1
+        }
+      }
+      // 緩衝區已掃描完畢（或尾端有待確認的斷行前導位元組）：需要更多資料。
+      if atEof {
+        guard consumed < buffer.count else { return nil }
+        // 緩衝區內剩餘的內容是未被斷行符號終結的最後一行。
+        return harvestLine(upTo: buffer.count, consuming: 0)
+      }
+      // 讀取下一個資料塊；讀取失敗或讀到空內容時視為 EOF。
+      guard let nextChunk = try? fileHandle.read(upToCount: chunkSize), !nextChunk.isEmpty else {
+        atEof = true
+        continue
+      }
+      buffer.append(contentsOf: nextChunk)
+    }
+  }
+
+  // MARK: Private
+
+  private let fileHandle: FileHandle
+  private let chunkSize: Int
+  private var buffer: [UInt8] = []
+  private var consumed = 0
+  private var atEof = false
+
+  /// 擷取 `[consumed, lineEnd)` 作為一行，並將已消費位置推過斷行符。
+  private func harvestLine(upTo lineEnd: Int, consuming delimiterLength: Int) -> ArraySlice<UInt8> {
+    let line = buffer[consumed ..< lineEnd]
+    consumed = lineEnd + delimiterLength
+    if consumed == buffer.count {
+      buffer.removeAll(keepingCapacity: true)
+      consumed = 0
+    }
+    return line
+  }
+}
+
+// MARK: Sequence
+
+nonisolated extension ByteLineIterator: Sequence {
+  public func makeIterator() -> AnyIterator<ArraySlice<UInt8>> {
+    AnyIterator {
+      self.nextLine()
+    }
+  }
+}
