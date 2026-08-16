@@ -3,8 +3,8 @@
 // This code is released under the SPDX-License-Identifier: `LGPL-3.0-or-later`.
 
 import CommonCrypto
-import CSQLite3Lib
 import Foundation
+import SQLite3
 
 // MARK: - KeyKeyUserDBKit.UserPhraseTextFileObj
 
@@ -295,52 +295,42 @@ extension KeyKeyUserDBKit {
       data: Data
     ) throws
       -> (bigrams: [KeyKeyGram], candidateOverrides: [KeyKeyGram]) {
-      // sbooth/CSQLite is built with SQLITE_OMIT_AUTOINIT,
-      // so we need to call sqlite3_initialize() first.
-      // However, the current project does not use that. Skipping that step.
+      // macOS 10.13 及之前的系統 libsqlite3 沒有 sqlite3_deserialize，
+      // 因此先將解密後的資料庫映像暫存為臨時檔案（唯擁有者可讀寫），
+      // 待連線關閉後再行清除。
+      // 此檔案開啟方式與奇摩輸入法原廠實作一致（sqlite3_open 直接開檔）。
+      let tempURL = URL(fileURLWithPath: NSTemporaryDirectory())
+        .appendingPathComponent("vChewing-KeyKey-\(UUID().uuidString).sqlite")
+      guard FileManager.default.createFile(
+        atPath: tempURL.path,
+        contents: data,
+        attributes: [.posixPermissions: 0o600]
+      ) else {
+        throw TextFileError.databaseReadFailed(message: "Failed to stage decrypted database.")
+      }
 
-      // 開啟記憶體資料庫
       var db: OpaquePointer?
-      guard sqlite3_open(":memory:", &db) == SQLITE_OK else {
+      guard sqlite3_open(tempURL.path, &db) == SQLITE_OK else {
+        try? FileManager.default.removeItem(at: tempURL)
         let errorMsg = db.flatMap { String(cString: sqlite3_errmsg($0)) } ?? "Unknown error"
         sqlite3_close(db)
         throw TextFileError.databaseReadFailed(message: errorMsg)
       }
 
-      // 使用 sqlite3_deserialize 載入資料
-      let dataSize = Int64(data.count)
-      guard let buffer = sqlite3_malloc64(UInt64(dataSize)) else {
-        sqlite3_close(db)
-        throw TextFileError.databaseReadFailed(message: "Failed to allocate memory for database")
-      }
-
-      // 複製資料到緩衝區
-      data.withUnsafeBytes { bytes in
-        guard let baseAddress = bytes.baseAddress else { return }
-        memcpy(buffer, baseAddress, data.count)
-      }
-
-      // 使用 sqlite3_deserialize 載入資料庫
-      // SQLITE_DESERIALIZE_FREEONCLOSE: 當資料庫關閉時，SQLite 會自動釋放緩衝區
-      // SQLITE_DESERIALIZE_RESIZEABLE: 允許資料庫調整大小
-      let result = sqlite3_deserialize(
-        db,
-        "main",
-        buffer.assumingMemoryBound(to: UInt8.self),
-        dataSize,
-        dataSize,
-        UInt32(SQLITE_DESERIALIZE_FREEONCLOSE | SQLITE_DESERIALIZE_RESIZEABLE)
-      )
-
-      guard result == SQLITE_OK else {
+      // sqlite3_open 屬惰性開啟；強制讀取一次以建立檔案描述子，
+      // 順便確認映像確為有效資料庫。
+      guard sqlite3_exec(db, "SELECT name FROM sqlite_master LIMIT 1", nil, nil, nil) == SQLITE_OK else {
         let errorMsg = db.flatMap { String(cString: sqlite3_errmsg($0)) } ?? "Unknown error"
         sqlite3_close(db)
-        throw TextFileError.databaseReadFailed(
-          message: "Failed to deserialize database: \(errorMsg)"
-        )
+        try? FileManager.default.removeItem(at: tempURL)
+        throw TextFileError.databaseReadFailed(message: "Failed to load database: \(errorMsg)")
       }
 
-      defer { sqlite3_close(db) }
+      // 連線關閉後清除暫存檔案，避免解密後的內容殘留於磁碟。
+      defer {
+        sqlite3_close(db)
+        try? FileManager.default.removeItem(at: tempURL)
+      }
 
       var bigrams: [KeyKeyGram] = []
       var candidateOverrides: [KeyKeyGram] = []

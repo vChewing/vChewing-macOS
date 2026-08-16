@@ -2,8 +2,8 @@
 // ====================
 // This code is released under the SPDX-License-Identifier: `LGPL-3.0-or-later`.
 
-import CSQLite3Lib
 import Foundation
+import SQLite3
 
 // MARK: - KeyKeyUserDBKit.UserDatabase
 
@@ -20,6 +20,7 @@ extension KeyKeyUserDBKit {
       self.path = path
       self.actor = .init(label: "KeyKeyUserDBQueue.\(UUID().uuidString)")
       self.inMemoryData = nil
+      self.tempFileURL = nil
 
       // sbooth/CSQLite is built with SQLITE_OMIT_AUTOINIT,
       // so we need to call sqlite3_initialize() first.
@@ -39,20 +40,30 @@ extension KeyKeyUserDBKit {
       self.db = dbPointer
     }
 
-    /// 從記憶體中的資料開啟資料庫（無需寫入臨時檔案）
+    /// 從記憶體中的資料開啟資料庫
     /// - Parameter data: 解密後的資料庫二進位資料
     /// - Throws: `DatabaseError` 如果開啟失敗
     public init(data: Data) throws {
       self.path = nil
       self.actor = .init(label: "KeyKeyUserDBQueue.\(UUID().uuidString)")
+      self.inMemoryData = nil
 
-      // sbooth/CSQLite is built with SQLITE_OMIT_AUTOINIT,
-      // so we need to call sqlite3_initialize() first.
-      // However, the current project does not use that. Skipping that step.
+      // macOS 10.13 及之前的系統 libsqlite3 沒有 sqlite3_deserialize，
+      // 因此先將解密後的資料庫映像暫存為臨時檔案（唯擁有者可讀寫），
+      // 待連線關閉後再行清除。
+      let tempURL = URL(fileURLWithPath: NSTemporaryDirectory())
+        .appendingPathComponent("vChewing-KeyKey-\(UUID().uuidString).sqlite")
+      guard FileManager.default.createFile(
+        atPath: tempURL.path,
+        contents: data,
+        attributes: [.posixPermissions: 0o600]
+      ) else {
+        throw DatabaseError.openFailed(message: "Failed to stage decrypted database.")
+      }
 
-      // 開啟一個記憶體資料庫
       var dbPointer: OpaquePointer?
-      guard sqlite3_open(":memory:", &dbPointer) == SQLITE_OK else {
+      guard sqlite3_open(tempURL.path, &dbPointer) == SQLITE_OK else {
+        try? FileManager.default.removeItem(at: tempURL)
         let errorMessage: String
         if let dbPointer {
           errorMessage = String(cString: sqlite3_errmsg(dbPointer))
@@ -63,40 +74,18 @@ extension KeyKeyUserDBKit {
         throw DatabaseError.openFailed(message: errorMessage)
       }
 
-      // 複製 data 到可變的記憶體區塊（sqlite3_deserialize 需要）
-      // 使用 sqlite3_malloc64 分配記憶體，讓 SQLite 管理生命週期
-      let dataSize = Int64(data.count)
-      guard let buffer = sqlite3_malloc64(UInt64(dataSize)) else {
+      // sqlite3_open 屬惰性開啟；強制讀取一次以建立檔案描述子，
+      // 順便確認映像確為有效資料庫。
+      guard sqlite3_exec(dbPointer, "SELECT name FROM sqlite_master LIMIT 1", nil, nil, nil) == SQLITE_OK
+      else {
+        let errorMessage = dbPointer.flatMap { String(cString: sqlite3_errmsg($0)) } ?? "Unknown error"
         sqlite3_close(dbPointer)
-        throw DatabaseError.openFailed(message: "Failed to allocate memory for database")
-      }
-
-      // 複製資料到緩衝區
-      data.withUnsafeBytes { bytes in
-        guard let baseAddress = bytes.baseAddress else { return }
-        memcpy(buffer, baseAddress, data.count)
-      }
-
-      // 使用 sqlite3_deserialize 載入資料庫
-      // SQLITE_DESERIALIZE_FREEONCLOSE: 當資料庫關閉時，SQLite 會自動釋放緩衝區
-      // SQLITE_DESERIALIZE_RESIZEABLE: 允許資料庫調整大小（雖然我們只讀取）
-      let result = sqlite3_deserialize(
-        dbPointer,
-        "main",
-        buffer.assumingMemoryBound(to: UInt8.self),
-        dataSize,
-        dataSize,
-        UInt32(SQLITE_DESERIALIZE_FREEONCLOSE | SQLITE_DESERIALIZE_RESIZEABLE)
-      )
-
-      guard result == SQLITE_OK else {
-        let errorMessage = String(cString: sqlite3_errmsg(dbPointer))
-        sqlite3_close(dbPointer)
-        throw DatabaseError.openFailed(message: "Failed to deserialize database: \(errorMessage)")
+        try? FileManager.default.removeItem(at: tempURL)
+        throw DatabaseError.openFailed(message: "Failed to load database: \(errorMessage)")
       }
 
       self.db = dbPointer
-      self.inMemoryData = nil // 記憶體由 SQLite 管理，不需要保留引用
+      self.tempFileURL = tempURL
     }
 
     deinit {
@@ -104,6 +93,9 @@ extension KeyKeyUserDBKit {
         if let db {
           sqlite3_close(db)
         }
+      }
+      if let tempFileURL {
+        try? FileManager.default.removeItem(at: tempFileURL)
       }
     }
 
@@ -291,6 +283,8 @@ extension KeyKeyUserDBKit {
     private let actor: DispatchQueue
     /// 保留記憶體資料的引用（如果需要的話）
     private let inMemoryData: Data?
+    /// 由記憶體映像暫存的臨時資料庫檔案（關閉連線後清除）
+    private let tempFileURL: URL?
   }
 }
 

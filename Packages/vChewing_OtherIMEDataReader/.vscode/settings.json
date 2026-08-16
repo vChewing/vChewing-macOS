@@ -6,15 +6,13 @@
     ".build": true,
     ".swiftpm": true,
     "**/.build": true,
-    "**/.swiftpm": true,
-    "sqlite3.h": true
+    "**/.swiftpm": true
   },
   "search.exclude": {
     "Build": true,
     ".build": true,
     ".swiftpm": true,
     "**/.build": true,
-    "**/.swiftpm": true,
-    "sqlite3.h": true
+    "**/.swiftpm": true
   }
 }

@@ -10,20 +10,23 @@ let package = Package(
       targets: ["OtherIMEDataReader"]
     ),
   ],
-  dependencies: [
-    .package(path: "../CSQLite3Lib"),
-  ],
   targets: [
     // Targets are the basic building blocks of a package, defining a module or a test suite.
     // Targets can depend on other targets in this package and products from dependencies.
     .target(
-      name: "KeyKeyUserDBKit",
-      dependencies: [
-        .product(name: "CSQLite3Lib", package: "CSQLite3Lib"),
-      ]
+      name: "KeyKeyUserDBKit"
     ),
     .target(
       name: "OtherIMEDataReader",
+      dependencies: [
+        "KeyKeyUserDBKit",
+      ],
+      swiftSettings: [
+        .defaultIsolation(MainActor.self), // set Default Actor Isolation
+      ]
+    ),
+    .testTarget(
+      name: "KeyKeyUserDBKitTests",
       dependencies: [
         "KeyKeyUserDBKit",
       ],
