@@ -1,11 +1,11 @@
 # 唯音（vChewing）演算法說明
 
-本文件說明唯音（vChewing）在 macOS 上的核心演算法與模組分工，涵蓋：注音符號（ㄅㄆㄇㄈ）與鍵盤配置、輸入態械（FSM）、組句引擎（Homa，採用 DAG 動態規劃），以及語言模型匯流（LangModelAssembly）和字典資料來源（Source/Data 子模組）。
+本文件說明唯音（vChewing）在 macOS 上的核心演算法與模組分工，涵蓋：注音符號（ㄅㄆㄇㄈ）與鍵盤配置、輸入態械（FSM）、組句引擎（Homa，採用 DAG 動態規劃），以及語言模型匯流（LangModelAssembly）和字典資料來源（VanguardLexicon）。
 
 ## 建置與測試
 
 詳細建置與測試請見根目錄 AGENTS.md。
-- 開發環境：macOS 14.7+、Xcode 15.3+（Swift toolchain）。
+- 開發環境：Swift 6.2+（`Package.swift` 為 `swift-tools-version` 6.2；CI 於 `macos-26` 使用 Xcode 26.6）。
 - 執行環境：本倉庫內之 Xcode 工程以 macOS 12+ 為目標；低版本 macOS (10.9 Mavericks) 支援則另有專案手動維護。
 - 單元測試：各 Swift Package 於 Packages/ 下以 Swift Testing / XCTest 進行；Linux 上可直接在 Typewriter、Homa 等套件執行 `swift test`。
 
@@ -30,7 +30,7 @@
   - [子語言模型與分數](#子語言模型與分數)
   - [使用者選字與優先規則](#使用者選字與優先規則)
   - [關聯詞語與符號輸出](#關聯詞語與符號輸出)
-- [字典與語料：Source/Data 子模組](#字典與語料sourcedata-子模組)
+- [字典與語料：VanguardLexicon](#字典與語料vanguardlexicon)
   - [生成工具與產物](#生成工具與產物)
 - [關鍵檔案位置](#關鍵檔案位置)
 - [延伸閱讀](#延伸閱讀)
@@ -42,16 +42,16 @@
 
 ### 關鍵模組
 
-- Packages/vChewing_MainAssembly4Darwin：IMK 進入點與整合（SessionCtl → InputSession）。InputSession 也參與態械管理。
+- Packages/vChewing_MainAssembly4Darwin：IMK 進入點與整合（InputSession）。InputSession 也參與態械管理。
 - Packages/vChewing_Typewriter：輸入處理邏輯、態械與鍵盤事件分診；亦提供 `SessionCoreProtocol` 作為所有輸入法會話（含測試用 MockSession 與 Darwin SessionProtocol）的共用基底協定。
 - Packages/vChewing_Tekkon：注音（ㄅㄆㄇㄈ）鍵盤與音節組合。
 - Packages/vChewing_Homa：句子組裝（DAG-DP 動態規劃求最大分數路徑、候選覆寫與上下文鞏固）。
 - Packages/vChewing_LangModelAssembly：語言模型匯流與資料來源整合。
-- Source/Data：字典與語料的編譯器與產物（git 子模組）。
+- Lexicon 資料：由遠端 `vChewing-VanguardLexicon` 倉庫的 `VanguardTextMapPlugin` Swift Package plugin 於建置時編譯注入（非 git 子模組）。
 
 ### 事件到輸出的基本流程
 
-1. NSEvent 抵達 → MainAssembly 的 SessionCtl 收下並委派 InputSession。
+1. NSEvent 抵達 → IMK 實例化的 `IMKInputSessionController`（vChewing_IMKUtils）經 `SessionControllerSputnik` 轉發至對應的 `InputSession`。
 2. InputSession 根據 KeyUp 與 KeyDown 的文脈關係事先決定某些行為（比如對 Shift 鍵的單擊行為的感知），然後將 KeyDown 轉 KBEvent 交給 Typewriter.InputHandler 分診。
 3. Tekkon 組音（依使用者配置的鍵盤與容錯規則）得出合法注音鍵序列，由 InputHandler 將合法注音鍵序列塞入 Homa 引擎。
 4. LangModelAssembly 依鍵序列回傳候選語元（unigram，含分數）。
@@ -83,7 +83,7 @@ Typewriter 是可以在 Linux 系統下建置的 Swift Package，以一個比較
 
 ### KBEvent 轉換與分診
 
-- SessionCtl 將 NSEvent 轉 KBEvent；
+- InputSession 將 NSEvent 轉 KBEvent；
 - InputHandler 根據 KBEvent 與目前 IMEState 決定：
   - 交由 Tekkon 組音、或
   - 觸發候選導覽、遞交（俗稱「上屏」）、撤銷等動作。
@@ -172,12 +172,9 @@ LangModelAssembly 對多個子語言模型進行匯整、去重、替換與增�
 
 ---
 
-## 字典與語料：Source/Data 子模組
+## 字典與語料：VanguardLexicon
 
-本專案的字典與語料由 git 子模組 Source/Data 維護與生成。此子模組包含：
-- VCDataBuilder（Swift）：生成不同目標引擎格式的辭典與索引。
-- VanguardTrieKit 等工具庫（用於其他專案）。
-- 產物通常位於 Source/Data/Build，供 LangModelAssembly 載入（例如 SQL/Plist/Trie 或其他中介檔）。
+本專案的字典與語料由外部倉庫 `vChewing-VanguardLexicon` 維護。工廠詞庫由遠端 Swift Package plugin `VanguardTextMapPlugin` 於建置時編譯為 Vanguard TextMap 格式（`.txtMap` + `.revlookup` 對）並注入至 `vChewing_MainAssembly4Darwin`（非 git 子模組）；執行期後端為 `VanguardTrie.TextMapTrie`。
 
 開發者一般不建議在本倉庫中直接修改大型辭典腳本或編譯產物，除非有特定任務。
 
@@ -186,8 +183,8 @@ LangModelAssembly 對多個子語言模型進行匯整、去重、替換與增�
 ## 關鍵檔案位置
 
 - MainAssembly：
-  - Packages/vChewing_MainAssembly4Darwin/Sources/MainAssembly4Darwin/SessionController/SessionCtl.swift
   - Packages/vChewing_MainAssembly4Darwin/Sources/MainAssembly4Darwin/SessionController/InputSession*.swift
+  - Packages/vChewing_MainAssembly4Darwin/Sources/MainAssembly4Darwin/SessionController/SessionControllerSputnik.swift
 - Typewriter：
   - Packages/vChewing_Typewriter/Sources/Typewriter/InputHandler/*.swift
   - Packages/vChewing_Typewriter/Sources/Typewriter/Session/SessionCoreProtocol.swift
@@ -202,9 +199,8 @@ LangModelAssembly 對多個子語言模型進行匯整、去重、替換與增�
   - Packages/vChewing_LangModelAssembly/Sources/LangModelAssembly/LMConsolidator.swift
   - Packages/vChewing_LangModelAssembly/Sources/LangModelAssembly/LMInstantiator*.swift
   - Packages/vChewing_LangModelAssembly/Sources/LangModelAssembly/SubLMs/*.swift
-- Data submodule：
-  - Source/Data/README.MD（VCDataBuilder 使用說明）
-  - Source/Data/Sources/*（生成工具原始碼）
+- VanguardLexicon（外部倉庫）：
+  - `vChewing-VanguardLexicon`（詞庫編譯工具與語料來源，非本倉庫子模組）
 
 ---
 
@@ -219,6 +215,6 @@ LangModelAssembly 對多個子語言模型進行匯整、去重、替換與增�
 
 ## 文件版本與更新紀錄
 
-- 文件版本：1.3
-- 最後更新：2026-05-24T12:00:00+08:00
+- 文件版本：1.4
+- 最後更新：2026-08-16
 - 適用版本：晚於 vChewing 4.4.7 的版本

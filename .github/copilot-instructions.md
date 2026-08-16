@@ -26,8 +26,8 @@ This file provides GitHub Copilot-specific coding instructions. For comprehensiv
 ## OS Framework Guidelines
 - All AppKit windows are supposed to be constructed using AppKit Result Builder DSL. You can find its definitions in `./Packages/vChewing_OSFrameworkImpl/`.
 - Study the `UserDef` enum which manages raw UserDefaults keys with their data types and localization keys (used in the SettingsUI and SettingsCocoa window). If you extended `UserDef`, please also extend `PrefMgrProtocol` and `PrefMgr`. Direct access to UserDefaults are discouraged in most times unless really necessary.
-- Localize UI strings with `NSLocalizedString("…", comment: "")` and update the localization assets (`.strings`) files. Note that `xcstring` assets can also be considered in the future if it is compatible with targets compiled for macOS 10.09.
-- Follow the established flow: `SessionCtl` retrieves NSEvents and passing it to `InputSession` which also handles menu actions; `InputSession` handles the KeyUp events and let `InputHandler` triage KeyDown events (as KBEvent); `IMEState` models state transitions.
+- Localize UI strings with `NSLocalizedString("…", comment: "")` and update the localization assets (`.strings`) files. Note that `xcstring` assets can also be considered in the future if it is compatible with targets compiled for macOS 12.
+- Follow the established flow: `InputSession` (bound by `SessionControllerSputnik.swift` to IMK's `IMKInputSessionController` from `vChewing_IMKUtils`) retrieves NSEvents and handles menu actions; it handles KeyUp events and lets `InputHandler` triage KeyDown events (as KBEvent); `IMEState` models state transitions.
 - Do not dispatch the UI-related things to an async thread unless it is on the main actor.
 
 ## FSM Design
@@ -40,7 +40,7 @@ This file provides GitHub Copilot-specific coding instructions. For comprehensiv
 
 ## Tests and Tooling
 - GitHub Coding Agent can only access Linux devenv in most times. `./Packages/vChewing_Typewriter/` is the Linux-compilable target that the developer usually ask GitHub Coding Agent to work on. This package and `./Packages/vChewing_Homa/` are the primary places to add migration-related tests.
-- Dictionary files are managed manually by the developer in another repository and is used as a git submodule here. Factory lexicons are now in Vanguard TextMap format (`.txtMap` + `.revlookup`); the `CSQLite3` dependency has been removed from `LangModelAssembly`. Regenerate lexicon assets via `make update` when explicitly instructed.
+- Factory lexicons come from the separate `vChewing-VanguardLexicon` repository in Vanguard TextMap format (`.txtMap` + `.revlookup`), injected into `vChewing_MainAssembly4Darwin` at build time by the remote `VanguardTextMapPlugin` Swift Package plugin (no git submodule). The legacy `CSQLite3` dependency has been fully removed from this repository; Yahoo KeyKey data import in `vChewing_OtherIMEDataReader` now uses the system libsqlite3. Regenerate lexicon assets via `make update` when explicitly instructed.
 
 ## Git Commit Convention
 
@@ -61,7 +61,7 @@ This file provides GitHub Copilot-specific coding instructions. For comprehensiv
 ## Things to Beware / Avoid
 - When implementing new APIs for InputSession and InputHandler, please put them onto the protocols if possible. For shared session-management logic (state transitions, handler reset), prefer `SessionCoreProtocol` (defined in Typewriter, `Session/SessionCoreProtocol.swift`) which provides default implementations of `switchState()` and `resetInputHandler()` shared between mock tests and production code.
 - Gate new APIs with availability checks (e.g. conditional compilation via `canImport(Darwin)` and Swift `@available` annotations) so shared packages keep compiling on Linux. The shipping Xcode target requires macOS 12+, but legacy macOS releases are maintained in a separate repository.
-- This repo has no dependency of InterfaceBuilder assets. AppKit is used by default with self-crafted result builder DSLs to make the coding experience similar to SwiftUI. SwiftUI in this project is only used for About window and SettingsUI. On macOS 10.9 Mavericks till macOS 13 Ventura, this repo uses SettingsCocoa (AppKit Result Builder DSL).
+- This repo has no dependency of InterfaceBuilder assets. AppKit is used by default with self-crafted result builder DSLs to make the coding experience similar to SwiftUI. SwiftUI in this project is only used for About window and SettingsUI. On macOS 12 Monterey and macOS 13 Ventura (i.e. below macOS 14), this repo uses SettingsCocoa (AppKit Result Builder DSL); on macOS 14 Sonoma and later it defaults to the SwiftUI SettingsUI (the Swift Observation macro it relies on requires macOS 14+), with SettingsCocoa kept as an AppKit alternate.
 - User data is not expected to be referred from hard-coded path, unless it is necessary in Test targets of a Swift package.
 - This repository uses Swift Testing / XCTest for unit tests among Swift packages situated in `./Packages` folder.
 - Do not manually edit or commit generated lexicon assets; they are transient build artifacts produced by the `VanguardTextMapPlugin` build tool plugin at compile-time.
@@ -71,7 +71,7 @@ This file provides GitHub Copilot-specific coding instructions. For comprehensiv
 - If your current environment is macOS, please hesitate your use of python3 scripts unless being specifically told. Instead, prioritize powershell scripts or csharp scripts while running on macOS. If both powershell and csharp scripts are not available, you can use Swift scripts as the last resort. If Swift can't do it, use `python3` in lieu of `python`.
 
 ## Reference Files and Folders
-- `./Packages/vChewing_MainAssembly4Darwin/Sources/MainAssembly4Darwin/SessionController/`: `SessionCtl.swift` is the IMK entry point working with candidate window, IME settings, etc. However, most of its tasks are delegated to `InputSession*.swift` files in this folder.
+- `./Packages/vChewing_MainAssembly4Darwin/Sources/MainAssembly4Darwin/SessionController/`: `InputSession*.swift` hosts the `InputSession` session logic; `SessionControllerSputnik.swift` binds it to IMK's `IMKInputSessionController` (from `vChewing_IMKUtils`), working with candidate window, IME settings, etc.
 - `./Packages/vChewing_Typewriter/`: The typing module `InputHandler` protocol working with the IMEStateProtocol-based finite state machine. Also hosts `SessionCoreProtocol` (in `Session/` subdirectory) which provides shared session state-transition logic (`switchState()`, `resetInputHandler()`) with default implementations.
 - `./Packages/vChewing_LangModelAssembly/`: Language model assembly (factory lexicon, user phrases, perceptor (LX_Perceptor), associated phrases).
 - `./Packages/vChewing_Homa/`: The current sentence assembler used by Typewriter and MainAssembly.

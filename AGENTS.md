@@ -7,7 +7,7 @@ This handbook briefs AI coding assistants on the vChewing (唯音) macOS reposit
 - **Purpose**: Native Zhuyin / Bopomofo input method for macOS with optional phonetic and stroke keyboards, simplified ↔ traditional isolation, and sandboxed distribution installers.
 - **Implementation**: Pure Swift modules layered on AppKit/IMK. C(++)/ObjC(++) bridges exist only where Swift cannot interface directly with legacy assets.
 - **Primary packages**:
-  - `vChewing_MainAssembly4Darwin`: IMK front-end (SessionCtl, InputSession, UI bridges, sandbox glue).
+  - `vChewing_MainAssembly4Darwin`: IMK front-end (InputSession, UI bridges, sandbox glue).
   - `vChewing_Typewriter`: Typing FSM, session core protocol (`SessionCoreProtocol`), Tekkon integration, user preference wiring, cassette/stroke handling.
   - `vChewing_Homa`: DAG-DP assembler (sentence assembler) with candidate override, consolidation, revolver, and perception hooks.
   - `vChewing_Tekkon`: Keyboard parsers, Zhuyin/Bopomofo composer, stroke cassette parser, phonabet utilities.
@@ -17,9 +17,9 @@ This handbook briefs AI coding assistants on the vChewing (唯音) macOS reposit
 
 ## 2. Environment & Build Paths
 
-- **Authoritative toolchain**: macOS 14.7+ (Sonoma recommended), Xcode 15.3+ with bundled Swift 5.10 or newer.
+- **Authoritative toolchain**: Swift 6.2+ (`Package.swift` declares `swift-tools-version` 6.2; CI runs on `macos-26` with Xcode 26.6).
 - **Runtime target**: macOS 12 Monterey and newer. Older macOS support lives in another repo.
-- **Build system**: Swift Package Manager (SwiftPM) 6.2.4+ via `Package.swift` root manifest. App bundle assembly and universal binary scripting via `Makefile` with `BundleApps` CommandPlugin.
+- **Build system**: Swift Package Manager (SwiftPM, `swift-tools-version` 6.2) via `Package.swift` root manifest. App bundle assembly and universal binary scripting via `Makefile` with `BundleApps` CommandPlugin.
 - **CLI builds**:
   - Universal binary release: `make release` (builds arm64 + x86_64, creates signed .app bundles in `Build/Products/Release/`).
   - Archive with dSYMs: `make archive` (creates `.xcarchive` in Xcode Archives folder).
@@ -29,7 +29,7 @@ This handbook briefs AI coding assistants on the vChewing (唯音) macOS reposit
 
 ## 3. Repository Layout (quick map)
 
-- `Packages/vChewing_MainAssembly4Darwin/.../SessionController/SessionCtl.swift`: IMK entry point. All NSEvent handling funnels through `InputSession*` files.
+- `Packages/vChewing_MainAssembly4Darwin/.../SessionController/InputSession*.swift`: IMK entry point (the `InputSession` class). IMK instantiates `IMKInputSessionController` (from `vChewing_IMKUtils`); `SessionControllerSputnik.swift` binds it to `InputSession` and forwards its callbacks. All NSEvent handling funnels through these files.
 - `Packages/vChewing_Typewriter/Sources/Typewriter/InputHandler/`: FSM split across triage, composition, candidate handling, and commissions.
 - `Packages/vChewing_Typewriter/Sources/Typewriter/Session/`: `SessionCoreProtocol` — shared session base protocol with `switchState()`/`resetInputHandler()` default implementations.
 - `Packages/vChewing_Homa/Sources/Homa/`: Assembler core (`Homa_Assembler.swift`, `Homa_PathFinder.swift`, candidate/consolidation APIs, etc.).
@@ -39,16 +39,16 @@ This handbook briefs AI coding assistants on the vChewing (唯音) macOS reposit
 - `Packages/vChewing_CandidateWindow/`: The Candidate window.
 - `Plugins/BundleApps/`: CommandPlugin that assembles `.app` bundles and optional `.xcarchive` archives (codesigning, entitlements, SPM bundle filtering).
 - `Makefile`: Root-level automation for universal binary builds (`swift build --arch arm64/x86_64`, `lipo` merge), lexicon toolchain integration, and CommandPlugin invocation.
-- `Installer/`: SwiftUI installer app + pkg resources.
+- `Sources/Installer_macOS/` + `Packages/vChewing_InstallerAssembly4Darwin/`: SwiftUI installer app (the `vChewingInstaller` executable) + pkg resources; `BuildPKG.sh` assembles the installer PKG.
 
 ## 4. Runtime Flow & Key Concepts
 
-1. **Event capture**: IMK `SessionCtl` receives NSEvents and marshals them into `KBEvent` structures.
+1. **Event capture**: IMK instantiates `IMKInputSessionController` (`vChewing_IMKUtils`); `SessionControllerSputnik` forwards its NSEvents to the bound `InputSession`, which marshals them into `KBEvent` structures.
 2. **FSM triage**: `InputHandler` in Typewriter interprets events, orchestrates Tekkon composer, updates the Homa assembler, and switches `IMEState` instances.
 3. **Composer**: Tekkon manages Zhuyin/phonetic/stroke buffers, auto-correction, cassette mode, and exposes inline display strings.
 4. **Assembler**: Homa Assembler builds DAG segments, snapshots perception intelligences, exposes candidate / consolidation / revolver APIs, and emits `assembledSentence` for UI rendering.
 5. **Language Models**: `LMAssembly` merges factory lexicons (via `FactoryTextMapLexicon` backed by Vanguard TextMap format), user phrases, exclusion lists, associated phrase suggestions, and perception override data, etc.
-6. **UI update**: `SessionCtl` refreshes candidate window, composition buffer, tooltips, notifications, symbol menu.
+6. **UI update**: `InputSession` refreshes candidate window, composition buffer, tooltips, notifications, symbol menu.
 
 Reference `algorithm.md` for the deep algorithm write-up (zh-Hant).
 
