@@ -95,4 +95,22 @@ struct LMReplacementsTests {
     #expect(saved == sampleData)
     try? FileManager.default.removeItem(at: tempURL)
   }
+
+  @Test
+  func testOpenSaveRoundTripPreservesInvalidUTF8() throws {
+    // open → saveData 全程以位元組進行：非法 UTF-8 位元組原樣保留（不再經 String 解碼成 U+FFFD）。
+    let header = LMAssembly.LMConsolidator.kPragmaHeader
+    let bytes: [UInt8] = Array("\(header)\nfoo 測試\n".utf8) + [0xFF, 0xFE] + Array("\nbar\n".utf8)
+    let tempURL = FileManager.default.temporaryDirectory
+      .appendingPathComponent("vChewingTest_replacements_invalid_\(UUID().uuidString).txt")
+    try Data(bytes).write(to: tempURL)
+    defer { try? FileManager.default.removeItem(at: tempURL) }
+
+    var lmTest = LMAssembly.LMReplacements()
+    let opened = lmTest.open(tempURL.path)
+    #expect(opened)
+    lmTest.saveData()
+    let saved = try Data(contentsOf: tempURL)
+    #expect(Array(saved) == bytes)
+  }
 }

@@ -6,6 +6,8 @@
 // marks, or product names of Contributor, except as required to fulfill notice
 // requirements defined in MIT License.
 
+import Foundation
+
 // MARK: - LMAssembly.LMReplacements
 
 extension LMAssembly {
@@ -43,12 +45,13 @@ extension LMAssembly {
       filePath = nil
 
       do {
-        let rawStrData: String = try LMAssembly.withFileHandleQueueSync {
+        // 直接以位元組讀入：非法 UTF-8 位元組原樣保留（不再經 String 解碼成 U+FFFD）。
+        let newBytes: [UInt8] = try LMAssembly.withFileHandleQueueSync {
           LMConsolidator.fixEOF(path: path)
           LMConsolidator.consolidate(path: path, pragma: true)
-          return try String(contentsOfFile: path, encoding: .utf8)
+          return [UInt8](try Data(contentsOf: URL(fileURLWithPath: path)))
         }
-        replaceData(textData: rawStrData)
+        replaceData(bytes: newBytes)
       } catch {
         filePath = oldPath
         vCLMLog("\(error)")
@@ -60,11 +63,17 @@ extension LMAssembly {
       return true
     }
 
-    /// 將資料從檔案讀入至資料庫辭典內。
+    /// 將資料從字串讀入至資料庫辭典內。
     /// - parameters:
-    ///   - path: 給定路徑。
+    ///   - textData: 給定資料字串。
     mutating func replaceData(textData rawStrData: String) {
-      let newBytes = Array(rawStrData.utf8)
+      replaceData(bytes: Array(rawStrData.utf8))
+    }
+
+    /// 將資料從位元組緩衝讀入至資料庫辭典內（非法 UTF-8 位元組原樣保留）。
+    /// - parameters:
+    ///   - bytes: 給定資料位元組。
+    mutating func replaceData(bytes newBytes: [UInt8]) {
       if rawData == newBytes { return }
       rawData = newBytes
       var newEntries: [ReplacementEntry] = []
@@ -126,7 +135,8 @@ extension LMAssembly {
       guard let filePath = filePath else { return }
       LMAssembly.withFileHandleQueueSync {
         do {
-          try strData.write(toFile: filePath, atomically: true, encoding: .utf8)
+          // 以原始位元組寫回：非法 UTF-8 位元組原樣保留（不再經 String 解碼成 U+FFFD）。
+          try Data(rawData).write(to: URL(fileURLWithPath: filePath), options: .atomic)
         } catch {
           vCLMLog("Failed to save current database to: \(filePath)")
         }

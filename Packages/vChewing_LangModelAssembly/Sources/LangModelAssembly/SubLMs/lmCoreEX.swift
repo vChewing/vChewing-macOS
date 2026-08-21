@@ -6,6 +6,7 @@
 // marks, or product names of Contributor, except as required to fulfill notice
 // requirements defined in MIT License.
 
+import Foundation
 import Homa
 
 // MARK: - LMAssembly.LMCoreEX
@@ -81,18 +82,20 @@ extension LMAssembly {
 
       let consolidated = allowConsolidation
       do {
-        let rawStrData: String = try LMAssembly.withFileHandleQueueSync {
+        // 直接以位元組讀入：非法 UTF-8 位元組原樣保留（不再經 String 解碼成 U+FFFD）。
+        let newBytes: [UInt8] = try LMAssembly.withFileHandleQueueSync {
           if consolidated {
             LMConsolidator.fixEOF(path: path)
             LMConsolidator.consolidate(path: path, pragma: true)
           }
-          return try String(contentsOfFile: path, encoding: .utf8)
+          return [UInt8](try Data(contentsOf: URL(fileURLWithPath: path)))
         }
-        var processed = rawStrData
+        var processed = newBytes
         if !consolidated {
-          processed = processed.replacingOccurrences(of: "\r", with: "\n")
+          // 未啟用 consolidation 時，以位元組層級將 CR 換成 LF（對應舊 `replacingOccurrences(of: "\r", with: "\n")`）。
+          processed = newBytes.map { $0 == 0x0D ? 0x0A : $0 }
         }
-        replaceData(textData: processed)
+        replaceData(bytes: processed)
       } catch {
         filePath = oldPath
         vCLMLog("\(error)")
@@ -104,16 +107,23 @@ extension LMAssembly {
       return true
     }
 
-    /// 將資料從檔案讀入至資料庫辭典內。
+    /// 將資料從字串讀入至資料庫辭典內。
     /// - parameters:
-    ///   - path: 給定路徑。
+    ///   - textData: 給定資料字串。
     mutating func replaceData(textData rawStrData: String) {
-      let processed = rawStrData.replacingOccurrences(of: "\t", with: " ")
-      let newBytes = Array(processed.utf8)
-      if rawData == newBytes { return }
+      replaceData(bytes: Array(rawStrData.utf8))
+    }
+
+    /// 將資料從位元組緩衝讀入至資料庫辭典內（非法 UTF-8 位元組原樣保留）。
+    /// - parameters:
+    ///   - bytes: 給定資料位元組。
+    mutating func replaceData(bytes newBytes: [UInt8]) {
+      // 以位元組層級將 Tab 換成空格（對應舊 `replacingOccurrences(of: "\t", with: " ")`）。
+      let processed = newBytes.map { $0 == 0x09 ? 0x20 : $0 }
+      if rawData == processed { return }
 
       // 清理之前的資料以釋放記憶體
-      rawData = newBytes
+      rawData = processed
       keyData.removeAll(keepingCapacity: false)
       entries.removeAll(keepingCapacity: false)
       uniqueKeyCount = 0
@@ -185,16 +195,17 @@ extension LMAssembly {
     func saveData() {
       guard let filePath = filePath else { return }
       LMAssembly.withFileHandleQueueSync {
-        var dataToWrite = strData
-        do {
-          if !temporaryMap.isEmpty {
-            temporaryMap.forEach { neta in
-              neta.value.forEach { unigram in
-                dataToWrite.append("\(unigram.current) \(neta.key) \(unigram.probability.description)\n")
-              }
+        var dataToWrite = rawData
+        if !temporaryMap.isEmpty {
+          temporaryMap.forEach { neta in
+            neta.value.forEach { unigram in
+              dataToWrite.append(contentsOf: "\(unigram.current) \(neta.key) \(unigram.probability.description)\n".utf8)
             }
           }
-          try dataToWrite.write(toFile: filePath, atomically: true, encoding: .utf8)
+        }
+        do {
+          // 以原始位元組寫回：非法 UTF-8 位元組原樣保留。
+          try Data(dataToWrite).write(to: URL(fileURLWithPath: filePath), options: .atomic)
         } catch {
           vCLMLog("Failed to save current database to: \(filePath)")
         }

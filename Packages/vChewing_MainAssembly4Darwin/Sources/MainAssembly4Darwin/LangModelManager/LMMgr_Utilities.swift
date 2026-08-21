@@ -387,12 +387,15 @@ extension LMMgr {
         guard FileManager.default.isReadableFile(atPath: oldURL.path),
               FileManager.default.isReadableFile(atPath: newURL.path) else { continue }
         do {
-          let oldData = try String(contentsOf: oldURL, encoding: .utf8)
-          let newData = try String(contentsOf: newURL, encoding: .utf8)
-          // 跳過空檔案
-          guard !oldData.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty else { continue }
-          let merged = newData + "\n" + oldData
-          try merged.write(to: newURL, atomically: true, encoding: .utf8)
+          // 直接以位元組讀取與拼接：非法 UTF-8 位元組原樣保留（不再經 String 解碼成 U+FFFD）。
+          let oldBytes = [UInt8](try Data(contentsOf: oldURL))
+          let newBytes = [UInt8](try Data(contentsOf: newURL))
+          // 跳過空檔案（byte 層級：全為空白／斷行字元即視為空）。
+          guard !isOnlyWhitespaceAndNewlines(oldBytes) else { continue }
+          var merged = newBytes
+          merged.append(0x0A)
+          merged.append(contentsOf: oldBytes)
+          try Data(merged).write(to: newURL, options: .atomic)
           migratedCount += 1
         } catch {
           vCLog("Failed to migrate \(type) for \(mode): \(error)")
@@ -400,6 +403,35 @@ extension LMMgr {
       }
     }
     return migratedCount
+  }
+
+  /// 判斷給定位元組是否全為空白／斷行字元（對齊 `CharacterSet.whitespacesAndNewlines` 的 UTF-8 位元組集合）。
+  private static func isOnlyWhitespaceAndNewlines(_ bytes: [UInt8]) -> Bool {
+    var index = 0
+    while index < bytes.count {
+      let b = bytes[index]
+      if b < 0x80 {
+        if !(b == 0x09 || b == 0x0A || b == 0x0B || b == 0x0C || b == 0x0D || b == 0x20) { return false }
+        index += 1
+      } else if b == 0xC2, index + 1 < bytes.count, bytes[index + 1] == 0x85 || bytes[index + 1] == 0xA0 {
+        index += 2 // U+0085／U+00A0
+      } else if b == 0xE1, index + 2 < bytes.count, bytes[index + 1] == 0x9A, bytes[index + 2] == 0x80 {
+        index += 3 // U+1680
+      } else if b == 0xE2, index + 2 < bytes.count, bytes[index + 1] == 0x80, bytes[index + 2] >= 0x80,
+                bytes[index + 2] <= 0x8A {
+        index += 3 // U+2000–U+200A
+      } else if b == 0xE2, index + 2 < bytes.count, bytes[index + 1] == 0x80,
+                bytes[index + 2] == 0xA8 || bytes[index + 2] == 0xA9 || bytes[index + 2] == 0xAF {
+        index += 3 // U+2028／U+2029／U+202F
+      } else if b == 0xE2, index + 2 < bytes.count, bytes[index + 1] == 0x81, bytes[index + 2] == 0x9F {
+        index += 3 // U+205F
+      } else if b == 0xE3, index + 2 < bytes.count, bytes[index + 1] == 0x80, bytes[index + 2] == 0x80 {
+        index += 3 // U+3000
+      } else {
+        return false
+      }
+    }
+    return true
   }
 
   public static func resetSpecifiedUserDataFolder() {

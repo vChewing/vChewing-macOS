@@ -183,4 +183,29 @@ struct LMCoreEXTests {
     #expect(saved.contains("高興 ㄍㄠ-ㄒㄧㄥ -5.0\n"))
     try? FileManager.default.removeItem(at: tempURL)
   }
+
+  @Test
+  func testOpenSaveRoundTripPreservesInvalidUTF8() throws {
+    // consolidate: false 路徑：open 以位元組讀入（CR→LF、Tab→空格為位元組層級取代），
+    // saveData 以原始位元組寫回——非法 UTF-8 位元組原樣保留。
+    var lmTest = LMAssembly.LMCoreEX(
+      reverse: false,
+      consolidate: false,
+      defaultScore: { _ in 0 },
+      forceDefaultScore: false
+    )
+    let bytes: [UInt8] = Array("foo\tbar\r\n".utf8) + [0xFF] + Array("\nbaz\n".utf8)
+    let tempURL = FileManager.default.temporaryDirectory
+      .appendingPathComponent("vChewingTest_coreex_invalid_\(UUID().uuidString).txt")
+    try Data(bytes).write(to: tempURL)
+    defer { try? FileManager.default.removeItem(at: tempURL) }
+
+    let opened = lmTest.open(tempURL.path)
+    #expect(opened)
+    lmTest.saveData()
+    let saved = try Data(contentsOf: tempURL)
+    // CR→LF、Tab→空格後：foo bar\n\n ＋ 0xFF ＋ \nbaz\n
+    let expected: [UInt8] = Array("foo bar\n\n".utf8) + [0xFF] + Array("\nbaz\n".utf8)
+    #expect(Array(saved) == expected)
+  }
 }
