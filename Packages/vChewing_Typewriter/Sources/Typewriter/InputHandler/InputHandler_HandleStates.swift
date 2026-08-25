@@ -1162,6 +1162,9 @@ extension InputHandlerProtocol {
     if input.isASCII, !input.charCode.isPrintableASCII { return false }
 
     // 將整個組字區的內容遞交給客體應用。
+    // 此處 `lowercased()` 是刻意的行為：
+    // 使用者關掉系統的 CpLk 中英輸入法切換之後，想在 CpLk 亮燈時直接打英數的話，
+    // 會希望在尚未摁 Shift 的時候預設敲小寫英數。
     session.switchState(State.ofCommitting(textToCommit: input.text.lowercased()))
 
     return true
