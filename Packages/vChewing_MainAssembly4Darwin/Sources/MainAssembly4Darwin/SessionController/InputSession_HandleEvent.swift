@@ -124,7 +124,14 @@ extension SessionProtocol {
     /// 這裡不判斷 flags 的話，用方向鍵前後定位光標之後，再次試圖觸發組字區時、反而會在首次按鍵時失敗。
     /// 同時注意：必須針對 event.type == .flagsChanged 提前返回結果，
     /// 否則，每次處理這種判斷時都會因為讀取 event.characters? 而觸發 NSInternalInconsistencyException。
-    if event.isFlagChanged { return true }
+    /// 但在這裡需要回傳 false，否則可能會在遠端桌面等場合下無法讓遠端的電腦知道修飾鍵狀態集合有發生變化。
+    ///
+    /// 自 2023 年起這裡曾回傳 true，源於當年誤讀 mozc（Google 日文輸入法）的實作——
+    /// mozc 並不處理 keyup 事件，且相關實作既不適用於唯音、也無助於修飾鍵狀態同步。
+    /// 另有其他輸入法會藉由在此回傳 true 來阻止系統的雙擊空格全形句號替換；但正確的作法應是
+    /// 確認輸入法 Info.plist 未帶 TISDoubleSpaceSubstitution 欄位（不少副廠中文輸入法直接
+    /// 繼承系統注音輸入法的 TIS 屬性而把該欄位一併帶走；此欄位並非必需）。
+    if event.isFlagChanged { return false }
 
     /// 沒有文字輸入客體的話，就不要再往下處理了。
     guard let inputHandler = inputHandler, clientProxy?.hasClient() == true else {
