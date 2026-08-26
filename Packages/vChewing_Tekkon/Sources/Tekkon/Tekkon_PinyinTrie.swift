@@ -265,4 +265,21 @@ extension Tekkon.PinyinTrie {
 
     return result
   }
+
+  /// 將（可能不完整的）拼音片段展開為對應的注音讀音清單（不含聲調）。
+  ///
+  /// 當輸入恰好是完整音節時，僅回傳該音節對應的注音；否則回傳所有以該輸入為前綴的
+  /// 音節所對應的注音（去重且排序，以保證輸出內容穩定）。
+  /// 這個函式是「狂拼模式」尾段預覽的基礎：讓尚未打完的拼音也能即時組句試算。
+  /// - Parameter romaji: 拼音組音區的暫存內容。
+  /// - Returns: 對應的注音讀音清單；無法解析時回傳空陣列。
+  public func zhuyinReadings(forPinyinFragment romaji: String) -> [String] {
+    guard !romaji.isEmpty, parser.isPinyin else { return [] }
+    // 完整音節：僅回傳該音節對應的注音。
+    if let exact = parser.mapZhuyinPinyin?[romaji] { return [exact] }
+    // 不完整前綴：回傳所有以該輸入為前綴的音節所對應的注音。
+    let expanded = search(romaji)
+    guard !expanded.isEmpty else { return [] }
+    return Array(Set(expanded)).sorted()
+  }
 }
