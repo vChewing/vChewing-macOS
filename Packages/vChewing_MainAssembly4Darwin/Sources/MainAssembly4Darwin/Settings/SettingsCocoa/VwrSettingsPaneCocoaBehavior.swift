@@ -208,6 +208,12 @@ extension SettingsPanesCocoa {
                 )
               }
             }?.boxed()
+            NSStackView.buildSection(width: innerContentWidth) {
+              UserDef.kFuriousTypingEnabled.renderCocoa(
+                fixWidth: innerContentWidth,
+                prefUITab: .tabBehavior
+              )
+            }?.boxed()
             NSView()
           }
         }?.makeSimpleConstraint(.width, relation: .equal, value: tabContainerWidth)

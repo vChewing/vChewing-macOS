@@ -44,6 +44,17 @@ public struct BPMFFullMatchTypewriter<Handler: InputHandlerProtocol>: Typewriter
         || input.isControlHeld || input.isOptionHeld || input.isShiftHeld || input.isCommandHeld
     let confirmCombination = input.isSpace || input.isEnter
 
+    // 狂拼模式：注拼槽尚有暫存拼音時，Enter 直接遞交「組字區內容＋尾段預覽」，
+    // 省略「先確認讀音、再敲一次 Enter」的兩步流程。
+    if confirmCombination, input.isEnter, !input.isHoldingAny([.control, .option, .shift, .command]),
+       prefs.furiousTypingEnabled, handler.composer.isPinyinMode,
+       !handler.composer.romajiBuffer.isEmpty {
+      let displayedText = handler.committableDisplayText()
+      guard !displayedText.isEmpty else { return nil }
+      session.switchState(State.ofCommitting(textToCommit: displayedText))
+      return true
+    }
+
     // 先嘗試讓注拼槽消化當前按鍵（含可能的聲調覆寫），以保留既有行為。
     let consumption = consumeReadingInputIfNeeded(
       input: input,

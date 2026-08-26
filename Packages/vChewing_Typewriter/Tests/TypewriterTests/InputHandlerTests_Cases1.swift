@@ -1429,4 +1429,143 @@ extension InputHandlerTests {
     #expect(testHandler.triageInput(event: KBEvent.KeyEventData.dataEnterReturn.asEvent))
     #expect(testSession.recentCommissions.joined() == "ˊ")
   }
+
+  // MARK: - 狂拼模式（Furious Typing Mode）尾段預覽
+
+  /// 狂拼模式啟用時，注拼槽內尚未完成拼寫的拼音會以組字器副本（copilot）試算尾段組句，
+  /// 並將最有可能的結果即時顯示於組字區；原始拼音字母流則改以 Tooltip 顯示。
+  @Test
+  func test_IH116A_FuriousTypingPreviewsTailReading() throws {
+    guard let testHandler, let testSession else {
+      Issue.record("testHandler and testSession at least one of them is nil.")
+      return
+    }
+    clearTestPOM()
+
+    let customGrams: [Homa.Gram] = [
+      .init(keyArray: ["ㄕˋ"], value: "世測", score: 9),
+      .init(keyArray: ["ㄐㄧㄝˋ"], value: "界測", score: 8.5),
+      .init(keyArray: ["ㄉㄚˋ"], value: "大測", score: 8),
+      .init(keyArray: ["ㄓㄢˋ"], value: "戰測", score: 8),
+    ]
+
+    defer {
+      testHandler.currentLM.clearTemporaryData(isFiltering: false)
+      testHandler.prefs.furiousTypingEnabled = false
+      testHandler.prefs.keyboardParser = KeyboardParser.ofStandard.rawValue
+      testHandler.ensureKeyboardParser()
+      testHandler.prefs.fetchSuggestionsFromPerceptionOverrideModel = true
+      testSession.resetInputHandler(forceComposerCleanup: true)
+    }
+
+    customGrams.forEach {
+      testHandler.currentLM.insertTemporaryData(unigram: $0, isFiltering: false)
+    }
+    testSession.resetInputHandler(forceComposerCleanup: true)
+    testHandler.prefs.keyboardParser = KeyboardParser.ofHanyuPinyin.rawValue
+    testHandler.ensureKeyboardParser()
+    testHandler.prefs.fetchSuggestionsFromPerceptionOverrideModel = false
+    testHandler.prefs.furiousTypingEnabled = true
+    testHandler.currentLM.syncPrefs()
+
+    // 「shijiedaz」：前段自動 chop 提交（世測界測大測），注拼槽暫存「z」。
+    typeSentence("shijiedaz")
+
+    #expect(testHandler.assembler.keys.count == 3)
+    #expect(testHandler.composer.romajiBuffer == "z")
+    // 主組字器只有已提交的三個讀音，尾段預覽不污染主組字器。
+    #expect(generateDisplayedText() == "世測界測大測")
+    // 尾段預覽：暫存的「z」經 copilot 試算組句出「戰測」，即時顯示於組字區。
+    #expect(testSession.state.type == .ofInputting)
+    #expect(testSession.state.displayedText == "世測界測大測戰測")
+    // 原始拼音字母流改以 Tooltip 顯示。
+    #expect(testSession.state.tooltip == "z")
+  }
+
+  /// 狂拼模式關閉時（預設），注拼槽暫存的拼音維持原文顯示，既有行為不受影響。
+  @Test
+  func test_IH116B_FuriousTypingDisabledKeepsRawPinyinDisplay() throws {
+    guard let testHandler, let testSession else {
+      Issue.record("testHandler and testSession at least one of them is nil.")
+      return
+    }
+    clearTestPOM()
+
+    let customGrams: [Homa.Gram] = [
+      .init(keyArray: ["ㄕˋ"], value: "世測", score: 9),
+      .init(keyArray: ["ㄐㄧㄝˋ"], value: "界測", score: 8.5),
+      .init(keyArray: ["ㄉㄚˋ"], value: "大測", score: 8),
+      .init(keyArray: ["ㄓㄢˋ"], value: "戰測", score: 8),
+    ]
+
+    defer {
+      testHandler.currentLM.clearTemporaryData(isFiltering: false)
+      testHandler.prefs.showHanyuPinyinInCompositionBuffer = false
+      testHandler.prefs.keyboardParser = KeyboardParser.ofStandard.rawValue
+      testHandler.ensureKeyboardParser()
+      testHandler.prefs.fetchSuggestionsFromPerceptionOverrideModel = true
+      testSession.resetInputHandler(forceComposerCleanup: true)
+    }
+
+    customGrams.forEach {
+      testHandler.currentLM.insertTemporaryData(unigram: $0, isFiltering: false)
+    }
+    testSession.resetInputHandler(forceComposerCleanup: true)
+    testHandler.prefs.keyboardParser = KeyboardParser.ofHanyuPinyin.rawValue
+    testHandler.ensureKeyboardParser()
+    testHandler.prefs.fetchSuggestionsFromPerceptionOverrideModel = false
+    testHandler.prefs.showHanyuPinyinInCompositionBuffer = true
+    testHandler.currentLM.syncPrefs()
+
+    typeSentence("shijiedaz")
+
+    #expect(testHandler.assembler.keys.count == 3)
+    // 狂拼模式關閉：尾段維持原始拼音「z」顯示。
+    #expect(testSession.state.displayedText == "世測界測大測z")
+    #expect(testSession.state.tooltip.isEmpty)
+  }
+
+  /// 狂拼模式啟用時，Enter 會把「組字區內容＋尾段預覽」直接遞交，
+  /// 省略「先確認讀音、再敲一次 Enter」的兩步流程。
+  @Test
+  func test_IH116C_FuriousTypingEnterCommitsPreviewedTail() throws {
+    guard let testHandler, let testSession else {
+      Issue.record("testHandler and testSession at least one of them is nil.")
+      return
+    }
+    clearTestPOM()
+
+    let customGrams: [Homa.Gram] = [
+      .init(keyArray: ["ㄕˋ"], value: "世測", score: 9),
+      .init(keyArray: ["ㄐㄧㄝˋ"], value: "界測", score: 8.5),
+      .init(keyArray: ["ㄉㄚˋ"], value: "大測", score: 8),
+      .init(keyArray: ["ㄓㄢˋ"], value: "戰測", score: 8),
+    ]
+
+    defer {
+      testHandler.currentLM.clearTemporaryData(isFiltering: false)
+      testHandler.prefs.furiousTypingEnabled = false
+      testHandler.prefs.keyboardParser = KeyboardParser.ofStandard.rawValue
+      testHandler.ensureKeyboardParser()
+      testHandler.prefs.fetchSuggestionsFromPerceptionOverrideModel = true
+      testSession.resetInputHandler(forceComposerCleanup: true)
+    }
+
+    customGrams.forEach {
+      testHandler.currentLM.insertTemporaryData(unigram: $0, isFiltering: false)
+    }
+    testSession.resetInputHandler(forceComposerCleanup: true)
+    testHandler.prefs.keyboardParser = KeyboardParser.ofHanyuPinyin.rawValue
+    testHandler.ensureKeyboardParser()
+    testHandler.prefs.fetchSuggestionsFromPerceptionOverrideModel = false
+    testHandler.prefs.furiousTypingEnabled = true
+    testHandler.currentLM.syncPrefs()
+
+    typeSentence("shijiedaz")
+    #expect(testSession.state.displayedText == "世測界測大測戰測")
+
+    // 敲 Enter：直接遞交「組字區內容＋尾段預覽」。
+    #expect(testHandler.triageInput(event: KBEvent.KeyEventData.dataEnterReturn.asEvent))
+    #expect(testSession.recentCommissions.joined() == "世測界測大測戰測")
+  }
 }

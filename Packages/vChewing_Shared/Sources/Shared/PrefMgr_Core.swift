@@ -329,6 +329,9 @@ public final class PrefMgr: PrefMgrProtocol, Sendable {
   @AppProperty(userDef: .kMixedAlphanumericalEnabled)
   public var mixedAlphanumericalEnabled: Bool
 
+  @AppProperty(userDef: .kFuriousTypingEnabled)
+  public var furiousTypingEnabled: Bool
+
   @AppProperty(userDef: .kUserPhrasesDatabaseBypassed)
   public var userPhrasesDatabaseBypassed: Bool {
     didSet { didAskForSyncingLMPrefs?() }

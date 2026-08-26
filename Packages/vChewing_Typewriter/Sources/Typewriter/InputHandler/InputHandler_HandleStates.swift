@@ -15,6 +15,51 @@ import Foundation
 extension InputHandlerProtocol {
   // MARK: - 構築狀態（State Building）
 
+  /// 狂拼模式（Furious Typing Mode）的尾段即時預覽。
+  ///
+  /// 當注拼槽內留有尚未完成拼寫的拼音時，以組字器的副本（copilot）試算「把暫存拼音當作
+  /// 尾段讀音」之後的組句結果，並取出尾段對應的文字作為即時預覽。
+  /// 僅在狂拼模式啟用、且游標位於組字區最前端時生效；回傳 nil 表示維持拼音原文顯示。
+  /// - Remark: 該屬性為無狀態的暫態試算，不對原組字器造成任何變更。
+  var furiousTypingPreviewedReading: String? {
+    guard currentTypingMethod == .vChewingFactory else { return nil }
+    guard prefs.furiousTypingEnabled, !prefs.cassetteEnabled else { return nil }
+    guard composer.isPinyinMode, composer.intonation.isEmpty else { return nil }
+    let romaji = composer.romajiBuffer
+    guard !romaji.isEmpty else { return nil }
+    guard assembler.isCursorAtAssemblerEdge(direction: .front) else { return nil }
+    // 將暫存拼音展開為注音讀音桶（含聲調變體）。
+    let tonelessZhuyin = Tekkon.PinyinTrie.shared(parser: composer.parser)
+      .zhuyinReadings(forPinyinFragment: romaji)
+    let bucket = tonelessZhuyin.flatMap { zhuyin -> [String] in
+      Tekkon.allowedIntonations.map { tone in
+        zhuyin + ((tone != " ") ? String(tone) : "")
+      }
+    }
+    guard !bucket.isEmpty else { return nil }
+    // 以組字器副本（copilot）試算尾段組句；不影響原組字器。
+    let mainLength = assembler.length
+    let copilot = assembler.copy
+    guard (try? copilot.insertKeys([bucket])) != nil else { return nil }
+    // 取出 copilot 組句結果當中越過原組字器長度的部分。
+    var counter = 0
+    var tailText = ""
+    for gram in copilot.assembledSentence {
+      let segLength = gram.keyArray.count
+      let nodeStart = counter
+      counter += segLength
+      guard counter > mainLength else { continue }
+      if nodeStart >= mainLength {
+        // 完全位於尾段的節點：取全部文字（節點的 value 長度不一定等於讀音數）。
+        tailText += gram.value
+      } else {
+        // 橫跨邊界的節點：僅取越界部分。
+        tailText += String(gram.value.suffix(counter - mainLength))
+      }
+    }
+    return tailText.isEmpty ? nil : tailText
+  }
+
   /// 生成「正在輸入」狀態。相關的內容會被拿給狀態機械用來處理在電腦螢幕上顯示的內容。
   /// - Parameters:
   ///   - sansReading: 不顯示組音區/組筆區。
@@ -45,7 +90,8 @@ extension InputHandlerProtocol {
     let cursorSansReading = cursor
     // 先提出來讀音資料，減輕運算負擔。
     let noReading = sansReading || [.codePoint, .romanNumerals].contains(currentTypingMethod)
-    let reading: String = noReading ? "" : readingForDisplay
+    let furiousPreview: String? = noReading ? nil : furiousTypingPreviewedReading
+    let reading: String = noReading ? "" : (furiousPreview ?? readingForDisplay)
     if !reading.isEmpty {
       var newDisplayTextSegments = [String]()
       var temporaryNode = ""
@@ -107,6 +153,12 @@ extension InputHandlerProtocol {
     if prefs.mixedAlphanumericalEnabled, !mixedAlphanumericalBuffer.isEmpty {
       result.tooltip = mixedAlphanumericalBuffer
       result.tooltipDuration = 0 // 設為 0 使 Tooltip 恆久顯示，直到混打模式結束。
+    }
+    /// 狂拼模式：預覽啟用時以 Tooltip 顯示注拼槽暫存的原始拼音，
+    /// 讓使用者仍能核對自己實際敲下的字母。
+    if furiousPreview != nil, result.tooltip.isEmpty {
+      result.tooltip = composer.romajiBuffer
+      result.tooltipDuration = 0 // 恆久顯示，直到暫存拼音被確認或清除。
     }
     return result
   }
@@ -171,7 +223,7 @@ extension InputHandlerProtocol {
     displayTextSegments = displayTextSegments.map { $0.trimmingCharacters(in: .newlines) }
     var displayedText = displayTextSegments.joined()
     let noReading = sansReading || [.codePoint, .romanNumerals].contains(currentTypingMethod)
-    let reading: String = noReading ? "" : readingForDisplay
+    let reading: String = noReading ? "" : (furiousTypingPreviewedReading ?? readingForDisplay)
     guard !reading.isEmpty else { return displayedText }
     let cursor = max(min(convertCursorForDisplay(assembler.cursor), displayedText.count), 0)
     let insertionIndex = displayedText.index(displayedText.startIndex, offsetBy: cursor)

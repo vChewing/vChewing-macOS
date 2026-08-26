@@ -91,6 +91,10 @@ public struct VwrSettingsPaneBehavior: View {
         }
         UserDef.kShiftEisuToggleOffTogetherWithCapsLock.renderUI()
       }
+
+      Section {
+        UserDef.kFuriousTypingEnabled.renderUI()
+      }
     }.formStyled()
       .frame(
         minWidth: CtlSettingsUI.formWidth,
