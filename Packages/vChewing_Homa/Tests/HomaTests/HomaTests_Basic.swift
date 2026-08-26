@@ -379,5 +379,54 @@ extension HomaTestsRoot {
       #expect(pos1_len1 != nil)
       #expect(pos1_len1!.grams.map(\.current) == ["之"])
     }
+
+    /// 期望的嚴格排序為「先 segment length、再 probability、再 key」。
+    /// 測資：兩個 key position 皆插入 all possible tone cluster，於最前端游標取候選。
+    @Test("[Homa] Assembler_FetchCandidatesSortsByWeightBeforeJoinedKey")
+    func testFetchCandidatesSortsByWeightBeforeJoinedKey() async throws {
+      let bucketXi = ["ㄒㄧ", "ㄒㄧˊ", "ㄒㄧˇ", "ㄒㄧˋ", "ㄒㄧ˙"]
+      let bucketAn = ["ㄢ", "ㄢˊ", "ㄢˇ", "ㄢˋ", "ㄢ˙"]
+      let assembler = Homa.Assembler(gramQuerier: { keyArray in
+        guard keyArray.count >= 1 else { return [] }
+        // insertKeys 的存在性檢查會對每個替代讀音做 .singleKey 查詢。
+        if keyArray.count == 1, case let .singleKey(k) = keyArray[0] {
+          if bucketXi.contains(k) { return [Homa.Gram(keyArray: [k], current: k, probability: -6)] }
+          if bucketAn.contains(k) { return [Homa.Gram(keyArray: [k], current: k, probability: -6)] }
+          return []
+        }
+        if keyArray.count == 1, case let .multipleKeys(k0) = keyArray[0], Set(k0) == Set(bucketXi) {
+          return [
+            Homa.Gram(keyArray: ["ㄒㄧ"], current: "西", probability: -5.16),
+            Homa.Gram(keyArray: ["ㄒㄧˋ"], current: "細", probability: -5.208),
+          ]
+        }
+        if keyArray.count == 1, case let .multipleKeys(k0) = keyArray[0], Set(k0) == Set(bucketAn) {
+          return [
+            Homa.Gram(keyArray: ["ㄢˋ"], current: "岸", probability: -5.196),
+            Homa.Gram(keyArray: ["ㄢˋ"], current: "按", probability: -5.159),
+          ]
+        }
+        guard keyArray.count == 2,
+              case let .multipleKeys(k0) = keyArray[0],
+              case let .multipleKeys(k1) = keyArray[1],
+              Set(k0) == Set(bucketXi), Set(k1) == Set(bucketAn) else { return [] }
+        // 權重取自 vChewing-VanguardLexicon 實際數據。
+        return [
+          Homa.Gram(keyArray: ["ㄒㄧ", "ㄢˋ"], current: "西岸", probability: -4.782),
+          Homa.Gram(keyArray: ["ㄒㄧ", "ㄢ"], current: "西安", probability: -4.877),
+          Homa.Gram(keyArray: ["ㄒㄧˊ", "ㄢ"], current: "錫安", probability: -6.381),
+          Homa.Gram(keyArray: ["ㄒㄧˋ", "ㄢˋ"], current: "細按", probability: -9.315),
+        ]
+      })
+      try assembler.insertKeys([.multipleKeys(bucketXi), .multipleKeys(bucketAn)])
+      // 最前端游標（frontest cursor position）。
+      assembler.cursor = assembler.keys.count
+      let candidates = assembler.fetchCandidates(filter: .endAt)
+      let values = candidates.map(\.pair.value)
+      // 期望：先 segment length（雙音節詞在前）、再 probability、再 key——
+      // 而非先 keyArray 字面（聲調符號會把「細按」誤排最前）。
+      #expect(values == ["西岸", "西安", "錫安", "細按", "按", "岸"])
+      // 對照：現況（排序鍵含 joinedKey 於 weight 之前）會把「細按」排最前。
+    }
   }
 }

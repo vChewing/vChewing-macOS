@@ -125,7 +125,6 @@ extension Homa.Assembler {
     // 只有當目標候選字真的成為邏輯游標上的 explicit node 時才算成功。
     var retryCount = 0
     let maxRetries = 20
-    let previousSentence = assembledSentence
     var successfullyRevolved = false
     var debugIntel: [String] = []
 
@@ -172,11 +171,14 @@ extension Homa.Assembler {
           value: $0.value
         )
       }
-      let didChangeSentence = previousSentence.map(\ .value) != currentSentence.map(\ .value)
+      // 以「目標候選已成為邏輯游標上的 explicit 節點」判定成功。
+      // 注意：不得要求句子值必須變化——partial match 下同字不同讀音（如「跡」ji1/ji4）
+      // 輪替時句子值不變但 keyArray 已變，若以句子值比較（didChangeSentence）判定會誤判
+      // 未穩定而卡死重試。
       let didApplyTargetCandidate = currentPairAtCursor == theCandidateNow.pair
       let didLockExplicitNode = currentGramAtCursor?.isExplicit == true
 
-      if didChangeSentence, didApplyTargetCandidate, didLockExplicitNode {
+      if didApplyTargetCandidate, didLockExplicitNode {
         debugIntel.append(
           "revolveCandidate: succeeded after \(retryCount + 1) attempts"
         )
@@ -187,7 +189,7 @@ extension Homa.Assembler {
       retryCount += 1
       if retryCount < maxRetries {
         debugIntel.append(
-          "revolveCandidate: target not stabilized, retrying (\(retryCount)/\(maxRetries)) [applied=\(didApplyTargetCandidate), explicit=\(didLockExplicitNode), changed=\(didChangeSentence)]"
+          "revolveCandidate: target not stabilized, retrying (\(retryCount)/\(maxRetries)) [applied=\(didApplyTargetCandidate), explicit=\(didLockExplicitNode)]"
         )
       }
     }
