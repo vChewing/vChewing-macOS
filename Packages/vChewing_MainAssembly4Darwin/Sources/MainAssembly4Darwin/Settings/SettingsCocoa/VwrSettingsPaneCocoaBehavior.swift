@@ -89,7 +89,7 @@ extension SettingsPanesCocoa {
                 fixWidth: innerContentWidth,
                 prefUITab: .tabBehavior
               )
-            }
+            }?.boxed()
             NSView()
           }
           NSTabView.TabPage(title: "Ｃ") {
