@@ -54,12 +54,12 @@ extension InputHandlerProtocol {
       case .kWindowsDelete: return handleDelete(input: input)
       case .kCarriageReturn, .kLineFeed:
         let frontNode = assembler.assembledSentence.last
-        return handleEnter(input: input) {
-          guard self.currentTypingMethod == .vChewingFactory else { return [] }
+        let shouldEarlyBreak: Bool = currentTypingMethod != .vChewingFactory
+        return handleEnter(input: input) { [currentLM = currentLM] in
+          guard !shouldEarlyBreak else { return [] }
           guard let frontNode = frontNode else { return [] }
           let pair = KeyValuePaired(keyArray: frontNode.keyArray, value: frontNode.value)
-          let associates = self.generateArrayOfAssociates(withPair: pair)
-          return associates
+          return currentLM.lookupHub.associatedCandidates(forPair: pair)
         }
       case .kSymbolMenuPhysicalKeyIntl, .kSymbolMenuPhysicalKeyJIS:
         let isJIS = keyCodeType == .kSymbolMenuPhysicalKeyJIS
