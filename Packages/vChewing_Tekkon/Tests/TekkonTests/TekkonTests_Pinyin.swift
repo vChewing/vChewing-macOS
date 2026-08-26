@@ -372,4 +372,32 @@ struct TekkonTestsPinyin {
     toneMarkerIndicator = composer.hasIntonation(withNothingElse: true)
     #expect(toneMarkerIndicator)
   }
+
+  /// BackSpace 清空拼音緩衝後，聲介韻槽位須同步清空（不得殘留已刪除的讀音）——
+  /// 否則 isPronounceable 誤判為真，後續的聲調鍵／空格鍵會把已刪除的讀音重新組回
+  /// （狂拼模式「BackSpace 後按空格」的輪替／重組錯亂由此而來）。
+  @Test("[Tekkon] Composer_BackSpaceResyncsPhonabetSlots_Pinyin")
+  func testBackSpaceResyncsPhonabetSlotsInPinyinMode() async throws {
+    var composer = Tekkon.Composer(arrange: .ofHanyuPinyin)
+
+    // 輸入完整音節「ma」。
+    composer.receiveKey(fromString: "m")
+    composer.receiveKey(fromString: "a")
+    #expect(composer.romajiBuffer == "ma")
+    #expect(composer.isPronounceable)
+
+    // 兩次 BackSpace 清空緩衝：聲介韻槽位須同步清空。
+    composer.doBackSpace()
+    #expect(composer.romajiBuffer == "m")
+    composer.doBackSpace()
+    #expect(composer.romajiBuffer.isEmpty)
+    #expect(composer.isEmpty)
+    #expect(!composer.isPronounceable)
+
+    // 清空後收下陰平空格鍵：不應把已刪除的「ma」重新組回。
+    composer.receiveKey(fromString: " ") // 陰平
+    #expect(composer.intonation.value == " ")
+    #expect(composer.getComposition() == "")
+    #expect(!composer.isPronounceable)
+  }
 }

@@ -426,8 +426,13 @@ extension Tekkon {
         if !intonation.isEmpty {
           intonation.clear()
         } else {
-          romajiBuffer = String(romajiBuffer.dropLast())
-          _needsRomajiUpdate = false
+          // 刪除拼音字元後，必須以縮短後的緩衝重新推導聲介韻槽位；否則 phonabet
+          // 欄位殘留已刪除的讀音（isPronounceable 誤判為真），後續的聲調鍵／空格鍵
+          // 會把已刪除的讀音重新組回（receiveSequence 會清空 romajiBuffer，故
+          // 事後須復原）。
+          let shortened = String(romajiBuffer.dropLast())
+          _ = receiveSequence(shortened, isRomaji: true)
+          romajiBuffer = shortened
         }
       } else if !intonation.isEmpty {
         intonation.clear()
