@@ -76,6 +76,8 @@ public final class InputHandler: @MainActor InputHandlerProtocol {
   public var strCodePointBuffer = "" // 內碼輸入專用組碼區
   public var calligrapher = "" // 磁帶專用組筆區
   public var mixedAlphanumericalBuffer = "" // 混輸暫存 ASCII 緩衝區
+  public var furiousTrail = [String]() // 狂拼模式：自動 chop 提交鍵對應的拼音字母 blob trail
+  public var furiousHighlightOverride: CandidateInState? // 狂拼 copilot 窗高亮候選（當拍消費）
   public var composer: Composer = .init() // 注拼槽
   public var assembler: Assembler // 組字器
 

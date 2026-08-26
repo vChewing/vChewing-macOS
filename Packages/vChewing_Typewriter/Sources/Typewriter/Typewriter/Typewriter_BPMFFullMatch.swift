@@ -44,11 +44,36 @@ public struct BPMFFullMatchTypewriter<Handler: InputHandlerProtocol>: Typewriter
         || input.isControlHeld || input.isOptionHeld || input.isShiftHeld || input.isCommandHeld
     let confirmCombination = input.isSpace || input.isEnter
 
+    // 狂拼模式：尾段候選窗顯示時，Shift+選字鍵就地選字（仿磁帶快選的路由方式）。
+    // 僅當該鍵確為選字鍵（與 handleCandidate 的 checkSelectionKey 同語義）時才路由，
+    // 避免 Shift+方向鍵／Shift+字母誤入 handleCandidate 的取消選字分支、造成重 triage
+    // 無限遞迴（注拼槽未動、候選恆在，事件反覆回到路由器）。
+    let selectionKeyMatched = input.inputTextIgnoringModifiers.map {
+      session.selectionKeys.lowercased().contains($0.lowercased())
+    } ?? false
+    let furiousShiftCandidateSelection = input.isShiftHeld
+      && handler.hasFuriousTailPending
+      && session.state.type == .ofInputting && !session.state.candidates.isEmpty
+      && selectionKeyMatched
+    if furiousShiftCandidateSelection,
+       handler.handleCandidate(input: input, ignoringModifiers: true) {
+      return true
+    }
+
     // 狂拼模式：注拼槽尚有暫存拼音時，Enter 直接遞交「組字區內容＋尾段預覽」，
-    // 省略「先確認讀音、再敲一次 Enter」的兩步流程。
+    // 省略「先確認讀音、再敲一次 Enter」的兩步流程。copilot 窗可見時，遞交的必須是
+    // 高亮（或置頂）候選的套用結果——先真實套用（含 POM 記憶），再遞交組字區全句。
     if confirmCombination, input.isEnter, !input.isHoldingAny([.control, .option, .shift, .command]),
-       prefs.furiousTypingEnabled, handler.composer.isPinyinMode,
-       !handler.composer.romajiBuffer.isEmpty {
+       handler.hasFuriousTailPending {
+      if session.isFuriousCopilotCandidateWindowVisible,
+         let candidate = handler.furiousHighlightOverride ?? session.state.candidates.first {
+        handler.confirmFuriousTailCandidate(candidate)
+        let displayedText = handler.committableDisplayText()
+        guard !displayedText.isEmpty else { return nil }
+        session.switchState(State.ofCommitting(textToCommit: displayedText))
+        return true
+      }
+      // 候選缺失或確認閘門不過：回落既有直遞語義。
       let displayedText = handler.committableDisplayText()
       guard !displayedText.isEmpty else { return nil }
       session.switchState(State.ofCommitting(textToCommit: displayedText))
@@ -233,6 +258,20 @@ public struct BPMFFullMatchTypewriter<Handler: InputHandlerProtocol>: Typewriter
       }
     }
 
+    // 狂拼模式：記錄本次自動 chop 提交的讀音鍵所對應的拼音字母 blob（trail）。
+    if handler.isFuriousTypingModeEffective {
+      let fullLetters = handler.composer.romajiBuffer + inputText
+      let consumedLetters = String(fullLetters.dropLast(autoChop.remainingRomaji.count))
+      let blobs = Array(
+        Tekkon.PinyinTrie.shared(parser: handler.composer.parser)
+          .chop(consumedLetters).prefix(autoChop.committedReadings.count)
+      )
+      // 重切段數與提交讀音數一致才記錄，避免 trail 與組字器鍵數脫鉤。
+      if blobs.count == autoChop.committedReadings.count {
+        handler.furiousTrail.append(contentsOf: blobs)
+      }
+    }
+
     let textToCommit = handler.commitOverflownComposition
     handler.retrievePOMSuggestions(apply: true)
     handler.composer.replacePinyinBuffer(with: autoChop.remainingRomaji)
@@ -246,6 +285,8 @@ public struct BPMFFullMatchTypewriter<Handler: InputHandlerProtocol>: Typewriter
     inputting.textToCommit = textToCommit
     session.switchState(inputting)
     handler.handleTypewriterSCPCTasks()
+    // 狂拼模式：語言模型引導的重切分（僅在 trail 達標時起作用）。
+    handler.resegmentFuriousTrailIfNeeded()
     return true
   }
 
@@ -301,7 +342,10 @@ public struct BPMFFullMatchTypewriter<Handler: InputHandlerProtocol>: Typewriter
     if input.isInvalid {
       errorCallback("22017F76: 不合規的按鍵輸入。")
       return true
-    } else if (try? handler.assembler.insertKey(readingKey)) == nil {
+    }
+    // 手動確認讀音為使用者顯式干涉：狂拼 trail 失效，避免重切動到已確認內容。
+    handler.invalidateFuriousTrail()
+    if (try? handler.assembler.insertKey(readingKey)) == nil {
       errorCallback(
         "3CF278C9-A: 得檢查對應的語言模組的 hasUnigramsFor() 是否有誤判之情形。"
       )
@@ -477,6 +521,7 @@ extension BPMFFullMatchTypewriter {
     }
     switch overrideRearKey(with: overrideRequest) {
     case .success:
+      handler.invalidateFuriousTrail() // 聲調覆寫為使用者顯式干涉：狂拼 trail 失效。
       handler.retrievePOMSuggestions(apply: true)
       let textToCommit = handler.commitOverflownComposition
       let targetIndex = handler.assembler.cursor - 1

@@ -281,7 +281,9 @@ extension InputHandlerProtocol {
     var shaltShiftHold = [.ofAssociates].contains(state.type)
     if state.type == .ofInputting {
       let cassetteShift = currentLM.areCassetteCandidateKeysShiftHeld
-      shaltShiftHold = shaltShiftHold || cassetteShift
+      // 狂拼模式：尾段候選就地選字亦以 Shift+選字鍵觸發（逐字選字模式停用時）。
+      let furiousShift = isFuriousTypingModeEffective
+      shaltShiftHold = shaltShiftHold || cassetteShift || furiousShift
     }
     let matched: String = (shaltShiftHold ? input.inputTextIgnoringModifiers ?? "" : inputText)
       .lowercased()

@@ -17,6 +17,19 @@ extension InputHandlerProtocol {
     var state: State { session.state }
     currentLM.syncPrefs()
 
+    // 狂拼固化：尾段候選窗顯示中、按下「可能叫出選字窗」的鍵（Space／翻頁／候選導航
+    // 方向鍵）時，先把尾段投機讀音固化進組字器（投機→實體），再讓同一事件繼續走
+    // 正常流程——正常流程自動開出正常選字窗（方向鍵、翻頁、revlookup 皆由既有機制
+    // 免費提供）。不重入、無遞迴風險；Enter／數字鍵／字母鍵／編輯鍵不屬觸發集合。
+    // 前後方向鍵不在此列——注拼槽有未完成讀音時由 handleForward/handleBackward
+    // 的專屬規則接管（狂拼開窗或 error 退回）。
+    if session.isFuriousCopilotCandidateWindowVisible,
+       !input.isHoldingAny([.control, .option, .command]),
+       input.isSpace || input.isPageUp || input.isPageDown
+       || input.isCursorClockLeft || input.isCursorClockRight {
+      solidifyFuriousTailReading()
+    }
+
     // MARK: - 按鍵碼分診（Triage by KeyCode）
 
     func triageByKeyCode() -> Bool? {

@@ -52,6 +52,8 @@ public protocol InputHandlerProtocol: AnyObject {
   var strCodePointBuffer: String { get set } // 內碼輸入專用組碼區
   var calligrapher: String { get set } // 磁帶專用組筆區
   var mixedAlphanumericalBuffer: String { get set } // 混輸暫存 ASCII 緩衝區
+  var furiousTrail: [String] { get set } // 狂拼模式：自動 chop 提交鍵對應的拼音字母 blob trail
+  var furiousHighlightOverride: CandidateInState? { get set } // 狂拼 copilot 窗高亮候選（當拍消費）
   var composer: Tekkon.Composer { get set } // 注拼槽
   var assembler: Homa.Assembler { get set } // 組字器
 }
@@ -205,6 +207,7 @@ extension InputHandlerProtocol {
     currentLM.purgeInputTokenHashMap()
     currentTypingMethod = .vChewingFactory
     backupCursor = nil
+    invalidateFuriousTrail() // 狀態重置：狂拼 trail 一併失效。
   }
 
   public func removeBackupCursor() {
@@ -245,6 +248,7 @@ extension InputHandlerProtocol {
     skipObservation: Bool = false,
     explicitlyChosen: Bool = false
   ) {
+    invalidateFuriousTrail() // 選字為使用者顯式干涉：狂拼 trail 失效。
     let theCandidate: Homa.CandidatePair = .init(candidate)
     let preservedSentenceBeforeConsolidation = assembler.assembledSentence
     let preservedCursorPosition = actualNodeCursorPosition
@@ -995,6 +999,7 @@ extension InputHandlerProtocol {
           let session = session,
           session.clientMitigationLevel >= 2
     else { return "" }
+    invalidateFuriousTrail() // 溢出遞交涉及組字器結構變更：狂拼 trail 失效。
     // 回頭在這裡插上對 Steam 的 Client Identifier 的要求。
     var textToCommit = ""
     while assembler.length > compositorWidthLimit {

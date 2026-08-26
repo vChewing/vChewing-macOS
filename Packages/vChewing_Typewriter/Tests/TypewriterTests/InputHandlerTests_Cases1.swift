@@ -11,6 +11,7 @@ import Homa
 import LMAssemblyMaterials4Tests
 
 import Shared
+import Tekkon
 import Testing
 
 import HomaSharedTestComponents
@@ -1478,8 +1479,9 @@ extension InputHandlerTests {
     // 尾段預覽：暫存的「z」經 copilot 試算組句出「戰測」，即時顯示於組字區。
     #expect(testSession.state.type == .ofInputting)
     #expect(testSession.state.displayedText == "世測界測大測戰測")
-    // 原始拼音字母流改以 Tooltip 顯示。
-    #expect(testSession.state.tooltip == "z")
+    // 尾段候選窗常駐顯示，且原始拼音字母流不再以 Tooltip 顯示（避免與候選窗重疊）。
+    #expect(!testSession.state.candidates.isEmpty)
+    #expect(testSession.state.tooltip.isEmpty)
   }
 
   /// 狂拼模式關閉時（預設），注拼槽暫存的拼音維持原文顯示，既有行為不受影響。
@@ -1567,5 +1569,1490 @@ extension InputHandlerTests {
     // 敲 Enter：直接遞交「組字區內容＋尾段預覽」。
     #expect(testHandler.triageInput(event: KBEvent.KeyEventData.dataEnterReturn.asEvent))
     #expect(testSession.recentCommissions.joined() == "世測界測大測戰測")
+  }
+
+  /// 狂拼模式啟用時，Inputting 狀態會常駐附掛尾段候選清單：
+  /// 置頂為 copilot 預覽猜測值「戰測」，其餘來自語言模組；狂拼關閉時不得附掛。
+  @Test
+  func test_IH117A_FuriousTypingAttachesTailCandidates() throws {
+    guard let testHandler, let testSession else {
+      Issue.record("testHandler and testSession at least one of them is nil.")
+      return
+    }
+    clearTestPOM()
+
+    let customGrams: [Homa.Gram] = [
+      .init(keyArray: ["ㄕˋ"], value: "世測", score: 9),
+      .init(keyArray: ["ㄐㄧㄝˋ"], value: "界測", score: 8.5),
+      .init(keyArray: ["ㄉㄚˋ"], value: "大測", score: 8),
+      .init(keyArray: ["ㄓㄢˋ"], value: "戰測", score: 8),
+    ]
+
+    defer {
+      testHandler.currentLM.clearTemporaryData(isFiltering: false)
+      testHandler.prefs.furiousTypingEnabled = false
+      testHandler.prefs.keyboardParser = KeyboardParser.ofStandard.rawValue
+      testHandler.ensureKeyboardParser()
+      testHandler.prefs.fetchSuggestionsFromPerceptionOverrideModel = true
+      testSession.resetInputHandler(forceComposerCleanup: true)
+    }
+
+    customGrams.forEach {
+      testHandler.currentLM.insertTemporaryData(unigram: $0, isFiltering: false)
+    }
+    testSession.resetInputHandler(forceComposerCleanup: true)
+    testHandler.prefs.keyboardParser = KeyboardParser.ofHanyuPinyin.rawValue
+    testHandler.ensureKeyboardParser()
+    testHandler.prefs.fetchSuggestionsFromPerceptionOverrideModel = false
+    testHandler.prefs.furiousTypingEnabled = true
+    testHandler.currentLM.syncPrefs()
+
+    // 「shijiedaz」：前段自動 chop 提交（世測界測大測），注拼槽暫存「z」。
+    typeSentence("shijiedaz")
+
+    #expect(testSession.state.type == .ofInputting)
+    // 尾段候選窗常駐顯示：候選清單非空、置頂為 copilot 預覽值「戰測」。
+    #expect(!testSession.state.candidates.isEmpty)
+    #expect(testSession.state.candidates.first?.value == "戰測")
+    // 其餘候選來自語言模組，且不得有空值。
+    #expect(testSession.state.candidates.dropFirst().allSatisfy { !$0.value.isEmpty })
+    #expect(testSession.state.candidates.count == (testHandler.furiousTypingTailCandidates?.count ?? 0))
+
+    // 狂拼關閉時不得附加候選（零行為差異）。
+    testHandler.prefs.furiousTypingEnabled = false
+    testHandler.currentLM.syncPrefs()
+    let stateSansFurious = testHandler.generateStateOfInputting()
+    #expect(stateSansFurious.candidates.isEmpty)
+  }
+
+  /// 狂拼模式啟用時，Shift+選字鍵「1」就地選中置頂尾段候選：
+  /// 注拼槽清空、組字器尾端寫入對應讀音、組字區顯示「戰測」、狀態回到無候選的 Inputting。
+  @Test
+  func test_IH117B_FuriousTypingShiftSelection() throws {
+    guard let testHandler, let testSession else {
+      Issue.record("testHandler and testSession at least one of them is nil.")
+      return
+    }
+    clearTestPOM()
+
+    let customGrams: [Homa.Gram] = [
+      .init(keyArray: ["ㄕˋ"], value: "世測", score: 9),
+      .init(keyArray: ["ㄐㄧㄝˋ"], value: "界測", score: 8.5),
+      .init(keyArray: ["ㄉㄚˋ"], value: "大測", score: 8),
+      .init(keyArray: ["ㄓㄢˋ"], value: "戰測", score: 8),
+    ]
+
+    defer {
+      testHandler.currentLM.clearTemporaryData(isFiltering: false)
+      testSession.mockCandidateController = nil
+      testHandler.prefs.furiousTypingEnabled = false
+      testHandler.prefs.keyboardParser = KeyboardParser.ofStandard.rawValue
+      testHandler.ensureKeyboardParser()
+      testHandler.prefs.fetchSuggestionsFromPerceptionOverrideModel = true
+      testSession.resetInputHandler(forceComposerCleanup: true)
+    }
+
+    customGrams.forEach {
+      testHandler.currentLM.insertTemporaryData(unigram: $0, isFiltering: false)
+    }
+    testSession.resetInputHandler(forceComposerCleanup: true)
+    testHandler.prefs.keyboardParser = KeyboardParser.ofHanyuPinyin.rawValue
+    testHandler.ensureKeyboardParser()
+    testHandler.prefs.fetchSuggestionsFromPerceptionOverrideModel = false
+    testHandler.prefs.furiousTypingEnabled = true
+    testHandler.currentLM.syncPrefs()
+
+    typeSentence("shijiedaz")
+    #expect(testSession.state.type == .ofInputting)
+    #expect(!testSession.state.candidates.isEmpty)
+    #expect(testSession.state.candidates.first?.value == "戰測")
+
+    // 模擬候選窗已顯示（handleCandidate 需要 ctlCandidate.visible）。
+    testSession.mockCandidateController = MockCandidateController(visible: true)
+
+    // Shift+1（選字鍵「1」）選中置頂候選。
+    let shift1 = KBEvent.KeyEventData(
+      flags: .shift, chars: "!", charsSansModifiers: "1", keyCode: 18
+    ).asEvent
+    #expect(testHandler.triageInput(event: shift1))
+
+    // 注拼槽已清空。
+    #expect(testHandler.composer.romajiBuffer.isEmpty)
+    // 組字器尾端插入對應讀音（3 個已提交讀音 + 1 個尾段讀音位置）。
+    #expect(testHandler.assembler.keys.count == 4)
+    // 組字區顯示文字含「戰測」。
+    #expect(generateDisplayedText().contains("戰測"))
+    // 狀態回到無候選的 Inputting，且未發生任何遞交。
+    #expect(testSession.state.type == .ofInputting)
+    #expect(testSession.state.candidates.isEmpty)
+    #expect(testSession.recentCommissions.isEmpty)
+  }
+
+  /// 狂拼候選窗顯示中，不帶 Shift 的數字鍵仍走既有語義（聲調鍵處理），不觸發選字。
+  @Test
+  func test_IH117C_FuriousTypingPlainDigitKeyKeepsToneSemantics() throws {
+    guard let testHandler, let testSession else {
+      Issue.record("testHandler and testSession at least one of them is nil.")
+      return
+    }
+    clearTestPOM()
+
+    let customGrams: [Homa.Gram] = [
+      .init(keyArray: ["ㄕˋ"], value: "世測", score: 9),
+      .init(keyArray: ["ㄐㄧㄝˋ"], value: "界測", score: 8.5),
+      .init(keyArray: ["ㄉㄚˋ"], value: "大測", score: 8),
+      .init(keyArray: ["ㄓㄢˋ"], value: "戰測", score: 8),
+    ]
+
+    defer {
+      testHandler.currentLM.clearTemporaryData(isFiltering: false)
+      testSession.mockCandidateController = nil
+      testHandler.prefs.furiousTypingEnabled = false
+      testHandler.prefs.keyboardParser = KeyboardParser.ofStandard.rawValue
+      testHandler.ensureKeyboardParser()
+      testHandler.prefs.fetchSuggestionsFromPerceptionOverrideModel = true
+      testSession.resetInputHandler(forceComposerCleanup: true)
+    }
+
+    customGrams.forEach {
+      testHandler.currentLM.insertTemporaryData(unigram: $0, isFiltering: false)
+    }
+    testSession.resetInputHandler(forceComposerCleanup: true)
+    testHandler.prefs.keyboardParser = KeyboardParser.ofHanyuPinyin.rawValue
+    testHandler.ensureKeyboardParser()
+    testHandler.prefs.fetchSuggestionsFromPerceptionOverrideModel = false
+    testHandler.prefs.furiousTypingEnabled = true
+    testHandler.currentLM.syncPrefs()
+
+    typeSentence("shijiedaz")
+    #expect(testSession.state.type == .ofInputting)
+    #expect(!testSession.state.candidates.isEmpty)
+
+    // 模擬候選窗已顯示。
+    testSession.mockCandidateController = MockCandidateController(visible: true)
+
+    // 不帶 Shift 的「1」：走聲調/一般處理，不得觸發選字。
+    let plain1 = KBEvent.KeyEventData(chars: "1", keyCode: 18).asEvent
+    _ = testHandler.triageInput(event: plain1)
+
+    // 未遞交任何內容。
+    #expect(testSession.recentCommissions.isEmpty)
+    // 置頂候選「戰測」未被寫入組字器（選字未觸發）。
+    #expect(!testHandler.assembler.assembledSentence.values.joined().contains("戰測"))
+    // 狀態仍是 Inputting。
+    #expect(testSession.state.type == .ofInputting)
+  }
+
+  /// 逐字選字模式（SCPC）啟用時狂拼完全無效：預覽停用（維持原文拼音）、候選清單為空。
+  @Test
+  func test_IH117D_SCPCForcesFuriousTypingInert() throws {
+    guard let testHandler, let testSession else {
+      Issue.record("testHandler and testSession at least one of them is nil.")
+      return
+    }
+    clearTestPOM()
+
+    let customGrams: [Homa.Gram] = [
+      .init(keyArray: ["ㄕˋ"], value: "世測", score: 9),
+      .init(keyArray: ["ㄐㄧㄝˋ"], value: "界測", score: 8.5),
+      .init(keyArray: ["ㄉㄚˋ"], value: "大測", score: 8),
+      .init(keyArray: ["ㄓㄢˋ"], value: "戰測", score: 8),
+    ]
+
+    defer {
+      testHandler.currentLM.clearTemporaryData(isFiltering: false)
+      testHandler.prefs.furiousTypingEnabled = false
+      testHandler.prefs.useSCPCTypingMode = false
+      testHandler.prefs.showHanyuPinyinInCompositionBuffer = false
+      testHandler.prefs.keyboardParser = KeyboardParser.ofStandard.rawValue
+      testHandler.ensureKeyboardParser()
+      testHandler.prefs.fetchSuggestionsFromPerceptionOverrideModel = true
+      testSession.resetInputHandler(forceComposerCleanup: true)
+    }
+
+    customGrams.forEach {
+      testHandler.currentLM.insertTemporaryData(unigram: $0, isFiltering: false)
+    }
+    testSession.resetInputHandler(forceComposerCleanup: true)
+    testHandler.prefs.keyboardParser = KeyboardParser.ofHanyuPinyin.rawValue
+    testHandler.ensureKeyboardParser()
+    testHandler.prefs.fetchSuggestionsFromPerceptionOverrideModel = false
+    testHandler.prefs.furiousTypingEnabled = true
+    testHandler.prefs.useSCPCTypingMode = true
+    testHandler.prefs.showHanyuPinyinInCompositionBuffer = true
+    testHandler.currentLM.syncPrefs()
+
+    // 手動建構「shijiedaz」打完後的狀態：前段已提交、注拼槽暫存「z」。
+    try? testHandler.assembler.insertKey(["ㄕˋ"])
+    try? testHandler.assembler.insertKey(["ㄐㄧㄝˋ"])
+    try? testHandler.assembler.insertKey(["ㄉㄚˋ"])
+    testHandler.composer.replacePinyinBuffer(with: "z")
+    let state = testHandler.generateStateOfInputting()
+
+    // SCPC 啟用時狂拼完全無效：維持原文拼音「z」顯示、不附加候選。
+    #expect(state.displayedText == "世測界測大測z")
+    #expect(state.candidates.isEmpty)
+  }
+
+  // MARK: - 狂拼重切分（Furious Resegmentation）
+
+  /// 建立「fangan → 反感」重切分測試用的詞庫：
+  /// 支撐單字（方／安／反／感）與高分的「反感」雙音節詞，讓兩種切分都能在庫組句。
+  private func insertFangAnResegmentationFixture(testHandler: MockInputHandler?) {
+    guard let testHandler else { return }
+    let customGrams: [Homa.Gram] = [
+      .init(keyArray: ["ㄈㄤ"], value: "方", score: -6),
+      .init(keyArray: ["ㄢ"], value: "安", score: -6),
+      .init(keyArray: ["ㄈㄢˇ"], value: "反", score: -6),
+      .init(keyArray: ["ㄍㄢˇ"], value: "感", score: -6),
+      .init(keyArray: ["ㄈㄢˇ", "ㄍㄢˇ"], value: "反感", score: -7),
+    ]
+    customGrams.forEach {
+      testHandler.currentLM.insertTemporaryData(unigram: $0, isFiltering: false)
+    }
+  }
+
+  /// 建構給定注音讀音的無調候選桶（與自動 chop 的展開語義一致）。
+  private func furiousTestBucket(for zhuyin: String) -> [String] {
+    Tekkon.allowedIntonations.map { tone in
+      zhuyin + ((tone != " ") ? String(tone) : "")
+    }
+  }
+
+  /// 狂拼模式：greedy chop 把「fangan」切成 fang|an 之後，語言模型引導的重切分
+  /// 應把尾段兩鍵換成 fan|gan 桶，使組句結果由「反感」勝出。
+  @Test
+  func test_IH118A_FuriousTypingResegmentsFangAn() throws {
+    guard let testHandler, let testSession else {
+      Issue.record("testHandler and testSession at least one of them is nil.")
+      return
+    }
+    clearTestPOM()
+
+    defer {
+      testHandler.currentLM.clearTemporaryData(isFiltering: false)
+      testHandler.prefs.furiousTypingEnabled = false
+      testHandler.prefs.keyboardParser = KeyboardParser.ofStandard.rawValue
+      testHandler.ensureKeyboardParser()
+      testHandler.prefs.fetchSuggestionsFromPerceptionOverrideModel = true
+      testSession.resetInputHandler(forceComposerCleanup: true)
+    }
+
+    insertFangAnResegmentationFixture(testHandler: testHandler)
+    testSession.resetInputHandler(forceComposerCleanup: true)
+    testHandler.prefs.keyboardParser = KeyboardParser.ofHanyuPinyin.rawValue
+    testHandler.ensureKeyboardParser()
+    testHandler.prefs.fetchSuggestionsFromPerceptionOverrideModel = false
+    testHandler.prefs.furiousTypingEnabled = true
+    testHandler.currentLM.syncPrefs()
+
+    // 「fanganz」：第一次 chop 提交 fang（暫存 a），第二次 chop 提交 an（暫存 z），
+    // 隨後重切分把 trail 換成 fan|gan。
+    typeSentence("fanganz")
+
+    // trail 已被重切為 fan|gan。
+    #expect(testHandler.furiousTrail == ["fan", "gan"])
+    // 組字器尾端兩鍵變成 fan/gan 無調候選桶。
+    #expect(testHandler.assembler.keys.count == 2)
+    #expect(
+      Array(testHandler.assembler.keys)
+        == [
+          .multipleKeys(furiousTestBucket(for: "ㄈㄢ")),
+          .multipleKeys(furiousTestBucket(for: "ㄍㄢ")),
+        ]
+    )
+    // 組句尾段值為「反感」。
+    #expect(testHandler.assembler.assembledSentence.map(\.value) == ["反感"])
+    // 替換後路徑總分高於原地維持的 fang|an 切分。
+    #expect(testHandler.assembler.mostRecentPathScore > -9)
+  }
+
+  /// 狂拼模式關閉時不記錄 trail、也不重切分：維持 greedy 的 fang|an 切分。
+  @Test
+  func test_IH118B_FuriousTypingNoResegmentationWhenDisabled() throws {
+    guard let testHandler, let testSession else {
+      Issue.record("testHandler and testSession at least one of them is nil.")
+      return
+    }
+    clearTestPOM()
+
+    defer {
+      testHandler.currentLM.clearTemporaryData(isFiltering: false)
+      testHandler.prefs.keyboardParser = KeyboardParser.ofStandard.rawValue
+      testHandler.ensureKeyboardParser()
+      testHandler.prefs.fetchSuggestionsFromPerceptionOverrideModel = true
+      testSession.resetInputHandler(forceComposerCleanup: true)
+    }
+
+    insertFangAnResegmentationFixture(testHandler: testHandler)
+    testSession.resetInputHandler(forceComposerCleanup: true)
+    testHandler.prefs.keyboardParser = KeyboardParser.ofHanyuPinyin.rawValue
+    testHandler.ensureKeyboardParser()
+    testHandler.prefs.fetchSuggestionsFromPerceptionOverrideModel = false
+    testHandler.currentLM.syncPrefs()
+
+    typeSentence("fanganz")
+
+    // 無 trail、無重切：維持 fang|an 桶，組句不出現「反感」。
+    #expect(testHandler.furiousTrail.isEmpty)
+    #expect(testHandler.assembler.keys.count == 2)
+    #expect(
+      Array(testHandler.assembler.keys)
+        == [
+          .multipleKeys(furiousTestBucket(for: "ㄈㄤ")),
+          .multipleKeys(furiousTestBucket(for: "ㄢ")),
+        ]
+    )
+    #expect(!testHandler.assembler.assembledSentence.map(\.value).contains("反感"))
+  }
+
+  /// BackSpace 在注拼槽為空時刪除組字器尾鍵：狂拼 trail 精確同步（pop 而非全清）。
+  @Test
+  func test_IH118C_FuriousTrailPopOnBackspace() throws {
+    guard let testHandler, let testSession else {
+      Issue.record("testHandler and testSession at least one of them is nil.")
+      return
+    }
+    clearTestPOM()
+
+    defer {
+      testHandler.currentLM.clearTemporaryData(isFiltering: false)
+      testHandler.prefs.furiousTypingEnabled = false
+      testHandler.prefs.keyboardParser = KeyboardParser.ofStandard.rawValue
+      testHandler.ensureKeyboardParser()
+      testHandler.prefs.fetchSuggestionsFromPerceptionOverrideModel = true
+      testSession.resetInputHandler(forceComposerCleanup: true)
+    }
+
+    insertFangAnResegmentationFixture(testHandler: testHandler)
+    testSession.resetInputHandler(forceComposerCleanup: true)
+    testHandler.prefs.keyboardParser = KeyboardParser.ofHanyuPinyin.rawValue
+    testHandler.ensureKeyboardParser()
+    testHandler.prefs.fetchSuggestionsFromPerceptionOverrideModel = false
+    testHandler.prefs.furiousTypingEnabled = true
+    testHandler.currentLM.syncPrefs()
+
+    typeSentence("fanganz")
+    #expect(testHandler.furiousTrail == ["fan", "gan"])
+    #expect(testHandler.composer.romajiBuffer == "z")
+
+    // 第一次 BackSpace：注拼槽尚有「z」，只清注拼槽、不動組字器，trail 不變。
+    _ = testHandler.triageInput(event: KBEvent.KeyEventData.backspace.asEvent)
+    #expect(testHandler.composer.romajiBuffer.isEmpty)
+    #expect(testHandler.furiousTrail == ["fan", "gan"])
+    #expect(testHandler.assembler.keys.count == 2)
+
+    // 第二次 BackSpace：注拼槽為空，刪除組字器尾鍵並同步 pop trail。
+    _ = testHandler.triageInput(event: KBEvent.KeyEventData.backspace.asEvent)
+    #expect(testHandler.furiousTrail == ["fan"])
+    #expect(testHandler.assembler.keys.count == 1)
+  }
+
+  /// 使用者顯式選字（consolidateNode）之後，狂拼 trail 失效（清空）。
+  @Test
+  func test_IH118D_FuriousTrailInvalidatedByConsolidateNode() throws {
+    guard let testHandler, let testSession else {
+      Issue.record("testHandler and testSession at least one of them is nil.")
+      return
+    }
+    clearTestPOM()
+
+    defer {
+      testHandler.currentLM.clearTemporaryData(isFiltering: false)
+      testHandler.prefs.furiousTypingEnabled = false
+      testHandler.prefs.keyboardParser = KeyboardParser.ofStandard.rawValue
+      testHandler.ensureKeyboardParser()
+      testHandler.prefs.fetchSuggestionsFromPerceptionOverrideModel = true
+      testSession.resetInputHandler(forceComposerCleanup: true)
+    }
+
+    insertFangAnResegmentationFixture(testHandler: testHandler)
+    testSession.resetInputHandler(forceComposerCleanup: true)
+    testHandler.prefs.keyboardParser = KeyboardParser.ofHanyuPinyin.rawValue
+    testHandler.ensureKeyboardParser()
+    testHandler.prefs.fetchSuggestionsFromPerceptionOverrideModel = false
+    testHandler.prefs.furiousTypingEnabled = true
+    testHandler.currentLM.syncPrefs()
+
+    typeSentence("fanganz")
+    #expect(testHandler.furiousTrail == ["fan", "gan"])
+
+    // 選字（明確覆寫）之後 trail 必須失效，避免重切動到使用者確認過的內容。
+    testHandler.consolidateNode(
+      candidate: (keyArray: ["ㄈㄢˇ", "ㄍㄢˇ"], value: "反感"),
+      respectCursorPushing: false,
+      preConsolidate: false,
+      skipObservation: true,
+      explicitlyChosen: true
+    )
+    #expect(testHandler.furiousTrail.isEmpty)
+  }
+
+  // MARK: - 狂拼固化（Furious Solidification）
+
+  /// 建立「shijie → 世界」固化測試用的詞庫：
+  /// 支撐單字（世／界）與高分的「世界」雙音節詞。
+  private func insertShiJieSolidificationFixture(testHandler: MockInputHandler?) {
+    guard let testHandler else { return }
+    let customGrams: [Homa.Gram] = [
+      .init(keyArray: ["ㄕˋ"], value: "世", score: -6),
+      .init(keyArray: ["ㄐㄧㄝˋ"], value: "界", score: -6),
+      .init(keyArray: ["ㄕˋ", "ㄐㄧㄝˋ"], value: "世界", score: -7),
+    ]
+    customGrams.forEach {
+      testHandler.currentLM.insertTemporaryData(unigram: $0, isFiltering: false)
+    }
+  }
+
+  /// 打「shijie」後（注拼槽暫存 jie、候選窗顯示中），按 Space：
+  /// 尾段讀音被固化進組字器（鍵數＋1、注拼槽清空、trail 尾筆為 jie），
+  /// 且同一事件繼續走正常流程、開出正常選字窗，候選涵蓋跨邊界詞「世界」。
+  @Test
+  func test_IH119A_FuriousTypingSpaceSolidifiesAndOpensCandidateWindow() throws {
+    guard let testHandler, let testSession else {
+      Issue.record("testHandler and testSession at least one of them is nil.")
+      return
+    }
+    clearTestPOM()
+
+    defer {
+      testHandler.currentLM.clearTemporaryData(isFiltering: false)
+      testHandler.prefs.furiousTypingEnabled = false
+      testHandler.prefs.keyboardParser = KeyboardParser.ofStandard.rawValue
+      testHandler.ensureKeyboardParser()
+      testHandler.prefs.fetchSuggestionsFromPerceptionOverrideModel = true
+      testSession.resetInputHandler(forceComposerCleanup: true)
+    }
+
+    insertShiJieSolidificationFixture(testHandler: testHandler)
+    testSession.resetInputHandler(forceComposerCleanup: true)
+    testHandler.prefs.keyboardParser = KeyboardParser.ofHanyuPinyin.rawValue
+    testHandler.ensureKeyboardParser()
+    testHandler.prefs.fetchSuggestionsFromPerceptionOverrideModel = false
+    testHandler.prefs.furiousTypingEnabled = true
+    testHandler.prefs.spaceKeyBehaviorAgainstICB = 1 // Space 為選字窗呼叫鍵（預設值）。
+    testHandler.currentLM.syncPrefs()
+
+    // 「shijie」：auto-chop 在 'j' 提交 shi（注拼槽暫存 jie）。
+    typeSentence("shijie")
+    #expect(testHandler.assembler.keys.count == 1)
+    #expect(testHandler.composer.romajiBuffer == "jie")
+    #expect(testHandler.furiousTrail == ["shi"])
+    #expect(!testSession.state.candidates.isEmpty)
+
+    // 按 Space：觸發鍵固化。
+    _ = testHandler.triageInput(event: KBEvent.KeyEventData(chars: " ", keyCode: 49).asEvent)
+
+    // 固化完成：注拼槽清空、組字器尾端多一個讀音鍵、trail 尾筆為 jie。
+    #expect(testHandler.composer.romajiBuffer.isEmpty)
+    #expect(testHandler.assembler.keys.count == 2)
+    #expect(testHandler.furiousTrail == ["shi", "jie"])
+    // 同一事件繼續走正常流程：開出正常選字窗，候選涵蓋跨邊界詞「世界」。
+    #expect(testSession.state.type == .ofCandidates)
+    #expect(testSession.state.candidates.contains { $0.value == "世界" })
+  }
+
+  /// 同前但按 Down 方向鍵（橫排時 Down＝isCursorClockLeft，正常流程會開選字窗）：
+  /// 固化發生且後續為正常語義（候選窗涵蓋「世界」）。
+  @Test
+  func test_IH119B_FuriousTypingDownArrowSolidifiesAndOpensCandidateWindow() throws {
+    guard let testHandler, let testSession else {
+      Issue.record("testHandler and testSession at least one of them is nil.")
+      return
+    }
+    clearTestPOM()
+
+    defer {
+      testHandler.currentLM.clearTemporaryData(isFiltering: false)
+      testHandler.prefs.furiousTypingEnabled = false
+      testHandler.prefs.keyboardParser = KeyboardParser.ofStandard.rawValue
+      testHandler.ensureKeyboardParser()
+      testHandler.prefs.fetchSuggestionsFromPerceptionOverrideModel = true
+      testSession.resetInputHandler(forceComposerCleanup: true)
+    }
+
+    insertShiJieSolidificationFixture(testHandler: testHandler)
+    testSession.resetInputHandler(forceComposerCleanup: true)
+    testHandler.prefs.keyboardParser = KeyboardParser.ofHanyuPinyin.rawValue
+    testHandler.ensureKeyboardParser()
+    testHandler.prefs.fetchSuggestionsFromPerceptionOverrideModel = false
+    testHandler.prefs.furiousTypingEnabled = true
+    testHandler.currentLM.syncPrefs()
+
+    // 橫排（MockSession 預設 isVerticalTyping == false）：Down＝isCursorClockLeft。
+    #expect(!testSession.isVerticalTyping)
+
+    typeSentence("shijie")
+    #expect(testHandler.composer.romajiBuffer == "jie")
+    #expect(!testSession.state.candidates.isEmpty)
+
+    // 按 Down：觸發鍵固化，同一事件開出正常選字窗。
+    _ = testHandler.triageInput(event: KBEvent.KeyEventData.dataArrowDown.asEvent)
+
+    #expect(testHandler.composer.romajiBuffer.isEmpty)
+    #expect(testHandler.assembler.keys.count == 2)
+    #expect(testHandler.furiousTrail == ["shi", "jie"])
+    #expect(testSession.state.type == .ofCandidates)
+    #expect(testSession.state.candidates.contains { $0.value == "世界" })
+  }
+
+  /// 狂拼候選窗顯示中，字母鍵與 Enter 不走固化：
+  /// 字母鍵維持既有打字（auto-chop）行為；Enter 維持狂拼直遞語義。
+  @Test
+  func test_IH119C_FuriousTypingLetterKeyAndEnterDoNotSolidify() throws {
+    guard let testHandler, let testSession else {
+      Issue.record("testHandler and testSession at least one of them is nil.")
+      return
+    }
+    clearTestPOM()
+
+    defer {
+      testHandler.currentLM.clearTemporaryData(isFiltering: false)
+      testHandler.prefs.furiousTypingEnabled = false
+      testHandler.prefs.keyboardParser = KeyboardParser.ofStandard.rawValue
+      testHandler.ensureKeyboardParser()
+      testHandler.prefs.fetchSuggestionsFromPerceptionOverrideModel = true
+      testSession.resetInputHandler(forceComposerCleanup: true)
+    }
+
+    insertShiJieSolidificationFixture(testHandler: testHandler)
+    testSession.resetInputHandler(forceComposerCleanup: true)
+    testHandler.prefs.keyboardParser = KeyboardParser.ofHanyuPinyin.rawValue
+    testHandler.ensureKeyboardParser()
+    testHandler.prefs.fetchSuggestionsFromPerceptionOverrideModel = false
+    testHandler.prefs.furiousTypingEnabled = true
+    testHandler.currentLM.syncPrefs()
+
+    // 字母鍵：不固化（不開候選窗）、維持既有 auto-chop 打字行為。
+    typeSentence("shijie")
+    #expect(testHandler.composer.romajiBuffer == "jie")
+    _ = testHandler.triageInput(event: KBEvent.KeyEventData(chars: "a").asEvent)
+    #expect(testSession.state.type == .ofInputting) // 未經固化＋開窗流程。
+    #expect(testHandler.assembler.keys.count == 2) // 既有 auto-chop 提交 jie。
+    #expect(testHandler.composer.romajiBuffer == "a")
+
+    // Enter：狂拼直遞（組字區＋尾段預覽直接遞交），不固化、不開選字窗。
+    testSession.switchState(IMEState.ofAbortion()) // 清空組字區與注拼槽，不遞交。
+    testHandler.prefs.furiousTypingEnabled = true
+    testHandler.currentLM.syncPrefs()
+    typeSentence("shijie")
+    _ = testHandler.triageInput(event: KBEvent.KeyEventData.dataEnterReturn.asEvent)
+    // 組字區「世」＋尾段預覽「界」＝「世界」直接遞交。
+    #expect(testSession.recentCommissions.joined() == "世界")
+  }
+
+  /// 狂拼候選窗顯示中，state 的 tooltip 被抑制（原文拼音不再以 tooltip 顯示）。
+  @Test
+  func test_IH119D_FuriousTypingSuppressesTooltipWhenCandidatesShow() throws {
+    guard let testHandler, let testSession else {
+      Issue.record("testHandler and testSession at least one of them is nil.")
+      return
+    }
+    clearTestPOM()
+
+    defer {
+      testHandler.currentLM.clearTemporaryData(isFiltering: false)
+      testHandler.prefs.furiousTypingEnabled = false
+      testHandler.prefs.keyboardParser = KeyboardParser.ofStandard.rawValue
+      testHandler.ensureKeyboardParser()
+      testHandler.prefs.fetchSuggestionsFromPerceptionOverrideModel = true
+      testSession.resetInputHandler(forceComposerCleanup: true)
+    }
+
+    insertShiJieSolidificationFixture(testHandler: testHandler)
+    testSession.resetInputHandler(forceComposerCleanup: true)
+    testHandler.prefs.keyboardParser = KeyboardParser.ofHanyuPinyin.rawValue
+    testHandler.ensureKeyboardParser()
+    testHandler.prefs.fetchSuggestionsFromPerceptionOverrideModel = false
+    testHandler.prefs.furiousTypingEnabled = true
+    testHandler.currentLM.syncPrefs()
+
+    typeSentence("shijie")
+    // 候選窗顯示中：tooltip 為空（抑制）、candidates 非空、組字區仍顯示預覽。
+    #expect(!testSession.state.candidates.isEmpty)
+    #expect(testSession.state.tooltip.isEmpty)
+    #expect(!testSession.state.displayedText.isEmpty)
+  }
+
+  /// 不完整前綴（例如「z」）被固化：固化成功但 trail 失效（清空），無崩潰。
+  @Test
+  func test_IH119E_FuriousTypingSolidifyingIncompletePrefixInvalidatesTrail() throws {
+    guard let testHandler, let testSession else {
+      Issue.record("testHandler and testSession at least one of them is nil.")
+      return
+    }
+    clearTestPOM()
+
+    defer {
+      testHandler.currentLM.clearTemporaryData(isFiltering: false)
+      testHandler.prefs.furiousTypingEnabled = false
+      testHandler.prefs.keyboardParser = KeyboardParser.ofStandard.rawValue
+      testHandler.ensureKeyboardParser()
+      testHandler.prefs.fetchSuggestionsFromPerceptionOverrideModel = true
+      testSession.resetInputHandler(forceComposerCleanup: true)
+    }
+
+    insertFangAnResegmentationFixture(testHandler: testHandler)
+    testSession.resetInputHandler(forceComposerCleanup: true)
+    testHandler.prefs.keyboardParser = KeyboardParser.ofHanyuPinyin.rawValue
+    testHandler.ensureKeyboardParser()
+    testHandler.prefs.fetchSuggestionsFromPerceptionOverrideModel = false
+    testHandler.prefs.furiousTypingEnabled = true
+    testHandler.currentLM.syncPrefs()
+
+    // 「fanganz」：auto-chop 提交 fang／an，注拼槽暫存「z」（不完整前綴）。
+    typeSentence("fanganz")
+    #expect(testHandler.composer.romajiBuffer == "z")
+    #expect(testHandler.furiousTrail == ["fan", "gan"])
+    #expect(!testSession.state.candidates.isEmpty)
+
+    // 按 Space：固化「z」前綴桶成功，但 trail 因不完整音節而失效。
+    _ = testHandler.triageInput(event: KBEvent.KeyEventData(chars: " ", keyCode: 49).asEvent)
+    #expect(testHandler.composer.romajiBuffer.isEmpty)
+    #expect(testHandler.assembler.keys.count == 3) // 固化為尾段新增一個讀音鍵。
+    #expect(testHandler.furiousTrail.isEmpty) // 不完整前綴固化 → trail 失效。
+  }
+
+  // MARK: - 狂拼跨邊界候選與反查（Furious Cross-Boundary & Reverse Lookup）
+
+  /// 打「shijie」時，copilot 候選窗須涵蓋跨邊界詞「世界」：
+  /// 順序為置頂預覽之後、尾段單音節候選之前，且全程按 value 去重。
+  @Test
+  func test_IH120A_FuriousTypingCandidatesIncludeCrossBoundaryWord() throws {
+    guard let testHandler, let testSession else {
+      Issue.record("testHandler and testSession at least one of them is nil.")
+      return
+    }
+    clearTestPOM()
+
+    defer {
+      testHandler.currentLM.clearTemporaryData(isFiltering: false)
+      testHandler.prefs.furiousTypingEnabled = false
+      testHandler.prefs.keyboardParser = KeyboardParser.ofStandard.rawValue
+      testHandler.ensureKeyboardParser()
+      testHandler.prefs.fetchSuggestionsFromPerceptionOverrideModel = true
+      testSession.resetInputHandler(forceComposerCleanup: true)
+    }
+
+    insertShiJieSolidificationFixture(testHandler: testHandler)
+    testSession.resetInputHandler(forceComposerCleanup: true)
+    testHandler.prefs.keyboardParser = KeyboardParser.ofHanyuPinyin.rawValue
+    testHandler.ensureKeyboardParser()
+    testHandler.prefs.fetchSuggestionsFromPerceptionOverrideModel = false
+    testHandler.prefs.furiousTypingEnabled = true
+    testHandler.currentLM.syncPrefs()
+
+    // 「shijie」：auto-chop 提交 shi、注拼槽暫存 jie、copilot 候選窗顯示。
+    typeSentence("shijie")
+    #expect(testHandler.assembler.keys.count == 1)
+    #expect(testHandler.composer.romajiBuffer == "jie")
+    #expect(!testSession.state.candidates.isEmpty)
+
+    // 置頂候選即為 copilot 的最佳猜測（含邊界文脈）「世界」，其後方無重複值。
+    let values = testSession.state.candidates.map(\.value)
+    #expect(testSession.state.candidates.first?.value == "世界")
+    if let worldIndex = values.firstIndex(of: "世界") {
+      #expect(worldIndex == 0) // 置頂。
+    }
+    // 全程按 value 去重（保留先出現者）。
+    #expect(values.count == Set(values).count)
+    // 置頂候選的 keyArray 為具體讀音（橫跨最後提交鍵＋尾段的雙讀音）。
+    #expect(testSession.state.candidates.first?.keyArray == ["ㄕˋ", "ㄐㄧㄝˋ"])
+  }
+
+  /// Shift+選字鍵選中跨邊界候選「世界」：注拼槽清空、組字器尾端雙鍵 span
+  /// 被覆寫為單節點「世界」、trail 失效、狀態回到無候選的 Inputting。
+  @Test
+  func test_IH120B_FuriousTypingShiftSelectionConfirmsCrossBoundaryWord() throws {
+    guard let testHandler, let testSession else {
+      Issue.record("testHandler and testSession at least one of them is nil.")
+      return
+    }
+    clearTestPOM()
+
+    defer {
+      testHandler.currentLM.clearTemporaryData(isFiltering: false)
+      testSession.mockCandidateController = nil
+      testHandler.prefs.furiousTypingEnabled = false
+      testHandler.prefs.keyboardParser = KeyboardParser.ofStandard.rawValue
+      testHandler.ensureKeyboardParser()
+      testHandler.prefs.fetchSuggestionsFromPerceptionOverrideModel = true
+      testSession.resetInputHandler(forceComposerCleanup: true)
+    }
+
+    insertShiJieSolidificationFixture(testHandler: testHandler)
+    testSession.resetInputHandler(forceComposerCleanup: true)
+    testHandler.prefs.keyboardParser = KeyboardParser.ofHanyuPinyin.rawValue
+    testHandler.ensureKeyboardParser()
+    testHandler.prefs.fetchSuggestionsFromPerceptionOverrideModel = false
+    testHandler.prefs.furiousTypingEnabled = true
+    testHandler.currentLM.syncPrefs()
+
+    typeSentence("shijie")
+    #expect(!testSession.state.candidates.isEmpty)
+    #expect(testSession.state.candidates.contains { $0.value == "世界" })
+    // 世界為跨邊界候選（雙讀音）；選中它（第二位，置頂預覽之後）。
+    let worldIndex = try #require(
+      testSession.state.candidates.firstIndex(where: { $0.value == "世界" })
+    )
+    testSession.mockCandidateController = MockCandidateController(visible: true)
+
+    // Shift + 對應選字鍵（1 為置頂預覽，worldIndex 位在第 worldIndex+1 個選字鍵）。
+    let keyNumber = String(worldIndex + 1)
+    let keyCode = mapKeyCodesANSIForTests[keyNumber] ?? 18
+    let shiftKey = KBEvent.KeyEventData(
+      flags: .shift, chars: keyNumber, charsSansModifiers: keyNumber, keyCode: keyCode
+    ).asEvent
+    #expect(testHandler.triageInput(event: shiftKey))
+
+    // 跨邊界覆寫生效：注拼槽清空、組字器仍為雙鍵、組句為單節點「世界」。
+    #expect(testHandler.composer.romajiBuffer.isEmpty)
+    #expect(testHandler.assembler.keys.count == 2)
+    #expect(testHandler.assembler.assembledSentence.map(\.value) == ["世界"])
+    // 就地選字為使用者顯式干涉：trail 失效。
+    #expect(testHandler.furiousTrail.isEmpty)
+    // 狀態回到無候選的 Inputting，且未發生任何遞交。
+    #expect(testSession.state.type == .ofInputting)
+    #expect(testSession.state.candidates.isEmpty)
+    #expect(testSession.recentCommissions.isEmpty)
+  }
+
+  /// 狂拼候選窗顯示中，反查欄位回傳注拼槽尚未固化的原始拼音字母流；
+  /// 總開關、縱排守衛、狂拼關閉時皆回空。
+  @Test
+  func test_IH120C_FuriousTypingReverseLookupExposesPendingRomaji() throws {
+    guard let testHandler, let testSession else {
+      Issue.record("testHandler and testSession at least one of them is nil.")
+      return
+    }
+    clearTestPOM()
+
+    defer {
+      testHandler.currentLM.clearTemporaryData(isFiltering: false)
+      testHandler.prefs.furiousTypingEnabled = false
+      testHandler.prefs.showReverseLookupInCandidateUI = true
+      testHandler.prefs.keyboardParser = KeyboardParser.ofStandard.rawValue
+      testHandler.ensureKeyboardParser()
+      testHandler.prefs.fetchSuggestionsFromPerceptionOverrideModel = true
+      testSession.isVerticalTyping = false
+      testSession.resetInputHandler(forceComposerCleanup: true)
+    }
+
+    insertShiJieSolidificationFixture(testHandler: testHandler)
+    testSession.resetInputHandler(forceComposerCleanup: true)
+    testHandler.prefs.keyboardParser = KeyboardParser.ofHanyuPinyin.rawValue
+    testHandler.ensureKeyboardParser()
+    testHandler.prefs.fetchSuggestionsFromPerceptionOverrideModel = false
+    testHandler.prefs.furiousTypingEnabled = true
+    testHandler.prefs.showReverseLookupInCandidateUI = true
+    testHandler.currentLM.syncPrefs()
+
+    typeSentence("shijie")
+    #expect(testHandler.composer.romajiBuffer == "jie")
+    #expect(!testSession.state.candidates.isEmpty)
+
+    // 狂拼候選窗顯示中：反查回傳注拼槽的原始拼音字母流。
+    #expect(testSession.reverseLookup(for: "界") == ["jie"])
+
+    // 狂拼讀音回顯刻意繞過總開關：總開關關閉時仍回傳字母流。
+    testHandler.prefs.showReverseLookupInCandidateUI = false
+    testHandler.currentLM.syncPrefs()
+    #expect(testSession.reverseLookup(for: "界") == ["jie"])
+
+    // 非狂拼時，總開關關閉仍回空（原守衛路徑不受影響）。
+    testHandler.prefs.furiousTypingEnabled = false
+    testHandler.currentLM.syncPrefs()
+    #expect(testSession.reverseLookup(for: "界").isEmpty)
+  }
+
+  /// 首音節還在注拼槽（組字器為空）時，copilot 窗不查跨邊界：
+  /// 候選僅為置頂預覽＋尾段單音節，無雙讀音候選、無崩潰。
+  @Test
+  func test_IH120D_FuriousTypingNoCrossBoundaryWhenAssemblerEmpty() throws {
+    guard let testHandler, let testSession else {
+      Issue.record("testHandler and testSession at least one of them is nil.")
+      return
+    }
+    clearTestPOM()
+
+    defer {
+      testHandler.currentLM.clearTemporaryData(isFiltering: false)
+      testHandler.prefs.furiousTypingEnabled = false
+      testHandler.prefs.keyboardParser = KeyboardParser.ofStandard.rawValue
+      testHandler.ensureKeyboardParser()
+      testHandler.prefs.fetchSuggestionsFromPerceptionOverrideModel = true
+      testSession.resetInputHandler(forceComposerCleanup: true)
+    }
+
+    insertShiJieSolidificationFixture(testHandler: testHandler)
+    testSession.resetInputHandler(forceComposerCleanup: true)
+    testHandler.prefs.keyboardParser = KeyboardParser.ofHanyuPinyin.rawValue
+    testHandler.ensureKeyboardParser()
+    testHandler.prefs.fetchSuggestionsFromPerceptionOverrideModel = false
+    testHandler.prefs.furiousTypingEnabled = true
+    testHandler.currentLM.syncPrefs()
+
+    // 只打首音節「jie」（無 auto-chop 提交）：組字器為空、注拼槽暫存 jie。
+    typeSentence("jie")
+    #expect(testHandler.assembler.isEmpty)
+    #expect(testHandler.composer.romajiBuffer == "jie")
+
+    // 候選窗顯示（置頂＋尾段單音節），但不含跨邊界的雙讀音候選。
+    #expect(!testSession.state.candidates.isEmpty)
+    #expect(!testSession.state.candidates.contains { $0.keyArray.count == 2 })
+    #expect(!testSession.state.candidates.map(\.value).contains("世界"))
+  }
+
+  // MARK: - 狂拼置頂最佳猜測與讀音回顯（Furious Top Guess & Reading Echo）
+
+  /// 打「shijie」時，copilot 的最佳猜測（含邊界文脈）「世界」置頂，清單無重複值。
+  @Test
+  func test_IH121A_FuriousTypingPinsCrossBoundaryWordAtTop() throws {
+    guard let testHandler, let testSession else {
+      Issue.record("testHandler and testSession at least one of them is nil.")
+      return
+    }
+    clearTestPOM()
+
+    defer {
+      testHandler.currentLM.clearTemporaryData(isFiltering: false)
+      testHandler.prefs.furiousTypingEnabled = false
+      testHandler.prefs.keyboardParser = KeyboardParser.ofStandard.rawValue
+      testHandler.ensureKeyboardParser()
+      testHandler.prefs.fetchSuggestionsFromPerceptionOverrideModel = true
+      testSession.resetInputHandler(forceComposerCleanup: true)
+    }
+
+    insertShiJieSolidificationFixture(testHandler: testHandler)
+    testSession.resetInputHandler(forceComposerCleanup: true)
+    testHandler.prefs.keyboardParser = KeyboardParser.ofHanyuPinyin.rawValue
+    testHandler.ensureKeyboardParser()
+    testHandler.prefs.fetchSuggestionsFromPerceptionOverrideModel = false
+    testHandler.prefs.furiousTypingEnabled = true
+    testHandler.currentLM.syncPrefs()
+
+    typeSentence("shijie")
+    #expect(!testSession.state.candidates.isEmpty)
+    // 置頂為跨邊界完整詞「世界」（具體讀音 keyArray）。
+    #expect(testSession.state.candidates.first?.value == "世界")
+    #expect(testSession.state.candidates.first?.keyArray == ["ㄕˋ", "ㄐㄧㄝˋ"])
+    // 清單無重複值。
+    let values = testSession.state.candidates.map(\.value)
+    #expect(values.count == Set(values).count)
+  }
+
+  /// Shift+1 選中置頂「世界」：雙鍵 span 覆寫生效（組字區單節點「世界」）、
+  /// 注拼槽清空、trail 失效。
+  @Test
+  func test_IH121B_FuriousTypingShiftOneConfirmsTopCrossBoundaryWord() throws {
+    guard let testHandler, let testSession else {
+      Issue.record("testHandler and testSession at least one of them is nil.")
+      return
+    }
+    clearTestPOM()
+
+    defer {
+      testHandler.currentLM.clearTemporaryData(isFiltering: false)
+      testSession.mockCandidateController = nil
+      testHandler.prefs.furiousTypingEnabled = false
+      testHandler.prefs.keyboardParser = KeyboardParser.ofStandard.rawValue
+      testHandler.ensureKeyboardParser()
+      testHandler.prefs.fetchSuggestionsFromPerceptionOverrideModel = true
+      testSession.resetInputHandler(forceComposerCleanup: true)
+    }
+
+    insertShiJieSolidificationFixture(testHandler: testHandler)
+    testSession.resetInputHandler(forceComposerCleanup: true)
+    testHandler.prefs.keyboardParser = KeyboardParser.ofHanyuPinyin.rawValue
+    testHandler.ensureKeyboardParser()
+    testHandler.prefs.fetchSuggestionsFromPerceptionOverrideModel = false
+    testHandler.prefs.furiousTypingEnabled = true
+    testHandler.currentLM.syncPrefs()
+
+    typeSentence("shijie")
+    #expect(testSession.state.candidates.first?.value == "世界")
+    testSession.mockCandidateController = MockCandidateController(visible: true)
+
+    // Shift+1：選中置頂候選。
+    let shift1 = KBEvent.KeyEventData(
+      flags: .shift, chars: "!", charsSansModifiers: "1", keyCode: 18
+    ).asEvent
+    #expect(testHandler.triageInput(event: shift1))
+
+    // 雙鍵 span 覆寫生效：注拼槽清空、組字器仍為雙鍵、組句為單節點「世界」。
+    #expect(testHandler.composer.romajiBuffer.isEmpty)
+    #expect(testHandler.assembler.keys.count == 2)
+    #expect(testHandler.assembler.assembledSentence.map(\.value) == ["世界"])
+    // 就地選字為使用者顯式干涉：trail 失效。
+    #expect(testHandler.furiousTrail.isEmpty)
+    // 狀態回到無候選的 Inputting，且未發生任何遞交。
+    #expect(testSession.state.type == .ofInputting)
+    #expect(testSession.state.candidates.isEmpty)
+    #expect(testSession.recentCommissions.isEmpty)
+  }
+
+  /// 狂拼讀音回顯：縱排模擬下仍回傳字母流（繞過縱排守衛）；
+  /// 狂拼關閉時不進狂拼分支；非狂拼（總開關開啟）走原磁帶路徑（Mock 回空）。
+  @Test
+  func test_IH121C_FuriousTypingReadingEchoBypassesVerticalGuard() throws {
+    guard let testHandler, let testSession else {
+      Issue.record("testHandler and testSession at least one of them is nil.")
+      return
+    }
+    clearTestPOM()
+
+    defer {
+      testHandler.currentLM.clearTemporaryData(isFiltering: false)
+      testHandler.prefs.furiousTypingEnabled = false
+      testHandler.prefs.showReverseLookupInCandidateUI = true
+      testHandler.prefs.keyboardParser = KeyboardParser.ofStandard.rawValue
+      testHandler.ensureKeyboardParser()
+      testHandler.prefs.fetchSuggestionsFromPerceptionOverrideModel = true
+      testSession.isVerticalTyping = false
+      testSession.resetInputHandler(forceComposerCleanup: true)
+    }
+
+    insertShiJieSolidificationFixture(testHandler: testHandler)
+    testSession.resetInputHandler(forceComposerCleanup: true)
+    testHandler.prefs.keyboardParser = KeyboardParser.ofHanyuPinyin.rawValue
+    testHandler.ensureKeyboardParser()
+    testHandler.prefs.fetchSuggestionsFromPerceptionOverrideModel = false
+    testHandler.prefs.furiousTypingEnabled = true
+    testHandler.prefs.showReverseLookupInCandidateUI = true
+    testHandler.currentLM.syncPrefs()
+
+    typeSentence("shijie")
+    #expect(!testSession.state.candidates.isEmpty)
+
+    // 縱排模擬（isVerticalTyping = true）：狂拼讀音回顯仍回傳字母流。
+    testSession.isVerticalTyping = true
+    #expect(testSession.reverseLookup(for: "界") == ["jie"])
+    testSession.isVerticalTyping = false
+
+    // 狂拼關閉時不進狂拼分支：走原守衛路徑（Mock 回空）。
+    testHandler.prefs.furiousTypingEnabled = false
+    testHandler.currentLM.syncPrefs()
+    #expect(testSession.reverseLookup(for: "界").isEmpty)
+
+    // 非狂拼（總開關開啟）走原磁帶反查路徑（Mock 無磁帶資料，回空）。
+    #expect(testSession.reverseLookup(for: "界").isEmpty)
+  }
+
+  // MARK: - 狂拼 copilot 全句組句顯示與遞交（Furious Joint Composition Display）
+
+  /// 建立「shijie → 世界」顯示/遞交測試用的詞庫：
+  /// [ㄕ] 單獨組句為高頻「是」，但 [ㄕˋ,ㄐㄧㄝˋ] 的「世界」雙音節詞更強，
+  /// 使 main 組字器組句「是」、copilot 聯合組句「世界」。
+  private func insertShiJieDisplayFixture(testHandler: MockInputHandler?) {
+    guard let testHandler else { return }
+    let customGrams: [Homa.Gram] = [
+      .init(keyArray: ["ㄕˋ"], value: "是", score: -5),
+      .init(keyArray: ["ㄐㄧㄝˋ"], value: "界", score: -6),
+      .init(keyArray: ["ㄕˋ", "ㄐㄧㄝˋ"], value: "世界", score: -6.5),
+    ]
+    customGrams.forEach {
+      testHandler.currentLM.insertTemporaryData(unigram: $0, isFiltering: false)
+    }
+  }
+
+  /// 狂拼模式：composition buffer 主段與尾段預覽同源於 copilot 全句組句——
+  /// 打「shijie」顯示「世界」（而非 main 組字器的「是」＋尾段「界」＝「是界」），
+  /// 置頂候選仍為「世界」。
+  @Test
+  func test_IH122A_FuriousTypingDisplayUsesCopilotJointComposition() throws {
+    guard let testHandler, let testSession else {
+      Issue.record("testHandler and testSession at least one of them is nil.")
+      return
+    }
+    clearTestPOM()
+
+    defer {
+      testHandler.currentLM.clearTemporaryData(isFiltering: false)
+      testHandler.prefs.furiousTypingEnabled = false
+      testHandler.prefs.keyboardParser = KeyboardParser.ofStandard.rawValue
+      testHandler.ensureKeyboardParser()
+      testHandler.prefs.fetchSuggestionsFromPerceptionOverrideModel = true
+      testSession.resetInputHandler(forceComposerCleanup: true)
+    }
+
+    insertShiJieDisplayFixture(testHandler: testHandler)
+    testSession.resetInputHandler(forceComposerCleanup: true)
+    testHandler.prefs.keyboardParser = KeyboardParser.ofHanyuPinyin.rawValue
+    testHandler.ensureKeyboardParser()
+    testHandler.prefs.fetchSuggestionsFromPerceptionOverrideModel = false
+    testHandler.prefs.furiousTypingEnabled = true
+    testHandler.currentLM.syncPrefs()
+
+    // 「shijie」：auto-chop 提交 shi、注拼槽暫存 jie、copilot 候選窗顯示。
+    typeSentence("shijie")
+    #expect(!testSession.state.candidates.isEmpty)
+    // main 組字器單獨組句為「是」，但 copilot 全句組句以尾段文脈重估邊界節點為「世界」。
+    #expect(testHandler.assembler.assembledSentence.map(\.value).joined() == "是")
+    #expect(testSession.state.displayedText == "世界") // 不再是「是界」。
+    // 置頂候選仍為 copilot 最佳猜測「世界」。
+    #expect(testSession.state.candidates.first?.value == "世界")
+  }
+
+  /// 同狀態按 Enter：遞交「copilot 主段＋尾段預覽」＝「世界」（與所見一致）。
+  @Test
+  func test_IH122B_FuriousTypingEnterCommitsCopilotJointText() throws {
+    guard let testHandler, let testSession else {
+      Issue.record("testHandler and testSession at least one of them is nil.")
+      return
+    }
+    clearTestPOM()
+
+    defer {
+      testHandler.currentLM.clearTemporaryData(isFiltering: false)
+      testHandler.prefs.furiousTypingEnabled = false
+      testHandler.prefs.keyboardParser = KeyboardParser.ofStandard.rawValue
+      testHandler.ensureKeyboardParser()
+      testHandler.prefs.fetchSuggestionsFromPerceptionOverrideModel = true
+      testSession.resetInputHandler(forceComposerCleanup: true)
+    }
+
+    insertShiJieDisplayFixture(testHandler: testHandler)
+    testSession.resetInputHandler(forceComposerCleanup: true)
+    testHandler.prefs.keyboardParser = KeyboardParser.ofHanyuPinyin.rawValue
+    testHandler.ensureKeyboardParser()
+    testHandler.prefs.fetchSuggestionsFromPerceptionOverrideModel = false
+    testHandler.prefs.furiousTypingEnabled = true
+    testHandler.currentLM.syncPrefs()
+
+    typeSentence("shijie")
+    #expect(testSession.state.displayedText == "世界")
+
+    // 敲 Enter：狂拼直遞「copilot 主段＋尾段預覽」。
+    _ = testHandler.triageInput(event: KBEvent.KeyEventData.dataEnterReturn.asEvent)
+    #expect(testSession.recentCommissions.joined() == "世界")
+  }
+
+  /// 打「shijie」後按後方向鍵（橫排 Left）：尾段先被固化（注拼槽清空、組字器尾端
+  /// 多一鍵），同一事件續走正常游標移動語義（游標左移）、狀態維持 Inputting、無遞交。
+  @Test
+  func test_IH122C_FuriousTypingBackwardArrowSolidifiesThenMovesCursor() throws {
+    guard let testHandler, let testSession else {
+      Issue.record("testHandler and testSession at least one of them is nil.")
+      return
+    }
+    clearTestPOM()
+
+    defer {
+      testHandler.currentLM.clearTemporaryData(isFiltering: false)
+      testHandler.prefs.furiousTypingEnabled = false
+      testHandler.prefs.keyboardParser = KeyboardParser.ofStandard.rawValue
+      testHandler.ensureKeyboardParser()
+      testHandler.prefs.fetchSuggestionsFromPerceptionOverrideModel = true
+      testSession.resetInputHandler(forceComposerCleanup: true)
+    }
+
+    insertShiJieDisplayFixture(testHandler: testHandler)
+    testSession.resetInputHandler(forceComposerCleanup: true)
+    testHandler.prefs.keyboardParser = KeyboardParser.ofHanyuPinyin.rawValue
+    testHandler.ensureKeyboardParser()
+    testHandler.prefs.fetchSuggestionsFromPerceptionOverrideModel = false
+    testHandler.prefs.furiousTypingEnabled = true
+    testHandler.currentLM.syncPrefs()
+
+    // 橫排（MockSession 預設 isVerticalTyping == false）：Left＝isCursorBackward。
+    #expect(!testSession.isVerticalTyping)
+
+    typeSentence("shijie")
+    #expect(testHandler.composer.romajiBuffer == "jie")
+    #expect(!testSession.state.candidates.isEmpty)
+
+    // 模擬候選窗已顯示（handleCandidate 需要 ctlCandidate.visible）。
+    let mockController = MockCandidateController(visible: true)
+    testSession.mockCandidateController = mockController
+
+    // 按後方向鍵（Left）：新規則——尾段固化＋開正常選字窗＋同一事件導航候選高亮。
+    _ = testHandler.triageInput(event: KBEvent.KeyEventData.dataArrowLeft.asEvent)
+
+    // 尾段已固化：注拼槽清空、組字器尾端多一個讀音鍵（固化前 1 鍵）。
+    #expect(testHandler.composer.romajiBuffer.isEmpty)
+    #expect(testHandler.assembler.keys.count == 2)
+    // 開出正常選字窗，候選涵蓋跨邊界詞「世界」。
+    #expect(testSession.state.type == .ofCandidates)
+    #expect(testSession.state.candidates.contains { $0.value == "世界" })
+    // 游標不進行組字區移動（固化後仍在組字器最前端）。
+    #expect(testHandler.assembler.cursor == testHandler.assembler.keys.count)
+    // 該方向鍵事件被交給選字窗導航（高亮移動嘗試發生）。
+    #expect(mockController.highlightNavigationCount > 0)
+    // 固化時 trail 已同步（完整音節 jie 被 append）；無任何遞交。
+    #expect(testHandler.furiousTrail == ["shi", "jie"])
+    #expect(testSession.recentCommissions.isEmpty)
+  }
+
+  // MARK: - 狂拼高亮預覽與方向鍵規則（Furious Highlight Preview & Cursor Key Rules）
+
+  /// W2：copilot 窗高亮即時反映到組字區（scratch 預覽）——高亮「世界」顯示「世界」、
+  /// 高亮「界」顯示「是界」；真組字器鍵數與注拼槽不受影響。
+  @Test
+  func test_IH123A_FuriousTypingHighlightPreviewReflectsCandidate() throws {
+    guard let testHandler, let testSession else {
+      Issue.record("testHandler and testSession at least one of them is nil.")
+      return
+    }
+    clearTestPOM()
+
+    defer {
+      testHandler.currentLM.clearTemporaryData(isFiltering: false)
+      testHandler.prefs.furiousTypingEnabled = false
+      testHandler.prefs.keyboardParser = KeyboardParser.ofStandard.rawValue
+      testHandler.ensureKeyboardParser()
+      testHandler.prefs.fetchSuggestionsFromPerceptionOverrideModel = true
+      testSession.resetInputHandler(forceComposerCleanup: true)
+    }
+
+    insertShiJieDisplayFixture(testHandler: testHandler)
+    testSession.resetInputHandler(forceComposerCleanup: true)
+    testHandler.prefs.keyboardParser = KeyboardParser.ofHanyuPinyin.rawValue
+    testHandler.ensureKeyboardParser()
+    testHandler.prefs.fetchSuggestionsFromPerceptionOverrideModel = false
+    testHandler.prefs.furiousTypingEnabled = true
+    testHandler.currentLM.syncPrefs()
+
+    typeSentence("shijie")
+    #expect(!testSession.state.candidates.isEmpty)
+    let keysBefore = testHandler.assembler.keys.count
+
+    // 高亮「世界」（置頂）：組字區顯示套用結果「世界」。
+    let worldIndex = try #require(
+      testSession.state.candidates.firstIndex(where: { $0.value == "世界" })
+    )
+    testSession.candidatePairHighlightChanged(at: worldIndex)
+    #expect(testSession.state.displayedText == "世界")
+    #expect(testHandler.furiousHighlightOverride?.value == "世界")
+
+    // 高亮「界」（尾段單字候選）：組字區顯示套用結果（「是」＋覆寫的「界」＝「是界」）。
+    let jieIndex = try #require(
+      testSession.state.candidates.firstIndex(where: { $0.value == "界" })
+    )
+    testSession.candidatePairHighlightChanged(at: jieIndex)
+    #expect(testSession.state.displayedText == "是界")
+    #expect(testHandler.furiousHighlightOverride?.value == "界")
+
+    // 預覽不觸碰真組字器、不動注拼槽。
+    #expect(testHandler.assembler.keys.count == keysBefore)
+    #expect(testHandler.composer.romajiBuffer == "jie")
+  }
+
+  /// W2：Enter 遞交高亮候選的套用結果；不切高亮時遞交置頂候選（IH122B 語義不變）。
+  @Test
+  func test_IH123B_FuriousTypingEnterCommitsHighlightedCandidate() throws {
+    guard let testHandler, let testSession else {
+      Issue.record("testHandler and testSession at least one of them is nil.")
+      return
+    }
+    clearTestPOM()
+
+    defer {
+      testHandler.currentLM.clearTemporaryData(isFiltering: false)
+      testHandler.prefs.furiousTypingEnabled = false
+      testHandler.prefs.keyboardParser = KeyboardParser.ofStandard.rawValue
+      testHandler.ensureKeyboardParser()
+      testHandler.prefs.fetchSuggestionsFromPerceptionOverrideModel = true
+      testSession.resetInputHandler(forceComposerCleanup: true)
+    }
+
+    insertShiJieDisplayFixture(testHandler: testHandler)
+    testSession.resetInputHandler(forceComposerCleanup: true)
+    testHandler.prefs.keyboardParser = KeyboardParser.ofHanyuPinyin.rawValue
+    testHandler.ensureKeyboardParser()
+    testHandler.prefs.fetchSuggestionsFromPerceptionOverrideModel = false
+    testHandler.prefs.furiousTypingEnabled = true
+    testHandler.currentLM.syncPrefs()
+
+    // 第一段：高亮「界」後按 Enter → 遞交「是界」。
+    typeSentence("shijie")
+    let jieIndex = try #require(
+      testSession.state.candidates.firstIndex(where: { $0.value == "界" })
+    )
+    testSession.candidatePairHighlightChanged(at: jieIndex)
+    #expect(testHandler.furiousHighlightOverride?.value == "界")
+    _ = testHandler.triageInput(event: KBEvent.KeyEventData.dataEnterReturn.asEvent)
+    #expect(testSession.recentCommissions == ["是界"])
+
+    // 第二段：不切高亮直接 Enter → 遞交置頂「世界」（IH122B 語義不變）。
+    testSession.switchState(IMEState.ofAbortion())
+    testSession.recentCommissions.removeAll()
+    testHandler.prefs.furiousTypingEnabled = true
+    testHandler.currentLM.syncPrefs()
+    typeSentence("shijie")
+    _ = testHandler.triageInput(event: KBEvent.KeyEventData.dataEnterReturn.asEvent)
+    #expect(testSession.recentCommissions == ["世界"])
+  }
+
+  /// W3：非狂拼（或狂拼窗不可見）時，注拼槽有未完成讀音按前後方向鍵 → error 退回、
+  /// 游標不動、無遞交。
+  @Test
+  func test_IH123C_FuriousTypingCursorKeyRejectedWithoutCopilotWindow() throws {
+    guard let testHandler, let testSession else {
+      Issue.record("testHandler and testSession at least one of them is nil.")
+      return
+    }
+    clearTestPOM()
+
+    defer {
+      testHandler.currentLM.clearTemporaryData(isFiltering: false)
+      testHandler.prefs.furiousTypingEnabled = false
+      testHandler.prefs.keyboardParser = KeyboardParser.ofStandard.rawValue
+      testHandler.ensureKeyboardParser()
+      testHandler.prefs.fetchSuggestionsFromPerceptionOverrideModel = true
+      testHandler.errorCallback = nil
+      testSession.resetInputHandler(forceComposerCleanup: true)
+    }
+
+    insertShiJieDisplayFixture(testHandler: testHandler)
+    testSession.resetInputHandler(forceComposerCleanup: true)
+    testHandler.prefs.keyboardParser = KeyboardParser.ofHanyuPinyin.rawValue
+    testHandler.ensureKeyboardParser()
+    testHandler.prefs.fetchSuggestionsFromPerceptionOverrideModel = false
+    testHandler.currentLM.syncPrefs()
+
+    // 非狂拼：拼音模式注拼槽有未完成拼裝的字母。
+    typeSentence("fan")
+    #expect(testHandler.composer.romajiBuffer == "fan")
+    var callbackFired = false
+    testHandler.errorCallback = { _ in callbackFired = true }
+
+    // 按後方向鍵（橫排 Left）：error 退回、游標不動、無遞交。
+    _ = testHandler.triageInput(event: KBEvent.KeyEventData.dataArrowLeft.asEvent)
+    #expect(callbackFired)
+    #expect(testHandler.composer.romajiBuffer == "fan")
+    #expect(testHandler.assembler.isEmpty)
+    #expect(testSession.recentCommissions.isEmpty)
+  }
+
+  /// W3：狂拼 copilot 窗可見時，前後方向鍵 → 固化＋開正常選字窗＋同一事件導航高亮。
+  @Test
+  func test_IH123D_FuriousTypingCursorKeySolidifiesAndNavigatesCandidates() throws {
+    guard let testHandler, let testSession else {
+      Issue.record("testHandler and testSession at least one of them is nil.")
+      return
+    }
+    clearTestPOM()
+
+    defer {
+      testHandler.currentLM.clearTemporaryData(isFiltering: false)
+      testSession.mockCandidateController = nil
+      testHandler.prefs.furiousTypingEnabled = false
+      testHandler.prefs.keyboardParser = KeyboardParser.ofStandard.rawValue
+      testHandler.ensureKeyboardParser()
+      testHandler.prefs.fetchSuggestionsFromPerceptionOverrideModel = true
+      testSession.resetInputHandler(forceComposerCleanup: true)
+    }
+
+    insertShiJieDisplayFixture(testHandler: testHandler)
+    testSession.resetInputHandler(forceComposerCleanup: true)
+    testHandler.prefs.keyboardParser = KeyboardParser.ofHanyuPinyin.rawValue
+    testHandler.ensureKeyboardParser()
+    testHandler.prefs.fetchSuggestionsFromPerceptionOverrideModel = false
+    testHandler.prefs.furiousTypingEnabled = true
+    testHandler.currentLM.syncPrefs()
+
+    typeSentence("shijie")
+    #expect(!testSession.state.candidates.isEmpty)
+    let mockController = MockCandidateController(visible: true)
+    testSession.mockCandidateController = mockController
+
+    // 按前方向鍵（橫排 Right）：固化＋開正常選字窗＋導航高亮。
+    _ = testHandler.triageInput(event: KBEvent.KeyEventData.dataArrowRight.asEvent)
+
+    #expect(testHandler.composer.romajiBuffer.isEmpty)
+    #expect(testHandler.assembler.keys.count == 2)
+    #expect(testSession.state.type == .ofCandidates)
+    #expect(testSession.state.candidates.contains { $0.value == "世界" })
+    // 該方向鍵事件被交給選字窗導航（高亮移動嘗試發生）。
+    #expect(mockController.highlightNavigationCount > 0)
+    // 游標不進行組字區移動。
+    #expect(testHandler.assembler.cursor == testHandler.assembler.keys.count)
+    #expect(testSession.recentCommissions.isEmpty)
+  }
+
+  // MARK: - 狂拼標記模式與 Shift+方向鍵（Furious Marking & Shift Cursor Keys）
+
+  /// Shift+前後方向鍵（注拼槽有未完成讀音）：狂拼 copilot 窗可見時，先固化尾段、
+  /// 再放行續走 Shift 標記流程（state 變 .ofMarking）、無遞交。
+  @Test
+  func test_IH124A_FuriousTypingShiftBackwardSolidifiesThenMarks() throws {
+    guard let testHandler, let testSession else {
+      Issue.record("testHandler and testSession at least one of them is nil.")
+      return
+    }
+    clearTestPOM()
+
+    defer {
+      testHandler.currentLM.clearTemporaryData(isFiltering: false)
+      testHandler.prefs.furiousTypingEnabled = false
+      testHandler.prefs.keyboardParser = KeyboardParser.ofStandard.rawValue
+      testHandler.ensureKeyboardParser()
+      testHandler.prefs.fetchSuggestionsFromPerceptionOverrideModel = true
+      testSession.resetInputHandler(forceComposerCleanup: true)
+    }
+
+    insertShiJieDisplayFixture(testHandler: testHandler)
+    testSession.resetInputHandler(forceComposerCleanup: true)
+    testHandler.prefs.keyboardParser = KeyboardParser.ofHanyuPinyin.rawValue
+    testHandler.ensureKeyboardParser()
+    testHandler.prefs.fetchSuggestionsFromPerceptionOverrideModel = false
+    testHandler.prefs.furiousTypingEnabled = true
+    testHandler.currentLM.syncPrefs()
+
+    typeSentence("shijie")
+    #expect(testHandler.composer.romajiBuffer == "jie")
+    #expect(!testSession.state.candidates.isEmpty)
+
+    // Shift+後方向鍵（橫排 Shift+Left）。
+    let shiftLeft = KBEvent.KeyEventData.dataArrowLeft.asEvent.reinitiate(modifierFlags: .shift)
+    _ = testHandler.triageInput(event: shiftLeft)
+
+    // 尾段已固化（注拼槽清空、組字器尾端多一個讀音鍵）。
+    #expect(testHandler.composer.romajiBuffer.isEmpty)
+    #expect(testHandler.assembler.keys.count == 2)
+    // 放行續走標記流程：state 變 .ofMarking。
+    #expect(testSession.state.type == .ofMarking)
+    // 無任何遞交。
+    #expect(testSession.recentCommissions.isEmpty)
+  }
+
+  /// Shift+前後方向鍵（非狂拼）：維持 T8 前行為——注拼槽有未完成讀音時撞上既有
+  /// `!isComposerOrCalligrapherEmpty` 守衛，errorCallback 退回、不插入、不進標記。
+  @Test
+  func test_IH124B_ShiftBackwardConfirmsCompletableReadingThenMarks() throws {
+    guard let testHandler, let testSession else {
+      Issue.record("testHandler and testSession at least one of them is nil.")
+      return
+    }
+    clearTestPOM()
+
+    defer {
+      testHandler.currentLM.clearTemporaryData(isFiltering: false)
+      testHandler.prefs.furiousTypingEnabled = false
+      testHandler.prefs.keyboardParser = KeyboardParser.ofStandard.rawValue
+      testHandler.ensureKeyboardParser()
+      testHandler.prefs.fetchSuggestionsFromPerceptionOverrideModel = true
+      testHandler.errorCallback = nil
+      testSession.resetInputHandler(forceComposerCleanup: true)
+    }
+
+    insertShiJieDisplayFixture(testHandler: testHandler)
+    testSession.resetInputHandler(forceComposerCleanup: true)
+    testHandler.prefs.keyboardParser = KeyboardParser.ofHanyuPinyin.rawValue
+    testHandler.ensureKeyboardParser()
+    testHandler.prefs.fetchSuggestionsFromPerceptionOverrideModel = false
+    testHandler.currentLM.syncPrefs()
+
+    // 非狂拼：拼音模式打入完整可唸讀音（注拼槽非空）。
+    typeSentence("fan")
+    #expect(testHandler.composer.romajiBuffer == "fan")
+    #expect(testHandler.assembler.isEmpty)
+    var callbackFired = false
+    testHandler.errorCallback = { _ in callbackFired = true }
+
+    // Shift+後方向鍵（橫排 Shift+Left）：落回既有守衛、errorCallback 退回。
+    let shiftLeft = KBEvent.KeyEventData.dataArrowLeft.asEvent.reinitiate(modifierFlags: .shift)
+    _ = testHandler.triageInput(event: shiftLeft)
+
+    // 不插入、不進標記：注拼槽內容不變、組字器不變、維持 Inputting。
+    #expect(callbackFired)
+    #expect(testHandler.composer.romajiBuffer == "fan")
+    #expect(testHandler.assembler.isEmpty)
+    #expect(testSession.state.type == .ofInputting)
+    #expect(testSession.recentCommissions.isEmpty)
+  }
+
+  /// Shift+前後方向鍵（非狂拼）：不完整前綴（如 z）無法確認 → error 退回、
+  /// 注拼槽仍為 z、組字器不變、無標記。
+  @Test
+  func test_IH124C_ShiftBackwardRejectsIncompleteReading() throws {
+    guard let testHandler, let testSession else {
+      Issue.record("testHandler and testSession at least one of them is nil.")
+      return
+    }
+    clearTestPOM()
+
+    defer {
+      testHandler.currentLM.clearTemporaryData(isFiltering: false)
+      testHandler.prefs.furiousTypingEnabled = false
+      testHandler.prefs.keyboardParser = KeyboardParser.ofStandard.rawValue
+      testHandler.ensureKeyboardParser()
+      testHandler.prefs.fetchSuggestionsFromPerceptionOverrideModel = true
+      testHandler.errorCallback = nil
+      testSession.resetInputHandler(forceComposerCleanup: true)
+    }
+
+    insertShiJieDisplayFixture(testHandler: testHandler)
+    testSession.resetInputHandler(forceComposerCleanup: true)
+    testHandler.prefs.keyboardParser = KeyboardParser.ofHanyuPinyin.rawValue
+    testHandler.ensureKeyboardParser()
+    testHandler.prefs.fetchSuggestionsFromPerceptionOverrideModel = false
+    testHandler.currentLM.syncPrefs()
+
+    // 非狂拼：拼音模式注拼槽為不完整前綴「z」。
+    typeSentence("z")
+    #expect(testHandler.composer.romajiBuffer == "z")
+    var callbackFired = false
+    testHandler.errorCallback = { _ in callbackFired = true }
+
+    // Shift+後方向鍵（橫排 Shift+Left）。
+    let shiftLeft = KBEvent.KeyEventData.dataArrowLeft.asEvent.reinitiate(modifierFlags: .shift)
+    _ = testHandler.triageInput(event: shiftLeft)
+
+    // error 退回、注拼槽仍為 z、組字器不變、無標記。
+    #expect(callbackFired)
+    #expect(testHandler.composer.romajiBuffer == "z")
+    #expect(testHandler.assembler.isEmpty)
+    #expect(testSession.state.type == .ofInputting)
+    #expect(testSession.recentCommissions.isEmpty)
+  }
+
+  /// 崩潰回歸（生產堆疊溢位）：狂拼 copilot 窗**可見**（復現生產條件）時，Shift+前後
+  /// 方向鍵不得經路由器誤入 handleCandidate 的重 triage 循環——尾段固化＋進標記、
+  /// 事件正常終了。修復前此測試會堆疊溢位。
+  @Test
+  func test_IH125A_FuriousTypingShiftBackwardDoesNotRecurseWithVisibleWindow() throws {
+    guard let testHandler, let testSession else {
+      Issue.record("testHandler and testSession at least one of them is nil.")
+      return
+    }
+    clearTestPOM()
+
+    defer {
+      testHandler.currentLM.clearTemporaryData(isFiltering: false)
+      testSession.mockCandidateController = nil
+      testHandler.prefs.furiousTypingEnabled = false
+      testHandler.prefs.keyboardParser = KeyboardParser.ofStandard.rawValue
+      testHandler.ensureKeyboardParser()
+      testHandler.prefs.fetchSuggestionsFromPerceptionOverrideModel = true
+      testSession.resetInputHandler(forceComposerCleanup: true)
+    }
+
+    insertShiJieDisplayFixture(testHandler: testHandler)
+    testSession.resetInputHandler(forceComposerCleanup: true)
+    testHandler.prefs.keyboardParser = KeyboardParser.ofHanyuPinyin.rawValue
+    testHandler.ensureKeyboardParser()
+    testHandler.prefs.fetchSuggestionsFromPerceptionOverrideModel = false
+    testHandler.prefs.furiousTypingEnabled = true
+    testHandler.currentLM.syncPrefs()
+
+    typeSentence("shijie")
+    #expect(!testSession.state.candidates.isEmpty)
+
+    // 復現生產條件：候選窗實際可見（handleCandidate 入口的 ctlCandidate.visible 通過）。
+    testSession.mockCandidateController = MockCandidateController(visible: true)
+
+    // Shift+後方向鍵（橫排 Shift+Left）：不得經路由器進 handleCandidate（非選字鍵），
+    // 落回 T8 狂拼路徑——固化＋進標記，事件正常終了、無遞迴。
+    let shiftLeft = KBEvent.KeyEventData.dataArrowLeft.asEvent.reinitiate(modifierFlags: .shift)
+    _ = testHandler.triageInput(event: shiftLeft)
+
+    // 尾段已固化（注拼槽清空、組字器尾端多一個讀音鍵）。
+    #expect(testHandler.composer.romajiBuffer.isEmpty)
+    #expect(testHandler.assembler.keys.count == 2)
+    // 放行續走標記流程：state 變 .ofMarking。
+    #expect(testSession.state.type == .ofMarking)
+    // 無任何遞交。
+    #expect(testSession.recentCommissions.isEmpty)
   }
 }

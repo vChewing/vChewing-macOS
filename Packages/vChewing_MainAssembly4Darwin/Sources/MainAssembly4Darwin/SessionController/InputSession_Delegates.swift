@@ -193,13 +193,21 @@ extension SessionProtocol {
   @discardableResult
   public func reverseLookup(for value: String) -> [String] {
     let blankResult: [String] = []
+    // 狂拼模式的讀音回顯：這是使用者自己敲入的字母流的即時回顯（tooltip 已因與
+    // 候選窗重疊的問題被抑制，這是狂拼模式下敲鍵內容的唯一可見管道），並非反查，
+    // 因此刻意不受 showReverseLookupInCandidateUI 總開關與 isVerticalTyping 守衛節制。
+    if isFuriousCopilotCandidateWindowVisible,
+       let romaji = inputHandler?.composer.romajiBuffer, !romaji.isEmpty {
+      return [romaji]
+    }
     // 這一段專門處理「反查」。
     if !prefs.showReverseLookupInCandidateUI { return blankResult }
     if state.type == .ofInputting, state.isCandidateContainer,
        inputHandler?.currentLM.nullCandidateInCassette == value {
       return blankResult
     }
-    if isVerticalTyping { return blankResult } // 縱排輸入的場合，選字窗沒有足夠的空間顯示反查結果。
+    // 縱排輸入的場合，選字窗沒有足夠的空間顯示反查結果。
+    if isVerticalTyping { return blankResult }
     if value.isEmpty { return blankResult } // 空字串沒有需要反查的東西。
     if value.contains("_") { return blankResult }
     // 因為唯音輸入法的反查結果僅由磁帶模組負責，所以相關運算挪至 LMInstantiator 內處理。
@@ -232,6 +240,14 @@ extension SessionProtocol {
     guard state.highlightedCandidateIndex != theIndex else { return }
     state.highlightedCandidateIndex = theIndex
     guard state.isCandidateContainer, let theIndex else { return }
+    // 狂拼 copilot 窗：高亮即時反映到組字區（scratch 預覽、不計 POM、不動真組字器）。
+    if isFuriousCopilotCandidateWindowVisible,
+       (0 ..< state.candidates.count).contains(theIndex) {
+      let candidate = state.candidates[theIndex]
+      inputHandler.furiousHighlightOverride = candidate
+      inputHandler.previewFuriousHighlightedCandidate(candidate)
+      return
+    }
     switch state.type {
     case .ofCandidates where (0 ..< state.candidates.count).contains(theIndex):
       inputHandler.previewCurrentCandidateAtCompositionBuffer()
@@ -322,6 +338,14 @@ extension SessionProtocol {
       )
       if !associates.candidates.isEmpty { result = associates }
     case .ofInputting where (0 ..< state.candidates.count).contains(index):
+      // 狂拼模式：尾段候選就地選字（滑鼠點選亦走這裡）。
+      if inputHandler.isFuriousTypingModeEffective {
+        let selectedValue = state.candidates[index]
+        inputHandler.confirmFuriousTailCandidate(selectedValue)
+        switchState(inputHandler.generateStateOfInputting())
+        return
+      }
+      // 以下為磁帶語義。
       let chosenStr = state.candidates[index].value
       guard !chosenStr.isEmpty, chosenStr != inputHandler.currentLM.nullCandidateInCassette else {
         callError("907F9F64")

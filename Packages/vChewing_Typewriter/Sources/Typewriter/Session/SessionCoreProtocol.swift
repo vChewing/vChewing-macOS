@@ -181,3 +181,14 @@ extension SessionCoreProtocol {
     showTooltip(string, colorState: colorState, duration: duration)
   }
 }
+
+// MARK: - 狂拼模式共用判定（Furious Typing Common Gates）
+
+extension SessionCoreProtocol {
+  /// 狂拼 copilot 候選窗是否可見：Inputting 狀態、附帶候選清單、且注拼槽尚有未完成
+  /// 拼裝的拼音字母流（`inputHandler.hasFuriousTailPending`）。
+  public var isFuriousCopilotCandidateWindowVisible: Bool {
+    state.type == .ofInputting && state.isCandidateContainer
+      && (inputHandler?.hasFuriousTailPending ?? false)
+  }
+}

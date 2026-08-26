@@ -40,6 +40,7 @@ extension Homa {
       self.perceptor = target.perceptor
       self.gramQueryCache = target.gramQueryCache
       self.gramQueryCacheOrder = target.gramQueryCacheOrder
+      self.mostRecentPathScore = target.mostRecentPathScore
     }
 
     // MARK: Public
@@ -68,6 +69,15 @@ extension Homa {
     /// - Remark: setter 為 `internal`：組字器在模組內部需要就地改寫節點狀態（節點為
     /// Struct、無法再靠引用穿透值拷貝），但對模組外部維持唯讀。
     public internal(set) var config = Config()
+
+    /// 最近一次組句（assemble）所得到的最佳路徑總分。
+    ///
+    /// 尚未組句、或組句時圖不可達（無可用的節點）時為 `Double(Int32.min)`。
+    /// 組字器的任何結構性變更（insertKey／dropKey 等）都會經由 assignNodes 觸發
+    /// 組句，故此數值在讀取前已是最新狀態。
+    /// - Remark: setter 為 `internal`：組句邏輯位於模組內的其它檔案，需要跨檔案寫入；
+    ///   對模組外部維持唯讀。
+    public internal(set) var mostRecentPathScore: Double = .init(Int32.min)
 
     /// 最近一次組句結果。
     public var assembledSentence: [GramInPath] {
@@ -158,6 +168,7 @@ extension Homa {
       config.clear()
       gramQueryCache.removeAll(keepingCapacity: true)
       gramQueryCacheOrder.removeAll(keepingCapacity: true)
+      mostRecentPathScore = Double(Int32.min)
     }
 
     /// 在游標位置插入給定的索引鍵（單一讀音，無聲調替代）。

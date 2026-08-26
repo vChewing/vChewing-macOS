@@ -67,6 +67,8 @@ public final class MockInputHandler: @MainActor InputHandlerProtocol {
   public var strCodePointBuffer = ""
   public var calligrapher = ""
   public var mixedAlphanumericalBuffer = ""
+  public var furiousTrail = [String]() // 狂拼模式：自動 chop 提交鍵對應的拼音字母 blob trail
+  public var furiousHighlightOverride: CandidateInState? // 狂拼 copilot 窗高亮候選（當拍消費）
   public var composer: Tekkon.Composer = .init()
   public var assembler: Homa.Assembler
   public var isJISKeyboard: (() -> Bool)? = { false }
@@ -232,6 +234,13 @@ public final class MockSession: @MainActor SessionCoreProtocol {
       )
       if !associates.candidates.isEmpty { result = associates }
     case .ofInputting where (0 ..< state.candidates.count).contains(index):
+      // 狂拼模式：尾段候選就地選字（與生產端 InputSession_Delegates 對應）。
+      if inputHandler.isFuriousTypingModeEffective {
+        let selectedValue = state.candidates[index]
+        inputHandler.confirmFuriousTailCandidate(selectedValue)
+        switchState(inputHandler.generateStateOfInputting())
+        return
+      }
       let chosenStr = state.candidates[index].value
       guard !chosenStr.isEmpty, chosenStr != inputHandler.currentLM.nullCandidateInCassette else {
         vCTestLog("TEST SESSION ERROR: 907F9F64")
@@ -248,6 +257,14 @@ public final class MockSession: @MainActor SessionCoreProtocol {
     guard state.highlightedCandidateIndex != theIndex else { return }
     state.highlightedCandidateIndex = theIndex
     guard state.isCandidateContainer, let theIndex else { return }
+    // 狂拼 copilot 窗：高亮即時反映到組字區（與生產端 InputSession_Delegates 對應）。
+    if isFuriousCopilotCandidateWindowVisible,
+       (0 ..< state.candidates.count).contains(theIndex) {
+      let candidate = state.candidates[theIndex]
+      inputHandler.furiousHighlightOverride = candidate
+      inputHandler.previewFuriousHighlightedCandidate(candidate)
+      return
+    }
     switch state.type {
     case .ofCandidates where (0 ..< state.candidates.count).contains(theIndex):
       inputHandler.previewCurrentCandidateAtCompositionBuffer()
@@ -285,7 +302,17 @@ public final class MockSession: @MainActor SessionCoreProtocol {
   public func checkIsMacroTokenResult(_ index: Int) -> Bool { false }
 
   @discardableResult
-  public func reverseLookup(for value: String) -> [String] { [] }
+  public func reverseLookup(for value: String) -> [String] {
+    // 與生產端 InputSession_Delegates 對應：狂拼讀音回顯為即時回顯（非反查），
+    // 刻意不受 showReverseLookupInCandidateUI 總開關與 isVerticalTyping 守衛節制。
+    guard let inputHandler = inputHandler else { return [] }
+    if isFuriousCopilotCandidateWindowVisible, inputHandler.hasFuriousTailPending {
+      return [inputHandler.composer.romajiBuffer]
+    }
+    if !inputHandler.prefs.showReverseLookupInCandidateUI { return [] }
+    if isVerticalTyping { return [] }
+    return []
+  }
 
   public func toggleCandidateUIVisibility(_: Bool, refresh _: Bool) {}
   public func commit(text: String, clearDisplayBeforeCommit _: Bool) {
@@ -323,13 +350,23 @@ public final class MockCandidateController: CtlCandidateProtocol {
   public var visible: Bool
   public var expanded: Bool = false
   public var currentLayout: UILayoutOrientation = .horizontal
+  /// 記錄高亮導航（highlightNext/Previous）被呼叫的次數，供測試斷言導航事件。
+  public private(set) var highlightNavigationCount = 0
 
   public func showNextPage() -> Bool { false }
   public func showPreviousPage() -> Bool { false }
   public func showNextLine() -> Bool { false }
   public func showPreviousLine() -> Bool { false }
-  public func highlightNextCandidate() -> Bool { false }
-  public func highlightPreviousCandidate() -> Bool { false }
+  public func highlightNextCandidate() -> Bool {
+    highlightNavigationCount += 1
+    return false
+  }
+
+  public func highlightPreviousCandidate() -> Bool {
+    highlightNavigationCount += 1
+    return false
+  }
+
   public func candidateIndexAtKeyLabelIndex(_ index: Int) -> Int? { index }
   public func set(
     windowTopLeftPoint _: CGPoint,

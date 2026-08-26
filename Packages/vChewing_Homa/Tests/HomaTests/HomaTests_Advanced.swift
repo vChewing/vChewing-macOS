@@ -1422,5 +1422,39 @@ extension HomaTestsRoot {
       #expect(assembler.segments[0][1]?.currentOverrideType == .withSpecified)
       #expect(assembler.segments[0][2] == nil)
     }
+
+    /// 路徑總分 API：insertKeys 之後 mostRecentPathScore 有值，且不同鍵序列給出不同分數。
+    @Test("[Homa] Assembler_mostRecentPathScore")
+    func testmostRecentPathScore() async throws {
+      let mockLM = TestLM(
+        rawData: """
+        fang1 方 -4.0
+        an1 安 -4.0
+        fan3 反 -4.0
+        gan3 感 -4.0
+        fan3-gan3 反感 -7.0
+        """
+      )
+      // 尚未組句時為地板值。
+      let freshAssembler = Homa.Assembler(gramQuerier: { mockLM.queryGrams($0) })
+      #expect(freshAssembler.mostRecentPathScore == Double(Int32.min))
+
+      // 序列一：fang1 + an1 → 方 + 安（-8.0）。
+      let assemblerA = Homa.Assembler(gramQuerier: { mockLM.queryGrams($0) })
+      try assemblerA.insertKey("fang1")
+      try assemblerA.insertKey("an1")
+      let scoreA = assemblerA.mostRecentPathScore
+      #expect(scoreA > Double(Int32.min))
+
+      // 序列二：fan3 + gan3 → 反感（雙音節詞 -7.0 勝過 反+感 -8.0）。
+      let assemblerB = Homa.Assembler(gramQuerier: { mockLM.queryGrams($0) })
+      try assemblerB.insertKey("fan3")
+      try assemblerB.insertKey("gan3")
+      let scoreB = assemblerB.mostRecentPathScore
+      #expect(scoreB > Double(Int32.min))
+      #expect(assemblerB.assembledSentence.values == ["反感"])
+      // 不同鍵序列的路徑總分必須不同。
+      #expect(scoreA != scoreB)
+    }
   }
 }
