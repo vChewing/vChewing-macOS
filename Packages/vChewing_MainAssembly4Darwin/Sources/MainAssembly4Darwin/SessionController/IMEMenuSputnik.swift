@@ -201,23 +201,6 @@ extension IMEMenuSputnik {
         )
         .state(PrefMgr.shared.cassetteEnabled)
         .hotkey(PrefMgr.shared.usingHotKeyCassette ? "I" : "", mask: [.command, .control])
-      NSMenu.Item("i18n:UserDef.kFuriousTypingEnabled.shortTitle")?
-        .act(
-          register {
-            self.core?.resetInputHandler(forceComposerCleanup: true)
-            Notifier
-              .notify(
-                message: "i18n:UserDef.kFuriousTypingEnabled.shortTitle".i18n
-                  + "\n"
-                  + (
-                    PrefMgr.shared.furiousTypingEnabled.toggled()
-                      ? "i18n:NotificationSwitch.On".i18n
-                      : "i18n:NotificationSwitch.Off".i18n
-                  )
-              )
-          }
-        )
-        .state(PrefMgr.shared.furiousTypingEnabled)
       NSMenu.Item("i18n:UserDef.kUsingHotKeyCNS.shortTitle")?
         .act(
           register {
