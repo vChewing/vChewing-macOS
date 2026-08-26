@@ -18,16 +18,22 @@ extension InputHandlerProtocol {
     currentLM.syncPrefs()
 
     // 狂拼固化：尾段候選窗顯示中、按下「可能叫出選字窗」的鍵（Space／翻頁／候選導航
-    // 方向鍵）時，先把尾段投機讀音固化進組字器（投機→實體），再讓同一事件繼續走
-    // 正常流程——正常流程自動開出正常選字窗（方向鍵、翻頁、revlookup 皆由既有機制
-    // 免費提供）。不重入、無遞迴風險；Enter／數字鍵／字母鍵／編輯鍵不屬觸發集合。
+    // 方向鍵）時，先把尾段投機讀音固化進組字器（投機→實體：只插聲調桶、不覆寫，
+    // trail 累積供重切分），再讓同一事件繼續走正常流程——正常流程自動開出正常選字窗
+    // （方向鍵、翻頁、revlookup 皆由既有機制免費提供）。不重入、無遞迴風險；
+    // Enter／數字鍵／字母鍵／編輯鍵不屬觸發集合。
     // 前後方向鍵不在此列——注拼槽有未完成讀音時由 handleForward/handleBackward
     // 的專屬規則接管（狂拼開窗或 error 退回）。
+    // 空格觸發固化時記錄本拍「空格已用於插入讀音」：後續的 kSpace 分診依此直接
+    // 消費本拍空格（不再輪替、不再遞交、不生成空格字符）——未完成讀音存在時，
+    // 空格語義為「把讀音插入組字器」而非「輪替候選」。
+    var spaceSolidifiedFuriousReading = false
     if session.isFuriousCopilotCandidateWindowVisible,
        !input.isHoldingAny([.control, .option, .command]),
        input.isSpace || input.isPageUp || input.isPageDown
        || input.isCursorClockLeft || input.isCursorClockRight {
       solidifyFuriousTailReading()
+      spaceSolidifiedFuriousReading = input.isSpace
     }
 
     // MARK: - 按鍵碼分診（Triage by KeyCode）
@@ -95,10 +101,23 @@ extension InputHandlerProtocol {
             return true
           }
         case .ofInputting:
+          // 空格已用於狂拼讀音固化：本拍空格被「插入讀音」消費——不再輪替候選、
+          // 亦不落入後續的空格遞交路徑（否則會生成空格字符拆斷組字區、使之直接
+          // 遞交）。behavior==1 的「空格呼叫選字窗」由更早的 callCandidateState
+          // 提供、不受本守衛影響；此處以新狀態刷新顯示（清掉已失效的狂拼尾段預覽窗）。
+          if spaceSolidifiedFuriousReading {
+            session.switchState(generateStateOfInputting())
+            return true
+          }
+          // 空格輪替守衛：注拼槽尚有未完成讀音時，停用空格輪替——未完成讀音存在時，
+          // 空格語義為「把讀音插入組字器」、不兼任候選輪替。
+          // （拼音模式下 composer.isEmpty 涵蓋 romajiBuffer；注音模式涵蓋聲介韻調。）
+          let spaceRotationBanned = !composer.isEmpty
           // 臉書等網站會攔截 Tab 鍵，所以用 Shift+Command+Space 對候選字詞做正向/反向輪替。
           // Space 鍵就地輪替候選字（對應 spaceKeyBehaviorAgainstICB == 2）。
           if prefs.spaceKeyBehaviorAgainstICB == 2,
-             input.keyModifierFlags.intersection([.control, .command, .option]).isEmpty {
+             input.keyModifierFlags.intersection([.control, .command, .option]).isEmpty,
+             !spaceRotationBanned {
             // 此時 Shift+Space 反向輪替，仿 Shift+Tab 行為。
             // SPACE 啟動的輪替一律套用 soft revolve，避免毀掉鄰近已覆寫節點。
             return revolveCandidate(
@@ -106,7 +125,7 @@ extension InputHandlerProtocol {
               softRevolve: prefs.preferredRevolverForceLevel != 0
             )
           }
-          if input.isShiftHeld, !input.isHoldingAny([.control, .option]) {
+          if input.isShiftHeld, !input.isHoldingAny([.control, .option]), !spaceRotationBanned {
             return revolveCandidate(
               reverseOrder: input.isCommandHeld,
               softRevolve: prefs.preferredRevolverForceLevel != 0

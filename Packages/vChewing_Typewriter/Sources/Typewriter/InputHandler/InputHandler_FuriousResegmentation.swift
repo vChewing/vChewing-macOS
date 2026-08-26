@@ -19,22 +19,21 @@ private let furiousSyllableScoreFloor: Double = -12
 enum FuriousTailApplyOutcome {
   /// 插入失敗（組字器未被變更）。
   case failed
-  /// 插入成功但覆寫失敗（組句維持語言模型預設；真實確認路徑保留已插入讀音、不觀察 POM）。
+  /// 插入成功但覆寫失敗（組句維持語言模型預設）。
   case inserted
   /// 插入＋覆寫皆成功。
   case overridden
 }
 
 extension InputHandlerProtocol {
-  /// 狂拼模式是否有效：打字方法為注音組字、狂拼啟用、非磁帶、非逐字選字、拼音模式。
+  /// 狂拼模式是否有效：打字方法為注音組字且打字模式為狂拼。
   ///
   /// 這是狂拼各功能（尾段預覽、copilot 候選窗、固化、重切分、就地選字等）的共用閘門；
   /// 尾段特定的額外條件（游標在組字區最前端、無聲調暫存、注拼槽非空等）由
   /// `furiousTailContext`／`hasFuriousTailPending` 各自把守。
+  /// `typingMode` 已把「狂拼開關＋非磁帶＋非逐字選字＋拼音注拼槽」打包為 `.pinyinFuriousTyping`。
   public var isFuriousTypingModeEffective: Bool {
-    currentTypingMethod == .vChewingFactory
-      && prefs.furiousTypingEnabled && !prefs.cassetteEnabled && !prefs.useSCPCTypingMode
-      && composer.isPinyinMode
+    currentTypingMethod == .vChewingFactory && typingMode == .pinyinFuriousTyping
   }
 
   /// 狂拼模式有效且注拼槽尚有未完成拼裝的拼音字母流（尾段待確認讀音）。
@@ -63,7 +62,14 @@ extension InputHandlerProtocol {
   /// 狂拼模式的尾段固化：把注拼槽的投機讀音固化進組字器（投機→實體）。
   ///
   /// 由「可能叫出選字窗」的觸發鍵（Space／翻頁／候選導航方向鍵）在 triage 早段觸發：
-  /// 先把尾段讀音桶插入組字器、清空注拼槽，再由同一事件的正常流程開出正常選字窗。
+  /// 只把尾段聲調桶插入組字器、**不覆寫**——保留 LM 重切分自由度，
+  /// 使後續音節可自動合併成長詞（如「xi 空格 an 空格」→「西安」），
+  /// 最後清空注拼槽。
+  /// 聲調桶鍵保留 ⇒ 隨後開出的選字窗仍陳列其他 tone-fuzzy（全調）候選；顯示則由
+  /// 真組字器組句決定（與 copilot 預覽同源：copilot 與真組字器使用同一 LM 與同一組
+  /// keys，單音節顯示必然一致）。
+  /// 完整音節固化後 trail 累積該拼音 blob，供語言模型引導的重切分使用；不完整前綴
+  /// （如「z」）固化後 trail 失效（無法作為合法切分素材）。
   /// 失敗時靜默退回、不主動 switchState（後續正常流程會生成新狀態）。
   func solidifyFuriousTailReading() {
     guard let furiousContext = furiousTailContext else { return }
@@ -75,8 +81,6 @@ extension InputHandlerProtocol {
     guard (try? assembler.insertKeys([.multipleKeys(bucket)])) != nil else { return }
     composer.replacePinyinBuffer(with: "")
     furiousHighlightOverride = nil // 高亮覆寫僅供當拍消費。
-    // trail 同步：完整音節 → append（維持重切分不變量）；不完整前綴 → 失效
-    // （使用者把不完整前綴固化屬顯式干涉，且 DP 無法處理非音節 blob）。
     if isCompleteSyllable {
       furiousTrail.append(romaji)
     } else {
@@ -96,12 +100,19 @@ extension InputHandlerProtocol {
   /// 套用：跨邊界僅插入尾段讀音（單鍵）並覆寫 anchor-(n-1) 起的 n 鍵 span；其餘沿用
   /// 既有語義（置頂無橫跨＝讀音桶單一位置多讀音，否則逐讀音單鍵）並覆寫 anchor 起的 span。
   /// 覆寫為 `.withSpecified`＋`isExplicitlyOverridden`；`perceptionHandler` 僅在覆寫成功時
-  /// 被呼叫（真實確認路徑借此收集 POM 觀察；高亮預覽路徑不傳入）。
+  /// 被呼叫，供「使用者顯式選字」的確認路徑（Shift+選字鍵／滑鼠點選）收集 POM 觀察。
+  /// Enter 直遞／高亮預覽不傳入——copilot 未經使用者逐字確認的最佳猜測
+  /// 不應寫入漸退記憶模組（否則記憶的短詞會綁架長詞的組句，如「是嗎」綁架
+  /// 「是媽媽」→「是嗎嗎」）。空格固化自同日起不再走本函式
+  /// （只插聲調桶、不覆寫，保留重切分自由度）。
+  /// - Parameter preservingFuzzyKeys: 為 true 時一律插入整組聲調桶（保留 tone-fuzzy
+  ///   候選窗），僅以覆寫釘住顯示——用於空格固化的「模擬選字窗選字」路徑。
   @discardableResult
   func applyFuriousTailCandidate(
     _ candidate: CandidateInState,
     to targetAssembler: Homa.Assembler,
     bucket: [String],
+    preservingFuzzyKeys: Bool = false,
     perceptionHandler: ((Homa.PerceptionIntel) -> ())? = nil
   )
     -> FuriousTailApplyOutcome {
@@ -122,7 +133,9 @@ extension InputHandlerProtocol {
     // 目標組字器的游標即新插入 span 的錨點（狂拼語義下位於組字區最前端）。
     let anchor = targetAssembler.cursor
     let inserted: Bool
-    if isCrossBoundary, let tailReading = candidate.keyArray.last {
+    if preservingFuzzyKeys {
+      inserted = (try? targetAssembler.insertKeys([.multipleKeys(bucket)])) != nil
+    } else if isCrossBoundary, let tailReading = candidate.keyArray.last {
       inserted = (try? targetAssembler.insertKeys([.singleKey(tailReading)])) != nil
     } else {
       let keysToInsert: [Homa.PossibleKey] = candidate.keyArray == bucket
@@ -169,13 +182,6 @@ extension InputHandlerProtocol {
     session.updateCompositionBufferDisplay()
   }
 
-  /// 將給定的注音讀音展開為無調候選桶（含聲調變體），與自動 chop 的展開語義一致。
-  private func furiousToneInsensitiveBucket(for zhuyin: String) -> [String] {
-    Tekkon.allowedIntonations.map { tone in
-      zhuyin + ((tone != " ") ? String(tone) : "")
-    }
-  }
-
   /// 語言模型引導的拼音重切分（furious resegmentation）。
   ///
   /// 當 trail 記錄了至少兩個由自動 chop 提交的讀音鍵時，把 trail 的字母流重新枚舉成
@@ -196,7 +202,7 @@ extension InputHandlerProtocol {
     // override 的保證）；不一致時視為 trail 失效，絕不重切動到 trail 以外的內容。
     let trailBuckets: [[String]] = furiousTrail.compactMap { blob in
       guard let zhuyin = readingMap[blob] else { return nil }
-      return furiousToneInsensitiveBucket(for: zhuyin)
+      return Tekkon.makeToneInsensitiveVariants(of: zhuyin)
     }
     guard trailBuckets.count == furiousTrail.count else {
       invalidateFuriousTrail()
@@ -216,7 +222,7 @@ extension InputHandlerProtocol {
         guard let self, let zhuyin = readingMap[syllable] else {
           return furiousSyllableScoreFloor
         }
-        let bucket = self.furiousToneInsensitiveBucket(for: zhuyin)
+        let bucket = Tekkon.makeToneInsensitiveVariants(of: zhuyin)
         let grams = self.currentLM.lookupHub.grams(for: [.multipleKeys(bucket)])
         return grams.map(\.probability).max() ?? furiousSyllableScoreFloor
       }
@@ -237,7 +243,7 @@ extension InputHandlerProtocol {
       // 逐音節展開六聲調桶，且每個桶都須有在庫命中；驗證失敗整個候選跳過。
       let keyBuckets: [[String]] = candidate.compactMap { blob in
         guard let zhuyin = readingMap[blob] else { return nil }
-        return furiousToneInsensitiveBucket(for: zhuyin)
+        return Tekkon.makeToneInsensitiveVariants(of: zhuyin)
       }
       guard keyBuckets.count == candidate.count,
             keyBuckets.allSatisfy({ bucket in
@@ -269,7 +275,7 @@ extension InputHandlerProtocol {
     }
     let bestKeyBuckets: [[String]] = bestCandidate.compactMap { blob in
       guard let zhuyin = readingMap[blob] else { return nil }
-      return furiousToneInsensitiveBucket(for: zhuyin)
+      return Tekkon.makeToneInsensitiveVariants(of: zhuyin)
     }
     guard (try? assembler.insertKeys(bestKeyBuckets)) != nil else {
       // 失敗防禦：復原原 trail 鍵以維持既有組句；trail 一併失效。

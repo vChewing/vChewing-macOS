@@ -178,6 +178,11 @@ extension SessionProtocol {
   public func candidateToolTip(shortened: Bool) -> String {
     if state.type == .ofAssociates {
       return shortened ? "⇧" : "i18n:StateOfInputting.Tooltip.HoldShiftChooseAssociates".i18n
+    } else if isFuriousCopilotCandidateWindowVisible {
+      // 狂拼 copilot 候選窗：就地選字需 Shift＋選字鍵（IH117C 語義不變）。
+      // 該窗常駐於 Inputting 狀態、與 tooltip 窗重疊，故以專屬 Shift 提示取代
+      // 「⚡️ 快速候選」（後者原為非磁帶下 quick-candidates 分支的顯示內容）。
+      return "i18n:CandidateWindow.Tooltip.HoldShiftToSelect".i18n
     } else if state.type == .ofInputting, state.isCandidateContainer {
       let useShift = inputMode.langModel.areCassetteCandidateKeysShiftHeld
       let theEmoji = useShift ? "⬆️" : "⚡️"
@@ -338,10 +343,11 @@ extension SessionProtocol {
       )
       if !associates.candidates.isEmpty { result = associates }
     case .ofInputting where (0 ..< state.candidates.count).contains(index):
-      // 狂拼模式：尾段候選就地選字（滑鼠點選亦走這裡）。
+      // 狂拼模式：尾段候選就地選字（滑鼠點選／Shift+選字鍵亦走這裡）。
+      // 使用者顯式選字＝符合 POM 記憶的明確意志，故傳入 memorizePOM: true。
       if inputHandler.isFuriousTypingModeEffective {
         let selectedValue = state.candidates[index]
-        inputHandler.confirmFuriousTailCandidate(selectedValue)
+        inputHandler.confirmFuriousTailCandidate(selectedValue, memorizePOM: true)
         switchState(inputHandler.generateStateOfInputting())
         return
       }

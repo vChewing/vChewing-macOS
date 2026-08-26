@@ -60,23 +60,19 @@ public struct BPMFFullMatchTypewriter<Handler: InputHandlerProtocol>: Typewriter
       return true
     }
 
-    // 狂拼模式：注拼槽尚有暫存拼音時，Enter 直接遞交「組字區內容＋尾段預覽」，
-    // 省略「先確認讀音、再敲一次 Enter」的兩步流程。copilot 窗可見時，遞交的必須是
-    // 高亮（或置頂）候選的套用結果——先真實套用（含 POM 記憶），再遞交組字區全句。
+    // 狂拼模式：注拼槽尚有暫存拼音時，Enter 只固化尾段讀音、停留在 Inputting 狀態
+    // 留待接下來的輸入，不直接遞交全部內容。copilot 窗可見
+    // 且使用者已高亮某候選時，固化該候選（等同就地選字、但不寫 POM——與 Enter 直遞
+    // 的 POM 政策一致）；否則以空格固化的語義只插聲調桶（保留重切分自由度）。
+    // 注拼槽清空後再次 Enter（hasFuriousTailPending 不成立）才走正常遞交路徑。
     if confirmCombination, input.isEnter, !input.isHoldingAny([.control, .option, .shift, .command]),
        handler.hasFuriousTailPending {
-      if session.isFuriousCopilotCandidateWindowVisible,
-         let candidate = handler.furiousHighlightOverride ?? session.state.candidates.first {
-        handler.confirmFuriousTailCandidate(candidate)
-        let displayedText = handler.committableDisplayText()
-        guard !displayedText.isEmpty else { return nil }
-        session.switchState(State.ofCommitting(textToCommit: displayedText))
-        return true
+      if let highlight = handler.furiousHighlightOverride {
+        handler.confirmFuriousTailCandidate(highlight)
+      } else {
+        handler.solidifyFuriousTailReading()
       }
-      // 候選缺失或確認閘門不過：回落既有直遞語義。
-      let displayedText = handler.committableDisplayText()
-      guard !displayedText.isEmpty else { return nil }
-      session.switchState(State.ofCommitting(textToCommit: displayedText))
+      session.switchState(handler.generateStateOfInputting())
       return true
     }
 
@@ -154,7 +150,7 @@ public struct BPMFFullMatchTypewriter<Handler: InputHandlerProtocol>: Typewriter
     ) else {
       return [readingKey]
     }
-    return makeToneInsensitivePinyinQueryKey(from: readingKey)
+    return Tekkon.makeToneInsensitiveVariants(of: readingKey)
   }
 
   /// 判斷本次是否應將無調拼音改以聲調候選桶查詢。
@@ -172,21 +168,6 @@ public struct BPMFFullMatchTypewriter<Handler: InputHandlerProtocol>: Typewriter
       && composer.isPinyinMode
       && composer.isPronounceable
       && existedIntonation.isEmpty
-  }
-
-  /// 將單一無調拼音讀音展開成同音節的聲調候選桶。
-  /// - Parameter readingKey: 不帶顯式聲調的單一讀音索引鍵。
-  /// - Returns: 該讀音的所有聲調變體陣列。
-  private func makeToneInsensitivePinyinQueryKey(from readingKey: String) -> [String] {
-    var toneVariants = [String]()
-    Tekkon.allowedIntonations.forEach { tone in
-      let intonationNow = (tone != " ") ? String(tone) : ""
-      let candidate = "\(readingKey)\(intonationNow)"
-      if !toneVariants.contains(candidate) {
-        toneVariants.append(candidate)
-      }
-    }
-    return toneVariants
   }
 
   private func consumeReadingInputIfNeeded(
@@ -241,7 +222,7 @@ public struct BPMFFullMatchTypewriter<Handler: InputHandlerProtocol>: Typewriter
     }
 
     let choppedReadingKeys = autoChop.committedReadings.map {
-      makeToneInsensitivePinyinQueryKey(from: $0)
+      Tekkon.makeToneInsensitiveVariants(of: $0)
     }
     guard choppedReadingKeys.allSatisfy({ key in
       key.contains(where: { handler.currentLM.hasUnigramsForFast(keyArray: [$0]) })

@@ -35,11 +35,14 @@ extension InputHandlerProtocol {
   /// `assembledMainValues` 為 copilot 全句組句的主段範圍擷取（與尾段 suffix 擷取互為
   /// 鏡像），供 composition buffer 顯示與 Enter 遞交使用，確保顯示/遞交與 copilot
   /// 最佳猜測（含邊界文脈）同源。
-  /// - Returns: 含讀音桶、預覽文字、橫跨節點詞音配對與主段文字陣列的暫態結果；
-  ///   閘門不符或試算失敗時回傳 nil。
+  /// `tailReading` 為 copilot 組句當中最末節點對「尾段位置」的具體選讀（含聲調），
+  /// 供尾段候選清單與高亮預覽／顯式選字（Shift+選字鍵）路徑使用；空格固化不再以
+  /// 之釘選——只插聲調桶、不覆寫，保留 LM 重切分自由度。
+  /// - Returns: 含讀音桶、預覽文字、橫跨節點詞音配對、主段文字陣列與尾段選讀的
+  ///   暫態結果；閘門不符或試算失敗時回傳 nil。
   var furiousTailContext: (
     bucket: [String], preview: String, crossingPair: CandidateInState?,
-    assembledMainValues: [String]
+    assembledMainValues: [String], tailReading: String?
   )? {
     guard isFuriousTypingModeEffective else { return nil }
     guard composer.intonation.isEmpty else { return nil }
@@ -90,13 +93,15 @@ extension InputHandlerProtocol {
     // 橫跨節點偵測：copilot 組句的最後節點若其範圍起點在尾段位置（mainLength）之前，
     // 即為橫跨「最後提交鍵＋尾段」邊界的節點（涵蓋最末鍵者必為最後節點）。
     var crossingPair: CandidateInState?
+    var tailReading: String?
     if let lastGram = copilot.assembledSentence.last {
+      tailReading = lastGram.keyArray.last // 最末節點的最後一個讀音＝尾段位置的選讀。
       let lastStart = copilot.assembledSentence.totalKeyCount - lastGram.keyArray.count
       if lastStart < mainLength {
         crossingPair = (keyArray: lastGram.keyArray, value: lastGram.value)
       }
     }
-    return (bucket, tailText, crossingPair, mainValues)
+    return (bucket, tailText, crossingPair, mainValues, tailReading)
   }
 
   /// 狂拼模式的尾段候選清單：置頂為 copilot 預覽猜測值，其餘取自語言模組對讀音桶的查詢。
@@ -115,7 +120,7 @@ extension InputHandlerProtocol {
   private func buildFuriousTailCandidates(
     from furiousContext: (
       bucket: [String], preview: String, crossingPair: CandidateInState?,
-      assembledMainValues: [String]
+      assembledMainValues: [String], tailReading: String?
     )
   )
     -> [CandidateInState] {
@@ -150,9 +155,18 @@ extension InputHandlerProtocol {
   /// 狂拼模式：就地確認尾段候選，將其詞音配對覆寫至組字器尾端的新插入 span。
   ///
   /// 先清空注拼槽、把候選的讀音（或讀音桶）插入組字器，再對 anchor 起的新 span 覆寫
-  /// 使用者指定的詞音配對（含 POM 觀察）。任一環節失敗時靜默退回，不更動既有狀態語義。
-  /// - Parameter candidate: 使用者選中的尾段候選。
-  public func confirmFuriousTailCandidate(_ candidate: CandidateInState) {
+  /// 使用者指定的詞音配對。任一環節失敗時靜默退回，不更動既有狀態語義。
+  /// 注意：僅當確認來自**使用者顯式選字**（Shift+選字鍵／滑鼠點選，`memorizePOM: true`）
+  /// 時才收集 POM 觀察；Enter 固化高亮候選（`memorizePOM` 預設 false）不寫入——copilot 未經
+  /// 使用者逐字確認的最佳猜測不應寫入漸退記憶模組（否則記憶的短詞會綁架長詞的組句，
+  /// 如「是嗎」綁架「是媽媽」→「是嗎嗎」）。
+  /// - Parameters:
+  ///   - candidate: 使用者選中的尾段候選。
+  ///   - memorizePOM: 是否收集 POM 觀察（僅使用者顯式選字的確認路徑傳入 true）。
+  public func confirmFuriousTailCandidate(
+    _ candidate: CandidateInState,
+    memorizePOM: Bool = false
+  ) {
     // 閘門再驗：與預覽／候選清單共用同一套守衛。
     guard hasFuriousTailPending else { return }
     guard let furiousContext = furiousTailContext else { return }
@@ -167,21 +181,22 @@ extension InputHandlerProtocol {
     // 三路徑套用（置頂無橫跨／跨邊界／尾段單音節）共用於真實確認與高亮預覽。
     var pomObservation: Homa.PerceptionIntel?
     let outcome = applyFuriousTailCandidate(
-      candidate, to: assembler, bucket: bucket
-    ) { perceptionIntel in
-      pomObservation = perceptionIntel
-    }
+      candidate, to: assembler, bucket: bucket,
+      perceptionHandler: memorizePOM ? { pomObservation = $0 } : nil
+    )
     switch outcome {
     case .failed:
       // 失敗防禦：復原注拼槽暫存，靜默退回。
       composer.replacePinyinBuffer(with: romajiBackup)
       return
     case .inserted:
-      // 覆寫失敗：保留已插入讀音（組句結果與 copilot 預覽一致），不觀察 POM。
+      // 覆寫失敗：保留已插入讀音（組句結果與 copilot 預覽一致）。
       return
     case .overridden:
       break
     }
+    // 僅使用者顯式選字（memorizePOM）才進入 POM 觀察；Enter 固化高亮候選不寫入。
+    guard memorizePOM else { return }
     if let adjustedObservation = Homa.makePerceptionIntel(
       previouslyAssembled: preservedSentenceBeforeConsolidation,
       currentAssembled: assembler.assembledSentence,
@@ -222,7 +237,7 @@ extension InputHandlerProtocol {
     let noReading = sansReading || [.codePoint, .romanNumerals].contains(currentTypingMethod)
     let furiousContext: (
       bucket: [String], preview: String, crossingPair: CandidateInState?,
-      assembledMainValues: [String]
+      assembledMainValues: [String], tailReading: String?
     )? = noReading ? nil : furiousTailContext
     let furiousPreview: String? = furiousContext?.preview
     /// 「更新內文組字區 (Update the composing buffer)」是指要求客體軟體將組字緩衝區的內容
@@ -388,11 +403,13 @@ extension InputHandlerProtocol {
     var displayedText = displayTextSegments.joined()
     let noReading = sansReading || [.codePoint, .romanNumerals].contains(currentTypingMethod)
     // 狂拼模式：遞交內容與 composition buffer 顯示同源於 copilot 全句組句
-    // （主段＋尾段預覽），確保 Enter 直遞與所見一致。
-    if let furiousContext: (
-      bucket: [String], preview: String, crossingPair: CandidateInState?,
-      assembledMainValues: [String]
-    ) = noReading ? nil : furiousTailContext {
+    // （主段＋尾段預覽），確保 IMK 強制遞交（CpLk 等）與所見一致。狂拼的尾段
+    // 預覽是 copilot 組句後的中文文字、並非未完成拼寫的原文拼音，故 sansReading
+    // （剔除未完成讀音）不適用於此分支——否則 CpLk 等強制遞交會遞交組字器自身的
+    // 組句結果、與內文組字區顯示不符。
+    // （Enter 直遞已定案為「固化＋停留」，不再走此全句遞交路徑。）
+    if let furiousContext = [.codePoint, .romanNumerals].contains(currentTypingMethod)
+      ? nil : furiousTailContext {
       return furiousContext.assembledMainValues.joined() + furiousContext.preview
     }
     let reading: String = noReading ? "" : (furiousTypingPreviewedReading ?? readingForDisplay)

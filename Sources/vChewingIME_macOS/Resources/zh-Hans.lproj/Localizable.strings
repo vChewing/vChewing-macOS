@@ -16,6 +16,7 @@
 "i18n:CandidateServiceMenuEditor.prompt" = "请键入您要登记的服务资料。";
 "i18n:CandidateServiceMenuEditor.table.field.MenuTitle" = "选单条目名称";
 "i18n:CandidateServiceMenuEditor.table.field.Value" = "定义资料值";
+"i18n:CandidateWindow.Tooltip.HoldShiftToSelect" = "摁⇧选字";
 "i18n:ClientManager.AddClient" = "登记新客体";
 "i18n:ClientManager.AddService" = "新增服务";
 "i18n:ClientManager.CompatibilityNote" = "有些客体应用可能会有不同的 IMKTextInput 实作相容问题。";

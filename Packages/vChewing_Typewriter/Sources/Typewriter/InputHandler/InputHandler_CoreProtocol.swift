@@ -52,7 +52,7 @@ public protocol InputHandlerProtocol: AnyObject {
   var strCodePointBuffer: String { get set } // 內碼輸入專用組碼區
   var calligrapher: String { get set } // 磁帶專用組筆區
   var mixedAlphanumericalBuffer: String { get set } // 混輸暫存 ASCII 緩衝區
-  var furiousTrail: [String] { get set } // 狂拼模式：自動 chop 提交鍵對應的拼音字母 blob trail
+  var furiousTrail: [String] { get set } // 狂拼模式：自動 chop／空格固化提交鍵對應的拼音字母 blob trail
   var furiousHighlightOverride: CandidateInState? { get set } // 狂拼 copilot 窗高亮候選（當拍消費）
   var composer: Tekkon.Composer { get set } // 注拼槽
   var assembler: Homa.Assembler { get set } // 組字器
@@ -182,6 +182,16 @@ extension InputHandlerProtocol {
   public var isCompositorEmpty: Bool { assembler.isEmpty }
 
   public var isComposerUsingPinyin: Bool { composer.isPinyinMode }
+
+  /// 鍵盤佈局翻譯守衛：當前打字模式是否為「拼音系」（拼音鍵盤或狂拼）。
+  ///
+  /// 拼音系（含狂拼）直接接收 ASCII 字母鍵，不需要將鍵盤佈局翻譯為美規鍵盤；
+  /// 狂拼模式必然為拼音系（`isFuriousTypingModeEffective` 內含 `composer.isPinyinMode`
+  /// 條件），故本旗子恆等於 `isComposerUsingPinyin`。此命名把該語義顯式化，
+  /// 避免鍵盤佈局翻譯等外部條件依賴「狂拼是否拼音」的隱式假設而與閘門語義脫鉤。
+  public var isPinyinFamilyTypingMode: Bool {
+    isComposerUsingPinyin || isFuriousTypingModeEffective
+  }
 
   public var moveCursorAfterSelectingCandidate: Bool {
     /// prefs.cursorPlacementAfterSelectingCandidate 的參數說明：

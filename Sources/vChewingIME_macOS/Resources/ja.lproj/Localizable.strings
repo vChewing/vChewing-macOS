@@ -16,6 +16,7 @@
 "i18n:CandidateServiceMenuEditor.prompt" = "登録したいサービスのメタデータを入力してください。";
 "i18n:CandidateServiceMenuEditor.table.field.MenuTitle" = "メニュー項目タイトル";
 "i18n:CandidateServiceMenuEditor.table.field.Value" = "定義値";
+"i18n:CandidateWindow.Tooltip.HoldShiftToSelect" = "⇧を押す";
 "i18n:ClientManager.AddClient" = "入れる";
 "i18n:ClientManager.AddService" = "サービスを追加";
 "i18n:ClientManager.CompatibilityNote" = "それぞれの客体アプリには、それぞれの IMKTextInput 不具合はあるかもしれません。";

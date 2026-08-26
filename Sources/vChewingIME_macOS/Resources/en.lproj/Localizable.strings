@@ -16,6 +16,7 @@
 "i18n:CandidateServiceMenuEditor.prompt" = "Please input the service metadata you want to register.";
 "i18n:CandidateServiceMenuEditor.table.field.MenuTitle" = "Menu Item Title";
 "i18n:CandidateServiceMenuEditor.table.field.Value" = "Defined Value";
+"i18n:CandidateWindow.Tooltip.HoldShiftToSelect" = "HOLD⇧";
 "i18n:ClientManager.AddClient" = "Add Client";
 "i18n:ClientManager.AddService" = "Add Service";
 "i18n:ClientManager.CompatibilityNote" = "Some client apps may have different compatibility issues in IMKTextInput implementation.";

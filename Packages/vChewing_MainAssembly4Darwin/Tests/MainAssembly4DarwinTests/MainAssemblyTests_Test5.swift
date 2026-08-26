@@ -124,4 +124,43 @@ extension MainAssemblyTests {
     #expect(testClient.toString() == "abc")
     #expect(testSession.state.type == .ofEmpty)
   }
+
+  /// 狂拼 copilot 候選窗的 tooltip：就地選字需 Shift＋選字鍵（IH117C 語義不變），
+  /// 候選窗以專屬 Shift 提示取代「⚡️ 快速候選」（T2）。
+  @Test
+  func test505_FuriousCopilotWindowTooltipShowsShiftHint() throws {
+    let customGrams: [Homa.Gram] = [
+      .init(keyArray: ["ㄕˋ"], value: "世測", score: 9),
+      .init(keyArray: ["ㄐㄧㄝˋ"], value: "界測", score: 8.5),
+      .init(keyArray: ["ㄉㄚˋ"], value: "大測", score: 8),
+      .init(keyArray: ["ㄓㄢˋ"], value: "戰測", score: 8),
+    ]
+    defer {
+      testHandler.currentLM.clearTemporaryData(isFiltering: false)
+      testHandler.prefs.furiousTypingEnabled = false
+      testHandler.prefs.keyboardParser = KeyboardParser.ofStandard.rawValue
+      testHandler.ensureKeyboardParser()
+      testHandler.prefs.fetchSuggestionsFromPerceptionOverrideModel = true
+      testSession.resetInputHandler(forceComposerCleanup: true)
+    }
+    customGrams.forEach {
+      testHandler.currentLM.insertTemporaryData(unigram: $0, isFiltering: false)
+    }
+    testSession.resetInputHandler(forceComposerCleanup: true)
+    testHandler.prefs.keyboardParser = KeyboardParser.ofHanyuPinyin.rawValue
+    testHandler.ensureKeyboardParser()
+    testHandler.prefs.fetchSuggestionsFromPerceptionOverrideModel = false
+    testHandler.prefs.furiousTypingEnabled = true
+    testHandler.currentLM.syncPrefs()
+
+    // 「shijiedaz」：前段自動 chop 提交（世測界測大測），注拼槽暫存「z」。
+    typeSentenceOrCandidates("shijiedaz")
+
+    #expect(testSession.state.type == .ofInputting)
+    #expect(testSession.isFuriousCopilotCandidateWindowVisible)
+    #expect(!testSession.state.candidates.isEmpty)
+    // 專屬 Shift 提示： HoldShiftToSelect（測試環境無 l10n 資源、`.i18n` 回退為原鍵名，故以鍵名斷言）。
+    #expect(testSession.candidateToolTip(shortened: false).contains("HoldShiftToSelect"))
+    // `shortened: true` 的場合無須測試了。
+  }
 }

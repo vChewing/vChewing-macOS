@@ -169,8 +169,9 @@ extension SessionProtocol {
       return handledEmacVIM
     }
 
-    // 在啟用注音排列而非拼音輸入的情況下，強制將當前鍵盤佈局翻譯為美規鍵盤（或指定的其它鍵盤佈局）。
-    if !inputHandler.isComposerUsingPinyin || IMKHelper.isDynamicBasicKeyboardLayoutEnabled {
+    // 在非拼音系模式（注音鍵盤；拼音系含狂拼則不需翻譯）的情況下，強制將當前鍵盤佈局
+    // 翻譯為美規鍵盤（或指定的其它鍵盤佈局）。狂拼為拼音系，由 isPinyinFamilyTypingMode 涵蓋。
+    if !inputHandler.isPinyinFamilyTypingMode || IMKHelper.isDynamicBasicKeyboardLayoutEnabled {
       var defaultLayout = LatinKeyboardMappings(rawValue: prefs.basicKeyboardLayout) ??
         .qwerty
       if let parser = KeyboardParser(rawValue: prefs.keyboardParser) {
