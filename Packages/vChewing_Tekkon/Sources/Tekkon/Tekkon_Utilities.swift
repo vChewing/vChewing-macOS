@@ -3,6 +3,24 @@
 // This code is released under the SPDX-License-Identifier: `LGPL-3.0-or-later`.
 
 extension Tekkon {
+  /// 將無調讀音展開為同音節的聲調候選桶（含聲調變體）。
+  ///
+  /// 陰平（無聲調）以空字串表示；依 `allowedIntonations` 的順序逐個附加聲調記號。
+  /// 以去重守衛防禦「多個聲調記號展開出相同候選」的極端情況，確保回傳內容無重複。
+  /// - Parameter reading: 不帶顯式聲調的讀音索引鍵（注音或拼音皆可）。
+  /// - Returns: 該讀音的所有聲調變體陣列（含陰平原形）。
+  public static func makeToneInsensitiveVariants(of reading: String) -> [String] {
+    var variants = [String]()
+    allowedIntonations.forEach { tone in
+      let intonationNow = (tone != " ") ? String(tone) : ""
+      let candidate = "\(reading)\(intonationNow)"
+      if !variants.contains(candidate) {
+        variants.append(candidate)
+      }
+    }
+    return variants
+  }
+
   // MARK: - Phonabet to Hanyu-Pinyin Conversion Processing
 
   // MARK: - Pre-built lookup for O(N) single-pass conversion.

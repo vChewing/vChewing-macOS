@@ -22,6 +22,23 @@ struct TekkonTestsUtilities {
     #expect(!"".has(string: "a"))
   }
 
+  @Test("[Tekkon] MakeToneInsensitiveVariants_Basic")
+  func testMakeToneInsensitiveVariantsBasic() async throws {
+    // 無調讀音展開為同音節聲調候選桶：陰平以空字串表示，
+    // 順序依 `allowedIntonations`（" ", "ˊ", "ˇ", "ˋ", "˙"）。
+    let result = Tekkon.makeToneInsensitiveVariants(of: "ㄕ")
+    #expect(result == ["ㄕ", "ㄕˊ", "ㄕˇ", "ㄕˋ", "ㄕ˙"])
+    // 去重守衛：回傳內容不得重複。
+    #expect(result.count == Tekkon.allowedIntonations.count)
+    #expect(Set(result).count == result.count)
+  }
+
+  @Test("[Tekkon] MakeToneInsensitiveVariants_EmptyReading")
+  func testMakeToneInsensitiveVariantsEmptyReading() async throws {
+    let result = Tekkon.makeToneInsensitiveVariants(of: "")
+    #expect(result == ["", "ˊ", "ˇ", "ˋ", "˙"])
+  }
+
   @Test("[Tekkon] HasScalar_Basic")
   func testHasScalarBasic() async throws {
     #expect("ㄅㄧㄢˋ".has(scalar: "ˋ"))
