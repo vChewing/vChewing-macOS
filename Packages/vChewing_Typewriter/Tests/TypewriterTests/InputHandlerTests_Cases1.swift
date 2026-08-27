@@ -1484,7 +1484,7 @@ extension InputHandlerTests {
     #expect(testSession.state.tooltip.isEmpty)
   }
 
-  /// 狂拼模式關閉時（預設），注拼槽暫存的拼音維持原文顯示，既有行為不受影響。
+  /// 狂拼模式關閉時（此處顯式停用，不再依賴預設值），注拼槽暫存的拼音維持原文顯示，既有行為不受影響。
   @Test
   func test_IH116B_FuriousTypingDisabledKeepsRawPinyinDisplay() throws {
     guard let testHandler, let testSession else {
@@ -1517,6 +1517,7 @@ extension InputHandlerTests {
     testHandler.ensureKeyboardParser()
     testHandler.prefs.fetchSuggestionsFromPerceptionOverrideModel = false
     testHandler.prefs.showHanyuPinyinInCompositionBuffer = true
+    testHandler.prefs.furiousTypingEnabled = false // 顯式停用狂拼（測試意圖為「關閉時」行為）。
     testHandler.currentLM.syncPrefs()
 
     typeSentence("shijiedaz")
@@ -1893,6 +1894,7 @@ extension InputHandlerTests {
     testHandler.prefs.keyboardParser = KeyboardParser.ofHanyuPinyin.rawValue
     testHandler.ensureKeyboardParser()
     testHandler.prefs.fetchSuggestionsFromPerceptionOverrideModel = false
+    testHandler.prefs.furiousTypingEnabled = false // 顯式停用狂拼（測試意圖為「關閉時」行為）。
     testHandler.currentLM.syncPrefs()
 
     typeSentence("fanganz")
@@ -2845,6 +2847,7 @@ extension InputHandlerTests {
     testHandler.prefs.keyboardParser = KeyboardParser.ofHanyuPinyin.rawValue
     testHandler.ensureKeyboardParser()
     testHandler.prefs.fetchSuggestionsFromPerceptionOverrideModel = false
+    testHandler.prefs.furiousTypingEnabled = false // 顯式停用狂拼（測試意圖為「非狂拼」行為）。
     testHandler.currentLM.syncPrefs()
 
     // 非狂拼：拼音模式注拼槽有未完成拼裝的字母。
@@ -2978,6 +2981,7 @@ extension InputHandlerTests {
     testHandler.prefs.keyboardParser = KeyboardParser.ofHanyuPinyin.rawValue
     testHandler.ensureKeyboardParser()
     testHandler.prefs.fetchSuggestionsFromPerceptionOverrideModel = false
+    testHandler.prefs.furiousTypingEnabled = false // 顯式停用狂拼（測試意圖為「非狂拼」行為）。
     testHandler.currentLM.syncPrefs()
 
     // 非狂拼：拼音模式打入完整可唸讀音（注拼槽非空）。
@@ -3024,6 +3028,7 @@ extension InputHandlerTests {
     testHandler.prefs.keyboardParser = KeyboardParser.ofHanyuPinyin.rawValue
     testHandler.ensureKeyboardParser()
     testHandler.prefs.fetchSuggestionsFromPerceptionOverrideModel = false
+    testHandler.prefs.furiousTypingEnabled = false // 顯式停用狂拼（測試意圖為「非狂拼」行為）。
     testHandler.currentLM.syncPrefs()
 
     // 非狂拼：拼音模式注拼槽為不完整前綴「z」。

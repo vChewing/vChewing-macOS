@@ -464,7 +464,7 @@ nonisolated extension UserDef {
     case .kSpaceKeyBehaviorAgainstICB: return .integer(1)
     case .kCassetteEnabled: return .bool(false)
     case .kMixedAlphanumericalEnabled: return .bool(false)
-    case .kFuriousTypingEnabled: return .bool(false)
+    case .kFuriousTypingEnabled: return .bool(true)
     case .kCNS11643Enabled: return .bool(false)
     case .kSymbolInputEnabled: return .bool(true)
     case .kChineseConversionEnabled: return .bool(false)
