@@ -111,6 +111,11 @@
 "i18n:InfoMessage.YouMayFollow" = "You may follow:";
 "i18n:InputMode.SwitchToInputMode:%@" = "Switch to %@ Input Mode";
 "i18n:InputMode.TargetInputModeActivationRequired" = "Target Input Mode Activation Required";
+"i18n:KanjiConversionMode.JIS" = "JIS";
+"i18n:KanjiConversionMode.KangXi" = "KangXi";
+"i18n:KanjiConversionMode.ModernTrad" = "Modern Traditional";
+"i18n:KanjiConversionRevolvement.Notification.Prefix" = "Kanji Conversion";
+"i18n:KanjiConversionRevolvement.Notification.Suffix.NoConv" = "No Conversion";
 "i18n:KeyboardLayout.AlvinLiuImitative" = "Alvin Liu (Imitative)";
 "i18n:KeyboardLayout.AppleABC" = "Apple ABC (equivalent to English US)";
 "i18n:KeyboardLayout.AppleChewingDachen" = "Apple Chewing - Dachen";
@@ -178,6 +183,7 @@
 "i18n:NotificationSwitch.Off" = "✘ OFF";
 "i18n:NotificationSwitch.On" = "✔ ON";
 "i18n:NotificationSwitch.Revolver" = "↺ Switched";
+"i18n:NotificationSwitch.Switched" = "↻ Switched to";
 "i18n:OtherIMEDataImportError.dataExtractionFailure.errMsg" = "Failed from getting importable data. Either the source file is missing or corrupted.";
 "i18n:OtherIMEDataImportError.lexiconWritingFailure.errMsg" = "Failed in writing new user phrases data.";
 "i18n:OtherIMEDataReader.OIDRException.fileNameInsane" = "The file name of the given URL does not make sense. It should have a valid file name.";
@@ -214,6 +220,8 @@
 "i18n:PhraseOperation.NerfUserPhraseSucceeded" = "- Succeeded in nerfing a user phrase.";
 "i18n:PhraseOperation.PhraseReplacementInterfering" = "⚠︎ Phrase replacement mode enabled, interfering user phrase entry.";
 "i18n:PhraseOperation.UnfilterPhraseSucceeded" = "- Succeeded in unfiltering a phrase.";
+"i18n:PinyinZhuyinTypingMode.Pinyin" = "Pinyin Mode";
+"i18n:PinyinZhuyinTypingMode.Zhuyin" = "Zhuyin Mode";
 "i18n:securityAgentHelper.warningMessage.footer" = "When this message shows up, vChewing has already attempted to call DisableSecureEventInput() trying to make itself selectable in the input method menu again. Your suggested further steps:\n\n0. Keep a screenshot of this dialog (if you don't have one) for further purposes.\n\n1. If vChewing is still not selectable in the input method menu, you are suggested to manually terminate the processes listed above to force-release their SecureEventInput states. This will make vChewing available immediately.\n\n2. If the process belongs to an app from Mac App Store, please report its abuse of SecureEventInput to Apple. Apple may take actions to such apps if necessary, including pulling them off from the Mac App Store until the problem gets solved by the developers of such apps.\n\n3. Whether this process is from Mac App Store or not, you report this abuse to the related app vendor / developer. You may give them the screenshot of this alert message since it should have enough information to help the vendor / developer troubleshoot the issue.\n\n4. Some users reported that closing the related running apps and services (especially password manager, macCatalyst-based password login tasks, or any shell-based password login tasks), plus lock-and-unlock the screen / current desktop user session, may mitigate the current issue.";
 "i18n:securityAgentHelper.warningMessage.header" = "vChewing has detected that the following background processes are abusing the SecureEventInput, hindering all 3rd-party input methods from being able to switch to.\n\nIt is fine to use SecureEventInput for sensitive input fields. However, an app calling EnableSecureEventInput() is responsible to call DisableSecureEventInput() immediately right after the input field loses focus. This situation may also happen if an app is hanging in the background (or working as a helper application in the background) with its SecureEventInput left enabled.\n\nThe found processes are:";
 "i18n:securityAgentHelper.warningMessage.title" = "SecureEventInput Abuse Detected";
@@ -405,9 +413,14 @@
 "i18n:UserDef.kInlineDumpPinyinInLieuOfZhuyin.description" = "Contents committed by Command+Option+Ctrl+Enter may vary depending on related behavior settings.";
 "i18n:UserDef.kInlineDumpPinyinInLieuOfZhuyin.shortTitle" = "Commit Hanyu-Pinyin instead on Ctrl(+Option)+Command+Enter";
 "i18n:UserDef.kIsDebugModeEnabled.shortTitle" = "Debug Mode";
+"i18n:UserDef.kKanjiConversionPreferences.description" = "Revolves the kanji conversion mode among Modern Traditional / KangXi / JIS. This setting only takes effect in Traditional Chinese output mode. ‘Modern Traditional’ means no conversion: the output stays as standard Traditional Chinese, without KangXi or JIS glyphs applied.";
+
+"i18n:UserDef.kKanjiConversionPreferences.shortTitle" = "Kanji Conversion Mode:";
 "i18n:UserDef.kKeepReadingUponCompositionError.shortTitle" = "Allow backspace-editing miscomposed readings";
-"i18n:UserDef.kKeyboardParser.description" = "Choose the phonetic layout for the Mandarin parser. Pinyin options are also available here. In Pinyin input mode, the compositor engine may cap candidate assembly to 4 readings when there are incompletely specified reading units (for example, missing tone marks) within the current +/-10 scan range. This cap is not applied when every reading within that +/-10 range is a fully specified, tone-marked spelling.";
-"i18n:UserDef.kKeyboardParser.shortTitle" = "Phonabet Parser:";
+"i18n:UserDef.kKeyboardParser4Pinyin.description" = "Specifies the pinyin input method used while typing in pinyin mode. In pinyin input mode, the compositor engine may cap candidate assembly to 4 readings when there are incompletely specified reading units (for example, missing tone marks) within the current +/-10 scan range. This cap is not applied when every reading within that +/-10 range is a fully specified, tone-marked spelling.";
+"i18n:UserDef.kKeyboardParser4Pinyin.shortTitle" = "Pinyin Parser:";
+"i18n:UserDef.kKeyboardParser4Zhuyin.description" = "Specifies the bopomofo keyboard layout used while typing in zhuyin mode.";
+"i18n:UserDef.kKeyboardParser4Zhuyin.shortTitle" = "Zhuyin Keyboard Layout:";
 "i18n:UserDef.kMinCellWidthForHorizontalMatrix.option.0" = "2 Kanjis";
 "i18n:UserDef.kMinCellWidthForHorizontalMatrix.option.1" = "2 Emojis (Wider)";
 "i18n:UserDef.kMinCellWidthForHorizontalMatrix.shortTitle" = "Minimum cell width for horizontal matrix:";
@@ -424,6 +437,8 @@
 "i18n:UserDef.kPhraseEditorAutoReloadExternalModifications.shortTitle" = "This editor only: Auto-reload modifications happened outside of this editor";
 "i18n:UserDef.kPhraseReplacementEnabled.description" = "This will batch-replace specified candidates.";
 "i18n:UserDef.kPhraseReplacementEnabled.shortTitle" = "Enable phrase replacement table";
+"i18n:UserDef.kPinyinTypingEnabled.description" = "Switches between pinyin and zhuyin typing modes. When enabled, the pinyin parser is used; when disabled, the zhuyin keyboard layout is used.";
+"i18n:UserDef.kPinyinTypingEnabled.shortTitle" = "Pinyin/Zhuyin Typing Mode";
 "i18n:UserDef.kPopupCompositionBufferTextSize.description" = "Adjust the font size of the popup composition buffer.";
 "i18n:UserDef.kPopupCompositionBufferTextSize.shortTitle" = "Popup Composition Buffer Font Size:";
 "i18n:UserDef.kPreferredRevolverForceLevel.description" = "Introduced in v4.5.4, \"Weak-Revolve\" is a protection mechanism for in-place revolving via keyboard shortcuts (e.g., Space/Tab). If a multi-syllable candidate would overwrite manually selected characters outside the current cursor position, it is skipped to prevent previous selections from being unexpectedly affected. This is especially useful for users who prefer \"character-by-character\" selection, ensuring that prior overrides remain intact while revolving subsequent text. This does not affect selections made via the candidate window.";
@@ -541,12 +556,15 @@
 "i18n:UserDef.kUseSpaceToCommitHighlightedCandidate4SCPC.description" = "If enabled, pressing Space while candidate window is visible will confirm the highlighted candidate instead. This setting is only effective in the Per-Char Select Mode (SCPC).";
 "i18n:UserDef.kUseSpaceToCommitHighlightedCandidate4SCPC.shortTitle" = "Use Space to confirm highlighted candidate in Per-Char Select Mode";
 "i18n:UserDef.kUsingHotKeyAssociates.shortTitle" = "Associated Phrases";
-"i18n:UserDef.kUsingHotKeyCassette.shortTitle" = "Currency Numeral Output";
+"i18n:UserDef.kUsingHotKeyCassette.shortTitle" = "CIN Cassette Mode";
 "i18n:UserDef.kUsingHotKeyCNS.shortTitle" = "CNS11643 Mode";
-"i18n:UserDef.kUsingHotKeyCurrencyNumerals.shortTitle" = "Half-Width Punctuation Mode";
-"i18n:UserDef.kUsingHotKeyHalfWidthASCII.shortTitle" = "JIS Shinjitai Output";
+"i18n:UserDef.kUsingHotKeyCurrencyNumerals.shortTitle" = "Currency Numeral Output";
+"i18n:UserDef.kUsingHotKeyHalfWidthPunctuation.shortTitle" = "Half-Width Punctuation Mode";
 "i18n:UserDef.kUsingHotKeyInputMode.shortTitle" = "CHS / CHT Input Mode Switch";
-"i18n:UserDef.kUsingHotKeyJIS.shortTitle" = "Reverse Lookup (Phonabets)";
 "i18n:UserDef.kUsingHotKeyKangXi.shortTitle" = "Force KangXi Writing";
-"i18n:UserDef.kUsingHotKeyRevLookup.shortTitle" = "CIN Cassette Mode";
+"i18n:UserDef.kUsingHotKeyKanjiConversionMode.longTitle" = "Revolve Kanji Conversion (Modern Trad. / KangXi / JIS)";
+"i18n:UserDef.kUsingHotKeyKanjiConversionMode.shortTitle" = "Revolve Kanji Conversion";
+
+"i18n:UserDef.kUsingHotKeyPinyinZhuyinTypingSwitch.shortTitle" = "Pinyin/Zhuyin Typing Mode Switch";
+"i18n:UserDef.kUsingHotKeyRevLookup.shortTitle" = "Reverse Lookup (Phonabets)";
 "i18n:UserDef.kUsingHotKeySCPC.shortTitle" = "Per-Char Select Mode";

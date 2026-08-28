@@ -17,16 +17,7 @@ public struct VwrSettingsPaneOutput: View {
   public var body: some View {
     Form {
       Section {
-        UserDef.kChineseConversionEnabled.renderUI {
-          if PrefMgr.shared.chineseConversionEnabled, PrefMgr.shared.shiftJISShinjitaiOutputEnabled {
-            PrefMgr.shared.shiftJISShinjitaiOutputEnabled = false
-          }
-        }
-        UserDef.kShiftJISShinjitaiOutputEnabled.renderUI {
-          if PrefMgr.shared.chineseConversionEnabled, PrefMgr.shared.shiftJISShinjitaiOutputEnabled {
-            PrefMgr.shared.chineseConversionEnabled = false
-          }
-        }
+        UserDef.kKanjiConversionPreferences.renderUI()
         UserDef.kInlineDumpPinyinInLieuOfZhuyin.renderUI()
         UserDef.kTrimUnfinishedReadingsOnCommit.renderUI()
         UserDef.kRomanNumeralOutputFormat.renderUI()

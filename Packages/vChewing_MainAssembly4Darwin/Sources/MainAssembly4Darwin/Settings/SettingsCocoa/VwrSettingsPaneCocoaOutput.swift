@@ -29,21 +29,10 @@ extension SettingsPanesCocoa {
     var body: NSView? {
       NSStackView.build(.vertical, insets: .new(all: 14)) {
         NSStackView.buildSection(width: contentWidth) {
-          UserDef.kChineseConversionEnabled.renderCocoa(
+          UserDef.kKanjiConversionPreferences.renderCocoa(
             fixWidth: contentWidth,
             prefUITab: .tabOutput
-          ) { renderable in
-            renderable.currentControl?.target = self
-            renderable.currentControl?.action = #selector(self.sanityCheckKangXi(_:))
-          }
-          UserDef.kShiftJISShinjitaiOutputEnabled
-            .renderCocoa(
-              fixWidth: contentWidth,
-              prefUITab: .tabOutput
-            ) { renderable in
-              renderable.currentControl?.target = self
-              renderable.currentControl?.action = #selector(self.sanityCheckJIS(_:))
-            }
+          )
           UserDef.kInlineDumpPinyinInLieuOfZhuyin.renderCocoa(
             fixWidth: contentWidth,
             prefUITab: .tabOutput
@@ -64,20 +53,6 @@ extension SettingsPanesCocoa {
           )
         }?.boxed()
         NSView().makeSimpleConstraint(.height, relation: .equal, value: NSFont.systemFontSize)
-      }
-    }
-
-    @IBAction
-    func sanityCheckKangXi(_: NSControl) {
-      if PrefMgr.shared.chineseConversionEnabled, PrefMgr.shared.shiftJISShinjitaiOutputEnabled {
-        PrefMgr.shared.shiftJISShinjitaiOutputEnabled = false
-      }
-    }
-
-    @IBAction
-    func sanityCheckJIS(_: NSControl) {
-      if PrefMgr.shared.chineseConversionEnabled, PrefMgr.shared.shiftJISShinjitaiOutputEnabled {
-        PrefMgr.shared.chineseConversionEnabled = false
       }
     }
   }

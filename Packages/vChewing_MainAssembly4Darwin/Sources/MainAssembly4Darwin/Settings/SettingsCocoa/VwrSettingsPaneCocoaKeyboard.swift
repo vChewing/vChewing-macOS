@@ -47,7 +47,11 @@ extension SettingsPanesCocoa {
               action: #selector(quickSetupButtonHanyuPinyin(_:))
             )
           }
-          UserDef.kKeyboardParser.renderCocoa(
+          UserDef.kKeyboardParser4Zhuyin.renderCocoa(
+            fixWidth: contentWidth,
+            prefUITab: .tabKeyboard
+          )
+          UserDef.kKeyboardParser4Pinyin.renderCocoa(
             fixWidth: contentWidth,
             prefUITab: .tabKeyboard
           )
@@ -78,7 +82,7 @@ extension SettingsPanesCocoa {
               fixWidth: contentHalfWidth,
               prefUITab: .tabKeyboard
             )
-            UserDef.kUsingHotKeyKangXi.renderCocoa(
+            UserDef.kUsingHotKeyKanjiConversionMode.renderCocoa(
               fixWidth: contentHalfWidth,
               prefUITab: .tabKeyboard
             )
@@ -88,11 +92,11 @@ extension SettingsPanesCocoa {
             )
           }
           NSStackView.build(.vertical) {
-            UserDef.kUsingHotKeyJIS.renderCocoa(
+            UserDef.kUsingHotKeyPinyinZhuyinTypingSwitch.renderCocoa(
               fixWidth: contentHalfWidth,
               prefUITab: .tabKeyboard
             )
-            UserDef.kUsingHotKeyHalfWidthASCII.renderCocoa(
+            UserDef.kUsingHotKeyHalfWidthPunctuation.renderCocoa(
               fixWidth: contentHalfWidth,
               prefUITab: .tabKeyboard
             )

@@ -79,16 +79,14 @@ extension ChineseConverter {
         cassetteEnabled: PrefMgr.shared.cassetteEnabled,
         forceCassetteChineseConversion: PrefMgr.shared.forceCassetteChineseConversion,
         inputMode: IMEApp.currentInputMode,
-        chineseConversionEnabled: PrefMgr.shared.chineseConversionEnabled,
-        shiftJISShinjitaiOutputEnabled: PrefMgr.shared.shiftJISShinjitaiOutputEnabled
+        kanjiConversionPreferences: PrefMgr.shared.kanjiConversionPreferences
       )
     }
 
     var cassetteEnabled: Bool
     var forceCassetteChineseConversion: Int
     var inputMode: Shared.InputMode
-    var chineseConversionEnabled: Bool
-    var shiftJISShinjitaiOutputEnabled: Bool
+    var kanjiConversionPreferences: Int
   }
 
   /// 繁簡轉換結果的快取（keyed by 原始字串），僅供 kanjiConversionIfRequired 使用。
@@ -113,15 +111,10 @@ extension ChineseConverter {
     var text = text
     if PrefMgr.shared.cassetteEnabled { cassetteConvert(&text) }
     guard IMEApp.currentInputMode == .imeModeCHT else { return text }
-    switch (
-      PrefMgr.shared.chineseConversionEnabled,
-      PrefMgr.shared.shiftJISShinjitaiOutputEnabled
-    ) {
-    case (false, true): return Self.cnvTradToJIS(text)
-    case (true, false): return Self.cnvTradToKangXi(text)
-    // 本來這兩個開關不該同時開啟的，但萬一被同時開啟了的話就這樣處理：
-    case (true, true): return Self.cnvTradToJIS(text)
-    case (false, false): return text
+    switch PrefMgr.shared.kanjiConversionPreferences {
+    case 1: return Self.cnvTradToKangXi(text)
+    case 2: return Self.cnvTradToJIS(text)
+    default: return text
     }
   }
 }

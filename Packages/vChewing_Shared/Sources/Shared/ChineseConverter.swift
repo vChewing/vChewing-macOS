@@ -32,15 +32,9 @@ public enum ChineseConverter {
         target = target.replacingOccurrences(of: key, with: result.3) // Simplified Chinese
         continue
       }
-      switch (
-        prefs.chineseConversionEnabled,
-        prefs.shiftJISShinjitaiOutputEnabled
-      ) {
-      case (false, true), (true, true): target = target.replacingOccurrences(
-          of: key,
-          with: result.2
-        ) // JIS
-      case (true, false): target = target.replacingOccurrences(of: key, with: result.0) // KangXi
+      switch prefs.kanjiConversionPreferences {
+      case 1: target = target.replacingOccurrences(of: key, with: result.0) // KangXi
+      case 2: target = target.replacingOccurrences(of: key, with: result.2) // JIS
       default: target = target.replacingOccurrences(of: key, with: result.1) // Contemporary
       }
     }

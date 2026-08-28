@@ -28,7 +28,10 @@ nonisolated public enum UserDef: String, CaseIterable, Identifiable, Sendable {
   case kUserDataFolderSpecified = "UserDataFolderSpecified"
   case kCheckUpdateAutomatically = "CheckUpdateAutomatically"
   case kUseExternalFactoryDict = "UseExternalFactoryDict"
-  case kKeyboardParser = "KeyboardParser"
+  case kKanjiConversionPreferences = "KanjiConversionPreferences"
+  case kKeyboardParser4Pinyin = "KeyboardParser4Pinyin"
+  case kKeyboardParser4Zhuyin = "KeyboardParser4Zhuyin"
+  case kPinyinTypingEnabled = "PinyinTypingEnabled"
   case kBasicKeyboardLayout = "BasicKeyboardLayout"
   case kAlphanumericalKeyboardLayout = "AlphanumericalKeyboardLayout"
   case kShowNotificationsWhenTogglingCapsLock = "ShowNotificationsWhenTogglingCapsLock"
@@ -54,8 +57,6 @@ nonisolated public enum UserDef: String, CaseIterable, Identifiable, Sendable {
   case kFuriousTypingEnabled = "FuriousTypingEnabled"
   case kCNS11643Enabled = "CNS11643Enabled"
   case kSymbolInputEnabled = "SymbolInputEnabled"
-  case kChineseConversionEnabled = "ChineseConversionEnabled"
-  case kShiftJISShinjitaiOutputEnabled = "ShiftJISShinjitaiOutputEnabled"
   case kSuppressFactoryUnigramsOfKanaSyllables = "SuppressFactoryUnigramsOfKanaSyllables"
   case kCurrencyNumeralsEnabled = "CurrencyNumeralsEnabled"
   case kHalfWidthPunctuationEnabled = "HalfWidthPunctuationEnable"
@@ -123,9 +124,9 @@ nonisolated public enum UserDef: String, CaseIterable, Identifiable, Sendable {
   case kUsingHotKeySCPC = "UsingHotKeySCPC"
   case kUsingHotKeyAssociates = "UsingHotKeyAssociates"
   case kUsingHotKeyCNS = "UsingHotKeyCNS"
-  case kUsingHotKeyKangXi = "UsingHotKeyKangXi"
-  case kUsingHotKeyJIS = "UsingHotKeyJIS"
-  case kUsingHotKeyHalfWidthASCII = "UsingHotKeyHalfWidthASCII"
+  case kUsingHotKeyKanjiConversionMode = "UsingHotKeyKanjiConversionMode"
+  case kUsingHotKeyPinyinZhuyinTypingSwitch = "UsingHotKeyPinyinZhuyinTypingSwitch"
+  case kUsingHotKeyHalfWidthPunctuation = "UsingHotKeyHalfWidthPunctuation"
   case kUsingHotKeyCurrencyNumerals = "UsingHotKeyCurrencyNumerals"
   case kUsingHotKeyCassette = "UsingHotKeyCassette"
   case kUsingHotKeyRevLookup = "UsingHotKeyRevLookup"
@@ -361,9 +362,15 @@ nonisolated public enum UserDef: String, CaseIterable, Identifiable, Sendable {
 nonisolated extension UserDef {
   public var validNumeralValueRange: ClosedRange<Int>? {
     switch self {
-    case .kKeyboardParser:
-      // KeyboardParser(rawValue:) 如果 nil 則不合理。
-      0 ... 100
+    case .kKeyboardParser4Pinyin:
+      // 拼音 parser 的值域（含 ofWadeGilesPinyin = 105）。
+      100 ... 105
+    case .kKeyboardParser4Zhuyin:
+      // 注音 parser 的值域。
+      0 ... 10
+    case .kKanjiConversionPreferences:
+      // 0 是不轉換，1 是康熙，2 是 JIS。
+      0 ... 2
     case .kSpecifyIntonationKeyBehavior: 0 ... 2
     case .kSpecifyShiftBackSpaceKeyBehavior: 0 ... 2
     case .kUpperCaseLetterKeyBehavior: 0 ... 4
@@ -389,10 +396,7 @@ nonisolated extension UserDef {
     let validNumeralValueRange = userDef.validNumeralValueRange
     if let validNumeralValueRange, !validNumeralValueRange.contains(value) {
       let rangeDescribed = String(describing: validNumeralValueRange)
-      switch userDef {
-      case .kKeyboardParser: return "Out of range for KeyboardParser"
-      default: return "Must be any Integer within this closed range: [\(rangeDescribed)]."
-      }
+      return "Must be any Integer within this closed range: [\(rangeDescribed)]."
     }
     return nil
   }
@@ -441,7 +445,10 @@ nonisolated extension UserDef {
     case .kUserDataFolderSpecified: return .string("")
     case .kCheckUpdateAutomatically: return .bool(false)
     case .kUseExternalFactoryDict: return .bool(false)
-    case .kKeyboardParser: return .integer(0)
+    case .kKanjiConversionPreferences: return .integer(0)
+    case .kKeyboardParser4Pinyin: return .integer(100)
+    case .kKeyboardParser4Zhuyin: return .integer(0)
+    case .kPinyinTypingEnabled: return .bool(false)
     case .kBasicKeyboardLayout: return .string(Self.kDefaultBasicKeyboardLayout)
     case .kAlphanumericalKeyboardLayout: return .string(Self.kDefaultAlphanumericalKeyboardLayout)
     case .kShowNotificationsWhenTogglingCapsLock: return .bool(true)
@@ -467,8 +474,6 @@ nonisolated extension UserDef {
     case .kFuriousTypingEnabled: return .bool(true)
     case .kCNS11643Enabled: return .bool(false)
     case .kSymbolInputEnabled: return .bool(true)
-    case .kChineseConversionEnabled: return .bool(false)
-    case .kShiftJISShinjitaiOutputEnabled: return .bool(false)
     case .kSuppressFactoryUnigramsOfKanaSyllables: return .bool(false)
     case .kCurrencyNumeralsEnabled: return .bool(false)
     case .kHalfWidthPunctuationEnabled: return .bool(false)
@@ -530,9 +535,9 @@ nonisolated extension UserDef {
     case .kUsingHotKeySCPC: return .bool(true)
     case .kUsingHotKeyAssociates: return .bool(true)
     case .kUsingHotKeyCNS: return .bool(true)
-    case .kUsingHotKeyKangXi: return .bool(true)
-    case .kUsingHotKeyJIS: return .bool(true)
-    case .kUsingHotKeyHalfWidthASCII: return .bool(true)
+    case .kUsingHotKeyKanjiConversionMode: return .bool(true)
+    case .kUsingHotKeyPinyinZhuyinTypingSwitch: return .bool(true)
+    case .kUsingHotKeyHalfWidthPunctuation: return .bool(true)
     case .kUsingHotKeyCurrencyNumerals: return .bool(true)
     case .kUsingHotKeyCassette: return .bool(true)
     case .kUsingHotKeyRevLookup: return .bool(true)
@@ -593,9 +598,26 @@ nonisolated extension UserDef {
         userDef: self, shortTitle: "i18n:UserDef.kUseExternalFactoryDict.shortTitle",
         description: "i18n:UserDef.kUseExternalFactoryDict.description"
       )
-    case .kKeyboardParser: return .init(
-        userDef: self, shortTitle: "i18n:UserDef.kKeyboardParser.shortTitle",
-        description: "i18n:UserDef.kKeyboardParser.description"
+    case .kKanjiConversionPreferences: return .init(
+        userDef: self, shortTitle: "i18n:UserDef.kKanjiConversionPreferences.shortTitle",
+        description: "i18n:UserDef.kKanjiConversionPreferences.description",
+        options: [
+          0: "i18n:KanjiConversionMode.ModernTrad",
+          1: "i18n:KanjiConversionMode.KangXi",
+          2: "i18n:KanjiConversionMode.JIS",
+        ]
+      )
+    case .kKeyboardParser4Pinyin: return .init(
+        userDef: self, shortTitle: "i18n:UserDef.kKeyboardParser4Pinyin.shortTitle",
+        description: "i18n:UserDef.kKeyboardParser4Pinyin.description"
+      )
+    case .kKeyboardParser4Zhuyin: return .init(
+        userDef: self, shortTitle: "i18n:UserDef.kKeyboardParser4Zhuyin.shortTitle",
+        description: "i18n:UserDef.kKeyboardParser4Zhuyin.description"
+      )
+    case .kPinyinTypingEnabled: return .init(
+        userDef: self, shortTitle: "i18n:UserDef.kPinyinTypingEnabled.shortTitle",
+        description: "i18n:UserDef.kPinyinTypingEnabled.description"
       )
     case .kBasicKeyboardLayout: return .init(
         userDef: self, shortTitle: "i18n:UserDef.kBasicKeyboardLayout.shortTitle",
@@ -743,13 +765,6 @@ nonisolated extension UserDef {
       )
     case .kSymbolInputEnabled: return .init(
         userDef: self, shortTitle: "i18n:UserDef.kSymbolInputEnabled.shortTitle"
-      )
-    case .kChineseConversionEnabled: return .init(
-        userDef: self, shortTitle: "i18n:UserDef.kChineseConversionEnabled.shortTitle"
-      )
-    case .kShiftJISShinjitaiOutputEnabled: return .init(
-        userDef: self,
-        shortTitle: "i18n:UserDef.kShiftJISShinjitaiOutputEnabled.shortTitle"
       )
     case .kSuppressFactoryUnigramsOfKanaSyllables: return .init(
         userDef: self,
@@ -1062,11 +1077,17 @@ nonisolated extension UserDef {
         shortTitle: "i18n:UserDef.kUsingHotKeyAssociates.shortTitle"
       )
     case .kUsingHotKeyCNS: return .init(userDef: self, shortTitle: "i18n:UserDef.kUsingHotKeyCNS.shortTitle")
-    case .kUsingHotKeyKangXi: return .init(userDef: self, shortTitle: "i18n:UserDef.kUsingHotKeyKangXi.shortTitle")
-    case .kUsingHotKeyJIS: return .init(userDef: self, shortTitle: "i18n:UserDef.kUsingHotKeyJIS.shortTitle")
-    case .kUsingHotKeyHalfWidthASCII: return .init(
+    case .kUsingHotKeyKanjiConversionMode: return .init(
         userDef: self,
-        shortTitle: "i18n:UserDef.kUsingHotKeyHalfWidthASCII.shortTitle"
+        shortTitle: "i18n:UserDef.kUsingHotKeyKanjiConversionMode.shortTitle"
+      )
+    case .kUsingHotKeyPinyinZhuyinTypingSwitch: return .init(
+        userDef: self,
+        shortTitle: "i18n:UserDef.kUsingHotKeyPinyinZhuyinTypingSwitch.shortTitle"
+      )
+    case .kUsingHotKeyHalfWidthPunctuation: return .init(
+        userDef: self,
+        shortTitle: "i18n:UserDef.kUsingHotKeyHalfWidthPunctuation.shortTitle"
       )
     case .kUsingHotKeyCurrencyNumerals: return .init(
         userDef: self,

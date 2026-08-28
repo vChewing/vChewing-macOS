@@ -81,8 +81,17 @@ public final class PrefMgr: PrefMgrProtocol, Sendable {
   @AppProperty(userDef: .kAppleLanguages)
   public var appleLanguages: [String]
 
-  @AppProperty(userDef: .kKeyboardParser)
-  public var keyboardParser: Int
+  @AppProperty(userDef: .kKeyboardParser4Pinyin)
+  public var keyboardParser4Pinyin: Int
+
+  @AppProperty(userDef: .kKeyboardParser4Zhuyin)
+  public var keyboardParser4Zhuyin: Int
+
+  @AppProperty(userDef: .kPinyinTypingEnabled)
+  public var pinyinTypingEnabled: Bool
+
+  @AppProperty(userDef: .kKanjiConversionPreferences)
+  public var kanjiConversionPreferences: Int
 
   @AppProperty(userDef: .kBasicKeyboardLayout)
   public var basicKeyboardLayout: String
@@ -305,14 +314,14 @@ public final class PrefMgr: PrefMgrProtocol, Sendable {
   @AppProperty(userDef: .kUsingHotKeyCNS)
   public var usingHotKeyCNS: Bool
 
-  @AppProperty(userDef: .kUsingHotKeyKangXi)
-  public var usingHotKeyKangXi: Bool
+  @AppProperty(userDef: .kUsingHotKeyKanjiConversionMode)
+  public var usingHotKeyKanjiConversionMode: Bool
 
-  @AppProperty(userDef: .kUsingHotKeyJIS)
-  public var usingHotKeyJIS: Bool
+  @AppProperty(userDef: .kUsingHotKeyPinyinZhuyinTypingSwitch)
+  public var usingHotKeyPinyinZhuyinTypingSwitch: Bool
 
-  @AppProperty(userDef: .kUsingHotKeyHalfWidthASCII)
-  public var usingHotKeyHalfWidthASCII: Bool
+  @AppProperty(userDef: .kUsingHotKeyHalfWidthPunctuation)
+  public var usingHotKeyHalfWidthPunctuation: Bool
 
   @AppProperty(userDef: .kUsingHotKeyCurrencyNumerals)
   public var usingHotKeyCurrencyNumerals: Bool
@@ -331,6 +340,24 @@ public final class PrefMgr: PrefMgrProtocol, Sendable {
 
   @AppProperty(userDef: .kFuriousTypingEnabled)
   public var furiousTypingEnabled: Bool
+
+  /// 舊版單一注拼槽 parser 屬性的相容層：依當前打字模式（注音/拼音）讀寫各自的 parser 槽位。
+  ///
+  /// - getter：`pinyinTypingEnabled` 時讀 `keyboardParser4Pinyin`，否則讀 `keyboardParser4Zhuyin`。
+  /// - setter：依給定值的語系自動分流——值 ≥ 100（拼音系）寫入 `keyboardParser4Pinyin` 並開啟
+  ///   `pinyinTypingEnabled`；值 < 100（注音系）寫入 `keyboardParser4Zhuyin` 並關閉 `pinyinTypingEnabled`。
+  public var keyboardParser: Int {
+    get { pinyinTypingEnabled ? keyboardParser4Pinyin : keyboardParser4Zhuyin }
+    set {
+      if newValue >= 100 {
+        keyboardParser4Pinyin = newValue
+        pinyinTypingEnabled = true
+      } else {
+        keyboardParser4Zhuyin = newValue
+        pinyinTypingEnabled = false
+      }
+    }
+  }
 
   @AppProperty(userDef: .kUserPhrasesDatabaseBypassed)
   public var userPhrasesDatabaseBypassed: Bool {
@@ -387,38 +414,6 @@ public final class PrefMgr: PrefMgrProtocol, Sendable {
     didSet { didAskForSyncingLMPrefs?() }
   }
 
-  @AppProperty(userDef: .kChineseConversionEnabled)
-  public var chineseConversionEnabled: Bool {
-    didSet {
-      // 康熙轉換與 JIS 轉換不能同時開啟，否則會出現某些奇奇怪怪的情況
-      if chineseConversionEnabled, shiftJISShinjitaiOutputEnabled {
-        shiftJISShinjitaiOutputEnabled.toggle()
-        UserDefaults.current.set(
-          shiftJISShinjitaiOutputEnabled, forKey: UserDef.kShiftJISShinjitaiOutputEnabled.rawValue
-        )
-      }
-      UserDefaults.current.set(
-        chineseConversionEnabled, forKey: UserDef.kChineseConversionEnabled.rawValue
-      )
-    }
-  }
-
-  @AppProperty(userDef: .kShiftJISShinjitaiOutputEnabled)
-  public var shiftJISShinjitaiOutputEnabled: Bool {
-    didSet {
-      // 康熙轉換與 JIS 轉換不能同時開啟，否則會出現某些奇奇怪怪的情況
-      if shiftJISShinjitaiOutputEnabled, chineseConversionEnabled {
-        chineseConversionEnabled.toggle()
-        UserDefaults.current.set(
-          chineseConversionEnabled, forKey: UserDef.kChineseConversionEnabled.rawValue
-        )
-      }
-      UserDefaults.current.set(
-        shiftJISShinjitaiOutputEnabled, forKey: UserDef.kShiftJISShinjitaiOutputEnabled.rawValue
-      )
-    }
-  }
-
   @AppProperty(userDef: .kSuppressFactoryUnigramsOfKanaSyllables)
   public var suppressFactoryUnigramsOfKanaSyllables: Bool {
     didSet { didAskForSyncingLMPrefs?() }
@@ -456,9 +451,16 @@ extension PrefMgr {
   public func fixOddPreferencesCore() {
     // 自動糾正選字鍵 (利用其 didSet 特性)
     candidateKeys = candidateKeys
-    // 注拼槽注音排列選項糾錯。
-    if KeyboardParser(rawValue: keyboardParser) == nil {
-      keyboardParser = 0
+    // 注拼槽注音排列選項糾錯：注音與拼音 parser 分兩路檢查，非法值各自歸回預設。
+    if KeyboardParser(rawValue: keyboardParser4Zhuyin) == nil {
+      keyboardParser4Zhuyin = 0
+    }
+    if KeyboardParser(rawValue: keyboardParser4Pinyin) == nil {
+      keyboardParser4Pinyin = 100
+    }
+    // 漢字轉換（當代繁體/康熙/JIS）的枚舉值糾錯。
+    if ![0, 1, 2].contains(kanjiConversionPreferences) {
+      kanjiConversionPreferences = 0
     }
     // 其它多元選項參數自動糾錯。
     if ![0, 1, 2].contains(specifyIntonationKeyBehavior) {
@@ -529,6 +531,39 @@ extension PrefMgr {
         }
       }
       defaults.removeObject(forKey: oldKey)
+    }
+    // 遷移舊設定：單一 KeyboardParser → 注音/拼音雙槽位（P153）。
+    // 依舊值的語系分流：≥100（拼音系）寫入 4Pinyin 並開啟拼音模式；
+    // <100（注音系）寫入 4Zhuyin 並關閉拼音模式。遷移完畢後移除舊 key。
+    if let oldParser = defaults.object(forKey: "KeyboardParser") as? Int {
+      if oldParser >= 100 {
+        keyboardParser4Pinyin = oldParser
+        pinyinTypingEnabled = true
+      } else {
+        keyboardParser4Zhuyin = oldParser
+        pinyinTypingEnabled = false
+      }
+      defaults.removeObject(forKey: "KeyboardParser")
+    }
+    // 遷移舊設定：康熙/JIS 兩個布林 → 漢字轉換枚舉（P153）。
+    // (true, false) → 1（康熙）；(false, true)／(true, true) → 2（JIS）；其餘 → 0（不轉換）。
+    if defaults.object(forKey: "ChineseConversionEnabled") != nil
+      || defaults.object(forKey: "ShiftJISShinjitaiOutputEnabled") != nil {
+      let oldKangXi = defaults.bool(forKey: "ChineseConversionEnabled")
+      let oldJIS = defaults.bool(forKey: "ShiftJISShinjitaiOutputEnabled")
+      switch (oldKangXi, oldJIS) {
+      case (true, false): kanjiConversionPreferences = 1
+      case (false, true), (true, true): kanjiConversionPreferences = 2
+      default: kanjiConversionPreferences = 0
+      }
+      defaults.removeObject(forKey: "ChineseConversionEnabled")
+      defaults.removeObject(forKey: "ShiftJISShinjitaiOutputEnabled")
+    }
+    // 遷移舊設定：半形標點熱鍵 pref 更名（"UsingHotKeyHalfWidthASCII" → "UsingHotKeyHalfWidthPunctuation"）。
+    // 舊 key 的用戶設定值搬移至新 key（若使用者曾自行調整過熱鍵開關）。
+    if defaults.object(forKey: "UsingHotKeyHalfWidthASCII") != nil {
+      usingHotKeyHalfWidthPunctuation = defaults.bool(forKey: "UsingHotKeyHalfWidthASCII")
+      defaults.removeObject(forKey: "UsingHotKeyHalfWidthASCII")
     }
   }
 }

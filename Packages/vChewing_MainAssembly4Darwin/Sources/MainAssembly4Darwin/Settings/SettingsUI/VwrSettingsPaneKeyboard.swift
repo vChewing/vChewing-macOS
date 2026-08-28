@@ -23,25 +23,26 @@ public struct VwrSettingsPaneKeyboard: View {
           Text("i18n:Settings.SectionQuickSetup".i18n)
           Spacer()
           Button {
-            keyboardParser = 0
+            PrefMgr.shared.keyboardParser = 0
             basicKeyboardLayout = "com.apple.keylayout.ZhuyinBopomofo"
           } label: {
             Text("↻ㄅ" + " " + "i18n:KeyboardLayout.DachenTraditional".i18n)
           }
           Button {
-            keyboardParser = 1
+            PrefMgr.shared.keyboardParser = 1
             basicKeyboardLayout = "com.apple.keylayout.ZhuyinEten"
           } label: {
             Text("↻ㄅ" + " " + "i18n:KeyboardLayout.EtenTraditionalShort".i18n)
           }
           Button {
-            keyboardParser = 100
+            PrefMgr.shared.keyboardParser = 100
             basicKeyboardLayout = "com.apple.keylayout.ABC"
           } label: {
             Text("↻Ａ")
           }
         }
-        UserDef.kKeyboardParser.renderUI()
+        UserDef.kKeyboardParser4Zhuyin.renderUI()
+        UserDef.kKeyboardParser4Pinyin.renderUI()
         UserDef.kBasicKeyboardLayout.renderUI()
         UserDef.kAlphanumericalKeyboardLayout.renderUI()
       }
@@ -58,9 +59,6 @@ public struct VwrSettingsPaneKeyboard: View {
   // MARK: Private
 
   // MARK: - AppStorage Variables
-
-  @AppStorage(wrappedValue: 0, UserDef.kKeyboardParser.rawValue)
-  private var keyboardParser: Int
 
   @AppStorage(
     wrappedValue: UserDef.kBasicKeyboardLayout.stringDefaultValue,
@@ -81,13 +79,13 @@ private struct VwrSettingsPaneKeyboard_KeyboardShortcuts: View {
         UserDef.kUsingHotKeySCPC.renderUI()
         UserDef.kUsingHotKeyAssociates.renderUI()
         UserDef.kUsingHotKeyCNS.renderUI()
-        UserDef.kUsingHotKeyKangXi.renderUI()
+        UserDef.kUsingHotKeyKanjiConversionMode.renderUI()
         UserDef.kUsingHotKeyRevLookup.renderUI()
       }
       Divider()
       VStack(alignment: .leading) {
-        UserDef.kUsingHotKeyJIS.renderUI()
-        UserDef.kUsingHotKeyHalfWidthASCII.renderUI()
+        UserDef.kUsingHotKeyPinyinZhuyinTypingSwitch.renderUI()
+        UserDef.kUsingHotKeyHalfWidthPunctuation.renderUI()
         UserDef.kUsingHotKeyCurrencyNumerals.renderUI()
         UserDef.kUsingHotKeyCassette.renderUI()
         UserDef.kUsingHotKeyInputMode.renderUI()

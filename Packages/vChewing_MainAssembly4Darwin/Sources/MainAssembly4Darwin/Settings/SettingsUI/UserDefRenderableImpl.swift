@@ -304,14 +304,25 @@ extension UserDefRenderable<Int> {
       VStack(alignment: .leading) {
         Group {
           switch def.dataType {
-          case .integer where options.isEmpty && def != .kKeyboardParser:
+          case .integer where options.isEmpty && ![.kKeyboardParser4Pinyin, .kKeyboardParser4Zhuyin]
+            .contains(def):
             Text("[Debug] Needs Review: \(def.rawValue)")
-          case .integer where options.isEmpty && def == .kKeyboardParser: // 鐵恨注拼引擎的佈局模式選項。
+          case .integer where options.isEmpty && [.kKeyboardParser4Pinyin, .kKeyboardParser4Zhuyin]
+            .contains(def): // 鐵恨注拼引擎的佈局模式選項（注音/拼音各自列示其值域）。
             Picker(
               LocalizedStringKey(metaData.shortTitle ?? ""),
               selection: binding
             ) {
-              ForEach(KeyboardParser.allCases, id: \.self) { item in
+              ForEach(
+                KeyboardParser.allCases.filter { parser in
+                  switch def {
+                  case .kKeyboardParser4Zhuyin: return parser.rawValue < 100
+                  case .kKeyboardParser4Pinyin: return parser.rawValue >= 100
+                  default: return true
+                  }
+                },
+                id: \.self
+              ) { item in
                 if [7, 100].contains(item.rawValue) { Divider() }
                 Text(item.localizedMenuName).tag(item.rawValue)
               }

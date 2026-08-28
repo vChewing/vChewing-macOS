@@ -111,6 +111,11 @@
 "i18n:InfoMessage.YouMayFollow" = "このように:";
 "i18n:InputMode.SwitchToInputMode:%@" = "%@入力モードに切り替え";
 "i18n:InputMode.TargetInputModeActivationRequired" = "関連の入力ソースの追加が必要";
+"i18n:KanjiConversionMode.JIS" = "JIS";
+"i18n:KanjiConversionMode.KangXi" = "康熙";
+"i18n:KanjiConversionMode.ModernTrad" = "現代繁体字";
+"i18n:KanjiConversionRevolvement.Notification.Prefix" = "漢字変換";
+"i18n:KanjiConversionRevolvement.Notification.Suffix.NoConv" = "不変換";
 "i18n:KeyboardLayout.AlvinLiuImitative" = "劉又銘擬音注音配列";
 "i18n:KeyboardLayout.AppleABC" = "Apple ABC (Apple U.S. キーボードと同じ)";
 "i18n:KeyboardLayout.AppleChewingDachen" = "Apple 大千注音キーボード";
@@ -178,6 +183,7 @@
 "i18n:NotificationSwitch.Off" = "✘ 機能停止";
 "i18n:NotificationSwitch.On" = "✔ 機能起動";
 "i18n:NotificationSwitch.Revolver" = "↺ 切替完了";
+"i18n:NotificationSwitch.Switched" = "↻ 切替完了";
 "i18n:OtherIMEDataImportError.dataExtractionFailure.errMsg" = "「直接読み込む」作動失敗：データソースファイルが存在しないか、あるいはデータが壊れたと判断しました。";
 "i18n:OtherIMEDataImportError.lexiconWritingFailure.errMsg" = "新しい資料はユーザー辞書データファイルに書き込むのはできませんでした。";
 "i18n:OtherIMEDataReader.OIDRException.fileNameInsane" = "指定されたURLのファイル名がおかしいです。有効なファイル名を含んでいる必要があります。";
@@ -214,6 +220,8 @@
 "i18n:PhraseOperation.NerfUserPhraseSucceeded" = "- この文節の（候補としての）優先順位を下げました。";
 "i18n:PhraseOperation.PhraseReplacementInterfering" = "⚠︎ 言葉置換機能稼働中、新添付言葉にも影響。";
 "i18n:PhraseOperation.UnfilterPhraseSucceeded" = "- この文節は排除リストから外しました。";
+"i18n:PinyinZhuyinTypingMode.Pinyin" = "弁音モード";
+"i18n:PinyinZhuyinTypingMode.Zhuyin" = "注音モード";
 "i18n:securityAgentHelper.warningMessage.footer" = "このメッセージが出た時に、唯音がすでに「DisableSecureEventInput()」を実行してみました。これで入力ソースメニューで唯音は利用できる状態になったかもしれませんが、下記のステップはおすすめです：\n\nイ）今のこのメッセージの画面のスクリーンショットを撮って置いてください。後ほど使えます。\n\nロ）もし、今でも入力ソースメニューで唯音は利用できぬ状態でしたら、上記のプロセスを（強制）中止してください。そうすれば、それぞれのSecureEventInput状態は解消できて、入力ソースメニューで唯音はすぐ利用できることになります。\n\nハ）もし、該当プロセスは Mac App Store のアプリからのものでしたら、該当アプリを Apple 社にご通報ください。状況と必要性次第、該当アプリは Mac App Store からしばらく取り下がて、支障解決まで Mac App Store 提供中止になるかもしれません。\n\nニ）該当プロセスは Mac App Store からダウンロードしたものか否か、それぞれの開発元にこの支障をご通報ください。今のこのメッセージの画面のスクリーンショットを該当開発元に送れば、必要なる情報は該当開発元に全部お知らせすることができます。\n\nホ）一部のユーザーから、関連する実行中のアプリやサービス（特にパスワードマネージャー、macCatalyst ベースのパスワードログイン作業、またはシェル経由のパスワードログイン作業）を終了し、その後に画面／現在のユーザーセッションをロックして再度解除すると、今回の問題が緩和されたとの報告があります。";
 "i18n:securityAgentHelper.warningMessage.header" = "唯音入力アプリ（略称「唯音」）は「他のバックグラウンド・プロセスがSecureEventInputを正しく利用していない」と検出しました。このような不正利用は「システム内蔵入力以外の全ての入力アプリがメニューで灰色状態で選べなくて使えない」の元凶です。\n\nセンシティブな資料の記入どころでSecureEventInputをEnableSecureEventInput()で使うのは当然ですが、「入力中」状態が終わった後必ずDisableSecureEventInput()で状態解消すべきだと義務です。いくつかヘルパーアプリも、あるいはSecureEventInputを呼び起こしてからすぐ固まったアプリも、この状態になりやすいです。特に、他のアプリの画面へ切り替えたとしても、固まったアプリのSecureEventInput状態は自動的に解消できません。\n\n検出した該当プロセスは:";
 "i18n:securityAgentHelper.warningMessage.title" = "SecureEventInput の不正利用が検出";
@@ -405,9 +413,14 @@
 "i18n:UserDef.kInlineDumpPinyinInLieuOfZhuyin.description" = "Command+Option+Ctrl+Enter で送り出したものは、それに関する作動設定次第です。";
 "i18n:UserDef.kInlineDumpPinyinInLieuOfZhuyin.shortTitle" = "Ctrl(+Option)+Command+Enter で出すのを漢語弁音と変換";
 "i18n:UserDef.kIsDebugModeEnabled.shortTitle" = "欠陥辿着モード";
+"i18n:UserDef.kKanjiConversionPreferences.description" = "漢字変換モードを現代繁体／康熙／JIS の間で循環します。この設定は繁体中文出力モードでのみ有効です。「現代繁体字」はすなわち変換なし——康熙・JIS 字形を適用せず、標準の繁体字で出力します。";
+
+"i18n:UserDef.kKanjiConversionPreferences.shortTitle" = "漢字変換モード:";
 "i18n:UserDef.kKeepReadingUponCompositionError.shortTitle" = "効かぬ音読みを BackSpace で再編集";
-"i18n:UserDef.kKeyboardParser.description" = "共通語分析器で使う注音配列を指定してください。ここでは各種弁音配列も選択できます。なお、弁音入力モードでは、現在位置の前後 ±10 の走査範囲内に不完全表記（たとえば声調欠落）の音読み単位がある場合、組字エンジンに「最大 4 読み」の候補組字上限が適用されることがあります。逆に、その ±10 範囲内のすべての読みが声調付きの完全表記である場合に限り、この上限は適用されません。";
-"i18n:UserDef.kKeyboardParser.shortTitle" = "注音配列:";
+"i18n:UserDef.kKeyboardParser4Pinyin.description" = "弁音モードで使用する弁音入力の種類を指定します。なお、弁音入力モードでは、現在位置の前後 ±10 の走査範囲内に不完全表記（たとえば声調欠落）の音読み単位がある場合、組字エンジンに「最大 4 読み」の候補組字上限が適用されることがあります。逆に、その ±10 範囲内のすべての読みが声調付きの完全表記である場合に限り、この上限は適用されません。";
+"i18n:UserDef.kKeyboardParser4Pinyin.shortTitle" = "弁音入力種類:";
+"i18n:UserDef.kKeyboardParser4Zhuyin.description" = "注音モードで使用する注音配列を指定します。";
+"i18n:UserDef.kKeyboardParser4Zhuyin.shortTitle" = "注音配列:";
 "i18n:UserDef.kMinCellWidthForHorizontalMatrix.option.0" = "２つの漢字（幅の狭い）";
 "i18n:UserDef.kMinCellWidthForHorizontalMatrix.option.1" = "２つの絵文字（幅の広い）";
 "i18n:UserDef.kMinCellWidthForHorizontalMatrix.shortTitle" = "多行横型陳列ウィンドウの候補の最小幅:";
@@ -424,6 +437,8 @@
 "i18n:UserDef.kPhraseEditorAutoReloadExternalModifications.shortTitle" = "このエディターの外部からの編集結果をこのエディターに自動的に読み込む";
 "i18n:UserDef.kPhraseReplacementEnabled.description" = "指定された候補そのものを置き換える";
 "i18n:UserDef.kPhraseReplacementEnabled.shortTitle" = "言葉置換表を起用";
+"i18n:UserDef.kPinyinTypingEnabled.description" = "弁音と注音のタイピングモードを切り替えます。有効時は弁音入力を、無効時は注音配列を使用します。";
+"i18n:UserDef.kPinyinTypingEnabled.shortTitle" = "弁音/注音タイピングモード";
 "i18n:UserDef.kPopupCompositionBufferTextSize.description" = "吹き出し入力緩衝列のフォントサイズを指定します。";
 "i18n:UserDef.kPopupCompositionBufferTextSize.shortTitle" = "吹き出し入力緩衝列の字号:";
 "i18n:UserDef.kPreferredRevolverForceLevel.description" = "v4.5.4より「軽きお回し」保護機能を導入しました。キーボードショートカット（Space/Tab等）でその場での候補切り替え（お回し）を行う際、複数音節の候補が現在のカーソル位置以外で「既に手動選択された文字」を上書きしてしまう場合は、その候補をスキップし、選択内容が不意に書き換えられたり影響を受けたりするのを防ぎます。これにより、一文字ずつ丁寧に選字する方が、後方の文字を切り替えても前方の選択内容が維持されます。この機能は候補窓による選択には影響しません。";
@@ -541,12 +556,15 @@
 "i18n:UserDef.kUseSpaceToCommitHighlightedCandidate4SCPC.description" = "有効にすると、候補ウィンドウ表示中にスペースキーを押すとハイライトされた候補を確定します。この設定は全候補入力モード（SCPC）でのみ有効です。";
 "i18n:UserDef.kUseSpaceToCommitHighlightedCandidate4SCPC.shortTitle" = "全候補入力の場合、ハイライト候補を Space キーで確認";
 "i18n:UserDef.kUsingHotKeyAssociates.shortTitle" = "関連文節モード";
-"i18n:UserDef.kUsingHotKeyCassette.shortTitle" = "数字大字変換";
+"i18n:UserDef.kUsingHotKeyCassette.shortTitle" = "CIN カセットモード";
 "i18n:UserDef.kUsingHotKeyCNS.shortTitle" = "全字庫モード";
-"i18n:UserDef.kUsingHotKeyCurrencyNumerals.shortTitle" = "半角句読モード";
-"i18n:UserDef.kUsingHotKeyHalfWidthASCII.shortTitle" = "JIS 新字体モード";
+"i18n:UserDef.kUsingHotKeyCurrencyNumerals.shortTitle" = "数字大字変換";
+"i18n:UserDef.kUsingHotKeyHalfWidthPunctuation.shortTitle" = "半角句読モード";
 "i18n:UserDef.kUsingHotKeyInputMode.shortTitle" = "簡体・繁体中国語入力の切り替え";
-"i18n:UserDef.kUsingHotKeyJIS.shortTitle" = "注音音読逆引参照";
 "i18n:UserDef.kUsingHotKeyKangXi.shortTitle" = "康熙文字変換モード";
-"i18n:UserDef.kUsingHotKeyRevLookup.shortTitle" = "CIN カセットモード";
+"i18n:UserDef.kUsingHotKeyKanjiConversionMode.longTitle" = "漢字変換モード循環（現代繁体/康熙/JIS）";
+"i18n:UserDef.kUsingHotKeyKanjiConversionMode.shortTitle" = "漢字変換モード循環";
+
+"i18n:UserDef.kUsingHotKeyPinyinZhuyinTypingSwitch.shortTitle" = "弁音/注音タイピングモード切替";
+"i18n:UserDef.kUsingHotKeyRevLookup.shortTitle" = "注音音読逆引参照";
 "i18n:UserDef.kUsingHotKeySCPC.shortTitle" = "全候補入力モード";

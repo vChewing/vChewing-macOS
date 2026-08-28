@@ -111,6 +111,11 @@
 "i18n:InfoMessage.YouMayFollow" = "你可以照這樣:";
 "i18n:InputMode.SwitchToInputMode:%@" = "切換至%@輸入模式";
 "i18n:InputMode.TargetInputModeActivationRequired" = "得啟用對應的「輸入方式」";
+"i18n:KanjiConversionMode.JIS" = "JIS";
+"i18n:KanjiConversionMode.KangXi" = "康熙正體";
+"i18n:KanjiConversionMode.ModernTrad" = "當代繁體中文";
+"i18n:KanjiConversionRevolvement.Notification.Prefix" = "漢字轉換";
+"i18n:KanjiConversionRevolvement.Notification.Suffix.NoConv" = "不轉換";
 "i18n:KeyboardLayout.AlvinLiuImitative" = "劉又銘擬音注音排列";
 "i18n:KeyboardLayout.AppleABC" = "Apple ABC (與 Apple 美規鍵盤等價)";
 "i18n:KeyboardLayout.AppleChewingDachen" = "Apple 大千注音鍵盤佈局";
@@ -178,6 +183,7 @@
 "i18n:NotificationSwitch.Off" = "✘ 已停用";
 "i18n:NotificationSwitch.On" = "✔ 已啟用";
 "i18n:NotificationSwitch.Revolver" = "↺ 切換完畢";
+"i18n:NotificationSwitch.Switched" = "↻ 已切換";
 "i18n:OtherIMEDataImportError.dataExtractionFailure.errMsg" = "「直接匯入」功能失敗：原始檔案不存在或損毀。";
 "i18n:OtherIMEDataImportError.lexiconWritingFailure.errMsg" = "沒能將新的資料成功寫入到使用者自訂語彙辭典當中。";
 "i18n:OtherIMEDataReader.OIDRException.fileNameInsane" = "提供的 URL 檔案名稱不合理，必須包含有效的檔案名稱。";
@@ -214,6 +220,8 @@
 "i18n:PhraseOperation.NerfUserPhraseSucceeded" = "- 成功將該詞音配對降權處理。";
 "i18n:PhraseOperation.PhraseReplacementInterfering" = "⚠︎ 語彙置換功能已啟用，會波及語彙自訂。";
 "i18n:PhraseOperation.UnfilterPhraseSucceeded" = "- 成功將該詞音配對從濾除清單移出。";
+"i18n:PinyinZhuyinTypingMode.Pinyin" = "拼音模式";
+"i18n:PinyinZhuyinTypingMode.Zhuyin" = "注音模式";
 "i18n:securityAgentHelper.warningMessage.footer" = "當這則訊息呈現出來的時候，唯音已經嘗試呼叫 `DisableSecureEventInput()` 來試圖解除這個狀態。以下是唯音建議您採取的行動：\n\n0. 將這則訊息視窗留一份螢幕擷圖、以備接下來的需要。\n\n1. 如果輸入法選單內的唯音仍舊處於無法選取的狀態（下文簡稱「灰色不可用狀態」），則請考慮結束上述執行緒、以迫使其釋放各自的 SecureEventInput 狀態。這將立刻解除唯音的灰色不可用狀態。\n\n2. 如果該執行緒所屬的 App 來自於 Mac App Store 的話，請向 Apple 檢舉其對 SecureEventInput 的濫用。Apple 會在必要的情況下對這類 App 採取措施，比如：臨時下架，直至軟體研發方解決相關故障。\n\n3. 無論該執行緒是否來自於 Mac App Store，也都請您向相關的研發方/提供方提報該故障。您可以將這則訊息的螢幕擷圖給他們看，因為裡面已經包含了用以偵測該故障的必要資訊。\n\n4. 有使用者回報，先關閉相關的執行中應用與服務（尤其是密碼管理工具、基於 macCatalyst 的密碼登入作業、或任何以 Shell 執行的密碼登入作業），再鎖定並解鎖螢幕／目前使用者的桌面工作階段，能夠在一定程度上舒緩目前的狀況。";
 "i18n:securityAgentHelper.warningMessage.header" = "唯音有偵測到下述後檯執行緒有在濫用 SecureEventInput。這種濫用會導致系統內的所有第三方輸入法全都無法正常使用（在輸入法選單內會變成灰色）。\n\n針對需要填寫敏感資料的場合，使用 SecureEventInput 無可厚非。但是，用 EnableSecureEventInput() 開啟該模式之後，就有義務在輸入窗格失焦的那一刻呼叫 DisableSecureEventInput() 來結束這種狀態。這種狀態還常見於後檯輔助 App 當中、或者某個 App 在叫出該模式之後失去回應（這樣的話，哪怕被切換到後檯，SecureEventInput 也不會自動解除）。\n\n被偵測到的執行緒如下:";
 "i18n:securityAgentHelper.warningMessage.title" = "偵測到對 SecureEventInput 的濫用行為";
@@ -405,9 +413,14 @@
 "i18n:UserDef.kInlineDumpPinyinInLieuOfZhuyin.description" = "藉由 Command+Option+Ctrl+Enter 輸出的內容受對應的行為設定所影響。";
 "i18n:UserDef.kInlineDumpPinyinInLieuOfZhuyin.shortTitle" = "Ctrl(+Option)+Command+Enter 輸出漢語拼音而非注音";
 "i18n:UserDef.kIsDebugModeEnabled.shortTitle" = "偵錯模式";
+"i18n:UserDef.kKanjiConversionPreferences.description" = "在當代繁體／康熙／JIS 之間輪替漢字轉換模式。此設定僅對繁體中文輸出模式有效，簡體中文輸出模式下不適用。「當代繁體中文」即為不轉換——輸出維持標準繁體中文，不套用康熙或 JIS 字形。";
+
+"i18n:UserDef.kKanjiConversionPreferences.shortTitle" = "漢字轉換模式:";
 "i18n:UserDef.kKeepReadingUponCompositionError.shortTitle" = "允許對無效的讀音使用 BackSpace 編輯";
-"i18n:UserDef.kKeyboardParser.description" = "請指定普通話/國音分析器所使用的注音排列。此處亦提供各式拼音選項。請注意：在拼音輸入模式下，若目前前後半徑 ±10 的掃描範圍內存在不完全拼寫（比如聲調缺失）的讀音單位，組字引擎可能會套用「最長 4 個讀音」的候選組字上限。當且僅當該 ±10 範圍內所有讀音皆為完整且帶聲調的拼寫時，才不會套用此上限。";
-"i18n:UserDef.kKeyboardParser.shortTitle" = "注音排列:";
+"i18n:UserDef.kKeyboardParser4Pinyin.description" = "指定拼音模式下的拼音輸入種類。請注意：在拼音輸入模式下，若目前前後半徑 ±10 的掃描範圍內存在不完全拼寫（比如聲調缺失）的讀音單位，組字引擎可能會套用「最長 4 個讀音」的候選組字上限。當且僅當該 ±10 範圍內所有讀音皆為完整且帶聲調的拼寫時，才不會套用此上限。";
+"i18n:UserDef.kKeyboardParser4Pinyin.shortTitle" = "拼音輸入種類:";
+"i18n:UserDef.kKeyboardParser4Zhuyin.description" = "指定注音模式下的注音排列。";
+"i18n:UserDef.kKeyboardParser4Zhuyin.shortTitle" = "注音排列:";
 "i18n:UserDef.kMinCellWidthForHorizontalMatrix.option.0" = "兩個漢字";
 "i18n:UserDef.kMinCellWidthForHorizontalMatrix.option.1" = "兩個繪文字（更寬）";
 "i18n:UserDef.kMinCellWidthForHorizontalMatrix.shortTitle" = "橫向多列選字窗最低單元寬度:";
@@ -424,6 +437,8 @@
 "i18n:UserDef.kPhraseEditorAutoReloadExternalModifications.shortTitle" = "僅限該編輯器：自動讀入來自該編輯器外部的檔案內容修改";
 "i18n:UserDef.kPhraseReplacementEnabled.description" = "這將會對指定的候選字詞進行整詞取代。";
 "i18n:UserDef.kPhraseReplacementEnabled.shortTitle" = "啟用語彙置換表";
+"i18n:UserDef.kPinyinTypingEnabled.description" = "在拼音與注音打字模式之間切換。啟用時使用拼音輸入，停用時使用注音排列。";
+"i18n:UserDef.kPinyinTypingEnabled.shortTitle" = "拼音/注音打字模式";
 "i18n:UserDef.kPopupCompositionBufferTextSize.description" = "調整浮動組字窗的字型大小。";
 "i18n:UserDef.kPopupCompositionBufferTextSize.shortTitle" = "浮動組字窗字號:";
 "i18n:UserDef.kPreferredRevolverForceLevel.description" = "自 v4.5.4 版起引入「弱輪替」保護機制：當您使用鍵盤熱鍵（如 Space/Tab）進行就地輪替時，若目標為多音節候選、且其範圍會覆蓋到「非當前游標位置」且「已被您手動選定」的字詞時，系統將跳過該候選，以防止已選定的內容受到意外影響。此功能特別適合習慣「一個字一個字地選字」的使用者，能確保您在修正後方字詞時，前方已選定的內容依然穩固。此設定不影響選字窗的選字行為。";
@@ -541,12 +556,15 @@
 "i18n:UserDef.kUseSpaceToCommitHighlightedCandidate4SCPC.description" = "啟用後，在選字窗可見時按空格鍵將確認高亮候選字。僅逐字選字模式（SCPC）下生效。";
 "i18n:UserDef.kUseSpaceToCommitHighlightedCandidate4SCPC.shortTitle" = "在逐字選字模式當中使用空格鍵確認當前高亮候選字";
 "i18n:UserDef.kUsingHotKeyAssociates.shortTitle" = "關聯詞語模式";
-"i18n:UserDef.kUsingHotKeyCassette.shortTitle" = "大寫漢字數字輸出";
+"i18n:UserDef.kUsingHotKeyCassette.shortTitle" = "CIN 磁帶模式";
 "i18n:UserDef.kUsingHotKeyCNS.shortTitle" = "全字庫模式";
-"i18n:UserDef.kUsingHotKeyCurrencyNumerals.shortTitle" = "半形標點模式";
-"i18n:UserDef.kUsingHotKeyHalfWidthASCII.shortTitle" = "JIS 新字體模式";
+"i18n:UserDef.kUsingHotKeyCurrencyNumerals.shortTitle" = "大寫漢字數字輸出";
+"i18n:UserDef.kUsingHotKeyHalfWidthPunctuation.shortTitle" = "半形標點模式";
 "i18n:UserDef.kUsingHotKeyInputMode.shortTitle" = "簡體/繁體中文輸入模式切換";
-"i18n:UserDef.kUsingHotKeyJIS.shortTitle" = "注音反查";
 "i18n:UserDef.kUsingHotKeyKangXi.shortTitle" = "康熙正體字模式";
-"i18n:UserDef.kUsingHotKeyRevLookup.shortTitle" = "CIN 磁帶模式";
+"i18n:UserDef.kUsingHotKeyKanjiConversionMode.longTitle" = "輪替漢字轉換（當代繁體/康熙/JIS）";
+"i18n:UserDef.kUsingHotKeyKanjiConversionMode.shortTitle" = "輪替漢字轉換";
+
+"i18n:UserDef.kUsingHotKeyPinyinZhuyinTypingSwitch.shortTitle" = "拼音/注音打字模式切換";
+"i18n:UserDef.kUsingHotKeyRevLookup.shortTitle" = "注音反查";
 "i18n:UserDef.kUsingHotKeySCPC.shortTitle" = "模擬逐字選字輸入";

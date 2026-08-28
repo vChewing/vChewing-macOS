@@ -23,6 +23,10 @@ public protocol PrefMgrProtocol {
   var userDataFolderSpecified: String { get set }
   var appleLanguages: [String] { get set }
   var keyboardParser: Int { get set }
+  var keyboardParser4Pinyin: Int { get set }
+  var keyboardParser4Zhuyin: Int { get set }
+  var pinyinTypingEnabled: Bool { get set }
+  var kanjiConversionPreferences: Int { get set }
   var basicKeyboardLayout: String { get set }
   var alphanumericalKeyboardLayout: String { get set }
   var showNotificationsWhenTogglingCapsLock: Bool { get set }
@@ -89,8 +93,6 @@ public protocol PrefMgrProtocol {
   var mixedAlphanumericalEnabled: Bool { get set }
   var furiousTypingEnabled: Bool { get set }
   var symbolInputEnabled: Bool { get set }
-  var chineseConversionEnabled: Bool { get set }
-  var shiftJISShinjitaiOutputEnabled: Bool { get set }
   var suppressFactoryUnigramsOfKanaSyllables: Bool { get set }
   var currencyNumeralsEnabled: Bool { get set }
   var halfWidthPunctuationEnabled: Bool { get set }
@@ -111,9 +113,9 @@ public protocol PrefMgrProtocol {
   var usingHotKeySCPC: Bool { get set }
   var usingHotKeyAssociates: Bool { get set }
   var usingHotKeyCNS: Bool { get set }
-  var usingHotKeyKangXi: Bool { get set }
-  var usingHotKeyJIS: Bool { get set }
-  var usingHotKeyHalfWidthASCII: Bool { get set }
+  var usingHotKeyKanjiConversionMode: Bool { get set }
+  var usingHotKeyPinyinZhuyinTypingSwitch: Bool { get set }
+  var usingHotKeyHalfWidthPunctuation: Bool { get set }
   var usingHotKeyCurrencyNumerals: Bool { get set }
   var usingHotKeyCassette: Bool { get set }
   var usingHotKeyRevLookup: Bool { get set }

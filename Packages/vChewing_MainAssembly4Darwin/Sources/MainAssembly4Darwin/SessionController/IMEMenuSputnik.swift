@@ -33,6 +33,24 @@ struct IMEMenuSputnik {
     guard session.inputControllerAssignedAddr != nil else { return nil }
     return session
   }
+
+  /// 依漢字轉換枚舉值回傳該模式在通知飄窗中使用的顯示名（l10n）。
+  private static func kanjiConversionModeTitle(for mode: Int) -> String {
+    var doConv = true
+    let result: String = {
+      switch mode {
+      case 1: return "i18n:KanjiConversionMode.KangXi".i18n
+      case 2: return "i18n:KanjiConversionMode.JIS".i18n
+      default:
+        doConv = false
+        return "i18n:KanjiConversionMode.ModernTrad".i18n
+      }
+    }()
+    if doConv {
+      return "i18n:KanjiConversionRevolvement.Notification.Prefix".i18n + " → \(result)"
+    }
+    return "\(result) (\("i18n:KanjiConversionRevolvement.Notification.Suffix.NoConv".i18n))"
+  }
 }
 
 extension IMEMenuSputnik {
@@ -158,7 +176,7 @@ extension IMEMenuSputnik {
           mask: [.command, .option, .control]
         )
         .nulled(silentMode)
-      NSMenu.Item("i18n:UserDef.kUsingHotKeyRevLookup.shortTitle")?
+      NSMenu.Item("i18n:UserDef.kUsingHotKeyCassette.shortTitle")?
         .act(
           register {
             self.core?.resetInputHandler(forceComposerCleanup: true)
@@ -186,7 +204,7 @@ extension IMEMenuSputnik {
             }
             Notifier
               .notify(
-                message: "i18n:UserDef.kUsingHotKeyRevLookup.shortTitle".i18n
+                message: "i18n:UserDef.kUsingHotKeyCassette.shortTitle".i18n
                   + "\n"
                   + (
                     PrefMgr.shared.cassetteEnabled.toggled()
@@ -218,51 +236,70 @@ extension IMEMenuSputnik {
         )
         .state(PrefMgr.shared.cns11643Enabled)
         .hotkey(PrefMgr.shared.usingHotKeyCNS ? "L" : "", mask: [.command, .control])
-      NSMenu.Item("i18n:UserDef.kUsingHotKeyKangXi.shortTitle")?
+      NSMenu.Item("i18n:UserDef.kUsingHotKeyKanjiConversionMode.longTitle")?
         .act(
           register {
             self.core?.resetInputHandler(forceComposerCleanup: true)
+            let newMode = (PrefMgr.shared.kanjiConversionPreferences + 1) % 3
+            PrefMgr.shared.kanjiConversionPreferences = newMode
             Notifier
               .notify(
-                message: "i18n:UserDef.kUsingHotKeyKangXi.shortTitle".i18n
+                message: Self.kanjiConversionModeTitle(for: newMode)
                   + "\n"
-                  + (
-                    PrefMgr.shared.chineseConversionEnabled.toggled()
-                      ? "i18n:NotificationSwitch.On".i18n
-                      : "i18n:NotificationSwitch.Off".i18n
-                  )
+                  + "i18n:NotificationSwitch.Switched".i18n
               )
           }
         )
-        .state(PrefMgr.shared.chineseConversionEnabled)
-        .hotkey(PrefMgr.shared.usingHotKeyKangXi ? "K" : "", mask: [.command, .control])
+        .hotkey(
+          PrefMgr.shared.usingHotKeyKanjiConversionMode ? "K" : "",
+          mask: [.command, .control]
+        )
         .nulled(currentInputMode != .imeModeCHT)
-      NSMenu.Item("i18n:UserDef.kUsingHotKeyHalfWidthASCII.shortTitle")?
+      NSMenu.Item("i18n:UserDef.kUsingHotKeyPinyinZhuyinTypingSwitch.shortTitle")?
         .act(
           register {
             self.core?.resetInputHandler(forceComposerCleanup: true)
-            Notifier
-              .notify(
-                message: "i18n:UserDef.kUsingHotKeyHalfWidthASCII.shortTitle".i18n
-                  + "\n"
-                  + (
-                    PrefMgr.shared.shiftJISShinjitaiOutputEnabled.toggled()
-                      ? "i18n:NotificationSwitch.On".i18n
-                      : "i18n:NotificationSwitch.Off".i18n
+            if PrefMgr.shared.cassetteEnabled {
+              // 磁帶模式開啟時，切換動作改為「先關閉磁帶」，且不切換注音/拼音打字模式。
+              PrefMgr.shared.cassetteEnabled = false
+              Notifier
+                .notify(
+                  message: "i18n:UserDef.kUsingHotKeyCassette.shortTitle".i18n
+                    + "\n"
+                    + "i18n:NotificationSwitch.Off".i18n
+                )
+            } else {
+              PrefMgr.shared.pinyinTypingEnabled.toggle()
+              self.core?.inputHandler?.ensureKeyboardParser()
+            }
+            // 無論是否切換，都緊接著提示當前的注音/拼音打字模式。
+            asyncOnMain {
+              Notifier
+                .notify(
+                  message: (
+                    PrefMgr.shared.pinyinTypingEnabled
+                      ? "i18n:PinyinZhuyinTypingMode.Pinyin".i18n
+                      : "i18n:PinyinZhuyinTypingMode.Zhuyin".i18n
                   )
-              )
+                    + "\n"
+                    + "i18n:NotificationSwitch.Switched".i18n
+                )
+            }
           }
         )
-        .state(PrefMgr.shared.shiftJISShinjitaiOutputEnabled)
-        .hotkey(PrefMgr.shared.usingHotKeyJIS ? "J" : "", mask: [.command, .control])
-        .nulled(currentInputMode != .imeModeCHT)
-      NSMenu.Item("i18n:UserDef.kUsingHotKeyCassette.shortTitle")?
+        .state(PrefMgr.shared.pinyinTypingEnabled)
+        .hotkey(
+          PrefMgr.shared.usingHotKeyPinyinZhuyinTypingSwitch ? "J" : "",
+          mask: [.command, .control]
+        )
+        .nulled(self.core?.inputHandler?.currentTypingMethod != .vChewingFactory)
+      NSMenu.Item("i18n:UserDef.kUsingHotKeyCurrencyNumerals.shortTitle")?
         .act(
           register {
             self.core?.resetInputHandler(forceComposerCleanup: true)
             Notifier
               .notify(
-                message: "i18n:UserDef.kUsingHotKeyCassette.shortTitle".i18n
+                message: "i18n:UserDef.kUsingHotKeyCurrencyNumerals.shortTitle".i18n
                   + "\n"
                   + (
                     PrefMgr.shared.currencyNumeralsEnabled.toggled()
@@ -274,13 +311,13 @@ extension IMEMenuSputnik {
         )
         .state(PrefMgr.shared.currencyNumeralsEnabled)
         .hotkey(PrefMgr.shared.usingHotKeyCurrencyNumerals ? "M" : "", mask: [.command, .control])
-      NSMenu.Item("i18n:UserDef.kUsingHotKeyCurrencyNumerals.shortTitle")?
+      NSMenu.Item("i18n:UserDef.kUsingHotKeyHalfWidthPunctuation.shortTitle")?
         .act(
           register {
             self.core?.resetInputHandler(forceComposerCleanup: true)
             Notifier
               .notify(
-                message: "i18n:UserDef.kUsingHotKeyCurrencyNumerals.shortTitle".i18n + "\n"
+                message: "i18n:UserDef.kUsingHotKeyHalfWidthPunctuation.shortTitle".i18n + "\n"
                   + (
                     PrefMgr.shared.halfWidthPunctuationEnabled.toggled()
                       ? "i18n:NotificationSwitch.On".i18n
@@ -290,7 +327,7 @@ extension IMEMenuSputnik {
           }
         )
         .state(PrefMgr.shared.halfWidthPunctuationEnabled)
-        .hotkey(PrefMgr.shared.usingHotKeyHalfWidthASCII ? "H" : "", mask: [.command, .control])
+        .hotkey(PrefMgr.shared.usingHotKeyHalfWidthPunctuation ? "H" : "", mask: [.command, .control])
       NSMenu.Item("i18n:UserDef.kPhraseReplacementEnabled.shortTitle")?
         .act(
           register {
@@ -386,7 +423,7 @@ extension IMEMenuSputnik {
           }
         )
         .alternated().nulled(silentMode)
-      NSMenu.Item(verbatim: "i18n:UserDef.kUsingHotKeyJIS.shortTitle".i18n.withEllipsis)?
+      NSMenu.Item(verbatim: "i18n:UserDef.kUsingHotKeyRevLookup.shortTitle".i18n.withEllipsis)?
         .act(register { CtlRevLookupWindow.show() })
         .hotkey(PrefMgr.shared.usingHotKeyRevLookup ? "/" : "", mask: [.command, .control])
       NSMenu.Item("i18n:Menu.OptimizeMemorizedPhrases")?

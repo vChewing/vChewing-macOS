@@ -88,7 +88,7 @@ final class FrmRevLookupWindow: NSWindow {
     allowsToolTipsWhenApplicationIsInactive = false
     autorecalculatesKeyViewLoop = false
     isReleasedWhenClosed = false
-    title = "i18n:UserDef.kUsingHotKeyJIS.shortTitle".i18n
+    title = "i18n:UserDef.kUsingHotKeyRevLookup.shortTitle".i18n
 
     view.addSubview(inputField)
     view.addSubview(scrollView)

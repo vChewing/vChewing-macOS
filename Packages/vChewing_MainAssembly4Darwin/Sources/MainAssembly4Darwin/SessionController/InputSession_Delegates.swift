@@ -114,7 +114,7 @@ extension SessionProtocol {
     switch inputMode {
     case .imeModeCHS: return "zh-Hans"
     case .imeModeCHT:
-      if !prefs.shiftJISShinjitaiOutputEnabled, !prefs.chineseConversionEnabled {
+      if prefs.kanjiConversionPreferences == 0 {
         return "zh-Hant"
       }
       return "ja"
@@ -124,8 +124,7 @@ extension SessionProtocol {
 
   public var clientAccentColor: HSBA? {
     var nullResponse = !prefs.respectClientAccentColor
-    nullResponse = nullResponse || prefs.shiftJISShinjitaiOutputEnabled
-    nullResponse = nullResponse || prefs.chineseConversionEnabled
+    nullResponse = nullResponse || prefs.kanjiConversionPreferences != 0
     guard !nullResponse else { return nil }
     guard !NSApp.isAccentColorCustomized else { return nil }
     if #unavailable(macOS 10.14) { return nil }
@@ -188,7 +187,7 @@ extension SessionProtocol {
       let theEmoji = useShift ? "⬆️" : "⚡️"
       return shortened ? theEmoji : "\(theEmoji) " + "i18n:StateOfInputting.Tooltip.QuickCandidates".i18n
     } else if prefs.cassetteEnabled {
-      return shortened ? "📼" : "📼 " + "i18n:UserDef.kUsingHotKeyRevLookup.shortTitle".i18n
+      return shortened ? "📼" : "📼 " + "i18n:UserDef.kUsingHotKeyCassette.shortTitle".i18n
     } else if state.type == .ofSymbolTable, state.node.containsCandidateServices {
       return shortened ? "🌎" : "🌎 " + "i18n:Menu.ServiceMenu".i18n
     }
