@@ -359,6 +359,88 @@ extension LMAssembly {
       return result
     }
 
+    /// 對「每位置的前綴候選集合」做多位置前綴交集掃描（排序鍵陣列、位元組層級比對）。
+    ///
+    /// 以排序鍵陣列本身充當索引的「sorted-array trie walk」：先以位置 0 的首字元範圍
+    /// 二分定位連續區間（initial 收斂，對齊整詞簡拼查詢的 `initialZhuyinOnly` 精神），
+    /// 再於區間內逐鍵做逐位置 byte 前綴比對、及早退出。訪問鍵數與「笛卡爾乘積」無關，
+    /// 避免 `ysxb` 類查詢把詞庫查詢展開成天文數字。語義與「逐 combo 前綴查詢的聯集」
+    /// 完全一致（∀i 第 i 段以某個候選前綴開頭）。
+    /// - Parameter prefixCells: 每位置的前綴候選（如 `[["ㄧ","ㄩ"],["ㄕ","ㄙ"],["ㄒ"],["ㄅ"]]`）。
+    /// - Returns: 匹配的讀音索引鍵（依排序序、去重）。
+    func keys(matchingPrefixesByPosition prefixCells: [[String]]) -> [String] {
+      guard !prefixCells.isEmpty else { return [] }
+      let cellBytes = prefixCells.map { cell in cell.map { Array($0.utf8) }.filter { !$0.isEmpty } }
+      guard cellBytes.allSatisfy({ !$0.isEmpty }) else { return [] }
+      let firstScalars = cellBytes[0].map { bytes in
+        Self.firstScalarBytes(bytes)
+      }
+      guard let minInitial = firstScalars.min(by: { $0.lexicographicallyPrecedes($1) }),
+            let maxInitial = firstScalars.max(by: { $0.lexicographicallyPrecedes($1) })
+      else { return [] }
+      var result: [String] = []
+      var seen: Set<String> = []
+      // 二分定位 lower bound：第一個「整鍵 ≥ minInitial」的 entry。
+      // 由於鍵以「首字元」排序，整鍵比較即可正確找出首字元 ≥ minInitial 的區間起點。
+      var low = 0
+      var high = entries.count
+      while low < high {
+        let mid = (low + high) / 2
+        let e = entries[mid]
+        let keyRange = Int(e.keyStart) ..< Int(e.keyEnd)
+        if keyData.compareByteRange(keyRange, with: minInitial) < 0 {
+          low = mid + 1
+        } else {
+          high = mid
+        }
+      }
+      var i = low
+      while i < entries.count {
+        let e = entries[i]
+        let keyRange = Int(e.keyStart) ..< Int(e.keyEnd)
+        // 首字元超出 maxInitial → 停止（排序保證）。
+        if Self.compareFirstScalar(keyData, at: keyRange.lowerBound, against: maxInitial) > 0 { break }
+        if Self.keyMatchesCells(keyData, keyRange: keyRange, cellBytes: cellBytes) {
+          let key = String(decoding: keyData[keyRange], as: UTF8.self)
+          if seen.insert(key).inserted { result.append(key) }
+        }
+        i += 1
+      }
+      // 線性掃描 temporaryMap（資料量通常很小）。
+      for key in temporaryMap.keys.sorted() {
+        let keyBytes = Array(key.utf8)
+        if Self.keyMatchesCells(keyBytes, keyRange: 0 ..< keyBytes.count, cellBytes: cellBytes),
+           seen.insert(key).inserted {
+          result.append(key)
+        }
+      }
+      return result
+    }
+
+    /// 根據給定的「每位置前綴候選集合」做多位置前綴交集查詢。
+    /// 對每個匹配到的 key 自動推導其 `keyArray` 並傳入 exact-match 查詢（同 `unigramsFor(keyPrefix:)`）。
+    /// - parameters:
+    ///   - prefixCells: 每位置的前綴候選集合。
+    ///   - omitNonTemporarySingleCharNonSymbolUnigrams: 是否省略非暫存的單字符非符號單元圖。
+    ///   - factorySingleReadingValueHashes: 原廠單讀音值雜湊集合，用於過濾。
+    func unigramsFor(
+      keyPrefixesByPosition prefixCells: [[String]],
+      omitNonTemporarySingleCharNonSymbolUnigrams: Bool = false,
+      factorySingleReadingValueHashes: Set<Int> = []
+    )
+      -> [Homa.Gram] {
+      let matchingKeys = keys(matchingPrefixesByPosition: prefixCells)
+      var grams: [Homa.Gram] = []
+      for key in matchingKeys {
+        grams.append(contentsOf: unigramsFor(
+          key: key,
+          omitNonTemporarySingleCharNonSymbolUnigrams: omitNonTemporarySingleCharNonSymbolUnigrams,
+          factorySingleReadingValueHashes: factorySingleReadingValueHashes
+        ))
+      }
+      return grams
+    }
+
     /// 根據給定的讀音索引鍵前綴，來獲取資料庫辭典內所有匹配的資料陣列。
     /// 對每個匹配到的 key，會自動推導其正確的 `keyArray` 並傳入 exact-match 查詢。
     /// - parameters:
@@ -395,6 +477,81 @@ extension LMAssembly {
     private var entries: [CoreEXEntry] = []
     /// 唯一 key 數量（entries 以行為單位，同 key 可能多行）。
     private var uniqueKeyCount = 0
+
+    /// 取位元組陣列的首個 UTF-8 字元（1–4 bytes）。
+    private static func firstScalarBytes(_ bytes: [UInt8]) -> [UInt8] {
+      guard let first = bytes.first else { return [] }
+      let len = utf8SequenceLength(first)
+      return len > 0 && bytes.count >= len ? Array(bytes[0 ..< len]) : [first]
+    }
+
+    /// 回傳 UTF-8 首字元位元組數。
+    private static func utf8SequenceLength(_ byte: UInt8) -> Int {
+      if byte & 0x80 == 0 { return 1 }
+      if byte & 0xE0 == 0xC0 { return 2 }
+      if byte & 0xF0 == 0xE0 { return 3 }
+      if byte & 0xF8 == 0xF0 { return 4 }
+      return 0
+    }
+
+    /// 比較兩個位元組陣列的字典序（-1 / 0 / 1；共同前綴時短者較小）。
+    private static func compareByteArrays(_ lhs: [UInt8], _ rhs: [UInt8]) -> Int {
+      let common = Swift.min(lhs.count, rhs.count)
+      for index in 0 ..< common {
+        if lhs[index] < rhs[index] { return -1 }
+        if lhs[index] > rhs[index] { return 1 }
+      }
+      if lhs.count < rhs.count { return -1 }
+      if lhs.count > rhs.count { return 1 }
+      return 0
+    }
+
+    /// 比較 keyData 於 offset 處的首個 UTF-8 字元與目標位元組陣列（字典序）。
+    private static func compareFirstScalar(_ keyData: [UInt8], at offset: Int, against target: [UInt8]) -> Int {
+      guard !target.isEmpty, offset < keyData.count else { return 0 }
+      let scalarLen = utf8SequenceLength(keyData[offset])
+      guard scalarLen > 0, offset + scalarLen <= keyData.count else {
+        return compareByteArrays([keyData[offset]], target)
+      }
+      return compareByteArrays(Array(keyData[offset ..< offset + scalarLen]), target)
+    }
+
+    /// 逐位置 byte 前綴比對：key 的第 i 段需以 cellBytes[i] 的任一前綴開頭；
+    /// 超出 cell 數的額外段忽略（對齊前綴查詢語義）。任一段不符即回傳 false。
+    private static func keyMatchesCells(
+      _ keyData: [UInt8],
+      keyRange: Range<Int>,
+      cellBytes: [[[UInt8]]]
+    )
+      -> Bool {
+      var segStart = keyRange.lowerBound
+      var segIndex = 0
+      var cursor = keyRange.lowerBound
+      while cursor <= keyRange.upperBound, segIndex < cellBytes.count {
+        if cursor == keyRange.upperBound || keyData[cursor] == 0x2D { // "-"
+          let segEnd = cursor
+          let segLen = segEnd - segStart
+          var matched = false
+          for prefix in cellBytes[segIndex] where segLen >= prefix.count {
+            var ok = true
+            for j in 0 ..< prefix.count where keyData[segStart + j] != prefix[j] {
+              ok = false
+              break
+            }
+            if ok {
+              matched = true
+              break
+            }
+          }
+          guard matched else { return false }
+          segStart = segEnd + 1
+          segIndex += 1
+          if cursor == keyRange.upperBound { break }
+        }
+        cursor += 1
+      }
+      return segIndex == cellBytes.count
+    }
 
     /// 二分搜尋 key，回傳對應 entries 的範圍（同 key 的行連續排列）。
     private func entryRange(forKey key: String) -> Range<Int>? {

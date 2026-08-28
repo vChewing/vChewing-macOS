@@ -273,11 +273,26 @@ extension LMAssembly.LMInstantiator {
     entryType: VanguardTrie.Trie.EntryType
   )
     -> [Homa.Gram] {
+    factoryChoppedUnigramsFor(
+      keyArray: keyArray,
+      entryType: entryType,
+      partiallyMatch: config.partialMatchEnabled
+    )
+  }
+
+  /// 「&」連讀查詢的原廠辭典版本，可指定逐位置前綴語義（與 `partialMatchEnabled` 偏好無關）。
+  /// 供狂拼整詞簡拼查詢（R2-α）使用：簡拼整詞查詢恆為逐位置前綴比對。
+  func factoryChoppedUnigramsFor(
+    keyArray: [String],
+    entryType: VanguardTrie.Trie.EntryType,
+    partiallyMatch: Bool
+  )
+    -> [Homa.Gram] {
     guard let trie = Self.factoryTrie else { return [] }
     let entryGroups = trie.getEntryGroups(
       keysChopped: keyArray,
       filterType: entryType,
-      partiallyMatch: config.partialMatchEnabled
+      partiallyMatch: partiallyMatch
     )
     guard !entryGroups.isEmpty else { return [] }
     return entryGroups.flatMap { group in

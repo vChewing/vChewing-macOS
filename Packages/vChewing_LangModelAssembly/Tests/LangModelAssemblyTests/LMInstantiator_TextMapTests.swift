@@ -689,6 +689,94 @@ struct LMInstantiatorTextMapTests {
     #expect(supplemental.firstIndex(of: "在")! < supplemental.firstIndex(of: "再")!)
   }
 
+  @Test
+  func testCartesianProductBudgetGateSkipsExpansionBeyondBudget() throws {
+    defer {
+      LMAssembly.LMInstantiator.disconnectFactoryDictionary()
+    }
+
+    let instance = LMAssembly.LMInstantiator(isCHS: true)
+    let textMap = makeTextMap([
+      ("ㄚㄚ-ㄅㄅ", [("factoryHit", -9.9, 5)]),
+    ])
+
+    #expect(LMAssembly.LMInstantiator.connectToTestFactoryDictionary(textMapData: textMap))
+    instance.setOptions { config in
+      config.bypassUserPhrasesData = false
+      config.isSymbolEnabled = false
+      config.alwaysSupplyETenDOSUnigrams = false
+      config.isCNSEnabled = false
+      config.filterNonCNSReadings = false
+      config.partialMatchEnabled = false
+    }
+    // 使用者片語鍵不可含半形英數（PinyinPhonaConverter 會將其轉成注音/聲調記號）。
+    // 注意：lmUserPhrases 以 reverse:true 建構，檔案行格式為「詞語 讀音 分數」。
+    instance.injectTestData(
+      userPhrases: { $0.replaceData(textData: "使用者命中 ㄚㄚ-ㄅㄅ -8\n另一條 ㄚㄚ-ㄅㄒ -8\n") }
+    )
+
+    // 預算內（2 × 1 = 2）：逐組合展開照常進行，使用者片語與原廠路徑皆可命中。
+    let small = instance.lookupHub.grams(for: [
+      .multipleKeys(["ㄚㄚ", "ㄒㄒ"]), .singleKey("ㄅㄅ"),
+    ])
+    #expect(gramsContainValue(small, "使用者命中"))
+    #expect(gramsContainValue(small, "factoryHit"))
+
+    // 超預算（100 × 101 = 10,100 > 10,000）：放棄逐組合展開，使用者片語不再被查詢；
+    // 原廠 "&" 連讀查詢路徑（O(候選節點) 而非 O(乘積)）依然有效。
+    let bigA = Array(repeating: "ㄚㄚ", count: 100)
+    let bigB = Array(repeating: "ㄅㄅ", count: 101)
+    let big = instance.lookupHub.grams(for: [
+      .multipleKeys(bigA), .multipleKeys(bigB),
+    ])
+    #expect(!gramsContainValue(big, "使用者命中"))
+    #expect(!gramsContainValue(big, "另一條"))
+    #expect(gramsContainValue(big, "factoryHit"))
+  }
+
+  @Test
+  func testAbbreviatedWordCandidatesReachesWholeWord() throws {
+    defer {
+      LMAssembly.LMInstantiator.disconnectFactoryDictionary()
+    }
+
+    let instance = LMAssembly.LMInstantiator(isCHS: true)
+    let textMap = makeTextMap([
+      ("ㄧㄝ-ㄕㄡ-ㄒㄧㄢ-ㄅㄟ", [("野獸先輩", -3.0, 5)]),
+      ("ㄧㄠ-ㄕㄨ-ㄒㄧㄥ-ㄅㄢ", [("遙梳星班", -4.0, 5)]),
+    ])
+
+    #expect(LMAssembly.LMInstantiator.connectToTestFactoryDictionary(textMapData: textMap))
+    instance.setOptions { config in
+      config.bypassUserPhrasesData = false
+      config.isSymbolEnabled = false
+      config.alwaysSupplyETenDOSUnigrams = false
+      config.isCNSEnabled = false
+      config.filterNonCNSReadings = false
+      config.partialMatchEnabled = false // 整詞簡拼查詢恆為 partial 語義、與此偏好無關。
+    }
+    // 使用者造詞（reverse: true 格式「詞語 讀音 分數」）：位置 0 以「ㄩ」命中。
+    instance.injectTestData(
+      userPhrases: { $0.replaceData(textData: "遠收星冰 ㄩㄢ-ㄕㄡ-ㄒㄧㄥ-ㄅㄧㄥ -5\n") }
+    )
+
+    // 「ysxb」→ chop → deduct → initial 類 cells。
+    let cells = ["ㄧ&ㄩ", "ㄕ&ㄙ", "ㄒ", "ㄅ"]
+    let grams = instance.lookupHub.abbreviatedWordCandidates(keysChopped: cells)
+    let values = grams.map(\.current)
+
+    // factory「&」逐位置前綴命中（含實際讀音 keyArray，供單鍵寫回）。
+    #expect(values.contains("野獸先輩"))
+    #expect(values.contains("遙梳星班"))
+    #expect(grams.first(where: { $0.current == "野獸先輩" })?.keyArray == ["ㄧㄝ", "ㄕㄡ", "ㄒㄧㄢ", "ㄅㄟ"])
+    // user-phrase 多前綴掃描命中。
+    #expect(values.contains("遠收星冰"))
+    // 分區順序：factory 命中在前（野獸先輩 -3 於遙梳星班 -4 之前）。
+    let firstYeShou = try #require(values.firstIndex(of: "野獸先輩"))
+    let firstYaoShu = try #require(values.firstIndex(of: "遙梳星班"))
+    #expect(firstYeShou < firstYaoShu)
+  }
+
   // MARK: Private
 
   private struct GramSnapshot: Equatable, Hashable {
