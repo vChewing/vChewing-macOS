@@ -383,13 +383,26 @@ extension Homa {
         let upperbound = Swift.min(cursor + maxSegLength, keys.count)
         rangeOfPositions = lowerbound ..< upperbound
       }
-      // 若掃描半徑 > 4 且範圍內有複合讀音鍵，動態縮減 maxSegLength 以避免笛卡爾積爆炸。
+      // 若掃描半徑 > 4 且窗內各鍵讀音數的乘積超過預算，動態縮減 maxSegLength 以避免笛卡爾積爆炸。
+      // 以「乘積」取代過往的「見桶即縮」：只針對真實超標的場合縮減，
+      // 讓全拼長詞（含免聲調的 5 音節以下組合）得以正常組句。
+      // 此預算與 LangModelAssembly 的笛卡爾積防禦閾值一致（10,000）。
       if maxSegLength > 4 {
-        let hasMultipleKeysInRange = rangeOfPositions.contains { position in
-          guard keys.indices.contains(position) else { return false }
-          return keys[position].isMultiple
+        let kCartesianBudgetLimit = 10_000
+        var product = 1
+        var budgetExceeded = false
+        for position in rangeOfPositions {
+          guard keys.indices.contains(position) else { continue }
+          let count = keys[position].count
+          guard count > 1 else { continue }
+          // 飽和乘法：一旦超過預算即早停，避免乘積溢出。
+          if product > kCartesianBudgetLimit / count {
+            budgetExceeded = true
+            break
+          }
+          product *= count
         }
-        if hasMultipleKeysInRange {
+        if budgetExceeded {
           maxSegLength = 4
         }
       }
