@@ -13,10 +13,10 @@ import Foundation
 /// 狂拼音節級分數查無命中時使用的地板值。
 private let furiousSyllableScoreFloor: Double = -12
 
-// MARK: - FuriousTailApplyOutcome
+// MARK: - FuriousFrontApplyOutcome
 
-/// 狂拼尾段候選套用結果。
-enum FuriousTailApplyOutcome {
+/// 狂拼前方候選套用結果。
+enum FuriousFrontApplyOutcome {
   /// 插入失敗（組字器未被變更）。
   case failed
   /// 插入成功但覆寫失敗（組句維持語言模型預設）。
@@ -28,16 +28,16 @@ enum FuriousTailApplyOutcome {
 extension InputHandlerProtocol {
   /// 狂拼模式是否有效：打字方法為注音組字且打字模式為狂拼。
   ///
-  /// 這是狂拼各功能（尾段預覽、copilot 候選窗、固化、重切分、就地選字等）的共用閘門；
-  /// 尾段特定的額外條件（游標在組字區最前端、無聲調暫存、注拼槽非空等）由
-  /// `furiousTailContext`／`hasFuriousTailPending` 各自把守。
+  /// 這是狂拼各功能（前方預覽、copilot 候選窗、固化、重切分、就地選字等）的共用閘門；
+  /// 前方特定的額外條件（游標在組字區最前端、無聲調暫存、注拼槽非空等）由
+  /// `furiousFrontContext`／`hasFuriousFrontPending` 各自把守。
   /// `typingMode` 已把「狂拼開關＋非磁帶＋非逐字選字＋拼音注拼槽」打包為 `.pinyinFuriousTyping`。
   public var isFuriousTypingModeEffective: Bool {
     currentTypingMethod == .vChewingFactory && typingMode == .pinyinFuriousTyping
   }
 
-  /// 狂拼模式有效且注拼槽尚有未完成拼裝的拼音字母流（尾段待確認讀音）。
-  public var hasFuriousTailPending: Bool {
+  /// 狂拼模式有效且注拼槽尚有未完成拼裝的拼音字母流（前方待確認讀音）。
+  public var hasFuriousFrontPending: Bool {
     isFuriousTypingModeEffective && !composer.romajiBuffer.isEmpty
   }
 
@@ -59,10 +59,10 @@ extension InputHandlerProtocol {
     furiousTrail.removeLast(Swift.min(count, furiousTrail.count))
   }
 
-  /// 狂拼模式的尾段固化：把注拼槽的投機讀音固化進組字器（投機→實體）。
+  /// 狂拼模式的前方固化：把注拼槽的投機讀音固化進組字器（投機→實體）。
   ///
   /// 由「可能叫出選字窗」的觸發鍵（Space／翻頁／候選導航方向鍵）在 triage 早段觸發：
-  /// 只把尾段聲調桶插入組字器、**不覆寫**——保留 LM 重切分自由度，
+  /// 只把前方聲調桶插入組字器、**不覆寫**——保留 LM 重切分自由度，
   /// 使後續音節可自動合併成長詞（如「xi 空格 an 空格」→「西安」），
   /// 最後清空注拼槽。
   /// 聲調桶鍵保留 ⇒ 隨後開出的選字窗仍陳列其他 tone-fuzzy（全調）候選；顯示則由
@@ -71,8 +71,8 @@ extension InputHandlerProtocol {
   /// 完整音節固化後 trail 累積該拼音 blob，供語言模型引導的重切分使用；不完整前綴
   /// （如「z」）固化後 trail 失效（無法作為合法切分素材）。
   /// 失敗時靜默退回、不主動 switchState（後續正常流程會生成新狀態）。
-  func solidifyFuriousTailReading() {
-    guard let furiousContext = furiousTailContext else { return }
+  func solidifyFuriousFrontReading() {
+    guard let furiousContext = furiousFrontContext else { return }
     let bucket = furiousContext.bucket
     let romaji = composer.romajiBuffer
     guard !romaji.isEmpty else { return }
@@ -89,15 +89,15 @@ extension InputHandlerProtocol {
     retrievePOMSuggestions(apply: true)
   }
 
-  /// 將尾段候選套用至給定的組字器實例（真實確認與高亮預覽共用）。
+  /// 將前方候選套用至給定的組字器實例（真實確認與高亮預覽共用）。
   ///
   /// 三路徑判定順序（互不誤判）：
-  /// 1) 置頂無橫跨：keyArray 即尾段桶本身（count ≥ 2，但首讀音隸屬提交鍵桶會造成
+  /// 1) 置頂無橫跨：keyArray 即前方桶本身（count ≥ 2，但首讀音隸屬提交鍵桶會造成
   ///    泛化判定誤判，故先行排除）。
   /// 2) 跨邊界：候選的「前 n-1 個讀音」逐位隸屬組字器「最後 n-1 個提交鍵」的讀音桶
-  ///    （n = keyArray.count ≥ 2），結構性判定候選橫跨最後 n-1 個提交鍵＋尾段。
-  /// 3) 尾段單音節 grams：keyArray.count == 1，兩者皆不成立。
-  /// 套用：跨邊界僅插入尾段讀音（單鍵）並覆寫 anchor-(n-1) 起的 n 鍵 span；其餘沿用
+  ///    （n = keyArray.count ≥ 2），結構性判定候選橫跨最後 n-1 個提交鍵＋前方。
+  /// 3) 前方單音節 grams：keyArray.count == 1，兩者皆不成立。
+  /// 套用：跨邊界僅插入前方讀音（單鍵）並覆寫 anchor-(n-1) 起的 n 鍵 span；其餘沿用
   /// 既有語義（置頂無橫跨＝讀音桶單一位置多讀音，否則逐讀音單鍵）並覆寫 anchor 起的 span。
   /// 覆寫為 `.withSpecified`＋`isExplicitlyOverridden`；`perceptionHandler` 僅在覆寫成功時
   /// 被呼叫，供「使用者顯式選字」的確認路徑（Shift+選字鍵／滑鼠點選）收集 POM 觀察。
@@ -108,14 +108,14 @@ extension InputHandlerProtocol {
   /// - Parameter preservingFuzzyKeys: 為 true 時一律插入整組聲調桶（保留 tone-fuzzy
   ///   候選窗），僅以覆寫釘住顯示——用於空格固化的「模擬選字窗選字」路徑。
   @discardableResult
-  func applyFuriousTailCandidate(
+  func applyFuriousFrontCandidate(
     _ candidate: CandidateInState,
     to targetAssembler: Homa.Assembler,
     bucket: [String],
     preservingFuzzyKeys: Bool = false,
     perceptionHandler: ((Homa.PerceptionIntel) -> ())? = nil
   )
-    -> FuriousTailApplyOutcome {
+    -> FuriousFrontApplyOutcome {
     guard !candidate.value.isEmpty else { return .failed }
     let isBucketPinned = candidate.keyArray == bucket
     var isCrossBoundary = false
@@ -163,9 +163,9 @@ extension InputHandlerProtocol {
   /// 不觸碰真組字器、不計 POM、不動 trail、不清注拼槽。
   public func previewFuriousHighlightedCandidate(_ candidate: CandidateInState) {
     guard let session = session else { return }
-    guard let furiousContext = furiousTailContext else { return }
+    guard let furiousContext = furiousFrontContext else { return }
     let scratch = assembler.copy
-    let outcome = applyFuriousTailCandidate(
+    let outcome = applyFuriousFrontCandidate(
       candidate, to: scratch, bucket: furiousContext.bucket
     )
     switch outcome {
@@ -188,7 +188,7 @@ extension InputHandlerProtocol {
   /// 各種同音節數的合法切分，以組字器副本（scratch）逐一評分，僅在候選的整句路徑總分
   /// 嚴格高於現狀時，才對真組字器做 drop+insert 替換。任何環節不符預期皆靜默退回。
   func resegmentFuriousTrailIfNeeded() {
-    // 閘門：與尾段預覽共用狂拼守衛，但注拼槽暫存可為空。
+    // 閘門：與前方預覽共用狂拼守衛，但注拼槽暫存可為空。
     guard isFuriousTypingModeEffective else { return }
     guard furiousTrail.count >= 2 else { return }
     guard assembler.length >= furiousTrail.count else {

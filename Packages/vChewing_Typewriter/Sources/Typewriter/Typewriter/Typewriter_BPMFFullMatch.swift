@@ -44,7 +44,7 @@ public struct BPMFFullMatchTypewriter<Handler: InputHandlerProtocol>: Typewriter
         || input.isControlHeld || input.isOptionHeld || input.isShiftHeld || input.isCommandHeld
     let confirmCombination = input.isSpace || input.isEnter
 
-    // 狂拼模式：尾段候選窗顯示時，Shift+選字鍵就地選字（仿磁帶快選的路由方式）。
+    // 狂拼模式：前方候選窗顯示時，Shift+選字鍵就地選字（仿磁帶快選的路由方式）。
     // 僅當該鍵確為選字鍵（與 handleCandidate 的 checkSelectionKey 同語義）時才路由，
     // 避免 Shift+方向鍵／Shift+字母誤入 handleCandidate 的取消選字分支、造成重 triage
     // 無限遞迴（注拼槽未動、候選恆在，事件反覆回到路由器）。
@@ -52,7 +52,7 @@ public struct BPMFFullMatchTypewriter<Handler: InputHandlerProtocol>: Typewriter
       session.selectionKeys.lowercased().contains($0.lowercased())
     } ?? false
     let furiousShiftCandidateSelection = input.isShiftHeld
-      && handler.hasFuriousTailPending
+      && handler.hasFuriousFrontPending
       && session.state.type == .ofInputting && !session.state.candidates.isEmpty
       && selectionKeyMatched
     if furiousShiftCandidateSelection,
@@ -60,17 +60,17 @@ public struct BPMFFullMatchTypewriter<Handler: InputHandlerProtocol>: Typewriter
       return true
     }
 
-    // 狂拼模式：注拼槽尚有暫存拼音時，Enter 只固化尾段讀音、停留在 Inputting 狀態
+    // 狂拼模式：注拼槽尚有暫存拼音時，Enter 只固化前方讀音、停留在 Inputting 狀態
     // 留待接下來的輸入，不直接遞交全部內容。copilot 窗可見
     // 且使用者已高亮某候選時，固化該候選（等同就地選字、但不寫 POM——與 Enter 直遞
     // 的 POM 政策一致）；否則以空格固化的語義只插聲調桶（保留重切分自由度）。
-    // 注拼槽清空後再次 Enter（hasFuriousTailPending 不成立）才走正常遞交路徑。
+    // 注拼槽清空後再次 Enter（hasFuriousFrontPending 不成立）才走正常遞交路徑。
     if confirmCombination, input.isEnter, !input.isHoldingAny([.control, .option, .shift, .command]),
-       handler.hasFuriousTailPending {
+       handler.hasFuriousFrontPending {
       if let highlight = handler.furiousHighlightOverride {
-        handler.confirmFuriousTailCandidate(highlight)
+        handler.confirmFuriousFrontCandidate(highlight)
       } else {
-        handler.solidifyFuriousTailReading()
+        handler.solidifyFuriousFrontReading()
       }
       session.switchState(handler.generateStateOfInputting())
       return true

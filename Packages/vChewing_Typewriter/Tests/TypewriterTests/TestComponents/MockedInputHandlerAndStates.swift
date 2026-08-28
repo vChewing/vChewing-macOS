@@ -234,11 +234,11 @@ public final class MockSession: @MainActor SessionCoreProtocol {
       )
       if !associates.candidates.isEmpty { result = associates }
     case .ofInputting where (0 ..< state.candidates.count).contains(index):
-      // 狂拼模式：尾段候選就地選字（與生產端 InputSession_Delegates 對應）。
+      // 狂拼模式：前方候選就地選字（與生產端 InputSession_Delegates 對應）。
       // 使用者顯式選字＝符合 POM 記憶的明確意志，故傳入 memorizePOM: true。
       if inputHandler.isFuriousTypingModeEffective {
         let selectedValue = state.candidates[index]
-        inputHandler.confirmFuriousTailCandidate(selectedValue, memorizePOM: true)
+        inputHandler.confirmFuriousFrontCandidate(selectedValue, memorizePOM: true)
         switchState(inputHandler.generateStateOfInputting())
         return
       }
@@ -307,7 +307,7 @@ public final class MockSession: @MainActor SessionCoreProtocol {
     // 與生產端 InputSession_Delegates 對應：狂拼讀音回顯為即時回顯（非反查），
     // 刻意不受 showReverseLookupInCandidateUI 總開關與 isVerticalTyping 守衛節制。
     guard let inputHandler = inputHandler else { return [] }
-    if isFuriousCopilotCandidateWindowVisible, inputHandler.hasFuriousTailPending {
+    if isFuriousCopilotCandidateWindowVisible, inputHandler.hasFuriousFrontPending {
       return [inputHandler.composer.romajiBuffer]
     }
     if !inputHandler.prefs.showReverseLookupInCandidateUI { return [] }

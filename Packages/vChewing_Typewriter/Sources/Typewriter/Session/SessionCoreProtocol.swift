@@ -186,9 +186,9 @@ extension SessionCoreProtocol {
 
 extension SessionCoreProtocol {
   /// 狂拼 copilot 候選窗是否可見：Inputting 狀態、附帶候選清單、且注拼槽尚有未完成
-  /// 拼裝的拼音字母流（`inputHandler.hasFuriousTailPending`）。
+  /// 拼裝的拼音字母流（`inputHandler.hasFuriousFrontPending`）。
   public var isFuriousCopilotCandidateWindowVisible: Bool {
     state.type == .ofInputting && state.isCandidateContainer
-      && (inputHandler?.hasFuriousTailPending ?? false)
+      && (inputHandler?.hasFuriousFrontPending ?? false)
   }
 }

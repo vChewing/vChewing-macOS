@@ -17,8 +17,8 @@ extension InputHandlerProtocol {
     var state: State { session.state }
     currentLM.syncPrefs()
 
-    // 狂拼固化：尾段候選窗顯示中、按下「可能叫出選字窗」的鍵（Space／翻頁／候選導航
-    // 方向鍵）時，先把尾段投機讀音固化進組字器（投機→實體：只插聲調桶、不覆寫，
+    // 狂拼固化：前方候選窗顯示中、按下「可能叫出選字窗」的鍵（Space／翻頁／候選導航
+    // 方向鍵）時，先把前方投機讀音固化進組字器（投機→實體：只插聲調桶、不覆寫，
     // trail 累積供重切分），再讓同一事件繼續走正常流程——正常流程自動開出正常選字窗
     // （方向鍵、翻頁、revlookup 皆由既有機制免費提供）。不重入、無遞迴風險；
     // Enter／數字鍵／字母鍵／編輯鍵不屬觸發集合。
@@ -32,7 +32,7 @@ extension InputHandlerProtocol {
        !input.isHoldingAny([.control, .option, .command]),
        input.isSpace || input.isPageUp || input.isPageDown
        || input.isCursorClockLeft || input.isCursorClockRight {
-      solidifyFuriousTailReading()
+      solidifyFuriousFrontReading()
       spaceSolidifiedFuriousReading = input.isSpace
     }
 
@@ -42,7 +42,13 @@ extension InputHandlerProtocol {
       guard let keyCodeType = KeyCode(rawValue: input.keyCode) else { return nil }
       switch keyCodeType {
       case .kEscape: return handleEsc()
-      case .kContextMenu, .kTab: return revolveCandidate(
+      case .kContextMenu, .kTab:
+        if input.isTab, hasFuriousFrontPending {
+          // 狂拼前方：Tab 先固化前方讀音（如 Enter 般、只插聲調桶不覆寫），
+          // 再讓本事件續走正常流程——注拼槽清空後 revolveCandidate 即可就地輪替。
+          solidifyFuriousFrontReading()
+        }
+        return revolveCandidate(
           reverseOrder: input.isShiftHeld,
           softRevolve: prefs.preferredRevolverForceLevel == 2
         )
@@ -104,7 +110,7 @@ extension InputHandlerProtocol {
           // 空格已用於狂拼讀音固化：本拍空格被「插入讀音」消費——不再輪替候選、
           // 亦不落入後續的空格遞交路徑（否則會生成空格字符拆斷組字區、使之直接
           // 遞交）。behavior==1 的「空格呼叫選字窗」由更早的 callCandidateState
-          // 提供、不受本守衛影響；此處以新狀態刷新顯示（清掉已失效的狂拼尾段預覽窗）。
+          // 提供、不受本守衛影響；此處以新狀態刷新顯示（清掉已失效的狂拼前方預覽窗）。
           if spaceSolidifiedFuriousReading {
             session.switchState(generateStateOfInputting())
             return true

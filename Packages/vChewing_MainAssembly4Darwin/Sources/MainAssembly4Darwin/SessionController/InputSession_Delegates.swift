@@ -342,11 +342,11 @@ extension SessionProtocol {
       )
       if !associates.candidates.isEmpty { result = associates }
     case .ofInputting where (0 ..< state.candidates.count).contains(index):
-      // 狂拼模式：尾段候選就地選字（滑鼠點選／Shift+選字鍵亦走這裡）。
+      // 狂拼模式：前方候選就地選字（滑鼠點選／Shift+選字鍵亦走這裡）。
       // 使用者顯式選字＝符合 POM 記憶的明確意志，故傳入 memorizePOM: true。
       if inputHandler.isFuriousTypingModeEffective {
         let selectedValue = state.candidates[index]
-        inputHandler.confirmFuriousTailCandidate(selectedValue, memorizePOM: true)
+        inputHandler.confirmFuriousFrontCandidate(selectedValue, memorizePOM: true)
         switchState(inputHandler.generateStateOfInputting())
         return
       }
