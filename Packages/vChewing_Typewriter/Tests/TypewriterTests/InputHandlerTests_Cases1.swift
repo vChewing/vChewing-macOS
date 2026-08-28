@@ -3511,4 +3511,113 @@ extension InputHandlerTests {
     #expect(testSession.state.type == .ofInputting)
     #expect(errorMessages.isEmpty)
   }
+
+  /// 狂拼整詞簡拼（R2-α）：注拼槽整段無法展開成單一音節桶（如「ysxb」）時，
+  /// copilot 窗改以整詞簡拼查詢生成候選——置頂為最佳整詞猜測、keyArray 為實際讀音。
+  @Test
+  func test_IH132_FuriousTypingAbbreviatedWholeWordCandidates() throws {
+    guard let testHandler, let testSession else {
+      Issue.record("testHandler and testSession at least one of them is nil.")
+      return
+    }
+    clearTestPOM()
+
+    defer {
+      testHandler.currentLM.clearTemporaryData(isFiltering: false)
+      testHandler.prefs.furiousTypingEnabled = false
+      testHandler.prefs.keyboardParser = KeyboardParser.ofStandard.rawValue
+      testHandler.ensureKeyboardParser()
+      testHandler.prefs.fetchSuggestionsFromPerceptionOverrideModel = true
+      testSession.resetInputHandler(forceComposerCleanup: true)
+    }
+
+    // 使用者造詞：ㄧㄝ-ㄕㄡ-ㄒㄧㄢ-ㄅㄟ（以「ysxb」的 initial 類 cells 可整詞命中）。
+    // 同時注入單音節 gram，供確認寫回時 insertKeys 的讀音存在性驗證。
+    [
+      .init(keyArray: ["ㄧㄝ", "ㄕㄡ", "ㄒㄧㄢ", "ㄅㄟ"], value: "野獸先輩", score: 9),
+      .init(keyArray: ["ㄧㄝ"], value: "椰", score: 0),
+      .init(keyArray: ["ㄕㄡ"], value: "收", score: 0),
+      .init(keyArray: ["ㄒㄧㄢ"], value: "先", score: 0),
+      .init(keyArray: ["ㄅㄟ"], value: "杯", score: 0),
+    ].forEach {
+      testHandler.currentLM.insertTemporaryData(unigram: $0, isFiltering: false)
+    }
+    testSession.resetInputHandler(forceComposerCleanup: true)
+    testHandler.prefs.keyboardParser = KeyboardParser.ofHanyuPinyin.rawValue
+    testHandler.ensureKeyboardParser()
+    testHandler.prefs.fetchSuggestionsFromPerceptionOverrideModel = false
+    testHandler.prefs.furiousTypingEnabled = true
+    testHandler.currentLM.syncPrefs()
+
+    // 「ysxb」：無完整音節可自動 chop 提交，整段留在注拼槽。
+    typeSentence("ysxb")
+    #expect(testHandler.composer.romajiBuffer == "ysxb")
+    #expect(testSession.state.type == .ofInputting)
+    // 整詞簡拼候選窗：置頂為最佳整詞猜測、keyArray 為實際讀音（供單鍵寫回）。
+    #expect(!testSession.state.candidates.isEmpty)
+    #expect(testSession.state.candidates.first?.value == "野獸先輩")
+    #expect(testSession.state.candidates.first?.keyArray == ["ㄧㄝ", "ㄕㄡ", "ㄒㄧㄢ", "ㄅㄟ"])
+  }
+
+  /// 狂拼整詞簡拼（R2-α）確認：Shift+選字鍵選中置頂整詞候選後，
+  /// 以實際讀音單鍵序列寫回組字器、注拼槽清空、trail 失效（顯式選字＝顯式干涉）。
+  @Test
+  func test_IH133_FuriousTypingAbbreviatedWholeWordSelectionWritesActualReadings() throws {
+    guard let testHandler, let testSession else {
+      Issue.record("testHandler and testSession at least one of them is nil.")
+      return
+    }
+    clearTestPOM()
+
+    defer {
+      testHandler.currentLM.clearTemporaryData(isFiltering: false)
+      testHandler.prefs.furiousTypingEnabled = false
+      testHandler.prefs.keyboardParser = KeyboardParser.ofStandard.rawValue
+      testHandler.ensureKeyboardParser()
+      testHandler.prefs.fetchSuggestionsFromPerceptionOverrideModel = true
+      testSession.resetInputHandler(forceComposerCleanup: true)
+    }
+
+    // 使用者造詞＋單音節 gram（供確認寫回的讀音存在性驗證）。
+    [
+      .init(keyArray: ["ㄧㄝ", "ㄕㄡ", "ㄒㄧㄢ", "ㄅㄟ"], value: "野獸先輩", score: 9),
+      .init(keyArray: ["ㄧㄝ"], value: "椰", score: 0),
+      .init(keyArray: ["ㄕㄡ"], value: "收", score: 0),
+      .init(keyArray: ["ㄒㄧㄢ"], value: "先", score: 0),
+      .init(keyArray: ["ㄅㄟ"], value: "杯", score: 0),
+    ].forEach {
+      testHandler.currentLM.insertTemporaryData(unigram: $0, isFiltering: false)
+    }
+    testSession.resetInputHandler(forceComposerCleanup: true)
+    testHandler.prefs.keyboardParser = KeyboardParser.ofHanyuPinyin.rawValue
+    testHandler.ensureKeyboardParser()
+    testHandler.prefs.fetchSuggestionsFromPerceptionOverrideModel = false
+    testHandler.prefs.furiousTypingEnabled = true
+    testHandler.currentLM.syncPrefs()
+
+    typeSentence("ysxb")
+    #expect(!testSession.state.candidates.isEmpty)
+    #expect(testSession.state.candidates.first?.value == "野獸先輩")
+
+    // 模擬候選窗已顯示（handleCandidate 需要 ctlCandidate.visible）。
+    testSession.mockCandidateController = MockCandidateController(visible: true)
+    defer { testSession.mockCandidateController = nil }
+
+    // Shift+選字鍵「1」：就地選中置頂整詞候選（R2-α 確認路徑）。
+    let shift1 = KBEvent.KeyEventData(
+      flags: .shift, chars: "!", charsSansModifiers: "1", keyCode: 18
+    ).asEvent
+    #expect(testHandler.triageInput(event: shift1))
+
+    // 注拼槽清空、組字器尾端寫入實際讀音單鍵序列（無桶、無 &）。
+    #expect(testHandler.composer.romajiBuffer.isEmpty)
+    #expect(testHandler.assembler.keys.count == 4)
+    #expect(testHandler.assembler.keys == [
+      .singleKey("ㄧㄝ"), .singleKey("ㄕㄡ"), .singleKey("ㄒㄧㄢ"), .singleKey("ㄅㄟ"),
+    ])
+    // 組字區顯示整詞；trail 失效（顯式選字＝使用者顯式干涉）。
+    #expect(generateDisplayedText() == "野獸先輩")
+    #expect(testHandler.furiousTrail.isEmpty)
+    #expect(testSession.state.type == .ofInputting)
+  }
 }

@@ -113,6 +113,34 @@ extension InputHandlerProtocol {
     return candidates.isEmpty ? nil : candidates
   }
 
+  /// 狂拼模式的前方簡拼整詞上下文（R2-α）：注拼槽整段無法展開成單一音節桶時
+  /// （如「ysxb」），以 chop＋deduct 產生「每位置的 & 連接前綴候選」。
+  ///
+  /// 與 `furiousFrontContext` 互斥：單音節前綴走既有桶路徑，多音節簡拼走本路徑。
+  /// 回傳的 cells 可直接餵給 `LookupHub.abbreviatedWordCandidates(keysChopped:)`。
+  var furiousAbbreviatedCells: [String]? {
+    guard isFuriousTypingModeEffective else { return nil }
+    guard composer.intonation.isEmpty else { return nil }
+    let romaji = composer.romajiBuffer
+    guard !romaji.isEmpty else { return nil }
+    guard assembler.isCursorAtAssemblerEdge(direction: .front) else { return nil }
+    let trie = Tekkon.PinyinTrie.shared(parser: composer.parser)
+    let chopped = trie.chop(romaji)
+    guard chopped.count >= 2 else { return nil }
+    let cells = trie.deductChoppedPinyinToZhuyin(chopped)
+    guard cells.count >= 2, cells.allSatisfy({ !$0.isEmpty }) else { return nil }
+    return cells
+  }
+
+  /// 以整詞簡拼查詢（R2-α）生成前方候選。
+  ///
+  /// 依分數降冪排序（置頂為最佳整詞猜測），詞值去重已由語言模組完成。
+  private func buildFuriousAbbreviatedCandidates(cells: [String]) -> [CandidateInState] {
+    currentLM.lookupHub.abbreviatedWordCandidates(keysChopped: cells).map {
+      (keyArray: $0.keyArray, value: $0.current)
+    }
+  }
+
   /// 依據已通過閘門的前方上下文生成候選清單。
   ///
   /// 清單順序：置頂（有橫跨節點時為完整詞音配對如「世界」，否則為前方預覽值）→
@@ -169,10 +197,13 @@ extension InputHandlerProtocol {
   ) {
     // 閘門再驗：與預覽／候選清單共用同一套守衛。
     guard hasFuriousFrontPending else { return }
-    guard let furiousContext = furiousFrontContext else { return }
+    // α 路徑：注拼槽整段無法展開成單一音節桶（如「ysxb」）時，以簡拼整詞候選確認。
+    let furiousContext = furiousFrontContext
+    let abbreviatedCells = furiousContext == nil ? furiousAbbreviatedCells : nil
+    guard furiousContext != nil || abbreviatedCells != nil else { return }
     invalidateFuriousTrail() // 就地選字為使用者顯式干涉：狂拼 trail 失效。
     furiousHighlightOverride = nil // 高亮覆寫僅供當拍消費。
-    let bucket = furiousContext.bucket
+    let bucket = furiousContext?.bucket ?? []
     guard !candidate.value.isEmpty else { return }
     let preservedSentenceBeforeConsolidation = assembler.assembledSentence
     let preservedCursorPosition = actualNodeCursorPosition
@@ -332,10 +363,18 @@ extension InputHandlerProtocol {
       let tailCandidates = buildFuriousFrontCandidates(from: furiousContext)
       if !tailCandidates.isEmpty { result.candidates = tailCandidates }
     }
+    /// 狂拼模式：注拼槽整段無法展開成單一音節桶（如「ysxb」）時，
+    /// 以整詞簡拼查詢（R2-α）生成候選，使簡拼整詞在 copilot 窗中可選。
+    if furiousContext == nil, let abbreviatedCells = furiousAbbreviatedCells {
+      let abbreviatedCandidates = buildFuriousAbbreviatedCandidates(cells: abbreviatedCells)
+      if !abbreviatedCandidates.isEmpty { result.candidates = abbreviatedCandidates }
+    }
     /// 狂拼模式：候選窗不顯示時，以 Tooltip 顯示注拼槽暫存的原始拼音，
     /// 讓使用者仍能核對自己實際敲下的字母。候選窗顯示時抑制 tooltip，避免
     /// 與候選窗重疊（原文拼音的可見性改由固化後正常選字窗的 revlookup 承擔）。
-    if furiousPreview != nil, result.tooltip.isEmpty, result.candidates.isEmpty {
+    /// α 路徑（多音節簡拼）查無命中時亦顯示暫存拼音。
+    if result.tooltip.isEmpty, result.candidates.isEmpty, furiousPreview != nil
+      || (furiousContext == nil && furiousAbbreviatedCells != nil) {
       result.tooltip = composer.romajiBuffer
       result.tooltipDuration = 0 // 恆久顯示，直到暫存拼音被確認或清除。
     }

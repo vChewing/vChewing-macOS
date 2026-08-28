@@ -163,7 +163,20 @@ extension InputHandlerProtocol {
   /// 不觸碰真組字器、不計 POM、不動 trail、不清注拼槽。
   public func previewFuriousHighlightedCandidate(_ candidate: CandidateInState) {
     guard let session = session else { return }
-    guard let furiousContext = furiousFrontContext else { return }
+    // α 路徑（R2-α）：前方無法形成單一音節桶（如「ysxb」）時，以空桶試算簡拼整詞候選。
+    let furiousContext: (
+      bucket: [String],
+      preview: String,
+      crossingPair: CandidateInState?,
+      assembledMainValues: [String],
+      tailReading: String?
+    )
+    if let context = furiousFrontContext {
+      furiousContext = context
+    } else {
+      guard furiousAbbreviatedCells != nil else { return }
+      furiousContext = ([], "", nil, [], nil)
+    }
     let scratch = assembler.copy
     let outcome = applyFuriousFrontCandidate(
       candidate, to: scratch, bucket: furiousContext.bucket
