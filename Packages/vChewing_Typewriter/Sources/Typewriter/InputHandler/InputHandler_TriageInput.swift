@@ -27,12 +27,19 @@ extension InputHandlerProtocol {
     // 空格觸發固化時記錄本拍「空格已用於插入讀音」：後續的 kSpace 分診依此直接
     // 消費本拍空格（不再輪替、不再遞交、不生成空格字符）——未完成讀音存在時，
     // 空格語義為「把讀音插入組字器」而非「輪替候選」。
+    // 固化後注拼槽仍有未完成讀音（α 查無候選、或固化失敗）時，直接消費本拍空格、
+    // 以新狀態刷新——避免空格流入注拼槽（拼音模式下空格＝中性聲調，其後的獨立聲調
+    // 處理會清空注拼槽、丟失前方的簡拼整詞上下文）。
     var spaceSolidifiedFuriousReading = false
     if session.isFuriousCopilotCandidateWindowVisible,
        !input.isHoldingAny([.control, .option, .command]),
        input.isSpace || input.isPageUp || input.isPageDown
        || input.isCursorClockLeft || input.isCursorClockRight {
       solidifyFuriousFrontReading()
+      if input.isSpace, hasFuriousFrontPending {
+        session.switchState(generateStateOfInputting())
+        return true
+      }
       spaceSolidifiedFuriousReading = input.isSpace
     }
 

@@ -70,9 +70,15 @@ extension InputHandlerProtocol {
   /// keys，單音節顯示必然一致）。
   /// 完整音節固化後 trail 累積該拼音 blob，供語言模型引導的重切分使用；不完整前綴
   /// （如「z」）固化後 trail 失效（無法作為合法切分素材）。
+  /// α 路徑（R2-α）：注拼槽整段無法展開成單一音節桶（如「xqr」→「星期日」）時，
+  /// 改以整詞簡拼候選之首的「實際讀音」單鍵插入組字器（同樣不覆寫、保留 LM 重切分
+  /// 自由度），簡拼前綴非完整音節故 trail 失效——固化語義與單音節前綴一致。
   /// 失敗時靜默退回、不主動 switchState（後續正常流程會生成新狀態）。
   func solidifyFuriousFrontReading() {
-    guard let furiousContext = furiousFrontContext else { return }
+    guard let furiousContext = furiousFrontContext else {
+      solidifyAbbreviatedFrontReading()
+      return
+    }
     let bucket = furiousContext.bucket
     let romaji = composer.romajiBuffer
     guard !romaji.isEmpty else { return }
@@ -87,6 +93,23 @@ extension InputHandlerProtocol {
       invalidateFuriousTrail()
     }
     retrievePOMSuggestions(apply: true)
+  }
+
+  /// 狂拼 α 路徑（R2-α）的前方固化：把整詞簡拼候選之首的實際讀音以單鍵插入組字器。
+  ///
+  /// 對應單音節前綴的「只插讀音、不覆寫」語義；查無候選時靜默退回（注拼槽保留，
+  /// 由呼叫端依 `hasFuriousFrontPending` 決定是否直接消費觸發鍵）。
+  private func solidifyAbbreviatedFrontReading() {
+    guard let cells = furiousAbbreviatedCells else { return }
+    let romaji = composer.romajiBuffer
+    guard !romaji.isEmpty else { return }
+    guard let topCandidate = buildFuriousAbbreviatedCandidates(cells: cells).first else { return }
+    let readings = topCandidate.keyArray
+    guard !readings.isEmpty else { return }
+    guard (try? assembler.insertKeys(readings.map { .singleKey($0) })) != nil else { return }
+    composer.replacePinyinBuffer(with: "")
+    furiousHighlightOverride = nil // 高亮覆寫僅供當拍消費。
+    invalidateFuriousTrail() // 簡拼前綴非完整音節：trail 失效（同「z」政策）。
   }
 
   /// 將前方候選套用至給定的組字器實例（真實確認與高亮預覽共用）。

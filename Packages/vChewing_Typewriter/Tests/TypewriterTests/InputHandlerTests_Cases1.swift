@@ -3620,4 +3620,59 @@ extension InputHandlerTests {
     #expect(testHandler.furiousTrail.isEmpty)
     #expect(testSession.state.type == .ofInputting)
   }
+
+  /// 狂拼整詞簡拼（R2-α）空格固化：注拼槽整段無法展開成單一音節桶（如「xqr」→
+  /// 「星期日」）時，空格把整詞簡拼候選之首的實際讀音以單鍵插入組字器
+  /// （不覆寫、保留 LM 重切分自由度）、清空注拼槽、trail 失效——不丟失前方上下文。
+  @Test
+  func test_IH134_FuriousTypingAbbreviatedSpaceSolidifiesTopCandidate() throws {
+    guard let testHandler, let testSession else {
+      Issue.record("testHandler and testSession at least one of them is nil.")
+      return
+    }
+    clearTestPOM()
+
+    defer {
+      testHandler.currentLM.clearTemporaryData(isFiltering: false)
+      testHandler.prefs.furiousTypingEnabled = false
+      testHandler.prefs.keyboardParser = KeyboardParser.ofStandard.rawValue
+      testHandler.ensureKeyboardParser()
+      testHandler.prefs.fetchSuggestionsFromPerceptionOverrideModel = true
+      testSession.resetInputHandler(forceComposerCleanup: true)
+    }
+
+    // 使用者造詞「星期日」＋單音節 gram（供固化插入的讀音存在性驗證）。
+    [
+      .init(keyArray: ["ㄒㄧㄥ", "ㄑㄧ", "ㄖˋ"], value: "星期日", score: 9),
+      .init(keyArray: ["ㄒㄧㄥ"], value: "星", score: 0),
+      .init(keyArray: ["ㄑㄧ"], value: "期", score: 0),
+      .init(keyArray: ["ㄖˋ"], value: "日", score: 0),
+    ].forEach {
+      testHandler.currentLM.insertTemporaryData(unigram: $0, isFiltering: false)
+    }
+    testSession.resetInputHandler(forceComposerCleanup: true)
+    testHandler.prefs.keyboardParser = KeyboardParser.ofHanyuPinyin.rawValue
+    testHandler.ensureKeyboardParser()
+    testHandler.prefs.fetchSuggestionsFromPerceptionOverrideModel = false
+    testHandler.prefs.furiousTypingEnabled = true
+    testHandler.prefs.spaceKeyBehaviorAgainstICB = 2 // 空格不作選字窗呼叫（聚焦固化語義）。
+    testHandler.currentLM.syncPrefs()
+
+    // 「xqr」：多音節簡拼、copilot 窗顯示整詞候選「星期日」。
+    typeSentence("xqr")
+    #expect(testHandler.composer.romajiBuffer == "xqr")
+    #expect(!testSession.state.candidates.isEmpty)
+    #expect(testSession.state.candidates.first?.value == "星期日")
+
+    // 空格：固化整詞簡拼候選之首的實際讀音（單鍵插入、不覆寫）。
+    _ = testHandler.triageInput(event: KBEvent.KeyEventData(chars: " ", keyCode: 49).asEvent)
+
+    #expect(testHandler.composer.romajiBuffer.isEmpty)
+    #expect(testHandler.assembler.keys == [
+      .singleKey("ㄒㄧㄥ"), .singleKey("ㄑㄧ"), .singleKey("ㄖˋ"),
+    ])
+    #expect(generateDisplayedText().contains("星期日"))
+    #expect(testHandler.furiousTrail.isEmpty) // 簡拼前綴非完整音節：trail 失效。
+    #expect(testSession.state.type == .ofInputting)
+  }
 }

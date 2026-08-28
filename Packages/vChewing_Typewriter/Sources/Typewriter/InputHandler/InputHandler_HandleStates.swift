@@ -135,7 +135,7 @@ extension InputHandlerProtocol {
   /// 以整詞簡拼查詢（R2-α）生成前方候選。
   ///
   /// 依分數降冪排序（置頂為最佳整詞猜測），詞值去重已由語言模組完成。
-  private func buildFuriousAbbreviatedCandidates(cells: [String]) -> [CandidateInState] {
+  func buildFuriousAbbreviatedCandidates(cells: [String]) -> [CandidateInState] {
     currentLM.lookupHub.abbreviatedWordCandidates(keysChopped: cells).map {
       (keyArray: $0.keyArray, value: $0.current)
     }
