@@ -778,6 +778,8 @@ extension VanguardTrie.TextMapTrie {
     -> Unicode.Scalar {
     let fallback: Unicode.Scalar = "\u{FFFD}"
     switch length {
+    case 1:
+      return Unicode.Scalar(buffer[offset]) // ?? fallback
     case 2:
       return Unicode.Scalar(
         (UInt32(buffer[offset] & 0x1F) << 6) |
@@ -810,6 +812,8 @@ extension VanguardTrie.TextMapTrie {
   )
     -> UInt32 {
     switch length {
+    case 1:
+      return UInt32(buffer[offset])
     case 2:
       return (UInt32(buffer[offset] & 0x1F) << 6) |
         UInt32(buffer[offset + 1] & 0x3F)
