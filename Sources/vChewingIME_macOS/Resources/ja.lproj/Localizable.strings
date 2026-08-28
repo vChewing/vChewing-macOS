@@ -251,7 +251,6 @@
 "i18n:Settings.SectionKeyboardShortcuts" = "ショートカット:";
 "i18n:Settings.SectionMiscSettings" = "他の設定:";
 "i18n:Settings.SectionOutputSettings" = "出力設定:";
-"i18n:Settings.SectionPhoneticParser" = "注音配列:";
 "i18n:Settings.SectionQuickSetup" = "直接設定:";
 "i18n:Settings.SectionSpace" = "Space:";
 "i18n:Settings.SectionTypingSettings" = "入力設定:";
