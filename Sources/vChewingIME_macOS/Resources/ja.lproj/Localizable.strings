@@ -417,7 +417,7 @@
 
 "i18n:UserDef.kKanjiConversionPreferences.shortTitle" = "漢字変換モード:";
 "i18n:UserDef.kKeepReadingUponCompositionError.shortTitle" = "効かぬ音読みを BackSpace で再編集";
-"i18n:UserDef.kKeyboardParser4Pinyin.description" = "弁音モードで使用する弁音入力の種類を指定します。なお、弁音入力モードでは、現在位置の前後 ±10 の走査範囲内に不完全表記（たとえば声調欠落）の音読み単位がある場合、組字エンジンに「最大 4 読み」の候補組字上限が適用されることがあります。逆に、その ±10 範囲内のすべての読みが声調付きの完全表記である場合に限り、この上限は適用されません。";
+"i18n:UserDef.kKeyboardParser4Pinyin.description" = "弁音モードで使用する弁音入力の種類を指定します。弁音入力モードでは、現在位置の前後 ±10 の走査範囲内にある各音読み単位の可能な読み数の積（デカルト積の規模）が予算（10,000）を超える場合、組字エンジンに「最大 4 読み」の候補組字上限が適用され、デカルト積による処理の停滞を防ぎます。声調付きの完全表記、およびデカルト積の規模が予算内に収まる入力（声調なしの 5 音節以下の組み合わせを含む）には、この上限は適用されません。";
 "i18n:UserDef.kKeyboardParser4Pinyin.shortTitle" = "弁音入力種類:";
 "i18n:UserDef.kKeyboardParser4Zhuyin.description" = "注音モードで使用する注音配列を指定します。";
 "i18n:UserDef.kKeyboardParser4Zhuyin.shortTitle" = "注音配列:";
