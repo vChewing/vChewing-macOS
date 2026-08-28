@@ -29,7 +29,7 @@ public final class CtlSettingsCocoa: NSWindowController, NSWindowDelegate {
     let totalWidth = kSidebarWidth + 1 + SettingsPanesCocoa.windowWidth
     super.init(
       window: .init(
-        contentRect: CGRect(x: 401, y: 295, width: totalWidth, height: 600),
+        contentRect: CGRect(x: 401, y: 295, width: totalWidth, height: 620),
         styleMask: [.titled, .closable, .miniaturizable],
         backing: .buffered,
         defer: true

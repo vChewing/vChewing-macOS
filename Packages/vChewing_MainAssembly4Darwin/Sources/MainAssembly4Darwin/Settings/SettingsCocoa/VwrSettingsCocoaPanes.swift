@@ -11,7 +11,16 @@ import AppKit
 // MARK: - SettingsPanesCocoa
 
 public final class SettingsPanesCocoa {
-  public static let windowWidth: CGFloat = 614
+  /// 視窗內容寬度：非中文/日文 UI（即英文 UI）時，因英文文字較長、額外再加寬。
+  public static let windowWidth: CGFloat = {
+    let isEnglishUI: Bool = {
+      guard let lang = UserDefaults.current.stringArray(forKey: "AppleLanguages")?.first else {
+        return true
+      }
+      return !(lang.hasPrefix("zh") || lang.hasPrefix("ja"))
+    }()
+    return 634 + (isEnglishUI ? 80 : 0)
+  }()
 
   public static var contentWidth: CGFloat { windowWidth - 65 }
   public static var innerContentWidth: CGFloat { contentWidth - 37 }
