@@ -458,7 +458,7 @@ extension LMAssembly.LMInstantiator {
   }
 
   private func makeFactoryUnigrams(
-    queriedGrams: [(keyArray: [String], value: String, probability: Double, previous: String?)],
+    queriedGrams: [(keyArray: [String], value: String, probability: Double, previous: String?, anterior: String?)],
     entryType: VanguardTrie.Trie.EntryType,
     includeHalfWidthVariants: Bool
   )
@@ -477,7 +477,14 @@ extension LMAssembly.LMInstantiator {
         score *= -1
       }
 
-      grams.append(.init(keyArray: queriedGram.keyArray, value: queriedGram.value, score: score))
+      // 攜帶 trie 的 previous／anterior 欄（雙元／三元圖資料）；無資料時維持 nil、行為零變更。
+      grams.append(.init(
+        keyArray: queriedGram.keyArray,
+        value: queriedGram.value,
+        score: score,
+        previous: queriedGram.previous,
+        anterior: queriedGram.anterior
+      ))
 
       let sourceKey = queriedGram.keyArray.joined(separator: "-")
       guard includeHalfWidthVariants, sourceKey.contains("_punctuation") else { continue }

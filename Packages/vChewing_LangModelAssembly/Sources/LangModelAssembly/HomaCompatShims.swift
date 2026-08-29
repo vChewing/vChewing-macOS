@@ -17,8 +17,19 @@ import Homa
 extension Homa.Gram {
   /// Convenience initialiser matching the old Megrez.Unigram signature.
   @inlinable
-  nonisolated public init(keyArray: [String] = [], value: String = "", score: Double = 0, id: FIUUID = .init()) {
-    self.init(keyArray: keyArray, current: value, previous: nil, probability: score, backoff: 0, id: id)
+  nonisolated public init(
+    keyArray: [String] = [],
+    value: String = "",
+    score: Double = 0,
+    id: FIUUID = .init(),
+    previous: String? = nil,
+    anterior: String? = nil
+  ) {
+    self.init(
+      keyArray: keyArray, current: value,
+      previous: previous, anterior: anterior,
+      probability: score, backoff: 0, id: id
+    )
   }
 }
 

@@ -583,7 +583,7 @@ extension LMAssembly.LXPerceptor {
     timestamp: Double,
     matchMode: LMAssembly.POMQueryMode = .toneInsensitivePrefix
   )
-    -> [(headReading: String, previous: String?, candidate: String, probability: Double)] {
+    -> [(headReading: String, previous: String?, anterior: String?, candidate: String, probability: Double)] {
     guard !headReading.isEmpty else { return [] }
     let separatorString = Homa.Assembler.theSeparator
     func segments(of reading: String) -> [String] {
@@ -592,7 +592,8 @@ extension LMAssembly.LXPerceptor {
     }
     let querySegments = segments(of: headReading)
     guard !querySegments.isEmpty else { return [] }
-    var results: [(headReading: String, previous: String?, candidate: String, probability: Double)] = []
+    var results: [(headReading: String, previous: String?, anterior: String?, candidate: String, probability: Double)] =
+      []
     lock.withLock {
       for kvPair in mutLRUMap.values {
         guard let parts = parsePerceptionKey(kvPair.key) else { continue }
@@ -619,6 +620,7 @@ extension LMAssembly.LXPerceptor {
           results.append((
             headReading: parts.headReading,
             previous: parts.previous?.value,
+            anterior: parts.anterior?.value,
             candidate: candidate,
             probability: overrideScore
           ))
