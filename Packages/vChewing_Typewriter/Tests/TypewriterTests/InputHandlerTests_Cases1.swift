@@ -3825,4 +3825,55 @@ extension InputHandlerTests {
     #expect(testHandler.composer.romajiBuffer.isEmpty)
     #expect(testHandler.assembler.assembledSentence.map(\.value) == ["是", "媽"])
   }
+
+  /// 狂拼 n-gram 來源＋POM 建議同時開啟時，固化後的自動套用被跳過（雙重加成收斂）：
+  /// 記憶詞由 DP 以 n-gram 統計路徑自然選中（gram.previous 帶「是」），
+  /// 而非自動 override 錨定的 bare unigram（previous 為 nil）。
+  @Test
+  func test_IH138_FuriousTypingNGramSourceSkipsAutoPOMApply() throws {
+    guard let testHandler, let testSession else {
+      Issue.record("testHandler and testSession at least one of them is nil.")
+      return
+    }
+    clearTestPOM()
+
+    defer {
+      testHandler.currentLM.clearTemporaryData(isFiltering: false)
+      testHandler.prefs.furiousTypingEnabled = false
+      testHandler.prefs.pomAsNGramSourceEnabled = false
+      testHandler.prefs.keyboardParser = KeyboardParser.ofStandard.rawValue
+      testHandler.ensureKeyboardParser()
+      testHandler.prefs.fetchSuggestionsFromPerceptionOverrideModel = true
+      testSession.resetInputHandler(forceComposerCleanup: true)
+    }
+
+    [
+      .init(keyArray: ["ㄕˋ"], value: "是", score: -6),
+      .init(keyArray: ["ㄇㄚ"], value: "媽", score: -8),
+      .init(keyArray: ["ㄇㄚˊ"], value: "麻", score: -8),
+      .init(keyArray: ["ㄇㄚ˙"], value: "嗎", score: -2),
+    ].forEach {
+      testHandler.currentLM.insertTemporaryData(unigram: $0, isFiltering: false)
+    }
+    testSession.resetInputHandler(forceComposerCleanup: true)
+    testHandler.prefs.keyboardParser = KeyboardParser.ofHanyuPinyin.rawValue
+    testHandler.ensureKeyboardParser()
+    testHandler.prefs.fetchSuggestionsFromPerceptionOverrideModel = true // POM 建議開啟。
+    testHandler.prefs.pomAsNGramSourceEnabled = true // n-gram 來源開啟。
+    testHandler.prefs.furiousTypingEnabled = true
+    testHandler.currentLM.syncPrefs()
+
+    testHandler.currentLM.memorizePerception(
+      (ngramKey: "(ㄕˋ,是)&(ㄇㄚ,媽)", candidate: "媽"),
+      timestamp: Date().timeIntervalSince1970
+    )
+
+    typeSentence("shima")
+    _ = testHandler.triageInput(event: KBEvent.KeyEventData(chars: " ", keyCode: 49).asEvent)
+
+    #expect(testHandler.composer.romajiBuffer.isEmpty)
+    #expect(testHandler.assembler.assembledSentence.map(\.value) == ["是", "媽"])
+    // 選取來自 n-gram 統計路徑（previous 帶「是」），非自動 override 錨定的 bare unigram。
+    #expect(testHandler.assembler.assembledSentence.last?.gram.previous == "是")
+  }
 }

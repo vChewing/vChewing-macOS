@@ -802,6 +802,12 @@ extension InputHandlerProtocol {
     let appendables = filterPOMAppendables(from: suggestion, rawCandidates: rawCandidates)
     arrResult.append(contentsOf: appendables)
     if apply {
+      // S4（P162）：狂拼 n-gram 來源開啟時，自動套用移交統計路徑（雙重加成收斂）——
+      // contextual 記憶已由 DP 以 n-gram 加分自然選中，不再以 override 錨定；
+      // 唯讀提取（arrResult）仍回傳、供候選窗置頂等消費端使用。
+      if isFuriousTypingModeEffective, prefs.pomAsNGramSourceEnabled {
+        return arrResult.stableSort { $0.1.probability > $1.1.probability }
+      }
       if !suggestion.isEmpty, let newestSuggestedCandidate = suggestion.candidates.last {
         let overrideBehavior: Homa.Node.OverrideType = suggestion.forceHighScoreOverride
           ? .withSpecified
