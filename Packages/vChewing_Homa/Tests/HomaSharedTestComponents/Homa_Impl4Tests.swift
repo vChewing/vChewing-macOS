@@ -131,13 +131,15 @@ public final class TestLM {
       let value = String(components[1])
       guard let probability = Double(components[2].description) else { return }
       let previous = components.count > 3 ? String(components[3]) : nil
+      let anterior = components.count > 4 ? String(components[4]) : nil
       let readings: [String] = valueSegmentationOnly
         ? value.map(\.description)
         : components[0].sliced(by: readingSeparator).map(\.description)
       let entry = SimpleTrie.Entry(
         value: value,
         probability: probability,
-        previous: previous
+        previous: previous,
+        anterior: anterior
       )
       trie.insert(entry: entry, readings: readings)
     }
@@ -170,7 +172,8 @@ public final class TestLM {
       partiallyMatch: partiallyMatch
     ).map {
       Homa.Gram(
-        keyArray: $0.keyArray, current: $0.value, previous: $0.previous, probability: $0.probability
+        keyArray: $0.keyArray, current: $0.value,
+        previous: $0.previous, anterior: $0.anterior, probability: $0.probability
       )
     }
   }
@@ -291,11 +294,13 @@ public final class SimpleTrie {
     public init(
       value: String,
       probability: Double,
-      previous: String?
+      previous: String?,
+      anterior: String? = nil
     ) {
       self.value = value
       self.probability = probability
       self.previous = previous
+      self.anterior = anterior
     }
 
     // MARK: Public
@@ -303,6 +308,7 @@ public final class SimpleTrie {
     public let value: String
     public let probability: Double
     public let previous: String?
+    public let anterior: String?
 
     public func encode(to encoder: any Encoder) throws {
       var container = encoder.singleValueContainer()
@@ -407,13 +413,15 @@ extension SimpleTrie.Entry {
     keyArray: [String],
     value: String,
     probability: Double,
-    previous: String?
+    previous: String?,
+    anterior: String?
   ) {
     (
       keyArray: readings,
       value: value,
       probability: probability,
-      previous: previous
+      previous: previous,
+      anterior: anterior
     )
   }
 
@@ -651,14 +659,14 @@ extension SimpleTrie {
     partiallyMatch: Bool = false,
     partiallyMatchedKeysPostHandler: ((Set<[String]>) -> ())? = nil
   )
-    -> [(keyArray: [String], value: String, probability: Double, previous: String?)] {
+    -> [(keyArray: [String], value: String, probability: Double, previous: String?, anterior: String?)] {
     guard !keys.isEmpty else { return [] }
 
     if !partiallyMatch {
       // 精確比對 - 現在也使用緩存提高效能
       let nodeIDs = getNodeIDs(keysChopped: keys, partiallyMatch: false)
       var processedNodeEntries = [Int: [Entry]]()
-      var results = [(keyArray: [String], value: String, probability: Double, previous: String?)]()
+      var results = [(keyArray: [String], value: String, probability: Double, previous: String?, anterior: String?)]()
 
       for nodeID in nodeIDs {
         guard let node = getNode(nodeID: nodeID) else { continue }
@@ -705,7 +713,7 @@ extension SimpleTrie {
 
       // 使用緩存避免重複查詢
       var processedNodeEntries = [Int: [Entry]]()
-      var results = [(keyArray: [String], value: String, probability: Double, previous: String?)]()
+      var results = [(keyArray: [String], value: String, probability: Double, previous: String?, anterior: String?)]()
 
       // 3. 獲取每個節點的詞條
       for nodeID in nodeIDs {

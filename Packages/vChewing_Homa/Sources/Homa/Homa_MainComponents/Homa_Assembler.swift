@@ -492,7 +492,10 @@ extension Homa {
       if lhs.keyArray != rhs.keyArray {
         return lhs.keyArray.lexicographicallyPrecedes(rhs.keyArray)
       }
-      return (lhs.previous ?? "") < (rhs.previous ?? "")
+      if (lhs.previous ?? "") != (rhs.previous ?? "") {
+        return (lhs.previous ?? "") < (rhs.previous ?? "")
+      }
+      return (lhs.anterior ?? "") < (rhs.anterior ?? "")
     }
 
     private static func makeGramIdentityHash(_ gram: Homa.Gram) -> Int {
@@ -500,6 +503,7 @@ extension Homa {
       hasher.combine(gram.keyArray)
       hasher.combine(gram.current)
       hasher.combine(gram.previous)
+      hasher.combine(gram.anterior)
       return hasher.finalize()
     }
 

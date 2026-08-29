@@ -72,8 +72,16 @@ extension Homa {
 
           // 計算新的權重分數，考慮前一個字詞的影響
           let previousCurrent = parent[i]?.gram?.current ?? ""
+          // 三元圖前驅之二：沿最佳路徑往回看「前驅節點起點」之前的節點值
+          // （與既有 bigram「最佳路徑前驅」近似一致；1D DP 結構零改動）。
+          let anteriorCurrent: String = {
+            guard let parentInfo = parent[i], parentInfo.segLength > 0 else { return "" }
+            let previousStart = i - parentInfo.segLength
+            guard previousStart >= 0 else { return "" }
+            return parent[previousStart]?.gram?.current ?? ""
+          }()
           var nodeCopy = nextNode
-          let newScore = dp[i] + nodeCopy.getScore(previous: previousCurrent)
+          let newScore = dp[i] + nodeCopy.getScore(previous: previousCurrent, anterior: anteriorCurrent)
           visitedNodes.append((i, length, nodeCopy))
 
           // 如果找到更好的路徑，更新 dp 和 parent

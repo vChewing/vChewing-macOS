@@ -80,8 +80,8 @@ extension HomaTestsRoot {
     func testNodeOverrideStatusProperty() {
       let keyArray = ["ㄅ", "ㄧ"]
       let testData = [
-        Homa.GramRAW(keyArray: keyArray, value: "逼", probability: -5.0, previous: nil),
-        Homa.GramRAW(keyArray: keyArray, value: "比", probability: -8.0, previous: nil),
+        Homa.GramRAW(keyArray: keyArray, value: "逼", probability: -5.0, previous: nil, anterior: nil),
+        Homa.GramRAW(keyArray: keyArray, value: "比", probability: -8.0, previous: nil, anterior: nil),
       ]
 
       let grams = testData.map { Homa.Gram($0) }
@@ -134,7 +134,7 @@ extension HomaTestsRoot {
     func testNodeOverrideStatusOverflowProtection() {
       let keyArray = ["ㄅ"]
       let grams = [
-        Homa.GramRAW(keyArray: keyArray, value: "逼", probability: -5.0, previous: nil),
+        Homa.GramRAW(keyArray: keyArray, value: "逼", probability: -5.0, previous: nil, anterior: nil),
       ].map { Homa.Gram($0) }
       var node = Homa.Node(keyArray: keyArray, grams: grams)
 
@@ -156,7 +156,7 @@ extension HomaTestsRoot {
     func testNodeIDUniqueness() {
       let keyArray = ["ㄅ", "ㄧ"]
       let testData = [
-        Homa.GramRAW(keyArray: keyArray, value: "逼", probability: -5.0, previous: nil),
+        Homa.GramRAW(keyArray: keyArray, value: "逼", probability: -5.0, previous: nil, anterior: nil),
       ]
 
       let grams = testData.map { Homa.Gram($0) }

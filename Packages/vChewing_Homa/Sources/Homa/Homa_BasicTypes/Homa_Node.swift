@@ -190,7 +190,7 @@ extension Homa.Node {
     // 單次線性掃描、只取陣列順序上的第一個單元圖機率，不建立任何一次性 filter 陣列。
     var firstUnigramProbability: Double?
     for gram in grams {
-      guard (gram.previous ?? "").isEmpty else { continue }
+      guard (gram.previous ?? "").isEmpty, (gram.anterior ?? "").isEmpty else { continue }
       firstUnigramProbability = gram.probability
       break
     }
@@ -202,55 +202,83 @@ extension Homa.Node {
     }
   }
 
-  /// 給出目前的最高權元圖當中的權重值（包括雙元圖）。該結果可能會受節點覆寫狀態所影響。
-  /// - Remark: 這個函式會根據比對到的前述節點內容，來查詢可能的雙元圖資料。
-  /// 一旦有比對到相符的雙元圖資料，就會比較雙元圖資料的權重與當前節點的權重，並選擇
+  /// 給出目前的最高權元圖當中的權重值（包括雙元圖與三元圖）。該結果可能會受節點覆寫狀態所影響。
+  /// - Remark: 這個函式會根據比對到的前述節點內容，來查詢可能的雙元／三元圖資料。
+  /// 一旦有比對到相符的雙元／三元圖資料，就會比較其權重與當前節點的權重，並選擇
   /// 權重較高的那個、然後**據此視情況自動修改這個節點的覆寫狀態種類**。
-  /// - Parameter previous: 前述節點內容，用以查詢可能的雙元圖資料。
+  /// - Parameters:
+  ///   - previous: 前述節點內容，用以查詢可能的雙元圖資料。
+  ///   - anterior: 前述節點再往前一格的內容，用以查詢可能的三元圖資料（可選）。
   /// - Returns: 權重。
-  internal mutating func getScore(previous: String?) -> Double {
+  internal mutating func getScore(previous: String?, anterior: String? = nil) -> Double {
     guard !grams.isEmpty else { return 0 }
     guard let previous, !previous.isEmpty else { return unigramScore }
-    // 單次線性掃描元圖陣列：同步捕捉「陣列順序上的首個單元圖機率」與「前述內容及當前值
-    // 均相符的最高權重雙元圖」，完全不建立任何一次性 filter 陣列。
-    let currentValue = currentGram?.current
+
+    // 單次線性掃描元圖陣列：同步捕捉「陣列順序上的首個單元圖機率」、「前述內容相符的
+    // 最高權重雙元圖」與「前驅二位相符的最高權重三元圖」。匹配不與 currentGram 綁定
+    // （currentGram 可能因先前未匹配語境而指向 unigram）。
     var firstUnigramProbability: Double?
+    var firstUnigramIndex: Int?
     var bestBigram: Homa.Gram?
-    for gram in grams {
-      if (gram.previous ?? "").isEmpty, firstUnigramProbability == nil {
+    var bestTrigram: Homa.Gram?
+    for (index, gram) in grams.enumerated() {
+      if (gram.previous ?? "").isEmpty, (gram.anterior ?? "").isEmpty, firstUnigramProbability == nil {
         firstUnigramProbability = gram.probability
+        firstUnigramIndex = index
       }
-      guard gram.previous == previous, gram.current == currentValue else { continue }
+      guard gram.previous == previous else { continue }
+      // 三元圖：需 exact 匹配前驅二位（anterior 語境存在時才可比對）。
+      if let anterior, !anterior.isEmpty, gram.anterior == anterior {
+        guard let currentBest = bestTrigram else {
+          bestTrigram = gram
+          continue
+        }
+        if gram.probability > currentBest.probability { bestTrigram = gram }
+        continue
+      }
+      // 雙元圖：僅要求 previous 匹配（anterior 非空的三元圖在此語境下不可用）。
+      guard (gram.anterior ?? "").isEmpty else { continue }
       guard let currentBest = bestBigram else {
         bestBigram = gram
         continue
       }
       if gram.probability > currentBest.probability { bestBigram = gram }
     }
-    // 套用與先前完全一致的覆寫邏輯。
-    let currentScore: Double
-    if let firstUnigramProbability {
-      switch currentOverrideType {
-      case .withSpecified: currentScore = overridingScore
-      case .withTopGramScore: currentScore = firstUnigramProbability
-      default: currentScore = currentGram?.probability ?? firstUnigramProbability
-      }
-    } else {
-      currentScore = 0
+    // 依序取「三元圖 → 雙元圖」中權重最高者作為加分項。
+    var bestBonus: Homa.Gram?
+    if let bestTrigram { bestBonus = bestTrigram }
+    if let bestBigram, bestBonus == nil || bestBigram.probability > (bestBonus?.probability ?? 0) {
+      bestBonus = bestBigram
     }
-    guard let bestBigram else { return currentScore }
-    let bigramScore = bestBigram.probability
-    guard bigramScore > currentScore else { return currentScore }
-    do {
-      try selectOverrideGram(
-        keyArray: bestBigram.keyArray,
-        value: bestBigram.current,
-        previous: bestBigram.previous,
-        type: .withTopGramScore
-      )
-      return bigramScore
-    } catch {
-      return currentScore
+    let unigramBaseline = firstUnigramProbability ?? 0
+    switch currentOverrideType {
+    case .withSpecified:
+      return overridingScore
+    case .withTopGramScore:
+      // 弱釘選語義（與既有行為一致）：維持既有選取（currentGramIndex 不動）、
+      // 以 unigram 基線計分——`withTopGramScore` 只釘「選取了哪個 gram」、不釘分數。
+      return unigramBaseline
+    default:
+      // 有匹配加分且高於 unigram 基線 → 選中 bonus gram；否則將選取指向最佳單元圖
+      // （未匹配語境的 top bigram／trigram 不應留駐輸出）。
+      if let bestBonus, bestBonus.probability > unigramBaseline {
+        do {
+          try selectOverrideGram(
+            keyArray: bestBonus.keyArray,
+            value: bestBonus.current,
+            previous: bestBonus.previous,
+            anterior: bestBonus.anterior,
+            type: .withTopGramScore
+          )
+          return bestBonus.probability
+        } catch {
+          // 覆寫失敗：退回 unigram 基線。
+        }
+      }
+      if let firstUnigramIndex {
+        currentGramIndex = firstUnigramIndex
+      }
+      return unigramBaseline
     }
   }
 
@@ -279,6 +307,7 @@ extension Homa.Node {
   ///   - keyArray: 給定索引鍵陣列。
   ///   - value: 給定的元圖資料值。
   ///   - previous: 前述資料。
+  ///   - anterior: 前述資料再往前一格（三元圖用，可選）。
   ///   - type: 覆寫行為種類。
   /// - Returns: 複寫成功的 Gram。
   @discardableResult
@@ -286,6 +315,7 @@ extension Homa.Node {
     keyArray: [String]?,
     value: String,
     previous: String? = nil,
+    anterior: String? = nil,
     type: Homa.Node.OverrideType
   ) throws
     -> Homa.Gram {
@@ -293,6 +323,7 @@ extension Homa.Node {
       if let keyArray, keyArray != gram.keyArray { continue }
       if value != gram.current { continue }
       if let previous, !previous.isEmpty, previous != gram.previous { continue }
+      if let anterior, !anterior.isEmpty, anterior != gram.anterior { continue }
       currentGramIndex = i
       currentOverrideType = type
       if overridingScore < 114_514 {

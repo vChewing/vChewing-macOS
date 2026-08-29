@@ -13,6 +13,7 @@ extension Homa {
     keyArray: [String],
     value: String,
     probability: Double,
-    previous: String?
+    previous: String?,
+    anterior: String?
   )
 }

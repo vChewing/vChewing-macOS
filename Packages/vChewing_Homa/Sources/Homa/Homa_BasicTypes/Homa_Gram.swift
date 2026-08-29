@@ -5,8 +5,8 @@
 // MARK: - Homa.Gram
 
 extension Homa {
-  /// 進階組字引擎專屬的語法單位類型，支援單元語法與雙元語法結構。
-  /// - Remark: 進階組字引擎所運用的雙元語法資料 `previous` 不包含讀音資訊。
+  /// 進階組字引擎專屬的語法單位類型，支援單元語法、雙元語法與三元語法結構。
+  /// - Remark: 進階組字引擎所運用的雙元／三元語法資料 `previous`／`anterior` 不包含讀音資訊。
   public struct Gram: Codable, CustomStringConvertible, Equatable, Sendable, Hashable {
     // MARK: Lifecycle
 
@@ -19,6 +19,11 @@ extension Homa {
       } else {
         self.previous = nil
       }
+      if let anterior = rawTuple.anterior, !anterior.isEmpty {
+        self.anterior = anterior
+      } else {
+        self.anterior = nil
+      }
       self.probability = rawTuple.probability
       self.backoff = backoff
     }
@@ -27,6 +32,7 @@ extension Homa {
       keyArray: [String],
       current: String,
       previous: String? = nil,
+      anterior: String? = nil,
       probability: Double = 0,
       backoff: Double = 0,
       id: FIUUID = .init()
@@ -38,6 +44,11 @@ extension Homa {
       } else {
         self.previous = nil
       }
+      if let anterior, !anterior.isEmpty {
+        self.anterior = anterior
+      } else {
+        self.anterior = nil
+      }
       self.current = current
       self.probability = probability
       self.backoff = backoff
@@ -48,6 +59,7 @@ extension Homa {
       self.keyArray = try container.decode([String].self, forKey: .keyArray)
       self.current = try container.decode(String.self, forKey: .current)
       self.previous = try container.decodeIfPresent(String.self, forKey: .previous)
+      self.anterior = try container.decodeIfPresent(String.self, forKey: .anterior)
       self.probability = try container.decode(Double.self, forKey: .probability)
       self.backoff = try container.decode(Double.self, forKey: .backoff)
       self.id = .init()
@@ -60,10 +72,11 @@ extension Homa {
     public let keyArray: [String]
     public let current: String
     public let previous: String?
+    public let anterior: String?
     public let probability: Double
     public let backoff: Double // 最大單元圖機率
 
-    public var isUnigram: Bool { previous == nil }
+    public var isUnigram: Bool { previous == nil && anterior == nil }
 
     public var description: String {
       describe(keySeparator: "-")
@@ -73,6 +86,9 @@ extension Homa {
       guard let previous else {
         return "P(\(current))=\(probability), BOW('\(current)')=\(backoff)" // 單元圖
       }
+      if let anterior {
+        return "P(\(current)|\(previous),\(anterior))=\(probability)" // 三元圖
+      }
       return "P(\(current)|\(previous))=\(probability)" // 雙元圖
     }
 
@@ -81,7 +97,8 @@ extension Homa {
         keyArray: keyArray,
         value: current,
         probability: probability,
-        previous: previous
+        previous: previous,
+        anterior: anterior
       )
     }
 
@@ -99,6 +116,7 @@ extension Homa {
       lhs.keyArray == rhs.keyArray &&
         lhs.current == rhs.current &&
         lhs.previous == rhs.previous &&
+        lhs.anterior == rhs.anterior &&
         lhs.probability == rhs.probability &&
         lhs.backoff == rhs.backoff
     }
@@ -113,13 +131,14 @@ extension Homa {
         keyArray: keyArray,
         current: current,
         previous: previous,
+        anterior: anterior,
         probability: probability,
         backoff: backoff
       )
     }
 
     public func describe(keySeparator: String) -> String {
-      let header = "[\(isUnigram ? "Unigram" : "Bigram")]"
+      let header = "[\(isUnigram ? "Unigram" : (anterior != nil ? "Trigram" : "Bigram"))]"
       let body = "'\(keyArray.joined(separator: keySeparator))', \(descriptionSansReading)"
       return "\(header) \(body)"
     }
@@ -130,6 +149,7 @@ extension Homa {
       hasher.combine(keyArray)
       hasher.combine(current)
       hasher.combine(previous)
+      hasher.combine(anterior)
       hasher.combine(probability)
       hasher.combine(backoff)
     }
@@ -139,6 +159,7 @@ extension Homa {
       try container.encode(keyArray, forKey: .keyArray)
       try container.encode(current, forKey: .current)
       try container.encodeIfPresent(previous, forKey: .previous)
+      try container.encodeIfPresent(anterior, forKey: .anterior)
       try container.encode(probability, forKey: .probability)
       try container.encode(backoff, forKey: .backoff)
     }
@@ -149,6 +170,7 @@ extension Homa {
       case keyArray = "keys"
       case current = "curr"
       case previous = "prev"
+      case anterior = "ante"
       case probability = "prob"
       case backoff = "bkof"
     }

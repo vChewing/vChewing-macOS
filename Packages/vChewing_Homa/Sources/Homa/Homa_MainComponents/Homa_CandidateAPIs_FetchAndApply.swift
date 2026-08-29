@@ -37,7 +37,7 @@ extension Homa.Assembler {
     anchors.forEach { theAnchor in
       let theNode = theAnchor.node
       theNode.grams.forEach { gram in
-        guard gram.previous == nil else { return } // 不要讓雙元圖的結果出現在選字窗內。
+        guard gram.previous == nil, gram.anterior == nil else { return } // 不要讓雙元圖/三元圖的結果出現在選字窗內。
         switch filter {
         case .all:
           // 得加上這道篩選，不然會出現很多無效結果。
