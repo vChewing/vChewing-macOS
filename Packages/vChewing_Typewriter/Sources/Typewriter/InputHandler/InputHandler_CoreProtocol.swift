@@ -789,10 +789,12 @@ extension InputHandlerProtocol {
     /// 如果這個開關沒打開的話，直接放棄執行這個函式。
     if !prefs.fetchSuggestionsFromPerceptionOverrideModel { return arrResult }
     /// 獲取來自漸退記憶模組的建議結果
+    /// 狂拼模式下以容錯查詢（逐段去聲調等值）取回記憶，使聲調桶／無調形代表鍵不致落空。
     let suggestion = currentLM.fetchPOMSuggestion(
       assembledResult: assembler.assembledSentence,
       cursor: actualNodeCursorPosition,
-      timestamp: Date().timeIntervalSince1970
+      timestamp: Date().timeIntervalSince1970,
+      matchMode: isFuriousTypingModeEffective ? .toneInsensitivePrefix : .exact
     )
     // 以組字器實際返回的候選字詞權重來過濾 POM 建議：
     // 若建議的分數比當前候選的最高權重還低，則忽略以避免覆寫。

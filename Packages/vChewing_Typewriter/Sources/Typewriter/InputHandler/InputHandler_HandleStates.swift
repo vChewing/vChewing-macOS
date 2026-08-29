@@ -155,6 +155,28 @@ extension InputHandlerProtocol {
     let bucket = furiousContext.bucket
     var seenValues = Set<String>()
     var result: [CandidateInState] = []
+    // T1：copilot 窗置頂 POM 建議——以組字器副本＋虛擬尾段做唯讀查詢（不套用、不寫記憶），
+    // 狂拼容錯模式（逐段去聲調等值）取回記憶，使聲調桶／無調形代表鍵不致落空；
+    // 依分數降冪、按 value 去重置頂。
+    if prefs.fetchSuggestionsFromPerceptionOverrideModel {
+      let copilot = assembler.copy
+      if (try? copilot.insertKeys([.multipleKeys(bucket)])) != nil {
+        let suggestion = currentLM.fetchPOMSuggestion(
+          assembledResult: copilot.assembledSentence,
+          cursor: copilot.length - 1,
+          timestamp: Date().timeIntervalSince1970,
+          matchMode: .toneInsensitivePrefix
+        )
+        let pomCandidates = suggestion.candidates
+          .sorted { $0.probability > $1.probability }
+          .map { (keyArray: $0.keyArray, value: $0.value) }
+        for candidate in pomCandidates {
+          guard !candidate.value.isEmpty else { continue }
+          guard seenValues.insert(candidate.value).inserted else { continue }
+          result.append(candidate)
+        }
+      }
+    }
     // 置頂候選：有橫跨節點時用完整詞音配對（最佳猜測含邊界文脈）；否則用前方預覽值。
     if let crossingPair = furiousContext.crossingPair {
       result.append(crossingPair)

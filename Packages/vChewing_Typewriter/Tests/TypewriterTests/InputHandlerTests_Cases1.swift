@@ -3675,4 +3675,104 @@ extension InputHandlerTests {
     #expect(testHandler.furiousTrail.isEmpty) // 簡拼前綴非完整音節：trail 失效。
     #expect(testSession.state.type == .ofInputting)
   }
+
+  /// 狂拼 copilot 窗置頂 POM 建議（T1）：以組字器副本＋虛擬尾段做唯讀查詢，
+  /// 容錯模式（逐段去聲調等值）召回記憶——聲調桶代表鍵（無調形）不致落空；
+  /// 記憶詞（媽）置頂於語言模型最佳猜測（嗎）之上。
+  @Test
+  func test_IH135_FuriousTypingCopilotWindowFrontsPOMSuggestion() throws {
+    guard let testHandler, let testSession else {
+      Issue.record("testHandler and testSession at least one of them is nil.")
+      return
+    }
+    clearTestPOM()
+
+    defer {
+      testHandler.currentLM.clearTemporaryData(isFiltering: false)
+      testHandler.prefs.furiousTypingEnabled = false
+      testHandler.prefs.keyboardParser = KeyboardParser.ofStandard.rawValue
+      testHandler.ensureKeyboardParser()
+      testHandler.prefs.fetchSuggestionsFromPerceptionOverrideModel = true
+      testSession.resetInputHandler(forceComposerCleanup: true)
+    }
+
+    // 語料：ㄕˋ→是（主段）、ㄇㄚ 桶→媽(-8)／麻(-8)／嗎(-2，LM 最佳猜測)。
+    [
+      .init(keyArray: ["ㄕˋ"], value: "是", score: -6),
+      .init(keyArray: ["ㄇㄚ"], value: "媽", score: -8),
+      .init(keyArray: ["ㄇㄚˊ"], value: "麻", score: -8),
+      .init(keyArray: ["ㄇㄚ˙"], value: "嗎", score: -2),
+    ].forEach {
+      testHandler.currentLM.insertTemporaryData(unigram: $0, isFiltering: false)
+    }
+    testSession.resetInputHandler(forceComposerCleanup: true)
+    testHandler.prefs.keyboardParser = KeyboardParser.ofHanyuPinyin.rawValue
+    testHandler.ensureKeyboardParser()
+    testHandler.prefs.fetchSuggestionsFromPerceptionOverrideModel = true
+    testHandler.prefs.furiousTypingEnabled = true
+    testHandler.currentLM.syncPrefs()
+
+    // 記憶「是」之後的前方為「媽」（無調形 head；語境鍵 (ㄕˋ,是)）。
+    testHandler.currentLM.memorizePerception(
+      (ngramKey: "(ㄕˋ,是)&(ㄇㄚ,媽)", candidate: "媽"),
+      timestamp: Date().timeIntervalSince1970
+    )
+
+    // 「shima」：auto-chop 提交「是」（ㄕˋ），注拼槽暫存 ma。
+    typeSentence("shima")
+    #expect(testHandler.composer.romajiBuffer == "ma")
+
+    // copilot 窗候選：POM 記憶（媽）置頂於 LM 最佳猜測（嗎）之上。
+    let candidates = testHandler.furiousTypingFrontCandidates
+    #expect(!(candidates?.isEmpty ?? true))
+    #expect(candidates?.first?.value == "媽")
+  }
+
+  /// 狂拼固化後 POM 建議套用（容錯模式）：空格固化前方聲調桶後，
+  /// `retrievePOMSuggestions(apply: true)` 以容錯查詢召回記憶並就地覆寫——組句結果
+  /// 由「是嗎」改為記憶的「是媽」。
+  @Test
+  func test_IH136_FuriousTypingSolidifyAppliesPOMSuggestionTolerantly() throws {
+    guard let testHandler, let testSession else {
+      Issue.record("testHandler and testSession at least one of them is nil.")
+      return
+    }
+    clearTestPOM()
+
+    defer {
+      testHandler.currentLM.clearTemporaryData(isFiltering: false)
+      testHandler.prefs.furiousTypingEnabled = false
+      testHandler.prefs.keyboardParser = KeyboardParser.ofStandard.rawValue
+      testHandler.ensureKeyboardParser()
+      testHandler.prefs.fetchSuggestionsFromPerceptionOverrideModel = true
+      testSession.resetInputHandler(forceComposerCleanup: true)
+    }
+
+    [
+      .init(keyArray: ["ㄕˋ"], value: "是", score: -6),
+      .init(keyArray: ["ㄇㄚ"], value: "媽", score: -8),
+      .init(keyArray: ["ㄇㄚˊ"], value: "麻", score: -8),
+      .init(keyArray: ["ㄇㄚ˙"], value: "嗎", score: -2),
+    ].forEach {
+      testHandler.currentLM.insertTemporaryData(unigram: $0, isFiltering: false)
+    }
+    testSession.resetInputHandler(forceComposerCleanup: true)
+    testHandler.prefs.keyboardParser = KeyboardParser.ofHanyuPinyin.rawValue
+    testHandler.ensureKeyboardParser()
+    testHandler.prefs.fetchSuggestionsFromPerceptionOverrideModel = true
+    testHandler.prefs.furiousTypingEnabled = true
+    testHandler.currentLM.syncPrefs()
+
+    testHandler.currentLM.memorizePerception(
+      (ngramKey: "(ㄕˋ,是)&(ㄇㄚ,媽)", candidate: "媽"),
+      timestamp: Date().timeIntervalSince1970
+    )
+
+    // 「shima」→ 空格：前方固化（插聲調桶）＋ POM 容錯套用（是嗎 → 是媽）。
+    typeSentence("shima")
+    _ = testHandler.triageInput(event: KBEvent.KeyEventData(chars: " ", keyCode: 49).asEvent)
+
+    #expect(testHandler.composer.romajiBuffer.isEmpty)
+    #expect(testHandler.assembler.assembledSentence.map(\.value) == ["是", "媽"])
+  }
 }
