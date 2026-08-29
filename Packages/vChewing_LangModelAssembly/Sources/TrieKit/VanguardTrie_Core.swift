@@ -146,12 +146,14 @@ public enum VanguardTrie {
         value: String,
         typeID: EntryType,
         probability: Double,
-        previous: String?
+        previous: String?,
+        anterior: String? = nil
       ) {
         self.value = value
         self.typeID = typeID
         self.probability = probability
         self.previous = previous
+        self.anterior = anterior
       }
 
       public init(from decoder: any Decoder, readingKey: String) throws {
@@ -165,6 +167,7 @@ public enum VanguardTrie {
         self.typeID = decoded.type
         self.probability = decoded.probability
         self.previous = decoded.previous
+        self.anterior = nil // 序列化（legacy）路徑不承載 anterior。
       }
 
       public init(from decoder: any Decoder) throws {
@@ -178,6 +181,7 @@ public enum VanguardTrie {
         self.typeID = decoded.type
         self.probability = decoded.probability
         self.previous = decoded.previous
+        self.anterior = nil // 序列化（legacy）路徑不承載 anterior。
       }
 
       // MARK: Public
@@ -186,6 +190,7 @@ public enum VanguardTrie {
       public let typeID: EntryType
       public let probability: Double
       public let previous: String?
+      public let anterior: String?
 
       public func encode(to encoder: any Encoder) throws {
         var container = encoder.singleValueContainer()

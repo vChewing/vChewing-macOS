@@ -168,7 +168,7 @@ extension VanguardTrie {
         var groupedByType: [Int32: [String]] = [:]
         for entry in node.entries where entry.typeID != revLookupEntryType {
           if let defaultProb = defaultProbs[entry.typeID.rawValue],
-             entry.probability == defaultProb, entry.previous == nil {
+             entry.probability == defaultProb, entry.previous == nil, entry.anterior == nil {
             groupedByType[entry.typeID.rawValue, default: []].append(entry.value)
           } else {
             var parts = [String]()
@@ -177,6 +177,9 @@ extension VanguardTrie {
             parts.append(entry.typeID.rawValue.description)
             if let previous = entry.previous {
               parts.append(previous)
+            }
+            if let anterior = entry.anterior {
+              parts.append(anterior)
             }
             valueLines.append(parts.joined(separator: "\t"))
           }
@@ -286,7 +289,7 @@ extension VanguardTrie {
       isTyping: Bool,
       defaultProbs: [Int32: Double]
     )
-      -> [(value: String, typeID: Trie.EntryType, probability: Double, previous: String?)] {
+      -> [(value: String, typeID: Trie.EntryType, probability: Double, previous: String?, anterior: String?)] {
       guard !line.isEmpty else { return [] }
       let parts = line.split(separator: "\t", omittingEmptySubsequences: false)
 
@@ -297,39 +300,40 @@ extension VanguardTrie {
               let probability = defaultProbs[typeIDRaw] else { return [] }
         let typeID = Trie.EntryType(rawValue: typeIDRaw)
         return decodeGroupedValues(String(parts[1])).map { value in
-          (value, typeID, probability, nil)
+          (value, typeID, probability, nil, nil)
         }
       }
 
       // 型別 B：`@probability\tchsCell\tchtCell`（TYPING 專用）。
       if isTyping, parts.count >= 3, let prob = parseTypingGroupedProbability(String(parts[0])) {
-        var results: [(String, Trie.EntryType, Double, String?)] = []
+        var results: [(String, Trie.EntryType, Double, String?, String?)] = []
         for val in decodeGroupedValues(String(parts[1])) where !val.isEmpty {
-          results.append((val, .init(rawValue: 5), prob, nil))
+          results.append((val, .init(rawValue: 5), prob, nil, nil))
         }
         for val in decodeGroupedValues(String(parts[2])) where !val.isEmpty {
-          results.append((val, .init(rawValue: 6), prob, nil))
+          results.append((val, .init(rawValue: 6), prob, nil, nil))
         }
         return results
       }
 
-      // 型別 C：`value\tprobability\ttypeID[\tprevious]`。
+      // 型別 C：`value\tprobability\ttypeID[\tprevious][\tanterior]`。
       if parts.count >= 3,
          let probability = Double(parts[1]),
          let typeIDRaw = Int32(parts[2]) {
         let value = String(parts[0])
         let previous: String? = parts.count >= 4 && !parts[3].isEmpty ? String(parts[3]) : nil
-        return [(value, Trie.EntryType(rawValue: typeIDRaw), probability, previous)]
+        let anterior: String? = parts.count >= 5 && !parts[4].isEmpty ? String(parts[4]) : nil
+        return [(value, Trie.EntryType(rawValue: typeIDRaw), probability, previous, anterior)]
       }
 
       // 舊四欄 CHS/CHT 合併格式（相容路徑）。
       if isTyping, parts.count >= 4 {
-        var results: [(String, Trie.EntryType, Double, String?)] = []
+        var results: [(String, Trie.EntryType, Double, String?, String?)] = []
         if !parts[0].isEmpty, let prob = Double(parts[1]) {
-          results.append((String(parts[0]), .init(rawValue: 5), prob, nil))
+          results.append((String(parts[0]), .init(rawValue: 5), prob, nil, nil))
         }
         if !parts[2].isEmpty, let prob = Double(parts[3]) {
-          results.append((String(parts[2]), .init(rawValue: 6), prob, nil))
+          results.append((String(parts[2]), .init(rawValue: 6), prob, nil, nil))
         }
         return results
       }
@@ -337,12 +341,12 @@ extension VanguardTrie {
       // 舊 bare numeric grouped line（相容路徑）。
       if isTyping, parts.count >= 3, isLegacyTypingGroupedLine(parts),
          let prob = Double(parts[0]) {
-        var results: [(String, Trie.EntryType, Double, String?)] = []
+        var results: [(String, Trie.EntryType, Double, String?, String?)] = []
         for val in decodeGroupedValues(String(parts[1])) where !val.isEmpty {
-          results.append((val, .init(rawValue: 5), prob, nil))
+          results.append((val, .init(rawValue: 5), prob, nil, nil))
         }
         for val in decodeGroupedValues(String(parts[2])) where !val.isEmpty {
-          results.append((val, .init(rawValue: 6), prob, nil))
+          results.append((val, .init(rawValue: 6), prob, nil, nil))
         }
         return results
       }
@@ -602,7 +606,8 @@ extension VanguardTrie {
               value: p.value,
               typeID: p.typeID,
               probability: p.probability,
-              previous: p.previous
+              previous: p.previous,
+              anterior: p.anterior
             )
             trie.insert(entry: entry, readings: readingArray)
           }

@@ -244,7 +244,7 @@ extension VanguardTrieProtocol {
     partiallyMatch: Bool = false,
     partiallyMatchedKeysPostHandler: ((Set<[String]>) -> ())? = nil
   )
-    -> [(keyArray: [String], value: String, probability: Double, previous: String?)] {
+    -> [(keyArray: [String], value: String, probability: Double, previous: String?, anterior: String?)] {
     guard !keys.isEmpty, keys.allSatisfy({ !$0.isEmpty }) else { return [] }
     let fetchedGroups = if !partiallyMatch {
       getEntryGroups(
@@ -260,7 +260,7 @@ extension VanguardTrieProtocol {
         partiallyMatch: partiallyMatch
       )
     }
-    var results = [(keyArray: [String], value: String, probability: Double, previous: String?)]()
+    var results = [(keyArray: [String], value: String, probability: Double, previous: String?, anterior: String?)]()
     fetchedGroups.forEach { currentGroup in
       currentGroup.entries.forEach { currentEntry in
         results.append(
@@ -268,7 +268,8 @@ extension VanguardTrieProtocol {
             currentGroup.keyArray,
             currentEntry.value,
             currentEntry.probability,
-            currentEntry.previous
+            currentEntry.previous,
+            currentEntry.anterior
           )
         )
       }
@@ -288,7 +289,7 @@ extension VanguardTrieProtocol {
     anterior anteriorValue: String? = nil,
     filterType: VanguardTrie.Trie.EntryType
   )
-    -> [(keyArray: [String], value: String, probability: Double, previous: String?)]? {
+    -> [(keyArray: [String], value: String, probability: Double, previous: String?, anterior: String?)]? {
     let keys = previous.keyArray
     guard !keys.isEmpty, keys.allSatisfy({ !$0.isEmpty }) else { return nil }
     guard !previous.value.isEmpty else { return nil }
@@ -302,7 +303,7 @@ extension VanguardTrieProtocol {
     )
     guard !groups.isEmpty else { return nil }
     var resultsMap = [
-      Int: (keyArray: [String], value: String, probability: Double, previous: String?, seq: Int)
+      Int: (keyArray: [String], value: String, probability: Double, previous: String?, anterior: String?, seq: Int)
     ]()
     groups.forEach { currentGroup in
       currentGroup.entries.forEach { entry in
@@ -322,6 +323,7 @@ extension VanguardTrieProtocol {
           value: entry.value,
           probability: entry.probability,
           previous: entry.previous,
+          anterior: entry.anterior,
           seq: resultsMap.count
         )
         let theHash: Int = {
@@ -329,6 +331,7 @@ extension VanguardTrieProtocol {
           hasher.combine(newResult.keyArray)
           hasher.combine(newResult.value)
           hasher.combine(newResult.previous)
+          hasher.combine(newResult.anterior)
           return hasher.finalize()
         }()
         if let existingValue = resultsMap[theHash] {
@@ -341,17 +344,18 @@ extension VanguardTrieProtocol {
       }
     }
     guard !resultsMap.isEmpty else { return nil }
-    var final = [(keyArray: [String], value: String, probability: Double, previous: String?)]()
+    var final = [(keyArray: [String], value: String, probability: Double, previous: String?, anterior: String?)]()
     final = resultsMap.values.sorted {
-      ($0.keyArray.count, $0.probability, $1.seq, $0.previous?.count ?? 0) > (
-        $1.keyArray.count, $1.probability, $0.seq, $1.previous?.count ?? 0
+      ($0.keyArray.count, $0.probability, $1.seq, $0.previous?.count ?? 0, $0.anterior?.count ?? 0) > (
+        $1.keyArray.count, $1.probability, $0.seq, $1.previous?.count ?? 0, $1.anterior?.count ?? 0
       )
     }.map {
       (
         keyArray: $0.keyArray,
         value: $0.value,
         probability: $0.probability,
-        previous: $0.previous
+        previous: $0.previous,
+        anterior: $0.anterior
       )
     }
     guard !final.isEmpty else { return nil }

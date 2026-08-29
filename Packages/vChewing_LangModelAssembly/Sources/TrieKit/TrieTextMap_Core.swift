@@ -954,7 +954,8 @@ extension VanguardTrie.TextMapTrie {
           value: $0.value,
           typeID: $0.typeID,
           probability: $0.probability,
-          previous: $0.previous
+          previous: $0.previous,
+          anterior: $0.anterior
         )
       })
     }
