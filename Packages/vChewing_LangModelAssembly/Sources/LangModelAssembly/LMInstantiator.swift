@@ -62,6 +62,9 @@ extension LMAssembly {
       /// - 「倚天傳統注音鍵盤佈局」是電腦鍵盤上的按鍵與注音符號的映射。「倚天26」也是這種映射。這些都是與 Tekkon Composer 有關的內容。
       public var alwaysSupplyETenDOSUnigrams = true
 
+      /// 是否將漸退記憶（POM）同時作為組字引擎的 bigram 統計來源。
+      public var pomAsNGramSourceEnabled = false
+
       public var partialMatchEnabled = false
       public var filterNonCNSReadings = false
       public var filterFactoryKanjisOfNonCurrentInputMode = false
@@ -255,6 +258,7 @@ extension LMAssembly {
       config.deltaOfCalendarYears = prefs.deltaOfCalendarYears
       config.allowRescoringSingleKanjiCandidates = prefs.allowRescoringSingleKanjiCandidates
       config.alwaysSupplyETenDOSUnigrams = prefs.enforceETenDOSCandidateSequence || prefs.useSCPCTypingMode
+      config.pomAsNGramSourceEnabled = prefs.pomAsNGramSourceEnabled
       config.bypassUserPhrasesData = prefs.userPhrasesDatabaseBypassed
       config.suppressFactoryUnigramsOfKanaSyllables = prefs.suppressFactoryUnigramsOfKanaSyllables
     }
@@ -673,6 +677,7 @@ extension LMAssembly {
       var hasher = Hasher()
       hasher.combine(config)
       hasher.combine(Self.mtxFactoryGeneration.value)
+      hasher.combine(Self.mtxPOMGeneration.value)
       let fingerprint = hasher.finalize()
       if fingerprint != unigramCacheFingerprint {
         unigramLRUCache.removeAll(keepingCapacity: true)
@@ -876,6 +881,20 @@ extension LMAssembly {
         )
       rawAllUnigrams.consolidate(filter: dataAsFilter)
       rawAllUnigrams.sort { $0.probability > $1.probability }
+      // S2（P160）：POM 記憶作為 bigram 統計來源——附加於 unigram 之後、不經 consolidate
+      // （避免與同名 unigram 去重互擾）；previous 非空故選字窗排除機制自動隔離、僅影響路徑選取。
+      if config.pomAsNGramSourceEnabled {
+        let pomGrams = lxPerceptor.perceptionsFor(
+          headReading: keyChain, timestamp: Date().timeIntervalSince1970
+        ).map { pom in
+          Homa.Gram(
+            keyArray: pom.headReading.split(separator: "-").map(String.init),
+            current: pom.candidate,
+            previous: pom.previous, probability: pom.probability
+          )
+        }
+        rawAllUnigrams.append(contentsOf: pomGrams)
+      }
       // Store in LRU cache with size limit
       unigramLRUCache[cacheKey] = rawAllUnigrams
       if unigramLRUCache.count > 1_024 {
@@ -905,6 +924,10 @@ extension LMAssembly {
     /// 原廠辭典世代計數器：每次原廠辭典被重新載入或解除安裝時遞增。
     /// 供 `unigramsFor` 的 LRU cache fingerprint 使用，確保切換原廠辭典後舊快取自動失效。
     nonisolated static let mtxFactoryGeneration: NSMutex<Int> = .init(0)
+
+    /// 漸退記憶（POM）世代計數器：每次記憶內容變更（記憶／清除／漂白／載入）時遞增。
+    /// 供 `unigramsFor` 的 LRU cache fingerprint 使用，確保 POM 更新後查詢即反映新記憶。
+    nonisolated static let mtxPOMGeneration: NSMutex<Int> = .init(0)
 
     nonisolated static var factoryTrie: VanguardTrie.TextMapTrie? {
       get {
@@ -1111,6 +1134,7 @@ extension LMAssembly {
       var hasher = Hasher()
       hasher.combine(config)
       hasher.combine(Self.mtxFactoryGeneration.value)
+      hasher.combine(Self.mtxPOMGeneration.value)
       let fingerprint = hasher.finalize()
       if fingerprint != unigramCacheFingerprint {
         unigramLRUCache.removeAll(keepingCapacity: true)
@@ -1308,6 +1332,19 @@ extension LMAssembly {
         )
       rawAllUnigrams.consolidate(filter: dataAsFilter)
       rawAllUnigrams.sort { $0.probability > $1.probability }
+      // S2（P160）：POM 記憶作為 bigram 統計來源——同 fast path，附加於 unigram 之後、不經 consolidate。
+      if config.pomAsNGramSourceEnabled {
+        let pomGrams = lxPerceptor.perceptionsFor(
+          headReading: keyChain, timestamp: Date().timeIntervalSince1970
+        ).map { pom in
+          Homa.Gram(
+            keyArray: pom.headReading.split(separator: "-").map(String.init),
+            current: pom.candidate,
+            previous: pom.previous, probability: pom.probability
+          )
+        }
+        rawAllUnigrams.append(contentsOf: pomGrams)
+      }
       unigramLRUCache[cacheKey] = rawAllUnigrams
       if unigramLRUCache.count > 1_024 {
         let half = unigramLRUCache.count / 2

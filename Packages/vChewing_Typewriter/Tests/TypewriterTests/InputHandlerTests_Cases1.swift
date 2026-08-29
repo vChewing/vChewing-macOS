@@ -3775,4 +3775,54 @@ extension InputHandlerTests {
     #expect(testHandler.composer.romajiBuffer.isEmpty)
     #expect(testHandler.assembler.assembledSentence.map(\.value) == ["是", "媽"])
   }
+
+  /// 狂拼 n-gram 來源（S2）：POM 記憶作為 bigram 統計來源時，即使關閉 POM 建議套用
+  /// （fetchSuggestionsFromPerceptionOverrideModel = false），組句路徑亦自然選中記憶詞
+  /// （是媽）而非語言模型最佳猜測（是嗎）——純統計路徑、無 override 介入。
+  @Test
+  func test_IH137_FuriousTypingNGramSourceGuidesPathSelection() throws {
+    guard let testHandler, let testSession else {
+      Issue.record("testHandler and testSession at least one of them is nil.")
+      return
+    }
+    clearTestPOM()
+
+    defer {
+      testHandler.currentLM.clearTemporaryData(isFiltering: false)
+      testHandler.prefs.furiousTypingEnabled = false
+      testHandler.prefs.pomAsNGramSourceEnabled = false
+      testHandler.prefs.keyboardParser = KeyboardParser.ofStandard.rawValue
+      testHandler.ensureKeyboardParser()
+      testHandler.prefs.fetchSuggestionsFromPerceptionOverrideModel = true
+      testSession.resetInputHandler(forceComposerCleanup: true)
+    }
+
+    [
+      .init(keyArray: ["ㄕˋ"], value: "是", score: -6),
+      .init(keyArray: ["ㄇㄚ"], value: "媽", score: -8),
+      .init(keyArray: ["ㄇㄚˊ"], value: "麻", score: -8),
+      .init(keyArray: ["ㄇㄚ˙"], value: "嗎", score: -2),
+    ].forEach {
+      testHandler.currentLM.insertTemporaryData(unigram: $0, isFiltering: false)
+    }
+    testSession.resetInputHandler(forceComposerCleanup: true)
+    testHandler.prefs.keyboardParser = KeyboardParser.ofHanyuPinyin.rawValue
+    testHandler.ensureKeyboardParser()
+    testHandler.prefs.fetchSuggestionsFromPerceptionOverrideModel = false // 關閉 POM 建議套用。
+    testHandler.prefs.pomAsNGramSourceEnabled = true // 僅 n-gram 統計來源。
+    testHandler.prefs.furiousTypingEnabled = true
+    testHandler.currentLM.syncPrefs()
+
+    testHandler.currentLM.memorizePerception(
+      (ngramKey: "(ㄕˋ,是)&(ㄇㄚ,媽)", candidate: "媽"),
+      timestamp: Date().timeIntervalSince1970
+    )
+
+    // 「shima」→ 空格固化前方：ㄇㄚ 桶查詢注入 POM bigram（previous=是），DP 自然選中「媽」。
+    typeSentence("shima")
+    _ = testHandler.triageInput(event: KBEvent.KeyEventData(chars: " ", keyCode: 49).asEvent)
+
+    #expect(testHandler.composer.romajiBuffer.isEmpty)
+    #expect(testHandler.assembler.assembledSentence.map(\.value) == ["是", "媽"])
+  }
 }

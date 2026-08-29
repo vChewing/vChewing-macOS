@@ -341,6 +341,9 @@ public final class PrefMgr: PrefMgrProtocol, Sendable {
   @AppProperty(userDef: .kFuriousTypingEnabled)
   public var furiousTypingEnabled: Bool
 
+  @AppProperty(userDef: .kPOMAsNGramSourceEnabled)
+  public var pomAsNGramSourceEnabled: Bool
+
   /// 舊版單一注拼槽 parser 屬性的相容層：依當前打字模式（注音/拼音）讀寫各自的 parser 槽位。
   ///
   /// - getter：`pinyinTypingEnabled` 時讀 `keyboardParser4Pinyin`，否則讀 `keyboardParser4Zhuyin`。

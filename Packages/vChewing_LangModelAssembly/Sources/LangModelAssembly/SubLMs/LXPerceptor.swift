@@ -573,6 +573,61 @@ extension LMAssembly.LXPerceptor {
     return String(String.UnicodeScalarView(scalars))
   }
 
+  /// 以 head 讀音取回所有高於閾值的 perception 記憶（供 n-gram 餵入，Phase 160 / S2）。
+  ///
+  /// 讀音比對沿用容錯語義（預設逐段去聲調等值；`.exact` 為逐段等值）；回傳每筆記憶的
+  /// previous 值（若有）與候選、權重。不做「只留最高分」篩選——n-gram 餵入需要全量記憶，
+  /// 各記憶的前後文（previous）即是 bigram 的條件鍵。
+  nonisolated func perceptionsFor(
+    headReading: String,
+    timestamp: Double,
+    matchMode: LMAssembly.POMQueryMode = .toneInsensitivePrefix
+  )
+    -> [(headReading: String, previous: String?, candidate: String, probability: Double)] {
+    guard !headReading.isEmpty else { return [] }
+    let separatorString = Homa.Assembler.theSeparator
+    func segments(of reading: String) -> [String] {
+      guard !separatorString.isEmpty else { return reading.isEmpty ? [] : [reading] }
+      return reading.components(separatedBy: separatorString).filter { !$0.isEmpty }
+    }
+    let querySegments = segments(of: headReading)
+    guard !querySegments.isEmpty else { return [] }
+    var results: [(headReading: String, previous: String?, candidate: String, probability: Double)] = []
+    lock.withLock {
+      for kvPair in mutLRUMap.values {
+        guard let parts = parsePerceptionKey(kvPair.key) else { continue }
+        guard !shouldIgnorePerception(parts) else { continue }
+        let storedSegments = segments(of: parts.headReading)
+        guard storedSegments.count == querySegments.count else { continue }
+        let headMatches = zip(storedSegments, querySegments).allSatisfy {
+          matchMode == .exact ? $0 == $1 : toneStrippedReading($0) == toneStrippedReading($1)
+        }
+        guard headMatches else { continue }
+        let perception = kvPair.perception
+        let isUnigramKey = parts.previous == nil && parts.anterior == nil
+        let isSingleCharUnigram = isUnigramKey && querySegments.count == 1
+        for (candidate, override) in perception.overrides {
+          let overrideScore = calculateWeight(
+            eventCount: override.count,
+            totalCount: perception.count,
+            eventTimestamp: override.timestamp,
+            timestamp: timestamp,
+            isUnigram: isUnigramKey,
+            isSingleCharUnigram: isSingleCharUnigram
+          )
+          guard overrideScore > threshold else { continue }
+          results.append((
+            headReading: parts.headReading,
+            previous: parts.previous?.value,
+            candidate: candidate,
+            probability: overrideScore
+          ))
+        }
+      }
+    }
+    return results
+  }
+
   nonisolated public func memorizePerception(
     _ perception: (ngramKey: String, candidate: String),
     timestamp: Double,
