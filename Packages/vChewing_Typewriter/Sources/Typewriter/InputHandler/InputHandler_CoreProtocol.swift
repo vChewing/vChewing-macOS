@@ -54,6 +54,8 @@ public protocol InputHandlerProtocol: AnyObject {
   var mixedAlphanumericalBuffer: String { get set } // 混輸暫存 ASCII 緩衝區
   var furiousTrail: [String] { get set } // 狂拼模式：自動 chop／空格固化提交鍵對應的拼音字母 blob trail
   var furiousHighlightOverride: CandidateInState? { get set } // 狂拼 copilot 窗高亮候選（當拍消費）
+  var furiousCoSegmentedOffers: [FuriousCoSegmentedOffer] { get set
+  } // 狂拼 copilot 窗聯合重切（P164）的替代切分 offers（furiousTypingFrontCandidates 生成時刷新）
   var composer: Tekkon.Composer { get set } // 注拼槽
   var assembler: Homa.Assembler { get set } // 組字器
 }

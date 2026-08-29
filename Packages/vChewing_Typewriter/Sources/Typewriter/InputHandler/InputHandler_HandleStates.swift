@@ -151,8 +151,10 @@ extension InputHandlerProtocol {
 
   /// 依據已通過閘門的前方上下文生成候選清單。
   ///
-  /// 清單順序：置頂（有橫跨節點時為完整詞音配對如「世界」，否則為前方預覽值）→
-  /// 跨邊界雙鍵查詢（最後提交鍵＋前方桶）→ 前方單音節查詢。全程按 value 去重（保留先出現者）。
+  /// 清單結構：置頂段（POM 建議→組句預覽，保持原順序）＋其餘候選（跨邊界雙鍵
+  /// 查詢、前方單音節查詢、trail＋注拼槽聯合重切整詞）按「詞長（segLength）降冪、
+  /// 再查詢分數（weight）降冪」stable-sort——長詞（含替代切分整詞如「反感」）
+  /// 浮於大量單音節候選之前，避免被擠到選字窗末頁。全程按 value 去重（保留先出現者）。
   private func buildFuriousFrontCandidates(
     from furiousContext: (
       bucket: [String], preview: String, crossingPair: CandidateInState?,
@@ -162,7 +164,10 @@ extension InputHandlerProtocol {
     -> [CandidateInState] {
     let bucket = furiousContext.bucket
     var seenValues = Set<String>()
-    var result: [CandidateInState] = []
+    // 置頂段：組句預覽（crossingPair／preview）與 POM 建議——保持原順序置頂。
+    var anchored: [CandidateInState] = []
+    // 其餘候選（跨邊界／尾段／聯合重切）：帶查詢分數、按 (segLength, weight) 排序。
+    var ranked: [(keyArray: [String], value: String, weight: Double)] = []
     // T1：copilot 窗置頂 POM 建議——以組字器副本＋虛擬尾段做唯讀查詢（不套用、不寫記憶），
     // 狂拼容錯模式（逐段去聲調等值）取回記憶，使聲調桶／無調形代表鍵不致落空；
     // 依分數降冪、按 value 去重置頂。
@@ -181,16 +186,16 @@ extension InputHandlerProtocol {
         for candidate in pomCandidates {
           guard !candidate.value.isEmpty else { continue }
           guard seenValues.insert(candidate.value).inserted else { continue }
-          result.append(candidate)
+          anchored.append(candidate)
         }
       }
     }
     // 置頂候選：有橫跨節點時用完整詞音配對（最佳猜測含邊界文脈）；否則用前方預覽值。
     if let crossingPair = furiousContext.crossingPair {
-      result.append(crossingPair)
+      anchored.append(crossingPair)
       seenValues.insert(crossingPair.value)
     } else {
-      result.append((keyArray: bucket, value: furiousContext.preview))
+      anchored.append((keyArray: bucket, value: furiousContext.preview))
       seenValues.insert(furiousContext.preview)
     }
     // 跨邊界候選：最後提交鍵＋前方桶的雙鍵查詢（組字器為空時不查）。
@@ -198,16 +203,28 @@ extension InputHandlerProtocol {
       for gram in currentLM.lookupHub.grams(for: [lastKey, .multipleKeys(bucket)]) {
         guard !gram.current.isEmpty else { continue }
         guard seenValues.insert(gram.current).inserted else { continue }
-        result.append((keyArray: gram.keyArray, value: gram.current))
+        ranked.append((keyArray: gram.keyArray, value: gram.current, weight: gram.probability))
       }
     }
     // 前方單音節候選：語言模組對讀音桶的查詢結果，依原順序取用、按 value 去重（保留先出現者）。
     for gram in currentLM.lookupHub.grams(for: [.multipleKeys(bucket)]) {
       guard !gram.current.isEmpty else { continue }
       guard seenValues.insert(gram.current).inserted else { continue }
-      result.append((keyArray: gram.keyArray, value: gram.current))
+      ranked.append((keyArray: gram.keyArray, value: gram.current, weight: gram.probability))
     }
-    return result
+    // trail＋注拼槽聯合重切候選——「fangan」連打時 copilot 窗即呈現「反感」
+    // （fan|gan）類替代切分整詞候選（與「fan gan」分開打的體驗一致）。
+    furiousCoSegmentedOffers = buildFuriousCoSegmentedOffers()
+    for offer in furiousCoSegmentedOffers {
+      guard seenValues.insert(offer.value).inserted else { continue }
+      ranked.append((keyArray: offer.keyArray, value: offer.value, weight: offer.weight))
+    }
+    return anchored.map { ($0.keyArray, $0.value) } + ranked
+      .stableSort { lhs, rhs in
+        (lhs.keyArray.count > rhs.keyArray.count)
+          || (lhs.keyArray.count == rhs.keyArray.count && lhs.weight > rhs.weight)
+      }
+      .map { ($0.keyArray, $0.value) }
   }
 
   /// 狂拼模式：就地確認前方候選，將其詞音配對覆寫至組字器尾端的新插入 span。
@@ -227,6 +244,9 @@ extension InputHandlerProtocol {
   ) {
     // 閘門再驗：與預覽／候選清單共用同一套守衛。
     guard hasFuriousFrontPending else { return }
+    // P164 補修：聯合重切候選（trail＋注拼槽替代切分）確認——執行切分替換、
+    // trail 更新為新切分、清注拼槽；不遞交、不寫 POM 觀察（讀音層變更）。
+    if applyFuriousCoSegmentedOfferIfAny(candidate: candidate) { return }
     // α 路徑：注拼槽整段無法展開成單一音節桶（如「ysxb」）時，以簡拼整詞候選確認。
     let furiousContext = furiousFrontContext
     let abbreviatedCells = furiousContext == nil ? furiousAbbreviatedCells : nil

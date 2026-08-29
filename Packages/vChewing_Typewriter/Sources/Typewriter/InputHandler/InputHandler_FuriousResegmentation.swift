@@ -17,6 +17,34 @@ private let furiousSyllableScoreFloor: Double = -12
 /// 低於此值時視為模稜兩可、不自動套用，避免誤自動。
 private let kFuriousAbbreviationDominanceThreshold: Double = 3.0
 
+// MARK: - FuriousResegmentationCandidate
+
+/// 狂拼 trail 重切的替代切分候選（P164）：已通過「桶存在性驗證＋組字器副本
+/// 試算」的同音節數切分。`topReading`／`topValue` 為該切分組句時 trail 段最後
+/// 節點的讀音與詞值（copilot 窗聯合重切的顯示與身分比對用）。
+/// 因暫存於 `InputHandlerProtocol`（public）的屬性而需為 public 型別。
+public struct FuriousResegmentationCandidate {
+  let blobs: [String]
+  let keyBuckets: [[String]]
+  let scratchScore: Double
+  let topReading: [String]
+  let topValue: String
+}
+
+// MARK: - FuriousCoSegmentedOffer
+
+/// 狂拼 copilot 窗的「trail＋注拼槽聯合重切」offer（P164）。
+/// `keyArray`／`value` 為替代切分的整詞候選（組句 top-1）；`blobs` 為切分 blob
+/// 序列（選取時 drop trail＋insert 音節桶＋trail 更新）；`weight` 為該候選的
+/// 查詢分數（copilot 窗候選排序用）。
+/// 因暫存於 `InputHandlerProtocol`（public）的屬性而需為 public 型別。
+public struct FuriousCoSegmentedOffer {
+  let keyArray: [String]
+  let value: String
+  let blobs: [String]
+  let weight: Double
+}
+
 // MARK: - FuriousFrontApplyOutcome
 
 /// 狂拼前方候選套用結果。
@@ -270,28 +298,23 @@ extension InputHandlerProtocol {
     session.updateCompositionBufferDisplay()
   }
 
-  /// 語言模型引導的拼音重切分（furious resegmentation）。
+  /// 枚舉 trail 的同音節數替代切分（共用於自動重切與重切候選入窗，P164）。
   ///
-  /// 當 trail 記錄了至少兩個由自動 chop 提交的讀音鍵時，把 trail 的字母流重新枚舉成
-  /// 各種同音節數的合法切分，以組字器副本（scratch）逐一評分，僅在候選的整句路徑總分
-  /// 嚴格高於現狀時，才對真組字器做 drop+insert 替換。任何環節不符預期皆靜默退回。
-  ///
-  /// **範圍收斂（P163 補修）**：本函式刻意只做「同音節數」重切、且 trail 至少兩段——
-  /// 跨音節數重切（`xian`→`[xi, an]`）在打字中途即把單音節 trail 拆開，會誤傷
-  /// 「先生」類的後續多音節組句（「xian 空格 sheng」被拆成「西 安 生」）；「每音節
-  /// 平均」正規化亦偏好多音節切分（普通單字平均分高於合併詞）。跨音節數的枚舉能力
-  /// 仍保留於 `FuriousTypingSegmentor.candidateSegmentations(of:syllableCount: nil)`，
-  /// 供今後經設計的觸發條件使用。
-  func resegmentFuriousTrailIfNeeded() {
-    // 閘門：與前方預覽共用狂拼守衛，但注拼槽暫存可為空。
-    guard isFuriousTypingModeEffective else { return }
-    guard furiousTrail.count >= 2 else { return }
+  /// 閘門與驗證沿襲 `resegmentFuriousTrailIfNeeded`：trail ≥ 2、組字器尾端與 trail
+  /// 逐段對應（trail span 無 explicit override 的保證）、每段桶皆有在庫命中；每個
+  /// 替代切分以組字器副本（scratch）drop trail 全長＋insert 候選桶試算，並取組句時
+  /// trail 段最後節點的讀音／詞值。回傳按 scratch 整句路徑總分降冪排序（不含現狀
+  /// trail）。任何環節不符預期時回傳空陣列（不失效 trail——失效與否由呼叫方依語義
+  /// 決定）。
+  func enumerateFuriousResegmentationCandidates() -> [FuriousResegmentationCandidate] {
+    guard isFuriousTypingModeEffective else { return [] }
+    guard furiousTrail.count >= 2 else { return [] }
     guard assembler.length >= furiousTrail.count else {
-      invalidateFuriousTrail()
-      return
+      invalidateFuriousTrail() // 自癒：trail 與組字器鍵數脫鉤時失效。
+      return []
     }
-    guard assembler.isCursorAtAssemblerEdge(direction: .front) else { return }
-    guard let readingMap = composer.parser.mapZhuyinPinyin else { return }
+    guard assembler.isCursorAtAssemblerEdge(direction: .front) else { return [] }
+    guard let readingMap = composer.parser.mapZhuyinPinyin else { return [] }
 
     // 組字器尾端必須恰好是 trail 全長（trail 存續本身就是 trail span 無 explicit
     // override 的保證）；不一致時視為 trail 失效，絕不重切動到 trail 以外的內容。
@@ -300,13 +323,13 @@ extension InputHandlerProtocol {
       return Tekkon.makeToneInsensitiveVariants(of: zhuyin)
     }
     guard trailBuckets.count == furiousTrail.count else {
-      invalidateFuriousTrail()
-      return
+      invalidateFuriousTrail() // 自癒：trail 含無法展開的段時失效。
+      return []
     }
     let expectedTrailingKeys = trailBuckets.map { Homa.PossibleKey.multipleKeys($0) }
     guard Array(assembler.keys.suffix(furiousTrail.count)) == expectedTrailingKeys else {
-      invalidateFuriousTrail()
-      return
+      invalidateFuriousTrail() // 自癒：組字器尾鍵與 trail 不符時失效。
+      return []
     }
 
     // 以 trail 字母流枚舉同音節數的合法切分。
@@ -325,17 +348,13 @@ extension InputHandlerProtocol {
     var candidates = segmentor.candidateSegmentations(
       of: letters, syllableCount: furiousTrail.count
     )
-    // 現狀（當前 trail）併入去重，避免 limit 截斷把它排擠掉。
+    // 現狀（當前 trail）併入去重，避免 limit 截斷把它排擠掉（供排除比較用）。
     if !candidates.contains(where: { $0 == furiousTrail }) {
       candidates.append(furiousTrail)
     }
-    guard candidates.count > 1 else { return } // 僅有現狀，無從比較。
+    guard candidates.count > 1 else { return [] } // 僅有現狀，無從比較。
 
-    // 基線：真組字器目前的整句路徑總分（顯式組句以確保讀取前已刷新）。
-    _ = assembler.assemble()
-    let baselineScore = assembler.mostRecentPathScore
-    var bestCandidate: [String]?
-    var bestScore = baselineScore
+    var result: [FuriousResegmentationCandidate] = []
     for candidate in candidates where candidate != furiousTrail {
       // 逐音節展開六聲調桶，且每個桶都須有在庫命中；驗證失敗整個候選跳過。
       let keyBuckets: [[String]] = candidate.compactMap { blob in
@@ -358,29 +377,156 @@ extension InputHandlerProtocol {
       }
       guard droppedAll, (try? scratch.insertKeys(keyBuckets)) != nil else { continue }
       _ = scratch.assemble()
-      if scratch.mostRecentPathScore > bestScore {
-        bestScore = scratch.mostRecentPathScore
-        bestCandidate = candidate
-      }
+      result.append(.init(
+        blobs: candidate,
+        keyBuckets: keyBuckets,
+        scratchScore: scratch.mostRecentPathScore,
+        topReading: scratch.assembledSentence.last?.keyArray ?? [],
+        topValue: scratch.assembledSentence.last?.value ?? ""
+      ))
     }
-    // 嚴格更高才替換；否則維持現狀。
-    guard let bestCandidate, bestCandidate != furiousTrail else { return }
+    return result.sorted { $0.scratchScore > $1.scratchScore }
+  }
+
+  /// 構建狂拼 copilot 窗的「trail＋注拼槽聯合重切」offers（P164）：
+  /// 把 trail 字母流與注拼槽字母流合併、以 `FuriousTypingSegmentor` 枚舉「同音節數」
+  /// （trail 段數＋1——copilot 語義下注拼槽整段為一音節）的合法切分，每個替代切分
+  /// 以「整詞查詢」（切分全部段的音節桶、只取整段匹配的完整詞）取組句 top-1 詞為
+  /// offer——使「fangan」連打（trail=fang、注拼槽=an）時 copilot 窗即呈現「反感」
+  /// （fan|gan）類候選，與「fan gan」分開打的體驗一致。同音節數約束延續 P163 收斂：
+  /// 不產生拆開型重切（「xiansheng」→「xi, an, sheng」為 3 音節、被過濾）。
+  func buildFuriousCoSegmentedOffers() -> [FuriousCoSegmentedOffer] {
+    guard isFuriousTypingModeEffective else { return [] }
+    guard composer.intonation.isEmpty else { return [] }
+    let romaji = composer.romajiBuffer
+    guard !romaji.isEmpty else { return [] }
+    guard !furiousTrail.isEmpty else { return [] }
+    guard assembler.isCursorAtAssemblerEdge(direction: .front) else { return [] }
+    guard let readingMap = composer.parser.mapZhuyinPinyin else { return [] }
+    // 現狀切分：trail 段＋注拼槽整段（copilot 語義下 1 段）。
+    let currentSegmentation = furiousTrail + [romaji]
+    let letters = furiousTrail.joined() + romaji
+    let expectedSyllableCount = furiousTrail.count + 1
+    let segmentor = FuriousTypingSegmentor(
+      isValidSyllable: { readingMap[$0] != nil },
+      syllableScore: { [weak self] syllable in
+        guard let self, let zhuyin = readingMap[syllable] else {
+          return furiousSyllableScoreFloor
+        }
+        let bucket = Tekkon.makeToneInsensitiveVariants(of: zhuyin)
+        let grams = self.currentLM.lookupHub.grams(for: [.multipleKeys(bucket)])
+        return grams.map(\.probability).max() ?? furiousSyllableScoreFloor
+      }
+    )
+    let segmentations = segmentor.candidateSegmentations(
+      of: letters, syllableCount: expectedSyllableCount
+    )
+    var result: [FuriousCoSegmentedOffer] = []
+    for candidate in segmentations where candidate != currentSegmentation {
+      // 逐段展開六聲調桶，且每個桶都須有在庫命中；驗證失敗整個切分跳過。
+      let keyBuckets: [[String]] = candidate.compactMap { blob in
+        guard let zhuyin = readingMap[blob] else { return nil }
+        return Tekkon.makeToneInsensitiveVariants(of: zhuyin)
+      }
+      guard keyBuckets.count == candidate.count,
+            keyBuckets.allSatisfy({ bucket in
+              bucket.contains(where: { currentLM.hasUnigramsForFast(keyArray: [$0]) })
+            })
+      else { continue }
+      // 整詞查詢：該切分全部段的音節桶——只取「整段匹配」的完整詞（段數一致）。
+      let grams = currentLM.lookupHub.grams(for: keyBuckets.map { .multipleKeys($0) })
+      guard let top = grams
+        .filter({ $0.keyArray.count == candidate.count })
+        .max(by: { $0.probability < $1.probability }),
+        !top.current.isEmpty
+      else { continue }
+      result.append(.init(
+        keyArray: top.keyArray, value: top.current, blobs: candidate, weight: top.probability
+      ))
+    }
+    return result
+  }
+
+  /// 聯合重切候選確認（P164 補修）：被選 copilot 候選匹配「聯合重切 offer」時，
+  /// drop trail 全長＋insert 替代切分音節桶＋清空注拼槽＋trail 更新為新切分——
+  /// 「fangan」連打選中「反感」後組字器變為 fan|gan 桶、組句「反感」。
+  /// 不遞交、不寫 POM 觀察（讀音層變更、非字詞確認）；失敗防禦復原 trail 鍵。
+  /// - Returns: 是否已處理（true＝呼叫端不應再走普通前方候選確認）。
+  @discardableResult
+  func applyFuriousCoSegmentedOfferIfAny(candidate: CandidateInState) -> Bool {
+    guard let offer = furiousCoSegmentedOffers.first(where: {
+      $0.keyArray == candidate.keyArray && $0.value == candidate.value
+    }) else { return false }
+    guard !furiousTrail.isEmpty, !composer.romajiBuffer.isEmpty else { return false }
+    guard let readingMap = composer.parser.mapZhuyinPinyin else { return false }
+    let keyBuckets: [[String]] = offer.blobs.compactMap { blob in
+      guard let zhuyin = readingMap[blob] else { return nil }
+      return Tekkon.makeToneInsensitiveVariants(of: zhuyin)
+    }
+    guard keyBuckets.count == offer.blobs.count else { return false }
+    // 替換：drop trail 全長、insert 替代切分音節桶。
+    for _ in 0 ..< furiousTrail.count {
+      guard (try? assembler.dropKey(direction: .rear)) != nil else { return false }
+    }
+    guard (try? assembler.insertKeys(keyBuckets)) != nil else {
+      // 失敗防禦：復原原 trail 鍵；trail 一併失效。
+      _ = (try? assembler.insertKeys(furiousTrailKeyBuckets()))
+      invalidateFuriousTrail()
+      return true // 已嘗試處理：呼叫端不應再走普通前方候選確認。
+    }
+    composer.replacePinyinBuffer(with: "")
+    furiousHighlightOverride = nil // 高亮覆寫僅供當拍消費。
+    furiousTrail = offer.blobs
+    retrievePOMSuggestions(apply: false)
+    return true
+  }
+
+  /// 將 trail 展開為音節桶序列（與 auto-chop／空格固化插入語義一致；失敗防禦用）。
+  private func furiousTrailKeyBuckets() -> [[String]] {
+    guard let readingMap = composer.parser.mapZhuyinPinyin else { return [] }
+    return furiousTrail.compactMap { blob in
+      guard let zhuyin = readingMap[blob] else { return nil }
+      return Tekkon.makeToneInsensitiveVariants(of: zhuyin)
+    }
+  }
+
+  /// 語言模型引導的拼音重切分（furious resegmentation）。
+  ///
+  /// 當 trail 記錄了至少兩個由自動 chop 提交的讀音鍵時，把 trail 的字母流重新枚舉成
+  /// 各種同音節數的合法切分，以組字器副本（scratch）逐一評分，僅在候選的整句路徑總分
+  /// 嚴格高於現狀時，才對真組字器做 drop+insert 替換。任何環節不符預期皆靜默退回。
+  /// 候選枚舉與試算統一交由 `enumerateFuriousResegmentationCandidates`（與重切候選
+  /// 入窗共用；P164）。
+  ///
+  /// **範圍收斂（P163 補修）**：本函式刻意只做「同音節數」重切、且 trail 至少兩段——
+  /// 跨音節數重切（`xian`→`[xi, an]`）在打字中途即把單音節 trail 拆開，會誤傷
+  /// 「先生」類的後續多音節組句（「xian 空格 sheng」被拆成「西 安 生」）；「每音節
+  /// 平均」正規化亦偏好多音節切分（普通單字平均分高於合併詞）。跨音節數的枚舉能力
+  /// 仍保留於 `FuriousTypingSegmentor.candidateSegmentations(of:syllableCount: nil)`，
+  /// 供今後經設計的觸發條件使用。
+  func resegmentFuriousTrailIfNeeded() {
+    // 閘門與候選枚舉（含 scratch 試算）統一交由共用 helper。
+    let candidates = enumerateFuriousResegmentationCandidates()
+    guard !candidates.isEmpty else { return }
+    // 基線：真組字器目前的整句路徑總分（顯式組句以確保讀取前已刷新）。
+    _ = assembler.assemble()
+    let baselineScore = assembler.mostRecentPathScore
+    // 嚴格更高才替換；否則維持現狀（enumerate 已按分數降冪）。
+    guard let bestCandidate = candidates.first(where: { $0.scratchScore > baselineScore }) else {
+      return
+    }
 
     // 替換：對真組字器做同樣的 drop+insert，更新 trail，並重取 POM 建議。
     for _ in 0 ..< furiousTrail.count {
       guard (try? assembler.dropKey(direction: .rear)) != nil else { return }
     }
-    let bestKeyBuckets: [[String]] = bestCandidate.compactMap { blob in
-      guard let zhuyin = readingMap[blob] else { return nil }
-      return Tekkon.makeToneInsensitiveVariants(of: zhuyin)
-    }
-    guard (try? assembler.insertKeys(bestKeyBuckets)) != nil else {
+    guard (try? assembler.insertKeys(bestCandidate.keyBuckets)) != nil else {
       // 失敗防禦：復原原 trail 鍵以維持既有組句；trail 一併失效。
-      _ = (try? assembler.insertKeys(trailBuckets))
+      _ = (try? assembler.insertKeys(furiousTrailKeyBuckets()))
       invalidateFuriousTrail()
       return
     }
-    furiousTrail = bestCandidate
+    furiousTrail = bestCandidate.blobs
     retrievePOMSuggestions(apply: false)
   }
 }

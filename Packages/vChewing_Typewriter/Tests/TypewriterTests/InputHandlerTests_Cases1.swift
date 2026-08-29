@@ -4039,4 +4039,161 @@ extension InputHandlerTests {
     #expect(testHandler.furiousTrail == ["xian", "sheng"])
     #expect(testSession.state.type == .ofInputting)
   }
+
+  /// 狂拼 copilot 窗聯合重切（P164 補修）：直接敲「fangan」連打（trail=fang、
+  /// 注拼槽=an）時，copilot 窗即呈現「反感」（fan|gan）類替代切分整詞候選——
+  /// 與「fan gan」分開打的體驗一致，不必先固化再開正常選字窗。
+  @Test
+  func test_IH147_FuriousTypingCoSegmentedOffersEnterCopilotWindow() throws {
+    guard let testHandler, let testSession else {
+      Issue.record("testHandler and testSession at least one of them is nil.")
+      return
+    }
+    clearTestPOM()
+
+    defer {
+      testHandler.currentLM.clearTemporaryData(isFiltering: false)
+      testHandler.prefs.furiousTypingEnabled = false
+      testHandler.prefs.keyboardParser = KeyboardParser.ofStandard.rawValue
+      testHandler.ensureKeyboardParser()
+      testHandler.prefs.fetchSuggestionsFromPerceptionOverrideModel = true
+      testSession.resetInputHandler(forceComposerCleanup: true)
+    }
+
+    [
+      .init(keyArray: ["ㄈㄤ"], value: "方", score: -6),
+      .init(keyArray: ["ㄢ"], value: "安", score: -6),
+      .init(keyArray: ["ㄈㄢˇ"], value: "反", score: -6),
+      .init(keyArray: ["ㄍㄢˇ"], value: "感", score: -6),
+      .init(keyArray: ["ㄈㄢˇ", "ㄍㄢˇ"], value: "反感", score: -7),
+    ].forEach {
+      testHandler.currentLM.insertTemporaryData(unigram: $0, isFiltering: false)
+    }
+    testSession.resetInputHandler(forceComposerCleanup: true)
+    testHandler.prefs.keyboardParser = KeyboardParser.ofHanyuPinyin.rawValue
+    testHandler.ensureKeyboardParser()
+    testHandler.prefs.fetchSuggestionsFromPerceptionOverrideModel = false
+    testHandler.prefs.furiousTypingEnabled = true
+    testHandler.currentLM.syncPrefs()
+
+    // 「fangan」連打：auto-chop 提交「方」（trail=["fang"]）、注拼槽暫存 "an"。
+    typeSentence("fangan")
+    #expect(testHandler.composer.romajiBuffer == "an")
+    #expect(testHandler.furiousTrail == ["fang"])
+    #expect(testSession.state.type == .ofInputting)
+
+    // copilot 窗候選：聯合重切 offer「反感」（fan|gan 整詞）入列。
+    let offer = testSession.state.candidates.first(where: { $0.value == "反感" })
+    #expect(offer != nil)
+    #expect(offer?.keyArray == ["ㄈㄢˇ", "ㄍㄢˇ"])
+    #expect(testHandler.furiousCoSegmentedOffers.first?.blobs == ["fan", "gan"])
+  }
+
+  /// 狂拼 copilot 窗聯合重切選取（P164 補修）：選中「反感」後，drop trail 的
+  /// fang、insert [fan, gan] 音節桶、清空注拼槽、trail 更新為新切分、組句「反感」。
+  @Test
+  func test_IH148_FuriousTypingSelectingCoSegmentedOfferReplacesTrail() throws {
+    guard let testHandler, let testSession else {
+      Issue.record("testHandler and testSession at least one of them is nil.")
+      return
+    }
+    clearTestPOM()
+
+    defer {
+      testHandler.currentLM.clearTemporaryData(isFiltering: false)
+      testHandler.prefs.furiousTypingEnabled = false
+      testHandler.prefs.keyboardParser = KeyboardParser.ofStandard.rawValue
+      testHandler.ensureKeyboardParser()
+      testHandler.prefs.fetchSuggestionsFromPerceptionOverrideModel = true
+      testSession.resetInputHandler(forceComposerCleanup: true)
+    }
+
+    [
+      .init(keyArray: ["ㄈㄤ"], value: "方", score: -6),
+      .init(keyArray: ["ㄢ"], value: "安", score: -6),
+      .init(keyArray: ["ㄈㄢˇ"], value: "反", score: -6),
+      .init(keyArray: ["ㄍㄢˇ"], value: "感", score: -6),
+      .init(keyArray: ["ㄈㄢˇ", "ㄍㄢˇ"], value: "反感", score: -7),
+    ].forEach {
+      testHandler.currentLM.insertTemporaryData(unigram: $0, isFiltering: false)
+    }
+    testSession.resetInputHandler(forceComposerCleanup: true)
+    testHandler.prefs.keyboardParser = KeyboardParser.ofHanyuPinyin.rawValue
+    testHandler.ensureKeyboardParser()
+    testHandler.prefs.fetchSuggestionsFromPerceptionOverrideModel = false
+    testHandler.prefs.furiousTypingEnabled = true
+    testHandler.currentLM.syncPrefs()
+
+    typeSentence("fangan")
+    guard let offerIndex = testSession.state.candidates.firstIndex(where: { $0.value == "反感" })
+    else {
+      Issue.record("Co-segmented offer '反感' not found in copilot window.")
+      return
+    }
+
+    // 模擬確認（copilot 窗 Shift+選字鍵／滑鼠點選 → mock ofInputting 分支）。
+    testSession.candidatePairSelectionConfirmed(at: offerIndex)
+
+    // trail 段替換為 fan|gan 音節桶、注拼槽清空、trail 更新、組句「反感」。
+    #expect(testHandler.composer.romajiBuffer.isEmpty)
+    #expect(testHandler.assembler.keys == [
+      .multipleKeys(Tekkon.makeToneInsensitiveVariants(of: "ㄈㄢ")),
+      .multipleKeys(Tekkon.makeToneInsensitiveVariants(of: "ㄍㄢ")),
+    ])
+    #expect(testHandler.furiousTrail == ["fan", "gan"])
+    #expect(testHandler.assembler.assembledSentence.map(\.value) == ["反感"])
+    #expect(testSession.state.type == .ofInputting)
+  }
+
+  /// 狂拼 copilot 窗候選排序（P164）：候選（置頂組句預覽除外）按「詞長降冪、
+  /// 再查詢分數降冪」stable-sort——替代切分整詞「反感」（2 段）浮於大量單音節
+  /// 候選之前（僅次於置頂預覽），純鍵盤操作即可見、不必捲到清單末頁。
+  @Test
+  func test_IH149_FuriousTypingCoSegmentedOfferRanksBeforeSingleSyllables() throws {
+    guard let testHandler, let testSession else {
+      Issue.record("testHandler and testSession at least one of them is nil.")
+      return
+    }
+    clearTestPOM()
+
+    defer {
+      testHandler.currentLM.clearTemporaryData(isFiltering: false)
+      testHandler.prefs.furiousTypingEnabled = false
+      testHandler.prefs.keyboardParser = KeyboardParser.ofStandard.rawValue
+      testHandler.ensureKeyboardParser()
+      testHandler.prefs.fetchSuggestionsFromPerceptionOverrideModel = true
+      testSession.resetInputHandler(forceComposerCleanup: true)
+    }
+
+    [
+      .init(keyArray: ["ㄈㄤ"], value: "方", score: -6),
+      .init(keyArray: ["ㄢ"], value: "安", score: -6),
+      .init(keyArray: ["ㄈㄢˇ"], value: "反", score: -6),
+      .init(keyArray: ["ㄍㄢˇ"], value: "感", score: -6),
+      .init(keyArray: ["ㄈㄢˇ", "ㄍㄢˇ"], value: "反感", score: -7),
+    ].forEach {
+      testHandler.currentLM.insertTemporaryData(unigram: $0, isFiltering: false)
+    }
+    testSession.resetInputHandler(forceComposerCleanup: true)
+    testHandler.prefs.keyboardParser = KeyboardParser.ofHanyuPinyin.rawValue
+    testHandler.ensureKeyboardParser()
+    testHandler.prefs.fetchSuggestionsFromPerceptionOverrideModel = false
+    testHandler.prefs.furiousTypingEnabled = true
+    testHandler.currentLM.syncPrefs()
+
+    typeSentence("fangan")
+    let candidates = testSession.state.candidates
+    #expect(!candidates.isEmpty)
+    // 置頂組句預覽（「安」）保持首位；「反感」（2 段整詞）緊隨其後——
+    // 排序於所有 1 段候選（方／安等）之前。
+    let fanGanIndex = candidates.firstIndex(where: { $0.value == "反感" })
+    #expect(fanGanIndex != nil)
+    #expect(fanGanIndex == 1)
+    if let fanGanIndex {
+      let firstSingleAfter = candidates[(fanGanIndex + 1)...]
+        .firstIndex(where: { $0.keyArray.count == 1 })
+      #expect(firstSingleAfter != nil)
+      #expect(candidates[fanGanIndex].keyArray == ["ㄈㄢˇ", "ㄍㄢˇ"])
+    }
+  }
 }
