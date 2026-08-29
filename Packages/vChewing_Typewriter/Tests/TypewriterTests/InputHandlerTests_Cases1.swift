@@ -3532,9 +3532,12 @@ extension InputHandlerTests {
     }
 
     // 使用者造詞：ㄧㄝ-ㄕㄡ-ㄒㄧㄢ-ㄅㄟ（以「ysxb」的 initial 類 cells 可整詞命中）。
+    // 同時注入近分競爭者「一世雄霸」（R3-a 之後唯一整詞匹配會自動套用，
+    // 此處以模稜兩可場景保留「copilot 窗顯示候選、不自動套用」的既有語義）。
     // 同時注入單音節 gram，供確認寫回時 insertKeys 的讀音存在性驗證。
     [
       .init(keyArray: ["ㄧㄝ", "ㄕㄡ", "ㄒㄧㄢ", "ㄅㄟ"], value: "野獸先輩", score: 9),
+      .init(keyArray: ["ㄧ", "ㄕˋ", "ㄒㄩㄥˊ", "ㄅㄚ"], value: "一世雄霸", score: 8),
       .init(keyArray: ["ㄧㄝ"], value: "椰", score: 0),
       .init(keyArray: ["ㄕㄡ"], value: "收", score: 0),
       .init(keyArray: ["ㄒㄧㄢ"], value: "先", score: 0),
@@ -3579,8 +3582,11 @@ extension InputHandlerTests {
     }
 
     // 使用者造詞＋單音節 gram（供確認寫回的讀音存在性驗證）。
+    // 與 IH132 相同：注入近分競爭者「一世雄霸」，使 ysxb 不觸發 R3-a 自動套用、
+    // 保留「Shift+選字鍵確認整詞候選」的確認路徑。
     [
       .init(keyArray: ["ㄧㄝ", "ㄕㄡ", "ㄒㄧㄢ", "ㄅㄟ"], value: "野獸先輩", score: 9),
+      .init(keyArray: ["ㄧ", "ㄕˋ", "ㄒㄩㄥˊ", "ㄅㄚ"], value: "一世雄霸", score: 8),
       .init(keyArray: ["ㄧㄝ"], value: "椰", score: 0),
       .init(keyArray: ["ㄕㄡ"], value: "收", score: 0),
       .init(keyArray: ["ㄒㄧㄢ"], value: "先", score: 0),
@@ -3642,8 +3648,11 @@ extension InputHandlerTests {
     }
 
     // 使用者造詞「星期日」＋單音節 gram（供固化插入的讀音存在性驗證）。
+    // 另注入近分競爭者「星期人」，使 xqr 不觸發 R3-a 自動套用、保留
+    // 「空格固化整詞候選之首的實際讀音」的既有確認路徑。
     [
       .init(keyArray: ["ㄒㄧㄥ", "ㄑㄧ", "ㄖˋ"], value: "星期日", score: 9),
+      .init(keyArray: ["ㄒㄧㄥ", "ㄑㄧ", "ㄖㄣˊ"], value: "星期人", score: 8),
       .init(keyArray: ["ㄒㄧㄥ"], value: "星", score: 0),
       .init(keyArray: ["ㄑㄧ"], value: "期", score: 0),
       .init(keyArray: ["ㄖˋ"], value: "日", score: 0),
@@ -3875,5 +3884,159 @@ extension InputHandlerTests {
     #expect(testHandler.assembler.assembledSentence.map(\.value) == ["是", "媽"])
     // 選取來自 n-gram 統計路徑（previous 帶「是」），非自動 override 錨定的 bare unigram。
     #expect(testHandler.assembler.assembledSentence.last?.gram.previous == "是")
+  }
+
+  /// 狂拼 α 自動套用（R3-a）：注拼槽整段無法展開成完整音節序列（如「ysxb」）、
+  /// 且整詞簡拼查詢的頂級候選「明確勝出」（唯一匹配）時，自動把其實際讀音以單鍵
+  /// 序列寫入組字器——全程自動出整詞「野獸先輩」、不必等使用者 Shift+選字鍵確認。
+  /// 自動套用為最佳猜測、非顯式選字：不觸發 POM 觀察、trail 失效（簡拼非完整音節）。
+  @Test
+  func test_IH139_FuriousTypingAbbreviationAutoAppliesClearWinner() throws {
+    guard let testHandler, let testSession else {
+      Issue.record("testHandler and testSession at least one of them is nil.")
+      return
+    }
+    clearTestPOM()
+
+    defer {
+      testHandler.currentLM.clearTemporaryData(isFiltering: false)
+      testHandler.prefs.furiousTypingEnabled = false
+      testHandler.prefs.keyboardParser = KeyboardParser.ofStandard.rawValue
+      testHandler.ensureKeyboardParser()
+      testHandler.prefs.fetchSuggestionsFromPerceptionOverrideModel = true
+      testSession.resetInputHandler(forceComposerCleanup: true)
+    }
+
+    // 唯一整詞匹配（無近分競爭者）：「野獸先輩」＋單音節 gram（組句存在性驗證）。
+    [
+      .init(keyArray: ["ㄧㄝ", "ㄕㄡ", "ㄒㄧㄢ", "ㄅㄟ"], value: "野獸先輩", score: 9),
+      .init(keyArray: ["ㄧㄝ"], value: "椰", score: 0),
+      .init(keyArray: ["ㄕㄡ"], value: "收", score: 0),
+      .init(keyArray: ["ㄒㄧㄢ"], value: "先", score: 0),
+      .init(keyArray: ["ㄅㄟ"], value: "杯", score: 0),
+    ].forEach {
+      testHandler.currentLM.insertTemporaryData(unigram: $0, isFiltering: false)
+    }
+    testSession.resetInputHandler(forceComposerCleanup: true)
+    testHandler.prefs.keyboardParser = KeyboardParser.ofHanyuPinyin.rawValue
+    testHandler.ensureKeyboardParser()
+    testHandler.prefs.fetchSuggestionsFromPerceptionOverrideModel = false
+    testHandler.prefs.furiousTypingEnabled = true
+    testHandler.currentLM.syncPrefs()
+
+    // 打字「ysxb」：最後一鍵 b 觸發 α 自動套用（明確勝出）——注拼槽清空、
+    // 組字器含實際讀音單鍵序列、組句顯示整詞、trail 失效。
+    typeSentence("ysxb")
+    #expect(testHandler.composer.romajiBuffer.isEmpty)
+    #expect(testHandler.assembler.keys == [
+      .singleKey("ㄧㄝ"), .singleKey("ㄕㄡ"), .singleKey("ㄒㄧㄢ"), .singleKey("ㄅㄟ"),
+    ])
+    #expect(testHandler.assembler.assembledSentence.map(\.value) == ["野獸先輩"])
+    #expect(testHandler.furiousTrail.isEmpty)
+    #expect(testSession.state.type == .ofInputting)
+  }
+
+  /// 狂拼 α 自動套用（R3-a）的「明確勝出」防禦：整詞簡拼查詢存在近分競爭者
+  /// （如「一世雄霸」）時不得自動套用——注拼槽保留、組字器不受影響、copilot 窗
+  /// 仍陳列候選供使用者 Shift+選字鍵確認。
+  @Test
+  func test_IH142_FuriousTypingAbbreviationAmbiguousStays() throws {
+    guard let testHandler, let testSession else {
+      Issue.record("testHandler and testSession at least one of them is nil.")
+      return
+    }
+    clearTestPOM()
+
+    defer {
+      testHandler.currentLM.clearTemporaryData(isFiltering: false)
+      testHandler.prefs.furiousTypingEnabled = false
+      testHandler.prefs.keyboardParser = KeyboardParser.ofStandard.rawValue
+      testHandler.ensureKeyboardParser()
+      testHandler.prefs.fetchSuggestionsFromPerceptionOverrideModel = true
+      testSession.resetInputHandler(forceComposerCleanup: true)
+    }
+
+    // 近分競爭者：「一世雄霸」與「野獸先輩」分數差 1（< 明確勝出閾值 3.0）。
+    [
+      .init(keyArray: ["ㄧㄝ", "ㄕㄡ", "ㄒㄧㄢ", "ㄅㄟ"], value: "野獸先輩", score: 9),
+      .init(keyArray: ["ㄧ", "ㄕˋ", "ㄒㄩㄥˊ", "ㄅㄚ"], value: "一世雄霸", score: 8),
+      .init(keyArray: ["ㄧㄝ"], value: "椰", score: 0),
+      .init(keyArray: ["ㄕㄡ"], value: "收", score: 0),
+      .init(keyArray: ["ㄒㄧㄢ"], value: "先", score: 0),
+      .init(keyArray: ["ㄅㄟ"], value: "杯", score: 0),
+    ].forEach {
+      testHandler.currentLM.insertTemporaryData(unigram: $0, isFiltering: false)
+    }
+    testSession.resetInputHandler(forceComposerCleanup: true)
+    testHandler.prefs.keyboardParser = KeyboardParser.ofHanyuPinyin.rawValue
+    testHandler.ensureKeyboardParser()
+    testHandler.prefs.fetchSuggestionsFromPerceptionOverrideModel = false
+    testHandler.prefs.furiousTypingEnabled = true
+    testHandler.currentLM.syncPrefs()
+
+    typeSentence("ysxb")
+    // 模稜兩可：不自動套用——注拼槽保留整段、組字器空、copilot 窗仍陳列候選。
+    #expect(testHandler.composer.romajiBuffer == "ysxb")
+    #expect(testHandler.assembler.keys.isEmpty)
+    #expect(testHandler.furiousTrail.isEmpty)
+    #expect(!testSession.state.candidates.isEmpty)
+    #expect(testSession.state.candidates.first?.value == "野獸先輩")
+  }
+
+  /// 狂拼「先生」回歸防護（P163 補修）：跨音節數重切在打字中途把單音節 trail 拆開，
+  /// 會把「xiansheng」誤切為「西 安 生」——「xian」剛被 auto-chop 提交為單音節 trail
+  /// 時即拆成「西」「安」，後續「生」只能接在其後。收斂後重切僅做「同音節數」且
+  /// trail 至少兩段，且固化後不再觸發重切：「xiansheng」應穩定組句為「先生」。
+  /// 本例刻意讓「西岸生」切分的每音節平均分（-2）高於「先生」（-3）——若跨音節數
+  /// 重切回歸（枚舉不限音節數或平均化比較），本測試即失敗。
+  @Test
+  func test_IH143_FuriousTypingXianShengNotSplit() throws {
+    guard let testHandler, let testSession else {
+      Issue.record("testHandler and testSession at least one of them is nil.")
+      return
+    }
+    clearTestPOM()
+
+    defer {
+      testHandler.currentLM.clearTemporaryData(isFiltering: false)
+      testHandler.prefs.furiousTypingEnabled = false
+      testHandler.prefs.keyboardParser = KeyboardParser.ofStandard.rawValue
+      testHandler.ensureKeyboardParser()
+      testHandler.prefs.fetchSuggestionsFromPerceptionOverrideModel = true
+      testSession.resetInputHandler(forceComposerCleanup: true)
+    }
+
+    // 「西」「安」「生」各 -2（西岸生 3 音節平均 -2）刻意高於「先生」(-4 + -2) / 2 = -3：
+    // 跨音節數重切若回歸，會以平均分勝出把「先生」拆成「西 安 生」。
+    [
+      .init(keyArray: ["ㄒㄧㄢ"], value: "先", score: -4),
+      .init(keyArray: ["ㄕㄥ"], value: "生", score: -2),
+      .init(keyArray: ["ㄒㄧ"], value: "西", score: -2),
+      .init(keyArray: ["ㄢ"], value: "安", score: -2),
+    ].forEach {
+      testHandler.currentLM.insertTemporaryData(unigram: $0, isFiltering: false)
+    }
+    testSession.resetInputHandler(forceComposerCleanup: true)
+    testHandler.prefs.keyboardParser = KeyboardParser.ofHanyuPinyin.rawValue
+    testHandler.ensureKeyboardParser()
+    testHandler.prefs.fetchSuggestionsFromPerceptionOverrideModel = false
+    testHandler.prefs.furiousTypingEnabled = true
+    testHandler.prefs.spaceKeyBehaviorAgainstICB = 2 // 空格不作選字窗呼叫（聚焦固化語義）。
+    testHandler.currentLM.syncPrefs()
+
+    // 「xiansheng」：auto-chop 在 's' 提交「先」（注拼槽暫存 sheng）；
+    // 空格固化「生」後 trail 為 [xian, sheng]、組句維持「先生」不被拆開。
+    typeSentence("xiansheng")
+    #expect(testHandler.composer.romajiBuffer == "sheng")
+    _ = testHandler.triageInput(event: KBEvent.KeyEventData(chars: " ", keyCode: 49).asEvent)
+
+    #expect(testHandler.composer.romajiBuffer.isEmpty)
+    #expect(testHandler.assembler.assembledSentence.map(\.value) == ["先", "生"])
+    #expect(testHandler.assembler.keys == [
+      .multipleKeys(Tekkon.makeToneInsensitiveVariants(of: "ㄒㄧㄢ")),
+      .multipleKeys(Tekkon.makeToneInsensitiveVariants(of: "ㄕㄥ")),
+    ])
+    #expect(testHandler.furiousTrail == ["xian", "sheng"])
+    #expect(testSession.state.type == .ofInputting)
   }
 }

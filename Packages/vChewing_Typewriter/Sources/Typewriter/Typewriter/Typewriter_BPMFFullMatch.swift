@@ -218,6 +218,13 @@ public struct BPMFFullMatchTypewriter<Handler: InputHandlerProtocol>: Typewriter
   )
     -> Bool? {
     guard let autoChop = handler.composer.pinyinAutoChopResult(appending: inputText) else {
+      // R3-a：完整音節自動 chop 不可行時，嘗試狂拼 α 自動套用——注拼槽整段為多音節
+      // 簡拼（如「ysxb」）且整詞簡拼查詢有明確勝出的頂級候選時，自動把其實際讀音
+      // 單鍵寫入組字器（本拍被消費、不再送入注拼槽）；模稜兩可時回傳 nil、維持
+      // 既有流程（按鍵送入注拼槽、copilot 窗繼續顯示候選）。
+      if handler.autoApplyFuriousAbbreviationIfClearWinner(appending: inputText) {
+        return true
+      }
       return nil
     }
 

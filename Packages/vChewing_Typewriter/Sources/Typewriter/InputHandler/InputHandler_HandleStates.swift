@@ -118,12 +118,20 @@ extension InputHandlerProtocol {
   ///
   /// 與 `furiousFrontContext` 互斥：單音節前綴走既有桶路徑，多音節簡拼走本路徑。
   /// 回傳的 cells 可直接餵給 `LookupHub.abbreviatedWordCandidates(keysChopped:)`。
+  /// 以注拼槽現況為準；R3-a 的自動套用需「含本拍字元」的版本，走 `furiousAbbreviatedCells(romaji:)`。
   var furiousAbbreviatedCells: [String]? {
     guard isFuriousTypingModeEffective else { return nil }
     guard composer.intonation.isEmpty else { return nil }
     let romaji = composer.romajiBuffer
     guard !romaji.isEmpty else { return nil }
     guard assembler.isCursorAtAssemblerEdge(direction: .front) else { return nil }
+    return furiousAbbreviatedCells(romaji: romaji)
+  }
+
+  /// 以給定拼音字母流計算簡拼整詞的 cells（前述閘門由呼叫方把守）。
+  /// 跨檔案 extension（`InputHandler_FuriousResegmentation` 的 α 自動套用）亦需使用，
+  /// 故不設為 private。
+  func furiousAbbreviatedCells(romaji: String) -> [String]? {
     let trie = Tekkon.PinyinTrie.shared(parser: composer.parser)
     let chopped = trie.chop(romaji)
     guard chopped.count >= 2 else { return nil }

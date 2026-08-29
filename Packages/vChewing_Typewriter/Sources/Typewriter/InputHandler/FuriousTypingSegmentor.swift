@@ -37,25 +37,30 @@ public struct FuriousTypingSegmentor {
   /// 單個音節允許的最長字母數。
   public var maxSyllableLength: Int
 
-  /// 枚舉給定字母流的所有合法音節切分，且僅保留總音節數等於 `syllableCount` 者。
+  /// 枚舉給定字母流的所有合法音節切分；`syllableCount` 指定時僅保留總音節數等於該值者，
+  /// 為 nil 時不限音節數（供「跨音節數重切」比較不同長度的切分）。
   ///
   /// 以 DP／beam 進行：`dp[pos]` 記錄「到位置 pos 為止」的分數最高的前 `limit` 條路徑
   /// （blob 序列＋累加分數），轉移為往後取 1...maxSyllableLength 個字母且
   /// `isValidSyllable` 成立者。最終按分數降冪截取前 `limit` 條。
+  /// 「簡拼感知」由呼叫方的閉包注入實現：`isValidSyllable` 可接受「完整音節 OR 合法簡拼
+  /// 前綴」、`syllableScore` 對簡拼段以整詞簡拼查詢（如 α 路徑的
+  /// `abbreviatedWordCandidates(keysChopped:)`）評分——本結構體自身不預設任何音節表。
   /// - Parameters:
   ///   - letters: 待切分的拼音字母流。
-  ///   - syllableCount: 只回傳總音節數等於此值的切分。
+  ///   - syllableCount: 只回傳總音節數等於此值的切分；nil 表示不限。
   ///   - limit: 每條 DP 路徑與最終結果的上限筆數。
   /// - Returns: 符合音節數約束的切分（blob 序列），按分數降冪排序。
   public func candidateSegmentations(
     of letters: String,
-    syllableCount: Int,
+    syllableCount: Int? = nil,
     limit: Int = 8
   )
     -> [[String]] {
     let chars = Array(letters)
     let n = chars.count
-    guard n > 0, syllableCount > 0, limit > 0 else { return [] }
+    guard n > 0, limit > 0 else { return [] }
+    if let syllableCount, syllableCount <= 0 { return [] }
     let safeLimit = Swift.max(1, limit)
     // dp[pos]：到位置 pos 為止的路徑，每位置僅保留分數最高的前 safeLimit 條。
     var dp = Array(repeating: [(blobs: [String], score: Double)](), count: n + 1)
@@ -75,10 +80,14 @@ public struct FuriousTypingSegmentor {
       }
     }
     let filtered = dp[n]
-      .filter { $0.blobs.count == syllableCount }
+    var result: [(blobs: [String], score: Double)] = filtered
+    if let syllableCount {
+      result = filtered.filter { $0.blobs.count == syllableCount }
+    }
+    return result
       .sorted { $0.score > $1.score }
       .prefix(safeLimit)
-    return filtered.map(\.blobs)
+      .map(\.blobs)
   }
 
   // MARK: Private

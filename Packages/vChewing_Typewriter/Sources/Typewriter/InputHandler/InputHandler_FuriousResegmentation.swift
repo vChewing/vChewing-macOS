@@ -13,6 +13,10 @@ import Foundation
 /// 狂拼音節級分數查無命中時使用的地板值。
 private let furiousSyllableScoreFloor: Double = -12
 
+/// 狂拼 α 自動套用（R3-a）的「顯著勝出」門檻：頂級候選與次級候選的 log-prob 差
+/// 低於此值時視為模稜兩可、不自動套用，避免誤自動。
+private let kFuriousAbbreviationDominanceThreshold: Double = 3.0
+
 // MARK: - FuriousFrontApplyOutcome
 
 /// 狂拼前方候選套用結果。
@@ -89,6 +93,10 @@ extension InputHandlerProtocol {
     furiousHighlightOverride = nil // 高亮覆寫僅供當拍消費。
     if isCompleteSyllable {
       furiousTrail.append(romaji)
+      // 注意：此處不做重切分——單音節 trail（如「xian」）在打字中途即被拆開會
+      // 誤傷「先生」類的後續多音節組句（「xian 空格 sheng」應為「先生」而非
+      // 「西 安 生」）。重切分僅由 auto-chop 提交路徑觸發、且 trail 至少兩段時
+      // 才執行（見 `resegmentFuriousTrailIfNeeded`）。
     } else {
       invalidateFuriousTrail()
     }
@@ -110,6 +118,50 @@ extension InputHandlerProtocol {
     composer.replacePinyinBuffer(with: "")
     furiousHighlightOverride = nil // 高亮覆寫僅供當拍消費。
     invalidateFuriousTrail() // 簡拼前綴非完整音節：trail 失效（同「z」政策）。
+  }
+
+  /// 狂拼 α 路徑（R3-a）的自動套用：注拼槽整段（含本拍字元）無法展開成完整音節
+  /// 序列、但整詞簡拼查詢有「明確勝出」的頂級候選時，自動把其實際讀音以單鍵序列
+  /// 插入組字器——使「ysxb」類輸入全程自動出整詞「野獸先輩」、不必等使用者
+  /// Shift+選字鍵確認。
+  ///
+  /// 明確勝出條件（避免誤自動）：
+  /// 1) 頂級候選的讀音數與簡拼段數一致（整詞完全匹配；「ysx」只命中四字詞前綴時
+  ///    不得自動套用、仍留在 copilot 窗供使用者確認）；
+  /// 2) 無其他候選（唯一匹配），或頂級候選分數顯著高於次級（log-prob 差 ≥ 3.0，
+  ///    即「一世雄霸」類近分競爭者不得自動套用）。
+  /// 套用語義與 `solidifyAbbreviatedFrontReading` 一致：不覆寫、保留 LM 重切分自由度、
+  /// 清空注拼槽、trail 失效（簡拼前綴非完整音節）。自動套用為「最佳猜測」、非使用者
+  /// 顯式選字，故不觸發 POM 觀察；「模稜兩可不得自動」由上述條件 2 把守。
+  /// - Parameter inputText: 本拍正在處理的拼音字元（尚未送入注拼槽）——cells 計算
+  ///   須涵蓋之，否則最後一鍵永遠不被納入簡拼整詞判定。
+  /// - Returns: 是否已自動套用（true＝本拍已被消費，呼叫端不再把按鍵送入注拼槽）。
+  @discardableResult
+  func autoApplyFuriousAbbreviationIfClearWinner(appending inputText: String) -> Bool {
+    guard isFuriousTypingModeEffective else { return false }
+    guard composer.intonation.isEmpty else { return false }
+    guard assembler.isCursorAtAssemblerEdge(direction: .front) else { return false }
+    let romaji = composer.romajiBuffer + inputText
+    guard !romaji.isEmpty else { return false }
+    guard let cells = furiousAbbreviatedCells(romaji: romaji) else { return false }
+    let grams = currentLM.lookupHub.abbreviatedWordCandidates(keysChopped: cells)
+    guard let top = grams.first, !top.current.isEmpty else { return false }
+    // 條件 1：整詞完全匹配（讀音數與簡拼段數一致），攔截「前綴殘缺」的自動套用。
+    guard top.keyArray.count == cells.count else { return false }
+    // 條件 2：唯一匹配或顯著勝出。
+    if grams.count >= 2 {
+      let runnerUp = grams[1]
+      guard top.probability - runnerUp.probability >= kFuriousAbbreviationDominanceThreshold else {
+        return false
+      }
+    }
+    // 套用：以實際讀音單鍵序列插入組字器（不覆寫）。
+    guard (try? assembler.insertKeys(top.keyArray.map { .singleKey($0) })) != nil else { return false }
+    composer.replacePinyinBuffer(with: "")
+    furiousHighlightOverride = nil // 高亮覆寫僅供當拍消費。
+    invalidateFuriousTrail() // 簡拼前綴非完整音節：trail 失效（同「z」政策）。
+    session?.switchState(generateStateOfInputting())
+    return true
   }
 
   /// 將前方候選套用至給定的組字器實例（真實確認與高亮預覽共用）。
@@ -223,6 +275,13 @@ extension InputHandlerProtocol {
   /// 當 trail 記錄了至少兩個由自動 chop 提交的讀音鍵時，把 trail 的字母流重新枚舉成
   /// 各種同音節數的合法切分，以組字器副本（scratch）逐一評分，僅在候選的整句路徑總分
   /// 嚴格高於現狀時，才對真組字器做 drop+insert 替換。任何環節不符預期皆靜默退回。
+  ///
+  /// **範圍收斂（P163 補修）**：本函式刻意只做「同音節數」重切、且 trail 至少兩段——
+  /// 跨音節數重切（`xian`→`[xi, an]`）在打字中途即把單音節 trail 拆開，會誤傷
+  /// 「先生」類的後續多音節組句（「xian 空格 sheng」被拆成「西 安 生」）；「每音節
+  /// 平均」正規化亦偏好多音節切分（普通單字平均分高於合併詞）。跨音節數的枚舉能力
+  /// 仍保留於 `FuriousTypingSegmentor.candidateSegmentations(of:syllableCount: nil)`，
+  /// 供今後經設計的觸發條件使用。
   func resegmentFuriousTrailIfNeeded() {
     // 閘門：與前方預覽共用狂拼守衛，但注拼槽暫存可為空。
     guard isFuriousTypingModeEffective else { return }
@@ -263,7 +322,9 @@ extension InputHandlerProtocol {
         return grams.map(\.probability).max() ?? furiousSyllableScoreFloor
       }
     )
-    var candidates = segmentor.candidateSegmentations(of: letters, syllableCount: furiousTrail.count)
+    var candidates = segmentor.candidateSegmentations(
+      of: letters, syllableCount: furiousTrail.count
+    )
     // 現狀（當前 trail）併入去重，避免 limit 截斷把它排擠掉。
     if !candidates.contains(where: { $0 == furiousTrail }) {
       candidates.append(furiousTrail)

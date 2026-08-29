@@ -76,6 +76,58 @@ struct FuriousTypingSegmentorTests {
     #expect(candidates == [["fan", "gan"]])
   }
 
+  /// 跨音節數枚舉（R3-b）：`syllableCount: nil` 時回傳不同音節數的切分並列——
+  /// 「xian」同時有 1 音節（xian）與 2 音節（xi|an）；「fangan」只有 2 音節切分
+  /// （無 1 音節合法切分）。不同音節數候選的公平比較（每音節平均分）由呼叫方
+  /// （重切分）負責，本結構體只負責枚舉與按總分排序。
+  @Test
+  func testCrossSyllableCountEnumeration() {
+    let segmentor = makeSegmentor()
+    // 「xian」：1 音節與 2 音節切分並列（xian -4 高於 xi+an -6，故 xian 在前）。
+    let xian = segmentor.candidateSegmentations(of: "xian", syllableCount: nil)
+    #expect(xian.contains(["xian"]))
+    #expect(xian.contains(["xi", "an"]))
+    #expect(xian.first == ["xian"])
+    // 「fangan」：無 1 音節合法切分；2 音節切分皆在列（fan+gan -6 高於 fang+an -8）。
+    let fangan = segmentor.candidateSegmentations(of: "fangan", syllableCount: nil)
+    #expect(fangan.contains(["fan", "gan"]))
+    #expect(fangan.contains(["fang", "an"]))
+    #expect(fangan.first == ["fan", "gan"])
+    // 指定音節數時的行為不變（既有語義）。
+    #expect(segmentor.candidateSegmentations(of: "xian", syllableCount: 1) == [["xian"]])
+  }
+
+  /// 簡拼感知枚舉（R3-a）：`isValidSyllable` 接受「完整音節 OR 合法簡拼前綴」後，
+  /// 段切分器可枚舉含簡拼段的切分；簡拼段的分數（α 整詞查詢注入）參與排序。
+  @Test
+  func testAbbreviationAwareEnumeration() {
+    // 完整音節表（同 makeSegmentor）＋簡拼前綴段表（值為注入的 α 整詞查詢分數）。
+    let abbreviationScores: [String: Double] = ["y": -1.0, "s": -1.0, "x": -1.0, "b": -1.0]
+    let segmentor = FuriousTypingSegmentor(
+      isValidSyllable: { syllableTable[$0] != nil || abbreviationScores[$0] != nil },
+      syllableScore: { syllableTable[$0] ?? abbreviationScores[$0] ?? -12.0 },
+      maxSyllableLength: 6
+    )
+    // 「ysxb」無完整音節切分；簡拼感知後整段切成 4 個簡拼段（每位置一個 initial 前綴）。
+    let abbreviated = segmentor.candidateSegmentations(of: "ysxb", syllableCount: nil)
+    #expect(abbreviated == [["y", "s", "x", "b"]])
+    // 混合場景：「xian」除完整音節切分外，也可切出含簡拼段 x 的「x|ian」
+    // （x -1 + ian -4 = -5，介於 xian -4 與 xi+an -6 之間）。
+    let tableWithIan = syllableTable.merging(["ian": -4.0]) { _, new in new }
+    let mixed = FuriousTypingSegmentor(
+      isValidSyllable: { tableWithIan[$0] != nil || abbreviationScores[$0] != nil },
+      syllableScore: { tableWithIan[$0] ?? abbreviationScores[$0] ?? -12.0 },
+      maxSyllableLength: 6
+    )
+    let candidates = mixed.candidateSegmentations(of: "xian", syllableCount: nil)
+    #expect(candidates.contains(["x", "ian"]))
+    #expect(candidates.first == ["xian"]) // 完整音節匹配優先（分數最高者在前）。
+    #expect(candidates.firstIndex(of: ["x", "ian"])! < candidates.firstIndex(of: ["xi", "an"])!)
+    // 簡拼感知不影響既有「完整音節閉包」的行為（zh 仍非合法段）。
+    let plain = makeSegmentor()
+    #expect(plain.candidateSegmentations(of: "zh", syllableCount: nil).isEmpty)
+  }
+
   // MARK: Private
 
   /// 小型音節表（值為音節級分數；「zh」刻意不在表內，以測試非法音節不參與切分）。
