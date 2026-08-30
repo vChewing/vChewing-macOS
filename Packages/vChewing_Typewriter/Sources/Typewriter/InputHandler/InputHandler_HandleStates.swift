@@ -191,12 +191,17 @@ extension InputHandlerProtocol {
       }
     }
     // 置頂候選：有橫跨節點時用完整詞音配對（最佳猜測含邊界文脈）；否則用前方預覽值。
+    // 與已置頂候選（POM 建議等）同值時跳過——copilot 窗去重：狂拼容錯查詢
+    // 與組句橫跨節點可能對同一詞各回傳一次（如「tamade」的 POM 建議與 crossingPair 皆為
+    // 「他媽的」），保留先出現者（POM 建議置頂語義不變）。
     if let crossingPair = furiousContext.crossingPair {
-      anchored.append(crossingPair)
-      seenValues.insert(crossingPair.value)
+      if seenValues.insert(crossingPair.value).inserted {
+        anchored.append(crossingPair)
+      }
     } else {
-      anchored.append((keyArray: bucket, value: furiousContext.preview))
-      seenValues.insert(furiousContext.preview)
+      if seenValues.insert(furiousContext.preview).inserted {
+        anchored.append((keyArray: bucket, value: furiousContext.preview))
+      }
     }
     // 跨邊界候選：最後提交鍵＋前方桶的雙鍵查詢（組字器為空時不查）。
     if let lastKey = assembler.keys.last {

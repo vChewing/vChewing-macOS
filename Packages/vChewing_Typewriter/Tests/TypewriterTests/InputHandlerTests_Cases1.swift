@@ -4264,4 +4264,61 @@ extension InputHandlerTests {
     #expect(testHandler.assembler.assembledSentence.map(\.value) == ["他媽的"])
     #expect(!testHandler.assembler.assembledSentence.values.joined().contains("他他"))
   }
+
+  /// 狂拼 copilot 窗去重：`tamade` 連打（ta、ma 已固化、de 在注拼槽）時，
+  /// 置頂 POM 建議與組句橫跨節點（crossingPair）會對同一詞「他媽的」各回傳一次——
+  /// `buildFuriousFrontCandidates` 的置頂段必須按 value 去重（保留先出現的 POM 建議），
+  /// 選字窗只能出現一個「他媽的」。
+  @Test
+  func test_IH151_FuriousCopilotWindowDedupsPOMFrontedCandidate() throws {
+    guard let testHandler, let testSession else { return }
+    clearTestPOM()
+    defer {
+      testHandler.currentLM.clearTemporaryData(isFiltering: false)
+      testHandler.prefs.furiousTypingEnabled = false
+      testHandler.prefs.pomAsNGramSourceEnabled = false
+      testHandler.prefs.keyboardParser = KeyboardParser.ofStandard.rawValue
+      testHandler.ensureKeyboardParser()
+      testSession.resetInputHandler(forceComposerCleanup: true)
+    }
+    // 與 IH150 同源：真實 factory 詞庫相關詞條 grams＋三條使用者環境 POM 記憶。
+    [
+      .init(keyArray: ["ㄊㄚ"], value: "他", score: -5.024),
+      .init(keyArray: ["ㄊㄚ"], value: "她", score: -5.045),
+      .init(keyArray: ["ㄇㄚ"], value: "媽", score: -5.169),
+      .init(keyArray: ["ㄇㄚ"], value: "嗎", score: -5.113),
+      .init(keyArray: ["ㄉㄜ˙"], value: "的", score: -4.971),
+      .init(keyArray: ["ㄊㄚ", "ㄇㄚ"], value: "他媽", score: -8.713),
+      .init(keyArray: ["ㄊㄚ", "ㄇㄚ", "ㄉㄜ˙"], value: "他媽的", score: -5.405),
+      .init(keyArray: ["ㄇㄚ", "ㄇㄚ˙"], value: "媽媽", score: -3.195),
+    ].forEach {
+      testHandler.currentLM.insertTemporaryData(unigram: $0, isFiltering: false)
+    }
+    testSession.resetInputHandler(forceComposerCleanup: true)
+    testHandler.prefs.keyboardParser = KeyboardParser.ofHanyuPinyin.rawValue
+    testHandler.ensureKeyboardParser()
+    testHandler.prefs.furiousTypingEnabled = true
+    testHandler.currentLM.syncPrefs()
+    [
+      ("()&()&(ㄨㄛˇ,我)", "我"),
+      ("()&(ㄋㄧˇ,你)&(ㄊㄚ-ㄇㄚ-ㄉㄜ˙,他媽的)", "他媽的"),
+      ("(ㄗㄞˋ,再)&(ㄍㄣ-ㄨㄛˇ-ㄕㄨㄛ,跟我說)&(ㄧ,一)", "一邊"),
+    ].forEach {
+      testHandler.currentLM.memorizePerception(
+        (ngramKey: $0.0, candidate: $0.1),
+        timestamp: Date().timeIntervalSince1970
+      )
+    }
+    testHandler.prefs.pomAsNGramSourceEnabled = true
+    testHandler.prefs.fetchSuggestionsFromPerceptionOverrideModel = true
+    testHandler.currentLM.syncPrefs()
+
+    typeSentence("tamade")
+    // 置頂候選仍為 POM 建議「他媽的」，且全窗僅出現一次。
+    #expect(testSession.state.candidates.first?.value == "他媽的")
+    #expect(testSession.state.candidates.filter { $0.value == "他媽的" }.count == 1)
+    #expect(!testSession.state.candidates.contains {
+      $0.value == "他媽的" && $0.keyArray != ["ㄊㄚ", "ㄇㄚ", "ㄉㄜ˙"]
+    })
+  }
 }
