@@ -722,7 +722,7 @@ struct LMInstantiatorTextMapTests {
     #expect(gramsContainValue(small, "使用者命中"))
     #expect(gramsContainValue(small, "factoryHit"))
 
-    // 超預算（100 × 101 = 10,100 > 10,000）：放棄逐組合展開，使用者片語不再被查詢；
+    // 超預算（100 × 101 = 10,100 > 625）：放棄逐組合展開，使用者片語不再被查詢；
     // 原廠 "&" 連讀查詢路徑（O(候選節點) 而非 O(乘積)）依然有效。
     let bigA = Array(repeating: "ㄚㄚ", count: 100)
     let bigB = Array(repeating: "ㄅㄅ", count: 101)

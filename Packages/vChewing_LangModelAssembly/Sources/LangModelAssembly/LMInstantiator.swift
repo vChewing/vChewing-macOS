@@ -1078,8 +1078,9 @@ extension LMAssembly {
     ///
     /// 當一個查詢的展開組合數量超過此值時，放棄逐組合展開、只保留原廠辭典的
     /// "&" 連讀查詢路徑，以避免在查詢過程中被笛卡爾積卡死（例如狂拼模式下的
-    /// 不完全拼寫）。此閾值以老舊硬體的下限為基準校準，與 Homa 組字器的防禦閾值一致。
-    nonisolated private static let kCartesianProductBudgetLimit = 10_000
+    /// 不完全拼寫）。此閾值與 Homa 組字器的防禦閾值一致（625，P167 依末代
+    /// Intel 硬體實測再校準：4,000 仍卡、625（=5⁴）順暢——維持免聲調 4 音節查詢）。
+    nonisolated private static let kCartesianProductBudgetLimit = 625
 
     // LRU cache for unigramsFor
     private var unigramCacheFingerprint: Int = 0
