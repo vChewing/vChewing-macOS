@@ -233,23 +233,87 @@ struct GradientViewWrapper: ViewModifier {
           [0, 1], [1, 1],
         ],
         colors: [
-          Color(red: 28 / 255, green: 46 / 255, blue: 61 / 255),
-          Color(red: 61 / 255, green: 98 / 255, blue: 126 / 255),
-          Color(red: 145 / 255, green: 189 / 255, blue: 224 / 255),
-          Color(red: 193 / 255, green: 207 / 255, blue: 217 / 255),
+          Color(red: 0.93, green: 0.49, blue: 0.21),
+          Color(red: 0.31, green: 0.73, blue: 0.30),
+          Color(red: 0.38, green: 0.58, blue: 0.81),
+          Color(red: 0.97, green: 0.84, blue: 0.02),
         ]
       )
     } else {
-      LinearGradient(
-        gradient: Gradient(
-          colors: [
-            Color(red: 28 / 255, green: 46 / 255, blue: 61 / 255),
-            Color(red: 145 / 255, green: 189 / 255, blue: 224 / 255),
-          ]
-        ),
-        startPoint: .topLeading,
-        endPoint: .bottomTrailing
-      )
+      Canvas { context, size in
+        // 角落顏色（sRGB 分量）
+        let c00: SIMD3<Double> = [0.93, 0.49, 0.21] // top-left
+        let c10: SIMD3<Double> = [0.31, 0.73, 0.30] // top-right
+        let c01: SIMD3<Double> = [0.38, 0.58, 0.81] // bottom-left
+        let c11: SIMD3<Double> = [0.97, 0.84, 0.02] // bottom-right
+
+        let steps = 64
+        let cellW = size.width / CGFloat(steps)
+        let cellH = size.height / CGFloat(steps)
+
+        for y in 0 ..< steps {
+          for x in 0 ..< steps {
+            let u = (Double(x) + 0.5) / Double(steps)
+            let v = (Double(y) + 0.5) / Double(steps)
+
+            // linear space bilinear
+            let top = context.lerp(context.srgbToLinear(c00), context.srgbToLinear(c10), t: u)
+            let bottom = context.lerp(context.srgbToLinear(c01), context.srgbToLinear(c11), t: u)
+            let linear = context.lerp(top, bottom, t: v)
+            let srgb = context.linearToSrgb(linear)
+
+            let color = Color(red: srgb.x, green: srgb.y, blue: srgb.z)
+
+            let rect = CGRect(
+              x: CGFloat(x) * cellW,
+              y: CGFloat(y) * cellH,
+              width: cellW + 0.5,
+              height: cellH + 0.5
+            )
+            context.fill(Path(rect), with: .color(color))
+          }
+        }
+      }
+    }
+  }
+}
+
+// MARK: - Helpers
+
+extension GraphicsContext {
+  fileprivate func lerp(_ a: SIMD3<Double>, _ b: SIMD3<Double>, t: Double) -> SIMD3<Double> {
+    a + (b - a) * t
+  }
+
+  fileprivate func srgbToLinear(_ c: SIMD3<Double>) -> SIMD3<Double> {
+    SIMD3(
+      srgbChannelToLinear(c.x),
+      srgbChannelToLinear(c.y),
+      srgbChannelToLinear(c.z)
+    )
+  }
+
+  fileprivate func linearToSrgb(_ c: SIMD3<Double>) -> SIMD3<Double> {
+    SIMD3(
+      linearChannelToSrgb(c.x),
+      linearChannelToSrgb(c.y),
+      linearChannelToSrgb(c.z)
+    )
+  }
+
+  fileprivate func srgbChannelToLinear(_ channel: Double) -> Double {
+    if channel <= 0.04045 {
+      return channel / 12.92
+    } else {
+      return pow((channel + 0.055) / 1.055, 2.4)
+    }
+  }
+
+  fileprivate func linearChannelToSrgb(_ channel: Double) -> Double {
+    if channel <= 0.0031308 {
+      return channel * 12.92
+    } else {
+      return 1.055 * pow(channel, 1.0 / 2.4) - 0.055
     }
   }
 }
