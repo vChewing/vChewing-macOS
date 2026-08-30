@@ -194,14 +194,19 @@ extension InputHandlerProtocol {
 
   /// 將前方候選套用至給定的組字器實例（真實確認與高亮預覽共用）。
   ///
-  /// 三路徑判定順序（互不誤判）：
+  /// 四路徑判定順序（互不誤判）：
   /// 1) 置頂無橫跨：keyArray 即前方桶本身（count ≥ 2，但首讀音隸屬提交鍵桶會造成
   ///    泛化判定誤判，故先行排除）。
   /// 2) 跨邊界：候選的「前 n-1 個讀音」逐位隸屬組字器「最後 n-1 個提交鍵」的讀音桶
   ///    （n = keyArray.count ≥ 2），結構性判定候選橫跨最後 n-1 個提交鍵＋前方。
-  /// 3) 前方單音節 grams：keyArray.count == 1，兩者皆不成立。
-  /// 套用：跨邊界僅插入前方讀音（單鍵）並覆寫 anchor-(n-1) 起的 n 鍵 span；其餘沿用
-  /// 既有語義（置頂無橫跨＝讀音桶單一位置多讀音，否則逐讀音單鍵）並覆寫 anchor 起的 span。
+  /// 3) 首段重合：候選的「前 k 段讀音」（k ≥ 1、k < n）逐位隸屬組字器「最後一鍵」的
+  ///    讀音桶——單一尾鍵即可承接（如「他媽的」[ㄊㄚ,ㄇㄚ,ㄉㄜ˙] 與尾鍵「他」ㄊㄚ 桶
+  ///    的 k=1 重合；組字器鍵數不足 span 時跨邊界無法成立、由本路徑接手）。
+  /// 4) 前方單音節 grams：keyArray.count == 1，前三者皆不成立。
+  /// 套用：跨邊界僅插入前方讀音（單鍵）並覆寫 anchor-(n-1) 起的 n 鍵 span；首段重合
+  /// 僅插入重合段之後的讀音（單鍵）並覆寫 anchor-1 起的 n 鍵 span（重合讀音全部落於
+  /// 最後一鍵）；其餘沿用既有語義（置頂無橫跨＝讀音桶單一位置多讀音，否則逐讀音單鍵）
+  /// 並覆寫 anchor 起的 span。
   /// 覆寫為 `.withSpecified`＋`isExplicitlyOverridden`；`perceptionHandler` 僅在覆寫成功時
   /// 被呼叫，供「使用者顯式選字」的確認路徑（Shift+選字鍵／滑鼠點選）收集 POM 觀察。
   /// Enter 直遞／高亮預覽不傳入——copilot 未經使用者逐字確認的最佳猜測
@@ -233,6 +238,19 @@ extension InputHandlerProtocol {
         if isCrossBoundary { crossBoundarySpan = span }
       }
     }
+    // 首段重合（P165）：候選的「前 k 段讀音」逐位隸屬組字器「最後一鍵」的讀音桶
+    // （k ≥ 1 且 k < keyArray.count）。與 isCrossBoundary 互斥：後者需「最後 n-1 鍵」
+    // 逐位承接前 n-1 段讀音、組字器鍵數不足 span 時不成立；本路徑僅以單一尾鍵承接。
+    // 例：「他媽的」[ㄊㄚ,ㄇㄚ,ㄉㄜ˙] 與尾鍵「他」ㄊㄚ 桶 k=1 重合——若全段插入會
+    // 複製「他」→「他他媽的」，本路徑只插入重合段之後的 [ㄇㄚ,ㄉㄜ˙] 再覆寫全詞。
+    var leadingOverlapCount = 0
+    if !isBucketPinned, !isCrossBoundary, candidate.keyArray.count >= 2,
+       let lastKey = targetAssembler.keys.last {
+      leadingOverlapCount = candidate.keyArray
+        .prefix(candidate.keyArray.count - 1)
+        .prefix(while: { lastKey.allValues.contains($0) })
+        .count
+    }
     // 目標組字器的游標即新插入 span 的錨點（狂拼語義下位於組字區最前端）。
     let anchor = targetAssembler.cursor
     let inserted: Bool
@@ -240,6 +258,10 @@ extension InputHandlerProtocol {
       inserted = (try? targetAssembler.insertKeys([.multipleKeys(bucket)])) != nil
     } else if isCrossBoundary, let tailReading = candidate.keyArray.last {
       inserted = (try? targetAssembler.insertKeys([.singleKey(tailReading)])) != nil
+    } else if leadingOverlapCount > 0 {
+      inserted = (try? targetAssembler.insertKeys(
+        candidate.keyArray.dropFirst(leadingOverlapCount).map { .singleKey($0) }
+      )) != nil
     } else {
       let keysToInsert: [Homa.PossibleKey] = candidate.keyArray == bucket
         ? [.multipleKeys(bucket)]
@@ -247,9 +269,15 @@ extension InputHandlerProtocol {
       inserted = !keysToInsert.isEmpty && (try? targetAssembler.insertKeys(keysToInsert)) != nil
     }
     guard inserted else { return .failed }
-    let overrideAnchor = isCrossBoundary
-      ? Swift.max(anchor - crossBoundarySpan, 0)
-      : anchor
+    let overrideAnchor: Int
+    if isCrossBoundary {
+      overrideAnchor = Swift.max(anchor - crossBoundarySpan, 0)
+    } else if leadingOverlapCount > 0 {
+      // 首段重合：重合讀音全部落於「最後一鍵」上，覆寫自該鍵起（anchor-1）的 n 鍵 span。
+      overrideAnchor = Swift.max(anchor - 1, 0)
+    } else {
+      overrideAnchor = anchor
+    }
     let overrideSucceeded = (try? targetAssembler.overrideCandidate(
       .init(keyArray: candidate.keyArray, value: candidate.value),
       at: overrideAnchor,

@@ -4196,4 +4196,72 @@ extension InputHandlerTests {
       #expect(candidates[fanGanIndex].keyArray == ["ㄈㄢˇ", "ㄍㄢˇ"])
     }
   }
+
+  /// 狂拼 copilot 窗置頂候選就地選字的首段重合（P165）：`tama`＋POM「他媽的」記憶
+  /// 時，copilot 窗置頂候選為「他媽的」（3 段、首段 ㄊㄚ 與組字器尾鍵 ㄊㄚ桶 重合）。
+  /// 就地選中後，`applyFuriousFrontCandidate` 應只插入重合段以外的讀音並覆寫完整詞
+  /// ——組字器「他媽的」、**不含重複「他」**（修復前：插入完整 keyArray →「他他媽的」）。
+  @Test
+  func test_IH150_FuriousTypingTamaPreviewNoDuplicate() throws {
+    guard let testHandler, let testSession else { return }
+    clearTestPOM()
+    defer {
+      testHandler.currentLM.clearTemporaryData(isFiltering: false)
+      testHandler.prefs.furiousTypingEnabled = false
+      testHandler.prefs.pomAsNGramSourceEnabled = false
+      testHandler.prefs.keyboardParser = KeyboardParser.ofStandard.rawValue
+      testHandler.ensureKeyboardParser()
+      testSession.resetInputHandler(forceComposerCleanup: true)
+    }
+    // 真實 factory 詞庫（mcbopomofo-cht 4.7.0）相關詞條的 grams（含分數）。
+    [
+      .init(keyArray: ["ㄊㄚ"], value: "他", score: -5.024),
+      .init(keyArray: ["ㄊㄚ"], value: "她", score: -5.045),
+      .init(keyArray: ["ㄇㄚ"], value: "媽", score: -5.169),
+      .init(keyArray: ["ㄇㄚ"], value: "嗎", score: -5.113),
+      .init(keyArray: ["ㄉㄜ˙"], value: "的", score: -4.971),
+      .init(keyArray: ["ㄊㄚ", "ㄇㄚ"], value: "他媽", score: -8.713),
+      .init(keyArray: ["ㄊㄚ", "ㄇㄚ", "ㄉㄜ˙"], value: "他媽的", score: -5.405),
+      .init(keyArray: ["ㄇㄚ", "ㄇㄚ˙"], value: "媽媽", score: -3.195),
+    ].forEach {
+      testHandler.currentLM.insertTemporaryData(unigram: $0, isFiltering: false)
+    }
+    testSession.resetInputHandler(forceComposerCleanup: true)
+    testHandler.prefs.keyboardParser = KeyboardParser.ofHanyuPinyin.rawValue
+    testHandler.ensureKeyboardParser()
+    testHandler.prefs.furiousTypingEnabled = true
+    testHandler.currentLM.syncPrefs()
+
+    // POM 記憶（使用者實際環境，2026-08-30）：三條全注入。
+    [
+      ("()&()&(ㄨㄛˇ,我)", "我"),
+      ("()&(ㄋㄧˇ,你)&(ㄊㄚ-ㄇㄚ-ㄉㄜ˙,他媽的)", "他媽的"),
+      ("(ㄗㄞˋ,再)&(ㄍㄣ-ㄨㄛˇ-ㄕㄨㄛ,跟我說)&(ㄧ,一)", "一邊"),
+    ].forEach {
+      testHandler.currentLM.memorizePerception(
+        (ngramKey: $0.0, candidate: $0.1),
+        timestamp: Date().timeIntervalSince1970
+      )
+    }
+    testHandler.prefs.pomAsNGramSourceEnabled = true
+    testHandler.prefs.fetchSuggestionsFromPerceptionOverrideModel = true
+    testHandler.currentLM.syncPrefs()
+
+    typeSentence("tama")
+    guard let idx = testSession.state.candidates.firstIndex(where: { $0.value == "他媽的" })
+    else {
+      Issue.record("POM-fronted '他媽的' candidate not found in copilot window.")
+      return
+    }
+    #expect(testSession.state.candidates[idx].keyArray == ["ㄊㄚ", "ㄇㄚ", "ㄉㄜ˙"])
+
+    // 就地選中置頂 POM 候選「他媽的」。
+    testSession.candidatePairSelectionConfirmed(at: idx)
+
+    // 修復後：只插重合段以外的讀音、覆寫完整詞——組字器「他媽的」、無重複「他」。
+    #expect(testHandler.composer.romajiBuffer.isEmpty)
+    #expect(testHandler.assembler.keys.count == 3)
+    #expect(testHandler.assembler.assembledSentence.map(\.value) == ["他媽的"])
+    #expect(!testHandler.assembler.assembledSentence.values.joined().contains("他他"))
+  }
 }
