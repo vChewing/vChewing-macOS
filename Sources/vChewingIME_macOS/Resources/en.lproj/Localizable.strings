@@ -2,7 +2,7 @@
 "i18n:aboutWindow.APP_NAME" = "vChewing for macOS";
 "i18n:aboutWindow.BUGREPORT_BUTTON" = "Bug Report";
 "i18n:aboutWindow.DEV_CREW" = "vChewing macOS Development: Shiki Suen.\nPrevious development reinforcers (v1.x): Isaac Xen and Hiraku Wang.\nvChewing Phrase Database Maintained by Shiki Suen.\nSentence-composition algorithm (DAG-DP) implemented by Shiki Suen.";
-"i18n:aboutWindow.DISCLAIMER_TEXT" = "NOTE: 1) Homa Compositor uses LGPLv3 license with exceptions for static linking in Swift projects. 2) vChewing IME uses Vanguard Corpus which consists of data from multiple external resources which are credited in its GitHub repository (`vChewing/libvchewing-data` repository). The data compiler of Vanguard Corpus is licensed using 3-Clause BSD License.";
+"i18n:aboutWindow.DISCLAIMER_TEXT" = "NOTE: 1) Homa Compositor uses LGPLv3 license with exceptions for static linking in Swift projects. 2) vChewing IME uses Vanguard Corpus which consists of data from multiple external resources which are credited in its GitHub repository (`vChewing/vChewing-VanguardLexicon` repository). The data compiler of Vanguard Corpus is licensed using 3-Clause BSD License.";
 "i18n:aboutWindow.DONATION_MESSAGE" = "Please consider donation. Details: https://vchewing.github.io";
 "i18n:aboutWindow.LICENSE_TITLE" = "MIT-NTL License:";
 "i18n:aboutWindow.OK_BUTTON" = "I Accept";
@@ -536,7 +536,7 @@
 "i18n:UserDef.kUpperCaseLetterKeyBehavior.option.4" = "Directly commit uppercased letters only if the compositor is empty";
 "i18n:UserDef.kUpperCaseLetterKeyBehavior.shortTitle" = "Shift+Letter:";
 "i18n:UserDef.kUseDynamicCandidateWindowOrigin.shortTitle" = "Adjust candidate window location according to current node length";
-"i18n:UserDef.kUseExternalFactoryDict.description" = "This will use the SQLite database deployed by the “make install” command from libvChewing-Data if possible.";
+"i18n:UserDef.kUseExternalFactoryDict.description" = "This will use the SQLite database deployed by the “make install” command from vChewing-VanguardLexicon if possible.";
 "i18n:UserDef.kUseExternalFactoryDict.shortTitle" = "Read external factory dictionary files if possible";
 "i18n:UserDef.kUseFixedCandidateOrderOnSelection.description" = "This will stop user override model from affecting how candidates get sorted.";
 "i18n:UserDef.kUseFixedCandidateOrderOnSelection.shortTitle" = "Always use fixed listing order in candidate window";

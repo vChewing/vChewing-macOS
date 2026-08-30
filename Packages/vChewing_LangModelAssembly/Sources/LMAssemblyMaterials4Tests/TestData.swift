@@ -1,4 +1,4 @@
-// 下述詞頻資料取自先鋒語料庫 (https://github.com/vchewing/libvchewing-data)
+// 下述詞頻資料取自先鋒語料庫 (https://github.com/vchewing/vChewing-VanguardLexicon)
 // 部分權重內容有篡改（「年中」的權重）、以符合單元測試之目的。
 
 import Foundation

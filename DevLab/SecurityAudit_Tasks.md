@@ -152,7 +152,7 @@
 
 ## Source/Data Submodule: 專門 TODO（由 submodule 專案另一個 copilot session 解決）
 
-> 說明：以下項目屬於 `Source/Data` 的子模組 (libvchewing-data) 中的資產與工具，請在對應的子模組專案中處理。不要在主倉庫直接變更這些檔案（除非你也更新子模組引用與 commit）。
+> 說明：以下項目屬於 `Source/Data` 的子模組 (vChewing-VanguardLexicon) 中的資產與工具，請在對應的子模組專案中處理。不要在主倉庫直接變更這些檔案（除非你也更新子模組引用與 commit）。
 >
 > 該子模組專案在開發者的電腦上的位置： `/Users/shikisuen/Repos/!vChewing/vChewing-VanguardLexicon`
 

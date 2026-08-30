@@ -21,6 +21,6 @@ Homa Engine is a module made for processing lingual data of an input method.
 ## 著作權 (Credits)
 
 - (c) 2025 and onwards The vChewing Project (LGPL v3.0 License or later).
-- The unit tests utilizes certain contents extracted from libvchewing-data by (c) 2022 and onwards The vChewing Project (BSD-3-Clause).
+- The unit tests utilizes certain contents extracted from vChewing-VanguardLexicon by (c) 2022 and onwards The vChewing Project (BSD-3-Clause).
 
 敝專案採雙授權發佈措施。除了 LGPLv3 以外，對商業使用者也提供不同的授權條款（比如允許閉源使用等）。詳情請[電郵聯絡作者](shikisuen@yeah.net)。
