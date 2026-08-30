@@ -386,9 +386,11 @@ extension Homa {
       // 若掃描半徑 > 4 且窗內各鍵讀音數的乘積超過預算，動態縮減 maxSegLength 以避免笛卡爾積爆炸。
       // 以「乘積」取代過往的「見桶即縮」：只針對真實超標的場合縮減，
       // 讓全拼長詞（含免聲調的 5 音節以下組合）得以正常組句。
-      // 此預算與 LangModelAssembly 的笛卡爾積防禦閾值一致（10,000）。
+      // 此預算與 LangModelAssembly 的笛卡爾積防禦閾值一致（625，P167 依末代
+      // Intel 硬體實測再校準：4,000 仍卡、625（=5⁴）順暢——維持免聲調 4 音節
+      // 可組、砍掉 5 音節以上）。
       if maxSegLength > 4 {
-        let kCartesianBudgetLimit = 10_000
+        let kCartesianBudgetLimit = 625
         var product = 1
         var budgetExceeded = false
         for position in rangeOfPositions {

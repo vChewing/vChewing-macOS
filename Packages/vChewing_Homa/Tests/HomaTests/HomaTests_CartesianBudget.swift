@@ -14,31 +14,32 @@ extension HomaTestsRoot {
   ///
   /// 過往的防禦是「窗內任一鍵有多讀音 → 直接將 maxSegLength 縮減為 4」，
   /// 導致全拼長詞（>4 音節）永遠無法在單一節點組出。
-  /// 精化後改以「窗內各鍵讀音數的乘積」判斷，乘積超過預算（10,000）才縮減，
-  /// 讓免聲調的 5 音節組合（5⁵ = 3,125）得以整詞組出，同時保留 6 音節以上的防禦。
+  /// 精化後改以「窗內各鍵讀音數的乘積」判斷，乘積超過預算（625）才縮減，
+  /// 讓免聲調的 4 音節組合（5⁴ = 625）得以整詞組出，同時保留 5 音節以上的防禦。
   @Suite(.serialized)
   public struct HomaTestsCartesianBudget: HomaTestSuite {
-    /// 免聲調 5 音節（每鍵 5 個聲調桶、乘積 3,125 ≤ 10,000）：
-    /// 不再觸發縮減，長詞得以在單一節點組出。
-    @Test("[Homa] CartesianBudget_ToneFreeFiveSyllableAssemblesAsOneSegment")
-    func testToneFreeFiveSyllableAssemblesAsOneSegment() async throws {
+    /// 免聲調 4 音節（每鍵 5 個聲調桶、乘積 625 ≤ 625）：
+    /// 不觸發縮減，四字詞得以在單一節點組出（P167 實測校準點：末代 Intel 上
+    /// 4,000 仍卡頓、625 順暢——預算即「最長四字 × 每字五讀音」）。
+    @Test("[Homa] CartesianBudget_ToneFreeFourSyllableAssemblesAsOneSegment")
+    func testToneFreeFourSyllableAssemblesAsOneSegment() async throws {
       let variantLetters = ["a", "b", "c", "d", "e"]
-      var mockData = "K1a-K2a-K3a-K4a-K5a 春眠不覺曉 -1.0\n"
-      for index in 1 ... 5 {
+      var mockData = "K1a-K2a-K3a-K4a 筆墨紙硯 -1.0\n"
+      for index in 1 ... 4 {
         for letter in variantLetters {
-          mockData += "K\(index)\(letter) 春 -5.0\n"
+          mockData += "K\(index)\(letter) 硯 -5.0\n"
         }
       }
       let mockLM = TestLM(rawData: mockData)
       let assembler = Homa.Assembler(
         gramQuerier: { mockLM.queryGrams($0) }
       )
-      let keys: [Homa.PossibleKey] = (1 ... 5).map { index in
+      let keys: [Homa.PossibleKey] = (1 ... 4).map { index in
         .multipleKeys(variantLetters.map { "K\(index)\($0)" })
       }
       try assembler.insertKeys(keys)
       let result = assembler.assemble().compactMap(\.value)
-      #expect(result == ["春眠不覺曉"])
+      #expect(result == ["筆墨紙硯"])
       #expect(assembler.assembledSentence.count == 1)
     }
 
@@ -61,7 +62,7 @@ extension HomaTestsRoot {
       #expect(assembler.assembledSentence.count == 1)
     }
 
-    /// 免聲調 6 音節（乘積 5⁶ = 15,625 > 10,000）：防禦仍生效，
+    /// 免聲調 6 音節（乘積 5⁶ = 15,625 > 625）：防禦仍生效，
     /// maxSegLength 縮減至 4、長詞無法在單一節點組出（此為避免笛卡爾積卡死的回歸防護）。
     @Test("[Homa] CartesianBudget_ToneFreeSixSyllableStaysSegmented")
     func testToneFreeSixSyllableStaysSegmented() async throws {
