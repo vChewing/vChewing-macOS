@@ -188,3 +188,53 @@ extension MainAssemblyTests {
     #expect(ChineseConverter.cnvTradToKangXi("吃") == "喫")
   }
 }
+
+extension MainAssemblyTests {
+  /// 狂拼 copilot 候選窗與 JKHL（VIM 式候選導航）重詮釋的隔離（P166）：
+  /// copilot 窗為唯讀顯示（選取走 Shift+選字鍵），其顯示中 JKHL 不得把字母鍵
+  /// （H/J/K/L）轉為方向鍵——否則 zh/ch/sh 的第二個 romaji「h」會被轉成
+  /// LeftArrow、誤觸狂拼「觸發鍵固化」、提早提交未完成讀音並開出正常選字窗
+  /// （修復前實測：buffer 清空、keys=1、state=ofCandidates）。
+  /// 本測試鎖定縱排與橫排兩種選字窗情境：修復後「h」皆維持字母（buffer「sh」）、
+  /// 組字器零改動、copilot 窗持續可見。
+  @Test
+  func test507_FuriousCopilotWindowIgnoresJKHLReinterpretation() throws {
+    let customGrams: [Homa.Gram] = [
+      .init(keyArray: ["ㄙㄢ"], value: "三測", score: 9),
+      .init(keyArray: ["ㄕˋ"], value: "是測", score: 8.5),
+      .init(keyArray: ["ㄕㄜˋ"], value: "社測", score: 8),
+    ]
+    defer {
+      testHandler.currentLM.clearTemporaryData(isFiltering: false)
+      testHandler.prefs.furiousTypingEnabled = false
+      testHandler.prefs.candidateStateJKHLBehavior = 0
+      testHandler.prefs.useHorizontalCandidateList = true
+      testHandler.prefs.keyboardParser = KeyboardParser.ofStandard.rawValue
+      testHandler.ensureKeyboardParser()
+      testHandler.prefs.fetchSuggestionsFromPerceptionOverrideModel = true
+      testSession.resetInputHandler(forceComposerCleanup: true)
+    }
+    customGrams.forEach {
+      testHandler.currentLM.insertTemporaryData(unigram: $0, isFiltering: false)
+    }
+    testHandler.prefs.furiousTypingEnabled = true
+    testHandler.prefs.candidateStateJKHLBehavior = 1 // JKHL 行為 1：HL 翻行列
+    testHandler.prefs.fetchSuggestionsFromPerceptionOverrideModel = false
+    for isVertical in [false, true] {
+      testSession.resetInputHandler(forceComposerCleanup: true)
+      testHandler.prefs.keyboardParser = KeyboardParser.ofHanyuPinyin.rawValue
+      testHandler.ensureKeyboardParser()
+      testHandler.prefs.useHorizontalCandidateList = !isVertical
+      testHandler.currentLM.syncPrefs()
+      handleKeyEvent(.init(chars: "s"))
+      #expect(testHandler.composer.romajiBuffer == "s")
+      #expect(testSession.isFuriousCopilotCandidateWindowVisible)
+      // 修復前：JKHL 把「h」轉為方向鍵 → 固化 → 正常選字窗誤開。
+      handleKeyEvent(.init(chars: "h", keyCode: 4))
+      #expect(testHandler.composer.romajiBuffer == "sh", "JKHL 不得把字母鍵 h 轉為方向鍵（isVertical=\(isVertical)）")
+      #expect(testHandler.assembler.keys.isEmpty)
+      #expect(testSession.state.type == .ofInputting)
+      #expect(testSession.isFuriousCopilotCandidateWindowVisible)
+    }
+  }
+}

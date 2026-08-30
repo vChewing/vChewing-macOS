@@ -245,6 +245,12 @@ extension SessionProtocol {
 
 extension SessionProtocol {
   private func reinterpreteKeyDownEventAsVIMEmacsKey(event eventToDeal: inout KBEvent) -> Bool? {
+    // 狂拼 copilot 候選窗為唯讀顯示（選取走 Shift+選字鍵），其顯示中若套用
+    // Emacs／JKHL 鍵重詮釋（Ctrl+字母→方向鍵、HL 翻行列），會把字母鍵轉成
+    // 方向鍵、誤觸狂拼「觸發鍵固化」——提早把未完成讀音提交進組字器並開出
+    // 正常選字窗（實測：zh/ch/sh 的第二個 romaji「h」＋JKHL 行為＝打字中
+    // copilot 窗顯示時被轉為 LeftArrow → 固化 → 正常選字窗誤開；P166）。
+    if isFuriousCopilotCandidateWindowVisible { return nil }
     // 使 NSEvent 自翻譯，這樣可以讓 Emacs NSEvent 變成標準 NSEvent。
     if eventToDeal.isEmacsKey {
       // 注意不要針對 Empty 空狀態使用這個轉換，否則會使得相關組合鍵遞交出垃圾字元。
