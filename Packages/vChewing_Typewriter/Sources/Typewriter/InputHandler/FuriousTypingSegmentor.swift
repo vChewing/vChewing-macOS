@@ -65,6 +65,9 @@ public struct FuriousTypingSegmentor {
     // dp[pos]：到位置 pos 為止的路徑，每位置僅保留分數最高的前 safeLimit 條。
     var dp = Array(repeating: [(blobs: [String], score: Double)](), count: n + 1)
     dp[0] = [([], 0)]
+    // 音節分數快取：同一 blob 在不同位置重複計分（每次皆 LM 查詢），
+    // 單次枚舉內以 blob 為鍵去重——狂拼 trail＋注拼槽的枚舉音節數少、重複率高。
+    var scoreCache: [String: Double] = [:]
     for pos in 0 ..< n {
       guard !dp[pos].isEmpty else { continue }
       let maxLen = Swift.min(maxSyllableLength, n - pos)
@@ -72,7 +75,13 @@ public struct FuriousTypingSegmentor {
       for length in 1 ... maxLen {
         let blob = String(chars[pos ..< pos + length])
         guard isValidSyllable(blob) else { continue }
-        let blobScore = syllableScore(blob)
+        let blobScore: Double
+        if let cached = scoreCache[blob] {
+          blobScore = cached
+        } else {
+          blobScore = syllableScore(blob)
+          scoreCache[blob] = blobScore
+        }
         for path in dp[pos] {
           let extended = (blobs: path.blobs + [blob], score: path.score + blobScore)
           keepTop(&dp[pos + length], entry: extended, limit: safeLimit)
