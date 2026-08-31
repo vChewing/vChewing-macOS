@@ -50,6 +50,13 @@ extension VanguardTrie {
       )
       self.keyEntries = parsedEntries
       self.keyInitialsBuckets = initialsBuckets
+      var firstScalarIndex: [UInt32: [Int]] = [:]
+      for (index, bucket) in initialsBuckets.enumerated() {
+        if let scalarValue = Self.firstScalarValue(of: bucket.initialsUTF8) {
+          firstScalarIndex[scalarValue, default: []].append(index)
+        }
+      }
+      self.keyInitialsBucketsByFirstScalar = firstScalarIndex
       self.valueLineToKeyEntryIndex = []
       self.reverseLookupTable = .empty
       self.reverseLookupReady = false
@@ -153,6 +160,9 @@ extension VanguardTrie {
     private let valuesEndOffset: Int
     private let keyEntries: [KeyEntry]
     private let keyInitialsBuckets: [InitialsBucket]
+    /// 首 scalar → 桶索引（`candidateNodeIDsForChoppedColumns` 只查首 scalar 命中的桶、
+    /// 取代全量掃描——狂拼大讀音桶查詢的主要開銷）。
+    private let keyInitialsBucketsByFirstScalar: [UInt32: [Int]]
     private var valueLineToKeyEntryIndex: [Int32] = []
     private var reverseLookupTable: ReverseLookupIndex = .empty
     private var reverseLookupReady: Bool = false
@@ -1250,26 +1260,57 @@ extension VanguardTrie.TextMapTrie {
     }
   }
 
+  /// 取出 `initialsUTF8` 的第一個 Unicode Scalar 值（供首 scalar 索引使用）。
+  private static func firstScalarValue(of initialsUTF8: ContiguousArray<UInt8>) -> UInt32? {
+    initialsUTF8.withUnsafeBufferPointer { buffer in
+      guard let firstByte = buffer.first else { return nil }
+      let len = Self.utf8SequenceLength(firstByte)
+      guard len > 0, len <= buffer.count else { return nil }
+      return Self.decodeUTF8ScalarValue(from: buffer, at: 0, length: len)
+    }
+  }
+
+  /// 排序陣列二元搜尋——取代 `Set<Unicode.Scalar>` 的 SipHash 成員測試
+  /// （狂拼大讀音桶的 `initialsMatch` 每桶成員測試皆 SipHash、佔 ~8% 總打字 CPU）。
+  private static func sortedScalarArrayContains(
+    _ array: [Unicode.Scalar], _ target: Unicode.Scalar
+  )
+    -> Bool {
+    var lower = 0
+    var upper = array.count
+    while lower < upper {
+      let mid = (lower + upper) >> 1
+      if array[mid] < target {
+        lower = mid + 1
+      } else {
+        upper = mid
+      }
+    }
+    return lower < array.count && array[lower] == target
+  }
+
   private func initialsMatch(
     _ bucket: InitialsBucket,
-    scalarSets: [Set<UnicodeScalar>]
+    scalarArrays: [[Unicode.Scalar]]
   )
     -> Bool {
     bucket.initialsUTF8.withUnsafeBufferPointer { buffer in
       var byteIndex = 0
       var setIndex = 0
       while byteIndex < buffer.count {
-        guard setIndex < scalarSets.count else { return false }
+        guard setIndex < scalarArrays.count else { return false }
         let len = Self.utf8SequenceLength(buffer[byteIndex])
         guard len > 0, byteIndex + len <= buffer.count else { return false }
         let scalarValue = Self.decodeUTF8ScalarValue(from: buffer, at: byteIndex, length: len)
-        guard let scalar = Unicode.Scalar(scalarValue), scalarSets[setIndex].contains(scalar) else {
+        guard let scalar = Unicode.Scalar(scalarValue),
+              Self.sortedScalarArrayContains(scalarArrays[setIndex], scalar)
+        else {
           return false
         }
         byteIndex += len
         setIndex += 1
       }
-      return setIndex == scalarSets.count
+      return setIndex == scalarArrays.count
     }
   }
 }
@@ -1554,15 +1595,22 @@ extension VanguardTrie.TextMapTrie: VanguardTrieProtocol {
   }
 
   private func candidateNodeIDsForChoppedColumns(_ choppedColumns: [ChoppedColumn]) -> [Int] {
-    let initialScalarSets: [Set<UnicodeScalar>] = choppedColumns.map { column in
-      Set(column.candidates.compactMap { $0.text.unicodeScalars.first })
+    // 每 column 的候選首 scalar 排序去重陣列（取代 Set——查詢首建一次、逐桶二元搜尋）。
+    let initialScalarArrays: [[Unicode.Scalar]] = choppedColumns.map { column in
+      Array(Set(column.candidates.compactMap { $0.text.unicodeScalars.first })).sorted()
     }
-    guard initialScalarSets.allSatisfy({ !$0.isEmpty }) else { return [] }
+    guard initialScalarArrays.allSatisfy({ !$0.isEmpty }) else { return [] }
 
     var matchedNodeIDs = [Int]()
-    for bucket in keyInitialsBuckets {
-      if initialsMatch(bucket, scalarSets: initialScalarSets) {
-        matchedNodeIDs.append(contentsOf: bucket.nodeIDs.map(Int.init))
+    // 只掃描「首 scalar 命中 column-0」的桶（取代全量 `keyInitialsBuckets` 掃描——
+    // 狂拼「sh」類 95 讀音桶的 column-0 首 scalar 僅 ㄕ/ㄙ 等少數值、命中桶從數百降至十餘）。
+    for scalar in initialScalarArrays[0] {
+      guard let bucketIndices = keyInitialsBucketsByFirstScalar[scalar.value] else { continue }
+      for bucketIndex in bucketIndices {
+        let bucket = keyInitialsBuckets[bucketIndex]
+        if initialsMatch(bucket, scalarArrays: initialScalarArrays) {
+          matchedNodeIDs.append(contentsOf: bucket.nodeIDs.map(Int.init))
+        }
       }
     }
     matchedNodeIDs.sort()
