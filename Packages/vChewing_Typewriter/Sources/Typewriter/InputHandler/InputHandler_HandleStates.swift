@@ -776,6 +776,14 @@ extension InputHandlerProtocol {
       return false
     }
 
+    // 狂拼模式：注拼槽尚有未完成讀音（hasFuriousFrontPending）時，先把前方讀音固化進
+    // 組字器（與空格／Tab／Enter 同語義），再讓標點正常插入——未完成讀音不再擋下標點
+    // 輸入（消除 A9B69908D 蜂鳴）。固化失敗（如無法展開成讀音桶的無效前綴）時維持
+    // 既有蜂鳴行為。
+    if !isComposerOrCalligrapherEmpty, hasFuriousFrontPending {
+      solidifyFuriousFrontReading()
+    }
+
     guard isComposerOrCalligrapherEmpty else {
       // 注音沒敲完的情況下，無視標點輸入。
       errorCallback?("A9B69908D")

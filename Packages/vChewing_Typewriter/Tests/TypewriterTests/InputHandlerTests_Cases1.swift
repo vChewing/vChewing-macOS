@@ -4382,4 +4382,54 @@ extension InputHandlerTests {
       $0.value == "他媽的" && $0.keyArray != ["ㄊㄚ", "ㄇㄚ", "ㄉㄜ˙"]
     })
   }
+
+  /// 狂拼模式下直接敲標點鍵不蜂鳴（P170 fail-first）：注拼槽尚有未完成讀音
+  /// （如「tama」的「ma」）時敲問號等標點鍵，不得再以 A9B69908D 蜂鳴——
+  /// 先以空格／Tab／Enter 同語義把前方讀音固化進組字器，再讓標點正常插入
+  /// （注拼槽清空、標點鍵被消費、組句含標點）。
+  @Test
+  func test_IH153_FuriousPunctuationSolidifiesThenInserts() throws {
+    guard let testHandler, let testSession else { return }
+    clearTestPOM()
+    var errorMessages: [String] = []
+    defer {
+      testHandler.errorCallback = nil
+      testHandler.currentLM.clearTemporaryData(isFiltering: false)
+      testHandler.prefs.furiousTypingEnabled = false
+      testHandler.prefs.keyboardParser = KeyboardParser.ofStandard.rawValue
+      testHandler.ensureKeyboardParser()
+      testSession.resetInputHandler(forceComposerCleanup: true)
+    }
+    // 與 IH150/151/152 同源：真實 factory 詞庫相關詞條（ㄊㄚ／ㄇㄚ 桶）。
+    [
+      .init(keyArray: ["ㄊㄚ"], value: "他", score: -5.024),
+      .init(keyArray: ["ㄊㄚ"], value: "她", score: -5.045),
+      .init(keyArray: ["ㄇㄚ"], value: "媽", score: -5.169),
+      .init(keyArray: ["ㄇㄚ"], value: "嗎", score: -5.113),
+      .init(keyArray: ["ㄊㄚ", "ㄇㄚ"], value: "他媽", score: -8.713),
+      .init(keyArray: ["ㄇㄚ", "ㄇㄚ˙"], value: "媽媽", score: -3.195),
+    ].forEach {
+      testHandler.currentLM.insertTemporaryData(unigram: $0, isFiltering: false)
+    }
+    testSession.resetInputHandler(forceComposerCleanup: true)
+    testHandler.prefs.keyboardParser = KeyboardParser.ofHanyuPinyin.rawValue
+    testHandler.ensureKeyboardParser()
+    testHandler.prefs.furiousTypingEnabled = true
+    testHandler.currentLM.syncPrefs()
+    testHandler.errorCallback = { errorMessages.append($0) }
+
+    // 打「tama」：組字器 [ㄊㄚ桶]＋注拼槽 "ma"。
+    typeSentence("tama")
+    #expect(testHandler.assembler.keys.count == 1)
+    #expect(testHandler.composer.romajiBuffer == "ma")
+
+    // 直接敲「？」（無修飾鍵）：標點鍵被消費、不再蜂鳴 A9B69908D。
+    #expect(testHandler.triageInput(event: KBEvent.KeyEventData(flags: [], chars: "?").asEvent))
+    #expect(!errorMessages.contains("A9B69908D"))
+    // 前方讀音已固化：注拼槽清空、組字器鍵數 1→3（固化ㄇㄚ桶＋標點鍵）。
+    #expect(testHandler.composer.romajiBuffer.isEmpty)
+    #expect(testHandler.assembler.keys.count == 3)
+    // 組句顯示含全形問號。
+    #expect(testSession.state.displayedText.contains("？"))
+  }
 }
