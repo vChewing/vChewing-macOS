@@ -4432,4 +4432,40 @@ extension InputHandlerTests {
     // 組句顯示含全形問號。
     #expect(testSession.state.displayedText.contains("？"))
   }
+
+  /// 狂拼長簡拼字母流不被注拼槽音頭丟棄截斷（「slliang」不得變成「lliang」）。
+  ///
+  /// 使用者回報：敲「slliang」只出現「力量」等「ㄌㄧˋ ㄌㄧㄤˋ」二字詞、且開頭的
+  /// 「s」像沒敲過似的；敲「sllian」則正常。根因：Tekkon 注拼槽的 romajiBuffer
+  /// 預設以「單音節最長 6 碼」為上限、超出即丟棄最早輸入的音頭——「slliang」
+  /// 為 7 字元，敲入最後一個「g」時開頭的「s」被靜默截斷、buffer 變「lliang」，
+  /// 後續簡拼整詞查詢便以「lliang」為準（命中「力量」類 ㄌ-ㄌㄧㄤ 詞）。修復：
+  /// 狂拼模式（`isFuriousTypingModeEffective`）下注拼槽關閉音頭丟棄。
+  @Test
+  func test_IH154_FuriousLongAbbreviationKeepsFrontLetters() throws {
+    guard let testHandler, let testSession else {
+      Issue.record("testHandler and testSession at least one of them is nil.")
+      return
+    }
+    clearTestPOM()
+    defer {
+      testHandler.currentLM.clearTemporaryData(isFiltering: false)
+      testHandler.prefs.furiousTypingEnabled = false
+      testHandler.prefs.keyboardParser = KeyboardParser.ofStandard.rawValue
+      testHandler.ensureKeyboardParser()
+      testSession.resetInputHandler(forceComposerCleanup: true)
+    }
+    testSession.resetInputHandler(forceComposerCleanup: true)
+    testHandler.prefs.keyboardParser = KeyboardParser.ofHanyuPinyin.rawValue
+    testHandler.ensureKeyboardParser()
+    testHandler.prefs.fetchSuggestionsFromPerceptionOverrideModel = false
+    testHandler.prefs.furiousTypingEnabled = true
+    testHandler.currentLM.syncPrefs()
+
+    // 「slliang」＝7 字元、超過注拼槽預設 6 碼上限；修復前「s」被音頭丟棄、
+    // buffer 變「lliang」。修復後完整保留「slliang」。
+    typeSentence("slliang")
+    #expect(testHandler.composer.romajiBuffer == "slliang")
+    #expect(testSession.state.type == .ofInputting)
+  }
 }

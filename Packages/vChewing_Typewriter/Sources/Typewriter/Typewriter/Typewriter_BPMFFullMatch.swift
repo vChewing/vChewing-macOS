@@ -196,6 +196,10 @@ public struct BPMFFullMatchTypewriter<Handler: InputHandlerProtocol>: Typewriter
       ) {
         return (autoChopHandled, true)
       }
+      // 狂拼等多音節簡拼字母流可超過注拼槽的單音節長度上限（預設 6 碼、超出會
+      // 自動丟棄最早輸入的音頭），此處依當前打字模式即時設定旗子、讓注拼槽
+      // 完整保留字母流（「slliang」不得被截斷成「lliang」而丟失前導字母）。
+      handler.composer.allowsExtendedRomajiBuffer = handler.isFuriousTypingModeEffective
       handler.composer.receiveKey(fromString: confirmCombination ? " " : inputText)
       keyConsumedByReading = true
       narrateTheComposer(
