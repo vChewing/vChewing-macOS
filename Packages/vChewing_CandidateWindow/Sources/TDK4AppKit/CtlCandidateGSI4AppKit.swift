@@ -142,6 +142,11 @@ extension GSI4AppKit {
       handleMouseScroll(deltaX: event.deltaX, deltaY: event.deltaY)
     }
 
+    /// 供組字引擎層指派注音→拼音的讀音 disambiguation 顯示轉換器（nullable）。nil 表示停用。
+    public static func setPhonabetPinyinConverter(_ converter: ((String) -> String)?) {
+      thePool.phonabetPinyinConverter = converter
+    }
+
     public func reloadData() {
       guard let delegate = delegate else { return }
 

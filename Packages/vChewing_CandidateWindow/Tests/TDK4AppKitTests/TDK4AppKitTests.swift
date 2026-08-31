@@ -404,4 +404,85 @@ struct TDK4AppKitTests {
       }
     }
   }
+
+  // MARK: - 讀音 Disambiguation 拼音顯示（PhonabetPinyinConverter）測試
+
+  /// 驗證：未指派 phonabetPinyinConverter 時，讀音 disambiguation 維持注音讀音原樣。
+  @Test
+  func testReadingDisambiguationKeepsPhonabetWithoutConverter() throws {
+    let candidates: [CandidateInState] = [
+      (keyArray: ["ㄨㄛˇ"], value: "我"),
+      (keyArray: ["ㄨㄛ"], value: "我"),
+    ]
+    let pool = TDK4AppKit.CandidatePool4AppKit(
+      candidates: candidates, selectionKeys: "123", layout: .horizontal
+    )
+    defer { pool.phonabetPinyinConverter = nil }
+
+    pool.updateReadingDisambiguation()
+    #expect(pool.readingDisambiguationResult == "ㄨㄛˇ")
+  }
+
+  /// 驗證：指派 phonabetPinyinConverter 後，讀音 disambiguation 顯示轉換後的內容。
+  /// （轉換鏈本身由 Tekkon 提供，此處以 stub converter 驗證 pool 的指派契約。）
+  @Test
+  func testReadingDisambiguationUsesConverterWhenAssigned() throws {
+    let candidates: [CandidateInState] = [
+      (keyArray: ["ㄨㄛˇ"], value: "我"),
+      (keyArray: ["ㄨㄛ"], value: "我"),
+    ]
+    let pool = TDK4AppKit.CandidatePool4AppKit(
+      candidates: candidates, selectionKeys: "123", layout: .horizontal
+    )
+    defer { pool.phonabetPinyinConverter = nil }
+
+    pool.phonabetPinyinConverter = { reading in
+      switch reading {
+      case "ㄨㄛˇ": return "wǒ"
+      case "ㄨㄛ": return "wō"
+      default: return reading
+      }
+    }
+    pool.updateReadingDisambiguation()
+    #expect(pool.readingDisambiguationResult == "wǒ")
+  }
+
+  /// 驗證：converter 對多讀音字詞逐 cell 生效，且以「-」連接；`_` 前綴 cell 維持「??」。
+  @Test
+  func testReadingDisambiguationConverterAppliesPerCell() throws {
+    let candidates: [CandidateInState] = [
+      (keyArray: ["ㄓㄨㄥ", "ㄍㄨㄛˊ"], value: "中國"),
+      (keyArray: ["ㄓㄨㄥ", "ㄍㄨㄛ"], value: "中國"),
+    ]
+    let pool = TDK4AppKit.CandidatePool4AppKit(
+      candidates: candidates, selectionKeys: "123", layout: .horizontal
+    )
+    defer { pool.phonabetPinyinConverter = nil }
+
+    pool.phonabetPinyinConverter = { reading in
+      reading.hasPrefix("ㄓㄨㄥ") ? "zhōng" : "guó"
+    }
+    pool.updateReadingDisambiguation()
+    #expect(pool.readingDisambiguationResult == "zhōng-guó")
+  }
+
+  /// 驗證：即使指派了 converter，`_` 前綴的讀音 cell（標點／特殊鍵）仍顯示「??」。
+  @Test
+  func testReadingDisambiguationConverterSkipsUnderscoreCells() throws {
+    let candidates: [CandidateInState] = [
+      (keyArray: ["_punctuation"], value: "，"),
+      (keyArray: ["ㄨㄛ"], value: "我"),
+    ]
+    let pool = TDK4AppKit.CandidatePool4AppKit(
+      candidates: candidates, selectionKeys: "123", layout: .horizontal
+    )
+    defer { pool.phonabetPinyinConverter = nil }
+
+    pool.phonabetPinyinConverter = { reading in
+      reading == "ㄨㄛ" ? "wō" : reading
+    }
+    pool.updateReadingDisambiguation()
+    // 任一讀音 cell 以 "_" 開頭 → 整段不顯示。
+    #expect(pool.readingDisambiguationResult == nil)
+  }
 }

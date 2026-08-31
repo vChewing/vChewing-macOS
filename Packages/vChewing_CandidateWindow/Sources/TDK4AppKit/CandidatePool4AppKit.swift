@@ -99,6 +99,10 @@ extension TDK4AppKit {
     /// 當前高亮候選字詞的讀音 disambiguation 顯示內容。nil 表示無需顯示。
     var readingDisambiguationResult: String?
 
+    /// 注音讀音轉換為拼音顯示用的 nullable converter。
+    /// 由組字引擎層（具備 Tekkon 能力的一側）指派；nil 時維持注音讀音原樣。
+    var phonabetPinyinConverter: ((String) -> String)?
+
     // MARK: - GSI Scroll Model
 
     /// 捲動偏移量（pixel）。0 = 第一行對齊 viewport 頂端。
@@ -1420,7 +1424,7 @@ extension TDK4AppKit.CandidatePool4AppKit {
 
     if rule1 || rule2 {
       let readingString = currentKeyArray.map { key in
-        key.hasPrefix("_") ? "??" : key
+        key.hasPrefix("_") ? "??" : (phonabetPinyinConverter?(key) ?? key)
       }.joined(separator: "-")
       readingDisambiguationResult = readingString
     }
