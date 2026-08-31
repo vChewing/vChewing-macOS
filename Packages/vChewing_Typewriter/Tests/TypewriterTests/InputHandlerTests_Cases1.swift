@@ -4197,10 +4197,12 @@ extension InputHandlerTests {
     }
   }
 
-  /// 狂拼 copilot 窗置頂候選就地選字的首段重合（P165）：`tama`＋POM「他媽的」記憶
-  /// 時，copilot 窗置頂候選為「他媽的」（3 段、首段 ㄊㄚ 與組字器尾鍵 ㄊㄚ桶 重合）。
-  /// 就地選中後，`applyFuriousFrontCandidate` 應只插入重合段以外的讀音並覆寫完整詞
-  /// ——組字器「他媽的」、**不含重複「他」**（修復前：插入完整 keyArray →「他他媽的」）。
+  /// 狂拼 copilot 窗置頂候選就地選字的首段重合（P165，P169 收斂）：`tama` 打完整
+  /// （組字器 [ㄊㄚ桶]）後，直接以 POM「他媽的」（3 段、首段 ㄊㄚ 與組字器尾鍵 ㄊㄚ桶
+  /// 重合）走就地確認路徑——`applyFuriousFrontCandidate` 應只插入重合段以外的讀音
+  /// 並覆寫完整詞——組字器「他媽的」、**不含重複「他」**（修復前：插入完整 keyArray
+  /// →「他他媽的」）。P169 收斂：此場景繞過 copilot 窗（3 段建議在 `tama` 時不再置頂，
+  /// 見 IH152），直接驗證首段重合路徑的套用正確性。
   @Test
   func test_IH150_FuriousTypingTamaPreviewNoDuplicate() throws {
     guard let testHandler, let testSession else { return }
@@ -4247,22 +4249,81 @@ extension InputHandlerTests {
     testHandler.prefs.fetchSuggestionsFromPerceptionOverrideModel = true
     testHandler.currentLM.syncPrefs()
 
+    // 打「tama」：組字器 [ㄊㄚ桶]＋注拼槽 "ma"。
     typeSentence("tama")
-    guard let idx = testSession.state.candidates.firstIndex(where: { $0.value == "他媽的" })
-    else {
-      Issue.record("POM-fronted '他媽的' candidate not found in copilot window.")
-      return
-    }
-    #expect(testSession.state.candidates[idx].keyArray == ["ㄊㄚ", "ㄇㄚ", "ㄉㄜ˙"])
-
-    // 就地選中置頂 POM 候選「他媽的」。
-    testSession.candidatePairSelectionConfirmed(at: idx)
+    #expect(testHandler.assembler.keys.count == 1)
+    #expect(testHandler.composer.romajiBuffer == "ma")
+    // 直接以 POM「他媽的」走就地確認（繞過 copilot 窗：3 段建議在 tama 時不再置頂）。
+    testHandler.confirmFuriousFrontCandidate(
+      (keyArray: ["ㄊㄚ", "ㄇㄚ", "ㄉㄜ˙"], value: "他媽的"), memorizePOM: true
+    )
 
     // 修復後：只插重合段以外的讀音、覆寫完整詞——組字器「他媽的」、無重複「他」。
     #expect(testHandler.composer.romajiBuffer.isEmpty)
     #expect(testHandler.assembler.keys.count == 3)
     #expect(testHandler.assembler.assembledSentence.map(\.value) == ["他媽的"])
     #expect(!testHandler.assembler.assembledSentence.values.joined().contains("他他"))
+  }
+
+  /// 狂拼 POM 建議段數上限（P169 fail-first）：`tama`（組字器 1 鍵＋注拼槽 1 鍵，
+  /// copilot 2 鍵）時，copilot 窗**不得**置頂 3 段「他媽的」POM 建議——段數溢出
+  /// （建議 3 段 > copilot 可承接 2 鍵）與組字器鍵數脫節，就地選中會造成讀音重疊。
+  /// 對照 IH151（`tamade` 時 copilot 3 鍵、3 段建議 == 可承接鍵數、照常置頂）。
+  @Test
+  func test_IH152_FuriousCopilotWindowRejectsOversizedPOMSuggestion() throws {
+    guard let testHandler, let testSession else { return }
+    clearTestPOM()
+    defer {
+      testHandler.currentLM.clearTemporaryData(isFiltering: false)
+      testHandler.prefs.furiousTypingEnabled = false
+      testHandler.prefs.pomAsNGramSourceEnabled = false
+      testHandler.prefs.keyboardParser = KeyboardParser.ofStandard.rawValue
+      testHandler.ensureKeyboardParser()
+      testSession.resetInputHandler(forceComposerCleanup: true)
+    }
+    [
+      .init(keyArray: ["ㄊㄚ"], value: "他", score: -5.024),
+      .init(keyArray: ["ㄊㄚ"], value: "她", score: -5.045),
+      .init(keyArray: ["ㄇㄚ"], value: "媽", score: -5.169),
+      .init(keyArray: ["ㄇㄚ"], value: "嗎", score: -5.113),
+      .init(keyArray: ["ㄉㄜ˙"], value: "的", score: -4.971),
+      .init(keyArray: ["ㄊㄚ", "ㄇㄚ"], value: "他媽", score: -8.713),
+      .init(keyArray: ["ㄊㄚ", "ㄇㄚ", "ㄉㄜ˙"], value: "他媽的", score: -5.405),
+      .init(keyArray: ["ㄇㄚ", "ㄇㄚ˙"], value: "媽媽", score: -3.195),
+    ].forEach {
+      testHandler.currentLM.insertTemporaryData(unigram: $0, isFiltering: false)
+    }
+    testSession.resetInputHandler(forceComposerCleanup: true)
+    testHandler.prefs.keyboardParser = KeyboardParser.ofHanyuPinyin.rawValue
+    testHandler.ensureKeyboardParser()
+    testHandler.prefs.furiousTypingEnabled = true
+    testHandler.currentLM.syncPrefs()
+    [
+      ("()&()&(ㄨㄛˇ,我)", "我"),
+      ("()&(ㄋㄧˇ,你)&(ㄊㄚ-ㄇㄚ-ㄉㄜ˙,他媽的)", "他媽的"),
+      ("(ㄗㄞˋ,再)&(ㄍㄣ-ㄨㄛˇ-ㄕㄨㄛ,跟我說)&(ㄧ,一)", "一邊"),
+    ].forEach {
+      testHandler.currentLM.memorizePerception(
+        (ngramKey: $0.0, candidate: $0.1),
+        timestamp: Date().timeIntervalSince1970
+      )
+    }
+    testHandler.prefs.pomAsNGramSourceEnabled = true
+    testHandler.prefs.fetchSuggestionsFromPerceptionOverrideModel = true
+    testHandler.currentLM.syncPrefs()
+
+    // tama：copilot 2 鍵——3 段「他媽的」不得置頂。
+    typeSentence("tama")
+    #expect(testHandler.assembler.keys.count == 1)
+    #expect(!testSession.state.candidates.contains { $0.value == "他媽的" })
+
+    // 對照：tamade（組字器 [ㄊㄚ,ㄇㄚ]＋注拼槽 de，copilot 3 鍵）——3 段建議照常置頂。
+    testHandler.clearComposerAndCalligrapher()
+    testSession.resetInputHandler(forceComposerCleanup: true)
+    testHandler.assembler.clear()
+    typeSentence("tamade")
+    #expect(testHandler.assembler.keys.count == 2)
+    #expect(testSession.state.candidates.first?.value == "他媽的")
   }
 
   /// 狂拼 copilot 窗去重：`tamade` 連打（ta、ma 已固化、de 在注拼槽）時，

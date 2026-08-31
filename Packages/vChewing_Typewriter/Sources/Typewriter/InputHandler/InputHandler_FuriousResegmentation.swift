@@ -243,13 +243,19 @@ extension InputHandlerProtocol {
     // 逐位承接前 n-1 段讀音、組字器鍵數不足 span 時不成立；本路徑僅以單一尾鍵承接。
     // 例：「他媽的」[ㄊㄚ,ㄇㄚ,ㄉㄜ˙] 與尾鍵「他」ㄊㄚ 桶 k=1 重合——若全段插入會
     // 複製「他」→「他他媽的」，本路徑只插入重合段之後的 [ㄇㄚ,ㄉㄜ˙] 再覆寫全詞。
+    // 收斂（P169）：k 恆為 1——僅當候選首段 ∈ 尾鍵桶、且第二段不 ∈ 尾鍵桶時生效。
+    // 不做 `prefix(while:)` 連續數算：多讀音桶下前兩段同屬一桶時 k 若數到 2，
+    // `dropFirst(k)` 的插入鍵數與「anchor-1 起 n 鍵」的覆寫 span 會錯位。
     var leadingOverlapCount = 0
     if !isBucketPinned, !isCrossBoundary, candidate.keyArray.count >= 2,
-       let lastKey = targetAssembler.keys.last {
-      leadingOverlapCount = candidate.keyArray
-        .prefix(candidate.keyArray.count - 1)
-        .prefix(while: { lastKey.allValues.contains($0) })
-        .count
+       let lastKey = targetAssembler.keys.last,
+       let firstReading = candidate.keyArray.first,
+       lastKey.allValues.contains(firstReading) {
+      // 第二段若也 ∈ 尾鍵桶（多讀音桶誤判防線）：不認定為首段重合。
+      if candidate.keyArray.count == 2
+        || !lastKey.allValues.contains(candidate.keyArray[1]) {
+        leadingOverlapCount = 1
+      }
     }
     // 目標組字器的游標即新插入 span 的錨點（狂拼語義下位於組字區最前端）。
     let anchor = targetAssembler.cursor
@@ -262,6 +268,17 @@ extension InputHandlerProtocol {
       inserted = (try? targetAssembler.insertKeys(
         candidate.keyArray.dropFirst(leadingOverlapCount).map { .singleKey($0) }
       )) != nil
+    } else if !isBucketPinned, !targetAssembler.keys.isEmpty,
+              candidate.keyArray.count > targetAssembler.keys.count + 1 {
+      // 收斂（P169）：組字器非空、候選段數大於「組字器鍵數＋注拼槽 1 鍵」的承接上限、
+      // 且前三路徑皆不命中（置頂無橫跨／跨邊界鍵數不足／首段不重合）——此時插入完整
+      // keyArray 會讓候選與組字器既有鍵讀音重疊（如組字器 [ㄇㄚ桶]＋候選「他媽的」
+      // →「嗎他媽的」）。靜默退回、不更動組字器；呼叫端
+      // （confirmFuriousFrontCandidate）已有注拼槽復原承接。
+      // （組字器為空時不攔截：R2-α 整詞簡拼「ysxb」→「野獸先輩」即為組字器空、
+      // 候選多段的合法情境；`isBucketPinned` 時 keyArray 為前方桶本身——keyArray.count
+      // 是桶內讀音數、非段數，插入語義為單鍵多讀音，亦不受攔截。）
+      inserted = false
     } else {
       let keysToInsert: [Homa.PossibleKey] = candidate.keyArray == bucket
         ? [.multipleKeys(bucket)]

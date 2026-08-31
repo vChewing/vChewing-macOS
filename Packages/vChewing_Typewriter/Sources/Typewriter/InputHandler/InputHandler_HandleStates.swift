@@ -183,8 +183,13 @@ extension InputHandlerProtocol {
         let pomCandidates = suggestion.candidates
           .sorted { $0.probability > $1.probability }
           .map { (keyArray: $0.keyArray, value: $0.value) }
+        // 段數上限（P169）：POM 建議的 keyArray 段數不得超過 copilot 可承接鍵數
+        // （組字器鍵數＋注拼槽 1 鍵）——否則「tama」類（copilot 2 鍵）會撈回 3 段
+        // 「他媽的」記憶，就地選中後插入完整 keyArray 與組字器既有鍵讀音重疊。
+        let maxSyllableCount = assembler.keys.count + 1
         for candidate in pomCandidates {
           guard !candidate.value.isEmpty else { continue }
+          guard candidate.keyArray.count <= maxSyllableCount else { continue }
           guard seenValues.insert(candidate.value).inserted else { continue }
           anchored.append(candidate)
         }
