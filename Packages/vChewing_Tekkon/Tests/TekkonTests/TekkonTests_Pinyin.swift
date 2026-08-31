@@ -400,4 +400,22 @@ struct TekkonTestsPinyin {
     #expect(composer.getComposition() == "")
     #expect(!composer.isPronounceable)
   }
+
+  /// 注拼槽 romajiBuffer 的單音節長度上限（預設 6 碼、超出丟棄最早音頭）——
+  /// 狂拼等多音節簡拼字母流需關閉音頭丟棄（`allowsExtendedRomajiBuffer`）：
+  /// 「slliang」不得被截斷成「lliang」而丟失前導字母。
+  @Test("[Tekkon] Composer_ExtendedRomajiBuffer_Pinyin")
+  func testExtendedRomajiBufferPreservesLongAbbreviationStream() async throws {
+    // 預設（false）：超過 6 碼即丟棄最早音頭——「slliang」第 7 碼「g」觸發、
+    // buffer 變「lliang」。
+    var capped = Tekkon.Composer(arrange: .ofHanyuPinyin)
+    for char in "slliang" { capped.receiveKey(fromString: String(char)) }
+    #expect(capped.romajiBuffer == "lliang")
+
+    // 啟用（true）：完整保留多音節簡拼字母流。
+    var extended = Tekkon.Composer(arrange: .ofHanyuPinyin)
+    extended.allowsExtendedRomajiBuffer = true
+    for char in "slliang" { extended.receiveKey(fromString: String(char)) }
+    #expect(extended.romajiBuffer == "slliang")
+  }
 }
