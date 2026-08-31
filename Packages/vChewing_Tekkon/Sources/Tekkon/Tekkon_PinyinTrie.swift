@@ -225,39 +225,45 @@ extension Tekkon.PinyinTrie {
     let complexLength = givenCharComplex.count
     var result = [String]()
 
-    // 此處無須呼叫 updateAllPossibleReadings()，因為一定是被事先呼叫過的。
-    // 每次 ensureParser() 的時候都會呼叫一次。
-
-    let longestReadingLength = allPossibleReadings.first?.count ?? 1
-    let maxScopeSize = min(complexLength, longestReadingLength)
+    // Pinyin parser 走 trie 走訪：沿輸入字元貪婪下探，最長可達路徑
+    // 即為「是某讀音前綴」的最長 blob——狂拼／auto-chop 的輸入皆為無調詞幹（聲調走
+    // intonation），與既有 `allPossibleReadings`（含聲調後綴）語義在實際輸入下等價；
+    // trie 由全部讀音詞幹建立，故「blob 存在於 trie」＝「blob 是某讀音前綴」。
+    // 非 Pinyin parser（注音排列等）的 trie 為空（mapZhuyinPinyin nil）、既有語義以
+    // `allPossibleReadings`（zhuyin 值）比對，保留原線性掃描。
     var currentPosition = 0
 
     while currentPosition < complexLength {
-      var foundMatch = false
-
-      // 嘗試從最長的可能前綴開始比對
-      let longPossibleScopeSize = min(maxScopeSize, complexLength - currentPosition)
-      checkPosition: for scopeSize in (1 ... longPossibleScopeSize).reversed() {
-        let endPosition = currentPosition + scopeSize
-        if endPosition > complexLength {
-          continue
+      var endPosition = currentPosition
+      if parser.isPinyin {
+        var node = root
+        while endPosition < complexLength {
+          let charStr = givenCharComplex[endPosition].description
+          guard let childID = node.children[charStr], let child = nodes[childID] else { break }
+          node = child
+          endPosition += 1
         }
-
-        let currentBlob = String(givenCharComplex[currentPosition ..< endPosition])
-
-        // 檢查是否有任何讀音以這個字串開頭
-        for currentReading in allPossibleReadings {
-          if currentReading.hasPrefix(currentBlob) {
-            result.append(currentBlob)
-            currentPosition = endPosition
-            foundMatch = true
-            break checkPosition
+      } else {
+        // 非 Pinyin：最長前綴線性掃描（讀音數少、非熱路徑）。
+        let longestReadingLength = allPossibleReadings.first?.count ?? 1
+        let maxScopeSize = min(complexLength - currentPosition, longestReadingLength)
+        scanPosition: for scopeSize in (1 ... maxScopeSize).reversed() {
+          let candidateEnd = currentPosition + scopeSize
+          let currentBlob = String(givenCharComplex[currentPosition ..< candidateEnd])
+          for currentReading in allPossibleReadings {
+            if currentReading.hasPrefix(currentBlob) {
+              endPosition = candidateEnd
+              break scanPosition
+            }
           }
         }
       }
 
-      // 如果沒找到相符的條目，將當前字元作為單獨的一項
-      if !foundMatch {
+      if endPosition > currentPosition {
+        result.append(String(givenCharComplex[currentPosition ..< endPosition]))
+        currentPosition = endPosition
+      } else {
+        // 如果沒找到相符的條目，將當前字元作為單獨的一項。
         result.append(String(givenCharComplex[currentPosition]))
         currentPosition += 1
       }
