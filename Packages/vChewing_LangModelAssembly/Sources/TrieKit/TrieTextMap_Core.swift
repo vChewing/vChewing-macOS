@@ -151,7 +151,7 @@ extension VanguardTrie {
     private static let revLookupEntryType = VanguardTrie.Trie.EntryType(rawValue: 3)
     private static let cnsEntryType = VanguardTrie.Trie.EntryType(rawValue: 7)
 
-    private static let cacheLimit = 256
+    private static let cacheLimit = 1_024
 
     private let rawData: Data
     private let isTyping: Bool

@@ -149,19 +149,13 @@ public final class QueryBuffer<T> {
     guard let maxCount else { return }
     let currentCount = count
     guard currentCount > maxCount else { return }
-    // 掃描快取尋找最舊條目（timestampNs 最小），逐出之。
-    // 每次 set() 最多逐出 1 條，避免單次操作過長時間。
-    var oldestKey: Int?
-    var oldestTime: UInt64 = .max
-    mtxCache.withLockRead { cache in
-      for (key, entry) in cache where entry.timestampNs < oldestTime {
-        oldestTime = entry.timestampNs
-        oldestKey = key
-      }
-    }
-    if let oldestKey {
-      _ = mtxCache.withLock { $0.removeValue(forKey: oldestKey) }
-    }
+    // O(1) 逐出：到期佇列為插入序（＝時間序、`DispatchTime` 單調），
+    // 佇列頭即最舊條目——直接消費之。取代舊實作的「全 Dictionary 掃描找最舊」：
+    // 快取滿後每次 set() 皆 O(n) 掃描（狂拼每鍵大量 set、舊實作佔 ~19% 打字 CPU）。
+    guard let marker = currentExpirationMarker() else { return }
+    _ = mtxCache.withLock { $0.removeValue(forKey: marker.hashKey) }
+    advanceExpirationQueueHead()
+    compactExpirationQueueIfNeeded()
   }
 
   private func shouldRunCleanupLocked(now: UInt64) -> Bool {
