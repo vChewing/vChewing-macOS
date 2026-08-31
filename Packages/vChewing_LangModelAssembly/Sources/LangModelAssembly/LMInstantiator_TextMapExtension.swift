@@ -295,7 +295,7 @@ extension LMAssembly.LMInstantiator {
       partiallyMatch: partiallyMatch
     )
     guard !entryGroups.isEmpty else { return [] }
-    return entryGroups.flatMap { group in
+    let grams = entryGroups.flatMap { group in
       makeFactoryUnigrams(
         entries: group.entries,
         keyArray: group.keyArray,
@@ -304,6 +304,27 @@ extension LMAssembly.LMInstantiator {
         includeHalfWidthVariants: true
       )
     }
+    // 詞值去重、保留最高機率者（狂拼 copilot 窗候選排序修正）：
+    // 同一個詞值可能以「無調墊底」與「聲調專屬」兩種讀音鍵同時存在
+    // （如「我」ㄨㄛ 與 ㄨㄛˇ），trie 鍵序使無調低權重條目先插入，
+    // 下游既有的「先插入者勝」去重（consolidate）會把高權重的聲調條目丟掉——
+    // 桶查詢（multipleKeys，狂拼注拼槽展開）中「我」便以墊底權重下沉、
+    // 排在「喔」等低權重單字之後。此處以「最高機率者勝出」去重，
+    // 使「我」以真實權重（ㄨㄛˇ）浮出於候選前列。
+    // 呼叫端最終仍會依機率排序（unigramsFor 的 sort），此處迭代順序不影響結果。
+    var bestByValue: [String: Homa.Gram] = [:]
+    bestByValue.reserveCapacity(grams.count)
+    for gram in grams {
+      guard !gram.current.isEmpty else { continue }
+      if let existing = bestByValue[gram.current] {
+        if gram.probability > existing.probability {
+          bestByValue[gram.current] = gram
+        }
+      } else {
+        bestByValue[gram.current] = gram
+      }
+    }
+    return Array(bestByValue.values)
   }
 
   func factoryChoppedCoreUnigramsFor(

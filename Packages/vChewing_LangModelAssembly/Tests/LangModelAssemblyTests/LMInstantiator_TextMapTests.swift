@@ -354,6 +354,37 @@ struct LMInstantiatorTextMapTests {
   }
 
   @Test
+  func testFactoryChoppedQueryDedupsValueByHighestProbability() throws {
+    defer {
+      LMAssembly.LMInstantiator.disconnectFactoryDictionary()
+    }
+
+    let instance = LMAssembly.LMInstantiator(isCHS: false)
+    // 模擬真實辭典中「我」同時以「無調墊底」（ㄨㄛ、低權重）與「聲調專屬」
+    // （ㄨㄛˇ、高權重）兩種讀音鍵存在（實際 mcbopomofo 資料即有此結構）；
+    // 「喔」僅有無調（ㄨㄛ、中權重）。
+    let textMap = makeTextMap([
+      ("ㄨㄛ", [("喔", -5.183, 6), ("我", -9.465, 6)]),
+      ("ㄨㄛˇ", [("我", -5.043, 6)]),
+    ])
+
+    #expect(LMAssembly.LMInstantiator.connectToTestFactoryDictionary(textMapData: textMap))
+
+    // 狂拼注拼槽「wo」展開的聲調桶查詢（multipleKeys，copilot 窗候選來源）：
+    // 修復前 consolidate「先插入者勝」保留無調低權重的「我」（ㄨㄛ、-9.465）、
+    // 使其以墊底權重沉到「喔」之後；修復後保留最高機率者（ㄨㄛˇ、-5.043）、
+    // 「我」以真實權重浮出且排在「喔」之前。
+    let grams = instance.unigramsFor(
+      keyArray: [.multipleKeys(["ㄨㄛ", "ㄨㄛˇ"])], partiallyMatch: false
+    )
+    let woGram = grams.first(where: { $0.current == "我" })
+    #expect(gramTriple(of: woGram) == .init(keyArray: ["ㄨㄛˇ"], value: "我", probability: -5.043))
+    let indexWo = grams.firstIndex(where: { $0.current == "我" }) ?? -1
+    let indexO = grams.firstIndex(where: { $0.current == "喔" }) ?? -1
+    #expect(indexWo >= 0 && indexO >= 0 && indexWo < indexO)
+  }
+
+  @Test
   func testFactoryStrictSupersetUnigramsFor() throws {
     defer {
       LMAssembly.LMInstantiator.disconnectFactoryDictionary()
