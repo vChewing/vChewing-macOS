@@ -17,6 +17,10 @@ extension VwrAppInstaller4Cocoa {
     .localizedInfoDictionary?["CFEULAContent"] as? String ?? "BAD_EULA_CONTENT"
   public static let eulaContentUpstream = Bundle.main
     .infoDictionary?["CFUpstreamEULAContent"] as? String ?? "BAD_EULA_UPSTREAM"
+
+  /// 主視窗的 content size，與 SwiftUI 版安裝程式的 Window Size（1000×630）一致。
+  public static let meshWindowWidth: CGFloat = 1_000
+  public static let meshWindowHeight: CGFloat = 630
 }
 
 // MARK: - VwrAppInstaller4Cocoa
@@ -33,9 +37,73 @@ public final class VwrAppInstaller4Cocoa: NSViewController, InstallerVMProtocol 
   // MARK: Public
 
   override public func loadView() {
-    view = body ?? .init()
-    (view as? NSStackView)?.alignment = .centerX
-    view.makeSimpleConstraint(.width, relation: .equal, value: windowWidth)
+    let container = NSView()
+    container.autoresizingMask = [.width, .height]
+
+    // 背景 color mesh（與 SwiftUI 版安裝程式的 GradientViewWrapper 一致）。
+    let meshView = MeshGradientView()
+    container.addSubview(meshView)
+    meshView.pinEdges(to: container)
+
+    // 左上角的標題文字（與 SwiftUI 版相同：30pt 斜體粗體、白色、黑色陰影）。
+    let titleLabel = Self.makeMeshTitleLabel()
+    container.addSubview(titleLabel)
+    titleLabel.translatesAutoresizingMaskIntoConstraints = false
+    container.addConstraint(
+      NSLayoutConstraint(
+        item: titleLabel, attribute: .top, relatedBy: .equal,
+        toItem: container, attribute: .top, multiplier: 1, constant: 16
+      )
+    )
+    container.addConstraint(
+      NSLayoutConstraint(
+        item: titleLabel, attribute: .leading, relatedBy: .equal,
+        toItem: container, attribute: .leading, multiplier: 1, constant: 16
+      )
+    )
+
+    // 置中的安裝程式內容（圓角卡片＋陰影，外觀對應 SwiftUI 版的 GroupBox）。
+    let content = body ?? .init()
+    (content as? NSStackView)?.alignment = .centerX
+    content.makeSimpleConstraint(.width, relation: .equal, value: windowWidth)
+    let card = InstallerCardView()
+    container.addSubview(card)
+    card.translatesAutoresizingMaskIntoConstraints = false
+    container.addConstraint(
+      NSLayoutConstraint(
+        item: card, attribute: .centerX, relatedBy: .equal,
+        toItem: container, attribute: .centerX, multiplier: 1, constant: 0
+      )
+    )
+    container.addConstraint(
+      NSLayoutConstraint(
+        item: card, attribute: .centerY, relatedBy: .equal,
+        toItem: container, attribute: .centerY, multiplier: 1, constant: 0
+      )
+    )
+    content.translatesAutoresizingMaskIntoConstraints = false
+    card.addSubview(content)
+    // 內容釘住「可見卡片」的四邊（frame 內縮 shadowMargin 後的可見圓角矩形）：
+    // 上方補上 inner padding（對應 SwiftUI 版 GroupBox 的頂部留白），其餘三邊貼齊。
+    // 注意 trailing／bottom 需用負號（向內縮），否則內容會往右下溢出卡片。
+    [NSLayoutConstraint.Attribute.top, .leading, .trailing, .bottom].forEach { attribute in
+      let constant: CGFloat
+      switch attribute {
+      case .top: constant = 20 + InstallerCardView.shadowMargin
+      case .leading: constant = InstallerCardView.shadowMargin
+      case .trailing: constant = -InstallerCardView.shadowMargin
+      case .bottom: constant = -InstallerCardView.shadowMargin
+      default: constant = 0
+      }
+      card.addConstraint(
+        NSLayoutConstraint(
+          item: content, attribute: attribute, relatedBy: .equal,
+          toItem: card, attribute: attribute, multiplier: 1, constant: constant
+        )
+      )
+    }
+
+    view = container
     updateUpgradeableStatus()
     refreshUI()
   }
@@ -248,6 +316,14 @@ public final class VwrAppInstaller4Cocoa: NSViewController, InstallerVMProtocol 
 
   // MARK: Private
 
+  // MARK: - 標題文字（mesh 左上角）
+
+  private static var meshTitleFont: NSFont {
+    let baseFont = NSFont.systemFont(ofSize: 30)
+    let descriptor = baseFont.fontDescriptor.withSymbolicTraits([.bold, .italic])
+    return NSFont(descriptor: descriptor, size: 30) ?? baseFont
+  }
+
   // MARK: UI Elements
 
   private lazy var installButton: NSButton = {
@@ -283,6 +359,27 @@ public final class VwrAppInstaller4Cocoa: NSViewController, InstallerVMProtocol 
   private var pendingSheetTimeLabel: NSTextField?
 
   private var isPresentingAlert: Bool = false
+
+  private static func makeMeshTitleLabel() -> NSTextField {
+    let shadow = NSShadow()
+    shadow.shadowColor = NSColor.black
+    shadow.shadowBlurRadius = 0
+    shadow.shadowOffset = .init(width: 5, height: -5)
+    let label = NSTextField()
+    label.attributedStringValue = NSAttributedString(
+      string: "i18n:Installer.VChewingInputMethod".i18n,
+      attributes: [
+        .font: meshTitleFont,
+        .foregroundColor: NSColor.white,
+        .shadow: shadow,
+      ]
+    )
+    label.isEditable = false
+    label.isSelectable = false
+    label.isBordered = false
+    label.drawsBackground = false
+    return label
+  }
 
   // MARK: - UI Refresh & Alerts
 
@@ -347,6 +444,9 @@ public final class VwrAppInstaller4Cocoa: NSViewController, InstallerVMProtocol 
          let postInstallAlertItem = self.config.currentAlertContent.makeAlertItemIfNeeded(
            paths: self.config.adminRenameFailureAlertPaths
          ) {
+        // 將 currentAlertContent 消耗掉（歸零），避免每次 refreshUI 都對同一內容
+        // 反覆重建 alertItem（在舊版 macOS 上會造成「安裝成功」提示循環彈出）。
+        self.config.currentAlertContent = .nothing
         self.config.alertItem = postInstallAlertItem
       }
 
@@ -418,7 +518,137 @@ public final class VwrAppInstaller4Cocoa: NSViewController, InstallerVMProtocol 
   }
 }
 
+// MARK: - InstallerCardView
+
+/// 置中的安裝程式內容卡片：以 CoreGraphics 直接繪製圓角底色與 thick round-rectangle
+/// outline，外觀對應 SwiftUI 版的 GroupBox（`.background(underPageBackgroundColor)`＋
+/// `.clipShape(RoundedRectangle(16))` 疊於其上）。
+private final class InstallerCardView: NSView {
+  // MARK: Internal
+
+  /// 外框留白：frame 比可見圓角矩形多出的邊距，讓 outline 得以在 bounds 內繪製
+  /// （`draw(_:)` 的輸出會被裁切到視圖 bounds，故外框必須留在界內）。
+  static let shadowMargin: CGFloat = 16
+
+  override func draw(_ dirtyRect: NSRect) {
+    super.draw(dirtyRect)
+    let visibleRect = bounds.insetBy(dx: Self.shadowMargin, dy: Self.shadowMargin)
+    let path = NSBezierPath(roundedRect: visibleRect, xRadius: 16, yRadius: 16)
+    // thick round-rectangle outline：以比可見卡片大一圈的圓角矩形繪出，邊緣以
+    // NSShadow 模糊柔化（shadowColor＝系統 shadowColor@0.3、blur 3）。外框基色為
+    // makeOutlineColor()（依底色 brightness 門檻：亮底→純白、暗底→純黑），再以
+    // controlBackgroundColor 覆蓋為實心色——皆為 dynamic color、隨外觀自動變化。
+    let outlinePath = NSBezierPath(
+      roundedRect: visibleRect.insetBy(dx: -10, dy: -10), xRadius: 26, yRadius: 26
+    )
+    let outlineColor = Self.makeOutlineColor()
+    let shadow = NSShadow()
+    shadow.shadowColor = NSColor.shadowColor.withAlphaComponent(0.3)
+    shadow.shadowBlurRadius = 3
+    shadow.shadowOffset = .zero
+    NSGraphicsContext.saveGraphicsState()
+    shadow.set()
+    outlineColor.setFill()
+    outlinePath.fill()
+    NSColor.controlBackgroundColor.setFill()
+    outlinePath.fill()
+    NSGraphicsContext.restoreGraphicsState()
+    // 底色：underPageBackgroundColor（dynamic color，隨 bright／dark 自動變化）。
+    NSColor.underPageBackgroundColor.setFill()
+    path.fill()
+  }
+
+  // MARK: Private
+
+  /// 依底色的 brightness 門檻產生外框基色：亮底→純白、暗底→純黑（brightness-only，
+  /// hue／saturation 不變）；實際外框色再由 controlBackgroundColor 覆蓋。
+  private static func makeOutlineColor() -> NSColor {
+    let background = NSColor.windowBackgroundColor
+    guard let rgb = background.usingColorSpace(.deviceRGB) else { return background }
+    var hue: CGFloat = 0
+    var saturation: CGFloat = 0
+    var brightness: CGFloat = 0
+    var alpha: CGFloat = 0
+    rgb.getHue(&hue, saturation: &saturation, brightness: &brightness, alpha: &alpha)
+    let adjustedBrightness = brightness > 0.5 ? 1.0 : 0.0
+    return NSColor(hue: hue, saturation: saturation, brightness: adjustedBrightness, alpha: alpha)
+  }
+}
+
+// MARK: - MeshGradientView
+
+/// AppKit 版的「2×2 四角色」color mesh 背景。
+/// 顏色與插值方式與 SwiftUI 版安裝程式的 `GradientViewWrapper`（Canvas fallback）
+/// 完全一致：以線性色域做雙線性插值、再轉回 sRGB，以 64×64 個小方格繪製。
+private final class MeshGradientView: NSView {
+  override var isFlipped: Bool { true }
+
+  override func draw(_ dirtyRect: NSRect) {
+    super.draw(dirtyRect)
+    let steps = 64
+    let cellWidth = bounds.width / CGFloat(steps)
+    let cellHeight = bounds.height / CGFloat(steps)
+    // 四角顏色（sRGB 分量）：左上、右上、左下、右下。
+    let c00 = (r: 0.93, g: 0.49, b: 0.21)
+    let c10 = (r: 0.31, g: 0.73, b: 0.30)
+    let c01 = (r: 0.38, g: 0.58, b: 0.81)
+    let c11 = (r: 0.97, g: 0.84, b: 0.02)
+    for y in 0 ..< steps {
+      for x in 0 ..< steps {
+        let u = (Double(x) + 0.5) / Double(steps)
+        let v = (Double(y) + 0.5) / Double(steps)
+        // 線性色域中的雙線性插值。
+        let top = lerp(srgbToLinear(c00), srgbToLinear(c10), t: u)
+        let bottom = lerp(srgbToLinear(c01), srgbToLinear(c11), t: u)
+        let linear = lerp(top, bottom, t: v)
+        let srgb = linearToSrgb(linear)
+        NSColor(
+          srgbRed: CGFloat(srgb.r), green: CGFloat(srgb.g), blue: CGFloat(srgb.b), alpha: 1
+        ).setFill()
+        NSRect(
+          x: CGFloat(x) * cellWidth,
+          y: CGFloat(y) * cellHeight,
+          width: cellWidth + 0.5,
+          height: cellHeight + 0.5
+        ).fill()
+      }
+    }
+  }
+}
+
+// MARK: - 色域換算輔助函式
+
+private typealias RGB = (r: Double, g: Double, b: Double)
+
+private func lerp(_ a: RGB, _ b: RGB, t: Double) -> RGB {
+  (r: a.r + (b.r - a.r) * t, g: a.g + (b.g - a.g) * t, b: a.b + (b.b - a.b) * t)
+}
+
+private func srgbToLinear(_ c: RGB) -> RGB {
+  (r: srgbChannelToLinear(c.r), g: srgbChannelToLinear(c.g), b: srgbChannelToLinear(c.b))
+}
+
+private func linearToSrgb(_ c: RGB) -> RGB {
+  (r: linearChannelToSrgb(c.r), g: linearChannelToSrgb(c.g), b: linearChannelToSrgb(c.b))
+}
+
+private func srgbChannelToLinear(_ channel: Double) -> Double {
+  if channel <= 0.04045 {
+    return channel / 12.92
+  } else {
+    return pow((channel + 0.055) / 1.055, 2.4)
+  }
+}
+
+private func linearChannelToSrgb(_ channel: Double) -> Double {
+  if channel <= 0.0031308 {
+    return channel * 12.92
+  } else {
+    return 1.055 * pow(channel, 1.0 / 2.4) - 0.055
+  }
+}
+
 @available(macOS 14.0, *)
-#Preview(traits: .fixedLayout(width: 533, height: 550)) {
+#Preview(traits: .fixedLayout(width: 1_000, height: 630)) {
   VwrAppInstaller4Cocoa()
 }

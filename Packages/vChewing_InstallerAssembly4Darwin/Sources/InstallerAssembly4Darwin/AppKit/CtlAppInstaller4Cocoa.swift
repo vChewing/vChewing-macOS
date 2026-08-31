@@ -13,7 +13,11 @@ public final class CtlAppInstaller4Cocoa: NSWindowController, NSWindowDelegate {
 
   public init() {
     let newWindow = NSWindow(
-      contentRect: CGRect(x: 401, y: 295, width: 577, height: 568),
+      contentRect: CGRect(
+        x: 401, y: 295,
+        width: VwrAppInstaller4Cocoa.meshWindowWidth,
+        height: VwrAppInstaller4Cocoa.meshWindowHeight
+      ),
       styleMask: [.titled, .closable, .miniaturizable],
       backing: .buffered, defer: true
     )
@@ -76,9 +80,11 @@ public final class CtlAppInstaller4Cocoa: NSWindowController, NSWindowDelegate {
       guard let window = window else { return }
       let theView = viewController.view
       window.contentView = theView
-      let size = theView.fittingSize
       window.setPosition(vertical: .center, horizontal: .center, padding: 0)
-      window.setFrame(.init(origin: window.frame.origin, size: size), display: true)
+      window.setContentSize(.init(
+        width: VwrAppInstaller4Cocoa.meshWindowWidth,
+        height: VwrAppInstaller4Cocoa.meshWindowHeight
+      ))
       window.standardWindowButton(.closeButton)?.isHidden = true
       window.standardWindowButton(.miniaturizeButton)?.isHidden = true
       window.standardWindowButton(.zoomButton)?.isHidden = true
@@ -92,9 +98,11 @@ public final class CtlAppInstaller4Cocoa: NSWindowController, NSWindowDelegate {
       super.windowDidLoad()
       guard let window = window else { return }
       window.contentViewController = viewController
-      let size = viewController.view.fittingSize
       window.setPosition(vertical: .center, horizontal: .center, padding: 0)
-      window.setFrame(.init(origin: window.frame.origin, size: size), display: true)
+      window.setContentSize(.init(
+        width: VwrAppInstaller4Cocoa.meshWindowWidth,
+        height: VwrAppInstaller4Cocoa.meshWindowHeight
+      ))
       window.standardWindowButton(.closeButton)?.isHidden = true
       window.standardWindowButton(.miniaturizeButton)?.isHidden = true
       window.standardWindowButton(.zoomButton)?.isHidden = true
