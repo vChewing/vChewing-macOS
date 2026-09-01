@@ -97,28 +97,28 @@ extension SettingsPanesCocoa {
       pathCtl.setContentCompressionResistancePriority(.defaultLow, for: .horizontal)
       pathCtl.makeSimpleConstraint(.height, relation: .equal, value: NSFont.smallSystemFontSize * 2)
       pathCtl.makeSimpleConstraint(.width, relation: .equal, value: windowWidth - 145)
-      let currentPath = LMMgr.cassettePath()
-      pathCtl.url = currentPath.isEmpty ? nil : URL(fileURLWithPath: LMMgr.cassettePath())
+      let currentPath = SettingsUIHost.shared.cassettePath()
+      pathCtl.url = currentPath.isEmpty ? nil : URL(fileURLWithPath: SettingsUIHost.shared.cassettePath())
       pathCtl.toolTip = "i18n:ClientManager.DragTargetInstruction".i18n
     }
 
     @IBAction
     func cassetteEnabledToggled(_: NSControl) {
       // 與 SwiftUI 偏好設定頁面保持行為一致：路徑為空時拒絕啟用磁帶模式。
-      if PrefMgr.shared.cassetteEnabled, LMMgr.cassettePath().isEmpty {
+      if PrefMgr.shared.cassetteEnabled, SettingsUIHost.shared.cassettePath().isEmpty {
         IMEApp.buzz()
-        LMMgr.resetCassettePath()
+        SettingsUIHost.shared.resetCassettePath()
         PrefMgr.shared.cassetteEnabled = false
         asyncOnMain {
           let window = CtlSettingsCocoa.shared?.window
           let alert = NSAlert(error: "i18n:LMMgr.accessFailure.cassette.title".i18n)
-          alert.informativeText = LMMgr.cassetteAccessFailureDescription(path: PrefMgr.shared.cassettePath)
+          alert.informativeText = SettingsUIHost.shared.cassetteAccessFailureDescription(PrefMgr.shared.cassettePath)
           alert.beginSheetModal(at: window) { _ in }
         }
       } else {
-        LMMgr.loadCassetteData()
+        SettingsUIHost.shared.loadCassetteData()
       }
-      LMMgr.syncLMPrefs()
+      SettingsUIHost.shared.syncLMPrefs()
     }
   }
 }
@@ -130,29 +130,29 @@ extension SettingsPanesCocoa.Cassette: NSPathControlDelegate {
     let urls = info.draggingPasteboard.readObjects(forClasses: [NSURL.self])
     guard let droppedURL = urls?.first as? URL else { return false }
     guard pathControl === pctCassetteFilePath else { return false }
-    let url = LMMgr.resolveUserSpecifiedURL(droppedURL)
-    let bolPreviousPathValidity = LMMgr.checkCassettePathValidity(
+    let url = SettingsUIHost.shared.resolveUserSpecifiedURL(droppedURL)
+    let bolPreviousPathValidity = SettingsUIHost.shared.checkCassettePathValidity(
       PrefMgr.shared.cassettePath.expandingTildeInPath
     )
-    if LMMgr.checkCassettePathValidity(url.path) {
+    if SettingsUIHost.shared.checkCassettePathValidity(url.path) {
       PrefMgr.shared.cassettePath = url.path
-      LMMgr.loadCassetteData()
+      SettingsUIHost.shared.loadCassetteData()
       BookmarkManager.shared.saveBookmark(for: url)
-      LMMgr.importCassetteFileToCache(from: url)
+      SettingsUIHost.shared.importCassetteFileToCache(url)
       pathControl.url = url
       return true
     }
     // On Error:
     IMEApp.buzz()
     if !bolPreviousPathValidity {
-      LMMgr.resetCassettePath()
+      SettingsUIHost.shared.resetCassettePath()
     }
     return false
   }
 
   @IBAction
   func resetCassettePath(_: Any) {
-    LMMgr.resetCassettePath()
+    SettingsUIHost.shared.resetCassettePath()
   }
 
   @IBAction
@@ -186,7 +186,7 @@ extension SettingsPanesCocoa.Cassette: NSPathControlDelegate {
     }
     dlgOpenFile.allowsOtherFileTypes = true
 
-    let bolPreviousPathValidity = LMMgr.checkCassettePathValidity(
+    let bolPreviousPathValidity = SettingsUIHost.shared.checkCassettePathValidity(
       PrefMgr.shared.cassettePath.expandingTildeInPath
     )
 
@@ -194,23 +194,23 @@ extension SettingsPanesCocoa.Cassette: NSPathControlDelegate {
     dlgOpenFile.beginSheetModal(at: window) { [weak self] result in
       if result == NSApplication.ModalResponse.OK {
         guard let selectedURL = dlgOpenFile.url else { return }
-        let url = LMMgr.resolveUserSpecifiedURL(selectedURL)
-        if LMMgr.checkCassettePathValidity(url.path) {
+        let url = SettingsUIHost.shared.resolveUserSpecifiedURL(selectedURL)
+        if SettingsUIHost.shared.checkCassettePathValidity(url.path) {
           PrefMgr.shared.cassettePath = url.path
-          LMMgr.loadCassetteData()
+          SettingsUIHost.shared.loadCassetteData()
           BookmarkManager.shared.saveBookmark(for: url)
-          LMMgr.importCassetteFileToCache(from: url)
+          SettingsUIHost.shared.importCassetteFileToCache(url)
           self?.pctCassetteFilePath.url = url
         } else {
           IMEApp.buzz()
           if !bolPreviousPathValidity {
-            LMMgr.resetCassettePath()
+            SettingsUIHost.shared.resetCassettePath()
           }
           return
         }
       } else {
         if !bolPreviousPathValidity {
-          LMMgr.resetCassettePath()
+          SettingsUIHost.shared.resetCassettePath()
         }
         return
       }

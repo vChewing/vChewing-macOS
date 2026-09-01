@@ -188,8 +188,8 @@ public struct VwrSettingsPaneGeneral: View {
       PrefMgr.shared.pinyinTypingEnabled = false
     }
     if !PrefMgr.shared.useSCPCTypingMode {
-      Notifier.notify(
-        message: "i18n:UserDef.kUsingHotKeySCPC.shortTitle".i18n + "\n"
+      SettingsUIHost.shared.notify(
+        "i18n:UserDef.kUsingHotKeySCPC.shortTitle".i18n + "\n"
           + (
             PrefMgr.shared.useSCPCTypingMode.toggled()
               ? "i18n:NotificationSwitch.On".i18n
@@ -200,8 +200,8 @@ public struct VwrSettingsPaneGeneral: View {
     // 錯開兩條通知，防止兩條通知重疊到一起。
     asyncOnMain {
       if !PrefMgr.shared.associatedPhrasesEnabled {
-        Notifier.notify(
-          message: "i18n:UserDef.kUsingHotKeyAssociates.shortTitle".i18n + "\n"
+        SettingsUIHost.shared.notify(
+          "i18n:UserDef.kUsingHotKeyAssociates.shortTitle".i18n + "\n"
             + (
               PrefMgr.shared.associatedPhrasesEnabled.toggled()
                 ? "i18n:NotificationSwitch.On".i18n

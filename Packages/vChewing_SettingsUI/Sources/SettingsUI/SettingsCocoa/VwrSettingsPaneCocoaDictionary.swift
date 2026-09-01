@@ -214,32 +214,32 @@ extension SettingsPanesCocoa {
       pathCtl.setContentCompressionResistancePriority(.defaultLow, for: .horizontal)
       pathCtl.makeSimpleConstraint(.height, relation: .equal, value: NSFont.smallSystemFontSize * 2)
       pathCtl.makeSimpleConstraint(.width, relation: .equal, value: windowWidth - 145)
-      pathCtl.url = URL(fileURLWithPath: LMMgr.dataFolderPath(isDefaultFolder: false))
+      pathCtl.url = URL(fileURLWithPath: SettingsUIHost.shared.dataFolderPath(false))
       pathCtl.toolTip = "i18n:ClientManager.DragTargetInstruction".i18n
     }
 
     @IBAction
     func lmmgrInitUserLMsWhenShould(_: NSControl) {
       if PrefMgr.shared.shouldAutoReloadUserDataFiles {
-        LMMgr.initUserLangModels()
+        SettingsUIHost.shared.initUserLangModels()
       }
     }
 
     @IBAction
     func lmmgrConnectCoreDB(_: NSControl) {
-      LMMgr.connectCoreDB()
+      SettingsUIHost.shared.connectCoreDB()
     }
 
     @IBAction
     func lmmgrSyncLMPrefs(_: NSControl) {
-      LMMgr.syncLMPrefs()
+      SettingsUIHost.shared.syncLMPrefs()
     }
 
     @IBAction
     func lmmgrSyncLMPrefsWithReplacementTable(_: NSControl) {
-      LMMgr.syncLMPrefs()
+      SettingsUIHost.shared.syncLMPrefs()
       if PrefMgr.shared.phraseReplacementEnabled {
-        LMMgr.loadUserPhraseReplacement()
+        SettingsUIHost.shared.loadUserPhraseReplacement()
       }
     }
 
@@ -283,7 +283,7 @@ extension SettingsPanesCocoa {
 
     private func task4ImportingKeyKeyUserDict(_ url: URL? = nil) {
       do {
-        let countResult = try LMMgr.importYahooKeyKeyUserDictionary(url: url)
+        let countResult = try SettingsUIHost.shared.importYahooKeyKeyUserDictionary(url)
         let allImported = countResult.importedCount == countResult.totalFound
         let postOpsNotice: String? = allImported
           ? nil
@@ -311,17 +311,17 @@ extension SettingsPanesCocoa.Dictionary: NSPathControlDelegate {
     let urls = info.draggingPasteboard.readObjects(forClasses: [NSURL.self])
     guard let droppedURL = urls?.first as? URL else { return false }
     guard pathControl === pctUserDictionaryFolder else { return false }
-    let url = LMMgr.resolveUserSpecifiedURL(droppedURL)
-    let bolPreviousFolderValidity = LMMgr.checkIfSpecifiedUserDataFolderValid(
+    let url = SettingsUIHost.shared.resolveUserSpecifiedURL(droppedURL)
+    let bolPreviousFolderValidity = SettingsUIHost.shared.checkIfSpecifiedUserDataFolderValid(
       PrefMgr.shared.userDataFolderSpecified.expandingTildeInPath
     )
     var newPath = url.path
     newPath.ensureTrailingSlash()
-    if LMMgr.checkIfSpecifiedUserDataFolderValid(newPath) {
-      let oldPath = LMMgr.dataFolderPath(isDefaultFolder: false)
+    if SettingsUIHost.shared.checkIfSpecifiedUserDataFolderValid(newPath) {
+      let oldPath = SettingsUIHost.shared.dataFolderPath(false)
       PrefMgr.shared.userDataFolderSpecified = newPath
       BookmarkManager.shared.saveBookmark(for: url)
-      AppDelegate.shared.updateDirectoryMonitorPath()
+      SettingsUIHost.shared.updateDirectoryMonitorPath()
       pathControl.url = url
       maybePromptToMergeUserData(oldPath: oldPath)
       return true
@@ -329,18 +329,18 @@ extension SettingsPanesCocoa.Dictionary: NSPathControlDelegate {
     // On Error:
     IMEApp.buzz()
     if !bolPreviousFolderValidity {
-      LMMgr.resetSpecifiedUserDataFolder()
-      pathControl.url = URL(fileURLWithPath: LMMgr.dataFolderPath(isDefaultFolder: true))
+      SettingsUIHost.shared.resetSpecifiedUserDataFolder()
+      pathControl.url = URL(fileURLWithPath: SettingsUIHost.shared.dataFolderPath(true))
     }
     return false
   }
 
   @IBAction
   func resetSpecifiedUserDataFolder(_: Any) {
-    let oldPath = LMMgr.dataFolderPath(isDefaultFolder: false)
-    LMMgr.resetSpecifiedUserDataFolder()
-    pctUserDictionaryFolder.url = URL(fileURLWithPath: LMMgr.dataFolderPath(isDefaultFolder: true))
-    AppDelegate.shared.updateDirectoryMonitorPath()
+    let oldPath = SettingsUIHost.shared.dataFolderPath(false)
+    SettingsUIHost.shared.resetSpecifiedUserDataFolder()
+    pctUserDictionaryFolder.url = URL(fileURLWithPath: SettingsUIHost.shared.dataFolderPath(true))
+    SettingsUIHost.shared.updateDirectoryMonitorPath()
     maybePromptToMergeUserData(oldPath: oldPath)
   }
 
@@ -368,39 +368,39 @@ extension SettingsPanesCocoa.Dictionary: NSPathControlDelegate {
     dlgOpenPath.canChooseDirectories = true
     dlgOpenPath.allowsMultipleSelection = false
 
-    let bolPreviousFolderValidity = LMMgr.checkIfSpecifiedUserDataFolderValid(
+    let bolPreviousFolderValidity = SettingsUIHost.shared.checkIfSpecifiedUserDataFolderValid(
       PrefMgr.shared.userDataFolderSpecified.expandingTildeInPath
     )
     let window = CtlSettingsCocoa.shared?.window
     dlgOpenPath.beginSheetModal(at: window) { [weak self] result in
       if result == NSApplication.ModalResponse.OK {
         guard let selectedURL = dlgOpenPath.url else { return }
-        let url = LMMgr.resolveUserSpecifiedURL(selectedURL)
+        let url = SettingsUIHost.shared.resolveUserSpecifiedURL(selectedURL)
         // CommonDialog 讀入的路徑沒有結尾斜槓，這會導致檔案目錄合規性判定失準。
         // 所以要手動補回來。
         var newPath = url.path
         newPath.ensureTrailingSlash()
-        if LMMgr.checkIfSpecifiedUserDataFolderValid(newPath) {
-          let oldPath = LMMgr.dataFolderPath(isDefaultFolder: false)
+        if SettingsUIHost.shared.checkIfSpecifiedUserDataFolderValid(newPath) {
+          let oldPath = SettingsUIHost.shared.dataFolderPath(false)
           PrefMgr.shared.userDataFolderSpecified = newPath
           BookmarkManager.shared.saveBookmark(for: url)
-          AppDelegate.shared.updateDirectoryMonitorPath()
+          SettingsUIHost.shared.updateDirectoryMonitorPath()
           self?.pctUserDictionaryFolder.url = url
           self?.maybePromptToMergeUserData(oldPath: oldPath)
         } else {
           IMEApp.buzz()
           if !bolPreviousFolderValidity {
-            LMMgr.resetSpecifiedUserDataFolder()
+            SettingsUIHost.shared.resetSpecifiedUserDataFolder()
             self?.pctUserDictionaryFolder
-              .url = URL(fileURLWithPath: LMMgr.dataFolderPath(isDefaultFolder: true))
+              .url = URL(fileURLWithPath: SettingsUIHost.shared.dataFolderPath(true))
           }
           return
         }
       } else {
         if !bolPreviousFolderValidity {
-          LMMgr.resetSpecifiedUserDataFolder()
+          SettingsUIHost.shared.resetSpecifiedUserDataFolder()
           self?.pctUserDictionaryFolder
-            .url = URL(fileURLWithPath: LMMgr.dataFolderPath(isDefaultFolder: true))
+            .url = URL(fileURLWithPath: SettingsUIHost.shared.dataFolderPath(true))
         }
         return
       }
@@ -412,12 +412,12 @@ extension SettingsPanesCocoa.Dictionary: NSPathControlDelegate {
   /// 在目錄變更後提示使用者是否合併舊目錄資料至新目錄。
   /// 以 sheet 形式吸附在設定視窗上。
   private func maybePromptToMergeUserData(oldPath: String) {
-    let newPath = LMMgr.dataFolderPath(isDefaultFolder: false)
+    let newPath = SettingsUIHost.shared.dataFolderPath(false)
     guard oldPath != newPath,
           FileManager.default.fileExists(atPath: oldPath) else { return }
     // 先確保新目錄的 template 檔案已存在，避免 migrateUserDataFrom 因檔案缺失而靜默跳過。
     for mode in Shared.InputMode.validCases {
-      LMMgr.chkUserLMFilesExist(mode)
+      _ = SettingsUIHost.shared.chkUserLMFilesExist(mode)
     }
     let alert = NSAlert()
     alert.messageText = "i18n:settings.dictionary.mergeUserDataToNewTarget.prompt.title".i18n
@@ -426,16 +426,16 @@ extension SettingsPanesCocoa.Dictionary: NSPathControlDelegate {
     alert.addButton(withTitle: "i18n:settings.dictionary.mergeUserDataToNewTarget.button.skip".i18n)
     alert.beginSheetModal(at: CtlSettingsCocoa.shared?.window) { response in
       guard response == .alertFirstButtonReturn else { return }
-      let count = LMMgr.migrateUserDataFrom(oldPath: oldPath, to: newPath)
+      let count = SettingsUIHost.shared.migrateUserDataFrom(oldPath, newPath)
       if count > 0 {
-        LMMgr.initUserLangModels()
-        Notifier.notify(message: String(
+        SettingsUIHost.shared.initUserLangModels()
+        SettingsUIHost.shared.notify(String(
           format: "i18n:settings.dictionary.mergeUserDataToNewTarget.notification.filesMerged:%d".i18n,
           count
         ))
       } else {
-        Notifier.notify(
-          message: "i18n:settings.dictionary.mergeUserDataToNewTarget.notification.noFilesMigrated".i18n
+        SettingsUIHost.shared.notify(
+          "i18n:settings.dictionary.mergeUserDataToNewTarget.notification.noFilesMigrated".i18n
         )
       }
     }

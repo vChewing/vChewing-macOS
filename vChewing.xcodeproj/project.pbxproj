@@ -57,7 +57,6 @@
 		5B65B919284D0185007C558B /* README.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = README.md; sourceTree = "<group>"; };
 		5B65FB322A9518C9007EEFB0 /* vChewing_MainAssembly4Darwin */ = {isa = PBXFileReference; lastKnownFileType = wrapper; name = vChewing_MainAssembly4Darwin; path = Packages/vChewing_MainAssembly4Darwin; sourceTree = "<group>"; };
 		5B6CA6272B8A1C9200A85050 /* vChewing_BrailleSputnik */ = {isa = PBXFileReference; lastKnownFileType = wrapper; name = vChewing_BrailleSputnik; path = Packages/vChewing_BrailleSputnik; sourceTree = "<group>"; };
-		5B765F07293A250000122315 /* vChewing_PhraseEditorUI */ = {isa = PBXFileReference; lastKnownFileType = wrapper; name = vChewing_PhraseEditorUI; path = Packages/vChewing_PhraseEditorUI; sourceTree = "<group>"; };
 		5B7CE1B42F3B2D9D0014EDFC /* Release-Version.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = "Release-Version.plist"; sourceTree = "<group>"; };
 		5B7DA80228BF6BBA00D7B2AD /* fixinstall.sh */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.script.sh; lineEnding = 0; path = fixinstall.sh; sourceTree = "<group>"; };
 		5B9184D62F3B04DD006B48E8 /* vChewing.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = vChewing.app; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -83,6 +82,7 @@
 		5BDB7A3628D47587001AC277 /* vChewing_Tekkon */ = {isa = PBXFileReference; lastKnownFileType = wrapper; name = vChewing_Tekkon; path = Packages/vChewing_Tekkon; sourceTree = "<group>"; };
 		5BE2E7652F951AC60072E5DB /* vChewing_Homa */ = {isa = PBXFileReference; lastKnownFileType = wrapper; name = vChewing_Homa; path = Packages/vChewing_Homa; sourceTree = "<group>"; };
 		5BE8A8C4281EE65300197741 /* CONTRIBUTING.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = CONTRIBUTING.md; sourceTree = "<group>"; };
+		5BEE2E012F9C4D22007E6AAB /* vChewing_SettingsUI */ = {isa = PBXFileReference; lastKnownFileType = wrapper; name = vChewing_SettingsUI; path = Packages/vChewing_SettingsUI; sourceTree = "<group>"; };
 		5BFC63C728D49511004A77B7 /* vChewing_IMKUtils */ = {isa = PBXFileReference; lastKnownFileType = wrapper; name = vChewing_IMKUtils; path = Packages/vChewing_IMKUtils; sourceTree = "<group>"; };
 		5BFC63CA28D49B2B004A77B7 /* vChewing_UpdateSputnik */ = {isa = PBXFileReference; lastKnownFileType = wrapper; name = vChewing_UpdateSputnik; path = Packages/vChewing_UpdateSputnik; sourceTree = "<group>"; };
 		5BFC63CD28D4AC98004A77B7 /* vChewing_LangModelAssembly */ = {isa = PBXFileReference; lastKnownFileType = wrapper; name = vChewing_LangModelAssembly; path = Packages/vChewing_LangModelAssembly; sourceTree = "<group>"; };
@@ -211,10 +211,10 @@
 				5BC5E01C28DDE4270094E427 /* vChewing_NotifierUI */,
 				5BDA45492B97588B00DFA179 /* vChewing_OSFrameworkImpl */,
 				5BAD29D12B7E1A1B0013D695 /* vChewing_OtherIMEDataReader */,
-				5B765F07293A250000122315 /* vChewing_PhraseEditorUI */,
 				5BC5E02228DE07250094E427 /* vChewing_PopupCompositionBuffer */,
 				5B963C9E28D5C14600DCEE88 /* vChewing_Shared */,
 				5B61DB312FA901CF005DE65A /* vChewing_Shared_DarwinImpl */,
+				5BEE2E012F9C4D22007E6AAB /* vChewing_SettingsUI */,
 				5B963CA128D5C22D00DCEE88 /* vChewing_SwiftExtension */,
 				5BDB7A3628D47587001AC277 /* vChewing_Tekkon */,
 				5BC5E01F28DDEFD80094E427 /* vChewing_TooltipUI */,

@@ -279,7 +279,7 @@ extension SettingsPanesCocoa.Clients {
 
     // 預先填寫近期用過唯音輸入法的客體軟體，最多二十筆。
     theTextView.textContainer?.textView?.string = {
-      let recentClients = InputSession.recentClientBundleIdentifiers.keys.compactMap {
+      let recentClients = SettingsUIHost.shared.recentClientBundleIdentifiers().keys.compactMap {
         PrefMgr.shared.clientsIMKTextInputIncapable.keys.contains($0) ? nil : $0
       }
       return recentClients.sorted().joined(separator: "\n")

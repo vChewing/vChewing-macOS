@@ -7,8 +7,6 @@
 // requirements defined in MIT License.
 
 import Foundation
-import LangModelAssembly
-import Shared_DarwinImpl
 
 public protocol PhraseEditorDelegate: AnyObject {
   var currentInputMode: Shared.InputMode { get }

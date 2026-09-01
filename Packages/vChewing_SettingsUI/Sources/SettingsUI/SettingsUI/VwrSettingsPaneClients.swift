@@ -268,7 +268,7 @@ private struct AddClientSheetView: View {
   private var dismiss
   @State
   private var inputText: String = {
-    let recentClients = InputSession.recentClientBundleIdentifiers.keys.compactMap {
+    let recentClients = SettingsUIHost.shared.recentClientBundleIdentifiers().keys.compactMap {
       PrefMgr.shared.clientsIMKTextInputIncapable.keys.contains($0) ? nil : $0
     }
     return recentClients.sorted().joined(separator: "\n")

@@ -14,7 +14,7 @@ import SwiftUI
 public struct VwrSettingsPanePhrases: View {
   public var body: some View {
     GroupBox {
-      VwrPhraseEditorUI(delegate: LMMgr.shared, window: CtlSettingsUI.shared?.window)
+      VwrPhraseEditorUI(delegate: SettingsUIHost.shared.phraseEditorDelegate, window: CtlSettingsUI.shared?.window)
         .padding(4)
         .frame(maxWidth: .infinity, minHeight: 440)
     }

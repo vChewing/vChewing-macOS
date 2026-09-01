@@ -1,8 +1,3 @@
-# PhraseEditorUI
-
-唯音語彙編輯器。
-
-```
 // (c) 2021 and onwards The vChewing Project (MIT-NTL License).
 // ====================
 // This code is released under the MIT license (SPDX-License-Identifier: MIT)
@@ -10,4 +5,7 @@
 // No trademark license is granted to use the trade names, trademarks, service
 // marks, or product names of Contributor, except as required to fulfill notice
 // requirements defined in MIT License.
-```
+
+@_exported import BookmarkManager
+@_exported import LangModelAssembly
+@_exported import Shared_DarwinImpl

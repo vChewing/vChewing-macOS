@@ -6,22 +6,23 @@
 // marks, or product names of Contributor, except as required to fulfill notice
 // requirements defined in MIT License.
 
+import Foundation
+import Shared
+
+// MARK: - PrefMgr Singleton (Darwin Implementation)
+
+// 此單例原先定義於 MainAssembly4Darwin 的 PrefMgr_Singleton.swift，
+// 但因為 vChewing_SettingsUI 不得依賴 MainAssembly4Darwin，
+// 故將此單例與選字鍵驗證函式移至 Shared_DarwinImpl，供兩個模組共用。
+
 extension PrefMgr {
+  /// 偏好設定單例。與 `sharedSansDidSetOps` 不同，此單例已掛載
+  /// `didAskForRefreshingSpeechSputnik` 與 `candidateKeyValidator`；
+  /// 而 `didAskForSyncingLMPrefs` 與 `didAskForSyncingShiftKeyDetectorPrefs`
+  /// 則由宿主（MainAssembly4Darwin）於啟動時另行注入（見 SettingsUIHost 的 wiring）。
   public static let shared: PrefMgr = {
     var result = PrefMgr(
-      didAskForSyncingLMPrefs: {
-        if PrefMgr.shared.phraseReplacementEnabled {
-          LMMgr.loadUserPhraseReplacement()
-        }
-        if PrefMgr.shared.associatedPhrasesEnabled {
-          LMMgr.loadUserAssociatesData()
-        }
-        LMMgr.syncLMPrefs()
-      },
-      didAskForRefreshingSpeechSputnik: { SpeechSputnik.shared.refreshStatus() },
-      didAskForSyncingShiftKeyDetectorPrefs: {
-        SessionUI.shared.resyncShiftKeyUpCheckerSettings()
-      }
+      didAskForRefreshingSpeechSputnik: { SpeechSputnik.shared.refreshStatus() }
     )
     result.candidateKeyValidator = { candidateKeys in
       result.validate(candidateKeys: candidateKeys)

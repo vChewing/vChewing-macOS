@@ -224,7 +224,7 @@ extension SettingsPanesCocoa {
     @IBAction
     func syncShiftKeyUpChecker(_: NSControl) {
       print("Syncing ShiftKeyUpChecker configurations.")
-      SessionUI.shared.resyncShiftKeyUpCheckerSettings()
+      SettingsUIHost.shared.resyncShiftKeyUpCheckerSettings()
     }
 
     @IBAction

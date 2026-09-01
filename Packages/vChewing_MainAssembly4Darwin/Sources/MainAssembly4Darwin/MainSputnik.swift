@@ -13,6 +13,7 @@ public final class MainSputnik4IME {
   // MARK: Lifecycle
 
   public init() {
+    SettingsUIHost.wireUp()
     if let varArgsResult = Self.handleVarArgs() {
       exit(varArgsResult)
     }

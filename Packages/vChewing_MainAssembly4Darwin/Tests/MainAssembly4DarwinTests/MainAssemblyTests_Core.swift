@@ -48,6 +48,7 @@ final class MainAssemblyTests {
     UserDefaults.unitTests = .init(suiteName: "org.atelierInmu.vChewing.MainAssembly.UnitTests")
     UserDefaults.pendingUnitTests = true
     UserDef.resetAll()
+    SettingsUIHost.wireUp()
     LMMgr.prepareForUnitTests()
     LMMgr.resetRecordedPathInvalidityAlerts()
     testLM = LMAssembly.LMInstantiator.construct { _ in

@@ -17,8 +17,8 @@
 @_exported import ModifierKeyHitChecker
 @_exported import NotifierUI
 @_exported import OtherIMEDataReader
-@_exported import PhraseEditorUI
 @_exported import PopupCompositionBuffer
+@_exported import SettingsUI
 @_exported import Shared_DarwinImpl
 @_exported import SwiftyCapsLockToggler
 @_exported import TooltipUI

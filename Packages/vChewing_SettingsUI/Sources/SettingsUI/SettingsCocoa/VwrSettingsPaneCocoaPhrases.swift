@@ -184,10 +184,7 @@ extension SettingsPanesCocoa.Phrases: NSTextViewDelegate, NSTextFieldDelegate {
     asyncOnMain { [weak self] in
       mainSync { [weak self] in
         guard let this = self else { return }
-        this.tfdPETextEditor.string = LMMgr.retrieveData(
-          mode: this.selInputMode,
-          type: this.selUserDataType
-        )
+        this.tfdPETextEditor.string = SettingsUIHost.shared.retrieveData(this.selInputMode, this.selUserDataType)
         this.tfdPETextEditor.toolTip = PETerminology.TooltipTexts
           .sampleDictionaryContent(for: this.selUserDataType)
         this.isLoading = false
@@ -379,7 +376,7 @@ extension SettingsPanesCocoa.Phrases: NSTextViewDelegate, NSTextFieldDelegate {
       this.isLoading = true
       LMAssembly.LMConsolidator.consolidate(text: &this.tfdPETextEditor.string, pragma: false)
       if this.selUserDataType == .thePhrases {
-        LMMgr.shared.tagOverrides(in: &this.tfdPETextEditor.string, mode: this.selInputMode)
+        SettingsUIHost.shared.tagOverrides(&this.tfdPETextEditor.string, this.selInputMode)
       }
       this.isLoading = false
     }
@@ -390,7 +387,7 @@ extension SettingsPanesCocoa.Phrases: NSTextViewDelegate, NSTextFieldDelegate {
     let toSave = tfdPETextEditor.string
     isLoading = true
     tfdPETextEditor.string = "i18n:DictionaryStatus.Loading".i18n
-    let newResult = LMMgr.saveData(mode: selInputMode, type: selUserDataType, data: toSave)
+    let newResult = SettingsUIHost.shared.saveData(selInputMode, selUserDataType, toSave)
     tfdPETextEditor.string = newResult
     isLoading = false
   }
@@ -400,7 +397,7 @@ extension SettingsPanesCocoa.Phrases: NSTextViewDelegate, NSTextFieldDelegate {
     asyncOnMain { [weak self] in
       guard let this = self else { return }
       let app: FileOpenMethod = NSEvent.keyModifierFlags.contains(.option) ? .textEdit : .finder
-      LMMgr.shared.openPhraseFile(mode: this.selInputMode, type: this.selUserDataType, using: app)
+      SettingsUIHost.shared.openPhraseFile(this.selInputMode, this.selUserDataType, app)
     }
   }
 
@@ -426,7 +423,7 @@ extension SettingsPanesCocoa.Phrases: NSTextViewDelegate, NSTextFieldDelegate {
       if !this.txtPECommentField.stringValue
         .isEmpty { arrResult.append("#" + this.txtPECommentField.stringValue) }
       var resultTaggable = arrResult.joined(separator: " ")
-      LMMgr.shared.tagOverrides(in: &resultTaggable, mode: this.selInputMode)
+      SettingsUIHost.shared.tagOverrides(&resultTaggable, this.selInputMode)
       if let lastChar = this.tfdPETextEditor.string.last, !"\n".contains(lastChar) {
         resultTaggable.insert("\n", at: resultTaggable.startIndex)
       }

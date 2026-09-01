@@ -76,10 +76,10 @@ public struct VwrSettingsPaneBehavior: View {
         UserDef.kShareAlphanumericalModeStatusAcrossClients.renderUI()
         VStack(alignment: .leading) {
           UserDef.kTogglingAlphanumericalModeWithLShift.renderUI {
-            SessionUI.shared.resyncShiftKeyUpCheckerSettings()
+            SettingsUIHost.shared.resyncShiftKeyUpCheckerSettings()
           }
           UserDef.kTogglingAlphanumericalModeWithRShift.renderUI {
-            SessionUI.shared.resyncShiftKeyUpCheckerSettings()
+            SettingsUIHost.shared.resyncShiftKeyUpCheckerSettings()
           }
           Spacer()
           Group {

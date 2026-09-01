@@ -30,18 +30,18 @@ public struct VwrSettingsPaneDictionary: View {
               } acceptDrop: { pathControl, info in
                 let urls = info.draggingPasteboard.readObjects(forClasses: [NSURL.self])
                 guard let droppedURL = urls?.first as? URL else { return false }
-                let url = LMMgr.resolveUserSpecifiedURL(droppedURL)
-                let bolPreviousFolderValidity = LMMgr.checkIfSpecifiedUserDataFolderValid(
+                let url = SettingsUIHost.shared.resolveUserSpecifiedURL(droppedURL)
+                let bolPreviousFolderValidity = SettingsUIHost.shared.checkIfSpecifiedUserDataFolderValid(
                   PrefMgr.shared.userDataFolderSpecified.expandingTildeInPath
                 )
                 var newPath = url.path
                 newPath.ensureTrailingSlash()
-                if LMMgr.checkIfSpecifiedUserDataFolderValid(newPath) {
-                  let oldPath = LMMgr.dataFolderPath(isDefaultFolder: false)
+                if SettingsUIHost.shared.checkIfSpecifiedUserDataFolderValid(newPath) {
+                  let oldPath = SettingsUIHost.shared.dataFolderPath(false)
                   userDataFolderSpecified = newPath
                   pathControl.url = url
                   BookmarkManager.shared.saveBookmark(for: url)
-                  AppDelegate.shared.updateDirectoryMonitorPath()
+                  SettingsUIHost.shared.updateDirectoryMonitorPath()
                   maybePromptMergeInSwiftUI(oldPath: oldPath)
                   return true
                 }
@@ -65,9 +65,9 @@ public struct VwrSettingsPaneDictionary: View {
                 Text("...")
               }.frame(minWidth: 25)
               Button {
-                let oldPath = LMMgr.dataFolderPath(isDefaultFolder: false)
+                let oldPath = SettingsUIHost.shared.dataFolderPath(false)
                 userDataFolderSpecified = fdrUserDataDefault
-                AppDelegate.shared.updateDirectoryMonitorPath()
+                SettingsUIHost.shared.updateDirectoryMonitorPath()
                 maybePromptMergeInSwiftUI(oldPath: oldPath)
               } label: {
                 Text("↻")
@@ -79,7 +79,7 @@ public struct VwrSettingsPaneDictionary: View {
           VStack(alignment: .leading) {
             UserDef.kShouldAutoReloadUserDataFiles.renderUI {
               if PrefMgr.shared.shouldAutoReloadUserDataFiles {
-                LMMgr.initUserLangModels()
+                SettingsUIHost.shared.initUserLangModels()
               }
             }
             Text("i18n:InfoMessage.SecurityConcernsNoShellScript".i18n)
@@ -91,21 +91,21 @@ public struct VwrSettingsPaneDictionary: View {
           allowedContentTypes: [.folder],
           allowsMultipleSelection: false
         ) { result in
-          let bolPreviousFolderValidity = LMMgr.checkIfSpecifiedUserDataFolderValid(
+          let bolPreviousFolderValidity = SettingsUIHost.shared.checkIfSpecifiedUserDataFolderValid(
             userDataFolderSpecified.expandingTildeInPath
           )
 
           switch result {
           case let .success(urls):
             guard let selectedURL = urls.first else { return }
-            let url = LMMgr.resolveUserSpecifiedURL(selectedURL)
+            let url = SettingsUIHost.shared.resolveUserSpecifiedURL(selectedURL)
             var newPath = url.path
             newPath.ensureTrailingSlash()
-            if LMMgr.checkIfSpecifiedUserDataFolderValid(newPath) {
-              let oldPath = LMMgr.dataFolderPath(isDefaultFolder: false)
+            if SettingsUIHost.shared.checkIfSpecifiedUserDataFolderValid(newPath) {
+              let oldPath = SettingsUIHost.shared.dataFolderPath(false)
               userDataFolderSpecified = newPath
               BookmarkManager.shared.saveBookmark(for: url)
-              AppDelegate.shared.updateDirectoryMonitorPath()
+              SettingsUIHost.shared.updateDirectoryMonitorPath()
               maybePromptMergeInSwiftUI(oldPath: oldPath)
             } else {
               IMEApp.buzz()
@@ -123,28 +123,28 @@ public struct VwrSettingsPaneDictionary: View {
 
       Section {
         UserDef.kEnforceETenDOSCandidateSequence.renderUI {
-          LMMgr.syncLMPrefs()
+          SettingsUIHost.shared.syncLMPrefs()
         }
         UserDef.kUseExternalFactoryDict.renderUI {
-          LMMgr.connectCoreDB()
+          SettingsUIHost.shared.connectCoreDB()
         }
         UserDef.kFilterNonCNSReadingsForCHTInput.renderUI {
-          LMMgr.connectCoreDB()
+          SettingsUIHost.shared.connectCoreDB()
         }
         UserDef.kFilterFactoryKanjisOfNonCurrentInputMode.renderUI {
-          LMMgr.syncLMPrefs()
+          SettingsUIHost.shared.syncLMPrefs()
         }
         UserDef.kCNS11643Enabled.renderUI {
-          LMMgr.syncLMPrefs()
+          SettingsUIHost.shared.syncLMPrefs()
         }
         UserDef.kSymbolInputEnabled.renderUI {
-          LMMgr.syncLMPrefs()
+          SettingsUIHost.shared.syncLMPrefs()
         }
         UserDef.kReplaceSymbolMenuNodeWithUserSuppliedData.renderUI()
         UserDef.kPhraseReplacementEnabled.renderUI {
-          LMMgr.syncLMPrefs()
+          SettingsUIHost.shared.syncLMPrefs()
           if PrefMgr.shared.phraseReplacementEnabled {
-            LMMgr.loadUserPhraseReplacement()
+            SettingsUIHost.shared.loadUserPhraseReplacement()
           }
         }
         UserDef.kSuppressFactoryUnigramsOfKanaSyllables.renderUI()
@@ -209,17 +209,17 @@ public struct VwrSettingsPaneDictionary: View {
         isPresented: $isShowingMergeAlert
       ) {
         Button("i18n:settings.dictionary.mergeUserDataToNewTarget.button.merge".i18n) {
-          let newPath = LMMgr.dataFolderPath(isDefaultFolder: false)
-          let count = LMMgr.migrateUserDataFrom(oldPath: pendingMergeOldPath, to: newPath)
+          let newPath = SettingsUIHost.shared.dataFolderPath(false)
+          let count = SettingsUIHost.shared.migrateUserDataFrom(pendingMergeOldPath, newPath)
           if count > 0 {
-            LMMgr.initUserLangModels()
-            Notifier.notify(message: String(
+            SettingsUIHost.shared.initUserLangModels()
+            SettingsUIHost.shared.notify(String(
               format: "i18n:settings.dictionary.mergeUserDataToNewTarget.notification.filesMerged:%d".i18n,
               count
             ))
           } else {
-            Notifier.notify(
-              message: "i18n:settings.dictionary.mergeUserDataToNewTarget.notification.noFilesMigrated".i18n
+            SettingsUIHost.shared.notify(
+              "i18n:settings.dictionary.mergeUserDataToNewTarget.notification.noFilesMigrated".i18n
             )
           }
         }
@@ -261,16 +261,16 @@ public struct VwrSettingsPaneDictionary: View {
   @State
   private var keykeyImportButtonDisabled = false
 
-  private var fdrUserDataDefault: String { LMMgr.dataFolderPath(isDefaultFolder: true) }
+  private var fdrUserDataDefault: String { SettingsUIHost.shared.dataFolderPath(true) }
 
   /// 檢查是否需要顯示合併提示，若是則觸發 SwiftUI alert。
   private func maybePromptMergeInSwiftUI(oldPath: String) {
-    let newPath = LMMgr.dataFolderPath(isDefaultFolder: false)
+    let newPath = SettingsUIHost.shared.dataFolderPath(false)
     guard oldPath != newPath,
           FileManager.default.fileExists(atPath: oldPath) else { return }
     // 先確保新目錄的 template 檔案已存在，避免 migrateUserDataFrom 因檔案缺失而靜默跳過。
     for mode in Shared.InputMode.validCases {
-      LMMgr.chkUserLMFilesExist(mode)
+      _ = SettingsUIHost.shared.chkUserLMFilesExist(mode)
     }
     pendingMergeOldPath = oldPath
     isShowingMergeAlert = true
@@ -278,7 +278,7 @@ public struct VwrSettingsPaneDictionary: View {
 
   private func task4ImportingKeyKeyUserDict(_ url: URL? = nil) {
     do {
-      let countResult = try LMMgr.importYahooKeyKeyUserDictionary(url: url)
+      let countResult = try SettingsUIHost.shared.importYahooKeyKeyUserDictionary(url)
       let allImported = countResult.importedCount == countResult.totalFound
       importAlertTitle = String(
         format: "i18n:settings.importFromKimoTxt.finishedCount:%@%@".i18n,
