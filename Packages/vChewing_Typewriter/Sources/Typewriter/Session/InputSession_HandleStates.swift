@@ -6,13 +6,13 @@
 // marks, or product names of Contributor, except as required to fulfill notice
 // requirements defined in MIT License.
 
-import AppKit
+import Foundation
 
 // MARK: - 狀態調度 (State Handling)
 
 extension SessionProtocol {
   /// 覆寫 SessionCoreProtocol 的 debugLogCondition，
-  /// 使用 Darwin Session 自身的 prefs 來判斷是否啟用 debug log。
+  /// 使用 Session 自身的 prefs 來判斷是否啟用 debug log。
   var debugLogCondition: Bool {
     prefs.isDebugModeEnabled
   }
@@ -60,7 +60,7 @@ extension SessionProtocol {
     // IMK 誤判 composition 已結束、將 keyboard event 洩漏給客體應用。
     // doSetMarkedText 的快取機制會確保相同 placeholder 不會觸發重複的 setMarkedText 呼叫。
     if attrStr.string.isEmpty, state.hasComposition {
-      attrStr = IMEStateParsed4Darwin(state).attributedStringPlaceholder
+      attrStr = IMEStateParsed(state).attributedStringPlaceholder
     }
     // 包括早期版本的騰訊 QQNT 在內，有些客體的 client.setMarkedText() 無法正常處理 .thick 下劃線。
     mitigation: if clientMitigationLevel == 1 {
@@ -70,7 +70,7 @@ extension SessionProtocol {
       let neo = NSMutableAttributedString(attributedString: attributedStringSecured.value)
       let rangeNeo = NSRange(location: 0, length: neo.string.utf16.count)
       // 不能用 .thick，否則會看不到游標；setAttributes 會替換掉既有的 attributes。
-      neo.setAttributes(IMEStateParsed4Darwin.AttrStrULStyle.single.getDict(), range: rangeNeo)
+      neo.setAttributes(IMEStateParsed.AttrStrULStyle.single.getDict(), range: rangeNeo)
       attrStr = neo
     }
     doSetMarkedText(attrStr)
@@ -78,7 +78,7 @@ extension SessionProtocol {
 
   /// 在處理某些「沒有組字區內容顯示」且「不需要攔截某些按鍵處理」的狀態時使用的函式，會清空螢幕上顯示的組字區。
   public func clearInlineDisplay() {
-    doSetMarkedText(NSAttributedString())
+    doSetMarkedText(NSAttributedString(string: ""))
   }
 
   /// 遞交組字區內容。
@@ -96,9 +96,9 @@ extension SessionProtocol {
       replaced = true
       text = queried
     }
-    var buffer = ChineseConverter.kanjiConversionIfRequired(text)
+    var buffer = SessionHost.shared.kanjiConversionIfRequired(text)
     if phE, !replaced, let queried = inputHandler?.currentLM.queryReplacementValue(key: buffer) {
-      buffer = ChineseConverter.kanjiConversionIfRequired(queried)
+      buffer = SessionHost.shared.kanjiConversionIfRequired(queried)
     }
 
     func doCommit(_ theBuffer: String) {
@@ -142,7 +142,8 @@ extension SessionProtocol {
     }
     // 唯音用不到 replacementRange，所以不用檢查 replacementRange 的異動情況。
     let range = attributedStringSecured.range
-    guard !(string.isEqual(to: recentMarkedText.text) && recentMarkedText.selectionRange == range)
+    let isSameText = recentMarkedText.text.map { string.isEqual(to: $0) } ?? false
+    guard !(isSameText && recentMarkedText.selectionRange == range)
     else { return }
     recentMarkedText = (string, range)
     // 得複製一份，因為 NSAttributedString 不支援 Sendable 特性。

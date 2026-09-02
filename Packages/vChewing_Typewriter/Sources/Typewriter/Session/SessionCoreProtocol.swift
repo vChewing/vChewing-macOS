@@ -7,7 +7,6 @@
 // requirements defined in MIT License.
 
 import Foundation
-import Shared
 
 // MARK: - SessionCoreProtocol
 

@@ -49,6 +49,7 @@ final class MainAssemblyTests {
     UserDefaults.pendingUnitTests = true
     UserDef.resetAll()
     SettingsUIHost.wireUp()
+    SessionHost.wireUp()
     LMMgr.prepareForUnitTests()
     LMMgr.resetRecordedPathInvalidityAlerts()
     testLM = LMAssembly.LMInstantiator.construct { _ in
@@ -67,7 +68,7 @@ final class MainAssemblyTests {
     session.inputHandler = testHandler
     testHandler.session = session
     testHandler.markingTooltipGenerator = { state in
-      let result = IMEStateParsed4Darwin(state).generateTooltipForMarking()
+      let result = IMEStateParsed(state).generateTooltipForMarking()
       var colorState = result.colorState
       var tooltip = result.tooltip
       if PrefMgr.shared.phraseReplacementEnabled {

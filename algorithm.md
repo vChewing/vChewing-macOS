@@ -42,8 +42,8 @@
 
 ### 關鍵模組
 
-- Packages/vChewing_MainAssembly4Darwin：IMK 進入點與整合（InputSession）。InputSession 也參與態械管理。
-- Packages/vChewing_Typewriter：輸入處理邏輯、態械與鍵盤事件分診；亦提供 `SessionCoreProtocol` 作為所有輸入法會話（含測試用 MockSession 與 Darwin SessionProtocol）的共用基底協定。
+- Packages/vChewing_MainAssembly4Darwin：IMK 進入點與整合。Sessions 體系（`InputSession` 等）已遷移至 Typewriter 且 OS-independent；本套件僅保留 Darwin 表面（`InputSession_DarwinSurface.swift`：controller 綁定、NSEvent→KBEvent 轉換、IMKInputController surface、`toggleInputMode`）與 `SessionHostWiring.swift`（`SessionHost` 閉包注入）。InputSession 也參與態械管理。
+- Packages/vChewing_Typewriter：輸入處理邏輯、態械與鍵盤事件分診；亦提供整個 OS-independent 會話體系（`Session` 子目錄）：`SessionCoreProtocol` 作為所有輸入法會話（含測試用 MockSession 與 Darwin SessionProtocol）的共用基底協定，另有 `SessionProtocol`＋`InputSession`（會話類別）、`IMEState` factories／`IMEStateParsed`、`SessionClientProxy`（跨平台客戶端 proxy 抽象）、`SessionHost`（OS-dependent 動作注入點，未注入＝無操作預設）。
 - Packages/vChewing_Tekkon：注音（ㄅㄆㄇㄈ）鍵盤與音節組合。
 - Packages/vChewing_Homa：句子組裝（DAG-DP 動態規劃求最大分數路徑、候選覆寫與上下文鞏固）。
 - Packages/vChewing_LangModelAssembly：語言模型匯流與資料來源整合。
@@ -51,8 +51,8 @@
 
 ### 事件到輸出的基本流程
 
-1. NSEvent 抵達 → IMK 實例化的 `IMKInputSessionController`（vChewing_IMKUtils）經 `SessionControllerSputnik` 轉發至對應的 `InputSession`。
-2. InputSession 根據 KeyUp 與 KeyDown 的文脈關係事先決定某些行為（比如對 Shift 鍵的單擊行為的感知），然後將 KeyDown 轉 KBEvent 交給 Typewriter.InputHandler 分診。
+1. NSEvent 抵達 → IMK 實例化的 `IMKInputSessionController`（vChewing_IMKUtils）經 `SessionControllerSputnik` 轉發至對應的 `InputSession`；Darwin 表面 `InputSession_DarwinSurface.handleNSEvent` 將 NSEvent 轉為 KBEvent 後交給 portable 會話核心。
+2. InputSession 根據 KeyUp 與 KeyDown 的文脈關係事先決定某些行為（比如對 Shift 鍵的單擊行為的感知），然後將 KeyDown（KBEvent）交給 Typewriter.InputHandler 分診。
 3. Tekkon 組音（依使用者配置的鍵盤與容錯規則）得出合法注音鍵序列，由 InputHandler 將合法注音鍵序列塞入 Homa 引擎。
 4. LangModelAssembly 依鍵序列回傳候選語元（unigram，含分數）。
 5. Homa 以候選節點建立 DAG，用動態規劃求最大總分路徑，產出組句。此過程不依賴「Vertex Topological-Sort Relax」方法。
@@ -77,20 +77,20 @@
 
 Typewriter 是可以在 Linux 系統下建置的 Swift Package，以一個比較小的工作範圍來集中處理輸入法的核心打字邏輯。其主要元件 `InputHandler` Protocol 把 UI 與輸入流程拆成可測的狀態與事件。
 
-`SessionCoreProtocol` 亦定義於 Typewriter（`Session/SessionCoreProtocol.swift`），為所有輸入法會話（包含測試用 MockSession 與 Darwin 生產環境的 `SessionProtocol`）提供共用的 `switchState()` 與 `resetInputHandler()` 預設實作，避免在 Shared/Typewriter/MainAssembly 之間重複相同邏輯。
+`SessionCoreProtocol` 亦定義於 Typewriter（`Session/SessionCoreProtocol.swift`），為所有輸入法會話（包含測試用 MockSession 與 Darwin 生產環境的 `SessionProtocol`）提供共用的 `switchState()` 與 `resetInputHandler()` 預設實作，避免在 Shared/Typewriter/MainAssembly 之間重複相同邏輯。整個會話體系（`SessionProtocol`、`InputSession`、`IMEState` factories、`IMEStateParsed`、`SessionClientProxy`、`SessionHost`）均位於 Typewriter 的 `Session/` 子目錄且 OS-independent——所有 OS-dependent 動作（LMMgr、IMEApp、Notifier、AppDelegate、NS* 系列、IMKHelper 等）皆由 `SessionHost.shared` 的閉包屬性注入（MainAssembly 的 `SessionHostWiring.swift` 於啟動時呼叫 `wireUp()`），未注入時維持無操作預設值，使套件可在 Linux／Windows 直接編譯。
 
 > 關鍵檔案：Packages/vChewing_Typewriter/Sources/Typewriter/
 
 ### KBEvent 轉換與分診
 
-- InputSession 將 NSEvent 轉 KBEvent；
+- Darwin 端 `InputSession_DarwinSurface` 將 NSEvent 轉 KBEvent，再交給 portable 會話核心（`handleEvent(KBEvent?)`）；
 - InputHandler 根據 KBEvent 與目前 IMEState 決定：
   - 交由 Tekkon 組音、或
   - 觸發候選導覽、遞交（俗稱「上屏」）、撤銷等動作。
 
 ### IMEState 狀態與轉移
 
-`SessionCoreProtocol`（定義於 Typewriter）提供 `switchState()` 與 `resetInputHandler()` 的預設實作，各平台 Session 僅需實作五個抽象方法（`commit`、`toggleCandidateUIVisibility`、`showTooltip`、`getMitigatedState`、`updateCompositionBufferDisplay`）。
+`SessionCoreProtocol`（定義於 Typewriter）提供 `switchState()` 與 `resetInputHandler()` 的預設實作，各平台 Session 僅需實作五個抽象方法（`commit`、`toggleCandidateUIVisibility`、`showTooltip`、`getMitigatedState`、`updateCompositionBufferDisplay`）；OS-dependent 動作則經 `SessionHost` 閉包注入（Darwin 端見 `SessionHostWiring.swift`）。
 
 - IMEState 是可序列化的邏輯狀態枚舉/結構，驅動：
   - 組字區內容與游標的記錄鏡照。
@@ -183,11 +183,12 @@ LangModelAssembly 對多個子語言模型進行匯整、去重、替換與增�
 ## 關鍵檔案位置
 
 - MainAssembly：
-  - Packages/vChewing_MainAssembly4Darwin/Sources/MainAssembly4Darwin/SessionController/InputSession*.swift
+  - Packages/vChewing_MainAssembly4Darwin/Sources/MainAssembly4Darwin/SessionController/InputSession_DarwinSurface.swift（IMK surface：controller 綁定、NSEvent→KBEvent 轉換、IMKInputController surface、`toggleInputMode` TIS 邏輯）
   - Packages/vChewing_MainAssembly4Darwin/Sources/MainAssembly4Darwin/SessionController/SessionControllerSputnik.swift
+  - Packages/vChewing_MainAssembly4Darwin/Sources/MainAssembly4Darwin/SessionController/SessionHostWiring.swift（`SessionHost` 閉包注入）
 - Typewriter：
   - Packages/vChewing_Typewriter/Sources/Typewriter/InputHandler/*.swift
-  - Packages/vChewing_Typewriter/Sources/Typewriter/Session/SessionCoreProtocol.swift
+  - Packages/vChewing_Typewriter/Sources/Typewriter/Session/（OS-independent 會話體系：`SessionCoreProtocol`、`SessionProtocol`、`InputSession`、`IMEState` factories、`IMEStateParsed`、`SessionClientProxy`、`SessionHost`）
 - Tekkon：
   - Packages/vChewing_Tekkon/Sources/Tekkon/
 - Homa：
@@ -215,6 +216,6 @@ LangModelAssembly 對多個子語言模型進行匯整、去重、替換與增�
 
 ## 文件版本與更新紀錄
 
-- 文件版本：1.4
-- 最後更新：2026-08-16
+- 文件版本：1.5
+- 最後更新：2026-09-02
 - 適用版本：晚於 vChewing 4.4.7 的版本

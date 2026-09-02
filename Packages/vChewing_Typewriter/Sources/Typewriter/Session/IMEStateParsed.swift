@@ -6,16 +6,16 @@
 // marks, or product names of Contributor, except as required to fulfill notice
 // requirements defined in MIT License.
 
-import AppKit
+import Foundation
 
-// MARK: - IMEStateParsed4Darwin
+// MARK: - IMEStateParsed
 
-/// 即用即拋的 Darwin 端 IMEState 包裝器。
+/// 即用即拋的 IMEState 包裝器。
 ///
-/// 所有需要 `NSAttributedString`、`ChineseConverter`、`LMMgr`、`Tekkon`、`InputSession`
-/// 等 Darwin-only 依賴的 IMEState 屬性均集中於此。Session 層面永久儲存的仍是純 `IMEState`。
+/// 所有需要 `NSAttributedString`、`ChineseConverter`、`SessionHost`、`Tekkon`、
+/// `InputSession` 等依賴的 IMEState 屬性均集中於此。Session 層面永久儲存的仍是純 `IMEState`。
 @frozen
-public struct IMEStateParsed4Darwin {
+public struct IMEStateParsed {
   // MARK: Lifecycle
 
   public init(_ state: IMEState) {
@@ -29,7 +29,7 @@ public struct IMEStateParsed4Darwin {
 
 // MARK: - AttrStrULStyle
 
-extension IMEStateParsed4Darwin {
+extension IMEStateParsed {
   /// IMKInputController 的 `mark(forStyle:)` 只可能會標出這些值。
   /// 該值乃使用 hopper disassembler 分析 IMK 而得出。
   public enum AttrStrULStyle: Int {
@@ -119,9 +119,9 @@ extension IMEStateParsed4Darwin {
 
 // MARK: - convertTextIfNeeded / displayedTextConverted / displayTextSegmentsConverted
 
-extension IMEStateParsed4Darwin {
+extension IMEStateParsed {
   private func convertTextIfNeeded(_ rawStr: String) -> String {
-    var result = ChineseConverter.kanjiConversionIfRequired(rawStr)
+    var result = SessionHost.shared.kanjiConversionIfRequired(rawStr)
     if result.utf16.count != rawStr.utf16.count
       || result.count != rawStr.count {
       result = rawStr
@@ -140,22 +140,18 @@ extension IMEStateParsed4Darwin {
 
 // MARK: - markedTargetExists / markedTargetIsCurrentlyFiltered
 
-extension IMEStateParsed4Darwin {
+extension IMEStateParsed {
   public var markedTargetExists: Bool {
     let pair = state.data.userPhraseKVPair
-    return LMMgr.checkIfPhrasePairExists(
-      userPhrase: pair.value,
-      mode: IMEApp.currentInputMode,
-      keyArray: pair.keyArray
+    return SessionHost.shared.checkIfPhrasePairExists(
+      pair.value, IMEApp.currentInputMode, pair.keyArray
     )
   }
 
   public var markedTargetIsCurrentlyFiltered: Bool {
     let pair = state.data.userPhraseKVPair
-    return LMMgr.checkIfPhrasePairIsFiltered(
-      userPhrase: pair.value,
-      mode: IMEApp.currentInputMode,
-      keyArray: pair.keyArray
+    return SessionHost.shared.checkIfPhrasePairIsFiltered(
+      pair.value, IMEApp.currentInputMode, pair.keyArray
     )
   }
 }
@@ -165,7 +161,7 @@ extension IMEStateParsed4Darwin {
 extension IMEStateData {
   /// 繁簡轉換
   private func convertTextIfNeeded(_ rawStr: String) -> String {
-    var result = ChineseConverter.kanjiConversionIfRequired(rawStr)
+    var result = SessionHost.shared.kanjiConversionIfRequired(rawStr)
     if result.utf16.count != rawStr.utf16.count
       || result.count != rawStr.count {
       result = rawStr
@@ -183,19 +179,15 @@ extension IMEStateData {
 
   public var markedTargetExists: Bool {
     let pair = userPhraseKVPair
-    return LMMgr.checkIfPhrasePairExists(
-      userPhrase: pair.value,
-      mode: IMEApp.currentInputMode,
-      keyArray: pair.keyArray
+    return SessionHost.shared.checkIfPhrasePairExists(
+      pair.value, IMEApp.currentInputMode, pair.keyArray
     )
   }
 
   public var markedTargetIsCurrentlyFiltered: Bool {
     let pair = userPhraseKVPair
-    return LMMgr.checkIfPhrasePairIsFiltered(
-      userPhrase: pair.value,
-      mode: IMEApp.currentInputMode,
-      keyArray: pair.keyArray
+    return SessionHost.shared.checkIfPhrasePairIsFiltered(
+      pair.value, IMEApp.currentInputMode, pair.keyArray
     )
   }
 
@@ -212,7 +204,7 @@ extension IMEStateData {
   }
 
   public func getAttributedStringPlaceholder(_ char: Unicode.Scalar = " ") -> NSAttributedString {
-    IMEStateParsed4Darwin.AttrStrULStyle.single.getMarkedAttrStr(
+    IMEStateParsed.AttrStrULStyle.single.getMarkedAttrStr(
       char.description,
       clauseSegment: 0
     )
@@ -222,7 +214,7 @@ extension IMEStateData {
     _ converter: ((String) -> String)?
   )
     -> NSAttributedString {
-    IMEStateParsed4Darwin.AttrStrULStyle.pack(
+    IMEStateParsed.AttrStrULStyle.pack(
       displayTextSegments.map {
         (converter?($0) ?? $0, .single)
       }
@@ -237,18 +229,18 @@ extension IMEStateData {
     let range2 = markedRange
     let range1 = 0 ..< range2.lowerBound
     let range3 = range2.upperBound ..< converted.count
-    let pairs: [IMEStateParsed4Darwin.AttrStrULStyle.StyledPair] = [
+    let pairs: [IMEStateParsed.AttrStrULStyle.StyledPair] = [
       (converted[range1].joined(), .single),
       (converted[range2].joined(), .thick),
       (converted[range3].joined(), .single),
     ]
-    return IMEStateParsed4Darwin.AttrStrULStyle.pack(pairs)
+    return IMEStateParsed.AttrStrULStyle.pack(pairs)
   }
 }
 
 // MARK: - attributedString (wrapper)
 
-extension IMEStateParsed4Darwin {
+extension IMEStateParsed {
   public var attributedStringNormal: NSAttributedString { state.data.attributedStringNormal }
   public var attributedStringMarking: NSAttributedString { state.data.attributedStringMarking }
   public var attributedStringPlaceholder: NSAttributedString { state.data.attributedStringPlaceholder }
@@ -270,7 +262,7 @@ extension IMEStateParsed4Darwin {
 
 // MARK: - readingThreadForDisplay
 
-extension IMEStateParsed4Darwin {
+extension IMEStateParsed {
   public var readingThreadForDisplay: String {
     var arrOutput = [String]()
     for neta in state.data.markedReadings {
@@ -281,9 +273,10 @@ extension IMEStateParsed4Darwin {
       }
       neta.components(separatedBy: "-").forEach { subNeta in
         var subNeta = subNeta
-        if !PrefMgr.shared.cassetteEnabled {
-          if PrefMgr.shared.showHanyuPinyinInCompositionBuffer,
-             PrefMgr.shared.alwaysShowTooltipTextsHorizontally || !InputSession.isVerticalTyping {
+        if !SessionHost.shared.prefs().cassetteEnabled {
+          if SessionHost.shared.prefs().showHanyuPinyinInCompositionBuffer,
+             SessionHost.shared.prefs().alwaysShowTooltipTextsHorizontally
+             || !InputSession.isVerticalTyping {
             subNeta = Tekkon.restoreToneOneInPhona(target: subNeta)
             subNeta = Tekkon.cnvPhonaToHanyuPinyin(targetJoined: subNeta)
             subNeta = Tekkon.cnvHanyuPinyinToTextbookStyle(targetJoined: subNeta)
@@ -300,7 +293,7 @@ extension IMEStateParsed4Darwin {
 
 // MARK: - generateTooltipForMarking
 
-extension IMEStateParsed4Darwin {
+extension IMEStateParsed {
   /// 生成標記狀態的工具提示。取代舊有的 `updateTooltipForMarking()` mutating func。
   /// - Returns: 工具提示字串與顏色狀態的 tuple。
   public func generateTooltipForMarking() -> (tooltip: String, colorState: TooltipColorState) {
@@ -333,7 +326,7 @@ extension IMEStateParsed4Darwin {
     }
 
     if markedTargetExists {
-      switch LMMgr.isStateDataFilterableForMarked(state.data) {
+      switch SessionHost.shared.isStateDataFilterableForMarked(state.data) {
       case false:
         return (
           String(
@@ -380,9 +373,11 @@ extension IMEStateParsed4Darwin {
 
 // MARK: - hardenVerticalPunctuationsIfNeeded
 
-extension IMEStateParsed4Darwin {
+extension IMEStateParsed {
   public static func hardenVerticalPunctuationsIfNeeded(_ target: inout [String]) {
-    if !InputSession.isVerticalTyping || !PrefMgr.shared.hardenVerticalPunctuations { return }
+    if !InputSession.isVerticalTyping || !SessionHost.shared.prefs().hardenVerticalPunctuations {
+      return
+    }
     target.indices.forEach { i in
       ChineseConverter.hardenVerticalPunctuations(
         target: &target[i],

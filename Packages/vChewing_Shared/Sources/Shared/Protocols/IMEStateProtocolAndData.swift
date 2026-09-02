@@ -232,7 +232,7 @@ public struct IMEState: IMEStateProtocol {
     self.data.candidates = node.members.map { ([""], $0.name) }
     if node.members.isEmpty {
       let newDisplayTextSegments = [node.name]
-      // hardenVerticalPunctuationsIfNeeded 已移至 IMEStateParsed4Darwin
+      // hardenVerticalPunctuationsIfNeeded 已移至 IMEStateParsed
       // factory method 的 call site 會在構造 state 之後手動呼叫
       self.data.displayTextSegments = newDisplayTextSegments
       self.data.cursor = self.data.displayTextSegments.first?.count ?? node.name.count

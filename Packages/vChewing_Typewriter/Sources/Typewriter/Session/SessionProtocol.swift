@@ -6,6 +6,8 @@
 // marks, or product names of Contributor, except as required to fulfill notice
 // requirements defined in MIT License.
 
+import Foundation
+
 // MARK: - SessionProtocol
 
 /// 輸入法控制模組，乃在輸入法端用以控制輸入行為的基礎型別。
@@ -28,8 +30,6 @@ public protocol SessionProtocol: AnyObject, CtlCandidateDelegate,
   var clientProxyObjectIdentifier: ObjectIdentifier? { get set }
   /// 當前客體應用是否採用 Web 技術構築（例：Electron）。
   var isClientElectronBased: Bool { get set }
-  /// 共用的 NSAlert 副本、用於在輸入法切換失敗時提示使用者修改系統偏好設定。
-  var sharedAlertForInputModeToggling: NSAlert { get }
   /// 標記狀態來聲明目前新增的詞彙是否需要賦以非常低的權重。
   static var areWeNerfing: Bool { get set }
   /// 用以記錄最近存取過的十個客體（亂序），相關內容會在客體管理器當中用得到。
@@ -59,16 +59,12 @@ public protocol SessionProtocol: AnyObject, CtlCandidateDelegate,
   var buzzer: (() -> ())? { get set }
   /// 上次實際套用至 client 的鍵盤佈局名稱，用以跳過重複的 overrideKeyboard() 呼叫。
   var lastAppliedKeyboardLayout: String? { get set }
-  /// 取得當前 controller，用於透過 ObjC proxy 安全存取 IMKClientProxyProtocol（避免 Swift ARC 干擾）。
-  var clientProxy: IMKClientProxyProtocol? { get }
+  /// 取得當前客戶端 proxy（跨平台抽象）。
+  var clientProxy: (any SessionClientProxy)? { get }
 
   func initInputHandler()
   func hidePalettes()
   func replacementRange() -> NSRange
-}
-
-nonisolated extension SessionProtocol {
-  public typealias ClientObj = IMKClientProxyProtocol
 }
 
 extension SessionProtocol {
@@ -80,7 +76,7 @@ extension SessionProtocol {
     cassetteQuick: if state.type == .ofInputting, state.isCandidateContainer {
       guard prefs.cassetteEnabled else { break cassetteQuick }
       guard let cinCandidateKey = inputMode.langModel.cassetteSelectionKey,
-            prefs.validate(candidateKeys: cinCandidateKey) == nil
+            SessionHost.shared.validateCandidateKeys(prefs, cinCandidateKey) == nil
       else {
         return "1234567890"
       }
@@ -128,39 +124,8 @@ extension SessionProtocol {
     ui?.currentSessionID = id
   }
 
-  /// 專門用來就地切換繁簡模式的函式。
-  /// This method is non-ObjC, requiring an ObjC wrapper.
-  public func toggleInputMode() {
-    defer { isASCIIMode = false }
-    let nowMode = IMEApp.currentInputMode
-    guard nowMode != .imeModeNULL else { return }
-    modeCheck: for neta in TISInputSource.allRegisteredInstancesOfThisInputMethod {
-      guard !neta.isActivated else { continue }
-      osCheck: if #unavailable(macOS 12) {
-        neta.activate()
-        if !neta.isActivated {
-          break osCheck
-        }
-        break modeCheck
-      }
-      let result = sharedAlertForInputModeToggling.runModal()
-      NSApp.popup()
-      if result == NSApplication.ModalResponse.alertFirstButtonReturn {
-        neta.activate()
-      }
-      return
-    }
-    let status = "i18n:NotificationSwitch.Revolver".i18n
-    asyncOnMain(bypassAsync: UserDefaults.pendingUnitTests) {
-      Notifier.notify(
-        message: nowMode.reversed.localizedDescription + "\n" + status
-      )
-    }
-    clientProxy?.clientSelectMode(withModeIdentifier: nowMode.reversed.rawValue)
-  }
-
   /// 所有建構子都會執行的共用部分，在 super.init() 之後執行。
-  public func construct(clientProxy theClientProxy: IMKClientProxyProtocol? = nil) {
+  public func construct(clientProxy theClientProxy: (any SessionClientProxy)? = nil) {
     // AsyncOnMain 自身的 Lambda Expression 可能與 Swift 6.2 的 Concurrency 相性不太好。
     // 於是這裡單獨判斷。
     if UserDefaults.pendingUnitTests {
@@ -172,7 +137,7 @@ extension SessionProtocol {
     }
   }
 
-  public func constructSansAsync(clientProxy theClientProxy: IMKClientProxyProtocol? = nil) {
+  public func constructSansAsync(clientProxy theClientProxy: (any SessionClientProxy)? = nil) {
     // Self.current?.hidePalettes() <- 該操作由 activateServer() 全權負責。
     Self.current = self
     initInputHandler()
@@ -192,7 +157,8 @@ extension SessionProtocol {
     if let clientProxy {
       var textFrame = CGRect.seniorTheBeast
       let attributes = clientProxy.clientAttributesForCharacterIndex(atU16Pos: 0, lineHeightRectangle: &textFrame)
-      let imkTO = (attributes?[IMKTextOrientationName] as? NSNumber)?.intValue
+      // IMKTextOrientationName 的值為 "IMKTextOrientation"（1 = 橫排、0 = 縱排）。
+      let imkTO = (attributes?["IMKTextOrientation"] as? NSNumber)?.intValue
       isVerticalTyping = imkTO == 0
       return textFrame
     }
@@ -206,7 +172,7 @@ extension SessionProtocol {
   ///   避免 async task 靜默失敗（例：clientProxy 為 nil）時緩存變成「已套用但未實際發生」的髒狀態。
   public func setKeyLayout() {
     let targetLayout: String =
-      (isASCIIMode && IMKHelper.isDynamicBasicKeyboardLayoutEnabled)
+      (isASCIIMode && SessionHost.shared.isDynamicBasicKeyboardLayoutEnabled())
         ? prefs.alphanumericalKeyboardLayout
         : prefs.basicKeyboardLayout
     guard targetLayout != lastAppliedKeyboardLayout else { return }
@@ -238,7 +204,7 @@ extension SessionProtocol {
     return clientProxyObjectIdentifier == .init(clientProxy)
   }
 
-  public func updateClientProxyObjectIdentifier(_ clientProxy: ClientObj?) {
+  public func updateClientProxyObjectIdentifier(_ clientProxy: (any SessionClientProxy)?) {
     guard let clientProxy else { return }
     clientProxyObjectIdentifier = .init(clientProxy)
   }
@@ -279,7 +245,7 @@ extension SessionProtocol {
       // 只要使用者沒有勾選檢查更新、沒有主動做出要檢查更新的操作，就不要檢查更新。
       if this.prefs.checkUpdateAutomatically {
         asyncOnMain(bypassAsync: UserDefaults.pendingUnitTests) {
-          AppDelegate.shared.checkUpdate(forced: false) {
+          SessionHost.shared.checkUpdate(false) {
             senderBundleID == "com.apple.SecurityAgent"
           }
         }
@@ -290,8 +256,7 @@ extension SessionProtocol {
       this.isClientElectronBased = false
       asyncOnMain(bypassAsync: UserDefaults.pendingUnitTests) { [weak self] in
         self?.isClientElectronBased =
-          NSRunningApplication
-            .isElectronBasedApp(identifier: senderBundleID)
+          SessionHost.shared.isElectronBasedApp(senderBundleID)
       }
     }
     this.updateClientProxyObjectIdentifier(clientProxy)
@@ -322,7 +287,7 @@ extension SessionProtocol {
         this.prefs
           .togglingAlphanumericalModeWithRShift
     }
-    if this.isASCIIMode, !IMEApp.isKeyboardJIS {
+    if this.isASCIIMode, !SessionHost.shared.isKeyboardJIS() {
       if #available(macOS 10.15, *) {
         if let shiftKeyDetector, !shiftKeyDetector.enabled {
           this.isASCIIMode = false
@@ -338,7 +303,7 @@ extension SessionProtocol {
 
     if !UserDefaults.pendingUnitTests {
       asyncOnMain {
-        AppDelegate.shared.checkMemoryUsage()
+        SessionHost.shared.checkMemoryUsage()
       }
     }
   }

@@ -6,53 +6,27 @@
 // marks, or product names of Contributor, except as required to fulfill notice
 // requirements defined in MIT License.
 
-// MARK: - ControllerAddrSentinel
-
-/// 對 controller 記憶體位址做生命週期核驗的輕量包裝。
-/// 僅在 controller 存活時允許解讀其位址。
-public struct ControllerAddrSentinel: Sendable {
-  // MARK: Lifecycle
-
-  init(addr: UInt) {
-    self.addr = addr
-  }
-
-  // MARK: Internal
-
-  let addr: UInt
-
-  var unwrapped: UInt? {
-    if UserDefaults.pendingUnitTests {
-      guard addr == 0 else { return nil }
-    } else {
-      guard IMKControllerLifetimeTracker.shared().isAddressAlive(addr) else { return nil }
-    }
-    return addr
-  }
-}
+import Foundation
 
 // MARK: - InputSession
 
 public final class InputSession: @MainActor SessionProtocol, Sendable {
   // MARK: Lifecycle
 
+  /// 預配置 session（極性雙緩衝用）：不繫結任何 controller/client，僅初始化內部引擎。
+  /// 後續經由 `reassign(toAddr:)` 與具體 controller 綁定。
   public init(
-    controller inputController: IMKInputSessionController?
+    preallocated: (),
+    manuallyAssignedClientProxy: (any SessionClientProxy)? = nil,
+    controllerAddr: UInt? = nil
   ) {
-    if let inputController {
-      let controllerAddr = UInt(bitPattern: Unmanaged.passUnretained(inputController).toOpaque())
+    if let controllerAddr {
       self.inputControllerAssignedAddr = controllerAddr
       Self.registerSessionAddr(self, for: controllerAddr)
     }
-    construct(clientProxy: inputController)
-    vCLog("InputSession constructed. ID: \(id.uuidString)")
-  }
-
-  /// 預配置 session（極性雙緩衝用）：不繫結任何 controller/client，僅初始化內部引擎。
-  /// 後續經由 `reassign(to:)` 與具體 controller 綁定。
-  public init(preallocated: (), manuallyAssignedClientProxy: IMKClientProxyProtocol? = nil) {
     if let manuallyAssignedClientProxy {
-      let controllerAddr = UInt(bitPattern: Unmanaged.passUnretained(manuallyAssignedClientProxy).toOpaque())
+      let obj = manuallyAssignedClientProxy as AnyObject
+      let controllerAddr = UInt(bitPattern: Unmanaged.passUnretained(obj).toOpaque())
       self.inputControllerAssignedAddr = controllerAddr
       Self.registerSessionAddr(self, for: controllerAddr)
       construct(clientProxy: manuallyAssignedClientProxy)
@@ -80,6 +54,13 @@ public final class InputSession: @MainActor SessionProtocol, Sendable {
   /// 一個共用辭典，專門用來給每個副本用的 isASCIIMode 追蹤用餐數。
   public static var isASCIIModeForEachClient: [String: Bool] = [:]
 
+  // MARK: - 極性雙緩衝 Session 池
+
+  /// 偶數 generation controller 專用 session。
+  public static let sessionEven = InputSession(preallocated: ())
+  /// 奇數 generation controller 專用 session。
+  public static let sessionOdd = InputSession(preallocated: ())
+
   public static var current: InputSession? {
     get { _current }
     set { _current = newValue }
@@ -100,26 +81,15 @@ public final class InputSession: @MainActor SessionProtocol, Sendable {
 
   public var clientProxyObjectIdentifier: ObjectIdentifier?
 
-  public var buzzer: (() -> ())? = { mainSync { IMEApp.buzz() } }
+  public var buzzer: (() -> ())? = { mainSync { SessionHost.shared.buzz() } }
 
-  public var synchronizer4LMPrefs: (() -> ())? = { LMMgr.syncLMPrefs() }
+  public var synchronizer4LMPrefs: (() -> ())? = { SessionHost.shared.syncLMPrefs() }
 
-  public var trieCacheFlushHandler: (() -> ())? = { LMMgr.flushTrieCaches() }
+  public var trieCacheFlushHandler: (() -> ())? = { SessionHost.shared.flushTrieCaches() }
 
-  public var ui: (any SessionUIProtocol)? = SessionUI.shared
+  public var ui: (any SessionUIProtocol)? = SessionHost.shared.ui()
 
-  public var prefs: any PrefMgrProtocol = PrefMgr.shared
-
-  public private(set) lazy var sharedAlertForInputModeToggling: NSAlert = {
-    let alert = NSAlert()
-    alert.alertStyle = .informational
-    alert.messageText = "i18n:InputMode.TargetInputModeActivationRequired".i18n
-    alert
-      .informativeText =
-      "i18n:InfoMessage.ProceedingToSystemPreferences".i18n
-    alert.addButton(withTitle: "i18n:Common.OK".i18n)
-    return alert
-  }()
+  public var prefs: any PrefMgrProtocol = SessionHost.shared.prefs()
 
   /// 上一個被處理過的鍵盤事件。
   public var previouslyHandledEvents = [KBEvent]()
@@ -147,25 +117,23 @@ public final class InputSession: @MainActor SessionProtocol, Sendable {
   /// IMKInputController 副本（記憶體位址）。
   public nonisolated(unsafe) var inputControllerAssignedAddr: UInt?
 
+  /// 宿主可注入的 replacementRange 提供器（Darwin 端會綁定至 IMK controller）。
+  public var replacementRangeProvider: () -> NSRange = {
+    .init(location: NSNotFound, length: NSNotFound)
+  }
+
   /// 用以透過 ObjC proxy 安全存取 IMKTextInput（避免 Swift ARC 干擾 IMKTextInput Client 物件）。
   /// 生產環境：從 `inputControllerAssignedAddr` 解析 IMKInputSessionController；
   /// 測試環境：從 `manuallyAssignedClientProxy` 解析 FakeClient。
-  public var clientProxy: IMKClientProxyProtocol? {
+  public var clientProxy: (any SessionClientProxy)? {
     guard let addr = inputControllerAssignedAddr,
           let opaque = UnsafeRawPointer(bitPattern: addr)
     else { return nil }
     if !UserDefaults.pendingUnitTests {
-      guard IMKControllerLifetimeTracker.shared().isAddressAlive(addr) else { return nil }
+      guard SessionHost.shared.isControllerAddressAlive(addr) else { return nil }
     }
-    return Unmanaged<any IMKClientProxyProtocol>.fromOpaque(opaque).takeUnretainedValue()
-  }
-
-  public var inputController: IMKInputSessionController? {
-    guard let addr = inputControllerAssignedAddr,
-          IMKControllerLifetimeTracker.shared().isAddressAlive(addr),
-          let opaque = UnsafeRawPointer(bitPattern: addr)
-    else { return nil }
-    return Unmanaged<IMKInputSessionController>.fromOpaque(opaque).takeUnretainedValue()
+    let obj = Unmanaged<AnyObject>.fromOpaque(opaque).takeUnretainedValue()
+    return obj as? any SessionClientProxy
   }
 
   /// 用以存儲客體的 bundleIdentifier。
@@ -220,67 +188,27 @@ public final class InputSession: @MainActor SessionProtocol, Sendable {
     }
   }
 
-  public func initInputHandler() {
-    if let inputHandler {
-      inputHandler.currentLM = inputMode.langModel
-      inputHandler.prefs = PrefMgr.shared
-      inputHandler.errorCallback = { [weak self] msg in self?.callError(msg) }
-      inputHandler.filterabilityChecker = LMMgr.isStateDataFilterableForMarked
-      inputHandler.notificationCallback = Notifier.notify
-      inputHandler.pomSaveCallback = { LMMgr.savePerceptionOverrideModelData(false) }
-      inputHandler.assembler.maxSegLength = prefs.maxCandidateLength
-      inputHandler.ensureKeyboardParser()
-    } else {
-      inputHandler = InputHandler(
-        lm: inputMode.langModel,
-        pref: PrefMgr.shared,
-        errorCallback: { [weak self] msg in self?.callError(msg) },
-        filterabilityChecker: LMMgr.isStateDataFilterableForMarked,
-        notificationCallback: Notifier.notify,
-        pomSaveCallback: { LMMgr.savePerceptionOverrideModelData(false) }
-      )
-    }
-    inputHandler?.markingTooltipGenerator = { state in
-      let result = IMEStateParsed4Darwin(state).generateTooltipForMarking()
-      var colorState = result.colorState
-      var tooltip = result.tooltip
-      if PrefMgr.shared.phraseReplacementEnabled {
-        colorState = .warning
-        tooltip += "\n" + "i18n:PhraseOperation.PhraseReplacementInterfering".i18n
-      }
-      return (tooltip, colorState)
-    }
-    inputHandler?.session = self
-  }
-
-  // MARK: Internal
-
-  // MARK: - 極性雙緩衝 Session 池
-
-  /// 偶數 generation controller 專用 session。
-  @MainActor
-  static let sessionEven = InputSession(preallocated: ())
-  /// 奇數 generation controller 專用 session。
-  @MainActor
-  static let sessionOdd = InputSession(preallocated: ())
-
   /// 從 controller 位址查詢對應的 InputSession。
-  static func session(for controllerAddr: UInt) -> InputSession? {
-    guard let sentinel = ControllerAddrSentinel(addr: controllerAddr).unwrapped else { return nil }
-    guard let ssnAddr = sessionAddrByControllerAddr.withLockRead({ $0[sentinel] }),
+  public static func session(for controllerAddr: UInt) -> InputSession? {
+    if UserDefaults.pendingUnitTests {
+      guard controllerAddr == 0 else { return nil }
+    } else {
+      guard SessionHost.shared.isControllerAddressAlive(controllerAddr) else { return nil }
+    }
+    guard let ssnAddr = sessionAddrByControllerAddr.withLockRead({ $0[controllerAddr] }),
           let opaque = UnsafeRawPointer(bitPattern: ssnAddr)
     else { return nil }
     return Unmanaged<InputSession>.fromOpaque(opaque).takeUnretainedValue()
   }
 
   /// 登記 controller → session 對照關係。
-  static func registerSessionAddr(_ session: InputSession, for controllerAddr: UInt) {
+  public static func registerSessionAddr(_ session: InputSession, for controllerAddr: UInt) {
     let ssnKey = UInt(bitPattern: Unmanaged.passUnretained(session).toOpaque())
     sessionAddrByControllerAddr.withLock { $0[controllerAddr] = ssnKey }
   }
 
   /// 以純記憶體位址移除 controller 對照關係（供 `onDealloc` block 使用，避免捕獲 self）。
-  static func unregisterSessionAddr(forControllerAddr ctlKey: UInt) {
+  public static func unregisterSessionAddr(forControllerAddr ctlKey: UInt) {
     sessionAddrByControllerAddr.withLock { map in
       guard let ssnKey = map[ctlKey],
             let opaque = UnsafeRawPointer(bitPattern: ssnKey) else { return }
@@ -295,15 +223,47 @@ public final class InputSession: @MainActor SessionProtocol, Sendable {
   }
 
   /// 以 generation parity 查詢對應的 InputSession singleton。
-  static func session(forParity parity: Int) -> InputSession {
+  public static func session(forParity parity: Int) -> InputSession {
     (parity & 1) == 0 ? sessionEven : sessionOdd
   }
 
-  /// 重新綁定至新的 IMKInputSessionController。
+  public func initInputHandler() {
+    if let inputHandler {
+      inputHandler.currentLM = inputMode.langModel
+      inputHandler.prefs = SessionHost.shared.prefs()
+      inputHandler.errorCallback = { [weak self] msg in self?.callError(msg) }
+      inputHandler.filterabilityChecker = SessionHost.shared.isStateDataFilterableForMarked
+      inputHandler.notificationCallback = SessionHost.shared.notify
+      inputHandler.pomSaveCallback = { SessionHost.shared.savePerceptionOverrideModelData() }
+      inputHandler.assembler.maxSegLength = prefs.maxCandidateLength
+      inputHandler.ensureKeyboardParser()
+    } else {
+      inputHandler = InputHandler(
+        lm: inputMode.langModel,
+        pref: SessionHost.shared.prefs(),
+        errorCallback: { [weak self] msg in self?.callError(msg) },
+        filterabilityChecker: SessionHost.shared.isStateDataFilterableForMarked,
+        notificationCallback: SessionHost.shared.notify,
+        pomSaveCallback: { SessionHost.shared.savePerceptionOverrideModelData() }
+      )
+    }
+    inputHandler?.markingTooltipGenerator = { state in
+      let result = IMEStateParsed(state).generateTooltipForMarking()
+      var colorState = result.colorState
+      var tooltip = result.tooltip
+      if SessionHost.shared.prefs().phraseReplacementEnabled {
+        colorState = .warning
+        tooltip += "\n" + "i18n:PhraseOperation.PhraseReplacementInterfering".i18n
+      }
+      return (tooltip, colorState)
+    }
+    inputHandler?.session = self
+  }
+
+  /// 重新綁定至新的 controller 位址。
   /// 更新 controller→session 對照表並清理舊 controller 的殘留 mapping。
-  func reassign(to controller: IMKInputSessionController) {
+  public func reassign(toAddr newAddr: UInt) {
     let oldAddr = inputControllerAssignedAddr
-    let newAddr = UInt(bitPattern: Unmanaged.passUnretained(controller).toOpaque())
     inputControllerAssignedAddr = newAddr
     if let oldAddr {
       Self.sessionAddrByControllerAddr.withLock { $0[oldAddr] = nil }
@@ -311,21 +271,15 @@ public final class InputSession: @MainActor SessionProtocol, Sendable {
     Self.registerSessionAddr(self, for: newAddr)
   }
 
-  // MARK: Private
+  public func hidePalettes() {
+    asyncOnMain {
+      SessionHost.shared.postEventForClosingAllPanels()
+    }
+  }
 
-  private static var _current: InputSession?
-
-  // MARK: - Controller ↔ Session 對照表
-
-  /// 以 controller NSObject 的記憶體位址整數值為鍵的對照字典。
-  /// 資料值是 Session 的記憶體位址。
-  /// - Note: Session 的記憶體位址必須在其生命週期有效期間內確保有效。
-  ///   此處不保留強引用，避免靜態字典參與 ARC。
-  private nonisolated(unsafe) static var sessionAddrByControllerAddr = NSMutex([UInt: UInt]())
-}
-
-extension InputSession {
-  // MARK: - IMKStateSetting surface
+  public func replacementRange() -> NSRange {
+    replacementRangeProvider()
+  }
 
   public func setValue(_ value: Any?, forTag tag: Int) {
     if isCurrentSession {
@@ -339,78 +293,9 @@ extension InputSession {
     }
   }
 
-  /// 該函式的回饋結果決定了輸入法會攔截且捕捉哪些類型的輸入裝置操作事件。
-  ///
-  /// 一個客體應用會與輸入法共同確認某個輸入裝置操作事件是否可以觸發輸入法內的某個方法。預設情況下，
-  /// 該函式僅響應 Swift 的「`NSEvent.EventTypeMask = [.keyDown]`」，也就是 ObjC 當中的「`NSKeyDownMask`」。
-  /// 如果您的輸入法「僅攔截」鍵盤按鍵事件處理的話，IMK 會預設啟用這些對滑鼠的操作：當組字區存在時，
-  /// 如果使用者用滑鼠點擊了該文字輸入區內的組字區以外的區域的話，則該組字區的顯示內容會被直接藉由
-  /// 「`commitComposition(_ message)`」遞交給客體。
-  /// - Parameter sender: 呼叫了該函式的客體（無須使用）。
-  /// - Returns: 返回一個 uint，其中承載了與系統 NSEvent 操作事件有關的掩碼集合（詳見 NSEvent.h）。
-  public func recognizedEvents() -> UInt {
-    let events: NSEvent.EventTypeMask = [.keyDown, .flagsChanged, .keyUp]
-    return UInt(events.rawValue)
-  }
-
-  public func showPreferences() {
-    resetInputHandler()
-    clearInlineDisplay()
-    osCheck: if #available(macOS 14, *) {
-      switch NSEvent.keyModifierFlags {
-      case .option: break osCheck
-      default: CtlSettingsUI.show()
-      }
-      NSApp.popup()
-      return
-    }
-    CtlSettingsCocoa.show()
-    NSApp.popup()
-  }
-
-  // MARK: - IMKInputController surface
-
-  public func updateComposition() {
-    inputController?.updateComposition()
-  }
-
-  public func cancelComposition() {
-    inputController?.cancelComposition()
-  }
-
-  public func compositionAttributes(at range: NSRange) -> NSMutableDictionary {
-    inputController?.compositionAttributes(at: range) ?? .init()
-  }
-
   public func selectionRange() -> NSRange {
     attributedStringSecured.range
   }
-
-  public func replacementRange() -> NSRange {
-    inputController?.replacementRange() ?? .init(location: NSNotFound, length: NSNotFound)
-  }
-
-  public func mark(forStyle style: Int, at range: NSRange) -> [AnyHashable: Any] {
-    inputController?.mark(forStyle: style, at: range) ?? [:]
-  }
-
-  public func doCommand(by aSelector: Selector, command infoDictionary: [AnyHashable: Any]) {
-    inputController?.doCommand(by: aSelector, command: infoDictionary)
-  }
-
-  public func hidePalettes() {
-    asyncOnMain {
-      Broadcaster.shared.postEventForClosingAllPanels()
-    }
-  }
-
-  public func menu() -> NSMenu? { inputController?.menu() }
-
-  public func delegate() -> Any? { inputController?.delegate() }
-
-  public func setDelegate(_ newDelegate: Any?) { inputController?.setDelegate(newDelegate) }
-
-  public func server() -> IMKServer { inputController!.server() }
 
   /// 輸入法要被換掉或關掉的時候，要做的事情。
   /// 不過好像因為 IMK 的 Bug 而並不會被執行。
@@ -428,7 +313,7 @@ extension InputSession {
     // 過濾掉尚未完成拼寫的注音。
     let sansReading: Bool = state.type == .ofInputting
     if state.hasComposition {
-      textToCommit = IMEStateParsed4Darwin(
+      textToCommit = IMEStateParsed(
         inputHandler
           .generateStateOfInputting(sansReading: sansReading)
       ).displayedTextConverted
@@ -444,4 +329,14 @@ extension InputSession {
     resetInputHandler()
     clearInlineDisplay()
   }
+
+  // MARK: Private
+
+  private static var _current: InputSession?
+
+  /// 以 controller NSObject 的記憶體位址整數值為鍵的對照字典。
+  /// 資料值是 Session 的記憶體位址。
+  /// - Note: Session 的記憶體位址必須在其生命週期有效期間內確保有效。
+  ///   此處不保留強引用，避免靜態字典參與 ARC。
+  private nonisolated(unsafe) static var sessionAddrByControllerAddr = NSMutex([UInt: UInt]())
 }

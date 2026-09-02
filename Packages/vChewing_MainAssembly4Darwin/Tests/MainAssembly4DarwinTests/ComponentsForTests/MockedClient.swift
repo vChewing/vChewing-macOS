@@ -7,6 +7,7 @@
 // requirements defined in MIT License.
 
 import IMKSwift
+import MainAssembly4Darwin
 
 // MARK: - FakeClient
 
@@ -135,9 +136,9 @@ nonisolated final class FakeClient: NSObject, IMKTextInput {
   }
 }
 
-// MARK: IMKClientProxyProtocol
+// MARK: IMKClientProxyProtocol, SessionClientProxy
 
-extension FakeClient: IMKClientProxyProtocol {
+extension FakeClient: IMKClientProxyProtocol, SessionClientProxy {
   func hasClient() -> Bool {
     true
   }
@@ -245,8 +246,8 @@ extension FakeClient: IMKClientProxyProtocol {
 }
 
 extension IMKTextInput {
-  public func lineHeightRect(u16Cursor: Int) -> CGRect {
-    // `lineHeightRect` 的尺寸不能是 0，否則 `attributes()` 在某些客體上的不良實作可能會炸掉客體。
+  public func lineHeightRect(u16Cursor: Int)
+    -> CGRect { // `lineHeightRect` 的尺寸不能是 0，否則 `attributes()` 在某些客體上的不良實作可能會炸掉客體。
     var lineHeightRect = CGRect.seniorTheBeast
     var u16Cursor = u16Cursor
     // iMessage 的話，據此算出來的 lineHeightRect 結果的橫向座標起始點不準確。目前無解。

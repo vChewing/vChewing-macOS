@@ -14,6 +14,7 @@ public final class MainSputnik4IME {
 
   public init() {
     SettingsUIHost.wireUp()
+    SessionHost.wireUp()
     if let varArgsResult = Self.handleVarArgs() {
       exit(varArgsResult)
     }

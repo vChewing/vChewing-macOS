@@ -6,7 +6,7 @@
 // marks, or product names of Contributor, except as required to fulfill notice
 // requirements defined in MIT License.
 
-import AppKit
+import Foundation
 
 // MARK: - Tooltip Display and Candidate Display Methods
 
@@ -18,11 +18,11 @@ extension SessionProtocol {
     // 這個針對 Discord 的 特殊相容策略對 Discord 網頁端無效。
     let isDiscordClient = clientBundleIdentifier.hasSuffix(".Discord")
     let securedPlaceholder = isDiscordClient
-      ? IMEStateParsed4Darwin(state).getAttributedStringPlaceholder("_")
-      : IMEStateParsed4Darwin(state).attributedStringPlaceholder
+      ? IMEStateParsed(state).getAttributedStringPlaceholder("_")
+      : IMEStateParsed(state).attributedStringPlaceholder
     return clientMitigationLevel >= 2
       ? (securedPlaceholder, NSRange(location: 0, length: 0))
-      : (IMEStateParsed4Darwin(state).attributedString, NSRange(state.u16MarkedRange))
+      : (IMEStateParsed(state).attributedString, NSRange(state.u16MarkedRange))
   }
 
   public var u16Cursor: Int {
@@ -30,7 +30,7 @@ extension SessionProtocol {
     if !prefs.useDynamicCandidateWindowOrigin, state.isCandidateContainer {
       u16Cursor = state.u16Cursor
     }
-    return max(min(IMEStateParsed4Darwin(state).displayedTextConverted.utf16.count, u16Cursor), 0)
+    return max(min(IMEStateParsed(state).displayedTextConverted.utf16.count, u16Cursor), 0)
   }
 
   public func lineHeightRect(zeroCursor: Bool = false) -> CGRect {

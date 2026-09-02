@@ -6,22 +6,21 @@
 // marks, or product names of Contributor, except as required to fulfill notice
 // requirements defined in MIT License.
 
-import AppKit
+import Foundation
 
 // MARK: - Facade
 
 extension SessionProtocol {
-  /// 接受所有鍵鼠事件為 NSEvent，讓輸入法判斷是否要處理、該怎樣處理。
+  /// 接受所有鍵鼠事件為 KBEvent，讓輸入法判斷是否要處理、該怎樣處理。
   /// 然後再交給 InputHandler.handleEvent() 分診。
   /// - Parameters:
   ///   - event: 裝置操作輸入事件，可能會是 nil。
-  ///   - sender: 呼叫了該函式的客體（無須使用）。
   /// - Returns: 回「`true`」以將該按鍵已攔截處理的訊息傳遞給 IMK；回「`false`」則放行、不作處理。
-  public func handleNSEvent(
-    _ event: NSEvent?
+  public func handleEvent(
+    _ event: KBEvent?
   )
     -> Bool {
-    // 就這傳入的 NSEvent 都還有可能是 nil，Apple InputMethodKit 團隊到底在搞三小。
+    // 就這傳入的 KBEvent 都還有可能是 nil，Apple InputMethodKit 團隊到底在搞三小。
     guard let event else {
       resetInputHandler(forceComposerCleanup: true)
       return false
@@ -54,23 +53,21 @@ extension SessionProtocol {
         guard this.prefs.showNotificationsWhenTogglingCapsLock else { return }
         guard !this.prefs.bypassNonAppleCapsLockHandling else { return }
         let status = "i18n:NotificationSwitch.Revolver".i18n
-        Notifier.notify(
-          message: isCapsLockTurnedOn
+        SessionHost.shared.notify(
+          isCapsLockTurnedOn
             ? "[Caps Lock ON] " + "i18n:Menu.AlphanumericalInputMode".i18n + "\n" + status
             : "[Caps Lock OFF] " + "i18n:Menu.ChineseInputMode".i18n + "\n" + status
         )
       }
     }
 
-    guard let newEvent = event.copyAsKBEvent else { return false }
-
-    switch newEvent.type {
-    case .flagsChanged: return handleKeyDown(event: newEvent)
+    switch event.type {
+    case .flagsChanged: return handleKeyDown(event: event)
     case .keyDown:
-      let result = handleKeyDown(event: newEvent)
-      if result { previouslyHandledEvents.append(newEvent) }
+      let result = handleKeyDown(event: event)
+      if result { previouslyHandledEvents.append(event) }
       return result
-    case .keyUp: return handleKeyUp(event: newEvent)
+    case .keyUp: return handleKeyUp(event: event)
     }
   }
 
@@ -142,7 +139,7 @@ extension SessionProtocol {
     }
 
     /// 除非核心辭典有載入，否則一律蜂鳴。
-    if !LMMgr.isCoreDBConnected {
+    if !SessionHost.shared.isCoreDBConnected() {
       if (event as InputSignalProtocol).isReservedKey { return false }
       var newState: State = .ofEmpty()
       newState.tooltip = "i18n:DictionaryStatus.FactoryDictNotLoaded".i18n
@@ -171,7 +168,7 @@ extension SessionProtocol {
 
     // 在非拼音系模式（注音鍵盤；拼音系含狂拼則不需翻譯）的情況下，強制將當前鍵盤佈局
     // 翻譯為美規鍵盤（或指定的其它鍵盤佈局）。狂拼為拼音系，由 isPinyinFamilyTypingMode 涵蓋。
-    if !inputHandler.isPinyinFamilyTypingMode || IMKHelper.isDynamicBasicKeyboardLayoutEnabled {
+    if !inputHandler.isPinyinFamilyTypingMode || SessionHost.shared.isDynamicBasicKeyboardLayoutEnabled() {
       var defaultLayout = LatinKeyboardMappings(rawValue: prefs.basicKeyboardLayout) ??
         .qwerty
       if let parser = KeyboardParser(rawValue: prefs.keyboardParser) {
@@ -208,7 +205,7 @@ extension SessionProtocol {
       if [.ofEmpty].contains(state.type) { ui?.tooltipUI?.hide() }
 
       // 將 Apple 動態鍵盤佈局的 RAW 輸出轉為 ABC 輸出，除非轉換結果與轉換前的內容一致。
-      if IMKHelper.isDynamicBasicKeyboardLayoutEnabled, event.text != eventToDeal.text {
+      if SessionHost.shared.isDynamicBasicKeyboardLayoutEnabled(), event.text != eventToDeal.text {
         switchState(.ofCommitting(textToCommit: eventToDeal.text))
         return true
       }
@@ -231,8 +228,8 @@ extension SessionProtocol {
 
       if popNotification {
         let status = "i18n:NotificationSwitch.Revolver".i18n
-        Notifier.notify(
-          message: newValue
+        SessionHost.shared.notify(
+          newValue
             ? "i18n:Menu.AlphanumericalInputMode".i18n + "\n" + status
             : "i18n:Menu.ChineseInputMode".i18n + "\n" + status
         )

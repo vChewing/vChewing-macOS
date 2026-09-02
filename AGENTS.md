@@ -29,9 +29,9 @@ This handbook briefs AI coding assistants on the vChewing (唯音) macOS reposit
 
 ## 3. Repository Layout (quick map)
 
-- `Packages/vChewing_MainAssembly4Darwin/.../SessionController/InputSession*.swift`: IMK entry point (the `InputSession` class). IMK instantiates `IMKInputSessionController` (from `vChewing_IMKUtils`); `SessionControllerSputnik.swift` binds it to `InputSession` and forwards its callbacks. All NSEvent handling funnels through these files.
-- `Packages/vChewing_Typewriter/Sources/Typewriter/InputHandler/`: FSM split across triage, composition, candidate handling, and commissions.
-- `Packages/vChewing_Typewriter/Sources/Typewriter/Session/`: `SessionCoreProtocol` — shared session base protocol with `switchState()`/`resetInputHandler()` default implementations.
+- `Packages/vChewing_MainAssembly4Darwin/.../SessionController/`: IMK-facing Darwin surface. `InputSession_DarwinSurface.swift` holds the IMK entry surface (`init(controller:)`, `recognizedEvents`, `showPreferences`, `handleNSEvent(NSEvent)` conversion, IMKInputController surface, `toggleInputMode` TIS logic); `SessionControllerSputnik.swift` binds `IMKInputSessionController` to the session and forwards callbacks; `SessionHostWiring.swift` wires `SessionHost` closures (called from `MainSputnik4IME.init`).
+- `Packages/vChewing_Typewriter/Sources/Typewriter/InputHandler/`: FSM split across triage, composition, candidate handling, and commissions; `InputHandler.swift` is the concrete handler class.
+- `Packages/vChewing_Typewriter/Sources/Typewriter/Session/`: OS-independent session system — `SessionCoreProtocol` (shared session base protocol with `switchState()`/`resetInputHandler()` defaults), `SessionProtocol` + `InputSession` (the session class), `IMEState` factories / `IMEStateParsed`, `SessionHost` (host-injection point for all OS-dependent actions), `SessionClientProxy` (cross-platform client-proxy abstraction). Darwin-specific behavior lives in MainAssembly4Darwin via `SessionHost` wiring + the Darwin surface.
 - `Packages/vChewing_Homa/Sources/Homa/`: Assembler core (`Homa_Assembler.swift`, `Homa_PathFinder.swift`, candidate/consolidation APIs, etc.).
 - `Packages/vChewing_Tekkon/Sources/Tekkon/`: Keyboard parsers, composer, Zhuyin constants.
 - `Packages/vChewing_LangModelAssembly/Sources/LangModelAssembly/`: LM instantiators, perception override, associated phrase derivation.
@@ -43,7 +43,7 @@ This handbook briefs AI coding assistants on the vChewing (唯音) macOS reposit
 
 ## 4. Runtime Flow & Key Concepts
 
-1. **Event capture**: IMK instantiates `IMKInputSessionController` (`vChewing_IMKUtils`); `SessionControllerSputnik` forwards its NSEvents to the bound `InputSession`, which marshals them into `KBEvent` structures.
+1. **Event capture**: IMK instantiates `IMKInputSessionController` (`vChewing_IMKUtils`); `SessionControllerSputnik` forwards its NSEvents to the bound `InputSession`, which converts NSEvent→KBEvent (`InputSession_DarwinSurface.handleNSEvent`) and marshals them into `KBEvent` structures for the portable session core.
 2. **FSM triage**: `InputHandler` in Typewriter interprets events, orchestrates Tekkon composer, updates the Homa assembler, and switches `IMEState` instances.
 3. **Composer**: Tekkon manages Zhuyin/phonetic/stroke buffers, auto-correction, cassette mode, and exposes inline display strings.
 4. **Assembler**: Homa Assembler builds DAG segments, snapshots perception intelligences, exposes candidate / consolidation / revolver APIs, and emits `assembledSentence` for UI rendering.

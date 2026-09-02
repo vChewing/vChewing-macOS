@@ -6,7 +6,7 @@
 // marks, or product names of Contributor, except as required to fulfill notice
 // requirements defined in MIT License.
 
-import AppKit
+import Foundation
 
 // MARK: - 針對不同的狀態，規定不同的構造器
 
@@ -25,8 +25,8 @@ extension IMEStateProtocol {
 }
 
 // Factory methods on concrete IMEState to shadow Shared baseline
-// and provide Darwin-specific logic (hardenVerticalPunctuationsIfNeeded,
-// generateTooltipForMarking, ChineseConverter.ensureCurrencyNumerals).
+// and provide the shared logic (hardenVerticalPunctuationsIfNeeded,
+// ChineseConverter.ensureCurrencyNumerals).
 extension IMEState {
   public static func ofDeactivated() -> IMEState { .init(type: .ofDeactivated) }
   public static func ofEmpty() -> IMEState { .init(type: .ofEmpty) }
@@ -57,7 +57,7 @@ extension IMEState {
   )
     -> IMEState {
     var newDisplayTextSegments = displayTextSegments
-    IMEStateParsed4Darwin.hardenVerticalPunctuationsIfNeeded(&newDisplayTextSegments)
+    IMEStateParsed.hardenVerticalPunctuationsIfNeeded(&newDisplayTextSegments)
     var result = IMEState(displayTextSegments: newDisplayTextSegments, cursor: cursor)
     result.type = .ofInputting
     if let readingAtSegment = highlightAtSegment {
@@ -75,13 +75,13 @@ extension IMEState {
   )
     -> IMEState {
     var newDisplayTextSegments = displayTextSegments
-    IMEStateParsed4Darwin.hardenVerticalPunctuationsIfNeeded(&newDisplayTextSegments)
+    IMEStateParsed.hardenVerticalPunctuationsIfNeeded(&newDisplayTextSegments)
     var result = IMEState(displayTextSegments: newDisplayTextSegments, cursor: cursor)
     result.type = .ofMarking
     result.data.marker = marker
     result.data.markedReadings = markedReadings
     result.data.rawDisplayTextSegments = rawDisplayTextSegments
-    // tooltip 由 switchState() 的 .ofMarking 分支產生（確保 IMEStateParsed4Darwin 可見）。
+    // tooltip 由 switchState() 的 .ofMarking 分支產生（確保 IMEStateParsed 可見）。
     return result
   }
 
@@ -92,7 +92,7 @@ extension IMEState {
   )
     -> IMEState {
     var newDisplayTextSegments = displayTextSegments
-    IMEStateParsed4Darwin.hardenVerticalPunctuationsIfNeeded(&newDisplayTextSegments)
+    IMEStateParsed.hardenVerticalPunctuationsIfNeeded(&newDisplayTextSegments)
     var result = IMEState(displayTextSegments: newDisplayTextSegments, cursor: cursor)
     result.type = .ofCandidates
     result.data.candidates = candidates

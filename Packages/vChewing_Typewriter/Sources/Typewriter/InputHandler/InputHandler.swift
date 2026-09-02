@@ -56,7 +56,7 @@ public final class InputHandler: @MainActor InputHandlerProtocol {
 
   public static var keySeparator: String { Assembler.theSeparator }
 
-  public var isJISKeyboard: (() -> Bool)? = { IMEApp.isKeyboardJIS }
+  public var isJISKeyboard: (() -> Bool)? = { SessionHost.shared.isKeyboardJIS() }
 
   /// 委任物件 (InputSession)，以便呼叫其中的函式。
   public weak var session: Session?
@@ -66,7 +66,7 @@ public final class InputHandler: @MainActor InputHandlerProtocol {
   public var pomSaveCallback: (() -> ())?
   public var filterabilityChecker: ((_ state: IMEStateData) -> Bool)?
   public var markingTooltipGenerator: ((_ state: State) -> (tooltip: String, colorState: TooltipColorState))?
-  public var narrator: (any SpeechNarratorProtocol)? = SpeechSputnik.shared
+  public var narrator: (any SpeechNarratorProtocol)? = SessionHost.shared.narrator()
 
   /// 用來記錄「叫出選字窗前」的游標位置的變數。
   public var backupCursor: Int?

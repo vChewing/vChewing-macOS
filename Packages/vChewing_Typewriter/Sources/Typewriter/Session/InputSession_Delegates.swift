@@ -6,7 +6,7 @@
 // marks, or product names of Contributor, except as required to fulfill notice
 // requirements defined in MIT License.
 
-import AppKit
+import Foundation
 
 // MARK: - Session + SessionProtocol
 
@@ -39,12 +39,12 @@ extension SessionProtocol {
     var action = CandidateContextMenuAction.toBoost
     if Self.areWeNerfing { action = .toNerf }
     if addToFilter { action = .toFilter }
-    userPhrase.updateWeight(basedOn: action)
-    guard LMMgr.writeUserPhrasesAtOnce(userPhrase, areWeFiltering: action == .toFilter) else { return false }
+    userPhrase = SessionHost.shared.updateUserPhraseWeight(userPhrase, action)
+    guard SessionHost.shared.writeUserPhrasesAtOnce(userPhrase, action == .toFilter) else { return false }
 
     // 後續操作。
     let valueCurrent = userPhrase.value
-    let valueReversed = ChineseConverter.crossConvert(valueCurrent)
+    let valueReversed = SessionHost.shared.crossConvert(valueCurrent)
     let separator = inputHandler.keySeparator.isEmpty
       ? Homa.Assembler.theSeparator
       : inputHandler.keySeparator
@@ -77,12 +77,14 @@ extension SessionProtocol {
     if !bleachTargets.isEmpty || !bleachHeadReadings.isEmpty {
       asyncOnMain {
         if !bleachTargets.isEmpty {
-          LMMgr.bleachSpecifiedSuggestions(targets: bleachTargets, mode: IMEApp.currentInputMode)
+          SessionHost.shared.bleachSpecifiedSuggestions(bleachTargets, nil, IMEApp.currentInputMode)
         }
         if !bleachHeadReadings.isEmpty {
-          LMMgr.bleachSpecifiedSuggestions(headReadings: [bleachHeadReadings], mode: IMEApp.currentInputMode)
+          SessionHost.shared.bleachSpecifiedSuggestions([], [bleachHeadReadings], IMEApp.currentInputMode)
         }
-        LMMgr.bleachSpecifiedSuggestions(targets: [bleachReversedValue], mode: IMEApp.currentInputMode.reversed)
+        SessionHost.shared.bleachSpecifiedSuggestions(
+          [bleachReversedValue], nil, IMEApp.currentInputMode.reversed
+        )
       }
     }
     return true
@@ -126,10 +128,10 @@ extension SessionProtocol {
     var nullResponse = !prefs.respectClientAccentColor
     nullResponse = nullResponse || prefs.kanjiConversionPreferences != 0
     guard !nullResponse else { return nil }
-    guard !NSApp.isAccentColorCustomized else { return nil }
+    guard !SessionHost.shared.isAccentColorCustomized() else { return nil }
     if #unavailable(macOS 10.14) { return nil }
     // 使用現成的 clientBundleIdentifier（已在 performServerActivation 期間記載）。
-    return NSRunningApplication.findAccentColor(with: clientBundleIdentifier)
+    return SessionHost.shared.findAccentColor(clientBundleIdentifier)
   }
 
   public var shouldAutoExpandCandidates: Bool {
@@ -170,7 +172,7 @@ extension SessionProtocol {
     let keyChain = target.keyArray.joined(separator: "-")
     let hashKey = "\(keyChain)\t\(target.value)".hashValue
     let result = Set(inputMode.langModel.inputTokenHashesArray).contains(hashKey)
-    if result { NSSound.buzz() }
+    if result { SessionHost.shared.soundBuzz() }
     return result
   }
 
@@ -231,7 +233,7 @@ extension SessionProtocol {
         value: String
       ) in
       var theCandidatePair = theCandidatePair
-      theCandidatePair.value = ChineseConverter.kanjiConversionIfRequired(
+      theCandidatePair.value = SessionHost.shared.kanjiConversionIfRequired(
         theCandidatePair.value
       )
       return theCandidatePair
@@ -273,7 +275,7 @@ extension SessionProtocol {
     voiceOverTask: if voiceOverIsOn() {
       let narratable = inputMode.langModel.prepareCandidateNarrationPair(state)
       guard let narratable else { break voiceOverTask }
-      SpeechSputnik.shared.narrate(narratable.readingToNarrate)
+      SessionHost.shared.narrate(narratable.readingToNarrate)
     }
   }
 
@@ -289,16 +291,15 @@ extension SessionProtocol {
         switch serviceNode.service.value {
         case let .url(theURL):
           // 雖然 Safari 理論上是啟動速度最快的，但這裡還是尊重一下使用者各自電腦內的偏好設定好了。
-          NSWorkspace.shared.open(theURL)
+          SessionHost.shared.openURL(theURL)
         case .selector:
-          if let response = serviceNode.service.responseFromSelector {
-            NSPasteboard.general.declareTypes([.string], owner: nil)
-            NSPasteboard.general.setString(response, forType: .string)
-            Notifier
-              .notify(message: "i18n:candidateServiceMenu.selectorResponse.succeeded".i18n)
+          if let response = SessionHost.shared.responseFromSelector(serviceNode.service) {
+            SessionHost.shared.setPasteboardString(response)
+            SessionHost.shared
+              .notify("i18n:candidateServiceMenu.selectorResponse.succeeded".i18n)
           } else {
             callError("4DFDC487: Candidate Text Service Selector Responsiveness Failure.")
-            Notifier.notify(message: "i18n:candidateServiceMenu.selectorResponse.failed".i18n)
+            SessionHost.shared.notify("i18n:candidateServiceMenu.selectorResponse.failed".i18n)
           }
         }
         switchState(.ofAbortion())
@@ -381,16 +382,16 @@ extension SessionProtocol {
       value: rawPair.value,
       inputMode: inputMode
     )
-    userPhrase.updateWeight(basedOn: action)
+    userPhrase = SessionHost.shared.updateUserPhraseWeight(userPhrase, action)
 
-    let succeeded = LMMgr.writeUserPhrasesAtOnce(userPhrase, areWeFiltering: action == .toFilter)
+    let succeeded = SessionHost.shared.writeUserPhrasesAtOnce(userPhrase, action == .toFilter)
 
     // 直接同步重載目前使用中的語言模組，以避免單元測試時不同 LM 實例之間資料不同步。
     if UserDefaults.pendingUnitTests {
-      let phrasesPath = LMMgr.userDictDataURL(mode: inputMode, type: .thePhrases).path
+      let phrasesPath = SessionHost.shared.userDictDataURL(inputMode, .thePhrases).path
       if action == .toFilter {
         inputHandler.currentLM.reloadUserFilterDirectly(
-          path: LMMgr.userDictDataURL(mode: inputMode, type: .theFilter).path
+          path: SessionHost.shared.userDictDataURL(inputMode, .theFilter).path
         )
       } else {
         inputHandler.currentLM.loadUserPhrasesData(path: phrasesPath, filterPath: nil)
@@ -399,7 +400,7 @@ extension SessionProtocol {
 
     // 後續操作。
     let valueCurrent = userPhrase.value
-    let valueReversed = ChineseConverter.crossConvert(valueCurrent)
+    let valueReversed = SessionHost.shared.crossConvert(valueCurrent)
 
     // 因為上述操作不會立即生效（除非遞交組字區），所以暫時塞入臨時資料記錄。
     // 該臨時資料記錄會在接下來的語言模組資料重載過程中被自動清除。
@@ -413,10 +414,9 @@ extension SessionProtocol {
     )
 
     // 開始針對使用者漸退模組的清詞處理
-    LMMgr.bleachSpecifiedSuggestions(targets: [valueCurrent], mode: IMEApp.currentInputMode)
-    LMMgr.bleachSpecifiedSuggestions(
-      targets: [valueReversed],
-      mode: IMEApp.currentInputMode.reversed
+    SessionHost.shared.bleachSpecifiedSuggestions([valueCurrent], nil, IMEApp.currentInputMode)
+    SessionHost.shared.bleachSpecifiedSuggestions(
+      [valueReversed], nil, IMEApp.currentInputMode.reversed
     )
     // 更新組字器內的單元圖資料。
     let updateResult = inputHandler.updateUnigramData()
@@ -456,14 +456,7 @@ extension SessionProtocol {
   private func voiceOverIsOn() -> Bool {
     switch prefs.candidateNarrationToggleType {
     case 1: return true
-    case 2:
-      if #available(macOS 10.13, *) {
-        return NSWorkspace.shared.isVoiceOverEnabled
-      } else {
-        return !NSRunningApplication.runningApplications(
-          withBundleIdentifier: "com.apple.VoiceOver"
-        ).isEmpty
-      }
+    case 2: return SessionHost.shared.isVoiceOverEnabled()
     default: return false
     }
   }
