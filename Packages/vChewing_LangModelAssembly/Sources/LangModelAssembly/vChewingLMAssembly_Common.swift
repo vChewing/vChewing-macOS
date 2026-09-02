@@ -91,9 +91,21 @@ nonisolated public enum LMAssembly {
 }
 
 nonisolated func vCLMLog(_ strPrint: StringLiteralType) {
+  // 測試模式下僅於指定過濾參數（如 swift test --filter ...）時輸出，
+  // 以免 mixedAlnum 等大量觸發 POM 儲存路徑的案例在完整測試時刷屏。
+  if UserDefaults.pendingUnitTests, !hasTestFilterArguments() {
+    return
+  }
   let toLog = UserDefaults.standard.object(forKey: "_DebugMode") as? Bool ?? true
   if toLog {
     Process.consoleLog("vChewingDebug: \(strPrint)")
+  }
+}
+
+/// 偵測目前程序是否帶有測試過濾參數（例如 `swift test --filter ...`、`--skip ...` 或 XCTest 的 `-XCTest ...`）。
+nonisolated private func hasTestFilterArguments() -> Bool {
+  ProcessInfo.processInfo.arguments.contains {
+    $0.hasPrefix("--filter") || $0.hasPrefix("--skip") || $0.hasPrefix("-XCTest")
   }
 }
 
