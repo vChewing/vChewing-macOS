@@ -419,7 +419,7 @@
 
 "i18n:UserDef.kKanjiConversionPreferences.shortTitle" = "漢字轉換模式:";
 "i18n:UserDef.kKeepReadingUponCompositionError.shortTitle" = "允許對無效的讀音使用 BackSpace 編輯";
-"i18n:UserDef.kKeyboardParser4Pinyin.description" = "指定拼音模式下的拼音輸入種類。在拼音輸入模式下，若目前前後半徑 ±10 的掃描範圍內各讀音單位的可能讀音數乘積（笛卡爾積規模）超過預算（4,000），組字引擎會套用「最長 4 個讀音」的候選組字上限，以免組字過程被笛卡爾積卡死。全拼（帶聲調）輸入、以及笛卡爾積規模在預算之內的輸入（含免聲調的 4 音節以下組合），不會套用此上限。";
+"i18n:UserDef.kKeyboardParser4Pinyin.description" = "指定拼音模式下的拼音輸入種類。在拼音輸入模式下，若目前前後半徑 ±10 的掃描範圍內各讀音單位的可能讀音數乘積（笛卡爾積規模）超過預算（625），組字引擎會套用「最長 4 個讀音」的候選組字上限，以免組字過程被笛卡爾積卡死。全拼（帶聲調）輸入、以及笛卡爾積規模在預算之內的輸入（含免聲調的 4 音節以下組合），不會套用此上限。";
 "i18n:UserDef.kKeyboardParser4Pinyin.shortTitle" = "拼音輸入種類:";
 "i18n:UserDef.kKeyboardParser4Zhuyin.description" = "指定注音模式下的注音排列。";
 "i18n:UserDef.kKeyboardParser4Zhuyin.shortTitle" = "注音排列:";

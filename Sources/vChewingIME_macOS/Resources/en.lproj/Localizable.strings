@@ -419,7 +419,7 @@
 
 "i18n:UserDef.kKanjiConversionPreferences.shortTitle" = "Kanji Conversion Mode:";
 "i18n:UserDef.kKeepReadingUponCompositionError.shortTitle" = "Allow backspace-editing miscomposed readings";
-"i18n:UserDef.kKeyboardParser4Pinyin.description" = "Specifies the pinyin input method used while typing in pinyin mode. In pinyin input mode, when the product of the possible reading counts across the reading units within the current +/-10 scan range (i.e. the Cartesian product scale) exceeds the budget of 4,000, the compositor engine may cap candidate assembly to 4 readings, so that the assembling process is not stalled by a Cartesian explosion. Fully tone-marked spellings, as well as inputs whose Cartesian product scale stays within the budget (including tone-less combinations of up to 4 syllables), are not subject to this cap.";
+"i18n:UserDef.kKeyboardParser4Pinyin.description" = "Specifies the pinyin input method used while typing in pinyin mode. In pinyin input mode, when the product of the possible reading counts across the reading units within the current +/-10 scan range (i.e. the Cartesian product scale) exceeds the budget of 625, the compositor engine may cap candidate assembly to 4 readings, so that the assembling process is not stalled by a Cartesian explosion. Fully tone-marked spellings, as well as inputs whose Cartesian product scale stays within the budget (including tone-less combinations of up to 4 syllables), are not subject to this cap.";
 "i18n:UserDef.kKeyboardParser4Pinyin.shortTitle" = "Pinyin Parser:";
 "i18n:UserDef.kKeyboardParser4Zhuyin.description" = "Specifies the bopomofo keyboard layout used while typing in zhuyin mode.";
 "i18n:UserDef.kKeyboardParser4Zhuyin.shortTitle" = "Zhuyin Keyboard Layout:";
