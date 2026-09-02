@@ -17,8 +17,20 @@ import Foundation
 #endif
 
 nonisolated public func vCLog(forced: Bool = false, _ strPrint: StringLiteralType) {
-  guard forced || UserDefaults.pendingUnitTests || UserDefaults.current.bool(forKey: "_DebugMode") else { return }
+  // 測試模式下僅於指定過濾參數（如 swift test --filter ...）時輸出，
+  // 以免 mixedAlnum 等大量觸發偵錯路徑的案例在完整測試時刷屏。
+  if UserDefaults.pendingUnitTests, !hasTestFilterArguments() {
+    return
+  }
+  guard forced || UserDefaults.current.bool(forKey: "_DebugMode") else { return }
   Process.consoleLog("vChewingDebug: \(strPrint)")
+}
+
+/// 偵測目前程序是否帶有測試過濾參數（例如 `swift test --filter ...`、`--skip ...` 或 XCTest 的 `-XCTest ...`）。
+nonisolated private func hasTestFilterArguments() -> Bool {
+  ProcessInfo.processInfo.arguments.contains {
+    $0.hasPrefix("--filter") || $0.hasPrefix("--skip") || $0.hasPrefix("-XCTest")
+  }
 }
 
 // MARK: - TooltipColorState
