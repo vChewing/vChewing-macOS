@@ -52,7 +52,9 @@ extension PrefMgr {
   @discardableResult
   public func dumpShellScriptBackup() -> String? {
     let mirror = Mirror(reflecting: self)
-    guard let bundleIdentifier = Bundle.main.bundleIdentifier else { return nil }
+    // swift test 等非 app 環境下 Bundle.main 沒有 bundle identifier；
+    // 以 process name 遞補，確保此工具在 CLI／測試環境也能產出內容。
+    let bundleIdentifier = Bundle.main.bundleIdentifier ?? ProcessInfo.processInfo.processName
     let strDoubleDashLine = String(String(repeating: "=", count: 70))
     var consoleOutput = ContiguousArray<String>(["#!/bin/sh\n\n"])
     consoleOutput.append("# \(strDoubleDashLine)\n")
