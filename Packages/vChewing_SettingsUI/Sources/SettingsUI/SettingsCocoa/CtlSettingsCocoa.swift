@@ -552,71 +552,50 @@ extension CtlSettingsCocoa {
 
     paneView.layoutSubtreeIfNeeded()
 
-    if #available(macOS 10.13, *) {
-      // macOS 10.13 以上使用 NSScrollView 包覆可捲動內容。
-      let scrollView = NSScrollView()
-      scrollView.translatesAutoresizingMaskIntoConstraints = false
-      scrollView.hasVerticalScroller = true
-      scrollView.hasHorizontalScroller = false
-      scrollView.autohidesScrollers = true
-      scrollView.drawsBackground = false
-      scrollView.borderType = .noBorder
-      scrollView.scrollerStyle = .legacy
+    // 以 NSScrollView 包覆可捲動內容（此用法經實測與 macOS 10.9 相容）。
+    let scrollView = NSScrollView()
+    scrollView.translatesAutoresizingMaskIntoConstraints = false
+    scrollView.hasVerticalScroller = true
+    scrollView.hasHorizontalScroller = false
+    scrollView.autohidesScrollers = true
+    scrollView.drawsBackground = false
+    scrollView.borderType = .noBorder
+    scrollView.scrollerStyle = .legacy
 
-      let docView = FlippedClipContainerView()
-      docView.translatesAutoresizingMaskIntoConstraints = false
-      docView.addSubview(paneView)
+    let docView = FlippedClipContainerView()
+    docView.translatesAutoresizingMaskIntoConstraints = false
+    docView.addSubview(paneView)
 
-      // 將 paneView 四邊釘齊 documentView，使分頁切換時
-      // intrinsicContentSize 的變化能自動傳播至 docView，
-      // 讓 NSScrollView 在 macOS 10.13–15.x 上正確更新可捲動範圍。
-      paneView.translatesAutoresizingMaskIntoConstraints = false
-      docView.addConstraints([
-        NSLayoutConstraint(
-          item: paneView, attribute: .top, relatedBy: .equal,
-          toItem: docView, attribute: .top, multiplier: 1, constant: 0
-        ),
-        NSLayoutConstraint(
-          item: paneView, attribute: .leading, relatedBy: .equal,
-          toItem: docView, attribute: .leading, multiplier: 1, constant: 0
-        ),
-        NSLayoutConstraint(
-          item: paneView, attribute: .trailing, relatedBy: .equal,
-          toItem: docView, attribute: .trailing, multiplier: 1, constant: 0
-        ),
-        NSLayoutConstraint(
-          item: paneView, attribute: .bottom, relatedBy: .equal,
-          toItem: docView, attribute: .bottom, multiplier: 1, constant: 0
-        ),
-      ])
+    // 將 paneView 四邊釘齊 documentView，使分頁切換時
+    // intrinsicContentSize 的變化能自動傳播至 docView，
+    // 讓 NSScrollView 正確更新可捲動範圍。
+    paneView.translatesAutoresizingMaskIntoConstraints = false
+    docView.addConstraints([
+      NSLayoutConstraint(
+        item: paneView, attribute: .top, relatedBy: .equal,
+        toItem: docView, attribute: .top, multiplier: 1, constant: 0
+      ),
+      NSLayoutConstraint(
+        item: paneView, attribute: .leading, relatedBy: .equal,
+        toItem: docView, attribute: .leading, multiplier: 1, constant: 0
+      ),
+      NSLayoutConstraint(
+        item: paneView, attribute: .trailing, relatedBy: .equal,
+        toItem: docView, attribute: .trailing, multiplier: 1, constant: 0
+      ),
+      NSLayoutConstraint(
+        item: paneView, attribute: .bottom, relatedBy: .equal,
+        toItem: docView, attribute: .bottom, multiplier: 1, constant: 0
+      ),
+    ])
 
-      scrollView.documentView = docView
-      contentContainerView.addSubview(scrollView)
-      scrollView.pinEdges(to: contentContainerView)
+    scrollView.documentView = docView
+    contentContainerView.addSubview(scrollView)
+    scrollView.pinEdges(to: contentContainerView)
 
-      // Scroll to top.
-      scrollView.contentView.scroll(to: .zero)
-      scrollView.reflectScrolledClipView(scrollView.contentView)
-    } else {
-      // macOS 10.13 以下直接將 paneView 放入容器，不使用捲動視圖，
-      // 以避免在輸入法程序中觸發系統凍結。
-      contentContainerView.addSubview(paneView)
-      paneView.translatesAutoresizingMaskIntoConstraints = false
-      contentContainerView.addConstraints([
-        NSLayoutConstraint(
-          item: paneView, attribute: .top, relatedBy: .equal,
-          toItem: contentContainerView, attribute: .top, multiplier: 1, constant: 0
-        ),
-        NSLayoutConstraint(
-          item: paneView, attribute: .leading, relatedBy: .equal,
-          toItem: contentContainerView, attribute: .leading, multiplier: 1, constant: 0
-        ),
-        NSLayoutConstraint(
-          item: paneView, attribute: .trailing, relatedBy: .equal,
-          toItem: contentContainerView, attribute: .trailing, multiplier: 1, constant: 0
-        ),
-      ])
-    }
+    // Scroll to top.
+    scrollView.contentView.scroll(to: .zero)
+    scrollView.reflectScrolledClipView(scrollView.contentView)
   }
 
   private func viewForTab(_ tab: PrefUITabs) -> NSView {
