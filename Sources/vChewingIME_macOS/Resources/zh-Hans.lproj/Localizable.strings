@@ -409,8 +409,6 @@
 "i18n:UserDef.kForceCassetteChineseConversion.shortTitle" = "繁简转换:";
 "i18n:UserDef.kFuriousTypingEnabled.description" = "本开关是为了方便习惯「智能狂拼（ChineseStar）」或「搜狗拼音（Sogou）」连续组句输入的用户。仅对拼音输入（任一拼音排列）生效，对磁带、逐字选字（SCPC）、内码、汉音键盘符号与罗马数字等输入方法不适用。启用后，连续敲击拼音字母即可组句，无需逐音节敲声调或空格键确认。注拼槽内尚未完成的拼音会以语言模型试算整句、即时预览于组字区，尾段候选窗亦同步显示，可循「Shift+选字键」就地选字；预览期间原始拼音改以提示框显示（候选窗显示时自动让位、避免重叠）。狂拼预览中按空格会将当前读音插入组字器（不再兼任候选轮替）；注拼槽尚有未完成拼音时按 Enter 亦仅固化当前读音（或就地确认高亮候选）并停留于组字状态，待注拼槽清空后再按 Enter 才递交整句。";
 "i18n:UserDef.kFuriousTypingEnabled.shortTitle" = "启用狂拼模式（连续拼音打字）";
-"i18n:UserDef.kPOMAsNGramSourceEnabled.shortTitle" = "以渐退记忆作为组句统计来源";
-"i18n:UserDef.kPOMAsNGramSourceEnabled.description" = "将您透过选字窗选字所累积的渐退记忆（POM）同时作为护摩组字引擎的二元语法（bigram）统计来源：在相同前后文下，组句路径会自然优先选取您记忆过的选字结果。此开关预设关闭——关闭时记忆仅在使用者当下选字时以覆写方式生效；开启后，记忆亦会以统计方式影响组句，且随记忆衰减自动淡化。";
 "i18n:UserDef.kHalfWidthPunctuationEnabled.shortTitle" = "启用半形标点";
 "i18n:UserDef.kHardenVerticalPunctuations.description" = "⚠︎ 该功能当且仅当目前的排版字型不支援纵排标点动态显示转义的情况下才有用。一旦使用了，所有敲出去的标点都会被永久转换为静态纵排标点：哪怕当前编辑器的排版模式已经改成横排，这些已经输入的标点也都还是纵排标点字元。";
 "i18n:UserDef.kHardenVerticalPunctuations.shortTitle" = "在纵排书写时，强制转换标点为纵排形式（不推荐）";
@@ -418,7 +416,6 @@
 "i18n:UserDef.kInlineDumpPinyinInLieuOfZhuyin.shortTitle" = "Ctrl(+Option)+Command+Enter 输出汉语拼音而非注音";
 "i18n:UserDef.kIsDebugModeEnabled.shortTitle" = "侦错模式";
 "i18n:UserDef.kKanjiConversionPreferences.description" = "在当代繁体／康熙／JIS 之间轮替汉字转换模式。此设定仅对繁体中文输出模式有效，简体中文输出模式下不适用。「当代繁体中文」即为不转换——输出维持标准繁体中文，不套用康熙或 JIS 字形。";
-
 "i18n:UserDef.kKanjiConversionPreferences.shortTitle" = "汉字转换模式:";
 "i18n:UserDef.kKeepReadingUponCompositionError.shortTitle" = "允许对无效的读音使用 BackSpace 编辑";
 "i18n:UserDef.kKeyboardParser4Pinyin.description" = "指定拼音模式下的拼音输入种类。在拼音输入模式下，若当前前后半径 ±10 的扫描范围内各读音单位的可能读音数乘积（笛卡尔积规模）超过预算（625），组字引擎会套用「最长 4 个读音」的候选组字上限，以免组字过程被笛卡尔积卡死。全拼（带声调）输入、以及笛卡尔积规模在预算之内的输入（含免声调的 4 音节以下组合），不会套用此上限。";
@@ -443,6 +440,8 @@
 "i18n:UserDef.kPhraseReplacementEnabled.shortTitle" = "启用语汇置换表";
 "i18n:UserDef.kPinyinTypingEnabled.description" = "在拼音与注音打字模式之间切换。启用时使用拼音输入，停用时使用注音排列。";
 "i18n:UserDef.kPinyinTypingEnabled.shortTitle" = "拼音/注音打字模式";
+"i18n:UserDef.kPOMAsNGramSourceEnabled.description" = "将您透过选字窗选字所累积的渐退记忆（POM）同时作为护摩组字引擎的二元语法（bigram）统计来源：在相同前后文下，组句路径会自然优先选取您记忆过的选字结果。此开关预设关闭——关闭时记忆仅在使用者当下选字时以覆写方式生效；开启后，记忆亦会以统计方式影响组句，且随记忆衰减自动淡化。";
+"i18n:UserDef.kPOMAsNGramSourceEnabled.shortTitle" = "以渐退记忆作为组句统计来源";
 "i18n:UserDef.kPopupCompositionBufferTextSize.description" = "调整浮动组字窗的字型大小。";
 "i18n:UserDef.kPopupCompositionBufferTextSize.shortTitle" = "浮动组字窗字号:";
 "i18n:UserDef.kPreferredRevolverForceLevel.description" = "自 v4.5.4 版起引入「弱轮替」保护机制：当您使用键盘热键（如 Space/Tab）进行就地轮替时，若目标为多音节候选、且其范围会覆盖到「非当前游标位置」且「已被您手动选定」的字词时，系统将跳过该候选，以防止已选定的内容受到意外影响。此功能特别适合习惯「一个字一个字地选字」的使用者，能确保您在修正后方字词时，前方已选定的内容依然稳固。此设定不影响选字窗的选字行为。";
@@ -568,7 +567,6 @@
 "i18n:UserDef.kUsingHotKeyKangXi.shortTitle" = "康熙正体字模式";
 "i18n:UserDef.kUsingHotKeyKanjiConversionMode.longTitle" = "轮替汉字转换（当代繁体/康熙/JIS）";
 "i18n:UserDef.kUsingHotKeyKanjiConversionMode.shortTitle" = "轮替汉字转换";
-
 "i18n:UserDef.kUsingHotKeyPinyinZhuyinTypingSwitch.shortTitle" = "拼音/注音打字模式切换";
 "i18n:UserDef.kUsingHotKeyRevLookup.shortTitle" = "注音反查";
 "i18n:UserDef.kUsingHotKeySCPC.shortTitle" = "模拟逐字选字输入";

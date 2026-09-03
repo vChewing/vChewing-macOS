@@ -409,8 +409,6 @@
 "i18n:UserDef.kForceCassetteChineseConversion.shortTitle" = "Chinese Conversion:";
 "i18n:UserDef.kFuriousTypingEnabled.description" = "This mode accommodates users accustomed to the continuous sentence-composing style of Sogou Pinyin or ChineseStar's 智能狂拼 (Furious Pinyin). Only takes effect with pinyin keyboards (any pinyin layout); cassette mode, SCPC (select-candidate-per-character) mode, and the code-point / Hanin keyboard symbol / Roman-numeral input methods are excluded. When enabled, you can type pinyin continuously without confirming each syllable with a tone key or the space bar. Pending pinyin is assembled into a whole-sentence guess by the language model and previewed inline, with the tail candidate window shown alongside — press Shift + a selection key to choose in place; while previewing, the raw letters are shown in a tooltip (automatically suppressed while the candidate window is visible, to avoid overlap). During the furious preview, pressing the space bar inserts the current reading into the composing buffer (and no longer rotates candidates); while a reading is still pending, pressing Enter likewise only solidifies the current reading (or confirms the highlighted candidate) and stays in the composing state — press Enter again once the buffer is empty to commit the whole sentence.";
 "i18n:UserDef.kFuriousTypingEnabled.shortTitle" = "Enable Furious Typing mode (continuous pinyin)";
-"i18n:UserDef.kPOMAsNGramSourceEnabled.shortTitle" = "Use perception memory as an assembly n-gram source";
-"i18n:UserDef.kPOMAsNGramSourceEnabled.description" = "Also feed the perception override memory (POM) accumulated from candidate selections into the Homa assembler as a bigram statistical source: under the same preceding context, the assembly path naturally prefers candidates you have memorized. Off by default — when off, memory only takes effect as an override at the moment of explicit selection; when on, memory also influences assembly statistically and fades automatically as it decays.";
 "i18n:UserDef.kHalfWidthPunctuationEnabled.shortTitle" = "Enable half-width punctuations";
 "i18n:UserDef.kHardenVerticalPunctuations.description" = "⚠︎ This feature is useful ONLY WHEN the font you are using doesn't support dynamic vertical punctuations. However, typed vertical punctuations will always shown as vertical punctuations EVEN IF your editor has changed the typing direction to horizontal.";
 "i18n:UserDef.kHardenVerticalPunctuations.shortTitle" = "Harden vertical punctuations during vertical typing (not recommended)";
@@ -418,7 +416,6 @@
 "i18n:UserDef.kInlineDumpPinyinInLieuOfZhuyin.shortTitle" = "Commit Hanyu-Pinyin instead on Ctrl(+Option)+Command+Enter";
 "i18n:UserDef.kIsDebugModeEnabled.shortTitle" = "Debug Mode";
 "i18n:UserDef.kKanjiConversionPreferences.description" = "Revolves the kanji conversion mode among Modern Traditional / KangXi / JIS. This setting only takes effect in Traditional Chinese output mode. ‘Modern Traditional’ means no conversion: the output stays as standard Traditional Chinese, without KangXi or JIS glyphs applied.";
-
 "i18n:UserDef.kKanjiConversionPreferences.shortTitle" = "Kanji Conversion Mode:";
 "i18n:UserDef.kKeepReadingUponCompositionError.shortTitle" = "Allow backspace-editing miscomposed readings";
 "i18n:UserDef.kKeyboardParser4Pinyin.description" = "Specifies the pinyin input method used while typing in pinyin mode. In pinyin input mode, when the product of the possible reading counts across the reading units within the current +/-10 scan range (i.e. the Cartesian product scale) exceeds the budget of 625, the compositor engine may cap candidate assembly to 4 readings, so that the assembling process is not stalled by a Cartesian explosion. Fully tone-marked spellings, as well as inputs whose Cartesian product scale stays within the budget (including tone-less combinations of up to 4 syllables), are not subject to this cap.";
@@ -443,6 +440,8 @@
 "i18n:UserDef.kPhraseReplacementEnabled.shortTitle" = "Enable phrase replacement table";
 "i18n:UserDef.kPinyinTypingEnabled.description" = "Switches between pinyin and zhuyin typing modes. When enabled, the pinyin parser is used; when disabled, the zhuyin keyboard layout is used.";
 "i18n:UserDef.kPinyinTypingEnabled.shortTitle" = "Pinyin/Zhuyin Typing Mode";
+"i18n:UserDef.kPOMAsNGramSourceEnabled.description" = "Also feed the perception override memory (POM) accumulated from candidate selections into the Homa assembler as a bigram statistical source: under the same preceding context, the assembly path naturally prefers candidates you have memorized. Off by default — when off, memory only takes effect as an override at the moment of explicit selection; when on, memory also influences assembly statistically and fades automatically as it decays.";
+"i18n:UserDef.kPOMAsNGramSourceEnabled.shortTitle" = "Use perception memory as an assembly n-gram source";
 "i18n:UserDef.kPopupCompositionBufferTextSize.description" = "Adjust the font size of the popup composition buffer.";
 "i18n:UserDef.kPopupCompositionBufferTextSize.shortTitle" = "Popup Composition Buffer Font Size:";
 "i18n:UserDef.kPreferredRevolverForceLevel.description" = "Introduced in v4.5.4, \"Weak-Revolve\" is a protection mechanism for in-place revolving via keyboard shortcuts (e.g., Space/Tab). If a multi-syllable candidate would overwrite manually selected characters outside the current cursor position, it is skipped to prevent previous selections from being unexpectedly affected. This is especially useful for users who prefer \"character-by-character\" selection, ensuring that prior overrides remain intact while revolving subsequent text. This does not affect selections made via the candidate window.";
@@ -568,7 +567,6 @@
 "i18n:UserDef.kUsingHotKeyKangXi.shortTitle" = "Force KangXi Writing";
 "i18n:UserDef.kUsingHotKeyKanjiConversionMode.longTitle" = "Revolve Kanji Conversion (Modern Trad. / KangXi / JIS)";
 "i18n:UserDef.kUsingHotKeyKanjiConversionMode.shortTitle" = "Revolve Kanji Conversion";
-
 "i18n:UserDef.kUsingHotKeyPinyinZhuyinTypingSwitch.shortTitle" = "Pinyin/Zhuyin Typing Mode Switch";
 "i18n:UserDef.kUsingHotKeyRevLookup.shortTitle" = "Reverse Lookup (Phonabets)";
 "i18n:UserDef.kUsingHotKeySCPC.shortTitle" = "Per-Char Select Mode";

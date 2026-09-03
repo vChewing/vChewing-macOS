@@ -409,8 +409,6 @@
 "i18n:UserDef.kForceCassetteChineseConversion.shortTitle" = "繁体字・簡体字変換:";
 "i18n:UserDef.kFuriousTypingEnabled.description" = "この機能は「智能狂弁入力 & Sogou入力」のような連続組句入力に慣れたユーザーのために提供されています。弁音配列でのみ有効です（カセットモード、SCPC（一文字ずつ候補選択）モード、コードポイント入力、漢音キーボード符号入力、ローマ数字入力を除く）。有効にすると、声調キーやスペースキーで音節をいちいち確定しなくても、弁音を連続して入力できます。未確定の弁音は言語モデルで全文を推定して組字区に即時プレビューされ、末尾の候補ウィンドウも同時に表示されます（Shift+選択キーでその場選択）。プレビュー中は入力中の文字がツールチップに表示されます（候補ウィンドウ表示中は重なりを避けるため自動的に非表示）。狂拼プレビュー中にスペースを押すと現在の読みを組字バッファに挿入します（候補のローテーションは行いません）。未確定の読みがある状態で Enter を押した場合も、現在の読みを確定するだけ（ハイライト中の候補があればそれを確定）で組字状態に留まり、読みが空になってからもう一度 Enter を押すと全文を確定します。";
 "i18n:UserDef.kFuriousTypingEnabled.shortTitle" = "狂拼モードを有効化（連続弁音入力）";
-"i18n:UserDef.kPOMAsNGramSourceEnabled.shortTitle" = "漸退記憶を組句統計のソースにする";
-"i18n:UserDef.kPOMAsNGramSourceEnabled.description" = "選字窓での選択で蓄積された漸退記憶（POM）を、護摩組字エンジンのバイグラム統計のソースとしても利用します。同じ前後文では、記憶された選択結果が組句経路で自然に優先されます。既定ではオフ——オフの間は記憶がユーザーの明示的選択時にのみオーバーライドとして効きます。オンにすると記憶が統計的にも組句に影響し、記憶の減衰に伴って自動的に薄まります。";
 "i18n:UserDef.kHalfWidthPunctuationEnabled.shortTitle" = "半角句読点を起用する";
 "i18n:UserDef.kHardenVerticalPunctuations.description" = "⚠︎ 該当の組版用フォントには縦書き（引用符・括弧）変換機能が備えていない限り、この機能を使う甲斐がある。一旦使うと、入力した全ての引用符・括弧は永遠的に縦書きの様式になる。例え入力を受けているアプリ（例えばワープロソフとなど）の書写方向は横書きと変えたとしても、これらの入力済みの引用符・括弧は全て縦書きの見た目であり、削除してから入力し直す必要になる。";
 "i18n:UserDef.kHardenVerticalPunctuations.shortTitle" = "縦書きの時に、引用符・括弧などを強制的に縦書き文字と変換する（不推奨）";
@@ -418,7 +416,6 @@
 "i18n:UserDef.kInlineDumpPinyinInLieuOfZhuyin.shortTitle" = "Ctrl(+Option)+Command+Enter で出すのを漢語弁音と変換";
 "i18n:UserDef.kIsDebugModeEnabled.shortTitle" = "欠陥辿着モード";
 "i18n:UserDef.kKanjiConversionPreferences.description" = "漢字変換モードを現代繁体／康熙／JIS の間で循環します。この設定は繁体中文出力モードでのみ有効です。「現代繁体字」はすなわち変換なし——康熙・JIS 字形を適用せず、標準の繁体字で出力します。";
-
 "i18n:UserDef.kKanjiConversionPreferences.shortTitle" = "漢字変換モード:";
 "i18n:UserDef.kKeepReadingUponCompositionError.shortTitle" = "効かぬ音読みを BackSpace で再編集";
 "i18n:UserDef.kKeyboardParser4Pinyin.description" = "弁音モードで使用する弁音入力の種類を指定します。弁音入力モードでは、現在位置の前後 ±10 の走査範囲内にある各音読み単位の可能な読み数の積（デカルト積の規模）が予算（625）を超える場合、組字エンジンに「最大 4 読み」の候補組字上限が適用され、デカルト積による処理の停滞を防ぎます。声調付きの完全表記、およびデカルト積の規模が予算内に収まる入力（声調なしの 4 音節以下の組み合わせを含む）には、この上限は適用されません。";
@@ -443,6 +440,8 @@
 "i18n:UserDef.kPhraseReplacementEnabled.shortTitle" = "言葉置換表を起用";
 "i18n:UserDef.kPinyinTypingEnabled.description" = "弁音と注音のタイピングモードを切り替えます。有効時は弁音入力を、無効時は注音配列を使用します。";
 "i18n:UserDef.kPinyinTypingEnabled.shortTitle" = "弁音/注音タイピングモード";
+"i18n:UserDef.kPOMAsNGramSourceEnabled.description" = "選字窓での選択で蓄積された漸退記憶（POM）を、護摩組字エンジンのバイグラム統計のソースとしても利用します。同じ前後文では、記憶された選択結果が組句経路で自然に優先されます。既定ではオフ——オフの間は記憶がユーザーの明示的選択時にのみオーバーライドとして効きます。オンにすると記憶が統計的にも組句に影響し、記憶の減衰に伴って自動的に薄まります。";
+"i18n:UserDef.kPOMAsNGramSourceEnabled.shortTitle" = "漸退記憶を組句統計のソースにする";
 "i18n:UserDef.kPopupCompositionBufferTextSize.description" = "吹き出し入力緩衝列のフォントサイズを指定します。";
 "i18n:UserDef.kPopupCompositionBufferTextSize.shortTitle" = "吹き出し入力緩衝列の字号:";
 "i18n:UserDef.kPreferredRevolverForceLevel.description" = "v4.5.4より「軽きお回し」保護機能を導入しました。キーボードショートカット（Space/Tab等）でその場での候補切り替え（お回し）を行う際、複数音節の候補が現在のカーソル位置以外で「既に手動選択された文字」を上書きしてしまう場合は、その候補をスキップし、選択内容が不意に書き換えられたり影響を受けたりするのを防ぎます。これにより、一文字ずつ丁寧に選字する方が、後方の文字を切り替えても前方の選択内容が維持されます。この機能は候補窓による選択には影響しません。";
@@ -568,7 +567,6 @@
 "i18n:UserDef.kUsingHotKeyKangXi.shortTitle" = "康熙文字変換モード";
 "i18n:UserDef.kUsingHotKeyKanjiConversionMode.longTitle" = "漢字変換モード循環（現代繁体/康熙/JIS）";
 "i18n:UserDef.kUsingHotKeyKanjiConversionMode.shortTitle" = "漢字変換モード循環";
-
 "i18n:UserDef.kUsingHotKeyPinyinZhuyinTypingSwitch.shortTitle" = "弁音/注音タイピングモード切替";
 "i18n:UserDef.kUsingHotKeyRevLookup.shortTitle" = "注音音読逆引参照";
 "i18n:UserDef.kUsingHotKeySCPC.shortTitle" = "全候補入力モード";
