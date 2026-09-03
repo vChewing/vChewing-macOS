@@ -43,131 +43,113 @@ extension SettingsPanesCocoa {
               renderable.currentControl = self.pctUserDictionaryFolder
               renderable.mainViewOverride = self.pathControlMainView
             }
+          NSStackView.build(.vertical) {
+            UserDef.kShouldAutoReloadUserDataFiles.renderCocoa(
+              fixWidth: contentWidth,
+              prefUITab: .tabDictionary
+            ) { renderable in
+              renderable.currentControl?.target = self
+              renderable.currentControl?.action = #selector(self.lmmgrInitUserLMsWhenShould(_:))
+            }
+            "i18n:InfoMessage.SecurityConcernsNoShellScript".i18n
+              .makeNSLabel(descriptive: true, fixWidth: contentWidth)
+          }
         }?.boxed()
-        NSTabView.build {
-          NSTabView.TabPage(title: "Ａ") {
-            NSStackView.buildSection(width: innerContentWidth) {
-              NSStackView.build(.vertical) {
-                UserDef.kShouldAutoReloadUserDataFiles.renderCocoa(
-                  fixWidth: innerContentWidth,
-                  prefUITab: .tabDictionary
-                ) { renderable in
-                  renderable.currentControl?.target = self
-                  renderable.currentControl?.action = #selector(self.lmmgrInitUserLMsWhenShould(_:))
-                }
-                "i18n:InfoMessage.SecurityConcernsNoShellScript".i18n
-                  .makeNSLabel(descriptive: true, fixWidth: innerContentWidth)
+        NSStackView.buildSection(width: contentWidth) {
+          UserDef.kEnforceETenDOSCandidateSequence
+            .renderCocoa(
+              fixWidth: contentWidth,
+              prefUITab: .tabDictionary
+            ) { renderable in
+              renderable.currentControl?.target = self
+              renderable.currentControl?.action = #selector(self.lmmgrSyncLMPrefs(_:))
+            }
+          UserDef.kUseExternalFactoryDict
+            .renderCocoa(
+              fixWidth: contentWidth,
+              prefUITab: .tabDictionary
+            ) { renderable in
+              renderable.currentControl?.target = self
+              renderable.currentControl?.action = #selector(self.lmmgrConnectCoreDB(_:))
+            }
+          UserDef.kFilterNonCNSReadingsForCHTInput
+            .renderCocoa(
+              fixWidth: contentWidth,
+              prefUITab: .tabDictionary
+            ) { renderable in
+              renderable.currentControl?.target = self
+              renderable.currentControl?.action = #selector(self.lmmgrSyncLMPrefs(_:))
+            }
+          UserDef.kFilterFactoryKanjisOfNonCurrentInputMode
+            .renderCocoa(
+              fixWidth: contentWidth,
+              prefUITab: .tabDictionary
+            ) { renderable in
+              renderable.currentControl?.target = self
+              renderable.currentControl?.action = #selector(self.lmmgrSyncLMPrefs(_:))
+            }
+          UserDef.kCNS11643Enabled
+            .renderCocoa(
+              fixWidth: contentWidth,
+              prefUITab: .tabDictionary
+            ) { renderable in
+              renderable.currentControl?.target = self
+              renderable.currentControl?.action = #selector(self.lmmgrSyncLMPrefs(_:))
+            }
+          UserDef.kSymbolInputEnabled
+            .renderCocoa(
+              fixWidth: contentWidth,
+              prefUITab: .tabDictionary
+            ) { renderable in
+              renderable.currentControl?.target = self
+              renderable.currentControl?.action = #selector(self.lmmgrSyncLMPrefs(_:))
+            }
+          UserDef.kReplaceSymbolMenuNodeWithUserSuppliedData.renderCocoa(
+            fixWidth: contentWidth,
+            prefUITab: .tabDictionary
+          )
+          UserDef.kPhraseReplacementEnabled
+            .renderCocoa(
+              fixWidth: contentWidth,
+              prefUITab: .tabDictionary
+            ) { renderable in
+              renderable.currentControl?.target = self
+              renderable.currentControl?
+                .action = #selector(self.lmmgrSyncLMPrefsWithReplacementTable(_:))
+            }
+          UserDef.kSuppressFactoryUnigramsOfKanaSyllables.renderCocoa(
+            fixWidth: contentWidth,
+            prefUITab: .tabDictionary
+          )
+        }?.boxed()
+        NSStackView.buildSection(width: contentWidth) {
+          UserDef.kFetchSuggestionsFromPerceptionOverrideModel.renderCocoa(
+            fixWidth: contentWidth,
+            prefUITab: .tabDictionary
+          )
+          UserDef.kReducePOMLifetimeToNoMoreThan12Hours.renderCocoa(
+            fixWidth: contentWidth,
+            prefUITab: .tabDictionary
+          )
+        }?.boxed()
+        NSStackView.buildSection(width: contentWidth) {
+          NSStackView.build(.vertical) {
+            NSStackView.build(.horizontal) {
+              "i18n:settings.importFromKimoTxt.label".makeNSLabel(fixWidth: contentWidth)
+              NSView()
+              NSStackView.build(.horizontal, spacing: 4) {
+                importKimoDragButton()
+                NSButton(
+                  "i18n:settings.importFromKimoTxt.DirectlyImport",
+                  target: self,
+                  action: #selector(importKeyKeyUserPhraseSQLiteDBAction(_:))
+                )
               }
-              UserDef.kUseExternalFactoryDict
-                .renderCocoa(
-                  fixWidth: innerContentWidth,
-                  prefUITab: .tabDictionary
-                ) { renderable in
-                  renderable.currentControl?.target = self
-                  renderable.currentControl?.action = #selector(self.lmmgrConnectCoreDB(_:))
-                }
-            }?.boxed()
-            NSStackView.buildSection(width: innerContentWidth) {
-              UserDef.kFetchSuggestionsFromPerceptionOverrideModel.renderCocoa(
-                fixWidth: innerContentWidth,
-                prefUITab: .tabDictionary
-              )
-              UserDef.kReducePOMLifetimeToNoMoreThan12Hours.renderCocoa(
-                fixWidth: innerContentWidth,
-                prefUITab: .tabDictionary
-              )
-            }?.boxed()
-            NSView()
+            }
+            "i18n:settings.importFromKimoTxt.description"
+              .makeNSLabel(descriptive: true, fixWidth: contentWidth)
           }
-          NSTabView.TabPage(title: "Ｂ") {
-            NSStackView.buildSection(width: innerContentWidth) {
-              UserDef.kFilterNonCNSReadingsForCHTInput
-                .renderCocoa(
-                  fixWidth: innerContentWidth,
-                  prefUITab: .tabDictionary
-                ) { renderable in
-                  renderable.currentControl?.target = self
-                  renderable.currentControl?.action = #selector(self.lmmgrSyncLMPrefs(_:))
-                }
-              UserDef.kFilterFactoryKanjisOfNonCurrentInputMode
-                .renderCocoa(
-                  fixWidth: innerContentWidth,
-                  prefUITab: .tabDictionary
-                ) { renderable in
-                  renderable.currentControl?.target = self
-                  renderable.currentControl?.action = #selector(self.lmmgrSyncLMPrefs(_:))
-                }
-              UserDef.kCNS11643Enabled
-                .renderCocoa(
-                  fixWidth: innerContentWidth,
-                  prefUITab: .tabDictionary
-                ) { renderable in
-                  renderable.currentControl?.target = self
-                  renderable.currentControl?.action = #selector(self.lmmgrSyncLMPrefs(_:))
-                }
-              UserDef.kSymbolInputEnabled
-                .renderCocoa(
-                  fixWidth: innerContentWidth,
-                  prefUITab: .tabDictionary
-                ) { renderable in
-                  renderable.currentControl?.target = self
-                  renderable.currentControl?.action = #selector(self.lmmgrSyncLMPrefs(_:))
-                }
-            }?.boxed()
-            NSView()
-          }
-          NSTabView.TabPage(title: "Ｃ") {
-            NSStackView.buildSection(width: innerContentWidth) {
-              UserDef.kEnforceETenDOSCandidateSequence
-                .renderCocoa(
-                  fixWidth: innerContentWidth,
-                  prefUITab: .tabDictionary
-                ) { renderable in
-                  renderable.currentControl?.target = self
-                  renderable.currentControl?.action = #selector(self.lmmgrSyncLMPrefs(_:))
-                }
-              UserDef.kReplaceSymbolMenuNodeWithUserSuppliedData.renderCocoa(
-                fixWidth: innerContentWidth,
-                prefUITab: .tabDictionary
-              )
-              UserDef.kPhraseReplacementEnabled
-                .renderCocoa(
-                  fixWidth: innerContentWidth,
-                  prefUITab: .tabDictionary
-                ) { renderable in
-                  renderable.currentControl?.target = self
-                  renderable.currentControl?
-                    .action = #selector(self.lmmgrSyncLMPrefsWithReplacementTable(_:))
-                }
-              UserDef.kSuppressFactoryUnigramsOfKanaSyllables.renderCocoa(
-                fixWidth: innerContentWidth,
-                prefUITab: .tabDictionary
-              )
-            }?.boxed()
-            NSView()
-          }
-          NSTabView.TabPage(title: "Ｄ") {
-            NSStackView.buildSection(width: innerContentWidth) {
-              NSStackView.build(.vertical) {
-                NSStackView.build(.horizontal) {
-                  "i18n:settings.importFromKimoTxt.label".makeNSLabel(fixWidth: innerContentWidth)
-                  NSView()
-                  NSStackView.build(.horizontal, spacing: 4) {
-                    importKimoDragButton()
-                    NSButton(
-                      "i18n:settings.importFromKimoTxt.DirectlyImport",
-                      target: self,
-                      action: #selector(importKeyKeyUserPhraseSQLiteDBAction(_:))
-                    )
-                  }
-                }
-                "i18n:settings.importFromKimoTxt.description"
-                  .makeNSLabel(descriptive: true, fixWidth: contentWidth)
-              }
-            }?.boxed()
-            NSView()
-          }
-        }?.makeSimpleConstraint(.width, relation: .equal, value: tabContainerWidth)
+        }?.boxed()
         NSView().makeSimpleConstraint(.height, relation: .equal, value: NSFont.systemFontSize)
       }
     }

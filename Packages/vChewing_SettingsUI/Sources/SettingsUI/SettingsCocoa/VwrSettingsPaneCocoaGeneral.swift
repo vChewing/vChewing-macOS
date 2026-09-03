@@ -80,6 +80,16 @@ extension SettingsPanesCocoa {
             fixWidth: contentWidth,
             prefUITab: .tabGeneral
           )
+          if Date.isTodayTheDate(from: 0_401) {
+            UserDef.kShouldNotFartInLieuOfBeep
+              .renderCocoa(
+                fixWidth: contentWidth,
+                prefUITab: .tabGeneral
+              ) { renderable in
+                renderable.currentControl?.target = self
+                renderable.currentControl?.action = #selector(self.onFartControlChange(_:))
+              }
+          }
         }?.boxed()
         NSStackView.buildSection(.horizontal, width: contentWidth) {
           UserDef.kCheckUpdateAutomatically.renderCocoa(
@@ -197,6 +207,36 @@ extension SettingsPanesCocoa {
       }
       vCLog(forced: true, "vChewing App self-terminated due to UI language change.")
       NSApp.terminate(nil)
+    }
+
+    @IBAction
+    func onFartControlChange(_: NSControl) {
+      let content = "i18n:UserDef.kShouldNotFartInLieuOfBeep.description".i18n
+      let alert = NSAlert(error: "i18n:Common.Warning".i18n)
+      alert.informativeText = content
+      alert.addButton(withTitle: "i18n:Common.Uncheck".i18n)
+      if #available(macOS 11, *) {
+        alert.buttons.forEach { button in
+          button.hasDestructiveAction = true
+        }
+      }
+      alert.addButton(withTitle: "i18n:Common.LeaveItChecked".i18n)
+      let window = CtlSettingsCocoa.shared?.window
+      if !PrefMgr.shared.shouldNotFartInLieuOfBeep {
+        PrefMgr.shared.shouldNotFartInLieuOfBeep = true
+        alert.beginSheetModal(at: window) { result in
+          switch result {
+          case .alertFirstButtonReturn:
+            PrefMgr.shared.shouldNotFartInLieuOfBeep = false
+          case .alertSecondButtonReturn:
+            PrefMgr.shared.shouldNotFartInLieuOfBeep = true
+          default: break
+          }
+          IMEApp.buzz()
+        }
+        return
+      }
+      IMEApp.buzz()
     }
   }
 }

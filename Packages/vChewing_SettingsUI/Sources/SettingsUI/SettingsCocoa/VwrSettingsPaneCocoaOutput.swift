@@ -46,6 +46,11 @@ extension SettingsPanesCocoa {
             prefUITab: .tabOutput
           )
         }?.boxed()
+        NSStackView.build(.horizontal, insets: .new(all: 0, left: 16, right: 16)) {
+          "i18n:Settings.SectionExperimental"
+            .makeNSLabel(fixWidth: contentWidth)
+          NSView()
+        }
         NSStackView.buildSection(width: contentWidth) {
           UserDef.kHardenVerticalPunctuations.renderCocoa(
             fixWidth: contentWidth,

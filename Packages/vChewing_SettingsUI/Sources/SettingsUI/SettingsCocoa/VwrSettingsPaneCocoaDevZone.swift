@@ -34,76 +34,61 @@ extension SettingsPanesCocoa {
             .makeNSLabel(fixWidth: contentWidth)
           NSView()
         }
-        NSTabView.build {
-          NSTabView.TabPage(title: "Ａ") {
-            NSStackView.buildSection(width: innerContentWidth) {
-              UserDef.kSecurityHardenedCompositionBuffer.renderCocoa(
-                fixWidth: innerContentWidth,
-                prefUITab: .tabDevZone
-              )
-              UserDef.kAlwaysUsePCBWithElectronBasedClients.renderCocoa(
-                fixWidth: innerContentWidth,
-                prefUITab: .tabDevZone
-              )
-              UserDef.kDisableSegmentedThickUnderlineInMarkingModeForManagedClients
-                .renderCocoa(
-                  fixWidth: innerContentWidth,
-                  prefUITab: .tabDevZone
-                )
-            }?.boxed()
-            NSView()
-          }
-          NSTabView.TabPage(title: "Ｂ") {
-            NSStackView.buildSection(width: innerContentWidth) {
-              UserDef.kCheckAbusersOfSecureEventInputAPI.renderCocoa(
-                fixWidth: innerContentWidth,
-                prefUITab: .tabDevZone
-              )
-            }?.boxed()
-            NSStackView.buildSection(width: innerContentWidth) {
-              UserDef.kUserPhrasesDatabaseBypassed.renderCocoa(
-                fixWidth: innerContentWidth,
-                prefUITab: .tabDevZone
-              )
-            }?.boxed()
-            NSStackView.buildSection(width: innerContentWidth) {
-              UserDef.kAllowRescoringSingleKanjiCandidates.renderCocoa(
-                fixWidth: innerContentWidth,
-                prefUITab: .tabDevZone
-              )
-            }?.boxed()
-            NSView()
-          }
-          NSTabView.TabPage(title: "Ｃ") {
-            NSStackView.buildSection(width: innerContentWidth) {
-              NSStackView.build(.vertical) {
-                NSStackView.build(.horizontal) {
-                  "i18n:DevZone.JSONPrefsExchange.SectionTitle"
-                    .makeNSLabel(fixWidth: innerContentWidth - 200)
-                  NSView()
-                  NSButton(
-                    "i18n:DevZone.JSONPrefsExchange.Export",
-                    target: self,
-                    action: #selector(exportPrefsAsJSON(_:))
-                  )
-                  NSButton(
-                    "i18n:DevZone.JSONPrefsExchange.Import",
-                    target: self,
-                    action: #selector(importPrefsFromJSON(_:))
-                  )
-                }
-                "i18n:DevZone.JSONPrefsExchange.Description"
-                  .makeNSLabel(descriptive: true, fixWidth: innerContentWidth)
-              }
-            }?.boxed()
-            NSView()
-          }
-        }?.makeSimpleConstraint(.width, relation: .equal, value: tabContainerWidth)
+        NSStackView.buildSection(width: contentWidth) {
+          UserDef.kSecurityHardenedCompositionBuffer.renderCocoa(
+            fixWidth: contentWidth,
+            prefUITab: .tabDevZone
+          )
+          UserDef.kAlwaysUsePCBWithElectronBasedClients.renderCocoa(
+            fixWidth: contentWidth,
+            prefUITab: .tabDevZone
+          )
+          UserDef.kDisableSegmentedThickUnderlineInMarkingModeForManagedClients
+            .renderCocoa(
+              fixWidth: contentWidth,
+              prefUITab: .tabDevZone
+            )
+        }?.boxed()
+        NSStackView.buildSection(width: contentWidth) {
+          UserDef.kCheckAbusersOfSecureEventInputAPI.renderCocoa(
+            fixWidth: contentWidth,
+            prefUITab: .tabDevZone
+          )
+          UserDef.kUserPhrasesDatabaseBypassed.renderCocoa(
+            fixWidth: contentWidth,
+            prefUITab: .tabDevZone
+          )
+          UserDef.kAllowRescoringSingleKanjiCandidates.renderCocoa(
+            fixWidth: contentWidth,
+            prefUITab: .tabDevZone
+          )
+        }?.boxed()
         NSStackView.build(.horizontal, insets: .new(all: 0, left: 16, right: 16)) {
           "i18n:Settings.OptionsMovedToOtherTabs"
             .makeNSLabel(descriptive: true, fixWidth: contentWidth)
           NSView()
         }
+        NSStackView.buildSection(width: contentWidth) {
+          NSStackView.build(.vertical) {
+            NSStackView.build(.horizontal) {
+              "i18n:DevZone.JSONPrefsExchange.SectionTitle"
+                .makeNSLabel(fixWidth: contentWidth - 200)
+              NSView()
+              NSButton(
+                "i18n:DevZone.JSONPrefsExchange.Export",
+                target: self,
+                action: #selector(exportPrefsAsJSON(_:))
+              )
+              NSButton(
+                "i18n:DevZone.JSONPrefsExchange.Import",
+                target: self,
+                action: #selector(importPrefsFromJSON(_:))
+              )
+            }
+            "i18n:DevZone.JSONPrefsExchange.Description"
+              .makeNSLabel(descriptive: true, fixWidth: contentWidth)
+          }
+        }?.boxed()
         NSView().makeSimpleConstraint(.height, relation: .equal, value: NSFont.systemFontSize)
       }
     }
