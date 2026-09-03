@@ -55,7 +55,6 @@ nonisolated public enum UserDef: String, CaseIterable, Identifiable, Sendable {
   case kCassetteEnabled = "CassetteEnabled"
   case kMixedAlphanumericalEnabled = "MixedAlphanumericalEnabled"
   case kFuriousTypingEnabled = "FuriousTypingEnabled"
-  case kPOMAsNGramSourceEnabled = "POMAsNGramSourceEnabled"
   case kCNS11643Enabled = "CNS11643Enabled"
   case kSymbolInputEnabled = "SymbolInputEnabled"
   case kSuppressFactoryUnigramsOfKanaSyllables = "SuppressFactoryUnigramsOfKanaSyllables"
@@ -473,7 +472,6 @@ nonisolated extension UserDef {
     case .kCassetteEnabled: return .bool(false)
     case .kMixedAlphanumericalEnabled: return .bool(false)
     case .kFuriousTypingEnabled: return .bool(true)
-    case .kPOMAsNGramSourceEnabled: return .bool(true)
     case .kCNS11643Enabled: return .bool(false)
     case .kSymbolInputEnabled: return .bool(true)
     case .kSuppressFactoryUnigramsOfKanaSyllables: return .bool(false)
@@ -760,11 +758,6 @@ nonisolated extension UserDef {
     case .kFuriousTypingEnabled: return .init(
         userDef: self, shortTitle: "i18n:UserDef.kFuriousTypingEnabled.shortTitle",
         description: "i18n:UserDef.kFuriousTypingEnabled.description"
-      )
-    case .kPOMAsNGramSourceEnabled: return .init(
-        userDef: self,
-        shortTitle: "i18n:UserDef.kPOMAsNGramSourceEnabled.shortTitle",
-        description: "i18n:UserDef.kPOMAsNGramSourceEnabled.description",
       )
     case .kCNS11643Enabled: return .init(
         userDef: self,

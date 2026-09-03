@@ -3785,11 +3785,11 @@ extension InputHandlerTests {
     #expect(testHandler.assembler.assembledSentence.map(\.value) == ["是", "媽"])
   }
 
-  /// 狂拼 n-gram 來源（S2）：POM 記憶作為 bigram 統計來源時，即使關閉 POM 建議套用
-  /// （fetchSuggestionsFromPerceptionOverrideModel = false），組句路徑亦自然選中記憶詞
-  /// （是媽）而非語言模型最佳猜測（是嗎）——純統計路徑、無 override 介入。
+  /// 主開關（fetch）關閉時，POM 記憶完全不影響組句（P182：建議、自動套用與 n-gram 餵入
+  /// 皆由 `kFetchSuggestionsFromPerceptionOverrideModel` 單一把守）——即使已種入記憶
+  /// （是→媽），組句仍為語言模型最佳猜測（是嗎）。
   @Test
-  func test_IH137_FuriousTypingNGramSourceGuidesPathSelection() throws {
+  func test_IH137_MasterSwitchOffKeepsCompositionUnaffected() throws {
     guard let testHandler, let testSession else {
       Issue.record("testHandler and testSession at least one of them is nil.")
       return
@@ -3799,7 +3799,6 @@ extension InputHandlerTests {
     defer {
       testHandler.currentLM.clearTemporaryData(isFiltering: false)
       testHandler.prefs.furiousTypingEnabled = false
-      testHandler.prefs.pomAsNGramSourceEnabled = false
       testHandler.prefs.keyboardParser = KeyboardParser.ofStandard.rawValue
       testHandler.ensureKeyboardParser()
       testHandler.prefs.fetchSuggestionsFromPerceptionOverrideModel = true
@@ -3817,8 +3816,7 @@ extension InputHandlerTests {
     testSession.resetInputHandler(forceComposerCleanup: true)
     testHandler.prefs.keyboardParser = KeyboardParser.ofHanyuPinyin.rawValue
     testHandler.ensureKeyboardParser()
-    testHandler.prefs.fetchSuggestionsFromPerceptionOverrideModel = false // 關閉 POM 建議套用。
-    testHandler.prefs.pomAsNGramSourceEnabled = true // 僅 n-gram 統計來源。
+    testHandler.prefs.fetchSuggestionsFromPerceptionOverrideModel = false // 關閉主開關（全通道停用）。
     testHandler.prefs.furiousTypingEnabled = true
     testHandler.currentLM.syncPrefs()
 
@@ -3827,15 +3825,15 @@ extension InputHandlerTests {
       timestamp: Date().timeIntervalSince1970
     )
 
-    // 「shima」→ 空格固化前方：ㄇㄚ 桶查詢注入 POM bigram（previous=是），DP 自然選中「媽」。
+    // 「shima」→ 空格固化前方：主開關關閉 ⇒ 無建議、無 n-gram 餵入，組句維持 LM 最佳猜測「是嗎」。
     typeSentence("shima")
     _ = testHandler.triageInput(event: KBEvent.KeyEventData(chars: " ", keyCode: 49).asEvent)
 
     #expect(testHandler.composer.romajiBuffer.isEmpty)
-    #expect(testHandler.assembler.assembledSentence.map(\.value) == ["是", "媽"])
+    #expect(testHandler.assembler.assembledSentence.map(\.value) == ["是", "嗎"])
   }
 
-  /// 狂拼 n-gram 來源＋POM 建議同時開啟時，固化後的自動套用被跳過（雙重加成收斂）：
+  /// 狂拼模式、主開關（fetch）開啟時，固化後的自動套用被跳過（雙重加成收斂）：
   /// 記憶詞由 DP 以 n-gram 統計路徑自然選中（gram.previous 帶「是」），
   /// 而非自動 override 錨定的 bare unigram（previous 為 nil）。
   @Test
@@ -3849,7 +3847,6 @@ extension InputHandlerTests {
     defer {
       testHandler.currentLM.clearTemporaryData(isFiltering: false)
       testHandler.prefs.furiousTypingEnabled = false
-      testHandler.prefs.pomAsNGramSourceEnabled = false
       testHandler.prefs.keyboardParser = KeyboardParser.ofStandard.rawValue
       testHandler.ensureKeyboardParser()
       testHandler.prefs.fetchSuggestionsFromPerceptionOverrideModel = true
@@ -3867,8 +3864,7 @@ extension InputHandlerTests {
     testSession.resetInputHandler(forceComposerCleanup: true)
     testHandler.prefs.keyboardParser = KeyboardParser.ofHanyuPinyin.rawValue
     testHandler.ensureKeyboardParser()
-    testHandler.prefs.fetchSuggestionsFromPerceptionOverrideModel = true // POM 建議開啟。
-    testHandler.prefs.pomAsNGramSourceEnabled = true // n-gram 來源開啟。
+    testHandler.prefs.fetchSuggestionsFromPerceptionOverrideModel = true // 主開關開啟（預設）：建議與 n-gram 餵入皆由此把守。
     testHandler.prefs.furiousTypingEnabled = true
     testHandler.currentLM.syncPrefs()
 
@@ -3886,9 +3882,9 @@ extension InputHandlerTests {
     #expect(testHandler.assembler.assembledSentence.last?.gram.previous == "是")
   }
 
-  /// 非狂拼（一般拼音）n-gram 來源＋POM 建議同時開啟時，contextual 記憶若已由 DP 以
-  /// n-gram 統計路徑自然選中（同值），不再重複以 override 錨定（P181：非狂拼 override
-  /// 轉為統計路徑的兜底、消除雙重加成）——gram.previous 帶「是」即證明選取來自統計路徑、
+  /// 非狂拼（一般拼音）主開關（fetch）開啟時，contextual 記憶若已由 DP 以統計路徑
+  /// 自然選中（同值），不再重複以 override 錨定（P181：非狂拼 override 轉為統計路徑的
+  /// 兜底、消除雙重加成）——gram.previous 帶「是」即證明選取來自統計路徑、
   /// 非自動 override 錨定的 bare unigram（previous 為 nil）。
   @Test
   func test_IH504_NonFuriousPinyinNGramSourceSkipsDuplicateAnchor() throws {
@@ -3901,7 +3897,6 @@ extension InputHandlerTests {
     defer {
       testHandler.currentLM.clearTemporaryData(isFiltering: false)
       testHandler.prefs.furiousTypingEnabled = false
-      testHandler.prefs.pomAsNGramSourceEnabled = false
       testHandler.prefs.keyboardParser = KeyboardParser.ofStandard.rawValue
       testHandler.ensureKeyboardParser()
       testHandler.prefs.fetchSuggestionsFromPerceptionOverrideModel = true
@@ -3918,8 +3913,7 @@ extension InputHandlerTests {
     testSession.resetInputHandler(forceComposerCleanup: true)
     testHandler.prefs.keyboardParser = KeyboardParser.ofHanyuPinyin.rawValue
     testHandler.ensureKeyboardParser()
-    testHandler.prefs.fetchSuggestionsFromPerceptionOverrideModel = true // POM 建議開啟。
-    testHandler.prefs.pomAsNGramSourceEnabled = true // n-gram 來源開啟。
+    testHandler.prefs.fetchSuggestionsFromPerceptionOverrideModel = true // 主開關開啟（預設）。
     testHandler.prefs.furiousTypingEnabled = false // 非狂拼（一般拼音）。
     testHandler.currentLM.syncPrefs()
 
@@ -4263,7 +4257,6 @@ extension InputHandlerTests {
     defer {
       testHandler.currentLM.clearTemporaryData(isFiltering: false)
       testHandler.prefs.furiousTypingEnabled = false
-      testHandler.prefs.pomAsNGramSourceEnabled = false
       testHandler.prefs.keyboardParser = KeyboardParser.ofStandard.rawValue
       testHandler.ensureKeyboardParser()
       testSession.resetInputHandler(forceComposerCleanup: true)
@@ -4298,7 +4291,6 @@ extension InputHandlerTests {
         timestamp: Date().timeIntervalSince1970
       )
     }
-    testHandler.prefs.pomAsNGramSourceEnabled = true
     testHandler.prefs.fetchSuggestionsFromPerceptionOverrideModel = true
     testHandler.currentLM.syncPrefs()
 
@@ -4329,7 +4321,6 @@ extension InputHandlerTests {
     defer {
       testHandler.currentLM.clearTemporaryData(isFiltering: false)
       testHandler.prefs.furiousTypingEnabled = false
-      testHandler.prefs.pomAsNGramSourceEnabled = false
       testHandler.prefs.keyboardParser = KeyboardParser.ofStandard.rawValue
       testHandler.ensureKeyboardParser()
       testSession.resetInputHandler(forceComposerCleanup: true)
@@ -4361,7 +4352,6 @@ extension InputHandlerTests {
         timestamp: Date().timeIntervalSince1970
       )
     }
-    testHandler.prefs.pomAsNGramSourceEnabled = true
     testHandler.prefs.fetchSuggestionsFromPerceptionOverrideModel = true
     testHandler.currentLM.syncPrefs()
 
@@ -4390,7 +4380,6 @@ extension InputHandlerTests {
     defer {
       testHandler.currentLM.clearTemporaryData(isFiltering: false)
       testHandler.prefs.furiousTypingEnabled = false
-      testHandler.prefs.pomAsNGramSourceEnabled = false
       testHandler.prefs.keyboardParser = KeyboardParser.ofStandard.rawValue
       testHandler.ensureKeyboardParser()
       testSession.resetInputHandler(forceComposerCleanup: true)
@@ -4423,7 +4412,6 @@ extension InputHandlerTests {
         timestamp: Date().timeIntervalSince1970
       )
     }
-    testHandler.prefs.pomAsNGramSourceEnabled = true
     testHandler.prefs.fetchSuggestionsFromPerceptionOverrideModel = true
     testHandler.currentLM.syncPrefs()
 

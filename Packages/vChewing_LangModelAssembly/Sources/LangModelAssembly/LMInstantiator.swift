@@ -62,8 +62,10 @@ extension LMAssembly {
       /// - 「倚天傳統注音鍵盤佈局」是電腦鍵盤上的按鍵與注音符號的映射。「倚天26」也是這種映射。這些都是與 Tekkon Composer 有關的內容。
       public var alwaysSupplyETenDOSUnigrams = true
 
-      /// 是否將漸退記憶（POM）同時作為組字引擎的 n-gram（bigram／trigram）統計來源。
-      public var pomAsNGramSourceEnabled = true
+      /// 是否讓漸退記憶（POM）向組字引擎提供 n-gram（bigram／trigram，可能含 unigram）
+      /// 統計資料——鏡像 `kFetchSuggestionsFromPerceptionOverrideModel` 主開關（P182 起
+      /// POM 對組句的所有影響皆由此把守）。
+      public var fetchSuggestionsFromPerceptionOverrideModel = true
 
       public var partialMatchEnabled = false
       public var filterNonCNSReadings = false
@@ -258,7 +260,7 @@ extension LMAssembly {
       config.deltaOfCalendarYears = prefs.deltaOfCalendarYears
       config.allowRescoringSingleKanjiCandidates = prefs.allowRescoringSingleKanjiCandidates
       config.alwaysSupplyETenDOSUnigrams = prefs.enforceETenDOSCandidateSequence || prefs.useSCPCTypingMode
-      config.pomAsNGramSourceEnabled = prefs.pomAsNGramSourceEnabled
+      config.fetchSuggestionsFromPerceptionOverrideModel = prefs.fetchSuggestionsFromPerceptionOverrideModel
       config.bypassUserPhrasesData = prefs.userPhrasesDatabaseBypassed
       config.suppressFactoryUnigramsOfKanaSyllables = prefs.suppressFactoryUnigramsOfKanaSyllables
     }
@@ -883,7 +885,7 @@ extension LMAssembly {
       rawAllUnigrams.sort { $0.probability > $1.probability }
       // S2（P160）：POM 記憶作為 bigram 統計來源——附加於 unigram 之後、不經 consolidate
       // （避免與同名 unigram 去重互擾）；previous 非空故選字窗排除機制自動隔離、僅影響路徑選取。
-      if config.pomAsNGramSourceEnabled {
+      if config.fetchSuggestionsFromPerceptionOverrideModel {
         let pomGrams = lxPerceptor.perceptionsFor(
           headReading: keyChain, timestamp: Date().timeIntervalSince1970
         ).map { pom in
@@ -1335,7 +1337,7 @@ extension LMAssembly {
       rawAllUnigrams.consolidate(filter: dataAsFilter)
       rawAllUnigrams.sort { $0.probability > $1.probability }
       // S2（P160）：POM 記憶作為 bigram 統計來源——同 fast path，附加於 unigram 之後、不經 consolidate。
-      if config.pomAsNGramSourceEnabled {
+      if config.fetchSuggestionsFromPerceptionOverrideModel {
         let pomGrams = lxPerceptor.perceptionsFor(
           headReading: keyChain, timestamp: Date().timeIntervalSince1970
         ).map { pom in

@@ -92,7 +92,6 @@ public protocol PrefMgrProtocol {
   var cassetteEnabled: Bool { get set }
   var mixedAlphanumericalEnabled: Bool { get set }
   var furiousTypingEnabled: Bool { get set }
-  var pomAsNGramSourceEnabled: Bool { get set }
   var symbolInputEnabled: Bool { get set }
   var suppressFactoryUnigramsOfKanaSyllables: Bool { get set }
   var currencyNumeralsEnabled: Bool { get set }

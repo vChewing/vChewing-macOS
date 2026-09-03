@@ -153,9 +153,6 @@ public struct VwrSettingsPaneDictionary: View {
       Section {
         UserDef.kFetchSuggestionsFromPerceptionOverrideModel.renderUI()
         UserDef.kReducePOMLifetimeToNoMoreThan12Hours.renderUI()
-        UserDef.kPOMAsNGramSourceEnabled.renderUI {
-          SettingsUIHost.shared.syncLMPrefs()
-        }
       }
 
       Section {

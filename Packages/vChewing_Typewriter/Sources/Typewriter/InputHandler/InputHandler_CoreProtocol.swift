@@ -804,8 +804,10 @@ extension InputHandlerProtocol {
     let appendables = filterPOMAppendables(from: suggestion, rawCandidates: rawCandidates)
     arrResult.append(contentsOf: appendables)
     if apply {
-      // n-gram 來源（`kPOMAsNGramSourceEnabled`）開啟時，contextual 記憶的自動套用處理：
-      if prefs.pomAsNGramSourceEnabled, let newestSuggestedCandidate = suggestion.candidates.last {
+      // P162／P181：POM 記憶對組句的影響已移交「統計路徑＋override 兜底」體系——n-gram 餵入
+      // 隨 `kFetchSuggestionsFromPerceptionOverrideModel` 主開關（P182 起已無獨立開關）。
+      // 此處為 contextual 記憶的自動套用處理：
+      if let newestSuggestedCandidate = suggestion.candidates.last {
         if isFuriousTypingModeEffective {
           // P162（狂拼）：自動套用一律移交統計路徑——override 錨定會與狂拼的
           // trail／retokenization 語義衝突；contextual 記憶已由 DP 以 n-gram 自然選中。

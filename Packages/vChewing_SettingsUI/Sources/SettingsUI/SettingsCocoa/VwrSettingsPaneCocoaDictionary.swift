@@ -131,13 +131,6 @@ extension SettingsPanesCocoa {
             fixWidth: contentWidth,
             prefUITab: .tabDictionary
           )
-          UserDef.kPOMAsNGramSourceEnabled.renderCocoa(
-            fixWidth: contentWidth,
-            prefUITab: .tabDictionary
-          ) { renderable in
-            renderable.currentControl?.target = self
-            renderable.currentControl?.action = #selector(self.lmmgrSyncLMPrefs(_:))
-          }
         }?.boxed()
         NSStackView.buildSection(width: contentWidth) {
           NSStackView.build(.vertical) {

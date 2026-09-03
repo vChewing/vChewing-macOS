@@ -440,8 +440,6 @@
 "i18n:UserDef.kPhraseReplacementEnabled.shortTitle" = "啟用語彙置換表";
 "i18n:UserDef.kPinyinTypingEnabled.description" = "在拼音與注音打字模式之間切換。啟用時使用拼音輸入，停用時使用注音排列。";
 "i18n:UserDef.kPinyinTypingEnabled.shortTitle" = "拼音/注音打字模式";
-"i18n:UserDef.kPOMAsNGramSourceEnabled.description" = "將您透過選字窗選字所累積的漸退記憶（POM）一併作為護摩組字引擎的雙元／三元語法（bigram／trigram）統計來源：在相同前後文下，組句路徑會自然優先選取您記憶過的選字結果，且隨記憶衰減自動淡化。此開關預設啟用——啟用時，狂拼模式在固化讀音時不再以覆寫方式直接帶出記憶詞、而改由統計路徑自然選中；若您不希望臨時記憶影響組句，可關閉此開關——關閉後記憶不參與組句統計、維持既有行為。";
-"i18n:UserDef.kPOMAsNGramSourceEnabled.shortTitle" = "以漸退記憶作為組句統計來源";
 "i18n:UserDef.kPopupCompositionBufferTextSize.description" = "調整浮動組字窗的字型大小。";
 "i18n:UserDef.kPopupCompositionBufferTextSize.shortTitle" = "浮動組字窗字號:";
 "i18n:UserDef.kPreferredRevolverForceLevel.description" = "自 v4.5.4 版起引入「弱輪替」保護機制：當您使用鍵盤熱鍵（如 Space/Tab）進行就地輪替時，若目標為多音節候選、且其範圍會覆蓋到「非當前游標位置」且「已被您手動選定」的字詞時，系統將跳過該候選，以防止已選定的內容受到意外影響。此功能特別適合習慣「一個字一個字地選字」的使用者，能確保您在修正後方字詞時，前方已選定的內容依然穩固。此設定不影響選字窗的選字行為。";
