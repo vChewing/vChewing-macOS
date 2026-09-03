@@ -883,13 +883,17 @@ extension LMAssembly {
         )
       rawAllUnigrams.consolidate(filter: dataAsFilter)
       rawAllUnigrams.sort { $0.probability > $1.probability }
-      // S2（P160）：POM 記憶作為 bigram 統計來源——附加於 unigram 之後、不經 consolidate
-      // （避免與同名 unigram 去重互擾）；previous 非空故選字窗排除機制自動隔離、僅影響路徑選取。
+      // POM 記憶作為 n-gram 統計來源（S2）：附加於 unigram 之後、不經 consolidate
+      // （避免與同名 unigram 去重互擾）。僅餵「帶前後文」的 contextual 記憶——bare unigram
+      // 記憶對 DP 無貢獻（節點 unigramScore 取陣列首筆、不選中尾端注入）且會污染選字窗
+      // 原始候選清單（fetchCandidates 僅排除 contextual grams）；unigram 記憶改由
+      // Typewriter 建議通道浮現（受 fetch／「固定順序」等把守）。
       if config.fetchSuggestionsFromPerceptionOverrideModel {
         let pomGrams = lxPerceptor.perceptionsFor(
           headReading: keyChain, timestamp: Date().timeIntervalSince1970
-        ).map { pom in
-          Homa.Gram(
+        ).compactMap { pom -> Homa.Gram? in
+          guard pom.previous != nil || pom.anterior != nil else { return nil }
+          return Homa.Gram(
             keyArray: pom.headReading.split(separator: "-").map(String.init),
             current: pom.candidate,
             previous: pom.previous, anterior: pom.anterior,
@@ -1336,12 +1340,13 @@ extension LMAssembly {
         )
       rawAllUnigrams.consolidate(filter: dataAsFilter)
       rawAllUnigrams.sort { $0.probability > $1.probability }
-      // S2（P160）：POM 記憶作為 bigram 統計來源——同 fast path，附加於 unigram 之後、不經 consolidate。
+      // POM 記憶作為 n-gram 統計來源——同 fast path：僅餵「帶前後文」的 contextual 記憶。
       if config.fetchSuggestionsFromPerceptionOverrideModel {
         let pomGrams = lxPerceptor.perceptionsFor(
           headReading: keyChain, timestamp: Date().timeIntervalSince1970
-        ).map { pom in
-          Homa.Gram(
+        ).compactMap { pom -> Homa.Gram? in
+          guard pom.previous != nil || pom.anterior != nil else { return nil }
+          return Homa.Gram(
             keyArray: pom.headReading.split(separator: "-").map(String.init),
             current: pom.candidate,
             previous: pom.previous, anterior: pom.anterior,

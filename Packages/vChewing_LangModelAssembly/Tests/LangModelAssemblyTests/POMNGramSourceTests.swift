@@ -61,19 +61,29 @@ struct POMNGramSourceTests {
     #expect(grams.contains { $0.current == "媽" && $0.previous == "是" })
   }
 
-  /// 餵入資料可含 unigram 記憶（無前後文）：以佔位符上下文鍵記憶、注入為 bare gram。
+  /// unigram 記憶（無前後文）不進入引擎 n-gram 餵入：bare gram 對 DP 無貢獻（節點
+  /// unigramScore 取陣列首筆、不選中尾端注入），只會污染選字窗原始候選清單——故由
+  /// Typewriter 建議通道浮現（受 fetch／「以固定順序陳列」等把守）。驗證方式：記憶
+  /// bare unigram 前後，unigramsFor 回傳內容必須完全一致（同讀音字元可能本已存在於
+  /// 內建詞庫，因此以「前後等值」而非「不含該字」斷言）。
   @Test
-  func testNGramSource_UnigramMemoryIsFed() {
+  func testNGramSource_UnigramMemoryStaysOutOfEngineFeed() {
     defer { LMAssembly.LMInstantiator.disconnectFactoryDictionary() }
     let lmi = LMAssembly.LMInstantiator()
+    let gramsBefore = lmi.unigramsFor(keyArray: ["ㄈㄤ"])
     lmi.memorizePerception(
       (ngramKey: "()&(ㄈㄤ,芳)", candidate: "芳"),
       timestamp: Date().timeIntervalSince1970
     )
-    let grams = lmi.unigramsFor(keyArray: ["ㄈㄤ"])
-    #expect(grams.contains {
-      $0.current == "芳" && ($0.previous ?? "").isEmpty && ($0.anterior ?? "").isEmpty
-    })
+    let gramsAfter = lmi.unigramsFor(keyArray: ["ㄈㄤ"])
+    #expect(gramsAfter == gramsBefore) // bare unigram 記憶不改變引擎回傳內容。
+    // 對照：帶前後文（previous）的記憶仍照常餵入（contextual n-gram 語義）。
+    lmi.memorizePerception(
+      (ngramKey: "(ㄕˋ,是)&(ㄇㄚ,媽)", candidate: "媽"),
+      timestamp: Date().timeIntervalSince1970
+    )
+    let grams2 = lmi.unigramsFor(keyArray: ["ㄇㄚ"])
+    #expect(grams2.contains { $0.current == "媽" && $0.previous == "是" })
   }
 
   /// 快取指紋納入 POM 世代：記憶更新後查詢即反映新記憶。
