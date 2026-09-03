@@ -56,6 +56,8 @@
 "i18n:Common.Yes" = "是";
 "i18n:DevZone.JSONPrefsExchange.Description" = "允許將目前的偏好設定匯出為 JSON 檔案、或從 JSON 檔案匯入偏好設定。涉及沙箱安全權限的路徑設定與介面語言設定不在交換範圍內。";
 "i18n:DevZone.JSONPrefsExchange.Export" = "匯出";
+"i18n:DevZone.JSONPrefsExchange.ExportDumpedMessage:%@" = "偏好設定檔已儲存為：\n\n%@\n\n將於 Finder 中顯示該檔案。";
+"i18n:DevZone.JSONPrefsExchange.ExportDumpedTitle" = "偏好設定已匯出至檔案傾印資料夾。";
 "i18n:DevZone.JSONPrefsExchange.ExportError" = "匯出偏好設定時發生錯誤。";
 "i18n:DevZone.JSONPrefsExchange.Import" = "匯入";
 "i18n:DevZone.JSONPrefsExchange.ImportError.AccessDenied" = "無法存取選取的檔案。";

@@ -56,6 +56,8 @@
 "i18n:Common.Yes" = "うむ";
 "i18n:DevZone.JSONPrefsExchange.Description" = "現在の環境設定を JSON ファイルに書き出し、または JSON ファイルから環境設定を読み込むことができます。サンドボックスに関連するパス設定とインターフェース言語の設定は交換対象外です。";
 "i18n:DevZone.JSONPrefsExchange.Export" = "書き出す";
+"i18n:DevZone.JSONPrefsExchange.ExportDumpedMessage:%@" = "環境設定ファイルは次の場所に保存されました：\n\n%@\n\nFinder でファイルの場所を表示します。";
+"i18n:DevZone.JSONPrefsExchange.ExportDumpedTitle" = "環境設定をファイルダンプフォルダーに書き出しました。";
 "i18n:DevZone.JSONPrefsExchange.ExportError" = "環境設定の書き出し中にエラーが発生しました。";
 "i18n:DevZone.JSONPrefsExchange.Import" = "読み込む";
 "i18n:DevZone.JSONPrefsExchange.ImportError.AccessDenied" = "選択されたファイルにアクセスできません。";

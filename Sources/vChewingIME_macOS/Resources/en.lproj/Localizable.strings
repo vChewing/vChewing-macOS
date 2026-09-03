@@ -56,6 +56,8 @@
 "i18n:Common.Yes" = "Yes";
 "i18n:DevZone.JSONPrefsExchange.Description" = "Allows exporting the current preferences to a JSON file, or importing preferences from a JSON file. Path settings involving sandbox security permissions and UI language settings are not within the exchange scope.";
 "i18n:DevZone.JSONPrefsExchange.Export" = "Export";
+"i18n:DevZone.JSONPrefsExchange.ExportDumpedMessage:%@" = "The preferences file was saved as:\n\n%@\n\nFinder will now reveal the file.";
+"i18n:DevZone.JSONPrefsExchange.ExportDumpedTitle" = "Preferences exported to the file dump folder.";
 "i18n:DevZone.JSONPrefsExchange.ExportError" = "An error occurred while exporting preferences.";
 "i18n:DevZone.JSONPrefsExchange.Import" = "Import";
 "i18n:DevZone.JSONPrefsExchange.ImportError.AccessDenied" = "Unable to access the selected file.";

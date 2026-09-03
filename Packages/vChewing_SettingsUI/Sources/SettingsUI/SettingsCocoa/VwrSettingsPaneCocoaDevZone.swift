@@ -21,6 +21,8 @@ extension SettingsPanesCocoa {
 
     // MARK: Internal
 
+    let dragRetrieverJSONImport: NSFileDragRetrieverButton = .init()
+
     var windowWidth: CGFloat { SettingsPanesCocoa.windowWidth }
     var contentWidth: CGFloat { SettingsPanesCocoa.contentWidth }
     var innerContentWidth: CGFloat { SettingsPanesCocoa.innerContentWidth }
@@ -79,11 +81,7 @@ extension SettingsPanesCocoa {
                 target: self,
                 action: #selector(exportPrefsAsJSON(_:))
               )
-              NSButton(
-                "i18n:DevZone.JSONPrefsExchange.Import",
-                target: self,
-                action: #selector(importPrefsFromJSON(_:))
-              )
+              jsonImportDragButton()
             }
             "i18n:DevZone.JSONPrefsExchange.Description"
               .makeNSLabel(descriptive: true, fixWidth: contentWidth)
@@ -111,6 +109,17 @@ extension SettingsPanesCocoa {
       return lines.joined(separator: "\n")
     }
 
+    func jsonImportDragButton() -> NSFileDragRetrieverButton {
+      dragRetrieverJSONImport.title = "i18n:DevZone.JSONPrefsExchange.Import".i18n
+      dragRetrieverJSONImport.target = self
+      dragRetrieverJSONImport.allowedTypes = ["json"]
+      dragRetrieverJSONImport.action = #selector(importPrefsFromJSON(_:))
+      dragRetrieverJSONImport.postDragHandler = { [weak self] url in
+        self?.importPrefsFromJSONFile(at: url)
+      }
+      return dragRetrieverJSONImport
+    }
+
     @IBAction
     func sanityCheck(_: NSControl) {}
 
@@ -124,6 +133,10 @@ extension SettingsPanesCocoa {
         alert.alertStyle = .warning
         alert.addButton(withTitle: "i18n:Common.OK".i18n)
         alert.beginSheetModal(at: CtlSettingsCocoa.shared?.window)
+        return
+      }
+      guard #available(macOS 10.13, *) else {
+        exportPrefsAsJSONToFileDump(jsonString)
         return
       }
       let dlgSave = NSSavePanel()
@@ -165,26 +178,77 @@ extension SettingsPanesCocoa {
       }
       dlgOpen.allowsMultipleSelection = false
       let window = CtlSettingsCocoa.shared?.window
-      dlgOpen.beginSheetModal(at: window) { result in
+      dlgOpen.beginSheetModal(at: window) { [weak self] result in
         guard result == .OK, let url = dlgOpen.url else { return }
-        guard let data = try? Data(contentsOf: url) else {
-          let alert = NSAlert()
-          alert.messageText = "i18n:DevZone.JSONPrefsExchange.ImportResultTitle".i18n
-          alert.informativeText = "i18n:DevZone.JSONPrefsExchange.ImportError.ReadFailure".i18n
-          alert.alertStyle = .warning
-          alert.addButton(withTitle: "i18n:Common.OK".i18n)
-          alert.beginSheetModal(at: window)
-          return
-        }
-        let importResult = UserDef.importFromJSON(data)
-        PrefMgr.shared.fixOddPreferencesCore()
-        let message = Self.formatImportResult(importResult)
+        self?.importPrefsFromJSONFile(at: url)
+      }
+    }
+
+    func importPrefsFromJSONFile(at url: URL) {
+      let window = CtlSettingsCocoa.shared?.window
+      guard let data = try? Data(contentsOf: url) else {
         let alert = NSAlert()
         alert.messageText = "i18n:DevZone.JSONPrefsExchange.ImportResultTitle".i18n
-        alert.informativeText = message
-        alert.alertStyle = importResult.failures.isEmpty ? .informational : .warning
+        alert.informativeText = "i18n:DevZone.JSONPrefsExchange.ImportError.ReadFailure".i18n
+        alert.alertStyle = .warning
         alert.addButton(withTitle: "i18n:Common.OK".i18n)
         alert.beginSheetModal(at: window)
+        return
+      }
+      let importResult = UserDef.importFromJSON(data)
+      PrefMgr.shared.fixOddPreferencesCore()
+      let message = Self.formatImportResult(importResult)
+      let alert = NSAlert()
+      alert.messageText = "i18n:DevZone.JSONPrefsExchange.ImportResultTitle".i18n
+      alert.informativeText = message
+      alert.alertStyle = importResult.failures.isEmpty ? .informational : .warning
+      alert.addButton(withTitle: "i18n:Common.OK".i18n)
+      alert.beginSheetModal(at: window)
+    }
+
+    // MARK: Private
+
+    // MARK: - macOS 10.12 與更早版本（ComDlg32 不可用）的匯出替代方案。
+
+    // 此段一律不使用 NSOpenPanel / NSSavePanel。
+
+    private func exportPrefsAsJSONToFileDump(_ jsonString: String) {
+      do {
+        let appSupportURL = FileManager.default.urls(
+          for: .applicationSupportDirectory,
+          in: .userDomainMask
+        )[0]
+        let dumpDirURL = appSupportURL.appendingPathComponent("fileDump")
+        try FileManager.default.createDirectory(
+          at: dumpDirURL,
+          withIntermediateDirectories: true
+        )
+        let formatter = DateFormatter()
+        formatter.locale = Locale(identifier: "en_US_POSIX")
+        formatter.dateFormat = "ddMMyy-HHmmss"
+        let stamp = formatter.string(from: Date())
+        let destURL = dumpDirURL.appendingPathComponent(
+          "vChewing_Preferences_\(stamp).json"
+        )
+        try jsonString.write(to: destURL, atomically: true, encoding: .utf8)
+        let window = CtlSettingsCocoa.shared?.window
+        let alert = NSAlert()
+        alert.messageText = "i18n:DevZone.JSONPrefsExchange.ExportDumpedTitle".i18n
+        alert.informativeText = String(
+          format: "i18n:DevZone.JSONPrefsExchange.ExportDumpedMessage:%@".i18n,
+          destURL.path
+        )
+        alert.addButton(withTitle: "i18n:Common.OK".i18n)
+        alert.beginSheetModal(at: window) { _ in
+          NSWorkspace.shared.activateFileViewerSelecting([destURL])
+        }
+      } catch {
+        let alert = NSAlert()
+        alert.messageText = "i18n:DevZone.JSONPrefsExchange.ExportError".i18n
+        alert.informativeText = error.localizedDescription
+        alert.alertStyle = .warning
+        alert.addButton(withTitle: "i18n:Common.OK".i18n)
+        alert.beginSheetModal(at: CtlSettingsCocoa.shared?.window)
       }
     }
   }
