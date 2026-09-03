@@ -1593,10 +1593,14 @@ extension InputHandlerProtocol {
   // MARK: - 處理全形/半形阿拉伯數字輸入（FW/HW Arabic Numerals）
 
   /// 處理全形/半形阿拉伯數字輸入。
+  ///
+  /// 半形標點模式啟用時略過此功能（不做數字鍵攔截），
+  /// 讓當下鍵盤佈局（例如 Ukelele 自訂佈局）所定義的字元可以透傳出去。
   /// - Parameter input: 輸入訊號。
   /// - Returns: 告知 IMK「該按鍵是否已經被輸入法攔截處理」。
   func handleArabicNumeralInputs(input: InputSignalProtocol) -> Bool {
     guard let session = session else { return false }
+    guard !prefs.halfWidthPunctuationEnabled else { return false }
     guard session.state.type == .ofEmpty, input.isMainAreaNumKey else { return false }
     guard input.isOptionHeld, !input.isHoldingAny([.command, .control]) else { return false }
     guard let strRAW = input.mainAreaNumKeyChar else { return false }

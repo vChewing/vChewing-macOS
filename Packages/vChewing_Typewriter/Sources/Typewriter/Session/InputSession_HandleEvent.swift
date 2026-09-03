@@ -185,8 +185,9 @@ extension SessionProtocol {
        let eventCharConverted = eventToDeal.characters?.applyingTransformFW2HW(reverse: false) {
       eventToDeal = eventToDeal.reinitiate(characters: eventCharConverted)
     } else if [.ofEmpty, .ofInputting].contains(state.type), eventToDeal.isMainAreaNumKey,
-              !eventToDeal.isCommandHeld, !eventToDeal.isControlHeld, eventToDeal.isOptionHeld {
-      // Alt(+Shift)+主鍵盤區數字鍵 預先處理
+              !eventToDeal.isCommandHeld, !eventToDeal.isControlHeld, eventToDeal.isOptionHeld,
+              !prefs.halfWidthPunctuationEnabled {
+      // Alt(+Shift)+主鍵盤區數字鍵 預先處理（半形標點模式下略過、保留鍵盤佈局自訂字元）。
       eventToDeal = eventToDeal.reinitiate(characters: eventToDeal.mainAreaNumKeyChar)
     }
 

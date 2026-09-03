@@ -1431,6 +1431,60 @@ extension InputHandlerTests {
     )
   }
 
+  // MARK: - Half-width punctuation mode bypasses Option+main-area numerals
+
+  /// 半形標點模式啟用時，Alt(+Shift)+主鍵盤區數字鍵不得被「阿拉伯數字輸入」功能攔截，
+  /// 使當下鍵盤佈局（例如 Ukelele 自訂佈局）在 Option 層定義的字元可以透傳出去；
+  /// 全形（非半形）標點模式下該功能維持不變。
+  @Test
+  func test_IH434_OptionMainAreaNumeralsBypassedInHalfWidthMode() throws {
+    guard let testHandler, let testSession else {
+      Issue.record("testHandler and testSession at least one of them is nil.")
+      return
+    }
+    testSession.switchState(.ofEmpty())
+
+    let optOneEvent = KBEvent.KeyEventData(
+      flags: .option,
+      chars: "1",
+      charsSansModifiers: "1",
+      keyCode: 18
+    ).asEvent
+    let optShiftOneEvent = KBEvent.KeyEventData(
+      flags: [.option, .shift],
+      chars: "1",
+      charsSansModifiers: "1",
+      keyCode: 18
+    ).asEvent
+
+    // 全形標點模式（半形標點關閉）：Alt(+Shift)+數字鍵仍由數字輸入功能攔截。
+    testHandler.prefs.halfWidthPunctuationEnabled = false
+    #expect(
+      testHandler.triageInput(event: optOneEvent),
+      "Alt+數字鍵在全形標點模式下應被數字輸入功能攔截"
+    )
+    testSession.switchState(.ofEmpty())
+    #expect(
+      testHandler.triageInput(event: optShiftOneEvent),
+      "Alt+Shift+數字鍵在全形標點模式下應被數字輸入功能攔截"
+    )
+
+    // 半形標點模式：數字輸入功能被 bypass，按鍵不得被攔截（透傳給鍵盤佈局）。
+    testSession.switchState(.ofEmpty())
+    testHandler.prefs.halfWidthPunctuationEnabled = true
+    #expect(
+      !testHandler.triageInput(event: optOneEvent),
+      "半形標點模式下 Alt+數字鍵不得被數字輸入功能攔截"
+    )
+    testSession.switchState(.ofEmpty())
+    #expect(
+      !testHandler.triageInput(event: optShiftOneEvent),
+      "半形標點模式下 Alt+Shift+數字鍵不得被數字輸入功能攔截"
+    )
+
+    testHandler.prefs.halfWidthPunctuationEnabled = false
+  }
+
   // MARK: - ETen Pure-Digit Sequence Stays ASCII
 
   /// 倚天傳統佈局下，1-4 為聲調鍵、7-9/0 為韻母鍵，

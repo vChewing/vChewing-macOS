@@ -346,6 +346,8 @@ extension MainAssemblyTests {
     testSession.switchState(.ofEmpty())
     testClient.clear()
 
+    // 全形標點（非半形）模式：Alt(+Shift)+主鍵盤數字鍵仍維持數字輸入功能。
+    testHandler.prefs.halfWidthPunctuationEnabled = false
     let optionOneEvent = NSEvent.KeyEventData(
       type: .keyDown,
       flags: .option,
@@ -360,7 +362,6 @@ extension MainAssemblyTests {
 
     testSession.switchState(.ofEmpty())
     testClient.clear()
-    testHandler.prefs.halfWidthPunctuationEnabled = false
     let optionShiftTwoEvent = NSEvent.KeyEventData(
       type: .keyDown,
       flags: [.option, .shift],
@@ -373,12 +374,23 @@ extension MainAssemblyTests {
     #expect(testSession.state.type == .ofEmpty || testSession.state.type == .ofCommitting)
     testClient.clear()
 
+    // 半形標點模式：bypass 數字輸出功能——按鍵不得被輸入法攔截，
+    // 讓當下鍵盤佈局（例如 Ukelele 自訂佈局）定義的字元可以直接透傳出去。
     testSession.switchState(.ofEmpty())
     testClient.clear()
     testHandler.prefs.halfWidthPunctuationEnabled = true
-    _ = press(optionShiftTwoEvent)
-    #expect(testClient.toString() == "2".applyingTransformFW2HW(reverse: false))
+    _ = handleKeyEvent(optionOneEvent, shouldHandle: false)
+    #expect(testClient.toString().isEmpty)
     #expect(testSession.state.type == .ofEmpty || testSession.state.type == .ofCommitting)
+    testClient.clear()
+
+    testSession.switchState(.ofEmpty())
+    testClient.clear()
+    _ = handleKeyEvent(optionShiftTwoEvent, shouldHandle: false)
+    #expect(testClient.toString().isEmpty)
+    #expect(testSession.state.type == .ofEmpty || testSession.state.type == .ofCommitting)
+
+    testHandler.prefs.halfWidthPunctuationEnabled = false
   }
 
   @Test
