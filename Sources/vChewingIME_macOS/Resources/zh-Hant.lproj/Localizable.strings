@@ -395,8 +395,8 @@
 "i18n:UserDef.kEnforceSingleLineCandidateWindowLayout4SCPC.shortTitle" = "對逐字選字模式強制單行選字窗佈局";
 "i18n:UserDef.kEscToCleanInputBuffer.description" = "若取消勾選，則 ESC 鍵會先嘗試清除未組成的讀音/字根；\n如果沒有未組成的讀音/字根的話，則會遞交當前組字區的內容。";
 "i18n:UserDef.kEscToCleanInputBuffer.shortTitle" = "敲 ESC 鍵以清空整個組字緩衝區";
-"i18n:UserDef.kFetchSuggestionsFromPerceptionOverrideModel.description" = "漸退記憶模組僅持有臨時記憶之功能。每一筆記錄都會在六天之內逐漸變得徹底失效。您可以藉由輸入法選單清除全部的記憶記錄。";
-"i18n:UserDef.kFetchSuggestionsFromPerceptionOverrideModel.shortTitle" = "在敲字時自動套用來自漸退記憶模組的建議";
+"i18n:UserDef.kFetchSuggestionsFromPerceptionOverrideModel.description" = "啟用後，漸退記憶（POM）模組會觀察您的選字行為以累積臨時記憶，並在敲字時自動以這些記憶提供建議（套用至組句結果、或置頂於候選窗）。記憶記錄會隨時間逐漸衰減失效，您亦可隨時藉由輸入法選單清除全部記憶。關閉本選項可停止此類自動建議與新的記憶學習——但若「以漸退記憶作為組句統計來源」仍啟用，既有的記憶仍會以統計方式影響組句。";
+"i18n:UserDef.kFetchSuggestionsFromPerceptionOverrideModel.shortTitle" = "啟用漸退記憶的學習與自動建議";
 "i18n:UserDef.kFilterFactoryKanjisOfNonCurrentInputMode.description" = "啟用時，僅存在於相反輸入模式（如在繁體模式下出現的簡體特有字）的單一漢字候選將從選字窗中移除。倚天中文系統支援的漢字與 CNS 全字庫漢字不受影響。注意：過濾範圍僅限萬國碼 1.0.1 所支援的漢字（即倚天中文系統收字範圍）；較新版本萬國碼才引入的字元不在覆蓋範圍內。";
 "i18n:UserDef.kFilterFactoryKanjisOfNonCurrentInputMode.shortTitle" = "濾除掉與輸入模式不相符的漢字候選";
 "i18n:UserDef.kFilterNonCNSReadingsForCHTInput.description" = "對於單漢字候選字，不符合全字庫讀音的結果將被降權至候選字列表尾端，而非完全移除。";
@@ -440,7 +440,7 @@
 "i18n:UserDef.kPhraseReplacementEnabled.shortTitle" = "啟用語彙置換表";
 "i18n:UserDef.kPinyinTypingEnabled.description" = "在拼音與注音打字模式之間切換。啟用時使用拼音輸入，停用時使用注音排列。";
 "i18n:UserDef.kPinyinTypingEnabled.shortTitle" = "拼音/注音打字模式";
-"i18n:UserDef.kPOMAsNGramSourceEnabled.description" = "將您透過選字窗選字所累積的漸退記憶（POM）同時作為護摩組字引擎的雙元語法（bigram）統計來源：在相同前後文下，組句路徑會自然優先選取您記憶過的選字結果。此開關預設關閉——關閉時記憶僅在使用者當下選字時以覆寫方式生效；開啟後，記憶亦會以統計方式影響組句，且隨記憶衰減自動淡化。";
+"i18n:UserDef.kPOMAsNGramSourceEnabled.description" = "將您透過選字窗選字所累積的漸退記憶（POM）一併作為護摩組字引擎的雙元／三元語法（bigram／trigram）統計來源：在相同前後文下，組句路徑會自然優先選取您記憶過的選字結果，且隨記憶衰減自動淡化。此開關預設啟用——啟用時，狂拼模式在固化讀音時不再以覆寫方式直接帶出記憶詞、而改由統計路徑自然選中；若您不希望臨時記憶影響組句，可關閉此開關——關閉後記憶不參與組句統計、維持既有行為。";
 "i18n:UserDef.kPOMAsNGramSourceEnabled.shortTitle" = "以漸退記憶作為組句統計來源";
 "i18n:UserDef.kPopupCompositionBufferTextSize.description" = "調整浮動組字窗的字型大小。";
 "i18n:UserDef.kPopupCompositionBufferTextSize.shortTitle" = "浮動組字窗字號:";

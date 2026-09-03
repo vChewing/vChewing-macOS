@@ -473,7 +473,7 @@ nonisolated extension UserDef {
     case .kCassetteEnabled: return .bool(false)
     case .kMixedAlphanumericalEnabled: return .bool(false)
     case .kFuriousTypingEnabled: return .bool(true)
-    case .kPOMAsNGramSourceEnabled: return .bool(false)
+    case .kPOMAsNGramSourceEnabled: return .bool(true)
     case .kCNS11643Enabled: return .bool(false)
     case .kSymbolInputEnabled: return .bool(true)
     case .kSuppressFactoryUnigramsOfKanaSyllables: return .bool(false)

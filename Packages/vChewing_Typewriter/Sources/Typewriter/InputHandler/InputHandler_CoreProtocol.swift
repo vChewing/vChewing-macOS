@@ -804,11 +804,24 @@ extension InputHandlerProtocol {
     let appendables = filterPOMAppendables(from: suggestion, rawCandidates: rawCandidates)
     arrResult.append(contentsOf: appendables)
     if apply {
-      // S4（P162）：狂拼 n-gram 來源開啟時，自動套用移交統計路徑（雙重加成收斂）——
-      // contextual 記憶已由 DP 以 n-gram 加分自然選中，不再以 override 錨定；
-      // 唯讀提取（arrResult）仍回傳、供候選窗置頂等消費端使用。
-      if isFuriousTypingModeEffective, prefs.pomAsNGramSourceEnabled {
-        return arrResult.stableSort { $0.1.probability > $1.1.probability }
+      // n-gram 來源（`kPOMAsNGramSourceEnabled`）開啟時，contextual 記憶的自動套用處理：
+      if prefs.pomAsNGramSourceEnabled, let newestSuggestedCandidate = suggestion.candidates.last {
+        if isFuriousTypingModeEffective {
+          // P162（狂拼）：自動套用一律移交統計路徑——override 錨定會與狂拼的
+          // trail／retokenization 語義衝突；contextual 記憶已由 DP 以 n-gram 自然選中。
+          // 唯讀提取（arrResult）仍回傳、供候選窗置頂等消費端使用。
+          return arrResult.stableSort { $0.1.probability > $1.1.probability }
+        }
+        // P181（非狂拼）：override 轉為統計路徑的兜底——當 DP 已於游標節點自然選中
+        // 同一記憶詞時，不再重複以 override 錨定（消除「n-gram 加分＋override 錨定」
+        // 雙重加成）；反之 DP 未選中時仍走下方 override 套用，維持「記憶詞必出」的
+        // 既有 recall 體驗（P158 D.2.6 前置驗證：一般拼音／注音依賴 override 的直接浮現）。
+        if newestSuggestedCandidate.previous != nil,
+           assembler.assembledSentence
+           .findGram(at: suggestion.overrideCursor ?? actualNodeCursorPosition)?
+           .gram.value == newestSuggestedCandidate.value {
+          return arrResult.stableSort { $0.1.probability > $1.1.probability }
+        }
       }
       if !suggestion.isEmpty, let newestSuggestedCandidate = suggestion.candidates.last {
         let overrideBehavior: Homa.Node.OverrideType = suggestion.forceHighScoreOverride

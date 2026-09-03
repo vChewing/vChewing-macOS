@@ -319,6 +319,9 @@ extension MainAssemblyTests {
     testHandler.prefs.useSCPCTypingMode = false
     testHandler.prefs.useRearCursorMode = false
     testHandler.prefs.cursorPlacementAfterSelectingCandidate = 1
+    // 本測試驗證的是 Typewriter 端「漸退記憶建議的適用範圍」（override 路徑語義），
+    // 與「記憶作為 Homa n-gram 統計來源」正交——釘住該開關、排除引擎統計路徑干擾。
+    testHandler.prefs.pomAsNGramSourceEnabled = false
     clearTestPOM()
 
     var sequenceChars = "u. 2u,6s/6xu.6u4xm3z; "

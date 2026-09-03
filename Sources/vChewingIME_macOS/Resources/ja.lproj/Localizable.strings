@@ -395,8 +395,8 @@
 "i18n:UserDef.kEnforceSingleLineCandidateWindowLayout4SCPC.shortTitle" = "全候補入力モードで候補陳列ウィンドウを常に１つ行で表示";
 "i18n:UserDef.kEscToCleanInputBuffer.description" = "未チェックの場合、ESC キーはまず未完成の音読/筆画を消す。\n未完成の音読/筆画がない場合、全緩衝列をそのまま送り出す。";
 "i18n:UserDef.kEscToCleanInputBuffer.shortTitle" = "ESC キーで入力緩衝列を消す";
-"i18n:UserDef.kFetchSuggestionsFromPerceptionOverrideModel.description" = "臨時記憶モジュールは文字の通り「臨時的」の記憶をします。記録は六日間どんどん忘れてしまいます。入力アプリのメニューから全ての記録を消すことはできます。";
-"i18n:UserDef.kFetchSuggestionsFromPerceptionOverrideModel.shortTitle" = "入力中で臨時記憶モジュールからお薦めの候補を自動的に選ぶ";
+"i18n:UserDef.kFetchSuggestionsFromPerceptionOverrideModel.description" = "有効にすると、漸退記憶（POM）モジュールが候補選択を観察して一時記憶を蓄積し、入力中にその記憶から候補を自動的に提案します（組句結果への適用、または候補ウィンドウ先頭への表示）。記憶は時間の経過とともに徐々に減衰して効力を失います。入力アプリのメニューからいつでも全記録を消去することもできます。このオプションをオフにすると、このような自動提案と新しい記憶の学習は停止します——ただし「漸退記憶を組句統計のソースにする」がオンのままなら、既存の記憶は統計として組句に影響し得ます。";
+"i18n:UserDef.kFetchSuggestionsFromPerceptionOverrideModel.shortTitle" = "漸退記憶の学習と自動提案を有効化";
 "i18n:UserDef.kFilterFactoryKanjisOfNonCurrentInputMode.description" = "有効にすると、逆のスクリプトモードにのみ存在する単漢字候補（例：繁体字モードでの簡体字専用文字）が候補ウィンドウから削除されます。倚天中文システム対応の漢字とCNS全字庫漢字は影響を受けません。注意：フィルタ範囲は Unicode 1.0.1（倚天中文システムの収字範囲）に限定されます。それ以降の Unicode バージョンで追加された文字は対象外です。";
 "i18n:UserDef.kFilterFactoryKanjisOfNonCurrentInputMode.shortTitle" = "入力モードに不対応の漢字候補を遮断する";
 "i18n:UserDef.kFilterNonCNSReadingsForCHTInput.description" = "単漢字候補については、全字庫の読みに合致しない結果は完全に削除されず、候補リストの末尾に降格されます。";
@@ -440,7 +440,7 @@
 "i18n:UserDef.kPhraseReplacementEnabled.shortTitle" = "言葉置換表を起用";
 "i18n:UserDef.kPinyinTypingEnabled.description" = "弁音と注音のタイピングモードを切り替えます。有効時は弁音入力を、無効時は注音配列を使用します。";
 "i18n:UserDef.kPinyinTypingEnabled.shortTitle" = "弁音/注音タイピングモード";
-"i18n:UserDef.kPOMAsNGramSourceEnabled.description" = "選字窓での選択で蓄積された漸退記憶（POM）を、護摩組字エンジンのバイグラム統計のソースとしても利用します。同じ前後文では、記憶された選択結果が組句経路で自然に優先されます。既定ではオフ——オフの間は記憶がユーザーの明示的選択時にのみオーバーライドとして効きます。オンにすると記憶が統計的にも組句に影響し、記憶の減衰に伴って自動的に薄まります。";
+"i18n:UserDef.kPOMAsNGramSourceEnabled.description" = "選字窓での選択で蓄積された漸退記憶（POM）を、護摩組字エンジンのバイグラム／トライグラム統計のソースとしても利用します。同じ前後文では、記憶された選択結果が組句経路で自然に優先され、記憶の減衰に伴って影響は自動的に薄まります。このスイッチは既定でオン——オンの間、狂拼モードでは読みの確定時に記憶された語をオーバーライドで直接適用せず、統計経路で自然に選ばれます。一時記憶を組句に影響させたくない場合はオフにしてください。オフの間、記憶は組句統計に参加せず、従来の挙動のままです。";
 "i18n:UserDef.kPOMAsNGramSourceEnabled.shortTitle" = "漸退記憶を組句統計のソースにする";
 "i18n:UserDef.kPopupCompositionBufferTextSize.description" = "吹き出し入力緩衝列のフォントサイズを指定します。";
 "i18n:UserDef.kPopupCompositionBufferTextSize.shortTitle" = "吹き出し入力緩衝列の字号:";

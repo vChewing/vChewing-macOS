@@ -62,8 +62,8 @@ extension LMAssembly {
       /// - 「倚天傳統注音鍵盤佈局」是電腦鍵盤上的按鍵與注音符號的映射。「倚天26」也是這種映射。這些都是與 Tekkon Composer 有關的內容。
       public var alwaysSupplyETenDOSUnigrams = true
 
-      /// 是否將漸退記憶（POM）同時作為組字引擎的 bigram 統計來源。
-      public var pomAsNGramSourceEnabled = false
+      /// 是否將漸退記憶（POM）同時作為組字引擎的 n-gram（bigram／trigram）統計來源。
+      public var pomAsNGramSourceEnabled = true
 
       public var partialMatchEnabled = false
       public var filterNonCNSReadings = false

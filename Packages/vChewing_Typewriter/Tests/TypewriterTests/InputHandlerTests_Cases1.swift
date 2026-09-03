@@ -3886,6 +3886,59 @@ extension InputHandlerTests {
     #expect(testHandler.assembler.assembledSentence.last?.gram.previous == "是")
   }
 
+  /// 非狂拼（一般拼音）n-gram 來源＋POM 建議同時開啟時，contextual 記憶若已由 DP 以
+  /// n-gram 統計路徑自然選中（同值），不再重複以 override 錨定（P181：非狂拼 override
+  /// 轉為統計路徑的兜底、消除雙重加成）——gram.previous 帶「是」即證明選取來自統計路徑、
+  /// 非自動 override 錨定的 bare unigram（previous 為 nil）。
+  @Test
+  func test_IH504_NonFuriousPinyinNGramSourceSkipsDuplicateAnchor() throws {
+    guard let testHandler, let testSession else {
+      Issue.record("testHandler and testSession at least one of them is nil.")
+      return
+    }
+    clearTestPOM()
+
+    defer {
+      testHandler.currentLM.clearTemporaryData(isFiltering: false)
+      testHandler.prefs.furiousTypingEnabled = false
+      testHandler.prefs.pomAsNGramSourceEnabled = false
+      testHandler.prefs.keyboardParser = KeyboardParser.ofStandard.rawValue
+      testHandler.ensureKeyboardParser()
+      testHandler.prefs.fetchSuggestionsFromPerceptionOverrideModel = true
+      testSession.resetInputHandler(forceComposerCleanup: true)
+    }
+
+    [
+      .init(keyArray: ["ㄕˋ"], value: "是", score: -6),
+      .init(keyArray: ["ㄇㄚ"], value: "嬤", score: -1),
+      .init(keyArray: ["ㄇㄚ"], value: "媽", score: -8),
+    ].forEach {
+      testHandler.currentLM.insertTemporaryData(unigram: $0, isFiltering: false)
+    }
+    testSession.resetInputHandler(forceComposerCleanup: true)
+    testHandler.prefs.keyboardParser = KeyboardParser.ofHanyuPinyin.rawValue
+    testHandler.ensureKeyboardParser()
+    testHandler.prefs.fetchSuggestionsFromPerceptionOverrideModel = true // POM 建議開啟。
+    testHandler.prefs.pomAsNGramSourceEnabled = true // n-gram 來源開啟。
+    testHandler.prefs.furiousTypingEnabled = false // 非狂拼（一般拼音）。
+    testHandler.currentLM.syncPrefs()
+
+    testHandler.currentLM.memorizePerception(
+      (ngramKey: "(ㄕˋ,是)&(ㄇㄚ,媽)", candidate: "媽"),
+      timestamp: Date().timeIntervalSince1970
+    )
+
+    // 「shi4 ma1」：無記憶時 ㄇㄚ 節點的最佳猜測為「嬤」（-1 > 媽 -8）；
+    // 記憶（是→媽）注入為 bigram 後，DP 自然選中「媽」。
+    typeSentence("shi4ma1")
+    _ = testHandler.triageInput(event: KBEvent.KeyEventData(chars: " ", keyCode: 49).asEvent)
+
+    #expect(testHandler.composer.romajiBuffer.isEmpty)
+    #expect(testHandler.assembler.assembledSentence.map(\.value) == ["是", "媽"])
+    // 選取來自 n-gram 統計路徑（previous 帶「是」），非自動 override 錨定的 bare unigram。
+    #expect(testHandler.assembler.assembledSentence.last?.gram.previous == "是")
+  }
+
   /// 狂拼 α 自動套用（R3-a）：注拼槽整段無法展開成完整音節序列（如「ysxb」）、
   /// 且整詞簡拼查詢的頂級候選「明確勝出」（唯一匹配）時，自動把其實際讀音以單鍵
   /// 序列寫入組字器——全程自動出整詞「野獸先輩」、不必等使用者 Shift+選字鍵確認。

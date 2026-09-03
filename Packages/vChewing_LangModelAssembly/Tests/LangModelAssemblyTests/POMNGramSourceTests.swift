@@ -34,17 +34,17 @@ struct POMNGramSourceTests {
     #expect(pomGram.probability < 0) // 衰減權重為負
   }
 
-  /// 開關預設關閉：記憶存在但不注入（現行行為逐位元組一致）。
+  /// 開關預設啟用：記憶存在即注入（組句統計預設由 Homa n-gram 承擔）。
   @Test
-  func testNGramSource_DisabledByDefault() {
+  func testNGramSource_EnabledByDefault() {
     defer { LMAssembly.LMInstantiator.disconnectFactoryDictionary() }
-    let lmi = LMAssembly.LMInstantiator() // pomAsNGramSourceEnabled 預設 false
+    let lmi = LMAssembly.LMInstantiator() // pomAsNGramSourceEnabled 預設 true
     lmi.memorizePerception(
       (ngramKey: "(ㄕˋ,是)&(ㄇㄚ,媽)", candidate: "媽"),
       timestamp: Date().timeIntervalSince1970
     )
     let grams = lmi.unigramsFor(keyArray: ["ㄇㄚ"])
-    #expect(!grams.contains { $0.current == "媽" && $0.previous == "是" })
+    #expect(grams.contains { $0.current == "媽" && $0.previous == "是" })
   }
 
   /// head 讀音容錯（逐段去聲調等值）：無調形記憶命中帶調查詢。
