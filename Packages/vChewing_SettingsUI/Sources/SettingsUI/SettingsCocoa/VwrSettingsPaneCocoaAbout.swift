@@ -35,6 +35,8 @@ extension SettingsPanesCocoa {
 
     var windowWidth: CGFloat { SettingsPanesCocoa.windowWidth }
     var contentWidth: CGFloat { SettingsPanesCocoa.contentWidth }
+    // 文字欄可用寬：contentWidth − banner(63) − 8pt 行距 − 4pt 緩衝；只扣 63 會使 eulaBox 總寬推出 contentWidth、觸發 Auto Layout 衝突。
+    var textColumnWidth: CGFloat { contentWidth - imgWidth - 12 }
 
     var appNameAndVersionString: NSAttributedString {
       let strResult = NSMutableAttributedString(string: "i18n:aboutWindow.APP_NAME".i18n)
@@ -69,23 +71,23 @@ extension SettingsPanesCocoa {
           NSStackView.build(.horizontal) {
             bannerImage
             NSStackView.build(.vertical) {
-              appNameAndVersionString.makeNSLabel(fixWidth: contentWidth - imgWidth)
+              appNameAndVersionString.makeNSLabel(fixWidth: textColumnWidth)
               makeFormattedLabel(
                 verbatim: "i18n:aboutWindow.DONATION_MESSAGE".i18n
                   + "\n"
                   + Self.copyrightLabel,
                 size: 11,
-                isBold: false, fixWidth: contentWidth - imgWidth
+                isBold: false, fixWidth: textColumnWidth
               )
               makeFormattedLabel(
                 verbatim: "i18n:aboutWindow.DEV_CREW".i18n,
                 size: 11,
-                isBold: false, fixWidth: contentWidth - imgWidth
+                isBold: false, fixWidth: textColumnWidth
               )
               makeFormattedLabel(
                 verbatim: "i18n:aboutWindow.LICENSE_TITLE".i18n,
                 size: 11,
-                isBold: false, fixWidth: contentWidth - imgWidth
+                isBold: false, fixWidth: textColumnWidth
               )
               eulaBox
             }
@@ -153,7 +155,7 @@ extension SettingsPanesCocoa {
       clipView.drawsBackground = false
       scrollView.contentView = clipView
       scrollView.makeSimpleConstraint(
-        .width, relation: .equal, value: contentWidth - imgWidth
+        .width, relation: .equal, value: textColumnWidth
       )
       scrollView.setContentCompressionResistancePriority(.defaultLow, for: .horizontal)
       scrollView.hasVerticalScroller = true

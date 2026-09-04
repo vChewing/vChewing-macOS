@@ -348,29 +348,44 @@ import SwiftExtension
             outerStack.addView(divider, in: orientation == .horizontal ? .leading : .top)
           }
           subView.layoutSubtreeIfNeeded()
+          // 子視圖已有自訂 == 寬/高者不再補 ≥ intrinsic（否則 makeSimpleConstraint 的 (.equal, .greaterThanOrEqual) 分支會把 == 拉高成 intrinsicContentSize、使 path 等控件塞不回容器而觸發衝突）。
+          let hasEqualHeight = subView.constraints.contains {
+            $0.firstAttribute == .height && $0.relation == .equal
+          }
+          let hasEqualWidth = subView.constraints.contains {
+            $0.firstAttribute == .width && $0.relation == .equal
+          }
           switch orientation {
           case .horizontal:
-            subView.makeSimpleConstraint(
-              .height,
-              relation: .greaterThanOrEqual,
-              value: subView.intrinsicContentSize.height
-            )
-            subView.makeSimpleConstraint(
-              .width,
-              relation: .greaterThanOrEqual,
-              value: subView.intrinsicContentSize.width
-            )
+            if !hasEqualHeight {
+              subView.makeSimpleConstraint(
+                .height,
+                relation: .greaterThanOrEqual,
+                value: subView.intrinsicContentSize.height
+              )
+            }
+            if !hasEqualWidth {
+              subView.makeSimpleConstraint(
+                .width,
+                relation: .greaterThanOrEqual,
+                value: subView.intrinsicContentSize.width
+              )
+            }
           case .vertical:
-            subView.makeSimpleConstraint(
-              .width,
-              relation: .greaterThanOrEqual,
-              value: subView.intrinsicContentSize.width
-            )
-            subView.makeSimpleConstraint(
-              .height,
-              relation: .greaterThanOrEqual,
-              value: subView.intrinsicContentSize.height
-            )
+            if !hasEqualWidth {
+              subView.makeSimpleConstraint(
+                .width,
+                relation: .greaterThanOrEqual,
+                value: subView.intrinsicContentSize.width
+              )
+            }
+            if !hasEqualHeight {
+              subView.makeSimpleConstraint(
+                .height,
+                relation: .greaterThanOrEqual,
+                value: subView.intrinsicContentSize.height
+              )
+            }
           @unknown default: break
           }
           subView.setContentCompressionResistancePriority(.defaultHigh, for: .horizontal)

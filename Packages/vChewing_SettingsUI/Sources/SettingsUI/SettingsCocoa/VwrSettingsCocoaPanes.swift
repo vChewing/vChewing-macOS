@@ -25,7 +25,9 @@ public final class SettingsPanesCocoa {
   public static var contentWidth: CGFloat { windowWidth - 65 }
   public static var innerContentWidth: CGFloat { contentWidth - 37 }
   public static var tabContainerWidth: CGFloat { contentWidth + 20 }
-  public static var contentHalfWidth: CGFloat { contentWidth / 2 - 4 }
+  // 此值必須等於 buildSection(.horizontal, width:) 的單欄實得寬（(width−4)/2−6）；
+  // 先前自訂為 contentWidth/2−4 會讓欄內 row 固定寬比欄寬多 4pt、觸發 Auto Layout 衝突。
+  public static var contentHalfWidth: CGFloat { (contentWidth - 4) / 2 - 6 }
 
   public let ctlPageAbout = SettingsPanesCocoa.About()
   public let ctlPageGeneral = SettingsPanesCocoa.General()

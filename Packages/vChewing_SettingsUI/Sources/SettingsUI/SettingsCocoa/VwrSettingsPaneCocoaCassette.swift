@@ -96,7 +96,8 @@ extension SettingsPanesCocoa {
       pathCtl.setContentHuggingPriority(.defaultHigh, for: .vertical)
       pathCtl.setContentCompressionResistancePriority(.defaultLow, for: .horizontal)
       pathCtl.makeSimpleConstraint(.height, relation: .equal, value: NSFont.smallSystemFontSize * 2)
-      pathCtl.makeSimpleConstraint(.width, relation: .equal, value: windowWidth - 145)
+      // 寬度若由 windowWidth 反推（=contentWidth−80），會比「兩按鈕＋間距」實耗（≥84）少 4pt 而觸發衝突；改以 contentWidth 為底並留緩衝。
+      pathCtl.makeSimpleConstraint(.width, relation: .equal, value: contentWidth - 90)
       let currentPath = SettingsUIHost.shared.cassettePath()
       pathCtl.url = currentPath.isEmpty ? nil : URL(fileURLWithPath: SettingsUIHost.shared.cassettePath())
       pathCtl.toolTip = "i18n:ClientManager.DragTargetInstruction".i18n
