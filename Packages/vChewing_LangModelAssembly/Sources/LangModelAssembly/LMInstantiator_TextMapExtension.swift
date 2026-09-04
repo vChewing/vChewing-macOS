@@ -356,6 +356,30 @@ extension LMAssembly.LMInstantiator {
     }
   }
 
+  /// CNS+GBEX 模式的補充單元圖（一般查詢路徑）：CNS 開關開啟時同時補給 CNS 與 GBEX。
+  /// 排序規則：GBEX 資料放在 CNS 資料之後；簡體中文模式例外，GBEX 優先於 CNS。
+  /// 因為最終 consolidate 以「先插入者勝」去重且保持插入順序，此處的排列次序即為同權重
+  /// （CNS／GBEX 基礎權重皆為 -11）下的候選次序。
+  func supplementalCNSAndGBEXUnigramsFor(
+    key: String,
+    keyArray: [String]
+  )
+    -> [Homa.Gram] {
+    let cnsGrams = factoryUnigramsFor(key: key, keyArray: keyArray, entryType: .cns)
+    let gbexGrams = factoryUnigramsFor(key: key, keyArray: keyArray, entryType: .gbex)
+    return isCHS ? gbexGrams + cnsGrams : cnsGrams + gbexGrams
+  }
+
+  /// CNS+GBEX 模式的補充單元圖（「&」連讀／chopped 查詢路徑），排序規則同上。
+  func supplementalChoppedCNSAndGBEXUnigramsFor(
+    keyArray: [String]
+  )
+    -> [Homa.Gram] {
+    let cnsGrams = factoryChoppedUnigramsFor(keyArray: keyArray, entryType: .cns)
+    let gbexGrams = factoryChoppedUnigramsFor(keyArray: keyArray, entryType: .gbex)
+    return isCHS ? gbexGrams + cnsGrams : cnsGrams + gbexGrams
+  }
+
   internal func factoryCNSFilterThreadFor(key: String) -> String? {
     if key == "_punctuation_list" { return nil }
     guard let trie = Self.factoryTrie else { return nil }

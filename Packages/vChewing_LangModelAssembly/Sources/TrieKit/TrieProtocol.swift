@@ -38,7 +38,7 @@ extension VanguardTrieProtocol {
 
   internal func filterMatches(entryType: EntryType, filter: EntryType) -> Bool {
     if filter.isEmpty { return true }
-    let rawTypeIDs: Set<Int32> = [2, 3, 4, 5, 6, 7, 8, 9, 10, 100]
+    let rawTypeIDs: Set<Int32> = [2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 100]
     if rawTypeIDs.contains(filter.rawValue) || rawTypeIDs.contains(entryType.rawValue) {
       return filter.rawValue == entryType.rawValue
     }

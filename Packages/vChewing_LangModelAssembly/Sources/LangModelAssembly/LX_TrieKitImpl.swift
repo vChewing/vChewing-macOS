@@ -15,4 +15,5 @@ extension VanguardTrie.Trie.EntryType {
   public static let nonKanji = Self(rawValue: 8 << 0)
   public static let symbolPhrases = Self(rawValue: 9 << 0)
   public static let zhuyinwen = Self(rawValue: 10 << 0)
+  public static let gbex = Self(rawValue: 11 << 0) // GB18030-2022 擴充字
 }

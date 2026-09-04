@@ -589,7 +589,8 @@ extension LMAssembly {
         }
 
         if config.isCNSEnabled,
-           hasFactoryChoppedUnigramsFor(keyArray: keyArray, entryType: .cns) {
+           hasFactoryChoppedUnigramsFor(keyArray: keyArray, entryType: .cns)
+           || hasFactoryChoppedUnigramsFor(keyArray: keyArray, entryType: .gbex) {
           return true
         }
 
@@ -753,10 +754,9 @@ extension LMAssembly {
         rawAllUnigrams += factoryCoreUnigramsResult
 
         if config.isCNSEnabled {
-          rawAllUnigrams += factoryUnigramsFor(
+          rawAllUnigrams += supplementalCNSAndGBEXUnigramsFor(
             key: keyChain,
-            keyArray: flatKeyArray,
-            entryType: .cns
+            keyArray: flatKeyArray
           )
         }
       }
@@ -1203,7 +1203,7 @@ extension LMAssembly {
         }
         rawAllUnigrams += factoryCoreUnigramsResult
         if config.isCNSEnabled {
-          rawAllUnigrams += factoryChoppedUnigramsFor(keyArray: choppedKeyArray, entryType: .cns)
+          rawAllUnigrams += supplementalChoppedCNSAndGBEXUnigramsFor(keyArray: choppedKeyArray)
         }
       }
 
