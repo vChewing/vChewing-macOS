@@ -35,6 +35,7 @@
 "i18n:Common.Initial" = "Initial";
 "i18n:Common.JustSelect" = "Just Select";
 "i18n:Common.LeaveItChecked" = "Leave it checked";
+"i18n:Common.MoreIntel" = "More Info";
 "i18n:Common.MoveDown" = "Move Down";
 "i18n:Common.MoveUp" = "Move Up";
 "i18n:Common.No" = "No";
@@ -267,6 +268,8 @@
 "i18n:Settings.SectionTypingStyle" = "Typing Style:";
 "i18n:settings.shiftKeyASCIITogle.description" = "This feature only needs to parse consecutive NSEvents passed by macOS built-in InputMethodKit framework, hence no necessity of asking end-users for extra privileges of monitoring global keyboard inputs. You are free to investigate our codebase or reverse-engineer this input method to see whether the above statement is trustable. Also, this Shift-key toggle won't work if CapsLock is ON.";
 "i18n:Settings.TabExperience" = "Experience";
+"i18n:Settings.Tips.YouMayAddPhrasesInPlace.shortTitle" = "You may also add user phrases in-place.";
+"i18n:Settings.Tips.YouMayAddPhrasesInPlace.explain" = "You may also save words directly as user phrases while typing, instead of building every entry by hand in this phrase editor:\n\n1. Type the word you want to keep, but do not press Enter yet.\n2. Hold Shift and press the arrow keys along the text flow to mark the range you want (Left/Right for regular horizontal text; Up/Down when the app you type into uses vertical text).\n3. Release the keys and an in-place hint appears: press Enter to save the marked range as a user phrase. If the phrase already exists, the hint also lets you boost, nerf, or exclude it in place.\n\nSaved phrases are written into the user phrase dictionary of the current input mode, so you can compose them directly afterwards.";
 "i18n:StateOfInputting.Tooltip.AttemptCombinePhonabet" = "It will attempt to combine with the incoming phonabet input.";
 "i18n:StateOfInputting.Tooltip.CharsReadingsMismatch" = "⚠︎ Unhandlable: Chars and Readings in buffer doesn't match.";
 "i18n:StateOfInputting.Tooltip.HoldShiftChooseAssociates" = "Hold ⇧ to choose associates.";

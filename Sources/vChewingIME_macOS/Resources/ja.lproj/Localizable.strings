@@ -35,6 +35,7 @@
 "i18n:Common.Initial" = "頭文字";
 "i18n:Common.JustSelect" = "直接に選ぶ";
 "i18n:Common.LeaveItChecked" = "チェックをそのままに";
+"i18n:Common.MoreIntel" = "詳しい情報";
 "i18n:Common.MoveDown" = "下へ移動";
 "i18n:Common.MoveUp" = "上へ移動";
 "i18n:Common.No" = "いな";
@@ -267,6 +268,8 @@
 "i18n:Settings.SectionTypingStyle" = "入力習慣:";
 "i18n:settings.shiftKeyASCIITogle.description" = "この機能の利用する NSEvent は、macOS 内蔵の入力アプリ共用モジュール「InputMethodKit」から提供した NSEvent のみであり、その NSEvent 文脈関係で「Shift キーは１回押したかどうか」と判断することはできる。この事実に疑いを持つ者は、本アプリのソースコードを審査するか、あるいは本アプリを逆向工程（分解工学, いわゆる「Reverse-Engineering」）するがよい。なお、Shiftキーによるこの切り替えは、CapsLockがONの時には効かぬ。";
 "i18n:Settings.TabExperience" = "体験設定";
+"i18n:Settings.Tips.YouMayAddPhrasesInPlace.shortTitle" = "入力中にそのまま語句をユーザー辞書へ登録できます。";
+"i18n:Settings.Tips.YouMayAddPhrasesInPlace.explain" = "入力した語句を、その場でユーザー辞書へ登録することもできます。わざわざこの編集画面で手入力する必要はありません。\n\n1. 登録したい語句を入力し、まだ Enter キーは押さないでください。\n2. Shift キーを押したまま、文字の流れに沿う方向キーで範囲を選択してください（横書きでは ←/→、縦書きのアプリでは ↑/↓）。\n3. キーを離すと入力欄に案内が表示されます。Enter キーで語句を登録できます。すでに存在する語句の場合は、案内に従って優先度の引き上げ・引き下げや除外もできます。\n\n登録された語句は現在の入力モードのユーザー辞書に書き込まれ、以後はそのまま変換できます。";
 "i18n:StateOfInputting.Tooltip.AttemptCombinePhonabet" = "この音調は次の注音入力と組み合わす。";
 "i18n:StateOfInputting.Tooltip.CharsReadingsMismatch" = "⚠︎ 対処不可：緩衝列の字数は読みの数と不同等。";
 "i18n:StateOfInputting.Tooltip.HoldShiftChooseAssociates" = "⇧を押しながら関連文節候補を選択。";

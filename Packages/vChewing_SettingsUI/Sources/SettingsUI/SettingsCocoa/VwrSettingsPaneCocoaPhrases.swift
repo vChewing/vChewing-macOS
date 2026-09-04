@@ -85,6 +85,16 @@ extension SettingsPanesCocoa {
     let txtPEField2 = NSTextField()
     let txtPEField3 = NSTextField()
     let btnPEAdd = NSButton()
+    let txtPETipsTitle: NSTextField = {
+      let field = NSTextField()
+      field.isEditable = false
+      field.isBezeled = false
+      field.drawsBackground = false
+      field.isSelectable = false
+      return field
+    }()
+
+    let btnPETips = NSButton()
     let formatter: NumberFormatter = {
       let formatter = NumberFormatter()
       formatter.numberStyle = .decimal
@@ -117,6 +127,11 @@ extension SettingsPanesCocoa {
       NSStackView.build(.vertical, insets: .new(all: 14)) {
         NSStackView.buildSection(width: contentWidth) {
           NSStackView.build(.vertical) {
+            NSStackView.build(.horizontal) {
+              txtPETipsTitle
+              NSView()
+              btnPETips
+            }
             NSStackView.build(.horizontal, spacing: 4) {
               cmbPEInputModeMenu
               cmbPEDataTypeMenu
@@ -126,7 +141,7 @@ extension SettingsPanesCocoa {
               btnPESave
               btnPEOpenExternally
             }
-            createTextViewStack().makeSimpleConstraint(.height, relation: .equal, value: 370)
+            createTextViewStack().makeSimpleConstraint(.height, relation: .equal, value: 390)
             NSStackView.build(.horizontal) {
               txtPECommentField
             }
@@ -294,6 +309,15 @@ extension SettingsPanesCocoa.Phrases: NSTextViewDelegate, NSTextFieldDelegate {
     btnPEAdd.title = PETerminology.AddPhrases.locAdd.localized.0
     btnPEOpenExternally.title = "…"
 
+    // In-place-add tip row.
+    txtPETipsTitle.font = NSFont.systemFont(ofSize: NSFont.smallSystemFontSize)
+    txtPETipsTitle.stringValue = "💡 " + "i18n:Settings.Tips.YouMayAddPhrasesInPlace.shortTitle".i18n
+    btnPETips.title = "i18n:Common.MoreIntel".i18n.withEllipsis
+    btnPETips.bezelStyle = .rounded
+    btnPETips.cell?.controlSize = .small
+    btnPETips.target = self
+    btnPETips.action = #selector(showPETipsButtonClicked(_:))
+
     // DataFormatter.
     txtPEField3.formatter = formatter
 
@@ -399,6 +423,15 @@ extension SettingsPanesCocoa.Phrases: NSTextViewDelegate, NSTextFieldDelegate {
       let app: FileOpenMethod = NSEvent.keyModifierFlags.contains(.option) ? .textEdit : .finder
       SettingsUIHost.shared.openPhraseFile(this.selInputMode, this.selUserDataType, app)
     }
+  }
+
+  @IBAction
+  func showPETipsButtonClicked(_: NSButton) {
+    guard let window = view.window else { return }
+    window.callAlert(
+      title: "i18n:Settings.Tips.YouMayAddPhrasesInPlace.shortTitle".i18n,
+      text: "i18n:Settings.Tips.YouMayAddPhrasesInPlace.explain".i18n
+    )
   }
 
   @IBAction

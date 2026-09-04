@@ -42,6 +42,23 @@ public struct VwrPhraseEditorUI: View {
 
   public var body: some View {
     VStack(spacing: 4) {
+      LabeledContent {
+        Button("i18n:Common.MoreIntel".i18n.withEllipsis) {
+          guard let window = window else { return }
+          window.callAlert(
+            title: "i18n:Settings.Tips.YouMayAddPhrasesInPlace.shortTitle".i18n,
+            text: "i18n:Settings.Tips.YouMayAddPhrasesInPlace.explain".i18n
+          )
+        }
+        .controlSize(.small)
+        .fixedSize()
+        .disabled(window == nil)
+      } label: {
+        Text("💡 " + "i18n:Settings.Tips.YouMayAddPhrasesInPlace.shortTitle".i18n)
+          .multilineTextAlignment(.leading)
+          .font(.subheadline)
+          .frame(maxWidth: .infinity, alignment: .leading)
+      }
       HStack {
         Picker("", selection: $selInputMode.didChange { dropDownMenuDidChange() }) {
           switch currentIMEInputMode {
