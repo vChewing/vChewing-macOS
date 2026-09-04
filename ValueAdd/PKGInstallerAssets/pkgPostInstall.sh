@@ -44,6 +44,23 @@ done
 chown "${login_user}:${login_group}" "${user_home}/Library/Input Methods" 2>/dev/null || true
 chown "${login_user}:${login_group}" "${user_kb_dir}" 2>/dev/null || true
 
+# Terminate the text input menu agent (TextInputMenuAgent) before registering the
+# input method: the register step must wait for the kill to finish (regardless of
+# its outcome) plus 0.5s, so the relaunched agent can pick up the newly registered
+# input source without requiring the user to log out and back in. Only
+# TextInputMenuAgent is targeted: killing imklaunchagent would cut the currently
+# active client app off from every input method until that app is restarted, while
+# TextInputSwitcher is a pure UI helper whose termination has no effect. This
+# agent belongs to the console user's GUI session, so the kill is performed with
+# the console user's privileges when the installer runs as root. The agent may not
+# exist on older macOS versions; ignore any failure.
+if [ "$(id -u)" -eq 0 ]; then
+    su - "${login_user}" -c "/usr/bin/killall TextInputMenuAgent" 2>/dev/null || true
+else
+    /usr/bin/killall TextInputMenuAgent 2>/dev/null || true
+fi
+sleep 0.5
+
 # Register the input method by running the IME executable with the "install"
 # argument. This must run as the console user, not as root.
 register_script=$(mktemp /tmp/vchewing-register.XXXXXX.sh)

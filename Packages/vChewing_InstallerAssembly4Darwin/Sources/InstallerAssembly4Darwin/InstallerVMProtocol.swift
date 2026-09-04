@@ -222,27 +222,35 @@ extension InstallerVMProtocol {
       }
     }
 
-    var mainInputSourceEnabled = false
+    // 結束文字輸入選單的 agent 程序（TextInputMenuAgent）：須在輸入源啟用（register）之前完成，
+    // 且 register 得等它結束（無論成敗）後再延後半秒才執行，讓系統重新載入輸入法清單、新裝的
+    // 輸入法才會出現在選單中。此程序在舊版 macOS 上可能不存在或尚未啟動，故不檢查 killall 的
+    // 結束狀態。
+    terminateTextInputSystemAgents()
 
-    allRegisteredInstancesOfThisInputMethod.forEach { neta in
-      let isActivated = neta.isActivated
-      defer {
-        // 如果使用者在升級安裝或再次安裝之前已經有啟用唯音任一簡繁模式的話，則標記安裝成功。
-        // 這樣可以尊重某些使用者「僅使用簡體中文」或「僅使用繁體中文」的習慣。
-        mainInputSourceEnabled = mainInputSourceEnabled || isActivated
-      }
-      if isActivated { return }
-      // 警告：macOS 12 可能回傳 false positive，因此採取強制啟用。
-      if neta.activate() {
-        Process.consoleLog("Input method enabled: \(imeIdentifier)")
-      } else {
-        Process.consoleLog("Failed to enable input method: \(imeIdentifier)")
-      }
-    }
-
-    // 提示面板
-    DispatchQueue.main.async { [weak self] in
+    // 提示面板（輸入源啟用也在這個主執行緒區塊內完成）：以 asyncAfter 延後半秒，確保
+    // TextInputMenuAgent 已經結束、系統也重新載入輸入法清單之後，才執行 register＋結果提示。
+    DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) { [weak self] in
       guard let self = self else { return }
+
+      var mainInputSourceEnabled = false
+
+      allRegisteredInstancesOfThisInputMethod.forEach { neta in
+        let isActivated = neta.isActivated
+        defer {
+          // 如果使用者在升級安裝或再次安裝之前已經有啟用唯音任一簡繁模式的話，則標記安裝成功。
+          // 這樣可以尊重某些使用者「僅使用簡體中文」或「僅使用繁體中文」的習慣。
+          mainInputSourceEnabled = mainInputSourceEnabled || isActivated
+        }
+        if isActivated { return }
+        // 警告：macOS 12 可能回傳 false positive，因此採取強制啟用。
+        if neta.activate() {
+          Process.consoleLog("Input method enabled: \(imeIdentifier)")
+        } else {
+          Process.consoleLog("Failed to enable input method: \(imeIdentifier)")
+        }
+      }
+
       let type: InstallerUIConfig.AlertType
       if !self.config.adminRenameFailureAlertPaths.isEmpty {
         type = .adminRenameFailure
@@ -255,6 +263,19 @@ extension InstallerVMProtocol {
       }
       self.config.currentAlertContent = type
     }
+  }
+
+  /// 強制結束文字輸入選單的 agent 程序（TextInputMenuAgent），使其重新載入輸入法清單。
+  /// 只針對 TextInputMenuAgent：結束 imklaunchagent 會讓正在接收文字輸入的客體 App 失去
+  /// 與所有輸入法的對接、須重啟該客體 App 才會恢復；TextInputSwitcher 只是純 UI 套件、
+  /// 結束它沒有意義。此程序在舊版 macOS 上可能不存在或尚未啟動，故不檢查 killall 的結束
+  /// 狀態（無論成敗皆返回）。呼叫端應於本方法返回後再延後半秒才執行輸入源啟用（register）。
+  private func terminateTextInputSystemAgents() {
+    let killTask = Process()
+    killTask.launchPath = "/usr/bin/killall"
+    killTask.arguments = ["TextInputMenuAgent"]
+    killTask.launch()
+    killTask.waitUntilExit()
   }
 }
 
