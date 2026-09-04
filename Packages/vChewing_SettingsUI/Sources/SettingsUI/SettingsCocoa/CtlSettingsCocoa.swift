@@ -541,7 +541,7 @@ extension CtlSettingsCocoa {
 // MARK: - Tab Selection & Content Switching
 
 extension CtlSettingsCocoa {
-  func selectTab(_ tab: PrefUITabs) {
+  public func selectTab(_ tab: PrefUITabs) {
     selectedTab = tab
     if let index = PrefUITabs.allCases.firstIndex(of: tab) {
       sidebarTableView.selectRowIndexes(IndexSet(integer: index), byExtendingSelection: false)
