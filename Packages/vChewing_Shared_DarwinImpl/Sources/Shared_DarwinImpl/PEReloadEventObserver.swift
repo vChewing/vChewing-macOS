@@ -11,12 +11,13 @@ import Combine
 
 // MARK: - PEReloadEventObserver
 
-@available(macOS 10.15, *)
-public final class PEReloadEventObserver: NSObject, ObservableObject {
+@available(macOS 14, *)
+@MainActor
+@Observable
+public final class PEReloadEventObserver {
   // MARK: Lifecycle
 
-  override public init() {
-    super.init()
+  public init() {
     self.observation = Broadcaster.shared
       .observe(\.eventForReloadingPhraseEditor, options: [.new]) { [weak self] _, _ in
         self?.touch()
@@ -31,7 +32,6 @@ public final class PEReloadEventObserver: NSObject, ObservableObject {
 
   public static let shared = PEReloadEventObserver()
 
-  @Published
   public var id = UUID().uuidString
 
   public static func == (
@@ -48,5 +48,6 @@ public final class PEReloadEventObserver: NSObject, ObservableObject {
 
   // MARK: Private
 
+  @ObservationIgnored
   private var observation: NSKeyValueObservation?
 }

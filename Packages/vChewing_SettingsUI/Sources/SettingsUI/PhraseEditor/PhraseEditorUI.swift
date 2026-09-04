@@ -38,29 +38,6 @@ public struct VwrPhraseEditorUI: View {
 
   // MARK: Public
 
-  @Binding
-  public var txtContent: String
-  @ObservedObject
-  public var fileChangeIndicator = PEReloadEventObserver.shared
-  @State
-  public var selInputMode: Shared.InputMode = .imeModeNULL
-  @State
-  public var selUserDataType: LMAssembly.ReplacableUserDataType = .thePhrases
-
-  public weak var window: NSWindow?
-
-  public var currentIMEInputMode: Shared.InputMode {
-    delegate?.currentInputMode ?? selInputMode
-  }
-
-  public var delegate: PhraseEditorDelegate? {
-    didSet {
-      guard let delegate = delegate else { return }
-      selInputMode = delegate.currentInputMode
-      update()
-    }
-  }
-
   // MARK: - Main View.
 
   public var body: some View {
@@ -199,41 +176,37 @@ public struct VwrPhraseEditorUI: View {
     }
   }
 
-  public func update() {
-    guard let delegate = delegate else { return }
-    updateLabels()
-    clearAllFields()
-    txtContent = "i18n:DictionaryStatus.Loading".i18n
-    isLoading = true
-    asyncOnMain {
-      txtContent = delegate.retrieveData(mode: selInputMode, type: selUserDataType)
-      textEditorTooltip = PETerms.TooltipTexts.sampleDictionaryContent(for: selUserDataType)
-      isLoading = false
-    }
-  }
-
   // MARK: Internal
 
   static var txtContentStorage: String = "i18n:PhraseEditor.SelectModeFirst".i18n
 
-  @State
-  var lblAddPhraseTag1 = PETerms.AddPhrases.locPhrase.localized.0
-  @State
-  var lblAddPhraseTag2 = PETerms.AddPhrases.locReadingOrStroke.localized.0
-  @State
-  var lblAddPhraseTag3 = PETerms.AddPhrases.locWeight.localized.0
-  @State
-  var lblAddPhraseTag4 = PETerms.AddPhrases.locComment.localized.0
-  @State
-  var txtAddPhraseField1 = ""
-  @State
-  var txtAddPhraseField2 = ""
-  @State
-  var txtAddPhraseField3 = ""
-  @State
-  var txtAddPhraseField4 = ""
-
   // MARK: Private
+
+  @Binding
+  private var txtContent: String
+
+  @State
+  private var lblAddPhraseTag1 = PETerms.AddPhrases.locPhrase.localized.0
+  @State
+  private var lblAddPhraseTag2 = PETerms.AddPhrases.locReadingOrStroke.localized.0
+  @State
+  private var lblAddPhraseTag3 = PETerms.AddPhrases.locWeight.localized.0
+  @State
+  private var lblAddPhraseTag4 = PETerms.AddPhrases.locComment.localized.0
+  @State
+  private var txtAddPhraseField1 = ""
+  @State
+  private var txtAddPhraseField2 = ""
+  @State
+  private var txtAddPhraseField3 = ""
+  @State
+  private var txtAddPhraseField4 = ""
+  @State
+  private var fileChangeIndicator = PEReloadEventObserver.shared
+  @State
+  private var selInputMode: Shared.InputMode = .imeModeNULL
+  @State
+  private var selUserDataType: LMAssembly.ReplacableUserDataType = .thePhrases
 
   @AppStorage("PhraseEditorAutoReloadExternalModifications")
   private var autoReloadExternalModifications: Bool = true
@@ -246,6 +219,33 @@ public struct VwrPhraseEditorUI: View {
   @State
   private var textEditorTooltip = PETerms.TooltipTexts
     .sampleDictionaryContent(for: .thePhrases)
+
+  private weak var window: NSWindow?
+
+  private var currentIMEInputMode: Shared.InputMode {
+    delegate?.currentInputMode ?? selInputMode
+  }
+
+  private var delegate: PhraseEditorDelegate? {
+    didSet {
+      guard let delegate = delegate else { return }
+      selInputMode = delegate.currentInputMode
+      update()
+    }
+  }
+
+  private func update() {
+    guard let delegate = delegate else { return }
+    updateLabels()
+    clearAllFields()
+    txtContent = "i18n:DictionaryStatus.Loading".i18n
+    isLoading = true
+    asyncOnMain {
+      txtContent = delegate.retrieveData(mode: selInputMode, type: selUserDataType)
+      textEditorTooltip = PETerms.TooltipTexts.sampleDictionaryContent(for: selUserDataType)
+      isLoading = false
+    }
+  }
 
   private func updateLabels() {
     clearAllFields()
