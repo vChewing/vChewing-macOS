@@ -3737,6 +3737,172 @@ extension InputHandlerTests {
     #expect(candidates?.first?.value == "媽")
   }
 
+  /// 狂拼 copilot 首位＝「組句預覽」語義（定案）：fixed-order（`useFixedCandidateOrderOnSelection`）
+  /// 只管「POM 不重排候選」；contextual 記憶經 n-gram 餵入使 DP 組句本就偏好「是媽」，
+  /// 該組句預覽居首屬 composition、不受該偏好管（實證：停用 fetch 置頂塊後 IH135 仍綠）。
+  /// 此測試鎖定此語義，防止日後誤把組句預覽一併閘掉。
+  @Test
+  func test_IH505_FuriousCopilotCompositionPreviewSurvivesFixedOrder() throws {
+    guard let testHandler, let testSession else {
+      Issue.record("testHandler and testSession at least one of them is nil.")
+      return
+    }
+    clearTestPOM()
+
+    defer {
+      testHandler.currentLM.clearTemporaryData(isFiltering: false)
+      testHandler.prefs.furiousTypingEnabled = false
+      testHandler.prefs.useFixedCandidateOrderOnSelection = false
+      testHandler.prefs.keyboardParser = KeyboardParser.ofStandard.rawValue
+      testHandler.ensureKeyboardParser()
+      testHandler.prefs.fetchSuggestionsFromPerceptionOverrideModel = true
+      testSession.resetInputHandler(forceComposerCleanup: true)
+    }
+
+    [
+      .init(keyArray: ["ㄕˋ"], value: "是", score: -6),
+      .init(keyArray: ["ㄇㄚ"], value: "媽", score: -8),
+      .init(keyArray: ["ㄇㄚˊ"], value: "麻", score: -8),
+      .init(keyArray: ["ㄇㄚ˙"], value: "嗎", score: -2),
+    ].forEach {
+      testHandler.currentLM.insertTemporaryData(unigram: $0, isFiltering: false)
+    }
+    testSession.resetInputHandler(forceComposerCleanup: true)
+    testHandler.prefs.keyboardParser = KeyboardParser.ofHanyuPinyin.rawValue
+    testHandler.ensureKeyboardParser()
+    testHandler.prefs.fetchSuggestionsFromPerceptionOverrideModel = true
+    testHandler.prefs.furiousTypingEnabled = true
+    testHandler.prefs.useFixedCandidateOrderOnSelection = true
+    testHandler.currentLM.syncPrefs()
+
+    testHandler.currentLM.memorizePerception(
+      (ngramKey: "(ㄕˋ,是)&(ㄇㄚ,媽)", candidate: "媽"),
+      timestamp: Date().timeIntervalSince1970
+    )
+
+    typeSentence("shima")
+    #expect(testHandler.composer.romajiBuffer == "ma")
+
+    // 固定順序啟用：fetch 置頂塊被閘掉，但組句預覽（DP 因 contextual 餵入選「是媽」）
+    // 仍使「媽」居首——此為 composition 語義、非候選重排。
+    let candidates = testHandler.furiousTypingFrontCandidates
+    #expect(!(candidates?.isEmpty ?? true))
+    #expect(candidates?.first?.value == "媽")
+  }
+
+  /// 狂拼 copilot 置頂塊收斂後（P182）僅服務 unigram（無前後文）記憶：句首（無前文）
+  /// 打「ma」時，unigram「媽」由 Typewriter 通道置頂（fetch 開）；「以固定順序陳列候選字」
+  /// 啟用時則不置頂（首位為 LM 最佳猜測「嗎」）。
+  @Test
+  func test_IH506_FuriousCopilotFrontsUnigramMemoryUnlessFixedOrder() throws {
+    guard let testHandler, let testSession else {
+      Issue.record("testHandler and testSession at least one of them is nil.")
+      return
+    }
+    clearTestPOM()
+
+    defer {
+      testHandler.currentLM.clearTemporaryData(isFiltering: false)
+      testHandler.prefs.furiousTypingEnabled = false
+      testHandler.prefs.useFixedCandidateOrderOnSelection = false
+      testHandler.prefs.keyboardParser = KeyboardParser.ofStandard.rawValue
+      testHandler.ensureKeyboardParser()
+      testHandler.prefs.fetchSuggestionsFromPerceptionOverrideModel = true
+      testSession.resetInputHandler(forceComposerCleanup: true)
+    }
+
+    [
+      .init(keyArray: ["ㄕˋ"], value: "是", score: -6),
+      .init(keyArray: ["ㄇㄚ"], value: "媽", score: -8),
+      .init(keyArray: ["ㄇㄚˊ"], value: "麻", score: -8),
+      .init(keyArray: ["ㄇㄚ˙"], value: "嗎", score: -2),
+    ].forEach {
+      testHandler.currentLM.insertTemporaryData(unigram: $0, isFiltering: false)
+    }
+    testSession.resetInputHandler(forceComposerCleanup: true)
+    testHandler.prefs.keyboardParser = KeyboardParser.ofHanyuPinyin.rawValue
+    testHandler.ensureKeyboardParser()
+    testHandler.prefs.fetchSuggestionsFromPerceptionOverrideModel = true
+    testHandler.prefs.furiousTypingEnabled = true
+    testHandler.currentLM.syncPrefs()
+
+    testHandler.currentLM.memorizePerception(
+      (ngramKey: "()&(ㄇㄚ,媽)", candidate: "媽"),
+      timestamp: Date().timeIntervalSince1970
+    )
+
+    // 句首、非 fixed-order：unigram「媽」置頂（LM 最佳為「嗎」）。
+    typeSentence("ma")
+    #expect(testHandler.composer.romajiBuffer == "ma")
+    #expect(testHandler.furiousTypingFrontCandidates?.first?.value == "媽")
+
+    // 句首、fixed-order 啟用：不置頂，首位為 LM 最佳猜測「嗎」。
+    testSession.switchState(.ofAbortion())
+    testHandler.prefs.useFixedCandidateOrderOnSelection = true
+    testSession.resetInputHandler(forceComposerCleanup: true)
+    typeSentence("ma")
+    #expect(testHandler.furiousTypingFrontCandidates?.first?.value == "嗎")
+  }
+
+  /// 狂拼 copilot 跨邊界整詞列舉（P183）：前段已提交為多鍵節點「電腦」、尾段打 `ban` 時，
+  /// copilot 除了組句預覽（版）與尾段單字外，亦列出覆蓋「前段＋尾段」的整詞
+  /// （電腦班／電腦版）——既有末鍵（L=1）雙鍵查詢涵蓋不到的長度。
+  @Test
+  func test_IH507_FuriousCopilotListsCrossBoundaryWholeWords() throws {
+    guard let testHandler, let testSession else {
+      Issue.record("testHandler and testSession at least one of them is nil.")
+      return
+    }
+    clearTestPOM()
+
+    defer {
+      testHandler.currentLM.clearTemporaryData(isFiltering: false)
+      testHandler.prefs.furiousTypingEnabled = false
+      testHandler.prefs.keyboardParser = KeyboardParser.ofStandard.rawValue
+      testHandler.ensureKeyboardParser()
+      testHandler.prefs.fetchSuggestionsFromPerceptionOverrideModel = true
+      testSession.resetInputHandler(forceComposerCleanup: true)
+    }
+
+    [
+      .init(keyArray: ["ㄉㄧㄢˋ"], value: "電", score: -6),
+      .init(keyArray: ["ㄋㄠˇ"], value: "腦", score: -6),
+      .init(keyArray: ["ㄅㄢ"], value: "班", score: -2),
+      .init(keyArray: ["ㄅㄢˇ"], value: "版", score: -3),
+      .init(keyArray: ["ㄉㄧㄢˋ", "ㄋㄠˇ"], value: "電腦", score: -9),
+      .init(keyArray: ["ㄉㄧㄢˋ", "ㄋㄠˇ", "ㄅㄢ"], value: "電腦班", score: -10),
+      .init(keyArray: ["ㄉㄧㄢˋ", "ㄋㄠˇ", "ㄅㄢˇ"], value: "電腦版", score: -11),
+    ].forEach {
+      testHandler.currentLM.insertTemporaryData(unigram: $0, isFiltering: false)
+    }
+    testSession.resetInputHandler(forceComposerCleanup: true)
+    testHandler.prefs.keyboardParser = KeyboardParser.ofHanyuPinyin.rawValue
+    testHandler.ensureKeyboardParser()
+    testHandler.prefs.fetchSuggestionsFromPerceptionOverrideModel = true
+    testHandler.prefs.furiousTypingEnabled = true
+    testHandler.currentLM.syncPrefs()
+
+    let ts: Double = 1_788_459_361
+    testHandler.currentLM.memorizePerception(
+      (ngramKey: "(ㄉㄧㄢˋ,電)&(ㄋㄠˇ,腦)&(ㄅㄢˇ,版)", candidate: "版"), timestamp: ts
+    )
+    testHandler.currentLM.memorizePerception(
+      (ngramKey: "()&()&(ㄉㄧㄢˋ-ㄋㄠˇ,電腦)", candidate: "電腦"), timestamp: ts + 10
+    )
+    testHandler.currentLM.memorizePerception(
+      (ngramKey: "()&(ㄉㄧㄢˋ-ㄋㄠˇ,電腦)&(ㄅㄢˇ,版)", candidate: "版"), timestamp: ts + 20
+    )
+
+    typeSentence("diannaoban")
+    #expect(testHandler.composer.romajiBuffer == "ban")
+
+    let candidates = testHandler.furiousTypingFrontCandidates ?? []
+    // 置頂為組句預覽（版）；第二位起為覆蓋前段＋尾段的整詞（電腦班），並含電腦版。
+    #expect(candidates.first?.value == "版")
+    #expect(candidates.dropFirst().first?.value == "電腦班")
+    #expect(candidates.contains { $0.value == "電腦版" })
+  }
+
   /// 狂拼固化後 POM 建議套用（容錯模式）：空格固化前方聲調桶後，
   /// `retrievePOMSuggestions(apply: true)` 以容錯查詢召回記憶並就地覆寫——組句結果
   /// 由「是嗎」改為記憶的「是媽」。

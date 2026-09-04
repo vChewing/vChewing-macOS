@@ -171,7 +171,8 @@ extension InputHandlerProtocol {
     // T1：copilot 窗置頂 POM 建議——以組字器副本＋虛擬尾段做唯讀查詢（不套用、不寫記憶），
     // 狂拼容錯模式（逐段去聲調等值）取回記憶，使聲調桶／無調形代表鍵不致落空；
     // 依分數降冪、按 value 去重置頂。
-    if prefs.fetchSuggestionsFromPerceptionOverrideModel {
+    // 「以固定順序來陳列選字窗內的候選字」啟用時亦不置頂（POM 不影響候選陳列順序）。
+    if prefs.fetchSuggestionsFromPerceptionOverrideModel, !prefs.useFixedCandidateOrderOnSelection {
       let copilot = assembler.copy
       if (try? copilot.insertKeys([.multipleKeys(bucket)])) != nil {
         let suggestion = currentLM.fetchPOMSuggestion(
@@ -180,7 +181,11 @@ extension InputHandlerProtocol {
           timestamp: Date().timeIntervalSince1970,
           matchMode: .toneInsensitivePrefix
         )
+        // P182 收斂：僅置頂 unigram（無前後文）記憶——contextual 記憶已由 DP 組句預覽
+        // （n-gram 餵入）自然居首、此處重複置頂屬 shadow 冗餘（S4「自動置頂降級」方向）；
+        // unigram 記憶不進引擎餵入，故保留此 Typewriter 通道（句首記憶單字直接浮現）。
         let pomCandidates = suggestion.candidates
+          .filter { $0.previous == nil }
           .sorted { $0.probability > $1.probability }
           .map { (keyArray: $0.keyArray, value: $0.value) }
         // 段數上限（P169）：POM 建議的 keyArray 段數不得超過 copilot 可承接鍵數
@@ -214,6 +219,20 @@ extension InputHandlerProtocol {
         guard !gram.current.isEmpty else { continue }
         guard seenValues.insert(gram.current).inserted else { continue }
         ranked.append((keyArray: gram.keyArray, value: gram.current, weight: gram.probability))
+      }
+    }
+    // 跨邊界整詞候選（P183）：前段為「多鍵節點／多音節」（如「電腦」）時，既有 L=1
+    // 查詢涵蓋不到「覆蓋整段前鍵＋尾段」的詞——以「尾端 L 鍵（L≥2）＋尾段桶」為鍵鏈
+    // 再列舉（「電腦班／電腦版」）。上限取前段鍵數與 3 之較小者，循 DP 詞長防禦。
+    if assembler.keys.count >= 2 {
+      let maxSuffixLength = min(assembler.keys.count, 3)
+      for suffixLength in 2 ... maxSuffixLength {
+        let suffixKeys = Array(assembler.keys.suffix(suffixLength))
+        for gram in currentLM.lookupHub.grams(for: suffixKeys + [.multipleKeys(bucket)]) {
+          guard !gram.current.isEmpty else { continue }
+          guard seenValues.insert(gram.current).inserted else { continue }
+          ranked.append((keyArray: gram.keyArray, value: gram.current, weight: gram.probability))
+        }
       }
     }
     // 前方單音節候選：語言模組對讀音桶的查詢結果，依原順序取用、按 value 去重（保留先出現者）。
