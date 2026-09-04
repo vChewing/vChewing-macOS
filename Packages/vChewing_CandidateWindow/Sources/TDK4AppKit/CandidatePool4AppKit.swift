@@ -124,7 +124,7 @@ extension TDK4AppKit {
     let cellTextHeight = CandidatePool4AppKit.shitCell.textDimension.height
 
     let originDelta: CGFloat = {
-      if #unavailable(macOS 26.0) { return 5 }
+      if #unavailable(macOS 26.0) { return 3 }
       return 2
     }()
 
