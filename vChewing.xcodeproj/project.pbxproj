@@ -134,11 +134,18 @@
 			);
 			target = 5BC0A1052FA1000100D0AA01 /* vChewingDebuggable */;
 		};
+		5BEA9603304AABAE00AC892B /* PBXFileSystemSynchronizedBuildFileExceptionSet */ = {
+			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
+			membershipExceptions = (
+				/Localized/Resources/Localizable.strings,
+			);
+			target = 5BC0A1052FA1000100D0AA01 /* vChewingDebuggable */;
+		};
 /* End PBXFileSystemSynchronizedBuildFileExceptionSet section */
 
 /* Begin PBXFileSystemSynchronizedRootGroup section */
 		5B2E75B52F3B0DE800815675 /* Plugins */ = {isa = PBXFileSystemSynchronizedRootGroup; explicitFileTypes = {}; explicitFolders = (); path = Plugins; sourceTree = "<group>"; };
-		5B9184802F3B01A1006B48E8 /* vChewingIME_macOS */ = {isa = PBXFileSystemSynchronizedRootGroup; exceptions = (5B9184D52F3B03D1006B48E8 /* PBXFileSystemSynchronizedBuildFileExceptionSet */, ); explicitFileTypes = {}; explicitFolders = (); path = vChewingIME_macOS; sourceTree = "<group>"; };
+		5B9184802F3B01A1006B48E8 /* vChewingIME_macOS */ = {isa = PBXFileSystemSynchronizedRootGroup; exceptions = (5B9184D52F3B03D1006B48E8 /* PBXFileSystemSynchronizedBuildFileExceptionSet */, 5BEA9603304AABAE00AC892B /* PBXFileSystemSynchronizedBuildFileExceptionSet */, ); explicitFileTypes = {}; explicitFolders = (); path = vChewingIME_macOS; sourceTree = "<group>"; };
 		5B9184C12F3B023A006B48E8 /* ValueAdd */ = {isa = PBXFileSystemSynchronizedRootGroup; exceptions = (5B9184C22F3B0244006B48E8 /* PBXFileSystemSynchronizedBuildFileExceptionSet */, ); explicitFileTypes = {}; explicitFolders = (); path = ValueAdd; sourceTree = "<group>"; };
 		5B9184C32F3B028C006B48E8 /* Installer_macOS */ = {isa = PBXFileSystemSynchronizedRootGroup; exceptions = (5B9184D12F3B0296006B48E8 /* PBXFileSystemSynchronizedBuildFileExceptionSet */, 5B9184D22F3B0296006B48E8 /* PBXFileSystemSynchronizedBuildFileExceptionSet */, ); explicitFileTypes = {}; explicitFolders = (); path = Installer_macOS; sourceTree = "<group>"; };
 		5BC0A1032FA1000100D0AA01 /* vChewingDebuggable */ = {isa = PBXFileSystemSynchronizedRootGroup; exceptions = (5BC0A10C2FA1000100D0AA01 /* PBXFileSystemSynchronizedBuildFileExceptionSet */, ); explicitFileTypes = {}; explicitFolders = (); path = vChewingDebuggable; sourceTree = "<group>"; };
@@ -332,7 +339,7 @@
 			attributes = {
 				BuildIndependentTargetsInParallel = YES;
 				LastSwiftUpdateCheck = 1510;
-				LastUpgradeCheck = 2640;
+				LastUpgradeCheck = 2700;
 				TargetAttributes = {
 					5BC0A1052FA1000100D0AA01 = {
 						LastSwiftMigration = 1400;
@@ -481,6 +488,7 @@
 		5BC0A1082FA1000100D0AA01 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CLANG_CXX_LANGUAGE_STANDARD = "c++17";
 				CLANG_CXX_LIBRARY = "libc++";
 				CLANG_ENABLE_MODULES = YES;
@@ -526,6 +534,7 @@
 		5BC0A1092FA1000100D0AA01 /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CLANG_CXX_LANGUAGE_STANDARD = "c++17";
 				CLANG_CXX_LIBRARY = "libc++";
 				CLANG_ENABLE_MODULES = YES;
