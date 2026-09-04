@@ -621,10 +621,11 @@ extension GSI4AppKit.VwrCandidateGSI4AppKit {
     let index = clickedCell.index
     guard let candidate = delegate.getCandidate(at: index) else { return }
     let candidateText = clickedCell.displayedText
-    let isEnabledInSession = delegate.isCandidateContextMenuEnabled
+    // 語境層級（如狂拼 copilot 窗）禁用候選操控選單時，右鍵一律不予響應——
+    // 不彈選單、也不發出單字拒絕蜂鳴（後者原於單字守衛處先行觸發）。
+    guard delegate.isCandidateContextMenuEnabled else { return }
     let isMacroToken = delegate.checkIsMacroTokenResult(index)
     var conditions: [Bool] = [
-      isEnabledInSession,
       !candidateText.isEmpty,
       !isMacroToken,
       index >= 0,
@@ -633,11 +634,11 @@ extension GSI4AppKit.VwrCandidateGSI4AppKit {
       guard let firstKey = candidate.keyArray.first else { break singleKanjiCheck }
       let segLengthIsOne = candidate.keyArray.count == 1
       let isPunctuation = firstKey.hasPrefix("_")
-      let shouldDisableMenu = !isPunctuation && segLengthIsOne
-      if shouldDisableMenu {
+      let shouldDisableMenu4ThisCandidate = !isPunctuation && segLengthIsOne
+      if shouldDisableMenu4ThisCandidate {
         delegate.callError("44E0B7CF")
       }
-      conditions.append(!shouldDisableMenu)
+      conditions.append(!shouldDisableMenu4ThisCandidate)
     }
     let allConditionsMet = conditions.reduce(true) { $0 && $1 }
     guard allConditionsMet else { return }
