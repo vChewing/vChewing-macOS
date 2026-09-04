@@ -48,7 +48,7 @@ extension SettingsPanesCocoa {
     ctlPageBehavior.loadView()
     ctlPageOutput.loadView()
     ctlPageDictionary.loadView()
-    ctlPagePhrases.loadView()
+    // Phrases 刻意不預載：開窗即全文載入詞庫文字徒增記憶體，改由首次造訪該頁才載入（與 About 同例）。
     ctlPageCassette.loadView()
     ctlPageKeyboard.loadView()
     ctlPageClients.loadView()

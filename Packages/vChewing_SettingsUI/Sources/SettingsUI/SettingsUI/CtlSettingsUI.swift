@@ -68,6 +68,8 @@ public final class CtlSettingsUI: NSWindowController, NSWindowDelegate {
       window?.delegate = nil
       // 此舉抽離 contentView。
       window?.contentView = nil
+      // 立即釋放語彙編輯器共享的程序級文字暫存，不依賴 onDisappear 時序。
+      VwrPhraseEditorUI.txtContentStorage = ""
       super.close()
       Self.shared = nil
     }
@@ -110,6 +112,8 @@ public final class CtlSettingsUI: NSWindowController, NSWindowDelegate {
     // 因此必須在此處做同等的清理。
     window?.delegate = nil
     window?.contentView = nil
+    // 立即釋放語彙編輯器共享的程序級文字暫存，不依賴 onDisappear 時序。
+    VwrPhraseEditorUI.txtContentStorage = ""
     Self.shared = nil
   }
 }
