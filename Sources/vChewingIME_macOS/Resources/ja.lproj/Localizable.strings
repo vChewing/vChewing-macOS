@@ -342,7 +342,7 @@
 "i18n:UserDef.kAutoCompositeWithLongestPossibleCassetteKey.shortTitle" = "最長可能キーができた場合、文字を組み立つ";
 "i18n:UserDef.kAutoCorrectReadingCombination.description" = "互換性のため、中英混在入力のフォールバックがONの場合、この機能は不作動。";
 "i18n:UserDef.kAutoCorrectReadingCombination.shortTitle" = "入力中で打ち間違った発音組み合わせを自動的に訂正する";
-"i18n:UserDef.kBasicKeyboardLayout.description" = "macOS 基礎キーボード配置をご指定ください。QWERTY 以外の英数キーボードは弁音以外の配列に不適用。弁音配列或いは「英数キーボードー配置と関わる注音配列（例えば許氏など）」を起用していない限り、キーボード配置の設定はキーボードビューアの有りようだけに影響を及ぼす。";
+"i18n:UserDef.kBasicKeyboardLayout.description" = "macOS 基礎キーボード配置をご指定ください。注音モードと弁音モードは、現在はいつでも相互に切り替えられます。弁音モードでは、この配置が実際のキー出力を決定します（QWERTY 以外の英数キーボードも適用可能）。注音モードでは、キーは常に標準配列として扱われ、キーボードビューアの表示もそれに応じて変わります。";
 "i18n:UserDef.kBasicKeyboardLayout.shortTitle" = "基礎キーボード:";
 "i18n:UserDef.kBeepSoundPreference.option.0" = "鳴らず";
 "i18n:UserDef.kBeepSoundPreference.option.1" = "システムSFXを使用";

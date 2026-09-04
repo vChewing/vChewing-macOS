@@ -342,7 +342,7 @@
 "i18n:UserDef.kAutoCompositeWithLongestPossibleCassetteKey.shortTitle" = "Auto-composite when the longest possible key is formed";
 "i18n:UserDef.kAutoCorrectReadingCombination.description" = "This feature is disabled with mixed Chinese-English typing fallback due to compatibility concerns.";
 "i18n:UserDef.kAutoCorrectReadingCombination.shortTitle" = "Automatically correct reading combinations when typing";
-"i18n:UserDef.kBasicKeyboardLayout.description" = "Choose the macOS-level basic keyboard layout. Non-QWERTY alphanumerical keyboard layouts are for Pinyin parser only. This option will only affect the appearance of the on-screen-keyboard if the current Mandarin parser is neither (any) pinyin nor dynamically reparsable with different western keyboard layouts (like Eten 26, Hsu, etc.).";
+"i18n:UserDef.kBasicKeyboardLayout.description" = "Choose the macOS-level basic keyboard layout. Zhuyin typing and Pinyin typing are now mutually switchable modes: while typing Pinyin, this layout determines the actual characters produced by your keys, so non-QWERTY alphanumerical keyboard layouts apply as well; while typing Zhuyin, keystrokes are translated as if on a standard layout, and the on-screen keyboard is displayed accordingly.";
 "i18n:UserDef.kBasicKeyboardLayout.shortTitle" = "Basic Keyboard Layout:";
 "i18n:UserDef.kBeepSoundPreference.option.0" = "Muted";
 "i18n:UserDef.kBeepSoundPreference.option.1" = "Use OS Settings";
