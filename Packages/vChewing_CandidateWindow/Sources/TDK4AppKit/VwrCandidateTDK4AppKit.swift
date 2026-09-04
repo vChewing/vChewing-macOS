@@ -148,6 +148,11 @@ extension TDK4AppKit.VwrCandidateTDK4AppKit {
     if !strReadingDisambig.string.isEmpty {
       strReadingDisambig.draw(at: sizesCalculated.readingDisambiguation.origin)
     }
+    // 繪製頂部 pane（unfinished reading；與 page indicator 同款文字樣式）。
+    let strUnfinishedReading = thePool.attributedDescriptionUnfinishedReading
+    if !strUnfinishedReading.string.isEmpty {
+      strUnfinishedReading.draw(at: sizesCalculated.unfinishedReading.origin)
+    }
   }
 }
 

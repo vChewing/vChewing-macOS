@@ -2338,10 +2338,11 @@ extension InputHandlerTests {
     #expect(testSession.recentCommissions.isEmpty)
   }
 
-  /// 狂拼候選窗顯示中，反查欄位回傳注拼槽尚未固化的原始拼音字母流；
-  /// 總開關、縱排守衛、狂拼關閉時皆回空。
+  /// 狂拼候選窗顯示中，「未完成讀音」資料源（選字窗頂部 pane 用）回傳注拼槽尚未
+  /// 固化的原始拼音字母流；該資料源由 data provider 單方把守、刻意繞過反查總開關，
+  /// 且自 P184 起不再經由底部反查欄位回顯。
   @Test
-  func test_IH120C_FuriousTypingReverseLookupExposesPendingRomaji() throws {
+  func test_IH120C_FuriousTypingUnfinishedReadingExposedViaTopPane() throws {
     guard let testHandler, let testSession else {
       Issue.record("testHandler and testSession at least one of them is nil.")
       return
@@ -2372,17 +2373,21 @@ extension InputHandlerTests {
     #expect(testHandler.composer.romajiBuffer == "jie")
     #expect(!testSession.state.candidates.isEmpty)
 
-    // 狂拼候選窗顯示中：反查回傳注拼槽的原始拼音字母流。
-    #expect(testSession.reverseLookup(for: "界") == ["jie"])
+    // 狂拼候選窗顯示中：unfinishedReading（頂部 pane 資料源）回傳注拼槽的字母流。
+    #expect(testSession.unfinishedReading == "jie")
 
-    // 狂拼讀音回顯刻意繞過總開關：總開關關閉時仍回傳字母流。
+    // 讀音回顯已移交 unfinishedReading：底部反查欄位自此不再回傳字母流。
+    #expect(testSession.reverseLookup(for: "界").isEmpty)
+
+    // unfinishedReading 由 provider 單方把守、刻意繞過反查總開關。
     testHandler.prefs.showReverseLookupInCandidateUI = false
     testHandler.currentLM.syncPrefs()
-    #expect(testSession.reverseLookup(for: "界") == ["jie"])
+    #expect(testSession.unfinishedReading == "jie")
 
-    // 非狂拼時，總開關關閉仍回空（原守衛路徑不受影響）。
+    // 非狂拼時：provider 不提供 unfinishedReading（nil）；反查守衛路徑不受影響。
     testHandler.prefs.furiousTypingEnabled = false
     testHandler.currentLM.syncPrefs()
+    #expect(testSession.unfinishedReading == nil)
     #expect(testSession.reverseLookup(for: "界").isEmpty)
   }
 
@@ -2512,10 +2517,10 @@ extension InputHandlerTests {
     #expect(testSession.recentCommissions.isEmpty)
   }
 
-  /// 狂拼讀音回顯：縱排模擬下仍回傳字母流（繞過縱排守衛）；
-  /// 狂拼關閉時不進狂拼分支；非狂拼（總開關開啟）走原磁帶路徑（Mock 回空）。
+  /// 狂拼未完成讀音（頂部 pane 資料源）：縱排模擬下仍提供字母流（繞過縱排守衛）；
+  /// 狂拼關閉時 provider 不提供（回 nil）；反查欄位自此只走一般守衛路徑（Mock 回空）。
   @Test
-  func test_IH121C_FuriousTypingReadingEchoBypassesVerticalGuard() throws {
+  func test_IH121C_FuriousTypingUnfinishedReadingBypassesVerticalGuard() throws {
     guard let testHandler, let testSession else {
       Issue.record("testHandler and testSession at least one of them is nil.")
       return
@@ -2545,14 +2550,17 @@ extension InputHandlerTests {
     typeSentence("shijie")
     #expect(!testSession.state.candidates.isEmpty)
 
-    // 縱排模擬（isVerticalTyping = true）：狂拼讀音回顯仍回傳字母流。
+    // 縱排模擬（isVerticalTyping = true）：unfinishedReading 仍提供字母流（繞過縱排守衛）。
     testSession.isVerticalTyping = true
-    #expect(testSession.reverseLookup(for: "界") == ["jie"])
+    #expect(testSession.unfinishedReading == "jie")
+    // 反查欄位自此只走一般守衛路徑：縱排時回空。
+    #expect(testSession.reverseLookup(for: "界").isEmpty)
     testSession.isVerticalTyping = false
 
-    // 狂拼關閉時不進狂拼分支：走原守衛路徑（Mock 回空）。
+    // 狂拼關閉：provider 不提供 unfinishedReading；反查走一般守衛路徑（Mock 回空）。
     testHandler.prefs.furiousTypingEnabled = false
     testHandler.currentLM.syncPrefs()
+    #expect(testSession.unfinishedReading == nil)
     #expect(testSession.reverseLookup(for: "界").isEmpty)
 
     // 非狂拼（總開關開啟）走原磁帶反查路徑（Mock 無磁帶資料，回空）。

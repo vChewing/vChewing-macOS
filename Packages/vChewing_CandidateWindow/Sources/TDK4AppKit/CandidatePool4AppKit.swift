@@ -68,7 +68,8 @@ extension TDK4AppKit {
           highlightedLine: .zero,
           highlightedCandidate: .zero,
           peripherals: .zero,
-          readingDisambiguation: .zero
+          readingDisambiguation: .zero,
+          unfinishedReading: .zero
         )
       }
 
@@ -77,6 +78,8 @@ extension TDK4AppKit {
       let highlightedCandidate: CGRect
       let peripherals: CGRect
       let readingDisambiguation: CGRect
+      /// 頂部 pane（未完成讀音）的排版矩形。zero 表示該 pane 隱藏。
+      let unfinishedReading: CGRect
     }
 
     // 只用來測量單漢字候選字 cell 的最大可能寬度。
@@ -98,6 +101,10 @@ extension TDK4AppKit {
     var reverseLookupResult: [String] = []
     /// 當前高亮候選字詞的讀音 disambiguation 顯示內容。nil 表示無需顯示。
     var readingDisambiguationResult: String?
+
+    /// 頂部 pane 的未完成讀音顯示內容。nullable：nil／空字串時整個 pane 隱藏。
+    /// 何時提供由 data provider（Session／InputHandler 側）決定。
+    var unfinishedReadingResult: String?
 
     /// 注音讀音轉換為拼音顯示用的 nullable converter。
     /// 由組字引擎層（具備 Tekkon 能力的一側）指派；nil 時維持注音讀音原樣。
@@ -346,6 +353,7 @@ extension TDK4AppKit {
       tooltip = ""
       reverseLookupResult = []
       readingDisambiguationResult = nil
+      unfinishedReadingResult = nil
       headerCache.removeAll()
       phraseCache.removeAll()
     }
@@ -986,6 +994,14 @@ extension TDK4AppKit.CandidatePool4AppKit {
   }
 
   func updateMetrics() {
+    // 先測量頂部 pane（unfinished reading）的尺寸；nil／空字串時整段為零、pane 隱藏。
+    let strUnfinishedReading = attributedDescriptionUnfinishedReading
+    var dimensionUnfinishedReading = CGSize.zero
+    if !strUnfinishedReading.string.isEmpty {
+      let rawDim = strUnfinishedReading.getBoundingDimension(forceFallback: true)
+      dimensionUnfinishedReading = CGSize(width: ceil(rawDim.width), height: ceil(rawDim.height))
+    }
+
     let initialOrigin = CGPoint(x: originDelta, y: originDelta)
 
     // 準備當前頁的行陣列（含空白行填充）。
@@ -1068,7 +1084,7 @@ extension TDK4AppKit.CandidatePool4AppKit {
       totalAccuSize.height += dimensionPeripherals.height
       totalAccuSize.width = max(totalAccuSize.width, dimensionPeripherals.width)
     }
-    let rectPeripherals = CGRect(origin: currentOrigin, size: dimensionPeripherals)
+    var rectPeripherals = CGRect(origin: currentOrigin, size: dimensionPeripherals)
 
     let strReadingDisambiguation = attributedDescriptionReadingDisambiguation
     var rectReadingDisambiguation: CGRect = .zero
@@ -1092,12 +1108,38 @@ extension TDK4AppKit.CandidatePool4AppKit {
     totalAccuSize.width += originDelta * 2
     totalAccuSize.height += originDelta * 2
 
+    // 頂部 pane：若存在，則將既有幾何資料整體下移（topPaneShift）騰出 pane 空間。
+    // 這樣一來無論橫向／縱向、單行／多行模式，候選區與底部欄位的相對位置皆不受影響。
+    let topPaneShift = dimensionUnfinishedReading.height > 0
+      ? dimensionUnfinishedReading.height + padding : 0
+    let rectUnfinishedReading: CGRect
+    if topPaneShift > 0 {
+      rectUnfinishedReading = .init(
+        origin: .init(x: originDelta, y: originDelta), size: dimensionUnfinishedReading
+      )
+      for lineIndex in candidateLines.indices {
+        for cellIndex in candidateLines[lineIndex].indices {
+          candidateLines[lineIndex][cellIndex].visualOrigin.y += topPaneShift
+        }
+      }
+      highlightedCellRect.origin.y += topPaneShift
+      highlightedLineRect.origin.y += topPaneShift
+      rectPeripherals.origin.y += topPaneShift
+      rectReadingDisambiguation.origin.y += topPaneShift
+      totalAccuSize.height += topPaneShift
+      // 頂部 pane 可能比候選區更寬，視窗寬度需一併放寬（左右各留 originDelta 邊距）。
+      totalAccuSize.width = max(totalAccuSize.width, dimensionUnfinishedReading.width + originDelta * 2)
+    } else {
+      rectUnfinishedReading = .zero
+    }
+
     metrics = .init(
       fittingSize: totalAccuSize,
       highlightedLine: highlightedLineRect,
       highlightedCandidate: highlightedCellRect,
       peripherals: rectPeripherals,
-      readingDisambiguation: rectReadingDisambiguation
+      readingDisambiguation: rectReadingDisambiguation,
+      unfinishedReading: rectUnfinishedReading
     )
   }
 
@@ -1382,6 +1424,44 @@ extension TDK4AppKit.CandidatePool4AppKit {
     let badgeCell = RoundedBadgeTextAttachmentCell(
       label: label,
       attributes: attrReading,
+      backgroundColor: .clear,
+      padding: .init(
+        top: verticalInset,
+        left: horizontalInset,
+        bottom: verticalInset,
+        right: horizontalInset
+      )
+    )
+    attachment.attachmentCell = badgeCell
+    return .init(attachment: attachment)
+  }
+
+  // MARK: Unfinished Reading Pane (頂部)
+
+  /// 選字窗頂部 pane（unfinished reading）用的 NSAttributedString。
+  /// 文字樣式與 page indicator（位置計數器）一致，但無底色。
+  /// 文字前綴為「✍️ 」（一個 emoji + 一個 ASCII SPACE）。
+  /// unfinishedReadingResult 為 nil／空字串時返回空字串（pane 隱藏）。
+  var attributedDescriptionUnfinishedReading: NSAttributedString {
+    guard let readingText = unfinishedReadingResult, !readingText.isEmpty else {
+      return NSAttributedString(string: "")
+    }
+    let paneTextSize = max(ceil(CandidateCellData4AppKit.unifiedSize * 0.7), 11)
+    let attrPane: [NSAttributedString.Key: Any] = [
+      .kern: 0,
+      .font: Self.blankCell.phraseFontEmphasized(size: paneTextSize),
+      .foregroundColor: CandidateCellData4AppKit.plainTextColor,
+    ]
+    let label = "✍️ \(readingText)"
+    let fontSize = CGFloat(paneTextSize)
+    let referenceHeight = positionCounterBadgeHeight()
+    let contentHeight = badgeContentHeight(label: label, attributes: attrPane)
+    let verticalInset = max((referenceHeight - contentHeight) / 2, 1)
+    let horizontalInset = max((fontSize * 0.45).rounded(.up), 4)
+    let attachment = NSTextAttachment()
+    let badgeCell = RoundedBadgeTextAttachmentCell(
+      label: label,
+      attributes: attrPane,
       backgroundColor: .clear,
       padding: .init(
         top: verticalInset,

@@ -196,16 +196,20 @@ extension SessionProtocol {
     return ""
   }
 
+  /// 狂拼 copilot 候選窗的「未完成讀音」顯示資料（選字窗頂部 pane 用；nullable）。
+  /// 由 data provider 這一側決定何時提供：僅在狂拼 copilot 候選窗顯示、且注拼槽尚有
+  /// 未固化的字母流時回傳該字母流；其餘場合一律 nil（選字窗側隱藏頂部 pane）。
+  /// 自 P184 起，狂拼模式的讀音回顯由底部反查欄位移交此專用資料源
+  /// （原回顯為 tooltip 因與候選窗重疊而被抑制時的敲鍵內容唯一可見管道）。
+  public var unfinishedReading: String? {
+    guard isFuriousCopilotCandidateWindowVisible,
+          let romaji = inputHandler?.composer.romajiBuffer, !romaji.isEmpty else { return nil }
+    return romaji
+  }
+
   @discardableResult
   public func reverseLookup(for value: String) -> [String] {
     let blankResult: [String] = []
-    // 狂拼模式的讀音回顯：這是使用者自己敲入的字母流的即時回顯（tooltip 已因與
-    // 候選窗重疊的問題被抑制，這是狂拼模式下敲鍵內容的唯一可見管道），並非反查，
-    // 因此刻意不受 showReverseLookupInCandidateUI 總開關與 isVerticalTyping 守衛節制。
-    if isFuriousCopilotCandidateWindowVisible,
-       let romaji = inputHandler?.composer.romajiBuffer, !romaji.isEmpty {
-      return [romaji]
-    }
     // 這一段專門處理「反查」。
     if !prefs.showReverseLookupInCandidateUI { return blankResult }
     if state.type == .ofInputting, state.isCandidateContainer,

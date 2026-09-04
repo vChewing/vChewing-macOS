@@ -334,6 +334,8 @@ extension GSI4AppKit {
       }
       Self.thePool.updateReadingDisambiguation()
       Self.thePool.reverseLookupResult = reverseLookupResult
+      // 頂部 pane：unfinished reading（nullable；由 data provider 決定是否提供）。
+      Self.thePool.unfinishedReadingResult = delegate?.unfinishedReading
       Self.thePool.tooltip = delegate?.candidateToolTip(shortened: !Self.thePool.isMatrix) ?? ""
       delegate?.candidatePairHighlightChanged(at: highlightedIndex)
     }

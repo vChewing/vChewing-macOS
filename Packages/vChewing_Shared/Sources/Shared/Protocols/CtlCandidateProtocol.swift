@@ -37,6 +37,9 @@ public protocol CtlCandidateDelegate: AnyObject {
   var shouldAutoExpandCandidates: Bool { get }
   var isCandidateContextMenuEnabled: Bool { get }
   var showReverseLookupResult: Bool { get }
+  /// 選字窗頂部 pane 的未完成讀音顯示資料（nullable）。
+  /// 由 data provider 這一側決定何時提供；nil 表示選字窗無需顯示該 pane。
+  var unfinishedReading: String? { get }
   var clientAccentColor: HSBA? { get }
 }
 

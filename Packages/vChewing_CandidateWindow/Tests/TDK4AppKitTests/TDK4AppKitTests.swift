@@ -405,6 +405,86 @@ struct TDK4AppKitTests {
     }
   }
 
+  // MARK: - 頂部 pane（Unfinished Reading）測試
+
+  /// 驗證：未指派 unfinishedReadingResult 時，頂部 pane 完全隱藏——
+  /// 屬性字串為空、排版矩形為零、版面與未提供資料時相同。
+  @Test
+  func testUnfinishedReadingPaneHiddenWhenNotProvided() throws {
+    let pool = TDK4AppKit.CandidatePool4AppKit(
+      candidates: variableCandidatesINMU, lines: 1, isExpanded: true,
+      selectionKeys: "123456", layout: .horizontal
+    )
+    #expect(pool.unfinishedReadingResult == nil)
+    #expect(pool.attributedDescriptionUnfinishedReading.string.isEmpty)
+    #expect(pool.metrics.unfinishedReading == .zero)
+  }
+
+  /// 驗證：提供 unfinishedReadingResult 後，頂部 pane 佔據候選區上方的空間——
+  /// 候選 cell 與高亮矩形整體下移、fittingSize 加高、視窗寬度足以容納 pane；
+  /// 撤除資料後版面回到原樣。
+  @Test
+  func testUnfinishedReadingPaneShiftsCandidatesDown() throws {
+    let pool = TDK4AppKit.CandidatePool4AppKit(
+      candidates: variableCandidatesINMU, lines: 1, isExpanded: true,
+      selectionKeys: "123456", layout: .horizontal
+    )
+    let baselineCellOriginY = pool.candidateLines[0][0].visualOrigin.y
+    let baselineHighlightedLineY = pool.metrics.highlightedLine.origin.y
+    let baselineHighlightedCandidateY = pool.metrics.highlightedCandidate.origin.y
+    let baselineFittingHeight = pool.metrics.fittingSize.height
+    let baselineFittingWidth = pool.metrics.fittingSize.width
+
+    pool.unfinishedReadingResult = "ban"
+    pool.updateMetrics()
+
+    let paneRect = pool.metrics.unfinishedReading
+    #expect(paneRect != .zero, "提供未完成讀音後頂部 pane 矩形不得為零")
+    #expect(paneRect.origin.y == pool.originDelta, "頂部 pane 應貼齊內容區頂端")
+    #expect(paneRect.height > 0)
+    #expect(paneRect.width > 0)
+
+    // 候選區整體下移 pane 高度＋padding。
+    let expectedShift = paneRect.height + pool.padding
+    #expect(
+      abs(pool.candidateLines[0][0].visualOrigin.y - (baselineCellOriginY + expectedShift)) < 0.001,
+      "候選 cell 應隨頂部 pane 下移"
+    )
+    #expect(
+      abs(pool.metrics.highlightedLine.origin.y - (baselineHighlightedLineY + expectedShift)) < 0.001,
+      "高亮行矩形應隨之下移"
+    )
+    #expect(
+      abs(pool.metrics.highlightedCandidate.origin.y - (baselineHighlightedCandidateY + expectedShift)) < 0.001,
+      "高亮候選矩形應隨之下移"
+    )
+    #expect(
+      abs(pool.metrics.fittingSize.height - (baselineFittingHeight + expectedShift)) < 0.001,
+      "視窗高度應隨 pane 增加"
+    )
+    #expect(
+      pool.metrics.fittingSize.width >= paneRect.width + pool.originDelta * 2,
+      "視窗寬度應足以容納頂部 pane（含左右邊距）"
+    )
+    #expect(
+      pool.metrics.fittingSize.width >= baselineFittingWidth,
+      "視窗寬度不得因 pane 而縮小"
+    )
+
+    // 撤除資料後回到原樣。
+    pool.unfinishedReadingResult = nil
+    pool.updateMetrics()
+    #expect(pool.metrics.unfinishedReading == .zero)
+    #expect(
+      abs(pool.candidateLines[0][0].visualOrigin.y - baselineCellOriginY) < 0.001,
+      "撤除後候選 cell 應回到原位"
+    )
+    #expect(
+      abs(pool.metrics.fittingSize.height - baselineFittingHeight) < 0.001,
+      "撤除後視窗高度應回到原樣"
+    )
+  }
+
   // MARK: - 讀音 Disambiguation 拼音顯示（PhonabetPinyinConverter）測試
 
   /// 驗證：未指派 phonabetPinyinConverter 時，讀音 disambiguation 維持注音讀音原樣。

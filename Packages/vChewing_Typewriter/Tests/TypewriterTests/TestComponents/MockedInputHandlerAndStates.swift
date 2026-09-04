@@ -123,6 +123,16 @@ public final class MockSession: @MainActor SessionCoreProtocol {
 
   public var localeForFontFallbacks: String { "zh-Hant" }
 
+  public var unfinishedReading: String? {
+    // 與生產端 InputSession_Delegates 對應：狂拼 copilot 窗的未完成讀音（頂部 pane 資料源）。
+    guard let inputHandler = inputHandler else { return nil }
+    guard isFuriousCopilotCandidateWindowVisible, inputHandler.hasFuriousFrontPending else {
+      return nil
+    }
+    let romaji = inputHandler.composer.romajiBuffer
+    return romaji.isEmpty ? nil : romaji
+  }
+
   public func callError(_ logMessage: String) {
     vCLog(logMessage)
   }
@@ -305,12 +315,9 @@ public final class MockSession: @MainActor SessionCoreProtocol {
 
   @discardableResult
   public func reverseLookup(for value: String) -> [String] {
-    // 與生產端 InputSession_Delegates 對應：狂拼讀音回顯為即時回顯（非反查），
-    // 刻意不受 showReverseLookupInCandidateUI 總開關與 isVerticalTyping 守衛節制。
+    // 與生產端 InputSession_Delegates 對應：狂拼讀音回顯已移交 unfinishedReading
+    // 專用資料源，反查欄位自此只走一般守衛路徑。
     guard let inputHandler = inputHandler else { return [] }
-    if isFuriousCopilotCandidateWindowVisible, inputHandler.hasFuriousFrontPending {
-      return [inputHandler.composer.romajiBuffer]
-    }
     if !inputHandler.prefs.showReverseLookupInCandidateUI { return [] }
     if isVerticalTyping { return [] }
     return []
