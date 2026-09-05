@@ -398,7 +398,7 @@
 "i18n:UserDef.kEnforceSingleLineCandidateWindowLayout4SCPC.shortTitle" = "對逐字選字模式強制單行選字窗佈局";
 "i18n:UserDef.kEscToCleanInputBuffer.description" = "若取消勾選，則 ESC 鍵會先嘗試清除未組成的讀音/字根；\n如果沒有未組成的讀音/字根的話，則會遞交當前組字區的內容。";
 "i18n:UserDef.kEscToCleanInputBuffer.shortTitle" = "敲 ESC 鍵以清空整個組字緩衝區";
-"i18n:UserDef.kFetchSuggestionsFromPerceptionOverrideModel.description" = "啟用後，漸退記憶（POM）模組會觀察您的選字行為以累積臨時記憶，並在敲字時自動以這些記憶提供建議（套用至組句結果、或置頂於候選窗）。記憶記錄會隨時間逐漸衰減失效，您亦可隨時藉由輸入法選單清除全部記憶。關閉本選項可停止此類自動建議與新的記憶學習——但若「以漸退記憶作為組句統計來源」仍啟用，既有的記憶仍會以統計方式影響組句。";
+"i18n:UserDef.kFetchSuggestionsFromPerceptionOverrideModel.description" = "啟用後，漸退記憶（POM）模組會觀察您的選字行為以累積臨時記憶，並在敲字時自動以這些記憶提供建議（套用至組句結果、或置頂於候選窗）；既有的記憶亦會以統計方式參與組句。記憶記錄會隨時間逐漸衰減失效，您亦可隨時藉由輸入法選單清除全部記憶。關閉本選項可停止此類自動建議、新的記憶學習、以及既有的記憶以統計方式參與組句的行為。";
 "i18n:UserDef.kFetchSuggestionsFromPerceptionOverrideModel.shortTitle" = "啟用漸退記憶的學習與自動建議";
 "i18n:UserDef.kFilterFactoryKanjisOfNonCurrentInputMode.description" = "啟用時，僅存在於相反輸入模式（如在繁體模式下出現的簡體特有字）的單一漢字候選將從選字窗中移除。倚天中文系統支援的漢字與 CNS 全字庫漢字不受影響。注意：過濾範圍僅限萬國碼 1.0.1 所支援的漢字（即倚天中文系統收字範圍）；較新版本萬國碼才引入的字元不在覆蓋範圍內。";
 "i18n:UserDef.kFilterFactoryKanjisOfNonCurrentInputMode.shortTitle" = "濾除掉與輸入模式不相符的漢字候選";

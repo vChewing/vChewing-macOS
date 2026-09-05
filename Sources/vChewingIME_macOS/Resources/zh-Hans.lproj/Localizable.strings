@@ -398,7 +398,7 @@
 "i18n:UserDef.kEnforceSingleLineCandidateWindowLayout4SCPC.shortTitle" = "对逐字选字模式强制单行选字窗布局";
 "i18n:UserDef.kEscToCleanInputBuffer.description" = "若取消勾选，则 ESC 键会先尝试清除未组成的读音/字根；\n如果没有未组成的读音/字根的话，则会递交当前组字区的内容。";
 "i18n:UserDef.kEscToCleanInputBuffer.shortTitle" = "敲 ESC 键以清空整个组字缓冲区";
-"i18n:UserDef.kFetchSuggestionsFromPerceptionOverrideModel.description" = "启用后，渐退记忆（POM）模块会观察您的选字行为以累积临时记忆，并在敲字时自动以这些记忆提供建议（套用至组句结果、或置顶于候选窗）。记忆记录会随时间逐渐衰减失效，您亦可随时借由输入法选单清除全部记忆。关闭本选项可停止此类自动建议与新的记忆学习——但若「以渐退记忆作为组句统计来源」仍启用，既有的记忆仍会以统计方式影响组句。";
+"i18n:UserDef.kFetchSuggestionsFromPerceptionOverrideModel.description" = "启用后，渐退记忆（POM）模块会观察您的选字行为以累积临时记忆，并在敲字时自动以这些记忆提供建议（套用至组句结果、或置顶于候选窗）；既有的记忆亦会以统计方式参与组句。记忆记录会随时间逐渐衰减失效，您亦可随时借由输入法选单清除全部记忆。关闭本选项可停止此类自动建议、新的记忆学习、以及既有的记忆以统计方式参与组句的行为。";
 "i18n:UserDef.kFetchSuggestionsFromPerceptionOverrideModel.shortTitle" = "启用渐退记忆的学习与自动建议";
 "i18n:UserDef.kFilterFactoryKanjisOfNonCurrentInputMode.description" = "启用时，仅存在于相反输入模式（如在简体模式下出现的繁体特有字）的单一汉字候选将从选字窗中移除。倚天中文系统支持的汉字与 CNS 全字库汉字不受影响。注意：过滤范围仅限于万国码 1.0.1 所支持的汉字（即倚天中文系统收字范围）；较新版本万国码才引入的字元不在覆盖范围内。";
 "i18n:UserDef.kFilterFactoryKanjisOfNonCurrentInputMode.shortTitle" = "滤除掉与输入模式不相符的汉字候选";
