@@ -102,6 +102,27 @@ struct POMNGramSourceTests {
     #expect(grams2.contains { $0.current == "媽" && $0.previous == "是" })
   }
 
+  /// 錯位記憶（候選字數 ≠ head 讀音段數，如「體式」記在單 ㄕˊ 下）不得餵入引擎——
+  /// 否則單鍵輸入會被錯位記憶綁架（客訴「打時出體式」）。
+  @Test
+  func testNGramSource_MisalignedCandidateNotFed() {
+    defer { LMAssembly.LMInstantiator.disconnectFactoryDictionary() }
+    let lmi = LMAssembly.LMInstantiator()
+    lmi.memorizePerception(
+      (ngramKey: "(ㄊㄧˇ,體)&(ㄕˊ,體式)", candidate: "體式"),
+      timestamp: Date().timeIntervalSince1970
+    )
+    let grams = lmi.unigramsFor(keyArray: ["ㄕˊ"])
+    #expect(!grams.contains { $0.current == "體式" && $0.previous == "體" })
+    // 對照：等長候選（時）照常注入。
+    lmi.memorizePerception(
+      (ngramKey: "(ㄊㄧˇ,體)&(ㄕˊ,時)", candidate: "時"),
+      timestamp: Date().timeIntervalSince1970
+    )
+    let grams2 = lmi.unigramsFor(keyArray: ["ㄕˊ"])
+    #expect(grams2.contains { $0.current == "時" && $0.previous == "體" })
+  }
+
   /// 快取指紋納入 POM 世代：記憶更新後查詢即反映新記憶。
   @Test
   func testNGramSource_CacheFingerprintTracksPOMGeneration() {

@@ -406,6 +406,8 @@ extension LMAssembly.LXPerceptor {
     let previousStr: String? = parts.previous?.value
 
     for (candidate, override) in perception.overrides {
+      // P192 資料守衛：注音讀音下候選字數 ≠ head 段數之錯位記憶不套用。
+      guard !(isZhuyinReading(keyArrayForCandidate) && candidate.count != keyArrayForCandidate.count) else { continue }
       let overrideScore = calculateWeight(
         eventCount: override.count,
         totalCount: perception.count,
@@ -492,6 +494,8 @@ extension LMAssembly.LXPerceptor {
       let isUnigramKey = candidateParts.previous == nil && candidateParts.anterior == nil
       let isSingleCharUnigram = isUnigramKey && queryHeadSegments.count == 1
       for (candidate, override) in perception.overrides {
+        // P192 資料守衛：注音讀音下候選字數 ≠ head 段數之錯位記憶不套用。
+        guard !(isZhuyinReading(queryHeadSegments) && candidate.count != queryHeadSegments.count) else { continue }
         let overrideScore = calculateWeight(
           eventCount: override.count,
           totalCount: perception.count,
@@ -573,6 +577,18 @@ extension LMAssembly.LXPerceptor {
     return String(String.UnicodeScalarView(scalars))
   }
 
+  /// 判斷一組 head 讀音段是否為「注音字形」讀音（Bopomofo 或注音聲調記號）。
+  /// 用以限定 P192 錯位記憶守衛只作用於真實注音讀音——合成測試常用 ASCII 讀音
+  /// （如 "target"）配多字候選，字數與段數本就不等、不屬資料錯位。
+  nonisolated private func isZhuyinReading(_ segments: [String]) -> Bool {
+    guard !segments.isEmpty else { return false }
+    let toneMarks: Set<Unicode.Scalar> = ["ˊ", "ˇ", "ˋ", "˙"]
+    func isZhuyinScalar(_ scalar: Unicode.Scalar) -> Bool {
+      (0x3100 ... 0x312F).contains(scalar.value) || toneMarks.contains(scalar)
+    }
+    return segments.allSatisfy { $0.unicodeScalars.contains(where: { isZhuyinScalar($0) }) }
+  }
+
   /// 以 head 讀音取回所有高於閾值的 perception 記憶（供 n-gram 餵入，Phase 160 / S2）。
   ///
   /// 讀音比對**預設 `.exact`（逐段：query 段帶聲調→與記憶逐字等值；query 段無聲調
@@ -628,6 +644,9 @@ extension LMAssembly.LXPerceptor {
         let isUnigramKey = parts.previous == nil && parts.anterior == nil
         let isSingleCharUnigram = isUnigramKey && querySegments.count == 1
         for (candidate, override) in perception.overrides {
+          // P192 資料守衛：注音 head 讀音段數與候選字數不符（如「體式」被記在單 ㄕˊ 下）
+          // 的錯位記憶不得餵入/套用——否則單鍵輸入會被錯位記憶綁架（客訴「打時出體式」）。
+          guard !(isZhuyinReading(storedSegments) && candidate.count != storedSegments.count) else { continue }
           let overrideScore = calculateWeight(
             eventCount: override.count,
             totalCount: perception.count,

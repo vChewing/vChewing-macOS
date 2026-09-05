@@ -3965,6 +3965,54 @@ extension InputHandlerTests {
     #expect(testHandler.assembler.assembledSentence.map(\.value) == ["是", "右"])
   }
 
+  /// P192 回歸：錯位 POM 記憶（候選字數 ≠ head 讀音段數，如「體式」被記在單 ㄕˊ 下）
+  /// 不得套用——影片客訴「打『時』(ㄕˊ) 直接組出/送出『體式』」即此類髒資料所致；
+  /// 資料守衛使其不進入建議/套用/餵入，組句維持「時」。
+  @Test
+  func test_IH509_MisalignedPOMCandidateIgnored() throws {
+    guard let testHandler, let testSession else {
+      Issue.record("testHandler and testSession at least one of them is nil.")
+      return
+    }
+    clearTestPOM()
+    defer {
+      testHandler.currentLM.clearTemporaryData(isFiltering: false)
+      testHandler.prefs.furiousTypingEnabled = false
+      testHandler.prefs.keyboardParser = KeyboardParser.ofStandard.rawValue
+      testHandler.ensureKeyboardParser()
+      testHandler.prefs.fetchSuggestionsFromPerceptionOverrideModel = true
+      testSession.resetInputHandler(forceComposerCleanup: true)
+    }
+    [
+      .init(keyArray: ["ㄕˊ"], value: "時", score: -1),
+      .init(keyArray: ["ㄕˋ"], value: "是", score: -1),
+    ].forEach {
+      testHandler.currentLM.insertTemporaryData(unigram: $0, isFiltering: false)
+    }
+    testSession.resetInputHandler(forceComposerCleanup: true)
+    testHandler.prefs.keyboardParser = KeyboardParser.ofHanyuPinyin.rawValue
+    testHandler.ensureKeyboardParser()
+    testHandler.prefs.fetchSuggestionsFromPerceptionOverrideModel = true
+    testHandler.prefs.furiousTypingEnabled = false // 非狂拼（全拼帶調）。
+    testHandler.currentLM.syncPrefs()
+
+    // 錯位記憶：單 ㄕˊ 讀音、候選「體式」(2 字)。
+    testHandler.currentLM.memorizePerception(
+      (ngramKey: "()&()&(ㄕˊ,體式)", candidate: "體式"), timestamp: Date().timeIntervalSince1970
+    )
+    typeSentence("shi2")
+    _ = testHandler.triageInput(event: KBEvent.KeyEventData(chars: " ", keyCode: 49).asEvent)
+    #expect(testHandler.assembler.assembledSentence.map(\.value) == ["時"])
+
+    // 對照：無記憶時亦為「時」。
+    testSession.switchState(.ofAbortion())
+    testSession.resetInputHandler(forceComposerCleanup: true)
+    clearTestPOM()
+    typeSentence("shi2")
+    _ = testHandler.triageInput(event: KBEvent.KeyEventData(chars: " ", keyCode: 49).asEvent)
+    #expect(testHandler.assembler.assembledSentence.map(\.value) == ["時"])
+  }
+
   /// 狂拼固化後 POM 建議套用（容錯模式）：空格固化前方聲調桶後，
   /// `retrievePOMSuggestions(apply: true)` 以容錯查詢召回記憶並就地覆寫——組句結果
   /// 由「是嗎」改為記憶的「是媽」。
