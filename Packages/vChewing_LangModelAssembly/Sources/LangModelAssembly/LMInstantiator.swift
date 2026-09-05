@@ -275,7 +275,7 @@ extension LMAssembly {
     }
 
     /// 清除所有使用者來源的資料（片語、濾除表、符號、關聯詞、置換表、LRU 快取、InputToken 雜湊）。
-    /// 不影響原廠辭典（factoryTrie）與半衰記憶模組（lxPerceptor）。
+    /// 不影響原廠辭典（factoryTrie）與漸退記憶模組（lxPerceptor）。
     /// 在切換使用者片語辭典目錄時必須呼叫此方法，以確保舊目錄的資料不會殘留。
     public func purgeUserData() {
       lmUserPhrases.clear()
