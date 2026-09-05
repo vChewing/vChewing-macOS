@@ -477,6 +477,10 @@ extension LMAssembly.LMInstantiator {
          Self.isKanaSyllableValue(entry.value) {
         continue
       }
+      // 狂拼啟用時，抑制來自原廠辭典（TextMapTrie）的注音文資料。
+      if entryType == .zhuyinwen, config.shouldSuppressFactoryZhuyinwenData {
+        continue
+      }
 
       var score = entry.probability
       if score > 0 {
@@ -514,6 +518,10 @@ extension LMAssembly.LMInstantiator {
       if entryType == .nonKanji,
          config.suppressFactoryUnigramsOfKanaSyllables,
          Self.isKanaSyllableValue(queriedGram.value) {
+        continue
+      }
+      // 狂拼啟用時，抑制來自原廠辭典（TextMapTrie）的注音文資料。
+      if entryType == .zhuyinwen, config.shouldSuppressFactoryZhuyinwenData {
         continue
       }
 
