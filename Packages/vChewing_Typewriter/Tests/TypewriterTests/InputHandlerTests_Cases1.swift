@@ -3911,6 +3911,60 @@ extension InputHandlerTests {
     #expect(candidates.contains { $0.value == "電腦版" })
   }
 
+  /// P192 回歸：引擎注入需「逐段含聲調」等值——記憶「(是)→右(ㄧㄡˋ)」不得影響「是 有(ㄧㄡˇ)」
+  /// 的組句（客訴：打「有」首候選為「右」；錯調 gram keyArray 與節點鍵不符仍可能被 DP 以
+  /// reading-mismatch 選中）。對照：同調（ㄧㄡˋ）注入仍有效。
+  @Test
+  func test_IH508_POMInjectionRequiresExactTone() throws {
+    guard let testHandler, let testSession else {
+      Issue.record("testHandler and testSession at least one of them is nil.")
+      return
+    }
+    clearTestPOM()
+
+    defer {
+      testHandler.currentLM.clearTemporaryData(isFiltering: false)
+      testHandler.prefs.furiousTypingEnabled = false
+      testHandler.prefs.keyboardParser = KeyboardParser.ofStandard.rawValue
+      testHandler.ensureKeyboardParser()
+      testHandler.prefs.fetchSuggestionsFromPerceptionOverrideModel = true
+      testSession.resetInputHandler(forceComposerCleanup: true)
+    }
+
+    [
+      .init(keyArray: ["ㄕˋ"], value: "是", score: -6),
+      .init(keyArray: ["ㄧㄡˇ"], value: "有", score: -1),
+      .init(keyArray: ["ㄧㄡˋ"], value: "右", score: -2),
+      .init(keyArray: ["ㄧㄡˋ"], value: "幼", score: -1),
+    ].forEach {
+      testHandler.currentLM.insertTemporaryData(unigram: $0, isFiltering: false)
+    }
+    testSession.resetInputHandler(forceComposerCleanup: true)
+    testHandler.prefs.keyboardParser = KeyboardParser.ofHanyuPinyin.rawValue
+    testHandler.ensureKeyboardParser()
+    testHandler.prefs.fetchSuggestionsFromPerceptionOverrideModel = true
+    testHandler.prefs.furiousTypingEnabled = false // 非狂拼（一般拼音、全拼帶聲調）。
+    testHandler.currentLM.syncPrefs()
+
+    // 記憶「(是)→右(ㄧㄡˋ)」。
+    testHandler.currentLM.memorizePerception(
+      (ngramKey: "(ㄕˋ,是)&(ㄧㄡˋ,右)", candidate: "右"),
+      timestamp: Date().timeIntervalSince1970
+    )
+
+    // 打「是 有」(shi4 you3)：ㄧㄡˋ 的「右」不得注入 ㄧㄡˇ 節點 → 組句「是有」。
+    typeSentence("shi4you3")
+    _ = testHandler.triageInput(event: KBEvent.KeyEventData(chars: " ", keyCode: 49).asEvent)
+    #expect(testHandler.assembler.assembledSentence.map(\.value) == ["是", "有"])
+
+    // 對照：同調（ㄧㄡˋ）注入仍有效——打「是 右」(shi4 you4)，記憶「(是)→右」勝過「幼」。
+    testSession.switchState(.ofAbortion())
+    testSession.resetInputHandler(forceComposerCleanup: true)
+    typeSentence("shi4you4")
+    _ = testHandler.triageInput(event: KBEvent.KeyEventData(chars: " ", keyCode: 49).asEvent)
+    #expect(testHandler.assembler.assembledSentence.map(\.value) == ["是", "右"])
+  }
+
   /// 狂拼固化後 POM 建議套用（容錯模式）：空格固化前方聲調桶後，
   /// `retrievePOMSuggestions(apply: true)` 以容錯查詢召回記憶並就地覆寫——組句結果
   /// 由「是嗎」改為記憶的「是媽」。

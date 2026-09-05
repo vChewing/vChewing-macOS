@@ -575,13 +575,17 @@ extension LMAssembly.LXPerceptor {
 
   /// 以 head 讀音取回所有高於閾值的 perception 記憶（供 n-gram 餵入，Phase 160 / S2）。
   ///
-  /// 讀音比對沿用容錯語義（預設逐段去聲調等值；`.exact` 為逐段等值）；回傳每筆記憶的
-  /// previous 值（若有）與候選、權重。不做「只留最高分」篩選——n-gram 餵入需要全量記憶，
-  /// 各記憶的前後文（previous）即是 bigram 的條件鍵。
+  /// 讀音比對**預設 `.exact`（逐段：query 段帶聲調→與記憶逐字等值；query 段無聲調
+  /// （聲調桶代表鍵／前綴 partial）→去聲調等值容錯）**——帶調的具體讀音不允許跨聲調注入
+  /// （錯調 gram keyArray 與節點鍵不符仍可能被 DP 以 reading-mismatch 選中，
+  /// 造成「打『有』出『右』」類故障）；無調查詢維持容錯以服務狂拼桶與 partial matching。
+  /// `.toneInsensitivePrefix` 為全局去聲調等值（狂拼 Typewriter 建議查詢專用）。
+  /// 回傳每筆記憶的 previous 值（若有）與候選、權重。不做「只留最高分」篩選——n-gram 餵入
+  /// 需要全量記憶，各記憶的前後文（previous）即是 bigram 的條件鍵。
   nonisolated func perceptionsFor(
     headReading: String,
     timestamp: Double,
-    matchMode: LMAssembly.POMQueryMode = .toneInsensitivePrefix
+    matchMode: LMAssembly.POMQueryMode = .exact
   )
     -> [(headReading: String, previous: String?, anterior: String?, candidate: String, probability: Double)] {
     guard !headReading.isEmpty else { return [] }
@@ -600,8 +604,24 @@ extension LMAssembly.LXPerceptor {
         guard !shouldIgnorePerception(parts) else { continue }
         let storedSegments = segments(of: parts.headReading)
         guard storedSegments.count == querySegments.count else { continue }
-        let headMatches = zip(storedSegments, querySegments).allSatisfy {
-          matchMode == .exact ? $0 == $1 : toneStrippedReading($0) == toneStrippedReading($1)
+        // 比對規則：`.exact` 為「逐段依 query 段是否帶聲調」——query 段帶聲調（具體讀音，
+        // 如注音「ㄧㄡˇ」）需與記憶逐字等值（跨聲調記憶不得注入——「打『有』出『右』」
+        // 類故障）；query 段無聲調（聲調桶代表鍵／前綴 partial）則沿用去聲調等值容錯
+        // （狂拼桶與 partial matching 依賴之，不能妨礙）。
+        // `.toneInsensitivePrefix` 維持全局去聲調等值（狂拼 Typewriter 建議查詢）。
+        let headMatches: Bool
+        switch matchMode {
+        case .toneInsensitivePrefix:
+          headMatches = zip(storedSegments, querySegments).allSatisfy {
+            toneStrippedReading($0) == toneStrippedReading($1)
+          }
+        case .exact:
+          headMatches = zip(storedSegments, querySegments).allSatisfy { stored, query in
+            if toneStrippedReading(query) == query { // query 段無聲調記號
+              return toneStrippedReading(stored) == query
+            }
+            return stored == query
+          }
         }
         guard headMatches else { continue }
         let perception = kvPair.perception

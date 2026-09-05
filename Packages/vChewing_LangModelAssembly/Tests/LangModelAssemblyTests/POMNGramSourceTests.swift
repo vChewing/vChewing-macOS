@@ -48,17 +48,33 @@ struct POMNGramSourceTests {
     #expect(!grams.contains { $0.current == "媽" && $0.previous == "是" })
   }
 
-  /// head 讀音容錯（逐段去聲調等值）：無調形記憶命中帶調查詢。
+  /// head 讀音需**逐段等值、含聲調**（引擎注入恆為具體讀音）：跨聲調記憶不得注入
+  /// （「打『有』(ㄧㄡˇ) 出『右』(ㄧㄡˋ)」類故障的根因——錯調 gram keyArray 與節點鍵不符，
+  /// 仍可能被 DP 以 reading-mismatch 選中）；同調記憶照常注入。
   @Test
-  func testNGramSource_ToneInsensitiveHeadMatch() {
+  func testNGramSource_ExactToneHeadMatchRequired() {
     defer { LMAssembly.LMInstantiator.disconnectFactoryDictionary() }
     let lmi = LMAssembly.LMInstantiator()
     lmi.memorizePerception(
       (ngramKey: "(ㄕˋ,是)&(ㄇㄚ,媽)", candidate: "媽"),
       timestamp: Date().timeIntervalSince1970
     )
-    let grams = lmi.unigramsFor(keyArray: ["ㄇㄚˋ"]) // 帶調查詢
-    #expect(grams.contains { $0.current == "媽" && $0.previous == "是" })
+    lmi.memorizePerception(
+      (ngramKey: "(ㄕˋ,是)&(ㄧㄡˋ,右)", candidate: "右"),
+      timestamp: Date().timeIntervalSince1970
+    )
+    // 跨調查詢（ㄇㄚˋ／ㄧㄡˇ）：不得注入（媽=ㄇㄚ 一調、右=ㄧㄡˋ 四調）。
+    #expect(!lmi.unigramsFor(keyArray: ["ㄇㄚˋ"]).contains { $0.current == "媽" && $0.previous == "是" })
+    #expect(!lmi.unigramsFor(keyArray: ["ㄧㄡˇ"]).contains { $0.current == "右" && $0.previous == "是" })
+    // 同調查詢（ㄇㄚ／ㄧㄡˋ）：照常注入。
+    #expect(lmi.unigramsFor(keyArray: ["ㄇㄚ"]).contains { $0.current == "媽" && $0.previous == "是" })
+    #expect(lmi.unigramsFor(keyArray: ["ㄧㄡˋ"]).contains { $0.current == "右" && $0.previous == "是" })
+    // 無調查詢（聲調桶代表鍵／前綴 partial 語義）：跨調仍容錯注入（狂拼桶與 partial 依賴）。
+    lmi.memorizePerception(
+      (ngramKey: "(ㄕˋ,是)&(ㄇㄚˊ,麻)", candidate: "麻"),
+      timestamp: Date().timeIntervalSince1970
+    )
+    #expect(lmi.unigramsFor(keyArray: ["ㄇㄚ"]).contains { $0.current == "麻" && $0.previous == "是" })
   }
 
   /// unigram 記憶（無前後文）不進入引擎 n-gram 餵入：bare gram 對 DP 無貢獻（節點
