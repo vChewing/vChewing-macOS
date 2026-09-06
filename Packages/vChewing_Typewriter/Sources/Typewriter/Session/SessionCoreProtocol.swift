@@ -31,7 +31,8 @@ public protocol SessionCoreProtocol: AnyObject & CtlCandidateDelegate {
   var id: UUID { get }
   /// 用以記錄當前輸入法狀態的變數。(有 DidSet)
   var state: IMEState { get set }
-  var isASCIIMode: Bool { get }
+  var isASCIIMode: Bool { get set }
+  var inputMode: Shared.InputMode { get }
   var clientMitigationLevel: Int { get }
   var ui: SessionUIProtocol? { get }
 
@@ -156,6 +157,10 @@ extension SessionCoreProtocol {
 // MARK: - Convenience Overloads
 
 extension SessionCoreProtocol {
+  public var inputMode: Shared.InputMode {
+    IMEApp.currentInputMode
+  }
+
   public var isCurrentSession: Bool {
     id == ui?.currentSessionID
   }

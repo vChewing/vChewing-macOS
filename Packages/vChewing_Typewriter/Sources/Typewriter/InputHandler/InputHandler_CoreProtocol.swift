@@ -7,6 +7,7 @@
 // requirements defined in MIT License.
 
 import Foundation
+import Shared
 
 // MARK: - InputHandlerProtocol
 
@@ -52,6 +53,7 @@ public protocol InputHandlerProtocol: AnyObject {
   var strCodePointBuffer: String { get set } // 內碼輸入專用組碼區
   var calligrapher: String { get set } // 磁帶專用組筆區
   var mixedAlphanumericalBuffer: String { get set } // 混輸暫存 ASCII 緩衝區
+  var consecutiveTypingErrors: [String] { get set } // 連續輸入錯誤鍵暫存區
   var furiousTrail: [String] { get set } // 狂拼模式：自動 chop／空格固化提交鍵對應的拼音字母 blob trail
   var furiousHighlightOverride: CandidateInState? { get set } // 狂拼 copilot 窗高亮候選（當拍消費）
   var furiousCoSegmentedOffers: [FuriousCoSegmentedOffer] { get set
@@ -431,6 +433,7 @@ extension InputHandlerProtocol {
   public func clearComposerAndCalligrapher() {
     calligrapher.removeAll()
     composer.clear()
+    consecutiveTypingErrors.removeAll()
     mixedAlphanumericalBuffer.removeAll()
     strCodePointBuffer.removeAll()
   }
@@ -1055,5 +1058,143 @@ extension InputHandlerProtocol {
       assembler.cursor = newCursor
     }
     return textToCommit
+  }
+}
+
+// MARK: - 連續錯誤鍵自動切換英數模式（Auto-switch to Alphanumerical on Consecutive Errors）
+
+extension InputHandlerProtocol {
+  /// 檢查給定按鍵是否屬於注音結構破壞鍵／無效鍵。
+  public func isConsideredPhoneticErrorKey(
+    input: some InputSignalProtocol,
+    inputText: String
+  ) -> Bool {
+    guard !composer.isPinyinMode else { return false }
+    if input.isCommandHeld || input.isControlHeld || input.isOptionHeld {
+      return false
+    }
+
+    // 1. 若該按鍵甚至不在當前鍵盤排列當中，直接判定為錯誤鍵。
+    if !composer.inputValidityCheck(charStr: inputText) {
+      return true
+    }
+
+    // 2. 以副本試驗該按鍵的吸收狀況。
+    var trialComposer = composer
+    let consumed = trialComposer.receiveKey(fromString: inputText)
+    if !consumed || trialComposer.value == composer.value {
+      return true
+    }
+
+    // 2a. 首音調判定：若當前注拼槽為空，且按鍵為聲調，但未開啟前置聲調設定，判定為錯誤鍵。
+    if composer.isEmpty {
+      if !trialComposer.intonation.isEmpty && !prefs.acceptLeadingIntonations {
+        return true
+      }
+      return false
+    }
+
+    // 2b. 覆寫既有位置判定：
+    // 聲母後重複輸入聲母
+    if !composer.consonant.isEmpty, !trialComposer.consonant.isEmpty,
+       composer.consonant != trialComposer.consonant {
+      return true
+    }
+    // 介母後重複輸入介母
+    if !composer.semivowel.isEmpty, !trialComposer.semivowel.isEmpty,
+       composer.semivowel != trialComposer.semivowel {
+      return true
+    }
+    // 韻母後重複輸入韻母
+    if !composer.vowel.isEmpty, !trialComposer.vowel.isEmpty,
+       composer.vowel != trialComposer.vowel {
+      return true
+    }
+    // 聲調後重複輸入聲調
+    if !composer.intonation.isEmpty, !trialComposer.intonation.isEmpty,
+       composer.intonation != trialComposer.intonation {
+      return true
+    }
+
+    // 2c. 聲/介/韻/調 槽位順序違反判定：
+    // 韻母後輸入聲母
+    if !composer.vowel.isEmpty, trialComposer.consonant != composer.consonant {
+      return true
+    }
+    // 韻母後輸入介母
+    if !composer.vowel.isEmpty, trialComposer.semivowel != composer.semivowel {
+      return true
+    }
+    // 介母後輸入聲母
+    if !composer.semivowel.isEmpty, trialComposer.consonant != composer.consonant {
+      return true
+    }
+    // 聲調後輸入聲/介/韻
+    if !composer.intonation.isEmpty,
+       trialComposer.consonant != composer.consonant
+       || trialComposer.semivowel != composer.semivowel
+       || trialComposer.vowel != composer.vowel {
+      return true
+    }
+
+    // 2d. 破壞既有已鍵入音位判定（例如自動糾錯移除掉已有的介母、韻母或聲母）：
+    if !composer.semivowel.isEmpty, trialComposer.semivowel.isEmpty {
+      return true
+    }
+    if !composer.vowel.isEmpty, trialComposer.vowel.isEmpty {
+      return true
+    }
+    if !composer.consonant.isEmpty, trialComposer.consonant.isEmpty {
+      return true
+    }
+
+    return false
+  }
+
+  /// 檢查是否需要因「連續鍵入 5 個錯誤鍵」而自動切換至英數模式。
+  public func handleConsecutiveTypingErrorsSwitchIfNeeded(
+    input: some InputSignalProtocol
+  ) -> Bool? {
+    guard prefs.autoSwitchToAlphanumericalOnConsecutiveErrors,
+          let session = session,
+          session.inputMode == .imeModeCHT,
+          !session.isASCIIMode,
+          !composer.isPinyinMode,
+          !prefs.mixedAlphanumericalEnabled,
+          currentTypingMethod == .vChewingFactory,
+          !input.isCommandHeld, !input.isControlHeld, !input.isOptionHeld,
+          !input.isEnter, !input.isSpace, !input.isTab, !input.isEsc
+    else {
+      if input.isEnter || input.isSpace || input.isTab || input.isEsc || input.isBackSpace || input.isDelete {
+        consecutiveTypingErrors.removeAll()
+      }
+      return nil
+    }
+
+    var inputText = (input.inputTextIgnoringModifiers ?? input.text)
+    inputText = inputText.lowercased().applyingTransformFW2HW(reverse: false)
+
+    let isError = isConsideredPhoneticErrorKey(input: input, inputText: inputText)
+    let charToRecord = input.text.isEmpty ? inputText : input.text
+
+    if isError {
+      consecutiveTypingErrors.append(charToRecord)
+      if consecutiveTypingErrors.count >= 5 {
+        let textToCommit = consecutiveTypingErrors.joined()
+        consecutiveTypingErrors.removeAll()
+        clearComposerAndCalligrapher()
+        assembler.clear()
+        session.switchState(State.ofCommitting(textToCommit: textToCommit))
+        session.isASCIIMode = true
+        return true
+      }
+    } else {
+      if composer.isEmpty {
+        consecutiveTypingErrors = [charToRecord]
+      } else {
+        consecutiveTypingErrors.removeAll()
+      }
+    }
+    return nil
   }
 }

@@ -32,6 +32,9 @@ extension InputHandlerProtocol {
       case .cassette:
         return CassetteTypewriter(self).handle(input)
       case .bopomofoKeyblock:
+        if let handled = handleConsecutiveTypingErrorsSwitchIfNeeded(input: input) {
+          return handled
+        }
         if prefs.mixedAlphanumericalEnabled {
           return MixedAlphanumericalTypewriter(self).handle(input)
         }

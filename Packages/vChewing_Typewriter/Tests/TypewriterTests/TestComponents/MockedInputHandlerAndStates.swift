@@ -67,6 +67,7 @@ public final class MockInputHandler: @MainActor InputHandlerProtocol {
   public var strCodePointBuffer = ""
   public var calligrapher = ""
   public var mixedAlphanumericalBuffer = ""
+  public var consecutiveTypingErrors = [String]()
   public var furiousTrail = [String]() // 狂拼模式：自動 chop 提交鍵對應的拼音字母 blob trail
   public var furiousHighlightOverride: CandidateInState? // 狂拼 copilot 窗高亮候選（當拍消費）
   public var furiousCoSegmentedOffers = [FuriousCoSegmentedOffer]() // 狂拼 copilot 窗聯合重切（P164）的替代切分 offers
@@ -101,6 +102,7 @@ public final class MockSession: @MainActor SessionCoreProtocol {
   public var state: IMEState = .init()
   public var inputHandler: MockInputHandler?
   public var isASCIIMode: Bool = false
+  public var inputMode: Shared.InputMode = .imeModeCHT
   public var clientMitigationLevel: Int = 0
   /// 預設為 nil（候選窗不存在）；測試需要模擬候選窗已顯示時才指派。
   public var mockCandidateController: MockCandidateController?

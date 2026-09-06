@@ -48,6 +48,13 @@ extension InputHandlerProtocol {
     func triageByKeyCode() -> Bool? {
       guard let keyCodeType = KeyCode(rawValue: input.keyCode) else { return nil }
       switch keyCodeType {
+      case .kEscape, .kContextMenu, .kTab, .kDownArrow, .kLeftArrow, .kRightArrow, .kUpArrow,
+           .kHome, .kEnd, .kBackSpace, .kWindowsDelete, .kCarriageReturn, .kLineFeed,
+           .kSymbolMenuPhysicalKeyIntl, .kSymbolMenuPhysicalKeyJIS, .kSpace:
+        consecutiveTypingErrors.removeAll()
+      default: break
+      }
+      switch keyCodeType {
       case .kEscape: return handleEsc()
       case .kContextMenu, .kTab:
         if input.isTab, hasFuriousFrontPending {
