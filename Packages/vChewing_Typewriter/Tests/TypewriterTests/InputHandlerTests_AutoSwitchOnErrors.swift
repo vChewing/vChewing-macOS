@@ -123,6 +123,29 @@ extension InputHandlerTests {
   }
 
   @Test
+  func test_AutoSwitchOnConsecutiveErrors_LeftBracketInputsFullWidthBracket() throws {
+    guard let testHandler, let testSession else {
+      Issue.record("Test handler or session is nil.")
+      return
+    }
+    testHandler.prefs.autoSwitchToAlphanumericalOnConsecutiveErrors = true
+    testSession.inputMode = .imeModeCHT
+    testSession.isASCIIMode = false
+    testSession.recentCommissions.removeAll()
+    testSession.resetInputHandler(forceComposerCleanup: true)
+
+    let leftBracketEvent = KBEvent.KeyEventData(chars: "[", keyCode: 33).asEvent
+    let leftHandled = testHandler.triageInput(event: leftBracketEvent)
+    #expect(leftHandled == true)
+    #expect(testHandler.assembler.assembledSentence.values.joined() == "「")
+
+    let rightBracketEvent = KBEvent.KeyEventData(chars: "]", keyCode: 30).asEvent
+    let rightHandled = testHandler.triageInput(event: rightBracketEvent)
+    #expect(rightHandled == true)
+    #expect(testHandler.assembler.assembledSentence.values.joined() == "「」")
+  }
+
+  @Test
   func test_AutoSwitchOnConsecutiveErrors_SudoApt() throws {
     guard let testHandler, let testSession else {
       Issue.record("Test handler or session is nil.")
@@ -384,7 +407,7 @@ extension InputHandlerTests {
   }
 
   @Test
-  func test_AutoSwitchOnConsecutiveErrors_UnmappedKeys() throws {
+  func test_AutoSwitchOnConsecutiveErrors_MkdirCommand() throws {
     guard let testHandler, let testSession else {
       Issue.record("Test handler or session is nil.")
       return
@@ -395,11 +418,20 @@ extension InputHandlerTests {
     testSession.recentCommissions.removeAll()
     testSession.resetInputHandler(forceComposerCleanup: true)
 
-    // On Dachen, '[' and ']' are not assigned to any Bopomofo phonabet
-    typeSentence("[][][")
+    var switchedToABC = false
+    SessionHost.shared.switchToSystemABCInputSource = {
+      switchedToABC = true
+      return true
+    }
+    defer {
+      SessionHost.shared.switchToSystemABCInputSource = { false }
+    }
 
-    #expect(testSession.recentCommissions == ["[][]["])
+    typeSentence("mkdir")
+
+    #expect(switchedToABC == true)
     #expect(testSession.isASCIIMode == true)
+    #expect(testSession.recentCommissions == ["mkdir"])
     #expect(testHandler.composer.isEmpty)
     #expect(testHandler.assembler.isEmpty)
   }

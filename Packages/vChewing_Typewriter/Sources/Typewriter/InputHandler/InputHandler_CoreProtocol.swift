@@ -1234,6 +1234,16 @@ extension InputHandlerProtocol {
       return true
     }
 
+    // 若尚未處於錯誤狀態（累積小於 2 個鍵），且該鍵是合法標點符號按鍵（詞庫中有定義標點符號），
+    // 則視為正常的中文標點輸入，不判定為錯誤。
+    if let puncKeys = punctuationQueryStrings(input: input),
+       puncKeys.contains(where: { currentLM.hasUnigramsFor(keyArray: [$0]) })
+    {
+      consecutiveTypingErrors.removeAll()
+      inFlightComposerKeys.removeAll()
+      return nil
+    }
+
     let isError = isConsideredPhoneticErrorKey(input: input, inputText: inputText)
 
     if isError {
