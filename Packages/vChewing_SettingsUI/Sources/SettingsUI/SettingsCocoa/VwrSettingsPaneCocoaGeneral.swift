@@ -64,6 +64,10 @@ extension SettingsPanesCocoa {
             fixWidth: contentWidth,
             prefUITab: .tabGeneral
           )
+          UserDef.kAutoSwitchToAlphanumericalOnConsecutiveErrors.renderCocoa(
+            fixWidth: contentWidth,
+            prefUITab: .tabGeneral
+          )
           UserDef.kShowHanyuPinyinInCompositionBuffer.renderCocoa(
             fixWidth: contentWidth,
             prefUITab: .tabGeneral
