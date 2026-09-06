@@ -52,6 +52,7 @@ extension InputHandlerProtocol {
            .kHome, .kEnd, .kBackSpace, .kWindowsDelete, .kCarriageReturn, .kLineFeed,
            .kSymbolMenuPhysicalKeyIntl, .kSymbolMenuPhysicalKeyJIS:
         consecutiveTypingErrors.removeAll()
+        inFlightComposerKeys.removeAll()
       default: break
       }
       switch keyCodeType {

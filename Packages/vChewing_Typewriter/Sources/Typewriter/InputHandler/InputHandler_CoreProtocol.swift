@@ -54,6 +54,7 @@ public protocol InputHandlerProtocol: AnyObject {
   var calligrapher: String { get set } // 磁帶專用組筆區
   var mixedAlphanumericalBuffer: String { get set } // 混輸暫存 ASCII 緩衝區
   var consecutiveTypingErrors: [String] { get set } // 連續輸入錯誤鍵暫存區
+  var inFlightComposerKeys: [String] { get set } // 當前注拼槽對應的鍵入字元暫存區
   var furiousTrail: [String] { get set } // 狂拼模式：自動 chop／空格固化提交鍵對應的拼音字母 blob trail
   var furiousHighlightOverride: CandidateInState? { get set } // 狂拼 copilot 窗高亮候選（當拍消費）
   var furiousCoSegmentedOffers: [FuriousCoSegmentedOffer] { get set
@@ -434,6 +435,7 @@ extension InputHandlerProtocol {
     calligrapher.removeAll()
     composer.clear()
     consecutiveTypingErrors.removeAll()
+    inFlightComposerKeys.removeAll()
     mixedAlphanumericalBuffer.removeAll()
     strCodePointBuffer.removeAll()
   }
@@ -1094,7 +1096,14 @@ extension InputHandlerProtocol {
       return false
     }
 
-    // 2b. 覆寫既有位置判定：
+    // 2b. 試驗吸收後的聲介韻組合是否在國語注音合法音節集合內。
+    // 若注拼槽已有音位，且追加此鍵後的聲介韻組合不屬於任何合法音節或合法音節前綴，直接判定為錯誤鍵。
+    let trialZhuyin = trialComposer.consonant.value + trialComposer.semivowel.value + trialComposer.vowel.value
+    if !trialZhuyin.isEmpty && !Tekkon.allValidMandarinSyllables.contains(trialZhuyin) {
+      return true
+    }
+
+    // 2c. 覆寫既有位置判定：
     // 聲母後重複輸入聲母
     if !composer.consonant.isEmpty, !trialComposer.consonant.isEmpty,
        composer.consonant != trialComposer.consonant {
@@ -1116,7 +1125,7 @@ extension InputHandlerProtocol {
       return true
     }
 
-    // 2c. 聲/介/韻/調 槽位順序違反判定：
+    // 2d. 聲/介/韻/調 槽位順序違反判定：
     // 韻母後輸入聲母
     if !composer.vowel.isEmpty, trialComposer.consonant != composer.consonant {
       return true
@@ -1137,7 +1146,7 @@ extension InputHandlerProtocol {
       return true
     }
 
-    // 2d. 破壞既有已鍵入音位判定（例如自動糾錯移除掉已有的介母、韻母或聲母）：
+    // 2e. 破壞既有已鍵入音位判定（例如自動糾錯移除掉已有的介母、韻母或聲母）：
     if !composer.semivowel.isEmpty, trialComposer.semivowel.isEmpty {
       return true
     }
@@ -1174,6 +1183,7 @@ extension InputHandlerProtocol {
         || input.isLeft || input.isRight || input.isPageUp || input.isPageDown || input.isHome || input.isEnd
       {
         consecutiveTypingErrors.removeAll()
+        inFlightComposerKeys.removeAll()
       }
       return nil
     }
@@ -1182,6 +1192,7 @@ extension InputHandlerProtocol {
       switch keyCodeType {
       case .kSymbolMenuPhysicalKeyIntl, .kSymbolMenuPhysicalKeyJIS, .kContextMenu:
         consecutiveTypingErrors.removeAll()
+        inFlightComposerKeys.removeAll()
         return nil
       default: break
       }
@@ -1194,12 +1205,14 @@ extension InputHandlerProtocol {
         consecutiveTypingErrors.append(" ")
         composer.clear()
         calligrapher.removeAll()
+        inFlightComposerKeys.removeAll()
         if consecutiveTypingErrors.count >= 5 {
           return commitConsecutiveErrorsAndSwitchToABC(session: session)
         }
         return true
       } else {
         consecutiveTypingErrors.removeAll()
+        inFlightComposerKeys.removeAll()
         return nil
       }
     }
@@ -1209,11 +1222,12 @@ extension InputHandlerProtocol {
     let charToRecord = input.text.isEmpty ? inputText : input.text
 
     // 當已處於連續錯誤狀態（已累積 >= 2 個鍵）時，後續無論是字母、標點符號或數字，
-    // 皆視為正在輸入英數字串（如 "cd .." 中的 "." 與 "/"），持續累積直到滿 5 鍵自動切換。
+    // 皆視為正在輸入英數字串（如 "cd .." 中的 "." 與 "/"、"git log" 中的字母），持續累積直到滿 5 鍵自動切換。
     if consecutiveTypingErrors.count >= 2 {
       consecutiveTypingErrors.append(charToRecord)
       composer.clear()
       calligrapher.removeAll()
+      inFlightComposerKeys.removeAll()
       if consecutiveTypingErrors.count >= 5 {
         return commitConsecutiveErrorsAndSwitchToABC(session: session)
       }
@@ -1223,7 +1237,14 @@ extension InputHandlerProtocol {
     let isError = isConsideredPhoneticErrorKey(input: input, inputText: inputText)
 
     if isError {
-      consecutiveTypingErrors.append(charToRecord)
+      // 若在累積錯誤鍵之前注拼槽內已有尚未固化／提交的鍵入字元（如合法的聲母或介母，但因後續鍵入破壞注音結構而判定為英文打字），
+      // 將這些尚未成為完整漢字的按鍵一併作為錯誤鍵序列納入
+      if !inFlightComposerKeys.isEmpty {
+        consecutiveTypingErrors = inFlightComposerKeys + [charToRecord]
+        inFlightComposerKeys.removeAll()
+      } else {
+        consecutiveTypingErrors.append(charToRecord)
+      }
       composer.clear()
       calligrapher.removeAll()
       if consecutiveTypingErrors.count >= 5 {
@@ -1232,9 +1253,10 @@ extension InputHandlerProtocol {
       return true
     } else {
       if composer.isEmpty {
+        inFlightComposerKeys = [charToRecord]
         consecutiveTypingErrors = [charToRecord]
       } else {
-        consecutiveTypingErrors.removeAll()
+        inFlightComposerKeys.append(charToRecord)
       }
     }
     return nil
@@ -1244,6 +1266,7 @@ extension InputHandlerProtocol {
   private func commitConsecutiveErrorsAndSwitchToABC(session: Session) -> Bool {
     let textToCommit = consecutiveTypingErrors.joined()
     consecutiveTypingErrors.removeAll()
+    inFlightComposerKeys.removeAll()
     composer.clear()
     calligrapher.removeAll()
     assembler.clear()

@@ -68,6 +68,7 @@ public final class MockInputHandler: @MainActor InputHandlerProtocol {
   public var calligrapher = ""
   public var mixedAlphanumericalBuffer = ""
   public var consecutiveTypingErrors = [String]()
+  public var inFlightComposerKeys = [String]()
   public var furiousTrail = [String]() // 狂拼模式：自動 chop 提交鍵對應的拼音字母 blob trail
   public var furiousHighlightOverride: CandidateInState? // 狂拼 copilot 窗高亮候選（當拍消費）
   public var furiousCoSegmentedOffers = [FuriousCoSegmentedOffer]() // 狂拼 copilot 窗聯合重切（P164）的替代切分 offers

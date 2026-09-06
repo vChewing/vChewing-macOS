@@ -325,6 +325,7 @@ public struct BPMFFullMatchTypewriter<Handler: InputHandlerProtocol>: Typewriter
 
       handler.composer.clear()
       handler.consecutiveTypingErrors.removeAll()
+      handler.inFlightComposerKeys.removeAll()
       switch handler.assembler.isEmpty {
       case false: session.switchState(handler.generateStateOfInputting())
       case true: session.switchState(State.ofAbortion())
@@ -356,6 +357,7 @@ public struct BPMFFullMatchTypewriter<Handler: InputHandlerProtocol>: Typewriter
     handler.retrievePOMSuggestions(apply: true)
     handler.composer.clear()
     handler.consecutiveTypingErrors.removeAll()
+    handler.inFlightComposerKeys.removeAll()
 
     var inputting = handler.generateStateOfInputting()
     inputting.textToCommit = textToCommit

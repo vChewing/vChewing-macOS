@@ -86,6 +86,105 @@ extension InputHandlerTests {
   }
 
   @Test
+  func test_AutoSwitchOnConsecutiveErrors_GitLog() throws {
+    guard let testHandler, let testSession else {
+      Issue.record("Test handler or session is nil.")
+      return
+    }
+    testHandler.prefs.autoSwitchToAlphanumericalOnConsecutiveErrors = true
+    testSession.inputMode = .imeModeCHT
+    testSession.isASCIIMode = false
+    testSession.recentCommissions.removeAll()
+    testSession.resetInputHandler(forceComposerCleanup: true)
+
+    var switchedToABC = false
+    SessionHost.shared.switchToSystemABCInputSource = {
+      switchedToABC = true
+      return true
+    }
+    defer {
+      SessionHost.shared.switchToSystemABCInputSource = { false }
+    }
+
+    for ch in "git log" {
+      _ = testHandler.triageInput(event: KBEvent.KeyEventData(chars: String(ch)).asEvent)
+    }
+    #expect(switchedToABC == true)
+    #expect(testSession.isASCIIMode == true)
+    #expect(testSession.recentCommissions == ["git l"])
+    #expect(testHandler.composer.isEmpty)
+    #expect(testHandler.assembler.isEmpty)
+
+    // 後續按鍵在英數模式下 pass-through 直接交由 OS 送出
+    let oHandled = testHandler.triageInput(event: KBEvent.KeyEventData(chars: "o").asEvent)
+    #expect(!oHandled)
+    let gHandled = testHandler.triageInput(event: KBEvent.KeyEventData(chars: "g").asEvent)
+    #expect(!gHandled)
+  }
+
+  @Test
+  func test_AutoSwitchOnConsecutiveErrors_SudoApt() throws {
+    guard let testHandler, let testSession else {
+      Issue.record("Test handler or session is nil.")
+      return
+    }
+    testHandler.prefs.autoSwitchToAlphanumericalOnConsecutiveErrors = true
+    testSession.inputMode = .imeModeCHT
+    testSession.isASCIIMode = false
+    testSession.recentCommissions.removeAll()
+    testSession.resetInputHandler(forceComposerCleanup: true)
+
+    var switchedToABC = false
+    SessionHost.shared.switchToSystemABCInputSource = {
+      switchedToABC = true
+      return true
+    }
+    defer {
+      SessionHost.shared.switchToSystemABCInputSource = { false }
+    }
+
+    // "sudo " 剛好滿 5 個鍵，即使 "su" 在大千上是合法的 "ㄋㄧ"，
+    // 當鍵入第三鍵 "d"（ㄎ）時因破壞注音結構而判定為英文打字，前序字元 "su" 一併納入錯誤序列；
+    // 鍵入到第 5 鍵空格時即觸發切換至 ABC 並遞交 "sudo "。
+    typeSentence("sudo ")
+    #expect(switchedToABC == true)
+    #expect(testSession.isASCIIMode == true)
+    #expect(testSession.recentCommissions == ["sudo "])
+    #expect(testHandler.composer.isEmpty)
+    #expect(testHandler.assembler.isEmpty)
+  }
+
+  @Test
+  func test_AutoSwitchOnConsecutiveErrors_NormalChineseTypingUntouched() throws {
+    guard let testHandler, let testSession else {
+      Issue.record("Test handler or session is nil.")
+      return
+    }
+    testHandler.prefs.autoSwitchToAlphanumericalOnConsecutiveErrors = true
+    testSession.inputMode = .imeModeCHT
+    testSession.isASCIIMode = false
+    testSession.recentCommissions.removeAll()
+    testSession.resetInputHandler(forceComposerCleanup: true)
+
+    var switchedToABC = false
+    SessionHost.shared.switchToSystemABCInputSource = {
+      switchedToABC = true
+      return true
+    }
+    defer {
+      SessionHost.shared.switchToSystemABCInputSource = { false }
+    }
+
+    // 正常輸入注音："su3" -> "你" (3聲)
+    typeSentence("su3")
+    #expect(!switchedToABC)
+    #expect(!testSession.isASCIIMode)
+    #expect(testHandler.consecutiveTypingErrors.isEmpty)
+    #expect(testHandler.inFlightComposerKeys.isEmpty)
+    #expect(testHandler.assembler.assembledSentence.values.joined() == "你")
+  }
+
+  @Test
   func test_AutoSwitchOnConsecutiveErrors_CdDotDotSlashFallbackToASCII() throws {
     guard let testHandler, let testSession else {
       Issue.record("Test handler or session is nil.")

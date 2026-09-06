@@ -32,6 +32,16 @@ public enum Tekkon {
     allowedConsonants + allowedSemivowels + allowedVowels + allowedIntonations
   }
 
+  /// 所有合法的國語注音音節與合法前綴（不含聲調）集合。
+  public static let allValidMandarinSyllables: Set<String> = {
+    var set = Set<String>()
+    for (phona, _) in arrPhonaToHanyuPinyin {
+      if [" ", "ˊ", "ˇ", "ˋ", "˙"].contains(phona) { continue }
+      set.insert(phona)
+    }
+    return set
+  }()
+
   // MARK: Internal
 
   /// 原始轉換對照表資料貯存專用佇列（數字標調格式）。
