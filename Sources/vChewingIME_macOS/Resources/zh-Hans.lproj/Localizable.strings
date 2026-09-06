@@ -345,6 +345,8 @@
 "i18n:UserDef.kAutoCompositeWithLongestPossibleCassetteKey.shortTitle" = "在已经敲出最长可能码的时候自动组字";
 "i18n:UserDef.kAutoCorrectReadingCombination.description" = "该功能在中英混合输入回退时不起作用，以确保相容性。";
 "i18n:UserDef.kAutoCorrectReadingCombination.shortTitle" = "敲字时自动纠正读音组合";
+"i18n:UserDef.kAutoSwitchToAlphanumericalOnConsecutiveErrors.description" = "在「唯音-繁」中文模式下，若连续输入破坏注音结构的错误键达 5 次，将清空组字区并输出对应英数文字，随后自动切换至英数模式。";
+"i18n:UserDef.kAutoSwitchToAlphanumericalOnConsecutiveErrors.shortTitle" = "连续键入错误达 5 键时自动切换至英数模式";
 "i18n:UserDef.kBasicKeyboardLayout.description" = "请选择 macOS 基础键盘布局。注音打字与拼音打字现为可随时互相切换的打字模式：拼音打字时，此布局决定实际按键输出（非 QWERTY 英数布局亦适用）；注音打字时，按键一律依标准键位翻译，荧幕键盘亦随之显示。";
 "i18n:UserDef.kBasicKeyboardLayout.shortTitle" = "基础键盘布局:";
 "i18n:UserDef.kBeepSoundPreference.option.0" = "静音";

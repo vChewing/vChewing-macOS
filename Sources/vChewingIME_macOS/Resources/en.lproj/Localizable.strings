@@ -345,6 +345,8 @@
 "i18n:UserDef.kAutoCompositeWithLongestPossibleCassetteKey.shortTitle" = "Auto-composite when the longest possible key is formed";
 "i18n:UserDef.kAutoCorrectReadingCombination.description" = "This feature is disabled with mixed Chinese-English typing fallback due to compatibility concerns.";
 "i18n:UserDef.kAutoCorrectReadingCombination.shortTitle" = "Automatically correct reading combinations when typing";
+"i18n:UserDef.kAutoSwitchToAlphanumericalOnConsecutiveErrors.description" = "Under Traditional Chinese typing mode, clear the composition buffer, commit corresponding alphanumeric text, and switch to alphanumeric mode if 5 consecutive invalid phonetic keys are pressed.";
+"i18n:UserDef.kAutoSwitchToAlphanumericalOnConsecutiveErrors.shortTitle" = "Auto-switch to alphanumeric mode upon 5 consecutive typing errors";
 "i18n:UserDef.kBasicKeyboardLayout.description" = "Choose the macOS-level basic keyboard layout. Zhuyin typing and Pinyin typing are now mutually switchable modes: while typing Pinyin, this layout determines the actual characters produced by your keys, so non-QWERTY alphanumerical keyboard layouts apply as well; while typing Zhuyin, keystrokes are translated as if on a standard layout, and the on-screen keyboard is displayed accordingly.";
 "i18n:UserDef.kBasicKeyboardLayout.shortTitle" = "Basic Keyboard Layout:";
 "i18n:UserDef.kBeepSoundPreference.option.0" = "Muted";
