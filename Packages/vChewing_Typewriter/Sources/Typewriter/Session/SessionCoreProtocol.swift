@@ -32,6 +32,9 @@ public protocol SessionCoreProtocol: AnyObject & CtlCandidateDelegate {
   /// 用以記錄當前輸入法狀態的變數。(有 DidSet)
   var state: IMEState { get set }
   var isASCIIMode: Bool { get set }
+  /// 記錄是否剛觸發連續錯誤自動切換至 ABC，此時在 deactivateServer 前應將後續按鍵 pass-through 給系統。
+  var isPassThroughUntilDeactivated: Bool { get set }
+  var passThroughUntilDeactivatedTimestamp: Date? { get set }
   var inputMode: Shared.InputMode { get }
   var clientMitigationLevel: Int { get }
   var ui: SessionUIProtocol? { get }

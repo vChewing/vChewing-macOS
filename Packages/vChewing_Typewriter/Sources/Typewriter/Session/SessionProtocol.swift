@@ -193,6 +193,8 @@ extension SessionProtocol {
   }
 
   public func performServerDeactivation() {
+    isPassThroughUntilDeactivated = false
+    passThroughUntilDeactivatedTimestamp = nil
     guard Self.current?.id != id else { return }
     isActivated = false
     // `resetInputHandler()` 會自動搞定 Empty 狀態。
@@ -212,6 +214,8 @@ extension SessionProtocol {
   }
 
   public func performServerActivation() {
+    isPassThroughUntilDeactivated = false
+    passThroughUntilDeactivatedTimestamp = nil
     // 檢查若前次是因連續鍵入錯誤而自動切換至 ABC，在使用者重新切回唯音時應自動恢復為中文模式。
     if Self.isAutoSwitchedToABC {
       Self.isAutoSwitchedToABC = false
@@ -236,6 +240,9 @@ extension SessionProtocol {
         inputMode = resolvedInputMode
       }
       state = .ofEmpty()
+      if isASCIIMode, !SessionHost.shared.isKeyboardJIS() {
+        isASCIIMode = false
+      }
       lastAppliedKeyboardLayout = nil
       setKeyLayout()
       return

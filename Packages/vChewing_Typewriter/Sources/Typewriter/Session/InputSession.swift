@@ -83,6 +83,9 @@ public final class InputSession: @MainActor SessionProtocol, Sendable {
 
   public let id: UUID = .init()
 
+  public var isPassThroughUntilDeactivated: Bool = false
+  public var passThroughUntilDeactivatedTimestamp: Date? = nil
+
   public var clientProxyObjectIdentifier: ObjectIdentifier?
 
   public var buzzer: (() -> ())? = { mainSync { SessionHost.shared.buzz() } }

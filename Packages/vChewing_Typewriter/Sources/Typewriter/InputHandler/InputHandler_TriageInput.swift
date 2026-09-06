@@ -9,11 +9,21 @@
 /// 該檔案乃輸入調度模組當中「用來規定當 IMK 接受按鍵訊號時且首次交給輸入調度模組處理時、
 /// 輸入調度模組要率先處理」的部分。據此判斷是否需要將按鍵處理委派給其它成員函式。
 
+import Foundation
+
 // MARK: - § 根據狀態調度按鍵輸入 (Handle Input with States) * Triage
 
 extension InputHandlerProtocol {
   public func triageInput(event input: InputSignalProtocol) -> Bool {
     guard let session = session else { return false }
+    if session.isPassThroughUntilDeactivated {
+      if let timestamp = session.passThroughUntilDeactivatedTimestamp,
+         Date().timeIntervalSince(timestamp) < 2.0 {
+        return false
+      }
+      session.isPassThroughUntilDeactivated = false
+      session.passThroughUntilDeactivatedTimestamp = nil
+    }
     var state: State { session.state }
     currentLM.syncPrefs()
 

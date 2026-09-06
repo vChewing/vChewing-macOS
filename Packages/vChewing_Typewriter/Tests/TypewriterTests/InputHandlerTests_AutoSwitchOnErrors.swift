@@ -45,7 +45,8 @@ extension InputHandlerTests {
     #expect(testSession.recentCommissions == ["great"])
     #expect(switchedToABC == true)
     #expect(InputSession.isAutoSwitchedToABC == true)
-    #expect(testSession.isASCIIMode == true)
+    #expect(testSession.isPassThroughUntilDeactivated == true)
+    #expect(testSession.isASCIIMode == false)
     #expect(testHandler.composer.isEmpty)
     #expect(testHandler.assembler.isEmpty)
   }
@@ -74,17 +75,19 @@ extension InputHandlerTests {
 
     // 當輸入到第 5 鍵（即 "cd .." 中的第二個 "."）時，累計達到 5 個錯誤鍵，
     // 即刻觸發自動切換至系統 ABC 輸入法，並將已鍵入的 5 個英數字元 "cd .." 遞交。
-    // 同時唯音內部狀態亦切換為英數模式（isASCIIMode == true），確保尚未切離此 session 的後續按鍵（如第 6 鍵 "/"）
+    // 同時標記 isPassThroughUntilDeactivated == true，確保尚未切離此 session 的後續按鍵（如第 6 鍵 "/"）
     // 不會被唯音當成注音（大千鍵盤的 "ㄥ"）攔截，而是直接 pass-through 由 OS 送出。
+    // 唯音自身的 isASCIIMode 仍保持 false（中文模式），以確保切回唯音時能直接輸入中文。
     typeSentence("cd ..")
     #expect(switchedToABC == true)
     #expect(InputSession.isAutoSwitchedToABC == true)
     #expect(testSession.recentCommissions == ["cd .."])
-    #expect(testSession.isASCIIMode == true)
+    #expect(testSession.isPassThroughUntilDeactivated == true)
+    #expect(testSession.isASCIIMode == false)
     #expect(testHandler.composer.isEmpty)
     #expect(testHandler.assembler.isEmpty)
 
-    // 第 6 鍵 "/" 在英數模式下 pass-through 直接由系統處理，不被唯音攔截為注音 "ㄥ"
+    // 第 6 鍵 "/" 在 pass-through 模式下直接由系統處理，不被唯音攔截為注音 "ㄥ"
     let slashHandled = testHandler.triageInput(event: KBEvent.KeyEventData(chars: "/").asEvent)
     #expect(!slashHandled)
   }
@@ -114,12 +117,13 @@ extension InputHandlerTests {
       _ = testHandler.triageInput(event: KBEvent.KeyEventData(chars: String(ch)).asEvent)
     }
     #expect(switchedToABC == true)
-    #expect(testSession.isASCIIMode == true)
+    #expect(testSession.isPassThroughUntilDeactivated == true)
+    #expect(testSession.isASCIIMode == false)
     #expect(testSession.recentCommissions == ["git l"])
     #expect(testHandler.composer.isEmpty)
     #expect(testHandler.assembler.isEmpty)
 
-    // 後續按鍵在英數模式下 pass-through 直接交由 OS 送出
+    // 後續按鍵在 pass-through 模式下直接交由 OS 送出
     let oHandled = testHandler.triageInput(event: KBEvent.KeyEventData(chars: "o").asEvent)
     #expect(!oHandled)
     let gHandled = testHandler.triageInput(event: KBEvent.KeyEventData(chars: "g").asEvent)
@@ -175,7 +179,8 @@ extension InputHandlerTests {
     // 鍵入到第 5 鍵空格時即觸發切換至 ABC 並遞交 "sudo "。
     typeSentence("sudo ")
     #expect(switchedToABC == true)
-    #expect(testSession.isASCIIMode == true)
+    #expect(testSession.isPassThroughUntilDeactivated == true)
+    #expect(testSession.isASCIIMode == false)
     #expect(testSession.recentCommissions == ["sudo "])
     #expect(testHandler.composer.isEmpty)
     #expect(testHandler.assembler.isEmpty)
@@ -278,6 +283,15 @@ extension InputHandlerTests {
     testSession.recentCommissions.removeAll()
     testSession.resetInputHandler(forceComposerCleanup: true)
 
+    var switchedToABC = false
+    SessionHost.shared.switchToSystemABCInputSource = {
+      switchedToABC = true
+      return true
+    }
+    defer {
+      SessionHost.shared.switchToSystemABCInputSource = { false }
+    }
+
     // Type a valid Chinese syllable first: ㄧㄡ ("u. ") -> forms a node in assembler
     typeSentence("u. ")
     #expect(!testHandler.assembler.isEmpty)
@@ -287,7 +301,9 @@ extension InputHandlerTests {
 
     // The prior assembled sentence must be discarded, only "great" committed
     #expect(testSession.recentCommissions.last == "great")
-    #expect(testSession.isASCIIMode == true)
+    #expect(switchedToABC == true)
+    #expect(testSession.isPassThroughUntilDeactivated == true)
+    #expect(testSession.isASCIIMode == false)
     #expect(testHandler.assembler.isEmpty)
     #expect(testHandler.composer.isEmpty)
   }
@@ -434,7 +450,8 @@ extension InputHandlerTests {
     typeSentence("mkdir")
 
     #expect(switchedToABC == true)
-    #expect(testSession.isASCIIMode == true)
+    #expect(testSession.isPassThroughUntilDeactivated == true)
+    #expect(testSession.isASCIIMode == false)
     #expect(testSession.recentCommissions == ["mkdir"])
     #expect(testHandler.composer.isEmpty)
     #expect(testHandler.assembler.isEmpty)
@@ -467,9 +484,51 @@ extension InputHandlerTests {
     typeSentence("git")
 
     #expect(switchedToABC == true)
-    #expect(testSession.isASCIIMode == true)
+    #expect(testSession.isPassThroughUntilDeactivated == true)
+    #expect(testSession.isASCIIMode == false)
     #expect(testSession.recentCommissions == ["git"])
     #expect(testHandler.composer.isEmpty)
     #expect(testHandler.assembler.isEmpty)
+  }
+
+  /// 測試自動切換至 ABC 後，使用者重新切回唯音（performServerActivation）時，
+  /// 輸入法應已重置 pass-through 狀態並維持中文模式（isASCIIMode == false），
+  /// 且能立即正常鍵入中文。
+  @Test
+  func test_AutoSwitchOnConsecutiveErrors_SwitchBackToVChewingEnablesChineseImmediately() throws {
+    guard let testHandler, let testSession else {
+      Issue.record("Test handler or session is nil.")
+      return
+    }
+    testHandler.prefs.autoSwitchToAlphanumericalOnConsecutiveErrors = true
+    testSession.inputMode = .imeModeCHT
+    testSession.isASCIIMode = false
+    testSession.recentCommissions.removeAll()
+    testSession.resetInputHandler(forceComposerCleanup: true)
+
+    SessionHost.shared.switchToSystemABCInputSource = { true }
+    defer {
+      SessionHost.shared.switchToSystemABCInputSource = { false }
+    }
+
+    // 1. 打 "cd .." 觸發自動切換至 ABC
+    typeSentence("cd ..")
+    #expect(testSession.recentCommissions == ["cd .."])
+    #expect(testSession.isPassThroughUntilDeactivated == true)
+    #expect(testSession.isASCIIMode == false)
+
+    // 2. 隨後的 "/" 仍在 pass-through，不被攔截
+    let slashHandled = testHandler.triageInput(event: KBEvent.KeyEventData(chars: "/").asEvent)
+    #expect(!slashHandled)
+
+    // 3. 模擬使用者透過 Cmd+Space 切回唯音：呼叫 performServerActivation
+    testSession.performServerActivation()
+    #expect(testSession.isPassThroughUntilDeactivated == false)
+    #expect(testSession.isASCIIMode == false)
+
+    // 4. 切回唯音後，應立即能正常輸入中文，無須手動按 Shift 或再次切換
+    // 在大千鍵盤上打 "su3" -> "你" (3聲)
+    typeSentence("su3")
+    #expect(testHandler.assembler.assembledSentence.values.joined() == "你")
   }
 }
