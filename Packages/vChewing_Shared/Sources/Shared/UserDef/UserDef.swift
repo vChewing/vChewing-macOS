@@ -500,7 +500,7 @@ nonisolated extension UserDef {
     case .kFetchSuggestionsFromPerceptionOverrideModel: return .bool(true)
     case .kUseFixedCandidateOrderOnSelection: return .bool(false)
     case .kAutoCorrectReadingCombination: return .bool(true)
-    case .kAutoSwitchToAlphanumericalOnConsecutiveErrors: return .bool(false)
+    case .kAutoSwitchToAlphanumericalOnConsecutiveErrors: return .bool(true)
     case .kConsecutiveTypingErrorsThreshold: return .integer(5)
     case .kReadingNarrationCoverage: return .integer(0)
     case .kAlsoConfirmAssociatedCandidatesByEnter: return .bool(false)
