@@ -50,7 +50,7 @@ extension InputHandlerProtocol {
       switch keyCodeType {
       case .kEscape, .kContextMenu, .kTab, .kDownArrow, .kLeftArrow, .kRightArrow, .kUpArrow,
            .kHome, .kEnd, .kBackSpace, .kWindowsDelete, .kCarriageReturn, .kLineFeed,
-           .kSymbolMenuPhysicalKeyIntl, .kSymbolMenuPhysicalKeyJIS, .kSpace:
+           .kSymbolMenuPhysicalKeyIntl, .kSymbolMenuPhysicalKeyJIS:
         consecutiveTypingErrors.removeAll()
       default: break
       }

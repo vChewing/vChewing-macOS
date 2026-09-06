@@ -1163,10 +1163,13 @@ extension InputHandlerProtocol {
           !prefs.mixedAlphanumericalEnabled,
           currentTypingMethod == .vChewingFactory,
           !input.isCommandHeld, !input.isControlHeld, !input.isOptionHeld,
-          !input.isEnter, !input.isSpace, !input.isTab, !input.isEsc,
-          !input.isBackSpace, !input.isDelete
+          !input.isEnter, !input.isTab, !input.isEsc,
+          !input.isBackSpace, !input.isDelete,
+          !input.isCursorBackward, !input.isCursorForward,
+          !input.isUp, !input.isDown, !input.isLeft, !input.isRight,
+          !input.isPageUp, !input.isPageDown, !input.isHome, !input.isEnd
     else {
-      if input.isEnter || input.isSpace || input.isTab || input.isEsc || input.isBackSpace || input.isDelete
+      if input.isEnter || input.isTab || input.isEsc || input.isBackSpace || input.isDelete
         || input.isCursorBackward || input.isCursorForward || input.isUp || input.isDown
         || input.isLeft || input.isRight || input.isPageUp || input.isPageDown || input.isHome || input.isEnd
       {
@@ -1175,18 +1178,56 @@ extension InputHandlerProtocol {
       return nil
     }
 
+    if let keyCodeType = KeyCode(rawValue: input.keyCode) {
+      switch keyCodeType {
+      case .kSymbolMenuPhysicalKeyIntl, .kSymbolMenuPhysicalKeyJIS, .kContextMenu:
+        consecutiveTypingErrors.removeAll()
+        return nil
+      default: break
+      }
+    }
+
+    // 當已處於連續錯誤狀態（已累積 >= 2 個錯誤鍵）時，Space 被視為英數輸入的一環（如 "cd .."、"ls -la"、"git status"），
+    // 應計入連續鍵擊並阻斷注音一聲/送字；若未處於錯誤狀態，Space 仍為正常的注音一聲或送字。
+    if input.isSpace {
+      if consecutiveTypingErrors.count >= 2 {
+        consecutiveTypingErrors.append(" ")
+        composer.clear()
+        calligrapher.removeAll()
+        if consecutiveTypingErrors.count >= 5 {
+          let textToCommit = consecutiveTypingErrors.joined()
+          consecutiveTypingErrors.removeAll()
+          composer.clear()
+          calligrapher.removeAll()
+          assembler.clear()
+          session.switchState(State.ofCommitting(textToCommit: textToCommit))
+          if !SessionHost.shared.switchToSystemABCInputSource() {
+            session.isASCIIMode = true
+          }
+          return true
+        }
+        return true
+      } else {
+        consecutiveTypingErrors.removeAll()
+        return nil
+      }
+    }
+
     var inputText = (input.inputTextIgnoringModifiers ?? input.text)
     inputText = inputText.lowercased().applyingTransformFW2HW(reverse: false)
-
-    let isError = isConsideredPhoneticErrorKey(input: input, inputText: inputText)
     let charToRecord = input.text.isEmpty ? inputText : input.text
 
-    if isError {
+    // 當已處於連續錯誤狀態（已累積 >= 2 個鍵）時，後續無論是字母、標點符號或數字，
+    // 皆視為正在輸入英數字串（如 "cd .." 中的 "." 與 "/"），持續累積直到滿 5 鍵自動切換。
+    if consecutiveTypingErrors.count >= 2 {
       consecutiveTypingErrors.append(charToRecord)
+      composer.clear()
+      calligrapher.removeAll()
       if consecutiveTypingErrors.count >= 5 {
         let textToCommit = consecutiveTypingErrors.joined()
         consecutiveTypingErrors.removeAll()
-        clearComposerAndCalligrapher()
+        composer.clear()
+        calligrapher.removeAll()
         assembler.clear()
         session.switchState(State.ofCommitting(textToCommit: textToCommit))
         if !SessionHost.shared.switchToSystemABCInputSource() {
@@ -1194,6 +1235,28 @@ extension InputHandlerProtocol {
         }
         return true
       }
+      return true
+    }
+
+    let isError = isConsideredPhoneticErrorKey(input: input, inputText: inputText)
+
+    if isError {
+      consecutiveTypingErrors.append(charToRecord)
+      composer.clear()
+      calligrapher.removeAll()
+      if consecutiveTypingErrors.count >= 5 {
+        let textToCommit = consecutiveTypingErrors.joined()
+        consecutiveTypingErrors.removeAll()
+        composer.clear()
+        calligrapher.removeAll()
+        assembler.clear()
+        session.switchState(State.ofCommitting(textToCommit: textToCommit))
+        if !SessionHost.shared.switchToSystemABCInputSource() {
+          session.isASCIIMode = true
+        }
+        return true
+      }
+      return true
     } else {
       if composer.isEmpty {
         consecutiveTypingErrors = [charToRecord]

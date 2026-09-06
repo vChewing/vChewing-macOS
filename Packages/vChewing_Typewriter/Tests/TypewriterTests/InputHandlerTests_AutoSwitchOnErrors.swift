@@ -49,6 +49,65 @@ extension InputHandlerTests {
   }
 
   @Test
+  func test_AutoSwitchOnConsecutiveErrors_CdDotDotSlash() throws {
+    guard let testHandler, let testSession else {
+      Issue.record("Test handler or session is nil.")
+      return
+    }
+    testHandler.prefs.autoSwitchToAlphanumericalOnConsecutiveErrors = true
+    testSession.inputMode = .imeModeCHT
+    testSession.isASCIIMode = false
+    testSession.recentCommissions.removeAll()
+    testSession.resetInputHandler(forceComposerCleanup: true)
+
+    var switchedToABC = false
+    SessionHost.shared.switchToSystemABCInputSource = {
+      switchedToABC = true
+      return true
+    }
+    defer {
+      SessionHost.shared.switchToSystemABCInputSource = { false }
+    }
+
+    // 當輸入到第 5 鍵（即 "cd .." 中的第二個 "."）時，累計達到 5 個錯誤鍵，
+    // 即刻觸發自動切換至系統 ABC 輸入法，並將已鍵入的 5 個英數字元 "cd .." 遞交。
+    // 在真實 macOS 環境中，此時系統已切換為 ABC 輸入法，第 6 鍵 "/" 隨即由 ABC 輸入法直接接收並送出。
+    typeSentence("cd ..")
+    #expect(switchedToABC == true)
+    #expect(testSession.recentCommissions == ["cd .."])
+    #expect(testSession.isASCIIMode == false)
+    #expect(testHandler.composer.isEmpty)
+    #expect(testHandler.assembler.isEmpty)
+  }
+
+  @Test
+  func test_AutoSwitchOnConsecutiveErrors_CdDotDotSlashFallbackToASCII() throws {
+    guard let testHandler, let testSession else {
+      Issue.record("Test handler or session is nil.")
+      return
+    }
+    testHandler.prefs.autoSwitchToAlphanumericalOnConsecutiveErrors = true
+    testSession.inputMode = .imeModeCHT
+    testSession.isASCIIMode = false
+    testSession.recentCommissions.removeAll()
+    testSession.resetInputHandler(forceComposerCleanup: true)
+
+    SessionHost.shared.switchToSystemABCInputSource = { false }
+
+    // 當切換系統 ABC 輸入法不可用時，降級啟用 session.isASCIIMode = true。
+    // 第 5 鍵 "cd .." 觸發遞交並轉為英數模式，後續的第 6 鍵 "/" 即在英數模式下 pass-through 直接交由 OS 送出。
+    typeSentence("cd ..")
+    #expect(testSession.isASCIIMode == true)
+    #expect(testSession.recentCommissions == ["cd .."])
+    #expect(testHandler.composer.isEmpty)
+    #expect(testHandler.assembler.isEmpty)
+
+    // 第 6 鍵 "/" 在英數模式下 pass-through 直接由系統處理
+    let slashHandled = testHandler.triageInput(event: KBEvent.KeyEventData(chars: "/").asEvent)
+    #expect(!slashHandled)
+  }
+
+  @Test
   func test_AutoSwitchOnConsecutiveErrors_FallbackToASCIIModeWhenABCUnavailable() throws {
     guard let testHandler, let testSession else {
       Issue.record("Test handler or session is nil.")
