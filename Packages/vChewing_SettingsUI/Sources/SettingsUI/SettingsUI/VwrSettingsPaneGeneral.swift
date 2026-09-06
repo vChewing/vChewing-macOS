@@ -65,6 +65,7 @@ public struct VwrSettingsPaneGeneral: View {
         }
         UserDef.kAutoCorrectReadingCombination.renderUI()
         UserDef.kAutoSwitchToAlphanumericalOnConsecutiveErrors.renderUI()
+        UserDef.kConsecutiveTypingErrorsThreshold.renderUI()
         UserDef.kShowHanyuPinyinInCompositionBuffer.renderUI()
         UserDef.kKeepReadingUponCompositionError.renderUI()
         UserDef.kClassicHaninKeyboardSymbolModeShortcutEnabled.renderUI()

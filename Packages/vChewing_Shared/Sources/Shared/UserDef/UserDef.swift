@@ -81,6 +81,7 @@ nonisolated public enum UserDef: String, CaseIterable, Identifiable, Sendable {
   case kUseFixedCandidateOrderOnSelection = "UseFixedCandidateOrderOnSelection"
   case kAutoCorrectReadingCombination = "AutoCorrectReadingCombination"
   case kAutoSwitchToAlphanumericalOnConsecutiveErrors = "AutoSwitchToAlphanumericalOnConsecutiveErrors"
+  case kConsecutiveTypingErrorsThreshold = "ConsecutiveTypingErrorsThreshold"
   case kReadingNarrationCoverage = "ReadingNarrationCoverage"
   case kAlsoConfirmAssociatedCandidatesByEnter = "AlsoConfirmAssociatedCandidatesByEnter"
   case kKeepReadingUponCompositionError = "KeepReadingUponCompositionError"
@@ -375,6 +376,7 @@ nonisolated extension UserDef {
     case .kSpecifyIntonationKeyBehavior: 0 ... 2
     case .kSpecifyShiftBackSpaceKeyBehavior: 0 ... 2
     case .kUpperCaseLetterKeyBehavior: 0 ... 4
+    case .kConsecutiveTypingErrorsThreshold: 3 ... 8
     case .kReadingNarrationCoverage: 0 ... 2
     case .kRomanNumeralOutputFormat: 0 ... 3
     case .kSpecifyCmdOptCtrlEnterBehavior: 0 ... 4
@@ -498,7 +500,8 @@ nonisolated extension UserDef {
     case .kFetchSuggestionsFromPerceptionOverrideModel: return .bool(true)
     case .kUseFixedCandidateOrderOnSelection: return .bool(false)
     case .kAutoCorrectReadingCombination: return .bool(true)
-    case .kAutoSwitchToAlphanumericalOnConsecutiveErrors: return .bool(true)
+    case .kAutoSwitchToAlphanumericalOnConsecutiveErrors: return .bool(false)
+    case .kConsecutiveTypingErrorsThreshold: return .integer(5)
     case .kReadingNarrationCoverage: return .integer(0)
     case .kAlsoConfirmAssociatedCandidatesByEnter: return .bool(false)
     case .kKeepReadingUponCompositionError: return .bool(false)
@@ -904,6 +907,17 @@ nonisolated extension UserDef {
         userDef: self,
         shortTitle: "i18n:UserDef.kAutoSwitchToAlphanumericalOnConsecutiveErrors.shortTitle",
         description: "i18n:UserDef.kAutoSwitchToAlphanumericalOnConsecutiveErrors.description"
+      )
+    case .kConsecutiveTypingErrorsThreshold: return .init(
+        userDef: self,
+        shortTitle: "i18n:UserDef.kConsecutiveTypingErrorsThreshold.shortTitle",
+        description: "i18n:UserDef.kConsecutiveTypingErrorsThreshold.description",
+        options: {
+          var result = [Int: String]()
+          guard let validNumeralValueRange else { return nil }
+          validNumeralValueRange.forEach { result[$0] = $0.description }
+          return result.isEmpty ? nil : result
+        }()
       )
     case .kReadingNarrationCoverage: return .init(
         userDef: self, shortTitle: "i18n:UserDef.kReadingNarrationCoverage.shortTitle",

@@ -1198,6 +1198,8 @@ extension InputHandlerProtocol {
       }
     }
 
+    let threshold = max(3, prefs.consecutiveTypingErrorsThreshold)
+
     // 當已處於連續錯誤狀態（已累積 >= 2 個錯誤鍵）時，Space 被視為英數輸入的一環（如 "cd .."、"ls -la"、"git status"），
     // 應計入連續鍵擊並阻斷注音一聲/送字；若未處於錯誤狀態，Space 仍為正常的注音一聲或送字。
     if input.isSpace {
@@ -1206,7 +1208,7 @@ extension InputHandlerProtocol {
         composer.clear()
         calligrapher.removeAll()
         inFlightComposerKeys.removeAll()
-        if consecutiveTypingErrors.count >= 5 {
+        if consecutiveTypingErrors.count >= threshold {
           return commitConsecutiveErrorsAndSwitchToABC(session: session)
         }
         return true
@@ -1222,13 +1224,13 @@ extension InputHandlerProtocol {
     let charToRecord = input.text.isEmpty ? inputText : input.text
 
     // 當已處於連續錯誤狀態（已累積 >= 2 個鍵）時，後續無論是字母、標點符號或數字，
-    // 皆視為正在輸入英數字串（如 "cd .." 中的 "." 與 "/"、"git log" 中的字母），持續累積直到滿 5 鍵自動切換。
+    // 皆視為正在輸入英數字串（如 "cd .." 中的 "." 與 "/"、"git log" 中的字母），持續累積直到滿門檻自動切換。
     if consecutiveTypingErrors.count >= 2 {
       consecutiveTypingErrors.append(charToRecord)
       composer.clear()
       calligrapher.removeAll()
       inFlightComposerKeys.removeAll()
-      if consecutiveTypingErrors.count >= 5 {
+      if consecutiveTypingErrors.count >= threshold {
         return commitConsecutiveErrorsAndSwitchToABC(session: session)
       }
       return true
@@ -1257,7 +1259,7 @@ extension InputHandlerProtocol {
       }
       composer.clear()
       calligrapher.removeAll()
-      if consecutiveTypingErrors.count >= 5 {
+      if consecutiveTypingErrors.count >= threshold {
         return commitConsecutiveErrorsAndSwitchToABC(session: session)
       }
       return true

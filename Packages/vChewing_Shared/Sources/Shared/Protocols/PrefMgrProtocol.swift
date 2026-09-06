@@ -55,6 +55,7 @@ public protocol PrefMgrProtocol {
   var useFixedCandidateOrderOnSelection: Bool { get set }
   var autoCorrectReadingCombination: Bool { get set }
   var autoSwitchToAlphanumericalOnConsecutiveErrors: Bool { get set }
+  var consecutiveTypingErrorsThreshold: Int { get set }
   var readingNarrationCoverage: Int { get set }
   var alsoConfirmAssociatedCandidatesByEnter: Bool { get set }
   var keepReadingUponCompositionError: Bool { get set }

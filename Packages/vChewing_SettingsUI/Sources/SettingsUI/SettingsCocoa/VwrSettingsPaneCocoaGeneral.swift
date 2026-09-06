@@ -68,6 +68,10 @@ extension SettingsPanesCocoa {
             fixWidth: contentWidth,
             prefUITab: .tabGeneral
           )
+          UserDef.kConsecutiveTypingErrorsThreshold.renderCocoa(
+            fixWidth: contentWidth,
+            prefUITab: .tabGeneral
+          )
           UserDef.kShowHanyuPinyinInCompositionBuffer.renderCocoa(
             fixWidth: contentWidth,
             prefUITab: .tabGeneral

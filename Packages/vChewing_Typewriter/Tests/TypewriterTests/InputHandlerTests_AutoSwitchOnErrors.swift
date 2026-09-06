@@ -435,4 +435,37 @@ extension InputHandlerTests {
     #expect(testHandler.composer.isEmpty)
     #expect(testHandler.assembler.isEmpty)
   }
+
+  @Test
+  func test_AutoSwitchOnConsecutiveErrors_CustomThreshold() throws {
+    guard let testHandler, let testSession else {
+      Issue.record("Test handler or session is nil.")
+      return
+    }
+    testHandler.prefs.autoSwitchToAlphanumericalOnConsecutiveErrors = true
+    testHandler.prefs.consecutiveTypingErrorsThreshold = 3
+    testSession.inputMode = .imeModeCHT
+    testSession.isASCIIMode = false
+    testSession.recentCommissions.removeAll()
+    testSession.resetInputHandler(forceComposerCleanup: true)
+
+    var switchedToABC = false
+    SessionHost.shared.switchToSystemABCInputSource = {
+      switchedToABC = true
+      return true
+    }
+    defer {
+      SessionHost.shared.switchToSystemABCInputSource = { false }
+      testHandler.prefs.consecutiveTypingErrorsThreshold = 5
+    }
+
+    // "git" with threshold = 3 should trigger switch on 3 keys
+    typeSentence("git")
+
+    #expect(switchedToABC == true)
+    #expect(testSession.isASCIIMode == true)
+    #expect(testSession.recentCommissions == ["git"])
+    #expect(testHandler.composer.isEmpty)
+    #expect(testHandler.assembler.isEmpty)
+  }
 }
