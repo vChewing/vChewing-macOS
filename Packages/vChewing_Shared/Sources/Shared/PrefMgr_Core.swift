@@ -168,6 +168,9 @@ public final class PrefMgr: PrefMgrProtocol, Sendable {
   @AppProperty(userDef: .kAutoCorrectReadingCombination)
   public var autoCorrectReadingCombination: Bool
 
+  @AppProperty(userDef: .kAutoSwitchToAlphanumericalOnConsecutiveErrors)
+  public var autoSwitchToAlphanumericalOnConsecutiveErrors: Bool
+
   @AppProperty(userDef: .kAlsoConfirmAssociatedCandidatesByEnter)
   public var alsoConfirmAssociatedCandidatesByEnter: Bool
 
