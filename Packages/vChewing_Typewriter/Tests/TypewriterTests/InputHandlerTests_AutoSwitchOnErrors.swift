@@ -18,7 +18,7 @@ import Testing
 
 extension InputHandlerTests {
   @Test
-  func test_AutoSwitchOnConsecutiveErrors_BasicSwitch() throws {
+  func test_AutoSwitchOnConsecutiveErrors_BasicSwitchToABC() throws {
     guard let testHandler, let testSession else {
       Issue.record("Test handler or session is nil.")
       return
@@ -28,6 +28,39 @@ extension InputHandlerTests {
     testSession.isASCIIMode = false
     testSession.recentCommissions.removeAll()
     testSession.resetInputHandler(forceComposerCleanup: true)
+
+    var switchedToABC = false
+    SessionHost.shared.switchToSystemABCInputSource = {
+      switchedToABC = true
+      return true
+    }
+    defer {
+      SessionHost.shared.switchToSystemABCInputSource = { false }
+    }
+
+    // Dachen: g=ㄕ, r=ㄐ, e=ㄍ, a=ㄇ, t=ㄔ (5 consonants -> 5 consecutive errors)
+    typeSentence("great")
+
+    #expect(testSession.recentCommissions == ["great"])
+    #expect(switchedToABC == true)
+    #expect(testSession.isASCIIMode == false)
+    #expect(testHandler.composer.isEmpty)
+    #expect(testHandler.assembler.isEmpty)
+  }
+
+  @Test
+  func test_AutoSwitchOnConsecutiveErrors_FallbackToASCIIModeWhenABCUnavailable() throws {
+    guard let testHandler, let testSession else {
+      Issue.record("Test handler or session is nil.")
+      return
+    }
+    testHandler.prefs.autoSwitchToAlphanumericalOnConsecutiveErrors = true
+    testSession.inputMode = .imeModeCHT
+    testSession.isASCIIMode = false
+    testSession.recentCommissions.removeAll()
+    testSession.resetInputHandler(forceComposerCleanup: true)
+
+    SessionHost.shared.switchToSystemABCInputSource = { false }
 
     // Dachen: g=ㄕ, r=ㄐ, e=ㄍ, a=ㄇ, t=ㄔ (5 consonants -> 5 consecutive errors)
     typeSentence("great")

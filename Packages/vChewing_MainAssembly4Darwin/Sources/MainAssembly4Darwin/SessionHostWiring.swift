@@ -21,6 +21,7 @@ extension SessionHost {
     // IMEApp 動作依賴。
     host.isKeyboardJIS = { IMEApp.isKeyboardJIS }
     host.buzz = { IMEApp.buzz() }
+    host.switchToSystemABCInputSource = { TISInputSource.selectSystemABCInputSource() }
     // LMMgr 動作依賴。
     host.isCoreDBConnected = { LMMgr.isCoreDBConnected }
     host.syncLMPrefs = { LMMgr.syncLMPrefs() }

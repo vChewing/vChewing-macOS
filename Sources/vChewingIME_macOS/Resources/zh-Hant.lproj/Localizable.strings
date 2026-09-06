@@ -345,8 +345,8 @@
 "i18n:UserDef.kAutoCompositeWithLongestPossibleCassetteKey.shortTitle" = "在已經敲出最長可能碼的時候自動組字";
 "i18n:UserDef.kAutoCorrectReadingCombination.description" = "該功能在中英混合輸入回退時不起作用，以確保相容性。";
 "i18n:UserDef.kAutoCorrectReadingCombination.shortTitle" = "敲字時自動糾正讀音組合";
-"i18n:UserDef.kAutoSwitchToAlphanumericalOnConsecutiveErrors.description" = "在「唯音-繁」中文模式下，若連續輸入破壞注音結構的錯誤鍵達 5 次，將清空組字區並輸出對應英數文字，隨後自動切換至英數模式。";
-"i18n:UserDef.kAutoSwitchToAlphanumericalOnConsecutiveErrors.shortTitle" = "連續鍵入錯誤達 5 鍵時自動切換至英數模式";
+"i18n:UserDef.kAutoSwitchToAlphanumericalOnConsecutiveErrors.description" = "在「唯音-繁」中文模式下，若連續輸入破壞注音結構的錯誤鍵達 5 次，將清空組字區並輸出對應英數文字，隨後自動切換至 ABC 輸入法。";
+"i18n:UserDef.kAutoSwitchToAlphanumericalOnConsecutiveErrors.shortTitle" = "連續鍵入錯誤達 5 鍵時自動切換至 ABC 輸入法";
 "i18n:UserDef.kBasicKeyboardLayout.description" = "請選擇 macOS 基礎鍵盤佈局。注音打字與拼音打字現為可隨時互相切換的打字模式：拼音打字時，此佈局決定實際按鍵輸出（非 QWERTY 英數佈局亦適用）；注音打字時，按鍵一律依標準鍵位翻譯，螢幕鍵盤亦隨之顯示。";
 "i18n:UserDef.kBasicKeyboardLayout.shortTitle" = "基礎鍵盤佈局:";
 "i18n:UserDef.kBeepSoundPreference.option.0" = "靜音";

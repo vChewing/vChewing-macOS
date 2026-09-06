@@ -345,8 +345,8 @@
 "i18n:UserDef.kAutoCompositeWithLongestPossibleCassetteKey.shortTitle" = "最長可能キーができた場合、文字を組み立つ";
 "i18n:UserDef.kAutoCorrectReadingCombination.description" = "互換性のため、中英混在入力のフォールバックがONの場合、この機能は不作動。";
 "i18n:UserDef.kAutoCorrectReadingCombination.shortTitle" = "入力中で打ち間違った発音組み合わせを自動的に訂正する";
-"i18n:UserDef.kAutoSwitchToAlphanumericalOnConsecutiveErrors.description" = "繁体字中国語入力モード時、注音構造に合致しない誤入力が5回連続した場合、未確定文字列を破棄して英数字を出力し、英数モードへ自動切替します。";
-"i18n:UserDef.kAutoSwitchToAlphanumericalOnConsecutiveErrors.shortTitle" = "タイピング誤入力が5回連続した際に英数モードへ自動切替";
+"i18n:UserDef.kAutoSwitchToAlphanumericalOnConsecutiveErrors.description" = "繁体字中国語入力モード時、注音構造に合致しない誤入力が5回連続した場合、未確定文字列を破棄して英数字を出力し、ABC入力ソースへ自動切替します。";
+"i18n:UserDef.kAutoSwitchToAlphanumericalOnConsecutiveErrors.shortTitle" = "タイピング誤入力が5回連続した際にABC入力ソースへ自動切替";
 "i18n:UserDef.kBasicKeyboardLayout.description" = "macOS 基礎キーボード配置をご指定ください。注音モードと弁音モードは、現在はいつでも相互に切り替えられます。弁音モードでは、この配置が実際のキー出力を決定します（QWERTY 以外の英数キーボードも適用可能）。注音モードでは、キーは常に標準配列として扱われ、キーボードビューアの表示もそれに応じて変わります。";
 "i18n:UserDef.kBasicKeyboardLayout.shortTitle" = "基礎キーボード:";
 "i18n:UserDef.kBeepSoundPreference.option.0" = "鳴らず";

@@ -1163,9 +1163,13 @@ extension InputHandlerProtocol {
           !prefs.mixedAlphanumericalEnabled,
           currentTypingMethod == .vChewingFactory,
           !input.isCommandHeld, !input.isControlHeld, !input.isOptionHeld,
-          !input.isEnter, !input.isSpace, !input.isTab, !input.isEsc
+          !input.isEnter, !input.isSpace, !input.isTab, !input.isEsc,
+          !input.isBackSpace, !input.isDelete
     else {
-      if input.isEnter || input.isSpace || input.isTab || input.isEsc || input.isBackSpace || input.isDelete {
+      if input.isEnter || input.isSpace || input.isTab || input.isEsc || input.isBackSpace || input.isDelete
+        || input.isCursorBackward || input.isCursorForward || input.isUp || input.isDown
+        || input.isLeft || input.isRight || input.isPageUp || input.isPageDown || input.isHome || input.isEnd
+      {
         consecutiveTypingErrors.removeAll()
       }
       return nil
@@ -1185,7 +1189,9 @@ extension InputHandlerProtocol {
         clearComposerAndCalligrapher()
         assembler.clear()
         session.switchState(State.ofCommitting(textToCommit: textToCommit))
-        session.isASCIIMode = true
+        if !SessionHost.shared.switchToSystemABCInputSource() {
+          session.isASCIIMode = true
+        }
         return true
       }
     } else {

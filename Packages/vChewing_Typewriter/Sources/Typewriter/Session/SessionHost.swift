@@ -32,6 +32,8 @@ public final class SessionHost {
   public var isKeyboardJIS: () -> Bool = { false }
   /// 蜂鳴或放屁聲。
   public var buzz: () -> () = {}
+  /// 切換至系統 ABC 輸入法（外部鍵盤輸入來源）。
+  public var switchToSystemABCInputSource: () -> Bool = { false }
 
   // MARK: - LMMgr 動作依賴
 
