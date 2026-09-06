@@ -53,6 +53,10 @@ public final class InputSession: @MainActor SessionProtocol, Sendable {
   public static var isASCIIModeForAllClients = false
   /// 一個共用辭典，專門用來給每個副本用的 isASCIIMode 追蹤用餐數。
   public static var isASCIIModeForEachClient: [String: Bool] = [:]
+  /// 記錄是否剛因連續鍵入錯誤而自動切換至 ABC 輸入法。
+  /// 若為 true，則當下次本輸入法被重新啟用（performServerActivation）時，
+  /// 應自動將英數模式解除，回到中文輸入模式。
+  public static var isAutoSwitchedToABC = false
 
   // MARK: - 極性雙緩衝 Session 池
 

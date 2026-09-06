@@ -1284,8 +1284,10 @@ extension InputHandlerProtocol {
     assembler.clear()
     session.switchState(State.ofCommitting(textToCommit: textToCommit))
     session.isASCIIMode = true
-    InputSession.isASCIIModeForAllClients = true
-    _ = SessionHost.shared.switchToSystemABCInputSource()
+    let switched = SessionHost.shared.switchToSystemABCInputSource()
+    if switched {
+      InputSession.isAutoSwitchedToABC = true
+    }
     return true
   }
 }

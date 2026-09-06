@@ -36,6 +36,7 @@ extension InputHandlerTests {
     }
     defer {
       SessionHost.shared.switchToSystemABCInputSource = { false }
+      InputSession.isAutoSwitchedToABC = false
     }
 
     // Dachen: g=ㄕ, r=ㄐ, e=ㄍ, a=ㄇ, t=ㄔ (5 consonants -> 5 consecutive errors)
@@ -43,6 +44,7 @@ extension InputHandlerTests {
 
     #expect(testSession.recentCommissions == ["great"])
     #expect(switchedToABC == true)
+    #expect(InputSession.isAutoSwitchedToABC == true)
     #expect(testSession.isASCIIMode == true)
     #expect(testHandler.composer.isEmpty)
     #expect(testHandler.assembler.isEmpty)
@@ -67,6 +69,7 @@ extension InputHandlerTests {
     }
     defer {
       SessionHost.shared.switchToSystemABCInputSource = { false }
+      InputSession.isAutoSwitchedToABC = false
     }
 
     // 當輸入到第 5 鍵（即 "cd .." 中的第二個 "."）時，累計達到 5 個錯誤鍵，
@@ -75,6 +78,7 @@ extension InputHandlerTests {
     // 不會被唯音當成注音（大千鍵盤的 "ㄥ"）攔截，而是直接 pass-through 由 OS 送出。
     typeSentence("cd ..")
     #expect(switchedToABC == true)
+    #expect(InputSession.isAutoSwitchedToABC == true)
     #expect(testSession.recentCommissions == ["cd .."])
     #expect(testSession.isASCIIMode == true)
     #expect(testHandler.composer.isEmpty)

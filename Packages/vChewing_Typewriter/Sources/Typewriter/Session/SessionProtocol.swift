@@ -38,6 +38,8 @@ public protocol SessionProtocol: AnyObject, CtlCandidateDelegate,
   static var isASCIIModeForAllClients: Bool { get set }
   /// 一個共用辭典，專門用來給每個副本用的 isASCIIMode 追蹤用餐數。
   static var isASCIIModeForEachClient: [String: Bool] { get set }
+  /// 記錄是否剛因連續鍵入錯誤而自動切換至 ABC 輸入法。
+  static var isAutoSwitchedToABC: Bool { get set }
   /// 偏好設定。
   var prefs: PrefMgrProtocol { get set }
   /// 上一個被處理過的鍵盤事件。
@@ -210,6 +212,15 @@ extension SessionProtocol {
   }
 
   public func performServerActivation() {
+    // 檢查若前次是因連續鍵入錯誤而自動切換至 ABC，在使用者重新切回唯音時應自動恢復為中文模式。
+    if Self.isAutoSwitchedToABC {
+      Self.isAutoSwitchedToABC = false
+      isASCIIMode = false
+      Self.isASCIIModeForAllClients = false
+      isASCIIModeForThisClient = false
+      Self.isASCIIModeForEachClient.removeAll()
+    }
+
     // MARK: 快速路徑 — 最佳化 CapsLock 中英頻繁切換的場景。
 
     /// 每次 activateServer 都是一次全新的啟用事件，
