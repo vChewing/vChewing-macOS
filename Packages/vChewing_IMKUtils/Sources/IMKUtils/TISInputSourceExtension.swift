@@ -103,6 +103,9 @@
       if let currentASCII = TISCopyCurrentASCIICapableKeyboardInputSource()?.takeRetainedValue() {
         if !currentASCII.identifier.lowercased().contains("vchewing"), currentASCII.isSelectable, currentASCII.isActivated {
           if currentASCII.select() {
+            DispatchQueue.main.async {
+              _ = currentASCII.select()
+            }
             return true
           }
         }
@@ -111,16 +114,27 @@
       let allSources = rawTISInputSources(onlyASCII: true)
       if let abcSource = allSources.first(where: { $0.identifier == "com.apple.keylayout.ABC" && $0.isSelectable && $0.isActivated }) {
         if abcSource.select() {
+          DispatchQueue.main.async {
+            _ = abcSource.select()
+          }
           return true
         }
       }
       // 3. Fallback: Any selectable and activated ASCII layout that is not vChewing.
       if let anyASCII = allSources.first(where: { !$0.identifier.lowercased().contains("vchewing") && $0.isSelectable && $0.isActivated }) {
-        return anyASCII.select()
+        let result = anyASCII.select()
+        DispatchQueue.main.async {
+          _ = anyASCII.select()
+        }
+        return result
       }
       // 4. Last resort: Any selectable ABC layout even if not marked activated yet.
       if let abcSource = allSources.first(where: { $0.identifier == "com.apple.keylayout.ABC" && $0.isSelectable }) {
-        return abcSource.select()
+        let result = abcSource.select()
+        DispatchQueue.main.async {
+          _ = abcSource.select()
+        }
+        return result
       }
       return false
     }

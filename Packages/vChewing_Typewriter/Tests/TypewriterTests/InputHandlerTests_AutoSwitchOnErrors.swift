@@ -43,7 +43,7 @@ extension InputHandlerTests {
 
     #expect(testSession.recentCommissions == ["great"])
     #expect(switchedToABC == true)
-    #expect(testSession.isASCIIMode == false)
+    #expect(testSession.isASCIIMode == true)
     #expect(testHandler.composer.isEmpty)
     #expect(testHandler.assembler.isEmpty)
   }
@@ -71,13 +71,18 @@ extension InputHandlerTests {
 
     // 當輸入到第 5 鍵（即 "cd .." 中的第二個 "."）時，累計達到 5 個錯誤鍵，
     // 即刻觸發自動切換至系統 ABC 輸入法，並將已鍵入的 5 個英數字元 "cd .." 遞交。
-    // 在真實 macOS 環境中，此時系統已切換為 ABC 輸入法，第 6 鍵 "/" 隨即由 ABC 輸入法直接接收並送出。
+    // 同時唯音內部狀態亦切換為英數模式（isASCIIMode == true），確保尚未切離此 session 的後續按鍵（如第 6 鍵 "/"）
+    // 不會被唯音當成注音（大千鍵盤的 "ㄥ"）攔截，而是直接 pass-through 由 OS 送出。
     typeSentence("cd ..")
     #expect(switchedToABC == true)
     #expect(testSession.recentCommissions == ["cd .."])
-    #expect(testSession.isASCIIMode == false)
+    #expect(testSession.isASCIIMode == true)
     #expect(testHandler.composer.isEmpty)
     #expect(testHandler.assembler.isEmpty)
+
+    // 第 6 鍵 "/" 在英數模式下 pass-through 直接由系統處理，不被唯音攔截為注音 "ㄥ"
+    let slashHandled = testHandler.triageInput(event: KBEvent.KeyEventData(chars: "/").asEvent)
+    #expect(!slashHandled)
   }
 
   @Test

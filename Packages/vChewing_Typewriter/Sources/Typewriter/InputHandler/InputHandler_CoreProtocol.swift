@@ -1195,16 +1195,7 @@ extension InputHandlerProtocol {
         composer.clear()
         calligrapher.removeAll()
         if consecutiveTypingErrors.count >= 5 {
-          let textToCommit = consecutiveTypingErrors.joined()
-          consecutiveTypingErrors.removeAll()
-          composer.clear()
-          calligrapher.removeAll()
-          assembler.clear()
-          session.switchState(State.ofCommitting(textToCommit: textToCommit))
-          if !SessionHost.shared.switchToSystemABCInputSource() {
-            session.isASCIIMode = true
-          }
-          return true
+          return commitConsecutiveErrorsAndSwitchToABC(session: session)
         }
         return true
       } else {
@@ -1224,16 +1215,7 @@ extension InputHandlerProtocol {
       composer.clear()
       calligrapher.removeAll()
       if consecutiveTypingErrors.count >= 5 {
-        let textToCommit = consecutiveTypingErrors.joined()
-        consecutiveTypingErrors.removeAll()
-        composer.clear()
-        calligrapher.removeAll()
-        assembler.clear()
-        session.switchState(State.ofCommitting(textToCommit: textToCommit))
-        if !SessionHost.shared.switchToSystemABCInputSource() {
-          session.isASCIIMode = true
-        }
-        return true
+        return commitConsecutiveErrorsAndSwitchToABC(session: session)
       }
       return true
     }
@@ -1245,16 +1227,7 @@ extension InputHandlerProtocol {
       composer.clear()
       calligrapher.removeAll()
       if consecutiveTypingErrors.count >= 5 {
-        let textToCommit = consecutiveTypingErrors.joined()
-        consecutiveTypingErrors.removeAll()
-        composer.clear()
-        calligrapher.removeAll()
-        assembler.clear()
-        session.switchState(State.ofCommitting(textToCommit: textToCommit))
-        if !SessionHost.shared.switchToSystemABCInputSource() {
-          session.isASCIIMode = true
-        }
-        return true
+        return commitConsecutiveErrorsAndSwitchToABC(session: session)
       }
       return true
     } else {
@@ -1265,5 +1238,19 @@ extension InputHandlerProtocol {
       }
     }
     return nil
+  }
+
+  @discardableResult
+  private func commitConsecutiveErrorsAndSwitchToABC(session: Session) -> Bool {
+    let textToCommit = consecutiveTypingErrors.joined()
+    consecutiveTypingErrors.removeAll()
+    composer.clear()
+    calligrapher.removeAll()
+    assembler.clear()
+    session.switchState(State.ofCommitting(textToCommit: textToCommit))
+    session.isASCIIMode = true
+    InputSession.isASCIIModeForAllClients = true
+    _ = SessionHost.shared.switchToSystemABCInputSource()
+    return true
   }
 }
