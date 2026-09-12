@@ -69,9 +69,6 @@ let package = Package(
       name: "MainAssembly4DarwinTests",
       dependencies: [
         "MainAssembly4Darwin",
-        .product(name: "Homa", package: "vChewing_Homa"),
-        .product(name: "HomaSharedTestComponents", package: "vChewing_Homa"),
-        .product(name: "LMAssemblyMaterials4Tests", package: "vChewing_LangModelAssembly"),
       ],
       swiftSettings: [
         .defaultIsolation(MainActor.self), // set Default Actor Isolation

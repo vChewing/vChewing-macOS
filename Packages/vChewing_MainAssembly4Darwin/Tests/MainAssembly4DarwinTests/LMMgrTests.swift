@@ -7,15 +7,44 @@
 // requirements defined in MIT License.
 
 import Foundation
+import Shared
 import Testing
 
 @testable import MainAssembly4Darwin
 
-// 本文的單元測試用例從 001 與 101 起算。
-// 001 家族（LMMgr 使用者資料沙盒與磁帶路徑）為 Darwin 宿主專屬，故保留於此；
-// 101 家族（InputHandler／Session 行為）已遷至 vChewing_Typewriter 套件的 TypewriterTests。
+// MARK: - LMMgrTests
 
-extension MainAssemblyTests {
+/// LMMgr（Darwin 宿主的使用者資料管理器）單元測試。
+///
+/// 收納原 `MainAssemblyTests` 的 001 家族——使用者資料沙盒 IO、磁帶快取路徑與退路、
+/// iCloud 指引、符號連結解析、使用者資料夾規格空值判定——與原 `LMMgrMigrateTests`
+/// 的位元組級使用者資料遷移。測試編號沿用原檔，便於與歷史紀錄對照。
+@Suite(.serialized)
+final class LMMgrTests {
+  // MARK: Lifecycle
+
+  init() {
+    UserDefaults.unitTests = .init(suiteName: "org.atelierInmu.vChewing.MainAssembly.UnitTests")
+    UserDefaults.pendingUnitTests = true
+    UserDef.resetAll()
+    // 生產路徑的 LMMgr.shared 已改由 phraseEditorDelegateProvider 延遲實體化；
+    // 測試需要其 KVO 觀察器在場以錄製路徑失效警示，故在此顯式武裝。
+    _ = LMMgr.shared
+    LMMgr.prepareForUnitTests()
+    LMMgr.resetRecordedPathInvalidityAlerts()
+  }
+
+  deinit {
+    mainSync {
+      LMMgr.resetAfterUnitTests()
+      LMMgr.resetRecordedPathInvalidityAlerts()
+    }
+    UserDefaults.unitTests?.removeSuite(named: "org.atelierInmu.vChewing.MainAssembly.UnitTests")
+    UserDefaults.pendingUnitTests = false
+  }
+
+  // MARK: Internal
+
   @Test
   func test011_LMMgr_UnitTestSandboxIO() throws {
     let directories = [
@@ -277,5 +306,69 @@ extension MainAssemblyTests {
     defer { defaults.removeObject(forKey: UserDef.kUserDataFolderSpecified.rawValue) }
     _ = PrefMgr() // 每次實體化皆會重新觸發所有 @AppProperty 的 seeding。
     #expect(defaults.string(forKey: UserDef.kUserDataFolderSpecified.rawValue) == "")
+  }
+
+  // MARK: - 使用者資料遷移
+
+  @Test
+  func testMigratePreservesInvalidUTF8() throws {
+    // migrateUserDataFrom 全程以位元組進行：非法 UTF-8 位元組原樣保留（不再經 String 解碼成 U+FFFD）。
+    let (oldDir, newDir) = try Self.makeDirs()
+    defer {
+      try? FileManager.default.removeItem(at: oldDir)
+      try? FileManager.default.removeItem(at: newDir)
+    }
+
+    let type = LMAssembly.ReplacableUserDataType.theAssociates
+    let mode = Shared.InputMode.imeModeCHT
+    let oldURL = LMMgr.userDictDataURL(mode: mode, type: type, basePath: oldDir.path)
+    let newURL = LMMgr.userDictDataURL(mode: mode, type: type, basePath: newDir.path)
+
+    let newBytes = Array("芳 苑 鄰 香\n".utf8)
+    let oldBytes: [UInt8] = Array("芳 芳香 苑\n".utf8) + [0xFF, 0xFE]
+    try Data(newBytes).write(to: newURL)
+    try Data(oldBytes).write(to: oldURL)
+
+    let migrated = LMMgr.migrateUserDataFrom(oldPath: oldDir.path, to: newDir.path)
+    #expect(migrated == 1)
+    let merged = try Data(contentsOf: newURL)
+    #expect(Array(merged) == newBytes + [0x0A] + oldBytes)
+  }
+
+  @Test
+  func testMigrateSkipsWhitespaceOnlyOldFile() throws {
+    // 舊檔全為空白／斷行時跳過合併（byte 層級空檔判斷，對齊 CharacterSet.whitespacesAndNewlines）。
+    let (oldDir, newDir) = try Self.makeDirs()
+    defer {
+      try? FileManager.default.removeItem(at: oldDir)
+      try? FileManager.default.removeItem(at: newDir)
+    }
+
+    let type = LMAssembly.ReplacableUserDataType.theAssociates
+    let mode = Shared.InputMode.imeModeCHT
+    let oldURL = LMMgr.userDictDataURL(mode: mode, type: type, basePath: oldDir.path)
+    let newURL = LMMgr.userDictDataURL(mode: mode, type: type, basePath: newDir.path)
+
+    let newBytes = Array("芳 苑 鄰 香\n".utf8)
+    let oldBytes: [UInt8] = Array("\u{3000} \t\n\u{00A0}\u{2028}".utf8) // 全為空白／斷行字元
+    try Data(newBytes).write(to: newURL)
+    try Data(oldBytes).write(to: oldURL)
+
+    let migrated = LMMgr.migrateUserDataFrom(oldPath: oldDir.path, to: newDir.path)
+    #expect(migrated == 0)
+    let merged = try Data(contentsOf: newURL)
+    #expect(Array(merged) == newBytes) // 舊檔未合併，新檔原樣。
+  }
+
+  // MARK: Private
+
+  private static func makeDirs() throws -> (old: URL, new: URL) {
+    let oldDir = FileManager.default.temporaryDirectory
+      .appendingPathComponent("vChewingTest_migrate_old_\(UUID().uuidString)")
+    let newDir = FileManager.default.temporaryDirectory
+      .appendingPathComponent("vChewingTest_migrate_new_\(UUID().uuidString)")
+    try FileManager.default.createDirectory(at: oldDir, withIntermediateDirectories: true)
+    try FileManager.default.createDirectory(at: newDir, withIntermediateDirectories: true)
+    return (oldDir, newDir)
   }
 }

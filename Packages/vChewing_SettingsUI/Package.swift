@@ -37,5 +37,16 @@ let package = Package(
         .defaultIsolation(MainActor.self), // set Default Actor Isolation
       ]
     ),
+    .testTarget(
+      name: "SettingsUITests",
+      dependencies: [
+        "SettingsUI",
+        .product(name: "Shared", package: "vChewing_Shared"),
+        .product(name: "SwiftExtension", package: "vChewing_SwiftExtension"),
+      ],
+      swiftSettings: [
+        .defaultIsolation(MainActor.self), // set Default Actor Isolation
+      ]
+    ),
   ]
 )
