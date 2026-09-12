@@ -7,7 +7,7 @@ import Foundation
 // MARK: - VanguardTrie.TrieIO
 
 extension VanguardTrie {
-  /// 提供 Trie 資料結構的高效二進位序列化與反序列化功能
+  /// 提供 Trie 資料結構的 Vanguard Pragma TextMap 格式讀寫與結構驗證功能。
   public enum TrieIO {
     // MARK: Public
 
@@ -15,12 +15,8 @@ extension VanguardTrie {
 
     /// Trie 輸入輸出操作可能發生的例外狀況
     public enum Exception: Swift.Error, LocalizedError {
-      /// 序列化失敗
-      case serializationFailed(Swift.Error)
       /// 反序列化失敗
       case deserializationFailed(Swift.Error)
-      /// 檔案儲存失敗
-      case fileSaveFailed(Swift.Error)
       /// 檔案載入失敗
       case fileLoadFailed(Swift.Error)
 
@@ -28,76 +24,11 @@ extension VanguardTrie {
 
       public var errorDescription: String? {
         switch self {
-        case let .serializationFailed(error):
-          return "序列化 Trie 失敗: \(error.localizedDescription)"
         case let .deserializationFailed(error):
           return "反序列化 Trie 失敗: \(error.localizedDescription)"
-        case let .fileSaveFailed(error):
-          return "儲存 Trie 至檔案失敗: \(error.localizedDescription)"
         case let .fileLoadFailed(error):
           return "從檔案載入 Trie 失敗: \(error.localizedDescription)"
         }
-      }
-    }
-
-    // MARK: - 公開方法
-
-    /// 將 Trie 序列化為二進位資料
-    /// - Parameter trie: 要序列化的 Trie 結構
-    /// - Returns: 二進位資料
-    /// - Throws: 序列化過程中的例外狀況
-    public static func serialize(_ trie: Trie) throws -> Data {
-      do {
-        // 使用 PropertyListEncoder 序列化為二進位格式
-        let encoder = PropertyListEncoder()
-        encoder.outputFormat = .binary
-        return try encoder.encode(trie)
-      } catch {
-        throw Exception.serializationFailed(error)
-      }
-    }
-
-    /// 從二進位資料反序列化 Trie 結構
-    /// - Parameter data: 二進位資料
-    /// - Returns: 反序列化的 Trie 結構
-    /// - Throws: 反序列化過程中的例外狀況
-    public static func deserialize(_ data: Data) throws -> Trie {
-      do {
-        // 使用 PropertyListDecoder 反序列化
-        let decoder = PropertyListDecoder()
-        return try decoder.decode(Trie.self, from: data)
-      } catch {
-        throw Exception.deserializationFailed(error)
-      }
-    }
-
-    /// 將 Trie 儲存到指定路徑
-    /// - Parameters:
-    ///   - trie: 要儲存的 Trie 結構
-    ///   - url: 儲存路徑
-    /// - Throws: 序列化或檔案寫入過程中的例外狀況
-    public static func save(_ trie: Trie, to url: URL) throws {
-      let data = try serialize(trie)
-
-      do {
-        try data.write(to: url, options: .atomic)
-      } catch {
-        throw Exception.fileSaveFailed(error)
-      }
-    }
-
-    /// 從指定路徑載入 Trie
-    /// - Parameter url: Trie 檔案路徑
-    /// - Returns: 載入的 Trie 結構
-    /// - Throws: 檔案讀取或反序列化過程中的例外狀況
-    public static func load(from url: URL) throws -> Trie {
-      do {
-        let data = try Data(contentsOf: url)
-        return try deserialize(data)
-      } catch let error as Exception {
-        throw error
-      } catch {
-        throw Exception.fileLoadFailed(error)
       }
     }
 
@@ -109,13 +40,13 @@ extension VanguardTrie {
     public static func validate(_ trie: Trie) -> (isValid: Bool, errors: [String]) {
       var errors = [String]()
 
-      // 檢查根節點
-      if trie.root.id != 1 {
-        errors.append("根節點 ID 不正確：期望為 1，實際為 \(String(describing: trie.root.id))")
+      // 檢查根節點（`Trie.init(separator:)` 與 `clearAllContents()` 皆把根節點固定為 ID 0。）
+      if trie.root.id != 0 {
+        errors.append("根節點 ID 不正確：期望為 0，實際為 \(String(describing: trie.root.id))")
       }
 
       // 檢查節點辭典中的根節點
-      if trie.nodes[1] == nil {
+      if trie.nodes[0] == nil {
         errors.append("節點辭典中缺少根節點")
       }
 
@@ -289,7 +220,13 @@ extension VanguardTrie {
       isTyping: Bool,
       defaultProbs: [Int32: Double]
     )
-      -> [(value: String, typeID: Trie.EntryType, probability: Double, previous: String?, anterior: String?)] {
+      -> [(
+        value: String,
+        typeID: Trie.EntryType,
+        probability: Double,
+        previous: String?,
+        anterior: String?
+      )] {
       guard !line.isEmpty else { return [] }
       let parts = line.split(separator: "\t", omittingEmptySubsequences: false)
 

@@ -8,15 +8,15 @@ import Tekkon
 import Testing
 @testable import TrieKit
 
-// MARK: - TrieKitTestsSQL
+// MARK: - TrieKitTests
 
 @Suite(.serialized)
 public struct TrieKitTests: TrieKitTestSuite {
   // MARK: Internal
 
-  @Test("[TrieKit] Trie SQL Query Test", arguments: [false, true])
-  func testTrieDirectQuery(useTextMap: Bool) async throws {
-    let mockLM = try prepareTrieLM(useTextMap: useTextMap).lm
+  @Test("[TrieKit] Trie Query Test")
+  func testTrieDirectQuery() async throws {
+    let mockLM = try prepareTrieLM().lm
     do {
       let partialMatchQueried = mockLM.queryGrams(["ㄧ"], partiallyMatch: true)
       #expect(!partialMatchQueried.isEmpty)
@@ -39,9 +39,9 @@ public struct TrieKitTests: TrieKitTestSuite {
   }
 
   /// 這裡重複對護摩引擎的胡桃測試（Full Match）。
-  @Test("[TrieKit] Trie SQL Structure Test (Full Match)", arguments: [false, true])
-  func testTrieSQLStructureWithFullMatch(useTextMap: Bool) async throws {
-    let mockLM = try prepareTrieLM(useTextMap: useTextMap).lm
+  @Test("[TrieKit] Trie Structure Test (Full Match)")
+  func testTrieStructureWithFullMatch() async throws {
+    let mockLM = try prepareTrieLM().lm
     let readings: [Substring] = "ㄧㄡ ㄉㄧㄝˊ ㄋㄥˊ ㄌㄧㄡˊ ㄧˋ ㄌㄩˇ ㄈㄤ".split(separator: " ")
     let assembler = Homa.Assembler(
       gramQuerier: { mockLM.queryGrams($0) }, // 會回傳包含 Bigram 的結果。
@@ -89,9 +89,9 @@ public struct TrieKitTests: TrieKitTestSuite {
   }
 
   /// 這裡重複對護摩引擎的胡桃測試（Partial Match）。
-  @Test("[TrieKit] Trie SQL Structure Test (Partial Match)", arguments: [false, true])
-  func testTrieSQLStructureWithPartialMatch(useTextMap: Bool) async throws {
-    let mockLM = try prepareTrieLM(useTextMap: useTextMap).lm
+  @Test("[TrieKit] Trie Structure Test (Partial Match)")
+  func testTrieStructureWithPartialMatch() async throws {
+    let mockLM = try prepareTrieLM().lm
     #expect(mockLM.hasGrams(["ㄧ"], partiallyMatch: true))
     #expect(!mockLM.queryGrams(["ㄧ"], partiallyMatch: true).isEmpty)
     let readings: [String] = "ㄧㄉㄋㄌㄧㄌㄈ".map(\.description)
@@ -122,15 +122,15 @@ public struct TrieKitTests: TrieKitTestSuite {
   ///
   /// 這會完整模擬一款簡拼輸入法「僅依賴使用者的不完全拼音輸入字串進行組字」的完整流程、
   /// 且組字時使用以注音索引的後端辭典資料。
-  @Test("[TrieKit] Test Chopped Pinyin Handling (with PinyinTrie)", arguments: [false, true])
-  func testTekkonPinyinTrieTogetherAgainstChoppedPinyin(useTextMap: Bool) async throws {
+  @Test("[TrieKit] Test Chopped Pinyin Handling (with PinyinTrie)")
+  func testTekkonPinyinTrieTogetherAgainstChoppedPinyin() async throws {
     let pinyinTrie = Tekkon.PinyinTrie(parser: .ofHanyuPinyin)
     let rawPinyin = "yodienliylvf"
     let rawPinyinChopped = pinyinTrie.chop(rawPinyin)
     #expect(rawPinyinChopped == ["yo", "die", "n", "li", "y", "lv", "f"])
     let keys2Add = pinyinTrie.deductChoppedPinyinToZhuyin(rawPinyinChopped)
     #expect(keys2Add == ["ㄧㄛ&ㄧㄡ&ㄩㄥ", "ㄉㄧㄝ", "ㄋ", "ㄌㄧ", "ㄧ&ㄩ", "ㄌㄩ&ㄌㄩㄝ&ㄌㄩㄢ", "ㄈ"])
-    let mockLM = try prepareTrieLM(useTextMap: useTextMap).lm
+    let mockLM = try prepareTrieLM().lm
     let hasResults = mockLM.hasGrams(["ㄧ&ㄩ"], partiallyMatch: true)
     #expect(hasResults)
     let queried = mockLM.queryGrams(["ㄧ&ㄩ"], partiallyMatch: true)
@@ -159,9 +159,9 @@ public struct TrieKitTests: TrieKitTestSuite {
   }
 
   /// 檢查對關聯詞語的檢索能力。
-  @Test("[TrieKit] Trie Associated Phrases Query Test", arguments: [false, true])
-  func testTrieQueryingAssociatedPhrases(useTextMap: Bool) async throws {
-    let trie = try prepareTrieLM(useTextMap: useTextMap).trie
+  @Test("[TrieKit] Trie Associated Phrases Query Test")
+  func testTrieQueryingAssociatedPhrases() async throws {
+    let trie = try prepareTrieLM().trie
     do {
       let fetched = trie.queryAssociatedPhrasesPlain(
         (["ㄌㄧㄡˊ"], "流"),
@@ -216,7 +216,7 @@ public struct TrieKitTests: TrieKitTestSuite {
 
   // MARK: Private
 
-  private func prepareTrieLM(useTextMap: Bool) throws -> (
+  private func prepareTrieLM() throws -> (
     lm: TestLM4Trie,
     trie: any VanguardTrieProtocol
   ) {
@@ -239,16 +239,8 @@ public struct TrieKitTests: TrieKitTestSuite {
       )
       trie.insert(entry: entry, readings: readings)
     }
-    let trieFinal: VanguardTrieProtocol
-    switch useTextMap {
-    case false:
-      let encoded = try VanguardTrie.TrieIO.serialize(trie)
-      trieFinal = try VanguardTrie.TrieIO.deserialize(encoded)
-    case true:
-      let textMap = VanguardTrie.TrieIO.serializeToTextMap(trie)
-      let trie = try VanguardTrie.TextMapTrie(data: Data(textMap.utf8))
-      trieFinal = trie
-    }
+    let textMap = VanguardTrie.TrieIO.serializeToTextMap(trie)
+    let trieFinal: VanguardTrieProtocol = try VanguardTrie.TextMapTrie(data: Data(textMap.utf8))
     let mockLM = TestLM4Trie(trie: trieFinal)
     #expect(mockLM.hasGrams(["ㄧˋ", "ㄌㄩˇ"]))
     #expect(!mockLM.queryGrams(["ㄧˋ", "ㄌㄩˇ"]).isEmpty)

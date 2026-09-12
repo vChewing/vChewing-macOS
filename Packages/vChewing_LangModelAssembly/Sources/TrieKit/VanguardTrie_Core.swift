@@ -5,7 +5,7 @@
 // MARK: - VanguardTrie
 
 public enum VanguardTrie {
-  public final class Trie: Codable {
+  public final class Trie {
     // MARK: Lifecycle
 
     public init(separator: Character) {
@@ -19,52 +19,9 @@ public enum VanguardTrie {
       self.keyInitialsIDMap = [:]
     }
 
-    public required init(from decoder: any Decoder) throws {
-      let container = try decoder.container(keyedBy: CodingKeys.self)
-      let decodingErrorSep = DecodingError.dataCorrupted(
-        DecodingError.Context(
-          codingPath: container.codingPath,
-          debugDescription: "Separator is not a single character."
-        )
-      )
-      let decodingErrorRoot0 = DecodingError.dataCorrupted(
-        DecodingError.Context(
-          codingPath: container.codingPath,
-          debugDescription: "Root node with ID 0 not found in nodes dictionary"
-        )
-      )
-
-      let separatorRaw = try container.decode(String.self, forKey: .readingSeparator)
-      guard separatorRaw.count == 1 else { throw decodingErrorSep }
-      guard let separatorChar = separatorRaw.first else { throw decodingErrorSep }
-
-      self.readingSeparator = separatorChar
-      let nodesExtracted: [TNode]
-      if let decodedArray = try? container.decode([TNode].self, forKey: .nodes) {
-        nodesExtracted = decodedArray
-      } else {
-        nodesExtracted = Array(try container.decode(Set<TNode>.self, forKey: .nodes))
-      }
-      var nodesMap = [Int: TNode]()
-      var newKeyInitialsIDMap: [String: Set<Int>] = [:]
-      nodesExtracted.forEach { node in
-        nodesMap[node.id] = node
-        let keyInitialsStr = node.readingKey.split(separator: separatorChar).compactMap {
-          $0.first?.description
-        }.joined()
-        newKeyInitialsIDMap[keyInitialsStr, default: []].insert(node.id)
-      }
-      self.nodes = nodesMap
-
-      // 從節點辭典中獲取根節點
-      guard let rootNode = nodes[0] else { throw decodingErrorRoot0 }
-      self.root = rootNode
-      self.keyInitialsIDMap = newKeyInitialsIDMap
-    }
-
     // MARK: Public
 
-    public final class TNode: Codable, Hashable, Identifiable {
+    public final class TNode: Hashable, Identifiable {
       // MARK: Lifecycle
 
       public init(
@@ -76,18 +33,6 @@ public enum VanguardTrie {
         self.entries = entries
         self.children = [:] // 重要：保證資料插入行為結果的準確性。
         self.readingKey = readingKey
-      }
-
-      public required init(from decoder: Decoder) throws {
-        let container = try decoder.container(keyedBy: CodingKeys.self)
-        self.id = try container.decode(Int.self, forKey: .id)
-        self.readingKey = try container.decodeIfPresent(String.self, forKey: .readingKey) ?? ""
-        self.children = (
-          try container.decodeIfPresent([String: Int].self, forKey: .children)
-        ) ?? [:]
-        self.entries = (
-          try container.decodeIfPresent([Entry].self, forKey: .entries)
-        ) ?? []
       }
 
       // MARK: Public
@@ -111,35 +56,9 @@ public enum VanguardTrie {
         hasher.combine(readingKey)
         hasher.combine(children)
       }
-
-      public func encode(to encoder: Encoder) throws {
-        var container = encoder.container(keyedBy: CodingKeys.self)
-        try container.encodeIfPresent(id, forKey: .id)
-        if !entries.isEmpty {
-          try container.encode(entries, forKey: .entries)
-        }
-        if !readingKey.isEmpty {
-          try container.encode(readingKey, forKey: .readingKey)
-        }
-        if !children.isEmpty {
-          let sortedChildren = Dictionary(uniqueKeysWithValues: children.sorted { lhs, rhs in
-            lhs.key < rhs.key
-          })
-          try container.encode(sortedChildren, forKey: .children)
-        }
-      }
-
-      // MARK: Private
-
-      private enum CodingKeys: String, CodingKey {
-        case id
-        case entries
-        case readingKey
-        case children
-      }
     }
 
-    public struct Entry: Codable, Hashable, Sendable {
+    public struct Entry: Hashable, Sendable {
       // MARK: Lifecycle
 
       public init(
@@ -156,34 +75,6 @@ public enum VanguardTrie {
         self.anterior = anterior
       }
 
-      public init(from decoder: any Decoder, readingKey: String) throws {
-        let container = try decoder.singleValueContainer()
-        let stackRawStr = try container.decode(String.self)
-        let decoded = try Self.decodeSerializedEntry(
-          stackRawStr,
-          codingPath: container.codingPath
-        )
-        self.value = decoded.value
-        self.typeID = decoded.type
-        self.probability = decoded.probability
-        self.previous = decoded.previous
-        self.anterior = nil // 序列化（legacy）路徑不承載 anterior。
-      }
-
-      public init(from decoder: any Decoder) throws {
-        let container = try decoder.singleValueContainer()
-        let stackRawStr = try container.decode(String.self)
-        let decoded = try Self.decodeSerializedEntry(
-          stackRawStr,
-          codingPath: container.codingPath
-        )
-        self.value = decoded.value
-        self.typeID = decoded.type
-        self.probability = decoded.probability
-        self.previous = decoded.previous
-        self.anterior = nil // 序列化（legacy）路徑不承載 anterior。
-      }
-
       // MARK: Public
 
       public let value: String
@@ -191,68 +82,6 @@ public enum VanguardTrie {
       public let probability: Double
       public let previous: String?
       public let anterior: String?
-
-      public func encode(to encoder: any Encoder) throws {
-        var container = encoder.singleValueContainer()
-        var stack = [String]()
-        stack.append(value)
-        stack.append(typeID.rawValue.description)
-        stack.append(probability.description)
-        if let previous {
-          stack.append(previous)
-        }
-        try container.encode(stack.joined(separator: "\t"))
-      }
-
-      // MARK: Private
-
-      private enum CodingKeysAlt: String, CodingKey {
-        case value
-        case typeID
-        case probability
-        case previous
-      }
-
-      private static func decodeSerializedEntry(
-        _ rawValue: String,
-        codingPath: [CodingKey]
-      ) throws
-        -> (value: String, type: EntryType, probability: Double, previous: String?) {
-        var components = rawValue.split(separator: "\t", omittingEmptySubsequences: false)
-          .map(String.init)
-        let decodingError = DecodingError.dataCorrupted(
-          DecodingError.Context(
-            codingPath: codingPath,
-            debugDescription: "Can't parse the following contents into an Entry: \(rawValue)"
-          )
-        )
-        guard components.count >= 3 else { throw decodingError }
-
-        var previous: String?
-
-        // Probability is expected near the tail. Handle optional previous values gracefully.
-        guard let lastComponent = components.popLast() else { throw decodingError }
-        let probabilityValue: Double
-        if let parsedProbability = Double(lastComponent) {
-          probabilityValue = parsedProbability
-        } else {
-          previous = lastComponent
-          guard let probabilityComponent = components.popLast(),
-                let parsedProbability = Double(probabilityComponent) else {
-            throw decodingError
-          }
-          probabilityValue = parsedProbability
-        }
-
-        guard let typeComponent = components.popLast(),
-              let typeIDRaw = Int32(typeComponent) else {
-          throw decodingError
-        }
-
-        let reconstructedValue = components.joined(separator: "\t")
-        let entryType = EntryType(rawValue: typeIDRaw)
-        return (reconstructedValue, entryType, probabilityValue, previous)
-      }
     }
 
     public struct EntryType: OptionSet, Sendable, Codable, Hashable {
@@ -266,27 +95,13 @@ public enum VanguardTrie {
 
       public static let langNeutral = Self(rawValue: 1 << 0)
 
-      public let rawValue: Int32 // 必須得是 Int32，否則 SQLite 編碼可能會有問題。
+      public let rawValue: Int32 // TextMap 辭典格式與各查詢介面皆以 Int32 承載型別 ID。
     }
 
     public let readingSeparator: Character
     public let root: TNode
     public internal(set) var nodes: [Int: TNode] // 新增：節點辭典，以id為索引
     public internal(set) var keyInitialsIDMap: [String: Set<Int>]
-
-    public func encode(to encoder: any Encoder) throws {
-      var container = encoder.container(keyedBy: CodingKeys.self)
-
-      try container.encode(String(readingSeparator), forKey: .readingSeparator)
-      try container.encode(nodes.values.sorted { $0.id < $1.id }, forKey: .nodes)
-    }
-
-    // MARK: Private
-
-    private enum CodingKeys: CodingKey {
-      case readingSeparator
-      case nodes
-    }
   }
 }
 
