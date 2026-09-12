@@ -211,7 +211,7 @@ extension VanguardTrie {
 
     // MARK: - TextMap 解析實作
 
-    /// 解析單一 VALUES 行為詞條元組陣列。
+    /// 解析單一 VALUES 行為詞條陣列。
     ///
     /// 此方法由 `parseTextMap` 與 `TextMapTrie` 共用，
     /// 確保完整物化與惰性解析兩條路徑使用同一份解析邏輯。
@@ -220,13 +220,7 @@ extension VanguardTrie {
       isTyping: Bool,
       defaultProbs: [Int32: Double]
     )
-      -> [(
-        value: String,
-        typeID: Trie.EntryType,
-        probability: Double,
-        previous: String?,
-        anterior: String?
-      )] {
+      -> [Trie.Entry] {
       guard !line.isEmpty else { return [] }
       let parts = line.split(separator: "\t", omittingEmptySubsequences: false)
 
@@ -237,18 +231,18 @@ extension VanguardTrie {
               let probability = defaultProbs[typeIDRaw] else { return [] }
         let typeID = Trie.EntryType(rawValue: typeIDRaw)
         return decodeGroupedValues(String(parts[1])).map { value in
-          (value, typeID, probability, nil, nil)
+          Trie.Entry(value: value, typeID: typeID, probability: probability, previous: nil)
         }
       }
 
       // 型別 B：`@probability\tchsCell\tchtCell`（TYPING 專用）。
       if isTyping, parts.count >= 3, let prob = parseTypingGroupedProbability(String(parts[0])) {
-        var results: [(String, Trie.EntryType, Double, String?, String?)] = []
+        var results: [Trie.Entry] = []
         for val in decodeGroupedValues(String(parts[1])) where !val.isEmpty {
-          results.append((val, .init(rawValue: 5), prob, nil, nil))
+          results.append(Trie.Entry(value: val, typeID: .init(rawValue: 5), probability: prob, previous: nil))
         }
         for val in decodeGroupedValues(String(parts[2])) where !val.isEmpty {
-          results.append((val, .init(rawValue: 6), prob, nil, nil))
+          results.append(Trie.Entry(value: val, typeID: .init(rawValue: 6), probability: prob, previous: nil))
         }
         return results
       }
@@ -260,17 +254,35 @@ extension VanguardTrie {
         let value = String(parts[0])
         let previous: String? = parts.count >= 4 && !parts[3].isEmpty ? String(parts[3]) : nil
         let anterior: String? = parts.count >= 5 && !parts[4].isEmpty ? String(parts[4]) : nil
-        return [(value, Trie.EntryType(rawValue: typeIDRaw), probability, previous, anterior)]
+        return [
+          Trie.Entry(
+            value: value,
+            typeID: Trie.EntryType(rawValue: typeIDRaw),
+            probability: probability,
+            previous: previous,
+            anterior: anterior
+          ),
+        ]
       }
 
       // 舊四欄 CHS/CHT 合併格式（相容路徑）。
       if isTyping, parts.count >= 4 {
-        var results: [(String, Trie.EntryType, Double, String?, String?)] = []
+        var results: [Trie.Entry] = []
         if !parts[0].isEmpty, let prob = Double(parts[1]) {
-          results.append((String(parts[0]), .init(rawValue: 5), prob, nil, nil))
+          results.append(Trie.Entry(
+            value: String(parts[0]),
+            typeID: .init(rawValue: 5),
+            probability: prob,
+            previous: nil
+          ))
         }
         if !parts[2].isEmpty, let prob = Double(parts[3]) {
-          results.append((String(parts[2]), .init(rawValue: 6), prob, nil, nil))
+          results.append(Trie.Entry(
+            value: String(parts[2]),
+            typeID: .init(rawValue: 6),
+            probability: prob,
+            previous: nil
+          ))
         }
         return results
       }
@@ -278,12 +290,12 @@ extension VanguardTrie {
       // 舊 bare numeric grouped line（相容路徑）。
       if isTyping, parts.count >= 3, isLegacyTypingGroupedLine(parts),
          let prob = Double(parts[0]) {
-        var results: [(String, Trie.EntryType, Double, String?, String?)] = []
+        var results: [Trie.Entry] = []
         for val in decodeGroupedValues(String(parts[1])) where !val.isEmpty {
-          results.append((val, .init(rawValue: 5), prob, nil, nil))
+          results.append(Trie.Entry(value: val, typeID: .init(rawValue: 5), probability: prob, previous: nil))
         }
         for val in decodeGroupedValues(String(parts[2])) where !val.isEmpty {
-          results.append((val, .init(rawValue: 6), prob, nil, nil))
+          results.append(Trie.Entry(value: val, typeID: .init(rawValue: 6), probability: prob, previous: nil))
         }
         return results
       }
@@ -538,14 +550,7 @@ extension VanguardTrie {
           let valueLine = valueLines[i]
           guard !valueLine.isEmpty else { continue }
           let parsed = parseValueLine(valueLine, isTyping: isTyping, defaultProbs: defaultProbs)
-          for p in parsed {
-            let entry = Trie.Entry(
-              value: p.value,
-              typeID: p.typeID,
-              probability: p.probability,
-              previous: p.previous,
-              anterior: p.anterior
-            )
+          for entry in parsed {
             trie.insert(entry: entry, readings: readingArray)
           }
         }

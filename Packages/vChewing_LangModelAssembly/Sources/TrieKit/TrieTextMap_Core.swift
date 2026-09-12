@@ -959,15 +959,7 @@ extension VanguardTrie.TextMapTrie {
         extractValueLine(at: lineIndex),
         isTyping: isTyping,
         defaultProbs: defaultProbs
-      ).map {
-        Entry(
-          value: $0.value,
-          typeID: $0.typeID,
-          probability: $0.probability,
-          previous: $0.previous,
-          anterior: $0.anterior
-        )
-      })
+      ))
     }
 
     // Evict LRU entry when at capacity.

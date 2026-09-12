@@ -3,7 +3,13 @@
 // This code is released under the SPDX-License-Identifier: `LGPL-3.0-or-later`.
 
 import Foundation
-import SwiftExtension
+#if canImport(SwiftExtension)
+  // 條件匯入：vChewing-OSX-Legacy 無 `SwiftExtension` 模組（其 `NSMutex` 與本檔同模組），
+  // 故以條件匯入維持三倉 TrieKit 逐位元組一致。
+  import SwiftExtension
+#endif
+
+// MARK: - QueryBuffer
 
 /// 一個會在指定時間間隔後自動使快取條目失效的快取系統。
 ///

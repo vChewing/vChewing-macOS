@@ -103,6 +103,41 @@ public enum VanguardTrie {
     public internal(set) var nodes: [Int: TNode] // 新增：節點辭典，以id為索引
     public internal(set) var keyInitialsIDMap: [String: Set<Int>]
   }
+
+  /// 護摩（Homa）元圖資料的承載結構，用以取代先前的 5-元 tuple。
+  ///
+  /// 改用具名結構的理由：5-元 tuple 會觸發 `large_tuple` lint，且具名欄位較易讀。
+  /// 記憶體佈局與原 tuple 完全相同（size／stride 皆 64 bytes、align 8），故無效能代價。
+  ///
+  /// - Note: 舊工具鏈（legacy 倉的 Xcode 15／`SWIFT_VERSION 5.0`）無法在時限內完成
+  ///   type-check 的對象是 **5 元 tuple 的 `>` 比較運算式**，與 tuple 型別本身無關——
+  ///   tuple 型別在該工具鏈下照常編譯。該比較已改寫為等價的逐欄條件分支
+  ///   （見 `queryAssociatedPhrasesAsGrams`）。
+  public struct TrieGram: Hashable, Sendable {
+    // MARK: Lifecycle
+
+    public init(
+      keyArray: [String],
+      value: String,
+      probability: Double,
+      previous: String?,
+      anterior: String?
+    ) {
+      self.keyArray = keyArray
+      self.value = value
+      self.probability = probability
+      self.previous = previous
+      self.anterior = anterior
+    }
+
+    // MARK: Public
+
+    public let keyArray: [String]
+    public let value: String
+    public let probability: Double
+    public let previous: String?
+    public let anterior: String?
+  }
 }
 
 // MARK: - Extending Methods (Trie: Insert and Search API).

@@ -2,7 +2,7 @@
 // ====================
 // This code is released under the SPDX-License-Identifier: `LGPL-3.0-or-later`.
 
-// Phase 156 回歸測試：TextMapTrie 的 "&" 連讀（keysChopped）查詢路徑必須
+// 回歸測試：TextMapTrie 的 "&" 連讀（keysChopped）查詢路徑必須
 // 對 ASCII 讀音鍵也能正常運作（decodeUTF8ScalarValue 曾缺 ASCII 分支，
 // 導致 initialsMatch 對 ASCII 鍵一律失敗、chopped 查詢回傳空陣列）。
 

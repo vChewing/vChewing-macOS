@@ -11,48 +11,6 @@ import Testing
 
 protocol TrieKitTestSuite {}
 
-extension TrieKitTestSuite {
-  static func makeAssemblerUsingMockLM() -> Homa.Assembler {
-    .init(
-      gramQuerier: { keyArray in
-        let flatKeys = keyArray.map(\.first)
-        return [
-          Homa.Gram(
-            keyArray: flatKeys,
-            current: flatKeys.joined(separator: "-"),
-            previous: nil,
-            probability: -1
-          ),
-        ]
-      }
-    )
-  }
-
-  static func mustDone(_ task: @escaping () throws -> ()) -> Bool {
-    do {
-      try task()
-      return true
-    } catch {
-      return false
-    }
-  }
-
-  static func mustFail(_ task: @escaping () throws -> ()) -> Bool {
-    do {
-      try task()
-      return false
-    } catch {
-      return true
-    }
-  }
-
-  static func measureTime(_ task: @escaping () throws -> ()) rethrows -> Double {
-    let startTime = Date.now.timeIntervalSince1970
-    try task()
-    return Date.now.timeIntervalSince1970 - startTime
-  }
-}
-
 // MARK: - TestLM4Trie
 
 final class TestLM4Trie {

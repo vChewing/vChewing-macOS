@@ -507,7 +507,7 @@ extension LMAssembly.LMInstantiator {
   }
 
   private func makeFactoryUnigrams(
-    queriedGrams: [(keyArray: [String], value: String, probability: Double, previous: String?, anterior: String?)],
+    queriedGrams: [VanguardTrie.TrieGram],
     entryType: VanguardTrie.Trie.EntryType,
     includeHalfWidthVariants: Bool
   )
