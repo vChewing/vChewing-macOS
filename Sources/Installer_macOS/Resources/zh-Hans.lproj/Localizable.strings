@@ -22,6 +22,7 @@
 "i18n:Installer.FatalError" = "安装错误";
 "i18n:installer.HP_AND_DONATION" = "🏠 主页・捐款";
 "i18n:Installer.InputMethodMayNotBeFullyEnabled" = "输入法已经安装好，但可能没有完全启用。请从「系统偏好设定」 > 「键盘」 > 「输入方式」分页加入输入法。";
+"i18n:Installer.OldVersionStillInUse" = "旧版本未能及时从系统中释放，安装未完成。请注销或重新开机后再运行一次安装程式。";
 "i18n:Installer.InstallationSuccessful" = "安装成功";
 "i18n:installer.INSTALLER_APP_TITLE_FULL" = "唯音输入法安装程式";
 "i18n:installer.INSTALLER_APP_TITLE" = "唯音安装程式";

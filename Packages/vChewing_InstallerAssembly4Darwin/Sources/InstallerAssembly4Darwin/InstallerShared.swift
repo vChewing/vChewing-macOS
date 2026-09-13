@@ -38,8 +38,27 @@ var installingIMEConnectionName: String? {
     .flatMap { $0.infoDictionary?["InputMethodConnectionName"] as? String ?? $0.bundleIdentifier }
 }
 
-let kTranslocationRemovalTickInterval: TimeInterval = 0.5
-let kTranslocationRemovalDeadline: TimeInterval = 60.0
+/// 安裝失敗後，兩次嘗試之間的等待間隔（秒）。
+let kInstallRetryInterval: TimeInterval = 0.5
+/// 放棄自動重試、改提示使用者重新登入前的等待上限（秒）。
+let kInstallRetryTimeout: Int = 60
+
+/// 於指定目錄內產生一個不會與既有項目碰撞的暫存 URL。
+///
+/// 之所以要求在**同一目錄**內：就位時用的是同卷宗的 `moveItem`，必須是原子搬移。
+/// 名稱以 `.` 起頭（隱藏），故 `findAppBundlesWithSameConnectionName`（帶 `skipsHiddenFiles`）
+/// 不會把殘留的暫存物誤認為已安裝的 bundle。
+func makeStagingURL(
+  inDirectory directory: URL,
+  fileManager: FileManager = .default
+)
+  -> URL {
+  var candidate = directory.appendingPathComponent(".vChewingInstallStaging-\(UUID().uuidString).app")
+  while fileManager.fileExists(atPath: candidate.path) {
+    candidate = directory.appendingPathComponent(".vChewingInstallStaging-\(UUID().uuidString).app")
+  }
+  return candidate
+}
 
 let installingVersion = Bundle.main
   .infoDictionary?[kCFBundleVersionKey as String] as? String ?? "BAD_INSTALLING_VER"
@@ -110,9 +129,10 @@ struct InstallerUIConfig: Hashable {
   var isCancelButtonEnabled: Bool = true
   var isAgreeButtonEnabled: Bool = true
   var isPreviousVersionNotFullyDeactivated: Bool = false
-  var isTranslocationFinished: Bool?
   var isUpgrading: Bool = false
-  var timeRemaining: Int = .init(kTranslocationRemovalDeadline)
+  var timeRemaining: Int = kInstallRetryTimeout
+  /// 首次安裝失敗時記下的重試截止時刻；`nil` 表示尚未失敗過。
+  var retryDeadline: Date?
   var adminRenameFailureAlertPaths: [String] = []
   /// 安裝結果面板所顯示的 AlertType（Cocoa / AppKit 前端仍使用此標記觸發 alert）。
   var currentAlertContent: AlertType = .nothing
@@ -121,6 +141,12 @@ struct InstallerUIConfig: Hashable {
   /// 因 SwiftUI 不允許在同一個 view 上串接多個 `.alert()`，
   /// 所以統一由單一 `alert(item:)` 驅動。
   var alertItem: InstallerAlertItem?
+
+  /// 距離重試截止時刻的剩餘秒數（無條件進位）；尚未失敗過時回傳逾時上限。
+  var retrySecondsRemaining: Int {
+    guard let retryDeadline else { return kInstallRetryTimeout }
+    return max(0, Int(retryDeadline.timeIntervalSinceNow.rounded(.up)))
+  }
 }
 
 // MARK: - InstallerAlertItem
@@ -154,7 +180,7 @@ struct InstallerAlertItem: Identifiable, Hashable {
 
 extension InstallerUIConfig {
   public enum AlertType: String, Identifiable, Hashable, Sendable {
-    case nothing, installationFailed, missingAfterRegistration, postInstallAttention,
+    case nothing, installationFailed, missingAfterRegistration, oldVersionStillInUse,
          postInstallWarning, postInstallOK, adminRenameFailure
 
     // MARK: Public
@@ -168,7 +194,7 @@ extension InstallerUIConfig {
       case .nothing: return ""
       case .installationFailed: return "i18n:Installer.InstallFailed".i18n
       case .missingAfterRegistration: return "i18n:Installer.FatalError".i18n
-      case .postInstallAttention: return "i18n:Installer.Attention".i18n
+      case .oldVersionStillInUse: return "i18n:Installer.Attention".i18n
       case .postInstallWarning: return "i18n:Common.Warning".i18n
       case .postInstallOK: return "i18n:Installer.InstallationSuccessful".i18n
       case .adminRenameFailure: return "i18n:Installer.Attention".i18n
@@ -185,8 +211,8 @@ extension InstallerUIConfig {
           format: "i18n:Installer.CannotFindInputSourceAfterRegistration:%@".i18n,
           kTISInputSourceID
         )
-      case .postInstallAttention:
-        return "i18n:Installer.UpgradedPleaseRelogin".i18n
+      case .oldVersionStillInUse:
+        return "i18n:Installer.OldVersionStillInUse".i18n
       case .postInstallWarning:
         return "i18n:Installer.InputMethodMayNotBeFullyEnabled".i18n
       case .postInstallOK:

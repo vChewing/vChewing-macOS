@@ -22,6 +22,7 @@
 "i18n:Installer.FatalError" = "Fatal Error";
 "i18n:installer.HP_AND_DONATION" = "🏠 Donation";
 "i18n:Installer.InputMethodMayNotBeFullyEnabled" = "Input method may not be fully enabled. Please enable it through System Preferences > Keyboard > Input Sources.";
+"i18n:Installer.OldVersionStillInUse" = "The old version could not be released by the system in time, so the installation was not completed. Please log out or reboot, then run the installer again.";
 "i18n:Installer.InstallationSuccessful" = "Installation Successful";
 "i18n:installer.INSTALLER_APP_TITLE_FULL" = "vChewing Installer";
 "i18n:installer.INSTALLER_APP_TITLE" = "vChewing Installer";

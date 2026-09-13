@@ -14,7 +14,7 @@ protocol InstallerVMProtocol: AnyObject {
   var config: InstallerUIConfig { get set }
 
   // 實作所需的計時器儲存欄位
-  var translocationTimer: DispatchSourceTimer? { get set }
+  var installRetryTimer: DispatchSourceTimer? { get set }
 
   // DispatchQueue
   var taskQueue: DispatchQueue { get }
@@ -50,9 +50,6 @@ extension InstallerVMProtocol {
   }
 
   func removeThenInstallInputMethod() {
-    let shouldWaitForTranslocationRemoval = Reloc
-      .isAppBundleTranslocated(atPath: kTargetPartialPath)
-
     // 先終止執行中的輸入法程序，避免 bundle 被系統鎖定
     let killTask = Process()
     killTask.launchPath = "/usr/bin/killall"
@@ -90,87 +87,62 @@ extension InstallerVMProtocol {
       }
     }
 
-    if shouldWaitForTranslocationRemoval {
-      DispatchQueue.main.async {
-        self.config.pendingSheetPresenting = true
-        self.startTranslocationTimer()
-      }
-    } else {
-      installInputMethod(previousExists: false, previousVersionNotFullyDeactivatedWarning: false)
-    }
+    installInputMethodWithRetry()
   }
 
-  func startTranslocationTimer() {
-    stopTranslocationTimer()
-
-    config.timeRemaining = Int(kTranslocationRemovalDeadline)
+  /// 直接開始安裝，並以退避重試因應「舊版 bundle 尚未被系統釋放」之類的暫時性失敗。
+  ///
+  /// 不預先判斷舊版是否仍被 Gatekeeper 的轉置映像佔用：轉置映像為唯讀，
+  /// 寫入該路徑必然失敗，故「複製失敗」本身就是可靠的等待訊號。
+  func installInputMethodWithRetry() {
+    stopInstallRetryTimer()
+    config.timeRemaining = kInstallRetryTimeout
+    config.retryDeadline = nil
 
     let timer = DispatchSource.makeTimerSource(queue: taskQueue)
-    timer.schedule(deadline: .now(), repeating: 1.0)
+    timer.schedule(deadline: .now(), repeating: kInstallRetryInterval)
     timer.setEventHandler { [weak self] in
-      guard let self = self else { return }
-
-      // 在背景執行檢查，但在主執行緒更新公開狀態
-      if self.config.timeRemaining > 0 {
-        if Reloc.isAppBundleTranslocated(atPath: kTargetPartialPath) == false {
-          self.stopTranslocationTimer()
-          DispatchQueue.main.async {
-            self.config.pendingSheetPresenting = false
-            self.config.isTranslocationFinished = true
-            self.installInputMethod(
-              previousExists: true, previousVersionNotFullyDeactivatedWarning: false
-            )
-          }
-        } else {
-          DispatchQueue.main.async {
-            self.config.timeRemaining -= 1
-          }
-        }
-      } else {
-        self.stopTranslocationTimer()
-        DispatchQueue.main.async {
-          self.config.pendingSheetPresenting = false
-          self.config.isTranslocationFinished = false
-          self.installInputMethod(
-            previousExists: true, previousVersionNotFullyDeactivatedWarning: true
-          )
-        }
-      }
+      self?.installInputMethod()
     }
-    translocationTimer = timer
+    installRetryTimer = timer
     timer.resume()
   }
 
-  func stopTranslocationTimer() {
-    if let timer = translocationTimer {
+  func stopInstallRetryTimer() {
+    if let timer = installRetryTimer {
       timer.setEventHandler(handler: nil)
       timer.cancel()
-      translocationTimer = nil
+      installRetryTimer = nil
     }
   }
 
-  private func installInputMethod(
-    previousExists _: Bool, previousVersionNotFullyDeactivatedWarning warning: Bool
-  ) {
+  /// 單次安裝嘗試。失敗不報錯，交由 `scheduleInstallRetry()` 排定下一次。
+  private func installInputMethod() {
     guard let targetBundle = Bundle.main.path(forResource: kTargetBin, ofType: kTargetType)
     else {
+      finishWithAlert(.installationFailed)
       return
     }
-    let cpTask = Process()
-    cpTask.launchPath = "/bin/cp"
-    print(kDestinationPartial)
-    cpTask.arguments = [
-      "-R", targetBundle, kDestinationPartial,
-    ]
-    cpTask.launch()
-    cpTask.waitUntilExit()
 
-    if cpTask.terminationStatus != 0 {
-      DispatchQueue.main.async {
-        // 讓使用者自己藉由 UI 結束安裝程式。
-        self.config.alertItem = InstallerUIConfig.AlertType.installationFailed.makeAlertItem()
+    let fileManager = FileManager.default
+    let staging = makeStagingURL(inDirectory: urlDestinationPartial, fileManager: fileManager)
+    do {
+      // 先複製到同目錄的暫名，再原子搬移就位；任一步失敗都視為本次嘗試失敗。
+      try fileManager.copyItem(at: URL(fileURLWithPath: targetBundle), to: staging)
+      // 舊版已於稍早改名／進垃圾桶；若仍有殘留（例如被系統佔用而未能丟棄），先清掉再就位。
+      if fileManager.fileExists(atPath: imeURLInstalled.path) {
+        try fileManager.removeItem(at: imeURLInstalled)
       }
+      try fileManager.moveItem(at: staging, to: imeURLInstalled)
+    } catch {
+      try? fileManager.removeItem(at: staging)
+      scheduleInstallRetry()
       return
+    }
+
+    stopInstallRetryTimer()
+    DispatchQueue.main.async { [weak self] in
+      self?.config.pendingSheetPresenting = false
     }
 
     do {
@@ -186,10 +158,8 @@ extension InstallerVMProtocol {
     guard let theBundle = Bundle(url: imeURLInstalled),
           let imeIdentifier = theBundle.bundleIdentifier
     else {
-      DispatchQueue.main.async {
-        // Bundled IME 缺失時，給出失敗告示。讓使用者自己藉由 UI 結束安裝程式。
-        self.config.alertItem = InstallerUIConfig.AlertType.missingAfterRegistration.makeAlertItem()
-      }
+      // Bundled IME 缺失時，給出失敗告示。讓使用者自己藉由 UI 結束安裝程式。
+      finishWithAlert(.missingAfterRegistration)
       return
     }
 
@@ -201,10 +171,8 @@ extension InstallerVMProtocol {
       )
       let status = (TISRegisterInputSource(imeBundleURL as CFURL) == noErr)
       if !status {
-        DispatchQueue.main.async {
-          // 讓使用者自己藉由 UI 結束安裝程式。
-          self.config.alertItem = InstallerUIConfig.AlertType.missingAfterRegistration.makeAlertItem()
-        }
+        // 讓使用者自己藉由 UI 結束安裝程式。
+        finishWithAlert(.missingAfterRegistration)
       }
 
       if allRegisteredInstancesOfThisInputMethod.isEmpty {
@@ -250,14 +218,38 @@ extension InstallerVMProtocol {
       let type: InstallerUIConfig.AlertType
       if !self.config.adminRenameFailureAlertPaths.isEmpty {
         type = .adminRenameFailure
-      } else if warning {
-        type = .postInstallAttention
       } else if !mainInputSourceEnabled {
         type = .postInstallWarning
       } else {
         type = .postInstallOK
       }
       self.config.currentAlertContent = type
+    }
+  }
+
+  /// 排定下一次安裝嘗試。首次失敗時才亮出等待面板並記下截止時刻；逾時則放棄。
+  private func scheduleInstallRetry() {
+    DispatchQueue.main.async { [weak self] in
+      guard let self = self else { return }
+      if self.config.retryDeadline == nil {
+        self.config.retryDeadline = Date().addingTimeInterval(TimeInterval(kInstallRetryTimeout))
+        self.config.pendingSheetPresenting = true
+      }
+      let remaining = self.config.retrySecondsRemaining
+      self.config.timeRemaining = remaining
+      guard remaining > 0 else {
+        self.finishWithAlert(.oldVersionStillInUse)
+        return
+      }
+    }
+  }
+
+  /// 收工並指定要顯示的結果面板；等待面板一併關閉。
+  private func finishWithAlert(_ type: InstallerUIConfig.AlertType) {
+    stopInstallRetryTimer()
+    DispatchQueue.main.async { [weak self] in
+      self?.config.pendingSheetPresenting = false
+      self?.config.currentAlertContent = type
     }
   }
 

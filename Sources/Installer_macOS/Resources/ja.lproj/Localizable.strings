@@ -22,6 +22,7 @@
 "i18n:Installer.FatalError" = "致命錯乱";
 "i18n:installer.HP_AND_DONATION" = "🏠 ＨＰ・お寄付";
 "i18n:Installer.InputMethodMayNotBeFullyEnabled" = "入力アプリの自動起動はうまく出来なかったかもしれません。ご自分で「システム環境設定→キーボード→入力ソース」で起動してください。";
+"i18n:Installer.OldVersionStillInUse" = "旧版がシステムから解放されなかったため、インストールを完了できませんでした。ログアウトまたは再起動のうえ、インストーラをもう一度実行してください。";
 "i18n:Installer.InstallationSuccessful" = "実装完了";
 "i18n:installer.INSTALLER_APP_TITLE_FULL" = "唯音入力 実装用アプリ";
 "i18n:installer.INSTALLER_APP_TITLE" = "唯音入力 実装用アプリ";
