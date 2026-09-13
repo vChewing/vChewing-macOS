@@ -57,22 +57,22 @@ public final class MainSputnik4IME {
         }
         return 0
       case "--dump-user-dict":
-        LMAssembly.LMInstantiator.asyncLoadingUserData = false
-        LMMgr.initUserLangModels()
-        LMMgr.loadUserPhraseReplacement()
-        LMMgr.dumpUserDictDataToJSON(print: true, all: false)
+        LXAssembly.LXFacade.asyncLoadingUserData = false
+        LXMgr.initUserLexicons()
+        LXMgr.loadUserPhraseReplacement()
+        LXMgr.dumpUserDictDataToJSON(print: true, all: false)
         return 0
       case "--dump-user-dict-all":
-        LMAssembly.LMInstantiator.asyncLoadingUserData = false
-        LMMgr.initUserLangModels()
-        LMMgr.loadUserPhraseReplacement()
-        LMMgr.loadUserAssociatesData()
-        LMMgr.dumpUserDictDataToJSON(print: true, all: true)
+        LXAssembly.LXFacade.asyncLoadingUserData = false
+        LXMgr.initUserLexicons()
+        LXMgr.loadUserPhraseReplacement()
+        LXMgr.loadUserAssociatesData()
+        LXMgr.dumpUserDictDataToJSON(print: true, all: true)
         return 0
       case "--import-kimo":
         let maybeCount: (totalFound: Int, importedCount: Int)?
         do {
-          maybeCount = try LMMgr.importYahooKeyKeyUserDictionary()
+          maybeCount = try LXMgr.importYahooKeyKeyUserDictionary()
         } catch {
           print(error.localizedDescription)
           return 1
@@ -106,7 +106,7 @@ public final class MainSputnik4IME {
         let url = URL(fileURLWithPath: path)
         let maybeCount: (totalFound: Int, importedCount: Int)?
         do {
-          maybeCount = try LMMgr.importYahooKeyKeyUserDictionary(url: url)
+          maybeCount = try LXMgr.importYahooKeyKeyUserDictionary(url: url)
         } catch {
           print(error.localizedDescription)
           return 1
@@ -140,7 +140,7 @@ public final class MainSputnik4IME {
 
     // 嘗試直接讀取驗證（若非沙盒環境或檔案已在可存取路徑內）
     if FileManager.default.isReadableFile(atPath: sourcePath) {
-      let validation = LMAssembly.LMInstantiator.validateFactoryTextMapFile(at: sourcePath)
+      let validation = LXAssembly.LXFacade.validateFactoryTextMapFile(at: sourcePath)
       guard validation.isValid else {
         print("vChewing: Factory lexicon validation failed: \(validation.errorDescription ?? "Unknown error")")
         return 1
@@ -219,7 +219,7 @@ public final class MainSputnik4IME {
     }
 
     // Step 4: 驗證 schema
-    let validation = LMAssembly.LMInstantiator.validateFactoryTextMapFile(at: selectedURL.path)
+    let validation = LXAssembly.LXFacade.validateFactoryTextMapFile(at: selectedURL.path)
     guard validation.isValid else {
       print("vChewing: Factory lexicon validation failed: \(validation.errorDescription ?? "Unknown error")")
       return 1
@@ -233,7 +233,7 @@ public final class MainSputnik4IME {
   /// - Parameter sourceURL: 來源檔案 URL
   /// - Returns: exit code
   private static func deployFactoryLexicon(from sourceURL: URL) -> Int32 {
-    let factoryDataDir = LMMgr.appSupportURL.appendingPathComponent("vChewingFactoryData")
+    let factoryDataDir = LXMgr.appSupportURL.appendingPathComponent("vChewingFactoryData")
     let destURL = factoryDataDir.appendingPathComponent("VanguardFactoryDict4Typing.txtMap")
     do {
       try FileManager.default.createDirectory(at: factoryDataDir, withIntermediateDirectories: true)

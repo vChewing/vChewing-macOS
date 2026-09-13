@@ -17,7 +17,7 @@ final class CtlRevLookupWindow: NSWindowController, NSWindowDelegate {
   /// 所有載入/卸除操作均經由 UI 行為在 MainActor 上完成，無需額外同步佇列。
   override func close() {
     autoreleasepool {
-      LMMgr.flushFactoryReverseLookupIndex()
+      LXMgr.flushFactoryReverseLookupIndex()
       super.close()
       Self.shared = nil
     }
@@ -35,7 +35,7 @@ final class CtlRevLookupWindow: NSWindowController, NSWindowDelegate {
       window.setPosition(vertical: .bottom, horizontal: .right, padding: 20)
       window.orderFrontRegardless() // 逼著視窗往最前方顯示
       window.level = .statusBar
-      LMMgr.preloadFactoryReverseLookupIndex()
+      LXMgr.preloadFactoryReverseLookupIndex()
       shared.showWindow(shared)
       NSApp.popup()
     }
@@ -62,7 +62,7 @@ final class FrmRevLookupWindow: NSWindow {
   lazy var resultView = NSTextView()
 
   static func reloadData() {
-    LMMgr.connectCoreDB()
+    LXMgr.connectCoreDB()
   }
 
   @objc
@@ -178,7 +178,7 @@ final class FrmRevLookupWindow: NSWindow {
         strBuilder.append("i18n:ErrorMessage.MaxResultsReturnable".i18n + "\n")
         break theLoop
       }
-      let arrResult = LMAssembly.LMInstantiator.getFactoryReverseLookupData(with: char)?
+      let arrResult = LXAssembly.LXFacade.getFactoryReverseLookupData(with: char)?
         .deduplicated ?? []
       if !arrResult.isEmpty {
         strBuilder.append(char + "\t")

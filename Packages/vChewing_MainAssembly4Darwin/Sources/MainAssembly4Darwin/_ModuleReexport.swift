@@ -13,15 +13,15 @@
 @_exported import Hotenka
 @_exported import IMKSwift
 @_exported import IMKUtils
-@_exported import LangModelAssembly
+@_exported import LexiconAssembly
 @_exported import ModifierKeyHitChecker
 @_exported import NotifierUI
+@_exported import OSNeutralAssembly
 @_exported import OtherIMEDataReader
 @_exported import PopupCompositionBuffer
 @_exported import SettingsUI
 @_exported import Shared_DarwinImpl
 @_exported import SwiftyCapsLockToggler
 @_exported import TooltipUI
-@_exported import Typewriter
 @_exported import Uninstaller
 @_exported import UpdateSputnik

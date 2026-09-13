@@ -7,14 +7,14 @@ import Testing
 
 @testable import Homa
 
-// MARK: - HomaTests4MockLM
+// MARK: - HomaTests4MockLX
 
 extension HomaTestsRoot {
-  public struct HomaTests4MockLM {
+  public struct HomaTests4MockLX {
     @Test("[Homa] MockedLanguageModel_(For Unit Tests)")
-    public func testMockLM() async throws {
-      let mockLM = TestLM(rawData: HomaTests.strLMSampleDataHutao)
-      let fangQueried = mockLM.queryGrams(["fang1"])
+    public func testMockLX() async throws {
+      let mockLX = TestLX(rawData: HomaTests.strLXSampleDataHutao)
+      let fangQueried = mockLX.queryGrams(["fang1"])
       #expect(fangQueried.count == 7)
       let firstBigramPreviousValue = fangQueried.compactMap(\.previous).first
       #expect(firstBigramPreviousValue == "一縷")
@@ -27,10 +27,10 @@ extension HomaTestsRoot {
   public struct HomaTestsBasic: HomaTestSuite {
     @Test("[Homa] SegmentAPIs")
     func testSegmentAPIs() async throws {
-      let langModel = TestLM(rawData: HomaTests.strLMSampleDataLitch)
+      let lexicon = TestLX(rawData: HomaTests.strLXSampleDataLitch)
       var segment = Homa.Segment()
-      let queriedRawGramsDa = langModel.queryGrams(["da4"])
-      let queriedRawGramsDaqiantian = langModel.queryGrams(["da4-qian2-tian1"])
+      let queriedRawGramsDa = lexicon.queryGrams(["da4"])
+      let queriedRawGramsDaqiantian = lexicon.queryGrams(["da4-qian2-tian1"])
       let n1 = Homa.Node(
         keyArray: ["da4"],
         grams: queriedRawGramsDa
@@ -56,7 +56,7 @@ extension HomaTestsRoot {
 
     @Test("[Homa] Assembler_BasicSegmentNodeGramInsertion")
     func testBasicSegmentNodeGramInsertion() async throws {
-      let assembler = Self.makeAssemblerUsingMockLM()
+      let assembler = Self.makeAssemblerUsingMockLX()
       #expect((assembler.cursor, assembler.length) == (0, 0))
       try assembler.insertKey("s")
       #expect((assembler.cursor, assembler.length) == (1, 1))
@@ -70,9 +70,9 @@ extension HomaTestsRoot {
 
     @Test("[Homa] Assembler_DefendingInvalidOps")
     func testDefendingInvalidOps() async throws {
-      let mockLM = TestLM(rawData: "ping2 ping2 -1")
+      let mockLX = TestLX(rawData: "ping2 ping2 -1")
       let assembler = Homa.Assembler(
-        gramQuerier: { mockLM.queryGrams($0) }
+        gramQuerier: { mockLX.queryGrams($0) }
       )
       #expect(Self.mustFail { try assembler.insertKey("guo3") })
       #expect(Self.mustFail { try assembler.insertKey("") })
@@ -146,7 +146,7 @@ extension HomaTestsRoot {
     /// 測試任何長度大於 1 的幅節。
     @Test("[Homa] Assembler_SegmentsAcrossPositions")
     func testSegmentsAcrossPositions() async throws {
-      let assembler = Self.makeAssemblerUsingMockLM()
+      let assembler = Self.makeAssemblerUsingMockLX()
       try assembler.insertKey("h")
       try assembler.insertKey("o")
       try assembler.insertKey("g")
@@ -169,7 +169,7 @@ extension HomaTestsRoot {
     /// 而是採用「前方 (Front) / 後方 (Rear)」這種中英文表述都不產生歧義的講法。
     @Test("[Homa] Assembler_KeyAndSegmentDeletionInAllDirections")
     func testKeyAndSegmentDeletionInAllDirections() async throws {
-      let assembler = Self.makeAssemblerUsingMockLM()
+      let assembler = Self.makeAssemblerUsingMockLX()
       // 測試對讀音鍵的刪除行為（對兩個方向都測試）。
       try assembler.insertKey("a")
       assembler.cursor = 0
@@ -253,7 +253,7 @@ extension HomaTestsRoot {
     /// 測試在插入某個幅節之後、對其他幅節的影響。
     @Test("[Homa] Assembler_SegmentInsertion")
     func testSegmentInsertion() async throws {
-      let assembler = Self.makeAssemblerUsingMockLM()
+      let assembler = Self.makeAssemblerUsingMockLX()
       try assembler.insertKey("是")
       try assembler.insertKey("學")
       try assembler.insertKey("生")
@@ -280,7 +280,7 @@ extension HomaTestsRoot {
     /// 測試在一個很長的組字區內在中间刪除掉或者添入某個讀音鍵之後的影響。
     @Test("[Homa] Assembler_LongGridDeletionAndInsertion")
     func testLongGridDeletionAndInsertion() async throws {
-      let assembler = Self.makeAssemblerUsingMockLM()
+      let assembler = Self.makeAssemblerUsingMockLX()
       try "無可奈何花作香幽蝶能留一縷芳".forEach {
         try assembler.insertKey($0.description)
       }

@@ -16,13 +16,13 @@ extension HomaTestsRoot {
     @Test("[Homa] Assembler_HardCopyAndWordSegmentation")
     func testHardCopyAndWordSegmentation() async throws {
       let regexToFilter = try Regex(".* 能留 .*\n")
-      let mockLM = TestLM(
-        rawData: HomaTests.strLMSampleDataHutao.replacing(regexToFilter, with: ""),
+      let mockLX = TestLX(
+        rawData: HomaTests.strLXSampleDataHutao.replacing(regexToFilter, with: ""),
         readingSeparator: "",
         valueSegmentationOnly: true
       )
       let assembler = Homa.Assembler(
-        gramQuerier: { mockLM.queryGrams($0) }
+        gramQuerier: { mockLX.queryGrams($0) }
       )
       try "幽蝶能留一縷芳".forEach { i in
         try assembler.insertKey(i.description)
@@ -37,9 +37,9 @@ extension HomaTestsRoot {
     @Test("[Homa] Assembler_StressBench")
     func testStressBenchOnAssemblingSentences() async throws {
       print("// Stress test preparation begins.")
-      let mockLM = TestLM(rawData: HomaTests.strLMStressData)
+      let mockLX = TestLX(rawData: HomaTests.strLXStressData)
       let assembler = Homa.Assembler(
-        gramQuerier: { mockLM.queryGrams($0) }
+        gramQuerier: { mockLX.queryGrams($0) }
       )
       try (0 ..< 512).forEach { _ in
         try assembler.insertKey("sheng1")
@@ -54,16 +54,16 @@ extension HomaTestsRoot {
     @Test("[Homa] Assembler_UpdateUnigramDataForAllNodes")
     func testUpdateUnigramDataForAllNodes() async throws {
       let readings: [Substring] = "shu4 xin1 feng1".split(separator: " ")
-      let newRawStringLM = HomaTests.strLMSampleDataEmoji + "\nshu4-xin1-feng1 樹新風 -9"
+      let newRawStringLX = HomaTests.strLXSampleDataEmoji + "\nshu4-xin1-feng1 樹新風 -9"
       let regexToFilter = try Regex(".*(樹|新|風) .*")
-      let mockLMWithFilter = TestLM(
-        rawData: newRawStringLM.replacing(regexToFilter, with: "")
+      let mockLXWithFilter = TestLX(
+        rawData: newRawStringLX.replacing(regexToFilter, with: "")
       )
-      let mockLM = TestLM(
-        rawData: newRawStringLM
+      let mockLX = TestLX(
+        rawData: newRawStringLX
       )
       let assembler = Homa.Assembler(
-        gramQuerier: { mockLMWithFilter.queryGrams($0) }, // 會回傳包含 Bigram 的結果。
+        gramQuerier: { mockLXWithFilter.queryGrams($0) }, // 會回傳包含 Bigram 的結果。
       )
       try readings.forEach {
         try assembler.insertKey($0.description)
@@ -71,7 +71,7 @@ extension HomaTestsRoot {
       var assembledSentence = assembler.assemble().compactMap(\.value)
       #expect(assembledSentence == ["樹心", "封"])
       // 先置換語言模型 API 再更新所有節點的 Unigram 資料。
-      assembler.gramQuerier = { mockLM.queryGrams($0) }
+      assembler.gramQuerier = { mockLX.queryGrams($0) }
       try assembler.assignNodes(updateBehavior: .refreshExisting)
       assembledSentence = assembler.assemble().compactMap(\.value)
       #expect(assembledSentence == ["樹新風"])
@@ -81,9 +81,9 @@ extension HomaTestsRoot {
     /// 且重新整理既有節點之後依然保持位置唯一性。
     @Test("[Homa] Assembler_GramIdentitiesArePositionallyUnique")
     func testGramIdentitiesArePositionallyUnique() async throws {
-      let mockLM = TestLM(rawData: "de5 的 -5.0")
+      let mockLX = TestLX(rawData: "de5 的 -5.0")
       let assembler = Homa.Assembler(
-        gramQuerier: { mockLM.queryGrams($0) }
+        gramQuerier: { mockLX.queryGrams($0) }
       )
       try assembler.insertKey("de5")
       try assembler.insertKey("de5")
@@ -110,9 +110,9 @@ extension HomaTestsRoot {
     /// 相同內容的元圖出現多次時，游標指向第一次出現的位置不得誤判為最後一次。
     @Test("[Homa] Assembler_PerceptionKeyGenerationRespectsPositionalIdentity")
     func testPerceptionKeyGenerationRespectsPositionalIdentity() async throws {
-      let mockLM = TestLM(rawData: "de5 的 -5.0")
+      let mockLX = TestLX(rawData: "de5 的 -5.0")
       let assembler = Homa.Assembler(
-        gramQuerier: { mockLM.queryGrams($0) }
+        gramQuerier: { mockLX.queryGrams($0) }
       )
       try assembler.insertKey("de5")
       try assembler.insertKey("de5")
@@ -133,11 +133,11 @@ extension HomaTestsRoot {
     @Test("[Homa] Assembler_VerifyCandidateFetchResultsWithNewAPI")
     func testVerifyCandidateFetchResultsWithNewAPI() async throws {
       let readings = "da4 qian2 tian1 zai5 ke1 ji4 gong1 yuan2 chao1 shang1"
-      let mockLM = TestLM(
-        rawData: HomaTests.strLMSampleDataTechGuarden + "\n" + HomaTests.strLMSampleDataLitch
+      let mockLX = TestLX(
+        rawData: HomaTests.strLXSampleDataTechGuarden + "\n" + HomaTests.strLXSampleDataLitch
       )
       let assembler = Homa.Assembler(
-        gramQuerier: { mockLM.queryGrams($0) }
+        gramQuerier: { mockLX.queryGrams($0) }
       )
       try readings.split(separator: " ").forEach {
         try assembler.insertKey($0.description)
@@ -186,9 +186,9 @@ extension HomaTestsRoot {
       // 一號測試。
       do {
         let readings: [Substring] = "ke1 ji4 gong1 yuan2".split(separator: " ")
-        let mockLM = TestLM(rawData: HomaTests.strLMSampleDataTechGuarden)
+        let mockLX = TestLX(rawData: HomaTests.strLXSampleDataTechGuarden)
         let assembler = Homa.Assembler(
-          gramQuerier: { mockLM.queryGrams($0) }
+          gramQuerier: { mockLX.queryGrams($0) }
         )
         try readings.forEach {
           try assembler.insertKey($0.description)
@@ -207,13 +207,13 @@ extension HomaTestsRoot {
       // 二號測試。
       do {
         let readings: [Substring] = "sheng1 sheng1".split(separator: " ")
-        let mockLM = TestLM(
-          rawData: HomaTests.strLMStressData + "\n"
+        let mockLX = TestLX(
+          rawData: HomaTests.strLXStressData + "\n"
             + HomaTests
-            .strLMSampleDataHutao
+            .strLXSampleDataHutao
         )
         let assembler = Homa.Assembler(
-          gramQuerier: { mockLM.queryGrams($0) }
+          gramQuerier: { mockLX.queryGrams($0) }
         )
         try readings.forEach {
           try assembler.insertKey($0.description)
@@ -253,10 +253,10 @@ extension HomaTestsRoot {
     @Test("[Homa] Assembler_AssembleAndOverride_WithUnigramAndCursorJump")
     func testAssembleAndOverrideWithUnigramAndCursorJump() async throws {
       let readings = "chao1 shang1 da4 qian2 tian1 wei2 zhi3 hai2 zai5 mai4 nai3 ji1"
-      let mockLM = TestLM(rawData: HomaTests.strLMSampleDataLitch)
+      let mockLX = TestLX(rawData: HomaTests.strLXSampleDataLitch)
       var perceptions = [Homa.PerceptionIntel]()
       let assembler = Homa.Assembler(
-        gramQuerier: { mockLM.queryGrams($0) },
+        gramQuerier: { mockLX.queryGrams($0) },
         perceptor: { intel in
           perceptions.append(intel)
         }
@@ -340,9 +340,9 @@ extension HomaTestsRoot {
     @Test("[Homa] Assembler_AssembleAndOverride_FullMatch_WithBigram")
     func testAssembleWithBigramAndOverrideWithFullMatch() async throws {
       let readings: [Substring] = "you1 die2 neng2 liu2 yi4 lv3 fang1".split(separator: " ")
-      let mockLM = TestLM(rawData: HomaTests.strLMSampleDataHutao)
+      let mockLX = TestLX(rawData: HomaTests.strLXSampleDataHutao)
       let assembler = Homa.Assembler(
-        gramQuerier: { mockLM.queryGrams($0) }, // 會回傳包含 Bigram 的結果。
+        gramQuerier: { mockLX.queryGrams($0) }, // 會回傳包含 Bigram 的結果。
       )
       try readings.forEach {
         try assembler.insertKey($0.description)
@@ -367,7 +367,7 @@ extension HomaTestsRoot {
       assembledSentence = assembler.assemble().values
       #expect(assembledSentence == ["幽蝶", "能", "留", "一縷", "芳"])
       // 剛才測試 Bigram 生效了。現在禁用 Bigram 試試看。先攔截掉 Bigram 結果。
-      assembler.gramQuerier = { mockLM.queryGrams($0).filter { $0.previous == nil } }
+      assembler.gramQuerier = { mockLX.queryGrams($0).filter { $0.previous == nil } }
       try assembler.assignNodes(updateBehavior: .refreshExisting) // 置換掉所有節點裡面的資料。
       assembledSentence = assembler.assemble().values
       #expect(assembledSentence == ["幽蝶", "能", "留", "一縷", "方"])
@@ -401,9 +401,9 @@ extension HomaTestsRoot {
     @Test("[Homa] Assembler_AssembleAndOverride_PartialMatch_WithBigram")
     func testAssembleWithBigramAndOverrideWithPartialMatch() async throws {
       let readings: [String] = "ydnlylf".map(\.description)
-      let mockLM = TestLM(rawData: HomaTests.strLMSampleDataHutao)
+      let mockLX = TestLX(rawData: HomaTests.strLXSampleDataHutao)
       let assembler = Homa.Assembler(
-        gramQuerier: { mockLM.queryGrams($0, partiallyMatch: true) }, // 會回傳包含 Bigram 的結果。
+        gramQuerier: { mockLX.queryGrams($0, partiallyMatch: true) }, // 會回傳包含 Bigram 的結果。
       )
       try readings.forEach {
         try assembler.insertKey($0.description)
@@ -433,9 +433,9 @@ extension HomaTestsRoot {
     @Test("[Homa] Assembler_ResetFullyOverlappedNodesOnOverride")
     func testResettingFullyOverlappedNodesOnOverride() async throws {
       let readings: [Substring] = "shui3 guo3 zhi1".split(separator: " ")
-      let mockLM = TestLM(rawData: HomaTests.strLMSampleDataFruitJuice)
+      let mockLX = TestLX(rawData: HomaTests.strLXSampleDataFruitJuice)
       let assembler = Homa.Assembler(
-        gramQuerier: { mockLM.queryGrams($0) }, // 會回傳包含 Bigram 的結果。
+        gramQuerier: { mockLX.queryGrams($0) }, // 會回傳包含 Bigram 的結果。
       )
       try readings.forEach {
         try assembler.insertKey($0.description)
@@ -518,9 +518,9 @@ extension HomaTestsRoot {
     @Test("[Homa] Assembler_ResetPartiallyOverlappedNodesOnOverride")
     func testResettingPartiallyOverlappedNodesOnOverride() async throws {
       let readings: [Substring] = "ke1 ji4 gong1 yuan2".split(separator: " ")
-      let mockLM = TestLM(rawData: HomaTests.strLMSampleDataTechGuarden + "\ngong1-yuan2 公猿 -9")
+      let mockLX = TestLX(rawData: HomaTests.strLXSampleDataTechGuarden + "\ngong1-yuan2 公猿 -9")
       let assembler = Homa.Assembler(
-        gramQuerier: { mockLM.queryGrams($0) }, // 會回傳包含 Bigram 的結果。
+        gramQuerier: { mockLX.queryGrams($0) }, // 會回傳包含 Bigram 的結果。
       )
       try readings.forEach {
         try assembler.insertKey($0.description)
@@ -569,11 +569,11 @@ extension HomaTestsRoot {
     func testCandidateDisambiguationAndCursorStepwiseMovement() async throws {
       let readings: [Substring] = "da4 shu4 xin1 de5 mi4 feng1".split(separator: " ")
       let regexToFilter = try Regex("\nshu4-xin1 .*")
-      let mockLM = TestLM(
-        rawData: HomaTests.strLMSampleDataEmoji.replacing(regexToFilter, with: "")
+      let mockLX = TestLX(
+        rawData: HomaTests.strLXSampleDataEmoji.replacing(regexToFilter, with: "")
       )
       let assembler = Homa.Assembler(
-        gramQuerier: { mockLM.queryGrams($0) }, // 會回傳包含 Bigram 的結果。
+        gramQuerier: { mockLX.queryGrams($0) }, // 會回傳包含 Bigram 的結果。
       )
       try readings.forEach {
         try assembler.insertKey($0.description)
@@ -661,10 +661,10 @@ extension HomaTestsRoot {
       let rdSimp = "k j g y c s m n j"
       let rdFull = "ke1 ji4 gong1 yuan2 chao1 shang1 mai4 nai3 ji1"
       let readings: String = partialMatch ? rdSimp : rdFull
-      let mockLM = TestLM(
-        rawData: HomaTests.strLMSampleDataTechGuarden + "\n"
+      let mockLX = TestLX(
+        rawData: HomaTests.strLXSampleDataTechGuarden + "\n"
           + HomaTests
-          .strLMSampleDataLitch
+          .strLXSampleDataLitch
       )
 
       struct CandidateIdentity: Hashable {
@@ -695,7 +695,7 @@ extension HomaTestsRoot {
       let cases: [Homa.Assembler.CandidateCursor] = [.placedFront, .placedRear]
       try cases.forEach { candidateCursorType in
         let assembler = Homa.Assembler(
-          gramQuerier: { mockLM.queryGrams($0, partiallyMatch: partialMatch) }
+          gramQuerier: { mockLX.queryGrams($0, partiallyMatch: partialMatch) }
         )
         try readings.split(separator: " ").forEach {
           try assembler.insertKey($0.description)
@@ -856,9 +856,9 @@ extension HomaTestsRoot {
     /// 組字器的候選字輪替測試——某個罕見情形。
     @Test("[Homa] Assembler_TestCandidateRevolvementRareCase1")
     func testCandidateRevolvementRareCase1() async throws {
-      let mockLM = TestLM(rawData: HomaTests.strLMSampleData_JiHuQiKeng)
+      let mockLX = TestLX(rawData: HomaTests.strLXSampleData_JiHuQiKeng)
       let assembler = Homa.Assembler(
-        gramQuerier: { mockLM.queryGrams($0) }
+        gramQuerier: { mockLX.queryGrams($0) }
       )
       let readingKeys = ["ji1", "hu1", "qi4", "keng1"]
       try readingKeys.forEach { try assembler.insertKey($0) }
@@ -892,9 +892,9 @@ extension HomaTestsRoot {
     /// 迴歸測試：輪替「旅 -> 一縷」時，不應把前一讀音「留」過度鞏固。
     @Test("[Homa] Assembler_RevolveCandidateAvoidsOverConsolidatingLeadingOverlap")
     func testRevolveCandidateAvoidsOverConsolidatingLeadingOverlap() async throws {
-      let mockLM = TestLM(rawData: HomaTests.strLMSampleDataHutao + "\nliu2 流 -4")
+      let mockLX = TestLX(rawData: HomaTests.strLXSampleDataHutao + "\nliu2 流 -4")
       let assembler = Homa.Assembler(
-        gramQuerier: { mockLM.queryGrams($0) }
+        gramQuerier: { mockLX.queryGrams($0) }
       )
       try ["liu2", "yi4", "lv3"].forEach { try assembler.insertKey($0) }
       #expect(assembler.assemble().values == ["留意", "旅"])
@@ -929,8 +929,8 @@ extension HomaTestsRoot {
     ///    把已覆寫的「濟」覆蓋掉，結果變回 [技工]。
     @Test("[Homa] Revolver_OverridesNeighboringExplicitNode_Scenario1")
     func testRevolverOverridesNeighboringExplicitNode_Scenario1() async throws {
-      let mockLM = TestLM(rawData: HomaTests.strLMSampleDataTechGuarden)
-      let assembler = Homa.Assembler(gramQuerier: { mockLM.queryGrams($0) })
+      let mockLX = TestLX(rawData: HomaTests.strLXSampleDataTechGuarden)
+      let assembler = Homa.Assembler(gramQuerier: { mockLX.queryGrams($0) })
       try ["ji4", "gong1"].forEach { try assembler.insertKey($0) }
       #expect(assembler.assemble().values == ["技工"])
 
@@ -978,8 +978,8 @@ extension HomaTestsRoot {
     /// Soft revolve 驗收（情境一）：`softRevolve: true` 時，輪替 gong1 不應毀掉已覆寫的「濟」。
     @Test("[Homa] Revolver_SoftRevolvePreservesExplicitNeighbor_Scenario1")
     func testRevolverSoftRevolvePreservesExplicitNeighbor_Scenario1() async throws {
-      let mockLM = TestLM(rawData: HomaTests.strLMSampleDataTechGuarden)
-      let assembler = Homa.Assembler(gramQuerier: { mockLM.queryGrams($0) })
+      let mockLX = TestLX(rawData: HomaTests.strLXSampleDataTechGuarden)
+      let assembler = Homa.Assembler(gramQuerier: { mockLX.queryGrams($0) })
       try ["ji4", "gong1"].forEach { try assembler.insertKey($0) }
       _ = assembler.assemble()
 
@@ -1010,8 +1010,8 @@ extension HomaTestsRoot {
     /// Soft revolve 驗收（情境二）：`softRevolve: true` 時，中段輪替 yi4 不應毀掉已覆寫的「流」。
     @Test("[Homa] Revolver_SoftRevolvePreservesExplicitNeighbor_Scenario2")
     func testRevolverSoftRevolvePreservesExplicitNeighbor_Scenario2() async throws {
-      let mockLM = TestLM(rawData: HomaTests.strLMSampleDataHutao)
-      let assembler = Homa.Assembler(gramQuerier: { mockLM.queryGrams($0) })
+      let mockLX = TestLX(rawData: HomaTests.strLXSampleDataHutao)
+      let assembler = Homa.Assembler(gramQuerier: { mockLX.queryGrams($0) })
       try ["neng2", "liu2", "yi4", "lv3"].forEach { try assembler.insertKey($0) }
       _ = assembler.assemble()
 
@@ -1040,7 +1040,7 @@ extension HomaTestsRoot {
 
     /// 情境二類比：中段游標、鞏固活躍、多音節候選跨越鄰近 explicit 節點。
     ///
-    /// 利用 `strLMSampleDataHutao` 最強的雙音節單元圖 `liu2-yi4 留意`(-4.407) 構築：
+    /// 利用 `strLXSampleDataHutao` 最強的雙音節單元圖 `liu2-yi4 留意`(-4.407) 構築：
     /// - 敲 `neng2 liu2 yi4 lv3` → 預設組字 `能 留意 旅`（留意為中段雙音節節點）。
     /// - 使用者將 `liu2`（留意的首音節，中段）覆寫成「流」（explicit，類比情境二的「要」）
     ///   → `能 流 亦 旅`（流存活，yi4 自動殘餘取最高權重）。
@@ -1051,8 +1051,8 @@ extension HomaTestsRoot {
     ///   在 non-explicit 分支回傳索引 0（留意），`overrideCandidate` 覆蓋 position 1 的 explicit「流」。
     @Test("[Homa] Revolver_MidBufferConsolidationActive_Scenario2Analogue")
     func testRevolverMidBufferConsolidationActive_Scenario2Analogue() async throws {
-      let mockLM = TestLM(rawData: HomaTests.strLMSampleDataHutao)
-      let assembler = Homa.Assembler(gramQuerier: { mockLM.queryGrams($0) })
+      let mockLX = TestLX(rawData: HomaTests.strLXSampleDataHutao)
+      let assembler = Homa.Assembler(gramQuerier: { mockLX.queryGrams($0) })
       try ["neng2", "liu2", "yi4", "lv3"].forEach { try assembler.insertKey($0) }
       let defaultAssembly = assembler.assemble().values
       print("[Scenario2] default assembly: \(defaultAssembly)")
@@ -1101,9 +1101,9 @@ extension HomaTestsRoot {
 
     @Test("[Homa] Assembler_ConsolidationUsesTrueNodeAnchorsOnOverlap")
     func testConsolidationUsesTrueNodeAnchorsOnOverlap() async throws {
-      let mockLM = TestLM(rawData: HomaTests.strLMSampleData_JiHuQiKeng)
+      let mockLX = TestLX(rawData: HomaTests.strLXSampleData_JiHuQiKeng)
       let assembler = Homa.Assembler(
-        gramQuerier: { mockLM.queryGrams($0) }
+        gramQuerier: { mockLX.queryGrams($0) }
       )
       let readingKeys = ["ji1", "hu1", "qi4", "keng1"]
       try readingKeys.forEach { try assembler.insertKey($0) }
@@ -1136,9 +1136,9 @@ extension HomaTestsRoot {
     /// 邊緣案例測試：再創世的凱歌（再創紀の凱歌）。
     @Test("[Homa] Perception Intel API (SaisoukiNoGaika)")
     func testPerceptionIntel_SaisoukiNoGaika() async throws {
-      let mockLM = TestLM(rawData: HomaTests.strLMSampleData_SaisoukiNoGaika)
+      let mockLX = TestLX(rawData: HomaTests.strLXSampleData_SaisoukiNoGaika)
       let assembler = Homa.Assembler(
-        gramQuerier: { mockLM.queryGrams($0) }
+        gramQuerier: { mockLX.queryGrams($0) }
       )
       let readingKeys = ["zai4", "chuang4", "shi4", "de5", "kai3", "ge1"]
       try readingKeys.forEach { try assembler.insertKey($0) }
@@ -1232,9 +1232,9 @@ extension HomaTestsRoot {
 
     @Test("[Homa] Perception Intel API (BusinessEnglishSession)")
     func testPerceptionIntel_BusinessEnglishSession() async throws {
-      let mockLM = TestLM(rawData: HomaTests.strLMSampleData_BusinessEnglishSession)
+      let mockLX = TestLX(rawData: HomaTests.strLXSampleData_BusinessEnglishSession)
       let assembler = Homa.Assembler(
-        gramQuerier: { mockLM.queryGrams($0) }
+        gramQuerier: { mockLX.queryGrams($0) }
       )
       let readingKeys = ["shang1", "wu4", "ying1", "yu3", "hui4", "hua4"]
       try readingKeys.forEach { try assembler.insertKey($0) }
@@ -1298,9 +1298,9 @@ extension HomaTestsRoot {
     @Test("[Homa] Perception Intel API (DiJiaoSubmission)")
     func testPerceptionIntel_DiJiaoSubmission() async throws {
       let readingKeys = ["di4", "jiao1"]
-      let mockLM = TestLM(rawData: HomaTests.strLMSampleData_DiJiaoSubmission)
+      let mockLX = TestLX(rawData: HomaTests.strLXSampleData_DiJiaoSubmission)
       let assembler = Homa.Assembler(
-        gramQuerier: { mockLM.queryGrams($0) }
+        gramQuerier: { mockLX.queryGrams($0) }
       )
       try readingKeys.forEach { try assembler.insertKey($0) }
       assembler.assemble()
@@ -1355,7 +1355,7 @@ extension HomaTestsRoot {
       #expect(assembledAfterSecond == "遞交")
 
       let validationAssembler = Homa.Assembler(
-        gramQuerier: { mockLM.queryGrams($0) }
+        gramQuerier: { mockLX.queryGrams($0) }
       )
       try readingKeys.forEach { try validationAssembler.insertKey($0) }
       validationAssembler.assemble()
@@ -1426,7 +1426,7 @@ extension HomaTestsRoot {
     /// 路徑總分 API：insertKeys 之後 mostRecentPathScore 有值，且不同鍵序列給出不同分數。
     @Test("[Homa] Assembler_mostRecentPathScore")
     func testmostRecentPathScore() async throws {
-      let mockLM = TestLM(
+      let mockLX = TestLX(
         rawData: """
         fang1 方 -4.0
         an1 安 -4.0
@@ -1436,18 +1436,18 @@ extension HomaTestsRoot {
         """
       )
       // 尚未組句時為地板值。
-      let freshAssembler = Homa.Assembler(gramQuerier: { mockLM.queryGrams($0) })
+      let freshAssembler = Homa.Assembler(gramQuerier: { mockLX.queryGrams($0) })
       #expect(freshAssembler.mostRecentPathScore == Double(Int32.min))
 
       // 序列一：fang1 + an1 → 方 + 安（-8.0）。
-      let assemblerA = Homa.Assembler(gramQuerier: { mockLM.queryGrams($0) })
+      let assemblerA = Homa.Assembler(gramQuerier: { mockLX.queryGrams($0) })
       try assemblerA.insertKey("fang1")
       try assemblerA.insertKey("an1")
       let scoreA = assemblerA.mostRecentPathScore
       #expect(scoreA > Double(Int32.min))
 
       // 序列二：fan3 + gan3 → 反感（雙音節詞 -7.0 勝過 反+感 -8.0）。
-      let assemblerB = Homa.Assembler(gramQuerier: { mockLM.queryGrams($0) })
+      let assemblerB = Homa.Assembler(gramQuerier: { mockLX.queryGrams($0) })
       try assemblerB.insertKey("fan3")
       try assemblerB.insertKey("gan3")
       let scoreB = assemblerB.mostRecentPathScore

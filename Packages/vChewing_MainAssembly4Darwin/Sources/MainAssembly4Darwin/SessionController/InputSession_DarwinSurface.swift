@@ -8,10 +8,10 @@
 
 import AppKit
 import IMKUtils
+import OSNeutralAssembly
 import Shared
 import Shared_DarwinImpl
 import SwiftExtension
-import Typewriter
 
 // MARK: - IMKInputSessionController + SessionClientProxy
 

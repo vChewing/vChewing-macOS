@@ -3,12 +3,12 @@
 說明：本研究以軟體倉庫 vChewing-macOS 為準（主頁資料僅作導讀）。以下依「用戶行為 → 觸發功能」重新檢視 `InputHandler.triageInput` 與其委派函式，列出實際支援的行為並標註適合做單元測試的項目，再整理當前測試覆蓋現況與待補清單。
 
 參考路徑（重點模組與測試）：
-- Packages/vChewing_Typewriter/Sources/Typewriter/InputHandler/*
+- Packages/vChewing_OSNeutralAssembly/Sources/OSNeutralAssembly/InputHandler/*
 - Packages/vChewing_MainAssembly4Darwin/Sources/MainAssembly4Darwin/SessionController/*
 - 測試：
-  - TypewriterTests: Packages/vChewing_Typewriter/Tests/TypewriterTests/*
+  - OSNeutralAssemblyTests: Packages/vChewing_OSNeutralAssembly/Tests/OSNeutralAssemblyTests/*
    - MainAssemblyTests: Packages/vChewing_MainAssembly4Darwin/Tests/MainAssembly4DarwinTests/*
-  - CandidateWindowTests、LangModelAssemblyTests 等輔助測試
+  - CandidateWindowTests、LexiconAssemblyTests 等輔助測試
 
 ---
 
@@ -82,7 +82,7 @@ I. 其他保護邏輯
 ## 3) 現有測試覆蓋與待補清單
 
 已覆蓋（摘錄）：
-- TypewriterTests IH101~106、IH107~109、IH111：基本組句、逐字選字、Cassette `%quick`、CodePoint、讀音/註記/點字提交以及 POM 觀察。
+- OSNeutralAssemblyTests IH101~106、IH107~109、IH111：基本組句、逐字選字、Cassette `%quick`、CodePoint、讀音/註記/點字提交以及 POM 觀察。
 - CandidateServiceCoordinatorTests：驗證服務選單內容與對應 selector。
 - MainAssemblyTests_Test2：
   - 201 覆蓋 Home/End 與 clock keys；202 覆蓋 ESC 偏好兩路徑；203 覆蓋 BackSpace / Delete 各分支與 CodePoint 回退。

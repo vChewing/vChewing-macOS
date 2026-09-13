@@ -43,14 +43,14 @@
       - 更新 `init(dictDir:)` 的檔案 URL 建構，改用 `URL(fileURLWithPath:)` + `appendingPathComponent`。
       - 在 `Hotenka` 單元測試加入對 SQL 注入的測試（`testSQLInjectionVulnerableQuery`）與將原先的 INSERT 測試改為使用 bind 以模擬不受影響的行為。
 
-- [x] Harden LMInstantiator and other SQL hotspots (Medium)
+- [x] Harden LXFacade and other SQL hotspots (Medium)
 
-  - 問題：`LMInstantiator_SQLExtension.swift`（和其他 SQL 片段）對某些查詢仍使用 string interpolation 並靠 `replace("'", "''")` 等防呆措施來避免 SQL injection；這不如使用 prepared/bound statements 安全可靠。
+  - 問題：`LXFacade_SQLExtension.swift`（和其他 SQL 片段）對某些查詢仍使用 string interpolation 並靠 `replace("'", "''")` 等防呆措施來避免 SQL injection；這不如使用 prepared/bound statements 安全可靠。
   - 建議步驟：
     1. 漸進式改動：把常用/關鍵 SQL 查询改寫成 bind 形式，再把其他次要查询一起改良。
     2. 編寫測試覆蓋邊界情形（包含單引號、分號、特殊字元）。
     3. 已完成實作：
-    - `LMInstantiator_SQLExtension` 中多處以 `sqlite3_prepare_v2` + `sqlite3_bind_text` 改寫 `SELECT *` 類型查詢（並新增針對 SQL 注入的單元測試 `LMInstantiator_SQLInjectionTests`）。
+    - `LXFacade_SQLExtension` 中多處以 `sqlite3_prepare_v2` + `sqlite3_bind_text` 改寫 `SELECT *` 類型查詢（並新增針對 SQL 注入的單元測試 `LXFacade_SQLInjectionTests`）。
     - 備註：`runAsSQLExec` 仍保留作為執行 PRAGMA/DDL/測試用途，任意 user-supplied SQL 應改為 prepared statements 並使用 `%` placeholders。
 
 - [x] Harden Candidate Text Services (High)
@@ -111,7 +111,7 @@
       - 註：目前已新增與強化 `build_darwin_MainAssembly.yml`，使 macOS CI:
         - 使用 `actions/checkout@v4` 並檢出 submodule。
         - 快取 SwiftPM 與 `.build` 產物以加速重複工作。
-        - 在 macOS Runner 上為關鍵 macOS-only package（`vChewing_Shared`, `vChewing_MainAssembly4Darwin`, `vChewing_LangModelAssembly`, `vChewing_Hotenka`, `vChewing_OSFrameworkImpl`, `vChewing_UpdateSputnik`, `Jad_BookmarkManager`）逐一執行 `swift test`。
+        - 在 macOS Runner 上為關鍵 macOS-only package（`vChewing_Shared`, `vChewing_MainAssembly4Darwin`, `vChewing_LexiconAssembly`, `vChewing_Hotenka`, `vChewing_OSFrameworkImpl`, `vChewing_UpdateSputnik`, `Jad_BookmarkManager`）逐一執行 `swift test`。
         - 適當處理 `swift test` 回傳的 `no tests found` (exit code 1) 情況，不會使 CI 失敗。
 
     - 確認 `@URL:` 只接受 `http`/`https`（`file:`、`data:`、`javascript:`、`mailto:` 等均被拒絕）。
@@ -133,7 +133,7 @@
 - 所有改動點皆有單元測試（可在 macOS runner 上跑通）。
 - 不會再直接使用 `-c` shell 命令字串插入（僅 developer-only scripts 保留且受控）。
 - 所有在執行時直接 `open(...)` 外部 URL 的場景，預先驗證 `scheme` 與白名單域名（或強制 `https`）。
-- `Hotenka` 與 `LMInstantiator` SQL 查詢全部改寫成 prepared/bound statements。
+- `Hotenka` 與 `LXFacade` SQL 查詢全部改寫成 prepared/bound statements。
 
 ---
 
@@ -146,7 +146,7 @@
 - `Packages/vChewing_OSFrameworkImpl/Sources/OSFrameworkImpl/AppKitImpl/AppKitImpl_Misc.swift`
 - `Source/Data/Sources/LibVanguardChewingData/Utils/ShellHelper.swift`
 - `Packages/vChewing_Hotenka/Sources/Hotenka/HotenkaChineseConverter.swift`
-- `Packages/vChewing_LangModelAssembly/Sources/LangModelAssembly/LMInstantiator_SQLExtension.swift`
+- `Packages/vChewing_LexiconAssembly/Sources/LexiconAssembly/LXFacade_SQLExtension.swift`
 
 ---
 

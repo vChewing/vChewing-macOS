@@ -11,18 +11,18 @@ import Foundation
 public protocol PhraseEditorDelegate: AnyObject {
   var currentInputMode: Shared.InputMode { get }
   var isCassetteModeEnabledInLM: Bool { get set }
-  func retrieveData(mode: Shared.InputMode, type: LMAssembly.ReplacableUserDataType) -> String
+  func retrieveData(mode: Shared.InputMode, type: LXAssembly.ReplacableUserDataType) -> String
   @discardableResult
   func saveData(
     mode: Shared.InputMode,
-    type: LMAssembly.ReplacableUserDataType,
+    type: LXAssembly.ReplacableUserDataType,
     data: String
   )
     -> String
   func consolidate(text strProcessed: inout String, pragma shouldCheckPragma: Bool)
   func openPhraseFile(
     mode: Shared.InputMode,
-    type: LMAssembly.ReplacableUserDataType,
+    type: LXAssembly.ReplacableUserDataType,
     using: FileOpenMethod
   )
   func tagOverrides(in strProcessed: inout String, mode: Shared.InputMode)

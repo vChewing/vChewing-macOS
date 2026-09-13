@@ -1,0 +1,90 @@
+// (c) 2021 and onwards The vChewing Project (MIT-NTL License).
+// ====================
+// This code is released under the MIT license (SPDX-License-Identifier: MIT)
+// ... with NTL restriction stating that:
+// No trademark license is granted to use the trade names, trademarks, service
+// marks, or product names of Contributor, except as required to fulfill notice
+// requirements defined in MIT License.
+
+import Foundation
+
+// MARK: - InputHandler
+
+/// InputHandler 輸入調度模組。
+public final class InputHandler: @MainActor InputHandlerProtocol {
+  // MARK: Lifecycle
+
+  /// 初期化。
+  public init(
+    lx: LXAssembly.LXFacade,
+    pref: PrefMgrProtocol,
+    errorCallback: ((_ message: String) -> ())? = nil,
+    filterabilityChecker: ((_ state: IMEStateData) -> Bool)? = nil,
+    notificationCallback: ((_ message: String) -> ())? = nil,
+    pomSaveCallback: (() -> ())? = nil
+  ) {
+    self.prefs = pref
+    self.currentLM = lx
+    self.pomSaveCallback = pomSaveCallback
+    self.errorCallback = errorCallback
+    self.filterabilityChecker = filterabilityChecker
+    self.notificationCallback = notificationCallback
+    /// 組字器初期化（先用空閉包，待 self 完成初期化後再指定真正的閉包）。
+    self.assembler = Assembler(
+      gramQuerier: { _ in [] }
+    )
+    /// 同步組字器單個詞的幅節長度上限。
+    assembler.maxSegLength = prefs.maxCandidateLength
+    /// 將真正的 LM 查詢閉包綁至組字器。
+    assembler.gramQuerier = { [weak self] keyArray in
+      guard let self else { return [] }
+      return self.currentLM.lxQuerier.grams(for: keyArray)
+    }
+    /// 將輕量級在庫檢查閉包綁至組字器，避免 insertKeys() 用完整查詢做 existence check。
+    assembler.gramAvailabilityChecker = { [weak self] keyArray in
+      guard let self else { return false }
+      return self.currentLM.lxQuerier.hasGrams(for: keyArray)
+    }
+    /// 注拼槽初期化。
+    ensureKeyboardParser()
+  }
+
+  // MARK: Public
+
+  public typealias State = IMEState
+  public typealias Session = InputSession
+
+  public static var keySeparator: String { Assembler.theSeparator }
+
+  public var isJISKeyboard: (() -> Bool)? = { SessionHost.shared.isKeyboardJIS() }
+
+  /// 委任物件 (InputSession)，以便呼叫其中的函式。
+  public weak var session: Session?
+  public var prefs: PrefMgrProtocol
+  public var errorCallback: ((String) -> ())?
+  public var notificationCallback: ((String) -> ())?
+  public var pomSaveCallback: (() -> ())?
+  public var filterabilityChecker: ((_ state: IMEStateData) -> Bool)?
+  public var markingTooltipGenerator: ((_ state: State) -> (tooltip: String, colorState: TooltipColorState))?
+  public var narrator: (any SpeechNarratorProtocol)? = SessionHost.shared.narrator()
+
+  /// 用來記錄「叫出選字窗前」的游標位置的變數。
+  public var backupCursor: Int?
+  /// 當前的打字模式。
+  public var currentTypingMethod: TypingMethod = .vChewingFactory
+
+  public var strCodePointBuffer = "" // 內碼輸入專用組碼區
+  public var calligrapher = "" // 磁帶專用組筆區
+  public var mixedAlphanumericalBuffer = "" // 混輸暫存 ASCII 緩衝區
+  public var furiousTrail = [String]() // 狂拼模式：自動 chop 提交鍵對應的拼音字母 blob trail
+  public var furiousHighlightOverride: CandidateInState? // 狂拼 copilot 窗高亮候選（當拍消費）
+  public var furiousCoSegmentedOffers = [FuriousCoSegmentedOffer]() // 狂拼 copilot 窗聯合重切（P164）的替代切分 offers
+  public var composer: Composer = .init() // 注拼槽
+  public var assembler: Assembler // 組字器
+
+  public var currentLM: LXAssembly.LXFacade {
+    didSet {
+      clear()
+    }
+  }
+}

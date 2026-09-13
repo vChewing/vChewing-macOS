@@ -254,7 +254,7 @@ extension Homa.Assembler {
       return counterClockwise ? candidatePairs.count - 1 : 1
     }
 
-    // 覆寫節點的情況：循序查找當前候選字並沿用 Typewriter 的輪替邏輯。
+    // 覆寫節點的情況：循序查找當前候選字並沿用 OSNeutralAssembly 的輪替邏輯。
     var result = 0
     for candidate in candidatePairs {
       result.revolveAsIndex(

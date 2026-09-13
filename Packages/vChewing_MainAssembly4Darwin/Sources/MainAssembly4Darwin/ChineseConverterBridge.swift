@@ -12,7 +12,7 @@ extension ChineseConverter {
   // MARK: Public
 
   private static let hotenkaSingleton: HotenkaChineseConverter? = {
-    guard let path = LMMgr.getBundleDataPath("convdict", ext: "stringmap") else { return nil }
+    guard let path = LXMgr.getBundleDataPath("convdict", ext: "stringmap") else { return nil }
     return try? HotenkaChineseConverter(stringMapPath: path)
   }()
 

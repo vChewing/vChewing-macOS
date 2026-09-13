@@ -49,7 +49,7 @@ extension SettingsPanesCocoa {
               prefUITab: .tabDictionary
             ) { renderable in
               renderable.currentControl?.target = self
-              renderable.currentControl?.action = #selector(self.lmmgrInitUserLMsWhenShould(_:))
+              renderable.currentControl?.action = #selector(self.lxmgrInitUserLMsWhenShould(_:))
             }
             "i18n:InfoMessage.SecurityConcernsNoShellScript".i18n
               .makeNSLabel(descriptive: true, fixWidth: contentWidth)
@@ -62,7 +62,7 @@ extension SettingsPanesCocoa {
               prefUITab: .tabDictionary
             ) { renderable in
               renderable.currentControl?.target = self
-              renderable.currentControl?.action = #selector(self.lmmgrSyncLMPrefs(_:))
+              renderable.currentControl?.action = #selector(self.lxmgrSyncLMPrefs(_:))
             }
           UserDef.kUseExternalFactoryDict
             .renderCocoa(
@@ -70,7 +70,7 @@ extension SettingsPanesCocoa {
               prefUITab: .tabDictionary
             ) { renderable in
               renderable.currentControl?.target = self
-              renderable.currentControl?.action = #selector(self.lmmgrConnectCoreDB(_:))
+              renderable.currentControl?.action = #selector(self.lxmgrConnectCoreDB(_:))
             }
           UserDef.kFilterNonCNSReadingsForCHTInput
             .renderCocoa(
@@ -78,7 +78,7 @@ extension SettingsPanesCocoa {
               prefUITab: .tabDictionary
             ) { renderable in
               renderable.currentControl?.target = self
-              renderable.currentControl?.action = #selector(self.lmmgrSyncLMPrefs(_:))
+              renderable.currentControl?.action = #selector(self.lxmgrSyncLMPrefs(_:))
             }
           UserDef.kFilterFactoryKanjisOfNonCurrentInputMode
             .renderCocoa(
@@ -86,7 +86,7 @@ extension SettingsPanesCocoa {
               prefUITab: .tabDictionary
             ) { renderable in
               renderable.currentControl?.target = self
-              renderable.currentControl?.action = #selector(self.lmmgrSyncLMPrefs(_:))
+              renderable.currentControl?.action = #selector(self.lxmgrSyncLMPrefs(_:))
             }
           UserDef.kCNS11643Enabled
             .renderCocoa(
@@ -94,7 +94,7 @@ extension SettingsPanesCocoa {
               prefUITab: .tabDictionary
             ) { renderable in
               renderable.currentControl?.target = self
-              renderable.currentControl?.action = #selector(self.lmmgrSyncLMPrefs(_:))
+              renderable.currentControl?.action = #selector(self.lxmgrSyncLMPrefs(_:))
             }
           UserDef.kSymbolInputEnabled
             .renderCocoa(
@@ -102,7 +102,7 @@ extension SettingsPanesCocoa {
               prefUITab: .tabDictionary
             ) { renderable in
               renderable.currentControl?.target = self
-              renderable.currentControl?.action = #selector(self.lmmgrSyncLMPrefs(_:))
+              renderable.currentControl?.action = #selector(self.lxmgrSyncLMPrefs(_:))
             }
           UserDef.kReplaceSymbolMenuNodeWithUserSuppliedData.renderCocoa(
             fixWidth: contentWidth,
@@ -115,7 +115,7 @@ extension SettingsPanesCocoa {
             ) { renderable in
               renderable.currentControl?.target = self
               renderable.currentControl?
-                .action = #selector(self.lmmgrSyncLMPrefsWithReplacementTable(_:))
+                .action = #selector(self.lxmgrSyncLMPrefsWithReplacementTable(_:))
             }
           UserDef.kSuppressFactoryUnigramsOfKanaSyllables.renderCocoa(
             fixWidth: contentWidth,
@@ -202,24 +202,24 @@ extension SettingsPanesCocoa {
     }
 
     @IBAction
-    func lmmgrInitUserLMsWhenShould(_: NSControl) {
+    func lxmgrInitUserLMsWhenShould(_: NSControl) {
       if PrefMgr.shared.shouldAutoReloadUserDataFiles {
-        SettingsUIHost.shared.initUserLangModels()
+        SettingsUIHost.shared.initUserLexicons()
       }
     }
 
     @IBAction
-    func lmmgrConnectCoreDB(_: NSControl) {
+    func lxmgrConnectCoreDB(_: NSControl) {
       SettingsUIHost.shared.connectCoreDB()
     }
 
     @IBAction
-    func lmmgrSyncLMPrefs(_: NSControl) {
+    func lxmgrSyncLMPrefs(_: NSControl) {
       SettingsUIHost.shared.syncLMPrefs()
     }
 
     @IBAction
-    func lmmgrSyncLMPrefsWithReplacementTable(_: NSControl) {
+    func lxmgrSyncLMPrefsWithReplacementTable(_: NSControl) {
       SettingsUIHost.shared.syncLMPrefs()
       if PrefMgr.shared.phraseReplacementEnabled {
         SettingsUIHost.shared.loadUserPhraseReplacement()
@@ -411,7 +411,7 @@ extension SettingsPanesCocoa.Dictionary: NSPathControlDelegate {
       guard response == .alertFirstButtonReturn else { return }
       let count = SettingsUIHost.shared.migrateUserDataFrom(oldPath, newPath)
       if count > 0 {
-        SettingsUIHost.shared.initUserLangModels()
+        SettingsUIHost.shared.initUserLexicons()
         SettingsUIHost.shared.notify(String(
           format: "i18n:settings.dictionary.mergeUserDataToNewTarget.notification.filesMerged:%d".i18n,
           count

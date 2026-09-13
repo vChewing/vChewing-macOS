@@ -1,0 +1,582 @@
+// (c) 2021 and onwards The vChewing Project (MIT-NTL License).
+// ====================
+// This code is released under the MIT license (SPDX-License-Identifier: MIT)
+// ... with NTL restriction stating that:
+// No trademark license is granted to use the trade names, trademarks, service
+// marks, or product names of Contributor, except as required to fulfill notice
+// requirements defined in MIT License.
+
+import Foundation
+import Homa
+import SwiftExtension
+import TrieKit
+
+// MARK: - VanguardTrie.Trie.EntryType
+
+extension VanguardTrie.Trie.EntryType {
+  fileprivate var defaultScore: Double {
+    switch self {
+    case .zhuyinwen: return -1
+    case .cns: return -11
+    case .symbolPhrases: return -13
+    case .letterPunctuations: return -10
+    default: return -9.9
+    }
+  }
+}
+
+// MARK: - Factory Dictionary Lifecycle
+
+extension LXAssembly.LXFacade {
+  public enum FactoryCoreLookupStrategy {
+    /// Route through the normal factory lookup path, respecting current config switches
+    /// such as `partialMatchEnabled`.
+    case configuredLookup
+    /// Return only longer complete-key matches. This is independent from partial match.
+    case strictSuperset
+  }
+
+  public static func connectFactoryDictionary(
+    textMapPath: String,
+    dropPreviousConnection: Bool = true,
+    completionHandler: (@Sendable (Bool) -> ())? = nil
+  ) {
+    if dropPreviousConnection {
+      disconnectFactoryDictionary()
+    }
+
+    guard let resolvedTextMapPath = resolveTextMapPath(from: textMapPath) else {
+      vCLMLog("Factory TextMap path not found: \(textMapPath)")
+      completionHandler?(false)
+      return
+    }
+
+    if !Self.asyncLoadingUserData {
+      do {
+        let textMapData = try Data(contentsOf: URL(fileURLWithPath: resolvedTextMapPath), options: [.mappedIfSafe])
+        factoryTrie = try VanguardTrie.TextMapTrie(data: textMapData)
+        vCLMLog("Factory TextMap loading complete: \(resolvedTextMapPath)")
+        completionHandler?(true)
+        return
+      } catch {
+        vCLMLog("Factory TextMap loading failed: \(error.localizedDescription)")
+        factoryTrie = nil
+        completionHandler?(false)
+        return
+      }
+    } else {
+      LXAssembly.fileHandleQueue.async {
+        do {
+          let textMapData = try Data(contentsOf: URL(fileURLWithPath: resolvedTextMapPath), options: [.mappedIfSafe])
+          let newTrie = try VanguardTrie.TextMapTrie(data: textMapData)
+          factoryTrie = newTrie
+          vCLMLog("Factory TextMap async loading complete: \(resolvedTextMapPath)")
+          completionHandler?(true)
+        } catch {
+          vCLMLog("Factory TextMap async loading failed: \(error.localizedDescription)")
+          factoryTrie = nil
+          completionHandler?(false)
+        }
+      }
+      return
+    }
+  }
+
+  public static func disconnectFactoryDictionary() {
+    factoryTrie = nil
+  }
+
+  /// 驗證外部 TextMap 工廠辭典檔案的 schema 正確性。
+  /// 僅解析並校驗，不修改全域 factoryTrie 狀態。
+  /// - Parameter path: TextMap 檔案路徑
+  /// - Returns: (isValid: Bool, errorDescription: String?)
+  public static func validateFactoryTextMapFile(at path: String) -> (isValid: Bool, errorDescription: String?) {
+    let url = URL(fileURLWithPath: path)
+    let data: Data
+    do {
+      data = try Data(contentsOf: url, options: [.mappedIfSafe])
+    } catch {
+      return (false, "Cannot read file: \(error.localizedDescription)")
+    }
+    guard let content = String(data: data, encoding: .utf8), !content.isEmpty else {
+      return (false, "File is empty or not valid UTF-8.")
+    }
+    guard !content.contains("#PRAGMA:VANGUARD_REVLOOKUP_TSV") else {
+      return (false, "External revlookup fixtures are no longer supported.")
+    }
+    do {
+      _ = try VanguardTrie.TextMapTrie(data: data)
+      return (true, nil)
+    } catch {
+      return (false, "TextMap schema validation failed: \(error.localizedDescription)")
+    }
+  }
+
+  @discardableResult
+  public static func connectToTestFactoryDictionary(
+    textMapData: String
+  )
+    -> Bool {
+    guard !textMapData.isEmpty else { return false }
+    guard !textMapData.contains("#PRAGMA:VANGUARD_REVLOOKUP_TSV") else {
+      vCLMLog("External revlookup fixtures are no longer supported.")
+      return false
+    }
+
+    do {
+      factoryTrie = try VanguardTrie.TextMapTrie(data: Data(textMapData.utf8))
+      return true
+    } catch {
+      vCLMLog("Factory TextMap test fixture loading failed: \(error.localizedDescription)")
+      factoryTrie = nil
+      return false
+    }
+  }
+
+  public static func getFactoryReverseLookupData(with kanji: String) -> [String]? {
+    guard let readings = factoryTrie?.reverseLookup(for: kanji) else { return nil }
+    return readings
+  }
+
+  func getHaninSymbolMenuUnigrams() -> [Homa.Gram] {
+    guard let trie = Self.factoryTrie else { return [] }
+    let nodes = trie.getNodes(
+      keyArray: ["_punctuation_list"],
+      filterType: [],
+      partiallyMatch: false,
+      longerSegment: false
+    )
+    let entries = nodes.flatMap(\.entries)
+    return makeFactoryUnigrams(
+      entries: entries,
+      keyArray: ["_punctuation_list"],
+      sourceKey: "_punctuation_list",
+      entryType: .letterPunctuations,
+      includeHalfWidthVariants: false
+    )
+  }
+
+  public func factoryCoreUnigramsFor(
+    key: String,
+    keyArray: [String],
+    strategy: FactoryCoreLookupStrategy = .configuredLookup
+  )
+    -> [Homa.Gram] {
+    switch strategy {
+    case .configuredLookup:
+      return factoryUnigramsFor(
+        key: key,
+        keyArray: keyArray,
+        entryType: isCHS ? .chs : .cht
+      )
+    case .strictSuperset:
+      return factoryStrictSupersetUnigramsFor(
+        subsetKey: key,
+        subsetKeyArray: keyArray,
+        entryType: isCHS ? .chs : .cht
+      )
+    }
+  }
+
+  @available(*, deprecated, message: "Use strategy: .strictSuperset or .configuredLookup instead of onlyFindSupersets.")
+  public func factoryCoreUnigramsFor(
+    key: String,
+    keyArray: [String],
+    onlyFindSupersets: Bool
+  )
+    -> [Homa.Gram] {
+    factoryCoreUnigramsFor(
+      key: key,
+      keyArray: keyArray,
+      strategy: onlyFindSupersets ? .strictSuperset : .configuredLookup
+    )
+  }
+
+  func factoryUnigramsFor(
+    key: String,
+    keyArray: [String],
+    entryType: VanguardTrie.Trie.EntryType
+  )
+    -> [Homa.Gram] {
+    if key == "_punctuation_list" { return [] }
+    guard let trie = Self.factoryTrie else { return [] }
+    if config.partialMatchEnabled {
+      return factoryPartiallyMatchedUnigramsFor(
+        queryKeyArray: keyArray,
+        entryType: entryType,
+        trie: trie
+      )
+    }
+    let nodes = trie.getNodes(
+      keyArray: keyArray,
+      filterType: [],
+      partiallyMatch: false,
+      longerSegment: false
+    )
+    let entries = nodes.flatMap(\.entries)
+    return makeFactoryUnigrams(
+      entries: entries,
+      keyArray: keyArray,
+      sourceKey: key,
+      entryType: entryType,
+      includeHalfWidthVariants: true
+    )
+  }
+
+  func factoryStrictSupersetUnigramsFor(
+    subsetKey: String,
+    subsetKeyArray: [String],
+    entryType: VanguardTrie.Trie.EntryType
+  )
+    -> [Homa.Gram] {
+    if subsetKey == "_punctuation_list" { return [] }
+    guard let trie = Self.factoryTrie else { return [] }
+    let nodes = trie.getNodes(
+      keyArray: subsetKeyArray,
+      filterType: [],
+      partiallyMatch: false,
+      longerSegment: true
+    )
+
+    return nodes.flatMap { node in
+      let nodeKeyArray = node.readingKey.split(separator: "-").map(String.init)
+      return makeFactoryUnigrams(
+        entries: node.entries,
+        keyArray: nodeKeyArray,
+        sourceKey: node.readingKey,
+        entryType: entryType,
+        includeHalfWidthVariants: true
+      )
+    }
+  }
+
+  func factoryPartiallyMatchedUnigramsFor(
+    queryKeyArray: [String],
+    entryType: VanguardTrie.Trie.EntryType,
+    trie: VanguardTrie.TextMapTrie
+  )
+    -> [Homa.Gram] {
+    let queriedGrams = trie.queryGrams(
+      queryKeyArray,
+      filterType: entryType,
+      partiallyMatch: true
+    )
+    return makeFactoryUnigrams(
+      queriedGrams: queriedGrams,
+      entryType: entryType,
+      includeHalfWidthVariants: true
+    )
+  }
+
+  func factoryChoppedUnigramsFor(
+    keyArray: [String],
+    entryType: VanguardTrie.Trie.EntryType
+  )
+    -> [Homa.Gram] {
+    factoryChoppedUnigramsFor(
+      keyArray: keyArray,
+      entryType: entryType,
+      partiallyMatch: config.partialMatchEnabled
+    )
+  }
+
+  /// 「&」連讀查詢的原廠辭典版本，可指定逐位置前綴語義（與 `partialMatchEnabled` 偏好無關）。
+  /// 供狂拼整詞簡拼查詢（R2-α）使用：簡拼整詞查詢恆為逐位置前綴比對。
+  func factoryChoppedUnigramsFor(
+    keyArray: [String],
+    entryType: VanguardTrie.Trie.EntryType,
+    partiallyMatch: Bool
+  )
+    -> [Homa.Gram] {
+    guard let trie = Self.factoryTrie else { return [] }
+    let entryGroups = trie.getEntryGroups(
+      keysChopped: keyArray,
+      filterType: entryType,
+      partiallyMatch: partiallyMatch
+    )
+    guard !entryGroups.isEmpty else { return [] }
+    let grams = entryGroups.flatMap { group in
+      makeFactoryUnigrams(
+        entries: group.entries,
+        keyArray: group.keyArray,
+        sourceKey: group.keyArray.joined(separator: "-"),
+        entryType: entryType,
+        includeHalfWidthVariants: true
+      )
+    }
+    // 詞值去重、保留最高機率者（狂拼 copilot 窗候選排序修正）：
+    // 同一個詞值可能以「無調墊底」與「聲調專屬」兩種讀音鍵同時存在
+    // （如「我」ㄨㄛ 與 ㄨㄛˇ），trie 鍵序使無調低權重條目先插入，
+    // 下游既有的「先插入者勝」去重（consolidate）會把高權重的聲調條目丟掉——
+    // 桶查詢（multipleKeys，狂拼注拼槽展開）中「我」便以墊底權重下沉、
+    // 排在「喔」等低權重單字之後。此處以「最高機率者勝出」去重，
+    // 使「我」以真實權重（ㄨㄛˇ）浮出於候選前列。
+    // 呼叫端最終仍會依機率排序（unigramsFor 的 sort），此處迭代順序不影響結果。
+    var bestByValue: [String: Homa.Gram] = [:]
+    bestByValue.reserveCapacity(grams.count)
+    for gram in grams {
+      guard !gram.current.isEmpty else { continue }
+      if let existing = bestByValue[gram.current] {
+        if gram.probability > existing.probability {
+          bestByValue[gram.current] = gram
+        }
+      } else {
+        bestByValue[gram.current] = gram
+      }
+    }
+    return Array(bestByValue.values)
+  }
+
+  func factoryChoppedCoreUnigramsFor(
+    keyArray: [String],
+    strategy: LXAssembly.LXFacade.FactoryCoreLookupStrategy
+  )
+    -> [Homa.Gram] {
+    let entryType: VanguardTrie.Trie.EntryType = isCHS ? .chs : .cht
+    switch strategy {
+    case .configuredLookup:
+      return factoryChoppedUnigramsFor(keyArray: keyArray, entryType: entryType)
+    case .strictSuperset:
+      guard let trie = Self.factoryTrie else { return [] }
+      let entryGroups = trie.getEntryGroups(
+        keysChopped: keyArray,
+        filterType: [],
+        partiallyMatch: false
+      )
+      return entryGroups.flatMap { group in
+        guard group.keyArray.count > keyArray.count else { return [] as [Homa.Gram] }
+        return makeFactoryUnigrams(
+          entries: group.entries,
+          keyArray: group.keyArray,
+          sourceKey: group.keyArray.joined(separator: "-"),
+          entryType: entryType,
+          includeHalfWidthVariants: true
+        )
+      }
+    }
+  }
+
+  /// CNS+GBEX 模式的補充單元圖（一般查詢路徑）：CNS 開關開啟時同時補給 CNS 與 GBEX。
+  /// 排序規則：GBEX 資料放在 CNS 資料之後；簡體中文模式例外，GBEX 優先於 CNS。
+  /// 因為最終 consolidate 以「先插入者勝」去重且保持插入順序，此處的排列次序即為同權重
+  /// （CNS／GBEX 基礎權重皆為 -11）下的候選次序。
+  func supplementalCNSAndGBEXUnigramsFor(
+    key: String,
+    keyArray: [String]
+  )
+    -> [Homa.Gram] {
+    let cnsGrams = factoryUnigramsFor(key: key, keyArray: keyArray, entryType: .cns)
+    let gbexGrams = factoryUnigramsFor(key: key, keyArray: keyArray, entryType: .gbex)
+    return isCHS ? gbexGrams + cnsGrams : cnsGrams + gbexGrams
+  }
+
+  /// CNS+GBEX 模式的補充單元圖（「&」連讀／chopped 查詢路徑），排序規則同上。
+  func supplementalChoppedCNSAndGBEXUnigramsFor(
+    keyArray: [String]
+  )
+    -> [Homa.Gram] {
+    let cnsGrams = factoryChoppedUnigramsFor(keyArray: keyArray, entryType: .cns)
+    let gbexGrams = factoryChoppedUnigramsFor(keyArray: keyArray, entryType: .gbex)
+    return isCHS ? gbexGrams + cnsGrams : cnsGrams + gbexGrams
+  }
+
+  internal func factoryCNSFilterThreadFor(key: String) -> String? {
+    if key == "_punctuation_list" { return nil }
+    guard let trie = Self.factoryTrie else { return nil }
+    let nodes = trie.getNodes(
+      keyArray: [key],
+      filterType: [],
+      partiallyMatch: false,
+      longerSegment: false
+    )
+    let result = nodes.flatMap(\.entries)
+      .filter { $0.typeID == .cns }
+      .map(\.value)
+    return result.isEmpty ? nil : result.joined(separator: "\t")
+  }
+
+  func hasFactoryCoreUnigramsFor(keyArray: [String]) -> Bool {
+    guard let trie = Self.factoryTrie else { return false }
+    let entryType: VanguardTrie.Trie.EntryType = isCHS ? .chs : .cht
+    if config.partialMatchEnabled {
+      return trie.hasGrams(
+        keyArray,
+        filterType: entryType,
+        partiallyMatch: true
+      )
+    }
+    let nodes = trie.getNodes(
+      keyArray: keyArray,
+      filterType: [],
+      partiallyMatch: false,
+      longerSegment: false
+    )
+    return nodes.flatMap(\.entries).contains(where: { $0.typeID == entryType })
+  }
+
+  /// 輕量版 factoryUnigramsFor：僅檢查 trie 層級是否存在，不建構 Gram 陣列。
+  func hasFactoryUnigramsFor(keyArray: [String], entryType: VanguardTrie.Trie.EntryType) -> Bool {
+    guard let trie = Self.factoryTrie else { return false }
+    return trie.hasGrams(keyArray, filterType: entryType, partiallyMatch: config.partialMatchEnabled)
+  }
+
+  /// 輕量版 factoryChoppedUnigramsFor：僅檢查 trie 層級是否存在，不建構 Gram 陣列。
+  func hasFactoryChoppedUnigramsFor(keyArray: [String], entryType: VanguardTrie.Trie.EntryType) -> Bool {
+    guard let trie = Self.factoryTrie else { return false }
+    return trie.hasGrams(keyArray, filterType: entryType, partiallyMatch: config.partialMatchEnabled)
+  }
+
+  func checkCNSConformation(for unigram: Homa.Gram, keyArray: [String]) -> Bool {
+    guard unigram.current.count == keyArray.count else { return true }
+    let chars = unigram.current.map(\.description)
+    for (index, key) in keyArray.enumerated() {
+      guard !key.hasPrefix("_") else { continue }
+      guard let matchedResult = factoryCNSFilterThreadFor(key: key) else { continue }
+      guard matchedResult.contains(chars[index]) else { return false }
+    }
+    return true
+  }
+
+  /// Automatically generated half-width punctuation aliases should stay selectable,
+  /// but must rank behind the lexicon's canonical full-width entry.
+  private static let generatedHalfWidthPunctuationPenalty = 0.0001
+
+  /// TextMap build output normalizes raw kana weights, so suppression must key off
+  /// the entry value's script rather than a hard-coded probability bucket.
+  private static func isKanaSyllableValue(_ value: String) -> Bool {
+    guard !value.isEmpty else { return false }
+    return value.unicodeScalars.allSatisfy { scalar in
+      switch scalar.value {
+      case 0x3031 ... 0x3035, // 假名迭代符號 (Kana Iteration Marks: ゝゞヽヾ〵)
+           0x3040 ... 0x309F, // 平假名 (Hiragana)
+           0x30A0 ... 0x30FF, // 片假名 (Katakana)
+           0x31F0 ... 0x31FF, // 片假名拼音擴展 (Katakana Phonetic Extensions)
+           0xFF66 ... 0xFF9F, // 半形片假名 (Half-width Katakana)
+           0x1AFF0 ... 0x1AFFF, // 假名擴展-B (Kana Extended-B, 含閩南語假名等)
+           0x1B000 ... 0x1B16F: // 假名補充 & 擴展-A (Hentaigana / Historic)
+        return true
+      default:
+        return false
+      }
+    }
+  }
+
+  private func makeFactoryUnigrams(
+    entries: [VanguardTrie.Trie.Entry],
+    keyArray: [String],
+    sourceKey: String,
+    entryType: VanguardTrie.Trie.EntryType,
+    includeHalfWidthVariants: Bool
+  )
+    -> [Homa.Gram] {
+    var grams: [Homa.Gram] = []
+    var extraHalfWidthGrams: [Homa.Gram] = []
+    for entry in entries where entry.typeID == entryType {
+      if entryType == .nonKanji,
+         config.suppressFactoryUnigramsOfKanaSyllables,
+         Self.isKanaSyllableValue(entry.value) {
+        continue
+      }
+      // 狂拼啟用時，抑制來自原廠辭典（TextMapTrie）的注音文資料。
+      if entryType == .zhuyinwen, config.shouldSuppressFactoryZhuyinwenData {
+        continue
+      }
+
+      var score = entry.probability
+      if score > 0 {
+        score *= -1
+      }
+
+      grams.append(.init(keyArray: keyArray, value: entry.value, score: score))
+
+      guard includeHalfWidthVariants, sourceKey.contains("_punctuation") else { continue }
+      let halfWidthValue = entry.value.applyingTransformFW2HW(reverse: false)
+      if halfWidthValue != entry.value {
+        extraHalfWidthGrams.append(
+          .init(
+            keyArray: keyArray,
+            value: halfWidthValue,
+            score: score - Self.generatedHalfWidthPunctuationPenalty
+          )
+        )
+      }
+    }
+
+    grams.append(contentsOf: extraHalfWidthGrams)
+    return grams
+  }
+
+  private func makeFactoryUnigrams(
+    queriedGrams: [VanguardTrie.TrieGram],
+    entryType: VanguardTrie.Trie.EntryType,
+    includeHalfWidthVariants: Bool
+  )
+    -> [Homa.Gram] {
+    var grams: [Homa.Gram] = []
+    var extraHalfWidthGrams: [Homa.Gram] = []
+    for queriedGram in queriedGrams {
+      if entryType == .nonKanji,
+         config.suppressFactoryUnigramsOfKanaSyllables,
+         Self.isKanaSyllableValue(queriedGram.value) {
+        continue
+      }
+      // 狂拼啟用時，抑制來自原廠辭典（TextMapTrie）的注音文資料。
+      if entryType == .zhuyinwen, config.shouldSuppressFactoryZhuyinwenData {
+        continue
+      }
+
+      var score = queriedGram.probability
+      if score > 0 {
+        score *= -1
+      }
+
+      // 攜帶 trie 的 previous／anterior 欄（雙元／三元圖資料）；無資料時維持 nil、行為零變更。
+      grams.append(.init(
+        keyArray: queriedGram.keyArray,
+        value: queriedGram.value,
+        score: score,
+        previous: queriedGram.previous,
+        anterior: queriedGram.anterior
+      ))
+
+      let sourceKey = queriedGram.keyArray.joined(separator: "-")
+      guard includeHalfWidthVariants, sourceKey.contains("_punctuation") else { continue }
+      let halfWidthValue = queriedGram.value.applyingTransformFW2HW(reverse: false)
+      if halfWidthValue != queriedGram.value {
+        extraHalfWidthGrams.append(
+          .init(
+            keyArray: queriedGram.keyArray,
+            value: halfWidthValue,
+            score: score - Self.generatedHalfWidthPunctuationPenalty
+          )
+        )
+      }
+    }
+
+    grams.append(contentsOf: extraHalfWidthGrams)
+    return grams
+  }
+
+  private static func resolveTextMapPath(from incomingPath: String) -> String? {
+    let manager = FileManager.default
+    let incomingURL = URL(fileURLWithPath: incomingPath)
+
+    if incomingURL.pathExtension == "txtMap", manager.isReadableFile(atPath: incomingURL.path) {
+      return incomingURL.path
+    }
+
+    let sameStem = incomingURL.deletingPathExtension().appendingPathExtension("txtMap")
+    if manager.isReadableFile(atPath: sameStem.path) {
+      return sameStem.path
+    }
+
+    let fixedName = incomingURL.deletingLastPathComponent()
+      .appendingPathComponent("VanguardFactoryDict4Typing")
+      .appendingPathExtension("txtMap")
+    if manager.isReadableFile(atPath: fixedName.path) {
+      return fixedName.path
+    }
+
+    return nil
+  }
+}

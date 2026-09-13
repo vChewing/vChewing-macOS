@@ -567,7 +567,7 @@ nonisolated public struct HSBA: Sendable {
 // from Foundation, so the shims below are unnecessary here and are kept only as a
 // commented-out stub for reference. Enabling them would redeclare the same API as
 // Foundation inside the SwiftExtension module, which makes cross-module call sites
-// (e.g. LangModelAssembly's LMConsolidator.checkPragma calling read(upToCount:)) hit
+// (e.g. LexiconAssembly's LXConsolidator.checkPragma calling read(upToCount:)) hit
 // an overload ambiguity and fail to compile. The legacy repo (older deployment
 // targets) keeps these shims active.
 // #if canImport(Darwin)

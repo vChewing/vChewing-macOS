@@ -43,7 +43,7 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
-		5B09A5172E9957F3002C2EC3 /* vChewing_Typewriter */ = {isa = PBXFileReference; lastKnownFileType = wrapper; name = vChewing_Typewriter; path = Packages/vChewing_Typewriter; sourceTree = "<group>"; };
+		5B09A5172E9957F3002C2EC3 /* vChewing_OSNeutralAssembly */ = {isa = PBXFileReference; lastKnownFileType = wrapper; name = vChewing_OSNeutralAssembly; path = Packages/vChewing_OSNeutralAssembly; sourceTree = "<group>"; };
 		5B18BA6F27C7BD8B0056EB19 /* LICENSE-CHS.txt */ = {isa = PBXFileReference; lastKnownFileType = text; path = "LICENSE-CHS.txt"; sourceTree = "<group>"; };
 		5B18BA7027C7BD8B0056EB19 /* Makefile */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.make; path = Makefile; sourceTree = "<group>"; };
 		5B18BA7127C7BD8B0056EB19 /* README-CHS.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = "README-CHS.md"; sourceTree = "<group>"; };
@@ -85,7 +85,7 @@
 		5BEE2E012F9C4D22007E6AAB /* vChewing_SettingsUI */ = {isa = PBXFileReference; lastKnownFileType = wrapper; name = vChewing_SettingsUI; path = Packages/vChewing_SettingsUI; sourceTree = "<group>"; };
 		5BFC63C728D49511004A77B7 /* vChewing_IMKUtils */ = {isa = PBXFileReference; lastKnownFileType = wrapper; name = vChewing_IMKUtils; path = Packages/vChewing_IMKUtils; sourceTree = "<group>"; };
 		5BFC63CA28D49B2B004A77B7 /* vChewing_UpdateSputnik */ = {isa = PBXFileReference; lastKnownFileType = wrapper; name = vChewing_UpdateSputnik; path = Packages/vChewing_UpdateSputnik; sourceTree = "<group>"; };
-		5BFC63CD28D4AC98004A77B7 /* vChewing_LangModelAssembly */ = {isa = PBXFileReference; lastKnownFileType = wrapper; name = vChewing_LangModelAssembly; path = Packages/vChewing_LangModelAssembly; sourceTree = "<group>"; };
+		5BFC63CD28D4AC98004A77B7 /* vChewing_LexiconAssembly */ = {isa = PBXFileReference; lastKnownFileType = wrapper; name = vChewing_LexiconAssembly; path = Packages/vChewing_LexiconAssembly; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
@@ -212,11 +212,12 @@
 				5BDB7A3228D47587001AC277 /* vChewing_Hotenka */,
 				5BFC63C728D49511004A77B7 /* vChewing_IMKUtils */,
 				5B60EAC12EF4892C00FFB49E /* vChewing_InstallerAssembly4Darwin */,
-				5BFC63CD28D4AC98004A77B7 /* vChewing_LangModelAssembly */,
+				5BFC63CD28D4AC98004A77B7 /* vChewing_LexiconAssembly */,
 				5B65FB322A9518C9007EEFB0 /* vChewing_MainAssembly4Darwin */,
 				5BDB7A3428D47587001AC277 /* vChewing_ModifierKeyHitChecker */,
 				5BC5E01C28DDE4270094E427 /* vChewing_NotifierUI */,
 				5BDA45492B97588B00DFA179 /* vChewing_OSFrameworkImpl */,
+				5B09A5172E9957F3002C2EC3 /* vChewing_OSNeutralAssembly */,
 				5BAD29D12B7E1A1B0013D695 /* vChewing_OtherIMEDataReader */,
 				5BC5E02228DE07250094E427 /* vChewing_PopupCompositionBuffer */,
 				5B963C9E28D5C14600DCEE88 /* vChewing_Shared */,
@@ -225,7 +226,6 @@
 				5B963CA128D5C22D00DCEE88 /* vChewing_SwiftExtension */,
 				5BDB7A3628D47587001AC277 /* vChewing_Tekkon */,
 				5BC5E01F28DDEFD80094E427 /* vChewing_TooltipUI */,
-				5B09A5172E9957F3002C2EC3 /* vChewing_Typewriter */,
 				5B40113A28D71B8700A9D4CB /* vChewing_Uninstaller */,
 				5BFC63CA28D49B2B004A77B7 /* vChewing_UpdateSputnik */,
 			);

@@ -255,7 +255,7 @@ public struct IMEState: IMEStateProtocol {
   /// 預設實作：回傳原始顯示文字。Darwin 端可覆蓋為經 ChineseConverter 轉換後的文字。
   public var displayedTextConverted: String { data.displayedText }
 
-  /// 預設實作：Darwin 端可覆蓋為實際的 LMMgr 查詢結果。
+  /// 預設實作：Darwin 端可覆蓋為實際的 LXMgr 查詢結果。
   public var markedTargetIsCurrentlyFiltered: Bool { false }
 }
 

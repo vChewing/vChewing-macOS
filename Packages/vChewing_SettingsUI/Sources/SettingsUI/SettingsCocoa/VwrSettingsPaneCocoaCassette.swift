@@ -112,7 +112,7 @@ extension SettingsPanesCocoa {
         PrefMgr.shared.cassetteEnabled = false
         asyncOnMain {
           let window = CtlSettingsCocoa.shared?.window
-          let alert = NSAlert(error: "i18n:LMMgr.accessFailure.cassette.title".i18n)
+          let alert = NSAlert(error: "i18n:LXMgr.accessFailure.cassette.title".i18n)
           alert.informativeText = SettingsUIHost.shared.cassetteAccessFailureDescription(PrefMgr.shared.cassettePath)
           alert.beginSheetModal(at: window) { _ in }
         }

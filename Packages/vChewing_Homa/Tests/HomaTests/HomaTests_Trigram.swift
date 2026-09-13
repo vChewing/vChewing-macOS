@@ -17,14 +17,14 @@ extension HomaTestsRoot {
     /// 三元圖命中：前驅二位（甲＋乙）匹配時，三元圖權重壓過既有最佳單元圖（餅）→ 選「丙」。
     @Test("Trigram Path Selection")
     func testTrigramPathSelection() throws {
-      let mockLM = TestLM(rawData: """
+      let mockLX = TestLX(rawData: """
       ㄐㄧㄚˇ 甲 -1
       ㄧˇ 乙 -1
       ㄅㄧㄥˇ 餅 -1
       ㄅㄧㄥˇ 丙 -3
       ㄅㄧㄥˇ 丙 -0.5 乙 甲
       """)
-      let assembler = Homa.Assembler(gramQuerier: { mockLM.queryGrams($0) })
+      let assembler = Homa.Assembler(gramQuerier: { mockLX.queryGrams($0) })
       try ["ㄐㄧㄚˇ", "ㄧˇ", "ㄅㄧㄥˇ"].forEach { try assembler.insertKey($0) }
       #expect(assembler.assemble().values == ["甲", "乙", "丙"])
     }
@@ -32,13 +32,13 @@ extension HomaTestsRoot {
     /// 三元圖前驅二位不匹配（anterior 為「義」而非「甲」）時退回單元圖 → 選「餅」。
     @Test("Trigram Anterior Mismatch Falls Back")
     func testTrigramAnteriorMismatchFallsBack() throws {
-      let mockLM = TestLM(rawData: """
+      let mockLX = TestLX(rawData: """
       ㄧˋ 義 -1
       ㄧˇ 乙 -1
       ㄅㄧㄥˇ 餅 -1
       ㄅㄧㄥˇ 丙 -0.5 乙 甲
       """)
-      let assembler = Homa.Assembler(gramQuerier: { mockLM.queryGrams($0) })
+      let assembler = Homa.Assembler(gramQuerier: { mockLX.queryGrams($0) })
       try ["ㄧˋ", "ㄧˇ", "ㄅㄧㄥˇ"].forEach { try assembler.insertKey($0) }
       let assembled = assembler.assemble()
       print("DBG values:", assembled.values)
@@ -50,11 +50,11 @@ extension HomaTestsRoot {
     /// 三元圖不得現身選字窗（previous／anterior 非 nil 的 grams 被既有排除機制隔離）。
     @Test("Trigram Excluded From Candidate Window")
     func testTrigramExcludedFromCandidateWindow() throws {
-      let mockLM = TestLM(rawData: """
+      let mockLX = TestLX(rawData: """
       ㄅㄧㄥˇ 餅 -1
       ㄅㄧㄥˇ 丙 -0.5 乙 甲
       """)
-      let assembler = Homa.Assembler(gramQuerier: { mockLM.queryGrams($0) })
+      let assembler = Homa.Assembler(gramQuerier: { mockLX.queryGrams($0) })
       try assembler.insertKey("ㄅㄧㄥˇ")
       let candidates = assembler.fetchCandidates(filter: .endAt).map(\.pair.value)
       #expect(candidates.contains("餅"))

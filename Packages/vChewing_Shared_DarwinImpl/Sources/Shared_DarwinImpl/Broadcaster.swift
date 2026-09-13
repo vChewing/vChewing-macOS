@@ -14,14 +14,14 @@ public final class Broadcaster: NSObject {
 
   public private(set) dynamic var eventForReloadingPhraseEditor = UUID()
   public private(set) dynamic var eventForClosingAllPanels = UUID()
-  public private(set) dynamic var lmMgrDataFolderPathInvalidityConfirmed: String?
-  public private(set) dynamic var lmMgrCassettePathInvalidityConfirmed: String?
+  public private(set) dynamic var lxMgrDataFolderPathInvalidityConfirmed: String?
+  public private(set) dynamic var lxMgrCassettePathInvalidityConfirmed: String?
 
   public func confirmLmMgrDataFolderPathInvalidity(
     _ path: String?
   ) {
     mainSync {
-      self.lmMgrDataFolderPathInvalidityConfirmed = path
+      self.lxMgrDataFolderPathInvalidityConfirmed = path
     }
   }
 
@@ -29,16 +29,16 @@ public final class Broadcaster: NSObject {
     _ path: String?
   ) {
     mainSync {
-      self.lmMgrCassettePathInvalidityConfirmed = path
+      self.lxMgrCassettePathInvalidityConfirmed = path
     }
   }
 
   public func clearLmMgrDataFolderPathInvalidity() {
-    mainSync { self.lmMgrDataFolderPathInvalidityConfirmed = nil }
+    mainSync { self.lxMgrDataFolderPathInvalidityConfirmed = nil }
   }
 
   public func clearLmMgrCassettePathInvalidity() {
-    mainSync { self.lmMgrCassettePathInvalidityConfirmed = nil }
+    mainSync { self.lxMgrCassettePathInvalidityConfirmed = nil }
   }
 
   public func postEventForReloadingPhraseEditor() {

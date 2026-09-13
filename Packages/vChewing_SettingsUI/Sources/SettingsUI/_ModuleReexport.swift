@@ -7,5 +7,5 @@
 // requirements defined in MIT License.
 
 @_exported import BookmarkManager
-@_exported import LangModelAssembly
+@_exported import LexiconAssembly
 @_exported import Shared_DarwinImpl

@@ -18,7 +18,7 @@ let package = Package(
     .package(path: "../vChewing_SwiftExtension"),
     .package(path: "../vChewing_OSFrameworkImpl"),
     .package(path: "../vChewing_IMKUtils"),
-    .package(path: "../vChewing_LangModelAssembly"),
+    .package(path: "../vChewing_LexiconAssembly"),
     .package(path: "../Jad_BookmarkManager"),
   ],
   targets: [
@@ -30,7 +30,7 @@ let package = Package(
         .product(name: "SwiftExtension", package: "vChewing_SwiftExtension"),
         .product(name: "OSFrameworkImpl", package: "vChewing_OSFrameworkImpl"),
         .product(name: "IMKUtils", package: "vChewing_IMKUtils"),
-        .product(name: "LangModelAssembly", package: "vChewing_LangModelAssembly"),
+        .product(name: "LexiconAssembly", package: "vChewing_LexiconAssembly"),
         .product(name: "BookmarkManager", package: "Jad_BookmarkManager"),
       ],
       swiftSettings: [

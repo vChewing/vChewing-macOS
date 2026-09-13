@@ -86,20 +86,20 @@ public struct VwrPhraseEditorUI: View {
         }
         .labelsHidden()
         Picker("", selection: $selUserDataType.didChange { dropDownMenuDidChange() }) {
-          Text(LMAssembly.ReplacableUserDataType.thePhrases.localizedDescription).tag(
-            LMAssembly.ReplacableUserDataType.thePhrases
+          Text(LXAssembly.ReplacableUserDataType.thePhrases.localizedDescription).tag(
+            LXAssembly.ReplacableUserDataType.thePhrases
           )
-          Text(LMAssembly.ReplacableUserDataType.theFilter.localizedDescription).tag(
-            LMAssembly.ReplacableUserDataType.theFilter
+          Text(LXAssembly.ReplacableUserDataType.theFilter.localizedDescription).tag(
+            LXAssembly.ReplacableUserDataType.theFilter
           )
-          Text(LMAssembly.ReplacableUserDataType.theReplacements.localizedDescription).tag(
-            LMAssembly.ReplacableUserDataType.theReplacements
+          Text(LXAssembly.ReplacableUserDataType.theReplacements.localizedDescription).tag(
+            LXAssembly.ReplacableUserDataType.theReplacements
           )
-          Text(LMAssembly.ReplacableUserDataType.theAssociates.localizedDescription).tag(
-            LMAssembly.ReplacableUserDataType.theAssociates
+          Text(LXAssembly.ReplacableUserDataType.theAssociates.localizedDescription).tag(
+            LXAssembly.ReplacableUserDataType.theAssociates
           )
-          Text(LMAssembly.ReplacableUserDataType.theSymbols.localizedDescription).tag(
-            LMAssembly.ReplacableUserDataType.theSymbols
+          Text(LXAssembly.ReplacableUserDataType.theSymbols.localizedDescription).tag(
+            LXAssembly.ReplacableUserDataType.theSymbols
           )
         }
         .labelsHidden()
@@ -223,7 +223,7 @@ public struct VwrPhraseEditorUI: View {
   @State
   private var selInputMode: Shared.InputMode = .imeModeNULL
   @State
-  private var selUserDataType: LMAssembly.ReplacableUserDataType = .thePhrases
+  private var selUserDataType: LXAssembly.ReplacableUserDataType = .thePhrases
 
   @AppStorage("PhraseEditorAutoReloadExternalModifications")
   private var autoReloadExternalModifications: Bool = true
@@ -402,7 +402,7 @@ public enum PETerms {
     public var localized: String { rawValue.i18n }
 
     public static func sampleDictionaryContent(
-      for type: LMAssembly
+      for type: LXAssembly
         .ReplacableUserDataType
     )
       -> String {

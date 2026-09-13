@@ -79,7 +79,7 @@ public struct VwrSettingsPaneDictionary: View {
           VStack(alignment: .leading) {
             UserDef.kShouldAutoReloadUserDataFiles.renderUI {
               if PrefMgr.shared.shouldAutoReloadUserDataFiles {
-                SettingsUIHost.shared.initUserLangModels()
+                SettingsUIHost.shared.initUserLexicons()
               }
             }
             Text("i18n:InfoMessage.SecurityConcernsNoShellScript".i18n)
@@ -212,7 +212,7 @@ public struct VwrSettingsPaneDictionary: View {
           let newPath = SettingsUIHost.shared.dataFolderPath(false)
           let count = SettingsUIHost.shared.migrateUserDataFrom(pendingMergeOldPath, newPath)
           if count > 0 {
-            SettingsUIHost.shared.initUserLangModels()
+            SettingsUIHost.shared.initUserLexicons()
             SettingsUIHost.shared.notify(String(
               format: "i18n:settings.dictionary.mergeUserDataToNewTarget.notification.filesMerged:%d".i18n,
               count

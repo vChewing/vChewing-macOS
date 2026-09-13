@@ -48,9 +48,9 @@ extension HomaTestsRoot {
       /// 無法區分 Class/Struct 的分配次數差異）。
       @Test("[Homa] RepeatedRecompositionAllocConvergence")
       func testRepeatedRecompositionAllocConvergence() throws {
-        let mockLM = TestLM(rawData: HomaTests.strLMSampleDataLitch)
+        let mockLX = TestLX(rawData: HomaTests.strLXSampleDataLitch)
         let assembler = Homa.Assembler(
-          gramQuerier: { mockLM.queryGrams($0) }
+          gramQuerier: { mockLX.queryGrams($0) }
         )
         let keys: [Homa.PossibleKey] =
           ["chao1", "shang1", "da4", "qian2", "tian1"].map { .singleKey($0) }

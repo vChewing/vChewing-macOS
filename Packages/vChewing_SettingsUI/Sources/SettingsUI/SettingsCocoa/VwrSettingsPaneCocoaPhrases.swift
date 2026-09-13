@@ -180,7 +180,7 @@ extension SettingsPanesCocoa.Phrases: NSTextViewDelegate, NSTextFieldDelegate {
     }
   }
 
-  var selUserDataType: LMAssembly.ReplacableUserDataType {
+  var selUserDataType: LXAssembly.ReplacableUserDataType {
     switch cmbPEDataTypeMenu.selectedTag() {
     case 0: return .thePhrases
     case 1: return .theFilter
@@ -295,7 +295,7 @@ extension SettingsPanesCocoa.Phrases: NSTextViewDelegate, NSTextFieldDelegate {
     // 嚴重警告：NSMenu.items 在 macOS 10.13 為止的系統下是唯讀的！！
     // 往這個 property 裡面直接寫東西會導致整個視窗叫不出來！！！
     cmbPEDataTypeMenu.menu?.appendItems {
-      for (tag, neta) in LMAssembly.ReplacableUserDataType.allCases.enumerated() {
+      for (tag, neta) in LXAssembly.ReplacableUserDataType.allCases.enumerated() {
         NSMenu.Item(verbatim: neta.localizedDescription)?.tag(tag)
       }
     }
@@ -398,7 +398,7 @@ extension SettingsPanesCocoa.Phrases: NSTextViewDelegate, NSTextFieldDelegate {
     asyncOnMain { [weak self] in
       guard let this = self else { return }
       this.isLoading = true
-      LMAssembly.LMConsolidator.consolidate(text: &this.tfdPETextEditor.string, pragma: false)
+      LXAssembly.LXConsolidator.consolidate(text: &this.tfdPETextEditor.string, pragma: false)
       if this.selUserDataType == .thePhrases {
         SettingsUIHost.shared.tagOverrides(&this.tfdPETextEditor.string, this.selInputMode)
       }
@@ -497,7 +497,7 @@ private enum PETerminology {
     public var localized: String { rawValue.i18n }
 
     public static func sampleDictionaryContent(
-      for type: LMAssembly
+      for type: LXAssembly
         .ReplacableUserDataType
     )
       -> String {

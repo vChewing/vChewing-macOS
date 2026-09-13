@@ -28,9 +28,9 @@ extension HomaTestsRoot {
         "cong2-lai2-bu4-you2-ta1-ren2-pu1-jiu4", // 從來不由他人鋪就
       ]
 
-      let mockLM = TestLM(rawData: HomaTests.strLMSampleDataTrailblazing)
+      let mockLX = TestLX(rawData: HomaTests.strLXSampleDataTrailblazing)
       let assembler = Homa.Assembler(
-        gramQuerier: { mockLM.queryGrams($0) }
+        gramQuerier: { mockLX.queryGrams($0) }
       )
 
       var totalTime: Double = 0
@@ -76,7 +76,7 @@ extension HomaTestsRoot {
     func testTrieOperationsStress() async throws {
       print("// Starting Trie operations stress test")
 
-      let mockLM = TestLM(rawData: HomaTests.strLMSampleDataTrailblazing)
+      let mockLX = TestLX(rawData: HomaTests.strLXSampleDataTrailblazing)
 
       // 測試查詢效能。
       let keys = ["suo3", "wei4", "kai1", "tuo4", "jiu4", "shi4"]
@@ -85,8 +85,8 @@ extension HomaTestsRoot {
       let queryTime = Self.measureTime {
         for _ in 0 ..< iterations {
           for key in keys {
-            _ = mockLM.queryGrams([key])
-            _ = mockLM.hasGrams([key])
+            _ = mockLX.queryGrams([key])
+            _ = mockLX.hasGrams([key])
           }
         }
       }
@@ -106,9 +106,9 @@ extension HomaTestsRoot {
     func testMemoryUsage() async throws {
       print("// Starting memory usage test")
 
-      let mockLM = TestLM(rawData: HomaTests.strLMSampleDataTrailblazing)
+      let mockLX = TestLX(rawData: HomaTests.strLXSampleDataTrailblazing)
       let assembler = Homa.Assembler(
-        gramQuerier: { mockLM.queryGrams($0) }
+        gramQuerier: { mockLX.queryGrams($0) }
       )
 
       // 模擬重度使用情形模式
@@ -117,7 +117,7 @@ extension HomaTestsRoot {
           // 創建暨摧毀組字器副本，測試 ARC 效能
           for _ in 0 ..< 20 {
             let tempAssembler = Homa.Assembler(
-              gramQuerier: { mockLM.queryGrams($0) }
+              gramQuerier: { mockLX.queryGrams($0) }
             )
 
             try? tempAssembler.insertKey("test\(batch)")
@@ -147,7 +147,7 @@ extension HomaTestsRoot {
 
       // 用更大的真實資料集來做測試
       let testData = generateRealisticChineseInput()
-      let mockLM = TestLM(rawData: testData.mockData)
+      let mockLX = TestLX(rawData: testData.mockData)
 
       var totalTime: Double = 0
       let iterations = 200 // 增加迭代次數以追求測試可信度
@@ -155,7 +155,7 @@ extension HomaTestsRoot {
       // 預熱快取
       for _ in 0 ..< 10 {
         let assembler = Homa.Assembler(
-          gramQuerier: { mockLM.queryGrams($0) }
+          gramQuerier: { mockLX.queryGrams($0) }
         )
 
         for key in testData.keys.prefix(5) {
@@ -170,7 +170,7 @@ extension HomaTestsRoot {
 
         let iterationTime = try Self.measureTime {
           let assembler = Homa.Assembler(
-            gramQuerier: { mockLM.queryGrams($0) }
+            gramQuerier: { mockLX.queryGrams($0) }
           )
 
           for key in keys {
@@ -201,7 +201,7 @@ extension HomaTestsRoot {
 
     private func generateRealisticChineseInput() -> (keys: [String], mockData: String) {
       // 生成複雜的擬真語言模型資料。
-      var mockData = HomaTests.strLMSampleDataTrailblazing
+      var mockData = HomaTests.strLXSampleDataTrailblazing
 
       // 建立真實的中文拼音輸入模式 - 使用與 Mock 資料對應的拼音讀音
       let knownPinyin = [

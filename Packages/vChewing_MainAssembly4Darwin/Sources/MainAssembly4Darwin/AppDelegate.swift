@@ -57,7 +57,7 @@ public final class AppDelegate: NSObject, NSApplicationDelegate {
 
   private static var folderMonitor = NSMutex<FolderMonitor>(
     FolderMonitor(
-      url: URL(fileURLWithPath: LMMgr.dataFolderPath(isDefaultFolder: false))
+      url: URL(fileURLWithPath: LXMgr.dataFolderPath(isDefaultFolder: false))
     )
   )
 }
@@ -69,9 +69,9 @@ extension AppDelegate {
     // 拖 100ms 再重載，畢竟有些有特殊需求的使用者可能會想使用巨型自訂語彙檔案。
     asyncOnMain(after: 0.1) {
       // forced 用於剛剛切換了辭典檔案目錄的場合。
-      // 先執行 initUserLangModels() 可以在目標辭典檔案不存在的情況下先行生成空白範本檔案。
+      // 先執行 initUserLexicons() 可以在目標辭典檔案不存在的情況下先行生成空白範本檔案。
       vCLog("[FolderMonitor] User Dictionary data changes detected.")
-      if PrefMgr.shared.shouldAutoReloadUserDataFiles || forced { LMMgr.initUserLangModels() }
+      if PrefMgr.shared.shouldAutoReloadUserDataFiles || forced { LXMgr.initUserLexicons() }
       asyncOnMain(after: 0.1) {
         if PrefMgr.shared.phraseEditorAutoReloadExternalModifications {
           Broadcaster.shared.postEventForReloadingPhraseEditor()
@@ -120,7 +120,7 @@ extension AppDelegate {
     if PrefMgr.shared.failureFlagForPOMObservation {
       PrefMgr.shared.failureFlagForPOMObservation = false
       asyncOnMain {
-        LMMgr.relocateWreckedPOMData()
+        LXMgr.relocateWreckedPOMData()
         if #available(macOS 10.14, *) {
           let msgPackage = UNMutableNotificationContent()
           msgPackage.title = "i18n:Common.VChewing".i18n
@@ -147,12 +147,12 @@ extension AppDelegate {
     // 核心辭典連線、磁帶載入、使用者語模初期化：
     // 延後至下一個 RunLoop 迭代以避免阻塞 applicationWillFinishLaunching。
     asyncOnMain {
-      LMMgr.connectCoreDB()
-      LMMgr.loadCassetteData()
-      LMMgr.initUserLangModels()
+      LXMgr.connectCoreDB()
+      LXMgr.loadCassetteData()
+      LXMgr.initUserLexicons()
       Self.folderMonitor.withLock { lockedMonitor in
         lockedMonitor.folderDidChange = { Self.reloadOnFolderChangeHappens() }
-        if LMMgr.userDataFolderExists { lockedMonitor.startMonitoring() }
+        if LXMgr.userDataFolderExists { lockedMonitor.startMonitoring() }
       }
     }
 
@@ -165,14 +165,14 @@ extension AppDelegate {
   }
 
   public func updateDirectoryMonitorPath() {
-    let newPath = LMMgr.dataFolderPath(isDefaultFolder: false)
+    let newPath = LXMgr.dataFolderPath(isDefaultFolder: false)
     Self.folderMonitor.withLock { lockedMonitor in
       lockedMonitor.stopMonitoring()
       lockedMonitor = FolderMonitor(
         url: URL(fileURLWithPath: newPath)
       )
       lockedMonitor.folderDidChange = { Self.reloadOnFolderChangeHappens() }
-      if LMMgr.userDataFolderExists { // 沒有資料夾的話，FolderMonitor 會崩潰。
+      if LXMgr.userDataFolderExists { // 沒有資料夾的話，FolderMonitor 會崩潰。
         lockedMonitor.startMonitoring()
         Self.reloadOnFolderChangeHappens(forced: true)
       }
@@ -198,8 +198,8 @@ extension AppDelegate {
     guard result == NSApplication.ModalResponse.alertFirstButtonReturn else { return }
     Uninstaller.showUninstallFailureGuidance()
     // Open Finder to reveal the three relevant locations so the user can remove them manually.
-    FileOpenMethod.finder.open(url: URL(fileURLWithPath: LMMgr.dataFolderPath(isDefaultFolder: false)))
-    FileOpenMethod.finder.open(url: LMMgr.appSupportURL)
+    FileOpenMethod.finder.open(url: URL(fileURLWithPath: LXMgr.dataFolderPath(isDefaultFolder: false)))
+    FileOpenMethod.finder.open(url: LXMgr.appSupportURL)
     FileOpenMethod.finder.open(url: Bundle.main.bundleURL)
   }
 

@@ -163,7 +163,7 @@ extension IMEMenuSputnik {
       NSMenu.Item("i18n:Menu.EditAssociatedPhrases")?
         .act(
           register {
-            LMMgr.openUserDictFile(
+            LXMgr.openUserDictFile(
               type: .theAssociates,
               dual: self.optionKeyPressed,
               alt: self.optionKeyPressed
@@ -180,9 +180,9 @@ extension IMEMenuSputnik {
         .act(
           register {
             self.core?.resetInputHandler(forceComposerCleanup: true)
-            if !PrefMgr.shared.cassetteEnabled, LMMgr.cassettePath().isEmpty {
-              let strErrorTitle = "i18n:LMMgr.accessFailure.cassette.title".i18n
-              let strErrorMsg = LMMgr.cassetteAccessFailureDescription(
+            if !PrefMgr.shared.cassetteEnabled, LXMgr.cassettePath().isEmpty {
+              let strErrorTitle = "i18n:LXMgr.accessFailure.cassette.title".i18n
+              let strErrorMsg = LXMgr.cassetteAccessFailureDescription(
                 path: PrefMgr.shared.cassettePath
               )
               if UserDefaults.pendingUnitTests {
@@ -195,7 +195,7 @@ extension IMEMenuSputnik {
                   let result = alert.runModal()
                   NSApp.popup()
                   if result == .alertFirstButtonReturn {
-                    LMMgr.resetCassettePath()
+                    LXMgr.resetCassettePath()
                     PrefMgr.shared.cassetteEnabled = false
                   }
                 }
@@ -212,8 +212,8 @@ extension IMEMenuSputnik {
                       : "i18n:NotificationSwitch.Off".i18n
                   )
               )
-            if let loaded = self.core?.inputMode.langModel.isCassetteDataLoaded, !loaded {
-              LMMgr.loadCassetteData()
+            if let loaded = self.core?.inputMode.lexicon.isCassetteDataLoaded, !loaded {
+              LXMgr.loadCassetteData()
             }
           }
         )
@@ -348,7 +348,7 @@ extension IMEMenuSputnik {
       NSMenu.Item("i18n:Menu.EditPhraseReplacementTable")?
         .act(
           register {
-            LMMgr.openUserDictFile(
+            LXMgr.openUserDictFile(
               type: .theReplacements,
               dual: self.optionKeyPressed,
               alt: self.optionKeyPressed
@@ -376,7 +376,7 @@ extension IMEMenuSputnik {
       NSMenu.Item("i18n:Menu.EditUserSymbolEmojiData")?
         .act(
           register {
-            LMMgr.openUserDictFile(
+            LXMgr.openUserDictFile(
               type: .theSymbols,
               dual: self.optionKeyPressed,
               alt: self.optionKeyPressed
@@ -389,20 +389,20 @@ extension IMEMenuSputnik {
       NSMenu.Item("i18n:Menu.OpenUserDictionaryFolder")?
         .act(
           register {
-            guard LMMgr.userDataFolderExists else { return }
+            guard LXMgr.userDataFolderExists else { return }
             FileOpenMethod.finder.open(
-              url: URL(fileURLWithPath: LMMgr.dataFolderPath(isDefaultFolder: false))
+              url: URL(fileURLWithPath: LXMgr.dataFolderPath(isDefaultFolder: false))
             )
           }
         )
         .nulled(silentMode)
       NSMenu.Item("i18n:Menu.OpenAppSupportFolder")?
-        .act(register { FileOpenMethod.finder.open(url: LMMgr.appSupportURL) })
+        .act(register { FileOpenMethod.finder.open(url: LXMgr.appSupportURL) })
         .alternated().nulled(silentMode)
       NSMenu.Item("i18n:Menu.EditVChewingUserPhrases")?
         .act(
           register {
-            LMMgr.openUserDictFile(
+            LXMgr.openUserDictFile(
               type: .thePhrases,
               dual: self.optionKeyPressed,
               alt: self.optionKeyPressed
@@ -411,11 +411,11 @@ extension IMEMenuSputnik {
         )
         .nulled(silentMode)
       NSMenu.Item("i18n:Menu.ReloadUserPhrases")?
-        .act(register { LMMgr.initUserLangModels() })
+        .act(register { LXMgr.initUserLexicons() })
       NSMenu.Item("i18n:Menu.EditExcludedPhrases")?
         .act(
           register {
-            LMMgr.openUserDictFile(
+            LXMgr.openUserDictFile(
               type: .theFilter,
               dual: self.optionKeyPressed,
               alt: self.optionKeyPressed
@@ -429,15 +429,15 @@ extension IMEMenuSputnik {
       NSMenu.Item("i18n:Menu.OptimizeMemorizedPhrases")?
         .act(
           register {
-            LMMgr.removeUnigramsFromPerceptionOverrideModel(IMEApp.currentInputMode)
-            LMMgr.removeUnigramsFromPerceptionOverrideModel(IMEApp.currentInputMode.reversed)
+            LXMgr.removeUnigramsFromPerceptionOverrideModel(IMEApp.currentInputMode)
+            LXMgr.removeUnigramsFromPerceptionOverrideModel(IMEApp.currentInputMode.reversed)
           }
         )
       NSMenu.Item("i18n:Menu.ClearMemorizedPhrases")?
         .act(
           register {
-            LMMgr.clearPerceptionOverrideModelData(IMEApp.currentInputMode)
-            LMMgr.clearPerceptionOverrideModelData(IMEApp.currentInputMode.reversed)
+            LXMgr.clearPerceptionOverrideModelData(IMEApp.currentInputMode)
+            LXMgr.clearPerceptionOverrideModelData(IMEApp.currentInputMode.reversed)
           }
         )
         .alternated()

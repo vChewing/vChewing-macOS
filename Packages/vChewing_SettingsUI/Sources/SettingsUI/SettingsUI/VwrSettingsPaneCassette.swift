@@ -95,7 +95,7 @@ public struct VwrSettingsPaneCassette: View {
         maxHeight: CtlSettingsUI.contentMaxHeight
       )
       .alert(
-        "i18n:LMMgr.accessFailure.cassette.title".i18n,
+        "i18n:LXMgr.accessFailure.cassette.title".i18n,
         isPresented: $isShowingCassetteError
       ) {
         Button("i18n:Common.OK".i18n, role: .cancel) {}

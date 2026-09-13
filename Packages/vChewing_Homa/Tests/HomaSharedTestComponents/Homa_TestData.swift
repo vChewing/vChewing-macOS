@@ -3,12 +3,12 @@
 // This code is released under the SPDX-License-Identifier: `BSD-3-Clause`.
 
 public enum HomaTests {
-  public static let strLMStressData = """
+  public static let strLXStressData = """
   sheng1-sheng1 聲聲 -5.506
   sheng1 聲 -5.246
   """
 
-  public static let strLMSampleDataHutao = """
+  public static let strLXSampleDataHutao = """
   you1 優 -5.321
   you1 憂 -5.363
   you1 幽 -5.545
@@ -162,7 +162,7 @@ public enum HomaTests {
   fang1 鈁 -8.941
   """
 
-  public static let strLMSampleDataLitch = """
+  public static let strLXSampleDataLitch = """
   chao1 超 -5.17
   chao1 鈔 -5.33
   chao1 抄 -5.342
@@ -314,7 +314,7 @@ public enum HomaTests {
   ji1 枝 -9.543
   """
 
-  public static let strLMSampleDataEmoji = """
+  public static let strLXSampleDataEmoji = """
   shu4 🌳 -11
   da4-shu4 🌳 -11
   xin1-de5 🆕 -11
@@ -398,7 +398,7 @@ public enum HomaTests {
   feng1 渢 -8.64
   """
 
-  public static let strLMSampleDataTechGuarden = """
+  public static let strLXSampleDataTechGuarden = """
   ke1 顆 -5.227
   ke1 科 -5.254
   ke1 棵 -5.263
@@ -519,7 +519,7 @@ public enum HomaTests {
   yuan2 洹 -9.543
   """
 
-  public static let strLMSampleDataFruitJuice = """
+  public static let strLXSampleDataFruitJuice = """
   shui3-guo3-zhi1 水果汁 -7.04
   shui3 水 -5.184
   shui3 💦 -11
@@ -561,7 +561,7 @@ public enum HomaTests {
   zhi1 zhi1 -8.941
   """
 
-  public static let strLMSampleDataTrailblazing = """
+  public static let strLXSampleDataTrailblazing = """
   suo3 所 -3.2
   suo3 索 -6.1
   wei4 謂 -3.8
@@ -625,7 +625,7 @@ public enum HomaTests {
   """
 
   // 再創世的凱歌（再創紀の凱歌）
-  public static let strLMSampleData_SaisoukiNoGaika = """
+  public static let strLXSampleData_SaisoukiNoGaika = """
   zai4 再 -5.005
   zai4 在 -5.005
   zai4 載 -5.165
@@ -695,7 +695,7 @@ public enum HomaTests {
   kai3-ge1 愷歌 -9.316
   """
 
-  public static let strLMSampleData_BusinessEnglishSession = """
+  public static let strLXSampleData_BusinessEnglishSession = """
   hua4 話 -5.29
   hua4 畫 -5.52
   hua4 化 -5.247
@@ -822,7 +822,7 @@ public enum HomaTests {
   yu3-hui4 語彙 -5.224
   """
 
-  public static let strLMSampleData_DiJiaoSubmission = """
+  public static let strLXSampleData_DiJiaoSubmission = """
   di4 地 -5.101
   di4 第 -5.101
   di4 帝 -5.248
@@ -867,7 +867,7 @@ public enum HomaTests {
   jiao1 鵁 -8.558
   """
 
-  public static let strLMSampleData_JiHuQiKeng = """
+  public static let strLXSampleData_JiHuQiKeng = """
   keng1 坑 -5.251
   keng1 傾 -5.575
   keng1 吭 -6.05

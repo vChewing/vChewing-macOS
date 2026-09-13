@@ -37,8 +37,8 @@ spmClean:
 		fi; \
 	done;
 
-spmLinuxTest-Typewriter:
-	docker run --rm -v '$(shell pwd):/workspace' -w /workspace/Packages/vChewing_Typewriter swift:latest swift test --filter InputHandlerTests
+spmLinuxTest-OSNeutralAssembly:
+	docker run --rm -v '$(shell pwd):/workspace' -w /workspace/Packages/vChewing_OSNeutralAssembly swift:latest swift test --filter InputHandlerTests
 
 # ── App Bundle Assembly (via SwiftPM CommandPlugin) ──────────────────
 
@@ -238,7 +238,7 @@ gc:
 
 test:
 	swift test
-	swift test --package-path ./Packages/vChewing_Typewriter
+	swift test --package-path ./Packages/vChewing_OSNeutralAssembly
 
 xcode-test:
 	xcodebuild -project vChewing.xcodeproj -scheme vChewing -configuration Debug test

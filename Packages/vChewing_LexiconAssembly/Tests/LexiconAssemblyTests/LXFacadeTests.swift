@@ -1,0 +1,329 @@
+// (c) 2021 and onwards The vChewing Project (MIT-NTL License).
+// ====================
+// This code is released under the MIT license (SPDX-License-Identifier: MIT)
+
+import Homa
+import Testing
+
+@testable import LexiconAssembly
+import LXAssemblyMaterials4Tests
+
+@Suite(.serialized)
+struct LXFacadeTests {
+  @Test
+  func testReplaceDataSavesToCorrectStore() {
+    defer {
+      LXAssembly.LXFacade.disconnectFactoryDictionary()
+    }
+    let lxFacade = LXAssembly.LXFacade()
+    let sample = "foo bar\n"
+
+    lxFacade.replaceData(textData: sample, for: .thePhrases, save: true)
+    #expect(lxFacade.retrieveData(from: .thePhrases).contains("foo bar"))
+
+    lxFacade.replaceData(textData: sample, for: .theFilter, save: true)
+    #expect(lxFacade.retrieveData(from: .theFilter).contains("foo bar"))
+
+    lxFacade.replaceData(textData: sample, for: .theReplacements, save: true)
+    #expect(lxFacade.retrieveData(from: .theReplacements).contains("foo bar"))
+
+    lxFacade.replaceData(textData: sample, for: .theAssociates, save: true)
+    #expect(lxFacade.retrieveData(from: .theAssociates).contains("foo bar"))
+
+    lxFacade.replaceData(textData: sample, for: .theSymbols, save: true)
+    #expect(lxFacade.retrieveData(from: .theSymbols).contains("foo bar"))
+  }
+
+  @Test
+  func testAssociatedCandidateFacadePreservesExpansionAndDedupOrder() {
+    defer {
+      LXAssembly.LXFacade.disconnectFactoryDictionary()
+    }
+    let lxFacade = LXAssembly.LXFacade()
+    lxFacade.replaceData(
+      textData: """
+      (ㄉㄢˋ-ㄍㄠ,蛋糕) 起司蛋糕 泡芙
+      蛋糕 泡芙 布丁
+      糕 布丁 年糕
+      """,
+      for: .theAssociates,
+      save: false
+    )
+
+    let pair = Homa.CandidatePair(keyArray: ["ㄉㄢˋ", "ㄍㄠ"], value: "蛋糕")
+    let expectedValues = ["起司蛋糕", "泡芙", "布丁", "年糕"]
+
+    #expect(lxFacade.lxQuerier.associatedCandidates(forPairs: [pair]).map(\.value) == ["起司蛋糕", "泡芙", "布丁"])
+
+    let expanded = lxFacade.lxQuerier.associatedCandidates(forPair: pair)
+    #expect(expanded.map(\.value) == expectedValues)
+    #expect(expanded.allSatisfy { $0.keyArray == [""] })
+  }
+
+  @Test
+  func testCleanupInputTokenHashMapRemovesToTargetSize() {
+    defer {
+      LXAssembly.LXFacade.disconnectFactoryDictionary()
+    }
+    let instance = LXAssembly.LXFacade()
+    // Create 3500 dummy hashes
+    instance.inputTokenHashesArray = Set((0 ..< 3_500).map { $0 })
+    // Trigger cleanup via a simple unigram query
+    _ = instance.unigramsFor(keyArray: ["ㄎㄜ"])
+    #expect(instance.inputTokenHashesArray.isEmpty)
+  }
+
+  @Test
+  func testQueryUserAddedKanjiByAPI() throws {
+    defer {
+      LXAssembly.LXFacade.disconnectFactoryDictionary()
+    }
+    let instance = LXAssembly.LXFacade()
+    LXAssembly.LXFacade.connectToTestFactoryDictionary(textMapData: LXATestsData.textMapTestCoreLXData)
+    let testSingleCharUnigramSymbol = "・"
+    let testReading = "ㄌㄧㄣ"
+    let testReadingArray = [testReading]
+    instance.insertTemporaryData(
+      unigram: .init(
+        keyArray: testReadingArray,
+        value: testSingleCharUnigramSymbol
+      ),
+      isFiltering: false
+    )
+    do {
+      let subQueried1 = instance.lxUserPhrases.unigramsFor(
+        key: testReading,
+        keyArray: testReadingArray,
+        omitNonTemporarySingleCharNonSymbolUnigrams: false
+      ).map(\.current)
+      #expect(subQueried1.contains(testSingleCharUnigramSymbol))
+    }
+    do {
+      let subQueried2 = instance.lxUserPhrases.unigramsFor(
+        key: testReading,
+        keyArray: testReadingArray,
+        omitNonTemporarySingleCharNonSymbolUnigrams: true
+      ).map(\.current)
+      #expect(subQueried2.contains(testSingleCharUnigramSymbol))
+    }
+    do {
+      let queried = instance.unigramsFor(keyArray: testReadingArray)
+      let queriedValues = queried.map(\.current)
+      #expect(queriedValues.contains(testSingleCharUnigramSymbol))
+    }
+  }
+
+  @Test
+  func testQueryUserAddedKanjiByRawString() throws {
+    defer {
+      LXAssembly.LXFacade.disconnectFactoryDictionary()
+    }
+    let instance = LXAssembly.LXFacade()
+    LXAssembly.LXFacade.connectToTestFactoryDictionary(textMapData: LXATestsData.textMapTestCoreLXData)
+    let testSingleCharUnigramSymbol = "・"
+    let testReading = "ㄌㄧㄣ"
+    let testReadingArray = [testReading]
+    let hdr = LXAssembly.LXConsolidator.kPragmaHeader
+    let rawStr = "\(hdr)\n\(testSingleCharUnigramSymbol) \(testReading)\n"
+    instance.lxUserPhrases.replaceData(textData: rawStr)
+    do {
+      let subQueried1 = instance.lxUserPhrases.unigramsFor(
+        key: testReading,
+        keyArray: testReadingArray,
+        omitNonTemporarySingleCharNonSymbolUnigrams: false
+      ).map(\.current)
+      #expect(subQueried1.contains(testSingleCharUnigramSymbol))
+    }
+    do {
+      let subQueried2 = instance.lxUserPhrases.unigramsFor(
+        key: testReading,
+        keyArray: testReadingArray,
+        omitNonTemporarySingleCharNonSymbolUnigrams: true
+      ).map(\.current)
+      #expect(subQueried2.contains(testSingleCharUnigramSymbol))
+    }
+    do {
+      let queried = instance.unigramsFor(keyArray: testReadingArray)
+      let queriedValues = queried.map(\.current)
+      #expect(queriedValues.contains(testSingleCharUnigramSymbol))
+    }
+  }
+
+  @Test
+  func testLXPlainBPMFDataQuery() throws {
+    defer {
+      LXAssembly.LXFacade.disconnectFactoryDictionary()
+    }
+    let instance1 = LXAssembly.LXFacade(isCHS: false).setOptions { config in
+      config.isSCPCEnabled = true
+    }
+    var liu2 = instance1.unigramsFor(keyArray: ["ㄌㄧㄡˊ"]).map(\.current).prefix(3)
+    var bao3 = instance1.unigramsFor(keyArray: ["ㄅㄠˇ"]).map(\.current).prefix(3)
+    var jie2 = instance1.unigramsFor(keyArray: ["ㄐㄧㄝˊ"]).map(\.current).prefix(3)
+    #expect(liu2 == ["劉", "流", "留"])
+    #expect(bao3 == ["保", "寶", "飽"])
+    #expect(jie2 == ["節", "潔", "傑"])
+    let instance2 = LXAssembly.LXFacade(isCHS: true).setOptions { config in
+      config.isSCPCEnabled = true
+    }
+    liu2 = instance2.unigramsFor(keyArray: ["ㄌㄧㄡˊ"]).map(\.current).prefix(3)
+    bao3 = instance2.unigramsFor(keyArray: ["ㄅㄠˇ"]).map(\.current).prefix(3)
+    jie2 = instance2.unigramsFor(keyArray: ["ㄐㄧㄝˊ"]).map(\.current).prefix(3)
+    #expect(liu2 == ["刘", "流", "留"])
+    #expect(bao3 == ["保", "宝", "饱"])
+    #expect(jie2 == ["节", "洁", "杰"])
+  }
+
+  @Test
+  func testETenDOSSequenceLookupStrategySeparatesConfiguredExactAndPartial() {
+    let instance = LXAssembly.LXFacade(isCHS: false)
+    let reading = "ㄅ"
+
+    let exact = instance.lxQuerier.supplementalValues(for: reading, strategy: .exactMatch)
+    let partial = instance.lxQuerier.supplementalValues(for: reading, strategy: .partialMatch)
+
+    #expect(instance.lxQuerier.supplementalValues(for: reading, strategy: .configuredLookup) == exact)
+    #expect(!exact.isEmpty)
+    #expect(Set(partial).isSuperset(of: Set(exact)))
+    #expect(partial.count > exact.count)
+
+    _ = instance.setOptions { config in
+      config.partialMatchEnabled = true
+    }
+
+    #expect(instance.lxQuerier.supplementalValues(for: reading, strategy: .configuredLookup) == partial)
+  }
+
+  @Test
+  func testCassetteQuickSetLookupStrategyPreservesConfiguredBackendDefault() {
+    let originalAsyncLoading = LXAssembly.LXFacade.asyncLoadingUserData
+    LXAssembly.LXFacade.asyncLoadingUserData = false
+    defer {
+      LXAssembly.LXFacade.asyncLoadingUserData = originalAsyncLoading
+      LXAssembly.LXFacade.lxCassette.clear()
+    }
+
+    func fetchQuickSetValues(
+      from instance: LXAssembly.LXFacade,
+      key: String,
+      strategy: LXAssembly.LXFacade.SupplementalLookupStrategy
+    )
+      -> [String] {
+      instance.lxQuerier.cassetteQuickSets(for: key, strategy: strategy)?
+        .split(separator: "\t")
+        .map(\.description) ?? []
+    }
+
+    guard let exactFixturePath = LXATestsData.getCINPath4Tests("cassette_exact_quick", ext: "cin") else {
+      Issue.record("無法存取用以測試的資料。當前嘗試存取的檔案：cassette_exact_quick.cin")
+      return
+    }
+
+    LXAssembly.LXFacade.loadCassetteData(path: exactFixturePath)
+    let instance = LXAssembly.LXFacade()
+    let exactFixtureExact = fetchQuickSetValues(from: instance, key: "a", strategy: .exactMatch)
+    let exactFixtureConfigured = fetchQuickSetValues(from: instance, key: "a", strategy: .configuredLookup)
+    let exactFixturePartial = fetchQuickSetValues(from: instance, key: "a", strategy: .partialMatch)
+
+    #expect(exactFixtureConfigured == exactFixtureExact)
+    #expect(exactFixtureExact == ["工"])
+    #expect(exactFixturePartial.contains("式"))
+    #expect(Set(exactFixturePartial).isSuperset(of: Set(exactFixtureExact)))
+
+    guard let partialFixturePath = LXATestsData.getCINPath4Tests("cassette_partial_quick", ext: "cin") else {
+      Issue.record("無法存取用以測試的資料。當前嘗試存取的檔案：cassette_partial_quick.cin")
+      return
+    }
+
+    LXAssembly.LXFacade.loadCassetteData(path: partialFixturePath)
+    let partialFixtureExact = fetchQuickSetValues(from: instance, key: "a", strategy: .exactMatch)
+    let partialFixtureConfigured = fetchQuickSetValues(from: instance, key: "a", strategy: .configuredLookup)
+    let partialFixturePartial = fetchQuickSetValues(from: instance, key: "a", strategy: .partialMatch)
+
+    #expect(partialFixtureExact == ["工"])
+    #expect(partialFixtureConfigured == partialFixturePartial)
+    #expect(partialFixturePartial == ["工", "式", "芯"])
+  }
+
+  @Test
+  func testUserPhrasePartialMatchViaLXQuerier() throws {
+    defer {
+      LXAssembly.LXFacade.disconnectFactoryDictionary()
+    }
+    let instance = LXAssembly.LXFacade()
+    instance.lxUserPhrases.replaceData(textData: """
+    年終 ㄋㄧㄢˊ-ㄓㄨㄥ -3.0
+    年糕 ㄋㄧㄢˊ-ㄍㄠ -4.0
+    年 ㄋㄧㄢˊ -5.0
+    """)
+
+    // Exact match without partialMatchEnabled
+    let exact = instance.lxQuerier.grams(for: [.singleKey("ㄋㄧㄢˊ")])
+    #expect(exact.map(\.current).contains("年"))
+    #expect(!exact.map(\.current).contains("年終"))
+    #expect(!exact.map(\.current).contains("年糕"))
+
+    // Enable partial match
+    _ = instance.setOptions { config in
+      config.partialMatchEnabled = true
+    }
+
+    let partial = instance.lxQuerier.grams(for: [.singleKey("ㄋㄧㄢˊ")])
+    let partialValues = partial.map(\.current)
+    #expect(partialValues.contains("年"))
+    #expect(partialValues.contains("年終"))
+    #expect(partialValues.contains("年糕"))
+
+    // Verify keyArray is correct for partial match results
+    let nianZhong = partial.first { $0.current == "年終" }
+    #expect(nianZhong?.keyArray == ["ㄋㄧㄢˊ", "ㄓㄨㄥ"])
+  }
+
+  @Test
+  func testUserPhrasePartialMatchRespectsSingleCharCap() throws {
+    defer {
+      LXAssembly.LXFacade.disconnectFactoryDictionary()
+    }
+    let instance = LXAssembly.LXFacade()
+    LXAssembly.LXFacade.connectToTestFactoryDictionary(textMapData: LXATestsData.textMapTestCoreLXData)
+
+    instance.lxUserPhrases.replaceData(textData: """
+    年終 ㄋㄧㄢˊ-ㄓㄨㄥ -3.0
+    年 ㄋㄧㄢˊ -1.0
+    """)
+
+    _ = instance.setOptions { config in
+      config.partialMatchEnabled = true
+    }
+
+    let partial = instance.unigramsFor(keyArray: ["ㄋㄧㄢˊ"], partiallyMatch: true)
+    let nian = partial.first { $0.current == "年" }
+    let nianZhong = partial.first { $0.current == "年終" }
+
+    // Single-char user phrase should be capped near factory top score
+    #expect(nian != nil)
+    // Multi-char partial match should retain original score
+    #expect(nianZhong != nil)
+    #expect(nianZhong?.probability == -3.0)
+  }
+
+  @Test
+  func testPartialAndExactQueriesDoNotShareCacheEntry() throws {
+    defer {
+      LXAssembly.LXFacade.disconnectFactoryDictionary()
+    }
+    let instance = LXAssembly.LXFacade()
+    instance.lxUserPhrases.replaceData(textData: """
+    年終 ㄋㄧㄢˊ-ㄓㄨㄥ -3.0
+    年 ㄋㄧㄢˊ -5.0
+    """)
+
+    _ = instance.unigramsFor(keyArray: ["ㄋㄧㄢˊ"], partiallyMatch: false)
+    let partialAfterExact = instance.unigramsFor(keyArray: ["ㄋㄧㄢˊ"], partiallyMatch: true)
+    #expect(partialAfterExact.map(\.current).contains("年終"))
+
+    _ = instance.unigramsFor(keyArray: ["ㄋㄧㄢˊ"], partiallyMatch: true)
+    let exactAfterPartial = instance.unigramsFor(keyArray: ["ㄋㄧㄢˊ"], partiallyMatch: false)
+    #expect(!exactAfterPartial.map(\.current).contains("年終"))
+  }
+}

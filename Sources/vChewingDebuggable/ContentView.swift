@@ -294,14 +294,14 @@ final class DiagnosticsViewModel {
     UserDefaults.unitTests = .init(suiteName: suiteName)
     UserDefaults.pendingUnitTests = true
     UserDef.resetAll()
-    LMMgr.prepareForUnitTests()
-    LMAssembly.LMInstantiator.asyncLoadingUserData = false
+    LXMgr.prepareForUnitTests()
+    LXAssembly.LXFacade.asyncLoadingUserData = false
     SettingsUIHost.wireUp()
     SessionHost.wireUp()
-    guard let factoryPath = LMMgr.getCoreDictionaryDBPath(factory: true) else {
+    guard let factoryPath = LXMgr.getCoreDictionaryDBPath(factory: true) else {
       throw DiagnosticsError.factoryLexiconNotFound
     }
-    LMMgr.connectCoreDB(dbPath: factoryPath)
+    LXMgr.connectCoreDB(dbPath: factoryPath)
   }
 
   nonisolated private static func privateAnonymousMB() -> Double {

@@ -272,7 +272,7 @@ extension BundleAppsPlugin {
     // the bundles are found when the .app is launched by the system.
     //
     // Exclude build-tool-only bundles that are not needed at runtime.
-    let excludedBundlePrefixes = ["VanguardLexicon_", "LangModelAssembly_"]
+    let excludedBundlePrefixes = ["VanguardLexicon_", "LexiconAssembly_"]
     for bundle in spmBundles {
       let name = bundle.lastPathComponent
       if excludedBundlePrefixes.contains(where: { name.hasPrefix($0) }) { continue }

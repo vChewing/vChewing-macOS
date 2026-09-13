@@ -8,10 +8,10 @@ This handbook briefs AI coding assistants on the vChewing (唯音) macOS reposit
 - **Implementation**: Pure Swift modules layered on AppKit/IMK. C(++)/ObjC(++) bridges exist only where Swift cannot interface directly with legacy assets.
 - **Primary packages**:
   - `vChewing_MainAssembly4Darwin`: IMK front-end (Darwin surface `InputSession_DarwinSurface`, session-controller bindings, `SessionHost` wiring, UI bridges, sandbox glue).
-  - `vChewing_Typewriter`: Typing FSM, session core protocol (`SessionCoreProtocol`), Tekkon integration, user preference wiring, cassette/stroke handling.
+  - `vChewing_OSNeutralAssembly`: Typing FSM, session core protocol (`SessionCoreProtocol`), Tekkon integration, user preference wiring, cassette/stroke handling.
   - `vChewing_Homa`: DAG-DP assembler (sentence assembler) with candidate override, consolidation, revolver, and perception hooks.
   - `vChewing_Tekkon`: Keyboard parsers, Zhuyin/Bopomofo composer, stroke cassette parser, phonabet utilities.
-  - `vChewing_LangModelAssembly`: LM instantiation facade, user phrase memory, perception override, associated phrases.
+  - `vChewing_LexiconAssembly`: LM instantiation facade, user phrase memory, perception override, associated phrases.
   - Shared dependencies (`vChewing_Shared`, `vChewing_SwiftExtension`, `vChewing_OSFrameworkImpl`, etc.) supply utilities, result-builder UI DSL, notifications, and AppKit wrappers.
 - **Lexicon assets**: Provided by remote Swift Package plugin `VanguardTextMapPlugin` (from `vChewing-VanguardLexicon` repository). Compiled factory lexicons (`.txtMap` + `.revlookup` pairs) are injected into `vChewing_MainAssembly4Darwin` during build-time. The runtime backend is `VanguardTrie.TextMapTrie` (sorted-array key index with binary search, on-demand VALUES parsing, bounded parsed-entry cache).
 
@@ -24,17 +24,17 @@ This handbook briefs AI coding assistants on the vChewing (唯音) macOS reposit
   - Universal binary release: `make release` (builds arm64 + x86_64, creates signed .app bundles in `Build/Products/Release/`).
   - Archive with dSYMs: `make archive` (creates `.xcarchive` in Xcode Archives folder).
   - Debug native build: `make debug` (single-arch; `.app` bundles output under `Build/Products/Debug/`).
-  - Package-only tests: `cd Packages/vChewing_Typewriter && swift build && swift test`.
+  - Package-only tests: `cd Packages/vChewing_OSNeutralAssembly && swift build && swift test`.
 - **First-time setup**: `make update` (fetches/generates lexicons) then `make release`.
 
 ## 3. Repository Layout (quick map)
 
 - `Packages/vChewing_MainAssembly4Darwin/.../SessionController/`: IMK-facing Darwin surface. `InputSession_DarwinSurface.swift` holds the IMK entry surface (`init(controller:)`, `recognizedEvents`, `showPreferences`, `handleNSEvent(NSEvent)` conversion, IMKInputController surface, `toggleInputMode` TIS logic); `SessionControllerSputnik.swift` binds `IMKInputSessionController` to the session and forwards callbacks; `SessionHostWiring.swift` wires `SessionHost` closures (called from `MainSputnik4IME.init`).
-- `Packages/vChewing_Typewriter/Sources/Typewriter/InputHandler/`: FSM split across triage, composition, candidate handling, and commissions; `InputHandler.swift` is the concrete handler class.
-- `Packages/vChewing_Typewriter/Sources/Typewriter/Session/`: OS-independent session system — `SessionCoreProtocol` (shared session base protocol with `switchState()`/`resetInputHandler()` defaults), `SessionProtocol` + `InputSession` (the session class), `IMEState` factories / `IMEStateParsed`, `SessionHost` (host-injection point for all OS-dependent actions), `SessionClientProxy` (cross-platform client-proxy abstraction). Darwin-specific behavior lives in MainAssembly4Darwin via `SessionHost` wiring + the Darwin surface.
+- `Packages/vChewing_OSNeutralAssembly/Sources/OSNeutralAssembly/InputHandler/`: FSM split across triage, composition, candidate handling, and commissions; `InputHandler.swift` is the concrete handler class.
+- `Packages/vChewing_OSNeutralAssembly/Sources/OSNeutralAssembly/Session/`: OS-independent session system — `SessionCoreProtocol` (shared session base protocol with `switchState()`/`resetInputHandler()` defaults), `SessionProtocol` + `InputSession` (the session class), `IMEState` factories / `IMEStateParsed`, `SessionHost` (host-injection point for all OS-dependent actions), `SessionClientProxy` (cross-platform client-proxy abstraction). Darwin-specific behavior lives in MainAssembly4Darwin via `SessionHost` wiring + the Darwin surface.
 - `Packages/vChewing_Homa/Sources/Homa/`: Assembler core (`Homa_Assembler.swift`, `Homa_PathFinder.swift`, candidate/consolidation APIs, etc.).
 - `Packages/vChewing_Tekkon/Sources/Tekkon/`: Keyboard parsers, composer, Zhuyin constants.
-- `Packages/vChewing_LangModelAssembly/Sources/LangModelAssembly/`: LM instantiators, perception override, associated phrase derivation.
+- `Packages/vChewing_LexiconAssembly/Sources/LexiconAssembly/`: LM instantiators, perception override, associated phrase derivation.
 - `Packages/vChewing_OSFrameworkImpl/`: AppKit result-builder DSL for SettingsCocoa window, etc.
 - `Packages/vChewing_SettingsUI/`: Preferences UI as a standalone package — SwiftUI `SettingsUI` for macOS 14+ (incl. the phrase editor and the About pane) plus the AppKit `SettingsCocoa` alternate; host actions are injected via `SettingsUIHost` closures (`SettingsUIHostWiring.swift` in MainAssembly).
 - `Packages/vChewing_CandidateWindow/`: The Candidate window.
@@ -45,10 +45,10 @@ This handbook briefs AI coding assistants on the vChewing (唯音) macOS reposit
 ## 4. Runtime Flow & Key Concepts
 
 1. **Event capture**: IMK instantiates `IMKInputSessionController` (`vChewing_IMKUtils`); `SessionControllerSputnik` forwards its NSEvents to the bound `InputSession`, which converts NSEvent→KBEvent (`InputSession_DarwinSurface.handleNSEvent`) and marshals them into `KBEvent` structures for the portable session core.
-2. **FSM triage**: `InputHandler` in Typewriter interprets events, orchestrates Tekkon composer, updates the Homa assembler, and switches `IMEState` instances.
+2. **FSM triage**: `InputHandler` in OSNeutralAssembly interprets events, orchestrates Tekkon composer, updates the Homa assembler, and switches `IMEState` instances.
 3. **Composer**: Tekkon manages Zhuyin/phonetic/stroke buffers, auto-correction, cassette mode, and exposes inline display strings.
 4. **Assembler**: Homa Assembler builds DAG segments, snapshots perception intelligences, exposes candidate / consolidation / revolver APIs, and emits `assembledSentence` for UI rendering.
-5. **Language Models**: `LMAssembly` merges factory lexicons (Vanguard TextMap format, served by `VanguardTrie.TextMapTrie` in the package-local `TrieKit` target), user phrases, exclusion lists, associated phrase suggestions, POM (perception / fading-memory) n-gram statistics, and perception override suggestions.
+5. **Language Models**: `LXAssembly` merges factory lexicons (Vanguard TextMap format, served by `VanguardTrie.TextMapTrie` in the package-local `TrieKit` target), user phrases, exclusion lists, associated phrase suggestions, POM (perception / fading-memory) n-gram statistics, and perception override suggestions.
 6. **UI update**: `InputSession` refreshes candidate window, composition buffer, tooltips, notifications, symbol menu.
 
 Reference `algorithm.md` for the deep algorithm write-up (zh-Hant).
@@ -59,9 +59,9 @@ Reference `algorithm.md` for the deep algorithm write-up (zh-Hant).
 - **UI**: AppKit by default — no Interface Builder nibs/storyboards, and AppKit windows are implemented with the AppKit Result Builder DSL (`vChewing_OSFrameworkImpl`). Exceptions: the SwiftUI settings surface (`vChewing_SettingsUI`, macOS 14+) and the SwiftUI installer app (`vChewing_InstallerAssembly4Darwin`). Keep UI work on the main actor.
 - **Preferences**: Extend `UserDef`, `PrefMgrProtocol`, and `PrefMgr` together. Avoid naked `UserDefaults.standard` access except in constrained scenarios.
 - **User data paths**: Avoid hard-coded user data paths except where necessary in package test targets.
-- **State machine**: Prefer new `IMEState` enum cases and explicit transition APIs over boolean shortcuts. `SessionCoreProtocol` (Typewriter) provides `switchState()`/`resetInputHandler()` default implementations shared by mock tests and production; extend `InputHandlerProtocol` for per-event triage logic.
-- **Conditional APIs**: Guard platform-specific code (`#if canImport(Darwin)`) as needed; keep Linux compatibility in `Typewriter` package and its local dependencies.
-- **Bundle resources**: SPM `#bundle` macro expands to `Bundle.module` from the auto-generated accessor. For packages with runtime resource lookup (e.g., `LangModelAssembly`), use custom `Bundle.currentSPM` accessor that checks `resourceURL` first, then falls back to `bundleURL`. This avoids codesign sand­box violations from files at `.app/` root.
+- **State machine**: Prefer new `IMEState` enum cases and explicit transition APIs over boolean shortcuts. `SessionCoreProtocol` (OSNeutralAssembly) provides `switchState()`/`resetInputHandler()` default implementations shared by mock tests and production; extend `InputHandlerProtocol` for per-event triage logic.
+- **Conditional APIs**: Guard platform-specific code (`#if canImport(Darwin)`) as needed; keep Linux compatibility in `OSNeutralAssembly` package and its local dependencies.
+- **Bundle resources**: SPM `#bundle` macro expands to `Bundle.module` from the auto-generated accessor. For packages with runtime resource lookup (e.g., `LexiconAssembly`), use custom `Bundle.currentSPM` accessor that checks `resourceURL` first, then falls back to `bundleURL`. This avoids codesign sand­box violations from files at `.app/` root.
 - **ObjC(++)/C(+=) style**: Follow Google Style Guide formatting for Objective-C(++) and C(++).
 - **Licensing**: Preserve MIT-NTL banners. Respect LGPL for Homa, Megrez legacy sources (if exists), and Tekkon; avoid mixing incompatible license assets.
 - **Lexicon tooling**: Factory lexicons are compiled by remote `VanguardTextMapPlugin` (Swift Package plugin from `vChewing-VanguardLexicon` repository) and injected into `vChewing_MainAssembly4Darwin` at build-time via SPM build plugins. The runtime backend is `VanguardTrie.TextMapTrie` (sorted-array key index with binary search, on-demand VALUES parsing, bounded parsed-entry cache). Do not modify or commit generated lexicon assets; they are transient build artifacts.
@@ -69,13 +69,13 @@ Reference `algorithm.md` for the deep algorithm write-up (zh-Hant).
 ## 6. Testing Expectations
 
 - Unit tests live alongside each Swift package (`swift test`). Focus on deterministic cases that mirror reported issues.
-- Typewriter and MainAssembly packages host end-to-end style tests; consider snapshotting `PrefMgr` state before/after.
+- OSNeutralAssembly and MainAssembly packages host end-to-end style tests; consider snapshotting `PrefMgr` state before/after.
 - When touching Tekkon or Homa, craft stress tests covering multi-syllable input, perception overrides, cursor edge cases.
 - Use `swift test --filter` to run targeted suites when debugging CI regressions.
 
 ## 7. Contribution Workflow
 
-- **Commit format**: `ModuleName // SubModuleName: Change.` (Conventional Commit semantics kept terse.) Example: `Typewriter // FSM: Fix cursor guard.`
+- **Commit format**: `ModuleName // SubModuleName: Change.` (Conventional Commit semantics kept terse.) Example: `OSNeutralAssembly // FSM: Fix cursor guard.`
 - **Reviews**: Highlight functional impact, state machine ramifications, and test coverage. Mention regression risk if tests are missing.
 - **Dependencies**: Prefer SwiftPM-targeted adjustments. When external patches are unavoidable, document rationale in code comments and PR description.
 - **Installer**: Keep pkg scripts idempotent. `pkgPreInstall.sh` / `pkgPostInstall.sh` must remain sandbox safe.

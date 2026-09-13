@@ -10,7 +10,7 @@ import Foundation
 public protocol HomaTestSuite {}
 
 extension HomaTestSuite {
-  public static func makeAssemblerUsingMockLM() -> Homa.Assembler {
+  public static func makeAssemblerUsingMockLX() -> Homa.Assembler {
     .init(
       gramQuerier: { keyArray in
         let flatKeys = keyArray.map(\.first)
@@ -114,9 +114,9 @@ extension Homa.Assembler {
   }
 }
 
-// MARK: - TestLM
+// MARK: - TestLX
 
-public final class TestLM {
+public final class TestLX {
   // MARK: Lifecycle
 
   public init(

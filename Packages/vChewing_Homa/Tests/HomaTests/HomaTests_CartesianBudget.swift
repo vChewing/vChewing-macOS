@@ -30,9 +30,9 @@ extension HomaTestsRoot {
           mockData += "K\(index)\(letter) 硯 -5.0\n"
         }
       }
-      let mockLM = TestLM(rawData: mockData)
+      let mockLX = TestLX(rawData: mockData)
       let assembler = Homa.Assembler(
-        gramQuerier: { mockLM.queryGrams($0) }
+        gramQuerier: { mockLX.queryGrams($0) }
       )
       let keys: [Homa.PossibleKey] = (1 ... 4).map { index in
         .multipleKeys(variantLetters.map { "K\(index)\($0)" })
@@ -51,9 +51,9 @@ extension HomaTestsRoot {
       for index in 1 ... 7 {
         mockData += "K\(index) 斷 -5.0\n"
       }
-      let mockLM = TestLM(rawData: mockData)
+      let mockLX = TestLX(rawData: mockData)
       let assembler = Homa.Assembler(
-        gramQuerier: { mockLM.queryGrams($0) }
+        gramQuerier: { mockLX.queryGrams($0) }
       )
       let keys: [Homa.PossibleKey] = (1 ... 7).map { .singleKey("K\($0)") }
       try assembler.insertKeys(keys)
@@ -73,9 +73,9 @@ extension HomaTestsRoot {
           mockData += "K\(index)\(letter) 詞 -5.0\n"
         }
       }
-      let mockLM = TestLM(rawData: mockData)
+      let mockLX = TestLX(rawData: mockData)
       let assembler = Homa.Assembler(
-        gramQuerier: { mockLM.queryGrams($0) }
+        gramQuerier: { mockLX.queryGrams($0) }
       )
       let keys: [Homa.PossibleKey] = (1 ... 6).map { index in
         .multipleKeys(variantLetters.map { "K\(index)\($0)" })

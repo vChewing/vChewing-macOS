@@ -7,37 +7,37 @@
 // requirements defined in MIT License.
 
 import Foundation
+import OSNeutralAssembly
 import Shared
 import Shared_DarwinImpl
-import Typewriter
 
 // MARK: - SessionHost 動作依賴注入
 
 extension SessionHost {
-  /// 由宿主（MainAssembly4Darwin）於啟動時呼叫，將 Typewriter 套件
-  /// 所需的宿主服務（LMMgr、IMEApp、Notifier、AppDelegate、SessionUI 等）注入。
+  /// 由宿主（MainAssembly4Darwin）於啟動時呼叫，將 OSNeutralAssembly 套件
+  /// 所需的宿主服務（LXMgr、IMEApp、Notifier、AppDelegate、SessionUI 等）注入。
   public static func wireUp() {
     let host = SessionHost.shared
     // IMEApp 動作依賴。
     host.isKeyboardJIS = { IMEApp.isKeyboardJIS }
     host.buzz = { IMEApp.buzz() }
-    // LMMgr 動作依賴。
-    host.isCoreDBConnected = { LMMgr.isCoreDBConnected }
-    host.syncLMPrefs = { LMMgr.syncLMPrefs() }
-    host.flushTrieCaches = { LMMgr.flushTrieCaches() }
-    host.isStateDataFilterableForMarked = { LMMgr.isStateDataFilterableForMarked($0) }
-    host.savePerceptionOverrideModelData = { LMMgr.savePerceptionOverrideModelData(false) }
-    host.writeUserPhrasesAtOnce = { LMMgr.writeUserPhrasesAtOnce($0, areWeFiltering: $1) }
+    // LXMgr 動作依賴。
+    host.isCoreDBConnected = { LXMgr.isCoreDBConnected }
+    host.syncLMPrefs = { LXMgr.syncLMPrefs() }
+    host.flushTrieCaches = { LXMgr.flushTrieCaches() }
+    host.isStateDataFilterableForMarked = { LXMgr.isStateDataFilterableForMarked($0) }
+    host.savePerceptionOverrideModelData = { LXMgr.savePerceptionOverrideModelData(false) }
+    host.writeUserPhrasesAtOnce = { LXMgr.writeUserPhrasesAtOnce($0, areWeFiltering: $1) }
     host.bleachSpecifiedSuggestions = { targets, headReadings, mode in
       if let headReadings, !headReadings.isEmpty {
-        LMMgr.bleachSpecifiedSuggestions(headReadings: headReadings, mode: mode)
+        LXMgr.bleachSpecifiedSuggestions(headReadings: headReadings, mode: mode)
       } else {
-        LMMgr.bleachSpecifiedSuggestions(targets: targets, mode: mode)
+        LXMgr.bleachSpecifiedSuggestions(targets: targets, mode: mode)
       }
     }
-    host.checkIfPhrasePairExists = { LMMgr.checkIfPhrasePairExists(userPhrase: $0, mode: $1, keyArray: $2) }
-    host.checkIfPhrasePairIsFiltered = { LMMgr.checkIfPhrasePairIsFiltered(userPhrase: $0, mode: $1, keyArray: $2) }
-    host.userDictDataURL = { LMMgr.userDictDataURL(mode: $0, type: $1) }
+    host.checkIfPhrasePairExists = { LXMgr.checkIfPhrasePairExists(userPhrase: $0, mode: $1, keyArray: $2) }
+    host.checkIfPhrasePairIsFiltered = { LXMgr.checkIfPhrasePairIsFiltered(userPhrase: $0, mode: $1, keyArray: $2) }
+    host.userDictDataURL = { LXMgr.userDictDataURL(mode: $0, type: $1) }
     // Notifier 動作依賴。
     host.notify = { Notifier.notify(message: $0) }
     // SpeechSputnik 動作依賴。
@@ -81,8 +81,8 @@ extension SessionHost {
     // UI / Prefs 動作依賴。
     host.ui = { SessionUI.shared }
     host.prefs = { PrefMgr.shared }
-    // LangModel 動作依賴。
-    host.pomDataURL = { LMMgr.perceptionOverrideModelDataURL($0) }
+    // Lexicon 動作依賴。
+    host.pomDataURL = { LXMgr.perceptionOverrideModelDataURL($0) }
     host.validateCandidateKeys = { prefs, keys in
       prefs.validate(candidateKeys: keys)
     }

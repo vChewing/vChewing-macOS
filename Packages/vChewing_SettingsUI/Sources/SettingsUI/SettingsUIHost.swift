@@ -13,7 +13,7 @@ import Foundation
 /// vChewing_SettingsUI 對宿主（MainAssembly4Darwin）的動作依賴注入點。
 ///
 /// 本套件不得依賴 MainAssembly4Darwin；所有需要宿主服務的動作
-/// （LMMgr、SessionUI、AppDelegate、InputSession 等）皆由宿主於啟動時
+/// （LXMgr、SessionUI、AppDelegate、InputSession 等）皆由宿主於啟動時
 /// 以 lambda-expression property assignment 的方式注入到 `SettingsUIHost.shared`。
 /// 未注入的屬性會保持無操作預設值，讓本套件可獨立於宿主被執行檔 bundle 除錯。
 @MainActor
@@ -26,7 +26,7 @@ public final class SettingsUIHost {
 
   public static var shared = SettingsUIHost()
 
-  // MARK: - LMMgr 動作依賴
+  // MARK: - LXMgr 動作依賴
 
   public var dataFolderPath: (_ isDefaultFolder: Bool) -> String = { _ in "" }
   public var cassettePath: () -> String = { "" }
@@ -35,7 +35,7 @@ public final class SettingsUIHost {
   public var checkIfSpecifiedUserDataFolderValid: (_ path: String) -> Bool = { _ in false }
   public var resolveUserSpecifiedURL: (_ url: URL) -> URL = { $0 }
   public var chkUserLMFilesExist: (_ mode: Shared.InputMode) -> Bool = { _ in false }
-  public var initUserLangModels: () -> () = {}
+  public var initUserLexicons: () -> () = {}
   public var connectCoreDB: () -> () = {}
   public var syncLMPrefs: () -> () = {}
   public var loadUserPhraseReplacement: () -> () = {}
@@ -46,21 +46,21 @@ public final class SettingsUIHost {
   public var migrateUserDataFrom: (_ oldPath: String, _ newPath: String) -> Int = { _, _ in 0 }
   public var importYahooKeyKeyUserDictionary: (_ url: URL?) throws -> (totalFound: Int, importedCount: Int)
     = { _ in (0, 0) }
-  public var retrieveData: (_ mode: Shared.InputMode, _ type: LMAssembly.ReplacableUserDataType) -> String
+  public var retrieveData: (_ mode: Shared.InputMode, _ type: LXAssembly.ReplacableUserDataType) -> String
     = { _, _ in "" }
   public var saveData: (
-    _ mode: Shared.InputMode, _ type: LMAssembly.ReplacableUserDataType, _ data: String
+    _ mode: Shared.InputMode, _ type: LXAssembly.ReplacableUserDataType, _ data: String
   )
     -> String = { _, _, data in data }
   public var tagOverrides: (_ text: inout String, _ mode: Shared.InputMode) -> () = { _, _ in }
   public var openPhraseFile: (
-    _ mode: Shared.InputMode, _ type: LMAssembly.ReplacableUserDataType, _ app: FileOpenMethod
+    _ mode: Shared.InputMode, _ type: LXAssembly.ReplacableUserDataType, _ app: FileOpenMethod
   )
     -> () = { _, _, _ in }
 
-  /// 語彙編輯器委派之延遲供應器（宿主注入 `{ LMMgr.shared }`）。
+  /// 語彙編輯器委派之延遲供應器（宿主注入 `{ LXMgr.shared }`）。
   /// 刻意不以值直接注入：`phraseEditorDelegate` 只在詞彙編輯頁（GUI）被使用，
-  /// 沒有必要在程序啟動階段就實體化 `LMMgr.shared`（連帶提早武裝其 KVO 路徑失效觀察器）。
+  /// 沒有必要在程序啟動階段就實體化 `LXMgr.shared`（連帶提早武裝其 KVO 路徑失效觀察器）。
   public var phraseEditorDelegateProvider: (() -> (any PhraseEditorDelegate)?)?
 
   // MARK: - SessionUI / AppDelegate / InputSession 動作依賴
