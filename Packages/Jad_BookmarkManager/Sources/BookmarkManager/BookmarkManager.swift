@@ -1,6 +1,6 @@
 /// Ref: https://stackoverflow.com/a/61695824
 /// License: https://creativecommons.org/licenses/by-sa/4.0/
-/// Further developments are done by (c) 2025 and onwards The vChewing Project (MIT-NTL License).
+/// Further developments are done by (c) 2022 and onwards The vChewing Project (MulanPSL-2.0 License).
 
 #if os(macOS)
   import AppKit

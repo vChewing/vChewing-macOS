@@ -14,7 +14,7 @@
 "i18n:Installer.Continue" = "繼續";
 "i18n:Installer.ContinueInstallation" = "繼續安裝";
 "i18n:installer.DEV_CREW" = "唯音 macOS 程式研發：Shiki Suen。\n前代研發協力者 (v1.x)：Isaac Xen 與 Hiraku Wang。\n唯音詞庫維護：Shiki Suen。\nDAG-DP 組句算法實作：Shiki Suen。";
-"i18n:installer.DISCLAIMER_TEXT" = "補記：1) Homa Compositor (護摩組字引擎)使用 LGPLv3 授權，但對於 Swift 專案中的靜態鏈接之情形有額外准許。2) 唯音輸入法使用了《先鋒語料庫 (Vanguard Corpus)》，該語料庫由多個外部資源資料組成，這些資料的來源在其 GitHub 儲存庫 (`vChewing/vChewing-VanguardLexicon`) 中有列出。先鋒語料庫的資料建置程式藉由 3-Clause BSD 授權釋出。";
+"i18n:installer.DISCLAIMER_TEXT" = "補記：1) 唯音輸入法的核心引擎模組群（含護摩組字引擎 Homa，詳見各模組同捆的 LICENSE）使用 LGPLv3 授權，但對於 Swift 專案中的靜態鏈接之情形有額外准許。2) 唯音輸入法、以及先鋒語料庫的資料建置程式，均以木蘭寬鬆授權條款第 2 版（MulanPSL-2.0）釋出。先鋒語料庫由多個外部資源資料組成，這些資料的來源在其 GitHub 儲存庫 (`vChewing/vChewing-VanguardLexicon`) 中有列出。";
 "i18n:installer.DO_APP_UPGRADE" = "接受並升級";
 "i18n:installer.DONATION_MESSAGE" = "請考慮對敝專案捐贈。詳情：https://vchewing.github.io";
 "i18n:Installer.DownloadMainstreamReleases" = "下載主流版本";
@@ -27,7 +27,7 @@
 "i18n:installer.INSTALLER_APP_TITLE" = "唯音安裝程式";
 "i18n:Installer.InstallFailed" = "安裝失敗";
 "i18n:Installer.LegacyInstallerNotice" = "當前的安裝包所安裝的版本是針對 macOS 10.9 特供的版本，或許也可以在 macOS 10.10 至 macOS 12 Montery 這幾個版本的系統內使用。而主流版本則針對最新的幾版 macOS 開發。";
-"i18n:installer.LICENSE_TITLE" = "麻理去商標授權合約 (MIT-NTL License):";
+"i18n:installer.LICENSE_TITLE" = "木蘭寬鬆授權條款第 2 版 (MulanPSL-2.0 License):";
 "i18n:Installer.PleaseUseMainstreamReleases" = "請就您目前的系統版本使用本產品的主流發行版。";
 "i18n:Installer.QuitInstallation" = "退出安裝程式";
 "i18n:Installer.ReadyToUse" = "唯音輸入法安裝成功。\n\n若是在當前使用者帳戶內首次安裝的話，請重新登入。";

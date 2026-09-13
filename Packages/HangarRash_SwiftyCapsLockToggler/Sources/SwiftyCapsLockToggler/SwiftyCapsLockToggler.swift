@@ -53,7 +53,7 @@ public enum CapsLockToggler: CapsLockTogglerProtocol {
 
 // MARK: - IOKit
 
-// Refactored by Shiki Suen (MIT License)
+// Refactored by Shiki Suen (MulanPSL-2.0 License)
 public enum IOKit {
   public static func handleHIDSystemService(_ taskHandler: @escaping (io_connect_t) -> ()) throws {
     let ioService: io_service_t = IOServiceGetMatchingService(
@@ -75,7 +75,7 @@ public enum IOKit {
 
 // MARK: - Mach
 
-// Refactored by Shiki Suen (MIT License)
+// Refactored by Shiki Suen (MulanPSL-2.0 License)
 public enum Mach {
   public enum KernReturn: Int32, Error {
     case success = 0

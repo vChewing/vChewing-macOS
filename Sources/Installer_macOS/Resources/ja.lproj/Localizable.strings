@@ -14,7 +14,7 @@
 "i18n:Installer.Continue" = "続行";
 "i18n:Installer.ContinueInstallation" = "このまま実装し続く";
 "i18n:installer.DEV_CREW" = "macOS 版唯音の開発：Shiki Suen。\n先代開発協力者 (v1.x)：Isaac Xen と Hiraku Wang。\n唯音語彙データの維持：Shiki Suen。\nDAG-DP センテンス構築算法実作：Shiki Suen。";
-"i18n:installer.DISCLAIMER_TEXT" = "補記：1) Homa Compositor はLGPLv3ライセンスを使用していますが、Swift プロジェクトでの静的リンクは例外として許容します。2) 唯音入力アプリは、複数の外部リソースからのデータで構成される Vanguard Corpus を使用しており、これらのリソースはGitHubリポジトリ（`vChewing/vChewing-VanguardLexicon`）にクレジットされています。Vanguard Corpusのデータコンパイラは、3-Clause BSDライセンスでリリースします。";
+"i18n:installer.DISCLAIMER_TEXT" = "補記：1) 唯音入力アプリの中核エンジンモジュール群（護摩組字エンジン Homa などを含む。各モジュールに同梱の LICENSE を参照）は LGPLv3 ライセンスを使用していますが、Swift プロジェクトでの静的リンクは例外として許容します。2) 唯音入力アプリ、および Vanguard Corpus のデータコンパイラは、木蘭寛容許諾文書 第2版（MulanPSL-2.0）でリリースします。Vanguard Corpus は複数の外部リソースからのデータで構成されており、それらのリソースは GitHub リポジトリ（`vChewing/vChewing-VanguardLexicon`）にクレジットされています。";
 "i18n:installer.DO_APP_UPGRADE" = "承認と更新";
 "i18n:installer.DONATION_MESSAGE" = "ご寄付をご検討ください。関連情報：https://vChewing.github.io";
 "i18n:Installer.DownloadMainstreamReleases" = "主流発行版を取る";
@@ -27,7 +27,7 @@
 "i18n:installer.INSTALLER_APP_TITLE" = "唯音入力 実装用アプリ";
 "i18n:Installer.InstallFailed" = "実装失敗。";
 "i18n:Installer.LegacyInstallerNotice" = "今の実装アプリで実装するバージョンは、macOS 10.9 のために作ったバージョンです。多分 macOS 10.10 から macOS 12 Monterey までの macOS バージョンでも使えます。一方、このアプリの主流発行版は、そのあとの macOS バージョンのために開発したものである。";
-"i18n:installer.LICENSE_TITLE" = "ＭＩＴ商標不許可ライセンス (MIT-NTL License):";
+"i18n:installer.LICENSE_TITLE" = "木蘭寛容許諾文書 第2版 (MulanPSL-2.0 License):";
 "i18n:Installer.PleaseUseMainstreamReleases" = "このアプリの主流発行版をお用い下さい。";
 "i18n:Installer.QuitInstallation" = "実装をやめる";
 "i18n:Installer.ReadyToUse" = "唯音入力、利用準備完了。\n\nこのシステムユーザーアカウントで初めて実装した場合、再ログインしてください。";

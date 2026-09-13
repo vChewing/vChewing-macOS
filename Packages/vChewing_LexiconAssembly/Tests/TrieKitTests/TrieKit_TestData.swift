@@ -1,6 +1,6 @@
-// (c) 2021 and onwards The vChewing Project (BSD-3-Clause).
+// (c) 2022 and onwards The vChewing Project (MulanPSL-2.0 License).
 // ====================
-// This code is released under the SPDX-License-Identifier: `BSD-3-Clause`.
+// This code is released under the SPDX-License-Identifier: `MulanPSL-2.0`.
 
 /// 針對 Vanguard Trie 以及 Tekkon PinyinTrie 專用的測試資料，故意使用注音索引鍵。
 let strLXSampleDataHutaoZhuyin = """

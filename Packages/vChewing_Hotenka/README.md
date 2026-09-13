@@ -13,6 +13,6 @@ Hotenka Engine is a module made for converting between Simplified Chinese and Tr
 
 ## 著作權 (Credits)
 
-- Swiftified by (c) 2022 and onwards The vChewing Project (MIT-NTL License).
+- Swiftified by (c) 2022 and onwards The vChewing Project (MulanPSL-2.0 License).
   - Swift programmer: Shiki Suen
 - Rebranded from (c) Nick Chen's Obj-C library "NCChineseConverter" (MIT License).

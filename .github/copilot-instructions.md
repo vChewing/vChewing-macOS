@@ -21,7 +21,7 @@ This file provides GitHub Copilot-specific coding instructions. For comprehensiv
 - If you are on Linux or Windows NT, your only workspace is `./Packages/vChewing_OSNeutralAssembly` and its dependencies situated in `./Packages`. If you are on Windows, you can also work with `./Packages/vChewing_MainAssembly4Darwin` and its dependencies situated in `./Packages` folder. Note that the session system (`InputSession`, `SessionProtocol`, `SessionHost`, etc.) now lives in `vChewing_OSNeutralAssembly` — session-involving development is possible on Linux/Windows, with all OS-dependent actions injected via `SessionHost` closures.
 - Lexicon assets are provided by remote Swift Package plugin `VanguardTextMapPlugin` (from `vChewing-VanguardLexicon` repository) and compiled at build-time as `.txtMap` / `.revlookup` pairs, then injected into `vChewing_MainAssembly4Darwin`.
 - Tests are written among local Swift Packages situated in `./Packages/` folder. Tests are usually implemented on a case-by-case basis when an issue case comes out: Write a new test case to confirm the bug exists. 
-- Preserve the existing MIT-NTL license banner on any new source file, except certain local Swift Packages licensed with things other than MIT-NTL.
+- Preserve the existing MulanPSL-2.0 license banner on any new source file, except certain local Swift Packages licensed with things other than MulanPSL-2.0.
 
 ## OS Framework Guidelines
 - All AppKit windows are supposed to be constructed using AppKit Result Builder DSL. You can find its definitions in `./Packages/vChewing_OSFrameworkImpl/`.

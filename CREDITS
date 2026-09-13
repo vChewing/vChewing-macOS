@@ -1,16 +1,10 @@
 The vChewing Input Method is provided under:
 
-	SPDX-License-Identifier: MIT
+	SPDX-License-Identifier: MulanPSL-2.0
 
-with one extra requirements (turning it into MIT-NTL license):
+Being under the terms of the MulanPSL-2.0 License only, according with:
 
-	No trademark license is granted to use the trade names, trademarks, 
-	service marks, or product names of Contributor, except as required 
-	to fulfill notice requirements above.
-
-Being under the terms of the MIT-NTL License only, according with:
-
-	./LICENSES.txt
+	./LICENSE.txt
 
 Please see:
 

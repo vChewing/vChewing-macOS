@@ -1,6 +1,6 @@
-// (c) 2026 and onwards The vChewing Project (MIT License).
+// (c) 2022 and onwards The vChewing Project (MulanPSL-2.0 License).
 // ====================
-// This code is released under the MIT license (SPDX-License-Identifier: MIT)
+// This code is released under the SPDX-License-Identifier: `MulanPSL-2.0`.
 
 @_exported import IMKSwiftModernHeaders
 

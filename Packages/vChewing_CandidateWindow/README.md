@@ -18,11 +18,7 @@ TDK 選字窗會在 macOS 10.15 與 macOS 11 系統下有下述特性折扣：
   - 原因：與該特性有關的幾個關鍵 API 都是 macOS 12 開始才有的 API。
 
 ```
-// (c) 2021 and onwards The vChewing Project (MIT-NTL License).
+// (c) 2022 and onwards The vChewing Project (MulanPSL-2.0 License).
 // ====================
-// This code is released under the MIT license (SPDX-License-Identifier: MIT)
-// ... with NTL restriction stating that:
-// No trademark license is granted to use the trade names, trademarks, service
-// marks, or product names of Contributor, except as required to fulfill notice
-// requirements defined in MIT License.
+// This code is released under the SPDX-License-Identifier: `MulanPSL-2.0`.
 ```
