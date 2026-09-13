@@ -152,5 +152,27 @@ extension POMTestSuite {
       #expect(afterSuggestions2 != nil)
       #expect(afterSuggestions2?.first?.value == candidate)
     }
+
+    @Test
+    func testBleachSpecifiedSuggestionsByHeadReading() throws {
+      let pom = LXAssembly.LXPerceptor(capacity: 10)
+      let timestamp = Date.now.timeIntervalSince1970
+
+      // 兩筆記憶的上下文相同，僅 head reading 不同。
+      let headReading = "ㄍㄡˇ"
+      let key = "(ㄕㄤˋ-ㄒㄧㄚˋ-ㄨㄣˊ,上下文)&(ㄊㄡˊ,頭)&(ㄍㄡˇ,狗)"
+      let otherKey = "(ㄕㄤˋ-ㄒㄧㄚˋ-ㄨㄣˊ,上下文)&(ㄊㄡˊ,頭)&(ㄇㄠ,貓)"
+
+      pom.memorizePerception((ngramKey: key, candidate: "狗"), timestamp: timestamp)
+      pom.memorizePerception((ngramKey: otherKey, candidate: "貓"), timestamp: timestamp)
+
+      pom.bleachSpecifiedSuggestions(headReadingTargets: [headReading])
+
+      // 指定讀音者應被清除；其他讀音者必須原樣保留。
+      #expect(pom.mutLRUMap[key] == nil)
+      #expect(pom.mutLRUMap[otherKey] != nil)
+      #expect(pom.getSuggestion(key: key, timestamp: timestamp + 100) == nil)
+      #expect(pom.getSuggestion(key: otherKey, timestamp: timestamp + 100)?.first?.value == "貓")
+    }
   }
 }

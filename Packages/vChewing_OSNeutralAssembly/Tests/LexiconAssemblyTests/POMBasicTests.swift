@@ -80,6 +80,7 @@ extension POMTestSuite {
       #expect(emptySuggestions == nil)
     }
 
+    @Test
     func testPOM_BS02_NewestAgainstRepeatedlyUsed() throws {
       let pom = LXAssembly.LXPerceptor(
         capacity: capacity,
@@ -117,9 +118,10 @@ extension POMTestSuite {
       #expect(suggested == nil)
     }
 
+    @Test
     func testPOM_BS03_LRUTable() throws {
       let a = (key: "(ㄕㄣˊ-ㄌㄧˇ-ㄌㄧㄥˊ-ㄏㄨㄚˊ,神里綾華)&(ㄉㄜ˙,的)&(ㄍㄡˇ,狗)", value: "狗", head: "ㄍㄡˇ")
-      let b = (key: "(ㄆㄞˋ-ㄇㄥˊ,派蒙)&(ㄉㄜ˙,的)&(ㄐㄧㄤˇ-ㄐㄧㄣ,獎金)", value: "伙食費", head: "ㄏㄨㄛˇ-ㄕˊ-ㄈㄟˋ")
+      let b = (key: "(ㄆㄞˋ-ㄇㄥˊ,派蒙)&(ㄉㄜ˙,的)&(ㄏㄨㄛˇ-ㄕˊ-ㄈㄟˋ,伙食費)", value: "伙食費", head: "ㄏㄨㄛˇ-ㄕˊ-ㄈㄟˋ")
       let c = (key: "(ㄍㄨㄛˊ-ㄅㄥ,國崩)&(ㄉㄜ˙,的)&(ㄇㄠˋ-ㄗ˙,帽子)", value: "帽子", head: "ㄇㄠˋ-ㄗ˙")
       let d = (key: "(ㄌㄟˊ-ㄉㄧㄢˋ-ㄐㄧㄤ-ㄐㄩㄣ,雷電將軍)&(ㄉㄜ˙,的)&(ㄐㄧㄠˇ-ㄔㄡˋ,腳臭)", value: "腳臭", head: "ㄐㄧㄠˇ-ㄔㄡˋ")
 
@@ -178,6 +180,7 @@ extension POMTestSuite {
     }
 
     // 添加一個專門測試長期記憶衰減的測試
+    @Test
     func testPOM_BS04_LongTermMemoryDecay() throws {
       let pom = LXAssembly.LXPerceptor(
         capacity: capacity,
@@ -214,6 +217,7 @@ extension POMTestSuite {
       #expect(pom.getSuggestion(key: contextualKey, timestamp: pastLongWindowTimestamp) == nil)
     }
 
+    @Test
     func testPOM_BS05_BleachUnigramsRemovesDelimitedUnigrams() throws {
       let json = """
       [
@@ -267,6 +271,7 @@ extension POMTestSuite {
       #expect(pom.mutLRUKeySeqList == ["(ㄧ,一)&(ㄎㄞ-ㄕˇ,開始)&(ㄓ,隻)"])
     }
 
+    @Test
     func testPOM_BS06_PerceptionKeyGeneration() throws {
       let nonInterruptionSuffix: [Homa.GramInPath] = [
         ("neng2", "能", -5.36),
@@ -299,6 +304,7 @@ extension POMTestSuite {
       #expect(interruptionResult.headReading == "liu2")
     }
 
+    @Test
     func testPOM_BS07_ParsePerceptionKeyUnigramHasNoContext() throws {
       let pom = LXAssembly.LXPerceptor(dataURL: nullURL)
       guard let parsed = pom.parsePerceptionKey("()&()&(ㄧˋ-ㄧˋ,意譯)") else {
@@ -311,6 +317,7 @@ extension POMTestSuite {
       #expect(parsed.anterior == nil)
     }
 
+    @Test
     func testPOM_BS08_ParsePerceptionKeyContextualParts() throws {
       let pom = LXAssembly.LXPerceptor(dataURL: nullURL)
       let key = "(ㄧ,一)&(ㄎㄞ-ㄕˇ,開始)&(ㄓ,隻)"
@@ -326,6 +333,7 @@ extension POMTestSuite {
       #expect(parsed.anterior?.value == "一")
     }
 
+    @Test
     func testPOM_BS09_IgnoresUnderscorePrefixedReadings() throws {
       let pom = LXAssembly.LXPerceptor(dataURL: nullURL)
       let punctuationKey = "()&()&(_punctuation_|,《》)"
@@ -339,6 +347,7 @@ extension POMTestSuite {
       #expect(pom.getSuggestion(key: dashedKey, timestamp: nowTimeStamp + 1) == nil)
     }
 
+    @Test
     func testPOM_BS10_AlternateKeysDoesNotMatchShortSegments() throws {
       let pom = LXAssembly.LXPerceptor(capacity: 10)
       let now = Date.now.timeIntervalSince1970
@@ -357,6 +366,7 @@ extension POMTestSuite {
       )
     }
 
+    @Test
     func testPOM_BS11_AlternateKeysAllowsPrimaryMatchForSingleSegmentOriginal() throws {
       let pom = LXAssembly.LXPerceptor(capacity: 10)
       let now = Date.now.timeIntervalSince1970
@@ -375,6 +385,7 @@ extension POMTestSuite {
       )
     }
 
+    @Test
     func testPOM_BS12_AlternateKeysRejectsSingleSegmentPrimaryMatchForMultiSegmentOriginal() throws {
       let pom = LXAssembly.LXPerceptor(capacity: 10)
       let now = Date.now.timeIntervalSince1970
@@ -391,6 +402,7 @@ extension POMTestSuite {
       #expect(!fallbacks.contains(candidate))
     }
 
+    @Test
     func testPOM_BS13_AlternateKeysAllowsSingleSegmentPrimaryWhenPreviousMatches() throws {
       let pom = LXAssembly.LXPerceptor(capacity: 10)
       let now = Date.now.timeIntervalSince1970
@@ -409,6 +421,7 @@ extension POMTestSuite {
       )
     }
 
+    @Test
     func testPOM_BS14_GetSuggestionIncludesPreviousField() throws {
       let pom = LXAssembly.LXPerceptor(capacity: 10)
       let now = Date.now.timeIntervalSince1970
